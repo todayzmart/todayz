@@ -33,7 +33,12 @@ export HTTP_PROXY="$proxy" HTTPS_PROXY="$proxy" ALL_PROXY="$proxy"
 export http_proxy="$proxy" https_proxy="$proxy" all_proxy="$proxy"
 export NO_PROXY="localhost,127.0.0.1,::1,.localhost" no_proxy="localhost,127.0.0.1,::1,.localhost"
 export NODE_USE_ENV_PROXY=1
-export GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local GOFLAGS="${GOFLAGS:-} -mod=readonly"
+# GOTOOLCHAIN=auto: use the toolchain go.mod pins (D-88). make setup put it in
+# the module cache; with GOPROXY=off a missing one fails instead of downloading.
+# GOSUMDB stays on: the toolchain is verified against the checksum lookup make
+# setup cached (GOSUMDB=off makes go refuse to switch toolchains); modules are
+# verified against go.sum.
+export GOPROXY=off GOTOOLCHAIN=auto GOFLAGS="${GOFLAGS:-} -mod=readonly"
 export npm_config_offline=true npm_config_update_notifier=false npm_config_proxy="$proxy" npm_config_https_proxy="$proxy"
 export DO_NOT_TRACK=1 ASTRO_TELEMETRY_DISABLED=1 STORYBOOK_DISABLE_TELEMETRY=1 NEXT_TELEMETRY_DISABLED=1
 export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 CHECKPOINT_DISABLE=1 TESTCONTAINERS_RYUK_DISABLED="${TESTCONTAINERS_RYUK_DISABLED:-false}"

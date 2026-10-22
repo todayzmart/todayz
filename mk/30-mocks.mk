@@ -22,6 +22,7 @@ $(MOCKS_BIN): $(MOCKS_SRC)
 .PHONY: setup-mocks check-mocks dev-mocks
 
 setup-mocks:
+	@GOTOOLCHAIN=auto go -C $(MOCKS_DIR) version >/dev/null # fetches the go.mod toolchain (D-88)
 	@go -C $(MOCKS_DIR) mod download
 	@$(MAKE) --no-print-directory $(MOCKS_BIN)
 	@echo "mocks built: .tools/bin/tz-mocks"

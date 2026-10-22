@@ -48,6 +48,10 @@ SELECT 'CREATE DATABASE todayz_test OWNER todayz_owner'
 WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = 'todayz_test')\gexec
 ALTER DATABASE todayz OWNER TO todayz_owner;
 ALTER DATABASE todayz_test OWNER TO todayz_owner;
+-- No temporary tables except for the owner: a temporary table named like a
+-- catalog or app table is how a session shadows unqualified names (W0-03 review B1).
+REVOKE TEMPORARY ON DATABASE todayz FROM PUBLIC;
+REVOKE TEMPORARY ON DATABASE todayz_test FROM PUBLIC;
 
 -- pg_stat_statements is preloaded by the server command line; the copy in the
 -- maintenance DB is what postgres_exporter reads.

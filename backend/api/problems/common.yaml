@@ -1,0 +1,86 @@
+# Problem codes: domain "common" (owner W0-03; 02 §2.6, 04 §1.4, D-24).
+#
+# Each work package adds its codes in its own file, backend/api/problems/<domain>.yaml,
+# with the same shape. A code is unique across all files. `make gen` validates every
+# file and generates backend/gen/problems (Go constants + the embedded registry).
+# A handler may return only a registered code; a refused state change is always
+# invalid_transition.
+#
+#   code    stable snake_case id, sent as "code" and in the type URL
+#   status  HTTP status
+#   i18n    client translation key (problems.<code>)
+#   title   short English title for logs and the "title" field
+domain: common
+problems:
+  - code: validation_failed
+    status: 400
+    i18n: problems.validation_failed
+    title: The request is not valid
+  - code: bad_request
+    status: 400
+    i18n: problems.bad_request
+    title: The request could not be read
+  - code: idempotency_key_required
+    status: 400
+    i18n: problems.idempotency_key_required
+    title: This request needs an Idempotency-Key header
+  - code: idempotency_key_invalid
+    status: 400
+    i18n: problems.idempotency_key_invalid
+    title: The Idempotency-Key header must be a ULID
+  - code: unauthorized
+    status: 401
+    i18n: problems.unauthorized
+    title: Sign in to continue
+  - code: forbidden
+    status: 403
+    i18n: problems.forbidden
+    title: You do not have access to this
+  - code: not_found
+    status: 404
+    i18n: problems.not_found
+    title: Not found
+  - code: method_not_allowed
+    status: 405
+    i18n: problems.method_not_allowed
+    title: Method not allowed
+  - code: conflict
+    status: 409
+    i18n: problems.conflict
+    title: The request conflicts with the current state
+  - code: invalid_transition
+    status: 409
+    i18n: problems.invalid_transition
+    title: This change is not allowed in the current state
+  - code: precondition_failed
+    status: 412
+    i18n: problems.precondition_failed
+    title: The resource changed since you read it
+  - code: payload_too_large
+    status: 413
+    i18n: problems.payload_too_large
+    title: The request body is too large
+  - code: unsupported_media_type
+    status: 415
+    i18n: problems.unsupported_media_type
+    title: Unsupported content type
+  - code: idempotency_mismatch
+    status: 422
+    i18n: problems.idempotency_mismatch
+    title: This Idempotency-Key was used with a different request
+  - code: precondition_required
+    status: 428
+    i18n: problems.precondition_required
+    title: This request needs an If-Match header
+  - code: rate_limited
+    status: 429
+    i18n: problems.rate_limited
+    title: Too many requests
+  - code: internal
+    status: 500
+    i18n: problems.internal
+    title: Something went wrong
+  - code: service_unavailable
+    status: 503
+    i18n: problems.service_unavailable
+    title: The service is not ready

@@ -1,0 +1,184 @@
+// Package queue wraps River (02 §2.6): durable jobs in Postgres, inserted in
+// the same transaction as the change that needs them.
+//
+// The worker process builds a full client from a Registry; the API builds an
+// insert-only client. Domains add their workers and periodic jobs through
+// internal/jobs (one file per domain).
+//
+// Role contract: River's tables are created by the migrations (as
+// todayz_owner); the services run River as todayz_app with DML only. River's
+// reindexer needs table ownership, so it is turned off here.
+package queue
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"log/slog"
+	"sync/atomic"
+	"time"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/riverqueue/river"
+	"github.com/riverqueue/river/riverdriver/riverpgxv5"
+	"github.com/riverqueue/river/rivertype"
+
+	"github.com/todayz/backend/internal/platform/telemetry"
+)
+
+// Client is the River client type the backend uses.
+type Client = river.Client[pgx.Tx]
+
+// JobArgs is river.JobArgs.
+type JobArgs = river.JobArgs
+
+// Worker is river.Worker.
+type Worker[T river.JobArgs] = river.Worker[T]
+
+// Registry collects workers and periodic jobs before the client is built.
+type Registry struct {
+	Workers  *river.Workers
+	Periodic []*river.PeriodicJob
+	kinds    []string
+}
+
+// NewRegistry returns an empty registry.
+func NewRegistry() *Registry { return &Registry{Workers: river.NewWorkers()} }
+
+// Add registers a worker for its job kind.
+func Add[T river.JobArgs](r *Registry, w river.Worker[T]) {
+	river.AddWorker(r.Workers, w)
+	var zero T
+	r.kinds = append(r.kinds, zero.Kind())
+}
+
+// Every adds a periodic job that also runs once when the worker starts.
+func (r *Registry) Every(d time.Duration, args func() river.JobArgs) {
+	r.Periodic = append(r.Periodic, river.NewPeriodicJob(
+		river.PeriodicInterval(d),
+		func() (river.JobArgs, *river.InsertOpts) { return args(), nil },
+		&river.PeriodicJobOpts{RunOnStart: true},
+	))
+}
+
+// Kinds lists the registered job kinds.
+func (r *Registry) Kinds() []string { return append([]string(nil), r.kinds...) }
+
+// Options configure a client.
+type Options struct {
+	Log *slog.Logger
+	// MaxWorkers for the default queue (default 20).
+	MaxWorkers int
+	// Time, when set, is River's clock: the local/test *clock.Offset, so jobs
+	// scheduled for "in 30 minutes" fall due when /v1/test/clock advances.
+	// Nil (staging, prod) means River uses the real and database clocks.
+	Time rivertype.TimeGenerator
+}
+
+func baseConfig(o Options) *river.Config {
+	if o.Log == nil {
+		o.Log = telemetry.Default()
+	}
+	cfg := &river.Config{
+		Logger:              o.Log.With(slog.String("component", "river")),
+		ReindexerIndexNames: []string{}, // needs ownership; todayz_app has DML only
+	}
+	if o.Time != nil {
+		cfg.Test.Time = o.Time
+	}
+	return cfg
+}
+
+// NewWorkerClient returns a client that works jobs (the worker process).
+func NewWorkerClient(pool *pgxpool.Pool, reg *Registry, o Options) (*Client, error) {
+	if o.MaxWorkers <= 0 {
+		o.MaxWorkers = 20
+	}
+	cfg := baseConfig(o)
+	cfg.Queues = map[string]river.QueueConfig{river.QueueDefault: {MaxWorkers: o.MaxWorkers}}
+	cfg.Workers = reg.Workers
+	cfg.PeriodicJobs = reg.Periodic
+	c, err := river.NewClient(riverpgxv5.New(pool), cfg)
+	if err != nil {
+		return nil, fmt.Errorf("queue: %w", err)
+	}
+	return c, nil
+}
+
+// NewInsertClient returns an insert-only client (the API process).
+func NewInsertClient(pool *pgxpool.Pool, o Options) (*Client, error) {
+	c, err := river.NewClient(riverpgxv5.New(pool), baseConfig(o))
+	if err != nil {
+		return nil, fmt.Errorf("queue: %w", err)
+	}
+	return c, nil
+}
+
+// DrainGrace is how long Drain lets running jobs finish, and then how long
+// it waits for cancelled ones to return. The deploy's stop timeout must
+// exceed twice this.
+const DrainGrace = 30 * time.Second
+
+// Start starts c detached from ctx's cancellation (W1). River hard-stops
+// (cancels every running job) when its start context ends, so a SIGTERM that
+// cancels ctx would abort jobs mid-way; Drain stops the client instead.
+func Start(ctx context.Context, c *Client) error {
+	if err := c.Start(context.WithoutCancel(ctx)); err != nil {
+		return fmt.Errorf("queue: start: %w", err)
+	}
+	return nil
+}
+
+// Drain stops c gracefully (W1): no new jobs are fetched, running jobs get up
+// to grace to finish, then the ones still running have their contexts
+// cancelled (StopAndCancel) and get up to grace again to return.
+func Drain(c *Client, grace time.Duration, log *slog.Logger) error {
+	if log == nil {
+		log = telemetry.Default()
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), grace)
+	defer cancel()
+	if err := c.Stop(ctx); err == nil {
+		return nil
+	}
+	log.WarnContext(ctx, "queue: jobs still running after the grace period; cancelling them",
+		slog.Duration("grace", grace))
+	hctx, hcancel := context.WithTimeout(context.Background(), grace)
+	defer hcancel()
+	if err := c.StopAndCancel(hctx); err != nil {
+		return fmt.Errorf("queue: stop and cancel: %w", err)
+	}
+	return nil
+}
+
+// Health tracks whether a worker client is running, for /readyz.
+type Health struct {
+	started atomic.Bool
+	stopped atomic.Bool
+}
+
+// Watch marks h started and watches c until it stops.
+func (h *Health) Watch(c *Client) {
+	h.started.Store(true)
+	go func() {
+		<-c.Stopped()
+		h.stopped.Store(true)
+	}()
+}
+
+// ErrNotRunning is reported by Check for a worker client that stopped.
+var ErrNotRunning = errors.New("queue: river client not running")
+
+// Check reports whether River is usable: its tables answer for this role and,
+// when h watches a worker client, the client is running.
+func Check(ctx context.Context, pool *pgxpool.Pool, h *Health) error {
+	var n int
+	if err := pool.QueryRow(ctx, `SELECT count(*) FROM river_queue`).Scan(&n); err != nil {
+		return fmt.Errorf("queue: river tables: %w", err)
+	}
+	if h != nil && (!h.started.Load() || h.stopped.Load()) {
+		return ErrNotRunning
+	}
+	return nil
+}

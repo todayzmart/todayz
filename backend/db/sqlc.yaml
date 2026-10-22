@@ -1,0 +1,201 @@
+# sqlc (02 §2.2): typed Go from SQL. `make gen` runs it; output in
+# backend/gen/sqlc is generated and not committed.
+#
+# One entry per domain (D-50: a domain WP edits only its own lines and
+# folder): queries in db/queries/<domain>/, generated into package
+# <domain>db at gen/sqlc/<domain>db. The schema is the goose migrations (sqlc
+# reads only the "+goose Up" part). River's tables come from a Go migration,
+# so sqlc does not see them: use the River client, never SQL, for jobs.
+#
+# A nullable timestamptz is a *time.Time (nil for NULL), never a time.Time
+# whose zero value would hide the NULL.
+version: "2"
+sql:
+  # The first entry carries the shared settings (&pkg, &go); every other
+  # entry merges them and sets only its queries, package and out.
+  - &pkg
+    engine: postgresql
+    schema: migrations
+    queries: queries/platform
+    gen:
+      go: &go
+        package: platformdb
+        out: ../gen/sqlc/platformdb
+        sql_package: pgx/v5
+        emit_interface: true
+        emit_empty_slices: true
+        emit_pointers_for_null_types: true
+        overrides:
+          - db_type: uuid
+            go_type: github.com/jackc/pgx/v5/pgtype.UUID
+          - db_type: timestamptz
+            go_type: time.Time
+          - db_type: timestamptz
+            nullable: true
+            go_type:
+              import: time
+              type: Time
+              pointer: true
+          - db_type: jsonb
+            go_type: encoding/json.RawMessage
+  - <<: *pkg
+    queries: queries/identity
+    gen:
+      go:
+        <<: *go
+        package: identitydb
+        out: ../gen/sqlc/identitydb
+  - <<: *pkg
+    queries: queries/business
+    gen:
+      go:
+        <<: *go
+        package: businessdb
+        out: ../gen/sqlc/businessdb
+  - <<: *pkg
+    queries: queries/catalogue
+    gen:
+      go:
+        <<: *go
+        package: cataloguedb
+        out: ../gen/sqlc/cataloguedb
+  - <<: *pkg
+    queries: queries/search
+    gen:
+      go:
+        <<: *go
+        package: searchdb
+        out: ../gen/sqlc/searchdb
+  - <<: *pkg
+    queries: queries/telemetry
+    gen:
+      go:
+        <<: *go
+        package: telemetrydb
+        out: ../gen/sqlc/telemetrydb
+  - <<: *pkg
+    queries: queries/credits
+    gen:
+      go:
+        <<: *go
+        package: creditsdb
+        out: ../gen/sqlc/creditsdb
+  - <<: *pkg
+    queries: queries/orders
+    gen:
+      go:
+        <<: *go
+        package: ordersdb
+        out: ../gen/sqlc/ordersdb
+  - <<: *pkg
+    queries: queries/referrals
+    gen:
+      go:
+        <<: *go
+        package: referralsdb
+        out: ../gen/sqlc/referralsdb
+  - <<: *pkg
+    queries: queries/pos
+    gen:
+      go:
+        <<: *go
+        package: posdb
+        out: ../gen/sqlc/posdb
+  - <<: *pkg
+    queries: queries/notify
+    gen:
+      go:
+        <<: *go
+        package: notifydb
+        out: ../gen/sqlc/notifydb
+  - <<: *pkg
+    queries: queries/reviews
+    gen:
+      go:
+        <<: *go
+        package: reviewsdb
+        out: ../gen/sqlc/reviewsdb
+  - <<: *pkg
+    queries: queries/offers
+    gen:
+      go:
+        <<: *go
+        package: offersdb
+        out: ../gen/sqlc/offersdb
+  - <<: *pkg
+    queries: queries/banners
+    gen:
+      go:
+        <<: *go
+        package: bannersdb
+        out: ../gen/sqlc/bannersdb
+  - <<: *pkg
+    queries: queries/support
+    gen:
+      go:
+        <<: *go
+        package: supportdb
+        out: ../gen/sqlc/supportdb
+  - <<: *pkg
+    queries: queries/payouts
+    gen:
+      go:
+        <<: *go
+        package: payoutsdb
+        out: ../gen/sqlc/payoutsdb
+  - <<: *pkg
+    queries: queries/risk
+    gen:
+      go:
+        <<: *go
+        package: riskdb
+        out: ../gen/sqlc/riskdb
+  - <<: *pkg
+    queries: queries/insights
+    gen:
+      go:
+        <<: *go
+        package: insightsdb
+        out: ../gen/sqlc/insightsdb
+  - <<: *pkg
+    queries: queries/voice
+    gen:
+      go:
+        <<: *go
+        package: voicedb
+        out: ../gen/sqlc/voicedb
+  - <<: *pkg
+    queries: queries/admin
+    gen:
+      go:
+        <<: *go
+        package: admindb
+        out: ../gen/sqlc/admindb
+  - <<: *pkg
+    queries: queries/rollups
+    gen:
+      go:
+        <<: *go
+        package: rollupsdb
+        out: ../gen/sqlc/rollupsdb
+  - <<: *pkg
+    queries: queries/ai
+    gen:
+      go:
+        <<: *go
+        package: aidb
+        out: ../gen/sqlc/aidb
+  - <<: *pkg
+    queries: queries/coach
+    gen:
+      go:
+        <<: *go
+        package: coachdb
+        out: ../gen/sqlc/coachdb
+  - <<: *pkg
+    queries: queries/standee
+    gen:
+      go:
+        <<: *go
+        package: standeedb
+        out: ../gen/sqlc/standeedb

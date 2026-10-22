@@ -1,0 +1,98 @@
+# golangci-lint v2 (W0-03). `make check` runs it after gofmt and go vet.
+# gosec and govulncheck also run as their own steps (check-backend).
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  default: standard # errcheck, govet, ineffassign, staticcheck, unused
+  enable:
+    - bodyclose
+    - copyloopvar
+    - errorlint
+    - forbidigo
+    - gocritic
+    - gosec
+    - misspell
+    - nilerr
+    - noctx
+    - rowserrcheck
+    - sqlclosecheck
+    - unconvert
+    - usestdlibvars
+  settings:
+    gosec:
+      excludes:
+        - G104 # errcheck covers unchecked errors
+    forbidigo:
+      analyze-types: true
+      # Each message starts with a [tag]; the exclusions below lift one tag
+      # per path, so a package excused from the wall clock still may not dial
+      # out or log around the redaction handler.
+      forbid:
+        # Time comes from platform/clock so the test clock (D-80) moves it.
+        - pattern: ^time\.Now$
+          msg: "[time] use the injected clock.Clock (internal/platform/clock)"
+        - pattern: ^time\.Since$
+          msg: "[time] use clock.Clock.Now().Sub"
+        # Outbound HTTP goes through httpx.NewOutboundClient (egress guard).
+        # `http.Client{` literals are refused by a grep step in check-backend
+        # (forbidigo does not see composite literals).
+        - pattern: ^http\.(Get|Post|Head|PostForm)$
+          msg: "[http] use httpx.NewOutboundClient"
+        - pattern: ^http\.(DefaultClient|DefaultTransport)$
+          msg: "[http] use httpx.NewOutboundClient"
+        - pattern: ^net\.Dial(Timeout|TCP|UDP|IP|Unix)?$
+          msg: "[dial] outbound connections go through internal/platform/egress"
+        - pattern: ^tls\.Dial(WithDialer)?$
+          msg: "[dial] outbound connections go through internal/platform/egress"
+        # Logs go through slog with the redaction handler.
+        - pattern: ^(fmt\.Print(f|ln)?|log\.(Print|Fatal|Panic)(f|ln)?)$
+          msg: "[print] use the slog logger (telemetry.Logger(ctx))"
+        - pattern: ^slog\.Default$
+          msg: "[slog] take the logger from ctx (telemetry.Logger) or inject it"
+        - pattern: ^slog\.(Debug|Info|Warn|Error|Log|LogAttrs)(Context)?$
+          msg: "[slog] take the logger from ctx (telemetry.Logger) or inject it"
+  exclusions:
+    generated: strict
+    presets:
+      - std-error-handling
+    paths:
+      - testdata
+    rules:
+      # Tests may read the wall clock, call loopback servers and print, but
+      # still log only through an injected logger.
+      - path: _test\.go
+        linters: [gosec, noctx, bodyclose]
+      - path: _test\.go
+        linters: [forbidigo]
+        text: \[(time|http|dial|print)\]
+      # The clock package is where the wall clock lives; httpx middleware
+      # stamps request times; the egress guard owns dialing; telemetry builds
+      # the default logger; testkit and devtools are build/test tooling; CLIs
+      # print to stdout.
+      - path: internal/platform/(clock|httpx)/
+        linters: [forbidigo]
+        text: \[time\]
+      - path: internal/platform/(egress|telemetry)/
+        linters: [forbidigo]
+      - path: internal/(testkit|devtools)/
+        linters: [forbidigo]
+      - path: cmd/
+        linters: [forbidigo]
+        text: \[print\]
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/todayz/backend
+  exclusions:
+    generated: strict
+    paths:
+      - testdata
