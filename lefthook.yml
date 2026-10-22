@@ -1,4 +1,8 @@
 # Git hooks (W0-01). Installed by `make setup`.
+output:
+  - failure
+  - summary
+
 pre-commit:
   parallel: true
   commands:
