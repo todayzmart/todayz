@@ -25,6 +25,7 @@ The plan is the source of truth. If a step and the plan disagree, the plan wins:
 | [CANCEL-cancellations-disputes.md](CANCEL-cancellations-disputes.md) | Cancels by every actor, partial accept, failed delivery, reviews and reports, support tickets |
 | [OFFER-offers-banners.md](OFFER-offers-banners.md) | Offer kinds, stacking, limits, schedules, banners, moderation |
 | [STOCK-stock-catalogue.md](STOCK-stock-catalogue.md) | Counts, damage, restock, batches, import, voice drafts, bill scan, offline sync conflicts |
+| [INSIGHT-demand-insights.md](INSIGHT-demand-insights.md) ★ | Demand insights card and tab: 11 kinds, sentences, actions that apply nothing, settings, permissions, privacy, "Not useful" |
 | [NOTIFY-notifications.md](NOTIFY-notifications.md) | SMS, WhatsApp, push and inbox through the mocks; opt-outs |
 | [PERM-permissions-matrix.md](PERM-permissions-matrix.md) | Every business and admin role against every action |
 | [SEC-security.md](SEC-security.md) | IDOR, OTP brute force, code reuse, XSS, CSV injection, tokens, headers |
@@ -39,6 +40,10 @@ The plan is the source of truth. If a step and the plan disagree, the plan wins:
 | [FAIL-failure-modes.md](FAIL-failure-modes.md) | Database down mid-checkout, mock errors, clock skew, two tabs, double clicks, back button, refresh, expired session |
 | [end-to-end-acceptance.md](end-to-end-acceptance.md) | A day in the life, from shop onboarding to dashboards, with a sign-off table |
 | [traceability.md](traceability.md) | Every 08 scenario ID and every 01 rule mapped to steps; questions for the lead |
+
+## Book size
+
+Scanned from the files on 2026-10-22: 1102 steps in 31 scripts, 245 of them marked ★. The traceability file maps 264 of 287 08 scenario IDs to steps (255 numbered IDs and 32 SC families; 23 are automated only and say why), all 144 rules, all 67 screens and all 42 problem codes and HTTP statuses. The per-file counts and how the totals were scanned are in [traceability.md](traceability.md) section 1.
 
 ## 1. Set up the local stack
 
@@ -143,6 +148,7 @@ The seed (`make reset`) builds the world below. Where the seed is not built yet,
 | O26 | +91 90000 00026 | Owner of Kaveri Fresh | |
 | O27 | +91 90000 00027 | Owner of Nandi Hardware | |
 | O28 | +91 90000 00028 | Owner of Auto Mart | |
+| M29 | +91 90000 00029 | Owner of Marina Mart (Chennai) | Used only by INSIGHT-M.23, M.25, M.43 and M.44 |
 | N30–N35 | +91 90000 00030–35 | New shop owners | No account |
 | F40 | +91 90000 00040 | Field agent "Rahul" | Onboarded Annapurna Provisions |
 | F41 | +91 90000 00041 | Field agent "Priya" | Onboarded nothing yet |
@@ -155,6 +161,7 @@ The seed (`make reset`) builds the world below. Where the seed is not built yet,
 | SA48 | +91 90000 00048 | Admin role `super_admin` (A) | |
 | SA49 | +91 90000 00049 | Admin role `super_admin` (B) | |
 | D50 | +91 90000 00050 | Admin roles `support` and `catalogue` | Two roles |
+| H01–H11 | +91 90000 00070–80 | Customers of Sri Lakshmi 2 (insights seed) | No wallet, no open orders. H01–H03: 3 purchases in the last 60 days, the last 22, 25 and 30 days ago. H04–H08: 4 purchases, the last 22 to 40 days ago. H09: 4 purchases, the last 20 days ago. H10: 2 purchases, the last 25 days ago. H11 (+91 90000 00080): 4 purchases, the last 3 days ago, a regular who is not slipping. So "regulars slipping away" counts H01–H08 (8). H01–H11 are the only phone-linked customers of Sri Lakshmi 2: 11, one more than `insight_regular_min_linked_customers` (10), so the default does not sit on the boundary; its walk-in sales carry no phone and are not counted. |
 
 ### Stores (Bengaluru unless noted)
 
@@ -163,7 +170,7 @@ Distances are from the **QA point**: PIN 560038, label "Indiranagar, 560038", at
 | Short | Name | State | Distance | Hours (IST) | Fulfilment | Notes |
 |---|---|---|---|---|---|---|
 | SL | Sri Lakshmi (business Lakshmi Traders) | business verified, store live | 0.6 km | 08:00–22:00 daily | pickup and delivery | cashback 500 bp (5%); delivery radius 3 km, fee ₹30, free delivery on ₹500+, minimum ₹150; auto-accept off; live since 2026-01-10 (primary store); 14 items I1–I14 |
-| SL2 | Sri Lakshmi 2 (Lakshmi Traders), HAL 2nd Stage | live | 1.8 km | 08:00–22:00 | pickup only | cashback 0; live since 2026-05-01; 8 items |
+| SL2 | Sri Lakshmi 2 (Lakshmi Traders), HAL 2nd Stage | live | 1.8 km | 08:00–22:00 | pickup only | cashback 0; live since 2026-05-01; 22 items J1–J22 (the insights shop, table below) |
 | AP | Annapurna Provisions | live, business verified 10 days ago | 1.2 km | 09:00–21:00 | pickup only | cashback 0; onboarded by F40; 20 items |
 | NH | Nandi Hardware | live, verified | 0.9 km | 10:00–20:00 | both off ("In-store only") | 15 items |
 | KF | Kaveri Fresh | live, verified | 3.5 km | 07:00–22:00 | delivery only, radius 5 km, fee ₹0, minimum ₹100 | cashback 200 bp; 12 items |
@@ -175,20 +182,31 @@ Distances are from the **QA point**: PIN 560038, label "Indiranagar, 560038", at
 | NI | Store of a business in `needs_info` | business `needs_info` | 1.6 km | | | |
 | SB | Store of a business in `submitted` | business `submitted` | 1.7 km | | | |
 | HY | Hyderabad store | live, verified | about 500 km | 08:00–22:00 | pickup and delivery | second city |
+| MM | Marina Mart (business Marina Traders), Chennai | live, verified | far from every Bengaluru shop | 08:00–22:00 | pickup only | owner M29; 2 items; twelve other live verified stores of twelve different businesses in Chennai (`<seed:price-compare>`) |
 
 So at the QA point, between 10:00 and 20:00 IST: radius 1 km shows 2 shops (SL, NH); 2 km shows 4 (SL, NH, AP, SL2); 5 km shows 6 (adds KF, AM); 20 km shows 6. Shops PS, DS, PR, SS, NI, SB are inside 2 km and must never show (D-40).
+
+For the insights scripts the seed also fixes distances and places every seeded search in a named H3 resolution-8 cell (analytics stores searches as cells, D-81). SL and SL2 lie on opposite sides of the QA point, 0.6 km and 1.8 km from it, so about 2.4 km apart (neither is inside the other's 2 km radius, and the midpoint is 1.2 km from each). AP is 1.2 km from the QA point on the SL2 side: within 1 km of SL2 and within 2 km of SL.
+
+| Cell | Where its centre is | To SL | To SL2 | Counts for | Holds |
+|---|---|---|---|---|---|
+| W | the midpoint of the SL–SL2 line | about 1.2 km | about 1.2 km | SL and SL2 | Horlicks 500 g (12), Bournvita 500 g (9) |
+| S2 | on the SL–SL2 line, 0.2 km beyond SL2 | about 2.6 km | about 0.2 km | SL2 only | Idli rice 1 kg (24), Boost 500 g (11) |
+| M | Chennai, about 0.5 km from MM | not in Bengaluru | not in Bengaluru | MM only | Horlicks 500 g (14) |
+
+Each search is stored with its cell only. When it builds, the seed computes the distance from every cell's centre to the shops and **fails the build, naming the cell, the shop and the distance, if a bound is broken**: a cell meant for one shop is at most 1.5 km from it and at least 2.5 km from the other (S2); a shared cell is at most 1.5 km from both (W); cell M is at most 1.5 km from MM. So every seeded search is at least 0.5 km inside or outside the 2 km radius, never on it.
 
 ### Items at Sri Lakshmi (SL)
 
 | Short | Item | Price | MRP | On hand | Notes |
 |---|---|---|---|---|---|
-| I1 | Amul Butter 100 g | ₹58 | ₹60 | 10 | barcode `8901262010016` |
+| I1 | Amul Butter 100 g | ₹58 | ₹60 | 10 | barcode `8901262010016`; 56 sold in the last 7 days (8 a day, 1.25 days of stock) |
 | I2 | Maggi 2-Minute Noodles 70 g | ₹14 | ₹15 | 50 | barcode `8901058000177` (POS-15) |
 | I3 | Nandini Toned Milk 500 ml | ₹24 | ₹24 | 30 | |
 | I4 | Wheat atta 5 kg | ₹245 | ₹260 | 6 | |
 | I5 | Coca-Cola 750 ml | ₹40 | ₹40 | 12 | |
 | I6 | Dolo 650 strip | ₹30 | ₹32 | 1 | last unit |
-| I7 | Toor dal 1 kg | ₹160 | ₹170 | 8 | stock last updated 73 h ago (stale) |
+| I7 | Toor dal 1 kg | ₹160 | ₹170 | 8 | stock last updated 84 h ago (stale; `stock_stale_after_hours` is 72) |
 | I8 | Curd 400 g (dahi) | ₹35 | ₹35 | 20 | batch of 10 expiring in 3 days |
 | I9 | QA pack ₹99.99 | ₹99.99 | ₹99.99 | 50 | boundary item, 9999 paise |
 | I10 | QA pack ₹100.00 | ₹100.00 | ₹100.00 | 50 | boundary item, 10000 paise |
@@ -197,6 +215,32 @@ So at the QA point, between 10:00 and 20:00 IST: radius 1 km shows 2 shops (SL, 
 | I13 | QA pack ₹120 | ₹120 | ₹120 | 50 | offer "₹21 off" (CR-21) |
 | I14 | QA pack ₹487 | ₹487 | ₹487 | 20 | CR-06 cashback example |
 
+### Items at Sri Lakshmi 2 (SL2), the insights shop
+
+Used by [INSIGHT-demand-insights.md](INSIGHT-demand-insights.md). Dates are for the QA clock (2026-10-22 11:00 IST, a Thursday); `seed test` builds them relative to the test clock.
+
+| Short | Item | Price | On hand | Notes |
+|---|---|---|---|---|
+| J1 | Tata Tea Gold 250 g | ₹145 | 12 | 64 sold in the last 7 days, in 64 bills (9.14 a day), so 1.3 days of stock; in 90 of the 600 bills in the last 60 days |
+| J2 | Curd 200 g | ₹20 | 12 | one batch, expires 23 Oct |
+| J3 | Buttermilk 200 ml | ₹15 | 10 | one batch, expires 24 Oct |
+| J4 | Cheese slices 200 g | ₹120 | 8 | one batch, expires 25 Oct |
+| J5 | Fresh cream 200 ml | ₹55 | 6 | one batch, expires 26 Oct (4 days) |
+| J6 | Paneer 200 g | ₹90 | 10 | two batches: 6 expired on 21 Oct, 4 expire on 28 Oct (6 days) |
+| J7 | Sunflower oil 1 L | ₹140 | 20 | MRP ₹155; two batches: the older costs ₹150, the latest (received later) costs ₹146 |
+| J8 | Mango pickle 500 g | ₹65 | 12 | batch cost ₹40 (₹480 in all); last sale 23 days ago |
+| J9 | Agarbatti pack | ₹30 | 5 | no cost known; last sale 40 days ago |
+| J10 | Papad 200 g | ₹45 | 9 | cost ₹30; last sale 19 days ago |
+| J11 | Idli rice 1 kg | ₹70 | 0 | closes at 0 on 20 and 21 Oct (2 whole days; today does not count); 4 sold, one each on 16, 17, 18 and 20 Oct; 24 nearby searches matched it in the last 7 days, 18 on 20 and 21 Oct and 6 on days it was in stock |
+| J12–J17 | Ragi flour 500 g (₹45), Poha 500 g (₹38), Jaggery 500 g (₹60), Sabudana 500 g (₹55), Vermicelli 400 g (₹40), Rice flour 1 kg (₹60) | as listed | 10 each | last movement (a sale of 1) 9 days ago, so `stock_updated_at` is 9 days ago |
+| J18 | Bread 400 g | ₹45 | 60 | in 84 of the 600 bills in the last 60 days |
+| J19 | Eggs tray 12 | ₹84 | 50 | in 70 bills in the last 60 days; 21 bills hold both J18 and J19 (A is Bread, share 25%, lift 2.14) |
+| J20 | Nandini Toned Milk 500 ml | ₹24 | 120 | in 480 of the 600 bills in the last 60 days (the "milk with everything" decoy); 56 sold in the last 7 days, in 56 bills (8 a day), so 15.0 days of stock |
+| J21 | Parle-G | ₹10 | 80 | in 300 of the 600 bills, 240 of them with J20 (A is milk, share 50%, lift 1.0): must not fire at the default lift; 35 sold in the last 7 days, in 35 bills (5 a day), so 16.0 days of stock |
+| J22 | Salt 1 kg | ₹24 | 30 | MRP ₹28; its latest batch cost is ₹240 (a case price entered as a unit price) |
+
+Rules for this shop: every in-stock item except J12–J17 has `stock_updated_at` at the clock time; J1, J20 and J21 are the only items that sold 5 or more units in the last 7 days (64, 56 and 35), and J20 and J21 hold 15.0 and 16.0 days of stock, so J1 is the only Selling fast row at the default `insight_cover_days` (7) and also at 14; every other item is in fewer than 120 of the 600 bills and the bills are otherwise independent, so no pair other than J18 + J19 and J20 + J21 reaches a 20% share, and at `insight_pair_min_lift_pct` 100 only J20 + J21 joins J18 + J19; no price except J7's is below its latest batch cost, and no batch cost reaches its MRP except J22's; for each item with batches the remaining quantities add up to the on hand shown; no other item, pair or customer meets a kind's rule. Every seeded date and count is at least half a day (or about 5 percent) away from the threshold it tests. Annapurna Provisions (AP) lists Boost 500 g with 8 on hand; no store lists Horlicks 500 g or Bournvita 500 g. Fewer than 10 other live verified stores of distinct businesses are near SL or SL2, so "No shop nearby has it." never shows there.
+
 ## 7. Seed data the book needs
 
 Steps use these placeholders until the seed provides them. The seed WP should create each one with the values in §6.
@@ -204,9 +248,9 @@ Steps use these placeholders until the seed provides them. The seed WP should cr
 | Placeholder | What it must be |
 |---|---|
 | `<seed:customers>` | C01–C19 as in §6, including wallets, lots, strikes, referral and open-order states |
-| `<seed:staff>` | O20, M21, K22, R23, M24, X25, O26, O27, O28 with the roles and store scopes in §6 |
+| `<seed:staff>` | O20, M21, K22, R23, M24, X25, O26, O27, O28, M29 with the roles and store scopes in §6 |
 | `<seed:admins>` | F40, F41, S42, G43, Y44, FN45, FN46, AD47, SA48, SA49, D50 pre-enrolled with TOTP (codes in the mocks "TOTP now" panel), except AD47, who is not enrolled |
-| `<seed:stores>` | SL, SL2, AP, KF, NH, AM, PS, DS, PR, SS, NI, SB, HY as in §6 |
+| `<seed:stores>` | SL, SL2, AP, KF, NH, AM, PS, DS, PR, SS, NI, SB, HY, MM as in §6 |
 | `<seed:items-SL>` | I1–I14 at SL with prices, stock, barcodes, the stale timestamp and the expiring batch |
 | `<seed:offer-I13-21off>` | ₹21 flat offer on I13 at SL, live |
 | `<seed:banner-SL>` | One live banner at SL, headline "Fresh stock every morning", target the I13 offer |
@@ -216,11 +260,14 @@ Steps use these placeholders until the seed provides them. The seed WP should cr
 | `<seed:pending-product>` | One pending master product from SL with a duplicate candidate |
 | `<seed:risk-flags>` | One open flag of each rule kind; the `store_strikes` flag is on Kaveri Fresh |
 | `<seed:tickets>` | One open customer ticket linked to an order, one business ticket |
-| `<seed:wanted-nearby>` | 12 searches for "Horlicks 500 g" within 2 km of SL in the last 7 days, and 9 for "Bournvita 500 g" (below k ≥ 10). SL stocks neither. |
+| `<seed:wanted-nearby>` | 12 searches for "Horlicks 500 g" and 9 for "Bournvita 500 g" (below k ≥ 10) in the last 7 days, all in cell W (§6: about 1.2 km from SL and from SL2), so both shops count them. SL stocks neither, and no store near SL lists either. Fewer than 10 other live verified stores of distinct businesses are near either shop, so the Wanted nearby row never carries "No shop nearby has it." there |
+| `<seed:insights-SL>` | On top of `<seed:history-SL>` (D-99): I1 Amul Butter 100 g sold 56 in the last 7 days (8 a day, 10 on hand, 1.25 days of stock, `high`); I7 Toor dal 1 kg last sold 26 days ago, its latest batch cost ₹128 and its stock was last updated 84 h ago (so Stock check due fires for it alone and customers see "Stock not confirmed recently"); I8 Curd 400 g has one batch of 10 expiring in 3 days. Every other SL item was updated at the clock time. Nothing else at SL meets a kind's rule: every other item sold fewer than 5 units in the last 7 days, no other batch expires within 5 days, no item is at 0 with matching searches, no price is below cost, no pair of items reaches 20 bills together, and no customer with 3 or more purchases in 60 days has been silent for 21 days |
+| `<seed:insights-SL2>` | The item table "Items at Sri Lakshmi 2" above, with the bills, searches and customers behind it: H01–H11 (§6, the only phone-linked customers) with their purchases; 600 bills in the 60-day window, including the Bread and Eggs bills and the Milk and Parle-G decoy; 24 searches for Idli rice 1 kg and 11 for Boost 500 g, both in cell S2 (about 0.2 km from SL2 and about 2.6 km from SL, so they count for SL2 only); Horlicks 500 g and Bournvita 500 g as in `<seed:wanted-nearby>`; Boost 500 g listed at AP with 8 on hand. Batches are received and sold in the order of 03 stock rule 8 (a sale takes unexpired dated batches first, so a sale of Paneer takes the 28 Oct batch, not the expired one), so the batch remainders match the on hand in the table. The rollups (`rollup_item_pairs`, search demand) run at the end of the seed; `rollup_item_pairs` stores every pair with at least `insight_pair_min_bills` bills together, so the decoy J20 + J21 (240 bills together, lift 10000 bp) is stored and appears as soon as `insight_pair_min_lift_pct` is lowered to 100. The seed fails if a cell is outside its distance bounds (§6) Every store other than SL, SL2, AP and MM (Auto Mart included) has no sales history and no search within 2 km, and its items are stamped as updated at the clock time |
+| `<seed:price-compare>` | Marina Mart (MM, Chennai, owner M29) lists Sugar 1 kg at ₹62 and Jaggery 1 kg at ₹95, fresh stock, no sales history. Twelve other live, verified Chennai stores within 2 km of MM, each of a different business ("Chennai Store 01" to "Chennai Store 12"), list Sugar 1 kg, with a median price of ₹58. Nine list Jaggery 1 kg, with a median of ₹90 (under the 10-store floor, D-71). 14 searches for "Horlicks 500 g" were made in the last 7 days, all in cell M (§6: about 0.5 km from MM) and none of the twelve lists it, so M29 sees "No shop nearby has it." (INSIGHT-M.23). `insight_price_compare_enabled` stays false until a step switches it on (Q-52) |
 | `<seed:addresses>` | C11 saved addresses: "Home" 0.6 km from SL and 3.5 km from KF; "Office" 4.0 km from SL and 4.5 km from KF; "Far" 6.0 km from KF |
 | `<seed:payout-history>` | Lakshmi Traders: two months ago a payout was marked paid with UTR `QAUTR0000000001`, so this month opens at ₹0. Kaveri Fresh: last month closed at −₹40 (no payout) |
 | `<seed:month-others>` | Current IST month. Kaveri Fresh: credits in ₹100, cashback −₹20, so it closes at ₹40 (opening −₹40). Auto Mart: credits in ₹50, cashback −₹120, closes at −₹70. Annapurna Provisions: credits in ₹200, cashback 0, closes at ₹200, and no payout details entered (PAN, UPI empty) |
-| `<seed:ai-fixtures>` | Recorded model replies for voice, bill scan, shelf scan, coach and reply drafts, served by the mocks server |
+| `<seed:ai-fixtures>` | Recorded model replies for voice, bill scan, shelf scan, coach, reply drafts and insight wording, served by the mocks server. Insight wording: for the SL "Going to waste" row "Your Curd 400 g expires within 5 days, so a flash offer can save it."; for the SL "Sitting on the shelf" row a sentence that contains ₹999, which is not in the row's facts |
 | `<seed:pseudo>` | Pseudo-locale bundle reachable with `?locale=pseudo` (en-XA, D-87) |
 
 ## 8. Devices

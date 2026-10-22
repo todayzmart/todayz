@@ -232,9 +232,10 @@ Cashier rights are D-06 as amended by D-65: cashiers run orders day to day (acce
 | POST | {S}/items | manager | W1-05 | list a product with price; opening stock writes an `opening` movement |
 | GET | {S}/items/{itemId} | cashier | W1-05 | |
 | PATCH | {S}/items/{itemId} | manager | W1-05 | price and listing need `item.price.edit` |
-| POST | {S}/items/{itemId}/movements | cashier / manager | W1-05 | `{kind, quantity, note}`: `count_correction` needs `stock.count` (cashier+); `restock` needs `stock.restock`, `damage` and `expired` need manager+ (D-06). Other sources (D-01) are written only by their own flows |
+| POST | {S}/items/{itemId}/movements | cashier / manager | W1-05 | `{kind, quantity, note, batchIds?}`: `count_correction` needs `stock.count` (cashier+); `restock` needs `stock.restock`, `damage` and `expired` need manager+ (D-06). Negative movements use up batches by 03 stock rule 8 (D-99): a sale (`sale_pos`, `sale_online`) takes unexpired dated batches first (earliest expiry first), then undated batches, then stock in no batch, and expired batches last; `damage` and a downward `count_correction` take the earliest expiry first. For `expired`, `batchIds` (optional) names the batches being written off instead: one `expired` movement per batch, each for min(the batch's remaining, available left), so the total never exceeds available, and a batch reaches 0 only if all of it was written off (03 stock rule 6; the "Mark expired" action of the insights, D-99). Other sources (D-01) are written only by their own flows |
 | GET | {S}/items/{itemId}/history | cashier | W1-05 | movements |
-| GET/POST | {S}/batches | manager | W1-05 | expiry batches |
+| GET | {S}/batches | manager | W1-05 | expiry batches with remaining quantity, expiry and cost |
+| PATCH | {S}/batches/{batchId} | manager | W1-05 | `{costPaise?, expiresOn?}` and nothing else (`batches.manage`, manager and above; D-99). Corrects what was entered at stock in; `quantity` and `received_quantity` cannot be changed here (that is a stock movement). Audited in `audit_log` with before and after. It re-runs nothing: the next read of insights uses the new cost and expiry. There is no `POST {S}/batches`: batches are created only by stock in and by a positive count (03 stock rule 8) |
 | POST | {S}/item-imports | manager | W1-05 | CSV/XLSX upload → validated preview with row errors |
 | POST | {S}/item-imports/{importId}/apply | manager | W1-05 | writes `import` movements |
 | GET | {S}/catalogue/snapshot | cashier | W1-05 | full snapshot for the offline POS, with the current `catalogue_changes` cursor |
@@ -280,12 +281,27 @@ Cashier rights are D-06 as amended by D-65: cashiers run orders day to day (acce
 | POST/PATCH | {S}/reviews/{reviewId}/reply | manager | W2-06 | one reply, editable |
 | POST | {S}/reviews/{reviewId}/report | manager | W2-06 | |
 | GET | {S}/overview?range= | manager | W3-03 | KPI strip, sales by hour, top items (D-46) |
-| GET | {S}/insights | manager | W3-03 | Demand insights (4 groups) |
+| GET | {S}/insights?all=&kind= | manager | W3-03 | Demand insights (D-99). Default: the B-03 card, top 4 firing rows by severity, one per kind; kinds that do not fire, including kinds below their minimum evidence, are not returned. `all=1`: every firing row, grouped by kind, plus one `needs_data` entry for each kind that has no row and is below its minimum evidence, for the B-12 Insights tab, with the usual `limit` and `cursor` (the same endpoint, no second path). `kind=` limits to one kind. Shape below |
+| POST | {S}/insights/dismiss | manager | W3-03 | "Not useful" on a row: `{kind, subjectRef}`; writes `insight_feedback`; that subject, not the whole kind, stays quiet for that shop for `coach_dismiss_quiet_days` (D-99). `subjectRef` is validated per kind (see the response table): a wrong shape, an item, batch or pair that does not belong to this store, or `store` on a kind that is not store-wide returns `422 validation_failed`; `expired_on_shelf` is refused with `422 validation_failed` too, because it cannot be dismissed. Response `200 { quietUntil }`. A repeat call while the subject is still quiet keeps the existing `quiet_until`. "Idempotent" here means a natural upsert on `(store_id, kind, subject_ref)`; the call takes no `Idempotency-Key` |
 | GET | {S}/analytics?range=&metric= | manager | W3-03 | |
-| GET | {S}/customers | manager | W3-03 | repeat customers (masked) (D-46) |
+| GET | {S}/customers?segment=&cursor= | manager | W3-03 | repeat customers (masked) (D-46). `segment=slipping` returns the regulars behind the "Regulars slipping away" insight (D-99); phones masked as in B-09 (R-16.2) |
 | GET | {S}/coach/cards?status= | manager | W3-11 | coach feed (D-48) |
 | POST | {S}/coach/cards/{cardId}/done | manager | W3-11 | |
 | POST | {S}/coach/cards/{cardId}/dismiss | manager | W3-11 | "Not useful" |
+
+**Demand insights response (D-99).** `GET {S}/insights` returns `{ items: [Insight], nextCursor, period: { days, label: "Last 7 days" } }`. Each `Insight`:
+
+| Field | Meaning |
+|---|---|
+| `kind` | `selling_fast`, `sitting_on_shelf`, `going_to_waste`, `wanted_nearby`, `missed_sales`, `expired_on_shelf`, `selling_below_cost`, `stock_check_due`, `bought_together`, `regulars_slipping`, `priced_above_nearby` |
+| `subjectRef` | Stable id of what the row is about, used by `dismiss`: a `store_item_id` (`selling_fast`, `sitting_on_shelf`, `missed_sales`, `selling_below_cost`, `priced_above_nearby`); the master product id, or `q:` plus the normalised query when no product matches (`wanted_nearby`); a batch id (`going_to_waste`: the earliest-expiring batch in the row; `expired_on_shelf`: its batch, which cannot be dismissed); an item pair `a:b` with item A first (`bought_together`); or `store` (`stock_check_due`, `regulars_slipping`) |
+| `severity` | `high`, `medium` or `low`. `high`: `expired_on_shelf`, `going_to_waste`, `selling_below_cost`, and `selling_fast` when the run-out is within 2 days. `medium`: the other `selling_fast`, `missed_sales`, `stock_check_due`, `regulars_slipping`. `low`: `sitting_on_shelf`, `wanted_nearby`, `bought_together`, `priced_above_nearby`. Inside a severity, kinds go in the kind order of 01 §12; rows of the same kind go by the money or units at stake, larger first |
+| `evidence` | `{ state: "ready" \| "needs_data", needs? }`. `needs_data` entries come only with `all=1` and carry the localisation key and parameters of the "what data it needs" text and no `subjectRef`, no `facts` and no `action`; such a kind never shows a number. `ready` rows are the ones that fire |
+| `facts` | The computed numbers the sentence quotes (for example `soldQty`, `runOutOn`, `searches`, `radiusM`, `noShopNearby: boolean` (true only with at least 10 other live verified stores of distinct businesses in the radius and none stocking it), `expiringCount`, `names[]`, `valueAtCostPaise?`, `staleCount`, `staleAfterHours`, `billsA`, `billsBoth`). Never a competing shop count, another shop's name or a customer's phone |
+| `action` | `{ type, payload }` with `type` one of `restock`, `create_offer`, `flash_offer`, `add_product`, `mark_expired`, `edit_price`, `check_cost`, `count_stock`, `see_customers`. `payload` carries the prefill (the query parameters the screens read are defined once in 06 "Insight deep links"): for `restock` the item and the quantity `ceil(sold × insight_cover_days ÷ insight_period_days) − available`, never below 0; for `create_offer` the item and a % inside the safe limits (AI-R4 may adjust the % and the wording only); for `flash_offer` the batch ids; for `add_product` the master product id or the search text; for `mark_expired` the item and the batch ids, earliest expiry first, each at min(batch remaining, available left) so the total stays within available; for `edit_price` the item and the suggested reference price (the cost rounded up to a whole rupee, never above the MRP); for `check_cost` the item and the batch id (used when the cost is at or above the MRP: the row reads "Check the cost entry for {item}"); it opens the edit form for that batch, which saves with `PATCH {S}/batches/{batchId}`; for `count_stock` the item ids; for `see_customers` the `segment` filter. The client opens the target screen with it. The API applies nothing |
+| `text` | AI-R4 sentence when on and valid (else null; the client renders the template from `facts`) |
+
+Priced above nearby is returned only while `insight_price_compare_enabled` is true. Staff below manager get 403.
 
 **Credits, statements, referrals, standees (`business-credits.yaml`, `referrals.yaml`, `standee.yaml`)**
 
@@ -476,7 +492,7 @@ None. (The shop cancel reason list was settled by D-68: `ShopCancelReason`, 1.5.
 
 ### 2.11 Count
 
-294 method + path pairs in `/v1`, plus 3 health endpoints outside it. By namespace: admin 123 (9 AI; +1 for `GET /v1/admin/field/me/stats`, D-64; +8 jobs and +1 system, D-95, D-97), biz 99 (15 AI), me 43 (6 AI), discover 11, auth 8, public 3, telemetry 3, test 4. Re-checked after the D-61…D-84 follow-ups (2026-10-22): no pair appears twice, no literal segment sits beside a parameter, and `/v1/discover/stores/` has only `{slug}` beneath it. The path lint (1.2) repeats the check on the bundled spec on every `make gen`.
+295 method + path pairs in `/v1`, plus 3 health endpoints outside it. By namespace: admin 123 (9 AI; +1 for `GET /v1/admin/field/me/stats`, D-64; +8 jobs and +1 system, D-95, D-97), biz 100 (15 AI; +1 for `POST {S}/insights/dismiss`, D-99; `GET/POST {S}/batches` became `GET {S}/batches` and `PATCH {S}/batches/{batchId}`, D-99, so the count is unchanged), me 43 (6 AI), discover 11, auth 8, public 3, telemetry 3, test 4. Re-checked after the D-61…D-84 follow-ups (2026-10-22): no pair appears twice, no literal segment sits beside a parameter, and `/v1/discover/stores/` has only `{slug}` beneath it. The path lint (1.2) repeats the check on the bundled spec on every `make gen`.
 
 ## 3. Contract tests
 

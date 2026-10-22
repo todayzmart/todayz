@@ -22,7 +22,7 @@ Each admin screen A-01 to A-22 opened and its main actions run once, as the role
 | ADMIN-M.02 ★ | Open A-02 Pulse, range 7 days. | KPI strip: GMV, orders, success rate, active customers, live stores, new stores. Trend charts, funnel, D7 retention, city map, zero-result searches, stores needing attention. | `R-13.1` A-02 | ▢ | |
 | ADMIN-M.03 | Zoom the A-02 city map into Indiranagar. | Demand heat shows as area cells (H3 resolution 8), never as single points or addresses. No customer name or phone anywhere on Pulse. | `R-16.1` `R-16.3` A-02 | ▢ | |
 | ADMIN-M.04 | Read the zero-result searches list. | Search terms and counts only; no person. A term searched by fewer than 10 people in an area is not shown with its area (record the rule the build applies). | `R-16.3` `R-11.7` | | |
-| ADMIN-M.05 | `set insight_wanted_nearby_radius_m = 500` (AD47; unit meters). As O20 open B-03 → Demand insights → Wanted nearby. Restore 2000. | With 500 m, Horlicks shows only if the cells inside 500 m add up to 10 or more; otherwise no row. At 2000 m: "12 people near you searched for Horlicks 500 g" and no Bournvita row (9). The count is summed over cells first, then k ≥ 10 applies to the total. | `R-16.5` `R-12.8` D-81 B-03 | ▢ | |
+| ADMIN-M.05 | `set insight_wanted_nearby_radius_m = 500` (AD47; unit meters). As O20 open B-03 → Demand insights → Wanted nearby. Restore 2000. | With 500 m, Horlicks shows (as "within 500 m") only if the cells inside 500 m add up to 10 or more; otherwise no row. At 2000 m: "**Horlicks 500 g**: 12 searches within 2 km this week. No shop nearby has it." and no Bournvita row (9). The count is summed over cells first, then k ≥ 10 applies to the total. | `R-16.5` `R-12.8` IN-06 D-81 B-03 | ▢ | |
 
 ### B. Businesses and stores
 

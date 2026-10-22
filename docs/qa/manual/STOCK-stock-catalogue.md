@@ -34,7 +34,7 @@ Stock movements of every source and who may write them, the stock math (on hand 
 | STOCK-M.08 | B-07 filter Low. | I6 Dolo (1 left) is listed; items with 5 or more are not (`low_stock_default` 5). B-03 KPI "items low" counts the same items. | `R-4.7` B-03 B-07 | ▢ | |
 | STOCK-M.09 | M21 counts I5 Coca-Cola to 5, then to 4. | At 5: low (quantity at or below the threshold is low, 01 §4). At 4: low. | `R-4.7` | | |
 | STOCK-M.10 | M21 sets I1's own low-stock threshold to 25 in the item detail. | I1 (19) shows as low. Restore 5. | `R-4.7` | | |
-| STOCK-M.11 ★ | In profile A open I7 Toor dal (last update 73 h ago) on C-07 and C-08. | "Stock not confirmed recently" instead of the freshness line. In search "toor dal", Sri Lakshmi ranks below a store with fresh stock at a similar distance (record order). | `R-4.6` `R-11.5` SC-CT C-07 C-08 | ▢ | |
+| STOCK-M.11 ★ | In profile A open I7 Toor dal (last update 84 h ago) on C-07 and C-08. | "Stock not confirmed recently" instead of the freshness line. In search "toor dal", Sri Lakshmi ranks below a store with fresh stock at a similar distance (record order). | `R-4.6` `R-11.5` SC-CT C-07 C-08 | ▢ | |
 | STOCK-M.12 | K22 counts I7 (8 → 8, "confirm count"). Reload C-08. | "In stock · updated 0 min ago" (or "just now"). B-07 freshness updated. | `R-4.6` B-07 C-08 | | |
 | STOCK-M.13 | `clock +71h59m`. Reload C-08. `clock +2m`. Reload. | At 71 h 59 m: still the freshness line ("updated 71 h ago" or similar). At 72 h 01 m: "Stock not confirmed recently" (`stock_stale_after_hours` 72). | `R-4.6` | ▢ | |
 
@@ -47,7 +47,7 @@ Stock movements of every source and who may write them, the stock math (on hand 
 | STOCK-M.16 | M21 creates a new product "QA Rasam Powder 100 g", barcode of I1 (`8901262010016`), price ₹45, stock 6. | Usable at once in Sri Lakshmi (B-05 and C-07). It lands in G43's A-08 review queue with I1's master product as a duplicate suggestion (same barcode). | `R-4.3` SC-CT A-08 | ▢ | |
 | STOCK-M.17 | M21 opens Import, uploads the 5,000-row fixture. | The validation preview lists all 37 bad rows with row number and reason. Nothing applied yet. | `R-4.4` SC-CT B-07 | ▢ | |
 | STOCK-M.18 | Apply. | 4,963 rows applied. New stock rows show `import` movements. Record the time taken. | `R-4.4` SC-CT | | |
-| STOCK-M.19 | M21 adds a batch to I3: 10 units expiring in 6 days, cost ₹20. Then one expiring in 5 days. Open Overview → Demand insights → Going to waste. | The 5-day batch shows (`insight_expiring_within_days` 5); the 6-day batch does not. I8's 3-day batch shows. | `R-12.8` SC-CT B-03 | ▢ | |
+| STOCK-M.19 | M21 adds a batch to I3: 10 units expiring in 6 days, cost ₹20. Then one expiring in 5 days. Open Overview → Demand insights → Going to waste. | The row reads "**2 items expire within 5 days**: Curd 400 g, Nandini Toned Milk 500 ml." (earliest expiry first). The 5-day batch counts (`insight_expiring_within_days` 5); the 6-day batch does not. **Flash offer →** opens with I8's 3-day batch and the 5-day I3 batch chosen, and the 6-day batch is not listed. | `R-12.8` SC-CT IN-05 B-03 | ▢ | |
 
 ### D. Stock races with customers
 

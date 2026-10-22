@@ -118,7 +118,7 @@ The story uses a new shop, **QA Kirana (QK)**, so its money is exact and separat
 | ACC-42 | Open Grafana dashboards 08 Marketplace health and 10 Retailer health. | QK's orders and acceptance show in the totals. No store id, phone or order id used as a metric label. | OB-11 05 §4 | ▢ | |
 | ACC-43 | Pick one ACC request (the ACC-16 collect), copy its trace id, open it in Tempo, Loki and the metric exemplar. | One trace id across all three. No phone, code or OTP anywhere. | OB-01 OB-02 | | |
 | ACC-44 | Open dashboard 05 Customer app experience and 06 Business app and POS experience for the run's time window. | RUM rows for the run's screens (C-07, C-11, B-05) within 2 minutes of use. | OB-06 | ▢ | |
-| ACC-45 | Open the A-02 city map and B-03 Demand insights for QK. | Searches made in this run appear only as area counts; nothing below 10 people per area is shown. | `R-16.3` `R-16.5` | | |
+| ACC-45 | Open the A-02 city map and B-03 Demand insights for QK. | Searches made in this run appear only as area counts; nothing below 10 people per area is shown. On B-03 a Wanted nearby row shows "N searches within 2 km this week" only when the summed count is 10 or more, and it never names another shop or counts shops. | `R-16.3` `R-16.5` IN-06 IN-20 | | |
 
 ## Cleanup
 

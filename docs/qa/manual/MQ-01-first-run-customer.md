@@ -51,7 +51,7 @@ A new shopper opens the customer app for the first time, picks a language, refus
 | MQ-01.30 | Submit the search. | Results grouped by shop; Sri Lakshmi header shows distance, open state and rating; ProductCard shows ₹58 with MRP ₹60 struck through and a stock tag like "In stock · updated 12 min ago". | `R-11.3` `R-4.6` C-05 | ▢ | |
 | MQ-01.31 ★ | Open Sri Lakshmi from the result. | C-07 shop page: banner carousel above the header with "Fresh stock every morning"; header has name, category, 0.6 km, "Open · 8:00 am – 10:00 pm" (today's hours), rating and count, "5% back", delivery terms (fee ₹30, free delivery on ₹500+, minimum ₹150), call and directions. | `R-12.6` `R-5.29` C-07 | ▢ | |
 | MQ-01.32 | Scroll the shop page. | An "Offers" row with the I13 "₹21 off" offer; in-shop search; category tabs; items with stock and freshness; a reviews tab. | `R-12.5` C-07 | | |
-| MQ-01.33 | Find Toor dal 1 kg (I7, last updated 73 h ago). | Its stock tag reads "Stock not confirmed recently" (`stock_stale_after_hours` = 72). | `R-4.6` C-07 | ▢ | |
+| MQ-01.33 | Find Toor dal 1 kg (I7, last updated 84 h ago). | Its stock tag reads "Stock not confirmed recently" (`stock_stale_after_hours` = 72). | `R-4.6` C-07 | ▢ | |
 | MQ-01.34 | Find Dolo 650 strip (I6, on hand 1). | Shown as in stock with freshness; no stock number above what the shop has. | `R-4.5` C-07 | | |
 | MQ-01.35 ★ | Tap Amul Butter 100 g. | C-08: image, name, pack 100 g, price ₹58, MRP ₹60, stock + freshness, shop name, a quantity stepper and Add to cart. "Other nearby shops" lists any other shop with the same product, with price and distance. | `R-4.1` C-08 | ▢ | |
 | MQ-01.36 | Tap Add to cart, then +1. | CartBar appears at the bottom: 2 items, ₹116. No sign-in prompt. | `R-2.1` C-08 C-09 | ▢ | |

@@ -77,7 +77,7 @@ Every AI feature returns a draft. The tester feeds each one an input that the mo
 | MQ-11.23 ★ | Profile C as M21. Stock → Scan supplier bill (B-17). Upload the QA bill photo. | 3 lines: Amul Butter ×24 cost ₹50 expiry, Curd ×12 cost ₹28 expiry in 3 days, "Tata Salt 1 kg" ×10 highlighted as no match with "Create product". | AI-R2 B-17 | ▢ | |
 | MQ-11.24 | Leave the page without confirming. Open B-07. Then as K22 call `GET {S}/ai/supplier-bill/drafts/<id>`. | Butter and curd on hand unchanged; no new batches. K22 (cashier) cannot read or confirm a supplier-bill draft: record the status (manager feature, 04 §2.8). | 11 §1 rule 1 04 §2.8 B-07 | | |
 | MQ-11.25 | Return to the draft. Change butter to 20. Remove the salt line. Confirm. | Butter +20 (`supplier_bill`) with a batch and expiry; curd +12 with a batch expiring in 3 days. Salt not created. | AI-R2 `R-4.4` E2E-14 B-07 | ▢ | |
-| MQ-11.26 | Open Overview (B-03) Demand insights. | "Going to waste" shows the curd batch expiring in 3 days with a "Create offer ›" action. | E2E-14 `R-12.8` B-03 | ▢ | |
+| MQ-11.26 | Open Overview (B-03) Demand insights. | "Going to waste" reads "**1 item expires within 5 days**: Curd 400 g." (the batch expiring in 3 days) with the action **Flash offer →**. | E2E-14 `R-12.8` IN-05 B-03 | ▢ | |
 | MQ-11.27 | Tap Create offer → a flash offer 20% off curd for today. Publish. In profile A open Sri Lakshmi. | The curd offer shows with the new price. | E2E-14 `R-12.2` C-07 | ▢ | |
 
 ### F. Shelf photo onboarding (AI-R3, B-18)
@@ -100,7 +100,7 @@ Every AI feature returns a draft. The tester feeds each one an input that the mo
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
 | MQ-11.33 | `clock set <tomorrow>T06:00:30+05:30` (the 06:00 coach job). As O20 open Overview. | Up to 3 newest coach cards on top; the feed (B-19) has no more than 5 new cards today (`coach_max_cards_per_day`). Each card has type, title, numbers and one action. | AI-R5 `R-12.8` B-19 | ▢ | |
-| MQ-11.34 | Find the "Wanted nearby" row. | "12 people near you searched for **Horlicks 500 g**" (12 ≥ 10). No row for Bournvita (9 searches, below `insight_min_searches` 10). | `R-16.4` D-71 B-19 | ▢ | |
+| MQ-11.34 | Find the "Wanted nearby" card. | "12 people near you searched for **Horlicks 500 g**" (12 ≥ 10), the same number as the Wanted nearby row on B-03 (one computation, 11 §2.1). No card for Bournvita (9 searches, below `insight_min_searches` 10). | `R-16.4` D-71 B-19 | ▢ | |
 | MQ-11.35 | Tap a card's action (for example Restock). | It opens the restock screen prefilled. Nothing is applied until the person saves. | 11 §2.1 B-19 | | |
 | MQ-11.36 | Mark one card "Not useful". | It leaves the feed; the same topic does not return for 7 days (`coach_dismiss_quiet_days`). | AI-R5 B-19 | | |
 | MQ-11.37 | Sign in as K22 (cashier). | No coach feed (owner and manager only). | B-19 | | |
@@ -119,7 +119,7 @@ Every AI feature returns a draft. The tester feeds each one an input that the mo
 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
-| MQ-11.43 | `set ai_daily_calls_customer = 2`. As C11 run 3 list searches. | Third one refused with a clear message; no model call. `429 ai_daily_cap_reached` with `extensions.scope` `customer`, a `Retry-After` header, and the copy "AI help is paused until tomorrow." The entry point is disabled, with no retry button. | `R-17.3` 11 §1 rule 7 | ▢ | |
+| MQ-11.43 | `set ai_daily_calls_customer = 2`. As C11 run 3 list searches. | Third one refused with a clear message; no model call. `429 ai_daily_cap_reached` with `extensions.scope` `customer`, a `Retry-After` header, and the copy "AI help is paused until tomorrow." The entry point is disabled, with no retry button. | `R-17.3` 11 §1 rule 7 AI-01 | ▢ | |
 | MQ-11.44 | `clock set <tomorrow>T00:00:05+05:30`. Search again. | Allowed again (the cap is per IST day). | `R-17.3` | | |
 | MQ-11.45 | Open Grafana dashboard 14 "AI quality and cost". | Calls by feature (list_search, voice_stock, bill_scan, shelf_photo, review_reply, ticket_triage, catalogue_cleanup, risk_summary, coach), acceptance rate per feature with this run's accepted, edited and discarded drafts, and cost per day. | 05 §4 dashboard 14 | ▢ | |
 | MQ-11.46 | `set ai_daily_cost_cap_paise = 100` (₹1) as SA48. Run list searches until the mock cost passes ₹0.80. | The "AI cost" alert fires at 80% in Grafana alerting (local contact point). At 100%, AI entry points show the "unavailable" state and no further model calls happen until the next IST day. | `R-17.3` D-70 05 §5 | ▢ | |

@@ -102,9 +102,23 @@ const (
 	CreditExpiryReminderDays    Key = "credit_expiry_reminder_days"      // days, default 7
 	ReviewEditWindowDays        Key = "review_edit_window_days"          // days, default 7
 	JobRunsRetentionDays        Key = "job_runs_retention_days"          // days, default 90
+
+	// Added by Demand insights v2 (D-99; seeded by 00011_w0-03_settings_d99.sql)
+	InsightCoverDays                 Key = "insight_cover_days"                   // days, default 7
+	InsightMissedSalesMinZeroDays    Key = "insight_missed_sales_min_zero_days"   // days, default 1
+	InsightMissedSalesMinSearches    Key = "insight_missed_sales_min_searches"    // count, default 10
+	InsightPairMinBills              Key = "insight_pair_min_bills"               // count, default 20
+	InsightPairWindowDays            Key = "insight_pair_window_days"             // days, default 60
+	InsightPairMinShareBp            Key = "insight_pair_min_share_bp"            // bp, default 2000
+	InsightPairMinLiftPct            Key = "insight_pair_min_lift_pct"            // count, default 150
+	InsightRegularMinVisits          Key = "insight_regular_min_visits"           // count, default 3
+	InsightRegularWindowDays         Key = "insight_regular_window_days"          // days, default 60
+	InsightRegularLapseDays          Key = "insight_regular_lapse_days"           // days, default 21
+	InsightRegularMinLinkedCustomers Key = "insight_regular_min_linked_customers" // count, default 10
+	InsightPriceCompareEnabled       Key = "insight_price_compare_enabled"        // bool, default false
 )
 
-// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95).
+// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99).
 var AllKeys = []Key{
 	OrderAcceptTimeoutMin,
 	PickupHoldMin,
@@ -190,4 +204,16 @@ var AllKeys = []Key{
 	CreditExpiryReminderDays,
 	ReviewEditWindowDays,
 	JobRunsRetentionDays,
+	InsightCoverDays,
+	InsightMissedSalesMinZeroDays,
+	InsightMissedSalesMinSearches,
+	InsightPairMinBills,
+	InsightPairWindowDays,
+	InsightPairMinShareBp,
+	InsightPairMinLiftPct,
+	InsightRegularMinVisits,
+	InsightRegularWindowDays,
+	InsightRegularLapseDays,
+	InsightRegularMinLinkedCustomers,
+	InsightPriceCompareEnabled,
 }

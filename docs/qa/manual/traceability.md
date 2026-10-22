@@ -4,21 +4,21 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 
 ## 1. Coverage
 
-- **Steps:** 1049 (236 marked ★ for the production smoke and short runs). The counts in this section were updated by hand for D-95 to D-98 and JOBS; the next full scan regenerates them.
-- **08 scenario IDs:** 231 of 251 covered by manual steps (219 numbered IDs and ranges plus 32 SC families); 20 automated only; 0 not covered.
-- **R-IDs (01):** 144 of 144.
+- **Steps:** 1102 in 31 script files (245 marked ★ for the production smoke and short runs). Counted by scanning every step row of the book.
+- **08 scenario IDs:** 264 of 287 covered by manual steps (255 numbered IDs and ranges plus 32 SC families); 23 automated only; 0 not covered.
+- **R-IDs (01):** 144 of 144 have at least one step (an R-ID is the 01 section number and bullet number, for example R-5.30).
 - **06 screens:** 67 of 67.
-- **Problem codes and HTTP statuses:** 32 of 32 triggered at least once.
+- **Problem codes and HTTP statuses:** 42 of 42 named by at least one step (30 codes registered in 04 §1.4 and 12 HTTP statuses).
 
 | File | Steps |
 |---|---|
 | [MQ-01-first-run-customer.md](MQ-01-first-run-customer.md) | 40 |
 | [MQ-02-order-pickup.md](MQ-02-order-pickup.md) | 57 |
 | [MQ-03-shop-day.md](MQ-03-shop-day.md) | 60 |
-| [MQ-04-delivery.md](MQ-04-delivery.md) | 43 |
+| [MQ-04-delivery.md](MQ-04-delivery.md) | 45 |
 | [MQ-05-onboarding.md](MQ-05-onboarding.md) | 45 |
 | [MQ-06-money-month.md](MQ-06-money-month.md) | 44 |
-| [MQ-07-admin-roles.md](MQ-07-admin-roles.md) | 58 |
+| [MQ-07-admin-roles.md](MQ-07-admin-roles.md) | 57 |
 | [MQ-08-languages.md](MQ-08-languages.md) | 37 |
 | [MQ-09-accessibility.md](MQ-09-accessibility.md) | 34 |
 | [MQ-10-slow-network.md](MQ-10-slow-network.md) | 20 |
@@ -29,6 +29,7 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 | [CANCEL-cancellations-disputes.md](CANCEL-cancellations-disputes.md) | 35 |
 | [OFFER-offers-banners.md](OFFER-offers-banners.md) | 31 |
 | [STOCK-stock-catalogue.md](STOCK-stock-catalogue.md) | 31 |
+| [INSIGHT-demand-insights.md](INSIGHT-demand-insights.md) | 52 |
 | [NOTIFY-notifications.md](NOTIFY-notifications.md) | 32 |
 | [PERM-permissions-matrix.md](PERM-permissions-matrix.md) | 32 |
 | [SEC-security.md](SEC-security.md) | 40 |
@@ -42,7 +43,17 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 | [PERF-performance.md](PERF-performance.md) | 16 |
 | [FAIL-failure-modes.md](FAIL-failure-modes.md) | 20 |
 | [end-to-end-acceptance.md](end-to-end-acceptance.md) | 45 |
-| **Total** | **1049** |
+| **Total** | **1102** |
+
+**Recount, 2026-10-22.** The counts above come from scanning the files, not from adding to the old totals. A step is a table row whose first cell is a step ID (`MQ-NN.nn`, `<AREA>-M.nn`, `ACC-nn`, with an optional letter suffix such as 13a). Where the scan and the earlier stated totals differed:
+
+- MQ-07 was stated as 58 steps. It has 57 rows (there is no MQ-07.08), so the old figure over-counted by 1.
+- MQ-04 was stated as 43 steps. It has 45 rows: the lettered steps MQ-04.13a and MQ-04.13b were not counted, so the old figure under-counted by 2.
+- The stated total of 1015 (before the jobs and insights files) was therefore 1 below the real 1016 (1015 − 1 + 2 = 1016). A scanner whose area pattern was `[A-Z]+-M` finds 991, because it misses every step in I18N-M (12) and A11Y-M (13), whose area names contain digits (1016 − 25 = 991).
+- The figure of 1049 in the version that added the jobs file was the stated 1015 plus the 34 JOBS steps; it did not include the INSIGHT file. With the 44 INSIGHT steps the real total was 1094.
+- The Demand insights review fixes (D-99) rewrote the INSIGHT script as 52 steps (+8), so the total is 1102 and the starred steps are 245 (the INSIGHT script has 8). The 08 scenario list grew by IN-25 to IN-28 (255 numbered IDs, 287 with the 32 SC families); IN-28 is automated only (23 in all). The INSIGHT step numbers changed throughout, so every row in sections 2 to 6 that cited INSIGHT steps was regenerated from the scan. Round 3 of the same work (a sale skips expired batches, the batch edit, the pair rollup, the named seed cells and the 11th regular customer) changed step text only: the INSIGHT script keeps its 52 steps and 8 starred, the totals above stand, and the only citation that moved is M.51 now naming INSIGHT-M.36, so the IN rows needed no regeneration.
+- Eight scenario IDs in 08 had no row in section 2 (BK-61 to BK-65, PO-04, RV-01, AI-01), so the earlier "0 not covered" was not checked against 08. They now have rows, each backed by a step that names the ID. BK-65 is covered only at midnight and by the B-14 toggle (TIMER-M.39), AI-01 only for the customer scope (MQ-11.43).
+- Section 5 was recounted too. The four codes `claim_already_used`, `job_not_runnable`, `job_already_running` and `job_paused` had no row; they do now. The HTTP status rows used to list a curated subset of steps; they now list every step that names the status.
 
 ## 2. 08 scenario IDs
 
@@ -56,13 +67,13 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 | AU-06 | I | SEC-M.05 |
 | AU-07 | I | SEC-M.09 |
 | AU-08 | E | TIMER-M.48, TIMER-M.49, FAIL-M.08, FAIL-M.09 |
-| AU-09 | I | PERM-M.04, PERM-M.06, PERM-M.07, SEC-M.14, SEC-M.15, SEC-M.17 |
-| AU-10 | I | MQ-03.39, MQ-06.05, OFFER-M.31, STOCK-M.02, PERM-M.14, PERM-M.15, PERM-M.18, PERM-M.19 |
+| AU-09 | I | INSIGHT-M.28, PERM-M.04, PERM-M.06, PERM-M.07, SEC-M.14, SEC-M.15, SEC-M.17 |
+| AU-10 | I | MQ-03.39, MQ-06.05, OFFER-M.31, STOCK-M.02, INSIGHT-M.27, PERM-M.14, PERM-M.15, PERM-M.18, PERM-M.19 |
 | AU-11 | I,E | MQ-07.01, MQ-07.02, ADMIN-M.01 |
 | AU-12 | I | MQ-06.26, MQ-07.49, ADMIN-M.27 |
 | AU-13 | I | PERM-M.02, SEC-M.10 |
 | AU-14 | U | automated only — unit test over the golden (role × action) policy table; the manual matrix is in PERM and MQ-07 |
-| AU-15 | I | MQ-12.16, MQ-12.17, MQ-12.20, NOTIFY-M.01 |
+| AU-15 | I | MQ-12.16, MQ-12.17, MQ-12.20, INSIGHT-M.26, NOTIFY-M.01 |
 | AU-16 | I | SEC-M.11 |
 | AU-17 | I,E | SEC-M.07, ADMIN-M.17 |
 | AU-18 | I,E | MONEY-M.61, MONEY-M.62, MONEY-M.63 |
@@ -91,7 +102,7 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 | BK-20 | I | TIMER-M.15 |
 | BK-21 | I | TIMER-M.58 |
 | BK-22 | I | ACC-25 |
-| BK-23 | I,E | MQ-04.06, MQ-04.07, MQ-04.09, MQ-04.10, MQ-04.11, MQ-04.39 |
+| BK-23 | I,E | MQ-04.06, MQ-04.07, MQ-04.09, MQ-04.10, MQ-04.11, MQ-04.13a, MQ-04.39 |
 | BK-24 | I,E | MQ-04.23, MQ-04.26, MQ-04.27, MONEY-M.15, TIMER-M.21, NOTIFY-M.07 |
 | BK-25 | I | TIMER-M.23, TIMER-M.24 |
 | BK-26 | I | MQ-04.29, MQ-04.31, MQ-04.32, MQ-04.33, MQ-04.34, TIMER-M.40, TIMER-M.41, TIMER-M.42, TIMER-M.43 |
@@ -116,6 +127,11 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 | BK-45 | I | MQ-04.12 |
 | BK-46 | I | TIMER-M.29, TIMER-M.30, TIMER-M.31 |
 | BK-47…60 | — | whole script: NOTIFY-notifications.md |
+| BK-61 | I,E | MQ-04.13b |
+| BK-62 | I,E | TIMER-M.26 |
+| BK-63 | I,E | TIMER-M.12 |
+| BK-64 | I,E | MQ-02.54 |
+| BK-65 | I,E | TIMER-M.39 |
 | CR-01 | I | MQ-02.21, MQ-03.12 |
 | CR-02 | I | MONEY-M.02, MONEY-M.03 |
 | CR-03 | U | MONEY-M.01, MONEY-M.04 |
@@ -200,11 +216,42 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 | PO-01 | I | MQ-06.40, MQ-06.43 |
 | PO-02 | I | MQ-06.11, MQ-06.39, MQ-06.41, MQ-06.43 |
 | PO-03 | I | MQ-06.08, MQ-06.15, MQ-06.16, MQ-06.17, MQ-06.18, MQ-06.19, MQ-06.21, MQ-06.22, PERM-M.24 |
+| PO-04 | I | MQ-06.24, MQ-06.25 |
 | BZ-01 | I | PERM-M.08, PERM-M.09, PERM-M.10, PERM-M.11, PERM-M.12 |
 | AD-01 | I | MQ-07.10, MQ-07.11, MQ-07.17, MQ-07.18, MQ-07.19, MQ-07.20, MQ-07.47, MQ-07.48, NOTIFY-M.32, PERM-M.25 (+1 more) |
-| AD-02 | E | MQ-05.26, MQ-06.22, MQ-06.23, MQ-07.09, MQ-07.10, MQ-07.12, MQ-07.14, MQ-07.16, MQ-07.19, MQ-07.21 (+8 more) |
+| AD-02 | E | MQ-05.26, MQ-06.22, MQ-06.23, MQ-07.09, MQ-07.10, MQ-07.12, MQ-07.14, MQ-07.16, MQ-07.19, MQ-07.21 (+9 more) |
+| RV-01 | I | MQ-02.50 |
+| AI-01 | I | MQ-11.43 |
 | VO-01 | I,E | MQ-11.17, MQ-11.18, MQ-11.19, MQ-11.20, PERM-M.20 |
 | VO-02 | I | MQ-11.16, MQ-11.21, STOCK-M.30 |
+| IN-01 | I,E | MQ-03.04, INSIGHT-M.01, INSIGHT-M.34 |
+| IN-02 | I,E | INSIGHT-M.08, INSIGHT-M.09 |
+| IN-03 | I | INSIGHT-M.02, INSIGHT-M.03, INSIGHT-M.08, INSIGHT-M.11, INSIGHT-M.29, INSIGHT-M.40, INSIGHT-M.41 |
+| IN-04 | I | INSIGHT-M.02, INSIGHT-M.05, INSIGHT-M.12 |
+| IN-05 | I | MQ-11.26, OFFER-M.07, STOCK-M.19, INSIGHT-M.02, INSIGHT-M.04, INSIGHT-M.08, INSIGHT-M.13, INSIGHT-M.35 |
+| IN-06 | I | INSIGHT-M.07, INSIGHT-M.10, ADMIN-M.05, ACC-45 |
+| IN-07 | I | INSIGHT-M.07, INSIGHT-M.10, INSIGHT-M.23, INSIGHT-M.24 |
+| IN-08 | I,E | INSIGHT-M.07 |
+| IN-09 | I | INSIGHT-M.14 |
+| IN-10 | I | INSIGHT-M.08, INSIGHT-M.15, INSIGHT-M.36 |
+| IN-11 | I,E | INSIGHT-M.15, INSIGHT-M.36 |
+| IN-12 | I | INSIGHT-M.08, INSIGHT-M.16, INSIGHT-M.17, INSIGHT-M.37, INSIGHT-M.38 |
+| IN-13 | I,E | INSIGHT-M.02, INSIGHT-M.06, INSIGHT-M.18, INSIGHT-M.30, INSIGHT-M.39 |
+| IN-14 | I | INSIGHT-M.19, INSIGHT-M.20, INSIGHT-M.31, INSIGHT-M.32 |
+| IN-15 | I,E | INSIGHT-M.21, INSIGHT-M.33 |
+| IN-16 | I | INSIGHT-M.43, INSIGHT-M.44, INSIGHT-M.45, INSIGHT-M.46 |
+| IN-17 | I,E | INSIGHT-M.03, INSIGHT-M.04, INSIGHT-M.05, INSIGHT-M.06, INSIGHT-M.07, INSIGHT-M.09, INSIGHT-M.11, INSIGHT-M.12, INSIGHT-M.13, INSIGHT-M.14 (+13 more) |
+| IN-18 | I,E | INSIGHT-M.02, INSIGHT-M.09, INSIGHT-M.44, INSIGHT-M.47 |
+| IN-19 | I | INSIGHT-M.48, INSIGHT-M.49, INSIGHT-M.50, INSIGHT-M.51, INSIGHT-M.52 |
+| IN-20 | I | INSIGHT-M.25, INSIGHT-M.26, INSIGHT-M.45, ACC-45 |
+| IN-21 | I,E | INSIGHT-M.27, INSIGHT-M.28 |
+| IN-22 | I | automated only — a compile-and-test rule: the coach detector and the insights package must both import `internal/insights/facts`, and the test fails if the detector holds its own SQL for the shared kinds. By hand you can only compare the two numbers on screen, which MQ-11.34 does |
+| IN-23 | I | automated only — a nightly job and its backfill command: idempotency, the 100-pair cap and the `todayz rollup --from --to` backfill are integration tests; the seed runs the rollups once, so every manual step already depends on them (`<seed:insights-SL2>`) |
+| IN-24 | I | INSIGHT-M.29, INSIGHT-M.30, INSIGHT-M.31, INSIGHT-M.32, INSIGHT-M.33, INSIGHT-M.34, INSIGHT-M.41, INSIGHT-M.46 |
+| IN-25 | I,E | INSIGHT-M.35, INSIGHT-M.36 |
+| IN-26 | I | INSIGHT-M.20, INSIGHT-M.32 |
+| IN-27 | I,E | INSIGHT-M.17, INSIGHT-M.38 |
+| IN-28 | I | automated only — the write path of `search_log.product_id` has no screen: its only visible effect is the Wanted nearby and Missed sales counts after the nightly rollup, and the seed already runs the rollups once (`<seed:insights-SL2>`); the match rules (exact barcode, exact normalised name or a synonym) are integration tests |
 | PL-01 | U | SEC-M.37 |
 | PL-02 | U,I | SEC-M.35, SEC-M.38, I18N-M.08, FAIL-M.12 |
 | PL-03 | I | MQ-12.21, MQ-12.22 |
@@ -227,10 +274,10 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 | E2E-14 | W3 | MQ-11.25, MQ-11.26, MQ-11.27, OFFER-M.07 |
 | E2E-15…20 |  | I18N-M.12 |
 | OB-01 | I | MQ-12.11, MQ-12.12, MQ-12.13, MQ-12.14, PERF-M.14, ACC-43 |
-| OB-02 | I | MQ-10.19, MQ-11.11, MQ-12.16, MQ-12.17, MQ-12.18, MQ-12.19, MQ-12.20, PERF-M.14, ACC-43 |
+| OB-02 | I | MQ-10.19, MQ-11.11, MQ-12.16, MQ-12.17, MQ-12.18, MQ-12.19, MQ-12.20, INSIGHT-M.26, PERF-M.14, ACC-43 |
 | OB-03 | I | MQ-12.15, PERF-M.11 |
 | OB-04 | I | MQ-12.15, PERF-M.10 |
-| OB-05 | I | PERF-M.13, FAIL-M.11, JOBS-M.15, JOBS-M.17 |
+| OB-05 | I | JOBS-M.15, JOBS-M.17, PERF-M.13, FAIL-M.11 |
 | OB-06 | I | MQ-10.17, MQ-10.18, MQ-12.04, PERF-M.15, ACC-44 |
 | OB-11 | I | PERF-M.16, ACC-41, ACC-42 |
 | SC-JB-01 | U | automated only — registry lint (W1-11) |
@@ -274,8 +321,8 @@ Family coverage counts every step that names the family or any ID with its prefi
 
 | Family | Steps | First steps |
 |---|---|---|
-| SC-AU | 58 | MQ-02.12, MQ-02.13, MQ-02.14, MQ-02.15, MQ-03.39, MQ-06.05 (+52 more) |
-| SC-BK | 138 | MQ-01.37, MQ-02.18, MQ-02.19, MQ-02.20, MQ-02.22, MQ-02.23 (+132 more) |
+| SC-AU | 61 | MQ-02.12, MQ-02.13, MQ-02.14, MQ-02.15, MQ-03.39, MQ-06.05 (+55 more) |
+| SC-BK | 141 | MQ-01.37, MQ-02.18, MQ-02.19, MQ-02.20, MQ-02.22, MQ-02.23 (+135 more) |
 | SC-CR | 63 | MQ-02.21, MQ-02.41, MQ-02.42, MQ-03.12, MQ-03.20, MQ-03.33 (+57 more) |
 | SC-RF | 21 | MONEY-M.34, MONEY-M.35, MONEY-M.36, MONEY-M.37, MONEY-M.39, MONEY-M.40 (+15 more) |
 | SC-POS | 52 | MQ-03.22, MQ-03.23, MQ-03.24, MQ-03.26, MQ-03.27, MQ-03.30 (+46 more) |
@@ -284,17 +331,17 @@ Family coverage counts every step that names the family or any ID with its prefi
 | SC-CT | 6 | STOCK-M.04, STOCK-M.11, STOCK-M.16, STOCK-M.17, STOCK-M.18, STOCK-M.19 |
 | SC-SR | 16 | SEC-M.29, I18N-M.09, ADMIN-M.19, MQ-01.16, MQ-01.18, MQ-01.37 (+10 more) |
 | SC-NT | 7 | NOTIFY-M.20, NOTIFY-M.21, NOTIFY-M.22, NOTIFY-M.23, NOTIFY-M.28, NOTIFY-M.29 (+1 more) |
-| SC-RV | 1 | SEC-M.27 |
+| SC-RV | 2 | SEC-M.27, MQ-02.50 |
 | SC-OF | 1 | OFFER-M.27 |
-| SC-PO | 19 | MQ-06.07, MQ-06.09, MQ-06.24, MQ-06.27, SEC-M.28, MQ-06.08 (+13 more) |
+| SC-PO | 20 | MQ-06.07, MQ-06.09, MQ-06.24, MQ-06.27, SEC-M.28, MQ-06.08 (+14 more) |
 | SC-RK | 2 | ADMIN-M.23, ABUSE-M.08 |
-| SC-IN | 2 | SEC-M.30, SEC-M.33 |
+| SC-IN | 58 | MQ-03.04, MQ-11.26, OFFER-M.07, STOCK-M.19, INSIGHT-M.01, INSIGHT-M.02 (+52 more) |
 | SC-VO | 8 | MQ-11.16, MQ-11.17, MQ-11.18, MQ-11.19, MQ-11.20, MQ-11.21 (+2 more) |
-| SC-AD | 27 | MQ-05.26, MQ-06.22, MQ-06.23, MQ-07.09, MQ-07.10, MQ-07.11 (+21 more) |
+| SC-AD | 28 | MQ-05.26, MQ-06.22, MQ-06.23, MQ-07.09, MQ-07.10, MQ-07.11 (+22 more) |
 | SC-FA | 9 | MQ-05.38, MQ-05.39, MQ-05.40, MQ-05.41, PERM-M.28, PERM-M.29 (+3 more) |
 | SC-SP | 1 | ADMIN-M.25 |
-| SC-OB | 26 | MQ-10.17, MQ-10.18, MQ-10.19, MQ-11.11, MQ-12.04, MQ-12.11 (+20 more) |
-| SC-AI | 1 | FAIL-M.15 |
+| SC-OB | 30 | MQ-10.17, MQ-10.18, MQ-10.19, MQ-11.11, MQ-12.04, MQ-12.11 (+24 more) |
+| SC-AI | 2 | FAIL-M.15, MQ-11.43 |
 | SC-UI | 5 | A11Y-M.05, A11Y-M.06, A11Y-M.07, A11Y-M.08, A11Y-M.12 |
 | SC-I18N | 5 | I18N-M.04, I18N-M.05, I18N-M.07, I18N-M.08, A11Y-M.13 |
 | SC-SITE | 3 | SITE-M.02, SITE-M.03, SITE-M.15 |
@@ -322,24 +369,24 @@ Family coverage counts every step that names the family or any ID with its prefi
 | R-2.6 | Turnstile | MQ-02.11, SEC-M.06, SITE-M.07, SITE-M.08 |
 | R-2.7 | sessions and sign out all | MQ-02.15, TIMER-M.48, TIMER-M.49, TIMER-M.50, PERM-M.02, SEC-M.09, SEC-M.10, ADMIN-M.16 |
 | R-2.8 | one phone, both profiles | PERM-M.01 |
-| R-3.1 | per-store data | PERM-M.04, PERM-M.05, SEC-M.17 |
+| R-3.1 | per-store data | INSIGHT-M.28, PERM-M.04, PERM-M.05, SEC-M.17 |
 | R-3.2 | onboarding fields | MQ-05.02, MQ-05.03, MQ-05.04, MQ-05.05, MQ-05.06 |
 | R-3.3 | KYC states | MQ-05.10, MQ-05.17, MQ-05.18, MQ-05.19, MQ-05.20, ADMIN-M.06, ADMIN-M.07, ADMIN-M.10, ACC-05 |
 | R-3.4 | store statuses, visibility and review | MQ-01.16, MQ-05.11, MQ-05.20, MQ-05.21, MQ-05.35, MQ-05.42, MQ-05.43, MQ-05.44, MQ-05.45, CANCEL-M.22 (+4 more) |
 | R-3.5 | fulfilment flags and In-store only | MQ-01.18, MQ-01.37, MQ-04.04, SEC-M.40 |
 | R-3.6 | payout details, encryption, masking | MQ-05.12, MQ-05.13, MQ-05.14, MQ-06.04, MQ-06.37, MQ-06.38, PERM-M.13, PERM-M.14, ACC-04 |
 | R-3.7 | owner | PERM-M.08 |
-| R-3.8 | manager | MQ-06.04, PERM-M.05, PERM-M.09, PERM-M.13, PERM-M.21 |
-| R-3.9 | cashier | MQ-03.05, MQ-03.21, MQ-03.39, MQ-06.05, CANCEL-M.09, OFFER-M.31, STOCK-M.02, PERM-M.03, PERM-M.11, PERM-M.15 |
+| R-3.8 | manager | MQ-06.04, INSIGHT-M.28, PERM-M.05, PERM-M.09, PERM-M.13, PERM-M.21 |
+| R-3.9 | cashier | MQ-03.05, MQ-03.21, MQ-03.39, MQ-06.05, CANCEL-M.09, OFFER-M.31, STOCK-M.02, INSIGHT-M.27, PERM-M.03, PERM-M.11 (+1 more) |
 | R-3.10 | manager-and-above list | PERM-M.09, PERM-M.16, PERM-M.17 |
 | R-3.11 | no business delete | PERM-M.12 |
 | R-3.12 | codes and standee URL | MQ-01.38, MQ-05.09, MQ-05.24, MQ-05.25, MONEY-M.50, ACC-11 |
 | R-4.1 | master and store catalogue | MQ-01.35, MQ-05.07, STOCK-M.14, STOCK-M.15 |
 | R-4.2 | master adds no stock | STOCK-M.14, ADMIN-M.20, ACC-10 |
 | R-4.3 | missing products | MQ-05.29, STOCK-M.16, ACC-07 |
-| R-4.4 | movement sources | MQ-02.38, MQ-03.43, MQ-03.57, MQ-05.08, MQ-05.23, MQ-11.18, MQ-11.25, STOCK-M.01, STOCK-M.03, STOCK-M.04 (+4 more) |
+| R-4.4 | movement sources | MQ-02.38, MQ-03.43, MQ-03.57, MQ-05.08, MQ-05.23, MQ-11.18, MQ-11.25, STOCK-M.01, STOCK-M.03, STOCK-M.04 (+7 more) |
 | R-4.5 | stock math | MQ-01.34, MQ-02.03, MQ-02.27, STOCK-M.01, STOCK-M.05, STOCK-M.21, STOCK-M.24 |
-| R-4.6 | freshness and stale | MQ-01.30, MQ-01.33, MQ-03.43, MQ-08.06, MQ-08.07, MQ-08.12, MQ-08.13, MQ-08.18, MQ-08.19, MQ-08.24 (+10 more) |
+| R-4.6 | freshness and stale | MQ-01.30, MQ-01.33, MQ-03.43, MQ-08.06, MQ-08.07, MQ-08.12, MQ-08.13, MQ-08.18, MQ-08.19, MQ-08.24 (+13 more) |
 | R-4.7 | low stock | STOCK-M.08, STOCK-M.09, STOCK-M.10, ACC-09 |
 | R-5.1 | one order one store, fulfilment, `feature_delivery_enabled` | MQ-02.06, MQ-04.41, MQ-04.42 |
 | R-5.2 | `store_closed` | TIMER-M.33, TIMER-M.34, TIMER-M.36, TIMER-M.37, TIMER-M.38 |
@@ -418,18 +465,18 @@ Family coverage counts every step that names the family or any ID with its prefi
 | R-11.6 | has offer | OFFER-M.21 |
 | R-11.7 | zero results | MQ-01.26, ADMIN-M.04 |
 | R-12.1 | business feature list | MQ-03.04 |
-| R-12.2 | offer kinds | MQ-11.27, OFFER-M.01, OFFER-M.04, OFFER-M.05, OFFER-M.06, OFFER-M.07, OFFER-M.08 |
+| R-12.2 | offer kinds | MQ-11.27, OFFER-M.01, OFFER-M.04, OFFER-M.05, OFFER-M.06, OFFER-M.07, OFFER-M.08, INSIGHT-M.19 |
 | R-12.3 | offer lifecycle, limits, preview | OFFER-M.01, OFFER-M.14, OFFER-M.15, OFFER-M.16, OFFER-M.17, OFFER-M.18, OFFER-M.19 |
-| R-12.4 | pricing rule | OFFER-M.03, OFFER-M.06, OFFER-M.08, OFFER-M.09, OFFER-M.10, OFFER-M.11, OFFER-M.13, STOCK-M.22 |
+| R-12.4 | pricing rule | MQ-04.13a, OFFER-M.03, OFFER-M.06, OFFER-M.08, OFFER-M.09, OFFER-M.10, OFFER-M.11, OFFER-M.13, STOCK-M.22 |
 | R-12.5 | offers shown | MQ-01.20, MQ-01.32, OFFER-M.02, OFFER-M.20 |
 | R-12.6 | banners | MQ-01.20, MQ-01.31, OFFER-M.20, OFFER-M.24, OFFER-M.25, OFFER-M.26, OFFER-M.27, OFFER-M.28, OFFER-M.29 |
 | R-12.7 | voice | MQ-11.15, MQ-11.16, STOCK-M.30, FAIL-M.16 |
-| R-12.8 | demand insights | MQ-11.26, MQ-11.33, OFFER-M.07, STOCK-M.19, ADMIN-M.05 |
+| R-12.8 | demand insights | MQ-11.26, MQ-11.33, OFFER-M.07, STOCK-M.19, INSIGHT-M.01, INSIGHT-M.02, INSIGHT-M.03, INSIGHT-M.04, INSIGHT-M.05, INSIGHT-M.06 (+35 more) |
 | R-12.9 | POS | MQ-03.21, MQ-03.22, MQ-03.27, MQ-03.45, MQ-03.46, STOCK-M.23, STOCK-M.27, STOCK-M.29, FAIL-M.18, ACC-28 |
 | R-12.10 | receipts | MQ-03.40, MQ-03.41, TIMER-M.53, TIMER-M.54, I18N-M.10, ACC-27 |
 | R-12.11 | customer purchases | MQ-03.31, MQ-03.38 |
 | R-13.1 | admin features | MQ-05.15, MQ-06.20, MQ-12.10, ADMIN-M.02, ADMIN-M.18, ADMIN-M.23, ADMIN-M.28, ACC-40, ACC-41 |
-| R-13.2 | roles | MQ-06.17, MQ-06.22, MQ-06.23, MQ-07.09, MQ-07.10, MQ-07.12, MQ-07.13, MQ-07.15, MQ-07.16, MQ-07.17 (+12 more) |
+| R-13.2 | roles | MQ-06.17, MQ-06.22, MQ-06.23, MQ-07.09, MQ-07.10, MQ-07.12, MQ-07.13, MQ-07.15, MQ-07.16, MQ-07.17 (+16 more) |
 | R-13.3 | KYC, Pulse, money settings | MQ-06.38, MQ-07.29, MQ-07.30 |
 | R-13.4 | background jobs (D-95) and System (D-97) | JOBS-M.01, JOBS-M.08, JOBS-M.14, JOBS-M.19 |
 | R-14.1 | field-agent login | MQ-05.26, ACC-01 |
@@ -446,12 +493,12 @@ Family coverage counts every step that names the family or any ID with its prefi
 | R-15.8 | payout paid | MQ-06.33, NOTIFY-M.10 |
 | R-15.9 | new review | MQ-02.51, NOTIFY-M.11 |
 | R-16.1 | minimal data, location | PWA-M.13, PWA-M.14, ADMIN-M.03 |
-| R-16.2 | phone masking | MQ-02.23, MQ-04.17, MQ-04.19, MQ-04.24, PERM-M.16, ADMIN-M.15, ACC-21 |
+| R-16.2 | phone masking | MQ-02.23, MQ-04.17, MQ-04.19, MQ-04.24, INSIGHT-M.21, PERM-M.16, ADMIN-M.15, ACC-21 |
 | R-16.3 | demand aggregated, k ≥ 10 | ADMIN-M.03, ADMIN-M.04, ACC-45 |
-| R-16.4 | coach k ≥ 10 | MQ-11.34 |
-| R-16.5 | H3 area count | ADMIN-M.05, ACC-45 |
+| R-16.4 | coach k ≥ 10 | MQ-11.34, INSIGHT-M.02, INSIGHT-M.07, INSIGHT-M.10, INSIGHT-M.14, INSIGHT-M.23, INSIGHT-M.25 |
+| R-16.5 | H3 area count | INSIGHT-M.25, INSIGHT-M.26, INSIGHT-M.34, INSIGHT-M.44, ADMIN-M.05, ACC-45 |
 | R-16.6 | account deletion | MONEY-M.61, MONEY-M.62, MONEY-M.63 |
-| R-17.1 | settings canonical, money keys super_admin only | MQ-07.47, MQ-07.48, MQ-07.49, MQ-07.50, MQ-07.51, MQ-07.52, MQ-12.21, MQ-12.22, PERM-M.26, ADMIN-M.26 (+1 more) |
+| R-17.1 | settings canonical, money keys super_admin only | MQ-07.47, MQ-07.48, MQ-07.49, MQ-07.50, MQ-07.51, MQ-07.52, MQ-12.21, MQ-12.22, INSIGHT-M.29, INSIGHT-M.30 (+9 more) |
 | R-17.2 | feature flags | MQ-04.40, MQ-04.41, MQ-04.43, OFFER-M.30 |
 | R-17.3 | AI flags, caps, models | MQ-11.01, MQ-11.02, MQ-11.03, MQ-11.04, MQ-11.05, MQ-11.43, MQ-11.44, MQ-11.46, ADMIN-M.21, FAIL-M.15 (+1 more) |
 | R-17.4 | client versions | PWA-M.11, PWA-M.12 |
@@ -462,16 +509,16 @@ Family coverage counts every step that names the family or any ID with its prefi
 |---|---|---|---|
 | C-01 | Language picker (first run) | 8 | MQ-01.01, MQ-01.02, MQ-01.03, MQ-01.04, MQ-01.05, MQ-09.01 (+2 more) |
 | C-02 | Location set | 12 | MQ-01.03, MQ-01.04, MQ-01.06, MQ-01.07, MQ-01.08, MQ-01.09 (+6 more) |
-| C-03 | Home | 52 | MQ-01.10, MQ-01.11, MQ-01.12, MQ-01.13, MQ-01.14, MQ-01.15 (+46 more) |
+| C-03 | Home | 53 | MQ-01.10, MQ-01.11, MQ-01.12, MQ-01.13, MQ-01.14, MQ-01.15 (+47 more) |
 | C-04 | Map full screen | 3 | MQ-01.23, MQ-01.24, MQ-01.25 |
 | C-05 | Search | 24 | MQ-01.29, MQ-01.30, MQ-05.21, MQ-08.06, MQ-08.12, MQ-08.18 (+18 more) |
 | C-06 | Category | 1 | MQ-01.28 |
-| C-07 | Shop page | 41 | MQ-01.31, MQ-01.32, MQ-01.33, MQ-01.34, MQ-01.37, MQ-01.38 (+35 more) |
+| C-07 | Shop page | 43 | MQ-01.31, MQ-01.32, MQ-01.33, MQ-01.34, MQ-01.37, MQ-01.38 (+37 more) |
 | C-08 | Product detail | 12 | MQ-01.35, MQ-01.36, MQ-09.11, MQ-09.12, MQ-09.22, OFFER-M.02 (+6 more) |
 | C-09 | Cart | 29 | MQ-01.36, MQ-02.04, MQ-02.05, MQ-02.06, MQ-02.07, MQ-02.08 (+23 more) |
 | C-10 | Sign-in (at checkout or from Account) | 16 | MQ-02.09, MQ-02.10, MQ-02.11, MQ-02.12, MQ-02.13, MQ-09.14 (+10 more) |
-| C-11 | Checkout | 30 | MQ-02.14, MQ-02.16, MQ-02.17, MQ-02.18, MQ-04.14, MQ-08.08 (+24 more) |
-| C-12 | Order placed / tracking | 66 | MQ-02.20, MQ-02.28, MQ-02.29, MQ-02.30, MQ-02.32, MQ-02.33 (+60 more) |
+| C-11 | Checkout | 33 | MQ-02.14, MQ-02.16, MQ-02.17, MQ-02.18, MQ-04.13b, MQ-04.14 (+27 more) |
+| C-12 | Order placed / tracking | 69 | MQ-02.20, MQ-02.28, MQ-02.29, MQ-02.30, MQ-02.32, MQ-02.33 (+63 more) |
 | C-13 | Orders list | 5 | MQ-01.39, MQ-02.44, MQ-03.31, MQ-03.38, CANCEL-M.26 |
 | C-14 | Review | 9 | MQ-02.45, MQ-02.46, MQ-02.47, MQ-02.49, MQ-02.50, MQ-02.52 (+3 more) |
 | C-15 | Wallet | 32 | MQ-01.39, MQ-02.21, MQ-02.41, MQ-02.42, MQ-03.33, MQ-03.37 (+26 more) |
@@ -484,24 +531,24 @@ Family coverage counts every step that names the family or any ID with its prefi
 | C-24 | Receipt (public) | 6 | MQ-03.41, TIMER-M.53, TIMER-M.54, SEC-M.18, I18N-M.10, ACC-27 |
 | B-01 | Sign-in + business picker | 8 | MQ-02.01, MQ-03.01, MQ-03.02, MQ-03.03, MQ-03.05, PERM-M.01 (+2 more) |
 | B-02 | Onboarding wizard | 16 | MQ-05.01, MQ-05.02, MQ-05.03, MQ-05.04, MQ-05.05, MQ-05.06 (+10 more) |
-| B-03 | Overview | 18 | MQ-02.01, MQ-03.03, MQ-03.04, MQ-03.08, MQ-03.58, MQ-05.22 (+12 more) |
+| B-03 | Overview | 31 | MQ-02.01, MQ-03.03, MQ-03.04, MQ-03.08, MQ-03.58, MQ-05.22 (+25 more) |
 | B-04 | Orders | 52 | MQ-02.02, MQ-02.22, MQ-02.23, MQ-02.26, MQ-02.33, MQ-02.34 (+46 more) |
-| B-05 | Sell (POS) | 44 | MQ-03.21, MQ-03.22, MQ-03.23, MQ-03.24, MQ-03.25, MQ-03.26 (+38 more) |
+| B-05 | Sell (POS) | 48 | MQ-03.21, MQ-03.22, MQ-03.23, MQ-03.24, MQ-03.25, MQ-03.26 (+42 more) |
 | B-06 | Voice update | 8 | MQ-11.02, MQ-11.15, MQ-11.17, MQ-11.21, MQ-11.22, STOCK-M.30 (+2 more) |
-| B-07 | Stock and products | 37 | MQ-02.03, MQ-02.25, MQ-02.27, MQ-02.38, MQ-03.43, MQ-03.51 (+31 more) |
-| B-08 | Offers and banners | 9 | OFFER-M.01, OFFER-M.17, OFFER-M.19, OFFER-M.24, OFFER-M.26, OFFER-M.28 (+3 more) |
+| B-07 | Stock and products | 53 | MQ-02.03, MQ-02.25, MQ-02.27, MQ-02.38, MQ-03.43, MQ-03.51 (+47 more) |
+| B-08 | Offers and banners | 14 | OFFER-M.01, OFFER-M.17, OFFER-M.19, OFFER-M.24, OFFER-M.26, OFFER-M.28 (+8 more) |
 | B-19 | Shop coach | 7 | MQ-11.33, MQ-11.34, MQ-11.35, MQ-11.36, MQ-11.37, MQ-11.38 (+1 more) |
-| B-09 | Customers | 5 | PERM-M.03, PERM-M.16, PERM-M.17, SEC-M.26, ACC-29 |
+| B-09 | Customers | 7 | INSIGHT-M.21, INSIGHT-M.26, PERM-M.03, PERM-M.16, PERM-M.17, SEC-M.26 (+1 more) |
 | B-10 | Credits and referrals | 24 | MQ-02.43, MQ-05.24, MQ-06.01, MQ-06.02, MQ-06.03, MQ-06.13 (+18 more) |
 | B-11 | Reviews | 11 | MQ-02.51, MQ-02.52, MQ-11.02, MQ-11.30, MQ-11.31, CANCEL-M.27 (+5 more) |
-| B-12 | Analytics | 3 | MQ-03.59, OFFER-M.19, STOCK-M.26 |
+| B-12 | Analytics | 22 | MQ-03.59, OFFER-M.19, STOCK-M.26, INSIGHT-M.07, INSIGHT-M.09, INSIGHT-M.10 (+16 more) |
 | B-13 | Stores and staff | 9 | MQ-05.42, MQ-05.44, PERM-M.03, PERM-M.08, PERM-M.09, PERM-M.11 (+3 more) |
 | B-14 | Settings | 16 | MQ-04.01, MQ-04.02, MQ-04.04, MQ-05.12, MQ-05.13, MQ-05.14 (+10 more) |
 | B-15 | Help | 3 | CANCEL-M.34, PERM-M.12, ADMIN-M.25 |
 | B-16 | Notifications inbox | 13 | MQ-02.51, MQ-03.60, MQ-04.32, MQ-04.33, MQ-06.33, TIMER-M.41 (+7 more) |
 | A-01 | Sign-in | 7 | MQ-07.01, MQ-07.03, MQ-07.04, MQ-09.25, MQ-09.26, TIMER-M.50 (+1 more) |
 | A-02 | Pulse | 10 | MQ-07.04, MQ-07.19, MQ-09.32, MQ-12.10, PERM-M.22, ADMIN-M.02 (+4 more) |
-| A-03 | Businesses | 15 | MQ-05.15, MQ-05.16, MQ-05.17, MQ-05.20, MQ-06.38, MQ-07.29 (+9 more) |
+| A-03 | Businesses | 18 | MQ-05.15, MQ-05.16, MQ-05.17, MQ-05.20, MQ-06.38, MQ-07.12 (+12 more) |
 | A-04 | Create business for shop (field agent) | 14 | MQ-05.26, MQ-05.27, MQ-05.28, MQ-05.29, MQ-05.30, MQ-05.31 (+8 more) |
 | A-05 | Stores | 16 | MQ-05.44, MQ-05.45, TIMER-M.05, TIMER-M.20, TIMER-M.24, TIMER-M.29 (+10 more) |
 | A-06 | Customers | 15 | MQ-07.15, MQ-07.34, MQ-09.31, MONEY-M.62, TIMER-M.10, TIMER-M.16 (+9 more) |
@@ -511,15 +558,15 @@ Family coverage counts every step that names the family or any ID with its prefi
 | A-10 | Referrals | 2 | MONEY-M.51, MONEY-M.52 |
 | A-11 | Payouts | 21 | MQ-06.06, MQ-06.07, MQ-06.08, MQ-06.09, MQ-06.10, MQ-06.11 (+15 more) |
 | A-12 | Reviews | 8 | MQ-07.33, CANCEL-M.27, CANCEL-M.28, CANCEL-M.29, PERM-M.22, SEC-M.27 (+2 more) |
-| A-13 | Risk | 18 | MQ-06.20, MQ-07.13, MQ-11.03, MQ-11.42, MONEY-M.21, MONEY-M.48 (+12 more) |
-| A-14 | Support | 11 | MQ-11.03, MQ-11.39, MQ-11.40, CANCEL-M.32, CANCEL-M.33, CANCEL-M.35 (+5 more) |
+| A-13 | Risk | 19 | MQ-06.20, MQ-07.13, MQ-11.03, MQ-11.42, MONEY-M.21, MONEY-M.48 (+13 more) |
+| A-14 | Support | 10 | MQ-11.03, MQ-11.39, MQ-11.40, CANCEL-M.32, CANCEL-M.33, CANCEL-M.35 (+4 more) |
 | A-15 | Field agents | 6 | MQ-05.37, MQ-07.11, PERM-M.22, PERM-M.32, ABUSE-M.07, ACC-02 |
 | A-16 | Notifications | 8 | MQ-07.53, MQ-07.55, NOTIFY-M.17, NOTIFY-M.19, NOTIFY-M.30, NOTIFY-M.31 (+2 more) |
-| A-17 | Settings | 13 | MQ-04.40, MQ-07.47, MQ-07.49, MQ-07.53, MQ-07.54, MQ-09.33 (+7 more) |
+| A-17 | Settings | 20 | MQ-04.40, MQ-07.47, MQ-07.49, MQ-07.53, MQ-07.54, MQ-09.33 (+14 more) |
 | A-18 | Admin users | 8 | MQ-07.23, MQ-07.24, MQ-07.26, MQ-07.56, MQ-07.57, MQ-07.58 (+2 more) |
-| A-19 | Audit log | 14 | MQ-06.15, MQ-06.28, MQ-07.06, MQ-07.29, MQ-07.42, TIMER-M.16 (+8 more) |
+| A-19 | Audit log | 19 | MQ-06.15, MQ-06.28, MQ-07.06, MQ-07.29, MQ-07.42, TIMER-M.16 (+13 more) |
 | A-20 | Banner moderation | 4 | OFFER-M.24, OFFER-M.25, OFFER-M.28, PERM-M.22 |
-| A-21 | Jobs | 19 | JOBS-M.01, JOBS-M.02, JOBS-M.03, JOBS-M.04, JOBS-M.06, JOBS-M.07 (+13 more) |
+| A-21 | Jobs | 20 | PERM-M.22, JOBS-M.01, JOBS-M.02, JOBS-M.03, JOBS-M.04, JOBS-M.06 (+14 more) |
 | A-22 | System | 6 | JOBS-M.21, JOBS-M.22, JOBS-M.23, JOBS-M.24, JOBS-M.25, JOBS-M.34 |
 | S-01 | Home | 6 | A11Y-M.05, SITE-M.01, SITE-M.02, SITE-M.13, SITE-M.16, SITE-M.18 |
 | S-02 | For retailers | 6 | SITE-M.02, SITE-M.04, SITE-M.07, SITE-M.09, SITE-M.13, SITE-M.16 |
@@ -530,13 +577,15 @@ Family coverage counts every step that names the family or any ID with its prefi
 
 ## 5. Problem codes and HTTP statuses
 
+A step counts for a code or status when its text names it (currency amounts such as ₹403 do not count). Counts and first steps come from scanning the step rows, in book order.
+
 | Code or status | Steps | First steps |
 |---|---|---|
-| `invalid_transition` | 14 | MQ-02.31, MQ-02.37, MQ-06.31, MQ-12.03, TIMER-M.04, TIMER-M.14 (+8 more) |
+| `invalid_transition` | 15 | MQ-02.31, MQ-02.37, MQ-06.31, MQ-12.03, TIMER-M.04, TIMER-M.14 (+9 more) |
 | `idempotency_mismatch` | 3 | MQ-06.30, SEC-M.32, FAIL-M.04 |
 | `insufficient_stock` | 3 | STOCK-M.20, STOCK-M.21, I18N-M.08 |
-| `store_closed` | 5 | TIMER-M.34, TIMER-M.36, TIMER-M.37, I18N-M.08, ADMIN-M.13 |
-| `store_not_bookable` | 2 | SEC-M.40, MQ-04.42 |
+| `store_closed` | 7 | TIMER-M.34, TIMER-M.36, TIMER-M.37, TIMER-M.38, TIMER-M.39, I18N-M.08 (+1 more) |
+| `store_not_bookable` | 2 | MQ-04.42, SEC-M.40 |
 | `delivery_closed` | 1 | MQ-04.13b |
 | `ordering_suspended` | 1 | TIMER-M.26 |
 | `extension_already_used` | 1 | TIMER-M.12 |
@@ -551,29 +600,33 @@ Family coverage counts every step that names the family or any ID with its prefi
 | `otp_locked` | 2 | SEC-M.01, ABUSE-M.03 |
 | `otp_expired` | 1 | TIMER-M.47 |
 | `account_blocked` | 2 | SEC-M.07, ADMIN-M.17 |
-| `step_up_required` | 3 | MQ-06.26, MQ-07.49, ADMIN-M.27 |
+| `step_up_required` | 4 | MQ-06.26, MQ-07.49, ADMIN-M.27, JOBS-M.20 |
 | `price_changed` | 3 | CANCEL-M.07, OFFER-M.18, STOCK-M.22 |
 | `below_credit_minimum` | 4 | MONEY-M.03, MONEY-M.04, OFFER-M.12, I18N-M.08 |
 | `below_minimum` | 3 | MQ-04.09, MQ-04.10, MQ-04.37 |
 | `credit_monthly_cap` | 2 | MONEY-M.25, ABUSE-M.09 |
 | `credit_max_exceeded` | 1 | MONEY-M.02 |
 | `claim_expired` | 2 | MQ-03.52, TIMER-M.52 |
-| 401 | 4 | SEC-M.12, SEC-M.13, SEC-M.35, ADMIN-M.01 |
-| 403 | 25 | CANCEL-M.09, OFFER-M.31, STOCK-M.02, NOTIFY-M.32, PERM-M.04, PERM-M.05 (+19 more) |
-| 404 | 3 | SEC-M.14, SEC-M.15, SEC-M.36 |
+| `claim_already_used` | 1 | SEC-M.21 |
+| `job_not_runnable` | 1 | JOBS-M.11 |
+| `job_already_running` | 1 | JOBS-M.10 |
+| `job_paused` | 1 | JOBS-M.12 |
+| 401 | 5 | MQ-07.02, SEC-M.12, SEC-M.13, SEC-M.35, ADMIN-M.01 |
+| 403 | 56 | MQ-05.40, MQ-05.41, MQ-06.05, MQ-06.18, MQ-06.19, MQ-06.22 (+50 more) |
+| 404 | 6 | MQ-11.04, CANCEL-M.22, NOTIFY-M.22, SEC-M.14, SEC-M.15, SEC-M.36 |
 | 405 | 1 | PERM-M.12 |
-| 409 | 14 | MONEY-M.61, TIMER-M.04, TIMER-M.20, TIMER-M.34, TIMER-M.56, CANCEL-M.05 (+8 more) |
-| 410 | 1 | STOCK-M.27 |
-| 412 | 1 | SEC-M.31 |
-| 413 | 1 | SEC-M.33 |
+| 409 | 31 | MQ-02.31, MQ-02.37, MQ-02.48, MQ-02.50, MQ-04.13b, MQ-04.42 (+25 more) |
+| 410 | 2 | STOCK-M.27, NOTIFY-M.22 |
+| 412 | 2 | SEC-M.31, SEC-M.38 |
+| 413 | 2 | NOTIFY-M.23, SEC-M.33 |
 | 421 | 1 | SEC-M.34 |
-| 422 | 7 | MQ-06.30, CANCEL-M.11, CANCEL-M.19, CANCEL-M.25, STOCK-M.04, SEC-M.32 (+1 more) |
-| 429 | 8 | TIMER-M.44, SEC-M.02, SEC-M.03, SEC-M.04, SEC-M.18, ABUSE-M.01 (+2 more) |
-| 503 | 2 | FAIL-M.01, FAIL-M.12 |
+| 422 | 11 | MQ-06.30, MQ-07.40, CANCEL-M.11, CANCEL-M.19, CANCEL-M.25, STOCK-M.04 (+5 more) |
+| 429 | 9 | MQ-11.43, TIMER-M.44, SEC-M.02, SEC-M.03, SEC-M.04, SEC-M.18 (+3 more) |
+| 503 | 3 | JOBS-M.27, FAIL-M.01, FAIL-M.12 |
 
 ## 6. Questions for the lead
 
-Each question names the steps that depend on it. Q-01 to Q-49 are resolved (D-91 to D-94 in the decision log, and the plan files named in the Status column); the steps now state the expected result. Q-50 and Q-51 are new and open. If the build differs from the resolution, mark the step **B**.
+Each question names the steps that depend on it. Q-01 to Q-49 are resolved (D-91 to D-94 in the decision log, and the plan files named in the Status column); the steps now state the expected result. Q-50, Q-51 and Q-52 are new and open (Q-52, added with D-99, blocks no step because the "Priced above nearby" kind is off by default). If the build differs from the resolution, mark the step **B**.
 
 ### A. Disagreements between plan files (01, 02, 04, 05, 06, 08, 12)
 
@@ -640,6 +693,7 @@ Each question names the steps that depend on it. Q-01 to Q-49 are resolved (D-91
 | Q-41 | The brief mentions coupons; 01 has no coupon codes, so the book tests none. | notes in OFFER-offers-banners.md | Resolved: 10 (Not planned) |
 | Q-50 | JOBS-M.14 to M.17 need a scheduled `notify` or `ai` kind that calls a mock, so that stopping the mocks makes it fail. Which kind does the seed and `make demo` provide? The book calls it K-mock and marks the steps **B** if none exists. | JOBS-M.14, JOBS-M.15, JOBS-M.16, JOBS-M.17 | Open: W1-11 / W3-15 to name one |
 | Q-51 | JOBS-M.28 and M.29 need a kind that runs for several seconds and is batched (a rollup backfill, payouts, a marketing send), so a stop mid-run can be seen. Which kind and which `periodKey` range does `make demo` give? | JOBS-M.28, JOBS-M.29 | Open: W1-11 to name one |
+| Q-52 | Should the Demand insights kind "Priced above nearby" be on at launch? It compares a shop's price with the median price across at least 10 live nearby shops; it is useful, but shops may dislike being compared. The book tests it with the setting switched on, and checks that it is off by default. | INSIGHT-M.43, INSIGHT-M.44, INSIGHT-M.45, INSIGHT-M.46 | Open: the founder decides. Default off (`insight_price_compare_enabled` false, 01 §12 and §17, D-99) |
 
 ### Uncovered rules
 

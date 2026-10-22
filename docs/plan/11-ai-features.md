@@ -41,7 +41,7 @@ The user asked (2026-10-22) for AI features wherever they are best, for retailer
 | AI-R1 | **Voice stock update** (W3-04, which depends on W3-10; drafts are `ai_drafts` rows with feature `voice_stock`) | Speak sales, restocks, counts, price changes; draft lines to confirm. Line kinds are `sale`, `restock`, `count`, `set_price` (D-65): `sale` records a quick POS sale with no customer (`sale_pos`) and cashiers may confirm it; "out of stock" is a `count` of 0 | Hands busy at the counter | v1 |
 | AI-R2 | **Scan a supplier bill to restock** | Photo of a distributor invoice/bill → line items matched to store items with quantities, cost price and (optionally) expiry dates; unmatched lines offered as "create product". Confirm → restock movements + batches. | Restocking is the biggest data-entry chore; keeping stock fresh is what makes TodayZ work | v1 |
 | AI-R3 | **Shelf photo to catalogue (onboarding)** | Photos of shelves → recognised products matched to the master catalogue → a checklist to add with price defaulting to MRP | Gets a new shop to 50+ listed items in minutes instead of an hour | v1 |
-| AI-R4 | **Insight explanations and suggested actions** | The Demand insights card gets one plain sentence per row in the shop's language ("Amul butter 100 g: 6 sold a day, 2 days left. Order 15 to cover a week.") and a suggested offer % for slow items, within limits the backend computes | Turns numbers into an action; works in Kannada/Hindi/etc. | v1 |
+| AI-R4 | **Insight explanations and suggested actions** | The Demand insights card and tab get one plain sentence per row, for every kind (D-99), in the shop's language ("Amul butter 100 g: 6 sold a day, 2 days left. Order 32 to cover a week.") and a suggested offer % for slow items, within limits the backend computes. The numbers come only from the row's `facts`; the model changes wording and the suggested %, never a number, and the template text shows when AI is off or a number is ungrounded | Turns numbers into an action; works in Kannada/Hindi/etc. | v1 |
 | AI-R5 | **Shop coach (background jobs)** | Scheduled jobs study each shop's numbers and post suggestion cards to a coach feed (B-19), see §2.1 | The user asked for background AI giving retailers suggestions: what to do, improve, highs and lows | v1 |
 | AI-R9 | **Banner maker and offer copy** | From a chosen offer or items: draft 3 banner headlines/sub-lines in the shop's language and English, pick a tint and product photo for the template; the retailer picks and edits | Shops won't design banners themselves | v1 |
 | AI-R10 | **Banner image safety check** | Uploaded banner images are checked (no explicit, violent, misleading or competitor-brand-abuse content; text legible); unsure → admin review queue | Banners publish without approval, so they need an automatic guard | v1 |
@@ -63,32 +63,44 @@ Runs as River periodic jobs per store, spread across the night so load is flat. 
 
 Pipeline per store:
 
-1. **Facts (SQL, deterministic):** a library of ~30 detectors in `internal/coach/detectors/` (D-48) computes candidate facts with numbers and a severity score (e.g. `missed_orders_peak_hour`, `top_seller_low_days_of_cover`, `slow_mover_21d`, `expiring_batch_value`, `stale_stock_share`, `rating_drop`, `offer_uplift`, `wanted_nearby`, `repeat_rate_change`, `best_day_record`, `accept_time_vs_benchmark`, `delivery_requests_but_off`, `setup_incomplete`).
-2. **Choose:** the top 3–5 facts by severity × recency, not repeating a dismissed topic for `coach_dismiss_quiet_days` (7), and at most `coach_max_cards_per_day` (5) new cards per store per day.
+1. **Facts (SQL, deterministic):** a library of ~30 detectors in `internal/coach/detectors/` (D-48) computes candidate facts with numbers and a severity score (e.g. `missed_orders_peak_hour`, `top_seller_low_days_of_cover`, `slow_mover_21d`, `expiring_batch_value`, `stale_stock_share`, `rating_drop`, `offer_uplift`, `wanted_nearby`, `repeat_rate_change`, `best_day_record`, `accept_time_vs_benchmark`, `delivery_requests_but_off`, `setup_incomplete`). Where a detector covers a Demand insights kind (`top_seller_low_days_of_cover` = selling fast, `slow_mover_21d` = sitting on the shelf, `expiring_batch_value` = going to waste, `stale_stock_share` = stock check due, `wanted_nearby`, and the D-99 kinds missed sales, expired on shelf, selling below cost, bought together, regulars slipping away), it imports the fact query from `internal/insights/facts` (W3-03) and only adds severity, recency and wording, so the card and the coach never compute the same number twice (D-99). The coach does not duplicate "priced above nearby" while `insight_price_compare_enabled` is false.
+2. **Choose:** the top 3–5 facts by severity × recency, not repeating a dismissed subject (an item, a pair, a batch or the store) for `coach_dismiss_quiet_days` (7), and at most `coach_max_cards_per_day` (5) new cards per store per day.
 3. **Write (AI):** Haiku turns each fact into a card in the shop's language (title ≤ 60 chars, body ≤ 200 chars) using only the given numbers; the grounding validator rejects any number not in the facts; on failure, the rule-based template text is used instead. AI off → template text always.
 4. **Act:** each card carries an `action_type` and a payload that opens the right screen prefilled (restock quantity, offer % within backend-computed safe limits, items for a flash offer). Nothing is applied automatically.
 5. **Learn:** Done / Not useful / ignored feeds detector weights per shop (simple bandit-style score adjustment, no model training) and dashboard 14 shows acceptance rate per detector.
 
-**Look and feel:** coach cards and Demand insights rows share one component (DemandInsights row in the design system): tinted icon, label, one sentence with the product name in bold, a metric chip, a text-link action, and a period tag on the card. This matches the old app's Demand insights card the user likes. The coach feed and cards live in `business/src/coach/` (W3-11) and are mounted in the `<CoachSlot/>` that W3-03 provides in the `business/src/overview` shell (D-48).
+**Look and feel:** coach cards and Demand insights rows share one component (DemandInsights row in the design system, `design/source/components/DemandInsights/`): a tinted 32px icon square, a label, one sentence with the product name in bold, a text action with an arrow ("Restock →"), and a period tag ("Last 7 days") on the card. There is no metric chip (D-99, to match the design). This matches the old app's Demand insights card the user likes. The coach feed and cards live in `business/src/coach/` (W3-11) and are mounted in the `<CoachSlot/>` that W3-03 provides in the `business/src/overview` shell (D-48).
 
-**Minimum evidence (fixes a weakness in the old card, which said "sold 1 unit this week … 100% of sales"):** a detector may only fire when it has enough data. Below the minimum, the card says what it needs ("Record sales on TodayZ for a week to see what sells fast") instead of a misleading number.
+**Minimum evidence (fixes a weakness in the old card, which said "sold 1 unit this week … 100% of sales"):** a detector may only fire when it has enough data. Below the minimum, a Demand insights kind has no row on the B-03 card; the B-12 Insights tab says what it needs ("Record sales on TodayZ for a week to see what sells fast") instead of a misleading number, and a coach detector does not fire.
 
 **Insight and coach settings (D-59, D-61).** Every threshold is a `platform_settings` key; detectors and copy read them and never hard-code them.
 
-| Key | Default | Unit | Rule |
-|---|---|---|---|
-| `insight_no_sale_days` | 21 | days | Days without a sale for "sitting on the shelf" (`slow_mover`) |
-| `insight_min_days_listed` | 21 | days | Days of listing history before "sitting on the shelf" (equal to the no-sale rule) |
-| `insight_expiring_within_days` | 5 | days | "Going to waste": batch expiry window |
-| `insight_wanted_nearby_radius_m` | 2000 | meters | Radius for "wanted nearby" and "near you" |
-| `insight_min_searches` | 10 | count | Nearby searches before "wanted nearby" (k-anonymity, never below 10) |
-| `insight_min_sales_lines` | 20 | count | Sales lines in the period before any share-of-sales claim |
-| `insight_min_units_selling_fast` | 5 | count | Units sold before "selling fast" |
-| `insight_min_events_for_percent` | 20 | count | Events behind any percentage shown |
-| `insight_period_days` | 7 | days | Insight period ("Past 7 days") |
-| `coach_max_cards_per_day` | 5 | count | New coach cards per store per day |
-| `coach_max_push_per_day` | 1 | count | Coach pushes per store per day |
-| `coach_dismiss_quiet_days` | 7 | days | Days a dismissed topic stays quiet |
+| Key | Default | Unit | Rule | Min | Max |
+|---|---|---|---|---|---|
+| `insight_no_sale_days` | 21 | days | Days without a sale for "sitting on the shelf" (`slow_mover`) | — | — |
+| `insight_min_days_listed` | 21 | days | Days of listing history before "sitting on the shelf" (equal to the no-sale rule) | — | — |
+| `insight_expiring_within_days` | 5 | days | "Going to waste": batch expiry window | — | — |
+| `insight_wanted_nearby_radius_m` | 2000 | meters | Radius for "wanted nearby" and "near you" | — | — |
+| `insight_min_searches` | 10 | count | Nearby searches before "wanted nearby" (k-anonymity, never below 10) | 10 | — |
+| `insight_min_sales_lines` | 20 | count | Sales lines in the period before any share-of-sales claim | — | — |
+| `insight_min_units_selling_fast` | 5 | count | Units sold before "selling fast" | — | — |
+| `insight_min_events_for_percent` | 20 | count | Events behind any percentage shown | — | — |
+| `insight_period_days` | 7 | days | Insight period ("Last 7 days") and the window for the average daily pace | — | — |
+| `insight_cover_days` | 7 | days | "Selling fast": the restock quantity covers this many days at the current pace; a row fires below this many days of stock (D-99) | 1 | 30 |
+| `insight_missed_sales_min_zero_days` | 1 | days | "Missed sales": whole IST days with closing stock of 0 or below in the period before it can fire | 1 | 30 |
+| `insight_missed_sales_min_searches` | 10 | count | "Missed sales": nearby searches matching the product on those days (k-anonymity, never below 10) | 10 | — |
+| `insight_pair_min_bills` | 20 | count | "Bought together": bills containing both items in the window | 5 | 1000 |
+| `insight_pair_window_days` | 60 | days | "Bought together": bill window for the pair counts | 14 | 180 |
+| `insight_pair_min_share_bp` | 2000 | bp | "Bought together": share of item A's bills (the item with more bills) that also contain B (super_admin-only, unit `bp`) | 500 | 10000 |
+| `insight_pair_min_lift_pct` | 150 | count | "Bought together": minimum lift in percent, P(B given A) ÷ P(B) (150 = 1.5×, 100 = no lift needed) | 100 | 1000 |
+| `insight_regular_min_visits` | 3 | count | "Regulars slipping away": visits (distinct IST purchase days) needed in the regular window | 2 | 20 |
+| `insight_regular_window_days` | 60 | days | "Regulars slipping away": window in which visits are counted | 14 | 180 |
+| `insight_regular_lapse_days` | 21 | days | "Regulars slipping away": no purchase for at least this many days | 7 | 90 |
+| `insight_regular_min_linked_customers` | 10 | count | "Regulars slipping away": phone-linked customers who bought in the regular window before the kind shows anything | 1 | — |
+| `insight_price_compare_enabled` | false | bool | "Priced above nearby" on or off (Q-52). Needs at least 10 other live verified stores of distinct businesses in the radius whatever the setting (D-71) | — | — |
+| `coach_max_cards_per_day` | 5 | count | New coach cards per store per day | — | — |
+| `coach_max_push_per_day` | 1 | count | Coach pushes per store per day | — | — |
+| `coach_dismiss_quiet_days` | 7 | days | Days a dismissed subject stays quiet | — | — |
 
 The names and defaults match [01-product-rules.md](01-product-rules.md) §17 exactly (D-61); if they ever differ, 01 wins.
 

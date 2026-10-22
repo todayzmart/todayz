@@ -43,7 +43,7 @@ func TestFixture(t *testing.T) {
 		"internal/orders/orders.go:18 literal 50_000 equals the default of admin_adjust_dual_approval_above_paise, ai_daily_cost_cap_paise",
 		"internal/orders/orders.go:22 literal 4500.0 equals the default of search_w_text",
 		"internal/orders/orders.go:27 //settings:ok needs a reason",
-		"internal/orders/orders.go:29 literal 0x7D0 equals the default of insight_wanted_nearby_radius_m",
+		"internal/orders/orders.go:29 literal 0x7D0 equals the default of insight_wanted_nearby_radius_m, insight_pair_min_share_bp",
 	}, lines)
 }
 

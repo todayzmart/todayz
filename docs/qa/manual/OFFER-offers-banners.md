@@ -26,7 +26,7 @@ Each offer kind, the pricing rule (one best item offer per line plus one bill of
 | OFFER-M.04 | Create "₹ off" on the category of I3 (milk), ₹2 off. C10 adds I3 ×2. | Line ₹44.00 (₹22 each). | `R-12.2` | | |
 | OFFER-M.05 | Create "Buy X get Y": I2 Maggi, buy 2 get 1. C10 adds I2 ×3, then ×2, then ×6. | ×3 → ₹28.00; ×2 → ₹28.00 with a hint to add one more if the app shows it; ×6 → ₹56.00. Record the display. | `R-12.2` | ▢ | |
 | OFFER-M.06 | Create a minimum-bill discount "₹50 off on ₹500+". C10 builds three carts: I9 ×5 (₹499.95), I10 ×5 (₹500.00) and I11 ×5 (₹500.05). | ₹499.95 → no discount. ₹500.05 → ₹50 off, total ₹450.05. ₹500.00 → ₹50 off, total ₹450.00 (the threshold is inclusive and uses the item subtotal after item-level offers, D-94). | `R-12.2` `R-12.4` | ▢ | |
-| OFFER-M.07 | Open the I8 Curd item (batch of 10 expiring in 3 days). From the item or Overview "Going to waste", create a flash offer 30% off on that batch. | The flash offer shows a countdown to the batch expiry on C-07 and C-08. Price ₹24.50. | `R-12.2` `R-12.8` E2E-14 B-03 | ▢ | |
+| OFFER-M.07 | Open the I8 Curd item (batch of 10 expiring in 3 days). From the item, or from Overview → Going to waste → **Flash offer →** (the form opens with that batch already chosen), create a flash offer 30% off on that batch. | The flash offer shows a countdown to the batch expiry on C-07 and C-08. Price ₹24.50. | `R-12.2` `R-12.8` E2E-14 IN-05 B-03 | ▢ | |
 | OFFER-M.08 | Create a whole-store 5% off, channel online only. Open C-07. | Every item without a better item-level offer shows 5% off; I1 keeps 10% (the better one). | `R-12.2` `R-12.4` | | |
 
 ### B. Pricing rule and credits

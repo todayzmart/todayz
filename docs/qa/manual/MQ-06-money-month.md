@@ -66,8 +66,8 @@ The worked example uses October 2026 as month 1 (M1) and November 2026 as month 
 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
-| MQ-06.24 ★ | As FN45 click CSV export for October 2026. | A CSV downloads. One row per `pending` payout: Lakshmi Traders ₹890.00 and Kaveri Fresh ₹40.00. The held Annapurna payout is not in the file. Exporting stamps `exported_at` on those rows. | `R-9.4` SC-PO A-11 | ▢ | |
-| MQ-06.25 | Open the CSV in a text editor. | Amounts equal the A-11 statement closing amounts. No cell starts with `=`, `+`, `-` or `@` without a leading `'`. Columns are exactly `payout_id, period, business_id, legal_name, beneficiary_name, amount_inr, upi_id, bank_account_number, ifsc`, with `amount_inr` at 2 decimals. | `R-9.4` SEC | | |
+| MQ-06.24 ★ | As FN45 click CSV export for October 2026. | A CSV downloads. One row per `pending` payout: Lakshmi Traders ₹890.00 and Kaveri Fresh ₹40.00. The held Annapurna payout is not in the file. Exporting stamps `exported_at` on those rows. | `R-9.4` SC-PO A-11 PO-04 | ▢ | |
+| MQ-06.25 | Open the CSV in a text editor. | Amounts equal the A-11 statement closing amounts. No cell starts with `=`, `+`, `-` or `@` without a leading `'`. Columns are exactly `payout_id, period, business_id, legal_name, beneficiary_name, amount_inr, upi_id, bank_account_number, ifsc`, with `amount_inr` at 2 decimals. | `R-9.4` SEC PO-04 | | |
 | MQ-06.26 | `clock +11m` (the last TOTP is now 11 min old). Click Mark paid on Lakshmi Traders, type UTR `QAUTR0000000003`. | Step-up prompt: the TOTP is asked again. The API without step-up returns `step_up_required`. | `R-9.5` AU-12 `step_up_required` A-11 | ▢ | |
 | MQ-06.27 | Cancel the step-up. Click Mark paid again and leave the UTR empty. | Refused: the UTR is required. Status still `pending`. | `R-9.5` SC-PO A-11 | | |
 | MQ-06.28 ★ | Enter UTR `QAUTR0000000003`, pass the TOTP step-up, confirm. | Status `paid` with the UTR, paid-by FN45 and the time. Audit row in A-19. | `R-9.5` E2E-09 A-11 A-19 | ▢ | |

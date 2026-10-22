@@ -54,7 +54,7 @@ Hands-on security checks a tester can do with a browser, DevTools and cURL: sign
 |---|---|---|---|---|---|
 | SEC-M.19 ★ | Accepted pickup order for C10. K22 enters 4 wrong codes, then the right one. | Collected. | `R-6.1` BK-12 | | |
 | SEC-M.20 | Another order. K22 enters 5 wrong codes. Then the right one. | After 5: `code_locked`; B-04 shows "Ask customer for a new code". The right code is refused. C10 taps New code on C-12; the new code is accepted, the old one is not. | `R-6.1` BK-12 `code_locked` C-12 | ▢ | |
-| SEC-M.21 | Open a bill QR on the POS. Scan it with C10 on profile A and C11 on profile F. Both tap Confirm. | The first confirm wins. The second sees "already claimed" (record the code). | `R-6.3` POS-09 | | |
+| SEC-M.21 | Open a bill QR on the POS. Scan it with C10 on profile A and C11 on profile F. Both tap Confirm. | The first confirm wins. The second gets `409 claim_already_used` and sees "already claimed". | `R-6.3` POS-09 | | |
 | SEC-M.22 | Decode the bill QR payload. Change the amount and submit the claim via cURL. | Refused: signature invalid. Nothing linked. | `R-6.3` POS-10 | | |
 | SEC-M.23 | At the POS pick counter code, type C10's phone and 5 wrong codes on one bill. | Locked for that bill; the right code is refused on that bill and accepted on a new bill. | `R-6.4` POS-13 | | |
 | SEC-M.24 | Offline POS (DevTools Offline), counter code sale for C10 with the right code. Use the same code again on a second offline sale. Go online. | First links. Second shows "Customer link failed" (reuse refused); the sale is kept, unlinked, no ledger entry. | `R-6.7` POS-22 | ▢ | |

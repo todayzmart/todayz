@@ -39,7 +39,7 @@ All timers run on the server; the apps only display them (`R-5.8`). After every 
 | TIMER-M.09 | `clock set` TA + 29 min 59 s. Refresh C-12 and B-04. | Still `accepted`. Hold countdown 0:01. The code still shows on C-12. | `R-5.4` BK-14 | | |
 | TIMER-M.10 ★ | `clock +2s` (TA + 30 min 01 s). Refresh. | `expired` with reason `no_show`. C10 gets one strike: A-06 → C10 → strikes shows 1, with the order number. I1 reservation released (available back to 10, on hand 10, no movement). The 30 held credits released. | `R-5.4` `R-5.24` `R-5.25` BK-14 BK-37 A-06 | ▢ | |
 | TIMER-M.11 | C10 places a new pickup order (I1 ×1). K22 accepts at **TB**. `clock set` TB + 25 min. On C-12 tap "I'm on my way (+10 min)". | Hold countdown jumps from 5:00 to 15:00. `hold_until` = TB + 40 min. The button is gone or disabled after the tap. B-04 shows the new hold time. | `R-5.5` BK-15 C-12 | ▢ | |
-| TIMER-M.12 | Send the extension request again via cURL. | `409 extension_already_used`. `hold_until` unchanged. | `R-5.5` BK-15 | | |
+| TIMER-M.12 | Send the extension request again via cURL. | `409 extension_already_used`. `hold_until` unchanged. | `R-5.5` BK-15 BK-63 | | |
 | TIMER-M.13 | `clock set` TB + 39 min 59 s. Refresh. | Still `accepted`. | `R-5.5` BK-15 | | |
 | TIMER-M.14 | `clock set` TB + 40 min 01 s. Refresh. Then send the extension request again. | `expired` (`no_show`). C10 strikes 2. The extension request is refused (`invalid_transition`). | `R-5.5` `R-5.24` BK-15 | | |
 | TIMER-M.15 | C10 places another order; K22 accepts at **TC**. `clock set` TC + 29 min 59 s. K22 enters C10's code. Then `clock set` TC + 31 min. | Collected at the last second. At +31 min nothing changes: no expiry, no strike (still 2). One outcome only. | `R-5.4` BK-20 | ▢ | |
@@ -68,7 +68,7 @@ All timers run on the server; the apps only display them (`R-5.8`). After every 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
 | TIMER-M.25 ★ | Sign in as C13 (3 no-shows in the last 30 days). Open Home and checkout. | C-21 banner on Home and Checkout explains the limit (1 active order) and its end date, 14 days after the 3rd strike (`noshow_limit_days`). Note the end date **EL**. | `R-5.24` BK-16 C-21 | ▢ | |
-| TIMER-M.26 | C13 places one pickup order at Sri Lakshmi. Then tries a second order at Annapurna Provisions. | First: `placed`. Second: refused with the limit explained. `409 ordering_suspended` with `extensions.until` (the limit end date). | `R-5.24` BK-16 | ▢ | |
+| TIMER-M.26 | C13 places one pickup order at Sri Lakshmi. Then tries a second order at Annapurna Provisions. | First: `placed`. Second: refused with the limit explained. `409 ordering_suspended` with `extensions.until` (the limit end date). | `R-5.24` BK-16 BK-62 | ▢ | |
 | TIMER-M.27 | C13 cancels the first order. Tries the second order again. | Allowed (only one active order). Cancel it again. | `R-5.24` BK-16 | | |
 | TIMER-M.28 | `clock set` EL − 1 s. Open Home. Then `clock set` EL + 1 s. | At EL − 1 s the banner still shows. At EL + 1 s it is gone and two orders can be active at once. | `R-5.24` BK-16 | ▢ | |
 | TIMER-M.29 | `make reset`; `clock set 2026-10-22T11:00:00+05:30`. Repeat M.21 and M.24 four times at Sri Lakshmi (4 dispatch timeouts). Open A-13 and A-05. | A-05: 4 new strikes. A-13: no `store_strikes` flag for Sri Lakshmi. Store still `live`. | `R-5.26` BK-46 | | |
@@ -91,7 +91,7 @@ All timers run on the server; the apps only display them (`R-5.8`). After every 
 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
-| TIMER-M.39 | Set Sri Lakshmi hours to all day (O20, B-14). `clock set 2026-10-22T23:59:58+05:30`. C10 places a pickup order. Then `clock set 2026-10-23T00:00:02+05:30` and C11 places one. Then C12 places one at Auto Mart. | Three numbers in increasing order, `TZ-` and at least 6 digits, zero-padded. No reset to a small number after midnight; Auto Mart's number continues the same sequence. | `R-5.16` BK-34 D-23 | ▢ | |
+| TIMER-M.39 | Set Sri Lakshmi hours to all day (O20, B-14). `clock set 2026-10-22T23:59:58+05:30`. C10 places a pickup order. Then `clock set 2026-10-23T00:00:02+05:30` and C11 places one. Then C12 places one at Auto Mart. | Three numbers in increasing order, `TZ-` and at least 6 digits, zero-padded. B-14 shows the "Open 24 hours" toggle on and the hours read 00:00–24:00. Neither of the first two orders is refused with `store_closed`. No reset to a small number after midnight; Auto Mart's number continues the same sequence. | `R-5.16` BK-34 D-23 BK-65 | ▢ | |
 
 ### H. Delivery-failed return clock (D-69)
 

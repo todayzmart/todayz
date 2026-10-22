@@ -24,7 +24,7 @@ One day at Sri Lakshmi: staff sign in, the new-order sound plays, orders are acc
 | MQ-03.01 | In profile B sign in as X25 (`+91 90000 00025`, OTP `000000`). | B-01 picker lists two businesses with the role shown: Annapurna Provisions · Owner, Lakshmi Traders · Cashier (Sri Lakshmi). | `R-2.4` B-01 | ▢ | |
 | MQ-03.02 | Pick Lakshmi Traders. Sign out. Sign in again as X25. | The picker preselects Lakshmi Traders (last store remembered). | `R-2.4` B-01 | | |
 | MQ-03.03 ★ | Sign out. Sign in as O20 (owner). | Picker shows Sri Lakshmi and Sri Lakshmi 2, role Owner. Pick Sri Lakshmi. B-03 Overview opens with the mint greeting band, store switcher and a sync state such as "Synced 6:40 pm". | `R-2.4` B-01 B-03 | ▢ | |
-| MQ-03.04 | Read B-03. | KPI strip (today's sales with delta, orders, avg bill, items low), sales by hour chart, DemandInsights card, top items table. Setup checklist card absent (SL is fully set up) or showing all four items done (KYC, 50 products, staff, QR standee printed). | `R-12.1` B-03 | ▢ | |
+| MQ-03.04 | Read B-03. | KPI strip (today's sales with delta, orders, avg bill, items low), sales by hour chart, the Demand insights card (title "Demand insights", tag "Last 7 days", four rows each with its own action, see INSIGHT-M.01), top items table. Setup checklist card absent (SL is fully set up) or showing all four items done (KYC, 50 products, staff, QR standee printed). | `R-12.1` IN-01 B-03 | ▢ | |
 | MQ-03.05 | In profile C (P360) sign in as K22 (cashier). | Lands on Overview for Sri Lakshmi; bottom tabs Overview, Orders, Sell, Stock, More. | `R-3.9` B-01 | ▢ | |
 
 ### B. New-order alert
