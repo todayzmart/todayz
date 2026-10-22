@@ -1,0 +1,66 @@
+{
+  "shell.appName": {
+    "defaultMessage": "TodayZ",
+    "description": "Product name. Never translated."
+  },
+  "shell.skipToContent": {
+    "defaultMessage": "Skip to content",
+    "description": "Keyboard skip link at the top of every page"
+  },
+  "shell.nav.label": {
+    "defaultMessage": "Main",
+    "description": "Accessible name of the bottom navigation"
+  },
+  "shell.nav.home": {
+    "defaultMessage": "Home",
+    "description": "Bottom nav tab"
+  },
+  "shell.nav.search": {
+    "defaultMessage": "Search",
+    "description": "Bottom nav tab"
+  },
+  "shell.nav.orders": {
+    "defaultMessage": "Orders",
+    "description": "Bottom nav tab"
+  },
+  "shell.nav.wallet": {
+    "defaultMessage": "Wallet",
+    "description": "Bottom nav tab"
+  },
+  "shell.nav.account": {
+    "defaultMessage": "Account",
+    "description": "Bottom nav tab"
+  },
+  "shell.hero.title": {
+    "defaultMessage": "Everything nearby, today.",
+    "description": "Headline in the mint band on the placeholder home"
+  },
+  "shell.hero.sub": {
+    "defaultMessage": "Find what local shops have in stock, book it, and pick it up or get it delivered.",
+    "description": "Sub-line under the headline"
+  },
+  "shell.soon.tag": {
+    "defaultMessage": "Coming soon",
+    "description": "Tag on the placeholder card"
+  },
+  "shell.soon.title": {
+    "defaultMessage": "{section} is on its way",
+    "description": "Placeholder card title. {section} is the tab name, for example Orders."
+  },
+  "shell.soon.body": {
+    "defaultMessage": "We're building this part of the app. Shops near you are adding their stock now.",
+    "description": "Placeholder card body"
+  },
+  "shell.notFound.title": {
+    "defaultMessage": "Page not found",
+    "description": "Title for an unknown route"
+  },
+  "shell.notFound.body": {
+    "defaultMessage": "This link doesn't go anywhere yet.",
+    "description": "Body for an unknown route"
+  },
+  "shell.notFound.home": {
+    "defaultMessage": "Go to home",
+    "description": "Button back to home from an unknown route"
+  }
+}

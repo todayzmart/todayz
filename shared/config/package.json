@@ -1,0 +1,75 @@
+{
+  "name": "@todayz/config",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared lint, type, test, dev-server and format config for the TodayZ frontends (W0-05).",
+  "type": "module",
+  "exports": {
+    "./eslint": {
+      "types": "./eslint.preset.d.mts",
+      "default": "./eslint.preset.mjs"
+    },
+    "./stylelint": "./stylelint.preset.mjs",
+    "./prettier": "./prettier.preset.mjs",
+    "./vite": {
+      "types": "./vite.preset.d.mts",
+      "default": "./vite.preset.mjs"
+    },
+    "./vitest": {
+      "types": "./vitest.preset.d.mts",
+      "default": "./vitest.preset.mjs"
+    },
+    "./playwright": {
+      "types": "./playwright.preset.d.mts",
+      "default": "./playwright.preset.mjs"
+    },
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./tsconfig.react.json": "./tsconfig.react.json"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "lint": "eslint --max-warnings 0 ."
+  },
+  "dependencies": {
+    "@eslint/js": "9.39.5",
+    "eslint-plugin-import-x": "4.17.1",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.7",
+    "globals": "17.13.0",
+    "stylelint-config-standard": "40.0.0",
+    "typescript-eslint": "8.71.1"
+  },
+  "peerDependencies": {
+    "@playwright/test": "1.64.0",
+    "eslint": "9.39.5",
+    "stylelint": "17.16.0",
+    "typescript": "6.0.3",
+    "vite": "8.3.3",
+    "vitest": "4.1.11"
+  },
+  "peerDependenciesMeta": {
+    "@playwright/test": {
+      "optional": true
+    },
+    "stylelint": {
+      "optional": true
+    },
+    "vite": {
+      "optional": true
+    },
+    "vitest": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "@types/node": "26.6.4",
+    "eslint": "9.39.5",
+    "prettier": "3.9.9",
+    "stylelint": "17.16.0",
+    "typescript": "6.0.3",
+    "vite": "8.3.3",
+    "vitest": "4.1.11"
+  }
+}

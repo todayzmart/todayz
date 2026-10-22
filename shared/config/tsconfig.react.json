@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "TodayZ strict React app",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "types": ["vite/client"],
+    // vite/client types CSS modules as an index signature; dot access to class names is fine.
+    "noPropertyAccessFromIndexSignature": false
+  }
+}

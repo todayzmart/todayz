@@ -1,0 +1,94 @@
+{
+  "shell.appName": {
+    "defaultMessage": "TodayZ",
+    "description": "Product name. Never translated."
+  },
+  "shell.appTag": {
+    "defaultMessage": "Business",
+    "description": "Small tag next to the logo in the sidebar"
+  },
+  "shell.skipToContent": {
+    "defaultMessage": "Skip to content",
+    "description": "Keyboard skip link at the top of every page"
+  },
+  "shell.nav.label": {
+    "defaultMessage": "Business",
+    "description": "Accessible name of the sidebar and bottom tabs"
+  },
+  "shell.nav.overview": {
+    "defaultMessage": "Overview",
+    "description": "Navigation item"
+  },
+  "shell.nav.orders": {
+    "defaultMessage": "Orders",
+    "description": "Navigation item"
+  },
+  "shell.nav.sell": {
+    "defaultMessage": "Sell",
+    "description": "Navigation item: the point-of-sale counter"
+  },
+  "shell.nav.stock": {
+    "defaultMessage": "Stock",
+    "description": "Navigation item"
+  },
+  "shell.nav.more": {
+    "defaultMessage": "More",
+    "description": "Bottom tab that opens the rest of the menu on phones"
+  },
+  "shell.nav.customers": {
+    "defaultMessage": "Customers",
+    "description": "Navigation item"
+  },
+  "shell.nav.groupGrow": {
+    "defaultMessage": "Grow",
+    "description": "Sidebar group heading"
+  },
+  "shell.nav.offers": {
+    "defaultMessage": "Offers",
+    "description": "Navigation item"
+  },
+  "shell.nav.analytics": {
+    "defaultMessage": "Analytics",
+    "description": "Navigation item"
+  },
+  "shell.nav.groupShop": {
+    "defaultMessage": "Shop",
+    "description": "Sidebar group heading"
+  },
+  "shell.nav.settings": {
+    "defaultMessage": "Settings",
+    "description": "Navigation item"
+  },
+  "shell.greet.title": {
+    "defaultMessage": "Your shop on TodayZ",
+    "description": "Headline in the mint greeting band"
+  },
+  "shell.greet.sub": {
+    "defaultMessage": "Run your counter, stock, orders and offers from one place.",
+    "description": "Sub-line in the greeting band"
+  },
+  "shell.soon.tag": {
+    "defaultMessage": "Coming soon",
+    "description": "Tag on the placeholder card"
+  },
+  "shell.soon.title": {
+    "defaultMessage": "{section} is on its way",
+    "description": "Placeholder card title. {section} is the navigation item, for example Stock."
+  },
+  "shell.soon.body": {
+    "defaultMessage": "We're building this part of the business app. It will work offline at the counter.",
+    "description": "Placeholder card body"
+  },
+  "shell.notFound.title": {
+    "defaultMessage": "Page not found",
+    "description": "Title for an unknown route"
+  },
+  "shell.notFound.body": {
+    "defaultMessage": "This link doesn't go anywhere yet.",
+    "description": "Body for an unknown route"
+  },
+  "shell.notFound.home": {
+    "defaultMessage": "Go to orders",
+    "description": "Button from an unknown route to the landing page, which is Orders until Overview is built"
+  }
+}

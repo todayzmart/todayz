@@ -1,0 +1,26 @@
+{
+  "name": "@todayz/telemetry",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Frontend telemetry bootstrap: RUM batch and Sentry init stubs that are no-ops without config (W0-05; filled in by W1-04 and Wave 5).",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint --max-warnings 0 ."
+  },
+  "dependencies": {
+    "web-vitals": "6.2.3"
+  },
+  "devDependencies": {
+    "@todayz/config": "workspace:*",
+    "eslint": "9.39.5",
+    "happy-dom": "20.14.5",
+    "typescript": "6.0.3",
+    "vitest": "4.1.11"
+  }
+}

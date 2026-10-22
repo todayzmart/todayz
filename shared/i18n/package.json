@@ -1,0 +1,29 @@
+{
+  "name": "@todayz/i18n",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Message catalogues per app and area, the en-XA pseudo-locale and the locale bootstrap (W0-05 minimal; W1-03 owns the full i18n).",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./compiled/*": "./compiled/*",
+    "./messages/*": "./messages/*"
+  },
+  "scripts": {
+    "gen": "node scripts/gen.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint --max-warnings 0 ."
+  },
+  "dependencies": {
+    "@formatjs/icu-messageformat-parser": "3.5.21"
+  },
+  "devDependencies": {
+    "@todayz/config": "workspace:*",
+    "@types/node": "26.6.4",
+    "eslint": "9.39.5",
+    "typescript": "6.0.3",
+    "vitest": "4.1.11"
+  }
+}

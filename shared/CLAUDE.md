@@ -18,4 +18,4 @@ Read first: the root `CLAUDE.md`, `docs/plan/README.md`, `docs/plan/01-product-r
 
 ## Status
 
-Stub from W0-01. The WP that builds this folder fills in layout and conventions.
+W0-05: `config`, `tokens`, `i18n` (minimal bootstrap) and `telemetry` (init stubs) are in place. `make gen` builds tokens, fonts, icons and compiled catalogues into git-ignored `generated/` and `compiled/`. `api-client` arrives with W0-04. `@todayz/tokens/css-vars` lets a package test that its CSS uses only declared token vars.

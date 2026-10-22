@@ -1,0 +1,9 @@
+{
+  "extends": "@todayz/config/tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM"],
+    "types": ["node"],
+    "allowJs": false
+  },
+  "include": ["generated/tokens.ts", "src/**/*.d.mts", "scripts/**/*.d.mts", "test/**/*.ts"]
+}

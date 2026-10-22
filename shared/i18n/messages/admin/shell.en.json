@@ -1,0 +1,98 @@
+{
+  "shell.appName": {
+    "defaultMessage": "TodayZ",
+    "description": "Product name. Never translated."
+  },
+  "shell.appTag": {
+    "defaultMessage": "Admin",
+    "description": "Small tag next to the logo in the sidebar"
+  },
+  "shell.skipToContent": {
+    "defaultMessage": "Skip to content",
+    "description": "Keyboard skip link at the top of every page"
+  },
+  "shell.nav.label": {
+    "defaultMessage": "Main",
+    "description": "Accessible name of the sidebar"
+  },
+  "shell.nav.pulse": {
+    "defaultMessage": "Pulse",
+    "description": "Navigation item: platform overview"
+  },
+  "shell.nav.businesses": {
+    "defaultMessage": "Businesses",
+    "description": "Navigation item"
+  },
+  "shell.nav.stores": {
+    "defaultMessage": "Stores",
+    "description": "Navigation item"
+  },
+  "shell.nav.customers": {
+    "defaultMessage": "Customers",
+    "description": "Navigation item"
+  },
+  "shell.nav.orders": {
+    "defaultMessage": "Orders",
+    "description": "Navigation item"
+  },
+  "shell.nav.support": {
+    "defaultMessage": "Support",
+    "description": "Navigation item"
+  },
+  "shell.nav.groupGrowth": {
+    "defaultMessage": "Growth",
+    "description": "Sidebar group heading"
+  },
+  "shell.nav.credits": {
+    "defaultMessage": "Credits and referrals",
+    "description": "Navigation item"
+  },
+  "shell.nav.catalogue": {
+    "defaultMessage": "Master catalogue",
+    "description": "Navigation item"
+  },
+  "shell.nav.payouts": {
+    "defaultMessage": "Payouts",
+    "description": "Navigation item"
+  },
+  "shell.nav.groupAccess": {
+    "defaultMessage": "Access",
+    "description": "Sidebar group heading"
+  },
+  "shell.nav.adminUsers": {
+    "defaultMessage": "Admin users",
+    "description": "Navigation item"
+  },
+  "shell.nav.settings": {
+    "defaultMessage": "Settings",
+    "description": "Navigation item"
+  },
+  "shell.page.sub": {
+    "defaultMessage": "Admin console for TodayZ operations",
+    "description": "Sub-line under the page title"
+  },
+  "shell.soon.tag": {
+    "defaultMessage": "Coming soon",
+    "description": "Tag on the placeholder card"
+  },
+  "shell.soon.title": {
+    "defaultMessage": "{section} is on its way",
+    "description": "Placeholder card title. {section} is the navigation item, for example Payouts."
+  },
+  "shell.soon.body": {
+    "defaultMessage": "This screen is not built yet. Every admin action here will be audited.",
+    "description": "Placeholder card body"
+  },
+  "shell.notFound.title": {
+    "defaultMessage": "Page not found",
+    "description": "Title for an unknown route"
+  },
+  "shell.notFound.body": {
+    "defaultMessage": "This link doesn't go anywhere yet.",
+    "description": "Body for an unknown route"
+  },
+  "shell.notFound.home": {
+    "defaultMessage": "Go to pulse",
+    "description": "Button back to Pulse from an unknown route"
+  }
+}

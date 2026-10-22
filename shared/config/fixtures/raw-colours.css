@@ -1,0 +1,12 @@
+/* Lint fixture: every declaration below must fail @todayz/config/stylelint. Kept out of lint globs. */
+.hex {
+  color: #0c231f;
+}
+
+.named {
+  background: white;
+}
+
+.fn {
+  border-color: rgb(10 10 10 / 50%);
+}

@@ -1,0 +1,7 @@
+/* Lint fixture: colours through tokens only; must pass @todayz/config/stylelint. */
+.ok {
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-xs);
+}

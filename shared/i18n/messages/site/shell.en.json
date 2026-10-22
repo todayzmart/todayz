@@ -1,0 +1,42 @@
+{
+  "site.title": {
+    "defaultMessage": "TodayZ: everything nearby, today",
+    "description": "Browser title of the home page"
+  },
+  "site.description": {
+    "defaultMessage": "Search what shops near you have in stock, book it, and pick it up or get it delivered.",
+    "description": "Meta description of the home page"
+  },
+  "site.skipToContent": {
+    "defaultMessage": "Skip to content",
+    "description": "Keyboard skip link"
+  },
+  "site.logoAlt": {
+    "defaultMessage": "TodayZ",
+    "description": "Alt text of the logo"
+  },
+  "site.hero.title": {
+    "defaultMessage": "Everything nearby, today.",
+    "description": "Home page headline"
+  },
+  "site.hero.sub": {
+    "defaultMessage": "Local shops put their stock online. You see what's in stock near you, book it, and pick it up or get it delivered.",
+    "description": "Home page sub-line"
+  },
+  "site.soon.tag": {
+    "defaultMessage": "Coming soon",
+    "description": "Tag on the placeholder card"
+  },
+  "site.soon.title": {
+    "defaultMessage": "We're getting ready to open",
+    "description": "Placeholder card title"
+  },
+  "site.soon.body": {
+    "defaultMessage": "This site is a placeholder while we build TodayZ. Shop owners will be able to sign up here soon.",
+    "description": "Placeholder card body"
+  },
+  "site.footer": {
+    "defaultMessage": "© {year} TodayZ",
+    "description": "Footer line. {year} is the current year."
+  }
+}

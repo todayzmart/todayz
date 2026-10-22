@@ -1,0 +1,80 @@
+---
+// Page frame for every site route: real HTML, tokens and fonts from @todayz/tokens, no client JS.
+import '@todayz/tokens/styles.css';
+import head from 'virtual:todayz-head';
+import { t } from '../lib/messages';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    {head.map(({ tag, attrs }) => (tag === 'link' ? <link {...attrs} /> : <meta {...attrs} />))}
+  </head>
+  <body>
+    <a class="skip" href="#main">{t('site.skipToContent')}</a>
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <footer class="foot">
+      <p>{t('site.footer', { year })}</p>
+    </footer>
+  </body>
+</html>
+
+<style>
+  body {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  main {
+    flex: 1;
+    outline: none;
+  }
+
+  .skip {
+    position: absolute;
+    left: var(--space-3);
+    top: calc(-1 * var(--space-12));
+    z-index: var(--z-toast);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    background: var(--inverse);
+    color: var(--on-inverse);
+    text-decoration: none;
+  }
+
+  .skip:focus {
+    top: var(--space-3);
+  }
+
+  .foot {
+    padding: var(--space-6) var(--space-4);
+    border-top: 1px solid var(--line);
+    font: var(--type-caption);
+    color: var(--ink-3);
+    text-align: center;
+  }
+
+  .foot p {
+    margin: 0;
+  }
+</style>

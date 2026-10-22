@@ -1,0 +1,10 @@
+{
+  "extends": "@todayz/config/tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["node"],
+    "jsx": "preserve"
+  },
+  "include": [".astro/types.d.ts", "src", "e2e", "scripts", "*.config.mjs", "*.config.ts"],
+  "exclude": ["dist", "node_modules"]
+}

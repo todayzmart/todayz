@@ -8,3 +8,8 @@ packages:
   - "site"
   - "e2e"
   - "e2e/*"
+
+# pnpm 10 skips dependency build scripts unless listed here (W0-05).
+onlyBuiltDependencies:
+  - esbuild
+  - unrs-resolver

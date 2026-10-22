@@ -1,0 +1,34 @@
+{
+  "name": "@todayz/site",
+  "version": "0.0.0",
+  "private": true,
+  "description": "TodayZ marketing site (todayz.in). Static Astro, zero client JS.",
+  "type": "module",
+  "scripts": {
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 ASTRO_DISABLE_UPDATE_CHECK=true astro dev --ignore-lock",
+    "gen": "ASTRO_TELEMETRY_DISABLED=1 astro sync",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build && node scripts/verify-dist.mjs",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview --ignore-lock",
+    "typecheck": "ASTRO_TELEMETRY_DISABLED=1 astro check",
+    "lint": "eslint --max-warnings 0 .",
+    "lint:css": "stylelint --max-warnings 0 \"src/**/*.{css,astro}\"",
+    "test": "vitest run",
+    "e2e:smoke": "playwright test -c playwright.config.ts"
+  },
+  "dependencies": {
+    "@todayz/i18n": "workspace:*",
+    "@todayz/tokens": "workspace:*",
+    "astro": "7.3.7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@playwright/test": "1.64.0",
+    "@todayz/config": "workspace:*",
+    "@types/node": "26.6.4",
+    "eslint": "9.39.5",
+    "postcss-html": "2.0.0",
+    "stylelint": "17.16.0",
+    "typescript": "6.0.3",
+    "vitest": "4.1.11"
+  }
+}

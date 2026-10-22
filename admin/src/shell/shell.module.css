@@ -1,0 +1,92 @@
+/* Admin shell layout. Values come from tokens only (Stylelint fails raw colours). */
+
+.app {
+  min-height: 100dvh;
+  display: flex;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.skip {
+  position: absolute;
+  left: var(--space-3);
+  top: calc(-1 * var(--space-12));
+  z-index: var(--z-toast);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--inverse);
+  color: var(--on-inverse);
+  text-decoration: none;
+}
+
+.skip:focus {
+  top: var(--space-3);
+}
+
+.side {
+  flex: none;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow-y: auto;
+}
+
+.mark {
+  width: 24px;
+  height: 24px;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6) var(--space-8);
+  outline: none;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.soon {
+  align-items: flex-start;
+}
+
+/* Below 1024px: icon rail. Labels are visually hidden but stay the links' accessible names. */
+@media (width < 1024px) {
+  /* Shrink-wrap the 44px links plus the sidebar's padding and border (no 1px overflow scrollbar). */
+  .side {
+    width: auto;
+    overflow-x: hidden;
+  }
+
+  /* 44px touch targets on the rail (the design's 32px rows are for a mouse). */
+  .side a {
+    justify-content: center;
+    height: var(--control-lg);
+    min-width: var(--control-lg);
+    padding: 0;
+  }
+
+  .tag,
+  .group {
+    display: none;
+  }
+
+  .label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .main {
+    padding: var(--space-4);
+  }
+}

@@ -17,6 +17,20 @@ Read first: the root `CLAUDE.md`, `docs/plan/README.md`, `docs/plan/01-product-r
 - All user-facing text through i18n keys in `shared/i18n/messages/business/<area>.en.json`.
 - Initial JS ≤ 250 KB gzip (size-limit).
 
+## Layout (W0-05)
+
+Same structure as `customer/` (see its CLAUDE.md): `src/main.tsx`, `src/app/`, `src/shell/`, `src/routes/`, `e2e/smoke.spec.ts`.
+
+- `src/routes/index.tsx`: `/` redirects to `/orders` with `replace` (D-84: B-04 Orders is the landing page until W3-03 builds B-03 Overview). The query string is kept.
+- `src/shell/Shell.tsx`: a `tz-side` sidebar (≥1024px, "Business" tag, Grow/Shop groups) and `tz-bnav` bottom tabs (<1024px: Overview, Orders, Sell, Stock, More). Below 1024px the content area gets `data-density="touch"` (44px controls) via `useNarrow()`.
+- `src/shell/nav.ts`: each item says whether it is a tab, a sidebar entry or both. "More" lists the sidebar-only sections on phones. Overview is `/overview`, a placeholder with the greeting band.
+
+## Conventions
+
+- To build a section: add your route file(s) under `src/routes/<area>/` (e.g. `src/routes/orders/index.tsx`, `src/routes/orders/$orderId.tsx`). A static route outranks `/$section`, so your page replaces the placeholder. Edit nothing in `nav.ts` or `$section.tsx` (`src/app/routing.test.ts` proves the precedence). W3-03 moves the landing redirect when it builds Overview.
+- Tokens only; i18n keys in `shared/i18n/messages/business/`. Dev port 5302, Host `business.todayz.localhost`. Initial JS budget 250 KB gzip. Hidden sourcemaps, checked by `build` as in `customer/`. The offline POS (W1+) adds its own service worker strategy on top of the precache set up here.
+- Smoke screenshots go to the git-ignored `test-results/screenshots/`; `TZ_QA_DIR=docs/qa/W0-05 make e2e` refreshes the committed ones.
+
 ## Status
 
-Stub from W0-01. The WP that builds this folder fills in layout and conventions.
+W0-05: shell, routing, i18n, PWA manifest, telemetry stub, size budget and smoke tests in place. Screens are placeholders.
