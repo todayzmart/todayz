@@ -1,0 +1,25 @@
+# Upload this run's reports as one artifact (W0-06 S3).
+# scripts/ci/collect-reports.sh copies the paths listed in scripts/ci/paths.env into
+# ci-reports/collected/ (hidden path parts renamed), and scanners write ci-reports/<name>/.
+# The upload is ci-reports/ only: no repo-wide **/ globs, no include-hidden-files,
+# no whole docs/qa tree.
+name: Upload TodayZ CI reports
+description: Collect the report paths from scripts/ci/paths.env into ci-reports/ and upload them.
+inputs:
+  name:
+    description: Artifact name
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Collect reports
+      shell: bash
+      run: scripts/ci/collect-reports.sh
+
+    - name: Upload ci-reports/
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: ${{ inputs.name }}
+        path: ci-reports/
+        if-no-files-found: ignore
+        retention-days: 14

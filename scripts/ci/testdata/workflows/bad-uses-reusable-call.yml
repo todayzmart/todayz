@@ -1,0 +1,14 @@
+name: x
+on:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+jobs:
+  a:
+    permissions: {}
+    uses: ./.github/workflows/ci.yml
+defaults:
+  run:
+    shell: bash

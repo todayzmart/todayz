@@ -1,0 +1,19 @@
+name: t
+on: [pull_request]
+x-perm: &w write
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+jobs:
+  a:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: *w
+      id-token: *w
+    steps:
+      - run: echo hi
+defaults:
+  run:
+    shell: bash

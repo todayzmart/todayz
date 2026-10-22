@@ -1,0 +1,8 @@
+{
+  "name": "lighthouse-bad-pkg-fixture",
+  "private": true,
+  "scripts": {
+    "lhci": "lhci autorun --upload.target=temporary-public-storage",
+    "lhci:server": "lhci upload --upload.target lhci --serverBaseUrl=https://lhci.example.invalid"
+  }
+}

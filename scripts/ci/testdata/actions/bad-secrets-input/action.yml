@@ -1,0 +1,7 @@
+name: bad
+description: Secrets inside a composite action.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: echo "${{ secrets.TOKEN }}"

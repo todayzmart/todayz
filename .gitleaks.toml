@@ -1,20 +1,9 @@
-# gitleaks config: default rules plus allowlists for local-only, git-ignored paths.
+# gitleaks config for git history scans (`gitleaks git`, security-gitleaks in CI).
+# Default rules only. There is deliberately no path allowlist here: in git mode a
+# path allowlist also hides committed files, so a committed .env.local would be
+# invisible (W0-06 review B1). The working-tree allowlist for `gitleaks dir` lives
+# in scripts/ci/gitleaks-dir.toml, which extends this file.
 title = "TodayZ gitleaks config"
 
 [extend]
 useDefault = true
-
-[[allowlists]]
-description = "git-ignored local files (make setup writes keys here; never committed)"
-paths = [
-  '''(^|/)\.env\.local$''',
-  '''(^|/)\.env\..*\.local$''',
-  '''(^|/)node_modules/''',
-  '''(^|/)\.tools/''',
-  '''(^|/)\.git/''',
-  '''(^|/)\.cache/''',
-  '''(^|/)dist/''',
-  '''(^|/)infra/local/data/''',
-  '''(^|/)\.terraform/''',
-  '''(^|/)\.claude/worktrees/''',
-]

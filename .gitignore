@@ -15,6 +15,7 @@ shared/api-client/src/gen/
 # Local tools and caches
 .tools/
 .cache/
+ci-reports/
 node_modules/
 .pnpm-store/
 dist/

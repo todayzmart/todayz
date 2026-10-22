@@ -1,0 +1,6 @@
+name: bad
+description: A local action outside .github/actions.
+runs:
+  using: composite
+  steps:
+    - uses: ./tools/evil

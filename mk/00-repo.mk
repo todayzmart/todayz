@@ -42,7 +42,8 @@ check-repo: $(ENVTOOL)
 	@go -C $(ROOT)/scripts/envtool vet ./...
 	@go -C $(ROOT)/scripts/envtool test -count=1 ./...
 	@shellcheck $(ROOT)/scripts/*.sh $(ROOT)/scripts/test/*.sh $(ROOT)/scripts/hooks/*.sh
-	@gitleaks dir $(ROOT) --config $(ROOT)/.gitleaks.toml --no-banner --redact --log-level warn
+	@# Working-tree scan: the dir config allowlists git-ignored local files (W0-06 B1).
+	@cd $(ROOT)/scripts/ci && gitleaks dir $(ROOT) --config gitleaks-dir.toml --no-banner --redact --log-level warn
 	@$(ROOT)/scripts/test/makefile-targets.sh
 	@$(ROOT)/scripts/test/make-fail-fast.sh
 	@$(ROOT)/scripts/test/sc-pl-03.sh

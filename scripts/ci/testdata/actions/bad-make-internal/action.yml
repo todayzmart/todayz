@@ -1,0 +1,7 @@
+name: bad
+description: A composite step calling a package step.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: make check-ci

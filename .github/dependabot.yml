@@ -1,0 +1,39 @@
+# Dependency update pull requests (W0-06 S8). Runs only after the repos split.
+# Weekly, with a 14-day cooldown on every ecosystem so a release is at least two weeks
+# old before it is proposed (D-88; pnpm minimumReleaseAge says the same for npm).
+# scripts/ci/wflint checks this file: every ecosystem below, weekly, cooldown >= 14,
+# and a gomod entry for every go.mod in the repo.
+# Not covered here: the scanner images and tool versions in scripts/ci/versions.env and
+# the stack digests in infra/local; those are bumped by hand with the same 14-day rule.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directories: ["/", "/.github/actions/*"]
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+  - package-ecosystem: gomod
+    directories: ["/backend", "/backend/tools", "/e2e/mocks", "/scripts/envtool", "/scripts/ci/wflint"]
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14

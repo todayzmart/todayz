@@ -1,0 +1,58 @@
+# Must pass wflint: every allowed form in one place.
+name: good
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "30 21 * * 0"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+defaults:
+  run:
+    shell: bash
+env:
+  TODAYZ_CI_TOOLS: docker
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: none
+    services:
+      cache:
+        image: alpine:3.22@sha256:4bcff63911fcb4448bd4fdacec207030997caf25e9bea4045fa6c8c44de311d1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-toolchain
+      - uses: docker://alpine:3.22@sha256:4bcff63911fcb4448bd4fdacec207030997caf25e9bea4045fa6c8c44de311d1
+      - run: make setup && make check
+      - run: make -C . -s -j4 --no-print-directory check >"$RUNNER_TEMP/out.txt" 2>&1
+      - run: |
+          # a comment that says make check-ci is fine: comments are not run
+          bash -c "make security"
+          m=make; $m stop
+      - if: github.event_name == 'push'
+        run: scripts/ci/terraform.sh validate
+      - run: |
+          terraform fmt -check -recursive infra/terraform
+          terraform -chdir=infra/terraform init -backend=false -input=false
+          terraform -chdir=infra/terraform validate -no-color
+          terraform -chdir=infra/terraform providers lock -platform=linux_amd64
+          terraform version
+          echo "terraform apply waits for Wave 5" # terraform plan in a comment
+  second:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions: {}
+    container:
+      image: alpine:3.22@sha256:4bcff63911fcb4448bd4fdacec207030997caf25e9bea4045fa6c8c44de311d1
+    steps:
+      - run: make e2e

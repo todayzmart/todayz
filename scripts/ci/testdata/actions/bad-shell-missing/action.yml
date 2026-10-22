@@ -1,0 +1,6 @@
+name: bad
+description: A composite run step without shell.
+runs:
+  using: composite
+  steps:
+    - run: make check

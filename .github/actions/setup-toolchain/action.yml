@@ -1,0 +1,72 @@
+# Go, Node and pnpm at the versions the repo pins, with Go module and pnpm store
+# caches, plus the pinned CI tools `make setup` and `make check` expect (W0-06).
+# Versions come from scripts/ci/toolchain.sh: go.mod, package.json packageManager,
+# and Node 24 LTS (NODE_CI_VERSION, checked against engines.node).
+# caddy is in the default set because check-stack validates the Caddyfile with it.
+# actionlint is not: `make setup` (setup-ci) installs it, the one place it is installed.
+# .tools/bin is cached, keyed on scripts/ci/versions.env; install-tools.sh still checks
+# every cached binary against the pinned version.
+# install-tools.sh adds .tools/bin to $GITHUB_PATH (lib.sh refuses a value with a newline).
+# Third-party actions are pinned by commit SHA.
+name: Set up the TodayZ toolchain
+description: Go, Node and pnpm from the repo pins, with caches, plus pinned CI tools in .tools/bin.
+inputs:
+  tools:
+    description: Space-separated tools for scripts/ci/install-tools.sh
+    required: false
+    default: gitleaks lefthook shellcheck caddy
+outputs:
+  go:
+    description: Go version from go.mod
+    value: ${{ steps.versions.outputs.go }}
+  node:
+    description: Node major for CI (NODE_CI_VERSION)
+    value: ${{ steps.versions.outputs.node }}
+  pnpm:
+    description: pnpm version from packageManager
+    value: ${{ steps.versions.outputs.pnpm }}
+runs:
+  using: composite
+  steps:
+    - name: Read toolchain versions from the repo
+      id: versions
+      shell: bash
+      run: scripts/ci/toolchain.sh print | tee -a "$GITHUB_OUTPUT"
+
+    - name: Set up Go
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      with:
+        go-version: ${{ steps.versions.outputs.go }}
+        cache: true
+        cache-dependency-path: |
+          **/go.sum
+          **/go.mod
+
+    - name: Set up Node
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version: ${{ steps.versions.outputs.node }}
+
+    # No `version:` input: pnpm/action-setup reads packageManager from package.json.
+    - name: Set up pnpm
+      uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      with:
+        cache: true
+
+    - name: Check the toolchain against the repo
+      shell: bash
+      run: scripts/ci/toolchain.sh check
+
+    - name: Cache .tools/bin (keyed on versions.env)
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: .tools/bin
+        key: tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('scripts/ci/versions.env') }}
+
+    - name: Install pinned CI tools
+      shell: bash
+      env:
+        TOOLS: ${{ inputs.tools }}
+      run: |
+        read -r -a tools <<<"$TOOLS"
+        scripts/ci/install-tools.sh "${tools[@]}"

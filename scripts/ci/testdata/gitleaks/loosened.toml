@@ -1,0 +1,8 @@
+# Fixture (selftest section 5): a pull request's own .gitleaks.toml that hides a
+# committed .env.local. scan.sh must ignore it on pull_request and read the base
+# branch's config instead.
+[extend]
+useDefault = true
+
+[[allowlists]]
+paths = ['''(^|/)\.env\.local$''']

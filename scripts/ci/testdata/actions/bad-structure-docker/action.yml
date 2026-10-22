@@ -1,0 +1,5 @@
+name: bad
+description: A Dockerfile action (unpinned base image).
+runs:
+  using: docker
+  image: Dockerfile

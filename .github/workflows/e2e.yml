@@ -1,0 +1,71 @@
+# make e2e on the runner (W0-06). Today that is e2e-stack (W0-02: it runs make dev
+# itself, probes every host, then stops the stack) and e2e-frontend-smoke (W0-05:
+# production-mode builds under preview, Playwright Chromium headless shell).
+# Lighthouse runs inside make e2e as well, when its package registers the step (S2).
+# `make setup` pulls the stack images, downloads the browser, gives the pinned Caddy
+# its port capability and (TODAYZ_CI_BROWSER_DEPS=1) adds the browser's system
+# libraries while the network is open; `make e2e` then runs offline under
+# scripts/no-egress.sh, where compose uses --pull never.
+# Reports: the paths in scripts/ci/paths.env, through .github/actions/upload-reports.
+name: e2e
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  TODAYZ_CI_TOOLS: docker
+
+jobs:
+  e2e:
+    name: make e2e
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go, Node, pnpm and CI tools
+        uses: ./.github/actions/setup-toolchain
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: make setup
+        env:
+          TODAYZ_CI_BROWSER_DEPS: "1"
+        run: make setup
+
+      # e2e-stack starts and stops the stack itself; no make dev here.
+      - name: make e2e
+        run: make e2e
+
+      - name: make stop
+        if: always()
+        run: make stop
+
+      - name: Upload reports
+        if: always()
+        uses: ./.github/actions/upload-reports
+        with:
+          name: e2e-reports

@@ -1,0 +1,4 @@
+# Owners whose actions workflows may use (W0-06). Adding one is a reviewed change
+# (CODEOWNERS for scripts/ci/** after the repo split). One owner per line.
+actions
+pnpm

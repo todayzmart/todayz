@@ -1,0 +1,8 @@
+{
+  "name": "lighthouse-good-pkg-fixture",
+  "private": true,
+  "scripts": {
+    "lhci": "lhci autorun --upload.target=filesystem --upload.outputDir=./.lighthouseci",
+    "lhci:quoted": "lhci upload --upload.target \"filesystem\""
+  }
+}

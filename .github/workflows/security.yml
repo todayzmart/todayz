@@ -1,0 +1,103 @@
+# make security (W0-06 S1). mk/90-ci.mk registers the scanners on SECURITY_STEPS:
+# gitleaks (git history), Trivy (filesystem), checkov (infra/) and a ZAP baseline that
+# runs only when the local stack answers its health check.
+#
+#   static   every pull request and push: make setup, make security (ZAP skips: no stack)
+#   dynamic  weekly and by hand: make setup, make dev, make security (ZAP runs), make stop
+#
+# gitleaks needs the whole history (fetch-depth: 0; scan.sh fails on a shallow clone).
+# On a pull request it reads .gitleaks.toml from the base branch (BASE_REF), so the
+# pull request cannot loosen its own scan. Trivy gates on fixed HIGH/CRITICAL findings;
+# the weekly run also writes a report-only pass that includes unfixed ones.
+# Scanner images are pinned by digest in scripts/ci/versions.env. Reports go up as
+# artifacts only (no code-scanning upload, so every permission stays read-only).
+name: security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "30 21 * * 0" # Mondays 03:00 IST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  TODAYZ_CI_TOOLS: docker
+
+jobs:
+  static:
+    name: make security (static)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - name: Check out (full history)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Go, Node, pnpm and CI tools
+        uses: ./.github/actions/setup-toolchain
+
+      - name: make setup
+        run: make setup
+
+      - name: make security
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: make security
+
+      - name: Upload reports
+        if: always()
+        uses: ./.github/actions/upload-reports
+        with:
+          name: security-static-reports
+
+  dynamic:
+    name: make security (local stack)
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    steps:
+      - name: Check out (full history)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Go, Node, pnpm and CI tools
+        uses: ./.github/actions/setup-toolchain
+
+      - name: make setup
+        run: make setup
+
+      - name: make dev
+        run: make dev
+
+      - name: make security
+        run: make security
+
+      - name: make stop
+        if: always()
+        run: make stop
+
+      - name: Upload reports
+        if: always()
+        uses: ./.github/actions/upload-reports
+        with:
+          name: security-dynamic-reports

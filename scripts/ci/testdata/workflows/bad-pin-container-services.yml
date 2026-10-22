@@ -1,0 +1,22 @@
+name: x
+on:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+jobs:
+  a:
+    permissions: {}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    container:
+      image: node:24
+    services:
+      pg:
+        image: postgres:16
+    steps:
+      - run: make check
+defaults:
+  run:
+    shell: bash

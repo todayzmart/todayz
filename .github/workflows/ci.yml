@@ -1,0 +1,57 @@
+# make check on every pull request and push (W0-06).
+# Written in Wave 0, run locally with `scripts/ci/act.sh`; it runs on GitHub only
+# after the user splits the repos. Until then the local `make check` is the gate.
+# Workflows call canonical make targets only (D-56), so this stays correct as
+# packages register their own steps in mk/*.mk. scripts/ci/wflint enforces the policy.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  # scripts/ci uses the pinned scanner images in CI, never whatever the runner has.
+  TODAYZ_CI_TOOLS: docker
+  # The default suite needs no provider keys (SC-PL-04), so no secrets are passed.
+
+jobs:
+  check:
+    name: make check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go, Node, pnpm and CI tools
+        uses: ./.github/actions/setup-toolchain
+
+      # Docker is on the runner for testcontainers (integration tests in make check).
+      - name: make setup
+        run: make setup
+
+      - name: make check
+        run: make check
+
+      - name: Upload reports
+        if: failure()
+        uses: ./.github/actions/upload-reports
+        with:
+          name: check-reports

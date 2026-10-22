@@ -1,0 +1,18 @@
+name: x
+on:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+jobs:
+  a:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: "write"
+    steps:
+      - run: make check
+defaults:
+  run:
+    shell: bash

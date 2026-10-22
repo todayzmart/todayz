@@ -1,0 +1,27 @@
+# gitleaks config for working-tree scans only (`gitleaks dir`: check-repo, check-ci).
+# Never use it for `gitleaks git`: these paths are git-ignored local files that hold
+# real keys on a developer machine (make setup writes .env.local), and in git mode
+# the same allowlist would hide them if they were ever committed (W0-06 review B1).
+#
+# The extend path is resolved from the current directory, so run gitleaks from
+# scripts/ci (scan.sh and mk/00-repo.mk do).
+title = "TodayZ gitleaks config (working tree)"
+
+[extend]
+path = "../../.gitleaks.toml"
+
+[[allowlists]]
+description = "git-ignored local files (make setup writes keys here; never committed)"
+paths = [
+  '''(^|/)\.env\.local$''',
+  '''(^|/)\.env\..*\.local$''',
+  '''(^|/)node_modules/''',
+  '''(^|/)\.tools/''',
+  '''(^|/)\.git/''',
+  '''(^|/)\.cache/''',
+  '''(^|/)ci-reports/''',
+  '''(^|/)dist/''',
+  '''(^|/)infra/local/data/''',
+  '''(^|/)\.terraform/''',
+  '''(^|/)\.claude/worktrees/''',
+]

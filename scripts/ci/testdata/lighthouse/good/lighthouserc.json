@@ -1,0 +1,1 @@
+{ "ci": { "collect": { "url": ["https://app.todayz.localhost/"] }, "upload": { "target": "filesystem", "outputDir": ".lighthouseci" } } }
