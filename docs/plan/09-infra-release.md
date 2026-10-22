@@ -110,6 +110,24 @@ The canonical target list (D-56), the same in 02, this file, `CLAUDE.md` and W0-
 
 GitHub Actions workflows are written in Wave 0 (W0-06) to mirror these. They will run once the user creates the repos and asks to push. Deploy workflows (Wave 5): build image → push to ECR → migrate → deploy Beanstalk api and worker → build and deploy Pages apps → upload Sentry source maps → smoke test → annotate Grafana. Production deploys need a manual approval.
 
+**Repo split checklist (W0-06).** When the user creates the repos:
+
+1. **CODEOWNERS** for:
+   - `.github/**`, `scripts/ci/**` and `mk/90-ci.mk`;
+   - the scanner configs (`.gitleaks.toml`, `scripts/ci/gitleaks-dir.toml`, `e2e/security/**`);
+   - `scripts/ci/wflint/allowed-owners.txt` and `id-token-allow.txt`.
+2. **Branch protection on main:**
+   - one required review, including code-owner review;
+   - stale approvals dismissed;
+   - no force push.
+3. **Required checks:** `ci / check`, `e2e`, `security / static`.
+4. **Actions settings:** "Require approval for all outside collaborators".
+5. **Runners:** GitHub-hosted only. wflint rejects `self-hosted`.
+6. **Wave 5 OIDC:**
+   - the AWS role trust scopes `sub` to `repo:<org>/<repo>:environment:production`;
+   - `id-token: write` is allowed only in the deploy jobs listed in `scripts/ci/wflint/id-token-allow.txt`;
+   - those jobs never run `make setup` or any repo script that installs tools.
+
 ## 5. Wave 5 steps (after credentials)
 
 1. The user adds credentials to env (names listed in `.env.example` under "Cloud"). The lead runs `make env-check` and confirms only `set`/`missing`.
