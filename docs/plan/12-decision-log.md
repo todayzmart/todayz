@@ -519,3 +519,8 @@ There is no `make seed`; use `make reset`.
 - Go is pinned per module with a `toolchain` line in `go.mod` (`go1.26.10` from W0-03). `make setup` downloads it into the Go cache, so `make check` stays offline. The user's system Go is left alone.
 - With the patched toolchain, govulncheck fails on any called standard-library vulnerability (`GOVULN_STDLIB=fail` by default).
 - First exceptions (W0-03): `golang.org/x/net` v0.60.0 and Go 1.26.10.
+
+**D-89 · Parallel-WP collision points in the backend (W0-03 review).**
+- Migration versions come in per-WP blocks, `<wave><wp:2><seq:2>` (W2-03 owns `20301`–`20399`), so parallel WPs never pick the same number. Wave 0 keeps `00001`–`00099`. goose stays in order; a local DB missing an older block is rebuilt with `make reset`.
+- Routes, sqlc queries and partitioned tables follow D-50: one pre-created file or entry per domain (`mountX` stubs, `db/queries/<domain>/` with package `<domain>db`), and the partition list is read from `pg_partitioned_table`, not a shared map.
+- Idempotency is opt-in per route, fenced by a claim id, and stores response bodies encrypted under `PII_ENC_KEY`. A `Cache-Control: no-store` response (auth, OTP, tokens) is never stored.
