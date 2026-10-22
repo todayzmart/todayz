@@ -1,0 +1,178 @@
+# TodayZ local stack (W0-02). Data services only; apps run on the host via
+# infra/local/proc.sh and Caddy (brew) terminates TLS for *.todayz.localhost.
+#
+# Run it through make (make dev / make stop / make logs). By hand:
+#   docker compose up -d --wait
+# Compose reads no env file: every credential below is a literal, local-only,
+# non-secret value, so nothing from .env.local or the shell can reach a container.
+# The one variable is TODAYZ_POSTGIS_IMAGE (infra/local/lib.sh picks it per CPU).
+#
+# Every host port binds to 127.0.0.1 and matches the port contract in /CLAUDE.md.
+# Images are pinned by tag and digest; see infra/local/README.md for why each one
+# was chosen and how to bump it. infra/local/test/static.sh requires @sha256.
+name: todayz
+
+x-logging: &logging
+  driver: json-file
+  options: { max-size: "10m", max-file: "3" }
+
+services:
+  postgres:
+    # postgis/postgis:16-3.4 is amd64 only. On Apple silicon make sets
+    # TODAYZ_POSTGIS_IMAGE to imresamu/postgis:16-3.4 (digest in infra/local/lib.sh):
+    # the same build (PostGIS 3.4, Postgres 16, bookworm) published multi-arch
+    # by the docker-postgis maintainer.
+    image: ${TODAYZ_POSTGIS_IMAGE:-postgis/postgis:16-3.4@sha256:44126d872ac91993766c341e369c539e8196614321765d36a6f1bab0419a5fa5}
+    command:
+      - postgres
+      - -c
+      - shared_preload_libraries=pg_stat_statements
+      - -c
+      - pg_stat_statements.track=all
+      - -c
+      - max_connections=200
+      - -c
+      - log_min_duration_statement=500
+    environment:
+      # Local-only, non-secret superuser for make reset and admin. The apps use
+      # todayz_app / todayz_owner from init.sql (DATABASE_URL, DATABASE_MIGRATE_URL
+      # in infra/local/local.env; infra/local/test/static.sh checks they match).
+      POSTGRES_USER: todayz
+      POSTGRES_PASSWORD: todayz
+      POSTGRES_DB: todayz
+      TZ: UTC
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infra/local/postgres/init.sql:/docker-entrypoint-initdb.d/10-todayz.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U todayz -d todayz -h 127.0.0.1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 30s
+      start_interval: 1s
+    logging: *logging
+    restart: unless-stopped
+
+  minio:
+    # MinIO stopped publishing images in 2025; pgsty/minio is the maintained
+    # community build of the same AGPL source (console included).
+    image: pgsty/minio:RELEASE.2026-08-04T00-00-00Z@sha256:b6bfe7239bfc83fb90d31612d9704d86039dd714f7904b3f1ad68f211e602372
+    command: ["server", "/data", "--address", ":9000", "--console-address", ":9001"]
+    environment:
+      # Local-only stand-in for R2; R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY in
+      # infra/local/local.env must match (checked by infra/local/test/static.sh).
+      MINIO_ROOT_USER: todayz
+      MINIO_ROOT_PASSWORD: todayz-local
+      MINIO_BROWSER_REDIRECT_URL: http://127.0.0.1:9101
+      MINIO_UPDATE: "off"
+      MINIO_API_CORS_ALLOW_ORIGIN: "https://app.todayz.localhost,https://business.todayz.localhost,https://admin.todayz.localhost,https://todayz.localhost"
+    ports:
+      - "127.0.0.1:9100:9000"
+      - "127.0.0.1:9101:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
+      start_interval: 1s
+    logging: *logging
+    restart: unless-stopped
+
+  # One-shot: buckets, policies and tile upload. Not started by `up`; make runs
+  # `docker compose run --rm minio-init <buckets|tiles>`.
+  minio-init:
+    image: pgsty/mc:RELEASE.2026-09-16T00-00-00Z@sha256:cfc83108c3abb371f8fb84d99c1fdc88f8c237e022409b0081fb7c0a3be634dd
+    profiles: ["tools"]
+    entrypoint: ["/bin/sh", "/init/minio-init.sh"]
+    command: ["buckets"]
+    environment:
+      MINIO_URL: http://minio:9000
+      MINIO_USER: todayz
+      MINIO_PASSWORD: todayz-local
+      MC_CONFIG_DIR: /tmp/.mc
+    volumes:
+      - ./infra/local/minio/minio-init.sh:/init/minio-init.sh:ro
+      - ./infra/local/pmtiles:/pmtiles:ro
+    depends_on:
+      minio: { condition: service_healthy }
+    logging: *logging
+
+  lgtm:
+    image: grafana/otel-lgtm:0.35.0@sha256:2de1094c593c671cbfca878a28ffcd7e46ff5e32f2ce966c0cf33003f6cf4266
+    environment:
+      GF_SERVER_ROOT_URL: https://grafana.todayz.localhost/
+      # Only grafana.todayz.localhost is served (other Host headers are redirected
+      # there), and every state-changing request is CSRF-checked, so a page on
+      # another origin cannot drive the anonymous session.
+      GF_SERVER_DOMAIN: grafana.todayz.localhost
+      GF_SERVER_ENFORCE_DOMAIN: "true"
+      GF_SECURITY_CSRF_ALWAYS_CHECK: "true"
+      # Anonymous local use: Editor can explore and build dashboards, not change
+      # datasources, users or settings.
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Editor
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: "false"
+      GF_NEWS_NEWS_FEED_ENABLED: "false"
+      # No plugin downloads: the stack must start without the internet.
+      GF_PLUGINS_PREINSTALL_DISABLED: "true"
+    ports:
+      - "127.0.0.1:3300:3000"
+      - "127.0.0.1:4317:4317"
+      - "127.0.0.1:4318:4318"
+      - "127.0.0.1:9390:9090"
+    volumes:
+      - lgtm-data:/data
+      # Prometheus: the image's config plus a scrape job for postgres_exporter.
+      - ./infra/local/lgtm/prometheus.yaml:/otel-lgtm/prometheus.yaml:ro
+      # Grafana: a read-only Postgres datasource and a dashboards provider that
+      # picks up infra/grafana/dashboards/*.json (W1-07 adds them). Only that
+      # folder is mounted.
+      - ./infra/local/lgtm/datasource-postgres.yaml:/otel-lgtm/grafana/conf/provisioning/datasources/todayz-postgres.yaml:ro
+      - ./infra/local/lgtm/dashboards.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/todayz.yaml:ro
+      - ./infra/grafana/dashboards:/todayz/dashboards:ro
+    healthcheck:
+      test: ["CMD", "/otel-lgtm/docker/healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 120s
+      start_interval: 2s
+    logging: *logging
+    restart: unless-stopped
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.20.1@sha256:ac5ec343104fae0e2d84a27bb8d69b38430a11910c5382cad85d478d2bab713e
+    command:
+      - --collector.stat_statements
+      - --web.listen-address=:9187
+    environment:
+      # Read-only monitoring role (pg_monitor) created by infra/local/postgres/init.sql.
+      DATA_SOURCE_URI: postgres:5432/postgres?sslmode=disable
+      DATA_SOURCE_USER: todayz_exporter
+      DATA_SOURCE_PASS: todayz_exporter
+    ports:
+      - "127.0.0.1:9187:9187"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9187/metrics"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+      start_interval: 1s
+    depends_on:
+      postgres: { condition: service_healthy }
+    logging: *logging
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  minio-data:
+  lgtm-data:

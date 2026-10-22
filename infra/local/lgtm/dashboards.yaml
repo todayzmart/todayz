@@ -1,0 +1,16 @@
+# Grafana dashboards provider for the local LGTM container (W0-02).
+# Dashboards are code in infra/grafana/dashboards/<nn>-<name>.json (W1-07 owns
+# them); docker-compose.yml mounts only that folder, read-only, at /todayz/dashboards.
+# The folder is kept in git (.gitkeep), so Grafana finds it even while it is empty.
+apiVersion: 1
+
+providers:
+  - name: todayz
+    folder: TodayZ
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    updateIntervalSeconds: 10
+    options:
+      path: /todayz/dashboards
+      foldersFromFilesStructure: false

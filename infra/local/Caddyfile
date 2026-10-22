@@ -1,0 +1,220 @@
+# TodayZ local HTTPS (W0-02). Caddy runs on the host (brew caddy), started by
+# `make dev` with TODAYZ_ROOT set to the repo root.
+#
+# - tls internal: certificates from Caddy's local CA in its default storage
+#   (~/Library/Application Support/Caddy). Run `caddy trust` once yourself
+#   (it asks for your password) so browsers and curl trust it.
+# - HTTPS on 443; plain HTTP on 80 only redirects to HTTPS.
+# - macOS lets a normal user bind 443/80 only on all interfaces, so every site
+#   aborts connections that do not come from this machine (local_only).
+#   `order abort first` makes that abort the first handler of every route:
+#   by default Caddy sorts abort after handle and redir, so sites built from
+#   handle blocks (and the :80 redirect) would answer before it ran.
+#   infra/local/test/static.sh checks the adapted JSON for this on every site.
+# - Upstream ports follow the contract in /CLAUDE.md.
+{
+	admin {$TODAYZ_CADDY_ADMIN:localhost:2019}
+	order abort first
+	# Never touch the system trust store from here; the user runs `caddy trust`.
+	skip_install_trust
+	# Requests are logged without Authorization or Cookie headers (Caddy redacts
+	# them by default); query strings are kept but the apps never put secrets there.
+	log {
+		output file "{$TODAYZ_ROOT}/.cache/dev/caddy.log" {
+			roll_size 10MiB
+			roll_keep 3
+		}
+		format json
+	}
+}
+
+(local_only) {
+	@remote not remote_ip 127.0.0.1/8 ::1/128
+	abort @remote
+}
+
+(tls_local) {
+	tls internal
+	encode zstd gzip
+}
+
+# Browser origins of the apps (CORS on tiles. and img.). Vary: Origin goes on
+# every response, so a cache never reuses one origin's answer for another.
+(cors_apps) {
+	header Vary Origin
+	@cors_origin header_regexp origin Origin ^https://((app|business|admin)\.)?todayz\.localhost$
+	@cors_preflight {
+		method OPTIONS
+		header_regexp Origin ^https://((app|business|admin)\.)?todayz\.localhost$
+	}
+	handle @cors_preflight {
+		header Access-Control-Allow-Origin "{header.Origin}"
+		header Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+		header Access-Control-Allow-Headers "Range, If-Match, If-None-Match, If-Modified-Since, Cache-Control"
+		header Access-Control-Max-Age "86400"
+		respond 204
+	}
+	header @cors_origin {
+		Access-Control-Allow-Origin "{header.Origin}"
+		Access-Control-Expose-Headers "ETag, Content-Range, Content-Length, Accept-Ranges, Last-Modified"
+	}
+}
+
+# Public, read-only view of one MinIO bucket (path-style: /<bucket>/<key>).
+# Range requests pass through untouched (MinIO answers 206), which PMTiles needs.
+# Only object reads: no writes, no bucket listing (GET / or ?list-type=...), and
+# no path tricks that could step out of the bucket (.., encoded dots or slashes,
+# backslashes, empty segments): the raw request line is checked, before any cleaning.
+(bucket_public) {
+	@trick vars_regexp {http.request.orig_uri} (\.\.|%2[eEfF]|%5[cC]|\\)
+	handle @trick {
+		respond "bad path" 400
+	}
+	@dslash vars_regexp {http.request.orig_uri.path} //
+	handle @dslash {
+		respond "bad path" 400
+	}
+	@write not method GET HEAD OPTIONS
+	handle @write {
+		respond "read only" 405
+	}
+	@list {
+		path /
+	}
+	handle @list {
+		respond "not found" 404
+	}
+	handle {
+		rewrite * /{args[0]}{uri}
+		reverse_proxy 127.0.0.1:9100 {
+			# MinIO's own CORS and Vary headers are replaced by cors_apps.
+			header_down -Access-Control-Allow-Origin
+			header_down -Access-Control-Allow-Credentials
+			header_down -Access-Control-Expose-Headers
+			header_down -Vary
+			header_down -Server
+		}
+	}
+}
+
+# Vite / Astro dev servers: reverse_proxy upgrades the HMR websocket on its own.
+(app_upstream) {
+	reverse_proxy 127.0.0.1:{args[0]} {
+		flush_interval -1
+	}
+}
+
+http://*.todayz.localhost, http://todayz.localhost {
+	import local_only
+	redir https://{host}{uri} 308
+}
+
+todayz.localhost {
+	import local_only
+	import tls_local
+	# Stack health page written by infra/local/health.sh (make dev runs it last).
+	# Each path maps to one fixed file; nothing else in .cache/dev is served.
+	handle /_health {
+		root * "{$TODAYZ_ROOT}/.cache/dev"
+		rewrite * /health.html
+		header Cache-Control "no-store"
+		file_server
+	}
+	handle /_health/bundle.css {
+		root * "{$TODAYZ_ROOT}/.cache/dev"
+		rewrite * /bundle.css
+		file_server
+	}
+	handle /_health/tokens.css {
+		root * "{$TODAYZ_ROOT}/.cache/dev"
+		rewrite * /tokens.css
+		file_server
+	}
+	handle {
+		import app_upstream 5304
+	}
+}
+
+app.todayz.localhost {
+	import local_only
+	import tls_local
+	import app_upstream 5301
+}
+
+business.todayz.localhost {
+	import local_only
+	import tls_local
+	import app_upstream 5302
+}
+
+admin.todayz.localhost {
+	import local_only
+	import tls_local
+	import app_upstream 5303
+}
+
+api.todayz.localhost {
+	import local_only
+	tls internal
+	# Compress API bodies, but never text/event-stream: SSE must reach the client
+	# event by event, unbuffered.
+	encode zstd gzip {
+		match {
+			header Content-Type application/json*
+			header Content-Type application/problem+json*
+			header Content-Type text/plain*
+			header Content-Type text/html*
+			header Content-Type text/css*
+			header Content-Type application/javascript*
+			header Content-Type image/svg+xml*
+		}
+	}
+	reverse_proxy 127.0.0.1:8180 {
+		flush_interval -1
+	}
+}
+
+mocks.todayz.localhost {
+	import local_only
+	import tls_local
+	reverse_proxy 127.0.0.1:4010
+}
+
+grafana.todayz.localhost {
+	import local_only
+	import tls_local
+	reverse_proxy 127.0.0.1:3300
+}
+
+# Full S3 API (presigned uploads from the browser). Host is passed through so
+# SigV4 signatures made for s3.todayz.localhost verify.
+s3.todayz.localhost {
+	import local_only
+	tls internal
+	request_body {
+		max_size 100MB
+	}
+	reverse_proxy 127.0.0.1:9100
+}
+
+img.todayz.localhost {
+	import local_only
+	import tls_local
+	import cors_apps
+	# Only successful reads are cacheable; errors and 304s keep MinIO's headers.
+	header {
+		match {
+			status 200 206
+		}
+		Cache-Control "public, max-age=300"
+	}
+	import bucket_public images
+}
+
+tiles.todayz.localhost {
+	import local_only
+	# No compression here: PMTiles readers need byte ranges of the raw file.
+	tls internal
+	import cors_apps
+	import bucket_public tiles
+}

@@ -1,0 +1,20 @@
+# Grafana datasource: the local app database through the read-only grafana_ro
+# role (pg_read_all_data + default_transaction_read_only; see infra/local/postgres/init.sql).
+# Local-only, non-secret password. Cloud datasources come from Terraform (Wave 5).
+apiVersion: 1
+
+datasources:
+  - name: TodayZ Postgres (local, read-only)
+    type: grafana-postgresql-datasource
+    uid: todayz-postgres
+    url: postgres:5432
+    user: grafana_ro
+    editable: false
+    jsonData:
+      database: todayz
+      sslmode: disable
+      postgresVersion: 1600
+      timescaledb: false
+      maxOpenConns: 5
+    secureJsonData:
+      password: grafana_ro

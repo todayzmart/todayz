@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "stack-health",
+      "url": "https://todayz.localhost"
+    },
+    {
+      "name": "app",
+      "url": "https://app.todayz.localhost"
+    },
+    {
+      "name": "business",
+      "url": "https://business.todayz.localhost"
+    },
+    {
+      "name": "admin",
+      "url": "https://admin.todayz.localhost"
+    },
+    {
+      "name": "mocks",
+      "url": "https://mocks.todayz.localhost"
+    },
+    {
+      "name": "grafana",
+      "url": "https://grafana.todayz.localhost"
+    }
+  ]
+}
