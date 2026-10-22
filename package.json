@@ -1,0 +1,13 @@
+{
+  "name": "todayz",
+  "private": true,
+  "description": "TodayZ monorepo root (local only). Each app folder builds on its own; see CLAUDE.md.",
+  "packageManager": "pnpm@10.32.0",
+  "engines": {
+    "node": ">=22.12",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "check": "make check"
+  }
+}

@@ -1,0 +1,13 @@
+# Git hooks (W0-01). Installed by `make setup`.
+pre-commit:
+  parallel: true
+  commands:
+    gitleaks:
+      run: gitleaks git --pre-commit --staged --config .gitleaks.toml --no-banner --redact
+    forbidden-files:
+      run: scripts/hooks/forbidden-files.sh {staged_files}
+
+pre-push:
+  commands:
+    no-push:
+      run: scripts/hooks/no-push.sh

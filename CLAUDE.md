@@ -61,4 +61,6 @@ make env-check          # env var names with set/missing, never values
 make release-candidate  # all of the above on a clean reset; writes docs/qa/rc-<date>/
 ```
 
+Each package registers its steps in its own `mk/<area>.mk` (`CHECK_STEPS += check-x`); nobody edits the root `Makefile`. `make check` and `make e2e` run under `scripts/no-egress.sh`: outbound traffic is refused and reported, and provider keys are unset (SC-PL-04). Provider base URLs use `*_API_URL` names, never SDK defaults like `ANTHROPIC_BASE_URL`.
+
 The list is canonical (D-56): the same in `docs/plan/02-architecture.md`, `docs/plan/09-infra-release.md` and W0-01. Before Wave 5, Terraform runs only `fmt -check`, `validate`, tflint and checkov; no `plan` or `apply`.

@@ -1,0 +1,10 @@
+# pnpm workspace (W0-01). Apps consume shared/* through workspace:*.
+# Each app must still build on its own so it can become its own repo later.
+packages:
+  - "shared/*"
+  - "customer"
+  - "business"
+  - "admin"
+  - "site"
+  - "e2e"
+  - "e2e/*"

@@ -1,0 +1,61 @@
+# Secrets and local env (make setup writes .env.local; never commit it)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Generated code (make gen produces it; D-55)
+backend/gen/
+backend/api/openapi.yaml
+shared/api-client/src/gen/
+**/routeTree.gen.ts
+**/mocks/handlers.gen.ts
+
+# Local tools and caches
+.tools/
+.cache/
+node_modules/
+.pnpm-store/
+dist/
+build/
+coverage/
+.turbo/
+.astro/
+*.tsbuildinfo
+.eslintcache
+.stylelintcache
+
+# Test output (QA evidence in docs/qa is committed; raw runner output is not)
+test-results/
+playwright-report/
+blob-report/
+.lighthouseci/
+e2e/load/out/
+e2e/security/out/
+e2e/contract/out/
+*.out
+*.test
+__debug_bin*
+
+# Local stack data
+infra/local/data/
+infra/local/caddy/data/
+infra/local/pmtiles/*.pmtiles
+
+# Terraform (no state before Wave 5; never commit state)
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# Claude Code local settings (launch.json is shared)
+.claude/settings.local.json

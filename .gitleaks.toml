@@ -1,0 +1,19 @@
+# gitleaks config: default rules plus allowlists for local-only, git-ignored paths.
+title = "TodayZ gitleaks config"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "git-ignored local files (make setup writes keys here; never committed)"
+paths = [
+  '''(^|/)\.env\.local$''',
+  '''(^|/)\.env\..*\.local$''',
+  '''(^|/)node_modules/''',
+  '''(^|/)\.tools/''',
+  '''(^|/)\.git/''',
+  '''(^|/)\.cache/''',
+  '''(^|/)dist/''',
+  '''(^|/)infra/local/data/''',
+  '''(^|/)\.terraform/''',
+]
