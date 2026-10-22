@@ -20,7 +20,7 @@ Stock movements of every source and who may write them, the stock math (on hand 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
 | STOCK-M.01 ★ | K22 opens B-07 → I3 Nandini Toned Milk (on hand 30). Inline count: 28. | On hand 28. History: one `count_correction` −2 by K22 with the time. Freshness resets ("updated 0 min ago" or "just now"). | `R-4.4` `R-4.5` `R-4.6` B-07 | ▢ | |
-| STOCK-M.02 | As K22 look for Restock, Damage, price edit, batches and Import on I3. | All hidden for the cashier. Via cURL, `POST {S}/items/{I3}/movements` with `kind` `restock` → `403`; `damage` → `403`; `PATCH {S}/items/{I3}` with a new price → `403`. | `R-3.9` AU-10 D-38 B-07 | | |
+| STOCK-M.02 | As K22 look for Restock, Damage, price edit, batches and Import on I3. | All hidden for the cashier. Via cURL, `POST {S}/items/{I3}/movements` with `kind` `restock` → `403`; `damage` → `403`; `PATCH {S}/items/{I3}` with a new price → `403`. | `R-3.9` AU-10 D-38 D-06 D-65 B-07 | | |
 | STOCK-M.03 | M21 restocks I1 Amul Butter +12 with note "QA". Records damage −1 on I5 Coca-Cola with note "dented". Marks 2 units of I8 Curd as `expired`. | I1 10 → 22 (`restock`). I5 12 → 11 (`damage`). I8 20 → 18 (`expired`). Each row shows source, quantity, actor M21 and time. | `R-4.4` B-07 | ▢ | |
 | STOCK-M.04 | Via cURL as M21, post a movement with `kind` `voice` and another with `kind` `gift`. | Both → `422`: the source is not in the D-01 list. No row written. | `R-4.4` SC-CT D-01 | | |
 | STOCK-M.05 ★ | C10 places a pickup order for I1 ×3. Before accepting, read I1 in B-07. K22 accepts. Read again. | Before: on hand 22, reserved 0, available 22, no new movement. After accept: on hand 22, reserved 3, available 19, still no movement; "Reserved for orders 3" shows apart from the history. | `R-4.5` `R-5.19` `R-5.20` BK-36 B-07 | ▢ | |
@@ -32,7 +32,7 @@ Stock movements of every source and who may write them, the stock math (on hand 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
 | STOCK-M.08 | B-07 filter Low. | I6 Dolo (1 left) is listed; items with 5 or more are not (`low_stock_default` 5). B-03 KPI "items low" counts the same items. | `R-4.7` B-03 B-07 | ▢ | |
-| STOCK-M.09 | M21 counts I5 Coca-Cola to 5, then to 4. | At 5: record whether it is low (the rule says threshold 5; whether "at" or "below" is low is not stated, note it). At 4: listed as low. | `R-4.7` | | |
+| STOCK-M.09 | M21 counts I5 Coca-Cola to 5, then to 4. | At 5: low (quantity at or below the threshold is low, 01 §4). At 4: low. | `R-4.7` | | |
 | STOCK-M.10 | M21 sets I1's own low-stock threshold to 25 in the item detail. | I1 (19) shows as low. Restore 5. | `R-4.7` | | |
 | STOCK-M.11 ★ | In profile A open I7 Toor dal (last update 73 h ago) on C-07 and C-08. | "Stock not confirmed recently" instead of the freshness line. In search "toor dal", Sri Lakshmi ranks below a store with fresh stock at a similar distance (record order). | `R-4.6` `R-11.5` SC-CT C-07 C-08 | ▢ | |
 | STOCK-M.12 | K22 counts I7 (8 → 8, "confirm count"). Reload C-08. | "In stock · updated 0 min ago" (or "just now"). B-07 freshness updated. | `R-4.6` B-07 C-08 | | |
@@ -67,7 +67,7 @@ Stock movements of every source and who may write them, the stock math (on hand 
 | STOCK-M.26 | Set profile E's system clock 2 hours behind (or use DevTools sensors to override time if available; otherwise mark **B**). Go offline, sell I3 ×1, go online. Open sales history and B-12. | `sold_at` = device time (2 h earlier); `received_at` = server time. B-12 reports place the sale at the device time, clamped to no more than 72 h before receipt. | POS-06 | ▢ | |
 | STOCK-M.27 | Profile E online; read `GET {S}/catalogue/changes?cursor=<cursor>` with a cursor from now. `clock +29d`. Repeat with the same cursor. `clock +2d`. Repeat. | At 29 days: a delta of changes. At 31 days: `410 resync_required`. | `R-12.9` POS-24 D-36 `resync_required` | | |
 | STOCK-M.28 | Open the business app on profile E after the 31-day jump. | The app downloads the full snapshot (a progress or "Updating catalogue" state), then works on deltas from the new cursor. No stale prices on the POS. | POS-24 B-05 | ▢ | |
-| STOCK-M.29 | Profile B offline. M21 (online, profile C) changes I1's price to ₹60. On profile B sell I1 ×1 at the cached ₹58. Go online and sync. | The sale is kept at the ₹58 that was charged. The POS then shows ₹60. Record whether the sale is flagged. | `R-12.9` POS-03 | | |
+| STOCK-M.29 | Profile B offline. M21 (online, profile C) changes I1's price to ₹60. On profile B sell I1 ×1 at the cached ₹58. Go online and sync. | The sale is kept at the ₹58 that was charged. The POS then shows ₹60. The sale is not flagged (no risk flag in v1, D-93). | `R-12.9` POS-03 | | |
 
 ### F. A confirmed voice draft reaches the customer (E2E-11)
 

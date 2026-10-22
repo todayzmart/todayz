@@ -35,7 +35,7 @@ Every way an order ends early, by every actor, with the reason lists of 01 §5.6
 | CANCEL-M.09 | Standard order; K22 accepts. As K22 open the order detail. | No Cancel button for the cashier. Via cURL, `POST {S}/orders/{id}/cancel` with K22's session → `403`. | `R-5.12` `R-3.9` BK-18 D-65 B-04 | | |
 | CANCEL-M.10 | As M21 open the same order. Tap Cancel. | The picker lists exactly the labels for `out_of_stock`, `customer_unreachable`, `closing_soon`, `other`. | `R-5.34` BK-18 D-68 B-04 | ▢ | |
 | CANCEL-M.11 | Pick `other` and leave the note empty. Then send the request via cURL with reason `too_busy`. | `other` without a note: the form will not submit; the API → `422`. `too_busy` (not in the shop-cancel list) → `422`. | `R-5.34` BK-18 | | |
-| CANCEL-M.12 ★ | Pick `customer_unreachable` and confirm. | `cancelled` (shop). C10 notified with the reason. Reservations and held credits released. A-05: the cancel is counted in Sri Lakshmi's reliability. C10 gets no strike. | `R-5.12` `R-5.26` BK-18 A-05 | ▢ | |
+| CANCEL-M.12 ★ | Pick `customer_unreachable` and confirm. | `cancelled` (shop). C10 notified with the reason. Reservations and held credits released. No strike for Sri Lakshmi and no change to its reliability (D-68); the cancel appears only in the store's order-outcome breakdown on A-05. C10 gets no strike. | `R-5.12` `R-5.26` BK-18 A-05 | ▢ | |
 | CANCEL-M.13 | Standard order (I1 ×1, I10 ×1). K22 taps Accept part and removes both lines. | The app does not allow confirming with zero lines and points to Reject. Via cURL `accept` with an empty `lines` → refused (record status and code). | `R-5.9` BK-10 | | |
 
 ### C. Partial accept: customer declines and confirms

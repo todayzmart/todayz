@@ -25,7 +25,7 @@ TodayZ is free for retailers in v1. No payment gateway: customers pay the shop d
 ## 2. Accounts and identity
 
 - Customers sign in with mobile number + SMS OTP (6 digits, 5 min validity, 5 attempts, resend after 30 s, max 5 sends per number per hour and 20 per IP per hour). Browsing never needs sign-in; sign-in is asked at checkout, and the cart survives sign-in.
-- An OTP is never logged, in any environment. In `local` and `test` only, the reserved numbers `+91 90000 000xx` accept `000000`; any other number goes through the mock SMS server. There is no `dev` environment.
+- An OTP is never logged, in any environment. In `local` and `test` only, the reserved numbers `+91 90000 000xx` accept `000000`; any other number goes through the mock SMS server. Sends to reserved numbers still go to the mock SMS server; only verification is short-circuited. There is no `dev` environment.
 - In `local` and `test` only, a test clock (`/v1/test/clock`) lets testers move server time for manual testing of timers and expiries. Staging and prod builds return 404 for it (D-80).
 - Business users sign in the same way. One person can belong to several businesses with a role in each.
 - Admin staff sign in with mobile OTP plus a TOTP authenticator app (mandatory for every admin role). Each admin gets 10 one-time recovery codes.
@@ -68,11 +68,13 @@ TodayZ is free for retailers in v1. No payment gateway: customers pay the shop d
   Voice and AI drafts write the ordinary source of each confirmed line; there is no `voice` source.
 - **Stock math:** on hand = sum of movements. Reservations are not movements: they live only in stock reservations, with a cached reserved count per store item. Available = on hand − reserved.
 - Customers always see freshness: "In stock · updated 12 min ago". A store item not updated for `stock_stale_after_hours` (default 72) shows "Stock not confirmed recently".
-- Low stock threshold: per item, default `low_stock_default` = 5 units.
+- Low stock threshold: per item, default `low_stock_default` = 5 units. An item is low when its quantity is at or below its threshold.
 
 ## 5. Booking (online order) flow
 
 One order = one store. Fulfilment is **pickup** or **delivery**, each only if the store accepts it (§3) and, for delivery, `feature_delivery_enabled` is on.
+
+`feature_delivery_enabled` off is a platform kill switch: every store's effective `accepts_delivery` becomes false. A store with `accepts_pickup` false then shows "In-store only", and booking it returns `409 store_not_bookable`. Delivery orders already in progress finish normally.
 
 - Ordering outside the store's opening hours, or while the shop is closed manually, is refused (`store_closed`).
 
@@ -86,7 +88,7 @@ One order = one store. Fulfilment is **pickup** or **delivery**, each only if th
 | Customer must answer a partial acceptance | 5 min | `partial_confirm_timeout_min` (**default**) |
 | Delivery order must be dispatched after acceptance | 60 min | `delivery_dispatch_timeout_min` (**default**) |
 
-Timers can be changed per platform only (not per shop) in v1. All timers run on the server; clients only display them.
+Timers can be changed per platform only (not per shop) in v1. All timers run on the server; clients only display them. Changing a timer setting never moves the deadlines of existing orders; each order stores its own deadlines.
 
 ### 5.2 States
 
@@ -122,6 +124,7 @@ Any non-terminal state
 
 - Terminal states: `collected`, `delivered`, `rejected`, `expired`, `cancelled`, `delivery_failed`.
 - Customers can cancel any time before `collected`/`delivered`/`out_for_delivery`.
+- A shop may accept an order after its closing time, until `accept_by`; `store_closed` applies to placing only.
 - **Who acts for the shop** (D-65): cashiers and above accept, reject, partial accept, mark ready, dispatch, verify the code (collected or delivered) and mark delivery failed. Cancelling an accepted order needs manager or above.
 - **Partial timeout** (D-68): if the customer does not answer a partial accept within `partial_confirm_timeout_min`, the order becomes `cancelled` with system reason `partial_timeout`. Nobody gets a strike.
 - **Admin cancel:** `support`, `admin` and `super_admin` can cancel from any non-terminal state, with a reason from the admin-cancel list (§5.6). It releases reservations and held credits. No strike is given unless the admin assigns fault to the customer or the shop. It is audited.
@@ -130,7 +133,7 @@ Any non-terminal state
 - **Auto-accept** (store setting, default off): if on and every item is available, the order is accepted at once.
 - **Partial accept:** the retailer reduces quantities or removes items. In `awaiting_customer` the customer sees the new totals and confirms or cancels. On confirm:
   - held credits are re-capped against the new eligible amount (§7); if it is under ₹100, all held credits are released and the order uses no credits;
-  - the delivery fee is recomputed on the new eligible amount and the free-delivery threshold is applied again. The delivery minimum is checked only at placement.
+  - the delivery fee is recomputed on the new item subtotal (§5.5) and the free-delivery threshold is applied again. The delivery minimum is checked only at placement.
 
 ### 5.3 Stock during an order
 
@@ -154,7 +157,10 @@ Any non-terminal state
 ### 5.5 Delivery
 
 - Store settings: delivery on/off, radius (km), fee (₹, may be 0), free above (₹, optional), minimum order (₹), delivery hours (default = opening hours).
-- The delivery minimum and the free-above threshold are checked against the eligible amount (§7). Credits never pay the delivery fee.
+- **₹ thresholds are inclusive** (D-94). The delivery minimum, the free-above threshold and a minimum-bill offer are all compared with the **item subtotal**: the items total after item-level offers, before the minimum-bill discount and before credits. Delivery is free when the item subtotal is ₹X or more; the business app label reads "Free delivery on ₹X+". Credits never pay the delivery fee.
+  - Order of operations in a quote: item-level offers, then the minimum-bill offer, then the delivery fee, then credits.
+  - Example, assuming free delivery on ₹500+: a ₹500 cart with a "₹50 off on ₹500+" offer gets free delivery and the ₹50 off, so it pays ₹450. A ₹520 cart with a ₹30 item offer has an item subtotal of ₹490: delivery is charged and the minimum-bill offer does not apply.
+- Ordering delivery outside delivery hours returns `409 delivery_closed` (with `nextDeliveryWindow` in `extensions`); pickup is still offered, and checkout (C-11) offers "Switch to pickup".
 - The shop's own staff delivers. The customer's delivery code is told to the rider, who enters it in the business app (rider = staff member with cashier role or a "delivery" flag).
 - Customer app shows "Delivery" on shops that offer it and only offers it if the address is inside the radius.
 - `delivery_failed`: held credits are released and no cashback is issued. The goods follow §5.3.
@@ -186,24 +192,25 @@ Any non-terminal state
   - the device clock was within 2 minutes of the server's at the device's last online check (the device records it);
   - the code has not been used before.
 
-  If verification fails, the sale stays unlinked and the shop sees "Customer link failed". More than `pos_offline_links_risk_per_day` (20) offline links at one store in a day raises a risk flag.
+  If verification fails, the sale stays unlinked and the shop sees "Customer link failed". More than `pos_offline_links_risk_per_day` (20) offline links at one store in a day raises a risk flag. More than `risk_code_lockouts_store_per_day` (10) order-code lockouts at one store in an IST day also raises a risk flag.
 
 ## 7. Credits
 
 - 1 credit = ₹1. Credits are not cash for customers: they are only spent on orders, never withdrawn.
-- **Eligible amount:** the items total after offers and discounts, before credits, without the delivery fee. At the POS it is the bill after discounts. Credit rules, cashback, delivery minimum and free delivery all use it.
+- **Eligible amount:** the items total after offers and discounts, before credits, without the delivery fee. At the POS it is the bill after discounts. Credit rules and cashback use it. The delivery minimum, free delivery and minimum-bill offers use the item subtotal instead (§5.5), which is measured before the minimum-bill discount.
 - **Spending:** at most 30 credits per order (`credit_max_per_order`), only when the eligible amount is ₹100 or more (`credit_min_order_value_paise`; copy says "₹100 or more"). The same minimum applies at the POS. Credits apply only to the eligible amount, which can never go below ₹1 after credits; they never pay the delivery fee. The customer picks how many (0 to the max) at checkout or when confirming a bill QR.
 - **Lots:** every credit into a customer wallet creates a lot (cashback, referral reward, positive admin adjustment). Each lot expires on its own date.
 - **Holding:** credits chosen at checkout are held when the order is placed. A hold consumes lots oldest first and marks those portions as held. The hold is captured on `collected`/`delivered` and released on any other terminal state; a released hold goes back to the same lots (no new lot). A lot that expires while held does not expire then; if the hold is released after the lot's expiry date, that portion expires at once.
 - **Where spent credits go:** to the shop's credit account (customer spends 30 → shop's account +30). The shop is paid that money with its payout (§9).
 - **Purchase cashback:** each store sets a cashback rate in settings (0–20%, stored as `cashback_bp` 0–2000, step 50 bp, default 0). On `collected`/`delivered` or a linked POS sale, the customer earns `floor(base_paise × cashback_bp / 1 000 000)` credits, where base = eligible amount − credits used (the delivery fee is excluded). Shown on the shop in the customer app ("5% back"). **The shop pays for its own cashback**: it is debited from the shop's credit account (**default**; may go negative, netted at payout).
 - **Referral credits** are paid by TodayZ (marketing expense), see §8.
-- **Expiry** (**default**): each lot expires 365 days after it was earned (`credit_expiry_days`); spending uses the oldest lots first; customers are told 7 days before.
+- **Expiry** (**default**): each lot expires 365 days after it was earned (`credit_expiry_days`); spending uses the oldest lots first; customers are told `credit_expiry_reminder_days` (7) days before. A lot earned on day X (IST) with `credit_expiry_days` = N is usable through day X+N and expires at 00:00 IST on day X+N+1.
 - **Caps** (**default**, fraud guard): one customer can spend credits on at most 10 orders per month (`credit_orders_per_month`); one store can accept at most 200 credit redemptions per day (`store_credit_redemptions_per_day`).
   - "Day" is the IST calendar day; "month" is the IST calendar month.
   - When a cap is reached, the order can still be placed, without credits. The quote says so before the customer places it (D-76):
     - store's daily cap: "Credits can't be used at this shop today";
     - customer's monthly cap: "You've used this month's credit limit".
+  - Counted when the hold is taken (when the order is placed). A cancelled or expired order releases its hold and no longer counts.
   - These are spend caps only. There are no caps on earning credits; cashback is limited per bill by the store's cashback rate (at most 20%, above), and that is what limits earning (D-62).
 - **Reversing a linked POS sale** (manager and above, within `pos_reversal_window_hours`, 24):
   - Credits spent on the sale go back to the lots they came from. Any part of a lot that has expired since then expires at once.
@@ -229,6 +236,7 @@ Keys: `ref_<kind>_referrer_credits` and `ref_<kind>_referee_credits` for each ki
 - A referral is **pending** at sign-up and **unlocks** when the new person completes the qualifying action:
   - a customer: their first `collected`/`delivered` order or `bill_qr`/`counter_code` POS sale whose qualifying amount (eligible amount − credits used) is at least ₹100 (`ref_qualifying_min_order_paise`);
   - a new shop: verification plus 10 completed orders or linked sales (`ref_shop_qualifying_orders`, **default**).
+- Customer rewards post in the same transaction as the qualifying order outcome; shop rewards post after the 10th order (D-72).
 - **Attribution:** one referrer per new person. First touch wins, within 7 days from opening the link to signing up (`ref_attribution_window_days`).
 - Self-referral, a second claim, and the same phone are refused. A sign-up on a device already tied to the referrer, or to another account in the last 90 days, is recorded as `rejected_same_device` with no reward. 3 or more accounts on one device raises a risk flag.
 - Rewards to a shop (as referrer or as the new shop) go to the credit account of the business's primary store and are paid out in money with payouts (§9).
@@ -239,8 +247,8 @@ Keys: `ref_<kind>_referrer_credits` and `ref_<kind>_referee_credits` for each ki
 
 - Each business has a credit account per store (statement is per business, broken down by store).
 - Credits in: customer credits spent at the store, referral rewards earned by the business. Credits out: cashback the store gave, payouts. Reversals (§7) and admin adjustments post here too.
-- **Monthly statement** (manual payout): on the 1st, the system closes the previous month's statement per business: opening balance + credits in − cashback ± reversals and adjustments − payouts paid = closing balance.
-- **Payout amount** = the business's store credit balance − its unpaid payouts. If that is above 0 and KYC is verified, a payout is created for finance.
+- **Monthly statement** (manual payout): statements close on the 1st of each month at 00:30 IST. The system closes the previous month's statement per business: opening balance + credits in − cashback ± reversals and adjustments − payouts paid = closing balance.
+- **Payout amount** = the business's store credit balance − its unpaid payouts. If the closing amount is above 0, a payout is created for finance. It is `pending` when KYC is verified, there is no open fraud flag and the business is not suspended. Otherwise it is `held` with `hold_reason` `kyc_incomplete`, `risk_flag` or `business_suspended`, and finance unholds it when the cause clears.
   - A business has at most one open payout (`pending` or `held`).
   - If the open payout is still unpaid when the next statement closes, its amount is recomputed; no second payout is created.
 - Finance in the admin console reviews (fraud flags shown), pays by UPI outside TodayZ, then marks it paid with the UTR reference. Only then does the business app show "Paid". Negative balances carry forward.
@@ -248,7 +256,7 @@ Keys: `ref_<kind>_referrer_credits` and `ref_<kind>_referee_credits` for each ki
 
 ## 10. Reviews
 
-- After `collected`/`delivered` (or a `bill_qr`/`counter_code` POS sale), the customer can review the store: 1–5 stars + optional text (≤ 1000 chars) + optional tags. One review per order; editable for 7 days.
+- After `collected`/`delivered` (or a `bill_qr`/`counter_code` POS sale), the customer can review the store: 1–5 stars + optional text (≤ 1000 chars) + optional tags. One review per order; editable for `review_edit_window_days` (7) days; after that, an edit returns `409 review_edit_window_passed`.
 
   | Tags | Values |
   |---|---|
@@ -278,9 +286,9 @@ Keys: `ref_<kind>_referrer_credits` and `ref_<kind>_referee_credits` for each ki
 Overview (KPI strip, sales by hour, new orders, demand insights, top items), Orders, Sell (POS), Voice update, Stock and products, Offers, Customers, Credits and referrals (credit account, statements, QR standee), Reviews, Analytics, Stores and staff, Settings (profile, hours, pickup/delivery, cashback %, auto-accept, payout details, notifications, language), Help.
 
 - **Offers and discounts** (user, 2026-10-22: retailers add banners, offers and discounts visible to consumers):
-  - Kinds: % off or ₹ off on selected items, a category, or the whole store; **buy X get Y** (same item); **minimum-bill discount** ("₹50 off above ₹500"); **flash offer** from an expiring batch (with a countdown).
-  - Each has a start/end, can be paused or ended early, and has a customer preview. Optional limits: per-customer once, first N orders, online only / POS too.
-  - Pricing rule: one best item-level offer per line, plus at most one bill-level offer; the total never goes below ₹1. Offers apply in checkout quotes and on the POS identically. Offer cost is the shop's own (it is a price cut, not credits).
+  - Kinds: % off or ₹ off on selected items, a category, or the whole store; **buy X get Y** (same item); **minimum-bill discount** ("₹50 off on ₹500+"); **flash offer** from an expiring batch (with a countdown).
+  - Each has a start/end, can be paused or ended early, and has a customer preview. Optional limits: per-customer once, first N orders, online only / POS too. "First N orders" and `max_redemptions` are used up when the order is placed and released on cancel or expiry.
+  - Pricing rule: one best item-level offer per line, plus at most one bill-level offer; the total never goes below ₹1. A minimum-bill offer applies when the item subtotal (after item-level offers, §5.5) is at or above `min_bill_paise`. Offers apply in checkout quotes and on the POS identically. Offer cost is the shop's own (it is a price cut, not credits).
   - Shown to customers: strike-through price + "20% off" tag on products, an "Offers" row on the shop page, offer tags on StoreCards, the "Offers near you" strip on Home (ranked by distance and discount), and an "Offers" filter in search.
 - **Banners:** a shop can publish up to 3 live banners per store (`store_banners_max`): a 16:9 image (uploaded or made from a template: colour from the tint palette, headline, sub-line, product photo), a headline (≤ 40 chars), and a target (an offer, a set of items, a category in the shop, or the shop page), with start/end dates. Banners show on the shop page header carousel and, if the shop is within the customer's radius, in the Home "Offers near you" carousel (fair rotation across nearby shops, max 1 banner per shop per screen). Published at once (like reviews); images pass an automatic safety check (AI image moderation when enabled, otherwise admin review queue before going live); admin can take any banner down with a reason. The shop's analytics show banner impressions, clicks and attributed orders. An order is attributed to a banner when the same customer orders at the same store within 24 h of clicking it; if they clicked more than one banner, the last click wins (D-77).
 - **Voice update:** speak "Sold 3 Maggi", "Received 12 Amul butter 100 g", "Coca-Cola 750 ml out of stock" (English, Hindi, mixed). The app shows the interpreted change and saves only after the retailer confirms. Never updates stock from an unconfirmed interpretation.
@@ -289,7 +297,7 @@ Overview (KPI strip, sales by hour, new orders, demand insights, top items), Ord
     - "Out of stock" is a `count` of 0.
   - Each line is checked against the user's permission: `sale` and `count` need cashier or above; `restock` and `set_price` need manager or above. Lines the user may not confirm show disabled with "Ask a manager".
 - **Demand insights:** selling fast (days of stock left), sitting on the shelf (no sale in 21 days, `insight_no_sale_days`), going to waste (batches expiring within 5 days, `insight_expiring_within_days`), wanted nearby (searches within 2 km, `insight_wanted_nearby_radius_m`, for items the store does not stock; analytics stores searches as H3 resolution-8 cells, so this adds up the cells within the radius and then applies k ≥ 10 to the total, D-81). Same row design as the old app's card (icon, label, sentence with bold product name, metric chip, "Check stock ›" link, "Past 7 days" tag). Minimum evidence before any number is shown (`insight_min_*`, see §17 and [11-ai-features.md](11-ai-features.md) §2.1); below it the card explains what data it needs.
-- **POS:** search or scan (USB/Bluetooth scanner as keyboard, or camera), quantities, discounts (manual discounts: manager and above), automatic round-off to the nearest ₹1 (allowed for cashiers, D-65), payment method record (cash, UPI, card, credit-to-customer "khata" **later**), link customer (bill QR / counter code / phone only, §6), works offline and syncs. Corrections are reversals (§7), never silent edits.
+- **POS:** search or scan (USB/Bluetooth scanner as keyboard, or camera), quantities, discounts (manual discounts: manager and above), automatic round-off to the nearest ₹1, half rounds up (₹100.50 becomes ₹101; allowed for cashiers, D-65, D-94), payment method record (cash, UPI, card, credit-to-customer "khata" **later**), link customer (bill QR / counter code / phone only, §6), works offline and syncs. Corrections are reversals (§7), never silent edits.
 - **Receipts:** each POS sale has a receipt link `/r/{token}` (128-bit token, expires after 30 days) shared by WhatsApp link or SMS. The page shows items, totals and the store, and no customer data.
 - **Customer purchases** (D-75): the customer's purchase list shows their online orders plus POS sales linked by `bill_qr` or `counter_code`. Sales linked by phone only never show there. In-store sales are on the "In store" tab of the Orders list (C-13).
 
@@ -306,7 +314,7 @@ Admin roles (D-64; summary, the full permission matrix is in 02). There are 7 ro
 | `catalogue` | Master catalogue review queue and merges |
 | `analyst` | Read-only Pulse and dashboards |
 | `finance` | Ledger; payouts (hold, unhold, mark paid, export); request and approve credit adjustments; payees' bank and UPI details, masked only. No KYC. |
-| `admin` | Everything except credit adjustments, admin role management, money settings, and payout mark-paid and hold |
+| `admin` | Everything except credit adjustments, admin-user and role management, money settings, and payout hold, unhold, mark-paid and export |
 | `super_admin` | Everything |
 
 - KYC verification: `admin` and `super_admin` only.
@@ -326,21 +334,23 @@ Channels: in-app inbox (always), web push (VAPID, free), SMS (OTP and critical u
 
 | Event | Customer | Business |
 |---|---|---|
-| New order | — | push + in-app + sound loop on open app; SMS if not seen in 3 min (**default**) |
+| New order | — | push + in-app + sound loop on open app; SMS if not seen in `order_unseen_sms_after_min` (3 min, **default**) |
 | Accepted / partial / rejected / expired | push + in-app | — |
 | Ready for pickup | push + in-app | — |
-| Hold ending in 10 min | push | — |
+| Hold ending in `pickup_hold_reminder_min` (10) min | push | — |
 | Out for delivery / delivered | push + in-app | — |
-| Referral unlocked, credits earned, credits expiring | in-app (+ push) | in-app |
+| Referral unlocked, credits earned, credits expiring | in-app (+ push) | in-app for referral unlocked and credits earned; – for credits expiring |
 | Payout paid | — | push + in-app |
 | New review | — | in-app |
+
+WhatsApp, when enabled, carries the same events as the SMS column; SMS is the fallback. The "not seen" SMS goes to the store's contact phone, falling back to the owner's login phone. It is sent once per order, in the business's notification language, falling back to English.
 
 ## 16. Privacy and data
 
 - Store the minimum: name (optional), phone, saved addresses, orders. Location is used for search, stored only as a saved address or as coarse search events (an H3 resolution-8 cell) for demand data.
 - Retailers see a customer's name and masked phone (`98•••••521`) for orders. The full phone number is shown to the shop only while the order is `out_for_delivery`.
 - Demand data shown to retailers or brands is aggregated and never names a person. k ≥ 10 always applies, including coach cards (e.g. "12 people near you searched…").
-- Every coach statement about other people needs k ≥ 10, including benchmarks against other shops (D-71).
+- Every coach statement about other people needs k ≥ 10, including benchmarks against other shops (D-71). The B-12 "nearby shops" benchmark card is an analytics card, not a coach statement; it needs k ≥ 5 stores ([05-observability.md](05-observability.md) §4).
 - Analytics stores location as H3 resolution-8 cells. An area count (such as "wanted nearby") adds up the cells inside the radius first, then applies k ≥ 10 to the total (D-81).
 - Account deletion on request (customer self-serve), with ledger and order records kept anonymised for accounting.
   - Deletion is blocked while the customer has an order that is not finished.
@@ -366,6 +376,9 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | `noshow_limit_days` | days | 14 | §5.4 |
 | `shop_expiry_penalty_threshold_bp` | bp | 3000 | §5.4 |
 | `store_strike_risk_threshold` | count | 5 | §5.4: store strikes in 30 days that raise a risk flag |
+| `order_unseen_sms_after_min` | minutes | 3 | §15: SMS to the shop if a new order is not seen |
+| `pickup_hold_reminder_min` | minutes | 10 | §15: "Hold ending" push to the customer |
+| `risk_code_lockouts_store_per_day` | count | 10 | §6: order-code lockouts at one store in an IST day that raise a risk flag |
 
 **Stock and catalogue**
 
@@ -382,6 +395,8 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | `credit_max_per_order` | credits | 30 | §7 |
 | `credit_min_order_value_paise` | paise | 10000 | §7 |
 | `credit_expiry_days` | days | 365 | §7 |
+| `credit_expiry_reminder_days` | days | 7 | §7: customers are told this many days before a lot expires |
+| `review_edit_window_days` | days | 7 | §10 |
 | `credit_orders_per_month` | count | 10 | §7 |
 | `store_credit_redemptions_per_day` | count | 200 | §7 |
 | `admin_adjust_dual_approval_above_paise` | paise | 50000 | §7 |
@@ -408,7 +423,7 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | `pos_offline_link_max_hours` | hours | 12 | §6 |
 | `pos_offline_links_risk_per_day` | count | 20 | §6 |
 
-**Search ranking** (§11)
+**Search ranking** (§11). Unit `bp`, therefore super_admin-only (§13), by design: ranking weights change every shop's visibility.
 
 | Key | Unit | Default |
 |---|---|---|
@@ -476,6 +491,29 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | `ai_daily_calls_store` | count | 100 |
 | `ai_daily_calls_customer` | count | 30 |
 | `ai_daily_cost_cap_paise` | paise | 50000 (₹500 a day; AI calls stop for the rest of the IST day when reached, alert at 80%, D-70) |
+
+**Fixed constants (code, not settings)** (D-92). These protect security, define a protocol, or feed an alert rule, so they change through code review, not in the console. Operational timings that an operator may need to tune are settings (the tables above).
+
+| Constant | Value | Where |
+|---|---|---|
+| Review text length | 1000 characters | §10 |
+| Bill QR validity | 120 s | §6 |
+| Counter code step | 60 s, ±1 step accepted | §6 |
+| Wrong tries before a code locks | 5 | §6 |
+| Receipt token life | 30 days | §12, D-45 |
+| Same-device window for referrals | 90 days | §8, D-13 |
+| Store rating prior | 4.0 with weight 5 | §10 |
+| Admin step-up validity | 10 min | 02 |
+| Sync cursor life | 30 days | D-36 |
+| Banner attribution window | 24 h | §12, D-77 |
+| OTP limits | 6 digits, 5 min, 5 attempts, resend 30 s, 5 sends per number per hour, 20 per IP per hour | §2 |
+| Device clock tolerance for offline links | 2 min | §6, D-12 |
+| Voice recording length | 15 s | §12 |
+| `sold_at` clamp for offline sales | 72 h | 02 §4.3 |
+| Order SSE poll interval | 15 s | 02 |
+| "3 or more orders expired in 2 h" alert | 3 in 2 h | 05 §5 |
+| Failed-delivery reminders and auto-confirm | 2 h, 24 h, 72 h | §5.3, D-85 |
+| Store-strike window (risk flag and reliability) | 30 days | §5.4, D-85 |
 
 **Client versions** (an older client shows "Update available" and reloads)
 

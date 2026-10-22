@@ -280,7 +280,7 @@ Family coverage counts every step that names the family or any ID with its prefi
 | R-2.2 | OTP never logged, reserved numbers | MQ-02.14, NOTIFY-M.01 |
 | R-2.3 | test clock | MQ-01.22, SEC-M.36 |
 | R-2.4 | business sign-in, multi-business | MQ-02.01, MQ-03.01, MQ-03.02, MQ-03.03, MQ-05.01, PERM-M.01, PERM-M.03 |
-| R-2.5 | admin TOTP and 10 recovery codes | MQ-07.01, MQ-07.02, MQ-07.03, MQ-07.04, MQ-07.05, MQ-07.06, MQ-07.07, MQ-07.08, MQ-07.58, MQ-09.26 (+1 more) |
+| R-2.5 | admin TOTP and 10 recovery codes | MQ-07.01, MQ-07.02, MQ-07.03, MQ-07.04, MQ-07.05, MQ-07.06, MQ-07.07, MQ-07.58, MQ-09.26 (+1 more) |
 | R-2.6 | Turnstile | MQ-02.11, SEC-M.06, SITE-M.07, SITE-M.08 |
 | R-2.7 | sessions and sign out all | MQ-02.15, TIMER-M.48, TIMER-M.49, TIMER-M.50, PERM-M.02, SEC-M.09, SEC-M.10, ADMIN-M.16 |
 | R-2.8 | one phone, both profiles | PERM-M.01 |
@@ -331,8 +331,8 @@ Family coverage counts every step that names the family or any ID with its prefi
 | R-5.26 | store strikes and risk flag | TIMER-M.05, TIMER-M.29, TIMER-M.30, TIMER-M.31, CANCEL-M.12, ADMIN-M.23, ABUSE-M.12 |
 | R-5.27 | expiry penalty in ranking and nudge | TIMER-M.32 |
 | R-5.28 | strike reset | MQ-07.34, TIMER-M.16, CANCEL-M.33, ADMIN-M.14 |
-| R-5.29 | delivery settings | MQ-01.31, MQ-02.07, MQ-04.01, MQ-04.08, MQ-04.13 |
-| R-5.30 | eligible amount for delivery | MQ-04.08, MQ-04.09, MQ-04.10, MQ-04.11, MQ-04.12, MQ-04.14, MQ-04.37, MQ-04.38, MONEY-M.14 |
+| R-5.29 | delivery settings | MQ-01.31, MQ-02.07, MQ-04.01, MQ-04.08, MQ-04.13, MQ-04.13a, MQ-04.13b |
+| R-5.30 | item subtotal for delivery (D-94) | MQ-04.08, MQ-04.09, MQ-04.10, MQ-04.11, MQ-04.12, MQ-04.13a, MQ-04.14, MQ-04.37, MQ-04.38, MONEY-M.14 |
 | R-5.31 | rider | MQ-04.18, MQ-04.21 |
 | R-5.32 | Delivery tag and radius | MQ-01.17, MQ-01.19, MQ-04.03, MQ-04.05, MQ-04.06, MQ-04.36, MQ-04.39 |
 | R-5.33 | delivery_failed credits and cashback | MQ-04.31 |
@@ -495,7 +495,13 @@ Family coverage counts every step that names the family or any ID with its prefi
 | `idempotency_mismatch` | 3 | MQ-06.30, SEC-M.32, FAIL-M.04 |
 | `insufficient_stock` | 3 | STOCK-M.20, STOCK-M.21, I18N-M.08 |
 | `store_closed` | 5 | TIMER-M.34, TIMER-M.36, TIMER-M.37, I18N-M.08, ADMIN-M.13 |
-| `store_not_bookable` | 1 | SEC-M.40 |
+| `store_not_bookable` | 2 | SEC-M.40, MQ-04.42 |
+| `delivery_closed` | 1 | MQ-04.13b |
+| `ordering_suspended` | 1 | TIMER-M.26 |
+| `extension_already_used` | 1 | TIMER-M.12 |
+| `review_edit_window_passed` | 1 | MQ-02.50 |
+| `store_credit_cap` | 1 | MONEY-M.21 |
+| `ai_daily_cap_reached` | 1 | MQ-11.43 |
 | `code_locked` | 3 | SEC-M.20, I18N-M.08, ABUSE-M.04 |
 | `account_has_active_order` | 3 | MONEY-M.61, FAIL-M.06, ACC-19 |
 | `resync_required` | 1 | STOCK-M.27 |
@@ -526,71 +532,71 @@ Family coverage counts every step that names the family or any ID with its prefi
 
 ## 6. Questions for the lead
 
-Each question names the steps that depend on it. Until it is answered, run the step, record what the build does, and mark it **B** if the result could go either way.
+Each question names the steps that depend on it. All 49 are resolved (D-91 to D-94 in the decision log, and the plan files named in the Status column); the steps now state the expected result. If the build differs from the resolution, mark the step **B**.
 
 ### A. Disagreements between plan files (01, 02, 04, 05, 06, 08, 12)
 
-| Q | Question | Steps that depend on it |
-|---|---|---|
-| Q-05 | Payout export: 02 gives `admin` the export; 04, 06 A-11 and D-85 say finance and super_admin only. D-85 asks for step-up on export; 02 and 04 do not mark it. | MQ-06.17 |
-| Q-06 | 01 §13 lists the admin role's payout exceptions as "mark paid and hold" only; 04 also gives unhold and export. | MQ-06.16, MQ-06.17, MQ-06.21, MQ-06.39, PERM-M.24 |
-| Q-07 | 02 and 04 let `support` GET businesses, but the 06 support nav has no A-03. | no step yet; affects the rule named |
-| Q-08 | Payout details: 08 SC-BZ says owner and finance only; 01, 02 and 06 say a manager sees them masked. MQ-06.05 also uses a `payout-details` path where 04 has `{B}/kyc`. | MQ-06.05, ACC-04 |
-| Q-09 | 08 BK-18 says a shop cancel "counts against shop reliability"; 01 §5.4, 04 and D-68 give no strike for it. | CANCEL-M.09, CANCEL-M.10, CANCEL-M.11, CANCEL-M.12 |
-| Q-12 | Wallet line copy: 01 "Spent at Sri Lakshmi · order TZ-…" vs 08 CR-04 "Spent at <shop> · TZ-…". | MQ-02.42 |
-| Q-17 | Superseded decisions still quoted: D-30 earn caps (withdrawn by D-62); D-01 `picked_up` (now `collected`, D-61); D-45 C-08 (moved to C-13 by D-75); D-38 five roles (now seven, D-64). | MONEY-M.23, STOCK-M.02, PERM-M.13, SEC-M.18 |
-| Q-19 | 02 names Sentry, but 05 and D-17 keep Sentry off before Wave 5. | MQ-07.53 |
-| Q-24 | Benchmarks use k ≥ 5 stores in 05; coach and demand use k ≥ 10 people in 01. Two different k on purpose? (note only) | no step yet; affects the rule named |
-| Q-30 | 01 §9 creates a payout only when KYC is verified; 08 PO-02 expects a `held` payout for missing KYC. | MQ-06.11 |
-| Q-44 | The SMS escalation "3 min" is a **default** in 01 §15 but has no key in 01 §17 (the canonical key list). Which number gets the SMS (store phone, owner, every manager)? In which language? | NOTIFY-M.16 |
-| Q-45 | `search_w_*` keys have unit `bp`; the unit rule (R-17.1) makes every `_bp` key a money setting for super_admin only. Intended for ranking weights? (OFFER-M.23, PERM-M.26) | OFFER-M.23, PERM-M.26 |
-| Q-46 | The site must ship zero client JS (`verify-dist.mjs` refuses any script or remote src), but the lead form uses Turnstile, which needs a script. Which wins? Also: which admin screen shows leads? | SITE-M.09, SITE-M.10 |
-| Q-48 | Load scenario names: 02 §11 says `search_peak`; 08 §6 says `browse_peak` (search inside it). | PERF-M.12 |
-| Q-49 | Reviews: 06 A-12 and 08 E2E-10 say "delete"; 01 §10 says hide/restore (soft delete with reason). The book tests hide and restore. | MQ-07.33, CANCEL-M.28, ACC-38 |
+| Q | Question | Steps that depend on it | Status |
+|---|---|---|---|
+| Q-05 | Payout export: 02 gives `admin` the export; 04, 06 A-11 and D-85 say finance and super_admin only. D-85 asks for step-up on export; 02 and 04 do not mark it. | MQ-06.17 | Resolved: D-85, D-64 / 02 §3.3, 04 §2.7 |
+| Q-06 | 01 §13 lists the admin role's payout exceptions as "mark paid and hold" only; 04 also gives unhold and export. | MQ-06.16, MQ-06.17, MQ-06.21, MQ-06.39, PERM-M.24 | Resolved: D-64 / 01 §13, 06 §3 |
+| Q-07 | 02 and 04 let `support` GET businesses, but the 06 support nav has no A-03. | no step yet; affects the rule named | Resolved: D-93 / 06 §3, A-03 (read-only) |
+| Q-08 | Payout details: 08 SC-BZ says owner and finance only; 01, 02 and 06 say a manager sees them masked. MQ-06.05 also uses a `payout-details` path where 04 has `{B}/kyc`. | MQ-06.05, ACC-04 | Resolved: 01 §9, 02 §3.3 / 08 SC-BZ (`{B}/kyc`) |
+| Q-09 | 08 BK-18 says a shop cancel "counts against shop reliability"; 01 §5.4, 04 and D-68 give no strike for it. | CANCEL-M.09, CANCEL-M.10, CANCEL-M.11, CANCEL-M.12 | Resolved: D-68 / 08 BK-18 |
+| Q-12 | Wallet line copy: 01 "Spent at Sri Lakshmi · order TZ-…" vs 08 CR-04 "Spent at <shop> · TZ-…". | MQ-02.42 | Resolved: 01 §7 / 08 CR-04 |
+| Q-17 | Superseded decisions still quoted: D-30 earn caps (withdrawn by D-62); D-01 `picked_up` (now `collected`, D-61); D-45 C-08 (moved to C-13 by D-75); D-38 five roles (now seven, D-64). | MONEY-M.23, STOCK-M.02, PERM-M.13, SEC-M.18 | Resolved: 12 (superseded tags under D-01, D-30, D-38, D-45) |
+| Q-19 | 02 names Sentry, but 05 and D-17 keep Sentry off before Wave 5. | MQ-07.53 | Resolved: 02 §2.3 (D-17) |
+| Q-24 | Benchmarks use k ≥ 5 stores in 05; coach and demand use k ≥ 10 people in 01. Two different k on purpose? (note only) | no step yet; affects the rule named | Resolved: 01 §16 / 05 §4 |
+| Q-30 | 01 §9 creates a payout only when KYC is verified; 08 PO-02 expects a `held` payout for missing KYC. | MQ-06.11 | Resolved: 01 §9 / 03 §8 |
+| Q-44 | The SMS escalation "3 min" is a **default** in 01 §15 but has no key in 01 §17 (the canonical key list). Which number gets the SMS (store phone, owner, every manager)? In which language? | NOTIFY-M.16 | Resolved: D-92 (founder) / 01 §15, §17; 07 W2-05 |
+| Q-45 | `search_w_*` keys have unit `bp`; the unit rule (R-17.1) makes every `_bp` key a money setting for super_admin only. Intended for ranking weights? (OFFER-M.23, PERM-M.26) | OFFER-M.23, PERM-M.26 | Resolved: D-93 / 01 §17 |
+| Q-46 | The site must ship zero client JS (`verify-dist.mjs` refuses any script or remote src), but the lead form uses Turnstile, which needs a script. Which wins? Also: which admin screen shows leads? | SITE-M.09, SITE-M.10 | Resolved: D-93 / 02 §4.5, 04 §2.7, 06 A-03 |
+| Q-48 | Load scenario names: 02 §11 says `search_peak`; 08 §6 says `browse_peak` (search inside it). | PERF-M.12 | Resolved: 02 §11 |
+| Q-49 | Reviews: 06 A-12 and 08 E2E-10 say "delete"; 01 §10 says hide/restore (soft delete with reason). The book tests hide and restore. | MQ-07.33, CANCEL-M.28, ACC-38 | Resolved: 01 §10 / 06 A-12, 08 E2E-10 |
 
 ### B. Rules that are unclear or missing (money, codes, timers, permissions)
 
-| Q | Question | Steps that depend on it |
-|---|---|---|
-| Q-10 | Codes not named: CR-11 "refused and flagged"; POS-09 "already claimed". Codes used in 01/08 but missing from the 04 §1.4 list: `credit_max_exceeded`, `below_credit_minimum`, `credit_monthly_cap`, `below_minimum`, `claim_expired`, `otp_locked`, `otp_expired`, `account_blocked`, `step_up_required`, `price_changed`. | MONEY-M.02, MONEY-M.21, TIMER-M.26 |
-| Q-13 | Does the client countdown use server time? With the test clock the display matches only if it does. | MQ-02.54 |
-| Q-14 | "Install prompt after the 2nd order": after it is placed or after it is completed? | MQ-02.57, PWA-M.02 |
-| Q-15 | The refusal code for editing a review after 7 days is not named. | MQ-02.50 |
-| Q-16 | Fixed numbers with no settings key (are they meant to be constants?): SMS escalation 3 min; "Hold ending in 10 min"; 7-day expiry reminder; review edit 7 days and 1000 chars; bill QR 120 s; counter code 60 s; 5 code tries; receipt 30 days; same device 90 days; Bayesian prior 4.0 weight 5; step-up 10 min; sync cursor 30 days; banner attribution 24 h; OTP limits; device clock 2 min; voice 15 s; `sold_at` clamp 72 h; SSE poll 15 s; ≥ 3 expired in 2 h alert. D-85 confirms 2 h / 24 h / 72 h and the 30-day strike window as constants. | MQ-03.34, ACC-26 |
-| Q-18 | 01 §15 has no business row for "credits expiring" and no WhatsApp mapping per event. | MONEY-M.11, NOTIFY-M.09 |
-| Q-23 | `ai_daily_cost_cap_paise` is a money key by unit: super_admin only? Confirm. | MQ-11.46 |
-| Q-25 | POS round-off direction at exactly ₹0.50 is not defined. | MQ-03.27, PERM-M.19, A11Y-M.02 |
-| Q-27 | Free delivery "above ₹500": is exactly ₹500 free? The same for an offer's minimum bill: inclusive, and measured after item offers? | MQ-04.13, OFFER-M.06 |
-| Q-28 | `feature_delivery_enabled` off with a delivery-only store: does it become "In-store only"? | MQ-04.42 |
-| Q-29 | Delivery hours narrower than opening hours: which refusal code? | MQ-04.01 |
-| Q-31 | The statement close time on the 1st is not given (the book waits up to 6 h of test clock). | MQ-06.07, ACC-33 |
-| Q-32 | Payout CSV: are held payouts in the file? Which payee columns? | MQ-06.24, MQ-06.25 |
-| Q-33 | CR-15 uses ₹500.01: can an admin adjustment carry fractional credits? | MQ-07.42 |
-| Q-34 | Digits in Indic locales (Latin or native) are not specified; the book assumes Latin and records what it sees. | I18N-M.02 |
-| Q-35 | Refusal code and copy when an AI per-customer or per-store daily cap is hit are not named. | MQ-11.43 |
-| Q-36 | Does the grounding validator (11 §1 rule 5) apply to review reply drafts? | MQ-11.31 |
-| Q-37 | No local hook is named for forcing a slow route or slow query (OB-03, OB-04). | MQ-12.15, PERF-M.10 |
-| Q-38 | Do `credit_orders_per_month` and `store_credit_redemptions_per_day` count at place (hold) or at capture? Does a cancelled credit order still count? | notes in MONEY-wallet-credits-payouts.md |
-| Q-39 | When does a referral reward post after qualification? The POS-21 "not yet posted" branch may only be testable automatically. | notes in MONEY-wallet-credits-payouts.md |
-| Q-40 | Also unclear: lot expiry time of day; the code for the no-show limit and the second extension; no "all day" hours option; whether an order placed before a timer setting change keeps the old timer (TIMER-M.57); whether accepting after closing time is allowed (TIMER-M.38); whether "first N orders" counts at place or at collect. | MONEY-M.10, OFFER-M.15, I18N-M.03 |
-| Q-42 | Low stock: is "at" the threshold low, or only below it (STOCK-M.09)? Is there a per-item threshold (STOCK-M.10)? | ACC-09 |
-| Q-43 | Which code when accepting with not enough available stock (STOCK-M.21)? Is an offline sale at an old cached price flagged (STOCK-M.29)? | no step yet; affects the rule named |
-| Q-47 | Many wrong order codes across orders at one store raise no risk flag in 01. Should they (ABUSE-M.05)? | ABUSE-M.05 |
+| Q | Question | Steps that depend on it | Status |
+|---|---|---|---|
+| Q-10 | Codes not named: CR-11 "refused and flagged"; POS-09 "already claimed". Codes used in 01/08 but missing from the 04 §1.4 list: `credit_max_exceeded`, `below_credit_minimum`, `credit_monthly_cap`, `below_minimum`, `claim_expired`, `otp_locked`, `otp_expired`, `account_blocked`, `step_up_required`, `price_changed`. | MONEY-M.02, MONEY-M.21, TIMER-M.26 | Resolved: D-91 / 04 §1.4 |
+| Q-13 | Does the client countdown use server time? With the test clock the display matches only if it does. | MQ-02.54 | Resolved: D-93 / 04 §1 (`serverNow`) |
+| Q-14 | "Install prompt after the 2nd order": after it is placed or after it is completed? | MQ-02.57, PWA-M.02 | Resolved: D-93 (founder) / 06 customer global |
+| Q-15 | The refusal code for editing a review after 7 days is not named. | MQ-02.50 | Resolved: D-91 / 04 §1.4 (`review_edit_window_passed`) |
+| Q-16 | Fixed numbers with no settings key (are they meant to be constants?): SMS escalation 3 min; "Hold ending in 10 min"; 7-day expiry reminder; review edit 7 days and 1000 chars; bill QR 120 s; counter code 60 s; 5 code tries; receipt 30 days; same device 90 days; Bayesian prior 4.0 weight 5; step-up 10 min; sync cursor 30 days; banner attribution 24 h; OTP limits; device clock 2 min; voice 15 s; `sold_at` clamp 72 h; SSE poll 15 s; ≥ 3 expired in 2 h alert. D-85 confirms 2 h / 24 h / 72 h and the 30-day strike window as constants. | MQ-03.34, ACC-26 | Resolved: D-92 / 01 §17 |
+| Q-18 | 01 §15 has no business row for "credits expiring" and no WhatsApp mapping per event. | MONEY-M.11, NOTIFY-M.09 | Resolved: D-93 / 01 §15 |
+| Q-23 | `ai_daily_cost_cap_paise` is a money key by unit: super_admin only? Confirm. | MQ-11.46 | Resolved: D-93 / 11 §1 rule 7 |
+| Q-25 | POS round-off direction at exactly ₹0.50 is not defined. | MQ-03.27, PERM-M.19, A11Y-M.02 | Resolved: D-94 (founder) / 01 §12, 08 POS-16 |
+| Q-27 | Free delivery "above ₹500": is exactly ₹500 free? The same for an offer's minimum bill: inclusive, and measured after item offers? | MQ-04.13, OFFER-M.06 | Resolved: D-94 (founder) / 01 §5.5, §12 |
+| Q-28 | `feature_delivery_enabled` off with a delivery-only store: does it become "In-store only"? | MQ-04.42 | Resolved: D-93 / 01 §5 |
+| Q-29 | Delivery hours narrower than opening hours: which refusal code? | MQ-04.01 | Resolved: D-91 / 01 §5.5, 04 §1.4 (`delivery_closed`) |
+| Q-31 | The statement close time on the 1st is not given (the book waits up to 6 h of test clock). | MQ-06.07, ACC-33 | Resolved: 01 §9 (00:30 IST) |
+| Q-32 | Payout CSV: are held payouts in the file? Which payee columns? | MQ-06.24, MQ-06.25 | Resolved: D-93 / 04 §2.7, 03 §8 |
+| Q-33 | CR-15 uses ₹500.01: can an admin adjustment carry fractional credits? | MQ-07.42 | Resolved: D-93 / 08 CR-15 |
+| Q-34 | Digits in Indic locales (Latin or native) are not specified; the book assumes Latin and records what it sees. | I18N-M.02 | Resolved: D-93 / 02 §4.1, 07 W1-03 |
+| Q-35 | Refusal code and copy when an AI per-customer or per-store daily cap is hit are not named. | MQ-11.43 | Resolved: D-91 (founder) / 11 §1 rule 7, 04 §1.4 |
+| Q-36 | Does the grounding validator (11 §1 rule 5) apply to review reply drafts? | MQ-11.31 | Resolved: D-93 / 11 §1 rule 5 |
+| Q-37 | No local hook is named for forcing a slow route or slow query (OB-03, OB-04). | MQ-12.15, PERF-M.10 | Resolved: D-93 / 04 §2.9 |
+| Q-38 | Do `credit_orders_per_month` and `store_credit_redemptions_per_day` count at place (hold) or at capture? Does a cancelled credit order still count? | notes in MONEY-wallet-credits-payouts.md | Resolved: D-93 (founder) / 01 §7 |
+| Q-39 | When does a referral reward post after qualification? The POS-21 "not yet posted" branch may only be testable automatically. | notes in MONEY-wallet-credits-payouts.md | Resolved: D-93 / 01 §8, 08 POS-21 |
+| Q-40 | Also unclear: lot expiry time of day; the code for the no-show limit and the second extension; no "all day" hours option; whether an order placed before a timer setting change keeps the old timer (TIMER-M.57); whether accepting after closing time is allowed (TIMER-M.38); whether "first N orders" counts at place or at collect. | MONEY-M.10, OFFER-M.15, I18N-M.03 | Resolved: D-91, D-93 / 01 §5.1, §5.2, §7, §12; 03 §2 |
+| Q-42 | Low stock: is "at" the threshold low, or only below it (STOCK-M.09)? Is there a per-item threshold (STOCK-M.10)? | ACC-09 | Resolved: D-93 / 01 §4 |
+| Q-43 | Which code when accepting with not enough available stock (STOCK-M.21)? Is an offline sale at an old cached price flagged (STOCK-M.29)? | no step yet; affects the rule named | Resolved: D-93 / 04 §2.6, 02 §4.3 |
+| Q-47 | Many wrong order codes across orders at one store raise no risk flag in 01. Should they (ABUSE-M.05)? | ABUSE-M.05 | Resolved: D-92 / 01 §17; 07 W3-02 |
 
 ### C. Book choices to confirm
 
-| Q | Question | Steps that depend on it |
-|---|---|---|
-| Q-01 | Book choice: mock-route numbers `+91 90000 00100`–`00199` deliver real SMS to the mock; all other reserved numbers use OTP 000000. Confirm with W0-07. | MQ-03.22, MQ-12.25, NOTIFY-M.01, NOTIFY-M.13, SEC-M.01, SEC-M.03, SEC-M.05, SITE-M.07 (+1 more) |
-| Q-02 | The body for `clock set` and `clock reset` on `/v1/test/clock` is not in 04. | MQ-01.21, MQ-01.22, MQ-02.50, MQ-04.35, MQ-05.41, MQ-06.06, MQ-06.07, MQ-06.35 (+57 more) |
-| Q-03 | C-03 "products" stat: distinct products or store listings? (MQ-01.12 expects 57.) | MQ-01.12 |
-| Q-04 | The brief's example said 15 min `order_accept_timeout`; 01 says 10 min `order_accept_timeout_min`. The book uses 01. | MQ-07.18, MQ-07.49, MQ-07.50, MQ-09.33, TIMER-M.57, ADMIN-M.27 |
-| Q-11 | C-12 hides Cancel in `out_for_delivery`: confirm. | MQ-04.20 |
-| Q-20 | How seeded admins get TOTP for QA (fixed seed secret or enrol on first run). | MQ-05.15, MQ-06.26, MQ-06.28, MQ-07.01, MQ-07.02, MQ-07.03, MQ-07.06, MQ-07.08 (+7 more) |
-| Q-21 | The B-14 example "On ₹500 … 25 credits" assumes 5%; the default cashback is 0. | no step yet; affects the rule named |
-| Q-22 | AU-06 (identical timing within 50 ms) is automated only; the manual step only records. | SEC-M.05 |
-| Q-26 | Do notification SMS to reserved numbers reach the mock, or are they dropped? | MQ-03.09 |
-| Q-41 | The brief mentions coupons; 01 has no coupon codes, so the book tests none. | notes in OFFER-offers-banners.md |
+| Q | Question | Steps that depend on it | Status |
+|---|---|---|---|
+| Q-01 | Book choice: mock-route numbers `+91 90000 00100`–`00199` deliver real SMS to the mock; all other reserved numbers use OTP 000000. Confirm with W0-07. | MQ-03.22, MQ-12.25, NOTIFY-M.01, NOTIFY-M.13, SEC-M.01, SEC-M.03, SEC-M.05, SITE-M.07 (+1 more) | Resolved: D-15 / 01 §2 |
+| Q-02 | The body for `clock set` and `clock reset` on `/v1/test/clock` is not in 04. | MQ-01.21, MQ-01.22, MQ-02.50, MQ-04.35, MQ-05.41, MQ-06.06, MQ-06.07, MQ-06.35 (+57 more) | Resolved: 04 §2.9 (test clock) |
+| Q-03 | C-03 "products" stat: distinct products or store listings? (MQ-01.12 expects 57.) | MQ-01.12 | Resolved: D-93 / 04 §2.3 (in-stock listings) |
+| Q-04 | The brief's example said 15 min `order_accept_timeout`; 01 says 10 min `order_accept_timeout_min`. The book uses 01. | MQ-07.18, MQ-07.49, MQ-07.50, MQ-09.33, TIMER-M.57, ADMIN-M.27 | Resolved: 01 §5.1 (10 min) |
+| Q-11 | C-12 hides Cancel in `out_for_delivery`: confirm. | MQ-04.20 | Resolved: 01 §5.2 |
+| Q-20 | How seeded admins get TOTP for QA (fixed seed secret or enrol on first run). | MQ-05.15, MQ-06.26, MQ-06.28, MQ-07.01, MQ-07.02, MQ-07.03, MQ-07.06 (+7 more) | Resolved: D-93 / 08 §2, 07 W1-01 |
+| Q-21 | The B-14 example "On ₹500 … 25 credits" assumes 5%; the default cashback is 0. | no step yet; affects the rule named | Resolved: D-93 / 06 B-14 |
+| Q-22 | AU-06 (identical timing within 50 ms) is automated only; the manual step only records. | SEC-M.05 | Resolved: 08 AU-06 (book is right) |
+| Q-26 | Do notification SMS to reserved numbers reach the mock, or are they dropped? | MQ-03.09 | Resolved: D-93 / 01 §2 |
+| Q-41 | The brief mentions coupons; 01 has no coupon codes, so the book tests none. | notes in OFFER-offers-banners.md | Resolved: 10 (Not planned) |
 
 ### Uncovered rules
 

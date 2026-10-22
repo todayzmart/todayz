@@ -9,7 +9,7 @@ Every business role and every admin role against the actions that matter, in the
 
 ## Preconditions
 
-1. `make reset`. Seeds `<seed:staff>`, `<seed:admins>` (TOTP enrolled as in MQ-07.08), `<seed:month-SL>`.
+1. `make reset`. Seeds `<seed:staff>`, `<seed:admins>` (pre-enrolled; AD47 enrols in MQ-07.01 to .07), `<seed:month-SL>`.
 2. For each API row: do the action once as an allowed user with DevTools open, Copy as cURL, then swap in the other user's bearer token from their own session (README §5). Record status and `code` only.
 3. Fill the result grid in the run notes: rows are actions, columns are roles, each cell the status you saw.
 
@@ -46,7 +46,7 @@ Every business role and every admin role against the actions that matter, in the
 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
-| PERM-M.13 | As O20 open B-14 → Payout details. As M21 open the same. | O20 sees edit fields. M21 sees PAN, GSTIN and UPI masked to the last 4 characters, legal name and status, and no Edit. | `R-3.6` `R-3.8` D-38 D-44 B-14 | ▢ | |
+| PERM-M.13 | As O20 open B-14 → Payout details. As M21 open the same. | O20 sees edit fields. M21 sees PAN, GSTIN and UPI masked to the last 4 characters, legal name and status, and no Edit. | `R-3.6` `R-3.8` D-38 D-66 D-44 B-14 | ▢ | |
 | PERM-M.14 | As M21 call `PUT {B}/kyc` with a new UPI. As K22 call `GET {B}/kyc`. | `403` for both. M21's `GET {B}/kyc` returns masked values only (no full PAN in the JSON). | `R-3.6` AU-10 | | |
 | PERM-M.15 | As K22 call `GET {B}/credit-account`, `GET {B}/statements`, `GET {S}/analytics?range=7d`, `GET {S}/customers`. | `403` each. | AU-10 `R-3.9` | | |
 | PERM-M.16 | As M21 open B-09 Customers at Sri Lakshmi. | Repeat customers with name, masked phone (`98•••••521` style), visits, spend, last visit, including a phone-only POS customer. No messaging action. | `R-3.10` `R-16.2` B-09 D-07 | ▢ | |
@@ -65,11 +65,11 @@ Every business role and every admin role against the actions that matter, in the
 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
-| PERM-M.22 ★ | Sign in as each of F40, S42, G43, Y44, FN45, AD47 and SA48 in turn. Write down the sidebar items. | Exactly the 06 §3 table: F40 A-04 and A-15 (own row); S42 A-02, A-05, A-06, A-07, A-12, A-13, A-14, A-20; G43 A-02, A-08; Y44 A-02; FN45 A-02, A-09, A-11; AD47 every screen except A-18; SA48 everything. D50 sees the union of support and catalogue. | AD-02 D-64 | ▢ | |
+| PERM-M.22 ★ | Sign in as each of F40, S42, G43, Y44, FN45, AD47 and SA48 in turn. Write down the sidebar items. | Exactly the 06 §3 table: F40 A-04, A-15 (own row) and the Leads tab on A-03; S42 A-02, A-03 (read-only), A-05, A-06, A-07, A-12, A-13, A-14, A-20; G43 A-02, A-08; Y44 A-02; FN45 A-02, A-09, A-11; AD47 every screen except A-18; SA48 everything. D50 sees the union of support and catalogue. | AD-02 D-64 | ▢ | |
 | PERM-M.23 | As each role, open three hidden screens by URL. | "You don't have access to this" every time; no broken page, no error toast. | AD-02 | ▢ | |
-| PERM-M.24 | Payout actions on a pending payout as FN45, AD47, S42, G43, Y44 and F40: hold, unhold, mark paid (UTR + step-up), export. | FN45 and SA48: allowed. AD47: hold and mark paid `403` (A-11 shows the list without those buttons). S42, G43, Y44, F40: `403` on every payout action. FN45 sees bank details masked to the last 4. | PO-03 D-64 A-11 | | |
+| PERM-M.24 | Payout actions on a pending payout as FN45, AD47, S42, G43, Y44 and F40: hold, unhold, mark paid (UTR + step-up), export. | FN45 and SA48: allowed. AD47: hold, unhold, mark paid and export all `403` (A-11 shows the list without those buttons). S42, G43, Y44, F40: `403` on every payout action. FN45 sees bank details masked to the last 4. | PO-03 D-64 A-11 | | |
 | PERM-M.25 | As AD47 call `POST /v1/admin/credit-adjustments` (+₹10). As SA48 do the same. | AD47 `403` (A-09 form hidden). SA48 posts (under ₹500). | AD-01 D-64 A-09 | | |
-| PERM-M.26 | As AD47 `PATCH /v1/admin/settings/search_w_offer` to 600 (unit `bp`, so a money setting by the unit rule; Q-45), and `PATCH /v1/admin/settings/stock_stale_after_hours` to 72 with reason "QA". | Money key `403`. Non-money key allowed (step-up). A-17 shows money keys read-only for AD47. | `R-17.1` D-64 A-17 | | |
+| PERM-M.26 | As AD47 `PATCH /v1/admin/settings/search_w_offer` to 600 (unit `bp`, so a money setting by the unit rule), and `PATCH /v1/admin/settings/stock_stale_after_hours` to 72 with reason "QA". | Money key `403`. Non-money key allowed (step-up). A-17 shows money keys read-only for AD47. | `R-17.1` D-64 A-17 | | |
 | PERM-M.27 | As AD47 and as S42 call `POST /v1/admin/businesses/{AP}/verify`. As FN45 call `GET /v1/admin/businesses/{AP}`. | AD47 allowed (or `409 invalid_transition` if already verified; use SB's business). S42 `403` (support cannot verify KYC). FN45 `403` (finance has no KYC). | AD-01 D-64 A-03 | | |
 
 ### G. Field agent edit window

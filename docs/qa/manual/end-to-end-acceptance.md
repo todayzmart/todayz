@@ -47,7 +47,7 @@ The story uses a new shop, **QA Kirana (QK)**, so its money is exact and separat
 | ACC-06 ★ | As F40 (inside the 30-day window) on `/v1/admin/field/...` or the A-04 items step, add 5 master items to QK: I1 Amul Butter ₹58 ×20, I2 Maggi ₹14 ×50, I3, I4, I5 with quantities. | Items appear in B-07 for QK with the quantities, each with a `restock` movement by F40. | FA-01 `R-14.3` B-07 | | |
 | ACC-07 | Owner on B-07 scans 3 more barcodes (camera), sets prices and quantities, and creates one missing product "QA Haldi 100 g" ₹30 ×10. | All 9 items live in QK. The missing product is usable at once and appears in the A-08 review queue. | `R-4.3` B-07 | ▢ | |
 | ACC-08 | Owner imports a 20-row CSV of items (`<seed:import-QK>` or a file built from the template) with 1 bad row. | Preview shows 19 good and 1 error. Apply adds 19 items. Stock count total matches the file. | `R-4.4` B-07 | | |
-| ACC-09 | Owner sets I6 (last unit) to quantity 1. | B-07 shows 1; the low-stock marker shows (record the threshold used, Q-42). | `R-4.7` | | |
+| ACC-09 | Owner sets I6 (last unit) to quantity 1. | B-07 shows 1; the low-stock marker shows (a quantity at or below the item's threshold is low, 01 §4). | `R-4.7` | | |
 | ACC-10 | As G43 promote "QA Haldi 100 g" to master from A-08. | A master product exists; QK's item links to it. Adding it to another store adds no stock there. | `R-4.2` A-08 | | |
 | ACC-11 | Owner downloads the QR standee PDF from B-10 and scans its QR with a phone camera. | URL `https://app.todayz.localhost/s/<qk-slug>?r=<qk short code>&s=<standee id>`; no other code in it. | ST-01 `R-3.12` B-10 | ▢ | |
 
@@ -91,7 +91,7 @@ The story uses a new shop, **QA Kirana (QK)**, so its money is exact and separat
 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
-| ACC-33 ★ | `clock set 2026-11-01T00:00:30+05:30` (or the 1st of the next month on another date). Wait for the close job (`clock +6h` if needed, Q-31). As FN45 open A-11 for October. | Statements for QA Kirana (opening ₹0, in ₹90, cashback ₹57, closing ₹33, KYC verified) and Lakshmi Traders (closing ₹890). Numbers exact to the paisa. | E2E-09 `R-9.3` A-11 | ▢ | |
+| ACC-33 ★ | `clock set 2026-11-01T00:30:30+05:30` (or 00:30:30 IST on the 1st of the next month on another date; statements close at 00:30 IST). As FN45 open A-11 for October. | Statements for QA Kirana (opening ₹0, in ₹90, cashback ₹57, closing ₹33, KYC verified) and Lakshmi Traders (closing ₹890). Numbers exact to the paisa. | E2E-09 `R-9.3` A-11 | ▢ | |
 | ACC-34 | As the QK owner open B-10 → Statements. | October: closing ₹33, status "Pending". | `R-9.3` B-10 | | |
 
 ### 7. Payout

@@ -7,6 +7,7 @@ The numbered files (01–11) are the source of truth. This log records why they 
 ### Money and stock
 
 **D-01 · Stock math.**
+- Superseded in part by D-61: `picked_up` is now `collected`.
 - On hand = the sum of `stock_movements`.
 - Reservations are not stock movements. They live only in `stock_reservations`, and `store_items.reserved` is a cached counter. Available = on hand − reserved.
 - Accepting an order creates reservations. It does not change on hand.
@@ -71,17 +72,20 @@ The shop never receives the plain code from the API. It only types what the cust
 - Invariant 3: the sum over lots of (remaining + held) = wallet balance + held balance.
 
 **D-28 · Partial accept.** The customer confirms the new totals (`awaiting_customer`), and the screen shows them.
+- Superseded in part by D-94: the delivery minimum and the free-above threshold use the item subtotal, not the eligible amount.
 - Held credits are re-capped against the new eligible amount.
 - If the new eligible amount is under ₹100, all held credits are released and the order uses no credits.
 - The delivery minimum is checked only at placement. After a partial accept, the delivery fee is recomputed on the new eligible amount, and the free-delivery threshold is applied again.
 
 **D-29 · What delivery and cashback are based on.**
+- Superseded in part by D-94: the delivery minimum and the free-above threshold use the item subtotal; cashback is unchanged.
 - The delivery minimum and the free-above threshold use the eligible amount.
 - Credits never pay the delivery fee.
 - Cashback base = eligible amount − credits used. The delivery fee is excluded.
 - The credit cap per order applies to the eligible amount.
 
 **D-30 · Credit caps.**
+- Superseded in part by D-62: there are no caps on earning credits.
 - "Day" is the IST calendar day. "Month" is the IST calendar month.
 - When a cap is reached, the order can still be placed, without credits. The quote shows "Credits can't be used at this shop today" before the customer places it.
 - Bill QR and counter-code claims count toward the customer's earn caps.
@@ -184,6 +188,7 @@ No method + path pair is defined twice. Business product endpoints become `/biz/
 - W0-03 creates the common file, and each work package adds codes in its own domain file.
 
 **D-38 · Permission matrix.** 02 holds the complete matrix: every action used in 04, with one column per role.
+- Superseded in part by D-64: there are now seven admin roles.
 - Business roles: owner, manager, cashier.
 - Admin roles: field_agent, support, finance, admin, super_admin.
 
@@ -254,6 +259,7 @@ Admin roles:
 **D-43 · Coach privacy threshold.** The coach example now reads "12 people near you searched…". k ≥ 10 always applies.
 
 **D-45 · Customers' in-store purchases.**
+- Superseded in part by D-75: the "In store" tab is on C-13, not C-08.
 - `GET /v1/me/purchases` lists online orders and linked POS sales together.
 - C-08 gets an "In store" tab.
 - Receipt link: `GET /v1/public/receipts/{token}`. The token is 128-bit and expires after 30 days. The page shows items, totals and the store, and no customer data. Screen C-24 Receipt, route `/r/{token}`.
@@ -530,3 +536,55 @@ There is no `make seed`; use `make reset`.
 - Why: per-WP version blocks (D-89) mean a lower block can merge after a higher one in the same wave. This is safe because a WP never merges before the WPs it depends on, so anything a migration needs is already applied. WPs in one wave that do not depend on each other do not touch each other's tables.
 - Locally, `make reset` remains the fix for a stale DB.
 - Status: the W0-03 code does not set this option yet; goose still refuses a file numbered below the newest applied one. W0-04 adds the option with a test.
+
+
+**D-91 · Refusal codes added from the QA book review.** Each is registered in `backend/api/problems/<domain>.yaml` and listed in 04 §1.4.
+- `auth.yaml`: `otp_locked` 429, `otp_expired` 401, `account_blocked` 403, `step_up_required` 403 (admin TOTP older than 10 min).
+- `orders.yaml`: `price_changed` 409 (fresh quote in `extensions`), `below_minimum` 409 (delivery minimum), `delivery_closed` 409 (`extensions.nextDeliveryWindow`; pickup still offered), `ordering_suspended` 409 (`extensions.until`), `extension_already_used` 409.
+- `wallet.yaml`: `below_credit_minimum` 409, `credit_max_exceeded` 409, `credit_monthly_cap` 409, `store_credit_cap` 409. "Refused and flagged" (CR-11) means the matching code plus a `risk_flags` row; the order can still be placed without credits.
+- `pos.yaml`: `claim_expired` 409, `claim_already_used` 409.
+- `reviews.yaml`: `review_edit_window_passed` 409.
+- `ai.yaml`: `ai_daily_cap_reached` 429, `extensions.scope` = `customer`, `store` or `platform`, `Retry-After` at the next IST midnight. Copy: "AI help is paused until tomorrow." The entry point is disabled, with no retry button.
+- Status: documented in the plan; the handlers register the codes in their WPs.
+
+**D-92 · New settings keys and the fixed-constants list.**
+- New admin-editable, non-money keys (01 §17): `order_unseen_sms_after_min` (3), `pickup_hold_reminder_min` (10), `credit_expiry_reminder_days` (7), `review_edit_window_days` (7), `risk_code_lockouts_store_per_day` (10; precedent `pos_offline_links_risk_per_day` in D-12).
+- Everything else that looked like a loose number is a fixed constant in code, listed in 01 §17 "Fixed constants".
+- Why: numbers that protect security (code tries, bill QR and counter-code validity, step-up window, OTP limits), define a protocol (sync cursor, SSE poll, device clock tolerance, `sold_at` clamp, receipt token life) or feed an alert rule change through code review. Operational timings an operator may need to tune are settings.
+- The 2 h / 24 h / 72 h failed-delivery values and the 30-day store-strike window stay constants (D-85). The customer no-show window is the setting `noshow_window_days`.
+
+**D-93 · Other rules settled from the QA book review.**
+- Q-03: `productsInRadius` counts in-stock listings (`store_products` with qty > 0) in `live` stores within the radius, not distinct products (04 §2.3).
+- Q-07: `support` opens A-03 read-only; the action buttons are hidden and the API refuses them with 403 (06 §3, A-03).
+- Q-13: timed responses and SSE order events carry `serverNow`; countdowns are computed from it, not the device clock (04 §1, 06 C-12, B-04).
+- Q-14: the install prompt shows once, on C-12, right after the second order is placed; D-87 is unchanged (06 customer global).
+- Q-18: no business notification for "credits expiring" in v1; WhatsApp, when enabled, carries the same events as SMS, with SMS as the fallback (01 §15).
+- Q-20: seed admins in local and test are pre-enrolled with deterministic TOTP secrets, plus one unenrolled admin; the mocks UI has a "TOTP now" panel. The backend never reads under `e2e/`: the seed module reads the fixture path from `SEED_ADMINS_FILE`, which `infra/local/local.env` sets to `e2e/fixtures/admins.yaml`. With the variable unset it seeds no TOTP admins and logs the variable's name; it refuses to seed them unless `APP_ENV` is `local` or `test` (08 §2, 07 W0-07, W1-01).
+- Q-21: the B-14 cashback example is computed from the store's current `cashback_bp`; at 0 it reads "Cashback is off…" (06 B-14).
+- Q-26: SMS to reserved numbers still goes to the mock SMS server; only verification is short-circuited (01 §2, 08 §2).
+- Q-28: `feature_delivery_enabled` off is a platform kill switch; a store with no pickup shows "In-store only" and booking returns `409 store_not_bookable`; in-progress delivery orders finish (01 §5).
+- Q-32: the payout export CSV holds `pending` rows only, with fixed columns, stamps `exported_at`, and is sanitised against formula injection (04 §2.7, 03 §8).
+- Q-33: admin adjustments are whole credits (fractions get `422 validation_failed`); dual approval applies above 500 credits, exclusive (08 CR-15).
+- Q-34: Latin digits in every locale (`nu-latn`); native digits are later (02 §4.1, 07 W1-03, 10).
+- Q-36: the grounding validator applies to every free-text AI output; for reply drafts the allowed numbers are those in the review text and order facts (11 §1 rule 5).
+- Q-37: `GET /v1/test/slow?ms=` and `GET /v1/test/slow-sql?ms=` (both with `ms` capped at 30000) behind the test-clock gate, owner W1-07 (04 §2.9, 08 §2).
+- Q-38: credit caps count when the hold is taken; a cancelled or expired order no longer counts (01 §7).
+- Q-39: customer referral rewards post with the qualifying outcome; only shop rewards wait for the 10th order (D-72) (01 §8, 08 POS-21).
+- Q-40a: a lot earned on day X (IST) is usable through day X+N and expires at 00:00 IST on X+N+1 (01 §7).
+- Q-40c: hours `00:00`–`24:00` means open all day; B-14 has an "Open 24 hours" toggle (03 §2 `stores.hours`, 06 B-14).
+- Q-40d: changing a timer setting never moves existing deadlines (01 §5.1).
+- Q-40e: a shop may accept after closing time until `accept_by`; `store_closed` applies to placing only (01 §5.2).
+- Q-40f: "first N orders" and `max_redemptions` are used up at placement and released on cancel or expiry (01 §12).
+- Q-42: an item is low when quantity is at or below its threshold (01 §4).
+- Q-43: accepting with too little stock returns `409 insufficient_stock`; an offline sale at an old cached price is accepted as recorded, with no risk flag in v1 (04 §2.6, 02 §4.3).
+- Q-45: search weights keep unit `bp` and are super_admin-only on purpose (01 §17).
+- Q-46: `verify-dist` moves to an allow-list (same-origin hashed bundles, and the Turnstile script on the lead-form page only); leads get admin list and status endpoints and a Leads tab on A-03 (02 §4.5, 04 §2.7, 06 A-03).
+- Q-14, Q-35, Q-38 and Q-44 were confirmed by the founder.
+
+**D-94 · ₹ thresholds and POS rounding (founder, 2026-10-22).**
+- ₹ thresholds are inclusive. The delivery minimum, the free-delivery threshold and a minimum-bill offer are compared with the item subtotal: the items total after item-level offers, before the minimum-bill discount and before credits.
+- Order of operations in a quote: item-level offers, minimum-bill offer, delivery fee, credits.
+- Example, assuming free delivery on ₹500+: a ₹500 cart gets free delivery and the "₹50 off on ₹500+" offer, so it pays ₹450. A ₹520 cart with a ₹30 item offer has an item subtotal of ₹490: delivery is charged and the minimum-bill offer does not apply.
+- This replaces "eligible amount" as the base for the delivery minimum and free delivery (D-28, D-29). Orders and POS sales store it as `item_subtotal_paise` (03). The eligible amount still drives the credit minimum, the credit cap and cashback.
+- POS round-off is to the nearest ₹1 and half rounds up: ₹100.50 becomes ₹101. `round_off_paise` is between −49 and +50.
+- Lives in: 01 §5.5, §7, §12; 03 §4 and §5; 04 quote row; 06 C-09, B-14; 08 POS-16.

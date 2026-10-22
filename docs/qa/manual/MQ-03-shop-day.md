@@ -34,7 +34,7 @@ One day at Sri Lakshmi: staff sign in, the new-order sound plays, orders are acc
 | MQ-03.06 | In profile C open Orders. Accept the "Allow sound" prompt. Then go to the Stock tab. | Sound allowed. Stock screen shows. | B-04 `R-15.2` | | |
 | MQ-03.07 ★ | In profile A sign in as C11 and place pickup order **O-A** at SL: I1 ×2, I2 ×2, I5 ×1 (₹184), no credits. | Order placed; C-12 shows "Waiting for Sri Lakshmi to accept · 10:00 left". | BK-01 C-12 | | |
 | MQ-03.08 ★ | Watch profile C (still on Stock) and profile B (on Overview). | Within 3 s on both: a new-order toast and a sound loop, on whatever screen is open. B-03 shows a "New orders" card with Accept buttons. Orders tab badge 1. | `R-15.2` BK-01 B-03 B-04 | ▢ | |
-| MQ-03.09 | Do not open the order. `clock +3m1s`. Open the mocks SMS tab. | One SMS to the Sri Lakshmi staff phone about a new order not yet seen (3 min escalation). Crop the phone before saving. See Q-26 for reserved numbers. | `R-15.2` NOTIFY-M | ▢ | |
+| MQ-03.09 | Do not open the order. `clock +3m1s`. Open the mocks SMS tab. | One SMS to the Sri Lakshmi staff phone about a new order not yet seen (3 min escalation). Crop the phone before saving. Reserved numbers still reach the mock SMS server (01 §2). | `R-15.2` NOTIFY-M | ▢ | |
 | MQ-03.10 | Open the order in profile C. | Sound stops on this device. Countdown about 6:5x (10:00 − 3:01). | `R-5.3` B-04 | | |
 | MQ-03.11 ★ | Click Accept. | O-A in Accepted. Profile A shows Accepted with the PickupCode within 3 s. | `R-5.12` BK-05 | ▢ | |
 
@@ -64,7 +64,7 @@ Sign profile B out and in as K22 for this section, so the cashier limits show.
 | MQ-03.24 | **Sale 2.** Scan I1, then I2 twice. | Amul Butter ×1 ₹58, Maggi ×2 ₹28 (the second scan increments the line). Total ₹86. UPI, Charge. | POS-15 B-05 | | |
 | MQ-03.25 | **Sale 3.** Tap quick tiles Coca-Cola 750 ml ×2 and Nandini Toned Milk ×1. | Total ₹104. Card, Charge. | B-05 | | |
 | MQ-03.26 ★ | **Sale 4.** Scan the unknown barcode `8900000000001`. | An "Add product" sheet opens. Close it. Nothing added. | POS-15 B-05 | ▢ | |
-| MQ-03.27 | Add I9 QA pack ₹99.99 ×1 and I12 QA pack ₹0.50 ×1. | Subtotal ₹100.49. Round-off line −₹0.49. Total ₹100. Cashier can see and use round-off. | `R-12.9` POS-16 B-05 | ▢ | |
+| MQ-03.27 | Add I9 QA pack ₹99.99 ×1 and I12 QA pack ₹0.50 ×1. | Subtotal ₹100.49. Round-off line −₹0.49. Total ₹100. Cashier can see and use round-off. Round-off is to the nearest ₹1 with half rounding up (D-94): a ₹100.50 subtotal gives +₹0.50 and total ₹101. | `R-12.9` POS-16 B-05 | ▢ | |
 | MQ-03.28 | Cash, Charge. | Sale saved at ₹100. | B-05 | | |
 | MQ-03.29 ★ | **Sale 5.** Press F2, type `atta`, press Enter, press + once, press F4. | Wheat atta 5 kg ×2, ₹490, charged by keyboard only. Pick Cash when asked. | B-05 | ▢ | |
 | MQ-03.30 ★ | **Sale 6.** Add I7 Toor dal ×1 (₹160). Link customer → Phone only. Type C19's number. | Label "Adds to your customer list · no credits or cashback". No credits field. Cash, Charge. | `R-6.5` POS-17 B-05 | ▢ | |

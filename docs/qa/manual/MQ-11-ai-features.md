@@ -119,7 +119,7 @@ Every AI feature returns a draft. The tester feeds each one an input that the mo
 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
-| MQ-11.43 | `set ai_daily_calls_customer = 2`. As C11 run 3 list searches. | Third one refused with a clear message; no model call. Record the `code` and copy (not named in the plan: Q-35). | `R-17.3` 11 §1 rule 7 | ▢ | |
+| MQ-11.43 | `set ai_daily_calls_customer = 2`. As C11 run 3 list searches. | Third one refused with a clear message; no model call. `429 ai_daily_cap_reached` with `extensions.scope` `customer`, a `Retry-After` header, and the copy "AI help is paused until tomorrow." The entry point is disabled, with no retry button. | `R-17.3` 11 §1 rule 7 | ▢ | |
 | MQ-11.44 | `clock set <tomorrow>T00:00:05+05:30`. Search again. | Allowed again (the cap is per IST day). | `R-17.3` | | |
 | MQ-11.45 | Open Grafana dashboard 14 "AI quality and cost". | Calls by feature (list_search, voice_stock, bill_scan, shelf_photo, review_reply, ticket_triage, catalogue_cleanup, risk_summary, coach), acceptance rate per feature with this run's accepted, edited and discarded drafts, and cost per day. | 05 §4 dashboard 14 | ▢ | |
 | MQ-11.46 | `set ai_daily_cost_cap_paise = 100` (₹1) as SA48. Run list searches until the mock cost passes ₹0.80. | The "AI cost" alert fires at 80% in Grafana alerting (local contact point). At 100%, AI entry points show the "unavailable" state and no further model calls happen until the next IST day. | `R-17.3` D-70 05 §5 | ▢ | |

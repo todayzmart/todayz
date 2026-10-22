@@ -38,7 +38,7 @@ Run a pickup order (MQ-02) and a shop day (MQ-03), then check that the activity 
 | MQ-12.12 | Read the trace. | One root span for the HTTP request, child spans for the handler, SQL queries (named, not raw SQL with values) and any outbound call. The time in DB is visible. | OB-01 05 §2.3 | ▢ | |
 | MQ-12.13 | From the trace, open "Logs for this span" (or search Loki for `{app="api"} |= "<trace id>"`). | The log lines of that request carry the same `trace_id`. | OB-01 05 §2.2 | ▢ | |
 | MQ-12.14 | In Explore → Prometheus, query the API request-duration histogram (`tz_` prefix, `_seconds` unit, 05 §2.1) filtered to that route. | The count moved at the same time. Metric, log and trace agree on one request. Record the metric name. | OB-01 05 §2.1 | | |
-| MQ-12.15 | Force a slow route and a slow query the way the OB-03 and OB-04 tests do. The plan does not name a local hook for this (Q-37); if none exists, mark **B**. Call it 20 times, wait 2 minutes, open 00. | The route ranks first in "Slowest endpoints by impact"; "Slowest SQL" shows the slow statement by its query name. | OB-03 OB-04 | ▢ | |
+| MQ-12.15 | Force a slow route and a slow query the way the OB-03 and OB-04 tests do. Use `GET /v1/test/slow?ms=` and `GET /v1/test/slow-sql?ms=` (04 §2.9). Call it 20 times, wait 2 minutes, open 00. | The route ranks first in "Slowest endpoints by impact"; "Slowest SQL" shows the slow statement by its query name. | OB-03 OB-04 | ▢ | |
 
 ### C. No PII in logs or traces
 

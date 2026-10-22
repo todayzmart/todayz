@@ -17,7 +17,7 @@ The three apps are installable PWAs. This file checks the customer install promp
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
 | PWA-M.01 ★ | As C01 (new) browse, sign in and place and collect one order. | No install prompt at any point. | 06 global SC-CU | | |
-| PWA-M.02 ★ | Place and collect a second order as C01. Return to Home. | The app's own install prompt shows after the 2nd order (not the browser's mini-infobar earlier). Record exactly when it shows (Q-14). | 06 global | ▢ | |
+| PWA-M.02 ★ | Place and collect a second order as C01. Return to Home. | The app's own install prompt shows after the 2nd order (not the browser's mini-infobar earlier). It shows on C-12 right after the second order is placed, and only once. | 06 global | ▢ | |
 | PWA-M.03 | Tap Install. Open the installed app from the home screen. | Opens standalone (no address bar), at Home, signed in, with the TodayZ icon and name. | SC-CU | ▢ | |
 | PWA-M.04 | On iOS Safari (P390) do the same as C19 after its 2nd order. | iOS has no install event: the app shows "Add to Home Screen" instructions instead, or nothing; record which. | SC-CU | | |
 | PWA-M.05 ★ | With Home and a search for "atta" loaded once, set DevTools → Offline. Reload Home, then open the "atta" search. | An offline banner shows. Cached shops and results show, marked "may be out of date". No browser dinosaur page. | 06 global | ▢ | |

@@ -15,4 +15,6 @@
 | ClickHouse for events | If events > ~5M/day | Volume |
 | Multi-AZ RDS, read replica for analytics | Reliability and isolation | Revenue |
 | AI later items | Ask about my shop (AI-R7), distributor restock lists (AI-R8), help assistant (AI-C4), AI substitutes ranking, Ask Pulse (AI-A4), KYC document check (AI-A5) | v1 AI adoption data |
+| Coupon codes | Not planned: no coupon codes anywhere in v1 (offers and credits only) | Product decision |
 | Dark theme | Removed at the user's request; only if asked | User request |
+| Native-script digits | Show Indic digits in hi, kn, te, ta (v1 uses Latin digits in all locales, `nu-latn`) | Translator review of number formats |

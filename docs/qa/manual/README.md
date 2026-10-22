@@ -72,9 +72,9 @@ Useful commands:
 
 ## 2. Sign-in and OTP
 
-- **Reserved numbers.** `+91 90000 00000` to `+91 90000 00099` accept the OTP `000000` in `local` and `test` only (01 §2). They never send an SMS, so nothing shows in the mocks for them.
-- **Mock-route numbers.** To see a real OTP pass through the SMS mock, use a synthetic number from `+91 90000 00100` to `+91 90000 00199`. These are not reserved, so the backend sends the SMS to the mock. Read the code in the mocks UI (SMS tab, click the OTP to copy it), or call `GET https://mocks.todayz.localhost/_mock/sms/latest-otp?to=919000000101&since=<RFC 3339 time>&wait=5`. A missing code returns 404 `{"error":"no OTP for that phone"}`. This range is a book choice: see Questions for the lead, Q-01.
-- **Admin sign-in** needs the phone OTP and a TOTP code. Seed admins enrol on first sign-in (A-01): scan the QR into an authenticator app on a test phone. Store the 10 recovery codes in a password manager, never in a run file.
+- **Reserved numbers.** `+91 90000 00000` to `+91 90000 00099` accept the OTP `000000` in `local` and `test` only (01 §2). OTP and notification SMS to these numbers still go to the mock and show in the mocks UI; only verification is short-circuited (`000000`).
+- **Mock-route numbers.** To see a real OTP pass through the SMS mock, use a synthetic number from `+91 90000 00100` to `+91 90000 00199`. These are not reserved, so the backend sends the SMS to the mock. Read the code in the mocks UI (SMS tab, click the OTP to copy it), or call `GET https://mocks.todayz.localhost/_mock/sms/latest-otp?to=919000000101&since=<RFC 3339 time>&wait=5`. A missing code returns 404 `{"error":"no OTP for that phone"}`. They are outside the reserved block (01 §2, D-15).
+- **Admin sign-in** needs the phone OTP and a TOTP code. Seed admins are pre-enrolled with TOTP, except AD47, the one unenrolled seed admin (§6), who enrols on first sign-in (A-01): scan the QR into an authenticator app on a test phone. Store the 10 recovery codes in a password manager, never in a run file. TOTP codes for the other seed admins come from the "TOTP now" panel in the mocks UI (local and test only).
 - **Turnstile** in the mock passes every token except `XXXX.DUMMY.TOKEN.FAIL`, which fails with `invalid-input-response`.
 
 ## 3. The test clock
@@ -88,7 +88,7 @@ The server clock can be moved in `local` and `test` only (D-80). Staging and pro
 | `clock set 2026-11-30T23:59:59+05:30` | `POST /v1/test/clock` with `{"set":"2026-11-30T23:59:59+05:30"}` |
 | `clock reset` | `POST /v1/test/clock` with `{"reset":true}` (back to real time) |
 
-`advance` is fixed by 08 §2. The exact body for `set` and `reset` is not fixed in the plan yet (Q-02). If they differ when W0-03 ships, use the real body and note it in the run header. Always `clock reset` in cleanup.
+The contract is in 04 §2.9: exactly one of `advance`, `set` or `reset` per request, plus an optional `wait` (default 10s). The response is `{"now","offsetMs","dueJobs"}`. Always `clock reset` in cleanup.
 
 All times in this book are IST (UTC+05:30). IST midnight is 18:30:00 UTC.
 
@@ -150,7 +150,7 @@ The seed (`make reset`) builds the world below. Where the seed is not built yet,
 | Y44 | +91 90000 00044 | Admin role `analyst` | |
 | FN45 | +91 90000 00045 | Admin role `finance` (A) | |
 | FN46 | +91 90000 00046 | Admin role `finance` (B) | |
-| AD47 | +91 90000 00047 | Admin role `admin` | |
+| AD47 | +91 90000 00047 | Admin role `admin` | The one seed admin without TOTP: enrols in MQ-07.01 to .07 |
 | SA48 | +91 90000 00048 | Admin role `super_admin` (A) | |
 | SA49 | +91 90000 00049 | Admin role `super_admin` (B) | |
 | D50 | +91 90000 00050 | Admin roles `support` and `catalogue` | Two roles |
@@ -161,7 +161,7 @@ Distances are from the **QA point**: PIN 560038, label "Indiranagar, 560038", at
 
 | Short | Name | State | Distance | Hours (IST) | Fulfilment | Notes |
 |---|---|---|---|---|---|---|
-| SL | Sri Lakshmi (business Lakshmi Traders) | business verified, store live | 0.6 km | 08:00–22:00 daily | pickup and delivery | cashback 500 bp (5%); delivery radius 3 km, fee ₹30, free above ₹500, minimum ₹150; auto-accept off; live since 2026-01-10 (primary store); 14 items I1–I14 |
+| SL | Sri Lakshmi (business Lakshmi Traders) | business verified, store live | 0.6 km | 08:00–22:00 daily | pickup and delivery | cashback 500 bp (5%); delivery radius 3 km, fee ₹30, free delivery on ₹500+, minimum ₹150; auto-accept off; live since 2026-01-10 (primary store); 14 items I1–I14 |
 | SL2 | Sri Lakshmi 2 (Lakshmi Traders), HAL 2nd Stage | live | 1.8 km | 08:00–22:00 | pickup only | cashback 0; live since 2026-05-01; 8 items |
 | AP | Annapurna Provisions | live, business verified 10 days ago | 1.2 km | 09:00–21:00 | pickup only | cashback 0; onboarded by F40; 20 items |
 | NH | Nandi Hardware | live, verified | 0.9 km | 10:00–20:00 | both off ("In-store only") | 15 items |
@@ -204,7 +204,7 @@ Steps use these placeholders until the seed provides them. The seed WP should cr
 |---|---|
 | `<seed:customers>` | C01–C19 as in §6, including wallets, lots, strikes, referral and open-order states |
 | `<seed:staff>` | O20, M21, K22, R23, M24, X25, O26, O27, O28 with the roles and store scopes in §6 |
-| `<seed:admins>` | F40, F41, S42, G43, Y44, FN45, FN46, AD47, SA48, SA49, D50 with TOTP not yet enrolled |
+| `<seed:admins>` | F40, F41, S42, G43, Y44, FN45, FN46, AD47, SA48, SA49, D50 pre-enrolled with TOTP (codes in the mocks "TOTP now" panel), except AD47, who is not enrolled |
 | `<seed:stores>` | SL, SL2, AP, KF, NH, AM, PS, DS, PR, SS, NI, SB, HY as in §6 |
 | `<seed:items-SL>` | I1–I14 at SL with prices, stock, barcodes, the stale timestamp and the expiring batch |
 | `<seed:offer-I13-21off>` | ₹21 flat offer on I13 at SL, live |

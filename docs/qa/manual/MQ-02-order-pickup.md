@@ -33,7 +33,7 @@ A signed-out shopper fills a cart at Sri Lakshmi, signs in at checkout, uses 30 
 | MQ-02.04 ★ | Open Sri Lakshmi (C-07). Add Amul Butter 100 g, set quantity 2. | CartBar: 2 items, ₹116. No sign-in prompt. | `R-2.1` C-07 C-09 | | |
 | MQ-02.05 | Add Maggi 2-Minute Noodles 70 g ×3 and Wheat atta 5 kg ×1. | CartBar: 6 items, ₹403. | C-09 | | |
 | MQ-02.06 | Open Annapurna Provisions and tap Add on any item. | A dialog asks to replace the Sri Lakshmi cart (one shop per cart). Choose Keep. Cart still ₹403 at Sri Lakshmi. | `R-5.1` C-09 | ▢ | |
-| MQ-02.07 ★ | Open the cart (C-09). | Three lines with steppers: Amul Butter 100 g ×2 ₹116, Maggi 70 g ×3 ₹42, Wheat atta 5 kg ×1 ₹245. Items ₹403. Pickup selected. Delivery option visible (SL offers delivery) with fee ₹30, free above ₹500, minimum ₹150. | `R-5.29` C-09 | ▢ | |
+| MQ-02.07 ★ | Open the cart (C-09). | Three lines with steppers: Amul Butter 100 g ×2 ₹116, Maggi 70 g ×3 ₹42, Wheat atta 5 kg ×1 ₹245. Items ₹403. Pickup selected. Delivery option visible (SL offers delivery) with fee ₹30, free delivery on ₹500+, minimum ₹150. | `R-5.29` C-09 | ▢ | |
 | MQ-02.08 | Read the credits row while signed out. | Copy "Use up to 30 credits on orders of ₹100 or more" (`credit_max_per_order`, `credit_min_order_value_paise`). The toggle asks to sign in to use credits. | `R-7.3` D-02 C-09 | ▢ | |
 | MQ-02.09 | Tap Checkout. | C-10 sign-in opens with the +91 prefix. | `R-2.1` C-10 | | |
 
@@ -98,7 +98,7 @@ A signed-out shopper fills a cart at Sri Lakshmi, signs in at checkout, uses 30 
 |---|---|---|---|---|---|
 | MQ-02.40 ★ | Look at C-12. | Terminal state Collected with next actions: review, reorder. | `R-5.10` C-12 | ▢ | |
 | MQ-02.41 ★ | Open Wallet (C-15). | Balance 88: 100 − 30 spent + 18 cashback. Held 0. Cashback is floor(37300 × 500 / 1,000,000) = 18 (base = ₹403 − ₹30 = ₹373). | `R-7.5` `R-7.7` CR-04 CR-23 C-15 | ▢ | |
-| MQ-02.42 | Read the history lines. | "Spent at Sri Lakshmi · order TZ-000301" (−30) and "5% back at Sri Lakshmi" (+18), with the real order number. See Q-12 for the exact "Spent" wording. | `R-7.13` CR-04 C-15 | ▢ | |
+| MQ-02.42 | Read the history lines. | "Spent at Sri Lakshmi · order TZ-000301" (−30) and "5% back at Sri Lakshmi" (+18), with the real order number. | `R-7.13` CR-04 C-15 | ▢ | |
 | MQ-02.43 | In profile B as O20 (switch user), open B-10 Credits. | Lines "spent at your shop" +30 and cashback −18 for this order. Balance moved by +12. | `R-7.6` `R-7.7` `R-9.2` B-10 | ▢ | |
 | MQ-02.44 | Open Orders (C-13) in profile A, tab Online. | The order shows under history with status Collected, total ₹373 and a reorder action. | C-13 | | |
 
@@ -111,7 +111,7 @@ A signed-out shopper fills a cart at Sri Lakshmi, signs in at checkout, uses 30 
 | MQ-02.47 ★ | Give 4 stars, tags "Fresh stock" and "Quick service", text "Butter was fresh. Quick at the counter." Submit. | Review published at once. Sri Lakshmi's rating on C-07 changes (Bayesian, prior 4.0 weight 5) and the count goes up by 1. | `R-10.2` `R-10.4` C-14 C-07 | ▢ | |
 | MQ-02.48 | Try `POST /v1/me/reviews` again for the same order (Copy as cURL). | Refused (one review per order): 409. | `R-10.1` | | |
 | MQ-02.49 | Edit the review: change to 5 stars. | Saved; shop page rating updates. "Edit" stays available (within 7 days). | `R-10.1` C-14 | | |
-| MQ-02.50 | `clock +7d1m`, reload the review. | Edit is no longer offered. A PATCH by Copy as cURL is refused; note the status and `code` (the plan names no code for this: Q-15). Then `clock reset`. | `R-10.1` C-14 | | |
+| MQ-02.50 | `clock +7d1m`, reload the review. | Edit is no longer offered. A PATCH by Copy as cURL is refused with `409 review_edit_window_passed`. Then `clock reset`. | `R-10.1` C-14 | | |
 | MQ-02.51 | In profile B as O20 open Reviews (B-11). | The review shows with stars and text. Reply box available. In-app inbox (B-16) shows "New review". | `R-10.2` `R-15.9` B-11 B-16 | ▢ | |
 | MQ-02.52 | Reply "Thank you, Ananya!" and save. Then edit the reply. | One reply only; editing changes it in place. Customer sees the reply on C-14. | `R-10.2` B-11 C-14 | ▢ | |
 
@@ -120,10 +120,10 @@ A signed-out shopper fills a cart at Sri Lakshmi, signs in at checkout, uses 30 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
 | MQ-02.53 | Place a second pickup order at SL as C10: I3 Nandini Toned Milk 500 ml ×5 (₹120), no credits. | New number is the previous number + 1 (one global sequence) or higher if other orders were placed. Countdown 10:00. | `R-5.16` BK-34 | | |
-| MQ-02.54 | `clock +9m59s`, then reload C-12. | Still Placed; countdown about 0:01. If the screen still shows ~10:00, the client is using device time: see Q-13. | `R-5.3` `R-5.8` | | |
+| MQ-02.54 | `clock +9m59s`, then reload C-12. | Still Placed; countdown about 0:01. If the screen still shows ~10:00, the client is using device time instead of `serverNow` (D-93): fail. | `R-5.3` `R-5.8` | | |
 | MQ-02.55 | In profile B accept it. | Accepted at 9 m 59 s. | `R-5.3` TIMER-M | | |
 | MQ-02.56 | As C10 cancel it from C-12 with reason "Changed my mind". | Cancelled (customer). Reservation released (I3 reserved back to 0). Shop gets an in-app line. | `R-5.11` BK-17 | ▢ | |
-| MQ-02.57 | After this second order, watch Home for the PWA install prompt. | The install prompt appears now (after the 2nd order, D-87) and did not appear after the first. Dismiss it. If it appears only after a 2nd *completed* order, record what you saw: see Q-14. Detailed in PWA-M. | D-87 C-03 | ▢ | |
+| MQ-02.57 | After this second order, watch Home for the PWA install prompt. | The install prompt appears now, on C-12 right after the second order is placed (D-87), and did not appear after the first. Dismiss it. Detailed in PWA-M. | D-87 C-03 | ▢ | |
 
 ## Cleanup
 

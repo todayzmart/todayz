@@ -39,7 +39,7 @@ All timers run on the server; the apps only display them (`R-5.8`). After every 
 | TIMER-M.09 | `clock set` TA + 29 min 59 s. Refresh C-12 and B-04. | Still `accepted`. Hold countdown 0:01. The code still shows on C-12. | `R-5.4` BK-14 | | |
 | TIMER-M.10 ★ | `clock +2s` (TA + 30 min 01 s). Refresh. | `expired` with reason `no_show`. C10 gets one strike: A-06 → C10 → strikes shows 1, with the order number. I1 reservation released (available back to 10, on hand 10, no movement). The 30 held credits released. | `R-5.4` `R-5.24` `R-5.25` BK-14 BK-37 A-06 | ▢ | |
 | TIMER-M.11 | C10 places a new pickup order (I1 ×1). K22 accepts at **TB**. `clock set` TB + 25 min. On C-12 tap "I'm on my way (+10 min)". | Hold countdown jumps from 5:00 to 15:00. `hold_until` = TB + 40 min. The button is gone or disabled after the tap. B-04 shows the new hold time. | `R-5.5` BK-15 C-12 | ▢ | |
-| TIMER-M.12 | Send the extension request again via cURL. | Refused (one extension per order). Record the code and status. `hold_until` unchanged. | `R-5.5` BK-15 | | |
+| TIMER-M.12 | Send the extension request again via cURL. | `409 extension_already_used`. `hold_until` unchanged. | `R-5.5` BK-15 | | |
 | TIMER-M.13 | `clock set` TB + 39 min 59 s. Refresh. | Still `accepted`. | `R-5.5` BK-15 | | |
 | TIMER-M.14 | `clock set` TB + 40 min 01 s. Refresh. Then send the extension request again. | `expired` (`no_show`). C10 strikes 2. The extension request is refused (`invalid_transition`). | `R-5.5` `R-5.24` BK-15 | | |
 | TIMER-M.15 | C10 places another order; K22 accepts at **TC**. `clock set` TC + 29 min 59 s. K22 enters C10's code. Then `clock set` TC + 31 min. | Collected at the last second. At +31 min nothing changes: no expiry, no strike (still 2). One outcome only. | `R-5.4` BK-20 | ▢ | |
@@ -68,7 +68,7 @@ All timers run on the server; the apps only display them (`R-5.8`). After every 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
 | TIMER-M.25 ★ | Sign in as C13 (3 no-shows in the last 30 days). Open Home and checkout. | C-21 banner on Home and Checkout explains the limit (1 active order) and its end date, 14 days after the 3rd strike (`noshow_limit_days`). Note the end date **EL**. | `R-5.24` BK-16 C-21 | ▢ | |
-| TIMER-M.26 | C13 places one pickup order at Sri Lakshmi. Then tries a second order at Annapurna Provisions. | First: `placed`. Second: refused with the limit explained. Record the code and status (not named in 04, Q-10). | `R-5.24` BK-16 | ▢ | |
+| TIMER-M.26 | C13 places one pickup order at Sri Lakshmi. Then tries a second order at Annapurna Provisions. | First: `placed`. Second: refused with the limit explained. `409 ordering_suspended` with `extensions.until` (the limit end date). | `R-5.24` BK-16 | ▢ | |
 | TIMER-M.27 | C13 cancels the first order. Tries the second order again. | Allowed (only one active order). Cancel it again. | `R-5.24` BK-16 | | |
 | TIMER-M.28 | `clock set` EL − 1 s. Open Home. Then `clock set` EL + 1 s. | At EL − 1 s the banner still shows. At EL + 1 s it is gone and two orders can be active at once. | `R-5.24` BK-16 | ▢ | |
 | TIMER-M.29 | `make reset`; `clock set 2026-10-22T11:00:00+05:30`. Repeat M.21 and M.24 four times at Sri Lakshmi (4 dispatch timeouts). Open A-13 and A-05. | A-05: 4 new strikes. A-13: no `store_strikes` flag for Sri Lakshmi. Store still `live`. | `R-5.26` BK-46 | | |
@@ -85,7 +85,7 @@ All timers run on the server; the apps only display them (`R-5.8`). After every 
 | TIMER-M.35 | Open Home and the shop page. | Sri Lakshmi shows closed, with its next opening time. | `R-11.2` C-03 C-07 | | |
 | TIMER-M.36 | `clock set 2026-10-23T07:59:59+05:30`, place again. Then `clock set 2026-10-23T08:00:00+05:30`, place again. | 07:59:59 → `store_closed`. 08:00:00 → placed. | `R-5.2` BK-28 | | |
 | TIMER-M.37 | In profile B, O20 closes the shop for today in B-14 (holiday or closed-now control). C10 tries to place. | `store_closed`. Record which control B-14 offers. Reopen the shop. | `R-5.2` BK-28 B-14 | ▢ | |
-| TIMER-M.38 | The M.33 order is still `placed` at 22:00. K22 accepts it at 22:05. | Record whether accepting after closing time is allowed. 01 only refuses placing; accepting is not addressed (do not mark F; note it). | `R-5.2` | | |
+| TIMER-M.38 | The M.33 order is still `placed` at 22:00. K22 accepts it at 22:05. | Accept succeeds: a shop may accept after closing time until `accept_by`; `store_closed` applies to placing only (01 §5.2). | `R-5.2` | | |
 
 ### G. Order numbers across IST midnight (D-23)
 
@@ -129,7 +129,7 @@ All timers run on the server; the apps only display them (`R-5.8`). After every 
 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
-| TIMER-M.57 | `set order_accept_timeout_min = 12` (AD47, a minutes key). C10 places a new order. | C-12 shows 12:00 left; B-04 countdown 12:00. Expiry happens at +12 min 01 s, not at +10 min 01 s. Whether an order placed before the change keeps 10 minutes is not stated: record it. Restore to 10. | `R-5.3` `R-5.8` PL-06 G7 | ▢ | |
+| TIMER-M.57 | `set order_accept_timeout_min = 12` (AD47, a minutes key). C10 places a new order. | C-12 shows 12:00 left; B-04 countdown 12:00. Expiry happens at +12 min 01 s, not at +10 min 01 s. An order placed before the change keeps its 10-minute deadline (01 §5.1). Restore to 10. | `R-5.3` `R-5.8` PL-06 G7 | ▢ | |
 | TIMER-M.58 | Stop the worker (`infra/local/proc.sh stop worker`). C10 places an order at **TW**. `clock set` TW + 15 min. Start the worker again. Wait 1 minute and refresh. | The order becomes `expired` (`not_accepted`) once, with the expiry time recorded as the server's run time. Credits released once (one release line in A-09). Running the job again (restart the worker) changes nothing. | `R-5.8` BK-21 | | |
 
 ## Cleanup

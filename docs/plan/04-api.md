@@ -13,6 +13,7 @@ The contract lives in `backend/api/` (OpenAPI 3.1), split per domain: `paths/<do
 - Tracing: clients send `traceparent`; every response returns `X-Request-Id`.
 - Versioning: `/v1`. Additive changes only within v1. The oldest client allowed per app is set in settings (`min_client_version_customer`, `min_client_version_business`, `min_client_version_admin`); an older app shows "Update available" and reloads its service worker.
 - Language: `Accept-Language` picks translated category names and notification text.
+- Time: timed responses (every order response and every SSE order event) include `serverNow` (RFC 3339). Clients compute countdowns against it: remaining = deadline − (`serverNow` + time elapsed since receipt), never against the device clock.
 
 ### 1.1 Namespaces (D-10)
 
@@ -52,6 +53,29 @@ Shorthand in 2.6: `{B}` = `/v1/biz/businesses/{bid}`, `{S}` = `{B}/stores/{sid}`
 - One registry: `backend/api/problems/<domain>.yaml`, bundled. Each entry has the code, HTTP status and i18n key. W0-03 creates `problems/common.yaml`; each package adds codes in its own domain file. A response may only use a registered code.
 - A refused state change is always `409 invalid_transition` (detail names the from and to states).
 - Codes named in this file: `invalid_transition`, `idempotency_mismatch` (common); `insufficient_stock`, `store_closed`, `store_not_bookable`, `code_locked`, `account_has_active_order` (orders); `resync_required` (sync); `reversal_window_passed` (pos); `approver_is_requester` (admin-credits).
+- Codes added after the QA book review (D-91). Each is registered in its domain file before its handler ships:
+
+  | Code | Status | Domain file | Meaning |
+  |---|---|---|---|
+  | `otp_locked` | 429 | `auth.yaml` | too many wrong OTP attempts |
+  | `otp_expired` | 401 | `auth.yaml` | OTP older than 5 min |
+  | `account_blocked` | 403 | `auth.yaml` | account blocked by admin |
+  | `step_up_required` | 403 | `auth.yaml` | admin TOTP older than 10 min |
+  | `price_changed` | 409 | `orders.yaml` | price moved since the quote; the fresh quote is in `extensions` |
+  | `below_minimum` | 409 | `orders.yaml` | under the store's delivery minimum |
+  | `delivery_closed` | 409 | `orders.yaml` | delivery ordered outside delivery hours; `extensions.nextDeliveryWindow`; pickup still offered |
+  | `ordering_suspended` | 409 | `orders.yaml` | no-show limit active; `extensions.until` |
+  | `extension_already_used` | 409 | `orders.yaml` | the one "I'm on my way" extension is already used |
+  | `below_credit_minimum` | 409 | `wallet.yaml` | eligible amount under the credit minimum |
+  | `credit_max_exceeded` | 409 | `wallet.yaml` | more credits than `credit_max_per_order` |
+  | `credit_monthly_cap` | 409 | `wallet.yaml` | customer's monthly credit-order cap reached |
+  | `store_credit_cap` | 409 | `wallet.yaml` | store's daily credit-redemption cap reached |
+  | `claim_expired` | 409 | `pos.yaml` | bill QR expired |
+  | `claim_already_used` | 409 | `pos.yaml` | bill QR already claimed |
+  | `review_edit_window_passed` | 409 | `reviews.yaml` | edit after `review_edit_window_days` |
+  | `ai_daily_cap_reached` | 429 | `ai.yaml` | daily AI cap reached; `extensions.scope` is `customer`, `store` or `platform`; `Retry-After` is the next IST midnight |
+
+  A credit cap refusal (CR-11 "refused and flagged") is the matching code plus a `risk_flags` row; the order can still be placed without credits.
 
 ### 1.5 Reason enums (D-60)
 
@@ -119,7 +143,7 @@ How it works (W0-03, `platform/idempotency`):
 |---|---|---|---|
 | GET | /v1/discover/places/search?q= | W1-06 | PIN / locality autocomplete |
 | GET | /v1/discover/places/reverse?lat=&lng= | W1-06 | nearest locality label |
-| GET | /v1/discover/summary?lat=&lng=&radius= | W1-06 | `{storesNearby, openNow, productsInRadius, pins:[{storeSlug, lat, lng, open, categoryTint}] or clusters}`: the StoreMap card |
+| GET | /v1/discover/summary?lat=&lng=&radius= | W1-06 | `{storesNearby, openNow, productsInRadius, pins:[{storeSlug, lat, lng, open, categoryTint}] or clusters}`: the StoreMap card. `productsInRadius` is the number of in-stock listings across live stores within the radius (not distinct catalogue products) |
 | GET | /v1/discover/categories | W1-05 | tree with tints and icons |
 | GET | /v1/discover/stores?lat=&lng=&radius=&category=&openNow=&delivery=&hasOffer= | W1-06 | shop list with distance, rating, cashbackPct, delivery flag, open state, `bookable` (false = "In-store only", D-41) |
 | GET | /v1/discover/stores/{slug} | W1-06 | shop page (hours, rating, offers, cashback, delivery terms); `?s={standeeId}` records a standee scan (D-26) |
@@ -133,8 +157,8 @@ How it works (W0-03, `platform/idempotency`):
 
 | Method | Path | Pkg | Notes |
 |---|---|---|---|
-| POST | /v1/me/checkout/quote | W2-02 | `{storeId, items, fulfilment, addressId?, creditsToUse}` → per-line availability, offers applied, `itemsAfterOffersPaise` (eligible amount, D-02), delivery fee, credits allowed with a reason when 0 (under ₹100, a cap reached: D-30), total. No side effects. |
-| POST | /v1/me/orders | W2-02 | idempotent; re-prices, rechecks stock, holds credits, sets `accept_by`, enqueues expiry job, notifies store; `409 store_closed` outside hours or when closed manually; `409 store_not_bookable` when pickup and delivery are both off (D-41) |
+| POST | /v1/me/checkout/quote | W2-02 | `{storeId, items, fulfilment, addressId?, creditsToUse}` → per-line availability, offers applied, `itemsAfterOffersPaise` (eligible amount, D-02), delivery fee, credits allowed with a reason when 0 (under ₹100, a cap reached: D-30), total. No side effects. Order of operations (D-94): item-level offers, then the minimum-bill offer, then the delivery fee, then credits. The delivery minimum, the free-delivery threshold and the minimum-bill offer are compared inclusively (`>=`) with the item subtotal after item-level offers, before the minimum-bill discount and before credits. |
+| POST | /v1/me/orders | W2-02 | idempotent; re-prices, rechecks stock, holds credits, sets `accept_by`, enqueues expiry job, notifies store; `409 store_closed` outside hours or when closed manually; `409 store_not_bookable` when pickup and delivery are both off (D-41), and also when `feature_delivery_enabled` is off and the store has no pickup; `409 delivery_closed` for delivery outside delivery hours |
 | GET | /v1/me/orders | W2-02 | own online orders |
 | GET | /v1/me/orders/{orderId} | W2-02 | detail with timeline; includes `code`, decrypted from `code_enc` for the owner only, only while valid (D-04) |
 | POST | /v1/me/orders/{orderId}/cancel | W2-02 | `{reason: CustomerCancelReason}` |
@@ -149,7 +173,7 @@ How it works (W0-03, `platform/idempotency`):
 | POST | /v1/me/bill-claims/{token}/preview | W2-04 | scanned bill QR → store, amount, max credits |
 | POST | /v1/me/bill-claims/{token}/confirm | W2-04 | `{creditsToUse}` → links sale (`bill_qr`), holds/captures credits |
 | POST | /v1/me/reviews | W2-06 | `{orderId|posSaleId, stars, text, tags: ReviewTagPositive[] | ReviewTagNegative[]}` |
-| PATCH | /v1/me/reviews/{reviewId} | W2-06 | own review, within 7 days |
+| PATCH | /v1/me/reviews/{reviewId} | W2-06 | own review, within `review_edit_window_days`; `409 review_edit_window_passed` after that |
 | POST | /v1/me/review-reports | W2-06 | `{reviewId, reason}`; report someone else's review |
 | GET/POST | /v1/me/support/tickets | W2-09 | list / create (linked to an order) (D-52) |
 | GET | /v1/me/support/tickets/{ticketId} | W2-09 | |
@@ -214,7 +238,7 @@ Cashier rights are D-06 as amended by D-65: cashiers run orders day to day (acce
 |---|---|---|---|---|
 | GET | {S}/orders?status=&cursor= | cashier | W2-02 | customer phone masked except while `out_for_delivery` (D-60) |
 | GET | {S}/orders/{orderId} | cashier | W2-02 | never contains the order code (D-04) |
-| POST | {S}/orders/{orderId}/accept | cashier | W2-02 | `{lines:[{orderItemId, quantity}]}` full or partial (partial → `awaiting_customer`); creates reservations, no movement (D-01) |
+| POST | {S}/orders/{orderId}/accept | cashier | W2-02 | `{lines:[{orderItemId, quantity}]}` full or partial (partial → `awaiting_customer`); creates reservations, no movement (D-01); `409 insufficient_stock` when any accepted qty exceeds available |
 | POST | {S}/orders/{orderId}/reject | cashier | W2-02 | `{reason: RejectReason}` |
 | POST | {S}/orders/{orderId}/ready | cashier | W2-02 | pickup only, optional |
 | POST | {S}/orders/{orderId}/dispatch | cashier | W2-02 | delivery: `accepted` → `out_for_delivery` |
@@ -229,7 +253,7 @@ Cashier rights are D-06 as amended by D-65: cashiers run orders day to day (acce
 | Method | Path | Role | Pkg | Notes |
 |---|---|---|---|---|
 | POST | {S}/sync | cashier | W2-04 | offline outbox (sales, movements) in device seq order; returns server deltas. An offline counter-code link carries the typed code, device time and the clock offset at the last online check; verified per D-12, else the sale stays unlinked ("Customer link failed") |
-| POST | {S}/pos/sales | cashier | W2-04 | online sale; `link.method: bill_qr|counter_code|phone_unverified` (D-07); manual line or bill discounts need manager+ (D-06); round-off to the nearest ₹1 is automatic and allowed for cashiers (D-65); response has `receiptToken` (D-45) |
+| POST | {S}/pos/sales | cashier | W2-04 | online sale; `link.method: bill_qr|counter_code|phone_unverified` (D-07); manual line or bill discounts need manager+ (D-06); round-off to the nearest ₹1 is automatic, half rounds up (₹100.50 becomes ₹101, `round_off_paise` −49…+50; D-94), and allowed for cashiers (D-65); response has `receiptToken` (D-45) |
 | POST | {S}/pos/sales/{saleId}/reverse | manager | W2-04 | within `pos_reversal_window_hours` else `409 reversal_window_passed`; `pos_reversal` movement + `reversal` ledger entry (D-08) |
 | POST | {S}/bill-claims | cashier | W2-04 | create bill QR token for a sale/draft |
 | GET | {S}/bill-claims/{claimId} | cashier | W2-04 | status (also via SSE) |
@@ -339,7 +363,9 @@ Cashier rights are D-06 as amended by D-65: cashiers run orders day to day (acce
 | Payouts | POST | /v1/admin/payouts/{payoutId}/hold | finance | W3-01 | `{reason}`; `admin` cannot (D-64) |
 | Payouts | POST | /v1/admin/payouts/{payoutId}/unhold | finance | W3-01 | `admin` cannot (D-64) |
 | Payouts | POST | /v1/admin/payouts/{payoutId}/mark-paid | finance | W3-01 | `{utr}`; step-up, idempotent; `admin` cannot (D-64) |
-| Payouts | GET | /v1/admin/payout-exports?period= | finance | W3-01 | CSV for the bank/UPI batch; `admin` cannot (D-64) |
+| Payouts | GET | /v1/admin/payout-exports?period= | finance | W3-01 | CSV for the bank/UPI batch; step-up (D-85); `admin` cannot (D-64). The CSV holds `pending` payouts only; held and paid rows are left out. Columns: `payout_id, period, business_id, legal_name, beneficiary_name, amount_inr` (2 decimals), `upi_id, bank_account_number, ifsc`. Exporting stamps `exported_at` on the rows. Cells are sanitised against formula injection (D-93) |
+| Leads | GET | /v1/admin/leads?status= | field_agent, support, admin | W3-05 | site leads for the "Leads" tab on A-03 |
+| Leads | POST | /v1/admin/leads/{leadId}/status | field_agent, support, admin | W3-05 | `{status: new|contacted|closed}`; audited |
 | Referrals | GET | /v1/admin/referrals | admin | W3-02 | `admin-referrals.yaml` (D-51) |
 | Referrals | POST | /v1/admin/referrals/{referralId}/reject | admin | W3-02 | `{reason}`; reverses pending |
 | Risk | GET | /v1/admin/risk/flags | support, admin | W3-02 | `admin-risk.yaml` (D-51) |
@@ -403,6 +429,8 @@ Insight text (AI-R4) and coach cards (AI-R5) come back inside `{S}/insights` and
 | POST | /v1/events | pub, rate-limited | W1-07 | batched product events (≤ 50 per call, schema-validated against `shared/telemetry/events/<domain>.yaml`) |
 | POST | /v1/client-errors | pub, rate-limited | W1-07 | only when Sentry is off |
 | GET/POST | /v1/test/clock | none | W0-03 | read / set / advance the fake clock, for manual testing of timers and expiries as well as automated tests; registered only when `APP_ENV` is `local` or `test` and `API_ADDR` is a loopback address; staging and prod builds return `404` (D-46, D-80). Contract below |
+| GET | /v1/test/slow?ms= | none | W1-07 | answers after `ms` milliseconds (capped at 30000), to force a slow route for latency alerts and the slow-network checks (D-93). Same gate as `/v1/test/clock` |
+| GET | /v1/test/slow-sql?ms= | none | W1-07 | runs `pg_sleep(ms / 1000)` in a query, to force a slow query for the slow-query alert (D-93); `ms` is capped at 30000. Same gate as `/v1/test/clock` |
 
 `GET /healthz`, `GET /readyz` and `GET /version` sit outside `/v1`. Owner W0-03. The API and the worker both serve `/healthz` and `/readyz`. They are plain JSON, not problem JSON, and send `Cache-Control: no-store`.
 
@@ -431,7 +459,7 @@ None. (The shop cancel reason list was settled by D-68: `ShopCancelReason`, 1.5.
 
 ### 2.11 Count
 
-281 method + path pairs in `/v1`, plus 3 health endpoints outside it. By namespace: admin 112 (9 AI; +1 for `GET /v1/admin/field/me/stats`, D-64), biz 99 (15 AI), me 43 (6 AI), discover 11, auth 8, public 3, telemetry 3, test 2. Re-checked after the D-61…D-84 follow-ups (2026-10-22): no pair appears twice, no literal segment sits beside a parameter, and `/v1/discover/stores/` has only `{slug}` beneath it. The path lint (1.2) repeats the check on the bundled spec on every `make gen`.
+285 method + path pairs in `/v1`, plus 3 health endpoints outside it. By namespace: admin 114 (9 AI; +1 for `GET /v1/admin/field/me/stats`, D-64), biz 99 (15 AI), me 43 (6 AI), discover 11, auth 8, public 3, telemetry 3, test 4. Re-checked after the D-61…D-84 follow-ups (2026-10-22): no pair appears twice, no literal segment sits beside a parameter, and `/v1/discover/stores/` has only `{slug}` beneath it. The path lint (1.2) repeats the check on the bundled spec on every `make gen`.
 
 ## 3. Contract tests
 

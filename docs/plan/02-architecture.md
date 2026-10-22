@@ -157,7 +157,7 @@ Rule: domain packages depend on `platform`, never on each other's internals. Cro
 | Crypto | stdlib `crypto/aes` (GCM), `crypto/hmac` | Field encryption and keyed lookups (§10) |
 | Logs | `log/slog` JSON | Stdlib |
 | Traces/metrics | OpenTelemetry Go SDK, OTLP HTTP | Vendor-neutral, Grafana Cloud |
-| Errors | `sentry-go` | Grouping, releases, user impact |
+| Errors | `sentry-go` (wired only when `SENTRY_DSN` is set; unset before Wave 5, D-17; until then browser errors go to `POST /v1/client-errors` and Loki) | Grouping, releases, user impact |
 | Validation | spec validation + hand-written domain checks | |
 | Images | `disintegration/imaging` or libvips via `govips` | Resize to WebP on upload |
 | Testing | `testing`, `testify/require`, `testcontainers-go` (PostGIS 16-3.4; the image comes from `TODAYZ_POSTGIS_IMAGE`, multi-arch on arm64, D-86), `go-cmp`, `rapid` (property tests for the ledger) | |
@@ -341,9 +341,11 @@ Other AI drafts ([04-api.md](04-api.md) §2.8) need, to create and to confirm, t
 | credits | `admin.adjustment.approve` † | approve or reject a pending adjustment | – | – | – | – | not own | – | not own |
 | referrals | `admin.referrals.view` | list, risk-flagged | – | – | – | – | – | ✓ | ✓ |
 | referrals | `admin.referral.reject` | reject with reason | – | – | – | – | – | ✓ | ✓ |
+| leads | `admin.lead.view` | list site leads, filter by status ("Leads" tab on A-03) | ✓ | ✓ | – | – | – | ✓ | ✓ |
+| leads | `admin.lead.manage` | set a lead's status (`new`, `contacted`, `closed`) | ✓ | ✓ | – | – | – | ✓ | ✓ |
 | payouts | `admin.payout.view` | statements, payouts | – | – | – | – | ✓ | ✓ | ✓ |
 | payouts | `admin.payout.bank_view` | payee's UPI ID and bank details, masked (last 4), on payout screens | – | – | – | – | ✓ | ✓ | ✓ |
-| payouts | `admin.payout.export` | payout export CSV (bank/UPI batch) | – | – | – | – | ✓ | ✓ | ✓ |
+| payouts | `admin.payout.export` † | payout export CSV (bank/UPI batch), decrypted payee fields (D-85) | – | – | – | – | ✓ | – | ✓ |
 | payouts | `admin.payout.manage` † | hold, unhold, mark paid (UTR) | – | – | – | – | ✓ | – | ✓ |
 | reviews | `admin.review.moderate` | hide with reason, review reports | – | ✓ | – | – | – | ✓ | ✓ |
 | reviews | `admin.review.restore` | restore a hidden review, with reason | – | ✓ | – | – | – | ✓ | ✓ |
@@ -375,6 +377,8 @@ Other AI drafts ([04-api.md](04-api.md) §2.8) need, to create and to confirm, t
 
 React 19 + TypeScript (strict) + Vite, TanStack Router (file routes, typed search params), TanStack Query (server state, persisted to IndexedDB for offline reads), Zod (forms and API responses), React Hook Form, `@todayz/ui` components, Lucide icons, FormatJS (ICU messages), `vite-plugin-pwa` (Workbox), MapLibre GL (customer map, admin maps), Sentry browser SDK, `web-vitals`.
 
+Numbers show in Latin digits in all locales (`numberingSystem: "latn"`, `nu-latn`). Native-script digits are a later item ([10-later.md](10-later.md)).
+
 Routes: each package owns its own `src/routes/<area>/` files; `routeTree.gen.ts` is git-ignored and generated (D-50).
 
 No CSS framework: the design system's `bundle.css` + CSS modules for app-specific layout, using tokens only. Stylelint forbids raw hex outside `shared/tokens`.
@@ -392,7 +396,7 @@ No CSS framework: the design system's `bundle.css` + CSS modules for app-specifi
 - Phone: bottom tabs (Overview, Orders, Sell, Stock, More). Desktop: sidebar.
 - **Offline-first POS and stock**: Dexie (IndexedDB) holds the store catalogue snapshot (items, prices, stock, barcodes), pending sales and pending stock changes (an outbox). Every local write gets a client ULID and a device sequence number. A sync engine sends the outbox in order to `POST /v1/biz/businesses/{bid}/stores/{sid}/sync` when online; the server applies each entry idempotently (unique `(store_id, client_id)`), authorises it as its own action (§3.3), and returns server changes since the device's cursor.
 - **Sync cursor (D-36):** catalogue changes come from `catalogue_changes` (`store_id`, `seq`, `entity`, `entity_id`, `op`), kept 30 days. A cursor older than that gets `resync_required`, and the device downloads a full snapshot. `outbox_events` (24 h) is only for SSE replay.
-- **Conflicts:** sales always apply (stock may go negative and is flagged "count needed"); price changes are last-writer-wins by server time; deletions win over edits.
+- **Conflicts:** sales always apply (stock may go negative and is flagged "count needed"); sold prices are never rewritten at sync (an offline sale at an old cached price is accepted as recorded, with no risk flag in v1); price changes are last-writer-wins by server time; deletions win over edits.
 - **Offline counter code (D-12):** the offline POS stores the typed counter code and the device time with the sale. The device records its clock offset at each online check. At sync the server checks the code against the time step at the recorded time, and links the sale only if: it syncs within `pos_offline_link_max_hours`; the device clock was within 2 minutes of the server's at its last online check; and the code was not used before. Otherwise the sale stays unlinked and the shop sees "Customer link failed". More than `pos_offline_links_risk_per_day` offline links at one store in a day raises a risk flag.
 - Order alerts: SSE stream per store + web push + an audible alert loop until the order is opened (user must tap once per session to allow audio, a known browser rule; the UI asks for it on first open).
 - Scanner: keyboard-wedge USB/Bluetooth scanners work as text input; camera scanning with the `BarcodeDetector` API where available, ZXing WASM fallback, both lazy-loaded.
@@ -406,6 +410,8 @@ Desktop-first, same stack, plus TanStack Table for large lists, Apache ECharts (
 ### 4.5 Site (`site/`)
 
 Astro (static output), the design system CSS, zero JS by default (islands only for the language switcher and the lead form). Fixes today's iframe wrapper so pages are indexable: real HTML per route, `sitemap.xml`, `robots.txt`, Open Graph images, JSON-LD (`Organization`, `SoftwareApplication`, `FAQPage`). Pages: home, for retailers, how it works, pricing ("Free for now"), about, contact, privacy, terms, and Hindi/Kannada/Telugu/Tamil versions of the home and retailer pages. Lead form posts to `POST /v1/public/leads` (Turnstile protected).
+
+`verify-dist` checks the built site against an allow-list: same-origin hashed island bundles, plus the Turnstile script `https://challenges.cloudflare.com/turnstile/v0/api.js` on the lead-form page only. Any other script or remote `src` fails the check. Leads are read in the admin console on a "Leads" tab of A-03 (`GET /v1/admin/leads`, 04 §2.7).
 
 ## 5. Realtime
 
@@ -505,7 +511,7 @@ Follows the rules for every AI feature ([11-ai-features.md](11-ai-features.md) �
 |---|---|---|
 | API read p95 | < 200 ms | Grafana SLO, k6 |
 | API write p95 | < 400 ms | Grafana SLO, k6 |
-| Search p95 | < 300 ms within 5 km at 1,000 stores | k6 scenario `search_peak` |
+| Search p95 | < 300 ms within 5 km at 1,000 stores | k6 scenario `browse_peak` |
 | Customer LCP (4G, mid Android) | < 2.5 s p75 | RUM, Lighthouse CI |
 | INP | < 200 ms p75 | RUM |
 | CLS | < 0.1 p75 | RUM |

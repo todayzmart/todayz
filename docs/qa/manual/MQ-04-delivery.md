@@ -1,6 +1,6 @@
 # MQ-04 Delivery
 
-Delivery settings, the radius, the minimum and free-above checks on the eligible amount, a rider handing over with the code, the phone-masking window, and a failed delivery with its return.
+Delivery settings, the radius, the minimum and free-above checks on the item subtotal (after item-level offers, before the minimum-bill discount and credits, D-94), a rider handing over with the code, the phone-masking window, and a failed delivery with its return.
 
 - **Covers:** 08 §5 MQ-04 (settings radius, out-of-radius customer, rider code); BK-23, BK-24, BK-26, BK-27, BK-45 manual side; E2E-05.
 - **Screens:** B-14, B-04, B-16, B-07; C-07, C-09, C-11, C-12.
@@ -11,7 +11,7 @@ Delivery settings, the radius, the minimum and free-above checks on the eligible
 
 1. `make reset`; `clock reset`; run between 10:00 and 18:00 IST.
 2. C11 (wallet 500) has the saved addresses in `<seed:addresses>`: "Home" 0.6 km from SL and 3.5 km from KF; "Office" 4.0 km from SL and 4.5 km from KF; "Far" 6.0 km from KF.
-3. SL delivery: on, radius 3 km, fee ₹30, free above ₹500, minimum ₹150, delivery hours = opening hours. KF: delivery only, radius 5 km, fee ₹0, minimum ₹100, cashback 200 bp.
+3. SL delivery: on, radius 3 km, fee ₹30, free delivery on ₹500+, minimum ₹150, delivery hours = opening hours. KF: delivery only, radius 5 km, fee ₹0, minimum ₹100, cashback 200 bp.
 4. `feature_delivery_enabled` = true.
 
 ## Steps
@@ -20,7 +20,7 @@ Delivery settings, the radius, the minimum and free-above checks on the eligible
 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
-| MQ-04.01 ★ | Open B-14 Settings → Delivery for Sri Lakshmi. | Delivery on; radius slider at 3 km with a map preview ring; fee ₹30; free above ₹500; minimum ₹150; delivery hours "Same as opening hours". | `R-5.29` B-14 | ▢ | |
+| MQ-04.01 ★ | Open B-14 Settings → Delivery for Sri Lakshmi. | Delivery on; radius slider at 3 km with a map preview ring; fee ₹30; free delivery on ₹500+; minimum ₹150; delivery hours "Same as opening hours". | `R-5.29` B-14 | ▢ | |
 | MQ-04.02 | Drag the radius to 1 km without saving. | The map preview ring shrinks live. Cancel the change. | B-14 | | |
 | MQ-04.03 | Turn delivery off and save. In profile A open Home at the QA point. | SL's StoreCard no longer has the "Delivery" tag. C-07 for SL shows pickup only. | `R-5.32` C-03 C-07 | ▢ | |
 | MQ-04.04 | Turn pickup off too and save. | Warning "Your shop will be In-store only: customers can browse but not order". Cancel, so pickup stays on. Turn delivery back on and save. | `R-3.5` D-41 B-14 | ▢ | |
@@ -34,10 +34,12 @@ Delivery settings, the radius, the minimum and free-above checks on the eligible
 | MQ-04.07 | Call `POST /v1/me/checkout/quote` with `fulfilment: delivery` and the Office address id (Copy as cURL from a pickup quote, edit the body). | The quote refuses delivery for this address. Record the `code`. | BK-23 | | |
 | MQ-04.08 ★ | Switch to address "Home". | Delivery allowed. Fee ₹30. Items ₹150, total ₹180. | `R-5.29` `R-5.30` C-09 | ▢ | |
 | MQ-04.09 | Reduce Coca-Cola to 1 (items ₹110). | Message that the shop's minimum for delivery is ₹150. Delivery Place disabled; quote returns `below_minimum`. | `R-5.30` BK-23 `below_minimum` C-09 | ▢ | |
-| MQ-04.10 | Replace the cart with I13 QA pack ₹120 ×1 (offer ₹21 off, so ₹99) and Nandini Toned Milk ×2 (₹48). | List price total ₹168, but the eligible amount is ₹147 (after the offer). Delivery refused with `below_minimum`. | `R-5.30` `R-7.2` BK-23 `below_minimum` | ▢ | |
-| MQ-04.11 | Replace the cart with I14 QA pack ₹487 ×1 and I12 QA pack ₹0.50 ×24 (₹12) = ₹499, Delivery to Home. | Fee ₹30 (₹499 is not above ₹500). Total ₹529. | `R-5.30` BK-23 | ▢ | |
-| MQ-04.12 | Change the cart to I14 ×1 and Maggi ×1 = ₹501. | Fee ₹0 (free above ₹500). Total ₹501. | `R-5.30` BK-45 | ▢ | |
-| MQ-04.13 | Change to exactly ₹500 (I14 ×1 and I12 ×26). | Record whether the fee is ₹0 or ₹30. The plan says "free above ₹500"; whether ₹500 itself is free is Q-27. | `R-5.29` | | |
+| MQ-04.10 | Replace the cart with I13 QA pack ₹120 ×1 (offer ₹21 off, so ₹99) and Nandini Toned Milk ×2 (₹48). | List price total ₹168, but the item subtotal is ₹147 (after the offer). Delivery refused with `below_minimum`. | `R-5.30` `R-7.2` BK-23 `below_minimum` | ▢ | |
+| MQ-04.11 | Replace the cart with I14 QA pack ₹487 ×1 and I12 QA pack ₹0.50 ×24 (₹12) = ₹499, Delivery to Home. | Fee ₹30 (₹499 is under ₹500). Total ₹529. | `R-5.30` BK-23 | ▢ | |
+| MQ-04.12 | Change the cart to I14 ×1 and Maggi ×1 = ₹501. | Fee ₹0 (free delivery on ₹500+). Total ₹501. | `R-5.30` BK-45 | ▢ | |
+| MQ-04.13a ★ | SL has a minimum-bill offer "₹50 off on ₹500+" (OFFER-M.06). Keep the ₹500 cart and read the quote. | Fee ₹0 and total ₹450.00: both the free delivery and the ₹50 off compare the ₹500 item subtotal inclusively (D-94). A cart of ₹520 with a ₹30 item offer (item subtotal ₹490) pays fee ₹30 and gets no minimum-bill offer. | `R-5.29` `R-12.4` BK-23b | ▢ | |
+| MQ-04.13b | O20 sets SL's delivery hours to 10:00–11:00 and `clock set <today>T15:00:00+05:30`. C11 builds a ₹501 delivery cart and places it. Then restore the hours and `clock reset`. | `409 delivery_closed` with `nextDeliveryWindow`; C-11 shows the next delivery window and a "Switch to pickup" button that works; the cart is kept; pickup at SL still places. | `R-5.29` BK-61 C-11 | ▢ | |
+| MQ-04.13 | Change to exactly ₹500 (I14 ×1 and I12 ×26). | Fee ₹0: the free-delivery threshold is inclusive and compared with the item subtotal after item-level offers (D-94). The shop page shows "Free delivery on ₹500+". | `R-5.29` | | |
 
 ### C. Delivered by the rider
 
@@ -49,7 +51,7 @@ Delivery settings, the radius, the minimum and free-above checks on the eligible
 | MQ-04.17 ★ | In profile B sign in as K22, open D-1. | Customer name and masked phone. Delivery address shown. Accept. | `R-16.2` BK-27 B-04 | ▢ | |
 | MQ-04.18 | Open D-1 in Accepted. Click Dispatch. | A rider picker lists staff who can deliver at SL: R23 (delivery flag) and cashiers. No Mark ready for delivery orders. | `R-5.31` B-04 | ▢ | |
 | MQ-04.19 ★ | Pick R23 and confirm. | D-1 moves to Out for delivery. The customer's full phone number now shows on the order detail and in the order list. | `R-16.2` BK-27 B-04 | ▢ | |
-| MQ-04.20 | In profile A read C-12. | State Out for delivery with the code "to tell the rider" (4 digits and QR). A push "out for delivery" in the mocks. Cancel is not offered (Q-11). | `R-6.2` `R-15.6` C-12 | ▢ | |
+| MQ-04.20 | In profile A read C-12. | State Out for delivery with the code "to tell the rider" (4 digits and QR). A push "out for delivery" in the mocks. Cancel is not offered. | `R-6.2` `R-15.6` C-12 | ▢ | |
 | MQ-04.21 | In profile C sign in as R23 (rider). Open Orders → Out for delivery → D-1. | R23 sees D-1 with Delivered and Delivery failed. Full phone shown. | `R-5.31` B-04 | ▢ | |
 | MQ-04.22 | Enter a wrong code. | Attempts left 4. | `R-6.2` BK-12 | | |
 | MQ-04.23 ★ | Enter the right code, payment Cash. | D-1 Delivered. Customer C-12 shows Delivered with review and reorder actions. A push "delivered". | `R-6.2` BK-24 C-12 | ▢ | |
@@ -86,7 +88,7 @@ Delivery settings, the radius, the minimum and free-above checks on the eligible
 |---|---|---|---|---|---|
 | MQ-04.40 | `set feature_delivery_enabled = false` (admin AD47 can change it: not a money key). | Saved with reason "QA MQ-04.40". | `R-17.2` A-17 | | |
 | MQ-04.41 | Refresh Home and SL's page in profile A. | No "Delivery" tags anywhere. SL's cart offers pickup only. | `R-5.1` `R-17.2` C-03 C-09 | ▢ | |
-| MQ-04.42 | Open Kaveri Fresh. | Record what shows. The plan does not say whether a delivery-only store becomes "In-store only" when the flag is off (Q-28). Ordering must not be possible. | `R-5.1` | ▢ | |
+| MQ-04.42 | Open Kaveri Fresh. | With `feature_delivery_enabled` off, Kaveri Fresh (delivery only) shows an "In-store only" tag and booking returns `409 store_not_bookable` (01 §5, D-93). Ordering must not be possible. | `R-5.1` | ▢ | |
 | MQ-04.43 | `set feature_delivery_enabled = true`. | Delivery tags back. | `R-17.2` | | |
 
 ## Cleanup

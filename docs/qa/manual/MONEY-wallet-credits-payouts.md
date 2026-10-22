@@ -12,7 +12,7 @@ Every rule that moves a credit: the spend rules and their paise boundaries, lots
 1. `make reset`; `clock set 2026-10-22T11:00:00+05:30` unless a section says otherwise.
 2. Seeds `<seed:customers>`, `<seed:staff>`, `<seed:admins>`, `<seed:stores>`, `<seed:items-SL>`, `<seed:standee-SL>` loaded.
 3. FN45, FN46 (finance), AD47 (admin), S42 (support) and SA48 (super_admin) have TOTP enrolled.
-4. In profile B, O20 sets Sri Lakshmi's hours to all day (00:00–24:00) on the dates used in section D. If B-14 cannot express all-day hours, mark section D **B** and note it.
+4. In profile B, O20 sets Sri Lakshmi's hours to all day with the "Open 24 hours" toggle in B-14 (stored as 00:00–24:00, D-93) on the dates used in section D.
 5. Keep a table of every customer's wallet in your run notes. Expected balances below assume the step order of this file.
 
 Cashback at Sri Lakshmi is 500 bp. Cashback = floor(base paise × `cashback_bp` / 1,000,000), base = eligible amount − credits used (`R-7.7`).
@@ -24,7 +24,7 @@ Cashback at Sri Lakshmi is 500 bp. Cashback = floor(base paise × `cashback_bp` 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
 | MONEY-M.01 ★ | Sign in as C10. Cart at Sri Lakshmi: I10 QA pack ₹100.00 ×1, pickup. Open checkout and turn credits on. | Copy "Use up to 30 credits on orders of ₹100 or more" (`credit_max_per_order` 30, `credit_min_order_value_paise` 10000). Slider 0 to 30. At 30 the total reads ₹70.00. Do not place. | `R-7.2` `R-7.3` CR-03 C-11 | ▢ | |
-| MONEY-M.02 | Copy the `POST /v1/me/checkout/quote` request as cURL (README §5). Change `creditsToUse` to 31 and send it. | Refused with code `credit_max_exceeded`. Record the HTTP status (04 does not name it, Q-10). Nothing is held: C-15 still shows 100 available, 0 held. | `R-7.3` CR-02 | | |
+| MONEY-M.02 | Copy the `POST /v1/me/checkout/quote` request as cURL (README §5). Change `creditsToUse` to 31 and send it. | Refused with code `credit_max_exceeded`. Status `409`. Nothing is held: C-15 still shows 100 available, 0 held. | `R-7.3` CR-02 | | |
 | MONEY-M.03 ★ | Replace the cart with I9 QA pack ₹99.99 ×1. Open checkout. | The credits toggle is off and disabled with the ₹100 rule shown. A quote with `creditsToUse` 30 → `below_credit_minimum` (eligible 9999 paise). | `R-7.3` CR-02 CR-21 D-02 C-09 | ▢ | |
 | MONEY-M.04 | Replace the cart with I3 ×1 and I12 ×2 (₹25.00). Quote with `creditsToUse` 10. | `below_credit_minimum`. The order can still be placed without credits (do not place). | `R-7.3` CR-03 | | |
 | MONEY-M.05 | Replace the cart with I11 QA pack ₹100.01 ×1. Turn credits on. | Up to 30 allowed. At 30 the total is ₹70.01. | `R-7.3` CR-21 | | |
@@ -37,7 +37,7 @@ Cashback at Sri Lakshmi is 500 bp. Cashback = floor(base paise × `cashback_bp` 
 | MONEY-M.07 ★ | Sign in as C12 (wallet 60). Open Wallet (C-15). | WalletCard: balance 60, held 0, expiring soon 40 with tomorrow's date. "How credits work" explains 365-day expiry (`credit_expiry_days`) and the 7-day reminder. | `R-7.4` `R-7.9` C-15 | ▢ | |
 | MONEY-M.08 | C12 places a pickup order at Sri Lakshmi: I4 Wheat atta ×1 (₹245), 30 credits. In profile D, FN45 opens A-09, finds C12's wallet and opens the lots. | C-15: available 30, held 30. A-09: lot L1 (40, oldest) has 30 held and 10 free; lot L2 (20) untouched. | `R-7.4` `R-7.5` CR-09 A-09 | ▢ | |
 | MONEY-M.09 | C12 cancels the order in `placed` with "Changed my mind". Refresh A-09 and C-15. | C-15 history: "Returned: order cancelled" +30. Balance 60, held 0. A-09: L1 back to 40 free, L2 20; no new lot row; L1 still listed first. | `R-7.5` CR-05 CR-25 D-27 | ▢ | |
-| MONEY-M.10 | FN45 opens A-09 → Expiry preview. | C12's L1 (40) listed under tomorrow's date. C10's lot (100) listed under its date 365 days after it was earned. Note C10's lot expiry time as **E**. | `R-7.9` A-09 | | |
+| MONEY-M.10 | FN45 opens A-09 → Expiry preview. | C12's L1 (40) listed under tomorrow's date. C10's lot (100) listed under the day after its last usable day: a lot earned on day X with `credit_expiry_days` N is usable through X+N and expires at 00:00 IST on X+N+1. Note that instant as **E**. | `R-7.9` A-09 | | |
 | MONEY-M.11 | `clock set` E − 7 days − 5 minutes. Open C10's inbox (C-20). Then `clock set` E − 6 days 23 h. Open C-20 again. | No "credits expiring" message at the first time. At the second, one in-app message (and a push if allowed) that 100 credits expire on E's date. If the job runs once a day, record when it arrived: it must be within the 7 days before E, never earlier. | `R-7.9` `R-15.7` CR-08 C-20 | ▢ | |
 | MONEY-M.12 | `clock set` E − 1 s. Open C10's wallet. | Balance 100. Nothing expired. | `R-7.9` CR-08 | | |
 | MONEY-M.13 ★ | `clock set` E + 1 s. Refresh. In A-09 open C10's ledger entries. | Balance 0. History line "Expired" −100. A-09: one entry customer wallet → `platform_expired` for 100. | `R-7.9` `R-7.13` CR-08 A-09 | ▢ | |
@@ -60,15 +60,15 @@ Run this section twice: run 1 ends delivered, run 2 ends cancelled.
 |---|---|---|---|---|---|
 | MONEY-M.19 | `make reset`. `set store_credit_redemptions_per_day = 2` (AD47, count key). `clock set 2026-10-22T23:50:00+05:30`. C10 and C11 each place a pickup order at Sri Lakshmi with I4 ×1 and 30 credits. | Both placed with 30 held. | `R-7.10` CR-11 | | |
 | MONEY-M.20 ★ | Sign in as C12. Cart I4 ×1 at Sri Lakshmi. Open the cart and checkout. | Credits toggle off and disabled with "Credits can't be used at this shop today". Total ₹245 without credits. | `R-7.10` CR-11 D-76 C-09 C-11 | ▢ | |
-| MONEY-M.21 | Send the place request with `creditsToUse` 30 via cURL. Then place without credits in the app. | With credits: refused (the code is not named, Q-10; record it), and a risk flag or flag event appears in A-13 (CR-11 "refused and flagged"). Without credits: `placed`. | `R-7.10` CR-11 | | |
+| MONEY-M.21 | Send the place request with `creditsToUse` 30 via cURL. Then place without credits in the app. | With credits: refused with `409 store_credit_cap`, and a `risk_flags` row appears in A-13 (CR-11 "refused and flagged"). Without credits: `placed`. | `R-7.10` CR-11 | | |
 | MONEY-M.22 | `clock set 2026-10-22T23:59:59+05:30`. C12 opens a new cart I1 ×2 at Sri Lakshmi and checks out. | Still "Credits can't be used at this shop today". | `R-7.10` CR-26 | | |
-| MONEY-M.23 ★ | `clock set 2026-10-23T00:00:00+05:30` (18:30:00 UTC). Refresh checkout. | Credits offered again, up to 30. Place it with 30 credits: `placed`. | `R-7.10` CR-26 D-30 | ▢ | |
+| MONEY-M.23 ★ | `clock set 2026-10-23T00:00:00+05:30` (18:30:00 UTC). Refresh checkout. | Credits offered again, up to 30. Place it with 30 credits: `placed`. | `R-7.10` CR-26 D-62 | ▢ | |
 | MONEY-M.24 | Restore `store_credit_redemptions_per_day` to 200. `clock set 2026-10-31T23:50:00+05:30`. Sign in as C17 (9 credit-using orders this month, wallet 200). Place a pickup order at Sri Lakshmi with I4 ×1 and 30 credits. | `placed`, 30 held. This is C17's 10th credit-using order this IST month. | `R-7.10` CR-10 | | |
 | MONEY-M.25 ★ | C17 starts another cart (I1 ×2) and opens checkout. | Credits toggle off and disabled with "You've used this month's credit limit". Placing via cURL with credits → `credit_monthly_cap`. Placing without credits in the app → `placed`. | `R-7.10` CR-10 D-76 C-11 | ▢ | |
 | MONEY-M.26 | `clock set 2026-10-31T23:59:59+05:30`, then `clock set 2026-11-01T00:00:00+05:30`. Refresh checkout each time. | At 23:59:59 still the monthly-cap message. At 00:00:00 credits offered up to 30. `GET /v1/me/wallet` cap info resets with the month. | `R-7.10` CR-26 | ▢ | |
 | MONEY-M.27 | Open Grafana dashboard 08 "Marketplace health". | The credits-blocked-by-caps panel counts the refusals from M.20 to M.25 by cap kind. | 05 §4 dashboard 08 | | |
 
-Whether an order counts toward a cap when it is placed or only when its credits are captured, and whether a cancelled order still counts, is not stated (Q-38). Record what you see in M.19 to M.25.
+An order counts toward a cap from the moment its hold is taken (when it is placed); an order that ends `cancelled` or `expired` releases the hold and no longer counts (01 §7, D-93). Check this in M.19 to M.25.
 
 ### E. Cashback rounding and the 0% store
 
@@ -120,7 +120,7 @@ New sign-ups use fresh browser profiles E to I so each has its own device id. Mo
 | MONEY-M.57 ★ | M21 reverses the ₹303 sale. | Clawback 5: C18 available 0, held 10 untouched; wallet never negative. Sri Lakshmi absorbs the 10 shortfall. `platform_*` accounts unchanged. | `R-7.11` POS-20 | ▢ | |
 | MONEY-M.58 | M21 reverses C03's bill QR sale from M.46 (run this right after section F if the stack was not reset; otherwise repeat M.43 and M.46 first). | The referral reward stays posted (C11 +30, C03 +100 remain). A risk flag is raised in A-13 for a reversed qualifying sale. | `R-7.11` POS-21 A-13 | ▢ | |
 
-The POS-21 branch where the reward has not yet posted needs the reversal to land between qualification and posting. If the reward posts at once, that branch is automated only (Q-39).
+The POS-21 branch where the reward has not yet posted needs the reversal to land between qualification and posting. A customer referral reward posts with the qualifying outcome, so that branch is reachable only for the shop reward, which waits for the 10th order (D-72); it is automated only.
 
 ### H. Partial accept re-cap and account deletion
 

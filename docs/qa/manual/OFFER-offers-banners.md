@@ -1,6 +1,6 @@
 # OFFER Offers, banners and offer search
 
-Each offer kind, the pricing rule (one best item offer per line plus one bill offer, never below ₹1, same price online and at the POS), limits and schedules, where offers show to customers, and banners from creation to takedown. v1 has no coupon codes: 01 §12 lists no code-entry offer, so the per-customer limit is the nearest rule (Q-41).
+Each offer kind, the pricing rule (one best item offer per line plus one bill offer, never below ₹1, same price online and at the POS), limits and schedules, where offers show to customers, and banners from creation to takedown. v1 has no coupon codes (not planned, 10); the per-customer limit is the nearest rule.
 
 - **Covers:** SC-OF; SR-02, SR-03, SR-04; E2E-14 manual side; D-42, D-77.
 - **Screens:** B-08, B-05, B-12; C-03, C-05, C-07, C-08, C-09, C-11; A-20.
@@ -25,7 +25,7 @@ Each offer kind, the pricing rule (one best item offer per line plus one bill of
 | OFFER-M.03 | K22 at the POS scans I1 (`8901262010016`). | The line shows ₹52.20 with the offer named: the same price as the online quote. | `R-12.4` B-05 | ▢ | |
 | OFFER-M.04 | Create "₹ off" on the category of I3 (milk), ₹2 off. C10 adds I3 ×2. | Line ₹44.00 (₹22 each). | `R-12.2` | | |
 | OFFER-M.05 | Create "Buy X get Y": I2 Maggi, buy 2 get 1. C10 adds I2 ×3, then ×2, then ×6. | ×3 → ₹28.00; ×2 → ₹28.00 with a hint to add one more if the app shows it; ×6 → ₹56.00. Record the display. | `R-12.2` | ▢ | |
-| OFFER-M.06 | Create a minimum-bill discount "₹50 off above ₹500". C10 builds three carts: I9 ×5 (₹499.95), I10 ×5 (₹500.00) and I11 ×5 (₹500.05). | ₹499.95 → no discount. ₹500.05 → ₹50 off, total ₹450.05. ₹500.00 → record (whether "above" includes ₹500 is not stated, Q-27). | `R-12.2` `R-12.4` | ▢ | |
+| OFFER-M.06 | Create a minimum-bill discount "₹50 off on ₹500+". C10 builds three carts: I9 ×5 (₹499.95), I10 ×5 (₹500.00) and I11 ×5 (₹500.05). | ₹499.95 → no discount. ₹500.05 → ₹50 off, total ₹450.05. ₹500.00 → ₹50 off, total ₹450.00 (the threshold is inclusive and uses the item subtotal after item-level offers, D-94). | `R-12.2` `R-12.4` | ▢ | |
 | OFFER-M.07 | Open the I8 Curd item (batch of 10 expiring in 3 days). From the item or Overview "Going to waste", create a flash offer 30% off on that batch. | The flash offer shows a countdown to the batch expiry on C-07 and C-08. Price ₹24.50. | `R-12.2` `R-12.8` E2E-14 B-03 | ▢ | |
 | OFFER-M.08 | Create a whole-store 5% off, channel online only. Open C-07. | Every item without a better item-level offer shows 5% off; I1 keeps 10% (the better one). | `R-12.2` `R-12.4` | | |
 
@@ -34,7 +34,7 @@ Each offer kind, the pricing rule (one best item offer per line plus one bill of
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
 | OFFER-M.09 | With I1 at 10% (₹5.80) and the store-wide 5% (₹2.90), add a second item offer "₹10 off" on I1. C10's cart: I1 ×1. | Only one item offer per line: the best one, ₹10 off → ₹48.00. The quote names the offer used. | `R-12.4` | ▢ | |
-| OFFER-M.10 | Create a second bill offer "₹30 off above ₹300". Cart: I14 ×1 and I1 ×1 (list ₹545). | Item offers first: I1 ₹48.00 (₹10 off), I14 ₹462.65 (store-wide 5%), so ₹510.65. One bill offer only, the best: ₹50 off. Total ₹460.65. If the bill threshold is measured on the list price instead, record it. | `R-12.4` | | |
+| OFFER-M.10 | Create a second bill offer "₹30 off on ₹300+". Cart: I14 ×1 and I1 ×1 (list ₹545). | Item offers first: I1 ₹48.00 (₹10 off), I14 ₹462.65 (store-wide 5%), so ₹510.65. One bill offer only, the best: ₹50 off. Total ₹460.65. | `R-12.4` | | |
 | OFFER-M.11 | Create "₹ off" ₹100 on I10 (₹100.00). C10's cart: I10 ×1, pickup. | Line ₹0.00 but the order total is ₹1.00 (never below ₹1). Same at the POS. Record the line display. | `R-12.4` BK-33 POS-16 | ▢ | |
 | OFFER-M.12 | Cart: I13 ×1 (₹120 with the seeded ₹21 off = ₹99). Turn credits on. | Credits disabled: the eligible amount is ₹99, under ₹100. Quote with credits → `below_credit_minimum`. | `R-7.2` `R-7.3` CR-21 D-02 C-09 | ▢ | |
 | OFFER-M.13 | Cart: I13 ×1 (₹99) and I3 ×1 (₹22 after the ₹2 category offer): eligible ₹121. Use 30 credits. K22 hands over. | Total ₹91. Cashback floor(9100 × 500 / 1,000,000) = 4. The offer cost is not a ledger entry: B-10 shows +30 spent and −4 cashback only. | `R-7.7` `R-12.4` B-10 | | |
@@ -44,7 +44,7 @@ Each offer kind, the pricing rule (one best item offer per line plus one bill of
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
 | OFFER-M.14 | Create 20% off I5 with limit "per customer once", channel online. C10 orders I5 ×1 and collects. C10 builds a second cart with I5. | First order ₹32. Second cart: the 20% offer is gone for C10; the store-wide 5% applies (₹38). C11 still sees ₹32. | `R-12.3` | ▢ | |
-| OFFER-M.15 | Create 15% off I4 with "first 2 orders". C10, C11 and C12 each order I4 ×1 in that order. | C10 and C11 get ₹208.25; C12 gets only the store-wide 5% (₹232.75). Record whether the count is taken at place or collect. | `R-12.3` | | |
+| OFFER-M.15 | Create 15% off I4 with "first 2 orders". C10, C11 and C12 each order I4 ×1 in that order. | C10 and C11 get ₹208.25; C12 gets only the store-wide 5% (₹232.75). The count is taken at placement, so C12's order gets no first-N price even if C10's order is later cancelled before collect (01 §12). | `R-12.3` | | |
 | OFFER-M.16 | Create 10% off I7 with channel "online only". K22 sells I7 at the POS. | POS price ₹160, no offer. Online ₹144. | `R-12.3` | | |
 | OFFER-M.17 | Create 25% off I2, start 2026-10-22 14:00 IST, end 16:00 IST. Check C-07 at 13:59:59, 14:00:00, 15:59:59 and 16:00:00 (`clock set`). | Not shown at 13:59:59; shown at 14:00:00 and 15:59:59; gone at 16:00:00. B-08 status scheduled → live → ended. | `R-12.3` B-08 | ▢ | |
 | OFFER-M.18 | M21 pauses the I1 10% offer and the I1 ₹10 off offer, then ends the store-wide 5% offer. | Both gone from C-07 and from the POS within one refresh. A cart that already had I1 re-quotes to ₹58 and C-11 asks for a second tap to accept the new total. | `R-12.3` BK-03 `price_changed` C-11 | ▢ | |
@@ -57,7 +57,7 @@ Each offer kind, the pricing rule (one best item offer per line plus one bill of
 | OFFER-M.20 | Create a 10% off offer at Annapurna Provisions (X25) and Kaveri Fresh (O26). C10 opens Home at radius 5 km. | "Offers near you" shows at most one item per shop and includes the Sri Lakshmi banner. Reload 5 times: the order rotates across shops. | `R-12.5` `R-12.6` C-03 | ▢ | |
 | OFFER-M.21 ★ | C10 searches "butter" on C-05, then taps the Offers chip. | With the chip: only items with a live offer (the URL holds `hasOffer=true`). Turn it off: the full set returns. | `R-11.6` SR-03 D-42 C-05 | ▢ | |
 | OFFER-M.22 | Search "atta" with sort Best match, then Nearest first, then Best match again. | Nearest first orders shop groups strictly by distance (SL 0.6, NH 0.9, AP 1.2, SL2 1.8 for those that stock it). Back to Best match restores the first order. | `R-11.5` SR-04 C-05 | ▢ | |
-| OFFER-M.23 | `set search_w_offer = 5000` (SA48: unit `bp` makes it a money setting, Q-45). Search "atta" again with Best match. Restore to 500. | A store with an atta offer moves up without a deploy. Record both orders. Equal scores put the nearer store first. | `R-11.5` SR-02 PL-06 | | |
+| OFFER-M.23 | `set search_w_offer = 5000` (SA48: unit `bp` makes it a money setting by design). Search "atta" again with Best match. Restore to 500. | A store with an atta offer moves up without a deploy. Record both orders. Equal scores put the nearer store first. | `R-11.5` SR-02 PL-06 | | |
 
 ### E. Banners
 

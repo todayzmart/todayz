@@ -46,7 +46,7 @@ Hands-on security checks a tester can do with a browser, DevTools and cURL: sign
 | SEC-M.15 | As O26 (Kaveri Fresh) call `GET {S}/orders/{Sri Lakshmi order id}` using Kaveri Fresh's own `{B}` and `{S}` in the path. | `404`: an order of another store under your own path is not found. | AU-09 | | |
 | SEC-M.16 | As K22 read `GET {S}/orders/{id}` and the SSE stream `{S}/stream` for an accepted pickup order. Search both for the 4-digit code shown on C-12. | The code is not in any business response, list, SSE event or push. | `R-6.1` BK-38 D-04 | | |
 | SEC-M.17 | As K22 open `{S}/stream` for Sri Lakshmi 2 (another store of the same business). | `403`. | AU-09 `R-3.1` | | |
-| SEC-M.18 | Open a receipt link `/r/{token}` from a POS sale. Change one character of the token. Then try 20 random tokens quickly. | Real token: store, items, totals, no customer name, phone, wallet or link method in the body or headers. Changed token: "This receipt link has expired" with the shop link, same timing as an expired one. The 20 quick tries hit a rate limit (`429`). | POS-25 D-45 C-24 | ▢ | |
+| SEC-M.18 | Open a receipt link `/r/{token}` from a POS sale. Change one character of the token. Then try 20 random tokens quickly. | Real token: store, items, totals, no customer name, phone, wallet or link method in the body or headers. Changed token: "This receipt link has expired" with the shop link, same timing as an expired one. The 20 quick tries hit a rate limit (`429`). | POS-25 D-75 C-24 | ▢ | |
 
 ### D. Codes
 

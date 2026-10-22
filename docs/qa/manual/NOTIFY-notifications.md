@@ -10,7 +10,7 @@ Every event in 01 §15 on the channels it names, read back in the mocks UI (http
 ## Preconditions
 
 1. `make reset`; `clock set 2026-10-22T11:00:00+05:30`. Mocks UI open in its own tab; `DELETE https://mocks.todayz.localhost/_mock/reset` before each section.
-2. Reserved numbers never reach the SMS mock (README §2). For SMS rows this file uses C10 for push and inbox, and a mock-route customer `+91 90000 00110` ("C110", signed up in step NOTIFY-M.01) for SMS.
+2. OTP and notification SMS to reserved numbers still go to the mock and show in the mocks UI; only verification is short-circuited (README §2). For SMS rows this file uses C10 for push and inbox, and a mock-route customer `+91 90000 00110` ("C110", signed up in step NOTIFY-M.01) for SMS.
 3. In profile A allow notifications when the browser asks (except in section D). In profile B keep the business app open on Overview.
 4. Push records in the mock show `title` and `body` from the `X-TZ-Mock-Plaintext` header (local only).
 5. Crop phones and codes from every mocks screenshot (README §9).
@@ -41,7 +41,7 @@ Every event in 01 §15 on the channels it names, read back in the mocks UI (http
 | NOTIFY-M.13 ★ | O20's staff phone for this test is the mock-route number `+91 90000 00120` (add it as a second owner contact in B-14 if the build has no other way; otherwise mark **B** and note it). Close every business app tab. C10 places an order. `clock +2m59s`. | No SMS yet. | `R-15.2` | | |
 | NOTIFY-M.14 | `clock +2s` (3 min 1 s after placing). | One SMS to the shop number naming the order number. Exactly one, not one per staff member unless the build says so (record). | `R-15.2` | ▢ | |
 | NOTIFY-M.15 | Place another order. Open profile B so the new-order toast shows (seen). `clock +3m1s`. | No SMS for that order. | `R-15.2` | | |
-| NOTIFY-M.16 | `set notify_sms_enabled = false` (AD47). Repeat M.13 and M.14. Restore true. | No SMS. Push and inbox still sent. The 3 minutes is marked a default in 01 §15 but has no `platform_settings` key (Q-44). | `R-15.1` PL-06 | | |
+| NOTIFY-M.16 | `set notify_sms_enabled = false` (AD47). Repeat M.13 and M.14. Restore true. | No SMS. Push and inbox still sent. The 3 minutes is the setting `order_unseen_sms_after_min`. | `R-15.1` PL-06 | | |
 
 ### C. Flags and keys
 
