@@ -62,3 +62,7 @@ crash.log
 
 # Agent worktrees
 .claude/worktrees/
+
+# LLM recordings from the mocks' live mode (may hold real prompt text; review before promoting to a fixture)
+e2e/mocks/fixtures/llm/_recorded/*
+!e2e/mocks/fixtures/llm/_recorded/.gitkeep
