@@ -1,0 +1,45 @@
+<!-- @dsCard height=288 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>TodayZ cover</title>
+<style>
+html,body{margin:0;background:var(--bg)}
+.cover{position:relative;width:960px;height:288px;overflow:hidden;background:var(--bg)}
+.art{position:absolute;left:480px;top:0;width:480px;height:288px}
+.slab{fill:var(--inverse)}
+.white{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.grey{fill:var(--surface-sunken)}
+.green{fill:var(--brand)}
+.tile{rx:var(--radius-lg)}
+.ring{fill:none;stroke:var(--on-inverse);stroke-width:1.5;opacity:.28}
+.dot{fill:var(--brand)}
+.name{position:absolute;left:var(--space-8);bottom:calc(var(--space-8) + 28px);margin:0;font-family:var(--font-display);font-weight:700;font-size:120px;line-height:.9;letter-spacing:-.01em;color:var(--ink);max-width:440px}
+.tagline{position:absolute;left:var(--space-8);bottom:var(--space-8);margin:0;font-family:var(--font-sans);font-size:14px;line-height:20px;color:var(--ink-2);max-width:440px}
+</style></head>
+<body>
+<div class="cover">
+<!--
+blocks: inverse 192x264 slab, white surface 160x176 with a hairline, grey surface-sunken 120x152, brand 120x96; corners radius-lg.
+arrangement: one tall slab with satellites, the slab and the grey block bleeding off the top, grey and green bleeding off the right edge.
+pattern: literal motif, the "nearby" radius rings, because TodayZ is about how far the shop is: 4 rings at a space-8 (32px) pitch around a green centre, clipped to the slab.
+colour: mostly white, grey and black; green is the one small block and the centre dot, as in the product.
+-->
+<svg class="art" viewBox="0 0 480 288" aria-hidden="true">
+<defs><clipPath id="slabclip"><rect x="0" y="-24" width="192" height="264" rx="16"/></clipPath></defs>
+<rect class="slab tile" x="0" y="-24" width="192" height="264"/>
+<g clip-path="url(#slabclip)">
+<circle class="ring" cx="96" cy="152" r="32"/>
+<circle class="ring" cx="96" cy="152" r="64"/>
+<circle class="ring" cx="96" cy="152" r="96"/>
+<circle class="ring" cx="96" cy="152" r="128"/>
+<circle class="dot" cx="96" cy="152" r="12"/>
+</g>
+<rect class="white tile" x="208.5" y="64" width="159" height="175"/>
+<rect class="grey tile" x="384" y="-24" width="120" height="152"/>
+<rect class="green tile" x="384" y="144" width="120" height="96"/>
+</svg>
+<h1 class="name">TodayZ</h1>
+<p class="tagline">Everything in the shops around you, searchable.</p>
+</div>
+</body>
+</html>
