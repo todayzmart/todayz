@@ -505,3 +505,10 @@ There is no `make seed`; use `make reset`.
   - `TODAYZ_POSTGIS_IMAGE` overrides the choice. The local stack and testcontainers use the same image.
 - MinIO stopped publishing images, so the local R2 stand-in uses `pgsty/minio` with a pinned tag. These images are used locally only; staging and prod use RDS and R2.
 - macOS ships GNU Make 3.81, which ignores `.SHELLFLAGS`. Recipes therefore run through `scripts/make-shell.sh` (bash `-euo pipefail`), and every canonical target stops at its first failing step. `scripts/test/make-fail-fast.sh` guards this.
+
+**D-87 · Frontend shell details (Wave 0 build).**
+- Active bottom-nav item: ink with a 2px icon stroke, as `design/source` `bundle.css` (`tz-bnav`) renders it. Only the active sidebar icon uses brand. The BottomNav README line saying "brand" is wrong; the CSS is the source of truth when they differ.
+- `?locale=pseudo` (en-XA) works in non-production builds only. Playwright smoke runs on `--mode e2e` builds.
+- Production builds use hidden sourcemaps. Shipped JS and CSS carry no `sourceMappingURL`, and deploy uploads the `.map` files to Sentry and keeps them out of the public bucket.
+- The customer app holds `beforeinstallprompt` from the first visit; the prompt is shown only after the 2nd order (06).
+- Playwright screenshots go to git-ignored `test-results/screenshots/`. `TZ_QA_DIR=docs/qa/<WP>` writes committed QA evidence.
