@@ -29,7 +29,11 @@ setup-keys: $(ENVTOOL)
 	@$(ENVTOOL) generate -env "$(ENV_FILE)"
 
 setup-node:
-	@if [ -f $(ROOT)/package.json ]; then pnpm install --frozen-lockfile=false --reporter=silent; fi
+	@# CI never resolves: the lockfile must match package.json (D-88). Locally pnpm may update it.
+	@if [ -f $(ROOT)/package.json ]; then \
+	  if [ -n "$${CI:-}" ]; then pnpm install --frozen-lockfile --reporter=silent; \
+	  else pnpm install --frozen-lockfile=false --reporter=silent; fi; \
+	fi
 
 setup-hooks:
 	@if [ -d $(ROOT)/.git ]; then lefthook install >/dev/null && echo "git hooks installed (lefthook)"; fi

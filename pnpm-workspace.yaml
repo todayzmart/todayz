@@ -13,3 +13,6 @@ packages:
 onlyBuiltDependencies:
   - esbuild
   - unrs-resolver
+
+# D-88: never resolve a version published less than 14 days ago (minutes).
+minimumReleaseAge: 20160
