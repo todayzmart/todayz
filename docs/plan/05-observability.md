@@ -251,7 +251,7 @@ Routing: local â†’ console + a local Grafana contact point (no paging). Cloud â†
 | DB connections | pool wait p95 > 50 ms or connections > 80% max | warning |
 | DB CPU / storage | CPU > 80% 15 min; free storage < 20% | warning |
 | Missing partition | next month's partition absent 7 days before | warning |
-| Idempotency completion failed | `tz_idempotency_complete_failures` > 0 in 10 min (the key is held, so the client gets 409 on retry until it expires; owner W1-07) | warning |
+| Idempotency completion failed | `tz_idempotency_complete_failures` > 0 in 10 min (the key stays claimed, so a retry gets 409 until the 3-minute lease runs out and the same request can claim it again; owner W1-07) | warning |
 | Order alerts slow | order alert latency p95 > 10 s for 10 min | critical |
 | SSE down | open business connections drop > 50% in 5 min (business hours) | warning |
 | SMS failures | OTP SMS failure > 5% for 10 min | critical |
