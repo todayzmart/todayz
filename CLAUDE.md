@@ -42,6 +42,27 @@ Each app folder must build and test on its own (no imports into a sibling app), 
 - AI output is always a draft a person confirms; nothing changes stock, money or orders from a model output directly.
 - Ask the lead (or the user) when a rule about money, codes, timers, permissions or user-visible behaviour is unclear. Do not guess.
 
+## Local hosts and ports (contract for `make dev`)
+
+Caddy runs on the host (`brew` caddy, local CA via `caddy trust`) and terminates TLS on 443 for `*.todayz.localhost`. Data services run in Docker (Colima). Apps run as host processes started by `infra/local/proc.sh`. Fixed host ports:
+
+| Service | Host port | URL |
+|---|---|---|
+| Postgres 16 + PostGIS 3.4 | 5433 (5432 is the user's own Postgres) | `postgres://…@127.0.0.1:5433/todayz` |
+| MinIO API / console | 9100 / 9101 | https://s3.todayz.localhost, https://img.todayz.localhost, https://tiles.todayz.localhost |
+| Grafana (otel-lgtm) | 3300 | https://grafana.todayz.localhost |
+| OTLP gRPC / HTTP | 4317 / 4318 | |
+| Prometheus (otel-lgtm) | 9390 | |
+| postgres_exporter | 9187 | |
+| API (`todayz api`) | 8180 | https://api.todayz.localhost |
+| Mocks server | 4010 | https://mocks.todayz.localhost |
+| Customer app (Vite) | 5301 | https://app.todayz.localhost |
+| Business app (Vite) | 5302 | https://business.todayz.localhost |
+| Admin console (Vite) | 5303 | https://admin.todayz.localhost |
+| Site (Astro) | 5304 | https://todayz.localhost |
+
+Make step files run in name order: `mk/00-repo.mk`, `mk/10-stack.mk`, `mk/20-backend.mk`, `mk/25-contract.mk`, `mk/30-mocks.mk`, `mk/40-frontend.mk`, `mk/90-ci.mk`. Non-secret local defaults (DB URL, MinIO, OTLP, `*_API_URL` → mocks) live in `infra/local/local.env` (committed); secrets live in `.env.local`. Processes get both exported; Go code reads env only.
+
 ## Commands (after Wave 0)
 
 ```
