@@ -9,7 +9,12 @@ TZ_DEV="$TZ_ROOT/.cache/dev"
 TZ_LOCAL_ENV="$TZ_LOCAL/local.env"
 TZ_ENV_LOCAL="${TODAYZ_ENV_FILE:-$TZ_ROOT/.env.local}"
 TZ_REGISTRY="$TZ_DEV/registry.tsv"
-TZ_CADDY_ROOT_CERT="${TODAYZ_CADDY_ROOT_CERT:-$HOME/Library/Application Support/Caddy/pki/authorities/local/root.crt}"
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  tz_caddy_data="$HOME/Library/Application Support/Caddy"
+else
+  tz_caddy_data="${XDG_DATA_HOME:-$HOME/.local/share}/caddy"
+fi
+TZ_CADDY_ROOT_CERT="${TODAYZ_CADDY_ROOT_CERT:-$tz_caddy_data/pki/authorities/local/root.crt}"
 TZ_CADDY_ADMIN="${TODAYZ_CADDY_ADMIN:-localhost:2019}"
 
 # PostGIS 16-3.4 pinned by digest (D-86). postgis/postgis is amd64 only; on arm64

@@ -27,7 +27,9 @@ fi
 for k in "${keys[@]}"; do
   grep -qx "$k set" "$work/check.out" || { echo "FAIL: env-check does not show $k set"; fail=1; }
 done
-[[ "$(stat -f %Lp "$TODAYZ_ENV_FILE")" == "600" ]] || { echo "FAIL: env file is not mode 600"; fail=1; }
+# GNU stat first (Linux CI), BSD stat on macOS.
+mode="$(stat -c %a "$TODAYZ_ENV_FILE" 2>/dev/null || stat -f %Lp "$TODAYZ_ENV_FILE")"
+[[ "$mode" == "600" ]] || { echo "FAIL: env file is not mode 600"; fail=1; }
 
 if ! "$envtool" leakscan -env "$TODAYZ_ENV_FILE" "$work"/*.out "$work"/*.err "$@"; then
   echo "FAIL: a generated value appeared in output"; fail=1
