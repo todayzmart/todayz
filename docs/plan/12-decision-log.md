@@ -529,4 +529,4 @@ There is no `make seed`; use `make reset`.
 - Every environment runs goose with out-of-order migrations allowed (`WithAllowOutofOrder`, or the equivalent the code uses).
 - Why: per-WP version blocks (D-89) mean a lower block can merge after a higher one in the same wave. This is safe because a WP never merges before the WPs it depends on, so anything a migration needs is already applied. WPs in one wave that do not depend on each other do not touch each other's tables.
 - Locally, `make reset` remains the fix for a stale DB.
-- Status: the W0-03 code does not set this option yet; goose still refuses a file numbered below the newest applied one. A follow-up in W0-04 or W1 adds the option with a test.
+- Status: the W0-03 code does not set this option yet; goose still refuses a file numbered below the newest applied one. W0-04 adds the option with a test.
