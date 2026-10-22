@@ -9,13 +9,13 @@
 # Nobody edits this file to add a step. Steps run in the order the mk files sort,
 # then the order they were registered. There is no `make seed`: `make reset` seeds.
 
-SHELL := /bin/bash
-.SHELLFLAGS := -euo pipefail -c
 .DEFAULT_GOAL := help
 .DELETE_ON_ERROR:
 MAKEFLAGS += --no-print-directory
 
-ROOT := $(abspath $(dir $(firstword $(MAKEFILE_LIST))))
+ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+# Strict bash for every recipe; a wrapper because make 3.81 (macOS) ignores .SHELLFLAGS.
+SHELL := $(ROOT)/scripts/make-shell.sh
 TOOLS := $(ROOT)/.tools/bin
 export PATH := $(TOOLS):$(PATH)
 export TODAYZ_ROOT := $(ROOT)
@@ -46,7 +46,7 @@ include $(sort $(wildcard $(ROOT)/mk/*.mk))
 define run_steps
 	@steps="$(strip $(2))"; \
 	if [ -z "$$steps" ]; then echo "make $(1): no steps registered yet"; exit 0; fi; \
-	for s in $$steps; do echo "==> $(1): $$s"; $(MAKE) $$s; done
+	for s in $$steps; do echo "==> $(1): $$s"; $(MAKE) $$s || { rc=$$?; echo "make $(1): step $$s failed (exit $$rc)"; exit $$rc; }; done
 endef
 
 .PHONY: help $(CANONICAL) _check _e2e

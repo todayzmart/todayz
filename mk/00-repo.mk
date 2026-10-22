@@ -40,6 +40,7 @@ check-repo: $(ENVTOOL)
 	@shellcheck $(ROOT)/scripts/*.sh $(ROOT)/scripts/test/*.sh $(ROOT)/scripts/hooks/*.sh
 	@gitleaks dir $(ROOT) --config $(ROOT)/.gitleaks.toml --no-banner --redact --log-level warn
 	@$(ROOT)/scripts/test/makefile-targets.sh
+	@$(ROOT)/scripts/test/make-fail-fast.sh
 	@$(ROOT)/scripts/test/sc-pl-03.sh
 	@$(ROOT)/scripts/test/sc-pl-04.sh
 	@$(ROOT)/scripts/test/hooks.sh

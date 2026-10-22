@@ -16,4 +16,5 @@ paths = [
   '''(^|/)dist/''',
   '''(^|/)infra/local/data/''',
   '''(^|/)\.terraform/''',
+  '''(^|/)\.claude/worktrees/''',
 ]
