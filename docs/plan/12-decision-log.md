@@ -512,3 +512,10 @@ There is no `make seed`; use `make reset`.
 - Production builds use hidden sourcemaps. Shipped JS and CSS carry no `sourceMappingURL`, and deploy uploads the `.map` files to Sentry and keeps them out of the public bucket.
 - The customer app holds `beforeinstallprompt` from the first visit; the prompt is shown only after the 2nd order (06).
 - Playwright screenshots go to git-ignored `test-results/screenshots/`. `TZ_QA_DIR=docs/qa/<WP>` writes committed QA evidence.
+
+**D-88 · Dependency age and security patches (Wave 0 build).**
+- A new dependency version is adopted only when it has been released for at least 2 weeks.
+- Exception: a patch release that fixes a vulnerability our code calls (govulncheck "called") or a Go toolchain point release may be adopted at once. Each exception is listed in the WP report.
+- Go is pinned per module with a `toolchain` line in `go.mod` (`go1.26.10` from W0-03). `make setup` downloads it into the Go cache, so `make check` stays offline. The user's system Go is left alone.
+- With the patched toolchain, govulncheck fails on any called standard-library vulnerability (`GOVULN_STDLIB=fail` by default).
+- First exceptions (W0-03): `golang.org/x/net` v0.60.0 and Go 1.26.10.

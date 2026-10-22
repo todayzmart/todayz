@@ -6,7 +6,7 @@ Indian hyperlocal retail: shops digitise their stock; customers search what is n
 
 1. `docs/plan/README.md`: the build plan, waves, roles, Definition of done
 2. `docs/plan/01-product-rules.md`: every product rule and number (single source of truth)
-3. `docs/plan/12-decision-log.md`: why the plan says what it says (D-01…D-87). If a numbered plan file disagrees with it, the numbered file is wrong: fix it and add an entry
+3. `docs/plan/12-decision-log.md`: why the plan says what it says (D-01…D-88). If a numbered plan file disagrees with it, the numbered file is wrong: fix it and add an entry
 4. The plan file for your area (architecture, data model, API, observability, screens, work packages, testing, infra, AI)
 5. The `CLAUDE.md` in the folder you are changing
 
@@ -55,6 +55,7 @@ Caddy runs on the host (`brew` caddy, local CA via `caddy trust`) and terminates
 | Prometheus (otel-lgtm) | 9390 | |
 | postgres_exporter | 9187 | |
 | API (`todayz api`) | 8180 | https://api.todayz.localhost |
+| Worker health (`todayz worker`) | 8181 | (loopback only, `/healthz`, `/readyz`) |
 | Mocks server | 4010 | https://mocks.todayz.localhost |
 | Customer app (Vite) | 5301 | https://app.todayz.localhost |
 | Business app (Vite) | 5302 | https://business.todayz.localhost |
