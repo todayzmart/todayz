@@ -3,7 +3,7 @@
 Each of the seven admin roles signs in, checks that the sidebar shows exactly its screens, opens a hidden screen by URL and tries actions it must not take. Credit adjustments above ₹500 need a second person. A-17 shows provider keys only as set or missing.
 
 - **Covers:** 08 §5 MQ-07; AD-01, AD-02, CR-15, CR-27, PO-03 (UI side), PL-05 (UI side), AU-11, AU-12, E2E-12.
-- **Screens:** A-01 to A-20 (nav only for most; A-09, A-17, A-18 in depth).
+- **Screens:** A-01 to A-22 (nav only for most; A-09, A-17, A-18 in depth).
 - **Devices:** D1440 (profile D); a second window (profile E) for the second approver.
 - **Time:** about 75 minutes.
 
@@ -19,13 +19,13 @@ Each of the seven admin roles signs in, checks that the sidebar shows exactly it
 | Role | Account | Screens in the nav |
 |---|---|---|
 | `field_agent` | F41 | A-04 Create business, A-15 My stats, A-03 (Leads tab only) |
-| `support` | S42 | A-02, A-03 (read-only), A-05, A-06, A-07, A-12, A-13, A-14, A-20 (9 screens) |
+| `support` | S42 | A-02, A-03 (read-only), A-05, A-06, A-07, A-12, A-13, A-14, A-20, A-21 (read-only) (10 screens) |
 | `catalogue` | G43 | A-02, A-08 |
-| `analyst` | Y44 | A-02 and a link to the Grafana dashboards |
-| `finance` | FN45 | A-02, A-09, A-11 |
-| `admin` | AD47 | A-02 to A-17, A-19, A-20 (no A-18) |
-| `super_admin` | SA48 | A-02 to A-20 |
-| `support` + `catalogue` | D50 | A-02, A-03 (read-only), A-05, A-06, A-07, A-08, A-12, A-13, A-14, A-20 (10 screens) |
+| `analyst` | Y44 | A-02, A-21 (read-only) and a link to the Grafana dashboards |
+| `finance` | FN45 | A-02, A-09, A-11, A-21 (read-only, `money` kinds only) |
+| `admin` | AD47 | A-02 to A-17, A-19 to A-22 (no A-18) |
+| `super_admin` | SA48 | A-02 to A-22 |
+| `support` + `catalogue` | D50 | A-02, A-03 (read-only), A-05, A-06, A-07, A-08, A-12, A-13, A-14, A-20, A-21 (read-only) (11 screens) |
 
 ## Steps
 
@@ -48,7 +48,7 @@ Each of the seven admin roles signs in, checks that the sidebar shows exactly it
 | MQ-07.09 ★ | Sign in as F41 (field agent). | Sidebar exactly as the table: Create business, My stats and Businesses showing only the Leads tab (list of site leads with a status control). No Pulse. | `R-13.2` AD-02 | ▢ | |
 | MQ-07.10 | As F41 open `/pulse` by URL. | "You don't have access to this" empty state; no broken page; no 403 toast. `GET /v1/admin/pulse` → 403. | `R-13.2` AD-01 AD-02 | ▢ | |
 | MQ-07.11 | As F41 open My stats. | Only F41's own row (0 shops onboarded). `GET /v1/admin/field/me/stats` returns F41's numbers only; `GET /v1/admin/field-agents` → 403. | `R-14.4` AD-01 A-15 | | |
-| MQ-07.12 ★ | Sign in as S42 (support). | Sidebar exactly as the table (9 screens). A-03 opens read-only: no verify, request-info, reject, suspend, reinstate, reveal or document-review buttons, and `POST /v1/admin/businesses/<id>/verify` → 403. | `R-13.2` AD-02 | ▢ | |
+| MQ-07.12 ★ | Sign in as S42 (support). | Sidebar exactly as the table (10 screens). A-03 opens read-only: no verify, request-info, reject, suspend, reinstate, reveal or document-review buttons, and `POST /v1/admin/businesses/<id>/verify` → 403. | `R-13.2` AD-02 | ▢ | |
 | MQ-07.13 | As S42 open A-13 Risk and a flag. | Queue and evidence visible. No Clear or Confirm buttons. `POST /v1/admin/risk/flags/<id>/clear` → 403. | `R-13.2` A-13 | ▢ | |
 | MQ-07.14 | As S42 open `/settings`, `/payouts`, `/credits`, `/users`, `/audit`, `/catalogue` by URL. | Each shows "You don't have access to this". | AD-02 | | |
 | MQ-07.15 | As S42 open A-06 Customers, search C13 by exact phone. | Detail: orders, wallet, strikes (3). Reset strikes button visible. No Block button. | `R-13.2` A-06 | ▢ | |
@@ -63,7 +63,7 @@ Each of the seven admin roles signs in, checks that the sidebar shows exactly it
 | MQ-07.24 | As AD47 open `/users` by URL. | "You don't have access to this". | `R-13.2` A-18 | | |
 | MQ-07.25 | As AD47 open A-09 Credits. | Ledger browser and expiry preview. No adjustment form. `POST /v1/admin/credit-adjustments` → 403. | `R-7.12` CR-27 A-09 | ▢ | |
 | MQ-07.26 ★ | Sign in as SA48 (super_admin). | Every screen including A-18 Admin users. | `R-13.2` AD-02 | ▢ | |
-| MQ-07.27 ★ | Sign in as D50 (support + catalogue). | Sidebar is the union: 10 screens as in the table. | `R-13.2` AD-02 | ▢ | |
+| MQ-07.27 ★ | Sign in as D50 (support + catalogue). | Sidebar is the union: 11 screens as in the table. | `R-13.2` AD-02 | ▢ | |
 | MQ-07.28 | Use each role's normal flows for 5 minutes (open lists, details). | No 403 toast or error appears in a normal flow (buttons the role cannot use are hidden, not refused). | AD-02 G1 | | |
 
 ### C. KYC, cancel, review and strike actions by role

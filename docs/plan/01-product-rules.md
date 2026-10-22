@@ -303,23 +303,34 @@ Overview (KPI strip, sales by hour, new orders, demand insights, top items), Ord
 
 ## 13. Admin console features (v1)
 
-Pulse (business health), Businesses (verification queue, details, suspend), Stores (store review, status), Customers, Orders (incl. admin cancel, §5.2), Master catalogue (review queue, merge duplicates, bulk import), Credits (ledger browser, manual adjustments with reason and 2-person approval above ₹500, §7), Referrals, Payouts (monthly statements, review, mark paid with UTR), Reviews (hide, restore, reports), Risk (fraud flags), Support tickets, Field agents (onboarding attribution), Notifications (templates, provider keys shown only as set/missing), Settings (`platform_settings`), Admin users and roles, Audit log.
+Pulse (business health), Businesses (verification queue, details, suspend), Stores (store review, status), Customers, Orders (incl. admin cancel, §5.2), Master catalogue (review queue, merge duplicates, bulk import), Credits (ledger browser, manual adjustments with reason and 2-person approval above ₹500, §7), Referrals, Payouts (monthly statements, review, mark paid with UTR), Reviews (hide, restore, reports), Risk (fraud flags), Support tickets, Field agents (onboarding attribution), Notifications (templates, provider keys shown only as set/missing), Settings (`platform_settings`), Jobs (A-21: every background job, its runs and controls, D-95), System (A-22: AWS and database health, read-only, D-97), Admin users and roles, Audit log.
 
 Admin roles (D-64; summary, the full permission matrix is in 02). There are 7 roles:
 
 | Role | Can |
 |---|---|
 | `field_agent` | Onboard businesses and manage their items (§14); see their own stats |
-| `support` | View orders and users, cancel orders, tickets, review moderation and restore, strike reset, view risk, banner moderation |
+| `support` | View orders and users, cancel orders, tickets, review moderation and restore, strike reset, view risk, banner moderation; read jobs (A-21) |
 | `catalogue` | Master catalogue review queue and merges |
-| `analyst` | Read-only Pulse and dashboards |
-| `finance` | Ledger; payouts (hold, unhold, mark paid, export); request and approve credit adjustments; payees' bank and UPI details, masked only. No KYC. |
-| `admin` | Everything except credit adjustments, admin-user and role management, money settings, and payout hold, unhold, mark-paid and export |
+| `analyst` | Read-only Pulse and dashboards; read jobs (A-21) |
+| `finance` | Ledger; payouts (hold, unhold, mark paid, export); request and approve credit adjustments; payees' bank and UPI details, masked only. No KYC. Reads the `money` class on A-21 only. |
+| `admin` | Everything except credit adjustments, admin-user and role management, money settings, payout hold, unhold, mark-paid and export, and pausing or running `money` jobs |
 | `super_admin` | Everything |
 
 - KYC verification: `admin` and `super_admin` only.
 - Pulse: every admin role except `field_agent`.
 - **Money settings** are `platform_settings` keys with unit `paise`, `bp` or `credits`. Only `super_admin` can change them.
+
+**Background jobs** (D-95). Every background job is a registered kind with a class: `timer` (order and hold expiries), `money` (ledger, payouts, credit expiry), `notify`, `marketing`, `ai`, `rollup` or `maintenance` (partitions, retention).
+- `timer` kinds can never be paused or run by hand: order correctness depends on them.
+- `money` kinds: `super_admin` only, with admin TOTP step-up (within 10 min) and a reason.
+- Every other kind: `admin` and `super_admin`, with a reason.
+- Read access to A-21: `admin`, `super_admin`, `analyst` and `support` (all classes); `finance` (the `money` class only). `field_agent` and `catalogue` have none.
+- Every pause, resume, run-now and retry writes an audit row.
+- `marketing` and `notify` kinds take their caps and quiet rules from §15 and §17. A job adds no rule of its own.
+- `ai` kinds only write drafts a person confirms (11).
+- A paused scheduled kind stops enqueuing; a paused event kind snoozes its jobs.
+- System (A-22) is read-only and visible to `admin` and `super_admin` (D-97).
 
 ## 14. Field agents (salespeople)
 
@@ -456,6 +467,12 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 |---|---|---|---|
 | `field_agent_edit_window_days` | days | 30 | §14 |
 
+**Jobs** (D-95)
+
+| Key | Unit | Default | Rule |
+|---|---|---|---|
+| `job_runs_retention_days` | days | 90 | §13: how long `job_runs` rows are kept (the `job_runs_retention` maintenance kind drops older months, 03 §9) |
+
 **Feature flags** (turn a feature off without a deploy)
 
 | Key | Unit | Default |
@@ -514,8 +531,11 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | "3 or more orders expired in 2 h" alert | 3 in 2 h | 05 §5 |
 | Failed-delivery reminders and auto-confirm | 2 h, 24 h, 72 h | §5.3, D-85 |
 | Store-strike window (risk flag and reliability) | 30 days | §5.4, D-85 |
+| Jobs watchdog interval | 5 min | §13, D-95 |
+| "Cron missed" threshold | no succeeded run within 2× the schedule interval (daily kinds: 15 min grace after the expected time) | §13, D-95 |
+| Job error text stored | scrubbed, at most 2 kB | §13, D-95 |
 
-**Client versions** (an older client shows "Update available" and reloads)
+**Client versions** (an older client shows "Update available"; it reloads when the user taps, never on its own and never while a sale or checkout is open, D-98)
 
 | Key | Unit | Default |
 |---|---|---|

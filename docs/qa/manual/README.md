@@ -32,7 +32,8 @@ The plan is the source of truth. If a step and the plan disagree, the plan wins:
 | [I18N-languages-detail.md](I18N-languages-detail.md) | Every language on every main screen, long strings, numerals and ₹, pseudo-locale |
 | [A11Y-accessibility-detail.md](A11Y-accessibility-detail.md) | Keyboard, screen reader, 200% zoom, touch targets, contrast |
 | [SITE-marketing-site.md](SITE-marketing-site.md) | Zero JS, links, lead form, SEO basics |
-| [ADMIN-console-screens.md](ADMIN-console-screens.md) | Every admin screen, A-01 to A-20 |
+| [ADMIN-console-screens.md](ADMIN-console-screens.md) | Every admin screen, A-01 to A-22 (A-21 and A-22 in depth in JOBS) |
+| [JOBS-ops-console.md](JOBS-ops-console.md) | A-21 Jobs and A-22 System per role: run now, pause, resume, retry, a forced failure and its alert, a missed schedule; `make stop` mid-request and mid-job; updates that never interrupt a sale or checkout; AWS keys in `.env.local` stay out of the app |
 | [ABUSE-abuse-cases.md](ABUSE-abuse-cases.md) | Mass referrals, OTP flooding, code guessing, offline-link abuse |
 | [PERF-performance.md](PERF-performance.md) | Slow 4G plus 4× CPU across the apps; budgets |
 | [FAIL-failure-modes.md](FAIL-failure-modes.md) | Database down mid-checkout, mock errors, clock skew, two tabs, double clicks, back button, refresh, expired session |
@@ -57,14 +58,14 @@ The stack runs on one laptop and never touches the internet or a cloud account.
 | https://admin.todayz.localhost | Admin console (A-xx screens) |
 | https://api.todayz.localhost | API (`/v1/...`, `/healthz`, `/readyz`, `/version`) |
 | https://mocks.todayz.localhost | Provider mocks: SMS, WhatsApp, push, Turnstile, speech-to-text, LLM |
-| https://grafana.todayz.localhost | Grafana dashboards 00–14, logs (Loki), traces (Tempo) |
+| https://grafana.todayz.localhost | Grafana dashboards 00–15, logs (Loki), traces (Tempo) |
 | https://todayz.localhost | Marketing site (S-xx screens); `/_health` is the stack health page |
 
 Useful commands:
 
 | Command | Use |
 |---|---|
-| `make stop` / `make dev` | Stop and start the whole stack |
+| `make stop` / `make dev` | Stop and start the whole stack. `make stop` sends SIGTERM and waits for the API and worker to drain (at most 180 s for the worker) before SIGKILL (D-98), so it can take a while when a job is running |
 | `make logs` | Follow container and app logs |
 | `docker compose -p todayz stop postgres` / `start postgres` | Take the database down and bring it back (FAIL script) |
 | `infra/local/proc.sh status` | See which app processes are up |

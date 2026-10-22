@@ -12,7 +12,7 @@ The design principle: every dashboard answers one question, starts with the few 
 | Logs | slog JSON → OTel → Loki | Grafana Cloud Loki |
 | Traces | OTel → Tempo | Grafana Cloud Tempo |
 | Errors | No Sentry before Wave 5 (D-17). Errors are `level=error` log lines with stack and fingerprint in Loki, shown on the local Grafana (`grafana.todayz.localhost`) | Sentry SaaS from Wave 5 (errors, releases, source maps, user impact) |
-| Database | `postgres_exporter` + `pg_stat_statements` + Grafana Postgres datasource (read-only role) | same, plus CloudWatch (RDS: CPU, memory, IOPS, connections, replica lag, storage) and Performance Insights |
+| Database | `postgres_exporter` + `pg_stat_statements` + Grafana Postgres datasource (read-only role) | same, plus CloudWatch (RDS: CPU, memory, IOPS, connections, replica lag, storage) and CloudWatch Database Insights (standard mode, Enhanced Monitoring every 60 s; Postgres logs exported to CloudWatch) |
 | Infra | Docker stats via cAdvisor | CloudWatch: ALB (RPS, 5xx, target latency), Beanstalk (instance health, CPU), plus Cloudflare analytics (edge requests, cache, WAF blocks) through the Cloudflare GraphQL datasource |
 | Client performance (RUM) | Our `/v1/rum` endpoint → histograms in Mimir + raw sample to Loki | same |
 | Product analytics | Our `events` table + rollups in Postgres → Grafana (Postgres datasource) and the admin **Pulse** | same |
@@ -29,7 +29,7 @@ Every dashboard is code: JSON in `infra/grafana/dashboards/*.json` (generated wi
 ### 2.1 Metric naming and labels
 
 - Prefix `tz_`. Units in the name (`_seconds`, `_bytes`, `_total`, `_paise`).
-- Allowed labels (bounded): `service` (`api|worker`), `route` (template, e.g. `/v1/stores/{id}/orders`), `method`, `status_class` (`2xx|4xx|5xx`), `code` (problem code, ~60 values), `app` (`customer|business|admin|site`), `role`, `job`, `channel`, `provider`, `outcome`, `feature` (one per AI feature in 11), `model` (the two model ids set in `ai_model_fast` and `ai_model_smart`), `source` (the stock movement source enum, D-01), `city` (≤ 20), `category` (≤ 30), `lang`, `platform` (`android|ios|desktop|other`), `conn` (`4g|3g|wifi|slow-2g|unknown`), `app_version` (last 5 kept).
+- Allowed labels (bounded): `service` (`api|worker`), `route` (template, e.g. `/v1/stores/{id}/orders`), `method`, `status_class` (`2xx|4xx|5xx`), `code` (problem code, ~60 values), `app` (`customer|business|admin|site`), `role`, `kind` (a registered job kind from the `jobs.Define` registry, D-95, about 40 values), `class` (the 7 job classes), `queue` (River queue names from the registry), `channel`, `provider`, `outcome`, `feature` (one per AI feature in 11), `model` (the two model ids set in `ai_model_fast` and `ai_model_smart`), `source` (the stock movement source enum, D-01), `city` (≤ 20), `category` (≤ 30), `lang`, `platform` (`android|ios|desktop|other`), `conn` (`4g|3g|wifi|slow-2g|unknown`), `app_version` (last 5 kept).
 - **Never** as labels: user id, store id, order id, phone, query text, IP. Store-level and customer-level numbers come from Postgres rollups, not metrics. A unit test scans registered metrics and fails on any label not in the allow-list.
 - Histograms use native/exponential buckets (OTel exponential histogram) so p50/p95/p99 are accurate without bucket tuning.
 
@@ -99,7 +99,7 @@ Identity: `anon_id` (random, first-party, localStorage) before sign-in, merged t
 
 ## 3. Rollups and derived metrics (Postgres)
 
-River periodic jobs (each one idempotent per period; backfill command `todayz rollup --from --to`):
+River periodic jobs. Every row is a registered kind (`jobs.Define`, class `rollup` unless noted; W3-07 registers its rollups through W1-11's interface, D-95). Each one is idempotent per period (`UniqueBy` the period key); backfill command `todayz rollup --from --to`, and the same runs appear on A-21 with trigger `backfill`:
 
 | Job | Every | Writes | Key definitions | Owner |
 |---|---|---|---|---|
@@ -139,7 +139,7 @@ One screen, refreshed every minute, ranked lists only:
 5. **Biggest funnel leak today vs 7-day baseline**: each leak step (search zero-result, checkout quote fail, unaccepted expiry, no-show, cancel) with today's rate, baseline, and Δ in lost orders.
 6. **Stores hurting customers**: top 10 stores by expired-unaccepted orders + rejections today, with avg time to accept (links to the admin store page).
 7. **Zero-result searches nearby**: top queries with no results, by city (product/supply gaps).
-8. **Jobs and notifications failing**: job kinds with failures or backlog; notification channels with failure rate > 2%.
+8. **Jobs and notifications failing**: job kinds with failures, missed schedules or backlog (row click → 15 · Jobs filtered to the kind); notification channels with failure rate > 2%.
 9. **SLO burn**: error budget remaining for each SLO (§6).
 
 ### 01 · Service overview (golden signals)
@@ -155,11 +155,11 @@ One screen, refreshed every minute, ranked lists only:
 ### 03 · Database (RDS / Postgres)
 
 - Connections (by state), pool wait time, transactions/s, commits vs rollbacks, deadlocks, lock waits, longest running query, replication lag (later), cache hit ratio, temp files, table/index bloat estimate, sequential scans on big tables, dead tuples and autovacuum activity, slowest queries table (mean, p95 via `pg_stat_statements` + `pg_stat_monitor` if allowed), top tables by size/growth, partitions present for `events`/`audit_log` (missing future partition = alert; `stock_movements` is not partitioned in v1, D-34, so watch its size and BRIN index instead).
-- Cloud only: CloudWatch CPU, freeable memory, read/write IOPS and latency, disk queue, free storage, burst balance, Performance Insights top waits.
+- Cloud only: CloudWatch CPU, freeable memory, read/write IOPS and latency, disk queue, free storage, burst balance, Database Insights top waits.
 
 ### 04 · Jobs, realtime, notifications, integrations
 
-- River: jobs/s by kind, queue depth, age of oldest available job, failures, retries, **timer lateness** (actual run − scheduled time; p99 must stay < 10 s, since late expiries mean wrong holds).
+- River: queue depth and age of the oldest available job, per queue (W1-07). Job-level numbers (runs, failures, retries, **timer lateness**: actual run − scheduled time, p99 must stay < 10 s since late expiries mean wrong holds) live on **15 · Jobs**; the panel here links to it.
 - SSE: open connections by app, events published/s, delivery lag (publish → client ack, sampled), reconnects/min.
 - Notifications: sent/delivered/failed by channel and kind, provider latency, SMS cost per day (₹), push permission rate, open rate.
 - Integrations: STT and LLM latency, errors, tokens and cost per day (AI detail lives on 14); SMS provider errors; R2 errors. Locally every provider is a mock (D-17); the panels show the mock's numbers.
@@ -226,7 +226,18 @@ Answers "which AI feature is weak or expensive?" (D-49, D-46). Sources: the `tz_
 - Lines blocked by permission (cashier confirming a `set_price` or `restock` line, D-06, D-65), per feature. Voice line kinds are `sale`, `restock`, `count`, `set_price` (D-65).
 - Locally the numbers come from the mock LLM unless the user has put their own key in `.env.local` (D-17).
 
-Dashboard ownership: W1-07 owns 01–04, W3-07 owns 00 and 05–13, W3-10 owns 14.
+### 15 · Jobs (owner W1-11, D-95)
+
+Answers "did every background job run, on time, and what did it do?". Sources: the `tz_job_*` metrics (§8) and the `job_runs` and `job_stats_hourly` tables (Postgres datasource).
+
+- Top row: kinds failing now, kinds missed now (`tz_job_missed`), jobs paused, oldest available job age, hard-cancelled at shutdown (24 h).
+- Table of every kind: class, owner, last run status and time, next run, 7-day success rate (`succeeded / (succeeded + failed + cancelled + discarded)`; `skipped` and `yielded` are excluded), average and maximum duration, paused. Row click → run history for the kind with each run's summary counts.
+- Per kind (variable `kind`): runs by status over time, duration p50/p95/max, lateness p99, attempts and retries, the summary counts over time (for example `sent`, `skipped`).
+- Timer class: lateness p99 against the 10 s target and the 30 s alert line.
+- Logs panel (Loki) filtered by `kind` and `run_id`; exemplars → Tempo by `trace_id`.
+- Links to A-21 for controls. Grafana is read-only for jobs; pausing and running happen only on A-21 (audited).
+
+Dashboard ownership: W1-07 owns 01–04, W3-07 owns 00 and 05–13, W3-10 owns 14, W1-11 owns 15.
 
 ### Admin console Pulse (inside the product, not Grafana)
 
@@ -245,8 +256,11 @@ Routing: local → console + a local Grafana contact point (no paging). Cloud �
 | API availability SLO fast burn | 5xx ratio burn rate > 14.4× over 1 h and 5 m | critical |
 | API availability SLO slow burn | burn rate > 6× over 6 h and 30 m | warning |
 | API latency | p95 reads > 400 ms or writes > 800 ms for 10 min | warning |
-| Order timers late | River timer lateness p99 > 30 s for 5 min | critical |
+| Order timers late | `tz_job_lateness_seconds` p99 > 30 s for 5 min on the `timer` class kinds (the rule's `kind` list is generated from the registry) | critical |
 | Job backlog | oldest available job > 2 min | warning |
+| Job failing (D-95) | 3 consecutive failed runs of a scheduled kind, or more than 20% of an event kind's runs failing over 15 min. Owner W1-11, `alerts/jobs.yaml` | critical for the `timer` and `money` classes, warning otherwise |
+| Cron missed (D-95) | `tz_job_missed{kind}` = 1: a scheduled, unpaused kind had no succeeded run within 2× its interval (daily kinds: 15 min grace). Owner W1-11, `alerts/jobs.yaml` | critical for `money`, warning otherwise |
+| Job hard-cancelled at shutdown (D-98) | `tz_job_hard_cancelled_total` > 0 in 10 min: a job did not finish inside the drain and was cancelled; it is retried. Owner W1-11, `alerts/jobs.yaml` | warning |
 | Ledger invariant | reconcile drift ≠ 0 or invariant error logged | critical |
 | DB connections | pool wait p95 > 50 ms or connections > 80% max | warning |
 | DB CPU / storage | CPU > 80% 15 min; free storage < 20% | warning |
@@ -275,16 +289,39 @@ Routing: local → console + a local Grafana contact point (no paging). Cloud �
 | API latency | 95% of reads < 200 ms, writes < 400 ms | histogram |
 | Order placement success | 99.5% of valid checkouts create an order | `POST /orders` 2xx / attempts without 4xx business errors |
 | Order alert delivery | 99% within 5 s | placed → business device ack |
-| Timer accuracy | 99.9% of expiries within 30 s of due | lateness histogram |
+| Timer accuracy | 99.9% of expiries within 30 s of due | `tz_job_lateness_seconds` histogram, `timer` class |
 | POS sync | 99% of offline sales synced within 2 min of coming online | sync lag |
 | Customer LCP | p75 < 2.5 s | RUM |
 
 ## 7. What "done" means for observability in every WP
 
 - New endpoints get RED metrics automatically from middleware (verify they show on 02 with the route template).
-- New jobs register a `kind` and appear on 04; timers report lateness.
+- New jobs register through `jobs.Define` (a `kind` with a class and owner) and appear on 15 and A-21; timers report lateness; a `timer` or `money` kind ships with its runbook.
 - New business facts emit the catalogued server event; new screens emit RUM with a stable route template.
 - Any new external call is wrapped with the integration client helper (metrics, spans, cost counter). Any new AI feature records each draft in `ai_drafts` and appears on 14.
 - New events go in the WP's own `shared/telemetry/events/<domain>.yaml`.
 - If the WP adds a failure mode a human must react to, it adds an alert and a runbook.
 - The QA agent checks the dashboards show the WP's data after running its scenarios locally (screenshot attached).
+
+## 8. Jobs (D-95, D-98)
+
+Every background job is a registered kind (02 §2.7). The jobs middleware in `internal/platform/jobs` (W1-11) emits the metrics, writes the run row and logs; a handler does none of it by hand.
+
+**Metrics** (the `kind` and `class` labels come from the registry and are in the 2.1 allow-list):
+
+| Metric | Labels | Meaning |
+|---|---|---|
+| `tz_job_runs_total` | `kind`, `class`, `status` | Attempts by outcome: `succeeded`, `failed`, `cancelled`, `skipped`, `discarded`, `missed`, `yielded` |
+| `tz_job_duration_seconds` | `kind` | Run duration (exponential histogram) |
+| `tz_job_lateness_seconds` | `kind` | Actual start − scheduled time. Replaces the earlier timer lateness metric |
+| `tz_job_missed` | `kind` | Gauge, 1 while the watchdog sees the kind as missed |
+| `tz_job_hard_cancelled_total` | `kind` | Attempts cancelled by `StopAndCancel` at shutdown (D-98) |
+| River queue depth, age of the oldest available job | `queue` (a bounded label: the queue names in the registry) | W1-07 emits the River numbers; W1-11 adds the rest |
+
+**Logs.** Each run logs its start and finish with `kind`, `run_id` and `trace_id`. A-21's run detail links to Grafana Explore: Loki by `run_id`, Tempo by `trace_id`. Errors stored on a run are scrubbed (no phone, no token, at most 2 kB); the full log line is scrubbed the same way.
+
+**Watchdog.** `jobs_watchdog` (class `maintenance`, every 5 min) writes one `missed` run row per missed period (never one per tick) and sets `tz_job_missed{kind}` to 1 for a scheduled, unpaused kind with no succeeded run within 2× its interval. Daily kinds get 15 min of grace after the expected time. It resets the gauge to 0 on the next success.
+
+**Dashboard and alerts.** Dashboard 15 (§4) and `infra/grafana/alerts/jobs.yaml` (§5: Job failing, Cron missed, Job hard-cancelled at shutdown). Each alert has a runbook in `docs/runbooks/<alert>.md`; every `timer` and `money` kind also has its own runbook, required by the registry.
+
+**Local.** Under the test clock (`/v1/test/clock`), `POST {"advance":"1h"}` runs due scheduled kinds, so dashboard 15 and A-21 have data. `make demo` runs jobs too.

@@ -51,7 +51,7 @@ Every shared file is split so each work package edits only its own part.
 | Problem codes | `backend/api/problems/<domain>.yaml` | W0-03 creates `common.yaml`; each package adds its own domain file (§2.6). |
 | Permissions | `internal/platform/authz/policy/<domain>.go` + a golden table per domain | The lead generates `docs/generated/permissions.md`. |
 | Product events | `shared/telemetry/events/<domain>.yaml` | One file per domain. |
-| Jobs and seed | `internal/jobs/`, `internal/seed/` | W0 pre-creates one registry line and one no-op stub per known domain. Each package fills only its own stub. |
+| Jobs and seed | `internal/platform/jobs/` (the framework, W1-11, D-95), `internal/jobs/`, `internal/seed/` | W0 pre-creates one registry line and one no-op stub per known domain. Each package fills only its own stub, and declares its kinds through `jobs.Define` (§2.7). |
 | Frontend routes | `<app>/src/routes/<area>/` | Each package owns its own area. `routeTree.gen.ts` is git-ignored and generated. |
 | HTTP middleware | `internal/platform/httpx` | W0-03 creates the chain with a slot (file) per middleware (§2.4). Each package fills only its own file. |
 | Makefile | root `Makefile` + `mk/<area>.mk` | W0-01 owns the root file. Each package adds its own `mk/<area>.mk`. |
@@ -85,13 +85,13 @@ One canonical list, the same in 02, 09, CLAUDE.md and W0-01.
 One Go module `github.com/todayz/backend` (path placeholder), one binary with sub-commands:
 
 - `todayz api`: HTTP server (all `/v1` namespaces, §3.2)
-- `todayz worker`: River job workers (timers, notifications, rollups, payouts, search indexing, coach)
+- `todayz worker`: River job workers (timers, notifications, rollups, payouts, search indexing, coach), all registered kinds (§2.7)
 - `todayz migrate up|down|status`
 - `todayz seed dev|demo|test` (local, test and staging only, refuses in prod)
 - `todayz ai eval <feature>` (recorded fixtures; live model only when the key is set)
 - `todayz admin create-super-admin` (one-off, prints nothing secret)
 
-Beanstalk runs two environments from the same image: `api` (web tier behind ALB) and `worker` (worker tier, no ALB). Both scale independently.
+Beanstalk runs two environments from the same image: `api` (web tier behind ALB) and `worker` (worker tier, no ALB). Both scale independently, with different deploy policies (09 §3, D-96).
 
 ### 2.2 Packages
 
@@ -128,7 +128,8 @@ backend/
 │   ├── risk/                  fraud rules, risk screens (W3-02); the `risk_flags` table itself is created by W0-03 (D-78)
 │   ├── support/               tickets
 │   ├── admin/                 admin users, roles, audit browser, pulse queries, field-agent scope
-│   ├── jobs/                  River registry: one line + one no-op stub per domain, pre-created by W0
+│   ├── ops/                   A-22 System: `GET /v1/admin/system`, read-only AWS and database health (W3-15, D-97)
+│   ├── jobs/                  River registry: one line + one no-op stub per domain, pre-created by W0; the stubs call `jobs.Define`
 │   └── seed/                  seed modules: one no-op stub per domain, pre-created by W0
 ├── db/
 │   ├── migrations/            goose SQL files NNNNN_<wp-id>_<what>.sql, e.g. 00001_w0-03_baseline.sql (changes only through new files)
@@ -151,7 +152,7 @@ Rule: domain packages depend on `platform`, never on each other's internals. Cro
 | Contract | `oapi-codegen` (strict server) + `kin-openapi` request validation; Redocly CLI bundles | Spec first; TS client from the same file |
 | DB | `pgx` v5 + `sqlc` | Typed queries, no ORM, full PostGIS SQL |
 | Migrations | `goose` (SQL files, embedded) | Simple, run as a sub-command before deploy |
-| Jobs and timers | `River` (Postgres-backed) | Transactional enqueue: an order and its expiry job commit together; no Redis needed |
+| Jobs and timers | `River` (Postgres-backed), wrapped by `internal/platform/jobs` (`jobs.Define`, W1-11, D-95) | Transactional enqueue: an order and its expiry job commit together; no Redis needed. Every worker is a registered kind (§2.7) |
 | Auth tokens | `golang-jwt` with EdDSA (Ed25519) | Small signatures; key id rotation |
 | TOTP | `pquerna/otp` | Admin 2FA and counter codes |
 | Crypto | stdlib `crypto/aes` (GCM), `crypto/hmac` | Field encryption and keyed lookups (§10) |
@@ -164,6 +165,8 @@ Rule: domain packages depend on `platform`, never on each other's internals. Cro
 | Lint/security | `golangci-lint`, `gosec`, `govulncheck` | |
 
 No Redis in v1. Rate limits use Cloudflare at the edge plus an in-process token bucket per instance with Postgres-backed counters for OTP (the only limit that must be exact). Caches are in-process (settings, categories) with short TTLs and a Postgres `LISTEN/NOTIFY` invalidation.
+
+**Redis trigger (D-96).** Add ElastiCache Serverless (Valkey) only when one of these is measured: rate-limit or cache queries take more than 20% of database load in Database Insights, or `LISTEN/NOTIFY` fan-out limits SSE. Until then, no Redis.
 
 ### 2.4 Request pipeline (middleware order)
 
@@ -195,6 +198,68 @@ All timestamps `timestamptz` in UTC; displayed in Asia/Kolkata. "Day" and "month
 - One registry: `backend/api/problems/<domain>.yaml`, bundled by `make gen`. Each entry has a code, HTTP status and i18n key. Handlers return only registered codes; a test fails on an unregistered one.
 - The code for a refused state change is always `invalid_transition`.
 - W0-03 creates `common.yaml`; each work package adds codes in its own domain file.
+
+### 2.7 Background jobs (D-95)
+
+Every background job is a registered kind, declared with `jobs.Define(jobs.Kind{...})` in `internal/platform/jobs` (W1-11). A test fails if a River worker is registered anywhere else. Adding a job is one declaration plus a handler.
+
+| Kind field | Meaning |
+|---|---|
+| `Name`, `Owner`, `Description` | Unique name, the owning work package (WP id), one sentence |
+| `Class` | `timer` (order and hold expiries), `money` (ledger, payouts, credit expiry), `notify`, `marketing`, `ai`, `rollup`, `maintenance` (partitions, retention) |
+| Trigger | `Schedule` (cron expression in IST) or event-triggered |
+| `Timeout`, `MaxAttempts`, `Queue`, `Concurrency` | Run limits. `Timeout` is at most 60 s unless the kind is `Batched` (§2.8, D-98) |
+| `Batched` | The kind works in batches of at most 60 s, commits a checkpoint per batch and calls `jobs.Yield(ctx)` between batches (§2.8). Payouts, marketing sends, rollup backfills and AI batch jobs are batched kinds |
+| `UniqueBy` | The period key for scheduled kinds, so a period runs at most once |
+| `Runbook` | Required for the `timer` and `money` classes |
+
+- A handler returns `jobs.Result{Summary map[string]int64, Note string}`, for example `{"sent":120,"skipped":3}`. The jobs middleware writes the run (`job_runs`), the hourly stats (`job_stats_hourly`) and the metrics (05 §8). A run ends `succeeded`, `failed`, `cancelled`, `skipped`, `discarded`, `missed` or `yielded` (a batched kind that stopped at a shutdown and enqueued its continuation, §2.8).
+- Scheduled, manual, retry and backfill runs are always logged. Event-triggered kinds (per-order timers, per-message sends) log only failed, retried and discarded attempts; successes are counted.
+- `jobs_watchdog` runs every 5 minutes and marks a scheduled kind `missed` when it has no succeeded run within 2× its interval (daily kinds: 15 minutes of grace).
+- `timer` kinds can never be paused or run by hand. `money` kinds need `super_admin` with step-up. Every other kind needs `admin` or above. All controls are audited (§3.3).
+- `ai` kinds write drafts only. `marketing` and `notify` kinds read their caps and quiet rules from the settings 01 defines.
+- Every job already in the plan is a registered kind with its class, owned by the same work package as before: the 05 §3 rollups, `store_reliability`, `store_rating`, `ledger_reconcile`, order timers, notifications, payouts, partition maintenance and the AI jobs.
+- Everything works locally under the test clock; `make demo` runs jobs so A-21 has data.
+
+### 2.8 Graceful shutdown (D-98)
+
+**Rule.** No deploy, scale-in or restart cuts off an API request or a running job. Work W0-03b (07) makes the lead follow-ups below; the rest sits with the owners named in the last table.
+
+**API, on SIGTERM**
+
+1. `/readyz` flips to 503 at once (a draining flag, body `status: "draining"`). `/healthz` stays 200.
+2. The server keeps serving for `SHUTDOWN_PRESTOP` (15 s deployed, 1 s locally) so the load balancer's health checks and deregistration stop new traffic.
+3. Every SSE stream gets a final `event: reconnect` with `retry: 1000` and is closed. Clients reconnect to another instance (§5).
+4. `srv.Shutdown` waits for in-flight requests for up to `SHUTDOWN_DRAIN` = 75 s. It must exceed `WriteTimeout` (60 s); a test holds the two together, like the idempotency lease test (04 §1.6).
+5. Request contexts never derive from the signal context. `BaseContext` is a background context that SIGTERM does not cancel. A test sends SIGTERM during an in-test slow handler (the test registers its own route; `/v1/test/slow` belongs to W1-07 and is not a Wave 0 dependency), expects 200, and expects a new `/readyz` call to get 503.
+6. Then, in order: stop in-process background loops (`LISTEN/NOTIFY`, caches), close the DB pool, flush telemetry (5 s).
+7. Deploy timings: ALB deregistration delay 75 s, container stop timeout 120 s (09 §3).
+
+**Worker, on SIGTERM**
+
+1. `/readyz` goes to 503 and the worker stops fetching new jobs (River `Stop`).
+2. Job timeouts cap at 60 s. The registry (§2.7) rejects any `Timeout` above 60 s unless the kind is `Batched`. A batched kind works in batches of at most 60 s, commits a checkpoint per batch and calls `jobs.Yield(ctx)` between batches. While the worker drains, `Yield` enqueues a continuation for the remaining work and returns, and the run ends `yielded`. Nothing is aborted. The continuation is a new run with `trigger` `continuation`. Its unique key is the period key plus the checkpoint sequence (`<period>#<n>`), so River's uniqueness does not drop it while the original run is still `running`.
+3. `queue.Drain(c, grace=90s, hardGrace=30s)` runs the whole worker drain: River `Stop` waits up to `DrainGrace` (90 s, more than the 60 s job cap), then `StopAndCancel` gets `hardGrace` (30 s). The total is 120 s, under the 180 s container stop timeout.
+4. Hard cancel is a last resort: `StopAndCancel`, with 30 s to return. It logs at error level, counts `tz_job_hard_cancelled_total{kind}` and fires the "Job hard-cancelled at shutdown" alert (warning, with a runbook). The cancelled attempt is retried. This is safe because every job is idempotent, and side effects (an SMS, a push, a ledger post) carry an idempotency key, so a retry never sends or posts twice.
+5. Container stop timeout is 180 s.
+6. Deploys are immutable: new instances are healthy before old ones get SIGTERM. River's leader election hands periodic scheduling over.
+
+**Database migrations** run before deploy as expand, migrate, contract (09 §3), so draining old instances keep working against the new schema.
+
+**Frontends**
+- No forced reloads: the update toast lets the user choose. This holds for a client below the minimum version too (01 §17): it shows "Update available" and reloads when the user taps.
+- The POS (B-05) and checkout (C-11) defer the update prompt while a sale or checkout is open (06).
+- The service worker precaches every chunk of its own version, so a tab still running the old version keeps working after a Pages deploy removes the old assets.
+
+**Local.** `make stop` (`infra/local/proc.sh`) sends SIGTERM and waits for the same drain (bounded at 180 s for the worker) before it sends SIGKILL.
+
+| Item | Owner |
+|---|---|
+| `/readyz` draining flag on both processes (`internal/platform/health`); API steps 1, 2 and 4–6 (`lifecycle`, `httpx`, telemetry flush, `cmd/todayz`); the `SHUTDOWN_DRAIN` vs `WriteTimeout` test; `queue.Drain(c, grace=90s, hardGrace=30s)` and `tz_job_hard_cancelled_total` (`internal/platform/queue`); the `proc.sh` ordered stop (`stop-all` stops `api` and `worker` first, waits for them, then stops the rest, mocks last) | W0-03b (lead follow-up) |
+| `Batched`, `Yield`, the `yielded` status, the 60 s cap, the hard-cancel alert | W1-11 |
+| SSE reconnect on shutdown (step 3) | W2-05 (the SSE hub) |
+| Frontend update toast and no forced reload | W1-08; deferral while a sale is open: W2-11 (B-05); while a checkout is open: W2-09 (C-11) |
+| ALB deregistration delay and container stop timeouts | W5 |
 
 ## 3. Auth and permissions
 
@@ -353,6 +418,10 @@ Other AI drafts ([04-api.md](04-api.md) §2.8) need, to create and to confirm, t
 | risk | `admin.risk.view` | flags queue, evidence | – | ✓ | – | – | – | ✓ | ✓ |
 | risk | `admin.risk.resolve` | clear, confirm | – | – | – | – | – | ✓ | ✓ |
 | support | `admin.support.tickets` | assign, reply, notes, close | – | ✓ | – | – | – | ✓ | ✓ |
+| jobs | `admin.jobs.view` | A-21 list, detail, runs (finance: `money` class only) | – | ✓ | – | ✓ | money | ✓ | ✓ |
+| jobs | `admin.jobs.manage` | pause, resume, run now, retry, with reason; never `timer` kinds, never `money` kinds | – | – | – | – | – | ✓ | ✓ |
+| jobs | `admin.jobs.manage_money` † | the same for `money` kinds | – | – | – | – | – | – | ✓ |
+| system | `admin.system.view` | A-22 System: AWS and database health, read-only | – | – | – | – | – | ✓ | ✓ |
 | notify | `admin.notifications.manage` | templates per language, test send | – | – | – | – | – | ✓ | ✓ |
 | notify | `admin.integrations.view` | flags on/off, keys `set`/`missing` | – | – | – | – | – | ✓ | ✓ |
 | settings | `admin.settings.view` | list, history | – | – | – | – | – | ✓ | ✓ |
@@ -363,8 +432,9 @@ Other AI drafts ([04-api.md](04-api.md) §2.8) need, to create and to confirm, t
 
 - AI drafts in the admin console need the action of the screen they sit on: `catalogue_cleanup` → `admin.catalogue.queue`, `ticket_triage` → `admin.support.tickets`, `risk_summary` → `admin.risk.view`.
 - **Finance (D-64):** ledger, payouts (view, export, hold, unhold, mark paid), adjustment request and approve, and the payee's bank and UPI details masked. Finance has no KYC access: no `admin.business.view`, `admin.kyc.reveal` or `admin.kyc.verify`.
-- **Admin (D-64):** everything except credit adjustments, role management, money settings, and payout hold, unhold and mark paid.
-- **Analyst:** read-only Pulse and dashboards; no other admin action.
+- **Admin (D-64):** everything except credit adjustments, role management, money settings, payout hold, unhold and mark paid, and pausing or running `money` jobs (D-95).
+- **Analyst:** read-only Pulse and dashboards, and read-only jobs (A-21); no other admin action.
+- **Jobs (D-95):** `admin.jobs.manage` never applies to a `timer` kind (`409 job_not_runnable`). Run-now, pause, resume and retry write an audit row with the reason. System (A-22, D-97) is read-only.
 - **Two-person rule (D-05, D-73):** the threshold `admin_adjust_dual_approval_above_paise` is compared with the absolute value of the amount. At or under it, the adjustment posts immediately and no request row is created. Above it, a pending `admin_adjustment_requests` row is created, for super_admin too. Only finance and super_admin request or approve, and the approver must be a different person from the requester. The admin role cannot adjust credits.
 - **Field agent window (D-39):** a field agent sees and edits only businesses they onboarded, and can add and edit items for them until `field_agent_edit_window_days` after the business is verified. After that, `own, window` becomes refused. Their own stats stay visible.
 - Admin cancel, review restore and strike reset are audited with their reason (D-20, D-41).
@@ -419,6 +489,7 @@ Astro (static output), the design system CSS, zero JS by default (islands only f
 - Fan-out: Postgres `LISTEN/NOTIFY` per channel (`store:{id}`, `user:{id}`) so any API instance can deliver an event raised on another. Payloads are small (`{type, id, version}`); clients refetch through Query.
 - Heartbeat comment every 25 s (Cloudflare closes idle streams at 100 s). Clients reconnect with `Last-Event-ID`; the server replays from `outbox_events` (kept 24 h, SSE replay only; POS sync uses `catalogue_changes`).
 - Fallback: if SSE fails 3 times, poll every 15 s while the screen is visible.
+- Shutdown (D-98): on SIGTERM each stream gets a final `event: reconnect` with `retry: 1000`, then closes. A reconnect is not a failure: it does not count toward the 3 failures that start polling, and the client resumes with `Last-Event-ID` on another instance. The hub (W2-05) owns this; SC-GS-07.
 
 ## 6. Maps and geo
 
@@ -464,7 +535,7 @@ Follows the rules for every AI feature ([11-ai-features.md](11-ai-features.md) �
 | LLM | `ANTHROPIC_API_KEY` | Voice and every AI feature in 11 | Mock with recorded responses (own key optional) | AI entry points hidden |
 | Sentry | `SENTRY_DSN` (+ per app `VITE_SENTRY_DSN`) | Errors | Off; errors go to local Grafana/Loki | Logs only |
 | Grafana Cloud | `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_HEADERS` | Metrics/logs/traces | Local LGTM container | — |
-| AWS | `AWS_REGION`, role credentials | RDS, Beanstalk, Secrets Manager | Not used before Wave 5 | — |
+| AWS | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` | Terraform and the lead only (D-96). The app never uses them: it runs on instance profiles (RDS, Secrets Manager, and the read-only ops policy for A-22) | Not used before Wave 5 | — |
 | Cloudflare | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID` | Terraform/CI only, never in the app | Not used before Wave 5 | — |
 
 - An OTP is never logged in any environment (D-15).
@@ -502,7 +573,9 @@ Follows the rules for every AI feature ([11-ai-features.md](11-ai-features.md) �
 - Uploads: content-type sniffed, size-limited, re-encoded (strips EXIF and anything executable), served from `img.todayz.in` (separate origin).
 - Abuse: Cloudflare WAF managed rules, rate limiting rules per path, bot fight mode on site, Turnstile on OTP, device fingerprint (coarse) on referral sign-ups, risk rules (see [03-data-model.md](03-data-model.md) `risk_flags`).
 - Audit log for every admin action and every money/role/settings change, append-only (no UPDATE/DELETE grant).
-- Backups: RDS automated backups 14 days + PITR, a weekly snapshot copied to a second region; restore drill before launch.
+- Backups: RDS is a single instance at launch (D-96 as amended): automated backups 14 days + PITR, deletion protection, a weekly snapshot copied to a second region; restore drill before launch. An AZ failure means a restore from PITR (an estimated 30–60 minutes); Multi-AZ is one Terraform flag when the founder decides.
+- A-22 reads AWS through the API instance role with a read-only policy (non-scopable read actions use `Resource: "*"`); Terraform checks the policy against an action allow-list, so it holds no write action (D-97).
+- AWS keys stay out of the app (D-97): `internal/ops` builds an AWS client only when `APP_ENV` is `staging` or `prod`, with an explicit EC2 instance-role (IMDS) credential provider and never the SDK's default credential chain. `infra/local/proc.sh` strips every `AWS_*` variable from app processes, so the founder's Wave 5 keys in `.env.local` reach only Terraform and the lead's shell. The worker's one AWS write is `cloudwatch:PutMetricData` into the `TodayZ/Worker` namespace, only in `staging` and `prod` (09 §3.6).
 - Data protection: India DPDP Act 2023 basics: consent text at sign-up, purpose-limited use, deletion on request, a grievance contact on the site.
 
 ## 11. Performance budgets

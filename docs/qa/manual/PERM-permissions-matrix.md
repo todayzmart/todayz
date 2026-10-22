@@ -3,7 +3,7 @@
 Every business role and every admin role against the actions that matter, in the UI and by direct API call. The UI must hide what a role cannot do (a user never meets a 403 in a normal flow); the API must refuse it anyway. MQ-07 covers the admin sign-in and the main per-role flows; this file fills the rest of the matrix.
 
 - **Covers:** AU-09, AU-10, BZ-01, PO-03, AD-01, AD-02, FA-01; D-06, D-38, D-39, D-64, D-65, D-66; R-2.8, R-3.1, R-3.6 to R-3.11.
-- **Screens:** B-01, B-07, B-09, B-10, B-13, B-14; A-02 to A-20 (nav only).
+- **Screens:** B-01, B-07, B-09, B-10, B-13, B-14; A-02 to A-22 (nav only).
 - **Devices:** D1280 with one profile per person; D1440 for admin.
 - **Time:** about 2 hours.
 
@@ -65,7 +65,7 @@ Every business role and every admin role against the actions that matter, in the
 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
-| PERM-M.22 ★ | Sign in as each of F40, S42, G43, Y44, FN45, AD47 and SA48 in turn. Write down the sidebar items. | Exactly the 06 §3 table: F40 A-04, A-15 (own row) and the Leads tab on A-03; S42 A-02, A-03 (read-only), A-05, A-06, A-07, A-12, A-13, A-14, A-20; G43 A-02, A-08; Y44 A-02; FN45 A-02, A-09, A-11; AD47 every screen except A-18; SA48 everything. D50 sees the union of support and catalogue. | AD-02 D-64 | ▢ | |
+| PERM-M.22 ★ | Sign in as each of F40, S42, G43, Y44, FN45, AD47 and SA48 in turn. Write down the sidebar items. | Exactly the 06 §3 table: F40 A-04, A-15 (own row) and the Leads tab on A-03; S42 A-02, A-03 (read-only), A-05, A-06, A-07, A-12, A-13, A-14, A-20, A-21 (read-only); G43 A-02, A-08; Y44 A-02, A-21 (read-only); FN45 A-02, A-09, A-11, A-21 (`money` kinds, read-only); AD47 every screen except A-18; SA48 everything. D50 sees the union of support and catalogue. | AD-02 D-64 | ▢ | |
 | PERM-M.23 | As each role, open three hidden screens by URL. | "You don't have access to this" every time; no broken page, no error toast. | AD-02 | ▢ | |
 | PERM-M.24 | Payout actions on a pending payout as FN45, AD47, S42, G43, Y44 and F40: hold, unhold, mark paid (UTR + step-up), export. | FN45 and SA48: allowed. AD47: hold, unhold, mark paid and export all `403` (A-11 shows the list without those buttons). S42, G43, Y44, F40: `403` on every payout action. FN45 sees bank details masked to the last 4. | PO-03 D-64 A-11 | | |
 | PERM-M.25 | As AD47 call `POST /v1/admin/credit-adjustments` (+₹10). As SA48 do the same. | AD47 `403` (A-09 form hidden). SA48 posts (under ₹500). | AD-01 D-64 A-09 | | |

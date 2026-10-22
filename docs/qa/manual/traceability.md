@@ -4,10 +4,10 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 
 ## 1. Coverage
 
-- **Steps:** 1015 (219 marked ★ for the production smoke and short runs).
-- **08 scenario IDs:** 204 of 214 covered by manual steps (185 numbered IDs and ranges plus 29 SC families); 10 automated only; 0 not covered.
-- **R-IDs (01):** 143 of 143.
-- **06 screens:** 65 of 65.
+- **Steps:** 1049 (236 marked ★ for the production smoke and short runs). The counts in this section were updated by hand for D-95 to D-98 and JOBS; the next full scan regenerates them.
+- **08 scenario IDs:** 231 of 251 covered by manual steps (219 numbered IDs and ranges plus 32 SC families); 20 automated only; 0 not covered.
+- **R-IDs (01):** 144 of 144.
+- **06 screens:** 67 of 67.
 - **Problem codes and HTTP statuses:** 32 of 32 triggered at least once.
 
 | File | Steps |
@@ -37,11 +37,12 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 | [A11Y-accessibility-detail.md](A11Y-accessibility-detail.md) | 13 |
 | [SITE-marketing-site.md](SITE-marketing-site.md) | 18 |
 | [ADMIN-console-screens.md](ADMIN-console-screens.md) | 29 |
+| [JOBS-ops-console.md](JOBS-ops-console.md) | 34 |
 | [ABUSE-abuse-cases.md](ABUSE-abuse-cases.md) | 16 |
 | [PERF-performance.md](PERF-performance.md) | 16 |
 | [FAIL-failure-modes.md](FAIL-failure-modes.md) | 20 |
 | [end-to-end-acceptance.md](end-to-end-acceptance.md) | 45 |
-| **Total** | **1015** |
+| **Total** | **1049** |
 
 ## 2. 08 scenario IDs
 
@@ -229,9 +230,43 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 | OB-02 | I | MQ-10.19, MQ-11.11, MQ-12.16, MQ-12.17, MQ-12.18, MQ-12.19, MQ-12.20, PERF-M.14, ACC-43 |
 | OB-03 | I | MQ-12.15, PERF-M.11 |
 | OB-04 | I | MQ-12.15, PERF-M.10 |
-| OB-05 | I | PERF-M.13, FAIL-M.11 |
+| OB-05 | I | PERF-M.13, FAIL-M.11, JOBS-M.15, JOBS-M.17 |
 | OB-06 | I | MQ-10.17, MQ-10.18, MQ-12.04, PERF-M.15, ACC-44 |
 | OB-11 | I | PERF-M.16, ACC-41, ACC-42 |
+| SC-JB-01 | U | automated only — registry lint (W1-11) |
+| SC-JB-02 | I | JOBS-M.01, JOBS-M.03, JOBS-M.04, JOBS-M.05 |
+| SC-JB-03 | I | JOBS-M.06 |
+| SC-JB-04 | I | JOBS-M.14, JOBS-M.15 |
+| SC-JB-05 | I | JOBS-M.18 |
+| SC-JB-06 | I | JOBS-M.07, JOBS-M.08, JOBS-M.09 |
+| SC-JB-07 | I | JOBS-M.11 |
+| SC-JB-08 | I | JOBS-M.19, JOBS-M.20 |
+| SC-JB-09 | I | JOBS-M.12, JOBS-M.13 |
+| SC-JB-10 | I | JOBS-M.16 |
+| SC-JB-11 | I | JOBS-M.09, JOBS-M.10 |
+| SC-JB-12 | I | automated only — partition retention (needs 90 days of clock) |
+| SC-JB-13 | I | automated only — label allow-list |
+| SC-JB-14 | I | automated only — AI kind writes drafts only |
+| SC-JB-15 | U | automated only — the 60 s cap lint |
+| SC-OPS-01 | I,E | JOBS-M.22 |
+| SC-OPS-02 | I | JOBS-M.23 |
+| SC-OPS-03 | I,E | JOBS-M.21 |
+| SC-OPS-04 | U,I | JOBS-M.24 |
+| SC-OPS-05 | U | automated only — Terraform policy check |
+| SC-OPS-06 | E | JOBS-M.01, JOBS-M.02 |
+| SC-OPS-07 | I,E | JOBS-M.21 |
+| SC-OPS-08 | I | automated only — fake AWS adapter error |
+| SC-OPS-09 | I,E | JOBS-M.34 |
+| SC-GS-01 | I | JOBS-M.26 |
+| SC-GS-02 | I | JOBS-M.27 |
+| SC-GS-03 | U | automated only — drain versus `WriteTimeout` |
+| SC-GS-04 | I | JOBS-M.28 |
+| SC-GS-05 | I | JOBS-M.29 |
+| SC-GS-06 | I | automated only — hard cancel and idempotency keys |
+| SC-GS-07 | I,E | JOBS-M.30 |
+| SC-GS-08 | E | JOBS-M.31, JOBS-M.32 |
+| SC-GS-09 | E | JOBS-M.33 |
+| SC-GS-10 | U | automated only — infra timings check |
 
 ### SC families
 
@@ -267,6 +302,9 @@ Family coverage counts every step that names the family or any ID with its prefi
 | SC-CU | 9 | PWA-M.01, PWA-M.03, PWA-M.04, PWA-M.13, A11Y-M.09, PERF-M.05 (+3 more) |
 | SC-BU | 9 | PWA-M.15, A11Y-M.01, A11Y-M.03, A11Y-M.04, A11Y-M.11, PERF-M.03 (+3 more) |
 | SC-PL | 16 | MQ-07.53, MQ-07.54, MQ-07.55, MQ-12.21, MQ-12.22, MONEY-M.45 (+10 more) |
+| SC-JB | 18 | JOBS-M.01, JOBS-M.03, JOBS-M.04, JOBS-M.05, JOBS-M.06, JOBS-M.07 (+12 more) |
+| SC-OPS | 7 | JOBS-M.01, JOBS-M.02, JOBS-M.21, JOBS-M.22, JOBS-M.23, JOBS-M.24 (+1 more) |
+| SC-GS | 8 | JOBS-M.26, JOBS-M.27, JOBS-M.28, JOBS-M.29, JOBS-M.30, JOBS-M.31 (+2 more) |
 | SC-E2E | 43 | MQ-03.47, MQ-03.50, MQ-05.20, MQ-05.32, MQ-05.35, MQ-05.36 (+37 more) |
 
 ## 3. Rules (R-IDs from 01)
@@ -280,7 +318,7 @@ Family coverage counts every step that names the family or any ID with its prefi
 | R-2.2 | OTP never logged, reserved numbers | MQ-02.14, NOTIFY-M.01 |
 | R-2.3 | test clock | MQ-01.22, SEC-M.36 |
 | R-2.4 | business sign-in, multi-business | MQ-02.01, MQ-03.01, MQ-03.02, MQ-03.03, MQ-05.01, PERM-M.01, PERM-M.03 |
-| R-2.5 | admin TOTP and 10 recovery codes | MQ-07.01, MQ-07.02, MQ-07.03, MQ-07.04, MQ-07.05, MQ-07.06, MQ-07.07, MQ-07.58, MQ-09.26 (+1 more) |
+| R-2.5 | admin TOTP and 10 recovery codes | MQ-07.01, MQ-07.02, MQ-07.03, MQ-07.04, MQ-07.05, MQ-07.06, MQ-07.07, MQ-07.58, MQ-09.26 (+2 more) |
 | R-2.6 | Turnstile | MQ-02.11, SEC-M.06, SITE-M.07, SITE-M.08 |
 | R-2.7 | sessions and sign out all | MQ-02.15, TIMER-M.48, TIMER-M.49, TIMER-M.50, PERM-M.02, SEC-M.09, SEC-M.10, ADMIN-M.16 |
 | R-2.8 | one phone, both profiles | PERM-M.01 |
@@ -393,6 +431,7 @@ Family coverage counts every step that names the family or any ID with its prefi
 | R-13.1 | admin features | MQ-05.15, MQ-06.20, MQ-12.10, ADMIN-M.02, ADMIN-M.18, ADMIN-M.23, ADMIN-M.28, ACC-40, ACC-41 |
 | R-13.2 | roles | MQ-06.17, MQ-06.22, MQ-06.23, MQ-07.09, MQ-07.10, MQ-07.12, MQ-07.13, MQ-07.15, MQ-07.16, MQ-07.17 (+12 more) |
 | R-13.3 | KYC, Pulse, money settings | MQ-06.38, MQ-07.29, MQ-07.30 |
+| R-13.4 | background jobs (D-95) and System (D-97) | JOBS-M.01, JOBS-M.08, JOBS-M.14, JOBS-M.19 |
 | R-14.1 | field-agent login | MQ-05.26, ACC-01 |
 | R-14.2 | create business with owner OTP | MQ-05.27, MQ-05.28, MQ-05.29, MQ-05.30, MQ-05.32, MQ-05.33, ACC-01, ACC-02 |
 | R-14.3 | edit window | MQ-05.38, MQ-05.39, MQ-05.40, MQ-05.41, PERM-M.28, PERM-M.30, ACC-06 |
@@ -480,6 +519,8 @@ Family coverage counts every step that names the family or any ID with its prefi
 | A-18 | Admin users | 8 | MQ-07.23, MQ-07.24, MQ-07.26, MQ-07.56, MQ-07.57, MQ-07.58 (+2 more) |
 | A-19 | Audit log | 14 | MQ-06.15, MQ-06.28, MQ-07.06, MQ-07.29, MQ-07.42, TIMER-M.16 (+8 more) |
 | A-20 | Banner moderation | 4 | OFFER-M.24, OFFER-M.25, OFFER-M.28, PERM-M.22 |
+| A-21 | Jobs | 19 | JOBS-M.01, JOBS-M.02, JOBS-M.03, JOBS-M.04, JOBS-M.06, JOBS-M.07 (+13 more) |
+| A-22 | System | 6 | JOBS-M.21, JOBS-M.22, JOBS-M.23, JOBS-M.24, JOBS-M.25, JOBS-M.34 |
 | S-01 | Home | 6 | A11Y-M.05, SITE-M.01, SITE-M.02, SITE-M.13, SITE-M.16, SITE-M.18 |
 | S-02 | For retailers | 6 | SITE-M.02, SITE-M.04, SITE-M.07, SITE-M.09, SITE-M.13, SITE-M.16 |
 | S-03 | How it works / Pricing ("Free for now") / About / Contact | 1 | SITE-M.05 |
@@ -532,7 +573,7 @@ Family coverage counts every step that names the family or any ID with its prefi
 
 ## 6. Questions for the lead
 
-Each question names the steps that depend on it. All 49 are resolved (D-91 to D-94 in the decision log, and the plan files named in the Status column); the steps now state the expected result. If the build differs from the resolution, mark the step **B**.
+Each question names the steps that depend on it. Q-01 to Q-49 are resolved (D-91 to D-94 in the decision log, and the plan files named in the Status column); the steps now state the expected result. Q-50 and Q-51 are new and open. If the build differs from the resolution, mark the step **B**.
 
 ### A. Disagreements between plan files (01, 02, 04, 05, 06, 08, 12)
 
@@ -597,6 +638,8 @@ Each question names the steps that depend on it. All 49 are resolved (D-91 to D-
 | Q-22 | AU-06 (identical timing within 50 ms) is automated only; the manual step only records. | SEC-M.05 | Resolved: 08 AU-06 (book is right) |
 | Q-26 | Do notification SMS to reserved numbers reach the mock, or are they dropped? | MQ-03.09 | Resolved: D-93 / 01 §2 |
 | Q-41 | The brief mentions coupons; 01 has no coupon codes, so the book tests none. | notes in OFFER-offers-banners.md | Resolved: 10 (Not planned) |
+| Q-50 | JOBS-M.14 to M.17 need a scheduled `notify` or `ai` kind that calls a mock, so that stopping the mocks makes it fail. Which kind does the seed and `make demo` provide? The book calls it K-mock and marks the steps **B** if none exists. | JOBS-M.14, JOBS-M.15, JOBS-M.16, JOBS-M.17 | Open: W1-11 / W3-15 to name one |
+| Q-51 | JOBS-M.28 and M.29 need a kind that runs for several seconds and is batched (a rollup backfill, payouts, a marketing send), so a stop mid-run can be seen. Which kind and which `periodKey` range does `make demo` give? | JOBS-M.28, JOBS-M.29 | Open: W1-11 to name one |
 
 ### Uncovered rules
 

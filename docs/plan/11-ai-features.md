@@ -51,7 +51,7 @@ The user asked (2026-10-22) for AI features wherever they are best, for retailer
 
 ### 2.1 Shop coach: how it works
 
-Runs as River periodic jobs per store, spread across the night so load is flat:
+Runs as River periodic jobs per store, spread across the night so load is flat. Each is a registered kind of class `ai` (`coach_realtime_rules` uses no model but is still class `ai`, owner W3-11), declared through `jobs.Define` (D-95). `coach_daily` and `coach_weekly` are batched kinds (they work in batches of at most 60 s and yield on shutdown, D-98). An `ai` kind only writes drafts (`ai_drafts`, `coach_suggestions`); a person confirms. The job's `Summary` counts cards created and skipped, and A-21 shows it:
 
 | Job | When (IST) | What it looks at | Example cards |
 |---|---|---|---|

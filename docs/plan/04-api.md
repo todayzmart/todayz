@@ -11,7 +11,7 @@ The contract lives in `backend/api/` (OpenAPI 3.1), split per domain: `paths/<do
 - Concurrency: mutable resources return `ETag: "v{version}"`; updates send `If-Match`. Mismatch → `412`.
 - Rate-limit headers: `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`; `429` with `Retry-After`.
 - Tracing: clients send `traceparent`; every response returns `X-Request-Id`.
-- Versioning: `/v1`. Additive changes only within v1. The oldest client allowed per app is set in settings (`min_client_version_customer`, `min_client_version_business`, `min_client_version_admin`); an older app shows "Update available" and reloads its service worker.
+- Versioning: `/v1`. Additive changes only within v1. The oldest client allowed per app is set in settings (`min_client_version_customer`, `min_client_version_business`, `min_client_version_admin`); an older app shows "Update available" and reloads its service worker when the user taps, never by itself and never while a POS sale or a checkout is open (D-98).
 - Language: `Accept-Language` picks translated category names and notification text.
 - Time: timed responses (every order response and every SSE order event) include `serverNow` (RFC 3339). Clients compute countdowns against it: remaining = deadline − (`serverNow` + time elapsed since receipt), never against the device clock.
 
@@ -43,7 +43,7 @@ Shorthand in 2.6: `{B}` = `/v1/biz/businesses/{bid}`, `{S}` = `{B}/stores/{sid}`
 - Access token: EdDSA JWT with `kid` (keys from `JWT_SIGNING_KEYS`, signer `JWT_CURRENT_KID`), held in memory, sent as `Authorization: Bearer`.
 - Refresh token (D-14): one cookie per app: `__Secure-tz_rt_c` (customer), `__Secure-tz_rt_b` (business), `__Secure-tz_rt_a` (admin). Host-only on the API host (no `Domain`), `Path=/v1/auth`, `HttpOnly`, `Secure`, `SameSite=Strict`. Only `/v1/auth/*` ever receives it. Refresh is `POST /v1/auth/refresh` with `{app}`; the server reads only that app's cookie.
 - Labels: **pub** = anonymous OK; **cus** = customer; **any** = any signed-in user; **biz(cashier)** = any staff with access to that store; **biz(manager)** = manager or owner; **biz(owner)** = owner only; **adm(roles)** = the listed admin roles. `super_admin` can do everything, so it is not repeated.
-- Admin roles (D-64): `field_agent`, `support`, `catalogue`, `analyst`, `finance`, `admin`, `super_admin`. `admin` can do everything except credit adjustments, admin-user and role management, money settings (unit `paise`, `bp` or `credits`), and payout hold, unhold, mark-paid and export. `analyst` only reads Pulse and dashboards. "all but field_agent" in 2.7 means `support`, `catalogue`, `analyst`, `finance`, `admin`.
+- Admin roles (D-64): `field_agent`, `support`, `catalogue`, `analyst`, `finance`, `admin`, `super_admin`. `admin` can do everything except credit adjustments, admin-user and role management, money settings (unit `paise`, `bp` or `credits`), payout hold, unhold, mark-paid and export, and pausing or running `money` jobs (D-95). `analyst` only reads Pulse, dashboards and jobs (A-21). "all but field_agent" in 2.7 means `support`, `catalogue`, `analyst`, `finance`, `admin`.
 - Permission keys (e.g. `item.price.edit`, `stock.restock`, `stock.count`) and the full role matrix are in 02 (D-38). Policy code lives in `platform/authz/policy/<domain>.go` (D-50).
 - Step-up: sensitive admin actions need a TOTP re-prompt within 10 min (02); marked **step-up** below.
 
@@ -75,6 +75,14 @@ Shorthand in 2.6: `{B}` = `/v1/biz/businesses/{bid}`, `{S}` = `{B}/stores/{sid}`
   | `review_edit_window_passed` | 409 | `reviews.yaml` | edit after `review_edit_window_days` |
   | `ai_daily_cap_reached` | 429 | `ai.yaml` | daily AI cap reached; `extensions.scope` is `customer`, `store` or `platform`; `Retry-After` is the next IST midnight |
 
+  Codes added for the jobs platform (D-95), registered in `problems/admin-jobs.yaml` before the handlers ship:
+
+  | Code | Status | Domain file | Meaning |
+  |---|---|---|---|
+  | `job_not_runnable` | 409 | `admin-jobs.yaml` | run-now, pause, resume or retry on a `timer` kind (retry of a `timer` kind's run), or run-now on an event-triggered kind |
+  | `job_already_running` | 409 | `admin-jobs.yaml` | run-now or retry while that kind (or that period) is already running |
+  | `job_paused` | 409 | `admin-jobs.yaml` | run-now or retry on a paused kind; resume it first |
+
   A credit cap refusal (CR-11 "refused and flagged") is the matching code plus a `risk_flags` row; the order can still be placed without credits.
 
 ### 1.5 Reason enums (D-60)
@@ -92,14 +100,14 @@ Reasons are schemas referenced by name; values are defined once in 01 and in `sc
 
 ### 1.6 Idempotency
 
-`Idempotency-Key` header (ULID from the client) required on: order create, every order transition (customer, shop, admin), confirm-return, code verify, POS sale, POS reverse, sync, bill-claim confirm, counter-code verify, credit adjustment request and approve, payout mark-paid, every AI draft confirm. Same key + same body → same response; same key + different body → `422 idempotency_mismatch`.
+`Idempotency-Key` header (ULID from the client) required on: order create, every order transition (customer, shop, admin), confirm-return, code verify, POS sale, POS reverse, sync, bill-claim confirm, counter-code verify, credit adjustment request and approve, payout mark-paid, job run-now (D-95), every AI draft confirm. Same key + same body → same response; same key + different body → `422 idempotency_mismatch`.
 
 How it works (W0-03, `platform/idempotency`):
 
 - It is opt-in per route: a route declares `IdempotencyRequired` (a missing header is `400 idempotency_key_required`) or `IdempotencyOptional` in its route policy. Other routes ignore the header. It applies to POST, PUT, PATCH and DELETE only. A key that is not a ULID is `400 idempotency_key_invalid`.
 - A record is scoped by principal + method and path + key, and kept 24 h with the response.
 - "Same body" means the same raw bytes: the request hash covers the raw query string and the raw body bytes, so reordered JSON is a different request.
-- The first request claims the key with a claim id and a 3-minute lease (longer than the 60 s write timeout). A second request with the same key while the first runs gets `409 conflict` with `Retry-After: 1`. Only the holder of the claim id can complete or release the key.
+- The first request claims the key with a claim id and a 3-minute lease (longer than the 60 s write timeout, which the shutdown drain of 75 s also exceeds, D-98). A second request with the same key while the first runs gets `409 conflict` with `Retry-After: 1`. Only the holder of the claim id can complete or release the key.
 - Replays repeat the stored status, body and an allow-list of headers (`Content-Type`, `Content-Language`, `Location`, `ETag`, `Cache-Control`, `Retry-After`) and add `Idempotent-Replayed: true`.
 - Stored response bodies are encrypted with AES-256-GCM under `PII_ENC_KEY`.
 - Never stored, and the key is released so a retry runs again: a 5xx, a body over 1 MB, a panic, and any response with `Cache-Control: no-store` (auth, OTP and token responses).
@@ -389,6 +397,15 @@ Cashier rights are D-06 as amended by D-65: cashiers run orders day to day (acce
 | Admin users | PATCH | /v1/admin/users/{adminId} | super_admin | W3-05 | roles, disable; step-up |
 | Admin users | POST | /v1/admin/users/{adminId}/reset-totp | super_admin | W3-05 | step-up |
 | Audit | GET | /v1/admin/audit | admin | W3-05 | |
+| Jobs | GET | /v1/admin/jobs | support, analyst, finance (`money` kinds only), admin | W1-11 | `admin-jobs.yaml` (D-95). Every kind with its class, owner, schedule, last run, next run, 7-day success rate, average and maximum duration, paused state; filters `class=`, `status=` |
+| Jobs | GET | /v1/admin/jobs/{kind} | same as the list | W1-11 | one kind: settings, schedule in IST, control state (`paused`, `reason`, who and when) |
+| Jobs | GET | /v1/admin/jobs/{kind}/runs?status=&trigger=&from=&to= | same as the list | W1-11 | run history, newest first, server-paginated; each row has the summary counts |
+| Jobs | GET | /v1/admin/job-runs/{runId} | same as the list | W1-11 | run detail: summary, note, scrubbed error, attempt, timeline, `triggeredBy`, Grafana Explore links (Loki by `run_id`, Tempo by `trace_id`). The path is `job-runs`, not `jobs/runs`, because of the 1.2 path rule |
+| Jobs | POST | /v1/admin/jobs/{kind}/run | admin; `money` kinds super_admin | W1-11 | `{reason, periodKey?}`; scheduled kinds only; `Idempotency-Key`; `money` needs step-up; `409 job_not_runnable`, `job_already_running`, `job_paused`; audited |
+| Jobs | POST | /v1/admin/jobs/{kind}/pause | admin; `money` kinds super_admin | W1-11 | `{reason}`; stops new scheduled enqueues, and event jobs snooze; `money` needs step-up; `409 job_not_runnable` for `timer`; audited |
+| Jobs | POST | /v1/admin/jobs/{kind}/resume | admin; `money` kinds super_admin | W1-11 | `{reason}`; same limits as pause; audited |
+| Jobs | POST | /v1/admin/job-runs/{runId}/retry | admin; `money` kinds super_admin | W1-11 | `{reason}`; a `failed`, `discarded` or `missed` run; `money` kinds need super_admin plus step-up; `409 job_not_runnable` for a `timer` kind; `409 job_already_running`, `job_paused`; `409 invalid_transition` for any other status; audited |
+| System | GET | /v1/admin/system | admin | W3-15 | `admin-system.yaml` (D-97). Beanstalk, ALB, RDS, River, CloudWatch alarm states and the top 10 SQL statements; read-only; cached 60 s per instance; AWS panels say "Not configured (local)" off AWS |
 
 ### 2.8 AI drafts (`ai.yaml`, D-46)
 
@@ -437,7 +454,7 @@ Insight text (AI-R4) and coach cards (AI-R5) come back inside `{S}/insights` and
 | Endpoint | Meaning | Response |
 |---|---|---|
 | `/healthz` | Process is up. Never touches a dependency. | `200 {"status":"ok"}` |
-| `/readyz` | DB reachable, migrations at head, River running. Result cached 2 s; one run in flight at a time. | `200 {"status":"ok","checks":{"db":"ok","migrations":"ok","river":"ok"}}`. When a check fails: `503 {"status":"unavailable","checks":{"db":"fail",...}}`. Error text never appears in the body; it is logged. |
+| `/readyz` | DB reachable, migrations at head, River running. Result cached 2 s; one run in flight at a time. After SIGTERM it answers 503 at once and stays 503 until the process exits (D-98, 02 §2.8). | `200 {"status":"ok","checks":{"db":"ok","migrations":"ok","river":"ok"}}`. When a check fails: `503 {"status":"unavailable","checks":{"db":"fail",...}}`. While draining: `503 {"status":"draining"}`. Error text never appears in the body; it is logged. |
 | `/version` | Build info. On the API only in `local` and `test`. On the worker's internal port (`WORKER_ADDR`, 8181) in every environment. | `200 {"version","commit","buildTime","dirty"}` |
 
 The load balancer health check uses `/readyz`. Nothing in this table is exposed through Cloudflare.
@@ -459,7 +476,7 @@ None. (The shop cancel reason list was settled by D-68: `ShopCancelReason`, 1.5.
 
 ### 2.11 Count
 
-285 method + path pairs in `/v1`, plus 3 health endpoints outside it. By namespace: admin 114 (9 AI; +1 for `GET /v1/admin/field/me/stats`, D-64), biz 99 (15 AI), me 43 (6 AI), discover 11, auth 8, public 3, telemetry 3, test 4. Re-checked after the D-61…D-84 follow-ups (2026-10-22): no pair appears twice, no literal segment sits beside a parameter, and `/v1/discover/stores/` has only `{slug}` beneath it. The path lint (1.2) repeats the check on the bundled spec on every `make gen`.
+294 method + path pairs in `/v1`, plus 3 health endpoints outside it. By namespace: admin 123 (9 AI; +1 for `GET /v1/admin/field/me/stats`, D-64; +8 jobs and +1 system, D-95, D-97), biz 99 (15 AI), me 43 (6 AI), discover 11, auth 8, public 3, telemetry 3, test 4. Re-checked after the D-61…D-84 follow-ups (2026-10-22): no pair appears twice, no literal segment sits beside a parameter, and `/v1/discover/stores/` has only `{slug}` beneath it. The path lint (1.2) repeats the check on the bundled spec on every `make gen`.
 
 ## 3. Contract tests
 

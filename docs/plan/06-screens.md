@@ -12,6 +12,7 @@ Every screen, in addition to its own criteria, must:
 - **G6** Be deep-linkable (URL holds state: filters, tabs, selected item).
 - **G7** Read every number in user-visible copy that [01-product-rules.md](01-product-rules.md) marks configurable from `platform_settings`, never from a constant (D-60). Numbers in the criteria below ("30 credits", "₹100 or more", "+10 min", "5 min", "15 s", "up to 3 live banners", "0–20 %", "₹500+" …) are today's defaults.
 - **G8** Every reason picker uses the enums in D-60 and D-68 (reject, delivery-failed, admin-cancel, customer-cancel, shop-cancel `ShopCancelReason`, review tags), with labels from i18n keys. No free-typed reasons where an enum exists.
+- **G9** (D-98) Never reload the app by itself. When a new version is ready, show the update toast and let the user choose. B-05 (Sell) and C-11 (Checkout) hold the prompt back while a sale or a checkout is open and show it afterwards. A tab still running the old version keeps working after a deploy (the service worker precaches every chunk of its own version).
 
 Screen owners are listed in [07-work-packages.md](07-work-packages.md). Where a decision in [12-decision-log.md](12-decision-log.md) settled an owner, the row below names it.
 
@@ -98,6 +99,8 @@ Role limits in the UI (D-06, D-38, D-65, D-66): the API is the guard; the UI hid
 | A-18 | Admin users | `super_admin` only. Invite, roles (multi, from the 7 roles in D-64: `field_agent`, `support`, `catalogue`, `analyst`, `finance`, `admin`, `super_admin`), disable, reset TOTP. |
 | A-19 | Audit log | Filter by actor, action, subject, date; before/after diff. |
 | A-20 | Banner moderation | Owner W3-05 (D-46, D-47). Queue of new and changed banners with the automatic image check result, shop, target and schedule; approve, or take down with a reason (the shop sees "Removed by TodayZ: reason" in B-08); a list of live banners with takedown. Every action is audited. |
+| A-21 | Jobs | Owner W3-15 (D-95, D-97); the API is W1-11. **List:** one row per registered kind with name, class, owner, schedule as readable IST text ("Every day at 00:30 IST"), next run, last run status and time, 7-day success rate, average and maximum duration, paused state. Filters for class and status; "Missed" and "Failing" badges. **Kind page:** run history as a DataTable (status, trigger, period key, started, duration, lateness, summary counts) with filters for status, trigger and date. **Run detail:** summary counts, note, error (scrubbed), attempts, timeline, who triggered it, and links to Grafana Explore (logs by `run_id`, trace by `trace_id`). **Actions** (each asks for a reason; each is audited): Run now (scheduled kinds, optional period key), Pause and Resume, Retry a failed run. `timer` kinds show no action buttons and the note "Order timers can't be paused or run by hand". `money` kinds show the actions only to `super_admin`, after step-up. Read-only roles (analyst, support, finance for `money`) see no action buttons. |
+| A-22 | System | Owner W3-15 (D-97). Read-only; `admin` and `super_admin`. Panels: **Beanstalk** (per environment: health, running version, instance count, last 10 deploys); **ALB** (requests per minute, 5xx rate, p95 latency); **RDS** (CPU, connections, free storage, "Multi-AZ: off" shown as a fact, not a warning, and the 10 most expensive SQL statements from `pg_stat_statements`); **River** (queue depth, age of the oldest job); **CloudWatch alarms** (state of each); links to the Grafana dashboards. Data is cached for 60 s and the page shows its age. Locally the AWS panels say "Not configured (local)" while the Postgres and River panels show real data. |
 
 AI in admin: catalogue assistant in A-08 review queue, triage and reply drafts in A-14, risk explanations in A-13. Each renders in that screen's `<AssistSlot/>` (the screen's owner provides the slot: W3-05 for A-08, W3-08 for A-14, W3-02 for A-13); W3-13 owns the content in `admin/src/ai-assist/{catalogue,support,risk}` (D-82).
 
@@ -106,12 +109,12 @@ AI in admin: catalogue assistant in A-08 review queue, triage and reply drafts i
 | Role | Screens in the nav |
 |---|---|
 | `field_agent` | A-04 Create business; their own stats (A-15, own row only); the Leads tab on A-03 |
-| `support` | A-02 Pulse, A-03 Businesses (read-only), A-05 Stores (view, strike reset), A-06 Customers (view, strike reset), A-07 Orders (view, cancel), A-12 Reviews (moderation and restore), A-13 Risk (view only), A-14 Support, A-20 Banner moderation |
+| `support` | A-02 Pulse, A-03 Businesses (read-only), A-05 Stores (view, strike reset), A-06 Customers (view, strike reset), A-07 Orders (view, cancel), A-12 Reviews (moderation and restore), A-13 Risk (view only), A-14 Support, A-20 Banner moderation, A-21 Jobs (read-only) |
 | `catalogue` | A-02 Pulse, A-08 Catalogue (review queue and merges) |
-| `analyst` | A-02 Pulse, read-only, and the Grafana dashboards; no actions anywhere |
-| `finance` | A-02 Pulse, A-09 Credits (ledger, adjustment request and approve), A-11 Payouts (hold, unhold, mark paid, export), bank details masked |
-| `admin` | Every screen; without credit adjustments (A-09 form), role management (A-18), editing money settings (A-17) and payout hold, unhold, mark paid and export (A-11; finance and super_admin only). KYC verification in A-03 |
-| `super_admin` | Everything, including A-18 and money settings |
+| `analyst` | A-02 Pulse, read-only, A-21 Jobs (read-only), and the Grafana dashboards; no actions anywhere |
+| `finance` | A-02 Pulse, A-09 Credits (ledger, adjustment request and approve), A-11 Payouts (hold, unhold, mark paid, export), bank details masked, A-21 Jobs (read-only, `money` class kinds only) |
+| `admin` | Every screen, A-21 Jobs and A-22 System included; without credit adjustments (A-09 form), role management (A-18), editing money settings (A-17), payout hold, unhold, mark paid and export (A-11; finance and super_admin only) and pausing or running `money` jobs (A-21). KYC verification in A-03 |
+| `super_admin` | Everything, including A-18, money settings and `money` jobs |
 
 KYC verification in A-03 is `admin` and `super_admin` only.
 

@@ -1,9 +1,9 @@
 # ADMIN Admin console screens
 
-Each admin screen A-01 to A-20 opened and its main actions run once, as the role that owns them. MQ-07 covers sign-in, TOTP, roles, credit adjustments, settings and admin users; MONEY covers A-09 and A-10; CANCEL covers A-07 cancel, A-12 and A-14; OFFER covers A-20; NOTIFY covers A-16. This file covers what is left, plus the privacy rules on aggregated data.
+Each admin screen A-01 to A-22 opened and its main actions run once, as the role that owns them. MQ-07 covers sign-in, TOTP, roles, credit adjustments, settings and admin users; MONEY covers A-09 and A-10; CANCEL covers A-07 cancel, A-12 and A-14; OFFER covers A-20; JOBS covers A-21 and A-22; NOTIFY covers A-16. This file covers what is left, plus the privacy rules on aggregated data.
 
 - **Covers:** SC-AD, SC-BZ (admin side), SC-RK, SC-SP; AU-11, AU-12; R-3.3, R-3.4, R-13.1 to R-13.3, R-16.1, R-16.3, R-16.5; D-40, D-41, D-64, D-81.
-- **Screens:** A-01 to A-20.
+- **Screens:** A-01 to A-22.
 - **Devices:** D1440 (profile D); D1280 for the business side (profile B, O20).
 - **Time:** about 2 hours.
 

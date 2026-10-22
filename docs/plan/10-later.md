@@ -13,7 +13,7 @@
 | Demand data for brands | Aggregated, anonymised demand reports (k-anonymity ≥ 10) sold to brands/distributors | Enough data; DPDP review |
 | Dedicated search engine | Meilisearch/OpenSearch if Postgres search p95 > 200 ms at scale | Load data |
 | ClickHouse for events | If events > ~5M/day | Volume |
-| Multi-AZ RDS, read replica for analytics | Reliability and isolation | Revenue |
+| Multi-AZ RDS (one Terraform flag, `multi_az = true`, D-96), read replica for analytics | Reliability and isolation | Founder's call (revenue) |
 | AI later items | Ask about my shop (AI-R7), distributor restock lists (AI-R8), help assistant (AI-C4), AI substitutes ranking, Ask Pulse (AI-A4), KYC document check (AI-A5) | v1 AI adoption data |
 | Coupon codes | Not planned: no coupon codes anywhere in v1 (offers and credits only) | Product decision |
 | Dark theme | Removed at the user's request; only if asked | User request |
