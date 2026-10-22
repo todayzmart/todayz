@@ -20,7 +20,7 @@ Coverage targets (enforced): Go domain packages ≥ 85% lines, `credits`, `order
 
 ## 2. Test infrastructure
 
-- **Test clock (D-80):** in `APP_ENV=local` and `APP_ENV=test`, `POST /v1/test/clock {advance: "31m"}` moves the server clock and runs due River jobs synchronously; QA agents use it for manual testing on the local stack. In staging and prod builds the route is not registered: a test asserts it returns 404 in a `staging` and a `prod` build.
+- **Test clock (D-80):** in `APP_ENV=local` and `APP_ENV=test`, `POST /v1/test/clock {advance: "31m"}` moves the server clock and waits (up to `wait`, default 10 s, at most 50 s) for the River jobs that became due to run; QA agents use it for manual testing on the local stack. In staging and prod builds the route is not registered: a test asserts it returns 404 in a `staging` and a `prod` build.
 - **Test OTP (D-15):** there is no `dev` environment; the environments are `local`, `test`, `staging`, `prod`.
   - In `local` and `test` only, the reserved numbers `+91 90000 000xx` accept `000000`. A test asserts that a `staging` or `prod` build treats them like any other number (`000000` refused).
   - Every other number goes through the mock SMS server. Tests and QA agents read the OTP from the mocks UI/API at `mocks.todayz.localhost`, never from a log.

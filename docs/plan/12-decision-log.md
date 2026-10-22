@@ -521,6 +521,12 @@ There is no `make seed`; use `make reset`.
 - First exceptions (W0-03): `golang.org/x/net` v0.60.0 and Go 1.26.10.
 
 **D-89 · Parallel-WP collision points in the backend (W0-03 review).**
-- Migration versions come in per-WP blocks, `<wave><wp:2><seq:2>` (W2-03 owns `20301`–`20399`), so parallel WPs never pick the same number. Wave 0 keeps `00001`–`00099`. goose stays in order; a local DB missing an older block is rebuilt with `make reset`.
-- Routes, sqlc queries and partitioned tables follow D-50: one pre-created file or entry per domain (`mountX` stubs, `db/queries/<domain>/` with package `<domain>db`), and the partition list is read from `pg_partitioned_table`, not a shared map.
+- Migration versions come in per-WP blocks, `<wave><wp:2><seq:2>` (W2-03 owns `20301`–`20399`), so parallel WPs never pick the same number. Wave 0 keeps `00001`–`00099`. (goose first stayed in order here; D-90 replaces that with out-of-order migrations.)
+- Routes, sqlc queries and partitioned tables follow D-50: one pre-created file or entry per domain (`mountX` stubs, `db/queries/<domain>/` with package `<domain>db`), and the tables to partition are listed in the owner-only `partition_policies` table (each WP inserts its own row in its migration; `ensure_partitions` reads it), not in a Go map.
 - Idempotency is opt-in per route, fenced by a claim id, and stores response bodies encrypted under `PII_ENC_KEY`. A `Cache-Control: no-store` response (auth, OTP, tokens) is never stored.
+
+**D-90 · goose runs with out-of-order migrations allowed.**
+- Every environment runs goose with out-of-order migrations allowed (`WithAllowOutofOrder`, or the equivalent the code uses).
+- Why: per-WP version blocks (D-89) mean a lower block can merge after a higher one in the same wave. This is safe because a WP never merges before the WPs it depends on, so anything a migration needs is already applied. WPs in one wave that do not depend on each other do not touch each other's tables.
+- Locally, `make reset` remains the fix for a stale DB.
+- Status: the W0-03 code does not set this option yet; goose still refuses a file numbered below the newest applied one. A follow-up in W0-04 or W1 adds the option with a test.

@@ -257,7 +257,11 @@ Payout amount (D-09) = Σ `store_credit` balances of the business's stores − �
 | `support_tickets` | id, opener_type, opener_id, order_id (plain uuid, D-35), category, status (`open|waiting|resolved|closed`), assignee, priority, sla_due_at | W2-09 (D-52; W3-08 owns the admin side) |
 | `support_messages` | id, ticket_id, author, body, attachments. Owner per D-84 | W2-09 |
 | `risk_flags` | id, subject_type, subject_id, rule, score, details jsonb, status (`open|cleared|confirmed`), reviewed_by | W0-03 creates the table; W3-02 owns rules and screens (D-78, see note) |
-| `audit_log` | id, actor_kind, actor_id, action, subject_type, subject_id, before jsonb, after jsonb, ip_hash, request_id, created_at. Append-only, partitioned by month | W0-03 |
+| `audit_log` | id, actor_kind, actor_id, action, subject_type, subject_id (`text`, so a setting key or an id can be the subject), before jsonb, after jsonb, ip_hash, request_id, created_at. Append-only, partitioned by month (UTC month boundaries). The app role has INSERT and SELECT only: UPDATE, DELETE and TRUNCATE are revoked on the parent, the default partition and every new partition, and triggers refuse them for every role | W0-03 |
+| `partition_policies` | parent (PK), granularity (`day|month`), ahead (1–400), created_at. Owner-only: the list of partitioned tables `ensure_partitions` maintains. A WP that adds a partitioned table inserts its own row in its migration | W0-03 |
+| `platform_environment` | one row: env (`local|test|staging|prod`), set_at. See "Platform guards" below | W0-03 |
+| `idempotency_keys` | principal, route, key (PK together), request_hash, state (`in_flight|done`), claim_id, locked_until, status_code, response_headers, response_body (AES-256-GCM), expires_at. See [04-api.md](04-api.md) §1.6 | W0-03 |
+| `test_clock` | one row: offset_ms. Read only when `APP_ENV` is `local` or `test` | W0-03 |
 | `platform_settings` | key PK, value jsonb, unit (`paise|bp|credits|minutes|hours|days|count|meters|bool|text`), min, max, description, updated_by, updated_at. Every key from [01-product-rules.md](01-product-rules.md). Key names are exactly those in 01 §17 (D-61). D-03: money keys end in `_paise`, percentages are basis points ending in `_bp`, credits are whole numbers (e.g. `credit_min_order_value_paise = 10000`, `credit_max_per_order = 30`, `ref_qualifying_min_order_paise = 10000`). Keys with unit `paise`, `bp` or `credits` are money settings and only `super_admin` changes them (D-64). Holds on/off flags only, never provider keys or other secrets (D-19) | W0-03 |
 | `leads` | id, name, phone_enc, shop_name, city, source, created_at. Site lead form | W1-04 |
 | `places` | id, kind (`pincode|locality|city`), name, names jsonb, pincode, location, bbox. Seeded from open data | W1-06 |
@@ -265,6 +269,13 @@ Payout amount (D-09) = Σ `store_credit` balances of the business's stores − �
 Review tags (D-60), check constraint on `reviews.tags`: positive `fresh_stock`, `fair_price`, `quick_service`, `friendly`, `stock_was_right`, `well_packed`; negative `item_missing`, `slow`, `rude`, `wrong_item`, `expired_item`, `overpriced`.
 
 `risk_flags` note (D-78): Wave 2 packages raise flags (W2-03 for D-13, W2-04 for D-08 and D-12, W2-02 for D-67 store strikes and D-69 unconfirmed returns), so the table must exist before Wave 2. W0-03 creates it next to `audit_log` so any package can raise a flag; W3-02 adds the rule engine, actions and A-10/A-13.
+
+### Platform guards (W0-03)
+
+- **Partitions.** Partitioned tables get their partitions from `ensure_partitions(parent, from_ts)`, a `SECURITY DEFINER` function the worker's nightly `platform_maintenance` job calls as `todayz_app`. It works only on a table listed in `partition_policies`, owned by the schema owner, range-partitioned on one `timestamptz` column. Names are `<parent>_pYYYYMM` or `<parent>_pYYYYMMDD`, bounded at UTC midnight. New partitions copy the parent's privileges and TRUNCATE triggers. No Go code lists the partitioned tables (D-50).
+- **Roles.** `todayz_owner` runs migrations and owns every object. `todayz_app` (API, worker, seed) gets DML through default privileges and cannot run DDL.
+- **Pinned search path.** Every trigger and function the migrations define sets `search_path = pg_catalog, pg_temp` and qualifies every name, so a planted temporary table or function cannot shadow it. `TEMPORARY` is revoked from `PUBLIC` on the database.
+- **`platform_environment`.** `todayz migrate up` writes the row as the owner and refuses to run when `APP_ENV` disagrees with it. The app role can only read it. `migrate down`, `seed` and the test clock refuse to run on staging or prod, when the row disagrees with `APP_ENV`, or when the row is missing.
 
 ## 10. Analytics tables (see [05-observability.md](05-observability.md))
 
@@ -296,6 +307,7 @@ Location in analytics (D-81): analytics tables store only H3 resolution-8 cells 
 
 ## 12. Seed data
 
+- `seed` runs as `todayz_app`, not the owner, and refuses on a staging or prod database (see "Platform guards").
 - `seed dev`: 3 cities (Bengaluru, Hyderabad, Chennai), 60 stores across 6 categories with real-looking hours and pins, 3,000 master products with images from a licensed or self-shot set (placeholder initials when missing), stock for each store, 50 customers, 300 historical orders in all end states, POS sales for 30 days, reviews, referrals, credit history, 2 payout months, admin users for each role. Deterministic (fixed seed) so screenshots and tests are stable.
 - `seed demo`: same plus a scripted "live" generator for investor demos (new orders every few minutes in one area).
 - Test phone numbers `+91 90000 000xx` are reserved for seeds and accept OTP `000000` only when `APP_ENV` is `local` or `test`.

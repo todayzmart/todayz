@@ -70,6 +70,17 @@ Reasons are schemas referenced by name; values are defined once in 01 and in `sc
 
 `Idempotency-Key` header (ULID from the client) required on: order create, every order transition (customer, shop, admin), confirm-return, code verify, POS sale, POS reverse, sync, bill-claim confirm, counter-code verify, credit adjustment request and approve, payout mark-paid, every AI draft confirm. Same key + same body → same response; same key + different body → `422 idempotency_mismatch`.
 
+How it works (W0-03, `platform/idempotency`):
+
+- It is opt-in per route: a route declares `IdempotencyRequired` (a missing header is `400 idempotency_key_required`) or `IdempotencyOptional` in its route policy. Other routes ignore the header. It applies to POST, PUT, PATCH and DELETE only. A key that is not a ULID is `400 idempotency_key_invalid`.
+- A record is scoped by principal + method and path + key, and kept 24 h with the response.
+- "Same body" means the same raw bytes: the request hash covers the raw query string and the raw body bytes, so reordered JSON is a different request.
+- The first request claims the key with a claim id and a 3-minute lease (longer than the 60 s write timeout). A second request with the same key while the first runs gets `409 conflict` with `Retry-After: 1`. Only the holder of the claim id can complete or release the key.
+- Replays repeat the stored status, body and an allow-list of headers (`Content-Type`, `Content-Language`, `Location`, `ETag`, `Cache-Control`, `Retry-After`) and add `Idempotent-Replayed: true`.
+- Stored response bodies are encrypted with AES-256-GCM under `PII_ENC_KEY`.
+- Never stored, and the key is released so a retry runs again: a 5xx, a body over 1 MB, a panic, and any response with `Cache-Control: no-store` (auth, OTP and token responses).
+- If the response was sent but storing it fails, the key is held until its lease ends (releasing would let a retry run the request twice). The failure is logged at Error and counted in `tz_idempotency_complete_failures`; alert on that metric.
+
 ## 2. Endpoint groups
 
 **Pkg** = the work package that owns the endpoint (07). The domain file is named in each heading.
@@ -391,9 +402,28 @@ Insight text (AI-R4) and coach cards (AI-R5) come back inside `{S}/insights` and
 | POST | /v1/rum | pub, rate-limited | W1-07 | batched web vitals + long tasks + API timings from browsers (sendBeacon) |
 | POST | /v1/events | pub, rate-limited | W1-07 | batched product events (≤ 50 per call, schema-validated against `shared/telemetry/events/<domain>.yaml`) |
 | POST | /v1/client-errors | pub, rate-limited | W1-07 | only when Sentry is off |
-| GET/POST | /v1/test/clock | none | W0-03 | read / set / advance the fake clock, for manual testing of timers and expiries as well as automated tests; registered only when `APP_ENV` is `local` or `test`; staging and prod builds return `404` (D-46, D-80) |
+| GET/POST | /v1/test/clock | none | W0-03 | read / set / advance the fake clock, for manual testing of timers and expiries as well as automated tests; registered only when `APP_ENV` is `local` or `test` and `API_ADDR` is a loopback address; staging and prod builds return `404` (D-46, D-80). Contract below |
 
-`GET /healthz` (process up), `GET /readyz` (DB reachable, migrations at head, River running), `GET /version` (git sha, build time) sit outside `/v1`. Not exposed through Cloudflare except `/version`. Owner W0-03.
+`GET /healthz`, `GET /readyz` and `GET /version` sit outside `/v1`. Owner W0-03. The API and the worker both serve `/healthz` and `/readyz`. They are plain JSON, not problem JSON, and send `Cache-Control: no-store`.
+
+| Endpoint | Meaning | Response |
+|---|---|---|
+| `/healthz` | Process is up. Never touches a dependency. | `200 {"status":"ok"}` |
+| `/readyz` | DB reachable, migrations at head, River running. Result cached 2 s; one run in flight at a time. | `200 {"status":"ok","checks":{"db":"ok","migrations":"ok","river":"ok"}}`. When a check fails: `503 {"status":"unavailable","checks":{"db":"fail",...}}`. Error text never appears in the body; it is logged. |
+| `/version` | Build info. On the API only in `local` and `test`. On the worker's internal port (`WORKER_ADDR`, 8181) in every environment. | `200 {"version","commit","buildTime","dirty"}` |
+
+The load balancer health check uses `/readyz`. Nothing in this table is exposed through Cloudflare.
+
+**Test clock contract (`/v1/test/clock`, D-80).** Registered only when `APP_ENV` is `local` or `test`, the database's `platform_environment` row agrees, and `API_ADDR` is a loopback address (`localhost`, `127.0.0.0/8`, `::1`; `:8180` is not). Otherwise it answers `404`.
+
+| Call | Body | Response |
+|---|---|---|
+| `GET` | none | `200 {"now","offsetMs"}` |
+| `POST` | `{"advance":"5m"}` (Go duration above zero; concurrent advances add up) | `200 {"now","offsetMs","dueJobs"}` |
+| `POST` | `{"set":"<RFC 3339>"}` | same |
+| `POST` | `{"reset":true}` | same |
+
+`POST` takes JSON only (`415 unsupported_media_type` otherwise) and exactly one of `advance`, `set`, `reset` (`422 validation_failed` otherwise). An optional `"wait"` (default `10s`, at most `50s`, `0s` to skip) bounds how long the call waits for River to work the jobs that became due; `dueJobs` is how many were still due when it returned.
 
 ### 2.10 Open items
 
