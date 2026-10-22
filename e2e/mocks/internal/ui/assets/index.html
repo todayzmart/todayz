@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>TodayZ mocks</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/assets/tz.css">
+<link rel="stylesheet" href="/assets/mocks.css">
+</head>
+<body>
+<svg class="tz-mock-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+  <!-- Lucide icons (ISC licence), stroke 2 -->
+  <symbol id="i-sms" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="i-push" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+  <symbol id="i-turnstile" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-stt" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></symbol>
+  <symbol id="i-llm" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+</svg>
+
+<header class="tz-mock-head">
+  <div class="tz-mock-head-inner">
+    <div>
+      <p class="tz-mock-overline">Local and test only</p>
+      <h1 class="tz-page-title">TodayZ mocks</h1>
+      <p class="tz-page-sub tz-mock-sub">Provider look-alikes for SMS, WhatsApp, push, Turnstile, speech-to-text and the LLM. Nothing here leaves this machine.</p>
+    </div>
+    <div class="tz-mock-status">
+      <span class="tz-pill tz-pill-completed" id="live-pill">Live</span>
+      <span class="tz-pill" id="llm-mode">LLM: fixtures</span>
+    </div>
+  </div>
+</header>
+
+<main class="tz-mock-main">
+  <nav class="tz-seg tz-mock-tabs" aria-label="Capture kind">
+    <button type="button" data-kind="sms" aria-pressed="true"><svg class="tz-ico"><use href="#i-sms"/></svg>SMS <span class="tz-mock-count" data-count="sms">0</span></button>
+    <button type="button" data-kind="whatsapp" aria-pressed="false"><svg class="tz-ico"><use href="#i-whatsapp"/></svg>WhatsApp <span class="tz-mock-count" data-count="whatsapp">0</span></button>
+    <button type="button" data-kind="push" aria-pressed="false"><svg class="tz-ico"><use href="#i-push"/></svg>Push <span class="tz-mock-count" data-count="push">0</span></button>
+    <button type="button" data-kind="turnstile" aria-pressed="false"><svg class="tz-ico"><use href="#i-turnstile"/></svg>Turnstile <span class="tz-mock-count" data-count="turnstile">0</span></button>
+    <button type="button" data-kind="stt" aria-pressed="false"><svg class="tz-ico"><use href="#i-stt"/></svg>STT <span class="tz-mock-count" data-count="stt">0</span></button>
+    <button type="button" data-kind="llm" aria-pressed="false"><svg class="tz-ico"><use href="#i-llm"/></svg>LLM <span class="tz-mock-count" data-count="llm">0</span></button>
+  </nav>
+
+  <section class="tz-card tz-mock-card">
+    <div class="tz-card-head tz-card-head-split">
+      <div>
+        <h2 class="tz-card-title" id="kind-title">SMS</h2>
+        <p class="tz-card-desc" id="kind-desc"></p>
+      </div>
+      <div class="tz-mock-actions">
+        <button type="button" class="tz-btn tz-btn-sm tz-btn-ghost" id="toggle-live" aria-pressed="false"><svg class="tz-ico"><use href="#i-pause"/></svg><span>Pause</span></button>
+        <button type="button" class="tz-btn tz-btn-sm" id="refresh"><svg class="tz-ico"><use href="#i-refresh"/></svg>Refresh</button>
+        <button type="button" class="tz-btn tz-btn-sm tz-btn-soft-danger" id="clear"><svg class="tz-ico"><use href="#i-trash"/></svg>Clear</button>
+      </div>
+    </div>
+    <div class="tz-table-wrap tz-mock-tablewrap">
+      <table class="tz-table tz-mock-table">
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <p class="tz-mock-empty" id="empty" hidden>Nothing captured yet.</p>
+    </div>
+    <div class="tz-card-foot">
+      <span id="foot-left">Newest first. Refreshes every 2 seconds.</span>
+      <span id="foot-right"></span>
+    </div>
+  </section>
+
+  <div class="tz-banner tz-mock-note">
+    <svg class="tz-ico"><use href="#i-info"/></svg>
+    <div>This page shows full phone numbers and codes because it only runs on this machine. Never copy a code or number from here into a report or snapshot. JSON for tests: <span class="tz-kbd">GET /_mock/sms?to=</span> <span class="tz-kbd">GET /_mock/sms/latest-otp?to=</span> <span class="tz-kbd">DELETE /_mock/reset</span></div>
+  </div>
+</main>
+<script src="/assets/app.js" defer></script>
+</body>
+</html>

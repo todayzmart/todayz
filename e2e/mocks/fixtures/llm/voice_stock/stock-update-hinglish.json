@@ -1,0 +1,21 @@
+{
+  "description": "The sample Hinglish utterance in fixtures/stt. store_item_id values are placeholders: W3-04 swaps in seeded ids or matches on unmatched_text.",
+  "match": {
+    "contains": ["do kilo atta"],
+    "tool": "record_stock_lines"
+  },
+  "response": {
+    "content": [
+      {
+        "type": "tool_use",
+        "name": "record_stock_lines",
+        "input": {
+          "lines": [
+            {"action": "sale", "unmatched_text": "atta", "quantity": 2, "unit": "kg", "price": null},
+            {"action": "sale", "store_item_id": "00000000-0000-4000-8000-0000000000a1", "quantity": 5, "unit": "pack", "price": null}
+          ]
+        }
+      }
+    ]
+  }
+}

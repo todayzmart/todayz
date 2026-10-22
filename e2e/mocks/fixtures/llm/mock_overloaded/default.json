@@ -1,0 +1,5 @@
+{
+  "description": "Set metadata.user_id to \"tz:mock_overloaded:<id>\" to test retry and fallback paths.",
+  "match": {},
+  "error": {"status": 529, "type": "overloaded_error", "message": "Overloaded"}
+}

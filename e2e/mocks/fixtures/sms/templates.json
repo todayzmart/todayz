@@ -1,0 +1,6 @@
+{
+  "tz_otp_login": "##OTP## is your TodayZ login code. It expires in ##expiry## minutes. Do not share it with anyone.",
+  "tz_order_ready": "Your TodayZ order ##order## is ready for pickup at ##store##. Show code ##code## at the counter.",
+  "tz_order_update": "TodayZ: order ##order## is now ##status##.",
+  "tz_receipt": "Thanks for shopping at ##store##. Your receipt: ##link##"
+}

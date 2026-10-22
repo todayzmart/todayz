@@ -1,0 +1,17 @@
+{
+  "description": "Any other voice_stock call: one unmatched line, so the draft asks the person to pick the item.",
+  "match": {},
+  "response": {
+    "content": [
+      {
+        "type": "tool_use",
+        "name": "record_stock_lines",
+        "input": {
+          "lines": [
+            {"action": "sale", "unmatched_text": "item not recognised", "quantity": 1, "unit": "piece", "price": null}
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "order_ready": "Your order {{1}} at {{2}} is ready for pickup.",
+  "order_update": "Order {{1}} is now {{2}}.",
+  "receipt": "Thanks for shopping at {{1}}. Your receipt: {{2}}"
+}

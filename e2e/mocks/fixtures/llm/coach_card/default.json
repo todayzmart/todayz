@@ -1,0 +1,9 @@
+{
+  "description": "A short coach card with no numbers, so the number-grounding validator has nothing to reject.",
+  "match": {},
+  "response": {
+    "content": [
+      {"type": "text", "text": "Maggi and Amul milk led sales yesterday. Keep both stocked before the evening rush."}
+    ]
+  }
+}
