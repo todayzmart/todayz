@@ -15,8 +15,8 @@
 
 | Service | Image / process | Host |
 |---|---|---|
-| Postgres 16 + PostGIS 3.4 | `postgis/postgis:16-3.4` with `shared_preload_libraries=pg_stat_statements` | `localhost:5432` |
-| MinIO (R2 stand-in) | `minio/minio` | `s3.todayz.localhost` |
+| Postgres 16 + PostGIS 3.4 | `postgis/postgis:16-3.4` (amd64) or the same build multi-arch as `imresamu/postgis:16-3.4` (arm64), with `shared_preload_libraries=pg_stat_statements` | `127.0.0.1:5433` (5432 is left for a developer's own Postgres; D-86) |
+| MinIO (R2 stand-in) | `pgsty/minio` (MinIO stopped publishing images; D-86) | `s3.todayz.localhost` (API 9100, console 9101) |
 | API + worker | `go run ./cmd/todayz api|worker` with `air` hot reload | `api.todayz.localhost` |
 | Customer / business / admin | Vite dev servers | `app.` `business.` `admin.todayz.localhost` |
 | Site | Astro dev | `todayz.localhost` |

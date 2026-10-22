@@ -496,3 +496,12 @@ There is no `make seed`; use `make reset`.
 - Only `finance` and `super_admin` can export, with step-up. Every export is audited.
 - Screens show masked values only.
 - The delivery-failed timers (2 h, 24 h, 72 h) and the 30-day strike window are fixed constants in code, not settings.
+
+**D-86 · Local stack images and ports (Wave 0 build).**
+- Local Postgres runs on host port 5433, because 5432 is left free for a developer's own Postgres. The full port table is in the root `CLAUDE.md`.
+- Which PostGIS image:
+  - amd64 uses `postgis/postgis:16-3.4`.
+  - arm64 uses `imresamu/postgis:16-3.4`, the same docker-postgis build published multi-arch; the official image is amd64 only.
+  - `TODAYZ_POSTGIS_IMAGE` overrides the choice. The local stack and testcontainers use the same image.
+- MinIO stopped publishing images, so the local R2 stand-in uses `pgsty/minio` with a pinned tag. These images are used locally only; staging and prod use RDS and R2.
+- macOS ships GNU Make 3.81, which ignores `.SHELLFLAGS`. Recipes therefore run through `scripts/make-shell.sh` (bash `-euo pipefail`), and every canonical target stops at its first failing step. `scripts/test/make-fail-fast.sh` guards this.

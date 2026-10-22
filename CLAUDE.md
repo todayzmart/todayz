@@ -6,7 +6,7 @@ Indian hyperlocal retail: shops digitise their stock; customers search what is n
 
 1. `docs/plan/README.md`: the build plan, waves, roles, Definition of done
 2. `docs/plan/01-product-rules.md`: every product rule and number (single source of truth)
-3. `docs/plan/12-decision-log.md`: why the plan says what it says (D-01…D-60). If a numbered plan file disagrees with it, the numbered file is wrong: fix it and add an entry
+3. `docs/plan/12-decision-log.md`: why the plan says what it says (D-01…D-86). If a numbered plan file disagrees with it, the numbered file is wrong: fix it and add an entry
 4. The plan file for your area (architecture, data model, API, observability, screens, work packages, testing, infra, AI)
 5. The `CLAUDE.md` in the folder you are changing
 

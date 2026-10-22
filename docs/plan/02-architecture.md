@@ -160,7 +160,7 @@ Rule: domain packages depend on `platform`, never on each other's internals. Cro
 | Errors | `sentry-go` | Grouping, releases, user impact |
 | Validation | spec validation + hand-written domain checks | |
 | Images | `disintegration/imaging` or libvips via `govips` | Resize to WebP on upload |
-| Testing | `testing`, `testify/require`, `testcontainers-go` (postgis/postgis:16-3.4), `go-cmp`, `rapid` (property tests for the ledger) | |
+| Testing | `testing`, `testify/require`, `testcontainers-go` (PostGIS 16-3.4; the image comes from `TODAYZ_POSTGIS_IMAGE`, multi-arch on arm64, D-86), `go-cmp`, `rapid` (property tests for the ledger) | |
 | Lint/security | `golangci-lint`, `gosec`, `govulncheck` | |
 
 No Redis in v1. Rate limits use Cloudflare at the edge plus an in-process token bucket per instance with Postgres-backed counters for OTP (the only limit that must be exact). Caches are in-process (settings, categories) with short TTLs and a Postgres `LISTEN/NOTIFY` invalidation.
