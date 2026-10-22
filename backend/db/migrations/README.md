@@ -76,3 +76,4 @@ runs them; `make reset` and `make dev` run `up`.
 | `00001_w0-03_baseline.sql` | W0-03 | extension check, `touch_updated_at`, `partition_policies`, `ensure_partitions`, `append_only`, `platform_environment`, `platform_settings` (+ NOTIFY), `audit_log` (monthly partitions, append-only), `risk_flags` (D-78), `idempotency_keys`, `test_clock` (D-80) |
 | `00002_w0-03_settings_seed.sql` | W0-03 | every 01 §17 key with its unit and default (D-61) |
 | (Go) version 3 | W0-03 | River schema 8 (`internal/platform/migrate`) |
+| `00010_w0-03_settings_d91_d95.sql` | lead | the five D-91–D-94 keys and `job_runs_retention_days` (D-95). A key added to 01 §17 after W0-03 is seeded by its own Wave 0 settings migration in the same merge |

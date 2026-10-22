@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/todayz/backend/internal/platform/migrate"
+	settingspkg "github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/testkit"
 )
 
@@ -55,7 +56,9 @@ func TestUpDownUp(t *testing.T) {
 
 	n, err := m.Up(ctx)
 	require.NoError(t, err)
-	require.Equal(t, int(m.Head()), n)
+	st, err := m.Status(ctx)
+	require.NoError(t, err)
+	require.Len(t, st, n) // numbers have gaps (D-89 blocks), so count, not Head()
 	ok, err = m.AtHead(ctx)
 	require.NoError(t, err)
 	require.True(t, ok)
@@ -66,9 +69,9 @@ func TestUpDownUp(t *testing.T) {
 
 	var settings int
 	require.NoError(t, db.Pool.QueryRow(ctx, `SELECT count(*) FROM platform_settings`).Scan(&settings))
-	require.Equal(t, 78, settings)
+	require.Equal(t, len(settingspkg.AllKeys), settings) // every 01 §17 key is seeded
 
-	st, err := m.Status(ctx)
+	st, err = m.Status(ctx)
 	require.NoError(t, err)
 	for _, s := range st {
 		require.True(t, s.Applied, s.Name)

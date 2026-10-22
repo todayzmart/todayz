@@ -8,6 +8,7 @@ package settings
 
 import (
 	"encoding/json"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -107,21 +108,38 @@ func parseProductRules(t *testing.T, path string) map[Key]docRow {
 	return out
 }
 
+// seedMigrationRows collects the platform_settings rows inserted by every
+// migration's Up section. A key added to 01 §17 after W0-03 is seeded by its
+// own migration (D-95), so the check cannot read 00002 alone.
 func seedMigrationRows(t *testing.T) map[Key]docRow {
 	t.Helper()
-	b, err := dbschema.Migrations.ReadFile("migrations/00002_w0-03_settings_seed.sql")
+	entries, err := fs.ReadDir(dbschema.Migrations, "migrations")
 	require.NoError(t, err)
-	up := strings.SplitN(string(b), "-- +goose Down", 2)[0]
 	out := map[Key]docRow{}
-	for _, line := range strings.Split(up, "\n") {
-		m := reSQLRow.FindStringSubmatch(line)
-		if m == nil {
+	from := map[Key]string{}
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".sql") {
 			continue
 		}
-		var v any
-		require.NoError(t, json.Unmarshal([]byte(m[2]), &v), "seed %s value", m[1])
-		canon, _ := json.Marshal(v)
-		out[Key(m[1])] = docRow{Unit: Unit(m[3]), Default: string(canon)}
+		b, err := dbschema.Migrations.ReadFile("migrations/" + e.Name())
+		require.NoError(t, err)
+		up := strings.SplitN(string(b), "-- +goose Down", 2)[0]
+		if !strings.Contains(up, "INSERT INTO platform_settings") {
+			continue
+		}
+		for _, line := range strings.Split(up, "\n") {
+			m := reSQLRow.FindStringSubmatch(line)
+			if m == nil {
+				continue
+			}
+			k := Key(m[1])
+			require.Empty(t, from[k], "%s is seeded by both %s and %s", k, from[k], e.Name())
+			from[k] = e.Name()
+			var v any
+			require.NoError(t, json.Unmarshal([]byte(m[2]), &v), "seed %s value", m[1])
+			canon, _ := json.Marshal(v)
+			out[k] = docRow{Unit: Unit(m[3]), Default: string(canon)}
+		}
 	}
 	require.NotEmpty(t, out)
 	return out

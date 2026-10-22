@@ -1,7 +1,7 @@
 package settings
 
 // Keys from docs/plan/01-product-rules.md §17 (D-61). TestKeysMatchMigration
-// keeps this list, the seed migration and 01 §17 identical.
+// keeps this list, the seed migrations and 01 §17 identical.
 //
 // #nosec G101 -- these are setting key names, not credentials (D-19).
 const (
@@ -94,9 +94,17 @@ const (
 	MinClientVersionCustomer Key = "min_client_version_customer" // text, default 0.0.0
 	MinClientVersionBusiness Key = "min_client_version_business" // text, default 0.0.0
 	MinClientVersionAdmin    Key = "min_client_version_admin"    // text, default 0.0.0
+
+	// Added after W0-03 (D-91–D-95; seeded by 00010_w0-03_settings_d91_d95.sql)
+	OrderUnseenSmsAfterMin      Key = "order_unseen_sms_after_min"       // minutes, default 3
+	PickupHoldReminderMin       Key = "pickup_hold_reminder_min"         // minutes, default 10
+	RiskCodeLockoutsStorePerDay Key = "risk_code_lockouts_store_per_day" // count, default 10
+	CreditExpiryReminderDays    Key = "credit_expiry_reminder_days"      // days, default 7
+	ReviewEditWindowDays        Key = "review_edit_window_days"          // days, default 7
+	JobRunsRetentionDays        Key = "job_runs_retention_days"          // days, default 90
 )
 
-// AllKeys lists every key in 01 §17 order.
+// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95).
 var AllKeys = []Key{
 	OrderAcceptTimeoutMin,
 	PickupHoldMin,
@@ -176,4 +184,10 @@ var AllKeys = []Key{
 	MinClientVersionCustomer,
 	MinClientVersionBusiness,
 	MinClientVersionAdmin,
+	OrderUnseenSmsAfterMin,
+	PickupHoldReminderMin,
+	RiskCodeLockoutsStorePerDay,
+	CreditExpiryReminderDays,
+	ReviewEditWindowDays,
+	JobRunsRetentionDays,
 }

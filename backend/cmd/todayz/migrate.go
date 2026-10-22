@@ -51,6 +51,17 @@ func runMigrate(ctx context.Context, action string, getenv func(string) string, 
 	}
 	defer func() { _ = m.Close() }()
 
+	// Only the schema owner migrates. A migration that is only DML (a settings
+	// seed) would otherwise run as todayz_app as well.
+	var isOwner bool
+	if err := pool.QueryRow(ctx, `SELECT pg_catalog.pg_get_userbyid(nspowner) = current_user
+		FROM pg_catalog.pg_namespace WHERE nspname = 'public'`).Scan(&isOwner); err != nil {
+		return err
+	}
+	if !isOwner {
+		return errors.New("DATABASE_MIGRATE_URL must connect as the owner of schema public (todayz_owner)")
+	}
+
 	switch action {
 	case "up":
 		if err := dbenv.CheckMatches(ctx, pool, cfg.Env); err != nil {
