@@ -90,7 +90,7 @@ Format: `ID · Given / When / Then · level (U unit, I integration, E E2E, M man
 | BK-16 | 3 no-shows in 30 days → 4th order allowed only if no other active order; banner shows until the limit ends 14 days later | I,E |
 | BK-17 | Customer cancels in `placed`, `accepted`, `ready` → `cancelled`, holds released, store notified; cancel in `collected` → 409 `invalid_transition` | I |
 | BK-18 | Shop cancels an accepted order (manager or owner) with a `ShopCancelReason` (`out_of_stock`, `customer_unreachable`, `closing_soon`, `other` with a note; D-68) → `cancelled`, customer notified, credits and reservations released; no strike and no reliability effect (D-68), counted in the store's order-outcome breakdown (B-12) and visible to admin on A-05. A cashier → 403 (D-65); a reason outside the list, or `other` without a note → 422 | I |
-| BK-19 | Race: customer cancel and shop accept at the same millisecond → exactly one wins; the loser gets 409; ledger and stock consistent | I |
+| BK-19 | Race: customer cancel and shop accept at the same millisecond → they serialise on the order row. Cancel first: the accept gets 409 `invalid_transition`. Accept first: the cancel then cancels the accepted order (a customer may cancel in `accepted`, BK-17). Either way the order ends `cancelled`, every hold is released exactly once, and ledger and stock are consistent (D-108) | I |
 | BK-20 | Race: expiry job and code verify at hold_until ± 1 s → exactly one outcome; if collected, no strike | I |
 | BK-21 | Expiry job runs twice or late by 5 min → second run no-op; late run still applies the correct outcome based on state | I |
 | BK-22 | Auto-accept store with all items available → accepted instantly; with an unavailable item → stays `placed` for manual decision | I |

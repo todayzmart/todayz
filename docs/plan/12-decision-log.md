@@ -793,3 +793,28 @@ There is no `make seed`; use `make reset`.
 - **Validation order.** The validator runs before authz (422 before 403), the platform's pipeline order.
 - **Seed.** Only Lakshmi Traders has staff (owner, manager, cashier). That is enough for the core-loop business journey.
 - Lives in: `backend/internal/business/`, `backend/db/queries/business/`, `backend/cmd/todayz/routes_business.go`; `business/src/app/shop.ts`; `docs/qa/W1-04/REPORT.md`; W1-04.
+
+**D-108 · Orders: cancel races, deadlines, the pickup code and deferrals (lead, 2026-10-24).** From W2-02, its open questions and its review.
+- **BK-19, a customer cancel racing a shop accept.** The two serialise on the order row (`FOR UPDATE`).
+  - Cancel first: the accept answers 409 `invalid_transition`.
+  - Accept first: the cancel then cancels the accepted order, because a customer may cancel in `accepted` (01 §6, BK-17).
+  - Either way the order ends `cancelled` and every hold is released exactly once. A cancel failing would need an If-Match precondition on the customer's cancel, and nothing gains from it: no money moves before the shop (pay at the shop). 08-testing BK-19 is reworded to match.
+- **Deadlines are strict.** After `accept_by` the shop cannot accept, and after `hold_until` it cannot hand over or cancel, even before the timer has run. A cancel in that gap answers 409, and the timer then expires the order as `no_show`.
+- **Hand-over** (`verify-code`) is allowed from `accepted` or `ready`; `ready` is optional (01 §6).
+- **Pickup code:**
+  - It is returned only on the customer's own `GET /v1/me/orders/{orderId}`, while the order is `accepted` or `ready` and the code is not locked; everywhere else it is `null`.
+  - A wrong code answers 422 `code_invalid` with `attemptsLeft`. The 5th wrong try locks it: 409 `code_locked`, and the right code is refused too.
+  - `new-code` replaces a locked code only.
+  - `codeTries = 5` is fixed by 01 §6, not a setting.
+- **Code-lockout risk flag** (01 §6, `risk_code_lockouts_store_per_day`): deferred to the risk WP. The count comes from `orders.code_locked_at` per store per IST day, so nothing more needs storing now.
+- **Totals in the guard trigger:** not frozen after placing, because partial accept (BK-08–10) will change them. `ck_orders_money` keeps them consistent.
+- **Deferred with W2-02:**
+  - partial accept (422 for now) and confirm-partial;
+  - delivery, dispatch and returns (409 for now);
+  - credits and cashback (0);
+  - store reliability and risk flags;
+  - auto-accept;
+  - admin cancel;
+  - the reconcile sweep for timers River discards (runbook `docs/runbooks/orders-timers.md`);
+  - `cancelled` and `no_show` notification variants (generic text for now).
+- Lives in: `backend/internal/orders/`, `backend/db/migrations/20201_w2-02_orders.sql`, `backend/cmd/todayz/routes_orders.go`; `docs/qa/W2-02/REPORT.md`; W2-02.
