@@ -65,6 +65,7 @@ args=(run "$spec" --url "$base"
   --generation-database none
   --max-failures 20
   --exclude-operation-id getTestSlow --exclude-operation-id getTestSlowSql # they sleep up to 30 s by design (W1-07)
+  --exclude-operation-id postEvents # event names and props are checked against the catalogue (422), which the schema cannot express; tested in internal/telemetry (W1-07)
   --report junit --report-dir "$out")
 case "$mode" in
   smoke) args+=(--phases "examples,coverage") ;;
