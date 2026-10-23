@@ -67,7 +67,38 @@ The dashboard was built ahead of its stage for this demo; it moves to live data 
 - The real anti-bot key (Turnstile) and the API address for the site form.
 - Cloud accounts (AWS and Cloudflare) when we reach stage 5.
 
-## Timeline (revised estimate)
+## Plan for this weekend (chosen 23 October)
+
+We cut the weekend to the core loop: the smallest version of TodayZ that works from start to finish.
+
+**Goal by Sunday night, 25 October, running locally:**
+1. A customer signs in with an OTP and searches what is in stock nearby.
+2. The customer books an item and gets a pickup code.
+3. The shop sees the new order straight away, accepts it, and hands it over at the counter after checking the code.
+
+**How we get there:**
+
+| When | Work |
+|---|---|
+| Friday evening (started) | Sign-in core, background jobs, monitoring, cloud setup files (written, not applied) |
+| Saturday | Admin sign-in and account deletion, shop sign-up and stores, catalogue and stock, nearby search, app shells with sign-in |
+| Saturday night to Sunday | Booking and pickup codes, live order alerts to the shop, the customer's search, shop and checkout screens, the shop's order screen, one end-to-end test of the whole loop |
+
+**Not in the weekend cut:**
+- The shop till (POS) and offline sales.
+- Credits, cashback, referrals, offers and reviews. Booking uses simple stand-ins for credits and offer pricing until these are built.
+- Payouts, fraud rules, AI features, voice search and the admin console.
+- The full test suite.
+
+**Afterwards:** the rest of stage 2, then stages 3 and 4, take about 2 to 3 weeks. Cloud launch follows about a week after that, once the accounts are ready.
+
+**Risks:**
+- The sign-in, shop and catalogue packages run one after another, so a delay in sign-in pushes everything behind it.
+- Usage limits paused work once today.
+
+Every piece is still reviewed and tested before it joins the main build; we are cutting scope, not checks.
+
+## Full plan timeline (for reference)
 
 The first target was stages 0 to 4 within a day, which was not realistic: stage 0 alone took about a day and a half, because each piece is reviewed and fixed before the next one builds on it.
 

@@ -1,0 +1,181 @@
+<title>TodayZ Build Progress</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Latin:wght@500;600;700&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: one reading column on a white page; a mint wash band for the headline, then plain sections. Light only, per the TodayZ design system. */
+:root {
+  --page: #ffffff;
+  --ink: #141714;
+  --muted: #5b625d;
+  --line: #e4ebe6;
+  --mint: #eaf7ef;
+  --brand: #12804a;
+  --amber-tint: #fff5e6;
+  --amber-ink: #8a5300;
+  --sky-tint: #edf4fd;
+  --display: "Anek Latin", "Anek", system-ui, sans-serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--page); color: var(--ink); font-family: var(--body);
+  font-size: 15.5px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 56px;
+}
+.wrap { max-width: 860px; margin: 0 auto; display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 5vw, 42px); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 22px; font-weight: 600; }
+h3 { font-size: 16px; font-weight: 600; }
+p { margin: 0; max-width: 66ch; }
+.label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+section { display: grid; gap: 16px; min-width: 0; }
+
+.head {
+  background: var(--mint); border-radius: 0 0 20px 20px;
+  padding-block: 36px 32px; padding-inline: 28px;
+  display: grid; gap: 14px;
+}
+.head .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--muted); font-size: 14px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500;
+  background: var(--page); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brand); }
+
+.show { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.show article { border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 8px; align-content: start; }
+.show article p { font-size: 14.5px; color: var(--muted); }
+
+.waves { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; min-width: 560px; }
+th, td { text-align: left; padding: 11px 10px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 14.5px; }
+th { font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+td.n { white-space: nowrap; }
+.bar { height: 6px; background: var(--line); border-radius: 3px; width: 110px; margin-top: 7px; }
+.bar i { display: block; height: 100%; background: var(--brand); border-radius: 3px; }
+.state { display: inline-block; font-size: 12.5px; font-weight: 600; border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
+.s-done { background: var(--mint); color: var(--brand); }
+.s-now { background: var(--amber-tint); color: var(--amber-ink); }
+.s-next { background: var(--sky-tint); color: #2a5a93; }
+
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px; }
+ul { margin: 0; padding-left: 18px; display: grid; gap: 7px; }
+li { max-width: 62ch; }
+.nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.nums div { border-top: 2px solid var(--ink); padding-top: 8px; }
+.nums b { font-family: var(--display); font-size: 26px; font-weight: 600; display: block; font-variant-numeric: tabular-nums; }
+.nums span { font-size: 13.5px; color: var(--muted); }
+.note { background: var(--amber-tint); border-radius: 12px; padding: 16px 18px; display: grid; gap: 6px; }
+.note p { font-size: 14.5px; }
+footer { color: var(--muted); font-size: 13px; }
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <span class="label">TodayZ · build update</span>
+    <h1>Foundation done. First screens are working.</h1>
+    <p>TodayZ lets neighbourhood shops put their stock online so people nearby can find an item, book it and pick it up. This page covers what is built, what you can see today and the time left to a tested product.</p>
+    <div class="meta">
+      <span>Friday, 23 October 2026</span>
+      <span class="pill"><span class="dot"></span>Everything runs locally; nothing is deployed yet</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>What we can show today</h2>
+    <div class="show">
+      <article>
+        <span class="label">Business app</span>
+        <h3>The shop owner's dashboard</h3>
+        <p>Today's sales against last week, new orders with a countdown to accept, demand insights such as what sells fast and what is about to expire, and top items. Desktop and phone. It runs on sample data and is labelled that way.</p>
+      </article>
+      <article>
+        <span class="label">Website</span>
+        <h3>The new marketing site</h3>
+        <p>Home, for retailers, pricing, how it works, contact and the legal pages, with a lead form for shops. English is final; Hindi, Kannada, Telugu and Tamil are machine drafts awaiting native review.</p>
+      </article>
+      <article>
+        <span class="label">Design system</span>
+        <h3>32 reusable components</h3>
+        <p>Product and store cards, the map with nearby shops, the till cart, pickup codes, order timeline and dashboard tiles. Every app is built from these, so screens look the same everywhere.</p>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <h2>Progress by stage</h2>
+    <p>The build is split into six stages. Each stage has a set of work packages that run in parallel and are tested before the next stage starts.</p>
+    <div class="waves">
+      <table>
+        <thead><tr><th>Stage</th><th>What it delivers</th><th>Packages</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>0 · Foundation</td><td>Local servers, backend skeleton, API contract, safe shutdown, test and release tooling, stand-ins for SMS, WhatsApp and AI</td><td class="n">8 of 8<div class="bar"><i style="width:100%"></i></div></td><td><span class="state s-done">Done</span></td></tr>
+          <tr><td>1 · Platform</td><td>Login, shop sign-up, catalogue and stock, nearby search, design system, languages, monitoring, website</td><td class="n">3 of 11<div class="bar"><i style="width:27%"></i></div></td><td><span class="state s-now">In progress</span></td></tr>
+          <tr><td>2 · Core flows</td><td>Bookings, pickup codes, the shop till, credits, referrals, notifications, delivery, the customer and shop screens</td><td class="n">0 of 13<div class="bar"><i style="width:0"></i></div></td><td><span class="state s-next">Next</span></td></tr>
+          <tr><td>3 · Money, insights, AI</td><td>Payouts, fraud rules, demand insights, voice search, AI drafts, admin console, dashboards and alerts</td><td class="n">0 of 16<div class="bar"><i style="width:0"></i></div></td><td><span class="state s-next">Later</span></td></tr>
+          <tr><td>4 · Hardening</td><td>End-to-end journeys, load, security and accessibility testing, translations, manual QA</td><td class="n">0 of 7<div class="bar"><i style="width:0"></i></div></td><td><span class="state s-next">Later</span></td></tr>
+          <tr><td>5 · Cloud and launch</td><td>AWS and Cloudflare, staging, production</td><td class="n">0 of 5<div class="bar"><i style="width:0"></i></div></td><td><span class="state s-next">After stage 4</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The business dashboard was built ahead of its stage for this demo. It will move to live data in stage 3.</p>
+  </section>
+
+  <section>
+    <h2>Quality so far</h2>
+    <div class="nums">
+      <div><b>600+</b><span>automated tests passing across the parts built</span></div>
+      <div><b>0</b><span>accessibility problems found on the dashboard and 156 component screens</span></div>
+      <div><b>100</b><span>Google Lighthouse score for the English home page on mobile</span></div>
+      <div><b>5</b><span>languages wired in from day one</span></div>
+    </div>
+    <p>Every change is reviewed and tested before it joins the main build. No real customer data is used anywhere; all screens show sample shops and products.</p>
+  </section>
+
+  <section class="cols">
+    <div style="display:grid;gap:12px;min-width:0">
+      <h2>Not real yet</h2>
+      <ul>
+        <li>No login, orders or payments. Those arrive in stages 1 and 2.</li>
+        <li>The dashboard shows sample numbers. Its buttons show a notice and change nothing.</li>
+        <li>Indian-language copy is machine translated and needs native review before launch.</li>
+        <li>Nothing is online yet. The site and apps run on the build machine only.</li>
+      </ul>
+    </div>
+    <div style="display:grid;gap:12px;min-width:0">
+      <h2>Decisions we need</h2>
+      <ul>
+        <li>Legal sign-off on the privacy and terms pages, and a named grievance officer.</li>
+        <li>Native reviewers for Hindi, Kannada, Telugu and Tamil.</li>
+        <li>The old website's page list, so links keep working after the switch.</li>
+        <li>Cloud accounts (AWS and Cloudflare) when we reach stage 5.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Timeline</h2>
+    <div class="note">
+      <span class="label" style="color:var(--amber-ink)">Revised estimate</span>
+      <p>The first target was stages 0 to 4 within a day. That was not realistic: stage 0 alone took about a day and a half, because each piece is reviewed and fixed before the next one builds on it.</p>
+      <p>At the current pace, a fully tested product running locally (end of stage 4) is about <b>3 to 4 weeks</b> away, with launch in the cloud about a week after that.</p>
+    </div>
+    <div class="waves">
+      <table>
+        <thead><tr><th>Stage</th><th>Estimate</th></tr></thead>
+        <tbody>
+          <tr><td>1 · Platform (8 packages left)</td><td>3 to 4 days</td></tr>
+          <tr><td>2 · Core flows</td><td>about 1 week</td></tr>
+          <tr><td>3 · Money, insights, AI</td><td>about 1 to 1.5 weeks</td></tr>
+          <tr><td>4 · Hardening</td><td>4 to 5 days</td></tr>
+          <tr><td>5 · Cloud and launch</td><td>about 1 week, once the accounts are ready</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>Prepared from the project's build records on 23 October 2026. Figures cover the parts merged into the main build that day.</footer>
+</div>
