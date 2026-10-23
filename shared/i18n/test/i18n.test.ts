@@ -33,11 +33,13 @@ const PROPER_PHRASES = ['Sharma General Store', 'Data Protection Board'];
 
 /**
  * Words that break sentence case: a capitalised word that is not the first word of a sentence,
- * not an acronym (UPI, KYC) and not a proper noun. Placeholders are ignored.
+ * not an acronym (UPI, KYC) and not a proper noun. Placeholders and quoted UI labels
+ * (“Open now”, which keep the label's own case) are ignored.
  */
 function titleCaseWords(msg: string): string[] {
   const out: string[] = [];
-  const text = PROPER_PHRASES.reduce((m, name) => m.replaceAll(name, 'x'), msg.replace(/\{[^}]*\}/g, 'x'));
+  const bare = msg.replace(/\{[^}]*\}/g, 'x').replace(/“[^”]*”/g, 'x');
+  const text = PROPER_PHRASES.reduce((m, name) => m.replaceAll(name, 'x'), bare);
   for (const sentence of text.split(/(?<=[.?:])\s+/)) {
     for (const word of sentence.split(/\s+/).slice(1)) {
       const w = word.replace(/^[^\p{L}]+|[^\p{L}\d]+$/gu, '').replace(/['’]s$/u, '');
