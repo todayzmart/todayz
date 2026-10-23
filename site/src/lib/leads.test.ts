@@ -1,7 +1,7 @@
 // Lead form logic: phone normalisation to E.164, validation, and the request to POST /v1/public/leads.
 // Test phone numbers come only from the reserved +91 90000 000xx block.
 import { describe, expect, it, vi } from 'vitest';
-import { LEAD_FIELDS, normalisePhone, submitLead, validateLead, type LeadRequest } from './leads.ts';
+import { LEAD_FIELDS, LEAD_TIMEOUT_MS, LeadKeys, leadStatus, newIdempotencyKey, normalisePhone, submitLead, validateLead, type LeadRequest } from './leads.ts';
 
 const PHONE = '+919000000012';
 
@@ -68,17 +68,21 @@ describe('validateLead', () => {
   });
 });
 
+const ULID = /^[0-7][0-9A-HJKMNP-TV-Z]{25}$/;
+const KEY = '01JB0000000000000000000000';
+
 describe('submitLead', () => {
   const ok = () => Promise.resolve(new Response(null, { status: 201 }));
 
-  it('posts camelCase JSON to /v1/public/leads on the API origin', async () => {
+  it('posts camelCase JSON with the Idempotency-Key to /v1/public/leads on the API origin', async () => {
     const fetchImpl = vi.fn(ok);
-    await expect(submitLead('https://api.todayz.in/', request, fetchImpl)).resolves.toEqual({ ok: true });
+    await expect(submitLead('https://api.todayz.in/', request, { idempotencyKey: KEY, fetchImpl })).resolves.toEqual({ ok: true });
     expect(fetchImpl).toHaveBeenCalledOnce();
     const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe('https://api.todayz.in/v1/public/leads');
     expect(init.method).toBe('POST');
-    expect(init.headers).toMatchObject({ 'content-type': 'application/json' });
+    expect(init.headers).toMatchObject({ 'content-type': 'application/json', 'idempotency-key': KEY });
+    expect(init.signal).toBeInstanceOf(AbortSignal);
     const body = JSON.parse(String(init.body)) as Record<string, unknown>;
     expect(body).toEqual({
       name: 'Asha',
@@ -94,17 +98,71 @@ describe('submitLead', () => {
   it.each([
     [400, 'rejected'],
     [422, 'rejected'],
-    [403, 'rejected'],
     [429, 'rate_limited'],
-    [500, 'server'],
-    [503, 'server'],
-  ] as const)('maps HTTP %i to %s', async (status, reason) => {
+    [401, 'error'],
+    [403, 'error'],
+    [404, 'error'],
+    [405, 'error'],
+    [413, 'error'],
+    [415, 'error'],
+    [500, 'error'],
+    [503, 'error'],
+  ] as const)('maps HTTP %i to %s (only 400 and 422 blame the details)', async (status, reason) => {
     const fetchImpl = vi.fn(() => Promise.resolve(new Response('{}', { status })));
-    await expect(submitLead('https://api.todayz.in', request, fetchImpl)).resolves.toEqual({ ok: false, reason });
+    await expect(submitLead('https://api.todayz.in', request, { idempotencyKey: KEY, fetchImpl })).resolves.toEqual({ ok: false, reason });
+  });
+
+  it('treats any 2xx as success', () => {
+    expect(leadStatus(200)).toEqual({ ok: true });
+    expect(leadStatus(202)).toEqual({ ok: true });
+    expect(leadStatus(304)).toEqual({ ok: false, reason: 'error' });
   });
 
   it('reports a network failure', async () => {
     const fetchImpl = vi.fn(() => Promise.reject(new TypeError('Failed to fetch')));
-    await expect(submitLead('https://api.todayz.in', request, fetchImpl)).resolves.toEqual({ ok: false, reason: 'network' });
+    await expect(submitLead('https://api.todayz.in', request, { idempotencyKey: KEY, fetchImpl })).resolves.toEqual({ ok: false, reason: 'network' });
+  });
+
+  it(`gives up after ${LEAD_TIMEOUT_MS / 1000} s and reports a network failure`, async () => {
+    vi.useFakeTimers();
+    try {
+      let signal: AbortSignal | undefined;
+      const fetchImpl = vi.fn((_url: string | URL | Request, init?: RequestInit) => {
+        signal = init?.signal ?? undefined;
+        return new Promise<Response>((_resolve, reject) => {
+          signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+        });
+      });
+      const pending = submitLead('https://api.todayz.in', request, { idempotencyKey: KEY, fetchImpl });
+      await vi.advanceTimersByTimeAsync(LEAD_TIMEOUT_MS - 1);
+      expect(signal?.aborted).toBe(false);
+      await vi.advanceTimersByTimeAsync(1);
+      await expect(pending).resolves.toEqual({ ok: false, reason: 'network' });
+      expect(signal?.aborted).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe('idempotency keys', () => {
+  it('makes ULIDs: 26 Crockford characters, time first', () => {
+    const key = newIdempotencyKey();
+    expect(key).toMatch(ULID);
+    expect(newIdempotencyKey(0, (b) => b.fill(0))).toBe('0'.repeat(26));
+    expect(newIdempotencyKey(1, (b) => b.fill(31))).toBe(`${'0'.repeat(9)}1${'Z'.repeat(16)}`);
+    expect(newIdempotencyKey(Date.now() + 1000).slice(0, 10) > key.slice(0, 10)).toBe(true);
+    expect(newIdempotencyKey()).not.toBe(newIdempotencyKey());
+  });
+
+  it('reuses the key for a retry of the same details, and starts a fresh one after a change or a success', () => {
+    let n = 0;
+    const keys = new LeadKeys(() => `key-${++n}`);
+    const lead = { name: 'Asha', shopName: 'Asha Stores', phone: PHONE, city: 'Bengaluru' };
+    expect(keys.keyFor(lead)).toBe('key-1');
+    expect(keys.keyFor({ ...lead }), 'retry').toBe('key-1');
+    expect(keys.keyFor({ ...lead, city: 'Mysuru' }), 'changed details').toBe('key-2');
+    keys.reset();
+    expect(keys.keyFor({ ...lead, city: 'Mysuru' }), 'after a success').toBe('key-3');
   });
 });

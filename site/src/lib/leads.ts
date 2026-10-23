@@ -63,26 +63,93 @@ export function validateLead(raw: Partial<Record<LeadField, string>>): LeadValid
   return { ok: true, value: { name, shopName, phone, city } };
 }
 
-/** rejected: the API refused the details (4xx other than 429); the form says so distinctly. */
-export type LeadResult = { ok: true } | { ok: false; reason: 'rejected' | 'rate_limited' | 'server' | 'network' };
+/**
+ * rejected: the API refused the details (400 or 422); the form says so distinctly.
+ * rate_limited: 429. error: any other status (401, 403, 404, 405, 413, 415, 5xx …), which is the
+ * site's or the API's fault, not the visitor's. network: no response, or none within the timeout.
+ */
+export type LeadResult = { ok: true } | { ok: false; reason: 'rejected' | 'rate_limited' | 'error' | 'network' };
 
-export async function submitLead(
-  apiBase: string,
-  request: LeadRequest,
-  fetchImpl: typeof fetch = fetch,
-): Promise<LeadResult> {
-  let response: Response;
+/** How long the form waits for the API before it gives up and lets the visitor retry. */
+export const LEAD_TIMEOUT_MS = 15_000;
+
+export interface SubmitOptions {
+  /** A ULID; the same key for every retry of the same details (see LeadKeys). */
+  idempotencyKey: string;
+  fetchImpl?: typeof fetch;
+  timeoutMs?: number;
+}
+
+const CROCKFORD = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+
+/** A ULID (48-bit millisecond time, 80 random bits, Crockford base32), as the API's Idempotency-Key expects. */
+type RandomFill = (bytes: Uint8Array<ArrayBuffer>) => Uint8Array<ArrayBuffer>;
+
+export function newIdempotencyKey(now: number = Date.now(), random: RandomFill = (b) => crypto.getRandomValues(b)): string {
+  let time = '';
+  let t = Math.floor(now);
+  for (let i = 0; i < 10; i += 1) {
+    time = CROCKFORD.charAt(t % 32) + time;
+    t = Math.floor(t / 32);
+  }
+  const bytes = random(new Uint8Array(16));
+  let rand = '';
+  for (let i = 0; i < 16; i += 1) rand += CROCKFORD.charAt((bytes[i] ?? 0) % 32);
+  return time + rand;
+}
+
+/**
+ * One Idempotency-Key per form fill: the same details get the same key on every retry (a timeout
+ * or a lost response must not create a second lead), changed details get a new key (the API
+ * refuses a reused key with a different body), and a success starts a fresh fill.
+ */
+export class LeadKeys {
+  #details = '';
+  #key = '';
+  readonly #make: () => string;
+
+  constructor(make: () => string = () => newIdempotencyKey()) {
+    this.#make = make;
+  }
+
+  keyFor(details: LeadInput): string {
+    const fingerprint = JSON.stringify([details.name, details.shopName, details.phone, details.city]);
+    if (fingerprint !== this.#details || this.#key === '') {
+      this.#details = fingerprint;
+      this.#key = this.#make();
+    }
+    return this.#key;
+  }
+
+  /** After a success: the next submission is a new lead. */
+  reset(): void {
+    this.#details = '';
+    this.#key = '';
+  }
+}
+
+export function leadStatus(status: number): LeadResult {
+  if (status >= 200 && status < 300) return { ok: true };
+  if (status === 400 || status === 422) return { ok: false, reason: 'rejected' };
+  if (status === 429) return { ok: false, reason: 'rate_limited' };
+  return { ok: false, reason: 'error' };
+}
+
+export async function submitLead(apiBase: string, request: LeadRequest, options: SubmitOptions): Promise<LeadResult> {
+  const { idempotencyKey, fetchImpl = fetch, timeoutMs = LEAD_TIMEOUT_MS } = options;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    response = await fetchImpl(`${apiBase.replace(/\/+$/, '')}/v1/public/leads`, {
+    const response = await fetchImpl(`${apiBase.replace(/\/+$/, '')}/v1/public/leads`, {
       method: 'POST',
-      headers: { 'content-type': 'application/json', accept: 'application/json' },
+      headers: { 'content-type': 'application/json', accept: 'application/json', 'idempotency-key': idempotencyKey },
       body: JSON.stringify(request),
+      signal: controller.signal,
     });
+    return leadStatus(response.status);
   } catch {
     return { ok: false, reason: 'network' };
+  } finally {
+    clearTimeout(timer);
   }
-  if (response.ok) return { ok: true };
-  if (response.status === 429) return { ok: false, reason: 'rate_limited' };
-  if (response.status >= 500) return { ok: false, reason: 'server' };
-  return { ok: false, reason: 'rejected' };
 }

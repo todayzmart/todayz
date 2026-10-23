@@ -2,7 +2,9 @@
 // The shop lead form (the only interactive island besides plain <details>). Needs JavaScript to
 // post JSON to POST /v1/public/leads, so the button renders disabled and the script enables it.
 // Turnstile renders implicitly and adds the cf-turnstile-response field; the script behind it is
-// loaded by Base.astro on pages with a form.
+// loaded by Base.astro on pages with a form. An input points at its error (aria-describedby) only
+// while the error shows. Requests time out after 15 s, carry one Idempotency-Key per set of
+// details (reused on retry), and a missing or failing Turnstile says so instead of waiting.
 //   variant "card": a standalone card with its own heading (contact page).
 //   variant "cta":  the form alone, labelled by the landing CTA heading (home, for retailers).
 import Icon from './Icon.astro';
@@ -59,6 +61,8 @@ const fields = [
     data-success={t('lead.success')}
     data-error={t('lead.error')}
     data-rejected={t('lead.err_rejected')}
+    data-captcha={t('lead.err_captcha')}
+    data-captcha-load={t('lead.err_captcha_load')}
   >
     {
       fields.map((f) => (
@@ -75,7 +79,6 @@ const fields = [
             inputmode={f.inputmode}
             maxlength={f.max}
             required
-            aria-describedby={`${id}-${f.name}-err`}
           />
           <p class="tz-field-error" id={`${id}-${f.name}-err`} data-error-for={f.name} hidden>
             {f.error}
@@ -83,8 +86,19 @@ const fields = [
         </div>
       ))
     }
-    <div class="cf-turnstile" data-sitekey={siteKey} data-theme="light" data-language={captchaLanguage}></div>
-    <p class="tz-field-error" data-error-for="captcha" hidden>{t('lead.err_captcha')}</p>
+    <div
+      class="cf-turnstile"
+      id={`${id}-captcha`}
+      role="group"
+      tabindex="-1"
+      data-sitekey={siteKey}
+      data-theme="light"
+      data-language={captchaLanguage}
+      data-callback="tzTurnstileOk"
+      data-error-callback="tzTurnstileError"
+    >
+    </div>
+    <p class="tz-field-error" id={`${id}-captcha-err`} data-error-for="captcha" hidden>{t('lead.err_captcha')}</p>
     <button class:list={cta ? 'btn-xl btn-brand full' : 'tz-btn tz-btn-brand tz-btn-lg'} type="submit" disabled>
       {t('lead.submit')}
       {cta && <Icon name="arrow" />}
@@ -99,60 +113,105 @@ const fields = [
 </div>
 
 <script>
-  import { LEAD_FIELDS, submitLead, validateLead, type LeadField } from '../lib/leads.ts';
+  import { LEAD_FIELDS, LeadKeys, submitLead, validateLead, type LeadField } from '../lib/leads.ts';
 
+  interface TurnstileWindow {
+    turnstile?: { reset: () => void };
+    tzTurnstileError?: () => boolean;
+    tzTurnstileOk?: () => void;
+  }
+  const page = window as unknown as TurnstileWindow;
+  const forms = [...document.querySelectorAll<HTMLFormElement>('form[data-lead-form]')];
+  let captchaFailed = false;
+
+  type Text = 'sending' | 'success' | 'error' | 'rejected' | 'captcha' | 'captchaLoad';
+  const text = (form: HTMLFormElement, key: Text) => form.dataset[key] ?? '';
+  const loadFailure = (form: HTMLFormElement) => `${text(form, 'error')} ${text(form, 'captchaLoad')}`;
+
+  /** Shows or hides a field's error; the input points at the message only while it is shown. */
   function setError(form: HTMLFormElement, name: string, show: boolean): void {
     const message = form.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
     if (message) message.hidden = !show;
-    const input = form.elements.namedItem(name);
-    if (input instanceof HTMLInputElement) {
-      input.classList.toggle('tz-input-invalid', show);
-      input.setAttribute('aria-invalid', show ? 'true' : 'false');
+    const target = name === 'captcha' ? form.querySelector<HTMLElement>('.cf-turnstile') : form.elements.namedItem(name);
+    if (!(target instanceof HTMLElement)) return;
+    if (show && message?.id) target.setAttribute('aria-describedby', message.id);
+    else target.removeAttribute('aria-describedby');
+    if (target instanceof HTMLInputElement) {
+      target.classList.toggle('tz-input-invalid', show);
+      target.setAttribute('aria-invalid', show ? 'true' : 'false');
     }
   }
 
-  document.querySelectorAll<HTMLFormElement>('form[data-lead-form]').forEach((form) => {
+  // Turnstile calls these by name (data-error-callback, data-callback) on every widget.
+  page.tzTurnstileError = () => {
+    captchaFailed = true;
+    for (const form of forms) {
+      const status = form.querySelector<HTMLElement>('[data-status]');
+      if (status && form.dataset['state'] !== 'sending') status.textContent = loadFailure(form);
+    }
+    return true; // handled: Turnstile does not throw
+  };
+  page.tzTurnstileOk = () => {
+    if (!captchaFailed) return;
+    captchaFailed = false;
+    for (const form of forms) {
+      const status = form.querySelector<HTMLElement>('[data-status]');
+      if (status?.textContent === loadFailure(form)) status.textContent = '';
+    }
+  };
+
+  for (const form of forms) {
     const status = form.querySelector<HTMLElement>('[data-status]');
     const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
-    const text = (key: 'sending' | 'success' | 'error' | 'rejected') => form.dataset[key] ?? '';
-    let sending = false;
+    const widget = form.querySelector<HTMLElement>('.cf-turnstile');
+    const keys = new LeadKeys();
+    const say = (message: string) => {
+      if (status) status.textContent = message;
+    };
     if (button) button.disabled = false;
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      if (sending) return;
+      if (form.dataset['state'] === 'sending') return;
       const data = new FormData(form);
       const raw: Partial<Record<LeadField, string>> = {};
       for (const f of LEAD_FIELDS) raw[f] = String(data.get(f) ?? '');
       const result = validateLead(raw);
       for (const f of LEAD_FIELDS) setError(form, f, !result.ok && result.errors[f] === true);
+      // The check could not load (blocked script, network) or reported an error: no token will come.
+      const checkBroken = page.turnstile === undefined || captchaFailed;
       const token = String(data.get('cf-turnstile-response') ?? '');
-      setError(form, 'captcha', token === '');
-      if (!result.ok || token === '') {
-        form.querySelector<HTMLInputElement>('[aria-invalid="true"]')?.focus();
+      const needToken = !checkBroken && token === '';
+      setError(form, 'captcha', needToken);
+      if (!result.ok || checkBroken || needToken) {
+        say(checkBroken ? loadFailure(form) : needToken ? text(form, 'captcha') : '');
+        const invalid = form.querySelector<HTMLInputElement>('[aria-invalid="true"]');
+        if (invalid) invalid.focus();
+        else if (needToken) widget?.focus();
         return;
       }
-      sending = true;
+      form.dataset['state'] = 'sending';
       if (button) button.disabled = true;
-      if (status) status.textContent = text('sending');
-      const outcome = await submitLead(form.dataset['api'] ?? '', {
-        ...result.value,
-        source: form.dataset['source'] ?? 'site',
-        turnstileToken: token,
-      });
-      sending = false;
+      say(text(form, 'sending'));
+      const outcome = await submitLead(
+        form.dataset['api'] ?? '',
+        { ...result.value, source: form.dataset['source'] ?? 'site', turnstileToken: token },
+        { idempotencyKey: keys.keyFor(result.value) },
+      );
       if (outcome.ok) {
+        keys.reset();
         form.reset();
-        if (status) status.textContent = text('success');
+        say(text(form, 'success'));
         form.dataset['state'] = 'sent';
       } else {
-        if (status) status.textContent = text(outcome.reason === 'rejected' ? 'rejected' : 'error');
+        say(text(form, outcome.reason === 'rejected' ? 'rejected' : 'error'));
+        form.dataset['state'] = 'failed';
       }
       if (button) button.disabled = false;
       // A token is single use: get a fresh one for the next attempt.
-      (window as unknown as { turnstile?: { reset: () => void } }).turnstile?.reset();
+      page.turnstile?.reset();
     });
-  });
+  }
 </script>
 
 <style>
