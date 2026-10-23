@@ -329,16 +329,29 @@ func deployedOnly(env Env, names []string) []string {
 }
 
 // CORSOrigins returns the exact browser origins allowed to call the API (02 §2.4 step 6).
-// The marketing site's origin is included for its lead form (POST /v1/public/leads).
 func (c *Config) CORSOrigins() []string {
 	switch c.Env {
 	case EnvProd:
-		return []string{"https://app.todayz.in", "https://business.todayz.in", "https://admin.todayz.in", "https://todayz.in"}
+		return []string{"https://app.todayz.in", "https://business.todayz.in", "https://admin.todayz.in"}
 	case EnvStaging:
 		// Placeholder host names until Wave 5 fixes the staging domains.
 		return []string{"https://app.staging.todayz.in", "https://business.staging.todayz.in", "https://admin.staging.todayz.in"}
 	default:
-		return []string{"https://app.todayz.localhost", "https://business.todayz.localhost", "https://admin.todayz.localhost", "https://todayz.localhost"}
+		return []string{"https://app.todayz.localhost", "https://business.todayz.localhost", "https://admin.todayz.localhost"}
+	}
+}
+
+// PublicCORSOrigins returns the marketing site origins that may call /v1/public/* without
+// credentials (D-102). They never get a credentialed response on any other route.
+func (c *Config) PublicCORSOrigins() []string {
+	switch c.Env {
+	case EnvProd:
+		return []string{"https://todayz.in", "https://www.todayz.in"}
+	case EnvStaging:
+		// Placeholder host name, like CORSOrigins, until Wave 5 fixes the staging domains.
+		return []string{"https://staging.todayz.in"}
+	default:
+		return []string{"https://todayz.localhost"}
 	}
 }
 

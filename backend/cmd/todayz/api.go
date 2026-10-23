@@ -26,10 +26,11 @@ import (
 // (only for tests of other slots).
 func buildRouter(d deps, idem idempotency.Store, v *openapi.Validator) (*httpx.Router, error) {
 	o := httpx.Options{
-		Log:         d.Log,
-		CORSOrigins: d.Config.CORSOrigins(),
-		ClientIP:    mw.ClientIPOptions{TrustCloudflare: d.Config.Env.IsDeployed()},
-		Idempotency: idempotency.Options{Store: idem, Clock: d.Clock, Log: d.Log},
+		Log:               d.Log,
+		CORSOrigins:       d.Config.CORSOrigins(),
+		PublicCORSOrigins: d.Config.PublicCORSOrigins(),
+		ClientIP:          mw.ClientIPOptions{TrustCloudflare: d.Config.Env.IsDeployed()},
+		Idempotency:       idempotency.Options{Store: idem, Clock: d.Clock, Log: d.Log},
 	}
 	if v != nil {
 		o.Validator, o.Policies = v, v

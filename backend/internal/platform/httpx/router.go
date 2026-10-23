@@ -26,8 +26,10 @@ import (
 type Options struct {
 	Log         *slog.Logger
 	CORSOrigins []string
-	ClientIP    mw.ClientIPOptions
-	Idempotency idempotency.Options
+	// PublicCORSOrigins may call /v1/public/* only, without credentials (D-102).
+	PublicCORSOrigins []string
+	ClientIP          mw.ClientIPOptions
+	Idempotency       idempotency.Options
 	// Validator is the OpenAPI request validator (W0-04); nil passes all.
 	// When it also has Has(method, pattern string) bool, Router.Check refuses
 	// a mounted route the contract does not know.
@@ -50,12 +52,12 @@ func Pipeline(o Options, routes *route.Table) []func(http.Handler) http.Handler 
 		mw.OTel(),               // 4  W1-07
 		mw.ClientIP(o.ClientIP), // 5
 		mw.AccessLog(o.Log),     // 6  W1-07 extends
-		mw.CORS(o.CORSOrigins),  // 7
-		mw.PathGuard(),          // 8  W0-04
-		mw.RoutePolicy(routes),  // 9
-		mw.BodyLimit(),          // 10
-		mw.Authn(),              // 11 W1-01
-		mw.RateLimit(),          // 12 W1-01
+		mw.CORS(o.CORSOrigins, o.PublicCORSOrigins), // 7
+		mw.PathGuard(),         // 8  W0-04
+		mw.RoutePolicy(routes), // 9
+		mw.BodyLimit(),         // 10
+		mw.Authn(),             // 11 W1-01
+		mw.RateLimit(),         // 12 W1-01
 	}
 }
 

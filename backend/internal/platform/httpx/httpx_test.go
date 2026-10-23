@@ -24,16 +24,20 @@ import (
 	"github.com/todayz/backend/internal/platform/reqctx"
 )
 
-const appOrigin = "https://app.todayz.localhost"
+const (
+	appOrigin  = "https://app.todayz.localhost"
+	siteOrigin = "https://todayz.localhost"
+)
 
 func newTestRouter(t *testing.T, logs *bytes.Buffer, v mw.Validator) *Router {
 	t.Helper()
 	log := slog.New(slog.NewJSONHandler(logs, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	r := NewRouter(Options{
-		Log:         log,
-		CORSOrigins: []string{appOrigin},
-		Idempotency: idempotency.Options{Store: idempotency.NewMemoryStore()},
-		Validator:   v,
+		Log:               log,
+		CORSOrigins:       []string{appOrigin},
+		PublicCORSOrigins: []string{siteOrigin},
+		Idempotency:       idempotency.Options{Store: idempotency.NewMemoryStore()},
+		Validator:         v,
 	})
 	r.Get("/v1/echo/{id}", func(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewEncoder(w).Encode(map[string]string{
@@ -287,6 +291,48 @@ func TestCORS(t *testing.T) {
 	w = do(r, "OPTIONS", "/v1/echo", nil, map[string]string{"Origin": "https://app.todayz.in.evil.example", "Access-Control-Request-Method": "POST"})
 	require.Equal(t, 204, w.Code)
 	require.Empty(t, w.Header().Get("Access-Control-Allow-Origin"))
+}
+
+// D-102: the marketing site may call /v1/public/* without credentials and
+// gets nothing on any other route; the apps keep their credentialed rule.
+func TestPublicCORS(t *testing.T) {
+	r := newTestRouter(t, &bytes.Buffer{}, nil)
+	preflight := func(origin, path string) *httptest.ResponseRecorder {
+		return do(r, "OPTIONS", path, nil, map[string]string{
+			"Origin": origin, "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "content-type, idempotency-key",
+		})
+	}
+
+	for _, p := range []string{"/v1/auth/refresh", "/v1/echo", "/v1/public/../auth/refresh", "/v1/publicity"} {
+		w := preflight(siteOrigin, p)
+		require.Equal(t, 204, w.Code, p)
+		require.Empty(t, w.Header().Get("Access-Control-Allow-Origin"), "the site gets no CORS on %s", p)
+		require.Empty(t, w.Header().Get("Access-Control-Allow-Credentials"), p)
+	}
+
+	w := preflight(siteOrigin, "/v1/public/leads")
+	require.Equal(t, 204, w.Code)
+	require.Equal(t, siteOrigin, w.Header().Get("Access-Control-Allow-Origin"))
+	require.Empty(t, w.Header().Get("Access-Control-Allow-Credentials"), "never credentials for the site")
+	require.Equal(t, "POST, OPTIONS", w.Header().Get("Access-Control-Allow-Methods"))
+	require.Equal(t, "Content-Type, Idempotency-Key", w.Header().Get("Access-Control-Allow-Headers"))
+
+	w = do(r, "POST", "/v1/public/leads", strings.NewReader("{}"), map[string]string{"Origin": siteOrigin, "Content-Type": "application/json"})
+	require.Equal(t, siteOrigin, w.Header().Get("Access-Control-Allow-Origin"))
+	require.Empty(t, w.Header().Get("Access-Control-Allow-Credentials"))
+	w = do(r, "GET", "/v1/public/leads", nil, map[string]string{"Origin": siteOrigin})
+	require.Empty(t, w.Header().Get("Access-Control-Allow-Origin"), "POST only")
+	w = do(r, "GET", "/v1/echo/1", nil, map[string]string{"Origin": siteOrigin})
+	require.Empty(t, w.Header().Get("Access-Control-Allow-Origin"))
+
+	w = preflight("https://evil.example", "/v1/public/leads")
+	require.Empty(t, w.Header().Get("Access-Control-Allow-Origin"))
+
+	for _, p := range []string{"/v1/auth/refresh", "/v1/public/leads"} {
+		w = preflight(appOrigin, p)
+		require.Equal(t, appOrigin, w.Header().Get("Access-Control-Allow-Origin"), p)
+		require.Equal(t, "true", w.Header().Get("Access-Control-Allow-Credentials"), "the apps keep credentials on %s", p)
+	}
 }
 
 func TestBodyLimit(t *testing.T) {

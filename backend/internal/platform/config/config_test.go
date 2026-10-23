@@ -213,10 +213,8 @@ func TestNoEgressAndAddr(t *testing.T) {
 	require.True(t, c.NoEgress)
 	require.Equal(t, "127.0.0.1:9999", c.APIAddr)
 	require.Equal(t, DefaultLocalWorkerAddr, c.WorkerAddr)
-	require.Equal(t, []string{
-		"https://app.todayz.localhost", "https://business.todayz.localhost", "https://admin.todayz.localhost",
-		"https://todayz.localhost",
-	}, c.CORSOrigins(), "the marketing site's lead form calls the API")
+	require.Equal(t, []string{"https://app.todayz.localhost", "https://business.todayz.localhost", "https://admin.todayz.localhost"}, c.CORSOrigins())
+	require.Equal(t, []string{"https://todayz.localhost"}, c.PublicCORSOrigins(), "the marketing site's lead form, without credentials (D-102)")
 
 	env, _ = fullEnv(t, "prod")
 	c, err = Load(get(env), nil)
@@ -224,7 +222,11 @@ func TestNoEgressAndAddr(t *testing.T) {
 	require.False(t, c.NoEgress)
 	require.Equal(t, DefaultDeployedAPIAddr, c.APIAddr)
 	require.Equal(t, DefaultDeployedWorkerAddr, c.WorkerAddr)
-	require.Equal(t, []string{"https://app.todayz.in", "https://business.todayz.in", "https://admin.todayz.in", "https://todayz.in"}, c.CORSOrigins())
+	require.Equal(t, []string{"https://app.todayz.in", "https://business.todayz.in", "https://admin.todayz.in"}, c.CORSOrigins())
+	require.Equal(t, []string{"https://todayz.in", "https://www.todayz.in"}, c.PublicCORSOrigins())
+	for _, o := range c.PublicCORSOrigins() {
+		require.NotContains(t, c.CORSOrigins(), o, "the site origin never gets credentials (D-102)")
+	}
 
 	env["API_ADDR"] = "nope"
 	_, err = Load(get(env), nil)
