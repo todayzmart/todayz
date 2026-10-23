@@ -25,7 +25,7 @@ Read first: the root `CLAUDE.md`, `docs/plan/README.md`, `docs/plan/01-product-r
 
 ## Status
 
-W0-05: `config`, `tokens`, `i18n` (minimal bootstrap) and `telemetry` (init stubs) are in place. `make gen` builds tokens, fonts, icons and compiled catalogues into git-ignored `generated/` and `compiled/`. `@todayz/tokens/css-vars` lets a package test that its CSS uses only declared token vars.
+W0-05: `config`, `tokens` and `telemetry` (init stubs) are in place. W1-03: `i18n` is complete (catalogues for en, hi, kn, te, ta, en-XA, formatters, detection, fonts, message lint wired by `mk/42-i18n.mk`; see `i18n/README.md`). `make gen` builds tokens, fonts, icons and compiled catalogues into git-ignored `generated/` and `compiled/`. `@todayz/tokens/css-vars` lets a package test that its CSS uses only declared token vars.
 
 W0-04: `api-client` is in place: `src/http.ts` (configure, request, ApiError), the orval config
 (fetch client + Zod, tags-split per domain), `scripts/gen.mjs` + `scripts/msw.mjs` (bundle to JSON,

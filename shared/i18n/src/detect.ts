@@ -13,10 +13,24 @@ export interface KeyValueStore {
   removeItem(key: string): void;
 }
 
-/** 'hi-IN' -> 'hi', 'kn' -> 'kn', 'fr' -> undefined. Underscores and case are tolerated. */
+/**
+ * 'hi-IN' -> 'hi', 'kn' -> 'kn', 'fr' -> undefined. Underscores and case are tolerated. An Indic
+ * language written in Latin letters ('hi-Latn', 'ta-Latn-IN') is not Devanagari or Tamil text, so it
+ * maps to English.
+ */
 export function matchLanguageTag(tag: string): Locale | undefined {
-  const lang = tag.trim().toLowerCase().replace(/_/g, '-').split('-')[0];
+  const [lang, second] = tag.trim().toLowerCase().replace(/_/g, '-').split('-');
+  if (second === 'latn') return lang === 'en' ? 'en' : isLocale(lang) ? 'en' : undefined;
   return isLocale(lang) ? lang : undefined;
+}
+
+/** The browser's localStorage, or undefined when it is missing or throws on access (blocked cookies, private mode, SSR). */
+export function browserStore(): KeyValueStore | undefined {
+  try {
+    return (globalThis as { localStorage?: KeyValueStore }).localStorage ?? undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 /** First supported language in a navigator.languages style list. */
@@ -60,7 +74,7 @@ export function saveLocale(store: KeyValueStore | undefined, locale: Locale): bo
 }
 
 export interface DetectInput {
-  store?: KeyValueStore;
+  store?: KeyValueStore | undefined;
   /** location.search */
   search?: string;
   /** navigator.languages */

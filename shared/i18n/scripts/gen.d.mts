@@ -9,5 +9,5 @@ export declare function compile(
 export declare function loadLocaleMessages(
   app: string,
   locale: string,
-  opts?: { drafts?: boolean; dir?: string },
+  opts?: { drafts?: boolean; dir?: string; onWarn?: (message: string) => void },
 ): Promise<Record<string, string>>;

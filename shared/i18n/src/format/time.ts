@@ -8,7 +8,16 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 export type DateInput = Date | number | string;
 
+/** An ISO 8601 string must say its zone: "Z" or an offset like "+05:30". */
+const HAS_ZONE = /[T ]\d{2}(?::?\d{2}(?::?\d{2}(?:[.,]\d+)?)?)?\s*(?:Z|[+-]\d{2}(?::?\d{2})?)$/i;
+
+/**
+ * Milliseconds since the epoch. A string without "Z" or an offset (`2026-10-22T18:40:00`) throws a
+ * RangeError: JavaScript would read it in the device's own time zone, so the same string would show
+ * different times on different phones. The API always sends an offset.
+ */
 const toMs = (d: DateInput): number => {
+  if (typeof d === 'string' && !HAS_ZONE.test(d.trim())) throw new RangeError(`date string has no time zone (add Z or an offset): ${d}`);
   const ms = d instanceof Date ? d.getTime() : typeof d === 'number' ? d : Date.parse(d);
   if (!Number.isFinite(ms)) throw new RangeError(`bad date ${String(d)}`);
   return ms;
@@ -63,7 +72,10 @@ export function formatRelative(then: DateInput, now: DateInput, locale: MessageL
   return tidy(locale, rtf(locale, 'always').format(-Math.floor(hours / 24), 'day'));
 }
 
-const upperFirst = (locale: MessageLocale, s: string): string => (s ? s.charAt(0).toLocaleUpperCase(intlTag(locale)) + s.slice(1) : s);
+/** Fixed three-letter English months: Intl gives "Sept" for September in en-IN, the copy says "Sep". */
+const EN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
+
+const upperFirst =(locale: MessageLocale, s: string): string => (s ? s.charAt(0).toLocaleUpperCase(intlTag(locale)) + s.slice(1) : s);
 
 /**
  * Absolute time for old things, in IST: "Today, 6:40 pm", "Yesterday, 6:40 pm", "22 Oct, 6:40 pm",
@@ -79,10 +91,10 @@ export function formatAbsolute(then: DateInput, now: DateInput, locale: MessageL
     const word = rtf(locale, 'auto').format(-delta, 'day');
     return `${upperFirst(locale, word)}, ${clock}`;
   }
-  const month = new Intl.DateTimeFormat(intlTag(locale), {
-    month: baseLocale(locale) === 'en' ? 'short' : 'long',
-    timeZone: 'Asia/Kolkata',
-  }).format(new Date(toMs(then)));
+  const month =
+    baseLocale(locale) === 'en'
+      ? EN_MONTHS[t.month]
+      : new Intl.DateTimeFormat(intlTag(locale), { month: 'long', timeZone: 'Asia/Kolkata' }).format(new Date(toMs(then)));
   const year = t.year === n.year ? '' : ` ${t.year}`;
   return `${t.day} ${month}${year}, ${clock}`;
 }

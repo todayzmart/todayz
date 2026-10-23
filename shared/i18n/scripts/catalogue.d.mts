@@ -21,8 +21,18 @@ export declare function loadTranslations(
   locale: string,
 ): Promise<Record<string, TranslationEntry>>;
 export declare function argSignature(ast: MessageFormatElement[], acc?: Set<string>): Set<string>;
-export declare function extractMessageIds(source: string): Set<string>;
-export declare function scanUsage(srcDirs: string[]): Promise<Map<string, string>>;
+export declare function messageProblem(msg: string): string | undefined;
+export declare function translationProblem(enMessage: string, message: string): string | undefined;
+export declare function extractMessageRefs(
+  code: string,
+  fileName?: string,
+  namespaces?: Set<string>,
+): { explicit: Set<string>; candidates: Set<string> };
+export declare function extractMessageIds(code: string, fileName?: string, namespaces?: Set<string>): Set<string>;
+export declare function scanUsage(
+  srcDirs: string[],
+  namespaces?: Set<string>,
+): Promise<{ used: Map<string, string>; problems: string[] }>;
 export interface LintStats {
   total: number;
   reviewed: number;

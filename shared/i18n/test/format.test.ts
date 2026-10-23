@@ -168,6 +168,20 @@ describe('SC-I18N-03 formatAbsolute in IST (English)', () => {
     expect(formatAbsolute(iso, NOW, 'en')).toBe(want);
   });
 
+  it('writes September as Sep, never Sept', () => {
+    expect(formatAbsolute('2026-09-22T13:10:00Z', NOW, 'en')).toBe('22 Sep, 6:40 pm');
+    expect(formatAbsolute('2025-09-22T13:10:00Z', NOW, 'en')).toBe('22 Sep 2025, 6:40 pm');
+  });
+
+  it('rejects an ISO string without Z or an offset (it would be read in the device zone)', () => {
+    expect(() => formatAbsolute('2026-10-22T18:40:00', NOW, 'en')).toThrow(RangeError);
+    expect(() => formatClock('2026-10-22T18:40:00')).toThrow(RangeError);
+    expect(() => formatRelative('2026-10-22T18:40:00', NOW, 'en')).toThrow(/time zone/);
+    expect(() => formatTime('2026-10-22', NOW, 'en', { relativeWithinMs: MIN })).toThrow(RangeError);
+    expect(formatClock('2026-10-22T18:40:00+05:30')).toBe('6:40 pm');
+    expect(formatClock('2026-10-22T13:10:00.000Z')).toBe('6:40 pm');
+  });
+
   it('is not shifted by the device time zone: uses IST only', () => {
     // 18:30 UTC on the 22nd is already the 23rd in India.
     expect(formatClock('2026-10-22T18:30:00Z')).toBe('12:00 am');

@@ -3,7 +3,7 @@ import type { MessageFormatElement } from '@formatjs/icu-messageformat-parser';
 import { localeFromSearch } from './detect';
 import { loadFonts } from './fonts';
 import { formatAbsolute, formatDistance, formatMoney, formatRelative, type DateInput, type MoneyStyle } from './format';
-import { htmlLang, type MessageLocale } from './locales';
+import { PSEUDO_LOCALE, htmlLang, type MessageLocale } from './locales';
 
 export * from './locales';
 export * from './detect';
@@ -19,11 +19,21 @@ export function asMessages(json: unknown): Messages {
 }
 
 /**
- * Language from `?locale=` alone (dev and test switch, and deep links): a language code, or the
- * pseudo-locale when `allowPseudo` is set; anything else is English. Apps normally call
- * detectLocale, which adds the stored choice and the browser's languages.
+ * The pseudo-locale switch only: `?locale=pseudo` gives en-XA when `allowPseudo` is set, anything
+ * else is English. A real language in the URL is ignored here (the apps' existing contract); use
+ * resolveLanguage or detectLocale for that.
  */
 export function resolveLocale(search: string, { allowPseudo = false }: { allowPseudo?: boolean } = {}): MessageLocale {
+  const found = localeFromSearch(search, { allowPseudo });
+  return found === PSEUDO_LOCALE ? found : 'en';
+}
+
+/**
+ * Language from `?locale=` alone (deep links, tests): a language code, or the pseudo-locale when
+ * `allowPseudo` is set; anything else is English. Apps normally call detectLocale, which adds the
+ * stored choice and the browser's languages.
+ */
+export function resolveLanguage(search: string, { allowPseudo = false }: { allowPseudo?: boolean } = {}): MessageLocale {
   return localeFromSearch(search, { allowPseudo }) ?? 'en';
 }
 

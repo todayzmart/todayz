@@ -8,12 +8,9 @@ import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { TRANSLATED_LOCALES, argSignature, enHash, loadEnglish, loadTranslations } from './catalogue.mjs';
-import { parse } from '@formatjs/icu-messageformat-parser';
+import { TRANSLATED_LOCALES, enHash, loadEnglish, loadTranslations, translationProblem } from './catalogue.mjs';
 
 const messagesDir = join(resolve(dirname(fileURLToPath(import.meta.url)), '..'), 'messages');
-
-const sig = (m) => [...argSignature(parse(m, { ignoreTag: false, requiresOtherClause: true }))].sort().join(',');
 
 /** Keys with no translation, or whose English changed since: [{ key, en, description, area, was? }]. */
 export async function todo(dir, app, locale) {
@@ -42,7 +39,8 @@ export async function importDrafts(dir, app, area, locale, drafts) {
   for (const [key, message] of Object.entries(drafts)) {
     const e = english[key];
     if (!e || e.file !== `${area}.en.json`) throw new Error(`${key} is not in ${app}/${area}.en.json`);
-    if (sig(message) !== sig(e.message)) throw new Error(`${key}: arguments differ from English`);
+    const problem = translationProblem(e.message, message);
+    if (problem) throw new Error(`${key}: ${problem}`);
     data[key] = { message, review: 'machine', enHash: enHash(e.message) };
   }
   await writeArea(file, data);

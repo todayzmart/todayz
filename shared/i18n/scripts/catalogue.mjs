@@ -10,6 +10,7 @@ import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
+import ts from 'typescript';
 
 /** Languages that are translated (English is the source). Same list as LOCALES in src/locales.ts. */
 export const TRANSLATED_LOCALES = ['hi', 'kn', 'te', 'ta'];
@@ -70,67 +71,196 @@ export function argSignature(ast, acc = new Set()) {
   return acc;
 }
 
-const sig = (msg) => [...argSignature(parse(msg, { ignoreTag: false, requiresOtherClause: true }))].sort().join(',');
+/** Argument types that format a value inside the message. Amounts, dates and distances arrive pre-formatted. */
+const SELF_FORMATTING = new Set([TYPE.number, TYPE.date, TYPE.time]);
+
+function selfFormatting(ast, acc = []) {
+  for (const el of ast) {
+    if (SELF_FORMATTING.has(el.type)) acc.push(el.value);
+    else if (el.type === TYPE.tag) selfFormatting(el.children, acc);
+    else if (el.type === TYPE.plural || el.type === TYPE.select) {
+      for (const o of Object.values(el.options)) selfFormatting(o.value, acc);
+    }
+  }
+  return acc;
+}
+
+const parseIcu = (msg) => parse(msg, { ignoreTag: false, requiresOtherClause: true });
+const sig = (msg) => [...argSignature(parseIcu(msg))].sort().join(',');
+
+/** Why a message is unusable (parse error, number/date/time argument), or undefined. */
+export function messageProblem(msg) {
+  let ast;
+  try {
+    ast = parseIcu(msg);
+  } catch (err) {
+    return `does not parse: ${err.message}`;
+  }
+  const bad = selfFormatting(ast);
+  if (bad.length) return `formats {${bad.join('}, {')}} itself; pass it pre-formatted (formatMoney, formatDistance, formatTime)`;
+  return undefined;
+}
 
 /**
- * Ids used in source code: `formatMessage({ id: 'a.b' ...`, `<FormattedMessage id="a.b"`, and
- * `defineMessage({ id: 'a.b' ...`. Ids built at run time cannot be seen and are not checked.
+ * Whether a translation can ship: it parses, has no number/date/time argument and takes the same
+ * arguments and tags as English. Returns undefined when fine, otherwise the reason.
  */
-export function extractMessageIds(source) {
-  const ids = new Set();
-  const patterns = [
-    /\b(?:formatMessage|defineMessage)\(\s*\{[^}]*?\bid:\s*(['"`])([A-Za-z0-9_.-]+)\1/g,
-    /<FormattedMessage\b[^>]*?\bid=(?:\{)?(['"`])([A-Za-z0-9_.-]+)\1/g,
-  ];
-  for (const re of patterns) for (const m of source.matchAll(re)) ids.add(m[2]);
-  return ids;
+export function translationProblem(enMessage, message) {
+  const own = messageProblem(message);
+  if (own) return own;
+  const want = sig(enMessage);
+  const got = sig(message);
+  return got === want ? undefined : `arguments differ from English (${got || 'none'} vs ${want || 'none'})`;
+}
+
+const KEY_SHAPE = /^[A-Za-z][A-Za-z0-9_-]*(?:\.[A-Za-z0-9_-]+)+$/;
+const FILE_EXT = new Set(['css', 'scss', 'ts', 'tsx', 'js', 'jsx', 'mjs', 'cjs', 'json', 'svg', 'png', 'jpg', 'jpeg', 'webp', 'ico', 'html', 'xml', 'txt', 'md', 'astro', 'webmanifest', 'woff', 'woff2', 'map']);
+
+/** A string that looks like a message key of one of the given namespaces. */
+function looksLikeKey(text, namespaces) {
+  if (!KEY_SHAPE.test(text)) return false;
+  const parts = text.split('.');
+  return namespaces.has(parts[0]) && !FILE_EXT.has(parts[parts.length - 1].toLowerCase());
+}
+
+function calleeName(expr) {
+  if (ts.isIdentifier(expr)) return expr.text;
+  if (ts.isPropertyAccessExpression(expr)) return expr.name.text;
+  return undefined;
+}
+const strOf = (n) => (n && (ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n)) ? n.text : undefined);
+
+function idOfDescriptor(obj) {
+  if (!obj || !ts.isObjectLiteralExpression(obj)) return undefined;
+  for (const p of obj.properties) {
+    if (ts.isPropertyAssignment(p) && (ts.isIdentifier(p.name) || ts.isStringLiteral(p.name)) && p.name.text === 'id') return strOf(p.initializer);
+  }
+  return undefined;
+}
+
+/**
+ * Message ids used in one file.
+ *   explicit    ids in formatMessage({ id }), defineMessage({ id }), defineMessages({ a: { id } }),
+ *               <FormattedMessage id="..." />, and t('...'): checked whatever they look like
+ *   candidates  any other string literal shaped like a key (`ns.part.part`) whose first segment is one
+ *               of `namespaces` (the first segments in that app's catalogue, e.g. "shell"), so
+ *               `label: 'shell.nav.serch'` held in data is caught. Import/export paths and names that
+ *               end in a file extension are skipped; test files are not scanned at all.
+ * Ids built at run time cannot be seen. .ts/.tsx/.js/.jsx/.mjs files are parsed with the TypeScript
+ * parser (so `values={{ b: (c) => <b>{c}</b> }}` and nested braces are no problem); .astro files are
+ * scanned for quoted strings only.
+ */
+export function extractMessageRefs(code, fileName = 'x.tsx', namespaces = new Set()) {
+  const explicit = new Set();
+  const candidates = new Set();
+  if (fileName.endsWith('.astro')) {
+    for (const m of code.matchAll(/\bt\(\s*(['"`])([A-Za-z0-9_.-]+)\1/g)) explicit.add(m[2]);
+    for (const m of code.matchAll(/(['"`])([A-Za-z0-9_.-]+)\1/g)) if (looksLikeKey(m[2], namespaces)) candidates.add(m[2]);
+    return { explicit, candidates };
+  }
+  const kind = /\.(tsx|jsx)$/.test(fileName) ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
+  const sf = ts.createSourceFile(fileName, code, ts.ScriptTarget.Latest, true, kind);
+  const visit = (node) => {
+    if (ts.isCallExpression(node)) {
+      const name = calleeName(node.expression);
+      const first = node.arguments[0];
+      if (name === 'formatMessage' || name === 'defineMessage') {
+        const id = idOfDescriptor(first);
+        if (id) explicit.add(id);
+      } else if (name === 'defineMessages' && first && ts.isObjectLiteralExpression(first)) {
+        for (const p of first.properties) {
+          const id = ts.isPropertyAssignment(p) ? idOfDescriptor(p.initializer) : undefined;
+          if (id) explicit.add(id);
+        }
+      } else if (name === 't') {
+        const id = strOf(first);
+        if (id) explicit.add(id);
+      }
+    } else if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
+      if (node.tagName.getText(sf) === 'FormattedMessage') {
+        for (const a of node.attributes.properties) {
+          if (ts.isJsxAttribute(a) && a.name.getText(sf) === 'id' && a.initializer) {
+            const init = a.initializer;
+            const id = strOf(init) ?? (ts.isJsxExpression(init) ? strOf(init.expression) : undefined);
+            if (id) explicit.add(id);
+          }
+        }
+      }
+    } else if ((ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) && looksLikeKey(node.text, namespaces)) {
+      const p = node.parent;
+      if (!(ts.isImportDeclaration(p) || ts.isExportDeclaration(p) || ts.isExternalModuleReference(p) || ts.isLiteralTypeNode(p))) candidates.add(node.text);
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sf);
+  return { explicit, candidates };
+}
+
+/** Explicit and candidate ids together. */
+export function extractMessageIds(code, fileName = 'x.tsx', namespaces = new Set()) {
+  const { explicit, candidates } = extractMessageRefs(code, fileName, namespaces);
+  return new Set([...explicit, ...candidates]);
 }
 
 async function* walk(dir) {
-  if (!existsSync(dir)) return;
   for (const e of await readdir(dir, { withFileTypes: true })) {
-    if (e.name === 'node_modules' || e.name === 'gen' || e.name.startsWith('.')) continue;
+    if (e.name === 'node_modules' || e.name === 'gen' || e.name.startsWith('.') || /\.gen\.ts$/.test(e.name)) continue;
     const p = join(dir, e.name);
     if (e.isDirectory()) yield* walk(p);
-    else if (/\.(tsx?|jsx?|mjs|astro)$/.test(e.name) && !/\.d\.ts$/.test(e.name)) yield p;
+    else if (/\.(tsx?|jsx?|mjs|astro)$/.test(e.name) && !/\.d\.ts$/.test(e.name) && !/\.(test|spec)\.[tj]sx?$/.test(e.name)) yield p;
   }
 }
 
-/** Every message id used under the given source folders: id -> first file that uses it. */
-export async function scanUsage(srcDirs) {
+/**
+ * Every message id used under the given folders: id -> first file that uses it. A folder that does
+ * not exist, or holds no source file, is a problem: the lint must never pass because it looked at
+ * nothing. Returns { used, problems }.
+ */
+export async function scanUsage(srcDirs, namespaces = new Set()) {
   const used = new Map();
+  const problems = [];
   for (const dir of srcDirs) {
-    for await (const file of walk(dir)) {
-      for (const id of extractMessageIds(await readFile(file, 'utf8'))) if (!used.has(id)) used.set(id, file);
+    if (!existsSync(dir)) {
+      problems.push(`source folder ${dir} does not exist`);
+      continue;
     }
+    let files = 0;
+    for await (const file of walk(dir)) {
+      files++;
+      for (const id of extractMessageIds(await readFile(file, 'utf8'), file, namespaces)) if (!used.has(id)) used.set(id, file);
+    }
+    if (files === 0) problems.push(`source folder ${dir} holds no source files`);
   }
-  return used;
+  return { used, problems };
 }
 
 /**
  * Lints one app's catalogues.
- * Errors (fail the build): English message that does not parse; id used in code but not in English
- * (the missing-key lint); translation of an unknown key; translation that does not parse or does not
- * take the same arguments as English; bad review flag; empty message.
+ * Errors (fail the build): English message that does not parse or formats a number/date/time itself;
+ * id used in code but not in English (the missing-key lint; see extractMessageRefs for what counts as
+ * use); a missing or empty source folder when `srcDirs` is given; translation of an unknown key;
+ * translation that does not parse, has a number/date/time argument or takes other arguments than
+ * English; bad review flag; empty message.
  * Warnings (reported, never fail): English keys never seen in code; keys not translated yet; machine
- * drafts waiting for review; stale translations (English changed since the translation).
+ * drafts waiting for review; stale translations (English changed since the translation; these skip the
+ * argument check, they will be translated again anyway).
+ * `srcDirs` omitted: the code is not scanned (library use). The CLI always passes it.
  * Returns { errors, warnings, stats } with stats[locale] = { total, reviewed, machine, missing, stale }.
  */
-export async function lintApp({ messagesDir, app, srcDirs = [], locales = TRANSLATED_LOCALES }) {
+export async function lintApp({ messagesDir, app, srcDirs, locales = TRANSLATED_LOCALES }) {
   const errors = [];
   const warnings = [];
   const stats = {};
   const english = await loadEnglish(messagesDir, app);
-  const enSig = {};
   for (const [key, e] of Object.entries(english)) {
-    try {
-      enSig[key] = sig(e.message);
-    } catch (err) {
-      errors.push(`${app}/${e.file}: ${key}: English message does not parse: ${err.message}`);
-    }
+    const problem = messageProblem(e.message);
+    if (problem) errors.push(`${app}/${e.file}: ${key}: English message ${problem}`);
   }
-  if (srcDirs.length) {
-    const used = await scanUsage(srcDirs);
+  if (srcDirs) {
+    const namespaces = new Set(Object.keys(english).map((k) => k.split('.')[0]));
+    const { used, problems } = await scanUsage(srcDirs, namespaces);
+    for (const p of problems) errors.push(`${app}: ${p}`);
+    if (!srcDirs.length) errors.push(`${app}: no source folder given`);
     for (const [id, file] of used) {
       if (!(id in english)) errors.push(`${app}: missing key ${id} (used in ${file}) is not in any ${app}/*.en.json`);
     }
@@ -153,21 +283,21 @@ export async function lintApp({ messagesDir, app, srcDirs = [], locales = TRANSL
         errors.push(`${where}: review must be one of ${REVIEW_STATES.join(', ')}`);
         continue;
       }
-      try {
-        if (key in enSig && sig(t.message) !== enSig[key]) {
-          errors.push(`${where}: arguments differ from English (${sig(t.message) || 'none'} vs ${enSig[key] || 'none'})`);
-          continue;
-        }
-      } catch (err) {
-        errors.push(`${where}: does not parse: ${err.message}`);
-        continue;
-      }
       if (t.enHash !== enHash(english[key].message)) {
         st.stale++;
-        warnings.push(`${where}: English changed since this was translated (${locale}); review again`);
-      } else if (t.review === 'reviewed') st.reviewed++;
-      else st.machine++;
-      if (t.review === 'machine') warnings.push(`${where}: machine draft, not reviewed (${locale})`);
+        warnings.push(`${where}: English changed since this was translated (${locale}); translate and review again`);
+        continue;
+      }
+      const problem = translationProblem(english[key].message, t.message);
+      if (problem) {
+        errors.push(`${where}: ${problem}`);
+        continue;
+      }
+      if (t.review === 'reviewed') st.reviewed++;
+      else {
+        st.machine++;
+        warnings.push(`${where}: machine draft, not reviewed (${locale})`);
+      }
     }
     st.missing = st.total - Object.keys(tr).filter((k) => k in english).length;
     stats[locale] = st;

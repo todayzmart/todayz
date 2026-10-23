@@ -14,7 +14,7 @@ import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PSEUDO_LOCALE, pseudoAst } from '../src/pseudo.mjs';
-import { TRANSLATED_LOCALES, enHash, loadEnglish, loadTranslations } from './catalogue.mjs';
+import { TRANSLATED_LOCALES, enHash, loadEnglish, loadTranslations, translationProblem } from './catalogue.mjs';
 
 const pkg = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const messagesDir = join(pkg, 'messages');
@@ -27,14 +27,18 @@ export async function loadApp(app) {
 }
 
 /** English messages with the shippable translations of one language laid over them. */
-export async function loadLocaleMessages(app, locale, { drafts = false, dir = messagesDir } = {}) {
+export async function loadLocaleMessages(app, locale, { drafts = false, dir = messagesDir, onWarn = console.warn } = {}) {
   const english = await loadEnglish(dir, app);
   const tr = await loadTranslations(dir, app, locale);
   const out = {};
   for (const [key, e] of Object.entries(english)) {
     const t = tr[key];
-    const usable = t && typeof t.message === 'string' && t.enHash === enHash(e.message) && (t.review === 'reviewed' || (drafts && t.review === 'machine'));
-    out[key] = usable ? t.message : e.message;
+    const wanted = t && typeof t.message === 'string' && t.enHash === enHash(e.message) && (t.review === 'reviewed' || (drafts && t.review === 'machine'));
+    // A translation ships only if it parses and takes the same arguments and tags as English.
+    // Otherwise English ships and gen warns: one bad translation never aborts the build.
+    const problem = wanted ? translationProblem(e.message, t.message) : undefined;
+    if (problem) onWarn(`i18n: ${app}/${t.file}: ${key} (${locale}) not shipped, English used: ${problem}`);
+    out[key] = wanted && !problem ? t.message : e.message;
   }
   return out;
 }

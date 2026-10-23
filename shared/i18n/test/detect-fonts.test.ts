@@ -10,6 +10,7 @@ import {
   PSEUDO_LOCALE,
   SCRIPT_OF,
   applyLocale,
+  browserStore,
   detectLocale,
   fontFamiliesFor,
   fontLoadRequests,
@@ -64,8 +65,17 @@ describe('SC-I18N-04 languages', () => {
     ['en-US', 'en'],
     ['fr-FR', undefined],
     ['', undefined],
+    ['hi-Latn', 'en'], // Hindi in Latin letters is not Devanagari: English
+    ['ta-Latn-IN', 'en'],
+    ['kn_latn', 'en'],
+    ['te-Telu', 'te'],
+    ['fr-Latn', undefined],
   ])('matches tag %s -> %s', (tag, want) => {
     expect(matchLanguageTag(tag)).toBe(want);
+  });
+
+  it('a Latin-script Indic browser language does not pick the Indic catalogue', () => {
+    expect(detectLocale({ languages: ['hi-Latn'] })).toBe('en');
   });
 
   it('picks the first supported browser language', () => {
@@ -123,6 +133,29 @@ describe('SC-I18N-04 detection and persistence', () => {
     expect(saveLocale(brokenStore, 'hi')).toBe(false);
     expect(saveLocale(undefined, 'hi')).toBe(false);
     expect(detectLocale({ store: brokenStore, languages: ['kn'] })).toBe('kn');
+  });
+
+  it('browserStore returns localStorage, and undefined when reading it throws or it is missing', () => {
+    const g = globalThis as { localStorage?: unknown };
+    const had = Object.getOwnPropertyDescriptor(g, 'localStorage');
+    try {
+      const fake = memoryStore();
+      Object.defineProperty(g, 'localStorage', { value: fake, configurable: true });
+      expect(browserStore()).toBe(fake);
+      Object.defineProperty(g, 'localStorage', {
+        get() {
+          throw new DOMException('denied', 'SecurityError');
+        },
+        configurable: true,
+      });
+      expect(browserStore()).toBeUndefined();
+      expect(detectLocale({ store: browserStore(), languages: ['kn'] })).toBe('kn');
+      delete g.localStorage;
+      expect(browserStore()).toBeUndefined();
+    } finally {
+      if (had) Object.defineProperty(g, 'localStorage', had);
+      else delete g.localStorage;
+    }
   });
 
   it('?locale=pseudo works only when allowed, and beats a stored choice', () => {

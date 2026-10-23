@@ -15,23 +15,40 @@ import { createFormatters, detectLocale, saveLocale, applyLocale, formatMoney } 
 - English source: `messages/<app>/<area>.en.json`, `{ "key": { "defaultMessage": "...", "description": "..." } }`, ICU MessageFormat, sentence case, no exclamation marks.
 - Translations: `messages/<app>/<area>.<hi|kn|te|ta>.json`, `{ "key": { "message": "...", "review": "machine"|"reviewed", "enHash": "ab12cd34" } }`. See [docs/translation-workflow.md](docs/translation-workflow.md).
 - `make gen` (`pnpm --filter @todayz/i18n gen`) writes `compiled/<app>/{en,en-XA,hi,kn,te,ta}.json` as ICU ASTs (git-ignored). A language file has the reviewed translation where there is one and English everywhere else. Machine drafts and stale translations never ship; `node scripts/gen.mjs --drafts` includes drafts for a local look.
-- Load a catalogue per app with `import('@todayz/i18n/compiled/customer/hi.json')` and `asMessages()`; hand it to react-intl with `locale={htmlLang(locale)}`.
-- In code use literal ids so the lint can see them: `intl.formatMessage({ id: 'shell.nav.home' })` or `<FormattedMessage id="..." />` (`defineMessage` works too).
+- Load a catalogue per app with `import('@todayz/i18n/compiled/customer/hi.json')` and `asMessages()`; hand it to react-intl:
 
-### Lint (`pnpm --filter @todayz/i18n lint`, runs in `make check`)
+  ```tsx
+  <IntlProvider locale={intlTag(locale)} messages={messages} timeZone="Asia/Kolkata">
+  ```
 
-Errors: an id used in an app's `src/` that is not in that app's English files (the missing-key lint); a translation for an unknown key; a translation that does not parse or takes different arguments than English (names, plural/select, tags); an empty message; a review flag other than `machine` or `reviewed`; a duplicate key. Warnings (counted; `lint:messages` lists them): untranslated keys, machine drafts, stale translations, English keys with no literal use.
+  `intlTag(locale)` is `<lang>-IN-u-nu-latn` (Latin digits in every language); `timeZone` keeps any react-intl date formatting in IST. Use `htmlLang(locale)` only for `<html lang>`.
+- In code use literal ids so the lint can see them: `intl.formatMessage({ id: 'shell.nav.home' })`, `<FormattedMessage id="..." />`, `defineMessage`, `defineMessages({ a: { id: '...' } })` or `t('site.home.title')` (the site's helper).
+- Messages must not use `{x, number}`, `{x, date}` or `{x, time}`: amounts, distances and times arrive pre-formatted (`formatMoney`, `formatDistance`, `formatTime`) as plain `{x}`. Plural `#` is fine.
+
+### Lint (`make check` step `check-i18n-messages`, wired in `mk/42-i18n.mk`)
+
+The package never reads sibling folders itself: the caller passes each app's source folder, `node scripts/lint.mjs --src customer=../../customer/src --src site=../../site/src ...` (`pnpm --filter @todayz/i18n lint:messages` does all four and lists warnings). Every app with a catalogue needs a `--src`; a folder that is missing or holds no source files is an error, so the lint cannot pass by looking at nothing. Test files (`*.test.*`, `*.spec.*`), `*.d.ts`, `*.gen.ts`, `gen/`, dot-folders and `node_modules` are not scanned.
+
+Errors:
+- an id used in code that is not in the app's English files (the missing-key lint). Code is parsed with the TypeScript parser (`.astro` files are scanned for quoted strings). Ids are collected from `formatMessage({ id })`, `defineMessage`, `defineMessages({ ... })`, `<FormattedMessage id=... />` (attribute order and nested `values={{ b: (c) => <b>{c}</b> }}` do not matter) and `t('...')`, and also from any other string literal that looks like a key: `ns.part[.part]` made of letters, digits, `_` or `-`, whose first segment is one of that app's catalogue namespaces (`shell`, `site`, ...) and that does not end in a file extension. This catches `label: 'shell.nav.serch'` held in data. Import/export paths and type literals are skipped. If a plain string such as `'shell.config'` is flagged by mistake, rename it or move it out of the catalogue's namespace;
+- an English message that does not parse or uses number/date/time arguments;
+- a translation for an unknown key; one that does not parse, uses number/date/time arguments or takes different arguments than English (names, plural/select, tags); an empty message; a review flag other than `machine` or `reviewed`; a duplicate key.
+
+Warnings (counted; `lint:messages` lists them): untranslated keys, machine drafts, stale translations (English changed since; these skip the argument check), English keys with no literal use. `make gen` ships a translation only if it parses and takes the same arguments and tags as English; otherwise it ships English and warns, and never aborts.
 
 ## Language detection and persistence
 
 ```ts
-const locale = detectLocale({ store: localStorage, search: location.search, languages: navigator.languages, allowPseudo: pseudoAllowed(mode) });
-await applyLocale(locale);        // <html lang> + font loading
-saveLocale(localStorage, 'hi');   // when the person picks a language (key "todayz.lang")
-hasChosenLocale(localStorage);    // false -> show the C-01 language screen
+const store = browserStore(); // localStorage, or undefined when access throws (blocked storage, private mode, SSR)
+const locale = detectLocale({ store, search: location.search, languages: navigator.languages, allowPseudo: pseudoAllowed(mode) });
+await applyLocale(locale);   // <html lang> + font loading
+saveLocale(store, 'hi');     // when the person picks a language (key "todayz.lang")
+hasChosenLocale(store);      // false -> show the C-01 language screen
 ```
 
-Order: stored choice, `?locale=`, browser languages, English. `?locale=pseudo` works only with `allowPseudo` and is never stored. Storage failures (private mode) are swallowed. `resolveLocale(search, opts)` is the URL-only step.
+Do not touch `localStorage` directly: reading the property can throw. Order: stored choice, `?locale=`, browser languages, English. `?locale=pseudo` works only with `allowPseudo` and is never stored. Storage failures are swallowed. `hi-Latn` (any `-Latn` Indic tag, Hindi written in Latin letters) maps to English.
+
+URL-only steps: `resolveLocale(search, opts)` is the pseudo-locale switch only (`?locale=pseudo` with `allowPseudo`, anything else `en`; the apps use it); `resolveLanguage(search, opts)` also accepts a language code (`?locale=hi`).
 
 ## Formatters
 
@@ -47,7 +64,9 @@ Numbers and money use English (India) rules in every language: Latin digits (`nu
 | `formatTime(then, now, locale, { relativeWithinMs })` | relative while younger than the cut-off, absolute after. The cut-off has no platform-wide value in the plan, so the caller passes it. |
 | `createFormatters(locale, now?)` | the above bound to a language |
 
-Amounts are integer paise everywhere; a fractional paise throws.
+Amounts are integer paise everywhere; a fractional paise throws. English months are fixed three-letter names (`Sep`, never `Sept`).
+
+Times: a `Date`, a number (epoch ms) or an ISO 8601 string **with `Z` or an offset** (`2026-10-22T13:10:00Z`, `...+05:30`). A string without one (`2026-10-22T18:40:00`, `2026-10-22`) throws a `RangeError`: JavaScript would read it in the device's own zone, so the same string would show different times on different phones.
 
 ## Fonts
 

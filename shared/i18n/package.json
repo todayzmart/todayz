@@ -14,8 +14,8 @@
     "gen": "node scripts/gen.mjs",
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "lint": "eslint --max-warnings 0 . && node scripts/lint.mjs",
-    "lint:messages": "node scripts/lint.mjs --verbose"
+    "lint": "eslint --max-warnings 0 .",
+    "lint:messages": "node scripts/lint.mjs --src customer=../../customer/src --src business=../../business/src --src admin=../../admin/src --src site=../../site/src --verbose"
   },
   "dependencies": {
     "@formatjs/icu-messageformat-parser": "3.5.21"

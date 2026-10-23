@@ -4,7 +4,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { compile, loadApp } from '../scripts/gen.mjs';
-import { htmlLang, pseudoAllowed, resolveLocale } from '../src/index';
+import { htmlLang, pseudoAllowed, resolveLanguage, resolveLocale } from '../src/index';
 import { PSEUDO_GROWTH, accent, pseudoAst } from '../src/pseudo.mjs';
 
 const pkg = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -46,11 +46,29 @@ describe('resolveLocale', () => {
     ['?locale=pseudo', 'en-XA'],
     ['?locale=en-XA', 'en-XA'],
     ['?locale=EN-xa', 'en-XA'],
-    ['?locale=hi', 'hi'],
+    ['?locale=hi', 'en'], // pseudo-only: a real language in the URL is not this function's job
     ['?locale=fr', 'en'],
     ['', 'en'],
   ])('%s -> %s', (search, want) => {
     expect(resolveLocale(search, { allowPseudo: true })).toBe(want);
+  });
+
+  it('in production mode ?locale=hi leaves resolveLocale at en', () => {
+    expect(resolveLocale('?locale=hi', { allowPseudo: pseudoAllowed('production') })).toBe('en');
+  });
+
+  it.each([
+    ['?locale=hi', 'hi'],
+    ['?locale=ta', 'ta'],
+    ['?locale=pseudo', 'en-XA'],
+    ['?locale=fr', 'en'],
+    ['', 'en'],
+  ])('resolveLanguage %s -> %s', (search, want) => {
+    expect(resolveLanguage(search, { allowPseudo: true })).toBe(want);
+  });
+
+  it('resolveLanguage ignores pseudo unless allowed', () => {
+    expect(resolveLanguage('?locale=pseudo')).toBe('en');
   });
 
   it('ignores ?locale=pseudo unless allowed (production builds)', () => {

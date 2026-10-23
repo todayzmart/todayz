@@ -19,7 +19,7 @@ English is the source. Hindi, Kannada, Telugu and Tamil follow in two steps: a m
 2. List what needs work: `node shared/i18n/scripts/translations.mjs todo <app> <lc>` prints JSON `[{ key, area, en, description, was? }]`.
 3. Machine draft: give that list to the translation model or service with the glossary below, get `{ "key": "translated message" }` back, and import it: `... import <app> <area> <lc> drafts.json`. The import checks that the draft takes the same arguments as English and stores it as `machine`. A model output is a draft that a person confirms; it never ships on its own.
 4. Human review: a fluent reviewer reads the drafts in context (use `?locale=<lc>` with `--drafts` output, or the draft file), edits the `message`, and approves: `... approve <app> <area> <lc> key1 key2`. Approve refuses a key whose English changed since the draft.
-5. `pnpm --filter @todayz/i18n lint` must pass. It reports reviewed, machine, missing and stale counts per language. `make gen` ships reviewed translations only.
+5. `pnpm --filter @todayz/i18n lint:messages` (and the `check-i18n-messages` step of `make check`) must pass. It reports reviewed, machine, missing and stale counts per language. A stale translation (English changed) only warns; the other checks (parse, same arguments and tags, no number/date/time arguments) are skipped for it because it will be translated again. `make gen` ships a reviewed translation only if it is not stale, parses and takes the same arguments and tags as English; otherwise English ships and gen warns.
 
 ## Glossary and style
 
@@ -27,7 +27,7 @@ English is the source. Hindi, Kannada, Telugu and Tamil follow in two steps: a m
 - Digits stay Western (4827). Dates and amounts come from placeholders formatted by the formatters, never typed into a message.
 - Translations run 20 to 40% longer; never rely on a fixed width. No uppercase and no letter spacing for Indic scripts.
 - Use the polite register ("aap"-form in Hindi, equivalent in the others), short and spoken, as a shop counter would say it.
-- Placeholders keep their names (`{name}`), tags keep theirs (`<b>`). The lint fails otherwise.
+- Placeholders keep their names (`{name}`), tags keep theirs (`<b>`). The lint fails otherwise. `{x, number}`, `{x, date}` and `{x, time}` are not allowed in any language; plural `#` is.
 - "Stock", "order", "credits", "pickup" and "delivery" take one fixed term per language; record the term here when the first reviewer picks it.
 
 ## Review checklist
