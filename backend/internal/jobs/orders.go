@@ -2,6 +2,8 @@ package jobs
 
 import (
 	"context"
+	"fmt"
+	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -27,13 +29,16 @@ const ordersTimerAttempts = 25
 // and accept (and extend) enqueue them in the order's transaction. A late or
 // repeated run finds the order moved on and does nothing (BK-21).
 func registerorders(r *Registry, d Deps) {
-	var enq platformjobs.Enqueuer
-	if d.Pool != nil {
-		if c, err := queue.NewInsertClient(d.Pool, queue.Options{Log: d.Log}); err == nil {
-			enq = platformjobs.NewEnqueuer(r, c, d.Clock)
-		}
-	}
+	// The timers' own enqueuer (the notices they write enqueue sends) is
+	// built on the first run, not here: the API registers these kinds only
+	// to name them (A-21, and its own enqueuer over d.Queue), so it never
+	// opens a client for them.
+	enqueuer := lazyEnqueuer(r, d)
 	svc := func() (*orders.Service, error) {
+		enq, err := enqueuer()
+		if err != nil {
+			return nil, err
+		}
 		nd := notify.Deps{Clock: d.Clock, Settings: d.Settings, Config: d.Config, Log: d.Log, Jobs: enq}
 		od := orders.Deps{Config: d.Config, Clock: d.Clock, Log: d.Log, Settings: d.Settings,
 			Jobs: enq, Stock: OrdersStock(d.Clock), Open: business.OpenAt}
@@ -68,6 +73,30 @@ func registerorders(r *Registry, d Deps) {
 	timer(orders.KindNoShow,
 		"Expires a held pickup order nobody collected by hold_until, returns its stock and records a no-show strike (BK-14)",
 		(*orders.Service).ExpireNoShow)
+}
+
+// lazyEnqueuer returns a func that builds one insert-only client and its
+// enqueuer on first use and returns the same one after. A failed build is
+// returned (the run fails and River retries it) and tried again next time.
+// Without a pool (tests that only list kinds) it returns nil.
+func lazyEnqueuer(r *Registry, d Deps) func() (platformjobs.Enqueuer, error) {
+	var (
+		mu  sync.Mutex
+		enq platformjobs.Enqueuer
+	)
+	return func() (platformjobs.Enqueuer, error) {
+		mu.Lock()
+		defer mu.Unlock()
+		if enq != nil || d.Pool == nil {
+			return enq, nil
+		}
+		c, err := queue.NewInsertClient(d.Pool, queue.Options{Log: d.Log})
+		if err != nil {
+			return nil, fmt.Errorf("orders timers: queue client: %w", err)
+		}
+		enq = platformjobs.NewEnqueuer(r, c, d.Clock)
+		return enq, nil
+	}
 }
 
 // OrdersStock is the catalogue's stock writer as orders.Stock: a collected
