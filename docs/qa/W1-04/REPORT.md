@@ -124,4 +124,17 @@ Review evidence (agent, on 8d0a0ad):
 
 - Real Turnstile, and a real R2 or MinIO upload: the verifier is faked in tests, and the presigned URL is checked against the AWS SigV4 test vector, not uploaded to.
 - That MinIO or R2 refuses a PUT whose Content-Length differs from the signed one (it is signed; no upload was made).
-- The seed through `make reset` on the local stack (run by the lead after the merge).
+- ~~The seed through `make reset` on the local stack~~: run by the lead after the merge (see below).
+
+## Lead, after the merge (2026-10-23)
+
+Merged to main at 3e3191f after a rebase. `make gen`, vet and `go test -race` were run on every package. H1 was checked by reading `toMember`. The questions above are answered in D-107 (kept as built), and question 5 of the review is now decided: deletion ends the memberships.
+
+| Change | Commit | Evidence |
+|---|---|---|
+| Deletion wiring in `routes_business.go`. `AddDeletionCheck` refuses with 409 `conflict` while `OwnsActiveBusiness` holds. `AddDeletionHook(svc)` withdraws the invites. | 3e3191f | `TestBusinessAccountDeletion`. An owner deleting through the customer app (`DELETE /v1/me` with a step-up OTP) gets 409 and no user is deleted. An invitee deleting gets 204, their invite is `removed` and its phone is cleared. |
+| Account deletion ends the account's manager and cashier memberships (`RemoveMembershipsForAccount`, D-107). Owner rows are left alone. | cd382c5 | `TestOnAccountDelete`. The cashier row goes to `removed`. The owner row and another account's manager row stay `active`. A second run changes nothing. |
+| The business picker uses the generated `listBusinesses` (`brandName`, `status`, `invitations`). The hand-typed types are gone. | 7f817f0 | The business unit tests pass. |
+| Stack journey: the seeded owner of Lakshmi Traders picks Sri Lakshmi 2, lands on `/orders`, and the store is remembered. | cd382c5 | `business/e2e/sign-in.stack.spec.ts`: 3 passed against `make dev` after `make reset`. Screenshot: `screens/business-picker-1280.png`. |
+
+`make check` on main passes every step except `check-infra`, which needs `make setup-infra-cloudflare`. That step downloads Terraform provider plugins and runs `init -backend=false`; it creates no cloud resource. The user has been asked to run it. Still open from the review: document pending→uploaded (W2-10, B-02), and whether closed businesses may create document URLs.

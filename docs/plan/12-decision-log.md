@@ -767,3 +767,29 @@ There is no `make seed`; use `make reset`.
 - **Logout-all** refuses a grace-window token with 401 and revokes nothing; the client refreshes and retries once. Like refresh, it is a cookie route that needs `X-TZ-Client`.
 - **OTP-only admin token.** Before the two-step check, an admin token is accepted on exactly `/v1/rum` and `/v1/events`, so the sign-in screens can report telemetry; nothing else in the admin namespace.
 - Lives in: `backend/internal/identity/`, `backend/db/queries/identity/identity.sql`, `internal/platform/httpx/mw/authn.go`; `admin/src/app/totp.ts`, `shared/auth/src/session.ts`; `docs/qa/W1-01/REPORT-phase-b.md`; W1-01, W1-08.
+
+**D-107 · Businesses, stores and staff: W1-04 questions and review (lead, 2026-10-23).** W1-04's open questions, kept as built, and the decisions from its security review.
+- **Hours.** A range that runs past midnight stays open into a holiday the next day: the shop really is open until the range ends.
+- **Verified business.** It is read-only to the owner. Renaming needs a re-review flow (later). A store may be submitted before its business is verified.
+- **Live store changes.** A change to a live or paused store's name, address, phone or pin sends it back to `pending_review`. A rejected or suspended business cannot change stores or KYC. It can still create document upload URLs for now; open, decide with W2-10.
+- **Staff.**
+  - A manager scoped to some stores cannot add a store.
+  - There is no ownership transfer or leaving a business yet; acting on the owner row is refused with 403.
+  - A removed, unaccepted invite is not reused; a re-invite makes a new row.
+  - An invite expires after 7 days (a code constant; 01 sets no number). It never shows the invitee's name or user id before it is accepted.
+- **Account deletion.**
+  - `OwnsActiveBusiness` counts a draft as active, so an owner closes or deletes the draft before deleting the account (D-106).
+  - Deletion withdraws the invites bound to the account and those waiting for its phone, and clears their phone.
+  - It ends the account's manager and cashier memberships (`status = removed`). Owner rows are not touched: an active owner cannot delete, and a rejected business's owner row stays as a record.
+- **KYC.**
+  - A GSTIN needs a PAN, sent with it or already stored.
+  - Sealed values are bound to their row (`field:<owner id>` as the AAD).
+  - Documents are at most 10 MB, with at most 5 per kind. Confirming a document from pending to uploaded comes with B-02 in W2-10.
+  - Payout details: a change to the bank account or UPI needs a fresh OTP and a notice to the owner and managers. Payouts read only `business_kyc.status = 'verified'`. This lives in the payout WP.
+- **Code constants.**
+  - The 24 h dedupe window on shop leads is anti-spam, not a product rule.
+  - `categoryId` is checked against `categories` once W1-05 lands.
+  - Presigning moves to a platform storage package with W1-05.
+- **Validation order.** The validator runs before authz (422 before 403), the platform's pipeline order.
+- **Seed.** Only Lakshmi Traders has staff (owner, manager, cashier). That is enough for the core-loop business journey.
+- Lives in: `backend/internal/business/`, `backend/db/queries/business/`, `backend/cmd/todayz/routes_business.go`; `business/src/app/shop.ts`; `docs/qa/W1-04/REPORT.md`; W1-04.
