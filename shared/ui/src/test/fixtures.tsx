@@ -2,6 +2,8 @@
 // (design/source/components/*/preview.html). No real customers or shops.
 import type { LinkProps } from '../internal/link';
 import type { QuantityStepperLabels } from '../QuantityStepper/QuantityStepper';
+import { destination } from '../StoreMap/geo';
+import type { MapShop } from '../StoreMap/StoreMap';
 
 export const stepperLabels: QuantityStepperLabels = { add: 'Add', decrement: 'Remove one', increment: 'Add one' };
 
@@ -42,3 +44,37 @@ export const radiusOptions = [
   { km: 10, label: '10 km' },
   { km: 20, label: '20 km' },
 ] as const;
+
+/** Jayanagar 4th Block, Bengaluru: the design's example neighbourhood. */
+export const mapCenter = { lng: 77.5838, lat: 12.9279 };
+
+const names = [
+  'Sri Lakshmi Provision Stores',
+  'Sharma General Store',
+  'Sri Venkateshwara Medicals',
+  'Nandini Milk Parlour',
+  'Ganesh Stationery',
+  'Raghavendra Hardware',
+  'Fresh Basket',
+  'Annapoorna Bakery',
+  'Kaveri Electronics',
+  'Mahalakshmi Fancy Store',
+];
+
+/** Deterministic synthetic shops: a tight cluster near the centre plus a scatter out to 4 km. */
+export function makeShops(count: number): MapShop[] {
+  const shops: MapShop[] = [];
+  for (let i = 0; i < count; i++) {
+    const near = i < 8;
+    const km = near ? 0.15 + (i % 4) * 0.08 : 0.4 + ((i * 37) % 36) / 10;
+    const p = destination(mapCenter, km * 1000, near ? 300 + i * 9 : (i * 137.5) % 360);
+    shops.push({
+      id: `shop-${i}`,
+      name: `${names[i % names.length]}${i >= names.length ? ` ${Math.floor(i / names.length) + 1}` : ''}`,
+      lng: p.lng,
+      lat: p.lat,
+      open: i % 7 !== 3,
+    });
+  }
+  return shops;
+}

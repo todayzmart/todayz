@@ -1,43 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { designRef, radiusOptions } from '../test/fixtures';
-import { destination } from './geo';
-import { StoreMap, type MapShop, type StoreMapProps } from './StoreMap';
+import { designRef, makeShops, mapCenter, radiusOptions } from '../test/fixtures';
+import { StoreMap, type StoreMapProps } from './StoreMap';
 
-/** Jayanagar 4th Block, Bengaluru: the design's example neighbourhood. */
-const center = { lng: 77.5838, lat: 12.9279 };
-
-const names = [
-  'Sri Lakshmi Provision Stores',
-  'Sharma General Store',
-  'Sri Venkateshwara Medicals',
-  'Nandini Milk Parlour',
-  'Ganesh Stationery',
-  'Raghavendra Hardware',
-  'Fresh Basket',
-  'Annapoorna Bakery',
-  'Kaveri Electronics',
-  'Mahalakshmi Fancy Store',
-];
-
-/** Deterministic synthetic shops: a tight cluster near the centre plus a scatter out to 4 km. */
-function makeShops(count: number): MapShop[] {
-  const shops: MapShop[] = [];
-  for (let i = 0; i < count; i++) {
-    const near = i < 8;
-    const km = near ? 0.15 + (i % 4) * 0.08 : 0.4 + ((i * 37) % 36) / 10;
-    const p = destination(center, km * 1000, near ? 300 + i * 9 : (i * 137.5) % 360);
-    shops.push({
-      id: `shop-${i}`,
-      name: `${names[i % names.length]}${i >= names.length ? ` ${Math.floor(i / names.length) + 1}` : ''}`,
-      lng: p.lng,
-      lat: p.lat,
-      open: i % 7 !== 3,
-    });
-  }
-  return shops;
-}
-
+const center = mapCenter;
 const shops = makeShops(43);
 
 const base: StoreMapProps = {

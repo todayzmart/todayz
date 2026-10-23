@@ -137,8 +137,13 @@ export function StoreMap({
   const [glProjector, setGlProjector] = useState<Projector | null>(null);
   /** Static mode zooms into a cluster by moving its own view; a new radius or location resets it. */
   const viewKey = `${radiusKm}|${center.lng}|${center.lat}`;
-  const [zoomedView, setStaticView] = useState<{ key: string; center: LngLat; zoom: number } | null>(null);
-  const staticView = zoomedView?.key === viewKey ? zoomedView : null;
+  const [staticView, setStaticView] = useState<{ center: LngLat; zoom: number } | null>(null);
+  const [viewFor, setViewFor] = useState(viewKey);
+  if (viewFor !== viewKey) {
+    // Reset during render (not in an effect) so the old zoom never paints with the new radius.
+    setViewFor(viewKey);
+    setStaticView(null);
+  }
 
   // Latest values for MapLibre callbacks without re-creating the map.
   const latest = useRef({ center, radiusKm, mapStyle });
@@ -306,7 +311,7 @@ export function StoreMap({
     if (mode === 'webgl' && map) {
       map.easeTo({ center: [at.lng, at.lat], zoom, duration: prefersReducedMotion() ? 0 : FIT_MS });
     } else {
-      setStaticView({ key: viewKey, center: at, zoom: zoom + 0.01 });
+      setStaticView({ center: at, zoom: zoom + 0.01 });
     }
   };
 
