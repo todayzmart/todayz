@@ -44,3 +44,5 @@ Same structure as `customer/` (see its CLAUDE.md): `src/main.tsx`, `src/app/`, `
 W0-05: shell, routing, i18n, PWA manifest, telemetry stub, size budget and smoke tests in place. Screens are placeholders.
 
 W1-08: sign-in gate, A-01 SMS step and two-step check (TOTP calls typed by hand until W1-01b merges), offline banner, update toast, error boundary and SW precache check.
+
+Offline first load: the gate shows `SessionPending` (offline notice and "Try again") while the session is `unknown` and the API cannot be reached.

@@ -21,6 +21,7 @@ function makeServer() {
     expiresInMs: 15 * 60_000,
     etag: '"v1"',
     refreshDelayMs: 0,
+    logoutDelayMs: 0,
   };
   const json = (status: number, body: unknown, extra: Record<string, string> = {}) =>
     new Response(JSON.stringify(body), {
@@ -54,7 +55,10 @@ function makeServer() {
       }
       return status === 401 ? problem(401, 'unauthorized') : problem(status, 'internal');
     }
-    if (path === '/v1/auth/logout') return new Response(null, { status: 204 });
+    if (path === '/v1/auth/logout') {
+      if (state.logoutDelayMs) await new Promise((r) => setTimeout(r, state.logoutDelayMs));
+      return new Response(null, { status: 204 });
+    }
     if (path === '/v1/me') {
       const token = headers.get('authorization')?.replace('Bearer ', '');
       if (!token || !state.validTokens.has(token)) return problem(401, 'unauthorized');
@@ -99,9 +103,9 @@ const HINT = 'todayz.hasSession.customer';
 const PENDING = 'todayz.logoutPending.customer';
 
 /** An unsigned JWT-shaped token whose payload carries `sub` (the session only decodes it). */
-function jwt(sub: string): string {
+function jwt(sub: string, claims: Record<string, unknown> = {}): string {
   const b64 = (o: unknown) => btoa(JSON.stringify(o)).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
-  return `${b64({ alg: 'none' })}.${b64({ sub })}.sig`;
+  return `${b64({ alg: 'none' })}.${b64({ sub, ...claims })}.sig`;
 }
 
 const tick = (ms = 5) => new Promise<void>((r) => setTimeout(r, ms));
@@ -508,11 +512,21 @@ describe('cold start (review 2, 7)', () => {
     const server = makeServer();
     localStorage.setItem(HINT, '1');
     server.state.refreshStatuses = [401];
-    const s = make(server, { graceWaitMs: 60_000 });
+    const s = make(server, { graceWaitMs: 60_000, locks: makeLocks() });
     await s.start();
     expect(s.getState().status).toBe('signedOut');
     expect(server.refreshCalls()).toBe(1);
     expect(localStorage.getItem(HINT)).toBeNull();
+  });
+
+  it('without Web Locks a 401 for a tab that never held a token leaves the shared hint alone (L5)', async () => {
+    const server = makeServer();
+    localStorage.setItem(HINT, '1');
+    server.state.refreshStatuses = [401];
+    const s = make(server);
+    await s.start();
+    expect(s.getState().status).toBe('signedOut');
+    expect(localStorage.getItem(HINT)).toBe('1');
   });
 
   it('makes no request for a visitor who never signed in here', async () => {
@@ -718,18 +732,22 @@ describe('refresh timing (review 6)', () => {
     expect(server.refreshCalls()).toBe(1);
   });
 
-  it('measures the lifetime on the server clock when the device clock is wrong', async () => {
+  it('counts the token life from its own exp - iat, not from either clock or a Date header', async () => {
     vi.useFakeTimers();
     const server = makeServer();
-    // The device is 10 minutes behind the server; the token lives 2 minutes by the server's clock.
-    server.state.expiresInMs = 600_000 + 120_000;
-    const skewed: typeof fetch = async (input, init) => {
-      const r = await server.fetch(input, init);
-      const headers = new Headers(r.headers);
-      headers.set('date', new Date(Date.now() + 600_000).toUTCString());
-      return new Response(r.body, { status: r.status, headers });
+    // exp and iat are stamped by a server whose clock is hours away from this device's.
+    const iat = Math.floor(Date.now() / 1000) + 3 * 3600;
+    const token = jwt('u1', { iat, exp: iat + 120 });
+    const odd: typeof fetch = async (input, init) => {
+      const path = new URL(typeof input === 'string' ? input : (input as Request).url, 'http://x').pathname;
+      if (path !== '/v1/auth/refresh') return server.fetch(input, init);
+      server.calls.push({ method: 'POST', path, auth: null, client: null, credentials: 'include' });
+      return new Response(JSON.stringify({ accessToken: token, tokenType: 'Bearer', expiresAt: new Date(Date.now() + 3 * 3600_000 + 120_000).toISOString() }), {
+        status: 200,
+        headers: { 'content-type': 'application/json', date: new Date(Date.now() - 86_400_000).toUTCString() },
+      });
     };
-    const s = make(server, { fetch: skewed });
+    const s = make(server, { fetch: odd });
     s.signIn({ accessToken: 'stale', expiresAt: new Date(Date.now() + 1000).toISOString() });
     await s.refresh();
     expect(server.refreshCalls()).toBe(1);
@@ -782,6 +800,208 @@ describe('user switch across tabs (review 8)', () => {
     s.signIn({ accessToken: jwt('user-2'), expiresAt: soon() });
     expect(listener).toHaveBeenCalledWith('user-1', 'user-2');
     expect(s.etag('/v1/me')).toBeUndefined();
+  });
+});
+
+describe('second review round', () => {
+  const hang: typeof fetch = (_input, init) =>
+    new Promise((_resolve, reject) => {
+      init?.signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+    });
+
+  describe('M1 sign-out order', () => {
+    it('forgets the token before the logout call returns, and a refresh asked for meanwhile does nothing', async () => {
+      const server = makeServer();
+      server.state.logoutDelayMs = 40;
+      const s = make(server);
+      s.signIn({ accessToken: 'a', expiresAt: soon() });
+      const out = s.signOut();
+      expect(s.getToken()).toBeNull();
+      expect(s.getState().status).toBe('signedOut');
+      expect(localStorage.getItem(PENDING)).toBe('1');
+      expect(await s.refresh()).toBe(false);
+      await out;
+      expect(server.refreshCalls()).toBe(0);
+      expect(s.getState().status).toBe('signedOut');
+      expect(localStorage.getItem(PENDING)).toBeNull();
+    });
+
+    it('drops a refresh that was queued on the lock behind a sign-out', async () => {
+      const server = makeServer();
+      server.state.refreshDelayMs = 40;
+      const locks = makeLocks();
+      const a = make(server, { locks });
+      const b = make(server, { locks });
+      b.signIn({ accessToken: 'b-old', expiresAt: soon() });
+      const first = a.refresh();
+      const queued = b.refresh();
+      await b.signOut();
+      await Promise.all([first, queued]);
+      expect(server.refreshCalls()).toBe(1);
+      expect(b.getToken()).toBeNull();
+      expect(b.getState().status).toBe('signedOut');
+    });
+  });
+
+  describe('M2 hint without storage', () => {
+    const broken = {
+      getItem: () => {
+        throw new Error('blocked');
+      },
+      setItem: () => undefined,
+      removeItem: () => undefined,
+    };
+    it('tries the cookie when the store throws', async () => {
+      const server = makeServer();
+      const s = make(server, { storage: broken });
+      await s.start();
+      expect(server.refreshCalls()).toBe(1);
+      expect(s.getState().status).toBe('signedIn');
+    });
+    it('tries the cookie when there is no store', async () => {
+      const server = makeServer();
+      const s = make(server, { storage: null });
+      await s.start();
+      expect(server.refreshCalls()).toBe(1);
+      expect(s.getState().status).toBe('signedIn');
+    });
+  });
+
+  describe('M4 user change after a sign-out', () => {
+    it('fires when a different user signs in after a sign-out', async () => {
+      const server = makeServer();
+      const s = make(server);
+      const listener = vi.fn();
+      s.onUserChange(listener);
+      s.signIn({ accessToken: jwt('u1'), expiresAt: soon() });
+      await s.signOut();
+      s.signIn({ accessToken: jwt('u2'), expiresAt: soon() });
+      expect(listener).toHaveBeenCalledWith('u1', 'u2');
+    });
+    it('fires after a final 401 too, and not for the same user', async () => {
+      const server = makeServer();
+      server.state.refreshStatuses = [401, 401];
+      const s = make(server);
+      const listener = vi.fn();
+      s.onUserChange(listener);
+      s.signIn({ accessToken: jwt('u1'), expiresAt: soon() });
+      await s.refresh();
+      expect(s.getState().status).toBe('signedOut');
+      s.signIn({ accessToken: jwt('u1'), expiresAt: soon() });
+      expect(listener).not.toHaveBeenCalled();
+      await s.signOut();
+      s.signIn({ accessToken: jwt('u3'), expiresAt: soon() });
+      expect(listener).toHaveBeenCalledWith('u1', 'u3');
+    });
+  });
+
+  describe('M6 logout timeout', () => {
+    it('gives up on a logout that never answers and keeps it pending', async () => {
+      const server = makeServer();
+      const s = make(server, { fetch: hang, logoutTimeoutMs: 20 });
+      s.signIn({ accessToken: 'a', expiresAt: soon() });
+      await s.signOut();
+      expect(s.getState().status).toBe('signedOut');
+      expect(localStorage.getItem(PENDING)).toBe('1');
+    });
+    it('the retry on the next load times out as well', async () => {
+      const server = makeServer();
+      localStorage.setItem(PENDING, '1');
+      const s = make(server, { fetch: hang, logoutTimeoutMs: 20 });
+      await s.start();
+      expect(s.getState().status).toBe('signedOut');
+      expect(localStorage.getItem(PENDING)).toBe('1');
+    });
+  });
+
+  describe('L2 stamps', () => {
+    it('a tie goes to the sign-out', async () => {
+      const server = makeServer();
+      const bus = new Bus();
+      const a = make(server, { channel: bus.channel() });
+      const other = bus.channel();
+      other.postMessage({ type: 'signout', at: 2000 });
+      await tick();
+      other.postMessage({ type: 'token', accessToken: 'tie', expiresAt: soon(), userId: null, at: 2000 });
+      await tick();
+      expect(a.getToken()).toBeNull();
+      other.postMessage({ type: 'token', accessToken: 'later', expiresAt: soon(), userId: null, at: 3000 });
+      await tick();
+      other.postMessage({ type: 'signout', at: 3000 });
+      await tick();
+      expect(a.getToken()).toBeNull();
+      expect(a.getState().status).toBe('signedOut');
+    });
+    it('a local stamp is never behind one it has seen', async () => {
+      const server = makeServer();
+      const bus = new Bus();
+      const a = make(server, { channel: bus.channel() });
+      const other = bus.channel();
+      const seen: { type: string; at: number }[] = [];
+      other.addEventListener('message', (e) => seen.push(e.data as { type: string; at: number }));
+      const future = Date.now() + 10_000_000;
+      other.postMessage({ type: 'token', accessToken: 'far', expiresAt: soon(), userId: null, at: future });
+      await tick();
+      await a.signOut();
+      await tick();
+      const out = seen.find((m) => m.type === 'signout');
+      expect(out?.at).toBeGreaterThan(future);
+    });
+  });
+
+  describe('L3 signed-in retries', () => {
+    it('retries a failed refresh with a growing pause, then stops after a few tries', async () => {
+      vi.useFakeTimers();
+      const server = makeServer();
+      server.state.refreshStatuses = Array.from({ length: 30 }, () => 503);
+      const s = make(server);
+      s.signIn({ accessToken: 'a', expiresAt: soon() });
+      await s.refresh();
+      expect(server.refreshCalls()).toBe(1);
+      await vi.advanceTimersByTimeAsync(5_000);
+      expect(server.refreshCalls()).toBe(2);
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(server.refreshCalls()).toBe(3);
+      await vi.advanceTimersByTimeAsync(10 * 60_000);
+      expect(server.refreshCalls()).toBe(6);
+      expect(s.getState().status).toBe('signedIn');
+    });
+    it('a retry that works clears the offline flag', async () => {
+      vi.useFakeTimers();
+      const server = makeServer();
+      server.state.refreshStatuses = [503];
+      const s = make(server);
+      s.signIn({ accessToken: 'a', expiresAt: soon() });
+      await s.refresh();
+      expect(s.getState().offline).toBe(true);
+      await vi.advanceTimersByTimeAsync(5_000);
+      expect(s.getState()).toMatchObject({ status: 'signedIn', offline: false });
+    });
+  });
+
+  describe('L4 logout flush', () => {
+    it('sends one logout however many wake-ups arrive', async () => {
+      const server = makeServer();
+      server.state.logoutDelayMs = 30;
+      localStorage.setItem(PENDING, '1');
+      const s = make(server);
+      const started = s.start();
+      window.dispatchEvent(new Event('online'));
+      document.dispatchEvent(new Event('visibilitychange'));
+      await started;
+      expect(server.calls.filter((c) => c.path === '/v1/auth/logout')).toHaveLength(1);
+    });
+    it('a sign-in while the flush is on its way keeps the new session', async () => {
+      const server = makeServer();
+      server.state.logoutDelayMs = 30;
+      localStorage.setItem(PENDING, '1');
+      const s = make(server);
+      const started = s.start();
+      s.signIn({ accessToken: 'new', expiresAt: soon() });
+      await started;
+      expect(s.getState().status).toBe('signedIn');
+      expect(localStorage.getItem(PENDING)).toBeNull();
+    });
   });
 });
 

@@ -48,3 +48,5 @@ Read first: the root `CLAUDE.md`, `docs/plan/README.md`, `docs/plan/01-product-r
 W0-05: shell, routing, i18n, PWA manifest, telemetry stub, size budget and smoke tests in place. Screens are placeholders.
 
 W1-08: shell with sign-in (C-10), language (C-01), location (C-02), account, offline banner, update toast, error boundary and SW precache check. Account is real; Search, Orders and Wallet are still placeholders.
+
+Offline first load: `/account` shows `SessionPending` (offline notice and "Try again") while the session is `unknown` and the API cannot be reached. Sign out clears the whole query cache.

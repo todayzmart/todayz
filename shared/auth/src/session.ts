@@ -14,8 +14,11 @@
 //   - never sends the bearer to the sign-in routes (api-client does that too);
 //   - a cold start that fails for a network or server reason stays `unknown` and retries (online,
 //     visibility, backoff); only a final 401 is signed out;
-//   - a sign-out bumps an epoch, so a refresh that was in flight cannot sign the person back in, and
-//     the cross-tab messages carry a stamp so a late token cannot undo a newer sign-out;
+//   - a sign-out forgets the token first (timers, epoch, broadcast) and only then tells the server, so
+//     a refresh that was in flight or queued cannot sign the person back in, and the cross-tab
+//     messages carry a stamp so a late token cannot undo a newer sign-out;
+//   - the token's lifetime is the server-stamped `exp - iat` of its payload counted from the moment it
+//     arrived, so a wrong device clock or an HTTP-cached Date header cannot skew the refresh;
 //   - two non-secret hints in localStorage: `hasSession.<app>` (skip the cookie try for visitors who
 //     never signed in) and `logoutPending.<app>` (a sign-out that could not reach the server is
 //     retried on the next load, before any refresh).
@@ -82,6 +85,8 @@ export interface SessionOptions {
   graceWaitMs?: number | undefined;
   /** A refresh call that takes longer than this counts as failed (default 15 s). */
   refreshTimeoutMs?: number | undefined;
+  /** A logout call that takes longer than this is given up on (default 10 s); the hint keeps it pending. */
+  logoutTimeoutMs?: number | undefined;
   /** Where the two hints live; undefined uses localStorage when it works, `null` keeps none. */
   storage?: Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> | null | undefined;
 }
@@ -99,8 +104,9 @@ export interface Session {
   signOut(): Promise<void>;
   /**
    * Sign out of every device (`POST /v1/auth/logout-all`, a cookie route). A 401 can mean the cookie
-   * was rotated moments ago in another tab: refresh once and retry once. If it still fails the call
-   * throws and this tab stays signed in: the caller shows "did not complete".
+   * was rotated moments ago in another tab: it refreshes once and retries once. Any other failure, a
+   * refresh that fails, or a second 401 throws and leaves this tab signed in: the caller shows "did
+   * not complete". Only a success signs this tab out.
    */
   signOutEverywhere(): Promise<void>;
   refresh(): Promise<boolean>;
@@ -122,6 +128,9 @@ const AUTH_PATH = /^\/v1\/auth\//;
 const MIN_REFRESH_WAIT_MS = 30_000;
 /** Used when the server's expiry is missing or not a date. */
 const FALLBACK_LIFETIME_MS = 5 * 60_000;
+const LOGOUT_TIMEOUT_MS = 10_000;
+/** A signed-in tab whose refresh failed tries this many more times, then waits for the next wake. */
+const SIGNED_IN_RETRIES = 5;
 const RETRY_FIRST_MS = 5_000;
 const RETRY_MAX_MS = 60_000;
 
@@ -159,12 +168,28 @@ export function subOf(accessToken: string): string | null {
   }
 }
 
+/** How long a token lives by the server's own stamps (`exp - iat`), or null when they are missing or odd. */
+export function lifetimeMsOf(accessToken: string): number | null {
+  try {
+    const part = accessToken.split('.')[1];
+    if (!part) return null;
+    const b64 = part.replace(/-/g, '+').replace(/_/g, '/');
+    const p = JSON.parse(atob(b64 + '='.repeat((4 - (b64.length % 4)) % 4))) as { exp?: unknown; iat?: unknown };
+    if (typeof p.exp !== 'number' || typeof p.iat !== 'number') return null;
+    const ms = (p.exp - p.iat) * 1000;
+    return Number.isFinite(ms) && ms > 0 ? ms : null;
+  } catch {
+    return null;
+  }
+}
+
 export function createSession(opts: SessionOptions): Session {
   const { app, clientId } = opts;
   const now = opts.now ?? Date.now;
   const lead = opts.leadMs ?? 60_000;
   const graceWait = opts.graceWaitMs ?? 400;
   const refreshTimeout = opts.refreshTimeoutMs ?? 15_000;
+  const logoutTimeout = opts.logoutTimeoutMs ?? LOGOUT_TIMEOUT_MS;
   const hintKey = `todayz.hasSession.${app}`;
   const pendingKey = `todayz.logoutPending.${app}`;
   const store = ((): SessionOptions['storage'] => {
@@ -176,11 +201,13 @@ export function createSession(opts: SessionOptions): Session {
     }
   })();
   const hint = {
-    get: (k: string) => {
+    /** `unknown` is the answer when nothing can be read (no storage, or it throws). */
+    get: (k: string, unknown = false) => {
+      if (!store) return unknown;
       try {
-        return store?.getItem(k) === '1';
+        return store.getItem(k) === '1';
       } catch {
-        return false;
+        return unknown;
       }
     },
     set: (k: string) => {
@@ -212,12 +239,16 @@ export function createSession(opts: SessionOptions): Session {
   let seq = 0;
   /** Bumped by every sign-out; a refresh that started before it must not sign anyone in. */
   let epoch = 0;
+  /** Above zero while a sign-out is on its way, so no refresh starts in between. */
+  let signingOut = 0;
   let lastStamp = 0;
   let lastTokenAt = 0;
   let lastSignoutAt = 0;
-  /** Server clock minus device clock, from the Date header of the latest answer. */
-  let skew = 0;
-  let sub: string | null = null;
+  /** The last user this tab saw sign in; it outlives a sign-out so the next user is noticed. */
+  let lastUserId: string | null = null;
+  let retryCount = 0;
+  let flushing: Promise<boolean> | null = null;
+  let flushCtl: AbortController | undefined;
   let retryDelay = RETRY_FIRST_MS;
   let retryTimer: ReturnType<typeof setTimeout> | undefined;
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -257,23 +288,30 @@ export function createSession(opts: SessionOptions): Session {
     timer = setTimeout(() => void refresh(), wait);
   }
 
-  /** The grant's expiry on this device's clock; never NaN. */
-  function expiryOf(iso: string, ms?: number): number {
+  /**
+   * The grant's expiry on this device's clock; never NaN. The token's own `exp - iat` counted from
+   * now (it just arrived) does not depend on either clock; a token without them falls back to the
+   * answer's `expiresAt`, then to a short fixed life.
+   */
+  function expiryOf(accessToken: string, iso: string, ms?: number): number {
     if (typeof ms === 'number' && Number.isFinite(ms)) return ms;
+    const life = lifetimeMsOf(accessToken);
+    if (life !== null) return now() + life;
     const server = Date.parse(iso);
-    if (!Number.isFinite(server)) return now() + FALLBACK_LIFETIME_MS;
-    return server - skew;
+    return Number.isFinite(server) ? server : now() + FALLBACK_LIFETIME_MS;
   }
 
   function accept(grant: TokenGrant, broadcast: boolean, expiresAtMs?: number, at?: number) {
     const nextSub = subOf(grant.accessToken);
-    const changed = sub !== null && nextSub !== null && sub !== nextSub;
-    const previous = sub;
+    const who = nextSub ?? grant.userId ?? null;
+    const previous = lastUserId;
+    const changed = previous !== null && who !== null && previous !== who;
     token = grant.accessToken;
-    expiresAt = expiryOf(grant.expiresAt, expiresAtMs);
-    sub = nextSub ?? (changed ? null : sub);
+    expiresAt = expiryOf(grant.accessToken, grant.expiresAt, expiresAtMs);
+    if (who !== null) lastUserId = who;
     seq += 1;
     lastTokenAt = at ?? stamp();
+    lastStamp = Math.max(lastStamp, lastTokenAt);
     if (changed) etags.clear();
     setState({
       status: 'signedIn',
@@ -282,6 +320,7 @@ export function createSession(opts: SessionOptions): Session {
     });
     hint.set(hintKey);
     retryDelay = RETRY_FIRST_MS;
+    retryCount = 0;
     if (retryTimer !== undefined) clearTimeout(retryTimer);
     retryTimer = undefined;
     schedule();
@@ -295,13 +334,12 @@ export function createSession(opts: SessionOptions): Session {
         at: lastTokenAt,
       });
     }
-    if (changed && previous !== null && nextSub !== null) userListeners.forEach((l) => l(previous, nextSub));
+    if (changed && previous !== null && who !== null) userListeners.forEach((l) => l(previous, who));
   }
 
-  function forget(broadcast: boolean, at?: number) {
+  function forget(broadcast: boolean, at?: number, keepHint = false) {
     epoch += 1;
     token = null;
-    sub = null;
     expiresAt = 0;
     etags.clear();
     if (timer !== undefined) clearTimeout(timer);
@@ -309,7 +347,8 @@ export function createSession(opts: SessionOptions): Session {
     if (retryTimer !== undefined) clearTimeout(retryTimer);
     retryTimer = undefined;
     lastSignoutAt = at ?? stamp();
-    hint.clear(hintKey);
+    lastStamp = Math.max(lastStamp, lastSignoutAt);
+    if (!keepHint) hint.clear(hintKey);
     setState({ status: 'signedOut', userId: null, offline: false });
     if (broadcast) post({ type: 'signout', at: lastSignoutAt });
   }
@@ -319,8 +358,8 @@ export function createSession(opts: SessionOptions): Session {
     if (!m || typeof m !== 'object') return;
     const at = typeof m.at === 'number' && Number.isFinite(m.at) ? m.at : undefined;
     if (m.type === 'token' && typeof m.accessToken === 'string') {
-      // A token older than the latest sign-out is a late message, not a new sign-in.
-      if (at !== undefined && at < lastSignoutAt) return;
+      // A token not newer than the latest sign-out is a late message, not a new sign-in (a tie goes to the sign-out).
+      if (at !== undefined && at <= lastSignoutAt) return;
       accept({ accessToken: m.accessToken, expiresAt: m.expiresAt, userId: m.userId ?? undefined }, false, m.expiresAtMs, at);
     } else if (m.type === 'signout') {
       // A sign-out older than the token we hold was answered by a newer sign-in.
@@ -334,8 +373,8 @@ export function createSession(opts: SessionOptions): Session {
 
   type Outcome = 'ok' | 'unauthorized' | 'failed' | 'stale';
 
-  async function callRefresh(): Promise<Outcome> {
-    const started = epoch;
+  async function callRefresh(started: number): Promise<Outcome> {
+    if (epoch !== started) return 'stale';
     const ctl = new AbortController();
     const abort = setTimeout(() => ctl.abort(), refreshTimeout);
     try {
@@ -352,12 +391,14 @@ export function createSession(opts: SessionOptions): Session {
     }
   }
 
-  async function runRefresh(startSeq: number): Promise<boolean> {
+  async function runRefresh(startSeq: number, startEpoch: number): Promise<boolean> {
     try {
+      // A sign-out came after this refresh was asked for (it may have waited on the lock): drop it.
+      if (epoch !== startEpoch) return false;
       // Another tab refreshed while we waited for the lock: use its token.
       if (seq !== startSeq && fresh()) return true;
       const held = token !== null;
-      let r = await callRefresh();
+      let r = await callRefresh(startEpoch);
       if (r === 'unauthorized' && held) {
         // D-105: a 401 within the rotation grace is a race with another tab, not a sign-out.
         // Only a tab that held a token can be in that race; a cold start has nothing to wait for.
@@ -366,11 +407,13 @@ export function createSession(opts: SessionOptions): Session {
         await sleep(graceWait);
         if (epoch !== started) return false;
         if (seq !== before && fresh()) return true;
-        r = await callRefresh();
+        r = await callRefresh(startEpoch);
       }
       if (r === 'ok') return true;
       if (r === 'stale') return false;
-      if (r === 'unauthorized') forget(held);
+      // Without Web Locks a tab that never held a token can be racing a rotation in another tab: its
+      // 401 must not clear the hint that tab shares.
+      if (r === 'unauthorized') forget(held, undefined, !held && !locks);
       else {
         setState({ offline: true });
         scheduleRetry();
@@ -382,12 +425,14 @@ export function createSession(opts: SessionOptions): Session {
   }
 
   function refresh(): Promise<boolean> {
+    if (signingOut > 0) return Promise.resolve(false);
     if (inflight) return inflight;
     const startSeq = seq;
+    const startEpoch = epoch;
     let began = false;
     const run = () => {
       began = true;
-      return runRefresh(startSeq);
+      return runRefresh(startSeq, startEpoch);
     };
     let p: Promise<boolean>;
     try {
@@ -405,31 +450,59 @@ export function createSession(opts: SessionOptions): Session {
     return inflight;
   }
 
-  /** While the first load could not reach the server, try again with a growing pause. */
+  /**
+   * After a failed refresh: an `unknown` tab (first load) keeps trying with a growing pause; a
+   * signed-in tab tries a few more times with the same pause, then waits for the next wake.
+   */
   function scheduleRetry() {
-    if (state.status !== 'unknown' || disposed || retryTimer !== undefined) return;
+    if (disposed || retryTimer !== undefined) return;
+    const unknown = state.status === 'unknown';
+    if (!unknown && !(state.status === 'signedIn' && token !== null && retryCount < SIGNED_IN_RETRIES)) return;
+    retryCount += 1;
     retryTimer = setTimeout(() => {
       retryTimer = undefined;
-      void attemptStart();
+      if (state.status === 'unknown') void attemptStart();
+      else void refresh();
     }, retryDelay);
     retryDelay = Math.min(retryDelay * 2, RETRY_MAX_MS);
   }
 
-  /** Sends the logout that could not be sent before. True when the server has answered. */
-  async function flushLogout(): Promise<boolean> {
-    if (!hint.get(pendingKey)) return true;
+  async function sendLogout(ctl: AbortController): Promise<void> {
+    const t = setTimeout(() => ctl.abort(), logoutTimeout);
     try {
-      await apiLogout({ app }, authOptions());
-      hint.clear(pendingKey);
-      return true;
-    } catch (e) {
-      // Any answer from the server (a 401 included) means the session is gone there.
-      if (e instanceof ApiError && e.status < 500) {
+      await apiLogout({ app }, { ...authOptions(), signal: ctl.signal });
+    } finally {
+      clearTimeout(t);
+    }
+  }
+
+  /** Sends the logout that could not be sent before. True when the server has answered. One at a time. */
+  function flushLogout(): Promise<boolean> {
+    if (flushing) return flushing;
+    if (!hint.get(pendingKey)) return Promise.resolve(true);
+    const ctl = new AbortController();
+    flushCtl = ctl;
+    flushing = (async () => {
+      try {
+        // A sign-in since the check has cleared the hint: that session's cookie must not be revoked.
+        if (!hint.get(pendingKey)) return true;
+        await sendLogout(ctl);
         hint.clear(pendingKey);
         return true;
+      } catch (e) {
+        if (!hint.get(pendingKey)) return true;
+        // Any answer from the server (a 401 included) means the session is gone there.
+        if (e instanceof ApiError && e.status < 500) {
+          hint.clear(pendingKey);
+          return true;
+        }
+        return false;
+      } finally {
+        flushing = null;
+        flushCtl = undefined;
       }
-      return false;
-    }
+    })();
+    return flushing;
   }
 
   async function attemptStart(): Promise<void> {
@@ -442,7 +515,8 @@ export function createSession(opts: SessionOptions): Session {
         return;
       }
       // Visitors who never signed in here cost no request.
-      if (!hint.get(hintKey)) {
+      // A missing or unreadable store says nothing, so only a definite absence skips the request.
+      if (!hint.get(hintKey, true)) {
         forget(false);
         return;
       }
@@ -454,7 +528,7 @@ export function createSession(opts: SessionOptions): Session {
 
   const onWake = () => {
     if (disposed) return;
-    if (hint.get(pendingKey) && state.status === 'signedOut') void flushLogout();
+    if (signingOut === 0 && hint.get(pendingKey) && state.status === 'signedOut') void flushLogout();
     if (state.status === 'unknown') {
       if (retryTimer !== undefined) clearTimeout(retryTimer);
       retryTimer = undefined;
@@ -471,9 +545,6 @@ export function createSession(opts: SessionOptions): Session {
     const path = pathOf(input);
     const sent = token;
     let res = await baseFetch(input, init);
-    // The server's clock, so token lifetimes do not depend on the device's clock being right.
-    const date = Date.parse(res.headers.get('date') ?? '');
-    if (Number.isFinite(date)) skew = date - now();
     // Sign-in, refresh, logout and logout-all are cookie routes: never retried with a new bearer.
     if (AUTH_PATH.test(path)) return res;
     // Only a plain `unauthorized` (or an answer with no problem body) means the bearer is stale.
@@ -520,20 +591,24 @@ export function createSession(opts: SessionOptions): Session {
     signIn(grant) {
       // A new sign-in replaces the old session's cookie, so a logout that was still pending is moot.
       hint.clear(pendingKey);
+      flushCtl?.abort();
       accept(grant, true);
     },
     async signOut() {
-      epoch += 1;
+      // Forget first: no refresh can rotate the cookie or sign anyone in while the server is asked.
+      signingOut += 1;
       hint.set(pendingKey);
+      forget(true);
       try {
-        await apiLogout({ app }, authOptions());
+        await sendLogout(new AbortController());
         hint.clear(pendingKey);
       } catch (e) {
-        // Offline or already revoked: the local session ends either way. An answer from the server
-        // means it is done there; no answer leaves the hint, and the next load retries.
+        // Offline, timed out or already revoked: the local session has ended either way. An answer
+        // from the server means it is done there; no answer leaves the hint, and the next load retries.
         if (e instanceof ApiError && e.status < 500) hint.clear(pendingKey);
+      } finally {
+        signingOut -= 1;
       }
-      forget(true);
     },
     async signOutEverywhere() {
       // TODO(W1-01b): swap for the generated client once the contract branch merges.
@@ -562,6 +637,7 @@ export function createSession(opts: SessionOptions): Session {
       disposed = true;
       if (timer !== undefined) clearTimeout(timer);
       if (retryTimer !== undefined) clearTimeout(retryTimer);
+      flushCtl?.abort();
       if (typeof document !== 'undefined') document.removeEventListener('visibilitychange', onVisible);
       if (typeof window !== 'undefined') window.removeEventListener('online', onWake);
       channel?.close();

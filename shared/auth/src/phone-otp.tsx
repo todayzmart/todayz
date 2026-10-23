@@ -79,6 +79,13 @@ export function PhoneOtpFlow({ session, siteKey, labels, onSignedIn, children, c
   const [verifying, setVerifying] = useState(false);
   const [wait, setWait] = useState(0);
   const verifyingRef = useRef(false);
+  // The latest callback, read when a code is verified, so a new function each render does not re-run effects.
+  const onSignedInRef = useRef(onSignedIn);
+  const labelsRef = useRef(labels);
+  useEffect(() => {
+    onSignedInRef.current = onSignedIn;
+    labelsRef.current = labels;
+  });
 
   useEffect(() => {
     if (wait <= 0) return undefined;
@@ -140,13 +147,13 @@ export function PhoneOtpFlow({ session, siteKey, labels, onSignedIn, children, c
         });
         session.signIn({ accessToken: r.accessToken, expiresAt: r.expiresAt, userId: r.userId });
         const step = (r as { nextStep?: string }).nextStep;
-        onSignedIn({
+        onSignedInRef.current({
           userId: r.userId,
           isNewUser: r.isNewUser,
           nextStep: step === 'totp_enrol' || step === 'totp_verify' ? step : undefined,
         });
       } catch (e) {
-        setCodeError(labels.errors[otpErrorKind(e)]);
+        setCodeError(labelsRef.current.errors[otpErrorKind(e)]);
         setErrorKey((k) => k + 1);
         setCode('');
       } finally {
@@ -154,7 +161,7 @@ export function PhoneOtpFlow({ session, siteKey, labels, onSignedIn, children, c
         setVerifying(false);
       }
     },
-    [labels, onSignedIn, requestId, session],
+    [requestId, session],
   );
 
   // WebOTP: Chrome on Android hands the SMS code to the page (AU-05). Silently absent elsewhere.

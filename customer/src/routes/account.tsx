@@ -1,6 +1,6 @@
 import { ApiError } from '@todayz/api-client';
 import { getMe } from '@todayz/api-client/gen/me/me';
-import { useSession, useSessionState } from '@todayz/auth';
+import { SessionPending, useSession, useSessionState } from '@todayz/auth';
 import { NATIVE_NAMES, isLocale } from '@todayz/i18n';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, createFileRoute } from '@tanstack/react-router';
@@ -38,10 +38,13 @@ function Account() {
   }
   if (status === 'unknown') {
     return (
-      <div className={styles.body} role="status" aria-label={intl.formatMessage({ id: 'account.loading' })}>
-        <Skeleton height="2rem" />
-        <Skeleton height="6rem" />
-      </div>
+      <SessionPending
+        className={styles.body}
+        loadingLabel={intl.formatMessage({ id: 'account.loading' })}
+        offlineTitle={intl.formatMessage({ id: 'app.offline.title' })}
+        offlineMessage={intl.formatMessage({ id: 'app.offline.body' })}
+        retryLabel={intl.formatMessage({ id: 'app.pending.retry' })}
+      />
     );
   }
   return <SignedIn />;
@@ -108,7 +111,8 @@ function Profile({ me, note, setNote }: { me: Me; note: Note; setNote: (n: Note)
 
   const signOut = async () => {
     await session.signOut();
-    client.removeQueries({ queryKey: ['me'] });
+    // Nothing cached for this person may outlive the session: orders, bookings and addresses too.
+    client.clear();
   };
 
   const place_ =

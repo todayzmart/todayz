@@ -11,6 +11,7 @@ export {
   isTestSiteKey,
 } from './turnstile';
 export { OfflineBanner, useOnline, type OfflineBannerProps } from './online';
+export { SessionPending, type SessionPendingProps } from './pending';
 export { ErrorBoundary, type ErrorBoundaryProps } from './error-boundary';
 export {
   UpdateToastHost,

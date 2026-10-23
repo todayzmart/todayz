@@ -29,7 +29,10 @@ export function safeNext(next: unknown, blocked: readonly string[] = []): string
   if (url.origin !== BASE) return '/';
   const path = url.pathname;
   if (blocked.some((b) => path === b || path.startsWith(`${b}/`))) return '/';
-  return path + url.search + url.hash;
+  const out = path + url.search + url.hash;
+  // Dot segments fold away ('/.//evil.example' becomes '//evil.example'): a protocol-relative URL.
+  if (out.startsWith('//')) return '/';
+  return out;
 }
 
 /** TanStack Router `validateSearch` for a route that takes `?next=`. */

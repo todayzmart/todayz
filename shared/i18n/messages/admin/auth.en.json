@@ -27,6 +27,10 @@
     "defaultMessage": "Try again",
     "description": "Button on the crash screen"
   },
+  "app.pending.retry": {
+    "defaultMessage": "Try again",
+    "description": "Button under the offline notice when the first sign-in check could not reach the server"
+  },
   "app.loading": {
     "defaultMessage": "Loading",
     "description": "Spoken while the app checks whether you are signed in"

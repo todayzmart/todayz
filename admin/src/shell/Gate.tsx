@@ -1,6 +1,5 @@
-import { OfflineBanner, useSessionState } from '@todayz/auth';
+import { OfflineBanner, SessionPending, useSessionState } from '@todayz/auth';
 import { Navigate, Outlet, useRouterState } from '@tanstack/react-router';
-import { Skeleton } from '@todayz/ui';
 import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { useSecondFactor, useSecondFactorState } from '../app/second-factor';
@@ -50,10 +49,13 @@ export function Gate() {
   if (OPEN.includes(location.pathname)) return bare;
   if (status === 'unknown') {
     return (
-      <div className={styles.signIn} role="status" aria-label={intl.formatMessage({ id: 'app.loading' })}>
-        <Skeleton height="2rem" />
-        <Skeleton height="8rem" />
-      </div>
+      <SessionPending
+        className={styles.signIn}
+        loadingLabel={intl.formatMessage({ id: 'app.loading' })}
+        offlineTitle={intl.formatMessage({ id: 'app.offline.title' })}
+        offlineMessage={intl.formatMessage({ id: 'app.offline.body' })}
+        retryLabel={intl.formatMessage({ id: 'app.pending.retry' })}
+      />
     );
   }
   if (status === 'signedOut') return <Navigate to="/sign-in" search={next} replace />;

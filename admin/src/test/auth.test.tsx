@@ -118,7 +118,7 @@ describe('A-01 first sign-in: enrol', () => {
         expect(key + (store.getItem(key) ?? '')).not.toContain('K7M2Q');
       }
     }
-    const next = screen.getByRole('button', { name: 'Continue to Pulse' });
+    const next = screen.getByRole('button', { name: 'Continue to “Pulse”' });
     expect(next).toBeDisabled();
     fireEvent.click(screen.getByLabelText('I have saved these codes'));
     fireEvent.click(next);

@@ -7,6 +7,10 @@
     "defaultMessage": "Saved pages still open. We'll catch up when you're back online.",
     "description": "Rest of the offline banner"
   },
+  "app.pending.retry": {
+    "defaultMessage": "Try again",
+    "description": "Button under the offline notice when the first sign-in check could not reach the server"
+  },
   "app.update.message": {
     "defaultMessage": "A new version of TodayZ is ready.",
     "description": "Toast shown when a new version of the app is waiting. The page never reloads until the person taps Update."
