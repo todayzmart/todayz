@@ -19,7 +19,7 @@ import (
 const KindRealtimeOutboxCleanup = "realtime_outbox_cleanup"
 
 // outboxCleanupBatches bounds one cleanup run (5,000 rows a batch).
-const outboxCleanupBatches = 40
+const outboxCleanupBatches = 40 //settings:ok an internal batch bound (5,000 x 40 rows a run), not a product rule
 
 // EscalationSources returns the "new order not seen" inputs: the orders not
 // yet seen by the store (W2-02) and the store contacts (W1-04). Nil, nil
