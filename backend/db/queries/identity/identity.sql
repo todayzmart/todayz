@@ -30,6 +30,12 @@ VALUES (@id, @phone_hash, @phone_enc, @purpose, @app, @code_hash, @expires_at, s
 SELECT id, phone_hash, phone_enc, purpose, app, code_hash, expires_at, attempts, consumed_at
 FROM otp_requests WHERE id = @id FOR UPDATE;
 
+-- name: GetStepUpOtpRequestForUpdate :one
+-- Deletion's read of its code: only a step_up row is locked (a login row may
+-- be held by a sign-in that waits for the user's row deletion holds).
+SELECT id, phone_hash, phone_enc, purpose, app, code_hash, expires_at, attempts, consumed_at
+FROM otp_requests WHERE id = @id AND purpose = 'step_up' FOR UPDATE;
+
 -- name: RecordOtpAttempt :one
 UPDATE otp_requests SET attempts = attempts + 1 WHERE id = @id RETURNING attempts;
 
@@ -104,7 +110,7 @@ VALUES (@id, @user_id, @app, @family_id, @refresh_hash, @expires_at, sqlc.narg(d
 
 -- name: GetSessionUserByRefreshHash :one
 -- The user of a refresh token, unlocked (a session's user never changes), so
--- refresh and logout-all can lock the users row before the session row.
+-- refresh, logout and logout-all can lock the users row before the session row.
 SELECT user_id FROM sessions WHERE refresh_hash = @refresh_hash;
 
 -- name: GetSessionByRefreshHashForUpdate :one
@@ -208,16 +214,19 @@ UPDATE sessions SET revoked_at = @now::timestamptz, revoked_reason = @reason::te
 WHERE user_id = @user_id AND revoked_at IS NULL;
 
 -- name: LockUser :one
--- The lock of a mass revocation (logout-all, the TOTP lockout, deletion) and
--- of the admin TOTP flows. It conflicts with LockUserShared, so a refresh never
--- inserts a session row a concurrent mass revocation cannot see, and not with
--- the KEY SHARE lock a session insert's foreign key takes (no deadlock).
--- Lock order: users, then admin_users, then sessions.
+-- The lock of every path that rotates or revokes a user's sessions: refresh
+-- (its reuse branch revokes a family), logout, logout-all, the admin TOTP
+-- flows (rotation, the lockout) and deletion. They run one at a time per
+-- user, so no revocation misses a row a concurrent rotation inserts. It does
+-- not conflict with the KEY SHARE lock a foreign key takes (no deadlock with
+-- inserts that reference the user). Lock order: users, then admin_users,
+-- then sessions.
 SELECT status FROM users WHERE id = @id FOR NO KEY UPDATE;
 
 -- name: LockUserShared :one
--- Refresh's lock: refreshes of one user run side by side, but never alongside
--- a mass revocation of that user (LockUser).
+-- Sign-in's lock, after the unlocked lookup by phone: sign-ins run alongside
+-- each other but not alongside a deletion (LockUser), and the status read
+-- under it is current.
 SELECT status FROM users WHERE id = @id FOR SHARE;
 
 -- name: GetPhoneHashByUser :one

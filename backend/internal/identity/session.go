@@ -126,12 +126,16 @@ type RefreshInput struct {
 // lifetime slides; sliding is assumed, admin is absolute (the conservative
 // reading for the privileged app).
 //
-// Locks: the users row FOR SHARE first (lockSessionUser), then the session
-// row. A mass revocation (logout-all, the TOTP lockout, deletion) holds the
-// users row FOR NO KEY UPDATE, so a rotation either commits before it starts
-// (and its new row is revoked with the rest) or runs after it (and finds its
-// token revoked). Without that, the revocation's UPDATE, whose snapshot
-// predates the rotation's insert, would miss the new row.
+// Locks: the users row FOR NO KEY UPDATE first (lockSessionUser), then the
+// session row. Every path that revokes sessions in bulk (logout, logout-all,
+// this function's reuse branch, the TOTP lockout, deletion) and every path
+// that rotates (refresh, TOTP elevation) holds that lock, so a rotation
+// either commits before a revocation starts (and its new row is revoked with
+// the rest) or runs after it (and finds its token revoked). Without that, a
+// revocation's UPDATE, whose snapshot predates the rotation's insert, would
+// miss the new row. Refreshes of one user therefore run one at a time; the
+// lock is held only for a few indexed statements and the audit insert (the
+// access token is signed after commit).
 func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) {
 	if err := s.readyTokens(); err != nil {
 		return SignIn{}, unavailable(ctx, err)
@@ -148,7 +152,7 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 	)
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
 		q := identitydb.New(s.db.Q(ctx))
-		if found, err := lockSessionUser(ctx, q, in.Token, false); err != nil || !found {
+		if found, err := lockSessionUser(ctx, q, in.Token); err != nil || !found {
 			if err == nil {
 				outcome = problem.New(genproblems.Unauthorized, "")
 			}
@@ -258,11 +262,13 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 	return out, nil
 }
 
-// lockSessionUser locks the users row of a refresh token's session before the
-// session row is locked: FOR SHARE for a refresh, FOR NO KEY UPDATE (LockUser)
-// for a mass revocation. found is false for an unknown token or user. The
-// first read takes no lock; a session's user never changes, so it is safe.
-func lockSessionUser(ctx context.Context, q *identitydb.Queries, token string, exclusive bool) (found bool, err error) {
+// lockSessionUser locks the users row of a refresh token's session (LockUser,
+// FOR NO KEY UPDATE) before the session row is locked, for refresh, logout
+// and logout-all. found is false for an unknown token or user. The first read
+// takes no lock; a session's user never changes, so it is safe. One lock mode
+// for all of them: a transaction that took FOR SHARE and then upgraded would
+// deadlock with another doing the same.
+func lockSessionUser(ctx context.Context, q *identitydb.Queries, token string) (found bool, err error) {
 	uid, err := q.GetSessionUserByRefreshHash(ctx, hashRefresh(token))
 	switch {
 	case db.IsNoRows(err):
@@ -270,11 +276,7 @@ func lockSessionUser(ctx context.Context, q *identitydb.Queries, token string, e
 	case err != nil:
 		return false, err
 	}
-	if exclusive {
-		_, err = q.LockUser(ctx, uid)
-	} else {
-		_, err = q.LockUserShared(ctx, uid)
-	}
+	_, err = q.LockUser(ctx, uid)
 	switch {
 	case db.IsNoRows(err):
 		return false, nil
@@ -294,7 +296,9 @@ func totpCurrent(enabledAt, verifiedAt *time.Time) bool {
 
 // Logout ends the sign-in (session family) of the presented refresh token.
 // An unknown or already revoked token is still a successful logout: the
-// cookie is cleared either way and nothing is revealed.
+// cookie is cleared either way and nothing is revealed. It locks the users
+// row first (lockSessionUser), so a concurrent refresh of the family cannot
+// insert a row its revocation misses.
 func (s *Service) Logout(ctx context.Context, in RefreshInput) error {
 	if err := s.ready(); err != nil {
 		return unavailable(ctx, err)
@@ -307,6 +311,9 @@ func (s *Service) Logout(ctx context.Context, in RefreshInput) error {
 	}
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
 		q := identitydb.New(s.db.Q(ctx))
+		if found, err := lockSessionUser(ctx, q, in.Token); err != nil || !found {
+			return err
+		}
 		now := s.clock.Now().UTC()
 		row, err := q.GetSessionByRefreshHashForUpdate(ctx, hashRefresh(in.Token))
 		if db.IsNoRows(err) {

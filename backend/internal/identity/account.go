@@ -48,7 +48,7 @@ func (s *Service) LogoutAll(ctx context.Context, in RefreshInput) (int64, error)
 	)
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
 		q := identitydb.New(s.db.Q(ctx))
-		if found, err := lockSessionUser(ctx, q, in.Token, true); err != nil || !found {
+		if found, err := lockSessionUser(ctx, q, in.Token); err != nil || !found {
 			if err == nil {
 				outcome = problem.New(genproblems.Unauthorized, "")
 			}
@@ -175,7 +175,10 @@ func (s *Service) DeleteAccount(ctx context.Context, p authn.Principal, in Delet
 			return err
 		}
 
-		row, err := q.GetOtpRequestForUpdate(ctx, ids.UUID(reqID))
+		// Only a step_up request is locked: a sign-in verifying a login
+		// request holds that row and then waits for this user's row, which
+		// this transaction already holds, so locking it here would deadlock.
+		row, err := q.GetStepUpOtpRequestForUpdate(ctx, ids.UUID(reqID))
 		switch {
 		case db.IsNoRows(err):
 			return problem.New(genproblems.OtpExpired, "")

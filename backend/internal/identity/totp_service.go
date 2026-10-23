@@ -90,11 +90,11 @@ func adminPrincipal(p authn.Principal) error {
 	return nil
 }
 
-// lockUserAdmin takes the users row lock of a mass revocation (LockUser, FOR
-// NO KEY UPDATE) and then the admin row (lockAdmin). Verify and recover can
-// revoke every admin session (the lockout) or rotate the sign-in, so they
-// serialise with refresh (LockUserShared) like logout-all does. The lock
-// order is users, admin_users, sessions everywhere.
+// lockUserAdmin takes the users row lock (LockUser, FOR NO KEY UPDATE) and
+// then the admin row (lockAdmin). Verify and recover can revoke every admin
+// session (the lockout) or rotate the sign-in, so they serialise with refresh
+// and logout like logout-all does. The lock order is users, admin_users,
+// sessions everywhere.
 func lockUserAdmin(ctx context.Context, q *identitydb.Queries, userID ids.ID) (identitydb.GetAdminForUpdateRow, error) {
 	if _, err := q.LockUser(ctx, ids.UUID(userID)); err != nil && !db.IsNoRows(err) {
 		return identitydb.GetAdminForUpdateRow{}, err
@@ -197,8 +197,7 @@ func (s *Service) VerifyTOTP(ctx context.Context, p authn.Principal, code, purpo
 		return TOTPResult{}, problem.New(genproblems.ValidationFailed, "").WithField("body.purpose", "must be login or step_up")
 	}
 	var (
-		roles   []string
-		rot     rotation
+		out     TOTPResult
 		outcome error // a refusal whose failure count must commit
 	)
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
@@ -232,6 +231,7 @@ func (s *Service) VerifyTOTP(ctx context.Context, p authn.Principal, code, purpo
 		if err := q.RecordTotpSuccess(ctx, identitydb.RecordTotpSuccessParams{Now: now, Step: &step, UserID: a.UserID}); err != nil {
 			return err
 		}
+		var rot rotation
 		if purpose == TOTPPurposeLogin {
 			if rot, err = s.rotateElevated(ctx, q, now, p); err != nil {
 				return err
@@ -248,7 +248,12 @@ func (s *Service) VerifyTOTP(ctx context.Context, p authn.Principal, code, purpo
 		})); err != nil {
 			return err
 		}
-		roles = a.Roles
+		// Signed before commit: a signing failure rolls the rotation back
+		// instead of leaving the client without its new refresh token.
+		if out, err = s.issueTOTP(p, a.Roles); err != nil {
+			return err
+		}
+		out.RefreshToken, out.RefreshExpiresAt = rot.token, rot.expiresAt
 		return nil
 	})
 	if err != nil {
@@ -257,9 +262,7 @@ func (s *Service) VerifyTOTP(ctx context.Context, p authn.Principal, code, purpo
 	if outcome != nil {
 		return TOTPResult{}, outcome
 	}
-	out, err := s.issueTOTP(p, roles)
-	out.RefreshToken, out.RefreshExpiresAt = rot.token, rot.expiresAt
-	return out, err
+	return out, nil
 }
 
 // RecoverTOTP signs in with a recovery code instead of a TOTP code. Each code
@@ -273,9 +276,7 @@ func (s *Service) RecoverTOTP(ctx context.Context, p authn.Principal, recoveryCo
 	}
 	norm, wellFormed := normalizeRecoveryCode(recoveryCode)
 	var (
-		roles   []string
-		left    int
-		rot     rotation
+		out     TOTPResult
 		outcome error
 	)
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
@@ -314,20 +315,26 @@ func (s *Service) RecoverTOTP(ctx context.Context, p authn.Principal, recoveryCo
 		if err := q.RecordTotpSuccess(ctx, identitydb.RecordTotpSuccessParams{Now: now, UserID: a.UserID}); err != nil {
 			return err
 		}
-		if rot, err = s.rotateElevated(ctx, q, now, p); err != nil {
+		rot, err := s.rotateElevated(ctx, q, now, p)
+		if err != nil {
 			return err
 		}
 		n, err := q.CountUnusedRecoveryCodes(ctx, a.UserID)
 		if err != nil {
 			return err
 		}
-		left = int(n)
+		left := int(n)
 		if _, err := s.audit.Write(ctx, auditEntry(authn.AppAdmin, p.UserID, "identity.totp_recovered", map[string]any{
 			"sessionId": p.SessionID.String(), "recoveryCodesLeft": left,
 		})); err != nil {
 			return err
 		}
-		roles = a.Roles
+		// Signed before commit, as in VerifyTOTP.
+		if out, err = s.issueTOTP(p, a.Roles); err != nil {
+			return err
+		}
+		out.RecoveryCodesLeft = left
+		out.RefreshToken, out.RefreshExpiresAt = rot.token, rot.expiresAt
 		return nil
 	})
 	if err != nil {
@@ -336,10 +343,7 @@ func (s *Service) RecoverTOTP(ctx context.Context, p authn.Principal, recoveryCo
 	if outcome != nil {
 		return TOTPResult{}, outcome
 	}
-	out, err := s.issueTOTP(p, roles)
-	out.RecoveryCodesLeft = left
-	out.RefreshToken, out.RefreshExpiresAt = rot.token, rot.expiresAt
-	return out, err
+	return out, nil
 }
 
 // rotation is the new refresh token of an elevated sign-in.

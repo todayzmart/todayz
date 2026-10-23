@@ -296,7 +296,17 @@ func (s *Service) signIn(ctx context.Context, q *identitydb.Queries, now time.Ti
 			return signInResult{}, nil, errors.New("identity: user without id")
 		}
 		userID = id
-		if refusal := statusRefusal(u.Status); refusal != nil {
+		// The lookup took no lock, so a deletion may have committed since:
+		// lock the users row (FOR SHARE, users before sessions as everywhere)
+		// and check the status again. A deletion holding the row waits for
+		// this sign-in and then revokes and scrubs its session and device;
+		// one that committed first leaves the user deleted, and the sign-in
+		// is refused like any non-active user's.
+		status, err := q.LockUserShared(ctx, u.ID)
+		if err != nil {
+			return signInResult{}, nil, err
+		}
+		if refusal := statusRefusal(status); refusal != nil {
 			return signInResult{}, refusal, nil
 		}
 	}

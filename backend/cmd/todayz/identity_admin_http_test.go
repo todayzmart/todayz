@@ -46,6 +46,14 @@ func TestIdentityHTTPAdminTOTP(t *testing.T) {
 	w := a.do(http.MethodGet, "/v1/admin/jobs", "", bearer(otpOnly))
 	require.Equal(t, http.StatusForbidden, w.Code, "an OTP-only admin token never reaches /v1/admin")
 	require.Equal(t, http.StatusForbidden, a.do(http.MethodGet, "/v1/admin/jobs", "", bearer(cust)).Code, "nor a customer token")
+	// L7: the admin app's telemetry intake takes an OTP-only token on the
+	// exact paths only; anything under them is refused by authn.
+	rum := `{"app":"admin","release":"admin@3f2a9c1","platform":"web","samples":[{"type":"vital","name":"LCP","value":900,"route":"/","t":1792660000000}]}`
+	w = a.do(http.MethodPost, "/v1/rum", rum, bearer(otpOnly))
+	require.Equal(t, http.StatusNoContent, w.Code, w.Body.String())
+	for _, p := range []string{"/v1/rum/x", "/v1/rum/"} {
+		require.Equal(t, http.StatusForbidden, a.do(http.MethodPost, p, rum, bearer(otpOnly)).Code, p)
+	}
 
 	w = a.do(http.MethodPost, "/v1/auth/totp/enrol", "", bearer(otpOnly))
 	require.Equal(t, http.StatusOK, w.Code, w.Body.String())
