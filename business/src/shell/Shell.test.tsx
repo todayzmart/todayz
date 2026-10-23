@@ -102,7 +102,8 @@ describe('business shell', () => {
     expect(links.at(-1)).toHaveAccessibleName('Finish setup');
   });
 
-  it.each(NAV.filter((n) => n.section !== 'more' && n.section !== 'overview'))('shows the placeholder for /$section', async ({ section }) => {
+  // Sections that have a real page (orders: W2-10) no longer show the placeholder.
+  it.each(NAV.filter((n) => n.section !== 'more' && n.section !== 'overview' && n.section !== 'orders'))('shows the placeholder for /$section', async ({ section }) => {
     renderAt(`/${section}`);
     const { side } = await navs();
     const active = within(side).getAllByRole('link').find((l) => l.getAttribute('aria-current') === 'page');
