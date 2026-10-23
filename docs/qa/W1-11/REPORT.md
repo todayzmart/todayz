@@ -187,3 +187,28 @@
 2. **Pause history.** Only the latest pause window is kept. A pause, resume and second pause inside one allowance excuses only by the latest window.
 3. **W1-01 merge.** On main, `backend/internal/jobs/identity.go` registers `identity.purge` with the W0-03 River registry (`Add` and `r.Every`). W1-11 replaced that registry with `jobs.Define`, so the merge will not compile until identity.go is ported. Suggested port: `Define(r, Kind{Name: "identity_purge", Class: ClassMaintenance, Schedule: "0 * * * *", UniqueBy: PerTick, ...})` calling `identity.Purge`. The old kind name `identity.purge` also fails the snake_case rule. The file is W1-01's.
 4. **Carried over.** The events-retention gap. 05 §2.1 should list `status` among the allowed labels.
+
+## Rebase onto main 8c63adc and the identity_purge port (2026-10-23)
+
+- Rebased onto main 8c63adc (W1-01 phase A, lead D-105, demo pack). One conflict, in `backend/internal/jobs/jobs_test.go` (TestRegisterAddsPlatformJobs); the W1-11 version was kept.
+- **identity_purge (Q3, done).** `backend/internal/jobs/identity.go` is ported from the W0-03 `Add` and `r.Every` registry to `jobs.Define`. The kind is `identity_purge`: owner W1-01, class `maintenance`, schedule `0 * * * *` (IST), `PerTick`, 60 s timeout and 3 attempts. The handler calls `identity.Purge(ctx, store, d.Clock.Now())` as before. The run summary holds `otp_requests` and `sessions`. Tested by TestIdentityPurgeIsAKind.
+- **Admin-jobs tests after W1-01.** W1-01's slot 11 (`mw.Authn`) now refuses an anonymous `/v1/admin` call before the router, so the harness's pre-router `reqctx` principal no longer counted and every admin-jobs DB test got 401. The harness now signs in through slot 11: a stub Authenticator gives an admin-app principal with amr otp+totp, the same pattern as `openapi_test`. No production code changed.
+- **Q1 (lead: yes).** `11101` (edited in place) raises the `job_runs_retention_days` minimum to 30. A value already under 30 is raised to 30, because `ck_platform_settings_range` needs value >= min. Down restores min 1. TestRetentionDropsOldPartitions checks that 29 is refused with `ck_platform_settings_range`. A local database that applied the earlier 11101 needs `make reset`.
+- **Q2 (lead: accepted).** Only the latest pause window is kept.
+- **Docs.** `identity.purge` is renamed to `identity_purge` in `docs/qa/W1-01/REPORT.md` (lines 59, 205, 209) and in D-105 (`docs/plan/12-decision-log.md`). Nothing else in those files changed.
+- **Files outside W1-11's paths (lead-allowed):** `backend/internal/jobs/identity.go`, `docs/qa/W1-01/REPORT.md`, `docs/plan/12-decision-log.md`.
+
+### Evidence (agent, after the rebase onto 8c63adc)
+
+| Check | Result |
+|---|---|
+| `go test -race` with DB: `internal/platform/jobs/...` (adminapi included), `internal/jobs`, `internal/identity`, `cmd/todayz`, `internal/platform/migrate`, `internal/platform/settings` | ok |
+| gofmt, go vet | clean |
+| make check (commit 3026a29) | Passed, exit 0, every step: check-repo through check-tf-static. 273 Go `ok` lines; golangci-lint 0 issues; checkov 370 passed, 0 failed. |
+
+### Notes for the lead
+
+1. **Phase-B jobs.** Main has not moved past 8c63adc, and none are on it. Any phase-B job must use `jobs.Define`, because `Add` and `r.Every` no longer exist.
+2. **Stale stub comments.** The 22 empty domain stubs in `backend/internal/jobs/` (W0-03 skeleton) still say "Add for each worker, r.Every for each periodic job". Agents filling them in (W1-04 now) will be pointed at a removed API. They were left alone to avoid conflicts with WPs running in parallel. Suggested wording: "jobs.Define for each kind (W1-11)". TODO(lead)
+3. **Old name in comments W1-11 may not edit.** `identity.purge` still appears in `backend/db/migrations/10101_w1-01_identity.sql:55` and `10102_w1-01_sessions_purge_index.sql:1` (on main), and in `backend/internal/identity/purge.go:12` (W1-01's).
+4. **Carried over (Q4).** The events-retention gap. 05 §2.1 should list `status` among the allowed labels.
