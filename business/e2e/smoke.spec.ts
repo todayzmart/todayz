@@ -1,13 +1,51 @@
 import { VIEWPORTS, expectFontLoaded, guardPage, shot, type PageGuard } from '@todayz/config/playwright';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 /** The self-hosted Figtree file, as Vite names it (figtree-latin-wght-normal-<hash>.woff2). */
 const FIGTREE = /\/figtree-[^/]*\.woff2$/;
 
 let guard: PageGuard;
 
+/**
+ * The app is for signed-in staff. The smoke run has no API, so the session refresh is answered here:
+ * with a grant (signed in) or a 401 (signed out). The API is on another origin, so the cookie-carrying
+ * call needs the preflight and an explicit origin in the answer.
+ */
+async function answerRefresh(page: Page, signedIn: boolean) {
+  await page.route('**/v1/auth/refresh', (route) => {
+    const origin = route.request().headers()['origin'] ?? '*';
+    const cors = {
+      'access-control-allow-origin': origin,
+      'access-control-allow-credentials': 'true',
+      'access-control-allow-headers': 'content-type, x-tz-client, accept-language',
+      'access-control-allow-methods': 'POST, OPTIONS',
+    };
+    if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
+    if (!signedIn) {
+      return route.fulfill({
+        status: 401,
+        contentType: 'application/problem+json',
+        headers: cors,
+        body: JSON.stringify({ type: 'about:blank#unauthorized', title: 'Unauthorized', status: 401, code: 'unauthorized' }),
+      });
+    }
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: cors,
+      body: JSON.stringify({
+        accessToken: 'smoke-token',
+        expiresAt: new Date(Date.now() + 3_600_000).toISOString(),
+        tokenType: 'Bearer',
+        userId: '01J9ZAAAAAAAAAAAAAAAAAAAAA',
+      }),
+    });
+  });
+}
+
 test.beforeEach(async ({ page }) => {
   guard = await guardPage(page);
+  await answerRefresh(page, true);
 });
 
 test.afterEach(() => {
@@ -89,4 +127,17 @@ test('PWA manifest and icons are served locally', async ({ page, request }) => {
   for (const icon of manifest.icons as { src: string }[]) {
     expect((await request.get(icon.src)).status(), icon.src).toBe(200);
   }
+});
+
+test('signed out: any page opens the sign-in screen (B-01), with no sidebar or tabs', async ({ page }) => {
+  await page.unroute('**/v1/auth/refresh');
+  await answerRefresh(page, false);
+  await page.setViewportSize(VIEWPORTS.phone);
+  await page.goto('/orders');
+  await expect(page).toHaveURL(/\/sign-in\?next=%2Forders$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Sign in to TodayZ Business' })).toBeVisible();
+  await expect(page.getByLabel('Mobile number')).toBeVisible();
+  await expect(page.locator(tabs)).toHaveCount(0);
+  await expect(page.locator(sidebar)).toHaveCount(0);
+  await shot(page, 'business-sign-in-phone.png');
 });

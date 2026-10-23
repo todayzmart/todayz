@@ -110,6 +110,12 @@ importers:
       '@tanstack/react-router':
         specifier: 1.170.41
         version: 1.170.41(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@todayz/api-client':
+        specifier: workspace:*
+        version: link:../shared/api-client
+      '@todayz/auth':
+        specifier: workspace:*
+        version: link:../shared/auth
       '@todayz/i18n':
         specifier: workspace:*
         version: link:../shared/i18n

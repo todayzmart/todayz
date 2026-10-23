@@ -1,4 +1,7 @@
+import { useSession } from '@todayz/auth';
+import { useQueryClient } from '@tanstack/react-query';
 import { Outlet } from '@tanstack/react-router';
+import { Button } from '@todayz/ui';
 import { Fragment } from 'react';
 import { useIntl } from 'react-intl';
 import { useOverview } from '../overview/queries';
@@ -16,6 +19,26 @@ import styles from './shell.module.css';
  * card at its foot (B-03). Below 1024px the Overview shows that card under its KPIs instead, so it
  * is rendered in one place only.
  */
+/** Ends this device's session and drops everything cached for the person who was signed in. */
+function SignOut() {
+  const intl = useIntl();
+  const session = useSession();
+  const client = useQueryClient();
+  return (
+    <div className={styles.signOut}>
+      <Button
+        variant="ghost"
+        block
+        onClick={() => {
+          void session.signOut().then(() => client.clear());
+        }}
+      >
+        {intl.formatMessage({ id: 'auth.signOut' })}
+      </Button>
+    </div>
+  );
+}
+
 export function Shell() {
   const intl = useIntl();
   const label = intl.formatMessage({ id: 'shell.nav.label' });
@@ -45,9 +68,11 @@ export function Shell() {
           );
         })}
         {!narrow && data && <SetupCard setup={data.setup} />}
+        {!narrow && <SignOut />}
       </nav>
       <main id="main" className={styles.main} tabIndex={-1} data-density={narrow ? 'touch' : undefined}>
         <Outlet />
+        {narrow && <SignOut />}
       </main>
       <nav className={`tz-bnav ${styles.bnav}`} aria-label={label} data-density="touch">
         {TABS.map((item) => (

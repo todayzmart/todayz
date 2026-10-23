@@ -1,19 +1,14 @@
 import en from '@todayz/i18n/compiled/business/en.json';
 import xa from '@todayz/i18n/compiled/business/en-XA.json';
 import { asMessages, type Messages } from '@todayz/i18n';
-import { createMemoryHistory } from '@tanstack/react-router';
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { App } from '../app/App';
-import { makeQueryClient, makeRouter } from '../app/router';
+import { renderAt as renderApp } from '../test/render';
 import { MORE, NAV } from './nav';
 import { NARROW_QUERY } from './useNarrow';
 
 function renderAt(path: string, messages: Messages = asMessages(en)) {
-  const queryClient = makeQueryClient();
-  const history = createMemoryHistory({ initialEntries: [path] });
-  const router = makeRouter(queryClient, history);
-  return { history, ...render(<App messages={messages} router={router} queryClient={queryClient} />) };
+  return renderApp(path, { messages });
 }
 
 function mockWidth(width: number) {

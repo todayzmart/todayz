@@ -31,6 +31,17 @@ Same structure as `customer/` (see its CLAUDE.md): `src/main.tsx`, `src/app/`, `
 - Tokens only; i18n keys in `shared/i18n/messages/business/`. Dev port 5302, Host `business.todayz.localhost`. Initial JS budget 250 KB gzip. Hidden sourcemaps, checked by `build` as in `customer/`. The offline POS (W1+) adds its own service worker strategy on top of the precache set up here.
 - Smoke screenshots go to the git-ignored `test-results/screenshots/`; `TZ_QA_DIR=docs/qa/W0-05 make e2e` refreshes the committed ones.
 
+## Auth and gate (W1-08)
+
+- The app is for signed-in staff. `src/shell/Gate.tsx` (root route) shows a skeleton while the refresh cookie is tried, sends a signed-out visitor to `/sign-in?next=<where they were going>`, and renders the sidebar `Shell` only when signed in. `/sign-in` is the only open route.
+- `src/app/`: `session.ts` (`@todayz/auth` session for app `business`; token in memory only), `env.ts`, `labels.ts`, `next.ts` (`?next=` must be a path on this app), `update-context.tsx` (`useUpdateController`; B-05 Sell calls `useHoldUpdates(controller, saleOpen)` so the update toast waits), `shop.ts` (picker data and the remembered store).
+- Routes: `/sign-in` (B-01), `/choose-shop` (picker: role shown, last store remembered, one store skips itself), `/invite/$token` (placeholder). `TODO(W1-04)`: `GET /v1/biz/businesses` and invite acceptance are not in the contract yet; while the list fails the picker offers "Continue to overview".
+- Sign out is a button at the foot of the sidebar (and of the page below 1024px); it clears the query cache.
+- `src/test/render.tsx` renders `<App>` signed in by default (`signedIn: false` for the gate) with a fake `fetch`.
+- Stack journeys: `e2e/sign-in.stack.spec.ts` via `playwright.stack.config.ts` against `make dev`: `pnpm --filter @todayz/business exec playwright test -c playwright.stack.config.ts`. The smoke spec answers the session refresh itself.
+
 ## Status
 
 W0-05: shell, routing, i18n, PWA manifest, telemetry stub, size budget and smoke tests in place. Screens are placeholders.
+
+W1-08: sign-in gate, B-01 sign-in and picker (picker data stubbed), offline banner, update toast, error boundary and SW precache check. B-03 Overview works behind it.

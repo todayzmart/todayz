@@ -1,13 +1,17 @@
 import { intlNoParserAlias, todayzServer } from '@todayz/config/vite';
+import { authDefines } from '@todayz/auth/build';
 import { pwaManifest, todayzIcons } from '@todayz/tokens/vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // Business PWA + offline POS: business.todayz.in, locally https://business.todayz.localhost (Caddy) -> 127.0.0.1:5302.
-export default defineConfig({
+// A production build needs a real VITE_TURNSTILE_SITE_KEY and an https VITE_API_URL (authDefines throws
+// without them); development, test and the e2e build fall back to the local API and Cloudflare's test key.
+export default defineConfig(({ mode }) => ({
   ...todayzServer({ port: 5302, hostname: 'business.todayz.localhost' }),
+  define: authDefines(mode, loadEnv(mode, process.cwd(), 'VITE_')),
   resolve: { alias: intlNoParserAlias },
   plugins: [
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),
@@ -47,4 +51,4 @@ export default defineConfig({
     sourcemap: 'hidden',
     reportCompressedSize: false,
   },
-});
+}));

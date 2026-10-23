@@ -1,0 +1,182 @@
+{
+  "app.offline.title": {
+    "defaultMessage": "You're offline.",
+    "description": "Bold lead-in of the banner shown while the device has no network"
+  },
+  "app.offline.body": {
+    "defaultMessage": "Saved pages still open. We'll catch up when you're back online.",
+    "description": "Rest of the offline banner"
+  },
+  "app.update.message": {
+    "defaultMessage": "A new version of TodayZ Business is ready.",
+    "description": "Toast shown when a new version of the app is waiting. The page never reloads until the person taps Update, and never while a sale or checkout is open."
+  },
+  "app.update.action": {
+    "defaultMessage": "Update",
+    "description": "Button in the update toast; reloads the app"
+  },
+  "app.error.title": {
+    "defaultMessage": "Something went wrong",
+    "description": "Heading of the screen shown when the app crashes"
+  },
+  "app.error.body": {
+    "defaultMessage": "Try again. If it keeps happening, reload the page.",
+    "description": "Body of the crash screen"
+  },
+  "app.error.retry": {
+    "defaultMessage": "Try again",
+    "description": "Button on the crash screen"
+  },
+  "app.loading": {
+    "defaultMessage": "Loading",
+    "description": "Spoken while the app checks whether you are signed in"
+  },
+  "auth.signIn.title": {
+    "defaultMessage": "Sign in to TodayZ Business",
+    "description": "B-01 page title"
+  },
+  "auth.signIn.sub": {
+    "defaultMessage": "Use the mobile number your shop is registered with. We'll send a code by SMS.",
+    "description": "B-01 line under the title"
+  },
+  "auth.phone.label": {
+    "defaultMessage": "Mobile number",
+    "description": "Label of the phone field. The +91 prefix is shown beside it."
+  },
+  "auth.phone.help": {
+    "defaultMessage": "We use it to sign you in and for order alerts.",
+    "description": "Help text under the phone field"
+  },
+  "auth.phone.invalid": {
+    "defaultMessage": "Enter a 10-digit mobile number that starts with 6, 7, 8 or 9.",
+    "description": "Error under the phone field"
+  },
+  "auth.code.send": {
+    "defaultMessage": "Send code",
+    "description": "Button that sends the SMS code"
+  },
+  "auth.code.sending": {
+    "defaultMessage": "Sending the code",
+    "description": "Spoken while the code is being sent"
+  },
+  "auth.code.label": {
+    "defaultMessage": "Enter the 6-digit code",
+    "description": "Name of the group of six code boxes"
+  },
+  "auth.code.digit": {
+    "defaultMessage": "Digit {position}",
+    "description": "Name of code box number {position}, 2 to 6"
+  },
+  "auth.code.sentTo": {
+    "defaultMessage": "We sent a code to {phone}.",
+    "description": "Line above the code boxes. {phone} is the number with some digits hidden."
+  },
+  "auth.code.verifying": {
+    "defaultMessage": "Checking the code",
+    "description": "Spoken while the code is being checked"
+  },
+  "auth.code.resend": {
+    "defaultMessage": "Resend code",
+    "description": "Button to ask for a new code"
+  },
+  "auth.code.resendIn": {
+    "defaultMessage": "Resend in {seconds} s",
+    "description": "Disabled button while the resend timer runs. {seconds} counts down."
+  },
+  "auth.code.change": {
+    "defaultMessage": "Change number",
+    "description": "Button that goes back to the phone field"
+  },
+  "auth.error.wrongCode": {
+    "defaultMessage": "That code is not right. Check it and try again.",
+    "description": "Wrong one-time code"
+  },
+  "auth.error.expired": {
+    "defaultMessage": "That code has expired. Ask for a new one.",
+    "description": "Expired one-time code"
+  },
+  "auth.error.locked": {
+    "defaultMessage": "Too many wrong codes. Ask for a new code.",
+    "description": "Too many wrong attempts on one code"
+  },
+  "auth.error.rateLimited": {
+    "defaultMessage": "Too many tries. Wait a moment and try again.",
+    "description": "Rate limit on sending codes"
+  },
+  "auth.error.blocked": {
+    "defaultMessage": "This account can't sign in right now. Contact support.",
+    "description": "Blocked account"
+  },
+  "auth.error.network": {
+    "defaultMessage": "We can't reach TodayZ. Check your connection and try again.",
+    "description": "No network or the server did not answer"
+  },
+  "auth.error.generic": {
+    "defaultMessage": "Something went wrong. Please try again.",
+    "description": "Any other sign-in failure"
+  },
+  "auth.error.captcha": {
+    "defaultMessage": "We couldn't check that you are a person. Reload the page and try again.",
+    "description": "The Turnstile check failed to load or run"
+  },
+  "auth.signOut": {
+    "defaultMessage": "Sign out",
+    "description": "Button that ends the session on this device"
+  },
+  "shop.pick.title": {
+    "defaultMessage": "Choose a shop",
+    "description": "B-01 shop picker title"
+  },
+  "shop.pick.sub": {
+    "defaultMessage": "Pick the business and store you want to work in. We'll remember it on this device.",
+    "description": "B-01 shop picker line under the title"
+  },
+  "shop.pick.loading": {
+    "defaultMessage": "Loading your shops",
+    "description": "Spoken while the list of shops loads"
+  },
+  "shop.pick.group": {
+    "defaultMessage": "Stores of {business}",
+    "description": "Accessible name of the store buttons of one business. {business} is the business name."
+  },
+  "shop.pick.role.owner": {
+    "defaultMessage": "Owner",
+    "description": "Role shown beside a business in the shop picker"
+  },
+  "shop.pick.role.manager": {
+    "defaultMessage": "Manager",
+    "description": "Role shown beside a business in the shop picker"
+  },
+  "shop.pick.role.cashier": {
+    "defaultMessage": "Cashier",
+    "description": "Role shown beside a business in the shop picker"
+  },
+  "shop.pick.empty": {
+    "defaultMessage": "No shop is linked to this number yet. Ask your owner to invite you, or contact support.",
+    "description": "The signed-in person has no business"
+  },
+  "shop.pick.unavailable": {
+    "defaultMessage": "We can't load your shops yet. You can carry on to the overview.",
+    "description": "The list of shops could not be loaded"
+  },
+  "shop.pick.retry": {
+    "defaultMessage": "Try again",
+    "description": "Button that loads the list of shops again"
+  },
+  "shop.pick.continue": {
+    "defaultMessage": "Continue to overview",
+    "description": "Button that skips the picker when the list is unavailable"
+  },
+  "shop.invite.title": {
+    "defaultMessage": "Join a shop",
+    "description": "Invite acceptance page title"
+  },
+  "shop.invite.soon": {
+    "defaultMessage": "Accepting an invitation is coming soon. Keep this link; it will work here.",
+    "description": "Placeholder until invitations can be accepted"
+  },
+  "shop.invite.home": {
+    "defaultMessage": "Go to overview",
+    "description": "Link out of the invite placeholder"
+  }
+}

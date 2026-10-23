@@ -1,11 +1,9 @@
 import en from '@todayz/i18n/compiled/business/en.json';
 import { asMessages, FORMAT_LOCALE, formatMoney } from '@todayz/i18n';
-import { createMemoryHistory } from '@tanstack/react-router';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { App } from '../app/App';
-import { makeQueryClient, makeRouter } from '../app/router';
+import { renderAt } from '../test/render';
 import { NARROW_QUERY } from '../shell/useNarrow';
 import { GreetBand } from './GreetBand';
 import { SAMPLE_DATA, averageBill, sampleOverview } from './sample';
@@ -15,10 +13,7 @@ import type { SetupProgress } from './types';
 const messages = asMessages(en);
 
 function renderOverview(path = '/') {
-  const queryClient = makeQueryClient();
-  const history = createMemoryHistory({ initialEntries: [path] });
-  const router = makeRouter(queryClient, history);
-  return { history, ...render(<App messages={messages} router={router} queryClient={queryClient} />) };
+  return renderAt(path, { messages });
 }
 
 async function insightsCard() {
