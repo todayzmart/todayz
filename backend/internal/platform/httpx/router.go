@@ -46,6 +46,12 @@ type Options struct {
 	// in-memory exporter); nil uses the globals.
 	TracerProvider trace.TracerProvider
 	Propagator     propagation.TextMapPropagator
+	// Authenticator verifies bearer tokens (slot 11, W1-01); nil makes every
+	// request anonymous and any Authorization header 401.
+	Authenticator mw.Authenticator
+	// Limiter is slot 12's per-principal / per-IP limiter (W1-01); nil limits
+	// nothing. Pass a nil interface, not a nil *ratelimit.Limiter.
+	Limiter mw.Limiter
 }
 
 // Pipeline returns the global middleware, slots 1–12 of 02 §2.4, which run
@@ -64,8 +70,8 @@ func Pipeline(o Options, routes *route.Table) []func(http.Handler) http.Handler 
 		mw.PathGuard(),                              // 8  W0-04
 		mw.RoutePolicy(routes),                      // 9
 		mw.BodyLimit(),                              // 10
-		mw.Authn(),                                  // 11 W1-01
-		mw.RateLimit(),                              // 12 W1-01
+		mw.Authn(o.Authenticator),                   // 11 W1-01
+		mw.RateLimit(o.Limiter),                     // 12 W1-01
 	}
 }
 

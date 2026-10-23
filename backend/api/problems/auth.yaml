@@ -1,0 +1,22 @@
+# Problem codes: domain "auth" (owner W1-01; 04 §1.4 D-91 table, 02 §3).
+#
+# Same shape as common.yaml. A wrong OTP answers the common `unauthorized` (401)
+# with `extensions.attemptsLeft` (docs/qa/W1-01/REPORT.md, Questions).
+domain: auth
+problems:
+  - code: otp_locked
+    status: 429
+    i18n: problems.otp_locked
+    title: Too many wrong codes; ask for a new one
+  - code: otp_expired
+    status: 401
+    i18n: problems.otp_expired
+    title: This code has expired; ask for a new one
+  - code: account_blocked
+    status: 403
+    i18n: problems.account_blocked
+    title: This account is blocked
+  - code: step_up_required
+    status: 403
+    i18n: problems.step_up_required
+    title: Confirm with your authenticator code to continue

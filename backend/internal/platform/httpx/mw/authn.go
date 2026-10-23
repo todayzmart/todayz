@@ -1,12 +1,102 @@
 package mw
 
-// Slot 11 · authn · owner W1-01. No-op until W1-01: it will read the Bearer
-// access token and store the principal with reqctx.WithPrincipal. Until then
-// reqctx.PrincipalFrom returns reqctx.Anonymous for every request.
+// Slot 11 · authn · owner W1-01 (02 §2.4, §3; 04 §1.3; D-14, D-100).
+//
+// Contract for every later slot and handler:
+//
+//   - A request without Authorization is anonymous: authn.FromContext reports
+//     false and reqctx.PrincipalFrom is reqctx.Anonymous.
+//   - "Authorization: Bearer <jwt>" with a valid, unexpired token whose session
+//     is live sets the principal (authn.WithPrincipal). Anything else in
+//     Authorization (another scheme, two headers, a bad, expired or revoked
+//     token) is 401 unauthorized on every path, public ones included, so a
+//     client always learns to refresh. A blocked user is 403 account_blocked.
+//   - Namespaces, before chi and the validator: /v1/me, /v1/biz and /v1/admin
+//     refuse an anonymous caller with 401. /v1/biz needs a business-app token
+//     and /v1/admin an admin-app token with amr otp+totp (AU-11), else 403
+//     forbidden. An admin-app token without TOTP reaches /v1/auth/* only.
+//   - Per-action permission is slot 15 (authz), not here.
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+	"strings"
 
-// Authn resolves the caller.
-func Authn() func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler { return next }
+	genproblems "github.com/todayz/backend/gen/problems"
+	"github.com/todayz/backend/internal/platform/authn"
+	"github.com/todayz/backend/internal/platform/httpx/problem"
+)
+
+// Authenticator verifies a bearer token (authn.Authenticator implements it).
+type Authenticator interface {
+	Authenticate(ctx context.Context, token string) (authn.Principal, error)
+}
+
+// Authn resolves the caller. a nil means no tokens can be verified: every
+// request is anonymous and any Authorization header is 401.
+func Authn(a Authenticator) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			p := authn.Principal{}
+			if vals := r.Header.Values("Authorization"); len(vals) > 0 {
+				tok, ok := bearer(vals)
+				if !ok || a == nil {
+					problem.Write(w, r, problem.New(genproblems.Unauthorized, ""))
+					return
+				}
+				got, err := a.Authenticate(ctx, tok)
+				if err != nil {
+					problem.Write(w, r, err)
+					return
+				}
+				p = got
+			}
+			if err := guardNamespace(r.URL.Path, p); err != nil {
+				problem.Write(w, r, err)
+				return
+			}
+			next.ServeHTTP(w, r.WithContext(authn.WithPrincipal(ctx, p)))
+		})
+	}
+}
+
+// bearer extracts the token from exactly one "Bearer <token>" header.
+func bearer(vals []string) (string, bool) {
+	if len(vals) != 1 {
+		return "", false
+	}
+	scheme, tok, ok := strings.Cut(vals[0], " ")
+	if !ok || !strings.EqualFold(scheme, "Bearer") {
+		return "", false
+	}
+	tok = strings.TrimSpace(tok)
+	if tok == "" || len(tok) > authn.MaxTokenLen {
+		return "", false
+	}
+	return tok, true
+}
+
+func under(path, prefix string) bool {
+	return path == prefix || strings.HasPrefix(path, prefix+"/")
+}
+
+// guardNamespace applies the path-level rules of the slot contract above.
+func guardNamespace(path string, p authn.Principal) error {
+	signedIn := !p.IsAnonymous()
+	needs := under(path, "/v1/me") || under(path, "/v1/biz") || under(path, "/v1/admin")
+	switch {
+	case needs && !signedIn:
+		return problem.New(genproblems.Unauthorized, "")
+	case !signedIn:
+		return nil
+	case p.App == authn.AppAdmin && p.AMR != authn.AMROTPTOTP && !under(path, "/v1/auth"):
+		// An admin who has not passed TOTP may only finish signing in (AU-11).
+		return problem.New(genproblems.Forbidden, "")
+	case under(path, "/v1/biz") && p.App != authn.AppBusiness:
+		return problem.New(genproblems.Forbidden, "")
+	case under(path, "/v1/admin") && (p.App != authn.AppAdmin || p.AMR != authn.AMROTPTOTP):
+		return problem.New(genproblems.Forbidden, "")
+	}
+	return nil
 }

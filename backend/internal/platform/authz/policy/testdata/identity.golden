@@ -1,0 +1,3 @@
+# domain identity: one line per (role x action); regenerate with -update
+me.view kind=any step-up=false
+me.edit kind=any step-up=false

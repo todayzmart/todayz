@@ -18,6 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/todayz/backend/internal/platform/authn"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/httpx"
 	"github.com/todayz/backend/internal/platform/httpx/mw"
@@ -25,6 +26,7 @@ import (
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/httpx/route"
 	"github.com/todayz/backend/internal/platform/idempotency"
+	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/reqctx"
 )
 
@@ -792,8 +794,9 @@ func newPipeline(t *testing.T, v *openapi.Validator) (http.Handler, *[]byte) {
 	t.Helper()
 	var got []byte
 	r := httpx.NewRouter(httpx.Options{
-		Validator: v,
-		Policies:  v,
+		Validator:     v,
+		Policies:      v,
+		Authenticator: stubAuthenticator{},
 		Idempotency: idempotency.Options{
 			Store: idempotency.NewMemoryStore(),
 			Clock: clock.NewFake(time.Date(2026, 10, 22, 0, 0, 0, 0, time.UTC)),
@@ -814,10 +817,32 @@ func newPipeline(t *testing.T, v *openapi.Validator) (http.Handler, *[]byte) {
 	r.Post("/v1/biz/businesses/{bid}/catalogue/imports", echo(http.StatusAccepted))
 	r.Post("/v1/biz/businesses/{bid}/media", echo(http.StatusAccepted))
 	require.NoError(t, r.Check())
+	// Sign every request in through slot 11 (W1-01): a business-app token
+	// under /v1/biz, a customer-app token elsewhere.
 	signedIn := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		r.ServeHTTP(w, req.WithContext(reqctx.WithPrincipal(req.Context(), user)))
+		tok := "customer"
+		if strings.HasPrefix(req.URL.Path, "/v1/biz/") {
+			tok = "business"
+		}
+		req.Header.Set("Authorization", "Bearer "+tok)
+		r.ServeHTTP(w, req)
 	})
 	return signedIn, &got
+}
+
+// stubAuthenticator signs in user with the app its token names.
+type stubAuthenticator struct{}
+
+func (stubAuthenticator) Authenticate(_ context.Context, tok string) (authn.Principal, error) {
+	app, ok := authn.ParseApp(tok)
+	if !ok {
+		return authn.Principal{}, problem.New("unauthorized", "")
+	}
+	id, err := ids.Parse(user.UserID)
+	if err != nil {
+		return authn.Principal{}, err
+	}
+	return authn.Principal{UserID: id, App: app, SessionID: id, AMR: authn.AMROTP}, nil
 }
 
 func do(r http.Handler, req *http.Request) (*httptest.ResponseRecorder, problem.Body) {
@@ -956,9 +981,11 @@ func TestPipeline(t *testing.T) {
 		}
 	})
 	t.Run("nil validator passes everything", func(t *testing.T) {
-		plain := httpx.NewRouter(httpx.Options{})
+		plain := httpx.NewRouter(httpx.Options{Authenticator: stubAuthenticator{}})
 		plain.Post("/v1/me/orders", func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(http.StatusCreated) })
-		rec, _ := do(plain, plainReq(http.MethodPost, ordersP, `{"bogus":true}`))
+		req := plainReq(http.MethodPost, ordersP, `{"bogus":true}`)
+		req.Header.Set("Authorization", "Bearer customer") // slot 11 (W1-01) refuses an anonymous /v1/me
+		rec, _ := do(plain, req)
 		assert.Equal(t, http.StatusCreated, rec.Code)
 	})
 }
