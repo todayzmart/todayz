@@ -13,6 +13,8 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
 
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/internal/platform/httpx/mw"
@@ -38,6 +40,12 @@ type Options struct {
 	// route.Handle (W0-04: the contract's x-idempotency and x-upload); nil
 	// leaves them at the zero Policy.
 	Policies route.Source
+	// Metrics records the RED metrics (W1-07); nil records none.
+	Metrics *telemetry.Metrics
+	// TracerProvider and Propagator override the global ones (tests use an
+	// in-memory exporter); nil uses the globals.
+	TracerProvider trace.TracerProvider
+	Propagator     propagation.TextMapPropagator
 }
 
 // Pipeline returns the global middleware, slots 1–12 of 02 §2.4, which run
@@ -46,18 +54,18 @@ type Options struct {
 func Pipeline(o Options, routes *route.Table) []func(http.Handler) http.Handler {
 	o.Log = telemetry.OrDefault(o.Log)
 	return []func(http.Handler) http.Handler{
-		mw.RequestID(o.Log),     // 1
-		mw.SecHeaders(),         // 2
-		mw.Recover(o.Log),       // 3
-		mw.OTel(),               // 4  W1-07
-		mw.ClientIP(o.ClientIP), // 5
-		mw.AccessLog(o.Log),     // 6  W1-07 extends
+		mw.RequestID(o.Log),                         // 1
+		mw.SecHeaders(),                             // 2
+		mw.Recover(o.Log),                           // 3
+		mw.OTel(o.TracerProvider, o.Propagator),     // 4  W1-07
+		mw.ClientIP(o.ClientIP),                     // 5
+		mw.AccessLog(o.Log, o.Metrics),              // 6  W1-07
 		mw.CORS(o.CORSOrigins, o.PublicCORSOrigins), // 7
-		mw.PathGuard(),         // 8  W0-04
-		mw.RoutePolicy(routes), // 9
-		mw.BodyLimit(),         // 10
-		mw.Authn(),             // 11 W1-01
-		mw.RateLimit(),         // 12 W1-01
+		mw.PathGuard(),                              // 8  W0-04
+		mw.RoutePolicy(routes),                      // 9
+		mw.BodyLimit(),                              // 10
+		mw.Authn(),                                  // 11 W1-01
+		mw.RateLimit(),                              // 12 W1-01
 	}
 }
 

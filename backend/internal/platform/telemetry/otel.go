@@ -101,6 +101,7 @@ func Setup(ctx context.Context, o Options) (Status, func(context.Context) error,
 		mp := sdkmetric.NewMeterProvider(
 			sdkmetric.WithReader(sdkmetric.NewPeriodicReader(mexp, sdkmetric.WithInterval(15*time.Second))),
 			sdkmetric.WithResource(res),
+			sdkmetric.WithView(ExponentialView()),
 		)
 		otel.SetMeterProvider(mp)
 		shutdowns = append(shutdowns, mp.Shutdown)

@@ -195,6 +195,7 @@ func Write(w http.ResponseWriter, r *http.Request, err error) {
 	ctx := r.Context()
 	body, ok := resolve(err)
 	body.RequestID = reqctx.RequestID(ctx)
+	telemetry.NoteErrCode(ctx, body.Code) // the access log's `code` label (W1-07)
 	log := telemetry.Logger(ctx)
 	if !ok {
 		unregistered.Add(1)
