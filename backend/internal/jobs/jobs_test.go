@@ -55,5 +55,5 @@ func TestRegisterAddsPlatformJobs(t *testing.T) {
 	Register(r, Deps{Clock: clock.NewFake(clock.Real{}.Now())})
 	require.Contains(t, r.Kinds(), "platform.heartbeat")
 	require.Contains(t, r.Kinds(), "platform.maintenance")
-	require.Len(t, r.Periodic, 2)
+	require.GreaterOrEqual(t, len(r.Periodic), 2, "the two platform jobs, plus any a domain adds")
 }

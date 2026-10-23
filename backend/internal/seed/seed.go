@@ -55,6 +55,8 @@ type Deps struct {
 	DB    *db.DB
 	Clock clock.Clock // fixed at Epoch unless the caller says otherwise
 	Log   *slog.Logger
+	// Keys seal and hash seeded PII (phones) the way the services do (W1-01).
+	Keys config.AppKeys
 }
 
 // Domain is one registry line.

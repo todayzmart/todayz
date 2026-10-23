@@ -129,5 +129,5 @@ func runSeed(ctx context.Context, profile string, getenv func(string) string, ou
 	if err := dbenv.RequireDev(ctx, pool, cfg.Env, "seed"); err != nil {
 		return err
 	}
-	return seed.Run(ctx, cfg.Env, p, seed.Deps{DB: db.New(pool), Log: log})
+	return seed.Run(ctx, cfg.Env, p, seed.Deps{DB: db.New(pool), Log: log, Keys: cfg.Keys})
 }
