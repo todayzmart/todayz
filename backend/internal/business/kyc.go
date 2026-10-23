@@ -62,11 +62,14 @@ func ValidPAN(pan string) bool {
 
 const gstinAlphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+// gstinBody is how many characters come before the check character.
+const gstinBody = 14 //settings:ok a GSTIN position, not a setting
+
 // gstinCheck is the GSTIN check character of the first 14 characters (GSTN's
 // mod-36 scheme: alternate factors 1 and 2, sum quotient and remainder).
 func gstinCheck(first14 string) (byte, bool) {
 	sum := 0
-	for i := 0; i < 14; i++ {
+	for i := 0; i < gstinBody; i++ {
 		v := strings.IndexByte(gstinAlphabet, first14[i])
 		if v < 0 {
 			return 0, false
@@ -103,8 +106,8 @@ func GSTINReason(gstin, pan string) string {
 	if !ValidPAN(gstin[2:12]) || gstin[13] != 'Z' {
 		return "must be a GSTIN"
 	}
-	c, ok := gstinCheck(gstin[:14])
-	if !ok || c != gstin[14] {
+	c, ok := gstinCheck(gstin[:gstinBody])
+	if !ok || c != gstin[gstinBody] {
 		return "check digit does not match"
 	}
 	if pan != "" && gstin[2:12] != pan {
