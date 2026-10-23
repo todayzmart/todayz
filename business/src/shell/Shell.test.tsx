@@ -44,14 +44,27 @@ describe('business shell', () => {
     const { tabs, side } = await navs();
     expect(within(tabs).getByRole('link', { name: 'Overview' })).toHaveAttribute('aria-current', 'page');
     expect(within(side).getByRole('link', { name: 'Overview' })).toHaveAttribute('aria-current', 'page');
-    expect(within(side).getByRole('link', { name: 'Orders' })).not.toHaveAttribute('aria-current');
+    expect(within(side).getByRole('link', { name: /^Orders\b/ })).not.toHaveAttribute('aria-current');
+  });
+
+  it('shows neutral counts on Orders and Stock in the sidebar only, read out in words', async () => {
+    renderAt('/orders');
+    const { side, tabs } = await navs();
+    const orders = await within(side).findByRole('link', { name: /2 orders waiting$/ });
+    expect(orders).toHaveAccessibleName(/^Orders\W+2 orders waiting$/);
+    expect(orders.querySelector('.tz-count')).toHaveTextContent('2');
+    expect(orders.querySelector('.tz-count')).toHaveAttribute('aria-hidden', 'true');
+    const stock = within(side).getByRole('link', { name: /^Stock\W+5 items sell out by tomorrow$/ });
+    expect(stock.querySelector('.tz-count')).toHaveTextContent('5');
+    expect(side.querySelectorAll('.tz-count')).toHaveLength(2);
+    expect(tabs.querySelectorAll('.tz-count')).toHaveLength(0);
   });
 
   it('keeps Overview active only on / (not on every page)', async () => {
     renderAt('/orders');
     const { side } = await navs();
     expect(within(side).getByRole('link', { name: 'Overview' })).not.toHaveAttribute('aria-current');
-    expect(within(side).getByRole('link', { name: 'Orders' })).toHaveAttribute('aria-current', 'page');
+    expect(within(side).getByRole('link', { name: /^Orders\b/ })).toHaveAttribute('aria-current', 'page');
   });
 
   it('replaces /overview with / and keeps the query string', async () => {
@@ -87,7 +100,11 @@ describe('business shell', () => {
     expect(within(side).getByText('Grow')).toHaveClass('tz-side-group');
     expect(within(side).getByText('Shop')).toHaveClass('tz-side-group');
     expect(within(side).queryByRole('link', { name: 'More' })).toBeNull();
-    expect(within(side).getAllByRole('link')).toHaveLength(NAV.filter((n) => n.side).length);
+    // Nav items, plus Finish setup on the setup card at the foot.
+    await within(side).findByRole('link', { name: 'Finish setup' });
+    const links = within(side).getAllByRole('link');
+    expect(links.filter((l) => !l.closest('.tz-side-card'))).toHaveLength(NAV.filter((n) => n.side).length);
+    expect(links.at(-1)).toHaveAccessibleName('Finish setup');
   });
 
   it.each(NAV.filter((n) => n.section !== 'more' && n.section !== 'overview'))('shows the placeholder for /$section', async ({ section }) => {

@@ -90,5 +90,13 @@
   "shell.notFound.home": {
     "defaultMessage": "Go to overview",
     "description": "Button from an unknown route to the landing page, Overview (B-03)"
+  },
+  "shell.nav.ordersCount": {
+    "defaultMessage": "{count, plural, one {# order waiting} other {# orders waiting}}",
+    "description": "Screen-reader text after the Orders sidebar item; the badge shows only the number"
+  },
+  "shell.nav.stockCount": {
+    "defaultMessage": "{count, plural, one {# item sells out by tomorrow} other {# items sell out by tomorrow}}",
+    "description": "Screen-reader text after the Stock sidebar item; the badge shows only the number"
   }
 }

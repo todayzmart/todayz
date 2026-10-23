@@ -8,10 +8,12 @@ import { Kpis } from './Kpis';
 import { NewOrders } from './NewOrders';
 import { useOverview } from './queries';
 import { SalesByHour } from './SalesByHour';
+import { SetupCard } from './SetupCard';
 import { TopItems } from './TopItems';
 import { Topbar } from './Topbar';
 import styles from './overview.module.css';
 import type { OverviewData, Period } from './types';
+import { useNarrow } from '../shell/useNarrow';
 
 /** B-03 Overview, the business landing page (`/`). */
 export function OverviewPage() {
@@ -64,6 +66,8 @@ interface DashboardProps {
 function Dashboard({ data, period, onPeriod }: DashboardProps) {
   const intl = useIntl();
   const toast = useToast();
+  // The sidebar has the setup card from 1024px; below that it sits under the KPIs (Shell.tsx).
+  const narrow = useNarrow();
   // "Not useful" hides the row for this visit; the next row of another kind moves up (D-99).
   const [hidden, setHidden] = useState<ReadonlySet<string>>(() => new Set());
   const onNotUseful = useCallback(
@@ -75,12 +79,17 @@ function Dashboard({ data, period, onPeriod }: DashboardProps) {
   );
   return (
     <div className={styles.page}>
-      <Topbar syncedAt={data.syncedAt} />
+      <Topbar syncedAt={data.syncedAt} storeName={data.storeName} />
       <GreetBand data={data} period={period} onPeriod={onPeriod} />
       <div className={styles.grid}>
         <div className={styles.areaKpi}>
           <Kpis data={data} />
         </div>
+        {narrow && (
+          <div className={styles.areaSetup}>
+            <SetupCard setup={data.setup} />
+          </div>
+        )}
         <div className={styles.areaChart}>
           <SalesByHour data={data} />
         </div>

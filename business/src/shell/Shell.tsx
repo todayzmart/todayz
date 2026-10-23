@@ -1,19 +1,27 @@
 import { Outlet } from '@tanstack/react-router';
 import { Fragment } from 'react';
 import { useIntl } from 'react-intl';
+import { useOverview } from '../overview/queries';
+import { SetupCard } from '../overview/SetupCard';
 import { NavLink } from './NavLink';
 import { SIDE, TABS } from './nav';
 import { useNarrow } from './useNarrow';
+import { useNavCounts } from './useNavCounts';
 import styles from './shell.module.css';
 
 /**
  * Business frame: white sidebar with the mint active item from 1024px (Sidebar in the design
  * system), phone bottom tabs below it (BottomNav). Only one of the two is rendered visible.
+ * The sidebar carries the Orders and Stock counts and, until setup is complete, the shop setup
+ * card at its foot (B-03). Below 1024px the Overview shows that card under its KPIs instead, so it
+ * is rendered in one place only.
  */
 export function Shell() {
   const intl = useIntl();
   const label = intl.formatMessage({ id: 'shell.nav.label' });
   const narrow = useNarrow();
+  const counts = useNavCounts();
+  const { data } = useOverview('today');
   return (
     <div className={styles.app}>
       <a className={styles.skip} href="#main">
@@ -32,10 +40,11 @@ export function Shell() {
           return (
             <Fragment key={item.section}>
               {heading && <div className="tz-side-group">{intl.formatMessage({ id: heading })}</div>}
-              <NavLink item={item} />
+              <NavLink item={item} count={counts[item.section]} />
             </Fragment>
           );
         })}
+        {!narrow && data && <SetupCard setup={data.setup} />}
       </nav>
       <main id="main" className={styles.main} tabIndex={-1} data-density={narrow ? 'touch' : undefined}>
         <Outlet />

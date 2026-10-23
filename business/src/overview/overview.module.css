@@ -17,6 +17,56 @@
   flex: 1;
 }
 
+/* Phone only: TodayZ mark and store name on their own row, above Synced and New sale. The
+   sidebar has the brand from 1024px. */
+.brand {
+  flex: 1 0 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.brandMark {
+  flex: none;
+  width: 24px;
+  height: 24px;
+}
+
+.store {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-heading);
+}
+
+@media (width >= 1024px) {
+  .brand {
+    display: none;
+  }
+}
+
+/* Shop setup card (SetupCard.tsx). In the sidebar the link would take the nav item look
+   (.tz-side a, including the mint active state on /settings); it is the design's plain bold link. */
+.setupLink,
+:global(.tz-side) a.setupLink[href] {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  height: auto;
+  min-height: var(--space-6);
+  padding: 0;
+  background: none;
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.setupLink:hover {
+  text-decoration: underline;
+}
+
 /* Greeting band. */
 .greet {
   flex-wrap: wrap;
@@ -40,12 +90,13 @@
   gap: var(--space-2);
 }
 
-/* Phone order (B-03): KPIs, new orders, insights, chart, top items. */
+/* Phone order (B-03): KPIs, setup card (until complete), new orders, insights, chart, top items. */
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
     'kpi'
+    'setup'
     'orders'
     'insights'
     'chart'
@@ -57,6 +108,10 @@
 .areaKpi {
   grid-area: kpi;
   min-width: 0;
+}
+
+.areaSetup {
+  grid-area: setup;
 }
 
 .areaChart {

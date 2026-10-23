@@ -406,5 +406,17 @@
   "overview.retry": {
     "defaultMessage": "Try again",
     "description": "Button on the error banner; loads the overview again"
+  },
+  "overview.setup.title": {
+    "defaultMessage": "Shop setup {pct}%",
+    "description": "Setup card title in the sidebar (phone: under the KPIs). {pct} is a whole number from 0 to 99, like 80."
+  },
+  "overview.setup.next.openingHours": {
+    "defaultMessage": "Add opening hours to appear in “Open now” searches.",
+    "description": "Setup card hint when opening hours are the next missing step. “Open now” is the customer app's search filter."
+  },
+  "overview.setup.finish": {
+    "defaultMessage": "Finish setup",
+    "description": "Link on the setup card; opens Settings"
   }
 }

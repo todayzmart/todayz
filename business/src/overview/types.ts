@@ -78,6 +78,17 @@ export interface TopItem {
   lastChange: { source: StockSource; at: string };
 }
 
+/** The next thing a shop needs to finish setting up; each has its own hint line on the setup card. */
+export type SetupStep = 'openingHours';
+
+/** Shop setup checklist progress (B-03: the setup card shows until it is complete). */
+export interface SetupProgress {
+  /** 0 to 100. The card hides at 100. */
+  percent: number;
+  /** The first unfinished step, or null when only optional steps are left. */
+  next: SetupStep | null;
+}
+
 export interface OverviewData {
   /** True when the screen shows built-in sample data, never a real shop. Drives the "Sample data" pill. */
   isSample: boolean;
@@ -95,6 +106,7 @@ export interface OverviewData {
   topItems: readonly TopItem[];
   /** Different items sold in the period ("3 of 86 items"). */
   distinctItemsSold: number;
+  setup: SetupProgress;
 }
 
 export type { InsightKind };

@@ -3,11 +3,14 @@ import { asMessages, FORMAT_LOCALE, formatMoney } from '@todayz/i18n';
 import { createMemoryHistory } from '@tanstack/react-router';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../app/App';
 import { makeQueryClient, makeRouter } from '../app/router';
+import { NARROW_QUERY } from '../shell/useNarrow';
 import { GreetBand } from './GreetBand';
 import { SAMPLE_DATA, averageBill, sampleOverview } from './sample';
+import { SetupCard } from './SetupCard';
+import type { SetupProgress } from './types';
 
 const messages = asMessages(en);
 
@@ -26,11 +29,22 @@ function kindsOf(card: HTMLElement) {
   return [...card.querySelectorAll('.tz-insight')].map((el) => el.getAttribute('data-kind'));
 }
 
+function mockWidth(width: number) {
+  vi.stubGlobal('matchMedia', (query: string) => ({
+    matches: query === NARROW_QUERY ? width < 1024 : false,
+    media: query,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+  }));
+}
+
+afterEach(() => vi.unstubAllGlobals());
+
 describe('B-03 Overview', () => {
   it('renders the greeting, shop, KPIs, new orders, chart and top items', async () => {
     renderOverview();
     expect(await screen.findByRole('heading', { level: 1, name: 'Good evening, Kavya' })).toBeInTheDocument();
-    expect(screen.getByText(/Sri Lakshmi Provision Stores/)).toBeInTheDocument();
+    expect(screen.getByText(/· Sri Lakshmi Provision Stores ·/)).toHaveClass('tz-page-sub');
     expect(screen.getByRole('region', { name: 'At a glance' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'New orders' })).toBeInTheDocument();
     expect(screen.getAllByTestId('countdown')).toHaveLength(2);
@@ -131,5 +145,47 @@ describe('B-03 Overview', () => {
     const kpis = screen.getByRole('region', { name: 'At a glance' });
     expect(within(kpis).queryByText('₹48,260')).toBeNull();
     expect(within(kpis).getByText('Sales')).toBeInTheDocument();
+  });
+
+  it('shows the shop setup card at the foot of the sidebar on desktop', async () => {
+    mockWidth(1280);
+    renderOverview();
+    const title = await screen.findByText('Shop setup 80%');
+    const card = title.closest('.tz-side-card');
+    if (!(card instanceof HTMLElement)) throw new Error('no setup card');
+    expect(card.closest('nav.tz-side')).not.toBeNull();
+    expect(card.querySelector('.tz-progress > i')).toHaveStyle({ width: '80%' });
+    expect(within(card).getByText('Add opening hours to appear in “Open now” searches.')).toBeInTheDocument();
+    expect(within(card).getByRole('link', { name: 'Finish setup' })).toHaveAttribute('href', '/settings');
+    expect(screen.getAllByText(/^Shop setup/)).toHaveLength(1);
+  });
+
+  it('moves the setup card under the KPIs on phones and shows the shop in the top bar', async () => {
+    mockWidth(390);
+    renderOverview();
+    const title = await screen.findByText('Shop setup 80%');
+    expect(title.closest('nav')).toBeNull();
+    expect(screen.getAllByText(/^Shop setup/)).toHaveLength(1);
+    const main = screen.getByRole('main');
+    const bar = main.querySelector('.tz-topbar');
+    if (!(bar instanceof HTMLElement)) throw new Error('no top bar');
+    expect(within(bar).getByRole('img', { name: 'TodayZ' })).toHaveAttribute('src', '/icons/mark-96.png');
+    expect(within(bar).getByText('Sri Lakshmi Provision Stores')).toBeInTheDocument();
+    // Brand first, then Synced and New sale; no search box and no bell.
+    expect(bar.textContent).toMatch(/^Sri Lakshmi Provision Stores.*Synced 6:40 pm.*New sale$/);
+    expect(within(bar).queryByRole('searchbox')).toBeNull();
+  });
+
+  it.each<[string, SetupProgress]>([
+    ['complete', { percent: 100, next: null }],
+    ['over 100', { percent: 120, next: null }],
+    ['not a number', { percent: Number.NaN, next: 'openingHours' }],
+  ])('hides the setup card when setup is %s', (_, setup) => {
+    const { container } = render(
+      <IntlProvider locale={FORMAT_LOCALE} messages={messages}>
+        <SetupCard setup={setup} />
+      </IntlProvider>,
+    );
+    expect(container).toBeEmptyDOMElement();
   });
 });

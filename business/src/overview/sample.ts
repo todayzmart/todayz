@@ -115,5 +115,6 @@ export function sampleOverview(period: Period): OverviewData {
     insights: INSIGHTS,
     topItems: TOP_ITEMS,
     distinctItemsSold: 86,
+    setup: { percent: 80, next: 'openingHours' },
   };
 }
