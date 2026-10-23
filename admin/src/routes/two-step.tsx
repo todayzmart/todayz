@@ -20,8 +20,8 @@ type Mode = 'enrol' | 'verify' | 'recover';
 /**
  * A-01 step 2: the authenticator code. First sign-in enrols (setup key, then the first code, then the
  * 10 recovery codes once); later sign-ins verify; a lost phone uses a recovery code.
- * TODO(W1-01b): the calls in `app/totp.ts` are typed by hand until the contract is merged; the setup
- * key is shown as text and a link because the QR code needs a library this repo does not have yet.
+ * The setup key is shown as text and a link because the QR code needs a library this repo does not
+ * have yet.
  */
 function TwoStep() {
   const intl = useIntl();

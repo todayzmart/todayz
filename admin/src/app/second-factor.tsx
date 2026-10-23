@@ -25,7 +25,7 @@ export interface SecondFactor {
  * Whether the person has passed the authenticator step, for routing only: it decides which screen
  * to show, never what the API allows (the server checks the token's `amr` on every admin call).
  * The flag lives in sessionStorage so a reload in the same tab does not ask again; it is a
- * timestamp, not a secret, and it goes with the tab. TODO(W1-01b): read it from the token's `amr`
+ * timestamp, not a secret, and it goes with the tab. TODO(amr): read it from the token's `amr`
  * claim or `/v1/me` once the contract says where.
  */
 export function createSecondFactor(): SecondFactor {

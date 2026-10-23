@@ -451,6 +451,24 @@ describe('401 decided by problem code', () => {
     expect(s.getState().status).toBe('signedOut');
   });
 
+  it('logout-all sends credentials and X-TZ-Client like refresh, and never a bearer', async () => {
+    const server = makeServer();
+    let seen: { client: string | null; auth: string | null; credentials: RequestCredentials | undefined } | undefined;
+    const f: typeof fetch = async (input, init) => {
+      const path = new URL(typeof input === 'string' ? input : (input as Request).url, 'http://x').pathname;
+      if (path === '/v1/auth/logout-all') {
+        const h = new Headers(init?.headers);
+        seen = { client: h.get('X-TZ-Client'), auth: h.get('Authorization'), credentials: init?.credentials };
+        return new Response(null, { status: 204 });
+      }
+      return server.fetch(input, init);
+    };
+    const s = make(server, { fetch: f });
+    s.signIn({ accessToken: 'a', expiresAt: soon() });
+    await s.signOutEverywhere();
+    expect(seen).toEqual({ client: 'customer/1.0.0', auth: null, credentials: 'include' });
+  });
+
   it('logout-all: a second 401 throws and does not sign this tab out', async () => {
     const { server, f, attempts } = logoutAllServer([401, 401]);
     const s = make(server, { fetch: f });

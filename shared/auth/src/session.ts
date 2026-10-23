@@ -22,8 +22,8 @@
 //   - two non-secret hints in localStorage: `hasSession.<app>` (skip the cookie try for visitors who
 //     never signed in) and `logoutPending.<app>` (a sign-out that could not reach the server is
 //     retried on the next load, before any refresh).
-import { ApiError, configure, request } from '@todayz/api-client';
-import { logout as apiLogout, refreshSession } from '@todayz/api-client/gen/auth/auth';
+import { ApiError, configure } from '@todayz/api-client';
+import { logout as apiLogout, logoutAll as apiLogoutAll, refreshSession } from '@todayz/api-client/gen/auth/auth';
 
 export type AuthApp = 'customer' | 'business' | 'admin';
 export type SessionStatus = 'unknown' | 'signedIn' | 'signedOut';
@@ -611,12 +611,7 @@ export function createSession(opts: SessionOptions): Session {
       }
     },
     async signOutEverywhere() {
-      // TODO(W1-01b): swap for the generated client once the contract branch merges.
-      const call = () => request('/v1/auth/logout-all', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ app }),
-      });
+      const call = () => apiLogoutAll({ app }, authOptions());
       try {
         await call();
       } catch (e) {
