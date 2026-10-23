@@ -152,7 +152,7 @@
     "description": "Label of the authenticator secret shown for typing in by hand"
   },
   "auth.twoStep.secretHelp": {
-    "defaultMessage": "In your authenticator app choose \"Enter a setup key\", paste this key and pick time-based.",
+    "defaultMessage": "In your authenticator app choose “Enter a setup key”, paste this key and pick time-based.",
     "description": "Help under the setup key"
   },
   "auth.twoStep.uriOpen": {
@@ -228,7 +228,7 @@
     "description": "Checkbox label; the person confirms they stored the codes"
   },
   "auth.recovery.continue": {
-    "defaultMessage": "Continue to Pulse",
+    "defaultMessage": "Continue to “Pulse”",
     "description": "Button after the recovery codes were saved"
   },
   "auth.recovery.continueRecover": {

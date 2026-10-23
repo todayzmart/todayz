@@ -136,7 +136,7 @@
     "description": "Goes on without a name"
   },
   "auth.welcome.error": {
-    "defaultMessage": "We couldn't save your name. You can add it later in Account.",
+    "defaultMessage": "We couldn't save your name. You can add it later in “Account”.",
     "description": "Saving the optional name failed"
   },
   "lang.title": {
@@ -144,7 +144,7 @@
     "description": "C-01 page title"
   },
   "lang.sub": {
-    "defaultMessage": "You can change it any time in Account.",
+    "defaultMessage": "You can change it any time in “Account”.",
     "description": "C-01 line under the title"
   },
   "lang.group": {

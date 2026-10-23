@@ -29,7 +29,7 @@ const PROPER_NOUNS = new Set([
   'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December',
 ]);
 /** Multi-word names (a sample shop in the site's mock, a statutory body in the privacy policy). */
-const PROPER_PHRASES = ['Sharma General Store', 'Data Protection Board'];
+const PROPER_PHRASES = ['Sharma General Store', 'Data Protection Board', 'TodayZ Business', 'TodayZ Admin'];
 
 /**
  * Words that break sentence case: a capitalised word that is not the first word of a sentence,
