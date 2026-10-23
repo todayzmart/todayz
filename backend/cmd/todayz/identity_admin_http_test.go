@@ -13,8 +13,6 @@ import (
 	"github.com/todayz/backend/internal/platform/ids"
 )
 
-const adminOrigin = "https://admin.todayz.localhost"
-
 // signInApp signs testPhone in to app over HTTP and returns the verify body
 // and the refresh cookie.
 func (a *identityAPI) signInApp(app string) (map[string]any, *http.Cookie) {

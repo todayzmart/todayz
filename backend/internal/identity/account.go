@@ -215,7 +215,7 @@ func (s *Service) DeleteAccount(ctx context.Context, p authn.Principal, in Delet
 		}
 		if refusal != nil {
 			outcome = refusal
-			return nil
+			return nil //nolint:nilerr // the refusal answers after the transaction, so the attempt count commits
 		}
 
 		if err := q.ConsumeOtpRequest(ctx, identitydb.ConsumeOtpRequestParams{Now: now, ID: row.ID}); err != nil {
