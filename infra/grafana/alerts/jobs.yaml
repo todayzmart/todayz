@@ -1,0 +1,187 @@
+# Jobs alerts (05 §5, §8; D-95; owner W1-11). Grafana alerting file provisioning.
+#
+#   Job failing        3 consecutive failed runs of a scheduled kind, or more than 20 % of an
+#                      event kind's runs failing over 15 min. critical for timer and money
+#                      kinds, warning otherwise.
+#   Cron missed        tz_job_missed{kind} = 1 (jobs_watchdog: no succeeded run within twice the
+#                      interval; daily kinds after 15 min). critical for money, warning otherwise.
+#   Job hard-cancelled tz_job_hard_cancelled_total rose in the last 10 min (D-98). warning.
+#
+# Datasource uids: todayz-postgres (infra/local/lgtm/datasource-postgres.yaml, read-only role
+# grafana_ro) and prometheus (otel-lgtm's provisioned Prometheus). Cloud provisioning (W5) must
+# keep these uids or rewrite them here. Alert files are not wired into the local stack yet;
+# routing (05 §5) is W5's contact points: critical pages, warning emails.
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: jobs
+    folder: TodayZ
+    interval: 1m
+    rules:
+      # Scheduled kinds: a kind with a schedule-triggered run in the last 7 days whose last three
+      # finished runs (succeeded, failed, discarded or cancelled; skipped and yielded are not
+      # outcomes) all failed or were discarded. Each River attempt is a job_runs row, so one tick
+      # that fails three attempts in a row also fires: three failures in a row is the signal.
+      - uid: tz-jobs-failing-scheduled
+        title: Job failing (scheduled kind)
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 604800, to: 0}
+            datasourceUid: todayz-postgres
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              editorMode: code
+              rawSql: |-
+                WITH sched AS (
+                  SELECT DISTINCT kind FROM job_runs
+                  WHERE trigger = 'schedule' AND created_at > now() - interval '7 days'),
+                ranked AS (
+                  SELECT r.kind, r.class, r.status,
+                    row_number() OVER (PARTITION BY r.kind ORDER BY r.created_at DESC, r.id DESC) AS rn
+                  FROM job_runs r JOIN sched s ON s.kind = r.kind
+                  WHERE r.status IN ('succeeded', 'failed', 'discarded', 'cancelled')
+                    AND r.created_at > now() - interval '7 days')
+                SELECT kind, max(class) AS class,
+                  CASE WHEN count(*) = 3 AND bool_and(status IN ('failed', 'discarded')) THEN 1 ELSE 0 END AS failing
+                FROM ranked WHERE rn <= 3
+                GROUP BY kind
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          area: jobs
+          severity: '{{ if or (eq $labels.class "timer") (eq $labels.class "money") }}critical{{ else }}warning{{ end }}'
+        annotations:
+          summary: 'Job {{ $labels.kind }} ({{ $labels.class }}) failed its last 3 runs'
+          description: 'The last three finished runs of {{ $labels.kind }} failed or were discarded. Open A-21 for the error and the run history.'
+          runbook_url: docs/runbooks/jobs-job-failing.md
+          __dashboardUid__: tz-jobs
+        isPaused: false
+
+      # Event kinds: more than 20 % of finished attempts failed or were discarded over 15 min.
+      # Scheduled kinds carry tz_job_missed (0 or 1), so "unless on (kind) tz_job_missed" keeps
+      # event kinds only. One failure out of one run is 100 %: the spec sets no minimum volume.
+      - uid: tz-jobs-failing-event
+        title: Job failing (event kind)
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 900, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                (
+                  sum by (kind, class) (increase(tz_job_runs_total{status=~"failed|discarded"}[15m]))
+                  /
+                  sum by (kind, class) (increase(tz_job_runs_total{status=~"succeeded|failed|discarded|cancelled"}[15m]))
+                ) unless on (kind) tz_job_missed
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0.2]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          area: jobs
+          severity: '{{ if or (eq $labels.class "timer") (eq $labels.class "money") }}critical{{ else }}warning{{ end }}'
+        annotations:
+          summary: 'Job {{ $labels.kind }} ({{ $labels.class }}): {{ humanizePercentage $values.A.Value }} of runs failed in 15 min'
+          description: 'More than 20 % of {{ $labels.kind }} attempts failed or were discarded in the last 15 minutes.'
+          runbook_url: docs/runbooks/jobs-job-failing.md
+          __dashboardUid__: tz-jobs
+        isPaused: false
+
+      # Cron missed: the watchdog's gauge, joined to the kind's class from tz_job_runs_total
+      # (seeded at 0 for every kind, so the join always has a partner).
+      - uid: tz-jobs-cron-missed
+        title: Cron missed
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                max by (kind) (tz_job_missed)
+                * on (kind) group_left (class)
+                max by (kind, class) (tz_job_runs_total * 0 + 1)
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        labels:
+          area: jobs
+          severity: '{{ if eq $labels.class "money" }}critical{{ else }}warning{{ end }}'
+        annotations:
+          summary: 'Scheduled job {{ $labels.kind }} ({{ $labels.class }}) has not succeeded on time'
+          description: 'jobs_watchdog found no succeeded run of {{ $labels.kind }} within twice its interval (daily kinds: 15 min after the tick). A missed row is in job_runs and A-21 shows Missed.'
+          runbook_url: docs/runbooks/jobs-cron-missed.md
+          __dashboardUid__: tz-jobs
+        isPaused: false
+
+      # Hard-cancelled at shutdown: the counter is zeroed per kind at worker start, so increase()
+      # sees the step from 0 even when the worker that counted it exits right after.
+      - uid: tz-jobs-hard-cancelled
+        title: Job hard-cancelled at shutdown
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: sum by (kind) (increase(tz_job_hard_cancelled_total[10m]))
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          area: jobs
+          severity: warning
+        annotations:
+          summary: 'Job {{ $labels.kind }} was hard-cancelled at worker shutdown'
+          description: 'A {{ $labels.kind }} attempt outlived the 90 s drain and was cancelled (D-98). River retries it; check that it is idempotent and why it ran long.'
+          runbook_url: docs/runbooks/jobs-hard-cancelled.md
+          __dashboardUid__: tz-jobs
+        isPaused: false
