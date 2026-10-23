@@ -2,7 +2,7 @@
   "name": "@todayz/i18n",
   "version": "0.0.0",
   "private": true,
-  "description": "Message catalogues per app and area, the en-XA pseudo-locale and the locale bootstrap (W0-05 minimal; W1-03 owns the full i18n).",
+  "description": "Message catalogues per app and area (en, hi, kn, te, ta), the en-XA pseudo-locale, formatters (₹, km, IST), language detection and fonts (W1-03).",
   "type": "module",
   "sideEffects": false,
   "exports": {
@@ -14,7 +14,8 @@
     "gen": "node scripts/gen.mjs",
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "lint": "eslint --max-warnings 0 ."
+    "lint": "eslint --max-warnings 0 . && node scripts/lint.mjs",
+    "lint:messages": "node scripts/lint.mjs --verbose"
   },
   "dependencies": {
     "@formatjs/icu-messageformat-parser": "3.5.21"

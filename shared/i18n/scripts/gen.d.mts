@@ -5,3 +5,9 @@ export declare function compile(
   messages: Record<string, string>,
   opts?: { pseudo?: boolean },
 ): Record<string, MessageFormatElement[]>;
+
+export declare function loadLocaleMessages(
+  app: string,
+  locale: string,
+  opts?: { drafts?: boolean; dir?: string },
+): Promise<Record<string, string>>;
