@@ -34,11 +34,11 @@ func init() {
 		{Name: BusinessCreate, Kind: authz.KindBusinessUser, Doc: "POST /v1/biz/businesses: start an onboarding draft; the caller becomes its owner"},
 		{Name: StaffAcceptInvite, Kind: authz.KindBusinessUser, Doc: "POST {B}/staff/{staffId}/accept: the invited phone joins (the handler matches the caller's phone)"},
 
-		{Name: BusinessView, Kind: authz.KindBusiness, Grants: ownerManager, Doc: "GET {B}, documents list"},
+		{Name: BusinessView, Kind: authz.KindBusiness, Grants: ownerManager, Doc: "GET {B}"},
 		{Name: BusinessEdit, Kind: authz.KindBusiness, Grants: ownerManager, Doc: "PATCH {B} (onboarding draft)"},
 		{Name: BusinessSubmit, Kind: authz.KindBusiness, Grants: owner, Doc: "POST {B}/submit"},
 		{Name: KycView, Kind: authz.KindBusiness, Grants: map[authz.Role]authz.Grant{authz.Owner: authz.Allow, authz.Manager: authz.Masked}, Doc: "GET {B}/kyc (manager: status and last 4 only)"},
-		{Name: KycEdit, Kind: authz.KindBusiness, Grants: owner, Doc: "PUT {B}/kyc, POST {B}/documents"},
+		{Name: KycEdit, Kind: authz.KindBusiness, Grants: owner, Doc: "PUT {B}/kyc, GET and POST {B}/documents (owner only, 02 §3.3 kyc.edit row)"},
 		{Name: StaffView, Kind: authz.KindBusiness, Grants: ownerManager, Doc: "GET {B}/staff"},
 		{Name: StaffManage, Kind: authz.KindBusiness, Grants: owner, Doc: "invite or remove a manager, PATCH {B}/staff/{staffId}"},
 		{Name: StaffManageCashiers, Kind: authz.KindBusiness, Grants: ownerManager, Doc: "POST {B}/staff (cashier), DELETE {B}/staff/{staffId} (cashier)"},
