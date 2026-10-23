@@ -1,0 +1,22 @@
+---
+// Every page in every locale comes from the registry (src/lib/pages.ts).
+import type { GetStaticPaths } from 'astro';
+import { allRoutes, pagePath } from '../lib/pages.ts';
+import HomeView from '../views/HomeView.astro';
+import InfoView from '../views/InfoView.astro';
+import LegalView from '../views/LegalView.astro';
+import RetailersView from '../views/RetailersView.astro';
+
+export const getStaticPaths = (() =>
+  allRoutes().map(({ page, locale }) => {
+    const path = pagePath(page, locale).replace(/^\/|\/$/g, '');
+    return { params: { slug: path === '' ? undefined : path }, props: { page, locale } };
+  })) satisfies GetStaticPaths;
+
+const { page, locale } = Astro.props;
+---
+
+{page.id === 'home' && <HomeView locale={locale} />}
+{page.id === 'retailers' && <RetailersView locale={locale} />}
+{['how', 'pricing', 'about', 'contact'].includes(page.id) && <InfoView page={page} locale={locale} />}
+{['privacy', 'terms-shoppers', 'terms-shops', 'refunds'].includes(page.id) && <LegalView page={page} locale={locale} />}

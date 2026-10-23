@@ -1,0 +1,81 @@
+---
+// Cards with a tinted icon ring, a title and a sentence.
+import type { ComponentProps } from 'astro/types';
+import Icon from './Icon.astro';
+
+type IconName = ComponentProps<typeof Icon>['name'];
+type Tint = 'green' | 'amber' | 'rose' | 'sky' | 'lilac' | 'peach';
+
+interface Props {
+  items: { icon: IconName; tint: Tint; title: string; body: string }[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="grid">
+  {
+    items.map((item) => (
+      <li class="card" data-tint={item.tint}>
+        <span class="ring"><Icon name={item.icon} size={22} /></span>
+        <h3>{item.title}</h3>
+        <p>{item.body}</p>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .grid {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .card {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+
+  .ring {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-bottom: var(--space-2);
+    border-radius: var(--radius-md);
+    background: var(--t-bg);
+    color: var(--t-ink);
+  }
+
+  h3 {
+    margin: 0;
+    font: var(--type-title);
+    color: var(--ink);
+  }
+
+  p {
+    margin: 0;
+    color: var(--ink-2);
+    font: var(--type-body);
+  }
+
+  @media (width >= 720px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (width >= 1000px) {
+    .grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

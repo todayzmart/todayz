@@ -1,0 +1,200 @@
+---
+import { createT, type Locale } from '../i18n/index.ts';
+import { pageById, pagePath, type PageDef, type PageId } from '../lib/pages.ts';
+import Icon from './Icon.astro';
+import LangSwitch from './LangSwitch.astro';
+
+interface Props {
+  page: PageDef;
+  locale: Locale;
+}
+
+const { page, locale } = Astro.props;
+const t = createT(locale);
+
+/** Link to a page in the current language when it exists in it, otherwise in English. */
+function href(id: PageId): string {
+  const target = pageById(id);
+  return pagePath(target, target.locales.includes(locale) ? locale : 'en');
+}
+
+const nav = [
+  { id: 'retailers' as const, label: t('nav.retailers') },
+  { id: 'how' as const, label: t('nav.how') },
+  { id: 'pricing' as const, label: t('nav.pricing') },
+  { id: 'about' as const, label: t('nav.about') },
+  { id: 'contact' as const, label: t('nav.contact') },
+];
+---
+
+<header class="bar">
+  <div class="inner">
+    <a class="brand" href={href('home')} aria-label={t('a11y.home')}>
+      <img class="mark" src="/icons/mark-96.png" alt="" width="32" height="32" />
+      <span class="word">Today<b>Z</b></span>
+    </a>
+
+    <nav class="wide" aria-label="TodayZ">
+      <ul>
+        {nav.map((item) => (
+          <li>
+            <a href={href(item.id)} aria-current={item.id === page.id ? 'page' : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="tools">
+      <LangSwitch page={page} locale={locale} />
+      <a class="tz-btn tz-btn-brand cta" href={href('contact')}>{t('nav.cta')}</a>
+      <details class="narrow">
+        <summary aria-label={t('nav.menu')}><Icon name="menu" size={22} /></summary>
+        <ul>
+          {nav.map((item) => (
+            <li>
+              <a href={href(item.id)} aria-current={item.id === page.id ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))}
+          <li><a href={href('contact')} class="strong">{t('nav.cta')}</a></li>
+        </ul>
+      </details>
+    </div>
+  </div>
+</header>
+
+<style>
+  .bar {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+  }
+
+  .inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--ink);
+    text-decoration: none;
+    font: 600 20px/24px var(--font-display);
+  }
+
+  .brand b {
+    color: var(--brand);
+  }
+
+  .mark {
+    width: 32px;
+    height: 32px;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .wide {
+    display: none;
+  }
+
+  .wide ul {
+    display: flex;
+    gap: var(--space-1);
+  }
+
+  .wide a,
+  .narrow a {
+    display: block;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    color: var(--ink-2);
+    text-decoration: none;
+    font: var(--type-label);
+  }
+
+  .wide a:hover,
+  .narrow a:hover,
+  a[aria-current='page'] {
+    background: var(--surface-sunken);
+    color: var(--ink);
+  }
+
+  .tools {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .cta {
+    display: none;
+  }
+
+  .narrow {
+    position: relative;
+  }
+
+  .narrow summary {
+    display: grid;
+    place-items: center;
+    width: var(--tap-min);
+    height: var(--tap-min);
+    border: 1px solid var(--line-control);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .narrow summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .narrow ul {
+    position: absolute;
+    inset-inline-end: 0;
+    top: calc(100% + var(--space-2));
+    z-index: var(--z-nav);
+    min-width: 220px;
+    padding: var(--space-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-pop);
+  }
+
+  .narrow .strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  @media (width >= 960px) {
+    .wide {
+      display: block;
+    }
+
+    .narrow {
+      display: none;
+    }
+
+    .cta {
+      display: inline-flex;
+    }
+  }
+</style>

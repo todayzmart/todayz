@@ -1,0 +1,103 @@
+---
+// S-04 Legal pages: numbered sections read from messages until a gap, a draft banner and the grievance block.
+import Section from '../components/Section.astro';
+import Base from '../layouts/Base.astro';
+import { createT, englishMessages, type Locale, type MessageKey } from '../i18n/index.ts';
+import { company } from '../lib/company.ts';
+import type { PageDef } from '../lib/pages.ts';
+
+interface Props {
+  page: PageDef;
+  locale: Locale;
+}
+
+const { page, locale } = Astro.props;
+const t = createT(locale);
+const key = (k: string) => k as MessageKey;
+const prefix = `legal.${page.id.replace('-', '_')}`;
+const all = englishMessages();
+const sections: { title: string; body: string }[] = [];
+for (let i = 1; `${prefix}.s${i}.title` in all; i += 1) {
+  sections.push({ title: t(key(`${prefix}.s${i}.title`)), body: t(key(`${prefix}.s${i}.body`)) });
+}
+const { name, email } = company.grievance;
+const grievance = name && email ? t('legal.grievance.named', { name, email }) : t('legal.grievance.pending');
+---
+
+<Base page={page} locale={locale}>
+  <div class="tz-hero-wash head">
+    <div class="inner">
+      <h1>{t(key(`${prefix}.title`))}</h1>
+      <p class="draft" role="note">{t('legal.draft')}</p>
+    </div>
+  </div>
+  <Section id="terms">
+    <div class="doc">
+      {
+        sections.map((s) => (
+          <section>
+            <h2>{s.title}</h2>
+            <p>{s.body}</p>
+          </section>
+        ))
+      }
+      {
+        page.id === 'privacy' && (
+          <section id="grievance">
+            <h2>{t('legal.grievance.title')}</h2>
+            <p>{grievance}</p>
+          </section>
+        )
+      }
+    </div>
+  </Section>
+</Base>
+
+<style>
+  .head {
+    padding-block: var(--space-10) var(--space-8);
+  }
+
+  .inner {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 1120px;
+    margin: 0 auto;
+    padding-inline: var(--space-4);
+  }
+
+  h1 {
+    margin: 0;
+    font: var(--type-display);
+    letter-spacing: var(--type-display-tracking);
+    color: var(--ink);
+  }
+
+  .draft {
+    margin: 0;
+    padding: var(--space-3);
+    max-width: 60ch;
+    border-radius: var(--radius-md);
+    background: var(--warning-soft);
+    color: var(--ink);
+    font: var(--type-body-sm);
+  }
+
+  .doc {
+    display: grid;
+    gap: var(--space-6);
+    max-width: 760px;
+  }
+
+  h2 {
+    margin: 0 0 var(--space-2);
+    font: var(--type-title);
+    color: var(--ink);
+  }
+
+  .doc p {
+    margin: 0;
+    font: var(--type-body);
+    color: var(--ink-2);
+  }
+</style>

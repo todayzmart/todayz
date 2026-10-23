@@ -1,0 +1,86 @@
+---
+// Numbered steps. Items are {title, body?}; the number is drawn by CSS so the text stays translatable.
+interface Props {
+  items: { title: string; body?: string }[];
+  columns?: 3 | 4;
+}
+
+const { items, columns = 3 } = Astro.props;
+---
+
+<ol class:list={['steps', `cols-${columns}`]}>
+  {
+    items.map((item) => (
+      <li class="step">
+        <span class="num" aria-hidden="true" />
+        <h3>{item.title}</h3>
+        {item.body && <p>{item.body}</p>}
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .steps {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+
+  .step {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    counter-increment: step;
+  }
+
+  .num {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--brand-soft);
+    color: var(--brand-strong);
+    font: 600 15px/1 var(--font-sans);
+  }
+
+  .num::before {
+    content: counter(step);
+  }
+
+  h3 {
+    margin: 0;
+    font: var(--type-title);
+    color: var(--ink);
+  }
+
+  p {
+    margin: 0;
+    color: var(--ink-2);
+    font: var(--type-body);
+  }
+
+  @media (width >= 720px) {
+    .cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .cols-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (width >= 1000px) {
+    .cols-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

@@ -1,39 +1,89 @@
 ---
-// Page frame for every site route: real HTML, tokens and fonts from @todayz/tokens, no client JS.
+// Page frame for every route: real HTML, tokens and fonts from @todayz/tokens, SEO tags (canonical,
+// hreflang, Open Graph, Twitter, JSON-LD) and no client JS except the lead form's own bundle and the
+// Turnstile script on pages that hold the form.
 import '@todayz/tokens/styles.css';
 import head from 'virtual:todayz-head';
-import { t } from '../lib/messages';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { LOCALE_INFO, createT, isMachineDraft, type Locale } from '../i18n/index.ts';
+import { alternates, pagePath, pageUrl, SITE_ORIGIN, type PageDef } from '../lib/pages.ts';
 
 interface Props {
-  title: string;
-  description: string;
+  page: PageDef;
+  locale: Locale;
+  /** Structured data objects, written as one JSON-LD script each. */
+  jsonLd?: Record<string, unknown>[];
+  /** Keep the page out of search results (the 404). */
+  noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
-const year = new Date().getFullYear();
+const { page, locale, jsonLd = [], noindex = false } = Astro.props;
+const t = createT(locale);
+const info = LOCALE_INFO[locale];
+const title = `${t(page.title)}${t(page.title).includes('TodayZ') ? '' : ' | TodayZ'}`;
+const description = t(page.description);
+const canonical = pageUrl(page, locale);
+const ogImage = `${SITE_ORIGIN}/og/${page.id}${locale === 'en' ? '' : `-${locale}`}.png`;
+const hreflang = alternates(page);
+const draft = isMachineDraft(locale);
+const englishPath = pagePath(page, 'en');
 ---
 
 <!doctype html>
-<html lang="en-IN">
+<html lang={info.tag}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonical} />
+    {hreflang.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
+    {draft && <meta name="todayz:translation" content="machine-draft" />}
+    <meta property="og:site_name" content="TodayZ" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={info.og} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
     {head.map(({ tag, attrs }) => (tag === 'link' ? <link {...attrs} /> : <meta {...attrs} />))}
+    {jsonLd.map((data) => <script is:inline type="application/ld+json" set:html={JSON.stringify(data).replace(/</g, '\\u003c')} />)}
+    {page.leadForm && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />}
   </head>
   <body>
-    <a class="skip" href="#main">{t('site.skipToContent')}</a>
+    <a class="skip" href="#main">{t('a11y.skip')}</a>
+    <Header page={page} locale={locale} />
+    {
+      draft && (
+        <p class="draft" role="note">
+          {t('draft.notice')} <a href={englishPath}>{t('draft.switch')}</a>
+        </p>
+      )
+    }
     <main id="main" tabindex="-1">
       <slot />
     </main>
-    <footer class="foot">
-      <p>{t('site.footer', { year })}</p>
-    </footer>
+    <Footer locale={locale} />
   </body>
 </html>
+
+<style is:global>
+  /* Indic scripts stack vowel signs above and below the line: the font shorthands on headings and
+     text would reset the bundle's 1.6 line height, so restore it, and never track Indic text. */
+  html:is(:lang(hi), :lang(kn), :lang(te), :lang(ta)) :is(h1, h2, h3, p, a, li, span, summary, label, button, input, small, b) {
+    line-height: 1.6;
+    letter-spacing: 0;
+  }
+</style>
 
 <style>
   body {
@@ -66,15 +116,17 @@ const year = new Date().getFullYear();
     top: var(--space-3);
   }
 
-  .foot {
-    padding: var(--space-6) var(--space-4);
-    border-top: 1px solid var(--line);
-    font: var(--type-caption);
-    color: var(--ink-3);
+  .draft {
+    margin: 0;
+    padding: var(--space-3) var(--space-4);
+    background: var(--warning-soft);
+    color: var(--ink);
+    font: var(--type-body-sm);
     text-align: center;
   }
 
-  .foot p {
-    margin: 0;
+  .draft a {
+    color: var(--ink);
+    font-weight: 600;
   }
 </style>

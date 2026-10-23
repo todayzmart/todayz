@@ -1,0 +1,91 @@
+---
+// Language switcher with no JavaScript: a <details> list of links. Each language is written in its
+// own script. It lists a language only when the current page exists in it.
+import { LOCALE_INFO, createT, type Locale } from '../i18n/index.ts';
+import { pagePath, type PageDef } from '../lib/pages.ts';
+import Icon from './Icon.astro';
+
+interface Props {
+  page: PageDef;
+  locale: Locale;
+}
+
+const { page, locale } = Astro.props;
+const t = createT(locale);
+const options = page.locales.map((l) => ({ locale: l, href: pagePath(page, l), native: LOCALE_INFO[l].native, tag: LOCALE_INFO[l].tag }));
+---
+
+{
+  options.length > 1 && (
+    <details class="lang">
+      <summary aria-label={t('a11y.language')}>
+        <Icon name="globe" size={18} />
+        <span>{LOCALE_INFO[locale].native}</span>
+        <Icon name="chevron" size={16} />
+      </summary>
+      <ul>
+        {options.map((o) => (
+          <li>
+            <a href={o.href} lang={o.tag} hreflang={o.locale} aria-current={o.locale === locale ? 'true' : undefined}>
+              {o.native}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </details>
+  )
+}
+
+<style>
+  .lang {
+    position: relative;
+  }
+
+  summary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--tap-min);
+    padding: 0 var(--space-3);
+    border: 1px solid var(--line-control);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--ink);
+    font: var(--type-label);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  ul {
+    position: absolute;
+    inset-inline-end: 0;
+    top: calc(100% + var(--space-2));
+    z-index: var(--z-nav);
+    min-width: 160px;
+    margin: 0;
+    padding: var(--space-2);
+    list-style: none;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-pop);
+  }
+
+  a {
+    display: block;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    color: var(--ink);
+    text-decoration: none;
+    font: var(--type-body);
+  }
+
+  a:hover,
+  a[aria-current='true'] {
+    background: var(--surface-sunken);
+  }
+</style>

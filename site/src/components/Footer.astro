@@ -1,0 +1,118 @@
+---
+import { createT, type Locale } from '../i18n/index.ts';
+import { pageById, pagePath, type PageId } from '../lib/pages.ts';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = createT(locale);
+const year = new Date().getFullYear();
+
+function href(id: PageId): string {
+  const target = pageById(id);
+  return pagePath(target, target.locales.includes(locale) ? locale : 'en');
+}
+---
+
+<footer class="foot">
+  <div class="inner">
+    <div class="about">
+      <span class="word">Today<b>Z</b></span>
+      <p>{t('footer.tagline')}</p>
+    </div>
+    <nav aria-label={t('footer.company')}>
+      <h2>{t('footer.company')}</h2>
+      <ul>
+        <li><a href={href('retailers')}>{t('nav.retailers')}</a></li>
+        <li><a href={href('how')}>{t('nav.how')}</a></li>
+        <li><a href={href('pricing')}>{t('nav.pricing')}</a></li>
+        <li><a href={href('about')}>{t('nav.about')}</a></li>
+        <li><a href={href('contact')}>{t('nav.contact')}</a></li>
+      </ul>
+    </nav>
+    <nav aria-label={t('footer.legal')}>
+      <h2>{t('footer.legal')}</h2>
+      <ul>
+        <li><a href={href('privacy')}>{t('footer.privacy')}</a></li>
+        <li><a href={href('terms-shoppers')}>{t('footer.terms_shoppers')}</a></li>
+        <li><a href={href('terms-shops')}>{t('footer.terms_shops')}</a></li>
+        <li><a href={href('refunds')}>{t('footer.refunds')}</a></li>
+      </ul>
+    </nav>
+  </div>
+  <p class="copy">{t('footer.copy', { year })}</p>
+</footer>
+
+<style>
+  .foot {
+    border-top: 1px solid var(--line);
+    background: var(--surface-subtle);
+    color: var(--ink-2);
+  }
+
+  .inner {
+    display: grid;
+    gap: var(--space-8);
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: var(--space-10) var(--space-4) var(--space-6);
+  }
+
+  .word {
+    font: 600 20px/24px var(--font-display);
+    color: var(--ink);
+  }
+
+  .word b {
+    color: var(--brand);
+  }
+
+  .about p {
+    margin: var(--space-2) 0 0;
+    font: var(--type-body);
+  }
+
+  h2 {
+    margin: 0 0 var(--space-3);
+    font: var(--type-label);
+    color: var(--ink);
+  }
+
+  ul {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    display: inline-block;
+    padding: var(--space-1) 0;
+    color: var(--ink-2);
+    text-decoration: none;
+    font: var(--type-body);
+  }
+
+  a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+  }
+
+  .copy {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: var(--space-4);
+    border-top: 1px solid var(--line);
+    font: var(--type-caption);
+    color: var(--ink-3);
+  }
+
+  @media (width >= 720px) {
+    .inner {
+      grid-template-columns: 2fr 1fr 1fr;
+    }
+  }
+</style>

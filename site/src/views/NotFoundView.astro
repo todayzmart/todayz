@@ -1,0 +1,40 @@
+---
+// The 404 page: noindex, plain, one way home.
+import Section from '../components/Section.astro';
+import Base from '../layouts/Base.astro';
+import { createT } from '../i18n/index.ts';
+import { pageById, type PageDef } from '../lib/pages.ts';
+
+const t = createT('en');
+const page: PageDef = { ...pageById('home'), title: 'info.404.meta.title', leadForm: false };
+---
+
+<Base page={page} locale="en" noindex>
+  <Section>
+    <div class="box">
+      <h1>{t('info.404.title')}</h1>
+      <p>{t('info.404.body')}</p>
+      <p><a class="tz-btn tz-btn-brand" href="/">{t('info.404.cta')}</a></p>
+    </div>
+  </Section>
+</Base>
+
+<style>
+  .box {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 560px;
+  }
+
+  h1 {
+    margin: 0;
+    font: var(--type-display);
+    color: var(--ink);
+  }
+
+  p {
+    margin: 0;
+    font: var(--type-body-lg);
+    color: var(--ink-2);
+  }
+</style>

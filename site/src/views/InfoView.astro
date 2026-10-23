@@ -1,0 +1,154 @@
+---
+// S-03 How it works, Pricing, About and Contact (English only).
+import Icon from '../components/Icon.astro';
+import LeadForm from '../components/LeadForm.astro';
+import Section from '../components/Section.astro';
+import Steps from '../components/Steps.astro';
+import Base from '../layouts/Base.astro';
+import { createT, numbered, type Locale, type MessageKey } from '../i18n/index.ts';
+import { company, links } from '../lib/company.ts';
+import { softwareApplicationJsonLd } from '../lib/jsonld.ts';
+import type { PageDef } from '../lib/pages.ts';
+
+interface Props {
+  page: PageDef;
+  locale: Locale;
+}
+
+const { page, locale } = Astro.props;
+const t = createT(locale);
+const key = (k: string) => k as MessageKey;
+const kind = page.id;
+const ns = `info.${kind}`;
+const shopSteps = [1, 2, 3].map((i) => ({ title: t(key(`home.steps.${i}.title`)), body: t(key(`home.steps.${i}.body`)) }));
+const shopperSteps = numbered(t, locale, 'home.shoppers').map((title) => ({ title }));
+const points = [1, 2, 3].map((i) => t(key(`info.pricing.point.${i}`)));
+const paragraphs = [1, 2, 3].map((i) => t(key(`info.about.${i}`)));
+const jsonLd = kind === 'pricing' ? [softwareApplicationJsonLd(locale, t('info.pricing.meta.description'))] : [];
+---
+
+<Base page={page} locale={locale} jsonLd={jsonLd}>
+  <div class="tz-hero-wash head">
+    <div class="inner">
+      <h1>{t(key(`${ns}.title`))}</h1>
+      {kind !== 'about' && <p class="lead">{t(key(`${ns}.intro`))}</p>}
+    </div>
+  </div>
+
+  {
+    kind === 'how' && (
+      <>
+        <Section id="shops" title={t('info.how.shops.title')}>
+          <Steps items={shopSteps} columns={3} />
+          <p><a class="tz-btn tz-btn-brand" href="/for-retailers">{t('nav.retailers')} <Icon name="arrow" size={18} /></a></p>
+        </Section>
+        <Section tone="wash" id="shoppers" title={t('info.how.shoppers.title')}>
+          <Steps items={shopperSteps} columns={4} />
+          <p><a class="tz-btn tz-btn-primary" href={links.customerApp}>{t('home.shoppers.cta')} <Icon name="arrow" size={18} /></a></p>
+        </Section>
+      </>
+    )
+  }
+
+  {
+    kind === 'pricing' && (
+      <Section id="plan">
+        <ul class="points">
+          {points.map((p) => (
+            <li class="tz-card"><span class="tick"><Icon name="check" size={18} /></span><p>{p}</p></li>
+          ))}
+        </ul>
+        <p><a class="tz-btn tz-btn-brand tz-btn-lg" href="/contact#join">{t('nav.cta')}</a></p>
+      </Section>
+    )
+  }
+
+  {
+    kind === 'about' && (
+      <Section id="story">
+        <div class="prose">{paragraphs.map((p) => <p>{p}</p>)}</div>
+      </Section>
+    )
+  }
+
+  {
+    kind === 'contact' && (
+      <>
+        {company.email && (
+          <Section id="email">
+            <p class="prose"><b>{t('info.contact.email')}:</b> <a href={`mailto:${company.email}`}>{company.email}</a></p>
+          </Section>
+        )}
+        <Section tone="wash" id="join">
+          <LeadForm locale={locale} source="contact" />
+        </Section>
+      </>
+    )
+  }
+</Base>
+
+<style>
+  .head {
+    padding-block: var(--space-10) var(--space-8);
+  }
+
+  .inner {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 1120px;
+    margin: 0 auto;
+    padding-inline: var(--space-4);
+  }
+
+  h1 {
+    margin: 0;
+    font: var(--type-display-xl);
+    letter-spacing: var(--type-display-xl-tracking);
+    color: var(--ink);
+  }
+
+  .lead {
+    margin: 0;
+    max-width: 60ch;
+    font: var(--type-body-lg);
+    color: var(--ink-2);
+  }
+
+  .points {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0 0 var(--space-6);
+    padding: 0;
+    list-style: none;
+    max-width: 760px;
+  }
+
+  .points li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+  }
+
+  .points p {
+    margin: 0;
+    font: var(--type-body);
+    color: var(--ink-2);
+  }
+
+  .tick {
+    color: var(--brand-strong);
+    flex: none;
+  }
+
+  .prose {
+    display: grid;
+    gap: var(--space-4);
+    max-width: 68ch;
+    font: var(--type-body-lg);
+    color: var(--ink-2);
+  }
+
+  .prose p {
+    margin: 0;
+  }
+</style>

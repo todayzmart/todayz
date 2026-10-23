@@ -1,0 +1,67 @@
+---
+// Lucide icon as inline SVG (stroke 1.75 like the apps). Only the icons the site uses are imported.
+import {
+  ArrowRight,
+  CalendarCheck,
+  Check,
+  ChevronDown,
+  Globe,
+  Menu,
+  MapPin,
+  Package,
+  PackageSearch,
+  Receipt,
+  Search,
+  ShoppingBag,
+  Smartphone,
+  Store,
+  Ticket,
+  TrendingUp,
+  Truck,
+} from 'lucide';
+
+const icons = {
+  arrow: ArrowRight,
+  booking: CalendarCheck,
+  check: Check,
+  chevron: ChevronDown,
+  globe: Globe,
+  menu: Menu,
+  pin: MapPin,
+  package: Package,
+  demand: PackageSearch,
+  receipt: Receipt,
+  search: Search,
+  bag: ShoppingBag,
+  phone: Smartphone,
+  store: Store,
+  credit: Ticket,
+  growth: TrendingUp,
+  delivery: Truck,
+} as const;
+
+interface Props {
+  name: keyof typeof icons;
+  size?: number;
+}
+
+const { name, size = 20 } = Astro.props;
+const nodes = icons[name] as unknown as [string, Record<string, string | number>][];
+---
+
+<svg
+  class="tz-ico"
+  xmlns="http://www.w3.org/2000/svg"
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {nodes.map(([tag, attrs]) => (tag === 'path' ? <path {...attrs} /> : tag === 'circle' ? <circle {...attrs} /> : tag === 'rect' ? <rect {...attrs} /> : tag === 'line' ? <line {...attrs} /> : <polyline {...attrs} />))}
+</svg>

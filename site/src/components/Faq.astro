@@ -1,0 +1,68 @@
+---
+// FAQ as native <details>, no JavaScript. Items are plain {q, a} pairs; pages also pass them to JSON-LD.
+interface Props {
+  items: { q: string; a: string }[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="faq">
+  {
+    items.map((item) => (
+      <details>
+        <summary>{item.q}</summary>
+        <p>{item.a}</p>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .faq {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 760px;
+  }
+
+  details {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    min-height: var(--tap-min);
+    padding: var(--space-3) var(--space-4);
+    color: var(--ink);
+    font: 600 15px/22px var(--font-sans);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary::after {
+    content: '+';
+    flex: none;
+    color: var(--ink-3);
+    font: 400 22px/1 var(--font-sans);
+  }
+
+  details[open] summary::after {
+    content: '\2212';
+  }
+
+  p {
+    margin: 0;
+    padding: 0 var(--space-4) var(--space-4);
+    color: var(--ink-2);
+    font: var(--type-body);
+  }
+</style>

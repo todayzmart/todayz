@@ -1,0 +1,121 @@
+---
+// S-02 For retailers, in any language.
+import Faq from '../components/Faq.astro';
+import FeatureGrid from '../components/FeatureGrid.astro';
+import LeadForm from '../components/LeadForm.astro';
+import Section from '../components/Section.astro';
+import Steps from '../components/Steps.astro';
+import Base from '../layouts/Base.astro';
+import { createT, type Locale, type MessageKey } from '../i18n/index.ts';
+import { faqJsonLd, softwareApplicationJsonLd } from '../lib/jsonld.ts';
+import { pageById } from '../lib/pages.ts';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const page = pageById('retailers');
+const t = createT(locale);
+const key = (k: string) => k as MessageKey;
+
+const benefits = (
+  [
+    ['receipt', 'green'],
+    ['bag', 'sky'],
+    ['demand', 'amber'],
+    ['credit', 'lilac'],
+  ] as const
+).map(([icon, tint], i) => ({
+  icon,
+  tint,
+  title: t(key(`retailers.benefits.${i + 1}.title`)),
+  body: t(key(`retailers.benefits.${i + 1}.body`)),
+}));
+const steps = [1, 2, 3].map((i) => ({ title: t(key(`home.steps.${i}.title`)), body: t(key(`home.steps.${i}.body`)) }));
+const faq = [1, 2, 3].map((i) => ({ q: t(key(`retailers.faq.${i}.q`)), a: t(key(`retailers.faq.${i}.a`)) }));
+---
+
+<Base page={page} locale={locale} jsonLd={[softwareApplicationJsonLd(locale, t('retailers.meta.description')), faqJsonLd(faq)]}>
+  <div class="tz-hero-wash hero">
+    <div class="inner">
+      <div class="copy">
+        <p class="eyebrow">{t('nav.retailers')}</p>
+        <h1>{t('retailers.hero.title')}</h1>
+        <p class="lead">{t('retailers.hero.body')}</p>
+        <p><a class="tz-btn tz-btn-brand tz-btn-lg" href="#join">{t('nav.cta')}</a></p>
+      </div>
+      <LeadForm locale={locale} source="retailers" id="join-hero" />
+    </div>
+  </div>
+
+  <Section id="benefits" title={t('retailers.benefits.title')}>
+    <FeatureGrid items={benefits} />
+  </Section>
+
+  <Section tone="subtle" id="steps" title={t('home.steps.title')}>
+    <Steps items={steps} columns={3} />
+  </Section>
+
+  <Section id="faq" title={t('retailers.faq.title')}>
+    <Faq items={faq} />
+  </Section>
+
+  <Section tone="wash" id="join">
+    <p class="join">{t('lead.intro')}</p>
+    <p><a class="tz-btn tz-btn-brand tz-btn-lg" href="#join-hero">{t('nav.cta')}</a></p>
+  </Section>
+</Base>
+
+<style>
+  .hero {
+    padding-block: var(--space-8) var(--space-10);
+  }
+
+  .inner {
+    display: grid;
+    gap: var(--space-8);
+    max-width: 1120px;
+    margin: 0 auto;
+    padding-inline: var(--space-4);
+    align-items: start;
+  }
+
+  .copy {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .eyebrow {
+    margin: 0;
+    color: var(--brand-strong);
+    font: var(--type-label);
+  }
+
+  h1 {
+    margin: 0;
+    max-width: 18ch;
+    font: var(--type-display-xl);
+    letter-spacing: var(--type-display-xl-tracking);
+    color: var(--ink);
+  }
+
+  .lead {
+    margin: 0;
+    max-width: 52ch;
+    font: var(--type-body-lg);
+    color: var(--ink-2);
+  }
+
+  .join {
+    margin: 0;
+    font: var(--type-body-lg);
+    color: var(--ink-2);
+  }
+
+  @media (width >= 1000px) {
+    .inner {
+      grid-template-columns: 1.2fr 1fr;
+    }
+  }
+</style>

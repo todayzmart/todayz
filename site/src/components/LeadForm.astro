@@ -1,0 +1,172 @@
+---
+// The shop lead form (the only interactive island besides plain <details>). Needs JavaScript to
+// post JSON to POST /v1/public/leads. Turnstile renders implicitly and adds the
+// cf-turnstile-response field; the script behind it is loaded by Base.astro on pages with a form.
+import { createT, type Locale } from '../i18n/index.ts';
+import { pageById, pagePath } from '../lib/pages.ts';
+
+interface Props {
+  locale: Locale;
+  /** Page id, sent as the lead source. */
+  source: string;
+  id?: string;
+}
+
+const { locale, source, id = 'lead' } = Astro.props;
+const t = createT(locale);
+const apiBase: string = import.meta.env['PUBLIC_API_URL'] ?? 'https://api.todayz.in';
+// Cloudflare's published always-pass test key. Production builds set PUBLIC_TURNSTILE_SITE_KEY.
+const siteKey: string = import.meta.env['PUBLIC_TURNSTILE_SITE_KEY'] ?? '1x00000000000000000000AA';
+const privacy = pageById('privacy');
+
+const fields = [
+  { name: 'name', label: t('lead.name'), error: t('lead.err_name'), type: 'text', autocomplete: 'name', inputmode: undefined },
+  { name: 'shop_name', label: t('lead.shop'), error: t('lead.err_shop'), type: 'text', autocomplete: 'organization', inputmode: undefined },
+  { name: 'phone', label: t('lead.phone'), error: t('lead.err_phone'), type: 'tel', autocomplete: 'tel', inputmode: 'tel' },
+  { name: 'city', label: t('lead.city'), error: t('lead.err_city'), type: 'text', autocomplete: 'address-level2', inputmode: undefined },
+] as const;
+---
+
+<section class="lead tz-card" id={id} aria-labelledby={`${id}-title`}>
+  <h2 id={`${id}-title`}>{t('lead.title')}</h2>
+  <p class="intro">{t('lead.intro')}</p>
+  <form
+    class="form"
+    method="post"
+    novalidate
+    data-lead-form
+    data-api={apiBase}
+    data-source={`site:${source}:${locale}`}
+    data-sending={t('lead.sending')}
+    data-success={t('lead.success')}
+    data-error={t('lead.error')}
+    data-captcha={t('lead.err_captcha')}
+  >
+    {
+      fields.map((f) => (
+        <div class="tz-field">
+          <label class="tz-field-label" for={`${id}-${f.name}`}>
+            {f.label}
+          </label>
+          <input
+            class="tz-input"
+            id={`${id}-${f.name}`}
+            name={f.name}
+            type={f.type}
+            autocomplete={f.autocomplete}
+            inputmode={f.inputmode}
+            maxlength="120"
+            required
+            aria-describedby={`${id}-${f.name}-err`}
+          />
+          <p class="tz-field-error" id={`${id}-${f.name}-err`} data-error-for={f.name} hidden>
+            {f.error}
+          </p>
+        </div>
+      ))
+    }
+    <div class="cf-turnstile" data-sitekey={siteKey} data-theme="light" data-language={locale}></div>
+    <p class="tz-field-error" data-error-for="captcha" hidden>{t('lead.err_captcha')}</p>
+    <button class="tz-btn tz-btn-brand tz-btn-lg" type="submit">{t('lead.submit')}</button>
+    <p class="status" role="status" aria-live="polite" data-status></p>
+    <p class="consent">
+      {t('lead.consent')} <a href={pagePath(privacy, 'en')}>{t('footer.privacy')}</a>
+    </p>
+  </form>
+</section>
+
+<script>
+  import { submitLead, validateLead, type LeadField } from '../lib/leads.ts';
+
+  const FIELDS: LeadField[] = ['name', 'shop_name', 'phone', 'city'];
+
+  function setError(form: HTMLFormElement, name: string, show: boolean): void {
+    const message = form.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
+    if (message) message.hidden = !show;
+    const input = form.elements.namedItem(name);
+    if (input instanceof HTMLInputElement) {
+      input.classList.toggle('tz-input-invalid', show);
+      input.setAttribute('aria-invalid', show ? 'true' : 'false');
+    }
+  }
+
+  document.querySelectorAll<HTMLFormElement>('form[data-lead-form]').forEach((form) => {
+    const status = form.querySelector<HTMLElement>('[data-status]');
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const text = (key: 'sending' | 'success' | 'error') => form.dataset[key] ?? '';
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const raw: Partial<Record<LeadField, string>> = {};
+      for (const f of FIELDS) raw[f] = String(data.get(f) ?? '');
+      const result = validateLead(raw);
+      for (const f of FIELDS) setError(form, f, !result.ok && result.errors[f] === true);
+      const token = String(data.get('cf-turnstile-response') ?? '');
+      setError(form, 'captcha', token === '');
+      if (!result.ok || token === '') {
+        form.querySelector<HTMLInputElement>('[aria-invalid="true"]')?.focus();
+        return;
+      }
+      if (button) button.disabled = true;
+      if (status) status.textContent = text('sending');
+      const outcome = await submitLead(form.dataset['api'] ?? '', {
+        ...result.value,
+        source: form.dataset['source'] ?? 'site',
+        turnstile_token: token,
+      });
+      if (outcome.ok) {
+        form.reset();
+        if (status) status.textContent = text('success');
+        form.dataset['state'] = 'sent';
+      } else {
+        if (status) status.textContent = text('error');
+        if (button) button.disabled = false;
+      }
+      (window as unknown as { turnstile?: { reset: () => void } }).turnstile?.reset();
+    });
+  });
+</script>
+
+<style>
+  .lead {
+    max-width: 520px;
+    padding: var(--space-6);
+    box-shadow: var(--shadow-pop);
+  }
+
+  h2 {
+    margin: 0;
+    font: var(--type-title);
+    letter-spacing: var(--type-title-tracking);
+    color: var(--ink);
+  }
+
+  .intro {
+    margin: 0;
+    color: var(--ink-2);
+    font: var(--type-body);
+  }
+
+  .form {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .status {
+    min-height: 1.5em;
+    margin: 0;
+    color: var(--ink);
+    font: var(--type-label);
+  }
+
+  .consent {
+    margin: 0;
+    color: var(--ink-3);
+    font: var(--type-caption);
+  }
+
+  .consent a {
+    color: var(--ink-2);
+  }
+</style>

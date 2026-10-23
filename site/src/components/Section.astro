@@ -1,0 +1,73 @@
+---
+// A page band. tone "wash" is the mint wash, "subtle" a quiet grey-green, "plain" the white page.
+interface Props {
+  id?: string;
+  title?: string;
+  intro?: string;
+  tone?: 'plain' | 'wash' | 'subtle';
+}
+
+const { id, title, intro, tone = 'plain' } = Astro.props;
+const headingId = id && title ? `${id}-title` : undefined;
+---
+
+<section class:list={['band', tone]} id={id} aria-labelledby={headingId}>
+  <div class="inner">
+    {
+      title && (
+        <header class="head">
+          <h2 id={headingId}>{title}</h2>
+          {intro && <p>{intro}</p>}
+        </header>
+      )
+    }
+    <slot />
+  </div>
+</section>
+
+<style>
+  .band {
+    padding-block: var(--space-10);
+  }
+
+  .wash {
+    background: linear-gradient(180deg, var(--wash) 0%, var(--surface) 100%);
+  }
+
+  .subtle {
+    background: var(--surface-subtle);
+  }
+
+  .inner {
+    display: grid;
+    gap: var(--space-6);
+    max-width: 1120px;
+    margin: 0 auto;
+    padding-inline: var(--space-4);
+  }
+
+  .head {
+    display: grid;
+    gap: var(--space-2);
+    max-width: 680px;
+  }
+
+  h2 {
+    margin: 0;
+    font: var(--type-headline);
+    letter-spacing: var(--type-headline-tracking);
+    color: var(--ink);
+  }
+
+  .head p {
+    margin: 0;
+    font: var(--type-body-lg);
+    color: var(--ink-2);
+  }
+
+  @media (width >= 720px) {
+    .band {
+      padding-block: calc(var(--space-12) + var(--space-4));
+    }
+  }
+</style>
