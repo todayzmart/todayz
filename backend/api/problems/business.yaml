@@ -1,0 +1,12 @@
+# Problem codes: domain "business" (owner W1-04; 04 §1.4 D-91 table).
+#
+# Same shape as common.yaml. Everything else the business routes answer is a
+# common code: invalid_transition for a submit from the wrong state, conflict
+# for an invite to someone already on the staff, forbidden for a role that may
+# not act, validation_failed (with `fields`) for a bad PAN, GSTIN or hours.
+domain: business
+problems:
+  - code: submit_incomplete
+    status: 409
+    i18n: problems.submit_incomplete
+    title: Some details are missing before this can be sent for review

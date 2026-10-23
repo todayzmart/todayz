@@ -9,4 +9,44 @@
 # Mark idempotent operations `x-idempotency: required|optional` and uploads
 # `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
 # List the domain problem codes an operation can return under `x-problems`.
-{}
+/v1/public/leads:
+  post:
+    operationId: createLead
+    tags: [public]
+    summary: The site's lead form
+    description: >-
+      Checks Turnstile first (`403 forbidden` on a failed check, `503` when the
+      check cannot run), then stores the lead with its phone encrypted. The
+      same details within 24 hours are not stored twice; the answer is the same
+      `202` either way. The site's `Idempotency-Key` is accepted and not used:
+      the details decide (D-103).
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/public.yaml#/LeadCreate
+          example:
+            name: Lakshmi Devi
+            phone: "+919000000021"
+            shopName: Lakshmi Traders
+            city: Bengaluru
+            source: site:home:en
+            turnstileToken: XXXX.DUMMY.TOKEN.XXXX
+    responses:
+      "202":
+        description: Received
+        headers:
+          Cache-Control:
+            description: Always `no-store`.
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/public.yaml#/LeadAccepted
+            example:
+              received: true
+      default:
+        $ref: ../common/responses.yaml#/Problem

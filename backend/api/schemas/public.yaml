@@ -6,4 +6,51 @@
 # an object that must stay open says `x-open-object: true`. Money is `*Paise`
 # (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
 # timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+#
+# W1-04: the site's lead form (S-01, S-02; D-102, D-103).
+LeadCreate:
+  type: object
+  description: >-
+    A shop owner asking to be called back. Each attempt carries a fresh
+    Turnstile token. The same details within 24 hours are taken again without
+    a second lead, so a retry is safe with or without an `Idempotency-Key`.
+  additionalProperties: false
+  required: [name, phone, shopName, city, source, turnstileToken]
+  properties:
+    name:
+      type: string
+      minLength: 2
+      maxLength: 80
+      pattern: ^\S(.*\S)?$
+    phone:
+      type: string
+      description: An Indian mobile in E.164.
+      pattern: ^\+91[6-9][0-9]{9}$
+      maxLength: 13
+    shopName:
+      type: string
+      minLength: 2
+      maxLength: 120
+      pattern: ^\S(.*\S)?$
+    city:
+      type: string
+      minLength: 2
+      maxLength: 80
+      pattern: ^\S(.*\S)?$
+    source:
+      type: string
+      description: Where the form was, for example `site:home:hi`.
+      pattern: ^[a-z][a-z0-9_-]*(:[a-z0-9_-]+){0,4}$
+      maxLength: 64
+    turnstileToken:
+      type: string
+      description: The Cloudflare Turnstile response token. A failed check stores nothing (`403 forbidden`).
+      minLength: 1
+      maxLength: 2048
+LeadAccepted:
+  type: object
+  required: [received]
+  properties:
+    received:
+      type: boolean
+      const: true

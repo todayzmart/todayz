@@ -9,4 +9,891 @@
 # Mark idempotent operations `x-idempotency: required|optional` and uploads
 # `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
 # List the domain problem codes an operation can return under `x-problems`.
-{}
+#
+# W1-04. `{B}` = /v1/biz/businesses/{bid}, `{S}` = {B}/stores/{sid} (04 §2.6);
+# the permission engine reads the scope from `bid` and `sid` (authz.ScopeFrom,
+# 02 §3.1). Roles per operation are in internal/platform/authz/policy/business.go.
+/v1/biz/businesses:
+  get:
+    operationId: listBusinesses
+    tags: [business]
+    summary: Businesses I am staff of, and invites waiting for me
+    description: The B-01 picker. Every business where I am active staff, with my role and the stores I may open, plus pending invites to my account or phone.
+    responses:
+      "200":
+        description: My businesses
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/BusinessList
+            example:
+              items:
+                - id: 01JB0S2A3B4C5D6E7F8G9H0J1K
+                  brandName: Lakshmi Traders
+                  status: verified
+                  role: owner
+                  stores:
+                    - id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                      name: Lakshmi Traders Indiranagar
+                      slug: lakshmi-traders-indiranagar
+                      status: live
+              invitations: []
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: createBusiness
+    tags: [business]
+    summary: Start an onboarding draft
+    description: The caller becomes the owner. The business starts as `draft` with a referral code (D-26).
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/business.yaml#/BusinessCreate
+          example:
+            brandName: Lakshmi Traders
+            legalName: Lakshmi Traders Private Limited
+    responses:
+      "201":
+        description: The new draft
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/Business
+            example:
+              id: 01JB0S2A3B4C5D6E7F8G9H0J1K
+              brandName: Lakshmi Traders
+              legalName: Lakshmi Traders Private Limited
+              categoryId: null
+              status: draft
+              referralCode: K7M2QX
+              myRole: owner
+              submittedAt: null
+              verifiedAt: null
+              infoRequest: null
+              createdAt: "2026-10-22T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getBusiness
+    tags: [business]
+    summary: One business
+    description: Owner and manager. There is no business-delete endpoint in v1; an owner asks support (D-66).
+    responses:
+      "200":
+        description: The business
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/Business
+            example:
+              id: 01JB0S2A3B4C5D6E7F8G9H0J1K
+              brandName: Lakshmi Traders
+              legalName: Lakshmi Traders Private Limited
+              categoryId: 01JB0S6A1B2C3D4E5F6G7H8J9K
+              status: needs_info
+              referralCode: K7M2QX
+              myRole: owner
+              submittedAt: "2026-10-22T09:30:00Z"
+              verifiedAt: null
+              infoRequest:
+                fields: [gstin]
+                note: The GST certificate photo is blurred.
+              createdAt: "2026-10-21T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  patch:
+    operationId: updateBusiness
+    tags: [business]
+    summary: Change the brand name, legal name or category
+    x-idempotency: none
+    parameters:
+      - $ref: ../common/parameters.yaml#/IfMatch
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/business.yaml#/BusinessUpdate
+          example:
+            brandName: Lakshmi Traders
+            categoryId: 01JB0S6A1B2C3D4E5F6G7H8J9K
+    responses:
+      "200":
+        description: The business after the change
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/Business
+            example:
+              id: 01JB0S2A3B4C5D6E7F8G9H0J1K
+              brandName: Lakshmi Traders
+              legalName: Lakshmi Traders Private Limited
+              categoryId: 01JB0S6A1B2C3D4E5F6G7H8J9K
+              status: draft
+              referralCode: K7M2QX
+              myRole: owner
+              submittedAt: null
+              verifiedAt: null
+              infoRequest: null
+              createdAt: "2026-10-21T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/submit:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: submitBusiness
+    tags: [business]
+    summary: Send the business for verification
+    description: >-
+      Owner only. From `draft` or `needs_info` to `submitted`. Needs the brand
+      name, the category and at least one store with its name, address, city,
+      pincode, map pin, phone and opening hours; otherwise `409
+      submit_incomplete` with `fields` naming what is missing.
+    x-idempotency: optional
+    x-problems: [submit_incomplete]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    responses:
+      "200":
+        description: The business, now submitted
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/Business
+            example:
+              id: 01JB0S2A3B4C5D6E7F8G9H0J1K
+              brandName: Lakshmi Traders
+              legalName: Lakshmi Traders Private Limited
+              categoryId: 01JB0S6A1B2C3D4E5F6G7H8J9K
+              status: submitted
+              referralCode: K7M2QX
+              myRole: owner
+              submittedAt: "2026-10-22T09:30:00Z"
+              verifiedAt: null
+              infoRequest: null
+              createdAt: "2026-10-21T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/kyc:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getKyc
+    tags: [business]
+    summary: Payout and tax details, masked
+    description: Owner; a manager sees the status and the last 4 characters only (D-44).
+    responses:
+      "200":
+        description: The details, masked
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/Kyc
+            example:
+              status: submitted
+              panLast4: "234F"
+              gstinLast4: "41Z5"
+              upiIdLast4: null
+              bankAccountLast4: "6789"
+              bankIfsc: HDFC0001234
+              legalName: Lakshmi Traders Private Limited
+              verifiedAt: null
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  put:
+    operationId: putKyc
+    tags: [business]
+    summary: Set payout and tax details
+    description: Owner only. Values are encrypted at rest and never returned in full (D-44). A change sends the details back to `submitted`.
+    x-idempotency: none
+    parameters:
+      - $ref: ../common/parameters.yaml#/IfMatch
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/business.yaml#/KycUpdate
+          example:
+            pan: ABCDE1234F
+            bankAccount: "123456789"
+            bankIfsc: HDFC0001234
+    responses:
+      "200":
+        description: The details after the change, masked
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/Kyc
+            example:
+              status: submitted
+              panLast4: "234F"
+              gstinLast4: null
+              upiIdLast4: null
+              bankAccountLast4: "6789"
+              bankIfsc: HDFC0001234
+              legalName: null
+              verifiedAt: null
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/documents:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listBusinessDocuments
+    tags: [business]
+    summary: Verification documents
+    description: Owner only.
+    responses:
+      "200":
+        description: The documents, newest first
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/DocumentList
+            example:
+              items:
+                - id: 01JB0S5K6M7N8P9Q0R1S2T3V4W
+                  kind: gst
+                  contentType: application/pdf
+                  storeId: null
+                  status: uploaded
+                  rejectReason: null
+                  createdAt: "2026-10-22T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: createBusinessDocument
+    tags: [business]
+    summary: Add a document and get its upload URL
+    description: >-
+      Owner only. Records the document and returns a presigned PUT into the
+      private bucket (D-46), valid for 15 minutes. The object key is never
+      shown. `503 service_unavailable` while storage is not configured.
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/business.yaml#/DocumentCreate
+          example:
+            kind: gst
+            contentType: application/pdf
+    responses:
+      "201":
+        description: The document and where to upload it
+        headers:
+          Cache-Control:
+            description: "`no-store`: the upload URL is a credential."
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/DocumentUpload
+            example:
+              document:
+                id: 01JB0S5K6M7N8P9Q0R1S2T3V4W
+                kind: gst
+                contentType: application/pdf
+                storeId: null
+                status: uploaded
+                rejectReason: null
+                createdAt: "2026-10-22T09:30:00Z"
+              upload:
+                url: https://s3.todayz.localhost/private/businesses/01JB0S2A3B4C5D6E7F8G9H0J1K/documents/01JB0S5K6M7N8P9Q0R1S2T3V4W?X-Amz-Algorithm=AWS4-HMAC-SHA256
+                method: PUT
+                headers:
+                  Content-Type: application/pdf
+                expiresAt: "2026-10-22T09:45:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/staff:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listStaff
+    tags: [business]
+    summary: Everyone on the staff, and open invites
+    description: Owner and manager. Phones are masked.
+    responses:
+      "200":
+        description: The staff
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/StaffList
+            example:
+              items:
+                - id: 01JB0S4Y5Z6A7B8C9D0E1F2G3H
+                  userId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+                  name: Ravi
+                  phoneMasked: 90•••••013
+                  role: cashier
+                  storeIds: [01JB0S3M4N5P6Q7R8S9T0V1W2X]
+                  canDeliver: true
+                  status: active
+                  createdAt: "2026-10-22T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: inviteStaff
+    tags: [business]
+    summary: Invite someone by phone
+    description: >-
+      The owner invites managers and cashiers; a manager may invite only
+      cashiers (D-66). `409 conflict` when that phone is already on the staff
+      or invited.
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/business.yaml#/StaffInvite
+          example:
+            phone: "+919000000013"
+            role: cashier
+            storeIds: [01JB0S3M4N5P6Q7R8S9T0V1W2X]
+            canDeliver: true
+    responses:
+      "201":
+        description: The invite
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/StaffMember
+            example:
+              id: 01JB0S4Y5Z6A7B8C9D0E1F2G3H
+              userId: null
+              name: null
+              phoneMasked: 90•••••013
+              role: cashier
+              storeIds: [01JB0S3M4N5P6Q7R8S9T0V1W2X]
+              canDeliver: true
+              status: invited
+              createdAt: "2026-10-22T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/staff/{staffId}:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: staffId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  patch:
+    operationId: updateStaff
+    tags: [business]
+    summary: Change a person's role, stores or delivery flag
+    description: Owner only (D-66). The owner's own row cannot change (`403 forbidden`).
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/business.yaml#/StaffUpdate
+          example:
+            role: manager
+            storeIds: null
+    responses:
+      "200":
+        description: The person after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/StaffMember
+            example:
+              id: 01JB0S4Y5Z6A7B8C9D0E1F2G3H
+              userId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+              name: Ravi
+              phoneMasked: 90•••••013
+              role: manager
+              storeIds: null
+              canDeliver: true
+              status: active
+              createdAt: "2026-10-22T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  delete:
+    operationId: removeStaff
+    tags: [business]
+    summary: Remove someone or withdraw an invite
+    description: The owner removes anyone but themselves; a manager removes only cashiers, anything else is `403` (D-66).
+    x-idempotency: none
+    responses:
+      "204":
+        description: Removed
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/staff/{staffId}/accept:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: staffId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: acceptStaffInvite
+    tags: [business]
+    summary: Accept an invite to my account or phone
+    description: >-
+      Any business-app user. The invite must be to this account or to the
+      phone it signed in with; anything else is `404`. Not in the 04 table
+      (docs/qa/W1-04/REPORT.md, Questions).
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    responses:
+      "200":
+        description: My staff row, now active
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/StaffMember
+            example:
+              id: 01JB0S4Y5Z6A7B8C9D0E1F2G3H
+              userId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+              name: Ravi
+              phoneMasked: 90•••••013
+              role: cashier
+              storeIds: [01JB0S3M4N5P6Q7R8S9T0V1W2X]
+              canDeliver: true
+              status: active
+              createdAt: "2026-10-22T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listStores
+    tags: [business]
+    summary: The stores I may open
+    description: Owner and manager; a manager limited to some stores sees only those.
+    responses:
+      "200":
+        description: The stores
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/StoreList
+            example:
+              items:
+                - id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                  businessId: 01JB0S2A3B4C5D6E7F8G9H0J1K
+                  slug: lakshmi-traders-indiranagar
+                  shortCode: Q4M7KX
+                  name: Lakshmi Traders Indiranagar
+                  addressLine1: 12, 100 Feet Road
+                  addressLine2: null
+                  landmark: Near the metro station
+                  locality: Indiranagar
+                  city: Bengaluru
+                  pincode: "560038"
+                  location:
+                    lat: 12.9719
+                    lng: 77.6412
+                  phone: "+919000000020"
+                  hours:
+                    weekly:
+                      mon: [{open: "09:00", close: "21:00"}]
+                      tue: [{open: "09:00", close: "21:00"}]
+                    holidays: []
+                  status: live
+                  openNow: true
+                  createdAt: "2026-10-21T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: createStore
+    tags: [business]
+    summary: Add a store
+    description: Owner and manager. The store starts as `draft` with a slug and a short code (D-26).
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/business.yaml#/StoreCreate
+          example:
+            name: Lakshmi Traders Indiranagar
+            addressLine1: 12, 100 Feet Road
+            locality: Indiranagar
+            city: Bengaluru
+            pincode: "560038"
+            location:
+              lat: 12.9719
+              lng: 77.6412
+            phone: "+919000000020"
+            hours:
+              weekly:
+                mon: [{open: "09:00", close: "21:00"}]
+              holidays: []
+    responses:
+      "201":
+        description: The new store
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/Store
+            example:
+              id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              businessId: 01JB0S2A3B4C5D6E7F8G9H0J1K
+              slug: lakshmi-traders-indiranagar
+              shortCode: Q4M7KX
+              name: Lakshmi Traders Indiranagar
+              addressLine1: 12, 100 Feet Road
+              addressLine2: null
+              landmark: null
+              locality: Indiranagar
+              city: Bengaluru
+              pincode: "560038"
+              location:
+                lat: 12.9719
+                lng: 77.6412
+              phone: "+919000000020"
+              hours:
+                weekly:
+                  mon: [{open: "09:00", close: "21:00"}]
+                holidays: []
+              status: draft
+              openNow: false
+              createdAt: "2026-10-22T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getStore
+    tags: [business]
+    summary: One store
+    description: Owner and manager with access to the store.
+    responses:
+      "200":
+        description: The store
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/Store
+            example:
+              id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              businessId: 01JB0S2A3B4C5D6E7F8G9H0J1K
+              slug: lakshmi-traders-indiranagar
+              shortCode: Q4M7KX
+              name: Lakshmi Traders Indiranagar
+              addressLine1: 12, 100 Feet Road
+              addressLine2: null
+              landmark: null
+              locality: Indiranagar
+              city: Bengaluru
+              pincode: "560038"
+              location:
+                lat: 12.9719
+                lng: 77.6412
+              phone: "+919000000020"
+              hours:
+                weekly:
+                  mon: [{open: "22:00", close: "02:00"}]
+                holidays: [{date: "2026-11-08", ranges: []}]
+              status: live
+              openNow: false
+              createdAt: "2026-10-21T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  patch:
+    operationId: updateStore
+    tags: [business]
+    summary: Change a store's name, address, pin or phone
+    x-idempotency: none
+    parameters:
+      - $ref: ../common/parameters.yaml#/IfMatch
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/business.yaml#/StoreUpdate
+          example:
+            landmark: Near the metro station
+            addressLine2: null
+    responses:
+      "200":
+        description: The store after the change
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/Store
+            example:
+              id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              businessId: 01JB0S2A3B4C5D6E7F8G9H0J1K
+              slug: lakshmi-traders-indiranagar
+              shortCode: Q4M7KX
+              name: Lakshmi Traders Indiranagar
+              addressLine1: 12, 100 Feet Road
+              addressLine2: null
+              landmark: Near the metro station
+              locality: Indiranagar
+              city: Bengaluru
+              pincode: "560038"
+              location:
+                lat: 12.9719
+                lng: 77.6412
+              phone: "+919000000020"
+              hours:
+                weekly: {}
+                holidays: []
+              status: draft
+              openNow: false
+              createdAt: "2026-10-21T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/submit:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: submitStore
+    tags: [business]
+    summary: Send a new store for review
+    description: >-
+      Owner and manager. From `draft` to `pending_review` (D-40); the same
+      store details as a business submit are needed, else `409
+      submit_incomplete`.
+    x-idempotency: optional
+    x-problems: [submit_incomplete]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    responses:
+      "200":
+        description: The store, now pending review
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/Store
+            example:
+              id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              businessId: 01JB0S2A3B4C5D6E7F8G9H0J1K
+              slug: lakshmi-traders-indiranagar
+              shortCode: Q4M7KX
+              name: Lakshmi Traders Indiranagar
+              addressLine1: 12, 100 Feet Road
+              addressLine2: null
+              landmark: null
+              locality: Indiranagar
+              city: Bengaluru
+              pincode: "560038"
+              location:
+                lat: 12.9719
+                lng: 77.6412
+              phone: "+919000000020"
+              hours:
+                weekly:
+                  mon: [{open: "09:00", close: "21:00"}]
+                holidays: []
+              status: pending_review
+              openNow: false
+              createdAt: "2026-10-21T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/settings:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getStoreSettings
+    tags: [business]
+    summary: A store's settings
+    description: Owner and manager with access to the store.
+    responses:
+      "200":
+        description: The settings
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/StoreSettings
+            example:
+              hours:
+                weekly:
+                  mon: [{open: "09:00", close: "21:00"}]
+                holidays: []
+              closedUntil: null
+              acceptsPickup: true
+              acceptsDelivery: false
+              deliveryRadiusM: 2000
+              deliveryFeePaise: 0
+              deliveryFreeAbovePaise: null
+              deliveryMinOrderPaise: 0
+              deliveryHours: null
+              cashbackBp: 0
+              autoAccept: false
+              asksMuted: false
+              openNow: true
+              inStoreOnly: false
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  patch:
+    operationId: updateStoreSettings
+    tags: [business]
+    summary: Change a store's settings
+    description: >-
+      Owner and manager with access to the store. Hours, holidays, a manual
+      close, `acceptsPickup` and `acceptsDelivery` (D-41), delivery terms,
+      cashback, auto-accept and `asksMuted` (`asks.manage`, D-101). Every change
+      is audited with the values before and after.
+    x-idempotency: none
+    parameters:
+      - $ref: ../common/parameters.yaml#/IfMatch
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/business.yaml#/StoreSettingsUpdate
+          example:
+            acceptsDelivery: true
+            deliveryRadiusM: 3000
+            deliveryFeePaise: 2000
+            deliveryFreeAbovePaise: 50000
+            asksMuted: true
+    responses:
+      "200":
+        description: The settings after the change
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business.yaml#/StoreSettings
+            example:
+              hours:
+                weekly:
+                  mon: [{open: "09:00", close: "21:00"}]
+                holidays: []
+              closedUntil: null
+              acceptsPickup: true
+              acceptsDelivery: true
+              deliveryRadiusM: 3000
+              deliveryFeePaise: 2000
+              deliveryFreeAbovePaise: 50000
+              deliveryMinOrderPaise: 0
+              deliveryHours: null
+              cashbackBp: 0
+              autoAccept: false
+              asksMuted: true
+              openNow: true
+              inStoreOnly: false
+      default:
+        $ref: ../common/responses.yaml#/Problem

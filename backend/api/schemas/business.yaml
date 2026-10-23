@@ -6,4 +6,674 @@
 # an object that must stay open says `x-open-object: true`. Money is `*Paise`
 # (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
 # timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+#
+# W1-04. Phones and KYC values are never returned in full to a role that may not
+# see them: staff phones are masked as in 01 R-16.2, KYC values show only their
+# last 4 characters (D-44).
+BusinessStatus:
+  type: string
+  description: "01 §3: draft, submitted, then verified, needs_info or rejected; an admin may suspend."
+  enum: [draft, submitted, needs_info, verified, rejected, suspended]
+StoreStatus:
+  type: string
+  description: "Only `live` stores of `verified` businesses are visible to customers (D-40)."
+  enum: [draft, pending_review, live, paused, suspended]
+StaffRole:
+  type: string
+  enum: [owner, manager, cashier]
+StaffInviteRole:
+  type: string
+  description: "Roles an invite can give (D-66): an owner invites managers and cashiers, a manager only cashiers."
+  enum: [manager, cashier]
+StaffStatus:
+  type: string
+  enum: [invited, active]
+BizPhone:
+  type: string
+  description: An Indian mobile in E.164 (`+91` and 10 digits starting 6 to 9).
+  pattern: ^\+91[6-9][0-9]{9}$
+  maxLength: 13
+BizText80:
+  type: string
+  description: Text without leading or trailing spaces.
+  minLength: 1
+  maxLength: 80
+  pattern: ^\S(.*\S)?$
+BizText120:
+  type: string
+  description: Text without leading or trailing spaces.
+  minLength: 1
+  maxLength: 120
+  pattern: ^\S(.*\S)?$
+BizText200:
+  type: string
+  description: Text without leading or trailing spaces.
+  minLength: 1
+  maxLength: 200
+  pattern: ^\S(.*\S)?$
+BizStoreRef:
+  type: object
+  required: [id, name, slug, status]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    name:
+      type: string
+    slug:
+      $ref: ./common.yaml#/Slug
+    status:
+      $ref: "#/StoreStatus"
+BusinessSummary:
+  type: object
+  description: One business I am active staff of, with my role and the stores I may open (B-01 picker).
+  required: [id, brandName, status, role, stores]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    brandName:
+      type: string
+    status:
+      $ref: "#/BusinessStatus"
+    role:
+      $ref: "#/StaffRole"
+    stores:
+      type: array
+      items:
+        $ref: "#/BizStoreRef"
+StaffInvitation:
+  type: object
+  description: A pending invite to this account (by its user or by the phone it signed in with).
+  required: [staffId, businessId, brandName, role, invitedAt]
+  properties:
+    staffId:
+      $ref: ./common.yaml#/Ulid
+    businessId:
+      $ref: ./common.yaml#/Ulid
+    brandName:
+      type: string
+    role:
+      $ref: "#/StaffRole"
+    invitedAt:
+      $ref: ./common.yaml#/Timestamp
+BusinessList:
+  type: object
+  required: [items, invitations]
+  properties:
+    items:
+      type: array
+      items:
+        $ref: "#/BusinessSummary"
+    invitations:
+      type: array
+      items:
+        $ref: "#/StaffInvitation"
+BusinessCreate:
+  type: object
+  description: "An onboarding draft (01 §3). The caller becomes its owner."
+  additionalProperties: false
+  required: [brandName]
+  properties:
+    brandName:
+      $ref: "#/BizText80"
+    legalName:
+      $ref: "#/BizText120"
+    categoryId:
+      $ref: ./common.yaml#/Ulid
+BusinessUpdate:
+  type: object
+  description: Only the fields present change; null clears `legalName` or `categoryId`.
+  additionalProperties: false
+  minProperties: 1
+  properties:
+    brandName:
+      $ref: "#/BizText80"
+    legalName:
+      type: [string, "null"]
+      minLength: 1
+      maxLength: 120
+      pattern: ^\S(.*\S)?$
+    categoryId:
+      type: [string, "null"]
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+      maxLength: 26
+BusinessInfoRequest:
+  type: object
+  description: What an admin asked for when moving the business to `needs_info` (SC-BZ-04).
+  required: [fields, note]
+  properties:
+    fields:
+      type: array
+      items:
+        type: string
+    note:
+      type: [string, "null"]
+Business:
+  type: object
+  required: [id, brandName, legalName, categoryId, status, referralCode, myRole, submittedAt, verifiedAt, infoRequest, createdAt]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    brandName:
+      type: string
+    legalName:
+      type: [string, "null"]
+    categoryId:
+      type: [string, "null"]
+    status:
+      $ref: "#/BusinessStatus"
+    referralCode:
+      type: string
+      description: The business's shop-to-shop referral code (D-26), 6 characters.
+    myRole:
+      $ref: "#/StaffRole"
+    submittedAt:
+      type: [string, "null"]
+      format: date-time
+    verifiedAt:
+      type: [string, "null"]
+      format: date-time
+    infoRequest:
+      description: Set while the status is `needs_info`.
+      oneOf:
+        - $ref: "#/BusinessInfoRequest"
+        - type: "null"
+    createdAt:
+      $ref: ./common.yaml#/Timestamp
+KycStatus:
+  type: string
+  enum: [missing, submitted, verified, rejected]
+Kyc:
+  type: object
+  description: >-
+    Payout and tax details (D-44). Only the last 4 characters of a value are
+    ever returned. A manager sees the status and the last 4s; `bankIfsc`,
+    `legalName` and `verifiedAt` are for the owner.
+  required: [status, panLast4, gstinLast4, upiIdLast4, bankAccountLast4]
+  properties:
+    status:
+      $ref: "#/KycStatus"
+    panLast4:
+      type: [string, "null"]
+    gstinLast4:
+      type: [string, "null"]
+    upiIdLast4:
+      type: [string, "null"]
+    bankAccountLast4:
+      type: [string, "null"]
+    bankIfsc:
+      type: [string, "null"]
+    legalName:
+      type: [string, "null"]
+    verifiedAt:
+      type: [string, "null"]
+      format: date-time
+KycUpdate:
+  type: object
+  description: >-
+    An absent field keeps its value; null clears it. PAN and GSTIN are checked
+    for format, the GSTIN checksum, and that the GSTIN carries the PAN. Bank
+    account and IFSC go together.
+  additionalProperties: false
+  minProperties: 1
+  properties:
+    pan:
+      type: [string, "null"]
+      pattern: ^[A-Z]{5}[0-9]{4}[A-Z]$
+      maxLength: 10
+    gstin:
+      type: [string, "null"]
+      pattern: ^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$
+      maxLength: 15
+    upiId:
+      type: [string, "null"]
+      pattern: ^[a-zA-Z0-9._-]{2,256}@[a-zA-Z]{2,64}$
+      maxLength: 321
+    bankAccount:
+      type: [string, "null"]
+      pattern: ^[0-9]{9,18}$
+      maxLength: 18
+    bankIfsc:
+      type: [string, "null"]
+      pattern: ^[A-Z]{4}0[A-Z0-9]{6}$
+      maxLength: 11
+    legalName:
+      type: [string, "null"]
+      minLength: 1
+      maxLength: 120
+      pattern: ^\S(.*\S)?$
+DocumentKind:
+  type: string
+  enum: [pan, gst, shop_photo, storefront, license, other]
+DocumentContentType:
+  type: string
+  enum: [image/jpeg, image/png, image/webp, application/pdf]
+DocumentStatus:
+  type: string
+  enum: [uploaded, accepted, rejected]
+DocumentCreate:
+  type: object
+  additionalProperties: false
+  required: [kind, contentType]
+  properties:
+    kind:
+      $ref: "#/DocumentKind"
+    contentType:
+      $ref: "#/DocumentContentType"
+    storeId:
+      $ref: ./common.yaml#/Ulid
+BusinessDocument:
+  type: object
+  required: [id, kind, contentType, storeId, status, rejectReason, createdAt]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    kind:
+      $ref: "#/DocumentKind"
+    contentType:
+      $ref: "#/DocumentContentType"
+    storeId:
+      type: [string, "null"]
+    status:
+      $ref: "#/DocumentStatus"
+    rejectReason:
+      type: [string, "null"]
+    createdAt:
+      $ref: ./common.yaml#/Timestamp
+DocumentUploadHeaders:
+  type: object
+  required: [Content-Type]
+  properties:
+    Content-Type:
+      $ref: "#/DocumentContentType"
+DocumentUploadTarget:
+  type: object
+  description: A presigned PUT into the private bucket (D-46). Send the file with exactly these headers before `expiresAt`.
+  required: [url, method, headers, expiresAt]
+  properties:
+    url:
+      type: string
+    method:
+      type: string
+      enum: [PUT]
+    headers:
+      $ref: "#/DocumentUploadHeaders"
+    expiresAt:
+      $ref: ./common.yaml#/Timestamp
+DocumentUpload:
+  type: object
+  required: [document, upload]
+  properties:
+    document:
+      $ref: "#/BusinessDocument"
+    upload:
+      $ref: "#/DocumentUploadTarget"
+DocumentList:
+  type: object
+  description: The newest 100 documents, newest first.
+  required: [items]
+  properties:
+    items:
+      type: array
+      items:
+        $ref: "#/BusinessDocument"
+StaffMember:
+  type: object
+  required: [id, userId, name, phoneMasked, role, storeIds, canDeliver, status, createdAt]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    userId:
+      type: [string, "null"]
+      description: Null until the invite is accepted by an account.
+    name:
+      type: [string, "null"]
+    phoneMasked:
+      type: [string, "null"]
+      description: The account's or the invited phone, masked as in 01 R-16.2.
+    role:
+      $ref: "#/StaffRole"
+    storeIds:
+      type: [array, "null"]
+      description: The stores this person may open; null means every store.
+      items:
+        type: string
+    canDeliver:
+      type: boolean
+    status:
+      $ref: "#/StaffStatus"
+    createdAt:
+      $ref: ./common.yaml#/Timestamp
+StaffList:
+  type: object
+  required: [items]
+  properties:
+    items:
+      type: array
+      items:
+        $ref: "#/StaffMember"
+StaffInvite:
+  type: object
+  additionalProperties: false
+  required: [phone, role]
+  properties:
+    phone:
+      $ref: "#/BizPhone"
+    role:
+      $ref: "#/StaffInviteRole"
+    storeIds:
+      type: [array, "null"]
+      description: Null or absent means every store.
+      minItems: 1
+      maxItems: 100
+      items:
+        $ref: ./common.yaml#/Ulid
+    canDeliver:
+      type: boolean
+StaffUpdate:
+  type: object
+  description: Owner only (D-66). Only the fields present change; `storeIds` null means every store.
+  additionalProperties: false
+  minProperties: 1
+  properties:
+    role:
+      $ref: "#/StaffInviteRole"
+    storeIds:
+      type: [array, "null"]
+      minItems: 1
+      maxItems: 100
+      items:
+        $ref: ./common.yaml#/Ulid
+    canDeliver:
+      type: boolean
+HoursRange:
+  type: object
+  description: "Open from `open` to `close`, IST. A `close` at or before `open` runs past midnight into the next day; `24:00` is midnight."
+  additionalProperties: false
+  required: [open, close]
+  properties:
+    open:
+      type: string
+      pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+      maxLength: 5
+    close:
+      type: string
+      pattern: ^(([01][0-9]|2[0-3]):[0-5][0-9]|24:00)$
+      maxLength: 5
+HoursDay:
+  type: array
+  description: The day's ranges; empty or absent means closed. At most 4, not overlapping.
+  maxItems: 4
+  items:
+    $ref: "#/HoursRange"
+StoreHoliday:
+  type: object
+  description: One date (IST) whose ranges replace the weekly ones; empty ranges mean closed all day.
+  additionalProperties: false
+  required: [date, ranges]
+  properties:
+    date:
+      type: string
+      pattern: ^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$
+      maxLength: 10
+    ranges:
+      $ref: "#/HoursDay"
+StoreWeek:
+  type: object
+  additionalProperties: false
+  properties:
+    mon:
+      $ref: "#/HoursDay"
+    tue:
+      $ref: "#/HoursDay"
+    wed:
+      $ref: "#/HoursDay"
+    thu:
+      $ref: "#/HoursDay"
+    fri:
+      $ref: "#/HoursDay"
+    sat:
+      $ref: "#/HoursDay"
+    sun:
+      $ref: "#/HoursDay"
+StoreHours:
+  type: object
+  description: Weekly opening hours and holidays, IST (01 §3).
+  additionalProperties: false
+  required: [weekly, holidays]
+  properties:
+    weekly:
+      $ref: "#/StoreWeek"
+    holidays:
+      type: array
+      maxItems: 60
+      items:
+        $ref: "#/StoreHoliday"
+StoreLocation:
+  type: object
+  description: The map pin (WGS 84), inside India.
+  additionalProperties: false
+  required: [lat, lng]
+  properties:
+    lat:
+      type: number
+      format: double
+      minimum: 6
+      maximum: 38
+    lng:
+      type: number
+      format: double
+      minimum: 68
+      maximum: 98
+StoreCreate:
+  type: object
+  additionalProperties: false
+  required: [name]
+  properties:
+    name:
+      $ref: "#/BizText80"
+    addressLine1:
+      $ref: "#/BizText200"
+    addressLine2:
+      $ref: "#/BizText200"
+    landmark:
+      $ref: "#/BizText120"
+    locality:
+      $ref: "#/BizText80"
+    city:
+      $ref: "#/BizText80"
+    pincode:
+      type: string
+      pattern: ^[1-9][0-9]{5}$
+      maxLength: 6
+    location:
+      $ref: "#/StoreLocation"
+    phone:
+      $ref: "#/BizPhone"
+    hours:
+      $ref: "#/StoreHours"
+StoreUpdate:
+  type: object
+  description: Only the fields present change; null clears an address field, the pin or the phone.
+  additionalProperties: false
+  minProperties: 1
+  properties:
+    name:
+      $ref: "#/BizText80"
+    addressLine1:
+      type: [string, "null"]
+      minLength: 1
+      maxLength: 200
+      pattern: ^\S(.*\S)?$
+    addressLine2:
+      type: [string, "null"]
+      minLength: 1
+      maxLength: 200
+      pattern: ^\S(.*\S)?$
+    landmark:
+      type: [string, "null"]
+      minLength: 1
+      maxLength: 120
+      pattern: ^\S(.*\S)?$
+    locality:
+      type: [string, "null"]
+      minLength: 1
+      maxLength: 80
+      pattern: ^\S(.*\S)?$
+    city:
+      type: [string, "null"]
+      minLength: 1
+      maxLength: 80
+      pattern: ^\S(.*\S)?$
+    pincode:
+      type: [string, "null"]
+      pattern: ^[1-9][0-9]{5}$
+      maxLength: 6
+    location:
+      oneOf:
+        - $ref: "#/StoreLocation"
+        - type: "null"
+    phone:
+      type: [string, "null"]
+      pattern: ^\+91[6-9][0-9]{9}$
+      maxLength: 13
+Store:
+  type: object
+  required: [id, businessId, slug, shortCode, name, addressLine1, addressLine2, landmark, locality, city, pincode, location, phone, hours, status, openNow, createdAt]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    businessId:
+      $ref: ./common.yaml#/Ulid
+    slug:
+      $ref: ./common.yaml#/Slug
+    shortCode:
+      type: string
+      description: The store's short code (6 characters) for standee and share links (D-26).
+    name:
+      type: string
+    addressLine1:
+      type: [string, "null"]
+    addressLine2:
+      type: [string, "null"]
+    landmark:
+      type: [string, "null"]
+    locality:
+      type: [string, "null"]
+    city:
+      type: [string, "null"]
+    pincode:
+      type: [string, "null"]
+    location:
+      oneOf:
+        - $ref: "#/StoreLocation"
+        - type: "null"
+    phone:
+      type: [string, "null"]
+      description: The store's contact number, in full (the store's own staff see it).
+    hours:
+      $ref: "#/StoreHours"
+    status:
+      $ref: "#/StoreStatus"
+    openNow:
+      type: boolean
+      description: Open at the server's current time (IST), counting holidays and a manual close.
+    createdAt:
+      $ref: ./common.yaml#/Timestamp
+StoreList:
+  type: object
+  description: The stores of the business this person may open.
+  required: [items]
+  properties:
+    items:
+      type: array
+      items:
+        $ref: "#/Store"
+StoreSettings:
+  type: object
+  description: "Store settings (01 §3, §6, §7; D-41, D-101). Both fulfilment options off means In-store only."
+  required: [hours, closedUntil, acceptsPickup, acceptsDelivery, deliveryRadiusM, deliveryFeePaise, deliveryFreeAbovePaise, deliveryMinOrderPaise, deliveryHours, cashbackBp, autoAccept, asksMuted, openNow, inStoreOnly]
+  properties:
+    hours:
+      $ref: "#/StoreHours"
+    closedUntil:
+      type: [string, "null"]
+      format: date-time
+      description: Closed by hand until this time.
+    acceptsPickup:
+      type: boolean
+    acceptsDelivery:
+      type: boolean
+    deliveryRadiusM:
+      type: integer
+    deliveryFeePaise:
+      $ref: ./common.yaml#/Paise
+    deliveryFreeAbovePaise:
+      type: [integer, "null"]
+      description: Delivery is free when the order total is at or above this.
+    deliveryMinOrderPaise:
+      $ref: ./common.yaml#/Paise
+    deliveryHours:
+      description: Null means the opening hours.
+      oneOf:
+        - $ref: "#/StoreHours"
+        - type: "null"
+    cashbackBp:
+      type: integer
+      description: Cashback in basis points (0 to 2000, steps of 50).
+    autoAccept:
+      type: boolean
+    asksMuted:
+      type: boolean
+      description: The store gets no new asks (D-101).
+    openNow:
+      type: boolean
+    inStoreOnly:
+      type: boolean
+      description: Neither pickup nor delivery is on (D-41).
+StoreSettingsUpdate:
+  type: object
+  description: >-
+    Only the fields present change. `asksMuted` needs `asks.manage` (D-101).
+    Every change is audited.
+  additionalProperties: false
+  minProperties: 1
+  properties:
+    hours:
+      $ref: "#/StoreHours"
+    closedUntil:
+      type: [string, "null"]
+      format: date-time
+      maxLength: 40
+    acceptsPickup:
+      type: boolean
+    acceptsDelivery:
+      type: boolean
+    deliveryRadiusM:
+      type: integer
+      minimum: 100
+      maximum: 20000
+    deliveryFeePaise:
+      type: integer
+      minimum: 0
+      maximum: 100000000
+    deliveryFreeAbovePaise:
+      type: [integer, "null"]
+      minimum: 1
+      maximum: 100000000
+    deliveryMinOrderPaise:
+      type: integer
+      minimum: 0
+      maximum: 100000000
+    deliveryHours:
+      oneOf:
+        - $ref: "#/StoreHours"
+        - type: "null"
+    cashbackBp:
+      type: integer
+      minimum: 0
+      maximum: 2000
+      multipleOf: 50
+    autoAccept:
+      type: boolean
+    asksMuted:
+      type: boolean
