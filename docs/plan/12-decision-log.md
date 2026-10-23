@@ -745,3 +745,25 @@ There is no `make seed`; use `make reset`.
 - **A deleted user** gets `403 account_blocked` on refresh and on `/v1/me`, as a blocked one does.
 - **Session purge.** `identity_purge` runs hourly. It deletes OTP requests 24 h after they expire and sessions 30 days after `coalesce(revoked_at, expires_at)`. The retention must stay at least the longest refresh lifetime (30 days), so a rotated row outlives its token and a late replay is still detected as reuse.
 - Lives in: 02 §8; `backend/api/common/parameters.yaml`, `backend/api/paths/me.yaml`; `backend/internal/identity/`; W1-01.
+
+**D-106 · Admin two-step, account deletion and session locking (lead, 2026-10-23).** From W1-01 phase B and its two reviews.
+- **TOTP lockout.** Wrong authenticator codes share the OTP limit (5 attempts). At the limit, the admin's admin-app sessions are revoked and the person signs in again from the SMS step. A refused code that is right (an admin or deletion check said no) uses no attempt.
+- **Rotation.** A login TOTP verify or a recovery rotates the refresh token within the same family, without extending its expiry, and sets the new cookie. A step-up verify does not rotate. Stricter than leaving the OTP-step token in place.
+- **Secrets.** The TOTP secret is sealed with `TOTP_ENC_KEY`, with the AAD bound to the user id. The preflight requires the key and refuses one equal to `PII_ENC_KEY`. Recovery codes carry 80 bits (`XXXX-XXXX-XXXX-XXXX`, Crockford base32).
+- **Deletion.**
+  - It uses the `step_up` OTP purpose.
+  - It is refused with 409 while the person:
+    - is an active admin (a super_admin disables them first);
+    - owns an active business, including a draft (W1-04's `OwnsActiveBusiness`, wired by the lead);
+    - is limited (`customer_profiles.limited_until > now`), so delete-and-sign-up cannot reset a no-show limit.
+  - Referral abuse through deletion is W2-03's.
+  - Session PII, devices, TOTP and recovery codes are scrubbed in the deletion transaction.
+- **Problem codes.** `code_invalid` is 422 on bearer routes, and sign-in keeps 401. `otp_expired` stays 401. Clients key on the problem code and never refresh on `otp_expired`.
+- **One lock per user for sessions.**
+  - Every path that rotates or revokes a user's sessions takes the users row `FOR NO KEY UPDATE` first, so they run one at a time per user. That covers refresh (and its reuse revoke), logout, logout-all, the admin TOTP flows, the lockout and deletion. Without the lock, a revocation's snapshot misses a row that a concurrent rotation inserts, and a thief looping refresh keeps a live session.
+  - Sign-in takes the row `FOR SHARE` and re-checks the status, so a sign-in racing a deletion is refused or scrubbed.
+  - Deletion locks only a `step_up` OTP row, so it cannot deadlock with a sign-in that holds a login row.
+  - Lock order: users, then admin_users, then sessions. Nothing takes `FOR SHARE` and then upgrades it.
+- **Logout-all** refuses a grace-window token with 401 and revokes nothing; the client refreshes and retries once. Like refresh, it is a cookie route that needs `X-TZ-Client`.
+- **OTP-only admin token.** Before the two-step check, an admin token is accepted on exactly `/v1/rum` and `/v1/events`, so the sign-in screens can report telemetry; nothing else in the admin namespace.
+- Lives in: `backend/internal/identity/`, `backend/db/queries/identity/identity.sql`, `internal/platform/httpx/mw/authn.go`; `admin/src/app/totp.ts`, `shared/auth/src/session.ts`; `docs/qa/W1-01/REPORT-phase-b.md`; W1-01, W1-08.
