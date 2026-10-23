@@ -32,3 +32,7 @@ W0-04: `api-client` is in place: `src/http.ts` (configure, request, ApiError), t
 run orval, write the MSW handlers from the examples) and `scripts/bundle.mjs` (Redocly bundle and
 lint for `make gen`/`make check`). Until the domain WPs land, the generated client only has the
 platform operations.
+
+W1-07: `telemetry` is complete: web-vitals, long tasks, route timing (`routeStart`/`routeReady`), traced
+fetch (`traceparent`), Sentry seam (no SDK dependency; staging and production with a DSN only), and a typed
+event emitter generated from `telemetry/events/*.yaml` (`src/gen`, git-ignored). Nothing is sent locally.

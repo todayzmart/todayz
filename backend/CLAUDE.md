@@ -178,3 +178,10 @@ built `api/` (root, common, one `paths`/`schemas` file per domain, `api/README.m
 out-of-order migrations (D-90). The platform paths (`/healthz`, `/readyz`, `/version`,
 `/v1/test/clock`) are the only operations until the domain WPs land; `/v1/test/slow*` come with
 W1-07 and the D-91 domain problem codes with their domains. Domain packages start in W1.
+
+W1-07 built the observability base: RED middleware with a label allow-list, runtime, pool, queue
+(`telemetry.RegisterQueue`, `QueueOldestAge`) and SSE metrics, the pgx tracer, the partitioned `events`
+table (`partition_policies` row), the event catalogue (`shared/telemetry/events/*.yaml`, `eventcat`,
+`eventgen`, `mk/26-events.mk`), `POST /v1/rum`, `POST /v1/events` (anonymous until W1-01 supplies
+`UserID`) and the gated `GET /v1/test/slow`, `/v1/test/slow-sql` (excluded from the contract smoke
+because they sleep).

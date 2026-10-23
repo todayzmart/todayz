@@ -26,3 +26,7 @@ Read first: the root `CLAUDE.md`, `docs/plan/README.md`, `docs/plan/01-product-r
 ## Status
 
 W1-10 built `terraform/` and `cloudflare/` (not applied; the first plan is Wave 5).
+
+W1-07: Grafana dashboards 01-04 are in `grafana/dashboards/` (generated from a script, kept as JSON). They use
+the datasource uids `prometheus`, `loki`, `tempo` (provisioned by otel-lgtm) and `todayz-postgres`.
+`backend/internal/platform/telemetry/dashboards_test.go` checks they query only registered `tz_` metrics.
