@@ -12,7 +12,7 @@ package mw
 //     token) is 401 unauthorized on every path, public ones included, so a
 //     client always learns to refresh. A blocked user is 403 account_blocked.
 //   - Except on the cookie routes of sign-in (cookieAuthPaths: OTP send and
-//     verify, refresh, logout): there Authorization is ignored and the caller
+//     verify, refresh, logout, logout-all): there Authorization is ignored and the caller
 //     is anonymous. They authenticate by the refresh cookie or not at all, and
 //     a client that refreshes because its bearer expired often still sends
 //     that bearer; a 401 there would stop it from ever refreshing.
@@ -69,12 +69,13 @@ func Authn(a Authenticator) func(http.Handler) http.Handler {
 // cookieAuthPaths are the routes that never read a bearer token. Matched
 // exactly: slot 8 (pathguard) has refused any path two routers could read
 // differently, and a lookalike (a trailing slash) keeps the bearer check.
-// /v1/auth/* routes that need the bearer (admin TOTP, phase B) are not here.
+// /v1/auth/* routes that need the bearer (/v1/auth/totp/*) are not here.
 var cookieAuthPaths = map[string]bool{
 	"/v1/auth/otp/send":   true,
 	"/v1/auth/otp/verify": true,
 	"/v1/auth/refresh":    true,
 	"/v1/auth/logout":     true,
+	"/v1/auth/logout-all": true,
 }
 
 // bearer extracts the token from exactly one "Bearer <token>" header.

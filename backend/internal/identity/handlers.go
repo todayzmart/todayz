@@ -31,18 +31,26 @@ const noStore = "no-store"
 const maxPatchBody = 1 << 20
 
 // authOps and meOps map every operation of the two strict servers to its
-// action (slot 15). OTP send and verify are public; refresh and logout
-// authenticate by their cookie inside the handler.
+// action (slot 15). OTP send and verify are public; refresh, logout and
+// logout-all authenticate by their cookie inside the handler. The TOTP routes
+// are not in the policy tables either: they are how an admin gets the
+// otp+totp session that every admin action needs, so the handler checks the
+// caller (an admin-app bearer, any amr) itself.
 var (
 	authOps = map[string]string{
 		"SendOtp":        authz.Public,
 		"VerifyOtp":      authz.Public,
 		"RefreshSession": authz.Public,
 		"Logout":         authz.Public,
+		"LogoutAll":      authz.Public,
+		"EnrolTotp":      authz.Public,
+		"VerifyTotp":     authz.Public,
+		"RecoverTotp":    authz.Public,
 	}
 	meOps = map[string]string{
 		"GetMe":    policy.MeView,
 		"UpdateMe": policy.MeEdit,
+		"DeleteMe": policy.MeDelete,
 	}
 )
 
@@ -196,11 +204,15 @@ func (h authHandlers) VerifyOtp(ctx context.Context, req authapi.VerifyOtpReques
 	if err != nil {
 		return nil, err
 	}
+	body := authapi.OtpVerifyResponse{
+		AccessToken: in.AccessToken, ExpiresAt: in.ExpiresAt.UTC(), IsNewUser: in.IsNewUser,
+		TokenType: authapi.OtpVerifyResponseTokenTypeBearer, UserId: in.UserID.String(),
+	}
+	if in.NextStep != "" {
+		body.NextStep = ptr(authapi.OtpVerifyResponseNextStep(in.NextStep))
+	}
 	return authapi.VerifyOtp200JSONResponse{
-		Body: authapi.OtpVerifyResponse{
-			AccessToken: in.AccessToken, ExpiresAt: in.ExpiresAt.UTC(), IsNewUser: in.IsNewUser,
-			TokenType: authapi.OtpVerifyResponseTokenTypeBearer, UserId: in.UserID.String(),
-		},
+		Body: body,
 		Headers: authapi.VerifyOtp200ResponseHeaders{
 			CacheControl: ptr(noStore),
 			SetCookie:    ptr(refreshCookie(app, in.RefreshToken, in.RefreshExpiresAt, h.s.clock.Now())),
@@ -282,6 +294,101 @@ func (h authHandlers) Logout(ctx context.Context, req authapi.LogoutRequestObjec
 		return nil, err
 	}
 	return authapi.Logout204Response{Headers: authapi.Logout204ResponseHeaders{SetCookie: ptr(clearCookie(app))}}, nil
+}
+
+func (h authHandlers) LogoutAll(ctx context.Context, req authapi.LogoutAllRequestObject) (authapi.LogoutAllResponseObject, error) {
+	if req.Body == nil {
+		return nil, problem.New(genproblems.BadRequest, "")
+	}
+	app, err := parseApp(string(req.Body.App))
+	if err != nil {
+		return nil, err
+	}
+	r := requestFrom(ctx)
+	if err := h.checkOrigin(r, app, req.Params.XTZClient); err != nil {
+		return nil, err
+	}
+	if _, err := h.s.LogoutAll(ctx, RefreshInput{App: app, Token: cookieValue(r, app), UserAgent: r.UserAgent()}); err != nil {
+		var g graceRetry
+		if errors.As(err, &g) {
+			return nil, g.p
+		}
+		var p *problem.Error
+		if errors.As(err, &p) && problem.Status(err) == http.StatusUnauthorized {
+			return nil, p.WithHeader("Set-Cookie", clearCookie(app))
+		}
+		return nil, err
+	}
+	return authapi.LogoutAll204Response{Headers: authapi.LogoutAll204ResponseHeaders{SetCookie: ptr(clearCookie(app))}}, nil
+}
+
+// adminCaller is the principal of a TOTP route: an admin-app bearer token
+// with any amr (slot 11 already refused a bad one).
+func adminCaller(ctx context.Context) (authn.Principal, error) {
+	p, err := principal(ctx)
+	if err != nil {
+		return p, err
+	}
+	if err := adminPrincipal(p); err != nil {
+		return authn.Principal{}, err
+	}
+	return p, nil
+}
+
+func (h authHandlers) EnrolTotp(ctx context.Context, _ authapi.EnrolTotpRequestObject) (authapi.EnrolTotpResponseObject, error) {
+	p, err := adminCaller(ctx)
+	if err != nil {
+		return nil, err
+	}
+	e, err := h.s.EnrolTOTP(ctx, p)
+	if err != nil {
+		return nil, err
+	}
+	return authapi.EnrolTotp200JSONResponse{
+		Body:    authapi.TotpEnrolResponse{Secret: e.Secret, OtpauthUri: e.URI, RecoveryCodes: e.RecoveryCodes},
+		Headers: authapi.EnrolTotp200ResponseHeaders{CacheControl: ptr(noStore)},
+	}, nil
+}
+
+func (h authHandlers) VerifyTotp(ctx context.Context, req authapi.VerifyTotpRequestObject) (authapi.VerifyTotpResponseObject, error) {
+	if req.Body == nil {
+		return nil, problem.New(genproblems.BadRequest, "")
+	}
+	p, err := adminCaller(ctx)
+	if err != nil {
+		return nil, err
+	}
+	res, err := h.s.VerifyTOTP(ctx, p, req.Body.Code, string(req.Body.Purpose))
+	if err != nil {
+		return nil, err
+	}
+	return authapi.VerifyTotp200JSONResponse{
+		Body: authapi.AccessTokenResponse{
+			AccessToken: res.AccessToken, ExpiresAt: res.ExpiresAt.UTC(), TokenType: authapi.AccessTokenResponseTokenTypeBearer,
+		},
+		Headers: authapi.VerifyTotp200ResponseHeaders{CacheControl: ptr(noStore)},
+	}, nil
+}
+
+func (h authHandlers) RecoverTotp(ctx context.Context, req authapi.RecoverTotpRequestObject) (authapi.RecoverTotpResponseObject, error) {
+	if req.Body == nil {
+		return nil, problem.New(genproblems.BadRequest, "")
+	}
+	p, err := adminCaller(ctx)
+	if err != nil {
+		return nil, err
+	}
+	res, err := h.s.RecoverTOTP(ctx, p, req.Body.RecoveryCode)
+	if err != nil {
+		return nil, err
+	}
+	return authapi.RecoverTotp200JSONResponse{
+		Body: authapi.TotpRecoverResponse{
+			AccessToken: res.AccessToken, ExpiresAt: res.ExpiresAt.UTC(),
+			TokenType: authapi.TotpRecoverResponseTokenTypeBearer, RecoveryCodesLeft: res.RecoveryCodesLeft,
+		},
+		Headers: authapi.RecoverTotp200ResponseHeaders{CacheControl: ptr(noStore)},
+	}, nil
 }
 
 // --- /v1/me -----------------------------------------------------------------
@@ -387,4 +494,19 @@ func (h meHandlers) UpdateMe(ctx context.Context, req meapi.UpdateMeRequestObjec
 		return nil, err
 	}
 	return meapi.UpdateMe200JSONResponse{Body: toAPIMe(m), Headers: meapi.UpdateMe200ResponseHeaders{ETag: ptr(etag(m.Version))}}, nil
+}
+
+func (h meHandlers) DeleteMe(ctx context.Context, req meapi.DeleteMeRequestObject) (meapi.DeleteMeResponseObject, error) {
+	p, err := principal(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if req.Body == nil {
+		return nil, problem.New(genproblems.BadRequest, "")
+	}
+	if err := h.s.DeleteAccount(ctx, p, DeleteInput{RequestID: req.Body.OtpRequestId, Code: req.Body.Code}); err != nil {
+		return nil, err
+	}
+	// Every session is revoked; the cookie goes too.
+	return meapi.DeleteMe204Response{Headers: meapi.DeleteMe204ResponseHeaders{SetCookie: ptr(clearCookie(authn.AppCustomer))}}, nil
 }

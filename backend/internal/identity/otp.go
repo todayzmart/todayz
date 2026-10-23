@@ -39,8 +39,8 @@ func (s *Service) SendOTP(ctx context.Context, app authn.App, phone, purpose, tu
 	if !ok {
 		return SendResult{}, problem.New(genproblems.ValidationFailed, "").WithField("body.phone", "must be an Indian mobile number in E.164")
 	}
-	if purpose != PurposeLogin {
-		return SendResult{}, problem.New(genproblems.ValidationFailed, "").WithField("body.purpose", "must be login")
+	if purpose != PurposeLogin && purpose != PurposeStepUp {
+		return SendResult{}, problem.New(genproblems.ValidationFailed, "").WithField("body.purpose", "must be login or step_up")
 	}
 	if !app.Valid() {
 		return SendResult{}, problem.New(genproblems.ValidationFailed, "").WithField("body.app", "unknown app")
@@ -141,7 +141,16 @@ type SignIn struct {
 	RefreshToken string
 	// RefreshExpiresAt is when the refresh cookie expires.
 	RefreshExpiresAt time.Time
+	// NextStep is the admin's second factor after OTP: NextStepTOTPEnrol or
+	// NextStepTOTPVerify. Empty for the other apps and for a refresh.
+	NextStep string
 }
+
+// The admin's next step after OTP (OtpVerifyResponse.nextStep).
+const (
+	NextStepTOTPEnrol  = "totp_enrol"
+	NextStepTOTPVerify = "totp_verify"
+)
 
 // VerifyOTP checks a code and signs in: five tries per code, then locked
 // (AU-02); expired, used and unknown codes are otp_expired. The attempt count
@@ -292,7 +301,10 @@ func (s *Service) signIn(ctx context.Context, q *identitydb.Queries, now time.Ti
 		}
 	}
 
-	var roles []string
+	var (
+		roles    []string
+		nextStep string
+	)
 	switch in.App {
 	case authn.AppAdmin:
 		a, err := q.GetAdminUser(ctx, ids.UUID(userID))
@@ -303,6 +315,10 @@ func (s *Service) signIn(ctx context.Context, q *identitydb.Queries, now time.Ti
 			return signInResult{}, nil, err
 		}
 		roles = a.Roles
+		nextStep = NextStepTOTPVerify
+		if a.TotpEnabledAt == nil {
+			nextStep = NextStepTOTPEnrol
+		}
 	case authn.AppCustomer:
 		if err := s.ensureCustomerProfile(ctx, q, userID, now); err != nil {
 			return signInResult{}, nil, err
@@ -334,7 +350,7 @@ func (s *Service) signIn(ctx context.Context, q *identitydb.Queries, now time.Ti
 		return signInResult{}, nil, err
 	}
 	return signInResult{
-		SignIn: SignIn{UserID: userID, IsNewUser: isNew, RefreshToken: refresh, RefreshExpiresAt: refreshExp},
+		SignIn: SignIn{UserID: userID, IsNewUser: isNew, RefreshToken: refresh, RefreshExpiresAt: refreshExp, NextStep: nextStep},
 		family: family, roles: roles,
 	}, nil, nil
 }

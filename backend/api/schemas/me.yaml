@@ -81,3 +81,16 @@ MePatch:
       maxLength: 80
     preferredLang:
       $ref: "#/Language"
+MeDeleteRequest:
+  type: object
+  description: "The step-up code that confirms deleting the account (`otp/send` with `purpose: step_up`)."
+  additionalProperties: false
+  required: [otpRequestId, code]
+  properties:
+    otpRequestId:
+      $ref: ./common.yaml#/Ulid
+    code:
+      type: string
+      description: The 6-digit code from the SMS. Never logged (D-15).
+      pattern: ^[0-9]{6}$
+      maxLength: 6

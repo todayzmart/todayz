@@ -75,6 +75,12 @@ func (a *Authenticator) Authenticate(ctx context.Context, raw string) (Principal
 	if p.App == AppAdmin {
 		p.Roles = slices.Clone(st.Roles)
 		p.StepUpAt = st.StepUpAt
+		// The token's amr is a claim; the session row is the truth. An
+		// otp+totp token whose sign-in holds no TOTP verification (it was
+		// reset) is only an OTP session.
+		if p.AMR == AMROTPTOTP && st.StepUpAt.IsZero() {
+			p.AMR = AMROTP
+		}
 	}
 	return p, nil
 }

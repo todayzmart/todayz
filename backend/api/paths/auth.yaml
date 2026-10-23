@@ -1,7 +1,7 @@
 # Paths: domain "auth" (owner W1-01): sign-in, OTP, TOTP, refresh, sign-out (04 §2.1).
 #
-# Phase A: OTP send and verify, refresh, logout. Phase B adds logout-all and
-# totp/enrol, totp/verify, totp/recover. Every operation: `tags: [auth]`, an
+# Phase A: OTP send and verify, refresh, logout. Phase B: logout-all and
+# totp/enrol, totp/verify, totp/recover (bearer, admin app). Every operation: `tags: [auth]`, an
 # operationId unique across the API, an example per request and success response,
 # and `default: {$ref: ../common/responses.yaml#/Problem}`.
 /v1/auth/otp/send:
@@ -51,7 +51,9 @@
       Five tries per code: a wrong code is `401 unauthorized` with `extensions.attemptsLeft`; the
       sixth try is `429 otp_locked` even with the right code (AU-02). A code older than 5 min, used,
       or unknown is `401 otp_expired`. A blocked account is `403 account_blocked`. On success the
-      app's refresh cookie is set (D-14) and the account is created if new (`isNewUser`).
+      app's refresh cookie is set (D-14) and the account is created if new (`isNewUser`). An admin
+      gets an `amr` `otp` token and `nextStep` (TOTP enrol or verify, AU-11). A `step_up` code
+      never signs in (`401 otp_expired`).
     security: []
     x-problems: [otp_locked, otp_expired, account_blocked]
     requestBody:
@@ -173,5 +175,153 @@
             description: Clears the app's refresh cookie (`Max-Age=0`).
             schema:
               type: string
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/auth/logout-all:
+  post:
+    operationId: logoutAll
+    tags: [auth]
+    summary: Sign out this app on every device
+    description: |
+      Revokes every session of `app` for the user of the app's refresh cookie, on every device, and
+      clears the cookie. The user's sessions in the other apps stay signed in (AU-13). Same `Origin`
+      and `X-TZ-Client` rule as refresh (AU-16). A missing, unknown, revoked or expired cookie is
+      `401 unauthorized`.
+    security:
+      - refreshCookieCustomer: []
+      - refreshCookieBusiness: []
+      - refreshCookieAdmin: []
+    parameters:
+      - name: X-TZ-Client
+        in: header
+        description: The app's client id and version (`customer/1.4.0`); required in practice (a request without it is `403 forbidden`, AU-16), optional in the schema so that refusal is a 403, not a 422.
+        schema:
+          type: string
+          maxLength: 64
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/auth.yaml#/AuthAppRequest
+          example:
+            app: customer
+    responses:
+      "204":
+        description: Every session of the app is signed out
+        headers:
+          Set-Cookie:
+            description: Clears the app's refresh cookie (`Max-Age=0`).
+            schema:
+              type: string
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/auth/totp/enrol:
+  post:
+    operationId: enrolTotp
+    tags: [auth]
+    summary: Start the admin's authenticator enrolment
+    description: |
+      Admin app only, after the OTP step (`amr` `otp`). Makes a new authenticator secret and 10
+      single-use recovery codes and answers them once (D-60); the server keeps the secret
+      encrypted (`TOTP_ENC_KEY`) and the codes hashed only. The enrolment is pending until
+      `POST /v1/auth/totp/verify` with `purpose: login` accepts a code from it. Calling it again
+      while pending replaces the secret and the codes. An admin already enrolled gets
+      `409 conflict` (a super admin resets an enrolment, W3-05); any other app `403 forbidden`.
+    responses:
+      "200":
+        description: The secret and recovery codes, shown once
+        headers:
+          Cache-Control:
+            description: Always `no-store`.
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/auth.yaml#/TotpEnrolResponse
+            example:
+              secret: JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP
+              otpauthUri: otpauth://totp/TodayZ:01JB0S1W6W8ZV7T1C3A6M9N4PQ?algorithm=SHA1&digits=6&issuer=TodayZ&period=30&secret=JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP
+              recoveryCodes: [K7M2Q-XB4NP, R9TDA-5HWZC, M3PQK-8VYXE, A2CDE-FGHJK, MNPQR-STUVW, XYZ23-45678, 9ABCD-EFGHJ, KMNPQ-RSTUV, WXYZ2-3456A, BCDEF-GHJKM]
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/auth/totp/verify:
+  post:
+    operationId: verifyTotp
+    tags: [auth]
+    summary: Verify an authenticator code (second factor or step-up)
+    description: |
+      Admin app only. `purpose: login` is the second factor after OTP (it also confirms a pending
+      enrolment); `purpose: step_up` re-confirms within a session that already passed TOTP, for
+      the actions marked † in 02 §3.3 (valid 10 min, else `403 step_up_required`). One 30-second
+      step either side is accepted, and each step once. A wrong code is `422 code_invalid` with
+      `extensions.attemptsLeft`; after 5 wrong codes in a row every admin session of the admin
+      ends and the answer is `429 otp_locked` (sign in again). The answer is a new access token
+      with `amr` `otp+totp`; the refresh cookie is unchanged.
+    x-problems: [otp_locked, code_invalid]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/auth.yaml#/TotpVerifyRequest
+          example:
+            code: "123456"
+            purpose: login
+    responses:
+      "200":
+        description: Verified
+        headers:
+          Cache-Control:
+            description: Always `no-store`.
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/auth.yaml#/AccessTokenResponse
+            example:
+              accessToken: EXAMPLE.ACCESS.TOKEN
+              tokenType: Bearer
+              expiresAt: "2026-10-22T09:45:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/auth/totp/recover:
+  post:
+    operationId: recoverTotp
+    tags: [auth]
+    summary: Use a recovery code instead of the authenticator
+    description: |
+      Admin app only, for an enrolled admin who lost the authenticator. Each code works once
+      (`admin_recovery_codes`, D-60); hyphens, spaces and case are ignored. Success counts as a
+      TOTP verification (amr `otp+totp`) and says how many codes are left. Wrong codes count
+      toward the same limit as `totp/verify` (`422 code_invalid`, then `429 otp_locked`).
+    x-problems: [otp_locked, code_invalid]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/auth.yaml#/TotpRecoverRequest
+          example:
+            recoveryCode: K7M2Q-XB4NP
+    responses:
+      "200":
+        description: Verified with a recovery code
+        headers:
+          Cache-Control:
+            description: Always `no-store`.
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/auth.yaml#/TotpRecoverResponse
+            example:
+              accessToken: EXAMPLE.ACCESS.TOKEN
+              tokenType: Bearer
+              expiresAt: "2026-10-22T09:45:00Z"
+              recoveryCodesLeft: 9
       default:
         $ref: ../common/responses.yaml#/Problem

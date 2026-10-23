@@ -77,3 +77,40 @@
               createdAt: "2026-10-22T09:30:00Z"
       default:
         $ref: ../common/responses.yaml#/Problem
+  delete:
+    operationId: deleteMe
+    tags: [me]
+    summary: Delete my account
+    description: |
+      Customer app only (D-31). Confirm with a fresh SMS code: `POST /v1/auth/otp/send` with
+      `purpose: step_up` and `app: customer` for the account's own number, then send its
+      `requestId` and code here. A wrong code is `422 code_invalid` with
+      `extensions.attemptsLeft` (5 tries, then `429 otp_locked`); an expired, used or foreign code
+      is `401 otp_expired`. Every domain's check runs first; a refusal (`409
+      account_has_active_order` while an order is not finished, D-31) changes nothing and leaves
+      the code unused. Otherwise, in one transaction: every domain's deletion hook runs (the
+      wallet is forfeited, asks are deleted, D-101), the account is anonymised (name and phone
+      removed; orders and ledger rows keep only the id), saved addresses and push endpoints are
+      deleted, and every session in every app is revoked. The number can sign up again as a new
+      account.
+    x-idempotency: none
+    x-problems: [otp_locked, otp_expired, code_invalid, account_blocked]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/me.yaml#/MeDeleteRequest
+          example:
+            otpRequestId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+            code: "123456"
+    responses:
+      "204":
+        description: The account is deleted and signed out everywhere
+        headers:
+          Set-Cookie:
+            description: Clears the customer refresh cookie (`Max-Age=0`).
+            schema:
+              type: string
+      default:
+        $ref: ../common/responses.yaml#/Problem

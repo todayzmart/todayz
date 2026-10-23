@@ -24,8 +24,10 @@ OtpSendRequest:
       $ref: "#/IndianMobile"
     purpose:
       type: string
-      description: Why the code is sent. Only `login` until the step-up and owner-confirm flows land (W1-01 phase B, W1-04).
-      enum: [login]
+      description: |
+        Why the code is sent. `login` signs in (`otp/verify`). `step_up` confirms a sensitive action of a
+        signed-in customer, such as deleting the account (`DELETE /v1/me`); it never signs in.
+      enum: [login, step_up]
     app:
       $ref: "#/AuthApp"
     turnstileToken:
@@ -83,6 +85,13 @@ OtpVerifyResponse:
       description: True when this sign-in created the account.
     userId:
       $ref: ./common.yaml#/Ulid
+    nextStep:
+      type: string
+      description: |
+        Admin app only: the access token has `amr` `otp` and reaches `/v1/auth/*` only until the
+        second factor. `totp_enrol`: no authenticator yet (`POST /v1/auth/totp/enrol`, then
+        `totp/verify`); `totp_verify`: enrolled (`POST /v1/auth/totp/verify` or `totp/recover`).
+      enum: [totp_enrol, totp_verify]
 AccessTokenResponse:
   type: object
   description: A fresh access token. The rotated refresh token is only in the `Set-Cookie` header.
@@ -104,3 +113,62 @@ AuthAppRequest:
   properties:
     app:
       $ref: "#/AuthApp"
+TotpEnrolResponse:
+  type: object
+  description: Shown once. The client renders `otpauthUri` as a QR code and asks the admin to store the recovery codes.
+  required: [secret, otpauthUri, recoveryCodes]
+  properties:
+    secret:
+      type: string
+      description: The authenticator secret, base32 without padding, for typing in by hand. Never logged.
+    otpauthUri:
+      type: string
+      description: "`otpauth://totp/...` (SHA1, 6 digits, 30 s); the label is the user id, never the phone."
+    recoveryCodes:
+      type: array
+      description: 10 single-use codes (D-60), `XXXXX-XXXXX`. Never shown again.
+      minItems: 10
+      maxItems: 10
+      items:
+        type: string
+TotpVerifyRequest:
+  type: object
+  additionalProperties: false
+  required: [code, purpose]
+  properties:
+    code:
+      type: string
+      description: The 6-digit code from the authenticator app. Never logged.
+      pattern: ^[0-9]{6}$
+      maxLength: 6
+    purpose:
+      type: string
+      description: "`login`: the second factor after OTP (confirms a pending enrolment). `step_up`: re-confirm for a † action."
+      enum: [login, step_up]
+TotpRecoverRequest:
+  type: object
+  additionalProperties: false
+  required: [recoveryCode]
+  properties:
+    recoveryCode:
+      type: string
+      description: One recovery code; hyphens, spaces and case are ignored. Never logged.
+      pattern: ^[A-Za-z0-9 -]{10,16}$
+      maxLength: 16
+TotpRecoverResponse:
+  type: object
+  description: A fresh access token with `amr` `otp+totp`, and how many recovery codes are left.
+  required: [accessToken, tokenType, expiresAt, recoveryCodesLeft]
+  properties:
+    accessToken:
+      type: string
+      description: The EdDSA access token (15 min). Keep it in memory only.
+    tokenType:
+      type: string
+      const: Bearer
+    expiresAt:
+      $ref: ./common.yaml#/Timestamp
+    recoveryCodesLeft:
+      type: integer
+      minimum: 0
+      maximum: 10

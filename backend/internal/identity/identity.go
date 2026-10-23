@@ -1,7 +1,9 @@
 // Package identity is sign-in and the signed-in user (W1-01; 01 §2, 02 §3,
-// 04 §2.1–2.2, D-14, D-15): SMS OTP send and verify, sessions with rotating
-// refresh tokens and reuse detection, logout, the session check behind the
-// access token (authn.SessionChecker), and GET/PATCH /v1/me.
+// 04 §2.1–2.2, D-14, D-15, D-31, D-60): SMS OTP send and verify, sessions with
+// rotating refresh tokens and reuse detection, logout and logout-all, admin
+// TOTP (enrol, verify, step-up, recovery codes), the session check behind the
+// access token (authn.SessionChecker), GET/PATCH /v1/me and account deletion
+// (DELETE /v1/me with the hooks other domains register).
 //
 // Security rules this package keeps:
 //
@@ -20,6 +22,7 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/todayz/backend/internal/platform/audit"
@@ -42,8 +45,9 @@ const (
 	OTPPerPhone     = 5  // sends per number per OTPWindow
 	OTPPerIP        = 20 // sends per client IP per OTPWindow
 	PurposeLogin    = "login"
-	testCode        = "000000" // reserved test numbers only, local and test only (01 §2)
-	refreshTokenLen = 32       // random bytes in a refresh token
+	PurposeStepUp   = "step_up" // re-confirms a signed-in user (DELETE /v1/me); never signs in
+	testCode        = "000000"  // reserved test numbers only, local and test only (01 §2)
+	refreshTokenLen = 32        // random bytes in a refresh token
 )
 
 // MaxActiveOrdersWhenLimited is the active-order cap while no-show strikes
@@ -62,7 +66,8 @@ type Deps struct {
 	// SMS and Human override the providers built from Config (tests).
 	SMS   SMSSender
 	Human HumanVerifier
-	// Hooks are the phase B account-deletion hooks; nil until W1-01 phase B.
+	// Hooks seeds the account-deletion hooks (tests); domains register theirs
+	// with AddDeletionCheck and AddDeletionHook.
 	Hooks *Hooks
 	// TestRoutes is true when the binary mounted the test clock, which it
 	// does only when the database's platform_environment agrees with a local
@@ -85,7 +90,13 @@ type Service struct {
 	seal   *pii.Sealer
 	hash   *pii.Hasher
 	audit  *audit.Writer
-	hooks  *Hooks
+	// totpSeal seals admin TOTP secrets under TOTP_ENC_KEY (field
+	// "totp_secret"); nil when the key is unset (TOTP answers 503).
+	totpSeal *pii.Sealer
+	// hooksMu guards hooks: domains register at mount time, DELETE /v1/me
+	// reads them per request.
+	hooksMu sync.RWMutex
+	hooks   Hooks
 	// allowTestCode accepts 000000 for the reserved test numbers (Deps.TestRoutes).
 	allowTestCode bool
 }
@@ -104,7 +115,7 @@ func New(d Deps) (*Service, error) {
 	}
 	s := &Service{
 		cfg: d.Config, db: d.DB, clock: d.Clock, log: d.Log, tokens: d.Tokens,
-		sms: d.SMS, human: d.Human, hooks: d.Hooks,
+		sms: d.SMS, human: d.Human,
 		allowTestCode: d.Config.Env.AllowsTestRoutes() && d.TestRoutes && testclock.Loopback(d.Config.APIAddr),
 	}
 	if s.sms == nil || s.human == nil {
@@ -122,6 +133,17 @@ func New(d Deps) (*Service, error) {
 			return nil, errors.New("identity: PII_ENC_KEY must be 32 bytes")
 		}
 		s.seal = seal
+	}
+	if d.Hooks != nil {
+		s.hooks.Can = append(s.hooks.Can, d.Hooks.Can...)
+		s.hooks.On = append(s.hooks.On, d.Hooks.On...)
+	}
+	if k := d.Config.Keys.TOTPEncKey; k.IsSet() {
+		seal, err := pii.NewSealer(k.Bytes())
+		if err != nil {
+			return nil, errors.New("identity: TOTP_ENC_KEY must be 32 bytes")
+		}
+		s.totpSeal = seal
 	}
 	if k := d.Config.Keys.PIIHashKey; k.IsSet() {
 		h, err := pii.NewHasher(k.Bytes())
@@ -186,6 +208,17 @@ func Preflight(cfg *config.Config) error {
 // ready reports whether sign-in can run.
 func (s *Service) ready() error {
 	if s.db == nil || s.seal == nil || s.hash == nil {
+		return errUnavailable
+	}
+	return nil
+}
+
+// readyTOTP is readyTokens plus the TOTP key.
+func (s *Service) readyTOTP() error {
+	if err := s.readyTokens(); err != nil {
+		return err
+	}
+	if s.totpSeal == nil {
 		return errUnavailable
 	}
 	return nil
