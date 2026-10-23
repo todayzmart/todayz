@@ -15,6 +15,14 @@ Read first: the root `CLAUDE.md`, `docs/plan/README.md`, `docs/plan/01-product-r
 - Never print AWS, RDS, Beanstalk or Cloudflare credentials; refer to variables by name.
 - Dashboards: `grafana/dashboards/<nn>-<name>.json`; alerts: `grafana/alerts/<area>.yaml`; each alert links a runbook in `docs/runbooks/`.
 
+## Layout
+
+- `terraform/` AWS: `envs/{account,staging,prod}` roots, `modules/*`, `checks/` (offline IAM allow-list and timings checks, `make check-infra`). See `terraform/README.md`.
+- `cloudflare/` DNS, WAF, rate limits, R2, Turnstile, cache rules, Pages. See `cloudflare/README.md`.
+- `local/`, `grafana/`: local stack and dashboards.
+- The API's read-only ops policy is a JSON file checked against an action allow-list (SC-OPS-05); change it only with its test.
+- Shutdown and health-check timings live in `terraform/modules/stack/timings.tf` as plain literals (SC-GS-10).
+
 ## Status
 
-Stub from W0-01. The WP that builds this folder fills in layout and conventions.
+W1-10 built `terraform/` and `cloudflare/` (not applied; the first plan is Wave 5).
