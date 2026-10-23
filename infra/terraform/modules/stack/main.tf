@@ -2,6 +2,7 @@
 # (ALB security group, logs, certificate), Beanstalk api and worker, IAM, scaling, alarms.
 
 terraform {
+  required_version = ">= 1.9"
   required_providers {
     aws = {
       source                = "hashicorp/aws"

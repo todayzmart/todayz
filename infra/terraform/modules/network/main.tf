@@ -2,6 +2,7 @@
 # Beanstalk and RDS, VPC endpoints for S3, ECR and Secrets Manager (09 §3.5).
 
 terraform {
+  required_version = ">= 1.9"
   required_providers {
     aws = {
       source  = "hashicorp/aws"

@@ -1,6 +1,7 @@
 # One ECR repository for the backend image (api, worker and the migrate task share it).
 
 terraform {
+  required_version = ">= 1.9"
   required_providers {
     aws = {
       source  = "hashicorp/aws"

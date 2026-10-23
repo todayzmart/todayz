@@ -21,6 +21,9 @@ locals {
   worker_stop_timeout_seconds = 180
 
   # Worker: River DrainGrace and the StopAndCancel window (backend queue.DrainGrace, HardGrace)
+  # Read by infra/terraform/checks/check.py (SC-GS-10), not by Terraform.
+  # tflint-ignore: terraform_unused_declarations
   worker_drain_grace_seconds = 90
+  # tflint-ignore: terraform_unused_declarations
   worker_hard_cancel_seconds = 30
 }

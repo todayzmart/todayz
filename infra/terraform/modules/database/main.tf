@@ -2,6 +2,7 @@
 # multi_az is one flag. Also: weekly cross-region snapshot copy through AWS Backup.
 
 terraform {
+  required_version = ">= 1.9"
   required_providers {
     aws = {
       source                = "hashicorp/aws"

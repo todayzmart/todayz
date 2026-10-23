@@ -6,6 +6,7 @@
 # Scaling policies live in the stack module because they need the ASG and the target group.
 
 terraform {
+  required_version = ">= 1.9"
   required_providers {
     aws = {
       source  = "hashicorp/aws"

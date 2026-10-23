@@ -7,6 +7,7 @@
 # list changes rarely and Cloudflare announces it.
 
 terraform {
+  required_version = ">= 1.9"
   required_providers {
     aws = {
       source  = "hashicorp/aws"

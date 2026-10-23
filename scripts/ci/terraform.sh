@@ -108,6 +108,13 @@ do_validate() {
   local m
   while IFS= read -r m; do
     ci_group "terraform validate $m"
+    # A module that takes an aliased provider (configuration_aliases) cannot be validated on
+    # its own; the roots that pass it the alias validate it.
+    if grep -qs 'configuration_aliases' "$ci_root/$m"/*.tf; then
+      echo "skip: $m takes an aliased provider; validated through the roots that call it"
+      ci_endgroup
+      continue
+    fi
     if [[ ! -d "$ci_root/$m/.terraform" ]]; then
       if [[ "${TODAYZ_NO_EGRESS:-}" == "1" ]]; then ci_die "terraform: $m is not initialised; run make setup (it prefetches providers)"; fi
       tf -chdir="$m" init -backend=false -input=false -no-color >/dev/null

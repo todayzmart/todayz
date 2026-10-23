@@ -3,6 +3,7 @@
 # ever in a .tf file or in the state. Beanstalk injects them by ARN.
 
 terraform {
+  required_version = ">= 1.9"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
