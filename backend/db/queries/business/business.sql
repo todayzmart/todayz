@@ -259,3 +259,15 @@ SELECT EXISTS (SELECT 1 FROM leads WHERE details_hash = @details_hash AND create
 -- name: InsertLead :exec
 INSERT INTO leads (id, name, phone_enc, shop_name, city, source, details_hash, created_at)
 VALUES (@id, @name, @phone_enc, @shop_name, @city, @source, @details_hash, @now);
+
+------------------------------------------------------------------------------
+-- Account deletion (W1-01 phase B asks before deleting an account)
+------------------------------------------------------------------------------
+
+-- name: OwnsActiveBusiness :one
+-- The user is the active owner of a business that is not rejected. A draft
+-- counts: its stores, staff and documents would be left without an owner.
+SELECT EXISTS (
+  SELECT 1 FROM staff s JOIN businesses b ON b.id = s.business_id
+  WHERE s.user_id = @user_id AND s.role = 'owner' AND s.status = 'active' AND b.status <> 'rejected'
+)::bool;
