@@ -83,7 +83,7 @@ func (h handlers) ListMyNotifications(ctx context.Context, req notificationsapi.
 	}
 	q := notifydb.New(h.s.d.DB.Pool)
 	rows, err := q.ListUserNotifications(ctx, notifydb.ListUserNotificationsParams{
-		UserID: ids.UUID(p.UserID), App: AppCustomer, BeforeAt: at, BeforeID: bid, Lim: int32(lim + 1),
+		UserID: ids.UUID(p.UserID), App: AppCustomer, BeforeAt: at, BeforeID: bid, Lim: int32(lim + 1), // #nosec G115 -- pageArgs clamps lim to [1, maxLimit]
 	})
 	if err != nil {
 		return nil, problem.Wrap(genproblems.Internal, err)
@@ -184,7 +184,7 @@ func (h handlers) ListBusinessInbox(ctx context.Context, req notificationsapi.Li
 	}
 	q := notifydb.New(h.s.d.DB.Pool)
 	rows, err := q.ListBusinessNotifications(ctx, notifydb.ListBusinessNotificationsParams{
-		BusinessID: ids.UUID(bid), StoreIds: stores, BeforeAt: at, BeforeID: before, Lim: int32(lim + 1),
+		BusinessID: ids.UUID(bid), StoreIds: stores, BeforeAt: at, BeforeID: before, Lim: int32(lim + 1), // #nosec G115 -- pageArgs clamps lim to [1, maxLimit]
 	})
 	if err != nil {
 		return nil, problem.Wrap(genproblems.Internal, err)

@@ -171,12 +171,15 @@ func render(s string, params map[string]string) string {
 	})
 }
 
-// templateFor is the provider template of kind in lang (English fallback).
-func templateFor(def kindDef, lang string) string {
+// templateFor is the provider template of kind in lang and the language it
+// is in: English when lang has no approved template. The message's language
+// and text follow the template, since a provider matches a template by name
+// and language (a Kannada label on the English template is refused).
+func templateFor(def kindDef, lang string) (name, tlang string) {
 	if t, ok := def.Templates[lang]; ok {
-		return t
+		return t, lang
 	}
-	return def.Templates["en"]
+	return def.Templates["en"], "en"
 }
 
 // validParams checks params against the kind's declared names and the size

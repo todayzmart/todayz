@@ -81,9 +81,9 @@ func (s *Service) Deliver(ctx context.Context, deliveryID ids.ID) (DeliverResult
 	if err := json.Unmarshal(row.Params, &params); err != nil {
 		return fail(prov.Name(), "params could not be read")
 	}
-	lang := pickLang(row.Lang)
+	tpl, lang := templateFor(def, pickLang(row.Lang))
 	t, _ := textFor(row.Kind, lang, params)
-	msg := Message{To: string(plain), Template: templateFor(def, lang), Lang: lang, Text: t.Body}
+	msg := Message{To: string(plain), Template: tpl, Lang: lang, Text: t.Body}
 	for _, name := range def.Params {
 		msg.Vars = append(msg.Vars, Var{Name: name, Value: params[name]})
 	}
