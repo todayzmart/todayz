@@ -1,6 +1,90 @@
 package jobs
 
-// registerorders declares the orders domain's job kinds.
-// The work package that builds internal/orders fills it in: one
-// platformjobs.Define per kind (W1-11, see identity.go). Keep it to this file.
-func registerorders(r *Registry, d Deps) {}
+import (
+	"context"
+	"time"
+
+	"github.com/jackc/pgx/v5"
+
+	"github.com/todayz/backend/internal/business"
+	"github.com/todayz/backend/internal/catalogue"
+	"github.com/todayz/backend/internal/notify"
+	"github.com/todayz/backend/internal/orders"
+	"github.com/todayz/backend/internal/platform/clock"
+	"github.com/todayz/backend/internal/platform/db"
+	"github.com/todayz/backend/internal/platform/ids"
+	platformjobs "github.com/todayz/backend/internal/platform/jobs"
+	"github.com/todayz/backend/internal/platform/queue"
+)
+
+// The orders timers run up to this many attempts. An attempt that runs
+// before its deadline (queue and clock skew) fails and is retried, and a
+// timer kind is never retried by hand (D-95), so the cap is generous.
+const ordersTimerAttempts = 25
+
+// registerorders declares the orders timers (W2-02): the accept timeout
+// (BK-06) and the pickup no-show (BK-14). Both are event-triggered: create
+// and accept (and extend) enqueue them in the order's transaction. A late or
+// repeated run finds the order moved on and does nothing (BK-21).
+func registerorders(r *Registry, d Deps) {
+	var enq platformjobs.Enqueuer
+	if d.Pool != nil {
+		if c, err := queue.NewInsertClient(d.Pool, queue.Options{Log: d.Log}); err == nil {
+			enq = platformjobs.NewEnqueuer(r, c, d.Clock)
+		}
+	}
+	svc := func() (*orders.Service, error) {
+		nd := notify.Deps{Clock: d.Clock, Settings: d.Settings, Config: d.Config, Log: d.Log, Jobs: enq}
+		od := orders.Deps{Config: d.Config, Clock: d.Clock, Log: d.Log, Settings: d.Settings,
+			Jobs: enq, Stock: OrdersStock(d.Clock), Open: business.OpenAt}
+		if d.Pool != nil {
+			pool := db.New(d.Pool)
+			nd.DB, nd.Staff, od.DB = pool, business.NewStaffResolver(pool), pool
+		}
+		ns, err := notify.New(nd)
+		if err != nil {
+			return nil, err
+		}
+		od.Notices = ns
+		return orders.New(od)
+	}
+	timer := func(name, desc string, run func(*orders.Service, context.Context, platformjobs.Run) (platformjobs.Result, error)) {
+		platformjobs.Define(r, platformjobs.Kind{
+			Name: name, Owner: "W2-02", Class: platformjobs.ClassTimer, Description: desc,
+			Timeout: 30 * time.Second, MaxAttempts: ordersTimerAttempts,
+			Runbook: "docs/runbooks/orders-timers.md",
+			Handler: func(ctx context.Context, rn platformjobs.Run) (platformjobs.Result, error) {
+				s, err := svc()
+				if err != nil {
+					return platformjobs.Result{}, err
+				}
+				return run(s, ctx, rn)
+			},
+		})
+	}
+	timer(orders.KindAcceptTimeout,
+		"Expires a placed order the shop did not accept or reject by accept_by (BK-06)",
+		(*orders.Service).ExpireUnanswered)
+	timer(orders.KindNoShow,
+		"Expires a held pickup order nobody collected by hold_until, returns its stock and records a no-show strike (BK-14)",
+		(*orders.Service).ExpireNoShow)
+}
+
+// OrdersStock is the catalogue's stock writer as orders.Stock: a collected
+// line is one sale_online movement referring to the order, idempotent on the
+// reservation id. The API's routes file uses it too.
+func OrdersStock(c clock.Clock) orders.Stock { return ordersStock{w: catalogue.NewWriter(c)} }
+
+type ordersStock struct{ w *catalogue.Writer }
+
+func (s ordersStock) Sell(ctx context.Context, tx pgx.Tx, in orders.Sale) (ids.ID, error) {
+	m, err := s.w.Sell(ctx, tx, catalogue.Sale{
+		StoreID: in.StoreID, ItemID: in.ItemID, Qty: in.Qty,
+		Source: catalogue.SourceSaleOnline, RefType: "order", RefID: in.OrderID,
+		ClientID: in.ClientID, Who: catalogue.Who{UserID: in.UserID},
+	})
+	if err != nil {
+		return ids.Zero, err
+	}
+	return m.ID, nil
+}
