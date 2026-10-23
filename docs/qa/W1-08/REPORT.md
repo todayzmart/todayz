@@ -50,7 +50,21 @@ Branch `worktree-agent-a0a26af00032565dd`, rebased by the lead onto `main` at 7b
 
 ## Stack run
 
-To be filled in after the merge and stack restart.
+Run by the lead on 23 October after the merge, on a fresh `make dev` (API, mocks, Caddy HTTPS). The OTP comes from the mocks' SMS log; test numbers only.
+
+| Journey | Result |
+|---|---|
+| Customer: send code, enter it, signed in, still signed in after a reload (the refresh cookie works cross-origin), wrong code refused | 2 passed |
+| Business: the same, through the sign-in gate | 2 passed |
+| Admin: SMS code, then the authenticator step | not run yet: needs a seeded admin, which comes with W1-01b |
+
+Two test fixes, committed in 4125f72:
+- The customer PIN field is found by role (`textbox` named "PIN code"); the label alone also matched the form.
+- The "wrong code" tests used `000000`, which the reserved test numbers accept locally by design (01 §2), so they signed in. They now use `123456` or `654321`.
+
+Screenshots in `screens/`: customer sign-in and code step at 390 px, business and admin sign-in at 1440 px.
+
+**Design gap:** the screens are functional but plain next to the design source (no mint wash or pastel tints, headings not in Anek). To be brought in line in the W2 screen work.
 
 ## Open items
 
