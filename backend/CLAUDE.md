@@ -133,9 +133,15 @@ on each other's internals; a cross-domain call goes through a small interface in
   `{"status":"draining"}` at once (`/healthz` stays 200). The API keeps serving for
   `SHUTDOWN_PRESTOP` (15 s deployed, 1 s locally), then `srv.Shutdown` waits up to
   `SHUTDOWN_DRAIN` (75 s, above the 60 s `WriteTimeout`; the API refuses to start otherwise), then
-  the LISTEN/NOTIFY loop stops, the pool closes and telemetry flushes (5 s). Request contexts never
+  the LISTEN/NOTIFY loop stops, the pool closes (given up after 5 s, logged at error level, since a
+  cut request or a job that ignored its cancel can hold a connection forever) and telemetry
+  flushes (5 s). A second SIGTERM or Ctrl-C exits at once. Request contexts never
   derive from the signal (`BaseContext` is a background context), so never pass the signal context
-  into a handler. Container stop timeouts: api 120 s, worker 180 s.
+  into a handler. Container stop timeouts: api 120 s, worker 180 s; `lifecycle.APIExit` and
+  `WorkerExit` are what each process still needs after its drain.
+- `infra/local/proc.sh` strips every `AWS_*` variable from the api and worker (D-97), but that does
+  not stop the AWS SDK's default credential chain from reading `~/.aws`; W3-15's explicit
+  instance-role (IMDS) provider, never the default chain, is what covers that.
 - Workers: start River with `queue.Start` (detached from the signal context); the worker stops it
   with `queue.Drain(c, queue.DrainGrace, queue.HardGrace, log)`: running jobs get 90 s to finish,
   then `StopAndCancel` gets 30 s, logged at error level and counted in
