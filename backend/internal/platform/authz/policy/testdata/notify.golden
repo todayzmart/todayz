@@ -1,0 +1,20 @@
+# domain notify: one line per (role x action); regenerate with -update
+me.stream kind=customer step-up=false
+me.notifications kind=customer step-up=false
+me.notification_prefs kind=any step-up=false
+store.stream kind=business step-up=false
+store.stream owner allow
+store.stream manager allow
+store.stream cashier allow
+inbox.view kind=business step-up=false
+inbox.view owner allow
+inbox.view manager allow
+inbox.view cashier allow
+admin.stream kind=admin step-up=false
+admin.stream field_agent -
+admin.stream support allow
+admin.stream catalogue allow
+admin.stream analyst allow
+admin.stream finance allow
+admin.stream admin allow
+admin.stream super_admin allow

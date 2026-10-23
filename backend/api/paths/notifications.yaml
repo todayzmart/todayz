@@ -1,0 +1,186 @@
+# Paths: domain "notifications" (owner W2-05): the in-app inboxes and notification
+# preferences (01 §15, 04 §2.2, §2.6). A domain of its own so that the notify package
+# serves it through its own generated Register (me.yaml is identity's handler,
+# business.yaml W1-04's). `{B}` = /v1/biz/businesses/{bid}. Roles are in
+# internal/platform/authz/policy/notify.go.
+/v1/me/notifications:
+  get:
+    operationId: listMyNotifications
+    tags: [notifications]
+    summary: My inbox
+    description: Customer app (C-20). Newest first; text in the Accept-Language language, English otherwise.
+    parameters:
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+      - $ref: ../common/parameters.yaml#/AcceptLanguage
+    responses:
+      "200":
+        description: A page of notifications and the unread count
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/notifications.yaml#/NotificationPage
+            example:
+              items:
+                - id: 01JB0S6A7B8C9D0E1F2G3H4J5K
+                  kind: order_update
+                  title: Order ready for pickup
+                  body: Your order from Lakshmi Traders is ready. Show your pickup code at the counter.
+                  storeId: null
+                  ref:
+                    type: order
+                    id: 01JB0S5Q6R7S8T9V0W1X2Y3Z4A
+                  readAt: null
+                  createdAt: "2026-10-22T09:30:00Z"
+              nextCursor: null
+              unreadCount: 1
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/notifications/read:
+  post:
+    operationId: readMyNotifications
+    tags: [notifications]
+    summary: Mark my notifications read
+    description: "`{ids}` (rows that are not mine are ignored) or `{all:true}`. Marking a read row again changes nothing."
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/notifications.yaml#/NotificationReadRequest
+          example:
+            ids: [01JB0S6A7B8C9D0E1F2G3H4J5K]
+    responses:
+      "200":
+        description: The unread count after marking
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/notifications.yaml#/UnreadCount
+            example:
+              unreadCount: 0
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/notification-prefs:
+  get:
+    operationId: getMyNotificationPrefs
+    tags: [notifications]
+    summary: My notification switches
+    description: Any app. Every kind the app can switch, per outside channel; on unless switched off.
+    responses:
+      "200":
+        description: The switches
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/notifications.yaml#/NotificationPrefs
+            example:
+              items:
+                - kind: order_update
+                  channel: push
+                  enabled: true
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  patch:
+    operationId: updateMyNotificationPrefs
+    tags: [notifications]
+    summary: Switch notifications on or off
+    description: Sets the listed switches; others keep their value. A kind or channel the app cannot switch is 422.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/notifications.yaml#/NotificationPrefsPatch
+          example:
+            items:
+              - kind: order_update
+                channel: push
+                enabled: false
+    responses:
+      "200":
+        description: All switches after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/notifications.yaml#/NotificationPrefs
+            example:
+              items:
+                - kind: order_update
+                  channel: push
+                  enabled: false
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/inbox:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listBusinessInbox
+    tags: [notifications]
+    summary: The business inbox
+    description: B-16 (D-46). Any staff member; a member limited to some stores sees business-wide rows and their stores' rows. Read state is shared by the staff.
+    parameters:
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+      - $ref: ../common/parameters.yaml#/AcceptLanguage
+    responses:
+      "200":
+        description: A page of notifications and the unread count
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/notifications.yaml#/NotificationPage
+            example:
+              items:
+                - id: 01JB0S6A7B8C9D0E1F2G3H4J5K
+                  kind: new_order
+                  title: New order
+                  body: A new order is waiting at Lakshmi Traders Indiranagar.
+                  storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                  ref:
+                    type: order
+                    id: 01JB0S5Q6R7S8T9V0W1X2Y3Z4A
+                  readAt: null
+                  createdAt: "2026-10-22T09:30:00Z"
+              nextCursor: null
+              unreadCount: 1
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/inbox/read:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: readBusinessInbox
+    tags: [notifications]
+    summary: Mark business inbox rows read
+    description: "`{ids}` or `{all:true}`, within the rows the caller can see."
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/notifications.yaml#/NotificationReadRequest
+          example:
+            all: true
+    responses:
+      "200":
+        description: The unread count after marking
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/notifications.yaml#/UnreadCount
+            example:
+              unreadCount: 0
+      default:
+        $ref: ../common/responses.yaml#/Problem
