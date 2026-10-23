@@ -43,7 +43,10 @@ function todayzSiteIcons() {
 export default defineConfig({
   site: 'https://todayz.in',
   output: 'static',
-  trailingSlash: 'ignore',
+  trailingSlash: 'always',
+  // Inline the CSS: every page is one route file, so Astro would ship all landing styles as two
+  // render-blocking files to every page; inlined, first paint waits on the HTML alone (mobile LCP).
+  build: { inlineStylesheets: 'always' },
   devToolbar: { enabled: false },
   integrations: [todayzSiteIcons()],
   server: { host: '127.0.0.1', port: PORT, allowedHosts: ALLOWED_HOSTS },

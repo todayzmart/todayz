@@ -8,7 +8,7 @@ import Base from '../layouts/Base.astro';
 import { createT, numbered, type Locale, type MessageKey } from '../i18n/index.ts';
 import { company, links } from '../lib/company.ts';
 import { softwareApplicationJsonLd } from '../lib/jsonld.ts';
-import type { PageDef } from '../lib/pages.ts';
+import { pageById, pagePath, type PageDef } from '../lib/pages.ts';
 
 interface Props {
   page: PageDef;
@@ -24,6 +24,8 @@ const shopSteps = [1, 2, 3].map((i) => ({ title: t(key(`home.steps.${i}.title`))
 const shopperSteps = numbered(t, locale, 'home.shoppers').map((title) => ({ title }));
 const points = [1, 2, 3].map((i) => t(key(`info.pricing.point.${i}`)));
 const paragraphs = [1, 2, 3].map((i) => t(key(`info.about.${i}`)));
+const retailersHref = pagePath(pageById('retailers'), locale);
+const joinHref = `${pagePath(pageById('contact'), locale)}#join`;
 const jsonLd = kind === 'pricing' ? [softwareApplicationJsonLd(locale, t('info.pricing.meta.description'))] : [];
 ---
 
@@ -40,7 +42,7 @@ const jsonLd = kind === 'pricing' ? [softwareApplicationJsonLd(locale, t('info.p
       <>
         <Section id="shops" title={t('info.how.shops.title')}>
           <Steps items={shopSteps} columns={3} />
-          <p><a class="tz-btn tz-btn-brand" href="/for-retailers">{t('nav.retailers')} <Icon name="arrow" size={18} /></a></p>
+          <p><a class="tz-btn tz-btn-brand" href={retailersHref}>{t('nav.retailers')} <Icon name="arrow" size={18} /></a></p>
         </Section>
         <Section tone="wash" id="shoppers" title={t('info.how.shoppers.title')}>
           <Steps items={shopperSteps} columns={4} />
@@ -58,7 +60,7 @@ const jsonLd = kind === 'pricing' ? [softwareApplicationJsonLd(locale, t('info.p
             <li class="tz-card"><span class="tick"><Icon name="check" size={18} /></span><p>{p}</p></li>
           ))}
         </ul>
-        <p><a class="tz-btn tz-btn-brand tz-btn-lg" href="/contact#join">{t('nav.cta')}</a></p>
+        <p><a class="tz-btn tz-btn-brand tz-btn-lg" href={joinHref}>{t('nav.cta')}</a></p>
       </Section>
     )
   }

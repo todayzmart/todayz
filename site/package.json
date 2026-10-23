@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "ASTRO_TELEMETRY_DISABLED=1 ASTRO_DISABLE_UPDATE_CHECK=true astro dev --ignore-lock",
     "gen": "ASTRO_TELEMETRY_DISABLED=1 astro sync",
-    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build && node scripts/verify-dist.mjs && node scripts/check-site.mjs",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build && node scripts/headers.mjs && node scripts/verify-dist.mjs && node scripts/check-site.mjs",
+    "build:e2e": "ASTRO_TELEMETRY_DISABLED=1 astro build --mode e2e && node scripts/headers.mjs && node scripts/verify-dist.mjs --e2e && node scripts/check-site.mjs",
     "og": "node scripts/og.mjs",
     "lighthouse": "node scripts/lighthouse.mjs",
     "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview --ignore-lock",
@@ -18,7 +19,6 @@
     "e2e:smoke": "playwright test -c playwright.config.ts && node scripts/lighthouse.mjs"
   },
   "dependencies": {
-    "@todayz/i18n": "workspace:*",
     "@todayz/tokens": "workspace:*",
     "astro": "7.3.7"
   },

@@ -329,15 +329,16 @@ func deployedOnly(env Env, names []string) []string {
 }
 
 // CORSOrigins returns the exact browser origins allowed to call the API (02 §2.4 step 6).
+// The marketing site's origin is included for its lead form (POST /v1/public/leads).
 func (c *Config) CORSOrigins() []string {
 	switch c.Env {
 	case EnvProd:
-		return []string{"https://app.todayz.in", "https://business.todayz.in", "https://admin.todayz.in"}
+		return []string{"https://app.todayz.in", "https://business.todayz.in", "https://admin.todayz.in", "https://todayz.in"}
 	case EnvStaging:
 		// Placeholder host names until Wave 5 fixes the staging domains.
 		return []string{"https://app.staging.todayz.in", "https://business.staging.todayz.in", "https://admin.staging.todayz.in"}
 	default:
-		return []string{"https://app.todayz.localhost", "https://business.todayz.localhost", "https://admin.todayz.localhost"}
+		return []string{"https://app.todayz.localhost", "https://business.todayz.localhost", "https://admin.todayz.localhost", "https://todayz.localhost"}
 	}
 }
 

@@ -24,7 +24,7 @@
     "defaultMessage": "What we collect"
   },
   "legal.privacy.s1.body": {
-    "defaultMessage": "From shops: name, shop name, mobile number, city and address, and the stock and sales data you add. From shoppers: mobile number, name, a location you choose to share, and your bookings."
+    "defaultMessage": "From shoppers: mobile number, an optional name, the addresses you save, your bookings, and coarse search areas (a neighbourhood-sized area, never an exact location) when you search. From shops: business and store details, contact person and mobile number, the stock and sales data you add, and the payout and identity details needed to verify the business (bank or UPI details, PAN, GSTIN), which are stored encrypted and shown masked. If a shop uses voice to update stock, the recording is sent to speech-to-text and AI services to turn it into a draft the shop confirms. The anti-bot check on our forms (Cloudflare Turnstile) reads signals from your browser and device."
   },
   "legal.privacy.s2.title": {
     "defaultMessage": "Why we collect it"
@@ -36,13 +36,19 @@
     "defaultMessage": "Who sees it"
   },
   "legal.privacy.s3.body": {
-    "defaultMessage": "A shop sees the details of a shopper who books with it. Services that host TodayZ and send messages for us handle data on our behalf. Demand insights show shops grouped, anonymous search counts, never a shopper's name or number."
+    "defaultMessage": "A shop sees the name and a masked mobile number of a shopper who books with it, and the full number only while that order is out for delivery. Services that host TodayZ, send messages, check forms for bots, and turn speech into text handle data on our behalf. Demand insights show shops grouped, anonymous search counts, never a shopper's name or number."
   },
   "legal.privacy.s4.title": {
     "defaultMessage": "Your rights"
   },
   "legal.privacy.s4.body": {
-    "defaultMessage": "You can ask to see, correct or delete your data, and you can withdraw your consent, by writing to the grievance officer below."
+    "defaultMessage": "You can ask to see or correct your data, and you can withdraw your consent, by writing to the grievance officer below. Shoppers can delete their account themselves in the app, once no order is still in progress. Deleting it ends any unused credits, and order and credit records are kept in anonymised form. Shops can ask support to delete their business."
+  },
+  "legal.privacy.s5.title": {
+    "defaultMessage": "Complaints"
+  },
+  "legal.privacy.s5.body": {
+    "defaultMessage": "If the grievance officer does not resolve your complaint, you can complain to the Data Protection Board of India."
   },
   "legal.terms_shoppers.meta.title": {
     "defaultMessage": "Terms for shoppers"
@@ -75,7 +81,7 @@
     "defaultMessage": "Changes and law"
   },
   "legal.terms_shoppers.s4.body": {
-    "defaultMessage": "We may update these terms and will show the date of the latest version. Indian law applies."
+    "defaultMessage": "We may update these terms and will tell you about important changes before they apply. Indian law applies."
   },
   "legal.terms_shops.meta.title": {
     "defaultMessage": "Terms for shops"
@@ -114,7 +120,7 @@
     "defaultMessage": "Changes and law"
   },
   "legal.terms_shops.s5.body": {
-    "defaultMessage": "We may update these terms and will show the date of the latest version. We may pause a shop that breaks them. Indian law applies."
+    "defaultMessage": "We may update these terms and will tell you about important changes before they apply. We may pause a shop that breaks them. Indian law applies."
   },
   "legal.refunds.meta.title": {
     "defaultMessage": "Refunds and credits"
@@ -129,13 +135,13 @@
     "defaultMessage": "Cancelling a booking"
   },
   "legal.refunds.s1.body": {
-    "defaultMessage": "You can cancel a booking before the shop has handed over your items. Once items are handed over, the shop's own return policy applies."
+    "defaultMessage": "You can cancel a booking any time until it is collected or out for delivery. You pay the shop directly at pickup or delivery; TodayZ does not take payments."
   },
   "legal.refunds.s2.title": {
     "defaultMessage": "Credits"
   },
   "legal.refunds.s2.body": {
-    "defaultMessage": "The rules for how long credits last and where they can be used are being finalised. They will be set out here before launch."
+    "defaultMessage": "Credits are not cash and cannot be withdrawn. Each batch of credits has its own expiry date, and the oldest credits are used first. An order can use credits only up to a limit and only above a minimum order value, and credits never pay the delivery fee. Unused credits end when you delete your account."
   },
   "legal.refunds.s3.title": {
     "defaultMessage": "Questions"

@@ -1,6 +1,8 @@
 // Lighthouse CI against the built dist/ (filesystem upload only, nothing leaves the machine).
 // Uses the Playwright-installed Chromium so no system Chrome is needed; the Turnstile host is blocked
-// in lighthouserc.json so the run never touches the network. Scores must be >= 95 in every category.
+// in lighthouserc.json so the run never touches the network. Scores must be >= 95 in every category,
+// on mobile (Lighthouse's default emulation, as configured in lighthouserc.json) and on desktop
+// (the same config with the desktop preset). Reports land in .lighthouseci/{mobile,desktop}/.
 import { chromium } from '@playwright/test';
 import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync } from 'node:fs';
@@ -23,9 +25,22 @@ function chromePath() {
 }
 
 const root = join(import.meta.dirname, '..');
-const result = spawnSync(join(root, 'node_modules', '.bin', 'lhci'), ['autorun', '--config=lighthouserc.json'], {
-  cwd: root,
-  stdio: 'inherit',
-  env: { ...process.env, CHROME_PATH: chromePath(), LHCI_NO_TELEMETRY: '1' },
-});
-process.exit(result.status ?? 1);
+const env = { ...process.env, CHROME_PATH: chromePath(), LHCI_NO_TELEMETRY: '1' };
+const runs = [
+  { name: 'mobile', args: [] },
+  { name: 'desktop', args: ['--collect.settings.preset=desktop', '--upload.outputDir=./.lighthouseci/desktop'] },
+];
+let failed = false;
+for (const run of runs) {
+  console.log(`\nLighthouse (${run.name})`);
+  const result = spawnSync(join(root, 'node_modules', '.bin', 'lhci'), ['autorun', '--config=lighthouserc.json', ...run.args], {
+    cwd: root,
+    stdio: 'inherit',
+    env,
+  });
+  if (result.status !== 0) {
+    console.error(`Lighthouse (${run.name}) failed`);
+    failed = true;
+  }
+}
+process.exit(failed ? 1 : 0);

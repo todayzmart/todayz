@@ -18,7 +18,7 @@ export type PageId =
 
 export interface PageDef {
   id: PageId;
-  /** English path. Other locales prefix it with /<locale>. */
+  /** English path, always with a trailing slash (the site builds directory URLs). Other locales prefix it with /<locale>. */
   path: string;
   /** Locales this page exists in. English always; hi, kn, te and ta only for home and retailers (S-05). */
   locales: readonly Locale[];
@@ -34,15 +34,15 @@ const EN_ONLY = [DEFAULT_LOCALE] as const;
 
 export const PAGES: readonly PageDef[] = [
   { id: 'home', path: '/', locales: LOCALES, title: 'home.meta.title', description: 'home.meta.description', leadForm: true, priority: 1 },
-  { id: 'retailers', path: '/for-retailers', locales: LOCALES, title: 'retailers.meta.title', description: 'retailers.meta.description', leadForm: true, priority: 0.9 },
-  { id: 'how', path: '/how-it-works', locales: EN_ONLY, title: 'info.how.meta.title', description: 'info.how.meta.description', leadForm: false, priority: 0.7 },
-  { id: 'pricing', path: '/pricing', locales: EN_ONLY, title: 'info.pricing.meta.title', description: 'info.pricing.meta.description', leadForm: false, priority: 0.7 },
-  { id: 'about', path: '/about', locales: EN_ONLY, title: 'info.about.meta.title', description: 'info.about.meta.description', leadForm: false, priority: 0.5 },
-  { id: 'contact', path: '/contact', locales: EN_ONLY, title: 'info.contact.meta.title', description: 'info.contact.meta.description', leadForm: true, priority: 0.5 },
-  { id: 'privacy', path: '/legal/privacy', locales: EN_ONLY, title: 'legal.privacy.meta.title', description: 'legal.privacy.meta.description', leadForm: false, priority: 0.3 },
-  { id: 'terms-shoppers', path: '/legal/terms-for-shoppers', locales: EN_ONLY, title: 'legal.terms_shoppers.meta.title', description: 'legal.terms_shoppers.meta.description', leadForm: false, priority: 0.3 },
-  { id: 'terms-shops', path: '/legal/terms-for-shops', locales: EN_ONLY, title: 'legal.terms_shops.meta.title', description: 'legal.terms_shops.meta.description', leadForm: false, priority: 0.3 },
-  { id: 'refunds', path: '/legal/refunds-and-credits', locales: EN_ONLY, title: 'legal.refunds.meta.title', description: 'legal.refunds.meta.description', leadForm: false, priority: 0.3 },
+  { id: 'retailers', path: '/for-retailers/', locales: LOCALES, title: 'retailers.meta.title', description: 'retailers.meta.description', leadForm: true, priority: 0.9 },
+  { id: 'how', path: '/how-it-works/', locales: EN_ONLY, title: 'info.how.meta.title', description: 'info.how.meta.description', leadForm: false, priority: 0.7 },
+  { id: 'pricing', path: '/pricing/', locales: EN_ONLY, title: 'info.pricing.meta.title', description: 'info.pricing.meta.description', leadForm: false, priority: 0.7 },
+  { id: 'about', path: '/about/', locales: EN_ONLY, title: 'info.about.meta.title', description: 'info.about.meta.description', leadForm: false, priority: 0.5 },
+  { id: 'contact', path: '/contact/', locales: EN_ONLY, title: 'info.contact.meta.title', description: 'info.contact.meta.description', leadForm: true, priority: 0.5 },
+  { id: 'privacy', path: '/legal/privacy/', locales: EN_ONLY, title: 'legal.privacy.meta.title', description: 'legal.privacy.meta.description', leadForm: false, priority: 0.3 },
+  { id: 'terms-shoppers', path: '/legal/terms-for-shoppers/', locales: EN_ONLY, title: 'legal.terms_shoppers.meta.title', description: 'legal.terms_shoppers.meta.description', leadForm: false, priority: 0.3 },
+  { id: 'terms-shops', path: '/legal/terms-for-shops/', locales: EN_ONLY, title: 'legal.terms_shops.meta.title', description: 'legal.terms_shops.meta.description', leadForm: false, priority: 0.3 },
+  { id: 'refunds', path: '/legal/refunds-and-credits/', locales: EN_ONLY, title: 'legal.refunds.meta.title', description: 'legal.refunds.meta.description', leadForm: false, priority: 0.3 },
 ];
 
 export function pageById(id: PageId): PageDef {
@@ -51,10 +51,9 @@ export function pageById(id: PageId): PageDef {
   return page;
 }
 
-/** URL path of a page in a locale: "/", "/hi/", "/for-retailers", "/hi/for-retailers". */
+/** URL path of a page in a locale, always ending in a slash: "/", "/hi/", "/for-retailers/", "/hi/for-retailers/". */
 export function pagePath(page: PageDef, locale: Locale): string {
-  if (locale === DEFAULT_LOCALE) return page.path;
-  return page.path === '/' ? `/${locale}/` : `/${locale}${page.path}`;
+  return locale === DEFAULT_LOCALE ? page.path : `/${locale}${page.path}`;
 }
 
 export function pageUrl(page: PageDef, locale: Locale): string {

@@ -15,6 +15,7 @@
     "./styles.css": "./styles.css",
     "./tokens.json": "./generated/tokens.json",
     "./icons/*": "./generated/icons/*",
+    "./fonts/*": "./generated/fonts/*",
     "./vite": {
       "types": "./src/vite.d.mts",
       "default": "./src/vite.mjs"
