@@ -13,6 +13,7 @@
 package problem
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -26,6 +27,10 @@ import (
 	"github.com/todayz/backend/internal/platform/reqctx"
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
+
+// StatusClientClosed is the access-log status of a request whose client
+// went away before the answer (nginx's 499).
+const StatusClientClosed = 499
 
 // TypeBase prefixes the problem type URI.
 const TypeBase = "https://todayz.in/errors/"
@@ -193,6 +198,13 @@ func resolve(err error) (Body, bool) {
 // secheaders middleware (no-store on /v1).
 func Write(w http.ResponseWriter, r *http.Request, err error) {
 	ctx := r.Context()
+	if errors.Is(err, context.Canceled) && ctx.Err() != nil {
+		// The client hung up first: not a server fault and nobody reads the
+		// answer. 499 keeps it out of the 5xx error rate.
+		telemetry.Logger(ctx).InfoContext(ctx, "client closed the request", slog.String("route", reqctx.Route(ctx)))
+		w.WriteHeader(StatusClientClosed)
+		return
+	}
 	body, ok := resolve(err)
 	body.RequestID = reqctx.RequestID(ctx)
 	telemetry.NoteErrCode(ctx, body.Code) // the access log's `code` label (W1-07)

@@ -818,3 +818,9 @@ There is no `make seed`; use `make reset`.
   - the reconcile sweep for timers River discards (runbook `docs/runbooks/orders-timers.md`);
   - `cancelled` and `no_show` notification variants (generic text for now).
 - Lives in: `backend/internal/orders/`, `backend/db/migrations/20201_w2-02_orders.sql`, `backend/cmd/todayz/routes_orders.go`; `docs/qa/W2-02/REPORT.md`; W2-02.
+
+**D-109 · If-Match survives compressing proxies; a client hang-up is 499, not 500 (lead, 2026-10-24).** From the first stack run of the core loop.
+- **What broke:** Caddy's `encode` turns the ETag of a compressed response into `"v1-gzip"`. The business app sent that back as If-Match, and the contract pattern `^"v[0-9]+"$` refused it with 422. Every PATCH whose GET body is large enough to compress failed in the browser, store settings first. In production, Cloudflare weakens a compressed response's ETag to `W/"v1"`, which fails the same way.
+- **Decision:** the server keeps sending the strong `"v{version}"`. If-Match also accepts `W/"v{n}"` and `"v{n}-{coding}"` (lowercase letters and digits), and only the version is compared. The version is a row version, not a byte hash, so a weak match is the right comparison. One parser, `internal/platform/httpx/ifmatch`, replaces the three domain copies; new domains use it.
+- **Client hang-up:** when the client has gone (`context.Canceled` with the request context done), `problem.Write` logs at info and records 499. It used to log at error and answer 500, which counts toward the 5xx error rate and pages. A cancel of our own making, while the client is still there, is still 500.
+- Lives in: `backend/api/common/parameters.yaml` (IfMatch), `backend/internal/platform/httpx/ifmatch/`, `backend/internal/platform/httpx/problem/problem.go`; 04-api.md §1.

@@ -38,6 +38,7 @@ import (
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/db"
+	"github.com/todayz/backend/internal/platform/httpx/ifmatch"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/pii"
@@ -315,17 +316,7 @@ func pathID(s string) (ids.ID, error) {
 func etag(version int32) string { return `"v` + strconv.FormatInt(int64(version), 10) + `"` }
 
 // parseETag reads `"v{version}"`; a version that does not fit is stale.
-func parseETag(s string) (int32, bool) {
-	s = strings.TrimSpace(s)
-	if !strings.HasPrefix(s, `"v`) || !strings.HasSuffix(s, `"`) || len(s) < 4 {
-		return 0, false
-	}
-	n, err := strconv.ParseInt(s[2:len(s)-1], 10, 32)
-	if err != nil || n < 0 {
-		return 0, false
-	}
-	return int32(n), true
-}
+func parseETag(s string) (int32, bool) { return ifmatch.Parse(s) }
 
 // ifMatch reads a required If-Match: missing is 428, unreadable is 412.
 func ifMatch(h *string) (int32, error) {

@@ -20,6 +20,7 @@ import (
 	"github.com/todayz/backend/internal/platform/authn"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/authz/policy"
+	"github.com/todayz/backend/internal/platform/httpx/ifmatch"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 )
 
@@ -416,17 +417,7 @@ func etag(version int32) string { return `"v` + strconv.FormatInt(int64(version)
 
 // parseETag reads `"v{version}"` (the validator checked the pattern); a
 // version that does not fit is stale by definition.
-func parseETag(s string) (int32, bool) {
-	s = strings.TrimSpace(s)
-	if !strings.HasPrefix(s, `"v`) || !strings.HasSuffix(s, `"`) || len(s) < 4 {
-		return 0, false
-	}
-	n, err := strconv.ParseInt(s[2:len(s)-1], 10, 32)
-	if err != nil || n < 0 {
-		return 0, false
-	}
-	return int32(n), true
-}
+func parseETag(s string) (int32, bool) { return ifmatch.Parse(s) }
 
 func toAPIMe(m Me) meapi.Me {
 	out := meapi.Me{

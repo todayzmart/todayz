@@ -137,8 +137,11 @@ func (s *Stream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	from, valid := parseCursor(lastID)
 	rp, err := s.replay(ctx, ch, from, resumed && valid)
 	if err != nil {
-		log.WarnContext(ctx, "realtime: replay failed", slog.String("err", err.Error()))
-		problem.Write(w, r, problem.New(genproblems.ServiceUnavailable, "").WithHeader("Retry-After", "5"))
+		if ctx.Err() == nil {
+			log.WarnContext(ctx, "realtime: replay failed", slog.String("err", err.Error()))
+		}
+		// Wrapped so a client that hung up is a 499 in the log, not a 503 (D-109).
+		problem.Write(w, r, problem.Wrap(genproblems.ServiceUnavailable, err).WithHeader("Retry-After", "5"))
 		return
 	}
 

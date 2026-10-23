@@ -8,7 +8,7 @@ The contract lives in `backend/api/` (OpenAPI 3.1), split per domain: `paths/<do
 - JSON, `camelCase` fields, ULID string ids, money as integer paise in fields named `*Paise`, credits as integers (1 credit = ₹1), timestamps RFC 3339 UTC.
 - Pagination: cursor based. `?limit=20&cursor=…` → `{ "items": [...], "nextCursor": "…" | null }`. Max limit 100.
 - Filtering and sorting through named query params only (no free-form SQL-ish filters).
-- Concurrency: mutable resources return `ETag: "v{version}"`; updates send `If-Match`. Mismatch → `412`.
+- Concurrency: mutable resources return `ETag: "v{version}"`; updates send `If-Match`. Mismatch → `412`. If-Match also accepts the forms a compressing proxy hands out (`W/"v3"`, `"v3-gzip"`); only the version is compared (D-109).
 - Rate-limit headers: `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`; `429` with `Retry-After`.
 - Tracing: clients send `traceparent`; every response returns `X-Request-Id`.
 - Versioning: `/v1`. Additive changes only within v1. The oldest client allowed per app is set in settings (`min_client_version_customer`, `min_client_version_business`, `min_client_version_admin`); an older app shows "Update available" and reloads its service worker when the user taps, never by itself and never while a POS sale or a checkout is open (D-98).

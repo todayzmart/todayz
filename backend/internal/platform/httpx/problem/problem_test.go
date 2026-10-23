@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
@@ -71,6 +72,29 @@ func TestWriteHidesInternals(t *testing.T) {
 	_, b = do(t, Wrap(genproblems.ServiceUnavailable, errors.New("db down")).WithDetail("db host x"))
 	require.Equal(t, 503, b.Status)
 	require.Empty(t, b.Detail, "5xx never sends detail")
+}
+
+func TestClientClosedIsNot500(t *testing.T) {
+	var logBuf bytes.Buffer
+	log := slog.New(slog.NewJSONHandler(&logBuf, nil))
+	ctx, cancel := context.WithCancel(telemetry.WithLogger(context.Background(), log))
+	cancel()
+	rec := httptest.NewRecorder()
+	Write(rec, httptest.NewRequest(http.MethodPost, "/v1/x", nil).WithContext(ctx), fmt.Errorf("internal: %w", context.Canceled))
+	require.Equal(t, StatusClientClosed, rec.Code)
+	require.Empty(t, rec.Body.String())
+	require.Contains(t, logBuf.String(), `"level":"INFO"`)
+	require.NotContains(t, logBuf.String(), "request failed")
+
+	// A problem that wraps the cancel (the SSE replay's 503) is a hang-up too.
+	rec = httptest.NewRecorder()
+	Write(rec, httptest.NewRequest(http.MethodGet, "/v1/me/stream", nil).WithContext(ctx), Wrap(genproblems.ServiceUnavailable, context.Canceled))
+	require.Equal(t, StatusClientClosed, rec.Code)
+
+	// A canceled context of our own making while the client is still there is a real failure.
+	rec, b := doLog(t, fmt.Errorf("query: %w", context.Canceled), log)
+	require.Equal(t, 500, rec.Code)
+	require.Equal(t, "internal", b.Code)
 }
 
 func TestUnregisteredCodeBecomes500(t *testing.T) {
