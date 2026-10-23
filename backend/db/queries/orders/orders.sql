@@ -257,7 +257,7 @@ SELECT count(*)::int AS n FROM strikes
 WHERE subject_type = @subject_type AND subject_id = @subject_id AND reset_at IS NULL
   AND reason = @reason AND created_at > @since;
 
--- name: SetCustomerStrikes :exec
+-- name: SetCustomerStrikes :execrows
 -- The 30-day count, and the limit when it is reached (never shortened).
 UPDATE customer_profiles SET strikes_count_30d = @strikes,
   limited_until = CASE
