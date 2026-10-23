@@ -19,7 +19,9 @@ package mw
 //   - Namespaces, before chi and the validator: /v1/me, /v1/biz and /v1/admin
 //     refuse an anonymous caller with 401. /v1/biz needs a business-app token
 //     and /v1/admin an admin-app token with amr otp+totp (AU-11), else 403
-//     forbidden. An admin-app token without TOTP reaches /v1/auth/* only.
+//     forbidden. An admin-app token without TOTP reaches /v1/auth/* and the
+//     telemetry intake (otpAdminPaths: /v1/rum, /v1/events) only, so the admin
+//     app's RUM and events from the TOTP screens are not refused.
 //   - Per-action permission is slot 15 (authz), not here.
 
 import (
@@ -78,6 +80,14 @@ var cookieAuthPaths = map[string]bool{
 	"/v1/auth/logout-all": true,
 }
 
+// otpAdminPaths are the routes outside /v1/auth an admin-app token without
+// TOTP may reach: the telemetry intake, which any caller, anonymous included,
+// may post to. Matched exactly, like cookieAuthPaths.
+var otpAdminPaths = map[string]bool{
+	"/v1/rum":    true,
+	"/v1/events": true,
+}
+
 // bearer extracts the token from exactly one "Bearer <token>" header.
 func bearer(vals []string) (string, bool) {
 	if len(vals) != 1 {
@@ -107,8 +117,9 @@ func guardNamespace(path string, p authn.Principal) error {
 		return problem.New(genproblems.Unauthorized, "")
 	case !signedIn:
 		return nil
-	case p.App == authn.AppAdmin && p.AMR != authn.AMROTPTOTP && !under(path, "/v1/auth"):
-		// An admin who has not passed TOTP may only finish signing in (AU-11).
+	case p.App == authn.AppAdmin && p.AMR != authn.AMROTPTOTP && !under(path, "/v1/auth") && !otpAdminPaths[path]:
+		// An admin who has not passed TOTP may only finish signing in (AU-11)
+		// and report telemetry.
 		return problem.New(genproblems.Forbidden, "")
 	case under(path, "/v1/biz") && p.App != authn.AppBusiness:
 		return problem.New(genproblems.Forbidden, "")
