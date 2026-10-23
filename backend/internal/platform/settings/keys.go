@@ -116,9 +116,29 @@ const (
 	InsightRegularLapseDays          Key = "insight_regular_lapse_days"           // days, default 21
 	InsightRegularMinLinkedCustomers Key = "insight_regular_min_linked_customers" // count, default 10
 	InsightPriceCompareEnabled       Key = "insight_price_compare_enabled"        // bool, default false
+
+	// Added by Ask shops nearby and search proof (D-101; seeded by 00012_w0-03_settings_d101.sql)
+	AskDailyLimitCustomer   Key = "ask_daily_limit_customer"   // count, default 5
+	AskRadiusM              Key = "ask_radius_m"               // meters, default 3000
+	AskMaxStores            Key = "ask_max_stores"             // count, default 8
+	AskDailyLimitStore      Key = "ask_daily_limit_store"      // count, default 40
+	AskReplyWindowMin       Key = "ask_reply_window_min"       // minutes, default 15
+	AskPriceValidMin        Key = "ask_price_valid_min"        // minutes, default 60
+	AskLowYieldAfterCount   Key = "ask_low_yield_after_count"  // count, default 20
+	AskLowYieldMaxStores    Key = "ask_low_yield_max_stores"   // count, default 3
+	AskRetentionDays        Key = "ask_retention_days"         // days, default 90
+	AskWhatsappEnabled      Key = "ask_whatsapp_enabled"       // bool, default false
+	AskGapMinCustomers      Key = "ask_gap_min_customers"      // count, default 10
+	AskGapWindowDays        Key = "ask_gap_window_days"        // days, default 7
+	SiteMarqueeMinSearchers Key = "site_marquee_min_searchers" // count, default 10
+	SiteMarqueeWindowDays   Key = "site_marquee_window_days"   // days, default 7
+	SiteMarqueeMaxItems     Key = "site_marquee_max_items"     // count, default 20
+	RefineAiMinWords        Key = "refine_ai_min_words"        // count, default 4
+	AiVoicesearchEnabled    Key = "ai_voicesearch_enabled"     // bool, default false
+	ShareCardCreatePerHour  Key = "share_card_create_per_hour" // count, default 30
 )
 
-// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99).
+// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101).
 var AllKeys = []Key{
 	OrderAcceptTimeoutMin,
 	PickupHoldMin,
@@ -216,4 +236,22 @@ var AllKeys = []Key{
 	InsightRegularLapseDays,
 	InsightRegularMinLinkedCustomers,
 	InsightPriceCompareEnabled,
+	AskDailyLimitCustomer,
+	AskRadiusM,
+	AskMaxStores,
+	AskDailyLimitStore,
+	AskReplyWindowMin,
+	AskPriceValidMin,
+	AskLowYieldAfterCount,
+	AskLowYieldMaxStores,
+	AskRetentionDays,
+	AskWhatsappEnabled,
+	AskGapMinCustomers,
+	AskGapWindowDays,
+	SiteMarqueeMinSearchers,
+	SiteMarqueeWindowDays,
+	SiteMarqueeMaxItems,
+	RefineAiMinWords,
+	AiVoicesearchEnabled,
+	ShareCardCreatePerHour,
 }
