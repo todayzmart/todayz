@@ -210,14 +210,15 @@ func TestPresignAWSVector(t *testing.T) {
 	require.True(t, strings.HasPrefix(u, "https://examplebucket.s3.amazonaws.com/test.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN7EXAMPLE%2F20130524%2Fus-east-1%2Fs3%2Faws4_request&"), u)
 }
 
-func TestPresignPutSignsContentType(t *testing.T) {
+func TestPresignPutSignsContentTypeAndLength(t *testing.T) {
 	p := &presigner{scheme: "http", host: "127.0.0.1:9100", bucket: "private", accessKey: "k", secretKey: "s"}
 	now := time.Date(2026, 10, 23, 4, 0, 0, 0, time.UTC)
-	u := p.putURL("businesses/B/documents/D", "application/pdf", now)
+	u := p.putURL("businesses/B/documents/D", "application/pdf", 1234, now)
 	require.Contains(t, u, "http://127.0.0.1:9100/private/businesses/B/documents/D?")
-	require.Contains(t, u, "X-Amz-SignedHeaders=content-type%3Bhost")
+	require.Contains(t, u, "X-Amz-SignedHeaders=content-length%3Bcontent-type%3Bhost")
 	require.Contains(t, u, "X-Amz-Expires=900")
-	require.NotEqual(t, u, p.putURL("businesses/B/documents/D", "image/png", now))
+	require.NotEqual(t, u, p.putURL("businesses/B/documents/D", "image/png", 1234, now))
+	require.NotEqual(t, u, p.putURL("businesses/B/documents/D", "application/pdf", 1235, now))
 }
 
 func TestSlugify(t *testing.T) {
@@ -238,11 +239,14 @@ func TestSlugify(t *testing.T) {
 func TestLeadHashNormalises(t *testing.T) {
 	h, err := pii.NewHasher(make([]byte, 32))
 	require.NoError(t, err)
-	a := leadHash(h, "+919000000021", "Lakshmi  Devi", "Lakshmi Traders", "Bengaluru")
-	b := leadHash(h, "+919000000021", "lakshmi devi", " LAKSHMI traders ", "bengaluru")
-	c := leadHash(h, "+919000000022", "lakshmi devi", "lakshmi traders", "bengaluru")
+	a := leadHash(h, "+919000000021", "Lakshmi  Devi", "Lakshmi Traders", "Bengaluru", "site")
+	b := leadHash(h, "+919000000021", "lakshmi devi", " LAKSHMI traders ", "bengaluru", "Site")
+	c := leadHash(h, "+919000000022", "lakshmi devi", "lakshmi traders", "bengaluru", "site")
 	require.Equal(t, a, b)
 	require.NotEqual(t, a, c)
+	// The source is part of the details: another form is another lead.
+	require.NotEqual(t, a, leadHash(h, "+919000000021", "lakshmi devi", "lakshmi traders", "bengaluru", "whatsapp"))
 	// The fields are separated, so moving text between them changes the hash.
-	require.NotEqual(t, leadHash(h, "+919000000021", "ab", "c", "x"), leadHash(h, "+919000000021", "a", "bc", "x"))
+	require.NotEqual(t, leadHash(h, "+919000000021", "ab", "c", "x", "s"), leadHash(h, "+919000000021", "a", "bc", "x", "s"))
+	require.NotEqual(t, leadHash(h, "+919000000021", "a", "b", "cx", "s"), leadHash(h, "+919000000021", "a", "b", "c", "xs"))
 }

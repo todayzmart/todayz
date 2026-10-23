@@ -33,6 +33,11 @@ UPDATE businesses SET
 WHERE id = @id AND version = @version
 RETURNING *;
 
+-- name: BusinessStatusForShare :one
+-- The business's status, held until the transaction ends so an admin
+-- rejection or suspension cannot slip in under a store or KYC change.
+SELECT status FROM businesses WHERE id = @id FOR SHARE;
+
 -- name: SubmitBusiness :one
 -- draft or needs_info → submitted (01 §3); the request for information is cleared.
 UPDATE businesses SET status = 'submitted', submitted_at = @now::timestamptz,
@@ -54,9 +59,10 @@ ORDER BY created_at, id;
 
 -- name: ListMyInvitations :many
 -- Pending invites to this user: by user id, or by the phone they signed in with.
+-- An invite sent at or before @expired_before has lapsed and is not listed.
 SELECT s.id, s.business_id, s.role, b.brand_name, s.created_at
 FROM staff s JOIN businesses b ON b.id = s.business_id
-WHERE s.status = 'invited'
+WHERE s.status = 'invited' AND s.invited_at > @expired_before::timestamptz
   AND (s.user_id = @user_id
        OR (s.user_id IS NULL AND s.invite_phone_hash = (SELECT p.phone_hash FROM phone_identities p WHERE p.user_id = @user_id)))
 ORDER BY s.created_at, s.id;
@@ -95,9 +101,15 @@ RETURNING *;
 ------------------------------------------------------------------------------
 
 -- name: InsertDocument :one
-INSERT INTO business_documents (id, business_id, store_id, kind, object_key, content_type, created_at, updated_at)
-VALUES (@id, @business_id, sqlc.narg(store_id), @kind, @object_key, @content_type, @now, @now)
+INSERT INTO business_documents (id, business_id, store_id, kind, object_key, content_type, size_bytes, created_at, updated_at)
+VALUES (@id, @business_id, sqlc.narg(store_id), @kind, @object_key, @content_type, @size_bytes, @now, @now)
 RETURNING *;
+
+-- name: CountDocumentsOfKind :one
+-- The documents of one kind a business holds that are not rejected (pending
+-- ones count, so unconfirmed upload URLs cannot pile up).
+SELECT count(*)::int FROM business_documents
+WHERE business_id = @business_id AND kind = @kind AND status <> 'rejected';
 
 -- name: ListDocuments :many
 SELECT * FROM business_documents WHERE business_id = @business_id
@@ -153,6 +165,9 @@ UPDATE stores SET
                        WHEN sqlc.narg(lat)::float8 IS NULL THEN NULL
                        ELSE ST_SetSRID(ST_MakePoint(sqlc.narg(lng)::float8, sqlc.narg(lat)::float8), 4326)::geography END,
   phone_enc     = CASE WHEN @set_phone::bool THEN sqlc.narg(phone_enc)::bytea ELSE phone_enc END,
+  -- A changed name, address, location or phone sends a store customers can
+  -- see (or one that was approved and paused) back to review (D-40).
+  status        = CASE WHEN @needs_review::bool AND status IN ('live','paused') THEN 'pending_review' ELSE status END,
   version = version + 1
 WHERE id = @id AND business_id = @business_id AND version = @version;
 
@@ -181,10 +196,11 @@ SELECT role, store_ids FROM staff
 WHERE user_id = @user_id AND business_id = @business_id AND status = 'active';
 
 -- name: InsertStaff :one
+-- invited_at is set for an invite and NULL for an owner made active at once.
 INSERT INTO staff (id, business_id, user_id, role, store_ids, can_deliver, invited_by, status,
-  invite_phone_hash, invite_phone_enc, created_at, updated_at)
+  invite_phone_hash, invite_phone_enc, invited_at, created_at, updated_at)
 VALUES (@id, @business_id, sqlc.narg(user_id), @role, sqlc.narg(store_ids), @can_deliver, sqlc.narg(invited_by),
-  @status, sqlc.narg(invite_phone_hash), sqlc.narg(invite_phone_enc), @now, @now)
+  @status, sqlc.narg(invite_phone_hash), sqlc.narg(invite_phone_enc), sqlc.narg(invited_at), @now, @now)
 RETURNING *;
 
 -- name: ListStaff :many
@@ -215,10 +231,10 @@ LEFT JOIN phone_identities p ON p.user_id = s.user_id
 WHERE s.id = @id AND s.business_id = @business_id;
 
 -- name: ReinviteStaff :one
--- A removed or invited row taken up again by a new invite.
+-- A removed or lapsed row taken up again by a new invite; the expiry clock restarts.
 UPDATE staff SET user_id = COALESCE(user_id, sqlc.narg(user_id)::uuid), role = @role,
   store_ids = sqlc.narg(store_ids), can_deliver = @can_deliver, invited_by = @invited_by,
-  status = 'invited', removed_at = NULL,
+  status = 'invited', removed_at = NULL, invited_at = @now::timestamptz,
   invite_phone_hash = @invite_phone_hash, invite_phone_enc = @invite_phone_enc, version = version + 1
 WHERE id = @id
 RETURNING *;
@@ -241,7 +257,7 @@ WHERE id = @id;
 -- name: AcceptInvite :one
 UPDATE staff SET status = 'active', user_id = @user_id,
   invite_phone_hash = NULL, invite_phone_enc = NULL, version = version + 1
-WHERE id = @id AND status = 'invited'
+WHERE id = @id AND status = 'invited' AND invited_at > @expired_before::timestamptz
 RETURNING *;
 
 -- name: UserIDByPhoneHash :one
@@ -267,6 +283,14 @@ VALUES (@id, @name, @phone_enc, @shop_name, @city, @source, @details_hash, @now)
 ------------------------------------------------------------------------------
 -- Account deletion (W1-01 phase B asks before deleting an account)
 ------------------------------------------------------------------------------
+
+-- name: RemoveInvitesForAccount :execrows
+-- Account deletion: the pending invites bound to the user, or to the phone they
+-- signed in with, are withdrawn and lose the phone. Running it twice is a no-op.
+UPDATE staff SET status = 'removed', removed_at = @now::timestamptz,
+  invite_phone_hash = NULL, invite_phone_enc = NULL, version = version + 1
+WHERE status = 'invited'
+  AND (user_id = @user_id OR (sqlc.narg(phone_hash)::bytea IS NOT NULL AND invite_phone_hash = sqlc.narg(phone_hash)::bytea));
 
 -- name: OwnsActiveBusiness :one
 -- The user is the active owner of a business that is not rejected. A draft

@@ -311,7 +311,11 @@
     summary: Add a document and get its upload URL
     description: >-
       Owner only. Records the document and returns a presigned PUT into the
-      private bucket (D-46), valid for 15 minutes. The object key is never
+      private bucket (D-46), valid for 15 minutes. The URL signs the
+      Content-Type and the declared size, so the PUT must send exactly the
+      returned headers. The document stays `pending` until the upload is
+      confirmed. A business holds at most 5 documents of one kind that are
+      not rejected (`409 conflict` past that). The object key is never
       shown. `503 service_unavailable` while storage is not configured.
     x-idempotency: optional
     parameters:
@@ -325,6 +329,7 @@
           example:
             kind: gst
             contentType: application/pdf
+            sizeBytes: 482113
     responses:
       "201":
         description: The document and where to upload it
@@ -343,7 +348,7 @@
                 kind: gst
                 contentType: application/pdf
                 storeId: null
-                status: uploaded
+                status: pending
                 rejectReason: null
                 createdAt: "2026-10-22T09:30:00Z"
               upload:
@@ -351,6 +356,7 @@
                 method: PUT
                 headers:
                   Content-Type: application/pdf
+                  Content-Length: "482113"
                 expiresAt: "2026-10-22T09:45:00Z"
       default:
         $ref: ../common/responses.yaml#/Problem
@@ -393,7 +399,10 @@
     description: >-
       The owner invites managers and cashiers; a manager may invite only
       cashiers (D-66). `409 conflict` when that phone is already on the staff
-      or invited.
+      or has a pending invite. The invite shows only the masked phone typed
+      here: `userId` and `name` stay null until it is accepted, so an invite
+      never reveals whether or by whom a phone is registered. An invite lapses
+      after 7 days; inviting a lapsed phone again starts a new one.
     x-idempotency: optional
     parameters:
       - $ref: ../common/parameters.yaml#/IdempotencyKey
@@ -425,6 +434,7 @@
               canDeliver: true
               status: invited
               createdAt: "2026-10-22T09:30:00Z"
+              inviteExpiresAt: "2026-10-29T09:30:00Z"
       default:
         $ref: ../common/responses.yaml#/Problem
 /v1/biz/businesses/{bid}/staff/{staffId}:
@@ -502,7 +512,8 @@
     summary: Accept an invite to my account or phone
     description: >-
       Any business-app user. The invite must be to this account or to the
-      phone it signed in with; anything else is `404`. Not in the 04 table
+      phone it signed in with, and must not have lapsed (7 days); anything
+      else is `404`. Not in the 04 table
       (docs/qa/W1-04/REPORT.md, Questions).
     x-idempotency: optional
     parameters:

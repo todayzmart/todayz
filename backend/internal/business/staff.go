@@ -3,19 +3,22 @@ package business
 // Staff (01 §3, D-66): an owner invites managers and cashiers, a manager only
 // cashiers; the owner's row never changes here. An invite is by phone: it is
 // bound to the account with that phone if there is one, else it waits for the
-// phone to sign in. The invite phone is stored sealed and hashed, and cleared
-// once the invite is accepted or removed.
+// phone to sign in. The invite phone is stored sealed (for that staff row)
+// and hashed, and cleared once the invite is accepted or removed. Until it is
+// accepted, an invite shows only the masked phone the inviter typed: never the
+// account's id or name, so inviting a phone does not reveal who holds it.
+// An invite lapses after inviteTTL.
 //
-// TODO(W1-01b): account deletion must refuse the owner of a live business
-// until it is handed over (OwnsActiveBusiness), and must clear
-// invite_phone_enc and invite_phone_hash on the staff rows still invited to
-// the deleted account's phone.
+// Account deletion (W1-01 phase B) refuses the owner of a live business
+// (OwnsActiveBusiness) and withdraws the invites to the account or its phone
+// (OnAccountDelete); the lead registers both on identity.
 
 import (
 	"bytes"
 	"context"
 	"fmt"
 	"slices"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 
@@ -24,24 +27,48 @@ import (
 	"github.com/todayz/backend/gen/sqlc/businessdb"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/authz/policy"
+	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/pii"
 )
 
+// inviteTTL is how long an invite can be accepted; inviting the phone again
+// after that starts a new invite.
+//
+// TODO(lead): 01 has no rule for invite expiry; 7 days is the review's
+// conservative default. If it should be configurable it moves to
+// platform_settings (01 §17).
+const inviteTTL = 7 * 24 * time.Hour
+
+// lapsed reports whether an invite was sent at or before cutoff (now minus
+// inviteTTL), the same test as the queries' invited_at > @expired_before.
+func lapsed(r businessdb.Staff, cutoff time.Time) bool {
+	return r.InvitedAt == nil || !r.InvitedAt.After(cutoff)
+}
+
 func (s *Service) toMember(r businessdb.GetStaffViewRow) (businessapi.StaffMember, error) {
 	out := businessapi.StaffMember{
-		CanDeliver: r.CanDeliver, CreatedAt: r.CreatedAt.UTC(), Id: idString(r.ID), Name: r.UserName,
+		CanDeliver: r.CanDeliver, CreatedAt: r.CreatedAt.UTC(), Id: idString(r.ID),
 		Role: businessapi.StaffRole(r.Role), Status: businessapi.StaffStatus(r.Status),
-		StoreIds: idStrings(r.StoreIds), UserId: optIDString(r.UserID),
+		StoreIds: idStrings(r.StoreIds),
 	}
-	sealed := r.UserPhoneEnc
-	if sealed == nil {
-		sealed = r.InvitePhoneEnc
+	field, sealed := identityPhoneField, r.UserPhoneEnc
+	if r.Status == staffInvited {
+		// Only what the inviter typed; the account behind the phone, if any,
+		// stays hidden until the invite is accepted.
+		id, _ := ids.FromUUID(r.ID)
+		field, sealed = SealField(FieldPhone, id), r.InvitePhoneEnc
+		if r.InvitedAt != nil {
+			exp := r.InvitedAt.Add(inviteTTL).UTC()
+			out.InviteExpiresAt = &exp
+		}
+	} else {
+		out.Name, out.UserId = r.UserName, optIDString(r.UserID)
 	}
 	if sealed != nil {
-		plain, err := s.seal.Open(FieldPhone, sealed)
+		plain, err := s.seal.Open(field, sealed)
 		if err != nil {
 			return businessapi.StaffMember{}, fmt.Errorf("business: open staff phone: %w", err)
 		}
@@ -162,46 +189,78 @@ func (s *Service) inviteStaff(ctx context.Context, bidStr string, body *business
 	}
 	canDeliver := body.CanDeliver != nil && *body.CanDeliver
 	hash := s.hash.Phone(e164)
-	enc, err := s.seal.Seal(FieldPhone, []byte(e164))
-	if err != nil {
-		return businessapi.StaffMember{}, fmt.Errorf("business: seal invite phone: %w", err)
+	// The phone is sealed for the staff row that holds it.
+	sealFor := func(id pgtype.UUID) ([]byte, error) {
+		sid, _ := ids.FromUUID(id)
+		enc, err := s.seal.Seal(SealField(FieldPhone, sid), []byte(e164))
+		if err != nil {
+			return nil, fmt.Errorf("business: seal invite phone: %w", err)
+		}
+		return enc, nil
 	}
 
 	var row businessdb.Staff
 	err = s.db.InTx(ctx, func(ctx context.Context) error {
 		q := s.q(ctx)
+		now := s.clock.Now()
+		cutoff := now.Add(-inviteTTL)
 		uid, err := q.UserIDByPhoneHash(ctx, hash)
 		if err != nil && !db.IsNoRows(err) {
 			return err
 		}
 		if uid.Valid {
+			// The account's own row (a business has one per user): a removed
+			// or lapsed one is taken up again, anything else is a conflict.
 			cur, err := q.GetStaffByUser(ctx, businessdb.GetStaffByUserParams{BusinessID: ids.UUID(bid), UserID: uid})
 			switch {
-			case err == nil && cur.Status != staffRemoved:
-				return problem.New(genproblems.Conflict, "this phone is already on the staff")
-			case err == nil:
+			case err == nil && (cur.Status == staffRemoved || (cur.Status == staffInvited && lapsed(cur, cutoff))):
+				enc, err := sealFor(cur.ID)
+				if err != nil {
+					return err
+				}
 				row, err = q.ReinviteStaff(ctx, businessdb.ReinviteStaffParams{
 					UserID: uid, Role: role, StoreIds: stores, CanDeliver: canDeliver, InvitedBy: ids.UUID(p.UserID),
-					InvitePhoneHash: hash, InvitePhoneEnc: enc, ID: cur.ID,
+					Now: now, InvitePhoneHash: hash, InvitePhoneEnc: enc, ID: cur.ID,
 				})
 				if err != nil {
 					return err
 				}
 				return s.writeAudit(ctx, p.UserID, "staff.invite", "staff", idString(row.ID), staffAudit(cur), staffAudit(row))
+			case err == nil:
+				return problem.New(genproblems.Conflict, "this phone is already on the staff or invited")
 			case !db.IsNoRows(err):
 				return err
 			}
 		}
-		if _, err := q.GetInviteByPhone(ctx, businessdb.GetInviteByPhoneParams{BusinessID: ids.UUID(bid), PhoneHash: hash}); err == nil {
-			return problem.New(genproblems.Conflict, "this phone is already invited")
-		} else if !db.IsNoRows(err) {
+		// An invite to the phone itself (made before it had an account, or
+		// bound to an account that has since changed its phone). A lapsed one
+		// is withdrawn and a new row made, so the new invite is bound to
+		// whoever holds the phone now.
+		cur, err := q.GetInviteByPhone(ctx, businessdb.GetInviteByPhoneParams{BusinessID: ids.UUID(bid), PhoneHash: hash})
+		switch {
+		case err == nil && lapsed(cur, cutoff):
+			if err := q.RemoveStaff(ctx, businessdb.RemoveStaffParams{Now: now, ID: cur.ID}); err != nil {
+				return err
+			}
+			gone := cur
+			gone.Status = staffRemoved
+			if err := s.writeAudit(ctx, p.UserID, "staff.remove", "staff", idString(cur.ID), staffAudit(cur), staffAudit(gone)); err != nil {
+				return err
+			}
+		case err == nil:
+			return problem.New(genproblems.Conflict, "this phone is already on the staff or invited")
+		case !db.IsNoRows(err):
 			return err
 		}
-		now := s.clock.Now()
+		id := ids.UUID(ids.New(now))
+		enc, err := sealFor(id)
+		if err != nil {
+			return err
+		}
 		row, err = q.InsertStaff(ctx, businessdb.InsertStaffParams{
-			ID: ids.UUID(ids.New(now)), BusinessID: ids.UUID(bid), UserID: uid, Role: role, StoreIds: stores,
+			ID: id, BusinessID: ids.UUID(bid), UserID: uid, Role: role, StoreIds: stores,
 			CanDeliver: canDeliver, InvitedBy: ids.UUID(p.UserID), Status: staffInvited,
-			InvitePhoneHash: hash, InvitePhoneEnc: enc, Now: now,
+			InvitePhoneHash: hash, InvitePhoneEnc: enc, InvitedAt: &now, Now: now,
 		})
 		if err != nil {
 			return err
@@ -209,7 +268,8 @@ func (s *Service) inviteStaff(ctx context.Context, bidStr string, body *business
 		return s.writeAudit(ctx, p.UserID, "staff.invite", "staff", idString(row.ID), nil, staffAudit(row))
 	})
 	if db.IsUniqueViolation(err, "ux_staff_business_user") || db.IsUniqueViolation(err, "ux_staff_business_invite_phone") {
-		return businessapi.StaffMember{}, problem.New(genproblems.Conflict, "this phone is already on the staff")
+		// A concurrent invite of the same phone won the race.
+		return businessapi.StaffMember{}, problem.New(genproblems.Conflict, "this phone is already on the staff or invited")
 	}
 	if err != nil {
 		return businessapi.StaffMember{}, err
@@ -338,8 +398,8 @@ func (s *Service) updateStaff(ctx context.Context, bidStr, staffIDStr string, bo
 
 // acceptInvite turns the caller's pending invite into an active membership.
 // The invite must name the caller's account, or (made before the account
-// existed) the phone the caller signed in with; anything else is 404, so
-// invites are not discoverable by id.
+// existed) the phone the caller signed in with, and must not have lapsed;
+// anything else is 404, so invites are not discoverable by id.
 func (s *Service) acceptInvite(ctx context.Context, bidStr, staffIDStr string) (businessapi.StaffMember, error) {
 	if err := s.ready(ctx); err != nil {
 		return businessapi.StaffMember{}, err
@@ -360,8 +420,9 @@ func (s *Service) acceptInvite(ctx context.Context, bidStr, staffIDStr string) (
 	var row businessdb.Staff
 	err = s.db.InTx(ctx, func(ctx context.Context) error {
 		q := s.q(ctx)
+		cutoff := s.clock.Now().Add(-inviteTTL)
 		cur, err := q.GetStaffForUpdate(ctx, businessdb.GetStaffForUpdateParams{ID: ids.UUID(id), BusinessID: ids.UUID(bid)})
-		if db.IsNoRows(err) || (err == nil && cur.Status != staffInvited) {
+		if db.IsNoRows(err) || (err == nil && (cur.Status != staffInvited || lapsed(cur, cutoff))) {
 			return problem.New(genproblems.NotFound, "")
 		}
 		if err != nil {
@@ -380,7 +441,10 @@ func (s *Service) acceptInvite(ctx context.Context, bidStr, staffIDStr string) (
 				return err
 			}
 		}
-		row, err = q.AcceptInvite(ctx, businessdb.AcceptInviteParams{UserID: uid, ID: cur.ID})
+		row, err = q.AcceptInvite(ctx, businessdb.AcceptInviteParams{UserID: uid, ID: cur.ID, ExpiredBefore: cutoff})
+		if db.IsNoRows(err) {
+			return problem.New(genproblems.NotFound, "")
+		}
 		if err != nil {
 			return err
 		}
@@ -393,4 +457,43 @@ func (s *Service) acceptInvite(ctx context.Context, bidStr, staffIDStr string) (
 		return businessapi.StaffMember{}, err
 	}
 	return s.memberView(ctx, bid, row.ID)
+}
+
+// OnAccountDelete withdraws the pending staff invites of an account being
+// deleted: those bound to the user and those waiting for the phone they
+// signed in with. Each becomes 'removed' and loses its sealed and hashed
+// phone. It runs inside identity's deletion transaction (d.Q(ctx) joins it),
+// before identity deletes the phone identity, so the phone hash is still
+// there to find. It is idempotent: a second run finds nothing invited.
+//
+// Active memberships are not touched here: OwnsActiveBusiness refuses the
+// deletion of an owner, and a manager's or cashier's row keeps pointing at
+// the anonymised user. TODO(lead): should a deleted account's non-owner
+// memberships be removed too (they can no longer sign in)?
+func OnAccountDelete(ctx context.Context, d *db.DB, clk clock.Clock, userID ids.ID) error {
+	if d == nil || clk == nil {
+		return errUnavailable
+	}
+	q := businessdb.New(d.Q(ctx))
+	uid := ids.UUID(userID)
+	hash, err := q.PhoneHashByUser(ctx, uid)
+	if err != nil && !db.IsNoRows(err) {
+		return fmt.Errorf("business: account phone: %w", err)
+	}
+	if len(hash) == 0 {
+		hash = nil
+	}
+	if _, err := q.RemoveInvitesForAccount(ctx, businessdb.RemoveInvitesForAccountParams{
+		Now: clk.Now(), UserID: uid, PhoneHash: hash,
+	}); err != nil {
+		return fmt.Errorf("business: withdraw invites: %w", err)
+	}
+	return nil
+}
+
+// OnAccountDelete runs the package function on the service's database and
+// clock, so the service itself satisfies identity.OnAccountDelete
+// (d.Identity.AddDeletionHook(svc) in mountBusiness).
+func (s *Service) OnAccountDelete(ctx context.Context, userID ids.ID) error {
+	return OnAccountDelete(ctx, s.db, s.clock, userID)
 }

@@ -249,16 +249,23 @@ DocumentContentType:
   enum: [image/jpeg, image/png, image/webp, application/pdf]
 DocumentStatus:
   type: string
-  enum: [uploaded, accepted, rejected]
+  description: "`pending` until the upload is confirmed, then `uploaded`; an admin accepts or rejects it."
+  enum: [pending, uploaded, accepted, rejected]
 DocumentCreate:
   type: object
   additionalProperties: false
-  required: [kind, contentType]
+  required: [kind, contentType, sizeBytes]
   properties:
     kind:
       $ref: "#/DocumentKind"
     contentType:
       $ref: "#/DocumentContentType"
+    sizeBytes:
+      type: integer
+      format: int64
+      minimum: 1
+      maximum: 10485760
+      description: The file's exact size in bytes (at most 10 MB). The upload URL signs it, so the PUT must send this Content-Length.
     storeId:
       $ref: ./common.yaml#/Ulid
 BusinessDocument:
@@ -281,10 +288,14 @@ BusinessDocument:
       $ref: ./common.yaml#/Timestamp
 DocumentUploadHeaders:
   type: object
-  required: [Content-Type]
+  required: [Content-Type, Content-Length]
   properties:
     Content-Type:
       $ref: "#/DocumentContentType"
+    Content-Length:
+      type: string
+      pattern: ^[1-9][0-9]*$
+      description: The declared `sizeBytes`, in decimal.
 DocumentUploadTarget:
   type: object
   description: A presigned PUT into the private bucket (D-46). Send the file with exactly these headers before `expiresAt`.
@@ -324,12 +335,17 @@ StaffMember:
       $ref: ./common.yaml#/Ulid
     userId:
       type: [string, "null"]
-      description: Null until the invite is accepted by an account.
+      description: Null until the invite is accepted, even when the phone already has an account (an invite never reveals who holds a phone).
     name:
       type: [string, "null"]
+      description: The account's name; null until the invite is accepted.
     phoneMasked:
       type: [string, "null"]
-      description: The account's or the invited phone, masked as in 01 R-16.2.
+      description: For an invite, the phone the inviter typed; once accepted, the account's phone. Masked as in 01 R-16.2.
+    inviteExpiresAt:
+      description: When a pending invite lapses (null once accepted). A lapsed invite can no longer be accepted; inviting the phone again restarts it.
+      type: [string, "null"]
+      format: date-time
     role:
       $ref: "#/StaffRole"
     storeIds:

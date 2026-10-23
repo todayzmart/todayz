@@ -146,14 +146,23 @@ func (s *Service) toStore(st businessdb.GetStoreRow, now time.Time) (businessapi
 		out.Location = &businessapi.StoreLocation{Lat: st.Lat, Lng: st.Lng}
 	}
 	if st.PhoneEnc != nil {
-		plain, err := s.seal.Open(FieldPhone, st.PhoneEnc)
+		phone, err := s.storePhone(st)
 		if err != nil {
-			return businessapi.Store{}, fmt.Errorf("business: open store phone: %w", err)
+			return businessapi.Store{}, err
 		}
-		phone := string(plain)
 		out.Phone = &phone
 	}
 	return out, nil
+}
+
+// storePhone opens a store's phone (sealed for that store).
+func (s *Service) storePhone(st businessdb.GetStoreRow) (string, error) {
+	sid, _ := ids.FromUUID(st.ID)
+	plain, err := s.seal.Open(SealField(FieldPhone, sid), st.PhoneEnc)
+	if err != nil {
+		return "", fmt.Errorf("business: open store phone: %w", err)
+	}
+	return string(plain), nil
 }
 
 func (s *Service) loadStore(ctx context.Context, bid, sid ids.ID) (businessdb.GetStoreRow, error) {
@@ -237,23 +246,24 @@ func (s *Service) getStore(ctx context.Context, bidStr, sidStr string) (business
 
 // --- create ----------------------------------------------------------------------
 
-// sealPhone normalises and seals a store phone (nil: no phone). The
-// contract has already checked the pattern; this is the strict mobile check.
-func (s *Service) sealPhone(v *invalid, path string, phone *string) []byte {
+// sealPhone normalises and seals a store phone for store sid (nil: no
+// phone), and returns the normalised number too. The contract has already
+// checked the pattern; this is the strict mobile check.
+func (s *Service) sealPhone(v *invalid, path string, sid ids.ID, phone *string) ([]byte, string) {
 	if phone == nil {
-		return nil
+		return nil, ""
 	}
 	e164, ok := pii.NormalizePhone(*phone)
 	if !ok {
 		v.add(path, "must be an Indian mobile number")
-		return nil
+		return nil, ""
 	}
-	enc, err := s.seal.Seal(FieldPhone, []byte(e164))
+	enc, err := s.seal.Seal(SealField(FieldPhone, sid), []byte(e164))
 	if err != nil {
 		v.add(path, "could not be stored")
-		return nil
+		return nil, ""
 	}
-	return enc
+	return enc, e164
 }
 
 func (s *Service) createStore(ctx context.Context, bidStr string, body *businessapi.StoreCreate) (businessapi.Store, int32, error) {
@@ -281,6 +291,9 @@ func (s *Service) createStore(ctx context.Context, bidStr string, body *business
 		return businessapi.Store{}, 0, problem.New(genproblems.Forbidden, "")
 	}
 
+	// The id comes first: the phone is sealed for it, and every retry below
+	// reuses it (a failed attempt rolled back, so the id is still free).
+	sid := ids.New(s.clock.Now())
 	var v invalid
 	v.text("body.name", &body.Name)
 	v.text("body.addressLine1", body.AddressLine1)
@@ -288,7 +301,7 @@ func (s *Service) createStore(ctx context.Context, bidStr string, body *business
 	v.text("body.landmark", body.Landmark)
 	v.text("body.locality", body.Locality)
 	v.text("body.city", body.City)
-	phoneEnc := s.sealPhone(&v, "body.phone", body.Phone)
+	phoneEnc, _ := s.sealPhone(&v, "body.phone", sid, body.Phone)
 	// No hours yet is a store never open; the submit asks for them.
 	hours := storedHours(&v, "body.hours", businessapi.StoreHours{})
 	if body.Hours != nil {
@@ -307,15 +320,16 @@ func (s *Service) createStore(ctx context.Context, bidStr string, body *business
 	}
 	base := Slugify(body.Name, locality)
 
-	var sid ids.ID
 	for attempt := 0; ; attempt++ {
 		slug, code, err := s.storeCodes(ctx, base, attempt)
 		if err != nil {
 			return businessapi.Store{}, 0, err
 		}
 		err = s.db.InTx(ctx, func(ctx context.Context) error {
+			if err := s.businessOpen(ctx, bid); err != nil {
+				return err
+			}
 			now := s.clock.Now()
-			sid = ids.New(now)
 			if err := s.q(ctx).InsertStore(ctx, businessdb.InsertStoreParams{
 				ID: ids.UUID(sid), BusinessID: ids.UUID(bid), Slug: slug, ShortCode: code, Name: body.Name,
 				AddressLine1: body.AddressLine1, AddressLine2: body.AddressLine2, Landmark: body.Landmark,
@@ -420,8 +434,10 @@ func (s *Service) updateStore(ctx context.Context, bidStr, sidStr string, ifMatc
 		}
 		changed = append(changed, "location")
 	}
+	newPhone := ""
 	if sent(ctx, "phone") {
-		params.SetPhone, params.PhoneEnc = true, s.sealPhone(&v, "body.phone", body.Phone)
+		params.SetPhone = true
+		params.PhoneEnc, newPhone = s.sealPhone(&v, "body.phone", sid, body.Phone)
 		changed = append(changed, "phone")
 	}
 	if err := v.err(); err != nil {
@@ -429,12 +445,19 @@ func (s *Service) updateStore(ctx context.Context, bidStr, sidStr string, ifMatc
 	}
 
 	err = s.db.InTx(ctx, func(ctx context.Context) error {
+		if err := s.businessOpen(ctx, bid); err != nil {
+			return err
+		}
 		cur, err := s.loadStore(ctx, bid, sid)
 		if err != nil {
 			return err
 		}
 		if cur.Version != version {
 			return problem.New(genproblems.PreconditionFailed, "")
+		}
+		params.NeedsReview, err = s.profileChanged(cur, params, newPhone)
+		if err != nil {
+			return err
 		}
 		n, err := s.q(ctx).UpdateStoreProfile(ctx, params)
 		if err != nil {
@@ -443,13 +466,67 @@ func (s *Service) updateStore(ctx context.Context, bidStr, sidStr string, ifMatc
 		if n == 0 {
 			return problem.New(genproblems.PreconditionFailed, "")
 		}
+		after := cur.Status
+		if params.NeedsReview && (cur.Status == storeLive || cur.Status == storePaused) {
+			after = storePendingReview
+		}
 		// Field names only: an address or a phone never goes in the audit log.
-		return s.writeAudit(ctx, p.UserID, "store.update", "store", sid.String(), nil, map[string]any{"fields": changed})
+		return s.writeAudit(ctx, p.UserID, "store.update", "store", sid.String(),
+			map[string]any{"status": cur.Status}, map[string]any{"status": after, "fields": changed})
 	})
 	if err != nil {
 		return businessapi.Store{}, 0, err
 	}
 	return s.getStore(ctx, bidStr, sidStr)
+}
+
+// profileChanged reports whether an update really changes what review
+// approved (D-40): the name, the address, the location or the phone. A field
+// sent with its current value is no change, so saving an unchanged form does
+// not take a live store off the map. newPhone is the normalised number sent.
+func (s *Service) profileChanged(cur businessdb.GetStoreRow, p businessdb.UpdateStoreProfileParams, newPhone string) (bool, error) {
+	text := func(set bool, next, now *string) bool {
+		return set && !equalText(next, now)
+	}
+	if (p.SetName && p.Name != cur.Name) ||
+		text(p.SetAddressLine1, p.AddressLine1, cur.AddressLine1) ||
+		text(p.SetAddressLine2, p.AddressLine2, cur.AddressLine2) ||
+		text(p.SetLandmark, p.Landmark, cur.Landmark) ||
+		text(p.SetLocality, p.Locality, cur.Locality) ||
+		text(p.SetCity, p.City, cur.City) ||
+		text(p.SetPincode, p.Pincode, cur.Pincode) {
+		return true, nil
+	}
+	if p.SetLocation {
+		if (p.Lat != nil) != cur.HasLocation {
+			return true, nil
+		}
+		if p.Lat != nil && (*p.Lat != cur.Lat || *p.Lng != cur.Lng) {
+			return true, nil
+		}
+	}
+	if p.SetPhone {
+		if (p.PhoneEnc != nil) != (cur.PhoneEnc != nil) {
+			return true, nil
+		}
+		if cur.PhoneEnc != nil {
+			old, err := s.storePhone(cur)
+			if err != nil {
+				return false, err
+			}
+			if old != newPhone {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
+}
+
+func equalText(a, b *string) bool {
+	if a == nil || b == nil {
+		return a == b
+	}
+	return *a == *b
 }
 
 // --- submit ----------------------------------------------------------------------

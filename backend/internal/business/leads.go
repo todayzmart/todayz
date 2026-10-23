@@ -31,9 +31,11 @@ var errNoHuman = errors.New("business: the Turnstile check is not configured")
 func leadText(s string) string { return strings.Join(strings.Fields(strings.ToLower(s)), " ") }
 
 // leadHash is the keyed hash the 24-hour dedupe compares (no lead detail is
-// stored in clear in it).
-func leadHash(h *pii.Hasher, e164, name, shop, city string) []byte {
-	return h.Sum("lead:" + e164 + "\x00" + leadText(name) + "\x00" + leadText(shop) + "\x00" + leadText(city))
+// stored in clear in it). The source is part of it: the same shop arriving
+// from two forms is two leads.
+func leadHash(h *pii.Hasher, e164, name, shop, city, source string) []byte {
+	return h.Sum("lead:" + e164 + "\x00" + leadText(name) + "\x00" + leadText(shop) + "\x00" + leadText(city) +
+		"\x00" + leadText(source))
 }
 
 // createLead stores the site's lead form after the Turnstile check. A repeat
@@ -68,7 +70,7 @@ func (s *Service) createLead(ctx context.Context, body *publicapi.LeadCreate) er
 	if err := v.err(); err != nil {
 		return err
 	}
-	hash := leadHash(s.hash, e164, body.Name, body.ShopName, body.City)
+	hash := leadHash(s.hash, e164, body.Name, body.ShopName, body.City, body.Source)
 	return s.db.InTx(ctx, func(ctx context.Context) error {
 		q := s.q(ctx)
 		if err := q.LockKey(ctx, "lead:"+hex.EncodeToString(hash)); err != nil {
@@ -82,12 +84,13 @@ func (s *Service) createLead(ctx context.Context, body *publicapi.LeadCreate) er
 		if seen {
 			return nil
 		}
-		enc, err := s.seal.Seal(FieldPhone, []byte(e164))
+		id := ids.New(now)
+		enc, err := s.seal.Seal(SealField(FieldPhone, id), []byte(e164))
 		if err != nil {
 			return fmt.Errorf("business: seal lead phone: %w", err)
 		}
 		return q.InsertLead(ctx, businessdb.InsertLeadParams{
-			ID: ids.UUID(ids.New(now)), Name: body.Name, PhoneEnc: enc, ShopName: body.ShopName,
+			ID: ids.UUID(id), Name: body.Name, PhoneEnc: enc, ShopName: body.ShopName,
 			City: body.City, Source: body.Source, DetailsHash: hash, Now: now,
 		})
 	})

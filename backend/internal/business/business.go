@@ -256,20 +256,42 @@ func OwnsActiveBusiness(ctx context.Context, d *db.DB, userID ids.ID) (bool, err
 
 // Status values (03 businesses.status, stores.status, staff.role/status).
 const (
-	businessDraft     = "draft"
-	businessNeedsInfo = "needs_info"
-	businessVerified  = "verified"
-	storeDraft        = "draft"
-	storeLive         = "live"
-	staffActive       = "active"
-	staffInvited      = "invited"
-	staffRemoved      = "removed"
-	roleOwner         = "owner"
-	roleManager       = "manager"
-	roleCashier       = "cashier"
+	businessDraft      = "draft"
+	businessNeedsInfo  = "needs_info"
+	businessVerified   = "verified"
+	businessRejected   = "rejected"
+	businessSuspended  = "suspended"
+	storeDraft         = "draft"
+	storeLive          = "live"
+	storePaused        = "paused"
+	storePendingReview = "pending_review"
+	staffActive        = "active"
+	staffInvited       = "invited"
+	staffRemoved       = "removed"
+	roleOwner          = "owner"
+	roleManager        = "manager"
+	roleCashier        = "cashier"
 )
 
 // --- helpers ---------------------------------------------------------------
+
+// businessOpen refuses a change to a rejected or suspended business's stores
+// or KYC with 409 invalid_transition. It must run inside the change's
+// transaction: the status stays locked (FOR SHARE) until it commits. An
+// unknown business is 404 (authz has normally answered that already).
+func (s *Service) businessOpen(ctx context.Context, bid ids.ID) error {
+	st, err := s.q(ctx).BusinessStatusForShare(ctx, ids.UUID(bid))
+	if db.IsNoRows(err) {
+		return problem.New(genproblems.NotFound, "")
+	}
+	if err != nil {
+		return fmt.Errorf("business: status: %w", err)
+	}
+	if st == businessRejected || st == businessSuspended {
+		return problem.New(genproblems.InvalidTransition, "the business is "+st)
+	}
+	return nil
+}
 
 // principal is the signed-in caller; anonymous is 401.
 func principal(ctx context.Context) (authn.Principal, error) {

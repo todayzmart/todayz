@@ -184,7 +184,9 @@ CREATE TRIGGER trg_stores_touch BEFORE UPDATE ON stores
 
 ------------------------------------------------------------------------------
 -- business_documents: files in the private bucket (D-46). The row is made
--- when the upload URL is issued; an admin accepts or rejects it.
+-- 'pending' when the upload URL is issued, with the size the client declared
+-- (the presigned PUT signs it); 'uploaded' once the object is confirmed; an
+-- admin accepts or rejects it.
 ------------------------------------------------------------------------------
 CREATE TABLE business_documents (
   id            uuid PRIMARY KEY,
@@ -193,7 +195,8 @@ CREATE TABLE business_documents (
   kind          text NOT NULL,
   object_key    text NOT NULL,
   content_type  text NOT NULL,
-  status        text NOT NULL DEFAULT 'uploaded',
+  size_bytes    bigint NOT NULL,
+  status        text NOT NULL DEFAULT 'pending',
   reviewed_by   uuid,
   reviewed_at   timestamptz,
   reject_reason text,
@@ -203,13 +206,15 @@ CREATE TABLE business_documents (
   CONSTRAINT fk_business_documents_business_id FOREIGN KEY (business_id) REFERENCES businesses (id),
   CONSTRAINT fk_business_documents_store_id FOREIGN KEY (store_id) REFERENCES stores (id),
   CONSTRAINT ck_business_documents_kind CHECK (kind IN ('pan','gst','shop_photo','storefront','license','other')),
-  CONSTRAINT ck_business_documents_status CHECK (status IN ('uploaded','accepted','rejected')),
+  CONSTRAINT ck_business_documents_status CHECK (status IN ('pending','uploaded','accepted','rejected')),
+  CONSTRAINT ck_business_documents_size CHECK (size_bytes > 0),
   CONSTRAINT ck_business_documents_content_type CHECK (content_type IN ('image/jpeg','image/png','image/webp','application/pdf')),
   CONSTRAINT ck_business_documents_object_key CHECK (char_length(object_key) BETWEEN 1 AND 512),
   CONSTRAINT ck_business_documents_reject_reason CHECK (reject_reason IS NULL OR char_length(reject_reason) <= 500)
 );
 CREATE UNIQUE INDEX ux_business_documents_object_key ON business_documents (object_key);
 CREATE INDEX ix_business_documents_business_id ON business_documents (business_id, created_at DESC);
+CREATE INDEX ix_business_documents_kind ON business_documents (business_id, kind) WHERE status <> 'rejected';
 CREATE INDEX ix_business_documents_store_id ON business_documents (store_id) WHERE store_id IS NOT NULL;
 CREATE INDEX ix_business_documents_reviewed_by ON business_documents (reviewed_by) WHERE reviewed_by IS NOT NULL;
 CREATE TRIGGER trg_business_documents_touch BEFORE UPDATE ON business_documents
@@ -220,7 +225,8 @@ CREATE TRIGGER trg_business_documents_touch BEFORE UPDATE ON business_documents
 -- means every store. An invite is a row in status 'invited'; user_id is set
 -- when the phone already has an account, else when the invitee accepts. The
 -- invited phone is kept sealed (masked in the staff list) and hashed (to
--- find the invite and refuse a duplicate). One live owner per business.
+-- find the invite and refuse a duplicate). invited_at starts the invite's
+-- expiry clock (a re-invite restarts it). One live owner per business.
 ------------------------------------------------------------------------------
 CREATE TABLE staff (
   id                uuid PRIMARY KEY,
@@ -233,6 +239,7 @@ CREATE TABLE staff (
   status            text NOT NULL DEFAULT 'invited',
   invite_phone_hash bytea,
   invite_phone_enc  bytea,
+  invited_at        timestamptz,
   removed_at        timestamptz,
   created_at        timestamptz NOT NULL DEFAULT now(),
   updated_at        timestamptz NOT NULL DEFAULT now(),
@@ -242,6 +249,7 @@ CREATE TABLE staff (
   CONSTRAINT ck_staff_status CHECK (status IN ('invited','active','removed')),
   CONSTRAINT ck_staff_active_user CHECK (status <> 'active' OR user_id IS NOT NULL),
   CONSTRAINT ck_staff_invite CHECK (status <> 'invited' OR user_id IS NOT NULL OR invite_phone_hash IS NOT NULL),
+  CONSTRAINT ck_staff_invited_at CHECK (status <> 'invited' OR invited_at IS NOT NULL),
   CONSTRAINT ck_staff_removed CHECK ((status = 'removed') = (removed_at IS NOT NULL)),
   CONSTRAINT ck_staff_owner_stores CHECK (role <> 'owner' OR store_ids IS NULL),
   CONSTRAINT ck_staff_store_ids CHECK (store_ids IS NULL OR cardinality(store_ids) BETWEEN 1 AND 100),

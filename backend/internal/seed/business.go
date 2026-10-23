@@ -292,7 +292,7 @@ func seedbusiness(ctx context.Context, d Deps, _ Profile) error {
 		var phone []byte
 		if s.OwnerLine && seal != nil {
 			e164 := identityPhone("staff.owner")
-			if phone, err = seal.Seal(business.FieldPhone, []byte(e164)); err != nil {
+			if phone, err = seal.Seal(business.SealField(business.FieldPhone, mustID(s.ID)), []byte(e164)); err != nil {
 				return fmt.Errorf("store %s: %w", s.Key, err)
 			}
 		}
@@ -353,7 +353,7 @@ func seedKYCRow(ctx context.Context, d Deps, seal *pii.Sealer, b seedBusiness, v
 	}
 	sealed := map[string][]byte{}
 	for field, v := range map[string]string{business.FieldPAN: k.PAN, business.FieldUPI: k.UPI, business.FieldBankAccount: k.Bank} {
-		enc, err := seal.Seal(field, []byte(v))
+		enc, err := seal.Seal(business.SealField(field, mustID(b.ID)), []byte(v))
 		if err != nil {
 			return fmt.Errorf("business %s: kyc: %w", b.Key, err)
 		}

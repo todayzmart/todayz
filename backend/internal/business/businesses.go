@@ -152,7 +152,9 @@ func (s *Service) listBusinesses(ctx context.Context) (businessapi.BusinessList,
 		}
 		out.Items = append(out.Items, item)
 	}
-	invites, err := q.ListMyInvitations(ctx, uid)
+	invites, err := q.ListMyInvitations(ctx, businessdb.ListMyInvitationsParams{
+		UserID: uid, ExpiredBefore: s.clock.Now().Add(-inviteTTL),
+	})
 	if err != nil {
 		return businessapi.BusinessList{}, fmt.Errorf("business: invitations: %w", err)
 	}

@@ -57,13 +57,16 @@ func newPresigner(c config.Storage) *presigner {
 	}
 }
 
-// putURL is a presigned path-style PUT of key with the given Content-Type,
-// which is signed: the upload must send exactly that header.
-func (p *presigner) putURL(key, contentType string, now time.Time) string {
+// putURL is a presigned path-style PUT of key with the given Content-Type
+// and Content-Length, both signed: the upload must send exactly those
+// headers, so it can be neither another type nor a larger file.
+func (p *presigner) putURL(key, contentType string, size int64, now time.Time) string {
 	return presignURL(presignInput{
 		Method: "PUT", Scheme: p.scheme, Host: p.host, Path: "/" + p.bucket + "/" + key,
 		Region: storageRegion, AccessKey: p.accessKey, SecretKey: p.secretKey,
-		Time: now, Expires: uploadTTL, Headers: map[string]string{"content-type": contentType},
+		Time: now, Expires: uploadTTL, Headers: map[string]string{
+			"content-type": contentType, "content-length": strconv.FormatInt(size, 10),
+		},
 	})
 }
 

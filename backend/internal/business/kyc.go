@@ -20,9 +20,9 @@ const (
 	kycSubmitted = "submitted"
 )
 
-// Sealing field names: the AAD that binds a sealed value to its column. The
-// seed (internal/seed) seals with the same names, so the service opens what
-// it wrote.
+// Sealing field names. A value is sealed under SealField(field, owner), never
+// the bare name, so it opens only in its own column of its own row. The seed
+// (internal/seed) seals the same way, so the service opens what it wrote.
 const (
 	FieldPAN         = "pan"
 	FieldGSTIN       = "gstin"
@@ -30,6 +30,16 @@ const (
 	FieldBankAccount = "bank_account"
 	FieldPhone       = "phone"
 )
+
+// identityPhoneField is identity's AAD for phone_identities.phone_enc (the
+// account's phone, shown masked for an active staff member).
+const identityPhoneField = "phone"
+
+// SealField is the additional data a business value is sealed under: the
+// field name and the id of the row that owns it (the business for KYC; the
+// store, staff row or lead for a phone). A sealed value copied into another
+// business's row, or into another column, does not open.
+func SealField(field string, owner ids.ID) string { return field + ":" + owner.String() }
 
 // --- PAN and GSTIN -------------------------------------------------------------
 
@@ -132,8 +142,15 @@ func toKyc(k businessdb.BusinessKyc, grant authz.Grant) businessapi.Kyc {
 	return out
 }
 
-// kycRow reads the business's KYC row, creating the empty one a business
-// made before W1-04 (or by hand) may lack.
+// emptyKyc is the view of a business that has no KYC row yet (one made
+// before W1-04, or by hand): nothing given, version 1 like a new row.
+func emptyKyc(bid ids.ID) businessdb.BusinessKyc {
+	return businessdb.BusinessKyc{BusinessID: ids.UUID(bid), Status: kycMissing, Version: 1}
+}
+
+// kycRow reads the business's KYC row for a change, creating the empty one a
+// business made before W1-04 (or by hand) may lack. Only a write calls it: a
+// read answers emptyKyc instead of inserting.
 func (s *Service) kycRow(ctx context.Context, bid ids.ID) (businessdb.BusinessKyc, error) {
 	q := s.q(ctx)
 	k, err := q.GetKyc(ctx, ids.UUID(bid))
@@ -161,9 +178,12 @@ func (s *Service) getKyc(ctx context.Context, bidStr string) (businessapi.Kyc, i
 	if err != nil {
 		return businessapi.Kyc{}, 0, err
 	}
-	k, err := s.kycRow(ctx, bid)
+	k, err := s.q(ctx).GetKyc(ctx, ids.UUID(bid))
+	if db.IsNoRows(err) {
+		k, err = emptyKyc(bid), nil
+	}
 	if err != nil {
-		return businessapi.Kyc{}, 0, err
+		return businessapi.Kyc{}, 0, fmt.Errorf("business: kyc: %w", err)
 	}
 	return toKyc(k, dec.Grant), k.Version, nil
 }
@@ -219,6 +239,9 @@ func (s *Service) putKyc(ctx context.Context, bidStr string, ifMatchHdr *string,
 
 	var out businessdb.BusinessKyc
 	err = s.db.InTx(ctx, func(ctx context.Context) error {
+		if err := s.businessOpen(ctx, bid); err != nil {
+			return err
+		}
 		cur, err := s.kycRow(ctx, bid)
 		if err != nil {
 			return err
@@ -226,7 +249,7 @@ func (s *Service) putKyc(ctx context.Context, bidStr string, ifMatchHdr *string,
 		if cur.Version != version {
 			return problem.New(genproblems.PreconditionFailed, "")
 		}
-		params, changed, err := s.mergeKyc(ctx, cur, body)
+		params, changed, err := s.mergeKyc(ctx, bid, cur, body)
 		if err != nil {
 			return err
 		}
@@ -249,7 +272,7 @@ func (s *Service) putKyc(ctx context.Context, bidStr string, ifMatchHdr *string,
 
 // mergeKyc applies the body to the current row: validates, seals and works
 // out the last 4s and the status. changed lists the field names sent.
-func (s *Service) mergeKyc(ctx context.Context, cur businessdb.BusinessKyc, body *businessapi.KycUpdate) (businessdb.UpdateKycParams, []string, error) {
+func (s *Service) mergeKyc(ctx context.Context, bid ids.ID, cur businessdb.BusinessKyc, body *businessapi.KycUpdate) (businessdb.UpdateKycParams, []string, error) {
 	var v invalid
 	var changed []string
 	params := businessdb.UpdateKycParams{
@@ -269,7 +292,7 @@ func (s *Service) mergeKyc(ctx context.Context, cur businessdb.BusinessKyc, body
 			v.add("body.pan", "must be a PAN")
 		}
 	case !sent(ctx, "pan") && cur.PanEnc != nil:
-		plain, err := s.seal.Open(FieldPAN, cur.PanEnc)
+		plain, err := s.seal.Open(SealField(FieldPAN, bid), cur.PanEnc)
 		if err != nil {
 			return params, nil, fmt.Errorf("business: open pan: %w", err)
 		}
@@ -277,7 +300,7 @@ func (s *Service) mergeKyc(ctx context.Context, cur businessdb.BusinessKyc, body
 	}
 
 	seal := func(field, value string, l4 *string) (sealedField, error) {
-		enc, err := s.seal.Seal(field, []byte(value))
+		enc, err := s.seal.Seal(SealField(field, bid), []byte(value))
 		if err != nil {
 			return sealedField{}, fmt.Errorf("business: seal %s: %w", field, err)
 		}
@@ -315,7 +338,7 @@ func (s *Service) mergeKyc(ctx context.Context, cur businessdb.BusinessKyc, body
 		}
 	} else if gstinNow && sent(ctx, "pan") && pan != "" {
 		// The PAN changed under a kept GSTIN: they must still agree.
-		plain, err := s.seal.Open(FieldGSTIN, cur.GstinEnc)
+		plain, err := s.seal.Open(SealField(FieldGSTIN, bid), cur.GstinEnc)
 		if err != nil {
 			return params, nil, fmt.Errorf("business: open gstin: %w", err)
 		}

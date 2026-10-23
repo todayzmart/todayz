@@ -162,20 +162,28 @@ func TestBusinessSeed(t *testing.T) {
 	require.Equal(t, 5000, radius)
 	require.Equal(t, 200, cashback)
 
-	// Sealed values open with the service's field names.
+	// Sealed values open with the service's field names, bound to their row.
 	seal, err := pii.NewSealer(keys.PIIEncKey.Bytes())
 	require.NoError(t, err)
 	var phone []byte
 	require.NoError(t, tdb.Pool.QueryRow(ctx, `SELECT phone_enc FROM stores WHERE id = $1`, ids.UUID(storeSeedID("SL"))).Scan(&phone))
-	plain, err := seal.Open(business.FieldPhone, phone)
+	plain, err := seal.Open(business.SealField(business.FieldPhone, storeSeedID("SL")), phone)
 	require.NoError(t, err)
 	require.Equal(t, identityPhone("staff.owner"), string(plain))
 	var pan []byte
 	var panLast4, status string
 	require.NoError(t, tdb.Pool.QueryRow(ctx, `SELECT pan_enc, pan_last4, status FROM business_kyc WHERE business_id = $1`,
 		ids.UUID(businessSeedID("lakshmi"))).Scan(&pan, &panLast4, &status))
-	plain, err = seal.Open(business.FieldPAN, pan)
+	plain, err = seal.Open(business.SealField(business.FieldPAN, businessSeedID("lakshmi")), pan)
 	require.NoError(t, err)
+	// Bound to that business: the bare field name or another business's id
+	// does not open it.
+	_, err = seal.Open(business.FieldPAN, pan)
+	require.ErrorIs(t, err, pii.ErrOpen)
+	other := seedBusinesses[len(seedBusinesses)-1].Key
+	require.NotEqual(t, "lakshmi", other)
+	_, err = seal.Open(business.SealField(business.FieldPAN, businessSeedID(other)), pan)
+	require.ErrorIs(t, err, pii.ErrOpen)
 	require.Equal(t, "verified", status)
 	require.Equal(t, string(plain[len(plain)-4:]), panLast4)
 

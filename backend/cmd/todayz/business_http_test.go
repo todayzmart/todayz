@@ -134,6 +134,9 @@ const (
 	strangerPhone = "+919000000014"
 	cashier2Phone = "+919000000016"
 	manager2Phone = "+919000000017"
+	// s2CashierPhone never signs in; otherOwnerPhone owns a second business.
+	s2CashierPhone  = "+919000000018"
+	otherOwnerPhone = "+919000000019"
 )
 
 var fullHours = map[string]any{
@@ -250,6 +253,41 @@ func TestBusinessHTTP(t *testing.T) {
 	mgrStaff := r.body["id"].(string)
 	r = a.call(owner, http.MethodPost, B+"/staff", map[string]any{"phone": managerPhone, "role": "cashier"}, nil)
 	require.Equal(t, http.StatusConflict, r.code, "one invite per phone: %s", r.raw)
+
+	// An invite does not reveal who holds the phone (review H1). The stranger
+	// has an account (they signed in to the customer app) with a name; the
+	// invite is bound to it, yet shows neither its id nor its name.
+	r = a.call(owner, http.MethodPost, B+"/staff", map[string]any{"phone": strangerPhone, "role": "cashier"}, nil)
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	strangerInvite := r.body["id"].(string)
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM staff WHERE id = $1 AND user_id IS NOT NULL`, uuidOf(t, strangerInvite)), "the invite is bound to the account")
+	require.Nil(t, r.body["userId"], r.raw)
+	require.Nil(t, r.body["name"], r.raw)
+	require.Equal(t, "90•••••014", r.body["phoneMasked"], r.raw)
+	require.NotNil(t, r.body["inviteExpiresAt"], r.raw)
+	_, err = a.tdb.OwnerPool.Exec(context.Background(),
+		`UPDATE users SET name = 'Hidden Holder' WHERE id = (SELECT user_id FROM staff WHERE id = $1)`, uuidOf(t, strangerInvite))
+	require.NoError(t, err)
+	r = a.call(owner, http.MethodPatch, B+"/staff/"+strangerInvite, map[string]any{"canDeliver": true}, nil)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.Nil(t, r.body["userId"], r.raw)
+	require.NotContains(t, r.raw, "Hidden Holder")
+	r = a.call(owner, http.MethodGet, B+"/staff", nil, nil)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.NotContains(t, r.raw, "Hidden Holder", "the staff list hides the invited account too")
+	found := false
+	for _, it := range r.body["items"].([]any) {
+		m := it.(map[string]any)
+		if m["id"] == strangerInvite {
+			found = true
+			require.Nil(t, m["userId"], r.raw)
+			require.Nil(t, m["name"], r.raw)
+			require.Equal(t, "90•••••014", m["phoneMasked"], r.raw)
+		}
+	}
+	require.True(t, found, r.raw)
+	r = a.call(owner, http.MethodDelete, B+"/staff/"+strangerInvite, nil, nil)
+	require.Equal(t, http.StatusNoContent, r.code, r.raw)
 
 	r = a.call(owner, http.MethodPost, B+"/stores", map[string]any{"name": "Lakshmi Traders", "locality": "Jayanagar"}, nil)
 	require.Equal(t, http.StatusCreated, r.code, r.raw)
@@ -369,6 +407,24 @@ func TestBusinessHTTP(t *testing.T) {
 	require.NotEqual(t, cash2Staff, r.body["id"], "the removed invite kept no phone, so the new invite is a new row")
 	require.Equal(t, []any{sid}, r.body["storeIds"])
 
+	// A scoped manager acts only inside their stores (review): not on S2's
+	// profile or review, and not on a cashier of S2.
+	cur = a.call(owner, http.MethodGet, S2, nil, nil)
+	require.Equal(t, http.StatusOK, cur.code, cur.raw)
+	r = a.call(manager2, http.MethodPatch, S2, map[string]any{"name": "Renamed By Manager"}, ifMatch(cur))
+	require.Equal(t, http.StatusForbidden, r.code, "a scoped manager edits another store: %s", r.raw)
+	r = a.call(manager2, http.MethodPost, S2+"/submit", nil, nil)
+	require.Equal(t, http.StatusForbidden, r.code, "a scoped manager submits another store: %s", r.raw)
+	r = a.call(owner, http.MethodPost, B+"/staff", map[string]any{"phone": s2CashierPhone, "role": "cashier", "storeIds": []string{sid2}}, nil)
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	s2Cashier := r.body["id"].(string)
+	r = a.call(manager2, http.MethodDelete, B+"/staff/"+s2Cashier, nil, nil)
+	require.Equal(t, http.StatusForbidden, r.code, "a scoped manager removes a cashier of another store: %s", r.raw)
+	r = a.call(owner, http.MethodGet, S2, nil, nil)
+	require.Equal(t, "Lakshmi Traders", r.body["name"], "the refused edit changed nothing")
+	r = a.call(owner, http.MethodDelete, B+"/staff/"+s2Cashier, nil, nil)
+	require.Equal(t, http.StatusNoContent, r.code, r.raw)
+
 	// A member who signed in and was removed comes back on the same row.
 	r = a.call(owner, http.MethodDelete, B+"/staff/"+mgr2Staff, nil, nil)
 	require.Equal(t, http.StatusNoContent, r.code, r.raw)
@@ -381,9 +437,15 @@ func TestBusinessHTTP(t *testing.T) {
 
 	// --- KYC: format, checksum, encryption and visibility (SC-BZ-10…15) -----
 	K := B + "/kyc"
+	// A business made before its KYC row existed (the create makes one): a
+	// GET answers "missing" and writes nothing (review L4).
+	_, err = a.tdb.OwnerPool.Exec(context.Background(), `DELETE FROM business_kyc WHERE business_id = $1`, uuidOf(t, bid))
+	require.NoError(t, err)
 	cur = a.call(owner, http.MethodGet, K, nil, nil)
 	require.Equal(t, http.StatusOK, cur.code, cur.raw)
 	require.Equal(t, "missing", cur.body["status"])
+	require.Equal(t, 0, a.count(`SELECT count(*) FROM business_kyc WHERE business_id = $1`, uuidOf(t, bid)), "a GET writes nothing")
+	require.Equal(t, `"v1"`, cur.hdr.Get("ETag"))
 	r = a.call(owner, http.MethodPut, K, map[string]any{"pan": "ABCDE1234"}, ifMatch(cur))
 	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
 	require.Contains(t, fieldsOf(r), "body.pan")
@@ -448,25 +510,251 @@ func TestBusinessHTTP(t *testing.T) {
 	require.Equal(t, true, r.body["asksMuted"], "a field left out keeps its value")
 
 	// --- documents ---------------------------------------------------------
-	r = a.call(owner, http.MethodPost, B+"/documents", map[string]any{"kind": "pan", "contentType": "application/pdf"}, nil)
+	pan := map[string]any{"kind": "pan", "contentType": "application/pdf", "sizeBytes": 482113}
+	r = a.call(owner, http.MethodPost, B+"/documents", pan, nil)
 	require.Equal(t, http.StatusCreated, r.code, r.raw)
 	require.Equal(t, "no-store", r.hdr.Get("Cache-Control"))
+	require.Equal(t, "pending", r.body["document"].(map[string]any)["status"], "pending until the upload is confirmed")
 	up := r.body["upload"].(map[string]any)
 	require.Equal(t, "PUT", up["method"])
+	require.Equal(t, map[string]any{"Content-Type": "application/pdf", "Content-Length": "482113"}, up["headers"])
 	require.True(t, strings.HasPrefix(up["url"].(string), "http://127.0.0.1:9100/todayz-private/businesses/"+bid+"/documents/"), up["url"])
+	require.Contains(t, up["url"], "X-Amz-SignedHeaders=content-length%3Bcontent-type%3Bhost", "the size is signed (review M1)")
 	require.NotContains(t, r.raw, "test-secret-value")
-	r = a.call(owner, http.MethodPost, B+"/documents", map[string]any{"kind": "pan", "contentType": "application/pdf", "storeId": ids.New(a.clk.Now()).String()}, nil)
+	r = a.call(owner, http.MethodPost, B+"/documents", map[string]any{"kind": "pan", "contentType": "application/pdf", "sizeBytes": 1234, "storeId": ids.New(a.clk.Now()).String()}, nil)
 	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
+	for _, size := range []int64{0, 10<<20 + 1} {
+		r = a.call(owner, http.MethodPost, B+"/documents", map[string]any{"kind": "pan", "contentType": "application/pdf", "sizeBytes": size}, nil)
+		require.Equal(t, http.StatusUnprocessableEntity, r.code, "size %d: %s", size, r.raw)
+		require.Contains(t, fieldsOf(r), "body.sizeBytes", r.raw)
+	}
 	r = a.call(manager, http.MethodGet, B+"/documents", nil, nil)
 	require.Equal(t, http.StatusForbidden, r.code, "documents are KYC: %s", r.raw)
 	r = a.call(owner, http.MethodGet, B+"/documents", nil, nil)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.Len(t, r.body["items"], 1)
+	// At most 5 documents of a kind per business, pending ones included.
+	for range 4 {
+		r = a.call(owner, http.MethodPost, B+"/documents", pan, nil)
+		require.Equal(t, http.StatusCreated, r.code, r.raw)
+	}
+	r = a.call(owner, http.MethodPost, B+"/documents", pan, nil)
+	require.Equal(t, http.StatusConflict, r.code, "the sixth of a kind: %s", r.raw)
+	r = a.call(owner, http.MethodPost, B+"/documents", map[string]any{"kind": "gst", "contentType": "image/png", "sizeBytes": 1234}, nil)
+	require.Equal(t, http.StatusCreated, r.code, "another kind has its own cap: %s", r.raw)
+	require.Equal(t, 6, a.count(`SELECT count(*) FROM business_documents WHERE business_id = $1`, uuidOf(t, bid)))
 
 	// --- nothing personal in the audit log ---------------------------------
 	for _, p := range []string{ownerPhone, managerPhone, cashierPhone, cashier2Phone, manager2Phone, "+919000000021", "9th Main"} {
 		require.Equal(t, 0, a.count(`SELECT count(*) FROM audit_log WHERE coalesce(before::text, '') || coalesce(after::text, '') LIKE '%' || $1 || '%'`, p), p)
 	}
+}
+
+// newBusiness creates a draft business with one store as the token's owner
+// and returns their ids.
+func (a *bizAPI) newBusiness(token, brand string) (bid, sid string) {
+	a.t.Helper()
+	r := a.call(token, http.MethodPost, "/v1/biz/businesses", map[string]any{"brandName": brand}, nil)
+	require.Equal(a.t, http.StatusCreated, r.code, r.raw)
+	bid = r.body["id"].(string)
+	r = a.call(token, http.MethodPost, "/v1/biz/businesses/"+bid+"/stores", map[string]any{"name": brand, "locality": "Jayanagar"}, nil)
+	require.Equal(a.t, http.StatusCreated, r.code, r.raw)
+	return bid, r.body["id"].(string)
+}
+
+func (a *bizAPI) exec(sql string, args ...any) {
+	a.t.Helper()
+	_, err := a.tdb.OwnerPool.Exec(context.Background(), sql, args...)
+	require.NoError(a.t, err)
+}
+
+// TestBusinessTenancyHTTP: the owner of one business reaches nothing of
+// another, by its paths or by mixing its store into their own business's path
+// (review).
+func TestBusinessTenancyHTTP(t *testing.T) {
+	if testing.Short() {
+		t.Skip("needs the database")
+	}
+	a := newBizAPI(t)
+	ownerX := a.signIn(ownerPhone, "business")
+	ownerY := a.signIn(otherOwnerPhone, "business")
+	bx, _ := a.newBusiness(ownerX, "Lakshmi Traders")
+	by, sy := a.newBusiness(ownerY, "Ganesh Stores")
+	X, Y := "/v1/biz/businesses/"+bx, "/v1/biz/businesses/"+by
+
+	kyc := a.call(ownerY, http.MethodGet, Y+"/kyc", nil, nil)
+	require.Equal(t, http.StatusOK, kyc.code, kyc.raw)
+	store := a.call(ownerY, http.MethodGet, Y+"/stores/"+sy, nil, nil)
+	require.Equal(t, http.StatusOK, store.code, store.raw)
+	for _, c := range []struct {
+		method, path string
+		body         any
+		hdr          map[string]string
+	}{
+		{http.MethodGet, Y, nil, nil},
+		{http.MethodGet, Y + "/kyc", nil, nil},
+		{http.MethodPut, Y + "/kyc", map[string]any{"upiId": "intruder@okaxis"}, ifMatch(kyc)},
+		{http.MethodGet, Y + "/staff", nil, nil},
+		{http.MethodPost, Y + "/staff", map[string]any{"phone": cashierPhone, "role": "cashier"}, nil},
+		{http.MethodGet, Y + "/stores", nil, nil},
+		{http.MethodGet, Y + "/stores/" + sy, nil, nil},
+		{http.MethodPatch, Y + "/stores/" + sy, map[string]any{"name": "Taken Over"}, ifMatch(store)},
+		{http.MethodGet, Y + "/stores/" + sy + "/settings", nil, nil},
+		{http.MethodGet, Y + "/documents", nil, nil},
+		// Y's store under X's business, where the caller is the owner.
+		{http.MethodGet, X + "/stores/" + sy, nil, nil},
+		{http.MethodPatch, X + "/stores/" + sy, map[string]any{"name": "Taken Over"}, ifMatch(store)},
+		{http.MethodPost, X + "/stores/" + sy + "/submit", nil, nil},
+		{http.MethodGet, X + "/stores/" + sy + "/settings", nil, nil},
+		{http.MethodPatch, X + "/stores/" + sy + "/settings", map[string]any{"asksMuted": true}, nil},
+		{http.MethodPost, X + "/staff", map[string]any{"phone": cashierPhone, "role": "cashier", "storeIds": []string{sy}}, nil},
+	} {
+		r := a.call(ownerX, c.method, c.path, c.body, c.hdr)
+		require.Contains(t, []int{http.StatusForbidden, http.StatusNotFound, http.StatusUnprocessableEntity}, r.code, "%s %s: %s", c.method, c.path, r.raw)
+		if strings.HasPrefix(c.path, Y) {
+			require.Contains(t, []int{http.StatusForbidden, http.StatusNotFound}, r.code, "%s %s: %s", c.method, c.path, r.raw)
+		}
+	}
+	r := a.call(ownerY, http.MethodGet, Y+"/stores/"+sy, nil, nil)
+	require.Equal(t, "Ganesh Stores", r.body["name"], "nothing of Y changed")
+	require.Equal(t, 0, a.count(`SELECT count(*) FROM business_kyc WHERE status <> 'missing'`))
+	require.Equal(t, 0, a.count(`SELECT count(*) FROM staff WHERE role <> 'owner'`))
+}
+
+// TestStoreReviewHTTP: a change to what review approved sends a live or
+// paused store back to review, and a rejected or suspended business takes no
+// store or KYC changes (review M4).
+func TestStoreReviewHTTP(t *testing.T) {
+	if testing.Short() {
+		t.Skip("needs the database")
+	}
+	a := newBizAPI(t)
+	owner := a.signIn(ownerPhone, "business")
+	bid, sid := a.newBusiness(owner, "Lakshmi Traders")
+	B := "/v1/biz/businesses/" + bid
+	S := B + "/stores/" + sid
+	profile := map[string]any{
+		"name": "Lakshmi Traders", "addressLine1": "12, 9th Main", "city": "Bengaluru", "pincode": "560041",
+		"location": map[string]float64{"lat": 12.925, "lng": 77.583}, "phone": "+919000000021",
+	}
+	cur := a.call(owner, http.MethodGet, S, nil, nil)
+	r := a.call(owner, http.MethodPatch, S, profile, ifMatch(cur))
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.Equal(t, "draft", r.body["status"], "a draft stays a draft")
+
+	patch := func(body map[string]any) resp {
+		t.Helper()
+		cur := a.call(owner, http.MethodGet, S, nil, nil)
+		r := a.call(owner, http.MethodPatch, S, body, ifMatch(cur))
+		require.Equal(t, http.StatusOK, r.code, r.raw)
+		return r
+	}
+	for _, c := range []struct {
+		from string
+		body map[string]any
+	}{
+		{"live", map[string]any{"name": "Lakshmi Traders & Sons"}},
+		{"live", map[string]any{"addressLine1": "14, 9th Main"}},
+		{"live", map[string]any{"location": map[string]float64{"lat": 12.926, "lng": 77.583}}},
+		{"live", map[string]any{"phone": "+919000000022"}},
+		{"paused", map[string]any{"pincode": "560011"}},
+	} {
+		a.exec(`UPDATE stores SET status = $2, live_at = now() WHERE id = $1`, uuidOf(t, sid), c.from)
+		r = patch(profile)
+		require.Equal(t, c.from, r.body["status"], "the same values change nothing: %v", c.body)
+		r = patch(c.body)
+		require.Equal(t, "pending_review", r.body["status"], "%v", c.body)
+		patch(profile)
+	}
+	require.Equal(t, 5, a.count(`SELECT count(*) FROM audit_log WHERE action = 'store.update'
+		AND before->>'status' IN ('live', 'paused') AND after->>'status' = 'pending_review'`))
+
+	kyc := a.call(owner, http.MethodGet, B+"/kyc", nil, nil)
+	require.Equal(t, http.StatusOK, kyc.code, kyc.raw)
+	for _, status := range []string{"suspended", "rejected"} {
+		a.exec(`UPDATE businesses SET status = $2 WHERE id = $1`, uuidOf(t, bid), status)
+		r = a.call(owner, http.MethodPost, B+"/stores", map[string]any{"name": "Second Shop"}, nil)
+		require.Equal(t, http.StatusConflict, r.code, "%s: %s", status, r.raw)
+		require.Equal(t, "invalid_transition", r.body["code"], r.raw)
+		cur = a.call(owner, http.MethodGet, S, nil, nil)
+		r = a.call(owner, http.MethodPatch, S, map[string]any{"name": "Renamed"}, ifMatch(cur))
+		require.Equal(t, http.StatusConflict, r.code, "%s: %s", status, r.raw)
+		require.Equal(t, "invalid_transition", r.body["code"], r.raw)
+		r = a.call(owner, http.MethodPut, B+"/kyc", map[string]any{"upiId": "lakshmitraders@okaxis"}, ifMatch(kyc))
+		require.Equal(t, http.StatusConflict, r.code, "%s: %s", status, r.raw)
+		require.Equal(t, "invalid_transition", r.body["code"], r.raw)
+	}
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM stores WHERE business_id = $1`, uuidOf(t, bid)))
+	require.Equal(t, 0, a.count(`SELECT count(*) FROM business_kyc WHERE status <> 'missing'`))
+}
+
+// TestStaffInvitesHTTP: invites lapse after 7 days and can be sent again
+// (review M2), and two invites of one phone at once give one invite (review).
+func TestStaffInvitesHTTP(t *testing.T) {
+	if testing.Short() {
+		t.Skip("needs the database")
+	}
+	a := newBizAPI(t)
+	owner := a.signIn(ownerPhone, "business")
+	bid, _ := a.newBusiness(owner, "Lakshmi Traders")
+	B := "/v1/biz/businesses/" + bid
+
+	// Two invites of the same phone at once: one 201, one 409.
+	codes := make(chan int, 2)
+	start := make(chan struct{})
+	for range 2 {
+		go func() {
+			<-start
+			codes <- a.call(owner, http.MethodPost, B+"/staff", map[string]any{"phone": cashier2Phone, "role": "cashier"}, nil).code
+		}()
+	}
+	close(start)
+	got := []int{<-codes, <-codes}
+	require.ElementsMatch(t, []int{http.StatusCreated, http.StatusConflict}, got)
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM staff WHERE status = 'invited'`))
+
+	// A user-bound invite: the manager has an account.
+	manager := a.signIn(managerPhone, "business")
+	r := a.call(owner, http.MethodPost, B+"/staff", map[string]any{"phone": managerPhone, "role": "manager"}, nil)
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	mgr := r.body["id"].(string)
+	// A phone-only invite: the cashier signs in later.
+	r = a.call(owner, http.MethodPost, B+"/staff", map[string]any{"phone": cashierPhone, "role": "cashier"}, nil)
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	cash := r.body["id"].(string)
+	exp, err := time.Parse(time.RFC3339, r.body["inviteExpiresAt"].(string))
+	require.NoError(t, err)
+	require.Equal(t, a.clk.Now().Add(7*24*time.Hour).Truncate(time.Second), exp.Truncate(time.Second))
+
+	// Seven days and a second later both have lapsed.
+	a.exec(`UPDATE staff SET invited_at = invited_at - interval '7 days 1 second' WHERE status = 'invited'`)
+	r = a.call(manager, http.MethodGet, "/v1/biz/businesses", nil, nil)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.Empty(t, r.body["invitations"], "a lapsed invite is not listed")
+	r = a.call(manager, http.MethodPost, B+"/staff/"+mgr+"/accept", nil, nil)
+	require.Equal(t, http.StatusNotFound, r.code, "a lapsed invite is not accepted: %s", r.raw)
+	cashier := a.signIn(cashierPhone, "business")
+	r = a.call(cashier, http.MethodPost, B+"/staff/"+cash+"/accept", nil, nil)
+	require.Equal(t, http.StatusNotFound, r.code, "a lapsed invite is not accepted: %s", r.raw)
+
+	// Inviting again restarts the clock: the account's row is taken up again,
+	// a phone-only invite is withdrawn and a new one made for whoever holds
+	// the phone now.
+	r = a.call(owner, http.MethodPost, B+"/staff", map[string]any{"phone": managerPhone, "role": "manager"}, nil)
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	require.Equal(t, mgr, r.body["id"])
+	r = a.call(owner, http.MethodPost, B+"/staff", map[string]any{"phone": cashierPhone, "role": "cashier"}, nil)
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	require.NotEqual(t, cash, r.body["id"])
+	cash2 := r.body["id"].(string)
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM staff WHERE id = $1 AND status = 'removed' AND invite_phone_hash IS NULL`, uuidOf(t, cash)))
+	r = a.call(manager, http.MethodGet, "/v1/biz/businesses", nil, nil)
+	require.Len(t, r.body["invitations"], 1)
+	r = a.call(manager, http.MethodPost, B+"/staff/"+mgr+"/accept", nil, nil)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.NotNil(t, r.body["userId"], "an accepted member shows their account")
+	r = a.call(cashier, http.MethodPost, B+"/staff/"+cash2+"/accept", nil, nil)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
 }
 
 // TestLeadsHTTP: the site's lead form (04 §2.5) answers 202 and stores the
