@@ -88,8 +88,11 @@ DiscoverSummary:
 DiscoverStoreCard:
   type: object
   description: A shop in the list or in a search result (D-41, D-101).
-  required: [storeSlug, name, locality, distanceM, open, pickup, delivery, bookable, rating, ratingCount, cashbackPct, categoryTint]
+  required: [storeId, storeSlug, name, locality, distanceM, open, pickup, delivery, bookable, rating, ratingCount, cashbackPct, categoryTint]
   properties:
+    storeId:
+      $ref: ./common.yaml#/Ulid
+      description: The id checkout and the cart use (CheckoutQuoteRequest.storeId).
     storeSlug:
       $ref: ./common.yaml#/Slug
     name:
@@ -334,8 +337,11 @@ DiscoverStorePage:
     The shop page (C-07): a live store of a verified business. Never the phone
     number or the stock counts. `distanceM` is set when the request carries
     `lat` and `lng`.
-  required: [storeSlug, name, locality, addressLine1, addressLine2, landmark, city, pincode, lat, lng, distanceM, open, closedUntil, hours, pickup, delivery, bookable, rating, ratingCount, cashbackPct, categoryTint, deliveryFeePaise, deliveryFreeAbovePaise, deliveryMinOrderPaise, deliveryRadiusM, serverNow]
+  required: [storeId, storeSlug, name, locality, addressLine1, addressLine2, landmark, city, pincode, lat, lng, distanceM, open, closedUntil, hours, pickup, delivery, bookable, rating, ratingCount, cashbackPct, categoryTint, deliveryFeePaise, deliveryFreeAbovePaise, deliveryMinOrderPaise, deliveryRadiusM, serverNow]
   properties:
+    storeId:
+      $ref: ./common.yaml#/Ulid
+      description: The id checkout and the cart use (CheckoutQuoteRequest.storeId).
     storeSlug:
       $ref: ./common.yaml#/Slug
     name:

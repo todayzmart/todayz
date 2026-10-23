@@ -3,6 +3,7 @@ package search
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"sort"
 	"time"
 
@@ -107,9 +108,13 @@ func (s *Service) GetStore(ctx context.Context, slug string, p discoverapi.GetDi
 	if err != nil {
 		return discoverapi.DiscoverStorePage{}, internal(err)
 	}
+	sid, ok := ids.FromUUID(r.ID)
+	if !ok {
+		return discoverapi.DiscoverStorePage{}, internal(errors.New("search: store without an id"))
+	}
 	delivers := r.AcceptsDelivery && deliveryOn
 	out := discoverapi.DiscoverStorePage{
-		StoreSlug: r.Slug, Name: r.Name, Locality: r.Locality, AddressLine1: r.AddressLine1, AddressLine2: r.AddressLine2,
+		StoreId: sid.String(), StoreSlug: r.Slug, Name: r.Name, Locality: r.Locality, AddressLine1: r.AddressLine1, AddressLine2: r.AddressLine2,
 		Landmark: r.Landmark, City: r.City, Pincode: r.Pincode, Lat: r.Lat, Lng: r.Lng,
 		Open: s.open.OpenAt(r.Hours, r.ClosedUntil, now), Hours: hoursOut(r.Hours, now),
 		Pickup: r.AcceptsPickup, Delivery: delivers, Bookable: r.AcceptsPickup || delivers,

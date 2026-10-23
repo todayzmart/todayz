@@ -402,7 +402,7 @@ func storeResult(st *candStore, m modes, badge string, now time.Time, rs rankSet
 // storeCard is the DiscoverStoreCard of a store.
 func storeCard(st *candStore) discoverapi.DiscoverStoreCard {
 	return discoverapi.DiscoverStoreCard{
-		StoreSlug: st.Slug, Name: st.Name, Locality: st.Locality, CategoryTint: st.Tint,
+		StoreId: st.ID.String(), StoreSlug: st.Slug, Name: st.Name, Locality: st.Locality, CategoryTint: st.Tint,
 		DistanceM: roundM(st.DistanceM), Open: st.Open, Pickup: st.Pickup, Delivery: st.Delivery,
 		Bookable: st.bookable(), Rating: st.Rating, RatingCount: int(st.RatingCount),
 		CashbackPct: cashbackPct(st.CashbackBP),

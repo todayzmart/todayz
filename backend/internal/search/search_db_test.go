@@ -336,6 +336,17 @@ func TestShopPage(t *testing.T) {
 	pg, err := f.svc.GetStore(f.ctx, "near", discoverapi.GetDiscoverStoreParams{Lat: &lat, Lng: &lng})
 	require.NoError(t, err)
 	assert.Equal(t, "near", pg.StoreSlug)
+	// Checkout takes the store id, so the page, the list and search all carry it.
+	assert.True(t, ids.Valid(pg.StoreId), pg.StoreId)
+	list, err := f.svc.ListStores(f.ctx, discoverapi.ListDiscoverStoresParams{Lat: qaLat, Lng: qaLng})
+	require.NoError(t, err)
+	require.NotEmpty(t, list.Items)
+	assert.Equal(t, "near", list.Items[0].StoreSlug)
+	assert.Equal(t, pg.StoreId, list.Items[0].StoreId)
+	found := f.search("amul butter")
+	require.NotEmpty(t, found.Results)
+	assert.Equal(t, "near", found.Results[0].Store.StoreSlug)
+	assert.Equal(t, pg.StoreId, found.Results[0].Store.StoreId)
 	require.NotNil(t, pg.DistanceM)
 	assert.InDelta(t, 300, *pg.DistanceM, 5)
 	// Half a point is no point: the page without a distance, not an error.

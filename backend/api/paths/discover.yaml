@@ -141,7 +141,8 @@
               openNow: 3
               productsInRadius: 412
               pins:
-              - storeSlug: lakshmi-traders-indiranagar
+              - storeId: 01KE0S1W6W8ZV7T1C3A6MS0001
+                storeSlug: lakshmi-traders-indiranagar
                 lat: 12.9752
                 lng: 77.6399
                 open: true
@@ -214,6 +215,7 @@
             example:
               items:
               - &id015
+                storeId: 01KE0S1W6W8ZV7T1C3A6MS0001
                 storeSlug: lakshmi-traders-indiranagar
                 name: Lakshmi Traders
                 locality: Indiranagar
@@ -263,6 +265,7 @@
             schema:
               $ref: ../schemas/discover.yaml#/DiscoverStorePage
             example:
+              storeId: 01KE0S1W6W8ZV7T1C3A6MS0001
               storeSlug: lakshmi-traders-indiranagar
               name: Lakshmi Traders
               locality: Indiranagar
