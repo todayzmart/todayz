@@ -7,13 +7,15 @@
   "scripts": {
     "dev": "ASTRO_TELEMETRY_DISABLED=1 ASTRO_DISABLE_UPDATE_CHECK=true astro dev --ignore-lock",
     "gen": "ASTRO_TELEMETRY_DISABLED=1 astro sync",
-    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build && node scripts/verify-dist.mjs",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build && node scripts/verify-dist.mjs && node scripts/check-site.mjs",
+    "og": "node scripts/og.mjs",
+    "lighthouse": "node scripts/lighthouse.mjs",
     "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview --ignore-lock",
     "typecheck": "ASTRO_TELEMETRY_DISABLED=1 astro check",
     "lint": "eslint --max-warnings 0 .",
     "lint:css": "stylelint --max-warnings 0 \"src/**/*.{css,astro}\"",
     "test": "vitest run",
-    "e2e:smoke": "playwright test -c playwright.config.ts"
+    "e2e:smoke": "playwright test -c playwright.config.ts && node scripts/lighthouse.mjs"
   },
   "dependencies": {
     "@todayz/i18n": "workspace:*",
@@ -22,10 +24,13 @@
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",
+    "@lhci/cli": "0.15.1",
     "@playwright/test": "1.64.0",
     "@todayz/config": "workspace:*",
     "@types/node": "26.6.4",
     "eslint": "9.39.5",
+    "html-validate": "11.16.2",
+    "lucide": "1.52.0",
     "postcss-html": "2.0.0",
     "stylelint": "17.16.0",
     "typescript": "6.0.3",

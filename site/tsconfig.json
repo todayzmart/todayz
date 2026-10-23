@@ -3,7 +3,9 @@
   "compilerOptions": {
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "types": ["node"],
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   },
   "include": [".astro/types.d.ts", "src", "e2e", "scripts", "*.config.mjs", "*.config.ts"],
   "exclude": ["dist", "node_modules"]
