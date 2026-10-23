@@ -36,7 +36,7 @@ async function enterPhoneAndCode(code = '123456') {
   }
 }
 
-const shops = (items: unknown[]): Handler => (c) => (c.path === '/v1/biz/businesses' ? json(200, { items }) : undefined);
+const shops = (items: unknown[]): Handler => (c) => (c.path === '/v1/biz/businesses' ? json(200, { items, invitations: [] }) : undefined);
 
 describe('B-01 gate', () => {
   it('sends a signed-out visitor to sign in and remembers where they were going', async () => {
@@ -64,7 +64,7 @@ describe('B-01 sign in', () => {
   it('sends the code without a bearer and verifies it for the business app', async () => {
     const { calls, session } = renderAt('/sign-in', {
       signedIn: false,
-      handlers: authHandlers([shops([{ id: 'b1', name: 'Sri Lakshmi', role: 'owner', stores: [{ id: 's1', name: 'Indiranagar' }] }])]),
+      handlers: authHandlers([shops([{ id: 'b1', status: 'verified', brandName: 'Sri Lakshmi', role: 'owner', stores: [{ id: 's1', name: 'Indiranagar' }] }])]),
     });
     await enterPhoneAndCode();
     expect(await screen.findByRole('heading', { level: 1, name: /^Good / })).toBeInTheDocument();
@@ -106,8 +106,8 @@ describe('B-01 shop picker', () => {
     const { history } = renderAt('/choose-shop?next=/orders', {
       handlers: [
         shops([
-          { id: 'b1', name: 'Sri Lakshmi', role: 'owner', stores: [{ id: 's1', name: 'Indiranagar' }, { id: 's2', name: 'Koramangala' }] },
-          { id: 'b2', name: 'Fresh Mart', role: 'cashier', stores: [{ id: 's3', name: 'HSR' }] },
+          { id: 'b1', status: 'verified', brandName: 'Sri Lakshmi', role: 'owner', stores: [{ id: 's1', name: 'Indiranagar' }, { id: 's2', name: 'Koramangala' }] },
+          { id: 'b2', status: 'verified', brandName: 'Fresh Mart', role: 'cashier', stores: [{ id: 's3', name: 'HSR' }] },
         ]),
       ],
     });
@@ -122,12 +122,12 @@ describe('B-01 shop picker', () => {
   it('goes straight on when the remembered store is still there', async () => {
     localStorage.setItem('todayz.biz.store', 's2');
     const { history } = renderAt('/choose-shop?next=/orders', {
-      handlers: [shops([{ id: 'b1', name: 'Sri Lakshmi', role: 'manager', stores: [{ id: 's1', name: 'A' }, { id: 's2', name: 'B' }] }])],
+      handlers: [shops([{ id: 'b1', status: 'verified', brandName: 'Sri Lakshmi', role: 'manager', stores: [{ id: 's1', name: 'A' }, { id: 's2', name: 'B' }] }])],
     });
     await waitFor(() => expect(history.location.pathname).toBe('/orders'));
   });
 
-  it('lets the person carry on to the overview while the list is unavailable (TODO W1-04)', async () => {
+  it('lets the person carry on to the overview while the list is unavailable', async () => {
     const { history } = renderAt('/choose-shop');
     fireEvent.click(await screen.findByRole('button', { name: 'Continue to overview' }));
     await waitFor(() => expect(history.location.pathname).toBe('/'));

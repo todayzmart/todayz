@@ -21,7 +21,7 @@ describe('B-01 gate when the first check cannot reach the server', () => {
       signedIn: false,
       handlers: [
         (c) => (c.path === '/v1/auth/refresh' ? (up ? json(200, grant) : problem(503, 'unavailable')) : undefined),
-        (c) => (c.path === '/v1/biz/businesses' ? json(200, { items: [] }) : undefined),
+        (c) => (c.path === '/v1/biz/businesses' ? json(200, { items: [], invitations: [] }) : undefined),
       ],
     });
     expect(await screen.findByText("You're offline.")).toBeInTheDocument();

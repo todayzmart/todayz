@@ -21,8 +21,8 @@ const ROLE_LABEL: Record<ShopRole, string> = {
 
 /**
  * B-01 picker: several businesses or stores, role shown, last store remembered. One store (or the
- * remembered one) goes straight on. TODO(W1-04): `GET /v1/biz/businesses` is not built yet; until
- * it is, a failed load shows a way on to the overview instead of blocking the app.
+ * remembered one) goes straight on. A failed load shows a way on to the overview instead of
+ * blocking the app.
  */
 function ChooseShop() {
   const intl = useIntl();
@@ -68,9 +68,9 @@ function ChooseShop() {
       {query.data &&
         !auto &&
         businesses.map((b) => (
-          <section key={b.id} className={`tz-card ${styles.stack}`} aria-label={intl.formatMessage({ id: 'shop.pick.group' }, { business: b.name })}>
+          <section key={b.id} className={`tz-card ${styles.stack}`} aria-label={intl.formatMessage({ id: 'shop.pick.group' }, { business: b.brandName })}>
             <h2 className="tz-card-title">
-              {b.name} <span className="tz-pill">{intl.formatMessage({ id: ROLE_LABEL[b.role] })}</span>
+              {b.brandName} <span className="tz-pill">{intl.formatMessage({ id: ROLE_LABEL[b.role] })}</span>
             </h2>
             {b.stores.map((s) => (
               <Button
