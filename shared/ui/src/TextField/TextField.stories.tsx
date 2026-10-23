@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { designRef } from '../test/fixtures';
+import { designRef, frame } from '../test/fixtures';
 import { TextField } from './TextField';
 
 const meta = {
@@ -10,7 +10,7 @@ const meta = {
     defaultValue: 'Sri Lakshmi Provision Stores',
     help: 'Shown to customers on search results and your shop page.',
   },
-  decorators: [(Story) => <div style={{ maxWidth: 420 }}>{Story()}</div>],
+  decorators: [frame({ maxWidth: 420 })],
 } satisfies Meta<typeof TextField>;
 
 export default meta;
@@ -56,7 +56,6 @@ export const Disabled: Story = { args: { disabled: true, help: 'Ask the owner to
 
 export const DesignReference: Story = {
   ...designRef('TextField', 196),
-  decorators: [],
   render: () => (
     <div className="tz-stack" style={{ maxWidth: 420 }}>
       <TextField

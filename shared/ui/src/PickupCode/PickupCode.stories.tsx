@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { OtpInput } from '../OtpInput/OtpInput';
-import { designRef } from '../test/fixtures';
+import { designRef, frame } from '../test/fixtures';
 import { PickupCode } from './PickupCode';
 
 const meta = {
   title: 'Commerce/PickupCode',
   component: PickupCode,
   args: { label: 'Pickup code', code: '4827', note: 'Show this at Sri Lakshmi Provision Stores' },
-  decorators: [(Story) => <div style={{ width: 260 }}>{Story()}</div>],
+  decorators: [frame({ width: 260 })],
 } satisfies Meta<typeof PickupCode>;
 
 export default meta;
@@ -23,7 +23,6 @@ export const NoNote: Story = { args: { note: undefined } };
 
 export const DesignReference: Story = {
   ...designRef('PickupCode', 300),
-  decorators: [],
   render: () => (
     <div className="tz-row" style={{ alignItems: 'flex-start', gap: 'var(--space-6)' }}>
       <div style={{ width: 260 }}>

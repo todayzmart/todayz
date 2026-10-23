@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { designRef, StoryLink } from '../test/fixtures';
+import { designRef, StoryLink, frame } from '../test/fixtures';
 import { DemandInsights, type DemandInsightsProps } from './DemandInsights';
 import type { InsightRow } from './insights';
 
@@ -99,7 +99,7 @@ const meta = {
   title: 'Dashboard/DemandInsights',
   component: DemandInsights,
   args: base,
-  decorators: [(Story) => <div style={{ maxWidth: 560 }}>{Story()}</div>],
+  decorators: [frame({ maxWidth: 560 })],
 } satisfies Meta<typeof DemandInsights>;
 
 export default meta;
@@ -120,7 +120,6 @@ export const NothingFired: Story = { args: { rows: [] } };
 
 export const DesignReference: Story = {
   ...designRef('DemandInsights', 470, 620),
-  decorators: [],
   render: (args) => (
     <div style={{ padding: 24, maxWidth: 560 }}>
       <DemandInsights {...args} />

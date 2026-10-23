@@ -12,7 +12,7 @@ import {
   Tag,
   Users,
 } from 'lucide-react';
-import { designRef, StoryLink } from '../test/fixtures';
+import { designRef, StoryLink, frame } from '../test/fixtures';
 import { Sidebar, type NavGroup } from './Sidebar';
 
 const business: readonly NavGroup[] = [
@@ -51,7 +51,7 @@ const meta = {
   component: Sidebar,
   args: { label: 'Business', groups: business, current: 'orders', LinkComponent: StoryLink },
   parameters: { layout: 'fullscreen' },
-  decorators: [(Story) => <div style={{ display: 'flex', height: 560 }}>{Story()}</div>],
+  decorators: [frame({ display: 'flex', height: 560 })],
 } satisfies Meta<typeof Sidebar>;
 
 export default meta;
@@ -74,7 +74,6 @@ export const WithStoreFooter: Story = {
 
 export const DesignReference: Story = {
   ...designRef('Sidebar', 520),
-  decorators: [],
   render: (args) => (
     <div style={{ display: 'flex', height: 520 }}>
       <Sidebar {...args} />

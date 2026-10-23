@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { designRef, makeShops, mapCenter, radiusOptions } from '../test/fixtures';
+import { designRef, makeShops, mapCenter, radiusOptions, frame } from '../test/fixtures';
 import { StoreMap, type StoreMapProps } from './StoreMap';
 
 const center = mapCenter;
@@ -50,7 +50,7 @@ const meta = {
   component: StoreMap,
   args: base,
   render: (args) => <Stateful {...args} />,
-  decorators: [(Story) => <div style={{ maxWidth: 344 }}>{Story()}</div>],
+  decorators: [frame({ maxWidth: 344 })],
 } satisfies Meta<typeof StoreMap>;
 
 export default meta;
@@ -64,6 +64,7 @@ export const StaticFallback: Story = { args: { renderer: 'static' } };
 
 export const FullMap: Story = {
   args: { interactive: true, height: 420, onExpand: undefined, expandLabel: undefined },
+  parameters: { frame: false },
   decorators: [(Story) => <div style={{ maxWidth: 720 }}>{Story()}</div>],
 };
 
@@ -77,7 +78,6 @@ export const NoShops: Story = {
 
 export const DesignReference: Story = {
   ...designRef('StoreMap', 400, 420),
-  decorators: [],
   args: { renderer: 'static', attribution: undefined },
   render: (args) => (
     <div style={{ padding: 24, maxWidth: 344 }}>

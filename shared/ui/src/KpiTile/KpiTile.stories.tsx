@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { IndianRupee, Package, PackageOpen, Receipt } from 'lucide-react';
-import { designRef, StoryLink } from '../test/fixtures';
+import { designRef, StoryLink, frame } from '../test/fixtures';
 import { KpiStrip, KpiTile, type KpiProps } from './KpiTile';
 
 type Item = KpiProps & { key: string };
@@ -46,7 +46,7 @@ const meta = {
   title: 'Dashboard/KpiTile',
   component: KpiTile,
   args: { ...orders, LinkComponent: StoryLink },
-  decorators: [(Story) => <div style={{ maxWidth: 260 }}>{Story()}</div>],
+  decorators: [frame({ maxWidth: 260 })],
 } satisfies Meta<typeof KpiTile>;
 
 export default meta;
@@ -61,12 +61,12 @@ export const WithLink: Story = { args: { ...low } };
 export const Loading: Story = { args: { loading: true } };
 
 export const Strip: Story = {
-  decorators: [],
+  parameters: { frame: false },
   render: () => <KpiStrip label="Today at a glance" items={today} LinkComponent={StoryLink} />,
 };
 
 export const StripLoading: Story = {
-  decorators: [],
+  parameters: { frame: false },
   render: () => (
     <KpiStrip label="Today at a glance" items={today.map((k) => ({ ...k, loading: true }))} LinkComponent={StoryLink} />
   ),
@@ -74,7 +74,6 @@ export const StripLoading: Story = {
 
 export const DesignReference: Story = {
   ...designRef('KpiTile', 190, 1100),
-  decorators: [],
   render: () => (
     <div style={{ padding: 'var(--space-4)' }}>
       <KpiStrip label="Today at a glance" items={today} LinkComponent={StoryLink} />

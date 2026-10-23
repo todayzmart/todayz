@@ -184,14 +184,16 @@ html.tz-ui-scroll-lock {
   font: 500 14px/20px var(--font-sans);
   white-space: nowrap;
   cursor: pointer;
-  transition: color 150ms cubic-bezier(0.2, 0, 0, 1), border-color 150ms cubic-bezier(0.2, 0, 0, 1);
+  transition:
+    color 150ms cubic-bezier(0.2, 0, 0, 1),
+    border-color 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 .tz-ui-tab:hover {
   color: var(--ink);
 }
 
-.tz-ui-tab[aria-selected="true"] {
+.tz-ui-tab[aria-selected='true'] {
   border-bottom-color: var(--ink);
   color: var(--ink);
 }
@@ -230,9 +232,8 @@ html.tz-ui-scroll-lock {
   margin-top: 6px;
 }
 
+/* A plain span, as the design card draws it: the icon sits on the text line, not centred. */
 .tz-ui-chevron {
-  display: grid;
-  place-items: center;
   color: var(--ink-2);
 }
 
@@ -385,8 +386,8 @@ html.tz-ui-scroll-lock {
 }
 
 .tz-ui-sort:hover,
-[aria-sort="ascending"] .tz-ui-sort,
-[aria-sort="descending"] .tz-ui-sort {
+[aria-sort='ascending'] .tz-ui-sort,
+[aria-sort='descending'] .tz-ui-sort {
   color: var(--ink);
 }
 
@@ -626,6 +627,11 @@ html.tz-ui-scroll-lock {
   background: var(--map-land);
 }
 
+/* In flow, so the box is as tall as the design's sketch at this width plus its bottom border. */
+.tz-ui-map-sizer {
+  aspect-ratio: 312 / 150;
+}
+
 .tz-ui-map > .tz-ui-map-canvas {
   position: absolute;
   inset: 0;
@@ -680,7 +686,7 @@ html.tz-ui-scroll-lock {
 }
 
 .tz-ui-map-pin::before {
-  content: "";
+  content: '';
   width: 10px;
   height: 10px;
   border-radius: 50%;
@@ -725,7 +731,9 @@ html.tz-ui-scroll-lock {
   margin: -6px 0 0 -6px;
   border-radius: 50%;
   background: var(--info);
-  box-shadow: 0 0 0 2px var(--surface), 0 0 0 8px color-mix(in srgb, var(--info) 14%, transparent);
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 8px color-mix(in srgb, var(--info) 14%, transparent);
   pointer-events: none;
 }
 

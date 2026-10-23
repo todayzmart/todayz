@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { designRef, stepperLabels } from '../test/fixtures';
+import { designRef, stepperLabels, frame } from '../test/fixtures';
 import { PosCart, type PosCartProps, type PosLine } from './PosCart';
 
 const bill: readonly PosLine[] = [
@@ -68,7 +68,7 @@ const meta = {
   component: PosCart,
   args: cartProps(bill, '98450 14521', 'upi'),
   render: (args) => <Counter {...args} />,
-  decorators: [(Story) => <div style={{ maxWidth: 400 }}>{Story()}</div>],
+  decorators: [frame({ maxWidth: 400 })],
 } satisfies Meta<typeof PosCart>;
 
 export default meta;
@@ -84,7 +84,6 @@ export const Charging: Story = { args: { ...cartProps(bill, '98450 14521', 'upi'
 
 export const DesignReference: Story = {
   ...designRef('PosCart', 470),
-  decorators: [],
   render: (args) => (
     <div style={{ padding: 'var(--space-4)', maxWidth: 400 }}>
       <PosCart {...args} />

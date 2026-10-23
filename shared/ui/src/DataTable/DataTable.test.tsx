@@ -27,7 +27,7 @@ const firstColumn = () =>
     .map((r) => within(r).getAllByRole('cell')[0]?.textContent);
 
 describe('DataTable', () => {
-  it('has a caption, sortable headers with aria-sort and right-aligned numeric cells', () => {
+  it('is named by its label, has sortable headers with aria-sort and right-aligned numeric cells', () => {
     render(<DataTable label="Stock" columns={columns} data={data} getRowId={(r) => r.id} emptyLabel="No items" />);
     expect(screen.getByRole('table', { name: 'Stock' })).toBeInTheDocument();
     const [item, qty, note] = screen.getAllByRole('columnheader');

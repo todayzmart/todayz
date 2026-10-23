@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { designRef } from '../test/fixtures';
+import { designRef, frame } from '../test/fixtures';
 import { LanguagePicker, type LanguageOption } from './LanguagePicker';
 
 const languages: readonly LanguageOption[] = [
@@ -20,7 +20,7 @@ const meta = {
   title: 'Inputs and actions/LanguagePicker',
   component: Picker,
   args: { initial: 'en' },
-  decorators: [(Story) => <div style={{ maxWidth: 520 }}>{Story()}</div>],
+  decorators: [frame({ maxWidth: 520 })],
 } satisfies Meta<typeof Picker>;
 
 export default meta;
@@ -32,7 +32,6 @@ export const Kannada: Story = { args: { initial: 'kn' } };
 
 export const DesignReference: Story = {
   ...designRef('LanguagePicker', 260),
-  decorators: [],
   render: () => (
     <div style={{ padding: 'var(--space-4)', maxWidth: 520 }}>
       <LanguagePicker label="Language" options={languages} value="en" onChange={() => undefined} />

@@ -187,6 +187,9 @@ describe('StoreMap (MapLibre)', () => {
     const box = screen.getByRole('group', { name: /^Map:/ });
     expect(box).toHaveAttribute('data-mode', 'loading');
     expect(map.options).toMatchObject({ interactive: false, attributionControl: false, dragRotate: false });
+    expect(map.options['locale']).toEqual({ 'Map.Title': 'Map: 43 shops within 2 km, 38 open now' });
+    // Not interactive: the canvas never takes focus, so it stays out of the accessibility tree.
+    expect(box.querySelector('.tz-ui-map-canvas')).toHaveAttribute('aria-hidden', 'true');
     expect((map.options['style'] as StyleSpecification).sources).toHaveProperty('roads');
     expect(map.touchZoomRotate.disableRotation).toHaveBeenCalled();
     act(() => map.emit('load'));
@@ -200,6 +203,8 @@ describe('StoreMap (MapLibre)', () => {
 
   it('redraws and fits the ring when the radius changes, eases into clusters, and removes the map', async () => {
     const { p, view, map } = await mount();
+    // Interactive: MapLibre's canvas is a focusable region, so its container is not hidden.
+    expect(document.querySelector('.tz-ui-map-canvas')).not.toHaveAttribute('aria-hidden');
     act(() => map.emit('load'));
     map.fitBounds.mockClear();
     view.rerender(<StoreMap {...p} radiusKm={5} />);

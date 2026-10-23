@@ -72,7 +72,10 @@ export interface StoreMapProps {
   mapStyle?: StyleSpecification | undefined;
   /** Map data credit, shown in WebGL mode (the static fallback draws no map data). */
   attribution?: string | undefined;
-  /** Map height in px (the width follows the card). */
+  /**
+   * Map height in px. Without it the map keeps the design card's 312 × 150 proportions at
+   * whatever width the card has.
+   */
   height?: number | undefined;
   /** auto: MapLibre when WebGL works, otherwise the static fallback. */
   renderer?: 'auto' | 'static' | undefined;
@@ -85,6 +88,9 @@ type Mode = 'loading' | 'webgl' | 'static';
 type ShopPoint = PointFeature<{ id: string }>;
 
 const PADDING = 12;
+/** The design card's map proportions (its sketch is drawn in a 312 × 150 box). */
+const DESIGN_WIDTH = 312;
+const DESIGN_HEIGHT = 150;
 const FIT_MS = 400;
 
 function prefersReducedMotion(): boolean {
@@ -121,7 +127,7 @@ export function StoreMap({
   onExpand,
   mapStyle,
   attribution = '© OpenStreetMap',
-  height = 150,
+  height,
   renderer = 'auto',
   interactive = true,
   className,
@@ -133,7 +139,7 @@ export function StoreMap({
   const [gl, setGl] = useState<'loading' | 'ready' | 'failed'>('loading');
   const mode: Mode =
     renderer === 'static' || !webgl || gl === 'failed' ? 'static' : gl === 'ready' ? 'webgl' : 'loading';
-  const [width, setWidth] = useState(0);
+  const [size, setSize] = useState({ width: 0, height: 0 });
   const [glProjector, setGlProjector] = useState<Projector | null>(null);
   /** Static mode zooms into a cluster by moving its own view; a new radius or location resets it. */
   const viewKey = `${radiusKm}|${center.lng}|${center.lat}`;
@@ -146,9 +152,9 @@ export function StoreMap({
   }
 
   // Latest values for MapLibre callbacks without re-creating the map.
-  const latest = useRef({ center, radiusKm, mapStyle });
+  const latest = useRef({ center, radiusKm, mapStyle, mapLabel });
   useLayoutEffect(() => {
-    latest.current = { center, radiusKm, mapStyle };
+    latest.current = { center, radiusKm, mapStyle, mapLabel };
   });
 
   const index = useMemo(() => {
@@ -167,7 +173,7 @@ export function StoreMap({
   useLayoutEffect(() => {
     const el = boxRef.current;
     if (!el) return undefined;
-    const measure = () => setWidth(el.clientWidth);
+    const measure = () => setSize({ width: el.clientWidth, height: el.clientHeight });
     measure();
     if (typeof ResizeObserver === 'undefined') return undefined;
     const ro = new ResizeObserver(measure);
@@ -210,6 +216,8 @@ export function StoreMap({
           pitchWithRotate: false,
           touchPitch: false,
           fadeDuration: 0,
+          // The interactive canvas is a focusable region; name it from props, not MapLibre's "Map".
+          locale: { 'Map.Title': latest.current.mapLabel },
         });
         map.touchZoomRotate.disableRotation();
         mapRef.current = map;
@@ -291,13 +299,15 @@ export function StoreMap({
     });
   }, [mode, mapStyle]);
 
-  const boxWidth = width || 312;
+  const boxWidth = size.width || DESIGN_WIDTH;
+  // Measured once laid out; before that (and in tests without layout) the prop or the design ratio.
+  const boxHeight = size.height || height || (boxWidth * DESIGN_HEIGHT) / DESIGN_WIDTH;
   const projector: Projector | null = useMemo(() => {
     if (mode === 'webgl') return glProjector;
     if (mode !== 'static') return null;
-    const view = staticView ?? { center, zoom: zoomToFitRadius(center, radiusKm, boxWidth, height, PADDING) };
-    return staticProjector(view.center, view.zoom, boxWidth, height);
-  }, [mode, glProjector, staticView, center, radiusKm, boxWidth, height]);
+    const view = staticView ?? { center, zoom: zoomToFitRadius(center, radiusKm, boxWidth, boxHeight, PADDING) };
+    return staticProjector(view.center, view.zoom, boxWidth, boxHeight);
+  }, [mode, glProjector, staticView, center, radiusKm, boxWidth, boxHeight]);
 
   const clusters = useMemo(() => {
     if (!projector) return [];
@@ -315,12 +325,12 @@ export function StoreMap({
     }
   };
 
-  const inBox = ([x, y]: [number, number]) => x >= -16 && y >= -16 && x <= boxWidth + 16 && y <= height + 16;
+  const inBox = ([x, y]: [number, number]) => x >= -16 && y >= -16 && x <= boxWidth + 16 && y <= boxHeight + 16;
   const place = ([x, y]: [number, number]): CSSProperties => ({ transform: `translate(${x}px, ${y}px)` });
 
   const ring =
     mode === 'static' && projector ? (
-      <svg className="tz-ui-map-static" width={boxWidth} height={height} aria-hidden="true" focusable="false">
+      <svg className="tz-ui-map-static" width={boxWidth} height={boxHeight} aria-hidden="true" focusable="false">
         <rect width="100%" height="100%" className="tz-ui-map-land" />
         <circle
           cx={projector.project(center)[0]}
@@ -336,12 +346,14 @@ export function StoreMap({
       <div
         ref={boxRef}
         className="tz-map tz-ui-map"
-        style={{ height }}
+        style={height === undefined ? undefined : { height }}
         role="group"
         aria-label={mapLabel}
         data-mode={mode}
       >
-        <div ref={canvasRef} className="tz-ui-map-canvas" aria-hidden="true" />
+        {height === undefined && <div className="tz-ui-map-sizer" />}
+        {/* Interactive, MapLibre's canvas takes focus for keyboard panning, so it cannot be hidden. */}
+        <div ref={canvasRef} className="tz-ui-map-canvas" aria-hidden={interactive ? undefined : true} />
         {ring}
         {projector && (
           <div className="tz-ui-map-overlay">

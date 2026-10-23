@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ShoppingBag } from 'lucide-react';
-import { designRef } from '../test/fixtures';
+import { designRef, frame } from '../test/fixtures';
 import { OrderTimeline, type TimelineStep } from './OrderTimeline';
 
 const stateLabels = { done: 'done', upcoming: 'not yet', failed: 'failed' };
@@ -23,7 +23,7 @@ const meta = {
   title: 'Commerce/OrderTimeline',
   component: OrderTimeline,
   args: { label: 'Order progress', steps: ready, stateLabels },
-  decorators: [(Story) => <div style={{ maxWidth: 360 }}>{Story()}</div>],
+  decorators: [frame({ maxWidth: 360 })],
 } satisfies Meta<typeof OrderTimeline>;
 
 export default meta;
@@ -64,7 +64,6 @@ export const Rejected: Story = {
 
 export const DesignReference: Story = {
   ...designRef('OrderTimeline', 300),
-  decorators: [],
   render: (args) => (
     <div className="tz-stack" style={{ maxWidth: 360 }}>
       <OrderTimeline {...args} />

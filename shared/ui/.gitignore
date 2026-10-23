@@ -2,3 +2,5 @@ storybook-static/
 visual/out/
 coverage/
 test-results/
+coverage/
+test-results/

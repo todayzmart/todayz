@@ -2,11 +2,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const h = vi.hoisted(() => ({
   addProtocol: vi.fn(),
+  setWorkerUrl: vi.fn(),
   fail: false,
   protocols: 0,
 }));
 
-vi.mock('maplibre-gl', () => ({ default: { addProtocol: h.addProtocol, Map: vi.fn() } }));
+vi.mock('maplibre-gl', () => ({
+  default: { addProtocol: h.addProtocol, setWorkerUrl: h.setWorkerUrl, Map: vi.fn() },
+}));
+vi.mock('maplibre-gl/dist/maplibre-gl-worker.mjs?url', () => ({ default: '/assets/maplibre-gl-worker.mjs' }));
 vi.mock('pmtiles', () => ({
   Protocol: class {
     constructor() {
@@ -43,11 +47,12 @@ describe('loadMapLibre', () => {
   beforeEach(() => {
     vi.resetModules();
     h.addProtocol.mockReset();
+    h.setWorkerUrl.mockReset();
     h.protocols = 0;
     h.fail = false;
   });
 
-  it('loads once and registers the pmtiles protocol once', async () => {
+  it('loads once, points MapLibre at the bundled worker and registers the pmtiles protocol once', async () => {
     const { loadMapLibre } = await import('./loader');
     const [a, b] = await Promise.all([loadMapLibre(), loadMapLibre()]);
     expect(a).toBe(b);
@@ -55,6 +60,7 @@ describe('loadMapLibre', () => {
     expect(h.addProtocol).toHaveBeenCalledTimes(1);
     expect(h.addProtocol).toHaveBeenCalledWith('pmtiles', expect.any(Function));
     expect(h.protocols).toBe(1);
+    expect(h.setWorkerUrl).toHaveBeenCalledWith('/assets/maplibre-gl-worker.mjs');
   });
 
   it('rejects when loading fails and tries again next time', async () => {

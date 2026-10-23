@@ -3,7 +3,7 @@ import { Mic } from 'lucide-react';
 import { useState } from 'react';
 import { IconButton } from '../Button/Button';
 import { Icon } from '../internal/Icon';
-import { designRef } from '../test/fixtures';
+import { designRef, frame } from '../test/fixtures';
 import { SearchField, type SearchFieldProps } from './SearchField';
 
 const meta = {
@@ -14,7 +14,7 @@ const meta = {
     placeholder: 'Search atta, milk, medicines…',
     clearLabel: 'Clear search',
   },
-  decorators: [(Story) => <div style={{ maxWidth: 480 }}>{Story()}</div>],
+  decorators: [frame({ maxWidth: 480 })],
 } satisfies Meta<typeof SearchField>;
 
 export default meta;
@@ -44,7 +44,6 @@ export const DebouncedSearch: Story = { render: (args) => <Debounced {...args} /
 
 export const DesignReference: Story = {
   ...designRef('SearchField', 88),
-  decorators: [],
   render: () => (
     <div className="tz-stack">
       <SearchField

@@ -25,7 +25,11 @@ declare module '@tanstack/react-table' {
 export type { ColumnDef, SortingState };
 
 export interface DataTableProps<T> {
-  /** Table caption for screen readers, e.g. "Stock". */
+  /**
+   * Accessible name of the table, e.g. "Stock". Given as aria-label rather than an sr-only
+   * caption: Chromium keeps a caption in the table's flow even when it is absolutely
+   * positioned, which shifts the body 1px off the design.
+   */
   label: string;
   columns: ColumnDef<T, unknown>[];
   data: readonly T[];
@@ -82,8 +86,7 @@ export function DataTable<T>({
 
   return (
     <div className={cx('tz-table-wrap', className)}>
-      <table className="tz-table" aria-busy={loading || undefined}>
-        <caption className="tz-ui-sr-only">{label}</caption>
+      <table className="tz-table" aria-label={label} aria-busy={loading || undefined}>
         <thead>
           {table.getHeaderGroups().map((hg) => (
             <tr key={hg.id}>

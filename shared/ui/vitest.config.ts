@@ -11,13 +11,16 @@ export default defineConfig({
   plugins: [react()],
   test: {
     ...preset.test,
+    // Each happy-dom worker holds the whole kit plus axe; an uncapped run on a busy machine was
+    // killed for memory. Two workers keep the run near 12 s.
+    maxWorkers: 2,
     // 08-testing: shared/ui coverage at least 90%.
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,tsx}'],
       exclude: ['src/**/*.stories.tsx', 'src/**/*.test.{ts,tsx}', 'src/test/**', 'src/**/index.ts', 'src/**/*.d.ts'],
       reporter: ['text-summary'],
-      thresholds: { lines: 90, statements: 90, functions: 90, branches: 85 },
+      thresholds: { lines: 90, statements: 90, functions: 90, branches: 90 },
     },
   },
 });

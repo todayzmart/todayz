@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Button } from '../Button/Button';
-import { designRef } from '../test/fixtures';
+import { designRef, frame } from '../test/fixtures';
 import { Toast } from '../Toast/Toast';
 import { Banner } from './Banner';
 
@@ -8,7 +8,7 @@ const meta = {
   title: 'Feedback and overlays/Banner',
   component: Banner,
   args: { title: "You're offline.", children: "Sales you record now will sync when you're back online." },
-  decorators: [(Story) => <div style={{ maxWidth: 560 }}>{Story()}</div>],
+  decorators: [frame({ maxWidth: 560 })],
 } satisfies Meta<typeof Banner>;
 
 export default meta;
@@ -37,7 +37,6 @@ export const LiveStatus: Story = { args: { live: 'status' } };
 
 export const DesignReference: Story = {
   ...designRef('Banner', 210),
-  decorators: [],
   render: () => (
     <div className="tz-stack" style={{ maxWidth: 560 }}>
       <Banner tone="warning" title="WhatsApp is off.">

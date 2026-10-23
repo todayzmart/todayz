@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ChartColumn, Ellipsis, House, Package, Receipt, ScanLine, Search, User, Wallet } from 'lucide-react';
 import type { NavItem } from '../Sidebar/Sidebar';
-import { designRef, StoryLink } from '../test/fixtures';
+import { designRef, StoryLink, frame } from '../test/fixtures';
 import { BottomNav } from './BottomNav';
 
 const customer: readonly NavItem[] = [
@@ -24,7 +24,7 @@ const meta = {
   title: 'Navigation/BottomNav',
   component: BottomNav,
   args: { label: 'Customer', items: customer, current: 'home', LinkComponent: StoryLink },
-  decorators: [(Story) => <div style={{ maxWidth: 400 }}>{Story()}</div>],
+  decorators: [frame({ maxWidth: 400 })],
 } satisfies Meta<typeof BottomNav>;
 
 export default meta;
@@ -44,7 +44,6 @@ export const WithBadge: Story = {
 
 export const DesignReference: Story = {
   ...designRef('BottomNav', 168),
-  decorators: [],
   render: () => (
     <div className="tz-stack" style={{ maxWidth: 400, gap: 'var(--space-4)' }}>
       <BottomNav label="Customer" items={customer} current="home" LinkComponent={StoryLink} />

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Gift } from 'lucide-react';
 import { Button } from '../Button/Button';
-import { designRef } from '../test/fixtures';
+import { designRef, frame } from '../test/fixtures';
 import { WalletCard } from './WalletCard';
 
 const meta = {
@@ -17,7 +17,7 @@ const meta = {
       </Button>
     ),
   },
-  decorators: [(Story) => <div style={{ maxWidth: 400 }}>{Story()}</div>],
+  decorators: [frame({ maxWidth: 400 })],
 } satisfies Meta<typeof WalletCard>;
 
 export default meta;
@@ -31,7 +31,6 @@ export const Zero: Story = {
 
 export const DesignReference: Story = {
   ...designRef('WalletCard', 230),
-  decorators: [],
   render: (args) => (
     <div style={{ padding: 'var(--space-4)', maxWidth: 400 }}>
       <WalletCard {...args} />

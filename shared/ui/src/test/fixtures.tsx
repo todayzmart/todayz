@@ -1,5 +1,7 @@
 // Synthetic data for stories and tests: the names and numbers the design previews use
 // (design/source/components/*/preview.html). No real customers or shops.
+import type { Decorator } from '@storybook/react-vite';
+import type { CSSProperties } from 'react';
 import type { LinkProps } from '../internal/link';
 import type { QuantityStepperLabels } from '../QuantityStepper/QuantityStepper';
 import { destination } from '../StoreMap/geo';
@@ -21,6 +23,18 @@ export function StoryLink({ href, children, ...rest }: LinkProps) {
       {children}
     </a>
   );
+}
+
+/**
+ * A meta-level wrapper that sizes a component's stories. Storybook always applies meta decorators
+ * (a story's own `decorators: []` adds to them, it does not replace them), so the frame steps aside
+ * for design references and for stories that set `parameters: { frame: false }`.
+ */
+export function frame(style: CSSProperties): Decorator {
+  return function Frame(Story, { parameters }) {
+    if (parameters['design'] !== undefined || parameters['frame'] === false) return Story();
+    return <div style={style}>{Story()}</div>;
+  };
 }
 
 /** Default card width when a design card does not set one. */

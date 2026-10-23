@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Plus, Receipt, SearchX } from 'lucide-react';
 import { Button } from '../Button/Button';
+import { frame } from '../test/fixtures';
 import { EmptyState } from './EmptyState';
 
 const meta = {
@@ -11,7 +12,7 @@ const meta = {
     title: 'No orders yet',
     description: 'Orders from customers nearby show up here. Keep your stock up to date so they can find you.',
   },
-  decorators: [(Story) => <div style={{ maxWidth: 480 }}>{Story()}</div>],
+  decorators: [frame({ maxWidth: 480 })],
 } satisfies Meta<typeof EmptyState>;
 
 export default meta;

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { designRef } from '../test/fixtures';
+import { designRef, frame } from '../test/fixtures';
 import { CartBar } from './CartBar';
 
 const meta = {
@@ -13,7 +13,7 @@ const meta = {
     ctaLabel: 'View cart',
     onOpen: () => undefined,
   },
-  decorators: [(Story) => <div style={{ maxWidth: 400 }}>{Story()}</div>],
+  decorators: [frame({ maxWidth: 400 })],
 } satisfies Meta<typeof CartBar>;
 
 export default meta;
@@ -36,7 +36,6 @@ export const NoShop: Story = { args: { from: undefined } };
 
 export const DesignReference: Story = {
   ...designRef('CartBar', 96),
-  decorators: [],
   render: (args) => (
     <div className="tz-stack" style={{ maxWidth: 400 }}>
       <CartBar {...args} />

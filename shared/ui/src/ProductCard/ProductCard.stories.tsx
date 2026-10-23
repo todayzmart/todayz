@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { designRef, stepperLabels, StoryLink } from '../test/fixtures';
+import { designRef, stepperLabels, StoryLink, frame } from '../test/fixtures';
 import { ProductCard, type ProductCardProps } from './ProductCard';
 
 function Stateful(props: ProductCardProps) {
@@ -41,7 +41,7 @@ const meta = {
   component: ProductCard,
   args: atta,
   render: (args) => <Stateful {...args} />,
-  decorators: [(Story) => <div style={{ maxWidth: 184 }}>{Story()}</div>],
+  decorators: [frame({ maxWidth: 184 })],
 } satisfies Meta<typeof ProductCard>;
 
 export default meta;
@@ -83,7 +83,6 @@ export const LongName: Story = {
 
 export const DesignReference: Story = {
   ...designRef('ProductCard', 360),
-  decorators: [],
   render: () => (
     <div className="tz-grid2" style={{ padding: 'var(--space-4)', maxWidth: 400 }}>
       <ProductCard {...atta} href={undefined} />

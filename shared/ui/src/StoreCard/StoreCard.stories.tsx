@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { designRef, StoryLink } from '../test/fixtures';
+import { designRef, StoryLink, frame } from '../test/fixtures';
 import { StoreCard, type StoreCardProps } from './StoreCard';
 
 const lakshmi: StoreCardProps = {
@@ -24,7 +24,7 @@ const meta = {
   title: 'Commerce/StoreCard',
   component: StoreCard,
   args: lakshmi,
-  decorators: [(Story) => <div style={{ maxWidth: 420 }}>{Story()}</div>],
+  decorators: [frame({ maxWidth: 420 })],
 } satisfies Meta<typeof StoreCard>;
 
 export default meta;
@@ -44,7 +44,6 @@ export const LongName: Story = {
 
 export const DesignReference: Story = {
   ...designRef('StoreCard', 196),
-  decorators: [],
   render: () => (
     <div className="tz-stack" style={{ maxWidth: 420 }}>
       <StoreCard {...lakshmi} />
