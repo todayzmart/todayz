@@ -58,8 +58,12 @@ describe('DemandInsights', () => {
   it('offers Not useful on every row except expired on shelf', () => {
     const onNotUseful = vi.fn();
     render(<DemandInsights {...props({ onNotUseful, notUsefulLabel: 'Not useful' })} />);
-    const buttons = screen.getAllByRole('button', { name: 'Not useful' });
+    const buttons = screen.getAllByRole('button', { name: /^Not useful/ });
     expect(buttons).toHaveLength(3);
+    // Each button names its row, so a list of buttons (or voice control) can tell them apart.
+    expect(buttons.map((b) => b.getAttribute('aria-labelledby')?.split(' ').length)).toEqual([2, 2, 2]);
+    expect(screen.getByRole('button', { name: 'Not useful Fast' })).toHaveAccessibleDescription('Fast sentence');
+    expect(screen.getByRole('button', { name: 'Not useful Wanted' })).toBeInTheDocument();
     fireEvent.click(buttons[0] as HTMLElement);
     expect(onNotUseful).toHaveBeenCalledWith(expect.objectContaining({ id: 'b' }));
   });

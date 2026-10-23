@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SearchField } from './SearchField';
@@ -62,5 +63,13 @@ describe('SearchField', () => {
     expect(onChange).toHaveBeenCalledWith('rice flour');
     expect(input).toHaveValue('rice');
     expect(screen.getByRole('button', { name: 'Voice search' })).toBeInTheDocument();
+  });
+
+  it('forwards the ref to the input', () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<SearchField ref={ref} label="Search products" />);
+    expect(ref.current).toBe(screen.getByRole('searchbox', { name: 'Search products' }));
+    ref.current?.focus();
+    expect(screen.getByRole('searchbox')).toHaveFocus();
   });
 });

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -132,5 +132,69 @@ describe('OtpInput', () => {
   it('disables every box', () => {
     render(<Code disabled />);
     for (const b of boxes()) expect(b).toBeDisabled();
+  });
+
+  it('wraps the boxes in a group named by the label', () => {
+    render(<Code />);
+    const group = screen.getByRole('group', { name: "Enter customer's code" });
+    expect(group).toContainElement(boxes()[3] as HTMLInputElement);
+  });
+
+  it('steps back on an Android keyboard (beforeinput deleteContentBackward, no Backspace key)', () => {
+    render(<Code start="12" />);
+    const third = boxes()[2] as HTMLInputElement;
+    third.focus();
+    const e = new InputEvent('beforeinput', { inputType: 'deleteContentBackward', bubbles: true, cancelable: true });
+    act(() => {
+      third.dispatchEvent(e);
+    });
+    expect(e.defaultPrevented).toBe(true);
+    expect(value()).toBe('1');
+    expect(boxes()[1]).toHaveFocus();
+    // Other input types are left to the browser.
+    const typing = new InputEvent('beforeinput', { inputType: 'insertText', data: '5', bubbles: true, cancelable: true });
+    (boxes()[1] as HTMLInputElement).dispatchEvent(typing);
+    expect(typing.defaultPrevented).toBe(false);
+  });
+
+  it('a box emptied without Backspace (cut, forward delete) clears that digit', () => {
+    render(<Code start="123" />);
+    fireEvent.change(boxes()[1] as HTMLInputElement, { target: { value: '' } });
+    expect(value()).toBe('13');
+  });
+
+  it('does not complete again for the same code, and does after it is edited or cleared', () => {
+    const onComplete = vi.fn();
+    function Clearable() {
+      const [v, setV] = useState('');
+      return (
+        <>
+          <OtpInput
+            label="Code"
+            digitLabel={(i) => `Digit ${i}`}
+            value={v}
+            onChange={setV}
+            onComplete={onComplete}
+          />
+          <button type="button" onClick={() => setV('')}>
+            Clear
+          </button>
+        </>
+      );
+    }
+    render(<Clearable />);
+    const paste = (text: string) =>
+      fireEvent.paste(boxes()[0] as HTMLInputElement, { clipboardData: { getData: () => text } });
+    paste('4827');
+    paste('4827');
+    // Retyping the same digit over a full code changes nothing.
+    fireEvent.change(boxes()[3] as HTMLInputElement, { target: { value: '7' } });
+    expect(onComplete).toHaveBeenCalledTimes(1);
+    paste('4828');
+    expect(onComplete).toHaveBeenCalledTimes(2);
+    // The parent clears the code after a wrong attempt: the same code counts again.
+    fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
+    paste('4828');
+    expect(onComplete).toHaveBeenCalledTimes(3);
   });
 });

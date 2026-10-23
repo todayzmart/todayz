@@ -36,4 +36,10 @@ describe('TextField', () => {
     expect(screen.getByRole('textbox')).not.toHaveAttribute('aria-invalid');
     expect(screen.getByRole('textbox')).not.toHaveAttribute('aria-describedby');
   });
+
+  it('the error is a polite live region, so it is read when it appears', () => {
+    const { rerender } = render(<TextField label="PIN code" id="pin2" />);
+    rerender(<TextField label="PIN code" id="pin2" error="Enter a 6-digit PIN code" />);
+    expect(screen.getByText('Enter a 6-digit PIN code')).toHaveAttribute('aria-live', 'polite');
+  });
 });

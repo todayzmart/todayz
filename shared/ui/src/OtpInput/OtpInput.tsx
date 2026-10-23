@@ -1,15 +1,24 @@
-import { useId, useRef, useState, type ClipboardEvent, type KeyboardEvent, type ReactNode } from 'react';
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ClipboardEvent,
+  type KeyboardEvent,
+  type ReactNode,
+} from 'react';
 import { cx } from '../internal/cx';
 
 export interface OtpInputProps {
-  /** Label of the whole code, also the first box's name (e.g. "Enter customer's code"). */
+  /** Label of the whole code: names the group of boxes and the first box (e.g. "Enter customer's code"). */
   label: ReactNode;
   /** Name of boxes 2…n, e.g. (i) => `Digit ${i}`. */
   digitLabel: (position: number) => string;
   length?: number | undefined;
   value: string;
   onChange: (value: string) => void;
-  /** Fires once when every box holds a digit. */
+  /** Fires once when every box holds a digit; not again for the same code until it is edited. */
   onComplete?: ((code: string) => void) | undefined;
   help?: ReactNode;
   /** Wrong-code message; the boxes shake once each time it changes to a new non-empty value. */
@@ -24,8 +33,9 @@ export interface OtpInputProps {
 const onlyDigits = (s: string) => s.replace(/\D/g, '');
 
 /**
- * Shop-side code entry (tz-otp): one box per digit, auto-advance, Backspace steps back, paste
- * fills every box, arrows move. A wrong code shakes once (a fade when motion is reduced).
+ * Shop-side code entry (tz-otp): one box per digit in a labelled group, auto-advance, Backspace
+ * steps back (also on Android keyboards, which send no Backspace key), paste fills every box,
+ * arrows move. A wrong code shakes once (a fade when motion is reduced).
  */
 export function OtpInput({
   label,
@@ -44,6 +54,7 @@ export function OtpInput({
   const id = useId();
   const firstId = `tz-otp-${id}`;
   const msgId = `${firstId}-msg`;
+  const labelId = `${firstId}-label`;
   const refs = useRef<(HTMLInputElement | null)[]>([]);
   const digits = Array.from({ length }, (_, i) => value[i] ?? '');
   const invalid = error !== undefined && error !== null && error !== false && error !== '';
@@ -65,10 +76,22 @@ export function OtpInput({
     el?.select();
   };
 
+  /** The complete code last reported, so a repeat (same paste, same digit retyped) is not. */
+  const completed = useRef<string | null>(null);
+  useEffect(() => {
+    // The parent cleared or shortened the code (a wrong code, a retry): the next full code counts.
+    if (value.length < length) completed.current = null;
+  }, [value, length]);
+
   const commit = (next: string) => {
     const clean = onlyDigits(next).slice(0, length);
     onChange(clean);
-    if (clean.length === length) onComplete?.(clean);
+    if (clean.length < length) {
+      completed.current = null;
+    } else if (clean !== completed.current) {
+      completed.current = clean;
+      onComplete?.(clean);
+    }
   };
 
   const setDigit = (i: number, d: string) => {
@@ -80,9 +103,50 @@ export function OtpInput({
     return joined.length;
   };
 
+  /** Backspace in box i: clear it, or when it is empty, clear the one before and step back. */
+  const backspace = (i: number) => {
+    if (digits[i]) {
+      commit(digits.slice(0, i).join('') + digits.slice(i + 1).join(''));
+      focusAt(i);
+    } else if (i > 0) {
+      commit(digits.slice(0, i - 1).join('') + digits.slice(i).join(''));
+      focusAt(i - 1);
+    }
+  };
+  const backspaceRef = useRef(backspace);
+  useLayoutEffect(() => {
+    backspaceRef.current = backspace;
+  });
+
+  // Android keyboards send keydown "Unidentified" (229), not Backspace, and an empty box has
+  // nothing to delete, so no change event: the native beforeinput (React's onBeforeInput does not
+  // carry inputType) is the only signal. Desktop Backspace is handled in keydown and never gets here.
+  useEffect(() => {
+    const boxes = refs.current.slice(0, length);
+    const handlers = boxes.map((el, i) => {
+      const h = (e: Event) => {
+        if ((e as InputEvent).inputType !== 'deleteContentBackward') return;
+        e.preventDefault();
+        backspaceRef.current(i);
+      };
+      el?.addEventListener('beforeinput', h);
+      return h;
+    });
+    return () => {
+      boxes.forEach((el, i) => {
+        const h = handlers[i];
+        if (h) el?.removeEventListener('beforeinput', h);
+      });
+    };
+  }, [length]);
+
   const onInput = (i: number, raw: string) => {
     let typed = onlyDigits(raw);
-    if (typed.length === 0) return;
+    if (typed.length === 0) {
+      // The box was emptied some other way (cut, a keyboard that deletes without beforeinput).
+      if (raw === '' && digits[i]) backspace(i);
+      return;
+    }
     const old = digits[i];
     if (old && typed.length === 2) {
       // Typed into a filled box without selecting it: keep the new digit only.
@@ -102,13 +166,7 @@ export function OtpInput({
   const onKeyDown = (i: number, e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace') {
       e.preventDefault();
-      if (digits[i]) {
-        commit(digits.slice(0, i).join('') + digits.slice(i + 1).join(''));
-        focusAt(i);
-      } else if (i > 0) {
-        commit(digits.slice(0, i - 1).join('') + digits.slice(i).join(''));
-        focusAt(i - 1);
-      }
+      backspace(i);
     } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
       focusAt(i - 1);
@@ -129,10 +187,15 @@ export function OtpInput({
 
   return (
     <div className={cx('tz-field', className)}>
-      <label className="tz-field-label" htmlFor={firstId}>
+      <label className="tz-field-label" htmlFor={firstId} id={labelId}>
         {label}
       </label>
-      <div className={cx('tz-otp', shaking && 'tz-ui-shake')} onAnimationEnd={() => setShaking(false)}>
+      <div
+        className={cx('tz-otp', shaking && 'tz-ui-shake')}
+        role="group"
+        aria-labelledby={labelId}
+        onAnimationEnd={() => setShaking(false)}
+      >
         {digits.map((d, i) => (
           <input
             key={i}

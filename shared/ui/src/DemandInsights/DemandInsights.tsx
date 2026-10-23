@@ -35,6 +35,8 @@ function Row({
   LinkComponent,
 }: { row: InsightRow } & Pick<DemandInsightsProps, 'onNotUseful' | 'notUsefulLabel' | 'LinkComponent'>) {
   const sentenceId = useId();
+  const labelId = useId();
+  const dismissId = useId();
   const look = INSIGHT_LOOK[row.kind];
   const Link = LinkComponent ?? 'a';
   const action = (
@@ -50,7 +52,7 @@ function Row({
         <Icon icon={look.icon} />
       </span>
       <div>
-        <b>{row.label}</b>
+        <b id={labelId}>{row.label}</b>
         <small id={sentenceId}>{row.sentence}</small>
       </div>
       {dismissable ? (
@@ -59,7 +61,11 @@ function Row({
           <button
             type="button"
             className="tz-ui-insight-dismiss"
+            id={dismissId}
             aria-label={notUsefulLabel}
+            // "Not useful, Low stock: Amul Gold": every row's button has its own name.
+            aria-labelledby={`${dismissId} ${labelId}`}
+            aria-describedby={sentenceId}
             title={notUsefulLabel}
             onClick={() => onNotUseful(row)}
           >

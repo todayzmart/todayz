@@ -1,9 +1,9 @@
 import { Info, TriangleAlert } from 'lucide-react';
-import { type ReactNode } from 'react';
+import { forwardRef, type HTMLAttributes, type ReactNode } from 'react';
 import { cx } from '../internal/cx';
 import { Icon, type LucideIcon } from '../internal/Icon';
 
-export interface BannerProps {
+export interface BannerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'role' | 'children'> {
   tone?: 'info' | 'warning' | undefined;
   /** Bold lead-in, e.g. "You're offline." */
   title?: ReactNode;
@@ -20,11 +20,16 @@ export interface BannerProps {
 }
 
 /** Inline page banner (tz-banner): info (sky) or warning (amber). Never a modal. */
-export function Banner({ tone = 'info', title, children, icon, action, live = 'none', className }: BannerProps) {
+export const Banner = forwardRef<HTMLDivElement, BannerProps>(function Banner(
+  { tone = 'info', title, children, icon, action, live = 'none', className, ...rest },
+  ref,
+) {
   return (
     <div
+      ref={ref}
       className={cx('tz-banner', tone === 'warning' && 'tz-banner-warning', className)}
       role={live === 'status' ? 'status' : undefined}
+      {...rest}
     >
       <Icon icon={icon ?? (tone === 'warning' ? TriangleAlert : Info)} />
       <span className="tz-ui-grow">
@@ -35,4 +40,4 @@ export function Banner({ tone = 'info', title, children, icon, action, live = 'n
       {action}
     </div>
   );
-}
+});

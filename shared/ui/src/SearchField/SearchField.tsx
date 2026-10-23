@@ -1,5 +1,14 @@
 import { Search, X } from 'lucide-react';
-import { useEffect, useId, useRef, useState, type InputHTMLAttributes, type ReactNode } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type InputHTMLAttributes,
+  type ReactNode,
+} from 'react';
 import { cx } from '../internal/cx';
 import { Icon } from '../internal/Icon';
 
@@ -27,8 +36,9 @@ export interface SearchFieldProps extends Omit<
   className?: string | undefined;
 }
 
-/** Search input with a leading search icon (tz-search). */
-export function SearchField({
+/** Search input with a leading search icon (tz-search). The ref is the input. */
+export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(function SearchField(
+  {
   label,
   value,
   defaultValue = '',
@@ -39,15 +49,18 @@ export function SearchField({
   trailing,
   clearLabel,
   className,
-  id,
-  ...rest
-}: SearchFieldProps) {
+    id,
+    ...rest
+  },
+  ref,
+) {
   const auto = useId();
   const inputId = id ?? `tz-search-${auto}`;
   const [inner, setInner] = useState(defaultValue);
   const text = value ?? inner;
   const searchRef = useRef(onSearch);
   const inputRef = useRef<HTMLInputElement>(null);
+  useImperativeHandle(ref, () => inputRef.current as HTMLInputElement, []);
   const first = useRef(true);
   useEffect(() => {
     searchRef.current = onSearch;
@@ -98,4 +111,4 @@ export function SearchField({
       {trailing && <span className="tz-ui-search-trailing">{trailing}</span>}
     </div>
   );
-}
+});

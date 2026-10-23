@@ -1,4 +1,4 @@
-import { type ButtonHTMLAttributes, type KeyboardEvent, type ReactNode } from 'react';
+import { forwardRef, type ButtonHTMLAttributes, type KeyboardEvent, type ReactNode } from 'react';
 import { cx } from '../internal/cx';
 import { Icon, type LucideIcon } from '../internal/Icon';
 
@@ -10,9 +10,13 @@ export interface ChipProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>,
 }
 
 /** Toggle chip (tz-chip with aria-pressed): filters and single-choice rows. */
-export function Chip({ pressed, onPressedChange, icon, className, children, onClick, ...rest }: ChipProps) {
+export const Chip = forwardRef<HTMLButtonElement, ChipProps>(function Chip(
+  { pressed, onPressedChange, icon, className, children, onClick, ...rest },
+  ref,
+) {
   return (
     <button
+      ref={ref}
       type="button"
       className={cx('tz-chip', className)}
       aria-pressed={pressed}
@@ -26,7 +30,7 @@ export function Chip({ pressed, onPressedChange, icon, className, children, onCl
       {children}
     </button>
   );
-}
+});
 
 export interface ChipOption<V extends string | number> {
   value: V;

@@ -49,7 +49,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
         input
       )}
       {invalid ? (
-        <span className="tz-field-error" id={errorId}>
+        <span className="tz-field-error" id={errorId} aria-live="polite">
           {error}
         </span>
       ) : (
