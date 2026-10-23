@@ -160,6 +160,25 @@ func (s *Service) end(ctx context.Context, o ordersdb.Order, to, reason string, 
 		return invalidTransition()
 	}
 	q := s.q(ctx)
+	// Lock the held items in id order first, as accept does: one UPDATE of
+	// the reservations moves store_items through the trigger in scan order,
+	// which against an accept of another order on the same items could wait
+	// in a cycle (a deadlock).
+	held, err := q.HeldReservations(ctx, o.ID)
+	if err != nil {
+		return fmt.Errorf("orders: held stock: %w", err)
+	}
+	if len(held) > 0 {
+		itemIDs := make([]pgtype.UUID, 0, len(held))
+		for i, r := range held { // ordered by store_item_id
+			if i == 0 || r.StoreItemID != held[i-1].StoreItemID {
+				itemIDs = append(itemIDs, r.StoreItemID)
+			}
+		}
+		if _, err := q.LockItems(ctx, itemIDs); err != nil {
+			return fmt.Errorf("orders: lock items: %w", err)
+		}
+	}
 	if _, err := q.ReleaseReservations(ctx, ordersdb.ReleaseReservationsParams{Reason: &reason, OrderID: o.ID}); err != nil {
 		return fmt.Errorf("orders: release stock: %w", err)
 	}
@@ -288,10 +307,14 @@ func fullAccept(lines []ordersdb.OrderLinesRow, body *ordersapi.AcceptOrderReque
 			return fieldErr(fmt.Sprintf("body.lines[%d].orderItemId", i), "not a line of this order, or repeated")
 		}
 		seen[id.String()] = true
-		if int32(min(max(al.Quantity, 0), 1<<20)) != q { //nolint:gosec // clamped
+		field := fmt.Sprintf("body.lines[%d].quantity", i)
+		switch {
+		case al.Quantity > int(q):
+			return fieldErr(field, "more than the order asked for")
+		case al.Quantity < int(q):
 			// TODO(lead): partial accept (BK-08–10) is deferred; until then a
 			// line must be accepted at the quantity asked.
-			return fieldErr(fmt.Sprintf("body.lines[%d].quantity", i), "a partial accept is not available yet")
+			return fieldErr(field, "a partial accept is not available yet")
 		}
 	}
 	return nil
@@ -412,6 +435,10 @@ func (s *Service) verify(ctx context.Context, by, storeID, orderID ids.ID, b *or
 			}
 			wrong = true
 			if r.CodeLockedAt != nil {
+				// TODO(risk): the code-lockout risk flag (01 §6,
+				// risk_code_lockouts_store_per_day) is the risk WP's; it counts
+				// orders.code_locked_at per store per IST day. Nothing is
+				// flagged here.
 				locked = true
 				return s.publish(ctx, o, r.Version)
 			}
