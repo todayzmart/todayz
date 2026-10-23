@@ -650,7 +650,7 @@ func (s *Service) updateSettings(ctx context.Context, bidStr, sidStr string, ifM
 			next.AsksMuted = *body.AsksMuted
 		}
 		if body.DeliveryRadiusM != nil {
-			next.DeliveryRadiusM = int32(*body.DeliveryRadiusM) //nolint:gosec // the contract bounds it
+			next.DeliveryRadiusM = int32(*body.DeliveryRadiusM) // #nosec G115 -- the validator bounds it to 100..20000 (ck_stores_delivery_radius)
 		}
 		if body.DeliveryFeePaise != nil {
 			next.DeliveryFeePaise = int64(*body.DeliveryFeePaise)
@@ -672,7 +672,7 @@ func (s *Service) updateSettings(ctx context.Context, bidStr, sidStr string, ifM
 			}
 		}
 		if body.CashbackBp != nil {
-			next.CashbackBp = int32(*body.CashbackBp) //nolint:gosec // the contract bounds it
+			next.CashbackBp = int32(*body.CashbackBp) // #nosec G115 -- the validator bounds it to 0..2000 (ck_stores_cashback)
 		}
 		if body.AutoAccept != nil {
 			next.AutoAccept = *body.AutoAccept
