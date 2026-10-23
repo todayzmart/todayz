@@ -822,6 +822,25 @@ func seedcatalogue(ctx context.Context, d Deps, _ Profile) error {
 		ON CONFLICT DO NOTHING`, bIDs, bNames, keys, now); err != nil {
 		return fmt.Errorf("brands: %w", err)
 	}
+	// A brand already there under its slug keeps its own id: read the ids back
+	// so products point at the row that exists.
+	rows, err := q.Query(ctx, `SELECT id, slug FROM brands WHERE slug = ANY($1::text[])`, keys)
+	if err != nil {
+		return fmt.Errorf("brand ids: %w", err)
+	}
+	for rows.Next() {
+		var id pgtype.UUID
+		var slug string
+		if err := rows.Scan(&id, &slug); err != nil {
+			rows.Close()
+			return fmt.Errorf("brand ids: %w", err)
+		}
+		brandID[slugs[slug]] = id
+	}
+	rows.Close()
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("brand ids: %w", err)
+	}
 
 	// Products in one statement.
 	n := len(products)
