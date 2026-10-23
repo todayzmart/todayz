@@ -33,6 +33,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/riverqueue/river/rivertype"
+
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/ids"
 )
@@ -273,7 +275,8 @@ type Kind struct {
 	// Queue is the River queue; empty means the default queue.
 	Queue string
 	// Concurrency caps how many runs of this kind work at once across all
-	// workers; 0 means no cap beyond the queue's.
+	// workers; 0 means no cap beyond the queue's. At most 10: each capped run
+	// holds a pool connection for its whole run (see maxConcurrency).
 	Concurrency int
 	// Runbook is the repo path of the kind's runbook
 	// ("docs/runbooks/<name>.md"). Required for timer and money kinds.
@@ -292,7 +295,12 @@ const MaxTimeout = 60 * time.Second
 // returns it (or any error wrapping it) and the run ends yielded.
 var ErrYielded = errors.New("jobs: yielded for shutdown; a continuation is enqueued")
 
-// outcome is the status of a finished attempt.
+// outcome is the status of a finished attempt. It matches the state River
+// gives the job: a person's JobCancel (cause ErrJobCancelledRemotely) is
+// cancelled whatever the attempt; a hard cancel at shutdown (StopAndCancel)
+// reaches River as an ordinary error (the middleware returns the scrubbed
+// text), so River retries it, or discards it on the last attempt, and the run
+// is recorded discarded there, where A-21 and the "Job failing" alert see it.
 func outcome(ctx context.Context, err error, yielded bool, attempt, maxAttempts int) Status {
 	switch {
 	case yielded:
@@ -302,6 +310,9 @@ func outcome(ctx context.Context, err error, yielded bool, attempt, maxAttempts 
 	case errors.Is(err, ErrYielded):
 		return StatusYielded
 	case errors.Is(ctx.Err(), context.Canceled):
+		if attempt >= maxAttempts && !errors.Is(context.Cause(ctx), rivertype.ErrJobCancelledRemotely) {
+			return StatusDiscarded
+		}
 		return StatusCancelled
 	case attempt >= maxAttempts:
 		return StatusDiscarded

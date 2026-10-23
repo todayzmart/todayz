@@ -163,9 +163,10 @@ func missedAllowance(interval time.Duration) time.Duration {
 
 // watchdog (D-95, SC-JB-05) closes abandoned running rows, then, for every
 // scheduled kind that is not paused, writes one `missed` row for the latest
-// period whose allowance has passed without a run, and sets
-// tz_job_missed{kind} to whether a missed row is newer than the kind's
-// latest success.
+// period whose allowance has passed without a run (and was not inside a
+// pause window), and counts the kinds whose missed row is newer than their
+// latest success. tz_job_missed{kind} reports the same from the database in
+// every worker (monitor.current); the watchdog never sets it inside its tx.
 func watchdog(ctx context.Context, r *Registry, d PlatformDeps) (Result, error) {
 	if err := needPool(d); err != nil {
 		return Result{}, err
@@ -181,7 +182,7 @@ func watchdog(ctx context.Context, r *Registry, d PlatformDeps) (Result, error) 
 			res.Note = "another watchdog run holds the lock"
 			return nil
 		}
-		paused, err := pausedKinds(ctx, tx)
+		controls, err := pausedKinds(ctx, tx)
 		if err != nil {
 			return err
 		}
@@ -199,11 +200,11 @@ func watchdog(ctx context.Context, r *Registry, d PlatformDeps) (Result, error) 
 			if !ok {
 				continue
 			}
-			if paused[k.Name] && k.Class != ClassTimer {
-				r.monitor().setMissed(k.Name, false) // a paused kind is not flagged
-				continue
+			c := controls[k.Name]
+			if k.Class != ClassTimer && c.paused {
+				continue // a paused kind is not flagged (and its gauge reads 0)
 			}
-			isNew, err := checkMissed(ctx, tx, r, k, sched, now, baseline)
+			isNew, err := checkMissed(ctx, tx, r, k, sched, now, baseline, c)
 			if err != nil {
 				return err
 			}
@@ -214,7 +215,6 @@ func watchdog(ctx context.Context, r *Registry, d PlatformDeps) (Result, error) 
 			if err != nil {
 				return err
 			}
-			r.monitor().setMissed(k.Name, missed)
 			if missed {
 				res.Summary["missed_now"]++
 			}
@@ -224,23 +224,46 @@ func watchdog(ctx context.Context, r *Registry, d PlatformDeps) (Result, error) 
 	if err != nil {
 		return Result{}, fmt.Errorf("jobs_watchdog: %w", err)
 	}
+	// Every worker's gauge reads the database (monitor.current); this one
+	// reads it again now that the watchdog's rows are committed.
+	r.monitor().invalidate()
 	return res, nil
 }
 
-func pausedKinds(ctx context.Context, tx pgx.Tx) (map[string]bool, error) {
-	rows, err := tx.Query(ctx, `SELECT kind FROM job_controls WHERE paused`)
+// control is a kind's job_controls row: whether it is paused now, and its
+// latest pause window (pausedAt to resumedAt; resumedAt nil while paused).
+type control struct {
+	paused              bool
+	pausedAt, resumedAt *time.Time
+}
+
+// pausedDuring: the kind was paused at some point in [from, to] by its
+// latest pause window (only the latest window is kept).
+func (c control) pausedDuring(from, to time.Time) bool {
+	if c.pausedAt == nil || c.pausedAt.After(to) {
+		return false
+	}
+	return c.resumedAt == nil || !c.resumedAt.Before(from)
+}
+
+func pausedKinds(ctx context.Context, tx pgx.Tx) (map[string]control, error) {
+	rows, err := tx.Query(ctx, `SELECT kind, paused, paused_at, resumed_at FROM job_controls`)
 	if err != nil {
 		return nil, err
 	}
-	names, err := pgx.CollectRows(rows, pgx.RowTo[string])
-	if err != nil {
-		return nil, err
+	defer rows.Close()
+	out := map[string]control{}
+	for rows.Next() {
+		var (
+			kind string
+			c    control
+		)
+		if err := rows.Scan(&kind, &c.paused, &c.pausedAt, &c.resumedAt); err != nil {
+			return nil, err
+		}
+		out[kind] = c
 	}
-	out := make(map[string]bool, len(names))
-	for _, n := range names {
-		out[n] = true
-	}
-	return out, nil
+	return out, rows.Err()
 }
 
 // watchdogBaseline is when the jobs platform first ran here: the watchdog's
@@ -273,7 +296,11 @@ func closeAbandoned(ctx context.Context, tx pgx.Tx, k Kind, now time.Time) (int6
 
 // checkMissed writes a missed row for k's latest tick whose allowance has
 // passed, if that period (or a later one) has no run and no missed row yet.
-func checkMissed(ctx context.Context, tx pgx.Tx, r *Registry, k Kind, sched *Schedule, now, baseline time.Time) (bool, error) {
+// A tick inside a pause window (paused at the tick or during its allowance,
+// then resumed) is not missed: the scheduler did not enqueue it, by design.
+// A skipped row counts as a run: it is either a duplicate of a succeeded
+// period or the scheduler's first-seen marker for a kind with no history.
+func checkMissed(ctx context.Context, tx pgx.Tx, r *Registry, k Kind, sched *Schedule, now, baseline time.Time, c control) (bool, error) {
 	if baseline.IsZero() {
 		return false, nil
 	}
@@ -282,10 +309,13 @@ func checkMissed(ctx context.Context, tx pgx.Tx, r *Registry, k Kind, sched *Sch
 	if p.IsZero() || p.Before(baseline) {
 		return false, nil
 	}
+	if k.Class != ClassTimer && c.pausedDuring(p, p.Add(allow)) {
+		return false, nil
+	}
 	key := k.UniqueBy.Key(p)
 	var ran bool
 	if err := tx.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM job_runs WHERE kind = $1 AND created_at >= $2
-		AND status IN ('succeeded', 'running', 'yielded') AND (period_key IS NULL OR period_key >= $3))`,
+		AND status IN ('succeeded', 'running', 'yielded', 'skipped') AND (period_key IS NULL OR period_key >= $3))`,
 		k.Name, p, key).Scan(&ran); err != nil {
 		return false, err
 	}

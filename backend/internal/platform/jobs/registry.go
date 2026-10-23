@@ -1,6 +1,7 @@
 package jobs
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"regexp"
@@ -80,7 +81,15 @@ const (
 	maxNameLen        = 63
 	maxDescriptionLen = 200
 	maxAttemptsCap    = 25
-	maxConcurrency    = 100
+	// maxConcurrency caps Kind.Concurrency. Each run of a capped kind pins one
+	// pool connection for its whole run (acquireSlot holds the session
+	// advisory lock on it), on top of the connections the handler uses. The
+	// worker pool is small (pgxpool's default max(4, NumCPU) unless
+	// DATABASE_URL sets pool_max_conns; cmd/todayz/app.go), so a large cap
+	// would let one kind pin the pool and starve its own handlers, River and
+	// the scheduler. A kind that needs more parallelism leaves Concurrency at
+	// 0 and is bounded by its queue's MaxWorkers instead.
+	maxConcurrency = 10
 )
 
 // Validate checks a declaration against the registry rules (SC-JB-01,
@@ -204,9 +213,10 @@ func (r *Registry) monitor() *monitor {
 	return r.mon
 }
 
-// MissedKinds lists the scheduled kinds the watchdog currently sees as
-// missed (tz_job_missed = 1) in this process; empty outside the worker.
-func (r *Registry) MissedKinds() []string { return r.monitor().missedKinds() }
+// MissedKinds lists the scheduled kinds tz_job_missed reads 1 for: read
+// from the database (shared by every worker) through the monitor's cache;
+// empty outside the worker.
+func (r *Registry) MissedKinds(ctx context.Context) []string { return r.monitor().missedKinds(ctx) }
 
 // DefaultQueue is the River queue a kind with no Queue uses.
 const DefaultQueue = "default"

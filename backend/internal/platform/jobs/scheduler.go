@@ -7,8 +7,10 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/riverqueue/river"
 
+	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/queue"
 )
 
@@ -24,7 +26,11 @@ import (
 //   - after downtime only the latest period is enqueued (a missed earlier
 //     one is the watchdog's to report, not to replay), and on start the
 //     latest period runs if it has not (River's RunOnStart, minus the
-//     duplicate).
+//     duplicate) — but only for a kind with history: a kind with no
+//     job_runs row at all (a fresh database, a newly deployed kind) does
+//     not run a tick that was due before this process started; the
+//     scheduler writes a skipped "first seen" row for that period (so the
+//     watchdog does not report it) and the kind first runs at its next tick.
 
 // periodTakenSQL: a period with a succeeded or running run, or any scheduled
 // or continuation run, is not enqueued again by the scheduler (a failed
@@ -55,6 +61,19 @@ func (r *Runner) EnqueueDue(ctx context.Context, c *queue.Client) (int, error) {
 		if tick.Equal(last) {
 			continue
 		}
+		if tick.Before(r.started) { // a catch-up tick, due before this process started
+			first, err := r.firstSeen(ctx, e.kind, tick, now)
+			if err != nil {
+				errs = append(errs, err)
+				continue
+			}
+			if first {
+				r.mu.Lock()
+				r.lastTick[name] = tick
+				r.mu.Unlock()
+				continue
+			}
+		}
 		ok, err := r.enqueueTick(ctx, c, e, tick)
 		if err != nil {
 			errs = append(errs, err)
@@ -68,6 +87,40 @@ func (r *Runner) EnqueueDue(ctx context.Context, c *queue.Client) (int, error) {
 		}
 	}
 	return n, errors.Join(errs...)
+}
+
+const firstSeenNote = "first seen by the scheduler with no history; the kind runs from its next tick"
+
+// firstSeen reports whether k has no job_runs row at all; if so it writes
+// the skipped first-seen row for tick's period (once across workers: the
+// check and the insert run under a per-kind transaction lock).
+func (r *Runner) firstSeen(ctx context.Context, k Kind, tick, now time.Time) (bool, error) {
+	var none bool
+	err := pgx.BeginFunc(ctx, r.o.Pool, func(tx pgx.Tx) error {
+		if _, err := tx.Exec(ctx, `SELECT pg_advisory_xact_lock(hashtext($1))`, "tz_jobs:first_seen:"+k.Name); err != nil {
+			return err
+		}
+		if err := tx.QueryRow(ctx, `SELECT NOT EXISTS (SELECT 1 FROM job_runs WHERE kind = $1)`, k.Name).Scan(&none); err != nil || !none {
+			return err
+		}
+		row := &runRow{id: ids.New(now), kind: k.Name, class: k.Class, trigger: TriggerSchedule,
+			periodKey: k.UniqueBy.Key(tick), status: StatusSkipped, scheduledAt: tick, finishedAt: now,
+			note: firstSeenNote, createdAt: now}
+		a, err := row.args()
+		if err != nil {
+			return err
+		}
+		_, err = tx.Exec(ctx, insertRunSQL, a...)
+		return err
+	})
+	if err != nil {
+		return false, fmt.Errorf("jobs: %s: first seen: %w", k.Name, err)
+	}
+	if none {
+		r.o.Log.InfoContext(ctx, "job has no history; waiting for its next tick",
+			slog.String("kind", k.Name), slog.String("period", k.UniqueBy.Key(tick)))
+	}
+	return none, nil
 }
 
 func (r *Runner) enqueueTick(ctx context.Context, c *queue.Client, e *entry, tick time.Time) (bool, error) {

@@ -61,6 +61,9 @@ type Runner struct {
 	o      RunnerOptions
 	mon    *monitor
 	tracer trace.Tracer
+	// started is when NewRunner ran (by the injected clock); a tick due
+	// before it is a catch-up tick (EnqueueDue).
+	started time.Time
 
 	mu       sync.Mutex
 	lastTick map[string]time.Time
@@ -79,12 +82,13 @@ func NewRunner(reg *Registry, o RunnerOptions) (*Runner, error) {
 	if tp == nil {
 		tp = otel.GetTracerProvider()
 	}
-	mon, err := newMonitor(o.MeterProvider, reg)
+	mon, err := newMonitor(o.MeterProvider, reg, o.Pool, o.Clock)
 	if err != nil {
 		return nil, fmt.Errorf("jobs: metrics: %w", err)
 	}
 	reg.setMonitor(mon)
-	return &Runner{reg: reg, o: o, mon: mon, tracer: tp.Tracer("todayz/jobs"), lastTick: map[string]time.Time{}}, nil
+	return &Runner{reg: reg, o: o, mon: mon, tracer: tp.Tracer("todayz/jobs"), started: o.Clock.Now(),
+		lastTick: map[string]time.Time{}}, nil
 }
 
 // Close unregisters the runner's metric callback.
@@ -350,7 +354,7 @@ func (r *Runner) work(ctx context.Context, e *entry, job *river.Job[envelope]) e
 		lateMS := late.Milliseconds()
 		row.latenessMS = &lateMS
 	}
-	row.summary, row.note = res.Summary, scrubNote(res.Note)
+	row.summary, row.note = scrubSummary(res.Summary), scrubNote(res.Note)
 	var retErr error
 	switch st {
 	case StatusFailed, StatusDiscarded, StatusCancelled:
@@ -364,7 +368,7 @@ func (r *Runner) work(ctx context.Context, e *entry, job *river.Job[envelope]) e
 	write := logged || st == StatusFailed || st == StatusDiscarded || st == StatusCancelled || job.Attempt > 1
 	r.finish(ctx, log, k, row, write, late, lateKnown)
 	if st == StatusSucceeded && k.Scheduled() {
-		r.mon.setMissed(k.Name, false) // the gauge resets on the next success (D-95)
+		r.mon.invalidate() // the gauge resets on the next success (D-95): read it again
 	}
 
 	attrs := []any{slog.String("status", string(st)), slog.Int64("duration_ms", durMS)}

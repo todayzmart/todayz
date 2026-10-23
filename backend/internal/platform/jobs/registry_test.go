@@ -2,9 +2,11 @@ package jobs
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
+	"github.com/riverqueue/river/rivertype"
 	"github.com/stretchr/testify/require"
 
 	"github.com/todayz/backend/internal/platform/telemetry"
@@ -61,6 +63,8 @@ func TestValidate(t *testing.T) {
 		{"bad queue", func(k *Kind) { k.Queue = "Bulk Queue" }, validScheduled, "Queue"},
 		{"named queue", func(k *Kind) { k.Queue = "bulk" }, validScheduled, ""},
 		{"negative concurrency", func(k *Kind) { k.Concurrency = -1 }, validScheduled, "Concurrency"},
+		{"concurrency at the cap", func(k *Kind) { k.Concurrency = maxConcurrency }, validScheduled, ""},
+		{"concurrency above the cap", func(k *Kind) { k.Concurrency = maxConcurrency + 1 }, validScheduled, "Concurrency"},
 		{"no handler", func(k *Kind) { k.Handler = nil }, validScheduled, "Handler"},
 		{"name not snake_case", func(k *Kind) { k.Name = "rollup.today" }, validScheduled, "snake_case"},
 		{"name with capitals", func(k *Kind) { k.Name = "RollupToday" }, validScheduled, "snake_case"},
@@ -169,6 +173,17 @@ func TestOutcome(t *testing.T) {
 	require.Equal(t, StatusFailed, outcome(ctx, boom, false, 1, 3))
 	require.Equal(t, StatusDiscarded, outcome(ctx, boom, false, 3, 3))
 	require.Equal(t, StatusCancelled, outcome(cancelled, boom, false, 1, 3))
+	// A hard cancel at shutdown on the last attempt: River discards the job
+	// (the middleware hands it an ordinary error), so the run is discarded.
+	stopped, stop := context.WithCancelCause(ctx)
+	stop(errors.New("river: stop and cancel"))
+	require.Equal(t, StatusCancelled, outcome(stopped, context.Canceled, false, 2, 3), "River retries it")
+	require.Equal(t, StatusDiscarded, outcome(stopped, context.Canceled, false, 3, 3))
+	require.Equal(t, StatusDiscarded, outcome(cancelled, boom, false, 3, 3))
+	// A person's JobCancel is cancelled on any attempt (River marks it cancelled).
+	remote, cancelRemote := context.WithCancelCause(ctx)
+	cancelRemote(rivertype.ErrJobCancelledRemotely)
+	require.Equal(t, StatusCancelled, outcome(remote, context.Canceled, false, 3, 3))
 	require.Equal(t, StatusYielded, outcome(ctx, ErrYielded, false, 1, 3))
 	require.Equal(t, StatusYielded, outcome(ctx, nil, true, 1, 3), "a run that yielded ends yielded even if the handler swallowed ErrYielded")
 }

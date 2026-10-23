@@ -59,7 +59,11 @@ CREATE INDEX ix_job_runs_river_job ON job_runs (river_job_id) WHERE river_job_id
 CREATE INDEX ix_job_runs_status_created ON job_runs (status, created_at DESC);
 REVOKE DELETE, TRUNCATE ON job_runs, job_runs_default FROM todayz_app;
 
-INSERT INTO partition_policies (parent, granularity, ahead, retention_days) VALUES ('job_runs', 'month', 3, 1);
+-- The floor is 30 days: drop_old_partitions refuses any cut-off newer than
+-- now() - 30 days, whatever job_runs_retention_days (01 §17, default 90) is
+-- set to. The retention kind uses the setting; the floor only stops a
+-- mistaken setting or call from dropping the last month of run history.
+INSERT INTO partition_policies (parent, granularity, ahead, retention_days) VALUES ('job_runs', 'month', 3, 30);
 SELECT ensure_partitions('job_runs', now());
 
 -- job_stats_hourly: one row per kind and IST hour, upserted once per attempt
@@ -87,13 +91,17 @@ REVOKE DELETE, TRUNCATE ON job_stats_hourly FROM todayz_app;
 
 -- job_controls: pause state per kind. A paused scheduled kind does not run
 -- at its ticks; a paused event kind snoozes. timer kinds can never be paused
--- (enforced in Go, 04 §2.7).
+-- (enforced in Go, 04 §2.7). paused_at and resumed_at hold the latest pause
+-- window: the watchdog does not report a tick missed when its allowance
+-- overlaps that window (the kind was paused when it was due).
 CREATE TABLE job_controls (
   kind        text PRIMARY KEY,
   paused      boolean NOT NULL DEFAULT false,
   reason      text,
   updated_by  uuid, -- admin user (plain uuid, D-35)
   updated_at  timestamptz NOT NULL DEFAULT now(),
+  paused_at   timestamptz, -- when the latest pause began
+  resumed_at  timestamptz, -- when it ended; NULL while paused or never resumed
   CONSTRAINT ck_job_controls_kind CHECK (kind ~ '^[a-z][a-z0-9]*(_[a-z0-9]+)*$' AND length(kind) <= 63),
   CONSTRAINT ck_job_controls_reason CHECK (reason IS NULL OR length(reason) <= 500)
 );
@@ -108,10 +116,17 @@ REVOKE DELETE, TRUNCATE ON job_controls FROM todayz_app;
 -- returns how many partitions it dropped. Idempotent; the worker's
 -- job_runs_retention kind calls it as todayz_app (SECURITY DEFINER: the
 -- owner drops its own tables, so todayz_app needs no DDL grant).
+-- DROP TABLE on a partition needs an ACCESS EXCLUSIVE lock on the parent;
+-- queued behind a long reader it would block every insert into the parent
+-- behind it. lock_timeout makes it give up after 3 s instead (SQLSTATE
+-- 55P03, the whole call rolls back); the daily retention run fails and River
+-- retries it.
 -- +goose StatementBegin
 CREATE FUNCTION drop_old_partitions(parent_name text, before timestamptz)
 RETURNS int
-LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = pg_catalog, pg_temp
+SET lock_timeout = '3s' AS $$
 DECLARE
   keep_days  int;
   parent_oid pg_catalog.oid;

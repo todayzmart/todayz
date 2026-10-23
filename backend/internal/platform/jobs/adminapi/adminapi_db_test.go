@@ -583,6 +583,16 @@ func TestPauseResume(t *testing.T) {
 	require.Equal(t, http.StatusConflict, r.status)
 	require.Equal(t, genproblems.InvalidTransition, r.problem(t).Code)
 
+	// The pause window is kept for the watchdog: paused_at from the pause,
+	// resumed_at from the resume.
+	var pausedAt, resumedAt *time.Time
+	require.NoError(t, a.db.Pool.QueryRow(context.Background(),
+		`SELECT paused_at, resumed_at FROM job_controls WHERE kind = 'rollup_today'`).Scan(&pausedAt, &resumedAt))
+	require.NotNil(t, pausedAt)
+	require.NotNil(t, resumedAt)
+	require.True(t, pausedAt.Equal(st.Control.UpdatedAt.Truncate(time.Microsecond)), "paused_at %s is the pause's stamp %s", pausedAt, st.Control.UpdatedAt)
+	require.True(t, resumedAt.After(*pausedAt))
+
 	detail := decode[adminjobsapi.JobKindDetail](t, a.do("GET", "/v1/admin/jobs/rollup_today", "admin", nil, ""))
 	require.Equal(t, adminjobsapi.JobHealthOk, detail.Job.Health)
 	require.NotNil(t, detail.Job.NextRunAt)

@@ -270,6 +270,77 @@ func TestScheduledRunIsLogged(t *testing.T) {
 }
 
 // TestEventSuccessesAreCountedNotLogged is SC-JB-03.
+// TestFirstBootWaitsForNextTick: a worker starting after a tick catches
+// that tick up only for a kind with history; a kind with no job_runs row
+// gets a skipped first-seen row (which the watchdog accepts) and first runs
+// at its next tick.
+func TestFirstBootWaitsForNextTick(t *testing.T) {
+	var freshCalls, histCalls atomic.Int64
+	daily := func(name string, calls *atomic.Int64) Kind {
+		return Kind{Name: name, Owner: "W3-07", Description: "Daily rollup.", Class: ClassRollup,
+			Schedule: "0 9 * * *", UniqueBy: PerDay, Timeout: 10 * time.Second, MaxAttempts: 1,
+			Handler: func(context.Context, Run) (Result, error) { calls.Add(1); return Result{}, nil }}
+	}
+	h := newHarness(t, func(r *Registry) {
+		Define(r, daily("rollup_fresh", &freshCalls))
+		Define(r, daily("rollup_hist", &histCalls))
+	})
+	day := h.clk.Now().In(clock.IST).AddDate(0, 0, 2)
+	at := func(hh, mm int) time.Time { return ist(day.Year(), day.Month(), day.Day(), hh, mm) }
+	period := PerDay.Key(at(9, 0))
+
+	// The platform has run here since 08:00, and rollup_hist ran yesterday.
+	insertRow(t, h.ctx, h.db, runRow{kind: KindWatchdog, class: ClassMaintenance, trigger: TriggerSchedule, attempt: 1,
+		status: StatusSucceeded, createdAt: at(8, 0), startedAt: at(8, 0)})
+	y := at(9, 0).AddDate(0, 0, -1)
+	insertRow(t, h.ctx, h.db, runRow{kind: "rollup_hist", class: ClassRollup, trigger: TriggerSchedule, attempt: 1,
+		periodKey: PerDay.Key(y), status: StatusSucceeded, createdAt: y, startedAt: y, finishedAt: y})
+
+	// A worker boots at 09:05, after the 09:00 tick.
+	h.clk.Set(at(9, 5))
+	boot, err := NewRunner(h.reg, RunnerOptions{Pool: h.db.Pool, Clock: h.clk, Log: quiet()})
+	require.NoError(t, err)
+	defer boot.Close()
+	h.reg.setMonitor(h.run.mon)
+	n, err := boot.EnqueueDue(h.ctx, h.c)
+	require.NoError(t, err)
+	require.Equal(t, 1, n, "only the kind with history catches up")
+	h.waitCount(1, `SELECT count(*) FROM job_runs WHERE kind = 'rollup_hist' AND status = 'succeeded' AND period_key = $1`, period)
+
+	require.Equal(t, 1, h.count(`SELECT count(*) FROM job_runs WHERE kind = 'rollup_fresh'`))
+	require.Equal(t, 1, h.count(`SELECT count(*) FROM job_runs WHERE kind = 'rollup_fresh' AND status = 'skipped'
+		AND trigger = 'schedule' AND attempt = 0 AND period_key = $1 AND note = $2`, period, firstSeenNote))
+	require.Equal(t, 0, h.count(`SELECT count(*) FROM river_job WHERE args->>'p' = $1 AND kind = 'rollup_fresh'`, period))
+
+	// Another worker booting now sees the first-seen row as history, and the
+	// period as taken: nothing is enqueued and no second row is written.
+	other, err := NewRunner(h.reg, RunnerOptions{Pool: h.db.Pool, Clock: h.clk, Log: quiet()})
+	require.NoError(t, err)
+	defer other.Close()
+	h.reg.setMonitor(h.run.mon)
+	n, err = other.EnqueueDue(h.ctx, h.c)
+	require.NoError(t, err)
+	require.Zero(t, n)
+	require.Equal(t, 1, h.count(`SELECT count(*) FROM job_runs WHERE kind = 'rollup_fresh'`))
+
+	// The watchdog does not report the first-seen period.
+	h.clk.Set(at(9, 30))
+	res, err := watchdog(h.ctx, h.reg, PlatformDeps{Pool: h.db.Pool, Clock: h.clk, Log: quiet()})
+	require.NoError(t, err)
+	require.Zero(t, res.Summary["missed_new"])
+
+	// The next tick runs.
+	h.clk.Set(at(9, 0).AddDate(0, 0, 1).Add(time.Second))
+	n, err = boot.EnqueueDue(h.ctx, h.c)
+	require.NoError(t, err)
+	require.Equal(t, 2, n)
+	h.waitCount(1, `SELECT count(*) FROM job_runs WHERE kind = 'rollup_fresh' AND status = 'succeeded'`)
+	h.waitCount(2, `SELECT count(*) FROM job_runs WHERE kind = 'rollup_hist' AND status = 'succeeded' AND trigger = 'schedule'`+
+		` AND period_key >= $1`, period)
+	require.Equal(t, int64(1), freshCalls.Load())
+	require.Equal(t, int64(2), histCalls.Load())
+}
+
 func TestEventSuccessesAreCountedNotLogged(t *testing.T) {
 	var calls atomic.Int64
 	h := newHarness(t, func(r *Registry) {
@@ -347,6 +418,38 @@ func TestFailureIsScrubbedRetriedAndDiscarded(t *testing.T) {
 	require.NotContains(t, riverErrs, token)
 	require.Equal(t, int64(1), h.runsTotal("notify_flaky", StatusFailed))
 	require.Equal(t, int64(1), h.runsTotal("notify_flaky", StatusDiscarded))
+}
+
+// TestBadBytesAreSanitised: an error, note and summary key carrying NUL and
+// invalid UTF-8 (which Postgres refuses in text and jsonb) still finish the
+// run as failed, with the text made valid, not leave it `running`.
+func TestBadBytesAreSanitised(t *testing.T) {
+	h := newHarness(t, func(r *Registry) {
+		k := validScheduled()
+		k.Name, k.MaxAttempts = "rollup_bytes", 1
+		k.Handler = func(context.Context, Run) (Result, error) {
+			return Result{Summary: map[string]int64{"rows\x00\xff": 3}, Note: "half\x00done \xc3"},
+				errors.New("decode \x00row\xff\xfe failed")
+		}
+		Define(r, k)
+	})
+	h.atTick("rollup_bytes")
+	_, err := h.run.EnqueueDue(h.ctx, h.c)
+	require.NoError(t, err)
+	h.waitCount(1, `SELECT count(*) FROM job_runs WHERE kind = 'rollup_bytes' AND status = 'discarded'`)
+	require.Zero(t, h.count(`SELECT count(*) FROM job_runs WHERE kind = 'rollup_bytes' AND status = 'running'`))
+	var errText, note string
+	var summary []byte
+	require.NoError(t, h.db.Pool.QueryRow(h.ctx, `SELECT error, note, summary FROM job_runs WHERE kind = 'rollup_bytes'`).
+		Scan(&errText, &note, &summary))
+	require.Equal(t, "decode row� failed", errText, "NUL dropped, the invalid run of bytes replaced once")
+	require.Equal(t, "halfdone �", note)
+	require.JSONEq(t, `{"rows�": 3}`, string(summary))
+	require.Equal(t, int64(1), h.runsTotal("rollup_bytes", StatusDiscarded))
+
+	require.Equal(t, "a�b", scrubError(errors.New("a\x00\xffb")))
+	require.Equal(t, map[string]int64{"n": 3}, scrubSummary(map[string]int64{"n": 1, "n\x00": 2}), "keys that become equal are summed")
+	require.Nil(t, scrubSummary(nil))
 }
 
 // TestPauseSkipsTicksAndSnoozesEvents is the runtime half of SC-JB-09.

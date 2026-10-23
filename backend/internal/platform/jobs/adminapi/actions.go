@@ -327,10 +327,14 @@ func (s *Service) setPaused(ctx context.Context, name string, pause bool, reason
 			by     pgtype.UUID
 			at     *time.Time
 		)
-		if err := tx.QueryRow(ctx, `INSERT INTO job_controls (kind, paused, reason, updated_by, updated_at)
-			VALUES ($1, $2, $3, $4, $5)
+		// paused_at / resumed_at keep the latest pause window, which the
+		// watchdog reads so a tick due while paused is not reported missed.
+		if err := tx.QueryRow(ctx, `INSERT INTO job_controls (kind, paused, reason, updated_by, updated_at, paused_at)
+			VALUES ($1, $2::boolean, $3, $4, $5::timestamptz, CASE WHEN $2::boolean THEN $5::timestamptz END)
 			ON CONFLICT (kind) DO UPDATE SET paused = EXCLUDED.paused, reason = EXCLUDED.reason,
-			  updated_by = EXCLUDED.updated_by, updated_at = EXCLUDED.updated_at
+			  updated_by = EXCLUDED.updated_by, updated_at = EXCLUDED.updated_at,
+			  paused_at = CASE WHEN EXCLUDED.paused THEN EXCLUDED.updated_at ELSE job_controls.paused_at END,
+			  resumed_at = CASE WHEN EXCLUDED.paused THEN NULL ELSE EXCLUDED.updated_at END
 			RETURNING paused, reason, updated_by, updated_at`,
 			k.Name, pause, reason, ids.UUID(a.ID), s.d.Clock.Now()).Scan(&paused, &r, &by, &at); err != nil {
 			return fmt.Errorf("adminapi: job_controls: %w", err)
