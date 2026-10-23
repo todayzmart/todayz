@@ -212,3 +212,9 @@
   font: var(--type-overline);
   color: var(--ink-3);
 }
+
+.textLink {
+  font: var(--type-label);
+  color: var(--ink);
+  text-decoration: underline;
+}

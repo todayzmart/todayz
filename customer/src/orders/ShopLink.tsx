@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
  * A link to a route that another work package owns (/s/{slug}, /search): it is an ordinary anchor
  * that the router handles, so this folder does not depend on those routes existing yet.
  */
-export function PathLink({ to, className, children }: { to: string; className?: string; children: ReactNode }) {
+export function PathLink({ to, className, children }: { to: string; className?: string | undefined; children: ReactNode }) {
   const router = useRouter();
   return (
     <a

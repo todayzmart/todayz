@@ -64,7 +64,7 @@ export function CartPage() {
     <div className={`${styles.page} ${styles.withBar}`}>
       <h1 className="tz-page-title">{intl.formatMessage({ id: 'cart.title' })}</h1>
       <p className={styles.meta}>
-        <PathLink to={`/s/${cart.store.slug}`}>{intl.formatMessage({ id: 'cart.from' }, { shop: cart.store.name })}</PathLink>
+        <PathLink to={`/s/${cart.store.slug}`} className={styles.textLink}>{intl.formatMessage({ id: 'cart.from' }, { shop: cart.store.name })}</PathLink>
       </p>
 
       {quote.isError && (

@@ -214,7 +214,7 @@ export function CheckoutPage() {
             { id: 'checkout.stock.body' },
             { item: nameOf(problem.storeItemId) ?? intl.formatMessage({ id: 'checkout.stock.anItem' }), count: problem.available ?? 0 },
           )}{' '}
-          <PathLink to="/cart">{intl.formatMessage({ id: 'checkout.stock.fix' })}</PathLink>
+          <PathLink to="/cart" className={styles.textLink}>{intl.formatMessage({ id: 'checkout.stock.fix' })}</PathLink>
         </Banner>
       )}
       {problem?.kind === 'until' && (
