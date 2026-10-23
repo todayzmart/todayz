@@ -3,7 +3,6 @@ package telemetry
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -16,7 +15,8 @@ import (
 )
 
 // An event's time must be recent: a device that was offline for a while still reports, but a clock
-// that is months off (or in the future) is a bug or abuse, not data.
+// that is months off (or in the future) is a bug or abuse, not data. These two are code constants,
+// not product rules: 01 §17 does not list them, so they are not in platform_settings.
 const (
 	maxEventAge    = 30 * 24 * time.Hour
 	maxEventFuture = time.Hour
@@ -46,46 +46,36 @@ func optUUID(s string) pgtype.UUID {
 	return pgtype.UUID{}
 }
 
-// validate checks every event against the catalogue and returns one field entry per problem.
-// Reasons never repeat a client value.
-func (s *Service) validate(b *eventBatch) *problem.Error {
-	now := s.d.Clock.Now()
-	var perr *problem.Error
-	fail := func(path, reason string) {
-		if perr == nil {
-			perr = problem.New("validation_failed", "")
-		}
-		_ = perr.WithField(path, reason)
+// dropReason returns why an event is not stored ("" when it is), one of
+// telemetry.EventDropReasons. A bad event never fails the batch: a stale client with an old event
+// name must not lose its good events. Only a malformed envelope is an error (the request validator
+// answers 400/422 before this runs).
+func (s *Service) dropReason(e *productEvent, now time.Time, seen map[string]struct{}) string {
+	if _, err := ids.Parse(e.ID); err != nil {
+		return "invalid_id"
 	}
-	seen := map[string]struct{}{}
-	for i, e := range b.Events {
-		p := fmt.Sprintf("body.events[%d]", i)
-		if _, err := ids.Parse(e.ID); err != nil {
-			fail(p+".id", "must be a ULID")
-		} else if _, dup := seen[e.ID]; dup {
-			fail(p+".id", "repeated in this batch")
-		}
-		seen[e.ID] = struct{}{}
-		def, ok := s.cat.Event(e.Name)
-		switch {
-		case !ok:
-			fail(p+".name", "not a known event")
-		case def.Emitter != eventcat.EmitterClient:
-			fail(p+".name", "this event is emitted by the server")
-		default:
-			props := e.Props
-			if props == nil {
-				props = map[string]any{}
-			}
-			if err := def.Validate(props); err != nil {
-				fail(p+".props", err.Error())
-			}
-		}
-		if e.T.Before(now.Add(-maxEventAge)) || e.T.After(now.Add(maxEventFuture)) {
-			fail(p+".t", "outside the accepted time window")
-		}
+	if _, dup := seen[e.ID]; dup {
+		return "duplicate_id"
 	}
-	return perr
+	seen[e.ID] = struct{}{}
+	def, ok := s.cat.Event(e.Name)
+	switch {
+	case !ok:
+		return "unknown_event"
+	case def.Emitter != eventcat.EmitterClient:
+		return "server_event"
+	}
+	props := e.Props
+	if props == nil {
+		props = map[string]any{}
+	}
+	if err := def.Validate(props); err != nil {
+		return "invalid_props"
+	}
+	if e.T.Before(now.Add(-maxEventAge)) || e.T.After(now.Add(maxEventFuture)) {
+		return "out_of_window"
+	}
+	return ""
 }
 
 func (s *Service) postEvents(w http.ResponseWriter, r *http.Request) {
@@ -93,11 +83,20 @@ func (s *Service) postEvents(w http.ResponseWriter, r *http.Request) {
 	if !decode(w, r, &b) {
 		return
 	}
-	if perr := s.validate(&b); perr != nil {
-		problem.Write(w, r, perr)
-		return
-	}
 	ctx := r.Context()
+	now := s.d.Clock.Now()
+	seen := make(map[string]struct{}, len(b.Events))
+	keep := make([]productEvent, 0, len(b.Events))
+	var dropped int64
+	for i := range b.Events {
+		if reason := s.dropReason(&b.Events[i], now, seen); reason != "" {
+			dropped++
+			s.d.Metrics.EventDropped(ctx, reason)
+			continue
+		}
+		keep = append(keep, b.Events[i])
+	}
+
 	var userID pgtype.UUID
 	if s.d.UserID != nil {
 		userID = optUUID(s.d.UserID(ctx))
@@ -107,7 +106,7 @@ func (s *Service) postEvents(w http.ResponseWriter, r *http.Request) {
 	var accepted int64
 	err := s.d.DB.InTx(ctx, func(ctx context.Context) error {
 		q := telemetrydb.New(s.d.DB.Q(ctx))
-		for _, e := range b.Events {
+		for _, e := range keep {
 			id, _ := ids.Parse(e.ID) // validated above
 			props := []byte("{}")
 			if len(e.Props) > 0 {
@@ -135,5 +134,5 @@ func (s *Service) postEvents(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-store")
 	w.WriteHeader(http.StatusAccepted)
-	_ = json.NewEncoder(w).Encode(map[string]int64{"accepted": accepted})
+	_ = json.NewEncoder(w).Encode(map[string]int64{"accepted": accepted, "dropped": dropped})
 }

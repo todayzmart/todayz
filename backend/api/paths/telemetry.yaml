@@ -37,10 +37,11 @@
     summary: Send a batch of client product events
     description: |
       Up to 50 events per call, anonymous (the signed-in user is added when the request has one). Each event's
-      name and props are checked against the catalogue in `shared/telemetry/events/<domain>.yaml`; an unknown
-      event, a server-emitted event, a missing or unknown prop or a value outside its enum fails the whole call
-      with 422 and one `fields` entry per problem. Retrying a batch is safe: an event id that is already stored
-      is skipped.
+      name and props are checked against the catalogue in `shared/telemetry/events/<domain>.yaml`. An event that
+      is unknown, server-emitted, has invalid props, is outside the time window or repeats an id is dropped and
+      counted in `tz_events_dropped_total{reason}`; the call still succeeds and the body says how many were
+      stored and dropped. Only a malformed envelope (bad JSON, more than 50 events, a missing required field)
+      is an error. Retrying a batch is safe: an event id that is already stored is skipped.
     security: []
     requestBody:
       required: true
@@ -68,6 +69,7 @@
               $ref: ../schemas/telemetry.yaml#/EventsAccepted
             example:
               accepted: 1
+              dropped: 0
       default:
         $ref: ../common/responses.yaml#/Problem
 /v1/test/slow:

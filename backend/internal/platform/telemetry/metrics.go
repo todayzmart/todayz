@@ -47,6 +47,8 @@ type Metrics struct {
 	rumErrors                       metric.Int64Counter
 	rumLongTasks                    metric.Int64Counter
 
+	eventsDropped metric.Int64Counter
+
 	routes *routeCap
 }
 
@@ -96,6 +98,8 @@ func NewMetrics(mp metric.MeterProvider, service string) (*Metrics, error) {
 	x.rumErrors, e = m.Int64Counter("tz_rum_errors_total")
 	chk(e)
 	x.rumLongTasks, e = m.Int64Counter("tz_rum_long_tasks_total")
+	chk(e)
+	x.eventsDropped, e = m.Int64Counter("tz_events_dropped_total", metric.WithDescription("Product events dropped by POST /v1/events, by reason"))
 	chk(e)
 	return x, err
 }
@@ -157,6 +161,14 @@ func (m *Metrics) RequestStart(ctx context.Context) func(route, method string, s
 
 // SSEOpened and SSEClosed track `tz_sse_open_connections{app}`.
 func (m *Metrics) SSEOpened(ctx context.Context, app string) { m.sseOpenDelta(ctx, app, 1) }
+
+// EventDropped counts one product event dropped by POST /v1/events. reason is one of EventDropReasons.
+func (m *Metrics) EventDropped(ctx context.Context, reason string) {
+	if m == nil {
+		return
+	}
+	m.eventsDropped.Add(ctx, 1, metric.WithAttributes(attribute.String("reason", LabelValue("reason", reason))))
+}
 
 // SSEClosed is the counterpart of SSEOpened.
 func (m *Metrics) SSEClosed(ctx context.Context, app string) { m.sseOpenDelta(ctx, app, -1) }

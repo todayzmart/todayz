@@ -3,7 +3,6 @@ package telemetry
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
@@ -74,7 +73,7 @@ func TestEventsAreStoredAndRetriesAreSkipped(t *testing.T) {
 	g := newRig(t, config.EnvTest)
 	w := g.do("POST", "/v1/events", goodEvents)
 	require.Equal(t, http.StatusAccepted, w.Code, w.Body.String())
-	require.JSONEq(t, `{"accepted":1}`, w.Body.String())
+	require.JSONEq(t, `{"accepted":1,"dropped":0}`, w.Body.String())
 
 	var name, app, platform, geo, version string
 	var props []byte
@@ -93,7 +92,7 @@ func TestEventsAreStoredAndRetriesAreSkipped(t *testing.T) {
 	// The same batch again stores nothing new.
 	w = g.do("POST", "/v1/events", goodEvents)
 	require.Equal(t, http.StatusAccepted, w.Code)
-	require.JSONEq(t, `{"accepted":0}`, w.Body.String())
+	require.JSONEq(t, `{"accepted":0,"dropped":0}`, w.Body.String())
 }
 
 func TestEventsRejectedByTheCatalogue(t *testing.T) {
@@ -112,20 +111,38 @@ func TestEventsRejectedByTheCatalogue(t *testing.T) {
 	}
 	for name, body := range cases {
 		w := g.do("POST", "/v1/events", body)
-		require.Equal(t, http.StatusUnprocessableEntity, w.Code, name+": "+w.Body.String())
-		var p struct {
-			Code   string            `json:"code"`
-			Fields map[string]string `json:"fields"`
-		}
-		require.NoError(t, json.Unmarshal(w.Body.Bytes(), &p))
-		require.Equal(t, "validation_failed", p.Code, name)
-		require.NotEmpty(t, p.Fields, name)
+		require.Equal(t, http.StatusAccepted, w.Code, name+": "+w.Body.String())
+		require.JSONEq(t, `{"accepted":0,"dropped":1}`, w.Body.String(), name)
 		require.NotContains(t, w.Body.String(), "milk near me", name)
-		require.NotContains(t, w.Body.String(), "lukewarm", name)
 	}
 	var n int
 	require.NoError(t, g.db.Pool.QueryRow(context.Background(), `SELECT count(*) FROM events`).Scan(&n))
-	require.Zero(t, n, "a rejected batch stores nothing")
+	require.Zero(t, n, "a fully unknown batch stores nothing")
+}
+
+func TestEventsMixedBatchKeepsTheGoodOnes(t *testing.T) {
+	g := newRig(t, config.EnvTest)
+	body := `{"app":"customer","events":[
+{"id":"01JB0S1W6W8ZV7T1C3A6M9N4P1","name":"app_opened","t":"2026-10-23T09:59:00Z","props":{"launch":"cold"}},
+{"id":"01JB0S1W6W8ZV7T1C3A6M9N4P2","name":"made_up","t":"2026-10-23T09:59:00Z","props":{}},
+{"id":"01JB0S1W6W8ZV7T1C3A6M9N4P3","name":"app_opened","t":"2026-10-23T09:59:00Z","props":{"launch":"lukewarm"}},
+{"id":"01JB0S1W6W8ZV7T1C3A6M9N4P4","name":"app_opened","t":"2025-01-01T00:00:00Z","props":{"launch":"cold"}},
+{"id":"01JB0S1W6W8ZV7T1C3A6M9N4P1","name":"app_opened","t":"2026-10-23T09:59:00Z","props":{"launch":"cold"}},
+{"id":"01JB0S1W6W8ZV7T1C3A6M9N4P5","name":"app_opened","t":"2026-10-23T09:58:00Z","props":{"launch":"warm"}}]}`
+	w := g.do("POST", "/v1/events", body)
+	require.Equal(t, http.StatusAccepted, w.Code, w.Body.String())
+	require.JSONEq(t, `{"accepted":2,"dropped":4}`, w.Body.String())
+	var n int
+	require.NoError(t, g.db.Pool.QueryRow(context.Background(), `SELECT count(*) FROM events`).Scan(&n))
+	require.Equal(t, 2, n)
+}
+
+// The request validator (not in this rig) answers 422 for a missing required envelope field or more
+// than 50 events; the handler itself answers 400 for a body that is not JSON.
+func TestEventsBadJSONIsAnError(t *testing.T) {
+	g := newRig(t, config.EnvTest)
+	w := g.do("POST", "/v1/events", `{`)
+	require.Equal(t, http.StatusBadRequest, w.Code, w.Body.String())
 }
 
 func TestEventsPartitionExists(t *testing.T) {

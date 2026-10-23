@@ -120,11 +120,16 @@ EventBatch:
         $ref: "#/ProductEvent"
 EventsAccepted:
   type: object
-  required: [accepted]
+  required: [accepted, dropped]
   properties:
     accepted:
       type: integer
       description: Events stored. A retried batch counts only the events not stored before.
+      minimum: 0
+      maximum: 50
+    dropped:
+      type: integer
+      description: Events not stored because they are unknown, server-emitted, have invalid props, fall outside the time window or repeat an id in the batch.
       minimum: 0
       maximum: 50
 SlowTestResult:

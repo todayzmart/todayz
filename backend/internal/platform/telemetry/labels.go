@@ -21,8 +21,12 @@ var AllowedLabels = map[string]bool{
 	"app": true, "role": true, "kind": true, "class": true, "queue": true,
 	"channel": true, "provider": true, "outcome": true, "feature": true, "model": true,
 	"source": true, "city": true, "category": true, "lang": true, "platform": true,
-	"conn": true, "app_version": true,
+	"conn": true, "app_version": true, "reason": true,
 }
+
+// EventDropReasons are the fixed values of the `reason` label on tz_events_dropped_total
+// (POST /v1/events drops an event instead of failing the batch).
+var EventDropReasons = []string{"unknown_event", "server_event", "invalid_props", "out_of_window", "duplicate_id", "invalid_id"}
 
 // JobClasses are the fixed job classes of 05 §2.1 and W1-11.
 var JobClasses = []string{"timer", "money", "notify", "marketing", "ai", "rollup", "maintenance"}
@@ -42,6 +46,7 @@ var (
 		"outcome":      set("ok", "error", "success", "failure", "retry", "cancelled", "discarded", "timeout", "other"),
 		"role":         set("anonymous", "customer", "staff", "admin", "owner", "manager", "cashier", "other"),
 		"service":      set("api", "worker", "other"),
+		"reason":       set(EventDropReasons...),
 		// kind, queue, channel, provider, feature, model, source, city, category
 		// and lang get their values from RegisterLabelValues (W1-11 registers
 		// job `kind` and `queue`; the domain that emits a metric registers the
