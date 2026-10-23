@@ -552,7 +552,11 @@ func TestPauseResume(t *testing.T) {
 	require.True(t, st.Control.Paused)
 	require.Equal(t, "upstream outage", *st.Control.Reason)
 	require.Equal(t, admin.ID.String(), *st.Control.UpdatedBy)
-	require.WithinDuration(t, testNow, *st.Control.UpdatedAt, time.Second)
+	// The offset clock keeps moving from testNow, so a slow run (make check
+	// under load) only bounds the stamp: from testNow to the clock after the
+	// response, never a fixed tolerance.
+	require.False(t, st.Control.UpdatedAt.Before(testNow), "updatedAt %s is before testNow", st.Control.UpdatedAt)
+	require.False(t, st.Control.UpdatedAt.After(a.clk.Now()), "updatedAt %s is after the clock", st.Control.UpdatedAt)
 
 	r = a.do("POST", base+"pause", "admin", reason("upstream outage"), "")
 	require.Equal(t, http.StatusConflict, r.status)
