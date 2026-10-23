@@ -28,6 +28,10 @@ const (
 	uxStoreCode = "ux_orders_store_code_active"
 )
 
+// codeSpace is 10^codeDigits, the number of distinct codes; draw picks
+// uniformly below it. Derived, so the range follows the digit count.
+var codeSpace = new(big.Int).Exp(big.NewInt(10), big.NewInt(codeDigits), nil)
+
 var errNoCodeKeys = errors.New("orders: ORDER_CODE_ENC_KEY and ORDER_CODE_HMAC_KEY are required to place or re-code an order")
 
 // codeKeys seals and looks up pickup codes.
@@ -68,7 +72,7 @@ func (k *codeKeys) lookup(storeID ids.ID, code string) []byte {
 
 // draw makes a new random code for the order and seals it.
 func (k *codeKeys) draw(storeID, orderID ids.ID) (sealedCode, error) {
-	n, err := rand.Int(rand.Reader, big.NewInt(10_000))
+	n, err := rand.Int(rand.Reader, codeSpace)
 	if err != nil {
 		return sealedCode{}, fmt.Errorf("orders: draw code: %w", err)
 	}
