@@ -19,7 +19,9 @@ Cursor:
 IfMatch:
   name: If-Match
   in: header
-  required: true
+  # Optional in the schema so a missing header reaches the handler's 428
+  # precondition_required instead of the validator's 422 (D-105).
+  required: false
   description: The `ETag` the client last read (`"v{version}"`); a mismatch is `412 precondition_failed`, a missing header `428 precondition_required`.
   schema:
     type: string

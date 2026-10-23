@@ -45,16 +45,7 @@
     x-idempotency: none
     x-problems: [account_blocked]
     parameters:
-      # Not the common IfMatch: that one is required, so the validator would
-      # answer a missing header 422 before the handler's 428
-      # precondition_required (problems/common.yaml).
-      - name: If-Match
-        in: header
-        required: false
-        description: The `ETag` the client last read (`"v{version}"`); a mismatch is `412 precondition_failed`, a missing header `428 precondition_required`.
-        schema:
-          type: string
-          pattern: ^"v[0-9]+"$
+      - $ref: ../common/parameters.yaml#/IfMatch
     requestBody:
       required: true
       content:

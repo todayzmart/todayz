@@ -238,6 +238,11 @@ func (h authHandlers) RefreshSession(ctx context.Context, req authapi.RefreshSes
 	}
 	in, err := h.s.Refresh(ctx, RefreshInput{App: app, Token: cookieValue(r, app), UserAgent: r.UserAgent()})
 	if err != nil {
+		// A retry inside RotationGrace keeps the cookie (see graceRetry).
+		var g graceRetry
+		if errors.As(err, &g) {
+			return nil, g.p
+		}
 		// A refused refresh ends the client's sign-in: clear its cookie so it
 		// stops retrying a dead token (401 and 403 alike; 5xx keeps it).
 		var p *problem.Error

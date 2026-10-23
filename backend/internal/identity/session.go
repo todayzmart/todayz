@@ -43,6 +43,14 @@ const (
 // (01 §17 does not cover it), so it is code and not a platform setting.
 const RotationGrace = 30 * time.Second
 
+// graceRetry is the 401 for a token rotated RotationGrace ago or less. The
+// handler answers it without clearing the cookie: another tab's refresh may
+// already have set the newer one, and clearing it would sign that tab out.
+type graceRetry struct{ p *problem.Error }
+
+func (g graceRetry) Error() string { return g.p.Error() }
+func (g graceRetry) Unwrap() error { return g.p }
+
 // maxUserAgent is sessions.user_agent's limit in characters.
 const maxUserAgent = 256
 
@@ -154,7 +162,7 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 				// A retry of a refresh that already succeeded: refuse it, end
 				// nothing (RotationGrace).
 				telemetry.Logger(ctx).InfoContext(ctx, "identity: rotated refresh token presented within the grace window", "app", row.App)
-				outcome = problem.New(genproblems.Unauthorized, "")
+				outcome = graceRetry{problem.New(genproblems.Unauthorized, "")}
 				return nil
 			}
 			if rotated {

@@ -544,7 +544,7 @@ Follows the rules for every AI feature ([11-ai-features.md](11-ai-features.md) Â
 | SMS (MSG91) | `MSG91_AUTH_KEY`, `MSG91_SENDER_ID`, `MSG91_OTP_TEMPLATE_ID` | OTP, critical alerts | Mock SMS; messages show at `mocks.todayz.localhost`. Reserved numbers `+91 90000 000xx` accept `000000`. | Auth refuses to start |
 | WhatsApp (MSG91 or Gupshup) | `WHATSAPP_PROVIDER`, `WHATSAPP_API_KEY` | Receipts, order updates (opt-in) | Mock | SMS / push |
 | Web push | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Push | Mock push | In-app inbox |
-| Turnstile | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | OTP send, lead form | Test keys (always pass) | Stricter rate limits |
+| Turnstile | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | OTP send, lead form | Test keys (always pass) | Staging and prod refuse to start without it (preflight); a build that somehow runs without it answers OTP send with 503 (D-105) |
 | Storage (R2) | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_IMAGES` | Images, voice audio, exports | MinIO | â€” |
 | STT | `SARVAM_API_KEY` | Voice stock update; customer voice search (AI-C5, D-101) | Mock (own key optional) | Voice hidden |
 | LLM | `ANTHROPIC_API_KEY` | Voice and every AI feature in 11 | Mock with recorded responses (own key optional) | AI entry points hidden |

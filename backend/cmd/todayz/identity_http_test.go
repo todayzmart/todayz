@@ -167,13 +167,12 @@ func TestIdentityHTTPRefresh(t *testing.T) {
 	rotated := refreshCookieOf(t, w)
 	require.NotEqual(t, c.Value, rotated.Value)
 
-	// Replaying the first cookie at once (the response was lost): 401 and
-	// the cookie cleared, but the family lives on.
+	// Replaying the first cookie at once (the response was lost, or a second
+	// tab raced the first): 401, the cookie left alone (it may already hold
+	// the rotated token), and the family lives on.
 	w = a.do(http.MethodPost, "/v1/auth/refresh", body, refreshHeaders(c, appOrigin))
 	require.Equal(t, http.StatusUnauthorized, w.Code)
-	cleared := refreshCookieOf(t, w)
-	require.Equal(t, cookieName, cleared.Name)
-	require.Negative(t, cleared.MaxAge, "Max-Age=0")
+	require.Empty(t, w.Header().Values("Set-Cookie"), "a grace retry keeps the cookie")
 	w = a.do(http.MethodPost, "/v1/auth/refresh", body, refreshHeaders(rotated, appOrigin))
 	require.Equal(t, http.StatusOK, w.Code, "a replay inside the grace window revokes nothing")
 	latest := refreshCookieOf(t, w)

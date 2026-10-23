@@ -736,3 +736,12 @@ There is no `make seed`; use `make reset`.
 - **checkov skips accepted.** CKV2_AWS_57 (no rotation Lambda; keys rotate by runbook) and CKV_AWS_157 (Single-AZ RDS, D-96).
 - **Open until W1-01.** `/v1/rum` and `/v1/events` have no rate limit until the W1-01 limiter lands.
 - Lives in: 05 (events); `backend/CLAUDE.md`; `infra/terraform/README.md`; W1-07, W1-10.
+
+**D-105 · Sign-in core: Turnstile fails closed, refresh grace, If-Match, session purge (lead, 2026-10-23).** From the W1-01 review.
+- **Turnstile fails closed.** 02 §8 said a missing Turnstile key means "stricter rate limits". That leaves OTP send (which costs an SMS) open to bots in production. Now staging and prod refuse to start without `TURNSTILE_API_URL` and `TURNSTILE_SECRET_KEY` (and `MSG91_OTP_TEMPLATE_ID`): the preflight names the missing variables, never their values. A deployed build that still runs without Turnstile answers OTP send with 503. Local and test use the mock's always-pass keys.
+- **Refresh grace.** A refresh token rotated `RotationGrace` (30 s) ago or less is answered 401 with no revoke and no audit: it is a retry whose response was lost, or a second tab racing the first. Older than that, it is reuse and the whole family is revoked (AU-07). The grace 401 does not clear the cookie, because the other tab's refresh may already have set the newer one. The trade-off: a thief who replays a stolen token within 30 s of the owner's refresh is not detected that time; the next replay after the window is. `RotationGrace` is a security guard, not a product number, so it stays a code constant (like D-104's event window).
+- **If-Match.** The common `IfMatch` parameter is optional in the schema, so a missing header reaches the handler's `428 precondition_required` instead of the validator's 422. A wrong one is still 412.
+- **No `X-TZ-Business` header.** The business scope is the URL path (04 §2.6); CORS allows only `X-TZ-Client` in addition to the standard headers, and exposes the `RateLimit-*` headers.
+- **A deleted user** gets `403 account_blocked` on refresh and on `/v1/me`, as a blocked one does.
+- **Session purge.** `identity.purge` runs hourly. It deletes OTP requests 24 h after they expire and sessions 30 days after `coalesce(revoked_at, expires_at)`. The retention must stay at least the longest refresh lifetime (30 days), so a rotated row outlives its token and a late replay is still detected as reuse.
+- Lives in: 02 §8; `backend/api/common/parameters.yaml`, `backend/api/paths/me.yaml`; `backend/internal/identity/`; W1-01.
