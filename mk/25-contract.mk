@@ -39,8 +39,8 @@ CONTRACT_ST := $(CONTRACT_VENV)/bin/schemathesis
 CONTRACT_API_URL ?= https://api.todayz.localhost
 # Newest release date a Python dependency may have when re-locking (D-88).
 CONTRACT_EXCLUDE_NEWER := 2026-10-08
-# 04 §2 lists 294 operations once every domain has landed. 0 only prints the count per
-# namespace; the lead sets 294 when the last domain WP merges (SC-PL-01).
+# 04 §2.11 lists 307 operations once every domain has landed. 0 only prints the count per
+# namespace; the lead sets 307 when the last domain WP merges (SC-PL-01).
 CONTRACT_EXPECT ?= 0
 
 # The Python toolchain, pinned to the patch (D-100 L8). uv is installed by scripts/install-uv.sh

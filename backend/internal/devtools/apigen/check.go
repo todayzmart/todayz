@@ -85,7 +85,7 @@ var moneyOperations = []string{
 	// AI draft confirms (11): shop, customer, admin
 	"confirmVoiceStockDraft", "confirmSupplierBillDraft", "confirmShelfPhotoDraft",
 	"confirmReviewReplyDraft", "confirmBannerCopyDraft",
-	"confirmListSearchDraft", "confirmVoiceSearchDraft",
+	"confirmListSearchDraft",
 	"confirmCatalogueCleanupDraft", "confirmTicketTriageDraft", "confirmRiskSummaryDraft",
 }
 
@@ -537,7 +537,7 @@ func hasAnyPrefix(p string, prefixes []string) bool {
 }
 
 // runCheck loads the bundle, lints it and prints the counts; expect > 0 also
-// fails unless the /v1 total matches (04 §2: 294 once every WP has landed).
+// fails unless the /v1 total matches (04 §2.11: 307 once every WP has landed).
 func runCheck(api, bundle string, expect int, w io.Writer) error {
 	reg, err := registry.Load(os.DirFS(filepath.Join(api, "problems")))
 	if err != nil {

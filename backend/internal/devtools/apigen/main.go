@@ -4,7 +4,7 @@
 //	apigen root    -api api -out gen/api/root.yaml
 //	   lints the raw domain files (one domain per file, unique paths, operationIds
 //	   and schema names) and writes the root document Redocly bundles
-//	apigen check   -api api -bundle api/openapi.yaml [-expect-count 294]
+//	apigen check   -api api -bundle api/openapi.yaml [-expect-count 307]
 //	   loads the bundle with kin-openapi, validates it with its examples and runs
 //	   the TodayZ lints (SC-PL-01, SC-PL-02, 04 §1.2, §1.6, §3)
 //	apigen codegen -api api -bundle api/openapi.yaml -out gen/api -tool oapi-codegen
