@@ -45,11 +45,13 @@
                 migrations: ok
                 river: ok
       "503":
-        description: A check failed (plain JSON, not problem JSON)
+        description: A check failed, or the process is draining after SIGTERM and answers `{"status":"draining"}` without running a check (D-98). Plain JSON, not problem JSON.
         content:
           application/json:
             schema:
-              $ref: ../schemas/platform.yaml#/Readiness
+              oneOf:
+                - $ref: ../schemas/platform.yaml#/Readiness
+                - $ref: ../schemas/platform.yaml#/ReadinessDraining
             example:
               status: unavailable
               checks:

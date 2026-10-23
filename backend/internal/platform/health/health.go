@@ -6,7 +6,10 @@
 //     check as "ok" or "fail" and never carries error text (which may hold a
 //     host name); the failure is logged instead. A result is reused for
 //     CacheFor (2 s), and only one run is in flight at a time, so a flood of
-//     /readyz calls cannot become a flood of database pings.
+//     /readyz calls cannot become a flood of database pings. Once the
+//     process starts draining (SIGTERM, D-98) it answers 503
+//     {"status":"draining"} at once, without running a check, until it
+//     exits; /healthz stays 200.
 //   - /version: buildinfo.Get() (no Go version). In staging and prod it is
 //     served only on the worker's internal health port (WORKER_ADDR), never
 //     on the public API (Options.Version).
@@ -20,6 +23,7 @@ import (
 	"log/slog"
 	"net/http"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -58,7 +62,21 @@ type Readiness struct {
 	last Report
 	at   time.Time
 	have bool
+
+	draining atomic.Bool
 }
+
+// StatusDraining is the /readyz status while the process drains.
+const StatusDraining = "draining"
+
+// SetDraining turns /readyz to 503 {"status":"draining"} for the rest of the
+// process's life (D-98, 02 §2.8 step 1). It is the first thing SIGTERM does,
+// so the load balancer stops sending traffic while in-flight work finishes.
+// There is no way back: a draining process only exits.
+func (rd *Readiness) SetDraining() { rd.draining.Store(true) }
+
+// Draining reports whether SetDraining was called.
+func (rd *Readiness) Draining() bool { return rd.draining.Load() }
 
 // Cached returns a result no older than CacheFor, running the checks when
 // there is none. Concurrent callers wait for the one run in flight.
@@ -130,6 +148,10 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 
 // ServeHTTP implements /readyz.
 func (rd *Readiness) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if rd.Draining() { // before the cache: a cached "ok" must not outlive the signal
+		writeJSON(w, http.StatusServiceUnavailable, map[string]string{"status": StatusDraining})
+		return
+	}
 	rep := rd.Cached(r.Context())
 	status := http.StatusOK
 	if rep.Status != "ok" {

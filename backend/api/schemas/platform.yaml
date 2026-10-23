@@ -24,6 +24,14 @@ Readiness:
       additionalProperties:
         type: string
         enum: [ok, fail]
+ReadinessDraining:
+  type: object
+  description: The process got SIGTERM and is draining (D-98); no check runs. It stays 503 until the process exits.
+  required: [status]
+  properties:
+    status:
+      type: string
+      const: draining
 BuildInfo:
   type: object
   required: [version, commit, buildTime, dirty]

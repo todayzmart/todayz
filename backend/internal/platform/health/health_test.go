@@ -93,6 +93,30 @@ func TestReadyzIsCached(t *testing.T) {
 	require.Equal(t, int32(2), runs.Load(), "expired")
 }
 
+// TestReadyzDraining (D-98, SC-GS-02): after SetDraining, /readyz is 503
+// {"status":"draining"} at once, even with a cached "ok" and without running
+// a check; /healthz stays 200.
+func TestReadyzDraining(t *testing.T) {
+	var runs atomic.Int32
+	rd := &Readiness{Checks: []Check{{Name: "db", Fn: func(context.Context) error { runs.Add(1); return nil }}}}
+	h := mount(rd)
+	w, _ := get(t, h, "/readyz")
+	require.Equal(t, 200, w.Code)
+	require.False(t, rd.Draining())
+
+	rd.SetDraining()
+	require.True(t, rd.Draining())
+	w = httptest.NewRecorder()
+	h.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/readyz", nil))
+	require.Equal(t, 503, w.Code, "the cached ok must not outlive the signal")
+	require.JSONEq(t, `{"status":"draining"}`, w.Body.String())
+	require.Equal(t, "no-store", w.Header().Get("Cache-Control"))
+	require.Equal(t, int32(1), runs.Load(), "draining runs no check")
+
+	w, _ = get(t, h, "/healthz")
+	require.Equal(t, 200, w.Code)
+}
+
 func TestReadyzFailureHidesErrorText(t *testing.T) {
 	var logs bytes.Buffer
 	rd := &Readiness{
