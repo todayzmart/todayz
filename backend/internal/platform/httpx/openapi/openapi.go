@@ -221,6 +221,9 @@ func (v *Validator) ValidateRequest(r *http.Request) error {
 	if err != nil {
 		return problem.New(genproblems.BadRequest, "The request path is not valid")
 	}
+	if unknown := undeclaredQuery(r, op.item, op.op); unknown != nil {
+		return unknown
+	}
 	opts := *v.opts
 	if whole := body(r, op.op, &opts); whole != nil {
 		return whole
@@ -235,6 +238,42 @@ func (v *Validator) ValidateRequest(r *http.Request) error {
 		return toProblem(err)
 	}
 	return nil
+}
+
+// undeclaredQuery refuses a query name the operation does not declare, as an
+// unknown body property is refused; kin-openapi lets one through. A name
+// outside reToken is echoed as <redacted> (D-100 L4).
+func undeclaredQuery(r *http.Request, item *openapi3.PathItem, op *openapi3.Operation) error {
+	query := r.URL.Query()
+	if len(query) == 0 {
+		return nil
+	}
+	declared := map[string]bool{}
+	for _, params := range []openapi3.Parameters{item.Parameters, op.Parameters} {
+		for _, p := range params {
+			if p.Value != nil && p.Value.In == openapi3.ParameterInQuery {
+				declared[p.Value.Name] = true
+			}
+		}
+	}
+	names := make([]string, 0, len(query))
+	for name := range query {
+		if !declared[name] {
+			names = append(names, name)
+		}
+	}
+	if len(names) == 0 {
+		return nil
+	}
+	sort.Strings(names)
+	p := problem.New(genproblems.ValidationFailed, "")
+	for _, name := range names {
+		if !reToken.MatchString(name) {
+			name = "<redacted>"
+		}
+		addField(p, "query."+name, "not allowed")
+	}
+	return p
 }
 
 func needsPrincipal(pattern string) bool {

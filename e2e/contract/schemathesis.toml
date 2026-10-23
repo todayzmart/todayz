@@ -1,0 +1,10 @@
+# Schemathesis settings for run.sh (W0-04). Loaded with --config-file.
+
+# A list cursor is opaque: the coverage phase sends a schema-valid string the
+# server never issued, and 422 validation_failed (query.cursor) is the right
+# answer (W1-06, lead 2026-10-23). Lists behind auth answer 401 first, so only
+# the public cursor lists are named here. A new public list with a cursor joins
+# this list.
+[[operations]]
+include-operation-id = ["listDiscoverStores", "listDiscoverStoreItems", "searchDiscover"]
+checks.positive_data_acceptance.expected-statuses = ["2xx", "401", "403", "404", "409", "422", "429", "5xx"]

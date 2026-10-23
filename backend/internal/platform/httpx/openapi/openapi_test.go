@@ -431,6 +431,21 @@ func TestParameters(t *testing.T) {
 	assert.Equal(t, map[string]string{"header.Idempotency-Key": "invalid format"}, f)
 }
 
+// TestUndeclaredQueryRefused: a query name the operation does not declare is
+// refused like an unknown body property, and a strange name is not echoed.
+func TestUndeclaredQueryRefused(t *testing.T) {
+	v := newValidator(t)
+	require.NoError(t, v.ValidateRequest(jsonReq(http.MethodGet, ordersP+"?limit=5", "")))
+
+	_, _, f := fields(t, v.ValidateRequest(jsonReq(http.MethodGet, ordersP+"?limit=5&extra=1", "")))
+	assert.Equal(t, map[string]string{"query.extra": "not allowed"}, f)
+
+	err := v.ValidateRequest(jsonReq(http.MethodGet, ordersP+"?%3Cscript%3E=1", ""))
+	_, _, f = fields(t, err)
+	assert.Equal(t, map[string]string{"query.<redacted>": "not allowed"}, f)
+	assert.NotContains(t, err.Error(), "script")
+}
+
 func TestWrongContentType(t *testing.T) {
 	v := newValidator(t)
 	for _, ct := range []string{"text/plain", "application/xml", "", "application/json; charset=\""} {

@@ -59,7 +59,7 @@ export TODAYZ_PROBLEMS_DIR="${TODAYZ_PROBLEMS_DIR:-$here/../../backend/api/probl
 # the symptom).
 export HYPOTHESIS_STORAGE_DIRECTORY="$out/.hypothesis"
 
-args=(run "$spec" --url "$base"
+args=(--config-file "$here/schemathesis.toml" run "$spec" --url "$base"
   --checks all
   --no-color --warnings off
   --generation-database none
