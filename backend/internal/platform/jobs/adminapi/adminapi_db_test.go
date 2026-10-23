@@ -19,6 +19,7 @@ import (
 	"github.com/todayz/backend/gen/api/spec"
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/internal/platform/audit"
+	"github.com/todayz/backend/internal/platform/authn"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx"
@@ -28,7 +29,6 @@ import (
 	"github.com/todayz/backend/internal/platform/ids"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/queue"
-	"github.com/todayz/backend/internal/platform/reqctx"
 	"github.com/todayz/backend/internal/testkit"
 )
 
@@ -186,7 +186,8 @@ func newAPI(t *testing.T, worker bool) *apiHarness {
 	v, err := openapi.New(spec.Bundle)
 	require.NoError(t, err)
 	r := httpx.NewRouter(httpx.Options{Log: quiet(), Validator: v, Policies: v,
-		Idempotency: idempotency.Options{Store: idempotency.NewMemoryStore(), Clock: a.clk, Log: quiet()}})
+		Authenticator: callerAuthenticator{a},
+		Idempotency:   idempotency.Options{Store: idempotency.NewMemoryStore(), Clock: a.clk, Log: quiet()}})
 	Register(r, Deps{Registry: a.reg, DB: d, Enqueuer: platformjobs.NewEnqueuer(a.reg, qc, a.clk),
 		Audit: audit.New(d, a.clk, nil), Clock: a.clk, Gate: a.gate, Log: quiet()})
 	require.NoError(t, r.Check())
@@ -209,15 +210,32 @@ func newAPI(t *testing.T, worker bool) *apiHarness {
 	su.stepUp = true
 	a.callers["super_stepup"] = su
 	a.h = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if c, ok := a.callers[req.Header.Get(callerHeader)]; ok {
-			// What W1-01's authn slot will do: the admin is the principal
-			// (the validator refuses an anonymous /v1/admin call with 401).
-			ctx := reqctx.WithPrincipal(req.Context(), reqctx.Principal{Kind: "admin", UserID: c.admin.ID.String()})
-			req = req.WithContext(context.WithValue(ctx, callerKey{}, c))
+		if name := req.Header.Get(callerHeader); name != "" {
+			if c, ok := a.callers[name]; ok {
+				// Sign in through slot 11 (W1-01), which refuses an
+				// anonymous /v1/admin call with 401 before the router; the
+				// fake gate reads the caller from the context.
+				req.Header.Set("Authorization", "Bearer "+name)
+				req = req.WithContext(context.WithValue(req.Context(), callerKey{}, c))
+			}
 		}
 		r.ServeHTTP(w, req)
 	})
 	return a
+}
+
+// callerAuthenticator is slot 11's seam in tests: the bearer token is a
+// caller name, signed in as an admin-app session that has passed TOTP
+// (W1-01's namespace rule for /v1/admin, AU-11). Role and step-up checks
+// stay with the fake gate.
+type callerAuthenticator struct{ a *apiHarness }
+
+func (s callerAuthenticator) Authenticate(_ context.Context, tok string) (authn.Principal, error) {
+	c, ok := s.a.callers[tok]
+	if !ok {
+		return authn.Principal{}, problem.New(genproblems.Unauthorized, "")
+	}
+	return authn.Principal{UserID: c.admin.ID, App: authn.AppAdmin, SessionID: c.admin.ID, AMR: authn.AMROTPTOTP}, nil
 }
 
 // resp is one answer.
