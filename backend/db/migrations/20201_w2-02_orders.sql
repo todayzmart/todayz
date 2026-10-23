@@ -123,6 +123,10 @@ CREATE TABLE orders (
 );
 CREATE UNIQUE INDEX ux_orders_number ON orders (number);
 CREATE INDEX ix_orders_store_status_placed ON orders (store_id, status, placed_at DESC);
+-- The store's inbox (ListStoreOrders): a tab is several statuses, newest
+-- first with id as the tie-break and the keyset cursor, so the scan walks the
+-- store's orders in that order and stops at the page size.
+CREATE INDEX ix_orders_store_placed ON orders (store_id, placed_at DESC, id DESC);
 CREATE INDEX ix_orders_customer_placed ON orders (customer_id, placed_at DESC);
 -- Timer stragglers after a restart (03 §11).
 CREATE INDEX ix_orders_accept_by ON orders (accept_by) WHERE status = 'placed';
@@ -377,5 +381,6 @@ DROP TABLE IF EXISTS order_events;
 DROP TABLE IF EXISTS order_items;
 DROP TRIGGER IF EXISTS trg_orders_guard ON orders;
 DROP FUNCTION IF EXISTS orders_guard();
+DROP INDEX IF EXISTS ix_orders_store_placed;
 DROP TABLE IF EXISTS orders;
 DROP SEQUENCE IF EXISTS order_number_seq;
