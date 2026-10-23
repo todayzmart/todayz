@@ -40,7 +40,9 @@ All four answered 200 at 17:20 on 23 October.
 - **Monitoring.** Four Grafana dashboards and app events.
 - **Cloud setup files.** Written and checked, not applied (that waits for Wave 5).
 
-**Still running:**
-- **Background jobs.** Its review fixes are being made; it merges next.
+- **Background jobs.** Scheduled jobs with run history, pause and resume, an alert when a job misses its time, and Grafana dashboard "15 · Jobs" (19 panels).
+  - Checked live: the dashboard loads and all 7 chart queries run.
+
+**Still running:** admin two-factor sign-in and account deletion; shops and stores; the app sign-in screens.
 
 **Next:** the shop and store setup, the customer and shop sign-in screens, then search and booking.
