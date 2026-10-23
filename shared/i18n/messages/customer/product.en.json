@@ -1,0 +1,94 @@
+{
+  "product.add": {
+    "defaultMessage": "Add",
+    "description": "Add pill of the quantity stepper"
+  },
+  "product.remove": {
+    "defaultMessage": "Remove one",
+    "description": "Quantity stepper minus"
+  },
+  "product.addOne": {
+    "defaultMessage": "Add one",
+    "description": "Quantity stepper plus"
+  },
+  "product.max": {
+    "defaultMessage": "Only {max} in stock",
+    "description": "Spoken when the stepper reaches the stock limit"
+  },
+  "product.off": {
+    "defaultMessage": "{pct}% off",
+    "description": "Saving against the MRP"
+  },
+  "product.unit.pc": {
+    "defaultMessage": "{size} pc",
+    "description": "Pack size in pieces"
+  },
+  "product.unit.pack": {
+    "defaultMessage": "{size} pack",
+    "description": "Pack size in packs"
+  },
+  "product.stock.in": {
+    "defaultMessage": "In stock",
+    "description": "Stock tag"
+  },
+  "product.stock.out": {
+    "defaultMessage": "Out of stock",
+    "description": "Stock tag"
+  },
+  "product.stock.stale": {
+    "defaultMessage": "Stock not confirmed recently",
+    "description": "Stock tag when the stock is older than the stale limit"
+  },
+  "product.confirmed": {
+    "defaultMessage": "Confirmed {time}",
+    "description": "Freshness of the stock; time reads like 12 min ago"
+  },
+  "product.confirmedNow": {
+    "defaultMessage": "Confirmed just now",
+    "description": "Freshness under a minute"
+  },
+  "product.back": {
+    "defaultMessage": "Back to {shop}",
+    "description": "Link from the product page to its shop"
+  },
+  "product.sold.by": {
+    "defaultMessage": "Sold by",
+    "description": "Accessible name of the shop block on the product page"
+  },
+  "product.addToCart": {
+    "defaultMessage": "Add to cart",
+    "description": "Product page main button"
+  },
+  "product.added": {
+    "defaultMessage": "{name} added to your cart",
+    "description": "Toast after adding"
+  },
+  "product.share": {
+    "defaultMessage": "Copy link",
+    "description": "Share fallback: copies the page link"
+  },
+  "product.share.copied": {
+    "defaultMessage": "Link copied",
+    "description": "Toast after copying"
+  },
+  "product.share.failed": {
+    "defaultMessage": "Could not copy the link",
+    "description": "Toast when copying fails"
+  },
+  "product.others.title": {
+    "defaultMessage": "Other nearby shops",
+    "description": "Heading of the list of other shops with the same product"
+  },
+  "product.gone.title": {
+    "defaultMessage": "We could not find this item",
+    "description": "Product page when the item is not listed"
+  },
+  "product.gone.body": {
+    "defaultMessage": "The shop may have removed it.",
+    "description": "Body of the product-gone state"
+  },
+  "product.gone.action": {
+    "defaultMessage": "Go to the shop",
+    "description": "Action of the product-gone state"
+  }
+}

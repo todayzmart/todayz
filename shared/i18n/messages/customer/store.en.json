@@ -1,0 +1,138 @@
+{
+  "store.rating": {
+    "defaultMessage": "{rating} ({count})",
+    "description": "Rating and number of ratings; both are text"
+  },
+  "store.open": {
+    "defaultMessage": "Open",
+    "description": "Shop is open now"
+  },
+  "store.closed": {
+    "defaultMessage": "Closed",
+    "description": "Shop is closed now"
+  },
+  "store.cashback": {
+    "defaultMessage": "{pct}% cashback",
+    "description": "Cashback tag on a shop"
+  },
+  "store.delivery": {
+    "defaultMessage": "Delivery",
+    "description": "Tag: the shop delivers"
+  },
+  "store.pickup": {
+    "defaultMessage": "Pickup",
+    "description": "Tag: the shop offers pickup"
+  },
+  "store.inStoreOnly": {
+    "defaultMessage": "In-store only",
+    "description": "Tag: the shop does not take orders on TodayZ"
+  },
+  "store.directions": {
+    "defaultMessage": "Get directions",
+    "description": "Opens the maps app to the shop"
+  },
+  "store.viewShop": {
+    "defaultMessage": "View shop",
+    "description": "Link to the shop page"
+  },
+  "store.hours.today": {
+    "defaultMessage": "Today {hours}",
+    "description": "Today's opening hours"
+  },
+  "store.hours.range": {
+    "defaultMessage": "{from} to {to}",
+    "description": "One opening span, times are text such as 9 am"
+  },
+  "store.hours.closedToday": {
+    "defaultMessage": "Closed today",
+    "description": "The shop has no hours today"
+  },
+  "store.deliveryNote": {
+    "defaultMessage": "Delivery {fee} · minimum order {min}",
+    "description": "Delivery terms on the shop page; fee and min are formatted money or text"
+  },
+  "store.deliveryFree": {
+    "defaultMessage": "free",
+    "description": "Delivery fee when it is zero"
+  },
+  "store.inStoreOnly.banner": {
+    "defaultMessage": "This shop sells in store only. You can see what it has and get directions.",
+    "description": "Banner on an in-store-only shop page"
+  },
+  "store.search.label": {
+    "defaultMessage": "Search this shop",
+    "description": "Accessible name of the in-shop search"
+  },
+  "store.search.placeholder": {
+    "defaultMessage": "Search in this shop",
+    "description": "Placeholder of the in-shop search"
+  },
+  "store.items.error": {
+    "defaultMessage": "Could not load items.",
+    "description": "Shop items error"
+  },
+  "store.items.more": {
+    "defaultMessage": "Show more items",
+    "description": "Loads the next page of items"
+  },
+  "store.items.none": {
+    "defaultMessage": "No items listed yet",
+    "description": "Empty shop catalogue heading"
+  },
+  "store.items.noneBody": {
+    "defaultMessage": "This shop has not listed anything yet.",
+    "description": "Empty shop catalogue body"
+  },
+  "store.items.noMatch": {
+    "defaultMessage": "No items match",
+    "description": "No items for the search or category"
+  },
+  "store.items.noMatchBody": {
+    "defaultMessage": "Try another word or category.",
+    "description": "Body of the no-match state"
+  },
+  "store.gone.title": {
+    "defaultMessage": "This shop is not on TodayZ right now",
+    "description": "Shop page for a store that is not live"
+  },
+  "store.gone.body": {
+    "defaultMessage": "It may be closed for now or no longer listed. Search for what you need nearby.",
+    "description": "Body of the shop-gone state"
+  },
+  "store.gone.action": {
+    "defaultMessage": "Search nearby",
+    "description": "Action of the shop-gone state"
+  },
+  "store.replace.title": {
+    "defaultMessage": "Start a new cart?",
+    "description": "Sheet title when adding from another shop"
+  },
+  "store.replace.body": {
+    "defaultMessage": "Your cart has items from {current}. Adding from {next} will replace it.",
+    "description": "Sheet body"
+  },
+  "store.replace.close": {
+    "defaultMessage": "Close",
+    "description": "Close button of the replace-cart sheet"
+  },
+  "store.replace.keep": {
+    "defaultMessage": "Keep my cart",
+    "description": "Keeps the current cart"
+  },
+  "store.replace.confirm": {
+    "defaultMessage": "Replace cart",
+    "description": "Replaces the cart with the new shop's item"
+  },
+  "store.cart.count": {
+    "defaultMessage": "{count} items",
+    "description": "Spoken label of the cart bar count"
+  },
+  "store.cart.from": {
+    "defaultMessage": "from {shop}",
+    "description": "Cart bar line naming the shop"
+  },
+  "store.cart.open": {
+    "defaultMessage": "View cart",
+    "description": "Cart bar button"
+  }
+}

@@ -1,0 +1,70 @@
+/* C-07 Shop page, shared bits for the cart bar and item grids. Tokens only. */
+
+.page {
+  padding-bottom: calc(var(--space-12) + var(--space-6));
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-5);
+  padding-inline: max(var(--space-4), calc((100% - var(--column)) / 2 + var(--space-4)));
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.name {
+  margin: 0;
+  font: var(--type-display);
+  letter-spacing: var(--type-display-tracking);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.note {
+  margin: 0;
+  font: var(--type-body-sm);
+  color: var(--ink-2);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.body {
+  max-width: var(--column);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-block: var(--space-3);
+}
+
+/* Above the bottom nav, inside the content column. */
+.cartbar {
+  position: fixed;
+  inset-inline: var(--space-4);
+  inset-block-end: calc(var(--bottom-nav) + env(safe-area-inset-bottom) + var(--space-3));
+  z-index: var(--z-sticky);
+  max-width: calc(var(--column, 560px) - 2 * var(--space-4));
+  margin-inline: auto;
+}

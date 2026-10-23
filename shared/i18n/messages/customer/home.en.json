@@ -1,0 +1,86 @@
+{
+  "home.search.label": {
+    "defaultMessage": "Search products or shops",
+    "description": "Accessible name of the search box on Home"
+  },
+  "home.search.placeholder": {
+    "defaultMessage": "Search atta, milk, a shop name",
+    "description": "Placeholder of the Home search box"
+  },
+  "home.noPlace.title": {
+    "defaultMessage": "Set your location",
+    "description": "Home empty state when no location is chosen"
+  },
+  "home.noPlace.body": {
+    "defaultMessage": "Choose where you are to see the shops and products near you.",
+    "description": "Home empty state body"
+  },
+  "home.placeError.title": {
+    "defaultMessage": "We could not find that PIN code",
+    "description": "Home state when the saved PIN code cannot be turned into a point"
+  },
+  "home.placeError.body": {
+    "defaultMessage": "Check your connection or choose your location again.",
+    "description": "Body of the PIN code lookup error"
+  },
+  "home.retry": {
+    "defaultMessage": "Try again",
+    "description": "Retry button on discover screens"
+  },
+  "home.stats.shops": {
+    "defaultMessage": "Shops nearby",
+    "description": "Home stat label: count of shops in the radius"
+  },
+  "home.stats.open": {
+    "defaultMessage": "Open now",
+    "description": "Home stat label: count of shops open now"
+  },
+  "home.stats.products": {
+    "defaultMessage": "Products",
+    "description": "Home stat label: count of products in the radius"
+  },
+  "home.radius.label": {
+    "defaultMessage": "Search radius",
+    "description": "Accessible name of the radius chips"
+  },
+  "home.radius.km": {
+    "defaultMessage": "{km} km",
+    "description": "Radius chip label; km is a number written as text"
+  },
+  "home.categories.label": {
+    "defaultMessage": "Categories",
+    "description": "Accessible name of the category row on Home"
+  },
+  "home.category.active": {
+    "defaultMessage": "Showing {name}",
+    "description": "Tag naming the category filter on Home"
+  },
+  "home.category.clear": {
+    "defaultMessage": "Show all",
+    "description": "Clears the category filter on Home"
+  },
+  "home.shops.title": {
+    "defaultMessage": "Shops near you",
+    "description": "Heading of the shop list on Home"
+  },
+  "home.shops.error": {
+    "defaultMessage": "Could not load shops.",
+    "description": "Shop list error on Home"
+  },
+  "home.shops.more": {
+    "defaultMessage": "Show more shops",
+    "description": "Loads the next page of shops"
+  },
+  "home.empty.title": {
+    "defaultMessage": "No shops here yet",
+    "description": "Home empty state when no shop is inside the radius"
+  },
+  "home.empty.body": {
+    "defaultMessage": "No shop within this distance is on TodayZ yet. Try a wider search radius.",
+    "description": "Home empty state body"
+  },
+  "home.empty.widen": {
+    "defaultMessage": "Search within {km} km",
+    "description": "Button that widens the radius to the next option"
+  }
+}

@@ -21,7 +21,7 @@ describe('customer shell', () => {
     expect(within(nav).getByRole('link', { name: 'Search' })).not.toHaveAttribute('aria-current');
   });
 
-  it.each(NAV.filter((n) => n.section !== '' && n.section !== 'account'))('shows the placeholder for /$section', async ({ section }) => {
+  it.each(NAV.filter((n) => n.section !== '' && n.section !== 'account' && n.section !== 'search'))('shows the placeholder for /$section', async ({ section }) => {
     renderAt(`/${section}`);
     const nav = await screen.findByRole('navigation', { name: 'Main' });
     const active = within(nav).getAllByRole('link').find((l) => l.getAttribute('aria-current') === 'page');

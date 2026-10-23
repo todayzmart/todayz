@@ -1,0 +1,122 @@
+{
+  "search.title": {
+    "defaultMessage": "Search",
+    "description": "Heading of the Search page"
+  },
+  "search.field.label": {
+    "defaultMessage": "Search products",
+    "description": "Accessible name of the search box"
+  },
+  "search.field.placeholder": {
+    "defaultMessage": "Search atta, milk, medicines",
+    "description": "Placeholder of the search box"
+  },
+  "search.field.clear": {
+    "defaultMessage": "Clear search",
+    "description": "Clear button of a search box"
+  },
+  "search.suggestions.label": {
+    "defaultMessage": "Suggestions",
+    "description": "Accessible name of the suggestion list"
+  },
+  "search.suggestions.search": {
+    "defaultMessage": "Search for {query}",
+    "description": "Button that searches for the typed text when there are no suggestions"
+  },
+  "search.idle.hint": {
+    "defaultMessage": "Type at least two letters to search shops near you.",
+    "description": "Hint on Search before any query"
+  },
+  "search.recent.title": {
+    "defaultMessage": "Recent searches",
+    "description": "Heading of the recent searches kept on this device"
+  },
+  "search.recent.clear": {
+    "defaultMessage": "Clear",
+    "description": "Clears the recent searches"
+  },
+  "search.filter.label": {
+    "defaultMessage": "Filters",
+    "description": "Accessible name of the filter chips"
+  },
+  "search.filter.open": {
+    "defaultMessage": "Open now",
+    "description": "Search filter chip"
+  },
+  "search.filter.pickup": {
+    "defaultMessage": "Pickup",
+    "description": "Search filter chip"
+  },
+  "search.filter.delivery": {
+    "defaultMessage": "Delivery",
+    "description": "Search filter chip"
+  },
+  "search.filter.offers": {
+    "defaultMessage": "Offers",
+    "description": "Search filter chip"
+  },
+  "search.category.label": {
+    "defaultMessage": "Category",
+    "description": "Accessible name of the category chips and tabs"
+  },
+  "search.category.all": {
+    "defaultMessage": "All",
+    "description": "First category chip: no category filter"
+  },
+  "search.sort.label": {
+    "defaultMessage": "Sort by",
+    "description": "Accessible name of the sort control"
+  },
+  "search.sort.relevance": {
+    "defaultMessage": "Best match",
+    "description": "Sort option"
+  },
+  "search.sort.nearest": {
+    "defaultMessage": "Nearest first",
+    "description": "Sort option"
+  },
+  "search.sort.cheapest": {
+    "defaultMessage": "Lowest price",
+    "description": "Sort option"
+  },
+  "search.refine.label": {
+    "defaultMessage": "Filters from your search",
+    "description": "Accessible name of the refine chips"
+  },
+  "search.refine.remove": {
+    "defaultMessage": "Remove filter {chip}",
+    "description": "Accessible name of a refine chip; pressing it removes the filter"
+  },
+  "search.summary": {
+    "defaultMessage": "Checked {checked} shops nearby · {have} have it · from {min}",
+    "description": "Proof line above results; numbers and the price are pre-formatted text"
+  },
+  "search.error": {
+    "defaultMessage": "Could not search right now.",
+    "description": "Search error"
+  },
+  "search.zero.title": {
+    "defaultMessage": "No shop nearby has {query} in stock",
+    "description": "Zero results heading"
+  },
+  "search.zero.body": {
+    "defaultMessage": "We have noted that people near you are looking for this, so shops can stock it.",
+    "description": "Zero results demand line"
+  },
+  "search.more": {
+    "defaultMessage": "Show more shops",
+    "description": "Loads the next page of results"
+  },
+  "search.badge.lowest": {
+    "defaultMessage": "Lowest price",
+    "description": "Badge on the result card with the lowest price"
+  },
+  "search.badge.closest": {
+    "defaultMessage": "Closest",
+    "description": "Badge on the nearest result card"
+  },
+  "search.deliveryFee": {
+    "defaultMessage": "+{fee} delivery",
+    "description": "Delivery fee tag on a result card; fee is formatted money"
+  }
+}
