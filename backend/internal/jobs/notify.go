@@ -5,7 +5,9 @@ import (
 	"errors"
 	"time"
 
+	"github.com/todayz/backend/internal/business"
 	"github.com/todayz/backend/internal/notify"
+	"github.com/todayz/backend/internal/orders"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/ids"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
@@ -22,12 +24,27 @@ const KindRealtimeOutboxCleanup = "realtime_outbox_cleanup"
 const outboxCleanupBatches = 40 //settings:ok an internal batch bound (5,000 x 40 rows a run), not a product rule
 
 // EscalationSources returns the "new order not seen" inputs: the orders not
-// yet seen by the store (W2-02) and the store contacts (W1-04). Nil, nil
-// leaves notify_order_unseen unregistered (the default until both land).
-//
-// TODO(lead): wire W2-02's UnseenOrders and W1-04's StoreContacts here when
-// they land; the job, its claim and its tests are ready (internal/notify).
-var EscalationSources = func(Deps) (notice.UnseenOrders, notice.StoreContacts) { return nil, nil }
+// yet seen by the store (orders.Service, W2-02) and the store contacts
+// (business.Contacts, W1-04). Without a pool or PII_ENC_KEY (the phones are
+// sealed under it) it returns nil, nil and notify_order_unseen stays
+// unregistered. Tests may replace it.
+var EscalationSources = func(d Deps) (notice.UnseenOrders, notice.StoreContacts) {
+	if d.Pool == nil || d.Config == nil || !d.Config.Keys.PIIEncKey.IsSet() {
+		return nil, nil
+	}
+	pool := db.New(d.Pool)
+	contacts, err := business.NewContacts(pool, d.Config)
+	if err != nil {
+		return nil, nil
+	}
+	// Unseen only reads; the sender, timers and stock a status change needs
+	// are not set.
+	svc, err := orders.New(orders.Deps{Config: d.Config, DB: pool, Clock: d.Clock, Log: d.Log, Settings: d.Settings})
+	if err != nil {
+		return nil, nil
+	}
+	return svc, contacts
+}
 
 // registernotify declares the notify domain's job kinds: the outside-message
 // sender (event), the realtime outbox cleanup (hourly) and, once its sources
