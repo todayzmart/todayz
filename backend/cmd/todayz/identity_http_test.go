@@ -31,6 +31,7 @@ type identityAPI struct {
 	t   *testing.T
 	h   http.Handler
 	clk *clock.Fake
+	db  *testkit.DB
 }
 
 const (
@@ -56,7 +57,7 @@ func newIdentityAPI(t *testing.T) *identityAPI {
 	}
 	h, err := buildRouter(d, idempotency.NewMemoryStore(), contractValidator(t))
 	require.NoError(t, err)
-	return &identityAPI{t: t, h: h, clk: clk}
+	return &identityAPI{t: t, h: h, clk: clk, db: tdb}
 }
 
 func (a *identityAPI) do(method, path, body string, hdr map[string]string) *httptest.ResponseRecorder {
