@@ -1,9 +1,363 @@
 # Schemas: domain "catalogue" (owner W1-05): products, items, stock and imports (04 §2.6).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Request objects carry `additionalProperties: false` (an unknown field is 422
+# validation_failed). Money is `*Paise`, ids are `Ulid`, times are `Timestamp`.
+# Stock quantities are whole units (pack counts), at most 1,000,000 per write.
+CategoryNames:
+  type: object
+  description: Display name per language. `en` is final; `hi`, `kn`, `te` and `ta` are drafts waiting for review.
+  required: [en]
+  properties:
+    en: {type: string}
+    hi: {type: string}
+    kn: {type: string}
+    te: {type: string}
+    ta: {type: string}
+CategoryTint:
+  type: string
+  description: One of the six design tints.
+  enum: [green, amber, rose, sky, lilac, peach]
+CategoryChild:
+  type: object
+  required: [id, slug, name, names, tint, icon]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    slug: {type: string}
+    name:
+      type: string
+      description: The name in the language of `Accept-Language` (en when the language has none).
+    names: {$ref: '#/CategoryNames'}
+    tint: {$ref: '#/CategoryTint'}
+    icon:
+      type: string
+      description: A Lucide icon name.
+Category:
+  type: object
+  required: [id, slug, name, names, tint, icon, children]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    slug: {type: string}
+    name:
+      type: string
+      description: The name in the language of `Accept-Language` (en when the language has none).
+    names: {$ref: '#/CategoryNames'}
+    tint: {$ref: '#/CategoryTint'}
+    icon:
+      type: string
+      description: A Lucide icon name.
+    children:
+      type: array
+      items: {$ref: '#/CategoryChild'}
+CategoryList:
+  type: object
+  required: [items]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/Category'}
+Unit:
+  type: string
+  description: The unit of `packSize`.
+  enum: [g, kg, ml, l, pc, pack]
+ProductMatch:
+  type: object
+  description: A master catalogue product (D-37), as "add an item" lists it.
+  required: [id, name, brand, variant, packSize, unit, mrpPaise, categoryId, barcodes, inStore]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name: {type: string}
+    brand: {type: [string, "null"]}
+    variant: {type: [string, "null"]}
+    packSize:
+      type: number
+      exclusiveMinimum: 0
+    unit: {$ref: '#/Unit'}
+    mrpPaise:
+      type: [integer, "null"]
+      minimum: 0
+    categoryId: {$ref: ./common.yaml#/Ulid}
+    barcodes:
+      type: array
+      items: {type: string}
+    inStore:
+      type: boolean
+      description: The store in the query already lists this product.
+ProductMatchList:
+  type: object
+  required: [items]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/ProductMatch'}
+StoreItem:
+  type: object
+  description: >-
+    A store's listing of a master product with its price and stock (01 §4).
+    `available` is `onHand − reserved`; `onHand` may be below 0 after an
+    offline sale (03 stock rule 1). `stale` is true when the stock was last
+    confirmed more than `stock_stale_after_hours` ago (or never).
+  required: [id, storeId, productId, name, productName, localName, brand, variant, packSize, unit,
+    categoryId, barcodes, pricePaise, mrpPaise, productMrpPaise, onHand, reserved, available,
+    lowStockAt, lowStock, isListed, stockUpdatedAt, stale, createdAt, updatedAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    storeId: {$ref: ./common.yaml#/Ulid}
+    productId: {$ref: ./common.yaml#/Ulid}
+    name:
+      type: string
+      description: The local name when set, else the product name.
+    productName: {type: string}
+    localName: {type: [string, "null"]}
+    brand: {type: [string, "null"]}
+    variant: {type: [string, "null"]}
+    packSize:
+      type: number
+      exclusiveMinimum: 0
+    unit: {$ref: '#/Unit'}
+    categoryId: {$ref: ./common.yaml#/Ulid}
+    barcodes:
+      type: array
+      items: {type: string}
+    pricePaise: {$ref: ./common.yaml#/Paise}
+    mrpPaise:
+      description: The store's MRP when it set one.
+      type: [integer, "null"]
+      minimum: 0
+    productMrpPaise:
+      description: The master product's MRP.
+      type: [integer, "null"]
+      minimum: 0
+    onHand: {type: integer}
+    reserved:
+      type: integer
+      minimum: 0
+    available: {type: integer}
+    lowStockAt:
+      type: [integer, "null"]
+      description: The store's threshold; null uses `low_stock_default`.
+    lowStock:
+      type: boolean
+      description: '`available` is at or below the threshold.'
+    isListed: {type: boolean}
+    stockUpdatedAt:
+      type: [string, "null"]
+      format: date-time
+    stale: {type: boolean}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    updatedAt: {$ref: ./common.yaml#/Timestamp}
+StoreItemList:
+  type: object
+  required: [items, nextCursor]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/StoreItem'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+StoreItemCreate:
+  type: object
+  additionalProperties: false
+  description: >-
+    List a master product in the store. `openingStock` above 0 writes an
+    `opening` movement; with `expiresOn` or `costPaise` it also starts a
+    batch (03 stock rule 8). The price may not be above the MRP (the store's,
+    else the product's).
+  required: [productId, pricePaise]
+  properties:
+    productId: {$ref: ./common.yaml#/Ulid}
+    pricePaise:
+      type: integer
+      minimum: 1
+      maximum: 100000000
+    mrpPaise:
+      type: integer
+      minimum: 1
+      maximum: 100000000
+    localName:
+      type: string
+      minLength: 1
+      maxLength: 120
+    lowStockAt:
+      type: integer
+      minimum: 0
+      maximum: 1000000
+    isListed: {type: boolean}
+    openingStock:
+      type: integer
+      minimum: 0
+      maximum: 1000000
+    expiresOn:
+      type: string
+      format: date
+      maxLength: 10
+    costPaise:
+      type: integer
+      minimum: 0
+      maximum: 100000000
+StoreItemUpdate:
+  type: object
+  additionalProperties: false
+  description: >-
+    Only the fields sent change. `pricePaise` and `mrpPaise` need
+    `item.price.edit`; `isListed` and `lowStockAt` need `item.manage`. Send
+    `mrpPaise` or `lowStockAt` as null to clear it. Stock never changes here
+    (that is a movement).
+  minProperties: 1
+  properties:
+    pricePaise:
+      type: integer
+      minimum: 1
+      maximum: 100000000
+    mrpPaise:
+      type: [integer, "null"]
+      minimum: 1
+      maximum: 100000000
+    isListed: {type: boolean}
+    lowStockAt:
+      type: [integer, "null"]
+      minimum: 0
+      maximum: 1000000
+MovementKind:
+  type: string
+  description: >-
+    `restock` needs `stock.restock`, `count_correction` needs `stock.count`,
+    `damage` and `expired` need `stock.damage` (D-06).
+  enum: [restock, count_correction, damage, expired]
+MovementCreate:
+  type: object
+  additionalProperties: false
+  description: >-
+    `quantity` is the units received (restock), lost (damage, expired
+    without `batchIds`) or counted on the shelf (`count_correction`: the
+    movement is the difference from on hand; a count equal to on hand moves
+    nothing and confirms the stock). `batchIds` is for `expired` only: one
+    movement per batch at min(the batch's remaining, available left), and
+    `quantity` is then ignored. `expiresOn` and `costPaise` are for `restock`
+    only and start a batch.
+  required: [kind]
+  properties:
+    kind: {$ref: '#/MovementKind'}
+    quantity:
+      type: integer
+      minimum: 0
+      maximum: 1000000
+    note:
+      type: string
+      minLength: 1
+      maxLength: 200
+    batchIds:
+      type: array
+      minItems: 1
+      maxItems: 50
+      items: {$ref: ./common.yaml#/Ulid}
+    expiresOn:
+      type: string
+      format: date
+      maxLength: 10
+    costPaise:
+      type: integer
+      minimum: 0
+      maximum: 100000000
+MovementSource:
+  type: string
+  enum: [opening, restock, supplier_bill, import, count_correction, damage, expired, sale_pos, sale_online, pos_reversal]
+BatchAllocation:
+  type: object
+  required: [batchId, delta]
+  properties:
+    batchId: {$ref: ./common.yaml#/Ulid}
+    delta: {type: integer}
+Movement:
+  type: object
+  description: One stock ledger line. `batches` is its per-batch allocation (03 stock rule 8).
+  required: [id, delta, source, refType, refId, note, createdAt, batches]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    delta: {type: integer}
+    source: {$ref: '#/MovementSource'}
+    refType: {type: [string, "null"]}
+    refId:
+      type: [string, "null"]
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    note: {type: [string, "null"]}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    batches:
+      type: array
+      items: {$ref: '#/BatchAllocation'}
+MovementResult:
+  type: object
+  description: The item after the write and the movements written (none for a count that matched).
+  required: [item, movements]
+  properties:
+    item: {$ref: '#/StoreItem'}
+    movements:
+      type: array
+      items: {$ref: '#/Movement'}
+MovementList:
+  type: object
+  required: [items, nextCursor]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/Movement'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+StockBatch:
+  type: object
+  description: An expiry or cost batch (D-99). `quantity` is what remains of `receivedQuantity`.
+  required: [id, itemId, itemName, receivedQuantity, quantity, expiresOn, expired, receivedAt,
+    costPaise, foundInCount, pricePaise, mrpPaise, updatedAt, etag]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    etag:
+      type: string
+      maxLength: 16
+      description: >-
+        The batch's current version, to send as `If-Match` on `PATCH
+        {S}/batches/{batchId}` (a list carries no per-row ETag header).
+      example: '"v1"'
+    itemId: {$ref: ./common.yaml#/Ulid}
+    itemName: {type: string}
+    receivedQuantity:
+      type: integer
+      minimum: 1
+    quantity:
+      type: integer
+      minimum: 0
+    expiresOn:
+      type: [string, "null"]
+      format: date
+    expired:
+      type: boolean
+      description: '`expiresOn` is before today (IST).'
+    receivedAt: {$ref: ./common.yaml#/Timestamp}
+    costPaise:
+      type: [integer, "null"]
+      minimum: 0
+    foundInCount: {type: boolean}
+    pricePaise: {$ref: ./common.yaml#/Paise}
+    mrpPaise:
+      type: [integer, "null"]
+      minimum: 0
+    updatedAt: {$ref: ./common.yaml#/Timestamp}
+StockBatchList:
+  type: object
+  required: [items]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/StockBatch'}
+StockBatchUpdate:
+  type: object
+  additionalProperties: false
+  description: >-
+    Corrects what was entered at stock in: cost and expiry only (D-99). Send
+    either as null to clear it. A "found in count" batch has no expiry.
+  minProperties: 1
+  properties:
+    costPaise:
+      type: [integer, "null"]
+      minimum: 0
+      maximum: 100000000
+    expiresOn:
+      type: [string, "null"]
+      format: date
+      maxLength: 10

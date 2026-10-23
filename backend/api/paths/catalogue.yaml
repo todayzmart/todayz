@@ -1,12 +1,629 @@
 # Paths: domain "catalogue" (owner W1-05): products, items, stock and imports (04 §2.6).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [catalogue]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/catalogue.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# W1-05 weekend slice. `{B}` = /v1/biz/businesses/{bid}, `{S}` = {B}/stores/{sid};
+# the permission engine reads the scope from `bid` and `sid`. Roles per
+# operation are in internal/platform/authz/policy/catalogue.go (02 §3.3).
+# Deferred (W1-05 report): `POST {B}/products` (review queue), item imports,
+# the catalogue snapshot and delta feed.
+/v1/discover/categories:
+  get:
+    operationId: listCategories
+    tags: [catalogue]
+    summary: The category tree with tints and icons
+    description: >-
+      Public. Top-level categories by their sort order, each with its
+      children. `name` is in the language of `Accept-Language` when the
+      category has it, else English.
+    security: []
+    parameters:
+      - $ref: ../common/parameters.yaml#/AcceptLanguage
+    responses:
+      "200":
+        description: Every category
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/catalogue.yaml#/CategoryList
+            example:
+              items:
+                - id: 01J43RW0000000000000000080
+                  slug: grocery
+                  name: Grocery
+                  names: {en: Grocery, hi: किराना}
+                  tint: green
+                  icon: shopping-basket
+                  children:
+                    - id: 01J43RW0000000000000000081
+                      slug: staples
+                      name: Staples
+                      names: {en: Staples}
+                      tint: green
+                      icon: wheat
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/products/search:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: searchProducts
+    tags: [catalogue]
+    summary: Search the master catalogue to add an item
+    description: >-
+      Cashier and above (D-37). `barcode` is an exact match; `q` matches the
+      name, variant or brand. One of them is required (`422
+      validation_failed` otherwise). With `storeId`, `inStore` says whether
+      that store already lists the product.
+    parameters:
+      - name: q
+        in: query
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+      - name: barcode
+        in: query
+        schema:
+          type: string
+          pattern: ^[0-9A-Za-z-]{4,32}$
+      - name: storeId
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Ulid
+      - $ref: ../common/parameters.yaml#/Limit
+    responses:
+      "200":
+        description: Matching active products, best match first
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/catalogue.yaml#/ProductMatchList
+            example:
+              items:
+                - id: 01JB0S9P1R2D3C4T5M6A7S8T9R
+                  name: Amul Butter
+                  brand: Amul
+                  variant: Pasteurised
+                  packSize: 100
+                  unit: g
+                  mrpPaise: 6000
+                  categoryId: 01J43RW0000000000000000082
+                  barcodes: ["8901262010016"]
+                  inStore: false
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/items:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listStoreItems
+    tags: [catalogue]
+    summary: The store's items (B-07)
+    description: >-
+      Cashier and above. By product name. `q` matches the name, local name,
+      variant, brand or an exact barcode; `categoryId` includes its children;
+      `lowStock` keeps items at or below their threshold; `listed` keeps
+      listed items only.
+    parameters:
+      - name: q
+        in: query
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+      - name: categoryId
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Ulid
+      - name: lowStock
+        in: query
+        schema:
+          type: boolean
+      - name: listed
+        in: query
+        schema:
+          type: boolean
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: One page of items
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/catalogue.yaml#/StoreItemList
+            example:
+              items:
+                - id: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                  storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                  productId: 01JB0S9P1R2D3C4T5M6A7S8T9R
+                  name: Amul Butter
+                  productName: Amul Butter
+                  localName: null
+                  brand: Amul
+                  variant: Pasteurised
+                  packSize: 100
+                  unit: g
+                  categoryId: 01J43RW0000000000000000082
+                  barcodes: ["8901262010016"]
+                  pricePaise: 5800
+                  mrpPaise: null
+                  productMrpPaise: 6000
+                  onHand: 10
+                  reserved: 2
+                  available: 8
+                  lowStockAt: null
+                  lowStock: false
+                  isListed: true
+                  stockUpdatedAt: "2026-10-23T05:00:00Z"
+                  stale: false
+                  createdAt: "2026-10-01T05:00:00Z"
+                  updatedAt: "2026-10-23T05:00:00Z"
+              nextCursor: null
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: createStoreItem
+    tags: [catalogue]
+    summary: List a master product in the store
+    description: >-
+      Manager and above (`item.manage`; the price also needs
+      `item.price.edit`). A product the store already lists is `409
+      conflict`. `openingStock` writes an `opening` movement.
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/catalogue.yaml#/StoreItemCreate
+          example:
+            productId: 01JB0S9P1R2D3C4T5M6A7S8T9R
+            pricePaise: 5800
+            openingStock: 10
+            expiresOn: "2026-11-20"
+            costPaise: 5000
+    responses:
+      "201":
+        description: The new item
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/catalogue.yaml#/StoreItem
+            example:
+              id: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+              storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              productId: 01JB0S9P1R2D3C4T5M6A7S8T9R
+              name: Amul Butter
+              productName: Amul Butter
+              localName: null
+              brand: Amul
+              variant: Pasteurised
+              packSize: 100
+              unit: g
+              categoryId: 01J43RW0000000000000000082
+              barcodes: ["8901262010016"]
+              pricePaise: 5800
+              mrpPaise: null
+              productMrpPaise: 6000
+              onHand: 10
+              reserved: 0
+              available: 10
+              lowStockAt: null
+              lowStock: false
+              isListed: true
+              stockUpdatedAt: "2026-10-23T05:00:00Z"
+              stale: false
+              createdAt: "2026-10-23T05:00:00Z"
+              updatedAt: "2026-10-23T05:00:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/items/{itemId}:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: itemId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getStoreItem
+    tags: [catalogue]
+    summary: One store item
+    description: Cashier and above.
+    responses:
+      "200":
+        description: The item
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/catalogue.yaml#/StoreItem
+            example:
+              id: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+              storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              productId: 01JB0S9P1R2D3C4T5M6A7S8T9R
+              name: Amul Butter
+              productName: Amul Butter
+              localName: null
+              brand: Amul
+              variant: Pasteurised
+              packSize: 100
+              unit: g
+              categoryId: 01J43RW0000000000000000082
+              barcodes: ["8901262010016"]
+              pricePaise: 5800
+              mrpPaise: null
+              productMrpPaise: 6000
+              onHand: 10
+              reserved: 2
+              available: 8
+              lowStockAt: null
+              lowStock: false
+              isListed: true
+              stockUpdatedAt: "2026-10-19T17:00:00Z"
+              stale: true
+              createdAt: "2026-10-01T05:00:00Z"
+              updatedAt: "2026-10-19T17:00:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  patch:
+    operationId: updateStoreItem
+    tags: [catalogue]
+    summary: Change an item's price, MRP, listing or low-stock threshold
+    description: >-
+      `pricePaise` and `mrpPaise` need `item.price.edit`; `isListed` and
+      `lowStockAt` need `item.manage` (manager and above). The price may not
+      be above the MRP (`422 validation_failed`).
+    x-idempotency: none
+    parameters:
+      - $ref: ../common/parameters.yaml#/IfMatch
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/catalogue.yaml#/StoreItemUpdate
+          example:
+            pricePaise: 5600
+            isListed: true
+    responses:
+      "200":
+        description: The item after the change
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/catalogue.yaml#/StoreItem
+            example:
+              id: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+              storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              productId: 01JB0S9P1R2D3C4T5M6A7S8T9R
+              name: Amul Butter
+              productName: Amul Butter
+              localName: null
+              brand: Amul
+              variant: Pasteurised
+              packSize: 100
+              unit: g
+              categoryId: 01J43RW0000000000000000082
+              barcodes: ["8901262010016"]
+              pricePaise: 5600
+              mrpPaise: null
+              productMrpPaise: 6000
+              onHand: 10
+              reserved: 2
+              available: 8
+              lowStockAt: null
+              lowStock: false
+              isListed: true
+              stockUpdatedAt: "2026-10-23T05:00:00Z"
+              stale: false
+              createdAt: "2026-10-01T05:00:00Z"
+              updatedAt: "2026-10-23T05:10:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/items/{itemId}/movements:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: itemId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: createStockMovement
+    tags: [catalogue]
+    summary: Restock, count, damage or expire stock
+    description: >-
+      `count_correction` needs `stock.count` (cashier and above), `restock`
+      needs `stock.restock`, `damage` and `expired` need `stock.damage`
+      (manager and above, D-06). Negative movements use up batches by 03 stock
+      rule 8 (D-99). `damage` and `expired` may take at most what is
+      available (`422 validation_failed` on `body.quantity`). An `expired`
+      write-off with `batchIds` that finds nothing left to write off is `409
+      conflict`.
+    x-idempotency: required
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/catalogue.yaml#/MovementCreate
+          examples:
+            restock:
+              value:
+                kind: restock
+                quantity: 12
+                expiresOn: "2026-11-20"
+                costPaise: 5000
+            count:
+              value:
+                kind: count_correction
+                quantity: 7
+            markExpired:
+              value:
+                kind: expired
+                batchIds: [01JB0SB4T5C6H7E8X9P0R1D2E3]
+    responses:
+      "201":
+        description: The item after the write and the movements written
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/catalogue.yaml#/MovementResult
+            example:
+              item:
+                id: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                productId: 01JB0S9P1R2D3C4T5M6A7S8T9R
+                name: Amul Butter
+                productName: Amul Butter
+                localName: null
+                brand: Amul
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                categoryId: 01J43RW0000000000000000082
+                barcodes: ["8901262010016"]
+                pricePaise: 5800
+                mrpPaise: null
+                productMrpPaise: 6000
+                onHand: 22
+                reserved: 0
+                available: 22
+                lowStockAt: null
+                lowStock: false
+                isListed: true
+                stockUpdatedAt: "2026-10-23T05:00:00Z"
+                stale: false
+                createdAt: "2026-10-01T05:00:00Z"
+                updatedAt: "2026-10-23T05:00:00Z"
+              movements:
+                - id: 01JB0SC5M6V7T8X9Y0Z1A2B3C4
+                  delta: 12
+                  source: restock
+                  refType: null
+                  refId: null
+                  note: null
+                  createdAt: "2026-10-23T05:00:00Z"
+                  batches:
+                    - batchId: 01JB0SB4T5C6H7E8X9P0R1D2E3
+                      delta: 12
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/items/{itemId}/history:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: itemId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getStoreItemHistory
+    tags: [catalogue]
+    summary: An item's stock movements, newest first
+    description: Cashier and above.
+    parameters:
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: One page of movements
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/catalogue.yaml#/MovementList
+            example:
+              items:
+                - id: 01JB0SC5M6V7T8X9Y0Z1A2B3C4
+                  delta: -2
+                  source: sale_pos
+                  refType: null
+                  refId: null
+                  note: null
+                  createdAt: "2026-10-23T05:00:00Z"
+                  batches:
+                    - batchId: 01JB0SB4T5C6H7E8X9P0R1D2E3
+                      delta: -2
+              nextCursor: null
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/batches:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listStockBatches
+    tags: [catalogue]
+    summary: Expiry and cost batches
+    description: >-
+      Manager and above (`batches.manage`, D-99). Batches with stock left,
+      earliest expiry first (undated after dated). `itemId` narrows to one
+      item; `empty` includes batches used up; `expiresBefore` keeps batches
+      that expire before that date. Each batch carries its `etag` for the
+      `If-Match` of a PATCH.
+    parameters:
+      - name: itemId
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Ulid
+      - name: empty
+        in: query
+        schema:
+          type: boolean
+      - name: expiresBefore
+        in: query
+        schema:
+          type: string
+          format: date
+          maxLength: 10
+      - $ref: ../common/parameters.yaml#/Limit
+    responses:
+      "200":
+        description: The batches
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/catalogue.yaml#/StockBatchList
+            example:
+              items:
+                - id: 01JB0SB4T5C6H7E8X9P0R1D2E3
+                  itemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                  itemName: Curd 400 g
+                  receivedQuantity: 10
+                  quantity: 10
+                  expiresOn: "2026-10-26"
+                  expired: false
+                  receivedAt: "2026-10-20T05:00:00Z"
+                  costPaise: 2800
+                  foundInCount: false
+                  pricePaise: 3500
+                  mrpPaise: 3500
+                  updatedAt: "2026-10-20T05:00:00Z"
+                  etag: '"v1"'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/batches/{batchId}:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: batchId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  patch:
+    operationId: updateStockBatch
+    tags: [catalogue]
+    summary: Correct a batch's cost or expiry
+    description: >-
+      Manager and above (`batches.manage`, D-99). Cost and expiry only; the
+      quantities change only through movements, and no endpoint creates a
+      batch. Audited with before and after. A "found in count" batch takes no
+      expiry (`422 validation_failed`).
+    x-idempotency: none
+    parameters:
+      - $ref: ../common/parameters.yaml#/IfMatch
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/catalogue.yaml#/StockBatchUpdate
+          example:
+            costPaise: 2400
+    responses:
+      "200":
+        description: The batch after the change
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/catalogue.yaml#/StockBatch
+            example:
+              id: 01JB0SB4T5C6H7E8X9P0R1D2E3
+              itemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+              itemName: Salt 1 kg
+              receivedQuantity: 30
+              quantity: 30
+              expiresOn: null
+              expired: false
+              receivedAt: "2026-10-20T05:00:00Z"
+              costPaise: 2400
+              foundInCount: false
+              pricePaise: 2400
+              mrpPaise: 2800
+              updatedAt: "2026-10-23T05:00:00Z"
+              etag: '"v2"'
+      default:
+        $ref: ../common/responses.yaml#/Problem

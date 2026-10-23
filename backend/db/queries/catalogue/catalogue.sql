@@ -258,6 +258,24 @@ FROM store_items si
 WHERE b.id = @id AND b.version = @version AND si.id = b.store_item_id AND si.store_id = @store_id
 RETURNING b.id;
 
+-- name: BatchesExpiredOnShelf :many
+-- "Expired on shelf" (D-99): batches of a store with stock left whose expiry
+-- is before today (IST, passed in). A sold-out batch (quantity 0) is never
+-- listed. The W3 insights read the same rule; W1-05's tests pin it.
+SELECT b.id, b.store_item_id, b.quantity, b.expires_on
+FROM stock_batches b JOIN store_items si ON si.id = b.store_item_id
+WHERE si.store_id = @store_id AND b.quantity > 0 AND b.expires_on < @today::date
+ORDER BY b.expires_on, b.received_at, b.id;
+
+-- name: BatchesGoingToWaste :many
+-- "Going to waste" (D-99): batches with stock left that expire from today up
+-- to and including until (today + insight_expiring_within_days).
+SELECT b.id, b.store_item_id, b.quantity, b.expires_on
+FROM stock_batches b JOIN store_items si ON si.id = b.store_item_id
+WHERE si.store_id = @store_id AND b.quantity > 0
+  AND b.expires_on >= @today::date AND b.expires_on <= @until::date
+ORDER BY b.expires_on, b.received_at, b.id;
+
 ------------------------------------------------------------------------------
 -- catalogue_changes (D-36)
 ------------------------------------------------------------------------------
@@ -304,6 +322,15 @@ LEFT JOIN (SELECT batch_id, sum(delta) AS total FROM stock_movement_batches GROU
 WHERE b.quantity <> coalesce(a.total, 0)
 ORDER BY b.id
 LIMIT @lim;
+
+-- name: LockBatchForRepair :one
+SELECT quantity FROM stock_batches WHERE id = @id FOR UPDATE;
+
+-- name: BatchLedgerSum :one
+SELECT coalesce(sum(delta), 0)::int AS total FROM stock_movement_batches WHERE batch_id = @batch_id;
+
+-- name: RepairBatchQuantity :exec
+UPDATE stock_batches SET quantity = @quantity WHERE id = @id;
 
 -- name: BatchOverItems :many
 -- Items whose batches hold more than max(on_hand, 0) (03 stock rule 8).
