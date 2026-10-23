@@ -94,13 +94,15 @@ func TestOnAccountDelete(t *testing.T) {
 	otherInvite := staff(b3, nil, hashOf(3), "cashier", "invited")
 	otherUsersInvite := staff(b4, &other, hashOf(2), "cashier", "invited")
 	ownerRow := staff(b4, &gone, nil, "owner", "active")
+	otherMember := staff(b3, &other, nil, "manager", "active")
 
 	for range 2 {
 		require.NoError(t, OnAccountDelete(ctx, d, clk, gone))
 		require.Equal(t, state{"removed", false, true}, stateOf(boundToUser), "an invite bound to the account")
 		require.Equal(t, state{"removed", false, true}, stateOf(waitingForPhone), "an invite waiting for its phone")
-		require.Equal(t, state{"active", false, false}, stateOf(activeMember), "an active membership is not an invite")
-		require.Equal(t, state{"active", false, false}, stateOf(ownerRow))
+		require.Equal(t, state{"removed", false, true}, stateOf(activeMember), "a cashier membership ends with the account (D-107)")
+		require.Equal(t, state{"active", false, false}, stateOf(ownerRow), "an owner row is left to OwnsActiveBusiness")
+		require.Equal(t, state{"active", false, false}, stateOf(otherMember), "another account's membership")
 		require.Equal(t, state{"invited", true, false}, stateOf(otherInvite), "another phone's invite")
 		require.Equal(t, state{"invited", true, false}, stateOf(otherUsersInvite), "another account's invite")
 	}

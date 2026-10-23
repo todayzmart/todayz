@@ -76,3 +76,19 @@ test('a wrong code is refused with a clear message', async ({ page, request }) =
   await page.keyboard.type(wrong);
   await expect(page.getByText('That code is not right. Check it and try again.')).toBeVisible();
 });
+
+test('the seeded owner of Lakshmi Traders picks one of its two stores', async ({ page, request }) => {
+  // +91 90000 00011 is the seed's Lakshmi Traders owner (backend/internal/seed/identity.go).
+  const phone = process.env.TZ_BIZ_OWNER_PHONE ?? '9000000011';
+  await page.goto('/orders');
+  await signIn(page, request, phone);
+
+  const shop = page.getByRole('region', { name: 'Stores of Lakshmi Traders' });
+  await expect(shop).toBeVisible();
+  await expect(shop.getByText('Owner')).toBeVisible();
+  await expect(shop.getByRole('button', { name: 'Sri Lakshmi', exact: true })).toBeVisible();
+  if (process.env.TZ_QA_DIR) await page.screenshot({ path: `${process.env.TZ_QA_DIR}/business-picker-1280.png` });
+  await shop.getByRole('button', { name: 'Sri Lakshmi 2' }).click();
+  await expect(page).toHaveURL(/\/orders$/);
+  expect(await page.evaluate(() => localStorage.getItem('todayz.biz.store'))).toBe('01KE0S1W6W8ZV7T1C3A6MS0002');
+});

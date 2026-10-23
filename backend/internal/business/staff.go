@@ -460,16 +460,14 @@ func (s *Service) acceptInvite(ctx context.Context, bidStr, staffIDStr string) (
 }
 
 // OnAccountDelete withdraws the pending staff invites of an account being
-// deleted: those bound to the user and those waiting for the phone they
-// signed in with. Each becomes 'removed' and loses its sealed and hashed
-// phone. It runs inside identity's deletion transaction (d.Q(ctx) joins it),
+// deleted, those bound to the user and those waiting for the phone they
+// signed in with (each becomes 'removed' and loses its sealed and hashed
+// phone), and ends the account's manager and cashier memberships (D-107). It runs inside identity's deletion transaction (d.Q(ctx) joins it),
 // before identity deletes the phone identity, so the phone hash is still
 // there to find. It is idempotent: a second run finds nothing invited.
 //
-// Active memberships are not touched here: OwnsActiveBusiness refuses the
-// deletion of an owner, and a manager's or cashier's row keeps pointing at
-// the anonymised user. TODO(lead): should a deleted account's non-owner
-// memberships be removed too (they can no longer sign in)?
+// Owner rows are not touched: OwnsActiveBusiness refuses the deletion of an
+// active owner.
 func OnAccountDelete(ctx context.Context, d *db.DB, clk clock.Clock, userID ids.ID) error {
 	if d == nil || clk == nil {
 		return errUnavailable
@@ -487,6 +485,11 @@ func OnAccountDelete(ctx context.Context, d *db.DB, clk clock.Clock, userID ids.
 		Now: clk.Now(), UserID: uid, PhoneHash: hash,
 	}); err != nil {
 		return fmt.Errorf("business: withdraw invites: %w", err)
+	}
+	if _, err := q.RemoveMembershipsForAccount(ctx, businessdb.RemoveMembershipsForAccountParams{
+		Now: clk.Now(), UserID: uid,
+	}); err != nil {
+		return fmt.Errorf("business: end memberships: %w", err)
 	}
 	return nil
 }

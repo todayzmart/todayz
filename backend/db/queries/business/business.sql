@@ -292,6 +292,13 @@ UPDATE staff SET status = 'removed', removed_at = @now::timestamptz,
 WHERE status = 'invited'
   AND (user_id = @user_id OR (sqlc.narg(phone_hash)::bytea IS NOT NULL AND invite_phone_hash = sqlc.narg(phone_hash)::bytea));
 
+-- name: RemoveMembershipsForAccount :execrows
+-- Account deletion (D-107): the user's manager and cashier rows end with the
+-- account. Owner rows are left alone: OwnsActiveBusiness refuses the deletion
+-- of an active owner, and a rejected business's owner row stays as a record.
+UPDATE staff SET status = 'removed', removed_at = @now::timestamptz, version = version + 1
+WHERE user_id = @user_id AND role <> 'owner' AND status = 'active';
+
 -- name: OwnsActiveBusiness :one
 -- The user is the active owner of a business that is not rejected. A draft
 -- counts: its stores, staff and documents would be left without an owner.
