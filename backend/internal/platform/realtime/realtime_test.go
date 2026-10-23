@@ -77,7 +77,9 @@ func TestRegistry(t *testing.T) {
 	require.Panics(t, func() { Register("nodot", KindStore) })
 	require.Panics(t, func() { Register("test.nokind") })
 	require.Panics(t, func() { Register("test.badkind", "orders") })
-	Register("test.registered", KindUser)
+	if _, done := Types()["test.registered"]; !done { // -count=N reuses the process
+		Register("test.registered", KindUser)
+	}
 	require.Equal(t, []ChannelKind{KindUser}, Types()["test.registered"])
 }
 

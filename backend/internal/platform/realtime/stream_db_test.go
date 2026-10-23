@@ -256,6 +256,13 @@ func TestStreamLiveThenReplayAfterReconnect(t *testing.T) {
 	}
 	require.Equal(t, []Event{e2, e3}, got)
 
+	// e3's NOTIFY reaching the hub only now (it was committed before the
+	// replay snapshot, after Subscribe) is not sent a second time.
+	var seq3 int64
+	require.NoError(t, db.Pool.QueryRow(context.Background(),
+		`SELECT seq FROM outbox_events WHERE channel = $1 AND payload->>'type' = $2`, string(c), string(AskCreated)).Scan(&seq3))
+	h.Notify(context.Background(), notifyPayload(t, seq3, c, e3, mustCursor(t, rd.ID)))
+
 	// Live again after the replay, with a cursor that moved on.
 	e4 := Event{Type: AskClosed, ID: e3.ID, Version: 2}
 	publish(t, db.Pool, c, e4)

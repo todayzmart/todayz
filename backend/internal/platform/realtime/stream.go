@@ -183,6 +183,13 @@ func (s *Stream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for {
 		select {
 		case d := <-sub.q:
+			// Subscribe comes before the replay snapshot (no gap), so a row
+			// committed just before the snapshot can be replayed and then
+			// arrive live too: send it once. Each seq is notified once.
+			if _, dup := rp.seqs[d.seq]; dup {
+				delete(rp.seqs, d.seq)
+				continue
+			}
 			mark := s.Hub.Mark() // before the queue check (cursor.go)
 			cur = maxU(cur, d.x)
 			if len(sub.q) == 0 {
@@ -282,9 +289,10 @@ func (s *Stream) expired(ctx context.Context) bool {
 
 // replayResult is what a connect sends before going live.
 type replayResult struct {
-	cursor uint64   // the stream's first cursor
-	frames [][]byte // "event: …\ndata: …\n" per replayed event
-	reset  bool     // the client's cursor could not be honoured
+	cursor uint64             // the stream's first cursor
+	frames [][]byte           // "event: …\ndata: …\n" per replayed event
+	seqs   map[int64]struct{} // the outbox rows replayed (at most ReplayLimit)
+	reset  bool               // the client's cursor could not be honoured
 }
 
 // replay reads, in one repeatable-read snapshot taken after Subscribe, the
@@ -325,7 +333,7 @@ func (s *Stream) replay(ctx context.Context, ch Channel, from uint64, resume boo
 	if limit <= 0 {
 		limit = DefaultReplayLimit
 	}
-	rows, err := tx.Query(ctx, `SELECT payload::text FROM outbox_events
+	rows, err := tx.Query(ctx, `SELECT seq, payload::text FROM outbox_events
 		WHERE channel = $1 AND xid >= $2::text::xid8 ORDER BY seq LIMIT $3`,
 		string(ch), formatCursor(from), limit+1)
 	if err != nil {
@@ -333,8 +341,9 @@ func (s *Stream) replay(ctx context.Context, ch Channel, from uint64, resume boo
 	}
 	defer rows.Close()
 	for rows.Next() {
+		var seq int64
 		var p string
-		if err := rows.Scan(&p); err != nil {
+		if err := rows.Scan(&seq, &p); err != nil {
 			return rp, err
 		}
 		var ev Event
@@ -343,6 +352,10 @@ func (s *Stream) replay(ctx context.Context, ch Channel, from uint64, resume boo
 		}
 		data, _ := json.Marshal(ev)
 		rp.frames = append(rp.frames, []byte("event: "+string(ev.Type)+"\ndata: "+string(data)+"\n"))
+		if rp.seqs == nil {
+			rp.seqs = map[int64]struct{}{}
+		}
+		rp.seqs[seq] = struct{}{}
 	}
 	if err := rows.Err(); err != nil {
 		return rp, err

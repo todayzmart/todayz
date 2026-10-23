@@ -62,6 +62,7 @@ type Options struct {
 type delivery struct {
 	frame []byte    // "event: <type>\ndata: {…}\n", rendered once per notification
 	x     uint64    // the publisher's snapshot xmin: a valid cursor once written
+	seq   int64     // the outbox row, so a stream can skip what its replay already sent
 	at    time.Time // publish time (Unix ms from the database), for the lag metric
 }
 
@@ -230,6 +231,7 @@ func (h *Hub) Notify(ctx context.Context, payload string) {
 		d := delivery{
 			frame: append(append(append(append([]byte("event: "), ev.Type...), "\ndata: "...), data...), '\n'),
 			x:     x,
+			seq:   n.Seq,
 			at:    time.UnixMilli(n.T),
 		}
 		h.metrics.SSEPublished(ctx, string(kind))
