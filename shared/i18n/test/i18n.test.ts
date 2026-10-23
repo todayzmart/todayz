@@ -46,7 +46,8 @@ describe('resolveLocale', () => {
     ['?locale=pseudo', 'en-XA'],
     ['?locale=en-XA', 'en-XA'],
     ['?locale=EN-xa', 'en-XA'],
-    ['?locale=hi', 'en'],
+    ['?locale=hi', 'hi'],
+    ['?locale=fr', 'en'],
     ['', 'en'],
   ])('%s -> %s', (search, want) => {
     expect(resolveLocale(search, { allowPseudo: true })).toBe(want);

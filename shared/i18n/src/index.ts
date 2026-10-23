@@ -1,27 +1,30 @@
-// @todayz/i18n bootstrap (W0-05). Locale choice and message loading for the apps.
-// W1-03 replaces this with the full setup: five languages, detection, persistence, formatters.
+// @todayz/i18n public API (W1-03). Documented in README.md.
 import type { MessageFormatElement } from '@formatjs/icu-messageformat-parser';
+import { localeFromSearch } from './detect';
+import { loadFonts } from './fonts';
+import { formatAbsolute, formatDistance, formatMoney, formatRelative, type DateInput, type MoneyStyle } from './format';
+import { htmlLang, type MessageLocale } from './locales';
 
-/** Message locales available before W1-03: English and the en-XA pseudo-locale. */
-export type MessageLocale = 'en' | 'en-XA';
+export * from './locales';
+export * from './detect';
+export * from './fonts';
+export * from './format';
 
 /** Compiled messages: key -> ICU AST, as produced by scripts/gen.mjs. */
 export type Messages = Record<string, MessageFormatElement[]>;
 
-/** Locale used for number, date and currency formatting (₹, Indian grouping, IST). */
-export const FORMAT_LOCALE = 'en-IN';
-
-export const PSEUDO_LOCALE = 'en-XA' satisfies MessageLocale;
+/** Casts a compiled JSON import to Messages (JSON imports widen the AST enums to number). */
+export function asMessages(json: unknown): Messages {
+  return json as Messages;
+}
 
 /**
- * `?locale=pseudo` or `?locale=en-XA` selects the pseudo-locale; anything else is English. Off
- * unless `allowPseudo` is set: production builds leave it off, so the switch exists only in dev,
- * unit tests and the e2e build (see pseudoAllowed).
+ * Language from `?locale=` alone (dev and test switch, and deep links): a language code, or the
+ * pseudo-locale when `allowPseudo` is set; anything else is English. Apps normally call
+ * detectLocale, which adds the stored choice and the browser's languages.
  */
 export function resolveLocale(search: string, { allowPseudo = false }: { allowPseudo?: boolean } = {}): MessageLocale {
-  if (!allowPseudo) return 'en';
-  const v = new URLSearchParams(search).get('locale')?.toLowerCase();
-  return v === 'pseudo' || v === 'en-xa' ? 'en-XA' : 'en';
+  return localeFromSearch(search, { allowPseudo }) ?? 'en';
 }
 
 /** The pseudo-locale is available in every Vite mode except `production`. */
@@ -29,12 +32,21 @@ export function pseudoAllowed(mode: string): boolean {
   return mode !== 'production';
 }
 
-/** Value for <html lang>. The pseudo-locale is still English underneath. */
-export function htmlLang(locale: MessageLocale): string {
-  return locale === 'en-XA' ? 'en-XA' : 'en-IN';
+/**
+ * Puts a language on the page: `<html lang>` (the CSS raises line height for hi, kn, te and ta
+ * from it) and starts loading that script's fonts. Safe to call outside a browser.
+ */
+export async function applyLocale(locale: MessageLocale, doc: Pick<Document, 'documentElement'> | undefined = globalThis.document): Promise<void> {
+  if (doc) doc.documentElement.lang = htmlLang(locale);
+  await loadFonts(locale);
 }
 
-/** Casts a compiled JSON import to Messages (JSON imports widen the AST enums to number). */
-export function asMessages(json: unknown): Messages {
-  return json as Messages;
+/** Formatters bound to one language, so components do not pass it around. `now` is injectable for tests. */
+export function createFormatters(locale: MessageLocale, now: () => number = Date.now) {
+  return {
+    money: (paise: number, style?: MoneyStyle) => formatMoney(paise, style),
+    distance: (metres: number) => formatDistance(metres),
+    relative: (then: DateInput) => formatRelative(then, now(), locale),
+    absolute: (then: DateInput) => formatAbsolute(then, now(), locale),
+  };
 }
