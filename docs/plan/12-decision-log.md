@@ -729,3 +729,10 @@ There is no `make seed`; use `make reset`.
 - **Sentence case.** The copy check in `shared/i18n/test/i18n.test.ts` ignores words inside curly quotes, so a quoted UI label keeps its own case (Add opening hours to appear in “Open now” searches.). Proper nouns added: English, Cloudflare, Turnstile, I, weekdays and months.
 - **For W1-04.** The lead form sends one `Idempotency-Key` per set of details and a fresh `turnstileToken` on every attempt. If `/v1/public/leads` uses idempotency, the request hash leaves out `turnstileToken`, or a retry gets `422 idempotency_mismatch`.
 - Lives in: D-102; `site/CLAUDE.md`; `shared/i18n/README.md`; W1-04, W1-09.
+
+**D-104 · `/v1/events` drops bad events and counts them; aliased-provider modules validate through their roots (lead, 2026-10-23).** From the W1-07 and W1-10 merges.
+- **Events.** A batch is a client's offline queue, so one bad event must not reject the rest. A well-formed envelope gets `202 {accepted, dropped}`. Each dropped event adds to `tz_events_dropped_total{reason}`, where reason is one of `unknown_event`, `server_event`, `invalid_props`, `out_of_window`, `duplicate_id` or `invalid_id`. Malformed envelopes still get 400 or 422. The catalogue checks live in code, not the OpenAPI schema, so `postEvents` stays in the contract smoke. The accepted clock window (`maxEventAge`, `maxEventFuture`) is an ingestion guard, not a product rule, so it stays a code constant.
+- **Terraform.** A module that declares `configuration_aliases` cannot be validated on its own. `scripts/ci/terraform.sh` skips standalone `validate` for such modules; the env roots that pass the alias validate them. Module lock files are git-ignored; only the env roots pin providers.
+- **checkov skips accepted.** CKV2_AWS_57 (no rotation Lambda; keys rotate by runbook) and CKV_AWS_157 (Single-AZ RDS, D-96).
+- **Open until W1-01.** `/v1/rum` and `/v1/events` have no rate limit until the W1-01 limiter lands.
+- Lives in: 05 (events); `backend/CLAUDE.md`; `infra/terraform/README.md`; W1-07, W1-10.
