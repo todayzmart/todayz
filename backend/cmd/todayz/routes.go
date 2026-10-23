@@ -16,6 +16,7 @@ import (
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/health"
 	"github.com/todayz/backend/internal/platform/queue"
+	"github.com/todayz/backend/internal/platform/realtime"
 	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/platform/telemetry"
 	"github.com/todayz/backend/internal/platform/testclock"
@@ -36,6 +37,9 @@ type deps struct {
 	// (W1-01): the session check behind slot 11 and the engine of slot 15.
 	Identity *identity.Service
 	Authz    *authz.Engine
+	// Realtime is the SSE hub fed by the API's LISTEN loop (W2-05); nil in
+	// router tests, where the stream routes answer 503.
+	Realtime *realtime.Hub
 }
 
 func routes(r chi.Router, d deps) {

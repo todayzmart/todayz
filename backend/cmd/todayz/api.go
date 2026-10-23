@@ -17,6 +17,7 @@ import (
 	"github.com/todayz/backend/internal/platform/migrate"
 	"github.com/todayz/backend/internal/platform/pgnotify"
 	"github.com/todayz/backend/internal/platform/queue"
+	"github.com/todayz/backend/internal/platform/realtime"
 )
 
 // buildRouter builds the router: the 02 §2.4 pipeline, then routes, then
@@ -87,6 +88,10 @@ func runAPI(ctx context.Context, getenv func(string) string, out io.Writer) erro
 		return err
 	}
 	st := a.settingsCache(pool, l)
+	// The SSE hub (W2-05) rides the same LISTEN connection; attach before
+	// the loop starts so no notification is missed.
+	hub := realtime.NewHub(realtime.Options{Log: a.log, Metrics: a.metrics})
+	hub.Attach(l)
 	stopLoops, err := startListener(ctx, l)
 	if err != nil {
 		return err
@@ -110,7 +115,7 @@ func runAPI(ctx context.Context, getenv func(string) string, out io.Writer) erro
 	}}
 	d := deps{
 		Config: a.cfg, Log: a.log, Clock: clk, DB: db.New(pool), Settings: st,
-		Queue: q, Ready: ready, TestClock: tc, Metrics: a.metrics,
+		Queue: q, Ready: ready, TestClock: tc, Metrics: a.metrics, Realtime: hub,
 	}
 	// Stored idempotent responses are sealed under PII_ENC_KEY (D-18).
 	idem, err := idempotency.NewPGStore(pool, a.cfg.Keys.PIIEncKey.Bytes())
@@ -129,6 +134,9 @@ func runAPI(ctx context.Context, getenv func(string) string, out io.Writer) erro
 	s := lifecycle.Server{
 		Name: "api", Srv: httpx.NewServer(a.cfg.APIAddr, h), Ready: ready,
 		PreStop: t.PreStop, Drain: t.Drain, Log: a.log,
+		// D-98: after PreStop, every open stream gets `event: reconnect`
+		// (retry 1000) and ends, so srv.Shutdown is not held by streams.
+		Before: hub.Shutdown,
 	}
 	return s.Run(ctx)
 }
