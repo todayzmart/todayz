@@ -3,6 +3,7 @@ import { FORMAT_LOCALE, type Messages } from '@todayz/i18n';
 import { QueryClientProvider, type QueryClient } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';
 import { Button, ToastProvider } from '@todayz/ui';
+import { useEffect } from 'react';
 import { IntlProvider, useIntl } from 'react-intl';
 import { useUpdateLabels } from './labels';
 import type { makeRouter } from './router';
@@ -46,6 +47,15 @@ function CrashFallback({ reset }: { reset: () => void }) {
  * so no extra Intl locale data is needed for it.
  */
 export function App({ messages, router, queryClient, session, update, factor }: AppProps) {
+  // Another tab signed in as someone else: nothing cached for the previous person may stay.
+  useEffect(
+    () =>
+      session.onUserChange(() => {
+        queryClient.clear();
+        factor.clear();
+      }),
+    [session, queryClient, factor],
+  );
   return (
     <IntlProvider locale={FORMAT_LOCALE} defaultLocale={FORMAT_LOCALE} messages={messages} onError={onIntlError}>
       <ErrorBoundary fallback={(reset) => <CrashFallback reset={reset} />}>

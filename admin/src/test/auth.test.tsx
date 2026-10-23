@@ -1,5 +1,8 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { ApiError } from '@todayz/api-client';
+import { totpError } from '../app/totp';
+import { createSecondFactor } from '../app/second-factor';
 import { json, problem, renderAt, type Handler } from './render';
 
 const PHONE = '9000000012';
@@ -213,5 +216,54 @@ describe('sign out', () => {
     await waitFor(() => expect(session.getState().status).toBe('signedOut'));
     await waitFor(() => expect(history.location.pathname).toBe('/sign-in'));
     expect(sessionStorage.getItem('todayz.admin.2fa')).toBeNull();
+  });
+});
+
+describe('review fixes', () => {
+  it('makes the otpauth link clickable only for an otpauth:// address', async () => {
+    const bad: Handler = (c) =>
+      c.path === '/v1/auth/totp/enrol'
+        ? json(200, { secret: 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP', otpauthUri: 'javascript:alert(1)', recoveryCodes: CODES })
+        : undefined;
+    renderAt('/sign-in', { signedIn: false, handlers: otpHandlers('totp_enrol', [bad, verifyOk]) });
+    await phoneStep();
+    await screen.findByTestId('totp-secret');
+    expect(document.querySelector('a[href^="javascript"]')).toBeNull();
+    expect(screen.queryByRole('link', { name: /authenticator app/i })).toBeNull();
+  });
+
+  it('opens the otpauth link when the address is otpauth://', async () => {
+    renderAt('/sign-in', { signedIn: false, handlers: otpHandlers('totp_enrol', [enrolOk, verifyOk]) });
+    await phoneStep();
+    await screen.findByTestId('totp-secret');
+    expect(document.querySelector('a[href^="otpauth://"]')).not.toBeNull();
+  });
+
+  it('maps step_up_required to its own kind and keeps attemptsLeft for a wrong code', () => {
+    const mk = (status: number, code: string, extensions?: Record<string, unknown>) =>
+      new ApiError({ type: 't', title: 't', status, code, ...(extensions ? { extensions } : {}) } as never, new Headers());
+    expect(totpError(mk(403, 'step_up_required'))).toEqual({ kind: 'stepUp' });
+    expect(totpError(mk(429, 'otp_locked'))).toEqual({ kind: 'locked' });
+    expect(totpError(mk(422, 'code_invalid', { attemptsLeft: 3 }))).toEqual({ kind: 'wrong', attemptsLeft: 3 });
+  });
+
+  it('keeps nextStep across a reload and forgets it on clear', () => {
+    sessionStorage.clear();
+    const a = createSecondFactor();
+    a.setNextStep('totp_enrol');
+    expect(createSecondFactor().getState().nextStep).toBe('totp_enrol');
+    a.clear();
+    expect(createSecondFactor().getState().nextStep).toBeUndefined();
+  });
+
+  it('forgets the authenticator step when another tab signs in as someone else', () => {
+    const { session, factor } = renderAt('/', {});
+    const jwt = (sub: string) => `${btoa('{}')}.${btoa(JSON.stringify({ sub }))}.s`;
+    const exp = new Date(Date.now() + 900_000).toISOString();
+    session.signIn({ accessToken: jwt('a1'), expiresAt: exp });
+    factor.markDone();
+    expect(factor.getState().done).toBe(true);
+    session.signIn({ accessToken: jwt('a2'), expiresAt: exp });
+    expect(factor.getState().done).toBe(false);
   });
 });

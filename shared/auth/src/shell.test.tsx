@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { ErrorBoundary } from './error-boundary';
 import { OfflineBanner } from './online';
 import { authDefines } from '../build.mjs';
+import { safeNext, validateNextSearch } from './next';
 import { TURNSTILE_DUMMY_TOKEN, getTurnstileToken } from './turnstile';
 import { UpdateToastHost, createUpdateController, useHoldUpdates } from './update';
 
@@ -126,11 +127,46 @@ describe('turnstile', () => {
     expect(ok['import.meta.env.VITE_API_URL']).toBe(`"${api}"`);
   });
 
+  it('fails every mode that is not development, test or e2e when the key or URL is missing', () => {
+    for (const mode of ['staging', 'preview', 'prod', '', 'Development']) {
+      expect(() => authDefines(mode, {}), mode).toThrow(/mode/);
+    }
+  });
+
   it('falls back to the local API and the test key outside production', () => {
     for (const mode of ['development', 'test', 'e2e']) {
       const d = authDefines(mode, {});
       expect(d['import.meta.env.VITE_TURNSTILE_SITE_KEY']).toBe('"1x00000000000000000000AA"');
       expect(d['import.meta.env.VITE_API_URL']).toBe('"https://api.todayz.localhost"');
     }
+  });
+});
+
+describe('safeNext', () => {
+  const blocked = ['/sign-in', '/two-step'];
+  it('keeps a path on this app, with its query and hash', () => {
+    expect(safeNext('/orders/12?tab=a#top', blocked)).toBe('/orders/12?tab=a#top');
+  });
+  it('falls back to / for anything that could leave the app or loop', () => {
+    const bad = [
+      undefined,
+      42,
+      '',
+      'orders',
+      '//evil.example',
+      'https://evil.example/x',
+      '/\\evil.example',
+      '/\tevil.example',
+      '/\n/evil.example',
+      '/a\u0000b',
+      '/sign-in',
+      '/sign-in/x?next=/',
+      '/two-step',
+    ];
+    for (const v of bad) expect(safeNext(v, blocked), String(v)).toBe('/');
+  });
+  it('validateNextSearch drops an unsafe value', () => {
+    expect(validateNextSearch({ next: '//evil.example' }, blocked)).toEqual({});
+    expect(validateNextSearch({ next: '/search' }, blocked)).toEqual({ next: '/search' });
   });
 });

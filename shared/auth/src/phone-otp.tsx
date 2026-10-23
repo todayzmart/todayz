@@ -93,12 +93,21 @@ export function PhoneOtpFlow({ session, siteKey, labels, onSignedIn, children, c
     }
     setPhoneError(undefined);
     setSending(true);
+    // Resending happens on the code step: its errors show there, not on the hidden phone field.
+    const fail = (message: string) => {
+      if (step === 'code') {
+        setCodeError(message);
+        setErrorKey((k) => k + 1);
+      } else {
+        setPhoneError(message);
+      }
+    };
     try {
       let token: string;
       try {
         token = await getTurnstileToken(siteKey);
       } catch {
-        setPhoneError(labels.errors.captcha);
+        fail(labels.errors.captcha);
         return;
       }
       const r = await sendOtp({ phone: `+91${digits}`, purpose: 'login', app: session.app, turnstileToken: token });
@@ -109,12 +118,12 @@ export function PhoneOtpFlow({ session, siteKey, labels, onSignedIn, children, c
       setStep('code');
     } catch (e) {
       const kind = otpErrorKind(e);
-      setPhoneError(labels.errors[kind === 'wrongCode' ? 'generic' : kind]);
+      fail(labels.errors[kind === 'wrongCode' ? 'generic' : kind]);
       if (e instanceof ApiError && e.retryAfterSeconds) setWait(e.retryAfterSeconds);
     } finally {
       setSending(false);
     }
-  }, [digits, labels, session.app, siteKey]);
+  }, [digits, labels, session.app, siteKey, step]);
 
   const verify = useCallback(
     async (value: string) => {

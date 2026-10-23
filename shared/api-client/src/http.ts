@@ -106,7 +106,20 @@ const PROBLEM_TYPE = 'https://todayz.in/errors/';
  * The sign-in routes authenticate by the refresh cookie or by nothing (04 §2.1): the bearer is
  * never sent to them, so a stale access token cannot turn a refresh into a 401 (W1-08).
  */
-const NO_BEARER = new Set(['/v1/auth/otp/send', '/v1/auth/otp/verify', '/v1/auth/refresh', '/v1/auth/logout']);
+const NO_BEARER = new Set([
+  '/v1/auth/otp/send',
+  '/v1/auth/otp/verify',
+  '/v1/auth/refresh',
+  '/v1/auth/logout',
+  '/v1/auth/logout-all',
+]);
+
+/**
+ * The refresh cookie is set and read by /v1/auth/*, and the API is on another origin than the app:
+ * without `credentials: 'include'` the browser drops the cookie and the next reload signs the person
+ * out. Every /v1/auth/ call sends it (a caller can still say otherwise).
+ */
+const AUTH_PREFIX = '/v1/auth/';
 
 function isProblem(v: unknown): v is Problem {
   if (typeof v !== 'object' || v === null) return false;
@@ -174,7 +187,12 @@ export async function request<T>(url: string, init: RequestOptions = {}): Promis
   if (lang) headers.set('Accept-Language', lang);
 
   const doFetch = config.fetch ?? globalThis.fetch;
-  const res = await doFetch((config.baseUrl ?? '') + url, { ...rest, headers });
+  const credentials = rest.credentials ?? (url.startsWith(AUTH_PREFIX) ? 'include' : undefined);
+  const res = await doFetch((config.baseUrl ?? '') + url, {
+    ...rest,
+    ...(credentials ? { credentials } : {}),
+    headers,
+  });
   const requestId = res.headers.get('x-request-id');
 
   if (res.ok) {

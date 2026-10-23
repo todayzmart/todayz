@@ -75,5 +75,5 @@ export function renderAt(path: string, opts: RenderOptions = {}) {
   const view = render(
     <App messages={opts.messages ?? asMessages(en)} router={router} queryClient={queryClient} session={session} update={update} />,
   );
-  return { ...view, history, router, session, update, calls };
+  return { ...view, history, router, session, update, calls, queryClient };
 }

@@ -95,6 +95,18 @@ function makeLocks(): Locks {
   };
 }
 
+const HINT = 'todayz.hasSession.customer';
+const PENDING = 'todayz.logoutPending.customer';
+
+/** An unsigned JWT-shaped token whose payload carries `sub` (the session only decodes it). */
+function jwt(sub: string): string {
+  const b64 = (o: unknown) => btoa(JSON.stringify(o)).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+  return `${b64({ alg: 'none' })}.${b64({ sub })}.sig`;
+}
+
+const tick = (ms = 5) => new Promise<void>((r) => setTimeout(r, ms));
+const soon = () => new Date(Date.now() + 15 * 60_000).toISOString();
+
 const sessions: Session[] = [];
 function make(server: ReturnType<typeof makeServer>, extra: Partial<Parameters<typeof createSession>[0]> = {}) {
   const s = createSession({
@@ -121,6 +133,7 @@ afterEach(() => {
 describe('refresh', () => {
   it('starts from the cookie and keeps the token in memory only', async () => {
     const server = makeServer();
+    localStorage.setItem(HINT, '1');
     const s = make(server);
     await s.start();
     expect(s.getState().status).toBe('signedIn');
@@ -321,6 +334,454 @@ describe('sign out', () => {
     s.signIn({ accessToken: 'x', expiresAt: new Date(Date.now() + 15 * 60_000).toISOString() });
     await s.signOut();
     expect(s.getState().status).toBe('signedOut');
+  });
+});
+
+describe('credentials on every auth call (review 1)', () => {
+  it('sends credentials: include on each /v1/auth/* route and on nothing else', async () => {
+    const server = makeServer();
+    const s = make(server);
+    s.signIn({ accessToken: 'live', expiresAt: soon() });
+    server.state.validTokens.add('live');
+    const routes = [
+      '/v1/auth/otp/send',
+      '/v1/auth/otp/verify',
+      '/v1/auth/refresh',
+      '/v1/auth/logout',
+      '/v1/auth/logout-all',
+      '/v1/auth/totp/verify',
+      '/v1/auth/totp/recover',
+    ];
+    for (const path of routes) await request(path, { method: 'POST', body: '{}' }).catch(() => undefined);
+    await request('/v1/me');
+    for (const path of routes) {
+      const c = server.calls.find((x) => x.path === path);
+      expect(c, path).toBeDefined();
+      expect(c?.credentials, path).toBe('include');
+      // The TOTP routes are bearer-authenticated (the SMS step has already signed the person in).
+      if (!path.includes('/totp/')) expect(c?.auth, path).toBeNull();
+    }
+    expect(server.calls.find((x) => x.path === '/v1/me')?.credentials).toBeUndefined();
+  });
+
+  it('logout-all is a cookie route: no bearer, and a 401 is not retried', async () => {
+    const server = makeServer();
+    const reject: typeof fetch = async (input, init) => {
+      const path = new URL(typeof input === 'string' ? input : (input as Request).url, 'http://x').pathname;
+      if (path === '/v1/auth/logout-all') {
+        return new Response(JSON.stringify({ type: 't', title: 't', status: 401, code: 'unauthorized' }), {
+          status: 401,
+          headers: { 'content-type': 'application/problem+json' },
+        });
+      }
+      return server.fetch(input, init);
+    };
+    const s = make(server, { fetch: reject });
+    s.signIn({ accessToken: 'live', expiresAt: soon() });
+    await request('/v1/auth/logout-all', { method: 'POST', body: '{"app":"customer"}' }).catch(() => undefined);
+    expect(server.refreshCalls()).toBe(0);
+  });
+});
+
+describe('401 decided by problem code', () => {
+  const answer = (status: number, code?: string) =>
+    code === undefined
+      ? new Response(null, { status })
+      : new Response(JSON.stringify({ type: 't', title: 't', status, code }), {
+          status,
+          headers: { 'content-type': 'application/problem+json' },
+        });
+
+  it('hands an otp_expired 401 to the caller: no refresh, no sign-out', async () => {
+    const server = makeServer();
+    const f: typeof fetch = async (input, init) => {
+      const path = new URL(typeof input === 'string' ? input : (input as Request).url, 'http://x').pathname;
+      return path === '/v1/me' ? answer(401, 'otp_expired') : server.fetch(input, init);
+    };
+    const s = make(server, { fetch: f });
+    s.signIn({ accessToken: 'live', expiresAt: soon() });
+    await expect(request('/v1/me', { method: 'DELETE' })).rejects.toMatchObject({ status: 401, code: 'otp_expired' });
+    expect(server.refreshCalls()).toBe(0);
+    expect(s.getState().status).toBe('signedIn');
+  });
+
+  it('refreshes and retries once on a plain unauthorized, and on a 401 with no body', async () => {
+    for (const code of ['unauthorized', undefined]) {
+      const server = makeServer();
+      const f: typeof fetch = async (input, init) => {
+        const path = new URL(typeof input === 'string' ? input : (input as Request).url, 'http://x').pathname;
+        if (path === '/v1/me' && new Headers(init?.headers).get('authorization') === 'Bearer stale') return answer(401, code);
+        return server.fetch(input, init);
+      };
+      const s = make(server, { fetch: f });
+      s.signIn({ accessToken: 'stale', expiresAt: soon() });
+      const me = await request<{ id: string }>('/v1/me');
+      expect(me.id).toBe('u1');
+      expect(server.refreshCalls()).toBe(1);
+      s.dispose();
+    }
+  });
+
+  function logoutAllServer(statuses: number[]) {
+    const server = makeServer();
+    let n = 0;
+    const f: typeof fetch = async (input, init) => {
+      const path = new URL(typeof input === 'string' ? input : (input as Request).url, 'http://x').pathname;
+      if (path === '/v1/auth/logout-all') {
+        n += 1;
+        const status = statuses.shift() ?? 204;
+        return status === 204 ? new Response(null, { status }) : answer(status, 'unauthorized');
+      }
+      return server.fetch(input, init);
+    };
+    return { server, f, attempts: () => n };
+  }
+
+  it('logout-all: a 401 refreshes once, retries once, then signs out everywhere', async () => {
+    const { server, f, attempts } = logoutAllServer([401]);
+    const s = make(server, { fetch: f });
+    s.signIn({ accessToken: 'a', expiresAt: soon() });
+    await s.signOutEverywhere();
+    expect(attempts()).toBe(2);
+    expect(server.refreshCalls()).toBe(1);
+    expect(s.getState().status).toBe('signedOut');
+  });
+
+  it('logout-all: a second 401 throws and does not sign this tab out', async () => {
+    const { server, f, attempts } = logoutAllServer([401, 401]);
+    const s = make(server, { fetch: f });
+    s.signIn({ accessToken: 'a', expiresAt: soon() });
+    await expect(s.signOutEverywhere()).rejects.toMatchObject({ status: 401 });
+    expect(attempts()).toBe(2);
+    expect(s.getState().status).toBe('signedIn');
+  });
+});
+
+describe('cold start (review 2, 7)', () => {
+  const offline = (server: ReturnType<typeof makeServer>, down: { v: boolean }): typeof fetch =>
+    async (input, init) => {
+      if (down.v) throw new TypeError('offline');
+      return server.fetch(input, init);
+    };
+
+  it('stays unknown when the network is down, then signs in on the online event', async () => {
+    const server = makeServer();
+    localStorage.setItem(HINT, '1');
+    const down = { v: true };
+    const s = make(server, { fetch: offline(server, down) });
+    await s.start();
+    expect(s.getState()).toMatchObject({ status: 'unknown', offline: true });
+    down.v = false;
+    window.dispatchEvent(new Event('online'));
+    await vi.waitFor(() => expect(s.getState().status).toBe('signedIn'));
+    expect(s.getToken()).toBe('token-1');
+  });
+
+  it('stays unknown on a 5xx and recovers when the tab becomes visible', async () => {
+    const server = makeServer();
+    localStorage.setItem(HINT, '1');
+    server.state.refreshStatuses = [503];
+    const s = make(server);
+    await s.start();
+    expect(s.getState()).toMatchObject({ status: 'unknown', offline: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+    await vi.waitFor(() => expect(s.getState().status).toBe('signedIn'));
+  });
+
+  it('retries by itself with a growing pause', async () => {
+    vi.useFakeTimers();
+    const server = makeServer();
+    localStorage.setItem(HINT, '1');
+    server.state.refreshStatuses = [503, 503];
+    const s = make(server);
+    await s.start();
+    expect(s.getState().status).toBe('unknown');
+    await vi.advanceTimersByTimeAsync(5_000);
+    expect(server.refreshCalls()).toBe(2);
+    expect(s.getState().status).toBe('unknown');
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(server.refreshCalls()).toBe(3);
+    expect(s.getState().status).toBe('signedIn');
+  });
+
+  it('only a final 401 is signed out, with no second call and no grace wait', async () => {
+    const server = makeServer();
+    localStorage.setItem(HINT, '1');
+    server.state.refreshStatuses = [401];
+    const s = make(server, { graceWaitMs: 60_000 });
+    await s.start();
+    expect(s.getState().status).toBe('signedOut');
+    expect(server.refreshCalls()).toBe(1);
+    expect(localStorage.getItem(HINT)).toBeNull();
+  });
+
+  it('makes no request for a visitor who never signed in here', async () => {
+    const server = makeServer();
+    const s = make(server);
+    await s.start();
+    expect(s.getState().status).toBe('signedOut');
+    expect(server.calls).toHaveLength(0);
+  });
+
+  it('sets the hint at sign-in and clears it at sign-out', async () => {
+    const server = makeServer();
+    const s = make(server);
+    s.signIn({ accessToken: 'x', expiresAt: soon() });
+    expect(localStorage.getItem(HINT)).toBe('1');
+    await s.signOut();
+    expect(localStorage.getItem(HINT)).toBeNull();
+  });
+
+  it('waits for the other tab only when this tab held a token', async () => {
+    const server = makeServer();
+    server.state.refreshStatuses = [401];
+    const s = make(server, { graceWaitMs: 40 });
+    s.signIn({ accessToken: 'a', expiresAt: soon() });
+    const t0 = Date.now();
+    await s.refresh();
+    expect(Date.now() - t0).toBeGreaterThanOrEqual(35);
+    expect(server.refreshCalls()).toBe(2);
+  });
+});
+
+describe('sign-out races (review 3)', () => {
+  it('a refresh that resolves after sign-out does not sign the person back in', async () => {
+    const server = makeServer();
+    server.state.refreshDelayMs = 40;
+    const s = make(server);
+    s.signIn({ accessToken: 'a', expiresAt: soon() });
+    const pending = s.refresh();
+    await s.signOut();
+    await pending;
+    expect(s.getState().status).toBe('signedOut');
+    expect(s.getToken()).toBeNull();
+    expect(localStorage.getItem(HINT)).toBeNull();
+  });
+
+  it('ignores a token message older than the latest sign-out', async () => {
+    const server = makeServer();
+    const bus = new Bus();
+    const a = make(server, { channel: bus.channel() });
+    const other = bus.channel();
+    other.postMessage({ type: 'signout', at: 2000 });
+    await tick();
+    expect(a.getState().status).toBe('signedOut');
+    other.postMessage({ type: 'token', accessToken: 'late', expiresAt: soon(), userId: null, at: 1000 });
+    await tick();
+    expect(a.getState().status).toBe('signedOut');
+    expect(a.getToken()).toBeNull();
+    other.postMessage({ type: 'token', accessToken: 'newer', expiresAt: soon(), userId: null, at: 3000 });
+    await tick();
+    expect(a.getToken()).toBe('newer');
+  });
+
+  it('ignores a sign-out message older than the token it already holds', async () => {
+    const server = makeServer();
+    const bus = new Bus();
+    const a = make(server, { channel: bus.channel() });
+    const other = bus.channel();
+    other.postMessage({ type: 'token', accessToken: 'fresh', expiresAt: soon(), userId: null, at: 5000 });
+    await tick();
+    other.postMessage({ type: 'signout', at: 4000 });
+    await tick();
+    expect(a.getToken()).toBe('fresh');
+    expect(a.getState().status).toBe('signedIn');
+  });
+});
+
+describe('offline sign-out (review 4)', () => {
+  const down: typeof fetch = async () => {
+    throw new TypeError('offline');
+  };
+
+  it('remembers a sign-out that could not reach the server', async () => {
+    const server = makeServer();
+    const s = make(server, { fetch: down });
+    s.signIn({ accessToken: 'x', expiresAt: soon() });
+    await s.signOut();
+    expect(localStorage.getItem(PENDING)).toBe('1');
+    expect(s.getState().status).toBe('signedOut');
+  });
+
+  it('retries the logout on the next load before any refresh, and does not sign back in', async () => {
+    const server = makeServer();
+    localStorage.setItem(HINT, '1');
+    localStorage.setItem(PENDING, '1');
+    const s = make(server);
+    await s.start();
+    expect(server.calls.map((c) => c.path)).toEqual(['/v1/auth/logout']);
+    expect(s.getState().status).toBe('signedOut');
+    expect(localStorage.getItem(PENDING)).toBeNull();
+    expect(localStorage.getItem(HINT)).toBeNull();
+  });
+
+  it('keeps the hint when the retry fails too, and still does not refresh', async () => {
+    const server = makeServer();
+    localStorage.setItem(HINT, '1');
+    localStorage.setItem(PENDING, '1');
+    const s = make(server, { fetch: down });
+    await s.start();
+    expect(s.getState().status).toBe('signedOut');
+    expect(localStorage.getItem(PENDING)).toBe('1');
+    expect(server.refreshCalls()).toBe(0);
+  });
+
+  it('a new sign-in drops the pending hint', () => {
+    const server = makeServer();
+    localStorage.setItem(PENDING, '1');
+    const s = make(server);
+    s.signIn({ accessToken: 'x', expiresAt: soon() });
+    expect(localStorage.getItem(PENDING)).toBeNull();
+  });
+});
+
+describe('hung refresh and locks (review 5)', () => {
+  it('a refresh that never answers times out and counts as failed', async () => {
+    const server = makeServer();
+    const hang: typeof fetch = (_input, init) =>
+      new Promise((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+      });
+    const s = make(server, { fetch: hang, refreshTimeoutMs: 20 });
+    s.signIn({ accessToken: 'a', expiresAt: soon() });
+    expect(await s.refresh()).toBe(false);
+    expect(s.getState()).toMatchObject({ status: 'signedIn', offline: true });
+  });
+
+  it('falls back to the in-tab path when locks.request throws', async () => {
+    const server = makeServer();
+    const locks: Locks = {
+      request() {
+        throw new DOMException('insecure', 'SecurityError');
+      },
+    };
+    const s = make(server, { locks });
+    s.signIn({ accessToken: 'a', expiresAt: soon() });
+    expect(await s.refresh()).toBe(true);
+    expect(s.getToken()).toBe('token-1');
+  });
+
+  it('falls back when locks.request rejects before running the callback', async () => {
+    const server = makeServer();
+    const locks: Locks = { request: () => Promise.reject(new DOMException('denied', 'SecurityError')) };
+    const s = make(server, { locks });
+    s.signIn({ accessToken: 'a', expiresAt: soon() });
+    expect(await s.refresh()).toBe(true);
+  });
+
+  it('start() and the timer never leave an unhandled rejection', async () => {
+    const seen: unknown[] = [];
+    const onRejection = (e: unknown) => void seen.push(e);
+    process.on('unhandledRejection', onRejection);
+    try {
+      const server = makeServer();
+      localStorage.setItem(HINT, '1');
+      const boom: typeof fetch = async () => {
+        throw new Error('not an ApiError');
+      };
+      const locks: Locks = {
+        request() {
+          throw new Error('locks broke');
+        },
+      };
+      const s = make(server, { fetch: boom, locks });
+      await s.start();
+      await tick(30);
+      expect(s.getState().status).toBe('unknown');
+    } finally {
+      process.off('unhandledRejection', onRejection);
+    }
+    expect(seen).toEqual([]);
+  });
+});
+
+describe('refresh timing (review 6)', () => {
+  it('never waits less than 30 s, however short the token lives', async () => {
+    vi.useFakeTimers();
+    const server = makeServer();
+    const s = make(server);
+    s.signIn({ accessToken: 'short', expiresAt: new Date(Date.now() + 10_000).toISOString() });
+    await vi.advanceTimersByTimeAsync(29_000);
+    expect(server.refreshCalls()).toBe(0);
+    await vi.advanceTimersByTimeAsync(2_000);
+    expect(server.refreshCalls()).toBe(1);
+  });
+
+  it('treats an expiry that is not a date as a short fallback life, not NaN', async () => {
+    vi.useFakeTimers();
+    const server = makeServer();
+    const s = make(server);
+    s.signIn({ accessToken: 'odd', expiresAt: 'not a date' });
+    await vi.advanceTimersByTimeAsync(29_000);
+    expect(server.refreshCalls()).toBe(0);
+    await vi.advanceTimersByTimeAsync(5 * 60_000);
+    expect(server.refreshCalls()).toBe(1);
+  });
+
+  it('measures the lifetime on the server clock when the device clock is wrong', async () => {
+    vi.useFakeTimers();
+    const server = makeServer();
+    // The device is 10 minutes behind the server; the token lives 2 minutes by the server's clock.
+    server.state.expiresInMs = 600_000 + 120_000;
+    const skewed: typeof fetch = async (input, init) => {
+      const r = await server.fetch(input, init);
+      const headers = new Headers(r.headers);
+      headers.set('date', new Date(Date.now() + 600_000).toUTCString());
+      return new Response(r.body, { status: r.status, headers });
+    };
+    const s = make(server, { fetch: skewed });
+    s.signIn({ accessToken: 'stale', expiresAt: new Date(Date.now() + 1000).toISOString() });
+    await s.refresh();
+    expect(server.refreshCalls()).toBe(1);
+    await vi.advanceTimersByTimeAsync(58_000);
+    expect(server.refreshCalls()).toBe(1);
+    await vi.advanceTimersByTimeAsync(4_000);
+    expect(server.refreshCalls()).toBe(2);
+  });
+});
+
+describe('user switch across tabs (review 8)', () => {
+  it('tells the app when another tab signs in as a different user', async () => {
+    const server = makeServer();
+    const bus = new Bus();
+    const a = make(server, { channel: bus.channel() });
+    const b = make(server, { channel: bus.channel() });
+    const changes: [string, string][] = [];
+    a.onUserChange((prev, next) => changes.push([prev, next]));
+    a.signIn({ accessToken: jwt('user-1'), expiresAt: soon() });
+    await tick();
+    expect(a.getState().userId).toBe('user-1');
+    b.signIn({ accessToken: jwt('user-2'), expiresAt: soon() });
+    await tick();
+    expect(changes).toEqual([['user-1', 'user-2']]);
+    expect(a.getState().userId).toBe('user-2');
+  });
+
+  it('is quiet when the same user gets a new token', async () => {
+    const server = makeServer();
+    const bus = new Bus();
+    const a = make(server, { channel: bus.channel() });
+    const b = make(server, { channel: bus.channel() });
+    const listener = vi.fn();
+    a.onUserChange(listener);
+    a.signIn({ accessToken: jwt('user-1'), expiresAt: soon() });
+    b.signIn({ accessToken: jwt('user-1'), expiresAt: soon() });
+    await tick();
+    expect(listener).not.toHaveBeenCalled();
+  });
+
+  it('fires for a different user signing in on this tab, and drops the old ETags', async () => {
+    const server = makeServer();
+    const s = make(server);
+    const listener = vi.fn();
+    s.onUserChange(listener);
+    s.signIn({ accessToken: jwt('user-1'), expiresAt: soon() });
+    server.state.validTokens.add(jwt('user-1'));
+    await request('/v1/me');
+    expect(s.etag('/v1/me')).toBe('"v1"');
+    s.signIn({ accessToken: jwt('user-2'), expiresAt: soon() });
+    expect(listener).toHaveBeenCalledWith('user-1', 'user-2');
+    expect(s.etag('/v1/me')).toBeUndefined();
   });
 });
 

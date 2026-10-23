@@ -260,9 +260,12 @@ function TwoStep() {
             </p>
             <p className={styles.sub}>{intl.formatMessage({ id: 'auth.twoStep.secretHelp' })}</p>
           </div>
-          <a className="tz-btn" href={enrol.data.otpauthUri}>
-            {intl.formatMessage({ id: 'auth.twoStep.uriOpen' })}
-          </a>
+          {/* The address comes from the API, but only an otpauth:// link is ever made clickable. */}
+          {enrol.data.otpauthUri.startsWith('otpauth://') && (
+            <a className="tz-btn" href={enrol.data.otpauthUri}>
+              {intl.formatMessage({ id: 'auth.twoStep.uriOpen' })}
+            </a>
+          )}
         </>
       )}
       <OtpInput

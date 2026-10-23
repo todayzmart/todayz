@@ -30,12 +30,17 @@ export interface RenderOptions {
   messages?: Messages;
   /** Stored language choice; false leaves it unset (first run). Default 'en'. */
   chosen?: string | false;
+  /** This device signed in before (the `hasSession` hint is set), so the start tries the refresh cookie. */
+  returning?: boolean;
   /** Answers per request; the first handler that returns a Response wins. Refresh answers 401 by default. */
   handlers?: Handler[];
 }
 
 export function renderAt(path: string, opts: RenderOptions = {}) {
+  localStorage.clear();
   if (opts.chosen !== false) localStorage.setItem('todayz.lang', opts.chosen ?? 'en');
+  // A returning person: this device has signed in before, so the cookie is tried at start.
+  if (opts.returning) localStorage.setItem('todayz.hasSession.customer', '1');
   const calls: Call[] = [];
   const handlers = opts.handlers ?? [];
   const fakeFetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -71,5 +76,5 @@ export function renderAt(path: string, opts: RenderOptions = {}) {
   const view = render(
     <App messages={opts.messages ?? asMessages(en)} router={router} queryClient={queryClient} session={session} update={update} />,
   );
-  return { ...view, router, session, update, calls };
+  return { ...view, router, session, update, calls, queryClient };
 }

@@ -158,3 +158,15 @@ describe('sign out and invite', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Join a shop' })).toBeInTheDocument();
   });
 });
+
+describe('user switch (review 8)', () => {
+  it('clears the query cache when a different user signs in', () => {
+    const { session, queryClient } = renderAt('/sign-in');
+    const jwt = (sub: string) => `${btoa('{}')}.${btoa(JSON.stringify({ sub }))}.s`;
+    const exp = new Date(Date.now() + 900_000).toISOString();
+    session.signIn({ accessToken: jwt('u1'), expiresAt: exp });
+    queryClient.setQueryData(['shops'], [1]);
+    session.signIn({ accessToken: jwt('u2'), expiresAt: exp });
+    expect(queryClient.getQueryData(['shops'])).toBeUndefined();
+  });
+});

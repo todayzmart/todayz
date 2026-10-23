@@ -94,6 +94,39 @@ describe('C-10 sign in', () => {
   });
 });
 
+describe('resend on the code step (review 9)', () => {
+  it('shows a resend failure on the code step', async () => {
+    let sends = 0;
+    renderAt('/sign-in', {
+      handlers: [
+        (c) => {
+          if (c.path !== '/v1/auth/otp/send') return undefined;
+          sends += 1;
+          return sends === 1 ? json(200, { requestId: 'req-1', resendAfter: 0 }) : problem(429, 'rate_limited');
+        },
+      ],
+    });
+    fireEvent.change(await screen.findByLabelText('Mobile number'), { target: { value: PHONE } });
+    fireEvent.click(screen.getByRole('button', { name: 'Send code' }));
+    await screen.findByText(/We sent a code to/);
+    fireEvent.click(screen.getByRole('button', { name: 'Resend code' }));
+    expect(await screen.findByText('Too many tries. Wait a moment and try again.')).toBeInTheDocument();
+    expect(screen.getByText(/We sent a code to/)).toBeInTheDocument();
+  });
+});
+
+describe('user switch (review 8)', () => {
+  it('clears the query cache when another tab signs in as someone else', async () => {
+    const { session, queryClient } = renderAt('/account', { handlers: authHandlers(false) });
+    const jwt = (sub: string) => `${btoa('{}')}.${btoa(JSON.stringify({ sub }))}.s`;
+    const exp = new Date(Date.now() + 900_000).toISOString();
+    session.signIn({ accessToken: jwt('u1'), expiresAt: exp });
+    queryClient.setQueryData(['me'], { id: 'u1' });
+    session.signIn({ accessToken: jwt('u2'), expiresAt: exp });
+    expect(queryClient.getQueryData(['me'])).toBeUndefined();
+  });
+});
+
 describe('Account', () => {
   it('offers sign in when signed out', async () => {
     renderAt('/account');
@@ -104,6 +137,7 @@ describe('Account', () => {
   it('shows the profile, saves a name with If-Match, and reloads on a 412', async () => {
     let conflict = true;
     const { calls } = renderAt('/account', {
+      returning: true,
       handlers: [
         (c) =>
           c.path === '/v1/auth/refresh'
@@ -129,6 +163,7 @@ describe('Account', () => {
 
   it('signs out', async () => {
     const { calls, session } = renderAt('/account', {
+      returning: true,
       handlers: [
         (c) =>
           c.path === '/v1/auth/refresh'

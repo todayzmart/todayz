@@ -44,6 +44,36 @@ function sentHeaders(s: { calls: Call[] }): Headers {
 
 afterEach(() => configure({}));
 
+describe('request credentials and bearer on auth routes', () => {
+  const cookieRoutes = ['otp/send', 'otp/verify', 'refresh', 'logout', 'logout-all'];
+
+  it('sends the cookie to every /v1/auth/ route, and to nothing else by default', async () => {
+    for (const r of [...cookieRoutes, 'totp/verify', 'totp/recover', 'totp/enrol']) {
+      const s = stub(json({}));
+      configure({ fetch: s.fetch });
+      await request(`/v1/auth/${r}`, { method: 'POST' });
+      expect(call(s).init.credentials, r).toBe('include');
+    }
+    const s = stub(json({}));
+    configure({ fetch: s.fetch });
+    await request('/v1/me');
+    expect(call(s).init.credentials).toBeUndefined();
+  });
+
+  it('never sends the bearer to the cookie routes, but does to the TOTP routes', async () => {
+    for (const r of cookieRoutes) {
+      const s = stub(json({}));
+      configure({ fetch: s.fetch, token: () => 'tok' });
+      await request(`/v1/auth/${r}`, { method: 'POST' });
+      expect(sentHeaders(s).get('authorization'), r).toBeNull();
+    }
+    const s = stub(json({}));
+    configure({ fetch: s.fetch, token: () => 'tok' });
+    await request('/v1/auth/totp/verify', { method: 'POST' });
+    expect(sentHeaders(s).get('authorization')).toBe('Bearer tok');
+  });
+});
+
 describe('request', () => {
   it('resolves the decoded JSON body of a 2xx answer', async () => {
     const s = stub(json({ status: 'ok' }));

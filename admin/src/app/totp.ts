@@ -2,8 +2,10 @@ import { ApiError, request } from '@todayz/api-client';
 
 // TODO(W1-01b): replace these local types and calls with the generated client once
 // `enrolTotp`, `verifyTotp` and `recoverTotp` are in the merged contract (backend/api/paths/auth.yaml).
-// The shapes follow that file as it stands on the W1-01b branch. They need the OTP-step bearer, so
-// they go through request() like every other call.
+// The shapes follow that file (checked against the W1-01 phase B branch): POST /v1/auth/totp/enrol
+// (TotpEnrolResponse), /totp/verify {code: 6 digits, purpose: login|step_up} (AccessTokenResponse) and
+// /totp/recover {recoveryCode} (TotpRecoverResponse). They need the OTP-step bearer, so they go
+// through request() like every other call; request() sends the cookie to every /v1/auth/ route.
 
 export interface TotpEnrol {
   /** Base32, for typing in by hand. Never logged, never stored. */
@@ -45,12 +47,14 @@ export function recoverTotp(recoveryCode: string): Promise<RecoverGrant> {
   });
 }
 
-export type TotpErrorKind = 'wrong' | 'locked' | 'unavailable';
+export type TotpErrorKind = 'wrong' | 'locked' | 'stepUp' | 'unavailable';
 
 /** `attemptsLeft` is only set for a wrong code that the server counted. */
 export function totpError(e: unknown): { kind: TotpErrorKind; attemptsLeft?: number } {
   if (e instanceof ApiError) {
     if (e.code === 'otp_locked') return { kind: 'locked' };
+    // 403 from the admin API: the action needs a fresh `purpose: step_up` confirmation (not built yet).
+    if (e.code === 'step_up_required') return { kind: 'stepUp' };
     if (e.code === 'code_invalid') {
       const left = e.problem.extensions?.['attemptsLeft'];
       return typeof left === 'number' ? { kind: 'wrong', attemptsLeft: left } : { kind: 'wrong' };
