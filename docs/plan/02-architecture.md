@@ -178,7 +178,7 @@ No Redis in v1. Rate limits use Cloudflare at the edge plus an in-process token 
 4. OpenTelemetry server span (extract `traceparent` from the client)
 5. Real client IP from `CF-Connecting-IP` (only trusted when the request came through Cloudflare; ALB security group accepts Cloudflare IP ranges only)
 6. Access log + RED metrics (route template, not raw path)
-7. CORS (exact origins: app., business., admin.; locally the same hosts on `todayz.localhost`)
+7. CORS (exact origins: app., business., admin.; locally the same hosts on `todayz.localhost`). `/v1/public/*` has its own rule: the marketing site origins only (`todayz.in`, `www.todayz.in`, locally `todayz.localhost`), POST and OPTIONS, no credentials; the site origin never gets a credentialed response on any other route (D-102)
 8. Path guard: `400 bad_request` for a raw path that two routers could read differently (one that is not the canonical encoding of its decoded form, or carries an encoded slash `%2F` or a backslash `%5C`), so chi and the validator always see one path (D-100)
 9. Route policy: puts the matched route's effective policy (body limit, idempotency opt-in) in the request context, because step 10 runs before chi has picked the route. The policy is the contract's `x-idempotency`/`x-upload` merged with what the code declares; the stronger rule wins, and code weaker than the contract fails startup (D-100)
 10. Body size limit (1 MB default, 10 MB on routes that declare an upload)
