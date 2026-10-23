@@ -215,8 +215,8 @@ func TestAuthzSlot(t *testing.T) {
 		d, _ = authz.DecisionFrom(req.Context())
 		w.WriteHeader(http.StatusNoContent)
 	})
-	r.With(Authz(allowOnly("x.y"), "order.accept")).Get("/refused", func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(204) })
-	r.With(Authz(nil, "order.accept")).Get("/nil", func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(204) })
+	r.With(Authz(allowOnly("x.y"), "order.accept")).Get("/refused", func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(http.StatusNoContent) })
+	r.With(Authz(nil, "order.accept")).Get("/nil", func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(http.StatusNoContent) })
 
 	biz := ids.New(mwT0)
 	rec := httptest.NewRecorder()

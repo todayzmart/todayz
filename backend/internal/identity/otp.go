@@ -219,7 +219,7 @@ func (s *Service) VerifyOTP(ctx context.Context, in VerifyInput) (SignIn, error)
 		if refusal != nil {
 			// The code is used either way; the refusal answers after commit.
 			outcome = refusal
-			return nil
+			return nil //nolint:nilerr // commit (the code is used), then answer the refusal
 		}
 		out, family, roles = res.SignIn, res.family, res.roles
 		return nil

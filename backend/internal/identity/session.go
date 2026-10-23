@@ -158,7 +158,7 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 		}
 		if refusal := statusRefusal(row.UserStatus); refusal != nil {
 			outcome = refusal
-			return nil
+			return nil //nolint:nilerr // the refusal answers after the transaction
 		}
 		if in.App == authn.AppAdmin {
 			a, err := q.GetAdminUser(ctx, row.UserID)
@@ -186,7 +186,7 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 		}
 		exp := now.Add(in.App.RefreshTTL())
 		if in.App == authn.AppAdmin {
-			exp = row.ExpiresAt
+			exp = row.ExpiresAt.UTC() // absolute: the family's first expiry
 		}
 		if err := q.InsertSession(ctx, identitydb.InsertSessionParams{
 			ID: ids.UUID(ids.New(now)), UserID: row.UserID, App: row.App, FamilyID: row.FamilyID,
