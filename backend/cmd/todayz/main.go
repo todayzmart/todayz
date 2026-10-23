@@ -33,10 +33,23 @@ commands:
 `
 
 func main() {
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	ctx, stop := notifyOnce()
 	code := run(ctx, os.Args[1:], config.FromOS(), os.Stdout, os.Stderr)
 	stop()
 	os.Exit(code)
+}
+
+// notifyOnce returns a context cancelled by the first SIGTERM or interrupt,
+// which starts the drain (D-98). After that the signals take their default
+// action again, so a second SIGTERM or Ctrl-C ends the process at once
+// instead of waiting for the drain.
+func notifyOnce() (context.Context, context.CancelFunc) {
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-ctx.Done()
+		stop()
+	}()
+	return ctx, stop
 }
 
 // run dispatches a command and returns the exit code: 0 ok, 1 failed, 2 usage.
