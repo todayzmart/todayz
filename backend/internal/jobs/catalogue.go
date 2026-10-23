@@ -1,6 +1,6 @@
 package jobs
 
-// registercatalogue adds the catalogue domain's River workers and periodic jobs.
-// The work package that builds internal/catalogue fills it in: Add for each
-// worker, r.Every for each periodic job. Keep it to this file.
+// registercatalogue declares the catalogue domain's job kinds.
+// The work package that builds internal/catalogue fills it in: one
+// platformjobs.Define per kind (W1-11, see identity.go). Keep it to this file.
 func registercatalogue(r *Registry, d Deps) {}

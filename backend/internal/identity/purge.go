@@ -9,7 +9,7 @@ import (
 	"github.com/todayz/backend/internal/platform/db"
 )
 
-// Retention of the sign-in tables (the identity.purge maintenance job).
+// Retention of the sign-in tables (the identity_purge maintenance job).
 const (
 	// OTPRetention: otp_requests are purged after 24 h (03 §1). The send
 	// limits look back one hour, so a purge never frees a limit early.

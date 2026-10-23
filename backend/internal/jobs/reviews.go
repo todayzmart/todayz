@@ -1,6 +1,6 @@
 package jobs
 
-// registerreviews adds the reviews domain's River workers and periodic jobs.
-// The work package that builds internal/reviews fills it in: Add for each
-// worker, r.Every for each periodic job. Keep it to this file.
+// registerreviews declares the reviews domain's job kinds.
+// The work package that builds internal/reviews fills it in: one
+// platformjobs.Define per kind (W1-11, see identity.go). Keep it to this file.
 func registerreviews(r *Registry, d Deps) {}

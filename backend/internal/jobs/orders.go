@@ -1,6 +1,6 @@
 package jobs
 
-// registerorders adds the orders domain's River workers and periodic jobs.
-// The work package that builds internal/orders fills it in: Add for each
-// worker, r.Every for each periodic job. Keep it to this file.
+// registerorders declares the orders domain's job kinds.
+// The work package that builds internal/orders fills it in: one
+// platformjobs.Define per kind (W1-11, see identity.go). Keep it to this file.
 func registerorders(r *Registry, d Deps) {}

@@ -1,6 +1,6 @@
 package jobs
 
-// registeroffers adds the offers domain's River workers and periodic jobs.
-// The work package that builds internal/offers fills it in: Add for each
-// worker, r.Every for each periodic job. Keep it to this file.
+// registeroffers declares the offers domain's job kinds.
+// The work package that builds internal/offers fills it in: one
+// platformjobs.Define per kind (W1-11, see identity.go). Keep it to this file.
 func registeroffers(r *Registry, d Deps) {}
