@@ -35,10 +35,6 @@
     "defaultMessage": "Out of stock",
     "description": "Stock tag"
   },
-  "product.stock.stale": {
-    "defaultMessage": "Stock not confirmed recently",
-    "description": "Stock tag when the stock is older than the stale limit"
-  },
   "product.confirmed": {
     "defaultMessage": "Confirmed {time}",
     "description": "Freshness of the stock; time reads like 12 min ago"

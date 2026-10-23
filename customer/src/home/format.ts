@@ -7,12 +7,6 @@ import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { useLocale } from '../app/locale';
 
-/**
- * `stock_stale_after_hours` (01 §4, default 72). TODO(lead): there is no public settings endpoint, so
- * the default is a constant here, like the radius options in radius.ts.
- */
-export const STALE_AFTER_HOURS = 72;
-
 export interface Fmt {
   money: (paise: number) => string;
   /** "12 min ago", computed against the server's clock. */
@@ -55,10 +49,9 @@ export function useStockProps(): (item: DiscoverSearchItem, serverNow: string) =
   return (item, serverNow) => {
     if (!item.inStock) return { level: 'out', label: intl.formatMessage({ id: 'product.stock.out' }), freshness: null };
     const label = intl.formatMessage({ id: 'product.stock.in' });
-    const staleLabel = intl.formatMessage({ id: 'product.stock.stale' });
-    if (!item.confirmedAt) return { level: 'in', label, stale: true, staleLabel };
+    // Discover sends confirmedAt: null once the item is past stock_stale_after_hours: show nothing then.
+    if (!item.confirmedAt) return { level: 'in', label, freshness: null };
     const age = Date.parse(serverNow) - Date.parse(item.confirmedAt);
-    if (age > STALE_AFTER_HOURS * 3_600_000) return { level: 'in', label, stale: true, staleLabel };
     const freshness =
       age < 60_000
         ? intl.formatMessage({ id: 'product.confirmedNow' })

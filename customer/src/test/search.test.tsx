@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { clearCart } from '../cart/cart';
-import { AGO_12_MIN, CATEGORIES, NOW, SHOP_B, atBengaluru, card, item, renderDiscover } from './discover-fixtures';
+import { AGO_12_MIN, CATEGORIES, NOW, SHOP_B, STORE_B_ID, atBengaluru, card, item, renderDiscover } from './discover-fixtures';
 
 beforeEach(() => clearCart());
 
@@ -11,7 +11,7 @@ const result = (over: Record<string, unknown> = {}) => ({
   results: [
     { store: card(), items: [item()], badge: 'lowest_price', deliveryFeePaise: 2000 },
     {
-      store: card({ storeSlug: SHOP_B, name: 'Annapurna Kirana', distanceM: 1200 }),
+      store: card({ storeId: STORE_B_ID, storeSlug: SHOP_B, name: 'Annapurna Kirana', distanceM: 1200 }),
       items: [item({ storeItemId: '01KE0S1W6W8ZV7T1C3A6ITEM02', pricePaise: 27000, confirmedAt: null })],
       badge: null,
       deliveryFeePaise: 0,
@@ -43,8 +43,8 @@ describe('C-05 Search', () => {
     expect(screen.queryByText('Closest')).not.toBeInTheDocument();
     expect(screen.getByText('+₹20 delivery')).toBeInTheDocument();
     expect(screen.getByText(/Confirmed 12 min/)).toBeInTheDocument();
-    // No timestamp from the API means the stale wording, not a guessed time.
-    expect(screen.getByText('Stock not confirmed recently')).toBeInTheDocument();
+    // No timestamp from the API (stale stock) means no freshness line, not a guessed time.
+    expect(screen.getAllByText(/Confirmed/)).toHaveLength(1);
     const search = calls.find((c) => c.path === '/v1/discover/search');
     expect(search?.query.get('q')).toBe('atta');
     expect(search?.query.get('radius')).toBe('2000');

@@ -119,7 +119,9 @@ export function StorePage({ slug, state, onChange }: { slug: string; state: Stor
             serverNow={serverNow}
             bookable={bookable}
             qty={qtyOf(slug, item.storeItemId)}
-            onChange={(qty) => change({ slug, name: s?.name ?? slug }, item, packLine(item), qty)}
+            onChange={(qty) => {
+              if (s) change({ id: s.storeId, slug, name: s.name }, item, packLine(item), qty);
+            }}
             directionsHref={s ? directionsUrl(s.lat, s.lng) : undefined}
           />
         ))}

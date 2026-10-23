@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { clearCart, getCart } from '../cart/cart';
-import { NOW, SHOP_A, SHOP_B, atBengaluru, card, item, page, pageOf, renderDiscover } from './discover-fixtures';
+import { NOW, SHOP_A, SHOP_B, STORE_B_ID, atBengaluru, card, item, page, pageOf, renderDiscover } from './discover-fixtures';
 
 beforeEach(() => clearCart());
 
@@ -16,7 +16,7 @@ function routes() {
       summary: { storesChecked: 5, storesWithIt: 2, minPricePaise: 25000 },
       results: [
         { store: card(), items: [item()], badge: null, deliveryFeePaise: 2000 },
-        { store: card({ storeSlug: SHOP_B, name: 'Annapurna Kirana', distanceM: 1200 }), items: [item({ storeItemId: '01KE0S1W6W8ZV7T1C3A6ITEM09', pricePaise: 25000 })], badge: null, deliveryFeePaise: 0 },
+        { store: card({ storeId: STORE_B_ID, storeSlug: SHOP_B, name: 'Annapurna Kirana', distanceM: 1200 }), items: [item({ storeItemId: '01KE0S1W6W8ZV7T1C3A6ITEM09', pricePaise: 25000 })], badge: null, deliveryFeePaise: 0 },
       ],
       chips: [],
       refineHint: null,

@@ -98,10 +98,11 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
   const inCart = qtyOf(slug, item.storeItemId);
   const pct = offPercent(item.pricePaise, item.mrpPaise);
   const stock = stockProps(item, serverNow);
-  const canAdd = bookable && item.inStock;
+  const canAdd = bookable && item.inStock && shop.data !== undefined;
 
   const add = () => {
-    change({ slug, name: shopName }, item, packLine(item), inCart + qty);
+    if (!shop.data) return;
+    change({ id: shop.data.storeId, slug, name: shopName }, item, packLine(item), inCart + qty);
     toast.show({ message: intl.formatMessage({ id: 'product.added' }, { name: item.name }) });
   };
 

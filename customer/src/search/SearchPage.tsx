@@ -388,7 +388,7 @@ function ResultGroup({ result, serverNow }: { result: DiscoverSearchStore; serve
             serverNow={serverNow}
             bookable={store.bookable}
             qty={qtyOf(store.storeSlug, item.storeItemId)}
-            onChange={(qty) => change({ slug: store.storeSlug, name: store.name }, item, packLine(item), qty)}
+            onChange={(qty) => change({ id: store.storeId, slug: store.storeSlug, name: store.name }, item, packLine(item), qty)}
           />
         ))}
       </div>

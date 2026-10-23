@@ -9,6 +9,8 @@ import { json, renderAt, type Handler } from './render';
 export const NOW = '2026-10-23T10:00:00.000Z';
 export const AGO_12_MIN = '2026-10-23T09:48:00.000Z';
 
+export const STORE_A_ID = '01KE0S1W6W8ZV7T1C3A6MS0001';
+export const STORE_B_ID = '01KE0S1W6W8ZV7T1C3A6MS0002';
 export const SHOP_A = 'sri-lakshmi-stores';
 export const SHOP_B = 'annapurna-kirana';
 
@@ -17,6 +19,7 @@ const weekly = Object.fromEntries(DAYS.map((d) => [d, [{ open: '09:00', close: '
 
 export function card(over: Partial<DiscoverStoreCard> = {}): DiscoverStoreCard {
   return {
+    storeId: STORE_A_ID,
     storeSlug: SHOP_A,
     name: 'Sri Lakshmi Stores',
     locality: 'Indiranagar',
@@ -55,6 +58,7 @@ export function item(over: Partial<DiscoverSearchItem> = {}): DiscoverSearchItem
 export function page(over: Partial<DiscoverStorePage> = {}): DiscoverStorePage {
   const c = card();
   return {
+    storeId: c.storeId,
     storeSlug: c.storeSlug,
     name: c.name,
     locality: c.locality,

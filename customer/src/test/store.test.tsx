@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { addToCart, clearCart, getCart } from '../cart/cart';
-import { CATEGORIES, NOW, SHOP_A, SHOP_B, atBengaluru, item, page, pageOf, renderDiscover } from './discover-fixtures';
+import { CATEGORIES, NOW, SHOP_A, SHOP_B, STORE_A_ID, STORE_B_ID, atBengaluru, item, page, pageOf, renderDiscover } from './discover-fixtures';
 import { problem } from './render';
 
 beforeEach(() => clearCart());
@@ -34,10 +34,13 @@ describe('C-07 Shop page', () => {
     fireEvent.click(screen.getAllByRole('button', { name: /^Add/ }).at(0) as HTMLElement);
     expect(getCart().lines).toHaveLength(1);
     expect(getCart().store?.slug).toBe(SHOP_A);
+    // The cart keeps the store ULID (what checkout needs), not the slug.
+    expect(getCart().store?.id).toBe(STORE_A_ID);
+    expect(getCart().store?.id).not.toBe(SHOP_A);
   });
 
   it('asks before replacing a cart that holds another shop\'s items', async () => {
-    addToCart({ id: SHOP_B, slug: SHOP_B, name: 'Annapurna Kirana' }, { storeItemId: 'x1', productName: 'Rice', pricePaise: 5000 }, 1);
+    addToCart({ id: STORE_B_ID, slug: SHOP_B, name: 'Annapurna Kirana' }, { storeItemId: 'x1', productName: 'Rice', pricePaise: 5000 }, 1);
     renderDiscover(`/s/${SHOP_A}`, routes());
     atBengaluru();
     await screen.findByText('Aashirvaad Atta');

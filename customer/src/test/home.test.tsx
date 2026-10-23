@@ -1,11 +1,11 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { CATEGORIES, NOW, SHOP_B, atBengaluru, card, pageOf, renderDiscover } from './discover-fixtures';
+import { CATEGORIES, NOW, SHOP_B, STORE_B_ID, atBengaluru, card, pageOf, renderDiscover } from './discover-fixtures';
 
 
 const SUMMARY = { storesNearby: 14, openNow: 9, productsInRadius: 1280, pins: [], pinsTruncated: false, serverNow: NOW };
 
-function routes(stores = [card(), card({ storeSlug: SHOP_B, name: 'Annapurna Kirana', open: false, bookable: false, delivery: false, distanceM: 1200 })]) {
+function routes(stores = [card(), card({ storeId: STORE_B_ID, storeSlug: SHOP_B, name: 'Annapurna Kirana', open: false, bookable: false, delivery: false, distanceM: 1200 })]) {
   return {
     '/v1/discover/summary': () => SUMMARY,
     '/v1/discover/categories': () => CATEGORIES,

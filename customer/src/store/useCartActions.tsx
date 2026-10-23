@@ -8,6 +8,8 @@ import { useIntl } from 'react-intl';
 import { addToCart, replaceCart, setQty, useCart, type CartLine, type CartStore } from '../cart/cart';
 
 export interface ShopRef {
+  /** The store ULID: what checkout (CheckoutQuoteRequest.storeId) needs. */
+  id: string;
   slug: string;
   name: string;
 }
@@ -20,9 +22,7 @@ interface Pending {
 }
 
 function toStore(shop: ShopRef): CartStore {
-  // The discover API has no store id for customers: the slug identifies the shop in the cart.
-  // TODO(lead): checkout needs the store id (W2-02 orders); the slug is what the customer API exposes today.
-  return { id: shop.slug, slug: shop.slug, name: shop.name };
+  return { id: shop.id, slug: shop.slug, name: shop.name };
 }
 
 export function lineOf(item: DiscoverSearchItem, pack: string): Omit<CartLine, 'qty'> {
@@ -46,7 +46,7 @@ export function useCartActions(): {
   const [pending, setPending] = useState<Pending | null>(null);
 
   const qtyOf = (shopSlug: string, storeItemId: string): number =>
-    cart.store?.id === shopSlug ? (cart.lines.find((l) => l.storeItemId === storeItemId)?.qty ?? 0) : 0;
+    cart.store?.slug === shopSlug ? (cart.lines.find((l) => l.storeItemId === storeItemId)?.qty ?? 0) : 0;
 
   const change = (shop: ShopRef, item: DiscoverSearchItem, pack: string, qty: number): void => {
     if (qtyOf(shop.slug, item.storeItemId) > 0) {
