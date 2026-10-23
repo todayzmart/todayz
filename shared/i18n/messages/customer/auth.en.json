@@ -1,0 +1,326 @@
+{
+  "app.offline.title": {
+    "defaultMessage": "You're offline.",
+    "description": "Bold lead-in of the banner shown while the phone has no network"
+  },
+  "app.offline.body": {
+    "defaultMessage": "Saved pages still open. We'll catch up when you're back online.",
+    "description": "Rest of the offline banner"
+  },
+  "app.update.message": {
+    "defaultMessage": "A new version of TodayZ is ready.",
+    "description": "Toast shown when a new version of the app is waiting. The page never reloads until the person taps Update."
+  },
+  "app.update.action": {
+    "defaultMessage": "Update",
+    "description": "Button in the update toast; reloads the app"
+  },
+  "app.error.title": {
+    "defaultMessage": "Something went wrong",
+    "description": "Heading of the screen shown when the app crashes"
+  },
+  "app.error.body": {
+    "defaultMessage": "Try again. If it keeps happening, reload the page.",
+    "description": "Body of the crash screen"
+  },
+  "app.error.retry": {
+    "defaultMessage": "Try again",
+    "description": "Button on the crash screen"
+  },
+  "auth.signIn.title": {
+    "defaultMessage": "Sign in",
+    "description": "C-10 page title"
+  },
+  "auth.signIn.sub": {
+    "defaultMessage": "Use your mobile number. We'll send a code by SMS.",
+    "description": "C-10 line under the title"
+  },
+  "auth.phone.label": {
+    "defaultMessage": "Mobile number",
+    "description": "Label of the phone field. The +91 prefix is shown beside it."
+  },
+  "auth.phone.help": {
+    "defaultMessage": "We use it to sign you in and for order updates.",
+    "description": "Help text under the phone field"
+  },
+  "auth.phone.invalid": {
+    "defaultMessage": "Enter a 10-digit mobile number that starts with 6, 7, 8 or 9.",
+    "description": "Error under the phone field"
+  },
+  "auth.code.send": {
+    "defaultMessage": "Send code",
+    "description": "Button that sends the SMS code"
+  },
+  "auth.code.sending": {
+    "defaultMessage": "Sending the code",
+    "description": "Spoken while the code is being sent"
+  },
+  "auth.code.label": {
+    "defaultMessage": "Enter the 6-digit code",
+    "description": "Name of the group of six code boxes"
+  },
+  "auth.code.digit": {
+    "defaultMessage": "Digit {position}",
+    "description": "Name of code box number {position}, 2 to 6"
+  },
+  "auth.code.sentTo": {
+    "defaultMessage": "We sent a code to {phone}.",
+    "description": "Line above the code boxes. {phone} is the number with some digits hidden."
+  },
+  "auth.code.verifying": {
+    "defaultMessage": "Checking the code",
+    "description": "Spoken while the code is being checked"
+  },
+  "auth.code.resend": {
+    "defaultMessage": "Resend code",
+    "description": "Button to ask for a new code"
+  },
+  "auth.code.resendIn": {
+    "defaultMessage": "Resend in {seconds} s",
+    "description": "Disabled button while the resend timer runs. {seconds} counts down."
+  },
+  "auth.code.change": {
+    "defaultMessage": "Change number",
+    "description": "Button that goes back to the phone field"
+  },
+  "auth.error.wrongCode": {
+    "defaultMessage": "That code is not right. Check it and try again.",
+    "description": "Wrong one-time code"
+  },
+  "auth.error.expired": {
+    "defaultMessage": "That code has expired. Ask for a new one.",
+    "description": "Expired one-time code"
+  },
+  "auth.error.locked": {
+    "defaultMessage": "Too many wrong codes. Ask for a new code.",
+    "description": "Too many wrong attempts on one code"
+  },
+  "auth.error.rateLimited": {
+    "defaultMessage": "Too many tries. Wait a moment and try again.",
+    "description": "Rate limit on sending codes"
+  },
+  "auth.error.blocked": {
+    "defaultMessage": "This account can't sign in right now. Contact support.",
+    "description": "Blocked account"
+  },
+  "auth.error.network": {
+    "defaultMessage": "We can't reach TodayZ. Check your connection and try again.",
+    "description": "No network or the server did not answer"
+  },
+  "auth.error.generic": {
+    "defaultMessage": "Something went wrong. Please try again.",
+    "description": "Any other sign-in failure"
+  },
+  "auth.error.captcha": {
+    "defaultMessage": "We couldn't check that you are a person. Reload the page and try again.",
+    "description": "The Turnstile check failed to load or run"
+  },
+  "auth.welcome.title": {
+    "defaultMessage": "Welcome to TodayZ",
+    "description": "Shown once after a new account is created"
+  },
+  "auth.welcome.sub": {
+    "defaultMessage": "Tell shops what to call you. You can skip this.",
+    "description": "Line under the welcome title"
+  },
+  "auth.welcome.name": {
+    "defaultMessage": "Your name (optional)",
+    "description": "Label of the optional name field"
+  },
+  "auth.welcome.continue": {
+    "defaultMessage": "Continue",
+    "description": "Saves the name and goes on"
+  },
+  "auth.welcome.skip": {
+    "defaultMessage": "Skip for now",
+    "description": "Goes on without a name"
+  },
+  "auth.welcome.error": {
+    "defaultMessage": "We couldn't save your name. You can add it later in Account.",
+    "description": "Saving the optional name failed"
+  },
+  "lang.title": {
+    "defaultMessage": "Choose your language",
+    "description": "C-01 page title"
+  },
+  "lang.sub": {
+    "defaultMessage": "You can change it any time in Account.",
+    "description": "C-01 line under the title"
+  },
+  "lang.group": {
+    "defaultMessage": "Language",
+    "description": "Accessible name of the language cards"
+  },
+  "lang.name.en": {
+    "defaultMessage": "English",
+    "description": "English written in the current language"
+  },
+  "lang.name.hi": {
+    "defaultMessage": "Hindi",
+    "description": "Hindi written in the current language"
+  },
+  "lang.name.kn": {
+    "defaultMessage": "Kannada",
+    "description": "Kannada written in the current language"
+  },
+  "lang.name.te": {
+    "defaultMessage": "Telugu",
+    "description": "Telugu written in the current language"
+  },
+  "lang.name.ta": {
+    "defaultMessage": "Tamil",
+    "description": "Tamil written in the current language"
+  },
+  "lang.continue": {
+    "defaultMessage": "Continue",
+    "description": "Saves the language and goes to Home"
+  },
+  "lang.skip": {
+    "defaultMessage": "Skip",
+    "description": "Leaves the language screen without choosing"
+  },
+  "location.title": {
+    "defaultMessage": "Where should we look?",
+    "description": "C-02 page title"
+  },
+  "location.sub": {
+    "defaultMessage": "We show shops and stock near this place.",
+    "description": "C-02 line under the title"
+  },
+  "location.gps.title": {
+    "defaultMessage": "Use my current location",
+    "description": "C-02 option heading"
+  },
+  "location.gps.explain": {
+    "defaultMessage": "Your browser will ask to share your location. We use it only to find shops near you.",
+    "description": "Explains the permission prompt before it appears"
+  },
+  "location.gps.button": {
+    "defaultMessage": "Share my location",
+    "description": "Button that triggers the permission prompt"
+  },
+  "location.gps.locating": {
+    "defaultMessage": "Finding your location",
+    "description": "Spoken while the location is being found"
+  },
+  "location.gps.denied": {
+    "defaultMessage": "Location is turned off for TodayZ. Enter your PIN code instead.",
+    "description": "The person refused the location permission"
+  },
+  "location.gps.unavailable": {
+    "defaultMessage": "We couldn't find your location. Enter your PIN code instead.",
+    "description": "Location unavailable or timed out"
+  },
+  "location.gps.label": {
+    "defaultMessage": "Current location",
+    "description": "Name of a saved location that came from the device"
+  },
+  "location.pin.title": {
+    "defaultMessage": "Enter a PIN code",
+    "description": "C-02 option heading"
+  },
+  "location.pin.label": {
+    "defaultMessage": "PIN code",
+    "description": "Label of the PIN field"
+  },
+  "location.pin.help": {
+    "defaultMessage": "6 digits",
+    "description": "Help text under the PIN field"
+  },
+  "location.pin.invalid": {
+    "defaultMessage": "Enter a 6-digit PIN code.",
+    "description": "Error under the PIN field"
+  },
+  "location.pin.save": {
+    "defaultMessage": "Use this PIN code",
+    "description": "Saves the PIN code as the location"
+  },
+  "location.pin.saved": {
+    "defaultMessage": "PIN {pin}",
+    "description": "Name of a saved location that came from a PIN code"
+  },
+  "location.search.title": {
+    "defaultMessage": "Search your locality",
+    "description": "C-02 option heading"
+  },
+  "location.search.soon": {
+    "defaultMessage": "Locality search is coming soon. Use your PIN code for now.",
+    "description": "Placeholder until locality search exists"
+  },
+  "location.current": {
+    "defaultMessage": "Shopping near {place}",
+    "description": "Chip at the top of Home. {place} is the saved location."
+  },
+  "location.set": {
+    "defaultMessage": "Set your location",
+    "description": "Chip at the top of Home when no location is saved"
+  },
+  "account.title": {
+    "defaultMessage": "Account",
+    "description": "Account page title"
+  },
+  "account.signedOut.title": {
+    "defaultMessage": "Sign in to TodayZ",
+    "description": "Signed-out Account heading"
+  },
+  "account.signedOut.body": {
+    "defaultMessage": "Sign in to book items, follow your orders and keep your wallet.",
+    "description": "Signed-out Account text"
+  },
+  "account.signIn": {
+    "defaultMessage": "Sign in",
+    "description": "Button to C-10"
+  },
+  "account.loading": {
+    "defaultMessage": "Loading your account",
+    "description": "Spoken while the profile loads"
+  },
+  "account.loadError": {
+    "defaultMessage": "We couldn't load your account. Check your connection and try again.",
+    "description": "Profile failed to load"
+  },
+  "account.retry": {
+    "defaultMessage": "Try again",
+    "description": "Button that loads the profile again"
+  },
+  "account.name.label": {
+    "defaultMessage": "Name",
+    "description": "Label of the name field"
+  },
+  "account.name.save": {
+    "defaultMessage": "Save",
+    "description": "Saves the name"
+  },
+  "account.name.saved": {
+    "defaultMessage": "Saved",
+    "description": "Toast after the name is saved"
+  },
+  "account.name.conflict": {
+    "defaultMessage": "Your details changed on another device. We reloaded them. Try again.",
+    "description": "Saving the name hit a version conflict"
+  },
+  "account.name.error": {
+    "defaultMessage": "We couldn't save that. Try again.",
+    "description": "Saving the name failed"
+  },
+  "account.phone": {
+    "defaultMessage": "Mobile number",
+    "description": "Row label for the signed-in number (masked)"
+  },
+  "account.language": {
+    "defaultMessage": "Language",
+    "description": "Row label for the language"
+  },
+  "account.location": {
+    "defaultMessage": "Location",
+    "description": "Row label for the saved location"
+  },
+  "account.change": {
+    "defaultMessage": "Change",
+    "description": "Link to change the language or location"
+  },
+  "account.signOut": {
+    "defaultMessage": "Sign out",
+    "description": "Button that ends the session on this device"
+  }
+}

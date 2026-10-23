@@ -8,7 +8,6 @@ export {
   TURNSTILE_TEST_SITE_KEY,
   getTurnstileToken,
   isTestSiteKey,
-  requireSiteKey,
 } from './turnstile';
 export { OfflineBanner, useOnline, type OfflineBannerProps } from './online';
 export { ErrorBoundary, type ErrorBoundaryProps } from './error-boundary';

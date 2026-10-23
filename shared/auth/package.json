@@ -6,7 +6,12 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./build": {
+      "types": "./build.d.mts",
+      "default": "./build.mjs"
+    },
+    "./scripts/precache-check.mjs": "./scripts/precache-check.mjs"
   },
   "scripts": {
     "lint": "eslint --max-warnings 0 .",

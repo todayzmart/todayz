@@ -4,7 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { ErrorBoundary } from './error-boundary';
 import { OfflineBanner } from './online';
-import { TURNSTILE_DUMMY_TOKEN, getTurnstileToken, requireSiteKey } from './turnstile';
+import { authDefines } from '../build.mjs';
+import { TURNSTILE_DUMMY_TOKEN, getTurnstileToken } from './turnstile';
 import { UpdateToastHost, createUpdateController, useHoldUpdates } from './update';
 
 describe('update toast', () => {
@@ -110,10 +111,26 @@ describe('turnstile', () => {
     expect(document.querySelector('script[src*="challenges.cloudflare.com"]')).toBeNull();
   });
 
-  it('fails a production build without a real site key', () => {
-    expect(() => requireSiteKey('production', undefined)).toThrow(/VITE_TURNSTILE_SITE_KEY/);
-    expect(() => requireSiteKey('production', '1x00000000000000000000AA')).toThrow();
-    expect(requireSiteKey('production', '0x4AAAAAAAreal')).toBe('0x4AAAAAAAreal');
-    expect(requireSiteKey('development', undefined)).toBe('1x00000000000000000000AA');
+  it('fails a production build without a real site key or an https API URL', () => {
+    const api = 'https://api.todayz.in';
+    expect(() => authDefines('production', { VITE_API_URL: api })).toThrow(/VITE_TURNSTILE_SITE_KEY/);
+    expect(() => authDefines('production', { VITE_API_URL: api, VITE_TURNSTILE_SITE_KEY: '1x00000000000000000000AA' })).toThrow(
+      /VITE_TURNSTILE_SITE_KEY/,
+    );
+    expect(() => authDefines('production', { VITE_TURNSTILE_SITE_KEY: '0x4AAAAAAAreal' })).toThrow(/VITE_API_URL/);
+    expect(() => authDefines('production', { VITE_TURNSTILE_SITE_KEY: '0x4AAAAAAAreal', VITE_API_URL: 'http://api.x' })).toThrow(
+      /VITE_API_URL/,
+    );
+    const ok = authDefines('production', { VITE_TURNSTILE_SITE_KEY: '0x4AAAAAAAreal', VITE_API_URL: `${api}/` });
+    expect(ok['import.meta.env.VITE_TURNSTILE_SITE_KEY']).toBe('"0x4AAAAAAAreal"');
+    expect(ok['import.meta.env.VITE_API_URL']).toBe(`"${api}"`);
+  });
+
+  it('falls back to the local API and the test key outside production', () => {
+    for (const mode of ['development', 'test', 'e2e']) {
+      const d = authDefines(mode, {});
+      expect(d['import.meta.env.VITE_TURNSTILE_SITE_KEY']).toBe('"1x00000000000000000000AA"');
+      expect(d['import.meta.env.VITE_API_URL']).toBe('"https://api.todayz.localhost"');
+    }
   });
 });

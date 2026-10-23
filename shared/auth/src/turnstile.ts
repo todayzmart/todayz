@@ -1,7 +1,7 @@
 // Cloudflare Turnstile for OTP send (AU-04). Local development uses Cloudflare's published
 // always-pass test site key, for which no script is loaded and the dummy token is sent (the
-// mock siteverify accepts it). A production build must carry a real site key: apps call
-// `requireSiteKey` from vite.config so the build fails without one.
+// mock siteverify accepts it). A production build must carry a real site key: build.mjs refuses
+// to build without one.
 
 /** Cloudflare's public always-pass test site key. */
 export const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
@@ -11,18 +11,6 @@ const TEST_KEY = /^[123]x0{20,}[A-Za-z]{2}$/;
 
 export function isTestSiteKey(key: string): boolean {
   return TEST_KEY.test(key);
-}
-
-/** For vite.config: the key to bake in, or a thrown error for a production build without a real one. */
-export function requireSiteKey(mode: string, key: string | undefined): string {
-  const value = key?.trim() ?? '';
-  if (mode === 'production') {
-    if (value === '' || isTestSiteKey(value)) {
-      throw new Error('VITE_TURNSTILE_SITE_KEY must be a real Turnstile site key for a production build');
-    }
-    return value;
-  }
-  return value === '' ? TURNSTILE_TEST_SITE_KEY : value;
 }
 
 interface TurnstileApi {
