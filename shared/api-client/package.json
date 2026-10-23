@@ -7,7 +7,7 @@
   "sideEffects": false,
   "exports": {
     ".": "./src/index.ts",
-    "./gen/*": "./src/gen/*",
+    "./gen/*": "./src/gen/*.ts",
     "./mocks": "./src/mocks/index.ts"
   },
   "scripts": {

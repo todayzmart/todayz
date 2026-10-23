@@ -1,0 +1,39 @@
+{
+  "name": "@todayz/auth",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Sign-in session for the three apps: in-memory access token, one refresh at a time across tabs, 401 retry, ETag cache, update controller, offline banner, error boundary, phone + OTP flow (W1-08).",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint --max-warnings 0 .",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@todayz/api-client": "workspace:*",
+    "@todayz/ui": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "19.3.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "16.3.3",
+    "@testing-library/user-event": "14.6.7",
+    "@todayz/config": "workspace:*",
+    "@types/node": "26.6.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "9.39.5",
+    "happy-dom": "20.14.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "typescript": "6.0.3",
+    "vitest": "4.1.11"
+  },
+  "prettier": "@todayz/config/prettier"
+}

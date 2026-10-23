@@ -1,0 +1,7 @@
+{
+  "extends": "@todayz/config/tsconfig.react.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["src", "vitest.config.ts"]
+}
