@@ -29,7 +29,8 @@ Read first: the root `CLAUDE.md`, `docs/plan/README.md`, `docs/plan/01-product-r
 Environment (names only; values live in `.env.local`): `APP_ENV` (local|test|staging|prod),
 `DATABASE_URL` (todayz_app), `DATABASE_MIGRATE_URL` (todayz_owner), `API_ADDR` (default
 127.0.0.1:8180 locally, :8080 deployed), `WORKER_ADDR` (127.0.0.1:8181 / :8081), `API_PUBLIC_URL`,
-`LOG_LEVEL`, `TODAYZ_NO_EGRESS`, `PII_ENC_KEY` (32 bytes, required: it seals stored idempotent
+`LOG_LEVEL`, `TODAYZ_NO_EGRESS`, `SHUTDOWN_PRESTOP` and `SHUTDOWN_DRAIN` (optional Go durations,
+see Shutdown below), `PII_ENC_KEY` (32 bytes, required: it seals stored idempotent
 response bodies; `make setup` generates it), plus the provider keys in `internal/platform/config`.
 Secret values are `config.Secret` (prints as `[redacted]`). Config logs the names of unset
 variables, never a value.
@@ -128,9 +129,17 @@ on each other's internals; a cross-domain call goes through a small interface in
 - `cmd/todayz/routes.go` belongs to the lead and calls `mountX(r, &d)` once per domain; your WP
   fills `mountX` in `cmd/todayz/routes_<domain>.go` (call your domain's `Register(r, deps)`) and
   edits no other routes file (`TestOneMountPerDomain`).
-- Workers: start River with `queue.Start` (detached from the signal context) and stop it with
-  `queue.Drain` (30 s for running jobs to finish, then cancel). The deploy's stop timeout must be
-  over 60 s.
+- Shutdown (02 §2.8, D-98; `internal/platform/lifecycle`): on SIGTERM `/readyz` turns 503
+  `{"status":"draining"}` at once (`/healthz` stays 200). The API keeps serving for
+  `SHUTDOWN_PRESTOP` (15 s deployed, 1 s locally), then `srv.Shutdown` waits up to
+  `SHUTDOWN_DRAIN` (75 s, above the 60 s `WriteTimeout`; the API refuses to start otherwise), then
+  the LISTEN/NOTIFY loop stops, the pool closes and telemetry flushes (5 s). Request contexts never
+  derive from the signal (`BaseContext` is a background context), so never pass the signal context
+  into a handler. Container stop timeouts: api 120 s, worker 180 s.
+- Workers: start River with `queue.Start` (detached from the signal context); the worker stops it
+  with `queue.Drain(c, queue.DrainGrace, queue.HardGrace, log)`: running jobs get 90 s to finish,
+  then `StopAndCancel` gets 30 s, logged at error level and counted in
+  `tz_job_hard_cancelled_total{kind}`; the attempt is retried, so every job must be idempotent.
 - Middleware: one file per slot in `internal/platform/httpx/mw/` (order in `doc.go`); edit only
   your WP's slot.
 
