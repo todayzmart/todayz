@@ -2,55 +2,105 @@
 // Lucide icon as inline SVG (stroke 1.75 like the apps). Only the icons the site uses are imported.
 import {
   ArrowRight,
+  Banknote,
+  Bell,
+  Bike,
+  Box,
   CalendarCheck,
+  ChartColumn,
   Check,
   ChevronDown,
+  ClipboardList,
+  CreditCard,
+  Gift,
   Globe,
-  Menu,
+  Hammer,
+  Hourglass,
+  LayoutDashboard,
   MapPin,
+  Menu,
   Package,
   PackageSearch,
-  Receipt,
+  Pencil,
+  Pill,
+  Plug,
+  Plus,
+  ReceiptIndianRupee,
+  ScanBarcode,
   Search,
+  SearchX,
   ShoppingBag,
+  ShoppingBasket,
   Smartphone,
+  Sparkles,
   Store,
+  Tag,
   Ticket,
   TrendingUp,
+  TriangleAlert,
   Truck,
+  Users,
+  WifiOff,
 } from 'lucide';
 
 const icons = {
+  alert: TriangleAlert,
   arrow: ArrowRight,
+  bag: ShoppingBag,
+  basket: ShoppingBasket,
+  bell: Bell,
+  bike: Bike,
   booking: CalendarCheck,
+  box: Box,
+  card: CreditCard,
+  cash: Banknote,
+  chart: ChartColumn,
   check: Check,
   chevron: ChevronDown,
-  globe: Globe,
-  menu: Menu,
-  pin: MapPin,
-  package: Package,
-  demand: PackageSearch,
-  receipt: Receipt,
-  search: Search,
-  bag: ShoppingBag,
-  phone: Smartphone,
-  store: Store,
   credit: Ticket,
-  growth: TrendingUp,
+  dash: LayoutDashboard,
   delivery: Truck,
+  demand: PackageSearch,
+  gift: Gift,
+  globe: Globe,
+  growth: TrendingUp,
+  hammer: Hammer,
+  hourglass: Hourglass,
+  menu: Menu,
+  orders: ClipboardList,
+  package: Package,
+  pencil: Pencil,
+  phone: Smartphone,
+  pill: Pill,
+  pin: MapPin,
+  plug: Plug,
+  plus: Plus,
+  receipt: ReceiptIndianRupee,
+  scan: ScanBarcode,
+  search: Search,
+  'search-x': SearchX,
+  sparkles: Sparkles,
+  store: Store,
+  tag: Tag,
+  users: Users,
+  'wifi-off': WifiOff,
 } as const;
 
+export type IconName = keyof typeof icons;
+
 interface Props {
-  name: keyof typeof icons;
+  name: IconName;
   size?: number;
+  /** Extra class names; the base class tz-ico is always set. */
+  class?: string;
 }
 
-const { name, size = 20 } = Astro.props;
+const { name, size = 20, class: extra } = Astro.props;
 const nodes = icons[name] as unknown as [string, Record<string, string | number>][];
 ---
 
 <svg
-  class="tz-ico"
+  class:list={['tz-ico', extra]}
   xmlns="http://www.w3.org/2000/svg"
   width={size}
   height={size}
@@ -63,5 +113,10 @@ const nodes = icons[name] as unknown as [string, Record<string, string | number>
   aria-hidden="true"
   focusable="false"
 >
-  {nodes.map(([tag, attrs]) => (tag === 'path' ? <path {...attrs} /> : tag === 'circle' ? <circle {...attrs} /> : tag === 'rect' ? <rect {...attrs} /> : tag === 'line' ? <line {...attrs} /> : <polyline {...attrs} />))}
+  {
+    nodes.map(([tag, attrs]) => {
+      const Tag = tag;
+      return <Tag {...attrs} />;
+    })
+  }
 </svg>

@@ -1,0 +1,78 @@
+---
+// For shoppers: two example phones (search results, order ready) and the four steps.
+import Icon from '../Icon.astro';
+import type { MessageKey, Translate } from '../../i18n/index.ts';
+
+interface Props {
+  t: Translate;
+  /** Customer app URL. */
+  appUrl: string;
+}
+
+const { t, appUrl } = Astro.props;
+const steps = [1, 2, 3, 4].map((i) => ({
+  title: t(`home.shoppers.${i}` as MessageKey),
+  body: t(`home.shoppers.body.${i}` as MessageKey),
+}));
+---
+
+<section class="shoppers" id="shoppers">
+  <div class="wrap split reverse">
+    <div class="phones" aria-hidden="true">
+      <div class="phone phone-lg">
+        <div class="phone-notch"></div>
+        <div class="ph-top"><span class="ph-loc"><Icon name="pin" />Jayanagar 4th Block</span></div>
+        <p class="ph-h">Aashirvaad Atta 5 kg</p>
+        <p class="ph-meta">{t('home.shoppers.avail', { count: 4 })}</p>
+        <div class="avail on">
+          <b>Sri Lakshmi Provision</b><span>0.6 km</span><em>₹289</em><i class="tz-stock">{t('home.mock.fresh_min', { n: 8 })}</i>
+        </div>
+        <div class="avail">
+          <b>Sharma General Store</b><span>0.9 km</span><em>₹289</em><i class="tz-stock">{t('home.mock.fresh_h', { n: 1 })}</i>
+        </div>
+        <div class="avail">
+          <b>Green Basket</b><span>1.4 km</span><em>₹295</em><i class="tz-stock tz-stock-low">{t('home.mock.stale')}</i>
+        </div>
+        <div class="seg">
+          <span class="on"><Icon name="bag" />{t('home.mock.pickup')}</span>
+          <span><Icon name="bike" />{t('home.mock.delivery')}</span>
+        </div>
+        <div class="ph-cta">{t('home.shoppers.book')}</div>
+      </div>
+      <div class="phone phone-sm">
+        <div class="phone-notch"></div>
+        <p class="ph-meta center">{t('home.shoppers.ready', { number: 'TZ-024821' })}</p>
+        <div class="code-card">
+          <span>{t('home.shoppers.code')}</span>
+          <b>7 3 0 5</b>
+          <em>{t('home.shoppers.show', { shop: 'Sri Lakshmi Provision' })}</em>
+        </div>
+        <div class="tl">
+          <span class="done">{t('home.shoppers.tl.booked', { time: '18:02' })}</span>
+          <span class="done">{t('home.shoppers.tl.accepted', { time: '18:03' })}</span>
+          <span class="done">{t('home.shoppers.tl.ready', { time: '18:14' })}</span>
+          <span>{t('home.shoppers.tl.collected')}</span>
+        </div>
+      </div>
+    </div>
+    <div class="split-copy">
+      <p class="eyebrow">{t('home.shoppers.eyebrow')}</p>
+      <h2>{t('home.shoppers.title')}</h2>
+      <p class="sec-intro">{t('home.shoppers.intro')}</p>
+      <ol class="num-steps">
+        {
+          steps.map((s, i) => (
+            <li>
+              <span aria-hidden="true">{i + 1}</span>
+              <div>
+                <b>{s.title}</b>
+                {s.body}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <a class="btn-xl btn-dark" href={appUrl}>{t('home.shoppers.cta')}<Icon name="arrow" /></a>
+    </div>
+  </div>
+</section>

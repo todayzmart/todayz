@@ -1,17 +1,24 @@
 ---
 // FAQ as native <details>, no JavaScript. Items are plain {q, a} pairs; pages also pass them to JSON-LD.
+import Icon from './Icon.astro';
+
 interface Props {
   items: { q: string; a: string }[];
+  /** Open the first answer (the landing pages do). */
+  openFirst?: boolean;
 }
 
-const { items } = Astro.props;
+const { items, openFirst = false } = Astro.props;
 ---
 
 <div class="faq">
   {
-    items.map((item) => (
-      <details>
-        <summary>{item.q}</summary>
+    items.map((item, i) => (
+      <details open={openFirst && i === 0}>
+        <summary>
+          <span>{item.q}</span>
+          <Icon name="chevron" class="chev" />
+        </summary>
         <p>{item.a}</p>
       </details>
     ))
@@ -21,25 +28,30 @@ const { items } = Astro.props;
 <style>
   .faq {
     display: grid;
-    gap: var(--space-3);
+    gap: 12px;
     max-width: 760px;
   }
 
   details {
     border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
+    border-radius: 18px;
+    background: var(--surface-subtle);
+  }
+
+  details[open] {
     background: var(--surface);
+    box-shadow: var(--shadow-pop);
   }
 
   summary {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-3);
+    gap: 16px;
     min-height: var(--tap-min);
-    padding: var(--space-3) var(--space-4);
+    padding: 20px 24px;
     color: var(--ink);
-    font: 600 15px/22px var(--font-sans);
+    font: 600 18px/24px var(--font-sans);
     cursor: pointer;
     list-style: none;
   }
@@ -48,21 +60,39 @@ const { items } = Astro.props;
     display: none;
   }
 
-  summary::after {
-    content: '+';
+  summary :global(.chev) {
     flex: none;
+    width: 20px;
+    height: 20px;
     color: var(--ink-3);
-    font: 400 22px/1 var(--font-sans);
+    transition: transform 160ms ease;
   }
 
-  details[open] summary::after {
-    content: '\2212';
+  details[open] summary :global(.chev) {
+    transform: rotate(180deg);
   }
 
   p {
     margin: 0;
-    padding: 0 var(--space-4) var(--space-4);
+    padding: 0 24px 22px;
     color: var(--ink-2);
-    font: var(--type-body);
+    font: 400 16px/24px var(--font-sans);
+  }
+
+  @media (width <= 760px) {
+    summary {
+      padding: 18px;
+      font-size: 16px;
+    }
+
+    p {
+      padding: 0 18px 18px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    summary :global(.chev) {
+      transition: none;
+    }
   }
 </style>

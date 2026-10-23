@@ -1,0 +1,67 @@
+---
+// The problem: four numbered cards, each with a small example visual (hidden from assistive tech).
+import Icon from '../Icon.astro';
+import type { MessageKey, Translate } from '../../i18n/index.ts';
+
+interface Props {
+  t: Translate;
+}
+
+const { t } = Astro.props;
+const item = (i: number, part: 'title' | 'body') => t(`home.problem.${i}.${part}` as MessageKey);
+---
+
+<section class="sec" id="problem">
+  <div class="wrap">
+    <div class="sec-head split-head">
+      <div>
+        <p class="eyebrow">{t('home.problem.eyebrow')}</p>
+        <h2>{t('home.problem.title')}</h2>
+      </div>
+      <p class="sec-intro">{t('home.problem.intro')}</p>
+    </div>
+    <ol class="problems">
+      <li class="prob" data-tint="rose">
+        <span class="prob-n" aria-hidden="true">01</span>
+        <div class="prob-viz viz-ledger" aria-hidden="true">
+          <div class="lg-row"><span>Parle-G 250 g</span><s>24</s><s>19</s><b>?</b></div>
+          <div class="lg-row"><span>Tata Salt 1 kg</span><s>12</s><b>?</b></div>
+          <div class="lg-row"><span>Surf Excel 1 kg</span><b>?</b></div>
+        </div>
+        <h3>{item(1, 'title')}</h3>
+        <p>{item(1, 'body')}</p>
+      </li>
+      <li class="prob" data-tint="sky">
+        <span class="prob-n" aria-hidden="true">02</span>
+        <div class="prob-viz viz-search" aria-hidden="true">
+          <div class="vs-box"><Icon name="search" />Dettol handwash 200 ml</div>
+          <div class="vs-empty"><Icon name="search-x" />{t('home.problem.no_shops')}</div>
+        </div>
+        <h3>{item(2, 'title')}</h3>
+        <p>{item(2, 'body')}</p>
+      </li>
+      <li class="prob" data-tint="amber">
+        <span class="prob-n" aria-hidden="true">03</span>
+        <div class="prob-viz viz-shelf" aria-hidden="true">
+          <div class="sh-item">
+            <span class="sh-thumb">HO</span>
+            <div><b>Horlicks 500 g</b><span><Icon name="hourglass" />{t('home.problem.shelf_weeks', { n: 9 })}</span></div>
+          </div>
+          <div class="sh-bar"><i></i></div>
+        </div>
+        <h3>{item(3, 'title')}</h3>
+        <p>{item(3, 'body')}</p>
+      </li>
+      <li class="prob" data-tint="lilac">
+        <span class="prob-n" aria-hidden="true">04</span>
+        <div class="prob-viz viz-ask" aria-hidden="true">
+          <span class="bub b1">{t('home.problem.ask.1', { item: 'Pampers M' })}</span>
+          <span class="bub b2">{t('home.problem.ask.2')}</span>
+          <span class="bub b3">{t('home.problem.ask.3')}</span>
+        </div>
+        <h3>{item(4, 'title')}</h3>
+        <p>{item(4, 'body')}</p>
+      </li>
+    </ol>
+  </div>
+</section>

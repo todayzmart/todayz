@@ -1,0 +1,70 @@
+---
+// Shop owner quotes. Renders nothing until real, approved quotes exist: the list stays empty and
+// nobody invents one (product rules: no claims we cannot back).
+import type { Translate } from '../../i18n/index.ts';
+
+export interface Testimonial {
+  quote: string;
+  name: string;
+  shop: string;
+}
+
+interface Props {
+  t: Translate;
+  items?: readonly Testimonial[];
+}
+
+const { t, items = [] } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <section class="sec" id="testimonials">
+      <div class="wrap">
+        <div class="sec-head center">
+          <h2>{t('home.testimonials.title')}</h2>
+        </div>
+        <ul class="quotes">
+          {items.map((item) => (
+            <li>
+              <blockquote>{item.quote}</blockquote>
+              <p>
+                <b>{item.name}</b>, {item.shop}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .quotes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .quotes li {
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: var(--surface);
+  }
+
+  blockquote {
+    margin: 0 0 16px;
+    color: var(--ink);
+    font: var(--type-body-lg);
+  }
+
+  .quotes p {
+    margin: 0;
+    color: var(--ink-3);
+    font: var(--type-caption);
+  }
+</style>

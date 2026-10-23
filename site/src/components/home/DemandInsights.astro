@@ -1,0 +1,72 @@
+---
+// Demand insights: the four kinds of insight, and example cards. The cards are example screens; the
+// radius there is an example value (the real one is a platform setting).
+import Icon from '../Icon.astro';
+import type { IconName } from '../Icon.astro';
+import type { MessageKey, Translate } from '../../i18n/index.ts';
+import type { Tint } from './data.ts';
+
+interface Props {
+  t: Translate;
+}
+
+const { t } = Astro.props;
+const kinds: { tint: Tint; icon: IconName }[] = [
+  { tint: 'green', icon: 'search' },
+  { tint: 'amber', icon: 'alert' },
+  { tint: 'sky', icon: 'growth' },
+  { tint: 'lilac', icon: 'users' },
+];
+const kind = (i: number, part: 'title' | 'body') => t(`home.insights.kind.${i}.${part}` as MessageKey);
+const cards = [
+  { tag: kind(1, 'title'), item: 'Nivea Body Lotion 200 ml', line: t('home.mock.wanted_line', { count: 14, distance: '2 km' }), w: 100, amber: false, cta: t('home.insights.add') },
+  { tag: kind(2, 'title'), item: 'Pampers Pants M', line: t('home.insights.missed_line', { days: 2, count: 18 }), w: 72, amber: true, cta: t('home.insights.restock') },
+  { tag: kind(1, 'title'), item: 'Colgate Sensitive 120 g', line: t('home.mock.wanted_line', { count: 11, distance: '2 km' }), w: 64, amber: false, cta: t('home.insights.add') },
+];
+---
+
+<section class="sec" id="insights">
+  <div class="wrap split">
+    <div class="split-copy">
+      <p class="eyebrow">{t('home.insights.eyebrow')}</p>
+      <h2>{t('home.insights.title')}</h2>
+      <p class="sec-intro">{t('home.insights.intro')}</p>
+      <ul class="feat-list">
+        {
+          kinds.map((k, i) => (
+            <li>
+              <span data-tint={k.tint}>
+                <Icon name={k.icon} />
+              </span>
+              <div>
+                <b>{kind(i + 1, 'title')}</b>
+                {kind(i + 1, 'body')}
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class="insight-stack" aria-hidden="true">
+      {
+        cards.map((c) => (
+          <div class="ins-card">
+            <div class="ins-top">
+              <span class="tz-tag">{c.tag}</span>
+              <span class="ins-when">{t('home.insights.period')}</span>
+            </div>
+            <b>{c.item}</b>
+            <p>{c.line}</p>
+            <div class:list={['ins-meter', { amber: c.amber }]}>
+              <i style={`width:${c.w}%`} />
+            </div>
+            <span class="ins-cta">
+              {c.cta}
+              <Icon name="arrow" />
+            </span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

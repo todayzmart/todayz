@@ -109,5 +109,39 @@
   },
   "lead.consent": {
     "defaultMessage": "We use these details only to contact you about TodayZ."
+  },
+  "nav.start": {
+    "defaultMessage": "Get started"
+  },
+  "nav.login": {
+    "defaultMessage": "Log in"
+  },
+  "nav.english_only": {
+    "defaultMessage": "English",
+    "description": "Marks a link to a page that exists only in English."
+  },
+  "cta.eyebrow": {
+    "defaultMessage": "Get started"
+  },
+  "cta.title": {
+    "defaultMessage": "Bring your shop online today."
+  },
+  "cta.body": {
+    "defaultMessage": "Leave your details and the TodayZ team will get in touch about setting up your shop."
+  },
+  "cta.tick.1": {
+    "defaultMessage": "Free for shops"
+  },
+  "cta.tick.2": {
+    "defaultMessage": "Start with a few items"
+  },
+  "cta.tick.3": {
+    "defaultMessage": "The app in your language"
+  },
+  "lead.err_rejected": {
+    "defaultMessage": "We could not accept these details. Check them and try again."
+  },
+  "lead.nojs": {
+    "defaultMessage": "This form needs JavaScript. Turn it on in your browser and reload the page."
   }
 }

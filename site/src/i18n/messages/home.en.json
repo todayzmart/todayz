@@ -5,32 +5,112 @@
   "home.meta.description": {
     "defaultMessage": "TodayZ helps neighbourhood shops put their stock online, so people nearby can find it, book it, and pick it up or get it delivered."
   },
-  "home.hero.eyebrow": {
-    "defaultMessage": "Built for Indian shops"
+  "home.hero.kicker": {
+    "defaultMessage": "For neighbourhood shops across India"
   },
   "home.hero.title": {
-    "defaultMessage": "Your neighbourhood shop, ready for more customers."
+    "defaultMessage": "Your neighbourhood shop, ready for {em}",
+    "description": "The {em} placeholder is replaced by the _em key, shown in the brand colour."
+  },
+  "home.hero.title_em": {
+    "defaultMessage": "more customers."
   },
   "home.hero.body": {
-    "defaultMessage": "Put your stock online, run your counter, and let people nearby find what you already have. Free for now."
+    "defaultMessage": "Put your stock online, run your counter, and let people nearby find what you already have on your shelves."
+  },
+  "home.hero.cta": {
+    "defaultMessage": "Get started free"
   },
   "home.hero.cta_secondary": {
     "defaultMessage": "See how it works"
   },
-  "home.mock.label": {
-    "defaultMessage": "Example"
+  "home.hero.tick.1": {
+    "defaultMessage": "Free for shops"
   },
-  "home.mock.searching": {
-    "defaultMessage": "Searching for"
+  "home.hero.tick.2": {
+    "defaultMessage": "Works when the internet drops"
   },
-  "home.mock.in_stock": {
-    "defaultMessage": "In stock"
+  "home.hero.tick.3": {
+    "defaultMessage": "In 5 Indian languages"
   },
-  "home.mock.away": {
-    "defaultMessage": "{distance} away"
+  "home.hero.tick.4": {
+    "defaultMessage": "Pickup or delivery"
+  },
+  "home.hero.scene": {
+    "defaultMessage": "Example: a shopper nearby finds milk at Sharma General Store, the shop gets the order and sees what else people nearby search for.",
+    "description": "Accessible name of the hero illustration."
+  },
+  "home.hero.note": {
+    "defaultMessage": "Shops, items and numbers on this page are examples."
+  },
+  "home.mock.shops_have": {
+    "defaultMessage": "{count} shops near you have it",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.mock.dist_pickup": {
+    "defaultMessage": "{distance} · Pickup",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.mock.dist_delivery": {
+    "defaultMessage": "{distance} · Delivery",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.mock.fresh_min": {
+    "defaultMessage": "In stock · updated {n} min ago",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.mock.fresh_h": {
+    "defaultMessage": "In stock · updated {n} h ago",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.mock.stale": {
+    "defaultMessage": "Stock not confirmed recently",
+    "description": "Shown when a shop has not confirmed an item for 72 h (product rules)."
+  },
+  "home.mock.book_pickup": {
+    "defaultMessage": "Book for pickup · {amount}",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.mock.new_order": {
+    "defaultMessage": "New order {number}",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.mock.pickup": {
+    "defaultMessage": "Pickup",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.mock.delivery": {
+    "defaultMessage": "Delivery",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.mock.accept": {
+    "defaultMessage": "Accept",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.mock.reject": {
+    "defaultMessage": "Reject",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.mock.add": {
+    "defaultMessage": "Add",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.mock.todays_sales": {
+    "defaultMessage": "Today's sales",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.mock.wanted_line": {
+    "defaultMessage": "{count} searches within {distance} this week",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.problem.eyebrow": {
+    "defaultMessage": "The problem"
   },
   "home.problem.title": {
     "defaultMessage": "Great shops. Big challenges."
+  },
+  "home.problem.intro": {
+    "defaultMessage": "Indian neighbourhood shops already stock what people need. But running the counter, the stock and the customers by hand leaves money on the shelf."
   },
   "home.problem.1.title": {
     "defaultMessage": "Stock is hard to keep track of"
@@ -56,14 +136,80 @@
   "home.problem.4.body": {
     "defaultMessage": "Shops rarely know what people around them are searching for."
   },
+  "home.problem.no_shops": {
+    "defaultMessage": "No shops found nearby",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.problem.shelf_weeks": {
+    "defaultMessage": "On the shelf for {n} weeks",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.problem.ask.1": {
+    "defaultMessage": "Do you have {item}?",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.problem.ask.2": {
+    "defaultMessage": "Any sensitive toothpaste?",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.problem.ask.3": {
+    "defaultMessage": "Kasuri methi?",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.insight.eyebrow": {
+    "defaultMessage": "The idea"
+  },
   "home.insight.title": {
-    "defaultMessage": "The shops are there. The stock is there. The search is not."
+    "defaultMessage": "The shops are there. The stock is there. {em}",
+    "description": "The {em} placeholder is replaced by the _em key, shown in the brand colour."
+  },
+  "home.insight.title_em": {
+    "defaultMessage": "The search is not."
   },
   "home.insight.body": {
-    "defaultMessage": "Indian neighbourhood shops already hold what people need. A lot of that stock cannot be found online. TodayZ connects the two."
+    "defaultMessage": "A lot of what people need is already on a shelf a few minutes away. It just cannot be found online. TodayZ connects the two."
+  },
+  "home.insight.flow.1.title": {
+    "defaultMessage": "People nearby"
+  },
+  "home.insight.flow.1.body": {
+    "defaultMessage": "search for what they need"
+  },
+  "home.insight.flow.2.title": {
+    "defaultMessage": "Finds it close by"
+  },
+  "home.insight.flow.2.body": {
+    "defaultMessage": "stock, price, distance, freshness"
+  },
+  "home.insight.flow.3.title": {
+    "defaultMessage": "Local shop shelves"
+  },
+  "home.insight.flow.3.body": {
+    "defaultMessage": "get the order and see the demand"
+  },
+  "home.insight.loop.1": {
+    "defaultMessage": "Search"
+  },
+  "home.insight.loop.2": {
+    "defaultMessage": "Find"
+  },
+  "home.insight.loop.3": {
+    "defaultMessage": "Book"
+  },
+  "home.insight.loop.4": {
+    "defaultMessage": "Pick up or deliver"
+  },
+  "home.insight.loop.5": {
+    "defaultMessage": "Learn what sells"
+  },
+  "home.features.eyebrow": {
+    "defaultMessage": "For shops"
   },
   "home.features.title": {
     "defaultMessage": "A simple way to grow your shop"
+  },
+  "home.features.intro": {
+    "defaultMessage": "One app for the counter, the stock and the customers. Built for everyday shop work, in your language."
   },
   "home.features.1.title": {
     "defaultMessage": "Run your counter"
@@ -78,10 +224,10 @@
     "defaultMessage": "Shoppers find your stock, book it, and pick it up or ask for delivery."
   },
   "home.features.3.title": {
-    "defaultMessage": "See what people look for"
+    "defaultMessage": "Stock that stays honest"
   },
   "home.features.3.body": {
-    "defaultMessage": "Demand insights show searches near you for items you do not stock yet."
+    "defaultMessage": "Every sale updates your stock, and shoppers see how fresh it is before they come."
   },
   "home.features.4.title": {
     "defaultMessage": "Bring customers back"
@@ -89,8 +235,264 @@
   "home.features.4.body": {
     "defaultMessage": "Offers and credits give people a reason to come to your shop again."
   },
+  "home.pos.search": {
+    "defaultMessage": "Search or scan",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.pos.bill": {
+    "defaultMessage": "Bill",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.pos.offline": {
+    "defaultMessage": "Offline · will sync",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.pos.cash": {
+    "defaultMessage": "Cash",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.pos.upi": {
+    "defaultMessage": "UPI",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.pos.card": {
+    "defaultMessage": "Card",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.pos.total": {
+    "defaultMessage": "Total",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.pos.charge": {
+    "defaultMessage": "Charge",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.orders.new": {
+    "defaultMessage": "New",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.orders.preparing": {
+    "defaultMessage": "Preparing",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.orders.ready": {
+    "defaultMessage": "Ready",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.orders.accept_within": {
+    "defaultMessage": "Accept within {time}",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.orders.waiting": {
+    "defaultMessage": "Waiting for pickup",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.stock.updated_min": {
+    "defaultMessage": "Updated {n} min ago",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.stock.updated_h": {
+    "defaultMessage": "Updated {n} h ago",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.stock.low": {
+    "defaultMessage": "Running low · updated {n} h ago",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.offers.week": {
+    "defaultMessage": "This week",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.offers.off": {
+    "defaultMessage": "{off} off {item}",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.offers.regular": {
+    "defaultMessage": "Regular · {n} visits this month",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.offers.credits": {
+    "defaultMessage": "+{n} credits",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.showcase.eyebrow": {
+    "defaultMessage": "The business app"
+  },
+  "home.showcase.title": {
+    "defaultMessage": "Your whole shop, at a glance"
+  },
+  "home.showcase.intro": {
+    "defaultMessage": "Open the app in the morning and see what needs you: orders to accept, items running low, and what people nearby are asking for."
+  },
+  "home.app.nav.1": {
+    "defaultMessage": "Overview",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.nav.2": {
+    "defaultMessage": "Orders",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.nav.3": {
+    "defaultMessage": "Sell",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.nav.4": {
+    "defaultMessage": "Stock",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.nav.5": {
+    "defaultMessage": "Offers",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.nav.6": {
+    "defaultMessage": "Customers",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.nav.7": {
+    "defaultMessage": "Insights",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.date": {
+    "defaultMessage": "Thursday, 23 October",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.greet": {
+    "defaultMessage": "Good morning, {shop}",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.synced": {
+    "defaultMessage": "Synced {time}",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.sales_delta": {
+    "defaultMessage": "{pct} vs last Thursday",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.orders": {
+    "defaultMessage": "Orders",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.waiting": {
+    "defaultMessage": "{n} waiting",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.low": {
+    "defaultMessage": "Items low",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.low_note": {
+    "defaultMessage": "Restock soon",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.searches": {
+    "defaultMessage": "Searches nearby",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.searches_note": {
+    "defaultMessage": "For items you don't list",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.act.orders": {
+    "defaultMessage": "{n} new orders",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.act.orders_cta": {
+    "defaultMessage": "Accept orders",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.act.low": {
+    "defaultMessage": "{n} products low",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.act.low_cta": {
+    "defaultMessage": "Restock now",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.act.expiring": {
+    "defaultMessage": "{n} expiring soon",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.act.expiring_cta": {
+    "defaultMessage": "Create offer",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.act.searches": {
+    "defaultMessage": "{n} searches",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.act.searches_cta": {
+    "defaultMessage": "View demand",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.chart": {
+    "defaultMessage": "Sales by hour",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.today": {
+    "defaultMessage": "Today",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.app.top": {
+    "defaultMessage": "Top items",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.insights.eyebrow": {
+    "defaultMessage": "Demand insights"
+  },
+  "home.insights.title": {
+    "defaultMessage": "See what people nearby are looking for"
+  },
+  "home.insights.intro": {
+    "defaultMessage": "Demand insights tell a shop which items people nearby search for and cannot find, what is about to run out, and which regulars have not been back."
+  },
+  "home.insights.kind.1.title": {
+    "defaultMessage": "Wanted nearby"
+  },
+  "home.insights.kind.1.body": {
+    "defaultMessage": "Items people near your shop search for that you do not list yet."
+  },
+  "home.insights.kind.2.title": {
+    "defaultMessage": "Missed sales"
+  },
+  "home.insights.kind.2.body": {
+    "defaultMessage": "Items that ran out while people nearby were searching for them."
+  },
+  "home.insights.kind.3.title": {
+    "defaultMessage": "Selling fast"
+  },
+  "home.insights.kind.3.body": {
+    "defaultMessage": "Items selling faster than usual, so you can restock in time."
+  },
+  "home.insights.kind.4.title": {
+    "defaultMessage": "Regulars slipping away"
+  },
+  "home.insights.kind.4.body": {
+    "defaultMessage": "Regular customers who have not been back in a while."
+  },
+  "home.insights.period": {
+    "defaultMessage": "Last 7 days",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.insights.missed_line": {
+    "defaultMessage": "Out of stock {days} days; {count} searches nearby matched it.",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.insights.add": {
+    "defaultMessage": "Add product",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.insights.restock": {
+    "defaultMessage": "Restock",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.shoppers.eyebrow": {
+    "defaultMessage": "For shoppers"
+  },
   "home.shoppers.title": {
     "defaultMessage": "Need something? Find it nearby."
+  },
+  "home.shoppers.intro": {
+    "defaultMessage": "See which shop around you has it, at what price, and how recently the shop updated its stock. Then book it before you leave home."
   },
   "home.shoppers.1": {
     "defaultMessage": "Search for what you need"
@@ -104,20 +506,59 @@
   "home.shoppers.4": {
     "defaultMessage": "Pick it up or get it delivered"
   },
+  "home.shoppers.body.1": {
+    "defaultMessage": "Groceries, medicines, stationery, a charger, a tap washer."
+  },
+  "home.shoppers.body.2": {
+    "defaultMessage": "Price, distance and how fresh the stock is."
+  },
+  "home.shoppers.body.3": {
+    "defaultMessage": "The shop keeps it aside for you."
+  },
+  "home.shoppers.body.4": {
+    "defaultMessage": "Pay the shop the way you always do."
+  },
   "home.shoppers.cta": {
     "defaultMessage": "Open the shopper app"
   },
-  "home.insights.title": {
-    "defaultMessage": "See what people are looking for"
+  "home.shoppers.avail": {
+    "defaultMessage": "Available at {count} shops near you",
+    "description": "Text inside an example screen (hidden from screen readers)."
   },
-  "home.insights.body": {
-    "defaultMessage": "Demand insights tell a shop which items people nearby search for and cannot find."
+  "home.shoppers.book": {
+    "defaultMessage": "Book · Pay at the shop",
+    "description": "Text inside an example screen (hidden from screen readers)."
   },
-  "home.insights.signal": {
-    "defaultMessage": "Searched often nearby"
+  "home.shoppers.ready": {
+    "defaultMessage": "Order {number} is ready",
+    "description": "Text inside an example screen (hidden from screen readers)."
   },
-  "home.insights.stock": {
-    "defaultMessage": "Stock this"
+  "home.shoppers.code": {
+    "defaultMessage": "Order code",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.shoppers.show": {
+    "defaultMessage": "Show this at {shop}",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.shoppers.tl.booked": {
+    "defaultMessage": "Booked · {time}",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.shoppers.tl.accepted": {
+    "defaultMessage": "Accepted · {time}",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.shoppers.tl.ready": {
+    "defaultMessage": "Ready · {time}",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.shoppers.tl.collected": {
+    "defaultMessage": "Picked up",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.steps.eyebrow": {
+    "defaultMessage": "How it works"
   },
   "home.steps.title": {
     "defaultMessage": "Start in three steps"
@@ -126,22 +567,48 @@
     "defaultMessage": "Create your shop"
   },
   "home.steps.1.body": {
-    "defaultMessage": "Sign up and add your shop details."
+    "defaultMessage": "Sign up with your phone number and add your shop details."
   },
   "home.steps.2.title": {
     "defaultMessage": "Add your stock"
   },
   "home.steps.2.body": {
-    "defaultMessage": "Add your products and stock."
+    "defaultMessage": "Start with a few items. Add the rest as you sell."
   },
   "home.steps.3.title": {
     "defaultMessage": "Start getting customers"
   },
   "home.steps.3.body": {
-    "defaultMessage": "People nearby can find your stock and book it."
+    "defaultMessage": "People nearby find your stock and book it."
+  },
+  "home.steps.shop_name": {
+    "defaultMessage": "Shop name",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.steps.area": {
+    "defaultMessage": "Area",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.steps.add_item": {
+    "defaultMessage": "Add item",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.steps.new_order": {
+    "defaultMessage": "New order nearby",
+    "description": "Text inside an example screen (hidden from screen readers)."
+  },
+  "home.types.eyebrow": {
+    "defaultMessage": "Who it is for"
   },
   "home.types.title": {
     "defaultMessage": "For every kind of shop"
+  },
+  "home.types.intro": {
+    "defaultMessage": "If you sell physical goods from a shop near people's homes, TodayZ is built for you."
+  },
+  "home.types.strip": {
+    "defaultMessage": "Made for every kind of shop",
+    "description": "Accessible name of the scrolling strip of shop types."
   },
   "home.types.1": {
     "defaultMessage": "General and grocery"
@@ -161,8 +628,36 @@
   "home.types.6": {
     "defaultMessage": "Hardware"
   },
+  "home.types.desc.1": {
+    "defaultMessage": "Daily needs, staples and packaged food."
+  },
+  "home.types.desc.2": {
+    "defaultMessage": "Pharmacy, wellness and baby care."
+  },
+  "home.types.desc.3": {
+    "defaultMessage": "Beauty, skin care and personal care."
+  },
+  "home.types.desc.4": {
+    "defaultMessage": "School, office and art supplies."
+  },
+  "home.types.desc.5": {
+    "defaultMessage": "Chargers, bulbs, cables and small appliances."
+  },
+  "home.types.desc.6": {
+    "defaultMessage": "Tools, fittings, paint and plumbing."
+  },
+  "home.testimonials.title": {
+    "defaultMessage": "What shop owners say",
+    "description": "Shown only once real, approved quotes exist."
+  },
+  "home.faq.eyebrow": {
+    "defaultMessage": "FAQ"
+  },
   "home.faq.title": {
     "defaultMessage": "Questions shops ask"
+  },
+  "home.faq.intro": {
+    "defaultMessage": "Something else on your mind? Leave your details below and the TodayZ team will get in touch."
   },
   "home.faq.1.q": {
     "defaultMessage": "What does it cost?"

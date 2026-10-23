@@ -1,0 +1,41 @@
+---
+// Scrolling strip of shop types. The list is rendered twice for a seamless loop; the copy is hidden
+// from assistive tech. The animation stops under prefers-reduced-motion (landing.css).
+import Icon from '../Icon.astro';
+import type { MessageKey, Translate } from '../../i18n/index.ts';
+import { SHOP_TYPES } from './data.ts';
+
+interface Props {
+  t: Translate;
+}
+
+const { t } = Astro.props;
+const types = SHOP_TYPES.map((type, i) => ({ ...type, name: t(`home.types.${i + 1}` as MessageKey) }));
+---
+
+<section class="types-strip" aria-label={t('home.types.strip')}>
+  <div class="marquee">
+    <ul class="marquee-track">
+      {
+        types.map((type) => (
+          <li data-tint={type.tint}>
+            <span>
+              <Icon name={type.icon} />
+            </span>
+            {type.name}
+          </li>
+        ))
+      }
+      {
+        types.map((type) => (
+          <li data-tint={type.tint} aria-hidden="true">
+            <span>
+              <Icon name={type.icon} />
+            </span>
+            {type.name}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

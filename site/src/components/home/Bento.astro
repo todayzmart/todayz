@@ -1,0 +1,151 @@
+---
+// For shops: four feature tiles (counter, orders, stock, offers), each with an example screen.
+import Icon from '../Icon.astro';
+import type { MessageKey, Translate } from '../../i18n/index.ts';
+
+interface Props {
+  t: Translate;
+  /** Section id (anchor). */
+  id?: string;
+}
+
+const { t, id = 'shops' } = Astro.props;
+const feature = (i: number, part: 'title' | 'body') => t(`home.features.${i}.${part}` as MessageKey);
+const posItems = [
+  // The last value is the quantity in the bill (0: not in it).
+  ['AA', 'Aashirvaad Atta 5 kg', '₹289', 0],
+  ['AT', 'Amul Taaza 500 ml', '₹28', 2],
+  ['TS', 'Tata Salt 1 kg', '₹28', 0],
+  ['MG', 'Maggi 4-pack', '₹56', 1],
+  ['PG', 'Parle-G 250 g', '₹25', 0],
+  ['SF', 'Surf Excel 1 kg', '₹140', 0],
+] as const;
+const cart = [
+  ['Amul Taaza 500 ml', '2 × ₹28', '₹56'],
+  ['Maggi 4-pack', '1 × ₹56', '₹56'],
+  ['Aashirvaad Atta 5 kg', '1 × ₹289', '₹289'],
+] as const;
+---
+
+<section class="sec" id={id}>
+  <div class="wrap">
+    <div class="sec-head center">
+      <p class="eyebrow">{t('home.features.eyebrow')}</p>
+      <h2>{t('home.features.title')}</h2>
+      <p class="sec-intro">{t('home.features.intro')}</p>
+    </div>
+
+    <div class="bento">
+      <article class="tile tile-pos">
+        <div class="tile-copy">
+          <span class="tile-ico" data-tint="green"><Icon name="receipt" /></span>
+          <h3>{feature(1, 'title')}</h3>
+          <p>{feature(1, 'body')}</p>
+        </div>
+        <div class="pos" aria-hidden="true">
+          <div class="pos-grid">
+            <div class="pos-search"><Icon name="search" />{t('home.pos.search')}<Icon name="scan" class="scan" /></div>
+            <div class="pos-items">
+              {
+                posItems.map(([mark, name, price, qty]) => (
+                  <span class:list={['pi', { on: qty > 0 }]} data-qty={qty > 0 ? qty : undefined}>
+                    <i>{mark}</i>
+                    {name}
+                    <b>{price}</b>
+                  </span>
+                ))
+              }
+            </div>
+          </div>
+          <div class="pos-cart">
+            <div class="pc-head">
+              <b>{t('home.pos.bill')}</b><span class="offline"><Icon name="wifi-off" />{t('home.pos.offline')}</span>
+            </div>
+            {
+              cart.map(([name, qty, total]) => (
+                <div class="pc-line">
+                  <span>
+                    {name}
+                    <em>{qty}</em>
+                  </span>
+                  <b>{total}</b>
+                </div>
+              ))
+            }
+            <div class="pc-pay">
+              <span class="on"><Icon name="cash" />{t('home.pos.cash')}</span>
+              <span><Icon name="phone" />{t('home.pos.upi')}</span>
+              <span><Icon name="card" />{t('home.pos.card')}</span>
+            </div>
+            <div class="pc-total">
+              <span>{t('home.pos.total')}<b>₹401</b></span><span class="charge">{t('home.pos.charge')}</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile tile-orders">
+        <div class="tile-copy">
+          <span class="tile-ico" data-tint="sky"><Icon name="bag" /></span>
+          <h3>{feature(2, 'title')}</h3>
+          <p>{feature(2, 'body')}</p>
+        </div>
+        <div class="orders" aria-hidden="true">
+          <div class="ord new">
+            <div class="ord-top">
+              <b>TZ-024821</b><span class="tz-pill tz-pill-pending">{t('home.orders.new')}</span>
+              <span class="ord-t">{t('home.orders.accept_within', { time: '4:12' })}</span>
+            </div>
+            <p>Amul Taaza Milk ×2, Parle-G ×1 · {t('home.mock.pickup')}</p>
+            <div class="ord-act"><span class="ghost">{t('home.mock.reject')}</span><span class="go">{t('home.mock.accept')}</span></div>
+          </div>
+          <div class="ord">
+            <div class="ord-top">
+              <b>TZ-024818</b><span class="tz-pill tz-pill-preparing">{t('home.orders.preparing')}</span>
+              <span class="ord-t">{t('home.mock.dist_delivery', { distance: '1.2 km' })}</span>
+            </div>
+          </div>
+          <div class="ord">
+            <div class="ord-top">
+              <b>TZ-024815</b><span class="tz-pill tz-pill-ready">{t('home.orders.ready')}</span>
+              <span class="ord-t">{t('home.orders.waiting')}</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile tile-stock">
+        <div class="tile-copy">
+          <span class="tile-ico" data-tint="amber"><Icon name="box" /></span>
+          <h3>{feature(3, 'title')}</h3>
+          <p>{feature(3, 'body')}</p>
+        </div>
+        <div class="stock" aria-hidden="true">
+          <div class="st-row"><span>Aashirvaad Atta 5 kg</span><b>18</b><em class="tz-stock">{t('home.stock.updated_min', { n: 12 })}</em></div>
+          <div class="st-row"><span>Tata Salt 1 kg</span><b>4</b><em class="tz-stock tz-stock-low">{t('home.stock.low', { n: 2 })}</em></div>
+          <div class="st-row"><span>Fortune Oil 1 L</span><b>26</b><em class="tz-stock">{t('home.stock.updated_h', { n: 1 })}</em></div>
+        </div>
+      </article>
+
+      <article class="tile tile-offers">
+        <div class="tile-copy">
+          <span class="tile-ico" data-tint="lilac"><Icon name="gift" /></span>
+          <h3>{feature(4, 'title')}</h3>
+          <p>{feature(4, 'body')}</p>
+        </div>
+        <div class="offers" aria-hidden="true">
+          <div class="offer-banner">
+            <span class="ob-tag">{t('home.offers.week')}</span>
+            <b>{t('home.offers.off', { off: '10%', item: 'Aashirvaad Atta 5 kg' })}</b>
+            <span>Sharma General Store</span>
+          </div>
+          <div class="credit">
+            <span class="cr-av">PR</span>
+            <div><b>Priya R.</b><span>{t('home.offers.regular', { n: 3 })}</span></div>
+            <span class="cr-pts">{t('home.offers.credits', { n: 12 })}</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

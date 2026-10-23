@@ -4,6 +4,16 @@
 // Turnstile script on pages that hold the form.
 import '@todayz/tokens/styles.css';
 import head from 'virtual:todayz-head';
+import anekLatin from '@todayz/tokens/fonts/anek-latin-latin-wght-normal.woff2?url';
+import anekDevanagari from '@todayz/tokens/fonts/anek-devanagari-devanagari-wght-normal.woff2?url';
+import anekKannada from '@todayz/tokens/fonts/anek-kannada-kannada-wght-normal.woff2?url';
+import anekTelugu from '@todayz/tokens/fonts/anek-telugu-telugu-wght-normal.woff2?url';
+import anekTamil from '@todayz/tokens/fonts/anek-tamil-tamil-wght-normal.woff2?url';
+import figtreeLatin from '@todayz/tokens/fonts/figtree-latin-wght-normal.woff2?url';
+import notoDevanagari from '@todayz/tokens/fonts/noto-sans-devanagari-devanagari-wght-normal.woff2?url';
+import notoKannada from '@todayz/tokens/fonts/noto-sans-kannada-kannada-wght-normal.woff2?url';
+import notoTelugu from '@todayz/tokens/fonts/noto-sans-telugu-telugu-wght-normal.woff2?url';
+import notoTamil from '@todayz/tokens/fonts/noto-sans-tamil-tamil-wght-normal.woff2?url';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { LOCALE_INFO, createT, isMachineDraft, type Locale } from '../i18n/index.ts';
@@ -28,6 +38,19 @@ const ogImage = `${SITE_ORIGIN}/og/${page.id}${locale === 'en' ? '' : `-${locale
 const hreflang = alternates(page);
 const draft = isMachineDraft(locale);
 const englishPath = pagePath(page, 'en');
+// Preload the faces the first screen draws, so text does not reflow when they swap in (Lighthouse
+// CLS on the localised heroes): Latin display and body on every page (Indic headings still use Anek
+// Latin for punctuation and digits, and the mock screens are English), plus the page script's display
+// and body faces. Same files as @todayz/tokens' @font-face rules, so the browser reuses the response.
+const LATIN = [anekLatin, figtreeLatin];
+const SCRIPT_FONTS: Record<Locale, string[]> = {
+  en: [],
+  hi: [anekDevanagari, notoDevanagari],
+  kn: [anekKannada, notoKannada],
+  te: [anekTelugu, notoTelugu],
+  ta: [anekTamil, notoTamil],
+};
+const preloads = [...LATIN, ...SCRIPT_FONTS[locale]];
 ---
 
 <!doctype html>
@@ -37,6 +60,7 @@ const englishPath = pagePath(page, 'en');
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light" />
     <title>{title}</title>
+    {preloads.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
@@ -65,7 +89,7 @@ const englishPath = pagePath(page, 'en');
     {
       draft && (
         <p class="draft" role="note">
-          {t('draft.notice')} <a href={englishPath}>{t('draft.switch')}</a>
+          {t('draft.notice')} <a href={englishPath} hreflang="en">{t('draft.switch')}</a>
         </p>
       )
     }
@@ -77,11 +101,18 @@ const englishPath = pagePath(page, 'en');
 </html>
 
 <style is:global>
-  /* Indic scripts stack vowel signs above and below the line: the font shorthands on headings and
-     text would reset the bundle's 1.6 line height, so restore it, and never track Indic text. */
-  html:is(:lang(hi), :lang(kn), :lang(te), :lang(ta)) :is(h1, h2, h3, p, a, li, span, summary, label, button, input, small, b) {
-    line-height: 1.6;
-    letter-spacing: 0;
+  /* Indic scripts stack vowel signs above and below the line (design/source/localization.md), so
+     the tight display line heights of the landing would clip them: restore the bundle's 1.6 for
+     text and use 1.45 for headings, and never track Indic text. !important because the landing's
+     section rules are more specific. Example screens (aria-hidden) keep their compact layout. */
+  html:is(:lang(hi), :lang(kn), :lang(te), :lang(ta)) :is(p, a, li, span, summary, label, button, input, small, b):not([aria-hidden='true'] *) {
+    line-height: 1.6 !important;
+    letter-spacing: 0 !important;
+  }
+
+  html:is(:lang(hi), :lang(kn), :lang(te), :lang(ta)) :is(h1, h2, h3) {
+    line-height: 1.45 !important;
+    letter-spacing: 0 !important;
   }
 </style>
 

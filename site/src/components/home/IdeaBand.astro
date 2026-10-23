@@ -1,0 +1,42 @@
+---
+// The idea: a dark (--deep) band with the search-to-shelf flow and the loop.
+import Icon from '../Icon.astro';
+import type { MessageKey, Translate } from '../../i18n/index.ts';
+import { EM, splitEm } from './data.ts';
+
+interface Props {
+  t: Translate;
+}
+
+const { t } = Astro.props;
+const [before, after] = splitEm(t('home.insight.title', EM));
+const flow = (i: number, part: 'title' | 'body') => t(`home.insight.flow.${i}.${part}` as MessageKey);
+const loop = [1, 2, 3, 4, 5].map((i) => t(`home.insight.loop.${i}` as MessageKey));
+---
+
+<section class="insight-band" id="insight">
+  <div class="wrap">
+    <p class="eyebrow on-dark">{t('home.insight.eyebrow')}</p>
+    <h2 class="insight-title">{before}<em>{t('home.insight.title_em')}</em>{after}</h2>
+    <p class="insight-body">{t('home.insight.body')}</p>
+    <div class="flow">
+      <div class="flow-node">
+        <span class="fn-ico"><Icon name="users" /></span>
+        <b>{flow(1, 'title')}</b><span>{flow(1, 'body')}</span>
+      </div>
+      <div class="flow-line" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="flow-node is-core">
+        <span class="fn-mark" aria-hidden="true">Today<b>Z</b></span>
+        <b>{flow(2, 'title')}</b><span>{flow(2, 'body')}</span>
+      </div>
+      <div class="flow-line" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="flow-node">
+        <span class="fn-ico"><Icon name="store" /></span>
+        <b>{flow(3, 'title')}</b><span>{flow(3, 'body')}</span>
+      </div>
+    </div>
+    <ol class="loop">
+      {loop.map((step) => <li>{step}</li>)}
+    </ol>
+  </div>
+</section>

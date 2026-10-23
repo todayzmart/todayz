@@ -1,0 +1,39 @@
+---
+// Closing call to action on the deep green card, with the real lead form.
+import Icon from '../Icon.astro';
+import LeadForm from '../LeadForm.astro';
+import type { Locale, MessageKey, Translate } from '../../i18n/index.ts';
+
+interface Props {
+  t: Translate;
+  locale: Locale;
+  /** Page id, sent as the lead source. */
+  source: string;
+}
+
+const { t, locale, source } = Astro.props;
+const ticks = [1, 2, 3].map((i) => t(`cta.tick.${i}` as MessageKey));
+---
+
+<section class="cta-sec" id="join">
+  <div class="wrap">
+    <div class="cta-card">
+      <div class="cta-copy">
+        <p class="eyebrow on-dark">{t('cta.eyebrow')}</p>
+        <h2 id="join-title">{t('cta.title')}</h2>
+        <p>{t('cta.body')}</p>
+        <ul class="ticks on-dark">
+          {
+            ticks.map((tick) => (
+              <li>
+                <Icon name="check" />
+                {tick}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <LeadForm locale={locale} source={source} id="lead" variant="cta" labelledBy="join-title" />
+    </div>
+  </div>
+</section>

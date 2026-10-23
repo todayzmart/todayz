@@ -1,0 +1,53 @@
+---
+// How it works: three steps, each with a small example visual.
+import Icon from '../Icon.astro';
+import type { MessageKey, Translate } from '../../i18n/index.ts';
+
+interface Props {
+  t: Translate;
+}
+
+const { t } = Astro.props;
+const step = (i: number, part: 'title' | 'body') => t(`home.steps.${i}.${part}` as MessageKey);
+---
+
+<section class="sec" id="how">
+  <div class="wrap">
+    <div class="sec-head center">
+      <p class="eyebrow">{t('home.steps.eyebrow')}</p>
+      <h2>{t('home.steps.title')}</h2>
+    </div>
+    <ol class="steps3">
+      <li>
+        <div class="s-viz" aria-hidden="true">
+          <div class="mini-field"><span>{t('home.steps.shop_name')}</span><b>Sharma General Store</b></div>
+          <div class="mini-field"><span>{t('home.steps.area')}</span><b>Jayanagar, 560011</b></div>
+        </div>
+        <span class="s-n" aria-hidden="true">1</span>
+        <h3>{step(1, 'title')}</h3>
+        <p>{step(1, 'body')}</p>
+      </li>
+      <li>
+        <div class="s-viz" aria-hidden="true">
+          <div class="mini-item"><i>TS</i>Tata Salt 1 kg<b>12</b></div>
+          <div class="mini-item"><i>AA</i>Aashirvaad Atta 5 kg<b>18</b></div>
+          <div class="mini-add"><Icon name="plus" />{t('home.steps.add_item')}</div>
+        </div>
+        <span class="s-n" aria-hidden="true">2</span>
+        <h3>{step(2, 'title')}</h3>
+        <p>{step(2, 'body')}</p>
+      </li>
+      <li>
+        <div class="s-viz" aria-hidden="true">
+          <div class="mini-note">
+            <span class="mn-ico"><Icon name="bell" /></span>
+            <div><b>{t('home.steps.new_order')}</b><span>Amul Taaza Milk ×2 · {t('home.mock.pickup')}</span></div>
+          </div>
+        </div>
+        <span class="s-n" aria-hidden="true">3</span>
+        <h3>{step(3, 'title')}</h3>
+        <p>{step(3, 'body')}</p>
+      </li>
+    </ol>
+  </div>
+</section>

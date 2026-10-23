@@ -1,0 +1,103 @@
+---
+// The business app in a browser frame: the morning overview. Purely an example screen.
+import Icon from '../Icon.astro';
+import type { IconName } from '../Icon.astro';
+import type { MessageKey, Translate } from '../../i18n/index.ts';
+import type { Tint } from './data.ts';
+
+interface Props {
+  t: Translate;
+}
+
+const { t } = Astro.props;
+const navIcons: IconName[] = ['dash', 'orders', 'receipt', 'box', 'tag', 'users', 'growth'];
+const nav = navIcons.map((icon, i) => ({ icon, label: t(`home.app.nav.${i + 1}` as MessageKey), count: i === 1 ? 4 : null }));
+const actions: { tint: Tint; icon: IconName; title: string; cta: string }[] = [
+  { tint: 'sky', icon: 'bag', title: t('home.app.act.orders', { n: 4 }), cta: t('home.app.act.orders_cta') },
+  { tint: 'amber', icon: 'alert', title: t('home.app.act.low', { n: 7 }), cta: t('home.app.act.low_cta') },
+  { tint: 'rose', icon: 'hourglass', title: t('home.app.act.expiring', { n: 3 }), cta: t('home.app.act.expiring_cta') },
+  { tint: 'green', icon: 'growth', title: t('home.app.act.searches', { n: 14 }), cta: t('home.app.act.searches_cta') },
+];
+const bars = [18, 34, 52, 41, 28, 22, 30, 46, 70, 88, 12, 10];
+const top = [
+  ['Amul Taaza Milk 500 ml', 64],
+  ['Aashirvaad Atta 5 kg', 21],
+  ['Parle-G 250 g', 18],
+  ['Maggi 4-pack', 15],
+] as const;
+---
+
+<section class="showcase">
+  <div class="wrap">
+    <div class="sec-head center">
+      <p class="eyebrow">{t('home.showcase.eyebrow')}</p>
+      <h2>{t('home.showcase.title')}</h2>
+      <p class="sec-intro">{t('home.showcase.intro')}</p>
+    </div>
+    <div class="browser" aria-hidden="true">
+      <div class="br-bar"><i></i><i></i><i></i><span>business.todayz.in</span></div>
+      <div class="app">
+        <div class="app-side">
+          <div class="app-brand">Today<b>Z</b></div>
+          {
+            nav.map((item, i) => (
+              <span class:list={{ on: i === 0 }}>
+                <Icon name={item.icon} />
+                {item.label}
+                {item.count !== null && <span class="count">{item.count}</span>}
+              </span>
+            ))
+          }
+        </div>
+        <div class="app-main">
+          <div class="greet">
+            <div>
+              <p class="g-date">{t('home.app.date')}</p>
+              <p class="g-title">{t('home.app.greet', { shop: 'Sharma General Store' })}</p>
+            </div>
+            <span class="g-sync"><i></i>{t('home.app.synced', { time: '9:40' })}</span>
+          </div>
+          <div class="kpis">
+            <div class="kpi"><span>{t('home.mock.todays_sales')}</span><b>₹24,860</b><em class="up">{t('home.app.sales_delta', { pct: '+12%' })}</em></div>
+            <div class="kpi"><span>{t('home.app.orders')}</span><b>12</b><em>{t('home.app.waiting', { n: 4 })}</em></div>
+            <div class="kpi"><span>{t('home.app.low')}</span><b>7</b><em>{t('home.app.low_note')}</em></div>
+            <div class="kpi"><span>{t('home.app.searches')}</span><b>26</b><em>{t('home.app.searches_note')}</em></div>
+          </div>
+          <div class="actions">
+            {
+              actions.map((a) => (
+                <div class="act" data-tint={a.tint}>
+                  <span class="a-ico">
+                    <Icon name={a.icon} />
+                  </span>
+                  <b>{a.title}</b>
+                  <span>{a.cta}</span>
+                </div>
+              ))
+            }
+          </div>
+          <div class="app-row">
+            <div class="chart">
+              <div class="ch-head"><b>{t('home.app.chart')}</b><span>{t('home.app.today')}</span></div>
+              <div class="bars">
+                {bars.map((h, i) => <i class:list={{ now: i === 9, fut: i > 9 }} style={`height:${h}%`}></i>)}
+              </div>
+              <div class="hours"><span>7:00</span><span>12:00</span><span>18:00</span><span>22:00</span></div>
+            </div>
+            <div class="top">
+              <div class="ch-head"><b>{t('home.app.top')}</b><span>{t('home.app.today')}</span></div>
+              {
+                top.map(([name, n]) => (
+                  <div class="ti">
+                    <span>{name}</span>
+                    <b>{n}</b>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,16 +1,25 @@
 ---
-// S-01 Home, in any language.
-import Faq from '../components/Faq.astro';
-import FeatureGrid from '../components/FeatureGrid.astro';
-import Icon from '../components/Icon.astro';
-import LeadForm from '../components/LeadForm.astro';
-import Section from '../components/Section.astro';
-import Steps from '../components/Steps.astro';
-import { createT, numbered, type Locale, type MessageKey } from '../i18n/index.ts';
+// S-01 Home, in any language: the landing page (components/home, styles/landing.css).
+import Bento from '../components/home/Bento.astro';
+import Cta from '../components/home/Cta.astro';
+import DemandInsights from '../components/home/DemandInsights.astro';
+import FaqSection from '../components/home/FaqSection.astro';
+import HeroScene from '../components/home/HeroScene.astro';
+import IdeaBand from '../components/home/IdeaBand.astro';
+import Marquee from '../components/home/Marquee.astro';
+import Problems from '../components/home/Problems.astro';
+import Shoppers from '../components/home/Shoppers.astro';
+import ShopTypes from '../components/home/ShopTypes.astro';
+import Showcase from '../components/home/Showcase.astro';
+import Testimonials from '../components/home/Testimonials.astro';
+import ThreeSteps from '../components/home/ThreeSteps.astro';
+import { EM } from '../components/home/data.ts';
+import { createT, type Locale, type MessageKey } from '../i18n/index.ts';
 import { company, links } from '../lib/company.ts';
 import { faqJsonLd, organizationJsonLd, websiteJsonLd } from '../lib/jsonld.ts';
 import { pageById } from '../lib/pages.ts';
 import Base from '../layouts/Base.astro';
+import '../styles/landing.css';
 
 interface Props {
   locale: Locale;
@@ -19,324 +28,31 @@ interface Props {
 const { locale } = Astro.props;
 const page = pageById('home');
 const t = createT(locale);
-const key = (k: string) => k as MessageKey;
-
-const faq = [1, 2, 3, 4].map((i) => ({ q: t(key(`home.faq.${i}.q`)), a: t(key(`home.faq.${i}.a`)) }));
-const problems = [1, 2, 3, 4].map((i) => ({
-  title: t(key(`home.problem.${i}.title`)),
-  body: t(key(`home.problem.${i}.body`)),
-}));
-const problemTints = ['rose', 'amber', 'peach', 'sky'] as const;
-const features = (
-  [
-    ['receipt', 'green'],
-    ['bag', 'sky'],
-    ['demand', 'amber'],
-    ['credit', 'lilac'],
-  ] as const
-).map(([icon, tint], i) => ({
-  icon,
-  tint,
-  title: t(key(`home.features.${i + 1}.title`)),
-  body: t(key(`home.features.${i + 1}.body`)),
-}));
-const shopperSteps = numbered(t, locale, 'home.shoppers').map((title) => ({ title }));
-const steps = [1, 2, 3].map((i) => ({ title: t(key(`home.steps.${i}.title`)), body: t(key(`home.steps.${i}.body`)) }));
-const types = numbered(t, locale, 'home.types');
-const examples = ['Body lotion 200 ml', 'Diapers M, 40 pcs', 'Sensitive toothpaste 120 g'];
+const faq = [1, 2, 3, 4].map((i) => ({ q: t(`home.faq.${i}.q` as MessageKey), a: t(`home.faq.${i}.a` as MessageKey) }));
 ---
 
 <Base page={page} locale={locale} jsonLd={[organizationJsonLd(company), websiteJsonLd(locale), faqJsonLd(faq)]}>
-  <div class="tz-hero-wash hero">
-    <div class="inner">
-      <div class="copy">
-        <p class="eyebrow">{t('home.hero.eyebrow')}</p>
-        <h1>{t('home.hero.title')}</h1>
-        <p class="lead">{t('home.hero.body')}</p>
-        <div class="actions">
-          <a class="tz-btn tz-btn-brand tz-btn-lg" href="#lead">{t('nav.cta')}</a>
-          <a class="tz-btn tz-btn-lg" href="#how">{t('home.hero.cta_secondary')}</a>
-        </div>
-      </div>
-      <div class="mock tz-card" role="group" aria-label={t('home.mock.label')}>
-        <span class="tz-tag">{t('home.mock.label')}</span>
-        <p class="searching">
-          <Icon name="search" size={18} />
-          <span>{t('home.mock.searching')}: <b>Amul Taaza Milk 500 ml</b></span>
-        </p>
-        <ul class="shops">
-          <li>
-            <span class="tz-lettermark">S</span>
-            <span class="shop"><b>Sharma General Store</b><small>{t('home.mock.away', { distance: '500 m' })}</small></span>
-            <span class="price">₹28</span>
-            <span class="tz-pill tz-pill-completed">{t('home.mock.in_stock')}</span>
-          </li>
-          <li>
-            <span class="tz-lettermark">G</span>
-            <span class="shop"><b>Gupta Stores</b><small>{t('home.mock.away', { distance: '800 m' })}</small></span>
-            <span class="price">₹29</span>
-            <span class="tz-pill tz-pill-completed">{t('home.mock.in_stock')}</span>
-          </li>
-        </ul>
-      </div>
-    </div>
+  <div class="lp">
+    <HeroScene
+      t={t}
+      kicker={t('home.hero.kicker')}
+      title={t('home.hero.title', EM)}
+      titleEm={t('home.hero.title_em')}
+      body={t('home.hero.body')}
+      primaryHref="#join"
+      secondaryHref="#how"
+    />
+    <Marquee t={t} />
+    <Problems t={t} />
+    <IdeaBand t={t} />
+    <Bento t={t} />
+    <Showcase t={t} />
+    <DemandInsights t={t} />
+    <Shoppers t={t} appUrl={links.customerApp} />
+    <ThreeSteps t={t} />
+    <ShopTypes t={t} />
+    <Testimonials t={t} />
+    <FaqSection t={t} title={t('home.faq.title')} items={faq} />
+    <Cta t={t} locale={locale} source="home" />
   </div>
-
-  <Section id="problem" title={t('home.problem.title')}>
-    <ul class="cards">
-      {
-        problems.map((p, i) => (
-          <li class="card" data-tint={problemTints[i]}>
-            <span class="dot" />
-            <h3>{p.title}</h3>
-            <p>{p.body}</p>
-          </li>
-        ))
-      }
-    </ul>
-  </Section>
-
-  <Section tone="subtle" id="insight">
-    <div class="insight">
-      <h2>{t('home.insight.title')}</h2>
-      <p>{t('home.insight.body')}</p>
-    </div>
-  </Section>
-
-  <Section id="features" title={t('home.features.title')}>
-    <FeatureGrid items={features} />
-  </Section>
-
-  <Section tone="wash" id="shoppers" title={t('home.shoppers.title')}>
-    <Steps items={shopperSteps} columns={4} />
-    <p><a class="tz-btn tz-btn-primary tz-btn-lg" href={links.customerApp}>{t('home.shoppers.cta')} <Icon name="arrow" size={18} /></a></p>
-  </Section>
-
-  <Section id="insights" title={t('home.insights.title')} intro={t('home.insights.body')}>
-    <ul class="examples">
-      {
-        examples.map((name) => (
-          <li class="tz-card">
-            <h3 class="tz-card-title">{name}</h3>
-            <p class="tz-card-desc">{t('home.insights.signal')}</p>
-            <span class="tz-tag tz-tag-offer">{t('home.insights.stock')}</span>
-          </li>
-        ))
-      }
-    </ul>
-    <p class="note">{t('home.mock.label')}</p>
-  </Section>
-
-  <Section tone="subtle" id="how" title={t('home.steps.title')}>
-    <Steps items={steps} columns={3} />
-  </Section>
-
-  <Section id="types" title={t('home.types.title')}>
-    <ul class="types">
-      {types.map((name) => <li class="tz-chip">{name}</li>)}
-    </ul>
-  </Section>
-
-  <Section tone="subtle" id="faq" title={t('home.faq.title')}>
-    <Faq items={faq} />
-  </Section>
-
-  <Section tone="wash" id="join">
-    <LeadForm locale={locale} source="home" />
-  </Section>
 </Base>
-
-<style>
-  .hero {
-    padding-block: var(--space-8) var(--space-10);
-  }
-
-  .inner {
-    display: grid;
-    gap: var(--space-8);
-    max-width: 1120px;
-    margin: 0 auto;
-    padding-inline: var(--space-4);
-    align-items: center;
-  }
-
-  .copy {
-    display: grid;
-    gap: var(--space-4);
-  }
-
-  .eyebrow {
-    margin: 0;
-    color: var(--brand-strong);
-    font: var(--type-label);
-  }
-
-  h1 {
-    margin: 0;
-    max-width: 18ch;
-    font: var(--type-display-xl);
-    letter-spacing: var(--type-display-xl-tracking);
-    color: var(--ink);
-  }
-
-  .lead {
-    margin: 0;
-    max-width: 52ch;
-    font: var(--type-body-lg);
-    color: var(--ink-2);
-  }
-
-  .actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-  }
-
-  .mock {
-    max-width: 440px;
-    box-shadow: var(--shadow-pop);
-  }
-
-  .mock .tz-tag {
-    align-self: flex-start;
-  }
-
-  .searching {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    margin: 0;
-    padding: var(--space-3);
-    border: 1px solid var(--line-control);
-    border-radius: var(--radius-md);
-    color: var(--ink-2);
-    font: var(--type-body-sm);
-  }
-
-  .searching b {
-    color: var(--ink);
-  }
-
-  .shops {
-    display: grid;
-    gap: var(--space-3);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .shops li {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-  }
-
-  .shop {
-    display: grid;
-    flex: 1;
-    min-width: 120px;
-  }
-
-  .shop small {
-    color: var(--ink-3);
-    font: var(--type-caption);
-  }
-
-  .price {
-    font: var(--type-price);
-    color: var(--ink);
-  }
-
-  .cards,
-  .examples,
-  .types {
-    display: grid;
-    gap: var(--space-4);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .card {
-    display: grid;
-    align-content: start;
-    gap: var(--space-2);
-    padding: var(--space-5);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    background: var(--surface);
-  }
-
-  .card .dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--t-ink);
-  }
-
-  .card h3 {
-    margin: 0;
-    font: var(--type-title);
-    color: var(--ink);
-  }
-
-  .card p {
-    margin: 0;
-    color: var(--ink-2);
-    font: var(--type-body);
-  }
-
-  .insight {
-    max-width: 760px;
-    display: grid;
-    gap: var(--space-3);
-  }
-
-  .insight h2 {
-    margin: 0;
-    font: var(--type-display);
-    letter-spacing: var(--type-display-tracking);
-    color: var(--ink);
-  }
-
-  .insight p {
-    margin: 0;
-    font: var(--type-body-lg);
-    color: var(--ink-2);
-  }
-
-  .note {
-    margin: 0;
-    color: var(--ink-3);
-    font: var(--type-caption);
-  }
-
-  .types {
-    grid-template-columns: repeat(auto-fit, minmax(160px, max-content));
-  }
-
-  .types .tz-chip {
-    cursor: default;
-  }
-
-  @media (width >= 720px) {
-    .cards {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .examples {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  @media (width >= 1000px) {
-    .inner {
-      grid-template-columns: 1.2fr 1fr;
-    }
-
-    .cards {
-      grid-template-columns: repeat(4, 1fr);
-    }
-  }
-</style>

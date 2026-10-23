@@ -20,7 +20,7 @@ const options = page.locales.map((l) => ({ locale: l, href: pagePath(page, l), n
     <details class="lang">
       <summary aria-label={t('a11y.language')}>
         <Icon name="globe" size={18} />
-        <span>{LOCALE_INFO[locale].native}</span>
+        <span class="current">{LOCALE_INFO[locale].native}</span>
         <Icon name="chevron" size={16} />
       </summary>
       <ul>
@@ -44,11 +44,11 @@ const options = page.locales.map((l) => ({ locale: l, href: pagePath(page, l), n
   summary {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
-    min-height: var(--tap-min);
-    padding: 0 var(--space-3);
+    gap: 6px;
+    min-height: 40px;
+    padding: 0 10px;
     border: 1px solid var(--line-control);
-    border-radius: var(--radius-md);
+    border-radius: 12px;
     background: var(--surface);
     color: var(--ink);
     font: var(--type-label);
@@ -87,5 +87,17 @@ const options = page.locales.map((l) => ({ locale: l, href: pagePath(page, l), n
   a:hover,
   a[aria-current='true'] {
     background: var(--surface-sunken);
+  }
+
+  /* As in the footer: other scripts in the system font, so opening the list loads no web fonts. */
+  a:not(:lang(en), [aria-current='true']) {
+    font-family: system-ui, sans-serif;
+  }
+
+  /* Phones: globe and chevron only; the summary keeps its accessible name. */
+  @media (width <= 760px) {
+    .current {
+      display: none;
+    }
   }
 </style>

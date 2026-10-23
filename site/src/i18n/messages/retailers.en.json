@@ -6,37 +6,14 @@
     "defaultMessage": "Run your counter, put your stock online and see what people nearby look for. Free for now."
   },
   "retailers.hero.title": {
-    "defaultMessage": "Run your counter. Reach your neighbourhood."
+    "defaultMessage": "Run your counter. {em}",
+    "description": "The {em} placeholder is replaced by the _em key, shown in the brand colour."
+  },
+  "retailers.hero.title_em": {
+    "defaultMessage": "Reach your neighbourhood."
   },
   "retailers.hero.body": {
     "defaultMessage": "TodayZ gives your shop a point-of-sale, online orders, demand insights and credits that bring customers back. Free for now."
-  },
-  "retailers.benefits.title": {
-    "defaultMessage": "What shops get"
-  },
-  "retailers.benefits.1.title": {
-    "defaultMessage": "Point-of-sale"
-  },
-  "retailers.benefits.1.body": {
-    "defaultMessage": "Bill customers and keep stock in step with every sale. It works offline too."
-  },
-  "retailers.benefits.2.title": {
-    "defaultMessage": "Online orders"
-  },
-  "retailers.benefits.2.body": {
-    "defaultMessage": "People nearby find your stock and book it for pickup or delivery."
-  },
-  "retailers.benefits.3.title": {
-    "defaultMessage": "Demand insights"
-  },
-  "retailers.benefits.3.body": {
-    "defaultMessage": "See which items people nearby search for and cannot find, so you know what to stock next."
-  },
-  "retailers.benefits.4.title": {
-    "defaultMessage": "Credits that bring people back"
-  },
-  "retailers.benefits.4.body": {
-    "defaultMessage": "Credits give customers a reason to come back to your shop."
   },
   "retailers.faq.title": {
     "defaultMessage": "Common questions"

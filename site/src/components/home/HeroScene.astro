@@ -1,0 +1,155 @@
+---
+// Landing hero: copy on the left, the example scene (map, shopper phone, shop cards) on the right.
+// The scene is one image to assistive tech (role="img" + label); everything inside it is hidden.
+import Icon from '../Icon.astro';
+import type { Translate } from '../../i18n/index.ts';
+import { splitEm } from './data.ts';
+
+interface Props {
+  t: Translate;
+  kicker: string;
+  /** Title formatted with the EM argument (see data.ts), and the emphasised part. */
+  title: string;
+  titleEm: string;
+  body: string;
+  primaryHref: string;
+  secondaryHref: string;
+}
+
+const { t, kicker, title, titleEm, body, primaryHref, secondaryHref } = Astro.props;
+const [before, after] = splitEm(title);
+const ticks = [1, 2, 3, 4].map((i) => t(`home.hero.tick.${i}` as Parameters<Translate>[0]));
+---
+
+<section class="hero">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="kicker"><span class="kicker-dot"></span>{kicker}</p>
+      <h1>{before}<em>{titleEm}</em>{after}</h1>
+      <p class="hero-lead">{body}</p>
+      <div class="hero-actions">
+        <a class="btn-xl btn-brand" href={primaryHref}>{t('home.hero.cta')}<Icon name="arrow" /></a>
+        <a class="btn-xl btn-ghost" href={secondaryHref}>{t('home.hero.cta_secondary')}</a>
+      </div>
+      <ul class="ticks">
+        {
+          ticks.map((tick) => (
+            <li>
+              <Icon name="check" />
+              {tick}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="scene" role="img" aria-label={t('home.hero.scene')}>
+      <div class="map" aria-hidden="true">
+        <svg class="map-svg" viewBox="0 0 600 560" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+          <rect width="600" height="560" class="m-land"></rect>
+          <path class="m-park" d="M380 40h150a20 20 0 0 1 20 20v90a20 20 0 0 1-20 20H400a20 20 0 0 1-20-20z"></path>
+          <path class="m-park" d="M40 380h110a16 16 0 0 1 16 16v70a16 16 0 0 1-16 16H56a16 16 0 0 1-16-16z"></path>
+          <path class="m-water" d="M600 330c-60 10-90 50-150 60s-80 60-70 120 10 50 10 50h210z"></path>
+          <g class="m-road-edge">
+            <path d="M-20 250 C 150 230, 300 270, 620 220"></path>
+            <path d="M210 -20 L 250 600"></path>
+            <path d="M-20 120 L 620 150"></path>
+            <path d="M420 -20 C 400 200, 470 300, 430 600"></path>
+            <path d="M-20 450 L 380 420"></path>
+            <path d="M90 -20 L 120 600"></path>
+          </g>
+          <g class="m-road">
+            <path d="M-20 250 C 150 230, 300 270, 620 220"></path>
+            <path d="M210 -20 L 250 600"></path>
+            <path d="M-20 120 L 620 150"></path>
+            <path d="M420 -20 C 400 200, 470 300, 430 600"></path>
+            <path d="M-20 450 L 380 420"></path>
+            <path d="M90 -20 L 120 600"></path>
+          </g>
+          <g class="m-block">
+            <rect x="130" y="150" width="62" height="70" rx="6"></rect>
+            <rect x="270" y="165" width="120" height="48" rx="6"></rect>
+            <rect x="130" y="275" width="70" height="120" rx="6"></rect>
+            <rect x="275" y="285" width="130" height="110" rx="6"></rect>
+            <rect x="20" y="150" width="50" height="80" rx="6"></rect>
+            <rect x="20" y="20" width="56" height="80" rx="6"></rect>
+            <rect x="250" y="20" width="140" height="90" rx="6"></rect>
+          </g>
+        </svg>
+        <span class="radius"></span>
+        <span class="you"></span>
+        <span class="pin pin-a"><Icon name="store" /></span>
+        <span class="pin pin-b"><Icon name="pill" /></span>
+        <span class="pin pin-c"><Icon name="basket" /></span>
+        <span class="pin pin-d"><Icon name="pencil" /></span>
+      </div>
+
+      <div class="phone" aria-hidden="true">
+        <div class="phone-notch"></div>
+        <div class="ph-top">
+          <span class="ph-loc"><Icon name="pin" />Jayanagar 4th Block</span>
+        </div>
+        <div class="ph-search"><Icon name="search" /><span>Amul Taaza Milk 500 ml</span></div>
+        <p class="ph-meta">{t('home.mock.shops_have', { count: 3 })}</p>
+        <div class="ph-result is-pick">
+          <span class="ph-thumb" data-tint="green">SG</span>
+          <div class="ph-r-body">
+            <b>Sharma General Store</b>
+            <span class="ph-sub">{t('home.mock.dist_pickup', { distance: '0.5 km' })}</span>
+            <span class="ph-fresh"><i></i>{t('home.mock.fresh_min', { n: 12 })}</span>
+          </div>
+          <span class="ph-price">₹28</span>
+        </div>
+        <div class="ph-result">
+          <span class="ph-thumb" data-tint="sky">GS</span>
+          <div class="ph-r-body">
+            <b>Gupta Stores</b>
+            <span class="ph-sub">{t('home.mock.dist_delivery', { distance: '0.8 km' })}</span>
+            <span class="ph-fresh"><i></i>{t('home.mock.fresh_h', { n: 1 })}</span>
+          </div>
+          <span class="ph-price">₹29</span>
+        </div>
+        <div class="ph-result">
+          <span class="ph-thumb" data-tint="amber">GB</span>
+          <div class="ph-r-body">
+            <b>Green Basket</b>
+            <span class="ph-sub">{t('home.mock.dist_pickup', { distance: '1.4 km' })}</span>
+            <span class="ph-fresh stale"><i></i>{t('home.mock.stale')}</span>
+          </div>
+          <span class="ph-price">₹28</span>
+        </div>
+        <div class="ph-cta">{t('home.mock.book_pickup', { amount: '₹56' })}</div>
+      </div>
+
+      <div class="float order-card" aria-hidden="true">
+        <div class="oc-head">
+          <span class="oc-ico"><Icon name="bell" /></span>
+          <div><b>{t('home.mock.new_order', { number: 'TZ-024821' })}</b><span>Sharma General Store</span></div>
+          <span class="oc-timer">4:12</span>
+        </div>
+        <div class="oc-line"><span>Amul Taaza Milk 500 ml</span><span>×2</span></div>
+        <div class="oc-line"><span>Parle-G 250 g</span><span>×1</span></div>
+        <div class="oc-foot">
+          <span class="oc-pick"><Icon name="bag" />{t('home.mock.pickup')}</span>
+          <span class="oc-btn">{t('home.mock.accept')}</span>
+        </div>
+      </div>
+
+      <div class="float demand-chip" aria-hidden="true">
+        <span class="dc-ico"><Icon name="growth" /></span>
+        <div><b>Nivea Body Lotion 200 ml</b><span>{t('home.mock.wanted_line', { count: 14, distance: '2 km' })}</span></div>
+        <span class="dc-add">{t('home.mock.add')}</span>
+      </div>
+
+      <div class="float sales-chip" aria-hidden="true">
+        <span class="sc-label">{t('home.mock.todays_sales')}</span>
+        <b>₹24,860</b>
+        <span class="sc-bars">
+          {[30, 45, 38, 62, 55, 80, 100].map((h) => <i style={`height:${h}%`}></i>)}
+        </span>
+      </div>
+    </div>
+  </div>
+  <p class="wrap sample-note">{t('home.hero.note')}</p>
+</section>

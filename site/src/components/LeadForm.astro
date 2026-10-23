@@ -1,8 +1,13 @@
 ---
 // The shop lead form (the only interactive island besides plain <details>). Needs JavaScript to
-// post JSON to POST /v1/public/leads. Turnstile renders implicitly and adds the
-// cf-turnstile-response field; the script behind it is loaded by Base.astro on pages with a form.
+// post JSON to POST /v1/public/leads, so the button renders disabled and the script enables it.
+// Turnstile renders implicitly and adds the cf-turnstile-response field; the script behind it is
+// loaded by Base.astro on pages with a form.
+//   variant "card": a standalone card with its own heading (contact page).
+//   variant "cta":  the form alone, labelled by the landing CTA heading (home, for retailers).
+import Icon from './Icon.astro';
 import { createT, type Locale } from '../i18n/index.ts';
+import { resolveLeadEnv } from '../lib/env.ts';
 import { pageById, pagePath } from '../lib/pages.ts';
 
 interface Props {
@@ -10,37 +15,50 @@ interface Props {
   /** Page id, sent as the lead source. */
   source: string;
   id?: string;
+  variant?: 'card' | 'cta';
+  /** For variant "cta": the id of the heading that names the form. */
+  labelledBy?: string;
 }
 
-const { locale, source, id = 'lead' } = Astro.props;
+const { locale, source, id = 'lead', variant = 'card', labelledBy } = Astro.props;
 const t = createT(locale);
-const apiBase: string = import.meta.env['PUBLIC_API_URL'] ?? 'https://api.todayz.in';
-// Cloudflare's published always-pass test key. Production builds set PUBLIC_TURNSTILE_SITE_KEY.
-const siteKey: string = import.meta.env['PUBLIC_TURNSTILE_SITE_KEY'] ?? '1x00000000000000000000AA';
+const { apiUrl, siteKey } = resolveLeadEnv(import.meta.env);
 const privacy = pageById('privacy');
+// Turnstile ships its own strings for these; for the rest it picks the browser language.
+const captchaLanguage = locale === 'en' || locale === 'hi' ? locale : 'auto';
+const cta = variant === 'cta';
+const titleId = cta ? labelledBy : `${id}-title`;
 
 const fields = [
-  { name: 'name', label: t('lead.name'), error: t('lead.err_name'), type: 'text', autocomplete: 'name', inputmode: undefined },
-  { name: 'shop_name', label: t('lead.shop'), error: t('lead.err_shop'), type: 'text', autocomplete: 'organization', inputmode: undefined },
-  { name: 'phone', label: t('lead.phone'), error: t('lead.err_phone'), type: 'tel', autocomplete: 'tel', inputmode: 'tel' },
-  { name: 'city', label: t('lead.city'), error: t('lead.err_city'), type: 'text', autocomplete: 'address-level2', inputmode: undefined },
+  { name: 'name', label: t('lead.name'), error: t('lead.err_name'), type: 'text', autocomplete: 'name', inputmode: undefined, max: 80 },
+  { name: 'phone', label: t('lead.phone'), error: t('lead.err_phone'), type: 'tel', autocomplete: 'tel', inputmode: 'tel', max: 20 },
+  { name: 'shopName', label: t('lead.shop'), error: t('lead.err_shop'), type: 'text', autocomplete: 'organization', inputmode: undefined, max: 120 },
+  { name: 'city', label: t('lead.city'), error: t('lead.err_city'), type: 'text', autocomplete: 'address-level2', inputmode: undefined, max: 80 },
 ] as const;
 ---
 
-<section class="lead tz-card" id={id} aria-labelledby={`${id}-title`}>
-  <h2 id={`${id}-title`}>{t('lead.title')}</h2>
-  <p class="intro">{t('lead.intro')}</p>
+<div class:list={[cta ? 'cta-form' : 'lead tz-card']} id={id}>
+  {
+    !cta && (
+      <>
+        <h2 id={titleId}>{t('lead.title')}</h2>
+        <p class="intro">{t('lead.intro')}</p>
+      </>
+    )
+  }
   <form
     class="form"
     method="post"
     novalidate
+    aria-labelledby={titleId}
+    data-density="touch"
     data-lead-form
-    data-api={apiBase}
+    data-api={apiUrl}
     data-source={`site:${source}:${locale}`}
     data-sending={t('lead.sending')}
     data-success={t('lead.success')}
     data-error={t('lead.error')}
-    data-captcha={t('lead.err_captcha')}
+    data-rejected={t('lead.err_rejected')}
   >
     {
       fields.map((f) => (
@@ -55,7 +73,7 @@ const fields = [
             type={f.type}
             autocomplete={f.autocomplete}
             inputmode={f.inputmode}
-            maxlength="120"
+            maxlength={f.max}
             required
             aria-describedby={`${id}-${f.name}-err`}
           />
@@ -65,20 +83,23 @@ const fields = [
         </div>
       ))
     }
-    <div class="cf-turnstile" data-sitekey={siteKey} data-theme="light" data-language={locale}></div>
+    <div class="cf-turnstile" data-sitekey={siteKey} data-theme="light" data-language={captchaLanguage}></div>
     <p class="tz-field-error" data-error-for="captcha" hidden>{t('lead.err_captcha')}</p>
-    <button class="tz-btn tz-btn-brand tz-btn-lg" type="submit">{t('lead.submit')}</button>
+    <button class:list={cta ? 'btn-xl btn-brand full' : 'tz-btn tz-btn-brand tz-btn-lg'} type="submit" disabled>
+      {t('lead.submit')}
+      {cta && <Icon name="arrow" />}
+    </button>
+    <noscript><p class="nojs">{t('lead.nojs')}</p></noscript>
     <p class="status" role="status" aria-live="polite" data-status></p>
     <p class="consent">
-      {t('lead.consent')} <a href={pagePath(privacy, 'en')}>{t('footer.privacy')}</a>
+      {t('lead.consent')}{' '}
+      <a href={pagePath(privacy, 'en')} hreflang={locale === 'en' ? undefined : 'en'}>{t('footer.privacy')}</a>
     </p>
   </form>
-</section>
+</div>
 
 <script>
-  import { submitLead, validateLead, type LeadField } from '../lib/leads.ts';
-
-  const FIELDS: LeadField[] = ['name', 'shop_name', 'phone', 'city'];
+  import { LEAD_FIELDS, submitLead, validateLead, type LeadField } from '../lib/leads.ts';
 
   function setError(form: HTMLFormElement, name: string, show: boolean): void {
     const message = form.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
@@ -93,36 +114,42 @@ const fields = [
   document.querySelectorAll<HTMLFormElement>('form[data-lead-form]').forEach((form) => {
     const status = form.querySelector<HTMLElement>('[data-status]');
     const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
-    const text = (key: 'sending' | 'success' | 'error') => form.dataset[key] ?? '';
+    const text = (key: 'sending' | 'success' | 'error' | 'rejected') => form.dataset[key] ?? '';
+    let sending = false;
+    if (button) button.disabled = false;
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
+      if (sending) return;
       const data = new FormData(form);
       const raw: Partial<Record<LeadField, string>> = {};
-      for (const f of FIELDS) raw[f] = String(data.get(f) ?? '');
+      for (const f of LEAD_FIELDS) raw[f] = String(data.get(f) ?? '');
       const result = validateLead(raw);
-      for (const f of FIELDS) setError(form, f, !result.ok && result.errors[f] === true);
+      for (const f of LEAD_FIELDS) setError(form, f, !result.ok && result.errors[f] === true);
       const token = String(data.get('cf-turnstile-response') ?? '');
       setError(form, 'captcha', token === '');
       if (!result.ok || token === '') {
         form.querySelector<HTMLInputElement>('[aria-invalid="true"]')?.focus();
         return;
       }
+      sending = true;
       if (button) button.disabled = true;
       if (status) status.textContent = text('sending');
       const outcome = await submitLead(form.dataset['api'] ?? '', {
         ...result.value,
         source: form.dataset['source'] ?? 'site',
-        turnstile_token: token,
+        turnstileToken: token,
       });
+      sending = false;
       if (outcome.ok) {
         form.reset();
         if (status) status.textContent = text('success');
         form.dataset['state'] = 'sent';
       } else {
-        if (status) status.textContent = text('error');
-        if (button) button.disabled = false;
+        if (status) status.textContent = text(outcome.reason === 'rejected' ? 'rejected' : 'error');
       }
+      if (button) button.disabled = false;
+      // A token is single use: get a fresh one for the next attempt.
       (window as unknown as { turnstile?: { reset: () => void } }).turnstile?.reset();
     });
   });
@@ -130,6 +157,8 @@ const fields = [
 
 <style>
   .lead {
+    display: grid;
+    gap: var(--space-4);
     max-width: 520px;
     padding: var(--space-6);
     box-shadow: var(--shadow-pop);
@@ -153,10 +182,39 @@ const fields = [
     gap: var(--space-4);
   }
 
+  /* Landing CTA: the form sits in a white card on the green CTA band. */
+  .cta-form {
+    padding: 28px;
+    border-radius: 24px;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 40px 80px -30px color-mix(in srgb, var(--ink) 60%, transparent);
+  }
+
+  .cta-form .form {
+    gap: 14px;
+  }
+
+  .cta-form .tz-input {
+    min-height: 48px;
+    border-radius: 12px;
+    font-size: 16px;
+  }
+
   .status {
     min-height: 1.5em;
     margin: 0;
     color: var(--ink);
+    font: var(--type-label);
+  }
+
+  .status:empty {
+    min-height: 0;
+  }
+
+  .nojs {
+    margin: 0;
+    color: var(--ink-2);
     font: var(--type-label);
   }
 
@@ -168,5 +226,11 @@ const fields = [
 
   .consent a {
     color: var(--ink-2);
+  }
+
+  @media (width <= 760px) {
+    .cta-form {
+      padding: 20px;
+    }
   }
 </style>

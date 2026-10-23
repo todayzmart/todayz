@@ -1,0 +1,24 @@
+---
+// FAQ band: heading and intro on the left, the questions on the right.
+import Faq from '../Faq.astro';
+import type { Translate } from '../../i18n/index.ts';
+
+interface Props {
+  t: Translate;
+  title: string;
+  items: { q: string; a: string }[];
+}
+
+const { t, title, items } = Astro.props;
+---
+
+<section class="sec" id="faq">
+  <div class="wrap faq-grid">
+    <div>
+      <p class="eyebrow">{t('home.faq.eyebrow')}</p>
+      <h2>{title}</h2>
+      <p class="sec-intro">{t('home.faq.intro')}</p>
+    </div>
+    <Faq items={items} openFirst />
+  </div>
+</section>

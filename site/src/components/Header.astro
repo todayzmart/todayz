@@ -1,5 +1,10 @@
 ---
+// Sticky glass header: wordmark, page links, log in, language, and the "Get started" button.
+// "Get started" goes to the lead form on the page (#join) when the page holds one (page.leadForm), and
+// to the form on the for-retailers page in the current language otherwise. It keys on the flag, not
+// the page id, because the 404 page reuses the home page definition without the form.
 import { createT, type Locale } from '../i18n/index.ts';
+import { links } from '../lib/company.ts';
 import { pageById, pagePath, type PageDef, type PageId } from '../lib/pages.ts';
 import Icon from './Icon.astro';
 import LangSwitch from './LangSwitch.astro';
@@ -13,53 +18,54 @@ const { page, locale } = Astro.props;
 const t = createT(locale);
 
 /** Link to a page in the current language when it exists in it, otherwise in English. */
-function href(id: PageId): string {
+function link(id: PageId): { href: string; hreflang: string | undefined } {
   const target = pageById(id);
-  return pagePath(target, target.locales.includes(locale) ? locale : 'en');
+  const inLocale = target.locales.includes(locale);
+  return { href: pagePath(target, inLocale ? locale : 'en'), hreflang: inLocale ? undefined : 'en' };
 }
 
-const nav = [
-  { id: 'retailers' as const, label: t('nav.retailers') },
-  { id: 'how' as const, label: t('nav.how') },
-  { id: 'pricing' as const, label: t('nav.pricing') },
-  { id: 'about' as const, label: t('nav.about') },
-  { id: 'contact' as const, label: t('nav.contact') },
-];
+const nav = (['retailers', 'how', 'pricing', 'about', 'contact'] as const).map((id) => ({
+  id,
+  ...link(id),
+  label: t(`nav.${id}`),
+}));
+const home = link('home');
+const start = page.leadForm ? { href: '#join', hreflang: undefined } : { ...link('retailers'), href: `${link('retailers').href}#join` };
 ---
 
-<header class="bar">
-  <div class="inner">
-    <a class="brand" href={href('home')} aria-label={t('a11y.home')}>
-      <img class="mark" src="/icons/mark-96.png" alt="" width="32" height="32" />
-      <span class="word">Today<b>Z</b></span>
-    </a>
+<header class="site-head">
+  <div class="head-row">
+    <a class="brand" href={home.href} aria-label={t('a11y.home')}>Today<b>Z</b></a>
 
-    <nav class="wide" aria-label="TodayZ">
-      <ul>
-        {nav.map((item) => (
-          <li>
-            <a href={href(item.id)} aria-current={item.id === page.id ? 'page' : undefined}>
-              {item.label}
-            </a>
-          </li>
-        ))}
-      </ul>
+    <nav class="nav" aria-label="TodayZ">
+      {
+        nav.map((item) => (
+          <a href={item.href} hreflang={item.hreflang} aria-current={item.id === page.id ? 'page' : undefined}>
+            {item.label}
+          </a>
+        ))
+      }
     </nav>
 
-    <div class="tools">
+    <div class="head-cta">
+      <a class="login" href={links.businessApp}>{t('nav.login')}</a>
       <LangSwitch page={page} locale={locale} />
-      <a class="tz-btn tz-btn-brand cta" href={href('contact')}>{t('nav.cta')}</a>
+      <a class="tz-btn tz-btn-brand start" href={start.href} hreflang={start.hreflang}>
+        {t('nav.start')}<Icon name="arrow" size={18} />
+      </a>
       <details class="narrow">
         <summary aria-label={t('nav.menu')}><Icon name="menu" size={22} /></summary>
         <ul>
-          {nav.map((item) => (
-            <li>
-              <a href={href(item.id)} aria-current={item.id === page.id ? 'page' : undefined}>
-                {item.label}
-              </a>
-            </li>
-          ))}
-          <li><a href={href('contact')} class="strong">{t('nav.cta')}</a></li>
+          {
+            nav.map((item) => (
+              <li>
+                <a href={item.href} hreflang={item.hreflang} aria-current={item.id === page.id ? 'page' : undefined}>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+          <li><a href={links.businessApp}>{t('nav.login')}</a></li>
         </ul>
       </details>
     </div>
@@ -67,85 +73,80 @@ const nav = [
 </header>
 
 <style>
-  .bar {
+  .site-head {
     position: sticky;
     top: 0;
     z-index: var(--z-sticky);
-    border-bottom: 1px solid var(--line);
-    background: var(--bg);
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    backdrop-filter: saturate(1.6) blur(14px);
   }
 
-  .inner {
+  .head-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4);
-    max-width: 1120px;
+    gap: 32px;
+    max-width: 1200px;
+    height: 68px;
     margin: 0 auto;
-    padding: var(--space-3) var(--space-4);
+    padding-inline: 24px;
   }
 
   .brand {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
     color: var(--ink);
     text-decoration: none;
-    font: 600 20px/24px var(--font-display);
+    font: 700 24px/1 var(--font-display);
+    letter-spacing: -0.02em;
   }
 
   .brand b {
-    color: var(--brand);
+    color: var(--brand-mark);
+    font: inherit;
   }
 
-  .mark {
-    width: 32px;
-    height: 32px;
-  }
-
-  ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .wide {
-    display: none;
-  }
-
-  .wide ul {
+  .nav {
     display: flex;
-    gap: var(--space-1);
+    gap: 4px;
   }
 
-  .wide a,
+  .nav a,
   .narrow a {
     display: block;
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    border-radius: 999px;
     color: var(--ink-2);
     text-decoration: none;
-    font: var(--type-label);
+    font: 500 15px/20px var(--font-sans);
   }
 
-  .wide a:hover,
-  .narrow a:hover,
-  a[aria-current='page'] {
-    background: var(--surface-sunken);
+  .head-cta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-left: auto;
+  }
+
+  .login {
+    color: var(--ink-2);
+    text-decoration: none;
+    font: 500 15px/20px var(--font-sans);
+  }
+
+  .login:hover {
     color: var(--ink);
   }
 
-  .tools {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-  }
-
-  .cta {
-    display: none;
+  .start {
+    gap: 6px;
+    text-decoration: none;
+    min-height: 40px;
+    padding: 0 16px;
+    border-radius: 12px;
+    font-weight: 600;
   }
 
   .narrow {
+    display: none;
     position: relative;
   }
 
@@ -155,7 +156,7 @@ const nav = [
     width: var(--tap-min);
     height: var(--tap-min);
     border: 1px solid var(--line-control);
-    border-radius: var(--radius-md);
+    border-radius: 12px;
     background: var(--surface);
     color: var(--ink);
     cursor: pointer;
@@ -169,32 +170,64 @@ const nav = [
   .narrow ul {
     position: absolute;
     inset-inline-end: 0;
-    top: calc(100% + var(--space-2));
+    top: calc(100% + 8px);
     z-index: var(--z-nav);
+    display: grid;
+    gap: 2px;
     min-width: 220px;
-    padding: var(--space-2);
+    margin: 0;
+    padding: 8px;
+    list-style: none;
     border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
+    border-radius: 16px;
     background: var(--surface);
     box-shadow: var(--shadow-pop);
   }
 
-  .narrow .strong {
-    color: var(--ink);
-    font-weight: 600;
+  .narrow a {
+    border-radius: 10px;
   }
 
-  @media (width >= 960px) {
-    .wide {
-      display: block;
-    }
+  .nav a:hover,
+  .narrow a:hover,
+  a[aria-current='page'] {
+    background: var(--surface-sunken);
+    color: var(--ink);
+  }
 
-    .narrow {
+  @media (width <= 1100px) {
+    .nav {
       display: none;
     }
 
-    .cta {
-      display: inline-flex;
+    .narrow {
+      display: block;
+    }
+  }
+
+  @media (width <= 760px) {
+    .head-row {
+      gap: 12px;
+      height: 60px;
+      padding-inline: 16px;
+    }
+
+    .head-cta {
+      gap: 8px;
+    }
+
+    .login {
+      display: none;
+    }
+
+    .start {
+      padding: 0 12px;
+    }
+  }
+
+  @media (width <= 400px) {
+    .start :global(.tz-ico) {
+      display: none;
     }
   }
 </style>
