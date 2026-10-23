@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/todayz/backend/internal/platform/clock"
-	"github.com/todayz/backend/internal/platform/queue"
+	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 )
 
 // domains is the 07 W0-03 list; internal/seed has the same test.
@@ -51,9 +51,13 @@ func TestSQLCPackagePerDomain(t *testing.T) {
 }
 
 func TestRegisterAddsPlatformJobs(t *testing.T) {
-	r := queue.NewRegistry()
+	r := platformjobs.NewRegistry()
 	Register(r, Deps{Clock: clock.NewFake(clock.Real{}.Now())})
-	require.Contains(t, r.Kinds(), "platform.heartbeat")
-	require.Contains(t, r.Kinds(), "platform.maintenance")
-	require.GreaterOrEqual(t, len(r.Periodic), 2, "the two platform jobs, plus any a domain adds")
+	names := r.Names()
+	for _, k := range []string{"platform_heartbeat", "platform_maintenance", "jobs_watchdog", "job_runs_retention"} {
+		require.Contains(t, names, k)
+		sched, ok := r.ScheduleOf(k)
+		require.True(t, ok, "%s is scheduled", k)
+		require.NotNil(t, sched)
+	}
 }

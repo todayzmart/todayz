@@ -17,6 +17,7 @@ type Registry struct {
 	mu    sync.Mutex
 	kinds map[string]*entry
 	order []string
+	mon   *monitor // set by NewRunner in the worker; nil elsewhere
 }
 
 type entry struct {
@@ -177,6 +178,22 @@ func (r *Registry) entry(name string) (*entry, bool) {
 	e, ok := r.kinds[name]
 	return e, ok
 }
+
+func (r *Registry) setMonitor(m *monitor) {
+	r.mu.Lock()
+	r.mon = m
+	r.mu.Unlock()
+}
+
+func (r *Registry) monitor() *monitor {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.mon
+}
+
+// MissedKinds lists the scheduled kinds the watchdog currently sees as
+// missed (tz_job_missed = 1) in this process; empty outside the worker.
+func (r *Registry) MissedKinds() []string { return r.monitor().missedKinds() }
 
 // DefaultQueue is the River queue a kind with no Queue uses.
 const DefaultQueue = "default"

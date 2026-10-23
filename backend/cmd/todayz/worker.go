@@ -13,6 +13,7 @@ import (
 	"github.com/todayz/backend/internal/jobs"
 	"github.com/todayz/backend/internal/platform/health"
 	"github.com/todayz/backend/internal/platform/httpx"
+	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/lifecycle"
 	"github.com/todayz/backend/internal/platform/migrate"
 	"github.com/todayz/backend/internal/platform/pgnotify"
@@ -48,17 +49,6 @@ func runWorker(ctx context.Context, getenv func(string) string, out io.Writer) e
 	}
 	defer lifecycle.Step(ctx, a.log, "background loops", stopLoops)
 
-	reg := queue.NewRegistry()
-	jobs.Register(reg, jobs.Deps{Pool: pool, Clock: clk, Settings: st, Config: a.cfg, Log: a.log})
-	var riverTime rivertype.TimeGenerator
-	if off != nil {
-		riverTime = off // local/test: River follows /v1/test/clock
-	}
-	c, err := queue.NewWorkerClient(pool, reg, queue.Options{Log: a.log, Time: riverTime})
-	if err != nil {
-		return err
-	}
-
 	// tz_queue_depth and tz_queue_oldest_available_age_seconds, read from river_job at each scrape (W1-07).
 	unregQueue, err := telemetry.RegisterQueue(nil, pool, clk.Now)
 	if err != nil {
@@ -77,6 +67,28 @@ func runWorker(ctx context.Context, getenv func(string) string, out io.Writer) e
 		health.MigrationsCheck(m),
 		{Name: "river", Fn: func(ctx context.Context) error { return queue.Check(ctx, pool, &qh) }},
 	}}
+
+	// Every kind is declared through jobs.Define (D-95) and worked through
+	// the jobs middleware; the runner also schedules the scheduled kinds.
+	kinds := platformjobs.NewRegistry()
+	jobs.Register(kinds, jobs.Deps{Pool: pool, Clock: clk, Settings: st, Config: a.cfg, Log: a.log})
+	runner, err := platformjobs.NewRunner(kinds, platformjobs.RunnerOptions{
+		Pool: pool, Clock: clk, Log: a.log, Draining: ready.Draining,
+	})
+	if err != nil {
+		return err
+	}
+	defer runner.Close()
+	reg := queue.NewRegistry()
+	runner.Register(reg)
+	var riverTime rivertype.TimeGenerator
+	if off != nil {
+		riverTime = off // local/test: River follows /v1/test/clock
+	}
+	c, err := queue.NewWorkerClient(pool, reg, queue.Options{Log: a.log, Time: riverTime})
+	if err != nil {
+		return err
+	}
 	r := chi.NewRouter()
 	health.Register(r, ready, health.Options{Version: true}) // the internal port: /version in every env
 	srv := httpx.NewServer(a.cfg.WorkerAddr, r)
@@ -85,7 +97,8 @@ func runWorker(ctx context.Context, getenv func(string) string, out io.Writer) e
 		return err
 	}
 	qh.Watch(c)
-	a.log.InfoContext(ctx, "worker started", slog.Int("kinds", len(reg.Kinds())), slog.Int("periodic", len(reg.Periodic)))
+	go runner.RunScheduler(ctx, c) // stops with the signal; idle while draining
+	a.log.InfoContext(ctx, "worker started", slog.Int("kinds", len(reg.Kinds())))
 
 	return serveWorker(ctx, a.log, lifecycle.Server{Srv: srv, Ready: ready}, c, queue.DrainGrace, queue.HardGrace)
 }

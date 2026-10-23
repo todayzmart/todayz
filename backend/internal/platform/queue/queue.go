@@ -2,8 +2,10 @@
 // the same transaction as the change that needs them.
 //
 // The worker process builds a full client from a Registry; the API builds an
-// insert-only client. Domains add their workers and periodic jobs through
-// internal/jobs (one file per domain).
+// insert-only client. Domains declare job kinds with jobs.Define
+// (internal/platform/jobs) through internal/jobs (one file per domain); the
+// jobs platform registers the workers here and schedules the scheduled kinds
+// itself (no River periodic jobs).
 //
 // Role contract: River's tables are created by the migrations (as
 // todayz_owner); the services run River as todayz_app with DML only. River's
@@ -16,7 +18,6 @@ import (
 	"fmt"
 	"log/slog"
 	"sync/atomic"
-	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -37,30 +38,49 @@ type JobArgs = river.JobArgs
 // Worker is river.Worker.
 type Worker[T river.JobArgs] = river.Worker[T]
 
-// Registry collects workers and periodic jobs before the client is built.
+// Registry collects workers and named queues before the client is built.
+// Every worker comes from a jobs.Define declaration (internal/platform/jobs
+// registers them here); a lint test refuses river.AddWorker, periodic jobs
+// and Add anywhere else outside tests.
 type Registry struct {
-	Workers  *river.Workers
-	Periodic []*river.PeriodicJob
-	kinds    []string
+	Workers *river.Workers
+	kinds   []string
+	queues  map[string]int
 }
 
 // NewRegistry returns an empty registry.
-func NewRegistry() *Registry { return &Registry{Workers: river.NewWorkers()} }
+func NewRegistry() *Registry { return &Registry{Workers: river.NewWorkers(), queues: map[string]int{}} }
 
-// Add registers a worker for its job kind.
+// Add registers a worker for its job kind. Only tests and the jobs platform
+// call it (the registry lint test); domains declare kinds with jobs.Define.
 func Add[T river.JobArgs](r *Registry, w river.Worker[T]) {
 	river.AddWorker(r.Workers, w)
 	var zero T
 	r.kinds = append(r.kinds, zero.Kind())
 }
 
-// Every adds a periodic job that also runs once when the worker starts.
-func (r *Registry) Every(d time.Duration, args func() river.JobArgs) {
-	r.Periodic = append(r.Periodic, river.NewPeriodicJob(
-		river.PeriodicInterval(d),
-		func() (river.JobArgs, *river.InsertOpts) { return args(), nil },
-		&river.PeriodicJobOpts{RunOnStart: true},
-	))
+// AddArgs registers w for the kind named by args.Kind() (river.AddWorkerArgs):
+// the jobs platform uses one args type for every kind.
+func AddArgs[T river.JobArgs](r *Registry, args T, w river.Worker[T]) {
+	river.AddWorkerArgs(r.Workers, args, w)
+	r.kinds = append(r.kinds, args.Kind())
+}
+
+// DefaultNamedQueueWorkers is how many jobs a named (non-default) queue works
+// at once.
+const DefaultNamedQueueWorkers = 5
+
+// AddQueue makes the worker client fetch from the named queue too, with
+// maxWorkers (DefaultNamedQueueWorkers when 0). The default queue is always
+// configured.
+func (r *Registry) AddQueue(name string, maxWorkers int) {
+	if name == "" || name == river.QueueDefault {
+		return
+	}
+	if maxWorkers <= 0 {
+		maxWorkers = DefaultNamedQueueWorkers
+	}
+	r.queues[name] = maxWorkers
 }
 
 // Kinds lists the registered job kinds.
@@ -101,8 +121,10 @@ func NewWorkerClient(pool *pgxpool.Pool, reg *Registry, o Options) (*Client, err
 	}
 	cfg := baseConfig(o)
 	cfg.Queues = map[string]river.QueueConfig{river.QueueDefault: {MaxWorkers: o.MaxWorkers}}
+	for name, n := range reg.queues {
+		cfg.Queues[name] = river.QueueConfig{MaxWorkers: n}
+	}
 	cfg.Workers = reg.Workers
-	cfg.PeriodicJobs = reg.Periodic
 	f := newInflight(o.MeterProvider) // lets Drain name the jobs it hard-cancels
 	cfg.Middleware = append(cfg.Middleware, f)
 	c, err := river.NewClient(riverpgxv5.New(pool), cfg)
