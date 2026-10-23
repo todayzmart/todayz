@@ -17,7 +17,7 @@ Read in this order:
 | 9 | [09-infra-release.md](09-infra-release.md) | Environments, AWS and Cloudflare setup, CI/CD, secrets, launch checklist, rollback. |
 | 10 | [10-later.md](10-later.md) | Agreed TODOs that are out of v1 (catalogue scraping, billing, storefronts). |
 | 11 | [11-ai-features.md](11-ai-features.md) | AI features for retailers, consumers and admins: rules (draft then confirm), v1 picks, evals, work packages W3-10…W3-13. |
-| 12 | [12-decision-log.md](12-decision-log.md) | Why the plan says what it says: every review finding and how it was settled (D-01…D-100). If a numbered file disagrees with the log, fix the numbered file and add an entry. |
+| 12 | [12-decision-log.md](12-decision-log.md) | Why the plan says what it says: every review finding and how it was settled (D-01…D-101). If a numbered file disagrees with the log, fix the numbered file and add an entry. |
 
 The visual source of truth is the design system artifact: https://claude.ai/artifact/W91M8EtFX8zJc9SgMUygZF (v8: white page, mint wash, pastel tints, Kargul-style controls, Lucide icons, Anek + Figtree).
 
@@ -29,7 +29,7 @@ The build runs in **waves**. Inside a wave, every work package (WP) owns a disjo
 Wave 0  Foundation (1 lead agent, sequential)        repo, tooling, contracts, DB baseline, design tokens, CI, local stack
 Wave 1  Platform (8–11 agents in parallel)           auth, businesses, catalogue, search/geo, UI kit, i18n, infra, observability base, jobs platform, site
 Wave 2  Core flows (13 agents in parallel)           bookings, codes, POS, credits ledger, referrals, notifications, realtime, reviews, delivery, app screens; W2-13 gate
-Wave 3  Money, intelligence, ops, AI (15 agents)     payouts, fraud rules, demand insights, voice, AI features, admin pulse, dashboards, alerts, field agents, jobs and system consoles; W3-14 E2E gate
+Wave 3  Money, intelligence, ops, AI (16 agents)     payouts, fraud rules, demand insights, voice, AI features, admin pulse, dashboards, alerts, field agents, jobs and system consoles, ask shops nearby; W3-14 E2E gate
 Wave 4  Hardening (6–8 agents)                       full E2E, load, security, accessibility, translations, manual QA, local release candidate
 Wave 5  Cloud (after the user hands over credentials) AWS + Cloudflare provisioning, staging, prod, launch
 ```

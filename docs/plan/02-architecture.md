@@ -111,7 +111,9 @@ backend/
 │   ├── identity/              users, phone identities, sessions, OTP, devices, admin TOTP + recovery codes, account deletion hooks
 │   ├── business/              businesses, stores, staff, KYC, business documents, onboarding, settings, QR standee
 │   ├── catalogue/             master products, store items, batches, stock movements, catalogue_changes, imports, review queue
-│   ├── search/                geo + text search, ranking, zero-result log
+│   ├── search/                geo + text search, ranking, zero-result log, result proof (summary, badges) and the refine-chip parser (D-101)
+│   ├── asks/                  Ask shops nearby: asks, recipients, replies, store selection, demand gaps, the site search strip list (W3-16, D-101)
+│   ├── share/                 share cards: codes, preview images, the public preview (W3-16, D-101)
 │   ├── orders/                cart validation, orders, state machine, timers, codes (enc + HMAC), delivery
 │   ├── pos/                   POS sales, reversals, offline sync, bill QR, counter code
 │   ├── credits/               double-entry ledger, lots, holds, cashback, expiry, caps, adjustment requests
@@ -221,6 +223,7 @@ Every background job is a registered kind, declared with `jobs.Define(jobs.Kind{
 - `timer` kinds can never be paused or run by hand. `money` kinds need `super_admin` with step-up. Every other kind needs `admin` or above. All controls are audited (§3.3).
 - `ai` kinds write drafts only. `marketing` and `notify` kinds read their caps and quiet rules from the settings 01 defines.
 - Every job already in the plan is a registered kind with its class, owned by the same work package as before: the 05 §3 rollups, `store_reliability`, `store_rating`, `ledger_reconcile`, order timers, notifications, payouts, partition maintenance and the AI jobs.
+- D-101 adds four kinds, all owned by W3-16: `asks_close_window` (`timer`, event-triggered at each recipient's `reply_by`: closes that store's window and, after the last one, the ask; it has a runbook), `asks_retention` (`maintenance`, nightly: deletes asks older than `ask_retention_days`), and `rollup_ask_demand` and `site_marquee_build` (`rollup`, 05 §3).
 - Everything works locally under the test clock; `make demo` runs jobs so A-21 has data.
 
 ### 2.8 Graceful shutdown (D-98)
@@ -319,6 +322,9 @@ Source of truth for every role check. It covers every action used in [04-api.md]
 | business | `staff.manage_cashiers` | add and remove cashiers only (D-66) | ✓ | ✓ | – |
 | business | `store.manage` | create, edit and submit stores | ✓ | ✓ | – |
 | business | `store.settings.edit` | `S/settings`: hours, delivery, cashback, auto-accept, notifications | ✓ | ✓ | – |
+| asks | `asks.view` | `S/asks` inbox (B-20), `ask.created` on `S/stream` (D-101) | ✓ | ✓ | ✓ |
+| asks | `asks.reply` | `S/asks/{askId}/reply` (Yes or No) and `S/asks/{askId}/report`; changing the prefilled price also needs `item.price.edit`, and "Add it to your stock" needs `item.manage` | ✓ | ✓ | ✓ |
+| asks | `asks.manage` | mute or unmute asks for the store (`asksMuted` on `S/settings`, audited) | ✓ | ✓ | – |
 | business | `standee.manage` | `S/qr-standee.pdf`, `S/standees` | ✓ | ✓ | – |
 | business | `inbox.view` | business inbox (B-16), mark read | ✓ | ✓ | ✓ |
 | business | `support.tickets` | business support tickets (B-15) | ✓ | ✓ | – |
@@ -418,6 +424,8 @@ Other AI drafts ([04-api.md](04-api.md) §2.8) need, to create and to confirm, t
 | reviews | `admin.review.restore` | restore a hidden review, with reason | – | ✓ | – | – | – | ✓ | ✓ |
 | banners | `admin.banner.moderate` | A-20 queue, approve, takedown | – | ✓ | – | – | – | ✓ | ✓ |
 | risk | `admin.risk.view` | flags queue, evidence | – | ✓ | – | – | – | ✓ | ✓ |
+| demand | `admin.demand_gaps.view` | A-23 Demand gaps (aggregated, no customer) (D-101) | ✓ | – | ✓ | ✓ | – | ✓ | ✓ |
+| demand | `admin.marquee.approve` | A-23 site search strip: read the proposed list, approve or reject it per city; audited (D-101) | – | – | ✓ | – | – | ✓ | ✓ |
 | risk | `admin.risk.resolve` | clear, confirm | – | – | – | – | – | ✓ | ✓ |
 | support | `admin.support.tickets` | assign, reply, notes, close | – | ✓ | – | – | – | ✓ | ✓ |
 | jobs | `admin.jobs.view` | A-21 list, detail, runs (finance: `money` class only) | – | ✓ | – | ✓ | money | ✓ | ✓ |
@@ -457,10 +465,11 @@ No CSS framework: the design system's `bundle.css` + CSS modules for app-specifi
 
 ### 4.2 Customer app (`customer/`)
 
-- Routes: `/` home, `/search`, `/s/:storeSlug` shop, `/p/:storeItemId` product, `/cart`, `/checkout`, `/orders` (online and "In store" tabs), `/orders/:id`, `/wallet`, `/refer`, `/scan` (bill QR), `/r/:token` receipt (C-24), `/account/*`, `/help/*`, `/auth/*`.
+- Routes: `/` home, `/search`, `/s/:storeSlug` shop, `/p/:storeItemId` product, `/x/:code` share link (opens `/p/:storeItemId?ref=share`, D-101), `/asks` and `/asks/:askId` (C-26, D-101), `/cart`, `/checkout`, `/orders` (online and "In store" tabs), `/orders/:id`, `/wallet`, `/refer`, `/scan` (bill QR), `/r/:token` receipt (C-24), `/account/*`, `/help/*`, `/auth/*`.
 - Location in a store (Zustand) persisted to localStorage: lat/lng, label, source (gps/pin/manual), radius.
 - Cart in IndexedDB, one store per cart; switching store asks to clear.
-- Realtime: an SSE connection while an order is active (`/v1/me/stream`), else push notifications.
+- Realtime: an SSE connection while an order is active or an ask is open (`/v1/me/stream`, D-101), else push notifications.
+- Share link previews (D-101): `app.todayz.in/x/{code}` is served by a Cloudflare Pages Function (`customer/functions/x/[code].ts`) that returns the Open Graph tags from `GET /v1/public/share-cards/{code}` and then the app; locally the same module runs as Vite dev middleware. The preview never shows a distance.
 - Budget: initial JS ≤ 170 KB gzip; map and scanner code-split and loaded on demand.
 
 ### 4.3 Business app (`business/`)
@@ -481,13 +490,13 @@ Desktop-first, same stack, plus TanStack Table for large lists, Apache ECharts (
 
 ### 4.5 Site (`site/`)
 
-Astro (static output), the design system CSS, zero JS by default (islands only for the language switcher and the lead form). Fixes today's iframe wrapper so pages are indexable: real HTML per route, `sitemap.xml`, `robots.txt`, Open Graph images, JSON-LD (`Organization`, `SoftwareApplication`, `FAQPage`). Pages: home, for retailers, how it works, pricing ("Free for now"), about, contact, privacy, terms, and Hindi/Kannada/Telugu/Tamil versions of the home and retailer pages. Lead form posts to `POST /v1/public/leads` (Turnstile protected).
+Astro (static output), the design system CSS, zero JS by default (islands only for the language switcher, the lead form and the home search strip, D-101). Fixes today's iframe wrapper so pages are indexable: real HTML per route, `sitemap.xml`, `robots.txt`, Open Graph images, JSON-LD (`Organization`, `SoftwareApplication`, `FAQPage`). Pages: home, for retailers, how it works, pricing ("Free for now"), about, contact, privacy, terms, and Hindi/Kannada/Telugu/Tamil versions of the home and retailer pages. Lead form posts to `POST /v1/public/leads` (Turnstile protected).
 
-`verify-dist` checks the built site against an allow-list: same-origin hashed island bundles, plus the Turnstile script `https://challenges.cloudflare.com/turnstile/v0/api.js` on the lead-form page only. Any other script or remote `src` fails the check. Leads are read in the admin console on a "Leads" tab of A-03 (`GET /v1/admin/leads`, 04 §2.7).
+`verify-dist` checks the built site against an allow-list: same-origin hashed island bundles, plus the Turnstile script `https://challenges.cloudflare.com/turnstile/v0/api.js` on the lead-form page only. Any other script or remote `src` fails the check. The home search strip island (D-101) fetches `GET /v1/public/site-marquee?city=` from the API origin, so the home pages add the API origin to `connect-src`; it renders the curated list when the call fails. Leads are read in the admin console on a "Leads" tab of A-03 (`GET /v1/admin/leads`, 04 §2.7).
 
 ## 5. Realtime
 
-- Server-Sent Events from the API: `GET /v1/biz/businesses/{bid}/stores/{sid}/stream` (business), `GET /v1/me/stream` (customer, active orders only), `GET /v1/admin/stream` (ops live counters).
+- Server-Sent Events from the API: `GET /v1/biz/businesses/{bid}/stores/{sid}/stream` (business), `GET /v1/me/stream` (customer, active orders and open asks, D-101), `GET /v1/admin/stream` (ops live counters).
 - Fan-out: Postgres `LISTEN/NOTIFY` per channel (`store:{id}`, `user:{id}`) so any API instance can deliver an event raised on another. Payloads are small (`{type, id, version}`); clients refetch through Query.
 - Heartbeat comment every 25 s (Cloudflare closes idle streams at 100 s). Clients reconnect with `Last-Event-ID`; the server replays from `outbox_events` (kept 24 h, SSE replay only; POS sync uses `catalogue_changes`).
 - Fallback: if SSE fails 3 times, poll every 15 s while the screen is visible.
@@ -517,6 +526,8 @@ Follows the rules for every AI feature ([11-ai-features.md](11-ai-features.md) �
 5. The app shows the draft as editable lines; the user taps **Confirm** → `POST …/ai/voice-stock/drafts/{draftId}/confirm`. Each line is checked against the user's role (§3.3, D-65); lines the user may not confirm come back disabled ("Ask a manager"). Allowed lines are applied as the matching change: `sale` → a quick POS sale with no customer (`sale_pos` movement, cashier and above), `restock` → `restock` movement, `count` → `count_correction` movement, `set_price` → price change. Per-line outcomes are recorded on the draft.
 6. The voice button is hidden (the endpoints return `404`) unless `feature_voice_enabled` and `ai_voice_stock_enabled` are both on and both keys are set; the admin console then shows "Voice: off". Audio is deleted after 7 days; transcripts kept 90 days for quality review.
 
+**Customer voice search (AI-C5, D-101)** uses the same STT client through the `voice_search` draft endpoints (`/v1/me/ai/voice-search`, 04 §2.8), but keeps no audio: it is sent to the provider and dropped (no object, `input_ref` null, no audio in logs or traces). The draft holds the transcript and its refine chips. The search runs only when the customer taps search (the confirm, with the query as edited), and only then is the query logged, exactly as a typed one. The mic is hidden unless `ai_voicesearch_enabled` is on and the key is set ([01](01-product-rules.md) §11.1).
+
 ## 9. Integrations and keys
 
 ### 9.1 Providers
@@ -533,7 +544,7 @@ Follows the rules for every AI feature ([11-ai-features.md](11-ai-features.md) �
 | Web push | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Push | Mock push | In-app inbox |
 | Turnstile | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | OTP send, lead form | Test keys (always pass) | Stricter rate limits |
 | Storage (R2) | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_IMAGES` | Images, voice audio, exports | MinIO | — |
-| STT | `SARVAM_API_KEY` | Voice | Mock (own key optional) | Voice hidden |
+| STT | `SARVAM_API_KEY` | Voice stock update; customer voice search (AI-C5, D-101) | Mock (own key optional) | Voice hidden |
 | LLM | `ANTHROPIC_API_KEY` | Voice and every AI feature in 11 | Mock with recorded responses (own key optional) | AI entry points hidden |
 | Sentry | `SENTRY_DSN` (+ per app `VITE_SENTRY_DSN`) | Errors | Off; errors go to local Grafana/Loki | Logs only |
 | Grafana Cloud | `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_HEADERS` | Metrics/logs/traces | Local LGTM container | — |

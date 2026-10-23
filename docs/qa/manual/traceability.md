@@ -4,11 +4,11 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 
 ## 1. Coverage
 
-- **Steps:** 1102 in 31 script files (245 marked ★ for the production smoke and short runs). Counted by scanning every step row of the book.
-- **08 scenario IDs:** 264 of 287 covered by manual steps (255 numbered IDs and ranges plus 32 SC families); 23 automated only; 0 not covered.
-- **R-IDs (01):** 144 of 144 have at least one step (an R-ID is the 01 section number and bullet number, for example R-5.30).
-- **06 screens:** 67 of 67.
-- **Problem codes and HTTP statuses:** 42 of 42 named by at least one step (30 codes registered in 04 §1.4 and 12 HTTP statuses).
+- **Steps:** 1168 in 32 script files (280 marked ★ for the production smoke and short runs). Counted by scanning every step row of the book.
+- **08 scenario IDs:** 285 of 309 covered by manual steps (276 numbered IDs and ranges plus 33 SC families); 24 automated only; 0 not covered.
+- **R-IDs (01):** 170 of 170 have at least one step (an R-ID is the 01 section number and bullet number, for example R-5.30).
+- **06 screens:** 72 of 72.
+- **Problem codes and HTTP statuses:** 48 of 48 named by at least one step (36 codes registered in 04 §1.4 and 12 HTTP statuses).
 
 | File | Steps |
 |---|---|
@@ -30,6 +30,7 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 | [OFFER-offers-banners.md](OFFER-offers-banners.md) | 31 |
 | [STOCK-stock-catalogue.md](STOCK-stock-catalogue.md) | 31 |
 | [INSIGHT-demand-insights.md](INSIGHT-demand-insights.md) | 52 |
+| [ASK-ask-shops-nearby.md](ASK-ask-shops-nearby.md) | 66 |
 | [NOTIFY-notifications.md](NOTIFY-notifications.md) | 32 |
 | [PERM-permissions-matrix.md](PERM-permissions-matrix.md) | 32 |
 | [SEC-security.md](SEC-security.md) | 40 |
@@ -43,7 +44,7 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 | [PERF-performance.md](PERF-performance.md) | 16 |
 | [FAIL-failure-modes.md](FAIL-failure-modes.md) | 20 |
 | [end-to-end-acceptance.md](end-to-end-acceptance.md) | 45 |
-| **Total** | **1102** |
+| **Total** | **1168** |
 
 **Recount, 2026-10-22.** The counts above come from scanning the files, not from adding to the old totals. A step is a table row whose first cell is a step ID (`MQ-NN.nn`, `<AREA>-M.nn`, `ACC-nn`, with an optional letter suffix such as 13a). Where the scan and the earlier stated totals differed:
 
@@ -54,6 +55,7 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 - The Demand insights review fixes (D-99) rewrote the INSIGHT script as 52 steps (+8), so the total is 1102 and the starred steps are 245 (the INSIGHT script has 8). The 08 scenario list grew by IN-25 to IN-28 (255 numbered IDs, 287 with the 32 SC families); IN-28 is automated only (23 in all). The INSIGHT step numbers changed throughout, so every row in sections 2 to 6 that cited INSIGHT steps was regenerated from the scan. Round 3 of the same work (a sale skips expired batches, the batch edit, the pair rollup, the named seed cells and the 11th regular customer) changed step text only: the INSIGHT script keeps its 52 steps and 8 starred, the totals above stand, and the only citation that moved is M.51 now naming INSIGHT-M.36, so the IN rows needed no regeneration.
 - Eight scenario IDs in 08 had no row in section 2 (BK-61 to BK-65, PO-04, RV-01, AI-01), so the earlier "0 not covered" was not checked against 08. They now have rows, each backed by a step that names the ID. BK-65 is covered only at midnight and by the B-14 toggle (TIMER-M.39), AI-01 only for the customer scope (MQ-11.43).
 - Section 5 was recounted too. The four codes `claim_already_used`, `job_not_runnable`, `job_already_running` and `job_paused` had no row; they do now. The HTTP status rows used to list a curated subset of steps; they now list every step that names the status.
+- Ask shops nearby (D-101) added the ASK script: 66 steps, 35 of them ★, so the total is 1168 and the starred steps are 280. The 08 scenario list grew by ASK-01 to ASK-20 and E2E-21 (276 numbered IDs, 309 with SC-ASK); ASK-20 is automated only (24 in all). 01 gained §11.1 to §11.3, two §15 rows, four §16 bullets and a §17 key group: 26 new R-IDs, so 170. R-11.8 to R-11.26 continue the §11 numbering through the bullets of §11.1 to §11.3; where two short bullets share one ID the Rule column names both. 06 gained C-25, C-26, B-20, A-23 and S-07 (72), and 04 §1.4 gained six codes (48 with the statuses).
 
 ## 2. 08 scenario IDs
 
@@ -252,6 +254,26 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 | IN-26 | I | INSIGHT-M.20, INSIGHT-M.32 |
 | IN-27 | I,E | INSIGHT-M.17, INSIGHT-M.38 |
 | IN-28 | I | automated only — the write path of `search_log.product_id` has no screen: its only visible effect is the Wanted nearby and Missed sales counts after the nightly rollup, and the seed already runs the rollups once (`<seed:insights-SL2>`); the match rules (exact barcode, exact normalised name or a synonym) are integration tests |
+| ASK-01 | I,E | ASK-M.01, ASK-M.02, ASK-M.03, ASK-M.43, ASK-M.45, ASK-M.66 |
+| ASK-02 | I | ASK-M.02, ASK-M.26, ASK-M.37, ASK-M.43 |
+| ASK-03 | I,E | ASK-M.04, ASK-M.06, ASK-M.50, ASK-M.65, ASK-M.66 |
+| ASK-04 | U,I | ASK-M.05, ASK-M.27, ASK-M.28 |
+| ASK-05 | I | ASK-M.02, ASK-M.30, ASK-M.38, ASK-M.48 |
+| ASK-06 | I,E | ASK-M.29, ASK-M.34, ASK-M.35, ASK-M.36, ASK-M.44 |
+| ASK-07 | I | ASK-M.31, ASK-M.33, ASK-M.47 |
+| ASK-08 | I,E | ASK-M.32, ASK-M.39, ASK-M.40, ASK-M.41, ASK-M.42 |
+| ASK-09 | I | ASK-M.07, ASK-M.08, ASK-M.10 |
+| ASK-10 | U,I | ASK-M.07, ASK-M.09 |
+| ASK-11 | U | ASK-M.12, ASK-M.13, ASK-M.14 |
+| ASK-12 | I,E | ASK-M.07, ASK-M.10, ASK-M.11, ASK-M.33 |
+| ASK-13 | I | ASK-M.46, ASK-M.49, ASK-M.50, ASK-M.51 |
+| ASK-14 | I,E | ASK-M.52, ASK-M.53, ASK-M.54 |
+| ASK-15 | I,E | ASK-M.19, ASK-M.20, ASK-M.21, ASK-M.23, ASK-M.25 |
+| ASK-16 | I | ASK-M.22 |
+| ASK-17 | I,E | ASK-M.15, ASK-M.16, ASK-M.17 |
+| ASK-18 | I | ASK-M.56, ASK-M.57, ASK-M.58 |
+| ASK-19 | I,E | ASK-M.59, ASK-M.60, ASK-M.61, ASK-M.62 |
+| ASK-20 | I | automated only — an ask with no Yes adds to the nightly Wanted nearby and Missed sales counts behind the k ≥ 10 floor, so one tester's search and ask never show on a screen; counting a search and an ask once within the hour is an integration test of `rollup_ask_demand` (08 ASK-20) |
 | PL-01 | U | SEC-M.37 |
 | PL-02 | U,I | SEC-M.35, SEC-M.38, I18N-M.08, FAIL-M.12 |
 | PL-03 | I | MQ-12.21, MQ-12.22 |
@@ -273,6 +295,7 @@ Every 08 scenario ID, every 01 rule (R-ID), every 06 screen and every problem co
 | E2E-13 | W3 | MQ-11.09, MQ-11.10 |
 | E2E-14 | W3 | MQ-11.25, MQ-11.26, MQ-11.27, OFFER-M.07 |
 | E2E-15…20 |  | I18N-M.12 |
+| E2E-21 | W3 | ASK-M.26, ASK-M.28, ASK-M.29, ASK-M.32, ASK-M.34, ASK-M.36, ASK-M.38, ASK-M.39, ASK-M.41 |
 | OB-01 | I | MQ-12.11, MQ-12.12, MQ-12.13, MQ-12.14, PERF-M.14, ACC-43 |
 | OB-02 | I | MQ-10.19, MQ-11.11, MQ-12.16, MQ-12.17, MQ-12.18, MQ-12.19, MQ-12.20, INSIGHT-M.26, PERF-M.14, ACC-43 |
 | OB-03 | I | MQ-12.15, PERF-M.11 |
@@ -352,6 +375,7 @@ Family coverage counts every step that names the family or any ID with its prefi
 | SC-JB | 18 | JOBS-M.01, JOBS-M.03, JOBS-M.04, JOBS-M.05, JOBS-M.06, JOBS-M.07 (+12 more) |
 | SC-OPS | 7 | JOBS-M.01, JOBS-M.02, JOBS-M.21, JOBS-M.22, JOBS-M.23, JOBS-M.24 (+1 more) |
 | SC-GS | 8 | JOBS-M.26, JOBS-M.27, JOBS-M.28, JOBS-M.29, JOBS-M.30, JOBS-M.31 (+2 more) |
+| SC-ASK | 61 | ASK-M.01, ASK-M.02, ASK-M.03, ASK-M.04, ASK-M.05, ASK-M.06 (+55 more) |
 | SC-E2E | 43 | MQ-03.47, MQ-03.50, MQ-05.20, MQ-05.32, MQ-05.35, MQ-05.36 (+37 more) |
 
 ## 3. Rules (R-IDs from 01)
@@ -464,6 +488,25 @@ Family coverage counts every step that names the family or any ID with its prefi
 | R-11.5 | score and sort | TIMER-M.30, OFFER-M.22, OFFER-M.23, STOCK-M.11 |
 | R-11.6 | has offer | OFFER-M.21 |
 | R-11.7 | zero results | MQ-01.26, ADMIN-M.04 |
+| R-11.8 | freshness label "Confirmed … ago" (§11.1) | ASK-M.07, ASK-M.11, ASK-M.33 |
+| R-11.9 | badges, at most one per card (§11.1) | ASK-M.07, ASK-M.09 |
+| R-11.10 | summary line "Checked N shops nearby" (§11.1) | ASK-M.07, ASK-M.08, ASK-M.10 |
+| R-11.11 | refine chips, parser first (§11.1) | ASK-M.12, ASK-M.13, ASK-M.14 |
+| R-11.12 | voice search, AI-C5 (§11.1) | ASK-M.19, ASK-M.20, ASK-M.21, ASK-M.22, ASK-M.23, ASK-M.24 |
+| R-11.13 | share link and preview (§11.1) | ASK-M.15, ASK-M.16, ASK-M.17, ASK-M.18 |
+| R-11.14 | ask: where it starts, who can ask, the ask (§11.2) | ASK-M.01, ASK-M.02, ASK-M.03, ASK-M.10, ASK-M.11, ASK-M.26, ASK-M.43, ASK-M.45, ASK-M.66 |
+| R-11.15 | which shops get an ask (§11.2) | ASK-M.02, ASK-M.04, ASK-M.06, ASK-M.26, ASK-M.43, ASK-M.50, ASK-M.65, ASK-M.66 |
+| R-11.16 | what the shop sees: distance band only (§11.2) | ASK-M.05, ASK-M.27, ASK-M.28 |
+| R-11.17 | the reply: Yes, No, price, stock confirm (§11.2) | ASK-M.29, ASK-M.30, ASK-M.31, ASK-M.34, ASK-M.35, ASK-M.36, ASK-M.37, ASK-M.44, ASK-M.47, ASK-M.48 |
+| R-11.18 | what the customer sees (§11.2) | ASK-M.05, ASK-M.32, ASK-M.38 |
+| R-11.19 | booking from a reply (§11.2) | ASK-M.38, ASK-M.39, ASK-M.40, ASK-M.41, ASK-M.42 |
+| R-11.20 | when an ask closes (§11.2) | ASK-M.02, ASK-M.05, ASK-M.38, ASK-M.48 |
+| R-11.21 | unanswered demand counts once (§11.2) | ASK-M.48 |
+| R-11.22 | demand gaps, A-23 (§11.2) | ASK-M.55, ASK-M.56, ASK-M.57 |
+| R-11.23 | abuse controls: low yield, report, mute (§11.2) | ASK-M.46, ASK-M.49, ASK-M.50, ASK-M.51, ASK-M.52, ASK-M.53, ASK-M.54 |
+| R-11.24 | kept for ask_retention_days; not in v1 (§11.2) | ASK-M.28 |
+| R-11.25 | site hero line and comparison section (§11.3) | ASK-M.59, ASK-M.64 |
+| R-11.26 | site search strip (§11.3) | ASK-M.55, ASK-M.59, ASK-M.60, ASK-M.61, ASK-M.62, ASK-M.63 |
 | R-12.1 | business feature list | MQ-03.04 |
 | R-12.2 | offer kinds | MQ-11.27, OFFER-M.01, OFFER-M.04, OFFER-M.05, OFFER-M.06, OFFER-M.07, OFFER-M.08, INSIGHT-M.19 |
 | R-12.3 | offer lifecycle, limits, preview | OFFER-M.01, OFFER-M.14, OFFER-M.15, OFFER-M.16, OFFER-M.17, OFFER-M.18, OFFER-M.19 |
@@ -476,7 +519,7 @@ Family coverage counts every step that names the family or any ID with its prefi
 | R-12.10 | receipts | MQ-03.40, MQ-03.41, TIMER-M.53, TIMER-M.54, I18N-M.10, ACC-27 |
 | R-12.11 | customer purchases | MQ-03.31, MQ-03.38 |
 | R-13.1 | admin features | MQ-05.15, MQ-06.20, MQ-12.10, ADMIN-M.02, ADMIN-M.18, ADMIN-M.23, ADMIN-M.28, ACC-40, ACC-41 |
-| R-13.2 | roles | MQ-06.17, MQ-06.22, MQ-06.23, MQ-07.09, MQ-07.10, MQ-07.12, MQ-07.13, MQ-07.15, MQ-07.16, MQ-07.17 (+16 more) |
+| R-13.2 | roles | MQ-06.17, MQ-06.22, MQ-06.23, MQ-07.09, MQ-07.10, MQ-07.12, MQ-07.13, MQ-07.15, MQ-07.16, MQ-07.17 (+18 more) |
 | R-13.3 | KYC, Pulse, money settings | MQ-06.38, MQ-07.29, MQ-07.30 |
 | R-13.4 | background jobs (D-95) and System (D-97) | JOBS-M.01, JOBS-M.08, JOBS-M.14, JOBS-M.19 |
 | R-14.1 | field-agent login | MQ-05.26, ACC-01 |
@@ -492,16 +535,23 @@ Family coverage counts every step that names the family or any ID with its prefi
 | R-15.7 | referral and credits | MONEY-M.11, MONEY-M.40, NOTIFY-M.08, NOTIFY-M.09, NOTIFY-M.25 |
 | R-15.8 | payout paid | MQ-06.33, NOTIFY-M.10 |
 | R-15.9 | new review | MQ-02.51, NOTIFY-M.11 |
+| R-15.10 | new ask to the shop: push and in-app, no SMS | ASK-M.28 |
+| R-15.11 | one customer push per ask, at the first Yes | ASK-M.32, ASK-M.38 |
 | R-16.1 | minimal data, location | PWA-M.13, PWA-M.14, ADMIN-M.03 |
 | R-16.2 | phone masking | MQ-02.23, MQ-04.17, MQ-04.19, MQ-04.24, INSIGHT-M.21, PERM-M.16, ADMIN-M.15, ACC-21 |
 | R-16.3 | demand aggregated, k ≥ 10 | ADMIN-M.03, ADMIN-M.04, ACC-45 |
 | R-16.4 | coach k ≥ 10 | MQ-11.34, INSIGHT-M.02, INSIGHT-M.07, INSIGHT-M.10, INSIGHT-M.14, INSIGHT-M.23, INSIGHT-M.25 |
 | R-16.5 | H3 area count | INSIGHT-M.25, INSIGHT-M.26, INSIGHT-M.34, INSIGHT-M.44, ADMIN-M.05, ACC-45 |
 | R-16.6 | account deletion | MONEY-M.61, MONEY-M.62, MONEY-M.63 |
+| R-16.7 | asks never carry name, phone, address or exact distance | ASK-M.05, ASK-M.27, ASK-M.28, ASK-M.56 |
+| R-16.8 | search proof counts stores; share preview has no distance | ASK-M.07, ASK-M.16 |
+| R-16.9 | site strip: master names, at least 10 searchers, approved | ASK-M.58, ASK-M.60 |
+| R-16.10 | voice: audio never stored | ASK-M.22 |
 | R-17.1 | settings canonical, money keys super_admin only | MQ-07.47, MQ-07.48, MQ-07.49, MQ-07.50, MQ-07.51, MQ-07.52, MQ-12.21, MQ-12.22, INSIGHT-M.29, INSIGHT-M.30 (+9 more) |
 | R-17.2 | feature flags | MQ-04.40, MQ-04.41, MQ-04.43, OFFER-M.30 |
-| R-17.3 | AI flags, caps, models | MQ-11.01, MQ-11.02, MQ-11.03, MQ-11.04, MQ-11.05, MQ-11.43, MQ-11.44, MQ-11.46, ADMIN-M.21, FAIL-M.15 (+1 more) |
+| R-17.3 | AI flags, caps, models | MQ-11.01, MQ-11.02, MQ-11.03, MQ-11.04, MQ-11.05, MQ-11.43, MQ-11.44, MQ-11.46, ADMIN-M.21, FAIL-M.15 (+4 more) |
 | R-17.4 | client versions | PWA-M.11, PWA-M.12 |
+| R-17.5 | asks and search proof keys, floors of 10 | ASK-M.06, ASK-M.42, ASK-M.45, ASK-M.58 |
 
 ## 4. Screens (06)
 
@@ -511,13 +561,13 @@ Family coverage counts every step that names the family or any ID with its prefi
 | C-02 | Location set | 12 | MQ-01.03, MQ-01.04, MQ-01.06, MQ-01.07, MQ-01.08, MQ-01.09 (+6 more) |
 | C-03 | Home | 53 | MQ-01.10, MQ-01.11, MQ-01.12, MQ-01.13, MQ-01.14, MQ-01.15 (+47 more) |
 | C-04 | Map full screen | 3 | MQ-01.23, MQ-01.24, MQ-01.25 |
-| C-05 | Search | 24 | MQ-01.29, MQ-01.30, MQ-05.21, MQ-08.06, MQ-08.12, MQ-08.18 (+18 more) |
+| C-05 | Search | 38 | MQ-01.29, MQ-01.30, MQ-05.21, MQ-08.06, MQ-08.12, MQ-08.18 (+32 more) |
 | C-06 | Category | 1 | MQ-01.28 |
-| C-07 | Shop page | 43 | MQ-01.31, MQ-01.32, MQ-01.33, MQ-01.34, MQ-01.37, MQ-01.38 (+37 more) |
-| C-08 | Product detail | 12 | MQ-01.35, MQ-01.36, MQ-09.11, MQ-09.12, MQ-09.22, OFFER-M.02 (+6 more) |
+| C-07 | Shop page | 47 | MQ-01.31, MQ-01.32, MQ-01.33, MQ-01.34, MQ-01.37, MQ-01.38 (+41 more) |
+| C-08 | Product detail | 15 | MQ-01.35, MQ-01.36, MQ-09.11, MQ-09.12, MQ-09.22, OFFER-M.02 (+9 more) |
 | C-09 | Cart | 29 | MQ-01.36, MQ-02.04, MQ-02.05, MQ-02.06, MQ-02.07, MQ-02.08 (+23 more) |
-| C-10 | Sign-in (at checkout or from Account) | 16 | MQ-02.09, MQ-02.10, MQ-02.11, MQ-02.12, MQ-02.13, MQ-09.14 (+10 more) |
-| C-11 | Checkout | 33 | MQ-02.14, MQ-02.16, MQ-02.17, MQ-02.18, MQ-04.13b, MQ-04.14 (+27 more) |
+| C-10 | Sign-in (at checkout or from Account) | 17 | MQ-02.09, MQ-02.10, MQ-02.11, MQ-02.12, MQ-02.13, MQ-09.14 (+11 more) |
+| C-11 | Checkout | 38 | MQ-02.14, MQ-02.16, MQ-02.17, MQ-02.18, MQ-04.13b, MQ-04.14 (+32 more) |
 | C-12 | Order placed / tracking | 69 | MQ-02.20, MQ-02.28, MQ-02.29, MQ-02.30, MQ-02.32, MQ-02.33 (+63 more) |
 | C-13 | Orders list | 5 | MQ-01.39, MQ-02.44, MQ-03.31, MQ-03.38, CANCEL-M.26 |
 | C-14 | Review | 9 | MQ-02.45, MQ-02.46, MQ-02.47, MQ-02.49, MQ-02.50, MQ-02.52 (+3 more) |
@@ -529,13 +579,15 @@ Family coverage counts every step that names the family or any ID with its prefi
 | C-20 | Notifications inbox | 9 | MQ-02.32, MONEY-M.11, MONEY-M.40, NOTIFY-M.03, NOTIFY-M.18, NOTIFY-M.21 (+3 more) |
 | C-21 | Restricted state | 4 | MQ-01.39, TIMER-M.25, I18N-M.11, ACC-19 |
 | C-24 | Receipt (public) | 6 | MQ-03.41, TIMER-M.53, TIMER-M.54, SEC-M.18, I18N-M.10, ACC-27 |
+| C-25 | Ask sheet | 8 | ASK-M.01, ASK-M.03, ASK-M.04, ASK-M.26, ASK-M.43, ASK-M.45 (+2 more) |
+| C-26 | Ask progress and replies | 13 | ASK-M.01, ASK-M.02, ASK-M.04, ASK-M.05, ASK-M.26, ASK-M.27 (+7 more) |
 | B-01 | Sign-in + business picker | 8 | MQ-02.01, MQ-03.01, MQ-03.02, MQ-03.03, MQ-03.05, PERM-M.01 (+2 more) |
 | B-02 | Onboarding wizard | 16 | MQ-05.01, MQ-05.02, MQ-05.03, MQ-05.04, MQ-05.05, MQ-05.06 (+10 more) |
 | B-03 | Overview | 31 | MQ-02.01, MQ-03.03, MQ-03.04, MQ-03.08, MQ-03.58, MQ-05.22 (+25 more) |
-| B-04 | Orders | 52 | MQ-02.02, MQ-02.22, MQ-02.23, MQ-02.26, MQ-02.33, MQ-02.34 (+46 more) |
+| B-04 | Orders | 55 | MQ-02.02, MQ-02.22, MQ-02.23, MQ-02.26, MQ-02.33, MQ-02.34 (+49 more) |
 | B-05 | Sell (POS) | 48 | MQ-03.21, MQ-03.22, MQ-03.23, MQ-03.24, MQ-03.25, MQ-03.26 (+42 more) |
 | B-06 | Voice update | 8 | MQ-11.02, MQ-11.15, MQ-11.17, MQ-11.21, MQ-11.22, STOCK-M.30 (+2 more) |
-| B-07 | Stock and products | 53 | MQ-02.03, MQ-02.25, MQ-02.27, MQ-02.38, MQ-03.43, MQ-03.51 (+47 more) |
+| B-07 | Stock and products | 57 | MQ-02.03, MQ-02.25, MQ-02.27, MQ-02.38, MQ-03.43, MQ-03.51 (+51 more) |
 | B-08 | Offers and banners | 14 | OFFER-M.01, OFFER-M.17, OFFER-M.19, OFFER-M.24, OFFER-M.26, OFFER-M.28 (+8 more) |
 | B-19 | Shop coach | 7 | MQ-11.33, MQ-11.34, MQ-11.35, MQ-11.36, MQ-11.37, MQ-11.38 (+1 more) |
 | B-09 | Customers | 7 | INSIGHT-M.21, INSIGHT-M.26, PERM-M.03, PERM-M.16, PERM-M.17, SEC-M.26 (+1 more) |
@@ -543,9 +595,10 @@ Family coverage counts every step that names the family or any ID with its prefi
 | B-11 | Reviews | 11 | MQ-02.51, MQ-02.52, MQ-11.02, MQ-11.30, MQ-11.31, CANCEL-M.27 (+5 more) |
 | B-12 | Analytics | 22 | MQ-03.59, OFFER-M.19, STOCK-M.26, INSIGHT-M.07, INSIGHT-M.09, INSIGHT-M.10 (+16 more) |
 | B-13 | Stores and staff | 9 | MQ-05.42, MQ-05.44, PERM-M.03, PERM-M.08, PERM-M.09, PERM-M.11 (+3 more) |
-| B-14 | Settings | 16 | MQ-04.01, MQ-04.02, MQ-04.04, MQ-05.12, MQ-05.13, MQ-05.14 (+10 more) |
+| B-14 | Settings | 19 | MQ-04.01, MQ-04.02, MQ-04.04, MQ-05.12, MQ-05.13, MQ-05.14 (+13 more) |
 | B-15 | Help | 3 | CANCEL-M.34, PERM-M.12, ADMIN-M.25 |
 | B-16 | Notifications inbox | 13 | MQ-02.51, MQ-03.60, MQ-04.32, MQ-04.33, MQ-06.33, TIMER-M.41 (+7 more) |
+| B-20 | Asks inbox and reply | 12 | ASK-M.05, ASK-M.28, ASK-M.29, ASK-M.34, ASK-M.35, ASK-M.36 (+6 more) |
 | A-01 | Sign-in | 7 | MQ-07.01, MQ-07.03, MQ-07.04, MQ-09.25, MQ-09.26, TIMER-M.50 (+1 more) |
 | A-02 | Pulse | 10 | MQ-07.04, MQ-07.19, MQ-09.32, MQ-12.10, PERM-M.22, ADMIN-M.02 (+4 more) |
 | A-03 | Businesses | 18 | MQ-05.15, MQ-05.16, MQ-05.17, MQ-05.20, MQ-06.38, MQ-07.12 (+12 more) |
@@ -558,22 +611,24 @@ Family coverage counts every step that names the family or any ID with its prefi
 | A-10 | Referrals | 2 | MONEY-M.51, MONEY-M.52 |
 | A-11 | Payouts | 21 | MQ-06.06, MQ-06.07, MQ-06.08, MQ-06.09, MQ-06.10, MQ-06.11 (+15 more) |
 | A-12 | Reviews | 8 | MQ-07.33, CANCEL-M.27, CANCEL-M.28, CANCEL-M.29, PERM-M.22, SEC-M.27 (+2 more) |
-| A-13 | Risk | 19 | MQ-06.20, MQ-07.13, MQ-11.03, MQ-11.42, MONEY-M.21, MONEY-M.48 (+13 more) |
+| A-13 | Risk | 20 | MQ-06.20, MQ-07.13, MQ-11.03, MQ-11.42, MONEY-M.21, MONEY-M.48 (+14 more) |
 | A-14 | Support | 10 | MQ-11.03, MQ-11.39, MQ-11.40, CANCEL-M.32, CANCEL-M.33, CANCEL-M.35 (+4 more) |
 | A-15 | Field agents | 6 | MQ-05.37, MQ-07.11, PERM-M.22, PERM-M.32, ABUSE-M.07, ACC-02 |
 | A-16 | Notifications | 8 | MQ-07.53, MQ-07.55, NOTIFY-M.17, NOTIFY-M.19, NOTIFY-M.30, NOTIFY-M.31 (+2 more) |
-| A-17 | Settings | 20 | MQ-04.40, MQ-07.47, MQ-07.49, MQ-07.53, MQ-07.54, MQ-09.33 (+14 more) |
+| A-17 | Settings | 21 | MQ-04.40, MQ-07.47, MQ-07.49, MQ-07.53, MQ-07.54, MQ-09.33 (+15 more) |
 | A-18 | Admin users | 8 | MQ-07.23, MQ-07.24, MQ-07.26, MQ-07.56, MQ-07.57, MQ-07.58 (+2 more) |
 | A-19 | Audit log | 19 | MQ-06.15, MQ-06.28, MQ-07.06, MQ-07.29, MQ-07.42, TIMER-M.16 (+13 more) |
 | A-20 | Banner moderation | 4 | OFFER-M.24, OFFER-M.25, OFFER-M.28, PERM-M.22 |
-| A-21 | Jobs | 20 | PERM-M.22, JOBS-M.01, JOBS-M.02, JOBS-M.03, JOBS-M.04, JOBS-M.06 (+14 more) |
+| A-21 | Jobs | 21 | PERM-M.22, JOBS-M.01, JOBS-M.02, JOBS-M.03, JOBS-M.04, JOBS-M.06 (+15 more) |
 | A-22 | System | 6 | JOBS-M.21, JOBS-M.22, JOBS-M.23, JOBS-M.24, JOBS-M.25, JOBS-M.34 |
-| S-01 | Home | 6 | A11Y-M.05, SITE-M.01, SITE-M.02, SITE-M.13, SITE-M.16, SITE-M.18 |
+| A-23 | Demand | 3 | ASK-M.56, ASK-M.57, ASK-M.60 |
+| S-01 | Home | 8 | A11Y-M.05, SITE-M.01, SITE-M.02, SITE-M.13, SITE-M.16, SITE-M.18 (+2 more) |
 | S-02 | For retailers | 6 | SITE-M.02, SITE-M.04, SITE-M.07, SITE-M.09, SITE-M.13, SITE-M.16 |
 | S-03 | How it works / Pricing ("Free for now") / About / Contact | 1 | SITE-M.05 |
 | S-04 | Legal | 3 | SITE-M.02, SITE-M.06, SITE-M.13 |
 | S-05 | Localised home + retailers | 1 | SITE-M.11 |
 | S-06 | SEO | 3 | SITE-M.12, SITE-M.13, SITE-M.14 |
+| S-07 | Home search sections | 3 | ASK-M.59, ASK-M.61, ASK-M.63 |
 
 ## 5. Problem codes and HTTP statuses
 
@@ -581,7 +636,7 @@ A step counts for a code or status when its text names it (currency amounts such
 
 | Code or status | Steps | First steps |
 |---|---|---|
-| `invalid_transition` | 15 | MQ-02.31, MQ-02.37, MQ-06.31, MQ-12.03, TIMER-M.04, TIMER-M.14 (+9 more) |
+| `invalid_transition` | 17 | MQ-02.31, MQ-02.37, MQ-06.31, MQ-12.03, TIMER-M.04, TIMER-M.14 (+11 more) |
 | `idempotency_mismatch` | 3 | MQ-06.30, SEC-M.32, FAIL-M.04 |
 | `insufficient_stock` | 3 | STOCK-M.20, STOCK-M.21, I18N-M.08 |
 | `store_closed` | 7 | TIMER-M.34, TIMER-M.36, TIMER-M.37, TIMER-M.38, TIMER-M.39, I18N-M.08 (+1 more) |
@@ -599,7 +654,7 @@ A step counts for a code or status when its text names it (currency amounts such
 | `approver_is_requester` | 1 | MQ-07.41 |
 | `otp_locked` | 2 | SEC-M.01, ABUSE-M.03 |
 | `otp_expired` | 1 | TIMER-M.47 |
-| `account_blocked` | 2 | SEC-M.07, ADMIN-M.17 |
+| `account_blocked` | 3 | SEC-M.07, ADMIN-M.17, ASK-M.03 |
 | `step_up_required` | 4 | MQ-06.26, MQ-07.49, ADMIN-M.27, JOBS-M.20 |
 | `price_changed` | 3 | CANCEL-M.07, OFFER-M.18, STOCK-M.22 |
 | `below_credit_minimum` | 4 | MONEY-M.03, MONEY-M.04, OFFER-M.12, I18N-M.08 |
@@ -611,22 +666,28 @@ A step counts for a code or status when its text names it (currency amounts such
 | `job_not_runnable` | 1 | JOBS-M.11 |
 | `job_already_running` | 1 | JOBS-M.10 |
 | `job_paused` | 1 | JOBS-M.12 |
+| `ask_limit_reached` | 1 | ASK-M.45 |
+| `ask_already_open` | 1 | ASK-M.01 |
+| `ask_no_shops` | 1 | ASK-M.65 |
+| `ask_store_unavailable` | 2 | ASK-M.06, ASK-M.50 |
+| `ask_closed` | 1 | ASK-M.48 |
+| `price_above_mrp` | 2 | ASK-M.29, ASK-M.34 |
 | 401 | 5 | MQ-07.02, SEC-M.12, SEC-M.13, SEC-M.35, ADMIN-M.01 |
-| 403 | 56 | MQ-05.40, MQ-05.41, MQ-06.05, MQ-06.18, MQ-06.19, MQ-06.22 (+50 more) |
-| 404 | 6 | MQ-11.04, CANCEL-M.22, NOTIFY-M.22, SEC-M.14, SEC-M.15, SEC-M.36 |
+| 403 | 60 | MQ-05.40, MQ-05.41, MQ-06.05, MQ-06.18, MQ-06.19, MQ-06.22 (+54 more) |
+| 404 | 7 | MQ-11.04, CANCEL-M.22, NOTIFY-M.22, SEC-M.14, SEC-M.15, SEC-M.36 (+1 more) |
 | 405 | 1 | PERM-M.12 |
-| 409 | 31 | MQ-02.31, MQ-02.37, MQ-02.48, MQ-02.50, MQ-04.13b, MQ-04.42 (+25 more) |
+| 409 | 38 | MQ-02.31, MQ-02.37, MQ-02.48, MQ-02.50, MQ-04.13b, MQ-04.42 (+32 more) |
 | 410 | 2 | STOCK-M.27, NOTIFY-M.22 |
 | 412 | 2 | SEC-M.31, SEC-M.38 |
 | 413 | 2 | NOTIFY-M.23, SEC-M.33 |
 | 421 | 1 | SEC-M.34 |
-| 422 | 11 | MQ-06.30, MQ-07.40, CANCEL-M.11, CANCEL-M.19, CANCEL-M.25, STOCK-M.04 (+5 more) |
-| 429 | 9 | MQ-11.43, TIMER-M.44, SEC-M.02, SEC-M.03, SEC-M.04, SEC-M.18 (+3 more) |
+| 422 | 14 | MQ-06.30, MQ-07.40, CANCEL-M.11, CANCEL-M.19, CANCEL-M.25, STOCK-M.04 (+8 more) |
+| 429 | 10 | MQ-11.43, TIMER-M.44, SEC-M.02, SEC-M.03, SEC-M.04, SEC-M.18 (+4 more) |
 | 503 | 3 | JOBS-M.27, FAIL-M.01, FAIL-M.12 |
 
 ## 6. Questions for the lead
 
-Each question names the steps that depend on it. Q-01 to Q-49 are resolved (D-91 to D-94 in the decision log, and the plan files named in the Status column); the steps now state the expected result. Q-50, Q-51 and Q-52 are new and open (Q-52, added with D-99, blocks no step because the "Priced above nearby" kind is off by default). If the build differs from the resolution, mark the step **B**.
+Each question names the steps that depend on it. Q-01 to Q-49 are resolved (D-91 to D-94 in the decision log, and the plan files named in the Status column); the steps now state the expected result. Q-50, Q-51 and Q-52 are new and open (Q-52, added with D-99, blocks no step because the "Priced above nearby" kind is off by default). Q-53 to Q-57 (D-101) are open founder questions; the ASK script tests the plan's default for each, so none blocks a step. Q-58 is open for the lead. If the build differs from the resolution, mark the step **B**.
 
 ### A. Disagreements between plan files (01, 02, 04, 05, 06, 08, 12)
 
@@ -676,6 +737,12 @@ Each question names the steps that depend on it. Q-01 to Q-49 are resolved (D-91
 | Q-42 | Low stock: is "at" the threshold low, or only below it (STOCK-M.09)? Is there a per-item threshold (STOCK-M.10)? | ACC-09 | Resolved: D-93 / 01 §4 |
 | Q-43 | Which code when accepting with not enough available stock (STOCK-M.21)? Is an offline sale at an old cached price flagged (STOCK-M.29)? | no step yet; affects the rule named | Resolved: D-93 / 04 §2.6, 02 §4.3 |
 | Q-47 | Many wrong order codes across orders at one store raise no risk flag in 01. Should they (ABUSE-M.05)? | ABUSE-M.05 | Resolved: D-92 / 01 §17; 07 W3-02 |
+| Q-53 | Is a replied price binding for `ask_price_valid_min` (60 min), or only indicative? The plan takes binding: booking from a Yes uses the lower of the replied and the normal price. | ASK-M.39, ASK-M.40, ASK-M.41, ASK-M.42 | Open (founder): D-101; the book tests binding |
+| Q-54 | Should shops ever pay per ask (a lead-generation fee)? The plan has none. | no step; affects the rule named (R-11.24) | Open (founder): D-101 |
+| Q-55 | Should WhatsApp delivery of asks to shops be on at launch? `ask_whatsapp_enabled` stays false. | ASK-M.28 | Open (founder): D-101; the book checks that no WhatsApp message is sent |
+| Q-56 | "Ready soonest" on search results needs a pickup prep time or delivery ETA, which no store has. Add one per store, or keep the badge to ask replies? The plan keeps it ask-only. | ASK-M.07, ASK-M.32 | Open (founder): D-101 |
+| Q-57 | May a cashier change the price in a reply? The plan says no (the 01 §3 price rule). | ASK-M.36, ASK-M.44 | Open (founder): D-101 |
+| Q-58 | A store that already answered replies again after the ask has closed: `409 invalid_transition` or `409 ask_closed`? 01 §11.2 and 04 give both codes but no order. The book tests each alone: a second reply while the ask is open (ASK-M.30) and a first reply after the window (ASK-M.48). | ASK-M.30, ASK-M.48 | Open (lead): W3-16, D-101 |
 
 ### C. Book choices to confirm
 

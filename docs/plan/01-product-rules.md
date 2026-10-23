@@ -46,6 +46,7 @@ TodayZ is free for retailers in v1. No payment gateway: customers pay the shop d
   - **manager:** everything except editing KYC or bank details, and staff management beyond adding and removing cashiers (D-66). Can view KYC masked.
   - **cashier** (D-65): sell at the POS (including voice `sale` lines), count stock, view items and orders, create voice drafts, and handle orders day to day: accept, reject, partial accept, mark ready, dispatch, mark delivered, mark delivery failed, and hand over (enter the order code). Cannot restock, record damage, change prices, give manual discounts, cancel an accepted order or reverse sales.
   - Manager and above only: cancelling an accepted order, POS reversals, manual discounts, recording damage. Customers, banners, offers, coach, review replies, batches and bulk import: owner and manager.
+  - Asks (§11.2, D-101): cashier and above read the Asks inbox, reply and report an ask (`asks.view`, `asks.reply`). Only owner and manager mute asks (`asks.manage`) or change the price on a reply (`item.price.edit`).
   - There is no way to delete a business in the app in v1; the owner asks support (D-66).
 - **Codes:** each code has one job.
   - The **business referral code** is for shop-to-shop referrals.
@@ -67,8 +68,8 @@ TodayZ is free for retailers in v1. No payment gateway: customers pay the shop d
 
   Voice and AI drafts write the ordinary source of each confirmed line; there is no `voice` source.
 - **Stock math:** on hand = sum of movements. Reservations are not movements: they live only in stock reservations, with a cached reserved count per store item. Available = on hand − reserved.
-- Customers always see freshness: "In stock · updated 12 min ago". A store item not updated for `stock_stale_after_hours` (default 72) shows "Stock not confirmed recently".
-- **What refreshes freshness (D-99):** `stock_updated_at` moves on any stock movement of the item (sale, restock, damage, expiry, count correction, reversal) and on a count that confirms the item with no change (no movement is written, only the timestamp moves). Price edits, listing changes and reservations do not refresh it. "Stock check due" (§12) uses the same moment and the same setting.
+- Customers always see freshness: "In stock · Confirmed 12 min ago" (D-101 changed the word from "updated"; the wording rules are in §11.1). A store item not updated for `stock_stale_after_hours` (default 72) shows "Stock not confirmed recently".
+- **What refreshes freshness (D-99):** `stock_updated_at` moves on any stock movement of the item (sale, restock, damage, expiry, count correction, reversal) and on a count that confirms the item with no change (no movement is written, only the timestamp moves). A **Yes** reply to an ask on a listed item refreshes it the same way, with no movement (§11.2, D-101). Price edits, listing changes and reservations do not refresh it. "Stock check due" (§12) uses the same moment and the same setting.
 - **Batches are used up as stock moves (D-99):** a batch has a received quantity, a remaining quantity, an optional `expires_on`, a received time and an optional cost per sale unit as paid (GST included). Batches are created only by stock-in that carries an expiry or a cost, and by a count that finds more than the books; there is no other way to add one. A manager or above can correct a batch's cost and expiry afterwards (`PATCH`, audited); nothing else on a batch can be edited. **A sale (`sale_pos`, `sale_online`) uses stock in this order:** (1) unexpired dated batches, earliest `expires_on` first; (2) undated batches, oldest received first; (3) stock in no batch; (4) expired batches, earliest expiry first. "Expired" means `expires_on` is before today in IST, the same test as Expired on shelf, so a sale never takes an expired unit while any unexpired stock remains. `damage`, a downward `count_correction` and the expired write-off keep the plain order: earliest `expires_on` first, ties to the oldest received, undated after dated, oldest received first, and a quantity beyond the batches comes from stock in no batch. The allocation is saved on the movement. A `pos_reversal` or a return gives the quantity back to the batches it came from. A count that finds more than the books adds a batch marked "found in count" with no expiry. The "Mark expired" write-off names its batches explicitly instead of taking the earliest. Insights read a batch's remaining quantity, never the received quantity. An item with no batches is a plain quantity.
 - Low stock threshold: per item, default `low_stock_default` = 5 units. An item is low when its quantity is at or below its threshold.
 
@@ -284,9 +285,79 @@ Keys: `ref_<kind>_referrer_credits` and `ref_<kind>_referee_credits` for each ki
 - Zero-result searches are recorded (they feed "Wanted nearby" insights).
 - Every recorded search carries a `product_id` when the query is an exact barcode or the normalised query equals a master product's name or one of its synonyms; otherwise it is empty. There is no fuzzy threshold and no setting. "Missed sales" counts only searches with a `product_id`; "Wanted nearby" groups the others by normalised query text (D-99).
 
+### 11.1 Proof on results, refine chips, voice and share (D-101)
+
+- **Freshness label.** A result card, a shop catalogue row and the product page show "Confirmed {time} ago" while the store item's `stock_updated_at` is within `stock_stale_after_hours` ("just now" under a minute, then minutes, hours or days, in the app's language). A Yes to an ask (§11.2) refreshes it and reads the same. After that the item shows "Stock not confirmed recently" (§4), unchanged.
+- **Badges.** Labels only: they never change the order of results (the score above) or the filters. A card carries at most one badge, and each badge goes to at most one card of the result page the customer sees (the first page of the current search). Ties go to the nearer store. When one card wins two badges it shows the first in the order Lowest price, Closest, Ready soonest, and the badge it does not show goes to no other card.
+  - **Closest:** the card nearest to the search location.
+  - **Lowest price:** the lowest total for the customer's chosen mode. With the Pickup chip, the item price after item-level offers. With the Delivery chip, that price plus the store's delivery fee for one unit (0 when that price reaches the store's free-delivery threshold, §5.5). With no mode chosen, each store counts with its cheaper mode: the item price when it accepts pickup, otherwise price plus fee. Credits never count. In-store-only stores (§3) never get it.
+  - **Ready soonest: not shown on search results in v1.** No store has a pickup prep time or a delivery ETA (03 `stores`), so there is nothing true to compare. It shows only among ask replies (§11.2), on the Yes with the earliest "ready by". TODO for the founder (Q-56): add a prep time per store, or keep it ask-only.
+  - The card of a store that delivers shows its fee, "+₹20 delivery", when the Delivery chip is on or the store is delivery-only (nothing when the fee is 0).
+- **Summary line.** Above the results: "Checked {N} shops nearby · {M} have it · from ₹{min}". N is the `live` stores of `verified` businesses inside the selected radius, open or closed. M is how many of them have at least one matching item in stock (they are the shops in the results). The minimum is the lowest item price after item-level offers among the results. With M = 0 the line is hidden and "Ask shops nearby" (§11.2) shows instead. It needs no k floor: it counts shops whose listings the customer can already see, not people (§16).
+- **Refine chips.** Words in a typed or spoken query that are filters become chips above the results: a top price ("under ₹200"), open now, pickup, delivery, near me, and a brand that is in the master catalogue. Each chip has a remove (×); removing it runs the search again without that filter, and the words it came from do not come back into the query. The chips map to the search filters (04 §2.3); "near me" sets "Nearest first". "Deliver by 7" sets the Delivery chip only: v1 has no delivery-time filter (TODO for the founder, D-101).
+  - A deterministic parser runs first, with patterns for all 5 languages and their digits (Latin, Devanagari, Kannada, Telugu and Tamil numerals).
+  - Only when the parser finds no chip, the query has at least `refine_ai_min_words` words, the customer is signed in and `ai_querynorm_enabled` (AI-C2) is on does the model propose chips. The call counts against `ai_daily_calls_customer`. Its output is only chips the customer sees and can remove; it never touches stock, money or orders ([11-ai-features.md](11-ai-features.md) §3).
+- **Voice search** (AI-C5). A mic in the customer search bar, shown only when `ai_voicesearch_enabled` is on, the speech provider key is set, the device is online and the customer is signed in (each use counts against `ai_daily_calls_customer`). Otherwise the mic is hidden, never shown broken.
+  - Speech goes to the speech-to-text provider (Sarvam, `SARVAM_API_URL`) in the app's language plus English, at most the voice recording length (§17 fixed constants).
+  - The transcript fills the search box. The customer can edit it, and the search runs only when they tap search: voice never submits by itself.
+  - Audio is never stored, in object storage, logs or traces. The transcript is logged only when the search runs, exactly as a typed query.
+  - At the daily cap the mic is disabled with "Voice search is used up for today. Type instead." (`429 ai_daily_cap_reached`).
+  - When the provider fails or times out, the customer sees "Voice search isn't working right now. Type instead." and the mic stays hidden for the rest of the session.
+  - The business app has no voice search in v1 (D-101).
+- **Share.** "Share" on a result card and on the product page. On Android it opens a small TodayZ sheet with WhatsApp first, then "More" (the system share sheet) and "Copy link"; elsewhere it opens the system share sheet. A web app cannot reorder the system sheet itself.
+  - Text: "{item} at {shop}, ₹{price} · TodayZ" and the link.
+  - The link is `https://app.todayz.in/x/{code}`: one share card per store item, opening that item's product page (C-08) with `ref=share`. It needs no sign-in.
+  - The link preview shows the item, the shop, the price and the shop's area (locality). It never shows a distance, which depends on the viewer. The preview image is rendered once per store item, kept in object storage and rendered again when the price changes.
+  - A share gives no reward in v1. `ref=share` is not a referral (`r=` is, §3): it only records the share and the open in events, with no PII.
+
+### 11.2 Ask shops nearby (D-101)
+
+A customer who cannot find an item in stock asks the shops near them, and the shops answer in the business app with one tap. Nobody is phoned.
+
+- **Where it starts.** (1) A search with no in-stock result, or none confirmed within `stock_stale_after_hours`: the empty or stale state offers "Ask shops nearby". (2) Every product page (C-08) offers "Ask shops nearby" for that product. (3) A shop page (C-07) offers "Ask this shop": the same flow, sent to that one store.
+- **Who can ask.** A signed-in customer (sign-in verifies the phone, §2), at most `ask_daily_limit_customer` asks per IST day (`429 ask_limit_reached`), and one open ask per product (or per normalised query text when there is no product) at a time (`409 ask_already_open`). A blocked customer cannot ask.
+- **The ask.** A master product, or free text when there is none; free text goes through the same normalisation as search (§11). A quantity (default 1) and an optional "need by": now, today or tomorrow. The customer's name and phone never go with it.
+- **Which shops get it.** `live` stores of `verified` businesses within `ask_radius_m` of the customer's search location, at most `ask_max_stores`.
+  - Left out: stores closed now (hours or manual close), stores that have already received `ask_daily_limit_store` asks this IST day, stores that have muted asks, and stores that reported this customer.
+  - Order: stores that list the product (in any stock state) first, then stores that list an item in its category, then the rest; nearest first inside each group.
+  - "Ask this shop" ignores the radius and the order but keeps every exclusion; a store that fails one refuses the ask (`409 ask_store_unavailable`).
+  - No store qualifies: `409 ask_no_shops`, and the customer sees "No shops nearby can take an ask right now."
+- **What the shop sees.** A push and a card in the new Asks inbox (B-20): the item, the quantity, "need by" and a distance band (under 1 km, 1–3 km, 3–5 km, over 5 km). Never the customer's name, phone, address or exact distance.
+- **The reply.** One tap, within `ask_reply_window_min` of the ask reaching the store; after that the ask closes for that store.
+  - **Yes**, with a price. For a listed item the price is prefilled from its listed price. Only owner and manager may change it (`item.price.edit`, the rule for prices in §3); a cashier sends the listed price. TODO for the founder (Q-57): may a cashier edit it? The price is never above the item's MRP (`422 price_above_mrp`). An optional "ready by" time, today.
+  - **No.**
+  - A Yes on a listed item confirms its stock: it refreshes `stock_updated_at` the way a count that confirms with no change does (§4), and writes no movement. When available stock is below the asked quantity the form says "You have {n}" and still allows Yes; a reply never changes stock.
+  - A Yes on an item the shop does not list offers "Add it to your stock", which opens the normal add-item form prefilled (owner and manager, `item.manage`). Nothing is created until the shop saves. On an unlisted item only owner and manager enter a price, never above the master product's MRP when it has one; a cashier's Yes on an unlisted item carries no price.
+  - Cashier and above can reply (`asks.reply`). A store answers an ask once: a second reply is `409 invalid_transition`.
+- **What the customer sees.** Live progress on the ask (C-26): "Asked 8 shops · 3 replied · best ₹38", updated over the same SSE stream as orders, with the same polling fallback (02 §5). Each Yes card shows the shop name, distance, price, "ready by" and "Replied 4 min ago"; No replies are counted, not listed. The customer gets one push for an ask, at the first Yes (§15).
+- **Booking from a reply.** "Book" on a Yes card opens the normal checkout (C-11) for that store item with the asked quantity.
+  - The replied price holds for `ask_price_valid_min` from the reply. Within it, the line's unit price for up to the asked quantity is the lower of the replied price and the price the normal pricing gives (item-level offers included), so the customer never pays more than the reply; units beyond the asked quantity use the normal price. Bill-level offers, the delivery fee and credits work as usual (§5.5, §7). TODO for the founder (Q-53): binding or only indicative; the plan takes binding.
+  - After it the card says "Price may have changed" and the booking uses the current price.
+  - A Yes without a store item (unlisted, not added yet) has no Book button until the shop adds the item; then Book follows the rule above. A Yes without a price shows "Ask the shop for the price" and books at the listed price. An in-store-only store (§3) still gets asks, since the customer can walk in; its Yes card shows "In-store only: visit the shop" and has no Book button.
+  - The order records `ask_reply_id`. Stock, availability and the store's hours are checked at placement as for any order (§5.3); a reply never reserves stock.
+- **When an ask closes.** When every store has answered, when the last reply window ends, or when the customer closes it. A closed ask takes no replies (`409 ask_closed`). Booking from a Yes stays possible while its price is valid.
+- **Unanswered demand.** An ask that got no Yes counts as one search, for each store that received it, in "Wanted nearby" and "Missed sales" (§12), so the same k ≥ 10 floors apply. If the same customer searched for the same product in the hour before the ask, the search and the ask count once.
+- **Demand gaps (admin, A-23).** A list for the field team: products asked by at least `ask_gap_min_customers` distinct customers in one city in the last `ask_gap_window_days` days with no Yes. It is aggregated, shows a count and the city, and never names or links a customer.
+- **Abuse controls.**
+  - A customer whose last `ask_low_yield_after_count` asks in a row got no Yes is not blocked, but their asks go to at most `ask_low_yield_max_stores` stores until they place a booking (any online order; a POS sale does not count).
+  - The shop can "Report this ask". It raises a `risk_flags` row with rule `ask_reported` for the customer (§13 Risk, A-13), and that store gets no more asks from that customer.
+  - Owner and manager can mute asks for a store (`asks.manage`, store setting `asks_muted`, audited). Muted stores get no asks.
+  - The usual per-IP and per-user rate limits apply (02).
+- **Kept.** Asks and their replies are kept for `ask_retention_days`, then deleted; the demand rollups keep only cells and counts.
+- **Not in v1.** WhatsApp delivery of asks to shops (`ask_whatsapp_enabled`, off; a Wave 5 option because each message costs money, Q-55). AI voice calls to shops: rejected (TRAI rules on automated calls, cost, shop goodwill, and they go around the shop's own app). Asks are free for shops; a fee per ask (lead generation) is not planned (TODO for the founder, Q-54).
+
+### 11.3 Site search sections (D-101)
+
+- **Rotating hero line** on the site home (S-01): "Just ask and find {item}". The items come from a fixed, curated list in each language's i18n bundle, not live data.
+- **"What people near you are searching for"** strip (S-07). A nightly job builds, per city, the master products searched by at least `site_marquee_min_searchers` distinct searchers (signed-in customers and anonymous devices) in the last `site_marquee_window_days` days, at most `site_marquee_max_items`. Only master product names, never free-text queries; a denylist of categories (§17 fixed constants) is applied before an admin sees the list, and the admin can leave out any product; nothing can identify a person.
+  - An admin approves the list for a city in A-23 before it shows. Anything not approved never shows.
+  - Until a city's list is approved, or when the API cannot be reached, the strip shows the curated hero list.
+  - The visitor picks the city in the strip; there is no IP location.
+- **Comparison section:** "Search engines, chatbots and directories vs TodayZ", written for India (JustDial-style directories), in the site's copy style. English source keys only; the other languages follow the i18n process.
+
 ## 12. Business app features (v1)
 
-Overview (KPI strip, sales by hour, new orders, demand insights, top items), Orders, Sell (POS), Voice update, Stock and products, Offers, Customers, Credits and referrals (credit account, statements, QR standee), Reviews, Analytics, Stores and staff, Settings (profile, hours, pickup/delivery, cashback %, auto-accept, payout details, notifications, language), Help.
+Overview (KPI strip, sales by hour, new orders, demand insights, top items), Orders, Asks (§11.2, D-101), Sell (POS), Voice update, Stock and products, Offers, Customers, Credits and referrals (credit account, statements, QR standee), Reviews, Analytics, Stores and staff, Settings (profile, hours, pickup/delivery, cashback %, auto-accept, mute asks, payout details, notifications, language), Help.
 
 - **Offers and discounts** (user, 2026-10-22: retailers add banners, offers and discounts visible to consumers):
   - Kinds: % off or ₹ off on selected items, a category, or the whole store; **buy X get Y** (same item); **minimum-bill discount** ("₹50 off on ₹500+"); **flash offer** from an expiring batch (with a countdown).
@@ -330,7 +401,7 @@ Overview (KPI strip, sales by hour, new orders, demand insights, top items), Ord
 
 ## 13. Admin console features (v1)
 
-Pulse (business health), Businesses (verification queue, details, suspend), Stores (store review, status), Customers, Orders (incl. admin cancel, §5.2), Master catalogue (review queue, merge duplicates, bulk import), Credits (ledger browser, manual adjustments with reason and 2-person approval above ₹500, §7), Referrals, Payouts (monthly statements, review, mark paid with UTR), Reviews (hide, restore, reports), Risk (fraud flags), Support tickets, Field agents (onboarding attribution), Notifications (templates, provider keys shown only as set/missing), Settings (`platform_settings`), Jobs (A-21: every background job, its runs and controls, D-95), System (A-22: AWS and database health, read-only, D-97), Admin users and roles, Audit log.
+Pulse (business health), Businesses (verification queue, details, suspend), Stores (store review, status), Customers, Orders (incl. admin cancel, §5.2), Master catalogue (review queue, merge duplicates, bulk import), Credits (ledger browser, manual adjustments with reason and 2-person approval above ₹500, §7), Referrals, Payouts (monthly statements, review, mark paid with UTR), Reviews (hide, restore, reports), Risk (fraud flags), Demand (A-23: demand gaps and the site search strip, §11.2, §11.3, D-101), Support tickets, Field agents (onboarding attribution), Notifications (templates, provider keys shown only as set/missing), Settings (`platform_settings`), Jobs (A-21: every background job, its runs and controls, D-95), System (A-22: AWS and database health, read-only, D-97), Admin users and roles, Audit log.
 
 Admin roles (D-64; summary, the full permission matrix is in 02). There are 7 roles:
 
@@ -346,6 +417,7 @@ Admin roles (D-64; summary, the full permission matrix is in 02). There are 7 ro
 
 - KYC verification: `admin` and `super_admin` only.
 - Pulse: every admin role except `field_agent`.
+- Demand (A-23, D-101): demand gaps are read by `field_agent`, `catalogue`, `analyst`, `admin` and `super_admin`; the site search strip list is approved by `catalogue`, `admin` and `super_admin` (audited).
 - **Money settings** are `platform_settings` keys with unit `paise`, `bp` or `credits`. Only `super_admin` can change them.
 
 **Background jobs** (D-95). Every background job is a registered kind with a class: `timer` (order and hold expiries), `money` (ledger, payouts, credit expiry), `notify`, `marketing`, `ai`, `rollup` or `maintenance` (partitions, retention).
@@ -358,6 +430,7 @@ Admin roles (D-64; summary, the full permission matrix is in 02). There are 7 ro
 - `ai` kinds only write drafts a person confirms (11).
 - A paused scheduled kind stops enqueuing; a paused event kind snoozes its jobs.
 - System (A-22) is read-only and visible to `admin` and `super_admin` (D-97).
+- Kinds added by D-101: `asks_close_window` (`timer`: closes each store's reply window and the ask), `asks_retention` (`maintenance`: deletes asks older than `ask_retention_days`), `rollup_ask_demand` and `site_marquee_build` (`rollup`, nightly).
 
 ## 14. Field agents (salespeople)
 
@@ -380,6 +453,8 @@ Channels: in-app inbox (always), web push (VAPID, free), SMS (OTP and critical u
 | Referral unlocked, credits earned, credits expiring | in-app (+ push) | in-app for referral unlocked and credits earned; – for credits expiring |
 | Payout paid | — | push + in-app |
 | New review | — | in-app |
+| New ask (§11.2) | — | push + in-app (Asks inbox); no SMS |
+| A shop replied Yes to your ask (§11.2) | push for the first Yes of an ask only, in-app for every Yes | — |
 
 WhatsApp, when enabled, carries the same events as the SMS column; SMS is the fallback. The "not seen" SMS goes to the store's contact phone, falling back to the owner's login phone. It is sent once per order, in the business's notification language, falling back to English.
 
@@ -394,10 +469,14 @@ WhatsApp, when enabled, carries the same events as the SMS column; SMS is the fa
 - Account deletion on request (customer self-serve), with ledger and order records kept anonymised for accounting.
   - Deletion is blocked while the customer has an order that is not finished.
   - On deletion, the wallet balance is forfeited to TodayZ (ledger kind `forfeit_deletion`).
+- **Asks (D-101).** An ask a shop sees is the customer's own request, sent at their choice; it carries the item, quantity, "need by" and a distance band, never the customer's name, phone, address or exact distance. Unanswered asks used as demand data follow the k ≥ 10 rules above. Demand gaps (A-23) need at least `ask_gap_min_customers` (never below 10) distinct customers. Asks are deleted after `ask_retention_days`.
+- **Search proof (D-101).** The summary line "Checked N shops · M have it" counts stores, not people, and only stores whose listings the customer can already see, so it needs no k floor. A share link and its preview carry no customer data and never a distance.
+- **Site search strip (D-101).** Built only from master product names searched by at least `site_marquee_min_searchers` (never below 10) distinct searchers in a city, after a denylist, and shown only after an admin approves it. Free-text queries never reach the site.
+- **Voice search (D-101).** Audio is sent to the speech provider and never stored; only the transcript of a search that runs is kept, as a typed query is.
 
 ## 17. Settings keys
 
-This is the complete, canonical list of `platform_settings` keys, with unit and default (D-61). Every other plan file, the seed and the code use exactly these names; a key that is not here does not exist. Store-level settings (cashback, delivery fee, radius, minimum, auto-accept, pickup/delivery on/off) live on the store, not here.
+This is the complete, canonical list of `platform_settings` keys, with unit and default (D-61). Every other plan file, the seed and the code use exactly these names; a key that is not here does not exist. Store-level settings (cashback, delivery fee, radius, minimum, auto-accept, pickup/delivery on/off, asks muted) live on the store, not here.
 
 Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin` can change them (§13, D-64).
 
@@ -513,6 +592,27 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 |---|---|---|---|
 | `job_runs_retention_days` | days | 90 | §13: how long `job_runs` rows are kept (the `job_runs_retention` maintenance kind drops older months, 03 §9) |
 
+**Asks and search proof** (§11.1–§11.3, D-101)
+
+| Key | Unit | Default | Rule |
+|---|---|---|---|
+| `ask_daily_limit_customer` | count | 5 | §11.2: asks one customer can send per IST day. Min 1, max 50. |
+| `ask_radius_m` | meters | 3000 | §11.2: stores within this distance of the search location get the ask. Min 500, max 10000. |
+| `ask_max_stores` | count | 8 | §11.2: stores one ask goes to. Min 1, max 20. |
+| `ask_daily_limit_store` | count | 40 | §11.2: asks one store receives per IST day; after that it gets none until midnight. Min 5, max 200. |
+| `ask_reply_window_min` | minutes | 15 | §11.2: time a store has to reply; then the ask closes for that store. Min 5, max 120. |
+| `ask_price_valid_min` | minutes | 60 | §11.2: a replied price holds for booking this long after the reply (Q-53). Min 15, max 240. |
+| `ask_low_yield_after_count` | count | 20 | §11.2: a customer's last asks in a row with no Yes before their asks are narrowed. Min 5, max 100. |
+| `ask_low_yield_max_stores` | count | 3 | §11.2: stores a narrowed customer's ask goes to, until they book. Min 1, max 20. |
+| `ask_retention_days` | days | 90 | §11.2: asks and replies are deleted after this (the `asks_retention` maintenance kind). Min 30, max 365. |
+| `ask_whatsapp_enabled` | bool | false | §11.2: WhatsApp delivery of asks to shops; a Wave 5 option, off in v1 (Q-55) |
+| `ask_gap_min_customers` | count | 10 | §11.2: distinct customers who asked for a product in a city before it shows in Demand gaps (never below 10, §16). Min 10. |
+| `ask_gap_window_days` | days | 7 | §11.2: Demand gaps window. Min 1, max 30. |
+| `site_marquee_min_searchers` | count | 10 | §11.3: distinct searchers of a product in a city before the nightly build proposes it (never below 10, §16). Min 10. |
+| `site_marquee_window_days` | days | 7 | §11.3: search window for the site strip. Min 1, max 30. |
+| `site_marquee_max_items` | count | 20 | §11.3: products proposed per city. Min 5, max 50. |
+| `refine_ai_min_words` | count | 4 | §11.1: words a query needs before the model may propose refine chips (AI-C2 fallback). Min 2, max 20. |
+
 **Feature flags** (turn a feature off without a deploy)
 
 | Key | Unit | Default |
@@ -540,6 +640,7 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | `ai_imagecheck_enabled` (AI-R10) | bool | false |
 | `ai_listparse_enabled` (AI-C1) | bool | false |
 | `ai_querynorm_enabled` (AI-C2) | bool | false |
+| `ai_voicesearch_enabled` (AI-C5, D-101) | bool | false |
 | `ai_catalogue_enabled` (AI-A1) | bool | false |
 | `ai_triage_enabled` (AI-A2) | bool | false |
 | `ai_riskexplain_enabled` (AI-A3) | bool | false |
@@ -565,7 +666,7 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | Banner attribution window | 24 h | §12, D-77 |
 | OTP limits | 6 digits, 5 min, 5 attempts, resend 30 s, 5 sends per number per hour, 20 per IP per hour | §2 |
 | Device clock tolerance for offline links | 2 min | §6, D-12 |
-| Voice recording length | 15 s | §12 |
+| Voice recording length | 15 s | §12; also customer voice search, §11.1, D-101 |
 | `sold_at` clamp for offline sales | 72 h | 02 §4.3 |
 | Order SSE poll interval | 15 s | 02 |
 | "3 or more orders expired in 2 h" alert | 3 in 2 h | 05 §5 |
@@ -578,6 +679,12 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | "Selling fast" is high severity when stock lasts at most | 2 days | §12, D-99 |
 | Pairs kept per store by the nightly rollup | 100, by lift | §12, D-99 |
 | Stores needed for "No shop nearby has it." and "Priced above nearby" | 10 other live verified stores of distinct businesses | §12, §16, D-71, D-99 |
+| Badges per result card; cards per badge | 1; 1 | §11.1, D-101 |
+| Ask distance bands shown to a shop | under 1 km, 1–3 km, 3–5 km, over 5 km | §11.2, D-101 |
+| Customer pushes per ask | 1, at the first Yes | §11.2, §15, D-101 |
+| Search before an ask counted once with it | same customer, same product, within 1 h | §11.2, D-101 |
+| Share code | 10 characters, base62, random | §11.1, D-101 |
+| Categories never proposed for the site search strip | medicines and health, personal and intimate care, tobacco, adult | §11.3, D-101 |
 
 **Client versions** (an older client shows "Update available"; it reloads when the user taps, never on its own and never while a sale or checkout is open, D-98)
 

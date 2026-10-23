@@ -36,7 +36,7 @@ Every AI feature returns a draft. The tester feeds each one an input that the mo
 | MQ-11.02 | In profile C (O20) open Overview, Stock, Reviews and the onboarding starter catalogue preview. | No coach AI text (template text only), no "Scan supplier bill", no "Shelf photo", no "Draft reply". Voice update shows only if `feature_voice_enabled` and `ai_voice_stock_enabled` are both on: it is hidden now. | `R-17.3` B-03 B-06 B-07 B-11 | ▢ | |
 | MQ-11.03 | In profile D (AD47) open a ticket in A-14, a pending product in A-08 and a flag in A-13. | No assist panel in any of them. | `R-17.3` A-08 A-13 A-14 | | |
 | MQ-11.04 | As C11 call `POST /v1/me/ai/list-search/drafts` with any list (README §5). | 404: the feature is hidden while its flag is off (04 §2.8). Nothing in the mocks LLM tab. | `R-17.3` 04 §2.8 | | |
-| MQ-11.05 | As SA48 in A-17 turn on `ai_listparse_enabled`, `ai_querynorm_enabled`, `ai_voice_stock_enabled`, `ai_billscan_enabled`, `ai_shelfscan_enabled`, `ai_replydraft_enabled`, `ai_triage_enabled`, `ai_catalogue_enabled`, `ai_riskexplain_enabled`, `ai_coach_enabled`, `ai_insighttext_enabled` with reason "QA MQ-11.05". | Each saved with an audit row. The entry points appear after a refresh in each app. | `R-17.3` A-17 | ▢ | |
+| MQ-11.05 | As SA48 in A-17 turn on `ai_listparse_enabled`, `ai_querynorm_enabled`, `ai_voice_stock_enabled`, `ai_billscan_enabled`, `ai_shelfscan_enabled`, `ai_replydraft_enabled`, `ai_triage_enabled`, `ai_catalogue_enabled`, `ai_riskexplain_enabled`, `ai_coach_enabled`, `ai_insighttext_enabled`, `ai_voicesearch_enabled` with reason "QA MQ-11.05". | Each saved with an audit row. The entry points appear after a refresh in each app. | `R-17.3` A-17 | ▢ | |
 
 ### B. Shopping list search (AI-C1, C-22)
 
@@ -49,12 +49,12 @@ Every AI feature returns a draft. The tester feeds each one an input that the mo
 | MQ-11.10 | Place the order (pickup, no credits) and cancel it with "Changed my mind". | Normal order flow; the list search did not change any price or stock. | E2E-13 | | |
 | MQ-11.11 | Open the mocks LLM tab, open the last list-search request. | The request text holds the list only; no phone, name, address or order code. | 11 §1 rule 6 OB-02 | | |
 
-### C. Voice search (AI-C2, C-23)
+### C. Multilingual and voice search (AI-C2, AI-C5, C-23)
 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
 | MQ-11.12 | Search "doodh" by typing. | Milk results (synonym table), and the mocks LLM tab shows no call (table first, model only when the table misses). | 11 §3 AI-C2 C-05 | | |
-| MQ-11.13 | Tap the mic (C-23), allow the microphone, play the STT fixture clip "ಹಾಲು" (or speak if a fixture exists for your voice). | The heard words show in the field before results load; the tester can edit them. Results for milk. | 11 §3 AI-C2 C-23 | ▢ | |
+| MQ-11.13 | Tap the mic (C-23), allow the microphone, play the STT fixture clip "ಹಾಲು" (or speak if a fixture exists for your voice). | The heard words fill the search field as a draft the tester can edit; nothing is searched until the tester taps search (D-101). Tap search: results for milk. | 11 §3 AI-C5 C-23 | ▢ | |
 | MQ-11.14 | Deny the microphone permission and tap the mic again. | A short message explains how to allow the mic; typing still works. | C-23 | | |
 
 ### D. Voice stock update (AI-R1, B-06)

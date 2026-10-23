@@ -26,6 +26,7 @@ The plan is the source of truth. If a step and the plan disagree, the plan wins:
 | [OFFER-offers-banners.md](OFFER-offers-banners.md) | Offer kinds, stacking, limits, schedules, banners, moderation |
 | [STOCK-stock-catalogue.md](STOCK-stock-catalogue.md) | Counts, damage, restock, batches, import, voice drafts, bill scan, offline sync conflicts |
 | [INSIGHT-demand-insights.md](INSIGHT-demand-insights.md) ★ | Demand insights card and tab: 11 kinds, sentences, actions that apply nothing, settings, permissions, privacy, "Not useful" |
+| [ASK-ask-shops-nearby.md](ASK-ask-shops-nearby.md) ★ | Ask shops nearby and search proof: summary line, badges, "Confirmed … ago", refine chips, share, voice search, an ask from sending to booking at the replied price, the shop's Asks inbox and its permissions, limits, mute and report, Demand gaps and the site search strip (D-101) |
 | [NOTIFY-notifications.md](NOTIFY-notifications.md) | SMS, WhatsApp, push and inbox through the mocks; opt-outs |
 | [PERM-permissions-matrix.md](PERM-permissions-matrix.md) | Every business and admin role against every action |
 | [SEC-security.md](SEC-security.md) | IDOR, OTP brute force, code reuse, XSS, CSV injection, tokens, headers |
@@ -43,7 +44,7 @@ The plan is the source of truth. If a step and the plan disagree, the plan wins:
 
 ## Book size
 
-Scanned from the files on 2026-10-22: 1102 steps in 31 scripts, 245 of them marked ★. The traceability file maps 264 of 287 08 scenario IDs to steps (255 numbered IDs and 32 SC families; 23 are automated only and say why), all 144 rules, all 67 screens and all 42 problem codes and HTTP statuses. The per-file counts and how the totals were scanned are in [traceability.md](traceability.md) section 1.
+Scanned from the files on 2026-10-22: 1168 steps in 32 scripts, 280 of them marked ★. The traceability file maps 285 of 309 08 scenario IDs to steps (276 numbered IDs and 33 SC families; 24 are automated only and say why), all 170 rules, all 72 screens and all 48 problem codes and HTTP statuses. The per-file counts and how the totals were scanned are in [traceability.md](traceability.md) section 1.
 
 ## 1. Set up the local stack
 
@@ -162,6 +163,12 @@ The seed (`make reset`) builds the world below. Where the seed is not built yet,
 | SA49 | +91 90000 00049 | Admin role `super_admin` (B) | |
 | D50 | +91 90000 00050 | Admin roles `support` and `catalogue` | Two roles |
 | H01–H11 | +91 90000 00070–80 | Customers of Sri Lakshmi 2 (insights seed) | No wallet, no open orders. H01–H03: 3 purchases in the last 60 days, the last 22, 25 and 30 days ago. H04–H08: 4 purchases, the last 22 to 40 days ago. H09: 4 purchases, the last 20 days ago. H10: 2 purchases, the last 25 days ago. H11 (+91 90000 00080): 4 purchases, the last 3 days ago, a regular who is not slipping. So "regulars slipping away" counts H01–H08 (8). H01–H11 are the only phone-linked customers of Sri Lakshmi 2: 11, one more than `insight_regular_min_linked_customers` (10), so the default does not sit on the boundary; its walk-in sales carry no phone and are not counted. |
+| C51 | +91 90000 00051 | Customer "Asha" (asks seed) | No asks, no wallet, no orders. Used by ASK sections D to F. |
+| C52 | +91 90000 00052 | Customer "Farhan" (asks seed) | 4 asks today, all closed, each sent to KF between 07:30 and 08:30 IST, so one more fits `ask_daily_limit_customer` (5) and a sixth does not |
+| C53 | +91 90000 00053 | Customer "Neha" (asks seed) | Her last 20 asks, all before today, closed with no Yes; no online order since, so her asks go to at most `ask_low_yield_max_stores` (3) stores |
+| C54 | +91 90000 00054 | Customer "Rohit" (asks seed) | Reported by Sri Lakshmi with "Report this ask" 3 days ago: an open `ask_reported` flag (A-13) and an `ask_store_blocks` row, so SL never gets his asks |
+| C55 | +91 90000 00055 | Customer "Zoya" (asks seed) | One open ask, "Extension board 4 socket", quantity 1, sent to NH alone at 10:58 IST today, so its window ends at 11:13 |
+| U01–U12 | +91 90000 00081–92 | Customers behind the Demand gaps seed | No wallet, no orders. Each asked once in Bengaluru in the last 7 days (`<seed:ask-gaps>`) and got no Yes |
 
 ### Stores (Bengaluru unless noted)
 
@@ -269,6 +276,9 @@ Steps use these placeholders until the seed provides them. The seed WP should cr
 | `<seed:month-others>` | Current IST month. Kaveri Fresh: credits in ₹100, cashback −₹20, so it closes at ₹40 (opening −₹40). Auto Mart: credits in ₹50, cashback −₹120, closes at −₹70. Annapurna Provisions: credits in ₹200, cashback 0, closes at ₹200, and no payout details entered (PAN, UPI empty) |
 | `<seed:ai-fixtures>` | Recorded model replies for voice, bill scan, shelf scan, coach, reply drafts and insight wording, served by the mocks server. Insight wording: for the SL "Going to waste" row "Your Curd 400 g expires within 5 days, so a flash offer can save it."; for the SL "Sitting on the shelf" row a sentence that contains ₹999, which is not in the row's facts |
 | `<seed:pseudo>` | Pseudo-locale bundle reachable with `?locale=pseudo` (en-XA, D-87) |
+| `<seed:asks>` | Used by [ASK-ask-shops-nearby.md](ASK-ask-shops-nearby.md), relative to the QA clock (2026-10-22 11:00 IST). The master product "LED bulb 9 W" (Electricals, MRP ₹120) is listed only at AP: ₹110, 2 on hand, 0 reserved, stock last confirmed 2026-10-17 11:00 (5 days, so stale). NH lists "Extension board 4 socket" (Electricals) and no bulb. SL is the only Bengaluru store that lists Amul Butter 100 g (I1). C51–C55 in the states in §6. NH has received 5 asks today, C55's included; KF has received C52's 4. The speech-to-text mock answers the mic with the recorded transcript "amul butter under 200". |
+| `<seed:ask-gaps>` | U01–U12 (§6) each asked once for "Kodo millet 1 kg" in Bengaluru in the last 7 days, and U01–U09 for "Foxtail millet 500 g"; none got a Yes. `rollup_ask_demand` has not run since. No Bengaluru store lists either product. |
+| `<seed:site-marquee>` | `search_performed` events with a `product_id`, in Bengaluru, in the last 7 days, by distinct signed-in users and anonymous devices: Amul Butter 100 g by 15, Maggi 2-Minute Noodles 70 g by 12, Dolo 650 by 20 (a denylisted category) and Toor dal 1 kg by 9. None in Hyderabad. No list is approved for any city and `site_marquee_build` has not run. |
 
 ## 8. Devices
 
