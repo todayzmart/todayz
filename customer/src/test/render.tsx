@@ -9,6 +9,8 @@ import { makeQueryClient, makeRouter } from '../app/router';
 export interface Call {
   method: string;
   path: string;
+  /** The query string, for tests that check what a screen asked for (W2-08). */
+  query: URLSearchParams;
   headers: Headers;
   body: unknown;
 }
@@ -49,6 +51,7 @@ export function renderAt(path: string, opts: RenderOptions = {}) {
     const call: Call = {
       method: (init?.method ?? 'GET').toUpperCase(),
       path: url.pathname,
+      query: url.searchParams,
       headers: new Headers(init?.headers),
       body: raw ? (JSON.parse(raw) as unknown) : undefined,
     };
