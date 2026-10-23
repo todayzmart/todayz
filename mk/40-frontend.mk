@@ -48,10 +48,11 @@ check-frontend-types:
 check-frontend-unit:
 	@$(call fe_run,$(FE_ALL),test)
 
-# The site builds in e2e mode here: a production site build needs the real PUBLIC_API_URL and
-# PUBLIC_TURNSTILE_SITE_KEY (release only); `build:e2e` allows the local API and the test key.
+# The Vite apps and the site build in e2e mode here: a production build needs the real
+# VITE_TURNSTILE_SITE_KEY / PUBLIC_TURNSTILE_SITE_KEY and an https API URL (release only, W1-08);
+# `build:e2e` allows the local API and Cloudflare's test key. Types are checked by check-frontend-types.
 check-frontend-build:
-	@$(call fe_run,$(FE_VITE),build)
+	@$(call fe_run,$(FE_VITE),build:e2e)
 	@$(call fe_run,@todayz/site,build:e2e)
 
 # Initial JS budgets: customer 170 KB, business 250 KB, admin 250 KB gzip (each app's .size-limit.js).

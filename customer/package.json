@@ -7,8 +7,8 @@
   "scripts": {
     "gen": "tsr generate",
     "dev": "vite",
-    "build": "tsr generate && tsc --noEmit -p tsconfig.json && vite build && node node_modules/@todayz/config/dist-check.mjs dist",
-    "build:e2e": "tsr generate && vite build --mode e2e && node node_modules/@todayz/config/dist-check.mjs dist",
+    "build": "tsr generate && tsc --noEmit -p tsconfig.json && vite build && node node_modules/@todayz/auth/scripts/precache-check.mjs && node node_modules/@todayz/config/dist-check.mjs dist",
+    "build:e2e": "tsr generate && vite build --mode e2e && node node_modules/@todayz/auth/scripts/precache-check.mjs && node node_modules/@todayz/config/dist-check.mjs dist",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint --max-warnings 0 .",
@@ -20,9 +20,12 @@
   "dependencies": {
     "@tanstack/react-query": "5.104.1",
     "@tanstack/react-router": "1.170.41",
+    "@todayz/api-client": "workspace:*",
+    "@todayz/auth": "workspace:*",
     "@todayz/i18n": "workspace:*",
     "@todayz/telemetry": "workspace:*",
     "@todayz/tokens": "workspace:*",
+    "@todayz/ui": "workspace:*",
     "lucide-react": "1.52.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",

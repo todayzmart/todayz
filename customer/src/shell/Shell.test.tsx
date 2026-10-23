@@ -1,17 +1,13 @@
 import en from '@todayz/i18n/compiled/customer/en.json';
 import xa from '@todayz/i18n/compiled/customer/en-XA.json';
 import { asMessages, type Messages } from '@todayz/i18n';
-import { createMemoryHistory } from '@tanstack/react-router';
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { App } from '../app/App';
-import { makeQueryClient, makeRouter } from '../app/router';
+import { renderAt as renderApp } from '../test/render';
 import { NAV } from './nav';
 
 function renderAt(path: string, messages: Messages = asMessages(en)) {
-  const queryClient = makeQueryClient();
-  const router = makeRouter(queryClient, createMemoryHistory({ initialEntries: [path] }));
-  return render(<App messages={messages} router={router} queryClient={queryClient} />);
+  return renderApp(path, { messages });
 }
 
 describe('customer shell', () => {
@@ -25,7 +21,7 @@ describe('customer shell', () => {
     expect(within(nav).getByRole('link', { name: 'Search' })).not.toHaveAttribute('aria-current');
   });
 
-  it.each(NAV.filter((n) => n.section !== ''))('shows the placeholder for /$section', async ({ section }) => {
+  it.each(NAV.filter((n) => n.section !== '' && n.section !== 'account'))('shows the placeholder for /$section', async ({ section }) => {
     renderAt(`/${section}`);
     const nav = await screen.findByRole('navigation', { name: 'Main' });
     const active = within(nav).getAllByRole('link').find((l) => l.getAttribute('aria-current') === 'page');

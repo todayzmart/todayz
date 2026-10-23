@@ -8,6 +8,17 @@ let guard: PageGuard;
 
 test.beforeEach(async ({ page }) => {
   guard = await guardPage(page);
+  // The language was chosen on an earlier visit (otherwise `/` opens the C-01 picker), and nobody is
+  // signed in: the session start asks the API to refresh, which the smoke run answers with a 401.
+  await page.addInitScript(() => localStorage.setItem('todayz.lang', 'en'));
+  await page.route('**/v1/auth/refresh', (route) =>
+    route.fulfill({
+      status: 401,
+      contentType: 'application/problem+json',
+      headers: { 'access-control-allow-origin': '*' },
+      body: JSON.stringify({ type: 'about:blank#unauthorized', title: 'Unauthorized', status: 401, code: 'unauthorized' }),
+    }),
+  );
 });
 
 test.afterEach(() => {

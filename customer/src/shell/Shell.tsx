@@ -1,3 +1,4 @@
+import { OfflineBanner } from '@todayz/auth';
 import { Link, Outlet } from '@tanstack/react-router';
 import { useIntl } from 'react-intl';
 import { Icon } from './Icon';
@@ -12,6 +13,11 @@ export function Shell() {
       <a className={styles.skip} href="#main">
         {intl.formatMessage({ id: 'shell.skipToContent' })}
       </a>
+      <OfflineBanner
+        className={styles.offline}
+        title={intl.formatMessage({ id: 'app.offline.title' })}
+        message={intl.formatMessage({ id: 'app.offline.body' })}
+      />
       <main id="main" className={styles.main} tabIndex={-1}>
         <Outlet />
       </main>

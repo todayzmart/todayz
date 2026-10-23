@@ -35,6 +35,16 @@ Read first: the root `CLAUDE.md`, `docs/plan/README.md`, `docs/plan/01-product-r
 - ICU messages are precompiled; the runtime parser is aliased away (`intlNoParserAlias`). Run `make gen` after editing a catalogue.
 - Dev: port 5301 (strictPort), Host `app.todayz.localhost`, HMR over wss:443 via Caddy; `TODAYZ_HMR=direct` for http://127.0.0.1:5301.
 
+## Auth, shell and onboarding (W1-08)
+
+- `src/app/`: `session.ts` (the `@todayz/auth` session for app `customer`; token in memory only), `env.ts` (`VITE_API_URL`, `VITE_TURNSTILE_SITE_KEY`, defined by `vite.config.ts` through `@todayz/auth/build`; a production build fails without a real site key and an https API URL), `locale.ts` (language choice: stores it, loads the catalogue, PATCHes `preferredLang` when signed in), `place.ts` (C-02 location, this device only), `me.ts` (`patchMe`: PATCH /v1/me with If-Match), `labels.ts` (strings for the shared auth pieces), `next.ts` (`?next=` must be a same-app path), `update-context.tsx` (`useUpdateController`; C-11 checkout calls `useHoldUpdates(controller, open)` so the update toast waits).
+- Routes: `/sign-in` (C-10), `/language` (C-01, `/` redirects first-run here), `/location` (C-02: GPS after an explainer, PIN code; locality search is `TODO(W1-06)`), `/account`.
+- `src/test/render.tsx` renders `<App>` with a fake `fetch`; tests of routes live in `src/test/`, not in `src/routes/` (every file there is a route).
+- `build` and `build:e2e` run `precache-check` (SC-GS-09): every chunk must be in the service worker's manifest.
+- Stack journeys: `e2e/sign-in.stack.spec.ts` runs from `playwright.stack.config.ts` against `make dev`: `pnpm --filter @todayz/customer exec playwright test -c playwright.stack.config.ts`.
+
 ## Status
 
 W0-05: shell, routing, i18n, PWA manifest, telemetry stub, size budget and smoke tests in place. Screens are placeholders.
+
+W1-08: shell with sign-in (C-10), language (C-01), location (C-02), account, offline banner, update toast, error boundary and SW precache check. Account is real; Search, Orders and Wallet are still placeholders.
