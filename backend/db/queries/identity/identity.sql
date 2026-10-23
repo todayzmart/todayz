@@ -131,3 +131,84 @@ GROUP BY u.status;
 -- Rows revoked (rotated, reused, logged out) or expired before @before,
 -- whichever came first (ix_sessions_purge).
 DELETE FROM sessions WHERE coalesce(revoked_at, expires_at) < @before::timestamptz;
+
+------------------------------------------------------------------------------
+-- Admin TOTP and recovery codes (W1-01 phase B; 02 §3.2, D-60)
+------------------------------------------------------------------------------
+
+-- name: GetAdminForUpdate :one
+SELECT user_id, roles, totp_secret_enc, totp_enabled_at, disabled_at, totp_last_step, totp_failures
+FROM admin_users WHERE user_id = @user_id FOR UPDATE;
+
+-- name: SetPendingTotp :exec
+-- A new, unconfirmed secret: totp_enabled_at stays NULL until a code verifies.
+UPDATE admin_users SET totp_secret_enc = @secret_enc, totp_enabled_at = NULL,
+  totp_last_step = NULL, totp_failures = 0, version = version + 1
+WHERE user_id = @user_id AND totp_enabled_at IS NULL;
+
+-- name: DeleteRecoveryCodes :exec
+DELETE FROM admin_recovery_codes WHERE admin_id = @admin_id;
+
+-- name: InsertRecoveryCode :exec
+INSERT INTO admin_recovery_codes (id, admin_id, code_hash, created_at)
+VALUES (@id, @admin_id, @code_hash, @now);
+
+-- name: RecordTotpSuccess :exec
+-- Confirms a pending enrolment too (totp_enabled_at is set once).
+UPDATE admin_users SET totp_enabled_at = COALESCE(totp_enabled_at, @now::timestamptz),
+  totp_last_step = COALESCE(sqlc.narg(step)::bigint, totp_last_step), totp_failures = 0
+WHERE user_id = @user_id;
+
+-- name: RecordTotpFailure :one
+UPDATE admin_users SET totp_failures = totp_failures + 1 WHERE user_id = @user_id
+RETURNING totp_failures;
+
+-- name: ResetTotpFailures :exec
+UPDATE admin_users SET totp_failures = 0 WHERE user_id = @user_id;
+
+-- name: UseRecoveryCode :one
+UPDATE admin_recovery_codes SET used_at = @now::timestamptz
+WHERE admin_id = @admin_id AND code_hash = @code_hash AND used_at IS NULL
+RETURNING id;
+
+-- name: CountUnusedRecoveryCodes :one
+SELECT count(*)::int FROM admin_recovery_codes WHERE admin_id = @admin_id AND used_at IS NULL;
+
+-- name: SetFamilyTotpVerified :execrows
+-- Marks the live row of a sign-in (family) as TOTP-verified now; refresh
+-- copies it to the next row. 0 rows: the sign-in is no longer live.
+UPDATE sessions SET totp_verified_at = @now::timestamptz
+WHERE family_id = @family_id AND user_id = @user_id AND app = 'admin'
+  AND revoked_at IS NULL AND expires_at > @now::timestamptz;
+
+------------------------------------------------------------------------------
+-- Sign-out everywhere and account deletion (04 §2.1, §2.2; D-31)
+------------------------------------------------------------------------------
+
+-- name: RevokeUserApp :execrows
+UPDATE sessions SET revoked_at = @now::timestamptz, revoked_reason = @reason::text
+WHERE user_id = @user_id AND app = @app AND revoked_at IS NULL;
+
+-- name: RevokeUserSessions :execrows
+UPDATE sessions SET revoked_at = @now::timestamptz, revoked_reason = @reason::text
+WHERE user_id = @user_id AND revoked_at IS NULL;
+
+-- name: LockUser :one
+SELECT status FROM users WHERE id = @id FOR UPDATE;
+
+-- name: GetPhoneHashByUser :one
+SELECT phone_hash FROM phone_identities WHERE user_id = @user_id;
+
+-- name: AnonymiseUser :exec
+UPDATE users SET status = 'deleted', deleted_at = @now::timestamptz, name = NULL, version = version + 1
+WHERE id = @id;
+
+-- name: DeletePhoneIdentity :exec
+DELETE FROM phone_identities WHERE user_id = @user_id;
+
+-- name: ScrubDevices :exec
+UPDATE devices SET push_endpoint = NULL, push_keys = NULL, counter_secret_enc = NULL, version = version + 1
+WHERE user_id = @user_id;
+
+-- name: DeleteAddresses :exec
+DELETE FROM addresses WHERE user_id = @user_id;
