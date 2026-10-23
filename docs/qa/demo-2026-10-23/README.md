@@ -32,12 +32,15 @@ All four answered 200 at 17:20 on 23 October.
 - every site page: `docs/qa/W1-09/screens/`
 - all 32 design-system components: `docs/qa/W1-02/screens/`
 
-## In progress (Friday evening)
+## Status (Friday, 19:00)
 
-Four packages are running for the weekend core loop:
-- sign-in;
-- background jobs;
-- monitoring;
-- the cloud setup files (written, not applied).
+**Merged and running on the local stack:**
+- **Sign-in (backend).** Phone and one-time code, sign-in that stays on with automatic renewal, sign-out, and "my account".
+  - Checked live: a code works once, sign-out ends the session, and no phone number or code reaches the logs.
+- **Monitoring.** Four Grafana dashboards and app events.
+- **Cloud setup files.** Written and checked, not applied (that waits for Wave 5).
 
-The cloud files are written and nearly through their checks. They join the main build after the freeze.
+**Still running:**
+- **Background jobs.** Its review fixes are being made; it merges next.
+
+**Next:** the shop and store setup, the customer and shop sign-in screens, then search and booking.
