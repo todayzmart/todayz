@@ -50,3 +50,5 @@ W0-05: shell, routing, i18n, PWA manifest, telemetry stub, size budget and smoke
 W1-08: shell with sign-in (C-10), language (C-01), location (C-02), account, offline banner, update toast, error boundary and SW precache check. Account is real; Search, Orders and Wallet are still placeholders.
 
 Offline first load: `/account` shows `SessionPending` (offline notice and "Try again") while the session is `unknown` and the API cannot be reached. Sign out clears the whole query cache.
+
+W2-08 (weekend slice): C-03 Home (`routes/index.tsx`, `src/home/`), C-05 Search (`src/search/`), C-07 shop page `/s/$slug` (`src/store/`) and C-08 product detail `/s/$slug/i/$itemId` (`src/product/`). The cart's store id is the discover `storeId` (ULID); the slug is `CartStore.slug`. Freshness shows only when `confirmedAt` is set (the server nulls it past `stock_stale_after_hours`). The StoreMap card, C-04 and C-06 are deferred. Stack journey: `e2e/discover.stack.spec.ts`.
