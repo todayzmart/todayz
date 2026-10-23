@@ -112,8 +112,8 @@
   top: 6px;
 }
 
-/* Legend swatch for today's bars (the bundle swatch is the line style). */
-.legendBar {
+/* Legend swatch for today's bars (the bundle swatch is the line style, so outrank .tz-legend i). */
+.chart i.legendBar {
   width: 8px;
   height: 8px;
   border-radius: 2px;
@@ -148,6 +148,48 @@
   }
 }
 
+/* Phone: the 600-unit chart is drawn at about half size, so the axis text is set larger to land
+   near 9px on screen. */
+@media (width <= 720px) {
+  .chart :global(.tz-chart .axis) {
+    font-size: 16px;
+  }
+}
+
+/* KPI footers on phone: the delta and the comparison wrap as units, not letter by letter. */
+@media (width <= 720px) {
+  .areaKpi :global(.tz-kpi-cell-foot) {
+    flex-wrap: wrap;
+    column-gap: var(--space-1);
+    padding-block: var(--space-2);
+  }
+
+  .areaKpi :global(.tz-kpi-delta) {
+    white-space: nowrap;
+  }
+}
+
+/* Insight rows on phone: the action and Not useful go under the sentence, so the text keeps its width. */
+@media (width <= 720px) {
+  .insights :global(.tz-insight) {
+    grid-template-columns: 32px 1fr;
+  }
+
+  .insights :global(.tz-insight > :last-child) {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .insights :global(.tz-card-foot) {
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+  }
+
+  .insights :global(.tz-card-foot a) {
+    white-space: nowrap;
+  }
+}
+
 /* Top items: the table sits flush in the card (kit gap: .tz-table-wrap brings its own border). */
 .top {
   padding: 0;
@@ -162,6 +204,18 @@
 .top :global(.tz-table-wrap) {
   border: 0;
   border-radius: 0;
+  overflow: visible;
+}
+
+/* Kit gap: .tz-table-wrap scrolls sideways on phones but cannot take focus (axe
+   scrollable-region-focusable), so this focusable region does the scrolling instead. */
+.tableScroll {
+  overflow-x: auto;
+}
+
+.tableScroll:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
 }
 
 .headLink {

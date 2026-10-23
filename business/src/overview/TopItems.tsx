@@ -95,7 +95,7 @@ export function TopItems({ data }: { data: OverviewData }) {
   const sold = items.reduce((s, i) => s + i.sold, 0);
   const revenue = items.reduce((s, i) => s + i.revenuePaise, 0);
   return (
-    <section className={`tz-card ${styles.top}`} aria-labelledby="ov-top-title">
+    <section className={`tz-card ${styles.top}`}>
       <div className={`tz-card-head ${styles.topHead}`}>
         <h2 className="tz-card-title" id="ov-top-title">
           {data.period === 'today'
@@ -106,21 +106,25 @@ export function TopItems({ data }: { data: OverviewData }) {
           {intl.formatMessage({ id: 'overview.top.viewAll' })}
         </RouterLink>
       </div>
-      <DataTable<TopItem>
-        label={intl.formatMessage({ id: 'overview.top.label' })}
-        columns={columns}
-        data={items}
-        getRowId={(r) => r.id}
-        emptyLabel={intl.formatMessage({ id: 'overview.top.empty' })}
-        footer={
-          <>
-            <span>{intl.formatMessage({ id: 'overview.top.total' }, { shown: items.length, all: data.distinctItemsSold })}</span>
-            <span className={styles.totals}>
-              {intl.formatMessage({ id: 'overview.top.totals' }, { sold, revenue: formatMoney(revenue, 'dashboard') })}
-            </span>
-          </>
-        }
-      />
+      {/* A scroll container must take focus so keyboard users can scroll it (axe scrollable-region-focusable). */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+      <div className={styles.tableScroll} role="region" aria-labelledby="ov-top-title" tabIndex={0}>
+        <DataTable<TopItem>
+          label={intl.formatMessage({ id: 'overview.top.label' })}
+          columns={columns}
+          data={items}
+          getRowId={(r) => r.id}
+          emptyLabel={intl.formatMessage({ id: 'overview.top.empty' })}
+          footer={
+            <>
+              <span>{intl.formatMessage({ id: 'overview.top.total' }, { shown: items.length, all: data.distinctItemsSold })}</span>
+              <span className={styles.totals}>
+                {intl.formatMessage({ id: 'overview.top.totals' }, { sold, revenue: formatMoney(revenue, 'dashboard') })}
+              </span>
+            </>
+          }
+        />
+      </div>
     </section>
   );
 }
