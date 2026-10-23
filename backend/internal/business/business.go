@@ -290,15 +290,6 @@ func pathID(s string) (ids.ID, error) {
 	return id, nil
 }
 
-func uuidString(u [16]byte, valid bool) *string {
-	if !valid {
-		return nil
-	}
-	id := ids.ID(u)
-	s := id.String()
-	return &s
-}
-
 func etag(version int32) string { return `"v` + strconv.FormatInt(int64(version), 10) + `"` }
 
 // parseETag reads `"v{version}"`; a version that does not fit is stale.
@@ -361,7 +352,7 @@ func (v *invalid) add(path, reason string) {
 	if v.p == nil {
 		v.p = problem.New(genproblems.ValidationFailed, "")
 	}
-	v.p.WithField(path, reason)
+	v.p = v.p.WithField(path, reason)
 }
 
 func (v *invalid) addAll(errs []FieldError) {

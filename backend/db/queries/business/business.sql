@@ -233,10 +233,14 @@ WHERE id = @id
 RETURNING *;
 
 -- name: RemoveStaff :exec
-UPDATE staff SET status = 'removed', removed_at = @now::timestamptz, version = version + 1 WHERE id = @id;
+-- The invite phone goes with the row (a removed invite keeps no phone).
+UPDATE staff SET status = 'removed', removed_at = @now::timestamptz,
+  invite_phone_hash = NULL, invite_phone_enc = NULL, version = version + 1
+WHERE id = @id;
 
 -- name: AcceptInvite :one
-UPDATE staff SET status = 'active', user_id = @user_id, version = version + 1
+UPDATE staff SET status = 'active', user_id = @user_id,
+  invite_phone_hash = NULL, invite_phone_enc = NULL, version = version + 1
 WHERE id = @id AND status = 'invited'
 RETURNING *;
 
