@@ -49,8 +49,10 @@ export interface PosCartProps {
   amount: ReactNode;
   chargeLabel: string;
   onCharge: () => void;
-  /** Charging in progress: the button spins and blocks double charges. */
+  /** Charging in progress: the button spins and blocks double charges, and keeps focus. */
   charging?: boolean | undefined;
+  /** Announced when charging starts, e.g. "Charging". */
+  chargingLabel?: string | undefined;
   className?: string | undefined;
 }
 
@@ -69,6 +71,7 @@ export function PosCart({
   summary,
   amount,
   chargeLabel,
+  chargingLabel,
   onCharge,
   charging = false,
   className,
@@ -124,7 +127,14 @@ export function PosCart({
             {amount}
           </div>
         </div>
-        <Button variant="brand" size="lg" loading={charging} disabled={lines.length === 0} onClick={onCharge}>
+        <Button
+          variant="brand"
+          size="lg"
+          loading={charging}
+          loadingLabel={chargingLabel}
+          disabled={lines.length === 0}
+          onClick={onCharge}
+        >
           {chargeLabel}
         </Button>
       </div>

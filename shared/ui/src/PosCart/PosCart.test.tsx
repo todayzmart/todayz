@@ -41,7 +41,7 @@ describe('PosCart', () => {
     expect(screen.getByText('Ananya R. · 6 visits')).toBeInTheDocument();
     const rice = screen.getAllByRole('listitem')[0] as HTMLElement;
     expect(within(rice).getByText('5 kg · ₹289')).toBeInTheDocument();
-    expect(within(rice).getByRole('button', { name: 'Add one, Sona Masoori Rice' })).toBeDisabled();
+    expect(within(rice).getByRole('button', { name: 'Add one, Sona Masoori Rice' })).toHaveAttribute('aria-disabled', 'true');
     fireEvent.click(within(rice).getByRole('button', { name: 'Remove one, Sona Masoori Rice' }));
     expect(p.onQuantityChange).toHaveBeenCalledWith('rice', 1);
     fireEvent.click(screen.getByRole('button', { name: 'Cash' }));
@@ -59,11 +59,15 @@ describe('PosCart', () => {
   });
 
   it('blocks a second charge while charging', () => {
-    const p = props({ charging: true });
+    const p = props({ charging: true, chargingLabel: 'Charging' });
     render(<PosCart {...p} />);
     const charge = screen.getByRole('button', { name: /Charge ₹743/ });
+    charge.focus();
     fireEvent.click(charge);
     expect(p.onCharge).not.toHaveBeenCalled();
     expect(charge).toHaveAttribute('aria-busy', 'true');
+    expect(charge).toHaveAttribute('aria-disabled', 'true');
+    expect(charge).toHaveFocus();
+    expect(charge).toHaveTextContent('Charging');
   });
 });

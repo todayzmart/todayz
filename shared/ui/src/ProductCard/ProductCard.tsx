@@ -11,13 +11,14 @@ export interface ProductCardProps {
   /** Two-letter fallback shown on the media tile when there is no photo, e.g. "AT". */
   initials: string;
   image?: { src: string; alt?: string | undefined } | undefined;
-  stock: {
-    level: StockLevel;
-    label: ReactNode;
-    freshness?: ReactNode;
-    stale?: boolean | undefined;
-    staleLabel?: ReactNode;
-  };
+  /**
+   * Stock and its proof (D-101): customers always see "Confirmed {time} ago", or the stale label
+   * once it is older than `stock_stale_after_hours`.
+   */
+  stock: { level: StockLevel; label: ReactNode } & (
+    | { stale?: false | undefined; freshness: ReactNode; staleLabel?: ReactNode }
+    | { stale: true; staleLabel: ReactNode; freshness?: ReactNode }
+  );
   /** Pre-formatted, e.g. "₹289". */
   price: ReactNode;
   /** Pre-formatted MRP, shown struck through when above the price. */
@@ -74,14 +75,7 @@ export function ProductCard({
         )}
       </div>
       {unit !== undefined && <div className="tz-pcard-unit">{unit}</div>}
-      <StockTag
-        layout="stacked"
-        level={stock.level}
-        label={stock.label}
-        freshness={stock.freshness}
-        stale={stock.stale}
-        staleLabel={stock.staleLabel}
-      />
+      <StockTag layout="stacked" {...stock} />
       <div className="tz-pcard-foot">
         <div>
           <div className="tz-price">{price}</div>

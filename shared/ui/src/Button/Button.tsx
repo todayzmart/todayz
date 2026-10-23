@@ -1,5 +1,5 @@
 import { LoaderCircle } from 'lucide-react';
-import { forwardRef, type ButtonHTMLAttributes } from 'react';
+import { forwardRef, type ButtonHTMLAttributes, type MouseEvent } from 'react';
 import { cx } from '../internal/cx';
 import { Icon, type LucideIcon } from '../internal/Icon';
 
@@ -17,8 +17,16 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   block?: boolean | undefined;
   /** Leading Lucide icon (16px inside buttons). */
   icon?: LucideIcon | undefined;
-  /** Shows a spinner, sets aria-busy and blocks clicks. The label stays, so the width holds. */
+  /**
+   * Shows a spinner and blocks clicks (and form submission) while keeping focus on the button:
+   * aria-disabled and aria-busy, not the disabled attribute. The label stays, so the width holds.
+   */
   loading?: boolean | undefined;
+  /**
+   * Announced politely when loading starts, e.g. "Charging". It also joins the button's name while
+   * loading. Without it screen readers only get aria-busy, which most do not read.
+   */
+  loadingLabel?: string | undefined;
 }
 
 /** Button with every design-system variant (tz-btn). Labels are sentence case, verb first. */
@@ -29,14 +37,25 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     block = false,
     icon,
     loading = false,
+    loadingLabel,
     disabled,
     className,
     children,
     type = 'button',
+    onClick,
     ...rest
   },
   ref,
 ) {
+  const busy = loading && disabled !== true;
+  const click = (e: MouseEvent<HTMLButtonElement>) => {
+    if (busy) {
+      // Also cancels the submit of a type=submit button, including Enter in a field.
+      e.preventDefault();
+      return;
+    }
+    onClick?.(e);
+  };
   return (
     <button
       ref={ref}
@@ -48,17 +67,25 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
         block && 'tz-btn-block',
         className,
       )}
-      disabled={disabled === true || loading}
+      disabled={disabled}
+      aria-disabled={busy || undefined}
       aria-busy={loading || undefined}
       {...rest}
+      onClick={click}
     >
       {loading ? <Icon icon={LoaderCircle} className="tz-ui-spin" /> : icon && <Icon icon={icon} />}
       {children}
+      {loadingLabel !== undefined && (
+        // Always present, so the live region exists before the text arrives.
+        <span className="tz-ui-sr-only" aria-live="polite">
+          {busy ? loadingLabel : ''}
+        </span>
+      )}
     </button>
   );
 });
 
-export interface IconButtonProps extends Omit<ButtonProps, 'children' | 'icon' | 'block' | 'loading'> {
+export interface IconButtonProps extends Omit<ButtonProps, 'children' | 'icon' | 'block' | 'loading' | 'loadingLabel'> {
   icon: LucideIcon;
   /** Accessible name; icon-only buttons always need one. */
   label: string;

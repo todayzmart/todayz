@@ -7,7 +7,12 @@ import type { QuantityStepperLabels } from '../QuantityStepper/QuantityStepper';
 import { destination } from '../StoreMap/geo';
 import type { MapShop } from '../StoreMap/StoreMap';
 
-export const stepperLabels: QuantityStepperLabels = { add: 'Add', decrement: 'Remove one', increment: 'Add one' };
+export const stepperLabels: QuantityStepperLabels = {
+  add: 'Add',
+  decrement: 'Remove one',
+  increment: 'Add one',
+  max: (n) => `Only ${n} in stock`,
+};
 
 /** A router link stand-in that keeps navigation inside the story. */
 export function StoryLink({ href, children, ...rest }: LinkProps) {

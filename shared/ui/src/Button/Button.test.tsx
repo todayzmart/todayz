@@ -20,7 +20,7 @@ describe('Button', () => {
     expect(b.querySelector('svg.tz-ico')).not.toBeNull();
   });
 
-  it('loading keeps the label, shows a spinner, sets aria-busy and blocks clicks', () => {
+  it('loading keeps the label and focus, shows a spinner, and blocks clicks without disabling', () => {
     const onClick = vi.fn();
     render(
       <Button loading icon={Plus} onClick={onClick}>
@@ -28,11 +28,66 @@ describe('Button', () => {
       </Button>,
     );
     const b = screen.getByRole('button', { name: 'Charge' });
-    expect(b).toBeDisabled();
+    expect(b).toBeEnabled();
+    expect(b).toHaveAttribute('aria-disabled', 'true');
     expect(b).toHaveAttribute('aria-busy', 'true');
     expect(b.querySelector('.tz-ui-spin')).not.toBeNull();
+    b.focus();
     fireEvent.click(b);
     expect(onClick).not.toHaveBeenCalled();
+    expect(b).toHaveFocus();
+  });
+
+  it('keeps focus when loading starts and announces the loading label', () => {
+    const { rerender } = render(
+      <Button loadingLabel="Charging" onClick={() => undefined}>
+        Charge
+      </Button>,
+    );
+    const b = screen.getByRole('button', { name: 'Charge' });
+    const live = b.querySelector('[aria-live="polite"]');
+    expect(live).toBeEmptyDOMElement();
+    b.focus();
+    rerender(
+      <Button loading loadingLabel="Charging" onClick={() => undefined}>
+        Charge
+      </Button>,
+    );
+    expect(b).toHaveFocus();
+    expect(live).toHaveTextContent('Charging');
+    expect(b).toHaveAccessibleName('Charge Charging');
+  });
+
+  it('a loading submit button does not submit its form', () => {
+    const onSubmit = vi.fn((e: { preventDefault: () => void }) => e.preventDefault());
+    render(
+      <form onSubmit={onSubmit}>
+        <Button type="submit" loading>
+          Save
+        </Button>
+      </form>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('disabled stays a real disabled button, even while loading', () => {
+    const onClick = vi.fn();
+    render(
+      <Button disabled loading onClick={onClick}>
+        Charge
+      </Button>,
+    );
+    const b = screen.getByRole('button', { name: 'Charge' });
+    expect(b).toBeDisabled();
+    expect(b).not.toHaveAttribute('aria-disabled');
+  });
+
+  it('calls onClick when not loading', () => {
+    const onClick = vi.fn();
+    render(<Button onClick={onClick}>Go</Button>);
+    fireEvent.click(screen.getByRole('button', { name: 'Go' }));
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 
   it('forwards the ref', () => {

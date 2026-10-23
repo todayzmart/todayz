@@ -34,6 +34,11 @@
   text-decoration: none;
 }
 
+/* A loading button keeps its variant and focus (aria-disabled, not disabled). */
+.tz-btn[aria-busy='true'] {
+  cursor: progress;
+}
+
 .tz-ui-spin {
   animation: tz-ui-spin 800ms linear infinite;
 }
@@ -149,7 +154,8 @@ html.tz-ui-scroll-lock {
   height: 32px;
 }
 
-.tz-stepper button:disabled {
+.tz-stepper button:disabled,
+.tz-stepper button[aria-disabled='true'] {
   opacity: 0.4;
   cursor: not-allowed;
 }

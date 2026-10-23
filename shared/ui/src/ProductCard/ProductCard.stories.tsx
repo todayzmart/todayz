@@ -64,7 +64,6 @@ export const StaleStock: Story = {
     stock: {
       level: 'in',
       label: 'In stock',
-      freshness: 'updated 3 days ago',
       stale: true,
       staleLabel: 'Stock not confirmed recently',
     },

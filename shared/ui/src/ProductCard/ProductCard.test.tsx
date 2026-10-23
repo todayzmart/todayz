@@ -62,10 +62,10 @@ describe('ProductCard', () => {
   });
 
   it('out of stock disables Add; an item already in the cart can still be reduced but not raised', () => {
-    const { rerender } = render(<ProductCard {...props({ stock: { level: 'out', label: 'Out of stock' } })} />);
+    const { rerender } = render(<ProductCard {...props({ stock: { level: 'out', label: 'Out of stock', freshness: 'Confirmed 1 hr ago' } })} />);
     expect(screen.getByRole('button', { name: 'Add, Aashirvaad Atta' })).toBeDisabled();
-    rerender(<ProductCard {...props({ quantity: 2, stock: { level: 'out', label: 'Out of stock' } })} />);
+    rerender(<ProductCard {...props({ quantity: 2, stock: { level: 'out', label: 'Out of stock', freshness: 'Confirmed 1 hr ago' } })} />);
     expect(screen.getByRole('button', { name: 'Remove one, Aashirvaad Atta' })).toBeEnabled();
-    expect(screen.getByRole('button', { name: 'Add one, Aashirvaad Atta' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Add one, Aashirvaad Atta' })).toHaveAttribute('aria-disabled', 'true');
   });
 });
