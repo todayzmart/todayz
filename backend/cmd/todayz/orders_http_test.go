@@ -63,6 +63,7 @@ func (l *logBuf) String() string {
 type orderShop struct {
 	t                                          *testing.T
 	a                                          *bizAPI
+	cfg                                        *config.Config
 	logs                                       *logBuf
 	runner                                     *platformjobs.Fake
 	owner, manager, cashier, cashierS2, owner2 string
@@ -176,7 +177,7 @@ func newOrderShop(t *testing.T) *orderShop {
 
 	reg := platformjobs.NewRegistry()
 	jobs.Register(reg, jobs.Deps{Pool: tdb.Pool, Clock: clk, Settings: st, Config: cfg, Log: log})
-	o := &orderShop{t: t, a: a, logs: lb, runner: platformjobs.NewFake(reg, clk)}
+	o := &orderShop{t: t, a: a, cfg: cfg, logs: lb, runner: platformjobs.NewFake(reg, clk)}
 
 	o.login(&o.owner, ownerPhone, "business")
 	o.login(&o.owner2, otherOwnerPhone, "business")
@@ -560,6 +561,12 @@ func TestBK05AcceptAll(t *testing.T) {
 	r = o.staff(o.cashier, id2, "accept", map[string]any{"lines": []any{map[string]any{"orderItemId": lineID, "quantity": 0}}})
 	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
 	require.Equal(t, "placed", o.status(id2))
+	// More than the order asked for is an invalid value, not a partial accept.
+	r = o.staff(o.cashier, id2, "accept", map[string]any{"lines": []any{map[string]any{"orderItemId": lineID, "quantity": 2}}})
+	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
+	require.Equal(t, "more than the order asked for", fieldsOf(r)["body.lines[0].quantity"], r.raw)
+	require.Equal(t, "placed", o.status(id2))
+	require.Zero(t, o.held(id2))
 }
 
 // BK-06: no answer by accept_by: the timer expires the order (not_accepted)
