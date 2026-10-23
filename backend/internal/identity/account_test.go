@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -91,6 +92,9 @@ func TestDeleteAccount(t *testing.T) {
 		VALUES ($1, $2, 'Home', '1 MG Road', '560001', 'SRID=4326;POINT(77.6 12.97)')`, ids.UUID(ids.New(t0)), uid)
 	f.owner(`UPDATE devices SET push_endpoint = 'https://push.example/1', push_keys = '\x01' WHERE user_id = $1`, uid)
 	ctx := f.ctx("10.0.0.1")
+	deviceKeys := f.strings(`SELECT device_key FROM devices WHERE user_id = $1`, uid)
+	require.NotEmpty(t, deviceKeys)
+	require.Equal(t, 2, f.count(`SELECT count(*) FROM sessions WHERE user_id = $1 AND user_agent IS NOT NULL AND ip_hash IS NOT NULL`, uid))
 	hookDB := db.New(f.db.Pool)
 
 	var (
@@ -155,6 +159,12 @@ func TestDeleteAccount(t *testing.T) {
 	require.Equal(t, []ids.ID{in.UserID}, checked)
 	require.Empty(t, ran, "no hook runs after a refusal")
 	require.Equal(t, 1, f.count(`SELECT count(*) FROM otp_requests WHERE id = $1 AND consumed_at IS NULL`, ids.UUID(mustParse(t, reqID))))
+	// L10a: the right code refused by a check is not a try; only the wrong
+	// one above counted. Five refusals in a row still leave the code usable.
+	for range OTPMaxAttempts {
+		requireCode(t, f.svc.DeleteAccount(ctx, p, DeleteInput{RequestID: reqID, Code: code}), genproblems.Conflict)
+	}
+	require.Equal(t, 1, f.count(`SELECT attempts FROM otp_requests WHERE id = $1`, ids.UUID(mustParse(t, reqID))), "a refusal does not use a try")
 
 	// A check that fails (not a refusal) is a 500.
 	refuse = errors.New("orders unreachable")
@@ -178,6 +188,11 @@ func TestDeleteAccount(t *testing.T) {
 	require.Zero(t, f.count(`SELECT count(*) FROM phone_identities WHERE user_id = $1`, uid))
 	require.Zero(t, f.count(`SELECT count(*) FROM addresses WHERE user_id = $1`, uid))
 	require.Zero(t, f.count(`SELECT count(*) FROM devices WHERE user_id = $1 AND (push_endpoint IS NOT NULL OR push_keys IS NOT NULL OR counter_secret_enc IS NOT NULL)`, uid))
+	// L1: the browser's device id no longer links to the deleted user, and no
+	// session keeps a user agent or IP hash.
+	require.Equal(t, len(deviceKeys), f.count(`SELECT count(*) FROM devices WHERE user_id = $1`, uid), "the rows stay")
+	require.Zero(t, f.count(`SELECT count(*) FROM devices WHERE device_key = ANY($1)`, deviceKeys), "every device_key replaced")
+	require.Zero(t, f.count(`SELECT count(*) FROM sessions WHERE user_id = $1 AND (user_agent IS NOT NULL OR ip_hash IS NOT NULL)`, uid))
 	require.Zero(t, f.count(`SELECT count(*) FROM sessions WHERE user_id = $1 AND revoked_at IS NULL`, uid), "every app")
 	require.Equal(t, 2, f.count(`SELECT count(*) FROM sessions WHERE user_id = $1 AND revoked_reason = 'deleted'`, uid))
 	require.Equal(t, 1, f.count(`SELECT count(*) FROM otp_requests WHERE id = $1 AND consumed_at IS NOT NULL`, ids.UUID(mustParse(t, reqID))))
@@ -188,6 +203,46 @@ func TestDeleteAccount(t *testing.T) {
 	again := f.signIn(phone, authn.AppCustomer)
 	require.True(t, again.IsNewUser)
 	require.NotEqual(t, in.UserID, again.UserID)
+}
+
+// D-106 (M3): while no-show strikes limit the account, it cannot be deleted
+// (that would shed the limit): 409 conflict naming the date, the code stays
+// unused and no try is spent. After the date it can.
+func TestDeleteAccountWhileLimited(t *testing.T) {
+	f := newFixture(t, config.EnvTest)
+	const phone = "+919876543210"
+	in := f.signIn(phone, authn.AppCustomer)
+	p, err := f.svc.tokens.Verify(in.AccessToken)
+	require.NoError(t, err)
+	uid := ids.UUID(in.UserID)
+	var other []ids.ID
+	f.svc.AddDeletionCheck(CanDeleteFunc(func(_ context.Context, id ids.ID) error {
+		other = append(other, id)
+		return nil
+	}))
+	reqID, code := stepUpCode(f, phone)
+	ctx := f.ctx("10.0.0.1")
+	// Limited for two more minutes, inside the code's five.
+	until := f.clk.Now().Add(2 * time.Minute).UTC().Truncate(time.Second)
+	require.Equal(t, 1, f.count(`WITH u AS (UPDATE customer_profiles SET limited_until = $2 WHERE user_id = $1 RETURNING 1) SELECT count(*) FROM u`, uid, until))
+
+	err = f.svc.DeleteAccount(ctx, p, DeleteInput{RequestID: reqID, Code: code})
+	requireCode(t, err, genproblems.Conflict)
+	pe := problemOf(t, err)
+	require.Equal(t, until.Format(time.RFC3339), pe.Extensions["limitedUntil"])
+	require.Contains(t, pe.Detail, until.Format(time.RFC3339))
+	require.Empty(t, other, "identity's own check runs first and stops the rest")
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM users WHERE id = $1 AND status = 'active'`, uid))
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM otp_requests WHERE id = $1 AND consumed_at IS NULL AND attempts = 0`, ids.UUID(mustParse(t, reqID))))
+
+	// A second before the limit's end it still holds; from limited_until on
+	// (the rule is limited_until > now) the account can go.
+	f.clk.Set(until.Add(-time.Second))
+	requireCode(t, f.svc.DeleteAccount(ctx, p, DeleteInput{RequestID: reqID, Code: code}), genproblems.Conflict)
+	f.clk.Advance(time.Second)
+	require.NoError(t, f.svc.DeleteAccount(ctx, p, DeleteInput{RequestID: reqID, Code: code}))
+	require.Equal(t, []ids.ID{in.UserID}, other)
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM users WHERE id = $1 AND status = 'deleted'`, uid))
 }
 
 // An active admin keeps their account: a super_admin disables them first.
@@ -204,6 +259,26 @@ func TestDeleteAccountRefusesAnAdmin(t *testing.T) {
 
 	f.owner(`UPDATE admin_users SET disabled_at = now() WHERE user_id = $1`, ids.UUID(in.UserID))
 	require.NoError(t, f.svc.DeleteAccount(f.ctx("10.0.0.1"), p, DeleteInput{RequestID: reqID, Code: code}))
+}
+
+// L1: deleting a disabled admin who had enrolled TOTP drops the sealed
+// secret and every recovery code with the account.
+func TestDeleteAccountDisabledAdminDropsTOTP(t *testing.T) {
+	f := newFixture(t, config.EnvTest)
+	ad := enrolAdmin(f) // TOTP secret, enabled, ten recovery codes
+	uid := ids.UUID(ad.in.UserID)
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM admin_users WHERE user_id = $1 AND totp_secret_enc IS NOT NULL AND totp_enabled_at IS NOT NULL`, uid))
+	require.NotZero(t, f.count(`SELECT count(*) FROM admin_recovery_codes WHERE admin_id = $1`, uid))
+	f.owner(`UPDATE admin_users SET disabled_at = now() WHERE user_id = $1`, uid)
+
+	cust := f.signIn(adminPhone, authn.AppCustomer)
+	p, err := f.svc.tokens.Verify(cust.AccessToken)
+	require.NoError(t, err)
+	reqID, code := stepUpCode(f, adminPhone)
+	require.NoError(t, f.svc.DeleteAccount(f.ctx("10.0.0.1"), p, DeleteInput{RequestID: reqID, Code: code}))
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM admin_users WHERE user_id = $1 AND totp_secret_enc IS NULL AND totp_enabled_at IS NULL AND totp_last_step IS NULL AND disabled_at IS NOT NULL`, uid))
+	require.Zero(t, f.count(`SELECT count(*) FROM admin_recovery_codes WHERE admin_id = $1`, uid))
+	require.Zero(t, f.count(`SELECT count(*) FROM sessions WHERE user_id = $1 AND revoked_at IS NULL`, uid))
 }
 
 // A step_up code is bound to its number: another user's code never deletes.

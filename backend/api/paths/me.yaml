@@ -87,8 +87,9 @@
       `requestId` and code here. A wrong code is `422 code_invalid` with
       `extensions.attemptsLeft` (5 tries, then `429 otp_locked`); an expired, used or foreign code
       is `401 otp_expired`. Every domain's check runs first; a refusal (`409
-      account_has_active_order` while an order is not finished, D-31) changes nothing and leaves
-      the code unused. Otherwise, in one transaction: every domain's deletion hook runs (the
+      account_has_active_order` while an order is not finished, D-31; `409 conflict` while no-show
+      strikes limit the account, with `extensions.limitedUntil`, D-106) changes nothing, leaves the
+      code unused and does not count as one of its 5 tries. Otherwise, in one transaction: every domain's deletion hook runs (the
       wallet is forfeited, asks are deleted, D-101), the account is anonymised (name and phone
       removed; orders and ledger rows keep only the id), saved addresses and push endpoints are
       deleted, and every session in every app is revoked. The number can sign up again as a new

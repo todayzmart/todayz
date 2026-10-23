@@ -12,6 +12,7 @@ import (
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/reqctx"
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
@@ -26,8 +27,12 @@ import (
 //   - enrolled: POST /v1/auth/totp/verify {purpose: login}, or
 //     POST /v1/auth/totp/recover with a recovery code.
 //
-// Either marks the sign-in (session family) TOTP-verified now and returns an
-// access token with amr `otp+totp`; refresh keeps the amr. Every request reads
+// Either rotates the sign-in (session family): its live refresh token becomes
+// rotated, a new one is issued with the TOTP verification on its row, and the
+// answer is an access token with amr `otp+totp` plus the new refresh cookie.
+// A refresh token taken during the OTP-only step so never carries the
+// elevation. Refresh keeps the amr. Verify {purpose: step_up} only stamps the
+// live row. Every request reads
 // the family's last verification as the principal's StepUpAt (CheckSession),
 // and a † action needs it younger than authn.StepUpWindow: past it the admin
 // calls verify {purpose: step_up} and retries.
@@ -39,9 +44,15 @@ import (
 // recoveryCodeCount is how many recovery codes an enrolment gets (01 §2, D-60).
 const recoveryCodeCount = 10
 
-// recoveryCodeLen is the length of a recovery code without its dash, from
-// referralAlphabet (31 symbols, so ~49 bits each); shown as XXXXX-XXXXX.
-const recoveryCodeLen = 10
+// Recovery codes are recoveryCodeLen symbols of recoveryAlphabet, Crockford's
+// base32 (32 symbols, no I, L, O or U): 16 x 5 = 80 bits each, shown as
+// XXXX-XXXX-XXXX-XXXX. Typing ignores case, dashes and spaces and reads I and
+// L as 1 and O as 0.
+const (
+	recoveryAlphabet = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
+	recoveryCodeLen  = 16
+	recoveryGroup    = 4
+)
 
 // TOTP verify purposes (TotpVerifyRequest.purpose).
 const (
@@ -60,6 +71,10 @@ type Enrolment struct {
 type TOTPResult struct {
 	AccessToken string
 	ExpiresAt   time.Time
+	// RefreshToken is the rotated refresh token of a login-purpose verify or a
+	// recovery (the handler sets it as the admin cookie); empty for step_up.
+	RefreshToken     string
+	RefreshExpiresAt time.Time
 	// RecoveryCodesLeft: recovery only.
 	RecoveryCodesLeft int
 }
@@ -73,6 +88,18 @@ func adminPrincipal(p authn.Principal) error {
 		return problem.New(genproblems.Forbidden, "")
 	}
 	return nil
+}
+
+// lockUserAdmin takes the users row lock of a mass revocation (LockUser, FOR
+// NO KEY UPDATE) and then the admin row (lockAdmin). Verify and recover can
+// revoke every admin session (the lockout) or rotate the sign-in, so they
+// serialise with refresh (LockUserShared) like logout-all does. The lock
+// order is users, admin_users, sessions everywhere.
+func lockUserAdmin(ctx context.Context, q *identitydb.Queries, userID ids.ID) (identitydb.GetAdminForUpdateRow, error) {
+	if _, err := q.LockUser(ctx, ids.UUID(userID)); err != nil && !db.IsNoRows(err) {
+		return identitydb.GetAdminForUpdateRow{}, err
+	}
+	return lockAdmin(ctx, q, userID)
 }
 
 // lockAdmin reads the caller's admin row under a row lock: every TOTP flow of
@@ -107,17 +134,17 @@ func (s *Service) EnrolTOTP(ctx context.Context, p authn.Principal) (Enrolment, 
 	if err != nil {
 		return Enrolment{}, problem.Wrap(genproblems.Internal, err)
 	}
-	sealed, err := s.totpSeal.Seal(TOTPSealField, secret)
+	sealed, err := s.totpSeal.Seal(TOTPSealFieldFor(p.UserID), secret)
 	if err != nil {
 		return Enrolment{}, problem.Wrap(genproblems.Internal, err)
 	}
 	codes := make([]string, recoveryCodeCount)
 	for i := range codes {
-		c, err := randomString(referralAlphabet, recoveryCodeLen)
+		c, err := newRecoveryCode()
 		if err != nil {
 			return Enrolment{}, problem.Wrap(genproblems.Internal, err)
 		}
-		codes[i] = c[:recoveryCodeLen/2] + "-" + c[recoveryCodeLen/2:]
+		codes[i] = c
 	}
 	err = s.db.InTx(ctx, func(ctx context.Context) error {
 		q := identitydb.New(s.db.Q(ctx))
@@ -156,9 +183,9 @@ func (s *Service) EnrolTOTP(ctx context.Context, p authn.Principal) (Enrolment, 
 }
 
 // VerifyTOTP checks a code from the authenticator app. purpose login is the
-// second factor after OTP (it also confirms a pending enrolment); step_up
-// re-confirms an otp+totp session for a † action. Both mark the sign-in
-// verified now and return a fresh otp+totp access token.
+// second factor after OTP (it also confirms a pending enrolment) and rotates
+// the refresh token; step_up re-confirms an otp+totp session for a † action
+// and stamps the live row. Both return a fresh otp+totp access token.
 func (s *Service) VerifyTOTP(ctx context.Context, p authn.Principal, code, purpose string) (TOTPResult, error) {
 	if err := s.readyTOTP(); err != nil {
 		return TOTPResult{}, unavailable(ctx, err)
@@ -171,12 +198,13 @@ func (s *Service) VerifyTOTP(ctx context.Context, p authn.Principal, code, purpo
 	}
 	var (
 		roles   []string
+		rot     rotation
 		outcome error // a refusal whose failure count must commit
 	)
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
 		q := identitydb.New(s.db.Q(ctx))
 		now := s.clock.Now().UTC()
-		a, err := lockAdmin(ctx, q, p.UserID)
+		a, err := lockUserAdmin(ctx, q, p.UserID)
 		if err != nil {
 			return err
 		}
@@ -187,7 +215,7 @@ func (s *Service) VerifyTOTP(ctx context.Context, p authn.Principal, code, purpo
 		if a.TotpSecretEnc == nil {
 			return problem.New(genproblems.Conflict, "") // enrol first
 		}
-		secret, err := s.totpSeal.Open(TOTPSealField, a.TotpSecretEnc)
+		secret, err := s.totpSeal.Open(TOTPSealFieldFor(p.UserID), a.TotpSecretEnc)
 		if err != nil {
 			return fmt.Errorf("identity: open totp secret: %w", err)
 		}
@@ -204,7 +232,11 @@ func (s *Service) VerifyTOTP(ctx context.Context, p authn.Principal, code, purpo
 		if err := q.RecordTotpSuccess(ctx, identitydb.RecordTotpSuccessParams{Now: now, Step: &step, UserID: a.UserID}); err != nil {
 			return err
 		}
-		if err := s.markVerified(ctx, q, now, p); err != nil {
+		if purpose == TOTPPurposeLogin {
+			if rot, err = s.rotateElevated(ctx, q, now, p); err != nil {
+				return err
+			}
+		} else if err := s.markVerified(ctx, q, now, p); err != nil {
 			return err
 		}
 		action := "identity.totp_verified"
@@ -225,7 +257,9 @@ func (s *Service) VerifyTOTP(ctx context.Context, p authn.Principal, code, purpo
 	if outcome != nil {
 		return TOTPResult{}, outcome
 	}
-	return s.issueTOTP(p, roles)
+	out, err := s.issueTOTP(p, roles)
+	out.RefreshToken, out.RefreshExpiresAt = rot.token, rot.expiresAt
+	return out, err
 }
 
 // RecoverTOTP signs in with a recovery code instead of a TOTP code. Each code
@@ -241,12 +275,13 @@ func (s *Service) RecoverTOTP(ctx context.Context, p authn.Principal, recoveryCo
 	var (
 		roles   []string
 		left    int
+		rot     rotation
 		outcome error
 	)
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
 		q := identitydb.New(s.db.Q(ctx))
 		now := s.clock.Now().UTC()
-		a, err := lockAdmin(ctx, q, p.UserID)
+		a, err := lockUserAdmin(ctx, q, p.UserID)
 		if err != nil {
 			return err
 		}
@@ -279,7 +314,7 @@ func (s *Service) RecoverTOTP(ctx context.Context, p authn.Principal, recoveryCo
 		if err := q.RecordTotpSuccess(ctx, identitydb.RecordTotpSuccessParams{Now: now, UserID: a.UserID}); err != nil {
 			return err
 		}
-		if err := s.markVerified(ctx, q, now, p); err != nil {
+		if rot, err = s.rotateElevated(ctx, q, now, p); err != nil {
 			return err
 		}
 		n, err := q.CountUnusedRecoveryCodes(ctx, a.UserID)
@@ -303,11 +338,58 @@ func (s *Service) RecoverTOTP(ctx context.Context, p authn.Principal, recoveryCo
 	}
 	out, err := s.issueTOTP(p, roles)
 	out.RecoveryCodesLeft = left
+	out.RefreshToken, out.RefreshExpiresAt = rot.token, rot.expiresAt
 	return out, err
 }
 
-// markVerified stamps the caller's live sign-in as TOTP-verified now. No live
-// row means the sign-in ended meanwhile (logout, reuse, an expiry): 401.
+// rotation is the new refresh token of an elevated sign-in.
+type rotation struct {
+	token     string
+	expiresAt time.Time
+}
+
+// rotateElevated rotates the caller's sign-in on a login-purpose TOTP
+// verification or a recovery: the family's live rows are revoked as rotated
+// (RotationGrace applies to their tokens; later they are reuse), and a new row
+// is inserted with totp_verified_at now, the family's absolute expiry, its
+// device and user agent, and this request's IP hash. No live row means the
+// sign-in ended meanwhile (logout, reuse, an expiry): 401. The caller holds
+// the users row lock (lockUserAdmin), so a concurrent refresh of the family
+// runs wholly before or after it.
+func (s *Service) rotateElevated(ctx context.Context, q *identitydb.Queries, now time.Time, p authn.Principal) (rotation, error) {
+	rows, err := q.RotateAdminFamily(ctx, identitydb.RotateAdminFamilyParams{
+		Now: now, FamilyID: ids.UUID(p.SessionID), UserID: ids.UUID(p.UserID),
+	})
+	if err != nil {
+		return rotation{}, err
+	}
+	if len(rows) == 0 {
+		return rotation{}, problem.New(genproblems.Unauthorized, "")
+	}
+	last := rows[0]
+	for _, r := range rows[1:] {
+		if r.ExpiresAt.Before(last.ExpiresAt) {
+			last = r // never extend the sign-in
+		}
+	}
+	token, hash, err := newRefreshToken()
+	if err != nil {
+		return rotation{}, err
+	}
+	exp := last.ExpiresAt.UTC()
+	if err := q.InsertSession(ctx, identitydb.InsertSessionParams{
+		ID: ids.UUID(ids.New(now)), UserID: ids.UUID(p.UserID), App: string(authn.AppAdmin), FamilyID: ids.UUID(p.SessionID),
+		RefreshHash: hash, ExpiresAt: exp, DeviceID: last.DeviceID,
+		UserAgent: last.UserAgent, IpHash: s.hash.IP(reqctx.ClientIP(ctx)), Now: now,
+		TotpVerifiedAt: &now,
+	}); err != nil {
+		return rotation{}, err
+	}
+	return rotation{token: token, expiresAt: exp}, nil
+}
+
+// markVerified stamps the caller's live sign-in as TOTP-verified now (step_up).
+// No live row means the sign-in ended meanwhile (logout, reuse, an expiry): 401.
 func (s *Service) markVerified(ctx context.Context, q *identitydb.Queries, now time.Time, p authn.Principal) error {
 	n, err := q.SetFamilyTotpVerified(ctx, identitydb.SetFamilyTotpVerifiedParams{
 		Now: now, FamilyID: ids.UUID(p.SessionID), UserID: ids.UUID(p.UserID),
@@ -369,15 +451,36 @@ func (s *Service) recoveryHash(adminID ids.ID, code string) []byte {
 	return s.hash.Sum("recovery:" + adminID.String() + ":" + norm)
 }
 
-// normalizeRecoveryCode upper-cases a typed code and drops dashes and spaces;
-// ok is false unless exactly recoveryCodeLen symbols of the alphabet remain.
+// newRecoveryCode returns a random recovery code, XXXX-XXXX-XXXX-XXXX.
+func newRecoveryCode() (string, error) {
+	c, err := randomString(recoveryAlphabet, recoveryCodeLen)
+	if err != nil {
+		return "", err
+	}
+	var b strings.Builder
+	for i := 0; i < len(c); i += recoveryGroup {
+		if i > 0 {
+			b.WriteByte('-')
+		}
+		b.WriteString(c[i : i+recoveryGroup])
+	}
+	return b.String(), nil
+}
+
+// recoveryTyping drops what a person adds when typing a code and maps the
+// letters Crockford's base32 reads as digits.
+var recoveryTyping = strings.NewReplacer("-", "", " ", "", "I", "1", "L", "1", "O", "0")
+
+// normalizeRecoveryCode upper-cases a typed code, drops dashes and spaces and
+// maps I and L to 1 and O to 0; ok is false unless exactly recoveryCodeLen
+// symbols of the alphabet remain.
 func normalizeRecoveryCode(code string) (string, bool) {
-	norm := strings.ToUpper(strings.NewReplacer("-", "", " ", "").Replace(code))
+	norm := recoveryTyping.Replace(strings.ToUpper(code))
 	if len(norm) != recoveryCodeLen {
 		return norm, false
 	}
 	for _, r := range norm {
-		if !strings.ContainsRune(referralAlphabet, r) {
+		if !strings.ContainsRune(recoveryAlphabet, r) {
 			return norm, false
 		}
 	}

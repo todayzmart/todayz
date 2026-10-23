@@ -123,7 +123,7 @@ func TestSeedAdmins(t *testing.T) {
 		require.NotNil(t, enabled, a.Key)
 		want, err := identity.DecodeTOTPSecret(a.TOTPSecret)
 		require.NoError(t, err)
-		got, err := totpSeal.Open(identity.TOTPSealField, enc)
+		got, err := totpSeal.Open(identity.TOTPSealFieldFor(mustID(a.ID)), enc)
 		require.NoError(t, err, "%s: sealed the way identity opens it", a.Key)
 		require.Equal(t, want, got, a.Key)
 		require.False(t, bytes.Contains(enc, want), "%s: stored sealed", a.Key)

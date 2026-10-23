@@ -18,6 +18,7 @@
 package identity
 
 import (
+	"crypto/subtle"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -134,6 +135,8 @@ func New(d Deps) (*Service, error) {
 		}
 		s.seal = seal
 	}
+	// Identity's own deletion check runs first (D-106).
+	s.hooks.Can = append(s.hooks.Can, CanDeleteFunc(s.canDeleteWhileLimited))
 	if d.Hooks != nil {
 		s.hooks.Can = append(s.hooks.Can, d.Hooks.Can...)
 		s.hooks.On = append(s.hooks.On, d.Hooks.On...)
@@ -163,8 +166,9 @@ func New(d Deps) (*Service, error) {
 }
 
 // Preflight is the start-up check of the API (02 §8: auth refuses to start
-// without its provider): in staging and prod the PII and JWT keys, the SMS
-// provider with its DLT template, and Turnstile must be configured. Turnstile
+// without its provider): in staging and prod the PII, TOTP and JWT keys, the
+// SMS provider with its DLT template, and Turnstile must be configured, and
+// TOTP_ENC_KEY must not be PII_ENC_KEY (one leaked key must not open both). Turnstile
 // is required too (lead decision on the W1-01 review), replacing 02 §8's
 // "stricter rate limits" fallback, which named no limits. It names
 // variables, never values. New does not run it, so a router can be built
@@ -180,6 +184,9 @@ func Preflight(cfg *config.Config) error {
 	}
 	if !k.PIIHashKey.IsSet() {
 		missing = append(missing, "PII_HASH_KEY")
+	}
+	if !k.TOTPEncKey.IsSet() {
+		missing = append(missing, "TOTP_ENC_KEY")
 	}
 	if len(k.JWTSigningKeys) == 0 {
 		missing = append(missing, "JWT_SIGNING_KEYS")
@@ -201,6 +208,9 @@ func Preflight(cfg *config.Config) error {
 	}
 	if len(missing) > 0 {
 		return fmt.Errorf("identity: required in staging and prod: %s", strings.Join(missing, ", "))
+	}
+	if subtle.ConstantTimeCompare(k.TOTPEncKey.Bytes(), k.PIIEncKey.Bytes()) == 1 {
+		return errors.New("identity: TOTP_ENC_KEY must differ from PII_ENC_KEY")
 	}
 	return nil
 }

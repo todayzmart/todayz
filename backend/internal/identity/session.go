@@ -125,6 +125,13 @@ type RefreshInput struct {
 // TODO(lead): 01 §2 does not say whether the 30-day customer/business
 // lifetime slides; sliding is assumed, admin is absolute (the conservative
 // reading for the privileged app).
+//
+// Locks: the users row FOR SHARE first (lockSessionUser), then the session
+// row. A mass revocation (logout-all, the TOTP lockout, deletion) holds the
+// users row FOR NO KEY UPDATE, so a rotation either commits before it starts
+// (and its new row is revoked with the rest) or runs after it (and finds its
+// token revoked). Without that, the revocation's UPDATE, whose snapshot
+// predates the rotation's insert, would miss the new row.
 func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) {
 	if err := s.readyTokens(); err != nil {
 		return SignIn{}, unavailable(ctx, err)
@@ -141,6 +148,12 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 	)
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
 		q := identitydb.New(s.db.Q(ctx))
+		if found, err := lockSessionUser(ctx, q, in.Token, false); err != nil || !found {
+			if err == nil {
+				outcome = problem.New(genproblems.Unauthorized, "")
+			}
+			return err
+		}
 		now := s.clock.Now().UTC()
 		row, err := q.GetSessionByRefreshHashForUpdate(ctx, hashRefresh(in.Token))
 		switch {
@@ -204,7 +217,7 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 				return err
 			}
 			roles = a.Roles
-			if row.TotpVerifiedAt != nil {
+			if totpCurrent(a.TotpEnabledAt, row.TotpVerifiedAt) {
 				amr = authn.AMROTPTOTP
 			}
 		}
@@ -243,6 +256,40 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 	}
 	out.AccessToken, out.ExpiresAt = tok, exp
 	return out, nil
+}
+
+// lockSessionUser locks the users row of a refresh token's session before the
+// session row is locked: FOR SHARE for a refresh, FOR NO KEY UPDATE (LockUser)
+// for a mass revocation. found is false for an unknown token or user. The
+// first read takes no lock; a session's user never changes, so it is safe.
+func lockSessionUser(ctx context.Context, q *identitydb.Queries, token string, exclusive bool) (found bool, err error) {
+	uid, err := q.GetSessionUserByRefreshHash(ctx, hashRefresh(token))
+	switch {
+	case db.IsNoRows(err):
+		return false, nil
+	case err != nil:
+		return false, err
+	}
+	if exclusive {
+		_, err = q.LockUser(ctx, uid)
+	} else {
+		_, err = q.LockUserShared(ctx, uid)
+	}
+	switch {
+	case db.IsNoRows(err):
+		return false, nil
+	case err != nil:
+		return false, err
+	}
+	return true, nil
+}
+
+// totpCurrent reports whether a sign-in's TOTP verification at verifiedAt
+// still counts: the admin is enrolled now (totp_enabled_at) and verified at
+// or after that enrolment. A reset (W3-05) clears totp_enabled_at, so no
+// verification survives it, nor a later re-enrolment.
+func totpCurrent(enabledAt, verifiedAt *time.Time) bool {
+	return enabledAt != nil && verifiedAt != nil && !verifiedAt.Before(*enabledAt)
 }
 
 // Logout ends the sign-in (session family) of the presented refresh token.
@@ -320,7 +367,7 @@ func (s *Service) CheckSession(ctx context.Context, userID, sessionID ids.ID, ap
 			return authn.SessionState{}, fmt.Errorf("identity: admin check: %w", err)
 		}
 		out.Roles = a.Roles
-		if st.HasTotp {
+		if st.HasTotp && totpCurrent(a.TotpEnabledAt, &st.TotpVerifiedAt) {
 			out.StepUpAt = st.TotpVerifiedAt
 		}
 	}

@@ -12,6 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/todayz/backend/internal/platform/ids"
 )
 
 // Admin TOTP (02 §3.2, 01 §2): RFC 6238 with the parameters every
@@ -28,10 +30,15 @@ const (
 	TOTPSkew       = 1  // steps accepted either side of now
 	totpSecretLen  = 20 // bytes (RFC 4226 §4 recommends 160 bits)
 	TOTPIssuer     = "TodayZ"
-	TOTPSealField  = "totp_secret" // pii.Sealer field of admin_users.totp_secret_enc (the seed seals with it too)
-	totpModulo     = 1_000_000     // 10^TOTPDigits
+	totpModulo     = 1_000_000 // 10^TOTPDigits
 	totpCodeFormat = "%06d"
 )
+
+// TOTPSealFieldFor is the pii.Sealer field (the AES-GCM associated data) of
+// admin userID's admin_users.totp_secret_enc: "totp_secret:<user id>". The
+// seal is bound to its admin, so a sealed secret copied to another admin's
+// row does not open. The admin seed seals with it too.
+func TOTPSealFieldFor(userID ids.ID) string { return "totp_secret:" + userID.String() }
 
 // TOTPMaxFailures is how many wrong TOTP or recovery codes in a row end every
 // admin session of that admin (they sign in again with OTP).

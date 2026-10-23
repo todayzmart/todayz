@@ -215,7 +215,7 @@ func seedAdmins(ctx context.Context, d Deps, seal *pii.Sealer, hash *pii.Hasher,
 			if err != nil {
 				return fmt.Errorf("admin %s: totp_secret is not valid base32", a.Key)
 			}
-			if secretEnc, err = totpSeal.Seal(identity.TOTPSealField, secret); err != nil {
+			if secretEnc, err = totpSeal.Seal(identity.TOTPSealFieldFor(mustID(a.ID)), secret); err != nil {
 				return fmt.Errorf("admin %s: %w", a.Key, err)
 			}
 			enabledAt = &now

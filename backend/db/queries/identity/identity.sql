@@ -102,6 +102,11 @@ INSERT INTO sessions (id, user_id, app, family_id, refresh_hash, expires_at, dev
 VALUES (@id, @user_id, @app, @family_id, @refresh_hash, @expires_at, sqlc.narg(device_id),
   sqlc.narg(user_agent), sqlc.narg(ip_hash), @now, sqlc.narg(totp_verified_at), @now);
 
+-- name: GetSessionUserByRefreshHash :one
+-- The user of a refresh token, unlocked (a session's user never changes), so
+-- refresh and logout-all can lock the users row before the session row.
+SELECT user_id FROM sessions WHERE refresh_hash = @refresh_hash;
+
 -- name: GetSessionByRefreshHashForUpdate :one
 SELECT s.id, s.user_id, s.app, s.family_id, s.expires_at, s.revoked_at, s.revoked_reason,
   s.device_id, s.totp_verified_at, u.status AS user_status
@@ -174,6 +179,15 @@ RETURNING id;
 -- name: CountUnusedRecoveryCodes :one
 SELECT count(*)::int FROM admin_recovery_codes WHERE admin_id = @admin_id AND used_at IS NULL;
 
+-- name: RotateAdminFamily :many
+-- A login-purpose TOTP verification or recovery rotates the sign-in: its live
+-- rows become rotated (the usual grace applies to their tokens) and the caller
+-- inserts the elevated row. No rows: the sign-in is no longer live.
+UPDATE sessions SET revoked_at = @now::timestamptz, revoked_reason = 'rotated'
+WHERE family_id = @family_id AND user_id = @user_id AND app = 'admin'
+  AND revoked_at IS NULL AND expires_at > @now::timestamptz
+RETURNING expires_at, device_id, user_agent;
+
 -- name: SetFamilyTotpVerified :execrows
 -- Marks the live row of a sign-in (family) as TOTP-verified now; refresh
 -- copies it to the next row. 0 rows: the sign-in is no longer live.
@@ -194,7 +208,17 @@ UPDATE sessions SET revoked_at = @now::timestamptz, revoked_reason = @reason::te
 WHERE user_id = @user_id AND revoked_at IS NULL;
 
 -- name: LockUser :one
-SELECT status FROM users WHERE id = @id FOR UPDATE;
+-- The lock of a mass revocation (logout-all, the TOTP lockout, deletion) and
+-- of the admin TOTP flows. It conflicts with LockUserShared, so a refresh never
+-- inserts a session row a concurrent mass revocation cannot see, and not with
+-- the KEY SHARE lock a session insert's foreign key takes (no deadlock).
+-- Lock order: users, then admin_users, then sessions.
+SELECT status FROM users WHERE id = @id FOR NO KEY UPDATE;
+
+-- name: LockUserShared :one
+-- Refresh's lock: refreshes of one user run side by side, but never alongside
+-- a mass revocation of that user (LockUser).
+SELECT status FROM users WHERE id = @id FOR SHARE;
 
 -- name: GetPhoneHashByUser :one
 SELECT phone_hash FROM phone_identities WHERE user_id = @user_id;
@@ -208,6 +232,24 @@ DELETE FROM phone_identities WHERE user_id = @user_id;
 
 -- name: ScrubDevices :exec
 UPDATE devices SET push_endpoint = NULL, push_keys = NULL, counter_secret_enc = NULL, version = version + 1
+WHERE user_id = @user_id;
+
+-- name: ListDeviceIDs :many
+SELECT id FROM devices WHERE user_id = @user_id ORDER BY id;
+
+-- name: SetDeviceKey :exec
+-- Deletion replaces the client's device id, which stays in the browser and
+-- would link a new account on that browser to the deleted one.
+UPDATE devices SET device_key = @device_key, version = version + 1 WHERE id = @id;
+
+-- name: ScrubSessionPII :exec
+UPDATE sessions SET user_agent = NULL, ip_hash = NULL
+WHERE user_id = @user_id AND (user_agent IS NOT NULL OR ip_hash IS NOT NULL);
+
+-- name: ClearAdminTotp :exec
+-- A deleted (disabled) admin keeps no authenticator secret.
+UPDATE admin_users SET totp_secret_enc = NULL, totp_enabled_at = NULL, totp_last_step = NULL,
+  totp_failures = 0, version = version + 1
 WHERE user_id = @user_id;
 
 -- name: DeleteAddresses :exec

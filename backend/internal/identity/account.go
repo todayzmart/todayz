@@ -3,7 +3,12 @@ package identity
 import (
 	"context"
 	"crypto/hmac"
+	"crypto/rand"
 	"errors"
+	"fmt"
+	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/gen/sqlc/identitydb"
@@ -26,6 +31,10 @@ const (
 // not live: unlike a plain logout, signing everyone out needs proof of a
 // current sign-in, so an old stolen token cannot sign the owner out
 // everywhere. It returns how many session rows it revoked.
+//
+// It locks the users row (LockUser) before the session row, like every mass
+// revocation, so a concurrent refresh of another device of the user cannot
+// slip a new live row past the revocation (see Refresh).
 func (s *Service) LogoutAll(ctx context.Context, in RefreshInput) (int64, error) {
 	if err := s.ready(); err != nil {
 		return 0, unavailable(ctx, err)
@@ -39,6 +48,12 @@ func (s *Service) LogoutAll(ctx context.Context, in RefreshInput) (int64, error)
 	)
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
 		q := identitydb.New(s.db.Q(ctx))
+		if found, err := lockSessionUser(ctx, q, in.Token, true); err != nil || !found {
+			if err == nil {
+				outcome = problem.New(genproblems.Unauthorized, "")
+			}
+			return err
+		}
 		now := s.clock.Now().UTC()
 		row, err := q.GetSessionByRefreshHashForUpdate(ctx, hashRefresh(in.Token))
 		switch {
@@ -101,11 +116,19 @@ type DeleteInput struct {
 //     must be a step_up code of the customer app sent to this user's phone;
 //     a wrong code is 422 code_invalid with attemptsLeft, and the attempt
 //     count commits;
-//   - every CanDeleteAccount runs in a savepoint; a refusal answers as is,
-//     changes nothing and leaves the code unused;
+//   - every CanDeleteAccount runs in a savepoint (identity's own first: no
+//     deletion while no-show strikes limit the account, D-106); a refusal
+//     answers as is, changes nothing, leaves the code unused and does not
+//     count as an attempt (the code was right);
 //   - then, in the same transaction, the code is used, every OnAccountDelete
 //     runs, and identity anonymises the user, deletes the phone identity and
-//     addresses, scrubs devices and revokes every session of every app.
+//     addresses, scrubs devices (push keys, and a new device id in place of
+//     the browser's), clears the user agent and IP hash of every session,
+//     revokes every session of every app and, for a disabled admin, drops
+//     the TOTP secret and recovery codes.
+//
+// otp_requests.phone_enc is NOT NULL (the verify step needs it), so the
+// sealed phone of this user's codes stays until the 24-hour OTP purge.
 //
 // The users row stays (status deleted, no name), so the orders, ledger and
 // audit rows that point at it keep their history without PII; the phone is
@@ -169,10 +192,6 @@ func (s *Service) DeleteAccount(ctx context.Context, p authn.Principal, in Delet
 		if !now.Before(row.ExpiresAt) {
 			return problem.New(genproblems.OtpExpired, "")
 		}
-		attempts, err := q.RecordOtpAttempt(ctx, row.ID)
-		if err != nil {
-			return err
-		}
 		match := hmac.Equal(s.codeHash(reqID, in.Code), row.CodeHash)
 		if !match && s.allowTestCode {
 			plain, err := s.seal.Open("phone", row.PhoneEnc)
@@ -182,22 +201,30 @@ func (s *Service) DeleteAccount(ctx context.Context, p authn.Principal, in Delet
 			match = pii.IsReservedTestPhone(string(plain)) && hmac.Equal([]byte(in.Code), []byte(testCode))
 		}
 		if !match {
+			// Only a wrong code uses up a try; a right one refused below
+			// does not, so a refusal never locks the owner out of the code.
+			attempts, err := q.RecordOtpAttempt(ctx, row.ID)
+			if err != nil {
+				return err
+			}
 			outcome = problem.New(genproblems.CodeInvalid, "").WithExtension("attemptsLeft", max(OTPMaxAttempts-int(attempts), 0))
 			return nil
 		}
 
-		// TODO(lead): deleting an admin's or a business owner's account is not
-		// specified; an active admin keeps their account (a super_admin
-		// disables them first). Business owners: W1-04 registers a check.
-		if a, err := q.GetAdminUser(ctx, uid); err == nil && a.DisabledAt == nil {
-			outcome = problem.New(genproblems.Conflict, "")
-			return nil
-		} else if err != nil && !db.IsNoRows(err) {
+		// Business owners: W1-04 registers a check; an active admin keeps
+		// their account (a super_admin disables them first; lead: 409, Q2).
+		disabledAdmin := false
+		if a, err := q.GetAdminUser(ctx, uid); err == nil {
+			if a.DisabledAt == nil {
+				return problem.New(genproblems.Conflict, "")
+			}
+			disabledAdmin = true
+		} else if !db.IsNoRows(err) {
 			return err
 		}
 
-		// The checks: a refusal rolls back their savepoint only, so the
-		// attempt count above still commits and the code stays unused.
+		// The checks, in a savepoint: a refusal answers as is and nothing of
+		// the deletion is written.
 		var refusal error
 		if err := s.db.InTx(ctx, func(ctx context.Context) error {
 			for _, c := range hooks.Can {
@@ -214,8 +241,7 @@ func (s *Service) DeleteAccount(ctx context.Context, p authn.Principal, in Delet
 			refusal = pe
 		}
 		if refusal != nil {
-			outcome = refusal
-			return nil //nolint:nilerr // the refusal answers after the transaction, so the attempt count commits
+			return refusal
 		}
 
 		if err := q.ConsumeOtpRequest(ctx, identitydb.ConsumeOtpRequestParams{Now: now, ID: row.ID}); err != nil {
@@ -235,12 +261,23 @@ func (s *Service) DeleteAccount(ctx context.Context, p authn.Principal, in Delet
 		if err := q.DeleteAddresses(ctx, uid); err != nil {
 			return err
 		}
-		if err := q.ScrubDevices(ctx, uid); err != nil {
+		if err := s.scrubDevices(ctx, q, uid); err != nil {
 			return err
 		}
 		revoked, err = q.RevokeUserSessions(ctx, identitydb.RevokeUserSessionsParams{Now: now, Reason: reasonDeleted, UserID: uid})
 		if err != nil {
 			return err
+		}
+		if err := q.ScrubSessionPII(ctx, uid); err != nil {
+			return err
+		}
+		if disabledAdmin {
+			if err := q.ClearAdminTotp(ctx, uid); err != nil {
+				return err
+			}
+			if err := q.DeleteRecoveryCodes(ctx, uid); err != nil {
+				return err
+			}
 		}
 		_, err = s.audit.Write(ctx, auditEntry(authn.AppCustomer, p.UserID, "identity.account_deleted", map[string]any{
 			"revoked": revoked, "checks": len(hooks.Can), "hooks": len(hooks.On),
@@ -251,4 +288,50 @@ func (s *Service) DeleteAccount(ctx context.Context, p authn.Principal, in Delet
 		return asProblem(err)
 	}
 	return outcome
+}
+
+// scrubDevices drops the push keys and counter secrets of the user's devices
+// and replaces each device_key: it is the browser's own id (localStorage), so
+// a new account signed up in that browser would otherwise share it with the
+// deleted one. The replacement is 128 random bits in the ULID form
+// ck_devices_key accepts.
+func (s *Service) scrubDevices(ctx context.Context, q *identitydb.Queries, uid pgtype.UUID) error {
+	if err := q.ScrubDevices(ctx, uid); err != nil {
+		return err
+	}
+	devs, err := q.ListDeviceIDs(ctx, uid)
+	if err != nil {
+		return err
+	}
+	for _, id := range devs {
+		var key ids.ID
+		if _, err := rand.Read(key[:]); err != nil {
+			return fmt.Errorf("identity: device key: %w", err)
+		}
+		if err := q.SetDeviceKey(ctx, identitydb.SetDeviceKeyParams{DeviceKey: key.String(), ID: id}); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// canDeleteWhileLimited is identity's own CanDeleteAccount, registered before
+// every other (D-106, the conservative reading): while no-show strikes limit
+// the account (customer_profiles.limited_until is in the future), deleting it
+// would shed the limit, so the answer is 409 conflict naming the date after
+// which it can be deleted (extensions.limitedUntil).
+func (s *Service) canDeleteWhileLimited(ctx context.Context, userID ids.ID) error {
+	cp, err := identitydb.New(s.db.Q(ctx)).GetCustomerProfile(ctx, ids.UUID(userID))
+	switch {
+	case db.IsNoRows(err):
+		return nil
+	case err != nil:
+		return err
+	}
+	if cp.LimitedUntil == nil || !cp.LimitedUntil.After(s.clock.Now()) {
+		return nil
+	}
+	until := cp.LimitedUntil.UTC().Format(time.RFC3339)
+	return problem.New(genproblems.Conflict, "This account is limited after missed pickups; it can be deleted after "+until+".").
+		WithExtension("limitedUntil", until)
 }

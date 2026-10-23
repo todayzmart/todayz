@@ -3,6 +3,7 @@ package identity
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -45,6 +46,7 @@ type enrolled struct {
 	in       SignIn
 	otp      authn.Principal // the OTP-only principal of the sign-in
 	totp     authn.Principal // the otp+totp principal after verify
+	refresh  string          // the refresh token the verify rotated to
 	secret   []byte
 	recovery []string
 }
@@ -64,7 +66,7 @@ func enrolAdmin(f *fixture) enrolled {
 	tp, err := f.svc.tokens.Verify(res.AccessToken)
 	require.NoError(f.t, err)
 	tp.StepUpAt = f.stepUpAt(tp)
-	return enrolled{in: in, otp: p, totp: tp, secret: secret, recovery: enr.RecoveryCodes}
+	return enrolled{in: in, otp: p, totp: tp, refresh: res.RefreshToken, secret: secret, recovery: enr.RecoveryCodes}
 }
 
 // totp verifies the current code for p and returns the result.
@@ -74,7 +76,7 @@ func (f *fixture) totp(p authn.Principal, secret []byte, purpose string) TOTPRes
 	f.remember(code)
 	res, err := f.svc.VerifyTOTP(f.ctx("10.0.0.1"), p, code, purpose)
 	require.NoError(f.t, err)
-	f.remember(res.AccessToken)
+	f.remember(res.AccessToken, res.RefreshToken)
 	return res
 }
 
@@ -187,8 +189,18 @@ func TestAdminTOTPEnrolAndVerify(t *testing.T) {
 	_, err = f.svc.EnrolTOTP(ctx, tp)
 	requireCode(t, err, genproblems.Conflict)
 
-	// A refresh keeps otp+totp; the next sign-in starts at totp_verify.
-	r, err := refreshIn(f, authn.AppAdmin, in.RefreshToken)
+	// L9: the login verify rotated the refresh token. The one taken during
+	// the OTP-only step is rotated (a grace retry now, reuse later) and the
+	// new one carries the elevation: a refresh keeps otp+totp.
+	require.NotEmpty(t, res.RefreshToken)
+	require.Equal(t, in.RefreshExpiresAt.UTC(), res.RefreshExpiresAt.UTC(), "the sign-in is not extended")
+	_, err = refreshIn(f, authn.AppAdmin, in.RefreshToken)
+	requireCode(t, err, genproblems.Unauthorized)
+	require.True(t, errors.As(err, new(graceRetry)), "the OTP-only token was rotated")
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM sessions WHERE family_id = $1 AND revoked_reason = 'rotated' AND totp_verified_at IS NULL`, ids.UUID(p.SessionID)))
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM sessions WHERE family_id = $1 AND revoked_at IS NULL AND totp_verified_at IS NOT NULL`, ids.UUID(p.SessionID)))
+	// The next sign-in starts at totp_verify.
+	r, err := refreshIn(f, authn.AppAdmin, res.RefreshToken)
 	require.NoError(t, err)
 	rp, err := f.svc.tokens.Verify(r.AccessToken)
 	require.NoError(t, err)
@@ -251,18 +263,28 @@ func TestAdminStepUp(t *testing.T) {
 func TestAdminRecoveryCodes(t *testing.T) {
 	f := newFixture(t, config.EnvTest)
 	a := enrolAdmin(f)
-	_, p := adminSignIn(f)
+	in, p := adminSignIn(f)
 	ctx := f.ctx("10.0.0.1")
 
 	typed := strings.ToLower(strings.ReplaceAll(a.recovery[0], "-", ""))
 	res, err := f.svc.RecoverTOTP(ctx, p, typed)
 	require.NoError(t, err)
-	f.remember(res.AccessToken)
+	f.remember(res.AccessToken, res.RefreshToken)
 	require.Equal(t, 9, res.RecoveryCodesLeft)
 	rp, err := f.svc.tokens.Verify(res.AccessToken)
 	require.NoError(t, err)
 	require.Equal(t, authn.AMROTPTOTP, rp.AMR)
 	require.Equal(t, f.clk.Now().UTC(), f.stepUpAt(rp))
+
+	// L9: a recovery rotates the sign-in like a login verify.
+	require.NotEmpty(t, res.RefreshToken)
+	_, err = refreshIn(f, authn.AppAdmin, in.RefreshToken)
+	require.True(t, errors.As(err, new(graceRetry)), "the OTP-only token was rotated: %v", err)
+	r, err := refreshIn(f, authn.AppAdmin, res.RefreshToken)
+	require.NoError(t, err)
+	rp, err = f.svc.tokens.Verify(r.AccessToken)
+	require.NoError(t, err)
+	require.Equal(t, authn.AMROTPTOTP, rp.AMR)
 
 	_, p2 := adminSignIn(f)
 	_, err = f.svc.RecoverTOTP(ctx, p2, a.recovery[0])
@@ -271,7 +293,7 @@ func TestAdminRecoveryCodes(t *testing.T) {
 	requireCode(t, err, genproblems.CodeInvalid)
 	res, err = f.svc.RecoverTOTP(ctx, p2, a.recovery[1])
 	require.NoError(t, err)
-	f.remember(res.AccessToken)
+	f.remember(res.AccessToken, res.RefreshToken)
 	require.Equal(t, 8, res.RecoveryCodesLeft)
 	require.Equal(t, 2, f.count(`SELECT count(*) FROM admin_recovery_codes WHERE used_at IS NOT NULL`))
 	require.Equal(t, 2, f.count(`SELECT count(*) FROM audit_log WHERE action = 'identity.totp_recovered'`))
@@ -330,7 +352,7 @@ func TestAdminTOTPConcurrentReplay(t *testing.T) {
 	for range n {
 		go func() {
 			res, err := f.svc.VerifyTOTP(f.ctx("10.0.0.1"), p, code, TOTPPurposeLogin)
-			f.remember(res.AccessToken)
+			f.remember(res.AccessToken, res.RefreshToken)
 			errs <- err
 		}()
 	}
@@ -356,4 +378,76 @@ func TestTOTPUnconfigured(t *testing.T) {
 	requireCode(t, err, genproblems.ServiceUnavailable)
 	_, err = f.svc.RecoverTOTP(ctx, authn.Principal{}, "AAAAA-AAAAA")
 	requireCode(t, err, genproblems.ServiceUnavailable)
+}
+
+// L9: a step_up verify stamps the live row and leaves the refresh token as
+// it is (no cookie); only a login verify or a recovery rotates.
+func TestStepUpDoesNotRotate(t *testing.T) {
+	f := newFixture(t, config.EnvTest)
+	a := enrolAdmin(f)
+	f.clk.Advance(TOTPPeriod)
+	res := f.totp(a.totp, a.secret, TOTPPurposeStepUp)
+	require.Empty(t, res.RefreshToken)
+	require.True(t, res.RefreshExpiresAt.IsZero())
+	r, err := refreshIn(f, authn.AppAdmin, a.refresh)
+	require.NoError(t, err, "the token from the login verify is still the live one")
+	rp, err := f.svc.tokens.Verify(r.AccessToken)
+	require.NoError(t, err)
+	require.Equal(t, authn.AMROTPTOTP, rp.AMR)
+}
+
+// L3: a TOTP reset (totp_enabled_at cleared by an operator, W1-05) ends the
+// elevation of every live sign-in: CheckSession reports no step-up time and
+// a refresh answers otp, not otp+totp. A verification older than a later
+// re-enrolment does not count either.
+func TestTOTPResetDropsElevation(t *testing.T) {
+	f := newFixture(t, config.EnvTest)
+	a := enrolAdmin(f)
+	uid := ids.UUID(a.totp.UserID)
+	require.False(t, f.stepUpAt(a.totp).IsZero())
+
+	f.owner(`UPDATE admin_users SET totp_enabled_at = NULL, totp_secret_enc = NULL, totp_last_step = NULL WHERE user_id = $1`, uid)
+	require.True(t, f.stepUpAt(a.totp).IsZero(), "no step-up time after a reset")
+	r, err := refreshIn(f, authn.AppAdmin, a.refresh)
+	require.NoError(t, err)
+	rp, err := f.svc.tokens.Verify(r.AccessToken)
+	require.NoError(t, err)
+	require.Equal(t, authn.AMROTP, rp.AMR, "a refresh does not keep otp+totp after a reset")
+
+	// Re-enrolled after the verification: the old verification is not current.
+	f.clk.Advance(time.Minute)
+	f.owner(`UPDATE admin_users SET totp_enabled_at = $2, totp_secret_enc = '\x00' WHERE user_id = $1`, uid, f.clk.Now())
+	require.True(t, f.stepUpAt(a.totp).IsZero(), "verified before the current enrolment")
+	r, err = refreshIn(f, authn.AppAdmin, r.RefreshToken)
+	require.NoError(t, err)
+	rp, err = f.svc.tokens.Verify(r.AccessToken)
+	require.NoError(t, err)
+	require.Equal(t, authn.AMROTP, rp.AMR)
+}
+
+// L4: the sealed secret is bound to its admin (AAD totp_secret:<user id>):
+// copied onto another admin's row it does not open, so that admin cannot
+// sign in with the first admin's authenticator.
+func TestTOTPSealBoundToAdmin(t *testing.T) {
+	f := newFixture(t, config.EnvTest)
+	a := enrolAdmin(f)
+	const phoneB = "+919876543299"
+	cust := f.signIn(phoneB, authn.AppCustomer)
+	f.owner(`INSERT INTO admin_users (user_id, roles, totp_secret_enc, totp_enabled_at)
+		SELECT $1, ARRAY['support'], totp_secret_enc, totp_enabled_at FROM admin_users WHERE user_id = $2`,
+		ids.UUID(cust.UserID), ids.UUID(a.totp.UserID))
+	in := f.signIn(phoneB, authn.AppAdmin)
+	require.Equal(t, NextStepTOTPVerify, in.NextStep)
+	pb, err := f.svc.tokens.Verify(in.AccessToken)
+	require.NoError(t, err)
+
+	f.clk.Advance(TOTPPeriod)
+	code := TOTPCode(a.secret, f.clk.Now())
+	f.remember(code)
+	_, err = f.svc.VerifyTOTP(f.ctx("10.0.0.1"), pb, code, TOTPPurposeLogin)
+	requireCode(t, err, genproblems.Internal, "another admin's sealed secret does not open")
+	require.Zero(t, f.count(`SELECT count(*) FROM sessions WHERE user_id = $1 AND totp_verified_at IS NOT NULL`, ids.UUID(cust.UserID)))
+
+	// The owner's own row still opens.
+	f.totp(a.totp, a.secret, TOTPPurposeStepUp)
 }

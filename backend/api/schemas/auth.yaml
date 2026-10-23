@@ -126,7 +126,7 @@ TotpEnrolResponse:
       description: "`otpauth://totp/...` (SHA1, 6 digits, 30 s); the label is the user id, never the phone."
     recoveryCodes:
       type: array
-      description: 10 single-use codes (D-60), `XXXXX-XXXXX`. Never shown again.
+      description: 10 single-use codes (D-60), 16 Crockford base32 symbols (80 bits) shown as `XXXX-XXXX-XXXX-XXXX`. Never shown again.
       minItems: 10
       maxItems: 10
       items:
@@ -152,9 +152,9 @@ TotpRecoverRequest:
   properties:
     recoveryCode:
       type: string
-      description: One recovery code; hyphens, spaces and case are ignored. Never logged.
-      pattern: ^[A-Za-z0-9 -]{10,16}$
-      maxLength: 16
+      description: One recovery code; hyphens, spaces and case are ignored (`I` and `L` read as `1`, `O` as `0`). Never logged.
+      pattern: ^[A-Za-z0-9 -]{16,32}$
+      maxLength: 32
 TotpRecoverResponse:
   type: object
   description: A fresh access token with `amr` `otp+totp`, and how many recovery codes are left.

@@ -362,11 +362,15 @@ func (h authHandlers) VerifyTotp(ctx context.Context, req authapi.VerifyTotpRequ
 	if err != nil {
 		return nil, err
 	}
+	hdr := authapi.VerifyTotp200ResponseHeaders{CacheControl: ptr(noStore)}
+	if res.RefreshToken != "" { // purpose login rotated the sign-in
+		hdr.SetCookie = ptr(refreshCookie(authn.AppAdmin, res.RefreshToken, res.RefreshExpiresAt, h.s.clock.Now()))
+	}
 	return authapi.VerifyTotp200JSONResponse{
 		Body: authapi.AccessTokenResponse{
 			AccessToken: res.AccessToken, ExpiresAt: res.ExpiresAt.UTC(), TokenType: authapi.AccessTokenResponseTokenTypeBearer,
 		},
-		Headers: authapi.VerifyTotp200ResponseHeaders{CacheControl: ptr(noStore)},
+		Headers: hdr,
 	}, nil
 }
 
@@ -387,7 +391,10 @@ func (h authHandlers) RecoverTotp(ctx context.Context, req authapi.RecoverTotpRe
 			AccessToken: res.AccessToken, ExpiresAt: res.ExpiresAt.UTC(),
 			TokenType: authapi.TotpRecoverResponseTokenTypeBearer, RecoveryCodesLeft: res.RecoveryCodesLeft,
 		},
-		Headers: authapi.RecoverTotp200ResponseHeaders{CacheControl: ptr(noStore)},
+		Headers: authapi.RecoverTotp200ResponseHeaders{
+			CacheControl: ptr(noStore),
+			SetCookie:    ptr(refreshCookie(authn.AppAdmin, res.RefreshToken, res.RefreshExpiresAt, h.s.clock.Now())),
+		},
 	}, nil
 }
 

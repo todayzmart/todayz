@@ -40,7 +40,7 @@ func TestIdentityHTTPAdminTOTP(t *testing.T) {
 	_, err := a.db.OwnerPool.Exec(context.Background(), `INSERT INTO admin_users (user_id, roles) SELECT id, ARRAY['support'] FROM users WHERE id = $1`, ids.UUID(mustID(t, me["id"].(string))))
 	require.NoError(t, err)
 
-	out, _ := a.signInApp("admin")
+	out, otpCookie := a.signInApp("admin")
 	require.Equal(t, "totp_enrol", out["nextStep"])
 	otpOnly := out["accessToken"].(string)
 	w := a.do(http.MethodGet, "/v1/admin/jobs", "", bearer(otpOnly))
@@ -58,6 +58,13 @@ func TestIdentityHTTPAdminTOTP(t *testing.T) {
 	w = a.do(http.MethodPost, "/v1/auth/totp/verify", `{"code":"`+identity.TOTPCode(secret, a.clk.Now())+`","purpose":"login"}`, bearer(otpOnly))
 	require.Equal(t, http.StatusOK, w.Code, w.Body.String())
 	require.Equal(t, "no-store", w.Header().Get("Cache-Control"))
+	// L9: the login verify rotates the sign-in and sets the new cookie.
+	rotated := refreshCookieOf(t, w)
+	require.Equal(t, otpCookie.Name, rotated.Name)
+	require.Equal(t, "/v1/auth", rotated.Path)
+	require.True(t, rotated.HttpOnly)
+	require.Positive(t, rotated.MaxAge)
+	require.NotEqual(t, otpCookie.Value, rotated.Value, "a new refresh token")
 	full := decode(t, w)["accessToken"].(string)
 
 	w = a.do(http.MethodGet, "/v1/admin/jobs", "", bearer(full))
@@ -81,6 +88,7 @@ func TestIdentityHTTPAdminTOTP(t *testing.T) {
 	a.clk.Advance(authn.StepUpWindow + time.Second)
 	w = a.do(http.MethodPost, "/v1/auth/totp/verify", `{"code":"`+identity.TOTPCode(secret, a.clk.Now())+`","purpose":"step_up"}`, bearer(full))
 	require.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	require.Empty(t, w.Header().Values("Set-Cookie"), "step_up leaves the cookie")
 	w = a.do(http.MethodPost, "/v1/auth/totp/verify", `{"code":"12345","purpose":"login"}`, bearer(full))
 	require.Equal(t, http.StatusUnprocessableEntity, w.Code, "the contract refuses a malformed code")
 }

@@ -2,9 +2,12 @@ package identity
 
 import (
 	"net/url"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 // RFC 6238 Appendix B, SHA-1 rows: the 8-digit codes, of which a 6-digit
@@ -94,5 +97,46 @@ func TestTOTPSecretRoundTripAndURI(t *testing.T) {
 	}
 	if !strings.HasPrefix(u.Path, "/TodayZ:") {
 		t.Fatalf("label %s", u.Path)
+	}
+}
+
+// L5: recovery codes are 16 Crockford base32 symbols (80 bits), shown as
+// XXXX-XXXX-XXXX-XXXX; typing ignores case, dashes and spaces and reads I and
+// L as 1 and O as 0.
+func TestRecoveryCodeFormat(t *testing.T) {
+	require.Len(t, recoveryAlphabet, 32)
+	seen := map[rune]bool{}
+	for _, r := range recoveryAlphabet {
+		require.False(t, seen[r], "unique symbols")
+		seen[r] = true
+	}
+	require.GreaterOrEqual(t, recoveryCodeLen*5, 80, "at least 80 bits")
+
+	shape := regexp.MustCompile(`^[0-9A-HJKMNP-TV-Z]{4}(-[0-9A-HJKMNP-TV-Z]{4}){3}$`)
+	codes := map[string]bool{}
+	for range 200 {
+		c, err := newRecoveryCode()
+		require.NoError(t, err)
+		require.Regexp(t, shape, c)
+		norm, ok := normalizeRecoveryCode(c)
+		require.True(t, ok)
+		require.Equal(t, strings.ReplaceAll(c, "-", ""), norm)
+		codes[c] = true
+	}
+	require.Len(t, codes, 200, "no repeats")
+
+	for typed, want := range map[string]string{
+		"abcd-efgh-jkmn-pqrs": "ABCDEFGHJKMNPQRS",
+		"ABCD EFGH JKMN PQRS": "ABCDEFGHJKMNPQRS",
+		"oIl0-0000-0000-0000": "0110000000000000",
+		"tvwxyz01-23456789":   "TVWXYZ0123456789",
+	} {
+		norm, ok := normalizeRecoveryCode(typed)
+		require.True(t, ok, typed)
+		require.Equal(t, want, norm, typed)
+	}
+	for _, bad := range []string{"", "ABCDE-FGHJK", "ABCD-EFGH-JKMN-PQR", "ABCD-EFGH-JKMN-PQRST", "UBCD-EFGH-JKMN-PQRS", "ABCD-EFGH-JKMN-PQR!"} {
+		_, ok := normalizeRecoveryCode(bad)
+		require.False(t, ok, bad)
 	}
 }

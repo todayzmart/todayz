@@ -12,19 +12,22 @@ import (
 //
 // DELETE /v1/me runs in one transaction:
 //
-//  1. every CanDeleteAccount, in registration order, inside a savepoint. The
-//     first refusal stops the deletion: the savepoint rolls back, nothing of
-//     the account changes and the OTP code stays unused (only the attempt
-//     count commits). Orders refuses while an order is open (BK-44,
-//     `409 account_has_active_order`).
+//  1. every CanDeleteAccount, in registration order, inside a savepoint.
+//     Identity's own check comes first: no deletion while no-show strikes
+//     limit the account (D-106, 409 conflict with extensions.limitedUntil).
+//     The first refusal stops the deletion: nothing of the account changes,
+//     the OTP code stays unused and the refusal does not count as one of its
+//     tries (the code was right). Orders refuses while an order is open
+//     (BK-44, `409 account_has_active_order`).
 //  2. every OnAccountDelete, in registration order. Each scrubs or detaches
 //     its own rows (credits forfeits the wallet, CR-28; asks deletes the
 //     asks, ASK-28). Any error rolls the whole deletion back, identity's part
 //     included, and answers that error (a *problem.Error as is, anything else
 //     500).
 //  3. identity anonymises the user (status deleted, name cleared), deletes the
-//     phone identity and addresses, scrubs device push keys and revokes every
-//     session.
+//     phone identity and addresses, scrubs device push keys and device ids,
+//     clears every session's user agent and IP hash, revokes every session
+//     and, for a disabled admin, drops the TOTP secret and recovery codes.
 //
 // Domains never import each other (backend/CLAUDE.md): a domain implements
 // the interfaces in its own package and its mountX in cmd/todayz registers

@@ -16,6 +16,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/require"
 
 	genproblems "github.com/todayz/backend/gen/problems"
@@ -227,6 +228,15 @@ func (f *fixture) count(sql string, args ...any) int {
 	var n int
 	require.NoError(f.t, f.db.OwnerPool.QueryRow(context.Background(), sql, args...).Scan(&n))
 	return n
+}
+
+func (f *fixture) strings(sql string, args ...any) []string {
+	f.t.Helper()
+	rows, err := f.db.OwnerPool.Query(context.Background(), sql, args...)
+	require.NoError(f.t, err)
+	out, err := pgx.CollectRows(rows, pgx.RowTo[string])
+	require.NoError(f.t, err)
+	return out
 }
 
 func problemOf(t *testing.T, err error) *problem.Error {
@@ -913,6 +923,21 @@ func TestPreflight(t *testing.T) {
 			require.NotContains(t, err.Error(), v, "values are never named")
 		}
 	}
+
+	// TOTP_ENC_KEY (M2): config.Load already refuses a deployed config
+	// without it; Preflight checks it again, like the other keys.
+	cfg = loadConfig(t, env)
+	cfg.Keys.TOTPEncKey = config.Secret{}
+	require.EqualError(t, Preflight(cfg), "identity: required in staging and prod: TOTP_ENC_KEY")
+
+	// The same value as PII_ENC_KEY is refused, without naming either value.
+	same := maps.Clone(env)
+	same["TOTP_ENC_KEY"] = same["PII_ENC_KEY"]
+	err = Preflight(loadConfig(t, same))
+	require.EqualError(t, err, "identity: TOTP_ENC_KEY must differ from PII_ENC_KEY")
+	require.NotContains(t, err.Error(), same["PII_ENC_KEY"])
+	same["APP_ENV"] = "local"
+	require.NoError(t, Preflight(loadConfig(t, same)), "local is not checked")
 }
 
 // The staging and prod providers: no SMS refuses every send.
