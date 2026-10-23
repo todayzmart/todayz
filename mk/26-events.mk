@@ -9,5 +9,8 @@ GEN_STEPS += gen-events
 
 .PHONY: gen-events
 
+# The binary embeds backend/gen/events, so make dev and make reset generate it first.
+backend-bin: gen-events
+
 gen-events:
 	@go -C $(BACKEND) run ./internal/devtools/eventgen -in ../shared/telemetry/events -go gen/events -ts ../shared/telemetry/src/gen/events.ts
