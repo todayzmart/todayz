@@ -306,3 +306,22 @@ SELECT EXISTS (
   SELECT 1 FROM staff s JOIN businesses b ON b.id = s.business_id
   WHERE s.user_id = @user_id AND s.role = 'owner' AND s.status = 'active' AND b.status <> 'rejected'
 )::bool;
+
+------------------------------------------------------------------------------
+-- Escalation contact (W2-05 "new order not seen")
+------------------------------------------------------------------------------
+
+-- name: StoreEscalationContact :one
+-- A store name, business and sealed contact phone, plus the active business
+-- owner user id, preferred language and sealed login phone (NULL when absent).
+SELECT s.name, s.business_id, s.phone_enc AS store_phone_enc,
+       o.user_id AS owner_user_id, u.preferred_lang AS owner_lang, pi.phone_enc AS owner_phone_enc
+FROM stores s
+LEFT JOIN LATERAL (
+  SELECT st.user_id FROM staff st
+  WHERE st.business_id = s.business_id AND st.role = 'owner' AND st.status = 'active'
+  LIMIT 1
+) o ON true
+LEFT JOIN users u ON u.id = o.user_id
+LEFT JOIN phone_identities pi ON pi.user_id = o.user_id
+WHERE s.id = @id;
