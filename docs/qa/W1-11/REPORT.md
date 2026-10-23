@@ -145,3 +145,45 @@
 
 - **PromQL** was not run against a live Prometheus: no promtool was available offline, and the stack was not started.
 - **Grafana alerts.** Grafana did not load the alert file, so the severity templating was not exercised.
+
+## Rebase onto W1-07 (2026-10-23)
+
+- Rebased onto main 8cf046f (W1-07 merged). Commits a06fed0 and 039d408.
+- `cmd/todayz/worker.go`: conflict resolved. The worker builds the jobs registry and runs it through `platformjobs.Runner` next to W1-07's queue metrics.
+- `telemetry/labels.go`: the jobs labels (`kind`, `class`, `status`) are added to W1-07's allow-list.
+- `telemetry/dashboards_test.go`: dashboard 15 is covered by W1-07's dashboard test.
+- The jobs histograms use W1-07's exponential view.
+- TestPauseResume: `updatedAt` is now bounded by the moving offset clock (it flaked under load).
+- Files outside W1-11's paths: `backend/cmd/todayz/worker.go`, `backend/internal/platform/telemetry/labels.go` and `backend/internal/platform/telemetry/dashboards_test.go`.
+- Post-rebase `make check`: every step through check-ui passed. check-infra stopped on uninitialised Terraform providers. Fixed with `scripts/ci/terraform.sh prefetch && make setup-infra-cloudflare`, as the lead allowed.
+
+## Review fixes (2026-10-23)
+
+| # | Review item | Fix | Test |
+|---|---|---|---|
+| 1 | `tz_job_missed` was per process | The gauge callback reads missed state from the database: one query for every scheduled kind, the same rule as `missedNow`. A paused kind (not a timer) reads 0. The result is cached for 30 s and read again at once after this process's watchdog commits or a scheduled kind succeeds here. A failed read keeps the last values. The watchdog no longer sets the gauge inside its transaction. `Registry.MissedKinds(ctx)` reads through the same cache. | TestMissedGaugeIsSharedAcrossWorkers: two runners on one DB. A's watchdog flags and both read 1. B succeeds: B reads 0 at once, A reads 1 (cached), then 0 after the TTL. |
+| 2 | Watchdog after a pause | `job_controls.paused_at` and `resumed_at` hold the latest pause window. They are set by the pause/resume upsert. The watchdog does not flag a tick when the kind was paused at the tick or during its allowance and has since resumed. | TestWatchdogSkipsPauseWindows: paused across the tick, or inside the allowance, is not flagged. Resumed before the tick is flagged. TestPauseResume checks that the window is stored. |
+| 3 | `drop_old_partitions` lock wait | The function sets `lock_timeout = '3s'`. Behind a long reader it fails with 55P03, and the daily retention retries it. | TestDropOldPartitionsGivesUpOnLock: a reader holds `job_runs`, the drop waits, an insert queued behind it goes through within the timeout, and the drop returns 55P03. After the reader ends, the retry drops the partitions. |
+| 4 | Bad bytes in errors | `scrubError`, `scrubNote` and the new `scrubSummary` (on Summary keys) apply `strings.ToValidUTF8` and strip NUL. Summary keys that collide after cleaning are summed. | TestBadBytesAreSanitised: the handler returns NUL and invalid UTF-8 in its error, note and summary. The run ends as discarded with the cleaned text. |
+| 5 | Retention floor | The `job_runs` policy is seeded with `retention_days = 30`. The job still uses `job_runs_retention_days` (90). | TestRetentionDropsOldPartitions: a 29-day cut-off is refused ("keeps at least 30 days"). A 31-day cut-off is allowed. |
+| 6 | First-boot catch-up | A tick due before the runner started is caught up only when the kind has a `job_runs` row. Without one, the scheduler writes a skipped first-seen row for that period, under a per-kind advisory lock. The watchdog counts it as a run, so the period is not flagged. The kind first runs at its next tick. | TestFirstBootWaitsForNextTick: the kind with history catches up and the fresh kind does not. A second booting worker writes nothing. The watchdog does not flag the period, and both kinds run at the next tick. |
+| 7 | Hard cancel on the last attempt | `outcome` records `discarded`, not `cancelled`, when the context was cancelled on the last attempt and the cause is not River's remote cancel. | TestOutcome (new cases) |
+| 8 | Cron `*/N` in day fields | A day-of-month or day-of-week field starting with `*` counts as unrestricted for the OR rule (Vixie). | TestScheduleNextPrev: `0 0 */2 * 1` and `0 0 1 * */2` |
+| 9 | Concurrency | `Validate` caps `Concurrency` at 10 (`maxConcurrency`). Each capped run pins one pool connection for its whole run, and the pool defaults to max(4, NumCPU). `job_stats_hourly` pruning is unchanged. | TestValidate: 10 is accepted, 11 is refused. |
+
+**Migration edited in place.** `11101_w1-11_jobs.sql` is not on main, so it was edited rather than given an 11102. A local database that already applied 11101 needs `make reset`.
+
+## Evidence (agent, after the review fixes)
+
+| Check | Result |
+|---|---|
+| `go test -race` with DB: `internal/platform/jobs/...`, `internal/platform/migrate` (TestUpDownUp), `internal/jobs`, `cmd/todayz` | ok |
+| gofmt, go vet | clean |
+| make check (commit e77b0c9) | Passed, exit 0, every step: check-repo through check-tf-static. 267 Go `ok` lines; golangci-lint 0 issues; checkov 370 passed, 0 failed. |
+
+## Questions (review round)
+
+1. **Retention setting below the floor.** `job_runs_retention_days` allows values down to 1 (migration 00010). A value under 30 now makes `job_runs_retention` fail with "too recent". The failure is loud, nothing is dropped, and the failing alert fires. Should the setting's minimum be raised to 30? TODO(lead)
+2. **Pause history.** Only the latest pause window is kept. A pause, resume and second pause inside one allowance excuses only by the latest window.
+3. **W1-01 merge.** On main, `backend/internal/jobs/identity.go` registers `identity.purge` with the W0-03 River registry (`Add` and `r.Every`). W1-11 replaced that registry with `jobs.Define`, so the merge will not compile until identity.go is ported. Suggested port: `Define(r, Kind{Name: "identity_purge", Class: ClassMaintenance, Schedule: "0 * * * *", UniqueBy: PerTick, ...})` calling `identity.Purge`. The old kind name `identity.purge` also fails the snake_case rule. The file is W1-01's.
+4. **Carried over.** The events-retention gap. 05 §2.1 should list `status` among the allowed labels.
