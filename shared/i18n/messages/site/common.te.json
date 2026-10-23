@@ -238,5 +238,15 @@
     "message": "ఈ ఫారమ్‌కు JavaScript కావాలి. బ్రౌజర్‌లో దాన్ని ఆన్ చేసి పేజీని మళ్లీ తెరవండి.",
     "review": "machine",
     "enHash": "7d142906"
+  },
+  "nav.label": {
+    "message": "ప్రధాన",
+    "review": "machine",
+    "enHash": "62bce942"
+  },
+  "lead.err_captcha_load": {
+    "message": "భద్రతా తనిఖీ లోడ్ కాలేదు. పేజీని మళ్లీ లోడ్ చేసి మళ్లీ ప్రయత్నించండి.",
+    "review": "machine",
+    "enHash": "15c3e9e7"
   }
 }

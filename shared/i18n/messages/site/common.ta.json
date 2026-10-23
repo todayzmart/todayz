@@ -238,5 +238,15 @@
     "message": "இந்தப் படிவத்துக்கு JavaScript தேவை. உலாவியில் அதை இயக்கி பக்கத்தை மீண்டும் திறக்கவும்.",
     "review": "machine",
     "enHash": "7d142906"
+  },
+  "nav.label": {
+    "message": "முதன்மை",
+    "review": "machine",
+    "enHash": "62bce942"
+  },
+  "lead.err_captcha_load": {
+    "message": "பாதுகாப்புச் சரிபார்ப்பு ஏற்றப்படவில்லை. பக்கத்தை மீண்டும் ஏற்றி மீண்டும் முயலவும்.",
+    "review": "machine",
+    "enHash": "15c3e9e7"
   }
 }

@@ -194,8 +194,14 @@ test.describe('SC-SITE-03 lead form: bad input and server trouble', () => {
     const form = await leadForm(page, '/contact/');
     await fillLead(form);
     await form.getByRole('button', { name: 'Send details' }).click();
-    await expect(form.getByText('Please complete the check above.')).toBeVisible();
-    await expect(form.getByRole('status')).toHaveText('');
+    const check = form.locator('[data-error-for="captcha"]');
+    await expect(check).toHaveText('Please complete the check above.');
+    await expect(check).toBeVisible();
+    await expect(form.getByRole('status'), 'the missing check is announced').toHaveText('Please complete the check above.');
+    const widget = form.locator('.cf-turnstile');
+    await expect(widget, 'only the token is missing: focus goes to the check').toBeFocused();
+    await expect(widget).toHaveAttribute('aria-describedby', (await check.getAttribute('id')) ?? 'missing id');
+    await expect(form.getByLabel('Your name')).not.toHaveAttribute('aria-describedby');
     expect(calls).toBe(0);
   });
 
@@ -227,6 +233,8 @@ test.describe('SC-SITE-03 lead form: bad input and server trouble', () => {
     ['rate limited (429)', (r: Parameters<Parameters<Page['route']>[1]>[0]) => r.fulfill({ status: 429, body: '{}' }), 'Something went wrong'],
     ['down (503)', (r: Parameters<Parameters<Page['route']>[1]>[0]) => r.fulfill({ status: 503, body: '{}' }), 'Something went wrong'],
     ['unreachable', (r: Parameters<Parameters<Page['route']>[1]>[0]) => r.abort('failed'), 'Something went wrong'],
+    ['missing (404)', (r: Parameters<Parameters<Page['route']>[1]>[0]) => r.fulfill({ status: 404, body: '{}' }), 'Something went wrong'],
+    ['forbidding the origin (403)', (r: Parameters<Parameters<Page['route']>[1]>[0]) => r.fulfill({ status: 403, body: '{}' }), 'Something went wrong'],
     ['refusing the details (400)', (r: Parameters<Parameters<Page['route']>[1]>[0]) => r.fulfill({ status: 400, body: '{}' }), 'We could not accept these details.'],
   ] as const;
 
@@ -242,6 +250,153 @@ test.describe('SC-SITE-03 lead form: bad input and server trouble', () => {
       guard.errors.length = 0; // the browser logs the failed request itself
     });
   }
+});
+
+test.describe('SC-SITE-03 lead form: errors are announced, and the form always recovers', () => {
+  test('an input points at its error only while the error shows', async ({ page }) => {
+    const form = await leadForm(page, '/contact/');
+    const name = form.getByLabel('Your name');
+    await expect(name).not.toHaveAttribute('aria-describedby');
+    await form.getByRole('button', { name: 'Send details' }).click();
+    await expect(name).toHaveAttribute('aria-describedby', 'lead-name-err');
+    await expect(page.locator('#lead-name-err')).toHaveText('Enter your name.');
+    await fillLead(form);
+    await page.route(LEADS_URL, (route) => route.fulfill({ status: 503, body: '{}' }));
+    await form.getByRole('button', { name: 'Send details' }).click();
+    await expect(form.getByRole('status')).toContainText('Something went wrong');
+    for (const label of ['Your name', 'Mobile number', 'Shop name', 'City']) {
+      await expect(form.getByLabel(label), label).not.toHaveAttribute('aria-describedby');
+      await expect(form.getByLabel(label), label).toHaveAttribute('aria-invalid', 'false');
+    }
+    await expect(form.locator('.cf-turnstile')).not.toHaveAttribute('aria-describedby');
+    guard.errors.length = 0;
+  });
+
+  test('says the security check could not load when the Turnstile script is blocked', async ({ page }) => {
+    await page.route(TURNSTILE_URL, (route) => route.abort('blockedbyclient'));
+    let calls = 0;
+    await page.route(LEADS_URL, (route) => {
+      calls += 1;
+      return route.fulfill({ status: 201, body: '{}' });
+    });
+    const form = await leadForm(page, '/contact/');
+    await fillLead(form);
+    await form.getByRole('button', { name: 'Send details' }).click();
+    await expect(form.getByRole('status')).toHaveText(
+      'Something went wrong. Please try again in a moment. The security check could not load. Reload the page and try again.',
+    );
+    await expect(form.locator('[data-error-for="captcha"]')).toBeHidden();
+    await expect(form.getByRole('button', { name: 'Send details' })).toBeEnabled();
+    expect(calls).toBe(0);
+    guard.errors.length = 0; // the browser logs the blocked script
+  });
+
+  test("says so when the Turnstile widget reports an error", async ({ page }) => {
+    await page.route(TURNSTILE_URL, (route) =>
+      route.fulfill({
+        contentType: 'text/javascript',
+        body: `window.turnstile = { reset() {} };
+          const wait = setInterval(() => { if (window.tzTurnstileError) { clearInterval(wait); window.tzTurnstileError('300030'); } }, 20);`,
+      }),
+    );
+    let calls = 0;
+    await page.route(LEADS_URL, (route) => {
+      calls += 1;
+      return route.fulfill({ status: 201, body: '{}' });
+    });
+    const form = await leadForm(page, '/contact/');
+    await expect(form.getByRole('status')).toContainText('The security check could not load.');
+    await fillLead(form);
+    await form.getByRole('button', { name: 'Send details' }).click();
+    await expect(form.getByRole('status')).toContainText('Something went wrong');
+    await expect(form.getByRole('status')).toContainText('The security check could not load.');
+    expect(calls).toBe(0);
+  });
+
+  test('gives up after 15 s, keeps the details and lets the visitor retry', async ({ page }) => {
+    await page.clock.install();
+    let release: () => void = () => {};
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route(LEADS_URL, async (route) => {
+      await held;
+      await route.fulfill({ status: 201, body: '{}' }).catch(() => undefined);
+    });
+    const form = await leadForm(page, '/contact/');
+    const button = form.getByRole('button', { name: 'Send details' });
+    await fillLead(form);
+    await button.click();
+    await expect(form.getByRole('status')).toHaveText('Sending…');
+    await page.clock.runFor(14_000);
+    await expect(button).toBeDisabled();
+    await page.clock.runFor(1_000);
+    await expect(form.getByRole('status')).toContainText('Something went wrong');
+    await expect(button).toBeEnabled();
+    await expect(form.getByLabel('Your name')).toHaveValue('Asha Rao');
+    await expect(form.getByLabel('Mobile number')).toHaveValue(TEST_PHONE);
+    release();
+    guard.errors.length = 0;
+  });
+
+  test('sends one Idempotency-Key per set of details: the same on a retry, a new one after a success', async ({ page }) => {
+    const keys: string[] = [];
+    const answers = [503, 503, 201, 201];
+    await page.route(LEADS_URL, (route) => {
+      keys.push(route.request().headers()['idempotency-key'] ?? '');
+      return route.fulfill({ status: answers[keys.length - 1] ?? 201, body: '{}' });
+    });
+    const form = await leadForm(page, '/contact/');
+    const button = form.getByRole('button', { name: 'Send details' });
+    const status = form.getByRole('status');
+    await fillLead(form);
+    await button.click();
+    await expect(status).toContainText('Something went wrong');
+    await button.click();
+    await expect.poll(() => keys.length).toBe(2);
+    await expect(status).toContainText('Something went wrong');
+    await button.click();
+    await expect(status).toHaveText('Thank you. We have your details.');
+    await fillLead(form);
+    await button.click();
+    await expect.poll(() => keys.length).toBe(4);
+    for (const key of keys) expect(key).toMatch(/^[0-7][0-9A-HJKMNP-TV-Z]{25}$/);
+    expect(keys[1], 'a retry reuses the key').toBe(keys[0]);
+    expect(keys[2], 'a retry reuses the key').toBe(keys[0]);
+    expect(keys[3], 'a new lead after a success gets a new key').not.toBe(keys[0]);
+    guard.errors.length = 0;
+  });
+});
+
+test.describe('SC-SITE-06 motion can be stopped (WCAG 2.2.2)', () => {
+  test('the shop-type strip has a visible pause control that works from the keyboard', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.goto('/');
+    const track = page.locator('.marquee-track').first();
+    await expect(track).toHaveCSS('animation-play-state', 'running');
+    const pause = page.getByRole('checkbox', { name: 'Pause the moving list' });
+    await expect(page.locator('.marquee-pause').first()).toBeVisible();
+    await pause.focus();
+    await page.keyboard.press('Space');
+    await expect(pause).toBeChecked();
+    await expect(track).toHaveCSS('animation-play-state', 'paused');
+    await page.keyboard.press('Space');
+    await expect(track).toHaveCSS('animation-play-state', 'running');
+  });
+
+  test('no other animation repeats forever', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    for (const path of ['/', '/for-retailers/']) {
+      await page.goto(path);
+      const endless = await page.evaluate(() =>
+        document
+          .getAnimations()
+          .filter((a) => a.effect?.getTiming().iterations === Infinity)
+          .map((a) => (a.effect instanceof KeyframeEffect && a.effect.target instanceof Element ? a.effect.target.className : '?')),
+      );
+      expect(endless.filter((c) => !String(c).includes('marquee-track')), path).toEqual([]);
+    }
+  });
 });
 
 test.describe('SC-SITE-04 languages', () => {
@@ -315,6 +470,7 @@ test.describe('SC-SITE-05 search engines', () => {
     expect(file).toContain("frame-ancestors 'none'");
     expect(file).toContain('X-Content-Type-Options: nosniff');
     expect(file).toContain('Referrer-Policy: strict-origin-when-cross-origin');
+    expect(file).toContain('/_astro/*\n  Cache-Control: public, max-age=31536000, immutable');
   });
 });
 

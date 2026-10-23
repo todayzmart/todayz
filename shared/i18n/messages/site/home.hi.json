@@ -988,5 +988,10 @@
     "message": "कोई भी मोहल्ले की दुकान जो असली सामान बेचती है, किराने से लेकर हार्डवेयर तक।",
     "review": "machine",
     "enHash": "de090547"
+  },
+  "home.types.pause": {
+    "message": "चलती सूची रोकें",
+    "review": "machine",
+    "enHash": "8cd44034"
   }
 }

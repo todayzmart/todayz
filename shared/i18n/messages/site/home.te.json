@@ -988,5 +988,10 @@
     "message": "కిరాణా నుండి హార్డ్‌వేర్ వరకు, వస్తువులు అమ్మే ఏ వీధి షాపైనా.",
     "review": "machine",
     "enHash": "de090547"
+  },
+  "home.types.pause": {
+    "message": "కదిలే జాబితాను ఆపండి",
+    "review": "machine",
+    "enHash": "8cd44034"
   }
 }

@@ -988,5 +988,10 @@
     "message": "மளிகை முதல் ஹார்டுவேர் வரை, பொருட்களை விற்கும் எந்தத் தெருக்கடையும்.",
     "review": "machine",
     "enHash": "de090547"
+  },
+  "home.types.pause": {
+    "message": "நகரும் பட்டியலை நிறுத்து",
+    "review": "machine",
+    "enHash": "8cd44034"
   }
 }

@@ -38,7 +38,7 @@ const start = page.leadForm ? { href: '#join', hreflang: undefined } : { ...link
   <div class="head-row">
     <a class="brand" href={home.href} aria-label={t('a11y.home')}>Today<b>Z</b></a>
 
-    <nav class="nav" aria-label="TodayZ">
+    <nav class="nav" aria-label={t('nav.label')}>
       {
         nav.map((item) => (
           <a href={item.href} hreflang={item.hreflang} aria-current={item.id === page.id ? 'page' : undefined}>

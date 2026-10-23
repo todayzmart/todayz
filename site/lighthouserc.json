@@ -22,32 +22,179 @@
       }
     },
     "assert": {
-      "assertions": {
-        "categories:performance": [
-          "error",
-          {
-            "minScore": 0.95
+      "assertMatrix": [
+        {
+          "matchingUrlPattern": "/(hi|te)/(index\\.html)?$",
+          "assertions": {
+            "categories:performance": [
+              "error",
+              {
+                "minScore": 0.85
+              }
+            ],
+            "categories:accessibility": [
+              "error",
+              {
+                "minScore": 0.95
+              }
+            ],
+            "categories:best-practices": [
+              "error",
+              {
+                "minScore": 0.95
+              }
+            ],
+            "document-title": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ],
+            "meta-description": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ],
+            "http-status-code": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ],
+            "link-text": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ],
+            "crawlable-anchors": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ],
+            "robots-txt": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ],
+            "hreflang": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ],
+            "canonical": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ]
           }
-        ],
-        "categories:accessibility": [
-          "error",
-          {
-            "minScore": 0.95
+        },
+        {
+          "matchingUrlPattern": "/(kn|ta)/(index\\.html)?$",
+          "assertions": {
+            "categories:performance": [
+              "error",
+              {
+                "minScore": 0.95
+              }
+            ],
+            "categories:accessibility": [
+              "error",
+              {
+                "minScore": 0.95
+              }
+            ],
+            "categories:best-practices": [
+              "error",
+              {
+                "minScore": 0.95
+              }
+            ],
+            "document-title": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ],
+            "meta-description": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ],
+            "http-status-code": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ],
+            "link-text": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ],
+            "crawlable-anchors": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ],
+            "robots-txt": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ],
+            "hreflang": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ],
+            "canonical": [
+              "error",
+              {
+                "minScore": 1
+              }
+            ]
           }
-        ],
-        "categories:best-practices": [
-          "error",
-          {
-            "minScore": 0.95
+        },
+        {
+          "matchingUrlPattern": "^(?!.*/(hi|kn|te|ta)/(index\\.html)?$).*$",
+          "assertions": {
+            "categories:performance": [
+              "error",
+              {
+                "minScore": 0.95
+              }
+            ],
+            "categories:accessibility": [
+              "error",
+              {
+                "minScore": 0.95
+              }
+            ],
+            "categories:best-practices": [
+              "error",
+              {
+                "minScore": 0.95
+              }
+            ],
+            "categories:seo": [
+              "error",
+              {
+                "minScore": 0.95
+              }
+            ]
           }
-        ],
-        "categories:seo": [
-          "error",
-          {
-            "minScore": 0.95
-          }
-        ]
-      }
+        }
+      ]
     },
     "upload": {
       "target": "filesystem",

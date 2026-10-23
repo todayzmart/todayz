@@ -1,6 +1,8 @@
 ---
 // Scrolling strip of shop types. The list is rendered twice for a seamless loop; the copy is hidden
-// from assistive tech. The animation stops under prefers-reduced-motion (landing.css).
+// from assistive tech. The animation stops under prefers-reduced-motion (landing.css), and the
+// visible "pause" checkbox stops it for anyone (WCAG 2.2.2). A checkbox, not a scripted button, so
+// the control works without JavaScript.
 import Icon from '../Icon.astro';
 import type { MessageKey, Translate } from '../../i18n/index.ts';
 import { SHOP_TYPES } from './data.ts';
@@ -38,4 +40,10 @@ const types = SHOP_TYPES.map((type, i) => ({ ...type, name: t(`home.types.${i + 
       }
     </ul>
   </div>
+  <label class="marquee-pause">
+    <input type="checkbox" data-marquee-pause />
+    <Icon name="pause" size={16} class="when-playing" />
+    <Icon name="play" size={16} class="when-paused" />
+    <span class="sr-only">{t('home.types.pause')}</span>
+  </label>
 </section>

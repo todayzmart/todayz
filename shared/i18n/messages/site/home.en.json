@@ -682,5 +682,9 @@
   },
   "home.faq.4.a": {
     "defaultMessage": "Any neighbourhood shop that sells physical goods, from grocery to hardware."
+  },
+  "home.types.pause": {
+    "defaultMessage": "Pause the moving list",
+    "description": "Label of the checkbox that pauses the scrolling strip of shop types (WCAG 2.2.2)."
   }
 }

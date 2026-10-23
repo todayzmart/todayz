@@ -42,6 +42,9 @@ export function headersFile(apiOrigins) {
     '  Referrer-Policy: strict-origin-when-cross-origin',
     '  X-Frame-Options: DENY',
     '  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()',
+    // Astro's hashed bundles never change under a name: cache them for a year.
+    '/_astro/*',
+    '  Cache-Control: public, max-age=31536000, immutable',
     '',
   ].join('\n');
 }

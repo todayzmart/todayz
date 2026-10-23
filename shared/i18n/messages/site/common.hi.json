@@ -238,5 +238,15 @@
     "message": "इस फ़ॉर्म के लिए JavaScript चाहिए। इसे ब्राउज़र में चालू करें और पेज दोबारा खोलें।",
     "review": "machine",
     "enHash": "7d142906"
+  },
+  "nav.label": {
+    "message": "मुख्य",
+    "review": "machine",
+    "enHash": "62bce942"
+  },
+  "lead.err_captcha_load": {
+    "message": "सुरक्षा जाँच लोड नहीं हो सकी। पेज दोबारा लोड करके फिर कोशिश करें।",
+    "review": "machine",
+    "enHash": "15c3e9e7"
   }
 }

@@ -143,5 +143,13 @@
   },
   "lead.nojs": {
     "defaultMessage": "This form needs JavaScript. Turn it on in your browser and reload the page."
+  },
+  "nav.label": {
+    "defaultMessage": "Main",
+    "description": "Accessible name of the header navigation."
+  },
+  "lead.err_captcha_load": {
+    "defaultMessage": "The security check could not load. Reload the page and try again.",
+    "description": "Shown after the generic error when the Turnstile check failed to load or errored."
   }
 }

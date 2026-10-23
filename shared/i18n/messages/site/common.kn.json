@@ -238,5 +238,15 @@
     "message": "ಈ ಫಾರ್ಮ್‌ಗೆ JavaScript ಬೇಕು. ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಅದನ್ನು ಆನ್ ಮಾಡಿ ಪುಟವನ್ನು ಮತ್ತೆ ತೆರೆಯಿರಿ.",
     "review": "machine",
     "enHash": "7d142906"
+  },
+  "nav.label": {
+    "message": "ಮುಖ್ಯ",
+    "review": "machine",
+    "enHash": "62bce942"
+  },
+  "lead.err_captcha_load": {
+    "message": "ಭದ್ರತಾ ಪರಿಶೀಲನೆ ಲೋಡ್ ಆಗಲಿಲ್ಲ. ಪುಟವನ್ನು ಮರುಲೋಡ್ ಮಾಡಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "machine",
+    "enHash": "15c3e9e7"
   }
 }

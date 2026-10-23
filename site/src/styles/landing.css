@@ -178,7 +178,7 @@
   border-radius: 50%;
   background: var(--brand-mark);
   box-shadow: 0 0 0 0 var(--ring);
-  animation: tz-ping 2.4s ease-out infinite;
+  animation: tz-ping 2.4s ease-out 2;
 }
 
 .lp h1 {
@@ -352,7 +352,7 @@
   inset: -3px;
   border-radius: inherit;
   box-shadow: 0 0 0 0 var(--ring);
-  animation: tz-ping 2.8s ease-out infinite;
+  animation: tz-ping 2.8s ease-out 2;
 }
 
 .lp .pin-a {
@@ -559,7 +559,7 @@
   border: 1px solid var(--line);
   border-radius: 18px;
   box-shadow: 0 24px 48px -16px color-mix(in srgb, var(--brand-strong) 28%, transparent), var(--shadow-pop);
-  animation: tz-float 7s ease-in-out infinite;
+  animation: tz-float 7s ease-in-out 1;
 }
 
 .lp .order-card {
@@ -736,10 +736,15 @@
 /* ============ MARQUEE ============ */
 
 .lp .types-strip {
-  padding: 24px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 16px 8px 0;
 }
 
 .lp .marquee {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   mask-image: linear-gradient(90deg, transparent, var(--ink) 10%, var(--ink) 90%, transparent);
 }
@@ -752,6 +757,63 @@
   padding: 0;
   list-style: none;
   animation: tz-marquee 36s linear infinite;
+}
+
+/* WCAG 2.2.2: a visible control pauses the strip. A checkbox, so it works without JavaScript. */
+.lp .marquee-pause {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.lp .marquee-pause:hover {
+  color: var(--ink);
+}
+
+.lp .marquee-pause input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border-radius: 50%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.lp .marquee-pause:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.lp .marquee-pause .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.lp .marquee-pause .when-paused,
+.lp .marquee-pause:has(input:checked) .when-playing {
+  display: none;
+}
+
+.lp .marquee-pause:has(input:checked) .when-paused {
+  display: block;
+}
+
+.lp .types-strip:has(input[data-marquee-pause]:checked) .marquee-track {
+  animation-play-state: paused;
 }
 
 .lp .marquee-track li {
@@ -1158,7 +1220,7 @@
   height: 8px;
   border-radius: 50%;
   background: color-mix(in srgb, var(--wash-strong) 70%, var(--brand-mark));
-  animation: tz-travel 2.4s linear infinite;
+  animation: tz-travel 2.4s linear 2 both;
 }
 
 .lp .flow-line i:nth-child(2) {
@@ -2413,7 +2475,7 @@
   border-radius: 16px;
   background: var(--surface);
   box-shadow: var(--shadow-pop);
-  animation: tz-float 6s ease-in-out infinite;
+  animation: tz-float 6s ease-in-out 1;
 }
 
 .lp .mini-note div {

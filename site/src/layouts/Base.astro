@@ -105,6 +105,11 @@ const preloads = [...LATIN, ...SCRIPT_FONTS[locale]];
 </html>
 
 <style is:global>
+  /* The sticky header must never cover a focused element or an anchor target (WCAG 2.4.11). */
+  html {
+    scroll-padding-top: 84px;
+  }
+
   /* Indic scripts stack vowel signs above and below the line (design/source/localization.md), so
      the tight display line heights of the landing would clip them: restore the bundle's 1.6 for
      text and use 1.45 for headings, and never track Indic text. !important because the landing's

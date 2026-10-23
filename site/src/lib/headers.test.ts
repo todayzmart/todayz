@@ -26,6 +26,13 @@ describe('_headers', () => {
     expect(file).toMatch(/^ {2}Content-Security-Policy: .*connect-src 'self' https:\/\/api\.todayz\.in;/m);
   });
 
+  it('caches the hashed /_astro/ bundles for a year, and nothing else', () => {
+    const rules = headersFile(['https://api.todayz.in']).split(/\n(?=\/)/);
+    expect(rules).toHaveLength(2);
+    expect(rules[0]).not.toContain('Cache-Control');
+    expect(rules[1]).toBe('/_astro/*\n  Cache-Control: public, max-age=31536000, immutable\n');
+  });
+
   it('reads the API origin from the built forms, once', () => {
     const page = (api: string) => `<form class="form" data-lead-form data-api="${api}" data-source="site:home:en"></form>`;
     expect(apiOrigins([page('https://api.todayz.in'), page('https://api.todayz.in/'), '<p>no form</p>'])).toEqual(['https://api.todayz.in']);
