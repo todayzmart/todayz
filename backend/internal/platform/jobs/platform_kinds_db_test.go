@@ -320,6 +320,12 @@ func TestRetentionDropsOldPartitions(t *testing.T) {
 	require.NoError(t, err)
 	st.Invalidate()
 	require.Positive(t, check(30), "the 60-day-old month goes once the setting is 30")
+	// The setting's minimum is the floor (11101): 29 is refused.
+	_, err = db.OwnerPool.Exec(ctx, `UPDATE platform_settings SET value = '29' WHERE key = 'job_runs_retention_days'`)
+	require.ErrorContains(t, err, "ck_platform_settings_range")
+	var minDays int64
+	require.NoError(t, db.OwnerPool.QueryRow(ctx, `SELECT min FROM platform_settings WHERE key = 'job_runs_retention_days'`).Scan(&minDays))
+	require.EqualValues(t, 30, minDays)
 
 	// The function refuses a table without a policy, and a cut-off inside
 	// the floor.

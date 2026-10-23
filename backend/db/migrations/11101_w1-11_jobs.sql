@@ -66,6 +66,15 @@ REVOKE DELETE, TRUNCATE ON job_runs, job_runs_default FROM todayz_app;
 INSERT INTO partition_policies (parent, granularity, ahead, retention_days) VALUES ('job_runs', 'month', 3, 30);
 SELECT ensure_partitions('job_runs', now());
 
+-- The setting cannot go below the floor either (lead, W1-11 review Q1):
+-- 00010 seeded it with min 1, and a value under 30 would only make the
+-- retention kind fail. ck_platform_settings_range needs value >= min, so a
+-- value already under 30 is raised to 30 (keeps more history, never less).
+UPDATE platform_settings
+   SET min = 30,
+       value = CASE WHEN value::numeric < 30 THEN '30'::jsonb ELSE value END
+ WHERE key = 'job_runs_retention_days';
+
 -- job_stats_hourly: one row per kind and IST hour, upserted once per attempt
 -- by the jobs middleware (where event-kind successes are counted). The 7-day
 -- success rate is succeeded / (succeeded + failed + cancelled + discarded).
@@ -195,6 +204,7 @@ $$;
 REVOKE EXECUTE ON FUNCTION drop_old_partitions(text, timestamptz) FROM PUBLIC;
 
 -- +goose Down
+UPDATE platform_settings SET min = 1 WHERE key = 'job_runs_retention_days';
 DROP FUNCTION IF EXISTS drop_old_partitions(text, timestamptz);
 DROP TABLE IF EXISTS job_controls;
 DROP TABLE IF EXISTS job_stats_hourly;
