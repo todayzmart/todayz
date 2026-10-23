@@ -34,6 +34,7 @@ module "secrets" {
 
 # One security group for every app instance (api and worker): the database lets it in.
 resource "aws_security_group" "app" {
+  #checkov:skip=CKV2_AWS_5:Attached to the instances through the aws:autoscaling:launchconfiguration SecurityGroups option in modules/beanstalk_env and allowed into the database; static analysis cannot see option settings.
   name_prefix = "${local.name}-app-"
   description = "Beanstalk instances (api and worker)"
   vpc_id      = module.network.vpc_id

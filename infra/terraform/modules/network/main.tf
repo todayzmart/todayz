@@ -44,6 +44,11 @@ variable "flow_log_retention_days" {
 
 data "aws_availability_zones" "this" {
   state = "available"
+  # Pin zone identity: the first az_count zones by name, so a new AZ never joins silently (CKV_AWS_394).
+  filter {
+    name   = "zone-name"
+    values = [for s in slice(["a", "b", "c"], 0, var.az_count) : "${data.aws_region.current.region}${s}"]
+  }
 }
 
 data "aws_region" "current" {}

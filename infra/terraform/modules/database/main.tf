@@ -159,6 +159,7 @@ resource "aws_iam_role_policy_attachment" "monitoring" {
 }
 
 resource "aws_db_instance" "this" {
+  #checkov:skip=CKV_AWS_293:Prod keeps deletion protection on (variable defaults to true, envs/prod does not override it, 09 section 3); only envs/staging sets it false so staging can be torn down.
   identifier = var.name
   engine     = "postgres"
   # Major version only: RDS picks the default 16.x minor and auto-upgrades minors.

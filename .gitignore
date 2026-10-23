@@ -70,3 +70,6 @@ crash.log
 # LLM recordings from the mocks' live mode (may hold real prompt text; review before promoting to a fixture)
 e2e/mocks/fixtures/llm/_recorded/*
 !e2e/mocks/fixtures/llm/_recorded/.gitkeep
+
+# Module lock files: only the env roots pin providers
+infra/terraform/modules/**/.terraform.lock.hcl

@@ -162,7 +162,6 @@ locals {
 
   common = [
     { ns = "aws:elasticbeanstalk:environment", name = "ServiceRole", value = var.service_role_arn },
-    { ns = "aws:elasticbeanstalk:healthreporting:system", name = "SystemType", value = "enhanced" },
     { ns = "aws:autoscaling:launchconfiguration", name = "IamInstanceProfile", value = var.instance_profile_name },
     { ns = "aws:autoscaling:launchconfiguration", name = "SecurityGroups", value = join(",", var.instance_security_group_ids) },
     { ns = "aws:autoscaling:launchconfiguration", name = "DisableIMDSv1", value = "true" },
@@ -220,10 +219,38 @@ locals {
 }
 
 resource "aws_elastic_beanstalk_environment" "this" {
+  #checkov:skip=CKV_AWS_312:Enhanced health is on (SystemType=enhanced below, plus health streaming to CloudWatch Logs). The check looks for HealthStreamingEnabled in the healthreporting:system namespace, where Beanstalk does not define it (it lives in aws:elasticbeanstalk:cloudwatch:logs:health).
   name                = var.name
   application         = var.application_name
   solution_stack_name = var.solution_stack_name
   tier                = local.is_api ? "WebServer" : "Worker"
+
+  # Written as static blocks (not through the dynamic list below) so static analysis sees them.
+  setting {
+    namespace = "aws:elasticbeanstalk:healthreporting:system"
+    name      = "SystemType"
+    value     = "enhanced"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs:health"
+    name      = "HealthStreamingEnabled"
+    value     = "true"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:managedactions"
+    name      = "ManagedActionsEnabled"
+    value     = "true"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:managedactions"
+    name      = "PreferredStartTime"
+    value     = "Sun:21:30" # 03:00 IST, inside the RDS maintenance window
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:managedactions:platformupdate"
+    name      = "UpdateLevel"
+    value     = "minor"
+  }
 
   dynamic "setting" {
     for_each = local.settings

@@ -62,6 +62,7 @@ data "aws_elb_service_account" "this" {}
 # ---- ALB security group --------------------------------------------------------------
 
 resource "aws_security_group" "alb" {
+  #checkov:skip=CKV2_AWS_5:Attached to the ALB that Beanstalk creates, through the aws:elbv2:loadbalancer SecurityGroups option in modules/beanstalk_env; static analysis cannot see option settings.
   name_prefix = "${var.name}-alb-"
   description = "ALB: HTTPS from Cloudflare ranges only"
   vpc_id      = var.vpc_id

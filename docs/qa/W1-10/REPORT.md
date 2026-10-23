@@ -37,14 +37,21 @@ Branch `worktree-agent-aed58796714ea7e6f`, rebased by the lead onto `main` and m
 | Image against a throwaway PostGIS container on its own network (API on 18080; the shared 5433 stack untouched) | `migrate up` ok (head 12); `/readyz` 200 with db, migrations and river ok; `docker stop` drained cleanly, exit 0 (agent) |
 | `terraform fmt -check -recursive infra` | ok (agent) |
 | Policy and timing checks: 16 unit tests, plus `check.py all` | ok (agent, lead) |
+| `make check-tf-static` (fmt, validate of the three roots and the modules, tflint, checkov on `infra/terraform`) | exit 0. checkov: 370 passed, 0 failed, 92 skipped (18 distinct `#checkov:skip` comments, each with its reason) |
+| `make check-infra` (16 unit tests, `check.py all`, fmt, validate, tflint, checkov on `infra/cloudflare`) | exit 0 |
 | `make check` in the agent's worktree | stopped at `check-backend` because that worktree had no govulncheck database (`.cache/govulndb`). Every other backend step passed. The lead reran the steps on main after the merge. |
 
 ## Not verified
 
-- `terraform validate`, tflint and checkov did not run: no provider or binary was cached offline, and nothing was downloaded.
-  - Resource and attribute names were written for AWS provider 6.x and Cloudflare provider 5.x. The first `validate`, after `make setup` online, may need fixes.
-  - The checkov skip comments are untested.
+- Terraform `validate`, tflint and checkov now run offline (see Evidence). Resource and attribute names were still written for AWS provider 6.x and Cloudflare provider 5.x, so only a real `plan` in Wave 5 proves them.
 - Scaling, alarms, the ALB and traffic-splitting deploys need a real account (Wave 5).
+
+## checkov notes
+
+- Fixed in code: managed platform updates on (CKV_AWS_340, `aws:elasticbeanstalk:managedactions` as static settings), zone identity pinned by name (CKV_AWS_394).
+- Skipped with a reason: CKV_AWS_312 (enhanced health is on through `SystemType`; the check looks for `HealthStreamingEnabled` in a namespace Beanstalk does not define it in, so health streaming is set in `aws:elasticbeanstalk:cloudwatch:logs:health`), CKV_AWS_293 (prod keeps deletion protection on, only staging turns it off), CKV2_AWS_5 twice (both security groups are attached through Beanstalk option settings, which static analysis cannot see).
+- Judgement call to confirm: CKV2_AWS_57 (no secret rotation Lambda, keys rotate by runbook) and the single-AZ skip CKV_AWS_157 (D-96).
+- Module lock files are git-ignored; only the env roots pin providers.
 
 ## Open
 
