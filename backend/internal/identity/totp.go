@@ -28,8 +28,8 @@ const (
 	TOTPSkew       = 1  // steps accepted either side of now
 	totpSecretLen  = 20 // bytes (RFC 4226 §4 recommends 160 bits)
 	TOTPIssuer     = "TodayZ"
-	totpSealField  = "totp_secret"
-	totpModulo     = 1_000_000 // 10^TOTPDigits
+	TOTPSealField  = "totp_secret" // pii.Sealer field of admin_users.totp_secret_enc (the seed seals with it too)
+	totpModulo     = 1_000_000     // 10^TOTPDigits
 	totpCodeFormat = "%06d"
 )
 

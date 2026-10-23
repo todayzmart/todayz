@@ -107,7 +107,7 @@ func (s *Service) EnrolTOTP(ctx context.Context, p authn.Principal) (Enrolment, 
 	if err != nil {
 		return Enrolment{}, problem.Wrap(genproblems.Internal, err)
 	}
-	sealed, err := s.totpSeal.Seal(totpSealField, secret)
+	sealed, err := s.totpSeal.Seal(TOTPSealField, secret)
 	if err != nil {
 		return Enrolment{}, problem.Wrap(genproblems.Internal, err)
 	}
@@ -187,7 +187,7 @@ func (s *Service) VerifyTOTP(ctx context.Context, p authn.Principal, code, purpo
 		if a.TotpSecretEnc == nil {
 			return problem.New(genproblems.Conflict, "") // enrol first
 		}
-		secret, err := s.totpSeal.Open(totpSealField, a.TotpSecretEnc)
+		secret, err := s.totpSeal.Open(TOTPSealField, a.TotpSecretEnc)
 		if err != nil {
 			return fmt.Errorf("identity: open totp secret: %w", err)
 		}
