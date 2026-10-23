@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 
@@ -29,12 +30,20 @@ func mountNotify(r chi.Router, d *deps) {
 	notify.Register(r, newNotifyService(d), az)
 }
 
+// storeStreamRecheck is how often an open store stream re-runs its
+// permission check (realtime.DefaultRecheck; the HTTP test shortens it).
+var storeStreamRecheck = realtime.DefaultRecheck
+
 // mountStreams mounts GET /v1/me/stream, /v1/admin/stream and the store
 // stream. Each runs slot 15 (mw.Authz) before the handler; the store stream
 // also re-runs its check every minute while open, so a member removed from
 // the store or the business (D-107) is cut off and refused on reconnect.
 func mountStreams(r chi.Router, d *deps, az authz.Authorizer) {
 	stream := func(ch realtime.ChannelFunc, app string, recheck func(*http.Request) error) http.Handler {
+		every := time.Duration(0)
+		if recheck != nil {
+			every = storeStreamRecheck
+		}
 		if d.Realtime == nil || d.DB == nil {
 			// Router tests and tools without the hub: the routes exist
 			// (the contract tests walk them) and answer 503.
@@ -44,7 +53,7 @@ func mountStreams(r chi.Router, d *deps, az authz.Authorizer) {
 		}
 		return &realtime.Stream{
 			Hub: d.Realtime, DB: d.DB.Pool, Clock: d.Clock, Channel: ch, App: app,
-			Metrics: d.Metrics, Log: d.Log, Recheck: recheck,
+			Metrics: d.Metrics, Log: d.Log, Recheck: recheck, RecheckEvery: every,
 		}
 	}
 	storeRecheck := func(r *http.Request) error {

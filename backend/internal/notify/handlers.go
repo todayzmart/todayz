@@ -30,14 +30,15 @@ const (
 	maxLimit     = 100
 )
 
-// Ops maps the notifications domain's operations to their authz actions.
+// Ops maps the notifications domain's operations to their authz actions,
+// keyed as the generated strict server names them (the Go method name).
 var Ops = map[string]string{
-	"listMyNotifications":       policy.MeNotifications,
-	"readMyNotifications":       policy.MeNotifications,
-	"getMyNotificationPrefs":    policy.MeNotificationPrefs,
-	"updateMyNotificationPrefs": policy.MeNotificationPrefs,
-	"listBusinessInbox":         policy.InboxView,
-	"readBusinessInbox":         policy.InboxView,
+	"ListMyNotifications":       policy.MeNotifications,
+	"ReadMyNotifications":       policy.MeNotifications,
+	"GetMyNotificationPrefs":    policy.MeNotificationPrefs,
+	"UpdateMyNotificationPrefs": policy.MeNotificationPrefs,
+	"ListBusinessInbox":         policy.InboxView,
+	"ReadBusinessInbox":         policy.InboxView,
 }
 
 // Register mounts the inbox and preference operations behind slot 15.
