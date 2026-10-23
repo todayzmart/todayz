@@ -1,12 +1,497 @@
 # Paths: domain "discover" (owner W1-06): public store discovery and search (04 §2.3).
 #
 # Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [discover]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/discover.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# (D-50). Every operation: `tags: [discover]`, public (`security: []`), an
+# example per success response and the default problem response.
+#
+# W1-06. Coordinates come in as query parameters and are never stored or
+# logged. Not built yet: the refine-chip parser (`chips` is always [] and
+# `refineHint` false, D-101), clusters by zoom (the app clusters the pins), and
+# the standee scan on the shop page (`?s=`, W2-10).
+/v1/discover/places/search:
+  get:
+    operationId: searchPlaces
+    tags:
+    - discover
+    summary: Find a PIN code, locality or city
+    description: Location picker autocomplete (C-02). Digits search PIN codes by prefix; text searches
+      locality and city names (typos allowed, names in Indian languages for cities). Covers Bengaluru,
+      Hyderabad and Chennai for now.
+    security: []
+    parameters:
+    - name: q
+      in: query
+      required: true
+      description: What the person typed.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 80
+      example: indira
+    - name: limit
+      in: query
+      description: At most this many places.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 20
+        default: 10
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/discover.yaml#/DiscoverPlaceList
+            example:
+              items:
+              - id: 01JB0S6A7B8C9D0E1F2G3H4J5K
+                kind: locality
+                name: Indiranagar
+                pincode: '560038'
+                city: Bengaluru
+                label: Indiranagar, Bengaluru 560038
+                lat: 12.9719
+                lng: 77.6412
+      default: &id001
+        $ref: ../common/responses.yaml#/Problem
+/v1/discover/places/reverse:
+  get:
+    operationId: reversePlace
+    tags:
+    - discover
+    summary: Name the place at a point
+    description: 'The location bar label for the device''s position: the nearest locality within 5 km,
+      else the nearest city within 50 km, else 404 `not_found`. The point is never stored or logged.'
+    security: []
+    parameters:
+    - &id002
+      name: lat
+      in: query
+      required: true
+      description: Latitude of the search location (WGS 84, inside India). Never stored.
+      schema: &id005
+        type: number
+        format: double
+        minimum: 6
+        maximum: 38
+      example: 12.9719
+    - &id003
+      name: lng
+      in: query
+      required: true
+      description: Longitude of the search location. Never stored.
+      schema: &id006
+        type: number
+        format: double
+        minimum: 68
+        maximum: 98
+      example: 77.6412
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/discover.yaml#/DiscoverPlace
+            example:
+              id: 01JB0S6A7B8C9D0E1F2G3H4J5K
+              kind: locality
+              name: Indiranagar
+              pincode: '560038'
+              city: Bengaluru
+              label: Indiranagar, Bengaluru 560038
+              lat: 12.9719
+              lng: 77.6412
+      default: *id001
+/v1/discover/summary:
+  get:
+    operationId: getDiscoverSummary
+    tags:
+    - discover
+    summary: Stores and listings around a point
+    description: 'The StoreMap card (C-03): live stores of verified businesses within the radius, how
+      many are open now, the in-stock listings across them, and the pins of the nearest 200.'
+    security: []
+    parameters:
+    - *id002
+    - *id003
+    - &id004
+      name: radius
+      in: query
+      description: 'Radius in metres: the 1, 2, 5, 10 and 20 km chips (01 §11).'
+      schema:
+        type: integer
+        enum:
+        - 1000
+        - 2000
+        - 5000
+        - 10000
+        - 20000
+        default: 2000
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/discover.yaml#/DiscoverSummary
+            example:
+              storesNearby: 4
+              openNow: 3
+              productsInRadius: 412
+              pins:
+              - storeSlug: lakshmi-traders-indiranagar
+                lat: 12.9752
+                lng: 77.6399
+                open: true
+                categoryTint: green
+              pinsTruncated: false
+              serverNow: '2026-10-24T05:30:00Z'
+      default: *id001
+/v1/discover/stores:
+  get:
+    operationId: listDiscoverStores
+    tags:
+    - discover
+    summary: Shops near a point
+    description: 'The shop list (C-04), nearest first: live stores of verified businesses within the radius,
+      with distance, open state, rating, cashback, pickup and delivery, and `bookable` (false is "In-store
+      only", D-41). `category` keeps shops of that category or with an in-stock item in it.'
+    security: []
+    parameters:
+    - *id002
+    - *id003
+    - *id004
+    - &id007
+      name: category
+      in: query
+      description: A category slug; a parent category takes in its children.
+      schema: &id013
+        type: string
+        pattern: ^[a-z0-9]+(-[a-z0-9]+)*$
+        minLength: 1
+        maxLength: 64
+    - &id010
+      name: openNow
+      in: query
+      description: Only stores open now.
+      schema:
+        type: boolean
+        default: false
+    - &id011
+      name: delivery
+      in: query
+      description: Only stores that deliver (the Delivery chip).
+      schema:
+        type: boolean
+        default: false
+    - &id012
+      name: pickup
+      in: query
+      description: Only stores that take pickup orders (the Pickup chip).
+      schema:
+        type: boolean
+        default: false
+    - &id014
+      name: hasOffer
+      in: query
+      description: Only items with a live offer (the C-05 offers chip).
+      schema:
+        type: boolean
+        default: false
+    - &id008
+      $ref: ../common/parameters.yaml#/Limit
+    - &id009
+      $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/discover.yaml#/DiscoverStoreList
+            example:
+              items:
+              - &id015
+                storeSlug: lakshmi-traders-indiranagar
+                name: Lakshmi Traders
+                locality: Indiranagar
+                distanceM: 600
+                open: true
+                pickup: true
+                delivery: true
+                bookable: true
+                rating: 4.6
+                ratingCount: 128
+                cashbackPct: 2.5
+                categoryTint: green
+              nextCursor: null
+              serverNow: '2026-10-24T05:30:00Z'
+      default: *id001
+/v1/discover/stores/{slug}:
+  parameters:
+  - name: slug
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Slug
+  get:
+    operationId: getDiscoverStore
+    tags:
+    - discover
+    summary: A shop's page
+    description: The shop page (C-07) of a live store of a verified business; any other store is 404 `not_found`
+      (SR-01). With both `lat` and `lng`, `distanceM` is the distance from there; with only one of them
+      the point is ignored and `distanceM` is absent. Standee scans (`?s=`) are
+      recorded by W2-10.
+    security: []
+    parameters:
+    - name: lat
+      in: query
+      description: 'Optional: the customer''s latitude, for `distanceM`. Never stored.'
+      schema: *id005
+    - name: lng
+      in: query
+      description: 'Optional: the customer''s longitude, for `distanceM`. Never stored.'
+      schema: *id006
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/discover.yaml#/DiscoverStorePage
+            example:
+              storeSlug: lakshmi-traders-indiranagar
+              name: Lakshmi Traders
+              locality: Indiranagar
+              addressLine1: 12, 100 Feet Road
+              addressLine2: null
+              landmark: Near the metro
+              city: Bengaluru
+              pincode: '560038'
+              lat: 12.9752
+              lng: 77.6399
+              distanceM: 600
+              open: true
+              closedUntil: null
+              hours:
+                weekly:
+                  mon:
+                  - open: 08:00
+                    close: '22:00'
+                  tue: []
+                  wed: []
+                  thu: []
+                  fri: []
+                  sat: []
+                  sun: []
+                holidays: []
+              pickup: true
+              delivery: true
+              bookable: true
+              rating: 4.6
+              ratingCount: 128
+              cashbackPct: 2.5
+              categoryTint: green
+              deliveryFeePaise: 2000
+              deliveryFreeAbovePaise: 49900
+              deliveryMinOrderPaise: 0
+              deliveryRadiusM: 2000
+              serverNow: '2026-10-24T05:30:00Z'
+      default: *id001
+/v1/discover/stores/{slug}/items:
+  parameters:
+  - name: slug
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Slug
+  get:
+    operationId: listDiscoverStoreItems
+    tags:
+    - discover
+    summary: A shop's items
+    description: 'The shop page catalogue (C-07): listed items, in stock first, then by name, each with
+      its freshness (`confirmedAt`, D-101) and never a stock count. `q` filters by name, `category` by
+      category. A store that is not live is 404 `not_found`.'
+    security: []
+    parameters:
+    - name: q
+      in: query
+      description: Words of the item name.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 200
+    - *id007
+    - *id008
+    - *id009
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/discover.yaml#/DiscoverStoreItemList
+            example:
+              items:
+              - &id016
+                storeItemId: 01JB0S5A6B7C8D9E0F1G2H3J4K
+                productId: 01JB0S4A5B6C7D8E9F0G1H2J3K
+                name: Amul Butter
+                variant: Pasteurised
+                brand: Amul
+                packSize: 100
+                unit: g
+                pricePaise: 5800
+                mrpPaise: 6000
+                hasOffer: false
+                inStock: true
+                confirmedAt: '2026-10-24T05:18:00Z'
+                imageKey: null
+              nextCursor: null
+              serverNow: '2026-10-24T05:30:00Z'
+      default: *id001
+/v1/discover/search:
+  get:
+    operationId: searchDiscover
+    tags:
+    - discover
+    summary: Search items in shops nearby
+    description: 'Results grouped by store (C-05, 01 §11). Filters first (in stock, a live store of a
+      verified business, inside the radius, then the request''s filters), then the score with weights
+      from `search_w_*`; equal scores go to the nearer store. `sort=nearest` orders by distance and `sort=cheapest`
+      by the cheapest matching item. D-101: `summary` (absent when no store has it), `confirmedAt` per
+      item, at most one `badge` per store on the first page, and `deliveryFeePaise`. The refine-chip parser
+      is not built yet: `parse` is accepted, `chips` is always empty and `refineHint` false. Every search
+      is logged to `search_log`, zero results too. Search never calls a model.'
+    security: []
+    parameters:
+    - name: q
+      in: query
+      required: true
+      description: The search text.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 200
+      example: amul butter
+    - *id002
+    - *id003
+    - *id004
+    - *id007
+    - *id010
+    - *id011
+    - *id012
+    - name: brand
+      in: query
+      description: A brand slug.
+      schema: *id013
+    - name: maxPricePaise
+      in: query
+      description: Items priced at most this.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100000000
+    - *id014
+    - name: sort
+      in: query
+      description: Result order.
+      schema:
+        type: string
+        enum:
+        - relevance
+        - nearest
+        - cheapest
+        default: relevance
+    - name: parse
+      in: query
+      description: Run the refine-chip parser on `q` (D-101). Accepted; the parser comes later.
+      schema:
+        type: boolean
+        default: true
+    - name: source
+      in: query
+      description: How the query was entered; recorded in `search_log` and the `search_performed` event.
+      schema:
+        type: string
+        enum:
+        - typed
+        - voice
+        default: typed
+    - *id008
+    - *id009
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/discover.yaml#/DiscoverSearchResult
+            example:
+              query: amul butter
+              summary:
+                storesChecked: 4
+                storesWithIt: 1
+                minPricePaise: 5800
+              results:
+              - store: *id015
+                items:
+                - *id016
+                badge: lowest_price
+                deliveryFeePaise: null
+              chips: []
+              refineHint: false
+              nextCursor: null
+              serverNow: '2026-10-24T05:30:00Z'
+      default: *id001
+/v1/discover/search/suggest:
+  get:
+    operationId: searchSuggest
+    tags:
+    - discover
+    summary: Suggestions while typing
+    description: Products, brands and categories whose names start with or are close to the text. Not
+      logged.
+    security: []
+    parameters:
+    - name: q
+      in: query
+      required: true
+      description: What the person typed.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 80
+      example: amu
+    - name: limit
+      in: query
+      description: At most this many suggestions.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 20
+        default: 8
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/discover.yaml#/DiscoverSuggestionList
+            example:
+              items:
+              - kind: brand
+                text: Amul
+                productId: null
+                brandSlug: amul
+                categorySlug: null
+              - kind: product
+                text: Amul Butter 100 g
+                productId: 01JB0S4A5B6C7D8E9F0G1H2J3K
+                brandSlug: null
+                categorySlug: null
+      default: *id001

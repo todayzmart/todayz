@@ -1,9 +1,413 @@
 # Schemas: domain "discover" (owner W1-06): public store discovery and search (04 §2.3).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Names are unique across every schemas/<domain>.yaml, so every schema here
+# starts with `Discover`. Money is `*Paise`, ids are `Ulid`, times are
+# `Timestamp`; every response carries `serverNow`. Nothing here ever carries a
+# customer's location back, a store's phone or a stock count (01 §16).
+DiscoverPlaceKind:
+  type: string
+  enum: [pincode, locality, city]
+DiscoverPlace:
+  type: object
+  description: A PIN code, locality or city for the location picker (01 §11).
+  required: [id, kind, name, pincode, city, label, lat, lng]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    kind:
+      $ref: "#/DiscoverPlaceKind"
+    name:
+      type: string
+    pincode:
+      type: [string, "null"]
+    city:
+      type: [string, "null"]
+      description: The city of a locality or PIN code; null for a city.
+    label:
+      type: string
+      description: The text the location bar shows, e.g. "Indiranagar, Bengaluru 560038".
+    lat:
+      type: number
+      format: double
+    lng:
+      type: number
+      format: double
+DiscoverPlaceList:
+  type: object
+  required: [items]
+  properties:
+    items:
+      type: array
+      items:
+        $ref: "#/DiscoverPlace"
+DiscoverPin:
+  type: object
+  description: One store on the StoreMap card.
+  required: [storeSlug, lat, lng, open, categoryTint]
+  properties:
+    storeSlug:
+      $ref: ./common.yaml#/Slug
+    lat:
+      type: number
+      format: double
+    lng:
+      type: number
+      format: double
+    open:
+      type: boolean
+    categoryTint:
+      type: [string, "null"]
+      description: The design tint of the business's category (green, rose, lilac, sky, amber, peach).
+DiscoverSummary:
+  type: object
+  description: >-
+    The StoreMap card (C-03): live stores of verified businesses in the radius,
+    how many are open now, the in-stock listings across them, and the pins of the
+    nearest stores (at most 200; `pinsTruncated` when there are more). Clusters
+    by zoom are not built yet: the app clusters the pins itself.
+  required: [storesNearby, openNow, productsInRadius, pins, pinsTruncated, serverNow]
+  properties:
+    storesNearby:
+      type: integer
+      minimum: 0
+    openNow:
+      type: integer
+      minimum: 0
+    productsInRadius:
+      type: integer
+      minimum: 0
+      description: In-stock listings across the stores (not distinct catalogue products).
+    pins:
+      type: array
+      items:
+        $ref: "#/DiscoverPin"
+    pinsTruncated:
+      type: boolean
+    serverNow:
+      $ref: ./common.yaml#/ServerNow
+DiscoverStoreCard:
+  type: object
+  description: A shop in the list or in a search result (D-41, D-101).
+  required: [storeSlug, name, locality, distanceM, open, pickup, delivery, bookable, rating, ratingCount, cashbackPct, categoryTint]
+  properties:
+    storeSlug:
+      $ref: ./common.yaml#/Slug
+    name:
+      type: string
+    locality:
+      type: [string, "null"]
+    distanceM:
+      type: integer
+      minimum: 0
+      description: Metres from the search location, rounded.
+    open:
+      type: boolean
+      description: Open at the server's time, counting holidays and a manual close.
+    pickup:
+      type: boolean
+    delivery:
+      type: boolean
+      description: The store delivers (its own setting and the platform's delivery switch).
+    bookable:
+      type: boolean
+      description: False for an In-store only store (no pickup and no delivery, D-41).
+    rating:
+      type: [number, "null"]
+      format: double
+      description: The average rating, 0 to 5; null before the first rating.
+    ratingCount:
+      type: integer
+      minimum: 0
+    cashbackPct:
+      type: number
+      format: double
+      description: Cashback on orders as a percentage (2.5 means 2.5 %).
+    categoryTint:
+      type: [string, "null"]
+DiscoverStoreList:
+  type: object
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      items:
+        $ref: "#/DiscoverStoreCard"
+    nextCursor:
+      $ref: ./common.yaml#/NextCursor
+    serverNow:
+      $ref: ./common.yaml#/ServerNow
+DiscoverUnit:
+  type: string
+  enum: [g, kg, ml, l, pc, pack]
+DiscoverSearchItem:
+  type: object
+  description: One matching in-stock item of a store.
+  required: [storeItemId, productId, name, variant, brand, packSize, unit, pricePaise, mrpPaise, hasOffer, inStock, confirmedAt, imageKey]
+  properties:
+    storeItemId:
+      $ref: ./common.yaml#/Ulid
+    productId:
+      $ref: ./common.yaml#/Ulid
+    name:
+      type: string
+      description: The store's local name when it set one, else the product name.
+    variant:
+      type: [string, "null"]
+    brand:
+      type: [string, "null"]
+    packSize:
+      type: number
+      format: double
+    unit:
+      $ref: "#/DiscoverUnit"
+    pricePaise:
+      $ref: ./common.yaml#/Paise
+    mrpPaise:
+      type: [integer, "null"]
+      minimum: 0
+    hasOffer:
+      type: boolean
+    inStock:
+      type: boolean
+      description: Always true in search results; the shop page also lists items that are out of stock.
+    confirmedAt:
+      type: [string, "null"]
+      format: date-time
+      description: >-
+        When the store last confirmed this item's stock (`stock_updated_at`), while
+        that is within `stock_stale_after_hours`; null after that ("Stock not
+        confirmed recently", D-101).
+    imageKey:
+      type: [string, "null"]
+      description: The product image's object key on the image host, when there is one.
+DiscoverBadge:
+  type: string
+  enum: [lowest_price, closest]
+  description: At most one per result, each on at most one result of the first page (D-101).
+DiscoverSearchStore:
+  type: object
+  description: >-
+    One store with its matching items, best first. `badge` is a label only; it
+    never changes the order. `deliveryFeePaise` is the fee for one unit of the
+    store's first (best-matching) item (0 at or above its free-delivery threshold),
+    set when the Delivery chip is on or the store only delivers, else null.
+  required: [store, items, badge, deliveryFeePaise]
+  properties:
+    store:
+      $ref: "#/DiscoverStoreCard"
+    items:
+      type: array
+      items:
+        $ref: "#/DiscoverSearchItem"
+    badge:
+      oneOf:
+        - $ref: "#/DiscoverBadge"
+        - type: "null"
+    deliveryFeePaise:
+      type: [integer, "null"]
+      minimum: 0
+DiscoverSearchSummary:
+  type: object
+  description: >-
+    "Checked {storesChecked} shops nearby · {storesWithIt} have it · from
+    ₹{minPricePaise}" (D-101). storesChecked counts every live store of a
+    verified business in the radius, open or closed.
+  required: [storesChecked, storesWithIt, minPricePaise]
+  properties:
+    storesChecked:
+      type: integer
+      minimum: 0
+    storesWithIt:
+      type: integer
+      minimum: 1
+    minPricePaise:
+      $ref: ./common.yaml#/Paise
+DiscoverChipKind:
+  type: string
+  enum: [maxPrice, openNow, pickup, delivery, offers, nearest, brand]
+DiscoverChip:
+  type: object
+  description: A refine chip the parser read from the query (D-101).
+  required: [kind, value, text]
+  properties:
+    kind:
+      $ref: "#/DiscoverChipKind"
+    value:
+      type: [string, "null"]
+      description: The filter value (paise for maxPrice, the brand slug for brand), null for the others.
+    text:
+      type: string
+      description: The words of the query the chip came from.
+DiscoverSearchResult:
+  type: object
+  description: >-
+    Results grouped by store (01 §11). `summary` is absent when no store has it.
+    `query` is the text searched after the chips were taken out.
+  required: [query, results, chips, refineHint, nextCursor, serverNow]
+  properties:
+    query:
+      type: string
+    summary:
+      $ref: "#/DiscoverSearchSummary"
+    results:
+      type: array
+      items:
+        $ref: "#/DiscoverSearchStore"
+    chips:
+      type: array
+      items:
+        $ref: "#/DiscoverChip"
+    refineHint:
+      type: boolean
+      description: True when the app may offer search assist (D-101).
+    nextCursor:
+      $ref: ./common.yaml#/NextCursor
+    serverNow:
+      $ref: ./common.yaml#/ServerNow
+DiscoverSuggestionKind:
+  type: string
+  enum: [product, brand, category]
+DiscoverSuggestion:
+  type: object
+  required: [kind, text, productId, brandSlug, categorySlug]
+  properties:
+    kind:
+      $ref: "#/DiscoverSuggestionKind"
+    text:
+      type: string
+      description: What the search box fills in when the suggestion is tapped.
+    productId:
+      oneOf:
+        - $ref: ./common.yaml#/Ulid
+        - type: "null"
+    brandSlug:
+      type: [string, "null"]
+    categorySlug:
+      type: [string, "null"]
+DiscoverSuggestionList:
+  type: object
+  required: [items]
+  properties:
+    items:
+      type: array
+      items:
+        $ref: "#/DiscoverSuggestion"
+DiscoverHoursRange:
+  type: object
+  required: [open, close]
+  properties:
+    open:
+      type: string
+      description: IST wall-clock time, HH:MM.
+    close:
+      type: string
+      description: IST wall-clock time, HH:MM or 24:00; at or before `open` it runs past midnight.
+DiscoverHoursHoliday:
+  type: object
+  required: [date, ranges]
+  properties:
+    date:
+      type: string
+      format: date
+    ranges:
+      type: array
+      items:
+        $ref: "#/DiscoverHoursRange"
+DiscoverHours:
+  type: object
+  description: The store's weekly hours (keys mon…sun) and its holidays from today on, IST (01 §3).
+  required: [weekly, holidays]
+  properties:
+    weekly:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: "#/DiscoverHoursRange"
+    holidays:
+      type: array
+      items:
+        $ref: "#/DiscoverHoursHoliday"
+DiscoverStorePage:
+  type: object
+  description: >-
+    The shop page (C-07): a live store of a verified business. Never the phone
+    number or the stock counts. `distanceM` is set when the request carries
+    `lat` and `lng`.
+  required: [storeSlug, name, locality, addressLine1, addressLine2, landmark, city, pincode, lat, lng, distanceM, open, closedUntil, hours, pickup, delivery, bookable, rating, ratingCount, cashbackPct, categoryTint, deliveryFeePaise, deliveryFreeAbovePaise, deliveryMinOrderPaise, deliveryRadiusM, serverNow]
+  properties:
+    storeSlug:
+      $ref: ./common.yaml#/Slug
+    name:
+      type: string
+    locality:
+      type: [string, "null"]
+    addressLine1:
+      type: [string, "null"]
+    addressLine2:
+      type: [string, "null"]
+    landmark:
+      type: [string, "null"]
+    city:
+      type: [string, "null"]
+    pincode:
+      type: [string, "null"]
+    lat:
+      type: number
+      format: double
+    lng:
+      type: number
+      format: double
+    distanceM:
+      type: [integer, "null"]
+      minimum: 0
+    open:
+      type: boolean
+    closedUntil:
+      type: [string, "null"]
+      format: date-time
+      description: Closed by hand until this time, while that is in the future.
+    hours:
+      $ref: "#/DiscoverHours"
+    pickup:
+      type: boolean
+    delivery:
+      type: boolean
+    bookable:
+      type: boolean
+    rating:
+      type: [number, "null"]
+      format: double
+    ratingCount:
+      type: integer
+      minimum: 0
+    cashbackPct:
+      type: number
+      format: double
+    categoryTint:
+      type: [string, "null"]
+    deliveryFeePaise:
+      $ref: ./common.yaml#/Paise
+    deliveryFreeAbovePaise:
+      type: [integer, "null"]
+      minimum: 0
+    deliveryMinOrderPaise:
+      $ref: ./common.yaml#/Paise
+    deliveryRadiusM:
+      type: integer
+      minimum: 0
+    serverNow:
+      $ref: ./common.yaml#/ServerNow
+DiscoverStoreItemList:
+  type: object
+  description: A page of the shop's listed items, in stock first, then by name.
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      items:
+        $ref: "#/DiscoverSearchItem"
+    nextCursor:
+      $ref: ./common.yaml#/NextCursor
+    serverNow:
+      $ref: ./common.yaml#/ServerNow

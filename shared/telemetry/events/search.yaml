@@ -1,0 +1,33 @@
+# Product events: search (05 §2.6). Owner W1-06. Emitted by the API (app 'api').
+# One file per domain (D-50); an event name may be defined in only one file.
+# The query text is never a prop (it is free text): it stays in search_log.query_norm.
+# Location is never a prop; geo_cell stays empty until the H3 cell is computed.
+domain: search
+owner: W1-06
+events:
+  search_performed:
+    emitter: server
+    description: >-
+      A search answered by GET /v1/discover/search, zero results too (D-99, D-101).
+      product_id is the master product the query names (an exact barcode, or the
+      normalised query equals its name or a synonym), absent otherwise. chips is the
+      refine-chip kinds applied, joined with '.', or none.
+    props:
+      results: { type: int, min: 0 }
+      stores: { type: int, min: 0 }
+      radius: { type: int, min: 1, max: 50000 }
+      category: { type: token, optional: true }
+      sort: { type: enum, values: [relevance, nearest, cheapest] }
+      has_offer: { type: bool }
+      latency_ms: { type: int, min: 0 }
+      product_id: { type: ulid, optional: true }
+      chips: { type: token }
+      source: { type: enum, values: [typed, voice] }
+  search_zero_results:
+    emitter: server
+    description: A search with no in-stock result in the radius (01 §11 zero-result capture).
+    props:
+      radius: { type: int, min: 1, max: 50000 }
+      category: { type: token, optional: true }
+      product_id: { type: ulid, optional: true }
+      source: { type: enum, values: [typed, voice] }
