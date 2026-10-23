@@ -1,0 +1,86 @@
+{
+  "info.how.meta.title": {
+    "defaultMessage": "How TodayZ works"
+  },
+  "info.how.meta.description": {
+    "defaultMessage": "How shops put their stock on TodayZ and how people nearby find it, book it, and pick it up or get it delivered."
+  },
+  "info.how.title": {
+    "defaultMessage": "How TodayZ works"
+  },
+  "info.how.intro": {
+    "defaultMessage": "TodayZ connects the stock on a shop's shelf with the people who live nearby."
+  },
+  "info.how.shops.title": {
+    "defaultMessage": "For shops"
+  },
+  "info.how.shoppers.title": {
+    "defaultMessage": "For shoppers"
+  },
+  "info.pricing.meta.title": {
+    "defaultMessage": "Pricing"
+  },
+  "info.pricing.meta.description": {
+    "defaultMessage": "TodayZ is free for shops for now. This page always shows the current pricing, so you can check before you join."
+  },
+  "info.pricing.title": {
+    "defaultMessage": "Free for now"
+  },
+  "info.pricing.intro": {
+    "defaultMessage": "TodayZ is free for shops while we get started. This page will always show the current pricing."
+  },
+  "info.pricing.point.1": {
+    "defaultMessage": "No joining fee."
+  },
+  "info.pricing.point.2": {
+    "defaultMessage": "Point-of-sale, online orders and demand insights are included."
+  },
+  "info.pricing.point.3": {
+    "defaultMessage": "For how credits and refunds work, read the refunds and credits page."
+  },
+  "info.about.meta.title": {
+    "defaultMessage": "About TodayZ"
+  },
+  "info.about.meta.description": {
+    "defaultMessage": "TodayZ is building a way to search what neighbourhood shops have in stock."
+  },
+  "info.about.title": {
+    "defaultMessage": "About TodayZ"
+  },
+  "info.about.1": {
+    "defaultMessage": "TodayZ is building a way to search what neighbourhood shops have in stock."
+  },
+  "info.about.2": {
+    "defaultMessage": "Shops get the tools to run their counter and their stock. Shoppers get a quick way to find what they need nearby and get it."
+  },
+  "info.about.3": {
+    "defaultMessage": "The product is new, and we are building it together with the shops that join."
+  },
+  "info.contact.meta.title": {
+    "defaultMessage": "Contact"
+  },
+  "info.contact.meta.description": {
+    "defaultMessage": "Get in touch with the TodayZ team, or leave your shop details and we will get back to you."
+  },
+  "info.contact.title": {
+    "defaultMessage": "Contact"
+  },
+  "info.contact.intro": {
+    "defaultMessage": "The quickest way to reach us is to leave your details below."
+  },
+  "info.contact.email": {
+    "defaultMessage": "Email"
+  },
+  "info.404.meta.title": {
+    "defaultMessage": "Page not found"
+  },
+  "info.404.title": {
+    "defaultMessage": "We could not find that page"
+  },
+  "info.404.body": {
+    "defaultMessage": "The link may be old or mistyped."
+  },
+  "info.404.cta": {
+    "defaultMessage": "Back to the home page"
+  }
+}

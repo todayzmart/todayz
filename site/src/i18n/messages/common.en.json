@@ -1,0 +1,113 @@
+{
+  "nav.retailers": {
+    "defaultMessage": "For shops"
+  },
+  "nav.shoppers": {
+    "defaultMessage": "For shoppers"
+  },
+  "nav.how": {
+    "defaultMessage": "How it works"
+  },
+  "nav.pricing": {
+    "defaultMessage": "Pricing"
+  },
+  "nav.about": {
+    "defaultMessage": "About"
+  },
+  "nav.contact": {
+    "defaultMessage": "Contact"
+  },
+  "nav.cta": {
+    "defaultMessage": "Get your shop on TodayZ"
+  },
+  "nav.menu": {
+    "defaultMessage": "Menu"
+  },
+  "a11y.skip": {
+    "defaultMessage": "Skip to content"
+  },
+  "a11y.language": {
+    "defaultMessage": "Language"
+  },
+  "a11y.home": {
+    "defaultMessage": "TodayZ home"
+  },
+  "draft.notice": {
+    "defaultMessage": "This page is a machine translation and is waiting for a human review. The English page is the reference."
+  },
+  "draft.switch": {
+    "defaultMessage": "Read the English page"
+  },
+  "footer.tagline": {
+    "defaultMessage": "Making the physical world searchable."
+  },
+  "footer.company": {
+    "defaultMessage": "Company"
+  },
+  "footer.legal": {
+    "defaultMessage": "Legal"
+  },
+  "footer.privacy": {
+    "defaultMessage": "Privacy"
+  },
+  "footer.terms_shoppers": {
+    "defaultMessage": "Terms for shoppers"
+  },
+  "footer.terms_shops": {
+    "defaultMessage": "Terms for shops"
+  },
+  "footer.refunds": {
+    "defaultMessage": "Refunds and credits"
+  },
+  "footer.copy": {
+    "defaultMessage": "© {year} TodayZ"
+  },
+  "lead.title": {
+    "defaultMessage": "Tell us about your shop"
+  },
+  "lead.intro": {
+    "defaultMessage": "Leave your details and the TodayZ team will get in touch."
+  },
+  "lead.name": {
+    "defaultMessage": "Your name"
+  },
+  "lead.shop": {
+    "defaultMessage": "Shop name"
+  },
+  "lead.phone": {
+    "defaultMessage": "Mobile number"
+  },
+  "lead.city": {
+    "defaultMessage": "City"
+  },
+  "lead.submit": {
+    "defaultMessage": "Send details"
+  },
+  "lead.sending": {
+    "defaultMessage": "Sending…"
+  },
+  "lead.success": {
+    "defaultMessage": "Thank you. We have your details."
+  },
+  "lead.error": {
+    "defaultMessage": "Something went wrong. Please try again in a moment."
+  },
+  "lead.err_name": {
+    "defaultMessage": "Enter your name."
+  },
+  "lead.err_shop": {
+    "defaultMessage": "Enter your shop name."
+  },
+  "lead.err_phone": {
+    "defaultMessage": "Enter a 10-digit mobile number."
+  },
+  "lead.err_city": {
+    "defaultMessage": "Enter your city."
+  },
+  "lead.err_captcha": {
+    "defaultMessage": "Please complete the check above."
+  },
+  "lead.consent": {
+    "defaultMessage": "We use these details only to contact you about TodayZ."
+  }
+}

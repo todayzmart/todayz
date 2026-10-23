@@ -1,0 +1,146 @@
+{
+  "legal.draft": {
+    "defaultMessage": "This document is a draft written for the product. It waits for legal review before launch."
+  },
+  "legal.grievance.title": {
+    "defaultMessage": "Grievance officer"
+  },
+  "legal.grievance.named": {
+    "defaultMessage": "{name}, {email}"
+  },
+  "legal.grievance.pending": {
+    "defaultMessage": "The grievance officer's name and email will be added here before launch."
+  },
+  "legal.privacy.meta.title": {
+    "defaultMessage": "Privacy"
+  },
+  "legal.privacy.meta.description": {
+    "defaultMessage": "What TodayZ collects, why, who sees it, and how to use your rights under India's data protection law."
+  },
+  "legal.privacy.title": {
+    "defaultMessage": "Privacy"
+  },
+  "legal.privacy.s1.title": {
+    "defaultMessage": "What we collect"
+  },
+  "legal.privacy.s1.body": {
+    "defaultMessage": "From shops: name, shop name, mobile number, city and address, and the stock and sales data you add. From shoppers: mobile number, name, a location you choose to share, and your bookings."
+  },
+  "legal.privacy.s2.title": {
+    "defaultMessage": "Why we collect it"
+  },
+  "legal.privacy.s2.body": {
+    "defaultMessage": "To run TodayZ: to show shops near you, to handle bookings, to give support and to keep the service safe. We ask for your consent where the law needs it."
+  },
+  "legal.privacy.s3.title": {
+    "defaultMessage": "Who sees it"
+  },
+  "legal.privacy.s3.body": {
+    "defaultMessage": "A shop sees the details of a shopper who books with it. Services that host TodayZ and send messages for us handle data on our behalf. Demand insights show shops grouped, anonymous search counts, never a shopper's name or number."
+  },
+  "legal.privacy.s4.title": {
+    "defaultMessage": "Your rights"
+  },
+  "legal.privacy.s4.body": {
+    "defaultMessage": "You can ask to see, correct or delete your data, and you can withdraw your consent, by writing to the grievance officer below."
+  },
+  "legal.terms_shoppers.meta.title": {
+    "defaultMessage": "Terms for shoppers"
+  },
+  "legal.terms_shoppers.meta.description": {
+    "defaultMessage": "The rules for using TodayZ to find and book items from shops."
+  },
+  "legal.terms_shoppers.title": {
+    "defaultMessage": "Terms for shoppers"
+  },
+  "legal.terms_shoppers.s1.title": {
+    "defaultMessage": "Using TodayZ"
+  },
+  "legal.terms_shoppers.s1.body": {
+    "defaultMessage": "TodayZ helps you find items in shops near you and book them. Use it only for yourself, with true details, and do not misuse it."
+  },
+  "legal.terms_shoppers.s2.title": {
+    "defaultMessage": "Stock and prices"
+  },
+  "legal.terms_shoppers.s2.body": {
+    "defaultMessage": "Stock and prices come from the shops and can change. A booking is between you and the shop; TodayZ connects the two of you."
+  },
+  "legal.terms_shoppers.s3.title": {
+    "defaultMessage": "Refunds and credits"
+  },
+  "legal.terms_shoppers.s3.body": {
+    "defaultMessage": "Read the refunds and credits page for what happens when a booking is cancelled."
+  },
+  "legal.terms_shoppers.s4.title": {
+    "defaultMessage": "Changes and law"
+  },
+  "legal.terms_shoppers.s4.body": {
+    "defaultMessage": "We may update these terms and will show the date of the latest version. Indian law applies."
+  },
+  "legal.terms_shops.meta.title": {
+    "defaultMessage": "Terms for shops"
+  },
+  "legal.terms_shops.meta.description": {
+    "defaultMessage": "The rules for shops that list stock and take bookings on TodayZ."
+  },
+  "legal.terms_shops.title": {
+    "defaultMessage": "Terms for shops"
+  },
+  "legal.terms_shops.s1.title": {
+    "defaultMessage": "Your shop on TodayZ"
+  },
+  "legal.terms_shops.s1.body": {
+    "defaultMessage": "You can list the stock you really have and take bookings from people nearby. Keep your details and stock correct."
+  },
+  "legal.terms_shops.s2.title": {
+    "defaultMessage": "What you sell"
+  },
+  "legal.terms_shops.s2.body": {
+    "defaultMessage": "You are responsible for the goods you sell and for the licences and taxes your shop needs. Do not list goods that the law does not allow you to sell."
+  },
+  "legal.terms_shops.s3.title": {
+    "defaultMessage": "Bookings"
+  },
+  "legal.terms_shops.s3.body": {
+    "defaultMessage": "Look after the bookings you accept. A booking is between you and the shopper; TodayZ connects the two of you."
+  },
+  "legal.terms_shops.s4.title": {
+    "defaultMessage": "Fees"
+  },
+  "legal.terms_shops.s4.body": {
+    "defaultMessage": "TodayZ is free for shops for now. The pricing page always shows the current position."
+  },
+  "legal.terms_shops.s5.title": {
+    "defaultMessage": "Changes and law"
+  },
+  "legal.terms_shops.s5.body": {
+    "defaultMessage": "We may update these terms and will show the date of the latest version. We may pause a shop that breaks them. Indian law applies."
+  },
+  "legal.refunds.meta.title": {
+    "defaultMessage": "Refunds and credits"
+  },
+  "legal.refunds.meta.description": {
+    "defaultMessage": "What happens to a booking when it is cancelled, and how credits work."
+  },
+  "legal.refunds.title": {
+    "defaultMessage": "Refunds and credits"
+  },
+  "legal.refunds.s1.title": {
+    "defaultMessage": "Cancelling a booking"
+  },
+  "legal.refunds.s1.body": {
+    "defaultMessage": "You can cancel a booking before the shop has handed over your items. Once items are handed over, the shop's own return policy applies."
+  },
+  "legal.refunds.s2.title": {
+    "defaultMessage": "Credits"
+  },
+  "legal.refunds.s2.body": {
+    "defaultMessage": "The rules for how long credits last and where they can be used are being finalised. They will be set out here before launch."
+  },
+  "legal.refunds.s3.title": {
+    "defaultMessage": "Questions"
+  },
+  "legal.refunds.s3.body": {
+    "defaultMessage": "If something went wrong with a booking, write to the grievance officer below."
+  }
+}

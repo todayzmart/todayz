@@ -1,0 +1,191 @@
+{
+  "home.meta.title": {
+    "defaultMessage": "TodayZ: find it in shops near you"
+  },
+  "home.meta.description": {
+    "defaultMessage": "TodayZ helps neighbourhood shops put their stock online, so people nearby can find it, book it, and pick it up or get it delivered."
+  },
+  "home.hero.eyebrow": {
+    "defaultMessage": "Built for Indian shops"
+  },
+  "home.hero.title": {
+    "defaultMessage": "Your neighbourhood shop, ready for more customers."
+  },
+  "home.hero.body": {
+    "defaultMessage": "Put your stock online, run your counter, and let people nearby find what you already have. Free for now."
+  },
+  "home.hero.cta_secondary": {
+    "defaultMessage": "See how it works"
+  },
+  "home.mock.label": {
+    "defaultMessage": "Example"
+  },
+  "home.mock.searching": {
+    "defaultMessage": "Searching for"
+  },
+  "home.mock.in_stock": {
+    "defaultMessage": "In stock"
+  },
+  "home.mock.away": {
+    "defaultMessage": "{distance} away"
+  },
+  "home.problem.title": {
+    "defaultMessage": "Great shops. Big challenges."
+  },
+  "home.problem.1.title": {
+    "defaultMessage": "Stock is hard to keep track of"
+  },
+  "home.problem.1.body": {
+    "defaultMessage": "Items get missed and counts drift, so it is hard to know what is selling."
+  },
+  "home.problem.2.title": {
+    "defaultMessage": "People nearby do not know you have it"
+  },
+  "home.problem.2.body": {
+    "defaultMessage": "Someone may need an item that is on your shelf, a few minutes away, and never find out."
+  },
+  "home.problem.3.title": {
+    "defaultMessage": "Stock sits unsold"
+  },
+  "home.problem.3.body": {
+    "defaultMessage": "Without a view of demand it is easy to overstock the wrong things."
+  },
+  "home.problem.4.title": {
+    "defaultMessage": "You cannot see what people want"
+  },
+  "home.problem.4.body": {
+    "defaultMessage": "Shops rarely know what people around them are searching for."
+  },
+  "home.insight.title": {
+    "defaultMessage": "The shops are there. The stock is there. The search is not."
+  },
+  "home.insight.body": {
+    "defaultMessage": "Indian neighbourhood shops already hold what people need. A lot of that stock cannot be found online. TodayZ connects the two."
+  },
+  "home.features.title": {
+    "defaultMessage": "A simple way to grow your shop"
+  },
+  "home.features.1.title": {
+    "defaultMessage": "Run your counter"
+  },
+  "home.features.1.body": {
+    "defaultMessage": "Bill at the counter, keep stock up to date and see your customers in one app. It keeps working when the internet drops."
+  },
+  "home.features.2.title": {
+    "defaultMessage": "Get orders from people nearby"
+  },
+  "home.features.2.body": {
+    "defaultMessage": "Shoppers find your stock, book it, and pick it up or ask for delivery."
+  },
+  "home.features.3.title": {
+    "defaultMessage": "See what people look for"
+  },
+  "home.features.3.body": {
+    "defaultMessage": "Demand insights show searches near you for items you do not stock yet."
+  },
+  "home.features.4.title": {
+    "defaultMessage": "Bring customers back"
+  },
+  "home.features.4.body": {
+    "defaultMessage": "Offers and credits give people a reason to come to your shop again."
+  },
+  "home.shoppers.title": {
+    "defaultMessage": "Need something? Find it nearby."
+  },
+  "home.shoppers.1": {
+    "defaultMessage": "Search for what you need"
+  },
+  "home.shoppers.2": {
+    "defaultMessage": "See which shops nearby have it"
+  },
+  "home.shoppers.3": {
+    "defaultMessage": "Book it"
+  },
+  "home.shoppers.4": {
+    "defaultMessage": "Pick it up or get it delivered"
+  },
+  "home.shoppers.cta": {
+    "defaultMessage": "Open the shopper app"
+  },
+  "home.insights.title": {
+    "defaultMessage": "See what people are looking for"
+  },
+  "home.insights.body": {
+    "defaultMessage": "Demand insights tell a shop which items people nearby search for and cannot find."
+  },
+  "home.insights.signal": {
+    "defaultMessage": "Searched often nearby"
+  },
+  "home.insights.stock": {
+    "defaultMessage": "Stock this"
+  },
+  "home.steps.title": {
+    "defaultMessage": "Start in three steps"
+  },
+  "home.steps.1.title": {
+    "defaultMessage": "Create your shop"
+  },
+  "home.steps.1.body": {
+    "defaultMessage": "Sign up and add your shop details."
+  },
+  "home.steps.2.title": {
+    "defaultMessage": "Add your stock"
+  },
+  "home.steps.2.body": {
+    "defaultMessage": "Add your products and stock."
+  },
+  "home.steps.3.title": {
+    "defaultMessage": "Start getting customers"
+  },
+  "home.steps.3.body": {
+    "defaultMessage": "People nearby can find your stock and book it."
+  },
+  "home.types.title": {
+    "defaultMessage": "For every kind of shop"
+  },
+  "home.types.1": {
+    "defaultMessage": "General and grocery"
+  },
+  "home.types.2": {
+    "defaultMessage": "Medical"
+  },
+  "home.types.3": {
+    "defaultMessage": "Cosmetics"
+  },
+  "home.types.4": {
+    "defaultMessage": "Stationery"
+  },
+  "home.types.5": {
+    "defaultMessage": "Electronics"
+  },
+  "home.types.6": {
+    "defaultMessage": "Hardware"
+  },
+  "home.faq.title": {
+    "defaultMessage": "Questions shops ask"
+  },
+  "home.faq.1.q": {
+    "defaultMessage": "What does it cost?"
+  },
+  "home.faq.1.a": {
+    "defaultMessage": "TodayZ is free for shops for now. See the pricing page for the latest."
+  },
+  "home.faq.2.q": {
+    "defaultMessage": "Do I need to be good with phones?"
+  },
+  "home.faq.2.a": {
+    "defaultMessage": "No. The business app is built for everyday shop work, and you can start with a few items."
+  },
+  "home.faq.3.q": {
+    "defaultMessage": "How do shoppers get their items?"
+  },
+  "home.faq.3.a": {
+    "defaultMessage": "They book the item on TodayZ, then pick it up from your shop or ask for delivery."
+  },
+  "home.faq.4.q": {
+    "defaultMessage": "Which shops can join?"
+  },
+  "home.faq.4.a": {
+    "defaultMessage": "Any neighbourhood shop that sells physical goods, from grocery to hardware."
+  }
+}
