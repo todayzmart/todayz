@@ -1,0 +1,56 @@
+# Problem codes: domain "orders" (owner W2-02; 04 §1.4 and the D-91 and D-101 tables).
+#
+# Same shape as common.yaml. A refused state change is always the common
+# invalid_transition; a role that may not act is forbidden; an order of another
+# customer or store is not_found. A wrong pickup code is auth's `code_invalid`
+# (422) with `extensions.attemptsLeft`, the same as every other typed code.
+domain: orders
+problems:
+  - code: insufficient_stock
+    status: 409
+    i18n: problems.insufficient_stock
+    title: Not enough stock for a line
+  - code: store_closed
+    status: 409
+    i18n: problems.store_closed
+    title: This shop is closed now
+  - code: store_not_bookable
+    status: 409
+    i18n: problems.store_not_bookable
+    title: This shop does not take orders this way
+  - code: code_locked
+    status: 409
+    i18n: problems.code_locked
+    title: Too many wrong codes; the customer needs a new code
+  - code: account_has_active_order
+    status: 409
+    i18n: problems.account_has_active_order
+    title: Finish or cancel your open orders first
+  - code: price_changed
+    status: 409
+    i18n: problems.price_changed
+    title: The price changed since the quote
+  - code: below_minimum
+    status: 409
+    i18n: problems.below_minimum
+    title: Below the shop's delivery minimum
+  - code: delivery_closed
+    status: 409
+    i18n: problems.delivery_closed
+    title: Delivery is closed now
+  - code: ordering_suspended
+    status: 409
+    i18n: problems.ordering_suspended
+    title: Ordering is paused after missed pickups
+  - code: extension_already_used
+    status: 409
+    i18n: problems.extension_already_used
+    title: The extra time was already used
+  - code: ask_reply_used
+    status: 409
+    i18n: problems.ask_reply_used
+    title: This reply is already booked
+  - code: ask_price_expired
+    status: 409
+    i18n: problems.ask_price_expired
+    title: The replied price has ended

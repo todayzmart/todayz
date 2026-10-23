@@ -1,9 +1,589 @@
 # Schemas: domain "orders" (owner W2-02, W2-04): customer and shop order flows (04 §2.4, §2.6).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Names are unique across every schemas/<domain>.yaml. Request objects carry
+# `additionalProperties: false` (an unknown field is 422 validation_failed).
+# Money is `*Paise` (`./common.yaml#/Paise`), ids are `Ulid`, times are
+# `Timestamp`, and every order response carries `serverNow` so a client counts
+# down from the server's clock (04 §1). The order code is 4 digits; it appears
+# only in the customer's own `Order` while it is valid and never in a store
+# response, a list, an event or an error (D-04).
+Fulfilment:
+  type: string
+  description: How the customer gets the order. Delivery is refused with `409 store_not_bookable` until W2 delivery ships (W2-02 report).
+  enum: [pickup, delivery]
+OrderStatus:
+  type: string
+  description: >-
+    Order state (03 §4). Terminal: collected, delivered, rejected, expired,
+    cancelled, delivery_failed.
+  enum: [placed, awaiting_customer, accepted, ready, out_for_delivery, collected, delivered,
+    rejected, expired, cancelled, delivery_failed]
+OrderActor:
+  type: string
+  description: Who made a change.
+  enum: [customer, staff, system, admin]
+PriceSource:
+  type: string
+  description: Where a line's unit price came from (D-101). `ask_reply` is the shop's replied price, with no item-level offer.
+  enum: [catalogue, ask_reply]
+PaymentStatus:
+  type: string
+  enum: [unpaid, paid]
+PaymentMethod:
+  type: string
+  description: How the customer paid at the counter.
+  enum: [cash, upi, card, other]
+LineAvailability:
+  type: string
+  description: >-
+    Stock for the line now: `in_stock` when available covers the quantity,
+    `short` when some but not all is available, `out_of_stock` when none is.
+  enum: [in_stock, short, out_of_stock]
+CreditsLimit:
+  type: string
+  description: What limits the credits, when fewer credits than asked can be used (D-30, D-76).
+  enum: [not_available, no_balance, below_credit_minimum, credit_max_exceeded, credit_monthly_cap,
+    store_credit_cap]
+OrderCode:
+  type: string
+  description: The 4-digit pickup code the customer shows at the counter (D-04).
+  pattern: ^[0-9]{4}$
+  examples:
+    - "4821"
+OrderNumber:
+  type: string
+  description: The display number (D-23).
+  pattern: ^TZ-[0-9]{6,}$
+  examples:
+    - TZ-024817
+OrderNote:
+  type: string
+  description: Free text for an `other` reason (required then, 03 §4.2).
+  minLength: 1
+  maxLength: 200
+
+# --- requests -----------------------------------------------------------------
+CheckoutItem:
+  type: object
+  additionalProperties: false
+  required: [storeItemId, quantity]
+  properties:
+    storeItemId: {$ref: ./common.yaml#/Ulid}
+    quantity:
+      type: integer
+      minimum: 1
+      maximum: 99
+CheckoutQuoteRequest:
+  type: object
+  description: >-
+    A cart to price. One store per cart; each store item at most once
+    (`422 validation_failed` on the repeated line). `askReplyId` prices the
+    replied item at the shop's reply while it is valid (D-101).
+  additionalProperties: false
+  required: [storeId, fulfilment, items, creditsToUse]
+  properties:
+    storeId: {$ref: ./common.yaml#/Ulid}
+    fulfilment: {$ref: '#/Fulfilment'}
+    items:
+      type: array
+      minItems: 1
+      maxItems: 50
+      items: {$ref: '#/CheckoutItem'}
+    addressId: {$ref: ./common.yaml#/Ulid}
+    creditsToUse:
+      type: integer
+      minimum: 0
+      maximum: 100000
+    askReplyId: {$ref: ./common.yaml#/Ulid}
+OrderCreateRequest:
+  type: object
+  description: >-
+    The quoted cart plus the total the customer saw. The server re-prices;
+    when its total differs from `expectedTotalPaise` the answer is `409
+    price_changed` with the fresh quote in `extensions.quote`, and nothing
+    is created.
+  additionalProperties: false
+  required: [storeId, fulfilment, items, creditsToUse, expectedTotalPaise]
+  properties:
+    storeId: {$ref: ./common.yaml#/Ulid}
+    fulfilment: {$ref: '#/Fulfilment'}
+    items:
+      type: array
+      minItems: 1
+      maxItems: 50
+      items: {$ref: '#/CheckoutItem'}
+    addressId: {$ref: ./common.yaml#/Ulid}
+    creditsToUse:
+      type: integer
+      minimum: 0
+      maximum: 100000
+    askReplyId: {$ref: ./common.yaml#/Ulid}
+    expectedTotalPaise: {$ref: ./common.yaml#/Paise}
+CancelOrderRequest:
+  type: object
+  description: '`declined_partial` is set only by confirm-partial and is refused here (`422 validation_failed`); `other` needs `note`.'
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason: {$ref: ./common.yaml#/CustomerCancelReason}
+    note: {$ref: '#/OrderNote'}
+ConfirmPartialRequest:
+  type: object
+  additionalProperties: false
+  required: [accept]
+  properties:
+    accept:
+      type: boolean
+      description: '`true` takes the changed order; `false` cancels it with `declined_partial`.'
+AcceptLine:
+  type: object
+  additionalProperties: false
+  required: [orderItemId, quantity]
+  properties:
+    orderItemId: {$ref: ./common.yaml#/Ulid}
+    quantity:
+      type: integer
+      minimum: 0
+      maximum: 99
+AcceptOrderRequest:
+  type: object
+  description: >-
+    Without `lines`, every line is accepted at the quantity asked. With
+    `lines`, each names one of the order's lines; a line not named is
+    accepted in full. A quantity below the one asked is a partial accept
+    (D-28).
+  additionalProperties: false
+  properties:
+    lines:
+      type: array
+      minItems: 1
+      maxItems: 50
+      items: {$ref: '#/AcceptLine'}
+RejectOrderRequest:
+  type: object
+  description: '`other` needs `note`.'
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason: {$ref: ./common.yaml#/RejectReason}
+    note: {$ref: '#/OrderNote'}
+StoreCancelOrderRequest:
+  type: object
+  description: '`other` needs `note` (D-68).'
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason: {$ref: ./common.yaml#/ShopCancelReason}
+    note: {$ref: '#/OrderNote'}
+FailDeliveryRequest:
+  type: object
+  description: '`other` needs `note`.'
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason: {$ref: ./common.yaml#/DeliveryFailedReason}
+    note: {$ref: '#/OrderNote'}
+ConfirmReturnRequest:
+  type: object
+  additionalProperties: false
+  required: [outcome]
+  properties:
+    outcome:
+      type: string
+      description: '`returned` releases the reservations; `damaged` (manager and above) writes `damage` movements first (D-69).'
+      enum: [returned, damaged]
+VerifyCodeRequest:
+  type: object
+  additionalProperties: false
+  required: [code, paymentMethod]
+  properties:
+    code: {$ref: '#/OrderCode'}
+    paymentMethod: {$ref: '#/PaymentMethod'}
+
+# --- quote ----------------------------------------------------------------------
+QuoteLine:
+  type: object
+  required: [storeItemId, productId, name, variant, packSize, unit, imageKey, quantity,
+    availableQuantity, availability, unitPricePaise, mrpPaise, lineSubtotalPaise, discountPaise,
+    lineTotalPaise, priceSource, validUntil]
+  properties:
+    storeItemId: {$ref: ./common.yaml#/Ulid}
+    productId: {$ref: ./common.yaml#/Ulid}
+    name:
+      type: string
+      description: The store's local name when set, else the product name.
+    variant: {type: [string, "null"]}
+    packSize:
+      type: number
+      exclusiveMinimum: 0
+    unit:
+      type: string
+      description: The unit of `packSize` (g, kg, ml, l, pc, pack).
+    imageKey: {type: [string, "null"]}
+    quantity:
+      type: integer
+      minimum: 1
+    availableQuantity:
+      type: integer
+      minimum: 0
+      description: Units available now (on hand less reserved, at least 0).
+    availability: {$ref: '#/LineAvailability'}
+    unitPricePaise: {$ref: ./common.yaml#/Paise}
+    mrpPaise:
+      oneOf:
+        - $ref: ./common.yaml#/Paise
+        - type: "null"
+    lineSubtotalPaise: {$ref: ./common.yaml#/Paise}
+    discountPaise: {$ref: ./common.yaml#/Paise}
+    lineTotalPaise: {$ref: ./common.yaml#/Paise}
+    priceSource: {$ref: '#/PriceSource'}
+    validUntil:
+      description: For an `ask_reply` line, when the replied price ends; null otherwise.
+      oneOf:
+        - $ref: ./common.yaml#/Timestamp
+        - type: "null"
+OfferApplied:
+  type: object
+  required: [offerId, title, discountPaise]
+  properties:
+    offerId: {$ref: ./common.yaml#/Ulid}
+    title: {type: string}
+    discountPaise: {$ref: ./common.yaml#/Paise}
+CheckoutQuote:
+  type: object
+  description: >-
+    The priced cart (D-02, D-94). No side effects. `itemSubtotalPaise` is the
+    items after item-level offers; `itemsAfterOffersPaise` is the eligible
+    amount after every offer. `totalPaise = itemsAfterOffersPaise −
+    creditsUsed × 100 + deliveryFeePaise`. `orderable` is false when any line
+    is short or out of stock.
+  required: [storeId, fulfilment, lines, subtotalPaise, discountPaise, itemSubtotalPaise,
+    itemsAfterOffersPaise, deliveryFeePaise, creditsRequested, creditsAllowed, creditsUsed,
+    creditsLimit, totalPaise, offersApplied, orderable, validUntil, serverNow]
+  properties:
+    storeId: {$ref: ./common.yaml#/Ulid}
+    fulfilment: {$ref: '#/Fulfilment'}
+    lines:
+      type: array
+      items: {$ref: '#/QuoteLine'}
+    subtotalPaise: {$ref: ./common.yaml#/Paise}
+    discountPaise: {$ref: ./common.yaml#/Paise}
+    itemSubtotalPaise: {$ref: ./common.yaml#/Paise}
+    itemsAfterOffersPaise: {$ref: ./common.yaml#/Paise}
+    deliveryFeePaise: {$ref: ./common.yaml#/Paise}
+    creditsRequested: {$ref: ./common.yaml#/Credits}
+    creditsAllowed: {$ref: ./common.yaml#/Credits}
+    creditsUsed: {$ref: ./common.yaml#/Credits}
+    creditsLimit:
+      description: Set when `creditsAllowed` is below `creditsRequested`.
+      oneOf:
+        - $ref: '#/CreditsLimit'
+        - type: "null"
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    offersApplied:
+      type: array
+      items: {$ref: '#/OfferApplied'}
+    orderable: {type: boolean}
+    validUntil:
+      description: The earliest `validUntil` of an `ask_reply` line; null when no line has one.
+      oneOf:
+        - $ref: ./common.yaml#/Timestamp
+        - type: "null"
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+
+# --- orders: shared parts ---------------------------------------------------------
+OrderStore:
+  type: object
+  required: [id, slug, name, addressLine, locality]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    slug: {type: string}
+    name: {type: string}
+    addressLine: {type: string}
+    locality: {type: [string, "null"]}
+OrderLine:
+  type: object
+  description: >-
+    A line as booked. `quantityAccepted` is null until the shop answers;
+    `lineTotalPaise` uses it once set (03 §4).
+  required: [id, storeItemId, name, variant, packSize, unit, imageKey, unitPricePaise,
+    quantityRequested, quantityAccepted, lineTotalPaise, priceSource]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    storeItemId: {$ref: ./common.yaml#/Ulid}
+    name: {type: string}
+    variant: {type: [string, "null"]}
+    packSize:
+      type: number
+      exclusiveMinimum: 0
+    unit: {type: string}
+    imageKey: {type: [string, "null"]}
+    unitPricePaise: {$ref: ./common.yaml#/Paise}
+    quantityRequested:
+      type: integer
+      minimum: 1
+    quantityAccepted:
+      type: [integer, "null"]
+      minimum: 0
+    lineTotalPaise: {$ref: ./common.yaml#/Paise}
+    priceSource: {$ref: '#/PriceSource'}
+StoreOrderLine:
+  type: object
+  description: A line as the shop sees it, with the stock available now (on hand less reserved; may be below 0).
+  required: [id, storeItemId, name, variant, packSize, unit, imageKey, unitPricePaise,
+    quantityRequested, quantityAccepted, lineTotalPaise, priceSource, available]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    storeItemId: {$ref: ./common.yaml#/Ulid}
+    name: {type: string}
+    variant: {type: [string, "null"]}
+    packSize:
+      type: number
+      exclusiveMinimum: 0
+    unit: {type: string}
+    imageKey: {type: [string, "null"]}
+    unitPricePaise: {$ref: ./common.yaml#/Paise}
+    quantityRequested:
+      type: integer
+      minimum: 1
+    quantityAccepted:
+      type: [integer, "null"]
+      minimum: 0
+    lineTotalPaise: {$ref: ./common.yaml#/Paise}
+    priceSource: {$ref: '#/PriceSource'}
+    available: {type: integer}
+OrderTimelineEvent:
+  type: object
+  required: [fromStatus, toStatus, actor, reason, at]
+  properties:
+    fromStatus:
+      oneOf:
+        - $ref: '#/OrderStatus'
+        - type: "null"
+    toStatus: {$ref: '#/OrderStatus'}
+    actor: {$ref: '#/OrderActor'}
+    reason:
+      type: [string, "null"]
+      description: The reason recorded with the change (03 §4.2), as `statusReason`.
+      maxLength: 40
+    at: {$ref: ./common.yaml#/Timestamp}
+NullableTimestamp:
+  oneOf:
+    - $ref: ./common.yaml#/Timestamp
+    - type: "null"
+
+# --- orders: customer view ---------------------------------------------------------
+Order:
+  type: object
+  description: >-
+    The customer's own order (C-12). `code` is set only while the order can
+    be handed over (accepted, ready, out_for_delivery) and the code is not
+    locked; after `codeLocked`, call new-code. `canExtend` says whether "I'm
+    on my way" is still offered.
+  required: [id, number, store, fulfilment, status, statusReason, statusNote, lines, subtotalPaise,
+    discountPaise, itemSubtotalPaise, itemsAfterOffersPaise, creditsUsed, deliveryFeePaise,
+    totalPaise, cashbackCredits, paymentStatus, paymentMethod, code, codeLocked, canExtend,
+    askReplyId, acceptBy, partialConfirmBy, holdUntil, extendedAt, placedAt, acceptedAt,
+    collectedAt, timeline, version, serverNow]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    number: {$ref: '#/OrderNumber'}
+    store: {$ref: '#/OrderStore'}
+    fulfilment: {$ref: '#/Fulfilment'}
+    status: {$ref: '#/OrderStatus'}
+    statusReason:
+      type: [string, "null"]
+      description: >-
+        Why the order reached its status (03 §4.2): a `RejectReason` for
+        rejected, a `SystemReason` for expired and system cancels, a
+        `CustomerCancelReason`, `ShopCancelReason` or `AdminCancelReason`
+        for cancelled, a `DeliveryFailedReason` for delivery_failed; null
+        otherwise.
+      maxLength: 40
+    statusNote: {type: [string, "null"]}
+    lines:
+      type: array
+      items: {$ref: '#/OrderLine'}
+    subtotalPaise: {$ref: ./common.yaml#/Paise}
+    discountPaise: {$ref: ./common.yaml#/Paise}
+    itemSubtotalPaise: {$ref: ./common.yaml#/Paise}
+    itemsAfterOffersPaise: {$ref: ./common.yaml#/Paise}
+    creditsUsed: {$ref: ./common.yaml#/Credits}
+    deliveryFeePaise: {$ref: ./common.yaml#/Paise}
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    cashbackCredits: {$ref: ./common.yaml#/Credits}
+    paymentStatus: {$ref: '#/PaymentStatus'}
+    paymentMethod:
+      oneOf:
+        - $ref: '#/PaymentMethod'
+        - type: "null"
+    code:
+      oneOf:
+        - $ref: '#/OrderCode'
+        - type: "null"
+    codeLocked: {type: boolean}
+    canExtend: {type: boolean}
+    askReplyId:
+      oneOf:
+        - $ref: ./common.yaml#/Ulid
+        - type: "null"
+    acceptBy: {$ref: '#/NullableTimestamp'}
+    partialConfirmBy: {$ref: '#/NullableTimestamp'}
+    holdUntil: {$ref: '#/NullableTimestamp'}
+    extendedAt: {$ref: '#/NullableTimestamp'}
+    placedAt: {$ref: ./common.yaml#/Timestamp}
+    acceptedAt: {$ref: '#/NullableTimestamp'}
+    collectedAt: {$ref: '#/NullableTimestamp'}
+    timeline:
+      type: array
+      items: {$ref: '#/OrderTimelineEvent'}
+    version:
+      type: integer
+      minimum: 1
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+OrderSummary:
+  type: object
+  required: [id, number, store, fulfilment, status, statusReason, itemCount, totalPaise, acceptBy,
+    holdUntil, placedAt, version]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    number: {$ref: '#/OrderNumber'}
+    store: {$ref: '#/OrderStore'}
+    fulfilment: {$ref: '#/Fulfilment'}
+    status: {$ref: '#/OrderStatus'}
+    statusReason:
+      type: [string, "null"]
+      description: >-
+        Why the order reached its status (03 §4.2): a `RejectReason` for
+        rejected, a `SystemReason` for expired and system cancels, a
+        `CustomerCancelReason`, `ShopCancelReason` or `AdminCancelReason`
+        for cancelled, a `DeliveryFailedReason` for delivery_failed; null
+        otherwise.
+      maxLength: 40
+    itemCount:
+      type: integer
+      minimum: 1
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    acceptBy: {$ref: '#/NullableTimestamp'}
+    holdUntil: {$ref: '#/NullableTimestamp'}
+    placedAt: {$ref: ./common.yaml#/Timestamp}
+    version:
+      type: integer
+      minimum: 1
+OrderList:
+  type: object
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/OrderSummary'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+
+# --- orders: store view --------------------------------------------------------------
+OrderCustomer:
+  type: object
+  description: The customer as the shop sees them; the phone is masked (D-60).
+  required: [name, phoneMasked]
+  properties:
+    name: {type: [string, "null"]}
+    phoneMasked: {type: [string, "null"]}
+StoreOrder:
+  type: object
+  description: >-
+    An order as the shop sees it (B-04). Never contains the code (D-04).
+    `codeAttemptsLeft` counts wrong codes left before `codeLocked`.
+  required: [id, number, customer, fulfilment, status, statusReason, statusNote, lines,
+    subtotalPaise, discountPaise, itemSubtotalPaise, itemsAfterOffersPaise, creditsUsed,
+    deliveryFeePaise, totalPaise, paymentStatus, paymentMethod, codeLocked, codeAttemptsLeft,
+    acceptBy, partialConfirmBy, holdUntil, extendedAt, placedAt, acceptedAt, collectedAt,
+    timeline, version, serverNow]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    number: {$ref: '#/OrderNumber'}
+    customer: {$ref: '#/OrderCustomer'}
+    fulfilment: {$ref: '#/Fulfilment'}
+    status: {$ref: '#/OrderStatus'}
+    statusReason:
+      type: [string, "null"]
+      description: >-
+        Why the order reached its status (03 §4.2): a `RejectReason` for
+        rejected, a `SystemReason` for expired and system cancels, a
+        `CustomerCancelReason`, `ShopCancelReason` or `AdminCancelReason`
+        for cancelled, a `DeliveryFailedReason` for delivery_failed; null
+        otherwise.
+      maxLength: 40
+    statusNote: {type: [string, "null"]}
+    lines:
+      type: array
+      items: {$ref: '#/StoreOrderLine'}
+    subtotalPaise: {$ref: ./common.yaml#/Paise}
+    discountPaise: {$ref: ./common.yaml#/Paise}
+    itemSubtotalPaise: {$ref: ./common.yaml#/Paise}
+    itemsAfterOffersPaise: {$ref: ./common.yaml#/Paise}
+    creditsUsed: {$ref: ./common.yaml#/Credits}
+    deliveryFeePaise: {$ref: ./common.yaml#/Paise}
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    paymentStatus: {$ref: '#/PaymentStatus'}
+    paymentMethod:
+      oneOf:
+        - $ref: '#/PaymentMethod'
+        - type: "null"
+    codeLocked: {type: boolean}
+    codeAttemptsLeft:
+      type: integer
+      minimum: 0
+    acceptBy: {$ref: '#/NullableTimestamp'}
+    partialConfirmBy: {$ref: '#/NullableTimestamp'}
+    holdUntil: {$ref: '#/NullableTimestamp'}
+    extendedAt: {$ref: '#/NullableTimestamp'}
+    placedAt: {$ref: ./common.yaml#/Timestamp}
+    acceptedAt: {$ref: '#/NullableTimestamp'}
+    collectedAt: {$ref: '#/NullableTimestamp'}
+    timeline:
+      type: array
+      items: {$ref: '#/OrderTimelineEvent'}
+    version:
+      type: integer
+      minimum: 1
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+StoreOrderSummary:
+  type: object
+  description: '`seen` is false until a staff member first opens the order or a list that shows it.'
+  required: [id, number, customerName, fulfilment, status, statusReason, itemCount, totalPaise,
+    acceptBy, holdUntil, placedAt, seen, version]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    number: {$ref: '#/OrderNumber'}
+    customerName: {type: [string, "null"]}
+    fulfilment: {$ref: '#/Fulfilment'}
+    status: {$ref: '#/OrderStatus'}
+    statusReason:
+      type: [string, "null"]
+      description: >-
+        Why the order reached its status (03 §4.2): a `RejectReason` for
+        rejected, a `SystemReason` for expired and system cancels, a
+        `CustomerCancelReason`, `ShopCancelReason` or `AdminCancelReason`
+        for cancelled, a `DeliveryFailedReason` for delivery_failed; null
+        otherwise.
+      maxLength: 40
+    itemCount:
+      type: integer
+      minimum: 1
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    acceptBy: {$ref: '#/NullableTimestamp'}
+    holdUntil: {$ref: '#/NullableTimestamp'}
+    placedAt: {$ref: ./common.yaml#/Timestamp}
+    seen: {type: boolean}
+    version:
+      type: integer
+      minimum: 1
+StoreOrderList:
+  type: object
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/StoreOrderSummary'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}

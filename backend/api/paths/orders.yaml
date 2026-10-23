@@ -1,12 +1,1887 @@
 # Paths: domain "orders" (owner W2-02, W2-04): customer and shop order flows (04 §2.4, §2.6).
 #
 # Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [orders]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/orders.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# (D-50). Every operation: `tags: [orders]`, an operationId unique across the
+# API, an example per request and success response, and `default:
+# {$ref: ../common/responses.yaml#/Problem}`. Domain problem codes are listed
+# under `x-problems`.
+#
+# W2-02. `/v1/biz/businesses/{bid}/stores/{sid}` is `{S}` in 04 §2.6; the
+# permission engine reads the scope from `bid` and `sid`. Roles per operation
+# are in internal/platform/authz/policy/orders.go. Every unsafe order route
+# takes a required Idempotency-Key; order create and every transition is
+# `x-money` (04 §1.6). The checkout quote lives here, not in a checkout
+# domain: it is the orders package's pricing (W2-02 report). Pickup only for
+# now: delivery, partial accept and returns are in the contract so clients can
+# build against them, and answer as each operation says until they ship.
+/v1/me/checkout/quote:
+  post:
+    operationId: quoteCheckout
+    tags:
+    - orders
+    summary: Price a cart before placing it (C-11)
+    description: >-
+      Customer app. No side effects. Re-reads prices and stock now. Lines are priced from the store item's
+      price; an `askReplyId` that is this customer's Yes for this store prices that item's line at the
+      replied price while it is valid (`priceSource: ask_reply`, D-101) and is ignored otherwise. `orderable`
+      is false while any line is short. Credits are not live yet: `creditsAllowed` is 0 with `creditsLimit:
+      not_available` when credits are asked for. `409 store_not_bookable` for a store that takes no pickup
+      orders (or `fulfilment: delivery` until delivery ships); `409 ask_reply_used` when the reply already
+      has an active order.
+    x-idempotency: none
+    x-problems:
+    - store_not_bookable
+    - ask_reply_used
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/orders.yaml#/CheckoutQuoteRequest
+          example:
+            storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+            fulfilment: pickup
+            creditsToUse: 0
+            items:
+            - storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+              quantity: 2
+            - storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+              quantity: 1
+    responses:
+      '200':
+        description: The priced cart
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/CheckoutQuote
+            example:
+              storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              fulfilment: pickup
+              lines:
+              - storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                productId: 01JB0S9P1R2D3C4T5M6A7S8T9R
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                quantity: 2
+                availableQuantity: 9
+                availability: in_stock
+                unitPricePaise: 5800
+                mrpPaise: 6000
+                lineSubtotalPaise: 11600
+                discountPaise: 0
+                lineTotalPaise: 11600
+                priceSource: catalogue
+                validUntil: null
+              - storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                productId: 01JB0S9P2R3D4C5T6M7A8S9T0R
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                quantity: 1
+                availableQuantity: 4
+                availability: in_stock
+                unitPricePaise: 28500
+                mrpPaise: 29500
+                lineSubtotalPaise: 28500
+                discountPaise: 0
+                lineTotalPaise: 28500
+                priceSource: catalogue
+                validUntil: null
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              deliveryFeePaise: 0
+              creditsRequested: 0
+              creditsAllowed: 0
+              creditsUsed: 0
+              creditsLimit: null
+              totalPaise: 40100
+              offersApplied: []
+              orderable: true
+              validUntil: null
+              serverNow: '2026-10-23T05:00:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/orders:
+  get:
+    operationId: listMyOrders
+    tags:
+    - orders
+    summary: My online orders (C-13)
+    description: >-
+      Customer app. Newest first. `status=active` keeps orders that are not finished, `past` the finished
+      ones; both when omitted.
+    parameters:
+    - name: status
+      in: query
+      schema:
+        type: string
+        enum:
+        - active
+        - past
+    - $ref: ../common/parameters.yaml#/Limit
+    - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      '200':
+        description: My orders
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/OrderList
+            example:
+              items:
+              - id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+                number: TZ-024817
+                store:
+                  id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                  slug: sri-lakshmi-stores-jayanagar
+                  name: Sri Lakshmi Stores
+                  addressLine: 12, 4th Cross, Jayanagar
+                  locality: Jayanagar
+                fulfilment: pickup
+                status: accepted
+                statusReason: null
+                itemCount: 2
+                totalPaise: 40100
+                acceptBy: null
+                holdUntil: '2026-10-23T05:33:00Z'
+                placedAt: '2026-10-23T05:00:00Z'
+                version: 2
+              nextCursor: null
+              serverNow: '2026-10-23T05:04:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: createOrder
+    tags:
+    - orders
+    summary: Place an order
+    description: >-
+      Customer app; idempotent (BK-04). Re-prices and rechecks stock in one transaction: `409 price_changed`
+      with the fresh quote in `extensions.quote` when the total is not `expectedTotalPaise`; `409 insufficient_stock`
+      naming the line in `extensions.storeItemId` and `extensions.available`. Sets `accept_by` from `order_accept_timeout_min`,
+      notifies the store and starts the accept timer. Nothing is reserved until the shop accepts (D-01).
+      `409 store_closed` outside opening hours or while closed by the shop; `409 store_not_bookable` when
+      the store takes no pickup orders or is not live (delivery is refused the same way until it ships);
+      `409 ordering_suspended` with `extensions.until` while no-show strikes limit the account and it
+      already has an unfinished order (01 §5.4); `409 ask_reply_used` (with `extensions.orderId`) and
+      `409 ask_price_expired` (with `extensions.quote`) for a booking from an ask reply (D-101). The response
+      never carries the pickup code; read the order for it.
+    x-idempotency: required
+    x-money: true
+    x-problems:
+    - price_changed
+    - insufficient_stock
+    - store_closed
+    - store_not_bookable
+    - delivery_closed
+    - below_minimum
+    - ordering_suspended
+    - ask_reply_used
+    - ask_price_expired
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/orders.yaml#/OrderCreateRequest
+          example:
+            storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+            fulfilment: pickup
+            creditsToUse: 0
+            expectedTotalPaise: 40100
+            items:
+            - storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+              quantity: 2
+            - storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+              quantity: 1
+    responses:
+      '201':
+        description: The order, placed
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/Order
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              store:
+                id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                slug: sri-lakshmi-stores-jayanagar
+                name: Sri Lakshmi Stores
+                addressLine: 12, 4th Cross, Jayanagar
+                locality: Jayanagar
+              fulfilment: pickup
+              status: placed
+              statusReason: null
+              statusNote: null
+              lines:
+              - id: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                unitPricePaise: 5800
+                quantityRequested: 2
+                quantityAccepted: null
+                lineTotalPaise: 11600
+                priceSource: catalogue
+              - id: 01JB0T1NE3M4S5T6V7W8X9Y0Z1
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                unitPricePaise: 28500
+                quantityRequested: 1
+                quantityAccepted: null
+                lineTotalPaise: 28500
+                priceSource: catalogue
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 40100
+              cashbackCredits: 0
+              paymentStatus: unpaid
+              paymentMethod: null
+              code: null
+              codeLocked: false
+              canExtend: false
+              askReplyId: null
+              acceptBy: '2026-10-23T05:10:00Z'
+              partialConfirmBy: null
+              holdUntil: null
+              extendedAt: null
+              placedAt: '2026-10-23T05:00:00Z'
+              acceptedAt: null
+              collectedAt: null
+              timeline:
+              - fromStatus: null
+                toStatus: placed
+                actor: customer
+                reason: null
+                at: '2026-10-23T05:00:00Z'
+              version: 1
+              serverNow: '2026-10-23T05:00:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/orders/{orderId}:
+  parameters:
+  - name: orderId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getMyOrder
+    tags:
+    - orders
+    summary: One of my orders, with its timeline (C-12)
+    description: >-
+      Customer app; another customer's order is `404 not_found`. `code` is decrypted for the owner only,
+      and only while the order can be handed over and the code is not locked (D-04).
+    responses:
+      '200':
+        description: The order
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/Order
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              store:
+                id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                slug: sri-lakshmi-stores-jayanagar
+                name: Sri Lakshmi Stores
+                addressLine: 12, 4th Cross, Jayanagar
+                locality: Jayanagar
+              fulfilment: pickup
+              status: accepted
+              statusReason: null
+              statusNote: null
+              lines:
+              - id: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                unitPricePaise: 5800
+                quantityRequested: 2
+                quantityAccepted: 2
+                lineTotalPaise: 11600
+                priceSource: catalogue
+              - id: 01JB0T1NE3M4S5T6V7W8X9Y0Z1
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                unitPricePaise: 28500
+                quantityRequested: 1
+                quantityAccepted: 1
+                lineTotalPaise: 28500
+                priceSource: catalogue
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 40100
+              cashbackCredits: 0
+              paymentStatus: unpaid
+              paymentMethod: null
+              code: '4821'
+              codeLocked: false
+              canExtend: true
+              askReplyId: null
+              acceptBy: '2026-10-23T05:10:00Z'
+              partialConfirmBy: null
+              holdUntil: '2026-10-23T05:33:00Z'
+              extendedAt: null
+              placedAt: '2026-10-23T05:00:00Z'
+              acceptedAt: '2026-10-23T05:03:00Z'
+              collectedAt: null
+              timeline:
+              - fromStatus: null
+                toStatus: placed
+                actor: customer
+                reason: null
+                at: '2026-10-23T05:00:00Z'
+              - fromStatus: placed
+                toStatus: accepted
+                actor: staff
+                reason: null
+                at: '2026-10-23T05:03:00Z'
+              version: 2
+              serverNow: '2026-10-23T05:04:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/orders/{orderId}/cancel:
+  parameters:
+  - name: orderId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: cancelOrder
+    tags:
+    - orders
+    summary: Cancel my order
+    description: >-
+      From placed, awaiting_customer, accepted or ready (03 §4.1). Releases any reserved stock. `declined_partial`
+      is refused here (`422 validation_failed`); `other` needs `note`. `409 invalid_transition` from any
+      other state.
+    x-idempotency: required
+    x-money: true
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/orders.yaml#/CancelOrderRequest
+          example:
+            reason: changed_mind
+    responses:
+      '200':
+        description: The order after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/Order
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              store:
+                id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                slug: sri-lakshmi-stores-jayanagar
+                name: Sri Lakshmi Stores
+                addressLine: 12, 4th Cross, Jayanagar
+                locality: Jayanagar
+              fulfilment: pickup
+              status: cancelled
+              statusReason: changed_mind
+              statusNote: null
+              lines:
+              - id: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                unitPricePaise: 5800
+                quantityRequested: 2
+                quantityAccepted: null
+                lineTotalPaise: 11600
+                priceSource: catalogue
+              - id: 01JB0T1NE3M4S5T6V7W8X9Y0Z1
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                unitPricePaise: 28500
+                quantityRequested: 1
+                quantityAccepted: null
+                lineTotalPaise: 28500
+                priceSource: catalogue
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 40100
+              cashbackCredits: 0
+              paymentStatus: unpaid
+              paymentMethod: null
+              code: null
+              codeLocked: false
+              canExtend: false
+              askReplyId: null
+              acceptBy: null
+              partialConfirmBy: null
+              holdUntil: null
+              extendedAt: null
+              placedAt: '2026-10-23T05:00:00Z'
+              acceptedAt: null
+              collectedAt: null
+              timeline:
+              - fromStatus: null
+                toStatus: placed
+                actor: customer
+                reason: null
+                at: '2026-10-23T05:00:00Z'
+              - fromStatus: placed
+                toStatus: cancelled
+                actor: customer
+                reason: changed_mind
+                at: '2026-10-23T05:02:00Z'
+              version: 2
+              serverNow: '2026-10-23T05:02:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/orders/{orderId}/confirm-partial:
+  parameters:
+  - name: orderId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: confirmPartialOrder
+    tags:
+    - orders
+    summary: Take or decline a partly accepted order
+    description: >-
+      From awaiting_customer before `partialConfirmBy` (D-28). `accept: false` cancels with `declined_partial`.
+      Partial accept is not built yet, so no order reaches awaiting_customer and this answers `409 invalid_transition`
+      (W2-02 report).
+    x-idempotency: required
+    x-money: true
+    x-problems:
+    - insufficient_stock
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/orders.yaml#/ConfirmPartialRequest
+          example:
+            accept: true
+    responses:
+      '200':
+        description: The order after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/Order
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              store:
+                id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                slug: sri-lakshmi-stores-jayanagar
+                name: Sri Lakshmi Stores
+                addressLine: 12, 4th Cross, Jayanagar
+                locality: Jayanagar
+              fulfilment: pickup
+              status: accepted
+              statusReason: null
+              statusNote: null
+              lines:
+              - id: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                unitPricePaise: 5800
+                quantityRequested: 2
+                quantityAccepted: 2
+                lineTotalPaise: 11600
+                priceSource: catalogue
+              - id: 01JB0T1NE3M4S5T6V7W8X9Y0Z1
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                unitPricePaise: 28500
+                quantityRequested: 1
+                quantityAccepted: 1
+                lineTotalPaise: 28500
+                priceSource: catalogue
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 40100
+              cashbackCredits: 0
+              paymentStatus: unpaid
+              paymentMethod: null
+              code: null
+              codeLocked: false
+              canExtend: true
+              askReplyId: null
+              acceptBy: '2026-10-23T05:10:00Z'
+              partialConfirmBy: null
+              holdUntil: '2026-10-23T05:33:00Z'
+              extendedAt: null
+              placedAt: '2026-10-23T05:00:00Z'
+              acceptedAt: '2026-10-23T05:03:00Z'
+              collectedAt: null
+              timeline:
+              - fromStatus: null
+                toStatus: placed
+                actor: customer
+                reason: null
+                at: '2026-10-23T05:00:00Z'
+              - fromStatus: placed
+                toStatus: accepted
+                actor: staff
+                reason: null
+                at: '2026-10-23T05:03:00Z'
+              version: 2
+              serverNow: '2026-10-23T05:04:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/orders/{orderId}/extend:
+  parameters:
+  - name: orderId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: extendOrder
+    tags:
+    - orders
+    summary: 'I''m on my way: hold a pickup a little longer'
+    description: >-
+      Once per order, pickup only, while accepted or ready: `holdUntil` moves by `pickup_extension_min`.
+      `409 extension_already_used` the second time.
+    x-idempotency: required
+    x-problems:
+    - extension_already_used
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    responses:
+      '200':
+        description: The order after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/Order
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              store:
+                id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                slug: sri-lakshmi-stores-jayanagar
+                name: Sri Lakshmi Stores
+                addressLine: 12, 4th Cross, Jayanagar
+                locality: Jayanagar
+              fulfilment: pickup
+              status: accepted
+              statusReason: null
+              statusNote: null
+              lines:
+              - id: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                unitPricePaise: 5800
+                quantityRequested: 2
+                quantityAccepted: 2
+                lineTotalPaise: 11600
+                priceSource: catalogue
+              - id: 01JB0T1NE3M4S5T6V7W8X9Y0Z1
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                unitPricePaise: 28500
+                quantityRequested: 1
+                quantityAccepted: 1
+                lineTotalPaise: 28500
+                priceSource: catalogue
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 40100
+              cashbackCredits: 0
+              paymentStatus: unpaid
+              paymentMethod: null
+              code: null
+              codeLocked: false
+              canExtend: false
+              askReplyId: null
+              acceptBy: '2026-10-23T05:10:00Z'
+              partialConfirmBy: null
+              holdUntil: '2026-10-23T05:43:00Z'
+              extendedAt: '2026-10-23T05:20:00Z'
+              placedAt: '2026-10-23T05:00:00Z'
+              acceptedAt: '2026-10-23T05:03:00Z'
+              collectedAt: null
+              timeline:
+              - fromStatus: null
+                toStatus: placed
+                actor: customer
+                reason: null
+                at: '2026-10-23T05:00:00Z'
+              - fromStatus: placed
+                toStatus: accepted
+                actor: staff
+                reason: null
+                at: '2026-10-23T05:03:00Z'
+              version: 3
+              serverNow: '2026-10-23T05:20:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/orders/{orderId}/new-code:
+  parameters:
+  - name: orderId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: newOrderCode
+    tags:
+    - orders
+    summary: Get a new pickup code after a lock
+    description: >-
+      After `code_locked` (5 wrong tries at the counter): a new code, with the tries reset. `409 invalid_transition`
+      when the code is not locked or the order cannot be handed over. Read the order for the new code;
+      the response never carries it.
+    x-idempotency: required
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    responses:
+      '200':
+        description: The order after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/Order
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              store:
+                id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                slug: sri-lakshmi-stores-jayanagar
+                name: Sri Lakshmi Stores
+                addressLine: 12, 4th Cross, Jayanagar
+                locality: Jayanagar
+              fulfilment: pickup
+              status: accepted
+              statusReason: null
+              statusNote: null
+              lines:
+              - id: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                unitPricePaise: 5800
+                quantityRequested: 2
+                quantityAccepted: 2
+                lineTotalPaise: 11600
+                priceSource: catalogue
+              - id: 01JB0T1NE3M4S5T6V7W8X9Y0Z1
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                unitPricePaise: 28500
+                quantityRequested: 1
+                quantityAccepted: 1
+                lineTotalPaise: 28500
+                priceSource: catalogue
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 40100
+              cashbackCredits: 0
+              paymentStatus: unpaid
+              paymentMethod: null
+              code: null
+              codeLocked: false
+              canExtend: true
+              askReplyId: null
+              acceptBy: '2026-10-23T05:10:00Z'
+              partialConfirmBy: null
+              holdUntil: '2026-10-23T05:33:00Z'
+              extendedAt: null
+              placedAt: '2026-10-23T05:00:00Z'
+              acceptedAt: '2026-10-23T05:03:00Z'
+              collectedAt: null
+              timeline:
+              - fromStatus: null
+                toStatus: placed
+                actor: customer
+                reason: null
+                at: '2026-10-23T05:00:00Z'
+              - fromStatus: placed
+                toStatus: accepted
+                actor: staff
+                reason: null
+                at: '2026-10-23T05:03:00Z'
+              version: 2
+              serverNow: '2026-10-23T05:04:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/orders:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listStoreOrders
+    tags:
+    - orders
+    summary: The store's orders (B-04)
+    description: >-
+      Cashier and above. Newest first. `status` picks a B-04 tab: `new` (placed), `accepted` (awaiting_customer,
+      accepted), `ready`, `out_for_delivery`, `returns` (delivery_failed, not settled), `done` (collected,
+      delivered, settled delivery_failed), `missed` (rejected, expired, cancelled); every order when omitted.
+      The customer's phone is masked (D-60). Listing marks the listed new orders as seen.
+    parameters:
+    - name: status
+      in: query
+      schema:
+        type: string
+        enum:
+        - new
+        - accepted
+        - ready
+        - out_for_delivery
+        - returns
+        - done
+        - missed
+    - $ref: ../common/parameters.yaml#/Limit
+    - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      '200':
+        description: The store's orders
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/StoreOrderList
+            example:
+              items:
+              - id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+                number: TZ-024817
+                customerName: Asha
+                fulfilment: pickup
+                status: placed
+                statusReason: null
+                itemCount: 2
+                totalPaise: 40100
+                acceptBy: '2026-10-23T05:10:00Z'
+                holdUntil: null
+                placedAt: '2026-10-23T05:00:00Z'
+                seen: false
+                version: 1
+              nextCursor: null
+              serverNow: '2026-10-23T05:01:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/orders/{orderId}:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: orderId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getStoreOrder
+    tags:
+    - orders
+    summary: One order with its timeline (B-04)
+    description: >-
+      Cashier and above. Never contains the code (D-04). An order of another store is `404 not_found`.
+      Opening an order marks it seen.
+    responses:
+      '200':
+        description: The order
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/StoreOrder
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              customer:
+                name: Asha
+                phoneMasked: 90•••••001
+              fulfilment: pickup
+              status: placed
+              statusReason: null
+              statusNote: null
+              lines:
+              - id: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                unitPricePaise: 5800
+                quantityRequested: 2
+                quantityAccepted: null
+                lineTotalPaise: 11600
+                priceSource: catalogue
+                available: 9
+              - id: 01JB0T1NE3M4S5T6V7W8X9Y0Z1
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                unitPricePaise: 28500
+                quantityRequested: 1
+                quantityAccepted: null
+                lineTotalPaise: 28500
+                priceSource: catalogue
+                available: 4
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 40100
+              paymentStatus: unpaid
+              paymentMethod: null
+              codeLocked: false
+              codeAttemptsLeft: 5
+              acceptBy: '2026-10-23T05:10:00Z'
+              partialConfirmBy: null
+              holdUntil: null
+              extendedAt: null
+              placedAt: '2026-10-23T05:00:00Z'
+              acceptedAt: null
+              collectedAt: null
+              timeline:
+              - fromStatus: null
+                toStatus: placed
+                actor: customer
+                reason: null
+                at: '2026-10-23T05:00:00Z'
+              version: 1
+              serverNow: '2026-10-23T05:00:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/orders/{orderId}/accept:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: orderId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: acceptOrder
+    tags:
+    - orders
+    summary: Accept a new order
+    description: >-
+      Cashier and above, from placed before `acceptBy`. Holds the stock as reservations; nothing is sold
+      yet (D-01). `409 insufficient_stock` naming the line when an accepted quantity is more than available.
+      A quantity below the one asked (partial accept, D-28) is not built yet and answers `422 validation_failed`
+      on that line (W2-02 report). Starts the pickup hold (`pickup_hold_min`).
+    x-idempotency: required
+    x-money: true
+    x-problems:
+    - insufficient_stock
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/orders.yaml#/AcceptOrderRequest
+          examples:
+            all:
+              value: {}
+            lines:
+              value:
+                lines:
+                - orderItemId: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                  quantity: 2
+    responses:
+      '200':
+        description: The order after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/StoreOrder
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              customer:
+                name: Asha
+                phoneMasked: 90•••••001
+              fulfilment: pickup
+              status: accepted
+              statusReason: null
+              statusNote: null
+              lines:
+              - id: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                unitPricePaise: 5800
+                quantityRequested: 2
+                quantityAccepted: 2
+                lineTotalPaise: 11600
+                priceSource: catalogue
+                available: 9
+              - id: 01JB0T1NE3M4S5T6V7W8X9Y0Z1
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                unitPricePaise: 28500
+                quantityRequested: 1
+                quantityAccepted: 1
+                lineTotalPaise: 28500
+                priceSource: catalogue
+                available: 4
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 40100
+              paymentStatus: unpaid
+              paymentMethod: null
+              codeLocked: false
+              codeAttemptsLeft: 5
+              acceptBy: '2026-10-23T05:10:00Z'
+              partialConfirmBy: null
+              holdUntil: '2026-10-23T05:33:00Z'
+              extendedAt: null
+              placedAt: '2026-10-23T05:00:00Z'
+              acceptedAt: '2026-10-23T05:03:00Z'
+              collectedAt: null
+              timeline:
+              - fromStatus: null
+                toStatus: placed
+                actor: customer
+                reason: null
+                at: '2026-10-23T05:00:00Z'
+              - fromStatus: placed
+                toStatus: accepted
+                actor: staff
+                reason: null
+                at: '2026-10-23T05:03:00Z'
+              version: 2
+              serverNow: '2026-10-23T05:04:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/orders/{orderId}/reject:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: orderId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: rejectOrder
+    tags:
+    - orders
+    summary: Reject a new order
+    description: Cashier and above, from placed. `other` needs `note`.
+    x-idempotency: required
+    x-money: true
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/orders.yaml#/RejectOrderRequest
+          example:
+            reason: out_of_stock
+    responses:
+      '200':
+        description: The order after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/StoreOrder
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              customer:
+                name: Asha
+                phoneMasked: 90•••••001
+              fulfilment: pickup
+              status: rejected
+              statusReason: out_of_stock
+              statusNote: null
+              lines:
+              - id: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                unitPricePaise: 5800
+                quantityRequested: 2
+                quantityAccepted: null
+                lineTotalPaise: 11600
+                priceSource: catalogue
+                available: 9
+              - id: 01JB0T1NE3M4S5T6V7W8X9Y0Z1
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                unitPricePaise: 28500
+                quantityRequested: 1
+                quantityAccepted: null
+                lineTotalPaise: 28500
+                priceSource: catalogue
+                available: 4
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 40100
+              paymentStatus: unpaid
+              paymentMethod: null
+              codeLocked: false
+              codeAttemptsLeft: 5
+              acceptBy: null
+              partialConfirmBy: null
+              holdUntil: null
+              extendedAt: null
+              placedAt: '2026-10-23T05:00:00Z'
+              acceptedAt: null
+              collectedAt: null
+              timeline:
+              - fromStatus: null
+                toStatus: placed
+                actor: customer
+                reason: null
+                at: '2026-10-23T05:00:00Z'
+              - fromStatus: placed
+                toStatus: rejected
+                actor: staff
+                reason: out_of_stock
+                at: '2026-10-23T05:02:00Z'
+              version: 2
+              serverNow: '2026-10-23T05:02:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/orders/{orderId}/ready:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: orderId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: readyOrder
+    tags:
+    - orders
+    summary: Mark a pickup order ready
+    description: >-
+      Cashier and above, from accepted, pickup only. Optional: an accepted order can be handed over directly.
+    x-idempotency: required
+    x-money: true
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    responses:
+      '200':
+        description: The order after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/StoreOrder
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              customer:
+                name: Asha
+                phoneMasked: 90•••••001
+              fulfilment: pickup
+              status: ready
+              statusReason: null
+              statusNote: null
+              lines:
+              - id: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                unitPricePaise: 5800
+                quantityRequested: 2
+                quantityAccepted: 2
+                lineTotalPaise: 11600
+                priceSource: catalogue
+                available: 9
+              - id: 01JB0T1NE3M4S5T6V7W8X9Y0Z1
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                unitPricePaise: 28500
+                quantityRequested: 1
+                quantityAccepted: 1
+                lineTotalPaise: 28500
+                priceSource: catalogue
+                available: 4
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 40100
+              paymentStatus: unpaid
+              paymentMethod: null
+              codeLocked: false
+              codeAttemptsLeft: 5
+              acceptBy: '2026-10-23T05:10:00Z'
+              partialConfirmBy: null
+              holdUntil: '2026-10-23T05:33:00Z'
+              extendedAt: null
+              placedAt: '2026-10-23T05:00:00Z'
+              acceptedAt: '2026-10-23T05:03:00Z'
+              collectedAt: null
+              timeline:
+              - fromStatus: null
+                toStatus: placed
+                actor: customer
+                reason: null
+                at: '2026-10-23T05:00:00Z'
+              - fromStatus: placed
+                toStatus: accepted
+                actor: staff
+                reason: null
+                at: '2026-10-23T05:03:00Z'
+              - fromStatus: accepted
+                toStatus: ready
+                actor: staff
+                reason: null
+                at: '2026-10-23T05:10:00Z'
+              version: 3
+              serverNow: '2026-10-23T05:10:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/orders/{orderId}/dispatch:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: orderId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: dispatchOrder
+    tags:
+    - orders
+    summary: Send a delivery order out
+    description: >-
+      Cashier and above, accepted to out_for_delivery, delivery only. Delivery is not built yet, so this
+      answers `409 invalid_transition` (W2-02 report).
+    x-idempotency: required
+    x-money: true
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    responses:
+      '200':
+        description: The order after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/StoreOrder
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              customer:
+                name: Asha
+                phoneMasked: 90•••••001
+              fulfilment: pickup
+              status: accepted
+              statusReason: null
+              statusNote: null
+              lines:
+              - id: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                unitPricePaise: 5800
+                quantityRequested: 2
+                quantityAccepted: 2
+                lineTotalPaise: 11600
+                priceSource: catalogue
+                available: 9
+              - id: 01JB0T1NE3M4S5T6V7W8X9Y0Z1
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                unitPricePaise: 28500
+                quantityRequested: 1
+                quantityAccepted: 1
+                lineTotalPaise: 28500
+                priceSource: catalogue
+                available: 4
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 40100
+              paymentStatus: unpaid
+              paymentMethod: null
+              codeLocked: false
+              codeAttemptsLeft: 5
+              acceptBy: '2026-10-23T05:10:00Z'
+              partialConfirmBy: null
+              holdUntil: '2026-10-23T05:33:00Z'
+              extendedAt: null
+              placedAt: '2026-10-23T05:00:00Z'
+              acceptedAt: '2026-10-23T05:03:00Z'
+              collectedAt: null
+              timeline:
+              - fromStatus: null
+                toStatus: placed
+                actor: customer
+                reason: null
+                at: '2026-10-23T05:00:00Z'
+              - fromStatus: placed
+                toStatus: accepted
+                actor: staff
+                reason: null
+                at: '2026-10-23T05:03:00Z'
+              version: 2
+              serverNow: '2026-10-23T05:04:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/orders/{orderId}/fail-delivery:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: orderId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: failOrderDelivery
+    tags:
+    - orders
+    summary: Record a failed delivery
+    description: >-
+      Cashier and above, only from out_for_delivery (D-22). Delivery is not built yet, so this answers
+      `409 invalid_transition` (W2-02 report).
+    x-idempotency: required
+    x-money: true
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/orders.yaml#/FailDeliveryRequest
+          example:
+            reason: customer_unreachable
+    responses:
+      '200':
+        description: The order after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/StoreOrder
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              customer:
+                name: Asha
+                phoneMasked: 90•••••001
+              fulfilment: pickup
+              status: accepted
+              statusReason: null
+              statusNote: null
+              lines:
+              - id: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                unitPricePaise: 5800
+                quantityRequested: 2
+                quantityAccepted: 2
+                lineTotalPaise: 11600
+                priceSource: catalogue
+                available: 9
+              - id: 01JB0T1NE3M4S5T6V7W8X9Y0Z1
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                unitPricePaise: 28500
+                quantityRequested: 1
+                quantityAccepted: 1
+                lineTotalPaise: 28500
+                priceSource: catalogue
+                available: 4
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 40100
+              paymentStatus: unpaid
+              paymentMethod: null
+              codeLocked: false
+              codeAttemptsLeft: 5
+              acceptBy: '2026-10-23T05:10:00Z'
+              partialConfirmBy: null
+              holdUntil: '2026-10-23T05:33:00Z'
+              extendedAt: null
+              placedAt: '2026-10-23T05:00:00Z'
+              acceptedAt: '2026-10-23T05:03:00Z'
+              collectedAt: null
+              timeline:
+              - fromStatus: null
+                toStatus: placed
+                actor: customer
+                reason: null
+                at: '2026-10-23T05:00:00Z'
+              - fromStatus: placed
+                toStatus: accepted
+                actor: staff
+                reason: null
+                at: '2026-10-23T05:03:00Z'
+              version: 2
+              serverNow: '2026-10-23T05:04:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/orders/{orderId}/confirm-return:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: orderId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: confirmOrderReturn
+    tags:
+    - orders
+    summary: Settle the goods of a failed delivery
+    description: >-
+      `returned`: cashier and above; `damaged`: manager and above (D-69). Delivery is not built yet, so
+      this answers `409 invalid_transition` (W2-02 report).
+    x-idempotency: required
+    x-money: true
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/orders.yaml#/ConfirmReturnRequest
+          example:
+            outcome: returned
+    responses:
+      '200':
+        description: The order after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/StoreOrder
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              customer:
+                name: Asha
+                phoneMasked: 90•••••001
+              fulfilment: pickup
+              status: accepted
+              statusReason: null
+              statusNote: null
+              lines:
+              - id: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                unitPricePaise: 5800
+                quantityRequested: 2
+                quantityAccepted: 2
+                lineTotalPaise: 11600
+                priceSource: catalogue
+                available: 9
+              - id: 01JB0T1NE3M4S5T6V7W8X9Y0Z1
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                unitPricePaise: 28500
+                quantityRequested: 1
+                quantityAccepted: 1
+                lineTotalPaise: 28500
+                priceSource: catalogue
+                available: 4
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 40100
+              paymentStatus: unpaid
+              paymentMethod: null
+              codeLocked: false
+              codeAttemptsLeft: 5
+              acceptBy: '2026-10-23T05:10:00Z'
+              partialConfirmBy: null
+              holdUntil: '2026-10-23T05:33:00Z'
+              extendedAt: null
+              placedAt: '2026-10-23T05:00:00Z'
+              acceptedAt: '2026-10-23T05:03:00Z'
+              collectedAt: null
+              timeline:
+              - fromStatus: null
+                toStatus: placed
+                actor: customer
+                reason: null
+                at: '2026-10-23T05:00:00Z'
+              - fromStatus: placed
+                toStatus: accepted
+                actor: staff
+                reason: null
+                at: '2026-10-23T05:03:00Z'
+              version: 2
+              serverNow: '2026-10-23T05:04:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/orders/{orderId}/cancel:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: orderId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: cancelStoreOrder
+    tags:
+    - orders
+    summary: Cancel an accepted order
+    description: >-
+      Manager and above (D-65), from accepted or ready. Releases the reservations; no strike (D-68). `other`
+      needs `note`.
+    x-idempotency: required
+    x-money: true
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/orders.yaml#/StoreCancelOrderRequest
+          example:
+            reason: closing_soon
+    responses:
+      '200':
+        description: The order after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/StoreOrder
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              customer:
+                name: Asha
+                phoneMasked: 90•••••001
+              fulfilment: pickup
+              status: cancelled
+              statusReason: closing_soon
+              statusNote: null
+              lines:
+              - id: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                unitPricePaise: 5800
+                quantityRequested: 2
+                quantityAccepted: 2
+                lineTotalPaise: 11600
+                priceSource: catalogue
+                available: 9
+              - id: 01JB0T1NE3M4S5T6V7W8X9Y0Z1
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                unitPricePaise: 28500
+                quantityRequested: 1
+                quantityAccepted: 1
+                lineTotalPaise: 28500
+                priceSource: catalogue
+                available: 4
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 40100
+              paymentStatus: unpaid
+              paymentMethod: null
+              codeLocked: false
+              codeAttemptsLeft: 5
+              acceptBy: '2026-10-23T05:10:00Z'
+              partialConfirmBy: null
+              holdUntil: null
+              extendedAt: null
+              placedAt: '2026-10-23T05:00:00Z'
+              acceptedAt: '2026-10-23T05:03:00Z'
+              collectedAt: null
+              timeline:
+              - fromStatus: null
+                toStatus: placed
+                actor: customer
+                reason: null
+                at: '2026-10-23T05:00:00Z'
+              - fromStatus: placed
+                toStatus: accepted
+                actor: staff
+                reason: null
+                at: '2026-10-23T05:03:00Z'
+              - fromStatus: accepted
+                toStatus: cancelled
+                actor: staff
+                reason: closing_soon
+                at: '2026-10-23T05:08:00Z'
+              version: 3
+              serverNow: '2026-10-23T05:08:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/orders/{orderId}/verify-code:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: orderId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: verifyOrderCode
+    tags:
+    - orders
+    summary: Hand over an order with the customer's code
+    description: >-
+      Cashier and above, from accepted or ready. The code is checked against this order only, in constant
+      time (D-04). A wrong code is `422 code_invalid` with `extensions.attemptsLeft`; the 5th wrong code
+      locks it (`409 code_locked`) until the customer gets a new one. A right code marks the order collected,
+      records the payment method and sells the reserved stock (`sale_online`, D-01).
+    x-idempotency: required
+    x-money: true
+    x-problems:
+    - code_invalid
+    - code_locked
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/orders.yaml#/VerifyCodeRequest
+          example:
+            code: '4821'
+            paymentMethod: upi
+    responses:
+      '200':
+        description: The order after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/StoreOrder
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              customer:
+                name: Asha
+                phoneMasked: 90•••••001
+              fulfilment: pickup
+              status: collected
+              statusReason: null
+              statusNote: null
+              lines:
+              - id: 01JB0T1NE2M3S4T5V6W7X8Y9Z0
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter
+                variant: Pasteurised
+                packSize: 100
+                unit: g
+                imageKey: null
+                unitPricePaise: 5800
+                quantityRequested: 2
+                quantityAccepted: 2
+                lineTotalPaise: 11600
+                priceSource: catalogue
+                available: 9
+              - id: 01JB0T1NE3M4S5T6V7W8X9Y0Z1
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                name: Aashirvaad Atta
+                variant: null
+                packSize: 5
+                unit: kg
+                imageKey: null
+                unitPricePaise: 28500
+                quantityRequested: 1
+                quantityAccepted: 1
+                lineTotalPaise: 28500
+                priceSource: catalogue
+                available: 4
+              subtotalPaise: 40100
+              discountPaise: 0
+              itemSubtotalPaise: 40100
+              itemsAfterOffersPaise: 40100
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 40100
+              paymentStatus: paid
+              paymentMethod: upi
+              codeLocked: false
+              codeAttemptsLeft: 5
+              acceptBy: '2026-10-23T05:10:00Z'
+              partialConfirmBy: null
+              holdUntil: null
+              extendedAt: null
+              placedAt: '2026-10-23T05:00:00Z'
+              acceptedAt: '2026-10-23T05:03:00Z'
+              collectedAt: '2026-10-23T05:25:00Z'
+              timeline:
+              - fromStatus: null
+                toStatus: placed
+                actor: customer
+                reason: null
+                at: '2026-10-23T05:00:00Z'
+              - fromStatus: placed
+                toStatus: accepted
+                actor: staff
+                reason: null
+                at: '2026-10-23T05:03:00Z'
+              - fromStatus: accepted
+                toStatus: ready
+                actor: staff
+                reason: null
+                at: '2026-10-23T05:10:00Z'
+              - fromStatus: ready
+                toStatus: collected
+                actor: staff
+                reason: null
+                at: '2026-10-23T05:25:00Z'
+              version: 4
+              serverNow: '2026-10-23T05:25:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
