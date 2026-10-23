@@ -37,29 +37,29 @@ async function navs() {
 }
 
 describe('business shell', () => {
-  it('lands on Orders: / is replaced by /orders (D-84)', async () => {
+  it('lands on Overview at / (B-03)', async () => {
     const { history } = renderAt('/');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Orders' })).toBeInTheDocument();
-    expect(history.location.pathname).toBe('/orders');
-    // Replaced, not pushed: there is no "/" entry to go back to.
-    expect(history.length).toBe(1);
+    expect(await screen.findByRole('heading', { level: 1, name: /^Good (morning|afternoon|evening), / })).toBeInTheDocument();
+    expect(history.location.pathname).toBe('/');
     const { tabs, side } = await navs();
-    expect(within(tabs).getByRole('link', { name: 'Orders' })).toHaveAttribute('aria-current', 'page');
+    expect(within(tabs).getByRole('link', { name: 'Overview' })).toHaveAttribute('aria-current', 'page');
+    expect(within(side).getByRole('link', { name: 'Overview' })).toHaveAttribute('aria-current', 'page');
+    expect(within(side).getByRole('link', { name: 'Orders' })).not.toHaveAttribute('aria-current');
+  });
+
+  it('keeps Overview active only on / (not on every page)', async () => {
+    renderAt('/orders');
+    const { side } = await navs();
+    expect(within(side).getByRole('link', { name: 'Overview' })).not.toHaveAttribute('aria-current');
     expect(within(side).getByRole('link', { name: 'Orders' })).toHaveAttribute('aria-current', 'page');
-    expect(within(tabs).getByRole('link', { name: 'Overview' })).not.toHaveAttribute('aria-current');
   });
 
-  it('keeps the query string across the landing redirect', async () => {
-    const { history } = renderAt('/?locale=pseudo');
-    await screen.findByRole('heading', { level: 1, name: 'Orders' });
-    expect(history.location.pathname).toBe('/orders');
+  it('replaces /overview with / and keeps the query string', async () => {
+    const { history } = renderAt('/overview?locale=pseudo');
+    await screen.findByRole('heading', { level: 1, name: /^Good / });
+    expect(history.location.pathname).toBe('/');
     expect(history.location.search).toBe('?locale=pseudo');
-  });
-
-  it('keeps Overview as a placeholder with the greeting band', async () => {
-    renderAt('/overview');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Your shop on TodayZ' })).toBeInTheDocument();
-    expect(screen.getByText('Coming soon')).toBeInTheDocument();
+    expect(history.length).toBe(1);
   });
 
   it('has phone tabs Overview, Orders, Sell, Stock, More', async () => {
@@ -90,7 +90,7 @@ describe('business shell', () => {
     expect(within(side).getAllByRole('link')).toHaveLength(NAV.filter((n) => n.side).length);
   });
 
-  it.each(NAV.filter((n) => n.section !== 'more'))('shows the placeholder for /$section', async ({ section }) => {
+  it.each(NAV.filter((n) => n.section !== 'more' && n.section !== 'overview'))('shows the placeholder for /$section', async ({ section }) => {
     renderAt(`/${section}`);
     const { side } = await navs();
     const active = within(side).getAllByRole('link').find((l) => l.getAttribute('aria-current') === 'page');
@@ -107,11 +107,11 @@ describe('business shell', () => {
   it('shows not found for unknown paths', async () => {
     renderAt('/no-such-page');
     expect(await screen.findByRole('heading', { name: 'Page not found' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Go to orders' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Go to overview' })).toHaveAttribute('href', '/');
   });
 
   it('renders the pseudo-locale with every key present', async () => {
-    renderAt('/overview', asMessages(xa));
+    renderAt('/', asMessages(xa));
     const h1 = await screen.findByRole('heading', { level: 1 });
     expect(h1.textContent).toMatch(/^\[.*\]$/);
   });

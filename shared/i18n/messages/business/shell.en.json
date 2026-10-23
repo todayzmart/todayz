@@ -88,7 +88,7 @@
     "description": "Body for an unknown route"
   },
   "shell.notFound.home": {
-    "defaultMessage": "Go to orders",
-    "description": "Button from an unknown route to the landing page, which is Orders until Overview is built"
+    "defaultMessage": "Go to overview",
+    "description": "Button from an unknown route to the landing page, Overview (B-03)"
   }
 }

@@ -1,0 +1,410 @@
+{
+  "overview.sample": {
+    "defaultMessage": "Sample data",
+    "description": "Neutral pill in the greeting band while the Overview shows built-in sample numbers, not the shop's own"
+  },
+  "overview.greet.morning": {
+    "defaultMessage": "Good morning, {name}",
+    "description": "Greeting before noon. {name} is the owner's first name."
+  },
+  "overview.greet.afternoon": {
+    "defaultMessage": "Good afternoon, {name}",
+    "description": "Greeting from noon to 5 pm. {name} is the owner's first name."
+  },
+  "overview.greet.evening": {
+    "defaultMessage": "Good evening, {name}",
+    "description": "Greeting from 5 pm. {name} is the owner's first name."
+  },
+  "overview.greet.sub": {
+    "defaultMessage": "{date} · {store} · {waiting, plural, =0 {no orders waiting} one {# order waiting} other {# orders waiting}}",
+    "description": "Line under the greeting. {date} is like 'Thursday, 22 October'; {store} is the shop name."
+  },
+  "overview.period.label": {
+    "defaultMessage": "Period",
+    "description": "Accessible name of the Today / 7 days / 30 days switch"
+  },
+  "overview.period.today": {
+    "defaultMessage": "Today",
+    "description": "Period switch option"
+  },
+  "overview.period.7d": {
+    "defaultMessage": "7 days",
+    "description": "Period switch option"
+  },
+  "overview.period.30d": {
+    "defaultMessage": "30 days",
+    "description": "Period switch option"
+  },
+  "overview.compare.today": {
+    "defaultMessage": "vs <b>last {weekday}</b>",
+    "description": "What today's numbers are compared with. {weekday} is like 'Thursday'."
+  },
+  "overview.compare.7d": {
+    "defaultMessage": "vs <b>previous 7 days</b>",
+    "description": "What the 7-day numbers are compared with"
+  },
+  "overview.compare.30d": {
+    "defaultMessage": "vs <b>previous 30 days</b>",
+    "description": "What the 30-day numbers are compared with"
+  },
+  "overview.compareShort.today": {
+    "defaultMessage": "vs last {weekday}",
+    "description": "KPI footer comparison. {weekday} is like 'Thursday' on the lead cell and 'Thu' on the others."
+  },
+  "overview.compareShort.7d": {
+    "defaultMessage": "vs previous 7 days",
+    "description": "KPI footer comparison"
+  },
+  "overview.compareShort.30d": {
+    "defaultMessage": "vs previous 30 days",
+    "description": "KPI footer comparison"
+  },
+  "overview.synced": {
+    "defaultMessage": "Synced {time}",
+    "description": "Sync state in the top bar. {time} is like '6:40 pm'."
+  },
+  "overview.newSale": {
+    "defaultMessage": "New sale",
+    "description": "Primary button in the top bar; opens the counter (Sell)"
+  },
+  "overview.kpi.label": {
+    "defaultMessage": "At a glance",
+    "description": "Accessible name of the KPI strip"
+  },
+  "overview.kpi.sales.today": {
+    "defaultMessage": "Sales today",
+    "description": "Lead KPI name for the Today period"
+  },
+  "overview.kpi.sales.period": {
+    "defaultMessage": "Sales",
+    "description": "Lead KPI name for the 7 and 30 day periods"
+  },
+  "overview.kpi.sales.note": {
+    "defaultMessage": "{bills, plural, one {# bill} other {# bills}} · {online, plural, one {# online order} other {# online orders}}",
+    "description": "Line under the sales value"
+  },
+  "overview.kpi.orders": {
+    "defaultMessage": "Orders",
+    "description": "KPI name"
+  },
+  "overview.kpi.orders.note": {
+    "defaultMessage": "{waiting, plural, =0 {None waiting to accept} other {# waiting to accept}}",
+    "description": "Line under the orders value"
+  },
+  "overview.kpi.avgBill": {
+    "defaultMessage": "Avg bill",
+    "description": "KPI name: average bill value"
+  },
+  "overview.kpi.avgBill.note": {
+    "defaultMessage": "Counter and online bills",
+    "description": "Line under the average bill value"
+  },
+  "overview.kpi.low": {
+    "defaultMessage": "Items low",
+    "description": "KPI name: items at or under their low-stock level"
+  },
+  "overview.kpi.low.note": {
+    "defaultMessage": "{soon, plural, =0 {None sell out by tomorrow} other {# sell out by tomorrow}}",
+    "description": "Line under the low items count"
+  },
+  "overview.kpi.low.link": {
+    "defaultMessage": "Reorder list",
+    "description": "KPI footer link to the low-stock list"
+  },
+  "overview.delta.up": {
+    "defaultMessage": "Up {value}",
+    "description": "Screen-reader text for a rising KPI. {value} is like '12%' or '5'."
+  },
+  "overview.delta.down": {
+    "defaultMessage": "Down {value}",
+    "description": "Screen-reader text for a falling KPI"
+  },
+  "overview.delta.flat": {
+    "defaultMessage": "No change",
+    "description": "Screen-reader text for an unchanged KPI"
+  },
+  "overview.orders.title": {
+    "defaultMessage": "New orders",
+    "description": "Card title"
+  },
+  "overview.orders.waiting": {
+    "defaultMessage": "{count, plural, one {# waiting} other {# waiting}}",
+    "description": "Pill in the new orders card head"
+  },
+  "overview.orders.head": {
+    "defaultMessage": "{code} · {customer}",
+    "description": "Order card heading: order code and customer name"
+  },
+  "overview.orders.timeLeft": {
+    "defaultMessage": "{time} left to accept",
+    "description": "Screen-reader text for the countdown. {time} is like '3:42'."
+  },
+  "overview.orders.expired": {
+    "defaultMessage": "Time to accept is up",
+    "description": "Screen-reader text when the countdown reached zero"
+  },
+  "overview.orders.pickup": {
+    "defaultMessage": "Pickup",
+    "description": "Order fulfilment pill"
+  },
+  "overview.orders.delivery": {
+    "defaultMessage": "Delivery",
+    "description": "Order fulfilment pill"
+  },
+  "overview.orders.accept": {
+    "defaultMessage": "Accept",
+    "description": "Accept button on a new order"
+  },
+  "overview.orders.reject": {
+    "defaultMessage": "Reject",
+    "description": "Reject button on a new order"
+  },
+  "overview.orders.acceptA11y": {
+    "defaultMessage": "Accept order {code}",
+    "description": "Accessible name of the Accept button"
+  },
+  "overview.orders.rejectA11y": {
+    "defaultMessage": "Reject order {code}",
+    "description": "Accessible name of the Reject button"
+  },
+  "overview.orders.sampleToast": {
+    "defaultMessage": "Sample order: nothing was changed",
+    "description": "Toast after Accept or Reject on a sample order. Nothing is sent or saved."
+  },
+  "overview.orders.open": {
+    "defaultMessage": "Open orders",
+    "description": "Toast action that opens the Orders section"
+  },
+  "overview.chart.title": {
+    "defaultMessage": "Sales by hour",
+    "description": "Card title"
+  },
+  "overview.chart.today": {
+    "defaultMessage": "Today",
+    "description": "Chart legend: today's bars"
+  },
+  "overview.chart.prev": {
+    "defaultMessage": "Last {weekday}",
+    "description": "Chart legend: the dotted line for the same weekday last week"
+  },
+  "overview.chart.a11y": {
+    "defaultMessage": "Sales by hour today against last {weekday}. {hour}, so far: {now}; last {weekday}: {prev}.",
+    "description": "Accessible description of the chart"
+  },
+  "overview.chart.hourAm": {
+    "defaultMessage": "{h}a",
+    "description": "Short x-axis hour label before noon, like '8a'"
+  },
+  "overview.chart.hourPm": {
+    "defaultMessage": "{h}p",
+    "description": "Short x-axis hour label from noon, like '6p'"
+  },
+  "overview.chart.axisK": {
+    "defaultMessage": "₹{k}k",
+    "description": "Y-axis label in thousands of rupees, like '₹2k'"
+  },
+  "overview.chart.tipHour": {
+    "defaultMessage": "{hour}, so far",
+    "description": "Tooltip heading for the current hour, like '6 pm, so far'"
+  },
+  "overview.chart.tipPrev": {
+    "defaultMessage": "Last {weekday} {amount}",
+    "description": "Tooltip line with last week's amount for the same hour"
+  },
+  "overview.chart.report": {
+    "defaultMessage": "View sales report",
+    "description": "Card footer link to Analytics"
+  },
+  "overview.chart.updated": {
+    "defaultMessage": "Updated {time}",
+    "description": "Card footer. {time} is like '6:40 pm'."
+  },
+  "overview.insights.title": {
+    "defaultMessage": "Demand insights",
+    "description": "Card title (D-99)"
+  },
+  "overview.insights.desc": {
+    "defaultMessage": "What sells, what sits, what is about to go to waste, and what people nearby want",
+    "description": "Card line under the title (D-99)"
+  },
+  "overview.insights.period": {
+    "defaultMessage": "Last 7 days",
+    "description": "Card tag: the insight period"
+  },
+  "overview.insights.notUseful": {
+    "defaultMessage": "Not useful",
+    "description": "Quiet button on an insight row; hides that row's item"
+  },
+  "overview.insights.hiddenToast": {
+    "defaultMessage": "Hidden for this visit. Sample data: nothing is saved.",
+    "description": "Toast after Not useful on a sample insight"
+  },
+  "overview.insights.all": {
+    "defaultMessage": "All insights",
+    "description": "Card footer link to the Insights tab of Analytics"
+  },
+  "overview.insights.foot": {
+    "defaultMessage": "From your sales, stock and searches near your shop",
+    "description": "Card footer note (D-99)"
+  },
+  "overview.insights.empty": {
+    "defaultMessage": "Nothing needs you right now",
+    "description": "Shown when no insight fires"
+  },
+  "overview.insights.selling_fast.label": {
+    "defaultMessage": "Selling fast",
+    "description": "Insight row label"
+  },
+  "overview.insights.selling_fast.sentence": {
+    "defaultMessage": "<strong>{item}</strong> sold {sold} this week. At this pace you run out on {day}.",
+    "description": "Insight sentence. {day} is a weekday like 'Saturday'."
+  },
+  "overview.insights.selling_fast.action": {
+    "defaultMessage": "Restock",
+    "description": "Insight action; opens the restock form prefilled"
+  },
+  "overview.insights.sitting_on_shelf.label": {
+    "defaultMessage": "Sitting on the shelf",
+    "description": "Insight row label"
+  },
+  "overview.insights.sitting_on_shelf.sentence": {
+    "defaultMessage": "<strong>{item}</strong>: {stock} in stock, no sale in {days} days.",
+    "description": "Insight sentence"
+  },
+  "overview.insights.sitting_on_shelf.action": {
+    "defaultMessage": "Create offer",
+    "description": "Insight action; opens the offer form prefilled"
+  },
+  "overview.insights.going_to_waste.label": {
+    "defaultMessage": "Going to waste",
+    "description": "Insight row label"
+  },
+  "overview.insights.going_to_waste.sentence": {
+    "defaultMessage": "<strong>{count, plural, one {# item expires} other {# items expire}} within {days} days</strong>: {items}.",
+    "description": "Insight sentence. {items} is a comma-separated list of item names."
+  },
+  "overview.insights.going_to_waste.action": {
+    "defaultMessage": "Flash offer",
+    "description": "Insight action; opens the flash offer form prefilled"
+  },
+  "overview.insights.wanted_nearby.label": {
+    "defaultMessage": "Wanted nearby",
+    "description": "Insight row label"
+  },
+  "overview.insights.wanted_nearby.sentence": {
+    "defaultMessage": "<strong>{item}</strong>: {searches} searches within {distance} this week.",
+    "description": "Insight sentence. {distance} is like '2.0 km'."
+  },
+  "overview.insights.wanted_nearby.sentenceNone": {
+    "defaultMessage": "<strong>{item}</strong>: {searches} searches within {distance} this week. No shop nearby has it.",
+    "description": "Insight sentence when no shop nearby lists the product (D-99)"
+  },
+  "overview.insights.wanted_nearby.action": {
+    "defaultMessage": "Add product",
+    "description": "Insight action; opens add item prefilled"
+  },
+  "overview.insights.bought_together.label": {
+    "defaultMessage": "Bought together",
+    "description": "Insight row label"
+  },
+  "overview.insights.bought_together.sentence": {
+    "defaultMessage": "<strong>{a}</strong> and <strong>{b}</strong> are in {pct}% of bills together.",
+    "description": "Insight sentence"
+  },
+  "overview.insights.bought_together.action": {
+    "defaultMessage": "Create offer",
+    "description": "Insight action; opens the offer form with the two items"
+  },
+  "overview.top.title": {
+    "defaultMessage": "Top items today",
+    "description": "Card title"
+  },
+  "overview.top.titlePeriod": {
+    "defaultMessage": "Top items",
+    "description": "Card title for the 7 and 30 day periods"
+  },
+  "overview.top.viewAll": {
+    "defaultMessage": "View all",
+    "description": "Card head link to Stock"
+  },
+  "overview.top.label": {
+    "defaultMessage": "Top items",
+    "description": "Accessible name of the table"
+  },
+  "overview.top.item": {
+    "defaultMessage": "Item",
+    "description": "Column header"
+  },
+  "overview.top.sold": {
+    "defaultMessage": "Sold",
+    "description": "Column header"
+  },
+  "overview.top.last7": {
+    "defaultMessage": "7 days",
+    "description": "Column header for the sparkline"
+  },
+  "overview.top.spark": {
+    "defaultMessage": "Sold on the last 7 days: {values}",
+    "description": "Accessible name of the sparkline. {values} is a comma-separated list of counts."
+  },
+  "overview.top.revenue": {
+    "defaultMessage": "Revenue",
+    "description": "Column header"
+  },
+  "overview.top.stock": {
+    "defaultMessage": "In stock",
+    "description": "Column header"
+  },
+  "overview.top.low": {
+    "defaultMessage": "{count} (low)",
+    "description": "Screen-reader text for a low stock count"
+  },
+  "overview.top.updated": {
+    "defaultMessage": "Updated",
+    "description": "Column header: source and time of the last stock change"
+  },
+  "overview.top.source.pos": {
+    "defaultMessage": "POS · {time}",
+    "description": "Last stock change came from the counter"
+  },
+  "overview.top.source.online": {
+    "defaultMessage": "Online · {time}",
+    "description": "Last stock change came from an online order"
+  },
+  "overview.top.source.voice": {
+    "defaultMessage": "Voice · {time}",
+    "description": "Last stock change came from a voice entry"
+  },
+  "overview.top.total": {
+    "defaultMessage": "Total, {shown} of {all} items",
+    "description": "Table footer"
+  },
+  "overview.top.totals": {
+    "defaultMessage": "{sold} sold · {revenue}",
+    "description": "Table footer totals. {revenue} is like '₹9,304'."
+  },
+  "overview.top.empty": {
+    "defaultMessage": "No sales yet",
+    "description": "Empty table"
+  },
+  "overview.loading": {
+    "defaultMessage": "Loading your shop's numbers",
+    "description": "Accessible text while the Overview loads"
+  },
+  "overview.error": {
+    "defaultMessage": "Could not load the overview",
+    "description": "Error banner title"
+  },
+  "overview.hour.am": {
+    "defaultMessage": "{h} am",
+    "description": "An hour of the day before noon, like '8 am'"
+  },
+  "overview.hour.pm": {
+    "defaultMessage": "{h} pm",
+    "description": "An hour of the day from noon, like '6 pm'"
+  },
+  "overview.retry": {
+    "defaultMessage": "Try again",
+    "description": "Button on the error banner; loads the overview again"
+  }
+}

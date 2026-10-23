@@ -18,47 +18,47 @@ test.afterEach(() => {
 const sidebar = '.tz-side';
 const tabs = '.tz-bnav';
 
-test('phone: lands on Orders with bottom tabs, no sidebar (D-84)', async ({ page }) => {
+test('phone: lands on Overview with bottom tabs, no sidebar (B-03)', async ({ page }) => {
   await page.setViewportSize(VIEWPORTS.phone);
   await page.goto('/');
-  await expect(page).toHaveURL(/\/orders$/);
-  await expect(page.getByRole('heading', { level: 1, name: 'Orders' })).toBeVisible();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole('heading', { level: 1, name: /^Good / })).toBeVisible();
   await expect(page.locator(tabs)).toBeVisible();
   await expect(page.locator(sidebar)).toBeHidden();
   await expect(page.locator(tabs).getByRole('link')).toHaveCount(5);
-  await expect(page.locator(tabs).getByRole('link', { name: 'Orders' })).toHaveAttribute('aria-current', 'page');
-  await expect(page.locator(tabs).getByRole('link', { name: 'Overview' })).not.toHaveAttribute('aria-current');
+  await expect(page.locator(tabs).getByRole('link', { name: 'Overview' })).toHaveAttribute('aria-current', 'page');
+  await expect(page.locator(tabs).getByRole('link', { name: 'Orders' })).not.toHaveAttribute('aria-current');
   await expect(page.getByRole('main')).toHaveAttribute('data-density', 'touch');
   await expectFontLoaded(page, guard, 'Figtree', FIGTREE);
   await shot(page, 'business-phone.png');
 });
 
-test('desktop: sidebar with Orders active, no bottom tabs', async ({ page }) => {
+test('desktop: sidebar with Overview active, no bottom tabs', async ({ page }) => {
   await page.setViewportSize(VIEWPORTS.desktop);
   await page.goto('/');
-  await expect(page).toHaveURL(/\/orders$/);
+  await expect(page).toHaveURL(/\/$/);
   await expect(page.locator(sidebar)).toBeVisible();
   await expect(page.locator(tabs)).toBeHidden();
-  await expect(page.locator(sidebar).getByRole('link', { name: 'Orders' })).toHaveAttribute('aria-current', 'page');
+  await expect(page.locator(sidebar).getByRole('link', { name: 'Overview' })).toHaveAttribute('aria-current', 'page');
   await expect(page.getByRole('main')).not.toHaveAttribute('data-density');
   await expectFontLoaded(page, guard, 'Figtree', FIGTREE);
   await shot(page, 'business-desktop.png');
 });
 
-test('Back after the landing redirect leaves the app instead of bouncing', async ({ page }) => {
+test('Back after the /overview redirect leaves the app instead of bouncing', async ({ page }) => {
   await page.goto('about:blank');
-  await page.goto('/');
-  await expect(page).toHaveURL(/\/orders$/);
+  await page.goto('/overview');
+  await expect(page).toHaveURL(/\/$/);
   await page.goBack();
   await expect(page).toHaveURL('about:blank');
 });
 
-test('Overview stays reachable as a placeholder', async ({ page }) => {
+test('the Overview tab goes back to / from another section', async ({ page }) => {
   await page.setViewportSize(VIEWPORTS.phone);
-  await page.goto('/');
+  await page.goto('/orders');
   await page.locator(tabs).getByRole('link', { name: 'Overview' }).click();
-  await expect(page).toHaveURL(/\/overview$/);
-  await expect(page.getByRole('heading', { level: 1, name: 'Your shop on TodayZ' })).toBeVisible();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole('heading', { level: 1, name: /^Good / })).toBeVisible();
 });
 
 test('More tab lists the other sections', async ({ page }) => {
@@ -70,10 +70,10 @@ test('More tab lists the other sections', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1, name: 'Offers' })).toBeVisible();
 });
 
-test('pseudo-locale via ?locale=pseudo survives the landing redirect', async ({ page }) => {
+test('pseudo-locale via ?locale=pseudo survives the /overview redirect', async ({ page }) => {
   await page.setViewportSize(VIEWPORTS.desktop);
-  await page.goto('/?locale=pseudo');
-  await expect(page).toHaveURL(/\/orders\?locale=pseudo$/);
+  await page.goto('/overview?locale=pseudo');
+  await expect(page).toHaveURL(/\/\?locale=pseudo$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(/^\[.+\]$/);
   await expect(page.locator('html')).toHaveAttribute('lang', 'en-XA');
   await expectFontLoaded(page, guard, 'Figtree', FIGTREE);

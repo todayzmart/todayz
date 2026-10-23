@@ -1,4 +1,5 @@
 import '@todayz/tokens/styles.css';
+import '@todayz/ui/styles.css';
 import { htmlLang } from '@todayz/i18n';
 import { configFromEnv, initTelemetry } from '@todayz/telemetry';
 import { StrictMode } from 'react';
