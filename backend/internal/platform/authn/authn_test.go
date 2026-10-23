@@ -350,6 +350,15 @@ func TestAuthenticator(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, []string{"finance"}, p.Roles)
 	require.Equal(t, step, p.StepUpAt)
+	require.Equal(t, AMROTPTOTP, p.AMR)
+
+	// An otp+totp token whose sign-in holds no TOTP verification (an admin
+	// whose TOTP was reset) is only an OTP session: the row is the truth.
+	fs.st = SessionState{Active: true, Roles: []string{"finance"}}
+	p, err = a.Authenticate(ctx, rawAdm)
+	require.NoError(t, err)
+	require.Equal(t, AMROTP, p.AMR)
+	require.True(t, p.StepUpAt.IsZero())
 }
 
 func TestCheckRefreshOrigin(t *testing.T) {

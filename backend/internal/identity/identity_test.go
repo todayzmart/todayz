@@ -654,7 +654,7 @@ func TestLogout(t *testing.T) {
 	require.False(t, st.Active)
 	require.Equal(t, 1, f.count(`SELECT count(*) FROM audit_log WHERE action = 'identity.sign_out'`))
 
-	// The other device is untouched (logout-all is phase B).
+	// The other device is untouched (logout-all: TestLogoutAll).
 	_, err = refreshIn(f, authn.AppCustomer, other.RefreshToken)
 	require.NoError(t, err)
 	// Logging out twice is fine.
@@ -697,7 +697,7 @@ func TestBlockedUser(t *testing.T) {
 }
 
 // Admin sign-in: only an existing, enabled admin; roles come from admin_users;
-// an OTP-only admin session is amr otp (TOTP is phase B).
+// an OTP-only admin session is amr otp (TOTP: totp_service_test.go).
 func TestAdminSignIn(t *testing.T) {
 	f := newFixture(t, config.EnvTest)
 	const phone = "+919876543210"
@@ -721,7 +721,7 @@ func TestAdminSignIn(t *testing.T) {
 	require.Equal(t, f.clk.Now().Add(authn.AdminRefreshTTL-OTPResendGap), adm.RefreshExpiresAt)
 	p, err := f.svc.tokens.Verify(adm.AccessToken)
 	require.NoError(t, err)
-	require.Equal(t, authn.AMROTP, p.AMR, "TOTP is phase B")
+	require.Equal(t, authn.AMROTP, p.AMR, "OTP only until TOTP verifies")
 	require.Equal(t, []string{"support", "finance"}, p.Roles)
 
 	st, err := f.svc.CheckSession(context.Background(), adm.UserID, p.SessionID, authn.AppAdmin)
