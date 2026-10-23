@@ -743,5 +743,5 @@ There is no `make seed`; use `make reset`.
 - **If-Match.** The common `IfMatch` parameter is optional in the schema, so a missing header reaches the handler's `428 precondition_required` instead of the validator's 422. A wrong one is still 412.
 - **No `X-TZ-Business` header.** The business scope is the URL path (04 §2.6); CORS allows only `X-TZ-Client` in addition to the standard headers, and exposes the `RateLimit-*` headers.
 - **A deleted user** gets `403 account_blocked` on refresh and on `/v1/me`, as a blocked one does.
-- **Session purge.** `identity.purge` runs hourly. It deletes OTP requests 24 h after they expire and sessions 30 days after `coalesce(revoked_at, expires_at)`. The retention must stay at least the longest refresh lifetime (30 days), so a rotated row outlives its token and a late replay is still detected as reuse.
+- **Session purge.** `identity_purge` runs hourly. It deletes OTP requests 24 h after they expire and sessions 30 days after `coalesce(revoked_at, expires_at)`. The retention must stay at least the longest refresh lifetime (30 days), so a rotated row outlives its token and a late replay is still detected as reuse.
 - Lives in: 02 §8; `backend/api/common/parameters.yaml`, `backend/api/paths/me.yaml`; `backend/internal/identity/`; W1-01.

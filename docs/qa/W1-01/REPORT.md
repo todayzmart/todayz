@@ -56,7 +56,7 @@ Branch `worktree-agent-a52a1dee280984955`. Everything ran locally on testcontain
   - `GET` returns the masked phone, name, language, app, roles (admin only), the customer's referral code and the no-show order limit.
   - `PATCH` takes `If-Match` and returns an `ETag` of the form `"v{version}"`. `"name": null` clears the name.
 - **Ops.**
-  - `identity.purge` is an hourly River job. It deletes expired OTP requests after 24 h, and sessions 30 days after they were revoked or expired, whichever came first (`coalesce(revoked_at, expires_at)`, index `ix_sessions_purge`, migration `10102_w1-01_sessions_purge_index.sql`).
+  - `identity_purge` is an hourly River job. It deletes expired OTP requests after 24 h, and sessions 30 days after they were revoked or expired, whichever came first (`coalesce(revoked_at, expires_at)`, index `ix_sessions_purge`, migration `10102_w1-01_sessions_purge_index.sql`).
   - `identity.Preflight` stops staging and prod from starting without the PII and JWT keys, the SMS provider with its `MSG91_OTP_TEMPLATE_ID`, or Turnstile (`TURNSTILE_API_URL`, `TURNSTILE_SECRET_KEY`). It names only the variables. A deployed build with no Turnstile config also fails closed at send time (`noHuman`, 503).
   - The seed adds 3 customers and 3 staff, with fixed ULIDs, reserved test numbers and sealed phones. It skips with a warning when `PII_ENC_KEY` or `PII_HASH_KEY` is unset.
 
@@ -202,11 +202,11 @@ All commands ran in `backend/`, with `DOCKER_HOST` set to the colima socket and 
 15. **Missing `If-Match`.** Resolved per the lead: `PATCH /v1/me` declares `If-Match` inline with `required: false`, so a missing header reaches the handler and answers 428 `precondition_required`; a malformed one is still the validator's 422. The common `IfMatch` parameter in `api/common/parameters.yaml` (lead-owned) has the same contradiction: `required: true` while its description promises 428. Only `me.yaml` used it; making it optional there would let other domains `$ref` it.
 16. **Logout with an unknown or junk token** returns 204 and clears the cookie. Only a missing cookie gets 401.
 17. **Profile updates are not audited.** They change only the name and language. Sign-in, reuse, logout and admin disable are audited.
-18. **Session retention.** A session is deleted by `identity.purge` 30 days after it was revoked or expired, whichever came first. `SessionRetention` must stay at least the longest refresh lifetime (30 days), so a rotated row outlives its own token and a late replay is still detected as reuse; after that a replay is a plain 401. (`TODO(lead)` in `purge.go`.)
+18. **Session retention.** A session is deleted by `identity_purge` 30 days after it was revoked or expired, whichever came first. `SessionRetention` must stay at least the longest refresh lifetime (30 days), so a rotated row outlives its own token and a late replay is still detected as reuse; after that a replay is a plain 401. (`TODO(lead)` in `purge.go`.)
 22. **`X-TZ-Business` was not added to CORS.** No such header exists: the business scope is the URL path (04 §2.6). Only `X-TZ-Client` was added.
 19. **Blank name.** `PATCH /v1/me` refuses a blank name with 422 on `body.name`. `null` clears it.
 20. **Seed without keys.** It skips with a warning that names `PII_ENC_KEY` and `PII_HASH_KEY`, rather than failing, so `make reset` works before `make setup` has generated the keys.
-21. **W1-11 overlap.** The `identity.purge` periodic job is registered in `internal/jobs/identity.go`. If W1-11 changes the registry API, moving it is a one-line change.
+21. **W1-11 overlap.** The `identity_purge` periodic job is registered in `internal/jobs/identity.go`. If W1-11 changes the registry API, moving it is a one-line change.
 
 ## Phase B (not built; the seams are in place)
 
