@@ -182,6 +182,6 @@ W1-07 and the D-91 domain problem codes with their domains. Domain packages star
 W1-07 built the observability base: RED middleware with a label allow-list, runtime, pool, queue
 (`telemetry.RegisterQueue`, `QueueOldestAge`) and SSE metrics, the pgx tracer, the partitioned `events`
 table (`partition_policies` row), the event catalogue (`shared/telemetry/events/*.yaml`, `eventcat`,
-`eventgen`, `mk/26-events.mk`), `POST /v1/rum`, `POST /v1/events` (anonymous until W1-01 supplies
-`UserID`; drops bad events and counts them in `tz_events_dropped_total`) and the gated `GET /v1/test/slow`, `/v1/test/slow-sql` (excluded from the contract smoke
+`eventgen`, `mk/26-events.mk`), `POST /v1/rum`, `POST /v1/events` (stores the signed-in caller's
+user id; drops bad events and counts them in `tz_events_dropped_total`) and the gated `GET /v1/test/slow`, `/v1/test/slow-sql` (excluded from the contract smoke
 because they sleep).
