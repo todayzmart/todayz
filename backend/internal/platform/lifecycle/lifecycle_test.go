@@ -32,9 +32,14 @@ import (
 // and its grace must exceed the 60 s job cap (D-98).
 func TestDrainOutlivesWriteTimeout(t *testing.T) {
 	require.Greater(t, Drain, httpx.WriteTimeout)
-	require.Less(t, PreStopDeployed+Drain, APIStopTimeout)
-	require.Less(t, PreStopLocal+Drain, APIStopTimeout)
-	require.Less(t, queue.DrainGrace+queue.HardGrace, WorkerStopTimeout)
+	// After the drain each process still closes its pool (bounded) and
+	// flushes telemetry; the stop timeout must cover that too, with a margin.
+	require.Equal(t, PoolClose+TelemetryFlush+ShutdownMargin, APIExit)
+	require.Equal(t, HealthShutdown+PoolClose+TelemetryFlush+ShutdownMargin, WorkerExit)
+	require.Less(t, PreStopDeployed+Drain+APIExit, APIStopTimeout)
+	require.Less(t, PreStopLocal+Drain+APIExit, APIStopTimeout)
+	require.Less(t, queue.DrainGrace+queue.HardGrace+HealthShutdown+PoolClose+TelemetryFlush, WorkerStopTimeout)
+	require.Less(t, queue.DrainGrace+queue.HardGrace+WorkerExit, WorkerStopTimeout)
 	require.Greater(t, queue.DrainGrace, 60*time.Second, "the grace must outlast the 60 s job cap")
 	require.Equal(t, 75*time.Second, Drain)
 	require.Equal(t, 90*time.Second, queue.DrainGrace)
@@ -45,6 +50,10 @@ func TestDrainOutlivesWriteTimeout(t *testing.T) {
 	require.ErrorContains(t, err, "SHUTDOWN_DRAIN")
 	_, err = APITimings(true, 30*time.Second, 90*time.Second)
 	require.ErrorContains(t, err, "container stop timeout")
+	// 15 + 90 = 105 fits on its own, but with the 15 s for the pool close,
+	// flush and margin it reaches the 120 s stop timeout: refused.
+	_, err = APITimings(true, 15*time.Second, 90*time.Second)
+	require.ErrorContains(t, err, "telemetry flush")
 }
 
 func TestAPITimingsDefaults(t *testing.T) {
@@ -159,18 +168,21 @@ func callSlow(base string) <-chan slowResult {
 }
 
 // TestSIGTERMDrainsInFlightRequest (SC-GS-01, SC-GS-02): a real SIGTERM
-// reaches the process while the test's 5 s handler runs. /readyz answers 503
-// {"status":"draining"} at once while /healthz stays 200; after the 1 s
-// pre-stop new connections are refused; the slow request still gets 200 with
-// its full body and a live context; Run returns only after it.
+// reaches the process while the test's 6 s handler runs. /readyz answers 503
+// {"status":"draining"} at once while /healthz stays 200; after the pre-stop
+// (the test's own 3 s, so a scheduling stall under -race cannot eat it; the
+// 1 s local default is pinned by TestAPITimingsDefaults) new connections are
+// refused; the slow request still gets 200 with its full body and a live
+// context; Run returns only after it.
 func TestSIGTERMDrainsInFlightRequest(t *testing.T) {
+	const preStop, handler = 3 * time.Second, 6 * time.Second
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM)
 	defer stop()
 
 	ready := &health.Readiness{CacheFor: -1}
 	r := chi.NewRouter()
 	health.Register(r, ready, health.Options{})
-	slow := newSlowRoute(r, 5*time.Second)
+	slow := newSlowRoute(r, handler)
 
 	l, err := net.Listen("tcp", "127.0.0.1:0")
 	require.NoError(t, err)
@@ -179,7 +191,7 @@ func TestSIGTERMDrainsInFlightRequest(t *testing.T) {
 	var logs syncBuffer
 	s := Server{
 		Name: "api", Srv: httpx.NewServer(addr, r), Ready: ready, Listener: l,
-		PreStop: PreStopLocal, Drain: Drain, Log: slog.New(slog.NewJSONHandler(&logs, nil)),
+		PreStop: preStop, Drain: Drain, Log: slog.New(slog.NewJSONHandler(&logs, nil)),
 	}
 	runDone := make(chan error, 1)
 	go func() { runDone <- s.Run(ctx) }()
@@ -197,13 +209,13 @@ func TestSIGTERMDrainsInFlightRequest(t *testing.T) {
 		var c int
 		c, body = call(base, "/readyz")
 		return c == http.StatusServiceUnavailable
-	}, 500*time.Millisecond, 5*time.Millisecond)
+	}, 2*time.Second, 5*time.Millisecond)
 	var rb map[string]string
 	require.NoError(t, json.Unmarshal([]byte(body), &rb))
 	require.Equal(t, map[string]string{"status": "draining"}, rb)
 	c, _ := call(base, "/healthz")
 	require.Equal(t, 200, c, "/healthz stays 200 while draining")
-	require.Less(t, time.Since(sigAt), PreStopLocal, "both answered inside the pre-stop")
+	require.Less(t, time.Since(sigAt), preStop, "both answered inside the pre-stop")
 
 	// After the pre-stop, new connections are refused (the slow one runs on).
 	var refusedAt time.Time
@@ -215,8 +227,8 @@ func TestSIGTERMDrainsInFlightRequest(t *testing.T) {
 		}
 		_ = conn.Close()
 		return false
-	}, 3*time.Second, 20*time.Millisecond)
-	require.GreaterOrEqual(t, refusedAt.Sub(sigAt), PreStopLocal-50*time.Millisecond, "refused only after the pre-stop")
+	}, preStop+3*time.Second, 20*time.Millisecond)
+	require.GreaterOrEqual(t, refusedAt.Sub(sigAt), preStop-50*time.Millisecond, "refused only after the pre-stop")
 	select {
 	case <-slow.finished:
 		t.Fatal("the slow handler ended before the listener closed; the test proves nothing")
@@ -230,7 +242,7 @@ func TestSIGTERMDrainsInFlightRequest(t *testing.T) {
 	require.Equal(t, slowBody, got.body)
 	require.NoError(t, <-slow.ctxErr, "SIGTERM must not cancel a request context")
 	finished := <-slow.finished
-	require.GreaterOrEqual(t, finished.Sub(sigAt), 4*time.Second, "the handler ran its full 5 s")
+	require.GreaterOrEqual(t, finished.Sub(sigAt), handler-time.Second, "the handler ran its full time")
 
 	// The server (and so the process) stops only after it.
 	select {
@@ -287,4 +299,24 @@ func TestListenErrorReturns(t *testing.T) {
 	s := Server{Name: "api", Srv: httpx.NewServer(l.Addr().String(), http.NotFoundHandler()), Drain: time.Second,
 		Log: slog.New(slog.NewTextHandler(io.Discard, nil))}
 	require.Error(t, s.Run(context.Background()))
+}
+
+// TestStepWithin: a close that returns in time is logged as closed; one that
+// blocks (a pool with a connection never returned) is abandoned at the limit
+// and logged at error level, so the shutdown moves on to the telemetry flush.
+func TestStepWithin(t *testing.T) {
+	var logs syncBuffer
+	log := slog.New(slog.NewJSONHandler(&logs, nil))
+
+	require.True(t, StepWithin(context.Background(), log, "quick", time.Second, func() {}))
+	require.Contains(t, logs.String(), "shutdown: quick closed")
+
+	release := make(chan struct{})
+	defer close(release)
+	start := time.Now()
+	require.False(t, StepWithin(context.Background(), log, "stuck", 200*time.Millisecond, func() { <-release }))
+	took := time.Since(start)
+	require.GreaterOrEqual(t, took, 200*time.Millisecond)
+	require.Less(t, took, 2*time.Second)
+	require.Contains(t, logs.String(), `"level":"ERROR","msg":"shutdown: stuck did not close in time; moving on","limit":"200ms"`)
 }

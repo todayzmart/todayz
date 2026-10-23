@@ -64,7 +64,7 @@ func runAPI(ctx context.Context, getenv func(string) string, out io.Writer) erro
 	if err != nil {
 		return err
 	}
-	defer lifecycle.Step(ctx, a.log, "db pool", pool.Close)
+	defer a.closePool(ctx, pool)
 
 	l := pgnotify.New(pool, a.log)
 	clk, _, tc, err := a.clocks(ctx, pool, l)

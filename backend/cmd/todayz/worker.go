@@ -33,7 +33,7 @@ func runWorker(ctx context.Context, getenv func(string) string, out io.Writer) e
 	if err != nil {
 		return err
 	}
-	defer lifecycle.Step(ctx, a.log, "db pool", pool.Close)
+	defer a.closePool(ctx, pool)
 
 	l := pgnotify.New(pool, a.log)
 	clk, off, _, err := a.clocks(ctx, pool, l)
@@ -94,7 +94,7 @@ func serveWorker(ctx context.Context, log *slog.Logger, s lifecycle.Server, c *q
 	drain := func() error {
 		drained = true
 		log.InfoContext(context.WithoutCancel(ctx), "worker draining: no new jobs; running jobs finish",
-			slog.Duration("grace", grace), slog.Duration("hard_grace", hardGrace))
+			slog.String("grace", grace.String()), slog.String("hard_grace", hardGrace.String()))
 		err := queue.Drain(c, grace, hardGrace, log)
 		if err == nil {
 			log.InfoContext(context.WithoutCancel(ctx), "worker drained: river stopped")

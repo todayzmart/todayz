@@ -105,9 +105,17 @@ func (a *app) close() {
 	ctx, cancel := context.WithTimeout(context.Background(), lifecycle.TelemetryFlush)
 	defer cancel()
 	if err := a.shutdown(ctx); err != nil {
-		a.log.Warn("telemetry shutdown", slog.String("err", err.Error()))
+		a.log.Warn("shutdown: telemetry flush failed", slog.String("err", err.Error()))
+		return
 	}
 	a.log.Info("shutdown: telemetry flushed")
+}
+
+// closePool closes pool, waiting at most lifecycle.PoolClose: a request cut
+// at the drain deadline or a job that ignored its hard cancel can hold a
+// connection forever, and the telemetry flush must still run after this.
+func (a *app) closePool(ctx context.Context, pool *pgxpool.Pool) {
+	lifecycle.StepWithin(ctx, a.log, "db pool", lifecycle.PoolClose, pool.Close)
 }
 
 // appPool opens DATABASE_URL (todayz_app: DML only).
