@@ -10,8 +10,13 @@ import (
 )
 
 const (
-	corsAllowHeaders  = "Authorization, Content-Type, Idempotency-Key, If-Match, X-Request-Id, traceparent, tracestate"
-	corsExposeHeaders = "X-Request-Id, Idempotent-Replayed, Retry-After, ETag, Location"
+	// X-TZ-Client is the CSRF header of refresh and logout (AU-16): without
+	// it the browser's preflight fails and the request is never sent. (The
+	// business scope is the URL path, 04 §2.6, not a header.)
+	corsAllowHeaders = "Authorization, Content-Type, Idempotency-Key, If-Match, X-Request-Id, X-TZ-Client, traceparent, tracestate"
+	// RateLimit-* are set by slot 12; Retry-After is listed for clarity
+	// (the Fetch spec does not safelist it).
+	corsExposeHeaders = "X-Request-Id, Idempotent-Replayed, Retry-After, RateLimit-Limit, RateLimit-Remaining, RateLimit-Reset, ETag, Location"
 	corsMethods       = "GET, POST, PUT, PATCH, DELETE"
 
 	// The marketing site's rule for /v1/public/* (D-102): no credentials,

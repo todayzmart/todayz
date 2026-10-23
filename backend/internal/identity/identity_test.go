@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"maps"
 	"strconv"
 	"sync"
 	"testing"
@@ -136,6 +137,12 @@ func (b *lockedBuffer) String() string {
 // environment (staging turns the reserved test code off).
 func newFixture(t *testing.T, appEnv config.Env) *fixture {
 	t.Helper()
+	return newFixtureWith(t, appEnv, nil)
+}
+
+// newFixtureWith lets a test change the config and Deps before New.
+func newFixtureWith(t *testing.T, appEnv config.Env, edit func(*config.Config, *Deps)) *fixture {
+	t.Helper()
 	tdb := testkit.NewDB(t)
 	cfg := loadConfig(t, testEnv(t))
 	cfg.Env = appEnv
@@ -147,10 +154,14 @@ func newFixture(t *testing.T, appEnv config.Env) *fixture {
 	// the test, not be masked by the redaction backstop.
 	log := slog.New(slog.NewJSONHandler(out, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	f := &fixture{t: t, db: tdb, clk: clk, sms: &smsBox{}, human: &human{ok: true}, cfg: cfg, log: log, out: out}
-	f.svc, err = New(Deps{
+	deps := Deps{
 		Config: cfg, DB: db.New(tdb.Pool), Clock: clk, Log: log,
-		Tokens: authn.NewTokens(ks, clk), SMS: f.sms, Human: f.human,
-	})
+		Tokens: authn.NewTokens(ks, clk), SMS: f.sms, Human: f.human, TestRoutes: true,
+	}
+	if edit != nil {
+		edit(cfg, &deps)
+	}
+	f.svc, err = New(deps)
 	require.NoError(t, err)
 	t.Cleanup(f.noSecretsLogged)
 	return f
@@ -377,6 +388,20 @@ func TestPerIPLimit(t *testing.T) {
 	require.NoError(t, err)
 }
 
+// AU-05 over IPv6: the limit binds a whole /64, so rotating addresses inside
+// one subscriber's network does not reset it; another /64 is unaffected.
+func TestPerIPLimitIPv6(t *testing.T) {
+	f := newFixture(t, config.EnvTest)
+	for i := range OTPPerIP {
+		_, err := f.send(fmt.Sprintf("+9198765432%02d", i), authn.AppCustomer, fmt.Sprintf("2001:db8:1:2::%x", i+1))
+		require.NoError(t, err, i)
+	}
+	_, err := f.send("+919876543299", authn.AppCustomer, "2001:db8:1:2:ffff::1")
+	require.Equal(t, int(OTPWindow/time.Second), retryAfter(t, err), "same /64, new address")
+	_, err = f.send("+919876543299", authn.AppCustomer, "2001:db8:1:3::1")
+	require.NoError(t, err, "another /64")
+}
+
 // The limits hold under concurrency (advisory locks): of many simultaneous
 // sends for one number, exactly one goes through.
 func TestConcurrentSends(t *testing.T) {
@@ -465,13 +490,24 @@ func TestReservedTestCode(t *testing.T) {
 		requireCode(t, err, genproblems.Unauthorized, "an ordinary number")
 	}
 
-	staging := newFixture(t, config.EnvStaging)
-	res, err = staging.send("+919000000042", authn.AppCustomer, "10.0.0.1")
-	require.NoError(t, err)
-	if staging.sms.code("+919000000042") != "000000" {
-		_, err = staging.verify(authn.AppCustomer, res.RequestID, "000000")
-		requireCode(t, err, genproblems.Unauthorized, "never in staging or prod")
+	// The /v1/test/clock gate (D-80): each of the three conditions alone
+	// turns the test code off.
+	for name, edit := range map[string]func(*config.Config, *Deps){
+		"staging":                      func(c *config.Config, _ *Deps) { c.Env = config.EnvStaging },
+		"database not local or test":   func(_ *config.Config, d *Deps) { d.TestRoutes = false },
+		"API listening on every iface": func(c *config.Config, _ *Deps) { c.APIAddr = ":8180" },
+		"API on a public address":      func(c *config.Config, _ *Deps) { c.APIAddr = "203.0.113.7:8180" },
+	} {
+		g := newFixtureWith(t, config.EnvTest, edit)
+		require.False(t, g.svc.allowTestCode, name)
+		res, err = g.send("+919000000042", authn.AppCustomer, "10.0.0.1")
+		require.NoError(t, err, name)
+		if g.sms.code("+919000000042") != "000000" {
+			_, err = g.verify(authn.AppCustomer, res.RequestID, "000000")
+			requireCode(t, err, genproblems.Unauthorized, name)
+		}
 	}
+	require.True(t, newFixtureWith(t, config.EnvLocal, func(c *config.Config, _ *Deps) { c.APIAddr = "localhost:8180" }).svc.allowTestCode)
 }
 
 // AU-20: a failed Turnstile check stores and sends nothing.
@@ -529,7 +565,8 @@ func TestRefreshRotationAndReuse(t *testing.T) {
 	r2, err := refreshIn(f, authn.AppCustomer, r1.RefreshToken)
 	require.NoError(t, err)
 
-	// Replay of the first, already rotated token.
+	// Replay of the first, already rotated token, past the grace window.
+	f.clk.Advance(RotationGrace + time.Microsecond)
 	_, err = refreshIn(f, authn.AppCustomer, in.RefreshToken)
 	requireCode(t, err, genproblems.Unauthorized)
 	_, err = refreshIn(f, authn.AppCustomer, r2.RefreshToken)
@@ -539,6 +576,45 @@ func TestRefreshRotationAndReuse(t *testing.T) {
 	require.False(t, st.Active, "access tokens of the family stop at once")
 	require.Equal(t, 1, f.count(`SELECT count(*) FROM audit_log WHERE action = 'identity.refresh_reuse'`))
 	require.Contains(t, f.out.String(), "refresh token reuse", "the log capture is live")
+	require.Equal(t, 0, f.count(`SELECT count(*) FROM sessions WHERE revoked_at IS NULL`))
+}
+
+// A retried refresh whose response was lost: the token rotated RotationGrace
+// ago or less is a plain 401 (no revoke, no audit); a moment later it is reuse.
+func TestRefreshRotationGrace(t *testing.T) {
+	f := newFixture(t, config.EnvTest)
+	in := f.signIn("+919876543210", authn.AppCustomer)
+	first, err := f.svc.tokens.Verify(in.AccessToken)
+	require.NoError(t, err)
+
+	r1, err := refreshIn(f, authn.AppCustomer, in.RefreshToken) // in rotated now
+	require.NoError(t, err)
+
+	_, err = refreshIn(f, authn.AppCustomer, in.RefreshToken)
+	requireCode(t, err, genproblems.Unauthorized, "a retry at once")
+	f.clk.Advance(RotationGrace)
+	_, err = refreshIn(f, authn.AppCustomer, in.RefreshToken)
+	requireCode(t, err, genproblems.Unauthorized, "a retry at the edge of the window")
+	require.Contains(t, f.out.String(), "within the grace window", "the log capture is live")
+
+	st, err := f.svc.CheckSession(context.Background(), in.UserID, first.SessionID, authn.AppCustomer)
+	require.NoError(t, err)
+	require.True(t, st.Active, "inside the window the sign-in lives on")
+	require.Equal(t, 0, f.count(`SELECT count(*) FROM audit_log WHERE action = 'identity.refresh_reuse'`))
+	require.Equal(t, 0, f.count(`SELECT count(*) FROM sessions WHERE revoked_reason = 'reuse'`))
+
+	// The holder of the successor carries on (this rotates r1, not in).
+	_, err = refreshIn(f, authn.AppCustomer, r1.RefreshToken)
+	require.NoError(t, err)
+
+	// Just past the window, the first token is reuse: the family ends.
+	f.clk.Advance(time.Microsecond)
+	_, err = refreshIn(f, authn.AppCustomer, in.RefreshToken)
+	requireCode(t, err, genproblems.Unauthorized)
+	st, err = f.svc.CheckSession(context.Background(), in.UserID, first.SessionID, authn.AppCustomer)
+	require.NoError(t, err)
+	require.False(t, st.Active)
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM audit_log WHERE action = 'identity.refresh_reuse'`))
 	require.Equal(t, 0, f.count(`SELECT count(*) FROM sessions WHERE revoked_at IS NULL`))
 }
 
@@ -610,7 +686,9 @@ func TestBlockedUser(t *testing.T) {
 	res, err = f.send("+919876543210", authn.AppCustomer, "10.0.0.1")
 	require.NoError(t, err)
 	_, err = f.verify(authn.AppCustomer, res.RequestID, f.sms.code("+919876543210"))
-	requireCode(t, err, genproblems.Forbidden)
+	requireCode(t, err, genproblems.AccountBlocked, "a deleted account: account_blocked (04 names no other code)")
+	_, err = f.svc.GetMe(context.Background(), p)
+	requireCode(t, err, genproblems.AccountBlocked)
 
 	// Unknown session, other user, other app: inactive, not an error.
 	st, err = f.svc.CheckSession(context.Background(), ids.New(t0), p.SessionID, authn.AppCustomer)
@@ -744,6 +822,40 @@ func TestPurge(t *testing.T) {
 	require.Zero(t, f.count(`SELECT count(*) FROM sessions`))
 }
 
+// A revoked session goes SessionRetention after its revocation, not after
+// its (later) expiry; a live one waits for its expiry. A rotated row always
+// outlives its own token, so reuse detection is never cut short.
+func TestPurgeRevokedSessions(t *testing.T) {
+	require.GreaterOrEqual(t, SessionRetention, authn.RefreshTTL, "a rotated row must outlive its token")
+	require.GreaterOrEqual(t, SessionRetention, authn.AdminRefreshTTL)
+
+	f := newFixture(t, config.EnvTest)
+	d := db.New(f.db.Pool)
+	out := f.signIn("+919876543210", authn.AppCustomer)
+	require.NoError(t, f.svc.Logout(f.ctx("10.0.0.1"), RefreshInput{App: authn.AppCustomer, Token: out.RefreshToken}))
+	loggedOutAt := f.clk.Now()
+
+	f.clk.Advance(time.Hour)
+	kept := f.signIn("+919876543211", authn.AppCustomer)
+	r1, err := refreshIn(f, authn.AppCustomer, kept.RefreshToken) // kept's first row: rotated now
+	require.NoError(t, err)
+	rotatedAt := f.clk.Now()
+
+	purgeAt := func(at time.Time) int64 {
+		t.Helper()
+		res, err := Purge(context.Background(), d, at)
+		require.NoError(t, err)
+		return res.Sessions
+	}
+	require.Zero(t, purgeAt(loggedOutAt.Add(SessionRetention)), "not before its retention")
+	require.Equal(t, int64(1), purgeAt(loggedOutAt.Add(SessionRetention+time.Microsecond)), "the logged-out session, well before its expiry")
+	require.Equal(t, int64(1), purgeAt(rotatedAt.Add(SessionRetention+time.Microsecond)), "the rotated row")
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM sessions WHERE revoked_at IS NULL`), "the live row waits for its expiry")
+	require.Zero(t, purgeAt(r1.RefreshExpiresAt.Add(SessionRetention)))
+	require.Equal(t, int64(1), purgeAt(r1.RefreshExpiresAt.Add(SessionRetention+time.Microsecond)))
+	require.Zero(t, f.count(`SELECT count(*) FROM sessions`))
+}
+
 func TestUnconfigured(t *testing.T) {
 	cfg := loadConfig(t, map[string]string{"APP_ENV": "test"})
 	svc, err := New(Deps{Config: cfg, Clock: clock.NewFake(t0)})
@@ -774,13 +886,33 @@ func TestPreflight(t *testing.T) {
 	env["API_PUBLIC_URL"] = "https://api.staging.todayz.in"
 	cfg := loadConfig(t, env)
 	err := Preflight(cfg)
-	require.ErrorContains(t, err, "SMS_API_URL")
-	require.ErrorContains(t, err, "MSG91_AUTH_KEY")
+	for _, name := range []string{"SMS_API_URL", "MSG91_AUTH_KEY", "MSG91_OTP_TEMPLATE_ID", "TURNSTILE_API_URL", "TURNSTILE_SECRET_KEY"} {
+		require.ErrorContains(t, err, name)
+	}
 	require.NotContains(t, err.Error(), "PII_ENC_KEY")
 
-	env["SMS_API_URL"] = "https://control.msg91.com"
-	env["MSG91_AUTH_KEY"] = "staging-key-value"
+	values := map[string]string{
+		"SMS_API_URL":           "https://control.msg91.com",
+		"MSG91_AUTH_KEY":        "staging-key-value",
+		"MSG91_OTP_TEMPLATE_ID": "staging-template-value",
+		"TURNSTILE_API_URL":     "https://challenges.cloudflare.com",
+		"TURNSTILE_SECRET_KEY":  "staging-turnstile-value",
+	}
+	for k, v := range values {
+		env[k] = v
+	}
 	require.NoError(t, Preflight(loadConfig(t, env)))
+
+	// Each one alone is enough to refuse, and the error names only it.
+	for name := range values {
+		short := maps.Clone(env)
+		delete(short, name)
+		err := Preflight(loadConfig(t, short))
+		require.EqualError(t, err, "identity: required in staging and prod: "+name)
+		for _, v := range values {
+			require.NotContains(t, err.Error(), v, "values are never named")
+		}
+	}
 }
 
 // The staging and prod providers: no SMS refuses every send.
@@ -794,7 +926,10 @@ func TestProviders(t *testing.T) {
 	sms, h = providers(cfg)
 	require.IsType(t, noSMS{}, sms)
 	require.ErrorIs(t, sms.SendOTP(context.Background(), "+919876543210", "123456"), ErrProvider)
-	require.IsType(t, passHuman{}, h)
+	require.IsType(t, noHuman{}, h, "deployed without Turnstile fails closed")
+	ok, err := h.Verify(context.Background(), "token", "10.0.0.1")
+	require.False(t, ok)
+	require.ErrorIs(t, err, ErrProvider)
 
 	cfg.Providers.SMSAPIURL = "http://127.0.0.1:1"
 	cfg.Providers.TurnstileAPIURL = "http://127.0.0.1:1"
@@ -835,5 +970,6 @@ func TestHelpers(t *testing.T) {
 
 	require.Nil(t, statusRefusal("active"))
 	requireCode(t, statusRefusal("blocked"), genproblems.AccountBlocked)
-	requireCode(t, statusRefusal("deleted"), genproblems.Forbidden)
+	requireCode(t, statusRefusal("deleted"), genproblems.AccountBlocked)
+	requireCode(t, statusRefusal("anything-new"), genproblems.AccountBlocked, "fails closed")
 }

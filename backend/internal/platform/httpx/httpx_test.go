@@ -335,6 +335,37 @@ func TestPublicCORS(t *testing.T) {
 	}
 }
 
+// AU-16 in a real browser: refresh and logout send X-TZ-Client, so the app's
+// preflight must allow it, and the app can read the rate-limit headers. The
+// site still gets nothing on /v1/auth (D-102).
+func TestCORSAuthPreflight(t *testing.T) {
+	r := newTestRouter(t, &bytes.Buffer{}, nil)
+	for _, p := range []string{"/v1/auth/refresh", "/v1/auth/logout"} {
+		w := do(r, "OPTIONS", p, nil, map[string]string{
+			"Origin": appOrigin, "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "content-type, x-tz-client",
+		})
+		require.Equal(t, 204, w.Code, p)
+		require.Equal(t, appOrigin, w.Header().Get("Access-Control-Allow-Origin"), p)
+		require.Equal(t, "true", w.Header().Get("Access-Control-Allow-Credentials"), p)
+		allowed := strings.Split(strings.ToLower(w.Header().Get("Access-Control-Allow-Headers")), ", ")
+		require.Contains(t, allowed, "x-tz-client", p)
+		require.Contains(t, allowed, "content-type", p)
+
+		w = do(r, "OPTIONS", p, nil, map[string]string{
+			"Origin": siteOrigin, "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "content-type, x-tz-client",
+		})
+		require.Equal(t, 204, w.Code, p)
+		require.Empty(t, w.Header().Get("Access-Control-Allow-Origin"), "the site gets no CORS on %s", p)
+		require.Empty(t, w.Header().Get("Access-Control-Allow-Headers"), p)
+	}
+
+	w := do(r, "GET", "/v1/echo/1", nil, map[string]string{"Origin": appOrigin})
+	exposed := strings.Split(w.Header().Get("Access-Control-Expose-Headers"), ", ")
+	for _, h := range []string{"RateLimit-Limit", "RateLimit-Remaining", "RateLimit-Reset", "Retry-After"} {
+		require.Contains(t, exposed, h)
+	}
+}
+
 func TestBodyLimit(t *testing.T) {
 	r := newTestRouter(t, &bytes.Buffer{}, nil)
 	big := strings.Repeat("x", mw.DefaultBodyLimit+1)

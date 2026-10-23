@@ -2,6 +2,7 @@ package ratelimit
 
 import (
 	"fmt"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -69,6 +70,45 @@ func TestSweepBoundsMemory(t *testing.T) {
 	require.Equal(t, 1, l.Len(), "full buckets are dropped")
 	require.Equal(t, 0, indexNUL("\x00a"))
 	require.Equal(t, 3, indexNUL("abc"))
+}
+
+// Past MaxKeys with no bucket full, a sweep frees nothing; it must not run
+// on every request, only once per MinSweepGap.
+func TestSweepBackOff(t *testing.T) {
+	clk := clock.NewFake(t0)
+	l := New(clk, map[string]Rule{"g": {PerMinute: 1, Burst: 2}})
+	for i := range MaxKeys {
+		l.Allow("g", strconv.Itoa(i))
+	}
+	l.mu.Lock()
+	base := l.sweeps
+	l.mu.Unlock()
+
+	for i := range 1000 {
+		l.Allow("g", "more"+strconv.Itoa(i)) // above MaxKeys, nothing to drop
+	}
+	require.Equal(t, MaxKeys+1000, l.Len(), "nothing was full, nothing dropped")
+	l.mu.Lock()
+	require.LessOrEqual(t, l.sweeps-base, 1, "at most one sweep in the same second")
+	base = l.sweeps
+	l.mu.Unlock()
+
+	clk.Advance(MinSweepGap - time.Millisecond)
+	l.Allow("g", "x")
+	l.mu.Lock()
+	require.Equal(t, base, l.sweeps, "not before the gap")
+	l.mu.Unlock()
+	clk.Advance(time.Millisecond)
+	l.Allow("g", "y")
+	l.mu.Lock()
+	require.Equal(t, base+1, l.sweeps, "again once the gap has passed")
+	l.mu.Unlock()
+
+	clk.Set(t0.Add(-time.Hour)) // the clock moved back: sweeping resumes at once
+	l.Allow("g", "z")
+	l.mu.Lock()
+	require.Equal(t, base+2, l.sweeps)
+	l.mu.Unlock()
 }
 
 func TestDefaultRulesCoverEveryGroup(t *testing.T) {

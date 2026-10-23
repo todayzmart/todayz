@@ -128,6 +128,6 @@ WHERE s.family_id = @family_id AND s.user_id = @user_id AND s.app = @app
 GROUP BY u.status;
 
 -- name: PurgeSessions :execrows
--- Rows past their expiry or revoked long enough ago; reuse detection only
--- needs a rotated row while its family could still be live.
-DELETE FROM sessions WHERE expires_at < @before;
+-- Rows revoked (rotated, reused, logged out) or expired before @before,
+-- whichever came first (ix_sessions_purge).
+DELETE FROM sessions WHERE coalesce(revoked_at, expires_at) < @before::timestamptz;

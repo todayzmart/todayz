@@ -28,6 +28,7 @@ import (
 	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/pii"
+	"github.com/todayz/backend/internal/platform/testclock"
 )
 
 // OTP rules (01 §2 and the fixed table in 01 §17: product constants, not
@@ -63,6 +64,13 @@ type Deps struct {
 	Human HumanVerifier
 	// Hooks are the phase B account-deletion hooks; nil until W1-01 phase B.
 	Hooks *Hooks
+	// TestRoutes is true when the binary mounted the test clock, which it
+	// does only when the database's platform_environment agrees with a local
+	// or test APP_ENV (dbenv). The reserved test code needs it, a local or
+	// test APP_ENV and a loopback API_ADDR: exactly the /v1/test/clock gate
+	// (D-80), so a local binary pointed at a deployed database, or listening
+	// on every interface, never accepts 000000.
+	TestRoutes bool
 }
 
 // Service implements sign-in, sessions and /v1/me.
@@ -78,7 +86,7 @@ type Service struct {
 	hash   *pii.Hasher
 	audit  *audit.Writer
 	hooks  *Hooks
-	// allowTestCode accepts 000000 for the reserved test numbers (local and test).
+	// allowTestCode accepts 000000 for the reserved test numbers (Deps.TestRoutes).
 	allowTestCode bool
 }
 
@@ -97,7 +105,7 @@ func New(d Deps) (*Service, error) {
 	s := &Service{
 		cfg: d.Config, db: d.DB, clock: d.Clock, log: d.Log, tokens: d.Tokens,
 		sms: d.SMS, human: d.Human, hooks: d.Hooks,
-		allowTestCode: d.Config.Env.AllowsTestRoutes(),
+		allowTestCode: d.Config.Env.AllowsTestRoutes() && d.TestRoutes && testclock.Loopback(d.Config.APIAddr),
 	}
 	if s.sms == nil || s.human == nil {
 		sms, human := providers(d.Config)
@@ -133,9 +141,12 @@ func New(d Deps) (*Service, error) {
 }
 
 // Preflight is the start-up check of the API (02 §8: auth refuses to start
-// without its provider): in staging and prod the PII and JWT keys and the SMS
-// provider must be configured. It names variables, never values. New does
-// not run it, so a router can be built from a bare config in route tests.
+// without its provider): in staging and prod the PII and JWT keys, the SMS
+// provider with its DLT template, and Turnstile must be configured. Turnstile
+// is required too (lead decision on the W1-01 review), replacing 02 §8's
+// "stricter rate limits" fallback, which named no limits. It names
+// variables, never values. New does not run it, so a router can be built
+// from a bare config in route tests.
 func Preflight(cfg *config.Config) error {
 	if !cfg.Env.IsDeployed() {
 		return nil
@@ -156,6 +167,15 @@ func Preflight(cfg *config.Config) error {
 	}
 	if !p.MSG91AuthKey.IsSet() {
 		missing = append(missing, "MSG91_AUTH_KEY")
+	}
+	if strings.TrimSpace(p.MSG91OTPTemplateID) == "" {
+		missing = append(missing, "MSG91_OTP_TEMPLATE_ID")
+	}
+	if p.TurnstileAPIURL == "" {
+		missing = append(missing, "TURNSTILE_API_URL")
+	}
+	if !p.TurnstileSecretKey.IsSet() {
+		missing = append(missing, "TURNSTILE_SECRET_KEY")
 	}
 	if len(missing) > 0 {
 		return fmt.Errorf("identity: required in staging and prod: %s", strings.Join(missing, ", "))

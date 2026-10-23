@@ -14,6 +14,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"net/netip"
 	"regexp"
 	"strings"
 )
@@ -94,6 +95,35 @@ func (h *Hasher) IP(ip string) []byte {
 		return nil
 	}
 	return h.Sum(ip)
+}
+
+// IPv6LimitBits is the prefix an IPv6 client is limited by: one subscriber
+// is routinely given a whole /64, so per-address limits would not bind.
+const IPv6LimitBits = 64
+
+// IPLimit is the hash a per-IP limit counts by: an IPv4 address as itself
+// (equal to IP, so it still joins audit_log.ip_hash), an IPv6 address by its
+// /64 network. An IPv4-mapped IPv6 address is IPv4. A string that is not an
+// address is hashed as given. Empty in, nil out.
+func (h *Hasher) IPLimit(ip string) []byte {
+	if ip == "" {
+		return nil
+	}
+	a, err := netip.ParseAddr(ip)
+	if err != nil {
+		return h.IP(ip)
+	}
+	a = a.Unmap()
+	if a.Is4() {
+		return h.IP(a.String())
+	}
+	p, err := a.Prefix(IPv6LimitBits)
+	if err != nil {
+		return h.IP(ip)
+	}
+	// "2001:db8:1:2::/64": a prefix never equals an address string, so the
+	// two kinds of key cannot collide.
+	return h.Sum(p.String())
 }
 
 // Sum is HMAC-SHA256(key, s). Callers prefix s with a purpose ("otp:…") so

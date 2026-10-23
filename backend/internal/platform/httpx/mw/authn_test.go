@@ -121,6 +121,31 @@ func TestAuthn(t *testing.T) {
 		}
 	}
 
+	// The cookie routes of sign-in ignore Authorization: an expired or junk
+	// bearer is anonymous there, never 401 (a client refreshing because its
+	// bearer expired still sends it). Other /v1/auth routes and lookalikes keep
+	// the check.
+	for _, p := range []string{"/v1/auth/otp/send", "/v1/auth/otp/verify", "/v1/auth/refresh", "/v1/auth/logout"} {
+		for _, hdr := range [][]string{{"Bearer nope"}, {"Bearer cust"}, {"Basic abc"}, {"Bearer a", "Bearer b"}} {
+			got, signedIn = authn.Principal{}, true
+			req := httptest.NewRequest(http.MethodPost, p, nil)
+			for _, v := range hdr {
+				req.Header.Add("Authorization", v)
+			}
+			rec := httptest.NewRecorder()
+			h.ServeHTTP(rec, req)
+			require.Equal(t, 204, rec.Code, "%s %v", p, hdr)
+			require.False(t, signedIn, "%s is anonymous whatever the bearer", p)
+		}
+	}
+	for _, p := range []string{"/v1/auth/totp/verify", "/v1/auth/refresh/", "/v1/auth/refreshx", "/v1/me"} {
+		req := httptest.NewRequest(http.MethodPost, p, nil)
+		req.Header.Set("Authorization", "Bearer nope")
+		rec := httptest.NewRecorder()
+		h.ServeHTTP(rec, req)
+		require.Equal(t, 401, rec.Code, p)
+	}
+
 	// No authenticator: anonymous requests pass, any Authorization is 401.
 	h = Authn(nil)(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(http.StatusNoContent) }))
 	rec := httptest.NewRecorder()

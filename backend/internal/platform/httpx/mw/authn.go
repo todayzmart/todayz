@@ -11,6 +11,11 @@ package mw
 //     Authorization (another scheme, two headers, a bad, expired or revoked
 //     token) is 401 unauthorized on every path, public ones included, so a
 //     client always learns to refresh. A blocked user is 403 account_blocked.
+//   - Except on the cookie routes of sign-in (cookieAuthPaths: OTP send and
+//     verify, refresh, logout): there Authorization is ignored and the caller
+//     is anonymous. They authenticate by the refresh cookie or not at all, and
+//     a client that refreshes because its bearer expired often still sends
+//     that bearer; a 401 there would stop it from ever refreshing.
 //   - Namespaces, before chi and the validator: /v1/me, /v1/biz and /v1/admin
 //     refuse an anonymous caller with 401. /v1/biz needs a business-app token
 //     and /v1/admin an admin-app token with amr otp+totp (AU-11), else 403
@@ -39,7 +44,7 @@ func Authn(a Authenticator) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 			p := authn.Principal{}
-			if vals := r.Header.Values("Authorization"); len(vals) > 0 {
+			if vals := r.Header.Values("Authorization"); len(vals) > 0 && !cookieAuthPaths[r.URL.Path] {
 				tok, ok := bearer(vals)
 				if !ok || a == nil {
 					problem.Write(w, r, problem.New(genproblems.Unauthorized, ""))
@@ -59,6 +64,17 @@ func Authn(a Authenticator) func(http.Handler) http.Handler {
 			next.ServeHTTP(w, r.WithContext(authn.WithPrincipal(ctx, p)))
 		})
 	}
+}
+
+// cookieAuthPaths are the routes that never read a bearer token. Matched
+// exactly: slot 8 (pathguard) has refused any path two routers could read
+// differently, and a lookalike (a trailing slash) keeps the bearer check.
+// /v1/auth/* routes that need the bearer (admin TOTP, phase B) are not here.
+var cookieAuthPaths = map[string]bool{
+	"/v1/auth/otp/send":   true,
+	"/v1/auth/otp/verify": true,
+	"/v1/auth/refresh":    true,
+	"/v1/auth/logout":     true,
 }
 
 // bearer extracts the token from exactly one "Bearer <token>" header.

@@ -350,10 +350,12 @@ func (h meHandlers) UpdateMe(ctx context.Context, req meapi.UpdateMeRequestObjec
 	if err != nil {
 		return nil, err
 	}
-	if req.Params.IfMatch == "" {
+	// If-Match is optional in the contract so that a missing one reaches
+	// here and answers 428 (a required header would be the validator's 422).
+	if req.Params.IfMatch == nil || *req.Params.IfMatch == "" {
 		return nil, problem.New(genproblems.PreconditionRequired, "")
 	}
-	version, ok := parseETag(req.Params.IfMatch)
+	version, ok := parseETag(*req.Params.IfMatch)
 	if !ok {
 		return nil, problem.New(genproblems.PreconditionFailed, "")
 	}

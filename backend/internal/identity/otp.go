@@ -62,7 +62,7 @@ func (s *Service) SendOTP(ctx context.Context, app authn.App, phone, purpose, tu
 		return SendResult{}, problem.Wrap(genproblems.Internal, err)
 	}
 	phoneHash := s.hash.Phone(e164)
-	ipHash := s.hash.IP(clientIP)
+	ipHash := s.hash.IPLimit(clientIP) // IPv6 by its /64 (otp_requests.ip_hash)
 	phoneEnc, err := s.seal.Seal("phone", []byte(e164))
 	if err != nil {
 		return SendResult{}, problem.Wrap(genproblems.Internal, err)
@@ -339,18 +339,18 @@ func (s *Service) signIn(ctx context.Context, q *identitydb.Queries, now time.Ti
 	}, nil, nil
 }
 
-// statusRefusal is the answer for a user who may not sign in.
+// statusRefusal is the answer for a user who may not sign in: 403
+// account_blocked for every status but active. 04 §1 names account_blocked
+// as the only refusal of a user and says nothing about a deleted account,
+// so a deleted one answers the same, as CheckSession already treats every
+// non-active status as blocked (REPORT question on deleted accounts; phase B
+// releases the phone identity on deletion, after which a new sign-in makes
+// a new user).
 func statusRefusal(status string) error {
-	switch status {
-	case "active":
+	if status == "active" {
 		return nil
-	case "blocked":
-		return problem.New(genproblems.AccountBlocked, "")
-	default:
-		// TODO(lead): a deleted account signing in again. The phone identity
-		// is released on deletion in phase B; until then 403 forbidden.
-		return problem.New(genproblems.Forbidden, "")
 	}
+	return problem.New(genproblems.AccountBlocked, "")
 }
 
 // referralAlphabet is the referral code alphabet (no 0, O, 1, I, L).

@@ -12,12 +12,15 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/todayz/backend/internal/identity"
+	"github.com/todayz/backend/internal/platform/authn"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/health"
 	"github.com/todayz/backend/internal/platform/idempotency"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/testclock"
 	"github.com/todayz/backend/internal/testkit"
 )
 
@@ -43,9 +46,13 @@ func newIdentityAPI(t *testing.T) *identityAPI {
 	cfg, err := config.Load(env(localEnv(tdb)), nil)
 	require.NoError(t, err)
 	clk := clock.NewFake(time.Date(2026, 10, 23, 6, 0, 0, 0, time.UTC))
+	log := slog.New(slog.NewTextHandler(io.Discard, nil))
+	// The test clock is mounted as in a local api, which is what lets the
+	// reserved test number sign in with 000000 (identity.Deps.TestRoutes).
 	d := deps{
-		Config: cfg, Log: slog.New(slog.NewTextHandler(io.Discard, nil)), Clock: clk,
+		Config: cfg, Log: log, Clock: clk,
 		DB: db.New(tdb.Pool), Ready: &health.Readiness{},
+		TestClock: testclock.New(clock.NewOffset(nil), nopStore{}, log),
 	}
 	h, err := buildRouter(d, idempotency.NewMemoryStore(), contractValidator(t))
 	require.NoError(t, err)
@@ -134,7 +141,8 @@ func refreshHeaders(c *http.Cookie, origin string) map[string]string {
 
 // AU-16: refresh and logout need the app's own origin and X-TZ-Client; a
 // refused request does not clear the cookie (a forged request must not sign
-// anyone out). AU-07 over HTTP: rotation and reuse.
+// anyone out). AU-07 over HTTP: rotation, the lost-response grace window
+// (identity.RotationGrace) and reuse.
 func TestIdentityHTTPRefresh(t *testing.T) {
 	a := newIdentityAPI(t)
 	_, c := a.signIn()
@@ -159,18 +167,51 @@ func TestIdentityHTTPRefresh(t *testing.T) {
 	rotated := refreshCookieOf(t, w)
 	require.NotEqual(t, c.Value, rotated.Value)
 
-	// Replaying the first cookie revokes the family and clears the cookie.
+	// Replaying the first cookie at once (the response was lost): 401 and
+	// the cookie cleared, but the family lives on.
 	w = a.do(http.MethodPost, "/v1/auth/refresh", body, refreshHeaders(c, appOrigin))
 	require.Equal(t, http.StatusUnauthorized, w.Code)
 	cleared := refreshCookieOf(t, w)
 	require.Equal(t, cookieName, cleared.Name)
 	require.Negative(t, cleared.MaxAge, "Max-Age=0")
 	w = a.do(http.MethodPost, "/v1/auth/refresh", body, refreshHeaders(rotated, appOrigin))
-	require.Equal(t, http.StatusUnauthorized, w.Code, "the rotated cookie died with the family")
+	require.Equal(t, http.StatusOK, w.Code, "a replay inside the grace window revokes nothing")
+	latest := refreshCookieOf(t, w)
+
+	// Past the window a replay is reuse: the family is revoked.
+	a.clk.Advance(identity.RotationGrace + time.Second)
+	w = a.do(http.MethodPost, "/v1/auth/refresh", body, refreshHeaders(c, appOrigin))
+	require.Equal(t, http.StatusUnauthorized, w.Code)
+	require.Negative(t, refreshCookieOf(t, w).MaxAge)
+	w = a.do(http.MethodPost, "/v1/auth/refresh", body, refreshHeaders(latest, appOrigin))
+	require.Equal(t, http.StatusUnauthorized, w.Code, "the newest cookie died with the family")
 
 	// No cookie at all.
 	w = a.do(http.MethodPost, "/v1/auth/refresh", body, refreshHeaders(nil, appOrigin))
 	require.Equal(t, http.StatusUnauthorized, w.Code)
+}
+
+// A client that still sends its expired access token on the cookie routes is
+// treated as anonymous there (slot 11), so refresh works; elsewhere the
+// expired bearer stays a 401.
+func TestIdentityHTTPStaleBearer(t *testing.T) {
+	a := newIdentityAPI(t)
+	access, c := a.signIn()
+	a.clk.Advance(authn.AccessTTL + time.Minute)
+	stale := map[string]string{"Authorization": "Bearer " + access}
+	require.Equal(t, http.StatusUnauthorized, a.do(http.MethodGet, "/v1/me", "", stale).Code, "expired")
+
+	hdr := refreshHeaders(c, appOrigin)
+	hdr["Authorization"] = "Bearer " + access
+	w := a.do(http.MethodPost, "/v1/auth/refresh", `{"app":"customer"}`, hdr)
+	require.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	fresh := decode(t, w)["accessToken"].(string)
+	require.Equal(t, http.StatusOK, a.do(http.MethodGet, "/v1/me", "", map[string]string{"Authorization": "Bearer " + fresh}).Code)
+
+	hdr = refreshHeaders(refreshCookieOf(t, w), appOrigin)
+	hdr["Authorization"] = "Bearer junk"
+	w = a.do(http.MethodPost, "/v1/auth/logout", `{"app":"customer"}`, hdr)
+	require.Equal(t, http.StatusNoContent, w.Code, w.Body.String())
 }
 
 func TestIdentityHTTPLogout(t *testing.T) {
@@ -226,9 +267,14 @@ func TestIdentityHTTPMe(t *testing.T) {
 	require.Equal(t, http.StatusPreconditionFailed, w.Code, "a stale If-Match")
 	require.Equal(t, "precondition_failed", decode(t, w)["code"])
 
-	// The contract marks If-Match required, so the validator (slot 13)
-	// answers before the handler's 428; see the W1-01 report.
+	// If-Match is optional in the contract, so a missing one reaches the
+	// handler: 428 precondition_required.
 	w = patch("", `{"preferredLang":"hi"}`)
+	require.Equal(t, http.StatusPreconditionRequired, w.Code, w.Body.String())
+	require.Equal(t, "precondition_required", decode(t, w)["code"])
+
+	// A malformed one is still the validator's (the pattern).
+	w = patch("v2", `{"preferredLang":"hi"}`)
 	require.Equal(t, http.StatusUnprocessableEntity, w.Code, w.Body.String())
 	fields, _ := decode(t, w)["fields"].(map[string]any)
 	require.Contains(t, fields, "header.If-Match", w.Body.String())

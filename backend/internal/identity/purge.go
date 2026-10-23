@@ -14,9 +14,12 @@ const (
 	// OTPRetention: otp_requests are purged after 24 h (03 §1). The send
 	// limits look back one hour, so a purge never frees a limit early.
 	OTPRetention = 24 * time.Hour
-	// SessionRetention keeps a session row this long after it expired, so a
-	// late replay of a rotated token still revokes its family and the
-	// sign-in trail stays readable for support.
+	// SessionRetention keeps a session row this long after it was revoked or
+	// expired, whichever came first, so the sign-in trail stays readable for
+	// support. It must be at least the longest refresh lifetime: a rotated
+	// row then outlives its own token (which expired at most that long after
+	// it was issued, before it was rotated), so reuse detection covers each
+	// token's whole life. A replay after that is a plain 401.
 	// TODO(lead): the plan names no retention for sessions; 30 days assumed.
 	SessionRetention = 30 * 24 * time.Hour
 )

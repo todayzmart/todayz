@@ -69,6 +69,28 @@ func TestHasher(t *testing.T) {
 	require.Error(t, err)
 }
 
+// The per-IP limit key: IPv4 by address (equal to IP), IPv6 by its /64.
+func TestIPLimit(t *testing.T) {
+	h, err := NewHasher(key(t))
+	require.NoError(t, err)
+
+	require.Nil(t, h.IPLimit(""))
+	require.Equal(t, h.IP("10.0.0.1"), h.IPLimit("10.0.0.1"), "IPv4 is the full address")
+	require.NotEqual(t, h.IPLimit("10.0.0.1"), h.IPLimit("10.0.0.2"))
+	require.Equal(t, h.IPLimit("10.0.0.1"), h.IPLimit("::ffff:10.0.0.1"), "IPv4-mapped is IPv4")
+
+	a := h.IPLimit("2001:db8:1:2::1")
+	require.Len(t, a, 32)
+	for _, same := range []string{"2001:db8:1:2:ffff:ffff:ffff:ffff", "2001:0db8:0001:0002:abcd::9", "2001:db8:1:2::1%eth0"} {
+		require.Equal(t, a, h.IPLimit(same), "one /64: %s", same)
+	}
+	for _, other := range []string{"2001:db8:1:3::1", "2001:db8:2:2::1", "2001:db9:1:2::1"} {
+		require.NotEqual(t, a, h.IPLimit(other), "another /64: %s", other)
+	}
+	require.NotEqual(t, h.IP("2001:db8:1:2::1"), a, "IPv6 limits are not per address")
+	require.Equal(t, h.IP("not-an-ip"), h.IPLimit("not-an-ip"))
+}
+
 func TestPhones(t *testing.T) {
 	for _, ok := range []string{"+919876543210", "+916000000000", "+919000000001"} {
 		got, valid := NormalizePhone(ok)

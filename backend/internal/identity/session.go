@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"strings"
+	"time"
 	"unicode/utf8"
 
 	genproblems "github.com/todayz/backend/gen/problems"
@@ -28,6 +29,19 @@ const (
 	reasonLogout  = "logout"
 	reasonAdmin   = "admin"
 )
+
+// RotationGrace is how long after its rotation a refresh token is answered
+// with a plain 401 instead of reuse detection. A refresh whose response was
+// lost (a dropped connection, a tab closed mid-request) leaves the client
+// holding the token the server just rotated; its retry must not end the
+// sign-in everywhere and raise a theft alarm. Past the window, presenting a
+// rotated token is reuse: the family is revoked and audited.
+//
+// The cost: a thief who rotates a stolen token first and is followed by the
+// owner within this window is not detected (the owner gets 401). The window
+// is kept short for that reason. A security constant, not a product rule
+// (01 §17 does not cover it), so it is code and not a platform setting.
+const RotationGrace = 30 * time.Second
 
 // maxUserAgent is sessions.user_agent's limit in characters.
 const maxUserAgent = 256
@@ -95,7 +109,8 @@ type RefreshInput struct {
 
 // Refresh rotates a refresh token (AU-07): the presented row is revoked as
 // rotated and a new row joins the same family. Presenting a token that was
-// already rotated revokes the whole family (reuse detection) and answers 401.
+// already rotated revokes the whole family (reuse detection) and answers 401,
+// unless it was rotated RotationGrace ago or less: then it is only a 401.
 //
 // Customer and business sessions slide (each refresh lasts the full TTL
 // again); an admin session keeps its first expiry (12 h absolute).
@@ -134,7 +149,15 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 			return nil
 		}
 		if row.RevokedAt != nil {
-			if row.RevokedReason != nil && *row.RevokedReason == reasonRotated {
+			rotated := row.RevokedReason != nil && *row.RevokedReason == reasonRotated
+			if rotated && now.Sub(*row.RevokedAt) <= RotationGrace {
+				// A retry of a refresh that already succeeded: refuse it, end
+				// nothing (RotationGrace).
+				telemetry.Logger(ctx).InfoContext(ctx, "identity: rotated refresh token presented within the grace window", "app", row.App)
+				outcome = problem.New(genproblems.Unauthorized, "")
+				return nil
+			}
+			if rotated {
 				// Reuse: someone holds an old token. End the sign-in everywhere.
 				n, err := q.RevokeFamily(ctx, identitydb.RevokeFamilyParams{Now: now, Reason: reasonReuse, FamilyID: row.FamilyID})
 				if err != nil {

@@ -144,9 +144,16 @@ func (noSMS) SendOTP(context.Context, string, string) error {
 	return fmt.Errorf("%w: SMS provider not configured", ErrProvider)
 }
 
-// passHuman stands in for Turnstile when it is not configured: local and test
-// without TURNSTILE_API_URL, or staging and prod without the key (02 §8:
-// "stricter rate limits" instead).
+// noHuman stands in when staging or prod has no Turnstile; every check fails
+// as a provider error (503), so no send goes out unchecked.
+type noHuman struct{}
+
+func (noHuman) Verify(context.Context, string, string) (bool, error) {
+	return false, fmt.Errorf("%w: Turnstile not configured", ErrProvider)
+}
+
+// passHuman stands in for Turnstile in local and test without
+// TURNSTILE_API_URL.
 type passHuman struct{ reason string }
 
 func (p passHuman) Verify(ctx context.Context, _, _ string) (bool, error) {
@@ -184,10 +191,9 @@ func providers(cfg *config.Config) (SMSSender, HumanVerifier) {
 	case p.TurnstileAPIURL != "" && !deployed:
 		human = &turnstile{client: client, endpoint: strings.TrimRight(p.TurnstileAPIURL, "/") + "/turnstile/v0/siteverify", secret: turnstileTestSecret}
 	case deployed:
-		// TODO(lead): 02 §8 says "stricter rate limits" when the Turnstile key is
-		// missing in staging/prod but gives no numbers; the OTP limits stay as
-		// they are until it does.
-		human = passHuman{reason: "TURNSTILE_SECRET_KEY unset"}
+		// Preflight refuses to start without Turnstile; should a service be
+		// built without it anyway, sends fail closed (503), never unchecked.
+		human = noHuman{}
 	default:
 		human = passHuman{reason: "TURNSTILE_API_URL unset"}
 	}

@@ -42,6 +42,16 @@ var DefaultRules = map[string]Rule{
 // so behave exactly like a new bucket) are dropped.
 const MaxKeys = 100_000
 
+// Sweeps walk every bucket under the lock, so they are rationed: every
+// SweepEvery in any case, and past MaxKeys at most once per MinSweepGap.
+// Without the gap, a flood of distinct keys that keeps the map above MaxKeys
+// (buckets that are not yet full cannot be dropped) would make every request
+// walk 100,000 buckets.
+const (
+	SweepEvery  = time.Minute
+	MinSweepGap = time.Second
+)
+
 // Result is one decision. Limit and Remaining feed the RateLimit-* headers.
 type Result struct {
 	Allowed    bool
@@ -64,6 +74,7 @@ type Limiter struct {
 	mu        sync.Mutex
 	buckets   map[string]*bucket
 	lastSweep time.Time
+	sweeps    int // for tests
 }
 
 // New returns a limiter with rules (a group without a rule is not limited).
@@ -82,7 +93,7 @@ func (l *Limiter) Allow(group, key string) Result {
 
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	if len(l.buckets) >= MaxKeys || now.Sub(l.lastSweep) > time.Minute {
+	if l.sweepDue(now) {
 		l.sweep(now)
 	}
 	k := group + "\x00" + key
@@ -107,10 +118,25 @@ func (l *Limiter) Allow(group, key string) Result {
 	return res
 }
 
+// sweepDue reports whether Allow should sweep now. A clock that moved back
+// (the local test clock, D-80) counts as due, so sweeps never stall until it
+// catches up. Caller holds mu.
+func (l *Limiter) sweepDue(now time.Time) bool {
+	since := now.Sub(l.lastSweep)
+	switch {
+	case since < 0 || since > SweepEvery:
+		return true
+	case len(l.buckets) >= MaxKeys:
+		return since >= MinSweepGap
+	}
+	return false
+}
+
 // sweep drops buckets that are full by now: they are indistinguishable from
 // absent ones. Caller holds mu.
 func (l *Limiter) sweep(now time.Time) {
 	l.lastSweep = now
+	l.sweeps++
 	for k, b := range l.buckets {
 		group := k[:indexNUL(k)]
 		rule := l.rules[group]
