@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  ENGLISH_FILES,
   OTHER_LOCALES,
   TRANSLATED_FILES,
   TRANSLATED_NAMESPACES,
@@ -8,6 +9,7 @@ import {
   formatMessage,
   isMachineDraft,
   numbered,
+  ownMessages,
   type MessageKey,
 } from './index.ts';
 
@@ -19,32 +21,31 @@ describe('site messages', () => {
     for (const l of OTHER_LOCALES) expect(isMachineDraft(l)).toBe(true);
   });
 
-  it.each(OTHER_LOCALES)('%s covers every English key of the translated namespaces and has no strays', (locale) => {
+  /** The English keys of one file, by namespace (each English file is its namespace). */
+  const englishKeys = (ns: (typeof TRANSLATED_NAMESPACES)[number]) => Object.keys(ENGLISH_FILES[ns]).filter((k) => k !== '$meta');
+
+  it.each(OTHER_LOCALES)('%s translates every key of common, home and retailers and has no strays', (locale) => {
     for (const ns of TRANSLATED_NAMESPACES) {
-      const file = TRANSLATED_FILES[locale][ns];
-      const own = Object.keys(file).filter((k) => k !== '$meta');
-      const english = Object.keys(en).filter((k) => k.split('.')[0] === (ns === 'common' ? k.split('.')[0] : ns));
-      // Every key the locale defines exists in English (no strays).
-      for (const k of own) expect(en, `${locale}:${k}`).toHaveProperty(k);
-      // Every English key of this namespace is translated.
-      if (ns !== 'common') for (const k of english) expect(own, `${locale} misses ${k}`).toContain(k);
+      const own = Object.keys(TRANSLATED_FILES[locale][ns]).filter((k) => k !== '$meta');
+      const english = englishKeys(ns);
+      expect(english.length, ns).toBeGreaterThan(0);
+      expect(own.filter((k) => !english.includes(k)), `${locale}/${ns} keys English does not have`).toEqual([]);
+      expect(english.filter((k) => !own.includes(k)), `${locale}/${ns} keys not translated`).toEqual([]);
     }
   });
 
-  it('keeps arguments identical between English and each translation', () => {
+  it.each(OTHER_LOCALES)('%s uses exactly the arguments of the English text, key by key', (locale) => {
     const args = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
-    for (const locale of OTHER_LOCALES) {
-      const t = createT(locale);
-      for (const key of Object.keys(en)) {
-        const translated = (() => {
-          try {
-            return t(key as MessageKey, Object.fromEntries(args(en[key] ?? '').map((a) => [a, `<${a}>`])));
-          } catch {
-            return null;
-          }
-        })();
-        expect(translated, `${locale}:${key}`).not.toBeNull();
-      }
+    const own = ownMessages(locale);
+    const mismatches = Object.keys(own)
+      .filter((k) => JSON.stringify(args(own[k] ?? '')) !== JSON.stringify(args(en[k] ?? '')))
+      .map((k) => `${k}: ${JSON.stringify(args(own[k] ?? ''))} vs English ${JSON.stringify(args(en[k] ?? ''))}`);
+    expect(mismatches).toEqual([]);
+  });
+
+  it.each(OTHER_LOCALES)('%s keeps no braces other than {name} arguments', (locale) => {
+    for (const [k, text] of Object.entries(ownMessages(locale))) {
+      expect(text.replace(/\{\w+\}/g, ''), `${locale}:${k}`).not.toMatch(/[{}]/);
     }
   });
 

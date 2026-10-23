@@ -66,4 +66,56 @@ describe('verify-dist', () => {
     expect(checkFile('_astro/page.js', '')).toEqual(['_astro/page.js: client JS emitted']);
     expect(checkFile('app.mjs', '')).toEqual(['app.mjs: client JS emitted']);
   });
+
+  it.each([
+    '<button onclick="go()">x</button>',
+    '<img src="/a.png" alt="" ONERROR=alert(1)>',
+    "<body onload='x()'>",
+    '<svg><a xlink:href="#" onmouseover="x()"></a></svg>',
+  ])('fails an inline event handler: %s', (html) => {
+    expect(checkFile('index.html', html).join('\n')).toMatch(/inline event handler/);
+  });
+
+  it.each([
+    '<a href="javascript:alert(1)">x</a>',
+    '<a href=" JavaScript:void(0)">x</a>',
+    '<a href="java\tscript:x()">x</a>',
+    '<a href="&#106;avascript:x()">x</a>',
+    '<a href="&#x6A;avascript&colon;x()">x</a>',
+    '<form action="javascript:x()"></form>',
+    '<button formaction="javascript:x()">x</button>',
+    '<iframe src="javascript:x()"></iframe>',
+  ])('fails a javascript: URL: %s', (html) => {
+    expect(checkFile('index.html', html).join('\n')).toMatch(/javascript: URL/);
+  });
+
+  it('does not mistake text that mentions on= or javascript for code', () => {
+    expect(checkFile('index.html', '<p title="turn on = yes" data-note="javascript is off">on=1 javascript:</p>')).toEqual([]);
+    expect(checkFile('index.html', '<a href="/javascript-guide/">x</a><input name="onboarding">')).toEqual([]);
+    expect(checkFile('index.html', '<a href="&#99999999;">x</a>')).toEqual([]);
+  });
+
+  describe('lead form build settings', () => {
+    const form = (key: string, api: string) => `<form data-lead-form data-api="${api}"></form><div class="cf-turnstile" data-sitekey="${key}"></div>`;
+
+    it.each(['1x00000000000000000000AA', '2x00000000000000000000AB', '1x00000000000000000000BB', '3x00000000000000000000FF'])(
+      'refuses the Turnstile test key %s outside e2e builds',
+      (key) => {
+        expect(checkFile('index.html', form(key, 'https://api.todayz.in')).join('\n')).toMatch(/test site key/);
+        expect(checkFile('index.html', form(key, 'https://api.todayz.in'), { e2e: true })).toEqual([]);
+      },
+    );
+
+    it.each(['https://api.todayz.localhost', 'https://api.todayz.localhost:8443/', 'http://localhost:8180', 'https://127.0.0.1'])(
+      'refuses the local API %s outside e2e builds',
+      (api) => {
+        expect(checkFile('index.html', form('0x4AAAAAAA-real', api)).join('\n')).toMatch(/local API origin/);
+        expect(checkFile('index.html', form('0x4AAAAAAA-real', api), { e2e: true })).toEqual([]);
+      },
+    );
+
+    it('passes a real key and API', () => {
+      expect(checkFile('index.html', form('0x4AAAAAAA-real', 'https://api.todayz.in'))).toEqual([]);
+    });
+  });
 });

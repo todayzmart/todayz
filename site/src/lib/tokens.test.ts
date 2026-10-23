@@ -13,7 +13,9 @@ it('every CSS variable in the site styles is declared by @todayz/tokens', () => 
   const files = readdirSync(src, { recursive: true, encoding: 'utf8' }).filter((f) => /\.(astro|css)$/.test(f));
   const styles = files
     .map((f) => read(join(src, f)))
-    .flatMap((text) => [...text.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1] ?? ''))
+    .flatMap((text, i) =>
+      files[i]?.endsWith('.css') ? [text] : [...text.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1] ?? ''),
+    )
     .join('\n');
   expect(styles.length).toBeGreaterThan(0);
   const tokens = read(require.resolve('@todayz/tokens/tokens.css'));

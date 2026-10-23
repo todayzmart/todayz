@@ -1,21 +1,25 @@
-// SC-SITE-01…06: the marketing site, as a visitor and a crawler see it. Runs against `astro preview`.
+// SC-SITE-01…06: the marketing site, as a visitor and a crawler see it. Runs against `astro preview`
+// of a `build:e2e` build (local API origin, Turnstile test key).
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { guardPage, type PageGuard } from '@todayz/config/playwright';
-import { expect, test } from '@playwright/test';
-import { LEADS_URL, TURNSTILE_URL, blockTurnstile } from './helpers.ts';
+import { expect, test, type Locator, type Page } from '@playwright/test';
+import { LEADS_URL, TEST_PHONE, TEST_PHONE_E164, TURNSTILE_URL, blockTurnstile, turnstileWithoutToken } from './helpers.ts';
 
 const EN_PAGES = [
   '/',
-  '/for-retailers',
-  '/how-it-works',
-  '/pricing',
-  '/about',
-  '/contact',
-  '/legal/privacy',
-  '/legal/terms-for-shoppers',
-  '/legal/terms-for-shops',
-  '/legal/refunds-and-credits',
+  '/for-retailers/',
+  '/how-it-works/',
+  '/pricing/',
+  '/about/',
+  '/contact/',
+  '/legal/privacy/',
+  '/legal/terms-for-shoppers/',
+  '/legal/terms-for-shops/',
+  '/legal/refunds-and-credits/',
 ];
 const LOCALISED = ['hi', 'kn', 'te', 'ta'] as const;
+const DIST = join(import.meta.dirname, '..', 'dist');
 
 let guard: PageGuard;
 
@@ -29,6 +33,22 @@ test.afterEach(() => {
   expect(guard.errors, 'console and page errors').toEqual([]);
 });
 
+/** Fills the lead form with valid values. */
+async function fillLead(form: Locator, city = 'Bengaluru'): Promise<void> {
+  await form.getByLabel('Your name').fill('Asha Rao');
+  await form.getByLabel('Shop name').fill('Rao General Store');
+  await form.getByLabel('Mobile number').fill(TEST_PHONE);
+  await form.getByLabel('City').fill(city);
+}
+
+/** Opens a page and returns its first lead form once the script has enabled the button. */
+async function leadForm(page: Page, path: string): Promise<Locator> {
+  await page.goto(path);
+  const form = page.locator('form[data-lead-form]').first();
+  await expect(form.getByRole('button', { name: 'Send details' })).toBeEnabled();
+  return form;
+}
+
 test.describe('SC-SITE-01 every page is a real, complete document', () => {
   for (const path of EN_PAGES) {
     test(`${path} has one h1, a canonical, Open Graph and no sideways scroll at 390 px`, async ({ page }) => {
@@ -37,8 +57,7 @@ test.describe('SC-SITE-01 every page is a real, complete document', () => {
       expect(res?.status()).toBe(200);
       await expect(page.locator('h1')).toHaveCount(1);
       await expect(page.locator('main#main')).toHaveCount(1);
-      const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
-      expect(canonical).toBe(`https://todayz.in${path === '/' ? '/' : path}`);
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://todayz.in${path}`);
       await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /^https:\/\/todayz\.in\/og\/[a-z-]+\.png$/);
       await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /.{40,}/);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
@@ -46,38 +65,82 @@ test.describe('SC-SITE-01 every page is a real, complete document', () => {
     });
   }
 
+  for (const locale of LOCALISED) {
+    test(`/${locale}/ has no sideways scroll at 390 px`, async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      for (const path of [`/${locale}/`, `/${locale}/for-retailers/`]) {
+        await page.goto(path);
+        const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+        expect(overflow, `${path} horizontal overflow in px`).toBeLessThanOrEqual(0);
+      }
+    });
+  }
+
   test('an unknown path gets the noindex 404 page', async ({ page }) => {
-    const res = await page.goto('/no-such-page');
+    const res = await page.goto('/no-such-page/');
     expect(res?.status()).toBe(404);
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
     await expect(page.getByRole('link', { name: /home/i }).first()).toBeVisible();
+    // The 404 has no form, so "Get started" goes to the one on the retailers page.
+    await expect(page.locator('header a.start')).toHaveAttribute('href', '/for-retailers/#join');
     guard.errors.length = 0; // the browser logs the 404 itself
   });
 });
 
 test.describe('SC-SITE-02 lead form: a valid submission', () => {
-  test('posts the typed payload with the Turnstile token and confirms', async ({ page }) => {
+  test('posts the camelCase payload with the phone in E.164 and the Turnstile token, then confirms', async ({ page }) => {
     let body: Record<string, unknown> | null = null;
     await page.route(LEADS_URL, async (route) => {
       body = route.request().postDataJSON() as Record<string, unknown>;
       await route.fulfill({ status: 201, contentType: 'application/json', body: '{}' });
     });
-    await page.goto('/');
-    const form = page.locator('form[data-lead-form]');
-    await form.getByLabel('Your name').fill('Asha Rao');
-    await form.getByLabel('Shop name').fill('Rao General Store');
-    await form.getByLabel('Mobile number').fill('+91 98765 43210');
-    await form.getByLabel('City').fill('Bengaluru');
+    const form = await leadForm(page, '/');
+    await expect(form).toHaveAttribute('data-density', 'touch');
+    await fillLead(form);
     await form.getByRole('button', { name: 'Send details' }).click();
     await expect(form.getByRole('status')).toHaveText('Thank you. We have your details.');
     expect(body).toEqual({
       name: 'Asha Rao',
-      shop_name: 'Rao General Store',
-      phone: '9876543210',
+      shopName: 'Rao General Store',
+      phone: TEST_PHONE_E164,
       city: 'Bengaluru',
       source: 'site:home:en',
-      turnstile_token: 'test-token',
+      turnstileToken: 'test-token',
     });
+    await expect(form.getByLabel('Your name')).toHaveValue('');
+  });
+
+  test('the localised form sends its own source and the header button goes to it', async ({ page }) => {
+    let body: Record<string, unknown> | null = null;
+    await page.route(LEADS_URL, async (route) => {
+      body = route.request().postDataJSON() as Record<string, unknown>;
+      await route.fulfill({ status: 201, body: '{}' });
+    });
+    await page.goto('/hi/for-retailers/');
+    await expect(page.locator('header a.start')).toHaveAttribute('href', '#join');
+    const form = page.locator('#join form[data-lead-form]');
+    await expect(form.locator('button[type="submit"]')).toBeEnabled();
+    await expect(form.locator('.cf-turnstile')).toHaveAttribute('data-language', 'hi');
+    await form.locator('input[name="name"]').fill('Asha Rao');
+    await form.locator('input[name="shopName"]').fill('Rao General Store');
+    await form.locator('input[name="phone"]').fill('0091 90000 00012');
+    await form.locator('input[name="city"]').fill('Mysuru');
+    await form.locator('button[type="submit"]').click();
+    await expect.poll(() => body?.['source']).toBe('site:retailers:hi');
+    expect(body?.['phone']).toBe(TEST_PHONE_E164);
+  });
+
+  test('Turnstile uses its own strings for en and hi, and the browser language otherwise', async ({ page }) => {
+    for (const [path, language] of [
+      ['/', 'en'],
+      ['/hi/', 'hi'],
+      ['/kn/', 'auto'],
+      ['/te/', 'auto'],
+      ['/ta/', 'auto'],
+    ] as const) {
+      await page.goto(path);
+      await expect(page.locator('.cf-turnstile'), path).toHaveAttribute('data-language', language);
+    }
   });
 
   test('the Turnstile script is requested on the form pages only', async ({ page }) => {
@@ -85,46 +148,100 @@ test.describe('SC-SITE-02 lead form: a valid submission', () => {
     page.on('request', (r) => {
       if (r.url() === TURNSTILE_URL) seen.push(r.url());
     });
-    await page.goto('/about');
+    await page.goto('/about/');
     await page.waitForLoadState('networkidle');
     expect(seen).toEqual([]);
-    await page.goto('/contact');
+    await page.goto('/contact/');
     await page.waitForLoadState('networkidle');
     expect(seen).toHaveLength(1);
   });
 });
 
 test.describe('SC-SITE-03 lead form: bad input and server trouble', () => {
+  test('the button renders disabled and only the script enables it', async ({ browser, baseURL }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false, baseURL: baseURL ?? '' });
+    const noJs = await context.newPage();
+    await noJs.goto('/contact/');
+    await expect(noJs.locator('form[data-lead-form] button[type="submit"]')).toBeDisabled();
+    // The <noscript> note explains why (Chromium with JS turned off by CDP still parses it as script-on).
+    await expect(noJs.locator('form[data-lead-form] noscript')).toHaveCount(1);
+    await context.close();
+  });
+
   test('shows field errors and sends nothing for an invalid form', async ({ page }) => {
     let calls = 0;
     await page.route(LEADS_URL, (route) => {
       calls += 1;
       return route.fulfill({ status: 201, body: '{}' });
     });
-    await page.goto('/contact');
-    const form = page.locator('form[data-lead-form]');
+    const form = await leadForm(page, '/contact/');
     await form.getByLabel('Mobile number').fill('12345');
     await form.getByRole('button', { name: 'Send details' }).click();
     await expect(page.getByText('Enter your name.')).toBeVisible();
     await expect(page.getByText('Enter a 10-digit mobile number.')).toBeVisible();
     await expect(form.getByLabel('Your name')).toBeFocused();
+    await expect(form.getByLabel('Your name')).toHaveAttribute('aria-invalid', 'true');
     expect(calls).toBe(0);
   });
 
-  test('says so plainly when the API is rate limited or down, and lets the visitor retry', async ({ page }) => {
-    await page.route(LEADS_URL, (route) => route.fulfill({ status: 429, body: '{}' }));
-    await page.goto('/for-retailers');
-    const form = page.locator('form[data-lead-form]').first();
-    await form.getByLabel('Your name').fill('Asha Rao');
-    await form.getByLabel('Shop name').fill('Rao General Store');
-    await form.getByLabel('Mobile number').fill('9876543210');
-    await form.getByLabel('City').fill('Mysuru');
+  test('asks for the check and sends nothing while Turnstile has no token', async ({ page }) => {
+    await turnstileWithoutToken(page);
+    let calls = 0;
+    await page.route(LEADS_URL, (route) => {
+      calls += 1;
+      return route.fulfill({ status: 201, body: '{}' });
+    });
+    const form = await leadForm(page, '/contact/');
+    await fillLead(form);
     await form.getByRole('button', { name: 'Send details' }).click();
-    await expect(form.getByRole('status')).toContainText('Something went wrong');
-    await expect(form.getByRole('button', { name: 'Send details' })).toBeEnabled();
-    await expect(form.getByLabel('Your name')).toHaveValue('Asha Rao');
-    guard.errors.length = 0; // the browser logs the 429 itself
+    await expect(form.getByText('Please complete the check above.')).toBeVisible();
+    await expect(form.getByRole('status')).toHaveText('');
+    expect(calls).toBe(0);
   });
+
+  test('disables the button while the request is in flight', async ({ page }) => {
+    let release: () => void = () => {};
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let calls = 0;
+    await page.route(LEADS_URL, async (route) => {
+      calls += 1;
+      await held;
+      await route.fulfill({ status: 201, body: '{}' });
+    });
+    const form = await leadForm(page, '/contact/');
+    const button = form.getByRole('button', { name: 'Send details' });
+    await fillLead(form);
+    await button.click();
+    await expect(form.getByRole('status')).toHaveText('Sending…');
+    await expect(button).toBeDisabled();
+    await form.evaluate((f: HTMLFormElement) => f.requestSubmit());
+    release();
+    await expect(form.getByRole('status')).toHaveText('Thank you. We have your details.');
+    await expect(button).toBeEnabled();
+    expect(calls, 'a second submit while sending sends nothing').toBe(1);
+  });
+
+  const failures = [
+    ['rate limited (429)', (r: Parameters<Parameters<Page['route']>[1]>[0]) => r.fulfill({ status: 429, body: '{}' }), 'Something went wrong'],
+    ['down (503)', (r: Parameters<Parameters<Page['route']>[1]>[0]) => r.fulfill({ status: 503, body: '{}' }), 'Something went wrong'],
+    ['unreachable', (r: Parameters<Parameters<Page['route']>[1]>[0]) => r.abort('failed'), 'Something went wrong'],
+    ['refusing the details (400)', (r: Parameters<Parameters<Page['route']>[1]>[0]) => r.fulfill({ status: 400, body: '{}' }), 'We could not accept these details.'],
+  ] as const;
+
+  for (const [what, answer, message] of failures) {
+    test(`says so plainly when the API is ${what}, and lets the visitor retry`, async ({ page }) => {
+      await page.route(LEADS_URL, answer);
+      const form = await leadForm(page, '/for-retailers/');
+      await fillLead(form, 'Mysuru');
+      await form.getByRole('button', { name: 'Send details' }).click();
+      await expect(form.getByRole('status')).toContainText(message);
+      await expect(form.getByRole('button', { name: 'Send details' })).toBeEnabled();
+      await expect(form.getByLabel('Your name')).toHaveValue('Asha Rao');
+      guard.errors.length = 0; // the browser logs the failed request itself
+    });
+  }
 });
 
 test.describe('SC-SITE-04 languages', () => {
@@ -136,9 +253,12 @@ test.describe('SC-SITE-04 languages', () => {
       await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(6);
       await expect(page.locator('link[rel="alternate"][hreflang="x-default"]')).toHaveAttribute('href', 'https://todayz.in/');
       await expect(page.locator('.draft a')).toHaveAttribute('href', '/');
-      await expect(page.locator('h1')).not.toHaveText('Everything nearby, today.');
-      await page.goto(`/${locale}/for-retailers`);
-      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://todayz.in/${locale}/for-retailers`);
+      await expect(page.locator('h1')).not.toHaveText(/Everything nearby/);
+      // Pages that exist only in English are marked as such where a localised page links to them.
+      await expect(page.locator('footer a[href="/pricing/"]')).toHaveAttribute('hreflang', 'en');
+      await expect(page.locator('footer a[href="/for-retailers/"]')).toHaveCount(0);
+      await page.goto(`/${locale}/for-retailers/`);
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://todayz.in/${locale}/for-retailers/`);
     });
   }
 
@@ -146,13 +266,14 @@ test.describe('SC-SITE-04 languages', () => {
     await page.goto('/');
     await expect(page.locator('meta[name="todayz:translation"]')).toHaveCount(0);
     await expect(page.locator('.draft')).toHaveCount(0);
-    const links = page.locator('header details a[hreflang]');
-    await expect(links).toHaveCount(5);
+    await expect(page.locator('header details.lang a[hreflang]')).toHaveCount(5);
+    await expect(page.locator('footer a[href="/pricing/"]')).not.toHaveAttribute('hreflang', /./);
   });
 
   test('pages that exist only in English offer no language switcher', async ({ page }) => {
-    await page.goto('/pricing');
-    await expect(page.locator('header details a[hreflang]')).toHaveCount(0);
+    await page.goto('/pricing/');
+    await expect(page.locator('header details.lang')).toHaveCount(0);
+    await expect(page.locator('header a.start')).toHaveAttribute('href', '/for-retailers/#join');
   });
 });
 
@@ -174,15 +295,26 @@ test.describe('SC-SITE-05 search engines', () => {
   });
 
   test('the retailers page carries SoftwareApplication and FAQPage JSON-LD', async ({ page }) => {
-    await page.goto('/for-retailers');
+    await page.goto('/for-retailers/');
     const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
     const types = blocks.map((b) => (JSON.parse(b) as { '@type': string })['@type']).sort();
     expect(types).toEqual(['FAQPage', 'SoftwareApplication']);
   });
 
-  test('the old landing page URL is covered by a 301 in _redirects', async ({ request }) => {
-    const file = await (await request.get('/_redirects')).text();
+  // `astro preview` does not serve Cloudflare's _redirects and _headers, so these read the built files.
+  test('the old landing page URL is covered by a 301 in _redirects', () => {
+    const file = readFileSync(join(DIST, '_redirects'), 'utf8');
     expect(file).toContain('/todayz-landing-page.html / 301');
+  });
+
+  test('_headers sets the CSP and the other security headers for every path', () => {
+    const file = readFileSync(join(DIST, '_headers'), 'utf8');
+    expect(file).toMatch(/^\/\*$/m);
+    expect(file).toContain("script-src 'self' https://challenges.cloudflare.com");
+    expect(file).toContain('connect-src \'self\' https://api.todayz.localhost');
+    expect(file).toContain("frame-ancestors 'none'");
+    expect(file).toContain('X-Content-Type-Options: nosniff');
+    expect(file).toContain('Referrer-Policy: strict-origin-when-cross-origin');
   });
 });
 
@@ -196,18 +328,22 @@ test.describe('SC-SITE-06 keyboard, no-JS content and restraint', () => {
     await expect(page.locator('main#main')).toBeFocused();
     await page.locator('summary[aria-label="Menu"]').click();
     await expect(page.locator('details.narrow').getByRole('link', { name: 'Pricing' })).toBeVisible();
-    const first = page.locator('.faq summary').first();
-    await first.focus();
+    // The landing FAQ opens its first answer; the second starts closed.
+    const second = page.locator('.faq details').nth(1);
+    await expect(second).not.toHaveAttribute('open');
+    await second.locator('summary').focus();
     await page.keyboard.press('Enter');
-    await expect(page.locator('.faq details').first()).toHaveAttribute('open', '');
+    await expect(second).toHaveAttribute('open', '');
   });
 
   test('all copy renders without JavaScript', async ({ browser, baseURL }) => {
     const context = await browser.newContext({ javaScriptEnabled: false, baseURL: baseURL ?? '' });
     const page = await context.newPage();
-    await page.goto('/for-retailers');
-    await expect(page.locator('h1')).toBeVisible();
-    await expect(page.locator('.faq summary').first()).toBeVisible();
+    for (const path of ['/', '/for-retailers/']) {
+      await page.goto(path);
+      await expect(page.locator('h1')).toBeVisible();
+      await expect(page.locator('.faq summary').first()).toBeVisible();
+    }
     await context.close();
   });
 
@@ -219,11 +355,21 @@ test.describe('SC-SITE-06 keyboard, no-JS content and restraint', () => {
     }
   });
 
-  test('the home page claims no numbers the product rules do not hold', async ({ page }) => {
+  test('the landing pages say their shops and numbers are examples, and claim no commission', async ({ page }) => {
+    for (const path of ['/', '/for-retailers/']) {
+      await page.goto(path);
+      await expect(page.getByText('Shops, items and numbers on this page are examples.')).toBeVisible();
+      const text = await page.locator('main').innerText();
+      expect(text, path).not.toMatch(/commission/i);
+      expect(text, path).not.toMatch(/\b\d[\d,]*\+/);
+    }
+  });
+
+  test('the mock screens are hidden from assistive technology', async ({ page }) => {
     await page.goto('/');
-    const text = await page.locator('main').innerText();
-    expect(text).not.toMatch(/\b\d+\s*%/);
-    expect(text).not.toMatch(/\b\d[\d,]*\+/);
-    expect(text).not.toMatch(/commission/i);
+    const mocks = page.locator('main [aria-hidden="true"]');
+    expect(await mocks.count()).toBeGreaterThan(0);
+    // No mock exposes a focusable control.
+    expect(await page.locator('main [aria-hidden="true"] :is(a, button, input, select, textarea)').count()).toBe(0);
   });
 });

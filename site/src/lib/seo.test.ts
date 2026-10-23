@@ -25,8 +25,12 @@ describe('page registry', () => {
     const retailers = pageById('retailers');
     expect(pagePath(home, 'en')).toBe('/');
     expect(pagePath(home, 'hi')).toBe('/hi/');
-    expect(pagePath(retailers, 'kn')).toBe('/kn/for-retailers');
-    expect(pageUrl(retailers, 'en')).toBe('https://todayz.in/for-retailers');
+    expect(pagePath(retailers, 'kn')).toBe('/kn/for-retailers/');
+    expect(pageUrl(retailers, 'en')).toBe('https://todayz.in/for-retailers/');
+  });
+
+  it('gives every page path a leading and trailing slash (the site builds directory URLs)', () => {
+    for (const { page, locale } of allRoutes()) expect(pagePath(page, locale)).toMatch(/^\/(?:[a-z0-9-]+\/)*$/);
   });
 
   it('emits hreflang alternates with x-default only for multi-language pages', () => {
@@ -44,7 +48,7 @@ describe('sitemap, robots and redirects', () => {
     expect(locs).toHaveLength(allRoutes().length);
     expect(new Set(locs).size).toBe(locs.length);
     for (const loc of locs) expect(loc).toMatch(/^https:\/\/todayz\.in\//);
-    expect(xml).toContain('hreflang="ta" href="https://todayz.in/ta/for-retailers"');
+    expect(xml).toContain('hreflang="ta" href="https://todayz.in/ta/for-retailers/"');
   });
 
   it('points robots at the sitemap and allows crawling', () => {
@@ -56,6 +60,16 @@ describe('sitemap, robots and redirects', () => {
     expect(REDIRECTS).toContainEqual({ from: '/todayz-landing-page.html', to: '/' });
     expect(redirectsFile()).toContain('/todayz-landing-page.html / 301');
     expect(readFileSync(new URL('../../public/_redirects', import.meta.url), 'utf8')).toBe(redirectsFile());
+  });
+
+  it('redirects only to built pages, never to itself, and from each old URL once', () => {
+    const built = new Set(allRoutes().map(({ page, locale }) => pagePath(page, locale)));
+    for (const r of REDIRECTS) {
+      expect(built, r.to).toContain(r.to);
+      expect(r.from).not.toBe(r.to);
+      expect(built.has(r.from), `${r.from} is a live page`).toBe(false);
+    }
+    expect(new Set(REDIRECTS.map((r) => r.from)).size).toBe(REDIRECTS.length);
   });
 });
 

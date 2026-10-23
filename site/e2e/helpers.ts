@@ -1,7 +1,19 @@
 import type { Page } from '@playwright/test';
 
 export const TURNSTILE_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-export const LEADS_URL = 'https://api.todayz.in/v1/public/leads';
+/** The leads endpoint of the build:e2e API origin (PUBLIC_API_URL falls back to the local API). */
+export const LEADS_URL = 'https://api.todayz.localhost/v1/public/leads';
+
+/** Test phone numbers come only from the reserved +91 90000 000xx block. */
+export const TEST_PHONE = '+91 90000 00012';
+export const TEST_PHONE_E164 = '+919000000012';
+
+/** Answers the Turnstile script with a stand-in that never renders a token. */
+export async function turnstileWithoutToken(page: Page): Promise<void> {
+  await page.route(TURNSTILE_URL, (route) =>
+    route.fulfill({ contentType: 'text/javascript', body: 'window.turnstile = { reset() {} };' }),
+  );
+}
 
 /**
  * Answers the Turnstile script with a local stand-in that renders a token into every

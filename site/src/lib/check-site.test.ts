@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, writeFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { checkLinks, scan, validateHtml } from '../../scripts/check-site.mjs';
+import { checkLinks, internalPath, missingSlash, scan, sitemapSlashProblems, slashProblems, validateHtml } from '../../scripts/check-site.mjs';
 import { allRoutes } from './pages.ts';
 
 const DOC = (body: string) =>
@@ -45,6 +45,51 @@ describe('link checker', () => {
     const { links, ids } = scan('<a href="/a" id="x"><img src="/i.png"></a>');
     expect(links.map((l) => l.url)).toEqual(['/a', '/i.png']);
     expect(ids.has('x')).toBe(true);
+  });
+});
+
+describe('trailing slashes', () => {
+  it('reads the path of internal URLs only', () => {
+    expect(internalPath('/about/#story')).toBe('/about/');
+    expect(internalPath('https://todayz.in')).toBe('/');
+    expect(internalPath('https://todayz.in/hi/?x=1')).toBe('/hi/');
+    expect(internalPath('https://todayz.in.evil.example/a')).toBeNull();
+    expect(internalPath('https://app.todayz.in/a')).toBeNull();
+    expect(internalPath('#main')).toBeNull();
+    expect(internalPath('mailto:a@b.in')).toBeNull();
+  });
+
+  it('wants a slash on page paths, not on files', () => {
+    expect(missingSlash('/about')).toBe(true);
+    expect(missingSlash('/legal/privacy')).toBe(true);
+    expect(missingSlash('/about/')).toBe(false);
+    expect(missingSlash('/')).toBe(false);
+    expect(missingSlash('/sitemap.xml')).toBe(false);
+    expect(missingSlash('/_astro/a.B1c2.css')).toBe(false);
+  });
+
+  it('reports links, canonical, hreflang and og:url without the slash', () => {
+    const html = DOC(
+      '<a href="/about">a</a><a href="/about/">ok</a><a href="/pricing#plan">p</a><a href="https://app.todayz.in/x">app</a>',
+    ).replace(
+      '<title>T</title>',
+      '<title>T</title><link rel="canonical" href="https://todayz.in/contact"><link rel="alternate" hreflang="hi" href="https://todayz.in/hi/"><meta property="og:url" content="https://todayz.in/legal/privacy">',
+    );
+    expect(slashProblems('x.html', html)).toEqual([
+      'x.html: page URL without trailing slash https://todayz.in/contact',
+      'x.html: page URL without trailing slash /about',
+      'x.html: page URL without trailing slash /pricing#plan',
+      'x.html: page URL without trailing slash https://todayz.in/legal/privacy',
+    ]);
+  });
+
+  it('reports sitemap URLs without the slash or on another origin', () => {
+    const xml =
+      '<url><loc>https://todayz.in/about/</loc><xhtml:link rel="alternate" hreflang="hi" href="https://todayz.in/hi/for-retailers"/></url><url><loc>https://example.com/</loc></url>';
+    expect(sitemapSlashProblems(xml)).toEqual([
+      'sitemap.xml: URL without trailing slash or off-site https://todayz.in/hi/for-retailers',
+      'sitemap.xml: URL without trailing slash or off-site https://example.com/',
+    ]);
   });
 });
 
