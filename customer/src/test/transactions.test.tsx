@@ -1,0 +1,431 @@
+import type { CheckoutQuote } from '@todayz/api-client/gen/model/checkoutQuote';
+import type { Order } from '@todayz/api-client/gen/model/order';
+import type { OrderList } from '@todayz/api-client/gen/model/orderList';
+import { formatMoney } from '@todayz/i18n';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { addToCart, getCart, resetCartForTests } from '../cart/cart';
+import { setStreamFetchForTests } from '../orders/stream';
+import { json, problem, renderAt, type Call, type Handler } from './render';
+
+const USER = '01J9ZAAAAAAAAAAAAAAAAAAAAA';
+const STORE = { id: '01J9ZSTOREAAAAAAAAAAAAAAAA', slug: 'raju-kirana', name: 'Raju Kirana' };
+const ITEM = '01J9ZITEMAAAAAAAAAAAAAAAAA';
+const ORDER_ID = '01J9ZORDERAAAAAAAAAAAAAAAA';
+const NOW = '2026-10-23T10:00:00.000Z';
+const at = (min: number) => new Date(Date.parse(NOW) + min * 60_000).toISOString();
+
+const grant = () => ({ accessToken: 'tok', expiresAt: new Date(Date.now() + 15 * 60_000).toISOString(), tokenType: 'Bearer', userId: USER });
+const signedIn: Handler = (c) => (c.path === '/v1/auth/refresh' ? json(200, grant()) : undefined);
+const on = (method: string, path: string, make: (c: Call) => Response): Handler => (c) =>
+  c.method === method && c.path === path ? make(c) : undefined;
+
+function quote(over: Partial<CheckoutQuote> = {}, unit = 2500, availability: 'in_stock' | 'short' | 'out_of_stock' = 'in_stock'): CheckoutQuote {
+  const total = unit * 2;
+  return {
+    storeId: STORE.id,
+    fulfilment: 'pickup',
+    lines: [
+      {
+        storeItemId: ITEM,
+        productId: '01J9ZPRODAAAAAAAAAAAAAAAAA',
+        name: 'Toor dal',
+        variant: null,
+        packSize: 1,
+        unit: 'kg',
+        imageKey: null,
+        quantity: 2,
+        availableQuantity: availability === 'short' ? 1 : 10,
+        availability,
+        unitPricePaise: unit,
+        mrpPaise: unit,
+        lineSubtotalPaise: total,
+        discountPaise: 0,
+        lineTotalPaise: total,
+        priceSource: 'catalog',
+        validUntil: null,
+      },
+    ],
+    subtotalPaise: total,
+    discountPaise: 0,
+    itemSubtotalPaise: total,
+    itemsAfterOffersPaise: total,
+    deliveryFeePaise: 0,
+    creditsRequested: 0,
+    creditsAllowed: 0,
+    creditsUsed: 0,
+    creditsLimit: null,
+    totalPaise: total,
+    offersApplied: [],
+    orderable: availability === 'in_stock',
+    validUntil: null,
+    serverNow: NOW,
+    ...over,
+  } as CheckoutQuote;
+}
+
+function order(over: Partial<Order> = {}): Order {
+  return {
+    id: ORDER_ID,
+    number: 'R-1042',
+    store: { ...STORE, addressLine: '12 Main Road', locality: 'Indiranagar' },
+    fulfilment: 'pickup',
+    status: 'placed',
+    statusReason: null,
+    statusNote: null,
+    lines: [
+      {
+        id: '01J9ZLINEAAAAAAAAAAAAAAAAA',
+        storeItemId: ITEM,
+        name: 'Toor dal',
+        variant: null,
+        packSize: 1,
+        unit: 'kg',
+        imageKey: null,
+        unitPricePaise: 2500,
+        quantityRequested: 2,
+        quantityAccepted: null,
+        lineTotalPaise: 5000,
+        priceSource: 'catalog',
+      },
+    ],
+    subtotalPaise: 5000,
+    discountPaise: 0,
+    itemSubtotalPaise: 5000,
+    itemsAfterOffersPaise: 5000,
+    creditsUsed: 0,
+    deliveryFeePaise: 0,
+    totalPaise: 5000,
+    cashbackCredits: 0,
+    paymentStatus: 'pay_at_shop',
+    paymentMethod: null,
+    code: null,
+    codeLocked: false,
+    canExtend: false,
+    askReplyId: null,
+    acceptBy: at(4),
+    partialConfirmBy: null,
+    holdUntil: null,
+    extendedAt: null,
+    placedAt: NOW,
+    acceptedAt: null,
+    collectedAt: null,
+    timeline: [{ fromStatus: null, toStatus: 'placed', actor: 'customer', reason: null, at: NOW }],
+    version: 1,
+    serverNow: NOW,
+    ...over,
+  } as Order;
+}
+
+const accepted = (over: Partial<Order> = {}) =>
+  order({
+    status: 'accepted',
+    code: '4821',
+    acceptBy: null,
+    holdUntil: at(30),
+    canExtend: true,
+    acceptedAt: at(1),
+    timeline: [
+      { fromStatus: null, toStatus: 'placed', actor: 'customer', reason: null, at: NOW },
+      { fromStatus: 'placed', toStatus: 'accepted', actor: 'staff', reason: null, at: at(1) },
+    ],
+    version: 2,
+    ...over,
+  });
+
+beforeEach(() => {
+  resetCartForTests();
+  addToCart(STORE, { storeItemId: ITEM, productName: 'Toor dal', pricePaise: 2500, mrpPaise: 2500, packLabel: '1 kg' }, 2);
+});
+// The live stream never reaches a real network: by default it is a connection that stays quiet.
+const quietStream = (() => Promise.resolve(new Response(new ReadableStream<Uint8Array>({ start: () => undefined }), { status: 200, headers: { 'content-type': 'text/event-stream' } }))) as typeof fetch;
+beforeEach(() => setStreamFetchForTests(quietStream));
+afterEach(() => setStreamFetchForTests(undefined));
+
+describe('C-09 cart', () => {
+  it('lists lines, flags a short line and offers to match the stock', async () => {
+    renderAt('/cart', { returning: true, handlers: [signedIn, on('POST', '/v1/me/checkout/quote', () => json(200, quote({}, 2500, 'short')))] });
+    expect(await screen.findByText('Toor dal')).toBeInTheDocument();
+    expect(await screen.findByText('Only 1 left')).toBeInTheDocument();
+    expect(screen.getByText('Remove or reduce the items marked below to continue.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Checkout' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Reduce to 1' }));
+    await waitFor(() => expect(getCart().lines[0]?.qty).toBe(1));
+  });
+
+  it('shows the total and a Checkout button when everything is available', async () => {
+    renderAt('/cart', { returning: true, handlers: [signedIn, on('POST', '/v1/me/checkout/quote', () => json(200, quote()))] });
+    expect(await screen.findByRole('button', { name: /Checkout/ })).toBeInTheDocument();
+    expect(screen.getAllByText(formatMoney(5000)).length).toBeGreaterThan(0);
+    expect(screen.getByText('Pick up at the shop and pay there.')).toBeInTheDocument();
+  });
+
+  it('shows an empty state with no lines', async () => {
+    resetCartForTests();
+    renderAt('/cart', { returning: true, handlers: [signedIn] });
+    expect(await screen.findByText('Your cart is empty')).toBeInTheDocument();
+  });
+});
+
+describe('C-11 checkout', () => {
+  it('sends a signed-out person to sign in first and keeps the cart', async () => {
+    const { router } = renderAt('/checkout');
+    await waitFor(() => expect(router.state.location.pathname).toBe('/sign-in'));
+    expect(router.state.location.search).toMatchObject({ next: '/checkout' });
+    expect(getCart().lines).toHaveLength(1);
+  });
+
+  it('places the order once with an idempotency key and opens the tracking page', async () => {
+    const posts: Call[] = [];
+    const { router } = renderAt('/checkout', {
+      returning: true,
+      handlers: [
+        signedIn,
+        on('POST', '/v1/me/checkout/quote', () => json(200, quote())),
+        on('POST', '/v1/me/orders', (c) => {
+          posts.push(c);
+          return json(201, order());
+        }),
+        on('GET', `/v1/me/orders/${ORDER_ID}`, () => json(200, order())),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: `Place order · ${formatMoney(5000)}` }));
+    await waitFor(() => expect(router.state.location.pathname).toBe(`/orders/${ORDER_ID}`));
+    expect(posts).toHaveLength(1);
+    expect(posts[0]?.headers.get('idempotency-key')).toMatch(/^[0-9A-Z]{26}$/);
+    expect(posts[0]?.body).toMatchObject({ storeId: STORE.id, fulfilment: 'pickup', expectedTotalPaise: 5000, creditsToUse: 0 });
+    await waitFor(() => expect(getCart().lines).toHaveLength(0));
+    // The check animation shows once and the flag leaves the URL.
+    expect(await screen.findByTestId('placed-check')).toBeInTheDocument();
+    await waitFor(() => expect(router.state.location.search).toEqual({}));
+  });
+
+  it('reuses the same idempotency key when the same order is retried after a failure', async () => {
+    const keys: (string | null)[] = [];
+    renderAt('/checkout', {
+      returning: true,
+      handlers: [
+        signedIn,
+        on('POST', '/v1/me/checkout/quote', () => json(200, quote())),
+        on('POST', '/v1/me/orders', (c) => {
+          keys.push(c.headers.get('idempotency-key'));
+          return keys.length === 1 ? problem(503, 'unavailable') : json(201, order());
+        }),
+        on('GET', `/v1/me/orders/${ORDER_ID}`, () => json(200, order())),
+      ],
+    });
+    const place = `Place order · ${formatMoney(5000)}`;
+    fireEvent.click(await screen.findByRole('button', { name: place }));
+    expect(await screen.findByText(/No connection/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: place }));
+    await waitFor(() => expect(keys).toHaveLength(2));
+    expect(keys[0]).toBeTruthy();
+    expect(keys[1]).toBe(keys[0]);
+  });
+
+  it('needs a second tap after the price changed, then sends the new total', async () => {
+    const bodies: unknown[] = [];
+    const fresh = quote({}, 2700);
+    renderAt('/checkout', {
+      returning: true,
+      handlers: [
+        signedIn,
+        on('POST', '/v1/me/checkout/quote', () => json(200, quote())),
+        on('POST', '/v1/me/orders', (c) => {
+          bodies.push(c.body);
+          if (bodies.length === 1) {
+            return json(409, { type: 'about:blank#price_changed', title: 'x', status: 409, code: 'price_changed', extensions: { quote: fresh } });
+          }
+          return json(201, order());
+        }),
+        on('GET', `/v1/me/orders/${ORDER_ID}`, () => json(200, order())),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: `Place order · ${formatMoney(5000)}` }));
+    expect(await screen.findByText('The total changed')).toBeInTheDocument();
+    const accept = await screen.findByRole('button', { name: `Accept new total · ${formatMoney(5400)}` });
+    fireEvent.click(accept);
+    expect(bodies).toHaveLength(1); // nothing sent by the acceptance tap
+    fireEvent.click(await screen.findByRole('button', { name: `Place order · ${formatMoney(5400)}` }));
+    await waitFor(() => expect(bodies).toHaveLength(2));
+    expect(bodies[1]).toMatchObject({ expectedTotalPaise: 5400 });
+  });
+
+  it('names the line that has too little stock and keeps the cart', async () => {
+    renderAt('/checkout', {
+      returning: true,
+      handlers: [
+        signedIn,
+        on('POST', '/v1/me/checkout/quote', () => json(200, quote())),
+        on('POST', '/v1/me/orders', () =>
+          json(409, { type: 'about:blank#insufficient_stock', title: 'x', status: 409, code: 'insufficient_stock', extensions: { storeItemId: ITEM, available: 1 } }),
+        ),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: `Place order · ${formatMoney(5000)}` }));
+    expect(await screen.findByText(/Toor dal: only 1 left\./)).toBeInTheDocument();
+    expect(getCart().lines).toHaveLength(1);
+  });
+
+  it('says the shop is closed and keeps the cart', async () => {
+    renderAt('/checkout', {
+      returning: true,
+      handlers: [signedIn, on('POST', '/v1/me/checkout/quote', () => problem(409, 'store_closed'))],
+    });
+    expect((await screen.findAllByText(/Your cart is kept\./)).length).toBeGreaterThan(0);
+    expect(getCart().lines).toHaveLength(1);
+  });
+
+  it('holds the update toast while checkout is open', async () => {
+    const { update } = renderAt('/checkout', {
+      returning: true,
+      handlers: [signedIn, on('POST', '/v1/me/checkout/quote', () => json(200, quote()))],
+    });
+    await screen.findByRole('button', { name: /Place order/ });
+    expect(update.getState().holds).toBe(1);
+  });
+});
+
+describe('C-12 order tracking', () => {
+  const track = (o: Order, extra: Handler[] = []) =>
+    renderAt(`/orders/${ORDER_ID}`, { returning: true, handlers: [signedIn, on('GET', `/v1/me/orders/${ORDER_ID}`, () => json(200, o)), ...extra] });
+
+  it('counts down to the shop answer from the server time', async () => {
+    track(order());
+    expect(await screen.findByText('Waiting for Raju Kirana to accept · 4:00 left')).toBeInTheDocument();
+    expect(screen.queryByText('4821')).toBeNull();
+  });
+
+  it('shows the pickup code and the hold countdown once accepted', async () => {
+    const { container } = track(accepted());
+    expect(await screen.findByText('Pickup code')).toBeInTheDocument();
+    expect(container.textContent).toContain('4821');
+    expect(screen.getByText(/Held for you · 30:00 left/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: "I'm on my way (+10 min)" })).toBeInTheDocument();
+  });
+
+  it('extends the hold once with an idempotency key', async () => {
+    const calls: Call[] = [];
+    track(accepted(), [
+      on('POST', `/v1/me/orders/${ORDER_ID}/extend`, (c) => {
+        calls.push(c);
+        return json(200, accepted({ canExtend: false, holdUntil: at(40), extendedAt: at(2), version: 3 }));
+      }),
+    ]);
+    fireEvent.click(await screen.findByRole('button', { name: "I'm on my way (+10 min)" }));
+    expect(await screen.findByText('Added 10 minutes.')).toBeInTheDocument();
+    expect(calls[0]?.headers.get('idempotency-key')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: "I'm on my way (+10 min)" })).toBeNull();
+  });
+
+  it('cancels with a reason; "something else" needs a note', async () => {
+    const calls: Call[] = [];
+    track(order(), [
+      on('POST', `/v1/me/orders/${ORDER_ID}/cancel`, (c) => {
+        calls.push(c);
+        return json(200, order({ status: 'cancelled', statusReason: 'other', acceptBy: null, version: 2 }));
+      }),
+    ]);
+    fireEvent.click(await screen.findByRole('button', { name: 'Cancel order' }));
+    const sheet = await screen.findByRole('dialog');
+    fireEvent.click(within(sheet).getByLabelText('Something else'));
+    const confirm = within(sheet).getByRole('button', { name: 'Cancel order' });
+    expect(confirm).toBeDisabled();
+    fireEvent.change(within(sheet).getByLabelText('Tell us what happened'), { target: { value: 'Plans changed' } });
+    expect(confirm).toBeEnabled();
+    fireEvent.click(confirm);
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0]?.body).toEqual({ reason: 'other', note: 'Plans changed' });
+    expect(await screen.findByText('This order was cancelled')).toBeInTheDocument();
+  });
+
+  it('offers a new code when the code is locked', async () => {
+    track(accepted({ code: null, codeLocked: true }));
+    expect(await screen.findByText('Code locked')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Get a new code' })).toBeInTheDocument();
+  });
+
+  it('shows the outcome and a next step when the shop declined', async () => {
+    track(order({ status: 'rejected', statusReason: 'out_of_stock', acceptBy: null, version: 2 }));
+    expect(await screen.findByText('Raju Kirana could not take this order')).toBeInTheDocument();
+    expect(screen.getByText('Some items were out of stock.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Find another shop' })).toBeInTheDocument();
+  });
+
+  it('moves when the live stream says the order changed', async () => {
+    let current = order();
+    const enc = new TextEncoder();
+    setStreamFetchForTests((() => {
+      const body = new ReadableStream<Uint8Array>({
+        start(ctrl) {
+          setTimeout(() => {
+            current = accepted();
+            ctrl.enqueue(enc.encode(`event: order.updated\nid: 1\ndata: {"type":"order.updated","id":"${ORDER_ID}","version":2}\n\n`));
+          }, 30);
+        },
+      });
+      return Promise.resolve(new Response(body, { status: 200, headers: { 'content-type': 'text/event-stream' } }));
+    }) as typeof fetch);
+    renderAt(`/orders/${ORDER_ID}`, {
+      returning: true,
+      handlers: [signedIn, on('GET', `/v1/me/orders/${ORDER_ID}`, () => json(200, current))],
+    });
+    expect(await screen.findByText(/Waiting for Raju Kirana to accept/)).toBeInTheDocument();
+    expect(await screen.findByText('Pickup code', undefined, { timeout: 3000 })).toBeInTheDocument();
+  });
+});
+
+describe('C-13 orders list', () => {
+  const summary = (id: string, status: Order['status']) => ({
+    id,
+    number: `R-${id.slice(-2)}`,
+    store: { ...STORE, addressLine: '12 Main Road', locality: null },
+    fulfilment: 'pickup' as const,
+    status,
+    statusReason: null,
+    itemCount: 2,
+    totalPaise: 5000,
+    acceptBy: null,
+    holdUntil: null,
+    placedAt: NOW,
+    version: 1,
+  });
+  const list = (items: ReturnType<typeof summary>[]): OrderList => ({ items, nextCursor: null, serverNow: NOW });
+
+  it('shows active orders first, then history', async () => {
+    const asked: string[] = [];
+    renderAt('/orders', {
+      returning: true,
+      handlers: [
+        signedIn,
+        (c: Call) => {
+          if (c.method !== 'GET' || c.path !== '/v1/me/orders') return undefined;
+          asked.push(c.search);
+          return json(200, c.search.includes('status=active') ? list([summary('01J9ZORDERAAAAAAAAAAAAAA01', 'accepted')]) : list([summary('01J9ZORDERAAAAAAAAAAAAAA02', 'collected')]));
+        },
+      ],
+    });
+    const active = await screen.findByRole('region', { name: 'In progress' });
+    const past = await screen.findByRole('region', { name: 'Earlier' });
+    expect(within(active).getByText('Accepted')).toBeInTheDocument();
+    expect(within(past).getByText('Collected')).toBeInTheDocument();
+    expect(active.compareDocumentPosition(past) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(asked.some((q) => q.includes('status=active'))).toBe(true);
+    expect(asked.some((q) => q.includes('status=past'))).toBe(true);
+  });
+
+  it('shows an empty state and a placeholder In store tab', async () => {
+    renderAt('/orders', {
+      returning: true,
+      handlers: [signedIn, on('GET', '/v1/me/orders', () => json(200, list([])))],
+    });
+    expect(await screen.findByText('No orders yet')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: 'In store' }));
+    expect(await screen.findByText('Store bills are coming')).toBeInTheDocument();
+  });
+
+  it('asks the signed-out person to sign in', async () => {
+    renderAt('/orders');
+    expect(await screen.findByText('Sign in to see your orders')).toBeInTheDocument();
+  });
+});

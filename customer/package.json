@@ -23,6 +23,7 @@
     "@todayz/api-client": "workspace:*",
     "@todayz/auth": "workspace:*",
     "@todayz/i18n": "workspace:*",
+    "@todayz/realtime": "workspace:*",
     "@todayz/telemetry": "workspace:*",
     "@todayz/tokens": "workspace:*",
     "@todayz/ui": "workspace:*",
