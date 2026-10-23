@@ -53,8 +53,8 @@ Every AI feature returns a draft. The tester feeds each one an input that the mo
 
 | Step | Action | Expected result | Refs | Shot | P/F |
 |---|---|---|---|---|---|
-| MQ-11.12 | Search "doodh" by typing. | Milk results (synonym table), and the mocks LLM tab shows no call (table first, model only when the table misses). | 11 §3 AI-C2 C-05 | | |
-| MQ-11.13 | Tap the mic (C-23), allow the microphone, play the STT fixture clip "ಹಾಲು" (or speak if a fixture exists for your voice). | The heard words fill the search field as a draft the tester can edit; nothing is searched until the tester taps search (D-101). Tap search: results for milk. | 11 §3 AI-C5 C-23 | ▢ | |
+| MQ-11.12 | Search "doodh" by typing. | Milk results (synonym table), and the mocks LLM tab shows no call: search never calls a model, and the app calls search assist (`POST /v1/me/ai/search-assist`) only after the results when the table missed (D-101). | 11 §3 AI-C2 C-05 | | |
+| MQ-11.13 | Tap the mic (C-23), allow the microphone, play the STT fixture clip "ಹಾಲು" (or speak if a fixture exists for your voice). | The heard words fill the search field as text the tester can edit (the response is the transcript and chips only; no draft is stored); nothing is searched until the tester taps search (D-101). Tap search: results for milk. | 11 §3 AI-C5 C-23 | ▢ | |
 | MQ-11.14 | Deny the microphone permission and tap the mic again. | A short message explains how to allow the mic; typing still works. | C-23 | | |
 
 ### D. Voice stock update (AI-R1, B-06)

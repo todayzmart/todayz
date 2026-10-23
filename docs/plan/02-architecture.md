@@ -223,7 +223,7 @@ Every background job is a registered kind, declared with `jobs.Define(jobs.Kind{
 - `timer` kinds can never be paused or run by hand. `money` kinds need `super_admin` with step-up. Every other kind needs `admin` or above. All controls are audited (§3.3).
 - `ai` kinds write drafts only. `marketing` and `notify` kinds read their caps and quiet rules from the settings 01 defines.
 - Every job already in the plan is a registered kind with its class, owned by the same work package as before: the 05 §3 rollups, `store_reliability`, `store_rating`, `ledger_reconcile`, order timers, notifications, payouts, partition maintenance and the AI jobs.
-- D-101 adds four kinds, all owned by W3-16: `asks_close_window` (`timer`, event-triggered at each recipient's `reply_by`: closes that store's window and, after the last one, the ask; it has a runbook), `asks_retention` (`maintenance`, nightly: deletes asks older than `ask_retention_days`), and `rollup_ask_demand` and `site_marquee_build` (`rollup`, 05 §3).
+- D-101 adds four kinds, all owned by W3-16: `asks_close_window` (`timer`, event-triggered at each recipient's `reply_by`: closes that store's window and, after the last one, the ask; it has a runbook), `asks_retention` (`maintenance`, nightly: deletes asks older than `ask_retention_days`; their recipients, replies and store blocks go by `on delete cascade`, and `orders.ask_reply_id` is set to null, 03 §9), and `rollup_ask_demand` and `site_marquee_build` (`rollup`, 05 §3).
 - Everything works locally under the test clock; `make demo` runs jobs so A-21 has data.
 
 ### 2.8 Graceful shutdown (D-98)
@@ -324,7 +324,7 @@ Source of truth for every role check. It covers every action used in [04-api.md]
 | business | `store.settings.edit` | `S/settings`: hours, delivery, cashback, auto-accept, notifications | ✓ | ✓ | – |
 | asks | `asks.view` | `S/asks` inbox (B-20), `ask.created` on `S/stream` (D-101) | ✓ | ✓ | ✓ |
 | asks | `asks.reply` | `S/asks/{askId}/reply` (Yes or No) and `S/asks/{askId}/report`; changing the prefilled price also needs `item.price.edit`, and "Add it to your stock" needs `item.manage` | ✓ | ✓ | ✓ |
-| asks | `asks.manage` | mute or unmute asks for the store (`asksMuted` on `S/settings`, audited) | ✓ | ✓ | – |
+| asks | `asks.manage` | mute or unmute asks for the store (`asksMuted` on `S/settings`, audited). W1-04 seeds this key in the role matrix and gates `asksMuted` with it; `asks.view`, `asks.reply` and the golden-table rows are enforced in W3-16's own `policy/asks.go`, on the stub the lead adds before Wave 3 (07, D-101) | ✓ | ✓ | – |
 | business | `standee.manage` | `S/qr-standee.pdf`, `S/standees` | ✓ | ✓ | – |
 | business | `inbox.view` | business inbox (B-16), mark read | ✓ | ✓ | ✓ |
 | business | `support.tickets` | business support tickets (B-15) | ✓ | ✓ | – |
@@ -526,7 +526,9 @@ Follows the rules for every AI feature ([11-ai-features.md](11-ai-features.md) �
 5. The app shows the draft as editable lines; the user taps **Confirm** → `POST …/ai/voice-stock/drafts/{draftId}/confirm`. Each line is checked against the user's role (§3.3, D-65); lines the user may not confirm come back disabled ("Ask a manager"). Allowed lines are applied as the matching change: `sale` → a quick POS sale with no customer (`sale_pos` movement, cashier and above), `restock` → `restock` movement, `count` → `count_correction` movement, `set_price` → price change. Per-line outcomes are recorded on the draft.
 6. The voice button is hidden (the endpoints return `404`) unless `feature_voice_enabled` and `ai_voice_stock_enabled` are both on and both keys are set; the admin console then shows "Voice: off". Audio is deleted after 7 days; transcripts kept 90 days for quality review.
 
-**Customer voice search (AI-C5, D-101)** uses the same STT client through the `voice_search` draft endpoints (`/v1/me/ai/voice-search`, 04 §2.8), but keeps no audio: it is sent to the provider and dropped (no object, `input_ref` null, no audio in logs or traces). The draft holds the transcript and its refine chips. The search runs only when the customer taps search (the confirm, with the query as edited), and only then is the query logged, exactly as a typed one. The mic is hidden unless `ai_voicesearch_enabled` is on and the key is set ([01](01-product-rules.md) §11.1).
+**Customer voice search (AI-C5, D-101)** uses the same STT client through one endpoint, `POST /v1/me/ai/voice-search` (04 §2.8), not the draft endpoints, and keeps nothing: the audio is sent to the provider and dropped (no object, no `ai_drafts` row, no audio or transcript in logs or traces), and the transcript and its refine chips go back in the response only. The search runs only when the customer taps search, as a normal `GET /v1/discover/search` with `source=voice`, and only then is the confirmed query logged, exactly as a typed one; an ask sent from it stores that query. The cost guard counts each call. The mic is hidden unless `ai_voicesearch_enabled` is on and the key is set ([01](01-product-rules.md) §11.1).
+
+**Search assist (AI-C2, D-101)** never runs inside `GET /v1/discover/search`. The app calls `POST /v1/me/ai/search-assist` after the results render, only when search returned `refineHint`, with a 3 s model timeout; any failure returns nothing and the results are untouched. No `ai_drafts` row; the cost guard counts each call.
 
 ## 9. Integrations and keys
 

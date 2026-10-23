@@ -83,16 +83,19 @@ Shorthand in 2.6: `{B}` = `/v1/biz/businesses/{bid}`, `{S}` = `{B}/stores/{sid}`
   | `job_already_running` | 409 | `admin-jobs.yaml` | run-now or retry while that kind (or that period) is already running |
   | `job_paused` | 409 | `admin-jobs.yaml` | run-now or retry on a paused kind; resume it first |
 
-  Codes added for Ask shops nearby (D-101), registered in `problems/asks.yaml` before the handlers ship:
+  Codes added for Ask shops nearby and search proof (D-101), each registered in its domain file before its handler ships:
 
   | Code | Status | Domain file | Meaning |
   |---|---|---|---|
   | `ask_limit_reached` | 429 | `asks.yaml` | the customer has sent `ask_daily_limit_customer` asks this IST day; `Retry-After` is the next IST midnight |
   | `ask_already_open` | 409 | `asks.yaml` | the customer already has an open ask for this product (or query); `extensions.askId` |
   | `ask_no_shops` | 409 | `asks.yaml` | no store qualifies (radius, open now, not muted, under its daily limit) |
-  | `ask_store_unavailable` | 409 | `asks.yaml` | "Ask this shop": that store is closed, muted, at its daily limit or blocked this customer |
-  | `ask_closed` | 409 | `asks.yaml` | a reply or report after the store's reply window, or on a closed ask |
+  | `ask_store_unavailable` | 409 | `asks.yaml` | "Ask this shop": that store is closed, muted, at its daily limit or blocked this customer. The body, `detail` and copy are the same for every reason; the reason is never sent (01 §11.2) |
+  | `ask_closed` | 409 | `asks.yaml` | a reply after the store's reply window, or on a closed ask |
   | `price_above_mrp` | 422 | `asks.yaml` | a Yes price above the item's MRP (the master product's MRP for an unlisted item) |
+  | `ask_reply_used` | 409 | `orders.yaml` | an order from an ask reply that already has an active order (any state but `cancelled`, `expired`, `rejected`); the unique index `ux_orders_ask_reply_active` (03) decides a race; `extensions.orderId` is the customer's own active order |
+  | `ask_price_expired` | 409 | `orders.yaml` | the replied price ended between the quote and the order; the fresh quote at the current price is in `extensions`; never re-priced silently |
+  | `share_card_unavailable` | 410 | `share.yaml` | share card create for an item whose store is not `live` or whose business is not `verified`, or a read of a card whose store is no longer `live` (D-40) |
 
   A second reply from the same store is `409 invalid_transition`.
 
@@ -151,7 +154,7 @@ How it works (W0-03, `platform/idempotency`):
 | Method | Path | Auth | Pkg | Notes |
 |---|---|---|---|---|
 | GET/PATCH | /v1/me | any | W1-01 | name, language; for customers also the active-order limit from no-show strikes (C-21) |
-| DELETE | /v1/me | cus | W1-01 | `{otpRequestId, code}`; anonymise; `409 account_has_active_order` while any order is unfinished; forfeits the wallet (D-31) |
+| DELETE | /v1/me | cus | W1-01 | `{otpRequestId, code}`; anonymise; `409 account_has_active_order` while any order is unfinished; forfeits the wallet (D-31); deletes the customer's asks with their replies and store blocks (W3-16's `OnAccountDelete` hook, D-101) |
 | GET/POST | /v1/me/addresses | cus | W1-01 | |
 | PATCH/DELETE | /v1/me/addresses/{addressId} | cus | W1-01 | |
 | GET | /v1/me/stream | cus | W2-05 | SSE; active orders and open asks (`ask.updated` with `{askId, version}` on a reply or close, D-101) |
@@ -173,7 +176,7 @@ How it works (W0-03, `platform/idempotency`):
 | GET | /v1/discover/stores/{slug} | W1-06 | shop page (hours, rating, offers, cashback, delivery terms); `?s={standeeId}` records a standee scan (D-26) |
 | GET | /v1/discover/stores/{slug}/items?q=&category=&cursor= | W1-06 | shop catalogue with stock + freshness (`confirmedAt`, D-101) |
 | GET | /v1/discover/stores/{slug}/reviews | W2-06 | |
-| GET | /v1/discover/search?q=&lat=&lng=&radius=&category=&openNow=&delivery=&pickup=&brand=&maxPricePaise=&hasOffer=&sort=&parse= | W1-06 | results grouped by store; filters first (in stock, `live`, in radius), then the D-42 score; `sort=relevance` (default) `|nearest|cheapest`; `hasOffer` is the C-05 chip; logs to `search_log`. D-101 adds: `summary {storesChecked, storesWithIt, minPricePaise}` (absent when `storesWithIt` is 0); per result `confirmedAt` (from `stock_updated_at`, null when stale), `badge` (`lowest_price|closest`, at most one, on the first page only) and `deliveryFeePaise`; `parse=true` (default) runs the refine-chip parser on `q` and returns `chips [{kind: maxPrice|openNow|pickup|delivery|nearest|brand, value, text}]` (applied as filters) and `query` (the rest of the text); removing a chip re-runs with the remaining chips as parameters and `parse=false`. When the parser finds no chip and the request carries a customer access token, the AI-C2 fallback may add chips (01 §11.1) |
+| GET | /v1/discover/search?q=&lat=&lng=&radius=&category=&openNow=&delivery=&pickup=&brand=&maxPricePaise=&hasOffer=&sort=&parse= | W1-06 | results grouped by store; filters first (in stock, `live`, in radius), then the D-42 score; `sort=relevance` (default) `|nearest|cheapest`; `hasOffer` is the C-05 chip; logs to `search_log`. D-101 adds: `summary {storesChecked, storesWithIt, minPricePaise}` (absent when `storesWithIt` is 0); per result `confirmedAt` (from `stock_updated_at`, null when stale), `badge` (`lowest_price|closest`, at most one, on the first page only) and `deliveryFeePaise`; `parse=true` (default) runs the refine-chip parser on `q` and returns `chips [{kind: maxPrice|openNow|pickup|delivery|offers|nearest|brand, value, text}]` (applied as filters; `offers` sets `hasOffer`) and `query` (the rest of the text); removing a chip re-runs with the remaining chips as parameters and `parse=false`. `refineHint: true` when the synonym table had no match or the parser found no chip in a query of at least `refine_ai_min_words` words; the app may then call `POST /v1/me/ai/search-assist` (§2.8) after the results render. Search itself never calls a model (01 §11.1) |
 | GET | /v1/discover/search/suggest?q= | W1-06 | product/brand/category suggestions |
 | GET | /v1/discover/offers?lat=&lng=&radius= | W2-07 | Offers near you: banners + top offers with fair rotation |
 
@@ -181,8 +184,8 @@ How it works (W0-03, `platform/idempotency`):
 
 | Method | Path | Pkg | Notes |
 |---|---|---|---|
-| POST | /v1/me/checkout/quote | W2-02 | `{storeId, items, fulfilment, addressId?, creditsToUse, askReplyId?}` (`askReplyId`, D-101: within its `priceValidUntil`, the line of that store item is priced at the lower of the replied price and the normal price for up to the asked quantity, through the `asks.Pricer` interface W3-16 registers; ignored after it, and when the reply is not this customer's, not a Yes, or for another store) → per-line availability, offers applied, `itemsAfterOffersPaise` (eligible amount, D-02), delivery fee, credits allowed with a reason when 0 (under ₹100, a cap reached: D-30), total. No side effects. Order of operations (D-94): item-level offers, then the minimum-bill offer, then the delivery fee, then credits. The delivery minimum, the free-delivery threshold and the minimum-bill offer are compared inclusively (`>=`) with the item subtotal after item-level offers, before the minimum-bill discount and before credits. |
-| POST | /v1/me/orders | W2-02 | idempotent; takes the quote's optional `askReplyId` and stores it as `ask_reply_id` (D-101); re-prices, rechecks stock, holds credits, sets `accept_by`, enqueues expiry job, notifies store; `409 store_closed` outside hours or when closed manually; `409 store_not_bookable` when pickup and delivery are both off (D-41), and also when `feature_delivery_enabled` is off and the store has no pickup; `409 delivery_closed` for delivery outside delivery hours |
+| POST | /v1/me/checkout/quote | W2-02 | `{storeId, items, fulfilment, addressId?, creditsToUse, askReplyId?}` (`askReplyId`, D-101: within its `priceValidUntil`, the line of that store item is priced at the replied price per unit with no item-level offer, `priceSource: ask_reply`, and the response carries `validUntil`; a Yes without a price gives the catalogue price, `priceSource: catalogue`. The line's quantity is at most the asked quantity (`422 validation_failed` on `items[i].quantity`). Through the `asks.Pricer` interface W3-16 registers. After `priceValidUntil` the line is at the catalogue price with no `validUntil`; `askReplyId` is ignored when the reply is not this customer's, not a Yes, or for another store; `409 store_not_bookable` for a reply from an in-store-only store; `409 ask_reply_used` when the reply already has an active order). Every line carries `priceSource` → per-line availability, offers applied, `itemsAfterOffersPaise` (eligible amount, D-02), delivery fee, credits allowed with a reason when 0 (under ₹100, a cap reached: D-30), total. No side effects. Order of operations (D-94): item-level offers, then the minimum-bill offer, then the delivery fee, then credits. The delivery minimum, the free-delivery threshold and the minimum-bill offer are compared inclusively (`>=`) with the item subtotal after item-level offers, before the minimum-bill discount and before credits. |
+| POST | /v1/me/orders | W2-02 | idempotent; takes the quote's optional `askReplyId` and stores it as `ask_reply_id`, with `price_source` on the line (D-101); checks the replied price's validity at placement: `409 ask_price_expired` with the fresh quote in `extensions` when it ended after the quote, never a silent re-price; `409 ask_reply_used` when the reply already has an active order (the unique index decides a race: exactly one of two concurrent orders succeeds); re-prices, rechecks stock, holds credits, sets `accept_by`, enqueues expiry job, notifies store; `409 store_closed` outside hours or when closed manually; `409 store_not_bookable` when pickup and delivery are both off (D-41), and also when `feature_delivery_enabled` is off and the store has no pickup; `409 delivery_closed` for delivery outside delivery hours |
 | GET | /v1/me/orders | W2-02 | own online orders |
 | GET | /v1/me/orders/{orderId} | W2-02 | detail with timeline; includes `code`, decrypted from `code_enc` for the owner only, only while valid (D-04) |
 | POST | /v1/me/orders/{orderId}/cancel | W2-02 | `{reason: CustomerCancelReason}` |
@@ -202,7 +205,7 @@ How it works (W0-03, `platform/idempotency`):
 | GET/POST | /v1/me/support/tickets | W2-09 | list / create (linked to an order) (D-52) |
 | GET | /v1/me/support/tickets/{ticketId} | W2-09 | |
 | GET/POST | /v1/me/support/tickets/{ticketId}/messages | W2-09 | |
-| GET | /v1/me/asks?status= | W3-16 | own asks, newest first (`asks.yaml`, D-101) |
+| GET | /v1/me/asks?status=&cursor=&limit= | W3-16 | own asks, newest first, paginated (§1; `asks.yaml`, D-101) |
 | POST | /v1/me/asks | W3-16 | idempotent; `{productId?, query?, quantity, needBy?, lat, lng, storeSlug?}` (exactly one of `productId`, `query`; `storeSlug` for "Ask this shop") → the ask with its recipients count. `429 ask_limit_reached`, `409 ask_already_open`, `409 ask_no_shops`, `409 ask_store_unavailable`. The point is used to pick stores and is not stored (03) |
 | GET | /v1/me/asks/{askId} | W3-16 | progress `{asked, replied, bestPricePaise}` and the Yes replies `[{askReplyId, storeSlug, storeName, distanceM, pricePaise?, readyBy?, repliedAt, priceValidUntil, storeItemId?}]`; No replies are counted only |
 | POST | /v1/me/asks/{askId}/close | W3-16 | the customer closes an open ask; `409 invalid_transition` when already closed |
@@ -214,8 +217,8 @@ How it works (W0-03, `platform/idempotency`):
 | POST | /v1/public/leads | W1-04 | site lead form (Turnstile) (D-46) |
 | GET | /v1/public/receipts/{token} | W2-04 | 128-bit token, expires after 30 days; items, totals, store; no customer data. Screen C-24, route `/r/{token}` (D-45) |
 | GET | /v1/public/ref/{code} | W2-03 | referral click → 302 to the app with the attribution cookie |
-| POST | /v1/public/share-cards | W3-16 | `{storeItemId}` → `{code, url, text, imageUrl}`; get-or-create, one card per store item; renders the preview image when missing or when the price changed; rate-limited per IP (D-101) |
-| GET | /v1/public/share-cards/{code} | W3-16 | `{storeItemId, itemName, storeName, locality, pricePaise, imageUrl}` for the link preview; never a distance (D-101) |
+| POST | /v1/public/share-cards | W3-16 | `{storeItemId}` → `{code, url, text, imageUrl}`; get-or-create, one card per store item; renders the preview image when missing or when the price changed; only for a `live` store of a `verified` business (D-40), else `410 share_card_unavailable`; at most `share_card_create_per_hour` new cards per IP or `anon_id` (`429`; returning an existing card does not count) (`share.yaml`, D-101) |
+| GET | /v1/public/share-cards/{code} | W3-16 | `{storeItemId, itemName, storeName, locality, pricePaise, imageUrl}` for the link preview; never a distance; `410 share_card_unavailable` once the store is not `live` or its business not `verified` (`share.yaml`, D-101) |
 | GET | /v1/public/site-marquee?city= | W3-16 | `city` is a `places` city slug; the latest approved list `{items:[{productName}]}`, or `{fallback:true}` when the city has none; cached 1 h (D-101) |
 
 ### 2.6 Business (`{B}` = `/v1/biz/businesses/{bid}`, `{S}` = `{B}/stores/{sid}`)
@@ -330,9 +333,9 @@ Priced above nearby is returned only while `insight_price_compare_enabled` is tr
 
 | Method | Path | Role | Pkg | Notes |
 |---|---|---|---|---|
-| GET | {S}/asks?status= | cashier | W3-16 | `asks.view`; the Asks inbox (B-20): open asks first, by `replyBy`. Each: `{askId, itemName, productId?, storeItemId?, quantity, needBy?, distanceBand, replyBy, available?, listedPricePaise?, mrpPaise?}`; never a name, phone, address or exact distance |
-| POST | {S}/asks/{askId}/reply | cashier | W3-16 | idempotent; `asks.reply`; `{answer: yes|no, pricePaise?, readyBy?}`. A price other than the listed price needs `item.price.edit` (`403` otherwise); on an unlisted item only `item.price.edit` may send a price. `422 price_above_mrp`, `409 ask_closed`, `409 invalid_transition` (already answered). A Yes on a listed item moves `stock_updated_at` with no movement |
-| POST | {S}/asks/{askId}/report | cashier | W3-16 | `asks.reply`; `{reason}`; raises a `risk_flags` row (rule `ask_reported`) for the customer and stops asks from that customer to this store; `409 ask_closed` after the window |
+| GET | {S}/asks?status=&cursor=&limit= | cashier | W3-16 | `asks.view`; the Asks inbox (B-20), paginated (§1): open asks first, by `replyBy`. Each: `{askId, itemName, productId?, storeItemId?, quantity, needBy?, distanceBand, replyBy, available?, listedPricePaise?, mrpPaise?}`; never a name, phone, address or exact distance |
+| POST | {S}/asks/{askId}/reply | cashier | W3-16 | idempotent; `asks.reply`; `{answer: yes|no, pricePaise?, readyBy?}`. `readyBy` is today (IST), or up to the end of tomorrow when the ask's `needBy` is `tomorrow`; later is `422 validation_failed`. A price other than the listed price needs `item.price.edit` (`403` otherwise); on an unlisted item only `item.price.edit` may send a price. `422 price_above_mrp`, `409 ask_closed`, `409 invalid_transition` (already answered). A Yes on a listed item moves `stock_updated_at` with no movement |
+| POST | {S}/asks/{askId}/report | cashier | W3-16 | `asks.reply`; `{reason}`; raises a `risk_flags` row (rule `ask_reported`) for the customer and stops asks from that customer to this store; allowed while the ask is kept (`ask_retention_days`), open or closed; `409 invalid_transition` when this store already reported it |
 
 **Credits, statements, referrals, standees (`business-credits.yaml`, `referrals.yaml`, `standee.yaml`)**
 
@@ -479,14 +482,20 @@ Nothing changes stock, money, orders, reviews or KYC except through confirm, and
 | `review_reply` (AI-R6) | {S}/ai/review-reply | manager | manager | posts the edited reply | W3-11 |
 | `banner_copy` (AI-R9) | {S}/ai/banner-copy | manager | manager | returns the chosen, edited copy for `POST {S}/banners`; publishes nothing | W3-11 |
 | `list_search` (AI-C1) | /v1/me/ai/list-search | cus | cus | returns shops ranked by list coverage, price, distance; read-only (cart filled on the client) | W3-12 |
-| `voice_search` (AI-C5, D-101) | /v1/me/ai/voice-search | cus | cus | create takes the audio (at most 15 s) and returns the transcript and its refine chips; the audio is never stored (`input_ref` null). Confirm takes the query as the customer edited it and returns `/v1/discover/search` results, logged as a typed query; read-only. Hidden (`404`) unless `ai_voicesearch_enabled` is on and the speech key is set | W3-12 |
 | `catalogue_cleanup` (AI-A1) | /v1/admin/ai/catalogue-cleanup | catalogue, admin | catalogue, admin | applies normalised fields / merge to a pending product | W3-13 |
 | `ticket_triage` (AI-A2) | /v1/admin/ai/ticket-triage | support, admin | support, admin | sets category/priority/linked order; sends the edited reply | W3-13 |
 | `risk_summary` (AI-A3) | /v1/admin/ai/risk-summary | support, admin | support, admin | attaches the summary to the flag | W3-13 |
 
 The three admin features (W3-13) keep the paths above. Their UI lives in `admin/src/ai-assist/{catalogue,support,risk}`, mounted through `<AssistSlot/>` on A-08, A-14 and A-13; the shared AI code (`internal/ai/{client,schema,scrub,guard,eval,prompts,drafts}`) is W3-10's (D-82).
 
-Insight text (AI-R4) and coach cards (AI-R5) come back inside `{S}/insights` and `{S}/coach/cards`; the banner image check (AI-R10) runs inside banner upload; the AI-C2 query normalisation and refine-chip fallback run inside `GET /v1/discover/search` (D-101). None has its own endpoint.
+Insight text (AI-R4) and coach cards (AI-R5) come back inside `{S}/insights` and `{S}/coach/cards`; the banner image check (AI-R10) runs inside banner upload. None has its own endpoint.
+
+**Customer search AI without a draft (D-101).** Voice search (AI-C5) and search assist (AI-C2) return a suggestion the customer acts on by tapping, so they have one endpoint each, not the three draft endpoints: no `ai_drafts` row, no audio, transcript or query stored, nothing in logs or traces. The W3-10 cost guard counts each call against `ai_daily_calls_customer` (`429 ai_daily_cap_reached`). Both are hidden (`404`) while their flag is off or the provider key is missing (11 §1 rule 11).
+
+| Method | Path | Role | Pkg | Notes |
+|---|---|---|---|---|
+| POST | /v1/me/ai/voice-search | cus | W3-12 | multipart audio (at most 15 s) → `200 {transcript, chips}`; the transcript goes back to the app only. The search then runs as a normal `GET /v1/discover/search` with `source=voice`, logged as a typed query. Flag `ai_voicesearch_enabled`, key `SARVAM_API_KEY` |
+| POST | /v1/me/ai/search-assist | cus | W3-12 | `{q}` → `200 {query?, chips}`, called by the app only after the results render and only when search returned `refineHint`. Model timeout 3 s (01 §17 fixed constants); on a timeout, provider error or output that fails validation → `204` and the app shows nothing. Flag `ai_querynorm_enabled` |
 
 ### 2.9 Telemetry, test, health
 
@@ -526,7 +535,7 @@ None. (The shop cancel reason list was settled by D-68: `ShopCancelReason`, 1.5.
 
 ### 2.11 Count
 
-308 method + path pairs in `/v1`, plus 3 health endpoints outside it. By namespace: admin 126 (9 AI; +1 for `GET /v1/admin/field/me/stats`, D-64; +8 jobs and +1 system, D-95, D-97; +3 demand gaps and site strip, D-101), biz 103 (15 AI; +3 asks, D-101; +1 for `POST {S}/insights/dismiss`, D-99; `GET/POST {S}/batches` became `GET {S}/batches` and `PATCH {S}/batches/{batchId}`, D-99, so the count is unchanged), me 47 (6 AI; +4 asks, D-101), discover 11 (D-101 adds parameters and fields to search, no pair), auth 8, public 6 (+3 share cards and site strip, D-101), telemetry 3, test 4. Store mute (D-101) is a field on `PATCH {S}/settings`, not a pair. Re-checked after the D-61…D-84 follow-ups (2026-10-22): no pair appears twice, no literal segment sits beside a parameter, and `/v1/discover/stores/` has only `{slug}` beneath it. The path lint (1.2) repeats the check on the bundled spec on every `make gen`.
+307 method + path pairs in `/v1`, plus 3 health endpoints outside it. By namespace: admin 126 (9 AI; +1 for `GET /v1/admin/field/me/stats`, D-64; +8 jobs and +1 system, D-95, D-97; +3 demand gaps and site strip, D-101), biz 103 (15 AI; +3 asks, D-101; +1 for `POST {S}/insights/dismiss`, D-99; `GET/POST {S}/batches` became `GET {S}/batches` and `PATCH {S}/batches/{batchId}`, D-99, so the count is unchanged), me 46 (5 AI: list search 3, voice search 1 and search assist 1, D-101; +4 asks, D-101), discover 11 (D-101 adds parameters and fields to search, no pair), auth 8, public 6 (+3 share cards and site strip, D-101), telemetry 3, test 4. Store mute (D-101) is a field on `PATCH {S}/settings`, not a pair. Re-checked after the D-61…D-84 follow-ups (2026-10-22): no pair appears twice, no literal segment sits beside a parameter, and `/v1/discover/stores/` has only `{slug}` beneath it. The path lint (1.2) repeats the check on the bundled spec on every `make gen`.
 
 ## 3. Contract tests
 
