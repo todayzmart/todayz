@@ -1,10 +1,344 @@
 # Schemas: domain "admin-jobs" (owner W1-11): jobs platform, A-21: kinds, runs, pause, resume,
 # run-now and retry (04 §2.7, D-95).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Names are unique across every schemas/<domain>.yaml. Request objects carry
+# `additionalProperties: false`; ids are `Ulid`, times are `Timestamp`, and every
+# response carries `serverNow`.
+JobKindName:
+  type: string
+  description: A registered job kind (snake_case, the `kind` label of the tz_job_* metrics).
+  pattern: ^[a-z][a-z0-9]*(_[a-z0-9]+)*$
+  maxLength: 63
+  examples:
+    - rollup_daily
+JobClass:
+  type: string
+  description: "D-95 class. `timer` kinds are never paused, run or retried by hand; `money` kinds need super_admin with step-up."
+  enum: [timer, money, notify, marketing, ai, rollup, maintenance]
+JobTrigger:
+  type: string
+  enum: [schedule, event, manual, retry, backfill, continuation]
+JobRunStatus:
+  type: string
+  enum: [running, succeeded, failed, cancelled, skipped, discarded, missed, yielded]
+JobHealth:
+  type: string
+  description: |
+    The list's badge. `paused` when the kind is paused; `missed` when its latest `missed` row is newer
+    than its latest success; `failing` when its latest finished run failed or was discarded; else `ok`.
+  enum: [ok, failing, missed, paused]
+JobSummaryCounts:
+  type: object
+  description: The handler's `jobs.Result.Summary` counts (name → integer).
+  additionalProperties:
+    type: integer
+  examples:
+    - rows: 1240
+      stores: 38
+JobControl:
+  type: object
+  description: Pause state from `job_controls`. A kind never paused has `paused` false and no reason.
+  required: [paused]
+  properties:
+    paused:
+      type: boolean
+    reason:
+      type: [string, "null"]
+    updatedBy:
+      description: The admin who last paused or resumed it.
+      oneOf:
+        - $ref: ./common.yaml#/Ulid
+        - type: "null"
+    updatedAt:
+      oneOf:
+        - $ref: ./common.yaml#/Timestamp
+        - type: "null"
+JobRunBrief:
+  type: object
+  required: [id, status, trigger, createdAt]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    status:
+      $ref: "#/JobRunStatus"
+    trigger:
+      $ref: "#/JobTrigger"
+    periodKey:
+      type: [string, "null"]
+    createdAt:
+      $ref: ./common.yaml#/Timestamp
+    finishedAt:
+      oneOf:
+        - $ref: ./common.yaml#/Timestamp
+        - type: "null"
+JobKindSummary:
+  type: object
+  required: [kind, class, owner, description, scheduled, health, control, runnable, pausable]
+  properties:
+    kind:
+      $ref: "#/JobKindName"
+    class:
+      $ref: "#/JobClass"
+    owner:
+      type: string
+      description: The work package that owns the kind (e.g. W3-07).
+    description:
+      type: string
+    scheduled:
+      type: boolean
+      description: True for a cron kind, false for an event-triggered one.
+    schedule:
+      type: [string, "null"]
+      description: The 5-field cron expression, read in IST.
+    scheduleText:
+      type: [string, "null"]
+      description: The schedule as readable English in IST, e.g. "Every day at 00:30 IST".
+    nextRunAt:
+      description: The next tick; null for event kinds and paused kinds.
+      oneOf:
+        - $ref: ./common.yaml#/Timestamp
+        - type: "null"
+    lastRun:
+      oneOf:
+        - $ref: "#/JobRunBrief"
+        - type: "null"
+    successRate7dBp:
+      type: [integer, "null"]
+      description: "succeeded / (succeeded + failed + cancelled + discarded) over 7 days, in basis points (10000 = 100%); null with no finished runs."
+      minimum: 0
+      maximum: 10000
+    avgDurationMs7d:
+      type: [integer, "null"]
+      minimum: 0
+    maxDurationMs7d:
+      type: [integer, "null"]
+      minimum: 0
+    runs7d:
+      type: integer
+      minimum: 0
+      description: Runs counted in job_stats_hourly over 7 days (every status but missed and running).
+    health:
+      $ref: "#/JobHealth"
+    control:
+      $ref: "#/JobControl"
+    runnable:
+      type: boolean
+      description: Run now is possible for this kind (a scheduled, non-timer kind). Who may press it is the caller's role.
+    pausable:
+      type: boolean
+      description: Pause and resume are possible for this kind (any non-timer kind).
+JobKindList:
+  type: object
+  required: [items, serverNow]
+  properties:
+    items:
+      type: array
+      items:
+        $ref: "#/JobKindSummary"
+    serverNow:
+      $ref: ./common.yaml#/ServerNow
+JobKindSettings:
+  type: object
+  required: [timeoutSeconds, maxAttempts, queue, concurrency, batched, uniqueBy]
+  properties:
+    timeoutSeconds:
+      type: integer
+      minimum: 1
+    maxAttempts:
+      type: integer
+      minimum: 1
+    queue:
+      type: string
+    concurrency:
+      type: integer
+      minimum: 0
+      description: Runs of this kind at once across all workers; 0 is no cap.
+    batched:
+      type: boolean
+    uniqueBy:
+      type: string
+      enum: [none, tick, hour, day, month]
+      description: The IST period a scheduled run is unique by; run-now's `periodKey` uses its format.
+    runbook:
+      type: [string, "null"]
+      description: Repository path of the kind's runbook.
+JobKindDetail:
+  type: object
+  required: [job, settings, serverNow]
+  properties:
+    job:
+      $ref: "#/JobKindSummary"
+    settings:
+      $ref: "#/JobKindSettings"
+    serverNow:
+      $ref: ./common.yaml#/ServerNow
+JobRunAttempt:
+  type: object
+  required: [id, attempt, status]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    attempt:
+      type: integer
+      minimum: 0
+    status:
+      $ref: "#/JobRunStatus"
+    startedAt:
+      oneOf:
+        - $ref: ./common.yaml#/Timestamp
+        - type: "null"
+    finishedAt:
+      oneOf:
+        - $ref: ./common.yaml#/Timestamp
+        - type: "null"
+    error:
+      type: [string, "null"]
+JobRun:
+  type: object
+  required: [id, kind, class, trigger, attempt, status, createdAt]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    kind:
+      $ref: "#/JobKindName"
+    class:
+      $ref: "#/JobClass"
+    trigger:
+      $ref: "#/JobTrigger"
+    periodKey:
+      type: [string, "null"]
+    attempt:
+      type: integer
+      minimum: 0
+      description: River's attempt number; 0 for a `missed` row the watchdog wrote.
+    status:
+      $ref: "#/JobRunStatus"
+    scheduledAt:
+      oneOf:
+        - $ref: ./common.yaml#/Timestamp
+        - type: "null"
+    startedAt:
+      oneOf:
+        - $ref: ./common.yaml#/Timestamp
+        - type: "null"
+    finishedAt:
+      oneOf:
+        - $ref: ./common.yaml#/Timestamp
+        - type: "null"
+    durationMs:
+      type: [integer, "null"]
+      minimum: 0
+    latenessMs:
+      type: [integer, "null"]
+    summary:
+      oneOf:
+        - $ref: "#/JobSummaryCounts"
+        - type: "null"
+    traceId:
+      type: [string, "null"]
+    triggeredBy:
+      description: The admin who asked for a manual, retry or backfill run.
+      oneOf:
+        - $ref: ./common.yaml#/Ulid
+        - type: "null"
+    createdAt:
+      $ref: ./common.yaml#/Timestamp
+JobRunPage:
+  type: object
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      items:
+        $ref: "#/JobRun"
+    nextCursor:
+      $ref: ./common.yaml#/NextCursor
+    serverNow:
+      $ref: ./common.yaml#/ServerNow
+JobRunDetail:
+  type: object
+  required: [run, attempts, explore, serverNow]
+  properties:
+    run:
+      $ref: "#/JobRun"
+    note:
+      type: [string, "null"]
+      description: The handler's note (at most 500 characters).
+    error:
+      type: [string, "null"]
+      description: The scrubbed error (phones, tokens, emails and secrets redacted; at most 2 kB).
+    attempts:
+      type: array
+      description: Every attempt of the same River job, oldest first (the timeline).
+      items:
+        $ref: "#/JobRunAttempt"
+    explore:
+      type: object
+      description: What to open in Grafana Explore. The admin app joins these to its Grafana URL.
+      required: [logsQuery]
+      properties:
+        logsQuery:
+          type: string
+          description: A LogQL query for this run's log lines (Loki, by run_id).
+        traceId:
+          type: [string, "null"]
+          description: The run's trace (Tempo).
+    serverNow:
+      $ref: ./common.yaml#/ServerNow
+JobReasonRequest:
+  type: object
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason:
+      type: string
+      minLength: 3
+      maxLength: 500
+      description: Why; stored in the audit row (and on the kind for pause and resume).
+JobRunNowRequest:
+  type: object
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason:
+      type: string
+      minLength: 3
+      maxLength: 500
+    periodKey:
+      type: string
+      maxLength: 16
+      pattern: ^[0-9]{4}-[0-9]{2}(-[0-9]{2}(T[0-9]{2}(:[0-9]{2})?)?)?$
+      description: |
+        The IST period to run, in the kind's `uniqueBy` format (day `2026-10-22`, hour `2026-10-22T09`,
+        month `2026-10`, tick `2026-10-22T09:05`). Omitted: the period of the latest tick. A future
+        period is refused.
+JobRunAccepted:
+  type: object
+  required: [runId, kind, trigger, periodKey, serverNow]
+  properties:
+    runId:
+      $ref: ./common.yaml#/Ulid
+      description: The id the run's job_runs row will have once a worker starts it.
+    kind:
+      $ref: "#/JobKindName"
+    trigger:
+      $ref: "#/JobTrigger"
+    periodKey:
+      type: string
+    retryOf:
+      description: For a retry, the run it retries.
+      oneOf:
+        - $ref: ./common.yaml#/Ulid
+        - type: "null"
+    serverNow:
+      $ref: ./common.yaml#/ServerNow
+JobControlState:
+  type: object
+  required: [kind, control, serverNow]
+  properties:
+    kind:
+      $ref: "#/JobKindName"
+    control:
+      $ref: "#/JobControl"
+    serverNow:
+      $ref: ./common.yaml#/ServerNow

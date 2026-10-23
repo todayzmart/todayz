@@ -1,0 +1,18 @@
+# Problem codes: domain "admin-jobs" (owner W1-11; 04 §1.4 and §2.7, D-95).
+#
+# Same shape as common.yaml. step_up_required (403) is W1-01's code in auth.yaml;
+# the admin-jobs handlers return it through the admin auth seam, never by name.
+domain: admin-jobs
+problems:
+  - code: job_not_runnable
+    status: 409
+    i18n: problems.job_not_runnable
+    title: This job cannot be run, paused or retried by hand
+  - code: job_already_running
+    status: 409
+    i18n: problems.job_already_running
+    title: This job is already running or queued
+  - code: job_paused
+    status: 409
+    i18n: problems.job_paused
+    title: This job is paused; resume it first

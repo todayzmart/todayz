@@ -1,14 +1,416 @@
 # Paths: domain "admin-jobs" (owner W1-11): jobs platform, A-21: kinds, runs, pause, resume,
 # run-now and retry (04 §2.7, D-95).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-jobs]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-jobs.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`
-# (job_not_runnable, job_already_running, job_paused go in problems/admin-jobs.yaml).
-{}
+# Roles (04 §1.3, D-64, D-95): reads are support, analyst, admin and super_admin, and finance for
+# `money` kinds only. Pause, resume, run-now and retry are admin or super_admin with a reason;
+# on a `money` kind super_admin with step-up (403 `step_up_required`, W1-01's code). `timer`
+# kinds are never paused, run or retried by hand. Every action writes an audit row.
+"/v1/admin/jobs":
+  get:
+    operationId: listAdminJobs
+    tags: [admin-jobs]
+    summary: Every registered job kind with its health
+    description: |
+      One row per kind: class, owner, schedule in IST, next and last run, 7-day success rate, average
+      and maximum duration, pause state. finance sees `money` kinds only. Roles: support, analyst,
+      finance (money kinds), admin, super_admin.
+    parameters:
+      - name: class
+        in: query
+        schema:
+          $ref: ../schemas/admin-jobs.yaml#/JobClass
+      - name: status
+        in: query
+        description: Filter by the list badge.
+        schema:
+          $ref: ../schemas/admin-jobs.yaml#/JobHealth
+    responses:
+      "200":
+        description: The kinds, sorted by name
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-jobs.yaml#/JobKindList
+            example:
+              items:
+                - kind: rollup_daily
+                  class: rollup
+                  owner: W3-07
+                  description: Daily store rollups.
+                  scheduled: true
+                  schedule: "30 0 * * *"
+                  scheduleText: Every day at 00:30 IST
+                  nextRunAt: "2026-10-23T19:00:00Z"
+                  lastRun:
+                    id: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+                    status: succeeded
+                    trigger: schedule
+                    periodKey: "2026-10-23"
+                    createdAt: "2026-10-22T19:00:01Z"
+                    finishedAt: "2026-10-22T19:00:09Z"
+                  successRate7dBp: 10000
+                  avgDurationMs7d: 8120
+                  maxDurationMs7d: 9400
+                  runs7d: 7
+                  health: ok
+                  control:
+                    paused: false
+                    reason: null
+                    updatedBy: null
+                    updatedAt: null
+                  runnable: true
+                  pausable: true
+              serverNow: "2026-10-23T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+"/v1/admin/jobs/{kind}":
+  parameters:
+    - name: kind
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/admin-jobs.yaml#/JobKindName
+  get:
+    operationId: getAdminJob
+    tags: [admin-jobs]
+    summary: One job kind with its settings and pause state
+    description: Roles as the list; finance gets 403 for a kind that is not `money`.
+    responses:
+      "200":
+        description: The kind
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-jobs.yaml#/JobKindDetail
+            example:
+              job:
+                kind: rollup_daily
+                class: rollup
+                owner: W3-07
+                description: Daily store rollups.
+                scheduled: true
+                schedule: "30 0 * * *"
+                scheduleText: Every day at 00:30 IST
+                nextRunAt: "2026-10-23T19:00:00Z"
+                lastRun: null
+                successRate7dBp: null
+                avgDurationMs7d: null
+                maxDurationMs7d: null
+                runs7d: 0
+                health: paused
+                control:
+                  paused: true
+                  reason: Backfilling stores
+                  updatedBy: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+                  updatedAt: "2026-10-23T08:00:00Z"
+                runnable: true
+                pausable: true
+              settings:
+                timeoutSeconds: 60
+                maxAttempts: 3
+                queue: default
+                concurrency: 0
+                batched: false
+                uniqueBy: day
+                runbook: null
+              serverNow: "2026-10-23T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+"/v1/admin/jobs/{kind}/runs":
+  parameters:
+    - name: kind
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/admin-jobs.yaml#/JobKindName
+  get:
+    operationId: listAdminJobRuns
+    tags: [admin-jobs]
+    summary: Run history of a kind, newest first
+    description: |
+      Logged runs (scheduled, manual, retry, backfill, continuation, and event-kind failures);
+      event-kind successes are only counted (D-95). `from` and `to` bound `createdAt`
+      (`from` inclusive, `to` exclusive). Roles as the list.
+    parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: ../schemas/admin-jobs.yaml#/JobRunStatus
+      - name: trigger
+        in: query
+        schema:
+          $ref: ../schemas/admin-jobs.yaml#/JobTrigger
+      - name: from
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Timestamp
+      - name: to
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Timestamp
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: A page of runs
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-jobs.yaml#/JobRunPage
+            example:
+              items:
+                - id: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+                  kind: rollup_daily
+                  class: rollup
+                  trigger: schedule
+                  periodKey: "2026-10-23"
+                  attempt: 1
+                  status: succeeded
+                  scheduledAt: "2026-10-22T19:00:00Z"
+                  startedAt: "2026-10-22T19:00:01Z"
+                  finishedAt: "2026-10-22T19:00:09Z"
+                  durationMs: 8120
+                  latenessMs: 1000
+                  summary:
+                    stores: 38
+                  traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+                  triggeredBy: null
+                  createdAt: "2026-10-22T19:00:01Z"
+              nextCursor: null
+              serverNow: "2026-10-23T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+"/v1/admin/jobs/{kind}/run":
+  parameters:
+    - name: kind
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/admin-jobs.yaml#/JobKindName
+  post:
+    operationId: runAdminJob
+    tags: [admin-jobs]
+    summary: Run a scheduled kind now
+    description: |
+      Enqueues a `manual` run for `periodKey` (default: the latest tick's period). Scheduled, non-timer
+      kinds only (`409 job_not_runnable` otherwise); `409 job_paused` on a paused kind;
+      `409 job_already_running` while a run of the kind is running or queued. admin or super_admin;
+      a `money` kind needs super_admin with step-up. Audited (`jobs.run`).
+    x-idempotency: required
+    x-problems: [job_not_runnable, job_already_running, job_paused]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-jobs.yaml#/JobRunNowRequest
+          example:
+            reason: Re-running after the stores import was fixed
+            periodKey: "2026-10-23"
+    responses:
+      "202":
+        description: The run is queued
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-jobs.yaml#/JobRunAccepted
+            example:
+              runId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+              kind: rollup_daily
+              trigger: manual
+              periodKey: "2026-10-23"
+              retryOf: null
+              serverNow: "2026-10-23T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+"/v1/admin/jobs/{kind}/pause":
+  parameters:
+    - name: kind
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/admin-jobs.yaml#/JobKindName
+  post:
+    operationId: pauseAdminJob
+    tags: [admin-jobs]
+    summary: Pause a kind
+    description: |
+      Its ticks are no longer enqueued and its event jobs snooze until it is resumed. Not for `timer`
+      kinds (`409 job_not_runnable`); a paused kind is `409 invalid_transition`. Roles as run-now.
+      Audited (`jobs.pause`).
+    x-idempotency: optional
+    x-problems: [job_not_runnable]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-jobs.yaml#/JobReasonRequest
+          example:
+            reason: Provider outage; holding sends
+    responses:
+      "200":
+        description: Paused
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-jobs.yaml#/JobControlState
+            example:
+              kind: notify_digest
+              control:
+                paused: true
+                reason: Provider outage; holding sends
+                updatedBy: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+                updatedAt: "2026-10-23T09:30:00Z"
+              serverNow: "2026-10-23T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+"/v1/admin/jobs/{kind}/resume":
+  parameters:
+    - name: kind
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/admin-jobs.yaml#/JobKindName
+  post:
+    operationId: resumeAdminJob
+    tags: [admin-jobs]
+    summary: Resume a paused kind
+    description: |
+      The next tick runs as usual. Same limits as pause; a kind that is not paused is
+      `409 invalid_transition`. Audited (`jobs.resume`).
+    x-idempotency: optional
+    x-problems: [job_not_runnable]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-jobs.yaml#/JobReasonRequest
+          example:
+            reason: Provider is back
+    responses:
+      "200":
+        description: Resumed
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-jobs.yaml#/JobControlState
+            example:
+              kind: notify_digest
+              control:
+                paused: false
+                reason: Provider is back
+                updatedBy: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+                updatedAt: "2026-10-23T10:30:00Z"
+              serverNow: "2026-10-23T10:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+"/v1/admin/job-runs/{runId}":
+  parameters:
+    - name: runId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getAdminJobRun
+    tags: [admin-jobs]
+    summary: One run with its note, scrubbed error and attempts
+    description: The path is `job-runs`, not `jobs/runs` (04 §1.2). Roles as the list.
+    responses:
+      "200":
+        description: The run
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-jobs.yaml#/JobRunDetail
+            example:
+              run:
+                id: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+                kind: rollup_daily
+                class: rollup
+                trigger: schedule
+                periodKey: "2026-10-23"
+                attempt: 2
+                status: failed
+                scheduledAt: "2026-10-22T19:00:00Z"
+                startedAt: "2026-10-22T19:00:31Z"
+                finishedAt: "2026-10-22T19:00:32Z"
+                durationMs: 950
+                latenessMs: null
+                summary: null
+                traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+                triggeredBy: null
+                createdAt: "2026-10-22T19:00:31Z"
+              note: null
+              error: "connect to +91 [phone] failed: timeout"
+              attempts:
+                - id: 01JB0S1W6W8ZV7T1C3A6M9N4PR
+                  attempt: 1
+                  status: failed
+                  startedAt: "2026-10-22T19:00:01Z"
+                  finishedAt: "2026-10-22T19:00:02Z"
+                  error: timeout
+                - id: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+                  attempt: 2
+                  status: failed
+                  startedAt: "2026-10-22T19:00:31Z"
+                  finishedAt: "2026-10-22T19:00:32Z"
+                  error: timeout
+              explore:
+                logsQuery: '{service_name=~"todayz.*"} |= "01JB0S1W6W8ZV7T1C3A6M9N4PQ"'
+                traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+              serverNow: "2026-10-23T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+"/v1/admin/job-runs/{runId}/retry":
+  parameters:
+    - name: runId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: retryAdminJobRun
+    tags: [admin-jobs]
+    summary: Retry a failed, discarded or missed run
+    description: |
+      Enqueues a `retry` run of the same kind for the same `periodKey`. Any other status is
+      `409 invalid_transition`; a `timer` kind, or an event kind (its arguments are not kept), is
+      `409 job_not_runnable`; `409 job_paused` and `409 job_already_running` as run-now. Roles as
+      run-now. Audited (`jobs.retry`, naming the original run).
+    x-idempotency: optional
+    x-problems: [job_not_runnable, job_already_running, job_paused]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-jobs.yaml#/JobReasonRequest
+          example:
+            reason: Upstream fixed; retrying the 23rd
+    responses:
+      "202":
+        description: The retry is queued
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-jobs.yaml#/JobRunAccepted
+            example:
+              runId: 01JB0S1W6W8ZV7T1C3A6M9N4PR
+              kind: rollup_daily
+              trigger: retry
+              periodKey: "2026-10-23"
+              retryOf: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+              serverNow: "2026-10-23T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
