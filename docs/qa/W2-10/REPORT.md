@@ -30,7 +30,7 @@ Deferred: QR scan, dispatch, delivery, returns, B-02, B-13 (incl. /invite/$token
 | build:e2e, precache check, dist-check | pass |
 | size-limit business | JS 136.19 kB / 250 kB gzip; CSS 10.35 kB / 20 kB |
 | make check (full) | failed at check-backend: gofmt of backend/cmd/todayz/contract_test.go (from W2-02's contract commit 8b2b909, outside this WP) |
-| Stack journey e2e/orders.stack.spec.ts | written, not run |
+| Stack journey e2e/orders.stack.spec.ts | both tests pass on the seed, 2026-10-24 (see `docs/qa/stack-2026-10-24/REPORT.md`) |
 | Live API | not run; order routes not mounted yet; fake fetch and mocked routes |
 
 ## Files outside owned paths
@@ -84,4 +84,4 @@ Taken at 390×844 with synthetic data, before the rebase. The rebase changed no 
 **Follow-ups:**
 - **Router warning.** Shell links to `/$section` print "Generated path /orders … matched route /orders/" in tests, now that `/orders` (and `/search` in the customer app) are real routes. It is only a warning. The shell should link a built section to its own route.
 - **A New card can show "Not enough stock" and still offer Accept.** The server refuses an accept it cannot hold. Decide with W2-04 whether the button should be disabled with a hint.
-- **The stack journey** `e2e/orders.stack.spec.ts` is not run yet: the lead runs it with the customer journeys.
+- **The stack journey** `e2e/orders.stack.spec.ts` passed on the seed on 2026-10-24 (`docs/qa/stack-2026-10-24/REPORT.md`).

@@ -41,7 +41,7 @@ C-03 Home, C-05 Search, C-07 Shop page and C-08 Product detail in `customer/`. B
 | `build:e2e` | built; precache-check: all 40 chunks in the manifest; dist-check: no `sourceMappingURL` |
 | size-limit | initial JS 130.27 kB gzip (limit 170); CSS 9.68 kB (limit 20) |
 | `make check-frontend` | exit 0 |
-| Stack journey `customer/e2e/discover.stack.spec.ts` | written, not run (language and PIN 560001 → Home → search "atta" → Sri Lakshmi → Add to cart → View cart) |
+| Stack journey `customer/e2e/discover.stack.spec.ts` | pass on the seed, 2026-10-24 (see `docs/qa/stack-2026-10-24/REPORT.md`); the PIN is now 560038 (language and PIN → Home → search "atta" → Sri Lakshmi → Add to cart → View cart) |
 
 The screenshots were made with `vite preview` of the e2e build, with every `/v1/**` call answered by synthetic data, at 390×844:
 
@@ -90,4 +90,4 @@ The screenshots were made with `vite preview` of the e2e build, with every `/v1/
 
 **Follow-ups:**
 - 06-screens C-05: when there are results but **none confirmed within `stock_stale_after_hours`**, show the zero-results treatment (nearest shop categories, the demand line and Ask shops nearby). Today only the zero-results case shows it.
-- Run the stack journey on the seed (lead, with the W2-09 and W2-10 journeys).
+- Stack journey: passed 2026-10-24 (`docs/qa/stack-2026-10-24/REPORT.md`).

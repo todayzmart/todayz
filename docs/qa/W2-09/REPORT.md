@@ -18,7 +18,7 @@ Branch `worktree-agent-ad1dcf20a6d81c25a`, rebased by the lead onto main c075155
 | size-limit customer | JS 127.85 kB / 170 gzip; CSS 9.68 / 20 |
 | make check (full) | stopped at check-backend: gofmt of backend/cmd/todayz/contract_test.go (W2-02 contract commit) |
 | Screenshot spec (e2e/transactions.shots.spec.ts) | 5/5 at 390x844, synthetic API via page.route, no non-local requests |
-| Stack journey e2e/order.stack.spec.ts | written, not run (needs TZ_SHOP_PHONE, TZ_SHOP_BUSINESS_ID, TZ_SHOP_STORE_ID, TZ_SHOP_STORE_SLUG; uses W2-08's /s/{slug} Add) |
+| Stack journey e2e/order.stack.spec.ts | pass on the seed, 2026-10-24 (see `docs/qa/stack-2026-10-24/REPORT.md`); seed defaults, no env needed |
 
 ## Deferred
 Delivery and address (W2-03), credits and wallet (W2-01), partial confirm (notice only, W2-02), reviews, refer, scan, inbox, help, receipt, support tickets and C-19, the In store tab, call shop (no phone in the contract), QR on the pickup code (no library).
