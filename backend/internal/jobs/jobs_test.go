@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -60,4 +61,22 @@ func TestRegisterAddsPlatformJobs(t *testing.T) {
 		require.True(t, ok, "%s is scheduled", k)
 		require.NotNil(t, sched)
 	}
+}
+
+// TestIdentityPurgeIsAKind: W1-01's purge runs hourly through jobs.Define
+// (it was a River periodic job, identity.purge, before W1-11).
+func TestIdentityPurgeIsAKind(t *testing.T) {
+	r := platformjobs.NewRegistry()
+	Register(r, Deps{Clock: clock.NewFake(clock.Real{}.Now())})
+	k, ok := r.Lookup(KindIdentityPurge)
+	require.True(t, ok)
+	require.Equal(t, "identity_purge", k.Name)
+	require.Equal(t, "W1-01", k.Owner)
+	require.Equal(t, platformjobs.ClassMaintenance, k.Class)
+	require.Equal(t, "0 * * * *", k.Schedule)
+	require.Equal(t, platformjobs.PerTick, k.UniqueBy)
+	sched, ok := r.ScheduleOf(KindIdentityPurge)
+	require.True(t, ok)
+	at := time.Date(2026, time.October, 23, 10, 17, 0, 0, clock.IST)
+	require.Equal(t, time.Date(2026, time.October, 23, 11, 0, 0, 0, clock.IST), sched.Next(at).In(clock.IST))
 }
