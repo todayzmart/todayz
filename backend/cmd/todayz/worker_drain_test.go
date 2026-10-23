@@ -68,8 +68,10 @@ func riverState(t *testing.T, db *testkit.DB, id int64) string {
 
 func probeGet(t *testing.T, url string) (int, string) {
 	t.Helper()
-	c := &http.Client{Transport: &http.Transport{DisableKeepAlives: true}, Timeout: 2 * time.Second}
-	resp, err := c.Get(url)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)
+	require.NoError(t, err)
+	req.Close = true // a new connection every call, like a fresh load-balancer probe
+	resp, err := testHTTP.Do(req)
 	require.NoError(t, err)
 	defer func() { _ = resp.Body.Close() }()
 	b, _ := io.ReadAll(resp.Body)

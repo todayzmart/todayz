@@ -18,6 +18,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
 
+	"github.com/todayz/backend/internal/platform/egress"
 	"github.com/todayz/backend/internal/platform/health"
 	"github.com/todayz/backend/internal/platform/httpx"
 	"github.com/todayz/backend/internal/platform/queue"
@@ -85,11 +86,24 @@ func (s *syncBuffer) String() string {
 	return s.b.String()
 }
 
-// probe is a client without keep-alive, so every call is a new connection.
-var probe = &http.Client{Transport: &http.Transport{DisableKeepAlives: true}, Timeout: 2 * time.Second}
+// probe and slowClient reach loopback only (egress guard); fresh() makes every
+// call a new connection, like a load-balancer probe.
+var (
+	probe      = egress.NewClient(egress.Options{Block: true, Timeout: 2 * time.Second})
+	slowClient = egress.NewClient(egress.Options{Block: true, Timeout: 30 * time.Second})
+)
+
+func fresh(c *http.Client, url string) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Close = true
+	return c.Do(req)
+}
 
 func call(base, path string) (int, string) {
-	resp, err := probe.Get(base + path)
+	resp, err := fresh(probe, base+path)
 	if err != nil {
 		return 0, err.Error()
 	}
@@ -132,8 +146,7 @@ type slowResult struct {
 func callSlow(base string) <-chan slowResult {
 	out := make(chan slowResult, 1)
 	go func() {
-		c := &http.Client{Transport: &http.Transport{DisableKeepAlives: true}, Timeout: 30 * time.Second}
-		resp, err := c.Get(base + "/test-slow")
+		resp, err := fresh(slowClient, base+"/test-slow")
 		if err != nil {
 			out <- slowResult{err: err}
 			return
