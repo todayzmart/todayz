@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Button } from '../Button/Button';
+import { useToast } from '../Toast/context';
+import { ToastProvider } from '../Toast/Toast';
 import { Dialog, type DialogProps } from './Dialog';
 
 function Launcher(props: DialogProps) {
@@ -60,3 +62,54 @@ export const WithCloseButton: Story = {
 };
 
 export const Closed: Story = { args: { open: false } };
+
+function SaveWithUndo(props: DialogProps) {
+  const toast = useToast();
+  const [open, setOpen] = useState(props.open);
+  const [restored, setRestored] = useState(false);
+  const close = () => setOpen(false);
+  const save = () =>
+    toast.show({ message: 'Hours saved', action: { label: 'Undo', onClick: () => setRestored(true) } });
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Edit opening hours</Button>
+      {restored && <p>Hours restored</p>}
+      <Dialog
+        {...props}
+        open={open}
+        onClose={close}
+        footer={
+          <>
+            <Button variant="ghost" onClick={close}>
+              Done
+            </Button>
+            <Button variant="primary" onClick={save}>
+              Save hours
+            </Button>
+          </>
+        }
+      />
+    </>
+  );
+}
+
+/**
+ * A toast raised while the dialog is open shows above it and its action can be clicked (the
+ * toast region moves into the open dialog, since a modal dialog makes the rest of the page inert).
+ * visual/overlays.spec.ts drives it in Chromium.
+ */
+export const WithToast: Story = {
+  args: {
+    open: false,
+    role: 'dialog',
+    title: 'Opening hours',
+    description: 'Customers see these on your shop page.',
+    closeLabel: 'Close',
+    children: <p>Monday to Saturday, 7 am to 10 pm. Sunday, 8 am to 1 pm.</p>,
+  },
+  render: (args) => (
+    <ToastProvider>
+      <SaveWithUndo {...args} />
+    </ToastProvider>
+  ),
+};

@@ -13,7 +13,7 @@ import { Button, ProductCard } from '@todayz/ui';
 import { StoreMap } from '@todayz/ui/map'; // separate entry: only map screens bundle MapLibre
 ```
 
-Entries: `.` (every component, `src/index.ts`), `./map` (StoreMap and its geo and style helpers), `./styles.css`. The package ships source (`exports` point at `src/`); the apps' Vite builds compile it.
+Entries: `.` (every component, `src/index.ts`), `./map` (StoreMap and its geo and style helpers), `./styles.css`. The package ships source (`exports` point at `src/`); the apps' Vite builds compile it. An app that imports `@todayz/ui/map` needs Vite's client types (`"types": ["vite/client"]` in its tsconfig): the loader imports MapLibre's worker with `?url`.
 
 ## Run
 
@@ -23,6 +23,7 @@ Entries: `.` (every component, `src/index.ts`), `./map` (StoreMap and its geo an
 | Unit tests + axe per story + coverage | `pnpm test` |
 | Lint, CSS lint, types | `pnpm lint`, `pnpm lint:css`, `pnpm typecheck` |
 | Design comparison and Chromium axe | `pnpm build-storybook && pnpm visual design.spec.ts a11y.spec.ts` |
+| Modal focus, Escape and toasts over modals (Chromium) | `pnpm build-storybook && pnpm visual overlays.spec.ts` |
 | QA screenshots | `TZ_QA_DIR=docs/qa/W1-02/screens pnpm visual screens.spec.ts` |
 
 `make check` runs `check-ui` (lint, types, unit + coverage, Storybook build). `make e2e` runs `e2e-ui-visual` (Storybook build, design comparison, Chromium axe). Both are offline: `visual/serve.mjs` serves only repo files on 127.0.0.1, and every Playwright test fails on an external request or a console error.
@@ -30,7 +31,7 @@ Entries: `.` (every component, `src/index.ts`), `./map` (StoreMap and its geo an
 ## Rules for this folder
 
 - **Strings come in as props.** No i18n import, no English in components (the one default is the map credit `© OpenStreetMap`). Labels for icon buttons, counts read in words, empty states: all props.
-- **Money, distance and time come pre-formatted** (`₹289`, `0.6 km`, `updated 12 min ago`). The kit never formats or computes them.
+- **Money, distance and time come pre-formatted** (`₹289`, `0.6 km`, `Confirmed 12 min ago`). The kit never formats or computes them. Stock freshness follows D-101: "Confirmed {time} ago", or `stale` with "Stock not confirmed recently".
 - **Tokens only.** No colour literals in `.ts`, `.tsx` or `.css` (`src/test/styles.test.ts` fails on hex, rgb, hsl, oklch, a dark-theme query, or a `var(--x)` the tokens do not declare). Use `tz-` classes from the design first; add a `tz-ui-` class in `src/styles.css` only for what the design does not draw.
 - **Light theme only. Lucide icons only** (`lucide-react` through `internal/Icon`). Sentence case in stories.
 - **Every component has a `DesignReference` story** when the design has a card for it: same markup and synthetic names as `preview.html`, tagged with `designRef(card, height, width?)` from `src/test/fixtures.tsx`. `visual/design.spec.ts` compares it with the card at 0.1% (icons masked; the map drawing masked). A design reference story renders at the card's own size: the `frame()` decorator skips it.
@@ -50,4 +51,4 @@ visual/            serve.mjs, catalog.ts (cards from Storybook's index + preview
 
 ## Status
 
-W1-02 done: every component in the WP list, 154 stories, 312 unit tests, 23 design cards matched, axe clean in Chromium apart from the two CartBar contrast findings that come from the design CSS (see `docs/qa/W1-02/REPORT.md`).
+W1-02 done: every component in the WP list, 156 stories, 354 unit tests, 23 design cards matched, 2 Chromium overlay checks, axe clean in Chromium apart from the two CartBar contrast findings that come from the design CSS (see `docs/qa/W1-02/REPORT.md`).

@@ -3,15 +3,24 @@ import type * as MapLibre from 'maplibre-gl';
 export type MapLibreModule = typeof MapLibre;
 
 let pending: Promise<MapLibreModule> | null = null;
+let webglSupport: boolean | undefined;
 
-/** True when the browser can create a WebGL context (MapLibre needs one). */
+/**
+ * True when the browser can create a WebGL context (MapLibre needs one). Probed once per page:
+ * browsers cap live WebGL contexts (about 16), so every map mount creating a throwaway context
+ * would evict real ones. The probe's context is released straight away.
+ */
 export function hasWebGL(): boolean {
+  if (webglSupport !== undefined) return webglSupport;
   try {
     const canvas = document.createElement('canvas');
-    return Boolean(canvas.getContext('webgl2') ?? canvas.getContext('webgl'));
+    const ctx = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
+    ctx?.getExtension('WEBGL_lose_context')?.loseContext();
+    webglSupport = Boolean(ctx);
   } catch {
-    return false;
+    webglSupport = false;
   }
+  return webglSupport;
 }
 
 /**

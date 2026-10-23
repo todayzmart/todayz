@@ -22,21 +22,45 @@ vi.mock('pmtiles', () => ({
 }));
 
 describe('hasWebGL', () => {
+  beforeEach(() => {
+    // The answer is cached per module, so each test probes a fresh copy.
+    vi.resetModules();
+  });
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('is true when a WebGL context can be created', async () => {
+  it('is true when a WebGL context can be created, and releases the probe context', async () => {
     const { hasWebGL } = await import('./loader');
-    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({} as RenderingContext);
+    const loseContext = vi.fn();
+    const ctx = { getExtension: (name: string) => (name === 'WEBGL_lose_context' ? { loseContext } : null) };
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(ctx as unknown as RenderingContext);
     expect(hasWebGL()).toBe(true);
+    expect(loseContext).toHaveBeenCalledTimes(1);
   });
 
-  it('is false without a context or when creating one throws', async () => {
+  it('probes once: later calls create no canvas or context', async () => {
     const { hasWebGL } = await import('./loader');
-    const spy = vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
+    const getContext = vi
+      .spyOn(HTMLCanvasElement.prototype, 'getContext')
+      .mockReturnValue({ getExtension: () => null } as unknown as RenderingContext);
+    const create = vi.spyOn(document, 'createElement');
+    expect(hasWebGL()).toBe(true);
+    expect(hasWebGL()).toBe(true);
+    expect(hasWebGL()).toBe(true);
+    expect(create.mock.calls.filter(([tag]) => tag === 'canvas')).toHaveLength(1);
+    expect(getContext).toHaveBeenCalledTimes(1);
+  });
+
+  it('is false without a context', async () => {
+    const { hasWebGL } = await import('./loader');
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
     expect(hasWebGL()).toBe(false);
-    spy.mockImplementation(() => {
+  });
+
+  it('is false when creating one throws', async () => {
+    const { hasWebGL } = await import('./loader');
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => {
       throw new Error('blocked');
     });
     expect(hasWebGL()).toBe(false);

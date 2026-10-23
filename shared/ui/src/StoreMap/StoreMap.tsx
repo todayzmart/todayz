@@ -105,7 +105,8 @@ function prefersReducedMotion(): boolean {
  * Shops near the customer on a light map (MapLibre + a Protomaps basemap painted with the map-*
  * tokens): open and closed pins, clusters, the customer's dot and the dashed radius ring, with
  * stats and radius chips below. Pins are real buttons in the DOM, so they are focusable and
- * named. Without WebGL it falls back to a static projection with the same pins and ring.
+ * named. Without WebGL it falls back to a static projection with the same pins and ring; while
+ * MapLibre loads, that static drawing stands in (marked busy), so pins are never missing.
  */
 export function StoreMap({
   label,
@@ -181,7 +182,11 @@ export function StoreMap({
     return () => ro.disconnect();
   }, []);
 
+  // MapLibre fires move on every animation frame of a pan or ease, sometimes more than once; the
+  // overlay (clusters and every pin) is recomputed at most once per frame.
+  const frame = useRef(0);
   const syncProjector = useCallback(() => {
+    frame.current = 0;
     const map = mapRef.current;
     if (!map) return;
     const b = map.getBounds();
@@ -194,6 +199,11 @@ export function StoreMap({
       },
     });
   }, []);
+
+  const scheduleSync = useCallback(() => {
+    if (frame.current !== 0) return;
+    frame.current = requestAnimationFrame(syncProjector);
+  }, [syncProjector]);
 
   // Create the MapLibre map once.
   useEffect(() => {
@@ -243,14 +253,16 @@ export function StoreMap({
           syncProjector();
           setGl('ready');
         });
-        map.on('move', syncProjector);
-        map.on('resize', syncProjector);
+        map.on('move', scheduleSync);
+        map.on('resize', scheduleSync);
       })
       .catch(() => {
         if (!cancelled) setGl('failed');
       });
     return () => {
       cancelled = true;
+      cancelAnimationFrame(frame.current);
+      frame.current = 0;
       map?.remove();
       mapRef.current = null;
       setGl('loading');
@@ -304,7 +316,7 @@ export function StoreMap({
   const boxHeight = size.height || height || (boxWidth * DESIGN_HEIGHT) / DESIGN_WIDTH;
   const projector: Projector | null = useMemo(() => {
     if (mode === 'webgl') return glProjector;
-    if (mode !== 'static') return null;
+    // Static, and while MapLibre loads: the same fit-to-radius view MapLibre opens with.
     const view = staticView ?? { center, zoom: zoomToFitRadius(center, radiusKm, boxWidth, boxHeight, PADDING) };
     return staticProjector(view.center, view.zoom, boxWidth, boxHeight);
   }, [mode, glProjector, staticView, center, radiusKm, boxWidth, boxHeight]);
@@ -329,7 +341,7 @@ export function StoreMap({
   const place = ([x, y]: [number, number]): CSSProperties => ({ transform: `translate(${x}px, ${y}px)` });
 
   const ring =
-    mode === 'static' && projector ? (
+    mode !== 'webgl' && projector ? (
       <svg className="tz-ui-map-static" width={boxWidth} height={boxHeight} aria-hidden="true" focusable="false">
         <rect width="100%" height="100%" className="tz-ui-map-land" />
         <circle
@@ -349,6 +361,7 @@ export function StoreMap({
         style={height === undefined ? undefined : { height }}
         role="group"
         aria-label={mapLabel}
+        aria-busy={mode === 'loading' || undefined}
         data-mode={mode}
       >
         {height === undefined && <div className="tz-ui-map-sizer" />}

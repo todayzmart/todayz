@@ -521,12 +521,6 @@ html.tz-ui-scroll-lock {
   overflow: auto;
 }
 
-/* The dialog takes focus only when nothing inside can; it is a container, not a control. */
-.tz-ui-sheet:focus,
-.tz-ui-dialog:focus {
-  outline: none;
-}
-
 .tz-ui-sheet::backdrop,
 .tz-ui-dialog::backdrop {
   background: var(--scrim);
@@ -568,6 +562,12 @@ html.tz-ui-scroll-lock {
     opacity: 0;
     transform: scale(0.96);
   }
+}
+
+/* The dialog takes focus only when nothing inside can; it is a container, not a control. */
+.tz-ui-sheet:focus,
+.tz-ui-dialog:focus {
+  outline: none;
 }
 
 .tz-ui-modal-body {

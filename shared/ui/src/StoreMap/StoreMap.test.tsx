@@ -250,3 +250,68 @@ describe('StoreMap (MapLibre)', () => {
     expect(FakeMap.instances).toHaveLength(0);
   });
 });
+
+describe('StoreMap (while MapLibre loads, and moving)', () => {
+  beforeEach(() => {
+    FakeMap.instances = [];
+    loader.webgl = true;
+    loader.load = () => Promise.resolve({ Map: FakeMap });
+    vi.spyOn(window, 'matchMedia').mockReturnValue({ matches: true } as MediaQueryList);
+  });
+
+  it('shows the static pins and ring, marked busy, until the map has loaded', async () => {
+    const { container } = render(<StoreMap {...props()} />);
+    const box = screen.getByRole('group', { name: /^Map:/ });
+    expect(box).toHaveAttribute('data-mode', 'loading');
+    expect(box).toHaveAttribute('aria-busy', 'true');
+    expect(pins().length + clusters().length).toBeGreaterThan(0);
+    expect(screen.getByRole('img', { name: 'You are here' })).toBeInTheDocument();
+    expect(container.querySelector('circle.tz-ui-map-ring')).not.toBeNull();
+    await settle();
+    const map = FakeMap.instances[0];
+    if (!map) throw new Error('map not created');
+    act(() => map.emit('load'));
+    expect(box).toHaveAttribute('data-mode', 'webgl');
+    expect(box).not.toHaveAttribute('aria-busy');
+    // MapLibre draws the ring now; the static drawing is gone.
+    expect(container.querySelector('circle.tz-ui-map-ring')).toBeNull();
+    expect(pins().length + clusters().length).toBeGreaterThan(0);
+  });
+
+  it('recomputes the overlay at most once per frame while the map moves, and cancels on unmount', async () => {
+    const frames: FrameRequestCallback[] = [];
+    let ids = 0;
+    const raf = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+      frames.push(cb);
+      ids += 1;
+      return ids;
+    });
+    const cancel = vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => undefined);
+    const view = render(<StoreMap {...props()} />);
+    await settle();
+    const map = FakeMap.instances[0];
+    if (!map) throw new Error('map not created');
+    act(() => map.emit('load'));
+    const project = vi.spyOn(map, 'project');
+    act(() => {
+      map.emit('move');
+      map.emit('move');
+      map.emit('resize');
+      map.emit('move');
+    });
+    expect(raf).toHaveBeenCalledTimes(1);
+    expect(project).not.toHaveBeenCalled();
+    // A pan: the next frame draws the pins where the map now is.
+    map.zoom = 15;
+    act(() => frames.shift()?.(0));
+    expect(project).toHaveBeenCalled();
+    act(() => map.emit('move'));
+    expect(raf).toHaveBeenCalledTimes(2);
+    view.unmount();
+    expect(cancel).toHaveBeenCalledWith(2);
+    // A frame that still runs after unmount does nothing.
+    expect(() => frames.shift()?.(0)).not.toThrow();
+    raf.mockRestore();
+    cancel.mockRestore();
+  });
+});

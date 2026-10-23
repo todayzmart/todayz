@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Button } from '../Button/Button';
 import { StoreCard } from '../StoreCard/StoreCard';
 import { StoryLink } from '../test/fixtures';
+import { useToast } from '../Toast/context';
+import { ToastProvider } from '../Toast/Toast';
 import { Sheet, type SheetProps } from './Sheet';
 
 function Launcher(props: SheetProps) {
@@ -59,4 +61,38 @@ export const NotDismissible: Story = {
     dismissible: false,
     children: undefined,
   },
+};
+
+function SaveWithUndo(props: SheetProps) {
+  const toast = useToast();
+  const [open, setOpen] = useState(props.open);
+  const [removed, setRemoved] = useState(false);
+  const save = () =>
+    toast.show({ message: 'Shop saved', action: { label: 'Undo', onClick: () => setRemoved(true) } });
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Show shop</Button>
+      {removed && <p>Shop removed from saved</p>}
+      <Sheet
+        {...props}
+        open={open}
+        onClose={() => setOpen(false)}
+        footer={
+          <Button variant="primary" block onClick={save}>
+            Save shop
+          </Button>
+        }
+      />
+    </>
+  );
+}
+
+/** A toast raised while the sheet is open shows above it and its action can be clicked. */
+export const WithToast: Story = {
+  args: { open: false },
+  render: (args) => (
+    <ToastProvider>
+      <SaveWithUndo {...args} />
+    </ToastProvider>
+  ),
 };
