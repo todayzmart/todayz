@@ -133,7 +133,7 @@ func TestOneRequestIsMetricLogAndTrace(t *testing.T) {
 	require.Len(t, sum.DataPoints, 1)
 	attrs := map[string]string{}
 	for _, kv := range sum.DataPoints[0].Attributes.ToSlice() {
-		attrs[string(kv.Key)] = kv.Value.Emit()
+		attrs[string(kv.Key)] = kv.Value.String()
 	}
 	require.Equal(t, map[string]string{
 		"service": "api", "route": "/v1/orders/{id}", "method": "GET",
@@ -184,7 +184,7 @@ func TestNoPIIInMetricLogOrTrace(t *testing.T) {
 	for _, s := range o.spans.Ended() {
 		spans.WriteString(s.Name())
 		for _, kv := range s.Attributes() {
-			spans.WriteString(string(kv.Key) + "=" + kv.Value.Emit() + " ")
+			spans.WriteString(string(kv.Key) + "=" + kv.Value.String() + " ")
 		}
 	}
 	all := o.logs.String() + string(b) + spans.String()

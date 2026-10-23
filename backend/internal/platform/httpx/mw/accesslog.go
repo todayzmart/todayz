@@ -9,6 +9,7 @@ import (
 	"encoding/hex"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 
@@ -89,7 +90,7 @@ func AccessLog(log *slog.Logger, m *telemetry.Metrics) func(http.Handler) http.H
 // Fingerprint groups the same failure: a short hash of method, route template,
 // problem code and status. It holds no request data.
 func Fingerprint(method, route, code string, status int) string {
-	h := sha256.Sum256([]byte(method + " " + route + " " + code + " " + string(rune('0'+status/100))))
+	h := sha256.Sum256([]byte(method + " " + route + " " + code + " " + strconv.Itoa(status/100)))
 	return hex.EncodeToString(h[:6])
 }
 

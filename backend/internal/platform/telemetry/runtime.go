@@ -59,8 +59,8 @@ func RegisterRuntime(mp metric.MeterProvider, service string) (func() error, err
 		var ms runtime.MemStats
 		runtime.ReadMemStats(&ms)
 		o.ObserveInt64(gor, int64(runtime.NumGoroutine()), svc)
-		o.ObserveInt64(heap, int64(ms.HeapAlloc), svc)
-		o.ObserveInt64(sys, int64(ms.Sys), svc)
+		o.ObserveInt64(heap, int64(ms.HeapAlloc), svc) // #nosec G115 -- heap size fits int64
+		o.ObserveInt64(sys, int64(ms.Sys), svc)        // #nosec G115 -- memory size fits int64
 		o.ObserveFloat64(gc, float64(ms.PauseTotalNs)/float64(time.Second), svc)
 		o.ObserveInt64(gcn, int64(ms.NumGC), svc)
 		var ru syscall.Rusage

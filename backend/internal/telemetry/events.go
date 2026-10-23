@@ -55,7 +55,7 @@ func (s *Service) validate(b *eventBatch) *problem.Error {
 		if perr == nil {
 			perr = problem.New("validation_failed", "")
 		}
-		perr.WithField(path, reason)
+		_ = perr.WithField(path, reason)
 	}
 	seen := map[string]struct{}{}
 	for i, e := range b.Events {
