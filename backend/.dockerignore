@@ -1,0 +1,10 @@
+# Keep the build context small and free of local state. backend/gen is NOT ignored here:
+# the image needs it (make gen first).
+.git
+tools
+*.md
+.env*
+*.pem
+*.key
+bin
+tmp
