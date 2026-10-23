@@ -1,0 +1,147 @@
+/* B-04 Orders layout. Component looks come from bundle.css (tz-*) and @todayz/ui; this file only
+   places them. Tokens only. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.soundRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--type-caption);
+  color: var(--ink-3);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.summary {
+  color: var(--ink-2);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.lineStock {
+  font: var(--type-caption);
+  color: var(--ink-3);
+}
+
+.lineShort {
+  color: var(--warning);
+}
+
+.cardLink {
+  align-self: flex-start;
+  font: var(--type-label);
+}
+
+.reasons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  padding: 0;
+  margin-bottom: var(--space-2);
+  font: var(--type-label);
+}
+
+.reason {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+}
+
+.detail {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+@media (width >= 1024px) {
+  .detail {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    align-items: start;
+  }
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.back {
+  align-self: flex-start;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.pay {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.payLabel {
+  font: var(--type-label);
+}
+
+.codeBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.muted {
+  color: var(--ink-3);
+}
