@@ -82,6 +82,24 @@ tz_load_env() {
   tz_export_env_file "$TZ_ENV_LOCAL" skip-empty
 }
 
+# tz_strip_aws_env: unset every AWS_* variable, whether it came from .env.local
+# or from the calling shell. The app never gets AWS keys (D-97): only Terraform
+# and the lead's shell see them. Prints nothing (not even the names).
+tz_strip_aws_env() {
+  { set +x; } 2>/dev/null
+  local n
+  for n in $(compgen -v AWS_); do
+    unset "$n" 2>/dev/null || true
+  done
+}
+
+# tz_load_app_env: tz_load_env for an app process (api, worker, migrate, seed,
+# mocks, Vite): the same values without any AWS_* variable.
+tz_load_app_env() {
+  tz_load_env
+  tz_strip_aws_env
+}
+
 # tz_port_owner PORT: prints "command(pid)" of the process listening on PORT,
 # "an unknown process" when the port answers but lsof cannot name it (another
 # user, a VM port forward), or nothing when the port is free.

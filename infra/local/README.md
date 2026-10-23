@@ -93,6 +93,7 @@ volume, on every `make dev`, and on `make reset`.
 | `minio/minio-init.sh` | Buckets, policies, probe objects, tile upload (runs in the `mc` container) |
 | `lgtm/` | Prometheus scrape config, Grafana Postgres datasource, dashboards provider (reads `infra/grafana/dashboards/`, the only repo folder mounted into the container) |
 | `test/static.sh` | `make check`: compose config (counts, loopback ports, digests, literal credentials), Caddyfile (abort first on every site; validated in a throwaway HOME), shellcheck, local.env rules (no network) |
+| `test/proc-test.sh` | `make check`: no `AWS_*` variable reaches a `proc.sh` child, `stop-all` order, SIGKILL after the stop timeout (throwaway root, dummy values) |
 | `test/dev-smoke.sh` | `make e2e`: real `make dev` twice, health, every host, LAN refusal, Grafana hardening, DB roles, image round trip, path tricks, tile range, CORS, leak scan; then `make stop` |
 
 ### proc.sh for other work packages
@@ -103,12 +104,20 @@ dev-api:
 	@$(ROOT)/infra/local/proc.sh start api --port 8180 --health http://127.0.0.1:8180/healthz --cwd $(ROOT)/backend -- go run ./cmd/api
 ```
 
-The child gets `local.env`, then `.env.local`, exported (no values are printed).
+The child gets `local.env`, then `.env.local`, exported (no values are printed),
+then every `AWS_*` variable is removed, whether it came from those files or the
+calling shell: the app never sees AWS keys (D-97).
 `start` is idempotent, refuses a port that is already taken (and names the
 owner), and with `--health` waits up to 90 s. Each process runs in its own
 process group, so `stop` also ends `pnpm -> vite` style children. Logs go to
 `.cache/dev/NAME.log`; pidfiles to `.cache/dev/pids/`; the registry the health
 check reads is `.cache/dev/registry.tsv`.
+
+`stop` sends SIGTERM to the group and waits before SIGKILL: `api` 120 s,
+`worker` 180 s, anything else 10 s (`PROC_STOP_TIMEOUT_API`,
+`PROC_STOP_TIMEOUT_WORKER` and `PROC_STOP_TIMEOUT` override them). `stop-all`
+(and so `make stop`) drains in order (D-98): `api` and `worker` together first,
+waiting for both to exit, then everything else, `mocks` last.
 
 Vite apps need `server.allowedHosts: ['.todayz.localhost']` and
 `server.hmr: { clientPort: 443, protocol: 'wss' }` to work behind Caddy.

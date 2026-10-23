@@ -49,6 +49,7 @@ reset-db:
 # Static only: no network, no running stack (runs under scripts/no-egress.sh).
 check-stack:
 	@$(ROOT)/infra/local/test/static.sh
+	@$(ROOT)/infra/local/test/proc-test.sh
 
 # Brings the stack up for real and probes every host (make e2e).
 e2e-stack:

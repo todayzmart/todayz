@@ -120,12 +120,12 @@ backend-bin: gen-backend
 # Runs after reset-db (mk/10-stack.mk) recreated the databases.
 reset-backend: backend-bin
 	@if [ ! -f $(BACKEND_LIB) ]; then echo "reset-backend skipped: infra/local/lib.sh not present yet"; exit 0; fi; \
-	  source $(BACKEND_LIB); tz_load_env; \
+	  source $(BACKEND_LIB); tz_load_app_env; \
 	  $(BACKEND_BIN) migrate up; \
 	  $(BACKEND_BIN) seed dev
 
 dev-backend: backend-bin
 	@if [ ! -x $(BACKEND_PROC) ]; then echo "dev-backend skipped: infra/local/proc.sh not present yet"; exit 0; fi; \
-	  ( source $(BACKEND_LIB); tz_load_env; $(BACKEND_BIN) migrate up ); \
+	  ( source $(BACKEND_LIB); tz_load_app_env; $(BACKEND_BIN) migrate up ); \
 	  $(BACKEND_PROC) start api --port $(API_PORT) --health http://127.0.0.1:$(API_PORT)/healthz -- $(BACKEND_BIN) api; \
 	  $(BACKEND_PROC) start worker --port $(WORKER_PORT) --health http://127.0.0.1:$(WORKER_PORT)/healthz -- $(BACKEND_BIN) worker

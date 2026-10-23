@@ -3,7 +3,7 @@
 #
 #   proc.sh start NAME [--port PORT] [--health URL] [--cwd DIR] [--timeout SEC] -- CMD [ARGS...]
 #   proc.sh stop NAME
-#   proc.sh stop-all
+#   proc.sh stop-all             api and worker first (drain), then the rest, mocks last
 #   proc.sh status
 #   proc.sh logs [NAME]          follow one log, or every log
 #
@@ -12,6 +12,9 @@
 # - start is idempotent: if NAME is already running it does nothing.
 # - The child gets infra/local/local.env, then .env.local, exported (no eval;
 #   values are never printed). An empty value in .env.local does not override.
+#   Then every AWS_* variable is removed, from those files or the shell (D-97).
+# - stop waits after SIGTERM before SIGKILL: api 120 s, worker 180 s, others 10 s
+#   (PROC_STOP_TIMEOUT_API, PROC_STOP_TIMEOUT_WORKER, PROC_STOP_TIMEOUT override).
 # - start refuses when --port is already taken by another process.
 # - With --health, start waits (default 90 s) for the URL to answer 2xx/3xx.
 # - Each child runs in its own process group, so stop also ends its children
@@ -112,7 +115,7 @@ cmd_start() {
   printf '\n===== %s start %s (cwd %s, port %s)\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$name" "$rel" "${port:--}" >>"$log"
   (
     cd "$cwd"
-    tz_load_env
+    tz_load_app_env # D-97: no AWS_* variable reaches an app process
     # New session = new process group led by the child, so stop can signal the group.
     exec perl -MPOSIX -e 'POSIX::setsid(); exec { $ARGV[0] } @ARGV or die "exec $ARGV[0]: $!\n"' -- "$@"
   ) </dev/null >>"$log" 2>&1 &
@@ -143,41 +146,101 @@ cmd_start() {
   fi
 }
 
+# stop_timeout NAME: seconds to wait after SIGTERM before SIGKILL (D-98). The
+# api drains for SHUTDOWN_PRESTOP + SHUTDOWN_DRAIN (1 s + 75 s locally) inside its
+# 120 s stop timeout; the worker's queue.Drain (90 s + 30 s) inside its 180 s.
+stop_timeout() {
+  local t
+  case "$1" in
+    api) t="${PROC_STOP_TIMEOUT_API:-120}" ;;
+    worker) t="${PROC_STOP_TIMEOUT_WORKER:-180}" ;;
+    *) t="${PROC_STOP_TIMEOUT:-10}" ;;
+  esac
+  [[ "$t" =~ ^[0-9]{1,4}$ ]] || { echo "proc: stop timeout for $1 must be a number of seconds" >&2; exit 2; }
+  echo "$t"
+}
+
+# stop_group NAME...: SIGTERM every named process group at once, then wait for
+# each up to its own stop_timeout; SIGKILL only the ones still running then.
+# Only a pid whose recorded start time still matches is ever signalled.
+stop_group() {
+  local names=() pids=() limits=() left=() n pid i t0 lim
+  for n in "$@"; do
+    lim="$(stop_timeout "$n")" || exit 2 # a bad override stops before any signal
+  done
+  for n in "$@"; do
+    pid="$(pid_of "$n")"
+    if [[ -n "$pid" ]] && running "$n"; then
+      lim="$(stop_timeout "$n")"
+      kill -TERM -- "-$pid" 2>/dev/null || kill -TERM "$pid" 2>/dev/null || true
+      names+=("$n"); pids+=("$pid"); limits+=("$lim"); left+=(1)
+      echo "proc: SIGTERM $n (pid $pid); waiting up to ${lim}s"
+    else
+      echo "proc: $n not running"
+      rm -f "$PIDS/$n.pid"; registry_remove "$n"
+    fi
+  done
+  [[ ${#names[@]} -gt 0 ]] || return 0
+  t0=$SECONDS
+  local waiting=${#names[@]}
+  while [[ $waiting -gt 0 ]]; do
+    for i in "${!names[@]}"; do
+      [[ ${left[$i]} -eq 1 ]] || continue
+      n="${names[$i]}"; pid="${pids[$i]}"
+      if ! running "$n"; then
+        echo "proc: stopped $n after $((SECONDS - t0))s"
+      elif [[ $((SECONDS - t0)) -ge ${limits[$i]} ]]; then
+        kill -KILL -- "-$pid" 2>/dev/null || kill -KILL "$pid" 2>/dev/null || true
+        echo "proc: $n still running after ${limits[$i]}s; sent SIGKILL" >&2
+      else
+        continue
+      fi
+      # Children that ignored TERM keep the group alive; finish them too.
+      kill -KILL -- "-$pid" 2>/dev/null || true
+      rm -f "$PIDS/$n.pid"; registry_remove "$n"
+      left[i]=0; waiting=$((waiting - 1))
+    done
+    [[ $waiting -eq 0 ]] || sleep 0.2
+  done
+}
+
 cmd_stop() {
   local name="${1:-}"; [[ -n "$name" ]] || usage
   valid_name "$name"
-  local pid; pid="$(pid_of "$name")"
-  # running() proved pid is a valid number above 1 with our recorded start time.
-  if [[ -n "$pid" ]] && running "$name"; then
-    kill -TERM -- "-$pid" 2>/dev/null || kill -TERM "$pid" 2>/dev/null || true
-    local i
-    for i in $(seq 1 50); do
-      kill -0 "$pid" 2>/dev/null || break
-      sleep 0.2
-    done
-    if kill -0 "$pid" 2>/dev/null; then
-      kill -KILL -- "-$pid" 2>/dev/null || kill -KILL "$pid" 2>/dev/null || true
-    fi
-    # Children that ignored TERM keep the group alive; finish them too.
-    kill -KILL -- "-$pid" 2>/dev/null || true
-    echo "proc: stopped $name"
-  else
-    echo "proc: $name not running"
-  fi
-  rm -f "$PIDS/$name.pid"
-  registry_remove "$name"
+  stop_group "$name"
 }
 
+# stop-all drains in order (D-98): api and worker first, together, each waited
+# for up to its stop timeout; then everything else; mocks last (the api and the
+# worker may still call it while they drain).
 cmd_stop_all() {
-  local f n any=0
+  local f n apps=() rest=() mocks=()
   for f in "$PIDS"/*.pid; do
     [[ -e "$f" ]] || continue
-    n="$(basename "$f" .pid)"; any=1
-    cmd_stop "$n"
+    n="$(basename "$f" .pid)"
+    case "$n" in
+      api | worker) apps+=("$n") ;;
+      mocks) mocks+=("$n") ;;
+      *) rest+=("$n") ;;
+    esac
   done
+  if [[ ${#apps[@]} -eq 0 && ${#rest[@]} -eq 0 && ${#mocks[@]} -eq 0 ]]; then
+    echo "proc: nothing running"
+  fi
+  if [[ ${#apps[@]} -gt 0 ]]; then
+    echo "proc: stop-all 1/3: draining ${apps[*]}"
+    stop_group "${apps[@]}"
+  fi
+  if [[ ${#rest[@]} -gt 0 ]]; then
+    echo "proc: stop-all 2/3: ${rest[*]}"
+    stop_group "${rest[@]}"
+  fi
+  if [[ ${#mocks[@]} -gt 0 ]]; then
+    echo "proc: stop-all 3/3: mocks"
+    stop_group mocks
+  fi
   # Registry rows without a pidfile (crashed and cleaned) go too.
   lock; : >"$TZ_REGISTRY"; unlock
-  [[ $any -eq 1 ]] || echo "proc: nothing running"
 }
 
 cmd_status() {
