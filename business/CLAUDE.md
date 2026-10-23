@@ -47,3 +47,12 @@ W0-05: shell, routing, i18n, PWA manifest, telemetry stub, size budget and smoke
 W1-08: sign-in gate, B-01 sign-in and picker (picker data stubbed), offline banner, update toast, error boundary and SW precache check. B-03 Overview works behind it.
 
 Offline first load: the gate shows `SessionPending` (offline notice and "Try again") while the session is `unknown` and the API cannot be reached.
+
+W2-10 (weekend slice): B-04 Orders in `src/orders/` with routes `src/routes/orders/index.tsx` and `$orderId.tsx`.
+
+- Tabs New, Accepted, Ready, Done, Missed and an empty Asks slot (B-20 comes with W3-16). New cards count down from the server's `serverNow`, show stock per line, Accept and Reject (D-60 reasons). Accept part, dispatch, delivery, returns, QR scan, B-02, B-13 and B-14 are deferred.
+- `queries.ts`: list and order queries, the store stream (`@todayz/realtime`, polling fallback with a banner), `useOrderAction` (one Idempotency-Key per attempt, reused only after a network failure).
+- `sound.ts` and `alerts.ts`: a Web Audio chime that repeats until the order is opened, accepted or rejected; "Allow sound" unlocks it. Orders already seen on the server at first load do not alert.
+- `store.ts`: the current shop and the role come from the same `listBusinesses` answer the picker uses. Cancel on an accepted order is manager and above only (D-65).
+- `CodeEntry.tsx`: the pickup code lives in component state only (never in a query key, URL, storage or log), is cleared after every answer, and shows tries left on `code_invalid` and the lock on `code_locked`.
+- Stack journey: `e2e/orders.stack.spec.ts` (customer by API, shop in the browser). Written, not run.
