@@ -1,18 +1,9 @@
-import en from '@todayz/i18n/compiled/admin/en.json';
 import xa from '@todayz/i18n/compiled/admin/en-XA.json';
-import { asMessages, type Messages } from '@todayz/i18n';
-import { createMemoryHistory } from '@tanstack/react-router';
-import { render, screen, within } from '@testing-library/react';
+import { asMessages } from '@todayz/i18n';
+import { screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { App } from '../app/App';
-import { makeQueryClient, makeRouter } from '../app/router';
+import { renderAt } from '../test/render';
 import { NAV } from './nav';
-
-function renderAt(path: string, messages: Messages = asMessages(en)) {
-  const queryClient = makeQueryClient();
-  const router = makeRouter(queryClient, createMemoryHistory({ initialEntries: [path] }));
-  return render(<App messages={messages} router={router} queryClient={queryClient} />);
-}
 
 describe('admin shell', () => {
   it('renders Pulse with the Admin-tagged sidebar', async () => {
@@ -52,7 +43,7 @@ describe('admin shell', () => {
   });
 
   it('renders the pseudo-locale with every key present', async () => {
-    renderAt('/', asMessages(xa));
+    renderAt('/', { messages: asMessages(xa) });
     const h1 = await screen.findByRole('heading', { level: 1 });
     expect(h1.textContent).toMatch(/^\[.*\]$/);
   });

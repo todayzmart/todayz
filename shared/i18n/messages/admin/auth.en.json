@@ -1,0 +1,238 @@
+{
+  "app.offline.title": {
+    "defaultMessage": "You're offline.",
+    "description": "Bold lead-in of the banner shown while the device has no network"
+  },
+  "app.offline.body": {
+    "defaultMessage": "Saved pages still open. We'll catch up when you're back online.",
+    "description": "Rest of the offline banner"
+  },
+  "app.update.message": {
+    "defaultMessage": "A new version of TodayZ Admin is ready.",
+    "description": "Toast shown when a new version of the app is waiting. The page never reloads until the person taps Update, and never while a sale or checkout is open."
+  },
+  "app.update.action": {
+    "defaultMessage": "Update",
+    "description": "Button in the update toast; reloads the app"
+  },
+  "app.error.title": {
+    "defaultMessage": "Something went wrong",
+    "description": "Heading of the screen shown when the app crashes"
+  },
+  "app.error.body": {
+    "defaultMessage": "Try again. If it keeps happening, reload the page.",
+    "description": "Body of the crash screen"
+  },
+  "app.error.retry": {
+    "defaultMessage": "Try again",
+    "description": "Button on the crash screen"
+  },
+  "app.loading": {
+    "defaultMessage": "Loading",
+    "description": "Spoken while the app checks whether you are signed in"
+  },
+  "auth.signIn.title": {
+    "defaultMessage": "Sign in to TodayZ Admin",
+    "description": "A-01 page title"
+  },
+  "auth.signIn.sub": {
+    "defaultMessage": "Use your staff mobile number. We'll send a code by SMS, then ask for your authenticator code.",
+    "description": "A-01 line under the title"
+  },
+  "auth.phone.label": {
+    "defaultMessage": "Mobile number",
+    "description": "Label of the phone field. The +91 prefix is shown beside it."
+  },
+  "auth.phone.help": {
+    "defaultMessage": "Staff numbers only.",
+    "description": "Help text under the phone field"
+  },
+  "auth.phone.invalid": {
+    "defaultMessage": "Enter a 10-digit mobile number that starts with 6, 7, 8 or 9.",
+    "description": "Error under the phone field"
+  },
+  "auth.code.send": {
+    "defaultMessage": "Send code",
+    "description": "Button that sends the SMS code"
+  },
+  "auth.code.sending": {
+    "defaultMessage": "Sending the code",
+    "description": "Spoken while the code is being sent"
+  },
+  "auth.code.label": {
+    "defaultMessage": "Enter the 6-digit code",
+    "description": "Name of the group of six code boxes"
+  },
+  "auth.code.digit": {
+    "defaultMessage": "Digit {position}",
+    "description": "Name of code box number {position}, 2 to 6"
+  },
+  "auth.code.sentTo": {
+    "defaultMessage": "We sent a code to {phone}.",
+    "description": "Line above the code boxes. {phone} is the number with some digits hidden."
+  },
+  "auth.code.verifying": {
+    "defaultMessage": "Checking the code",
+    "description": "Spoken while the code is being checked"
+  },
+  "auth.code.resend": {
+    "defaultMessage": "Resend code",
+    "description": "Button to ask for a new code"
+  },
+  "auth.code.resendIn": {
+    "defaultMessage": "Resend in {seconds} s",
+    "description": "Disabled button while the resend timer runs. {seconds} counts down."
+  },
+  "auth.code.change": {
+    "defaultMessage": "Change number",
+    "description": "Button that goes back to the phone field"
+  },
+  "auth.error.wrongCode": {
+    "defaultMessage": "That code is not right. Check it and try again.",
+    "description": "Wrong one-time code"
+  },
+  "auth.error.expired": {
+    "defaultMessage": "That code has expired. Ask for a new one.",
+    "description": "Expired one-time code"
+  },
+  "auth.error.locked": {
+    "defaultMessage": "Too many wrong codes. Ask for a new code.",
+    "description": "Too many wrong attempts on one code"
+  },
+  "auth.error.rateLimited": {
+    "defaultMessage": "Too many tries. Wait a moment and try again.",
+    "description": "Rate limit on sending codes"
+  },
+  "auth.error.blocked": {
+    "defaultMessage": "This account can't sign in right now. Contact support.",
+    "description": "Blocked account"
+  },
+  "auth.error.network": {
+    "defaultMessage": "We can't reach TodayZ. Check your connection and try again.",
+    "description": "No network or the server did not answer"
+  },
+  "auth.error.generic": {
+    "defaultMessage": "Something went wrong. Please try again.",
+    "description": "Any other sign-in failure"
+  },
+  "auth.error.captcha": {
+    "defaultMessage": "We couldn't check that you are a person. Reload the page and try again.",
+    "description": "The Turnstile check failed to load or run"
+  },
+  "auth.signOut": {
+    "defaultMessage": "Sign out",
+    "description": "Button that ends the session on this device"
+  },
+  "auth.twoStep.title": {
+    "defaultMessage": "Two-step check",
+    "description": "A-01 second step heading"
+  },
+  "auth.twoStep.verifySub": {
+    "defaultMessage": "Open your authenticator app and enter the 6-digit code for TodayZ.",
+    "description": "A-01 line under the heading when the admin already has an authenticator"
+  },
+  "auth.twoStep.enrolSub": {
+    "defaultMessage": "Set up an authenticator app before you continue. You only do this once.",
+    "description": "A-01 line under the heading on first sign-in"
+  },
+  "auth.twoStep.loading": {
+    "defaultMessage": "Checking your two-step setup",
+    "description": "Spoken while the authenticator setup loads"
+  },
+  "auth.twoStep.unavailable": {
+    "defaultMessage": "The two-step check is not available yet. Try again in a moment.",
+    "description": "The enrol or verify call failed or does not exist yet"
+  },
+  "auth.twoStep.retry": {
+    "defaultMessage": "Try again",
+    "description": "Button that loads the two-step setup again"
+  },
+  "auth.twoStep.secretLabel": {
+    "defaultMessage": "Setup key",
+    "description": "Label of the authenticator secret shown for typing in by hand"
+  },
+  "auth.twoStep.secretHelp": {
+    "defaultMessage": "In your authenticator app choose \"Enter a setup key\", paste this key and pick time-based.",
+    "description": "Help under the setup key"
+  },
+  "auth.twoStep.uriOpen": {
+    "defaultMessage": "Open in authenticator app",
+    "description": "Link that opens the otpauth address"
+  },
+  "auth.twoStep.codeLabel": {
+    "defaultMessage": "Authenticator code",
+    "description": "Name of the group of six code boxes for the authenticator code"
+  },
+  "auth.twoStep.confirm": {
+    "defaultMessage": "Confirm code",
+    "description": "Button that sends the authenticator code"
+  },
+  "auth.twoStep.wrong": {
+    "defaultMessage": "That code is not right. Check the time on your phone and try again.",
+    "description": "Wrong authenticator code"
+  },
+  "auth.twoStep.wrongLeft": {
+    "defaultMessage": "That code is not right. {count, plural, one {# try} other {# tries}} left.",
+    "description": "Wrong authenticator code with the tries left. {count} is the number left."
+  },
+  "auth.twoStep.locked": {
+    "defaultMessage": "Too many wrong codes. Sign in again.",
+    "description": "The admin sessions were ended after too many wrong authenticator codes"
+  },
+  "auth.twoStep.signInAgain": {
+    "defaultMessage": "Sign in again",
+    "description": "Button that returns to the phone step after a lock"
+  },
+  "auth.twoStep.useRecovery": {
+    "defaultMessage": "Use a recovery code instead",
+    "description": "Link that switches to the recovery code form"
+  },
+  "auth.twoStep.useApp": {
+    "defaultMessage": "Use the authenticator app instead",
+    "description": "Link that switches back to the authenticator code"
+  },
+  "auth.recovery.label": {
+    "defaultMessage": "Recovery code",
+    "description": "Label of the recovery code field"
+  },
+  "auth.recovery.help": {
+    "defaultMessage": "Each code works once. Hyphens and spaces are ignored.",
+    "description": "Help under the recovery code field"
+  },
+  "auth.recovery.submit": {
+    "defaultMessage": "Use recovery code",
+    "description": "Button that sends the recovery code"
+  },
+  "auth.recovery.wrong": {
+    "defaultMessage": "That recovery code is not right or was already used.",
+    "description": "Wrong recovery code"
+  },
+  "auth.recovery.left": {
+    "defaultMessage": "{count, plural, one {# recovery code left} other {# recovery codes left}}. Ask a super admin for a reset when you run low.",
+    "description": "Shown after a recovery code was used. {count} is how many are left."
+  },
+  "auth.recovery.shownTitle": {
+    "defaultMessage": "Save your recovery codes",
+    "description": "Heading of the screen that shows the 10 recovery codes once"
+  },
+  "auth.recovery.shownBody": {
+    "defaultMessage": "Each code works once if you lose your authenticator. They are shown only now. Store them somewhere safe, away from this device.",
+    "description": "Body of the recovery codes screen"
+  },
+  "auth.recovery.listLabel": {
+    "defaultMessage": "Recovery codes",
+    "description": "Accessible name of the list of recovery codes"
+  },
+  "auth.recovery.saved": {
+    "defaultMessage": "I have saved these codes",
+    "description": "Checkbox label; the person confirms they stored the codes"
+  },
+  "auth.recovery.continue": {
+    "defaultMessage": "Continue to Pulse",
+    "description": "Button after the recovery codes were saved"
+  },
+  "auth.recovery.continueRecover": {
+    "defaultMessage": "Continue",
+    "description": "Button after a recovery code was accepted"
+  }
+}

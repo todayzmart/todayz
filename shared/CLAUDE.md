@@ -36,3 +36,5 @@ platform operations.
 W1-07: `telemetry` is complete: web-vitals, long tasks, route timing (`routeStart`/`routeReady`), traced
 fetch (`traceparent`), Sentry seam (no SDK dependency; staging and production with a DSN only), and a typed
 event emitter generated from `telemetry/events/*.yaml` (`src/gen`, git-ignored). Nothing is sent locally.
+
+W1-08: `auth` (`@todayz/auth`) is the shared session core and sign-in UI for the three apps: in-memory token with cookie refresh (cross-tab race per D-105), `PhoneOtpFlow` (Turnstile, OTP, resend), offline banner, error boundary, update controller and toast (held while a sale or checkout is open), and the build-time site-key check (`@todayz/auth/build`) plus `scripts/precache-check.mjs`. Tests: `mk/46-auth.mk`.

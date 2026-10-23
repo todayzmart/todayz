@@ -1,4 +1,8 @@
+import { useSession } from '@todayz/auth';
+import { useQueryClient } from '@tanstack/react-query';
 import { Link, Outlet } from '@tanstack/react-router';
+import { Button } from '@todayz/ui';
+import { LogOut } from 'lucide-react';
 import { Fragment } from 'react';
 import { useIntl } from 'react-intl';
 import { Icon } from './Icon';
@@ -23,6 +27,29 @@ function NavLink({ item }: { item: NavItem }) {
       <Icon icon={item.icon} />
       {label}
     </Link>
+  );
+}
+
+/** Ends this device's session and drops everything cached for the person who was signed in. */
+function SignOut() {
+  const intl = useIntl();
+  const session = useSession();
+  const client = useQueryClient();
+  const text = intl.formatMessage({ id: 'auth.signOut' });
+  return (
+    <div className={styles.signOut}>
+      <Button
+        variant="ghost"
+        block
+        icon={LogOut}
+        title={text}
+        onClick={() => {
+          void session.signOut().then(() => client.clear());
+        }}
+      >
+        <span className={styles.label}>{text}</span>
+      </Button>
+    </div>
   );
 }
 
@@ -58,6 +85,7 @@ export function Shell() {
             </Fragment>
           );
         })}
+        <SignOut />
       </nav>
       <main id="main" className={styles.main} tabIndex={-1}>
         <Outlet />

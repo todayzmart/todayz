@@ -65,7 +65,8 @@
   }
 
   /* 44px touch targets on the rail (the design's 32px rows are for a mouse). */
-  .side a {
+  .side a,
+  .side button {
     justify-content: center;
     height: var(--control-lg);
     min-width: var(--control-lg);
@@ -89,4 +90,68 @@
   .main {
     padding: var(--space-4);
   }
+}
+
+/* A-01 and the loading state: one centred column, no sidebar. */
+.signIn {
+  max-width: 560px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-4);
+  outline: none;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sub {
+  margin: 0;
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+/* Offline banner sits at the top of the page, above the sidebar. */
+.offline {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-nav);
+}
+
+.signOut {
+  margin-top: auto;
+  padding: var(--space-2);
+}
+
+.secret {
+  font: var(--type-body);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  word-break: break-all;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+}
+
+.codes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+.codes li {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
 }

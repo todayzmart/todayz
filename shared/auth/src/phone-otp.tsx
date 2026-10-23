@@ -46,6 +46,8 @@ export interface PhoneOtpLabels {
 export interface SignedIn {
   userId: string;
   isNewUser: boolean;
+  /** Admin app only: what the second factor needs (`totp_enrol` or `totp_verify`). */
+  nextStep?: 'totp_enrol' | 'totp_verify' | undefined;
 }
 
 export interface PhoneOtpFlowProps {
@@ -128,7 +130,12 @@ export function PhoneOtpFlow({ session, siteKey, labels, onSignedIn, children, c
           deviceId: getDeviceId(session.app),
         });
         session.signIn({ accessToken: r.accessToken, expiresAt: r.expiresAt, userId: r.userId });
-        onSignedIn({ userId: r.userId, isNewUser: r.isNewUser });
+        const step = (r as { nextStep?: string }).nextStep;
+        onSignedIn({
+          userId: r.userId,
+          isNewUser: r.isNewUser,
+          nextStep: step === 'totp_enrol' || step === 'totp_verify' ? step : undefined,
+        });
       } catch (e) {
         setCodeError(labels.errors[otpErrorKind(e)]);
         setErrorKey((k) => k + 1);
