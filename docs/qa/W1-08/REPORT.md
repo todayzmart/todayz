@@ -27,7 +27,7 @@ Branch `worktree-agent-a0a26af00032565dd`, rebased by the lead onto `main` at 7b
   - The picker assumes `GET /v1/biz/businesses` returns `{items:[{id,name,role,stores:[{id,name}]}]}` (`TODO(W1-04)`).
 - **Admin:**
   - The sign-in gate and the two-step page.
-  - The TOTP calls match the W1-01 phase B contract (enrol, verify with `purpose: login|step_up`, recover, and `nextStep`), but are hand-typed (`TODO(W1-01b)`) until the generated client is swapped in.
+  - The TOTP calls (enrol, verify with `purpose: login|step_up`, recover, and `nextStep`) use the generated client since W1-01b merged.
   - The `otpauth://` link is rendered only when the URI has that scheme.
 - **i18n:** sign-in catalogues for the three apps. hi, kn, te and ta are English copies for now.
 - **Make:** `mk/46-auth.mk` adds `check-auth`, and `check-frontend-build` runs `build:e2e`.
@@ -56,13 +56,17 @@ Run by the lead on 23 October after the merge, on a fresh `make dev` (API, mocks
 |---|---|
 | Customer: send code, enter it, signed in, still signed in after a reload (the refresh cookie works cross-origin), wrong code refused | 2 passed |
 | Business: the same, through the sign-in gate | 2 passed |
-| Admin: SMS code, then the authenticator step | not run yet: needs a seeded admin, which comes with W1-01b |
+| Admin, after W1-01b merged (`make reset` seeds the admins of `e2e/fixtures/admins.yaml`): SMS code then the two-step check, a wrong authenticator code refused; a wrong SMS code refused; a seeded admin with the right authenticator code (RFC 6238 from the fixture's test-only secret) reaches the console and stays signed in after a reload (the rotated refresh cookie, L9) | 3 passed |
 
 Two test fixes, committed in 4125f72:
 - The customer PIN field is found by role (`textbox` named "PIN code"); the label alone also matched the form.
 - The "wrong code" tests used `000000`, which the reserved test numbers accept locally by design (01 §2), so they signed in. They now use `123456` or `654321`.
 
-Screenshots in `screens/`: customer sign-in and code step at 390 px, business and admin sign-in at 1440 px.
+Admin journey fixes (lead, after W1-01b): each test signs in with its own number, because the API limits how often one phone may ask for a code ("Too many tries" on the third send). `TZ_ADMIN_PHONE` is the two-step test's admin, `TZ_ADMIN_CONSOLE_PHONE` and `TZ_ADMIN_TOTP_SECRET` the console test's; the wrong-SMS test uses a random reserved number.
+
+The admin TOTP calls and `signOutEverywhere()` now use the generated client (642810a). The hand-typed logout-all call did not send `X-TZ-Client`, which the API requires on it as on refresh; it does now, with a test.
+
+Screenshots in `screens/`: customer sign-in and code step at 390 px, business and admin sign-in at 1440 px, and the admin console after the two-step check at 1280 px (`admin-console-1280.png`).
 
 **Design gap:** the screens are functional but plain next to the design source (no mint wash or pastel tints, headings not in Anek). To be brought in line in the W2 screen work.
 
@@ -74,7 +78,6 @@ Screenshots in `screens/`: customer sign-in and code step at 390 px, business an
 - No screen calls `signOutEverywhere()` yet. The screen that does must show "did not complete" when it throws.
 - If site data is cleared but the cookie survives, the device signs in again, because the hint is gone.
 - The hi, kn, te and ta catalogues are English copies.
-- The TOTP and logout-all calls are hand-typed until the generated client is wired in after W1-01b merges.
 
 ## Questions answered by the lead
 
