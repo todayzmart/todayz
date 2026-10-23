@@ -71,7 +71,42 @@ Rebased onto main 5c75d3b (W1-05 merged). Git skipped the duplicate schema commi
 1. **Undeclared query names.** The validator now refuses a query name the operation does not declare, with 422 `query.<name>: not allowed`. A name outside the field-token pattern is echoed as `<redacted>`. This matches how an unknown body property is already refused. Before the change I checked that every app calls the API through the generated clients, which send only declared params. `TestUndeclaredQueryRefused` covers it.
 2. **Opaque cursors.** A cursor the server never issued is refused with 422 `query.cursor`, and that stays. `e2e/contract/schemathesis.toml` (loaded by `run.sh --config-file`) lets `positive_data_acceptance` accept 422 on the three public cursor lists only: `listDiscoverStores`, `listDiscoverStoreItems` and `searchDiscover`. Lists behind auth answer 401 first. A new public cursor list joins that file.
 
-Verification on main after the fixes is recorded in the table below.
+### Latency regression on the real seed (fixed in 818e8ca)
+
+With W1-05's full seed on main, `TestSearchAtScale/latency` failed: p95 523 ms against the 300 ms target (the agent's 81 ms had been on the stub seed). I sent it back to the agent; the target stayed.
+
+**Cause.** The cause was the query plan, not the SQL or the indexes. pgx caches prepared statements, and after five runs Postgres switches each to its generic plan, made without the point, the radius or the optional filters. For `SearchItems`:
+- the generic plan guessed 1 store in the radius (actually 186) and 11 products (actually about 3,600);
+- it then probed `ux_store_items_store_product` once per (store, product) pair: about 670k probes and about 500 ms.
+
+The plan made with the real arguments runs in about 60 ms. This was confirmed with `plan_cache_mode` forced each way and with `EXPLAIN (GENERIC_PLAN)`.
+
+**Fix.** `search.ready()` wraps the querier in `planPerCall`. Its `Query` and `QueryRow` use `pgx.QueryExecModeCacheDescribe`:
+- the discover reads run as unnamed statements and are planned per call;
+- planning costs about 0.5 ms, and it is still one round trip;
+- writes (search log, events) keep the default mode.
+
+There is no new index and no migration. The perf test now times each query by name and prints `EXPLAIN (ANALYZE, BUFFERS)` of the worst two queries when p95 misses. It also guards the regression: the same statement runs 56 times, well past the switch.
+
+| | p50 | p95 | max |
+|---|---|---|---|
+| Before (main 61e593c) | 107 ms | 517 ms | 539 ms |
+| After (agent) | 22 ms | 78 ms | 89 ms |
+| After (lead, in the worktree before the merge) | 24 ms | 74 ms | 80 ms |
+
+Lead verification of 818e8ca, before the fast-forward:
+
+| Check | Result |
+|---|---|
+| `make gen` | ok |
+| `go vet ./...` | ok |
+| golangci-lint | 0 issues |
+| `go test -race ./internal/search/ ./cmd/todayz/` | ok |
+| `TestSearchAtScale` (indexes, latency) | pass |
+
+**Follow-ups:**
+- Cost still grows with the listings inside the radius (about 31k at 5 km in the synthetic city). If real density goes far beyond that, filter on text first through the GIN `ix_store_items_search`. That needs the `OR p.category_id = ANY(…)` branch restructured.
+- Any other package whose reads hang on a point plus optional `$n IS NULL OR …` filters should use the same per-call planning. Only `search` does today.
 
 Decisions on the agent's questions (all accepted unless noted):
 
