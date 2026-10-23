@@ -119,6 +119,9 @@ importers:
       '@todayz/tokens':
         specifier: workspace:*
         version: link:../shared/tokens
+      '@todayz/ui':
+        specifier: workspace:*
+        version: link:../shared/ui
       lucide-react:
         specifier: 1.52.0
         version: 1.52.0(@types/react@19.3.0)(react@19.3.0)
