@@ -33,15 +33,21 @@ var EscalationSources = func(d Deps) (notice.UnseenOrders, notice.StoreContacts)
 		return nil, nil
 	}
 	pool := db.New(d.Pool)
+	off := func(err error) (notice.UnseenOrders, notice.StoreContacts) {
+		if d.Log != nil {
+			d.Log.Warn("notify: order-unseen escalation is off", "error", err)
+		}
+		return nil, nil
+	}
 	contacts, err := business.NewContacts(pool, d.Config)
 	if err != nil {
-		return nil, nil
+		return off(err)
 	}
 	// Unseen only reads; the sender, timers and stock a status change needs
 	// are not set.
 	svc, err := orders.New(orders.Deps{Config: d.Config, DB: pool, Clock: d.Clock, Log: d.Log, Settings: d.Settings})
 	if err != nil {
-		return nil, nil
+		return off(err)
 	}
 	return svc, contacts
 }
