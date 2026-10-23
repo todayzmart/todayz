@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
+
 	"github.com/go-chi/chi/v5"
 
+	"github.com/todayz/backend/internal/platform/reqctx"
 	teldomain "github.com/todayz/backend/internal/telemetry"
 )
 
@@ -12,6 +15,7 @@ func mountTelemetry(r chi.Router, d *deps) {
 	_, _, err := teldomain.Register(r, teldomain.Deps{
 		DB: d.DB, Clock: d.Clock, Metrics: d.Metrics,
 		Env: d.Config.Env, APIAddr: d.Config.APIAddr, TestRoutes: d.TestClock != nil,
+		UserID: func(ctx context.Context) string { return reqctx.PrincipalFrom(ctx).UserID },
 	})
 	if err != nil {
 		panic("telemetry routes: " + err.Error())

@@ -11,6 +11,7 @@ import (
 	"github.com/todayz/backend/internal/platform/authn"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
 // Public marks an operation that needs no permission check (a `security: []`
@@ -59,7 +60,22 @@ func Authorize(a Authorizer, r *http.Request, action string) (context.Context, e
 	if err != nil {
 		return ctx, err
 	}
+	notePrincipal(ctx, p, d)
 	return WithDecision(ctx, d), nil
+}
+
+// notePrincipal gives the access log the caller's kind, role and store (05;
+// never the user id).
+func notePrincipal(ctx context.Context, p authn.Principal, d Decision) {
+	kind := "anonymous"
+	if !p.IsAnonymous() {
+		kind = p.App.Kind()
+	}
+	store := ""
+	if d.Scope.StoreID != ids.Zero {
+		store = d.Scope.StoreID.String()
+	}
+	telemetry.NotePrincipal(ctx, kind, string(d.Role), store)
 }
 
 // Strict returns slot 15 for one domain's generated strict server. ops maps

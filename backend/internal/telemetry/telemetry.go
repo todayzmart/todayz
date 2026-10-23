@@ -35,7 +35,6 @@ type Deps struct {
 	// use exactly the /v1/test/clock gate: Env.AllowsTestRoutes, a loopback API_ADDR and this.
 	TestRoutes bool
 	// UserID returns the signed-in user's id (a ULID) or "". nil means every caller is anonymous.
-	// TODO(W1-01): pass the authenticated principal here once the auth middleware lands.
 	UserID func(ctx context.Context) string
 }
 

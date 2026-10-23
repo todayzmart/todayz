@@ -342,8 +342,8 @@ func NoteErrCode(ctx context.Context, code string) {
 }
 
 // NotePrincipal records the caller for the access log (user_kind, role,
-// store_id; never the user id). TODO(W1-01): authn calls this once it has
-// resolved the principal.
+// store_id; never the user id). authz.Authorize calls it once a check has
+// passed; before that the access log falls back to reqctx's kind.
 func NotePrincipal(ctx context.Context, userKind, role, storeID string) {
 	if h := notesFrom(ctx); h != nil {
 		h.mu.Lock()

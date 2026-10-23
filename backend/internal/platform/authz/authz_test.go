@@ -17,6 +17,7 @@ import (
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
 var t0 = time.Date(2026, 10, 23, 6, 0, 0, 0, time.UTC)
@@ -288,6 +289,28 @@ func TestScopeFromAndAuthorize(t *testing.T) {
 	require.Equal(t, genproblems.Unauthorized, code(t, err))
 	_, ok = DecisionFrom(context.Background())
 	require.False(t, ok)
+}
+
+// TestAuthorizeNotesThePrincipal: a passed check gives the access log the
+// kind, role and store; a refused one notes nothing.
+func TestAuthorizeNotesThePrincipal(t *testing.T) {
+	biz, store := ids.New(t0), ids.New(t0.Add(time.Second))
+	s := staff{members: map[ids.ID]Membership{biz: {Role: Owner}}, stores: map[ids.ID]ids.ID{store: biz}}
+	e := engine(t, clock.NewFake(t0), s)
+
+	r := request(t, "/v1/biz/businesses/{bid}/stores/{sid}/orders", "/v1/biz/businesses/"+biz.String()+"/stores/"+store.String()+"/orders", user(authn.AppBusiness))
+	ctx, notes := telemetry.WithReqNotes(r.Context())
+	_, err := Authorize(e, r.WithContext(ctx), "order.accept")
+	require.NoError(t, err)
+	kind, role, sid := notes.Principal()
+	require.Equal(t, []string{"staff", "owner", store.String()}, []string{kind, role, sid})
+
+	r = request(t, "/v1/biz/businesses/{bid}", "/v1/biz/businesses/"+biz.String(), user(authn.AppCustomer))
+	ctx, notes = telemetry.WithReqNotes(r.Context())
+	_, err = Authorize(e, r.WithContext(ctx), "order.accept")
+	require.Error(t, err)
+	kind, role, sid = notes.Principal()
+	require.Equal(t, []string{"", "", ""}, []string{kind, role, sid})
 }
 
 type handlerFunc func(context.Context, http.ResponseWriter, *http.Request, any) (any, error)
