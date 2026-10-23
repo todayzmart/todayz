@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/todayz/backend/internal/business"
 	"github.com/todayz/backend/internal/identity"
 	"github.com/todayz/backend/internal/platform/authn"
 	"github.com/todayz/backend/internal/platform/authz"
@@ -36,7 +37,14 @@ func buildSecurity(d *deps) (mw.Authenticator, mw.Limiter, error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("security: %w", err)
 	}
-	engine, err := authz.New(policy.All(), authz.Options{Clock: d.Clock})
+	// Business membership comes from the staff table (W1-04). Without a
+	// database the resolver stays a nil interface and the engine refuses
+	// every business action.
+	var staff authz.StaffResolver
+	if d.DB != nil {
+		staff = business.NewStaffResolver(d.DB)
+	}
+	engine, err := authz.New(policy.All(), authz.Options{Clock: d.Clock, Staff: staff})
 	if err != nil {
 		return nil, nil, fmt.Errorf("security: %w", err)
 	}
