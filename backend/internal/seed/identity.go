@@ -234,7 +234,7 @@ func seedAdmins(ctx context.Context, d Deps, seal *pii.Sealer, hash *pii.Hasher,
 // loadSeedAdmins reads and checks the fixture. Errors never quote a phone or
 // a secret from it.
 func loadSeedAdmins(path string) ([]seedAdmin, error) {
-	f, err := os.Open(path) //nolint:gosec // G304: the path is the operator's SEED_ADMINS_FILE, local/test only
+	f, err := os.Open(path) // #nosec G304 -- the path is the operator's SEED_ADMINS_FILE, local/test only
 	if err != nil {
 		return nil, fmt.Errorf("admins: %s: %w", seedAdminsFileEnv, err)
 	}

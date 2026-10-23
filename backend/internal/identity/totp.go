@@ -3,7 +3,7 @@ package identity
 import (
 	"crypto/hmac"
 	"crypto/rand"
-	"crypto/sha1" //nolint:gosec // RFC 6238 TOTP is HMAC-SHA1 for every authenticator app; not a collision use
+	"crypto/sha1" // #nosec G505 -- RFC 6238 TOTP is HMAC-SHA1 for every authenticator app; not a collision use
 	"crypto/subtle"
 	"encoding/base32"
 	"encoding/binary"
@@ -73,7 +73,7 @@ func totpStep(t time.Time) int64 { return t.Unix() / int64(TOTPPeriod/time.Secon
 // hotp is RFC 4226 §5.3 with 6 digits.
 func hotp(secret []byte, counter int64) string {
 	var msg [8]byte
-	binary.BigEndian.PutUint64(msg[:], uint64(counter)) //nolint:gosec // counters are positive Unix steps
+	binary.BigEndian.PutUint64(msg[:], uint64(counter)) // #nosec G115 -- counters are positive Unix steps
 	m := hmac.New(sha1.New, secret)
 	m.Write(msg[:])
 	sum := m.Sum(nil)
