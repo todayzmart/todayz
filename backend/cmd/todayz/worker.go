@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"errors"
 	"io"
 	"log/slog"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/riverqueue/river/rivertype"
@@ -11,11 +13,15 @@ import (
 	"github.com/todayz/backend/internal/jobs"
 	"github.com/todayz/backend/internal/platform/health"
 	"github.com/todayz/backend/internal/platform/httpx"
+	"github.com/todayz/backend/internal/platform/lifecycle"
 	"github.com/todayz/backend/internal/platform/migrate"
 	"github.com/todayz/backend/internal/platform/pgnotify"
 	"github.com/todayz/backend/internal/platform/queue"
 )
 
+// runWorker works jobs until SIGTERM, then drains (02 §2.8, D-98; see
+// serveWorker). The rest closes in order on the way out: the migrator, the
+// LISTEN/NOTIFY loop, the DB pool, then the telemetry flush.
 func runWorker(ctx context.Context, getenv func(string) string, out io.Writer) error {
 	a, err := boot(ctx, "worker", getenv, out)
 	if err != nil {
@@ -27,7 +33,7 @@ func runWorker(ctx context.Context, getenv func(string) string, out io.Writer) e
 	if err != nil {
 		return err
 	}
-	defer pool.Close()
+	defer lifecycle.Step(ctx, a.log, "db pool", pool.Close)
 
 	l := pgnotify.New(pool, a.log)
 	clk, off, _, err := a.clocks(ctx, pool, l)
@@ -35,9 +41,11 @@ func runWorker(ctx context.Context, getenv func(string) string, out io.Writer) e
 		return err
 	}
 	st := a.settingsCache(pool, l)
-	if err := waitListener(ctx, l); err != nil {
+	stopLoops, err := startListener(ctx, l)
+	if err != nil {
 		return err
 	}
+	defer lifecycle.Step(ctx, a.log, "background loops", stopLoops)
 
 	reg := queue.NewRegistry()
 	jobs.Register(reg, jobs.Deps{Pool: pool, Clock: clk, Settings: st, Config: a.cfg, Log: a.log})
@@ -71,11 +79,32 @@ func runWorker(ctx context.Context, getenv func(string) string, out io.Writer) e
 	qh.Watch(c)
 	a.log.InfoContext(ctx, "worker started", slog.Int("kinds", len(reg.Kinds())), slog.Int("periodic", len(reg.Periodic)))
 
-	err = serve(ctx, a.log, srv, "worker health")
+	return serveWorker(ctx, a.log, lifecycle.Server{Srv: srv, Ready: ready}, c, queue.DrainGrace, queue.HardGrace)
+}
 
-	// Running jobs finish (up to DrainGrace), then the rest are cancelled.
-	if serr := queue.Drain(c, queue.DrainGrace, a.log); serr != nil {
-		a.log.WarnContext(context.WithoutCancel(ctx), "worker stop", slog.String("err", serr.Error()))
+// serveWorker serves the worker's health port until ctx ends (SIGTERM), then
+// drains: /readyz turns 503 at once, River stops fetching and running jobs
+// get grace to finish, then StopAndCancel gets hardGrace (queue.Drain), all
+// while the health port keeps answering; then the health server shuts down.
+// If the health server fails before any signal, River is drained all the
+// same.
+func serveWorker(ctx context.Context, log *slog.Logger, s lifecycle.Server, c *queue.Client, grace, hardGrace time.Duration) error {
+	s.Name, s.Log, s.Drain = "worker health", log, lifecycle.HealthShutdown
+	drained := false
+	drain := func() error {
+		drained = true
+		log.InfoContext(context.WithoutCancel(ctx), "worker draining: no new jobs; running jobs finish",
+			slog.Duration("grace", grace), slog.Duration("hard_grace", hardGrace))
+		err := queue.Drain(c, grace, hardGrace, log)
+		if err == nil {
+			log.InfoContext(context.WithoutCancel(ctx), "worker drained: river stopped")
+		}
+		return err
+	}
+	s.Before = drain
+	err := s.Run(ctx)
+	if !drained {
+		err = errors.Join(err, drain())
 	}
 	return err
 }

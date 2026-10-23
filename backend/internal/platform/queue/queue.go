@@ -23,6 +23,7 @@ import (
 	"github.com/riverqueue/river"
 	"github.com/riverqueue/river/riverdriver/riverpgxv5"
 	"github.com/riverqueue/river/rivertype"
+	"go.opentelemetry.io/otel/metric"
 
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
@@ -74,6 +75,9 @@ type Options struct {
 	// scheduled for "in 30 minutes" fall due when /v1/test/clock advances.
 	// Nil (staging, prod) means River uses the real and database clocks.
 	Time rivertype.TimeGenerator
+	// MeterProvider for tz_job_hard_cancelled_total (the global provider
+	// when nil; tests pass their own reader).
+	MeterProvider metric.MeterProvider
 }
 
 func baseConfig(o Options) *river.Config {
@@ -99,10 +103,13 @@ func NewWorkerClient(pool *pgxpool.Pool, reg *Registry, o Options) (*Client, err
 	cfg.Queues = map[string]river.QueueConfig{river.QueueDefault: {MaxWorkers: o.MaxWorkers}}
 	cfg.Workers = reg.Workers
 	cfg.PeriodicJobs = reg.Periodic
+	f := newInflight(o.MeterProvider) // lets Drain name the jobs it hard-cancels
+	cfg.Middleware = append(cfg.Middleware, f)
 	c, err := river.NewClient(riverpgxv5.New(pool), cfg)
 	if err != nil {
 		return nil, fmt.Errorf("queue: %w", err)
 	}
+	trackers.Store(c, f)
 	return c, nil
 }
 
@@ -115,39 +122,12 @@ func NewInsertClient(pool *pgxpool.Pool, o Options) (*Client, error) {
 	return c, nil
 }
 
-// DrainGrace is how long Drain lets running jobs finish, and then how long
-// it waits for cancelled ones to return. The deploy's stop timeout must
-// exceed twice this.
-const DrainGrace = 30 * time.Second
-
 // Start starts c detached from ctx's cancellation (W1). River hard-stops
 // (cancels every running job) when its start context ends, so a SIGTERM that
 // cancels ctx would abort jobs mid-way; Drain stops the client instead.
 func Start(ctx context.Context, c *Client) error {
 	if err := c.Start(context.WithoutCancel(ctx)); err != nil {
 		return fmt.Errorf("queue: start: %w", err)
-	}
-	return nil
-}
-
-// Drain stops c gracefully (W1): no new jobs are fetched, running jobs get up
-// to grace to finish, then the ones still running have their contexts
-// cancelled (StopAndCancel) and get up to grace again to return.
-func Drain(c *Client, grace time.Duration, log *slog.Logger) error {
-	if log == nil {
-		log = telemetry.Default()
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), grace)
-	defer cancel()
-	if err := c.Stop(ctx); err == nil {
-		return nil
-	}
-	log.WarnContext(ctx, "queue: jobs still running after the grace period; cancelling them",
-		slog.Duration("grace", grace))
-	hctx, hcancel := context.WithTimeout(context.Background(), grace)
-	defer hcancel()
-	if err := c.StopAndCancel(hctx); err != nil {
-		return fmt.Errorf("queue: stop and cancel: %w", err)
 	}
 	return nil
 }

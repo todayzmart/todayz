@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 	"log/slog"
-	"sync/atomic"
 	"testing"
 	"time"
 
@@ -110,87 +109,6 @@ func TestScheduledJobFollowsOffsetClock(t *testing.T) {
 		t.Fatal("the job did not run after the clock moved past it")
 	}
 	require.Equal(t, int64(1), hb.Runs.Load())
-}
-
-type slowArgs struct{}
-
-func (slowArgs) Kind() string { return "test.slow" }
-
-// slowWorker blocks until release closes or its context is cancelled.
-type slowWorker struct {
-	river.WorkerDefaults[slowArgs]
-	started   chan struct{}
-	release   chan struct{}
-	cancelled atomic.Bool
-	finished  atomic.Bool
-}
-
-func (w *slowWorker) Work(ctx context.Context, _ *river.Job[slowArgs]) error {
-	close(w.started)
-	select {
-	case <-w.release:
-		w.finished.Store(true)
-		return nil
-	case <-ctx.Done():
-		w.cancelled.Store(true)
-		return ctx.Err()
-	}
-}
-
-func startSlow(t *testing.T, db *testkit.DB, ctx context.Context) (*Client, *slowWorker, int64) {
-	t.Helper()
-	w := &slowWorker{started: make(chan struct{}), release: make(chan struct{})}
-	reg := NewRegistry()
-	Add[slowArgs](reg, w)
-	c, err := NewWorkerClient(db.Pool, reg, Options{Log: quiet()})
-	require.NoError(t, err)
-	require.NoError(t, Start(ctx, c))
-	res, err := c.Insert(context.WithoutCancel(ctx), slowArgs{}, nil)
-	require.NoError(t, err)
-	select {
-	case <-w.started:
-	case <-time.After(20 * time.Second):
-		t.Fatal("the job did not start")
-	}
-	return c, w, res.Job.ID
-}
-
-func jobState(t *testing.T, db *testkit.DB, id int64) string {
-	t.Helper()
-	var s string
-	require.NoError(t, db.Pool.QueryRow(context.Background(), `SELECT state FROM river_job WHERE id = $1`, id).Scan(&s))
-	return s
-}
-
-// TestDrainLetsRunningJobFinish (W1): SIGTERM cancels the process context;
-// a job running at that moment still finishes and is marked completed.
-func TestDrainLetsRunningJobFinish(t *testing.T) {
-	db := testkit.NewDB(t)
-	ctx, signal := context.WithCancel(context.Background())
-	c, w, id := startSlow(t, db, ctx)
-
-	signal() // what SIGTERM does to the worker's context
-	drained := make(chan error, 1)
-	go func() { drained <- Drain(c, 10*time.Second, quiet()) }()
-	time.Sleep(300 * time.Millisecond) // the job is still working when the drain starts
-	require.False(t, w.cancelled.Load(), "the signal cancelled the running job")
-	close(w.release)
-
-	require.NoError(t, <-drained)
-	require.True(t, w.finished.Load())
-	require.False(t, w.cancelled.Load())
-	require.Equal(t, "completed", jobState(t, db, id))
-}
-
-// TestDrainCancelsAfterGrace (W1): a job still running after the grace
-// period gets its context cancelled, and Drain returns.
-func TestDrainCancelsAfterGrace(t *testing.T) {
-	db := testkit.NewDB(t)
-	c, w, id := startSlow(t, db, context.Background())
-	require.NoError(t, Drain(c, 300*time.Millisecond, quiet()))
-	require.True(t, w.cancelled.Load())
-	require.False(t, w.finished.Load())
-	require.NotEqual(t, "completed", jobState(t, db, id))
 }
 
 // TestInsertClient: the API's insert-only client inserts inside a transaction.

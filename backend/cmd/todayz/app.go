@@ -18,6 +18,7 @@ import (
 	"github.com/todayz/backend/internal/platform/dbenv"
 	"github.com/todayz/backend/internal/platform/egress"
 	"github.com/todayz/backend/internal/platform/httpx"
+	"github.com/todayz/backend/internal/platform/lifecycle"
 	"github.com/todayz/backend/internal/platform/pgnotify"
 	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/platform/telemetry"
@@ -98,12 +99,15 @@ func loadAndLog(service string, getenv config.Getenv, out io.Writer) (*config.Co
 	return cfg, log, nil
 }
 
+// close flushes telemetry (bounded): the last step of the shutdown, after the
+// DB pool has closed (02 §2.8).
 func (a *app) close() {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), lifecycle.TelemetryFlush)
 	defer cancel()
 	if err := a.shutdown(ctx); err != nil {
 		a.log.Warn("telemetry shutdown", slog.String("err", err.Error()))
 	}
+	a.log.Info("shutdown: telemetry flushed")
 }
 
 // appPool opens DATABASE_URL (todayz_app: DML only).
@@ -145,15 +149,30 @@ func (a *app) settingsCache(pool *pgxpool.Pool, l *pgnotify.Listener) *settings.
 	return c
 }
 
-// waitListener starts l and waits for its first LISTEN (bounded).
-func waitListener(ctx context.Context, l *pgnotify.Listener) error {
-	go func() { _ = l.Run(ctx) }()
+// startListener starts l and waits for its first LISTEN (bounded). l is an
+// in-process loop (settings cache, test clock): it runs on its own context,
+// not the signal context, so settings keep following NOTIFY while requests
+// and jobs drain (02 §2.8). stop ends it and waits for it to return, which
+// must happen before the pool closes.
+func startListener(ctx context.Context, l *pgnotify.Listener) (stop func(), err error) {
+	lctx, cancel := context.WithCancel(context.WithoutCancel(ctx))
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		_ = l.Run(lctx)
+	}()
+	stop = func() {
+		cancel()
+		<-done
+	}
 	select {
 	case <-l.Ready():
-		return nil
+		return stop, nil
 	case <-ctx.Done():
-		return ctx.Err()
+		stop()
+		return nil, ctx.Err()
 	case <-time.After(10 * time.Second):
-		return fmt.Errorf("pgnotify: no LISTEN connection after 10s")
+		stop()
+		return nil, fmt.Errorf("pgnotify: no LISTEN connection after 10s")
 	}
 }

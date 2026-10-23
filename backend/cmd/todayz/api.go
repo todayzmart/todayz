@@ -2,12 +2,8 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
-	"log/slog"
-	"net/http"
-	"time"
 
 	"github.com/todayz/backend/gen/api/spec"
 	"github.com/todayz/backend/internal/platform/db"
@@ -16,6 +12,7 @@ import (
 	"github.com/todayz/backend/internal/platform/httpx/mw"
 	"github.com/todayz/backend/internal/platform/httpx/openapi"
 	"github.com/todayz/backend/internal/platform/idempotency"
+	"github.com/todayz/backend/internal/platform/lifecycle"
 	"github.com/todayz/backend/internal/platform/migrate"
 	"github.com/todayz/backend/internal/platform/pgnotify"
 	"github.com/todayz/backend/internal/platform/queue"
@@ -45,6 +42,11 @@ func buildRouter(d deps, idem idempotency.Store, v *openapi.Validator) (*httpx.R
 	return r, nil
 }
 
+// runAPI serves the API until SIGTERM, then drains (02 §2.8, D-98): /readyz
+// turns 503 at once, the server keeps serving for SHUTDOWN_PRESTOP, then
+// srv.Shutdown waits up to SHUTDOWN_DRAIN for in-flight requests. The rest
+// closes in order on the way out (the defers run last-first): the migrator,
+// the LISTEN/NOTIFY loop, the DB pool, then the telemetry flush.
 func runAPI(ctx context.Context, getenv func(string) string, out io.Writer) error {
 	a, err := boot(ctx, "api", getenv, out)
 	if err != nil {
@@ -52,11 +54,17 @@ func runAPI(ctx context.Context, getenv func(string) string, out io.Writer) erro
 	}
 	defer a.close()
 
+	// Refuse to start with a drain the deploy would cut (SC-GS-03).
+	t, err := lifecycle.APITimings(a.cfg.Env.IsDeployed(), a.cfg.Shutdown.PreStop, a.cfg.Shutdown.Drain)
+	if err != nil {
+		return fmt.Errorf("api: %w", err)
+	}
+
 	pool, err := a.appPool(ctx, "api")
 	if err != nil {
 		return err
 	}
-	defer pool.Close()
+	defer lifecycle.Step(ctx, a.log, "db pool", pool.Close)
 
 	l := pgnotify.New(pool, a.log)
 	clk, _, tc, err := a.clocks(ctx, pool, l)
@@ -64,9 +72,11 @@ func runAPI(ctx context.Context, getenv func(string) string, out io.Writer) erro
 		return err
 	}
 	st := a.settingsCache(pool, l)
-	if err := waitListener(ctx, l); err != nil {
+	stopLoops, err := startListener(ctx, l)
+	if err != nil {
 		return err
 	}
+	defer lifecycle.Step(ctx, a.log, "background loops", stopLoops)
 
 	q, err := queue.NewInsertClient(pool, queue.Options{Log: a.log})
 	if err != nil {
@@ -101,27 +111,9 @@ func runAPI(ctx context.Context, getenv func(string) string, out io.Writer) erro
 	if err != nil {
 		return fmt.Errorf("api: %w", err)
 	}
-	srv := httpx.NewServer(a.cfg.APIAddr, h)
-	return serve(ctx, a.log, srv, "api")
-}
-
-// serve runs srv until ctx is done, then shuts it down gracefully.
-func serve(ctx context.Context, log *slog.Logger, srv *http.Server, what string) error {
-	errc := make(chan error, 1)
-	go func() {
-		log.InfoContext(ctx, what+" listening", slog.String("addr", srv.Addr))
-		errc <- srv.ListenAndServe()
-	}()
-	select {
-	case err := <-errc:
-		if errors.Is(err, http.ErrServerClosed) {
-			return nil
-		}
-		return err
-	case <-ctx.Done():
+	s := lifecycle.Server{
+		Name: "api", Srv: httpx.NewServer(a.cfg.APIAddr, h), Ready: ready,
+		PreStop: t.PreStop, Drain: t.Drain, Log: a.log,
 	}
-	log.Info(what + " shutting down")
-	sctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-	return srv.Shutdown(sctx)
+	return s.Run(ctx)
 }
