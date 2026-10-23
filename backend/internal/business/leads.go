@@ -82,7 +82,7 @@ func (s *Service) createLead(ctx context.Context, body *publicapi.LeadCreate) er
 		if seen {
 			return nil
 		}
-		enc, err := s.seal.Seal(fieldPhone, []byte(e164))
+		enc, err := s.seal.Seal(FieldPhone, []byte(e164))
 		if err != nil {
 			return fmt.Errorf("business: seal lead phone: %w", err)
 		}

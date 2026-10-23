@@ -146,7 +146,7 @@ func (s *Service) toStore(st businessdb.GetStoreRow, now time.Time) (businessapi
 		out.Location = &businessapi.StoreLocation{Lat: st.Lat, Lng: st.Lng}
 	}
 	if st.PhoneEnc != nil {
-		plain, err := s.seal.Open(fieldPhone, st.PhoneEnc)
+		plain, err := s.seal.Open(FieldPhone, st.PhoneEnc)
 		if err != nil {
 			return businessapi.Store{}, fmt.Errorf("business: open store phone: %w", err)
 		}
@@ -248,7 +248,7 @@ func (s *Service) sealPhone(v *invalid, path string, phone *string) []byte {
 		v.add(path, "must be an Indian mobile number")
 		return nil
 	}
-	enc, err := s.seal.Seal(fieldPhone, []byte(e164))
+	enc, err := s.seal.Seal(FieldPhone, []byte(e164))
 	if err != nil {
 		v.add(path, "could not be stored")
 		return nil

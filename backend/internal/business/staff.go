@@ -41,7 +41,7 @@ func (s *Service) toMember(r businessdb.GetStaffViewRow) (businessapi.StaffMembe
 		sealed = r.InvitePhoneEnc
 	}
 	if sealed != nil {
-		plain, err := s.seal.Open(fieldPhone, sealed)
+		plain, err := s.seal.Open(FieldPhone, sealed)
 		if err != nil {
 			return businessapi.StaffMember{}, fmt.Errorf("business: open staff phone: %w", err)
 		}
@@ -162,7 +162,7 @@ func (s *Service) inviteStaff(ctx context.Context, bidStr string, body *business
 	}
 	canDeliver := body.CanDeliver != nil && *body.CanDeliver
 	hash := s.hash.Phone(e164)
-	enc, err := s.seal.Seal(fieldPhone, []byte(e164))
+	enc, err := s.seal.Seal(FieldPhone, []byte(e164))
 	if err != nil {
 		return businessapi.StaffMember{}, fmt.Errorf("business: seal invite phone: %w", err)
 	}

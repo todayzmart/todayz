@@ -20,13 +20,15 @@ const (
 	kycSubmitted = "submitted"
 )
 
-// Sealing field names: the AAD that binds a sealed value to its column.
+// Sealing field names: the AAD that binds a sealed value to its column. The
+// seed (internal/seed) seals with the same names, so the service opens what
+// it wrote.
 const (
-	fieldPAN         = "pan"
-	fieldGSTIN       = "gstin"
-	fieldUPI         = "upi_id"
-	fieldBankAccount = "bank_account"
-	fieldPhone       = "phone"
+	FieldPAN         = "pan"
+	FieldGSTIN       = "gstin"
+	FieldUPI         = "upi_id"
+	FieldBankAccount = "bank_account"
+	FieldPhone       = "phone"
 )
 
 // --- PAN and GSTIN -------------------------------------------------------------
@@ -264,7 +266,7 @@ func (s *Service) mergeKyc(ctx context.Context, cur businessdb.BusinessKyc, body
 			v.add("body.pan", "must be a PAN")
 		}
 	case !sent(ctx, "pan") && cur.PanEnc != nil:
-		plain, err := s.seal.Open(fieldPAN, cur.PanEnc)
+		plain, err := s.seal.Open(FieldPAN, cur.PanEnc)
 		if err != nil {
 			return params, nil, fmt.Errorf("business: open pan: %w", err)
 		}
@@ -283,7 +285,7 @@ func (s *Service) mergeKyc(ctx context.Context, cur businessdb.BusinessKyc, body
 		changed = append(changed, "pan")
 		params.PanEnc, params.PanLast4 = nil, nil
 		if body.Pan != nil && pan != "" {
-			f, err := seal(fieldPAN, pan, last4(pan))
+			f, err := seal(FieldPAN, pan, last4(pan))
 			if err != nil {
 				return params, nil, err
 			}
@@ -301,7 +303,7 @@ func (s *Service) mergeKyc(ctx context.Context, cur businessdb.BusinessKyc, body
 			if r := GSTINReason(g, pan); r != "" {
 				v.add("body.gstin", r)
 			} else {
-				f, err := seal(fieldGSTIN, g, last4(g))
+				f, err := seal(FieldGSTIN, g, last4(g))
 				if err != nil {
 					return params, nil, err
 				}
@@ -310,7 +312,7 @@ func (s *Service) mergeKyc(ctx context.Context, cur businessdb.BusinessKyc, body
 		}
 	} else if gstinNow && sent(ctx, "pan") && pan != "" {
 		// The PAN changed under a kept GSTIN: they must still agree.
-		plain, err := s.seal.Open(fieldGSTIN, cur.GstinEnc)
+		plain, err := s.seal.Open(FieldGSTIN, cur.GstinEnc)
 		if err != nil {
 			return params, nil, fmt.Errorf("business: open gstin: %w", err)
 		}
@@ -328,7 +330,7 @@ func (s *Service) mergeKyc(ctx context.Context, cur businessdb.BusinessKyc, body
 		changed = append(changed, "upiId")
 		params.UpiIDEnc, params.UpiIDLast4 = nil, nil
 		if body.UpiId != nil {
-			f, err := seal(fieldUPI, *body.UpiId, upiLast4(*body.UpiId))
+			f, err := seal(FieldUPI, *body.UpiId, upiLast4(*body.UpiId))
 			if err != nil {
 				return params, nil, err
 			}
@@ -340,7 +342,7 @@ func (s *Service) mergeKyc(ctx context.Context, cur businessdb.BusinessKyc, body
 		changed = append(changed, "bankAccount")
 		params.BankAccountEnc, params.BankAccountLast4 = nil, nil
 		if body.BankAccount != nil {
-			f, err := seal(fieldBankAccount, *body.BankAccount, last4(*body.BankAccount))
+			f, err := seal(FieldBankAccount, *body.BankAccount, last4(*body.BankAccount))
 			if err != nil {
 				return params, nil, err
 			}
