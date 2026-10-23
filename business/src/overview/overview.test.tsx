@@ -81,7 +81,7 @@ describe('B-03 Overview', () => {
     renderOverview();
     let card = await insightsCard();
     // Hiding Amul (selling fast) brings the next selling-fast item, Tata Salt, into its place.
-    const [first] = within(card).getAllByRole('button', { name: 'Not useful' });
+    const [first] = within(card).getAllByRole('button', { name: /^Not useful/ });
     if (!first) throw new Error('no Not useful button');
     fireEvent.click(first);
     card = await insightsCard();
@@ -89,7 +89,7 @@ describe('B-03 Overview', () => {
     expect(within(card).getByText(/Tata Salt/)).toBeInTheDocument();
     expect(await screen.findByText(/Hidden for this visit/)).toBeInTheDocument();
     // Hiding the last row (wanted nearby) lets the lowest kind, bought together, fill in.
-    const last = within(card).getAllByRole('button', { name: 'Not useful' }).at(-1);
+    const last = within(card).getAllByRole('button', { name: /^Not useful/ }).at(-1);
     if (!last) throw new Error('no Not useful button');
     fireEvent.click(last);
     const kinds = kindsOf(await insightsCard());
@@ -126,7 +126,7 @@ describe('B-03 Overview', () => {
   it('switches the period without a network call', async () => {
     renderOverview();
     await screen.findByRole('heading', { level: 1 });
-    fireEvent.click(screen.getByRole('button', { name: '7 days' }));
+    fireEvent.click(screen.getByRole('radio', { name: '7 days' }));
     expect((await screen.findAllByText('vs previous 7 days')).length).toBeGreaterThan(0);
     const kpis = screen.getByRole('region', { name: 'At a glance' });
     expect(within(kpis).queryByText('₹48,260')).toBeNull();

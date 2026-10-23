@@ -24,4 +24,4 @@ check-ui:
 
 e2e-ui-visual:
 	@pnpm -C $(ROOT) --filter $(UI_PKG) run build-storybook
-	@pnpm -C $(ROOT) --filter $(UI_PKG) run visual design.spec.ts a11y.spec.ts
+	@pnpm -C $(ROOT) --filter $(UI_PKG) run visual design.spec.ts a11y.spec.ts overlays.spec.ts
