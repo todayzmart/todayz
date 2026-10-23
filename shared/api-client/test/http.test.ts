@@ -90,8 +90,15 @@ describe('request', () => {
   });
 
   it('never sends the bearer to the sign-in routes', async () => {
-    const s = stub(json({}));
-    configure({ fetch: s.fetch, token: () => 'tok' });
+    const calls: Call[] = [];
+    const s = { calls };
+    configure({
+      token: () => 'tok',
+      fetch: (async (url: string | URL | Request, init?: RequestInit) => {
+        calls.push({ url: String(url), init: init ?? {} });
+        return json({});
+      }) as unknown as typeof globalThis.fetch,
+    });
     for (const p of ['/v1/auth/otp/send', '/v1/auth/otp/verify', '/v1/auth/refresh', '/v1/auth/logout?x=1']) {
       await request(p, { method: 'POST' });
     }
