@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/todayz/backend/gen/api/spec"
+	"github.com/todayz/backend/internal/identity"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/health"
 	"github.com/todayz/backend/internal/platform/httpx"
@@ -25,7 +26,13 @@ import (
 // policies the contract declares (x-idempotency, x-upload); nil skips both
 // (only for tests of other slots).
 func buildRouter(d deps, idem idempotency.Store, v *openapi.Validator) (*httpx.Router, error) {
+	authenticator, limiter, err := buildSecurity(&d)
+	if err != nil {
+		return nil, err
+	}
 	o := httpx.Options{
+		Authenticator:     authenticator,
+		Limiter:           limiter,
 		Log:               d.Log,
 		CORSOrigins:       d.Config.CORSOrigins(),
 		PublicCORSOrigins: d.Config.PublicCORSOrigins(),
@@ -55,6 +62,12 @@ func runAPI(ctx context.Context, getenv func(string) string, out io.Writer) erro
 		return err
 	}
 	defer a.close()
+
+	// Sign-in refuses to start without its keys and SMS provider in staging
+	// and prod (02 §8, W1-01).
+	if err := identity.Preflight(a.cfg); err != nil {
+		return fmt.Errorf("api: %w", err)
+	}
 
 	// Refuse to start with a drain the deploy would cut (SC-GS-03).
 	t, err := lifecycle.APITimings(a.cfg.Env.IsDeployed(), a.cfg.Shutdown.PreStop, a.cfg.Shutdown.Drain)

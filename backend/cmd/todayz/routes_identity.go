@@ -1,8 +1,14 @@
 package main
 
-import "github.com/go-chi/chi/v5"
+import (
+	"github.com/go-chi/chi/v5"
 
-// mountIdentity mounts the identity domain's routes. Only the work package that builds
-// internal/identity edits this file (D-50): build the domain's service from d and
-// call its Register, e.g. identity.Register(r, identity.Deps{DB: d.DB, Clock: d.Clock}).
-func mountIdentity(r chi.Router, d *deps) {}
+	"github.com/todayz/backend/internal/identity"
+)
+
+// mountIdentity mounts /v1/auth/* and /v1/me (W1-01). The service and the
+// permission engine come from buildSecurity, which built them before the
+// pipeline so the authenticator could use the session check.
+func mountIdentity(r chi.Router, d *deps) {
+	identity.Register(r, d.Identity, d.Authz)
+}

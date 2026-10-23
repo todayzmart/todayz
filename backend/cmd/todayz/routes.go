@@ -9,6 +9,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
+	"github.com/todayz/backend/internal/identity"
+	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/db"
@@ -30,6 +32,10 @@ type deps struct {
 	Ready     *health.Readiness
 	TestClock *testclock.Service // nil in staging and prod
 	Metrics   *telemetry.Metrics // RED, SSE and RUM instruments (W1-07); nil in tests that skip them
+	// Identity and Authz are built by buildSecurity before the routes mount
+	// (W1-01): the session check behind slot 11 and the engine of slot 15.
+	Identity *identity.Service
+	Authz    *authz.Engine
 }
 
 func routes(r chi.Router, d deps) {

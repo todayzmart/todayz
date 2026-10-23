@@ -6,4 +6,78 @@
 # an object that must stay open says `x-open-object: true`. Money is `*Paise`
 # (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
 # timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+Language:
+  type: string
+  description: UI language (01 §1). English is the default.
+  enum: [en, hi, kn, te, ta]
+Me:
+  type: object
+  description: The signed-in user as this app sees them (04 §2.2).
+  required: [id, name, preferredLang, phoneMasked, app, createdAt]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    name:
+      type:
+        - string
+        - "null"
+      maxLength: 80
+    preferredLang:
+      $ref: "#/Language"
+    phoneMasked:
+      type: string
+      description: The sign-in number masked as in 01 R-16.2 (`98•••••521`). The full number is never returned.
+    app:
+      type: string
+      description: The app this token belongs to.
+      enum: [customer, business, admin]
+    roles:
+      type: array
+      description: Admin roles (D-64); admin app only.
+      items:
+        type: string
+    customer:
+      description: Customer app only.
+      oneOf:
+        - $ref: "#/CustomerProfile"
+        - type: "null"
+    createdAt:
+      $ref: ./common.yaml#/Timestamp
+CustomerProfile:
+  type: object
+  required: [referralCode, activeOrderLimit]
+  properties:
+    referralCode:
+      type: string
+      description: This customer's own referral code (6 characters).
+    activeOrderLimit:
+      description: Set while no-show strikes limit the account (01 §5.4, C-21); null otherwise.
+      oneOf:
+        - $ref: "#/ActiveOrderLimit"
+        - type: "null"
+ActiveOrderLimit:
+  type: object
+  required: [maxActiveOrders, until, reason]
+  properties:
+    maxActiveOrders:
+      type: integer
+      minimum: 1
+    until:
+      $ref: ./common.yaml#/Timestamp
+    reason:
+      type: string
+      enum: [no_show_strikes]
+MePatch:
+  type: object
+  description: Only the fields present change. `name` null clears it.
+  additionalProperties: false
+  minProperties: 1
+  properties:
+    name:
+      type:
+        - string
+        - "null"
+      minLength: 1
+      maxLength: 80
+    preferredLang:
+      $ref: "#/Language"

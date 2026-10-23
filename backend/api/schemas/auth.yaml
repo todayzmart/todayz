@@ -1,9 +1,106 @@
 # Schemas: domain "auth" (owner W1-01): sign-in, OTP, TOTP, refresh, sign-out (04 §2.1).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Map of schema name -> JSON Schema; names are unique across every
+# schemas/<domain>.yaml. Request objects carry `additionalProperties: false`.
+AuthApp:
+  type: string
+  description: |
+    The app signing in (D-14). Each app has its own session and refresh cookie:
+    `customer` → `__Secure-tz_rt_c`, `business` → `__Secure-tz_rt_b`, `admin` → `__Secure-tz_rt_a`.
+  enum: [customer, business, admin]
+IndianMobile:
+  type: string
+  description: An Indian mobile number in E.164 (`+91` and 10 digits starting 6–9). Never logged (D-15).
+  pattern: ^\+91[6-9][0-9]{9}$
+  maxLength: 13
+  examples:
+    - "+919000000001"
+OtpSendRequest:
+  type: object
+  additionalProperties: false
+  required: [phone, purpose, app, turnstileToken]
+  properties:
+    phone:
+      $ref: "#/IndianMobile"
+    purpose:
+      type: string
+      description: Why the code is sent. Only `login` until the step-up and owner-confirm flows land (W1-01 phase B, W1-04).
+      enum: [login]
+    app:
+      $ref: "#/AuthApp"
+    turnstileToken:
+      type: string
+      description: The Cloudflare Turnstile response token from the page. A failed check sends nothing (`403 forbidden`, AU-20).
+      minLength: 1
+      maxLength: 2048
+OtpSendResponse:
+  type: object
+  description: |
+    Identical for a known and an unknown number (AU-06). `requestId` names this code in
+    `POST /v1/auth/otp/verify`.
+  required: [requestId, resendAfter]
+  properties:
+    requestId:
+      $ref: ./common.yaml#/Ulid
+    resendAfter:
+      type: integer
+      minimum: 0
+      description: Seconds until `otp/send` may be called again for this number.
+OtpVerifyRequest:
+  type: object
+  additionalProperties: false
+  required: [requestId, code, app, deviceId]
+  properties:
+    requestId:
+      $ref: ./common.yaml#/Ulid
+    code:
+      type: string
+      description: The 6-digit code from the SMS. Never logged (D-15).
+      pattern: ^[0-9]{6}$
+      maxLength: 6
+    app:
+      $ref: "#/AuthApp"
+    deviceId:
+      type: string
+      description: A ULID the app makes once per install and keeps; it names this device's session.
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+      maxLength: 26
+OtpVerifyResponse:
+  type: object
+  description: The access token and whether this sign-in created the account. The refresh token is only in the `Set-Cookie` header.
+  required: [accessToken, tokenType, expiresAt, isNewUser, userId]
+  properties:
+    accessToken:
+      type: string
+      description: "The EdDSA access token (15 min). Keep it in memory only; send it as `Authorization: Bearer`."
+    tokenType:
+      type: string
+      const: Bearer
+    expiresAt:
+      $ref: ./common.yaml#/Timestamp
+    isNewUser:
+      type: boolean
+      description: True when this sign-in created the account.
+    userId:
+      $ref: ./common.yaml#/Ulid
+AccessTokenResponse:
+  type: object
+  description: A fresh access token. The rotated refresh token is only in the `Set-Cookie` header.
+  required: [accessToken, tokenType, expiresAt]
+  properties:
+    accessToken:
+      type: string
+      description: The EdDSA access token (15 min). Keep it in memory only.
+    tokenType:
+      type: string
+      const: Bearer
+    expiresAt:
+      $ref: ./common.yaml#/Timestamp
+AuthAppRequest:
+  type: object
+  description: Names the app whose refresh cookie the server reads; it reads no other (D-14).
+  additionalProperties: false
+  required: [app]
+  properties:
+    app:
+      $ref: "#/AuthApp"

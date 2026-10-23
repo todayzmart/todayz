@@ -1,12 +1,177 @@
 # Paths: domain "auth" (owner W1-01): sign-in, OTP, TOTP, refresh, sign-out (04 §2.1).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [auth]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/auth.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Phase A: OTP send and verify, refresh, logout. Phase B adds logout-all and
+# totp/enrol, totp/verify, totp/recover. Every operation: `tags: [auth]`, an
+# operationId unique across the API, an example per request and success response,
+# and `default: {$ref: ../common/responses.yaml#/Problem}`.
+/v1/auth/otp/send:
+  post:
+    operationId: sendOtp
+    tags: [auth]
+    summary: Send a sign-in code by SMS
+    description: |
+      Checks Turnstile, then the limits (01 §2): resend after 30 s, at most 5 sends per number
+      and 20 per IP an hour (`429 rate_limited` with `Retry-After`). The answer is the same for a
+      known and an unknown number (AU-06). The code is never logged (D-15).
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/auth.yaml#/OtpSendRequest
+          example:
+            phone: "+919000000001"
+            purpose: login
+            app: customer
+            turnstileToken: XXXX.DUMMY.TOKEN.XXXX
+    responses:
+      "200":
+        description: A code was sent (or, for a number that cannot get one, nothing was; the answer is the same)
+        headers:
+          Cache-Control:
+            description: Always `no-store`.
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/auth.yaml#/OtpSendResponse
+            example:
+              requestId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+              resendAfter: 30
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/auth/otp/verify:
+  post:
+    operationId: verifyOtp
+    tags: [auth]
+    summary: Sign in with the code
+    description: |
+      Five tries per code: a wrong code is `401 unauthorized` with `extensions.attemptsLeft`; the
+      sixth try is `429 otp_locked` even with the right code (AU-02). A code older than 5 min, used,
+      or unknown is `401 otp_expired`. A blocked account is `403 account_blocked`. On success the
+      app's refresh cookie is set (D-14) and the account is created if new (`isNewUser`).
+    security: []
+    x-problems: [otp_locked, otp_expired, account_blocked]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/auth.yaml#/OtpVerifyRequest
+          example:
+            requestId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+            code: "000000"
+            app: customer
+            deviceId: 01JB0S1W6W8ZV7T1C3A6M9N4PR
+    responses:
+      "200":
+        description: Signed in
+        headers:
+          Set-Cookie:
+            description: The app's refresh cookie (`__Secure-tz_rt_c|b|a`), host-only, `Path=/v1/auth`, HttpOnly, Secure, SameSite=Strict.
+            schema:
+              type: string
+          Cache-Control:
+            description: Always `no-store`.
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/auth.yaml#/OtpVerifyResponse
+            example:
+              accessToken: EXAMPLE.ACCESS.TOKEN
+              tokenType: Bearer
+              expiresAt: "2026-10-22T09:45:00Z"
+              isNewUser: true
+              userId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/auth/refresh:
+  post:
+    operationId: refreshSession
+    tags: [auth]
+    summary: Rotate the refresh token and get a new access token
+    description: |
+      Reads only the cookie of `app` (D-14). Every use rotates the token; presenting a token that
+      was already rotated revokes the whole session family (AU-07). The request must come from the
+      app's own origin (`Origin`) and carry `X-TZ-Client`, else `403 forbidden` (AU-16).
+    security:
+      - refreshCookieCustomer: []
+      - refreshCookieBusiness: []
+      - refreshCookieAdmin: []
+    x-problems: [account_blocked]
+    parameters:
+      - name: X-TZ-Client
+        in: header
+        description: The app's client id and version (`customer/1.4.0`); required in practice (a request without it is `403 forbidden`, AU-16), optional in the schema so that refusal is a 403, not a 422.
+        schema:
+          type: string
+          maxLength: 64
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/auth.yaml#/AuthAppRequest
+          example:
+            app: customer
+    responses:
+      "200":
+        description: Rotated
+        headers:
+          Set-Cookie:
+            description: The rotated refresh cookie, same attributes as at sign-in.
+            schema:
+              type: string
+          Cache-Control:
+            description: Always `no-store`.
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/auth.yaml#/AccessTokenResponse
+            example:
+              accessToken: EXAMPLE.ACCESS.TOKEN
+              tokenType: Bearer
+              expiresAt: "2026-10-22T09:45:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/auth/logout:
+  post:
+    operationId: logout
+    tags: [auth]
+    summary: Sign out this app on this device
+    description: Revokes the session of `app`'s refresh cookie and clears the cookie. Same `Origin` and `X-TZ-Client` rule as refresh.
+    security:
+      - refreshCookieCustomer: []
+      - refreshCookieBusiness: []
+      - refreshCookieAdmin: []
+    parameters:
+      - name: X-TZ-Client
+        in: header
+        description: The app's client id and version (`customer/1.4.0`); required in practice (a request without it is `403 forbidden`, AU-16), optional in the schema so that refusal is a 403, not a 422.
+        schema:
+          type: string
+          maxLength: 64
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/auth.yaml#/AuthAppRequest
+          example:
+            app: customer
+    responses:
+      "204":
+        description: Signed out
+        headers:
+          Set-Cookie:
+            description: Clears the app's refresh cookie (`Max-Age=0`).
+            schema:
+              type: string
+      default:
+        $ref: ../common/responses.yaml#/Problem

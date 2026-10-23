@@ -9,4 +9,71 @@
 # Mark idempotent operations `x-idempotency: required|optional` and uploads
 # `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
 # List the domain problem codes an operation can return under `x-problems`.
-{}
+/v1/me:
+  get:
+    operationId: getMe
+    tags: [me]
+    summary: The signed-in user
+    description: Any app. For a customer also the referral code and the active-order limit from no-show strikes (C-21).
+    x-problems: [account_blocked]
+    responses:
+      "200":
+        description: The user
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/me.yaml#/Me
+            example:
+              id: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+              name: Asha
+              preferredLang: en
+              phoneMasked: 90•••••001
+              app: customer
+              customer:
+                referralCode: K7M2QX
+                activeOrderLimit: null
+              createdAt: "2026-10-22T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  patch:
+    operationId: updateMe
+    tags: [me]
+    summary: Change name or language
+    x-idempotency: none
+    x-problems: [account_blocked]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IfMatch
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/me.yaml#/MePatch
+          example:
+            name: Asha
+            preferredLang: kn
+    responses:
+      "200":
+        description: The user after the change
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/me.yaml#/Me
+            example:
+              id: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+              name: Asha
+              preferredLang: kn
+              phoneMasked: 90•••••001
+              app: customer
+              customer:
+                referralCode: K7M2QX
+                activeOrderLimit: null
+              createdAt: "2026-10-22T09:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
