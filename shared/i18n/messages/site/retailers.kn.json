@@ -1,0 +1,62 @@
+{
+  "retailers.meta.title": {
+    "message": "ಅಂಗಡಿಗಳಿಗಾಗಿ | TodayZ",
+    "review": "machine",
+    "enHash": "84e84db2"
+  },
+  "retailers.meta.description": {
+    "message": "ನಿಮ್ಮ ಕೌಂಟರ್ ನಡೆಸಿ, ಸ್ಟಾಕ್ ಆನ್‌ಲೈನ್‌ಗೆ ತನ್ನಿ, ಹತ್ತಿರದವರು ಏನು ಹುಡುಕುತ್ತಾರೆ ನೋಡಿ. ಸದ್ಯಕ್ಕೆ ಉಚಿತ.",
+    "review": "machine",
+    "enHash": "5ebd1f7f"
+  },
+  "retailers.hero.title": {
+    "message": "ನಿಮ್ಮ ಕೌಂಟರ್ ನಡೆಸಿ. {em}",
+    "review": "machine",
+    "enHash": "731f7a9c"
+  },
+  "retailers.hero.title_em": {
+    "message": "ನಿಮ್ಮ ಬಡಾವಣೆಯನ್ನು ತಲುಪಿ.",
+    "review": "machine",
+    "enHash": "66e0f09b"
+  },
+  "retailers.hero.body": {
+    "message": "TodayZ ನಿಮ್ಮ ಅಂಗಡಿಗೆ ಪಾಯಿಂಟ್-ಆಫ್-ಸೇಲ್, ಆನ್‌ಲೈನ್ ಆರ್ಡರ್, ಬೇಡಿಕೆ ಮಾಹಿತಿ ಮತ್ತು ಗ್ರಾಹಕರನ್ನು ಮತ್ತೆ ಕರೆತರುವ ಕ್ರೆಡಿಟ್‌ಗಳನ್ನು ಕೊಡುತ್ತದೆ. ಸದ್ಯಕ್ಕೆ ಉಚಿತ.",
+    "review": "machine",
+    "enHash": "6459059b"
+  },
+  "retailers.faq.title": {
+    "message": "ಸಾಮಾನ್ಯ ಪ್ರಶ್ನೆಗಳು",
+    "review": "machine",
+    "enHash": "f07ac22a"
+  },
+  "retailers.faq.1.q": {
+    "message": "ಸೇರಲು ಶುಲ್ಕ ಇದೆಯೇ?",
+    "review": "machine",
+    "enHash": "02642550"
+  },
+  "retailers.faq.1.a": {
+    "message": "ಇಲ್ಲ. ಸದ್ಯಕ್ಕೆ TodayZ ಅಂಗಡಿಗಳಿಗೆ ಉಚಿತ.",
+    "review": "machine",
+    "enHash": "6036c302"
+  },
+  "retailers.faq.2.q": {
+    "message": "ಈಗ ನಡೆಸುತ್ತಿರುವಂತೆಯೇ ನನ್ನ ಅಂಗಡಿ ನಡೆಸಬಹುದೇ?",
+    "review": "machine",
+    "enHash": "2cc787ac"
+  },
+  "retailers.faq.2.a": {
+    "message": "ಹೌದು. TodayZ ನೀವು ಈಗ ಕೆಲಸ ಮಾಡುವ ರೀತಿಗೆ ಸೇರ್ಪಡೆಯಾಗುತ್ತದೆ; ನಿಮ್ಮ ಕೌಂಟರ್ ಅನ್ನು ಬದಲಿಸುವುದಿಲ್ಲ.",
+    "review": "machine",
+    "enHash": "ee8e9935"
+  },
+  "retailers.faq.3.q": {
+    "message": "ನನ್ನ ಹತ್ತಿರದವರು ಏನು ಹುಡುಕುತ್ತಾರೆ ಎಂದು ನೋಡಬಹುದೇ?",
+    "review": "machine",
+    "enHash": "75c50e26"
+  },
+  "retailers.faq.3.a": {
+    "message": "ಹೌದು. ಬೇಡಿಕೆ ಮಾಹಿತಿ ನಿಮ್ಮ ಅಂಗಡಿ ಹತ್ತಿರ, ನೀವು ಇಡದ ಐಟಂಗಳಿಗಾಗಿನ ಹುಡುಕಾಟಗಳನ್ನು ತೋರಿಸುತ್ತದೆ.",
+    "review": "machine",
+    "enHash": "312beb90"
+  }
+}

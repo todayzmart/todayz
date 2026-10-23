@@ -48,11 +48,11 @@
     "description": "Text inside an example screen (hidden from screen readers)."
   },
   "home.mock.dist_pickup": {
-    "defaultMessage": "{distance} · Pickup",
+    "defaultMessage": "{distance} · pickup",
     "description": "Text inside an example screen (hidden from screen readers)."
   },
   "home.mock.dist_delivery": {
-    "defaultMessage": "{distance} · Delivery",
+    "defaultMessage": "{distance} · delivery",
     "description": "Text inside an example screen (hidden from screen readers)."
   },
   "home.mock.fresh_min": {
@@ -526,7 +526,7 @@
     "description": "Text inside an example screen (hidden from screen readers)."
   },
   "home.shoppers.book": {
-    "defaultMessage": "Book · Pay at the shop",
+    "defaultMessage": "Book · pay at the shop",
     "description": "Text inside an example screen (hidden from screen readers)."
   },
   "home.shoppers.ready": {

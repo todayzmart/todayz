@@ -20,7 +20,10 @@ export interface PageDef {
   id: PageId;
   /** English path, always with a trailing slash (the site builds directory URLs). Other locales prefix it with /<locale>. */
   path: string;
-  /** Locales this page exists in. English always; hi, kn, te and ta only for home and retailers (S-05). */
+  /**
+   * Locales this page can exist in. English always; hi, kn, te and ta only for home and retailers (S-05).
+   * A build narrows this to the locales it ships (siteLocales): use pageLocales(page, site), not this.
+   */
   locales: readonly Locale[];
   title: MessageKey;
   description: MessageKey;
@@ -45,6 +48,28 @@ export const PAGES: readonly PageDef[] = [
   { id: 'refunds', path: '/legal/refunds-and-credits/', locales: EN_ONLY, title: 'legal.refunds.meta.title', description: 'legal.refunds.meta.description', leadForm: false, priority: 0.3 },
 ];
 
+export type ViewId = 'home' | 'retailers' | 'info' | 'legal';
+
+const VIEWS: Readonly<Record<PageId, ViewId>> = {
+  home: 'home',
+  retailers: 'retailers',
+  how: 'info',
+  pricing: 'info',
+  about: 'info',
+  contact: 'info',
+  privacy: 'legal',
+  'terms-shoppers': 'legal',
+  'terms-shops': 'legal',
+  refunds: 'legal',
+};
+
+/** The view that renders a page. Throws on an id with no view, so a new registry row cannot build blank. */
+export function viewOf(id: string): ViewId {
+  const view = Object.hasOwn(VIEWS, id) ? VIEWS[id as PageId] : undefined;
+  if (!view) throw new Error(`site: page ${id} has no view (add it to VIEWS in src/lib/pages.ts)`);
+  return view;
+}
+
 export function pageById(id: PageId): PageDef {
   const page = PAGES.find((p) => p.id === id);
   if (!page) throw new Error(`unknown page ${id}`);
@@ -60,18 +85,24 @@ export function pageUrl(page: PageDef, locale: Locale): string {
   return `${SITE_ORIGIN}${pagePath(page, locale)}`;
 }
 
-/** hreflang entries for a page: every locale it exists in plus x-default (English). */
-export function alternates(page: PageDef): { hreflang: string; href: string }[] {
-  if (page.locales.length < 2) return [];
+/** The locales a page is built in: its own locales that the build ships (`site`, from siteLocales). */
+export function pageLocales(page: PageDef, site: readonly Locale[]): Locale[] {
+  return page.locales.filter((l) => site.includes(l));
+}
+
+/** hreflang entries for a page: every locale it is built in plus x-default (English). */
+export function alternates(page: PageDef, site: readonly Locale[]): { hreflang: string; href: string }[] {
+  const locales = pageLocales(page, site);
+  if (locales.length < 2) return [];
   return [
-    ...page.locales.map((l) => ({ hreflang: l, href: pageUrl(page, l) })),
+    ...locales.map((l) => ({ hreflang: l, href: pageUrl(page, l) })),
     { hreflang: 'x-default', href: pageUrl(page, DEFAULT_LOCALE) },
   ];
 }
 
-/** Every (page, locale) pair that gets built. */
-export function allRoutes(): { page: PageDef; locale: Locale }[] {
-  return PAGES.flatMap((page) => page.locales.map((locale) => ({ page, locale })));
+/** Every (page, locale) pair a build with these locales produces. */
+export function allRoutes(site: readonly Locale[]): { page: PageDef; locale: Locale }[] {
+  return PAGES.flatMap((page) => pageLocales(page, site).map((locale) => ({ page, locale })));
 }
 
 export { OTHER_LOCALES };

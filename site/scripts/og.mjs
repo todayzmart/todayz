@@ -12,6 +12,7 @@ const dist = join(root, 'dist');
 const out = join(root, 'public', 'og');
 
 const { allRoutes, pagePath } = await import('../src/lib/pages.ts');
+const { LOCALES } = await import('../src/i18n/index.ts');
 
 const TYPES = { '.html': 'text/html', '.css': 'text/css', '.woff2': 'font/woff2', '.png': 'image/png', '.js': 'text/javascript' };
 
@@ -34,7 +35,8 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
 await page.route('**/*', (route) => (route.request().url().startsWith(base) ? route.continue() : route.abort()));
 
-for (const { page: def, locale } of allRoutes()) {
+// Every locale, drafts included (run it on a build:e2e dist); production builds drop draft locales' images.
+for (const { page: def, locale } of allRoutes(LOCALES)) {
   const name = `${def.id}${locale === 'en' ? '' : `-${locale}`}`;
   await page.goto(`${base}${pagePath(def, locale)}`);
   await page.evaluate(() => document.fonts.ready);

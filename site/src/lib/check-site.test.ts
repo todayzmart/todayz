@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { checkLinks, internalPath, missingSlash, scan, sitemapSlashProblems, slashProblems, validateHtml } from '../../scripts/check-site.mjs';
+import { LOCALES } from '../i18n/index.ts';
 import { allRoutes } from './pages.ts';
 
 const DOC = (body: string) =>
@@ -104,7 +105,7 @@ describe('HTML validator', () => {
 
 describe('Open Graph images', () => {
   it('exist in public/og for every page and language', () => {
-    for (const { page, locale } of allRoutes()) {
+    for (const { page, locale } of allRoutes(LOCALES)) {
       const name = `${page.id}${locale === 'en' ? '' : `-${locale}`}.png`;
       expect(existsSync(new URL(`../../public/og/${name}`, import.meta.url)), name).toBe(true);
     }

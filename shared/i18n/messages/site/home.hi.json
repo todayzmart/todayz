@@ -1,0 +1,992 @@
+{
+  "home.meta.title": {
+    "message": "TodayZ: अपने आसपास की दुकानों में खोजें",
+    "review": "machine",
+    "enHash": "cd0d038a"
+  },
+  "home.meta.description": {
+    "message": "TodayZ आसपास की दुकानों का स्टॉक ऑनलाइन लाता है, ताकि पास के लोग उसे खोज सकें, बुक कर सकें और खुद ले जाएँ या घर मँगवाएँ।",
+    "review": "machine",
+    "enHash": "db78764a"
+  },
+  "home.hero.kicker": {
+    "message": "पूरे भारत की आसपास की दुकानों के लिए",
+    "review": "machine",
+    "enHash": "73d64763"
+  },
+  "home.hero.title": {
+    "message": "आपकी मोहल्ले की दुकान, {em} तैयार।",
+    "review": "machine",
+    "enHash": "b83fa4d2"
+  },
+  "home.hero.title_em": {
+    "message": "ज़्यादा ग्राहकों के लिए",
+    "review": "machine",
+    "enHash": "9194981c"
+  },
+  "home.hero.body": {
+    "message": "अपना स्टॉक ऑनलाइन लाएँ, काउंटर चलाएँ, और आसपास के लोगों को वह दिखने दें जो आपकी अलमारी में पहले से है।",
+    "review": "machine",
+    "enHash": "e1ce6218"
+  },
+  "home.hero.cta": {
+    "message": "मुफ़्त में शुरू करें",
+    "review": "machine",
+    "enHash": "a99da3b9"
+  },
+  "home.hero.cta_secondary": {
+    "message": "देखें कैसे काम करता है",
+    "review": "machine",
+    "enHash": "f7b38f07"
+  },
+  "home.hero.tick.1": {
+    "message": "दुकानों के लिए मुफ़्त",
+    "review": "machine",
+    "enHash": "a2839388"
+  },
+  "home.hero.tick.2": {
+    "message": "इंटरनेट जाने पर भी चलता है",
+    "review": "machine",
+    "enHash": "18aca7ee"
+  },
+  "home.hero.tick.3": {
+    "message": "5 भारतीय भाषाओं में",
+    "review": "machine",
+    "enHash": "8cfef760"
+  },
+  "home.hero.tick.4": {
+    "message": "पिकअप या डिलीवरी",
+    "review": "machine",
+    "enHash": "8a9547f9"
+  },
+  "home.hero.scene": {
+    "message": "उदाहरण: पास का एक ग्राहक Sharma General Store में दूध खोजता है, दुकान को ऑर्डर मिलता है और दिखता है कि आसपास के लोग और क्या खोजते हैं।",
+    "review": "machine",
+    "enHash": "9ee19e50"
+  },
+  "home.hero.note": {
+    "message": "इस पेज पर दुकानें, आइटम और आँकड़े उदाहरण हैं।",
+    "review": "machine",
+    "enHash": "673f32fb"
+  },
+  "home.mock.shops_have": {
+    "message": "आपके पास की {count} दुकानों में है",
+    "review": "machine",
+    "enHash": "97ce7209"
+  },
+  "home.mock.dist_pickup": {
+    "message": "{distance} · पिकअप",
+    "review": "machine",
+    "enHash": "48cd9361"
+  },
+  "home.mock.dist_delivery": {
+    "message": "{distance} · डिलीवरी",
+    "review": "machine",
+    "enHash": "e99aab7a"
+  },
+  "home.mock.fresh_min": {
+    "message": "स्टॉक में · {n} मिनट पहले अपडेट",
+    "review": "machine",
+    "enHash": "bc9fe70a"
+  },
+  "home.mock.fresh_h": {
+    "message": "स्टॉक में · {n} घंटे पहले अपडेट",
+    "review": "machine",
+    "enHash": "79117543"
+  },
+  "home.mock.stale": {
+    "message": "स्टॉक की हाल में पुष्टि नहीं हुई",
+    "review": "machine",
+    "enHash": "c8a47c2d"
+  },
+  "home.mock.book_pickup": {
+    "message": "पिकअप के लिए बुक करें · {amount}",
+    "review": "machine",
+    "enHash": "1e5e5edf"
+  },
+  "home.mock.new_order": {
+    "message": "नया ऑर्डर {number}",
+    "review": "machine",
+    "enHash": "93fdc4bf"
+  },
+  "home.mock.pickup": {
+    "message": "पिकअप",
+    "review": "machine",
+    "enHash": "a51122c1"
+  },
+  "home.mock.delivery": {
+    "message": "डिलीवरी",
+    "review": "machine",
+    "enHash": "9631af52"
+  },
+  "home.mock.accept": {
+    "message": "स्वीकार करें",
+    "review": "machine",
+    "enHash": "bb54db51"
+  },
+  "home.mock.reject": {
+    "message": "मना करें",
+    "review": "machine",
+    "enHash": "2b03b592"
+  },
+  "home.mock.add": {
+    "message": "जोड़ें",
+    "review": "machine",
+    "enHash": "61cc55aa"
+  },
+  "home.mock.todays_sales": {
+    "message": "आज की बिक्री",
+    "review": "machine",
+    "enHash": "23b9b8de"
+  },
+  "home.mock.wanted_line": {
+    "message": "इस हफ़्ते {distance} के अंदर {count} खोजें",
+    "review": "machine",
+    "enHash": "9fff406b"
+  },
+  "home.problem.eyebrow": {
+    "message": "समस्या",
+    "review": "machine",
+    "enHash": "8a940000"
+  },
+  "home.problem.title": {
+    "message": "बढ़िया दुकानें। बड़ी चुनौतियाँ।",
+    "review": "machine",
+    "enHash": "fd3d5075"
+  },
+  "home.problem.intro": {
+    "message": "भारत की मोहल्ले की दुकानों में लोगों की ज़रूरत का सामान पहले से है। पर काउंटर, स्टॉक और ग्राहक सब हाथ से सँभालने में कमाई अलमारी में ही रह जाती है।",
+    "review": "machine",
+    "enHash": "c98749ea"
+  },
+  "home.problem.1.title": {
+    "message": "स्टॉक का हिसाब रखना मुश्किल",
+    "review": "machine",
+    "enHash": "c972354e"
+  },
+  "home.problem.1.body": {
+    "message": "आइटम छूट जाते हैं और गिनती बिगड़ जाती है, इसलिए पता नहीं चलता क्या बिक रहा है।",
+    "review": "machine",
+    "enHash": "f2a7e83c"
+  },
+  "home.problem.2.title": {
+    "message": "आसपास के लोगों को पता ही नहीं कि आपके पास है",
+    "review": "machine",
+    "enHash": "394c25ed"
+  },
+  "home.problem.2.body": {
+    "message": "किसी को ऐसी चीज़ चाहिए जो कुछ मिनट दूर आपकी अलमारी में है, और उसे कभी पता ही नहीं चलता।",
+    "review": "machine",
+    "enHash": "cff44d11"
+  },
+  "home.problem.3.title": {
+    "message": "स्टॉक बिना बिके पड़ा रहता है",
+    "review": "machine",
+    "enHash": "7f0971df"
+  },
+  "home.problem.3.body": {
+    "message": "माँग का अंदाज़ा न हो तो गलत चीज़ें ज़्यादा मँगवाना आसान है।",
+    "review": "machine",
+    "enHash": "aea1fac2"
+  },
+  "home.problem.4.title": {
+    "message": "लोग क्या चाहते हैं, दिखता नहीं",
+    "review": "machine",
+    "enHash": "ca5cc745"
+  },
+  "home.problem.4.body": {
+    "message": "दुकानों को कम ही पता होता है कि आसपास के लोग क्या खोज रहे हैं।",
+    "review": "machine",
+    "enHash": "8e04ffe9"
+  },
+  "home.problem.no_shops": {
+    "message": "आसपास कोई दुकान नहीं मिली",
+    "review": "machine",
+    "enHash": "b75d7b5d"
+  },
+  "home.problem.shelf_weeks": {
+    "message": "{n} हफ़्ते से अलमारी में",
+    "review": "machine",
+    "enHash": "b336c6e4"
+  },
+  "home.problem.ask.1": {
+    "message": "क्या आपके पास {item} है?",
+    "review": "machine",
+    "enHash": "13192ad7"
+  },
+  "home.problem.ask.2": {
+    "message": "सेंसिटिव टूथपेस्ट मिलेगा?",
+    "review": "machine",
+    "enHash": "7c097792"
+  },
+  "home.problem.ask.3": {
+    "message": "कसूरी मेथी?",
+    "review": "machine",
+    "enHash": "e84eae02"
+  },
+  "home.insight.eyebrow": {
+    "message": "आइडिया",
+    "review": "machine",
+    "enHash": "43e19816"
+  },
+  "home.insight.title": {
+    "message": "दुकानें हैं। स्टॉक है। {em}",
+    "review": "machine",
+    "enHash": "d7f0208d"
+  },
+  "home.insight.title_em": {
+    "message": "बस खोज नहीं है।",
+    "review": "machine",
+    "enHash": "1d313870"
+  },
+  "home.insight.body": {
+    "message": "लोगों को जो चाहिए, वह अक्सर कुछ मिनट दूर किसी अलमारी में पहले से रखा है। बस ऑनलाइन नहीं मिलता। TodayZ दोनों को जोड़ता है।",
+    "review": "machine",
+    "enHash": "7a11ad45"
+  },
+  "home.insight.flow.1.title": {
+    "message": "आसपास के लोग",
+    "review": "machine",
+    "enHash": "a80df8f3"
+  },
+  "home.insight.flow.1.body": {
+    "message": "अपनी ज़रूरत का सामान खोजते हैं",
+    "review": "machine",
+    "enHash": "81ccd64a"
+  },
+  "home.insight.flow.2.title": {
+    "message": "पास में मिल जाता है",
+    "review": "machine",
+    "enHash": "b1923d37"
+  },
+  "home.insight.flow.2.body": {
+    "message": "स्टॉक, कीमत, दूरी, ताज़गी",
+    "review": "machine",
+    "enHash": "72f87ea4"
+  },
+  "home.insight.flow.3.title": {
+    "message": "पास की दुकानें",
+    "review": "machine",
+    "enHash": "1b3fdc74"
+  },
+  "home.insight.flow.3.body": {
+    "message": "ऑर्डर पाती हैं और माँग देखती हैं",
+    "review": "machine",
+    "enHash": "a4c8429f"
+  },
+  "home.insight.loop.1": {
+    "message": "खोजें",
+    "review": "machine",
+    "enHash": "bce06414"
+  },
+  "home.insight.loop.2": {
+    "message": "पाएँ",
+    "review": "machine",
+    "enHash": "df251b06"
+  },
+  "home.insight.loop.3": {
+    "message": "बुक करें",
+    "review": "machine",
+    "enHash": "f69f2330"
+  },
+  "home.insight.loop.4": {
+    "message": "ले जाएँ या डिलीवरी",
+    "review": "machine",
+    "enHash": "b0214dcb"
+  },
+  "home.insight.loop.5": {
+    "message": "जानें क्या बिकता है",
+    "review": "machine",
+    "enHash": "7bb646b4"
+  },
+  "home.features.eyebrow": {
+    "message": "दुकानदारों के लिए",
+    "review": "machine",
+    "enHash": "673d17e5"
+  },
+  "home.features.title": {
+    "message": "दुकान बढ़ाने का आसान तरीका",
+    "review": "machine",
+    "enHash": "5f2c440a"
+  },
+  "home.features.intro": {
+    "message": "काउंटर, स्टॉक और ग्राहकों के लिए एक ऐप। रोज़ की दुकानदारी के लिए बना, आपकी भाषा में।",
+    "review": "machine",
+    "enHash": "259da520"
+  },
+  "home.features.1.title": {
+    "message": "अपना काउंटर चलाएँ",
+    "review": "machine",
+    "enHash": "3de6c082"
+  },
+  "home.features.1.body": {
+    "message": "एक ही ऐप में काउंटर पर बिल बनाएँ, स्टॉक अपडेट रखें और अपने ग्राहक देखें। इंटरनेट जाने पर भी चलता रहता है।",
+    "review": "machine",
+    "enHash": "9a5e7d93"
+  },
+  "home.features.2.title": {
+    "message": "आसपास के लोगों से ऑर्डर पाएँ",
+    "review": "machine",
+    "enHash": "34ccd1e9"
+  },
+  "home.features.2.body": {
+    "message": "ग्राहक आपका स्टॉक खोजते हैं, बुक करते हैं, और खुद ले जाते हैं या डिलीवरी माँगते हैं।",
+    "review": "machine",
+    "enHash": "405258e5"
+  },
+  "home.features.3.title": {
+    "message": "स्टॉक जो सच बताए",
+    "review": "machine",
+    "enHash": "65484a6d"
+  },
+  "home.features.3.body": {
+    "message": "हर बिक्री से आपका स्टॉक अपडेट होता है, और ग्राहक आने से पहले देख लेते हैं कि वह कितना ताज़ा है।",
+    "review": "machine",
+    "enHash": "ead82d37"
+  },
+  "home.features.4.title": {
+    "message": "ग्राहकों को वापस लाएँ",
+    "review": "machine",
+    "enHash": "21e48b9d"
+  },
+  "home.features.4.body": {
+    "message": "ऑफ़र और क्रेडिट से लोगों के पास आपकी दुकान दोबारा आने की वजह रहती है।",
+    "review": "machine",
+    "enHash": "192b570e"
+  },
+  "home.pos.search": {
+    "message": "खोजें या स्कैन करें",
+    "review": "machine",
+    "enHash": "a7407992"
+  },
+  "home.pos.bill": {
+    "message": "बिल",
+    "review": "machine",
+    "enHash": "3d734614"
+  },
+  "home.pos.offline": {
+    "message": "ऑफ़लाइन · बाद में सिंक होगा",
+    "review": "machine",
+    "enHash": "4be5bc3e"
+  },
+  "home.pos.cash": {
+    "message": "कैश",
+    "review": "machine",
+    "enHash": "758ec54e"
+  },
+  "home.pos.upi": {
+    "message": "UPI",
+    "review": "machine",
+    "enHash": "f295b2cd"
+  },
+  "home.pos.card": {
+    "message": "कार्ड",
+    "review": "machine",
+    "enHash": "4d4ce73b"
+  },
+  "home.pos.total": {
+    "message": "कुल",
+    "review": "machine",
+    "enHash": "b25928c6"
+  },
+  "home.pos.charge": {
+    "message": "वसूलें",
+    "review": "machine",
+    "enHash": "d4e1aee4"
+  },
+  "home.orders.new": {
+    "message": "नए",
+    "review": "machine",
+    "enHash": "6403f2b7"
+  },
+  "home.orders.preparing": {
+    "message": "तैयार हो रहे",
+    "review": "machine",
+    "enHash": "96a9b7cd"
+  },
+  "home.orders.ready": {
+    "message": "तैयार",
+    "review": "machine",
+    "enHash": "20c7c552"
+  },
+  "home.orders.accept_within": {
+    "message": "{time} में स्वीकार करें",
+    "review": "machine",
+    "enHash": "ec988822"
+  },
+  "home.orders.waiting": {
+    "message": "पिकअप का इंतज़ार",
+    "review": "machine",
+    "enHash": "1323a7f6"
+  },
+  "home.stock.updated_min": {
+    "message": "{n} मिनट पहले अपडेट",
+    "review": "machine",
+    "enHash": "bc8f82ef"
+  },
+  "home.stock.updated_h": {
+    "message": "{n} घंटे पहले अपडेट",
+    "review": "machine",
+    "enHash": "b19204d8"
+  },
+  "home.stock.low": {
+    "message": "कम बचा है · {n} घंटे पहले अपडेट",
+    "review": "machine",
+    "enHash": "8be3a9d0"
+  },
+  "home.offers.week": {
+    "message": "इस हफ़्ते",
+    "review": "machine",
+    "enHash": "7b72883e"
+  },
+  "home.offers.off": {
+    "message": "{item} पर {off} की छूट",
+    "review": "machine",
+    "enHash": "84319622"
+  },
+  "home.offers.regular": {
+    "message": "नियमित ग्राहक · इस महीने {n} बार आए",
+    "review": "machine",
+    "enHash": "7ebeb72a"
+  },
+  "home.offers.credits": {
+    "message": "+{n} क्रेडिट",
+    "review": "machine",
+    "enHash": "5b03b4e6"
+  },
+  "home.showcase.eyebrow": {
+    "message": "बिज़नेस ऐप",
+    "review": "machine",
+    "enHash": "66468763"
+  },
+  "home.showcase.title": {
+    "message": "पूरी दुकान, एक नज़र में",
+    "review": "machine",
+    "enHash": "e0eb3462"
+  },
+  "home.showcase.intro": {
+    "message": "सुबह ऐप खोलिए और देखिए किस पर ध्यान चाहिए: कौन से ऑर्डर स्वीकार करने हैं, कौन से आइटम कम हैं, और आसपास के लोग क्या माँग रहे हैं।",
+    "review": "machine",
+    "enHash": "c24545a9"
+  },
+  "home.app.nav.1": {
+    "message": "ओवरव्यू",
+    "review": "machine",
+    "enHash": "0efc2e6b"
+  },
+  "home.app.nav.2": {
+    "message": "ऑर्डर",
+    "review": "machine",
+    "enHash": "cded0933"
+  },
+  "home.app.nav.3": {
+    "message": "बिक्री",
+    "review": "machine",
+    "enHash": "fa3cf2ad"
+  },
+  "home.app.nav.4": {
+    "message": "स्टॉक",
+    "review": "machine",
+    "enHash": "bcecf456"
+  },
+  "home.app.nav.5": {
+    "message": "ऑफ़र",
+    "review": "machine",
+    "enHash": "43c94306"
+  },
+  "home.app.nav.6": {
+    "message": "ग्राहक",
+    "review": "machine",
+    "enHash": "035eae60"
+  },
+  "home.app.nav.7": {
+    "message": "इनसाइट्स",
+    "review": "machine",
+    "enHash": "b4510362"
+  },
+  "home.app.date": {
+    "message": "गुरुवार, 23 अक्टूबर",
+    "review": "machine",
+    "enHash": "a377ff45"
+  },
+  "home.app.greet": {
+    "message": "सुप्रभात, {shop}",
+    "review": "machine",
+    "enHash": "ccd50e36"
+  },
+  "home.app.synced": {
+    "message": "{time} पर सिंक हुआ",
+    "review": "machine",
+    "enHash": "01d62c94"
+  },
+  "home.app.sales_delta": {
+    "message": "पिछले गुरुवार से {pct}",
+    "review": "machine",
+    "enHash": "adef0b35"
+  },
+  "home.app.orders": {
+    "message": "ऑर्डर",
+    "review": "machine",
+    "enHash": "cded0933"
+  },
+  "home.app.waiting": {
+    "message": "{n} इंतज़ार में",
+    "review": "machine",
+    "enHash": "e4536212"
+  },
+  "home.app.low": {
+    "message": "कम आइटम",
+    "review": "machine",
+    "enHash": "3f83eddd"
+  },
+  "home.app.low_note": {
+    "message": "जल्द मँगवाएँ",
+    "review": "machine",
+    "enHash": "384c0929"
+  },
+  "home.app.searches": {
+    "message": "आसपास की खोजें",
+    "review": "machine",
+    "enHash": "2c9b6552"
+  },
+  "home.app.searches_note": {
+    "message": "उन आइटम के लिए जो आप नहीं रखते",
+    "review": "machine",
+    "enHash": "d4521c69"
+  },
+  "home.app.act.orders": {
+    "message": "{n} नए ऑर्डर",
+    "review": "machine",
+    "enHash": "675b510a"
+  },
+  "home.app.act.orders_cta": {
+    "message": "ऑर्डर स्वीकार करें",
+    "review": "machine",
+    "enHash": "1fc40062"
+  },
+  "home.app.act.low": {
+    "message": "{n} प्रोडक्ट कम",
+    "review": "machine",
+    "enHash": "837e3fec"
+  },
+  "home.app.act.low_cta": {
+    "message": "अभी मँगवाएँ",
+    "review": "machine",
+    "enHash": "bb595184"
+  },
+  "home.app.act.expiring": {
+    "message": "{n} जल्द एक्सपायर होंगे",
+    "review": "machine",
+    "enHash": "5be326eb"
+  },
+  "home.app.act.expiring_cta": {
+    "message": "ऑफ़र बनाएँ",
+    "review": "machine",
+    "enHash": "c6af210c"
+  },
+  "home.app.act.searches": {
+    "message": "{n} खोजें",
+    "review": "machine",
+    "enHash": "92a1e12c"
+  },
+  "home.app.act.searches_cta": {
+    "message": "माँग देखें",
+    "review": "machine",
+    "enHash": "44537575"
+  },
+  "home.app.chart": {
+    "message": "घंटे के हिसाब से बिक्री",
+    "review": "machine",
+    "enHash": "162aeab3"
+  },
+  "home.app.today": {
+    "message": "आज",
+    "review": "machine",
+    "enHash": "24345a14"
+  },
+  "home.app.top": {
+    "message": "सबसे ज़्यादा बिकने वाले",
+    "review": "machine",
+    "enHash": "79ec189d"
+  },
+  "home.insights.eyebrow": {
+    "message": "माँग की जानकारी",
+    "review": "machine",
+    "enHash": "750bb313"
+  },
+  "home.insights.title": {
+    "message": "देखिए आसपास के लोग क्या खोज रहे हैं",
+    "review": "machine",
+    "enHash": "9d1c4606"
+  },
+  "home.insights.intro": {
+    "message": "माँग की जानकारी दुकान को बताती है कि आसपास के लोग किन आइटम को खोजते हैं और नहीं पाते, क्या खत्म होने वाला है, और कौन से नियमित ग्राहक वापस नहीं आए।",
+    "review": "machine",
+    "enHash": "8f9a9203"
+  },
+  "home.insights.kind.1.title": {
+    "message": "आसपास माँग में",
+    "review": "machine",
+    "enHash": "4e90f3e0"
+  },
+  "home.insights.kind.1.body": {
+    "message": "आपकी दुकान के पास लोग जो आइटम खोजते हैं और आप अभी नहीं रखते।",
+    "review": "machine",
+    "enHash": "18d9f53a"
+  },
+  "home.insights.kind.2.title": {
+    "message": "छूटी बिक्री",
+    "review": "machine",
+    "enHash": "7e65c327"
+  },
+  "home.insights.kind.2.body": {
+    "message": "वे आइटम जो तब खत्म थे जब आसपास के लोग उन्हें खोज रहे थे।",
+    "review": "machine",
+    "enHash": "9cf19971"
+  },
+  "home.insights.kind.3.title": {
+    "message": "तेज़ी से बिक रहे",
+    "review": "machine",
+    "enHash": "5cbd2b13"
+  },
+  "home.insights.kind.3.body": {
+    "message": "आम से तेज़ बिकने वाले आइटम, ताकि आप समय पर मँगवा सकें।",
+    "review": "machine",
+    "enHash": "a437058d"
+  },
+  "home.insights.kind.4.title": {
+    "message": "दूर जाते नियमित ग्राहक",
+    "review": "machine",
+    "enHash": "55ae88e6"
+  },
+  "home.insights.kind.4.body": {
+    "message": "नियमित ग्राहक जो काफ़ी समय से वापस नहीं आए।",
+    "review": "machine",
+    "enHash": "09c1326e"
+  },
+  "home.insights.period": {
+    "message": "पिछले 7 दिन",
+    "review": "machine",
+    "enHash": "df833fe8"
+  },
+  "home.insights.missed_line": {
+    "message": "{days} दिन से स्टॉक खत्म; आसपास {count} खोजें इससे मेल खाईं।",
+    "review": "machine",
+    "enHash": "1253e1c2"
+  },
+  "home.insights.add": {
+    "message": "प्रोडक्ट जोड़ें",
+    "review": "machine",
+    "enHash": "7c37958a"
+  },
+  "home.insights.restock": {
+    "message": "दोबारा मँगवाएँ",
+    "review": "machine",
+    "enHash": "3ccf7127"
+  },
+  "home.shoppers.eyebrow": {
+    "message": "ग्राहकों के लिए",
+    "review": "machine",
+    "enHash": "b88dfd14"
+  },
+  "home.shoppers.title": {
+    "message": "कुछ चाहिए? पास में ही खोजिए।",
+    "review": "machine",
+    "enHash": "d1036fc0"
+  },
+  "home.shoppers.intro": {
+    "message": "देखिए आपके आसपास किस दुकान में है, किस कीमत पर, और दुकान ने स्टॉक कब अपडेट किया। फिर घर से निकलने से पहले बुक कर लीजिए।",
+    "review": "machine",
+    "enHash": "c2ee387e"
+  },
+  "home.shoppers.1": {
+    "message": "जो चाहिए वह खोजें",
+    "review": "machine",
+    "enHash": "7d5bd0fc"
+  },
+  "home.shoppers.2": {
+    "message": "देखें पास की कौन सी दुकानों में है",
+    "review": "machine",
+    "enHash": "5177cb50"
+  },
+  "home.shoppers.3": {
+    "message": "बुक करें",
+    "review": "machine",
+    "enHash": "b016aa80"
+  },
+  "home.shoppers.4": {
+    "message": "खुद ले जाएँ या डिलीवरी पाएँ",
+    "review": "machine",
+    "enHash": "61974e58"
+  },
+  "home.shoppers.body.1": {
+    "message": "किराना, दवाइयाँ, स्टेशनरी, चार्जर, नल की वॉशर।",
+    "review": "machine",
+    "enHash": "15fa5ef8"
+  },
+  "home.shoppers.body.2": {
+    "message": "कीमत, दूरी और स्टॉक कितना ताज़ा है।",
+    "review": "machine",
+    "enHash": "b7f275ee"
+  },
+  "home.shoppers.body.3": {
+    "message": "दुकान आपके लिए सामान अलग रख देती है।",
+    "review": "machine",
+    "enHash": "19cd1f93"
+  },
+  "home.shoppers.body.4": {
+    "message": "दुकान को पैसे हमेशा की तरह दें।",
+    "review": "machine",
+    "enHash": "f5248dcf"
+  },
+  "home.shoppers.cta": {
+    "message": "ग्राहक ऐप खोलें",
+    "review": "machine",
+    "enHash": "ebb9af61"
+  },
+  "home.shoppers.avail": {
+    "message": "आपके पास की {count} दुकानों में उपलब्ध",
+    "review": "machine",
+    "enHash": "8a80f660"
+  },
+  "home.shoppers.book": {
+    "message": "बुक करें · दुकान पर भुगतान",
+    "review": "machine",
+    "enHash": "e4fb86ee"
+  },
+  "home.shoppers.ready": {
+    "message": "ऑर्डर {number} तैयार है",
+    "review": "machine",
+    "enHash": "fd16fe5b"
+  },
+  "home.shoppers.code": {
+    "message": "ऑर्डर कोड",
+    "review": "machine",
+    "enHash": "bc91748b"
+  },
+  "home.shoppers.show": {
+    "message": "{shop} पर यह दिखाएँ",
+    "review": "machine",
+    "enHash": "94d28e88"
+  },
+  "home.shoppers.tl.booked": {
+    "message": "बुक हुआ · {time}",
+    "review": "machine",
+    "enHash": "210c37a3"
+  },
+  "home.shoppers.tl.accepted": {
+    "message": "स्वीकार हुआ · {time}",
+    "review": "machine",
+    "enHash": "71950c1f"
+  },
+  "home.shoppers.tl.ready": {
+    "message": "तैयार · {time}",
+    "review": "machine",
+    "enHash": "75e8b56e"
+  },
+  "home.shoppers.tl.collected": {
+    "message": "ले लिया",
+    "review": "machine",
+    "enHash": "924a70ff"
+  },
+  "home.steps.eyebrow": {
+    "message": "कैसे काम करता है",
+    "review": "machine",
+    "enHash": "1dd6a17c"
+  },
+  "home.steps.title": {
+    "message": "तीन कदम में शुरू करें",
+    "review": "machine",
+    "enHash": "a1af60ea"
+  },
+  "home.steps.1.title": {
+    "message": "अपनी दुकान बनाएँ",
+    "review": "machine",
+    "enHash": "f5508ea0"
+  },
+  "home.steps.1.body": {
+    "message": "फ़ोन नंबर से साइन अप करें और दुकान की जानकारी जोड़ें।",
+    "review": "machine",
+    "enHash": "872900c2"
+  },
+  "home.steps.2.title": {
+    "message": "अपना स्टॉक जोड़ें",
+    "review": "machine",
+    "enHash": "05a92e78"
+  },
+  "home.steps.2.body": {
+    "message": "कुछ आइटम से शुरू करें। बाकी बिक्री के साथ जोड़ते जाएँ।",
+    "review": "machine",
+    "enHash": "fe0d0fdd"
+  },
+  "home.steps.3.title": {
+    "message": "ग्राहक आने लगेंगे",
+    "review": "machine",
+    "enHash": "6014332c"
+  },
+  "home.steps.3.body": {
+    "message": "आसपास के लोग आपका स्टॉक खोजते हैं और बुक करते हैं।",
+    "review": "machine",
+    "enHash": "38f7c00b"
+  },
+  "home.steps.shop_name": {
+    "message": "दुकान का नाम",
+    "review": "machine",
+    "enHash": "6a5cc02e"
+  },
+  "home.steps.area": {
+    "message": "इलाका",
+    "review": "machine",
+    "enHash": "2745deba"
+  },
+  "home.steps.add_item": {
+    "message": "आइटम जोड़ें",
+    "review": "machine",
+    "enHash": "5bcf4db4"
+  },
+  "home.steps.new_order": {
+    "message": "पास में नया ऑर्डर",
+    "review": "machine",
+    "enHash": "0fd71c2f"
+  },
+  "home.types.eyebrow": {
+    "message": "किसके लिए",
+    "review": "machine",
+    "enHash": "0c5ba882"
+  },
+  "home.types.title": {
+    "message": "हर तरह की दुकान के लिए",
+    "review": "machine",
+    "enHash": "76a8ff39"
+  },
+  "home.types.intro": {
+    "message": "अगर आप लोगों के घरों के पास की दुकान से सामान बेचते हैं, तो TodayZ आपके लिए बना है।",
+    "review": "machine",
+    "enHash": "38933281"
+  },
+  "home.types.strip": {
+    "message": "हर तरह की दुकान के लिए बना",
+    "review": "machine",
+    "enHash": "f8180338"
+  },
+  "home.types.1": {
+    "message": "जनरल और किराना",
+    "review": "machine",
+    "enHash": "37823308"
+  },
+  "home.types.2": {
+    "message": "मेडिकल",
+    "review": "machine",
+    "enHash": "a9a24cd1"
+  },
+  "home.types.3": {
+    "message": "कॉस्मेटिक्स",
+    "review": "machine",
+    "enHash": "9555b604"
+  },
+  "home.types.4": {
+    "message": "स्टेशनरी",
+    "review": "machine",
+    "enHash": "f6211e63"
+  },
+  "home.types.5": {
+    "message": "इलेक्ट्रॉनिक्स",
+    "review": "machine",
+    "enHash": "89f1ebf5"
+  },
+  "home.types.6": {
+    "message": "हार्डवेयर",
+    "review": "machine",
+    "enHash": "b76ab659"
+  },
+  "home.types.desc.1": {
+    "message": "रोज़ की ज़रूरतें, राशन और पैकेट वाला खाना।",
+    "review": "machine",
+    "enHash": "3a4cd0b8"
+  },
+  "home.types.desc.2": {
+    "message": "दवा, सेहत और बच्चों की देखभाल।",
+    "review": "machine",
+    "enHash": "b525a650"
+  },
+  "home.types.desc.3": {
+    "message": "ब्यूटी, स्किन केयर और पर्सनल केयर।",
+    "review": "machine",
+    "enHash": "b5574763"
+  },
+  "home.types.desc.4": {
+    "message": "स्कूल, ऑफ़िस और आर्ट का सामान।",
+    "review": "machine",
+    "enHash": "f4dce562"
+  },
+  "home.types.desc.5": {
+    "message": "चार्जर, बल्ब, केबल और छोटे उपकरण।",
+    "review": "machine",
+    "enHash": "7a6e702f"
+  },
+  "home.types.desc.6": {
+    "message": "औज़ार, फ़िटिंग, पेंट और प्लंबिंग।",
+    "review": "machine",
+    "enHash": "5e7cad99"
+  },
+  "home.testimonials.title": {
+    "message": "दुकानदार क्या कहते हैं",
+    "review": "machine",
+    "enHash": "a9b676a9"
+  },
+  "home.faq.eyebrow": {
+    "message": "सवाल-जवाब",
+    "review": "machine",
+    "enHash": "03688ba6"
+  },
+  "home.faq.title": {
+    "message": "दुकानदार जो पूछते हैं",
+    "review": "machine",
+    "enHash": "18e2d52e"
+  },
+  "home.faq.intro": {
+    "message": "कुछ और जानना है? नीचे अपनी जानकारी छोड़िए, TodayZ की टीम आपसे संपर्क करेगी।",
+    "review": "machine",
+    "enHash": "a6c2f090"
+  },
+  "home.faq.1.q": {
+    "message": "इसका कितना खर्च है?",
+    "review": "machine",
+    "enHash": "ed90bcad"
+  },
+  "home.faq.1.a": {
+    "message": "अभी TodayZ दुकानों के लिए मुफ़्त है। ताज़ा जानकारी के लिए कीमत वाला पेज देखें।",
+    "review": "machine",
+    "enHash": "9f35ab56"
+  },
+  "home.faq.2.q": {
+    "message": "क्या मुझे फ़ोन चलाना अच्छे से आना चाहिए?",
+    "review": "machine",
+    "enHash": "bb61bdaa"
+  },
+  "home.faq.2.a": {
+    "message": "नहीं। बिज़नेस ऐप रोज़ की दुकानदारी के लिए बना है, और आप कुछ आइटम से शुरू कर सकते हैं।",
+    "review": "machine",
+    "enHash": "90ac0fa2"
+  },
+  "home.faq.3.q": {
+    "message": "ग्राहकों को सामान कैसे मिलता है?",
+    "review": "machine",
+    "enHash": "0c54ae3e"
+  },
+  "home.faq.3.a": {
+    "message": "वे TodayZ पर आइटम बुक करते हैं, फिर आपकी दुकान से ले जाते हैं या डिलीवरी माँगते हैं।",
+    "review": "machine",
+    "enHash": "b722f805"
+  },
+  "home.faq.4.q": {
+    "message": "कौन सी दुकानें जुड़ सकती हैं?",
+    "review": "machine",
+    "enHash": "c5b54c7f"
+  },
+  "home.faq.4.a": {
+    "message": "कोई भी मोहल्ले की दुकान जो असली सामान बेचती है, किराने से लेकर हार्डवेयर तक।",
+    "review": "machine",
+    "enHash": "de090547"
+  }
+}

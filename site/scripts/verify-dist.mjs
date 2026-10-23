@@ -9,7 +9,9 @@
 // Never allowed: inline event handlers (on*= attributes) and javascript: URLs, which the CSP in
 // _headers (scripts/headers.mjs) would block anyway.
 // Unless run with --e2e (the `build:e2e` script), a built lead form must not carry a Turnstile test
-// site key or a local (.localhost) API origin: those builds are for local runs and tests only.
+// site key or a local (.localhost) API origin: those builds are for local runs and tests only, and
+// no machine-draft locale may appear anywhere: no /<lc>/ pages or OG images, no hreflang, lang or
+// links naming it, no sitemap entry (shared/i18n/README.md: machine drafts never ship).
 import { readFileSync, readdirSync, realpathSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,6 +20,8 @@ const PUBLIC_ORIGIN = 'https://todayz.in/';
 const TURNSTILE_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
 /** Links (not subresources) may point at the product apps. */
 const APP_ORIGINS = ['https://app.todayz.in', 'https://business.todayz.in'];
+/** build:e2e links to the local app hosts (PUBLIC_*_APP_URL in infra/local/local.env). */
+const LOCAL_APP_ORIGINS = ['https://app.todayz.localhost', 'https://business.todayz.localhost'];
 /** A page holds the lead form when it renders this marker. */
 const LEAD_FORM_MARKER = 'data-lead-form';
 /** Cloudflare's published Turnstile test site keys (always pass, always block, forced challenge…). */
@@ -92,11 +96,14 @@ function isOwnBundle(url) {
  * Problems in one built file.
  * @param {string} rel   path relative to dist/
  * @param {string} text  file contents (only read for .html and .css)
- * @param {{ e2e?: boolean }} [options]  e2e: allow the Turnstile test key and a local API (build:e2e)
+ * @param {{ e2e?: boolean, draftLocales?: readonly string[] }} [options]
+ *   e2e: allow the Turnstile test key, a local API and draft locales (build:e2e);
+ *   draftLocales: locales that must not appear outside e2e
  * @returns {string[]}
  */
 export function checkFile(rel, text, options = {}) {
   const problems = [];
+  if (!options.e2e) problems.push(...draftLocaleProblems(rel, text, options.draftLocales ?? []));
   if (/\.m?js$/.test(rel) && !/^_astro\/[\w.-]+\.[\w-]{6,}\.js$/.test(rel)) problems.push(`${rel}: client JS emitted`);
   if (!/\.(html|css)$/.test(rel)) return problems;
   if (/fonts\.(googleapis|gstatic)\.com/.test(text)) problems.push(`${rel}: references a font CDN`);
@@ -135,9 +142,34 @@ export function checkFile(rel, text, options = {}) {
       }
       if (!isRemote(url) || url.startsWith(PUBLIC_ORIGIN)) continue;
       if (tag === 'script' && url === TURNSTILE_SRC) continue;
-      if (tag === 'a' && attr === 'href' && APP_ORIGINS.some((o) => url === o || url.startsWith(`${o}/`) || url.startsWith(`${o}#`) || url.startsWith(`${o}?`))) continue;
+      const appOrigins = options.e2e ? [...APP_ORIGINS, ...LOCAL_APP_ORIGINS] : APP_ORIGINS;
+      if (tag === 'a' && attr === 'href' && appOrigins.some((o) => url === o || url.startsWith(`${o}/`) || url.startsWith(`${o}#`) || url.startsWith(`${o}?`))) continue;
       problems.push(`${rel}: remote reference ${url}`);
     }
+  }
+  return problems;
+}
+
+/**
+ * Traces of a draft locale in one file: its folder, its OG images, and in HTML, XML or text any
+ * hreflang, lang attribute or link that names it.
+ * @param {string} rel
+ * @param {string} text
+ * @param {readonly string[]} locales
+ */
+export function draftLocaleProblems(rel, text, locales) {
+  const problems = [];
+  const path = rel.split('\\').join('/');
+  for (const lc of locales) {
+    if (path.startsWith(`${lc}/`)) problems.push(`${rel}: page of draft locale ${lc}`);
+    if (new RegExp(`^og/[\\w-]+-${lc}\\.png$`).test(path)) problems.push(`${rel}: OG image of draft locale ${lc}`);
+    if (!/\.(html|xml|txt)$/.test(path)) continue;
+    const named = [
+      [new RegExp(`hreflang=["']?${lc}\\b`, 'i'), 'hreflang'],
+      [new RegExp(`\\slang=["']?${lc}\\b`, 'i'), 'lang attribute'],
+      [new RegExp(`(?:href=["']?|todayz\\.in)/${lc}/`, 'i'), 'link'],
+    ];
+    for (const [re, what] of named) if (re.test(text)) problems.push(`${rel}: ${what} for draft locale ${lc}`);
   }
   return problems;
 }
@@ -152,14 +184,14 @@ function walk(dir) {
 /**
  * All problems in a built dist/ folder.
  * @param {string} dist
- * @param {{ e2e?: boolean }} [options]
+ * @param {{ e2e?: boolean, draftLocales?: readonly string[] }} [options]
  * @returns {{ files: number, problems: string[] }}
  */
 export function checkDist(dist, options = {}) {
   const files = walk(dist);
   const problems = files.flatMap((file) => {
     const rel = relative(dist, file);
-    return checkFile(rel, /\.(html|css)$/.test(rel) ? readFileSync(file, 'utf8') : '', options);
+    return checkFile(rel, /\.(html|css|xml|txt)$/.test(rel) ? readFileSync(file, 'utf8') : '', options);
   });
   if (!files.some((f) => relative(dist, f) === 'index.html')) problems.push('dist/index.html is missing');
   return { files: files.length, problems };
@@ -167,12 +199,14 @@ export function checkDist(dist, options = {}) {
 
 if (process.argv[1] && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
   const e2e = process.argv.includes('--e2e');
-  const { files, problems } = checkDist(join(import.meta.dirname, '..', 'dist'), { e2e });
+  const { LOCALES, isMachineDraft } = await import('../src/i18n/index.ts');
+  const draftLocales = LOCALES.filter((l) => isMachineDraft(l));
+  const { files, problems } = checkDist(join(import.meta.dirname, '..', 'dist'), { e2e, draftLocales });
   if (problems.length) {
     console.error(`site: ${problems.length} problem(s) in dist/\n  ${problems.join('\n  ')}`);
     process.exit(1);
   }
   console.log(
-    `site: dist ok (${files} files; only own hashed bundles and Turnstile on lead-form pages; no remote assets; no inline handlers${e2e ? '; e2e build: test key and local API allowed' : ''})`,
+    `site: dist ok (${files} files; only own hashed bundles and Turnstile on lead-form pages; no remote assets; no inline handlers${e2e ? '; e2e build: test key, local API and draft locales allowed' : `; no draft locale (${draftLocales.join(', ') || 'none'})`})`,
   );
 }

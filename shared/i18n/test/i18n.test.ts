@@ -23,7 +23,13 @@ function text(ast: MessageFormatElement[], values: Record<string, string> = {}):
 }
 
 /** Product and brand names that keep their capitals mid-sentence. */
-const PROPER_NOUNS = new Set(['TodayZ', 'WhatsApp', 'Google', 'India', 'Indian']);
+const PROPER_NOUNS = new Set([
+  'TodayZ', 'WhatsApp', 'Google', 'India', 'Indian', 'English', 'JavaScript', 'Cloudflare', 'Turnstile', 'I',
+  'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
+  'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December',
+]);
+/** Multi-word names (a sample shop in the site's mock, a statutory body in the privacy policy). */
+const PROPER_PHRASES = ['Sharma General Store', 'Data Protection Board'];
 
 /**
  * Words that break sentence case: a capitalised word that is not the first word of a sentence,
@@ -31,9 +37,10 @@ const PROPER_NOUNS = new Set(['TodayZ', 'WhatsApp', 'Google', 'India', 'Indian']
  */
 function titleCaseWords(msg: string): string[] {
   const out: string[] = [];
-  for (const sentence of msg.replace(/\{[^}]*\}/g, 'x').split(/(?<=[.?:])\s+/)) {
+  const text = PROPER_PHRASES.reduce((m, name) => m.replaceAll(name, 'x'), msg.replace(/\{[^}]*\}/g, 'x'));
+  for (const sentence of text.split(/(?<=[.?:])\s+/)) {
     for (const word of sentence.split(/\s+/).slice(1)) {
-      const w = word.replace(/^[^\p{L}]+|[^\p{L}\d]+$/gu, '');
+      const w = word.replace(/^[^\p{L}]+|[^\p{L}\d]+$/gu, '').replace(/['’]s$/u, '');
       if (!/^\p{Lu}/u.test(w) || PROPER_NOUNS.has(w) || /^[\p{Lu}\d]{2,}$/u.test(w)) continue;
       out.push(w);
     }

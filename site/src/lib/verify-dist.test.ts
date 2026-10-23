@@ -1,6 +1,7 @@
 // The post-build guard (scripts/verify-dist.mjs) must catch any remote asset and any unexpected script.
 import { describe, expect, it } from 'vitest';
 import { checkFile } from '../../scripts/verify-dist.mjs';
+import { LOCALES, isMachineDraft } from '../i18n/index.ts';
 
 const TURNSTILE = '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>';
 const FORM = '<form data-lead-form></form>';
@@ -116,6 +117,31 @@ describe('verify-dist', () => {
 
     it('passes a real key and API', () => {
       expect(checkFile('index.html', form('0x4AAAAAAA-real', 'https://api.todayz.in'))).toEqual([]);
+    });
+  });
+
+  describe('machine-draft locales never ship', () => {
+    const drafts = ['hi', 'ta'];
+    const prod = { draftLocales: drafts };
+    it.each([
+      ['hi/index.html', '<p>x</p>', /page of draft locale hi/],
+      ['ta/for-retailers/index.html', '<p>x</p>', /page of draft locale ta/],
+      ['og/home-hi.png', '', /OG image of draft locale hi/],
+      ['index.html', '<link rel="alternate" hreflang="hi" href="https://todayz.in/hi/">', /hreflang for draft locale hi/],
+      ['index.html', '<a href="/ta/" lang="ta-IN">தமிழ்</a>', /lang attribute for draft locale ta/],
+      ['index.html', '<a href="/hi/for-retailers/">x</a>', /link for draft locale hi/],
+      ['sitemap.xml', '<loc>https://todayz.in/hi/</loc>', /link for draft locale hi/],
+    ])('refuses %s outside e2e builds', (rel, text, problem) => {
+      expect(checkFile(rel, text, prod).join('\n')).toMatch(problem);
+      expect(checkFile(rel, text, { ...prod, e2e: true })).toEqual([]);
+    });
+    it('passes English pages and reviewed locales', () => {
+      expect(checkFile('index.html', '<html lang="en-IN"><a href="/for-retailers/" hreflang="en">x</a><a href="/hindi/">y</a></html>', prod)).toEqual([]);
+      expect(checkFile('kn/index.html', '<html lang="kn-IN"></html>', prod)).toEqual([]);
+      expect(checkFile('og/home.png', '', prod)).toEqual([]);
+    });
+    it('treats every non-English locale as a draft today', () => {
+      expect(LOCALES.filter((l) => isMachineDraft(l))).toEqual(['hi', 'kn', 'te', 'ta']);
     });
   });
 });

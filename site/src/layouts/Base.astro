@@ -18,6 +18,7 @@ import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { LOCALE_INFO, createT, isMachineDraft, type Locale } from '../i18n/index.ts';
 import { alternates, pagePath, pageUrl, SITE_ORIGIN, type PageDef } from '../lib/pages.ts';
+import { SITE_LOCALES } from '../lib/site-locales.ts';
 
 interface Props {
   page: PageDef;
@@ -35,8 +36,11 @@ const title = `${t(page.title)}${t(page.title).includes('TodayZ') ? '' : ' | Tod
 const description = t(page.description);
 const canonical = pageUrl(page, locale);
 const ogImage = `${SITE_ORIGIN}/og/${page.id}${locale === 'en' ? '' : `-${locale}`}.png`;
-const hreflang = alternates(page);
 const draft = isMachineDraft(locale);
+// The 404 and machine drafts stay out of search results. A noindex page names no canonical, hreflang
+// or og:url: it is not the address of anything (the 404 is served at every unknown path).
+const robotsNoindex = noindex || draft;
+const hreflang = noindex ? [] : alternates(page, SITE_LOCALES);
 const englishPath = pagePath(page, 'en');
 // Preload the faces the first screen draws, so text does not reflow when they swap in (Lighthouse
 // CLS on the localised heroes): Latin display and body on every page (Indic headings still use Anek
@@ -62,15 +66,15 @@ const preloads = [...LATIN, ...SCRIPT_FONTS[locale]];
     <title>{title}</title>
     {preloads.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
     <meta name="description" content={description} />
-    {noindex && <meta name="robots" content="noindex" />}
-    <link rel="canonical" href={canonical} />
+    {robotsNoindex && <meta name="robots" content="noindex" />}
+    {!noindex && <link rel="canonical" href={canonical} />}
     {hreflang.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
     {draft && <meta name="todayz:translation" content="machine-draft" />}
     <meta property="og:site_name" content="TodayZ" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {!noindex && <meta property="og:url" content={canonical} />}
     <meta property="og:locale" content={info.og} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />

@@ -2,7 +2,8 @@
 // Language switcher with no JavaScript: a <details> list of links. Each language is written in its
 // own script. It lists a language only when the current page exists in it.
 import { LOCALE_INFO, createT, type Locale } from '../i18n/index.ts';
-import { pagePath, type PageDef } from '../lib/pages.ts';
+import { pageLocales, pagePath, type PageDef } from '../lib/pages.ts';
+import { SITE_LOCALES } from '../lib/site-locales.ts';
 import Icon from './Icon.astro';
 
 interface Props {
@@ -12,7 +13,7 @@ interface Props {
 
 const { page, locale } = Astro.props;
 const t = createT(locale);
-const options = page.locales.map((l) => ({ locale: l, href: pagePath(page, l), native: LOCALE_INFO[l].native, tag: LOCALE_INFO[l].tag }));
+const options = pageLocales(page, SITE_LOCALES).map((l) => ({ locale: l, href: pagePath(page, l), native: LOCALE_INFO[l].native, tag: LOCALE_INFO[l].tag }));
 ---
 
 {

@@ -1,0 +1,242 @@
+{
+  "nav.retailers": {
+    "message": "షాపుల కోసం",
+    "review": "machine",
+    "enHash": "673d17e5"
+  },
+  "nav.shoppers": {
+    "message": "కస్టమర్ల కోసం",
+    "review": "machine",
+    "enHash": "b88dfd14"
+  },
+  "nav.how": {
+    "message": "ఎలా పని చేస్తుంది",
+    "review": "machine",
+    "enHash": "1dd6a17c"
+  },
+  "nav.pricing": {
+    "message": "ధర",
+    "review": "machine",
+    "enHash": "a0d9bbad"
+  },
+  "nav.about": {
+    "message": "మా గురించి",
+    "review": "machine",
+    "enHash": "6b21fb79"
+  },
+  "nav.contact": {
+    "message": "సంప్రదించండి",
+    "review": "machine",
+    "enHash": "b37456c4"
+  },
+  "nav.cta": {
+    "message": "మీ షాపును TodayZ లో చేర్చండి",
+    "review": "machine",
+    "enHash": "c24d8be6"
+  },
+  "nav.menu": {
+    "message": "మెనూ",
+    "review": "machine",
+    "enHash": "57f5f5ef"
+  },
+  "a11y.skip": {
+    "message": "నేరుగా కంటెంట్‌కు వెళ్లండి",
+    "review": "machine",
+    "enHash": "0a4470d6"
+  },
+  "a11y.language": {
+    "message": "భాష",
+    "review": "machine",
+    "enHash": "89b86ab0"
+  },
+  "a11y.home": {
+    "message": "TodayZ హోమ్",
+    "review": "machine",
+    "enHash": "7365855c"
+  },
+  "draft.notice": {
+    "message": "ఈ పేజీ మెషిన్ అనువాదం, ఇంకా సమీక్ష కోసం వేచి ఉంది. ఇంగ్లీష్ పేజీయే అసలైనది.",
+    "review": "machine",
+    "enHash": "d1b692d6"
+  },
+  "draft.switch": {
+    "message": "ఇంగ్లీష్ పేజీ చదవండి",
+    "review": "machine",
+    "enHash": "a0390598"
+  },
+  "footer.tagline": {
+    "message": "చుట్టూ ఉన్న నిజమైన ప్రపంచాన్ని వెతికి దొరికేలా చేయడం.",
+    "review": "machine",
+    "enHash": "d87dd890"
+  },
+  "footer.company": {
+    "message": "కంపెనీ",
+    "review": "machine",
+    "enHash": "7a199499"
+  },
+  "footer.legal": {
+    "message": "చట్టపరమైన",
+    "review": "machine",
+    "enHash": "902c91d9"
+  },
+  "footer.privacy": {
+    "message": "గోప్యత",
+    "review": "machine",
+    "enHash": "cf01481f"
+  },
+  "footer.terms_shoppers": {
+    "message": "కస్టమర్లకు నిబంధనలు",
+    "review": "machine",
+    "enHash": "1ed20291"
+  },
+  "footer.terms_shops": {
+    "message": "షాపులకు నిబంధనలు",
+    "review": "machine",
+    "enHash": "43b1e64b"
+  },
+  "footer.refunds": {
+    "message": "రీఫండ్‌లు మరియు క్రెడిట్‌లు",
+    "review": "machine",
+    "enHash": "1f2dac46"
+  },
+  "footer.copy": {
+    "message": "© {year} TodayZ",
+    "review": "machine",
+    "enHash": "04b1a988"
+  },
+  "lead.title": {
+    "message": "మీ షాపు గురించి చెప్పండి",
+    "review": "machine",
+    "enHash": "709fb0ad"
+  },
+  "lead.intro": {
+    "message": "మీ వివరాలు ఇవ్వండి, TodayZ బృందం మిమ్మల్ని సంప్రదిస్తుంది.",
+    "review": "machine",
+    "enHash": "d4d02e2c"
+  },
+  "lead.name": {
+    "message": "మీ పేరు",
+    "review": "machine",
+    "enHash": "ab42293e"
+  },
+  "lead.shop": {
+    "message": "షాపు పేరు",
+    "review": "machine",
+    "enHash": "6a5cc02e"
+  },
+  "lead.phone": {
+    "message": "మొబైల్ నంబర్",
+    "review": "machine",
+    "enHash": "8e5c12de"
+  },
+  "lead.city": {
+    "message": "నగరం",
+    "review": "machine",
+    "enHash": "4271627f"
+  },
+  "lead.submit": {
+    "message": "వివరాలు పంపండి",
+    "review": "machine",
+    "enHash": "08568274"
+  },
+  "lead.sending": {
+    "message": "పంపుతున్నాం…",
+    "review": "machine",
+    "enHash": "cf765512"
+  },
+  "lead.success": {
+    "message": "ధన్యవాదాలు. మాకు మీ వివరాలు అందాయి.",
+    "review": "machine",
+    "enHash": "3ec987c4"
+  },
+  "lead.error": {
+    "message": "ఏదో తప్పు జరిగింది. కొద్దిసేపటి తర్వాత మళ్లీ ప్రయత్నించండి.",
+    "review": "machine",
+    "enHash": "c9e1a4fb"
+  },
+  "lead.err_name": {
+    "message": "మీ పేరు నమోదు చేయండి.",
+    "review": "machine",
+    "enHash": "dacddcd9"
+  },
+  "lead.err_shop": {
+    "message": "షాపు పేరు నమోదు చేయండి.",
+    "review": "machine",
+    "enHash": "00a41eb3"
+  },
+  "lead.err_phone": {
+    "message": "10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి.",
+    "review": "machine",
+    "enHash": "a2dd77f6"
+  },
+  "lead.err_city": {
+    "message": "మీ నగరం నమోదు చేయండి.",
+    "review": "machine",
+    "enHash": "91141962"
+  },
+  "lead.err_captcha": {
+    "message": "దయచేసి పై తనిఖీని పూర్తి చేయండి.",
+    "review": "machine",
+    "enHash": "52b00d89"
+  },
+  "lead.consent": {
+    "message": "ఈ వివరాలను TodayZ గురించి మిమ్మల్ని సంప్రదించడానికి మాత్రమే వాడతాం.",
+    "review": "machine",
+    "enHash": "5c1c2ace"
+  },
+  "nav.start": {
+    "message": "ప్రారంభించండి",
+    "review": "machine",
+    "enHash": "90e40d50"
+  },
+  "nav.login": {
+    "message": "లాగిన్",
+    "review": "machine",
+    "enHash": "f7c400ed"
+  },
+  "nav.english_only": {
+    "message": "ఇంగ్లీష్",
+    "review": "machine",
+    "enHash": "649df08a"
+  },
+  "cta.eyebrow": {
+    "message": "ప్రారంభించండి",
+    "review": "machine",
+    "enHash": "90e40d50"
+  },
+  "cta.title": {
+    "message": "మీ షాపును ఈ రోజే ఆన్‌లైన్‌లోకి తీసుకురండి.",
+    "review": "machine",
+    "enHash": "4aab645b"
+  },
+  "cta.body": {
+    "message": "మీ వివరాలు ఇవ్వండి, షాపు సెటప్ కోసం TodayZ బృందం మిమ్మల్ని సంప్రదిస్తుంది.",
+    "review": "machine",
+    "enHash": "4931e9ff"
+  },
+  "cta.tick.1": {
+    "message": "షాపులకు ఉచితం",
+    "review": "machine",
+    "enHash": "a2839388"
+  },
+  "cta.tick.2": {
+    "message": "కొన్ని ఐటెమ్‌లతో మొదలుపెట్టండి",
+    "review": "machine",
+    "enHash": "9e8a5dec"
+  },
+  "cta.tick.3": {
+    "message": "యాప్ మీ భాషలో",
+    "review": "machine",
+    "enHash": "dfe5627d"
+  },
+  "lead.err_rejected": {
+    "message": "ఈ వివరాలను స్వీకరించలేకపోయాం. సరిచూసి మళ్లీ ప్రయత్నించండి.",
+    "review": "machine",
+    "enHash": "d7e0a3cb"
+  },
+  "lead.nojs": {
+    "message": "ఈ ఫారమ్‌కు JavaScript కావాలి. బ్రౌజర్‌లో దాన్ని ఆన్ చేసి పేజీని మళ్లీ తెరవండి.",
+    "review": "machine",
+    "enHash": "7d142906"
+  }
+}

@@ -5,7 +5,8 @@
 // the page id, because the 404 page reuses the home page definition without the form.
 import { createT, type Locale } from '../i18n/index.ts';
 import { links } from '../lib/company.ts';
-import { pageById, pagePath, type PageDef, type PageId } from '../lib/pages.ts';
+import { pageById, pageLocales, pagePath, type PageDef, type PageId } from '../lib/pages.ts';
+import { SITE_LOCALES } from '../lib/site-locales.ts';
 import Icon from './Icon.astro';
 import LangSwitch from './LangSwitch.astro';
 
@@ -20,7 +21,7 @@ const t = createT(locale);
 /** Link to a page in the current language when it exists in it, otherwise in English. */
 function link(id: PageId): { href: string; hreflang: string | undefined } {
   const target = pageById(id);
-  const inLocale = target.locales.includes(locale);
+  const inLocale = pageLocales(target, SITE_LOCALES).includes(locale);
   return { href: pagePath(target, inLocale ? locale : 'en'), hreflang: inLocale ? undefined : 'en' };
 }
 

@@ -7,11 +7,13 @@ import {
   createT,
   englishMessages,
   formatMessage,
+  enHash,
+  fullyReviewed,
   isMachineDraft,
-  numbered,
+  siteLocales,
   ownMessages,
-  type MessageKey,
 } from './index.ts';
+import { isPreviewMode } from '../lib/env.ts';
 
 describe('site messages', () => {
   const en = englishMessages();
@@ -22,11 +24,11 @@ describe('site messages', () => {
   });
 
   /** The English keys of one file, by namespace (each English file is its namespace). */
-  const englishKeys = (ns: (typeof TRANSLATED_NAMESPACES)[number]) => Object.keys(ENGLISH_FILES[ns]).filter((k) => k !== '$meta');
+  const englishKeys = (ns: (typeof TRANSLATED_NAMESPACES)[number]) => Object.keys(ENGLISH_FILES[ns]);
 
   it.each(OTHER_LOCALES)('%s translates every key of common, home and retailers and has no strays', (locale) => {
     for (const ns of TRANSLATED_NAMESPACES) {
-      const own = Object.keys(TRANSLATED_FILES[locale][ns]).filter((k) => k !== '$meta');
+      const own = Object.keys(TRANSLATED_FILES[locale][ns]);
       const english = englishKeys(ns);
       expect(english.length, ns).toBeGreaterThan(0);
       expect(own.filter((k) => !english.includes(k)), `${locale}/${ns} keys English does not have`).toEqual([]);
@@ -58,10 +60,36 @@ describe('site messages', () => {
     expect(() => formatMessage('{n, plural, one {a} other {b}}', { n: 1 })).toThrow();
   });
 
-  it('reads numbered keys in order until the first gap', () => {
-    const items = numbered(createT('en'), 'en', 'home.shoppers');
-    expect(items.length).toBeGreaterThanOrEqual(3);
-    expect(items[0]).toBe(createT('en')('home.shoppers.1' as MessageKey));
+  describe('machine drafts fail closed', () => {
+    const english = { 'a.one': 'One', 'a.two': 'Two' };
+    const keys = Object.keys(english);
+    const ok = (k: keyof typeof english) => ({ message: 'x', review: 'reviewed', enHash: enHash(english[k]) });
+
+    it('ships a locale only when every key is reviewed and current', () => {
+      expect(fullyReviewed({ 'a.one': ok('a.one'), 'a.two': ok('a.two') }, keys, english)).toBe(true);
+    });
+    it.each([
+      ['a missing key', { 'a.one': ok('a.one') }],
+      ['a machine draft', { 'a.one': ok('a.one'), 'a.two': { ...ok('a.two'), review: 'machine' } }],
+      ['an unknown review value', { 'a.one': ok('a.one'), 'a.two': { ...ok('a.two'), review: 'Reviewed' } }],
+      ['a stale text (English changed)', { 'a.one': ok('a.one'), 'a.two': { ...ok('a.two'), enHash: enHash('Old two') } }],
+    ])('treats %s as a draft', (_, entries) => {
+      expect(fullyReviewed(entries, keys, english)).toBe(false);
+    });
+    it('treats a locale with no file or no keys as a draft', () => {
+      expect(fullyReviewed(undefined, keys, english)).toBe(false);
+      expect(fullyReviewed({}, [], english)).toBe(false);
+    });
+  });
+
+  it('shows drafts only in development and e2e builds', () => {
+    expect(isPreviewMode('development')).toBe(true);
+    expect(isPreviewMode('e2e')).toBe(true);
+    for (const mode of ['production', 'staging', 'preview', '', undefined]) expect(isPreviewMode(mode)).toBe(false);
+    expect(siteLocales('e2e')).toEqual(['en', 'hi', 'kn', 'te', 'ta']);
+    // Every translation is a machine draft today, so production ships English alone.
+    expect(siteLocales('production')).toEqual(['en']);
+    expect(siteLocales('staging')).toEqual(['en']);
   });
 
   it('never uses emoji or raw hex colours in copy', () => {

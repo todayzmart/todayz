@@ -17,7 +17,8 @@ describe('page registry', () => {
       const expected = p.id === 'home' || p.id === 'retailers' ? LOCALES : ['en'];
       expect(p.locales).toEqual(expected);
     }
-    expect(allRoutes()).toHaveLength(2 * 5 + 8);
+    expect(allRoutes(LOCALES)).toHaveLength(2 * 5 + 8);
+    expect(allRoutes(['en'])).toHaveLength(10);
   });
 
   it('computes localised paths', () => {
@@ -30,25 +31,35 @@ describe('page registry', () => {
   });
 
   it('gives every page path a leading and trailing slash (the site builds directory URLs)', () => {
-    for (const { page, locale } of allRoutes()) expect(pagePath(page, locale)).toMatch(/^\/(?:[a-z0-9-]+\/)*$/);
+    for (const { page, locale } of allRoutes(LOCALES)) expect(pagePath(page, locale)).toMatch(/^\/(?:[a-z0-9-]+\/)*$/);
   });
 
   it('emits hreflang alternates with x-default only for multi-language pages', () => {
-    const a = alternates(pageById('home'));
+    const a = alternates(pageById('home'), LOCALES);
     expect(a.map((x) => x.hreflang)).toEqual(['en', 'hi', 'kn', 'te', 'ta', 'x-default']);
     expect(a.at(-1)?.href).toBe('https://todayz.in/');
-    expect(alternates(pageById('how'))).toEqual([]);
+    expect(alternates(pageById('how'), LOCALES)).toEqual([]);
+    // A build that ships only some locales names only those.
+    expect(alternates(pageById('home'), ['en', 'kn']).map((x) => x.hreflang)).toEqual(['en', 'kn', 'x-default']);
+    expect(alternates(pageById('home'), ['en'])).toEqual([]);
   });
 });
 
 describe('sitemap, robots and redirects', () => {
   it('lists every route once, with absolute canonical URLs', () => {
-    const xml = sitemapXml();
+    const xml = sitemapXml(LOCALES);
     const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-    expect(locs).toHaveLength(allRoutes().length);
+    expect(locs).toHaveLength(allRoutes(LOCALES).length);
     expect(new Set(locs).size).toBe(locs.length);
     for (const loc of locs) expect(loc).toMatch(/^https:\/\/todayz\.in\//);
     expect(xml).toContain('hreflang="ta" href="https://todayz.in/ta/for-retailers/"');
+  });
+
+  it('leaves locales the build does not ship out of the sitemap entirely', () => {
+    const xml = sitemapXml(['en']);
+    expect(xml).not.toMatch(/todayz\.in\/(?:hi|kn|te|ta)\//);
+    expect(xml).not.toMatch(/hreflang=/);
+    expect([...xml.matchAll(/<loc>/g)]).toHaveLength(10);
   });
 
   it('points robots at the sitemap and allows crawling', () => {
@@ -63,7 +74,7 @@ describe('sitemap, robots and redirects', () => {
   });
 
   it('redirects only to built pages, never to itself, and from each old URL once', () => {
-    const built = new Set(allRoutes().map(({ page, locale }) => pagePath(page, locale)));
+    const built = new Set(allRoutes(['en']).map(({ page, locale }) => pagePath(page, locale)));
     for (const r of REDIRECTS) {
       expect(built, r.to).toContain(r.to);
       expect(r.from).not.toBe(r.to);

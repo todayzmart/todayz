@@ -1,7 +1,8 @@
 ---
 // Footer: wordmark and tagline, company and legal links, languages, and the giant wordmark.
-import { LOCALES, LOCALE_INFO, createT, type Locale } from '../i18n/index.ts';
-import { pageById, pagePath, type PageId } from '../lib/pages.ts';
+import { LOCALE_INFO, createT, type Locale } from '../i18n/index.ts';
+import { pageById, pageLocales, pagePath, type PageId } from '../lib/pages.ts';
+import { SITE_LOCALES } from '../lib/site-locales.ts';
 
 interface Props {
   locale: Locale;
@@ -14,7 +15,7 @@ const year = new Date().getFullYear();
 /** Link to a page in the current language when it exists in it, otherwise in English. */
 function link(id: PageId): { href: string; hreflang: string | undefined } {
   const target = pageById(id);
-  const inLocale = target.locales.includes(locale);
+  const inLocale = pageLocales(target, SITE_LOCALES).includes(locale);
   return { href: pagePath(target, inLocale ? locale : 'en'), hreflang: inLocale ? undefined : 'en' };
 }
 
@@ -28,7 +29,7 @@ const legal = (
   ] as const
 ).map(([id, key]) => ({ ...link(id), label: t(key) }));
 const home = pageById('home');
-const languages = LOCALES.map((l) => ({ locale: l, href: pagePath(home, l), tag: LOCALE_INFO[l].tag, native: LOCALE_INFO[l].native }));
+const languages = pageLocales(home, SITE_LOCALES).map((l) => ({ locale: l, href: pagePath(home, l), tag: LOCALE_INFO[l].tag, native: LOCALE_INFO[l].native }));
 ---
 
 <footer class="site-foot">

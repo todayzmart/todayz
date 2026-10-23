@@ -1,0 +1,242 @@
+{
+  "nav.retailers": {
+    "message": "दुकानदारों के लिए",
+    "review": "machine",
+    "enHash": "673d17e5"
+  },
+  "nav.shoppers": {
+    "message": "ग्राहकों के लिए",
+    "review": "machine",
+    "enHash": "b88dfd14"
+  },
+  "nav.how": {
+    "message": "कैसे काम करता है",
+    "review": "machine",
+    "enHash": "1dd6a17c"
+  },
+  "nav.pricing": {
+    "message": "कीमत",
+    "review": "machine",
+    "enHash": "a0d9bbad"
+  },
+  "nav.about": {
+    "message": "हमारे बारे में",
+    "review": "machine",
+    "enHash": "6b21fb79"
+  },
+  "nav.contact": {
+    "message": "संपर्क",
+    "review": "machine",
+    "enHash": "b37456c4"
+  },
+  "nav.cta": {
+    "message": "अपनी दुकान TodayZ पर लाएँ",
+    "review": "machine",
+    "enHash": "c24d8be6"
+  },
+  "nav.menu": {
+    "message": "मेन्यू",
+    "review": "machine",
+    "enHash": "57f5f5ef"
+  },
+  "a11y.skip": {
+    "message": "सीधे सामग्री पर जाएँ",
+    "review": "machine",
+    "enHash": "0a4470d6"
+  },
+  "a11y.language": {
+    "message": "भाषा",
+    "review": "machine",
+    "enHash": "89b86ab0"
+  },
+  "a11y.home": {
+    "message": "TodayZ होम",
+    "review": "machine",
+    "enHash": "7365855c"
+  },
+  "draft.notice": {
+    "message": "यह पेज मशीन से अनुवादित है और इसकी समीक्षा बाकी है। अंग्रेज़ी पेज ही असली संदर्भ है।",
+    "review": "machine",
+    "enHash": "d1b692d6"
+  },
+  "draft.switch": {
+    "message": "अंग्रेज़ी पेज पढ़ें",
+    "review": "machine",
+    "enHash": "a0390598"
+  },
+  "footer.tagline": {
+    "message": "आसपास की असली दुनिया को खोजने लायक बनाना।",
+    "review": "machine",
+    "enHash": "d87dd890"
+  },
+  "footer.company": {
+    "message": "कंपनी",
+    "review": "machine",
+    "enHash": "7a199499"
+  },
+  "footer.legal": {
+    "message": "कानूनी",
+    "review": "machine",
+    "enHash": "902c91d9"
+  },
+  "footer.privacy": {
+    "message": "प्राइवेसी",
+    "review": "machine",
+    "enHash": "cf01481f"
+  },
+  "footer.terms_shoppers": {
+    "message": "ग्राहकों के लिए शर्तें",
+    "review": "machine",
+    "enHash": "1ed20291"
+  },
+  "footer.terms_shops": {
+    "message": "दुकानों के लिए शर्तें",
+    "review": "machine",
+    "enHash": "43b1e64b"
+  },
+  "footer.refunds": {
+    "message": "रिफ़ंड और क्रेडिट",
+    "review": "machine",
+    "enHash": "1f2dac46"
+  },
+  "footer.copy": {
+    "message": "© {year} TodayZ",
+    "review": "machine",
+    "enHash": "04b1a988"
+  },
+  "lead.title": {
+    "message": "अपनी दुकान के बारे में बताइए",
+    "review": "machine",
+    "enHash": "709fb0ad"
+  },
+  "lead.intro": {
+    "message": "अपनी जानकारी छोड़िए, TodayZ की टीम आपसे संपर्क करेगी।",
+    "review": "machine",
+    "enHash": "d4d02e2c"
+  },
+  "lead.name": {
+    "message": "आपका नाम",
+    "review": "machine",
+    "enHash": "ab42293e"
+  },
+  "lead.shop": {
+    "message": "दुकान का नाम",
+    "review": "machine",
+    "enHash": "6a5cc02e"
+  },
+  "lead.phone": {
+    "message": "मोबाइल नंबर",
+    "review": "machine",
+    "enHash": "8e5c12de"
+  },
+  "lead.city": {
+    "message": "शहर",
+    "review": "machine",
+    "enHash": "4271627f"
+  },
+  "lead.submit": {
+    "message": "जानकारी भेजें",
+    "review": "machine",
+    "enHash": "08568274"
+  },
+  "lead.sending": {
+    "message": "भेज रहे हैं…",
+    "review": "machine",
+    "enHash": "cf765512"
+  },
+  "lead.success": {
+    "message": "धन्यवाद। हमें आपकी जानकारी मिल गई है।",
+    "review": "machine",
+    "enHash": "3ec987c4"
+  },
+  "lead.error": {
+    "message": "कुछ गड़बड़ हो गई। थोड़ी देर बाद फिर कोशिश करें।",
+    "review": "machine",
+    "enHash": "c9e1a4fb"
+  },
+  "lead.err_name": {
+    "message": "अपना नाम लिखें।",
+    "review": "machine",
+    "enHash": "dacddcd9"
+  },
+  "lead.err_shop": {
+    "message": "दुकान का नाम लिखें।",
+    "review": "machine",
+    "enHash": "00a41eb3"
+  },
+  "lead.err_phone": {
+    "message": "10 अंकों का मोबाइल नंबर लिखें।",
+    "review": "machine",
+    "enHash": "a2dd77f6"
+  },
+  "lead.err_city": {
+    "message": "अपना शहर लिखें।",
+    "review": "machine",
+    "enHash": "91141962"
+  },
+  "lead.err_captcha": {
+    "message": "कृपया ऊपर की जाँच पूरी करें।",
+    "review": "machine",
+    "enHash": "52b00d89"
+  },
+  "lead.consent": {
+    "message": "हम ये जानकारी सिर्फ़ TodayZ के बारे में आपसे संपर्क करने के लिए इस्तेमाल करते हैं।",
+    "review": "machine",
+    "enHash": "5c1c2ace"
+  },
+  "nav.start": {
+    "message": "शुरू करें",
+    "review": "machine",
+    "enHash": "90e40d50"
+  },
+  "nav.login": {
+    "message": "लॉग इन",
+    "review": "machine",
+    "enHash": "f7c400ed"
+  },
+  "nav.english_only": {
+    "message": "अंग्रेज़ी",
+    "review": "machine",
+    "enHash": "649df08a"
+  },
+  "cta.eyebrow": {
+    "message": "शुरू करें",
+    "review": "machine",
+    "enHash": "90e40d50"
+  },
+  "cta.title": {
+    "message": "अपनी दुकान आज ही ऑनलाइन लाएँ।",
+    "review": "machine",
+    "enHash": "4aab645b"
+  },
+  "cta.body": {
+    "message": "अपनी जानकारी छोड़िए, TodayZ की टीम आपकी दुकान शुरू कराने के लिए संपर्क करेगी।",
+    "review": "machine",
+    "enHash": "4931e9ff"
+  },
+  "cta.tick.1": {
+    "message": "दुकानों के लिए मुफ़्त",
+    "review": "machine",
+    "enHash": "a2839388"
+  },
+  "cta.tick.2": {
+    "message": "कुछ आइटम से शुरू करें",
+    "review": "machine",
+    "enHash": "9e8a5dec"
+  },
+  "cta.tick.3": {
+    "message": "ऐप आपकी भाषा में",
+    "review": "machine",
+    "enHash": "dfe5627d"
+  },
+  "lead.err_rejected": {
+    "message": "हम ये जानकारी स्वीकार नहीं कर सके। जाँचकर फिर कोशिश करें।",
+    "review": "machine",
+    "enHash": "d7e0a3cb"
+  },
+  "lead.nojs": {
+    "message": "इस फ़ॉर्म के लिए JavaScript चाहिए। इसे ब्राउज़र में चालू करें और पेज दोबारा खोलें।",
+    "review": "machine",
+    "enHash": "7d142906"
+  }
+}

@@ -1,4 +1,5 @@
 // Sitemap, robots and the old-URL redirect map as pure functions so tests and endpoints share them.
+import type { Locale } from '../i18n/index.ts';
 import { allRoutes, alternates, pageUrl, SITE_ORIGIN } from './pages.ts';
 
 /** Old todayz.in paths and where they go (301). Anchors cannot be redirected, so only paths appear. */
@@ -7,9 +8,10 @@ export const REDIRECTS: readonly { from: string; to: string }[] = [
   { from: '/todayz-landing-page.html', to: '/' },
 ];
 
-export function sitemapXml(): string {
-  const entries = allRoutes().map(({ page, locale }) => {
-    const alts = alternates(page)
+/** Sitemap of every route a build with these locales produces (siteLocales). */
+export function sitemapXml(site: readonly Locale[]): string {
+  const entries = allRoutes(site).map(({ page, locale }) => {
+    const alts = alternates(page, site)
       .map((a) => `    <xhtml:link rel="alternate" hreflang="${a.hreflang}" href="${a.href}"/>`)
       .join('\n');
     return [

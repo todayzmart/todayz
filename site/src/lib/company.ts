@@ -1,3 +1,5 @@
+import { resolveAppLinks } from './env.ts';
+
 // Company facts the site shows. Anything not decided yet is null and the pages say so plainly
 // instead of inventing a value (open questions are listed in docs/qa/W1-09/REPORT.md).
 export const company = {
@@ -11,7 +13,4 @@ export const company = {
 } as const;
 
 /** Apps the site links to. Overridable per build so local and staging builds point at their own hosts. */
-export const links = {
-  customerApp: import.meta.env['PUBLIC_CUSTOMER_APP_URL'] ?? 'https://app.todayz.in',
-  businessApp: import.meta.env['PUBLIC_BUSINESS_APP_URL'] ?? 'https://business.todayz.in',
-} as const;
+export const links = resolveAppLinks(import.meta.env);
