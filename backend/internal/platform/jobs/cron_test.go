@@ -31,6 +31,12 @@ func TestScheduleNextPrev(t *testing.T) {
 		{"0 6,18 * * *", ist(2026, 10, 23, 12, 0), ist(2026, 10, 23, 18, 0), ist(2026, 10, 23, 6, 0)},
 		{"10-20/5 * * * *", ist(2026, 10, 23, 10, 21), ist(2026, 10, 23, 11, 10), ist(2026, 10, 23, 10, 20)},
 		{"0 0 13 * 5", ist(2026, 10, 10, 0, 0), ist(2026, 10, 13, 0, 0), ist(2026, 10, 9, 0, 0)}, // dom OR dow: Tue 13th, Fri 9th
+		// Vixie cron: "*/2" starts with "*", so the day fields AND: odd days
+		// that are Mondays (5 Oct and 19 Oct 2026; 12 Oct is even, 21 Sep
+		// odd). Under the OR rule the next after Fri 9 Oct would be Sun 11th.
+		{"0 0 */2 * 1", ist(2026, 10, 9, 12, 0), ist(2026, 10, 19, 0, 0), ist(2026, 10, 5, 0, 0)},
+		// A 1st that is a Sun/Tue/Thu/Sat: Thu 1 Oct, Sun 1 Nov (OR: Sat 3 Oct).
+		{"0 0 1 * */2", ist(2026, 10, 2, 0, 0), ist(2026, 11, 1, 0, 0), ist(2026, 10, 1, 0, 0)},
 	}
 	for _, c := range cases {
 		s, err := ParseSchedule(c.expr)

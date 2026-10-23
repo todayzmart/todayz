@@ -14,7 +14,8 @@ import (
 // "minute hour day-of-month month day-of-week". A field is *, a number, a
 // range a-b, a step */n or a-b/n, or a comma list of those. Day of week is
 // 0–7 (0 and 7 are Sunday). When both day fields are restricted, a day
-// matching either runs (classic cron).
+// matching either runs; a day field that starts with "*" (including "*/n")
+// is unrestricted, and then a day must match both (Vixie cron).
 //
 // Schedule implements river.PeriodicSchedule (Next).
 type Schedule struct {
@@ -56,7 +57,10 @@ func ParseSchedule(expr string) (*Schedule, error) {
 			return nil, fmt.Errorf("jobs: schedule %q: %s: %w", expr, f.name, err)
 		}
 		*f.bits = bits
-		*f.star = parts[i] == "*"
+		// Vixie cron: a field that starts with "*" ("*", "*/2") counts as
+		// unrestricted for the day-of-month / day-of-week OR rule, so
+		// "0 0 */2 * 1" is odd days that are Mondays, not odd days or Mondays.
+		*f.star = strings.HasPrefix(parts[i], "*")
 	}
 	if s.dow&(1<<7) != 0 { // 7 is Sunday
 		s.dow = s.dow&^(1<<7) | 1
