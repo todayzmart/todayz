@@ -26,10 +26,12 @@ import (
 	"github.com/todayz/backend/internal/seed"
 )
 
-// recorder keeps the last SQL text and arguments of each sqlc query by name.
+// recorder keeps the last SQL text and arguments of each sqlc query by name,
+// and how long each query name took (total, calls, slowest call).
 type recorder struct {
 	mu   sync.Mutex
 	seen map[string]recorded
+	took map[string]*timing
 }
 
 type recorded struct {
@@ -37,17 +39,70 @@ type recorded struct {
 	args []any
 }
 
+type timing struct {
+	calls      int
+	total, max time.Duration
+	slowest    recorded
+}
+
+type traceKey struct{}
+
+type traceStart struct {
+	name  string
+	rec   recorded
+	start time.Time
+}
+
 func (r *recorder) TraceQueryStart(ctx context.Context, _ *pgx.Conn, d pgx.TraceQueryStartData) context.Context {
 	if rest, ok := strings.CutPrefix(d.SQL, "-- name: "); ok {
 		name, _, _ := strings.Cut(rest, " ")
+		rec := recorded{sql: d.SQL, args: d.Args}
 		r.mu.Lock()
-		r.seen[name] = recorded{sql: d.SQL, args: d.Args}
+		r.seen[name] = rec
 		r.mu.Unlock()
+		return context.WithValue(ctx, traceKey{}, traceStart{name: name, rec: rec, start: time.Now()})
 	}
 	return ctx
 }
 
-func (r *recorder) TraceQueryEnd(context.Context, *pgx.Conn, pgx.TraceQueryEndData) {}
+func (r *recorder) TraceQueryEnd(ctx context.Context, _ *pgx.Conn, _ pgx.TraceQueryEndData) {
+	s, ok := ctx.Value(traceKey{}).(traceStart)
+	if !ok {
+		return
+	}
+	d := time.Since(s.start)
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if r.took == nil {
+		r.took = map[string]*timing{}
+	}
+	tm := r.took[s.name]
+	if tm == nil {
+		tm = &timing{}
+		r.took[s.name] = tm
+	}
+	tm.calls++
+	tm.total += d
+	if d > tm.max {
+		tm.max, tm.slowest = d, s.rec
+	}
+}
+
+// tracedService is a Service on a second pool whose queries rec records.
+func tracedService(t *testing.T, f *qa) (*Service, *recorder) {
+	t.Helper()
+	rec := &recorder{seen: map[string]recorded{}}
+	cfg := f.tdb.Pool.Config()
+	cfg.ConnConfig.Tracer = rec
+	pool, err := pgxpool.NewWithConfig(f.ctx, cfg)
+	require.NoError(t, err)
+	t.Cleanup(pool.Close)
+	cat, err := eventcat.Load(events.FS)
+	require.NoError(t, err)
+	svc, err := New(Deps{DB: db.New(pool), Settings: f.cache, Clock: f.clk, Open: fakeOpen}, cat)
+	require.NoError(t, err)
+	return svc, rec
+}
 
 // explain is the plan of a recorded query with sequential scans priced out,
 // so it names an index whenever the query can use one.
@@ -77,19 +132,9 @@ func (w *world) explain(rec recorded) string {
 // that keeps it off a full scan (02 §9: search is an index walk from the
 // customer's point).
 func checkIndexes(t *testing.T, f *qa) {
-	rec := &recorder{seen: map[string]recorded{}}
-	cfg := f.tdb.Pool.Config()
-	cfg.ConnConfig.Tracer = rec
-	pool, err := pgxpool.NewWithConfig(f.ctx, cfg)
-	require.NoError(t, err)
-	t.Cleanup(pool.Close)
-	cat, err := eventcat.Load(events.FS)
-	require.NoError(t, err)
-	svc, err := New(Deps{DB: db.New(pool), Settings: f.cache, Clock: f.clk, Open: fakeOpen}, cat)
-	require.NoError(t, err)
-
+	svc, rec := tracedService(t, f)
 	ctx := f.ctx
-	_, err = svc.Search(ctx, discoverapi.SearchDiscoverParams{Q: "Amul Butter 100 g", Lat: qaLat, Lng: qaLng})
+	_, err := svc.Search(ctx, discoverapi.SearchDiscoverParams{Q: "Amul Butter 100 g", Lat: qaLat, Lng: qaLng})
 	require.NoError(t, err)
 	_, err = svc.Search(ctx, discoverapi.SearchDiscoverParams{Q: "8901262150019", Lat: qaLat, Lng: qaLng})
 	require.NoError(t, err)
@@ -205,33 +250,84 @@ func checkLatency(t *testing.T, f *qa) {
 	radii := []discoverapi.SearchDiscoverParamsRadius{
 		discoverapi.SearchDiscoverParamsRadiusN2000, discoverapi.SearchDiscoverParamsRadiusN5000,
 	}
-	var took []time.Duration
-	measure := func(fn func() error) {
+	// The tracer costs microseconds per query; it names the slow query when
+	// the target is missed.
+	svc, rec := tracedService(t, f)
+	type sample struct {
+		label string
+		d     time.Duration
+	}
+	var took []sample
+	measure := func(label string, fn func() error) {
 		start := time.Now()
 		require.NoError(t, fn())
-		took = append(took, time.Since(start))
+		took = append(took, sample{label, time.Since(start)})
 	}
 	// Warm the settings cache and the connection pool.
-	f.search("curd")
+	_, err := svc.Search(ctx, discoverapi.SearchDiscoverParams{Q: "curd", Lat: qaLat, Lng: qaLng})
+	require.NoError(t, err)
+	rec.mu.Lock()
+	rec.took = nil
+	rec.mu.Unlock()
 	for range 2 {
 		for _, q := range queries {
 			for _, r := range radii {
 				p := discoverapi.SearchDiscoverParams{Q: q, Lat: qaLat, Lng: qaLng, Radius: &r}
-				measure(func() error { _, err := f.svc.Search(ctx, p); return err })
+				measure(fmt.Sprintf("search %q r=%d", q, r), func() error { _, err := svc.Search(ctx, p); return err })
 			}
 		}
-		measure(func() error {
-			_, err := f.svc.Summary(ctx, discoverapi.GetDiscoverSummaryParams{Lat: qaLat, Lng: qaLng})
+		measure("summary", func() error {
+			_, err := svc.Summary(ctx, discoverapi.GetDiscoverSummaryParams{Lat: qaLat, Lng: qaLng})
 			return err
 		})
-		measure(func() error {
-			_, err := f.svc.ListStores(ctx, discoverapi.ListDiscoverStoresParams{Lat: qaLat, Lng: qaLng, OpenNow: bp(true)})
+		measure("stores open now", func() error {
+			_, err := svc.ListStores(ctx, discoverapi.ListDiscoverStoresParams{Lat: qaLat, Lng: qaLng, OpenNow: bp(true)})
 			return err
 		})
 	}
-	sort.Slice(took, func(i, j int) bool { return took[i] < took[j] })
-	p50 := took[len(took)/2]
-	p95 := took[int(math.Ceil(0.95*float64(len(took))))-1]
-	t.Logf("latency over %d requests: p50 %v, p95 %v, max %v", len(took), p50, p95, took[len(took)-1])
-	assert.Less(t, p95, 300*time.Millisecond)
+	sort.Slice(took, func(i, j int) bool { return took[i].d < took[j].d })
+	p50 := took[len(took)/2].d
+	p95 := took[int(math.Ceil(0.95*float64(len(took))))-1].d
+	t.Logf("latency over %d requests: p50 %v, p95 %v, max %v", len(took), p50, p95, took[len(took)-1].d)
+	for _, s := range took[len(took)-6:] {
+		t.Logf("  slow request %-36s %v", s.label, s.d)
+	}
+	rec.mu.Lock()
+	names := make([]string, 0, len(rec.took))
+	for n := range rec.took {
+		names = append(names, n)
+	}
+	sort.Slice(names, func(i, j int) bool { return rec.took[names[i]].total > rec.took[names[j]].total })
+	var worst []recorded
+	for i, n := range names {
+		tm := rec.took[n]
+		t.Logf("  query %-26s calls %3d total %9v max %9v", n, tm.calls, tm.total.Round(time.Microsecond), tm.max.Round(time.Microsecond))
+		if i < 2 {
+			worst = append(worst, tm.slowest)
+		}
+	}
+	rec.mu.Unlock()
+	if !assert.Less(t, p95, 300*time.Millisecond) {
+		for _, w := range worst {
+			t.Logf("EXPLAIN (ANALYZE, BUFFERS) of the slowest call\n%s\n%s", w.sql, f.analyze(w))
+		}
+	}
+}
+
+// analyze is EXPLAIN (ANALYZE, BUFFERS) of a recorded query under the
+// planner's normal settings.
+func (w *world) analyze(rec recorded) string {
+	w.t.Helper()
+	rows, err := w.tdb.OwnerPool.Query(w.ctx, "EXPLAIN (ANALYZE, BUFFERS) "+rec.sql, rec.args...)
+	require.NoError(w.t, err)
+	defer rows.Close()
+	var b strings.Builder
+	for rows.Next() {
+		var line string
+		require.NoError(w.t, rows.Scan(&line))
+		b.WriteString(line)
+		b.WriteByte('\n')
+	}
+	require.NoError(w.t, rows.Err())
+	return b.String()
 }

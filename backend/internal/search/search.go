@@ -34,6 +34,8 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/jackc/pgx/v5"
+
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/gen/sqlc/searchdb"
 	"github.com/todayz/backend/internal/platform/clock"
@@ -142,7 +144,29 @@ func (s *Service) ready(ctx context.Context) (*searchdb.Queries, error) {
 		telemetry.Logger(ctx).ErrorContext(ctx, "search: not configured (needs the database and settings)")
 		return nil, problem.Wrap(genproblems.ServiceUnavailable, errUnavailable)
 	}
-	return searchdb.New(s.db.Q(ctx)), nil
+	return searchdb.New(planPerCall{s.db.Q(ctx)}), nil
+}
+
+// planPerCall runs the discover reads as unnamed statements
+// (pgx.QueryExecModeCacheDescribe: one round trip, description cached
+// client-side), so Postgres plans each call with its own arguments.
+//
+// Under the default statement cache, Postgres switches a prepared statement
+// to its generic plan after five runs. Every discover read hangs on a point,
+// a radius and optional filters ($n IS NULL OR …), which a generic plan can
+// only guess: for SearchItems it guessed one store in the radius and eleven
+// products, and chose a nested loop that probed every (store, product) pair
+// in the radius — 0.5 s at 5 km with the dev seed and 1,000 stores, against
+// 60 ms for the plan made with the arguments. Planning costs under a
+// millisecond per query. Writes keep the default mode.
+type planPerCall struct{ searchdb.DBTX }
+
+func (p planPerCall) Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error) {
+	return p.DBTX.Query(ctx, sql, append([]any{pgx.QueryExecModeCacheDescribe}, args...)...)
+}
+
+func (p planPerCall) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row {
+	return p.DBTX.QueryRow(ctx, sql, append([]any{pgx.QueryExecModeCacheDescribe}, args...)...)
 }
 
 // internal wraps an unexpected error as a 500 problem.
