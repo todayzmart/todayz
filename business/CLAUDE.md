@@ -27,7 +27,7 @@ Same structure as `customer/` (see its CLAUDE.md): `src/main.tsx`, `src/app/`, `
 
 ## Conventions
 
-- To build a section: add your route file(s) under `src/routes/<area>/` (e.g. `src/routes/orders/index.tsx`, `src/routes/orders/$orderId.tsx`). A static route outranks `/$section`, so your page replaces the placeholder. Edit nothing in `nav.ts` or `$section.tsx` (`src/app/routing.test.ts` proves the precedence). W3-03 moves the landing redirect when it builds Overview.
+- To build a section: add your route file(s) under `src/routes/<area>/` (e.g. `src/routes/orders/index.tsx`, `src/routes/orders/$orderId.tsx`). A static route outranks `/$section`, so your page replaces the placeholder. Edit nothing in `nav.ts` or `$section.tsx` (`src/app/routing.test.ts` proves the precedence). Overview (B-03) is the landing page at `/`.
 - Tokens only; i18n keys in `shared/i18n/messages/business/`. Dev port 5302, Host `business.todayz.localhost`. Initial JS budget 250 KB gzip. Hidden sourcemaps, checked by `build` as in `customer/`. The offline POS (W1+) adds its own service worker strategy on top of the precache set up here.
 - Smoke screenshots go to the git-ignored `test-results/screenshots/`; `TZ_QA_DIR=docs/qa/W0-05 make e2e` refreshes the committed ones.
 
