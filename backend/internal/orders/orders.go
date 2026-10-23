@@ -15,6 +15,11 @@
 //     stock_reservations row (the trigger moves store_items.reserved); an
 //     end state releases them; hand-over sells each line through the stock
 //     writer (sale_online) and marks its reservation consumed.
+//   - Lock order: the order row, then (hand-over only, through the stock
+//     writer) the stores row, then store_items in id order. Accept and the
+//     release at an end state lock their items in id order before the
+//     reservation rows move them, so two orders sharing items never wait on
+//     each other in a cycle.
 //   - The pickup code is 4 random digits, stored sealed (code_enc, AES-GCM
 //     under ORDER_CODE_ENC_KEY) and as an HMAC (code_hmac, under
 //     ORDER_CODE_HMAC_KEY) (D-04). It is compared in constant time against
@@ -31,6 +36,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"time"
 
@@ -77,6 +83,9 @@ type Deps struct {
 	AskPricer AskPricer
 	// Credits holds and settles credits; nil means credits are not live.
 	Credits Credits
+	// CodeRand is the randomness pickup codes are drawn from; nil means
+	// crypto/rand. Only tests set it, to force a code collision.
+	CodeRand io.Reader
 }
 
 // Stock is what orders needs from the catalogue's stock writer.
@@ -140,6 +149,9 @@ func New(d Deps) (*Service, error) {
 		k, err := newCodeKeys(d.Config.Keys.OrderCodeEncKey, d.Config.Keys.OrderCodeHMACKey)
 		if err != nil {
 			return nil, err
+		}
+		if k != nil && d.CodeRand != nil {
+			k.rnd = d.CodeRand
 		}
 		s.codes = k
 		if d.Config.Keys.PIIEncKey.IsSet() {

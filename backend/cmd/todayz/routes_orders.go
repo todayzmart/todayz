@@ -1,6 +1,8 @@
 package main
 
 import (
+	"io"
+
 	"github.com/go-chi/chi/v5"
 
 	"github.com/todayz/backend/internal/business"
@@ -10,6 +12,10 @@ import (
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 )
 
+// orderCodeRand replaces crypto/rand for pickup codes. It is nil in the
+// binary; only tests set it (to force a code collision).
+var orderCodeRand io.Reader
+
 // mountOrders mounts W2-02's routes: checkout quote and create, the
 // customer's orders and actions, and the store's order inbox and actions.
 // It also registers the orders deletion check (BK-44: no account deletion
@@ -18,6 +24,7 @@ func mountOrders(r chi.Router, d *deps) {
 	od := orders.Deps{
 		Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Settings: d.Settings,
 		Notices: newNotifyService(d), Stock: jobs.OrdersStock(d.Clock), Open: business.OpenAt,
+		CodeRand: orderCodeRand,
 	}
 	if d.Queue != nil {
 		// The timers are enqueued in the order's transaction through the

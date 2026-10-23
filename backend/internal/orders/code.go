@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
+	"io"
 	"math/big"
 
 	"github.com/todayz/backend/gen/sqlc/ordersdb"
@@ -13,6 +14,7 @@ import (
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/pii"
+	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
 // The pickup code (01 §6, D-04).
@@ -38,6 +40,7 @@ var errNoCodeKeys = errors.New("orders: ORDER_CODE_ENC_KEY and ORDER_CODE_HMAC_K
 type codeKeys struct {
 	seal *pii.Sealer
 	mac  *pii.Hasher
+	rnd  io.Reader // crypto/rand.Reader; Deps.CodeRand replaces it in tests
 }
 
 // newCodeKeys builds the keys; nil (and no error) when either is unset, so
@@ -54,7 +57,7 @@ func newCodeKeys(enc, mac config.Secret) (*codeKeys, error) {
 	if err != nil {
 		return nil, fmt.Errorf("orders: ORDER_CODE_HMAC_KEY: %w", err)
 	}
-	return &codeKeys{seal: s, mac: h}, nil
+	return &codeKeys{seal: s, mac: h, rnd: rand.Reader}, nil
 }
 
 // sealedCode is a code as stored. It never holds the plain code.
@@ -72,7 +75,7 @@ func (k *codeKeys) lookup(storeID ids.ID, code string) []byte {
 
 // draw makes a new random code for the order and seals it.
 func (k *codeKeys) draw(storeID, orderID ids.ID) (sealedCode, error) {
-	n, err := rand.Int(rand.Reader, codeSpace)
+	n, err := rand.Int(k.rnd, codeSpace)
 	if err != nil {
 		return sealedCode{}, fmt.Errorf("orders: draw code: %w", err)
 	}
@@ -115,13 +118,23 @@ func (s *Service) withFreshCode(ctx context.Context, storeID, orderID ids.ID, wr
 			return fmt.Errorf("orders: code in use: %w", err)
 		}
 		if taken {
+			redrawn(ctx, "in_use")
 			continue
 		}
 		err = s.db.InTx(ctx, func(ctx context.Context) error { return write(ctx, c) })
 		if db.IsUniqueViolation(err, uxStoreCode) {
+			// Another order of the store took the code between the check
+			// and the insert; only this attempt's savepoint rolled back.
+			redrawn(ctx, "unique_violation")
 			continue
 		}
 		return err
 	}
 	return errors.New("orders: no free pickup code for the store after several draws")
+}
+
+// redrawn logs one redraw of a pickup code and why, never the code. Many
+// of them mean a store's open orders crowd the code space.
+func redrawn(ctx context.Context, reason string) {
+	telemetry.Logger(ctx).InfoContext(ctx, "orders: pickup code redrawn", "reason", reason)
 }
