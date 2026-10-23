@@ -1,9 +1,137 @@
 # Schemas: domain "telemetry" (owner W1-07): RUM, product events, client errors and the slow test routes (04 §2.9, D-93).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Request objects carry `additionalProperties: false` (an unknown field is 422 validation_failed);
+# an object that must stay open says `x-open-object: true`.
+TelemetryApp:
+  type: string
+  description: The client app that sent the batch.
+  enum: [customer, business, admin, site]
+TelemetryPlatform:
+  type: string
+  description: Where the client runs.
+  enum: [web, android, ios, desktop, other]
+RumConn:
+  type: string
+  description: Connection type from the Network Information API, when the browser has one.
+  enum: [slow-2g, 2g, 3g, 4g, wifi, ethernet, unknown]
+RumSample:
+  type: object
+  description: |
+    One measurement. `type` `vital` carries a web vital (`LCP`, `INP`, `CLS`, `FCP`, `TTFB`),
+    a `route_change` or a `long_task`; `error` carries a scrubbed error (`detail.message`).
+  additionalProperties: false
+  required: [type, name, route, t]
+  properties:
+    type:
+      type: string
+      enum: [vital, error]
+    name:
+      type: string
+      description: Metric name (`LCP`, `INP`, `CLS`, `FCP`, `TTFB`, `route_change`, `long_task`) or the error name.
+      minLength: 1
+      maxLength: 100
+    value:
+      type: number
+      description: Milliseconds, except `CLS` (a score).
+      minimum: 0
+      maximum: 3600000
+    route:
+      type: string
+      description: The route template (`/r/$token`), never a concrete path with ids.
+      minLength: 1
+      maxLength: 120
+    detail:
+      type: object
+      description: Rating for a vital, scrubbed `message` for an error. Only these two keys are read.
+      x-open-object: true
+      maxProperties: 12
+    t:
+      type: integer
+      description: Client time of the sample, milliseconds since the epoch.
+      minimum: 0
+      maximum: 4102444800000
+RumBatch:
+  type: object
+  additionalProperties: false
+  required: [app, samples]
+  properties:
+    app:
+      $ref: "#/TelemetryApp"
+    release:
+      type: string
+      description: "`app@gitsha`, or `dev`."
+      maxLength: 64
+    platform:
+      $ref: "#/TelemetryPlatform"
+    conn:
+      $ref: "#/RumConn"
+    samples:
+      type: array
+      minItems: 1
+      maxItems: 50
+      items:
+        $ref: "#/RumSample"
+ProductEvent:
+  type: object
+  additionalProperties: false
+  required: [id, name, t]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    name:
+      type: string
+      description: A client event from `shared/telemetry/events/<domain>.yaml`.
+      pattern: ^[a-z][a-z0-9]*(_[a-z0-9]+)*$
+      maxLength: 64
+    t:
+      $ref: ./common.yaml#/Timestamp
+    props:
+      type: object
+      description: Props the event's catalogue entry declares (enums, numbers, booleans, ids; never free text).
+      x-open-object: true
+      maxProperties: 16
+    geoCell:
+      type: string
+      description: H3 resolution-8 cell, 15 hex digits; never coordinates.
+      pattern: ^[0-9a-f]{15}$
+      maxLength: 15
+EventBatch:
+  type: object
+  additionalProperties: false
+  required: [app, events]
+  properties:
+    app:
+      $ref: "#/TelemetryApp"
+    appVersion:
+      type: string
+      pattern: ^[A-Za-z0-9._+-]{1,40}$
+      maxLength: 40
+    platform:
+      $ref: "#/TelemetryPlatform"
+    anonId:
+      $ref: ./common.yaml#/Ulid
+    sessionId:
+      $ref: ./common.yaml#/Ulid
+    events:
+      type: array
+      minItems: 1
+      maxItems: 50
+      items:
+        $ref: "#/ProductEvent"
+EventsAccepted:
+  type: object
+  required: [accepted]
+  properties:
+    accepted:
+      type: integer
+      description: Events stored. A retried batch counts only the events not stored before.
+      minimum: 0
+      maximum: 50
+SlowTestResult:
+  type: object
+  required: [sleptMs]
+  properties:
+    sleptMs:
+      type: integer
+      minimum: 0
+      maximum: 30000

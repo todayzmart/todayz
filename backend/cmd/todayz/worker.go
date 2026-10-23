@@ -17,6 +17,7 @@ import (
 	"github.com/todayz/backend/internal/platform/migrate"
 	"github.com/todayz/backend/internal/platform/pgnotify"
 	"github.com/todayz/backend/internal/platform/queue"
+	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
 // runWorker works jobs until SIGTERM, then drains (02 §2.8, D-98; see
@@ -57,6 +58,13 @@ func runWorker(ctx context.Context, getenv func(string) string, out io.Writer) e
 	if err != nil {
 		return err
 	}
+
+	// tz_queue_depth and tz_queue_oldest_available_age_seconds, read from river_job at each scrape (W1-07).
+	unregQueue, err := telemetry.RegisterQueue(nil, pool, clk.Now)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = unregQueue() }()
 
 	m, err := migrate.New(pool, nil)
 	if err != nil {

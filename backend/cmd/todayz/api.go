@@ -31,6 +31,7 @@ func buildRouter(d deps, idem idempotency.Store, v *openapi.Validator) (*httpx.R
 		PublicCORSOrigins: d.Config.PublicCORSOrigins(),
 		ClientIP:          mw.ClientIPOptions{TrustCloudflare: d.Config.Env.IsDeployed()},
 		Idempotency:       idempotency.Options{Store: idem, Clock: d.Clock, Log: d.Log},
+		Metrics:           d.Metrics, // RED metrics in the access-log slot (W1-07); nil skips them
 	}
 	if v != nil {
 		o.Validator, o.Policies = v, v
@@ -96,7 +97,7 @@ func runAPI(ctx context.Context, getenv func(string) string, out io.Writer) erro
 	}}
 	d := deps{
 		Config: a.cfg, Log: a.log, Clock: clk, DB: db.New(pool), Settings: st,
-		Queue: q, Ready: ready, TestClock: tc,
+		Queue: q, Ready: ready, TestClock: tc, Metrics: a.metrics,
 	}
 	// Stored idempotent responses are sealed under PII_ENC_KEY (D-18).
 	idem, err := idempotency.NewPGStore(pool, a.cfg.Keys.PIIEncKey.Bytes())

@@ -15,6 +15,7 @@ import (
 	"github.com/todayz/backend/internal/platform/health"
 	"github.com/todayz/backend/internal/platform/queue"
 	"github.com/todayz/backend/internal/platform/settings"
+	"github.com/todayz/backend/internal/platform/telemetry"
 	"github.com/todayz/backend/internal/platform/testclock"
 )
 
@@ -28,6 +29,7 @@ type deps struct {
 	Queue     *queue.Client // insert-only in the API
 	Ready     *health.Readiness
 	TestClock *testclock.Service // nil in staging and prod
+	Metrics   *telemetry.Metrics // RED, SSE and RUM instruments (W1-07); nil in tests that skip them
 }
 
 func routes(r chi.Router, d deps) {

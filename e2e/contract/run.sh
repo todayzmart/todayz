@@ -64,6 +64,7 @@ args=(run "$spec" --url "$base"
   --no-color --warnings off
   --generation-database none
   --max-failures 20
+  --exclude-operation-id getTestSlow --exclude-operation-id getTestSlowSql # they sleep up to 30 s by design (W1-07)
   --report junit --report-dir "$out")
 case "$mode" in
   smoke) args+=(--phases "examples,coverage") ;;

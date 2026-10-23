@@ -1,12 +1,133 @@
-# Paths: domain "telemetry" (owner W1-07): RUM, product events, client errors and the slow test routes (04 §2.9, D-93).
-#
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [telemetry]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/telemetry.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Paths: domain "telemetry" (owner W1-07): RUM, product events and the slow test routes (04 §2.9, D-93).
+# `/v1/client-errors` is not built: errors travel in the RUM batch (05 §2.4), so the endpoint is not needed
+# while the RUM route exists.
+/v1/rum:
+  post:
+    operationId: postRum
+    tags: [telemetry]
+    summary: Send a batch of browser performance samples and errors
+    description: |
+      Called by `@todayz/telemetry` with `sendBeacon`. Anonymous. The samples become the `tz_rum_*`
+      histograms (route cardinality is capped per app); errors are logged with a fingerprint, app and
+      app version; 1% of the samples are also kept as raw log lines. Answers 204 with no body.
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/telemetry.yaml#/RumBatch
+          example:
+            app: customer
+            release: customer@3f2a9c1
+            platform: web
+            conn: 4g
+            samples:
+              - { type: vital, name: LCP, value: 1820.5, route: /search, detail: { rating: good }, t: 1792660000000 }
+              - { type: error, name: TypeError, route: /r/$token, detail: { message: "Cannot read properties of undefined" }, t: 1792660001000 }
+    responses:
+      "204":
+        description: Accepted
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/events:
+  post:
+    operationId: postEvents
+    tags: [telemetry]
+    summary: Send a batch of client product events
+    description: |
+      Up to 50 events per call, anonymous (the signed-in user is added when the request has one). Each event's
+      name and props are checked against the catalogue in `shared/telemetry/events/<domain>.yaml`; an unknown
+      event, a server-emitted event, a missing or unknown prop or a value outside its enum fails the whole call
+      with 422 and one `fields` entry per problem. Retrying a batch is safe: an event id that is already stored
+      is skipped.
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/telemetry.yaml#/EventBatch
+          example:
+            app: customer
+            appVersion: 3f2a9c1
+            platform: web
+            anonId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+            sessionId: 01JB0S1W6W8ZV7T1C3A6M9N4PR
+            events:
+              - id: 01JB0S1W6W8ZV7T1C3A6M9N4PS
+                name: app_opened
+                t: "2026-10-22T09:30:00Z"
+                props: { launch: cold }
+    responses:
+      "202":
+        description: Stored
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/telemetry.yaml#/EventsAccepted
+            example:
+              accepted: 1
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/test/slow:
+  get:
+    operationId: getTestSlow
+    tags: [telemetry]
+    summary: Answer after a delay
+    description: |
+      Forces a slow route for the latency alerts and the slow-network checks (D-93). Registered only when
+      `APP_ENV` is `local` or `test`, the database agrees and `API_ADDR` is a loopback address (the same gate
+      as `/v1/test/clock`); otherwise 404.
+    security: []
+    parameters:
+      - name: ms
+        in: query
+        required: true
+        description: Milliseconds to wait, 0 to 30000.
+        schema:
+          type: integer
+          minimum: 0
+          maximum: 30000
+        example: 5
+    responses:
+      "200":
+        description: Waited
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/telemetry.yaml#/SlowTestResult
+            example:
+              sleptMs: 5
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/test/slow-sql:
+  get:
+    operationId: getTestSlowSql
+    tags: [telemetry]
+    summary: Answer after a slow query
+    description: |
+      Runs `pg_sleep(ms / 1000)` in a query, to force a slow query for the slow-query alert (D-93). Same
+      gate as `/v1/test/clock`; otherwise 404.
+    security: []
+    parameters:
+      - name: ms
+        in: query
+        required: true
+        description: Milliseconds the query sleeps, 0 to 30000.
+        schema:
+          type: integer
+          minimum: 0
+          maximum: 30000
+        example: 5
+    responses:
+      "200":
+        description: The query returned
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/telemetry.yaml#/SlowTestResult
+            example:
+              sleptMs: 5
+      default:
+        $ref: ../common/responses.yaml#/Problem

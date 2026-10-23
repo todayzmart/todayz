@@ -1,8 +1,19 @@
 package main
 
-import "github.com/go-chi/chi/v5"
+import (
+	"github.com/go-chi/chi/v5"
 
-// mountTelemetry mounts the telemetry domain's routes. Only the work package that builds
-// internal/telemetry edits this file (D-50): build the domain's service from d and
-// call its Register, e.g. telemetry.Register(r, telemetry.Deps{DB: d.DB, Clock: d.Clock}).
-func mountTelemetry(r chi.Router, d *deps) {}
+	teldomain "github.com/todayz/backend/internal/telemetry"
+)
+
+// mountTelemetry mounts POST /v1/rum, POST /v1/events and, behind the /v1/test/clock gate, the slow
+// test routes (W1-07). A catalogue that does not load is a build error: the API refuses to start.
+func mountTelemetry(r chi.Router, d *deps) {
+	_, _, err := teldomain.Register(r, teldomain.Deps{
+		DB: d.DB, Clock: d.Clock, Metrics: d.Metrics,
+		Env: d.Config.Env, APIAddr: d.Config.APIAddr, TestRoutes: d.TestClock != nil,
+	})
+	if err != nil {
+		panic("telemetry routes: " + err.Error())
+	}
+}
