@@ -102,6 +102,12 @@ export interface RequestOptions extends RequestInit {
 
 const PROBLEM_TYPE = 'https://todayz.in/errors/';
 
+/**
+ * The sign-in routes authenticate by the refresh cookie or by nothing (04 §2.1): the bearer is
+ * never sent to them, so a stale access token cannot turn a refresh into a 401 (W1-08).
+ */
+const NO_BEARER = new Set(['/v1/auth/otp/send', '/v1/auth/otp/verify', '/v1/auth/refresh', '/v1/auth/logout']);
+
 function isProblem(v: unknown): v is Problem {
   if (typeof v !== 'object' || v === null) return false;
   const p = v as Record<string, unknown>;
@@ -162,7 +168,7 @@ export async function request<T>(url: string, init: RequestOptions = {}): Promis
   if (!headers.has('Accept')) headers.set('Accept', 'application/json, application/problem+json');
   if (idempotencyKey) headers.set('Idempotency-Key', idempotencyKey);
   if (ifMatch) headers.set('If-Match', ifMatch);
-  const token = await config.token?.();
+  const token = NO_BEARER.has(url.split('?', 1)[0] ?? '') ? undefined : await config.token?.();
   if (token) headers.set('Authorization', `Bearer ${token}`);
   const lang = config.language?.();
   if (lang) headers.set('Accept-Language', lang);

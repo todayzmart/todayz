@@ -89,6 +89,17 @@ describe('request', () => {
     expect('ifMatch' in call(s).init).toBe(false);
   });
 
+  it('never sends the bearer to the sign-in routes', async () => {
+    const s = stub(json({}));
+    configure({ fetch: s.fetch, token: () => 'tok' });
+    for (const p of ['/v1/auth/otp/send', '/v1/auth/otp/verify', '/v1/auth/refresh', '/v1/auth/logout?x=1']) {
+      await request(p, { method: 'POST' });
+    }
+    await request('/v1/me');
+    expect(s.calls.slice(0, 4).every((c) => !new Headers(c.init.headers).has('authorization'))).toBe(true);
+    expect(new Headers(call(s, 4).init.headers).get('authorization')).toBe('Bearer tok');
+  });
+
   it('sends no Authorization or Accept-Language when signed out', async () => {
     const s = stub(json({}));
     configure({ fetch: s.fetch, token: () => null, language: () => undefined });
