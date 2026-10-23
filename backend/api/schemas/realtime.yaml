@@ -1,0 +1,3 @@
+# Schemas: domain "realtime" (owner W2-05). The streams carry text/event-stream; their frames
+# are described in paths/realtime.yaml. No JSON schemas.
+{}

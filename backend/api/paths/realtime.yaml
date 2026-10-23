@@ -1,0 +1,102 @@
+# Paths: domain "realtime" (owner W2-05): the Server-Sent Event streams (02 §5, 04 §2.2, §2.6).
+#
+# A domain of its own, not me.yaml or business.yaml: a domain's generated Register mounts
+# every operation of its tag on one handler, and these three are hand-mounted SSE handlers
+# (internal/platform/realtime.Stream) behind mw.Authz, served from cmd/todayz/routes_notify.go.
+# Every operation: `tags: [realtime]`. Roles are in internal/platform/authz/policy/notify.go.
+#
+# Each stream: authenticate with `Authorization: Bearer <access token>` on a streaming fetch
+# (EventSource cannot send the header). Frames: `retry: 3000`; `event: reset` when the
+# Last-Event-ID is unknown or older than the 24 h replay window (refetch everything); the
+# missed events; `event: ready` (data `{resumed}`); then live events, each
+# `event: <type>` + `data: {type, id, version}` (what changed, never the data), and a `: hb`
+# comment every 25 s. `event: reconnect` (`retry: 1000`, data `{reason}`) asks the client to
+# reconnect at once with its Last-Event-ID: shutdown (D-98), an expired access token, a reader
+# too slow to keep up, a lost database listener, or a permission that was withdrawn. A
+# reconnect is not a failure. The `id` of a frame is the resume cursor (opaque digits).
+/v1/me/stream:
+  get:
+    operationId: streamMe
+    tags: [realtime]
+    summary: The customer's live events
+    description: Customer app. `order.updated` for the customer's orders, `ask.updated` (D-101) and `inbox.updated`. See the file header for the frames.
+    x-problems: [rate_limited, service_unavailable]
+    parameters:
+      - name: Last-Event-ID
+        in: header
+        required: false
+        description: The `id` of the last frame the client read; the stream resumes after it.
+        schema:
+          type: string
+          maxLength: 64
+    responses:
+      "200":
+        description: An event stream that stays open
+        content:
+          text/event-stream:
+            schema:
+              type: string
+            example: "retry: 3000\n\nevent: ready\nid: 48213\ndata: {\"resumed\":false}\n\nevent: order.updated\nid: 48220\ndata: {\"type\":\"order.updated\",\"id\":\"01JB0S5Q6R7S8T9V0W1X2Y3Z4A\",\"version\":3}\n\n: hb\n\n"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/stream:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: streamStore
+    tags: [realtime]
+    summary: A store's live events
+    description: Business app, any staff member with access to the store. `order.created` (B-04 alert), `order.updated`, `ask.created` and `ask.closed` (D-101), `inbox.updated`. Access is checked again every minute; a member removed from the store gets `reconnect` and the next connect is refused. See the file header for the frames.
+    x-problems: [rate_limited, service_unavailable]
+    parameters:
+      - name: Last-Event-ID
+        in: header
+        required: false
+        description: The `id` of the last frame the client read; the stream resumes after it.
+        schema:
+          type: string
+          maxLength: 64
+    responses:
+      "200":
+        description: An event stream that stays open
+        content:
+          text/event-stream:
+            schema:
+              type: string
+            example: "retry: 3000\n\nevent: ready\nid: 48213\ndata: {\"resumed\":false}\n\nevent: order.created\nid: 48220\ndata: {\"type\":\"order.created\",\"id\":\"01JB0S5Q6R7S8T9V0W1X2Y3Z4A\",\"version\":1}\n\n: hb\n\n"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/stream:
+  get:
+    operationId: streamAdmin
+    tags: [realtime]
+    summary: Ops live counters
+    description: Admin console, every admin role except field_agent (the pulse row of 02 §3.3). `pulse.updated` when the live counters change. See the file header for the frames.
+    x-problems: [rate_limited, service_unavailable]
+    parameters:
+      - name: Last-Event-ID
+        in: header
+        required: false
+        description: The `id` of the last frame the client read; the stream resumes after it.
+        schema:
+          type: string
+          maxLength: 64
+    responses:
+      "200":
+        description: An event stream that stays open
+        content:
+          text/event-stream:
+            schema:
+              type: string
+            example: "retry: 3000\n\nevent: ready\nid: 48213\ndata: {\"resumed\":false}\n\n: hb\n\n"
+      default:
+        $ref: ../common/responses.yaml#/Problem
