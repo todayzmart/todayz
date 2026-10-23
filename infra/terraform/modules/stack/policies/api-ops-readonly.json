@@ -1,0 +1,32 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "OpsReadsNotScopable",
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:GetMetricData",
+        "cloudwatch:DescribeAlarms",
+        "elasticbeanstalk:Describe*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "OpsReadsRds",
+      "Effect": "Allow",
+      "Action": [
+        "rds:DescribeDBInstances"
+      ],
+      "Resource": "${rds_arn}"
+    },
+    {
+      "Sid": "OpsReadsPerformanceInsights",
+      "Effect": "Allow",
+      "Action": [
+        "pi:GetResourceMetrics",
+        "pi:DescribeDimensionKeys"
+      ],
+      "Resource": "${pi_arn}"
+    }
+  ]
+}
