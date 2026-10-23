@@ -25,6 +25,7 @@ import (
 	"slices"
 	"sort"
 	"strings"
+	"time"
 )
 
 // Env is the deployment environment.
@@ -157,8 +158,20 @@ type Config struct {
 	// may reach only loopback addresses (SC-PL-04).
 	NoEgress bool
 
+	// Shutdown holds the API drain timings from the environment (02 §2.8,
+	// D-98). Zero means unset: lifecycle.APITimings applies the defaults and
+	// checks them against WriteTimeout and the container stop timeout.
+	Shutdown Shutdown
+
 	// Missing lists the names of known variables that are unset (for logging).
 	Missing []string
+}
+
+// Shutdown is the API's SIGTERM timing (02 §2.8). These are deploy settings
+// read from the environment, not platform_settings keys (01 §17 has none).
+type Shutdown struct {
+	PreStop time.Duration // SHUTDOWN_PRESTOP: keep serving after /readyz turns 503
+	Drain   time.Duration // SHUTDOWN_DRAIN: srv.Shutdown's budget for in-flight requests
 }
 
 // DefaultLocalAPIAddr is where `todayz api` listens locally (root CLAUDE.md port table).
@@ -273,6 +286,7 @@ func Load(getenv Getenv, log *slog.Logger) (*Config, error) {
 		GeocoderAPIKey:     r.secret("GEOCODER_API_KEY"),
 	}
 	c.NoEgress = r.boolDefault("TODAYZ_NO_EGRESS", false) || env == EnvTest
+	c.Shutdown = Shutdown{PreStop: r.duration("SHUTDOWN_PRESTOP"), Drain: r.duration("SHUTDOWN_DRAIN")}
 
 	sort.Strings(r.missing)
 	c.Missing = r.missing
@@ -394,6 +408,21 @@ func (r *reader) level(name string) slog.Level {
 	}
 	r.bad(name, "must be debug, info, warn or error")
 	return slog.LevelInfo
+}
+
+// duration reads an optional Go duration ("15s", "1m15s"). Unset is zero and
+// not reported as missing; a value must be above zero and at most an hour.
+func (r *reader) duration(name string) time.Duration {
+	v := strings.TrimSpace(r.get(name))
+	if v == "" {
+		return 0
+	}
+	d, err := time.ParseDuration(v)
+	if err != nil || d <= 0 || d > time.Hour {
+		r.bad(name, "must be a Go duration such as 15s, above zero and at most one hour")
+		return 0
+	}
+	return d
 }
 
 func (r *reader) boolDefault(name string, def bool) bool {

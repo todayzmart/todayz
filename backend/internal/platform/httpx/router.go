@@ -3,9 +3,11 @@
 package httpx
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -67,7 +69,8 @@ func Inline(o Options) []func(http.Handler) http.Handler {
 	}
 }
 
-// WriteTimeout bounds one response; idempotency.DefaultLease must outlive it.
+// WriteTimeout bounds one response; idempotency.DefaultLease must outlive it,
+// and the API's SHUTDOWN_DRAIN must exceed it (lifecycle, D-98).
 const WriteTimeout = 60 * time.Second
 
 // Router is the API router. Routes are registered on it as on any chi.Router
@@ -151,10 +154,15 @@ func methodNotAllowed(mux *chi.Mux) http.HandlerFunc {
 }
 
 // NewServer returns an http.Server with conservative timeouts.
+//
+// Request contexts derive from BaseContext, a background context: never from
+// the signal context, so SIGTERM does not cancel a request in flight; the
+// drain (srv.Shutdown, lifecycle.Server) lets it finish (02 §2.8, D-98).
 func NewServer(addr string, h http.Handler) *http.Server {
 	return &http.Server{
 		Addr:              addr,
 		Handler:           h,
+		BaseContext:       func(net.Listener) context.Context { return context.Background() },
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       30 * time.Second,
 		WriteTimeout:      WriteTimeout,

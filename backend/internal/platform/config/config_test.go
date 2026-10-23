@@ -11,6 +11,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -224,6 +225,31 @@ func TestNoEgressAndAddr(t *testing.T) {
 	env["API_ADDR"] = "nope"
 	_, err = Load(get(env), nil)
 	require.ErrorContains(t, err, "API_ADDR")
+}
+
+// TestShutdownDurations (D-98): SHUTDOWN_PRESTOP and SHUTDOWN_DRAIN are
+// optional Go durations; unset is zero (lifecycle applies the defaults) and is
+// not reported missing; a bad value is named, never shown.
+func TestShutdownDurations(t *testing.T) {
+	env, _ := fullEnv(t, "prod")
+	c, err := Load(get(env), nil)
+	require.NoError(t, err)
+	require.Zero(t, c.Shutdown)
+	require.NotContains(t, c.Missing, "SHUTDOWN_PRESTOP")
+	require.NotContains(t, c.Missing, "SHUTDOWN_DRAIN")
+
+	env["SHUTDOWN_PRESTOP"] = "15s"
+	env["SHUTDOWN_DRAIN"] = "1m15s"
+	c, err = Load(get(env), nil)
+	require.NoError(t, err)
+	require.Equal(t, Shutdown{PreStop: 15 * time.Second, Drain: 75 * time.Second}, c.Shutdown)
+
+	for _, bad := range []string{"75", "0s", "-1s", "2h", "soon-7d1f"} {
+		env["SHUTDOWN_DRAIN"] = bad
+		_, err = Load(get(env), nil)
+		require.ErrorContains(t, err, "SHUTDOWN_DRAIN", bad)
+		require.NotContains(t, err.Error(), bad, "the value is never shown")
+	}
 }
 
 func TestSecretNeverPrints(t *testing.T) {
