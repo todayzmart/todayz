@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
+
 	"github.com/go-chi/chi/v5"
 
 	"github.com/todayz/backend/internal/jobs"
 	"github.com/todayz/backend/internal/platform/audit"
+	"github.com/todayz/backend/internal/platform/authz"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/jobs/adminapi"
 )
@@ -26,9 +29,8 @@ func mountAdminJobs(r chi.Router, d *deps) {
 	reg := platformjobs.NewRegistry()
 	jd := jobs.Deps{Clock: d.Clock, Settings: d.Settings, Config: d.Config, Log: d.Log}
 	ad := adminapi.Deps{Registry: reg, Clock: d.Clock, Log: d.Log,
-		// TODO(W1-01): pass W1-01's admin Gate (session, role, step-up). Until
-		// then every admin-jobs request is 401 (fail closed).
-		Gate: adminapi.DenyGate{}}
+		// W1-01's admin gate: the slot-11 session, its live roles and step-up.
+		Gate: adminJobsGate{authz.NewAdminGate(d.Clock)}}
 	if d.DB != nil {
 		jd.Pool = d.DB.Pool
 		ad.DB = d.DB
@@ -43,4 +45,28 @@ func mountAdminJobs(r chi.Router, d *deps) {
 		ad.Enqueuer = platformjobs.NewEnqueuer(reg, d.Queue, d.Clock)
 	}
 	adminapi.Register(r, ad)
+}
+
+// adminJobsGate is W1-01's authz.AdminGate behind W1-11's adminapi.Gate seam.
+// The role names are the same D-64 strings in both packages; the admin's id
+// is its user id (admin_users.user_id).
+type adminJobsGate struct{ g *authz.AdminGate }
+
+// Require implements adminapi.Gate.
+func (a adminJobsGate) Require(ctx context.Context, anyOf []adminapi.Role, stepUp bool) (adminapi.Admin, error) {
+	want := make([]authz.Role, len(anyOf))
+	for i, r := range anyOf {
+		want[i] = authz.Role(r)
+	}
+	p, err := a.g.Require(ctx, want, stepUp)
+	if err != nil {
+		return adminapi.Admin{}, err
+	}
+	held := make([]adminapi.Role, 0, len(p.Roles))
+	for _, r := range p.Roles {
+		if authz.IsAdminRole(r) {
+			held = append(held, adminapi.Role(r))
+		}
+	}
+	return adminapi.Admin{ID: p.UserID, Roles: held}, nil
 }

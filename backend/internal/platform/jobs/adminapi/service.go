@@ -1,7 +1,7 @@
 // Package adminapi serves the admin-jobs API (04 §2.7, D-95, A-21): the
 // job kinds with their health, run history and run detail, and the pause,
 // resume, run-now and retry actions. Who may call it is the Gate's answer
-// (W1-01, TODO(W1-01)); what may be done to a kind is decided here.
+// (W1-01's authz.AdminGate); what may be done to a kind is decided here.
 package adminapi
 
 import (
@@ -36,7 +36,7 @@ type Deps struct {
 	Enqueuer RunEnqueuer // nil: run-now and retry answer 503
 	Audit    *audit.Writer
 	Clock    clock.Clock
-	Gate     Gate // TODO(W1-01): DenyGate until W1-01's admin auth lands
+	Gate     Gate // W1-01's admin gate (routes_admin.go); nil is DenyGate
 	Log      *slog.Logger
 }
 

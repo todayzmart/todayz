@@ -42,10 +42,9 @@ func (a Admin) HasAny(rs []Role) bool {
 // Gate is the admin auth seam: "require an admin holding one of these roles,
 // and a fresh step-up when stepUp is set".
 //
-// TODO(W1-01): W1-01 owns admin sessions, roles and step-up (D-64) and is not
-// on main yet. At merge, the lead implements Gate on top of W1-01's admin
-// session and passes it in cmd/todayz/routes_admin.go instead of DenyGate.
-// The contract of Require:
+// W1-01 owns admin sessions, roles and step-up (D-64): cmd/todayz/routes_admin.go
+// passes authz.AdminGate (internal/platform/authz/admingate.go) through a small
+// adapter. The contract of Require:
 //
 //   - no admin session: a *problem.Error with code unauthorized (401);
 //   - an admin holding none of anyOf (super_admin counts as every role): forbidden (403);
@@ -58,9 +57,8 @@ type Gate interface {
 	Require(ctx context.Context, anyOf []Role, stepUp bool) (Admin, error)
 }
 
-// DenyGate refuses every request with 401 unauthorized. It is the gate until
-// W1-01 lands (TODO(W1-01)), so the admin-jobs routes are mounted and in the
-// contract but fail closed.
+// DenyGate refuses every request with 401 unauthorized. It is the gate when
+// Deps.Gate is nil, so a mount without W1-01's gate fails closed.
 type DenyGate struct{}
 
 // Require implements Gate.
