@@ -222,7 +222,7 @@ func TestPresignPutSignsContentType(t *testing.T) {
 
 func TestSlugify(t *testing.T) {
 	cases := map[string][]string{
-		"lakshmi-traders-jayanagar": {"Lakshmi Traders", "Jayanagar"},
+		"lakshmi-traders-jayanagar":   {"Lakshmi Traders", "Jayanagar"},
 		"sri-ganesh-kirana-4th-block": {"  Sri Ganesh   Kirana!! ", "4th Block"},
 		"store":                       {"श्री गणेश", ""},
 		"a-b":                         {"--a--", "--b--"},
