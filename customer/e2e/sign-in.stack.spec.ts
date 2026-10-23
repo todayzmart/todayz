@@ -39,7 +39,7 @@ test('first run: language, location, sign in, stay signed in across a reload, si
 
   // C-02: a PIN code.
   await expect(page.getByRole('heading', { level: 1, name: 'Where should we look?' })).toBeVisible();
-  await page.getByLabel('PIN code').fill('560001');
+  await page.getByRole('textbox', { name: 'PIN code' }).fill('560001');
   await page.getByRole('button', { name: 'Use this PIN code' }).click();
   await expect(page.getByRole('link', { name: /Shopping near 560001/ })).toBeVisible();
 
@@ -81,7 +81,8 @@ test('a wrong code is refused with a clear message', async ({ page, request }) =
   await page.getByRole('button', { name: 'Send code' }).click();
   await expect(page.getByText(/We sent a code to/)).toBeVisible();
   const real = await latestOtp(request, phone, since);
-  const wrong = real === '000000' ? '111111' : '000000';
+  // Not 000000: the reserved test numbers accept it locally (01 §2).
+  const wrong = real === '123456' ? '654321' : '123456';
   await page.getByRole('group', { name: 'Enter the 6-digit code' }).locator('input').first().click();
   await page.keyboard.type(wrong);
   await expect(page.getByText('That code is not right. Check it and try again.')).toBeVisible();

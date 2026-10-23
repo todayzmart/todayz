@@ -66,6 +66,7 @@ test('a wrong SMS code is refused with a clear message', async ({ page, request 
   const phone = testPhone();
   const since = await sendCode(page, phone);
   const real = await latestOtp(request, phone, since);
-  await typeInto(page, 'Enter the 6-digit code', real === '000000' ? '111111' : '000000');
+  // Not 000000: the reserved test numbers accept it locally (01 §2).
+  await typeInto(page, 'Enter the 6-digit code', real === '123456' ? '654321' : '123456');
   await expect(page.getByText('That code is not right. Check it and try again.')).toBeVisible();
 });
