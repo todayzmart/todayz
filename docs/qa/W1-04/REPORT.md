@@ -54,13 +54,54 @@ Backend domain `business` in `backend/internal/business`, mounted at `/v1/biz/bu
 
 ## Review
 
-To be filled in after the security review.
+The coordinator's security review, fixed in 8d0a0ad (code and tests) and 53eaa42 (`docs/plan/03-data-model.md`). Migration 10401 was edited in place, so a local database needs `make reset`.
+
+| Item | Outcome | Test |
+|---|---|---|
+| **H1** An invite reveals who holds a phone | Fixed. While a row is `invited`, `userId` and `name` are null, and `phoneMasked` is the number the inviter typed, opened from the row's own seal. The account's name and phone show only once the invite is accepted. This applies to the invite response, PATCH and ListStaff. `StaffMember` gains an optional `inviteExpiresAt`. | `TestBusinessHTTP`: a stranger with an account and a name is invited. The row is bound to the account, but the response, PATCH and list show no id and no name. |
+| **M1** Documents | Fixed. `sizeBytes` is required, between 1 and 10 MB (`maxDocumentBytes`, `TODO(lead)`). `Content-Length` is signed into the presigned PUT and returned in `upload.headers`. A new document is `pending`. There are at most 5 per business per kind (`maxDocumentsPerKind`, `TODO(lead)`), with pending ones counted, under an advisory lock. | `TestBusinessHTTP`: the headers, the signed-headers list, 0 and 10 MB + 1 give 422, the sixth pan gives 409, and another kind still gives 201. `TestPresignPutSignsContentTypeAndLength`. |
+| **M2** Invite expiry and account deletion | Fixed. A new `staff.invited_at` column restarts on reinvite. An invite lapses after 7 days (`inviteTTL`, `TODO(lead)`) in accept, in the invitations list and in reinvite: a lapsed account-bound row is taken up again, and a lapsed phone-only row is withdrawn and replaced. `business.OnAccountDelete(ctx, *db.DB, clock.Clock, ids.ID)` and `(*Service).OnAccountDelete` mark the account's pending invites `removed`, both those bound to the user id and those waiting for its phone hash, and clear their phone. They are idempotent and leave active rows alone. The lead does the wiring. | `TestStaffInvitesHTTP` (lapsed invites are not listed and not accepted, reinvite and accept work), `TestOnAccountDelete` |
+| **M4** Re-review and closed businesses | Fixed. A real change to name, address, location or phone sends a `live` or `paused` store to `pending_review`. Saving the same values does not. The audit records `{status}` → `{status, fields}`. Store create, store update and KYC PUT take the business row `FOR SHARE` and answer 409 `invalid_transition` when it is rejected or suspended. There is no store-count cap. | `TestStoreReviewHTTP` |
+| **L1** Seal AAD | Fixed. The AAD is `field:owning id`: KYC uses the business id, an invite phone the staff row id, a store phone the store id and a lead phone the lead id. The seed is updated. | `internal/seed/business_test.go`: business A's PAN does not open as business B's or under the bare field. |
+| **L2** Lead dedupe | Fixed. The source is part of the hash. | `TestLeadHashNormalises` |
+| **L4** KYC GET inserted a row | Fixed. A GET answers an empty `missing` view (ETag `"v1"`), and only PUT creates the row. | `TestBusinessHTTP`, which runs with the row deleted. |
+| Cross-tenant | Covered. The owner of X gets 403 on Y's business, KYC (GET and PUT), staff (GET and POST), stores, store, store PATCH, settings and documents. Y's store under X's path gets 403 on GET, PATCH, submit and settings, and POST X/staff with Y's store gets 422. | `TestBusinessTenancyHTTP` |
+| Scoped manager | Covered. manager2, scoped to S, gets 403 on PATCH S2, on submit S2, and on removing a cashier scoped to S2. | `TestBusinessHTTP` |
+| Concurrent invites | Covered. Two simultaneous invites of one phone give one 201 and one 409, leaving one invited row. | `TestStaffInvitesHTTP` |
+
+Deferred as agreed:
+- **M3:** re-auth and a notification for payout changes belong to the payout WP. That WP must also gate payouts on `business_kyc.status = 'verified'`.
+- **L3:** a scoped manager's business-level reach follows 02 §3.3.
+- Caps on businesses and stores per user.
+- Validation running before Turnstile on the lead form.
+
+New `TODO(lead)` questions from the review:
+1. **Invite lifetime:** 7 days, a code constant (01 has no rule). It moves to `platform_settings` if it should be configurable.
+2. **Document limits:** 10 MB and 5 per kind are code constants.
+3. **Pending to uploaded:** nothing moves a document from `pending` to `uploaded` yet. That needs an upload-confirm call or a bucket notification.
+4. **Paused stores:** a paused store's profile change also goes back to `pending_review`. This is the conservative reading; the other is to keep it paused.
+5. **Deleted accounts:** their manager and cashier memberships stay `active` and point at the anonymised user. Should `OnAccountDelete` remove them too?
+6. **Documents of closed businesses:** a rejected or suspended business can still create document upload URLs. The review did not list it, so it is not gated.
+
+Wiring for the lead (in `mountBusiness`): `d.Identity.AddDeletionHook(svc)`, since `*business.Service` satisfies `identity.OnAccountDelete`. Alternatively, use `identity.OnDeleteFunc(func(ctx context.Context, uid ids.ID) error { return business.OnAccountDelete(ctx, d.DB, d.Clock, uid) })`.
+
+Review evidence (agent, on 8d0a0ad):
+
+| Check | Result |
+|---|---|
+| `gofmt -l`, `go vet ./...` | clean |
+| `golangci-lint run ./...` | 0 issues |
+| `gosec -quiet -exclude-generated -exclude-dir=testdata -exclude=G104 ./...` | 0 issues |
+| `go run ./internal/devtools/settingslint .` | ok |
+| `go test -race -count=1 ./...` (colima, GOFLAGS=-p=3) | every package ok, including `cmd/todayz` (`TestContractSmoke`, `TestRoutesAreInTheContract`, the four business HTTP tests), `internal/business` and `internal/seed` |
+| `make gen` | ok after the contract change |
 
 ## Files outside W1-04's paths
 
 - `internal/platform/authz/engine.go`, `strict.go`, `authz_test.go`, `httpx/mw/authz.go`, `httpx/mw/authn_test.go` (the `{bid}`/`{sid}` path scope)
 - `cmd/todayz/security.go` (the engine gets `business.NewStaffResolver`)
 - `internal/identity/human.go` (`HumanVerifier()` for the lead form)
+- `docs/plan/03-data-model.md` (document `size_bytes` and `pending`, staff `invited_at`; review)
 
 ## Questions (each is a `TODO(lead)` in the code; the conservative reading is what is built)
 
@@ -82,4 +123,5 @@ To be filled in after the security review.
 ## Not verified
 
 - Real Turnstile, and a real R2 or MinIO upload: the verifier is faked in tests, and the presigned URL is checked against the AWS SigV4 test vector, not uploaded to.
+- That MinIO or R2 refuses a PUT whose Content-Length differs from the signed one (it is signed; no upload was made).
 - The seed through `make reset` on the local stack (run by the lead after the merge).
