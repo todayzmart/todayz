@@ -1,0 +1,786 @@
+/*
+ * @todayz/ui additions to the design system's tz- CSS (@todayz/tokens/styles.css), for states and
+ * pieces the design cards do not draw: focus, loading, overlays, the map overlay, sorting, tabs.
+ * Tokens only (no colour literals), light theme only. Motion: one curve, 150ms for state changes,
+ * 220ms for sheets; prefers-reduced-motion cuts movement to fades.
+ * Load after @todayz/tokens/styles.css.
+ */
+
+/* ---------- Utilities ---------- */
+
+.tz-ui-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.tz-ui-grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.tz-ui-minw0 {
+  min-width: 0;
+}
+
+.tz-ui-plainlink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.tz-ui-spin {
+  animation: tz-ui-spin 800ms linear infinite;
+}
+
+@keyframes tz-ui-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.tz-ui-shake {
+  animation: tz-ui-shake 300ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes tz-ui-shake {
+  20%,
+  60% {
+    transform: translateX(-4px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes tz-ui-fade {
+  from {
+    opacity: 0.4;
+  }
+}
+
+html.tz-ui-scroll-lock {
+  overflow: hidden;
+}
+
+/* ---------- Inputs ---------- */
+
+.tz-ui-affix {
+  display: flex;
+  align-items: center;
+  min-height: var(--control-md);
+  border: 1px solid var(--line-control);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-xs);
+}
+
+.tz-ui-affix:focus-within {
+  border-color: var(--ink);
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.tz-ui-affix-invalid {
+  border-color: var(--danger);
+}
+
+.tz-ui-affix-text {
+  flex: none;
+  padding-left: var(--space-3);
+  font: 500 14px/20px var(--font-sans);
+  color: var(--ink-2);
+}
+
+.tz-ui-affix .tz-input {
+  min-height: calc(var(--control-md) - 2px);
+  padding-left: var(--space-2);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.tz-ui-affix .tz-input:focus {
+  outline: none;
+}
+
+.tz-search:focus-within {
+  border-color: var(--ink);
+}
+
+.tz-ui-search-clear {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.tz-ui-search-clear:hover {
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+
+.tz-ui-search-trailing {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tz-stepper.tz-ui-stepper-sm {
+  height: var(--control-sm);
+}
+
+.tz-stepper.tz-ui-stepper-sm button {
+  width: 32px;
+  height: 32px;
+}
+
+.tz-stepper button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------- Tabs ---------- */
+
+.tz-ui-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.tz-ui-tablist {
+  display: flex;
+  gap: var(--space-5);
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--line);
+}
+
+.tz-ui-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0;
+  margin-bottom: -1px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--ink-2);
+  font: 500 14px/20px var(--font-sans);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 150ms cubic-bezier(0.2, 0, 0, 1), border-color 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.tz-ui-tab:hover {
+  color: var(--ink);
+}
+
+.tz-ui-tab[aria-selected="true"] {
+  border-bottom-color: var(--ink);
+  color: var(--ink);
+}
+
+.tz-ui-tab-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-xs);
+  background: var(--surface-sunken);
+  color: var(--ink-2);
+  font: 500 11px/14px var(--font-sans);
+}
+
+.tz-ui-tabpanel:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+
+/* ---------- Commerce ---------- */
+
+.tz-ui-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.tz-ui-mrp-spacer {
+  text-decoration: none;
+}
+
+.tz-ui-meta-tags {
+  margin-top: 6px;
+}
+
+.tz-ui-chevron {
+  display: grid;
+  place-items: center;
+  color: var(--ink-2);
+}
+
+.tz-ui-code-label {
+  font: 600 14px/20px var(--font-sans);
+}
+
+.tz-ui-code-note {
+  font: 500 13px/18px var(--font-sans);
+  text-align: center;
+}
+
+.tz-steps li[data-failed] .tz-dot {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: var(--on-danger);
+}
+
+.tz-ui-wallet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.tz-ui-poscart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.tz-ui-poscart-phone {
+  min-height: var(--tap-min);
+}
+
+.tz-ui-poscart-customer {
+  min-height: 18px;
+  font: 500 13px/18px var(--font-sans);
+  color: var(--ink-2);
+}
+
+.tz-ui-poscart-empty {
+  margin: 0;
+  padding: var(--space-6) var(--space-4);
+  border: 1px dashed var(--line-control);
+  border-radius: var(--radius-md);
+  text-align: center;
+  font: 500 13px/18px var(--font-sans);
+  color: var(--ink-2);
+}
+
+.tz-pos-line .tz-sub {
+  display: block;
+  font: 500 12px/16px var(--font-sans);
+  color: var(--ink-2);
+}
+
+.tz-ui-pos-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font: 500 12px/16px var(--font-sans);
+  color: var(--on-inverse-2);
+}
+
+/* ---------- Loading and empty ---------- */
+
+.tz-ui-skeleton {
+  display: block;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--surface-sunken) 0%, var(--surface-subtle) 50%, var(--surface-sunken) 100%);
+  background-size: 200% 100%;
+  animation: tz-ui-shimmer 1.4s linear infinite;
+}
+
+.tz-ui-skeleton-text {
+  display: inline-block;
+  width: 100%;
+  height: 1em;
+  vertical-align: middle;
+  border-radius: var(--radius-xs);
+}
+
+.tz-ui-skeleton-block {
+  width: 100%;
+  height: 48px;
+  border-radius: var(--radius-md);
+}
+
+.tz-ui-skeleton-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+@keyframes tz-ui-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}
+
+.tz-ui-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+}
+
+.tz-ui-empty-title {
+  margin: 0;
+  font: 600 15px/22px var(--font-sans);
+  color: var(--ink);
+}
+
+.tz-ui-empty-desc {
+  max-width: 36ch;
+  margin: 0;
+  font: 400 14px/20px var(--font-sans);
+  color: var(--ink-2);
+}
+
+.tz-ui-empty-action {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+/* ---------- Dashboard ---------- */
+
+.tz-ui-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.tz-ui-sort:hover,
+[aria-sort="ascending"] .tz-ui-sort,
+[aria-sort="descending"] .tz-ui-sort {
+  color: var(--ink);
+}
+
+.tz-ui-sort .tz-ico {
+  width: 14px;
+  height: 14px;
+}
+
+.tz-table td.tz-ui-table-empty {
+  height: 96px;
+  text-align: center;
+  white-space: normal;
+  color: var(--ink-2);
+}
+
+.tz-ui-insight-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.tz-ui-insight-dismiss {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.tz-ui-insight-dismiss:hover {
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+
+.tz-ui-insight-dismiss .tz-ico {
+  width: 16px;
+  height: 16px;
+}
+
+.tz-ui-insights-empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  font: 400 13px/18px var(--font-sans);
+  color: var(--ink-2);
+}
+
+.tz-ui-insights-empty b {
+  font: 600 13px/18px var(--font-sans);
+  color: var(--ink);
+}
+
+.tz-ui-insights-empty ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.tz-ui-insights-empty a {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ---------- Navigation ---------- */
+
+.tz-ui-bnav-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.tz-ui-bnav-badge {
+  position: absolute;
+  top: -4px;
+  left: calc(100% - 6px);
+  display: grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: var(--radius-pill);
+  background: var(--brand);
+  color: var(--on-brand);
+  font: 600 10px/1 var(--font-sans);
+}
+
+.tz-bnav a:focus-visible,
+.tz-side a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+/* ---------- Overlays ---------- */
+
+.tz-ui-sheet,
+.tz-ui-dialog {
+  padding: 0;
+  border: 0;
+  background: var(--surface);
+  color: var(--ink);
+  overflow: auto;
+}
+
+.tz-ui-sheet::backdrop,
+.tz-ui-dialog::backdrop {
+  background: var(--scrim);
+}
+
+.tz-ui-sheet {
+  width: 100%;
+  max-width: var(--phone-max);
+  max-height: 90dvh;
+  margin: auto auto 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow: var(--shadow-sheet);
+}
+
+.tz-ui-sheet[open] {
+  animation: tz-ui-sheet-in 220ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes tz-ui-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+.tz-ui-dialog {
+  width: min(calc(100% - 2 * var(--space-4)), 440px);
+  max-height: calc(100dvh - 2 * var(--space-4));
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-pop);
+}
+
+.tz-ui-dialog[open] {
+  animation: tz-ui-dialog-in 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes tz-ui-dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+.tz-ui-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+}
+
+.tz-ui-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.tz-ui-modal-title {
+  margin: 0;
+  font: 600 18px/24px var(--font-sans);
+  color: var(--ink);
+}
+
+.tz-ui-modal-desc {
+  margin: 0;
+  font: 400 14px/20px var(--font-sans);
+  color: var(--ink-2);
+}
+
+.tz-ui-modal-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.tz-ui-sheet .tz-ui-modal-foot > * {
+  flex: 1;
+}
+
+.tz-ui-toast-region {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--bottom-nav) + var(--space-4) + env(safe-area-inset-bottom));
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: max-content;
+  max-width: calc(100% - 2 * var(--space-4));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.tz-ui-toast-item {
+  pointer-events: auto;
+  animation: tz-ui-toast-in 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes tz-ui-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.tz-ui-toast-action {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--on-inverse);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* ---------- Map ---------- */
+
+.tz-ui-map {
+  overflow: hidden;
+  background: var(--map-land);
+}
+
+.tz-ui-map > .tz-ui-map-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.tz-map > svg.tz-ui-map-static {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.tz-ui-map-land {
+  fill: var(--map-land);
+}
+
+.tz-ui-map-ring {
+  fill: var(--brand);
+  fill-opacity: 0.06;
+  stroke: var(--brand-mark);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+
+.tz-ui-map-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.tz-ui-map-pin,
+.tz-ui-map-cluster,
+.tz-ui-map-you {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: auto;
+}
+
+.tz-ui-map-pin {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tz-ui-map-pin::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--on-inverse-2);
+  box-shadow: 0 0 0 2px var(--surface);
+}
+
+.tz-ui-map-pin[data-open]::before {
+  background: var(--brand-mark);
+}
+
+.tz-ui-map-cluster {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: -16px 0 0 -16px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tz-ui-map-cluster span {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
+  border: 2px solid var(--brand-mark);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font: 600 11px/1 var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+.tz-ui-map-you {
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--info);
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 8px color-mix(in srgb, var(--info) 14%, transparent);
+  pointer-events: none;
+}
+
+.tz-map-live,
+.tz-map-legend,
+.tz-map-btn,
+.tz-ui-map-attribution {
+  z-index: 2;
+}
+
+.tz-map-btn {
+  cursor: pointer;
+}
+
+.tz-ui-map-attribution {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 2px 6px;
+  border-top-right-radius: var(--radius-xs);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  color: var(--ink-2);
+  font: 400 10px/14px var(--font-sans);
+}
+
+/* ---------- Focus ---------- */
+
+.tz-ui-plainlink:focus-visible,
+.tz-ui-sort:focus-visible,
+.tz-ui-tab:focus-visible,
+.tz-ui-search-clear:focus-visible,
+.tz-ui-toast-action:focus-visible,
+.tz-ui-insight-dismiss:focus-visible,
+.tz-ui-map-pin:focus-visible,
+.tz-ui-map-cluster:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .tz-ui-spin,
+  .tz-ui-skeleton {
+    animation: none;
+  }
+
+  .tz-ui-shake,
+  .tz-ui-sheet[open],
+  .tz-ui-dialog[open],
+  .tz-ui-toast-item {
+    animation: tz-ui-fade 150ms linear;
+  }
+
+  .tz-ui-tab {
+    transition: none;
+  }
+}

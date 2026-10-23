@@ -1,0 +1,7 @@
+{
+  "extends": "@todayz/config/tsconfig.react.json",
+  "compilerOptions": {
+    "types": ["vite/client", "node"]
+  },
+  "include": ["src", ".storybook", "visual", "vite.config.ts", "vitest.config.ts"]
+}

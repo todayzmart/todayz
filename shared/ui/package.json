@@ -1,0 +1,67 @@
+{
+  "name": "@todayz/ui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "TodayZ React UI kit: one component per design-system card, tz- classes and tokens only (W1-02).",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./map": "./src/StoreMap/index.ts",
+    "./styles.css": "./src/styles.css"
+  },
+  "scripts": {
+    "lint": "eslint --max-warnings 0 .",
+    "lint:css": "stylelint --max-warnings 0 \"src/**/*.css\"",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run --coverage",
+    "storybook": "storybook dev --port 6006 --host 127.0.0.1 --ci --no-open",
+    "build-storybook": "storybook build --output-dir storybook-static --quiet",
+    "visual": "playwright test -c visual/playwright.config.ts"
+  },
+  "dependencies": {
+    "@tanstack/react-table": "8.21.3",
+    "lucide-react": "1.52.0",
+    "maplibre-gl": "6.13.0",
+    "pmtiles": "4.5.0",
+    "supercluster": "9.1.0"
+  },
+  "peerDependencies": {
+    "@todayz/tokens": "workspace:*",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.64.0",
+    "@storybook/addon-a11y": "10.6.1",
+    "@storybook/react-vite": "10.6.1",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "16.3.3",
+    "@testing-library/user-event": "14.6.7",
+    "@todayz/config": "workspace:*",
+    "@todayz/tokens": "workspace:*",
+    "@types/geojson": "7946.0.16",
+    "@types/node": "26.6.4",
+    "@types/pngjs": "6.0.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "@vitest/coverage-v8": "4.1.11",
+    "axe-core": "4.14.0",
+    "eslint": "9.39.5",
+    "happy-dom": "20.14.5",
+    "pixelmatch": "8.0.0",
+    "pngjs": "7.0.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "storybook": "10.6.1",
+    "stylelint": "17.16.0",
+    "typescript": "6.0.3",
+    "vite": "8.3.3",
+    "vitest": "4.1.11"
+  },
+  "prettier": "@todayz/config/prettier"
+}
