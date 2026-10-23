@@ -21,6 +21,7 @@ paths = [
   '''(^|/)\.cache/''',
   '''(^|/)ci-reports/''',
   '''(^|/)dist/''',
+  '''(^|/)storybook-static/''',
   '''(^|/)infra/local/data/''',
   '''(^|/)\.terraform/''',
   '''(^|/)\.claude/worktrees/''',
