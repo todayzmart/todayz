@@ -113,6 +113,7 @@ grep -q "SIGKILL" <<<"$out" && bad "stop-all SIGKILLed a process that exited on 
 
 # --- 3. SIGKILL after the stop timeout -------------------------------------------------
 sec=0
+: >"$order" # section 2 already wrote "worker up"; the wait below must see this worker's line
 "$proc" start worker -- "$fake" worker ignore "$order" >/dev/null
 wait_for "$order" "^worker up$" || bad "the stubborn worker did not start"
 pid="$(head -n 1 "$TODAYZ_ROOT/.cache/dev/pids/worker.pid")"
