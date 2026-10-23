@@ -263,7 +263,7 @@ func TestScopeFromAndAuthorize(t *testing.T) {
 	e := engine(t, clock.NewFake(t0), s)
 	owner := user(authn.AppBusiness)
 
-	r := request(t, "/v1/biz/businesses/{businessId}/stores/{storeId}/orders", "/v1/biz/businesses/"+biz.String()+"/stores/"+store.String()+"/orders", owner)
+	r := request(t, "/v1/biz/businesses/{bid}/stores/{sid}/orders", "/v1/biz/businesses/"+biz.String()+"/stores/"+store.String()+"/orders", owner)
 	sc, err := ScopeFrom(r)
 	require.NoError(t, err)
 	require.Equal(t, Scope{BusinessID: biz, StoreID: store}, sc)
@@ -274,7 +274,7 @@ func TestScopeFromAndAuthorize(t *testing.T) {
 	require.Equal(t, Owner, d.Role)
 	require.Equal(t, sc, d.Scope)
 
-	r = request(t, "/v1/biz/businesses/{businessId}", "/v1/biz/businesses/not-a-ulid", owner)
+	r = request(t, "/v1/biz/businesses/{bid}", "/v1/biz/businesses/not-a-ulid", owner)
 	_, err = ScopeFrom(r)
 	require.Equal(t, genproblems.NotFound, code(t, err))
 	_, err = Authorize(e, r, "order.accept")

@@ -24,12 +24,12 @@ type Authorizer interface {
 	Check(ctx context.Context, p authn.Principal, action string, s Scope) (Decision, error)
 }
 
-// ScopeFrom reads the scope from chi's URL params `businessId` and `storeId`
+// ScopeFrom reads the scope from chi's URL params `bid` and `sid`
 // (02 §3.1 names them so in every /v1/biz path). A value that is present but
 // not a ULID is a 404, never a scope-less check.
 func ScopeFrom(r *http.Request) (Scope, error) {
 	var s Scope
-	for name, dst := range map[string]*ids.ID{"businessId": &s.BusinessID, "storeId": &s.StoreID} {
+	for name, dst := range map[string]*ids.ID{"bid": &s.BusinessID, "sid": &s.StoreID} {
 		v := chi.URLParam(r, name)
 		if v == "" {
 			continue

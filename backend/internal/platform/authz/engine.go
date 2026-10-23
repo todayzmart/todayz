@@ -14,7 +14,7 @@ import (
 )
 
 // Scope is what a business action applies to, from the path
-// (/v1/biz/businesses/{businessId}/stores/{storeId}/…, 02 §3.1).
+// (/v1/biz/businesses/{bid}/stores/{sid}/…, 02 §3.1).
 type Scope struct {
 	BusinessID ids.ID // required for KindBusiness
 	StoreID    ids.ID // zero for business-level actions

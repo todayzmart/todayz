@@ -16,7 +16,7 @@ import (
 )
 
 // Authz checks that the principal may perform action on the route's scope
-// (businessId / storeId path params). A nil authorizer refuses (500).
+// (bid / sid path params). A nil authorizer refuses (500).
 func Authz(a authz.Authorizer, action string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

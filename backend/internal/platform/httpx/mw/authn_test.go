@@ -240,7 +240,7 @@ func TestAuthzSlot(t *testing.T) {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			next.ServeHTTP(w, req.WithContext(authn.WithPrincipal(req.Context(), mwPrincipal(authn.AppBusiness, authn.AMROTP))))
 		})
-	}).With(Authz(allowOnly("order.accept"), "order.accept")).Get("/v1/biz/businesses/{businessId}/orders", func(w http.ResponseWriter, req *http.Request) {
+	}).With(Authz(allowOnly("order.accept"), "order.accept")).Get("/v1/biz/businesses/{bid}/orders", func(w http.ResponseWriter, req *http.Request) {
 		d, _ = authz.DecisionFrom(req.Context())
 		w.WriteHeader(http.StatusNoContent)
 	})
