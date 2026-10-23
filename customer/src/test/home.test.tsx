@@ -1,7 +1,9 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { addToCart, clearCart } from '../cart/cart';
 import { CATEGORIES, NOW, SHOP_B, STORE_B_ID, atBengaluru, card, pageOf, renderDiscover } from './discover-fixtures';
 
+beforeEach(() => clearCart());
 
 const SUMMARY = { storesNearby: 14, openNow: 9, productsInRadius: 1280, pins: [], pinsTruncated: false, serverNow: NOW };
 
@@ -55,5 +57,20 @@ describe('C-03 Home', () => {
     await screen.findByText('Sri Lakshmi Stores');
     expect(calls.find((c) => c.path === '/v1/discover/stores')?.query.get('category')).toBe('pharmacy');
     expect(within(document.body).getByText('Showing Pharmacy')).toBeInTheDocument();
+  });
+
+  it('shows the cart bar when the cart has items, and opens the cart', async () => {
+    addToCart({ id: STORE_B_ID, slug: SHOP_B, name: 'Annapurna Kirana' }, { storeItemId: 'item-1', productName: 'Toor dal 1 kg', pricePaise: 16_500 }, 2);
+    renderDiscover('/', routes());
+    atBengaluru();
+    expect(await screen.findByText(/View cart/)).toBeInTheDocument();
+    expect(screen.getByText(/Annapurna Kirana/, { selector: '*:not(h3)' })).toBeInTheDocument();
+  });
+
+  it('shows no cart bar when the cart is empty', async () => {
+    renderDiscover('/', routes());
+    atBengaluru();
+    await screen.findByText('Sri Lakshmi Stores');
+    expect(screen.queryByText(/View cart/)).not.toBeInTheDocument();
   });
 });

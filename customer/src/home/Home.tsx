@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { usePlace } from '../app/place';
 import { Icon } from '../shell/Icon';
+import { CartBarLink } from '../store/CartBarLink';
 import { categoryIcon } from './categories';
 import { useCoords, type Coords } from './coords';
 import { asTint, radiusM, useStoreCardProps } from './present';
@@ -89,6 +90,7 @@ export function Home({ category }: { category?: string | undefined }) {
         )}
         {coords.status === 'ready' && <Nearby coords={coords.coords} category={category} />}
       </div>
+      <CartBarLink />
     </>
   );
 }
