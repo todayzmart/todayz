@@ -1,10 +1,12 @@
 -- orders queries (W2-02), generated into package ordersdb (gen/sqlc/ordersdb).
 -- Only the work package that builds internal/orders edits this folder (D-50).
 --
--- Times come from the injected clock (@now), never now(). Lock order, the
--- same in every write (and the catalogue writer's for the store and items):
--- the order row (FOR UPDATE), then the stores row, then store_items by id,
--- then the reservations.
+-- Times come from the injected clock (@now), never now(). Lock order: the
+-- order row (FOR UPDATE) first. Holding or releasing stock then locks the
+-- order's store_items by id and never the stores row; collecting goes
+-- through the catalogue writer (stores row, then the item), one item at a
+-- time in store_item_id order, and never pre-locks items, so no path takes
+-- an item before the stores row.
 
 ------------------------------------------------------------------------------
 -- Placing
@@ -163,11 +165,6 @@ RETURNING version;
 ------------------------------------------------------------------------------
 -- Stock reservations (03 §3; trg_stock_reservations_apply moves reserved)
 ------------------------------------------------------------------------------
-
--- name: LockStoreForStock :one
--- The stores row, the first lock of every stock write (the catalogue writer
--- takes it the same way, through catalogue_seq).
-SELECT id FROM stores WHERE id = @id FOR NO KEY UPDATE;
 
 -- name: LockItems :many
 -- The order's items, locked in id order.
