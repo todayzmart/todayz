@@ -45,6 +45,8 @@ type app struct {
 	cfg      *config.Config
 	log      *slog.Logger
 	shutdown func(context.Context) error
+	service  string
+	metrics  *telemetry.Metrics // RED, SSE and RUM instruments (W1-07)
 }
 
 func version(cfg *config.Config) string {
@@ -74,8 +76,18 @@ func boot(ctx context.Context, service string, getenv config.Getenv, out io.Writ
 	if err != nil {
 		return nil, err
 	}
+	met, err := telemetry.NewMetrics(nil, service)
+	if err != nil {
+		return nil, err
+	}
+	unreg, err := telemetry.RegisterRuntime(nil, service)
+	if err != nil {
+		return nil, err
+	}
+	stop := shutdown
+	shutdown = func(ctx context.Context) error { _ = unreg(); return stop(ctx) }
 	log.InfoContext(ctx, "starting", slog.Bool("no_egress", cfg.NoEgress))
-	return &app{cfg: cfg, log: log, shutdown: shutdown}, nil
+	return &app{cfg: cfg, log: log, shutdown: shutdown, service: service, metrics: met}, nil
 }
 
 // loadAndLog loads config and builds the process logger. Before anything
@@ -123,7 +135,17 @@ func (a *app) appPool(ctx context.Context, name string) (*pgxpool.Pool, error) {
 	if !a.cfg.DatabaseURL.IsSet() {
 		return nil, errors.New("DATABASE_URL is not set")
 	}
-	return db.Open(ctx, a.cfg.DatabaseURL.Reveal(), db.Options{AppName: "todayz-" + name})
+	pool, err := db.Open(ctx, a.cfg.DatabaseURL.Reveal(), db.Options{AppName: "todayz-" + name, Tracer: telemetry.NewPgxTracer(nil)})
+	if err != nil {
+		return nil, err
+	}
+	// The pool gauges live as long as the process; the pool outlives the
+	// registration, which is dropped with the process.
+	if _, err := telemetry.RegisterPool(nil, a.service, pool); err != nil {
+		pool.Close()
+		return nil, err
+	}
+	return pool, nil
 }
 
 // clocks returns the process clock and, in local and test, the test-clock

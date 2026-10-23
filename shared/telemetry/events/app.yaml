@@ -1,0 +1,31 @@
+# Product events: app lifecycle (05 §2.6). Owner W1-07. Emitted by the clients.
+# One file per domain (D-50); an event name may be defined in only one file.
+# Prop types: enum (values), int, number, bool, ulid, token. Free text is never
+# a prop. Mark a prop `optional: true` when it may be absent.
+domain: app
+owner: W1-07
+events:
+  app_opened:
+    emitter: client
+    description: The app came to the foreground (cold start or warm resume).
+    props:
+      launch: { type: enum, values: [cold, warm] }
+      source: { type: enum, values: [direct, push, qr, referral, share], optional: true }
+  session_started:
+    emitter: client
+    description: A new session began (30 minutes of inactivity ends one).
+    props: {}
+  pwa_installed:
+    emitter: client
+    description: The browser reported that the PWA was installed.
+    props: {}
+  push_permission:
+    emitter: client
+    description: The user answered the push permission prompt.
+    props:
+      result: { type: enum, values: [granted, denied] }
+  lang_changed:
+    emitter: client
+    description: The user switched the interface language.
+    props:
+      lang: { type: enum, values: [en, hi, kn, te, ta] }

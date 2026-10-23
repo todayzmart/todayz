@@ -9,6 +9,7 @@
 backend/gen/
 backend/api/openapi.yaml
 shared/api-client/src/gen/
+shared/telemetry/src/gen/
 **/routeTree.gen.ts
 **/mocks/handlers.gen.ts
 

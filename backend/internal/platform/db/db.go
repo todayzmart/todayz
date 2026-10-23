@@ -32,6 +32,8 @@ type Options struct {
 	MaxConnLifetime time.Duration
 	// AppName is sent as application_name (shows in pg_stat_activity).
 	AppName string
+	// Tracer, when set, traces every query (telemetry.PgxTracer, W1-07).
+	Tracer pgx.QueryTracer
 }
 
 // Open parses url, applies opts and pings. The URL is never put in an error.
@@ -51,6 +53,9 @@ func Open(ctx context.Context, url string, opts Options) (*pgxpool.Pool, error) 
 	}
 	if opts.AppName != "" {
 		cfg.ConnConfig.RuntimeParams["application_name"] = opts.AppName
+	}
+	if opts.Tracer != nil {
+		cfg.ConnConfig.Tracer = opts.Tracer
 	}
 	// All timestamps are UTC (02 §2.5).
 	cfg.ConnConfig.RuntimeParams["timezone"] = "UTC"
