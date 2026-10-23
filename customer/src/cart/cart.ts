@@ -1,8 +1,10 @@
 // C-09 cart: one shop at a time (01 §6 "one order = one store"). The lead set this interface so
 // W2-08 (Add to cart on C-05, C-07, C-08) and W2-09 (cart, checkout) build on the same module.
-// W2-09 owns this folder: it keeps the exported names and types and replaces the in-memory
-// state with IndexedDB so the cart survives reloads and sign-in (01 §2).
+// W2-09 owns this folder: it keeps the exported names and types. The state is read synchronously
+// from memory and written through to IndexedDB (storage.ts), so the cart survives reloads and
+// sign-in (01 §2). Nothing about the person is kept here: no phone, no token, no pickup code.
 import { useSyncExternalStore } from 'react';
+import { indexedDbStorage, type CartStorage } from './storage';
 
 export interface CartStore {
   id: string;
@@ -31,11 +33,87 @@ export type AddResult = { ok: true } | { ok: false; reason: 'other_store'; curre
 const EMPTY: CartState = { store: null, lines: [] };
 const listeners = new Set<() => void>();
 let state: CartState = EMPTY;
+let storage: CartStorage | null = null;
+let touched = false;
+let ready: Promise<void> = Promise.resolve();
+let writes: Promise<void> = Promise.resolve();
+
+function emit(): void {
+  listeners.forEach((l) => l());
+}
 
 function set(next: CartState): void {
   state = next.lines.length === 0 ? EMPTY : next;
-  listeners.forEach((l) => l());
+  touched = true;
+  emit();
+  const s = storage;
+  if (s) {
+    const snapshot = state;
+    // Writes go one after the other so an older snapshot never lands last.
+    writes = writes.then(() => s.save(snapshot)).catch(() => undefined);
+  }
 }
+
+/** Valid lines only: a record from an older build or a damaged one never breaks the page. */
+function clean(v: CartState): CartState {
+  const lines = v.lines.filter(
+    (l) =>
+      typeof l.storeItemId === 'string' &&
+      typeof l.productName === 'string' &&
+      Number.isInteger(l.pricePaise) &&
+      Number.isInteger(l.qty) &&
+      l.qty > 0,
+  );
+  return v.store && lines.length > 0 ? { store: v.store, lines } : EMPTY;
+}
+
+/**
+ * Points the cart at a storage and loads what it holds. A change made before the load finishes
+ * wins: the saved lines are merged in only when they are the same shop's.
+ */
+export function attachCartStorage(next: CartStorage | null): Promise<void> {
+  storage = next;
+  touched = false;
+  if (!next) {
+    ready = Promise.resolve();
+    return ready;
+  }
+  ready = next
+    .load()
+    .then((loaded) => {
+      const saved = loaded ? clean(loaded) : EMPTY;
+      if (saved === EMPTY) return;
+      if (!touched || state === EMPTY) {
+        state = saved;
+      } else if (state.store && saved.store && state.store.id === saved.store.id) {
+        const have = new Set(state.lines.map((l) => l.storeItemId));
+        state = { store: state.store, lines: [...state.lines, ...saved.lines.filter((l) => !have.has(l.storeItemId))] };
+      } else {
+        return;
+      }
+      emit();
+    })
+    .catch(() => undefined);
+  return ready;
+}
+
+/** Resolves when the saved cart has been read and the last write has landed. */
+export function cartSettled(): Promise<void> {
+  return ready.then(() => writes);
+}
+
+/** Tests only: forget everything in memory. */
+export function resetCartForTests(): void {
+  state = EMPTY;
+  storage = null;
+  touched = false;
+  ready = Promise.resolve();
+  writes = Promise.resolve();
+  emit();
+}
+
+// Start-up: the browser's IndexedDB, except under test where each test attaches its own storage.
+if (import.meta.env.MODE !== 'test') void attachCartStorage(indexedDbStorage());
 
 export function getCart(): CartState {
   return state;
