@@ -1,13 +1,17 @@
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
+import { expect, request as playwrightRequest, test, type APIRequestContext, type Page } from '@playwright/test';
 
 // Needs `make dev` running with the seed. Two contexts: the customer (API only, since the customer
 // checkout screens come with W2-09) and the shop (the real business app in the browser).
 // The pickup code is read from the customer's own order in memory and typed once; it is never logged.
-// NOT RUN by the W2-10 weekend slice (no `make dev` there); it is here for the lead's first stack run.
+// The seed manager opens Sri Lakshmi all day for the run (the API refuses orders outside opening
+// hours) and puts the seed's hours back afterwards. OTP sends are kept low: 30 s apart per number,
+// 5 per number and 20 per address an hour; a send inside the 30 s waits it out.
 const API = process.env.TZ_API_URL ?? 'https://api.todayz.localhost';
 const MOCKS = process.env.TZ_MOCKS_URL ?? 'http://127.0.0.1:4010';
 const CUSTOMER_PHONE = process.env.TZ_CUSTOMER_PHONE ?? '9000000001'; // seed: customer.asha
 const OWNER_PHONE = process.env.TZ_BIZ_OWNER_PHONE ?? '9000000011'; // seed: Lakshmi Traders owner
+const MANAGER_PHONE = '9000000012'; // seed: Lakshmi Traders manager (Sri Lakshmi)
+const BUSINESS_ID = '01KE0S1W6W8ZV7T1C3A6MB0001'; // seed: Lakshmi Traders
 const STORE_SLUG = 'sri-lakshmi-indiranagar'; // seed: Sri Lakshmi
 const STORE_ID = '01KE0S1W6W8ZV7T1C3A6MS0001';
 const STORE_NAME = 'Sri Lakshmi';
@@ -31,18 +35,65 @@ async function latestOtp(request: APIRequestContext, national: string, since: st
   return ((await r.json()) as { otp: string }).otp;
 }
 
-/** Signs the seeded customer in over the API and places a one-item pickup order. Returns what the test needs. */
-async function placeOrder(request: APIRequestContext): Promise<{ orderId: string; number: string; token: string }> {
+/** POST /v1/auth/otp/send, waiting out the 30 s resend gap once (a run straight after another hits it). */
+async function sendOtp(request: APIRequestContext, data: Record<string, string>) {
+  const r = await request.post(`${API}/v1/auth/otp/send`, { data });
+  const wait = Number(r.headers()['retry-after'] ?? '0');
+  if (r.status() !== 429 || wait > 35) return r;
+  await new Promise((done) => setTimeout(done, wait * 1000 + 500));
+  return request.post(`${API}/v1/auth/otp/send`, { data });
+}
+
+/** Signs in over the API (one OTP send) and returns the access token. */
+async function apiSignIn(request: APIRequestContext, national: string, app: 'customer' | 'business'): Promise<string> {
   const since = new Date().toISOString();
-  const send = await request.post(`${API}/v1/auth/otp/send`, {
-    data: { phone: `+91${CUSTOMER_PHONE}`, purpose: 'login', app: 'customer', turnstileToken: 'XXXX.DUMMY.TOKEN.XXXX' },
-  });
+  const send = await sendOtp(request, { phone: `+91${national}`, purpose: 'login', app, turnstileToken: 'XXXX.DUMMY.TOKEN.XXXX' });
   expect(send.status()).toBe(200);
   const { requestId } = (await send.json()) as { requestId: string };
-  const code = await latestOtp(request, CUSTOMER_PHONE, since);
-  const verify = await request.post(`${API}/v1/auth/otp/verify`, { data: { requestId, code, app: 'customer', deviceId: ulid() } });
+  const code = await latestOtp(request, national, since);
+  const verify = await request.post(`${API}/v1/auth/otp/verify`, { data: { requestId, code, app, deviceId: ulid() } });
   expect(verify.status()).toBe(200);
-  const { accessToken } = (await verify.json()) as { accessToken: string };
+  return ((await verify.json()) as { accessToken: string }).accessToken;
+}
+
+let customerToken: string | undefined;
+
+// OTP resend gaps can add half a minute.
+test.describe.configure({ timeout: 120_000 });
+
+const ALL_DAY = {
+  weekly: Object.fromEntries(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((d) => [d, [{ open: '00:00', close: '00:00' }]])),
+  holidays: [],
+};
+let restoreHours: (() => Promise<void>) | undefined;
+
+test.beforeAll(async () => {
+  const request = await playwrightRequest.newContext({ ignoreHTTPSErrors: true });
+  const auth = { Authorization: `Bearer ${await apiSignIn(request, MANAGER_PHONE, 'business')}` };
+  const url = `${API}/v1/biz/businesses/${BUSINESS_ID}/stores/${STORE_ID}/settings`;
+  const got = await request.get(url, { headers: auth });
+  expect(got.status(), 'read the store settings').toBe(200);
+  const before = ((await got.json()) as { hours: unknown }).hours;
+  const set = async (hours: unknown, etag: string) => {
+    const r = await request.patch(url, { headers: { ...auth, 'If-Match': etag }, data: { hours } });
+    expect(r.status(), `changed the store hours: ${await r.text()}`).toBe(200);
+    return r.headers()['etag'] ?? '';
+  };
+  const etag = await set(ALL_DAY, got.headers()['etag'] ?? '');
+  restoreHours = async () => {
+    await set(before, etag);
+    await request.dispose();
+  };
+});
+
+test.afterAll(async () => {
+  await restoreHours?.();
+});
+
+/** Signs the seeded customer in over the API (once per run) and places a one-item pickup order. Returns what the test needs. */
+async function placeOrder(request: APIRequestContext): Promise<{ orderId: string; number: string; token: string }> {
+  customerToken ??= await apiSignIn(request, CUSTOMER_PHONE, 'customer');
+  const accessToken = customerToken;
   const auth = { Authorization: `Bearer ${accessToken}` };
 
   const items = await request.get(`${API}/v1/discover/stores/${STORE_SLUG}/items`, { params: { limit: 20 } });
@@ -69,10 +120,20 @@ async function placeOrder(request: APIRequestContext): Promise<{ orderId: string
 
 async function shopSignIn(page: Page, request: APIRequestContext) {
   await page.goto('/orders');
-  const since = new Date().toISOString();
+  let since = new Date().toISOString();
   await page.getByLabel('Mobile number').fill(OWNER_PHONE);
   await page.getByRole('button', { name: 'Send code' }).click();
-  await expect(page.getByText(/We sent a code to/)).toBeVisible();
+  // The number may have had a code less than 30 s ago (the previous test or spec): the app counts down, then we send again.
+  const sent = page.getByText(/We sent a code to/);
+  const tooMany = page.getByText('Too many tries. Wait a moment and try again.');
+  await expect(sent.or(tooMany)).toBeVisible();
+  if (await tooMany.isVisible()) {
+    const send = page.getByRole('button', { name: /^(Send|Resend) code$/ });
+    await expect(send).toBeEnabled({ timeout: 40_000 });
+    since = new Date().toISOString();
+    await send.click();
+  }
+  await expect(sent).toBeVisible();
   const code = await latestOtp(request, OWNER_PHONE, since);
   await page.getByRole('group', { name: 'Enter the 6-digit code' }).locator('input').first().click();
   await page.keyboard.type(code);

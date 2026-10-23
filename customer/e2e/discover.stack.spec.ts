@@ -8,7 +8,7 @@ test('home, search atta, open a shop, add to cart', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'English' }).click();
   await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('textbox', { name: 'PIN code' }).fill('560001');
+  await page.getByRole('textbox', { name: 'PIN code' }).fill('560038');
   await page.getByRole('button', { name: 'Use this PIN code' }).click();
 
   // C-03: stats and shops near you, radius defaults to 2 km.
