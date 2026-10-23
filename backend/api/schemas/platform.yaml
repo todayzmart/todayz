@@ -1,0 +1,76 @@
+# Schemas: domain "platform" (owner W0-03/W0-04; 04 §2.9, D-80).
+#
+# A domain schema file is a map of schema name → JSON Schema. Names are unique
+# across every schemas/<domain>.yaml. Request objects say `additionalProperties:
+# false` (an unknown field is `422 validation_failed`); an object that must stay
+# open says `x-open-object: true` instead.
+Health:
+  type: object
+  required: [status]
+  properties:
+    status:
+      type: string
+      const: ok
+Readiness:
+  type: object
+  required: [status, checks]
+  properties:
+    status:
+      type: string
+      enum: [ok, unavailable]
+    checks:
+      type: object
+      description: Check name → `ok` or `fail`. No error text.
+      additionalProperties:
+        type: string
+        enum: [ok, fail]
+BuildInfo:
+  type: object
+  required: [version, commit, buildTime, dirty]
+  properties:
+    version:
+      type: string
+    commit:
+      type: string
+    buildTime:
+      type: string
+    dirty:
+      type: boolean
+      description: True when the working tree had uncommitted changes at build time.
+TestClockState:
+  type: object
+  required: [now, offsetMs]
+  properties:
+    now:
+      $ref: ./common.yaml#/Timestamp
+    offsetMs:
+      type: integer
+      description: The shared offset from the wall clock, in milliseconds.
+    dueJobs:
+      type: integer
+      minimum: 0
+      description: Jobs still due when the call returned (POST only).
+TestClockRequest:
+  type: object
+  description: Exactly one of `advance`, `set` and `reset`.
+  additionalProperties: false
+  properties:
+    advance:
+      type: string
+      description: A Go duration above zero, such as `31m` or `2h`.
+      pattern: ^([0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h))+$
+      maxLength: 64
+    set:
+      $ref: ./common.yaml#/Timestamp
+    reset:
+      type: boolean
+      const: true
+    wait:
+      type: string
+      description: How long to wait for due jobs, `0s` to `50s` (default `10s`).
+      pattern: ^([0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h))+$
+      maxLength: 64
+  oneOf:
+    - required: [advance]
+    - required: [set]
+    - required: [reset]

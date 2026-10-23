@@ -1,0 +1,127 @@
+# Shared schemas (W0-04; 04 §1, §1.4, §1.5). Reference as
+# `$ref: ../schemas/common.yaml#/Ulid`. Reason lists are defined once here from
+# D-60 and D-68 and referenced by name; never inline a reason list in a path file.
+# Schema names are unique across every schemas/<domain>.yaml (the contract lint
+# checks it), because the bundle hoists them all into components.schemas.
+Ulid:
+  type: string
+  description: A ULID (26 Crockford base32 characters).
+  pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+  examples:
+    - 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+Paise:
+  type: integer
+  description: Money in integer paise (₹1 = 100). Fields carrying it are named `*Paise`.
+  minimum: 0
+  examples:
+    - 12500
+Credits:
+  type: integer
+  description: Wallet credits (1 credit = ₹1).
+  minimum: 0
+  examples:
+    - 40
+Timestamp:
+  type: string
+  format: date-time
+  description: RFC 3339, UTC.
+  maxLength: 40
+  examples:
+    - "2026-10-22T09:30:00Z"
+ServerNow:
+  type: string
+  format: date-time
+  description: |
+    The server's clock when the response was built (RFC 3339). Every timed response
+    (order responses, SSE order events) carries it as `serverNow`; a client computes
+    remaining time as deadline − (serverNow + time elapsed since receipt), never
+    against the device clock (04 §1).
+  examples:
+    - "2026-10-22T09:30:00Z"
+NextCursor:
+  type:
+    - string
+    - "null"
+  description: Cursor of the next page, or null on the last page (04 §1).
+  maxLength: 512
+  examples:
+    - "eyJpZCI6IjAxSkIifQ"
+Slug:
+  type: string
+  description: "A public store slug (04 §1.2): lowercase letters, digits and hyphens."
+  pattern: ^[a-z0-9]+(-[a-z0-9]+)*$
+  minLength: 1
+  maxLength: 64
+  examples:
+    - sharma-kirana-koramangala
+Problem:
+  type: object
+  description: RFC 9457 problem details (04 §1.4, D-24). `code` is stable and translated by the client; `title` and `detail` are English for logs.
+  required: [type, title, status, code]
+  properties:
+    type:
+      type: string
+      format: uri
+      description: '`https://todayz.in/errors/<code>`'
+    title:
+      type: string
+    status:
+      type: integer
+      minimum: 400
+      maximum: 599
+    code:
+      type: string
+      pattern: ^[a-z][a-z0-9]*(_[a-z0-9]+)*$
+    detail:
+      type: string
+    requestId:
+      type: string
+    fields:
+      type: object
+      description: Field path → reason, for `validation_failed`. Paths are `body.items[2].quantity`, `query.limit`, `path.orderId`, `header.If-Match`.
+      additionalProperties:
+        type: string
+    extensions:
+      type: object
+      description: Code-specific extras (04 §1.4, D-91), for example the fresh quote for `price_changed` or `until` for `ordering_suspended`.
+  examples:
+    - type: https://todayz.in/errors/insufficient_stock
+      title: Not enough stock
+      status: 409
+      code: insufficient_stock
+      detail: 2 of 3 items are short
+      requestId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+      fields:
+        body.items[2].quantity: max 3
+RejectReason:
+  type: string
+  description: Why a shop rejected an order (D-60).
+  enum: [out_of_stock, closing_soon, too_busy, cannot_deliver_address, price_changed, other]
+DeliveryFailedReason:
+  type: string
+  description: Why a delivery failed (D-60).
+  enum: [customer_unreachable, address_not_found, customer_refused, other]
+ShopCancelReason:
+  type: string
+  description: Why a shop cancelled an accepted order (D-68).
+  enum: [out_of_stock, customer_unreachable, closing_soon, other]
+AdminCancelReason:
+  type: string
+  description: Why an admin cancelled an order (D-60).
+  enum: [customer_request, store_request, fraud_suspected, technical_issue, other]
+CustomerCancelReason:
+  type: string
+  description: Why a customer cancelled (D-60). `declined_partial` is set by confirm-partial `{accept:false}`, never sent directly.
+  enum: [changed_mind, declined_partial, too_slow, other]
+SystemReason:
+  type: string
+  description: Reasons the system sets on its own (04 §1.5). They appear only in responses and are never accepted in a request.
+  enum: [not_accepted, no_show, dispatch_timeout, partial_timeout]
+ReviewTagPositive:
+  type: string
+  description: Positive review tags (D-60).
+  enum: [fresh_stock, fair_price, quick_service, friendly, stock_was_right, well_packed]
+ReviewTagNegative:
+  type: string
+  description: Negative review tags (D-60).
+  enum: [item_missing, slow, rude, wrong_item, expired_item, overpriced]

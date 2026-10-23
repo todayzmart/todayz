@@ -12,12 +12,17 @@ Read first: the root `CLAUDE.md`, `docs/plan/README.md`, `docs/plan/01-product-r
   (https://api.todayz.localhost through Caddy) and the worker on :8181 (health only) under
   `infra/local/proc.sh`. Postgres/PostGIS is on host port 5433.
 - `make reset` recreates the DB, migrates (as `todayz_owner`) and seeds `dev` (as `todayz_app`).
-- `make gen` writes `gen/sqlc/<domain>db` (sqlc, one package per domain) and `gen/problems`
-  (problem codes from `api/problems/`).
-  W0-04 adds the OpenAPI bundle and the generated server types.
+- `make gen` writes `gen/sqlc/<domain>db` (sqlc, one package per domain), `gen/problems`
+  (problem codes from `api/problems/`), and the contract (`mk/25-contract.mk`): `gen/api/root.yaml`
+  (the domain files joined), the bundle `api/openapi.yaml`, `gen/api/spec` (the bundle embedded for
+  the request validator) and `gen/api/<domain>/api.gen.go` (oapi-codegen types + strict chi server
+  per domain tag). `api/README.md` says how a domain adds a path; never edit the bundle.
 - `make check` (backend part, `mk/20-backend.mk`): gofmt, go vet, golangci-lint, `go test -race`,
   gosec, govulncheck against the offline DB in `.cache/govulndb`, and the settings lint. It runs
-  offline under `scripts/no-egress.sh` once `make setup` has run online.
+  offline under `scripts/no-egress.sh` once `make setup` has run online. The contract part
+  (`mk/25-contract.mk`): `redocly lint`, `apigen check` (SC-PL-01), the api-client checks, and the
+  Schemathesis smoke (`TestContractSmoke`: examples + coverage phases against an in-process api on
+  a fresh database, every error a registered problem, SC-PL-02).
 - Quick loop: `cd backend && go test -short ./...` skips the database tests; without `-short`
   they need Docker (colima). `make check` sets `DOCKER_HOST` and the Ryuk socket override for you.
 
@@ -58,8 +63,8 @@ on each other's internals; a cross-domain call goes through a small interface in
   `internal/seed/<domain>.go`, `platform/authz/policy/<domain>.go`.
 - Change the database only through a new migration `db/migrations/NNNNN_<wp-id>_<what>.sql`,
   numbered inside your WP's block (D-89: `<wave><wp:2><seq:2>`, so W1-02 uses 10201–10299;
-  `TestMigrationFileNames` checks it). Read `db/migrations/README.md` first. A local database that
-  already holds a later block refuses an earlier one: `make reset`.
+  `TestMigrationFileNames` checks it). Read `db/migrations/README.md` first. goose applies
+  out of order (D-90), so a database that already holds a later block still takes an earlier one.
 - A partitioned table gets a `partition_policies` row in its own migration; nothing in Go lists
   partitioned tables.
 - Read every configurable number from `platform_settings` (01 §17) through `settings.Cache`;
@@ -93,6 +98,30 @@ on each other's internals; a cross-domain call goes through a small interface in
 - Errors are problem+json with a code from `api/problems/` (`problem.New(code, …)`); the generated
   registry (`gen/problems`) is the list. Idempotency mismatch is 422; a request already in flight
   is 409 `conflict`.
+- The request validator (slot 13, `httpx/openapi`) runs on every mounted route after chi has
+  picked it (D-100: one router decides; it finds the operation by method and chi's route
+  pattern, so an unmounted path or method is chi's 404/405 with `Allow` listing mounted methods
+  only, everywhere). It answers 422 `validation_failed` with one `fields` entry per problem, keyed
+  by the full prefixed path (`body.items[2].quantity: required`, `query.limit`, `path.orderId`;
+  reasons never repeat the client's value; at most 50 entries, then `fieldsTruncated: true`), 415
+  for the wrong `Content-Type`, 400 `bad_request` for a body that is not JSON, has trailing data,
+  more than 10,000 values or an array past its `maxItems`, 413 past the body limit. Slot 8
+  (`pathguard`) answers 400 first for a raw path two routers could read differently (`%2F`,
+  `%5C`, a non-canonical escape). Authn runs before validation (an unauthenticated `/v1/me`,
+  `/v1/biz`, `/v1/admin` call is 401, never a field name) and idempotency after it (a refused
+  request is never stored). A JSON body is buffered (at most the 1 MB limit), pre-scanned for
+  the 10,000-value budget and `maxItems` (also under `oneOf`/`anyOf`), then validated. A request
+  body is `application/json` only, unless the operation is `x-upload: true`, and then it may
+  not be JSON at all; `openapi.New` (and `apigen check`) refuse any other contract. An upload
+  body is checked for media type and size only and streamed to the handler. Route policies come
+  from the operation's `x-idempotency` (`none|optional|required`) and `x-upload`, merged with
+  what the code declares: the stronger rule wins, code weaker than the contract fails startup
+  and `TestRoutesAreInTheContract`, and `Upload: true` in code on an operation the contract does
+  not mark `x-upload` fails startup too (only the contract grants an upload). A mounted pattern
+  may not end in `/` (`Check()` refuses it, as apigen refuses the path). That
+  test also fails on a chi route the contract does not know and, in reverse, on a contract
+  operation without a route once its domain has landed (the allowlist is in the test). Every
+  generated `Register` builds its strict handler with `openapi.StrictOptions()`.
 - Database: the API, worker and seed connect as `todayz_app` (DML only); only `todayz migrate`
   uses `todayz_owner`. River runs as `todayz_app`.
 - Do not commit `gen/` or `api/openapi.yaml`.
@@ -124,7 +153,13 @@ on each other's internals; a cross-domain call goes through a small interface in
 
 ## Status
 
-W0-03 built the skeleton: platform packages, the 12 middleware slots, `/healthz`, `/readyz`,
+W0-03 built the skeleton: platform packages, the middleware slots (`httpx/mw/doc.go` lists them;
+13–15 run after chi has routed, D-100), `/healthz`, `/readyz`,
 `/version`, `/v1/test/clock` (local/test), the goose baseline (00001, 00002) and River (version 3),
 sqlc, testkit, the jobs and seed registries for the 23 domains, and the SC-PL-06 checks. W0-04
-owns `api/` and wires the request validator. Domain packages start in W1.
+built `api/` (root, common, one `paths`/`schemas` file per domain, `api/README.md`), `apigen`
+(root, check, codegen), the request validator (`httpx/openapi`) with spec-driven route policies,
+`gen/api/spec` + per-domain oapi-codegen stubs, the Schemathesis smoke and fixture, and goose
+out-of-order migrations (D-90). The platform paths (`/healthz`, `/readyz`, `/version`,
+`/v1/test/clock`) are the only operations until the domain WPs land; `/v1/test/slow*` come with
+W1-07 and the D-91 domain problem codes with their domains. Domain packages start in W1.

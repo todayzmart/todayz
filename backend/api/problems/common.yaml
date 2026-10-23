@@ -13,7 +13,7 @@
 domain: common
 problems:
   - code: validation_failed
-    status: 400
+    status: 422
     i18n: problems.validation_failed
     title: The request is not valid
   - code: bad_request

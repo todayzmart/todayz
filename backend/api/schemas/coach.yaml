@@ -1,0 +1,9 @@
+# Schemas: domain "coach" (owner W3-10): the business coach (04 §2.6).
+#
+# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
+# Schema; names are unique across every schemas/<domain>.yaml. Request objects
+# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
+# an object that must stay open says `x-open-object: true`. Money is `*Paise`
+# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
+# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
+{}

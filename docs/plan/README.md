@@ -17,7 +17,7 @@ Read in this order:
 | 9 | [09-infra-release.md](09-infra-release.md) | Environments, AWS and Cloudflare setup, CI/CD, secrets, launch checklist, rollback. |
 | 10 | [10-later.md](10-later.md) | Agreed TODOs that are out of v1 (catalogue scraping, billing, storefronts). |
 | 11 | [11-ai-features.md](11-ai-features.md) | AI features for retailers, consumers and admins: rules (draft then confirm), v1 picks, evals, work packages W3-10…W3-13. |
-| 12 | [12-decision-log.md](12-decision-log.md) | Why the plan says what it says: every review finding and how it was settled (D-01…D-98). If a numbered file disagrees with the log, fix the numbered file and add an entry. |
+| 12 | [12-decision-log.md](12-decision-log.md) | Why the plan says what it says: every review finding and how it was settled (D-01…D-100). If a numbered file disagrees with the log, fix the numbered file and add an entry. |
 
 The visual source of truth is the design system artifact: https://claude.ai/artifact/W91M8EtFX8zJc9SgMUygZF (v8: white page, mint wash, pastel tints, Kargul-style controls, Lucide icons, Anek + Figtree).
 

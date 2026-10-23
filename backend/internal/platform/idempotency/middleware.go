@@ -68,7 +68,7 @@ func countCompleteFailure(ctx context.Context) {
 }
 
 // Middleware runs on unsafe requests to routes that declare idempotency
-// (route.Policy; 02 §2.4 step 10). On every other route the header is
+// (route.Policy; 02 §2.4 step 14, after validation). On every other route the header is
 // ignored. A route with IdempotencyRequired refuses a request without the
 // header (400 idempotency_key_required); IdempotencyOptional honours it when
 // present.

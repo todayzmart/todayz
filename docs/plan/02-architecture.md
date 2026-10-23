@@ -24,7 +24,7 @@ todayz/
 ├── shared/                   pnpm workspace packages                  → repo todayz-shared (versioned package after the split)
 │   ├── tokens/               @todayz/tokens   CSS variables + TS constants generated from design/source/tokens.json
 │   ├── ui/                   @todayz/ui       React components (Button, Pill, Sheet, KpiStrip, StoreMap …) + Storybook
-│   ├── api-client/           @todayz/api      TS client + Zod schemas generated from the bundled backend/api/openapi.yaml (generated, not committed)
+│   ├── api-client/           @todayz/api-client TS client + Zod schemas + MSW handlers generated from the bundled backend/api/openapi.yaml (generated, not committed)
 │   ├── i18n/                 @todayz/i18n     message catalogues (en, hi, kn, te, ta), formatters (₹, km, time)
 │   ├── telemetry/            @todayz/telemetry RUM, product events (catalogue in events/<domain>.yaml), Sentry setup, traceparent fetch wrapper
 │   └── config/               eslint, tsconfig, vitest, playwright presets
@@ -177,16 +177,18 @@ No Redis in v1. Rate limits use Cloudflare at the edge plus an in-process token 
 5. Real client IP from `CF-Connecting-IP` (only trusted when the request came through Cloudflare; ALB security group accepts Cloudflare IP ranges only)
 6. Access log + RED metrics (route template, not raw path)
 7. CORS (exact origins: app., business., admin.; locally the same hosts on `todayz.localhost`)
-8. Route policy: puts the matched route's declared policy (body limit, idempotency opt-in) in the request context, because steps 9 and 12 run before chi has picked the route
-9. Body size limit (1 MB default, 10 MB on routes that declare an upload)
-10. Authn (Bearer access token → principal; anonymous allowed on public routes)
-11. Rate limit (per principal or IP per route group)
-12. Idempotency (opt-in per route through its policy; `Idempotency-Key` is required on money and order mutations; kept 24 h with the response; details in [04-api.md](04-api.md) §1.6)
-13. OpenAPI request validation
-14. Authz (route action + path scope `{bid}`/`{sid}`, §3), applied per route
-15. Handler → domain service → repository
+8. Path guard: `400 bad_request` for a raw path that two routers could read differently (one that is not the canonical encoding of its decoded form, or carries an encoded slash `%2F` or a backslash `%5C`), so chi and the validator always see one path (D-100)
+9. Route policy: puts the matched route's effective policy (body limit, idempotency opt-in) in the request context, because step 10 runs before chi has picked the route. The policy is the contract's `x-idempotency`/`x-upload` merged with what the code declares; the stronger rule wins, and code weaker than the contract fails startup (D-100)
+10. Body size limit (1 MB default, 10 MB on routes that declare an upload)
+11. Authn (Bearer access token → principal; anonymous allowed on public routes). An unauthenticated call to `/v1/me`, `/v1/biz` or `/v1/admin` ends here with 401 and never sees a field name
+12. Rate limit (per principal or IP per route group)
+13. chi picks the route: 404 for an unmounted path, 405 with `Allow` (mounted methods only) for an unmounted method; nothing below runs for either
+14. OpenAPI request validation, on the route chi picked: `422 validation_failed` with prefixed field paths; the JSON decoder refuses trailing data, more than 10,000 values or an array past its `maxItems` (`400 bad_request`); at most 50 field errors are listed (`fieldsTruncated`) (D-100)
+15. Idempotency (opt-in per route through its policy; `Idempotency-Key` is required on money and order mutations; kept 24 h with the response; details in [04-api.md](04-api.md) §1.6). It runs after validation so a refused request is never stored or replayed
+16. Authz (route action + path scope `{bid}`/`{sid}`, §3), applied per route
+17. Handler → domain service → repository
 
-In code the order is `requestid → secheaders → recover → otel → clientip → accesslog → cors → routepolicy → bodylimit → authn → ratelimit → idempotency → validate`, then `authz` per route. Request ID is outermost so every later layer, `recover` included, logs with the ID. W0-03 creates this chain in `platform/httpx` with one slot (file) per middleware in `httpx/mw/`; each package fills only its own file (D-50).
+In code the order is `requestid → secheaders → recover → otel → clientip → accesslog → cors → pathguard → routepolicy → bodylimit → authn → ratelimit`, then chi routes, then `validate → idempotency → authz` on every mounted route (D-100: one router decides, authn before validation, validation before idempotency). Request ID is outermost so every later layer, `recover` included, logs with the ID. W0-03 creates this chain in `platform/httpx` with one slot (file) per middleware in `httpx/mw/`; each package fills only its own file (D-50).
 
 ### 2.5 Time
 

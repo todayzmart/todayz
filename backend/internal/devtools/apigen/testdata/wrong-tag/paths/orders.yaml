@@ -1,0 +1,18 @@
+# Fixture: wrong-tag.
+/v1/me/orders:
+  get:
+    operationId: listOrders
+    tags: [me]
+    summary: List my orders
+    responses:
+      "200":
+        description: A page
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/OrderList
+            example:
+              items: []
+              nextCursor: null
+      default:
+        $ref: ../common/responses.yaml#/Problem

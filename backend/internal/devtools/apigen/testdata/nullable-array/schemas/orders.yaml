@@ -1,0 +1,44 @@
+# Fixture: nullable-array (type [array, null] is still an array and needs maxItems, D-100 M-C).
+OrderRequest:
+  type: object
+  additionalProperties: false
+  required: [items]
+  properties:
+    items:
+      type: [array, "null"]
+      minItems: 1
+      items:
+        $ref: "#/OrderItem"
+OrderItem:
+  type: object
+  additionalProperties: false
+  required: [sku, quantity]
+  properties:
+    sku:
+      type: string
+      maxLength: 64
+    quantity:
+      type: integer
+      minimum: 1
+      maximum: 3
+Order:
+  type: object
+  required: [id, status, totalPaise]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    status:
+      type: string
+      enum: [placed, accepted, rejected]
+    totalPaise:
+      $ref: ./common.yaml#/Paise
+OrderList:
+  type: object
+  required: [items, nextCursor]
+  properties:
+    items:
+      type: array
+      items:
+        $ref: "#/Order"
+    nextCursor:
+      $ref: ./common.yaml#/NextCursor

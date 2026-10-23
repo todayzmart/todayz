@@ -1,0 +1,19 @@
+# Fixture: upload-on-get.
+/v1/me/orders:
+  get:
+    operationId: listOrders
+    tags: [orders]
+    summary: List my orders
+    x-upload: true
+    responses:
+      "200":
+        description: A page
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/OrderList
+            example:
+              items: []
+              nextCursor: null
+      default:
+        $ref: ../common/responses.yaml#/Problem

@@ -1,0 +1,34 @@
+# Shared responses (W0-04; 04 §1.4). Every operation's `default` response is
+# `$ref: ../common/responses.yaml#/Problem` (the contract lint checks it), and the
+# codes the handler can return beyond the common ones are listed under the
+# operation's `x-problems`.
+Problem:
+  description: An error (RFC 9457). `code` is registered in problems/<domain>.yaml; the HTTP status is the registered one.
+  headers:
+    X-Request-Id:
+      $ref: ./headers.yaml#/RequestId
+    Retry-After:
+      $ref: ./headers.yaml#/RetryAfter
+  content:
+    application/problem+json:
+      schema:
+        $ref: ../schemas/common.yaml#/Problem
+      examples:
+        validationFailed:
+          summary: A field failed validation
+          value:
+            type: https://todayz.in/errors/validation_failed
+            title: The request is not valid
+            status: 422
+            code: validation_failed
+            requestId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+            fields:
+              body.items[2].quantity: max 3
+        notFound:
+          summary: Nothing at this path
+          value:
+            type: https://todayz.in/errors/not_found
+            title: Not found
+            status: 404
+            code: not_found
+            requestId: 01JB0S1W6W8ZV7T1C3A6M9N4PQ

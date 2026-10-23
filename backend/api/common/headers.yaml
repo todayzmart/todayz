@@ -1,0 +1,31 @@
+# Shared response headers (W0-04; 04 §1). Reference as
+# `$ref: ../common/headers.yaml#/ETag` under a response's `headers`.
+RequestId:
+  description: The request id, also in logs and in problem bodies (`requestId`).
+  schema:
+    type: string
+ETag:
+  description: '`"v{version}"` of a mutable resource; send it back as `If-Match`.'
+  schema:
+    type: string
+    pattern: ^"v[0-9]+"$
+RateLimitLimit:
+  description: Requests allowed in the current window.
+  schema:
+    type: integer
+RateLimitRemaining:
+  description: Requests left in the current window.
+  schema:
+    type: integer
+RateLimitReset:
+  description: Seconds until the window resets.
+  schema:
+    type: integer
+RetryAfter:
+  description: Seconds (or an HTTP date) to wait before retrying; sent with 429, with 409 `conflict` while an idempotent request is in flight, and with `ai_daily_cap_reached`.
+  schema:
+    type: string
+IdempotentReplayed:
+  description: '`true` when the response was replayed from the stored result of the same `Idempotency-Key` (04 §1.6).'
+  schema:
+    type: boolean

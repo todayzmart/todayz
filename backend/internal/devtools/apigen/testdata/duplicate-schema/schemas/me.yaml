@@ -1,0 +1,6 @@
+# Fixture: duplicate-schema (Order is already in orders.yaml).
+Order:
+  type: object
+  properties:
+    id:
+      type: string

@@ -1,0 +1,57 @@
+# TodayZ API: the OpenAPI 3.1 root (W0-04; 04 §1, D-50, D-55).
+#
+# This file holds what every domain shares: info, servers, security schemes and
+# the default security. Paths and schemas live per domain in paths/<domain>.yaml
+# and schemas/<domain>.yaml; shared parameters, headers and responses in common/;
+# problem codes in problems/<domain>.yaml.
+#
+# `make gen` (apigen root) joins the domain files into gen/api/root.yaml, which
+# Redocly bundles into the git-ignored api/openapi.yaml. Nobody edits that bundle,
+# and nobody adds paths or schemas here: a domain edits only its own files.
+openapi: 3.1.0
+info:
+  title: TodayZ API
+  version: "1.0"
+  summary: Hyperlocal retail. Shops digitise their stock; customers find what is nearby, book it and pick it up or get it delivered.
+  description: |
+    Conventions (04 §1): JSON with camelCase fields, ULID string ids, money as integer
+    paise in fields named `*Paise`, credits as integers, timestamps RFC 3339 UTC.
+    Cursor pagination: `?limit=&cursor=` returns `{items, nextCursor}` (limit at most 100).
+    Mutable resources carry `ETag: "v{version}"` and updates send `If-Match` (412 on a mismatch).
+    Every error is RFC 9457 problem JSON with a registered `code` (problems/<domain>.yaml).
+    Timed responses carry `serverNow`; clients compute countdowns against it, never the device clock.
+  contact:
+    name: TodayZ
+    url: https://todayz.in
+servers:
+  - url: https://api.todayz.in
+    description: Production
+  - url: https://api.todayz.localhost
+    description: Local stack (make dev, through Caddy)
+security:
+  - bearer: []
+tags:
+  - name: platform
+    description: Health, build info and the local/test clock (W0-03, W0-04).
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: EdDSA access token with `kid`, held in memory by the client (04 §1.3).
+    refreshCookieCustomer:
+      type: apiKey
+      in: cookie
+      name: __Secure-tz_rt_c
+      description: Customer refresh token (D-14). Host-only, `Path=/v1/auth`, HttpOnly, Secure, SameSite=Strict.
+    refreshCookieBusiness:
+      type: apiKey
+      in: cookie
+      name: __Secure-tz_rt_b
+      description: Business refresh token (D-14), same attributes as the customer cookie.
+    refreshCookieAdmin:
+      type: apiKey
+      in: cookie
+      name: __Secure-tz_rt_a
+      description: Admin refresh token (D-14), same attributes as the customer cookie.

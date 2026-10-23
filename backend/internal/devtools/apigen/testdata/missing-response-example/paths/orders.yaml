@@ -1,0 +1,76 @@
+# Fixture: missing-response-example (the 201 response has no example).
+/v1/me/orders:
+  get:
+    operationId: listOrders
+    tags: [orders]
+    summary: List my orders
+    parameters:
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: A page
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/OrderList
+            example:
+              items:
+                - id: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+                  status: placed
+                  totalPaise: 12000
+              nextCursor: null
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: placeOrder
+    tags: [orders]
+    summary: Place an order
+    x-idempotency: required
+    x-problems: [not_found]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/orders.yaml#/OrderRequest
+          example:
+            items:
+              - sku: TEA-500
+                quantity: 2
+    responses:
+      "201":
+        description: Placed
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/Order
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/orders/{oid}:
+  parameters:
+    - name: oid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getOrder
+    tags: [orders]
+    summary: One order
+    x-problems: [not_found]
+    responses:
+      "200":
+        description: The order
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/Order
+            example:
+              id: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+              status: placed
+              totalPaise: 12000
+      default:
+        $ref: ../common/responses.yaml#/Problem

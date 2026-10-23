@@ -1,6 +1,6 @@
 package mw
 
-// Slot 12 · idempotency · owner W0-03. The logic lives in
+// Slot 14 · idempotency · owner W0-03. Inline on every route, after validate (D-100). The logic lives in
 // platform/idempotency; a route opts in where it is registered with
 // route.Handle(route.Policy{Idempotency: …}, h) (04 §1.6).
 

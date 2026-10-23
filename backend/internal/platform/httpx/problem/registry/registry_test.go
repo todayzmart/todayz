@@ -29,7 +29,7 @@ problems:
   - {code: internal, status: 500, i18n: problems.internal, title: x}
   - {code: invalid_transition, status: 409, i18n: problems.invalid_transition, title: x}
   - {code: not_found, status: 404, i18n: problems.not_found, title: x}
-  - {code: validation_failed, status: 400, i18n: problems.validation_failed, title: x}
+  - {code: validation_failed, status: 422, i18n: problems.validation_failed, title: x}
   - {code: idempotency_mismatch, status: 422, i18n: problems.idempotency_mismatch, title: x}
 `
 

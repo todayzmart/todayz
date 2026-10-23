@@ -1,0 +1,4 @@
+# Schemathesis for the contract suite (W0-04, D-88). Compile with
+#   make contract-lock
+# which pins every transitive package with hashes, resolved as of 2026-10-08.
+schemathesis==4.29.1

@@ -1,0 +1,35 @@
+# Fixture: unsafe-without-idempotency (an unsafe method under /v1/me must state x-idempotency).
+/v1/me/orders/{oid}:
+  parameters:
+    - name: oid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  patch:
+    operationId: renameOrder
+    tags: [orders]
+    summary: Rename an order
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/orders.yaml#/OrderRequest
+          example:
+            items:
+              - sku: TEA-500
+                quantity: 2
+    responses:
+      "200":
+        description: The order
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/Order
+            example:
+              id: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+              status: placed
+              totalPaise: 12000
+      default:
+        $ref: ../common/responses.yaml#/Problem

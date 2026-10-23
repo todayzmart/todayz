@@ -1,7 +1,10 @@
 package mw
 
 // Slot 13 · validate · hook from W0-03; W0-04 supplies the Validator
-// (kin-openapi against the bundled api/openapi.yaml).
+// (kin-openapi against the bundled api/openapi.yaml). It runs inline on
+// every registered route, after chi has picked it and before idempotency
+// (D-100): the validator reads chi's route pattern and parameters, and a
+// refused request is never stored under its Idempotency-Key.
 
 import (
 	"net/http"

@@ -1,0 +1,46 @@
+# Shared parameters (W0-04; 04 §1). Reference them from a domain file as
+# `$ref: ../common/parameters.yaml#/Limit`. Nobody redefines these inline.
+Limit:
+  name: limit
+  in: query
+  description: Page size (04 §1), at most 100.
+  schema:
+    type: integer
+    minimum: 1
+    maximum: 100
+    default: 20
+Cursor:
+  name: cursor
+  in: query
+  description: The `nextCursor` of the previous page. Opaque.
+  schema:
+    type: string
+    maxLength: 512
+IfMatch:
+  name: If-Match
+  in: header
+  required: true
+  description: The `ETag` the client last read (`"v{version}"`); a mismatch is `412 precondition_failed`, a missing header `428 precondition_required`.
+  schema:
+    type: string
+    pattern: ^"v[0-9]+"$
+IdempotencyKey:
+  name: Idempotency-Key
+  in: header
+  description: "A client-made ULID (04 §1.6). Required where the operation says `x-idempotency: required`."
+  schema:
+    $ref: ../schemas/common.yaml#/Ulid
+AcceptLanguage:
+  name: Accept-Language
+  in: header
+  description: Picks translated category names and notification text.
+  schema:
+    type: string
+    maxLength: 64
+Traceparent:
+  name: traceparent
+  in: header
+  description: W3C trace context from the client; the response always carries `X-Request-Id`.
+  schema:
+    type: string
+    pattern: ^[0-9a-f]{2}-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$

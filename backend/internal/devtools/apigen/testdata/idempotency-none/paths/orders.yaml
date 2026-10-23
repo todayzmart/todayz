@@ -1,0 +1,30 @@
+# Fixture: idempotency-none (valid): x-idempotency none with no Idempotency-Key parameter (D-100).
+/v1/me/orders:
+  post:
+    operationId: placeOrder
+    tags: [orders]
+    summary: Place an order
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/orders.yaml#/OrderRequest
+          example:
+            items:
+              - sku: TEA-500
+                quantity: 2
+    responses:
+      "201":
+        description: Placed
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/Order
+            example:
+              id: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+              status: placed
+              totalPaise: 12000
+      default:
+        $ref: ../common/responses.yaml#/Problem

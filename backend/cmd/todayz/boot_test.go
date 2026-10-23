@@ -46,7 +46,8 @@ func TestBootRedactsEveryLogPath(t *testing.T) {
 	require.NoError(t, err)
 
 	d := deps{Config: cfg, Log: lg, Clock: clock.Real{}, Ready: &health.Readiness{}}
-	r := newAPIRouter(d, idempotency.NewMemoryStore(), nil)
+	r, err := buildRouter(d, idempotency.NewMemoryStore(), nil)
+	require.NoError(t, err)
 	r.Get("/v1/boom", func(w http.ResponseWriter, req *http.Request) {
 		log.Printf("stray std log: sms to 9876543210 otp 482913")        //nolint:forbidigo // the bypass under test
 		slog.Default().Error("stray slog: sms to 9876543210 otp 482913") //nolint:forbidigo // the bypass under test

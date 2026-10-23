@@ -1,0 +1,29 @@
+# Redocly config for the TodayZ contract (W0-04). `make gen` bundles gen/api/root.yaml
+# (written by apigen from root.yaml + paths/ + schemas/) into the git-ignored
+# api/openapi.yaml; `make check` lints the bundle with these rules. The TodayZ-specific
+# lints (one domain per file, path rules, examples, problem codes) live in apigen.
+extends:
+  - recommended
+rules:
+  no-unresolved-refs: error
+  no-identical-paths: error
+  no-ambiguous-paths: error
+  no-path-trailing-slash: error
+  path-params-defined: error
+  path-not-include-query: error
+  operation-operationId: error
+  operation-operationId-unique: error
+  operation-operationId-url-safe: error
+  operation-4xx-response: off # every operation has a `default` problem response instead (apigen checks it)
+  operation-2xx-response: error
+  operation-summary: error
+  operation-tag-defined: error
+  tags-alphabetical: off
+  no-unused-components: warn
+  security-defined: error
+  spec-strict-refs: off
+  info-license: off
+  operation-description: off
+  no-server-example.com: off # the rule flags the local server https://api.todayz.localhost
+  no-empty-servers: error
+  struct: error

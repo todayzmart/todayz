@@ -1,6 +1,6 @@
 package mw
 
-// Slot 9 · bodylimit · owner W0-03.
+// Slot 10 · bodylimit · owner W0-03.
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ import (
 	"github.com/todayz/backend/internal/platform/httpx/route"
 )
 
-// Body limits (02 §2.4 step 7).
+// Body limits (02 §2.4 step 10).
 const (
 	DefaultBodyLimit = 1 << 20  // 1 MB, every route
 	UploadBodyLimit  = 10 << 20 // 10 MB, only routes registered with route.Policy{Upload: true}

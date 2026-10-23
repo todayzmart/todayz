@@ -35,6 +35,9 @@ blob-report/
 e2e/load/out/
 e2e/security/out/
 e2e/contract/out/
+.schemathesis/
+.hypothesis/
+__pycache__/
 *.out
 *.test
 __debug_bin*

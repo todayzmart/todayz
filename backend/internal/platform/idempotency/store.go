@@ -1,4 +1,4 @@
-// Package idempotency makes unsafe requests safe to retry (02 §2.4 step 10,
+// Package idempotency makes unsafe requests safe to retry (02 §2.4 step 14,
 // 04 §1.6). A client sends an Idempotency-Key (a ULID it made); the first
 // request with that key runs, and every later request with the same key and
 // the same body gets the stored response back. The same key with a different

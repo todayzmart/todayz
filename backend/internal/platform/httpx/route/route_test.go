@@ -11,6 +11,46 @@ import (
 
 func ok(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(http.StatusNoContent) }
 
+// policies is a Source for the tests: method+pattern to the contract's Policy.
+type policies map[string]Policy
+
+func (p policies) Policy(method, pattern string) (Policy, bool) {
+	pol, ok := p[method+" "+pattern]
+	return pol, ok
+}
+
+// TestUploadNeedsTheContract (D-100 round 2, Low 3): code may declare
+// Upload only on an operation the contract marks x-upload; an upload lifts
+// the body limit and skips body validation, so the contract alone grants it.
+// Without a source there is no contract to hold code to.
+func TestUploadNeedsTheContract(t *testing.T) {
+	src := policies{
+		"POST /v1/imports": {Upload: true},
+		"POST /v1/orders":  {Idempotency: IdempotencyRequired},
+	}
+	r := chi.NewRouter()
+	r.Method(http.MethodPost, "/v1/imports", HandleFunc(Policy{Upload: true}, ok))
+	r.Method(http.MethodPost, "/v1/orders", HandleFunc(Policy{Idempotency: IdempotencyRequired}, ok))
+	require.NoError(t, NewTableWith(r, src).Check())
+
+	// Upload on an operation the contract knows but does not mark x-upload.
+	r = chi.NewRouter()
+	r.Method(http.MethodPost, "/v1/orders", HandleFunc(Policy{Idempotency: IdempotencyRequired, Upload: true}, ok))
+	err := NewTableWith(r, src).Check()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "POST /v1/orders: code declares upload but the contract does not mark it x-upload")
+
+	// Upload on an operation the contract has no policy for at all.
+	r = chi.NewRouter()
+	r.Method(http.MethodPost, "/v1/other", HandleFunc(Policy{Upload: true}, ok))
+	err = NewTableWith(r, src).Check()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "POST /v1/other: code declares upload but the contract does not mark it x-upload")
+
+	// No source: nothing to check against.
+	require.NoError(t, NewTable(r).Check())
+}
+
 // TestTableFindsPolicies: policies are found on top-level routes, through
 // r.With chains, in r.Route and r.Mount sub-routers, and with URL params;
 // any other route has the zero Policy.

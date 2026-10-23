@@ -1,0 +1,24 @@
+# Fixture: discover-id.
+/v1/discover/stores/{storeId}:
+  get:
+    operationId: getDiscoverStore
+    tags: [orders]
+    summary: List my orders
+    parameters:
+      - name: storeId
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      "200":
+        description: A page
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/OrderList
+            example:
+              items: []
+              nextCursor: null
+      default:
+        $ref: ../common/responses.yaml#/Problem

@@ -9,29 +9,40 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-chi/chi/v5"
-
+	"github.com/todayz/backend/gen/api/spec"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/health"
 	"github.com/todayz/backend/internal/platform/httpx"
 	"github.com/todayz/backend/internal/platform/httpx/mw"
+	"github.com/todayz/backend/internal/platform/httpx/openapi"
 	"github.com/todayz/backend/internal/platform/idempotency"
 	"github.com/todayz/backend/internal/platform/migrate"
 	"github.com/todayz/backend/internal/platform/pgnotify"
 	"github.com/todayz/backend/internal/platform/queue"
 )
 
-// newAPIRouter builds the router: the 02 §2.4 pipeline, then routes.
-func newAPIRouter(d deps, idem idempotency.Store, v mw.Validator) chi.Router {
-	r := httpx.NewRouter(httpx.Options{
+// buildRouter builds the router: the 02 §2.4 pipeline, then routes, then
+// Router.Check (D-100): a route the contract does not know, a sub-router,
+// or a code policy weaker than the contract's refuses to start the API. v
+// validates every request against the contract and supplies the route
+// policies the contract declares (x-idempotency, x-upload); nil skips both
+// (only for tests of other slots).
+func buildRouter(d deps, idem idempotency.Store, v *openapi.Validator) (*httpx.Router, error) {
+	o := httpx.Options{
 		Log:         d.Log,
 		CORSOrigins: d.Config.CORSOrigins(),
 		ClientIP:    mw.ClientIPOptions{TrustCloudflare: d.Config.Env.IsDeployed()},
 		Idempotency: idempotency.Options{Store: idem, Clock: d.Clock, Log: d.Log},
-		Validator:   v,
-	})
+	}
+	if v != nil {
+		o.Validator, o.Policies = v, v
+	}
+	r := httpx.NewRouter(o)
 	routes(r, d)
-	return r
+	if err := r.Check(); err != nil {
+		return nil, fmt.Errorf("routes: %w", err)
+	}
+	return r, nil
 }
 
 func runAPI(ctx context.Context, getenv func(string) string, out io.Writer) error {
@@ -81,8 +92,15 @@ func runAPI(ctx context.Context, getenv func(string) string, out io.Writer) erro
 	if err != nil {
 		return fmt.Errorf("api: PII_ENC_KEY is required (make setup writes it; make env-check shows set/missing): %w", err)
 	}
-	// W0-04 passes the kin-openapi validator here.
-	h := newAPIRouter(d, idem, nil)
+	// The bundled contract (gen/api/spec, written by make gen) validates every request.
+	v, err := openapi.New(spec.Bundle)
+	if err != nil {
+		return fmt.Errorf("api: %w", err)
+	}
+	h, err := buildRouter(d, idem, v)
+	if err != nil {
+		return fmt.Errorf("api: %w", err)
+	}
 	srv := httpx.NewServer(a.cfg.APIAddr, h)
 	return serve(ctx, a.log, srv, "api")
 }

@@ -42,7 +42,10 @@ type Error struct {
 	Fields map[string]string
 	// Header is set on the response (e.g. Retry-After for rate_limited).
 	Header http.Header
-	cause  error
+	// Extensions are extra members of the body (04 §1.4 "extensions"), e.g.
+	// fieldsTruncated: true when Fields was capped.
+	Extensions map[string]any
+	cause      error
 }
 
 // New returns a problem with a registered code and an English detail.
@@ -62,6 +65,15 @@ func (e *Error) WithField(path, reason string) *Error {
 		e.Fields = map[string]string{}
 	}
 	e.Fields[path] = reason
+	return e
+}
+
+// WithExtension sets an extension member. Never put a client value in it.
+func (e *Error) WithExtension(key string, v any) *Error {
+	if e.Extensions == nil {
+		e.Extensions = map[string]any{}
+	}
+	e.Extensions[key] = v
 	return e
 }
 
@@ -110,13 +122,14 @@ func CodeOf(err error) string {
 
 // Body is the wire shape.
 type Body struct {
-	Type      string            `json:"type"`
-	Title     string            `json:"title"`
-	Status    int               `json:"status"`
-	Code      string            `json:"code"`
-	Detail    string            `json:"detail,omitempty"`
-	RequestID string            `json:"requestId,omitempty"`
-	Fields    map[string]string `json:"fields,omitempty"`
+	Type       string            `json:"type"`
+	Title      string            `json:"title"`
+	Status     int               `json:"status"`
+	Code       string            `json:"code"`
+	Detail     string            `json:"detail,omitempty"`
+	RequestID  string            `json:"requestId,omitempty"`
+	Fields     map[string]string `json:"fields,omitempty"`
+	Extensions map[string]any    `json:"extensions,omitempty"`
 }
 
 var (
@@ -156,12 +169,12 @@ func Status(err error) int {
 // resolve maps err to a body. ok is false when err carried an unregistered code.
 func resolve(err error) (Body, bool) {
 	r := Registry()
-	code, detail, fields := genproblems.Internal, "", map[string]string(nil)
+	code, detail, fields, ext := genproblems.Internal, "", map[string]string(nil), map[string]any(nil)
 	var p *Error
 	ok := true
 	if errors.As(err, &p) {
 		if _, found := r.Lookup(p.Code); found {
-			code, detail, fields = p.Code, p.Detail, p.Fields
+			code, detail, fields, ext = p.Code, p.Detail, p.Fields, p.Extensions
 		} else {
 			ok = false
 		}
@@ -169,9 +182,9 @@ func resolve(err error) (Body, bool) {
 	e, _ := r.Lookup(code)
 	if e.Status >= 500 {
 		// Never send internals to the client; the cause is in the log.
-		detail, fields = "", nil
+		detail, fields, ext = "", nil, nil
 	}
-	return Body{Type: TypeBase + code, Title: e.Title, Status: e.Status, Code: code, Detail: detail, Fields: fields}, ok
+	return Body{Type: TypeBase + code, Title: e.Title, Status: e.Status, Code: code, Detail: detail, Fields: fields, Extensions: ext}, ok
 }
 
 // Write sends err as problem JSON and logs it: 5xx at error with the cause,

@@ -26,7 +26,7 @@ import (
 
 const appOrigin = "https://app.todayz.localhost"
 
-func newTestRouter(t *testing.T, logs *bytes.Buffer, v mw.Validator) *chi.Mux {
+func newTestRouter(t *testing.T, logs *bytes.Buffer, v mw.Validator) *Router {
 	t.Helper()
 	log := slog.New(slog.NewJSONHandler(logs, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	r := NewRouter(Options{
@@ -166,6 +166,98 @@ func TestNotFoundAndMethodNotAllowed(t *testing.T) {
 	w = do(r, "DELETE", "/v1/echo/1", nil, nil)
 	require.Equal(t, 405, w.Code)
 	require.Equal(t, "method_not_allowed", code(t, w))
+	require.Equal(t, "GET", w.Header().Get("Allow"), "Allow lists only the mounted methods (D-100)")
+	w = do(r, "DELETE", "/v1/echo", nil, nil)
+	require.Equal(t, 405, w.Code)
+	require.Equal(t, "POST", w.Header().Get("Allow"))
+}
+
+// TestValidationRunsBeforeIdempotency (D-100 D3): a request the validator
+// refuses is never stored under its Idempotency-Key, so the corrected retry
+// with the same key runs instead of replaying or mismatching.
+func TestValidationRunsBeforeIdempotency(t *testing.T) {
+	v := mw.ValidatorFunc(func(r *http.Request) error {
+		b, _ := io.ReadAll(r.Body)
+		r.Body = io.NopCloser(bytes.NewReader(b))
+		if bytes.Contains(b, []byte("bad")) {
+			return problem.New("validation_failed", "").WithField("body.x", "invalid")
+		}
+		return nil
+	})
+	r := newTestRouter(t, &bytes.Buffer{}, v)
+	key := ids.New(timeZero()).String()
+	w := do(r, "POST", "/v1/must", strings.NewReader(`{"x":"bad"}`), map[string]string{idempotency.HeaderKey: key})
+	require.Equal(t, 422, w.Code)
+	require.Equal(t, "validation_failed", code(t, w))
+
+	w = do(r, "POST", "/v1/must", strings.NewReader(`{"x":"good"}`), map[string]string{idempotency.HeaderKey: key})
+	require.Equal(t, 201, w.Code, w.Body.String())
+	require.Empty(t, w.Header().Get(idempotency.HeaderReplayed))
+}
+
+// contractOf is a validator that also knows which routes the contract has.
+type contractOf map[string]bool
+
+func (contractOf) ValidateRequest(*http.Request) error { return nil }
+func (c contractOf) Has(method, pattern string) bool   { return c[method+" "+pattern] }
+func (c contractOf) Policy(method, pattern string) (route.Policy, bool) {
+	if c[method+" "+pattern] {
+		return route.Policy{Idempotency: route.IdempotencyRequired}, true
+	}
+	return route.Policy{}, false
+}
+
+// TestRouterCheck (D-100 D2, M-1): Check refuses a mounted route the contract
+// does not know, a sub-router (whose pattern the inline validator cannot
+// see), and a code policy weaker than the contract's.
+func TestRouterCheck(t *testing.T) {
+	ok := func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(http.StatusNoContent) }
+	c := contractOf{"GET /v1/a": true, "POST /v1/b": true}
+
+	r := NewRouter(Options{Validator: c, Policies: c})
+	r.Get("/v1/a", ok)
+	r.Method(http.MethodPost, "/v1/b", route.HandleFunc(route.Policy{Idempotency: route.IdempotencyRequired}, ok))
+	require.NoError(t, r.Check())
+
+	r = NewRouter(Options{Validator: c, Policies: c})
+	r.Get("/v1/a", ok)
+	r.Get("/v1/stray", ok)
+	err := r.Check()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "GET /v1/stray is mounted but not in the contract")
+
+	r = NewRouter(Options{Validator: c, Policies: c})
+	r.Route("/v1/sub", func(sr chi.Router) { sr.Get("/a", ok) })
+	err = r.Check()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "sub-router")
+
+	r = NewRouter(Options{Validator: c, Policies: c})
+	r.Method(http.MethodPost, "/v1/b", route.HandleFunc(route.Policy{Idempotency: route.IdempotencyOptional}, ok))
+	err = r.Check()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "POST /v1/b: code declares idempotency optional")
+
+	// D-100 round 2, Low 5: a mounted pattern ending in `/` is a route the
+	// contract can never name (apigen refuses the path), so it cannot start.
+	slash := contractOf{"GET /v1/a": true, "GET /v1/a/": true}
+	r = NewRouter(Options{Validator: slash, Policies: slash})
+	r.Get("/v1/a/", ok)
+	err = r.Check()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "/v1/a/: a mounted pattern may not end in `/` (D-100)")
+
+	// D-100 round 2, Low 3: Upload in code needs x-upload in the contract.
+	r = NewRouter(Options{Validator: c, Policies: c})
+	r.Method(http.MethodPost, "/v1/b", route.HandleFunc(route.Policy{Idempotency: route.IdempotencyRequired, Upload: true}, ok))
+	err = r.Check()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "POST /v1/b: code declares upload but the contract does not mark it x-upload")
+
+	// Without a contract-aware validator only the policy conflicts count.
+	plain := NewRouter(Options{})
+	plain.Get("/v1/anything", ok)
+	require.NoError(t, plain.Check())
 }
 
 func TestRecover(t *testing.T) {
@@ -257,7 +349,7 @@ func TestValidateHook(t *testing.T) {
 	r := newTestRouter(t, &bytes.Buffer{}, v)
 	require.Equal(t, 200, do(r, "GET", "/v1/echo/1", nil, nil).Code)
 	w := do(r, "GET", "/v1/echo/1?bad=1", nil, nil)
-	require.Equal(t, 400, w.Code)
+	require.Equal(t, 422, w.Code, "validation_failed is 422 (D-100)")
 	require.Equal(t, "validation_failed", code(t, w))
 }
 

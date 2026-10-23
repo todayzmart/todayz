@@ -135,7 +135,8 @@ func TestRoutesPerEnv(t *testing.T) {
 				tc = testclock.New(clock.NewOffset(nil), nopStore{}, log)
 			}
 			d := deps{Config: &config.Config{Env: c.env, APIAddr: config.DefaultLocalAPIAddr}, Log: log, Clock: clock.Real{}, Ready: &health.Readiness{}, TestClock: tc}
-			h := newAPIRouter(d, idempotency.NewMemoryStore(), nil)
+			h, err := buildRouter(d, idempotency.NewMemoryStore(), contractValidator(t))
+			require.NoError(t, err)
 			for path, want := range map[string]int{"/healthz": 200, "/readyz": 200, "/version": c.clock, "/v1/test/clock": c.clock, "/v1/nope": 404} {
 				w := httptest.NewRecorder()
 				h.ServeHTTP(w, httptest.NewRequest(http.MethodGet, path, nil))
@@ -160,7 +161,8 @@ func TestTestClockNeedsLoopbackAPIAddr(t *testing.T) {
 	} {
 		tc := testclock.New(clock.NewOffset(nil), nopStore{}, log)
 		d := deps{Config: &config.Config{Env: config.EnvLocal, APIAddr: addr}, Log: log, Clock: clock.Real{}, Ready: &health.Readiness{}, TestClock: tc}
-		h := newAPIRouter(d, idempotency.NewMemoryStore(), nil)
+		h, err := buildRouter(d, idempotency.NewMemoryStore(), contractValidator(t))
+		require.NoError(t, err)
 		w := httptest.NewRecorder()
 		h.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/v1/test/clock", nil))
 		require.Equal(t, want, w.Code, addr)

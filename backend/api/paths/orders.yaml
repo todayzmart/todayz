@@ -1,0 +1,12 @@
+# Paths: domain "orders" (owner W2-02, W2-04): customer and shop order flows (04 §2.4, §2.6).
+#
+# Pre-created empty by W0-04 so parallel work packages never edit the same file
+# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [orders]`,
+# an operationId unique across the API, an example per request and success
+# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
+# this domain's schemas as `../schemas/orders.yaml#/Name` and the shared ones as
+# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
+# Mark idempotent operations `x-idempotency: required|optional` and uploads
+# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
+# List the domain problem codes an operation can return under `x-problems`.
+{}

@@ -38,8 +38,15 @@ type Migrator struct {
 // New builds a migrator on pool. It takes a session advisory lock while
 // migrating, so two instances never migrate at once.
 func New(pool *pgxpool.Pool, log *slog.Logger) (*Migrator, error) {
+	return NewFS(pool, dbschema.Migrations, log)
+}
+
+// NewFS is New over another set of files (a "migrations" directory in files).
+// It exists for the migrator's own tests (TestOutOfOrderBlocks runs fixture
+// files); the binary always runs db/migrations through New.
+func NewFS(pool *pgxpool.Pool, files fs.FS, log *slog.Logger) (*Migrator, error) {
 	sqlDB := stdlib.OpenDBFromPool(pool)
-	return newWith(sqlDB, dbschema.Migrations, log)
+	return newWith(sqlDB, files, log)
 }
 
 func newWith(sqlDB *sql.DB, files fs.FS, log *slog.Logger) (*Migrator, error) {
@@ -55,6 +62,9 @@ func newWith(sqlDB *sql.DB, files fs.FS, log *slog.Logger) (*Migrator, error) {
 		goose.WithSessionLocker(locker),
 		goose.WithDisableGlobalRegistry(true),
 		goose.WithGoMigrations(riverMigration()),
+		// D-90: per-WP version blocks (D-89) merge in any order, so a file
+		// numbered below the newest applied one must still apply.
+		goose.WithAllowOutofOrder(true),
 	}
 	if log != nil {
 		opts = append(opts, goose.WithSlog(log))

@@ -159,7 +159,7 @@ func TestValidation(t *testing.T) {
 		`{"set":"tomorrow"}`, `{"advance":"1m","wait":"2h"}`,
 	} {
 		w := call(h, "POST", body)
-		require.Equal(t, 400, w.Code, body)
+		require.Equal(t, 422, w.Code, body)
 		require.Contains(t, w.Body.String(), `"validation_failed"`, body)
 	}
 	w := call(h, "POST", `{"advance":"1m","extra":1}`)
@@ -186,7 +186,7 @@ func TestPostNeedsJSONContentType(t *testing.T) {
 func TestWaitIsCappedAt50s(t *testing.T) {
 	require.Equal(t, 50*time.Second, maxWait)
 	h := router(config.EnvLocal, newService(nil, &memStore{}))
-	require.Equal(t, 400, call(h, "POST", `{"advance":"1m","wait":"51s"}`).Code)
+	require.Equal(t, 422, call(h, "POST", `{"advance":"1m","wait":"51s"}`).Code)
 	require.Equal(t, 200, call(h, "POST", `{"advance":"1m","wait":"0s"}`).Code)
 }
 

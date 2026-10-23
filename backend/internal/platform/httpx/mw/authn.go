@@ -1,6 +1,6 @@
 package mw
 
-// Slot 10 · authn · owner W1-01. No-op until W1-01: it will read the Bearer
+// Slot 11 · authn · owner W1-01. No-op until W1-01: it will read the Bearer
 // access token and store the principal with reqctx.WithPrincipal. Until then
 // reqctx.PrincipalFrom returns reqctx.Anonymous for every request.
 

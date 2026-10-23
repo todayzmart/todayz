@@ -1,0 +1,143 @@
+# Paths: domain "platform" (owner W0-03/W0-04; 04 §2.9, D-80).
+#
+# Health, build info and the local/test clock. A domain path file is a map of
+# path → path item; every operation is tagged with the file's domain, has an
+# operationId unique across the API, at least one example per request and
+# success response, and a `default` response that is `../common/responses.yaml#/Problem`.
+# The slow routes `/v1/test/slow` and `/v1/test/slow-sql` (D-93) are W1-07's and
+# live in telemetry.yaml.
+/healthz:
+  get:
+    operationId: getHealthz
+    tags: [platform]
+    summary: Process is up
+    description: "Never touches a dependency. Plain JSON, not problem JSON; `Cache-Control: no-store`."
+    security: []
+    responses:
+      "200":
+        description: Up
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/platform.yaml#/Health
+            example:
+              status: ok
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/readyz:
+  get:
+    operationId: getReadyz
+    tags: [platform]
+    summary: Dependencies are ready
+    description: DB reachable, migrations at head, River running. Cached 2 s; one run in flight at a time. Error text never appears in the body.
+    security: []
+    responses:
+      "200":
+        description: Ready
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/platform.yaml#/Readiness
+            example:
+              status: ok
+              checks:
+                db: ok
+                migrations: ok
+                river: ok
+      "503":
+        description: A check failed (plain JSON, not problem JSON)
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/platform.yaml#/Readiness
+            example:
+              status: unavailable
+              checks:
+                db: fail
+                migrations: ok
+                river: ok
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/version:
+  get:
+    operationId: getVersion
+    tags: [platform]
+    summary: Build info
+    description: On the API only in `local` and `test` (staging and prod answer 404); on the worker's internal health port everywhere.
+    security: []
+    responses:
+      "200":
+        description: Build info
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/platform.yaml#/BuildInfo
+            example:
+              version: 0.1.0
+              commit: 512c7281b6c0f1f6b3f4a7b1d2e3c4f5a6b7c8d9
+              buildTime: "2026-10-22T09:30:00Z"
+              dirty: false
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/test/clock:
+  get:
+    operationId: getTestClock
+    tags: [platform]
+    summary: Read the test clock
+    description: Registered only when `APP_ENV` is `local` or `test`, the database agrees and `API_ADDR` is a loopback address (D-80); otherwise 404.
+    security: []
+    responses:
+      "200":
+        description: The clock
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/platform.yaml#/TestClockState
+            example:
+              now: "2026-10-22T09:30:00Z"
+              offsetMs: 0
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: moveTestClock
+    tags: [platform]
+    summary: Advance, set or reset the test clock
+    description: |
+      Exactly one of `advance`, `set` and `reset`. `advance` adds atomically in the database, so
+      concurrent advances add up. `wait` (default `10s`, at most `50s`, `0s` to skip) bounds how
+      long the call waits for River to work the jobs that became due; `dueJobs` is how many were
+      still due when it returned. JSON only (415 otherwise).
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/platform.yaml#/TestClockRequest
+          examples:
+            advance:
+              summary: Jump 31 minutes ahead
+              value:
+                advance: 31m
+            set:
+              summary: Pin the clock
+              value:
+                set: "2026-10-22T18:00:00Z"
+                wait: 0s
+            reset:
+              summary: Back to the wall clock
+              value:
+                reset: true
+    responses:
+      "200":
+        description: The clock after the move
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/platform.yaml#/TestClockState
+            example:
+              now: "2026-10-22T10:01:00Z"
+              offsetMs: 1860000
+              dueJobs: 0
+      default:
+        $ref: ../common/responses.yaml#/Problem

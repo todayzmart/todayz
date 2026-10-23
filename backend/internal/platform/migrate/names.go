@@ -12,8 +12,9 @@ import (
 // WPs built in parallel never pick the same number. Wave 0 keeps the old
 // 00001–00099 (00003 is River's Go migration).
 //
-// goose refuses to apply a file numbered below one a database already has
-// (blocks merge in any order). Locally `make reset` fixes such a database.
+// Blocks merge in any order, so goose runs with out-of-order migrations
+// allowed (D-90, TestOutOfOrderBlocks): a file numbered below one a database
+// already has still applies.
 var reFileName = regexp.MustCompile(`^([0-9]{5})_(w([0-9])-([0-9]{2}))_([a-z0-9]+(?:[_-][a-z0-9]+)*)\.sql$`)
 
 // Block returns the numbers a work package owns: wave 0 shares 1–99, every

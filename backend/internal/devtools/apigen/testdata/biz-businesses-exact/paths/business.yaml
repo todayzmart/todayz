@@ -1,0 +1,29 @@
+# Fixture: biz-businesses-exact (valid): /v1/biz/businesses itself is in the biz namespace (D-100 M1).
+/v1/biz/businesses:
+  get:
+    operationId: listMyBusinesses
+    tags: [business]
+    summary: Businesses I belong to
+    responses:
+      "200":
+        description: The list
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items]
+              properties:
+                items:
+                  type: array
+                  maxItems: 50
+                  items:
+                    type: object
+                    required: [id]
+                    properties:
+                      id:
+                        $ref: ../schemas/common.yaml#/Ulid
+            example:
+              items:
+                - id: 01JB0S1W6W8ZV7T1C3A6M9N4PQ
+      default:
+        $ref: ../common/responses.yaml#/Problem

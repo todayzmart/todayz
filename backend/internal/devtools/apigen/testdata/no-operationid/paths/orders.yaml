@@ -1,0 +1,17 @@
+# Fixture: no-operationid.
+/v1/me/orders:
+  get:
+    tags: [orders]
+    summary: List my orders
+    responses:
+      "200":
+        description: A page
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/orders.yaml#/OrderList
+            example:
+              items: []
+              nextCursor: null
+      default:
+        $ref: ../common/responses.yaml#/Problem

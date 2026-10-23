@@ -14,11 +14,29 @@ runs them; `make reset` and `make dev` run `up`.
   fails on a file whose number is outside its wp-id's block, a bad shape or a reused number;
   `TestCheckFileNameFires` is its fixture.
 - Blocks merge in any order, so a database can already hold a higher block than the one a new
-  file adds. goose refuses to apply a file numbered below the newest it has applied. Locally,
-  `make reset` fixes it (recreate, migrate, seed). For staging and prod the lead decides the
-  merge order before Wave 5.
+  file adds. goose runs with out-of-order migrations allowed (D-90, `WithAllowOutofOrder`;
+  `TestOutOfOrderBlocks` applies a higher block first, then a lower one), so the lower file
+  still applies. This is safe because a WP never merges before the WPs it depends on. Locally,
+  `make reset` remains the fix for a stale database.
+- Because of that, a migration may only touch tables created in its own block (by a lower
+  number) or in a lower block (D-90, D-100). `TestMigrationBlockOrder` (`CheckBlockOrder`) reads
+  the Up section of every file and fails on an ALTER, DROP, INSERT, UPDATE, DELETE, TRUNCATE,
+  index, trigger, policy, partition, GRANT/REVOKE or COMMENT against a table a higher block, a
+  later file of the same block, or no migration creates, and likewise on a `REFERENCES <table>`
+  in a CREATE TABLE or ALTER TABLE and on a table named after FROM or JOIN in a CREATE VIEW or
+  CREATE MATERIALIZED VIEW (a view counts as created, so a view over a view resolves);
+  `TestCheckBlockOrderFires` is its fixture. It reads statement heads (comments, strings and
+  function bodies stripped), so DDL built inside a function at run time, such as
+  `ensure_partitions`' partitions, is out of its sight by design. Also out of its sight, on
+  purpose: a statement starting with `WITH` (a CTE INSERT/UPDATE/DELETE), the FROM/USING clauses
+  of UPDATE and DELETE and any subselect, `SELECT ... INTO`, what a view reads through a subselect
+  or a function, `ALTER TABLE ... ATTACH PARTITION` (the parent is read, not the partition),
+  CREATE RULE, LOCK, COPY, and anything inside a DO block or a function body. A migration that
+  needs one of those against another block's table says so in a comment.
 - Every file has `-- +goose Up` and `-- +goose Down`; Down undoes Up exactly. `TestUpDownUp`
-  (internal/platform/migrate) runs up, down to zero and up again on a fresh database.
+  (internal/platform/migrate) runs up, down to zero and up again on a fresh database. Down
+  unwinds in reverse order of application, not of version (goose walks the applied rows
+  newest-first), so a lower block applied after a higher one is undone before it.
 - **Version 3 is reserved.** It is the Go migration in `internal/platform/migrate` that installs
   River's tables (River schema version 8). Do not create `00003_*.sql` (the name check refuses it).
   When River ships a new schema version, add a new Go migration there (TestRiverVersionIsLatest
