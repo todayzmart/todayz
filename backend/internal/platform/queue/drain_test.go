@@ -155,7 +155,7 @@ func TestDrainLetsRunningJobFinish(t *testing.T) {
 	require.True(t, w.finished.Load())
 	require.False(t, w.cancelled.Load())
 	require.Equal(t, "completed", jobState(t, db, id))
-	require.Empty(t, m.hardCancelled(t), "tz_job_hard_cancelled_total stays 0")
+	require.Equal(t, map[string]int64{"test.slow": 0}, m.hardCancelled(t), "tz_job_hard_cancelled_total exists and stays 0")
 	require.NotContains(t, logs.String(), `"level":"ERROR"`)
 	_, tracked := trackers.Load(c)
 	require.False(t, tracked, "Drain forgets the client")
@@ -170,6 +170,9 @@ func TestDrainHardCancelsAfterGrace(t *testing.T) {
 	m := newMetrics(t)
 	w := &slowWorker{}
 	c, id := startSlow(t, db, context.Background(), w, m)
+	// The series exists at 0 before the first cancel, so an increase() alert
+	// sees 0 → 1 rather than a series that starts at 1.
+	require.Equal(t, map[string]int64{"test.slow": 0}, m.hardCancelled(t))
 
 	log, logs := jsonLogger()
 	require.NoError(t, Drain(c, 300*time.Millisecond, 5*time.Second, log))

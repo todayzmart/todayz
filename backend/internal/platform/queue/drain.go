@@ -59,6 +59,18 @@ func newInflight(mp metric.MeterProvider) *inflight {
 	return f
 }
 
+// zero adds 0 to the counter once per kind, so every kind's series exists at
+// 0 for the worker's whole life. An increase() alert compares two samples;
+// a series whose first sample is already 1 never shows an increase.
+func (f *inflight) zero(kinds []string) {
+	if f.counter == nil {
+		return
+	}
+	for _, k := range kinds {
+		f.counter.Add(context.Background(), 0, metric.WithAttributes(attribute.String("kind", k)))
+	}
+}
+
 // Work implements rivertype.WorkerMiddleware.
 func (f *inflight) Work(ctx context.Context, job *rivertype.JobRow, doInner func(context.Context) error) error {
 	f.mu.Lock()
@@ -119,8 +131,13 @@ func Drain(c *Client, grace, hardGrace time.Duration, log *slog.Logger) error {
 	if err == nil {
 		return nil
 	}
+	// Any failed Stop escalates: a deadline means jobs outlived the grace;
+	// any other error leaves the client in an unknown state, and only
+	// StopAndCancel is sure to end its jobs before the process exits.
+	var stopErr error
 	if !errors.Is(err, context.DeadlineExceeded) {
-		return fmt.Errorf("queue: stop: %w", err)
+		stopErr = fmt.Errorf("queue: stop: %w", err)
+		log.ErrorContext(bg, "queue: stop failed; hard-cancelling", slog.String("err", err.Error()))
 	}
 
 	f := trackerFor(c)
@@ -129,7 +146,7 @@ func Drain(c *Client, grace, hardGrace time.Duration, log *slog.Logger) error {
 		still = f.snapshot()
 	}
 	log.ErrorContext(bg, "queue: jobs still running after the drain grace; hard-cancelling them (they are retried)",
-		slog.Duration("grace", grace), slog.Duration("hard_grace", hardGrace), slog.Int("jobs", len(still)))
+		slog.String("grace", grace.String()), slog.String("hard_grace", hardGrace.String()), slog.Int("jobs", len(still)))
 	for _, j := range still {
 		log.ErrorContext(bg, "queue: job hard-cancelled at shutdown",
 			slog.String("kind", j.kind), slog.Int64("job_id", j.id))
@@ -142,8 +159,8 @@ func Drain(c *Client, grace, hardGrace time.Duration, log *slog.Logger) error {
 	defer hcancel()
 	if err := c.StopAndCancel(hctx); err != nil {
 		log.ErrorContext(bg, "queue: jobs did not return after the hard cancel",
-			slog.Duration("hard_grace", hardGrace), slog.String("err", err.Error()))
-		return fmt.Errorf("queue: stop and cancel: %w", err)
+			slog.String("hard_grace", hardGrace.String()), slog.String("err", err.Error()))
+		return errors.Join(stopErr, fmt.Errorf("queue: stop and cancel: %w", err))
 	}
-	return nil
+	return stopErr
 }

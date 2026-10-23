@@ -109,6 +109,7 @@ func NewWorkerClient(pool *pgxpool.Pool, reg *Registry, o Options) (*Client, err
 	if err != nil {
 		return nil, fmt.Errorf("queue: %w", err)
 	}
+	f.zero(reg.Kinds()) // the series exist at 0 from the start, so increase() sees the first cancel
 	trackers.Store(c, f)
 	return c, nil
 }

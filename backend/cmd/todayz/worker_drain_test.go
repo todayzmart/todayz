@@ -174,11 +174,21 @@ func TestWorkerSIGTERMLetsJobFinish(t *testing.T) {
 
 	var rm metricdata.ResourceMetrics
 	require.NoError(t, reader.Collect(context.Background(), &rm))
+	hard := map[string]int64{}
 	for _, sm := range rm.ScopeMetrics {
 		for _, md := range sm.Metrics {
-			require.NotEqual(t, queue.HardCancelledMetric, md.Name, "tz_job_hard_cancelled_total stays 0")
+			if md.Name != queue.HardCancelledMetric {
+				continue
+			}
+			sum, ok := md.Data.(metricdata.Sum[int64])
+			require.True(t, ok)
+			for _, dp := range sum.DataPoints {
+				kind, _ := dp.Attributes.Value("kind")
+				hard[kind.AsString()] += dp.Value
+			}
 		}
 	}
+	require.Equal(t, map[string]int64{"test.long": 0}, hard, "tz_job_hard_cancelled_total exists at 0 and stays 0")
 	out := logs.String()
 	require.NotContains(t, out, `"level":"ERROR"`)
 	require.Contains(t, out, "worker drained: river stopped")
