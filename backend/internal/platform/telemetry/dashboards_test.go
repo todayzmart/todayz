@@ -11,6 +11,8 @@ import (
 var (
 	metricName    = regexp.MustCompile(`\btz_[a-z0-9_]+`)
 	metricLiteral = regexp.MustCompile(`"(tz_[a-z0-9_]+)"`)
+	// metricPrefixed is a name built as telemetry.MetricPrefix + "job_runs_total".
+	metricPrefixed = regexp.MustCompile(`MetricPrefix \+ "([a-z0-9_]+)"`)
 )
 
 // TestDashboardsUseRegisteredMetrics keeps infra/grafana/dashboards honest: every
@@ -23,10 +25,17 @@ func TestDashboardsUseRegisteredMetrics(t *testing.T) {
 		t.Skip("infra/grafana/dashboards not present (backend built on its own)")
 	}
 
+	// This package registers the platform metrics; the jobs platform (W1-11)
+	// registers tz_job_* in platform/jobs and tz_job_hard_cancelled_total in
+	// platform/queue, both as MetricPrefix + "…".
 	known := map[string]bool{}
-	srcs, err := filepath.Glob("*.go")
-	if err != nil {
-		t.Fatal(err)
+	var srcs []string
+	for _, dir := range []string{".", filepath.Join("..", "jobs"), filepath.Join("..", "queue")} {
+		fs, err := filepath.Glob(filepath.Join(dir, "*.go"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		srcs = append(srcs, fs...)
 	}
 	for _, f := range srcs {
 		if strings.HasSuffix(f, "_test.go") {
@@ -38,6 +47,14 @@ func TestDashboardsUseRegisteredMetrics(t *testing.T) {
 		}
 		for _, m := range metricLiteral.FindAllSubmatch(b, -1) {
 			known[string(m[1])] = true
+		}
+		for _, m := range metricPrefixed.FindAllSubmatch(b, -1) {
+			known[MetricPrefix+string(m[1])] = true
+		}
+	}
+	for _, name := range []string{"tz_job_runs_total", "tz_job_hard_cancelled_total"} {
+		if !known[name] {
+			t.Fatalf("the scan did not find %s in platform/jobs or platform/queue; it is broken", name)
 		}
 	}
 	if len(known) < 10 {

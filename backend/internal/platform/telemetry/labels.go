@@ -22,6 +22,9 @@ var AllowedLabels = map[string]bool{
 	"channel": true, "provider": true, "outcome": true, "feature": true, "model": true,
 	"source": true, "city": true, "category": true, "lang": true, "platform": true,
 	"conn": true, "app_version": true, "reason": true,
+	// status is the job run status on tz_job_runs_total (05 §8, W1-11): a
+	// fixed set, JobStatuses.
+	"status": true,
 }
 
 // EventDropReasons are the fixed values of the `reason` label on tz_events_dropped_total
@@ -30,6 +33,10 @@ var EventDropReasons = []string{"unknown_event", "server_event", "invalid_props"
 
 // JobClasses are the fixed job classes of 05 §2.1 and W1-11.
 var JobClasses = []string{"timer", "money", "notify", "marketing", "ai", "rollup", "maintenance"}
+
+// JobStatuses are the fixed job run statuses of 03 §9 and 05 §8 (W1-11). The
+// jobs package keeps its Statuses() equal to it (TestLabelSetsMatchTelemetry).
+var JobStatuses = []string{"running", "succeeded", "failed", "cancelled", "skipped", "discarded", "missed", "yielded"}
 
 // Other is the value every guarded label takes when its input is not known.
 const Other = "other"
@@ -43,6 +50,7 @@ var (
 		"method":       set("GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "other"),
 		"status_class": set("1xx", "2xx", "3xx", "4xx", "5xx"),
 		"class":        set(JobClasses...),
+		"status":       set(JobStatuses...),
 		"outcome":      set("ok", "error", "success", "failure", "retry", "cancelled", "discarded", "timeout", "other"),
 		"role":         set("anonymous", "customer", "staff", "admin", "owner", "manager", "cashier", "other"),
 		"service":      set("api", "worker", "other"),

@@ -7,6 +7,8 @@ import (
 	"sort"
 	"sync"
 	"time"
+
+	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
 // Registry holds the declared kinds. The worker builds one, every domain
@@ -52,6 +54,17 @@ func (r *Registry) define(k Kind) error {
 	}
 	r.kinds[k.Name] = &entry{kind: k, sched: sched}
 	r.order = append(r.order, k.Name)
+	// The kind and its queue become allowed values of the kind and queue
+	// labels (05 §2.1), so W1-07's metrics (tz_queue_* and any other series
+	// labelled by kind or queue through telemetry.LabelValue) show them
+	// instead of "other". Values are only ever added: a registry built in a
+	// test leaves its names behind, which is harmless.
+	q := k.Queue
+	if q == "" {
+		q = DefaultQueue
+	}
+	telemetry.RegisterLabelValues("kind", k.Name)
+	telemetry.RegisterLabelValues("queue", q)
 	return nil
 }
 

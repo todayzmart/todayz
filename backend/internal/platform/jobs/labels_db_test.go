@@ -8,12 +8,14 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/attribute"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/queue"
 	"github.com/todayz/backend/internal/platform/settings"
+	"github.com/todayz/backend/internal/platform/telemetry"
 	"github.com/todayz/backend/internal/testkit"
 )
 
@@ -45,7 +47,9 @@ func TestEveryKindCarriesOnlyAllowedLabels(t *testing.T) {
 	}
 
 	reader := sdkmetric.NewManualReader()
-	mp := sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
+	// The production view (telemetry.Setup installs it): histograms are
+	// exponential, so Prometheus stores them as native histograms.
+	mp := sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader), sdkmetric.WithView(telemetry.ExponentialView()))
 	tp := sdktrace.NewTracerProvider()
 	run, err := NewRunner(reg, RunnerOptions{Pool: db.Pool, Clock: clk, Log: quiet(), MeterProvider: mp, TracerProvider: tp})
 	require.NoError(t, err)
@@ -124,6 +128,31 @@ func TestEveryKindCarriesOnlyAllowedLabels(t *testing.T) {
 	}
 	for _, n := range reg.Names() {
 		require.True(t, seen[n], "tz_job_runs_total has no series for %s", n)
+	}
+
+	// W1-07's allow-list (05 §2.1) agrees: every key is allowed, every value
+	// is a registered one, and the duration and lateness histograms are
+	// exponential under the production view.
+	var rm metricdata.ResourceMetrics
+	require.NoError(t, reader.Collect(ctx, &rm))
+	require.Empty(t, telemetry.CheckResourceMetrics(&rm))
+	exp := map[string]bool{}
+	for _, sm := range rm.ScopeMetrics {
+		for _, m := range sm.Metrics {
+			if _, ok := m.Data.(metricdata.ExponentialHistogram[float64]); ok {
+				exp[m.Name] = true
+			}
+		}
+	}
+	require.True(t, exp[MetricDuration], "%s is not an exponential histogram", MetricDuration)
+	require.True(t, exp[MetricLateness], "%s is not an exponential histogram", MetricLateness)
+	for m, sets := range series {
+		for _, set := range sets {
+			for _, kv := range set.ToSlice() {
+				v := kv.Value.AsString()
+				require.Equal(t, v, telemetry.LabelValue(string(kv.Key), v), "%s %s=%q is not a registered label value", m, kv.Key, v)
+			}
+		}
 	}
 	// The scheduled kinds carry tz_job_missed; event kinds do not (the
 	// alerts tell them apart with "unless on (kind) tz_job_missed").

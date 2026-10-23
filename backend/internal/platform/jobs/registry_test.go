@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
 func noop(context.Context, Run) (Result, error) { return Result{}, nil }
@@ -111,6 +113,33 @@ func TestRegistryLookupsAndLabels(t *testing.T) {
 	require.Equal(t, []string{"orders_accept_by", "rollup_month", "rollup_today"}, l.Kinds)
 	require.Equal(t, []string{"timer", "money", "notify", "marketing", "ai", "rollup", "maintenance"}, l.Classes)
 	require.Equal(t, []string{"bulk", "default"}, l.Queues)
+
+	// Define hands the kind and queue values to W1-07's label allow-list, so
+	// telemetry.LabelValue keeps them instead of folding them into "other".
+	for _, n := range l.Kinds {
+		require.Equal(t, n, telemetry.LabelValue("kind", n))
+	}
+	for _, q := range l.Queues {
+		require.Equal(t, q, telemetry.LabelValue("queue", q))
+	}
+	require.Equal(t, telemetry.Other, telemetry.LabelValue("kind", "never_defined_kind"))
+}
+
+// TestLabelSetsMatchTelemetry keeps the fixed class and status sets equal to
+// the ones W1-07's allow-list holds (telemetry.JobClasses, JobStatuses).
+func TestLabelSetsMatchTelemetry(t *testing.T) {
+	var classes, statuses []string
+	for _, c := range Classes() {
+		classes = append(classes, string(c))
+	}
+	for _, s := range Statuses() {
+		statuses = append(statuses, string(s))
+	}
+	require.ElementsMatch(t, telemetry.JobClasses, classes)
+	require.ElementsMatch(t, telemetry.JobStatuses, statuses)
+	for _, s := range statuses {
+		require.Equal(t, s, telemetry.LabelValue("status", s))
+	}
 }
 
 func TestPeriodKeys(t *testing.T) {
