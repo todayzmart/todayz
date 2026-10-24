@@ -227,7 +227,7 @@ func percent(memo *string) string {
 	if frac == 0 {
 		return strconv.Itoa(whole)
 	}
-	return strings.TrimRight(strconv.Itoa(whole)+"."+strconv.Itoa(100+frac)[1:], "0")
+	return strings.TrimRight(strconv.Itoa(whole)+"."+strconv.Itoa(100 + frac)[1:], "0")
 }
 
 // CreditAccount is GET {B}/credit-account: the business's store credit

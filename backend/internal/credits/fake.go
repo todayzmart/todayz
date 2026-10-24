@@ -52,12 +52,12 @@ type fakeHold struct {
 }
 
 type fakeLot struct {
-	ID, Customer         ids.ID
-	Source               TxKind
-	Original             int
-	Remaining, Held      int
-	EarnedAt, ExpiresAt  time.Time
-	Expired              bool
+	ID, Customer        ids.ID
+	Source              TxKind
+	Original            int
+	Remaining, Held     int
+	EarnedAt, ExpiresAt time.Time
+	Expired             bool
 	remDelta, heldDelta int // Σ of the lot's consumptions (invariant 8)
 }
 
