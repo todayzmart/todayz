@@ -83,11 +83,9 @@ func registerreferrals(r *Registry, d Deps) {
 			if err != nil {
 				return platformjobs.Result{}, err
 			}
+			// An error is one referral's: the others were still swept.
 			out, err := s.Sweep(ctx)
-			if err != nil {
-				return platformjobs.Result{}, err
-			}
-			return platformjobs.Result{Summary: out}, nil
+			return platformjobs.Result{Summary: out}, err
 		},
 	})
 }

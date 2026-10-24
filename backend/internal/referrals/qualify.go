@@ -157,10 +157,11 @@ func (s *Service) tryQualifyShop(ctx context.Context, row referralsdb.Referral) 
 // void, a reversed order; 01 §7, D-08), inside the reversal's transaction and
 // after its credit postings: ledger accounts first, the referral last, the
 // order a reward posting takes them in (D-169). A
-// qualification whose rewards have not posted goes back to pending; one with
-// a posted side keeps its rewards and raises referral.reversed_after_reward;
-// a side still unposted then is paid later all the same (01 §7: a reward
-// stays once earned).
+// qualification whose rewards have not posted goes back to pending, and a
+// side marked done without a posting (void, zero credits) is cleared with it:
+// posted means a ledger transaction. One with a posted side keeps its rewards
+// and raises referral.reversed_after_reward; a side still unposted then is
+// paid later all the same (01 §7: a reward stays once earned).
 // A counted shop sale of a still-pending referral is uncounted.
 func (s *Service) OnPurchaseReversed(ctx context.Context, refType string, refID ids.ID) error {
 	if s.db == nil {
@@ -174,7 +175,10 @@ func (s *Service) OnPurchaseReversed(ctx context.Context, refType string, refID 
 			return err
 		}
 		for _, row := range rows {
-			if row.ReferrerRewardedAt == nil && row.RefereeRewardedAt == nil {
+			// Posted means a ledger transaction, not a side marked done
+			// without one (a deleted beneficiary, zero credits): 01 §7 keeps
+			// only a reward that posted (D-169).
+			if !row.ReferrerTransactionID.Valid && !row.RefereeTransactionID.Valid {
 				if err := q.RevertQualified(ctx, referralsdb.RevertQualifiedParams{Now: now, ID: row.ID}); err != nil {
 					return err
 				}

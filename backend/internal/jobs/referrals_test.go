@@ -48,12 +48,14 @@ type refEnv struct {
 
 // flakyPoster fails the next fail postings before they post, as a ledger
 // that is down, and posts then fails with a real SQL error in the posting's
-// own transaction the next sqlFail[side] postings of a side.
+// own transaction the next sqlFail[side] postings of a side. before[side]
+// runs once, outside the posting's transaction, just before a side posts.
 type flakyPoster struct {
 	p       credits.Poster
 	mu      sync.Mutex
 	fail    int
 	sqlFail map[string]int
+	before  map[string]func()
 }
 
 func (f *flakyPoster) Post(ctx context.Context, p credits.Posting) (credits.Posted, error) {
@@ -67,9 +69,14 @@ func (f *flakyPoster) Post(ctx context.Context, p credits.Posting) (credits.Post
 	if broken {
 		f.sqlFail[side]--
 	}
+	hook := f.before[side]
+	delete(f.before, side)
 	f.mu.Unlock()
 	if down {
 		return credits.Posted{}, errors.New("ledger down")
+	}
+	if hook != nil {
+		hook()
 	}
 	out, err := f.p.Post(ctx, p)
 	if err != nil || !broken {
@@ -123,7 +130,7 @@ func newRefEnv(t *testing.T, flaky bool) *refEnv {
 	e.jobs = platformjobs.NewFake(reg, e.clk)
 	h, err := pii.NewHasher(make([]byte, pii.KeySize))
 	require.NoError(t, err)
-	e.flaky = &flakyPoster{p: e.cs, sqlFail: map[string]int{}}
+	e.flaky = &flakyPoster{p: e.cs, sqlFail: map[string]int{}, before: map[string]func(){}}
 	e.svc, err = referrals.New(referrals.Deps{DB: e.pool, Clock: e.clk, Settings: e.cache, Hasher: h, Ledger: ReferralsLedger(e.flaky), Jobs: e.jobs,
 		PublicURL: "https://api.todayz.localhost", CustomerApp: "https://app.todayz.localhost", BusinessApp: "https://business.todayz.localhost"})
 	require.NoError(t, err)
@@ -547,7 +554,7 @@ func TestReferralRewardStoreRefusedDB(t *testing.T) {
 	require.Equal(t, 1, e.balance(credits.StoreCredit, store), "only the earlier posting")
 	require.Equal(t, r.refereeCr, e.balance(credits.CustomerWallet, referee))
 	require.Equal(t, 1, e.count(`SELECT count(*) FROM risk_flags WHERE rule = 'referral.reward_refused' AND subject_id = $1
-	  AND details->>'side' = 'referrer' AND status = 'open'`, ids.UUID(ref)))
+	  AND details->'sides' ? 'referrer' AND status = 'open'`, ids.UUID(ref)))
 	require.Zero(t, e.sweep(time.Hour))
 	require.Equal(t, 1, e.balance(credits.StoreCredit, store))
 }
@@ -640,4 +647,180 @@ func TestReferralRewardConcurrentWithReferrersOrderDB(t *testing.T) {
 	}
 	require.Positive(t, captured.Load(), "the referrer's orders spent credits")
 	require.Equal(t, 1_000+total-int(captured.Load())+int(cashback.Load()), e.balance(credits.CustomerWallet, referrer))
+}
+
+// review: one side posted and the other waiting (a store referrer with no
+// live store) when the purchase is reversed. The posted reward stays, so the
+// referral stays qualified with one flag (01 §7, D-166), and the waiting
+// side is still paid once the store is live.
+func TestReferralReversedWithASideWaitingDB(t *testing.T) {
+	e := newRefEnv(t, false)
+	store, code := e.shop()
+	e.exec(`UPDATE stores SET status = 'paused' WHERE id = $1`, ids.UUID(store))
+	referee, ref := e.claim(code)
+	o := e.buy(referee)
+	e.runJobs()
+	r := e.referral(ref)
+	require.Equal(t, "qualified", r.status)
+	require.False(t, r.referrerTx.Valid, "the store side waits")
+	require.True(t, r.refereeTx.Valid)
+
+	require.NoError(t, e.svc.OnPurchaseReversed(e.ctx, referrals.RefOrder, o.RefID))
+	require.Equal(t, "qualified", e.referral(ref).status)
+	require.Equal(t, 1, e.count(`SELECT count(*) FROM risk_flags WHERE rule = 'referral.reversed_after_reward' AND subject_id = $1`, ids.UUID(ref)))
+
+	e.exec(`UPDATE stores SET status = 'live' WHERE id = $1`, ids.UUID(store))
+	require.EqualValues(t, 1, e.sweep(time.Hour))
+	r = e.referral(ref)
+	require.Equal(t, "rewarded", r.status)
+	require.Equal(t, 2, e.rewardTxs(ref))
+	require.Equal(t, r.referrerCr, e.balance(credits.StoreCredit, store))
+	require.Equal(t, r.refereeCr, e.balance(credits.CustomerWallet, referee))
+	require.Equal(t, 1, e.count(`SELECT count(*) FROM risk_flags WHERE rule = 'referral.reversed_after_reward' AND subject_id = $1`, ids.UUID(ref)))
+}
+
+// review: a side marked done without a posting (a deleted referrer) is not a
+// posted reward. Reversed while the other side waits, the qualification is
+// revoked, the done mark cleared, and nobody is paid for the reversed sale.
+func TestReferralReversedWithAVoidSideDB(t *testing.T) {
+	e := newRefEnv(t, true)
+	referrer, code := e.customer(refNow.Add(-30 * 24 * time.Hour))
+	referee, ref := e.claim(code)
+	e.exec(`UPDATE users SET status = 'deleted', deleted_at = $2 WHERE id = $1`, ids.UUID(referrer), refNow)
+	e.flaky.fail = 1 // the referee's posting (the referrer's is void, no posting)
+	o := e.buy(referee)
+	e.runJobs()
+	require.Equal(t, 1, e.count(`SELECT count(*) FROM referrals WHERE id = $1 AND status = 'qualified'
+	  AND referrer_rewarded_at IS NOT NULL AND referrer_transaction_id IS NULL AND referee_rewarded_at IS NULL`, ids.UUID(ref)))
+
+	require.NoError(t, e.svc.OnPurchaseReversed(e.ctx, referrals.RefOrder, o.RefID))
+	require.Equal(t, 1, e.count(`SELECT count(*) FROM referrals WHERE id = $1 AND status = 'pending'
+	  AND referrer_rewarded_at IS NULL AND referee_rewarded_at IS NULL AND next_attempt_at IS NULL`, ids.UUID(ref)))
+	require.Zero(t, e.count(`SELECT count(*) FROM risk_flags WHERE subject_id = $1`, ids.UUID(ref)))
+	require.Zero(t, e.sweep(time.Hour))
+	require.Zero(t, e.rewardTxs(ref))
+	require.Zero(t, e.balance(credits.CustomerWallet, referee))
+}
+
+// review: the job and the sweep post the same referral at the same moment.
+// Each side posts exactly once.
+func TestReferralRewardJobAndSweepRaceDB(t *testing.T) {
+	e := newRefEnv(t, false)
+	referrer, code := e.customer(refNow.Add(-30 * 24 * time.Hour))
+	total := 0
+	for i := range 10 {
+		referee, ref := e.claim(code)
+		e.buy(referee)
+		var wg sync.WaitGroup
+		start := make(chan struct{})
+		var runs []platformjobs.FakeRun
+		var sweepErr error
+		wg.Add(2)
+		go func() { defer wg.Done(); <-start; runs = e.jobs.RunDue(e.ctx) }()
+		go func() { defer wg.Done(); <-start; _, sweepErr = e.svc.Sweep(e.ctx) }()
+		close(start)
+		wg.Wait()
+		require.NoError(t, sweepErr, "round %d", i)
+		for _, r := range runs {
+			require.Equal(t, platformjobs.StatusSucceeded, r.Status, "round %d: %v", i, r.Err)
+		}
+		r := e.referral(ref)
+		require.Equal(t, "rewarded", r.status, "round %d", i)
+		require.Equal(t, 2, e.rewardTxs(ref), "round %d", i)
+		require.Equal(t, r.refereeCr, e.balance(credits.CustomerWallet, referee))
+		total += r.referrerCr
+	}
+	require.Equal(t, total, e.balance(credits.CustomerWallet, referrer))
+}
+
+// review: the beneficiary is deleted (wallet forfeited, user marked deleted,
+// one transaction) after the side read it and before the ledger locked the
+// wallet. The recheck under the lock rolls the posting back and the retry
+// voids the side, so no lot lands in a forfeited wallet.
+func TestReferralRewardBeneficiaryDeletedWhilePostingDB(t *testing.T) {
+	e := newRefEnv(t, true)
+	referrer, code := e.customer(refNow.Add(-30 * 24 * time.Hour))
+	referee, ref := e.claim(code)
+	e.grant(referee, 5)
+	e.flaky.before[referrals.SideReferee] = func() {
+		require.NoError(t, e.pool.InTx(e.ctx, func(ctx context.Context) error {
+			if err := e.cs.OnAccountDelete(ctx, referee); err != nil {
+				return err
+			}
+			tx, _ := db.TxFrom(ctx)
+			_, err := tx.Exec(ctx, `UPDATE users SET status = 'deleted', deleted_at = $2 WHERE id = $1`, ids.UUID(referee), refNow)
+			return err
+		}))
+	}
+	e.buy(referee)
+	e.runJobs()
+
+	r := e.referral(ref)
+	require.Equal(t, "rewarded", r.status)
+	require.True(t, r.referrerTx.Valid)
+	require.False(t, r.refereeTx.Valid, "the deleted referee's side is void")
+	require.Zero(t, e.count(`SELECT count(*) FROM ledger_transactions WHERE idempotency_key = $1`, referrals.RewardKey(ref, referrals.SideReferee)))
+	require.Zero(t, e.balance(credits.CustomerWallet, referee))
+	require.Zero(t, e.count(`SELECT coalesce(sum(remaining), 0)::int FROM credit_lots WHERE customer_id = $1`, ids.UUID(referee)))
+	require.Equal(t, r.referrerCr, e.balance(credits.CustomerWallet, referrer))
+}
+
+// review: a referral whose pass errors (here its refused flag cannot be
+// written) does not stop the sweep. The others post, the error comes back
+// at the end, and the failing referral backs off instead of heading every
+// batch.
+func TestRewardSweepGoesOnAfterOneFailsDB(t *testing.T) {
+	e := newRefEnv(t, false)
+	_, code := e.customer(refNow.Add(-30 * 24 * time.Hour))
+	bad, badRef := e.claim(code)
+	_, err := e.cs.Post(e.ctx, credits.Posting{Kind: credits.TxReferralReward, RefType: "referral", RefID: badRef,
+		IdempotencyKey: referrals.RewardKey(badRef, referrals.SideReferee),
+		Legs:           []credits.Leg{{Account: credits.Account{Kind: credits.PlatformMarketing}, Amount: -1}, {Account: credits.Account{Kind: credits.CustomerWallet, Owner: bad}, Amount: 1}}})
+	require.NoError(t, err)
+	e.exec(`CREATE FUNCTION tz_test_no_flag() RETURNS trigger LANGUAGE plpgsql AS $$
+	  BEGIN IF NEW.subject_id = '` + ids.UUID(badRef).String() + `'::uuid THEN RAISE EXCEPTION 'test: no flag'; END IF; RETURN NEW; END $$`)
+	e.exec(`CREATE TRIGGER tz_test_no_flag BEFORE INSERT ON risk_flags FOR EACH ROW EXECUTE FUNCTION tz_test_no_flag()`)
+	e.buy(bad)
+	good, goodRef := e.claim(code)
+	e.buy(good)
+
+	e.clk.Advance(time.Minute)
+	out, err := e.svc.Sweep(e.ctx)
+	require.Error(t, err)
+	require.EqualValues(t, 1, out["rewarded"])
+	require.EqualValues(t, 1, out["waiting"])
+	require.Equal(t, "rewarded", e.referral(goodRef).status)
+	require.Equal(t, "qualified", e.referral(badRef).status)
+	require.Equal(t, 1, e.count(`SELECT attempts FROM referrals WHERE id = $1`, ids.UUID(badRef)))
+	require.Equal(t, 1, e.count(`SELECT count(*) FROM referrals WHERE id = $1 AND next_attempt_at > $2`, ids.UUID(badRef), e.clk.Now()))
+
+	e.clk.Advance(time.Minute)
+	out, err = e.svc.Sweep(e.ctx)
+	require.NoError(t, err, "not due again yet")
+	require.Zero(t, out["rewarded"]+out["waiting"])
+}
+
+// review: one referral.reward_refused flag per referral. A retried job adds
+// nothing; a second refused side is added to the same flag.
+func TestReferralRewardRefusedFlagOnceDB(t *testing.T) {
+	e := newRefEnv(t, false)
+	referrer, code := e.customer(refNow.Add(-30 * 24 * time.Hour))
+	referee, ref := e.claim(code)
+	for side, owner := range map[string]ids.ID{referrals.SideReferrer: referrer, referrals.SideReferee: referee} {
+		_, err := e.cs.Post(e.ctx, credits.Posting{Kind: credits.TxReferralReward, RefType: "referral", RefID: ref,
+			IdempotencyKey: referrals.RewardKey(ref, side),
+			Legs:           []credits.Leg{{Account: credits.Account{Kind: credits.PlatformMarketing}, Amount: -1}, {Account: credits.Account{Kind: credits.CustomerWallet, Owner: owner}, Amount: 1}}})
+		require.NoError(t, err)
+	}
+	e.buy(referee)
+	e.runJobs()
+	for range 2 { // the job retried, and run by hand
+		_, err := e.jobs.RunEvent(e.ctx, referrals.KindReward, referrals.RewardArgs{ReferralID: ref})
+		require.NoError(t, err)
+	}
+	require.Equal(t, 1, e.count(`SELECT count(*) FROM risk_flags WHERE rule = 'referral.reward_refused' AND subject_id = $1`, ids.UUID(ref)))
+	var sides string
+	e.scan(`SELECT details->>'sides' FROM risk_flags WHERE rule = 'referral.reward_refused' AND subject_id = $1`, []any{ids.UUID(ref)}, &sides)
+	require.JSONEq(t, `["referrer", "referee"]`, sides)
+	require.Equal(t, "qualified", e.referral(ref).status)
 }

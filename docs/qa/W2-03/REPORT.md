@@ -225,3 +225,30 @@ Questions (the conservative reading is what is built):
 - **A store referrer with no live store backs off.** Its reward can therefore lag up to 6 h after the store goes live. Excluding it from the batch by query, as for a blocked referrer, would need a join on stores. The backoff was the simpler choice the review allowed.
 - **Reversal while one side waits.** 01 §7 says "if it has posted, the reward stays". It is read as "if either side has posted", so the waiting side is still paid later and a flag is raised. The other reading would void the waiting side.
 - **Without the job queue** (`Deps.Jobs` nil, only in tests), the sweep posts within about 10 min. The app always passes the enqueuer.
+
+## Second review fixes (after bb557e6)
+
+**1. Posted means a ledger transaction.** `OnPurchaseReversed` and `RevertQualified` now test `referrer_transaction_id`/`referee_transaction_id IS NULL`, not `*_rewarded_at`. The revert also clears both `*_rewarded_at`, so a side marked done without a posting (a deleted beneficiary, zero credits) is undone with the qualification.
+
+**2. Tests** (`backend/internal/jobs/referrals_test.go`, real ledger):
+- `TestReferralReversedWithASideWaitingDB`: the store side waits (store paused) and the referee side posts, then the purchase is reversed. The referral stays qualified with one `reversed_after_reward` flag. Once the store is live the sweep pays the store side, the final status is `rewarded` with 2 reward transactions, and there is still one flag.
+- `TestReferralReversedWithAVoidSideDB`: the referrer is deleted (void, marked done, no transaction) and the referee side waits. After the reversal the referral is `pending` with both `*_rewarded_at` cleared and no flag. The sweep posts nothing, and the referee's balance is 0.
+- `TestReferralRewardJobAndSweepRaceDB`: the `referral_reward` job and `Sweep` run at the same moment on the same referral, 10 rounds. There are no errors, exactly 2 reward transactions per referral, and the balances are exact.
+
+**3. Beneficiary recheck under the ledger lock.** After `PostReward` (which holds the wallet lock), `postSide` reads the beneficiary again. If it is no longer payable as read, the side rolls back (`errBeneficiaryChanged`) and runs once more, which voids or waits it.
+- `TestReferralRewardBeneficiaryDeletedWhilePostingDB` deletes the referee in a deletion transaction (`credits.OnAccountDelete` plus `users.status = 'deleted'`) between the read and the posting. Result: no ledger transaction for that key, no lot, a zero balance, and the side void. The other side is paid.
+- Mutation check: with the recheck disabled, this test fails ("the deleted referee's side is void").
+
+**4. The sweep goes on.** An error on one referral is logged at error level and counted (`error`). That referral's attempt is recorded with the backoff, so it no longer heads the batch, and the sweep continues; the first error is returned at the end. The job handler returns the summary together with the error.
+- `TestRewardSweepGoesOnAfterOneFailsDB`: a trigger makes one refused referral's flag insert fail. The sweep returns an error, the other referral is rewarded, and the failing one has `attempts = 1` and a future `next_attempt_at`. A sweep 1 minute later has no error and nothing due.
+
+**5. Metric.** `tz_referral_reward_failed_total` gains `reason="waiting"` (a store referrer with no live store) and `reason="blocked"` (a blocked customer referrer). The runbook line is updated, and also says which reasons are expected.
+
+**6. One refused flag.** `flagRefused` locks the referral and then any open or confirmed `referral.reward_refused` flag for it. With no flag, it inserts one with `details: {kind, sides: [side]}`. When the side is already listed it does nothing. Otherwise it appends the side.
+- `TestReferralRewardRefusedFlagOnceDB`: both sides are refused, and the job is run 2 more times. There is 1 flag, with `sides` `["referrer", "referee"]`.
+- `TestReferralRewardStoreRefusedDB` now reads `details->'sides'`.
+
+Questions (the conservative reading is what is built):
+- **Flag shape.** The review asked to skip an insert when an open flag with the same rule *and side* exists, and for both sides refused not to raise two. These cannot both hold with one flag per side, so there is one flag per referral and rule, and its `details.sides` lists the refused sides. Admin sees one item per referral. Is that the intended shape?
+- **A `rewarded` referral with no postings.** If both sides were marked done without a posting (both void or zero credits), the referral is `rewarded`. A reversal now sends it back to `pending`. Nothing was paid, so nothing is lost, but its status changes after it showed as rewarded.
+- **Repeated reversals.** A purchase reversed twice (two partial refunds) raises `reversed_after_reward` each time. This is unchanged from before and was not in the review.

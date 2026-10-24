@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"strconv"
 	"sync"
 	"time"
@@ -63,15 +64,18 @@ func rewardBackoff(attempts int32) time.Duration {
 // refused for good (D-169).
 const ruleRewardRefused = "referral.reward_refused"
 
-// Reasons in tz_referral_reward_failed_total.
+// Reasons in tz_referral_reward_failed_total: one per side a pass left
+// unposted.
 const (
 	failLedger  = "ledger_error" // the ledger errored or did not post; retried with the backoff
 	failRefused = "refused"      // the ledger refused for good; parked until a person clears the flag
 	failError   = "error"        // any other error in the side's transaction; retried with the backoff
+	failWaiting = "waiting"      // the beneficiary is not payable yet (no live store); retried with the backoff
+	failBlocked = "blocked"      // a blocked customer referrer (D-168); retried once unblocked
 )
 
 func init() {
-	telemetry.RegisterLabelValues("reason", failLedger, failRefused, failError)
+	telemetry.RegisterLabelValues("reason", failLedger, failRefused, failError, failWaiting, failBlocked)
 }
 
 var (
@@ -193,6 +197,11 @@ const (
 // the unlocked read and the lock (reversed, or posted by another pass).
 var errStale = errors.New("referrals: referral changed while posting")
 
+// errBeneficiaryChanged rolls a side's transaction back when the beneficiary
+// changed between the first read and the ledger lock (a customer deleted or
+// blocked meanwhile); the pass tries the side once more and sees the change.
+var errBeneficiaryChanged = errors.New("referrals: beneficiary changed while posting")
+
 // ledgerError marks a ledger failure (an error, or nothing posted).
 type ledgerError struct{ err error }
 
@@ -203,8 +212,14 @@ var errNotPosted = errors.New("the ledger did not post")
 
 // postSide posts one side of a qualified referral in a transaction of its
 // own. The referral is read unlocked, the ledger posts (one lock call on its
-// accounts), then the referral is locked and checked again: if it changed,
-// the whole transaction, posting included, rolls back.
+// accounts), the beneficiary is read again under that lock, then the
+// referral is locked and checked again: if either changed, the whole
+// transaction, posting included, rolls back.
+//
+// The beneficiary recheck closes a race with account deletion: deletion
+// forfeits the wallet under the same wallet lock, in the transaction that
+// marks the user deleted. If it committed first, the recheck sees deleted;
+// if it comes after, it forfeits the lot this posting made.
 func (s *Service) postSide(ctx context.Context, id pgtype.UUID, name string) (int, error) {
 	out := sideNothing
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
@@ -246,6 +261,13 @@ func (s *Service) postSide(ctx context.Context, id pgtype.UUID, name string) (in
 				return ledgerError{err}
 			case !posted:
 				return ledgerError{errNotPosted}
+			}
+			again, pay2, err := s.beneficiary(ctx, name, sd.typ, sd.id)
+			if err != nil {
+				return err
+			}
+			if pay2 != payPost || again != to {
+				return errBeneficiaryChanged
 			}
 		}
 		row, err = q.LockReferral(ctx, id)
@@ -300,6 +322,9 @@ func (s *Service) PostRewards(ctx context.Context, referralID ids.ID) (RewardRes
 	backoff, unposted := false, false
 	for _, name := range []string{SideReferrer, SideReferee} {
 		out, err := s.postSide(ctx, id, name)
+		if errors.Is(err, errBeneficiaryChanged) {
+			out, err = s.postSide(ctx, id, name)
+		}
 		switch {
 		case errors.Is(err, ErrRewardRefused):
 			countFailed(ctx, failRefused)
@@ -320,8 +345,10 @@ func (s *Service) PostRewards(ctx context.Context, referralID ids.ID) (RewardRes
 		case out == sidePosted:
 			res.Posted++
 		case out == sideWait:
+			countFailed(ctx, failWaiting)
 			unposted, backoff = true, true
 		case out == sideBlocked:
+			countFailed(ctx, failBlocked)
 			unposted = true
 		}
 	}
@@ -337,28 +364,68 @@ func (s *Service) PostRewards(ctx context.Context, referralID ids.ID) (RewardRes
 		return res, nil
 	}
 	res.Waiting = true
+	return res, s.recordAttempt(ctx, row, backoff)
+}
+
+// recordAttempt records a pass that left a qualified referral with a side
+// unposted: due again after the backoff, or at once (a blocked referrer and
+// a refused reward are kept out of the batch by their own condition).
+func (s *Service) recordAttempt(ctx context.Context, row referralsdb.Referral, backoff bool) error {
+	if row.Status != statusQualified {
+		return nil
+	}
 	now := s.now()
 	next := now
 	if backoff {
 		next = now.Add(rewardBackoff(row.Attempts))
 	}
-	return res, s.q(ctx).RecordRewardAttempt(ctx, referralsdb.RecordRewardAttemptParams{Next: next, Now: now, ID: id})
+	return s.q(ctx).RecordRewardAttempt(ctx, referralsdb.RecordRewardAttemptParams{Next: next, Now: now, ID: row.ID})
+}
+
+// refusedDetails is a referral.reward_refused flag's details.
+type refusedDetails struct {
+	Kind  string   `json:"kind"`
+	Sides []string `json:"sides"`
 }
 
 // flagRefused raises referral.reward_refused for a side the ledger refused
 // for good (D-169), in a transaction of its own (the side's rolled back).
-// The sweep skips a referral with that flag open or confirmed; a person
-// clears it once the cause is fixed.
+// A referral has one such flag while it is open or confirmed: a second
+// refused side is added to its sides, and a retried pass adds nothing. The
+// referral's row lock orders concurrent passes. The sweep skips a referral
+// with that flag open or confirmed; a person clears it once the cause is
+// fixed.
 func (s *Service) flagRefused(ctx context.Context, id pgtype.UUID, side string) error {
-	now := s.now()
-	row, err := s.q(ctx).GetReferral(ctx, id)
-	if err != nil {
-		return err
-	}
-	details, _ := json.Marshal(map[string]any{"side": side, "kind": row.Kind})
-	return s.q(ctx).InsertRiskFlag(ctx, referralsdb.InsertRiskFlagParams{
-		ID: ids.UUID(s.ids.New(now)), SubjectType: "referral", SubjectID: id,
-		Rule: ruleRewardRefused, Score: 50, Details: details, Now: now, //settings:ok a risk score
+	return s.db.InTx(ctx, func(ctx context.Context) error {
+		q, now := s.q(ctx), s.now()
+		row, err := q.LockReferral(ctx, id)
+		if err != nil {
+			return err
+		}
+		flag, err := q.LockOpenRiskFlag(ctx, referralsdb.LockOpenRiskFlagParams{SubjectID: id, Rule: ruleRewardRefused})
+		switch {
+		case db.IsNoRows(err):
+			details, _ := json.Marshal(refusedDetails{Kind: row.Kind, Sides: []string{side}})
+			return q.InsertRiskFlag(ctx, referralsdb.InsertRiskFlagParams{
+				ID: ids.UUID(s.ids.New(now)), SubjectType: "referral", SubjectID: id,
+				Rule: ruleRewardRefused, Score: 50, Details: details, Now: now, //settings:ok a risk score
+			})
+		case err != nil:
+			return err
+		}
+		var d refusedDetails
+		if err := json.Unmarshal(flag.Details, &d); err != nil {
+			return err
+		}
+		if slices.Contains(d.Sides, side) {
+			return nil
+		}
+		d.Sides = append(d.Sides, side)
+		if d.Kind == "" {
+			d.Kind = row.Kind
+		}
+		details, _ := json.Marshal(d)
+		return q.SetRiskFlagDetails(ctx, referralsdb.SetRiskFlagDetailsParams{Details: details, Now: now, ID: flag.ID})
 	})
 }
 
@@ -397,7 +464,8 @@ func (s *Service) notify(ctx context.Context, row referralsdb.Referral, to Benef
 // unposted whose backoff has passed) and qualifies shops whose verification
 // came after their last counted sale. Each referral's sides post in their
 // own transactions. waiting counts referrals a pass left with a side
-// unposted.
+// unposted. One referral's error does not stop the others: it is logged,
+// the referral backs off, and the first error is returned at the end.
 func (s *Service) Sweep(ctx context.Context) (map[string]int64, error) {
 	out := map[string]int64{"rewarded": 0, "waiting": 0, "shops_qualified": 0}
 	if s.db == nil || s.settings == nil {
@@ -407,10 +475,29 @@ func (s *Service) Sweep(ctx context.Context) (map[string]int64, error) {
 	if err != nil {
 		return out, err
 	}
+	log := telemetry.Logger(ctx)
+	var firstErr error
+	fail := func(msg string, id pgtype.UUID, err error) {
+		log.ErrorContext(ctx, msg, "referral", idOf(id).String(), "err", err)
+		if firstErr == nil {
+			firstErr = err
+		}
+	}
 	for _, id := range due {
 		res, err := s.PostRewards(ctx, idOf(id))
 		if err != nil {
-			return out, err
+			countFailed(ctx, failError)
+			fail("referrals: sweep: reward pass failed", id, err)
+			out["waiting"]++
+			// Back it off, so a referral that keeps failing cannot head
+			// every batch.
+			if row, err := s.q(ctx).GetReferral(ctx, id); err == nil {
+				err = s.recordAttempt(ctx, row, true)
+				if err != nil {
+					log.WarnContext(ctx, "referrals: sweep: attempt not recorded", "referral", idOf(id).String(), "err", err)
+				}
+			}
+			continue
 		}
 		switch {
 		case res.Done:
@@ -421,7 +508,7 @@ func (s *Service) Sweep(ctx context.Context) (map[string]int64, error) {
 	}
 	pending, err := s.q(ctx).PendingShopReferrals(ctx, sweepBatch)
 	if err != nil {
-		return out, err
+		return out, errors.Join(firstErr, err)
 	}
 	for _, id := range pending {
 		var qualifiedNow bool
@@ -438,11 +525,12 @@ func (s *Service) Sweep(ctx context.Context) (map[string]int64, error) {
 			return err
 		})
 		if err != nil {
-			return out, err
+			fail("referrals: sweep: shop qualification failed", id, err)
+			continue
 		}
 		if qualifiedNow {
 			out["shops_qualified"]++
 		}
 	}
-	return out, nil
+	return out, firstErr
 }

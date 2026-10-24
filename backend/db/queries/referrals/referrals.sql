@@ -119,6 +119,14 @@ SELECT count(*)::int AS n FROM (
   SELECT r.referee_id FROM referrals r WHERE r.device_hash = @device_hash
 ) a;
 
+-- name: LockOpenRiskFlag :one
+-- A referral's open or confirmed flag for a rule, to add to it rather than
+-- raise a second one (D-169). The caller holds the referral's row lock.
+SELECT id, details FROM risk_flags
+WHERE subject_type = 'referral' AND subject_id = @subject_id AND rule = @rule::text AND status IN ('open', 'confirmed')
+ORDER BY created_at, id LIMIT 1 FOR UPDATE;
+-- name: SetRiskFlagDetails :exec
+UPDATE risk_flags SET details = @details, updated_at = @now::timestamptz, version = version + 1 WHERE id = @id;
 -- name: InsertRiskFlag :exec
 INSERT INTO risk_flags (id, subject_type, subject_id, rule, score, details, created_at, updated_at)
 VALUES (@id, @subject_type, @subject_id, @rule, @score, @details, @now, @now);
@@ -188,9 +196,14 @@ RETURNING *;
 
 -- name: RevertQualified :exec
 -- D-08: a reversed sale revokes a qualification whose reward has not posted.
+-- "Posted" is a ledger transaction: a side marked done without one (a
+-- deleted beneficiary, zero credits) is cleared with the qualification
+-- (D-169).
 UPDATE referrals SET status = 'pending', qualifying_ref_type = NULL, qualifying_ref_id = NULL, qualified_at = NULL,
+  referrer_rewarded_at = NULL, referee_rewarded_at = NULL,
   attempts = 0, next_attempt_at = NULL, updated_at = @now, version = version + 1
-WHERE id = @id AND status = 'qualified' AND referrer_rewarded_at IS NULL AND referee_rewarded_at IS NULL;
+WHERE id = @id AND status IN ('qualified', 'rewarded')
+  AND referrer_transaction_id IS NULL AND referee_transaction_id IS NULL;
 
 -- name: RejectReferral :exec
 UPDATE referrals SET status = 'rejected', reject_reason = @reason, updated_at = @now, version = version + 1
