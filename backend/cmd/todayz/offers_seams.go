@@ -36,8 +36,13 @@ func (a offersForOrders) Price(ctx context.Context, customerID, storeID ids.ID, 
 	if err != nil {
 		return orders.Pricing{}, err
 	}
-	out := orders.Pricing{LineDiscounts: make([]int64, len(lines)), BillDiscount: q.BillDiscountPaise}
-	for i := range lines {
+	return pricing(q, len(lines)), nil
+}
+
+// pricing is an offers quote of n lines as orders.Pricing.
+func pricing(q offers.Quote, n int) orders.Pricing {
+	out := orders.Pricing{LineDiscounts: make([]int64, n), BillDiscount: q.BillDiscountPaise}
+	for i := range n {
 		if i < len(q.Lines) {
 			out.LineDiscounts[i] = q.Lines[i].DiscountPaise
 		}
@@ -45,7 +50,21 @@ func (a offersForOrders) Price(ctx context.Context, customerID, storeID ids.ID, 
 	for _, ap := range q.Applied {
 		out.Offers = append(out.Offers, orders.AppliedOffer{OfferID: ap.OfferID, Title: ap.Title, DiscountPaise: ap.DiscountPaise})
 	}
-	return out, nil
+	return out
+}
+
+// Reprice implements orders.Pricer: the offers the order holds, at its
+// placing time.
+func (a offersForOrders) Reprice(ctx context.Context, orderID, customerID, storeID ids.ID, placedAt time.Time, lines []orders.PriceLine) (orders.Pricing, error) {
+	cart := offers.Cart{StoreID: storeID, CustomerID: customerID, Channel: offers.ChannelOnline, At: placedAt, Lines: make([]offers.Line, len(lines))}
+	for i, l := range lines {
+		cart.Lines[i] = offers.Line{StoreItemID: l.StoreItemID, UnitPricePaise: l.UnitPricePaise, Quantity: l.Quantity, Fixed: l.Fixed}
+	}
+	q, err := a.s.Reprice(ctx, offers.Ref{OrderID: orderID}, cart)
+	if err != nil {
+		return orders.Pricing{}, err
+	}
+	return pricing(q, len(lines)), nil
 }
 
 // Redeem implements orders.Redeemer. An offer that ran out is orders.ErrOfferGone.

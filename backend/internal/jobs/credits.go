@@ -140,6 +140,10 @@ func (c ordersCredits) Recap(ctx context.Context, orderID ids.ID, eligiblePaise 
 	return c.s.Recap(ctx, orderRef(orderID), eligiblePaise)
 }
 
+func (c ordersCredits) Kept(ctx context.Context, held int, eligiblePaise int64) (int, error) {
+	return c.s.Kept(ctx, held, eligiblePaise)
+}
+
 func (c ordersCredits) Complete(ctx context.Context, orderID, customerID, storeID ids.ID, eligiblePaise int64, cashbackBP int) (int, error) {
 	r, err := c.s.Complete(ctx, credits.Completion{
 		Ref: orderRef(orderID), CustomerID: customerID, StoreID: storeID, EligiblePaise: eligiblePaise,

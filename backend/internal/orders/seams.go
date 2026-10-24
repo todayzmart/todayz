@@ -41,6 +41,10 @@ type Pricing struct {
 // Pricer applies the store's offers to a checkout (W3 offers).
 type Pricer interface {
 	Price(ctx context.Context, customerID, storeID ids.ID, lines []PriceLine) (Pricing, error)
+	// Reprice prices an order's lines again with only the offers the order
+	// redeemed, as they stood at placedAt, without counting their limits
+	// again (a partial accept, BK-08).
+	Reprice(ctx context.Context, orderID, customerID, storeID ids.ID, placedAt time.Time, lines []PriceLine) (Pricing, error)
 }
 
 // NoOffers is the Pricer until offers land: nothing off.
@@ -48,6 +52,11 @@ type NoOffers struct{}
 
 // Price implements Pricer.
 func (NoOffers) Price(_ context.Context, _, _ ids.ID, lines []PriceLine) (Pricing, error) {
+	return Pricing{LineDiscounts: make([]int64, len(lines))}, nil
+}
+
+// Reprice implements Pricer.
+func (NoOffers) Reprice(_ context.Context, _, _, _ ids.ID, _ time.Time, lines []PriceLine) (Pricing, error) {
 	return Pricing{LineDiscounts: make([]int64, len(lines))}, nil
 }
 
@@ -118,6 +127,10 @@ type Credits interface {
 	// allows after a partial accept (D-28): all of it under the credit
 	// minimum. It returns the credits still held (0 without a hold).
 	Recap(ctx context.Context, orderID ids.ID, eligiblePaise int64) (int, error)
+	// Kept is how many of held credits Recap would keep against
+	// eligiblePaise; it writes nothing (the preview a partly accepted
+	// order shows while it waits for the customer).
+	Kept(ctx context.Context, held int, eligiblePaise int64) (int, error)
 	// Complete captures the hold to the store and pays cashback at the
 	// rate the order snapshotted when it was placed (cashbackBP, D-124); it
 	// returns the cashback credits.
@@ -142,6 +155,9 @@ func (NoCredits) Release(context.Context, ids.ID) error { return nil }
 
 // Recap implements Credits.
 func (NoCredits) Recap(context.Context, ids.ID, int64) (int, error) { return 0, nil }
+
+// Kept implements Credits.
+func (NoCredits) Kept(context.Context, int, int64) (int, error) { return 0, nil }
 
 // Complete implements Credits.
 func (NoCredits) Complete(context.Context, ids.ID, ids.ID, ids.ID, int64, int) (int, error) {

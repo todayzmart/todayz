@@ -1,5 +1,5 @@
 // C-12 partial accept (`awaiting_customer`, D-28): the shop could not give everything. The customer sees
-// the changed lines, the new items total, credits, fee and total (the server re-capped credits and recomputed the delivery fee) and takes
+// the changed lines, the new items total, credits, fee and total (the credits the server will keep once it is accepted, and the recomputed delivery fee) and takes
 // it or cancels it before `partialConfirmBy`. Cancel records `declined_partial` on the server.
 import { ApiError } from '@todayz/api-client';
 import type { Order } from '@todayz/api-client/gen/model/order';

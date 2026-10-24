@@ -142,6 +142,12 @@ UPDATE orders SET status = 'awaiting_customer', partial_confirm_by = @partial_co
 WHERE id = @id
 RETURNING version;
 
+-- name: SetOrderCredits :exec
+-- The credits a confirmed partial accept kept (D-28), when the ledger's
+-- re-cap differs from the preview the order showed.
+UPDATE orders SET credits_used = @credits_used, total_paise = @total_paise
+WHERE id = @id;
+
 -- name: SetLineAccepted :exec
 UPDATE order_items SET quantity_accepted = @quantity_accepted, line_total_paise = @line_total_paise
 WHERE id = @id AND order_id = @order_id;

@@ -16,8 +16,8 @@ import (
 
 // Partial accept (BK-08–10, D-28): the shop takes fewer of some lines, the
 // order waits in awaiting_customer with the totals recomputed and the
-// credits re-capped, and the customer takes it (the stock is held then) or
-// declines it before partial_confirm_by; with no answer it is cancelled
+// re-capped credits shown, and the customer takes it (the stock is held and
+// the credits re-capped then) or declines it before partial_confirm_by; with no answer it is cancelled
 // partial_timeout, with no strike for anyone (D-68).
 
 // Customer and system reasons of a partial accept (03 §4.2).
@@ -39,55 +39,62 @@ type partialBill struct {
 	subtotal, discount, itemsAfterOffers, itemSubtotal, deliveryFee int64
 }
 
-// billFor recomputes the order's money on want[i] of each line. The offers
-// the order got at placing scale with what is left: a line's offer
-// discount by the share of its quantity kept, the bill-level discount by
-// the share of the item subtotal kept, both rounded down, so the customer
-// never pays more a unit than they agreed to and an offer is never counted
-// again. An ask reply's line keeps its replied price (D-101).
+// billFor recomputes the order's money on want[i] of each line (03 §4.2:
+// every bill figure is recomputed). The offers are priced again on the
+// smaller cart, with only the offers the order redeemed, as they stood when
+// it was placed (lead, W2-02 finish): a minimum-bill offer drops off when
+// the new item subtotal is under its minimum. Discounts are clamped as at
+// checkout. An ask reply's line keeps its replied price (D-101).
 //
-// TODO(lead): the offers engine is not asked again (its per-customer limit
-// would count this order's own redemption against it), so a minimum-bill
-// offer stays, scaled, when the smaller bill is under its minimum.
-func billFor(o ordersdb.Order, lines []ordersdb.OrderLinesRow, want []int32) partialBill {
+// TODO(lead): the redemption of an offer that dropped off stays counted
+// until the order ends (collected keeps it, any other end releases it); the
+// offers engine has no partial release.
+func (s *Service) billFor(ctx context.Context, o ordersdb.Order, lines []ordersdb.OrderLinesRow, want []int32) (partialBill, error) {
 	b := partialBill{lineTotals: make([]int64, len(lines))}
+	plines := make([]PriceLine, len(lines))
+	for i, l := range lines {
+		plines[i] = PriceLine{StoreItemID: mustID(l.StoreItemID), UnitPricePaise: l.UnitPricePaise,
+			Quantity: int(want[i]), Fixed: l.PriceSource == sourceAskReply}
+	}
+	pr, err := s.pricer.Reprice(ctx, mustID(o.ID), mustID(o.CustomerID), mustID(o.StoreID), o.PlacedAt, plines)
+	if err != nil {
+		return partialBill{}, fmt.Errorf("orders: reprice offers: %w", err)
+	}
 	var lineDiscounts int64
 	for i, l := range lines {
-		asked := l.UnitPricePaise * int64(l.QuantityRequested)
-		was := min(max(asked-l.LineTotalPaise, 0), asked)
 		sub := l.UnitPricePaise * int64(want[i])
 		var off int64
-		if l.QuantityRequested > 0 {
-			off = was * int64(want[i]) / int64(l.QuantityRequested)
+		if i < len(pr.LineDiscounts) {
+			off = min(max(pr.LineDiscounts[i], 0), sub)
 		}
 		b.lineTotals[i] = sub - off
 		b.subtotal += sub
 		lineDiscounts += off
 	}
 	b.itemSubtotal = b.subtotal - lineDiscounts
-	var bill int64
-	if wasBill := o.DiscountPaise - (o.SubtotalPaise - o.ItemSubtotalPaise); wasBill > 0 && o.ItemSubtotalPaise > 0 {
-		bill = min(wasBill*b.itemSubtotal/o.ItemSubtotalPaise, b.itemSubtotal)
-	}
-	b.discount = lineDiscounts + bill
+	b.discount = lineDiscounts + min(max(pr.BillDiscount, 0), b.itemSubtotal)
 	b.itemsAfterOffers = b.subtotal - b.discount
 	b.deliveryFee = 0 // pickup only; delivery recomputes its fee here (BK-23)
-	return b
+	return b, nil
 }
 
 // partialAccept moves a locked placed order to awaiting_customer with the
 // quantities in want (some below what was asked, at least one above 0).
 func (s *Service) partialAccept(ctx context.Context, o ordersdb.Order, lines []ordersdb.OrderLinesRow, want []int32, by actor, answerIn time.Duration, now time.Time) error {
 	q := s.q(ctx)
-	b := billFor(o, lines, want)
-	// Credits after the order's rows (D-132): the hold is cut down to what
-	// the new eligible amount allows, or released under the minimum (D-28).
-	credits, err := s.credits.Recap(ctx, mustID(o.ID), b.itemsAfterOffers)
+	b, err := s.billFor(ctx, o, lines, want)
 	if err != nil {
-		return fmt.Errorf("orders: recap credits: %w", err)
+		return err
 	}
-	if credits < 0 || int64(credits)*100 > b.itemsAfterOffers {
-		return fmt.Errorf("orders: recap kept %d credits on %d paise", credits, b.itemsAfterOffers)
+	// The credits the order would keep, shown as a preview: the hold stays
+	// whole until the customer confirms (01 §7, lead W2-02 finish), and a
+	// decline or timeout releases all of it.
+	credits, err := s.credits.Kept(ctx, int(o.CreditsUsed), b.itemsAfterOffers)
+	if err != nil {
+		return fmt.Errorf("orders: credits preview: %w", err)
+	}
+	if err := checkCredits(credits, b.itemsAfterOffers); err != nil {
+		return err
 	}
 	for i, l := range lines {
 		if err := q.SetLineAccepted(ctx, ordersdb.SetLineAcceptedParams{
@@ -116,10 +123,41 @@ func (s *Service) partialAccept(ctx context.Context, o ordersdb.Order, lines []o
 		platformjobs.EnqueueOpts{ScheduledAt: by2, UniqueKey: mustID(o.ID).String() + ":partial"})
 }
 
+// checkCredits refuses a credits figure the bill cannot carry.
+func checkCredits(credits int, itemsAfterOffers int64) error {
+	if credits < 0 || int64(credits)*100 > itemsAfterOffers {
+		return fmt.Errorf("orders: %d credits on %d paise", credits, itemsAfterOffers)
+	}
+	return nil
+}
+
+// recapCredits cuts the confirmed order's hold down to what its new bill
+// allows (D-28) and writes what it kept. The ledger comes after the order
+// and its items (D-132). It normally keeps the preview; it differs only
+// when the credit rules changed while the order waited.
+func (s *Service) recapCredits(ctx context.Context, o ordersdb.Order) error {
+	kept, err := s.credits.Recap(ctx, mustID(o.ID), o.ItemsAfterOffersPaise)
+	if err != nil {
+		return fmt.Errorf("orders: recap credits: %w", err)
+	}
+	if err := checkCredits(kept, o.ItemsAfterOffersPaise); err != nil {
+		return err
+	}
+	if kept == int(o.CreditsUsed) {
+		return nil
+	}
+	if err := s.q(ctx).SetOrderCredits(ctx, ordersdb.SetOrderCreditsParams{
+		CreditsUsed: i32(kept), TotalPaise: o.ItemsAfterOffersPaise - int64(kept)*100 + o.DeliveryFeePaise, ID: o.ID,
+	}); err != nil {
+		return fmt.Errorf("orders: order credits: %w", err)
+	}
+	return nil
+}
+
 // confirmPartial is the customer's answer to a partial accept (C-12):
 // accept holds the accepted quantities (409 insufficient_stock when one is
-// no longer available; the order keeps waiting) and starts the pickup
-// hold; decline cancels with declined_partial.
+// no longer available; the order keeps waiting), re-caps the credits and
+// starts the pickup hold; decline cancels with declined_partial.
 func (s *Service) confirmPartial(ctx context.Context, userID, orderID ids.ID, b *ordersapi.ConfirmPartialRequest) error {
 	if err := s.readyToWrite(ctx); err != nil {
 		return err
@@ -155,6 +193,9 @@ func (s *Service) confirmPartial(ctx context.Context, userID, orderID ids.ID, b 
 			want[i] = *l.QuantityAccepted
 		}
 		if err := s.lockStock(ctx, lines, want); err != nil {
+			return err
+		}
+		if err := s.recapCredits(ctx, o); err != nil {
 			return err
 		}
 		return s.holdAndStart(ctx, o, lines, want, customer(userID), silent, hold, now)

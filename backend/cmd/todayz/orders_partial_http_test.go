@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/todayz/backend/internal/orders"
+	"github.com/todayz/backend/internal/platform/ids"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 )
 
@@ -46,7 +47,8 @@ func (o *orderShop) money(id string) money {
 
 // BK-08: the shop takes some lines or fewer of one: the order waits in
 // awaiting_customer for partial_confirm_timeout_min with the totals on the
-// accepted lines, the held credits re-capped, nothing reserved, the
+// accepted lines, the re-capped credits as a preview (the hold is re-capped
+// on the confirm), nothing reserved, the
 // customer told and the timer queued. Taking nothing is refused.
 func TestBK08PartialAccept(t *testing.T) {
 	o := newOrderShop(t)
@@ -105,9 +107,14 @@ func TestBK08PartialAccept(t *testing.T) {
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	m = o.money(id2)
 	require.EqualValues(t, 5500, m.subtotal)
-	require.Zero(t, m.credits, "₹55 is under credit_min_order_value_paise")
+	require.Zero(t, m.credits, "₹55 is under credit_min_order_value_paise: the preview keeps none")
 	require.EqualValues(t, 5500, m.total)
-	require.True(t, o.walletIs(cust, 30), "the second order's 10 credits are back")
+	require.True(t, o.walletIs(cust, 20), "the hold stays whole until the customer confirms (01 §7)")
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM credit_holds WHERE order_id = $1 AND status = 'held' AND amount = 10 AND released = 0`, uuidOf(t, id2)))
+	r = o.me(o.cust, id2, "confirm-partial", map[string]any{"accept": true})
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.True(t, o.walletIs(cust, 30), "the confirm re-caps: the second order's 10 credits are back")
+	require.Equal(t, m, o.money(id2), "the re-cap kept the preview")
 
 	// An accepted quantity over what is available is 409 naming the line.
 	id3 := o.orderOf(line{o.butter, 2}, line{o.salt, 1})
@@ -239,25 +246,90 @@ func TestBK10PartialDeclineAndTimeout(t *testing.T) {
 	require.Equal(t, http.StatusConflict, r.code, r.raw)
 }
 
-// A partial accept scales the offer the order got: 10% of 2 butters, one
-// kept, is 10% of one, and the redemption stays.
-func TestPartialAcceptScalesOffer(t *testing.T) {
+// A partial accept prices the order's offers again on what is left (03 §4.2,
+// lead W2-02 finish): 10% of the one butter kept, and the ₹10-off-₹100
+// minimum-bill offer drops off because the new item subtotal is under ₹100.
+// The 10% offer is one use per customer, and the order's own use does not
+// count against it. Both redemptions stay until the order ends.
+func TestPartialAcceptRepricesOffers(t *testing.T) {
 	o := newOrderShop(t)
-	offer := o.offerOn("percent", 10, nil)
+	pct := ids.New(o.a.clk.Now()).String()
+	o.a.exec(`INSERT INTO offers (id, store_id, kind, value, scope, store_item_ids, channels, per_customer_limit, starts_at, status)
+	  VALUES ($1, $2, 'percent', 10, 'store', '{}', 'both', 1, $3, 'live')`, uuidOf(t, pct), uuidOf(t, o.sid), o.a.clk.Now().Add(-time.Hour))
+	bill := ids.New(o.a.clk.Now()).String()
+	o.a.exec(`INSERT INTO offers (id, store_id, kind, value, min_bill_paise, scope, store_item_ids, channels, starts_at, status)
+	  VALUES ($1, $2, 'bill_min', 1000, 10000, 'store', '{}', 'both', $3, 'live')`, uuidOf(t, bill), uuidOf(t, o.sid), o.a.clk.Now().Add(-time.Hour))
 	lines := []line{{o.butter, 2}, {o.salt, 1}}
 	q := o.quote(lines...)
 	require.Equal(t, http.StatusOK, q.code, q.raw)
+	// ₹135, 10% off each line (₹13.50), then ₹10 off ₹121.50.
+	require.EqualValues(t, 2350, q.body["discountPaise"], q.raw)
 	r := o.a.call(o.cust, http.MethodPost, "/v1/me/orders", o.cart(lines, int(q.body["totalPaise"].(float64))), idem(o.a))
 	require.Equal(t, http.StatusCreated, r.code, r.raw)
 	id := r.body["id"].(string)
+	require.Equal(t, 1, o.redemptions(pct, false))
+	require.Equal(t, 1, o.redemptions(bill, false))
+
 	o.keepOneButter(id)
 	m := o.money(id)
 	require.EqualValues(t, 5500, m.subtotal)
-	require.EqualValues(t, 550, m.discount)
+	require.EqualValues(t, 550, m.discount, "10%% of one butter; no bill offer under ₹100 (scaling would have kept ₹4.07 of it)")
 	require.EqualValues(t, 4950, m.itemsAfterOffers)
 	require.EqualValues(t, 4950, m.total)
-	require.Equal(t, 1, o.redemptions(offer, false))
-	r = o.me(o.cust, id, "confirm-partial", map[string]any{"accept": false})
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM order_items WHERE order_id = $1 AND quantity_accepted = 1 AND line_total_paise = 4950`, uuidOf(t, id)))
+	require.Equal(t, 1, o.redemptions(pct, false))
+	require.Equal(t, 1, o.redemptions(bill, false), "TODO(lead): a dropped offer's use stays until the order ends")
+
+	r = o.me(o.cust, id, "confirm-partial", map[string]any{"accept": true})
 	require.Equal(t, http.StatusOK, r.code, r.raw)
-	require.Equal(t, 1, o.redemptions(offer, true), "a declined partial gives the offer back")
+	require.Equal(t, m, o.money(id), "the confirm keeps the re-priced bill")
+	r = o.verify(o.cashier, id, o.code(id))
+	require.Equal(t, http.StatusOK, r.code, "verify: status %d", r.code)
+	require.Equal(t, 1, o.redemptions(pct, false), "a collected order keeps its offer")
+
+	// A declined partial gives every offer back (the 10% is used up now,
+	// so only the bill offer applies).
+	q = o.quote(lines...)
+	require.Equal(t, http.StatusOK, q.code, q.raw)
+	require.EqualValues(t, 1000, q.body["discountPaise"], q.raw)
+	r = o.a.call(o.cust, http.MethodPost, "/v1/me/orders", o.cart(lines, int(q.body["totalPaise"].(float64))), idem(o.a))
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	id2 := r.body["id"].(string)
+	o.keepOneButter(id2)
+	r = o.me(o.cust, id2, "confirm-partial", map[string]any{"accept": false})
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.Zero(t, o.a.count(`SELECT count(*) FROM offer_redemptions WHERE order_id = $1 AND released_at IS NULL`, uuidOf(t, id2)))
+	require.Equal(t, 1, o.redemptions(bill, true))
+}
+
+// The hold is re-capped on the confirm, under the credit rules then (01 §7,
+// lead W2-02 finish): the preview kept 10 credits, credit_max_per_order went
+// down to 5 while the customer looked, so the confirm keeps 5 and the order's
+// figures follow.
+func TestConfirmPartialRecapsCredits(t *testing.T) {
+	o := newOrderShop(t)
+	cust := o.grantCredits(40)
+	id := o.placeWithCredits(10)
+	qty := []int{2, 0}
+	if o.lineStoreItem(id, 0) == o.atta {
+		qty = []int{0, 2}
+	}
+	r := o.partial(id, qty...)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.Equal(t, 10, o.money(id).credits)
+	require.True(t, o.walletIs(cust, 30))
+
+	o.a.exec(`UPDATE platform_settings SET value = '5' WHERE key = 'credit_max_per_order'`)
+	o.settings.Invalidate()
+	r = o.me(o.cust, id, "confirm-partial", map[string]any{"accept": true})
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	m := o.money(id)
+	require.Equal(t, 5, m.credits)
+	require.EqualValues(t, 11000, m.itemsAfterOffers)
+	require.EqualValues(t, 10500, m.total)
+	require.True(t, o.walletIs(cust, 35), "5 of the 10 held credits are back")
+	c := o.a.call(o.cust, http.MethodGet, "/v1/me/orders/"+id, nil, nil)
+	require.Equal(t, http.StatusOK, c.code, c.raw)
+	require.EqualValues(t, 5, c.body["creditsUsed"])
+	require.EqualValues(t, 10500, c.body["totalPaise"])
 }
