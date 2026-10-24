@@ -577,7 +577,8 @@ func TestReferralRewardConcurrentWithReferrersOrderDB(t *testing.T) {
 	// What the referrer's orders spent and earned back as cashback.
 	var captured, cashback atomic.Int64
 	purchase := func(customer, store ids.ID, spend int) error {
-		ref := credits.Ref{Type: credits.RefOrder, ID: ids.New(refNow)}
+		// credit_holds.order_id is a foreign key to orders (D-211).
+		ref := credits.Ref{Type: credits.RefOrder, ID: e.tdb.InsertOrder(e.t, ids.New(refNow), customer, store)}
 		if spend > 0 { // checkout
 			if err := e.pool.InTx(e.ctx, func(ctx context.Context) error {
 				_, err := e.cs.Hold(ctx, credits.HoldRequest{Ref: ref, CustomerID: customer, StoreID: store, Credits: spend, EligiblePaise: 10_000})

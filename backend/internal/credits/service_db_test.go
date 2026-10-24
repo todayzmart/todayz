@@ -141,8 +141,21 @@ func (e *denv) tx(fn func(ctx context.Context) error) error {
 	return e.svc.db.InTx(e.ctx, fn)
 }
 
+// ensureRef inserts the order or bill claim a hold points at (credit_holds
+// has foreign keys to both, D-211); a repeat is a no-op.
+func (e *denv) ensureRef(ref Ref, c, s ids.ID) {
+	e.t.Helper()
+	switch ref.Type {
+	case RefOrder:
+		e.tdb.InsertOrder(e.t, ref.ID, c, s)
+	case RefBillClaim:
+		e.tdb.InsertBillClaim(e.t, ref.ID, s, c)
+	}
+}
+
 func (e *denv) hold(ref Ref, c, s ids.ID, n int, eligible int64) Allowance {
 	e.t.Helper()
+	e.ensureRef(ref, c, s)
 	var a Allowance
 	require.NoError(e.t, e.tx(func(ctx context.Context) error {
 		var err error
@@ -416,9 +429,11 @@ func TestFlagNeverStallsHoldDB(t *testing.T) {
 	}
 	start := time.Now()
 	var a Allowance
+	heldRef := e.order()
+	e.ensureRef(heldRef, c2, shop)
 	require.NoError(t, one.db.InTx(e.ctx, func(ctx context.Context) error {
 		var err error
-		a, err = one.Hold(ctx, HoldRequest{Ref: e.order(), CustomerID: c2, StoreID: shop, Credits: 10, EligiblePaise: 20000})
+		a, err = one.Hold(ctx, HoldRequest{Ref: heldRef, CustomerID: c2, StoreID: shop, Credits: 10, EligiblePaise: 20000})
 		return err
 	}), "a flag that cannot be written does not fail Hold")
 	require.Less(t, time.Since(start), 5*time.Second, "the flag gave up instead of waiting for the caller's connection")
@@ -443,6 +458,7 @@ func TestConcurrentSpendDB(t *testing.T) {
 	refs := make([]Ref, 50)
 	for i := range shops {
 		shops[i], refs[i] = e.store("Shop", 0), e.order()
+		e.ensureRef(refs[i], cust, shops[i])
 	}
 	var ok atomic.Int32
 	var wg sync.WaitGroup
@@ -501,6 +517,7 @@ func TestConcurrentStoreCapDB(t *testing.T) {
 	refs := make([]Ref, n)
 	for i := range custs {
 		custs[i], refs[i] = e.user(), e.order()
+		e.ensureRef(refs[i], custs[i], shop)
 		e.grant(custs[i], 50)
 	}
 	var held, capped atomic.Int32
@@ -841,10 +858,10 @@ func TestReadsDB(t *testing.T) {
 	}
 	require.Equal(t, []string{
 		"2.5% back at Lakshmi Traders",
-		"Spent at Lakshmi Traders",
-		"Held for your order at Lakshmi Traders",
+		"Spent at Lakshmi Traders · order TZ-000002",
+		"Held for order TZ-000002 at Lakshmi Traders",
 		"Returned to your wallet",
-		"Held for your order at Lakshmi Traders",
+		"Held for order TZ-000001 at Lakshmi Traders",
 		"Referral bonus",
 	}, texts)
 	require.Equal(t, 7, all.Items[0].Credits, "floor(2.5% of ₹280)")
@@ -869,9 +886,9 @@ func TestReadsDB(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 20-7, acct.BalanceCredits)
 	require.Len(t, acct.Lines, 2)
-	require.Equal(t, "Cashback paid", acct.Lines[0].Text)
+	require.Equal(t, "Cashback paid · order TZ-000002", acct.Lines[0].Text)
 	require.Equal(t, -7, acct.Lines[0].Credits)
-	require.Equal(t, "Credits redeemed", acct.Lines[1].Text)
+	require.Equal(t, "Credits redeemed · order TZ-000002", acct.Lines[1].Text)
 
 	// D-125: a member limited to some stores sees only those.
 	other := e.store("Ganesh Stores", 0)
@@ -963,6 +980,7 @@ func (h txHolder) Allow(ctx context.Context, c, s ids.ID, n int, p int64) (Allow
 }
 
 func (h txHolder) Hold(ctx context.Context, r HoldRequest) (a Allowance, err error) {
+	h.e.ensureRef(r.Ref, r.CustomerID, r.StoreID)
 	err = h.e.tx(func(ctx context.Context) error { a, err = h.e.svc.Hold(ctx, r); return err })
 	return a, err
 }

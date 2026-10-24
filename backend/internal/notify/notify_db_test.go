@@ -91,9 +91,15 @@ type fakeUnseen struct {
 	orders  []notice.UnseenOrder // sorted by (CreatedAt, OrderID)
 	queries []notice.UnseenQuery
 	err     error
+	seed    func(notice.UnseenOrder) // makes the order's row, when set
 }
 
 func (f *fakeUnseen) add(o ...notice.UnseenOrder) {
+	if f.seed != nil {
+		for _, u := range o {
+			f.seed(u)
+		}
+	}
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.orders = append(f.orders, o...)
@@ -205,6 +211,17 @@ func newEnv(t *testing.T, mut ...func(*Deps)) *tenv {
 	require.NoError(t, err)
 	e.svc = svc
 	return e
+}
+
+// unseen is a fakeUnseen whose orders exist in the database: the escalation
+// table has a foreign key to orders (D-211). An order at a store the test
+// has not created (the no-contact case) is never claimed, so it needs no row.
+func (e *tenv) unseen() *fakeUnseen {
+	return &fakeUnseen{seed: func(o notice.UnseenOrder) {
+		if o.StoreID == e.store || o.StoreID == e.store2 {
+			e.tdb.InsertOrder(e.t, o.OrderID, e.user, o.StoreID)
+		}
+	}}
 }
 
 func (e *tenv) newID() ids.ID {
@@ -507,7 +524,7 @@ func TestEscalateOncePerOrder(t *testing.T) {
 	}
 	e := newEnv(t)
 	now := e.clk.Now()
-	src := &fakeUnseen{}
+	src := e.unseen()
 	contacts := fakeContacts{m: map[ids.ID]notice.Contact{
 		e.store: {BusinessID: e.biz, Phone: testPhone, Lang: "hi", OwnerUserID: e.owner, StoreName: "Lakshmi Traders"},
 	}}
@@ -550,7 +567,7 @@ func TestEscalateContactsAndChannels(t *testing.T) {
 	}
 	e := newEnv(t)
 	now := e.clk.Now()
-	src := &fakeUnseen{}
+	src := e.unseen()
 	unknownStore := e.newID()
 	contacts := fakeContacts{m: map[ids.ID]notice.Contact{
 		// No phone at all: the inbox row is still written.
@@ -614,7 +631,7 @@ func TestEscalatePagesPastAStuckBacklog(t *testing.T) {
 	}
 	e := newEnv(t)
 	now := e.clk.Now()
-	src := &fakeUnseen{}
+	src := e.unseen()
 	contacts := fakeContacts{m: map[ids.ID]notice.Contact{e.store: {BusinessID: e.biz, StoreName: "Lakshmi Traders"}}}
 	// A page of old orders already escalated and still unseen (the store
 	// never opened them), then newer ones behind them.

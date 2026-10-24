@@ -77,7 +77,7 @@ func TestPricePerCustomerLimit(t *testing.T) {
 	q, err := w.svc.Price(w.ctx, cart)
 	require.NoError(t, err)
 	require.EqualValues(t, 1000, q.ItemDiscountPaise)
-	require.NoError(t, w.svc.Redeem(w.ctx, Ref{OrderID: w.id()}, cust, q))
+	require.NoError(t, w.svc.Redeem(w.ctx, Ref{OrderID: w.order(cust, store)}, cust, q))
 	q, err = w.svc.Price(w.ctx, cart)
 	require.NoError(t, err)
 	require.EqualValues(t, 0, q.ItemDiscountPaise, "used up for this customer")
@@ -102,7 +102,7 @@ func TestRedeemCapAndRelease(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, q.Applied, 1)
 
-	o1, o2 := w.id(), w.id()
+	o1, o2 := w.order(cust, store), w.order(cust, store)
 	require.NoError(t, w.svc.Redeem(w.ctx, Ref{OrderID: o1}, cust, q))
 	require.NoError(t, w.svc.Redeem(w.ctx, Ref{OrderID: o1}, cust, q), "redeeming a ref twice is a no-op")
 	require.ErrorIs(t, w.svc.Redeem(w.ctx, Ref{OrderID: o2}, cust, q), ErrUnavailable)
@@ -141,13 +141,17 @@ func TestRedeemConcurrent(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, q.Applied)
 
+	orders := make([]ids.ID, 20)
+	for i := range orders {
+		orders[i] = w.order(cust, store)
+	}
 	var ok, gone atomic.Int32
 	var wg sync.WaitGroup
-	for range 20 {
+	for i := range 20 {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			err := w.svc.db.InTx(w.ctx, func(ctx2 context.Context) error { return w.svc.Redeem(ctx2, Ref{OrderID: w.idSafe()}, cust, q) })
+			err := w.svc.db.InTx(w.ctx, func(ctx2 context.Context) error { return w.svc.Redeem(ctx2, Ref{OrderID: orders[i]}, cust, q) })
 			switch {
 			case err == nil:
 				ok.Add(1)

@@ -195,7 +195,9 @@ func newAPI(t *testing.T, worker bool) *apiHarness {
 	at := testNow
 	who := func(rs ...Role) caller {
 		at = at.Add(time.Millisecond)
-		return caller{admin: Admin{ID: ids.New(at), Roles: rs}}
+		// job_runs.triggered_by and job_controls.updated_by are foreign keys
+		// to users (D-211): each admin is a real user.
+		return caller{admin: Admin{ID: a.db.InsertUser(t, ids.New(at)), Roles: rs}}
 	}
 	a.callers = map[string]caller{
 		"admin":       who(RoleAdmin),
