@@ -74,6 +74,14 @@ class DeclaredJsonStatuses(unittest.TestCase):
         self.assertEqual(hooks.declared_json_statuses({}), set())
 
 
+class DeclaresRedirect(unittest.TestCase):
+    def test_3xx_only(self) -> None:
+        self.assertTrue(hooks.declares_redirect({"responses": {"302": {}, "default": {}}}))
+        self.assertTrue(hooks.declares_redirect({"responses": {301: {}}}))
+        self.assertFalse(hooks.declares_redirect({"responses": {"200": {}, "default": {}}}))
+        self.assertFalse(hooks.declares_redirect({}))
+
+
 class LoadRegistry(unittest.TestCase):
     def write(self, tmp: str, name: str, text: str) -> None:
         pathlib.Path(tmp, name).write_text(textwrap.dedent(text), encoding="utf-8")
