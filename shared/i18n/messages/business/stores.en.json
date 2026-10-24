@@ -1,0 +1,602 @@
+{
+  "stores.title": {
+    "defaultMessage": "Stores and staff",
+    "description": "B-13 page title"
+  },
+  "stores.loading": {
+    "defaultMessage": "Loading stores",
+    "description": "B-13 loading status"
+  },
+  "stores.loadFailed.title": {
+    "defaultMessage": "Could not load your shops",
+    "description": "B-13 error title"
+  },
+  "stores.loadFailed.body": {
+    "defaultMessage": "Check your connection and try again.",
+    "description": "B-13 error body"
+  },
+  "stores.retry": {
+    "defaultMessage": "Try again",
+    "description": "Retry button"
+  },
+  "stores.none.title": {
+    "defaultMessage": "No shop yet",
+    "description": "B-13 empty state when the person has no business"
+  },
+  "stores.none.body": {
+    "defaultMessage": "Set up your shop first. It takes a few minutes.",
+    "description": "B-13 empty state"
+  },
+  "stores.none.action": {
+    "defaultMessage": "Set up your shop",
+    "description": "B-13 empty state button"
+  },
+  "stores.noAccess.title": {
+    "defaultMessage": "Owners and managers only",
+    "description": "B-13 shown to cashiers"
+  },
+  "stores.noAccess.body": {
+    "defaultMessage": "Ask the owner or a manager if a store or a person needs to change.",
+    "description": "B-13 shown to cashiers"
+  },
+  "stores.section.stores": {
+    "defaultMessage": "Stores",
+    "description": "B-13 section heading"
+  },
+  "stores.section.staff": {
+    "defaultMessage": "Staff",
+    "description": "B-13 section heading"
+  },
+  "stores.add": {
+    "defaultMessage": "Add a store",
+    "description": "B-13 button"
+  },
+  "stores.edit": {
+    "defaultMessage": "Edit",
+    "description": "B-13 button on a store row"
+  },
+  "stores.editNamed": {
+    "defaultMessage": "Edit {name}",
+    "description": "B-13 accessible name of the edit button"
+  },
+  "stores.submit": {
+    "defaultMessage": "Send for review",
+    "description": "B-13 button on a draft store"
+  },
+  "stores.submitNamed": {
+    "defaultMessage": "Send {name} for review",
+    "description": "B-13 accessible name"
+  },
+  "stores.empty": {
+    "defaultMessage": "No stores yet",
+    "description": "B-13 empty list"
+  },
+  "stores.addTitle": {
+    "defaultMessage": "Add a store",
+    "description": "B-13 sheet title"
+  },
+  "stores.addBody": {
+    "defaultMessage": "Customers see this address and pin. You can change it later.",
+    "description": "B-13 sheet description"
+  },
+  "stores.editTitle": {
+    "defaultMessage": "Edit store",
+    "description": "B-13 sheet title"
+  },
+  "stores.editBody": {
+    "defaultMessage": "Changes to the name or address may need a review before they show to customers.",
+    "description": "B-13 sheet description"
+  },
+  "stores.sheet.close": {
+    "defaultMessage": "Close",
+    "description": "Sheet close button"
+  },
+  "stores.save": {
+    "defaultMessage": "Save store",
+    "description": "Save button"
+  },
+  "stores.create": {
+    "defaultMessage": "Add store",
+    "description": "Create button"
+  },
+  "stores.cancel": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button"
+  },
+  "stores.saved": {
+    "defaultMessage": "Saved",
+    "description": "Toast after a save"
+  },
+  "stores.submitted": {
+    "defaultMessage": "Sent for review",
+    "description": "Toast after submitting a store"
+  },
+  "stores.status.draft": {
+    "defaultMessage": "Draft",
+    "description": "Store status"
+  },
+  "stores.status.pending_review": {
+    "defaultMessage": "In review",
+    "description": "Store status"
+  },
+  "stores.status.live": {
+    "defaultMessage": "Live",
+    "description": "Store status"
+  },
+  "stores.status.paused": {
+    "defaultMessage": "Paused",
+    "description": "Store status"
+  },
+  "stores.status.suspended": {
+    "defaultMessage": "Suspended",
+    "description": "Store status"
+  },
+  "stores.business.draft": {
+    "defaultMessage": "Setup not sent yet",
+    "description": "Business status line"
+  },
+  "stores.business.submitted": {
+    "defaultMessage": "Your shop is in review",
+    "description": "Business status line"
+  },
+  "stores.business.needs_info": {
+    "defaultMessage": "We need a little more from you",
+    "description": "Business status line"
+  },
+  "stores.business.verified": {
+    "defaultMessage": "Your shop is verified",
+    "description": "Business status line"
+  },
+  "stores.business.rejected": {
+    "defaultMessage": "Your shop was not approved",
+    "description": "Business status line"
+  },
+  "stores.business.suspended": {
+    "defaultMessage": "Your shop is suspended",
+    "description": "Business status line"
+  },
+  "stores.business.continue": {
+    "defaultMessage": "Continue setup",
+    "description": "Link to onboarding"
+  },
+  "stores.support": {
+    "defaultMessage": "To close or move a store, contact support.",
+    "description": "Note: closing a store is not self-serve"
+  },
+  "stores.staff.invite": {
+    "defaultMessage": "Invite someone",
+    "description": "B-13 button"
+  },
+  "stores.staff.empty": {
+    "defaultMessage": "No one else on the team yet",
+    "description": "B-13 empty staff list"
+  },
+  "stores.staff.you": {
+    "defaultMessage": "You",
+    "description": "Marks the signed-in person's row"
+  },
+  "stores.staff.role.owner": {
+    "defaultMessage": "Owner",
+    "description": "Role name"
+  },
+  "stores.staff.role.manager": {
+    "defaultMessage": "Manager",
+    "description": "Role name"
+  },
+  "stores.staff.role.cashier": {
+    "defaultMessage": "Cashier",
+    "description": "Role name"
+  },
+  "stores.staff.status.invited": {
+    "defaultMessage": "Invited",
+    "description": "Staff status"
+  },
+  "stores.staff.status.active": {
+    "defaultMessage": "Active",
+    "description": "Staff status"
+  },
+  "stores.staff.expires": {
+    "defaultMessage": "Invite ends {date}",
+    "description": "Pending invite expiry"
+  },
+  "stores.staff.allStores": {
+    "defaultMessage": "All stores",
+    "description": "Staff scope"
+  },
+  "stores.staff.someStores": {
+    "defaultMessage": "{count, plural, one {# store} other {# stores}}",
+    "description": "Staff scope count"
+  },
+  "stores.staff.delivers": {
+    "defaultMessage": "Delivers orders",
+    "description": "Staff flag"
+  },
+  "stores.staff.unnamed": {
+    "defaultMessage": "New team member",
+    "description": "Staff with no name yet"
+  },
+  "stores.staff.edit": {
+    "defaultMessage": "Edit",
+    "description": "Staff button"
+  },
+  "stores.staff.editNamed": {
+    "defaultMessage": "Edit {name}",
+    "description": "Staff accessible name"
+  },
+  "stores.staff.remove": {
+    "defaultMessage": "Remove",
+    "description": "Staff button"
+  },
+  "stores.staff.removeNamed": {
+    "defaultMessage": "Remove {name}",
+    "description": "Staff accessible name"
+  },
+  "stores.staff.inviteTitle": {
+    "defaultMessage": "Invite someone",
+    "description": "Sheet title"
+  },
+  "stores.staff.inviteBody": {
+    "defaultMessage": "They get a link to join. It works for 7 days.",
+    "description": "Sheet description"
+  },
+  "stores.staff.phone": {
+    "defaultMessage": "Mobile number",
+    "description": "Field label"
+  },
+  "stores.staff.phoneHelp": {
+    "defaultMessage": "The number they use for TodayZ.",
+    "description": "Field help"
+  },
+  "stores.staff.role": {
+    "defaultMessage": "Role",
+    "description": "Field label"
+  },
+  "stores.staff.roleHelp.manager": {
+    "defaultMessage": "Manager: runs stock, offers and staff cashiers.",
+    "description": "Role help"
+  },
+  "stores.staff.roleHelp.cashier": {
+    "defaultMessage": "Cashier: takes orders and runs the counter.",
+    "description": "Role help"
+  },
+  "stores.staff.scope": {
+    "defaultMessage": "Stores they can open",
+    "description": "Field label"
+  },
+  "stores.staff.scopeAll": {
+    "defaultMessage": "Every store",
+    "description": "Scope option"
+  },
+  "stores.staff.scopeSome": {
+    "defaultMessage": "Only some stores",
+    "description": "Scope option"
+  },
+  "stores.staff.scopeNone": {
+    "defaultMessage": "Pick at least one store.",
+    "description": "Scope validation"
+  },
+  "stores.staff.canDeliver": {
+    "defaultMessage": "Can deliver orders",
+    "description": "Checkbox"
+  },
+  "stores.staff.sendInvite": {
+    "defaultMessage": "Send invite",
+    "description": "Button"
+  },
+  "stores.staff.invited": {
+    "defaultMessage": "Invite sent",
+    "description": "Toast"
+  },
+  "stores.staff.editTitle": {
+    "defaultMessage": "Edit {name}",
+    "description": "Sheet title"
+  },
+  "stores.staff.editBody": {
+    "defaultMessage": "Only the owner can change a role or the stores someone can open.",
+    "description": "Sheet description"
+  },
+  "stores.staff.saveChanges": {
+    "defaultMessage": "Save changes",
+    "description": "Button"
+  },
+  "stores.staff.removeTitle": {
+    "defaultMessage": "Remove {name}?",
+    "description": "Dialog title"
+  },
+  "stores.staff.removeBody": {
+    "defaultMessage": "They lose access to the shop right away. You can invite them again later.",
+    "description": "Dialog body"
+  },
+  "stores.staff.removeInvite": {
+    "defaultMessage": "This cancels the invite.",
+    "description": "Dialog body for a pending invite"
+  },
+  "stores.staff.removeConfirm": {
+    "defaultMessage": "Remove",
+    "description": "Dialog confirm"
+  },
+  "stores.staff.removed": {
+    "defaultMessage": "Removed",
+    "description": "Toast"
+  },
+  "stores.form.name": {
+    "defaultMessage": "Store name",
+    "description": "Store form field label"
+  },
+  "stores.form.address1": {
+    "defaultMessage": "Address line 1",
+    "description": "Store form field label"
+  },
+  "stores.form.address2": {
+    "defaultMessage": "Address line 2",
+    "description": "Store form field label"
+  },
+  "stores.form.landmark": {
+    "defaultMessage": "Landmark",
+    "description": "Store form field label"
+  },
+  "stores.form.locality": {
+    "defaultMessage": "Area",
+    "description": "Store form field label"
+  },
+  "stores.form.city": {
+    "defaultMessage": "City",
+    "description": "Store form field label"
+  },
+  "stores.form.pincode": {
+    "defaultMessage": "Pincode",
+    "description": "Store form field label"
+  },
+  "stores.form.phone": {
+    "defaultMessage": "Store phone",
+    "description": "Store form field label"
+  },
+  "stores.form.lat": {
+    "defaultMessage": "Latitude",
+    "description": "Store form field label"
+  },
+  "stores.form.lng": {
+    "defaultMessage": "Longitude",
+    "description": "Store form field label"
+  },
+  "stores.form.phoneHelp": {
+    "defaultMessage": "Customers can call this number.",
+    "description": "Store form help"
+  },
+  "stores.form.pin": {
+    "defaultMessage": "Map pin",
+    "description": "Store form group"
+  },
+  "stores.form.pinHelp": {
+    "defaultMessage": "Customers find you by this pin. Stand at your counter and tap Use my location.",
+    "description": "Store form help"
+  },
+  "stores.form.locate": {
+    "defaultMessage": "Use my location",
+    "description": "Store form button"
+  },
+  "stores.form.locateFailed": {
+    "defaultMessage": "Could not get your location. Type the latitude and longitude instead.",
+    "description": "Store form error"
+  },
+  "stores.form.err.required": {
+    "defaultMessage": "Enter the store name.",
+    "description": "Store form error"
+  },
+  "stores.form.err.pincode": {
+    "defaultMessage": "Enter a 6-digit pincode.",
+    "description": "Store form error"
+  },
+  "stores.form.err.phone": {
+    "defaultMessage": "Enter a 10-digit mobile number.",
+    "description": "Store form error"
+  },
+  "stores.form.err.pinBoth": {
+    "defaultMessage": "Enter both latitude and longitude.",
+    "description": "Store form error"
+  },
+  "stores.form.err.pinRange": {
+    "defaultMessage": "This is outside India. Check the number.",
+    "description": "Store form error"
+  },
+  "stores.error.forbidden": {
+    "defaultMessage": "You do not have permission for this.",
+    "description": "Shop setup error shown under the form"
+  },
+  "stores.error.conflict": {
+    "defaultMessage": "This already exists.",
+    "description": "Shop setup error shown under the form"
+  },
+  "stores.error.validation_failed": {
+    "defaultMessage": "Some details are not right. Check the form and try again.",
+    "description": "Shop setup error shown under the form"
+  },
+  "stores.error.submit_incomplete": {
+    "defaultMessage": "Some required details are missing.",
+    "description": "Shop setup error shown under the form"
+  },
+  "stores.error.precondition_failed": {
+    "defaultMessage": "Someone changed this while you were editing. We reloaded it; check and save again.",
+    "description": "Shop setup error shown under the form"
+  },
+  "stores.error.precondition_required": {
+    "defaultMessage": "Reload the page and try again.",
+    "description": "Shop setup error shown under the form"
+  },
+  "stores.error.invalid_transition": {
+    "defaultMessage": "This cannot be done right now.",
+    "description": "Shop setup error shown under the form"
+  },
+  "stores.error.service_unavailable": {
+    "defaultMessage": "This is not available right now. Try again in a minute.",
+    "description": "Shop setup error shown under the form"
+  },
+  "stores.error.not_found": {
+    "defaultMessage": "We could not find this. It may have been removed.",
+    "description": "Shop setup error shown under the form"
+  },
+  "stores.error.generic": {
+    "defaultMessage": "Something went wrong. Check your connection and try again.",
+    "description": "Shop setup error shown under the form"
+  },
+  "stores.hours.day.mon": {
+    "defaultMessage": "Monday",
+    "description": "Weekday name"
+  },
+  "stores.hours.day.tue": {
+    "defaultMessage": "Tuesday",
+    "description": "Weekday name"
+  },
+  "stores.hours.day.wed": {
+    "defaultMessage": "Wednesday",
+    "description": "Weekday name"
+  },
+  "stores.hours.day.thu": {
+    "defaultMessage": "Thursday",
+    "description": "Weekday name"
+  },
+  "stores.hours.day.fri": {
+    "defaultMessage": "Friday",
+    "description": "Weekday name"
+  },
+  "stores.hours.day.sat": {
+    "defaultMessage": "Saturday",
+    "description": "Weekday name"
+  },
+  "stores.hours.day.sun": {
+    "defaultMessage": "Sunday",
+    "description": "Weekday name"
+  },
+  "stores.hours.open": {
+    "defaultMessage": "Open",
+    "description": "Day toggle"
+  },
+  "stores.hours.closed": {
+    "defaultMessage": "Closed",
+    "description": "Day toggle"
+  },
+  "stores.hours.allDay": {
+    "defaultMessage": "Open 24 hours",
+    "description": "Checkbox"
+  },
+  "stores.hours.from": {
+    "defaultMessage": "Opens",
+    "description": "Time field"
+  },
+  "stores.hours.to": {
+    "defaultMessage": "Closes",
+    "description": "Time field"
+  },
+  "stores.hours.addRange": {
+    "defaultMessage": "Add a break",
+    "description": "Button to add another time range"
+  },
+  "stores.hours.removeRange": {
+    "defaultMessage": "Remove a time range on {day}",
+    "description": "Accessible name"
+  },
+  "stores.hours.copyMonday": {
+    "defaultMessage": "Use Monday for every day",
+    "description": "Button"
+  },
+  "stores.hours.holidays": {
+    "defaultMessage": "Holidays",
+    "description": "Group"
+  },
+  "stores.hours.holidaysHelp": {
+    "defaultMessage": "Days the shop is closed or opens at special times.",
+    "description": "Group help"
+  },
+  "stores.hours.holidayDate": {
+    "defaultMessage": "Date",
+    "description": "Field label"
+  },
+  "stores.hours.holidayClosed": {
+    "defaultMessage": "Closed all day",
+    "description": "Checkbox"
+  },
+  "stores.hours.addHoliday": {
+    "defaultMessage": "Add a holiday",
+    "description": "Button"
+  },
+  "stores.hours.removeHoliday": {
+    "defaultMessage": "Remove holiday {date}",
+    "description": "Accessible name"
+  },
+  "stores.hours.err.time": {
+    "defaultMessage": "Enter a valid time.",
+    "description": "Hours error"
+  },
+  "stores.hours.err.order": {
+    "defaultMessage": "Closing time must be after opening time.",
+    "description": "Hours error"
+  },
+  "stores.hours.err.overlap": {
+    "defaultMessage": "These times overlap.",
+    "description": "Hours error"
+  },
+  "stores.hours.err.tooMany": {
+    "defaultMessage": "Up to 4 time ranges a day.",
+    "description": "Hours error"
+  },
+  "stores.hours.err.date": {
+    "defaultMessage": "Pick a date.",
+    "description": "Hours error"
+  },
+  "stores.hours.err.duplicate": {
+    "defaultMessage": "This date is already listed.",
+    "description": "Hours error"
+  },
+  "stores.invite.title": {
+    "defaultMessage": "Join a shop",
+    "description": "B-01 invite page title"
+  },
+  "stores.invite.loading": {
+    "defaultMessage": "Checking your invitation",
+    "description": "Loading status"
+  },
+  "stores.invite.none.title": {
+    "defaultMessage": "No invitation found",
+    "description": "Invite page empty state"
+  },
+  "stores.invite.none.body": {
+    "defaultMessage": "The link may have expired, or it was sent to a different number. Ask the owner to invite you again.",
+    "description": "Invite page empty state"
+  },
+  "stores.invite.for": {
+    "defaultMessage": "{brand} invited you to join as {role}.",
+    "description": "Invite page line"
+  },
+  "stores.invite.others": {
+    "defaultMessage": "Other invitations",
+    "description": "Invite page heading when several"
+  },
+  "stores.invite.accept": {
+    "defaultMessage": "Accept and join",
+    "description": "Button"
+  },
+  "stores.invite.acceptNamed": {
+    "defaultMessage": "Accept {brand}",
+    "description": "Accessible name"
+  },
+  "stores.invite.accepted": {
+    "defaultMessage": "You joined {brand}",
+    "description": "Toast"
+  },
+  "stores.invite.home": {
+    "defaultMessage": "Go to my shop",
+    "description": "Link"
+  },
+  "stores.invite.failed.title": {
+    "defaultMessage": "Could not load your invitations",
+    "description": "Error title"
+  },
+  "stores.invite.err.conflict": {
+    "defaultMessage": "You already joined, or the invite was used.",
+    "description": "Invite error"
+  },
+  "stores.invite.err.not_found": {
+    "defaultMessage": "This invitation has ended. Ask the owner to send a new one.",
+    "description": "Invite error"
+  }
+}
