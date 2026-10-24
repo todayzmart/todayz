@@ -1,12 +1,465 @@
-# Paths: domain "pos" (owner W2-04): point of sale and bill claims (04 §2.6).
+# Paths: domain "pos" (owner W2-04): point of sale and bill claims (04 §2.4, §2.6).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [pos]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/pos.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# `/v1/biz/businesses/{bid}/stores/{sid}` is `{S}` in 04 §2.6; the permission
+# engine reads the scope from `bid` and `sid`. Roles per operation are in
+# internal/platform/authz/policy/pos.go. Every unsafe POS route takes an
+# Idempotency-Key; a sale, its reversal, the bill-claim confirm and the
+# counter-code verify are `x-money` (04 §1.6). Offline sales come through
+# `POST {S}/sync` (sync.yaml). Credits and cashback are held and posted by the
+# wallet (W2-01) through internal/pos's seams; until it lands no credits are
+# spent and no cashback is earned (W2-04 report).
+/v1/biz/businesses/{bid}/stores/{sid}/pos/sales:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: createPosSale
+    tags:
+    - pos
+    summary: Ring an online sale (B-03)
+    description: >-
+      Cashier and above (`pos.sell`). Idempotent by `clientId` as well as the key: a second call with the
+      same `clientId` returns the first sale. Catalogued lines are sold at the item's price now (`409
+      price_changed` with `extensions.storeItemId` and `extensions.pricePaise` when the POS's price is
+      old) and offers are applied by the server; each writes a `sale_pos` movement, and stock may go
+      negative (02 §4.3). A manual line or bill discount needs `pos.discount` (manager and above, D-06).
+      Round-off to the nearest ₹1 is automatic (D-94). `link.method: bill_qr` takes the claim the customer
+      confirmed (`409 claim_mismatch` when the bill changed since the QR, `409 claim_expired`, `409
+      claim_already_used` when another sale used it) and spends its credits; `counter_code` needs a right
+      code for this `clientId` first; `phone_unverified` touches no ledger (D-07). The response carries the
+      receipt token (D-45).
+    x-idempotency: required
+    x-money: true
+    x-problems:
+    - price_changed
+    - claim_expired
+    - claim_already_used
+    - claim_mismatch
+    - code_locked
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/pos.yaml#/PosSaleCreateRequest
+          example:
+            clientId: 01JB0V1S4K3C5K6N7T8D9X0Y1Z
+            lines:
+            - clientId: 01JB0V1K1N2E3C4K5N6T7D8X9Y
+              storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+              unitPricePaise: 5800
+              quantity: 2
+            - clientId: 01JB0V1K2N3E4C5K6N7T8D9X0Y
+              name: Loose sugar 500 g
+              unitPricePaise: 2450
+              quantity: 1
+            paymentMethod: cash
+    responses:
+      '200':
+        description: The sale
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/pos.yaml#/PosSale
+            example:
+              id: 01JB0V2S4K3E5S6A7K8E9X0Y1Z
+              clientId: 01JB0V1S4K3C5K6N7T8D9X0Y1Z
+              lines:
+              - id: 01JB0V2K1N2E3S4A5K6E7X8Y9Z
+                clientId: 01JB0V1K1N2E3C4K5N6T7D8X9Y
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter 100 g
+                unitPricePaise: 5800
+                quantity: 2
+                offerDiscountPaise: 0
+                manualDiscountPaise: 0
+                lineTotalPaise: 11600
+              - id: 01JB0V2K2N3E4S5A6K7E8X9Y0Z
+                clientId: 01JB0V1K2N3E4C5K6N7T8D9X0Y
+                storeItemId: null
+                name: Loose sugar 500 g
+                unitPricePaise: 2450
+                quantity: 1
+                offerDiscountPaise: 0
+                manualDiscountPaise: 0
+                lineTotalPaise: 2450
+              itemSubtotalPaise: 14050
+              billOfferDiscountPaise: 0
+              subtotalPaise: 14050
+              discountPaise: 0
+              roundOffPaise: 50
+              creditsUsed: 0
+              cashbackCredits: 0
+              totalPaise: 14100
+              paymentMethod: cash
+              link: null
+              status: completed
+              reversedAt: null
+              reversalReason: null
+              soldAt: '2026-10-24T05:00:00Z'
+              receivedAt: '2026-10-24T05:00:00Z'
+              receiptToken: EXAMPLE_receipt_000000
+              version: 1
+              serverNow: '2026-10-24T05:00:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/pos/sales/{saleId}/reverse:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: saleId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: reversePosSale
+    tags:
+    - pos
+    summary: Reverse a sale
+    description: >-
+      Manager and above (`pos.reverse`). Within `pos_reversal_window_hours` of `soldAt`, else `409
+      reversal_window_passed`. Writes a `pos_reversal` movement per catalogued line, marks the sale
+      reversed (D-74) and reverses its credits, cashback and referral through the wallet (D-08). A
+      reversed sale is `409 invalid_transition`.
+    x-idempotency: required
+    x-money: true
+    x-problems:
+    - reversal_window_passed
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/pos.yaml#/PosSaleReverseRequest
+          example:
+            reason: Customer returned the items
+    responses:
+      '200':
+        description: The sale after the reversal
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/pos.yaml#/PosSale
+            example:
+              id: 01JB0V2S4K3E5S6A7K8E9X0Y1Z
+              clientId: 01JB0V1S4K3C5K6N7T8D9X0Y1Z
+              lines:
+              - id: 01JB0V2K1N2E3S4A5K6E7X8Y9Z
+                clientId: 01JB0V1K1N2E3C4K5N6T7D8X9Y
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                name: Amul Butter 100 g
+                unitPricePaise: 5800
+                quantity: 2
+                offerDiscountPaise: 0
+                manualDiscountPaise: 0
+                lineTotalPaise: 11600
+              itemSubtotalPaise: 11600
+              billOfferDiscountPaise: 0
+              subtotalPaise: 11600
+              discountPaise: 0
+              roundOffPaise: 0
+              creditsUsed: 0
+              cashbackCredits: 0
+              totalPaise: 11600
+              paymentMethod: cash
+              link: null
+              status: reversed
+              reversedAt: '2026-10-24T06:00:00Z'
+              reversalReason: Customer returned the items
+              soldAt: '2026-10-24T05:00:00Z'
+              receivedAt: '2026-10-24T05:00:00Z'
+              receiptToken: null
+              version: 2
+              serverNow: '2026-10-24T06:00:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/bill-claims:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: createBillClaim
+    tags:
+    - pos
+    summary: Show a bill QR (B-03)
+    description: >-
+      Cashier and above (`pos.link_customer`). Makes a signed token for the bill the POS is about to ring
+      (`saleClientId`, the bill after discounts). It expires after 120 s; show a new one after that (01
+      §6). Making a new QR for the same `saleClientId` leaves the old one to expire. The POS follows the
+      claim on the store's stream (`bill_claim.updated`) or by reading it. `409 conflict` while
+      `feature_bill_qr_enabled` is off.
+    x-idempotency: required
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/pos.yaml#/BillClaimCreateRequest
+          example:
+            saleClientId: 01JB0V1S4K3C5K6N7T8D9X0Y1Z
+            amountPaise: 14050
+    responses:
+      '201':
+        description: The bill QR
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/pos.yaml#/BillClaim
+            example:
+              id: 01JB0V3C1A2J3M4B5K6Q7R8S9T
+              saleClientId: 01JB0V1S4K3C5K6N7T8D9X0Y1Z
+              amountPaise: 14050
+              status: open
+              token: EXAMPLE_bill_qr_0000000000000000000000000000000000000000000000
+              expiresAt: '2026-10-24T05:02:00Z'
+              customerName: null
+              creditsUsed: 0
+              posSaleId: null
+              version: 1
+              serverNow: '2026-10-24T05:00:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/bill-claims/{claimId}:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: claimId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getBillClaim
+    tags:
+    - pos
+    summary: A bill QR's state
+    description: >-
+      Cashier and above. `claimed` names the customer and the credits they chose ("claimed by Ananya · 30
+      credits"); an open claim past its expiry reads `expired`.
+    responses:
+      '200':
+        description: The bill QR
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/pos.yaml#/BillClaim
+            example:
+              id: 01JB0V3C1A2J3M4B5K6Q7R8S9T
+              saleClientId: 01JB0V1S4K3C5K6N7T8D9X0Y1Z
+              amountPaise: 14050
+              status: claimed
+              token: null
+              expiresAt: '2026-10-24T05:02:00Z'
+              customerName: Ananya
+              creditsUsed: 30
+              posSaleId: null
+              version: 2
+              serverNow: '2026-10-24T05:01:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/counter-code/verify:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: verifyCounterCode
+    tags:
+    - pos
+    summary: Check a customer's counter code (B-03)
+    description: >-
+      Cashier and above (`pos.link_customer`). Checks the code against every device of the customer with
+      that phone, at the current 60 s step and one step either side (D-12). A code is accepted once. A
+      wrong code, or a phone with no account, is `422 code_invalid` with `extensions.attemptsLeft`; the 5th
+      wrong code locks this bill (`409 code_locked`). A right code lets the sale with `saleClientId` link
+      with `counter_code`.
+    x-idempotency: required
+    x-money: true
+    x-problems:
+    - code_invalid
+    - code_locked
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/pos.yaml#/CounterCodeVerifyRequest
+          example:
+            phone: '+919000000001'
+            code: '4821'
+            saleClientId: 01JB0V1S4K3C5K6N7T8D9X0Y1Z
+    responses:
+      '200':
+        description: The code is right
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/pos.yaml#/CounterCodeVerification
+            example:
+              saleClientId: 01JB0V1S4K3C5K6N7T8D9X0Y1Z
+              customerName: Ananya
+              serverNow: '2026-10-24T05:00:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/counter-code-seed:
+  get:
+    operationId: getCounterCodeSeed
+    tags:
+    - pos
+    summary: This device's counter-code secret (C-15)
+    description: >-
+      Customer app. Made on the first call for the signed-in device and the same afterwards; stored
+      encrypted under DEVICE_SECRET_ENC_KEY. `409 conflict` for a session with no device.
+    responses:
+      '200':
+        description: The secret
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/pos.yaml#/CounterCodeSeed
+            example:
+              secret: JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP
+              algorithm: SHA1
+              digits: 4
+              periodSeconds: 60
+              serverNow: '2026-10-24T05:00:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/bill-claims/{token}/preview:
+  parameters:
+  - name: token
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/pos.yaml#/BillClaimToken
+  post:
+    operationId: previewBillClaim
+    tags:
+    - pos
+    summary: What a scanned bill QR is for (C-17)
+    description: >-
+      Customer app. No side effects. The store, the amount and the most credits this bill allows (`0`
+      with `creditsLimit: below_credit_minimum` under `credit_min_order_value_paise`, D-30). A token that
+      does not verify is `404 not_found`; past its 120 s `409 claim_expired`; confirmed by someone `409
+      claim_already_used`.
+    x-idempotency: none
+    x-problems:
+    - claim_expired
+    - claim_already_used
+    responses:
+      '200':
+        description: The bill
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/pos.yaml#/BillClaimPreview
+            example:
+              claimId: 01JB0V3C1A2J3M4B5K6Q7R8S9T
+              store:
+                id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                name: Sri Lakshmi Stores
+              amountPaise: 14050
+              maxCredits: 0
+              creditsLimit: not_available
+              expiresAt: '2026-10-24T05:02:00Z'
+              serverNow: '2026-10-24T05:00:30Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/bill-claims/{token}/confirm:
+  parameters:
+  - name: token
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/pos.yaml#/BillClaimToken
+  post:
+    operationId: confirmBillClaim
+    tags:
+    - pos
+    summary: Claim a bill with my account (C-17)
+    description: >-
+      Customer app. The first confirm wins (BK: two phones, one QR): the second gets `409
+      claim_already_used`. `creditsToUse` is clamped to what the bill allows and held until the sale is
+      rung. The POS sees the claim at once (`bill_claim.updated`). Past 120 s is `409 claim_expired`.
+    x-idempotency: required
+    x-money: true
+    x-problems:
+    - claim_expired
+    - claim_already_used
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/pos.yaml#/BillClaimConfirmRequest
+          example:
+            creditsToUse: 30
+    responses:
+      '200':
+        description: The claim
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/pos.yaml#/BillClaimConfirmation
+            example:
+              claimId: 01JB0V3C1A2J3M4B5K6Q7R8S9T
+              store:
+                id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                name: Sri Lakshmi Stores
+              amountPaise: 14050
+              creditsUsed: 30
+              payablePaise: 11050
+              status: claimed
+              serverNow: '2026-10-24T05:00:40Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem

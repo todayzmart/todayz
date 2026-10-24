@@ -1,0 +1,24 @@
+# domain pos: one line per (role x action); regenerate with -update
+me.counter_code kind=customer step-up=false
+me.bill_claim kind=customer step-up=false
+me.purchases kind=customer step-up=false
+pos.sell kind=business step-up=false
+pos.sell owner allow
+pos.sell manager allow
+pos.sell cashier allow
+pos.link_customer kind=business step-up=false
+pos.link_customer owner allow
+pos.link_customer manager allow
+pos.link_customer cashier allow
+pos.discount kind=business step-up=false
+pos.discount owner allow
+pos.discount manager allow
+pos.discount cashier -
+pos.reverse kind=business step-up=false
+pos.reverse owner allow
+pos.reverse manager allow
+pos.reverse cashier -
+pos.sync kind=business step-up=false
+pos.sync owner allow
+pos.sync manager allow
+pos.sync cashier allow

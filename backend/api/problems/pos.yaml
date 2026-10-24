@@ -1,0 +1,25 @@
+# Problem codes: domain "pos" (owner W2-04; 04 §1.4 and the D-91 table).
+#
+# Same shape as common.yaml. A wrong counter code is auth's `code_invalid`
+# (422) with `extensions.attemptsLeft` and the 5th locks the bill with orders'
+# `code_locked`, like every other typed code. A reversed sale reversed again is
+# the common invalid_transition. A bill QR whose signature does not verify is
+# not_found: it reveals nothing about the claim.
+domain: pos
+problems:
+  - code: claim_expired
+    status: 409
+    i18n: problems.claim_expired
+    title: This bill QR has expired
+  - code: claim_already_used
+    status: 409
+    i18n: problems.claim_already_used
+    title: This bill QR was already claimed
+  - code: claim_mismatch
+    status: 409
+    i18n: problems.claim_mismatch
+    title: The bill changed after the QR was shown
+  - code: reversal_window_passed
+    status: 409
+    i18n: problems.reversal_window_passed
+    title: This sale is too old to reverse
