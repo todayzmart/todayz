@@ -97,9 +97,12 @@ func TestBK16StrikeResetLiftsLimit(t *testing.T) {
 }
 
 // The limit ends by itself after noshow_limit_days, and the recount then
-// clears limited_until too.
+// clears limited_until too. Once the window has passed the strikes stop
+// counting (lead review 6: CountActiveStrikes is created_at > now-window),
+// so one more no-show on day 31 does not limit the customer again.
 func TestBK16LimitEnds(t *testing.T) {
 	o := newOrderShop(t)
+	start := o.a.clk.Now()
 	for range 3 {
 		o.noShow()
 	}
@@ -110,4 +113,14 @@ func TestBK16LimitEnds(t *testing.T) {
 	require.Equal(t, http.StatusOK, q.code, q.raw)
 	require.EqualValues(t, 1, o.recountRun())
 	require.Equal(t, 1, o.unlimited(3), "the strikes are still inside the 30 days")
+
+	o.set(start.Add(31 * day))
+	require.EqualValues(t, 1, o.recountRun())
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM customer_profiles p WHERE strikes_count_30d = 0 AND limited_until IS NULL
+	  AND EXISTS (SELECT 1 FROM strikes s WHERE s.subject_id = p.user_id)`), "all three aged out")
+	o.noShow()
+	require.Equal(t, 1, o.unlimited(1), "one strike in the window, no limit")
+	o.order()
+	q = o.quote(line{o.butter, 1})
+	require.Equal(t, http.StatusOK, q.code, q.raw)
 }
