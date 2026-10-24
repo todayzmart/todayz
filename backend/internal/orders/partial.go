@@ -135,8 +135,10 @@ func checkCredits(credits int, itemsAfterOffers int64) error {
 
 // recapCredits cuts the confirmed order's hold down to what its new bill
 // allows (D-28) and writes what it kept. The ledger comes after the order
-// and its items (D-132). It normally keeps the preview; it differs only
-// when the credit rules changed while the order waited.
+// and its items (D-132). It normally keeps the preview; it keeps more only
+// when the credit rules loosened while the order waited (the customer pays
+// less), and never fewer: confirmPartial has refused that already, and a
+// hold that shrank anyway is price_changed too.
 func (s *Service) recapCredits(ctx context.Context, o ordersdb.Order) error {
 	kept, err := s.credits.Recap(ctx, mustID(o.ID), o.ItemsAfterOffersPaise)
 	if err != nil {
@@ -144,6 +146,9 @@ func (s *Service) recapCredits(ctx context.Context, o ordersdb.Order) error {
 	}
 	if err := checkCredits(kept, o.ItemsAfterOffersPaise); err != nil {
 		return err
+	}
+	if kept < int(o.CreditsUsed) {
+		return problem.New(genproblems.PriceChanged, "")
 	}
 	if kept == int(o.CreditsUsed) {
 		return nil
@@ -159,7 +164,12 @@ func (s *Service) recapCredits(ctx context.Context, o ordersdb.Order) error {
 // confirmPartial is the customer's answer to a partial accept (C-12):
 // accept holds the accepted quantities (409 insufficient_stock when one is
 // no longer available; the order keeps waiting), re-caps the credits and
-// starts the pickup hold; decline cancels with declined_partial.
+// starts the pickup hold; decline cancels with declined_partial. When the
+// credit rules tightened while the order waited (credit_max_per_order
+// dropped), a confirm would keep fewer credits than the preview showed and
+// charge more than the customer agreed to: it lowers the preview instead,
+// keeps the order waiting and answers 409 price_changed, so the customer
+// sees the new total and answers again (lead review, W2-02 finish).
 func (s *Service) confirmPartial(ctx context.Context, userID, orderID ids.ID, b *ordersapi.ConfirmPartialRequest) error {
 	if err := s.readyToWrite(ctx); err != nil {
 		return err
@@ -171,7 +181,8 @@ func (s *Service) confirmPartial(ctx context.Context, userID, orderID ids.ID, b 
 	if err != nil {
 		return problem.Wrap(genproblems.Internal, err)
 	}
-	return asProblemOrNil(s.db.InTx(ctx, func(ctx context.Context) error {
+	lowered := false
+	err = s.db.InTx(ctx, func(ctx context.Context) error {
 		now := s.now()
 		o, err := s.lockOrder(ctx, orderID, ofCustomer(userID))
 		if err != nil {
@@ -182,6 +193,14 @@ func (s *Service) confirmPartial(ctx context.Context, userID, orderID ids.ID, b 
 		}
 		if !b.Accept {
 			return s.end(ctx, o, StatusCancelled, reasonDeclinedPartial, nil, customer(userID), silent, now)
+		}
+		kept, err := s.credits.Kept(ctx, int(o.CreditsUsed), o.ItemsAfterOffersPaise)
+		if err != nil {
+			return fmt.Errorf("orders: credits preview: %w", err)
+		}
+		if kept < int(o.CreditsUsed) {
+			lowered = true
+			return s.lowerPreview(ctx, o, kept)
 		}
 		lines, err := s.q(ctx).OrderLines(ctx, o.ID)
 		if err != nil {
@@ -201,5 +220,24 @@ func (s *Service) confirmPartial(ctx context.Context, userID, orderID ids.ID, b 
 			return err
 		}
 		return s.holdAndStart(ctx, o, lines, want, customer(userID), silent, hold, now)
-	}))
+	})
+	if err == nil && lowered {
+		return problem.New(genproblems.PriceChanged, "")
+	}
+	return asProblemOrNil(err)
+}
+
+// lowerPreview writes the credits a confirm would keep now, and the total
+// with them, as the order's preview; the hold stays whole until the
+// customer answers.
+func (s *Service) lowerPreview(ctx context.Context, o ordersdb.Order, kept int) error {
+	if err := checkCredits(kept, o.ItemsAfterOffersPaise); err != nil {
+		return err
+	}
+	if _, err := s.q(ctx).SetPreviewCredits(ctx, ordersdb.SetPreviewCreditsParams{
+		CreditsUsed: i32(kept), TotalPaise: o.ItemsAfterOffersPaise - int64(kept)*100 + o.DeliveryFeePaise, ID: o.ID,
+	}); err != nil {
+		return fmt.Errorf("orders: lower credits preview: %w", err)
+	}
+	return nil
 }

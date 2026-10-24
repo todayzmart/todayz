@@ -142,6 +142,31 @@ UPDATE orders SET status = 'awaiting_customer', partial_confirm_by = @partial_co
 WHERE id = @id
 RETURNING version;
 
+-- name: SetPreviewCredits :one
+-- A partial accept's credits preview, lowered when the credit rules changed
+-- while the order waited, so the customer sees what a confirm would keep
+-- before taking it (lead review, W2-02 finish). The version moves: the
+-- order the customer sees changed.
+UPDATE orders SET credits_used = @credits_used, total_paise = @total_paise, version = version + 1
+WHERE id = @id
+RETURNING version;
+
+-- name: LockStoreStrikes :exec
+-- Serialises one store's strikes and its store_strikes flag (an admin
+-- cancel's store strike, the hourly job's flag), so the count a flag is
+-- raised on sees every committed strike and the store gets one open flag.
+-- An advisory lock, not the stores row: nothing else waits on it.
+SELECT pg_advisory_xact_lock(hashtextextended('store_strikes:' || sqlc.arg(store_key)::text, 0));
+
+-- name: LockStrikeCustomers :exec
+-- The daily recount's lock on the customers it recounts (every customer
+-- with a count or a limit), in id order, the users row LockCustomer takes:
+-- a strike in flight finishes first, so the recount's own statement sees it.
+SELECT u.id FROM users u JOIN customer_profiles cp ON cp.user_id = u.id
+WHERE cp.strikes_count_30d > 0 OR cp.limited_until IS NOT NULL
+ORDER BY u.id
+FOR NO KEY UPDATE OF u;
+
 -- name: SetOrderCredits :exec
 -- The credits a confirmed partial accept kept (D-28), when the ledger's
 -- re-cap differs from the preview the order showed.
@@ -381,7 +406,8 @@ FROM strikes s, p
 WHERE s.subject_type = 'store' AND s.reset_at IS NULL AND s.created_at > p.since
   AND (p.every OR s.subject_id = p.store_id)
 GROUP BY s.subject_id, p.threshold
-HAVING count(*) >= p.threshold;
+HAVING count(*) >= p.threshold
+ORDER BY s.subject_id;
 
 -- name: InsertStoreStrikeFlag :execrows
 -- Raises the store_strikes risk flag (D-67), once: not while the store has

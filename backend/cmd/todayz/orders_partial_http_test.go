@@ -303,9 +303,11 @@ func TestPartialAcceptRepricesOffers(t *testing.T) {
 }
 
 // The hold is re-capped on the confirm, under the credit rules then (01 §7,
-// lead W2-02 finish): the preview kept 10 credits, credit_max_per_order went
-// down to 5 while the customer looked, so the confirm keeps 5 and the order's
-// figures follow.
+// lead W2-02 finish), but a confirm never charges more than the order showed
+// (lead review 4): the preview kept 10 credits, credit_max_per_order went
+// down to 5 while the customer looked, so the first confirm is 409
+// price_changed with the order still waiting, now showing 5 credits and the
+// higher total, and nothing held or released. Confirming that keeps 5.
 func TestConfirmPartialRecapsCredits(t *testing.T) {
 	o := newOrderShop(t)
 	cust := o.grantCredits(40)
@@ -318,9 +320,23 @@ func TestConfirmPartialRecapsCredits(t *testing.T) {
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.Equal(t, 10, o.money(id).credits)
 	require.True(t, o.walletIs(cust, 30))
+	before := o.a.call(o.cust, http.MethodGet, "/v1/me/orders/"+id, nil, nil)
+	require.Equal(t, http.StatusOK, before.code, before.raw)
 
 	o.a.exec(`UPDATE platform_settings SET value = '5' WHERE key = 'credit_max_per_order'`)
 	o.settings.Invalidate()
+	r = o.me(o.cust, id, "confirm-partial", map[string]any{"accept": true})
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, "price_changed", problemCode(r))
+	require.Equal(t, "awaiting_customer", o.status(id))
+	require.Zero(t, o.a.count(`SELECT count(*) FROM stock_reservations WHERE order_id = $1`, uuidOf(t, id)), "nothing held")
+	require.True(t, o.walletIs(cust, 30), "the hold stays whole until the customer answers")
+	c := o.a.call(o.cust, http.MethodGet, "/v1/me/orders/"+id, nil, nil)
+	require.Equal(t, http.StatusOK, c.code, c.raw)
+	require.EqualValues(t, 5, c.body["creditsUsed"])
+	require.EqualValues(t, 10500, c.body["totalPaise"])
+	require.Greater(t, c.body["version"], before.body["version"], "the order the customer sees changed")
+
 	r = o.me(o.cust, id, "confirm-partial", map[string]any{"accept": true})
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	m := o.money(id)
@@ -328,10 +344,6 @@ func TestConfirmPartialRecapsCredits(t *testing.T) {
 	require.EqualValues(t, 11000, m.itemsAfterOffers)
 	require.EqualValues(t, 10500, m.total)
 	require.True(t, o.walletIs(cust, 35), "5 of the 10 held credits are back")
-	c := o.a.call(o.cust, http.MethodGet, "/v1/me/orders/"+id, nil, nil)
-	require.Equal(t, http.StatusOK, c.code, c.raw)
-	require.EqualValues(t, 5, c.body["creditsUsed"])
-	require.EqualValues(t, 10500, c.body["totalPaise"])
 }
 
 // placeQuoted places lines at the quote's total and returns the order id.

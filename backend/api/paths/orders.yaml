@@ -510,11 +510,14 @@
       quantities as reservations and starts the pickup hold (`pickup_hold_min`); `409 insufficient_stock` naming
       the line when one is no longer available (the order keeps waiting). `accept: false` cancels with
       `declined_partial`. At or after `partialConfirmBy` this is `409 invalid_transition`; the order is cancelled
-      `partial_timeout` with no strike (BK-10).
+      `partial_timeout` with no strike (BK-10). When the credit rules tightened while the order waited, so a
+      confirm would keep fewer credits than the order shows, it is `409 price_changed`: the order keeps waiting
+      with the lower credits and the new total, and the customer answers again.
     x-idempotency: required
     x-money: true
     x-problems:
     - insufficient_stock
+    - price_changed
     parameters:
     - $ref: ../common/parameters.yaml#/IdempotencyKey
     requestBody:
