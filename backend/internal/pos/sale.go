@@ -213,10 +213,16 @@ func (s *Service) rewards(ctx context.Context, st posdb.StoreInfoRow, row posdb.
 	return row, nil
 }
 
+// A receipt token: 16 random bytes, 22 base64url characters (D-45).
+const (
+	receiptBytes = 16
+	receiptChars = 22
+)
+
 // receipt makes the sale's receipt token: 128 random bits, stored as their
 // SHA-256 (D-45). The token itself is returned once, never stored or logged.
 func (s *Service) receipt(ctx context.Context, saleID ids.ID, now time.Time) (string, error) {
-	raw, err := s.random(16)
+	raw, err := s.random(receiptBytes)
 	if err != nil {
 		return "", err
 	}
