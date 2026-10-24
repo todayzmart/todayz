@@ -21,14 +21,15 @@ var posSeams func(*pos.Deps)
 
 // posDeps is the pos service's deps in the API. Offers are W2-07's (the
 // POS channel); stock, credits and referrals come from jobs.PosDeps, which
-// the worker's sweep shares (W2-01 and W2-03 wire theirs there).
+// the worker's sweep shares, over the API's credits ledger and referrals.
 func posDeps(d *deps) pos.Deps {
 	var az authz.Authorizer
 	if d.Authz != nil {
 		az = d.Authz
 	}
 	off := offersForPos{newOffers(d)}
-	pd := jobs.PosDeps(pos.Deps{Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Settings: d.Settings, Authz: az})
+	pd := jobs.PosDeps(pos.Deps{Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Settings: d.Settings, Authz: az},
+		creditsService(d), newReferrals(d))
 	pd.Pricer, pd.Redeemer = off, off
 	return pd
 }

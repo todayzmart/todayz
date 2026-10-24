@@ -77,7 +77,8 @@ func TestPOSDepsShared(t *testing.T) {
 	clk := clock.NewFake(time.Date(2026, 10, 23, 6, 0, 0, 0, time.UTC))
 	log := slog.New(slog.NewJSONHandler(io.Discard, nil))
 	api := posDeps(&deps{Clock: clk, Log: log})
-	job := jobs.PosJobDeps(jobs.Deps{Clock: clk, Log: log})
+	job, err := jobs.PosJobDeps(jobs.Deps{Clock: clk, Log: log}, nil)
+	require.NoError(t, err)
 	for name, pair := range map[string][2]any{
 		"Stock": {api.Stock, job.Stock}, "Credits": {api.Credits, job.Credits}, "Referrals": {api.Referrals, job.Referrals},
 	} {
@@ -224,8 +225,8 @@ func TestPOSFreshVerifiedNeedsSamePhone(t *testing.T) {
 	p.noSecrets(right, custPhone, cust2Phone)
 }
 
-// A hold the ledger already released cannot be captured: the sale fails
-// and leaves nothing.
+// A hold the ledger already released cannot be captured: the sale is
+// refused as claim_expired (D-132) and leaves nothing.
 func TestPOSCaptureOfReleasedHold(t *testing.T) {
 	p := newPosShop(t)
 	bill := p.newID()
@@ -234,7 +235,8 @@ func TestPOSCaptureOfReleasedHold(t *testing.T) {
 	require.NoError(t, p.credits.Release(context.Background(), idOf(t, id)))
 
 	r := p.sell(p.cashier, p.qrSale(bill, id))
-	require.Equal(t, http.StatusInternalServerError, r.code, problemCode(r))
+	require.Equal(t, http.StatusConflict, r.code, problemCode(r))
+	require.Equal(t, "claim_expired", problemCode(r))
 	require.Empty(t, p.credits.captured)
 	require.Zero(t, p.a.count(`SELECT count(*) FROM pos_sales WHERE client_id = $1`, uuidOf(t, bill)))
 	require.Equal(t, "claimed", p.getClaim(id).body["status"], "rolled back with the sale")

@@ -12,7 +12,9 @@ timers). A failed release does not fail the run, so it has its own alert:
 Every minute it expires every bill QR claim (`bill_claims`) that is `open` or `claimed`,
 has no sale and is past `expires_at` (120 s after the POS made the QR). For a claim a customer
 confirmed (`claimed_by` set), it releases the credits the confirm held (the Credits seam,
-`Release`). Each claim runs in its own savepoint, so one that fails does not hold up the rest.
+`Release`, which is the W2-01 ledger in the worker as in the API since D-132: `jobs.PosJobDeps`).
+A sale whose hold the ledger already released is refused with 409 `claim_expired` and spends
+nothing (`RefuseReleased`, D-132). Each claim runs in its own savepoint, so one that fails does not hold up the rest.
 The summary is `expired`, `released` and `failed`.
 
 The sweep only gives holds back. The reads and the sale do not wait for it: a claim past

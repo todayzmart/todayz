@@ -19,6 +19,8 @@ Every run is idempotent. A run works at most 20 batches of 100 customers; the ne
 Holds and spends also expire a customer's due lots inline, so a late `credits_expire` never lets
 anyone spend an expired credit. Job arguments carry no customer data.
 
+A counter sale (W2-04) posts under `ref_type` `pos_sale`: its cashback (key `cashback:pos_sale:<sale>`), and on a reversal `reversal` transactions keyed `reverse:pos_sale:<sale>` (spent credits back to their lots, the expired part to `platform_expired`) and `clawback:pos_sale:<sale>` (the cashback taken back up to the balance, the store absorbs the rest); the spend itself is the bill claim's hold (`bill_claim`). `Reverse` run twice is a no-op (D-132).
+
 ## The reconcile reasons
 
 | `reason` | Means |

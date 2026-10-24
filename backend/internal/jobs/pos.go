@@ -8,12 +8,16 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
+	"github.com/todayz/backend/internal/business"
 	"github.com/todayz/backend/internal/catalogue"
+	"github.com/todayz/backend/internal/credits"
+	"github.com/todayz/backend/internal/notify"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/ids"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/pos"
+	"github.com/todayz/backend/internal/referrals"
 )
 
 // KindPosBillClaimExpiry expires bill claims past their 120 s and releases
@@ -24,6 +28,9 @@ const KindPosBillClaimExpiry = "pos_bill_claim_expiry"
 // claim's reads and its sale already treat it as expired at expires_at; the
 // sweep only gives the held credits back.
 func registerpos(r *Registry, d Deps) {
+	// The sweep's enqueuer (its notices) is built on its first run, as the
+	// orders timers' is.
+	enqueuer := lazyEnqueuer(r, d, "pos sweep")
 	var (
 		mu  sync.Mutex
 		svc *pos.Service
@@ -34,7 +41,11 @@ func registerpos(r *Registry, d Deps) {
 		if svc != nil {
 			return svc, nil
 		}
-		s, err := pos.New(PosJobDeps(d))
+		pd, err := PosJobDeps(d, enqueuer)
+		if err != nil {
+			return nil, err
+		}
+		s, err := pos.New(pd)
 		if err != nil {
 			return nil, err
 		}
@@ -63,26 +74,122 @@ func registerpos(r *Registry, d Deps) {
 }
 
 // PosDeps completes base with the pos seams the API's routes and the worker
-// must share: the stock writer, credits and referrals. Both build their
-// service through it, so the sweep releases a hold through the same ledger
-// the routes held it with (D-131).
-func PosDeps(base pos.Deps) pos.Deps {
+// must share: the stock writer, the credits ledger (W2-01) and referrals
+// (W2-03). Both build their service through it, so the sweep releases a
+// hold through the same ledger the routes held it with (D-131, D-132).
+func PosDeps(base pos.Deps, cs *credits.Service, rs *referrals.Service) pos.Deps {
 	base.Stock = PosStock(base.Clock)
-	// TODO(lead): W2-01 wires its credits ledger here and W2-03 its
-	// referrals; until then the do-nothing defaults (no hold exists).
-	base.Credits = pos.NoCredits{}
-	base.Referrals = pos.NoReferrals{}
+	base.Credits, base.Referrals = PosCredits(cs), PosReferrals(rs)
 	return base
 }
 
 // PosJobDeps is the pos service's deps in the worker (the bill-claim
-// sweep): PosDeps over the job deps.
-func PosJobDeps(d Deps) pos.Deps {
+// sweep): PosDeps over the job deps, with the worker's own notices. enq
+// builds the worker's enqueuer on first use (nil without a pool).
+func PosJobDeps(d Deps, enq func() (platformjobs.Enqueuer, error)) (pos.Deps, error) {
 	pd := pos.Deps{Config: d.Config, Clock: d.Clock, Log: d.Log, Settings: d.Settings}
-	if d.Pool != nil {
-		pd.DB = db.New(d.Pool)
+	var e platformjobs.Enqueuer
+	if enq != nil {
+		var err error
+		if e, err = enq(); err != nil {
+			return pos.Deps{}, err
+		}
 	}
-	return PosDeps(pd)
+	nd := notify.Deps{Clock: d.Clock, Settings: d.Settings, Config: d.Config, Log: d.Log, Jobs: e}
+	if d.Pool != nil {
+		pool := db.New(d.Pool)
+		pd.DB, nd.DB, nd.Staff = pool, pool, business.NewStaffResolver(pool)
+	}
+	ns, err := notify.New(nd)
+	if err != nil {
+		return pos.Deps{}, err
+	}
+	cs, err := CreditsService(d, ns)
+	if err != nil {
+		return pos.Deps{}, err
+	}
+	rs, err := ReferralsService(d, ns, e)
+	if err != nil {
+		return pos.Deps{}, err
+	}
+	return PosDeps(pd, cs, rs), nil
+}
+
+// PosCredits is the credits ledger as pos.Credits (D-132). A bill claim's
+// hold is the credits.RefBillClaim ref of the claim; the sale's cashback is
+// the credits.RefPOSSale ref of the sale, posted on its own so a replayed
+// sale finds it posted (cashback:pos_sale:<id>). Capture refuses a released
+// hold (RefuseReleased) and posts no cashback: that comes with Cashback.
+func PosCredits(s *credits.Service) pos.Credits { return posCredits{s: s} }
+
+type posCredits struct{ s *credits.Service }
+
+func claimRef(id ids.ID) credits.Ref { return credits.Ref{Type: credits.RefBillClaim, ID: id} }
+
+func saleRef(id ids.ID) credits.Ref { return credits.Ref{Type: credits.RefPOSSale, ID: id} }
+
+func (c posCredits) Allow(ctx context.Context, customerID, storeID ids.ID, requested int, eligiblePaise int64) (pos.CreditsAllowance, error) {
+	a, err := c.s.Allow(ctx, customerID, storeID, requested, eligiblePaise)
+	return pos.CreditsAllowance{Allowed: a.Allowed, Limit: string(a.Limit)}, err
+}
+
+func (c posCredits) Hold(ctx context.Context, customerID, storeID, claimID ids.ID, n int, eligiblePaise int64) (int, error) {
+	a, err := c.s.Hold(ctx, credits.HoldRequest{
+		Ref: claimRef(claimID), CustomerID: customerID, StoreID: storeID, Credits: n, EligiblePaise: eligiblePaise,
+	})
+	return a.Allowed, err
+}
+
+func (c posCredits) Capture(ctx context.Context, claimID, customerID, storeID ids.ID) error {
+	none := 0
+	_, err := c.s.Complete(ctx, credits.Completion{
+		Ref: claimRef(claimID), CustomerID: customerID, StoreID: storeID, CashbackBP: &none, RefuseReleased: true,
+	})
+	if errors.Is(err, credits.ErrReleased) {
+		return pos.ErrHoldReleased
+	}
+	return err
+}
+
+func (c posCredits) Release(ctx context.Context, claimID ids.ID) error {
+	_, err := c.s.Release(ctx, claimRef(claimID))
+	return err
+}
+
+func (c posCredits) Cashback(ctx context.Context, in pos.Cashback) (int, error) {
+	bp := in.CashbackBP
+	done, err := c.s.Complete(ctx, credits.Completion{
+		Ref: saleRef(in.SaleID), CustomerID: in.CustomerID, StoreID: in.StoreID,
+		EligiblePaise: in.PaidPaise, CashbackBP: &bp,
+	})
+	return done.Cashback, err
+}
+
+func (c posCredits) ReverseSale(ctx context.Context, r pos.SaleReversal) error {
+	rv := credits.Reversal{Ref: saleRef(r.SaleID), CustomerID: r.CustomerID, StoreID: r.StoreID}
+	if r.ClaimID != ids.Zero {
+		rv.Spend = claimRef(r.ClaimID)
+	}
+	_, err := c.s.Reverse(ctx, rv)
+	return err
+}
+
+// PosReferrals is referrals as pos.Referrals: a linked sale is a
+// referrals.RefPOSSale outcome, passed in the sale's transaction; the
+// rewards post after it commits (D-169).
+func PosReferrals(s *referrals.Service) pos.Referrals { return posReferrals{s: s} }
+
+type posReferrals struct{ s *referrals.Service }
+
+func (r posReferrals) Qualify(ctx context.Context, p pos.Purchase) error {
+	return r.s.OnPurchaseCompleted(ctx, referrals.Outcome{
+		RefType: referrals.RefPOSSale, RefID: p.SaleID, CustomerID: p.CustomerID, StoreID: p.StoreID,
+		EligiblePaise: p.EligiblePaise, CreditsUsed: p.CreditsUsed, LinkMethod: p.LinkMethod,
+	})
+}
+
+func (r posReferrals) Revoke(ctx context.Context, _, saleID ids.ID) error {
+	return r.s.OnPurchaseReversed(ctx, referrals.RefPOSSale, saleID)
 }
 
 // PosStock is the catalogue's stock writer as pos.Stock: a sale line is one

@@ -488,7 +488,7 @@ func (s *Service) ConfirmClaim(ctx context.Context, token string, creditsToUse i
 		}
 		held := 0
 		if a.Allowed > 0 {
-			if held, err = s.credits.Hold(ctx, p.UserID, storeID, mustID(c.ID), a.Allowed); err != nil {
+			if held, err = s.credits.Hold(ctx, p.UserID, storeID, mustID(c.ID), a.Allowed, c.AmountPaise); err != nil {
 				return fmt.Errorf("pos: hold credits: %w", err)
 			}
 			held = min(max(held, 0), a.Allowed)

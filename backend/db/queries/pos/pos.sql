@@ -129,6 +129,11 @@ SELECT bc.*, u.name AS customer_name
 FROM bill_claims bc LEFT JOIN users u ON u.id = bc.claimed_by
 WHERE bc.id = @id;
 
+-- name: SaleBillClaim :one
+-- The bill claim a sale bound (ux_bill_claims_pos_sale): its hold is what
+-- the sale spent.
+SELECT id FROM bill_claims WHERE pos_sale_id = @pos_sale_id;
+
 -- name: LockBillClaim :one
 SELECT * FROM bill_claims WHERE id = @id
 FOR UPDATE;

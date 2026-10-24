@@ -158,6 +158,25 @@ The lead's round-2 review: no blockers. No schema change. `main` was merged firs
 | 4, alert | `infra/grafana/alerts/pos.yaml`, rule `tz-pos-claim-release-failed` (*Bill claim hold not released*): `sum(increase(tz_pos_claim_release_failed_total[10m])) > 0` for 5 min, critical (customer credits stay held), runbook `docs/runbooks/pos-bill-claims.md`. The run itself succeeds when a release fails, so Job failing never fires for it. The counter has no zero sample before its first failure, so `increase()` misses that step; a claim that keeps failing adds one each tick, and those fire it | YAML parses. No test reads `infra/grafana/alerts/` (see question 27) |
 | 5, wrong code on a verified bill | In `VerifyCode`, a wrong code against a fresh verified check (another phone) skips `FailCounterCheck`: the check's attempts stay as they were and `attemptsLeft` reports them. The phone's and cashier's counters still take the failure. A stale verified check (older than 2 min) is checked as before | `TestPOSFreshVerifiedNeedsSamePhone`: two wrong codes from another phone are `code_invalid` with `attemptsLeft` 5, the check's `attempts` stays 0, `counter_code_failures` has 2 rows, and the verified phone then answers and sells |
 
+## The real credits ledger and referrals (D-132)
+
+The lead's task after round 3: replace `NoCredits` and `NoReferrals` with W2-01's and W2-03's services, in the API and the worker. The lead approved three additions to `internal/credits` (W2-01's package), committed first in d6f5b92: the `pos_sale` ref, `Completion.RefuseReleased` (opt-in) and `Reverse`. Orders' behaviour is unchanged and the existing credits tests pass untouched. No schema change, no FKs.
+
+| Item | What changed | Test |
+|---|---|---|
+| Wiring | `jobs.PosDeps(base, credits, referrals)` sets Stock, Credits and Referrals; the API (`routes_pos.go`) passes `creditsService(d)` and `newReferrals(d)`, the worker's sweep builds the same through `jobs.PosJobDeps` (notify, credits, referrals) | `TestPOSDepsShared` |
+| Capture | `Complete` on `bill_claim` with `CashbackBP` 0 and `RefuseReleased`; `credits.ErrReleased` maps to `pos.ErrHoldReleased`, and the sale answers 409 `claim_expired` (question 24) and rolls back | `TestPOSLedgerCaptureAfterReleaseDB`: the ledger released the hold under a live claim; the sale is 409, no `pos_sales` row, no capture, no cashback, wallet unchanged, claim still `claimed` |
+| Cashback | `Complete` on `pos_sale`, `EligiblePaise` = paid before round-off, the store's rate now | `TestPOSLedgerBillQRDB`: 50 credits, 10 held, sale of ₹290 pays ₹280, 14 cashback at 5%; wallet 54, store −4; a replay of the bill gives the same sale, one `spend_capture`, one `cashback` |
+| Reversal | `Reverse{Ref: pos_sale, Spend: bill_claim when the sale had one}` | Same test: wallet back to 50, store 0, two `reversal` transactions; a second reverse is refused and moves nothing |
+| Sweep | The worker releases through the ledger | `TestPOSLedgerSweepReleasesDB`: the hold is `released`, the wallet back to 50, the late sale `claim_expired` with no capture |
+| Sync replay | — | `TestPOSLedgerSyncReplayDB`: a counter-code entry synced twice: one sale, one cashback (14), wallet 64 |
+| Referrals | `Qualify` → `OnPurchaseCompleted(Outcome{RefPOSSale, …})` for every linked ledger sale (POS no longer applies `ref_qualifying_min_order_paise` itself; referrals does, D-164/D-165); `Revoke` → `OnPurchaseReversed(pos_sale, id)` | `TestPOSLedgerReferralDB`: a pending store→customer referral stays pending after a ₹75 sale, qualifies on a ₹100 sale (`qualifying_ref_id` = the sale), no reward posted inside the sale, and goes back to `pending` when that sale is reversed |
+| Bind vs sweep | — | `TestPOSLedgerBindRacesSweepDB` (`-race`): the API's clock 1 s before expiry, the worker's 1 s after, the sweep started 0–500 ms after the sale over 8 rounds. Each round has exactly one winner (sale: hold `captured`, sweep result empty; sweep: `{Expired 1, Released 1}`, hold `released`, sale `claim_expired`), no error, the wallet right after each. Four runs gave sale/sweep 6/2, 5/3, 6/2, 5/3 |
+
+Checks on this change (shared test Postgres, `-p 2`): `make check-contract` passes; gofmt and `go vet ./...` clean; golangci-lint and gosec on `internal/pos`, `internal/jobs`, `internal/credits`, `cmd/todayz` 0 issues; settingslint clean; `go test -race` passes for `internal/credits`, `internal/pos`, `internal/jobs`, `internal/referrals`, and `cmd/todayz` but for one flake: `TestPOSCashierCodeLock` (round 1, unchanged here) failed once in `noSecrets`, which looks for the 4-digit code anywhere in the log text, so a timestamp or id can match by chance; it passed 8 of 8 on a rerun (question 33).
+
+The lock order as built is pos rows, then ledger accounts, then `credit_holds`, the reverse of the brief's wording; D-132 has the analysis. Existing POS tests changed where the behaviour did: `TestPOS14` and `TestPOS22` now expect every linked sale handed to referrals (2 each), and `TestPOSCaptureOfReleasedHold` expects 409 `claim_expired` instead of 500.
+
 ## Coverage of SC-POS (08-testing.md)
 
 | Scenario | Where | Notes |
@@ -171,7 +190,7 @@ The lead's round-2 review: no blockers. No schema change. `main` was merged firs
 | Bill-claim race | `TestPOS09ClaimRace` | one winner; credits held once |
 | Sync property | `TestPOSSyncProperty` | random batches and replays; every entry applies once, stock ends the same |
 | POS-03, 07, 15 | — | E2E with the POS frontend (W2-11) |
-| POS-18…21 | — | the ledger side belongs to the credits and referrals domains. Here they are fakes; the tests only check that `ReverseSale` and `Revoke` are called |
+| POS-18…21 | `pos_ledger_http_test.go` | on the real ledger and referrals (D-132): hold, capture, cashback, reversal with clawback, referral qualify and revoke. The fake-seam tests in `pos_http_test.go` still check the calls |
 | POS-35 | — | not written; the slot is free |
 | Offers at the counter | `TestPOSOffersRedeemAndRelease` | a 10% offer prices the line and writes one redemption; a reversal releases it; an offline sale writes none; a flat offer with `maxRedemptions` 1 applies to the first sale only |
 | Reviews of a sale | `TestPOSSaleReview` | a counter-code sale is reviewable once (`review_exists` after); `phone_unverified` is 404; a reversed sale is `review_not_eligible` |
@@ -180,7 +199,7 @@ Tests never print codes, tokens or phones. `noSecrets` captures the API's log ou
 
 ## Not verified
 
-- **Real seams:** the credits ledger and referrals run as fakes (offers are now real). Holds, captures, cashback and clawback are checked only as calls on the seam.
+- **Real seams:** the ledger tests (D-132) run the real credits and referrals; the rest of the POS tests keep the recording fakes. The referral reward job itself (`referral_reward`) is not run from POS tests; W2-03's tests cover it.
 - **SSE delivery:** `bill_claim.updated` is checked as an `outbox_events` row. Delivery to a connected POS was not run.
 - **Authenticated contract smoke:** the smoke runs unauthenticated, so `/v1/biz` and `/v1/me` return only 401s there. Their shapes are covered by the HTTP tests and the request validator.
 - `make check`, `make e2e`, load and the abuse suite were not run.
@@ -190,7 +209,7 @@ Tests never print codes, tokens or phones. `noSecrets` captures the API's log ou
 Each one has the most conservative reading built, and the ones in code are marked `TODO(lead):`.
 
 1. **How long a confirmed QR stays usable:** resolved by the review (D-131). A sale binds a claim only before its `expires_at`.
-2. **Hold release:** resolved by the review (D-131). A new QR, the bill's sale and the `pos_bill_claim_expiry` timer release holds. The routes and the worker now share one constructor (`jobs.PosDeps`); W2-01 wires its ledger there (`TODO(lead)`).
+2. **Hold release:** resolved by the review (D-131). A new QR, the bill's sale and the `pos_bill_claim_expiry` timer release holds. The routes and the worker share one constructor (`jobs.PosDeps`), which now wires W2-01's ledger and W2-03's referrals (D-132).
 3. **`phone_unverified` sales:** should they link later, once the customer verifies that phone? Built: they never link.
 4. **Realtime catalogue:** `bill_claim.updated` is not in `realtime.yaml` or the shared catalogue yet.
 5. **Pricer:** resolved. W2-07's `offers.Service` is wired through `offersForPos`.
@@ -212,10 +231,16 @@ Each one has the most conservative reading built, and the ones in code are marke
 21. **Deadlocks between syncs:** resolved in round 2. A sync takes all its code locks at its start, in sorted order.
 22. **Retention of `counter_code_*` rows.** `counter_code_checks`, `counter_code_uses` and `counter_code_failures` keep `phone_hash` forever, and `todayz_app` has no `DELETE` on them (and the owner cannot truncate them). Nothing removes them, not even account deletion (W1-01's `OnAccountDelete`). Proposed owner: **W3-02 Risk and fraud**, which owns the abuse signals these rows are: a retention kind through `jobs.Define`, run as the owner (or a `SECURITY DEFINER` function, as `drop_old_partitions`), with a `platform_settings` key for the days (the lockout only needs one hour of failures; checks and uses need the 2-minute bind and the offline replay window of `pos_offline_link_max_hours`). W4-03 Security should check it under DPDP. Not built here.
 23. **Fresh-verified branch and the body's phone:** tightened in round 2. A verified check under 2 minutes old answers again only when the body's phone (canonicalised) belongs to the verified customer; the code is not re-checked, since that (device, step) is already used. Another phone falls through to a new check with the usual locks.
-24. **Capture of a released hold** is a 500 (the seam's error is not a problem code). The sale rolls back. Should it be `409 claim_expired`? (TODO(lead))
+24. **Capture of a released hold:** now 409 `claim_expired` (D-132), and the sale rolls back.
 25. **Offer matching is per line.** An engine bill-level discount is not spread over the lines, so an offline sale whose line discounts add up to an engine bill discount reads as unmatched. Offline matching prices as a walk-in (`ids.Zero`), as the online sale does (question 14).
 26. **Sweep starvation.** Resolved in round 3: one run pages past failing claims by `(expires_at, id)`, and alert `tz-pos-claim-release-failed` fires on the counter.
 27. **Alert rules are not tested.** Nothing checks `infra/grafana/alerts/*.yaml` against the registered metrics, as `dashboards_test.go` does for dashboards. `pos.yaml` follows `jobs.yaml`. The 05 §5 alert table does not list it yet; TODO(lead): add a row there or say where W2 alerts are listed.
+28. **Reverse of an uncaptured hold** (`credits.ErrHoldOpen`, TODO(lead)). D-08/D-74 do not say what reversing a purchase whose hold is still `held` means. It is refused. A POS sale captures in its own transaction, so it cannot reach this.
+29. **Reverse before Complete.** A `Reverse` on a ref that was never completed posts nothing, and a later `Complete` on that ref is `ErrReversed`. POS cannot reverse a sale that has not committed, so this only guards other callers. Is that the reading you want for orders too?
+30. **Partial reversal** is not supported: `Reverse` takes the whole purchase, as the POS reversal does. Refused rather than guessed (D-132).
+31. **Lock order wording.** The brief said "ledger accounts, then pos rows"; every path takes pos rows first, then the ledger accounts, then `credit_holds`. No cycle found (D-132). Please confirm the brief meant the order within the ledger.
+32. **Changed POS test expectations.** `TestPOS14`, `TestPOS22` (every linked sale now reaches referrals) and `TestPOSCaptureOfReleasedHold` (409 instead of 500). No credits test was changed.
+33. **`noSecrets` and 4-digit codes.** A counter code is 4 digits, so `strings.Contains` on the whole log can match a timestamp or an id: `TestPOSCashierCodeLock` failed once that way in the full race run. Not changed here (it guards secrets); a fix would look for the code as a JSON value or in a known field. Who wants it?
 
 ## The cross-package FKs
 
@@ -245,14 +270,14 @@ type Redeemer interface {
 }
 type Credits interface {
     Allow(ctx, customerID, storeID ids.ID, requested int, eligiblePaise int64) (CreditsAllowance{Allowed int; Limit string}, error)
-    Hold(ctx, customerID, storeID, claimID ids.ID, credits int) (int, error)
-    Capture(ctx, claimID, saleID ids.ID) error
+    Hold(ctx, customerID, storeID, claimID ids.ID, credits int, eligiblePaise int64) (int, error)
+    Capture(ctx, claimID, customerID, storeID ids.ID) error // ErrHoldReleased on a released hold
     Release(ctx, claimID ids.ID) error
-    Cashback(ctx, Cashback{CustomerID, StoreID, SaleID ids.ID; Credits int}) (int, error)
-    ReverseSale(ctx, saleID, customerID ids.ID) error
+    Cashback(ctx, Cashback{CustomerID, StoreID, SaleID ids.ID; PaidPaise int64; CashbackBP int}) (int, error)
+    ReverseSale(ctx, SaleReversal{SaleID, CustomerID, StoreID, ClaimID ids.ID}) error
 }
 type Referrals interface {
-    Qualify(ctx, customerID, saleID ids.ID, qualifyingPaise int64) error
+    Qualify(ctx, Purchase{CustomerID, StoreID, SaleID ids.ID; LinkMethod string; EligiblePaise int64; CreditsUsed int}) error
     Revoke(ctx, customerID, saleID ids.ID) error
 }
 type Stock interface {

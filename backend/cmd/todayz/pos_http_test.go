@@ -6,7 +6,6 @@ import (
 	"crypto/sha1" //nolint:gosec // RFC 6238 TOTP is HMAC-SHA1 (D-12)
 	"encoding/base32"
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"math/rand/v2"
 	"net/http"
@@ -53,7 +52,7 @@ func (f *fakeCredits) Allow(_ context.Context, _, _ ids.ID, requested int, _ int
 	return pos.CreditsAllowance{Allowed: min(requested, f.balance)}, nil
 }
 
-func (f *fakeCredits) Hold(_ context.Context, _, _, claimID ids.ID, credits int) (int, error) {
+func (f *fakeCredits) Hold(_ context.Context, _, _, claimID ids.ID, credits int, _ int64) (int, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.holds[claimID] = credits
@@ -61,11 +60,11 @@ func (f *fakeCredits) Hold(_ context.Context, _, _, claimID ids.ID, credits int)
 	return credits, nil
 }
 
-func (f *fakeCredits) Capture(_ context.Context, claimID, _ ids.ID) error {
+func (f *fakeCredits) Capture(_ context.Context, claimID, _, _ ids.ID) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	if slices.Contains(f.released, claimID) {
-		return errors.New("fake credits: capture of a released hold")
+		return pos.ErrHoldReleased
 	}
 	f.captured = append(f.captured, claimID)
 	delete(f.holds, claimID) // spent
@@ -90,19 +89,24 @@ func (f *fakeCredits) Cashback(_ context.Context, in pos.Cashback) (int, error) 
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.cashback = append(f.cashback, in)
-	return in.Credits, nil
+	return fakeCashback(in), nil
 }
 
-func (f *fakeCredits) ReverseSale(_ context.Context, saleID, _ ids.ID) error {
+// fakeCashback is the ledger's cashback: CashbackBP of the paise paid, in
+// whole credits.
+func fakeCashback(in pos.Cashback) int { return int(in.PaidPaise * int64(in.CashbackBP) / 1_000_000) }
+
+func (f *fakeCredits) ReverseSale(_ context.Context, r pos.SaleReversal) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	f.reversed = append(f.reversed, saleID)
+	f.reversed = append(f.reversed, r.SaleID)
 	return nil
 }
 
 type qualified struct {
 	customer, sale ids.ID
-	paise          int64
+	paise          int64 // the qualifying amount: eligible less credits used
+	method         string
 }
 
 // fakeReferrals records qualifications and revocations.
@@ -112,10 +116,10 @@ type fakeReferrals struct {
 	revoked   []ids.ID // sales
 }
 
-func (f *fakeReferrals) Qualify(_ context.Context, customerID, saleID ids.ID, paise int64) error {
+func (f *fakeReferrals) Qualify(_ context.Context, p pos.Purchase) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	f.qualified = append(f.qualified, qualified{customerID, saleID, paise})
+	f.qualified = append(f.qualified, qualified{p.CustomerID, p.SaleID, p.EligiblePaise - int64(p.CreditsUsed)*100, p.LinkMethod})
 	return nil
 }
 
@@ -594,7 +598,7 @@ func TestPOS11CounterCode(t *testing.T) {
 	require.EqualValues(t, 5, s.body["cashbackCredits"], "2% of ₹290, whole credits")
 	saleID := idOf(t, s.body["id"])
 	require.Len(t, p.credits.cashback, 1)
-	require.Equal(t, 5, p.credits.cashback[0].Credits)
+	require.Equal(t, 5, fakeCashback(p.credits.cashback[0]))
 	require.Equal(t, saleID, p.credits.cashback[0].SaleID)
 	require.Len(t, p.refs.qualified, 1)
 	require.EqualValues(t, 29000, p.refs.qualified[0].paise)
@@ -643,8 +647,10 @@ func TestPOS13CodeLockout(t *testing.T) {
 	p.noSecrets(right, wrong, custPhone)
 }
 
-// POS-14: a linked sale qualifies the referral at ref_qualifying_min_order_paise
-// (₹100), not below.
+// POS-14: every linked sale goes to referrals with its qualifying amount;
+// referrals applies ref_qualifying_min_order_paise (₹100) itself, since a
+// shop's count takes any amount (D-165, D-132). The real threshold is
+// TestPOSLedgerReferralDB's.
 func TestPOS14ReferralQualifies(t *testing.T) {
 	p := newPosShop(t)
 	secret := p.seed(p.cust)
@@ -658,8 +664,10 @@ func TestPOS14ReferralQualifies(t *testing.T) {
 		s := p.sell(p.cashier, body)
 		require.Equal(t, http.StatusOK, s.code, s.raw)
 	}
-	require.Len(t, p.refs.qualified, 1)
-	require.EqualValues(t, 10000, p.refs.qualified[0].paise)
+	require.Len(t, p.refs.qualified, 2)
+	require.EqualValues(t, 7500, p.refs.qualified[0].paise)
+	require.EqualValues(t, 10000, p.refs.qualified[1].paise)
+	require.Equal(t, "counter_code", p.refs.qualified[1].method)
 	require.Empty(t, p.credits.cashback, "cashback_bp is 0 by default")
 }
 
@@ -730,7 +738,10 @@ func TestPOS22OfflineCodeBoundaries(t *testing.T) {
 	require.True(t, offlineAt.Equal(c), "the code's time is the device's less its offset")
 	require.Equal(t, 119_000, skew)
 	require.Len(t, p.credits.cashback, 0)
-	require.Len(t, p.refs.qualified, 0, "₹25 does not qualify")
+	require.Len(t, p.refs.qualified, 2, "the linked sales go to referrals, which applies the minimum")
+	for _, q := range p.refs.qualified {
+		require.EqualValues(t, 2500, q.paise)
+	}
 	require.Equal(t, 2, p.a.count(`SELECT count(*) FROM pos_sales WHERE store_id = $1 AND link_status = 'linked' AND customer_id IS NOT NULL`, uuidOf(t, p.sid)))
 	for _, x := range results(r) {
 		require.NotContains(t, fmt.Sprint(x), custPhone)
