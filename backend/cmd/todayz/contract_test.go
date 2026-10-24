@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/go-chi/chi/v5"
@@ -142,9 +143,16 @@ func TestDomainsRegisterThroughGeneratedRegister(t *testing.T) {
 }
 
 // contractValidator loads the bundled contract for tests of the real router.
+// It is parsed once per test binary: a Validator is read-only after New, and
+// parsing it per test under -race put the package past go test's 10 minutes
+// on GitHub's runners.
 func contractValidator(t *testing.T) *openapi.Validator {
 	t.Helper()
-	v, err := openapi.New(spec.Bundle)
+	v, err := sharedValidator()
 	require.NoError(t, err)
 	return v
 }
+
+var sharedValidator = sync.OnceValues(func() (*openapi.Validator, error) {
+	return openapi.New(spec.Bundle)
+})
