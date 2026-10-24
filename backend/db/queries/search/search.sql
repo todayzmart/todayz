@@ -103,7 +103,7 @@ SELECT s.id, s.slug, s.name, s.locality, s.address_line1, s.address_line2, s.lan
   s.delivery_fee_paise, s.delivery_free_above_paise, s.delivery_min_order_paise, s.delivery_radius_m,
   s.cashback_bp, (s.rating_avg IS NOT NULL)::bool AS has_rating, COALESCE(s.rating_avg, 0)::float8 AS rating_avg,
   s.rating_count, c.tint AS category_tint, c.slug AS category_slug,
-  COALESCE(NULLIF(c.names->>'en', ''), c.slug) AS category_name,
+  COALESCE(NULLIF(c.names->>'en', ''), c.slug, '') AS category_name, -- '' when the business has no category (the Go code then sends null)
   ST_Y(s.location::geometry)::float8 AS lat, ST_X(s.location::geometry)::float8 AS lng,
   (sqlc.narg(lng)::float8 IS NOT NULL AND sqlc.narg(lat)::float8 IS NOT NULL)::bool AS has_distance,
   COALESCE(ST_Distance(s.location, ST_SetSRID(ST_MakePoint(sqlc.narg(lng)::float8, sqlc.narg(lat)::float8), 4326)::geography), 0)::float8 AS distance_m

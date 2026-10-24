@@ -352,6 +352,23 @@ func TestSearchLogProductIN28(t *testing.T) {
 	assert.Equal(t, "amul butter 100 g", logs[1].query)
 }
 
+// TestShopPageWithoutCategory: a business with no category (every dev seed shop)
+// still has a shop page, with the category fields null (W2-13 B-1: was a 500).
+func TestShopPageWithoutCategory(t *testing.T) {
+	w := newWorld(t)
+	biz := w.id()
+	w.exec(`INSERT INTO businesses (id, brand_name, referral_code, status) VALUES ($1, 'Biz', $2, 'verified')`, biz, shortCode(w.n))
+	w.store(biz, "plain", 300, 0, storeOpt{pickup: true})
+	pg, err := w.svc.GetStore(w.ctx, "plain", discoverapi.GetDiscoverStoreParams{})
+	require.NoError(t, err)
+	assert.Equal(t, "plain", pg.StoreSlug)
+	assert.Nil(t, pg.CategorySlug)
+	assert.Nil(t, pg.CategoryName)
+	assert.Nil(t, pg.CategoryTint)
+	_, err = w.svc.ListStoreItems(w.ctx, "plain", discoverapi.ListDiscoverStoreItemsParams{})
+	require.NoError(t, err)
+}
+
 func TestShopPage(t *testing.T) {
 	f := newQA(t)
 	lat, lng := qaLat, qaLng
