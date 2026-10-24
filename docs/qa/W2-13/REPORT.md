@@ -2,7 +2,7 @@
 
 This report covers the Playwright multi-context journeys for Wave 2 and the gate that runs them.
 
-- **Branch:** `claude/wp-w2-13-gate-a2a139`, cut from `main` at 0e61d1e. `main` has moved to bf7be17, but only by an infra/deploy commit, so the product code under test is the same.
+- **Branch:** `claude/wp-w2-13-gate-a2a139`, cut from `main` at 0e61d1e. Local `main` 573be3e (W2-02 finish, which carries the B-1 fix feeadca) was merged in as c600b10. Runs 5–8 test that merged code.
 - **Where it ran:** locally, against the `make dev` stack, under `scripts/no-egress.sh`. Nothing touched a cloud account.
 - **Product code:** none changed. The bugs found are listed below for the lead to route.
 
@@ -34,28 +34,35 @@ TODAYZ_STACK_FORCE=1 scripts/no-egress.sh make gen e2e-journeys
 |---|---|---|---|---|---|
 | 1 | f4f1d1d (first cut) | 10 | 10 | 9 | 2 |
 | 2 | 264d67d (fixes after run 1) | 14 | 5 | 10 | 2 |
-| **3** | **d30cdab (final)** | **16** | **3** | **10** | 2 |
-| **4** | **d30cdab (final)** | **16** | **3** | **10** | 2 |
+| 3 | d30cdab (before the merge) | 16 | 3 | 10 | 2 |
+| 4 | d30cdab (before the merge) | 16 | 3 | 10 | 2 |
+| 5 | c600b10 + E2E-03/04/12 now strict (uncommitted) | 18 | 3 | 7 | 2 |
+| 6 | 85d115a | 20 | 1 | 7 | 2 |
+| **7** | **14a2fdb (final)** | **21** | **0** | **7** | **0** |
+| **8** | **14a2fdb (final)** | **21** | **0** | **7** | **0** |
 
-- **Final code:** runs 3 and 4 are the two runs on the final code, and they agree test for test. Their 3 failures are all the same product bug (B-1).
-- **No secrets in the output:** across every run log and reset log, a grep for the test phone prefix and `+91` found 0 matches. No OTP, pickup code, counter code, bill token or phone is printed or attached.
+- **Final code:** runs 7 and 8 are the two runs on the final code. They agree test for test: 21 pass, 0 fail, 7 fixme, and the gate exits 0.
+- **Runs 3–4:** their 3 failures were all B-1, which is fixed on the merged code.
+- **Runs 5–6:** every failure was a test-side matcher or step order (see Test problems), not a product bug.
+- **API log:** no 5xx in runs 5–8. The last 5xx in `.cache/dev/api.log` is a B-1 500 from before the merge.
+- **No secrets in the output:** across every run log and reset log (runs 1–8), a grep for the test phone prefix and `+91` found 0 matches. No OTP, pickup code, counter code, bill token or phone is printed or attached.
 
-## Results per journey (runs 3 and 4)
+## Results per journey (runs 7 and 8, merged code)
 
 | Journey | Test | Result | Note |
 |---|---|---|---|
 | E2E-02 | Referral credits; a ₹300 order using 30; cashback 13; wallet 83; credit account +30 −13 | **pass** | |
-| E2E-03 | Partial accept → the customer confirms the new total → collected | fixme (at run time) | D-1: the backend refuses a partial accept (`422 validation_failed`). The test cancels the order, then marks the fixme. |
-| E2E-03 | Shop side in the business app | fixme | D-2 |
+| E2E-03 | Partial accept (API) → the customer confirms the new total → collected | **pass** | Strict: the accept answers 200 with `awaiting_customer`. D-1 closed by W2-02 finish |
+| E2E-03 | Shop side in the business app: Accept part → one less → Send to customer → "Waiting for …" banner; the order is `awaiting_customer` with 1 accepted | **pass** | New. D-2 closed |
 | E2E-06 | POS walk-in with bill QR credits | **pass** | |
 | E2E-10 | Admin hides a review → the public rating drops; restore brings it back (admin API) | **pass** | |
-| E2E-10 | The customer shop page (C-07) shows the rating | **FAIL** | B-1 (product bug) |
-| E2E-12 | Before the change: checkout caps credits at 30 and never spends 40 | **pass** | Runs 3–4 asserted the clamp. Since rewritten for Q-1 (see After the runs) |
+| E2E-10 | The customer shop page (C-07) shows the rating ("3.5 (1)") | **pass** | B-1 fixed |
+| E2E-12 | Before the change: 30 credits placed and released; 40 refused `409 credit_max_exceeded`, nothing held | **pass** | Strict (Q-1, D-216). First run against the stack was run 5 |
 | E2E-12 | Super admin sets `credit_max_per_order` to 40 with step-up; audit entry | fixme | D-3 |
 | E2E-13 | "Weekly groceries" → Fill cart → order → pickup; "Sunday breakfast" split → two orders | **pass** | |
 | E2E-13 | Build a basket from search results (C-05) | **pass** | |
-| E2E-13 | Build a basket from a shop page (C-07) | **FAIL** | B-1 (product bug) |
-| E2E-13 | Build a basket from a product page (C-08) | **FAIL** | B-1 (product bug) |
+| E2E-13 | Build a basket from a shop page (C-07) | **pass** | B-1 fixed |
+| E2E-13 | Build a basket from a product page (C-08) | **pass** | B-1 fixed |
 | E2E-15 | Language switch mid-journey keeps the cart and finishes the order | **pass** | |
 | E2E-15 | The screens read in Hindi after the switch | fixme | D-4 |
 | E2E-16 | Offline banner; the page is kept; the banner clears when back online | **pass** | |
@@ -66,8 +73,7 @@ TODAYZ_STACK_FORCE=1 scripts/no-egress.sh make gen e2e-journeys
 | E2E-05 | Delivery to a saved address | fixme | D-6 |
 | E2E-05 | Dispatch with a rider → delivered | fixme | D-6 |
 | E2E-05 | The full phone shows only while out for delivery | fixme | D-6 |
-| E2E-04 | Three no-shows → strikes → the open-order limit (`409 ordering_suspended`) | **pass** | |
-| E2E-04 | The limit banner in the customer and business apps | fixme | D-7 |
+| E2E-04 | Three no-shows → strikes → the limit → the C-21 banner on Home → one open order; the second refused `409 ordering_suspended` at quote and at place | **pass** | Banner step new. D-7 closed for the customer app |
 | E2E-07 | Offline counter code → synced within 12 h → linked, cashback posted | **pass** | |
 | E2E-07 | Variant: the same code used again → sale kept, link failed, no credits | **pass** | |
 | E2E-07 | Variant: device clock off by more than 2 min → link failed, no credits | **pass** | |
@@ -78,7 +84,7 @@ TODAYZ_STACK_FORCE=1 scripts/no-egress.sh make gen e2e-journeys
 
 ### B-1: the shop page and its items return 500 for every seeded store
 
-**Status:** the lead fixed it on local `main` in feeadca, with a regression test. It is not on this branch, so the three B-1 failures stand until the branch is merged and the gate reruns.
+**Status: resolved.** The lead fixed it on `main` in feeadca, with a regression test. It reached this branch with the merge (c600b10). On the merged code, the three journeys it failed pass in runs 5–8, and the API log shows no more 500s on these routes.
 
 **Where:** `backend/db/queries/search/search.sql:106` (`StoreBySlug`), scanned in `backend/internal/search/shop.go:127`.
 
@@ -99,13 +105,13 @@ TODAYZ_STACK_FORCE=1 scripts/no-egress.sh make gen e2e-journeys
 
 | Id | What is missing | Where |
 |---|---|---|
-| D-1 | Partial accept in the backend (BK-08–10) | `backend/internal/orders/transitions.go:326`: "a partial accept is not available yet" |
-| D-2 | The business app's partial-accept UI | W2-02 finish |
+| ~~D-1~~ | ~~Partial accept in the backend (BK-08–10)~~ | Closed by W2-02 finish (573be3e); E2E-03 is strict |
+| ~~D-2~~ | ~~The business app's partial-accept UI~~ | Closed by W2-02 finish; E2E-03's business-app test passes |
 | D-3 | Admin settings API and A-17 (`credit_max_per_order`, step-up, audit) | W3-09 / W3-05 |
 | D-4 | Hindi copy | `shared/i18n/compiled/customer/hi.json` has English text for all 485 keys (0 translated) |
 | D-5 | Admin customer-block API or screen, and a blocked customer in the seed | W3-05 |
 | D-6 | Customer address API (createOrder needs `addressId`; C-11 is pickup only), dispatch UI, and the full-phone reveal (`StoreOrder` has `phoneMasked` only) | W3 delivery |
-| D-7 | The no-show limit banner (BK-16) | W2-02 finish |
+| ~~D-7~~ | ~~The no-show limit banner (BK-16)~~ | Closed for the customer app (C-21 on Home, asserted). The business-app side of the limit is not asserted at this gate |
 | D-8 | The POS sales list with the link status in the business app | business POS |
 
 ## Open question for the lead
@@ -121,6 +127,7 @@ TODAYZ_STACK_FORCE=1 scripts/no-egress.sh make gen e2e-journeys
 - **What the test does:** E2E-12 asserts the clamp, which is the conservative reading and the current behaviour.
 - **Decision needed:** whether clamping is intended, which would mean 08 CR-02 changes, or whether an over-cap request should be refused, which would be a backend change.
 - **Answer (lead, 24 Oct):** refuse with 409 `credit_max_exceeded` (04-api, D-544); CR-02 stands. The W2-02 finish session is making the backend change.
+- **Closed:** the change came with W2-02 finish (D-216). E2E-12 asserts the refusal strictly and passes in runs 5–8.
 
 ## Test problems found and fixed during the runs
 
@@ -144,12 +151,20 @@ TODAYZ_STACK_FORCE=1 scripts/no-egress.sh make gen e2e-journeys
 | E2E-13 and E2E-15: empty cart | The specs did a full `goto`/`reload` a few milliseconds after adding to the cart. That aborted the app's IndexedDB write (`customer/src/cart/storage.ts`), so the cart came back empty. This is a test race, not a product bug: the cart survives a reload once the write lands. | `cartSaved(page)` waits for the saved lines, and `checkoutCart` no longer reloads `/cart`. E2E-15 now also asserts that the cart holds the item before the switch. |
 | E2E-15: lang tag | The spec expected `<html lang="en">`. English uses `en-IN` by design (`shared/i18n/src/locales.ts:54`). | The spec expects `en-IN`. |
 
+**After the merge of W2-02 finish** (commits 85d115a, 14a2fdb):
+
+| Change or failure | Cause | Fix |
+|---|---|---|
+| E2E-03, E2E-12 runtime fixmes | W2-02 finish shipped partial accept and the `credit_max_exceeded` refusal. | Both are strict assertions now. |
+| E2E-03 shop side (D-2), E2E-04 banner (D-7) | The screens now exist. | New steps: the business app's Accept part sheet (`AcceptPartSheet`) and the C-21 banner. |
+| Run 5: E2E-10 C-07 rating | The spec looked for "N ratings/reviews". The shop page shows the average and count as "3.5 (1)". | The spec matches `d.d (count)`, with the count read from the public reviews API. |
+| Run 5: E2E-13 C-08 | The product page uses the full-size Add to basket button, whose name is "Add to basket". Only the compact one on cards and shop pages is "Add to basket: {name}" (`customer/src/basket/AddToBasket.tsx:104`). | The helper accepts both names. |
+| Run 5: E2E-04 banner body | The `status` element holds the title and the body as one text, so an anchored `getByText` regex missed it. | `toContainText` on the status element filtered by the title. |
+| Run 6: E2E-04 limit step | With one open order, the quote now also refuses with `409 ordering_suspended`, as `backend/api/paths/orders.yaml:30` specifies. The spec quoted after placing the first order. | The spec prices before the first order, then asserts that both the quote and the place refuse the second order. |
+
 ## After the runs
 
-**E2E-12 for Q-1** (commit after c7b4f28):
-- The spec now places an order with 30 credits, cancels it and checks the wallet. Then it expects an order for 40 to be refused with 409 `credit_max_exceeded`, with nothing held.
-- While the server still clamps (it answers `409 price_changed`), that second step is a runtime fixme naming W2-02 finish.
-- The new spec passes the typecheck but has **not run against the stack**: the lead asked for no more stack runs. The lead's rerun after W2-02 finish lands is its first run.
+None of runs 5–8 found a new product bug. What is left is the 7 fixmes (D-3, D-4, D-5, D-6 ×3, D-8), all waiting on later work packages.
 
 ## Notes
 
