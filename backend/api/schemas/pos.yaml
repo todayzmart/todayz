@@ -1,9 +1,264 @@
 # Schemas: domain "pos" (owner W2-04): point of sale and bill claims (04 §2.6).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Names are unique across every schemas/<domain>.yaml. Request objects carry
+# `additionalProperties: false` (an unknown field is 422 validation_failed).
+# Money is `*Paise` (`./common.yaml#/Paise`), ids are `Ulid`, times are
+# `Timestamp`, timed responses carry `serverNow`. Money on a sale (D-94, 01 §7):
+# a line's total is unit × quantity − its offer discount; `subtotalPaise` is
+# the lines less the bill offer; `discountPaise` is the cashier's manual line
+# and bill discounts; credits come off after that; `roundOffPaise` takes the
+# total to the nearest ₹1 with half rounding up (−49…+50). The counter code is
+# 4 digits and never appears in a response, an event or an error (D-04, D-12).
+PosPhone:
+  type: string
+  description: An Indian mobile number in E.164 (`+91` and 10 digits starting 6–9). Never logged and never returned.
+  pattern: ^\+91[6-9][0-9]{9}$
+  maxLength: 13
+  examples:
+    - "+919000000001"
+PosLinkMethod:
+  type: string
+  description: >-
+    How a sale is tied to a customer (D-07). Only `bill_qr` and `counter_code` touch the ledger
+    (cashback, credits, referral); `phone_unverified` only adds the phone to the shop's customer list.
+  enum: [bill_qr, counter_code, phone_unverified]
+PosLinkStatus:
+  type: string
+  description: >-
+    `linked`; `pending_verification` never comes back from the server (it is the device's state before
+    sync); `failed` is an offline counter code the server refused at sync ("Customer link failed", D-12).
+  enum: [linked, pending_verification, failed]
+PosPaymentMethod:
+  type: string
+  description: How the customer paid at the counter.
+  enum: [cash, upi, card, other]
+PosSaleStatus:
+  type: string
+  description: A reversed sale keeps its row and its lines (D-74).
+  enum: [completed, reversed]
+PosCounterCode:
+  type: string
+  description: The 4-digit code the customer's app shows (TOTP, 60 s steps, D-12).
+  pattern: ^[0-9]{4}$
+  examples:
+    - "4821"
+PosSaleLineInput:
+  type: object
+  additionalProperties: false
+  description: >-
+    One line as the POS rang it. A catalogued line names `storeItemId` and must carry the item's price
+    now (else `409 price_changed`); a custom line has no `storeItemId`, needs `name` and takes the
+    typed price. `manualDiscountPaise` needs `pos.discount` (manager and above, D-06).
+  required: [clientId, unitPricePaise, quantity]
+  properties:
+    clientId: {$ref: ./common.yaml#/Ulid}
+    storeItemId: {$ref: ./common.yaml#/Ulid}
+    name: {type: string, minLength: 1, maxLength: 120}
+    unitPricePaise: {type: integer, minimum: 1, maximum: 100000000}
+    quantity: {type: integer, minimum: 1, maximum: 9999}
+    manualDiscountPaise: {type: integer, minimum: 0, maximum: 100000000}
+PosSaleLinkInput:
+  type: object
+  additionalProperties: false
+  description: >-
+    The customer link (D-07). `bill_qr` names the claim the customer confirmed; `counter_code` needs a
+    right code for this sale's `clientId` from `POST {S}/counter-code/verify`; `phone_unverified`
+    carries the typed phone.
+  required: [method]
+  properties:
+    method: {$ref: "#/PosLinkMethod"}
+    claimId: {$ref: ./common.yaml#/Ulid}
+    phone: {$ref: "#/PosPhone"}
+PosSaleCreateRequest:
+  type: object
+  additionalProperties: false
+  required: [clientId, lines, paymentMethod]
+  properties:
+    clientId: {$ref: ./common.yaml#/Ulid}
+    lines:
+      type: array
+      minItems: 1
+      maxItems: 200
+      items: {$ref: "#/PosSaleLineInput"}
+    billDiscountPaise:
+      type: integer
+      minimum: 0
+      maximum: 100000000
+      description: A manual discount off the whole bill (`pos.discount`, manager and above).
+    paymentMethod: {$ref: "#/PosPaymentMethod"}
+    link: {$ref: "#/PosSaleLinkInput"}
+    expectedTotalPaise:
+      type: integer
+      minimum: 0
+      maximum: 10000000000
+      description: The total the POS showed; when given and different, `409 price_changed` with `extensions.totalPaise`.
+PosSaleReverseRequest:
+  type: object
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason: {type: string, minLength: 1, maxLength: 200}
+PosSaleLine:
+  type: object
+  required: [id, clientId, storeItemId, name, unitPricePaise, quantity, offerDiscountPaise, manualDiscountPaise, lineTotalPaise]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    clientId: {$ref: ./common.yaml#/Ulid}
+    storeItemId: {type: [string, "null"], maxLength: 26}
+    name: {type: string}
+    unitPricePaise: {$ref: ./common.yaml#/Paise}
+    quantity: {type: integer}
+    offerDiscountPaise: {$ref: ./common.yaml#/Paise}
+    manualDiscountPaise: {$ref: ./common.yaml#/Paise}
+    lineTotalPaise:
+      $ref: ./common.yaml#/Paise
+PosSaleLink:
+  type: object
+  description: The link as the shop sees it. The customer is named only for `bill_qr` and `counter_code`; a phone is never returned.
+  required: [method, status, customerName]
+  properties:
+    method: {$ref: "#/PosLinkMethod"}
+    status: {$ref: "#/PosLinkStatus"}
+    customerName: {type: [string, "null"]}
+PosSale:
+  type: object
+  required: [id, clientId, lines, itemSubtotalPaise, billOfferDiscountPaise, subtotalPaise, discountPaise,
+    roundOffPaise, creditsUsed, cashbackCredits, totalPaise, paymentMethod, link, status, reversedAt,
+    reversalReason, soldAt, receivedAt, receiptToken, version, serverNow]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    clientId: {$ref: ./common.yaml#/Ulid}
+    lines:
+      type: array
+      items: {$ref: "#/PosSaleLine"}
+    itemSubtotalPaise: {$ref: ./common.yaml#/Paise}
+    billOfferDiscountPaise: {$ref: ./common.yaml#/Paise}
+    subtotalPaise: {$ref: ./common.yaml#/Paise}
+    discountPaise: {$ref: ./common.yaml#/Paise}
+    roundOffPaise: {type: integer, minimum: -49, maximum: 50}
+    creditsUsed: {$ref: ./common.yaml#/Credits}
+    cashbackCredits: {$ref: ./common.yaml#/Credits}
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    paymentMethod: {$ref: "#/PosPaymentMethod"}
+    link:
+      oneOf:
+        - {$ref: "#/PosSaleLink"}
+        - {type: "null"}
+    status: {$ref: "#/PosSaleStatus"}
+    reversedAt:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: "null"}
+    reversalReason: {type: [string, "null"]}
+    soldAt: {$ref: ./common.yaml#/Timestamp}
+    receivedAt: {$ref: ./common.yaml#/Timestamp}
+    receiptToken:
+      type: [string, "null"]
+      description: >-
+        The receipt link's token (`/r/{token}`, D-45), 22 base64url characters. Only in the response that
+        rang the sale; the server keeps only its hash.
+    version: {type: integer}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+BillClaimCreateRequest:
+  type: object
+  additionalProperties: false
+  required: [saleClientId, amountPaise]
+  properties:
+    saleClientId: {$ref: ./common.yaml#/Ulid}
+    amountPaise:
+      type: integer
+      minimum: 1
+      maximum: 10000000000
+      description: The bill after discounts (before credits and round-off) the QR is for.
+BillClaimStatus:
+  type: string
+  description: >-
+    `open` until a customer confirms or it expires (120 s); `claimed` once confirmed; `used` once the
+    sale is rung with it; `expired`.
+  enum: [open, claimed, used, expired]
+BillClaim:
+  type: object
+  description: A bill QR as the POS sees it. `token` is only in the response that made it.
+  required: [id, saleClientId, amountPaise, status, token, expiresAt, customerName, creditsUsed, posSaleId, version, serverNow]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    saleClientId: {$ref: ./common.yaml#/Ulid}
+    amountPaise: {$ref: ./common.yaml#/Paise}
+    status: {$ref: "#/BillClaimStatus"}
+    token: {type: [string, "null"]}
+    expiresAt: {$ref: ./common.yaml#/Timestamp}
+    customerName: {type: [string, "null"]}
+    creditsUsed: {$ref: ./common.yaml#/Credits}
+    posSaleId: {type: [string, "null"], maxLength: 26}
+    version: {type: integer}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+BillClaimToken:
+  type: string
+  description: The signed bill QR token (base64url).
+  pattern: ^[A-Za-z0-9_-]{40,200}$
+BillClaimStore:
+  type: object
+  required: [id, name]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name: {type: string}
+BillClaimPreview:
+  type: object
+  description: A scanned bill QR as the customer sees it before confirming.
+  required: [claimId, store, amountPaise, maxCredits, creditsLimit, expiresAt, serverNow]
+  properties:
+    claimId: {$ref: ./common.yaml#/Ulid}
+    store: {$ref: "#/BillClaimStore"}
+    amountPaise: {$ref: ./common.yaml#/Paise}
+    maxCredits: {$ref: ./common.yaml#/Credits}
+    creditsLimit:
+      type: [string, "null"]
+      description: Why fewer credits can be used, as the checkout's `creditsLimit` (D-30).
+      enum: [not_available, no_balance, below_credit_minimum, credit_max_exceeded, credit_monthly_cap, store_credit_cap, null]
+    expiresAt: {$ref: ./common.yaml#/Timestamp}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+BillClaimConfirmRequest:
+  type: object
+  additionalProperties: false
+  required: [creditsToUse]
+  properties:
+    creditsToUse: {type: integer, minimum: 0, maximum: 100000}
+BillClaimConfirmation:
+  type: object
+  required: [claimId, store, amountPaise, creditsUsed, payablePaise, status, serverNow]
+  properties:
+    claimId: {$ref: ./common.yaml#/Ulid}
+    store: {$ref: "#/BillClaimStore"}
+    amountPaise: {$ref: ./common.yaml#/Paise}
+    creditsUsed: {$ref: ./common.yaml#/Credits}
+    payablePaise:
+      $ref: ./common.yaml#/Paise
+    status: {$ref: "#/BillClaimStatus"}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+CounterCodeVerifyRequest:
+  type: object
+  additionalProperties: false
+  required: [phone, code, saleClientId]
+  properties:
+    phone: {$ref: "#/PosPhone"}
+    code: {$ref: "#/PosCounterCode"}
+    saleClientId: {$ref: ./common.yaml#/Ulid}
+CounterCodeVerification:
+  type: object
+  required: [saleClientId, customerName, serverNow]
+  properties:
+    saleClientId: {$ref: ./common.yaml#/Ulid}
+    customerName: {type: string}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+CounterCodeSeed:
+  type: object
+  description: >-
+    This device's counter-code secret (RFC 6238 TOTP: SHA-1, 4 digits, 60 s). The same secret comes back
+    for the same device; the app keeps it encrypted at rest.
+  required: [secret, algorithm, digits, periodSeconds, serverNow]
+  properties:
+    secret: {type: string, description: Base32 without padding.}
+    algorithm: {type: string, enum: [SHA1]}
+    digits: {type: integer, enum: [4]}
+    periodSeconds: {type: integer, enum: [60]}
+    serverNow: {$ref: ./common.yaml#/ServerNow}

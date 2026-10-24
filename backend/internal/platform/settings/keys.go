@@ -142,9 +142,12 @@ const (
 	BasketMaxItems      Key = "basket_max_items"       // count, default 30
 	BasketSplitMaxShops Key = "basket_split_max_shops" // count, default 2
 	BasketResultsMax    Key = "basket_results_max"     // count, default 10
+
+	// Added by the POS counter-code locks (D-131; seeded by 20401_w2-04_pos.sql)
+	PosCodePhoneFailuresPerHour Key = "pos_code_phone_failures_per_hour" // count, default 10
 )
 
-// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101, D-110).
+// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101, D-110, D-131).
 var AllKeys = []Key{
 	OrderAcceptTimeoutMin,
 	PickupHoldMin,
@@ -264,4 +267,5 @@ var AllKeys = []Key{
 	BasketMaxItems,
 	BasketSplitMaxShops,
 	BasketResultsMax,
+	PosCodePhoneFailuresPerHour,
 }

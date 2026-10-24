@@ -1,0 +1,54 @@
+# POS alerts (05 §5, D-131; owner W2-04). Grafana alerting file provisioning, same layout and
+# datasource uids as jobs.yaml.
+#
+#   Bill claim hold not released  tz_pos_claim_release_failed_total rose over 10 min, for 5 min:
+#                                 expired, confirmed bill claims whose credit holds the sweep
+#                                 could not release. critical (customer credits stay held).
+#
+# The sweep (pos_bill_claim_expiry) still succeeds when a release fails, so Job failing does not
+# fire for it: this rule is the signal. Alert files are not wired into the local stack yet;
+# routing (05 §5) is W5's contact points.
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: pos
+    folder: TodayZ
+    interval: 1m
+    rules:
+      # A failing claim is retried every tick, so the counter keeps rising while the ledger refuses
+      # it. The counter is created on its first failure, so increase() misses that first step; the
+      # retries a minute later are what fire, and "for: 5m" ignores one release that a later pass
+      # fixed.
+      - uid: tz-pos-claim-release-failed
+        title: Bill claim hold not released
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: sum(increase(tz_pos_claim_release_failed_total[10m]))
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        labels:
+          area: pos
+          severity: critical
+        annotations:
+          summary: 'Expired bill claims keep failing to release their credit holds'
+          description: 'pos_bill_claim_expiry could not release {{ $values.A.Value }} credit holds in 10 min; those claims stay live and their customers'' credits stay held. The worker log line "pos: claim hold not released" names each claim id.'
+          runbook_url: docs/runbooks/pos-bill-claims.md
+          __dashboardUid__: tz-jobs
+        isPaused: false
