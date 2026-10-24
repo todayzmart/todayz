@@ -44,8 +44,8 @@ func (s *Service) claimTag(id ids.ID, nonce []byte, storeID ids.ID, amount int64
 	m.Write(nonce)
 	m.Write(storeID[:])
 	var n [16]byte
-	binary.BigEndian.PutUint64(n[:8], uint64(amount))              //nolint:gosec // a non-negative amount
-	binary.BigEndian.PutUint64(n[8:], uint64(expires.UnixMicro())) //nolint:gosec // after 1970
+	binary.BigEndian.PutUint64(n[:8], uint64(amount))              // #nosec G115 -- a claim amount is at least 100 paise
+	binary.BigEndian.PutUint64(n[8:], uint64(expires.UnixMicro())) // #nosec G115 -- after 1970
 	m.Write(n[:])
 	return m.Sum(nil)[:tokenTagLen]
 }

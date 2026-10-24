@@ -317,7 +317,7 @@ func (s *Service) CreateSale(ctx context.Context, sc authz.Scope, body posapi.Po
 		}
 		if perr != nil {
 			linkFail = perr
-			return nil // a wrong code's attempt must commit
+			return nil //nolint:nilerr // the refusal is returned after commit: a wrong code's attempt must count
 		}
 		b := b0
 		if credits > 0 {

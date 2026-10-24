@@ -41,9 +41,6 @@ type bill struct {
 	Total        int64
 }
 
-// manual reports whether the bill carries a cashier's discount (pos.discount).
-func (b bill) manual() bool { return b.Discount > 0 }
-
 // lineInput is a bill line before pricing.
 type lineInput struct {
 	ClientID  ids.ID

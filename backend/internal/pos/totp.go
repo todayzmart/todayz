@@ -3,7 +3,7 @@ package pos
 import (
 	"context"
 	"crypto/hmac"
-	"crypto/sha1" //nolint:gosec // RFC 6238 TOTP is HMAC-SHA-1 (D-12); the customer apps compute the same
+	"crypto/sha1" // #nosec G505 -- RFC 6238 TOTP is HMAC-SHA1 (D-12); the customer apps compute the same, not a collision use
 	"crypto/subtle"
 	"encoding/base32"
 	"encoding/binary"
@@ -41,13 +41,13 @@ func totpStep(t time.Time) int64 { return t.Unix() / int64(totpPeriod/time.Secon
 // totp is the 4-digit code for secret at step (RFC 4226 §5.3 truncation).
 func totp(secret []byte, step int64) string {
 	var msg [8]byte
-	binary.BigEndian.PutUint64(msg[:], uint64(step)) //nolint:gosec // steps after 1970 are positive
+	binary.BigEndian.PutUint64(msg[:], uint64(step)) // #nosec G115 -- steps after 1970 are positive
 	m := hmac.New(sha1.New, secret)
 	m.Write(msg[:])
 	h := m.Sum(nil)
 	off := h[len(h)-1] & 0x0f
 	bin := binary.BigEndian.Uint32(h[off:off+4]) & 0x7fffffff
-	return fmt.Sprintf("%0*d", totpDigits, bin%10_000)
+	return fmt.Sprintf("%0*d", totpDigits, bin%10_000) //settings:ok 10^totpDigits, the code space, not a money amount
 }
 
 // codeAt finds the step within ±1 of at whose code is code, 0 when none.
