@@ -28,6 +28,9 @@ export default defineConfig({
     locale: 'en-IN',
     timezoneId: 'Asia/Kolkata',
     viewport: { width: 390, height: 844 },
+    // A control that is not on the screen fails the step in seconds, not at the 3-minute test timeout.
+    actionTimeout: 20_000,
+    navigationTimeout: 30_000,
     trace: 'off',
     video: 'off',
     screenshot: 'only-on-failure',

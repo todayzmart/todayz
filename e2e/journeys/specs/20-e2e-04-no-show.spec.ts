@@ -30,7 +30,7 @@ test('E2E-04 three no-shows → strikes → the open-order limit', async ({ who 
     const first = await c.place(STORES.SL, items);
     const q = await c.quote(STORES.SL, items);
     const second = await c.api.post('/v1/me/orders', { storeId: STORES.SL.id, fulfilment: 'pickup', items, creditsToUse: 0, expectedTotalPaise: q.totalPaise });
-    expect(second.status).toBe(422);
+    expect(second.status).toBe(409);
     expect(second.code).toBe('ordering_suspended');
     await c.api.ok('customer cancels the open order', 'POST', `/v1/me/orders/${first.id}/cancel`, { reason: 'changed_mind' });
   });

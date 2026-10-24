@@ -210,7 +210,8 @@ export class Principal implements Bearer {
   /** Takes the session back from the browser context (call before the context closes). */
   async detach(): Promise<void> {
     if (!this.lent) return;
-    const cookies = (await this.lent.cookies(URLS.api)).filter((c) => c.name === COOKIE[this.person.app]) as Cookie[];
+    // All of the jar, then by name: the refresh cookie's path is /v1/auth, so cookies(URLS.api) misses it.
+    const cookies = (await this.lent.cookies()).filter((c) => c.name === COOKIE[this.person.app]) as Cookie[];
     this.lent = undefined;
     await this.ctx?.dispose();
     this.ctx = await newRequest(cookies);

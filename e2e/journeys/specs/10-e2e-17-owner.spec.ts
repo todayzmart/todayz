@@ -14,10 +14,10 @@ test('E2E-17 multi-store owner sees both shops and can open each one’s orders'
     }
   });
 
-  await test.step('the business app shows both shops', async () => {
+  await test.step('the business app shop picker (B-01) shows both shops', async () => {
     const app = await openApp(browser, owner, URLS.business);
     try {
-      await app.page.goto('/');
+      await app.page.goto('/choose-shop');
       const region = app.page.getByRole('region', { name: `Stores of ${LAKSHMI.name}` });
       await expect(region).toBeVisible();
       await expect(region.getByText(STORES.SL.name, { exact: true })).toBeVisible();

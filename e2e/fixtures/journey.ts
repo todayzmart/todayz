@@ -2,7 +2,7 @@ import { expect, request as playwrightRequest, test as base, type Browser, type 
 
 import { anon, totp, ulid, type Api } from './api';
 import { principal, readState, setClockOffset, type Principal } from './principals';
-import { LAKSHMI, PEOPLE, URLS, type SeedStore } from './seed';
+import { LAKSHMI, PEOPLE, QA_POINT, URLS, type SeedStore } from './seed';
 
 // The steps the journeys share. Every helper asserts through Api.ok, whose messages carry the step,
 // the route and the problem code only: an order's pickup code, a bill token or a counter code is
@@ -14,11 +14,11 @@ export interface Clock {
   dueJobs?: number;
 }
 
-/** Moves the stack's test clock (D-80) and records the offset for the token-expiry checks. */
+/** Moves the stack's test clock (D-80), waiting up to `wait` seconds for due jobs, and records the offset. */
 export async function moveClock(body: { advance: string } | { reset: true }, wait = 20): Promise<Clock> {
   const ctx = await playwrightRequest.newContext({ ignoreHTTPSErrors: true });
   try {
-    const r = await anon<Clock>(ctx, 'POST', '/v1/test/clock', { ...body, ...(wait > 0 ? { wait } : {}) });
+    const r = await anon<Clock>(ctx, 'POST', '/v1/test/clock', { ...body, wait: `${wait}s` });
     expect(r.status, 'the test clock moved').toBe(200);
     setClockOffset(r.body.offsetMs);
     return r.body;
@@ -244,18 +244,21 @@ export async function counterCode(c: Customer, at: number): Promise<string> {
 
 export { ulid };
 
-/** First-run picks in the customer app (C-01 language, C-02 place): English and PIN 560038. */
+/**
+ * First-run picks in the customer app (C-01 language, C-02 place): English and the seed's QA point,
+ * written to the app's own storage keys before any page script runs, so search, baskets and the
+ * shop pages see nearby shops. A choice the journey makes later (a language switch) is kept.
+ */
 export async function customerFirstRun(page: Page) {
+  await page.addInitScript((place: string) => {
+    try {
+      if (!localStorage.getItem('todayz.lang')) localStorage.setItem('todayz.lang', 'en');
+      if (!localStorage.getItem('todayz.place')) localStorage.setItem('todayz.place', place);
+    } catch {
+      // storage blocked: the journey's own checks fail with the screen they see
+    }
+  }, JSON.stringify({ kind: 'gps', lat: QA_POINT.lat, lng: QA_POINT.lng }));
   await page.goto('/');
-  if (await page.getByRole('button', { name: 'English' }).isVisible().catch(() => false)) {
-    await page.getByRole('button', { name: 'English' }).click();
-    await page.getByRole('button', { name: 'Continue' }).click();
-  }
-  const pin = page.getByRole('textbox', { name: 'PIN code' });
-  if (await pin.isVisible().catch(() => false)) {
-    await pin.fill('560038');
-    await page.getByRole('button', { name: 'Use this PIN code' }).click();
-  }
 }
 
 export interface AppPage {
