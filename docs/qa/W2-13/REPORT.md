@@ -50,7 +50,7 @@ TODAYZ_STACK_FORCE=1 scripts/no-egress.sh make gen e2e-journeys
 | E2E-06 | POS walk-in with bill QR credits | **pass** | |
 | E2E-10 | Admin hides a review → the public rating drops; restore brings it back (admin API) | **pass** | |
 | E2E-10 | The customer shop page (C-07) shows the rating | **FAIL** | B-1 (product bug) |
-| E2E-12 | Before the change: checkout caps credits at 30 and never spends 40 | **pass** | See Q-1 |
+| E2E-12 | Before the change: checkout caps credits at 30 and never spends 40 | **pass** | Runs 3–4 asserted the clamp. Since rewritten for Q-1 (see After the runs) |
 | E2E-12 | Super admin sets `credit_max_per_order` to 40 with step-up; audit entry | fixme | D-3 |
 | E2E-13 | "Weekly groceries" → Fill cart → order → pickup; "Sunday breakfast" split → two orders | **pass** | |
 | E2E-13 | Build a basket from search results (C-05) | **pass** | |
@@ -77,6 +77,8 @@ TODAYZ_STACK_FORCE=1 scripts/no-egress.sh make gen e2e-journeys
 ## Product bugs (for the lead to route)
 
 ### B-1: the shop page and its items return 500 for every seeded store
+
+**Status:** the lead fixed it on local `main` in feeadca, with a regression test. It is not on this branch, so the three B-1 failures stand until the branch is merged and the gate reruns.
 
 **Where:** `backend/db/queries/search/search.sql:106` (`StoreBySlug`), scanned in `backend/internal/search/shop.go:127`.
 
@@ -118,6 +120,7 @@ TODAYZ_STACK_FORCE=1 scripts/no-egress.sh make gen e2e-journeys
 - **Is money at risk?** No: more than 30 is never spent either way.
 - **What the test does:** E2E-12 asserts the clamp, which is the conservative reading and the current behaviour.
 - **Decision needed:** whether clamping is intended, which would mean 08 CR-02 changes, or whether an over-cap request should be refused, which would be a backend change.
+- **Answer (lead, 24 Oct):** refuse with 409 `credit_max_exceeded` (04-api, D-544); CR-02 stands. The W2-02 finish session is making the backend change.
 
 ## Test problems found and fixed during the runs
 
@@ -140,6 +143,13 @@ TODAYZ_STACK_FORCE=1 scripts/no-egress.sh make gen e2e-journeys
 |---|---|---|
 | E2E-13 and E2E-15: empty cart | The specs did a full `goto`/`reload` a few milliseconds after adding to the cart. That aborted the app's IndexedDB write (`customer/src/cart/storage.ts`), so the cart came back empty. This is a test race, not a product bug: the cart survives a reload once the write lands. | `cartSaved(page)` waits for the saved lines, and `checkoutCart` no longer reloads `/cart`. E2E-15 now also asserts that the cart holds the item before the switch. |
 | E2E-15: lang tag | The spec expected `<html lang="en">`. English uses `en-IN` by design (`shared/i18n/src/locales.ts:54`). | The spec expects `en-IN`. |
+
+## After the runs
+
+**E2E-12 for Q-1** (commit after c7b4f28):
+- The spec now places an order with 30 credits, cancels it and checks the wallet. Then it expects an order for 40 to be refused with 409 `credit_max_exceeded`, with nothing held.
+- While the server still clamps (it answers `409 price_changed`), that second step is a runtime fixme naming W2-02 finish.
+- The new spec passes the typecheck but has **not run against the stack**: the lead asked for no more stack runs. The lead's rerun after W2-02 finish lands is its first run.
 
 ## Notes
 
