@@ -260,7 +260,7 @@ No second independent review was done after these fixes.
 10. **POS reversal** (`TxReversal`) has a kind and a wallet line text but no operation. W2-04 owns how a refunded POS sale reverses a capture.
 11. **Hot platform rows.** Platform balance rows are updated in every cashback and expiry. They are written last to keep lock time short. Under load, `platform_marketing` and `platform_expired` could become contention points. Consider a sharded or append-only platform balance.
 12. **i18n keys.** The wallet problem codes (`api/problems/wallet.yaml`) and line `params` need app translations (W2-05 and the apps).
-14. **Contract smoke on main (not W2-01).** See the evidence table: the reviews cursor 422 (W2-06) and the referral redirect (W2-03) fail `TestContractSmoke` here. The lead may want to see them on main before the next `make check`.
 13. **Referrals on the real Poster.** W2-03 posts through its own `referrals.Ledger` seam (D-161). Wiring it to `credits.Poster` is a follow-up; its keys (`referral:<id>:<side>`) already satisfy D-122.
+14. **Contract smoke on main (not W2-01).** See the evidence table: the reviews cursor 422 (W2-06) and the referral redirect (W2-03) fail `TestContractSmoke` here. The lead may want to see them on main before the next `make check`.
 
 Decision-log entries: D-120–D-127.
