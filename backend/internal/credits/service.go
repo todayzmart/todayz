@@ -74,6 +74,16 @@ func (s *Service) ready(ctx context.Context) error {
 	return nil
 }
 
+// dbReady is ready for the paths that read no settings (the deletion
+// forfeiture), so an API built without settings can still delete accounts.
+func (s *Service) dbReady(ctx context.Context) error {
+	if s.db == nil {
+		telemetry.Logger(ctx).ErrorContext(ctx, "credits: not configured (needs the database)")
+		return ErrUnavailable
+	}
+	return nil
+}
+
 // now is the clock's time at the database's precision.
 func (s *Service) now() time.Time { return s.clock.Now().UTC().Truncate(time.Microsecond) }
 
@@ -869,7 +879,7 @@ var ErrHeld = errors.New("credits: credits are still held")
 // the deletion's transaction (identity's deletion hook). A repeat posts
 // nothing.
 func (s *Service) OnAccountDelete(ctx context.Context, userID ids.ID) error {
-	if err := s.ready(ctx); err != nil {
+	if err := s.dbReady(ctx); err != nil {
 		return err
 	}
 	return s.db.InTx(ctx, func(ctx context.Context) error {
