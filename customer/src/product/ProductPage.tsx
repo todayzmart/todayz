@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useCoords } from '../home/coords';
 import { offPercent, useFmt, usePackLine, useStockProps } from '../home/format';
-import { directionsUrl, initials, radiusM } from '../home/present';
+import { directionsUrl, imageUrl, initials, radiusM } from '../home/present';
 import { RouterLink } from '../home/RouterLink';
 import { useRadiusKm } from '../home/radius';
 import { AddToBasket } from '../basket/AddToBasket';
@@ -50,15 +50,14 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
   const item = found.data?.item;
   const serverNow = found.data?.serverNow ?? '';
 
-  // Other nearby shops: the discover search by name, keeping the results with the same product.
-  // TODO(lead): the search has no productId filter, so this matches by name and filters on the client.
+  // Other nearby shops: the discover search limited to this master product (`productId`; `q` stays required).
   const others = useQuery({
     queryKey: ['discover', 'others', item?.productId ?? null, coords?.lat ?? null, coords?.lng ?? null, km],
     enabled: item !== undefined && coords !== null,
     staleTime: 60_000,
     queryFn: async () => {
       if (!item || !coords) return [];
-      const r = await searchDiscover({ q: item.name, lat: coords.lat, lng: coords.lng, radius: radiusM(km), limit: 20 });
+      const r = await searchDiscover({ q: item.name, productId: item.productId, lat: coords.lat, lng: coords.lng, radius: radiusM(km), limit: 20 });
       const out = r.results.flatMap((res) =>
         res.store.storeSlug === slug
           ? []
@@ -124,7 +123,7 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
       </RouterLink>
 
       <div className={styles.media} aria-hidden="true">
-        {initials(item.name)}
+        {imageUrl(item.imageKey) ? <img className={styles.mediaImg} src={imageUrl(item.imageKey)} alt="" decoding="async" /> : initials(item.name)}
       </div>
 
       <div className={styles.titleBlock}>

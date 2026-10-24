@@ -80,6 +80,8 @@ export function page(over: Partial<DiscoverStorePage> = {}): DiscoverStorePage {
     ratingCount: 120,
     cashbackPct: 0,
     categoryTint: 'green',
+    categorySlug: 'grocery',
+    categoryName: 'Grocery',
     deliveryFeePaise: 2000,
     deliveryFreeAbovePaise: null,
     deliveryMinOrderPaise: 10000,

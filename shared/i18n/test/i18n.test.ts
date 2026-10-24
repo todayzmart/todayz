@@ -24,7 +24,7 @@ function text(ast: MessageFormatElement[], values: Record<string, string> = {}):
 
 /** Product and brand names that keep their capitals mid-sentence. */
 const PROPER_NOUNS = new Set([
-  'TodayZ', 'WhatsApp', 'Google', 'India', 'Indian', 'English', 'JavaScript', 'Cloudflare', 'Turnstile', 'I',
+  'TodayZ', 'WhatsApp', 'Google', 'India', 'Indian', 'English', 'JavaScript', 'Cloudflare', 'Turnstile', 'WebP', 'I',
   'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
   'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December',
 ]);

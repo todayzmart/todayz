@@ -12,7 +12,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useUpdateController } from '../app/update-context';
 import { clearCart, useCart } from '../cart/cart';
-import { FULFILMENT, quoteKey, todaysHours, useCartQuote } from '../cart/quote';
+import { CreditsControl } from '../cart/CreditsControl';
+import { FULFILMENT, quoteKey, todaysHours, useCartPricing } from '../cart/quote';
 import styles from '../cart/tx.module.css';
 import { PathLink } from '../orders/ShopLink';
 import { newUlid } from '../orders/ulid';
@@ -59,7 +60,7 @@ export function CheckoutPage() {
   // G9, D-98: the "new version" prompt waits while a checkout is open.
   useHoldUpdates(update, true);
 
-  const quote = useCartQuote(cart, status === 'signedIn');
+  const { quote, probe, choice, settling } = useCartPricing(cart, status === 'signedIn');
   const [accepted, setAccepted] = useState<number | null>(null);
   const [problem, setProblem] = useState<PlaceProblem | null>(null);
   const [placing, setPlacing] = useState(false);
@@ -134,7 +135,7 @@ export function CheckoutPage() {
       storeId: store.id,
       fulfilment: FULFILMENT,
       items,
-      creditsToUse: 0,
+      creditsToUse: q.creditsUsed,
       expectedTotalPaise: q.totalPaise,
     };
     // One key per attempt; a retry of the same order reuses it so the shop gets one order (BK-04).
@@ -155,10 +156,10 @@ export function CheckoutPage() {
       if (p.kind === 'price_changed' && err instanceof ApiError) {
         // The 409 carries the fresh quote: show it and wait for a second tap.
         const fresh = err.problem.extensions?.['quote'] as CheckoutQuote | undefined;
-        if (fresh) client.setQueryData(quoteKey(cart), fresh);
-        else void client.invalidateQueries({ queryKey: quoteKey(cart) });
+        if (fresh) client.setQueryData(quoteKey(cart, q?.creditsRequested ?? 0), fresh);
+        else void client.invalidateQueries({ queryKey: quoteKey(cart, q?.creditsRequested ?? 0) });
       } else if (p.kind === 'insufficient_stock') {
-        void client.invalidateQueries({ queryKey: quoteKey(cart) });
+        void client.invalidateQueries({ queryKey: ['quote'] });
       }
     } finally {
       setPlacing(false);
@@ -272,12 +273,19 @@ export function CheckoutPage() {
                 <dd>−{formatMoney(q.discountPaise)}</dd>
               </div>
             )}
+            {q.creditsUsed > 0 && (
+              <div className={styles.totalRow}>
+                <dt>{intl.formatMessage({ id: 'cart.creditsRow' })}</dt>
+                <dd>−{formatMoney(q.creditsUsed * 100)}</dd>
+              </div>
+            )}
             <div className={`${styles.totalRow} ${styles.grand}`}>
               <dt>{intl.formatMessage({ id: 'cart.total' })}</dt>
               <dd>{formatMoney(q.totalPaise)}</dd>
             </div>
           </dl>
         )}
+        <CreditsControl storeId={store.id} probe={probe} quote={q} on={choice.on} amount={choice.amount} />
       </section>
 
       <p className={styles.note}>
@@ -292,7 +300,7 @@ export function CheckoutPage() {
           block
           loading={placing}
           loadingLabel={intl.formatMessage({ id: 'checkout.placing' })}
-          disabled={!q || blocked || closed}
+          disabled={!q || blocked || closed || settling}
           onClick={() => void place()}
         >
           {needsAccept && q

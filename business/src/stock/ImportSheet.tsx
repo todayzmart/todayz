@@ -13,15 +13,30 @@ import styles from './stock.module.css';
 /** The largest file the screen sends; the server checks again. */
 const MAX_BYTES = 5 * 1024 * 1024;
 
-function known(intl: IntlShape, prefix: string, key: string, fallback: string): string {
-  const id = `${prefix}.${key}`;
-  return intl.messages[id] ? intl.formatMessage({ id }) : intl.formatMessage({ id: fallback });
-}
+const FIELD_IDS: Record<string, string> = {
+  name: 'stock.import.field.name',
+  barcode: 'stock.import.field.barcode',
+  pricePaise: 'stock.import.field.pricePaise',
+  mrpPaise: 'stock.import.field.mrpPaise',
+  quantity: 'stock.import.field.quantity',
+  expiresOn: 'stock.import.field.expiresOn',
+};
+const CODE_IDS: Record<string, string> = {
+  required: 'stock.import.code.required',
+  invalid: 'stock.import.code.invalid',
+  too_long: 'stock.import.code.too_long',
+  price_above_mrp: 'stock.import.code.price_above_mrp',
+  unknown_product: 'stock.import.code.unknown_product',
+  duplicate: 'stock.import.code.duplicate',
+};
 
 function errorText(intl: IntlShape, e: ImportRowError): string {
   return intl.formatMessage(
     { id: 'stock.import.rowError' },
-    { field: known(intl, 'stock.import.field', e.field, 'stock.import.field.other'), problem: known(intl, 'stock.import.code', e.code, 'stock.import.code.other') },
+    {
+      field: intl.formatMessage({ id: FIELD_IDS[e.field] ?? 'stock.import.field.other' }),
+      problem: intl.formatMessage({ id: CODE_IDS[e.code] ?? 'stock.import.code.other' }),
+    },
   );
 }
 

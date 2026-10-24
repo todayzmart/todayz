@@ -27,7 +27,11 @@ type Querier interface {
 
 // Options tune the pool.
 type Options struct {
-	MaxConns        int32
+	MaxConns int32
+	// MinMaxConns raises the pool size to at least this when the URL's
+	// pool_max_conns (or pgx's default, max(4, CPUs)) is lower; a larger
+	// pool_max_conns in the URL still wins. MaxConns, when set, overrides both.
+	MinMaxConns     int32
 	MinConns        int32
 	MaxConnLifetime time.Duration
 	// AppName is sent as application_name (shows in pg_stat_activity).
@@ -38,9 +42,31 @@ type Options struct {
 
 // Open parses url, applies opts and pings. The URL is never put in an error.
 func Open(ctx context.Context, url string, opts Options) (*pgxpool.Pool, error) {
+	cfg, err := poolConfig(url, opts)
+	if err != nil {
+		return nil, err
+	}
+	pool, err := pgxpool.NewWithConfig(ctx, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("db: open pool: %w", redact(err))
+	}
+	pctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	if err := pool.Ping(pctx); err != nil {
+		pool.Close()
+		return nil, fmt.Errorf("db: ping: %w", redact(err))
+	}
+	return pool, nil
+}
+
+// poolConfig parses url and applies opts, without connecting.
+func poolConfig(url string, opts Options) (*pgxpool.Config, error) {
 	cfg, err := pgxpool.ParseConfig(url)
 	if err != nil {
 		return nil, errors.New("db: DATABASE_URL is not a valid postgres URL")
+	}
+	if cfg.MaxConns < opts.MinMaxConns {
+		cfg.MaxConns = opts.MinMaxConns
 	}
 	if opts.MaxConns > 0 {
 		cfg.MaxConns = opts.MaxConns
@@ -59,17 +85,7 @@ func Open(ctx context.Context, url string, opts Options) (*pgxpool.Pool, error) 
 	}
 	// All timestamps are UTC (02 §2.5).
 	cfg.ConnConfig.RuntimeParams["timezone"] = "UTC"
-	pool, err := pgxpool.NewWithConfig(ctx, cfg)
-	if err != nil {
-		return nil, fmt.Errorf("db: open pool: %w", redact(err))
-	}
-	pctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
-	if err := pool.Ping(pctx); err != nil {
-		pool.Close()
-		return nil, fmt.Errorf("db: ping: %w", redact(err))
-	}
-	return pool, nil
+	return cfg, nil
 }
 
 // redact drops connection details pgx may include (host, user) from errors.

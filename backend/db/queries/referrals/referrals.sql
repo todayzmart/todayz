@@ -194,8 +194,14 @@ WHERE id = @id AND status = 'pending';
 SELECT id FROM referrals WHERE referee_type = 'customer' AND referee_id = @user_id AND status = 'pending';
 
 -- name: QualifiedReferrals :many
--- Rewards still to post (the sweep), oldest first.
-SELECT id FROM referrals WHERE status = 'qualified' ORDER BY qualified_at, id LIMIT @lim;
+-- Rewards still to post (the sweep), oldest first. A referral waiting only on
+-- a blocked customer referrer is skipped (D-168), so a pile of them cannot
+-- fill every batch; it comes back once the referrer is unblocked.
+SELECT r.id FROM referrals r
+WHERE r.status = 'qualified'
+  AND NOT (r.referee_rewarded_at IS NOT NULL AND r.referrer_type = 'customer'
+    AND EXISTS (SELECT 1 FROM users u WHERE u.id = r.referrer_id AND u.status = 'blocked'))
+ORDER BY r.qualified_at, r.id LIMIT @lim;
 
 -- name: PendingShopReferrals :many
 -- New shops still counting toward qualification (the sweep).
@@ -210,8 +216,8 @@ SELECT business_id FROM stores WHERE id = @id;
 SELECT (status = 'verified')::bool AS verified FROM businesses WHERE id = @id;
 
 -- name: CountShopSale :exec
-INSERT INTO referral_shop_sales (referral_id, ref_type, ref_id, store_id, created_at)
-VALUES (@referral_id, @ref_type, @ref_id, @store_id, @now)
+INSERT INTO referral_shop_sales (referral_id, ref_type, ref_id, store_id, customer_id, created_at)
+VALUES (@referral_id, @ref_type, @ref_id, @store_id, @customer_id, @now)
 ON CONFLICT DO NOTHING;
 
 -- name: UncountShopSale :execrows
@@ -219,7 +225,8 @@ DELETE FROM referral_shop_sales WHERE ref_type = @ref_type AND ref_id = @ref_id
   AND referral_id IN (SELECT id FROM referrals WHERE status = 'pending');
 
 -- name: ShopSaleCount :one
-SELECT count(*)::int AS n FROM referral_shop_sales WHERE referral_id = @referral_id;
+-- D-168: distinct customers, not purchases.
+SELECT count(DISTINCT customer_id)::int AS n FROM referral_shop_sales WHERE referral_id = @referral_id;
 
 -- name: LastShopSale :one
 SELECT ref_type, ref_id FROM referral_shop_sales WHERE referral_id = @referral_id
@@ -230,8 +237,8 @@ ORDER BY created_at DESC, ref_id DESC LIMIT 1;
 SELECT id FROM stores WHERE business_id = @business_id AND status = 'live'
 ORDER BY live_at, id LIMIT 1;
 
--- name: UserActive :one
-SELECT (status <> 'deleted')::bool AS active FROM users WHERE id = @id;
+-- name: UserStatus :one
+SELECT status FROM users WHERE id = @id;
 
 -- --- stats -----------------------------------------------------------------------
 

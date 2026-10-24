@@ -952,10 +952,12 @@ There is no `make seed`; use `make reset`.
 
 Still open as work, not decisions: `has_offer` in search must agree with `offers.Price`, and the `banner_limit_reached` problem needs its i18n key.
 
+## Referrals as built (W2-03, 2026-10-24)
+
 **D-160 · A business claims its referral itself, owner only, before verification (W2-03).** 01 §8 lets a new shop be referred but names no claim step. A business claims through `POST /v1/biz/businesses/{bid}/referrals/claim`, which needs `referrals.claim` (owner only; owner and manager hold `referrals.view`). The window (`ref_attribution_window_days`) runs from the business's `created_at`, and a claim is refused once the business is verified (draft, submitted and needs_info may claim). A business takes a customer or business code, never a store code; a customer takes a customer or store code, never a business code (`referral_not_eligible`). Self covers the business's own code, its staff's customer codes, and a business sharing any staff member.
 - Lives in: `backend/internal/referrals/claim.go`, `backend/internal/platform/authz/policy/referrals.go`, `backend/api/paths/referrals.yaml`.
 
-**D-161 · Rewards post per side, idempotently, and wait when they cannot post (W2-03).** A referral holds `referrer_rewarded_at` and `referee_rewarded_at` and the two amounts snapshotted at the claim (RF-10). Each side posts on its own in a savepoint, with the idempotency key `referral:<id>:<side>`, so a ledger failure never fails the purchase that qualified it: the referral stays `qualified` and the `referral_sweep` job (every 10 minutes, 200 per list per pass) posts it later. A referral is `rewarded` when both sides are done. A store referrer's reward goes to its business's primary store (the oldest live store, D-72); with no live store that side waits. A deleted referrer's side is closed without a posting; a blocked one is still paid. The ledger is a seam (`referrals.Ledger`) until W2-01's `credits.Poster` merges.
+**D-161 · Rewards post per side, idempotently, and wait when they cannot post (W2-03).** A referral holds `referrer_rewarded_at` and `referee_rewarded_at` and the two amounts snapshotted at the claim (RF-10). Each side posts on its own in a savepoint, with the idempotency key `referral:<id>:<side>`, so a ledger failure never fails the purchase that qualified it: the referral stays `qualified` and the `referral_sweep` job (every 10 minutes, 200 per list per pass) posts it later. A referral is `rewarded` when both sides are done. A store referrer's reward goes to its business's primary store (the oldest live store, D-72); with no live store that side waits. A deleted referrer's side is closed without a posting; a blocked customer referrer's side waits until they are unblocked (D-168). The ledger is a seam (`referrals.Ledger`) until W2-01's `credits.Poster` merges.
 - Lives in: `backend/internal/referrals/qualify.go`, `backend/internal/referrals/seams.go`, `backend/internal/jobs/referrals.go`, `backend/db/migrations/20301_w2-03_referrals.sql`.
 
 **D-162 · Links, standees and the attribution cookie (W2-03).** Every link and standee is `GET /v1/public/ref/{code}` (`?k=c|b` marks a customer or business link; `?s=<standeeId>` a standee scan). It records a `referral_clicks` row (the referrer resolved at click time, IP and user agent as keyed hashes only) and redirects: a store code to `/s/{slug}` in the customer app (keeping `?s=`), a business link to the business app, anything else to the customer app. An unknown code redirects home and records nothing. The click id goes in `__Secure-tz_ref` (Path=/v1, HttpOnly, Secure, SameSite=Lax, Max-Age = the window). First touch: a live cookie is kept on a later click, and at the claim a valid click made before sign-up and within the window beats a typed code; otherwise the typed code is used.
@@ -964,10 +966,10 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 **D-163 · The fraud rules as built (W2-03).** One referral per referee (a repeated identical claim answers 200 with `created: false`; any other is `referral_already_claimed`). A phone hash already used by a referral of the same referee type is `referral_already_claimed` (a deleted account that signs up again). Same device (D-13): the referrer's (or, for a store or business, any staff member's) device at any time, or another account active on the device within 90 days, records the referral as `rejected_same_device`; clients see `rejected` with no reason. A device that has carried 3 or more accounts raises a `referral.device_accounts` risk flag but does not reject.
 - Lives in: `backend/internal/referrals/claim.go`, `backend/internal/referrals/referrals.go`.
 
-**D-164 · What qualifies a customer referral (W2-03).** The referee's first completed purchase whose eligible amount minus credits used is at least `ref_qualifying_min_order_paise` qualifies it: a collected order (through `orders.Referrals`, called in the hand-over transaction) or a POS sale linked by `bill_qr` or `phone_verified` (`phone_unverified` and unlinked sales never qualify, D-07). A smaller purchase leaves the referral pending, with no expiry; a later big enough one still qualifies it.
+**D-164 · What qualifies a customer referral (W2-03).** The referee's first completed purchase whose eligible amount minus credits used is at least `ref_qualifying_min_order_paise` qualifies it: a collected order (through `orders.Referrals`, called in the hand-over transaction) or a POS sale linked by `bill_qr` or `counter_code` (`phone_unverified` and unlinked sales never qualify, D-07). A smaller purchase leaves the referral pending, with no expiry; a later big enough one still qualifies it.
 - Lives in: `backend/internal/referrals/qualify.go`, `backend/internal/orders/seams.go`, `backend/internal/orders/transitions.go`.
 
-**D-165 · How a new shop's sales are counted (W2-03).** Each completed order or linked POS sale at any store of a pending referred business adds one `referral_shop_sales` row (idempotent per purchase), of any amount. Not counted: purchases by the business's own staff, by the referrer (a customer referrer, or any staff of a referrer business), unlinked or `phone_unverified` POS sales. When the count reaches `ref_shop_qualifying_orders` and the business is verified, the referral qualifies; if verification comes later, the sweep qualifies it. Purchases are counted, not distinct customers.
+**D-165 · How a new shop's sales are counted (W2-03).** Each completed order or linked POS sale at any store of a pending referred business adds one `referral_shop_sales` row (idempotent per purchase), of any amount. Not counted: purchases by the business's own staff, by the referrer (a customer referrer, or any staff of a referrer business), unlinked or `phone_unverified` POS sales. When `ref_shop_qualifying_orders` different customers have a counted purchase and the business is verified, the referral qualifies; if verification comes later, the sweep qualifies it. Distinct customers, not purchases, since D-168.
 - Lives in: `backend/internal/referrals/qualify.go`, `backend/db/queries/referrals/referrals.sql`.
 
 **D-166 · A reversed purchase (W2-03).** `OnPurchaseReversed(refType, refID)` reverts every referral that purchase qualified back to `pending` when neither side has posted; once a side has posted, the rewards stay and a `referral.reversed_after_reward` risk flag (score 40) is raised for admin. The purchase is always uncounted from a pending shop referral. One purchase can touch several referrals (a customer's and a shop's).
@@ -975,3 +977,46 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 
 **D-167 · Referral notifications and deletion (W2-03).** Two notice kinds: `referral_unlocked` (to a customer, either side) and `shop_referral_unlocked` (to the shop: the business and the store credited; notify picks the staff), sent when that side's reward posts. Deleting an account rejects the pending referral it joined through (`account_deleted`); referrals it made stay, and its device and phone hashes stay on the rows for the D-163 checks.
 - Lives in: `backend/internal/platform/notice/notice.go`, `backend/internal/notify/catalogue.go`, `backend/internal/referrals/referrals.go`.
+
+**D-168 · A new shop qualifies on distinct customers; a blocked referrer waits (founder, 24 Oct; W2-03).** The founder decided two of W2-03's questions:
+- **Distinct customers.** A referred shop qualifies after purchases by `ref_shop_qualifying_orders` different customers, not that many purchases. Each counted purchase stores its buyer (`referral_shop_sales.customer_id`, migration 20302), and the count is distinct buyers. A customer's second purchase is recorded but adds nothing. The exclusions of D-165 still apply. `ordersCounted` in the business's referral stats is that count.
+- **A blocked referrer is not paid.** When a referral qualifies while its customer referrer is blocked, that side stays qualified and unpaid. The referee is still paid. The `referral_sweep` job pays the referrer once they are unblocked. A referral waiting only on a blocked referrer is left out of the sweep's batch, so a pile of them cannot hold up other rewards. A deleted referrer stays void (D-161).
+- Lives in: `backend/internal/referrals/qualify.go`, `backend/db/queries/referrals/referrals.sql`, `backend/db/migrations/20302_w2-03_shop_sale_customer.sql`, 01 §8.
+
+## Business setup screens as built (W2-10 finish, 2026-10-24)
+
+**D-200 · Business onboarding, stores and settings screens (W2-10 finish).** B-02 is a single resumable page at `/onboarding` (not a step-by-step flow): the business, its first store, hours, payout and tax details, documents and "Send for review", each saved on its own. Resume is by reading the server's state.
+- Hours for the first store are saved through the settings endpoint, so a wizard run never creates the store twice.
+- Skipped for now: language step, starter catalogue, notification prefs, custom delivery hours, photos, field-agent confirm (W3-06).
+- Lives in: `business/src/onboarding/`, `business/src/stores/`, `business/src/settings/`.
+
+**D-201 · Roles on the business screens (W2-10 finish).** Owner: onboarding, payout and tax edits, invite manager or cashier, edit staff, remove a non-owner. Manager: sees stores and settings, edits the store and settings, invites and removes cashiers, mutes asks, sees payout masked. Cashier: none of these. The server is the real gate; the screens only hide what the person cannot do.
+- Lives in: `business/src/stores/perm.ts`, `business/src/credits/permissions.ts`.
+
+**D-202 · Reads before writes with If-Match (W2-10 finish).** Business, store and settings edits send `If-Match` from the ETag of the last read; when none is known the screen reads first. A `412 precondition_failed` refetches and asks the person to try again. Create, invite, submit and document routes carry an `Idempotency-Key`.
+
+**D-203 · Documents (W2-10 finish).** The file is checked in the browser (type, 10 MB, not empty) before any call. The screen registers the document, then PUTs the file to the presigned URL with only the signed `Content-Type`. There is no confirm call in 04, so a failed PUT leaves a `pending` document that uses one of the five slots until support clears it.
+- Open question for the lead: should 04 add a confirm or delete route for a failed upload?
+
+**D-204 · Conservative readings (W2-10 finish).** Where the plan is silent the screen takes the stricter reading: the map pin is latitude and longitude inputs plus "Use my location"; closing or moving a store says "contact support"; a manager scoped to some stores cannot add a store; the delivery radius limit of 20 km follows the API schema, not `platform_settings`; the invitation page treats the link token as the staff id (04 has no get-invitation-by-token route).
+
+**D-205 · Standee page (W2-10 finish).** `/standee` previews the A5 PDF in a frame and downloads it, for owner and manager. The PDF is fetched with the session token and shown from a blob URL, so no token is ever in a URL. It uses the `getStandeePdf` adapter in `credits/api.ts` until `getQrStandee` is generated (`standee.yaml` is still a stub, owner W3-04 per its header, though D-51 gives the PDF to W2-10).
+- Lives in: `business/src/standee/`.
+
+**D-206 · Lead answers to the W2-10 finish questions (lead, 24 Oct).** Conservative readings, per the founder's standing call:
+- `/invite/$token` may treat the token as the staff id, provided the backend only shows an invitation to the phone it was sent to.
+- A document whose upload failed stays `pending` and uses one of the five slots. Open as work for the W2-10 backend owner: a route that deletes your own `pending` document.
+- The 20 km delivery radius maximum stays in the API schema: 01 §17 does not mark it configurable, and it matches the largest radius chip (01 §11).
+- The form may leave category empty for a draft; submit names it in plain words.
+- Store-limited managers do not see Add a store until the backend `TODO(lead)` is settled.
+- `standee.yaml` belongs to W2-10 (D-51); its header naming W3-04 is wrong and gets fixed with the next change to that file.
+- The unused `shop.invite.*` keys are removed from `auth.en.json`.
+
+## Customer finish as built (W2-08/09 finish, 2026-10-24)
+
+**D-190 · Lead answers to the W2-08/09 finish questions (lead, 24 Oct).** Conservative readings:
+- **Shop phone:** customers do not see it. `DiscoverStorePage` says never the phone, so "Call shop" stays out.
+- **Credits copy** ("30 credits on ₹100+") stays out until a public settings endpoint exists.
+- **Pickup-code QR:** waits; no dependency is added in Wave 2. The code is shown as text.
+- **Production tiles and the `IMAGE_BASE_URL` key form** are settled in Wave 5 with the infra. Locally they are per-city tiles and `<base>/<imageKey>`.
+- **C-05 when no shop confirmed** (founder, 24 Oct): say none of the shops has confirmed yet and offer a wider radius. The shops are not asked again automatically.
