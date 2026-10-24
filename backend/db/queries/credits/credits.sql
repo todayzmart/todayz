@@ -45,9 +45,9 @@ RETURNING id;
 SELECT id FROM ledger_transactions WHERE idempotency_key = @idempotency_key;
 
 -- KeyAmount is what accounts of a kind got from the posting with this key.
--- PostedLegs are the kind and entries of the posting with this key.
+-- PostedLegs are the kind, ref and entries of the posting with this key.
 -- name: PostedLegs :many
-SELECT t.kind, e.account_id, e.amount FROM ledger_transactions t
+SELECT t.kind, t.ref_type, t.ref_id, e.account_id, e.amount FROM ledger_transactions t
 JOIN ledger_entries e ON e.transaction_id = t.id
 WHERE t.idempotency_key = @idempotency_key;
 

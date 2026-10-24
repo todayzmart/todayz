@@ -507,9 +507,16 @@ func (s *Service) Hold(ctx context.Context, req HoldRequest) (Allowance, error) 
 	return out, nil
 }
 
+// flagTimeout bounds the risk-flag insert. Hold runs in the caller's
+// transaction, which keeps the store's row locked until it commits, so the
+// flag must never wait long for a second pool connection: with the pool full
+// of orders queued on that lock, it would wait forever.
+var flagTimeout = 2 * time.Second
+
 // flag raises a risk flag for a cap refusal (01 §7, D-30) on the pool, so it
-// survives the caller rolling the checkout back. A failure is logged, not
-// returned: the refusal stands either way.
+// survives the caller rolling the checkout back. It is a fraud signal and
+// never holds up or fails the order: a failure or a timeout is logged and
+// counted in tz_credits_risk_flag_failures_total, and the refusal stands.
 func (s *Service) flag(ctx context.Context, rule string, req HoldRequest) {
 	subjectType, subject := "user", req.CustomerID
 	if rule == capRule(LimitStoreCap) {
@@ -517,12 +524,16 @@ func (s *Service) flag(ctx context.Context, rule string, req HoldRequest) {
 	}
 	details, _ := json.Marshal(map[string]string{"ref_type": string(req.Ref.Type), "ref_id": req.Ref.ID.String()})
 	now := s.now()
-	// One flag per subject and rule per IST day (D-126); the first refusal's
-	// ref is the one kept. Score 0: the plan gives no number.
-	if err := creditsdb.New(s.db.Pool).InsertRiskFlag(context.WithoutCancel(ctx), creditsdb.InsertRiskFlagParams{
+	fctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), flagTimeout)
+	defer cancel()
+	// At most one flag per subject and rule per IST day, best effort (D-126);
+	// the first refusal's ref is the one kept. Score 0: the plan gives no
+	// number.
+	if err := creditsdb.New(s.db.Pool).InsertRiskFlag(fctx, creditsdb.InsertRiskFlagParams{
 		ID: s.newID(now), SubjectType: subjectType, SubjectID: ids.UUID(subject), Rule: rule, Details: details, Now: now,
 		DayStart: clock.StartOfDayIST(now),
 	}); err != nil {
+		countFlagFailed(ctx)
 		telemetry.Logger(ctx).ErrorContext(ctx, "credits: risk flag not written", "rule", rule, "err", err)
 	}
 }
@@ -892,8 +903,8 @@ func (s *Service) Post(ctx context.Context, p Posting) (Posted, error) {
 	return out, nil
 }
 
-// samePosting refuses a repeated key whose first posting had another kind or
-// other legs (D-122): a repeat must be the same posting, never a new one that
+// samePosting refuses a repeated key whose first posting had another kind,
+// ref or other legs (D-122): a repeat must be the same posting, never a new one that
 // only looks posted.
 func (s *Service) samePosting(ctx context.Context, q *creditsdb.Queries, p Posting, es []entry) error {
 	rows, err := q.PostedLegs(ctx, p.IdempotencyKey)
@@ -903,14 +914,30 @@ func (s *Service) samePosting(ctx context.Context, q *creditsdb.Queries, p Posti
 	if len(rows) != len(es) {
 		return ErrKeyReused
 	}
-	want := make(map[pgtype.UUID]int64, len(es))
+	type leg struct {
+		account string
+		amount  int64
+	}
+	want, got := make([]leg, 0, len(es)), make([]leg, 0, len(rows))
 	for _, e := range es {
-		want[e.Account] = e.Amount
+		want = append(want, leg{e.Account.String(), e.Amount})
 	}
 	for _, r := range rows {
-		if n, ok := want[r.AccountID]; !ok || n != r.Amount || r.Kind != string(p.Kind) {
+		if r.Kind != string(p.Kind) || deref(r.RefType) != p.RefType || mustID(r.RefID) != p.RefID {
 			return ErrKeyReused
 		}
+		got = append(got, leg{r.AccountID.String(), r.Amount})
+	}
+	cmp := func(a, b leg) int {
+		if c := strings.Compare(a.account, b.account); c != 0 {
+			return c
+		}
+		return int(min(max(a.amount-b.amount, -1), 1))
+	}
+	slices.SortFunc(want, cmp)
+	slices.SortFunc(got, cmp)
+	if !slices.Equal(want, got) {
+		return ErrKeyReused
 	}
 	return nil
 }
@@ -980,6 +1007,13 @@ func (s *Service) OnAccountDelete(ctx context.Context, userID ids.ID) error {
 func mustID(u pgtype.UUID) ids.ID {
 	id, _ := ids.FromUUID(u)
 	return id
+}
+
+func deref(s *string) string {
+	if s == nil {
+		return ""
+	}
+	return *s
 }
 
 func i32(n int) int32 { return int32(min(max(n, math.MinInt32), math.MaxInt32)) } //nolint:gosec // clamped

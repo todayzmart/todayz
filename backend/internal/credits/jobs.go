@@ -56,6 +56,7 @@ var (
 	mDrift      metric.Int64Gauge
 	mCapRefused metric.Int64Counter
 	mExpired    metric.Int64Counter
+	mFlagFailed metric.Int64Counter
 )
 
 func instruments() {
@@ -67,6 +68,8 @@ func instruments() {
 			metric.WithDescription("Credit holds refused by a cap (D-30, D-76), by cap"))
 		mExpired, _ = m.Int64Counter("tz_credits_expired_total",
 			metric.WithDescription("Credits expired by the expiry job"))
+		mFlagFailed, _ = m.Int64Counter("tz_credits_risk_flag_failures_total",
+			metric.WithDescription("Cap-refusal risk flags not written (an error or the flag timeout); the refusal stands"))
 	})
 }
 
@@ -74,6 +77,13 @@ func countCapRefused(ctx context.Context, l Limit) {
 	instruments()
 	if mCapRefused != nil {
 		mCapRefused.Add(ctx, 1, metric.WithAttributes(attribute.String("reason", telemetry.LabelValue("reason", string(l)))))
+	}
+}
+
+func countFlagFailed(ctx context.Context) {
+	instruments()
+	if mFlagFailed != nil {
+		mFlagFailed.Add(ctx, 1)
 	}
 }
 

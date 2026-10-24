@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -39,6 +40,9 @@ type fakeTx struct {
 	Kind TxKind
 	Key  string
 	Legs []Leg
+	// RefType and RefID are a Poster posting's ref (D-122 compares them).
+	RefType string
+	RefID   ids.ID
 }
 
 type fakeHold struct {
@@ -440,7 +444,7 @@ func (f *Fake) Post(_ context.Context, p Posting) (Posted, error) {
 	}
 	if t, ok := f.txs[p.IdempotencyKey]; ok {
 		f.attempts++
-		if t.Kind != p.Kind || !sameLegs(t.Legs, p.Legs) {
+		if t.Kind != p.Kind || t.RefType != p.RefType || t.RefID != p.RefID || !sameLegs(t.Legs, p.Legs) {
 			return Posted{}, ErrKeyReused
 		}
 		return Posted{TransactionID: t.ID, Duplicate: true}, nil
@@ -467,6 +471,7 @@ func (f *Fake) Post(_ context.Context, p Posting) (Posted, error) {
 	if err != nil {
 		return Posted{}, err
 	}
+	tx.RefType, tx.RefID = p.RefType, p.RefID
 	for _, d := range debits {
 		for _, pt := range d.ps {
 			f.consume(f.lot(pt.Lot), -pt.N, 0)
@@ -601,25 +606,29 @@ func capRule(l Limit) string {
 	return ""
 }
 
-// validatePosting checks a Poster posting's shape.
 // sameLegs reports whether two postings move the same accounts by the same
-// amounts, in any order.
+// amounts, in any order. It compares sorted copies, so two legs on one
+// account never collapse into one.
 func sameLegs(a, b []Leg) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	m := make(map[Account]int64, len(a))
-	for _, l := range a {
-		m[l.Account] = l.Amount
-	}
-	for _, l := range b {
-		if n, ok := m[l.Account]; !ok || n != l.Amount {
-			return false
+	cmp := func(x, y Leg) int {
+		if c := strings.Compare(string(x.Account.Kind), string(y.Account.Kind)); c != 0 {
+			return c
 		}
+		if c := strings.Compare(x.Account.Owner.String(), y.Account.Owner.String()); c != 0 {
+			return c
+		}
+		return int(min(max(x.Amount-y.Amount, -1), 1))
 	}
-	return true
+	a, b = slices.Clone(a), slices.Clone(b)
+	slices.SortFunc(a, cmp)
+	slices.SortFunc(b, cmp)
+	return slices.Equal(a, b)
 }
 
+// validatePosting checks a Poster posting's shape.
 func validatePosting(p Posting) error {
 	switch p.Kind {
 	case TxReferralReward, TxAdminAdjustment, TxPayout:

@@ -7,7 +7,9 @@
 -- The default 0 is for a writer that does not know the column yet (an older
 -- API during a deploy, a test fixture): such an order pays no cashback rather
 -- than a rate nobody showed. InsertOrder always sets it. Orders that already
--- exist take their store's current rate.
+-- exist take their store's current rate; the backfill's UPDATE bumps their
+-- updated_at once (the touch trigger); the lead accepted that (the orders
+-- code reads no updated_at).
 
 -- +goose Up
 ALTER TABLE orders ADD COLUMN cashback_bp int NOT NULL DEFAULT 0;

@@ -15,6 +15,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
 	"pgregory.net/rapid"
 
@@ -356,6 +357,9 @@ func TestCapsDB(t *testing.T) {
 	require.Equal(t, 0, a.Allowed)
 	require.Equal(t, 1, e.count(`SELECT count(*) FROM risk_flags WHERE subject_type = 'store' AND subject_id = $1`, ids.UUID(shop)),
 		"CR-11: flagged although the caller's transaction committed nothing")
+	require.Equal(t, LimitStoreCap, e.hold(e.order(), c3, shop, 10, 20000).Limit)
+	require.Equal(t, 1, e.count(`SELECT count(*) FROM risk_flags WHERE subject_type = 'store' AND subject_id = $1`, ids.UUID(shop)),
+		"D-126: a second refusal on the same IST day raises no second flag")
 	e.clk.Set(ist(2026, 6, 2, 0, 0, 0))
 	require.Equal(t, 10, e.hold(e.order(), c3, shop, 10, 20000).Allowed, "CR-26: a new IST day")
 
@@ -379,6 +383,52 @@ func TestCapsDB(t *testing.T) {
 	require.Equal(t, LimitMonthlyCap, e.hold(e.order(), cust, shops[2], 10, 20000).Limit)
 	e.clk.Set(ist(2026, 9, 1, 0, 0, 0))
 	require.Equal(t, 10, e.hold(e.order(), cust, shops[2], 10, 20000).Allowed, "CR-26: a new IST month")
+	e.clean()
+}
+
+// D-126: Hold runs in the caller's transaction, which keeps the store's row
+// locked until it commits. With every pool connection taken the risk flag
+// cannot get one; it gives up after flagTimeout and Hold still answers the
+// refusal, so a fraud signal never stalls or fails an order.
+func TestFlagNeverStallsHoldDB(t *testing.T) {
+	e := newDBEnv(t)
+	e.setting(settings.StoreCreditRedemptionsPerDay, "1")
+	shop := e.store("Lakshmi Traders", 0)
+	c1, c2 := e.user(), e.user()
+	e.grant(c1, 100)
+	e.grant(c2, 100)
+	require.Equal(t, 10, e.hold(e.order(), c1, shop, 10, 20000).Allowed)
+
+	cfg, err := pgxpool.ParseConfig(e.tdb.URL)
+	require.NoError(t, err)
+	cfg.MaxConns = 1
+	pool, err := pgxpool.NewWithConfig(e.ctx, cfg)
+	require.NoError(t, err)
+	t.Cleanup(pool.Close)
+	one, err := New(Deps{DB: db.New(pool), Clock: e.clk, Settings: e.st})
+	require.NoError(t, err)
+	old := flagTimeout
+	flagTimeout = 300 * time.Millisecond
+	t.Cleanup(func() { flagTimeout = old })
+
+	flags := func() int {
+		return e.count(`SELECT count(*) FROM risk_flags WHERE subject_type = 'store' AND subject_id = $1`, ids.UUID(shop))
+	}
+	start := time.Now()
+	var a Allowance
+	require.NoError(t, one.db.InTx(e.ctx, func(ctx context.Context) error {
+		var err error
+		a, err = one.Hold(ctx, HoldRequest{Ref: e.order(), CustomerID: c2, StoreID: shop, Credits: 10, EligiblePaise: 20000})
+		return err
+	}), "a flag that cannot be written does not fail Hold")
+	require.Less(t, time.Since(start), 5*time.Second, "the flag gave up instead of waiting for the caller's connection")
+	require.Equal(t, LimitStoreCap, a.Limit)
+	require.Zero(t, a.Allowed)
+	require.Zero(t, flags(), "no connection, no flag; the refusal stands")
+
+	// A free connection writes it.
+	require.Equal(t, LimitStoreCap, e.hold(e.order(), c2, shop, 10, 20000).Limit)
+	require.Equal(t, 1, flags())
 	e.clean()
 }
 
@@ -657,6 +707,13 @@ func TestPostDB(t *testing.T) {
 	other.Legs = []Leg{{mk, -30}, {wallet(e.user()), 30}}
 	_, err = e.post(other)
 	require.ErrorIs(t, err, ErrKeyReused, "another customer")
+	other = reward
+	other.RefID = e.gen.New(e.clk.Now())
+	_, err = e.post(other)
+	require.ErrorIs(t, err, ErrKeyReused, "another ref")
+	other.RefType, other.RefID = "", ids.Zero
+	_, err = e.post(other)
+	require.ErrorIs(t, err, ErrKeyReused, "no ref")
 	require.EqualValues(t, 30, e.balance(wallet(cust)))
 
 	_, err = e.post(Posting{Kind: TxAdminAdjustment, IdempotencyKey: "adjust:1",
@@ -729,6 +786,17 @@ func TestAppendOnlyDB(t *testing.T) {
 		require.ErrorAs(t, err, &pg, sql)
 		require.Equal(t, "42501", pg.Code, "%s: permission denied", sql)
 	}
+	// CR-19: a balance row carries its account's kind, never another.
+	acct := e.gen.New(e.clk.Now())
+	_, err := e.tdb.Pool.Exec(e.ctx, `INSERT INTO ledger_accounts (id, kind, owner_type, owner_id) VALUES ($1, 'customer_wallet', 'customer', $2)`,
+		ids.UUID(acct), ids.UUID(e.user()))
+	require.NoError(t, err)
+	_, err = e.tdb.Pool.Exec(e.ctx, `INSERT INTO account_balances (account_id, kind) VALUES ($1, 'store_credit')`, ids.UUID(acct))
+	var pg *pgconn.PgError
+	require.ErrorAs(t, err, &pg)
+	require.Equal(t, "23503", pg.Code, "another kind than the account's")
+	_, err = e.tdb.Pool.Exec(e.ctx, `INSERT INTO account_balances (account_id, kind) VALUES ($1, 'customer_wallet')`, ids.UUID(acct))
+	require.NoError(t, err)
 }
 
 // CR-14: a corrupted balance row shows on the reconcile and is not fixed.

@@ -46,8 +46,18 @@ anyone spend an expired credit. Job arguments carry no customer data.
 - **A setting cannot be read** (`credit_expiry_days`, `credit_expiry_reminder_days`): fix the
   row in `platform_settings` (A-20).
 - **Drift above 0**: a bug, or a write that went around the service. `todayz_app` cannot update or
-  delete accounts, transactions, entries or consumptions; it updates only balance, hold and lot rows. Find the first
-  transaction where the account's Σ entries stop matching.
+  delete accounts, transactions, entries or consumptions, cannot set a balance or a lot's
+  remaining or held (only the triggers move them, D-123), and updates only hold rows and a lot's
+  `expired_at` and `reminded_at`. A lot inserted with no consumption behind it shows as
+  `lots_vs_balances`. Find the first transaction where the account's Σ entries stop matching.
+- **An order collected with no cashback during a deploy**: an order written by an old pod in a
+  rolling deploy of migration 20202 gets `orders.cashback_bp` 0, so it earns no cashback (D-124).
+  This is by design (no rate the customer was not shown); a goodwill top-up is an
+  `admin_adjustment`.
+- **`tz_credits_risk_flag_failures_total` rising**: cap-refusal risk flags are not being written
+  (the 2 s timeout or a database error; the log line `credits: risk flag not written` carries
+  the rule). Orders are not affected (D-126). Usually the API pool is exhausted; check
+  `tz_db_pool_*` and the slow-query panel.
 
 ## Fix
 

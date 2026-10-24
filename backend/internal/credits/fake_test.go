@@ -237,6 +237,12 @@ func TestFakeScenarios(t *testing.T) {
 	_, err = f.Post(ctx, other)
 	require.ErrorIs(t, err, ErrKeyReused)
 	other = reward
+	other.RefType, other.RefID = "referral", g.New(now)
+	_, err = f.Post(ctx, other)
+	require.ErrorIs(t, err, ErrKeyReused, "another ref")
+	require.False(t, sameLegs([]Leg{{wallet(cust), 5}, {wallet(cust), 5}, {wallet(shop), -10}},
+		[]Leg{{wallet(cust), 5}, {wallet(shop), -10}, {wallet(shop), -10}}), "two legs on one account never collapse")
+	other = reward
 	other.IdempotencyKey = "hold:r1"
 	_, err = f.Post(ctx, other)
 	require.ErrorIs(t, err, ErrInvalid)
