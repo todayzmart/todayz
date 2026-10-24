@@ -6,9 +6,14 @@ import type { StockLevel } from '@todayz/ui';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+/** The app's message locale from react-intl's tag: the shell passes the `<html lang>` form (`en-IN`, `kn`, `en-XA`). */
+function messageLocale(intl: IntlShape): MessageLocale {
+  return (intl.locale.startsWith('en-XA') ? 'en-XA' : intl.locale.split('-')[0]) as MessageLocale;
+}
+
 /** "12 min ago" within a day, then "Yesterday, 6:40 pm" and older (IST). */
 export function whenText(intl: IntlShape, iso: string, now: number = Date.now()): string {
-  const locale = intl.locale as MessageLocale;
+  const locale = messageLocale(intl);
   return now - Date.parse(iso) < DAY_MS ? formatRelative(iso, now, locale) : formatAbsolute(iso, now, locale);
 }
 
