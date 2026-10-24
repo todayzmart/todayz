@@ -154,6 +154,12 @@ func (s *Service) guard(store, cashier ids.ID, phone string) codeGuard {
 // (D-131). A phone's lock is one key for every store, as its ceiling is. A
 // lock taken again in the same transaction is a no-op.
 func (s *Service) lockCodeKeys(ctx context.Context, cashier ids.ID, phones ...[]byte) error {
+	return s.lockKeys(ctx, codeKeys(cashier, phones...))
+}
+
+// codeKeys is the advisory keys of a cashier and phones in lock order: the
+// cashier, then the phones sorted, each once. A nil phone has no key.
+func codeKeys(cashier ids.ID, phones ...[]byte) []string {
 	keys := make([]string, 0, len(phones))
 	for _, p := range phones {
 		if p != nil {
@@ -161,9 +167,12 @@ func (s *Service) lockCodeKeys(ctx context.Context, cashier ids.ID, phones ...[]
 		}
 	}
 	slices.Sort(keys)
-	keys = slices.Compact(keys)
+	return append([]string{"pos.code.cashier:" + cashier.String()}, slices.Compact(keys)...)
+}
+
+func (s *Service) lockKeys(ctx context.Context, keys []string) error {
 	q := s.q(ctx)
-	for _, k := range append([]string{"pos.code.cashier:" + cashier.String()}, keys...) {
+	for _, k := range keys {
 		if err := q.LockCodeKey(ctx, k); err != nil {
 			return fmt.Errorf("pos: lock code key: %w", err)
 		}
@@ -356,7 +365,8 @@ func (s *Service) VerifyCode(ctx context.Context, sc authz.Scope, body posapi.Co
 			refused = problem.New(genproblems.CodeLocked, "")
 			return nil
 		}
-		if exists && c.VerifiedAt != nil && now.Sub(*c.VerifiedAt) <= codeCheckTTL {
+		verified := exists && c.VerifiedAt != nil && now.Sub(*c.VerifiedAt) <= codeCheckTTL
+		if verified {
 			// Already right for this bill: answer the same customer again,
 			// for the same phone only (the code itself was used up). Another
 			// phone, or an older check, is checked again (D-131).
@@ -405,11 +415,17 @@ func (s *Service) VerifyCode(ctx context.Context, sc authz.Scope, body posapi.Co
 			}
 		}
 		if !ok {
-			r, err := q.FailCounterCheck(ctx, posdb.FailCounterCheckParams{
-				MaxAttempts: codeTries, Now: now, StoreID: key.StoreID, SaleClientID: key.SaleClientID,
-			})
-			if err != nil {
-				return fmt.Errorf("pos: fail counter check: %w", err)
+			// A wrong code against a fresh verified check leaves its attempts
+			// alone (another phone cannot lock the verified bill); the phone
+			// and cashier still count it (D-131).
+			r := posdb.FailCounterCheckRow{Attempts: c.Attempts}
+			if !verified {
+				r, err = q.FailCounterCheck(ctx, posdb.FailCounterCheckParams{
+					MaxAttempts: codeTries, Now: now, StoreID: key.StoreID, SaleClientID: key.SaleClientID,
+				})
+				if err != nil {
+					return fmt.Errorf("pos: fail counter check: %w", err)
+				}
 			}
 			locked, err := s.codeFailed(ctx, g, locks, "online", now)
 			if err != nil {

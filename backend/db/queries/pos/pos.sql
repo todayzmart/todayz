@@ -153,11 +153,14 @@ WHERE store_id = @store_id AND sale_client_id = @sale_client_id AND id IS DISTIN
 RETURNING id, claimed_by;
 
 -- name: DueBillClaims :many
--- Up to @lim live claims past their expiry (the sweep), oldest first; a
--- claim a sale is binding right now is skipped and its sale sees it expired.
-SELECT id, claimed_by FROM bill_claims
+-- One page of the sweep: up to @lim live claims past their expiry after the
+-- keyset (@after_at, @after_id), oldest first, so a claim left live does not
+-- hold the page back; a claim a sale is binding right now is skipped and its
+-- sale sees it expired.
+SELECT id, claimed_by, expires_at FROM bill_claims
 WHERE status IN ('open','claimed') AND pos_sale_id IS NULL AND expires_at <= @now
-ORDER BY expires_at
+  AND (expires_at, id) > (@after_at::timestamptz, @after_id::uuid)
+ORDER BY expires_at, id
 LIMIT @lim
 FOR UPDATE SKIP LOCKED;
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	syncapi "github.com/todayz/backend/gen/api/sync"
 	"github.com/todayz/backend/gen/sqlc/posdb"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/ids"
@@ -179,6 +180,36 @@ func TestGuardPhoneVariantsShareKey(t *testing.T) {
 	}
 	require.NotEqual(t, want, s.guard(store, cashier, "+919876543211").phone)
 	require.Nil(t, s.guard(store, cashier, "+449876543210").phone)
+}
+
+// A sync locks the cashier up front whenever it carries a counter code, even
+// when no phone parses, so no entry takes it after stock rows (D-131).
+func TestSyncCodeKeys(t *testing.T) {
+	h, err := pii.NewHasher(bytes.Repeat([]byte{7}, 32))
+	require.NoError(t, err)
+	s := &Service{hasher: h}
+	at := time.Date(2026, 10, 23, 6, 0, 0, 0, time.UTC)
+	store, cashier := ids.New(at), ids.New(at.Add(time.Millisecond))
+	code := "1234"
+	entry := func(method syncapi.SyncSaleLinkMethod, phone string, code *string) syncapi.SyncEntry {
+		return syncapi.SyncEntry{Kind: syncapi.Sale, Sale: &syncapi.SyncSale{Link: &syncapi.SyncSaleLink{Method: method, Phone: phone, Code: code}}}
+	}
+	cashierKey := "pos.code.cashier:" + cashier.String()
+
+	require.Nil(t, s.syncCodeKeys(store, cashier, []syncapi.SyncEntry{
+		{Kind: syncapi.Restock}, entry(syncapi.PhoneUnverified, "+919876543210", nil), entry(syncapi.CounterCode, "+919876543210", nil),
+	}), "no counter code, no lock")
+	require.Equal(t, []string{cashierKey}, s.syncCodeKeys(store, cashier, []syncapi.SyncEntry{
+		{Kind: syncapi.Restock}, entry(syncapi.CounterCode, "+449876543210", &code),
+	}), "an unparseable phone still locks the cashier")
+
+	keys := s.syncCodeKeys(store, cashier, []syncapi.SyncEntry{
+		entry(syncapi.CounterCode, "+919876543211", &code), entry(syncapi.CounterCode, "bad", &code),
+		entry(syncapi.CounterCode, "+919876543210", &code), entry(syncapi.CounterCode, "+91 98765 43211", &code),
+	})
+	require.Len(t, keys, 3, "cashier, then two phones once each")
+	require.Equal(t, cashierKey, keys[0])
+	require.Less(t, keys[1], keys[2], "phones sorted")
 }
 
 func TestCanonPhone(t *testing.T) {

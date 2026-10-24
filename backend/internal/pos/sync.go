@@ -144,22 +144,29 @@ func (s *Service) Sync(ctx context.Context, sc authz.Scope, body syncapi.SyncReq
 // order would deadlock and one sync would fail; held to commit, the locks
 // taken again by each entry are no-ops.
 func (s *Service) lockSyncCodes(ctx context.Context, run *syncRun, entries []syncapi.SyncEntry) error {
+	return s.lockKeys(ctx, s.syncCodeKeys(run.sc.StoreID, run.p.UserID, entries))
+}
+
+// syncCodeKeys is the code keys a batch locks up front: none without a
+// counter code, else the cashier's, even when no phone parses (taken later,
+// after stock rows, it would invert VerifyCode's order), then the phones'.
+func (s *Service) syncCodeKeys(store, cashier ids.ID, entries []syncapi.SyncEntry) []string {
 	if s.hasher == nil {
 		return nil
 	}
 	var phones [][]byte
+	codes := false
 	for _, e := range entries {
 		if e.Sale == nil || e.Sale.Link == nil || e.Sale.Link.Method != syncapi.CounterCode || e.Sale.Link.Code == nil {
 			continue
 		}
-		if g := s.guard(run.sc.StoreID, run.p.UserID, e.Sale.Link.Phone); g.phone != nil {
-			phones = append(phones, g.phone)
-		}
+		codes = true
+		phones = append(phones, s.guard(store, cashier, e.Sale.Link.Phone).phone)
 	}
-	if len(phones) == 0 {
+	if !codes {
 		return nil
 	}
-	return s.lockCodeKeys(ctx, run.p.UserID, phones...)
+	return codeKeys(cashier, phones...)
 }
 
 // checkCursor refuses (410 resync_required) a cursor the changes cannot

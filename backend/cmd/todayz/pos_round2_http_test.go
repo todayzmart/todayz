@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
 
 	"github.com/todayz/backend/internal/jobs"
@@ -103,12 +104,7 @@ func TestPOSSweepPoisonClaim(t *testing.T) {
 	p.credits.mu.Unlock()
 	p.advance(121 * time.Second)
 
-	log := slog.New(slog.NewJSONHandler(io.Discard, nil))
-	svc, err := pos.New(pos.Deps{
-		Config: p.cfg, DB: db.New(p.a.tdb.Pool), Clock: p.a.clk, Log: log, Credits: p.credits,
-		Settings: settings.NewCache(settings.PGLoader(p.a.tdb.Pool), settings.Options{Log: log}),
-	})
-	require.NoError(t, err)
+	svc := p.sweeper(t)
 	sw, err := svc.ExpireClaims(context.Background())
 	require.NoError(t, err)
 	require.Equal(t, pos.Sweep{Expired: 2, Released: 2, Failed: 1}, sw)
@@ -202,7 +198,8 @@ func TestPOSPhoneVariantsRefused(t *testing.T) {
 }
 
 // The fresh-verified answer is for the verified phone only: another phone
-// on the same bill is checked again.
+// on the same bill is checked again, and its wrong codes do not use up the
+// verified check's attempts.
 func TestPOSFreshVerifiedNeedsSamePhone(t *testing.T) {
 	p := newPosShop(t)
 	secret := p.seed(p.cust)
@@ -212,8 +209,13 @@ func TestPOSFreshVerifiedNeedsSamePhone(t *testing.T) {
 	require.Equal(t, http.StatusOK, r.code, "verify: status %d", r.code)
 	name := r.body["customerName"]
 
-	r = p.verifyCode(p.cashier, cust2Phone, right, bill)
-	require.Equal(t, "code_invalid", problemCode(r), "another phone: status %d", r.code)
+	for range 2 {
+		r = p.verifyCode(p.cashier, cust2Phone, right, bill)
+		require.Equal(t, "code_invalid", problemCode(r), "another phone: status %d", r.code)
+		require.EqualValues(t, 5, ext(r, "attemptsLeft"), "the verified check's attempts are untouched")
+	}
+	require.Zero(t, p.a.count(`SELECT attempts FROM counter_code_checks WHERE sale_client_id = $1`, uuidOf(t, bill)))
+	require.Equal(t, 2, p.a.count(`SELECT count(*) FROM counter_code_failures`), "the phone and cashier still count them")
 	r = p.verifyCode(p.cashier, custPhone, right, bill)
 	require.Equal(t, http.StatusOK, r.code, "the same phone again: status %d", r.code)
 	require.Equal(t, name, r.body["customerName"])
@@ -328,4 +330,60 @@ func TestPOSOfflineOfferMatchesEngine(t *testing.T) {
 	require.Equal(t, []string{"applied"}, statuses(r), "status %d", r.code)
 	require.Equal(t, 1, flags("pos.offline_links"), "the 21st")
 	p.noSecrets(custPhone)
+}
+
+// sweeper is a pos service over the shop's database and recording credits,
+// as the worker's sweep builds one.
+func (p *posShop) sweeper(t *testing.T) *pos.Service {
+	t.Helper()
+	log := slog.New(slog.NewJSONHandler(io.Discard, nil))
+	svc, err := pos.New(pos.Deps{
+		Config: p.cfg, DB: db.New(p.a.tdb.Pool), Clock: p.a.clk, Log: log, Credits: p.credits,
+		Settings: settings.NewCache(settings.PGLoader(p.a.tdb.Pool), settings.Options{Log: log}),
+	})
+	require.NoError(t, err)
+	return svc
+}
+
+// More failing claims than one page holds do not starve the claims behind
+// them: one pass pages past them by (expires_at, id) and releases the rest.
+func TestPOSSweepPagesPastFailures(t *testing.T) {
+	p := newPosShop(t)
+	var good []string
+	for range 3 {
+		id, tok := p.claim(p.cashier, p.newID(), 29000)
+		require.Equal(t, http.StatusOK, p.confirm(p.cust, tok, 5).code, "confirm")
+		good = append(good, id)
+		p.noSecrets(tok)
+	}
+	// 501 confirmed claims due before the good ones, copied from the first
+	// (no hold of their own); every release of theirs fails.
+	const poisoned = 501
+	ctx := context.Background()
+	rows, err := p.a.tdb.OwnerPool.Query(ctx, `
+		INSERT INTO bill_claims (id, store_id, sale_client_id, amount_paise, token_nonce, expires_at,
+		  created_by, claimed_by, claimed_at, credits_requested, credits_used, status)
+		SELECT gen_random_uuid(), store_id, gen_random_uuid(), amount_paise, token_nonce,
+		  expires_at - interval '1 minute' + g * interval '1 microsecond',
+		  created_by, claimed_by, claimed_at, credits_requested, credits_used, status
+		FROM bill_claims, generate_series(1, $2) g WHERE id = $1
+		RETURNING id`, uuidOf(t, good[0]), poisoned)
+	require.NoError(t, err)
+	p.credits.mu.Lock()
+	for rows.Next() {
+		var id pgtype.UUID
+		require.NoError(t, rows.Scan(&id))
+		p.credits.poison[ids.ID(id.Bytes)] = errors.New("fake credits: ledger down")
+	}
+	p.credits.mu.Unlock()
+	require.NoError(t, rows.Err())
+	require.Len(t, p.credits.poison, poisoned)
+	p.advance(121 * time.Second)
+
+	sw, err := p.sweeper(t).ExpireClaims(ctx)
+	require.NoError(t, err)
+	require.Equal(t, pos.Sweep{Expired: 3, Released: 3, Failed: poisoned}, sw, "one pass")
+	require.Equal(t, 3, p.a.count(`SELECT count(*) FROM bill_claims WHERE status = 'expired'`))
+	require.Equal(t, poisoned, p.a.count(`SELECT count(*) FROM bill_claims WHERE status = 'claimed'`), "the failing ones stay live")
+	require.Empty(t, p.credits.holds, "the good claims' holds are released")
 }

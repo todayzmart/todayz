@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric"
 
@@ -231,7 +232,7 @@ func (s *Service) cancelClaims(ctx context.Context, storeID, clientID, keep ids.
 	return nil
 }
 
-// claimSweep is how many claims one ExpireClaims pass expires.
+// claimSweep is how many claims one page of ExpireClaims takes.
 const claimSweep = 500
 
 // Sweep is one ExpireClaims pass: the claims it expired, the holds it
@@ -240,56 +241,83 @@ type Sweep struct{ Expired, Released, Failed int }
 
 // ExpireClaims expires the live claims past their 120 s and releases the
 // holds of those a customer confirmed (the pos_bill_claim_expiry job,
-// D-131). Each claim is its own savepoint: a claim whose release fails is
-// logged by id, counted in tz_pos_claim_release_failed_total and left live
-// for the next pass, and the claims behind it still expire.
+// D-131). It pages through every claim due at the pass's now by the keyset
+// (expires_at, id), one transaction a page, until the due set is done or
+// ctx (the job's timeout) ends. Each claim is its own savepoint: a claim
+// whose release fails is logged by id, counted in
+// tz_pos_claim_release_failed_total and left live for the next pass, and
+// the page goes on past it, so failing claims never hold back younger ones.
 func (s *Service) ExpireClaims(ctx context.Context) (Sweep, error) {
 	var out Sweep
 	if err := s.ready(ctx); err != nil {
 		return out, err
 	}
-	err := s.db.InTx(ctx, func(ctx context.Context) error {
-		now := s.now()
-		rows, err := s.q(ctx).DueBillClaims(ctx, posdb.DueBillClaimsParams{Now: now, Lim: claimSweep})
-		if err != nil {
-			return fmt.Errorf("pos: due bill claims: %w", err)
+	now := s.now()
+	// The keyset starts before every claim (a NULL id would match none).
+	after := posdb.DueBillClaimsParams{Now: now, AfterID: pgtype.UUID{Valid: true}, Lim: claimSweep}
+	for {
+		if err := ctx.Err(); err != nil {
+			return out, err
 		}
-		for _, r := range rows {
-			id := mustID(r.ID)
-			released := false
-			err := s.db.InTx(ctx, func(ctx context.Context) error {
-				n, err := s.q(ctx).ExpireBillClaim(ctx, posdb.ExpireBillClaimParams{ID: r.ID, Now: now})
-				if err != nil || n == 0 {
+		var page Sweep
+		n := 0
+		err := s.db.InTx(ctx, func(ctx context.Context) error {
+			page = Sweep{}
+			rows, err := s.q(ctx).DueBillClaims(ctx, after)
+			if err != nil {
+				return fmt.Errorf("pos: due bill claims: %w", err)
+			}
+			n = len(rows)
+			for _, r := range rows {
+				if err := s.expireClaim(ctx, r, now, &page); err != nil {
 					return err
 				}
-				if r.ClaimedBy.Valid {
-					if err := s.credits.Release(ctx, id); err != nil {
-						return fmt.Errorf("%w: %w", errRelease, err)
-					}
-					released = true
-				}
-				return nil
-			})
-			switch {
-			case errors.Is(err, errRelease):
-				out.Failed++
-				claimReleaseFailed(ctx)
-				telemetry.Logger(ctx).ErrorContext(ctx, "pos: claim hold not released; retried next pass", "claim_id", id.String(), "err", err)
-			case err != nil:
-				return fmt.Errorf("pos: expire bill claim: %w", err)
-			default:
-				out.Expired++
-				if released {
-					out.Released++
-				}
+				after.AfterAt, after.AfterID = r.ExpiresAt, r.ID
 			}
+			return nil
+		})
+		if err != nil {
+			return out, err
+		}
+		out.Expired, out.Released, out.Failed = out.Expired+page.Expired, out.Released+page.Released, out.Failed+page.Failed
+		if n < claimSweep {
+			return out, nil
+		}
+	}
+}
+
+// expireClaim expires one due claim in its own savepoint and releases its
+// hold; a failed release rolls the claim back, is counted and leaves it live.
+func (s *Service) expireClaim(ctx context.Context, r posdb.DueBillClaimsRow, now time.Time, out *Sweep) error {
+	id := mustID(r.ID)
+	released := false
+	err := s.db.InTx(ctx, func(ctx context.Context) error {
+		n, err := s.q(ctx).ExpireBillClaim(ctx, posdb.ExpireBillClaimParams{ID: r.ID, Now: now})
+		if err != nil || n == 0 {
+			return err
+		}
+		if r.ClaimedBy.Valid {
+			if err := s.credits.Release(ctx, id); err != nil {
+				return fmt.Errorf("%w: %w", errRelease, err)
+			}
+			released = true
 		}
 		return nil
 	})
-	if err != nil {
-		return Sweep{}, err
+	switch {
+	case errors.Is(err, errRelease):
+		out.Failed++
+		claimReleaseFailed(ctx)
+		telemetry.Logger(ctx).ErrorContext(ctx, "pos: claim hold not released; retried next pass", "claim_id", id.String(), "err", err)
+	case err != nil:
+		return fmt.Errorf("pos: expire bill claim: %w", err)
+	default:
+		out.Expired++
+		if released {
+			out.Released++
+		}
 	}
-	return out, nil
+	return nil
 }
 
 // errRelease marks a claim whose hold the ledger did not release.
@@ -301,7 +329,8 @@ var (
 )
 
 // claimReleaseFailed counts a claim the sweep left live because its hold's
-// release failed (tz_pos_claim_release_failed_total; the runbook alerts on it).
+// release failed (tz_pos_claim_release_failed_total; alert
+// tz-pos-claim-release-failed in infra/grafana/alerts/pos.yaml).
 func claimReleaseFailed(ctx context.Context) {
 	metricsOnce.Do(func() {
 		m := otel.Meter("todayz/pos")
