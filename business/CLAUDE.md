@@ -35,7 +35,7 @@ Same structure as `customer/` (see its CLAUDE.md): `src/main.tsx`, `src/app/`, `
 
 - The app is for signed-in staff. `src/shell/Gate.tsx` (root route) shows a skeleton while the refresh cookie is tried, sends a signed-out visitor to `/sign-in?next=<where they were going>`, and renders the sidebar `Shell` only when signed in. `/sign-in` is the only open route.
 - `src/app/`: `session.ts` (`@todayz/auth` session for app `business`; token in memory only), `env.ts`, `labels.ts`, `next.ts` (`?next=` must be a path on this app), `update-context.tsx` (`useUpdateController`; B-05 Sell calls `useHoldUpdates(controller, saleOpen)` so the update toast waits), `shop.ts` (picker data and the remembered store).
-- Routes: `/sign-in` (B-01), `/choose-shop` (picker: role shown, last store remembered, one store skips itself), `/invite/$token` (placeholder). The picker uses the generated `listBusinesses` (`brandName`, `role`, `stores`); while the list fails it offers "Continue to overview". `TODO`: the `/invite/$token` screen (W1-04 has `POST …/staff/{staffId}/accept` and the list's `invitations`) comes with B-13 in W2-10.
+- Routes: `/sign-in` (B-01), `/choose-shop` (picker: role shown, last store remembered, one store skips itself), `/invite/$token` (the invitation page, W2-10 finish). The picker uses the generated `listBusinesses` (`brandName`, `role`, `stores`); while the list fails it offers "Continue to overview".
 - Sign out is a button at the foot of the sidebar (and of the page below 1024px); it clears the query cache.
 - `src/test/render.tsx` renders `<App>` signed in by default (`signedIn: false` for the gate) with a fake `fetch`.
 - Stack journeys: `e2e/sign-in.stack.spec.ts` via `playwright.stack.config.ts` against `make dev`: `pnpm --filter @todayz/business exec playwright test -c playwright.stack.config.ts`. The smoke spec answers the session refresh itself.
@@ -58,3 +58,8 @@ W2-10 (weekend slice): B-04 Orders in `src/orders/` with routes `src/routes/orde
 - Stack journey: `e2e/orders.stack.spec.ts` (customer by API, shop in the browser). Passes on the seed (`docs/qa/stack-2026-10-24/`).
 
 W2-12: B-07 Stock (`src/stock/`), B-08 Offers and banners (`src/offers/`), B-11 Reviews (`src/reviews/`) and B-10 Credits (`src/credits/`), each with its route under `src/routes/<area>/`. Stock, offers and reviews use the generated client; `stock/api.ts` (create product, import) and `credits/api.ts` are adapters marked `TODO(merge)`. Reviews, Credits and Offers still need `nav.ts` entries. Report: `docs/qa/W2-12/REPORT.md`.
+
+W2-10 finish: B-02 onboarding (`src/onboarding/`, `/onboarding`), B-13 stores and staff (`src/stores/`, `/stores`, `/invite/$token`), B-14 settings (`src/settings/`, `/settings`) and the QR standee page (`src/standee/`, `/standee`). All use the generated client except the standee PDF (`credits/api.ts` adapter, `TODO(merge)` until `getQrStandee` is generated). Report: `docs/qa/W2-10-finish/REPORT.md`.
+
+- Edits send `If-Match` (read first when the ETag is unknown; a 412 refetches). Create, invite, submit and document calls carry an `Idempotency-Key`. Roles are in `src/stores/perm.ts`; the server is the gate (D-200 to D-205).
+- Documents: the file is checked in the browser, registered, then PUT to the presigned URL with only `Content-Type`. A failed PUT leaves a `pending` document (no confirm route in 04).

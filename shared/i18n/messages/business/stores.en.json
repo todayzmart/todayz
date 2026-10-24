@@ -368,7 +368,7 @@
     "description": "Store form group"
   },
   "stores.form.pinHelp": {
-    "defaultMessage": "Customers find you by this pin. Stand at your counter and tap Use my location.",
+    "defaultMessage": "Customers find you by this pin. Stand at your counter and tap “Use my location”.",
     "description": "Store form help"
   },
   "stores.form.locate": {

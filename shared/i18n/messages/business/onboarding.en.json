@@ -108,7 +108,7 @@
     "description": "Step title"
   },
   "onboarding.docs.help": {
-    "defaultMessage": "Photos or PDFs, up to 10 MB each. Documents are kept private and only our review team sees them.",
+    "defaultMessage": "Photos or a PDF, up to 10 MB each. Documents are kept private and only our review team sees them.",
     "description": "Help"
   },
   "onboarding.docs.kind.pan": {

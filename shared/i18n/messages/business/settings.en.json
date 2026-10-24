@@ -56,7 +56,7 @@
     "description": "Banner"
   },
   "settings.noStore.body": {
-    "defaultMessage": "Add a store under Stores and staff. Its settings will show here.",
+    "defaultMessage": "Add a store under “Stores and staff”. Its settings will show here.",
     "description": "Banner"
   },
   "settings.forStore": {

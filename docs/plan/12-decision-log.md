@@ -943,3 +943,21 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 
 **D-167 · Referral notifications and deletion (W2-03).** Two notice kinds: `referral_unlocked` (to a customer, either side) and `shop_referral_unlocked` (to the shop: the business and the store credited; notify picks the staff), sent when that side's reward posts. Deleting an account rejects the pending referral it joined through (`account_deleted`); referrals it made stay, and its device and phone hashes stay on the rows for the D-163 checks.
 - Lives in: `backend/internal/platform/notice/notice.go`, `backend/internal/notify/catalogue.go`, `backend/internal/referrals/referrals.go`.
+
+**D-200 · Business onboarding, stores and settings screens (W2-10 finish).** B-02 is a single resumable page at `/onboarding` (not a step-by-step flow): the business, its first store, hours, payout and tax details, documents and "Send for review", each saved on its own. Resume is by reading the server's state.
+- Hours for the first store are saved through the settings endpoint, so a wizard run never creates the store twice.
+- Skipped for now: language step, starter catalogue, notification prefs, custom delivery hours, photos, field-agent confirm (W3-06).
+- Lives in: `business/src/onboarding/`, `business/src/stores/`, `business/src/settings/`.
+
+**D-201 · Roles on the business screens (W2-10 finish).** Owner: onboarding, payout and tax edits, invite manager or cashier, edit staff, remove a non-owner. Manager: sees stores and settings, edits the store and settings, invites and removes cashiers, mutes asks, sees payout masked. Cashier: none of these. The server is the real gate; the screens only hide what the person cannot do.
+- Lives in: `business/src/stores/perm.ts`, `business/src/credits/permissions.ts`.
+
+**D-202 · Reads before writes with If-Match (W2-10 finish).** Business, store and settings edits send `If-Match` from the ETag of the last read; when none is known the screen reads first. A `412 precondition_failed` refetches and asks the person to try again. Create, invite, submit and document routes carry an `Idempotency-Key`.
+
+**D-203 · Documents (W2-10 finish).** The file is checked in the browser (type, 10 MB, not empty) before any call. The screen registers the document, then PUTs the file to the presigned URL with only the signed `Content-Type`. There is no confirm call in 04, so a failed PUT leaves a `pending` document that uses one of the five slots until support clears it.
+- Open question for the lead: should 04 add a confirm or delete route for a failed upload?
+
+**D-204 · Conservative readings (W2-10 finish).** Where the plan is silent the screen takes the stricter reading: the map pin is latitude and longitude inputs plus "Use my location"; closing or moving a store says "contact support"; a manager scoped to some stores cannot add a store; the delivery radius limit of 20 km follows the API schema, not `platform_settings`; the invitation page treats the link token as the staff id (04 has no get-invitation-by-token route).
+
+**D-205 · Standee page (W2-10 finish).** `/standee` previews the A5 PDF in a frame and downloads it, for owner and manager. The PDF is fetched with the session token and shown from a blob URL, so no token is ever in a URL. It uses the `getStandeePdf` adapter in `credits/api.ts` until `getQrStandee` is generated (`standee.yaml` is still a stub, owner W3-04 per its header, though D-51 gives the PDF to W2-10).
+- Lives in: `business/src/standee/`.
