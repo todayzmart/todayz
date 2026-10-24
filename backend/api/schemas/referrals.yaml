@@ -112,7 +112,7 @@ ShopReferredBy:
     ordersCounted:
       type: integer
       minimum: 0
-      description: Completed orders and linked sales counted so far.
+      description: Different customers with a counted completed order or linked sale so far (D-168).
     ordersNeeded:
       type: integer
       minimum: 0
