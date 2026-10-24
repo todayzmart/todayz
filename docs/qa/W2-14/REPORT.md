@@ -63,7 +63,7 @@ Date: 2026-10-24. Spec: D-110 and D-111 (`docs/plan/12-decision-log.md`), 01 §1
 | `build:e2e` + precache check | pass |
 | Size: initial JS | 136.2 KB of 170 KB gzip; CSS 9.7 KB of 20 KB |
 | Stack journey `customer/e2e/basket.stack.spec.ts` on a fresh `make reset` + `make dev` | 1 passed (also passes on a rerun) |
-| `scripts/no-egress.sh make check` | every W2-14 part passes; three failures outside W2-14 remain (see below) |
+| `scripts/no-egress.sh make check` | every W2-14 part passes; only check-infra fails (terraform not initialised on this machine) |
 
 ## Scenarios
 
