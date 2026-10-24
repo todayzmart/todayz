@@ -117,7 +117,7 @@ type Completion struct {
 
 // maxCashbackBP is the top of a store's cashback range, 20% (01 §7,
 // ck_stores_cashback): a product bound, not a setting.
-const maxCashbackBP = 2000
+const maxCashbackBP = 2000 //settings:ok the 0–20% cashback range, a product bound (ck_stores_cashback)
 
 // Completed is what Complete posted.
 type Completed struct {
