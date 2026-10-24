@@ -1,7 +1,13 @@
 // Package testkit gives integration tests a real PostGIS database.
 //
 // One container per test binary (testcontainers, image TODAYZ_POSTGIS_IMAGE,
-// default the digest-pinned PostGIS 16-3.4 build the local stack uses).
+// default the digest-pinned PostGIS 16-3.4 build the local stack uses), or,
+// when TODAYZ_TEST_PG_URL_FILE names a file holding a superuser URL, one
+// shared server for every test binary (scripts/testpg.sh up starts it). The
+// shared server saves a container per package, which is what keeps several
+// worktrees testing at once inside the Docker VM's memory. Each binary still
+// migrates its own template (worktrees carry different migrations) and every
+// test still gets its own fresh database.
 //
 // The container mirrors the database role contract of the local stack
 // (roles.sql, database.sql): a superuser creates the extensions and two
@@ -23,6 +29,7 @@ package testkit
 import (
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
 	_ "embed" // role SQL
 	"encoding/hex"
 	"fmt"
@@ -68,7 +75,8 @@ const (
 	AppRole   = "todayz_app"
 )
 
-const templateDB = "tz_template"
+// SharedURLFileEnv names the file holding the shared server's superuser URL.
+const SharedURLFileEnv = "TODAYZ_TEST_PG_URL_FILE"
 
 // Label marks every container testkit starts.
 const Label = "in.todayz.testkit"
@@ -91,6 +99,13 @@ var (
 	tmplOnce sync.Once
 	tmplErr  error
 
+	// procTag keeps this binary's databases apart on a shared server.
+	procTag    = randHex(4)
+	shared     bool
+	ownServer  bool
+	templateDB = "tz_template"
+	tmplMade   bool
+
 	createMu sync.Mutex
 	seq      atomic.Int64
 )
@@ -103,13 +118,28 @@ func Image() string {
 	return DefaultImage()
 }
 
-// Main runs the tests and removes the container afterwards.
+// Main runs the tests and removes the container (or, on a shared server,
+// this binary's template) afterwards.
 func Main(m *testing.M) {
 	code := m.Run()
 	if container != nil {
 		_ = testcontainers.TerminateContainer(container)
 	}
+	if shared && tmplMade {
+		ctx := context.Background()
+		_ = adminExec(ctx, "postgres", "ALTER DATABASE "+templateDB+" WITH IS_TEMPLATE false")
+		_ = adminExec(ctx, "postgres", "DROP DATABASE IF EXISTS "+templateDB+" WITH (FORCE)")
+	}
 	os.Exit(code)
+}
+
+// MainOwnServer is Main for a package that must not share a server even when
+// TODAYZ_TEST_PG_URL_FILE is set: transaction ids and snapshots are
+// cluster-wide, so another package's open transaction would hold back what
+// this one measures (realtime's xmin cursors).
+func MainOwnServer(m *testing.M) {
+	ownServer = true
+	Main(m)
 }
 
 func randHex(n int) string {
@@ -121,6 +151,10 @@ func randHex(n int) string {
 func start() {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
+	if f := strings.TrimSpace(os.Getenv(SharedURLFileEnv)); f != "" && !ownServer {
+		startShared(ctx, f)
+		return
+	}
 	// Per-run random passwords: nothing secret-looking lives in the repo.
 	pw := randHex(16)
 	ownerPW, appPW = randHex(16), randHex(16)
@@ -149,6 +183,31 @@ func start() {
 	if startErr != nil {
 		startErr = fmt.Errorf("testkit: roles: %w", startErr)
 	}
+}
+
+// startShared uses the server whose superuser URL is in file. The role
+// passwords derive from that URL, so every binary sets the same ones; the
+// advisory lock keeps concurrent binaries from racing on CREATE ROLE.
+func startShared(ctx context.Context, file string) {
+	b, err := os.ReadFile(file) // #nosec G304 -- a path the developer sets for tests
+	if err != nil {
+		startErr = fmt.Errorf("testkit: %s: %w (scripts/testpg.sh up)", SharedURLFileEnv, err)
+		return
+	}
+	shared = true
+	adminURL = strings.TrimSpace(string(b))
+	templateDB = "tz_template_" + procTag
+	ownerPW, appPW = derivePW(adminURL, OwnerRole), derivePW(adminURL, AppRole)
+	startErr = adminExec(ctx, "postgres", "SELECT pg_advisory_xact_lock(7307);\n"+rolesSQL+
+		fmt.Sprintf("\nALTER ROLE %s PASSWORD '%s';\nALTER ROLE %s PASSWORD '%s';", OwnerRole, ownerPW, AppRole, appPW))
+	if startErr != nil {
+		startErr = fmt.Errorf("testkit: shared server roles (scripts/testpg.sh up): %w", startErr)
+	}
+}
+
+func derivePW(seed, role string) string {
+	sum := sha256.Sum256([]byte(seed + "|" + role))
+	return hex.EncodeToString(sum[:16])
 }
 
 // urlFor returns a URL for dbName as user (empty user: the superuser).
@@ -201,6 +260,7 @@ func buildTemplate() {
 		tmplErr = fmt.Errorf("testkit: template: %w", err)
 		return
 	}
+	tmplMade = true
 	pool, err := pgxpool.New(ctx, urlFor(templateDB, OwnerRole))
 	if err != nil {
 		tmplErr = err
@@ -271,7 +331,7 @@ func create(t testing.TB, tmpl string) *DB {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
-	name := fmt.Sprintf("tz_t%d_%s", seq.Add(1), randHex(3))
+	name := fmt.Sprintf("tz_%s_t%d", procTag, seq.Add(1))
 	if err := createPrepared(ctx, name, tmpl); err != nil {
 		t.Fatalf("testkit: create database: %v", err)
 	}
