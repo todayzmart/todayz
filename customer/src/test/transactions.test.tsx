@@ -363,6 +363,68 @@ describe('C-11 checkout', () => {
   });
 });
 
+describe('C-21 order limit', () => {
+  const until = () => new Date(Date.now() + 7 * 24 * 60 * 60_000).toISOString();
+  const meWith = (limit: unknown): Handler =>
+    on('GET', '/v1/me', () =>
+      json(200, {
+        id: USER,
+        name: null,
+        preferredLang: 'en',
+        phoneMasked: '90•••••011',
+        app: 'customer',
+        customer: { referralCode: 'ABC123', activeOrderLimit: limit },
+        createdAt: NOW,
+      }),
+    );
+
+  it('shows the limit and its end date on checkout while it lasts', async () => {
+    renderAt('/checkout', {
+      returning: true,
+      handlers: [signedIn, meWith({ maxActiveOrders: 1, until: until(), reason: 'no_show_strikes' }), on('POST', '/v1/me/checkout/quote', () => json(200, quote()))],
+    });
+    expect(await screen.findByText('Ordering is limited for now')).toBeInTheDocument();
+    expect(screen.getByText(/You missed several pickups, so until .+ you can have one open order at a time\./)).toBeInTheDocument();
+  });
+
+  it('shows the limit on Home too', async () => {
+    renderAt('/', { returning: true, handlers: [signedIn, meWith({ maxActiveOrders: 1, until: until(), reason: 'no_show_strikes' })] });
+    expect(await screen.findByText('Ordering is limited for now')).toBeInTheDocument();
+  });
+
+  it('shows nothing once the limit has ended', async () => {
+    const calls: Call[] = [];
+    renderAt('/checkout', {
+      returning: true,
+      handlers: [
+        signedIn,
+        (c) => {
+          calls.push(c);
+          return undefined;
+        },
+        meWith({ maxActiveOrders: 1, until: new Date(Date.now() - 60_000).toISOString(), reason: 'no_show_strikes' }),
+        on('POST', '/v1/me/checkout/quote', () => json(200, quote())),
+      ],
+    });
+    expect(await screen.findByRole('button', { name: /Place order/ })).toBeInTheDocument();
+    await waitFor(() => expect(calls.some((c) => c.path === '/v1/me')).toBe(true));
+    expect(screen.queryByText('Ordering is limited for now')).toBeNull();
+  });
+
+  it('gives the end date when the quote is refused with ordering_suspended', async () => {
+    renderAt('/cart', {
+      returning: true,
+      handlers: [
+        signedIn,
+        on('POST', '/v1/me/checkout/quote', () =>
+          json(409, { type: 'about:blank#ordering_suspended', title: 'ordering_suspended', status: 409, code: 'ordering_suspended', extensions: { until: until() } }),
+        ),
+      ],
+    });
+    expect(await screen.findByText(/until .+ you can have only one open order\. Finish or cancel it first\./)).toBeInTheDocument();
+  });
+});
+
 describe('C-12 order tracking', () => {
   const track = (o: Order, extra: Handler[] = []) =>
     renderAt(`/orders/${ORDER_ID}`, { returning: true, handlers: [signedIn, on('GET', `/v1/me/orders/${ORDER_ID}`, () => json(200, o)), ...extra] });
@@ -439,6 +501,7 @@ describe('C-12 order tracking', () => {
         lines: [{ ...first, quantityAccepted: 1, lineTotalPaise: 2500 } as Order['lines'][number]],
         subtotalPaise: 2500,
         itemSubtotalPaise: 2500,
+        itemsAfterOffersPaise: 2500,
         totalPaise: 2500,
         version: 2,
         ...over,
@@ -451,6 +514,16 @@ describe('C-12 order tracking', () => {
       expect(screen.getByText('1 instead of 2')).toBeInTheDocument();
       expect(screen.getByText('Confirm within 3:00')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: `Take it · ${formatMoney(2500)}` })).toBeInTheDocument();
+    });
+
+    it('shows the new items total, the re-capped credits and the total', async () => {
+      track(partial({ creditsUsed: 5, totalPaise: 2000 }));
+      const totals = (await screen.findByText('Items')).closest('dl') as HTMLElement;
+      expect(within(totals).getByText(formatMoney(2500))).toBeInTheDocument();
+      expect(within(totals).getByText('Credits used')).toBeInTheDocument();
+      expect(within(totals).getByText(`−${formatMoney(500)}`)).toBeInTheDocument();
+      expect(within(totals).getByText(formatMoney(2000))).toBeInTheDocument();
+      expect(within(totals).queryByText('Delivery fee')).toBeNull();
     });
 
     it('says a line is not available when the shop accepted none of it', async () => {

@@ -9,6 +9,7 @@ import { MapPin, ShoppingBasket, Store as StoreIcon } from 'lucide-react';
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { usePlace } from '../app/place';
+import { LimitBanner } from '../orders/LimitBanner';
 import { Icon } from '../shell/Icon';
 import { CartBarLink } from '../store/CartBarLink';
 import { categoryIcon } from './categories';
@@ -70,6 +71,7 @@ export function Home({ category }: { category?: string | undefined }) {
         </form>
       </header>
       <div className={styles.body}>
+        <LimitBanner />
         <Link to="/baskets" className={`tz-card ${styles.basketEntry}`}>
           <Icon icon={ShoppingBasket} />
           <span className={styles.basketText}>

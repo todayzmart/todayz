@@ -72,6 +72,57 @@ func (s *Service) Price(ctx context.Context, cart Cart) (Quote, error) {
 	return compute(in), nil
 }
 
+// Reprice prices a cart again for an order or POS sale that already redeemed
+// offers (an order the shop accepted in part, BK-08: 03 §4.2 recomputes every
+// bill figure). Only the offers ref holds apply, as they stood at cart.At
+// (when it was placed), and their caps are not counted again, since ref's own
+// redemption is one of the uses. Every other rule of the engine stands, so a
+// minimum-bill offer drops off when the cart is now under its minimum. An
+// offer paused, ended or switched off since still applies: the customer took
+// it and ref still holds it until it ends.
+func (s *Service) Reprice(ctx context.Context, ref Ref, cart Cart) (Quote, error) {
+	if err := s.ready(ctx); err != nil {
+		return Quote{}, err
+	}
+	if (ref.OrderID == ids.Zero) == (ref.POSSaleID == ids.Zero) {
+		return Quote{}, fmt.Errorf("offers: reprice needs exactly one of an order and a POS sale")
+	}
+	at := cart.At
+	if at.IsZero() {
+		at = s.clock.Now()
+	}
+	in := input{cart: cart, now: at}
+	if len(cart.Lines) == 0 {
+		return compute(in), nil
+	}
+	q := s.q(ctx)
+	held, err := q.RedemptionsOfRef(ctx, offersdb.RedemptionsOfRefParams{OrderID: ref.orderUUID(), PosSaleID: ref.saleUUID()})
+	if err != nil {
+		return Quote{}, fmt.Errorf("offers: redemptions of ref: %w", err)
+	}
+	slices.SortFunc(held, func(a, b pgtype.UUID) int { return slices.Compare(a.Bytes[:], b.Bytes[:]) })
+	held = slices.CompactFunc(held, func(a, b pgtype.UUID) bool { return a.Bytes == b.Bytes })
+	byCategory := false
+	for _, id := range held {
+		r, err := q.GetOffer(ctx, offersdb.GetOfferParams{ID: id, StoreID: ids.UUID(cart.StoreID)})
+		if db.IsNoRows(err) {
+			continue
+		} else if err != nil {
+			return Quote{}, fmt.Errorf("offers: held offer: %w", err)
+		}
+		o := engineOffer(r)
+		o.Status, o.PerCustomerLimit, o.MaxRedemptions = StatusLive, 0, 0
+		in.offers = append(in.offers, o)
+		byCategory = byCategory || o.Scope == ScopeCategory
+	}
+	if byCategory {
+		if in.cats, err = s.categories(ctx, q, cart.Lines); err != nil {
+			return Quote{}, err
+		}
+	}
+	return compute(in), nil
+}
+
 // categories is, per cart line, the line's category and its ancestors.
 func (s *Service) categories(ctx context.Context, q *offersdb.Queries, lines []Line) ([][]ids.ID, error) {
 	items := make([]pgtype.UUID, len(lines))

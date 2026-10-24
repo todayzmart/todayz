@@ -9,4 +9,59 @@
 # Mark idempotent operations `x-idempotency: required|optional` and uploads
 # `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
 # List the domain problem codes an operation can return under `x-problems`.
-{}
+#
+# W2-02 pulled the admin cancel forward from W3-05 (the Wave 2 gate drives it through the admin
+# API, D-83); the list, detail and console screens stay W3-05/W3-06. Roles are in
+# internal/platform/authz/policy/orders.go.
+/v1/admin/orders/{orderId}/cancel:
+  parameters:
+    - name: orderId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: cancelAdminOrder
+    tags: [admin-orders]
+    summary: Cancel an order as support (audited)
+    description: >-
+      `support`, `admin` and `super_admin`, from any non-terminal state (placed, awaiting_customer, accepted,
+      ready, out_for_delivery; 03 §4.1). Releases reserved stock, held credits and offer redemptions. `strike`
+      names the side at fault (01 §5.2): `customer` or `store` records one `admin_cancel` strike on that side
+      only, `none` records none. A store strike lowers its reliability on the next `store_reliability` run
+      and can raise a `store_strikes` risk flag (D-67, no automatic pause). `other` needs `note`. Audited
+      (`order.admin_cancel`). `409 invalid_transition` on a finished order.
+    x-idempotency: required
+    x-money: true
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-orders.yaml#/AdminCancelOrderRequest
+          example:
+            reason: store_request
+            strike: store
+            note: Shop called; item not available
+    responses:
+      "200":
+        description: The order after the cancel
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-orders.yaml#/AdminCancelledOrder
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              customerId: 01JB0SCS1A2B3C4D5E6F7G8H9J
+              status: cancelled
+              statusReason: store_request
+              statusNote: Shop called; item not available
+              strike: store
+              version: 4
+              serverNow: "2026-10-24T11:00:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem

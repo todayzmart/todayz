@@ -66,6 +66,7 @@ type orderShop struct {
 	cfg                                        *config.Config
 	logs                                       *logBuf
 	runner                                     *platformjobs.Fake
+	settings                                   *settings.Cache
 	owner, manager, cashier, cashierS2, owner2 string
 	B, S, S2, SY                               string
 	sid                                        string
@@ -177,7 +178,7 @@ func newOrderShop(t *testing.T) *orderShop {
 
 	reg := platformjobs.NewRegistry()
 	jobs.Register(reg, jobs.Deps{Pool: tdb.Pool, Clock: clk, Settings: st, Config: cfg, Log: log})
-	o := &orderShop{t: t, a: a, cfg: cfg, logs: lb, runner: platformjobs.NewFake(reg, clk)}
+	o := &orderShop{t: t, a: a, cfg: cfg, logs: lb, runner: platformjobs.NewFake(reg, clk), settings: st}
 
 	o.login(&o.owner, ownerPhone, "business")
 	o.login(&o.owner2, otherOwnerPhone, "business")
@@ -300,6 +301,26 @@ func (o *orderShop) order() string {
 	r := o.place(o.cust, line{o.butter, 1})
 	require.Equal(o.t, http.StatusCreated, r.code, r.raw)
 	return r.body["id"].(string)
+}
+
+// orderOf places lines for the customer and returns the order's id.
+func (o *orderShop) orderOf(lines ...line) string {
+	o.t.Helper()
+	r := o.place(o.cust, lines...)
+	require.Equal(o.t, http.StatusCreated, r.code, r.raw)
+	return r.body["id"].(string)
+}
+
+// lineIDs are an order's line ids in the order the store's GET lists them.
+func (o *orderShop) lineIDs(id string) []string {
+	o.t.Helper()
+	g := o.a.call(o.cashier, http.MethodGet, o.S+"/orders/"+id, nil, nil)
+	require.Equal(o.t, http.StatusOK, g.code, g.raw)
+	var out []string
+	for _, l := range g.body["lines"].([]any) {
+		out = append(out, l.(map[string]any)["id"].(string))
+	}
+	return out
 }
 
 // accepted places an order and has the cashier accept it.
@@ -553,15 +574,9 @@ func TestBK05AcceptAll(t *testing.T) {
 	require.Equal(t, http.StatusConflict, r.code, "a second accept: %s", r.raw)
 	require.Equal(t, "invalid_transition", problemCode(r))
 
-	// A partial accept is deferred (BK-08–10): a lower quantity is 422.
-	id2 := o.order()
-	g := o.a.call(o.cashier, http.MethodGet, o.S+"/orders/"+id2, nil, nil)
-	require.Equal(t, http.StatusOK, g.code, g.raw)
-	lineID := g.body["lines"].([]any)[0].(map[string]any)["id"].(string)
-	r = o.staff(o.cashier, id2, "accept", map[string]any{"lines": []any{map[string]any{"orderItemId": lineID, "quantity": 0}}})
-	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
-	require.Equal(t, "placed", o.status(id2))
 	// More than the order asked for is an invalid value, not a partial accept.
+	id2 := o.order()
+	lineID := o.lineIDs(id2)[0]
 	r = o.staff(o.cashier, id2, "accept", map[string]any{"lines": []any{map[string]any{"orderItemId": lineID, "quantity": 2}}})
 	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
 	require.Equal(t, "more than the order asked for", fieldsOf(r)["body.lines[0].quantity"], r.raw)
@@ -742,9 +757,54 @@ func TestBK14NoShow(t *testing.T) {
 	require.Equal(t, 500, onHand)
 	require.Zero(t, reserved)
 	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM customer_profiles WHERE strikes_count_30d = 1 AND limited_until IS NULL`))
-	// The credit hold's release is TestEndReleasesHoldHTTP's.
-	// TODO(lead): BK-16 (the limit after noshow_strikes) is deferred to its
-	// own test with the banner.
+	// The credit hold's release is TestEndReleasesHoldHTTP's; the limit
+	// after noshow_strikes is TestBK16NoShowLimit's.
+}
+
+// BK-16: after noshow_strikes no-shows in noshow_window_days the customer
+// may place one more order only with no other unfinished: the quote and
+// the place both answer 409 ordering_suspended with extensions.until, and
+// the limit ends after noshow_limit_days.
+func TestBK16NoShowLimit(t *testing.T) {
+	o := newOrderShop(t)
+	for i := range 3 {
+		id := o.accepted()
+		_, hold := o.times(id)
+		o.advance(30 * time.Minute)
+		expiredRun(t, o.timer(orders.KindNoShow, id, hold))
+		if i < 2 {
+			require.Zero(t, o.a.count(`SELECT count(*) FROM customer_profiles WHERE limited_until IS NOT NULL`), "strike %d", i+1)
+		}
+	}
+	now := o.a.clk.Now()
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM customer_profiles WHERE strikes_count_30d = 3 AND limited_until = $1`, now.Add(14*24*time.Hour)))
+
+	// No other open order: the 4th is allowed.
+	q := o.quote(line{o.butter, 1})
+	require.Equal(t, http.StatusOK, q.code, q.raw)
+	open := o.order()
+
+	q = o.quote(line{o.butter, 1})
+	require.Equal(t, http.StatusConflict, q.code, q.raw)
+	require.Equal(t, "ordering_suspended", problemCode(q))
+	require.Equal(t, now.Add(14*24*time.Hour).UTC().Format(time.RFC3339), ext(q, "until"))
+	r := o.place(o.cust, line{o.butter, 1})
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, "ordering_suspended", problemCode(r))
+	r = o.place(o.cust2, line{o.butter, 1})
+	require.Equal(t, http.StatusCreated, r.code, "another customer is not limited: %s", r.raw)
+
+	// The open order finishing frees the one slot again.
+	r = o.me(o.cust, open, "cancel", map[string]any{"reason": "changed_mind"})
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	o.order()
+
+	// After noshow_limit_days the limit is over.
+	o.set(now.Add(14 * 24 * time.Hour))
+	q = o.quote(line{o.butter, 1})
+	require.Equal(t, http.StatusOK, q.code, q.raw)
+	r = o.place(o.cust, line{o.butter, 1})
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
 }
 
 // BK-15: "+10 min" before the hold ends adds pickup_extension_min once; a
@@ -1025,15 +1085,48 @@ func TestBK21TimerLateAndDuplicate(t *testing.T) {
 	noopRun(t, o.timer(orders.KindNoShow, ids.New(o.a.clk.Now()).String(), nil))
 }
 
-// BK-22: auto-accept is deferred, so an order at an auto_accept store stays
-// placed for a manual decision.
-func TestBK22AutoAcceptStoreStaysPlaced(t *testing.T) {
+// BK-22: a store with auto-accept accepts an order at once when every item
+// is available: accepted by the system, stock held, the hold and its
+// no-show timer started, no accept timer, the customer told and the shop
+// still told of the new order. A short item never becomes an order (BK-02),
+// and a store without auto-accept leaves the order placed.
+func TestBK22AutoAccept(t *testing.T) {
 	o := newOrderShop(t)
 	o.a.exec(`UPDATE stores SET auto_accept = true WHERE id = $1`, uuidOf(t, o.sid))
-	id := o.order()
+	now := o.a.clk.Now()
+	r := o.place(o.cust, line{o.butter, 2}, line{o.salt, 1})
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	require.Equal(t, "accepted", r.body["status"])
+	noCode(t, r.body, "the create answer never carries the code")
+	id := r.body["id"].(string)
+	_, hold := o.times(id)
+	require.NotNil(t, hold)
+	require.True(t, hold.Equal(now.Add(30*time.Minute)), "hold_until = placed_at + pickup_hold_min")
+	require.Equal(t, 2, o.held(id))
+	_, reserved := o.stock(o.butter)
+	require.Equal(t, 2, reserved)
+	require.Equal(t, 1, o.timerJobs(orders.KindNoShow, id, *hold))
+	require.Zero(t, o.a.count(`SELECT count(*) FROM river_job WHERE kind = $1 AND args->'a'->>'orderId' = $2`, orders.KindAcceptTimeout, id))
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM order_events WHERE order_id = $1 AND from_status = 'placed' AND to_status = 'accepted' AND actor_kind = 'system'`, uuidOf(t, id)))
+	require.Equal(t, 2, o.a.count(`SELECT count(*) FROM order_items WHERE order_id = $1 AND quantity_accepted = quantity_requested`, uuidOf(t, id)))
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM notifications WHERE kind = 'order_update' AND ref_id = $1 AND params->>'variant' = 'accepted'`, uuidOf(t, id)))
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM notifications WHERE kind = 'new_order' AND ref_id = $1`, uuidOf(t, id)))
+	o.code(id)
+
+	// A short item: refused at place, nothing placed or held.
+	before := o.a.count(`SELECT count(*) FROM orders`)
+	r = o.a.call(o.manager, http.MethodPost, o.S+"/items/"+o.butter+"/movements", map[string]any{"kind": "damage", "quantity": 497}, idem(o.a))
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	r = o.place(o.cust2, line{o.butter, 3})
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, "insufficient_stock", problemCode(r))
+	require.Equal(t, before, o.a.count(`SELECT count(*) FROM orders`))
+
+	// Auto-accept off: the order waits for the shop.
+	o.a.exec(`UPDATE stores SET auto_accept = false WHERE id = $1`, uuidOf(t, o.sid))
+	id = o.order()
 	require.Equal(t, "placed", o.status(id))
 	require.Zero(t, o.held(id))
-	// TODO(lead): auto-accept (BK-22's accepted-instantly half) is deferred.
 }
 
 // --- deletion, tenancy, roles, the code ----------------------------------------------
@@ -1211,15 +1304,15 @@ type move struct{ from, to, actor string }
 // reason when it is not built in W2-02.
 var planMoves = map[move]string{
 	{"placed", "accepted", "staff"}:                  "",
-	{"placed", "awaiting_customer", "staff"}:         "partial accept (BK-08–10)",
+	{"placed", "awaiting_customer", "staff"}:         "",
 	{"placed", "rejected", "staff"}:                  "",
 	{"placed", "expired", "system"}:                  "",
 	{"placed", "cancelled", "customer"}:              "",
 	{"awaiting_customer", "cancelled", "customer"}:   "",
 	{"accepted", "cancelled", "customer"}:            "",
 	{"ready", "cancelled", "customer"}:               "",
-	{"awaiting_customer", "accepted", "customer"}:    "partial accept (BK-08–10)",
-	{"awaiting_customer", "cancelled", "system"}:     "partial accept (partial_timeout)",
+	{"awaiting_customer", "accepted", "customer"}:    "",
+	{"awaiting_customer", "cancelled", "system"}:     "",
 	{"accepted", "ready", "staff"}:                   "",
 	{"accepted", "collected", "staff"}:               "",
 	{"ready", "collected", "staff"}:                  "",
@@ -1257,8 +1350,13 @@ func (o *orderShop) force(id, status string, acceptBy, hold time.Time) {
 	_, err = tx.Exec(ctx, `ALTER TABLE orders DISABLE TRIGGER trg_orders_guard`)
 	require.NoError(o.t, err)
 	_, err = tx.Exec(ctx, `UPDATE orders SET status = $1, status_reason = $2, accept_by = $3, hold_until = $4,
+	  partial_confirm_by = CASE WHEN $1 = 'awaiting_customer' THEN $4::timestamptz END,
 	  accepted_at = CASE WHEN $1 IN ('placed','awaiting_customer') THEN NULL ELSE placed_at END WHERE id = $5`,
 		status, reasonFor(status), acceptBy, hold, uuidOf(o.t, id))
+	require.NoError(o.t, err)
+	// An awaiting order's lines carry the quantities the shop took.
+	_, err = tx.Exec(ctx, `UPDATE order_items SET quantity_accepted = CASE WHEN $1 = 'awaiting_customer' THEN quantity_requested END
+	  WHERE order_id = $2`, status, uuidOf(o.t, id))
 	require.NoError(o.t, err)
 	_, err = tx.Exec(ctx, `ALTER TABLE orders ENABLE TRIGGER trg_orders_guard`)
 	require.NoError(o.t, err)
@@ -1288,23 +1386,27 @@ func TestOrderTransitionTable(t *testing.T) {
 		"customer extend":          {"customer", func(id string) { o.me(o.cust, id, "extend", nil) }},
 		"customer new-code":        {"customer", func(id string) { o.me(o.cust, id, "new-code", nil) }},
 		"staff accept":             {"staff", func(id string) { o.staff(o.owner, id, "accept", map[string]any{}) }},
-		"staff reject":             {"staff", func(id string) { o.staff(o.owner, id, "reject", map[string]any{"reason": "too_busy"}) }},
-		"staff ready":              {"staff", func(id string) { o.staff(o.owner, id, "ready", nil) }},
-		"staff verify":             {"staff", verify},
-		"staff cancel":             {"staff", func(id string) { o.staff(o.owner, id, "cancel", map[string]any{"reason": "out_of_stock"}) }},
-		"staff dispatch":           {"staff", func(id string) { o.staff(o.owner, id, "dispatch", nil) }},
+		"staff partial accept": {"staff", func(id string) {
+			o.staff(o.owner, id, "accept", map[string]any{"lines": []any{map[string]any{"orderItemId": o.lineIDs(id)[0], "quantity": 1}}})
+		}},
+		"staff reject":   {"staff", func(id string) { o.staff(o.owner, id, "reject", map[string]any{"reason": "too_busy"}) }},
+		"staff ready":    {"staff", func(id string) { o.staff(o.owner, id, "ready", nil) }},
+		"staff verify":   {"staff", verify},
+		"staff cancel":   {"staff", func(id string) { o.staff(o.owner, id, "cancel", map[string]any{"reason": "out_of_stock"}) }},
+		"staff dispatch": {"staff", func(id string) { o.staff(o.owner, id, "dispatch", nil) }},
 		"staff fail-delivery": {"staff", func(id string) {
 			o.staff(o.owner, id, "fail-delivery", map[string]any{"reason": "customer_unreachable"})
 		}},
 		"staff confirm-return": {"staff", func(id string) { o.staff(o.owner, id, "confirm-return", map[string]any{"outcome": "returned"}) }},
 		"system accept timer":  {"system", func(id string) { o.timer(orders.KindAcceptTimeout, id, nil) }},
 		"system no-show timer": {"system", func(id string) { o.timer(orders.KindNoShow, id, nil) }},
+		"system partial timer": {"system", func(id string) { o.timer(orders.KindPartialTimeout, id, nil) }},
 	}
 
 	seen := map[move]string{} // the move → the action that made it
 	for _, from := range orders.Statuses() {
 		for name, act := range actions {
-			id := o.order()
+			id := o.orderOf(line{o.butter, 2}) // 2, so a partial accept can take 1
 			now := o.a.clk.Now()
 			acceptBy, hold := now.Add(10*time.Minute), now.Add(30*time.Minute)
 			if act.actor == "system" {

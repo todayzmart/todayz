@@ -652,6 +652,17 @@ func (s *Service) Release(ctx context.Context, ref Ref) (int, error) {
 	return n, err
 }
 
+// Kept is how many of open held credits a re-cap against eligiblePaise
+// would keep (D-28); it writes nothing. Orders shows it while a partly
+// accepted order waits for the customer, and re-caps on the confirm.
+func (s *Service) Kept(ctx context.Context, open int, eligiblePaise int64) (int, error) {
+	r, err := s.Rules(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return keep(r, max(open, 0), eligiblePaise), nil
+}
+
 // Recap implements Holder.
 func (s *Service) Recap(ctx context.Context, ref Ref, eligiblePaise int64) (int, error) {
 	if !ref.valid() {

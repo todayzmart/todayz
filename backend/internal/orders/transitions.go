@@ -26,6 +26,7 @@ const (
 	actorCustomer = "customer"
 	actorStaff    = "staff"
 	actorSystem   = "system"
+	actorAdmin    = "admin"
 )
 
 // maxParamRunes is the notification catalogue's cap on one param.
@@ -225,9 +226,10 @@ func noteFor(reason string, note *string) (*string, error) {
 
 // --- staff ----------------------------------------------------------------------
 
-// accept takes a placed order in full (B-04): it holds every line's stock
-// and starts the pickup hold. A partial accept is not built yet (BK-08–10):
-// a line below what was asked is 422.
+// accept answers a placed order before accept_by (B-04). In full it holds
+// every line's stock and starts the pickup hold; with a line below what was
+// asked it is a partial accept (BK-08): the order waits for the customer,
+// and nothing is held until they take it (03 §4.1).
 func (s *Service) accept(ctx context.Context, by ids.ID, storeID, orderID ids.ID, body *ordersapi.AcceptOrderRequest) error {
 	if err := s.readyToWrite(ctx); err != nil {
 		return err
@@ -236,9 +238,12 @@ func (s *Service) accept(ctx context.Context, by ids.ID, storeID, orderID ids.ID
 	if err != nil {
 		return problem.Wrap(genproblems.Internal, err)
 	}
+	answerIn, err := s.duration(ctx, settings.PartialConfirmTimeoutMin)
+	if err != nil {
+		return problem.Wrap(genproblems.Internal, err)
+	}
 	return asProblemOrNil(s.db.InTx(ctx, func(ctx context.Context) error {
 		now := s.now()
-		q := s.q(ctx)
 		o, err := s.lockOrder(ctx, orderID, ofStore(storeID))
 		if err != nil {
 			return err
@@ -246,87 +251,130 @@ func (s *Service) accept(ctx context.Context, by ids.ID, storeID, orderID ids.ID
 		if o.Status != StatusPlaced || pastAcceptBy(o, now) || !CanMove(o.Status, StatusAccepted, o.Fulfilment) {
 			return invalidTransition()
 		}
-		lines, err := q.OrderLines(ctx, o.ID)
+		lines, err := s.q(ctx).OrderLines(ctx, o.ID)
 		if err != nil {
 			return fmt.Errorf("orders: lines: %w", err)
 		}
-		if err := fullAccept(lines, body); err != nil {
+		want, partial, err := acceptedQuantities(lines, body)
+		if err != nil {
 			return err
 		}
-
-		// Lock the items in id order and check each has the stock.
-		need := map[ids.ID]int32{}
-		var itemIDs []pgtype.UUID
-		for _, l := range lines {
-			id := mustID(l.StoreItemID)
-			if _, ok := need[id]; !ok {
-				itemIDs = append(itemIDs, l.StoreItemID)
-			}
-			need[id] += l.QuantityRequested
-		}
-		items, err := q.LockItems(ctx, itemIDs)
-		if err != nil {
-			return fmt.Errorf("orders: lock items: %w", err)
-		}
-		for _, it := range items {
-			id := mustID(it.ID)
-			if avail := it.OnHand - it.Reserved; avail < need[id] {
-				return problem.New(genproblems.InsufficientStock, "").
-					WithExtension("storeItemId", id.String()).WithExtension("available", max(avail, 0))
-			}
-		}
-		for _, l := range lines {
-			if err := q.InsertReservation(ctx, ordersdb.InsertReservationParams{
-				ID: ids.UUID(s.ids.New(now)), OrderID: o.ID, OrderItemID: l.ID, StoreItemID: l.StoreItemID,
-				Quantity: l.QuantityRequested, Now: now,
-			}); err != nil {
-				return fmt.Errorf("orders: reserve: %w", err)
-			}
-		}
-		holdUntil := now.Add(hold)
-		v, err := q.SetAccepted(ctx, ordersdb.SetAcceptedParams{Now: &now, HoldUntil: &holdUntil, ID: o.ID})
-		if err != nil {
-			return fmt.Errorf("orders: accept: %w", err)
-		}
-		if err := q.AcceptAllLines(ctx, o.ID); err != nil {
-			return fmt.Errorf("orders: accept lines: %w", err)
-		}
-		if err := s.record(ctx, o, StatusAccepted, v, staff(by), nil, variant("accepted"), now); err != nil {
+		// Lock the items in id order and check each has the stock, for a
+		// partial accept too (04: 409 when an accepted quantity is more
+		// than available).
+		if err := s.lockStock(ctx, lines, want); err != nil {
 			return err
 		}
-		return s.noShowTimer(ctx, orderID, holdUntil)
+		if partial {
+			return s.partialAccept(ctx, o, lines, want, staff(by), answerIn, now)
+		}
+		return s.holdAndStart(ctx, o, lines, want, staff(by), variant("accepted"), hold, now)
 	}))
 }
 
-// fullAccept checks an accept's lines, when sent: each a line of the order,
-// once, at the quantity asked.
-func fullAccept(lines []ordersdb.OrderLinesRow, body *ordersapi.AcceptOrderRequest) error {
-	if body == nil || body.Lines == nil {
+// holdAndStart moves a placed or awaiting_customer order to accepted: it
+// holds want[i] of each line (the items locked and checked by lockStock),
+// records the accepted quantities, starts the pickup hold and its no-show
+// timer.
+func (s *Service) holdAndStart(ctx context.Context, o ordersdb.Order, lines []ordersdb.OrderLinesRow, want []int32, by actor, t tell, hold time.Duration, now time.Time) error {
+	q := s.q(ctx)
+	for i, l := range lines {
+		if want[i] == 0 {
+			continue
+		}
+		if err := q.InsertReservation(ctx, ordersdb.InsertReservationParams{
+			ID: ids.UUID(s.ids.New(now)), OrderID: o.ID, OrderItemID: l.ID, StoreItemID: l.StoreItemID,
+			Quantity: want[i], Now: now,
+		}); err != nil {
+			return fmt.Errorf("orders: reserve: %w", err)
+		}
+	}
+	holdUntil := now.Add(hold)
+	v, err := q.SetAccepted(ctx, ordersdb.SetAcceptedParams{Now: &now, HoldUntil: &holdUntil, ID: o.ID})
+	if err != nil {
+		return fmt.Errorf("orders: accept: %w", err)
+	}
+	if o.Status == StatusPlaced {
+		// A confirmed partial accept already wrote its quantities.
+		if err := q.AcceptAllLines(ctx, o.ID); err != nil {
+			return fmt.Errorf("orders: accept lines: %w", err)
+		}
+	}
+	if err := s.record(ctx, o, StatusAccepted, v, by, nil, t, now); err != nil {
+		return err
+	}
+	return s.noShowTimer(ctx, mustID(o.ID), holdUntil)
+}
+
+// lockStock locks the items of the lines with a quantity in want, in id
+// order, and answers 409 insufficient_stock naming the first item that
+// does not have it available.
+func (s *Service) lockStock(ctx context.Context, lines []ordersdb.OrderLinesRow, want []int32) error {
+	need := map[ids.ID]int32{}
+	var itemIDs []pgtype.UUID
+	for i, l := range lines {
+		if want[i] == 0 {
+			continue
+		}
+		id := mustID(l.StoreItemID)
+		if _, ok := need[id]; !ok {
+			itemIDs = append(itemIDs, l.StoreItemID)
+		}
+		need[id] += want[i]
+	}
+	if len(itemIDs) == 0 {
 		return nil
 	}
-	asked := make(map[string]int32, len(lines))
-	for _, l := range lines {
-		asked[mustID(l.ID).String()] = l.QuantityRequested
+	items, err := s.q(ctx).LockItems(ctx, itemIDs)
+	if err != nil {
+		return fmt.Errorf("orders: lock items: %w", err)
+	}
+	for _, it := range items {
+		id := mustID(it.ID)
+		if avail := it.OnHand - it.Reserved; avail < need[id] {
+			return problem.New(genproblems.InsufficientStock, "").
+				WithExtension("storeItemId", id.String()).WithExtension("available", max(avail, 0))
+		}
+	}
+	return nil
+}
+
+// acceptedQuantities reads an accept's lines, when sent: each a line of the
+// order, once, at most the quantity asked. A line not named is taken in
+// full. partial is true when any line is below what was asked; a partial
+// accept that leaves nothing is 422 (BK-10: reject the order instead).
+func acceptedQuantities(lines []ordersdb.OrderLinesRow, body *ordersapi.AcceptOrderRequest) (want []int32, partial bool, err error) {
+	want = make([]int32, len(lines))
+	at := make(map[string]int, len(lines))
+	for i, l := range lines {
+		want[i] = l.QuantityRequested
+		at[mustID(l.ID).String()] = i
+	}
+	if body == nil || body.Lines == nil {
+		return want, false, nil
 	}
 	seen := map[string]bool{}
 	for i, al := range *body.Lines {
 		id, err := ids.Parse(al.OrderItemId)
-		q, ok := asked[id.String()]
+		j, ok := at[id.String()]
 		if err != nil || !ok || seen[id.String()] {
-			return fieldErr(fmt.Sprintf("body.lines[%d].orderItemId", i), "not a line of this order, or repeated")
+			return nil, false, fieldErr(fmt.Sprintf("body.lines[%d].orderItemId", i), "not a line of this order, or repeated")
 		}
 		seen[id.String()] = true
-		field := fmt.Sprintf("body.lines[%d].quantity", i)
-		switch {
-		case al.Quantity > int(q):
-			return fieldErr(field, "more than the order asked for")
-		case al.Quantity < int(q):
-			// TODO(lead): partial accept (BK-08–10) is deferred; until then a
-			// line must be accepted at the quantity asked.
-			return fieldErr(field, "a partial accept is not available yet")
+		if al.Quantity < 0 || al.Quantity > int(lines[j].QuantityRequested) {
+			return nil, false, fieldErr(fmt.Sprintf("body.lines[%d].quantity", i), "more than the order asked for")
 		}
+		want[j] = i32(al.Quantity)
 	}
-	return nil
+	left := false
+	for i, l := range lines {
+		partial = partial || want[i] < l.QuantityRequested
+		left = left || want[i] > 0
+	}
+	if !left {
+		return nil, false, fieldErr("body.lines", "nothing is left to accept; reject the order instead")
+	}
+	return want, partial, nil
 }
 
 // reject refuses a placed order before its accept deadline.
@@ -541,7 +589,7 @@ func (s *Service) customerCancel(ctx context.Context, userID, orderID ids.ID, b 
 		}
 		switch {
 		case o.Status == StatusPlaced && !pastAcceptBy(o, now):
-		case o.Status == StatusAwaitingCustomer:
+		case o.Status == StatusAwaitingCustomer && !pastPartial(o, now):
 		case handable(o.Status) && !pastHold(o, now):
 		default:
 			return invalidTransition()

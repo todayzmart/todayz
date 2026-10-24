@@ -126,6 +126,12 @@
   align-self: flex-start;
 }
 
+/* The New card's Reject, Accept part and Accept share one row (the design's
+   .tz-ocard-actions has two columns, which put Accept on a row of its own). */
+:global(.tz-ocard-actions).threeActions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -150,4 +156,27 @@
 
 .muted {
   color: var(--ink-3);
+}
+
+/* Accept part sheet: one row per line, the name and stock on the left, the stepper on the right. */
+.partLines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.partLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.partName {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
 }

@@ -45,6 +45,7 @@ import (
 
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/gen/sqlc/ordersdb"
+	"github.com/todayz/backend/internal/platform/audit"
 	"github.com/todayz/backend/internal/platform/authn"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/config"
@@ -88,6 +89,9 @@ type Deps struct {
 	Credits Credits
 	// Referrals qualifies referrals on a collected order (W2-03); nil means none.
 	Referrals Referrals
+	// Audit writes the admin cancel's audit_log row; nil refuses the admin
+	// routes with 503.
+	Audit *audit.Writer
 	// CodeRand is the randomness pickup codes are drawn from; nil means
 	// crypto/rand. Only tests set it, to force a code collision.
 	CodeRand io.Reader
@@ -129,6 +133,7 @@ type Service struct {
 	askPricer AskPricer
 	credits   Credits
 	referrals Referrals
+	audit     *audit.Writer
 	codes     *codeKeys // nil when either code key is missing
 	phones    *pii.Sealer
 	ids       *ids.Generator
@@ -144,7 +149,7 @@ func New(d Deps) (*Service, error) {
 	s := &Service{
 		db: d.DB, clock: d.Clock, settings: d.Settings, notices: d.Notices, jobs: d.Jobs,
 		stock: d.Stock, open: d.Open, pricer: d.Pricer, redeemer: d.Redeemer, askPricer: d.AskPricer, credits: d.Credits,
-		referrals: d.Referrals, ids: ids.NewGenerator(),
+		referrals: d.Referrals, audit: d.Audit, ids: ids.NewGenerator(),
 	}
 	if s.pricer == nil {
 		s.pricer = NoOffers{}

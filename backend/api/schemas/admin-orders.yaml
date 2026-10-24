@@ -6,4 +6,37 @@
 # an object that must stay open says `x-open-object: true`. Money is `*Paise`
 # (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
 # timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+AdminStrikeSide:
+  type: string
+  description: The side at fault for an admin cancel (01 §5.2); only that side gets an `admin_cancel` strike.
+  enum: [none, customer, store]
+AdminCancelOrderRequest:
+  type: object
+  description: '`other` needs `note`.'
+  additionalProperties: false
+  required: [reason, strike]
+  properties:
+    reason: {$ref: ./common.yaml#/AdminCancelReason}
+    strike: {$ref: '#/AdminStrikeSide'}
+    note:
+      type: string
+      description: Free text, required for `other` (03 §4.2).
+      minLength: 1
+      maxLength: 200
+AdminCancelledOrder:
+  type: object
+  description: The order after an admin cancel. The full admin order view comes with W3-05.
+  required: [id, number, storeId, customerId, status, statusReason, statusNote, strike, version, serverNow]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    number: {type: string}
+    storeId: {$ref: ./common.yaml#/Ulid}
+    customerId: {$ref: ./common.yaml#/Ulid}
+    status:
+      type: string
+      enum: [cancelled]
+    statusReason: {$ref: ./common.yaml#/AdminCancelReason}
+    statusNote: {type: [string, "null"]}
+    strike: {$ref: '#/AdminStrikeSide'}
+    version: {type: integer}
+    serverNow: {$ref: ./common.yaml#/ServerNow}

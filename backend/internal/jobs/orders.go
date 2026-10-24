@@ -25,9 +25,11 @@ import (
 const ordersTimerAttempts = 25
 
 // registerorders declares the orders timers (W2-02): the accept timeout
-// (BK-06) and the pickup no-show (BK-14). Both are event-triggered: create
-// and accept (and extend) enqueue them in the order's transaction. A late or
-// repeated run finds the order moved on and does nothing (BK-21).
+// (BK-06), the pickup no-show (BK-14) and the partial-confirm timeout
+// (BK-10). All are event-triggered: create, accept (and extend) enqueue them in the order's transaction. A late or
+// repeated run finds the order moved on and does nothing (BK-21). The
+// reconcile sweep runs every minute and applies the same outcomes to an
+// order whose timer was lost or discarded.
 func registerorders(r *Registry, d Deps) {
 	// The timers' own enqueuer (the notices they write enqueue sends) is
 	// built on the first run, not here: the API registers these kinds only
@@ -79,6 +81,48 @@ func registerorders(r *Registry, d Deps) {
 	timer(orders.KindNoShow,
 		"Expires a held pickup order nobody collected by hold_until, returns its stock and records a no-show strike (BK-14)",
 		(*orders.Service).ExpireNoShow)
+	timer(orders.KindPartialTimeout,
+		"Cancels a partly accepted order the customer did not confirm or decline by partial_confirm_by, releasing its credits, with no strike (BK-10)",
+		(*orders.Service).ExpirePartial)
+	platformjobs.Define(r, platformjobs.Kind{
+		Name: orders.KindReconcile, Owner: "W2-02", Class: platformjobs.ClassTimer,
+		Description: "Applies the orders timers' outcomes to orders still waiting past accept_by, partial_confirm_by or hold_until (BK-20, BK-21)",
+		Schedule:    "* * * * *", UniqueBy: platformjobs.PerTick, Timeout: 50 * time.Second, MaxAttempts: 3, Concurrency: 1,
+		Runbook: "docs/runbooks/orders-timers.md",
+		Handler: func(ctx context.Context, rn platformjobs.Run) (platformjobs.Result, error) {
+			s, err := svc()
+			if err != nil {
+				return platformjobs.Result{}, err
+			}
+			return s.Reconcile(ctx, rn)
+		},
+	})
+	platformjobs.Define(r, platformjobs.Kind{
+		Name: orders.KindStrikesRecount, Owner: "W2-02", Class: platformjobs.ClassMaintenance,
+		Description: "Recounts customers' 30-day strike counts and no-show limits from strikes, so aged-out and reset strikes stop counting (01 §5.4)",
+		Schedule:    "45 3 * * *", UniqueBy: platformjobs.PerDay, Timeout: 60 * time.Second, MaxAttempts: 3, Concurrency: 1,
+		Runbook: "docs/runbooks/orders-timers.md",
+		Handler: func(ctx context.Context, rn platformjobs.Run) (platformjobs.Result, error) {
+			s, err := svc()
+			if err != nil {
+				return platformjobs.Result{}, err
+			}
+			return s.RecountStrikes(ctx, rn)
+		},
+	})
+	platformjobs.Define(r, platformjobs.Kind{
+		Name: orders.KindStoreReliability, Owner: "W2-02", Class: platformjobs.ClassRollup,
+		Description: "Recomputes stores' 30-day accept rate, expiry rate and reliability score (those fields only) and raises the store_strikes risk flag at the threshold, with no pause (D-67)",
+		Schedule:    "20 * * * *", UniqueBy: platformjobs.PerHour, Timeout: 60 * time.Second, MaxAttempts: 3, Concurrency: 1,
+		Runbook: "docs/runbooks/orders-timers.md",
+		Handler: func(ctx context.Context, rn platformjobs.Run) (platformjobs.Result, error) {
+			s, err := svc()
+			if err != nil {
+				return platformjobs.Result{}, err
+			}
+			return s.StoreReliability(ctx, rn)
+		},
+	})
 }
 
 // lazyEnqueuer returns a func that builds one insert-only client and its
