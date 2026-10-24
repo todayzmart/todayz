@@ -42,13 +42,12 @@ There was no `TODO(merge)` adapter in the customer areas, so nothing was swapped
 - **In store tab:** needs `/v1/me/purchases` (W2-04) and the wallet, not in the contract.
 - **QR of the pickup code:** needs a QR library; none is in the workspace and no dependency was added.
 - **Call shop:** no customer-facing shop phone in any response.
-- **C-05 "none confirmed" state:** needs a founder rule.
 - **C-04 "Search this area":** `StoreMap` has no map-moved event (`shared/ui`, lead-owned).
 - **C-06 products:** the search needs `q` and has no category filter, so the page lists shops only.
 
 ## Questions
 
-1. C-05 "none confirmed": what should the customer see when no shop in range has confirmed stock?
+1. ~~C-05 none confirmed~~ answered in D-190 and built (below).
 2. Shop phone: may a customer see it, and from which response? (Unblocks "Call shop" on C-12 and the shop page.)
 3. QR code: OK to add a small QR library to `customer/`?
 4. Production tile layout: one India file or per-city files? `home/tiles.ts` assumes per-city names from `infra/local/tiles.sh`.
@@ -68,3 +67,9 @@ There was no `TODO(merge)` adapter in the customer areas, so nothing was swapped
 - `customer/vite.config.ts`: a `stripAssetSourceMapComments` plugin (the MapLibre worker ships a `sourceMappingURL` that dist-check rejects) and `mjs` in the Workbox precache globs. Precache grew to about 2.7 MiB; initial JS is unaffected because the map is lazy. Sibling apps that use `@todayz/ui/map` need the same.
 - `shared/i18n/messages/customer/{home,orders,cart}.en.json`: new keys.
 - New customer folders `src/map` and `src/category`, plus `customer/CLAUDE.md` status lines.
+
+## Follow-up: C-05 "none confirmed" (D-190)
+
+Built on `a0a4dae` + merge of `main`. In `search/SearchPage.tsx` a `NoneConfirmed` banner shows when the results are loaded, there is no further page, and no in-stock item in any result has `confirmedAt` (the server nulls it past `stock_stale_after_hours`). It says "None of the shops has confirmed yet." and offers "Search within {next} km" (the next radius chip up, which only changes the search). At 20 km there is no wider radius: the copy says so and the button is "Search again later", which re-runs the search. The shops are never asked from here; "Ask shops nearby" stays the customer's own action in `AskNearbySlot`, which is still an empty slot because the asks contract does not exist yet.
+
+Reading used: the ask flow is not built, so "the ask has ended" cannot be checked; the state is the stale-results case of 01 §11.2 / ASK-12. The zero-results state keeps its own copy. Tests: 3 new in `search.test.tsx` (next radius sent in the request and no ask call; 20 km; hidden while any shop has confirmed). Run: customer typecheck, lint, vitest (119 passed), `shared/i18n` test (197 passed), `build:e2e`, size 137.46 kB. Screenshot: `screens/search-none-confirmed.png` (390 px). One unrelated flake seen once under load: `transactions.test.tsx` "moves when the live stream says the order changed"; it passed on rerun.
