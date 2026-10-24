@@ -6,9 +6,11 @@ import (
 	"crypto/sha1" //nolint:gosec // RFC 6238 TOTP is HMAC-SHA1 (D-12)
 	"encoding/base32"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"math/rand/v2"
 	"net/http"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
@@ -36,6 +38,7 @@ type fakeCredits struct {
 	balance  int
 	holds    map[ids.ID]int // claim → credits held
 	captured []ids.ID       // claims captured by a sale
+	released []ids.ID       // claims whose hold was given back, once each
 	cashback []pos.Cashback
 	reversed []ids.ID // sales whose credits were reversed
 }
@@ -60,13 +63,20 @@ func (f *fakeCredits) Hold(_ context.Context, _, _, claimID ids.ID, credits int)
 func (f *fakeCredits) Capture(_ context.Context, claimID, _ ids.ID) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
+	if slices.Contains(f.released, claimID) {
+		return errors.New("fake credits: capture of a released hold")
+	}
 	f.captured = append(f.captured, claimID)
+	delete(f.holds, claimID) // spent
 	return nil
 }
 
 func (f *fakeCredits) Release(_ context.Context, claimID ids.ID) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
+	if !slices.Contains(f.released, claimID) {
+		f.released = append(f.released, claimID)
+	}
 	f.balance += f.holds[claimID]
 	delete(f.holds, claimID)
 	return nil
@@ -476,8 +486,12 @@ func TestPOS06DeviceClock(t *testing.T) {
 		var sold, received time.Time
 		require.NoError(t, p.a.tdb.OwnerPool.QueryRow(context.Background(),
 			`SELECT sold_at, received_at FROM pos_sales WHERE id = $1`, uuidOf(t, results(r)[0]["saleId"].(string))).Scan(&sold, &received))
-		require.True(t, sold.Equal(at), "sold_at is the device's time")
 		require.True(t, received.Equal(p.a.clk.Now()), "received_at is the server's")
+		if at.After(now) {
+			require.True(t, sold.Equal(received), "a device ahead of the server is clamped to received_at (D-131)")
+		} else {
+			require.True(t, sold.Equal(at), "sold_at is the device's time")
+		}
 	}
 }
 
@@ -890,7 +904,7 @@ func TestPOSBillQRSale(t *testing.T) {
 	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
 	require.Contains(t, fieldsOf(r), "body.link.claimId")
 
-	p.a.clk.Advance(2 * time.Minute) // a confirmed claim outlives its 120 s
+	p.a.clk.Advance(119 * time.Second) // a confirmed claim binds within its 120 s (D-131)
 	s := p.sell(p.cashier, linked(bill, id))
 	require.Equal(t, http.StatusOK, s.code, s.raw)
 	require.EqualValues(t, 10, s.body["creditsUsed"])
