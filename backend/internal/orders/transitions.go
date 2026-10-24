@@ -26,6 +26,7 @@ const (
 	actorCustomer = "customer"
 	actorStaff    = "staff"
 	actorSystem   = "system"
+	actorAdmin    = "admin"
 )
 
 // maxParamRunes is the notification catalogue's cap on one param.

@@ -2,7 +2,7 @@
 
 Kinds `order_accept_timeout`, `order_pickup_no_show` and `order_partial_timeout` (owner W2-02, class `timer`, code in
 `backend/internal/orders/timers.go`), their reconcile sweep `order_timer_reconcile`
-(`backend/internal/orders/reconcile.go`) and the daily `customer_strikes_recount` (`backend/internal/orders/strikes.go`), all declared in `backend/internal/jobs/orders.go`. The general
+(`backend/internal/orders/reconcile.go`) the daily `customer_strikes_recount` (`backend/internal/orders/strikes.go`) and the hourly `store_reliability` (`backend/internal/orders/reliability.go`), all declared in `backend/internal/jobs/orders.go`. The general
 alert is [Job failing](jobs-job-failing.md) (`tz-jobs-failing-event`, critical for timers).
 
 ## What they do
@@ -14,6 +14,7 @@ alert is [Job failing](jobs-job-failing.md) (`tz-jobs-failing-event`, critical f
 | `order_partial_timeout` | a partial accept (same transaction) | `partial_confirm_by` | A still-`awaiting_customer` order becomes `cancelled`, reason `partial_timeout` (BK-10). Nothing was reserved; its credit hold and offer redemptions are released. No strike for anyone. The customer is told (variant `generic`). |
 | `order_timer_reconcile` | the schedule, every minute (one run per minute, one at a time) | — | Finds orders still `placed` past `accept_by`, `awaiting_customer` past `partial_confirm_by`, or held for pickup past `hold_until` (at the deadline itself, no grace), and applies the same outcome through the same code (BK-20, BK-21). Oldest first, at most 500 per deadline per run; the next minute takes the rest. Summary: `expired`, `noop`, `failed`. |
 | `customer_strikes_recount` | the schedule, daily at 03:45 (class `maintenance`) | — | Recomputes every striked or limited customer's `strikes_count_30d` and `limited_until` from `strikes`, so a strike older than `noshow_window_days`, or reset, stops counting (01 §5.4). Each strike recounts its own customer at once; this run catches the ones that only aged out. A limit already past its end is cleared. Summary: `recounted` (rows changed). |
+| `store_reliability` | the schedule, hourly at :20 (class `rollup`) | — | Recomputes each store's `accept_rate_30d`, `unaccepted_expiry_rate_30d` and `reliability_score` over the fixed 30-day window (D-85) and writes only those fields and `reliability_computed_at` (never `version`, the rating or the status). A store with nothing in the window goes back to NULL (ranking reads 1.0). Then raises the `store_strikes` risk flag for any store with `store_strike_risk_threshold` unreset store strikes in the window and no open flag; a flag cleared by support is not raised again from the same strikes, a newer strike raises it again. No automatic pause (D-67). An admin cancel with `strike: store` raises the flag at once; the score drops on the next run (BK-46). Summary: `stores` (rows changed), `flags` (raised). |
 
 The job arguments are the order id and, for the no-show timer, the hold it was set for. Never a
 code, a phone or a customer id.

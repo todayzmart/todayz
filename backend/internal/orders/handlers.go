@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
+	adminordersapi "github.com/todayz/backend/gen/api/admin-orders"
 	ordersapi "github.com/todayz/backend/gen/api/orders"
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/internal/platform/authz"
@@ -43,6 +44,8 @@ var Ops = map[string]string{
 func Register(r chi.Router, s *Service, az authz.Authorizer) {
 	ordersapi.Register(r, handlers{s},
 		ordersapi.StrictMiddlewareFunc(authz.Strict[ordersapi.StrictHandlerFunc](az, Ops)))
+	adminordersapi.Register(r, adminHandlers{s},
+		adminordersapi.StrictMiddlewareFunc(authz.Strict[adminordersapi.StrictHandlerFunc](az, AdminOps)))
 }
 
 type handlers struct{ s *Service }

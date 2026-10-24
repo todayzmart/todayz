@@ -341,3 +341,93 @@ WHERE status IN ('accepted','ready') AND fulfilment = 'pickup' AND hold_until <=
   AND (hold_until, id) > (@after_at::timestamptz, @after_id::uuid)
 ORDER BY hold_until, id
 LIMIT @lim;
+
+-- name: StoresAtStrikeThreshold :many
+-- Stores with at least @threshold unreset strikes after @since (01 §5.4,
+-- D-67): @store_id alone, or with @every every store. oldest and newest are
+-- the oldest and newest strikes that count.
+WITH p AS (
+  SELECT @since::timestamptz AS since, @threshold::int AS threshold, @every::boolean AS every, @store_id::uuid AS store_id
+)
+SELECT s.subject_id AS store_id, count(*)::int AS n, min(s.created_at)::timestamptz AS oldest,
+  max(s.created_at)::timestamptz AS newest
+FROM strikes s, p
+WHERE s.subject_type = 'store' AND s.reset_at IS NULL AND s.created_at > p.since
+  AND (p.every OR s.subject_id = p.store_id)
+GROUP BY s.subject_id, p.threshold
+HAVING count(*) >= p.threshold;
+
+-- name: InsertStoreStrikeFlag :execrows
+-- Raises the store_strikes risk flag (D-67), once: not while the store has
+-- an open one, nor when one (cleared since) was raised at or after @newest,
+-- the newest strike that counts now, so clearing a flag does not raise it
+-- again from the same strikes; a strike after it does. No automatic pause:
+-- nothing else changes.
+INSERT INTO risk_flags (id, subject_type, subject_id, rule, score, details, created_at, updated_at)
+SELECT @id, 'store', @store_id, 'store_strikes', @score, @details, @now, @now
+WHERE NOT EXISTS (
+  SELECT 1 FROM risk_flags rf
+  WHERE rf.subject_type = 'store' AND rf.subject_id = @store_id AND rf.rule = 'store_strikes'
+    AND (rf.status = 'open' OR rf.created_at >= @newest)
+);
+
+-- name: RecomputeStoreReliability :execrows
+-- The store_reliability job (05 §3, D-67): writes only the reliability
+-- fields of stores (never the rating, D-52). Over orders placed after @since
+-- (30 days, D-85), the ones the shop answered or let lapse: accept_rate_30d
+-- is the share it accepted in full or in part, unaccepted_expiry_rate_30d
+-- the share that expired unanswered. reliability_score starts from the
+-- accept rate (1 with no answered order), loses the expiry rate as a factor
+-- above @expiry_bp, and loses half at @threshold unreset store strikes in
+-- the window, all of it at twice that. A store with nothing in the window
+-- goes back to NULL (ranking reads 1.0). Only rows whose values change are
+-- written; version does not move (the shop's ETag stays).
+WITH p AS (
+  SELECT @now::timestamptz AS now, @since::timestamptz AS since, @expiry_bp::int AS expiry_bp, @threshold::int AS threshold
+), answered AS (
+  SELECT o.store_id,
+    EXISTS (SELECT 1 FROM order_events e WHERE e.order_id = o.id AND e.to_status IN ('accepted','awaiting_customer')) AS took,
+    (o.status = 'expired' AND o.status_reason = 'not_accepted') AS lapsed,
+    o.status = 'rejected' AS refused
+  FROM orders o, p
+  WHERE o.placed_at > p.since
+), rates AS (
+  SELECT a.store_id,
+    count(*) FILTER (WHERE a.took)::numeric AS took,
+    count(*) FILTER (WHERE a.lapsed)::numeric AS lapsed,
+    count(*) FILTER (WHERE a.took OR a.lapsed OR a.refused)::numeric AS n
+  FROM answered a GROUP BY a.store_id
+), struck AS (
+  SELECT s.subject_id AS store_id, count(*)::numeric AS n
+  FROM strikes s, p
+  WHERE s.subject_type = 'store' AND s.reset_at IS NULL AND s.created_at > p.since
+  GROUP BY s.subject_id
+), calc AS (
+  SELECT st.id,
+    CASE WHEN r.n > 0 THEN round(r.took / r.n, 4) END AS accept_rate,
+    CASE WHEN r.n > 0 THEN round(r.lapsed / r.n, 4) END AS expiry_rate,
+    COALESCE(k.n, 0) AS strikes
+  FROM stores st
+  LEFT JOIN rates r ON r.store_id = st.id
+  LEFT JOIN struck k ON k.store_id = st.id
+  WHERE r.n > 0 OR k.n > 0 OR st.reliability_score IS NOT NULL
+    OR st.accept_rate_30d IS NOT NULL OR st.unaccepted_expiry_rate_30d IS NOT NULL
+), next AS (
+  SELECT c.id, c.accept_rate, c.expiry_rate,
+    CASE WHEN c.accept_rate IS NOT NULL OR c.strikes > 0 THEN
+      round(greatest(0, least(1,
+        COALESCE(c.accept_rate, 1)
+        * CASE WHEN c.expiry_rate * 10000 > p.expiry_bp THEN 1 - c.expiry_rate ELSE 1 END
+        * greatest(0, 1 - c.strikes / (2 * greatest(p.threshold, 1)))
+      )), 3)
+    END AS score
+  FROM calc c, p
+)
+UPDATE stores st
+SET accept_rate_30d = x.accept_rate, unaccepted_expiry_rate_30d = x.expiry_rate,
+  reliability_score = x.score, reliability_computed_at = p.now
+FROM next x, p
+WHERE st.id = x.id
+  AND (st.accept_rate_30d IS DISTINCT FROM x.accept_rate
+    OR st.unaccepted_expiry_rate_30d IS DISTINCT FROM x.expiry_rate
+    OR st.reliability_score IS DISTINCT FROM x.score);

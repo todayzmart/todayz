@@ -110,6 +110,19 @@ func registerorders(r *Registry, d Deps) {
 			return s.RecountStrikes(ctx, rn)
 		},
 	})
+	platformjobs.Define(r, platformjobs.Kind{
+		Name: orders.KindStoreReliability, Owner: "W2-02", Class: platformjobs.ClassRollup,
+		Description: "Recomputes stores' 30-day accept rate, expiry rate and reliability score (those fields only) and raises the store_strikes risk flag at the threshold, with no pause (D-67)",
+		Schedule:    "20 * * * *", UniqueBy: platformjobs.PerHour, Timeout: 60 * time.Second, MaxAttempts: 3, Concurrency: 1,
+		Runbook: "docs/runbooks/orders-timers.md",
+		Handler: func(ctx context.Context, rn platformjobs.Run) (platformjobs.Result, error) {
+			s, err := svc()
+			if err != nil {
+				return platformjobs.Result{}, err
+			}
+			return s.StoreReliability(ctx, rn)
+		},
+	})
 }
 
 // lazyEnqueuer returns a func that builds one insert-only client and its

@@ -66,6 +66,7 @@ type orderShop struct {
 	cfg                                        *config.Config
 	logs                                       *logBuf
 	runner                                     *platformjobs.Fake
+	settings                                   *settings.Cache
 	owner, manager, cashier, cashierS2, owner2 string
 	B, S, S2, SY                               string
 	sid                                        string
@@ -177,7 +178,7 @@ func newOrderShop(t *testing.T) *orderShop {
 
 	reg := platformjobs.NewRegistry()
 	jobs.Register(reg, jobs.Deps{Pool: tdb.Pool, Clock: clk, Settings: st, Config: cfg, Log: log})
-	o := &orderShop{t: t, a: a, cfg: cfg, logs: lb, runner: platformjobs.NewFake(reg, clk)}
+	o := &orderShop{t: t, a: a, cfg: cfg, logs: lb, runner: platformjobs.NewFake(reg, clk), settings: st}
 
 	o.login(&o.owner, ownerPhone, "business")
 	o.login(&o.owner2, otherOwnerPhone, "business")
