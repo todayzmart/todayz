@@ -368,15 +368,17 @@ Each column below is created as a plain `uuid` with an index. The constraint is 
 | Target (owner, wave) | Plain `uuid` columns | FK added by |
 |---|---|---|
 | `users` (W1-01, 1) | `platform_settings.updated_by`, `risk_flags.reviewed_by` (W0-03) | W1-01 |
-| `users` (W1-01, 1) | `job_runs.triggered_by`, `job_controls.updated_by` (W1-11); `businesses.onboarded_by`, `businesses.verified_by`, `business_kyc.verified_by`, `business_documents.reviewed_by`, `staff.user_id`, `staff.invited_by`, `stores.reviewed_by` (W1-04); `stock_movements.actor_user_id`, `product_review_queue.decided_by` (W1-05) | Wave 1 constraints migration |
+| `users` (W1-01, 1) | `job_runs.triggered_by`, `job_controls.updated_by` (W1-11); `businesses.onboarded_by`, `businesses.verified_by`, `business_kyc.verified_by`, `business_documents.reviewed_by`, `staff.user_id`, `staff.invited_by`, `stores.reviewed_by` (W1-04); `stock_movements.actor_user_id` (W1-05) | Wave 1 constraints migration (`19901`, D-211) |
+| `users` (W1-01, 1) | `product_review_queue.decided_by` (W1-05) | The package that creates `product_review_queue` (deferred, D-211) |
 | `devices` (W1-01, 1) | `stock_movements.device_id` (W1-05) | Wave 1 constraints migration |
 | `categories` (W1-05, 1) | `businesses.category_id` (W1-04) | Wave 1 constraints migration |
 | `stores` (W1-04, 1) | `products.created_by_store_id`, `store_items.store_id`, `stock_movements.store_id`, `catalogue_changes.store_id` (W1-05) | Wave 1 constraints migration |
 | `referrals` (W2-03, 2) | `customer_profiles.referred_by_referral_id` (W1-01), `businesses.referred_by_referral_id` (W1-04) | W2-03 |
-| `orders` (W2-02, 2) | `credit_holds.order_id` (W2-01), `reviews.order_id` (W2-06), `offer_redemptions.order_id` (W2-07), `support_tickets.order_id` (W2-09) | Wave 2 constraints migration |
+| `orders` (W2-02, 2) | `credit_holds.order_id` (W2-01), `notify_order_escalations.order_id` (W2-05), `reviews.order_id` (W2-06), `offer_redemptions.order_id` (W2-07) | Wave 2 constraints migration |
+| `orders` (W2-02, 2) | `support_tickets.order_id` (W2-09) | W2-09, when it creates the table (D-211) |
 | `pos_sales` (W2-04, 2) | `reviews.pos_sale_id` (W2-06), `offer_redemptions.pos_sale_id` (W2-07) | Wave 2 constraints migration |
 | `bill_claims` (W2-04, 2) | `credit_holds.bill_claim_id` (W2-01) | Wave 2 constraints migration |
-| `ledger_transactions` (W2-01, 2) | `referrals.reward_transaction_id` (W2-03) | Wave 2 constraints migration |
-| `qr_standees` (W2-10, 2) | `referrals.standee_id`, `referral_clicks.standee_id` (W2-03) | Wave 2 constraints migration |
+| `ledger_transactions` (W2-01, 2) | `referrals.referrer_transaction_id`, `referrals.referee_transaction_id` (W2-03) | Wave 2 constraints migration |
+| `qr_standees` (W2-10, 2) | `referrals.standee_id`, `referral_clicks.standee_id` (W2-03) | The package that creates `qr_standees` (not built yet, D-211) |
 | `ai_drafts` (W3-10, 3) | `coach_suggestions.ai_draft_id` (W3-11) | Wave 3 constraints migration |
 | `ask_recipients` (W3-16, 3) | `orders.ask_reply_id` (W2-02), `on delete set null` (D-101) | W3-16 |

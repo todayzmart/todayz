@@ -1155,3 +1155,17 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 - **Kept:** the budget alarm comes first. The founder sees the prod `terraform plan` summary (resources and cost, about ₹13–17k a month) before the first apply. App keys are generated fresh for prod, straight into Secrets Manager. `make check` stays the gate before every deploy.
 - **Prod data:** reference data only (categories, places, master catalogue, admin users). Never the dev seed.
 - **Guide:** `docs/runbooks/cloud-access.md`.
+
+## Constraints migrations (lead, 2026-10-24)
+
+**D-211 · The Wave 1 and Wave 2 constraints migrations (D-79).** The Wave 1 constraints migration was never written, so it lands now with Wave 2's.
+- **Lead block.** A lead file needs a `w<wave>-NN` id for the name check (D-89), and "lead" does not match it. The lead uses WP number 99: `19901_w1-99_lead_constraints.sql` and `29901_w2-99_lead_constraints.sql`. No work package has number 99. Both sort after every package in their wave, and a lower block applied late is fine under D-90.
+- **Wave 1 (16 FKs).** These are the 03 §13 columns except `product_review_queue.decided_by`, whose table was deferred in the W1-05 weekend slice. `job_runs.triggered_by` and `job_controls.updated_by` get the index they lacked.
+- **Wave 2 (9 FKs).**
+  - `credit_holds.order_id` and `credit_holds.bill_claim_id`;
+  - `reviews.order_id` and `reviews.pos_sale_id`;
+  - `offer_redemptions.order_id` and `offer_redemptions.pos_sale_id`;
+  - `referrals.referrer_transaction_id` and `referrals.referee_transaction_id`, each with a new partial index. 03 §13 called these a single `reward_transaction_id`; it is corrected;
+  - `notify_order_escalations.order_id` (W2-05). It was missing from 03 §13 and is added there.
+- **Still deferred.** `referrals.standee_id` and `referral_clicks.standee_id` wait for a `qr_standees` table, and `support_tickets.order_id` waits for W2-09. Whichever package creates the table adds the FK in its own migration, the way a later-wave target does (D-35).
+- All the constraints are plain `NO ACTION`, like the earlier FKs. No code deletes a parent row: orders, sales, claims and ledger transactions are never deleted, and users are anonymised, not removed.
