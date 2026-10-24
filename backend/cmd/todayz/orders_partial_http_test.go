@@ -333,3 +333,71 @@ func TestConfirmPartialRecapsCredits(t *testing.T) {
 	require.EqualValues(t, 5, c.body["creditsUsed"])
 	require.EqualValues(t, 10500, c.body["totalPaise"])
 }
+
+// placeQuoted places lines at the quote's total and returns the order id.
+func (o *orderShop) placeQuoted(lines ...line) string {
+	o.t.Helper()
+	q := o.quote(lines...)
+	require.Equal(o.t, http.StatusOK, q.code, q.raw)
+	r := o.a.call(o.cust, http.MethodPost, "/v1/me/orders", o.cart(lines, int(q.body["totalPaise"].(float64))), idem(o.a))
+	require.Equal(o.t, http.StatusCreated, r.code, r.raw)
+	return r.body["id"].(string)
+}
+
+// lineQty is the partial-accept quantities for an order's lines, by item.
+func (o *orderShop) lineQty(id string, want map[string]int) []int {
+	o.t.Helper()
+	qty := make([]int, len(o.lineIDs(id)))
+	for i := range qty {
+		qty[i] = want[o.lineStoreItem(id, i)]
+	}
+	return qty
+}
+
+// A buy-2-get-1 line is priced again on the kept quantity (lead review 1):
+// six butters (two free) kept as four give one free, kept as two give none.
+func TestPartialAcceptRepricesBuyXGetY(t *testing.T) {
+	o := newOrderShop(t)
+	bx := ids.New(o.a.clk.Now()).String()
+	o.a.exec(`INSERT INTO offers (id, store_id, kind, value, buy_qty, get_qty, scope, store_item_ids, channels, starts_at, status)
+	  VALUES ($1, $2, 'bxgy', 0, 2, 1, 'store', '{}', 'both', $3, 'live')`, uuidOf(t, bx), uuidOf(t, o.sid), o.a.clk.Now().Add(-time.Hour))
+
+	id := o.placeQuoted(line{o.butter, 6}, line{o.salt, 1})
+	require.EqualValues(t, 2*5500, o.money(id).discount, "two butters free")
+	r := o.partial(id, o.lineQty(id, map[string]int{o.butter: 4, o.salt: 1})...)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	m := o.money(id)
+	require.EqualValues(t, 4*5500+2500, m.subtotal)
+	require.EqualValues(t, 5500, m.discount, "four butters keep one free")
+	require.EqualValues(t, 3*5500+2500, m.total)
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM order_items WHERE order_id = $1 AND store_item_id = $2 AND quantity_accepted = 4 AND line_total_paise = $3`,
+		uuidOf(t, id), uuidOf(t, o.butter), 3*5500))
+
+	id = o.placeQuoted(line{o.butter, 3}, line{o.salt, 1})
+	require.EqualValues(t, 5500, o.money(id).discount)
+	r = o.partial(id, o.lineQty(id, map[string]int{o.butter: 2, o.salt: 1})...)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	m = o.money(id)
+	require.Zero(t, m.discount, "two butters no longer make a group")
+	require.EqualValues(t, 2*5500+2500, m.total)
+}
+
+// An ask reply's line keeps its replied price on a partial accept and takes
+// no offer (D-101, lead review 7); the other lines are re-priced as usual.
+func TestPartialAcceptKeepsAskReplyPrice(t *testing.T) {
+	o := newOrderShop(t)
+	o.offerOn("percent", 10, nil)
+	id := o.placeQuoted(line{o.butter, 2}, line{o.salt, 1})
+	// The order's butter line came from an ask reply at ₹50 a unit.
+	o.a.exec(`UPDATE order_items SET price_source = 'ask_reply', unit_price_paise = 5000 WHERE order_id = $1 AND store_item_id = $2`,
+		uuidOf(t, id), uuidOf(t, o.butter))
+
+	r := o.partial(id, o.lineQty(id, map[string]int{o.butter: 1, o.salt: 1})...)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	m := o.money(id)
+	require.EqualValues(t, 5000+2500, m.subtotal)
+	require.EqualValues(t, 250, m.discount, "10% of the salt only")
+	require.EqualValues(t, 5000+2250, m.total)
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM order_items WHERE order_id = $1 AND store_item_id = $2 AND unit_price_paise = 5000 AND line_total_paise = 5000`,
+		uuidOf(t, id), uuidOf(t, o.butter)))
+}

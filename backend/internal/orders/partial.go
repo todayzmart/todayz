@@ -74,7 +74,9 @@ func (s *Service) billFor(ctx context.Context, o ordersdb.Order, lines []ordersd
 	b.itemSubtotal = b.subtotal - lineDiscounts
 	b.discount = lineDiscounts + min(max(pr.BillDiscount, 0), b.itemSubtotal)
 	b.itemsAfterOffers = b.subtotal - b.discount
-	b.deliveryFee = 0 // pickup only; delivery recomputes its fee here (BK-23)
+	// TODO(lead): pickup only for now; the delivery WP recomputes the fee
+	// on the kept lines here (BK-23), and its sweep covers dispatch_by.
+	b.deliveryFee = 0
 	return b, nil
 }
 
