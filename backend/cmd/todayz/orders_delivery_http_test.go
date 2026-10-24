@@ -235,13 +235,7 @@ func TestBK23DeliveryRadiusMinimumAndFee(t *testing.T) {
 // answer delivery_closed with the next window; pickup is still open.
 func TestBK23DeliveryClosed(t *testing.T) {
 	d := newDeliveryShop(t)
-	w := map[string]any{}
-	for _, day := range []string{"mon", "tue", "wed", "thu", "fri", "sat", "sun"} {
-		w[day] = []any{map[string]string{"open": "09:00", "close": "11:00"}}
-	}
-	hours, err := json.Marshal(map[string]any{"weekly": w, "holidays": []any{}})
-	require.NoError(t, err)
-	d.a.exec(`UPDATE stores SET delivery_hours = $1 WHERE id = $2`, hours, uuidOf(t, d.sid))
+	d.a.exec(`UPDATE stores SET delivery_hours = $1 WHERE id = $2`, everyDay(t, "09:00", "11:00"), uuidOf(t, d.sid))
 
 	// Friday 11:30 IST: the next window is Saturday 09:00–11:00 IST.
 	r := d.dquote(d.near, line{d.butter, 2})
@@ -259,6 +253,51 @@ func TestBK23DeliveryClosed(t *testing.T) {
 	d.set(time.Date(2026, 10, 24, 3, 30, 0, 0, time.UTC))
 	r = d.dquote(d.near, line{d.butter, 2})
 	require.Equal(t, http.StatusOK, r.code, "inside the window: %s", r.raw)
+}
+
+// everyDay is store hours open..close (IST) on every day of the week.
+func everyDay(t *testing.T, open, close string) []byte {
+	t.Helper()
+	w := map[string]any{}
+	for _, day := range []string{"mon", "tue", "wed", "thu", "fri", "sat", "sun"} {
+		w[day] = []any{map[string]string{"open": open, "close": close}}
+	}
+	hours, err := json.Marshal(map[string]any{"weekly": w, "holidays": []any{}})
+	require.NoError(t, err)
+	return hours
+}
+
+// BK-23 (D-219): a delivery order follows the delivery hours alone, a
+// pickup order the counter hours; closed_until stops both. Counter 09–20,
+// delivery 09–22: at 21:00 the delivery quote and the place agree.
+func TestBK23DeliveryHoursWiderThanCounter(t *testing.T) {
+	d := newDeliveryShop(t)
+	d.a.exec(`UPDATE stores SET hours = $1, delivery_hours = $2 WHERE id = $3`,
+		everyDay(t, "09:00", "20:00"), everyDay(t, "09:00", "22:00"), uuidOf(t, d.sid))
+	d.set(time.Date(2026, 10, 23, 15, 30, 0, 0, time.UTC)) // Friday 21:00 IST
+
+	r := d.dquote(d.near, line{d.butter, 2})
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.Equal(t, true, r.body["orderable"], r.raw)
+	r = d.dplace(d.near, 11000+dFee, line{d.butter, 2})
+	require.Equal(t, http.StatusCreated, r.code, "the place agrees with the quote: %s", r.raw)
+
+	r = d.place(d.cust, line{d.salt, 1})
+	require.Equal(t, http.StatusConflict, r.code, "pickup follows the counter hours: %s", r.raw)
+	require.Equal(t, "store_closed", problemCode(r))
+
+	// Closed by the shop: both kinds stop, delivery as delivery_closed.
+	d.a.exec(`UPDATE stores SET hours = $1, closed_until = $2 WHERE id = $3`,
+		everyDay(t, "09:00", "22:00"), d.a.clk.Now().Add(time.Hour), uuidOf(t, d.sid))
+	r = d.dquote(d.near, line{d.butter, 2})
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, "delivery_closed", problemCode(r))
+	r = d.dplace(d.near, 11000+dFee, line{d.butter, 2})
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, "delivery_closed", problemCode(r))
+	r = d.place(d.cust, line{d.salt, 1})
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, "store_closed", problemCode(r))
 }
 
 // BK-23b (D-94): the free-delivery amount and a minimum-bill offer both
@@ -374,14 +413,27 @@ func TestBK24CancelBeforeDispatch(t *testing.T) {
 	r = d.staff(d.manager, id, "cancel", map[string]any{"reason": "out_of_stock"})
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 
+	// At and after dispatch_by, before the timer has run: the order can
+	// only expire. Dispatch and both cancels are 409 invalid_transition
+	// and change nothing (orders.yaml dispatchOrder).
 	id = d.daccepted()
-	d.set(d.dispatchBy(id))
-	r = d.me(d.cust, id, "cancel", map[string]any{"reason": "changed_mind"})
-	require.Equal(t, http.StatusConflict, r.code, "past dispatch_by: %s", r.raw)
-	r = d.staff(d.manager, id, "cancel", map[string]any{"reason": "out_of_stock"})
-	require.Equal(t, http.StatusConflict, r.code, "past dispatch_by: %s", r.raw)
-	r = d.staff(d.cashier, id, "dispatch", nil)
-	require.Equal(t, http.StatusConflict, r.code, "past dispatch_by the order can only expire: %s", r.raw)
+	by := d.dispatchBy(id)
+	for _, at := range []time.Time{by, by.Add(time.Minute)} {
+		d.set(at)
+		r = d.staff(d.cashier, id, "dispatch", nil)
+		require.Equal(t, http.StatusConflict, r.code, "dispatch at %s: %s", at, r.raw)
+		require.Equal(t, "invalid_transition", problemCode(r))
+		r = d.me(d.cust, id, "cancel", map[string]any{"reason": "changed_mind"})
+		require.Equal(t, http.StatusConflict, r.code, "customer cancel at %s: %s", at, r.raw)
+		require.Equal(t, "invalid_transition", problemCode(r))
+		r = d.staff(d.manager, id, "cancel", map[string]any{"reason": "out_of_stock"})
+		require.Equal(t, http.StatusConflict, r.code, "manager cancel at %s: %s", at, r.raw)
+		require.Equal(t, "invalid_transition", problemCode(r))
+		require.Equal(t, "accepted", d.status(id))
+		require.Equal(t, 1, d.held(id))
+	}
+	expiredRun(t, d.timer(orders.KindDispatchTimeout, id, nil))
+	require.Equal(t, "expired", d.status(id))
 }
 
 // BK-24 (partial): a partly accepted delivery order keeps the fee, and one
@@ -436,7 +488,7 @@ func TestBK25DispatchTimeout(t *testing.T) {
 	require.Zero(t, d.held(id))
 	require.Equal(t, 1, d.a.count(`SELECT count(*) FROM stock_reservations WHERE order_id = $1 AND status = 'released' AND released_reason = 'dispatch_timeout'`, uuidOf(t, id)))
 	require.Equal(t, 1, d.a.count(`SELECT count(*) FROM credit_holds WHERE order_id = $1 AND status = 'released'`, uuidOf(t, id)))
-	require.Equal(t, 1, d.a.count(`SELECT count(*) FROM notifications WHERE kind = 'order_update' AND ref_id = $1 AND params->>'variant' = 'expired'`, uuidOf(t, id)))
+	require.Equal(t, 1, d.a.count(`SELECT count(*) FROM notifications WHERE kind = 'order_update' AND ref_id = $1 AND params->>'variant' = 'dispatch_timeout'`, uuidOf(t, id)))
 	_, reserved := d.stock(d.butter)
 	require.Zero(t, reserved)
 
@@ -697,9 +749,11 @@ func TestBK27PhoneOnlyWhileOutForDelivery(t *testing.T) {
 	p, l := phone(id, "accepted")
 	require.Nil(t, p, "accepted: masked")
 	require.Nil(t, l)
-	r := d.staff(d.cashier, id, "dispatch", nil)
+	key := idem(d.a)
+	r := d.a.call(d.cashier, http.MethodPost, d.S+"/orders/"+id+"/dispatch", nil, key)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
-	require.Contains(t, r.body["customer"].(map[string]any)["phone"], "9000000014")
+	require.Nil(t, r.body["customer"].(map[string]any)["phone"], "the dispatch response never carries the full phone")
+	require.NotEmpty(t, r.body["customer"].(map[string]any)["phoneMasked"])
 	p, l = phone(id, "out_for_delivery")
 	isFull(p)
 	isFull(l)
@@ -708,6 +762,9 @@ func TestBK27PhoneOnlyWhileOutForDelivery(t *testing.T) {
 	p, l = phone(id, "done")
 	require.Nil(t, p, "delivered: masked")
 	require.Nil(t, l)
+	r = d.a.call(d.cashier, http.MethodPost, d.S+"/orders/"+id+"/dispatch", nil, key)
+	require.Equal(t, http.StatusOK, r.code, "the replay: %s", r.raw)
+	require.Nil(t, r.body["customer"].(map[string]any)["phone"], "an idempotent replay after delivery has no phone either")
 
 	id, _ = d.failed()
 	p, l = phone(id, "returns")
@@ -739,4 +796,103 @@ func TestBK41NoNoShowForDelivery(t *testing.T) {
 	require.Equal(t, "expired", d.status(id))
 	require.Equal(t, 1, d.a.count(`SELECT count(*) FROM orders WHERE id = $1 AND status_reason = 'dispatch_timeout'`, uuidOf(t, id)))
 	require.Zero(t, d.strikes(), "still no customer strike")
+}
+
+// The delivery actions need a delivery order of this store: a pickup order
+// is 409 on dispatch, fail-delivery and confirm-return; another store's
+// delivery order is 404 on its own path.
+func TestDeliveryActionsNeedADeliveryOrderOfTheStore(t *testing.T) {
+	d := newDeliveryShop(t)
+	pick := d.accepted()
+	r := d.staff(d.cashier, pick, "dispatch", nil)
+	require.Equal(t, http.StatusConflict, r.code, "dispatch a pickup order: %s", r.raw)
+	require.Equal(t, "invalid_transition", problemCode(r))
+	r = d.staff(d.cashier, pick, "ready", nil)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	r = d.staff(d.cashier, pick, "fail-delivery", map[string]any{"reason": "customer_unreachable"})
+	require.Equal(t, http.StatusConflict, r.code, "fail a pickup order: %s", r.raw)
+	require.Equal(t, "invalid_transition", problemCode(r))
+	r = d.staff(d.cashier, pick, "confirm-return", map[string]any{"outcome": "returned"})
+	require.Equal(t, http.StatusConflict, r.code, "confirm a pickup order's return: %s", r.raw)
+	require.Equal(t, "invalid_transition", problemCode(r))
+	require.Equal(t, "ready", d.status(pick))
+
+	accepted := d.daccepted()
+	out := d.dispatched()
+	failed, _ := d.failed()
+	for _, act := range []struct {
+		id, path string
+		body     any
+	}{
+		{accepted, "dispatch", nil},
+		{out, "fail-delivery", map[string]any{"reason": "customer_unreachable"}},
+		{failed, "confirm-return", map[string]any{"outcome": "returned"}},
+	} {
+		r = d.a.call(d.cashierS2, http.MethodPost, d.S2+"/orders/"+act.id+"/"+act.path, act.body, idem(d.a))
+		require.Equal(t, http.StatusNotFound, r.code, "S2's cashier, %s: %s", act.path, r.raw)
+		r = d.a.call(d.owner2, http.MethodPost, d.SY+"/orders/"+act.id+"/"+act.path, act.body, idem(d.a))
+		require.Equal(t, http.StatusNotFound, r.code, "another business, %s: %s", act.path, r.raw)
+	}
+	require.Equal(t, "accepted", d.status(accepted))
+	require.Equal(t, "out_for_delivery", d.status(out))
+	require.Nil(t, d.returnOutcome(failed))
+}
+
+// BK-26: once a person has confirmed the return, the return job's later
+// steps do nothing: no reminder, no auto-confirm, no risk flag.
+func TestBK26ReturnJobAfterStaffConfirm(t *testing.T) {
+	d := newDeliveryShop(t)
+	id, at := d.failed()
+	r := d.staff(d.cashier, id, "confirm-return", map[string]any{"outcome": "returned"})
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+
+	for step, after := range map[int]time.Duration{1: 2 * time.Hour, 2: 24 * time.Hour, 3: 72 * time.Hour} {
+		d.set(at.Add(after))
+		fr := d.returnRun(id, step)
+		require.Equal(t, platformjobs.StatusSucceeded, fr.Status, "step %d: %v", step, fr.Err)
+		require.EqualValues(t, 1, fr.Result.Summary["noop"], "step %d", step)
+	}
+	require.Zero(t, d.reminders(id))
+	out := d.returnOutcome(id)
+	require.NotNil(t, out)
+	require.Equal(t, "returned", *out)
+	require.Zero(t, d.a.count(`SELECT count(*) FROM risk_flags WHERE rule = 'return_unconfirmed'`))
+	require.Equal(t, 1, d.a.count(`SELECT count(*) FROM orders WHERE id = $1 AND return_confirmed_by IS NOT NULL`, uuidOf(t, id)))
+}
+
+// The return's outcome is the store's business: the customer's timeline
+// shows the order's status changes only, never the delivery_failed →
+// delivery_failed event the settlement writes; the store's keeps it.
+func TestBK26ReturnOutcomeIsStoreOnly(t *testing.T) {
+	d := newDeliveryShop(t)
+	id, _ := d.failed()
+	r := d.staff(d.manager, id, "confirm-return", map[string]any{"outcome": "damaged"})
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+
+	same := func(body map[string]any) (n int, reasons []any) {
+		t.Helper()
+		evs, ok := body["timeline"].([]any)
+		require.True(t, ok, "a timeline")
+		for _, e := range evs {
+			m := e.(map[string]any)
+			if m["fromStatus"] != nil && m["fromStatus"] == m["toStatus"] {
+				n++
+				reasons = append(reasons, m["reason"])
+			}
+		}
+		return n, reasons
+	}
+	c := d.a.call(d.cust, http.MethodGet, "/v1/me/orders/"+id, nil, nil)
+	require.Equal(t, http.StatusOK, c.code, c.raw)
+	n, _ := same(c.body)
+	require.Zero(t, n, "the customer sees no return outcome")
+	require.Equal(t, "delivery_failed", c.body["status"])
+	evs := c.body["timeline"].([]any)
+	require.Equal(t, "delivery_failed", evs[len(evs)-1].(map[string]any)["toStatus"])
+
+	g := d.a.call(d.manager, http.MethodGet, d.S+"/orders/"+id, nil, nil)
+	require.Equal(t, http.StatusOK, g.code, g.raw)
+	n, reasons := same(g.body)
+	require.Equal(t, 1, n, "the store keeps the outcome event")
+	require.Equal(t, []any{"return_damaged"}, reasons)
 }

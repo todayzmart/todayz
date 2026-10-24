@@ -291,6 +291,10 @@ func (h handlers) DispatchOrder(ctx context.Context, req ordersapi.DispatchOrder
 	if err != nil {
 		return nil, err
 	}
+	// The full phone stays out of this response: an idempotent replay would
+	// return it long after delivery. The order read gates it on
+	// out_for_delivery (BK-27).
+	o.Customer.Phone = nil
 	return ordersapi.DispatchOrder200JSONResponse(o), nil
 }
 

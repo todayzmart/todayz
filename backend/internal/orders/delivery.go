@@ -92,6 +92,24 @@ func deliveryHours(st ordersdb.StoreForBookingRow) []byte {
 	return st.Hours
 }
 
+// closedFor is the hours check that quote and place share (01 §5, D-219):
+// a delivery order follows the delivery hours alone (delivery_closed), a
+// pickup order the counter hours (store_closed); closed_until applies to
+// both. The quote asks it for delivery only: a pickup quote stays
+// informational (D-216) and placing refuses outside counter hours.
+func (s *Service) closedFor(st ordersdb.StoreForBookingRow, f string, now time.Time) error {
+	if f == Delivery {
+		return s.deliveryClosed(st, now)
+	}
+	if s.open == nil {
+		return problem.Wrap(genproblems.ServiceUnavailable, errUnavailable)
+	}
+	if !s.open(st.Hours, st.ClosedUntil, now) {
+		return problem.New(genproblems.StoreClosed, "")
+	}
+	return nil
+}
+
 // deliveryClosed refuses a delivery cart outside the store's delivery hours
 // (or while it is closed by the shop) with delivery_closed and the next
 // window in extensions.nextDeliveryWindow (null when nothing opens within

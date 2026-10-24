@@ -90,10 +90,14 @@ var catalogue = map[string]kindDef{
 			"en": {"Order update", "Your order from {store} has an update."},
 		},
 		Variants: map[string]map[string]text{
-			"accepted":         {"en": {"Order accepted", "{store} accepted your order."}},
-			"partial":          {"en": {"Order partly accepted", "{store} can give only part of your order. Open it to see what is available."}},
-			"rejected":         {"en": {"Order not accepted", "{store} could not take your order."}},
-			"expired":          {"en": {"Order expired", "{store} did not answer in time, so your order was cancelled."}},
+			"accepted": {"en": {"Order accepted", "{store} accepted your order."}},
+			"partial":  {"en": {"Order partly accepted", "{store} can give only part of your order. Open it to see what is available."}},
+			"rejected": {"en": {"Order not accepted", "{store} could not take your order."}},
+			"expired":  {"en": {"Order expired", "{store} did not answer in time, so your order was cancelled."}},
+			"dispatch_timeout": {
+				"en": {"Order cancelled", "{store} did not send your order out in time, so it was cancelled."},
+				"hi": {"ऑर्डर रद्द हुआ", "{store} ने आपका ऑर्डर समय पर नहीं भेजा, इसलिए इसे रद्द कर दिया गया।"},
+			},
 			"ready":            {"en": {"Ready for pickup", "Your order from {store} is ready. Show your pickup code at the counter."}},
 			"out_for_delivery": {"en": {"Out for delivery", "Your order from {store} is on its way."}},
 			"delivered":        {"en": {"Delivered", "Your order from {store} was delivered."}},

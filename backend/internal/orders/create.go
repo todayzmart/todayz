@@ -69,16 +69,9 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		if err != nil {
 			return err
 		}
-		// A delivery cart is told the next delivery window first; the shop
-		// must be open too (its hours, or closed by the shop).
 		var address []byte
-		if c.fulfilment == Delivery {
-			if err := s.deliveryClosed(st, now); err != nil {
-				return err
-			}
-		}
-		if !s.open(st.Hours, st.ClosedUntil, now) {
-			return problem.New(genproblems.StoreClosed, "")
+		if err := s.closedFor(st, c.fulfilment, now); err != nil {
+			return err
 		}
 		if c.fulfilment == Delivery {
 			if address, err = s.deliveryAddress(ctx, p.UserID, st, c); err != nil {

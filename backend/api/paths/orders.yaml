@@ -176,7 +176,9 @@
       with the fresh quote in `extensions.quote` when the total is not `expectedTotalPaise`; `409 insufficient_stock`
       naming the line in `extensions.storeItemId` and `extensions.available`. Sets `accept_by` from `order_accept_timeout_min`,
       notifies the store and starts the accept timer. Nothing is reserved until the shop accepts (D-01).
-      `409 store_closed` outside opening hours or while closed by the shop; `409 store_not_bookable` when
+      `409 store_closed` for a pickup order outside opening hours or while closed by the shop; a delivery
+      order follows the delivery hours alone (D-219), so it answers `409 delivery_closed` instead, as the
+      quote does; `409 store_not_bookable` when
       the store takes no orders of this fulfilment or is not live; delivery is checked as in the quote
       (`below_minimum`, `delivery_closed`, radius) and snapshots the address onto the order;
       `409 ordering_suspended` with `extensions.until` while no-show strikes limit the account and it
@@ -1411,9 +1413,12 @@
     - orders
     summary: Send a delivery order out
     description: >-
-      Cashier and above, accepted to out_for_delivery, delivery only. The customer is told. Missing
-      `dispatchBy` expires the order instead (`dispatch_timeout`, a store strike, reservations and credits
-      released). `409 invalid_transition` from any other state.
+      Cashier and above, accepted to out_for_delivery, delivery only. The customer is told. At or after
+      `dispatchBy` the dispatch is refused with `409 invalid_transition`; the dispatch timer (or the sweep,
+      if the timer is lost) expires the order (`dispatch_timeout`, a store strike, reservations and credits
+      released). `409 invalid_transition` from any other state, or for a pickup order. `customer.phone` is
+      always null in this response (an idempotent replay must not return it after delivery); the order
+      read carries it while out_for_delivery (BK-27).
     x-idempotency: required
     x-money: true
     parameters:

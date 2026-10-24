@@ -95,7 +95,7 @@ func (s *Service) customerView(ctx context.Context, d detail, st ordersdb.OrderS
 		CanExtend:  o.Fulfilment == Pickup && handable(o.Status) && o.ExtendedAt == nil && o.HoldUntil != nil && now.Before(*o.HoldUntil),
 		DispatchBy: utc(o.DispatchBy), DeliveryFailedAt: utc(o.DeliveryFailedAt), ReturnOutcome: returnOutcome(o.ReturnOutcome),
 		ReturnConfirmedAt: utc(o.ReturnConfirmedAt), DeliveryAddress: readAddress(o.AddressSnapshot),
-		Lines: make([]ordersapi.OrderLine, 0, len(d.lines)), Timeline: timeline(d.timeline),
+		Lines: make([]ordersapi.OrderLine, 0, len(d.lines)), Timeline: timeline(statusChanges(d.timeline)),
 		ServerNow: now, Version: int(o.Version),
 	}
 	if id, ok := ids.FromUUID(o.AskReplyID); ok {
@@ -237,6 +237,20 @@ func orderStore(st ordersdb.OrderStoreRow) ordersapi.OrderStore {
 		Id: mustID(st.ID).String(), Slug: st.Slug, Name: st.Name, Locality: st.Locality,
 		AddressLine: strings.Join(parts, ", "),
 	}
+}
+
+// statusChanges keeps the events that move the status: the customer's
+// timeline leaves out a store-side note on the same status, such as a
+// failed delivery's return being settled (returned, damaged, unconfirmed).
+func statusChanges(rows []ordersdb.OrderTimelineRow) []ordersdb.OrderTimelineRow {
+	out := make([]ordersdb.OrderTimelineRow, 0, len(rows))
+	for _, r := range rows {
+		if r.FromStatus != nil && *r.FromStatus == r.ToStatus {
+			continue
+		}
+		out = append(out, r)
+	}
+	return out
 }
 
 func timeline(rows []ordersdb.OrderTimelineRow) []ordersapi.OrderTimelineEvent {

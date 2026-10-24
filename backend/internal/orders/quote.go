@@ -315,7 +315,7 @@ func (s *Service) quoteCart(ctx context.Context, c cart) (ordersapi.CheckoutQuot
 		if err := belowMinimum(q); err != nil {
 			return ordersapi.CheckoutQuote{}, err
 		}
-		if err := s.deliveryClosed(st, now); err != nil {
+		if err := s.closedFor(st, c.fulfilment, now); err != nil {
 			return ordersapi.CheckoutQuote{}, err
 		}
 	}

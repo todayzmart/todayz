@@ -84,6 +84,10 @@ func TestTextFor(t *testing.T) {
 
 	tx, _ = textFor(notice.KindOrderUpdate, "hi", map[string]string{"store": "Ganesh", "variant": "ready"})
 	require.Equal(t, "Ready for pickup", tx.Title, "a variant without Hindi uses its English, not the kind's Hindi")
+	tx, _ = textFor(notice.KindOrderUpdate, "hi", map[string]string{"store": "Ganesh", "variant": "dispatch_timeout"})
+	require.Equal(t, "ऑर्डर रद्द हुआ", tx.Title, "a dispatch timeout has its own text, not the accept timeout's")
+	tx, _ = textFor(notice.KindOrderUpdate, "en", map[string]string{"store": "Ganesh", "variant": "dispatch_timeout"})
+	require.Equal(t, "Ganesh did not send your order out in time, so it was cancelled.", tx.Body)
 	tx, _ = textFor(notice.KindOrderUpdate, "en", map[string]string{"store": "Ganesh", "variant": "nope"})
 	require.Equal(t, "Order update", tx.Title, "an unknown variant uses the kind's text")
 

@@ -343,7 +343,7 @@ func (s *Service) expireDispatch(ctx context.Context, orderID ids.ID, threshold 
 			return errEarly
 		}
 		expired = true
-		if err := s.end(ctx, o, StatusExpired, reasonDispatchTimeout, nil, system, variant("expired"), now); err != nil {
+		if err := s.end(ctx, o, StatusExpired, reasonDispatchTimeout, nil, system, variant("dispatch_timeout"), now); err != nil {
 			return err
 		}
 		return s.strikeStore(ctx, q, o, reasonDispatchTimeout, now, threshold)
