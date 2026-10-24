@@ -1,7 +1,8 @@
 # Orders timers
 
 Kinds `order_accept_timeout`, `order_pickup_no_show` and `order_partial_timeout` (owner W2-02, class `timer`, code in
-`backend/internal/orders/timers.go`, declared in `backend/internal/jobs/orders.go`). The general
+`backend/internal/orders/timers.go`), and their reconcile sweep `order_timer_reconcile`
+(`backend/internal/orders/reconcile.go`), all declared in `backend/internal/jobs/orders.go`. The general
 alert is [Job failing](jobs-job-failing.md) (`tz-jobs-failing-event`, critical for timers).
 
 ## What they do
@@ -11,6 +12,7 @@ alert is [Job failing](jobs-job-failing.md) (`tz-jobs-failing-event`, critical f
 | `order_accept_timeout` | placing an order (same transaction) | `accept_by` | A still-`placed` order becomes `expired`, reason `not_accepted` (BK-06). The customer is told (`order_update`, variant `expired`). |
 | `order_pickup_no_show` | accept, and each extension (same transaction) | `hold_until` | A held pickup order (`accepted`, `ready`) not collected becomes `expired`, reason `no_show` (BK-14). Its reservations are released, the customer gets one strike, and `noshow_limit_days` of the one-open-order limit once the strikes in `noshow_window_days` reach `noshow_strikes`. |
 | `order_partial_timeout` | a partial accept (same transaction) | `partial_confirm_by` | A still-`awaiting_customer` order becomes `cancelled`, reason `partial_timeout` (BK-10). Nothing was reserved; its credit hold and offer redemptions are released. No strike for anyone. The customer is told (variant `generic`). |
+| `order_timer_reconcile` | the schedule, every minute (one run per minute, one at a time) | — | Finds orders still `placed` past `accept_by`, `awaiting_customer` past `partial_confirm_by`, or held for pickup past `hold_until`, by more than 2 minutes (the timer's own time), and applies the same outcome through the same code (BK-20, BK-21). Oldest first, at most 500 per deadline per run; the next minute takes the rest. Summary: `expired`, `noop`, `failed`. |
 
 The job arguments are the order id and, for the no-show timer, the hold it was set for. Never a
 code, a phone or a customer id.
@@ -26,6 +28,10 @@ All three are idempotent (BK-21):
 - A late run still applies the right outcome from the order's current state.
 - A run *before* its deadline (queue and clock disagree) fails with "timer ran before its
   deadline" and River retries it with backoff (up to 25 attempts). It changes nothing.
+- The sweep and a timer that reach the same order serialise on its row lock; the second finds it
+  moved on (`noop`). The sweep takes each order in its own transaction. An order it cannot
+  apply is logged at error level with the kind and the order id, counted in `failed`, and
+  tried again next minute; the rest of the walk goes on.
 
 Every expiry takes the order row lock first (`FOR UPDATE`), so a timer racing a shop's accept or a
 hand-over (BK-19, BK-20) serialises with it: whichever commits first wins and the other sees the
@@ -57,12 +63,12 @@ new status.
 
 - Timer kinds are **never paused, run or retried by hand** (04 §2.7; A-21 refuses with
   `job_not_runnable`). Fix the cause; River's retries pick the run up.
-- A run that exhausted its 25 attempts is discarded and nothing re-drives it. The order stays
-  in `placed` (or held) past its deadline: the shop cannot accept or hand it over (deadlines are
-  strict) and the customer can no longer cancel it.
-  TODO(lead): there is no reconcile sweep yet that re-expires such orders. Until one exists, tell
-  the owner with the order ids; do not edit `orders` by hand (the guard trigger and the
-  reservations must move together).
+- A run that exhausted its 25 attempts is discarded. The order stays in `placed` (or held, or
+  `awaiting_customer`) past its deadline only until the next `order_timer_reconcile` run picks it
+  up (2 minutes past the deadline at the earliest). If the sweep's `failed` count stays above 0
+  for the same order, its log line names the order and the error: fix the cause (often the same
+  as the timer's) and the next minute applies it. Do not edit `orders` by hand (the guard
+  trigger and the reservations must move together).
 - Never edit `orders`, `order_events`, `stock_reservations`, `strikes` or `river_job` by hand.
 
 ## Who to tell

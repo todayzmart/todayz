@@ -27,7 +27,9 @@ const ordersTimerAttempts = 25
 // registerorders declares the orders timers (W2-02): the accept timeout
 // (BK-06), the pickup no-show (BK-14) and the partial-confirm timeout
 // (BK-10). All are event-triggered: create, accept (and extend) enqueue them in the order's transaction. A late or
-// repeated run finds the order moved on and does nothing (BK-21).
+// repeated run finds the order moved on and does nothing (BK-21). The
+// reconcile sweep runs every minute and applies the same outcomes to an
+// order whose timer was lost or discarded.
 func registerorders(r *Registry, d Deps) {
 	// The timers' own enqueuer (the notices they write enqueue sends) is
 	// built on the first run, not here: the API registers these kinds only
@@ -82,6 +84,19 @@ func registerorders(r *Registry, d Deps) {
 	timer(orders.KindPartialTimeout,
 		"Cancels a partly accepted order the customer did not confirm or decline by partial_confirm_by, releasing its credits, with no strike (BK-10)",
 		(*orders.Service).ExpirePartial)
+	platformjobs.Define(r, platformjobs.Kind{
+		Name: orders.KindReconcile, Owner: "W2-02", Class: platformjobs.ClassTimer,
+		Description: "Applies the orders timers' outcomes to orders still waiting past accept_by, partial_confirm_by or hold_until (BK-20, BK-21)",
+		Schedule:    "* * * * *", UniqueBy: platformjobs.PerTick, Timeout: 50 * time.Second, MaxAttempts: 3, Concurrency: 1,
+		Runbook: "docs/runbooks/orders-timers.md",
+		Handler: func(ctx context.Context, rn platformjobs.Run) (platformjobs.Result, error) {
+			s, err := svc()
+			if err != nil {
+				return platformjobs.Result{}, err
+			}
+			return s.Reconcile(ctx, rn)
+		},
+	})
 }
 
 // lazyEnqueuer returns a func that builds one insert-only client and its

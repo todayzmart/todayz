@@ -285,3 +285,29 @@ UPDATE customer_profiles SET strikes_count_30d = @strikes,
     ELSE limited_until END,
   version = version + 1
 WHERE user_id = @user_id;
+
+-- name: DueUnanswered :many
+-- One page of the reconcile sweep (BK-21): placed orders past accept_by by
+-- @before, after the keyset (@after_at, @after_id), oldest first. It locks
+-- nothing; each order is locked and checked again in its own transaction.
+SELECT id, accept_by::timestamptz AS due FROM orders
+WHERE status = 'placed' AND accept_by <= @before::timestamptz
+  AND (accept_by, id) > (@after_at::timestamptz, @after_id::uuid)
+ORDER BY accept_by, id
+LIMIT @lim;
+
+-- name: DuePartials :many
+-- The same for awaiting_customer orders past partial_confirm_by.
+SELECT id, partial_confirm_by::timestamptz AS due FROM orders
+WHERE status = 'awaiting_customer' AND partial_confirm_by <= @before::timestamptz
+  AND (partial_confirm_by, id) > (@after_at::timestamptz, @after_id::uuid)
+ORDER BY partial_confirm_by, id
+LIMIT @lim;
+
+-- name: DueHolds :many
+-- The same for held pickup orders past hold_until.
+SELECT id, hold_until::timestamptz AS due FROM orders
+WHERE status IN ('accepted','ready') AND fulfilment = 'pickup' AND hold_until <= @before::timestamptz
+  AND (hold_until, id) > (@after_at::timestamptz, @after_id::uuid)
+ORDER BY hold_until, id
+LIMIT @lim;
