@@ -1052,3 +1052,37 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 - **Smaller fixes.** A manual discount larger than what the offer left on the line is refused (`422`, `manualDiscountPaise: range`), never cut down. A verified counter-code check binds a sale for 2 minutes only; after that it is `code_invalid`. `Stock.Reverse` errors (item gone, stock invalid) are `409 invalid_transition`, not a 500. Re-confirming a claim, by the same customer too, is `claim_already_used`.
 - **Open item.** A replayed sale has no receipt token (the token is shown once and stored hashed). The report lists it.
 - Lives in: `backend/internal/pos/{sale,totp,sync,claims,seams}.go`, `backend/internal/jobs/pos.go`, `backend/db/migrations/20401_w2-04_pos.sql`, `docs/runbooks/pos-bill-claims.md`; tests in `backend/cmd/todayz/pos_review_http_test.go`; `docs/qa/W2-04/REPORT.md`.
+
+## POS counter and offline queue as built (W2-11, 2026-10-24)
+
+**D-170 · The offline store is raw IndexedDB behind a `PosStorage` interface, not Dexie (W2-11).** D-88 names Dexie; the build had no new dependency to spend, and the POS needs three object stores (`outbox`, `catalogue`, `meta`, the last holding the cursor, settings and the in-flight marker). `business/src/sync/idb.ts` wraps them; `memoryStorage` backs the tests. When storage cannot open (private mode), the counter keeps working in memory and says the sales are not safe if the tab closes. Swapping in Dexie later touches only `idb.ts`. TODO(lead): confirm.
+
+**D-171 · The outbox and its send rules (W2-11).**
+- Every sale gets a client ULID and the next device sequence in the same write that saves it; nothing is shown as sold before that write succeeds. A failed write keeps the bill on screen.
+- A sale is first sent by itself (`createPosSale`, `Idempotency-Key` = its client id) when online, and by `syncStore` (cursor, entries in sequence order) otherwise or after a failure. The server's idempotency on `(store_id, client_id)` makes a double send safe.
+- Failures back off (the engine exposes `nextAttemptAt`); `applied`, `duplicate` and `refused` results settle an entry. A `refused` sale stays in the list as "needs your attention" with the server's reason; it is never retried or deleted by the app.
+- Sales always apply: stock may go negative and the item is flagged `countNeeded`; the sold price stands as sent (D-130, 02 §4.3).
+
+**D-172 · Money units on the counter (W2-11).** Everything is integer paise; the wire is paise except credits, where 1 credit = ₹1 (01). Round-off is half up to the whole rupee and is shown as its own line. A bill under 50 paise would round to zero: TODO(lead) rule not stated.
+
+**D-173 · No snapshot or changes endpoint exists, so the catalogue bootstraps from `syncStore` plus `listStoreItems` (W2-11).** First open syncs from cursor 0 with no entries, then pages `listStoreItems` into the local catalogue; later syncs apply the `store_item` changes (`upsert` and `delete`). Product, category and offer changes are ignored by the POS. A cursor the server has pruned (`410 resync_required`, D-36) restarts the bootstrap. TODO(lead): an explicit snapshot endpoint, and a feed for the best-seller order of the quick tiles (they fall back to alphabetical).
+
+**D-174 · Settings are never assumed on the client (W2-11).** `PosSettings` fields are nullable; the counter does not gate on them and shows no number the server did not send. `credit_min_order_value_paise`, `pos_reversal_window_hours` and `pos_offline_link_max_hours` have no feed yet, so below-minimum, reversal-window and offline-link failures show the server's answer (`below_credit_minimum`, `reversal_window_passed`). TODO(lead): a settings feed on the store sync.
+
+**D-175 · Customer links (W2-11).**
+- A bill QR (`createBillClaim`, polled with `getBillClaim`) needs the network; once confirmed, the sale carries the claim and credits used. A bill-QR sale that fails after the claim expired is refused and must be rung again (`claim_expired`, `claim_already_used`, `claim_mismatch`).
+- A counter code (`verifyCounterCode`) binds a sale for 2 minutes (D-130). A verified code that falls back to sync is sent with its entry time and clock offset; the server may refuse it as used, and the sale then shows as refused.
+- An unverified phone is allowed and noted on the receipt; it earns no credits.
+- `code_invalid` shows tries left; `code_locked` and the cross-store lock that W2-04 added are one generic locked state ("Too many wrong codes. Try again later or link by phone."). Codes are held in component state only and never logged or stored.
+
+**D-176 · Roles on the counter (W2-11).** A cashier can ring and charge. Whole-bill and line discounts, reversal and the sales history's Reverse action are manager and above; those controls are hidden for a cashier, and the server is the gate. A reversal asks for a reason and confirms in an `alertdialog`.
+
+**D-177 · Scanner (W2-11).** The keyboard wedge (fast keystrokes ending in Enter into the search box, or anywhere on the counter) always works. Camera scanning uses the browser's `BarcodeDetector` when present and otherwise says it is not available on this device; no ZXing dependency was added. TODO(lead): decide whether iOS Safari needs the fallback in Wave 3. An unknown barcode opens "Add this product" (name, price), which saves a custom line and links to Stock for the full form (W2-12).
+
+**D-178 · Receipts (W2-11).** The receipt view is rendered from the local sale or the server's, so it also works offline; printing is the browser's (`@page` 80 mm wide with a 72 mm receipt body, fixed 297 mm tall because `auto` height is not valid CSS, so a very long receipt may paginate). Share on WhatsApp or SMS uses the receipt link only when the server returned a token (a replayed sale has none, D-130). The bill-QR URL `…/scan/{token}` and the customer scan route are assumed; TODO(lead) confirm with W2-08/09.
+
+**D-179 · What is cached on the device, and the conservative readings (W2-11).**
+- The store reference and role are cached in `localStorage` so the counter opens offline; `clearCachedPosStore` exists but is not yet wired to sign-out. TODO(lead).
+- Storage is one IndexedDB per store id. The in-flight marker records the entries being sent so a reload mid-send resends them with the same ids.
+- `expectedTotalPaise` is not sent, so a price change the shop did not see is a `409 price_changed` and the sale stands at the price quoted; the line is redrawn on the next catalogue sync.
+- The update toast is held while a sale is open (`useHoldUpdates`, W1-08).
