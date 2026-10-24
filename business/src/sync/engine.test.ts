@@ -431,6 +431,30 @@ describe('online sale path', () => {
   });
 });
 
+describe('reversal', () => {
+  it('reverses a synced sale once, under a key fixed by the sale, and marks it', async () => {
+    const { engine, server } = setup();
+    const keys: string[] = [];
+    server.api.reverseSale = (saleId, key) => {
+      keys.push(`${saleId}:${key}`);
+      return Promise.resolve({ stockReturned: [{ storeItemId: 'item-1', quantity: 2 }], creditsReturned: 0, cashbackClawedBack: 0 });
+    };
+    await engine.recordSale(sale('a'));
+    await engine.flush();
+    const ack = await engine.reverse('a');
+    expect(ack.stockReturned).toHaveLength(1);
+    expect((await engine.entries())[0]?.result?.reversed).toBe(true);
+    await engine.reverse('a');
+    expect(new Set(keys).size).toBe(1);
+  });
+
+  it('refuses a sale that has not synced', async () => {
+    const { engine } = setup({ online: false });
+    await engine.recordSale(sale('a'));
+    await expect(engine.reverse('a')).rejects.toThrow();
+  });
+});
+
 describe('housekeeping', () => {
   it('keeps the newest synced sales for the history and drops older ones', async () => {
     const { engine } = setup();

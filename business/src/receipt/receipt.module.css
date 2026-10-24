@@ -1,0 +1,136 @@
+/* The receipt paper. On screen it is a card; when printed it is the only thing on the page, 80 mm
+   wide (thermal rolls). Tokens only. */
+
+.paper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px dashed var(--line-control);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  font: var(--type-body-sm);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  text-align: center;
+  color: var(--ink-2);
+}
+
+.head strong {
+  color: var(--ink);
+  font: var(--type-heading);
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) 0;
+  border-block: 1px dashed var(--line-control);
+  list-style: none;
+}
+
+.lines li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: var(--space-3);
+}
+
+.name {
+  grid-column: 1 / -1;
+}
+
+.qty {
+  color: var(--ink-2);
+}
+
+.amt {
+  text-align: right;
+}
+
+.note {
+  grid-column: 1 / -1;
+  color: var(--ink-3);
+  font: var(--type-caption);
+}
+
+.totals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.totals div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.totals dt {
+  color: var(--ink-2);
+}
+
+.totals dd {
+  margin: 0;
+}
+
+.strong dt,
+.strong dd {
+  color: var(--ink);
+  font: var(--type-heading);
+}
+
+.thanks {
+  margin: 0;
+  text-align: center;
+  color: var(--ink-2);
+}
+
+@media print {
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+
+  :global(body *) {
+    visibility: hidden;
+  }
+
+  .paper,
+  .paper * {
+    visibility: visible;
+  }
+
+  .paper {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 72mm;
+    padding: 4mm;
+    border: 0;
+    border-radius: 0;
+  }
+}
+
+.sheetBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.actions a {
+  text-decoration: none;
+}

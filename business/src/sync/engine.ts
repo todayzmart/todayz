@@ -390,6 +390,22 @@ export function createSyncEngine(deps: EngineDeps) {
     });
   }
 
+  /**
+   * Reverses a synced sale on the server (manager and above, inside the window). The key is fixed per
+   * sale, so a second tap or a retry after a lost answer cannot reverse it twice.
+   */
+  function reverse(clientId: string) {
+    return exclusive(async () => {
+      const e = (await storage.listEntries()).find((x) => x.clientId === clientId);
+      const saleId = e?.result?.saleId;
+      if (!e || e.kind !== 'sale' || !saleId) throw new Error('sale is not synced');
+      const ack = await api.reverseSale(saleId, `reverse-${saleId}`);
+      await storage.putEntry({ ...e, result: { ...e.result, reversed: true } });
+      await recount();
+      return ack;
+    });
+  }
+
   /** Removes a refused entry once a person has seen it. */
   async function dismiss(clientId: string) {
     await storage.removeEntries([clientId]);
@@ -413,6 +429,7 @@ export function createSyncEngine(deps: EngineDeps) {
     recordSale,
     recordMovement,
     sendSaleNow,
+    reverse,
     flush,
     refreshCatalogue: () => exclusive(refreshCatalogue),
     entries: () => storage.listEntries(),

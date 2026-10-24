@@ -63,7 +63,12 @@ export function creditsAllowed(netPaise: number, creditMinOrderValuePaise: numbe
   return netPaise >= creditMinOrderValuePaise;
 }
 
-/** What the customer pays once a bill QR claim has taken credits off. */
+/** 1 credit = ₹1 (01 §7). */
+export function creditsToPaise(credits: number): number {
+  return Math.max(0, Math.floor(credits)) * RUPEE;
+}
+
+/** What the customer pays once a bill QR claim has taken credits off (credits in paise; see `creditsToPaise`). */
 export function amountDue(totalPaise: number, creditsUsed: number): number {
   return Math.max(0, totalPaise - Math.max(0, creditsUsed));
 }
