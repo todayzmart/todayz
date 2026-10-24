@@ -147,3 +147,98 @@ func TestOfferBasketSearchAdapter(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, []int64{0}, got, "before the offer began")
 }
+
+// The shop's offer routes: a manager makes, pauses and ends an offer with
+// If-Match; a cashier cannot; a paused offer leaves the price at once and an
+// order already placed keeps it; null clears a limit while an absent field
+// leaves it.
+func TestOfferManageAPI(t *testing.T) {
+	o := newOrderShop(t)
+	lines := []line{{o.butter, 2}}
+
+	r := o.a.call(o.cashier, http.MethodPost, o.S+"/offers", map[string]any{"kind": "percent", "value": 10, "scope": "store"}, idem(o.a))
+	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+
+	r = o.a.call(o.manager, http.MethodPost, o.S+"/offers", map[string]any{"kind": "percent", "value": 95, "scope": "store"}, idem(o.a))
+	require.Equal(t, http.StatusUnprocessableEntity, r.code, "a percent over 90: %s", r.raw)
+
+	r = o.a.call(o.manager, http.MethodPost, o.S+"/offers",
+		map[string]any{"kind": "percent", "value": 10, "scope": "store", "perCustomerLimit": 3, "maxRedemptions": 50}, idem(o.a))
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	id, created := r.body["id"].(string), r
+	require.Equal(t, "live", created.body["status"])
+	require.EqualValues(t, 3, created.body["perCustomerLimit"])
+	require.NotEmpty(t, created.hdr.Get("ETag"))
+
+	q := o.quote(lines...)
+	require.Equal(t, http.StatusOK, q.code, q.raw)
+	require.EqualValues(t, 9900, q.body["totalPaise"], "live at once")
+	placed := o.a.call(o.cust, http.MethodPost, "/v1/me/orders", o.cart(lines, 9900), idem(o.a))
+	require.Equal(t, http.StatusCreated, placed.code, placed.raw)
+
+	// No If-Match: 428; a stale one: 412.
+	r = o.a.call(o.manager, http.MethodPatch, o.S+"/offers/"+id, map[string]any{"status": "paused"}, nil)
+	require.Equal(t, http.StatusPreconditionRequired, r.code, r.raw)
+	// null clears, absent keeps.
+	r = o.a.call(o.manager, http.MethodPatch, o.S+"/offers/"+id, map[string]any{"perCustomerLimit": nil}, ifMatch(created))
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.Nil(t, r.body["perCustomerLimit"], "null clears")
+	require.EqualValues(t, 50, r.body["maxRedemptions"], "absent keeps")
+	cleared := r
+	r = o.a.call(o.manager, http.MethodPatch, o.S+"/offers/"+id, map[string]any{"status": "paused"}, ifMatch(created))
+	require.Equal(t, http.StatusPreconditionFailed, r.code, "the version before the change: %s", r.raw)
+
+	r = o.a.call(o.manager, http.MethodPatch, o.S+"/offers/"+id, map[string]any{"status": "paused"}, ifMatch(cleared))
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.Equal(t, "paused", r.body["status"])
+	paused := r
+	q = o.quote(lines...)
+	require.EqualValues(t, 11000, q.body["totalPaise"], "paused leaves the price at once")
+	require.Equal(t, http.StatusOK, o.me(o.cust, placed.body["id"].(string), "cancel", map[string]any{"reason": "changed_mind"}).code)
+
+	r = o.a.call(o.manager, http.MethodPatch, o.S+"/offers/"+id, map[string]any{"status": "ended"}, ifMatch(paused))
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	ended := r
+	r = o.a.call(o.manager, http.MethodPatch, o.S+"/offers/"+id, map[string]any{"status": "live"}, ifMatch(ended))
+	require.Equal(t, http.StatusConflict, r.code, "ended is final: %s", r.raw)
+	require.Equal(t, "invalid_transition", problemCode(r))
+
+	// Another shop's manager cannot see it.
+	r = o.a.call(o.owner2, http.MethodGet, o.SY+"/offers/"+id, nil, nil)
+	require.Equal(t, http.StatusNotFound, r.code, r.raw)
+	r = o.a.call(o.manager, http.MethodGet, o.S+"/offers", nil, nil)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+}
+
+// Banners: a template banner is live at once, a customer's tap is recorded,
+// the cap and the routes' permissions hold.
+func TestBannerManageAndTapAPI(t *testing.T) {
+	o := newOrderShop(t)
+	body := map[string]any{"headline": "Fresh stock every morning", "template": map[string]any{"tint": "green"}, "targetType": "store"}
+
+	r := o.a.call(o.cashier, http.MethodPost, o.S+"/banners", body, idem(o.a))
+	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+
+	r = o.a.call(o.manager, http.MethodPost, o.S+"/banners", body, idem(o.a))
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	id := r.body["id"].(string)
+	require.Equal(t, "live", r.body["status"])
+
+	bad := map[string]any{"headline": "x", "imageKey": "k", "template": map[string]any{"tint": "green"}, "targetType": "store"}
+	r = o.a.call(o.manager, http.MethodPost, o.S+"/banners", bad, idem(o.a))
+	require.Equal(t, http.StatusUnprocessableEntity, r.code, "both an image and a template: %s", r.raw)
+
+	r = o.a.call(o.cust, http.MethodPost, "/v1/me/banners/"+id+"/tap", nil, nil)
+	require.Equal(t, http.StatusNoContent, r.code, r.raw)
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM banner_taps WHERE banner_id = $1`, uuidOf(t, id)))
+	r = o.a.call(o.cust, http.MethodPost, "/v1/me/banners/"+id+"/tap", nil, nil)
+	require.Equal(t, http.StatusNoContent, r.code, r.raw)
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM banner_taps WHERE banner_id = $1`, uuidOf(t, id)), "one row per customer and banner")
+
+	r = o.a.call(o.manager, http.MethodGet, o.S+"/banners", nil, nil)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	r = o.a.call(o.owner2, http.MethodGet, o.SY+"/banners/"+id, nil, nil)
+	require.Equal(t, http.StatusNotFound, r.code, "another shop's banner: %s", r.raw)
+	r = o.a.call("", http.MethodPost, "/v1/me/banners/"+id+"/tap", nil, nil)
+	require.Equal(t, http.StatusUnauthorized, r.code, r.raw)
+}
