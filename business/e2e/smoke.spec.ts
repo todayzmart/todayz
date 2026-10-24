@@ -6,6 +6,9 @@ const FIGTREE = /\/figtree-[^/]*\.woff2$/;
 
 let guard: PageGuard;
 
+const BID = '01J9ZBBBBBBBBBBBBBBBBBBBBB';
+const SID = '01J9ZCCCCCCCCCCCCCCCCCCCCC';
+
 /**
  * The app is for signed-in staff. The smoke run has no API, so the session refresh is answered here:
  * with a grant (signed in) or a 401 (signed out). The API is on another origin, so the cookie-carrying
@@ -43,8 +46,50 @@ async function answerRefresh(page: Page, signedIn: boolean) {
   });
 }
 
-test.beforeEach(async ({ page }) => {
+/**
+ * Signed in, the shell asks for the staff's businesses and the live orders. One shop with no orders;
+ * any other call is a 404 problem. Registered before the refresh route, which wins for its path.
+ */
+async function answerApi(page: Page) {
+  await page.route('**/v1/**', (route) => {
+    const req = route.request();
+    const headers = {
+      'access-control-allow-origin': req.headers()['origin'] ?? '*',
+      'access-control-allow-credentials': 'true',
+      'access-control-allow-headers': 'authorization, content-type, x-tz-client, accept-language, idempotency-key, if-match',
+      'access-control-allow-methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
+    };
+    if (req.method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
+    const json = (status: number, body: unknown, contentType = 'application/json') =>
+      route.fulfill({ status, contentType, headers, body: JSON.stringify(body) });
+    const path = new URL(req.url()).pathname;
+    if (path === '/v1/biz/businesses') {
+      return json(200, {
+        items: [{ id: BID, brandName: 'Asha Stores', status: 'active', role: 'owner', stores: [{ id: SID, name: 'Asha Stores, Indiranagar', slug: 'asha-indiranagar', status: 'live' }] }],
+        invitations: [],
+      });
+    }
+    if (path.endsWith('/orders')) return json(200, { items: [], nextCursor: null, serverNow: new Date().toISOString() });
+    if (path.endsWith('/offers')) return json(200, { items: [], nextCursor: null });
+    if (path.endsWith('/stream')) {
+      return route.fulfill({ status: 200, contentType: 'text/event-stream', headers, body: 'retry: 600000\nevent: ready\ndata: {}\n\n' });
+    }
+    return json(404, { type: 'about:blank#not_found', title: 'Not found', status: 404, code: 'not_found' }, 'application/problem+json');
+  });
+}
+
+test.beforeEach(async ({ page }, info) => {
   guard = await guardPage(page);
+  // The app only tries a refresh after a sign-in left this hint (as sell.spec.ts does). The signed-out
+  // test goes without it; about:blank (the Back test) refuses localStorage.
+  if (!info.title.startsWith('signed out')) await page.addInitScript(() => {
+    try {
+      localStorage.setItem('todayz.hasSession.business', '1');
+    } catch {
+      /* not this app's document */
+    }
+  });
+  await answerApi(page);
   await answerRefresh(page, true);
 });
 
