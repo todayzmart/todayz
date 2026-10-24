@@ -1,9 +1,180 @@
-# Schemas: domain "sync" (owner W2-04): offline POS sync (04 §2.6).
+# Schemas: domain "sync" (owner W2-04): offline POS sync (04 §2.6, 02 §4.3).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Names are unique across every schemas/<domain>.yaml. Request objects carry
+# `additionalProperties: false`. Money is `*Paise`, ids are `Ulid`, times are
+# `Timestamp`. A sync sends the device's outbox in device-seq order and gets
+# back what happened to each entry and the catalogue changes after its cursor
+# (D-36). The offline counter code is 4 digits and never comes back.
+SyncEntryKind:
+  type: string
+  description: >-
+    `sale` is an offline bill; the others are stock changes as on the item's movements route
+    (`count` is a count correction to `counted`; `restock`, `damage` and `expired` move `quantity`).
+  enum: [sale, count, restock, damage, expired]
+SyncPhone:
+  type: string
+  description: An Indian mobile number in E.164. Never logged and never returned.
+  pattern: ^\+91[6-9][0-9]{9}$
+  maxLength: 13
+SyncSaleLine:
+  type: object
+  additionalProperties: false
+  description: >-
+    One line as the device sold it. Sold prices are never rewritten (02 §4.3): the price, the offer
+    discount the device applied and the cashier's manual discount are recorded as sent. A line whose
+    item is gone is kept as a custom line with no stock movement.
+  required: [clientId, name, unitPricePaise, quantity]
+  properties:
+    clientId: {$ref: ./common.yaml#/Ulid}
+    storeItemId: {$ref: ./common.yaml#/Ulid}
+    name: {type: string, minLength: 1, maxLength: 120}
+    unitPricePaise: {type: integer, minimum: 1, maximum: 100000000}
+    quantity: {type: integer, minimum: 1, maximum: 9999}
+    offerDiscountPaise: {type: integer, minimum: 0, maximum: 100000000}
+    manualDiscountPaise: {type: integer, minimum: 0, maximum: 100000000}
+SyncSaleLink:
+  type: object
+  additionalProperties: false
+  description: >-
+    An offline link (D-07, D-12). `counter_code` carries the typed code, the device time it was typed
+    and the device's clock offset (device − server, ms) at its last online check; the server links the
+    sale only when the code verifies at that time, the sale syncs within `pos_offline_link_max_hours`,
+    the offset was within 2 minutes and the code was not used before. `phone_unverified` carries the
+    phone only. A bill QR needs the server and cannot be offline.
+  required: [method, phone]
+  properties:
+    method: {type: string, enum: [counter_code, phone_unverified]}
+    phone: {$ref: "#/SyncPhone"}
+    code: {type: string, pattern: "^[0-9]{4}$"}
+    codeEnteredAt: {$ref: ./common.yaml#/Timestamp}
+    clockOffsetMs: {type: integer, minimum: -86400000, maximum: 86400000}
+SyncSale:
+  type: object
+  additionalProperties: false
+  required: [lines, paymentMethod]
+  properties:
+    lines:
+      type: array
+      minItems: 1
+      maxItems: 200
+      items: {$ref: "#/SyncSaleLine"}
+    billDiscountPaise: {type: integer, minimum: 0, maximum: 100000000}
+    paymentMethod: {type: string, enum: [cash, upi, card, other]}
+    link: {$ref: "#/SyncSaleLink"}
+SyncStockChange:
+  type: object
+  additionalProperties: false
+  required: [storeItemId]
+  properties:
+    storeItemId: {$ref: ./common.yaml#/Ulid}
+    quantity: {type: integer, minimum: 1, maximum: 1000000}
+    counted: {type: integer, minimum: 0, maximum: 1000000}
+    note: {type: string, maxLength: 200}
+SyncEntry:
+  type: object
+  additionalProperties: false
+  description: One outbox entry. `sale` needs `sale`; every other kind needs `stock`.
+  required: [clientId, deviceSeq, kind, at]
+  properties:
+    clientId: {$ref: ./common.yaml#/Ulid}
+    deviceSeq: {type: integer, minimum: 1, maximum: 9007199254740991}
+    kind: {$ref: "#/SyncEntryKind"}
+    at:
+      $ref: ./common.yaml#/Timestamp
+    sale: {$ref: "#/SyncSale"}
+    stock: {$ref: "#/SyncStockChange"}
+SyncRequest:
+  type: object
+  additionalProperties: false
+  required: [cursor, entries]
+  properties:
+    cursor:
+      type: integer
+      minimum: 0
+      maximum: 9007199254740991
+      description: The last catalogue `seq` the device has; 0 right after a snapshot of an empty store.
+    entries:
+      type: array
+      maxItems: 500
+      description: Strictly increasing `deviceSeq` (else `422 validation_failed`).
+      items: {$ref: "#/SyncEntry"}
+SyncEntryStatus:
+  type: string
+  description: >-
+    `applied` now; `duplicate` was applied by an earlier sync (same `clientId`); `rejected` is never
+    applied and `reason` says why.
+  enum: [applied, duplicate, rejected]
+SyncRejection:
+  type: string
+  description: >-
+    `forbidden`: the signed-in role may not do this kind (D-06); `item_not_found`: a stock change for an
+    item that is not this store's; `invalid`: the entry is malformed for its kind.
+  enum: [forbidden, item_not_found, invalid]
+SyncEntryResult:
+  type: object
+  required: [clientId, deviceSeq, status, reason, saleId, movementId, linkStatus, receiptToken]
+  properties:
+    clientId: {$ref: ./common.yaml#/Ulid}
+    deviceSeq: {type: integer}
+    status: {$ref: "#/SyncEntryStatus"}
+    reason:
+      oneOf:
+        - {$ref: "#/SyncRejection"}
+        - {type: "null"}
+    saleId: {type: [string, "null"], maxLength: 26}
+    movementId: {type: [string, "null"], maxLength: 26}
+    linkStatus:
+      type: [string, "null"]
+      description: For a sale with a link, `linked` or `failed` ("Customer link failed", D-12).
+      enum: [linked, failed, null]
+    receiptToken:
+      type: [string, "null"]
+      description: The receipt token for a sale applied now; the server keeps only its hash.
+SyncItemState:
+  type: object
+  description: A store item as it is now. `countNeeded` is true while stock is below zero (02 §4.3).
+  required: [id, productId, name, pricePaise, mrpPaise, onHand, reserved, available, isListed, countNeeded, version]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    productId: {type: [string, "null"], maxLength: 26}
+    name: {type: string}
+    pricePaise: {$ref: ./common.yaml#/Paise}
+    mrpPaise: {type: [integer, "null"]}
+    onHand: {type: integer}
+    reserved: {type: integer}
+    available: {type: integer}
+    isListed: {type: boolean}
+    countNeeded: {type: boolean}
+    version: {type: integer}
+SyncChange:
+  type: object
+  description: >-
+    One catalogue change after the cursor, newest state only. A `store_item` upsert carries `item`; for a
+    product, category or offer the device refreshes that entity. Deletions win over edits.
+  required: [seq, entity, entityId, op, item]
+  properties:
+    seq: {type: integer}
+    entity: {type: string, enum: [store_item, product, category, offer]}
+    entityId: {$ref: ./common.yaml#/Ulid}
+    op: {type: string, enum: [upsert, delete]}
+    item:
+      oneOf:
+        - {$ref: "#/SyncItemState"}
+        - {type: "null"}
+SyncResponse:
+  type: object
+  required: [results, changes, cursor, hasMore, serverNow]
+  properties:
+    results:
+      type: array
+      items: {$ref: "#/SyncEntryResult"}
+    changes:
+      type: array
+      items: {$ref: "#/SyncChange"}
+    cursor:
+      type: integer
+      description: The cursor to send next time.
+    hasMore:
+      type: boolean
+      description: More changes wait after `cursor`; sync again (with no entries) to fetch them.
+    serverNow: {$ref: ./common.yaml#/ServerNow}

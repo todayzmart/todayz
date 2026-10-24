@@ -1,12 +1,119 @@
-# Paths: domain "sync" (owner W2-04): offline POS sync (04 §2.6).
+# Paths: domain "sync" (owner W2-04): offline POS sync (04 §2.6, 02 §4.3, D-36).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [sync]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/sync.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# One operation. Roles: the route needs `pos.sync` (cashier and above); each
+# entry is then authorised as its own action (`pos.sell`, `pos.discount`,
+# `stock.count`, `stock.restock`, `stock.damage`), see
+# internal/platform/authz/policy/pos.go. The full snapshot a device downloads
+# after `410 resync_required` is the catalogue's item list (W1-05).
+/v1/biz/businesses/{bid}/stores/{sid}/sync:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: syncStore
+    tags:
+    - sync
+    summary: Send the offline outbox and fetch catalogue changes (B-03, B-05)
+    description: >-
+      Cashier and above. Applies the entries in `deviceSeq` order in one transaction, each idempotent by
+      `clientId` (a replayed entry is `duplicate`). Sales always apply at the device's prices; stock may go
+      below zero and the item is then `countNeeded` (02 §4.3). `soldAt` is the entry's `at`, `receivedAt`
+      the server's time. Then returns the catalogue changes after `cursor` (at most 500; `hasMore`). `410
+      resync_required`, with nothing applied, when the cursor is ahead of the store, older than the 30
+      days the changes are kept, or this device has not synced in 30 days; download the snapshot and
+      sync again with its cursor.
+    x-idempotency: required
+    x-money: true
+    x-problems:
+    - resync_required
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/sync.yaml#/SyncRequest
+          example:
+            cursor: 1042
+            entries:
+            - clientId: 01JB0V1S4K3C5K6N7T8D9X0Y1Z
+              deviceSeq: 17
+              kind: sale
+              at: '2026-10-24T04:10:00Z'
+              sale:
+                lines:
+                - clientId: 01JB0V1K1N2E3C4K5N6T7D8X9Y
+                  storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                  name: Amul Butter 100 g
+                  unitPricePaise: 5800
+                  quantity: 1
+                paymentMethod: cash
+                link:
+                  method: counter_code
+                  phone: '+919000000001'
+                  code: '4821'
+                  codeEnteredAt: '2026-10-24T04:09:50Z'
+                  clockOffsetMs: 1200
+            - clientId: 01JB0V1M2V3T4C5N6T7D8X9Y0Z
+              deviceSeq: 18
+              kind: count
+              at: '2026-10-24T04:20:00Z'
+              stock:
+                storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                counted: 6
+    responses:
+      '200':
+        description: What happened to each entry, and the changes after the cursor
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/sync.yaml#/SyncResponse
+            example:
+              results:
+              - clientId: 01JB0V1S4K3C5K6N7T8D9X0Y1Z
+                deviceSeq: 17
+                status: applied
+                reason: null
+                saleId: 01JB0V2S4K3E5S6A7K8E9X0Y1Z
+                movementId: null
+                linkStatus: linked
+                receiptToken: EXAMPLE_receipt_000000
+              - clientId: 01JB0V1M2V3T4C5N6T7D8X9Y0Z
+                deviceSeq: 18
+                status: applied
+                reason: null
+                saleId: null
+                movementId: 01JB0V2M1V2T3M4V5N6T7D8X9Y
+                linkStatus: null
+                receiptToken: null
+              changes:
+              - seq: 1043
+                entity: store_item
+                entityId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                op: upsert
+                item:
+                  id: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                  productId: 01JB0S9P1R2D3C4T5M6A7S8T9R
+                  name: Amul Butter 100 g
+                  pricePaise: 5800
+                  mrpPaise: 6000
+                  onHand: -1
+                  reserved: 0
+                  available: -1
+                  isListed: true
+                  countNeeded: true
+                  version: 9
+              cursor: 1043
+              hasMore: false
+              serverNow: '2026-10-24T05:00:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem

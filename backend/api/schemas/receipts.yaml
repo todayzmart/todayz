@@ -1,0 +1,79 @@
+# Schemas: domain "receipts" (owner W2-04): the public receipt and my purchases (D-45, D-75).
+#
+# Names are unique across every schemas/<domain>.yaml. A receipt carries the
+# items, the totals and the store only: no customer name, phone, wallet, link
+# method or staff (D-45). Money is `*Paise`, times are `Timestamp`.
+ReceiptToken:
+  type: string
+  description: A receipt link's token, 128 random bits as 22 base64url characters (D-45).
+  pattern: ^[A-Za-z0-9_-]{22}$
+ReceiptStore:
+  type: object
+  required: [name, addressLine, locality]
+  properties:
+    name: {type: string}
+    addressLine: {type: [string, "null"]}
+    locality: {type: [string, "null"]}
+ReceiptLine:
+  type: object
+  required: [name, unitPricePaise, quantity, discountPaise, lineTotalPaise]
+  properties:
+    name: {type: string}
+    unitPricePaise: {$ref: ./common.yaml#/Paise}
+    quantity: {type: integer}
+    discountPaise:
+      $ref: ./common.yaml#/Paise
+    lineTotalPaise:
+      $ref: ./common.yaml#/Paise
+Receipt:
+  type: object
+  required: [store, lines, itemSubtotalPaise, discountPaise, creditsUsed, roundOffPaise, totalPaise,
+    paymentMethod, status, soldAt]
+  properties:
+    store: {$ref: "#/ReceiptStore"}
+    lines:
+      type: array
+      items: {$ref: "#/ReceiptLine"}
+    itemSubtotalPaise: {$ref: ./common.yaml#/Paise}
+    discountPaise:
+      $ref: ./common.yaml#/Paise
+    creditsUsed: {$ref: ./common.yaml#/Credits}
+    roundOffPaise: {type: integer, minimum: -49, maximum: 50}
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    paymentMethod: {type: string, enum: [cash, upi, card, other]}
+    status: {type: string, enum: [completed, reversed]}
+    soldAt: {$ref: ./common.yaml#/Timestamp}
+PurchaseKind:
+  type: string
+  description: An online order or a POS sale linked by `bill_qr` or `counter_code` (D-75).
+  enum: [order, pos_sale]
+PurchaseStore:
+  type: object
+  required: [id, name]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name: {type: string}
+Purchase:
+  type: object
+  required: [kind, id, store, itemCount, totalPaise, status, at]
+  properties:
+    kind: {$ref: "#/PurchaseKind"}
+    id: {$ref: ./common.yaml#/Ulid}
+    store: {$ref: "#/PurchaseStore"}
+    itemCount: {type: integer}
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    status:
+      type: string
+      description: The order's status, or the sale's (`completed`, `reversed`).
+    at:
+      description: When the order was placed or the sale rung.
+      $ref: ./common.yaml#/Timestamp
+PurchaseList:
+  type: object
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      items: {$ref: "#/Purchase"}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}

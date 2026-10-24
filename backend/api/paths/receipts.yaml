@@ -1,0 +1,97 @@
+# Paths: domain "receipts" (owner W2-04): the public receipt link and my purchases (04 §2.4, §2.5; D-45, D-75, D-84).
+#
+# Every operation: `tags: [receipts]`. The receipt route is public (no
+# account) and sits in the public rate-limit group. Mounted from
+# cmd/todayz/routes_pos.go with the pos and sync domains.
+/v1/public/receipts/{token}:
+  parameters:
+  - name: token
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/receipts.yaml#/ReceiptToken
+  get:
+    operationId: getPublicReceipt
+    tags:
+    - receipts
+    summary: A POS receipt (C-24, `/r/{token}`)
+    description: >-
+      No account. Items, totals and the store only (D-45). After 30 days, or for a token that was never
+      issued, `404 not_found`, found or not with the same lookup.
+    security: []
+    responses:
+      '200':
+        description: The receipt
+        headers:
+          Cache-Control:
+            description: Always `no-store`.
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/receipts.yaml#/Receipt
+            example:
+              store:
+                name: Sri Lakshmi Stores
+                addressLine: 12, 4th Cross, Jayanagar
+                locality: Jayanagar
+              lines:
+              - name: Amul Butter 100 g
+                unitPricePaise: 5800
+                quantity: 2
+                discountPaise: 0
+                lineTotalPaise: 11600
+              itemSubtotalPaise: 11600
+              discountPaise: 0
+              creditsUsed: 0
+              roundOffPaise: 0
+              totalPaise: 11600
+              paymentMethod: cash
+              status: completed
+              soldAt: '2026-10-24T05:00:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/purchases:
+  get:
+    operationId: listMyPurchases
+    tags:
+    - receipts
+    summary: My orders and in-store purchases (C-13)
+    description: >-
+      Customer app. Online orders and POS sales linked by `bill_qr` or `counter_code`, newest first; a
+      sale linked by `phone_unverified` never appears (D-75). Backs the "In store" tab.
+    parameters:
+    - $ref: ../common/parameters.yaml#/Limit
+    - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      '200':
+        description: My purchases
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/receipts.yaml#/PurchaseList
+            example:
+              items:
+              - kind: pos_sale
+                id: 01JB0V2S4K3E5S6A7K8E9X0Y1Z
+                store:
+                  id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                  name: Sri Lakshmi Stores
+                itemCount: 2
+                totalPaise: 11600
+                status: completed
+                at: '2026-10-24T05:00:00Z'
+              - kind: order
+                id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+                store:
+                  id: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                  name: Sri Lakshmi Stores
+                itemCount: 2
+                totalPaise: 40100
+                status: collected
+                at: '2026-10-23T05:00:00Z'
+              nextCursor: null
+              serverNow: '2026-10-24T05:04:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem

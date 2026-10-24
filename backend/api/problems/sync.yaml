@@ -1,0 +1,11 @@
+# Problem codes: domain "sync" (owner W2-04; 04 §1.4, D-36).
+#
+# Same shape as common.yaml. Nothing in a batch is applied when the batch is
+# refused; an entry the server will not apply comes back `rejected` in the
+# batch's results instead of failing the batch.
+domain: sync
+problems:
+  - code: resync_required
+    status: 410
+    i18n: problems.resync_required
+    title: Download the catalogue again
