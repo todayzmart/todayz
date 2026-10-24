@@ -7,6 +7,7 @@ Read first: the root `CLAUDE.md`, `docs/plan/README.md`, `docs/plan/01-product-r
 ## Run
 
 - `make e2e`, `make load`, `make security`
+- The Wave 2 journeys alone, from a fresh `make reset`: `scripts/no-egress.sh make gen e2e-journeys`
 - Mock SMS/push UI: https://mocks.todayz.localhost
 
 ## Rules for this folder
@@ -22,10 +23,20 @@ contract/     Schemathesis (W0-04): run.sh smoke|full, hooks.py (the todayz_prob
               error is a registered problem code, SC-PL-02), test_hooks.py, requirements.in/.txt
               (uv-compiled, hash-pinned, D-88). The venv lives in .tools/schemathesis (make setup).
               out/ (reports) is git-ignored.
+fixtures/     @todayz/e2e-fixtures (W2-13): seed.ts (seed ids, slugs, prices, test people),
+              api.ts (JSON client, ULID, TOTP), principals.ts (sign-in once per run through the
+              mocks' OTP, session kept in a 0600 temp file), journey.ts (Shop, Customer, clock and
+              browser helpers, `test` with `who`). admins.yaml holds test-only admin TOTP secrets.
+journeys/     @todayz/e2e-journeys (W2-13): Playwright multi-context journeys, specs/NN-e2e-XX-*.
+              globalSetup opens SL and SL2 all day and globalTeardown restores their hours and
+              resets the test clock. Specs that move the clock run last (20-*, 21-*).
 ```
 
 ## Conventions
 
+- Journeys print step names, routes, statuses and problem codes only: never a body, an OTP, a
+  pickup or counter code, a bill token or a phone. Admin steps go through the admin API (D-83).
+  A step that needs unbuilt work is a `test.fixme` with a one-line reason.
 - `make check` runs `run.sh smoke` (examples + coverage phases) from `backend/cmd/todayz`'s
   `TestContractSmoke` against an in-process api on a fresh database, plus the hooks' unit tests.
   `make e2e` runs `run.sh full` (examples, coverage, fuzzing) against the running stack through
@@ -53,5 +64,5 @@ contract/     Schemathesis (W0-04): run.sh smoke|full, hooks.py (the todayz_prob
 
 ## Status
 
-W0-04 built `contract/`. Playwright journeys, load, security and the mocks server come with their
-WPs.
+W0-04 built `contract/`. W2-13 built `fixtures/` and `journeys/` (the Wave 2 gate, report in
+`docs/qa/W2-13/`). Load and security come with their WPs.
