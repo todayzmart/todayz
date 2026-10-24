@@ -36,38 +36,49 @@ const (
 // an order it could not apply this run.
 const outcomeFailed = "failed"
 
-// dueRow is one order a walk found past its deadline.
+// dueRow is one order a walk found past its deadline, with when the sweep
+// last failed on it (the zero time for never).
 type dueRow struct {
-	id pgtype.UUID
-	at time.Time
+	id     pgtype.UUID
+	at     time.Time
+	failed time.Time
 }
 
-// duePage reads one page of a walk after the keyset (at, id).
-type duePage func(ctx context.Context, q *ordersdb.Queries, before, at time.Time, id pgtype.UUID) ([]dueRow, error)
+// dueKey is a walk's keyset: the sweep's order is never-failed orders
+// first, oldest deadline first, then the failed ones, least recently failed
+// first (migration 20203), so orders that keep failing cannot hold newer
+// due orders behind reconcileMax.
+type dueKey struct {
+	failed, at time.Time
+	id         pgtype.UUID
+}
 
-func dueUnanswered(ctx context.Context, q *ordersdb.Queries, before, at time.Time, id pgtype.UUID) ([]dueRow, error) {
-	rows, err := q.DueUnanswered(ctx, ordersdb.DueUnansweredParams{Before: before, AfterAt: at, AfterID: id, Lim: reconcilePage})
+// duePage reads one page of a walk after the keyset.
+type duePage func(ctx context.Context, q *ordersdb.Queries, before time.Time, k dueKey) ([]dueRow, error)
+
+func dueUnanswered(ctx context.Context, q *ordersdb.Queries, before time.Time, k dueKey) ([]dueRow, error) {
+	rows, err := q.DueUnanswered(ctx, ordersdb.DueUnansweredParams{Before: before, AfterFailed: k.failed, AfterAt: k.at, AfterID: k.id, Lim: reconcilePage})
 	out := make([]dueRow, len(rows))
 	for i, r := range rows {
-		out[i] = dueRow{r.ID, r.Due}
+		out[i] = dueRow{r.ID, r.Due, r.Failed}
 	}
 	return out, err
 }
 
-func duePartials(ctx context.Context, q *ordersdb.Queries, before, at time.Time, id pgtype.UUID) ([]dueRow, error) {
-	rows, err := q.DuePartials(ctx, ordersdb.DuePartialsParams{Before: before, AfterAt: at, AfterID: id, Lim: reconcilePage})
+func duePartials(ctx context.Context, q *ordersdb.Queries, before time.Time, k dueKey) ([]dueRow, error) {
+	rows, err := q.DuePartials(ctx, ordersdb.DuePartialsParams{Before: before, AfterFailed: k.failed, AfterAt: k.at, AfterID: k.id, Lim: reconcilePage})
 	out := make([]dueRow, len(rows))
 	for i, r := range rows {
-		out[i] = dueRow{r.ID, r.Due}
+		out[i] = dueRow{r.ID, r.Due, r.Failed}
 	}
 	return out, err
 }
 
-func dueHolds(ctx context.Context, q *ordersdb.Queries, before, at time.Time, id pgtype.UUID) ([]dueRow, error) {
-	rows, err := q.DueHolds(ctx, ordersdb.DueHoldsParams{Before: before, AfterAt: at, AfterID: id, Lim: reconcilePage})
+func dueHolds(ctx context.Context, q *ordersdb.Queries, before time.Time, k dueKey) ([]dueRow, error) {
+	rows, err := q.DueHolds(ctx, ordersdb.DueHoldsParams{Before: before, AfterFailed: k.failed, AfterAt: k.at, AfterID: k.id, Lim: reconcilePage})
 	out := make([]dueRow, len(rows))
 	for i, r := range rows {
-		out[i] = dueRow{r.ID, r.Due}
+		out[i] = dueRow{r.ID, r.Due, r.Failed}
 	}
 	return out, err
 }
@@ -77,7 +88,9 @@ type reconciled struct{ expired, noop, failed int64 }
 // Reconcile is the KindReconcile handler. Each order is locked and checked
 // again in a transaction of its own, as its timer does: an order that moved
 // on meanwhile is a no-op, and one that fails is logged with its id,
-// counted and left for the next run, while the walk goes on.
+// counted (the summary's failed and tz_order_reconcile_failed_total, alert
+// tz-order-reconcile-failed), marked with the run's time and left for the
+// next run, behind the orders that never failed, while the walk goes on.
 func (s *Service) Reconcile(ctx context.Context, _ platformjobs.Run) (platformjobs.Result, error) {
 	if err := s.readyToWrite(ctx); err != nil {
 		return platformjobs.Result{}, err
@@ -107,16 +120,16 @@ func (s *Service) Reconcile(ctx context.Context, _ platformjobs.Run) (platformjo
 	}}, nil
 }
 
-// walk applies one timer's outcome to its due orders, oldest first, at most
-// reconcileMax of them. An order whose deadline moved since the page was
-// read (an extended hold) answers errEarly and is a no-op.
+// walk applies one timer's outcome to its due orders in the sweep's order,
+// at most reconcileMax of them. An order whose deadline moved since the page
+// was read (an extended hold) answers errEarly and is a no-op.
 func (s *Service) walk(ctx context.Context, name string, before time.Time, page duePage, apply func(context.Context, ids.ID) (bool, error), out *reconciled) error {
-	at, after := time.Time{}, pgtype.UUID{Valid: true} // before every order
+	k := dueKey{id: pgtype.UUID{Valid: true}} // before every order
 	for seen := 0; seen < reconcileMax; {
 		if err := ctx.Err(); err != nil {
 			return err
 		}
-		rows, err := page(ctx, s.q(ctx), before, at, after)
+		rows, err := page(ctx, s.q(ctx), before, k)
 		if err != nil {
 			return fmt.Errorf("orders: reconcile %s: %w", name, err)
 		}
@@ -135,10 +148,18 @@ func (s *Service) walk(ctx context.Context, name string, before time.Time, page 
 				return ctx.Err()
 			default:
 				out.failed++
-				telemetry.Logger(ctx).ErrorContext(ctx, "orders: reconcile could not apply a timer",
+				reconcileFailed(ctx, name)
+				log := telemetry.Logger(ctx)
+				log.ErrorContext(ctx, "orders: reconcile could not apply a timer",
 					"kind", name, "order_id", mustID(r.id).String(), "error", err)
+				// Outside the failed transaction; a mark that fails only
+				// leaves the order where it sorts now.
+				if err := s.q(ctx).SetSweepFailed(ctx, ordersdb.SetSweepFailedParams{At: &before, ID: r.id}); err != nil {
+					log.ErrorContext(ctx, "orders: reconcile could not mark a failed order",
+						"kind", name, "order_id", mustID(r.id).String(), "error", err)
+				}
 			}
-			at, after = r.at, r.id
+			k = dueKey{r.failed, r.at, r.id}
 		}
 		if len(rows) < reconcilePage {
 			return nil

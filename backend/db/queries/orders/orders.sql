@@ -324,29 +324,49 @@ WHERE cp.user_id = x.user_id
 
 -- name: DueUnanswered :many
 -- One page of the reconcile sweep (BK-21): placed orders past accept_by by
--- @before, after the keyset (@after_at, @after_id), oldest first. It locks
--- nothing; each order is locked and checked again in its own transaction.
-SELECT id, accept_by::timestamptz AS due FROM orders
+-- @before, in the sweep's order (orders it never failed on first, oldest
+-- deadline first, then the failed ones, least recently failed first), after
+-- the keyset (@after_failed, @after_at, @after_id). Never failed reads as
+-- 0001-01-01 UTC, Go's zero time (pgx cannot scan -infinity into a time). An order that failed at
+-- or after @before (this run) is left for the next run. It locks nothing;
+-- each order is locked and checked again in its own transaction.
+SELECT id, accept_by::timestamptz AS due,
+  coalesce(sweep_failed_at, '0001-01-01 00:00:00+00')::timestamptz AS failed
+FROM orders
 WHERE status = 'placed' AND accept_by <= @before::timestamptz
-  AND (accept_by, id) > (@after_at::timestamptz, @after_id::uuid)
-ORDER BY accept_by, id
+  AND coalesce(sweep_failed_at, '0001-01-01 00:00:00+00') < @before::timestamptz
+  AND (coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), accept_by, id)
+    > (@after_failed::timestamptz, @after_at::timestamptz, @after_id::uuid)
+ORDER BY coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), accept_by, id
 LIMIT @lim;
 
 -- name: DuePartials :many
 -- The same for awaiting_customer orders past partial_confirm_by.
-SELECT id, partial_confirm_by::timestamptz AS due FROM orders
+SELECT id, partial_confirm_by::timestamptz AS due,
+  coalesce(sweep_failed_at, '0001-01-01 00:00:00+00')::timestamptz AS failed
+FROM orders
 WHERE status = 'awaiting_customer' AND partial_confirm_by <= @before::timestamptz
-  AND (partial_confirm_by, id) > (@after_at::timestamptz, @after_id::uuid)
-ORDER BY partial_confirm_by, id
+  AND coalesce(sweep_failed_at, '0001-01-01 00:00:00+00') < @before::timestamptz
+  AND (coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), partial_confirm_by, id)
+    > (@after_failed::timestamptz, @after_at::timestamptz, @after_id::uuid)
+ORDER BY coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), partial_confirm_by, id
 LIMIT @lim;
 
 -- name: DueHolds :many
 -- The same for held pickup orders past hold_until.
-SELECT id, hold_until::timestamptz AS due FROM orders
+SELECT id, hold_until::timestamptz AS due,
+  coalesce(sweep_failed_at, '0001-01-01 00:00:00+00')::timestamptz AS failed
+FROM orders
 WHERE status IN ('accepted','ready') AND fulfilment = 'pickup' AND hold_until <= @before::timestamptz
-  AND (hold_until, id) > (@after_at::timestamptz, @after_id::uuid)
-ORDER BY hold_until, id
+  AND coalesce(sweep_failed_at, '0001-01-01 00:00:00+00') < @before::timestamptz
+  AND (coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), hold_until, id)
+    > (@after_failed::timestamptz, @after_at::timestamptz, @after_id::uuid)
+ORDER BY coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), hold_until, id
 LIMIT @lim;
+
+-- name: SetSweepFailed :exec
+-- Marks an order the reconcile sweep could not apply at @at (the run's time).
+UPDATE orders SET sweep_failed_at = @at WHERE id = @id;
 
 -- name: StoresAtStrikeThreshold :many
 -- Stores with at least @threshold unreset strikes after @since (01 §5.4,

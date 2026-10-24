@@ -6,8 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
 
+	"github.com/todayz/backend/gen/sqlc/ordersdb"
 	"github.com/todayz/backend/internal/orders"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 )
@@ -78,4 +80,59 @@ func TestBK21ReconcileSweep(t *testing.T) {
 	fr = o.sweep()
 	require.EqualValues(t, 1, fr.Result.Summary["expired"])
 	require.Equal(t, "expired", o.status(fresh))
+}
+
+// BK-21 (lead review, W2-02 finish): an order the sweep cannot apply does
+// not stop the others. The run still succeeds, expires the rest and counts
+// the order in failed; the order is marked (sweep_failed_at), so the next
+// run takes every order that never failed before it, however old its
+// deadline, and once the cause is fixed a run applies it.
+func TestBK21ReconcileFailingOrderDoesNotBlockTheOthers(t *testing.T) {
+	o := newOrderShop(t)
+	ctx := context.Background()
+	stuck := o.order() // the oldest deadline
+	o.advance(time.Minute)
+	first := []string{o.order(), o.order()}
+
+	// The guard-like trigger refuses only stuck's status change, the way a
+	// bug or a bad row would.
+	o.a.exec(`CREATE FUNCTION test_refuse_stuck() RETURNS trigger LANGUAGE plpgsql AS $$
+		BEGIN RAISE EXCEPTION 'test: refused'; END $$`)
+	o.a.exec(`CREATE TRIGGER test_refuse_stuck BEFORE UPDATE OF status ON orders
+		FOR EACH ROW WHEN (OLD.id = '` + uuidOf(t, stuck).String() + `'::uuid) EXECUTE FUNCTION test_refuse_stuck()`)
+
+	acceptBy, _ := o.times(first[1])
+	o.set(*acceptBy)
+	fr, err := o.runner.RunScheduled(ctx, orders.KindReconcile)
+	require.NoError(t, err)
+	require.Equal(t, platformjobs.StatusSucceeded, fr.Status, "%v", fr.Err)
+	require.EqualValues(t, 2, fr.Result.Summary["expired"])
+	require.EqualValues(t, 1, fr.Result.Summary["failed"])
+	for _, id := range first {
+		require.Equal(t, "expired", o.status(id))
+	}
+	require.Equal(t, "placed", o.status(stuck))
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM orders WHERE id = $1 AND sweep_failed_at = $2`, uuidOf(t, stuck), *acceptBy))
+
+	// Newer due orders now come first, the failed one last.
+	o.advance(time.Minute)
+	later := []string{o.order(), o.order()}
+	acceptBy, _ = o.times(later[1])
+	o.set(*acceptBy)
+	rows, err := ordersdb.New(o.a.tdb.OwnerPool).DueUnanswered(ctx, ordersdb.DueUnansweredParams{
+		Before: *acceptBy, AfterID: pgtype.UUID{Valid: true}, Lim: 10,
+	})
+	require.NoError(t, err)
+	got := make([]string, len(rows))
+	for i, r := range rows {
+		got[i] = r.ID.String()
+	}
+	want := []string{uuidOf(t, later[0]).String(), uuidOf(t, later[1]).String(), uuidOf(t, stuck).String()}
+	require.Equal(t, want, got)
+
+	// The cause is fixed: the next run applies it with the rest.
+	o.a.exec(`DROP TRIGGER test_refuse_stuck ON orders`)
+	fr = o.sweep()
+	require.EqualValues(t, 3, fr.Result.Summary["expired"])
+	require.Equal(t, "expired", o.status(stuck))
 }

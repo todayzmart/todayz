@@ -1,0 +1,54 @@
+# Orders alerts (05 §5; owner W2-02). Grafana alerting file provisioning, same layout and
+# datasource uids as jobs.yaml and pos.yaml.
+#
+#   Order timer not applied  tz_order_reconcile_failed_total rose over 10 min, for 5 min: orders
+#                            past accept_by, partial_confirm_by or hold_until whose outcome the
+#                            reconcile sweep (order_timer_reconcile) could not apply. critical
+#                            (an order stays open past its deadline; stock or credits stay held).
+#
+# The sweep still succeeds when one order fails (the rest of the walk goes on, BK-21), so Job
+# failing does not fire for it: this rule is the signal. Alert files are not wired into the local
+# stack yet; routing (05 §5) is W5's contact points.
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: orders
+    folder: TodayZ
+    interval: 1m
+    rules:
+      # A failing order is tried again every minute, so the counter keeps rising while the cause
+      # stays. The counter is created on its first failure, so increase() misses that first step;
+      # the retries a minute later are what fire, and "for: 5m" ignores one order a later run fixed.
+      - uid: tz-order-reconcile-failed
+        title: Order timer not applied
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: sum(increase(tz_order_reconcile_failed_total[10m]))
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        labels:
+          area: orders
+          severity: critical
+        annotations:
+          summary: 'Orders past their deadline keep failing to expire or cancel'
+          description: 'order_timer_reconcile could not apply {{ $values.A.Value }} order timers in 10 min; those orders stay open past their deadline. The worker log line "orders: reconcile could not apply a timer" names the kind and each order id.'
+          runbook_url: docs/runbooks/orders-timers.md
+          __dashboardUid__: tz-jobs
+        isPaused: false
