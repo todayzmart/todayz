@@ -50,7 +50,7 @@ Offline first load: the gate shows `SessionPending` (offline notice and "Try aga
 
 W2-10 (weekend slice): B-04 Orders in `src/orders/` with routes `src/routes/orders/index.tsx` and `$orderId.tsx`.
 
-- Tabs New, Accepted, Ready, Done, Missed and an empty Asks slot (B-20 comes with W3-16). New cards count down from the server's `serverNow`, show stock per line, Accept and Reject (D-60 reasons). Accept part, dispatch, delivery, returns, QR scan, B-02, B-13 and B-14 are deferred.
+- Tabs New, Accepted, Ready, Done, Missed and an empty Asks slot (B-20 comes with W3-16). New cards count down from the server's `serverNow`, show stock per line, Accept and Reject (D-60 reasons). While a line is short (`isShort`), Accept is disabled on the card and the detail page with the hint `orders.card.shortHint` (founder's call, 2026-10-24): the shop rejects or fixes the stock until Accept part ships. Accept part, dispatch, delivery, returns, QR scan, B-02, B-13 and B-14 are deferred.
 - `queries.ts`: list and order queries, the store stream (`@todayz/realtime`, polling fallback with a banner), `useOrderAction` (one Idempotency-Key per attempt, reused only after a network failure).
 - `sound.ts` and `alerts.ts`: a Web Audio chime that repeats until the order is opened, accepted or rejected; "Allow sound" unlocks it. Orders already seen on the server at first load do not alert.
 - `store.ts`: the current shop and the role come from the same `listBusinesses` answer the picker uses. Cancel on an accepted order is manager and above only (D-65).

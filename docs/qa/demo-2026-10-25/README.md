@@ -115,7 +115,7 @@ More screens, from tests with made-up data:
 
 **Deferred from the weekend cut:**
 - **Delivery.** Pickup only for now; there is no delivery or address.
-- **Partial orders.** There is no "Accept part" when a line is short. Today the shop can accept or reject the whole order (see the open question below).
+- **Partial orders.** There is no "Accept part" yet. When a line is short, Accept is disabled with "Not enough stock for one item. Reject the order, or update the stock." (decided on 24 October; screenshot in `docs/qa/W2-10-short/`).
 - **Money and rewards.** There are no credits, cashback, wallet, referrals, offers or reviews. The cashback tag on a shop is seed data.
 - **The shop till.** No POS, offline sales, stock screens, product editing or shop onboarding screens.
 - **Pickup code extras.** There is no QR code (only the digits, until a QR library is approved), and no "Call shop" button (whether a customer may see the shop's phone is still open).
@@ -154,7 +154,6 @@ More screens, from tests with made-up data:
 
 ## Decisions we need
 
-- **Partial stock.** When a line says "Not enough stock", should Accept be disabled until the shop rejects, or should we build "Accept part" now (planned for later)?
 - **The shop's phone.** May a customer with an active order see it ("Call shop")?
 - **QR code.** May we add a QR library for the pickup code?
 - **Messaging.** MSG91 DLT template ids, the WhatsApp number, SMS cost per message, and a Hindi template review.
@@ -163,5 +162,5 @@ More screens, from tests with made-up data:
 
 ## Next
 
-1. The rest of stage 2: partial accept (after the decision above), credits and referrals, delivery, reviews and offers, the shop's POS and stock screens, and the stage-2 test gate.
+1. The rest of stage 2: partial accept (Accept part), credits and referrals, delivery, reviews and offers, the shop's POS and stock screens, and the stage-2 test gate.
 2. Stage 3, then stage 4. A fully tested product running locally is about 3 weeks away; the cloud launch follows about a week after the accounts are ready.

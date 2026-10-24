@@ -66,10 +66,12 @@ const ALL_DAY = {
   holidays: [],
 };
 let restoreHours: (() => Promise<void>) | undefined;
+let managerAuth: Record<string, string> | undefined;
 
 test.beforeAll(async () => {
   const request = await playwrightRequest.newContext({ ignoreHTTPSErrors: true });
   const auth = { Authorization: `Bearer ${await apiSignIn(request, MANAGER_PHONE, 'business')}` };
+  managerAuth = auth;
   const url = `${API}/v1/biz/businesses/${BUSINESS_ID}/stores/${STORE_ID}/settings`;
   const got = await request.get(url, { headers: auth });
   expect(got.status(), 'read the store settings').toBe(200);
@@ -91,7 +93,7 @@ test.afterAll(async () => {
 });
 
 /** Signs the seeded customer in over the API (once per run) and places a one-item pickup order. Returns what the test needs. */
-async function placeOrder(request: APIRequestContext): Promise<{ orderId: string; number: string; token: string }> {
+async function placeOrder(request: APIRequestContext, quantity = 1): Promise<{ orderId: string; number: string; token: string; storeItemId: string }> {
   customerToken ??= await apiSignIn(request, CUSTOMER_PHONE, 'customer');
   const accessToken = customerToken;
   const auth = { Authorization: `Bearer ${accessToken}` };
@@ -108,14 +110,14 @@ async function placeOrder(request: APIRequestContext): Promise<{ orderId: string
     data: {
       storeId: STORE_ID,
       fulfilment: 'pickup',
-      items: [{ storeItemId: item.storeItemId, quantity: 1 }],
+      items: [{ storeItemId: item.storeItemId, quantity }],
       creditsToUse: 0,
-      expectedTotalPaise: item.pricePaise,
+      expectedTotalPaise: item.pricePaise * quantity,
     },
   });
   expect(placed.status()).toBe(201);
   const order = (await placed.json()) as { id: string; number: string };
-  return { orderId: order.id, number: order.number, token: accessToken };
+  return { orderId: order.id, number: order.number, token: accessToken, storeItemId: item.storeItemId };
 }
 
 async function shopSignIn(page: Page, request: APIRequestContext) {
@@ -208,4 +210,36 @@ test('an owner can cancel an accepted order; the reason "other" needs a note', a
   await dialog.getByRole('textbox').fill('Power cut at the shop');
   await dialog.getByRole('button', { name: 'Cancel order' }).click();
   await expect(page.getByText('Order cancelled.')).toBeVisible();
+});
+
+test('Accept is disabled while a line is short; the shop rejects the order instead', async ({ page, request }) => {
+  const { number, storeItemId } = await placeOrder(request, 2);
+  // The manager counts the item down to 1 (fewer than the 2 asked for), and puts the count back afterwards.
+  const itemUrl = `${API}/v1/biz/businesses/${BUSINESS_ID}/stores/${STORE_ID}/items/${storeItemId}`;
+  const count = async (quantity: number) => {
+    const r = await request.post(`${itemUrl}/movements`, {
+      headers: { ...managerAuth, 'Idempotency-Key': ulid() },
+      data: { kind: 'count_correction', quantity },
+    });
+    expect(r.status(), `counted the stock: ${await r.text()}`).toBe(201);
+  };
+  const before = await request.get(itemUrl, { headers: managerAuth });
+  expect(before.status()).toBe(200);
+  const onHand = ((await before.json()) as { onHand: number }).onHand;
+  await count(1);
+  try {
+    await shopSignIn(page, request);
+    const card = page.getByRole('article', { name: number });
+    await expect(card.getByText(/^Not enough stock for one item\./)).toBeVisible({ timeout: 20_000 });
+    await expect(card.getByRole('button', { name: `Accept order ${number}` })).toBeDisabled();
+    if (process.env.TZ_QA_DIR) await page.screenshot({ path: `${process.env.TZ_QA_DIR}/business-order-short-1280.png` });
+
+    await card.getByRole('button', { name: `Reject order ${number}` }).click();
+    const dialog = page.getByRole('dialog');
+    await dialog.getByRole('radio', { name: 'Out of stock' }).click();
+    await dialog.getByRole('button', { name: 'Reject order' }).click();
+    await expect(card).toBeHidden();
+  } finally {
+    await count(onHand);
+  }
 });

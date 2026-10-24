@@ -28,7 +28,9 @@ function FulfilmentPill({ fulfilment }: { fulfilment: StoreOrderSummary['fulfilm
 
 /**
  * A new order: the time left to accept (from the server's clock), the items with their stock, and
- * Accept and Reject. Accept part is not here: partial accept is deferred in W2-02.
+ * Accept and Reject. Accept part is not here: partial accept is deferred in W2-02. While a line is
+ * short, Accept is disabled with a hint (the API refuses it with `insufficient_stock`), so the shop
+ * rejects the order or fixes the stock.
  * TODO(W2-02): "Accept part" opens a quantity editor once the API takes `lines` below the quantity asked.
  */
 export function NewOrderCard({ store, order, offsetMs }: { store: CurrentStore; order: StoreOrderSummary; offsetMs: number }) {
@@ -40,6 +42,8 @@ export function NewOrderCard({ store, order, offsetMs }: { store: CurrentStore; 
   const expired = left === 0;
   const name = order.customerName ?? intl.formatMessage({ id: 'orders.card.noName' });
   const time = mmss(left ?? 0);
+  const shortLines = detail.data?.lines.filter(isShort).length ?? 0;
+  const hintId = `${order.id}-short`;
   return (
     <article className="tz-ocard" aria-label={order.number}>
       <div className="tz-ocard-top">
@@ -75,6 +79,11 @@ export function NewOrderCard({ store, order, offsetMs }: { store: CurrentStore; 
         <FulfilmentPill fulfilment={order.fulfilment} />
       </div>
       <ActionError error={action.error} />
+      {shortLines > 0 && (
+        <p id={hintId} className={styles.shortHint}>
+          {intl.formatMessage({ id: 'orders.card.shortHint' }, { count: shortLines })}
+        </p>
+      )}
       <div className="tz-ocard-actions">
         <Button
           size="sm"
@@ -88,7 +97,8 @@ export function NewOrderCard({ store, order, offsetMs }: { store: CurrentStore; 
           size="sm"
           variant="primary"
           loading={action.pending === 'accept'}
-          disabled={action.pending !== null && action.pending !== 'accept'}
+          disabled={shortLines > 0 || (action.pending !== null && action.pending !== 'accept')}
+          aria-describedby={shortLines > 0 ? hintId : undefined}
           onClick={() => {
             acknowledgeOrder(store.sid, order.id);
             void action.run('accept', acceptCall(store, order.id));

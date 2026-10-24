@@ -118,6 +118,8 @@ function OrderView({ store, order }: { store: CurrentStore; order: StoreOrder })
   const [cancelling, setCancelling] = useState(false);
   const name = order.customer.name ?? intl.formatMessage({ id: 'orders.card.noName' });
   const placed = order.status === 'placed';
+  // A short line makes the API refuse Accept (insufficient_stock): disable it and say why.
+  const shortLines = order.lines.filter(isShort).length;
   const open = order.status === 'accepted' || order.status === 'ready';
   const canMarkReady = order.status === 'accepted' && order.fulfilment === 'pickup';
   const canCancel = open && canCancelAccepted(store.role);
@@ -186,7 +188,12 @@ function OrderView({ store, order }: { store: CurrentStore; order: StoreOrder })
         </section>
       </div>
       <div className={styles.stack}>
-        {placed && <Banner tone="info">{intl.formatMessage({ id: 'orders.detail.acceptPartialSoon' })}</Banner>}
+        {placed && shortLines > 0 && (
+          <Banner tone="warning" id="short-hint">
+            {intl.formatMessage({ id: 'orders.card.shortHint' }, { count: shortLines })}
+          </Banner>
+        )}
+        {placed && shortLines === 0 && <Banner tone="info">{intl.formatMessage({ id: 'orders.detail.acceptPartialSoon' })}</Banner>}
         <ActionError error={action.error} />
         {placed && (
           <div className={styles.actions}>
@@ -196,7 +203,8 @@ function OrderView({ store, order }: { store: CurrentStore; order: StoreOrder })
             <Button
               variant="primary"
               loading={action.pending === 'accept'}
-              disabled={action.pending !== null && action.pending !== 'accept'}
+              disabled={shortLines > 0 || (action.pending !== null && action.pending !== 'accept')}
+              aria-describedby={shortLines > 0 ? 'short-hint' : undefined}
               onClick={() => void action.run('accept', acceptCall(store, order.id)).then((o) => announce('orders.action.accepted', o))}
             >
               {intl.formatMessage({ id: 'orders.card.accept' })}

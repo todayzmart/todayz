@@ -64,6 +64,12 @@ function full(id: string, over: Record<string, unknown> = {}) {
   };
 }
 
+/** The order with only its in-stock line (the default fixture's Toor dal is short). */
+function inStock(id: string, over: Record<string, unknown> = {}) {
+  const order = full(id, over);
+  return { ...order, lines: order.lines.slice(0, 1) };
+}
+
 function listHandler(byTab: Record<string, unknown[]>): Handler {
   return (c) => {
     if (c.method !== 'GET' || c.path !== `${BASE}/orders`) return undefined;
@@ -123,13 +129,23 @@ describe('B-04 orders list', () => {
             ? ((accepted = true), json(200, full('o1', { status: 'accepted' })))
             : undefined,
         (c) => (c.method === 'GET' && c.path === `${BASE}/orders` ? json(200, { items: accepted ? [] : [summary('o1')], nextCursor: null, serverNow: SERVER_NOW }) : undefined),
-        orderHandler(() => full('o1')),
+        orderHandler(() => inStock('o1')),
       ],
     });
+    await screen.findByText('Amul Butter · 100 g × 2');
     fireEvent.click(await screen.findByRole('button', { name: 'Accept order TZ-o1' }));
     await waitFor(() => expect(screen.queryByRole('article', { name: 'TZ-o1' })).not.toBeInTheDocument());
     const post = calls.find((c) => c.path.endsWith('/accept'));
     expect(post?.headers.get('idempotency-key')).toMatch(/^[0-9A-Z]{26}$/);
+  });
+
+  it('disables Accept while a line is short and says why; Reject still works', async () => {
+    renderAt('/orders', { messages, handlers: [shops('cashier'), listHandler({ new: [summary('o1')] }), orderHandler(() => full('o1'))] });
+    const hint = await screen.findByText('Not enough stock for one item. Reject the order, or update the stock.');
+    const accept = screen.getByRole('button', { name: 'Accept order TZ-o1' });
+    expect(accept).toBeDisabled();
+    expect(accept).toHaveAttribute('aria-describedby', hint.id);
+    expect(screen.getByRole('button', { name: 'Reject order TZ-o1' })).toBeEnabled();
   });
 
   it('reject needs a reason, and sends it with an Idempotency-Key', async () => {
@@ -167,6 +183,20 @@ describe('B-04 order detail', () => {
       ],
       ...over,
     });
+
+  it('disables Accept on a new order with short lines, with the reason in a warning', async () => {
+    const short = renderAt('/orders/o1', { messages, handlers: [shops('cashier'), orderHandler(() => full('o1'))] });
+    await screen.findByRole('heading', { level: 1, name: 'Order TZ-o1' });
+    expect(screen.getByRole('button', { name: 'Accept' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Accept' })).toHaveAccessibleDescription('Not enough stock for one item. Reject the order, or update the stock.');
+    expect(screen.queryByText('Accepting part of an order is not available yet.')).not.toBeInTheDocument();
+    short.unmount();
+
+    renderAt('/orders/o1', { messages, handlers: [shops('cashier'), orderHandler(() => inStock('o1'))] });
+    await screen.findByRole('heading', { level: 1, name: 'Order TZ-o1' });
+    expect(screen.getByRole('button', { name: 'Accept' })).toBeEnabled();
+    expect(screen.queryByText(/Not enough stock for/)).not.toBeInTheDocument();
+  });
 
   it('shows the timeline, the customer and the masked phone', async () => {
     renderAt('/orders/o1', { messages, handlers: [shops('cashier'), orderHandler(() => accepted())] });
