@@ -970,3 +970,21 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 
 **D-205 · Standee page (W2-10 finish).** `/standee` previews the A5 PDF in a frame and downloads it, for owner and manager. The PDF is fetched with the session token and shown from a blob URL, so no token is ever in a URL. It uses the `getStandeePdf` adapter in `credits/api.ts` until `getQrStandee` is generated (`standee.yaml` is still a stub, owner W3-04 per its header, though D-51 gives the PDF to W2-10).
 - Lives in: `business/src/standee/`.
+
+**D-206 · Lead answers to the W2-10 finish questions (lead, 24 Oct).** Conservative readings, per the founder's standing call:
+- `/invite/$token` may treat the token as the staff id, provided the backend only shows an invitation to the phone it was sent to.
+- A document whose upload failed stays `pending` and uses one of the five slots. Open as work for the W2-10 backend owner: a route that deletes your own `pending` document.
+- The 20 km delivery radius maximum stays in the API schema: 01 §17 does not mark it configurable, and it matches the largest radius chip (01 §11).
+- The form may leave category empty for a draft; submit names it in plain words.
+- Store-limited managers do not see Add a store until the backend `TODO(lead)` is settled.
+- `standee.yaml` belongs to W2-10 (D-51); its header naming W3-04 is wrong and gets fixed with the next change to that file.
+- The unused `shop.invite.*` keys are removed from `auth.en.json`.
+
+## Customer finish as built (W2-08/09 finish, 2026-10-24)
+
+**D-190 · Lead answers to the W2-08/09 finish questions (lead, 24 Oct).** Conservative readings:
+- **Shop phone:** customers do not see it. `DiscoverStorePage` says never the phone, so "Call shop" stays out.
+- **Credits copy** ("30 credits on ₹100+") stays out until a public settings endpoint exists.
+- **Pickup-code QR:** waits; no dependency is added in Wave 2. The code is shown as text.
+- **Production tiles and the `IMAGE_BASE_URL` key form** are settled in Wave 5 with the infra. Locally they are per-city tiles and `<base>/<imageKey>`.
+- **C-05 when no shop confirmed:** goes to the founder. Until they answer, the screen says none of the shops has confirmed yet and offers a wider radius. It does not ask the shops again automatically.
