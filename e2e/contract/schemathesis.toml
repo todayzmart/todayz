@@ -17,3 +17,10 @@ checks.positive_data_acceptance.expected-statuses = ["2xx", "401", "403", "404",
 [[operations]]
 include-operation-id = ["searchBasket"]
 checks.positive_data_acceptance.expected-statuses = ["2xx", "401", "403", "404", "409", "422", "429", "5xx"]
+
+# A referral link answers 302 to the app page (W2-03): the redirect is the
+# success answer. hooks.py's before_call does not follow it, since the apps are
+# not running under the smoke.
+[[operations]]
+include-operation-id = ["openReferralLink"]
+checks.positive_data_acceptance.expected-statuses = ["2xx", "302", "401", "403", "404", "409", "429", "5xx"]
