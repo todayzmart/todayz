@@ -1,12 +1,223 @@
-# Paths: domain "referrals" (owner W3-04): referrals (04 §2.4, §2.6).
+# Paths: domain "referrals" (owner W2-03): referrals (01 §8, 04 §2.4, §2.6; D-13, D-26, D-32).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [referrals]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/referrals.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Every operation: `tags: [referrals]`, an operationId unique across the API, an
+# example per request and success response, and the default problem response.
+# Roles per operation are in internal/platform/authz/policy/referrals.go. The
+# referral link (`/v1/public/ref/{code}`) sets the first-touch attribution
+# cookie; the claim reads it when no code is typed.
+/v1/public/ref/{code}:
+  parameters:
+    - name: code
+      in: path
+      required: true
+      description: A customer's or business's referral code, or a store short code (any case).
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 16
+      example: ASHA22
+  get:
+    operationId: openReferralLink
+    tags: [referrals]
+    summary: Open a referral link or standee URL
+    description: >-
+      Records the click and sends the browser on with `302`: a store code (or `k=s`) to the store
+      page in the customer app (`/s/{slug}`, carrying `?s=` when the standee id is given), a
+      customer code to the customer app, a business code to the business app. The attribution
+      cookie (`__Secure-tz_ref`, HttpOnly, Secure, SameSite=Lax, `Path=/v1`) carries the click for
+      `ref_attribution_window_days`; a cookie whose click is still inside the window is kept (first
+      touch, D-32). An unknown code records nothing, sets no cookie and goes to the customer app.
+    security: []
+    parameters:
+      - name: s
+        in: query
+        description: The standee the QR was printed for (D-26); ignored unless it is an id.
+        schema:
+          type: string
+          maxLength: 32
+      - name: k
+        in: query
+        description: Which code it is when the link says so (`c` customer, `b` business, `s` store).
+        schema:
+          type: string
+          enum: [c, b, s]
+    responses:
+      "302":
+        description: Redirect to the app
+        headers:
+          Location:
+            description: The app page to open.
+            schema:
+              type: string
+          Set-Cookie:
+            description: The attribution cookie, when this is the first touch inside the window.
+            schema:
+              type: string
+          Cache-Control:
+            description: Always `no-store`.
+            schema:
+              type: string
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/referrals:
+  get:
+    operationId: getMyReferrals
+    tags: [referrals]
+    summary: My referral code, link and stats (C-16)
+    description: >-
+      `rewards` are the amounts a referral made today earns; `referredBy` is the referral this
+      account joined through.
+    responses:
+      "200":
+        description: The caller's referrals
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/referrals.yaml#/MyReferrals
+            example:
+              code: ASHA22
+              link: https://api.todayz.in/v1/public/ref/ASHA22
+              rewards:
+                referrerCredits: 30
+                refereeCredits: 100
+              stats:
+                clicks: 12
+                pending: 2
+                rewarded: 3
+                creditsEarned: 90
+              referredBy: null
+      default: *problem
+/v1/me/referrals/claim:
+  post:
+    operationId: claimReferral
+    tags: [referrals]
+    summary: Claim a referral at sign-up
+    description: >-
+      Once per account, before its first completed order and within `ref_attribution_window_days`
+      of sign-up. Without `code` the attribution cookie is used (the link must have been opened
+      before sign-up and inside the window). `422 referral_code_unknown`, `422 referral_self` (your
+      own code, or a store of a business you work for), `409 referral_already_claimed` (this
+      account or this phone number already used one), `422 referral_not_eligible` (too late,
+      already ordered, or a business code). A sign-up on the referrer's device or on a device
+      another recent account used is recorded with status `rejected` and earns nothing (D-13).
+    x-idempotency: optional
+    x-problems: [referral_code_unknown, referral_self, referral_already_claimed, referral_not_eligible]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/referrals.yaml#/ReferralClaim
+          example:
+            code: ASHA22
+    responses:
+      "201":
+        description: The referral
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/referrals.yaml#/ReferralClaimResult
+            example: &claimed
+              referralId: 01JB0SR1A2B3C4D5E6F7G8H9J0
+              kind: customer_customer
+              status: pending
+              rewardCredits: 100
+      "200":
+        description: The same claim again (the referral already recorded for this code)
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/referrals.yaml#/ReferralClaimResult
+            example: *claimed
+      default: *problem
+/v1/biz/businesses/{bid}/referrals:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getBusinessReferrals
+    tags: [referrals]
+    summary: The business referral code, link and stats (B-10)
+    description: >-
+      The shop-to-shop code and link, the referrals made with it and by the business's stores, and,
+      when the business joined through a referral, how far it is to qualifying
+      (`ref_shop_qualifying_orders` completed orders or linked sales after verification).
+    responses:
+      "200":
+        description: The business's referrals
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/referrals.yaml#/BusinessReferrals
+            example:
+              code: BMKT22
+              link: https://api.todayz.in/v1/public/ref/BMKT22?k=b
+              rewards:
+                referrerCredits: 30
+                refereeCredits: 100
+              stats:
+                clicks: 40
+                pending: 4
+                rewarded: 9
+                creditsEarned: 270
+              referredBy:
+                status: pending
+                ordersCounted: 3
+                ordersNeeded: 10
+                verified: true
+      default: *problem
+/v1/biz/businesses/{bid}/referrals/claim:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: claimBusinessReferral
+    tags: [referrals]
+    summary: Claim the referral a new business joined through
+    description: >-
+      Owner only, once per business, while it is not verified yet and within
+      `ref_attribution_window_days` of its creation. A customer's code or another business's code
+      (a store short code is `422 referral_not_eligible`); without `code` the attribution cookie is
+      used. A business whose staff are also the referrer's (or the referrer themself) is `422
+      referral_self`. The same-device rule records `rejected` as for customers.
+    x-idempotency: optional
+    x-problems: [referral_code_unknown, referral_self, referral_already_claimed, referral_not_eligible]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/referrals.yaml#/ReferralClaim
+          example:
+            code: BANP23
+            referrer: business
+    responses:
+      "201":
+        description: The referral
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/referrals.yaml#/ReferralClaimResult
+            example: &bizclaimed
+              referralId: 01JB0SR2A3B4C5D6E7F8G9H0J1
+              kind: any_shop
+              status: pending
+              rewardCredits: 100
+      "200":
+        description: The same claim again
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/referrals.yaml#/ReferralClaimResult
+            example: *bizclaimed
+      default: *problem

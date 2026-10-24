@@ -1,0 +1,11 @@
+# domain referrals: one line per (role x action); regenerate with -update
+me.referrals.view kind=customer step-up=false
+me.referrals.claim kind=customer step-up=false
+referrals.view kind=business step-up=false
+referrals.view owner allow
+referrals.view manager allow
+referrals.view cashier -
+referrals.claim kind=business step-up=false
+referrals.claim owner allow
+referrals.claim manager -
+referrals.claim cashier -

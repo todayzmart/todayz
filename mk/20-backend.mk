@@ -47,7 +47,7 @@ BACKEND_POSTGIS_IMAGE = \
   img="$${TODAYZ_POSTGIS_IMAGE:-}"; \
   if [ -z "$$img" ] && [ -f $(BACKEND_LIB) ]; then img="$$(source $(BACKEND_LIB) && echo "$$TODAYZ_POSTGIS_IMAGE")"; fi
 
-.PHONY: setup-backend setup-backend-vulndb gen-backend check-backend backend-bin reset-backend dev-backend
+.PHONY: setup-backend setup-backend-vulndb gen-backend check-backend backend-bin reset-backend dev-backend testpg-up testpg-down
 
 setup-backend:
 	@echo "backend toolchain: $$(GOTOOLCHAIN=auto go -C $(BACKEND) version)"
@@ -129,3 +129,11 @@ dev-backend: backend-bin
 	  ( source $(BACKEND_LIB); tz_load_app_env; $(BACKEND_BIN) migrate up ); \
 	  $(BACKEND_PROC) start api --port $(API_PORT) --health http://127.0.0.1:$(API_PORT)/healthz -- $(BACKEND_BIN) api; \
 	  $(BACKEND_PROC) start worker --port $(WORKER_PORT) --health http://127.0.0.1:$(WORKER_PORT)/healthz -- $(BACKEND_BIN) worker
+
+# Opt-in: one shared PostGIS for Go tests instead of a container per package.
+# After `make testpg-up`, export the TODAYZ_TEST_PG_URL_FILE line it prints.
+testpg-up:
+	@$(ROOT)/scripts/testpg.sh up
+
+testpg-down:
+	@$(ROOT)/scripts/testpg.sh down

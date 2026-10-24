@@ -6,8 +6,10 @@ import {
   ReceiptText,
   ScanBarcode,
   Settings,
+  Star,
   Tag,
   UsersRound,
+  WalletCards,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -33,7 +35,9 @@ export const NAV: readonly NavItem[] = [
   { section: 'stock', label: 'shell.nav.stock', icon: Package, tab: true, side: true, group: null },
   { section: 'customers', label: 'shell.nav.customers', icon: UsersRound, tab: false, side: true, group: null },
   { section: 'offers', label: 'shell.nav.offers', icon: Tag, tab: false, side: true, group: 'shell.nav.groupGrow' },
+  { section: 'reviews', label: 'shell.nav.reviews', icon: Star, tab: false, side: true, group: 'shell.nav.groupGrow' },
   { section: 'analytics', label: 'shell.nav.analytics', icon: ChartLine, tab: false, side: true, group: 'shell.nav.groupGrow' },
+  { section: 'credits', label: 'shell.nav.credits', icon: WalletCards, tab: false, side: true, group: 'shell.nav.groupShop' },
   { section: 'settings', label: 'shell.nav.settings', icon: Settings, tab: false, side: true, group: 'shell.nav.groupShop' },
   { section: 'more', label: 'shell.nav.more', icon: Ellipsis, tab: true, side: false, group: null },
 ];

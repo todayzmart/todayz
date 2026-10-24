@@ -1,0 +1,678 @@
+{
+  "offers.title": {
+    "defaultMessage": "Offers",
+    "description": "B-08 page title"
+  },
+  "offers.loading": {
+    "defaultMessage": "Loading offers",
+    "description": "Loading state of B-08"
+  },
+  "offers.noStore.title": {
+    "defaultMessage": "Pick a shop first",
+    "description": "B-08 empty state: no current shop"
+  },
+  "offers.noStore.body": {
+    "defaultMessage": "Offers belong to a shop. Choose one to see them.",
+    "description": "B-08 empty state body"
+  },
+  "offers.noStore.action": {
+    "defaultMessage": "Choose a shop",
+    "description": "B-08 empty state button"
+  },
+  "offers.askManager": {
+    "defaultMessage": "Offers and banners are for the owner and managers. Ask a manager.",
+    "description": "B-08 shown to a cashier"
+  },
+  "offers.error.title": {
+    "defaultMessage": "Could not load offers",
+    "description": "B-08 load failure title"
+  },
+  "offers.error.body": {
+    "defaultMessage": "Check your connection and try again.",
+    "description": "B-08 load failure body"
+  },
+  "offers.error.retry": {
+    "defaultMessage": "Try again",
+    "description": "B-08 retry button"
+  },
+  "offers.error.generic": {
+    "defaultMessage": "Something went wrong. Try again.",
+    "description": "B-08 generic failure line"
+  },
+  "offers.error.validation_failed": {
+    "defaultMessage": "Some details are not allowed. Check the form and try again.",
+    "description": "B-08 server rejected the input"
+  },
+  "offers.error.forbidden": {
+    "defaultMessage": "You do not have permission to do this. Ask a manager.",
+    "description": "B-08 403"
+  },
+  "offers.error.not_found": {
+    "defaultMessage": "This was not found. It may have been removed.",
+    "description": "B-08 404"
+  },
+  "offers.error.invalid_transition": {
+    "defaultMessage": "This can no longer be changed.",
+    "description": "B-08 409 invalid_transition, e.g. an ended offer"
+  },
+  "offers.error.banner_limit_reached": {
+    "defaultMessage": "You have reached the limit of banners. End one to add another.",
+    "description": "B-08 banner_limit_reached (D-155)"
+  },
+  "offers.error.precondition_failed": {
+    "defaultMessage": "This changed on another device. The list is up to date now, try again.",
+    "description": "B-08 412"
+  },
+  "offers.error.precondition_required": {
+    "defaultMessage": "This could not be saved. Reload and try again.",
+    "description": "B-08 428"
+  },
+  "offers.error.conflict": {
+    "defaultMessage": "This offer already exists. Check the list.",
+    "description": "B-08 409 conflict, e.g. a second flash offer for one batch"
+  },
+  "offers.tabs.label": {
+    "defaultMessage": "Offers and banners",
+    "description": "B-08 tab list accessible name"
+  },
+  "offers.tabs.offers": {
+    "defaultMessage": "Offers",
+    "description": "B-08 tab"
+  },
+  "offers.tabs.banners": {
+    "defaultMessage": "Banners",
+    "description": "B-08 tab"
+  },
+  "offers.new": {
+    "defaultMessage": "New offer",
+    "description": "B-08 button"
+  },
+  "offers.close": {
+    "defaultMessage": "Close",
+    "description": "B-08 sheet close button"
+  },
+  "offers.cancel": {
+    "defaultMessage": "Cancel",
+    "description": "B-08 form cancel"
+  },
+  "offers.create": {
+    "defaultMessage": "Create offer",
+    "description": "B-08 form submit"
+  },
+  "offers.created": {
+    "defaultMessage": "{count, plural, one {Offer created} other {# offers created}}",
+    "description": "B-08 toast after creating"
+  },
+  "offers.more": {
+    "defaultMessage": "Show more",
+    "description": "B-08 load more"
+  },
+  "offers.empty.title": {
+    "defaultMessage": "No offers yet",
+    "description": "B-08 empty list title"
+  },
+  "offers.empty.body": {
+    "defaultMessage": "Make an offer and customers see it on your shop and at the counter.",
+    "description": "B-08 empty list body"
+  },
+  "offers.empty.filtered": {
+    "defaultMessage": "No offers here.",
+    "description": "B-08 filter shows nothing"
+  },
+  "offers.filter.label": {
+    "defaultMessage": "Filter offers",
+    "description": "B-08 filter group"
+  },
+  "offers.filter.all": {
+    "defaultMessage": "All",
+    "description": "B-08 offer filter chip"
+  },
+  "offers.filter.live": {
+    "defaultMessage": "Live",
+    "description": "B-08 offer filter chip"
+  },
+  "offers.filter.scheduled": {
+    "defaultMessage": "Scheduled",
+    "description": "B-08 offer filter chip"
+  },
+  "offers.filter.paused": {
+    "defaultMessage": "Paused",
+    "description": "B-08 offer filter chip"
+  },
+  "offers.filter.ended": {
+    "defaultMessage": "Ended",
+    "description": "B-08 offer filter chip"
+  },
+  "offers.status.scheduled": {
+    "defaultMessage": "Scheduled",
+    "description": "B-08 offer status pill"
+  },
+  "offers.status.live": {
+    "defaultMessage": "Live",
+    "description": "B-08 offer status pill"
+  },
+  "offers.status.paused": {
+    "defaultMessage": "Paused",
+    "description": "B-08 offer status pill"
+  },
+  "offers.status.ended": {
+    "defaultMessage": "Ended",
+    "description": "B-08 offer status pill"
+  },
+  "offers.list.label": {
+    "defaultMessage": "Offers",
+    "description": "B-08 list accessible name"
+  },
+  "offers.row.redemptions": {
+    "defaultMessage": "{max, plural, =0 {{count} used} other {{count} of {max} used}}",
+    "description": "B-08 redemptions on an offer row"
+  },
+  "offers.row.until": {
+    "defaultMessage": "Until {when}",
+    "description": "B-08 offer or banner end"
+  },
+  "offers.row.noEnd": {
+    "defaultMessage": "No end date",
+    "description": "B-08 offer or banner without an end"
+  },
+  "offers.pause": {
+    "defaultMessage": "Pause",
+    "description": "B-08 pause button"
+  },
+  "offers.resume": {
+    "defaultMessage": "Resume",
+    "description": "B-08 resume button"
+  },
+  "offers.end": {
+    "defaultMessage": "End",
+    "description": "B-08 end button"
+  },
+  "offers.end.confirm": {
+    "defaultMessage": "End this for good?",
+    "description": "B-08 ending is final"
+  },
+  "offers.end.keep": {
+    "defaultMessage": "Keep it",
+    "description": "B-08 cancel ending"
+  },
+  "offers.end.yes": {
+    "defaultMessage": "End it",
+    "description": "B-08 confirm ending"
+  },
+  "offers.new.title": {
+    "defaultMessage": "New offer",
+    "description": "B-08 sheet title"
+  },
+  "offers.kind.label": {
+    "defaultMessage": "Kind of offer",
+    "description": "B-08 offer kind group"
+  },
+  "offers.kind.percent": {
+    "defaultMessage": "Percent off",
+    "description": "B-08 offer kind chip"
+  },
+  "offers.kind.flat": {
+    "defaultMessage": "Rupees off",
+    "description": "B-08 offer kind chip"
+  },
+  "offers.kind.bxgy": {
+    "defaultMessage": "Buy and get free",
+    "description": "B-08 offer kind chip"
+  },
+  "offers.kind.bill_min": {
+    "defaultMessage": "Bill discount",
+    "description": "B-08 offer kind chip"
+  },
+  "offers.kind.flash": {
+    "defaultMessage": "Expiring stock",
+    "description": "B-08 offer kind chip"
+  },
+  "offers.kind.summary": {
+    "defaultMessage": "{kind, select, percent {{pct}% off} flat {{amount} off each} bxgy {Buy {buy} get {get}} bill_min {{amount} off bills over {min}} other {Offer}}",
+    "description": "B-08 offer headline on a row"
+  },
+  "offers.scope.label": {
+    "defaultMessage": "Applies to",
+    "description": "B-08 scope switch"
+  },
+  "offers.scope.items": {
+    "defaultMessage": "Items",
+    "description": "B-08 scope"
+  },
+  "offers.scope.category": {
+    "defaultMessage": "Category",
+    "description": "B-08 scope"
+  },
+  "offers.scope.store": {
+    "defaultMessage": "Whole shop",
+    "description": "B-08 scope"
+  },
+  "offers.scope.storeNote": {
+    "defaultMessage": "Applies to the whole shop.",
+    "description": "B-08 note when scope is the whole shop"
+  },
+  "offers.scope.summary": {
+    "defaultMessage": "{scope, select, store {Whole shop} category {A category} other {{count, plural, one {# item} other {# items}}}}",
+    "description": "B-08 scope on a row"
+  },
+  "offers.items.one": {
+    "defaultMessage": "Item",
+    "description": "B-08 single item picker label"
+  },
+  "offers.items.many": {
+    "defaultMessage": "Items",
+    "description": "B-08 multi item picker label"
+  },
+  "offers.category.label": {
+    "defaultMessage": "Category",
+    "description": "B-08 category select label"
+  },
+  "offers.category.choose": {
+    "defaultMessage": "Choose a category",
+    "description": "B-08 category placeholder"
+  },
+  "offers.picker.search": {
+    "defaultMessage": "Search items",
+    "description": "B-08 item search accessible name"
+  },
+  "offers.picker.searchHint": {
+    "defaultMessage": "Search your items",
+    "description": "B-08 item search placeholder"
+  },
+  "offers.picker.picked": {
+    "defaultMessage": "Chosen items",
+    "description": "B-08 chosen items list"
+  },
+  "offers.picker.results": {
+    "defaultMessage": "Items found",
+    "description": "B-08 search results list"
+  },
+  "offers.picker.none": {
+    "defaultMessage": "No items found.",
+    "description": "B-08 no search results"
+  },
+  "offers.picker.add": {
+    "defaultMessage": "Add",
+    "description": "B-08 add item"
+  },
+  "offers.picker.added": {
+    "defaultMessage": "Added",
+    "description": "B-08 item already added"
+  },
+  "offers.picker.remove": {
+    "defaultMessage": "Remove {name}",
+    "description": "B-08 remove item button"
+  },
+  "offers.flash.batches": {
+    "defaultMessage": "Batches to sell off",
+    "description": "B-08 flash batches label"
+  },
+  "offers.flash.none": {
+    "defaultMessage": "No batches with an expiry date are in stock.",
+    "description": "B-08 no expiring batches"
+  },
+  "offers.flash.batchMeta": {
+    "defaultMessage": "{qty} left, expires {date}",
+    "description": "B-08 flash batch meta"
+  },
+  "offers.flash.help": {
+    "defaultMessage": "Each batch gets its own offer that ends with its expiry date.",
+    "description": "B-08 flash help"
+  },
+  "offers.value.percent": {
+    "defaultMessage": "Percent off",
+    "description": "B-08 percent field"
+  },
+  "offers.value.percentHelp": {
+    "defaultMessage": "A whole number from 1 to {max}.",
+    "description": "B-08 percent help"
+  },
+  "offers.value.flatOff": {
+    "defaultMessage": "Rupees off each",
+    "description": "B-08 flat field"
+  },
+  "offers.value.flatHelp": {
+    "defaultMessage": "Taken off every unit, so it must be less than the price.",
+    "description": "B-08 flat help"
+  },
+  "offers.value.billOff": {
+    "defaultMessage": "Rupees off the bill",
+    "description": "B-08 bill discount field"
+  },
+  "offers.value.billHelp": {
+    "defaultMessage": "Taken off the whole bill once it reaches the minimum.",
+    "description": "B-08 bill help"
+  },
+  "offers.minBill.label": {
+    "defaultMessage": "Minimum bill",
+    "description": "B-08 minimum bill"
+  },
+  "offers.buy.label": {
+    "defaultMessage": "Buy",
+    "description": "B-08 buy quantity"
+  },
+  "offers.get.label": {
+    "defaultMessage": "Get free",
+    "description": "B-08 get quantity"
+  },
+  "offers.title.label": {
+    "defaultMessage": "Name (optional)",
+    "description": "B-08 offer name"
+  },
+  "offers.title.help": {
+    "defaultMessage": "Shown to customers. Leave empty to name it for you.",
+    "description": "B-08 name help"
+  },
+  "offers.channels.label": {
+    "defaultMessage": "Where it applies",
+    "description": "B-08 channels"
+  },
+  "offers.channels.both": {
+    "defaultMessage": "Online and counter",
+    "description": "B-08 channel"
+  },
+  "offers.channels.online": {
+    "defaultMessage": "Online",
+    "description": "B-08 channel"
+  },
+  "offers.channels.pos": {
+    "defaultMessage": "Counter",
+    "description": "B-08 channel"
+  },
+  "offers.once.label": {
+    "defaultMessage": "Once per customer",
+    "description": "B-08 limit"
+  },
+  "offers.max.label": {
+    "defaultMessage": "First orders only (optional)",
+    "description": "B-08 redemption limit"
+  },
+  "offers.max.help": {
+    "defaultMessage": "Stops after this many orders. Leave empty for no limit.",
+    "description": "B-08 redemption limit help"
+  },
+  "offers.starts.label": {
+    "defaultMessage": "Starts",
+    "description": "B-08 start"
+  },
+  "offers.starts.help": {
+    "defaultMessage": "Leave empty to start now.",
+    "description": "B-08 start help"
+  },
+  "offers.ends.label": {
+    "defaultMessage": "Ends",
+    "description": "B-08 end"
+  },
+  "offers.ends.help": {
+    "defaultMessage": "Leave empty to run until you end it.",
+    "description": "B-08 end help"
+  },
+  "offers.err.percent": {
+    "defaultMessage": "Enter a whole number from {min} to {max}.",
+    "description": "B-08 field error"
+  },
+  "offers.err.flatMin": {
+    "defaultMessage": "Enter an amount in rupees.",
+    "description": "B-08 field error"
+  },
+  "offers.err.flatTooHigh": {
+    "defaultMessage": "The amount must be less than the item price.",
+    "description": "B-08 field error"
+  },
+  "offers.err.buy": {
+    "defaultMessage": "Enter a whole number from {min} to {max}.",
+    "description": "B-08 field error"
+  },
+  "offers.err.get": {
+    "defaultMessage": "Enter a whole number from {min} to {max}.",
+    "description": "B-08 field error"
+  },
+  "offers.err.minBill": {
+    "defaultMessage": "Enter the minimum bill in rupees.",
+    "description": "B-08 field error"
+  },
+  "offers.err.discountAboveBill": {
+    "defaultMessage": "The discount must be less than the minimum bill.",
+    "description": "B-08 field error"
+  },
+  "offers.err.itemsRequired": {
+    "defaultMessage": "Choose at least one item.",
+    "description": "B-08 field error"
+  },
+  "offers.err.oneItem": {
+    "defaultMessage": "Choose one item.",
+    "description": "B-08 field error"
+  },
+  "offers.err.tooManyItems": {
+    "defaultMessage": "Choose at most {max} items.",
+    "description": "B-08 field error"
+  },
+  "offers.err.categoryRequired": {
+    "defaultMessage": "Choose a category.",
+    "description": "B-08 field error"
+  },
+  "offers.err.batchesRequired": {
+    "defaultMessage": "Choose at least one batch.",
+    "description": "B-08 field error"
+  },
+  "offers.err.title": {
+    "defaultMessage": "Use at most {max} characters.",
+    "description": "B-08 field error"
+  },
+  "offers.err.maxRedemptions": {
+    "defaultMessage": "Enter a whole number up to {max}, or leave it empty.",
+    "description": "B-08 field error"
+  },
+  "offers.err.dateInvalid": {
+    "defaultMessage": "Enter a valid date and time.",
+    "description": "B-08 field error"
+  },
+  "offers.err.startPast": {
+    "defaultMessage": "The start is in the past.",
+    "description": "B-08 field error"
+  },
+  "offers.err.endBeforeStart": {
+    "defaultMessage": "The end must be after the start.",
+    "description": "B-08 field error"
+  },
+  "offers.preview.label": {
+    "defaultMessage": "Preview",
+    "description": "B-08 preview accessible name"
+  },
+  "offers.preview.title": {
+    "defaultMessage": "How it looks at checkout",
+    "description": "B-08 preview heading"
+  },
+  "offers.preview.waiting": {
+    "defaultMessage": "Fill in the offer to see a sample cart priced with it.",
+    "description": "B-08 preview before the form is valid"
+  },
+  "offers.preview.failed": {
+    "defaultMessage": "The preview is not available right now. You can still create the offer.",
+    "description": "B-08 preview failed"
+  },
+  "offers.preview.item": {
+    "defaultMessage": "Item",
+    "description": "B-08 preview line without a known name"
+  },
+  "offers.preview.free": {
+    "defaultMessage": "({count} free)",
+    "description": "B-08 free units on a preview line"
+  },
+  "offers.preview.without": {
+    "defaultMessage": "Without the offer",
+    "description": "B-08 preview total"
+  },
+  "offers.preview.with": {
+    "defaultMessage": "With the offer",
+    "description": "B-08 preview total"
+  },
+  "offers.preview.noEffect": {
+    "defaultMessage": "This offer takes nothing off this sample cart.",
+    "description": "B-08 preview: offer does not apply"
+  },
+  "offers.banner.new": {
+    "defaultMessage": "New banner",
+    "description": "B-08 button and sheet title"
+  },
+  "offers.banner.create": {
+    "defaultMessage": "Create banner",
+    "description": "B-08 banner submit"
+  },
+  "offers.banner.created": {
+    "defaultMessage": "Banner created",
+    "description": "B-08 toast"
+  },
+  "offers.banner.list": {
+    "defaultMessage": "Banners",
+    "description": "B-08 banner list accessible name"
+  },
+  "offers.banner.empty.title": {
+    "defaultMessage": "No banners yet",
+    "description": "B-08 empty banners"
+  },
+  "offers.banner.empty.body": {
+    "defaultMessage": "A banner puts a headline at the top of your shop page.",
+    "description": "B-08 empty banners body"
+  },
+  "offers.banner.headline": {
+    "defaultMessage": "Headline",
+    "description": "B-08 banner field"
+  },
+  "offers.banner.headlineHelp": {
+    "defaultMessage": "At most {max} characters.",
+    "description": "B-08 banner help"
+  },
+  "offers.banner.subline": {
+    "defaultMessage": "Sub-line (optional)",
+    "description": "B-08 banner field"
+  },
+  "offers.banner.sampleHeadline": {
+    "defaultMessage": "Your headline",
+    "description": "B-08 banner preview placeholder"
+  },
+  "offers.banner.tint": {
+    "defaultMessage": "Colour",
+    "description": "B-08 banner colour group"
+  },
+  "offers.banner.tint.green": {
+    "defaultMessage": "Green",
+    "description": "B-08 banner colour"
+  },
+  "offers.banner.tint.amber": {
+    "defaultMessage": "Amber",
+    "description": "B-08 banner colour"
+  },
+  "offers.banner.tint.rose": {
+    "defaultMessage": "Rose",
+    "description": "B-08 banner colour"
+  },
+  "offers.banner.tint.sky": {
+    "defaultMessage": "Sky",
+    "description": "B-08 banner colour"
+  },
+  "offers.banner.tint.lilac": {
+    "defaultMessage": "Lilac",
+    "description": "B-08 banner colour"
+  },
+  "offers.banner.tint.peach": {
+    "defaultMessage": "Peach",
+    "description": "B-08 banner colour"
+  },
+  "offers.banner.target": {
+    "defaultMessage": "Opens",
+    "description": "B-08 banner target"
+  },
+  "offers.banner.target.store": {
+    "defaultMessage": "Your shop",
+    "description": "B-08 banner target"
+  },
+  "offers.banner.target.offer": {
+    "defaultMessage": "An offer",
+    "description": "B-08 banner target"
+  },
+  "offers.banner.target.category": {
+    "defaultMessage": "A category",
+    "description": "B-08 banner target"
+  },
+  "offers.banner.target.items": {
+    "defaultMessage": "Some items",
+    "description": "B-08 banner target"
+  },
+  "offers.banner.pickOffer": {
+    "defaultMessage": "Offer",
+    "description": "B-08 banner offer select"
+  },
+  "offers.banner.chooseOffer": {
+    "defaultMessage": "Choose an offer",
+    "description": "B-08 banner offer placeholder"
+  },
+  "offers.banner.err.headlineRequired": {
+    "defaultMessage": "Enter a headline.",
+    "description": "B-08 banner error"
+  },
+  "offers.banner.err.headlineMax": {
+    "defaultMessage": "Use at most {max} characters.",
+    "description": "B-08 banner error"
+  },
+  "offers.banner.err.sublineMax": {
+    "defaultMessage": "Use at most {max} characters.",
+    "description": "B-08 banner error"
+  },
+  "offers.banner.err.offerRequired": {
+    "defaultMessage": "Choose an offer.",
+    "description": "B-08 banner error"
+  },
+  "offers.banner.err.categoryRequired": {
+    "defaultMessage": "Choose a category.",
+    "description": "B-08 banner error"
+  },
+  "offers.banner.err.itemsRequired": {
+    "defaultMessage": "Choose at least one item.",
+    "description": "B-08 banner error"
+  },
+  "offers.banner.uploadLater": {
+    "defaultMessage": "Photo banners are not available in this version.",
+    "description": "B-08 note: image upload is not built"
+  },
+  "offers.banner.status.pending_review": {
+    "defaultMessage": "Checking",
+    "description": "B-08 banner status pill"
+  },
+  "offers.banner.status.live": {
+    "defaultMessage": "Live",
+    "description": "B-08 banner status pill"
+  },
+  "offers.banner.status.scheduled": {
+    "defaultMessage": "Scheduled",
+    "description": "B-08 banner status pill"
+  },
+  "offers.banner.status.paused": {
+    "defaultMessage": "Paused",
+    "description": "B-08 banner status pill"
+  },
+  "offers.banner.status.ended": {
+    "defaultMessage": "Ended",
+    "description": "B-08 banner status pill"
+  },
+  "offers.banner.status.removed": {
+    "defaultMessage": "Removed",
+    "description": "B-08 banner status pill"
+  },
+  "offers.banner.checking": {
+    "defaultMessage": "Checking image…",
+    "description": "B-08 banner waiting for the safety check"
+  },
+  "offers.banner.removed": {
+    "defaultMessage": "Removed by TodayZ.",
+    "description": "B-08 banner removed, no reason"
+  },
+  "offers.banner.removedWhy": {
+    "defaultMessage": "Removed by TodayZ: {reason}",
+    "description": "B-08 banner removed with a reason"
+  },
+  "offers.banner.reach": {
+    "defaultMessage": "{views, plural, one {# view} other {# views}} · {taps, plural, one {# tap} other {# taps}} · {orders, plural, one {# order} other {# orders}}",
+    "description": "B-08 banner reach"
+  }
+}
