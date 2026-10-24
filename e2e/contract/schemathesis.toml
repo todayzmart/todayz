@@ -6,7 +6,7 @@
 # the public cursor lists are named here. A new public list with a cursor joins
 # this list.
 [[operations]]
-include-operation-id = ["listDiscoverStores", "listDiscoverStoreItems", "searchDiscover"]
+include-operation-id = ["listDiscoverStores", "listDiscoverStoreItems", "searchDiscover", "listDiscoverStoreReviews"]
 checks.positive_data_acceptance.expected-statuses = ["2xx", "401", "403", "404", "409", "422", "429", "5xx"]
 
 # Basket search caps its lines at basket_max_items, a platform setting (01 §17,
