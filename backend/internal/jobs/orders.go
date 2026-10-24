@@ -97,6 +97,19 @@ func registerorders(r *Registry, d Deps) {
 			return s.Reconcile(ctx, rn)
 		},
 	})
+	platformjobs.Define(r, platformjobs.Kind{
+		Name: orders.KindStrikesRecount, Owner: "W2-02", Class: platformjobs.ClassMaintenance,
+		Description: "Recounts customers' 30-day strike counts and no-show limits from strikes, so aged-out and reset strikes stop counting (01 §5.4)",
+		Schedule:    "45 3 * * *", UniqueBy: platformjobs.PerDay, Timeout: 60 * time.Second, MaxAttempts: 3, Concurrency: 1,
+		Runbook: "docs/runbooks/orders-timers.md",
+		Handler: func(ctx context.Context, rn platformjobs.Run) (platformjobs.Result, error) {
+			s, err := svc()
+			if err != nil {
+				return platformjobs.Result{}, err
+			}
+			return s.RecountStrikes(ctx, rn)
+		},
+	})
 }
 
 // lazyEnqueuer returns a func that builds one insert-only client and its

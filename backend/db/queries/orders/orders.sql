@@ -276,15 +276,45 @@ SELECT count(*)::int AS n FROM strikes
 WHERE subject_type = @subject_type AND subject_id = @subject_id AND reset_at IS NULL
   AND reason = @reason AND created_at > @since;
 
--- name: SetCustomerStrikes :execrows
--- The 30-day count, and the limit when it is reached (never shortened).
-UPDATE customer_profiles SET strikes_count_30d = @strikes,
-  limited_until = CASE
-    WHEN sqlc.narg(limited_until)::timestamptz IS NULL THEN limited_until
-    WHEN limited_until IS NULL OR limited_until < sqlc.narg(limited_until)::timestamptz THEN sqlc.narg(limited_until)::timestamptz
-    ELSE limited_until END,
-  version = version + 1
-WHERE user_id = @user_id;
+-- name: RecountCustomerStrikes :execrows
+-- Recomputes the cached strike count and the no-show limit from strikes
+-- (01 §5.4), so a strike that ages out of the window or is reset stops
+-- counting. strikes_count_30d is the customer's unreset strikes after
+-- @now - window. limited_until is the latest end of a limit: a no_show
+-- strike that, with the unreset no_show strikes in the window before it,
+-- makes @strikes, limits for limit_secs from its own time; NULL once that
+-- end has passed. It recounts @user_id (on every strike), or with @every
+-- every customer with a count or a limit, and only rows
+-- that change (the daily job).
+WITH p AS (
+  SELECT @now::timestamptz AS now, @every::boolean AS every, @user_id::uuid AS user_id,
+    @win::interval AS win, @lim::interval AS lim, @strikes::int AS strikes
+), target AS (
+  SELECT cp.user_id FROM customer_profiles cp, p
+  WHERE CASE WHEN p.every THEN cp.strikes_count_30d > 0 OR cp.limited_until IS NOT NULL
+        ELSE cp.user_id = p.user_id END
+), calc AS (
+  SELECT t.user_id,
+    (SELECT count(*) FROM strikes s
+     WHERE s.subject_type = 'customer' AND s.subject_id = t.user_id AND s.reset_at IS NULL
+       AND s.created_at > p.now - p.win)::int AS n,
+    (SELECT max(a.created_at) + p.lim FROM strikes a
+     WHERE a.subject_type = 'customer' AND a.subject_id = t.user_id AND a.reset_at IS NULL
+       AND a.reason = 'no_show' AND p.strikes > 0
+       AND (SELECT count(*) FROM strikes b
+            WHERE b.subject_type = 'customer' AND b.subject_id = t.user_id AND b.reset_at IS NULL
+              AND b.reason = 'no_show' AND b.created_at <= a.created_at
+              AND b.created_at > a.created_at - p.win) >= p.strikes
+    ) AS until,
+    p.now, p.every
+  FROM target t, p
+), next AS (
+  SELECT user_id, n, CASE WHEN until > now THEN until END AS until, every FROM calc
+)
+UPDATE customer_profiles cp SET strikes_count_30d = x.n, limited_until = x.until, version = cp.version + 1
+FROM next x
+WHERE cp.user_id = x.user_id
+  AND (NOT x.every OR cp.strikes_count_30d IS DISTINCT FROM x.n OR cp.limited_until IS DISTINCT FROM x.until);
 
 -- name: DueUnanswered :many
 -- One page of the reconcile sweep (BK-21): placed orders past accept_by by

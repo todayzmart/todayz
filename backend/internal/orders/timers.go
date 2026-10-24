@@ -6,12 +6,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/todayz/backend/gen/sqlc/ordersdb"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/ids"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/settings"
-	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
 // The orders timers (timer class, docs/runbooks/orders-timers.md).
@@ -219,43 +217,7 @@ func (s *Service) expireNoShow(ctx context.Context, orderID ids.ID, setFor *time
 		if err := s.end(ctx, o, StatusExpired, reasonNoShow, nil, system, generic, now); err != nil {
 			return err
 		}
-		return s.strike(ctx, q, o, now, r.window, r.limitFor, r.strikes)
+		return s.strikeCustomer(ctx, q, o, reasonNoShow, now, r)
 	})
 	return expired, err
-}
-
-// strike records the no-show against the customer, once per order, and
-// sets the limit when the window's count reaches the setting.
-func (s *Service) strike(ctx context.Context, q *ordersdb.Queries, o ordersdb.Order, now time.Time, window, limitFor time.Duration, limit int) error {
-	n, err := q.InsertStrike(ctx, ordersdb.InsertStrikeParams{
-		ID: ids.UUID(s.ids.New(now)), SubjectType: "customer", SubjectID: o.CustomerID,
-		OrderID: o.ID, Reason: reasonNoShow, CreatedAt: now,
-	})
-	if err != nil {
-		return fmt.Errorf("orders: strike: %w", err)
-	}
-	if n == 0 {
-		return nil // this order's strike is already there
-	}
-	count, err := q.CountActiveStrikes(ctx, ordersdb.CountActiveStrikesParams{
-		SubjectType: "customer", SubjectID: o.CustomerID, Reason: reasonNoShow, Since: now.Add(-window),
-	})
-	if err != nil {
-		return fmt.Errorf("orders: count strikes: %w", err)
-	}
-	var until *time.Time
-	if limit > 0 && int(count) >= limit {
-		until = ptr(now.Add(limitFor))
-	}
-	// TODO(lead): strikes_count_30d is the count at the last strike; nothing
-	// lowers it as strikes age out of the window (the limit itself is read
-	// from limited_until, which is right).
-	rows, err := q.SetCustomerStrikes(ctx, ordersdb.SetCustomerStrikesParams{Strikes: count, LimitedUntil: until, UserID: o.CustomerID})
-	if err != nil {
-		return fmt.Errorf("orders: customer strikes: %w", err)
-	}
-	if rows == 0 {
-		telemetry.Logger(ctx).WarnContext(ctx, "orders: no customer profile to record a strike on", "order_id", mustID(o.ID).String())
-	}
-	return nil
 }
