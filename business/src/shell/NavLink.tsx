@@ -1,5 +1,5 @@
 import { VisuallyHidden } from '@todayz/ui';
-import { Link } from '@tanstack/react-router';
+import { Link, type LinkProps } from '@tanstack/react-router';
 import { useIntl } from 'react-intl';
 import { Icon } from './Icon';
 import type { NavItem } from './nav';
@@ -13,7 +13,9 @@ export interface NavCount {
 
 /**
  * One nav entry; TanStack Router sets aria-current="page" on the active link. `to` is the plain
- * path, so it keeps working when a WP replaces the `/$section` placeholder with a static route.
+ * path, not the `/$section` template, so the route that serves it wins: a built section's static
+ * route (`/orders/`), else the placeholder. Linking the template to a built section makes the
+ * router warn that the path matched another route.
  * Overview is the landing page at `/` (B-03); its link matches `/` exactly, or it would be active
  * on every page. A zero or missing count draws no badge.
  */
@@ -38,7 +40,7 @@ export function NavLink({ item, count }: { item: NavItem; count?: NavCount | und
     );
   }
   return (
-    <Link to="/$section" params={{ section: item.section }}>
+    <Link to={`/${item.section}` as NonNullable<LinkProps['to']>}>
       <Icon icon={item.icon} />
       {label}
       {badge}

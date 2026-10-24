@@ -2,7 +2,7 @@ import en from '@todayz/i18n/compiled/customer/en.json';
 import xa from '@todayz/i18n/compiled/customer/en-XA.json';
 import { asMessages, type Messages } from '@todayz/i18n';
 import { screen, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { renderAt as renderApp } from '../test/render';
 import { NAV } from './nav';
 
@@ -27,6 +27,16 @@ describe('customer shell', () => {
     const active = within(nav).getAllByRole('link').find((l) => l.getAttribute('aria-current') === 'page');
     expect(active?.getAttribute('href')).toBe(`/${section}`);
     expect(screen.getByText('Coming soon')).toBeInTheDocument();
+  });
+
+  it('links a built section to its own route, not the /$section template (no router warning)', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    renderAt('/');
+    const nav = await screen.findByRole('navigation', { name: 'Main' });
+    expect(within(nav).getByRole('link', { name: 'Orders' })).toHaveAttribute('href', '/orders');
+    expect(within(nav).getByRole('link', { name: 'Search' })).toHaveAttribute('href', '/search');
+    expect(warn.mock.calls.flat().join(' ')).not.toMatch(/Generated path/);
+    warn.mockRestore();
   });
 
   it('shows not found for unknown paths', async () => {

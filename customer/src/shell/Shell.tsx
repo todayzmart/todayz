@@ -1,5 +1,5 @@
 import { OfflineBanner } from '@todayz/auth';
-import { Link, Outlet } from '@tanstack/react-router';
+import { Link, Outlet, type LinkProps } from '@tanstack/react-router';
 import { useIntl } from 'react-intl';
 import { Icon } from './Icon';
 import { NAV } from './nav';
@@ -29,7 +29,8 @@ export function Shell() {
               {intl.formatMessage({ id: item.label })}
             </Link>
           ) : (
-            <Link key={item.section} to="/$section" params={{ section: item.section }}>
+            // The plain path, not the `/$section` template: a built section's static route wins.
+            <Link key={item.section} to={`/${item.section}` as NonNullable<LinkProps['to']>}>
               <Icon icon={item.icon} />
               {intl.formatMessage({ id: item.label })}
             </Link>

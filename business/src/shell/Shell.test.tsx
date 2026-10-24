@@ -75,6 +75,15 @@ describe('business shell', () => {
     expect(tabs.querySelectorAll('.tz-count')).toHaveLength(0);
   });
 
+  it('links a built section to its own route, not the /$section template (no router warning)', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    renderAt('/');
+    const { side } = await navs();
+    expect(within(side).getByRole('link', { name: /^Orders\b/ })).toHaveAttribute('href', '/orders');
+    expect(warn.mock.calls.flat().join(' ')).not.toMatch(/Generated path/);
+    warn.mockRestore();
+  });
+
   it('keeps Overview active only on / (not on every page)', async () => {
     renderAt('/orders');
     const { side } = await navs();
