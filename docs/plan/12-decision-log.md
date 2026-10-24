@@ -856,6 +856,30 @@ There is no `make seed`; use `make reset`.
 - **Logging.** One `search_log` row per line with `source = basket` (the product's id for a product line); a product id that names no product is dropped silently and logs nothing.
 - Lives in: `backend/internal/baskets/`, `backend/internal/search/basket*.go`, `backend/db/migrations/21401_w2-14_baskets.sql`, `backend/api/{paths,schemas,problems}/baskets.yaml`, `customer/src/basket/`; 01 §11.4, 03, 04 §2.3, 08 BSK-05; `docs/qa/W2-14/REPORT.md`.
 
+## Reviews and ratings as built (W2-06, 2026-10-24)
+
+**D-140 · Reviews and ratings as built (W2-06).** Choices the build had to make where 01 §10, 03 and 04 were silent.
+- **Single writer.** `reviews` is the only code that writes `stores.rating_avg` and `rating_count` (D-59). The rating is the Bayesian average of the visible reviews, prior 4.0 with weight 5, computed in SQL and rounded to 2 places (`round`, half away from zero); `BayesAvg` in Go is the test oracle. Both numbers are fixed constants in code (D-92). Every review write recomputes its store inside the same transaction, under a per-store advisory lock taken after the row lock; the hourly `store_rating` job (rollup class) heals any drift.
+- **Eligibility.** The order must be the caller's and `collected` or `delivered`. A POS sale needs the W2-04 `SaleSource`; until it lands, a `posSaleId` is not eligible (`422`). One review per order or sale (unique index); a second is `409`. Someone else's order, review or report is `404`, never `403`.
+- **Edit window.** An edit is allowed while `now <= created_at + review_edit_window_days`; after that `409 review_edit_window_passed`. Stars, text and tags can change; the order cannot. A hidden review cannot be edited.
+- **Reply.** One reply per review, editable, by an owner or manager of the store (cashiers do not see reviews). A reply is published at once.
+- **Reports.** A customer may report a review that is not their own (`422` for their own); a manager may report a review of their store. One report per reporter per review; a duplicate returns `201` with the first report. A report never hides anything on its own.
+- **Moderation.** Hide and restore (of a review or of its reply) need a reason, are soft deletes (`hidden_at`), write an audit row in the same transaction and recalculate the rating. `support`, `admin` and `super_admin` can hide and restore (D-41). Hiding twice or restoring a visible one is `409 invalid_transition`. Hiding a review marks its open reports `upheld`. Resolving a report as `upheld` does not hide the review by itself; hiding is the separate act.
+- **Public list.** `GET /v1/discover/stores/{slug}/reviews` shows visible reviews only, newest first, with the customer's first name. A hidden reply is dropped from a visible review.
+- **Added beyond 04.** `GET /v1/me/reviews` (my reviews), `POST /v1/admin/reviews/{id}/reply/hide` and `.../reply/restore`, and the admin review endpoints, pulled forward from W3-05 and mounted from `routes_reviews.go` so the moderation flow is testable end to end. W3-05 builds the console screens on them.
+- **Not built.** The "New review" in-app notification (01 §10 table) waits for the W2-05 outbox consumer; nothing sends it yet.
+- Lives in: `backend/internal/reviews/`, `backend/internal/jobs/reviews.go`, `backend/cmd/todayz/routes_reviews.go`, `backend/db/migrations/20601_w2-06_reviews.sql`, `backend/api/{paths,schemas,problems}/{reviews,admin-reviews}.yaml`, `authz/policy/reviews.go`; 01 §10, 03, 04 §2.3, §2.4, §2.6; `docs/qa/W2-06/REPORT.md`.
+
+**D-141 · W2-06's open questions take the conservative defaults (lead, 24 Oct, following the founder's call in D-155).** As built:
+- A review can be edited while `now <= created_at + review_edit_window_days`.
+- A deleted customer's reviews stay, showing the first name only.
+- Cashiers cannot see or reply to reviews.
+- Upholding a report does not hide the review; hiding is a separate action, and it upholds open reports.
+- A duplicate report returns `201` with the first report.
+- Reporting your own review is `422`.
+- Hiding or restoring twice is `409 invalid_transition`.
+- The "New review" notification waits for the W2-05 consumer.
+
 ## Offers, discounts and banners as built (W2-07, 2026-10-24)
 
 **D-150 · Offer pricing as built: kinds, rounding, caps and what is immutable (W2-07).** Choices the build had to make where 01 §12 was silent.
