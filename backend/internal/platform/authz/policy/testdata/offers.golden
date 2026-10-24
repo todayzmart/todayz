@@ -1,0 +1,5 @@
+# domain offers: one line per (role x action); regenerate with -update
+offers.manage kind=business step-up=false
+offers.manage owner allow
+offers.manage manager allow
+offers.manage cashier -

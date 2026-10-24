@@ -189,8 +189,9 @@ ORDER BY distance_m, s.id
 LIMIT @lim;
 
 -- name: ItemPrices :many
--- List prices of store items (turns a flat offer into a percent for ranking).
-SELECT id, price_paise FROM store_items WHERE id = ANY(@ids::uuid[]);
+-- The store and list price of store items (the has-offer lookup and the
+-- ranking of a flat offer against a percent one).
+SELECT id, store_id, price_paise FROM store_items WHERE id = ANY(@ids::uuid[]);
 
 ------------------------------------------------------------------------------
 -- Events

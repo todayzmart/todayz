@@ -1,0 +1,6 @@
+# domain banners: one line per (role x action); regenerate with -update
+banners.manage kind=business step-up=false
+banners.manage owner allow
+banners.manage manager allow
+banners.manage cashier -
+me.banners.tap kind=customer step-up=false
