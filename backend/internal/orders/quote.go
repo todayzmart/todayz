@@ -209,7 +209,7 @@ func (s *Service) price(ctx context.Context, customerID ids.ID, st ordersdb.Stor
 	q.itemsAfterOffers = q.subtotal - q.discount
 	q.offers = pr.Offers
 
-	// Credits (none until the credits WP).
+	// Credits (W2-01): what the wallet, the per-order max and the caps allow.
 	al, err := s.credits.Allow(ctx, customerID, storeID, q.creditsRequested, q.itemsAfterOffers)
 	if err != nil {
 		return quoted{}, fmt.Errorf("orders: credits: %w", err)

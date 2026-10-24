@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/gen/sqlc/ordersdb"
@@ -125,6 +126,11 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		if err != nil {
 			return fmt.Errorf("orders: insert order: %w", err)
 		}
+		if qq.creditsUsed > 0 {
+			if err := s.holdCredits(ctx, qq, orderID, p.UserID, st, c, now); err != nil {
+				return err
+			}
+		}
 		for _, l := range qq.lines {
 			snap, err := json.Marshal(snapshot{
 				ProductID: l.productID.String(), Name: l.row.Name, Variant: l.row.Variant, PackSize: l.row.PackSize,
@@ -169,4 +175,37 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		return ids.Zero, asProblem(err)
 	}
 	return orderID, nil
+}
+
+// holdCredits holds the order's credits in its transaction. The quote's
+// Allow did not lock, so a spend or a cap reached since can still refuse:
+// a credit rule answers its own problem; a wallet that no longer covers the
+// credits answers price_changed with the quote as it is now.
+func (s *Service) holdCredits(ctx context.Context, qq quoted, orderID, customerID ids.ID, st ordersdb.StoreForBookingRow, c cart, now time.Time) error {
+	al, err := s.credits.Hold(ctx, CreditsHold{
+		OrderID: orderID, CustomerID: customerID, StoreID: mustID(st.ID),
+		Credits: qq.creditsUsed, EligiblePaise: qq.itemsAfterOffers,
+	})
+	if err != nil {
+		return fmt.Errorf("orders: hold credits: %w", err)
+	}
+	if al.Allowed >= qq.creditsUsed {
+		return nil
+	}
+	if code, ok := creditProblems[al.Limit]; ok {
+		return problem.New(code, "")
+	}
+	fresh, err := s.price(ctx, customerID, st, c, now)
+	if err != nil {
+		return err
+	}
+	return problem.New(genproblems.PriceChanged, "").WithExtension("quote", fresh.view())
+}
+
+// creditProblems are the credit rules' refusals (wallet.yaml).
+var creditProblems = map[string]string{
+	"below_credit_minimum": genproblems.BelowCreditMinimum,
+	"credit_max_exceeded":  genproblems.CreditMaxExceeded,
+	"credit_monthly_cap":   genproblems.CreditMonthlyCap,
+	"store_credit_cap":     genproblems.StoreCreditCap,
 }

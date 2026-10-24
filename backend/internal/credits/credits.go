@@ -18,9 +18,12 @@
 //
 //   - Every posting is one ledger_transactions row whose entries sum to 0;
 //     the entries move account_balances in the same statement.
-//   - Every posting locks the account_balances rows it touches FOR UPDATE,
-//     in account id order, and checks customer_wallet and customer_held
-//     there: they never go below 0.
+//   - Every posting first locks the customer and store account_balances rows
+//     it touches FOR UPDATE, in one statement in account id order, then the
+//     hold, then the lots; it checks customer_wallet and customer_held
+//     there: they never go below 0. Platform rows are not locked up front;
+//     their entries are written last, so a hot platform row is held only
+//     until commit and never waited on while a customer row is wanted.
 //   - Every credit into a customer_wallet creates a lot; spending and debits
 //     consume lots by earliest expires_at (then id). A release goes back to
 //     the same lots; the part on a lot whose expires_at has passed goes to

@@ -182,6 +182,11 @@ func (s *Service) end(ctx context.Context, o ordersdb.Order, to, reason string, 
 	if _, err := q.ReleaseReservations(ctx, ordersdb.ReleaseReservationsParams{Reason: &reason, OrderID: o.ID}); err != nil {
 		return fmt.Errorf("orders: release stock: %w", err)
 	}
+	if o.CreditsUsed > 0 {
+		if err := s.credits.Release(ctx, mustID(o.ID)); err != nil {
+			return fmt.Errorf("orders: release credits: %w", err)
+		}
+	}
 	v, err := q.SetEnded(ctx, ordersdb.SetEndedParams{Status: to, Reason: &reason, Note: note, ID: o.ID})
 	if err != nil {
 		return fmt.Errorf("orders: end order: %w", err)
@@ -483,10 +488,13 @@ func (s *Service) collect(ctx context.Context, o ordersdb.Order, by ids.ID, meth
 			return fmt.Errorf("orders: consume stock: %w", err)
 		}
 	}
-	// TODO(lead): cashback (the store's cashback_bp) is not credited until
-	// the credits WP lands, so the order records 0 rather than a promise no
-	// ledger keeps.
-	v, err := q.SetCollected(ctx, ordersdb.SetCollectedParams{Now: &now, PaymentMethod: &method, CashbackCredits: 0, ID: o.ID})
+	// The held credits go to the store and the store's cashback is paid on
+	// the items after offers less the credits (D-02).
+	cashback, err := s.credits.Complete(ctx, mustID(o.ID), mustID(o.CustomerID), mustID(o.StoreID), o.ItemsAfterOffersPaise)
+	if err != nil {
+		return fmt.Errorf("orders: settle credits: %w", err)
+	}
+	v, err := q.SetCollected(ctx, ordersdb.SetCollectedParams{Now: &now, PaymentMethod: &method, CashbackCredits: i32(cashback), ID: o.ID})
 	if err != nil {
 		return fmt.Errorf("orders: collect: %w", err)
 	}
