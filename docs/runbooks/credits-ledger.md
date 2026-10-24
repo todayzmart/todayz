@@ -23,12 +23,12 @@ anyone spend an expired credit. Job arguments carry no customer data.
 | `reason` | Means |
 |---|---|
 | `unbalanced` | A transaction whose entries do not sum to 0. The trigger should make this impossible. |
-| `negative` | A customer wallet, held balance or lot amount below 0. |
-| `lots_vs_balances` | Σ lot remaining ≠ the wallet, or Σ lot held ≠ the held balance. |
-| `holds` | A hold whose amounts break its status (captured + released > amount, a closed hold with credits left). |
-| `held_vs_holds` | Σ open holds ≠ the customer's held balance. |
+| `negative` | A customer wallet or held balance below 0. |
+| `lots_vs_balances` | Per customer, Σ lot (remaining + held) ≠ wallet + held. |
+| `holds` | An open hold whose lots do not hold exactly amount − released, or a settled hold whose lots still hold credits. |
+| `held_vs_holds` | Σ (amount − released) of a customer's open holds ≠ their held balance. |
 | `cache_drift` | `account_balances` ≠ Σ `ledger_entries` for an account. |
-| `lot_drift` | A lot ≠ its original amount + Σ its consumptions. |
+| `lot_drift` | A lot's remaining ≠ original + Σ its remaining deltas, or its held ≠ Σ its held deltas. |
 
 ## First three checks
 
@@ -45,8 +45,8 @@ anyone spend an expired credit. Job arguments carry no customer data.
 - **"no notification sender for the reminder"**: the worker could not build notify (boot log).
 - **A setting cannot be read** (`credit_expiry_days`, `credit_expiry_reminder_days`): fix the
   row in `platform_settings` (A-20).
-- **Drift above 0**: a bug, or a write that went around the service. The tables are append-only
-  for `todayz_app` except the balance, lot and hold rows the service updates. Find the first
+- **Drift above 0**: a bug, or a write that went around the service. `todayz_app` cannot update or
+  delete accounts, transactions, entries or consumptions; it updates only balance, hold and lot rows. Find the first
   transaction where the account's Σ entries stop matching.
 
 ## Fix
