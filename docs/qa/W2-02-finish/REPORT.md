@@ -87,23 +87,46 @@ Also 526750e: the settings lint flagged the literal 10000 (100 % in basis points
 - The partial accept keeps the delivery fee at 0 (`TODO(lead)` in `billFor`); the delivery WP recomputes it on the kept lines.
 - The D-69 72 h delivery-failed auto-confirm flag (see Skipped).
 
+## Second review (8c2bbb1..9c3898c, items 1 to 5)
+
+| Item | What changed | Commit | Test |
+|---|---|---|---|
+| 1. Duplicate open `store_strikes` flags | `strikeStore` takes a per-store transaction advisory lock (`LockStoreStrikes`, `pg_advisory_xact_lock(hashtextextended('store_strikes:' \|\| store, 0))`, the `LockStoreReviews` precedent) before it inserts the strike and counts. `flagStores` takes the same lock before each flag insert, so the daily `store_reliability` job (now in a transaction) and a strike in flight do not both raise one. `StoresAtStrikeThreshold` orders by store, so the job takes the locks in one order | 6ab8124 | `TestStoreStrikesAtOnceRaiseOneFlag`: 4 strikes, then two admin cancels with `strike: store` at once on orders with no item in common. Result: 6 strikes, 1 open flag |
+| 2. Lost strike count under concurrent no-shows | `expireNoShow`, and the admin cancel with the customer at fault, take `LockCustomer` (the users row placing takes) before the order's stock moves. That keeps the lock order customer → store_items → ledger. `strikeCustomer` and `recount` then run under it. The daily `customer_strikes_recount` job has the same lost update, so it locks every customer it recounts in id order first (`LockStrikeCustomers`, in a transaction) | 6ab8124 | `TestNoShowsAtOnceCountEachOther`: one no-show, then two holds expiring at once. Result: count 3 and limited |
+| 3. Problem order in `checkCreditsAsked` | The quote's limit decides, in the quote's order (minimum, store cap, monthly cap, max). `credit_max_exceeded` comes only when the max is the limit, or when the limit is the wallet (no problem of its own) and the ask is over the max. Otherwise it is `price_changed` with the quote | de5a029 | `TestCR02…`: ₹55 cart with 31 credits gives quote `below_credit_minimum`, and placing gives 409 `below_credit_minimum`. 31 credits with 10 in the wallet gives `credit_max_exceeded` |
+| 4. Confirm raising the total | `price_changed` (409) exists, so it is used. If the credits kept now (`credits.Kept`) are fewer than the preview, `confirm-partial` lowers the preview to them (credits, total, version + 1), commits that, and answers 409 `price_changed`. Nothing is reserved or charged. The customer sees the new total and confirms again. `recapCredits` refuses the same way if the hold would be cut below the preview. Added to the operation's description and `x-problems`; `make gen` ran. The customer's C-12 already shows "This order has changed again" on any 409 and refetches, so no UI change | c3373df | `TestConfirmPartialRecapsCredits`: max dropped to 5. The first confirm gets 409 `price_changed`, still `awaiting_customer`, nothing reserved, wallet untouched. The GET shows 5 credits, ₹105 and a higher version. The second confirm gets 200: 5 credits used, wallet 35 |
+| 5. B-04 card at 360 px | No change needed. "Accept part" fits on one line, unclipped, with all three buttons on one row | a72be16 | `orders.shots.spec.ts` "360 px": the three buttons share one top. Each has `scrollWidth <= clientWidth`, a single text line, and a right edge ≤ 360. Checked once at 280 px, where it fails ("Accept part … is clipped"), so the assertion bites. Shot `w2-02-accept-part-card-360.png` |
+
+**Deviation from the review, item 1.** The review suggested `SELECT … FOR UPDATE` on the stores row. I used an advisory lock instead, for two reasons:
+- Every new order's foreign key takes `KEY SHARE` on its store, so `FOR UPDATE` would stall placing at that store for the rest of the cancel's transaction.
+- The strike comes after the order's store_items are locked, and hand-over locks stores before store_items, so a stores-row lock here would invert that order.
+
+The advisory key is per store and is taken only by the strike paths. No partial unique index was added; the review marked it optional.
+
+**How the two race tests prove the race.** The two orders have no item in common, so their store_items locks cannot serialise them. A test-only trigger sleeps 300 ms after the strike insert. A second one sleeps on the write after the count: the flag insert, or the profile recount. With both locks stubbed out, each test failed 3 runs out of 3 (2 flags; count not 3). With the locks, both pass.
+
+Noted, not changed (lead's call):
+- **Version bump on recount (finding 6):** a single-customer recount always rewrites `customer_profiles` and bumps `version`, even when the count and limit are unchanged.
+- **Dropped offer's redemption:** see Questions 3.
+- Below 360 px, "Accept part" clips (seen at 280 px). 360 is the narrowest width tested.
+
 ## Evidence
 
 | Check | Result |
 |---|---|
-| All checks below were rerun on the final commit of this pass (53456a4 plus the docs commit) | |
+| All checks below were rerun after the second review's fixes (a72be16 plus this report). The business checks were rerun; customer and i18n have not changed since the first pass | |
 | `make gen` | exit 0 |
 | `gofmt -l`, `go vet ./...` | clean |
 | `golangci-lint run ./...` (`.tools/bin`) | 0 issues |
 | settings lint (`go run ./internal/devtools/settingslint .`) | clean |
 | `go test -race -p 2 ./...` (shared test Postgres, `TODAYZ_TEST_PG_URL_FILE`) | ok in every package. `internal/platform/realtime` keeps its own container (`MainOwnServer`), so it ran separately with `DOCKER_HOST` set as `make check` does: ok |
-| New Go tests | `TestBK22AutoAccept`, `TestBK21ReconcileSweep`, `TestBK21ReconcileFailingOrderDoesNotBlockTheOthers`, the partial tests in `orders_partial_http_test.go` (including `TestPartialAcceptRepricesOffers`, `TestPartialAcceptRepricesBuyXGetY`, `TestPartialAcceptKeepsAskReplyPrice` and `TestConfirmPartialRecapsCredits`), `TestCR02PlacingRefusesCreditsItCannotUse`, BK-16 in `orders_http_test.go` and `orders_strikes_http_test.go` (`TestBK16LimitEnds` now checks the limit lifts at day 31), `orders_admin_http_test.go`, `orders_deadline_http_test.go` |
-| Contract (`make check-contract`: redocly lint, api-client lint/types/tests, hooks, `TestContractSmoke`) | exit 0. Redocly: valid, with 10 warnings, none in the orders files (unused components and existing examples). api-client: 42 tests passed. `TestContractSmoke` and `TestContractProblemCheckFires`: ok |
+| New Go tests | `TestBK22AutoAccept`, `TestBK21ReconcileSweep`, `TestBK21ReconcileFailingOrderDoesNotBlockTheOthers`, the partial tests in `orders_partial_http_test.go` (including `TestPartialAcceptRepricesOffers`, `TestPartialAcceptRepricesBuyXGetY`, `TestPartialAcceptKeepsAskReplyPrice` and `TestConfirmPartialRecapsCredits`), `TestCR02PlacingRefusesCreditsItCannotUse`, BK-16 in `orders_http_test.go` and `orders_strikes_http_test.go` (`TestBK16LimitEnds` now checks the limit lifts at day 31), `orders_admin_http_test.go`, `orders_deadline_http_test.go`, and from the second review `TestStoreStrikesAtOnceRaiseOneFlag` and `TestNoShowsAtOnceCountEachOther` (`orders_race_test.go`) |
+| Contract (`make check-contract`: redocly lint, api-client lint/types/tests, hooks, `TestContractSmoke`) | exit 0. Redocly: valid, with 9 warnings, none in the orders files (unused components and existing examples). api-client: 42 tests passed. `TestContractSmoke` and `TestContractProblemCheckFires`: ok |
 | customer lint, lint:css, typecheck, unit tests | clean; 124 passed |
 | business lint, lint:css, typecheck, unit tests | clean; 362 passed |
 | `@todayz/i18n` tests, `lint:messages` | 197 passed; clean |
 | customer `transactions.shots.spec.ts` (second pass; no UI change since) (built with `build:e2e`, run under `vite preview`) | 7 passed |
-| business `orders.shots.spec.ts` (same setup, second pass) | 2 passed |
+| business `orders.shots.spec.ts` (same setup, with the 360 px case) | 3 passed |
 
 ## Screenshots
 
@@ -112,6 +135,7 @@ These are in `docs/qa/W2-02-finish/`, at 390 px unless marked otherwise.
 | File | Shows |
 |---|---|
 | `w2-02-accept-part-card.png` | B-04 desktop: a New card with one short line and one out-of-stock line. Accept is disabled; the hint is shown, and Reject, Accept part and Accept sit on one row |
+| `w2-02-accept-part-card-360.png` | B-04 at 360 px: the same card; Reject, Accept part and Accept on one row, none clipped or wrapped |
 | `w2-02-accept-part-sheet.png` | B-04 phone: the Accept part sheet, prefilled as 2, 1 and 0 |
 | `w2-02-partial-confirm.png` | C-12: "Raju Kirana changed your order", with the items total, credits used, new total, countdown, Take it and Cancel |
 | `w2-02-limit-banner.png` | C-11: the C-21 banner with its end date |
@@ -148,7 +172,7 @@ The first pass's six questions are answered: re-price offers (1), re-cap credits
 - Nothing ran against the full local stack (`make dev`, `make e2e` and the stack journeys were out of bounds). The screenshots use a faked API.
 - Real-time behaviour (SSE) of the new statuses in the browser was not checked; the specs answer the stream with an empty body.
 - The sweep was tested with the fake jobs runner (`RunScheduled`), not a live River worker.
-- There are no load or concurrency tests beyond the lock-order tests in the Go suite.
+- There are no load tests. Concurrency is covered only by the lock-order tests and the two strike race tests in the Go suite.
 
 ## Files changed outside the orders, checkout, customer-orders and business-orders areas
 
