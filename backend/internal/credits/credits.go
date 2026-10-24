@@ -125,7 +125,8 @@ type Holder interface {
 	// Hold holds req.Credits (> 0) for req.Ref. It holds all of them or
 	// none: a refusal returns Allowed 0 and the Limit, with a nil error (a
 	// cap refusal also raises a risk flag that survives the caller's
-	// rollback). A repeat for a ref already held returns its amount.
+	// rollback). A repeat for a ref already held returns its amount
+	// (Allowed and Max only; Available is not read again).
 	Hold(ctx context.Context, req HoldRequest) (Allowance, error)
 	// Recap re-caps an open hold against a new eligible amount (a partial
 	// accept, D-28, CR-17): it keeps min(held, credit_max_per_order, the ₹1

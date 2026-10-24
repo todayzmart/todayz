@@ -194,7 +194,8 @@ FROM moved m
 JOIN ledger_transactions t ON t.id = m.transaction_id
 LEFT JOIN orders o ON t.ref_type = 'order' AND o.id = t.ref_id
 LEFT JOIN stores so ON so.id = o.store_id
-LEFT JOIN credit_holds h ON t.ref_type = 'bill_claim' AND h.bill_claim_id = t.ref_id
+LEFT JOIN credit_holds h ON (t.ref_type = 'bill_claim' AND h.bill_claim_id = t.ref_id)
+  OR (t.ref_type = 'order' AND h.order_id = t.ref_id)
 LEFT JOIN stores sh ON sh.id = h.store_id
 WHERE (sqlc.narg(cursor_at)::timestamptz IS NULL
   OR (t.created_at, t.id) < (sqlc.narg(cursor_at)::timestamptz, @cursor_id::uuid))
