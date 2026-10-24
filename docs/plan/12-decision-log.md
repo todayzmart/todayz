@@ -1183,3 +1183,19 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 - TODO(lead): removing `MSG91_AUTH_KEY` from `modules/secrets` destroys that secret if it was ever applied. Nothing has been applied yet.
 - TODO(lead): price. `CostPerUnitPaise` for SMS still needs the AWS India price per part.
 - TODO(lead): legacy routes. Remove the legacy MSG91 SMS mock routes when nothing uses them.
+
+## Frontends live on Cloudflare Pages before AWS (lead, 2026-10-24)
+
+**D-214 · The four Pages sites go live now, and deploy from GitHub Actions on every push to main.**
+
+The founder asked for the landing site and every UI to be live on GitHub and Cloudflare while the AWS account is still blocked.
+
+- **What is live.** Pages projects `todayz-site`, `todayz-customer`, `todayz-business` and `todayz-admin`, serving todayz.in and www.todayz.in, app., business. and admin.todayz.in. The apex A record and the www CNAME that pointed at Vercel now point at `todayz-site.pages.dev`. Mail (MX, SPF, DMARC, autodiscover, `email.`) is unchanged; the `_vercel` TXT records are left in place and can go.
+- **Until the API is on AWS**, the UIs load but sign-in and data fail: api.todayz.in has no record yet.
+- **Turnstile.** A `todayz-prod` widget (managed, for todayz.in, app., business. and api.) was created. Its site key is public and lives in `infra/cloudflare/pages.env` with the other build settings. The secret stays in Cloudflare and goes into Secrets Manager as `TURNSTILE_SECRET_KEY` with the AWS stack.
+- **Made by hand, not by Terraform.** The projects, Pages domains, DNS records and Turnstile widget were created through the Cloudflare API, because Terraform's state backend is the S3 bucket that does not exist yet. When the state bucket exists, `infra/cloudflare` imports them (import blocks with the same names) before its first apply, so nothing is recreated. The Terraform module does not yet know `www.`; add it to the site project there.
+- **Deploy.** `.github/workflows/deploy.yml` has two jobs. `build` (no secrets) runs `make setup`, `make gen` and `scripts/deploy/pages.sh build`, and uploads `.cache/pages`. `deploy` downloads that and runs `scripts/deploy/pages.sh deploy` (wrangler pinned, via npx) with `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` from repository secrets, so the secret never shares a job with package installs.
+- **wflint exception (amends W0-06's "no secrets").** `scripts/ci/wflint/secrets-allow.txt` lists `path NAME` pairs. A listed workflow may set a step `env:` value to exactly `${{ secrets.NAME }}` for a listed name; a secret anywhere else (run blocks, `with:`, longer strings, `if:`, `secrets:` keys, unlisted names or files) still fails. The selftest proves each case.
+- **Build output.** Hidden source maps are deleted before upload (error symbolication can come with Sentry later). The three Vite apps get a `_headers` file from the script: nosniff, referrer policy, frame DENY, HSTS without `includeSubDomains`, a permissions policy, and caching for `sw.js` and `/assets/*`. They have no CSP yet; the site keeps its own CSP.
+- TODO(lead): the repository secret is the founder's admin Cloudflare token. Replace it with a token scoped to Cloudflare Pages edit on this account, then rotate the admin token.
+- TODO(lead): a CSP for the three apps, proved by an e2e run against a prod-mode build.

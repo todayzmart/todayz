@@ -22,7 +22,9 @@
 //	permissions  missing at workflow or job level, not a mapping, or any value other
 //	             than read or none (write-all, read-all and write in any spelling)
 //	secrets      `secrets` inside any ${{ }} (run blocks and comments included), in an
-//	             `if:` condition, github.token, or a `secrets:` key (secrets: inherit)
+//	             `if:` condition, github.token, or a `secrets:` key (secrets: inherit).
+//	             One exception (D-214): a workflow in secrets-allow.txt may set an env:
+//	             value to exactly ${{ secrets.NAME }} for a NAME listed with it there.
 //	pin          a remote action not pinned by a 40-hex SHA with a `# vX.Y.Z` comment,
 //	             or a docker:// action, container or services image without @sha256:
 //	uses         a ./ path outside .github/actions/, or an action owner that is not in
@@ -75,7 +77,8 @@ type linter struct {
 	canonical map[string]bool
 	owners    map[string]bool
 	idToken   map[string]bool
-	goMods    []string // repo-relative dirs holding a go.mod (dependabot coverage)
+	secrets   map[string]map[string]bool // workflow → secret names it may read (secrets-allow.txt)
+	goMods    []string                   // repo-relative dirs holding a go.mod (dependabot coverage)
 	tf        *tfScanner
 	findings  []finding
 	seen      map[string]bool
@@ -380,8 +383,31 @@ func (l *linter) loadPolicy() error {
 	if l.idToken, err = readList(filepath.Join(dir, "id-token-allow.txt")); err != nil {
 		return err
 	}
+	if l.secrets, err = readPairs(filepath.Join(dir, "secrets-allow.txt")); err != nil {
+		return err
+	}
 	l.goMods = findGoMods(l.root)
 	return nil
+}
+
+// readPairs reads "path NAME" lines (comments after #) into path → set of names.
+func readPairs(p string) (map[string]map[string]bool, error) {
+	list, err := readList(p)
+	if err != nil {
+		return nil, err
+	}
+	out := map[string]map[string]bool{}
+	for line := range list {
+		f := strings.Fields(line)
+		if len(f) != 2 {
+			return nil, fmt.Errorf("%s: want \"path NAME\", got %q", filepath.Base(p), line)
+		}
+		if out[f[0]] == nil {
+			out[f[0]] = map[string]bool{}
+		}
+		out[f[0]][f[1]] = true
+	}
+	return out, nil
 }
 
 func readList(p string) (map[string]bool, error) {
