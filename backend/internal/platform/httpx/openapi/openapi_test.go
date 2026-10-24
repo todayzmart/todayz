@@ -309,6 +309,48 @@ func TestWrongType(t *testing.T) {
 	assert.Equal(t, map[string]string{"body.items": "value must be an array"}, f)
 }
 
+// A whole number written as 1.0 or 1e0 is an integer to JSON Schema; the
+// handler reads it as a plain integer, so encoding/json can fill an int
+// (D-217, contract fuzzing on GitHub).
+func TestWholeNumbersReachTheHandlerAsIntegers(t *testing.T) {
+	v := newValidator(t)
+	type order struct {
+		Items []struct {
+			Sku      string `json:"sku"`
+			Quantity int    `json:"quantity"`
+		} `json:"items"`
+		Note string `json:"note"`
+	}
+	for _, body := range []string{
+		`{"items":[{"sku":"a","quantity":2.0}]}`,
+		`{"items":[{"sku":"a","quantity":2e0}]}`,
+		`{"items":[{"sku":"a","quantity":0.2E1}],"note":"x"}`,
+	} {
+		req := jsonReq(http.MethodPost, ordersP, body)
+		require.NoError(t, v.ValidateRequest(req), body)
+		b, err := io.ReadAll(req.Body)
+		require.NoError(t, err)
+		assert.Equal(t, int64(len(b)), req.ContentLength, body)
+		var o order
+		require.NoError(t, json.Unmarshal(b, &o), body)
+		require.Len(t, o.Items, 1)
+		assert.Equal(t, 2, o.Items[0].Quantity, body)
+	}
+
+	// Nothing to rewrite: the bytes are untouched (key order, spacing, a fraction).
+	for _, body := range []string{validJS, `{ "items": [ {"sku":"e.E","quantity":3} ], "note": "a b" }`} {
+		req := jsonReq(http.MethodPost, ordersP, body)
+		require.NoError(t, v.ValidateRequest(req))
+		b, err := io.ReadAll(req.Body)
+		require.NoError(t, err)
+		assert.Equal(t, body, string(b))
+	}
+
+	// A fraction stays a refused non-integer.
+	_, _, f := fields(t, v.ValidateRequest(jsonReq(http.MethodPost, ordersP, `{"items":[{"sku":"a","quantity":2.5}]}`)))
+	assert.Equal(t, map[string]string{"body.items[0].quantity": "value must be an integer"}, f)
+}
+
 func TestUnknownFieldRefused(t *testing.T) {
 	// 04 §1.4: request objects are closed (additionalProperties: false).
 	v := newValidator(t)

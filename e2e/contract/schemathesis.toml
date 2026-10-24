@@ -24,3 +24,11 @@ checks.positive_data_acceptance.expected-statuses = ["2xx", "401", "403", "404",
 [[operations]]
 include-operation-id = ["openReferralLink"]
 checks.positive_data_acceptance.expected-statuses = ["2xx", "302", "401", "403", "404", "409", "429", "5xx"]
+
+# The lead form's free text (name, shopName, city) is checked past the contract's
+# pattern: valid UTF-8 with no control characters (a C1 control like U+009D
+# matches \S), since a lead lands in SMS and CSV exports. The fuzzing phase sends
+# one, and 422 validation_failed on that field is the right answer (D-217).
+[[operations]]
+include-operation-id = ["createLead"]
+checks.positive_data_acceptance.expected-statuses = ["2xx", "401", "403", "404", "409", "422", "429", "5xx"]

@@ -34,11 +34,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"mime"
 	"net/http"
 	"net/url"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -237,7 +239,85 @@ func (v *Validator) ValidateRequest(r *http.Request) error {
 	if err := openapi3filter.ValidateRequest(r.Context(), in); err != nil {
 		return toProblem(err)
 	}
+	if !opts.ExcludeRequestBody {
+		wholeNumbers(r)
+	}
 	return nil
+}
+
+// wholeNumbers rewrites, in a JSON body the contract has accepted, a whole
+// number written with a fraction or an exponent (1.0, 2e3) as a plain integer
+// (D-217). JSON Schema counts 1.0 as an integer, so the validator lets it
+// through, but encoding/json refuses it for an int field and the handler would
+// answer 400 to a request the contract allows. Only values within ±2^53 are
+// rewritten (a float field reads the integer just as well); a body with
+// nothing to rewrite is left byte for byte.
+func wholeNumbers(r *http.Request) {
+	if r.Body == nil || r.Body == http.NoBody {
+		return
+	}
+	data, err := io.ReadAll(r.Body) // kin-openapi left the validated bytes in memory
+	if out, ok := rewriteWholeNumbers(data); err == nil && ok {
+		data = out
+		r.ContentLength = int64(len(data))
+		r.Header.Set("Content-Length", strconv.Itoa(len(data)))
+	}
+	r.Body = io.NopCloser(bytes.NewReader(data))
+}
+
+func rewriteWholeNumbers(data []byte) ([]byte, bool) {
+	if !bytes.ContainsAny(data, ".eE") {
+		return nil, false
+	}
+	dec := json.NewDecoder(bytes.NewReader(data))
+	dec.UseNumber()
+	var v any
+	if dec.Decode(&v) != nil {
+		return nil, false
+	}
+	v, changed := wholeIn(v)
+	if !changed {
+		return nil, false
+	}
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetEscapeHTML(false)
+	if enc.Encode(v) != nil {
+		return nil, false
+	}
+	return bytes.TrimSuffix(buf.Bytes(), []byte("\n")), true
+}
+
+func wholeIn(v any) (any, bool) {
+	switch t := v.(type) {
+	case json.Number:
+		s := string(t)
+		if !strings.ContainsAny(s, ".eE") {
+			return t, false
+		}
+		f, err := strconv.ParseFloat(s, 64)
+		if err != nil || f != math.Trunc(f) || math.Abs(f) > 1<<53 {
+			return t, false
+		}
+		return json.Number(strconv.FormatInt(int64(f), 10)), true
+	case map[string]any:
+		changed := false
+		for k, e := range t {
+			if n, ok := wholeIn(e); ok {
+				t[k], changed = n, true
+			}
+		}
+		return t, changed
+	case []any:
+		changed := false
+		for i, e := range t {
+			if n, ok := wholeIn(e); ok {
+				t[i], changed = n, true
+			}
+		}
+		return t, changed
+	}
+	return v, false
 }
 
 // undeclaredQuery refuses a query name the operation does not declare, as an
