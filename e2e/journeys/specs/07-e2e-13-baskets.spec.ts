@@ -57,9 +57,12 @@ test('E2E-13 a basket one shop has in full → Fill cart → order → pickup; a
   }
 });
 
-/** Adds the first item card's line on the page to Sunday breakfast and waits for the toast. */
+/**
+ * Adds the first item on the page to Sunday breakfast and waits for the toast. Result cards and shop
+ * pages use the compact button ("Add to basket: {name}"); the product page's is just "Add to basket".
+ */
 async function addFirstToBasket(page: import('@playwright/test').Page) {
-  await page.getByRole('button', { name: /^Add to basket: / }).first().click();
+  await page.getByRole('button', { name: /^Add to basket(: |$)/ }).first().click();
   await page.getByRole('button', { name: /Sunday breakfast/ }).click();
   await expect(page.getByText(/Added .* to Sunday breakfast/)).toBeVisible();
 }

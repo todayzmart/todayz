@@ -66,7 +66,9 @@ test('E2E-10 the customer shop page (C-07) shows the rating', async ({ who, brow
     await page.goto(`/s/${STORES.SL.slug}`);
     expect((await store).status(), 'GET /v1/discover/stores/{slug} for the shop page').toBe(200);
     await expect(page.getByRole('heading', { level: 1, name: STORES.SL.name })).toBeVisible();
-    await expect(page.getByText(new RegExp(`${countWith || ''}\\s*(ratings?|reviews?)`, 'i')).first()).toBeVisible();
+    // The meta line shows the average and the count, e.g. "3.5 (1)".
+    const { count } = await rating();
+    await expect(page.getByText(new RegExp(`\\d(\\.\\d)? \\(${count}\\)`)).first()).toBeVisible();
   } finally {
     await app.close();
   }

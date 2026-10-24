@@ -6,8 +6,7 @@ import { SL_ITEMS, STORES } from '../../fixtures/seed';
 // with W3-09/W3-05), so only the "before" half runs: 30 credits are used, 40 are refused.
 //
 // More credits than `credit_max_per_order` is a 409 `credit_max_exceeded` (04-api, 08 CR-02; the
-// lead's answer to Q-1 in docs/qa/W2-13/REPORT.md). Until W2-02 finish lands, the order API clamps
-// 40 to 30 instead and answers the total for 40 with price_changed: that is a runtime fixme.
+// lead's answer to Q-1 in docs/qa/W2-13/REPORT.md; D-216, W2-02 finish).
 test('E2E-12 before the change: 30 credits are used, 40 are refused with credit_max_exceeded', async ({ who }) => {
   const c = new Customer(await who('referee'));
   const credits = (await c.wallet()).availableCredits;
@@ -28,10 +27,6 @@ test('E2E-12 before the change: 30 credits are used, 40 are refused with credit_
 
   await test.step('40 credits: refused with credit_max_exceeded, nothing held', async () => {
     const r = await c.api.post<Order>('/v1/me/orders', { storeId: STORES.SL.id, fulfilment: 'pickup', items, creditsToUse: 40, expectedTotalPaise: 50000 - 4000 });
-    test.fixme(
-      r.status === 409 && r.code === 'price_changed',
-      'credit_max_exceeded on an over-cap order is in W2-02 finish: the order API still clamps 40 to 30 (backend/internal/orders/create.go)',
-    );
     expect(r.status, `order with 40 credits: ${r.code}`).toBe(409);
     expect(r.code).toBe('credit_max_exceeded');
     await waitForCredits(c, credits);
