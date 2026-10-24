@@ -34,20 +34,21 @@ const (
 
 // searchReq is GET /v1/discover/search after defaults.
 type searchReq struct {
-	Q        string
-	Lat, Lng float64
-	RadiusM  int
-	Category string
-	Brand    string
-	OpenNow  bool
-	Pickup   bool
-	Delivery bool
-	HasOffer bool
-	MaxPrice *int64
-	Sort     string
-	Source   string
-	Limit    int
-	Cursor   *string
+	Q         string
+	Lat, Lng  float64
+	RadiusM   int
+	Category  string
+	Brand     string
+	ProductID *string
+	OpenNow   bool
+	Pickup    bool
+	Delivery  bool
+	HasOffer  bool
+	MaxPrice  *int64
+	Sort      string
+	Source    string
+	Limit     int
+	Cursor    *string
 }
 
 func searchReqFrom(p discoverapi.SearchDiscoverParams) searchReq {
@@ -64,6 +65,7 @@ func searchReqFrom(p discoverapi.SearchDiscoverParams) searchReq {
 	if p.Brand != nil {
 		r.Brand = *p.Brand
 	}
+	r.ProductID = p.ProductId
 	r.OpenNow = p.OpenNow != nil && *p.OpenNow
 	r.Pickup = p.Pickup != nil && *p.Pickup
 	r.Delivery = p.Delivery != nil && *p.Delivery
@@ -229,6 +231,13 @@ func (s *Service) find(ctx context.Context, q *searchdb.Queries, req searchReq, 
 			return nil, false, err
 		}
 		params.BrandID = id
+	}
+	if req.ProductID != nil {
+		id, perr := ids.Parse(*req.ProductID)
+		if perr != nil { // a product id that is no id names no product: no results
+			return nil, false, nil //nolint:nilerr // no results is the answer
+		}
+		params.ProductID = ids.UUID(id)
 	}
 	if utf8.RuneCountInString(core) >= typoMinRunes {
 		typo, err := q.TypoProducts(ctx, searchdb.TypoProductsParams{Q: core, Lim: typoLimit})

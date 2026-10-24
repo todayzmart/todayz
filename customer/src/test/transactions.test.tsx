@@ -431,12 +431,12 @@ describe('C-12 order tracking', () => {
 
   describe('partial confirm', () => {
     const partial = (over: Partial<Order> = {}) => {
-      const base = order();
+      const [first] = order().lines;
       return order({
         status: 'awaiting_customer',
         acceptBy: null,
         partialConfirmBy: at(3),
-        lines: [{ ...base.lines[0]!, quantityAccepted: 1, lineTotalPaise: 2500 }],
+        lines: [{ ...first, quantityAccepted: 1, lineTotalPaise: 2500 } as Order['lines'][number]],
         subtotalPaise: 2500,
         itemSubtotalPaise: 2500,
         totalPaise: 2500,
@@ -454,8 +454,8 @@ describe('C-12 order tracking', () => {
     });
 
     it('says a line is not available when the shop accepted none of it', async () => {
-      const base = order();
-      track(partial({ lines: [{ ...base.lines[0]!, quantityAccepted: 0, lineTotalPaise: 0 }] }));
+      const [first] = order().lines;
+      track(partial({ lines: [{ ...first, quantityAccepted: 0, lineTotalPaise: 0 } as Order['lines'][number]] }));
       expect(await screen.findByText('Not available. You asked for 2.')).toBeInTheDocument();
     });
 

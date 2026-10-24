@@ -250,6 +250,28 @@ func TestFilters(t *testing.T) {
 	assert.Nil(t, r.Summary)
 	assert.Equal(t, []string{"near", "far"}, resultSlugs(f.search("atta", func(p *discoverapi.SearchDiscoverParams) { p.Category = sp("staples") })))
 	assert.Empty(t, f.search("atta", func(p *discoverapi.SearchDiscoverParams) { p.Category = sp("dairy-eggs") }).Results)
+	// productId: only that master product's listings, counted in the summary.
+	for _, tc := range []struct {
+		name, q, product string
+		want             []string
+		withIt           int
+	}{
+		{"same name", "curd", f.curd, []string{"near", "mid", "far"}, 3},
+		{"q about another product", "atta", f.curd, []string{"near", "mid", "far"}, 3},
+		{"one pack size only", "amul butter", f.butter100, []string{"near"}, 1},
+		{"no stock anywhere", "ghee", f.atta, []string{"near", "far"}, 2},
+	} {
+		r := f.search(tc.q, func(p *discoverapi.SearchDiscoverParams) { p.ProductId = sp(ulidOf(t, tc.product)) })
+		assert.ElementsMatch(t, tc.want, resultSlugs(r), tc.name)
+		for _, st := range r.Results {
+			for _, it := range st.Items {
+				assert.Equal(t, ulidOf(t, tc.product), it.ProductId, tc.name)
+			}
+		}
+		require.NotNil(t, r.Summary, tc.name)
+		assert.Equal(t, tc.withIt, r.Summary.StoresWithIt, tc.name)
+	}
+	assert.Empty(t, f.search("curd", func(p *discoverapi.SearchDiscoverParams) { p.ProductId = sp("01JB0S4A5B6C7D8E9F0G1H2J3K") }).Results, "an unknown product")
 	before := len(f.logRows())
 	assert.Empty(t, f.search("curd", func(p *discoverapi.SearchDiscoverParams) { p.Brand = sp("no-such-brand") }).Results)
 	assert.Empty(t, f.search("curd", func(p *discoverapi.SearchDiscoverParams) { p.Category = sp("no-such-category") }).Results)
@@ -347,6 +369,10 @@ func TestShopPage(t *testing.T) {
 	require.NotEmpty(t, found.Results)
 	assert.Equal(t, "near", found.Results[0].Store.StoreSlug)
 	assert.Equal(t, pg.StoreId, found.Results[0].Store.StoreId)
+	require.NotNil(t, pg.CategorySlug)
+	require.NotNil(t, pg.CategoryName)
+	assert.Equal(t, "grocery", *pg.CategorySlug)
+	assert.NotEmpty(t, *pg.CategoryName)
 	require.NotNil(t, pg.DistanceM)
 	assert.InDelta(t, 300, *pg.DistanceM, 5)
 	// Half a point is no point: the page without a distance, not an error.
