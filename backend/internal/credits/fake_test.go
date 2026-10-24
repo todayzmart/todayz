@@ -2,6 +2,7 @@ package credits
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"testing"
@@ -121,7 +122,8 @@ func (m *ledgerMachine) actions() map[string]func(*rapid.T) {
 				StoreID:       rapid.SampledFrom(m.stores).Draw(t, "store"),
 				EligiblePaise: int64(rapid.IntRange(10000, 60000).Draw(t, "eligible")),
 			}
-			if _, err := m.h.Complete(m.ctx, c); err != nil {
+			// A completion for another customer's or store's hold is refused.
+			if _, err := m.h.Complete(m.ctx, c); err != nil && !errors.Is(err, ErrInvalid) {
 				t.Fatalf("complete: %v", err)
 			}
 		},
@@ -137,7 +139,8 @@ func (m *ledgerMachine) actions() map[string]func(*rapid.T) {
 			if rapid.IntRange(0, 9).Draw(t, "rare") != 0 {
 				return
 			}
-			if err := m.forfeit(m.ctx, rapid.SampledFrom(m.customers).Draw(t, "customer")); err != nil {
+			// Held credits block the deletion (an order is still open).
+			if err := m.forfeit(m.ctx, rapid.SampledFrom(m.customers).Draw(t, "customer")); err != nil && !errors.Is(err, ErrHeld) {
 				t.Fatalf("forfeit: %v", err)
 			}
 		},

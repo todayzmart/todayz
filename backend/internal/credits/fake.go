@@ -375,6 +375,9 @@ func (f *Fake) Complete(_ context.Context, c Completion) (Completed, error) {
 	}
 	var out Completed
 	h, ok := f.holds[c.Ref]
+	if ok && (h.Customer != c.CustomerID || h.Store != c.StoreID) {
+		return Completed{}, ErrInvalid
+	}
 	if ok && h.settled {
 		return Completed{Captured: h.Captured, Cashback: h.cashback}, nil
 	}
@@ -473,6 +476,9 @@ func (f *Fake) OnAccountDelete(_ context.Context, userID ids.ID) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.init()
+	if f.balances[held(userID)] != 0 {
+		return ErrHeld
+	}
 	n := f.balances[wallet(userID)]
 	if n > 0 {
 		if _, dup, err := f.post(TxForfeitDeletion, "forfeit:"+userID.String(), []Leg{
