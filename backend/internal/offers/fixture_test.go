@@ -2,7 +2,6 @@ package offers
 
 import (
 	"context"
-	"sync"
 	"testing"
 	"time"
 
@@ -146,6 +145,11 @@ func (w *world) customer() ids.ID {
 	return id
 }
 
+// order is a real order of cust at store: offer_redemptions points at orders.
+func (w *world) order(cust, store ids.ID) ids.ID {
+	return w.tdb.InsertOrder(w.t, w.id(), cust, store)
+}
+
 func ip(n int) *int             { return &n }
 func i64(n int64) *int64        { return &n }
 func tp(t time.Time) *time.Time { return &t }
@@ -163,13 +167,4 @@ func (f *fakeBanners) LiveBanners(_ context.Context, stores []ids.ID, _ time.Tim
 		}
 	}
 	return out, nil
-}
-
-var idMu sync.Mutex
-
-// idSafe is id() for goroutines.
-func (w *world) idSafe() ids.ID {
-	idMu.Lock()
-	defer idMu.Unlock()
-	return w.id()
 }

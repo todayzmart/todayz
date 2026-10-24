@@ -223,7 +223,11 @@ func TestBusinessHTTP(t *testing.T) {
 	require.Equal(t, true, r.body["openNow"], "Friday 11:30 IST is inside 09:00–21:00")
 
 	cur = a.call(owner, http.MethodGet, B, nil, nil)
-	r = a.call(owner, http.MethodPatch, B, map[string]any{"categoryId": ids.New(a.clk.Now()).String()}, ifMatch(cur))
+	// businesses.category_id is a foreign key (D-211): a seeded category.
+	var category pgtype.UUID
+	require.NoError(t, a.tdb.OwnerPool.QueryRow(context.Background(), `SELECT id FROM categories WHERE parent_id IS NULL ORDER BY sort, slug LIMIT 1`).Scan(&category))
+	categoryID, _ := ids.FromUUID(category)
+	r = a.call(owner, http.MethodPatch, B, map[string]any{"categoryId": categoryID.String()}, ifMatch(cur))
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	r = a.call(owner, http.MethodPost, B+"/submit", nil, nil)
 	require.Equal(t, http.StatusOK, r.code, r.raw)

@@ -533,7 +533,7 @@ func TestEnqueueRunTx(t *testing.T) {
 		Define(r, validEvent())
 	})
 	tick := h.atTick("rollup_today")
-	admin := ids.New(h.clk.Now())
+	admin := h.db.InsertUser(t, ids.New(h.clk.Now())) // job_runs.triggered_by is a foreign key (D-211)
 	enq := NewEnqueuer(h.reg, h.c, h.clk)
 	id, period, err := enq.EnqueueRunTx(h.ctx, nil, "rollup_today", RunOpts{Trigger: TriggerManual, By: admin})
 	require.NoError(t, err)

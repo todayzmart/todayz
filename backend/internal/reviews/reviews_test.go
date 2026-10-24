@@ -255,7 +255,8 @@ func TestPOSSaleEligibility(t *testing.T) {
 	e := newEnv(t)
 	u := e.user()
 	sale := func(method string, completed bool, customer ids.ID) ids.ID {
-		id := ids.New(testNow)
+		// reviews.pos_sale_id is a foreign key (D-211): the sale is a real row too.
+		id := e.tdb.InsertPosSale(t, ids.New(testNow), e.store, u)
 		e.sales[id] = Sale{StoreID: e.store, CustomerID: customer, LinkMethod: method, Completed: completed}
 		return id
 	}

@@ -42,6 +42,10 @@ type fakeLedger struct {
 	fail   map[ids.ID]bool // referrals whose postings error
 	posted []Reward
 	keys   map[string]ids.ID
+	// referrals.referrer_/referee_transaction_id are foreign keys to
+	// ledger_transactions (D-211): each posting is a real row.
+	t   testing.TB
+	tdb *testkit.DB
 }
 
 func (l *fakeLedger) PostReward(_ context.Context, r Reward) (ids.ID, bool, error) {
@@ -62,7 +66,7 @@ func (l *fakeLedger) PostReward(_ context.Context, r Reward) (ids.ID, bool, erro
 	if id, ok := l.keys[r.IdempotencyKey]; ok {
 		return id, true, nil
 	}
-	id := ids.New(testNow)
+	id := l.tdb.InsertLedgerTx(l.t, ids.New(testNow), "referral_reward")
 	l.keys[r.IdempotencyKey] = id
 	l.posted = append(l.posted, r)
 	return id, true, nil
@@ -137,6 +141,7 @@ func newEnv(t *testing.T) *env {
 	}
 	tdb := testkit.NewDB(t)
 	e := &env{t: t, tdb: tdb, ctx: context.Background(), clk: clock.NewFake(testNow), ledger: &fakeLedger{}, notices: &fakeNotices{}, jobs: &fakeJobs{}}
+	e.ledger.t, e.ledger.tdb = t, tdb
 	e.cache = settings.NewCache(settings.PGLoader(tdb.Pool), settings.Options{})
 	h, err := pii.NewHasher(make([]byte, pii.KeySize))
 	require.NoError(t, err)
