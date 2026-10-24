@@ -1,6 +1,6 @@
 # W2-04 POS backend and sync: QA report
 
-The Go backend for the counter: online sales, the offline outbox sync, bill QR claims, counter codes, receipts and purchases. Branch `claude/wp-w2-04-pos-421f24`, cut from `main`, not yet merged. Everything ran locally against testcontainers PostGIS; nothing touched a cloud account. Decisions are in D-130 (`docs/plan/12-decision-log.md`).
+The Go backend for the counter: online sales, the offline outbox sync, bill QR claims, counter codes, receipts and purchases. Branch `claude/wp-w2-04-pos-421f24`, cut from `main`, with `main` merged back in at 0f2f4ed (W2-06 reviews, W2-07 offers, the shared test Postgres); not yet merged into `main`. Everything ran locally against PostGIS (testcontainers, then the shared test server); nothing touched a cloud account. Decisions are in D-130 (`docs/plan/12-decision-log.md`).
 
 ## What was built
 
@@ -39,12 +39,18 @@ The Go backend for the counter: online sales, the offline outbox sync, bill QR c
   - a 128-bit receipt token per sale;
   - `GET /v1/public/receipts/{token}` returns no customer, phone, wallet or link method, sends `no-store` and expires after 30 days;
   - `GET /v1/me/purchases` merges orders and linked POS sales, newest first, with a keyset cursor (D-45, D-84).
-- **Seams** (`seams.go`): Stock, Pricer, Credits and Referrals. The defaults are `NoOffers`, `NoCredits` (`not_available`) and `NoReferrals`. Stock is the catalogue writer through `jobs.PosStock`.
-- **Wiring:** `cmd/todayz/routes_pos.go` mounts the three domains. It has a `posSeams` test hook that sets the fakes.
+- **Seams** (`seams.go`): Stock, Pricer, Redeemer, Credits and Referrals. The defaults are `NoOffers`, `NoRedeem`, `NoCredits` (`not_available`) and `NoReferrals`. Stock is the catalogue writer through `jobs.PosStock`.
+- **Offers (W2-07, real):** `offersForPos` in `cmd/todayz/routes_pos.go` adapts `offers.Service`:
+  - `Price` on `ChannelPOS`, as a walk-in, with no Fixed lines (a catalogued line already carries the catalogue price);
+  - `Redeem(ctx, Ref{POSSaleID}, customer, quote)` runs inside the sale's transaction (`db.InTx` puts the tx in ctx), after the lines and before the claim bind; `offers.ErrUnavailable` becomes `pos.ErrOfferGone`, which the sale returns as `409 price_changed`;
+  - a reversal calls `Release(Ref{POSSaleID})` in the reversal's transaction;
+  - an offline sale at sync redeems nothing (its discounts are the device's, with no offer ids).
+- **Reviews (W2-06):** `posForReviews` implements `reviews.SaleSource` through `pos.Service.SaleRef` (store, customer, link method only for a rewarding link, completed unless reversed). `routes_reviews.go` now passes it as `Sales`, so a POS sale can be reviewed.
+- **Wiring:** `newPos` in `cmd/todayz/routes_pos.go` builds the service for `mountPos` and for reviews. It has a `posSeams` test hook that sets the fakes (credits, referrals, and the offers fakes in the older tests).
 
 ## Evidence
 
-All runs were on this branch at 5e3a82b, one heavy command at a time, Go tests with `-p 2`. The full `make check` was not run (lead's rule after the crash).
+Runs were on this branch at 5e3a82b (first table) and 64b075b (second table), one heavy command at a time, Go tests with `-p 2`. The full `make check` was not run (lead's rule after the crash).
 
 | Check | Result |
 |---|---|
@@ -59,6 +65,17 @@ All runs were on this branch at 5e3a82b, one heavy command at a time, Go tests w
 | `go test -race -p 2 -run POS ./cmd/todayz/` (27 tests) plus `TestRoutesAreInTheContract`, `TestOneMountPerDomain` | ok, 39 s |
 | `internal/pos` unit tests (7) | ok |
 | `TestMigrationFileNames` | ok |
+
+After merging `main` and wiring offers and reviews (64b075b), with `TODAYZ_TEST_PG_URL_FILE` set to the shared test server:
+
+| Check | Result |
+|---|---|
+| `go vet`, golangci-lint, gosec, settings lint (`internal/pos`, `cmd/todayz`) | clean, 0 issues |
+| `make gen` | exit 0 |
+| `TestPOSOffersRedeemAndRelease`, `TestPOSSaleReview` | ok, 5.7 s |
+| `go test -race -p 2 -run 'POS\|TestRoutesAreInTheContract\|TestOneMountPerDomain\|Offer\|Review' ./cmd/todayz/` | ok, 56 s |
+| `internal/pos`, `internal/reviews`, `internal/offers` unit and DB tests | ok |
+| `go test -race -p 2 ./cmd/todayz/` (whole package) | ok, 161 s |
 
 ## Coverage of SC-POS (08-testing.md)
 
@@ -75,12 +92,14 @@ All runs were on this branch at 5e3a82b, one heavy command at a time, Go tests w
 | POS-03, 07, 15 | — | E2E with the POS frontend (W2-11) |
 | POS-18…21 | — | the ledger side belongs to the credits and referrals domains. Here they are fakes; the tests only check that `ReverseSale` and `Revoke` are called |
 | POS-35 | — | not written; the slot is free |
+| Offers at the counter | `TestPOSOffersRedeemAndRelease` | a 10% offer prices the line and writes one redemption; a reversal releases it; an offline sale writes none; a flat offer with `maxRedemptions` 1 applies to the first sale only |
+| Reviews of a sale | `TestPOSSaleReview` | a counter-code sale is reviewable once (`review_exists` after); `phone_unverified` is 404; a reversed sale is `review_not_eligible` |
 
 Tests never print codes, tokens or phones. `noSecrets` captures the API's log output and asserts that no receipt token, claim token, counter code or phone reached it, in POS-01, 08, 11, 13, 17, 22, 25 and the bill QR test. POS-01 also checks that the receipt has `no-store` and that its body holds no phone and no `customer` field. That sale is unlinked; a receipt for a linked sale is not checked for PII separately, since the Receipt schema has no such fields.
 
 ## Not verified
 
-- **Real seams:** the credits ledger, referrals and the Pricer (W2-07 offers) run as fakes. Holds, captures, cashback and clawback are checked only as calls on the seam.
+- **Real seams:** the credits ledger and referrals run as fakes (offers are now real). Holds, captures, cashback and clawback are checked only as calls on the seam.
 - **SSE delivery:** `bill_claim.updated` is checked as an `outbox_events` row. Delivery to a connected POS was not run.
 - **Authenticated contract smoke:** the smoke runs unauthenticated, so `/v1/biz` and `/v1/me` return only 401s there. Their shapes are covered by the HTTP tests and the request validator.
 - `make check`, `make e2e`, load and the abuse suite were not run.
@@ -93,19 +112,44 @@ Each one has the most conservative reading built, and the ones in code are marke
 2. **Hold release:** nothing in pos releases credits held by a claim that was confirmed but never used. Built: that sweep is assumed to live in the credits domain.
 3. **`phone_unverified` sales:** should they link later, once the customer verifies that phone? Built: they never link.
 4. **Realtime catalogue:** `bill_claim.updated` is not in `realtime.yaml` or the shared catalogue yet.
-5. **Pricer:** does W2-07's Pricer match the assumed interface (below)?
+5. **Pricer:** resolved. W2-07's `offers.Service` is wired through `offersForPos`.
 6. **Offline-link risk flag score** (`sync.go`, TODO). Built: 50.
 7. **Counter-code lockout:** it raises no risk flag. Should five wrong codes flag the store?
 8. **Device secret rotation** (`totp.go`, TODO). `DEVICE_SECRET_ENC_KEY` rotation and a customer's "reset my code" are not built.
 9. **Fixed 30-day windows:** `changesKept` (cursor) and the receipt TTL are constants, not `platform_settings`. 01 lists no setting for them.
 10. **Files outside the owned folders:** `cmd/todayz/pos_http_test.go` and the `posSeams` hook in `routes_pos.go` live in `cmd/todayz`.
 11. **Counts in the sync property test:** they are absolute and depend on order, so the property covers sales, restocks, damage and expiries only.
+12. **Offline sales and offer limits:** a synced sale carries the device's discounts with no offer ids, so it redeems nothing and does not count against `maxRedemptions` or a budget. Should the outbox entry carry offer ids so sync can redeem (and accept going over a limit)?
+13. **Custom lines and minimum-bill offers:** custom lines (no `storeItemId`) are not sent to the pricer, so they do not count toward a minimum-bill threshold.
+14. **Walk-in pricing:** the sale is priced with no customer, even when a customer is linked; the redemption records the linked customer. Per-customer offers therefore never apply at the counter. Should the sale price with the linked customer?
+15. **An offer that runs out mid-sale:** `409 price_changed` with no extension members; the POS re-sends and gets the new prices. A dedicated code may read better at the counter.
+16. **FKs to `pos_sales` and `bill_claims`:** not added here (see below).
+
+## The cross-package FKs
+
+The lead asked for the FKs from `reviews.pos_sale_id` and `offer_redemptions.pos_sale_id` to `pos_sales` in a new migration in this block. They are not in this branch. Migrations run in file-name order, and any 204xx file sorts before `20601_w2-06_reviews.sql` and `20701_w2-07_offers.sql`, so on a fresh database it would run before those tables exist and fail. The plan puts these in the Wave 2 constraints migration that sorts after every Wave 2 file (03 §13, D-35, D-79). The SQL for it:
+
+```sql
+ALTER TABLE reviews
+  ADD CONSTRAINT fk_reviews_pos_sale FOREIGN KEY (pos_sale_id) REFERENCES pos_sales(id);
+ALTER TABLE offer_redemptions
+  ADD CONSTRAINT fk_offer_redemptions_pos_sale FOREIGN KEY (pos_sale_id) REFERENCES pos_sales(id);
+-- after W2-01 lands credit_holds:
+-- ALTER TABLE credit_holds
+--   ADD CONSTRAINT fk_credit_holds_bill_claim FOREIGN KEY (bill_claim_id) REFERENCES bill_claims(id);
+```
+
+The indexes they need already exist (`uq_reviews_pos_sale`, `ix_offer_redemptions_pos_sale`). No `ON DELETE` is needed: POS sales are never deleted, only reversed.
 
 ## Assumed seam interfaces (`internal/pos/seams.go`)
 
 ```go
 type Pricer interface {
     Price(ctx, customerID, storeID ids.ID, lines []PriceLine) (Pricing{LineDiscounts []int64; BillDiscount int64; Offers []AppliedOffer}, error)
+}
+type Redeemer interface {
+    Redeem(ctx, saleID, customerID ids.ID, applied []AppliedOffer) error // in the sale's tx; ErrOfferGone when one ran out
+    Release(ctx, saleID ids.ID) error
 }
 type Credits interface {
     Allow(ctx, customerID, storeID ids.ID, requested int, eligiblePaise int64) (CreditsAllowance{Allowed int; Limit string}, error)
