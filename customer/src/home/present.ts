@@ -3,6 +3,7 @@ import type { DiscoverStoreCard } from '@todayz/api-client/gen/model/discoverSto
 import { formatDistance } from '@todayz/i18n';
 import type { StoreCardProps, Tint } from '@todayz/ui';
 import { useIntl } from 'react-intl';
+import { IMAGE_BASE_URL } from '../app/env';
 import { RouterLink } from './RouterLink';
 
 export type RadiusM = 1000 | 2000 | 5000 | 10000 | 20000;
@@ -22,6 +23,12 @@ export function initials(name: string): string {
   const second = words[1] ?? '';
   const out = words.length > 1 ? `${[...first][0] ?? ''}${[...second][0] ?? ''}` : [...first].slice(0, 2).join('');
   return out.toUpperCase();
+}
+
+/** The image URL for an API `imageKey`, or undefined when the item has none (the tile keeps its initials). */
+export function imageUrl(key: string | null | undefined): string | undefined {
+  if (!key || IMAGE_BASE_URL === '') return undefined;
+  return `${IMAGE_BASE_URL}/${key.split('/').map(encodeURIComponent).join('/')}`;
 }
 
 /** Opens the system maps for a point (directions); no coordinates of the customer are sent. */

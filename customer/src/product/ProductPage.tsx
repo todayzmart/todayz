@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useCoords } from '../home/coords';
 import { offPercent, useFmt, usePackLine, useStockProps } from '../home/format';
-import { directionsUrl, initials, radiusM } from '../home/present';
+import { directionsUrl, imageUrl, initials, radiusM } from '../home/present';
 import { RouterLink } from '../home/RouterLink';
 import { useRadiusKm } from '../home/radius';
 import { AddToBasket } from '../basket/AddToBasket';
@@ -124,7 +124,7 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
       </RouterLink>
 
       <div className={styles.media} aria-hidden="true">
-        {initials(item.name)}
+        {imageUrl(item.imageKey) ? <img className={styles.mediaImg} src={imageUrl(item.imageKey)} alt="" decoding="async" /> : initials(item.name)}
       </div>
 
       <div className={styles.titleBlock}>
