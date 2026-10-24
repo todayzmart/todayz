@@ -156,7 +156,7 @@ LIMIT @lim;
 
 -- name: ListAdminReportsOpen :many
 -- The open queue, oldest first.
-SELECT id, review_id, (reporter_store_id IS NOT NULL) AS from_store, reason, status, resolution, resolution_note, created_at, resolved_at
+SELECT id, review_id, (reporter_store_id IS NOT NULL)::boolean AS from_store, reason, status, resolution, resolution_note, created_at, resolved_at
 FROM review_reports
 WHERE status = 'open'
   AND (sqlc.narg('after_at')::timestamptz IS NULL OR (created_at, id) > (sqlc.narg('after_at')::timestamptz, sqlc.narg('after_id')::uuid))
@@ -165,7 +165,7 @@ LIMIT @lim;
 
 -- name: ListAdminReportsResolved :many
 -- Resolved reports, newest first.
-SELECT id, review_id, (reporter_store_id IS NOT NULL) AS from_store, reason, status, resolution, resolution_note, created_at, resolved_at
+SELECT id, review_id, (reporter_store_id IS NOT NULL)::boolean AS from_store, reason, status, resolution, resolution_note, created_at, resolved_at
 FROM review_reports
 WHERE status = 'resolved'
   AND (sqlc.narg('before_at')::timestamptz IS NULL OR (created_at, id) < (sqlc.narg('before_at')::timestamptz, sqlc.narg('before_id')::uuid))
@@ -179,7 +179,7 @@ SELECT id, review_id, status FROM review_reports WHERE id = @id FOR UPDATE;
 UPDATE review_reports
 SET status = 'resolved', resolution = @resolution, resolution_note = sqlc.narg('note'), resolved_by = @actor, resolved_at = @now
 WHERE id = @id
-RETURNING id, review_id, (reporter_store_id IS NOT NULL) AS from_store, reason, status, resolution, resolution_note, created_at, resolved_at;
+RETURNING id, review_id, (reporter_store_id IS NOT NULL)::boolean AS from_store, reason, status, resolution, resolution_note, created_at, resolved_at;
 
 -- name: RecomputeStoreRating :execrows
 -- Bayesian average (prior @prior_avg with weight @prior_weight, 01 §10) over visible reviews; NULL
