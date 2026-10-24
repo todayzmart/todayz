@@ -9,7 +9,7 @@ import { useIntl } from 'react-intl';
 import type { BillClaim, BillClaimStatus } from './api';
 import { billQrUrl, normalizeIndianPhone } from './links';
 import { QrCode } from './QrCode';
-import { usePos } from './runtime';
+import { usePos } from './context';
 import type { SaleLink } from './types';
 import styles from './pos.module.css';
 
@@ -34,9 +34,11 @@ export interface LinkPanelProps {
 export function LinkPanel({ open, onClose, saleClientId, amountPaise, creditsAllowed, phone, onLink }: LinkPanelProps) {
   const intl = useIntl();
   const [view, setView] = useState<View>('menu');
-  useEffect(() => {
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
     if (open) setView('menu');
-  }, [open]);
+  }
   const back = (
     <Button variant="ghost" size="sm" onClick={() => setView('menu')}>
       {intl.formatMessage({ id: 'pos.link.back' })}
@@ -115,14 +117,17 @@ function BillQr({
   const [failed, setFailed] = useState(false);
   const [round, setRound] = useState(0);
   const [left, setLeft] = useState<number | null>(null);
+  const retryClaim = () => {
+    setClaim(null);
+    setStatus(null);
+    setFailed(false);
+    setRound((n) => n + 1);
+  };
   // Device clock minus server clock when the claim was made, so the countdown follows the server's expiry.
   const skewRef = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
-    setClaim(null);
-    setStatus(null);
-    setFailed(false);
     api
       .createBillClaim({ saleClientId, amountPaise }, `claim-${saleClientId}-${amountPaise}-${round}`)
       .then((c) => {
@@ -199,14 +204,14 @@ function BillQr({
       {claim && expired && (
         <>
           <p role="status">{intl.formatMessage({ id: 'pos.link.qrExpired' })}</p>
-          <Button variant="primary" onClick={() => setRound((n) => n + 1)}>
+          <Button variant="primary" onClick={() => retryClaim()}>
             {intl.formatMessage({ id: 'pos.link.newQr' })}
           </Button>
         </>
       )}
       {!claim && !failed && <p role="status">{intl.formatMessage({ id: 'pos.link.qrPreparing' })}</p>}
       {failed && (
-        <Button variant="primary" onClick={() => setRound((n) => n + 1)}>
+        <Button variant="primary" onClick={() => retryClaim()}>
           {intl.formatMessage({ id: 'pos.link.retry' })}
         </Button>
       )}
@@ -231,7 +236,8 @@ function CounterCode({
   const [phone, setPhone] = useState(initialPhone);
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<'phone' | 'code' | 'mismatch' | null>(null);
+  const [error, setError] = useState<'phone' | 'code' | 'mismatch' | 'locked' | null>(null);
+  const [triesLeft, setTriesLeft] = useState<number | null>(null);
   const ten = normalizeIndianPhone(phone);
 
   const submit = async () => {
@@ -254,7 +260,10 @@ function CounterCode({
         } catch (e) {
           // No answer is not a wrong code: keep it and let the server check it when the sale syncs (D-12).
           if (e instanceof ApiError && e.status >= 400 && e.status < 500) {
-            setError('mismatch');
+            // Too many wrong tries (on this bill, this phone or this cashier) is one locked state.
+            const left = e.problem.extensions?.attemptsLeft;
+            setTriesLeft(typeof left === 'number' ? left : null);
+            setError(e.code === 'code_invalid' ? 'mismatch' : e.code.endsWith('locked') ? 'locked' : 'mismatch');
             return;
           }
         }
@@ -294,8 +303,10 @@ function CounterCode({
           error === 'code'
             ? intl.formatMessage({ id: 'pos.link.codeInvalid' })
             : error === 'mismatch'
-              ? intl.formatMessage({ id: 'pos.link.codeMismatch' })
-              : undefined
+              ? intl.formatMessage({ id: triesLeft === null ? 'pos.link.codeMismatch' : 'pos.link.codeMismatchTries' }, { count: triesLeft ?? 0 })
+              : error === 'locked'
+                ? intl.formatMessage({ id: 'pos.link.codeLocked' })
+                : undefined
         }
       />
       {!online && <Banner>{intl.formatMessage({ id: 'pos.link.codeOffline' })}</Banner>}

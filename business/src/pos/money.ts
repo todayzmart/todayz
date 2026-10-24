@@ -59,8 +59,9 @@ export function billTotals(lines: readonly CartLineInput[], billDiscountPaise: n
 }
 
 /** The credit minimum (D-30) is checked on the bill after discounts, before round-off and credits. */
-export function creditsAllowed(netPaise: number, creditMinOrderValuePaise: number): boolean {
-  return netPaise >= creditMinOrderValuePaise;
+export function creditsAllowed(netPaise: number, creditMinOrderValuePaise: number | null): boolean {
+  // Unknown minimum: do not gate here, the server answers `below_credit_minimum`.
+  return creditMinOrderValuePaise === null || netPaise >= creditMinOrderValuePaise;
 }
 
 /** 1 credit = ₹1 (01 §7). */

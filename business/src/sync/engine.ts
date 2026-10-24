@@ -11,12 +11,14 @@
 //    has no timers; the caller asks `nextAttemptAt()` and calls `flush()`.
 //  - A request the server refuses outright (4xx other than the retryable ones) is split: one entry per
 //    request until the bad one is found; that entry is `rejected` and later entries still go.
+//  - A sale linked by bill QR cannot wait for a sync (its claim lasts 120 s), so it goes through
+//    POST pos/sales only; if that fails past the claim it is refused and a person rings it again.
 //  - A sale never conflicts away: stock may go negative (flagged "count needed"), a counter-code link
 //    may fail at sync ("Customer link failed"), and the server's price is shown as returned.
 //  - `410 resync_required` (cursor older than 30 days, D-36) downloads a full catalogue snapshot first.
 import { ApiError } from '@todayz/api-client';
-import { entryToWire, saleToWire, type PosApi, type SaleAck, type SyncResult } from '../pos/api';
-import type { CatalogueChange, CatalogueSnapshot, Sale } from '../pos/types';
+import { entryToWire, needsOnline, saleToWire, type PosApi, type SaleAck, type SyncResult } from '../pos/api';
+import type { CatalogueChange, CatalogueItem, CatalogueSnapshot, Sale } from '../pos/types';
 import type { PosStorage } from './storage';
 import { SYNC_BATCH_MAX, type EntryResult, type OutboxEntry, type StockMovement } from './types';
 
@@ -49,6 +51,8 @@ export interface EngineDeps {
 
 /** Synced entries kept on the device for the sales history; older ones are dropped. */
 export const KEEP_SYNCED = 200;
+/** New items per feed pull that are fetched in full for their barcodes. */
+const MAX_DETAIL_FETCH = 20;
 const BACKOFF_BASE_MS = 1000;
 const BACKOFF_MAX_MS = 5 * 60 * 1000;
 
@@ -174,7 +178,7 @@ export function createSyncEngine(deps: EngineDeps) {
         ...next,
         totalPaise: ack.totalPaise,
         roundOffPaise: ack.roundOffPaise ?? next.roundOffPaise,
-        billDiscountPaise: ack.discountPaise ?? next.billDiscountPaise,
+        billDiscountPaise: ack.billDiscountPaise ?? next.billDiscountPaise,
         creditsUsed: ack.creditsUsed ?? next.creditsUsed,
       };
     }
@@ -212,9 +216,28 @@ export function createSyncEngine(deps: EngineDeps) {
     const { meta } = await storage.loadCatalogue();
     const keep = settings ?? meta?.settings;
     if (!keep) return; // no snapshot yet; the next refresh downloads one
-    const upserts = changes.flatMap((c) => (c.op === 'upsert' && c.item ? [c.item] : []));
+    const { items } = await storage.loadCatalogue();
+    const known = new Map(items.map((i) => [i.id, i]));
+    const merged = new Map<string, CatalogueItem>();
+    const fresh: string[] = [];
+    for (const c of changes) {
+      if (c.op !== 'upsert' || !c.item) continue;
+      const base = merged.get(c.entityId) ?? known.get(c.entityId);
+      if (!base) fresh.push(c.entityId);
+      merged.set(c.entityId, { packSize: 1, unit: 'pc', barcodes: [], ...base, ...c.item });
+    }
+    // The feed carries price and stock only; an item new to this device is fetched once for its barcodes.
+    for (const id of [...new Set(fresh)].slice(0, MAX_DETAIL_FETCH)) {
+      try {
+        const full = await api.getItem(id);
+        const cur = merged.get(id);
+        merged.set(id, cur ? { ...full, pricePaise: cur.pricePaise, available: cur.available, isListed: cur.isListed } : full);
+      } catch {
+        // Keep the patch; the next snapshot fills the rest.
+      }
+    }
     const deletes = changes.filter((c) => c.op === 'delete').map((c) => c.entityId);
-    await storage.applyChanges(upserts, deletes, {
+    await storage.applyChanges([...merged.values()], deletes, {
       cursor,
       settings: keep,
       syncedAt: new Date(now()).toISOString(),
@@ -266,7 +289,7 @@ export function createSyncEngine(deps: EngineDeps) {
       batch = inflight.clientIds.map((id) => byId.get(id)).filter((e): e is OutboxEntry => !!e && e.state !== 'synced' && e.state !== 'rejected');
       key = inflight.key;
     } else {
-      batch = entries.filter((e) => e.state === 'pending').slice(0, singleMode ? 1 : SYNC_BATCH_MAX);
+      batch = entries.filter((e) => e.state === 'pending' && !(e.kind === 'sale' && needsOnline(e.payload as Sale))).slice(0, singleMode ? 1 : SYNC_BATCH_MAX);
       key = newId();
     }
     if (batch.length === 0) {
@@ -346,6 +369,7 @@ export function createSyncEngine(deps: EngineDeps) {
       if (!opts.force && state.nextAttemptAt !== null && now() < state.nextAttemptAt) return;
       set({ status: 'syncing', nextAttemptAt: null });
       try {
+        await sendOnlineOnly();
         // A batch of 50 per round; the loop ends when nothing is left or a failure sets a backoff.
         for (let guard = 0; guard < 1000; guard += 1) {
           if ((await sendBatch()) === 'done') break;
@@ -362,6 +386,49 @@ export function createSyncEngine(deps: EngineDeps) {
     });
   }
 
+  /** One sale through POST pos/sales. Returns false when the attempt failed and should be retried later. */
+  async function sendOne(entry: OutboxEntry): Promise<void> {
+    const sale = entry.payload as Sale;
+    const sending: OutboxEntry = { ...entry, state: 'sending', attempts: entry.attempts + 1 };
+    await storage.putEntry(sending);
+    try {
+      const ack = await api.createSale(saleToWire(sale), entry.clientId);
+      await markApplied(sending, ack);
+      await noteServerTime(ack.serverNow);
+    } catch (e) {
+      if (e instanceof ApiError && e.code === 'price_changed') {
+        // The shelf price moved since the snapshot. Adopt the new price for the next sale; this one stands
+        // at the price the customer was quoted (a sync never reprices a sale), unless a claim ties it online.
+        await adoptPrice(e);
+        if (needsOnline(sale)) await markRejected(sending, e.code);
+        else await storage.putEntry({ ...sending, state: 'pending', lastError: e.code });
+      } else if (isRetryable(e)) {
+        await storage.putEntry({ ...sending, state: 'pending', lastError: e instanceof ApiError ? e.code : 'network' });
+        if (needsOnline(sale)) failure(e, state.attempts + 1);
+      } else {
+        await markRejected(sending, e instanceof ApiError ? e.code : 'rejected');
+      }
+    }
+  }
+
+  async function adoptPrice(e: ApiError) {
+    const ext = e.problem.extensions;
+    const id = ext?.storeItemId;
+    const price = ext?.pricePaise;
+    if (typeof id !== 'string' || typeof price !== 'number') return;
+    const { items, meta } = await storage.loadCatalogue();
+    const item = items.find((i) => i.id === id);
+    if (!item || !meta) return;
+    await storage.applyChanges([{ ...item, pricePaise: price }], [], meta);
+    set({ catalogueVersion: state.catalogueVersion + 1 });
+  }
+
+  /** Bill-QR sales wait for the network here, not in a sync batch (their claim cannot be replayed later). */
+  async function sendOnlineOnly() {
+    const waiting = (await storage.listEntries()).filter((e) => e.kind === 'sale' && e.state === 'pending' && needsOnline(e.payload as Sale));
+    for (const e of waiting) await sendOne(e);
+  }
+
   /**
    * The online sale path (POST pos/sales): immediate server pricing and a receipt link. A network
    * failure leaves the sale in the outbox for `flush`; the same client id keeps the server from
@@ -372,19 +439,7 @@ export function createSyncEngine(deps: EngineDeps) {
       const entry = (await storage.listEntries()).find((e) => e.clientId === clientId);
       if (!entry || entry.kind !== 'sale' || entry.state !== 'pending') return entry;
       if (!online()) return entry;
-      const sending: OutboxEntry = { ...entry, state: 'sending', attempts: entry.attempts + 1 };
-      await storage.putEntry(sending);
-      try {
-        const ack = await api.createSale(saleToWire(entry.payload as Sale), clientId);
-        await markApplied(sending, ack);
-        await noteServerTime(ack.serverNow);
-      } catch (e) {
-        if (isRetryable(e)) {
-          await storage.putEntry({ ...sending, state: 'pending', lastError: e instanceof ApiError ? e.code : 'network' });
-        } else {
-          await markRejected(sending, e instanceof ApiError ? e.code : 'rejected');
-        }
-      }
+      await sendOne(entry);
       await recount();
       return (await storage.listEntries()).find((x) => x.clientId === clientId);
     });
@@ -394,12 +449,12 @@ export function createSyncEngine(deps: EngineDeps) {
    * Reverses a synced sale on the server (manager and above, inside the window). The key is fixed per
    * sale, so a second tap or a retry after a lost answer cannot reverse it twice.
    */
-  function reverse(clientId: string) {
+  function reverse(clientId: string, reason: string) {
     return exclusive(async () => {
       const e = (await storage.listEntries()).find((x) => x.clientId === clientId);
       const saleId = e?.result?.saleId;
       if (!e || e.kind !== 'sale' || !saleId) throw new Error('sale is not synced');
-      const ack = await api.reverseSale(saleId, `reverse-${saleId}`);
+      const ack = await api.reverseSale(saleId, `reverse-${saleId}`, reason);
       await storage.putEntry({ ...e, result: { ...e.result, reversed: true } });
       await recount();
       return ack;

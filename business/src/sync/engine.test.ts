@@ -27,6 +27,8 @@ function sale(id: string, over: Partial<Sale> = {}): Omit<Sale, 'deviceSeq' | 'd
   };
 }
 
+const ackOf = (clientId: string): SaleAck => ({ saleId: `sale-${clientId}`, receiptToken: `tok-${clientId}`, roundOffPaise: 0, totalPaise: 10000, serverNow: '2026-10-24T10:00:00.000Z' });
+
 interface Server {
   api: PosApi;
   syncCalls: { body: SyncRequest; key: string }[];
@@ -94,6 +96,7 @@ function fakeServer(): Server {
       s.applied.set(wire.clientId, a);
       return Promise.resolve(a);
     },
+    getItem: () => Promise.reject(new Error('unused')),
     reverseSale: () => Promise.reject(new Error('unused')),
     createBillClaim: () => Promise.reject(new Error('unused')),
     getBillClaim: () => Promise.reject(new Error('unused')),
@@ -431,6 +434,82 @@ describe('online sale path', () => {
   });
 });
 
+describe('bill QR sales and price changes', () => {
+  const qr = (id: string) => sale(id, { link: { method: 'bill_qr', claimId: 'claim-1', creditsUsed: 0 } });
+
+  it('sends a bill QR sale through the online route only, never in a sync batch', async () => {
+    const { engine, server } = setup({ online: false });
+    const created: string[] = [];
+    server.api.createSale = (wire) => {
+      created.push(wire.clientId);
+      return Promise.resolve(ackOf(wire.clientId));
+    };
+    await engine.recordSale(qr('q'));
+    await engine.recordSale(sale('a'));
+    await engine.flush();
+    expect(created).toEqual([]);
+    const online = createSyncEngine({ storage: engine.storage, api: server.api, deviceId: 'dev-1', newId: () => 'k9' });
+    await online.flush();
+    expect(created).toEqual(['q']);
+    expect(server.syncCalls.flatMap((c) => c.body.entries.map((e) => e.clientId))).toEqual(['a']);
+    expect((await online.entries()).every((e) => e.state === 'synced')).toBe(true);
+  });
+
+  it('refuses a bill QR sale whose claim has expired, for a person to ring again', async () => {
+    const { engine, server } = setup();
+    server.api.createSale = () => Promise.reject(problem(409, 'claim_expired'));
+    await engine.recordSale(qr('q'));
+    await engine.flush();
+    expect((await engine.entries())[0]).toMatchObject({ state: 'rejected', lastError: 'claim_expired' });
+  });
+
+  it('on price_changed adopts the new price and lets a plain sale stand at the quoted price via sync', async () => {
+    const { engine, server, storage } = setup();
+    server.snapshot.items = [{ id: 'item-1', name: 'Rice', packSize: 1, unit: 'kg', barcodes: [], pricePaise: 5000, available: 9, isListed: true }];
+    await engine.refreshCatalogue();
+    server.api.createSale = () =>
+      Promise.reject(new ApiError({ type: 'about:blank', title: 'x', status: 409, code: 'price_changed', extensions: { storeItemId: 'item-1', pricePaise: 5500 } }, new Headers()));
+    await engine.recordSale(sale('a'));
+    const e = await engine.sendSaleNow('a');
+    expect(e?.state).toBe('pending');
+    expect((await storage.loadCatalogue()).items[0]?.pricePaise).toBe(5500);
+    await engine.flush({ force: true });
+    expect((await engine.entries())[0]?.state).toBe('synced');
+    expect(server.syncCalls[0]?.body.entries[0]?.payload).toMatchObject({ lines: [{ unitPricePaise: 5000 }] });
+  });
+});
+
+describe('catalogue changes', () => {
+  it('merges price and stock into the stored item and fetches a new item in full', async () => {
+    const { engine, server, storage } = setup();
+    server.snapshot.items = [{ id: 'i1', name: 'Rice', packSize: 1, unit: 'kg', barcodes: ['890'], pricePaise: 5000, available: 9, isListed: true }];
+    await engine.refreshCatalogue();
+    server.api.getChanges = () =>
+      Promise.resolve({
+        changes: [
+          { seq: 1, entityId: 'i1', op: 'upsert', item: { id: 'i1', name: 'Rice', pricePaise: 5200, available: 7, isListed: true } },
+          { seq: 2, entityId: 'i2', op: 'upsert', item: { id: 'i2', name: 'Dal', pricePaise: 9000, available: 3, isListed: true } },
+        ],
+        cursor: '2',
+        serverNow: '2026-10-24T10:00:00.000Z',
+      });
+    server.api.getItem = (id) => Promise.resolve({ id, name: 'Dal', packSize: 500, unit: 'g', barcodes: ['891'], pricePaise: 9000, available: 3, isListed: true });
+    await engine.refreshCatalogue();
+    const items = new Map((await storage.loadCatalogue()).items.map((i) => [i.id, i]));
+    expect(items.get('i1')).toMatchObject({ pricePaise: 5200, available: 7, barcodes: ['890'], unit: 'kg' });
+    expect(items.get('i2')).toMatchObject({ barcodes: ['891'], packSize: 500 });
+  });
+
+  it('keeps a new item from the feed even when the detail fetch fails', async () => {
+    const { engine, server, storage } = setup();
+    await engine.refreshCatalogue();
+    server.api.getChanges = () =>
+      Promise.resolve({ changes: [{ seq: 1, entityId: 'i2', op: 'upsert', item: { id: 'i2', name: 'Dal', pricePaise: 9000, available: 3, isListed: true } }], cursor: '1', serverNow: '2026-10-24T10:00:00.000Z' });
+    await engine.refreshCatalogue();
+    expect((await storage.loadCatalogue()).items[0]).toMatchObject({ id: 'i2', barcodes: [] });
+  });
+});
+
 describe('reversal', () => {
   it('reverses a synced sale once, under a key fixed by the sale, and marks it', async () => {
     const { engine, server } = setup();
@@ -441,17 +520,17 @@ describe('reversal', () => {
     };
     await engine.recordSale(sale('a'));
     await engine.flush();
-    const ack = await engine.reverse('a');
+    const ack = await engine.reverse('a', 'wrong item');
     expect(ack.stockReturned).toHaveLength(1);
     expect((await engine.entries())[0]?.result?.reversed).toBe(true);
-    await engine.reverse('a');
+    await engine.reverse('a', 'wrong item');
     expect(new Set(keys).size).toBe(1);
   });
 
   it('refuses a sale that has not synced', async () => {
     const { engine } = setup({ online: false });
     await engine.recordSale(sale('a'));
-    await expect(engine.reverse('a')).rejects.toThrow();
+    await expect(engine.reverse('a', 'x')).rejects.toThrow();
   });
 });
 

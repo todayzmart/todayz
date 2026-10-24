@@ -2,7 +2,7 @@
 // for the whole bill, in rupees. The bill never drops below ₹1, so the cart caps the bill discount.
 import { formatMoney } from '@todayz/i18n';
 import { Button, Sheet, TextField } from '@todayz/ui';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import type { CartAction, CartState } from './cart';
 import { parseRupees } from './money';
@@ -23,14 +23,16 @@ export function DiscountSheet({ open, onClose, cart, dispatch }: DiscountSheetPr
   const [lines, setLines] = useState<Record<string, string>>({});
   const [invalid, setInvalid] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    if (!open) return;
-    setBill(asRupees(cart.billDiscountPaise));
-    setLines(Object.fromEntries(cart.lines.map((l) => [l.id, asRupees(l.discountPaise)])));
-    setInvalid(new Set());
-    // Opening snapshots the cart; edits while it is open are the user's.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  // Opening snapshots the cart; edits while it is open are the user's.
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) {
+      setBill(asRupees(cart.billDiscountPaise));
+      setLines(Object.fromEntries(cart.lines.map((l) => [l.id, asRupees(l.discountPaise)])));
+      setInvalid(new Set());
+    }
+  }
 
   const apply = () => {
     const bad = new Set<string>();

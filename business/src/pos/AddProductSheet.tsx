@@ -2,7 +2,7 @@
 // line (name and price), and point to Stock for adding the real product.
 import { Link } from '@tanstack/react-router';
 import { Banner, Button, Sheet, TextField } from '@todayz/ui';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { parseRupees } from './money';
 import styles from './pos.module.css';
@@ -20,13 +20,16 @@ export function AddProductSheet({ open, onClose, barcode, onAdd }: AddProductShe
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [error, setError] = useState<'name' | 'price' | null>(null);
-  useEffect(() => {
+  // Each time the sheet opens it starts empty (state adjusted while rendering, not in an effect).
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
     if (open) {
       setName('');
       setPrice('');
       setError(null);
     }
-  }, [open]);
+  }
 
   const submit = () => {
     const paise = parseRupees(price);

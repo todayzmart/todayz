@@ -31,8 +31,10 @@ export function toRecords(entries: readonly OutboxEntry[]): SaleRecord[] {
 }
 
 /** True while a manager can still reverse the sale (`pos_reversal_window_hours`, measured from the device sale time). */
-export function canReverse(rec: SaleRecord, windowHours: number, nowMs: number): boolean {
+export function canReverse(rec: SaleRecord, windowHours: number | null, nowMs: number): boolean {
   if (rec.state !== 'synced' || rec.reversed || !rec.saleId) return false;
+  // Unknown window: offer it, the server answers `reversal_window_passed`.
+  if (windowHours === null) return true;
   const soldAt = Date.parse(rec.sale.soldAt);
   return Number.isFinite(soldAt) && nowMs - soldAt <= windowHours * 3_600_000;
 }

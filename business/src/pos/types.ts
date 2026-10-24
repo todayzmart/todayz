@@ -1,7 +1,5 @@
-// Shapes the POS code uses. They follow 04-api.md "POS and sync", 03-data-model.md (`pos_sales`,
-// `pos_sale_lines`) and 02 §4.3, because W2-04's generated contract is not on this branch yet.
-// TODO(merge): when `@todayz/api-client` has the pos, sync and receipts operations, derive the wire
-// types in `api.ts` from the generated models; the local types here (cart, outbox, history) stay.
+// Shapes the POS code keeps on the device (catalogue, cart, outbox, history). The wire shapes are the
+// generated models, and `api.ts` is the only file that converts between the two.
 
 export type PaymentMethod = 'cash' | 'upi' | 'card';
 export const PAYMENT_METHODS: readonly PaymentMethod[] = ['cash', 'upi', 'card'];
@@ -26,14 +24,19 @@ export interface CatalogueItem {
   topRank?: number | null;
 }
 
-/** Numbers the POS reads from `platform_settings` (01 §17); the server sends them with the snapshot. */
+/**
+ * Numbers the POS would read from `platform_settings` (01 §17). No route sends them yet, so each is
+ * `null` (unknown) and the POS does not gate on it: the server enforces the rule and the screen shows
+ * its answer (`below_credit_minimum`, `reversal_window_passed`, a failed link).
+ * TODO(lead): a settings feed for the POS, or these three numbers on the sync response.
+ */
 export interface PosSettings {
   /** `credit_min_order_value_paise`: the bill after discounts must reach this for credits (D-30). */
-  creditMinOrderValuePaise: number;
+  creditMinOrderValuePaise: number | null;
   /** `pos_reversal_window_hours`. */
-  reversalWindowHours: number;
+  reversalWindowHours: number | null;
   /** `pos_offline_link_max_hours`. */
-  offlineLinkMaxHours: number;
+  offlineLinkMaxHours: number | null;
 }
 
 export interface CatalogueSnapshot {
@@ -44,12 +47,15 @@ export interface CatalogueSnapshot {
   serverNow: string;
 }
 
+/** What a change feed carries about an item: price and stock, not barcodes or pack size. */
+export type CatalogueItemPatch = Pick<CatalogueItem, 'id' | 'name' | 'pricePaise' | 'available' | 'isListed'> & Partial<CatalogueItem>;
+
 export interface CatalogueChange {
   seq: number;
   entityId: string;
   op: 'upsert' | 'delete';
-  /** Present on an upsert. */
-  item?: CatalogueItem;
+  /** Present on an upsert; merged into the stored item. */
+  item?: CatalogueItemPatch;
 }
 
 export interface CatalogueChanges {

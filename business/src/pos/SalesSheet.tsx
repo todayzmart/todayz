@@ -3,13 +3,13 @@
 // found. Sales always apply; stock may go below 0 and is flagged "count needed" (02 §4.3).
 import { ApiError } from '@todayz/api-client';
 import { formatMoney } from '@todayz/i18n';
-import { Banner, Button, Dialog, EmptyState, Sheet, StatusPill } from '@todayz/ui';
+import { Banner, Button, Dialog, EmptyState, Sheet, StatusPill, TextField } from '@todayz/ui';
 import { ReceiptText, RefreshCw, Undo2 } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import type { ReverseAck } from './api';
 import { canReverse, needsAttention } from './history';
-import { usePos } from './runtime';
+import { usePos } from './context';
 import type { SaleRecord } from './types';
 import styles from './pos.module.css';
 
@@ -30,19 +30,21 @@ export function SalesSheet({ open, onClose, canReverseSales, onReceipt }: SalesS
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<{ ack: ReverseAck } | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
+  const [reason, setReason] = useState('');
   const safe = useRef<HTMLButtonElement>(null);
   const attention = records.filter(needsAttention).length;
 
   const nameOf = (id: string) => items.find((i) => i.id === id)?.name ?? id;
 
   const reverse = async () => {
-    if (!confirm || busy) return;
+    if (!confirm || busy || reason.trim() === '') return;
     setBusy(true);
     setFailed(null);
     try {
-      const ack = await engine.reverse(confirm.sale.clientId);
+      const ack = await engine.reverse(confirm.sale.clientId, reason.trim().slice(0, 200));
       setDone({ ack });
       setConfirm(null);
+      setReason('');
     } catch (e) {
       setFailed(e instanceof ApiError ? e.code : 'network');
     } finally {
@@ -102,10 +104,10 @@ export function SalesSheet({ open, onClose, canReverseSales, onReceipt }: SalesS
                       {rec.linkStatus === 'failed' && <StatusPill tone="pending">{intl.formatMessage({ id: 'pos.history.linkFailed' })}</StatusPill>}
                       {rec.stockFlags.length > 0 && <StatusPill tone="pending">{intl.formatMessage({ id: 'pos.history.countNeeded' })}</StatusPill>}
                     </div>
-                    {(rec.stockFlags.length > 0 || (rec.serverTotalPaise != null && rec.serverTotalPaise !== rec.sale.totalPaise) || rec.state === 'rejected') && (
+                    {(rec.stockFlags.length > 0 || (rec.serverTotalPaise !== null && rec.serverTotalPaise !== undefined && rec.serverTotalPaise !== rec.sale.totalPaise) || rec.state === 'rejected') && (
                       <ul className={styles.notes}>
                         {rec.stockFlags.length > 0 && <li>{intl.formatMessage({ id: 'pos.history.countNeededItems' }, { names: rec.stockFlags.map(nameOf).join(', ') })}</li>}
-                        {rec.serverTotalPaise != null && rec.serverTotalPaise !== rec.sale.totalPaise && (
+                        {rec.serverTotalPaise !== null && rec.serverTotalPaise !== undefined && rec.serverTotalPaise !== rec.sale.totalPaise && (
                           <li>{intl.formatMessage({ id: 'pos.history.serverPrice' }, { device: money(rec.sale.totalPaise), server: money(rec.serverTotalPaise) })}</li>
                         )}
                         {rec.state === 'rejected' && <li>{intl.formatMessage({ id: 'pos.history.refused' })}</li>}
@@ -116,7 +118,7 @@ export function SalesSheet({ open, onClose, canReverseSales, onReceipt }: SalesS
                         {intl.formatMessage({ id: 'pos.history.receipt' })}
                       </Button>
                       {reversible && (
-                        <Button size="sm" variant="soft-danger" icon={Undo2} disabled={!online} onClick={() => setConfirm(rec)}>
+                        <Button size="sm" variant="soft-danger" icon={Undo2} disabled={!online} onClick={() => { setReason(''); setFailed(null); setConfirm(rec); }}>
                           {intl.formatMessage({ id: 'pos.reverse.action' })}
                         </Button>
                       )}
@@ -152,7 +154,7 @@ export function SalesSheet({ open, onClose, canReverseSales, onReceipt }: SalesS
             <Button ref={safe} onClick={() => setConfirm(null)} disabled={busy}>
               {intl.formatMessage({ id: 'pos.reverse.keep' })}
             </Button>
-            <Button variant="danger" loading={busy} onClick={() => void reverse()}>
+            <Button variant="danger" loading={busy} disabled={reason.trim() === ''} onClick={() => void reverse()}>
               {intl.formatMessage({ id: 'pos.reverse.confirm' })}
             </Button>
           </>
@@ -165,7 +167,17 @@ export function SalesSheet({ open, onClose, canReverseSales, onReceipt }: SalesS
               <li>{intl.formatMessage({ id: 'pos.reverse.credits' }, { count: confirm.sale.creditsUsed })}</li>
               <li>{intl.formatMessage({ id: 'pos.reverse.cashback' }, { count: confirm.cashbackCredits ?? 0 })}</li>
             </ul>
-            {failed && <Banner tone="warning" live="status">{intl.formatMessage({ id: failed === 'network' ? 'pos.reverse.offline' : 'pos.reverse.failed' })}</Banner>}
+            <TextField
+              label={intl.formatMessage({ id: 'pos.reverse.reason' })}
+              value={reason}
+              maxLength={200}
+              onChange={(e) => setReason(e.target.value)}
+            />
+            {failed && (
+              <Banner tone="warning" live="status">
+                {intl.formatMessage({ id: failed === 'network' ? 'pos.reverse.offline' : failed === 'reversal_window_passed' ? 'pos.reverse.windowPassed' : 'pos.reverse.failed' })}
+              </Banner>
+            )}
           </>
         )}
       </Dialog>

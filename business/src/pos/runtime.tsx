@@ -2,50 +2,19 @@
 // the sales history, shared with every part of the Sell screen. Sync runs by itself: at start, when
 // the network comes back, when a backoff ends, and every 30 seconds while sales are waiting.
 import { getDeviceId, newUlid, useOnline } from '@todayz/auth';
-import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createSyncEngine, type SyncEngine, type SyncState } from '../sync/engine';
 import { openStorage } from '../sync/idb';
 import type { PosStorage } from '../sync/storage';
 import { toRecords } from './history';
-import { httpPosApi, type PosApi } from './api';
+import { httpPosApi, NO_SETTINGS, type PosApi } from './api';
+import { Ctx, type PosRuntime, type PosStoreRef } from './context';
 import type { CatalogueItem, PosSettings, SaleRecord } from './types';
 
-/** Used until the first snapshot arrives; the server's numbers replace them (platform_settings, 01 §17). */
-export const DEFAULT_SETTINGS: PosSettings = { creditMinOrderValuePaise: 10000, reversalWindowHours: 24, offlineLinkMaxHours: 12 };
-// TODO(lead): the defaults above mirror 01 §17 for the first run offline; confirm the snapshot carries `settings`.
+/** No number is assumed (platform_settings are the server's, 01 §17): the server enforces them. */
+export const DEFAULT_SETTINGS: PosSettings = NO_SETTINGS;
 
 export const AUTO_SYNC_MS = 30_000;
-
-export interface PosStoreRef {
-  bid: string;
-  sid: string;
-  name: string;
-  role: 'owner' | 'manager' | 'cashier' | string;
-}
-
-export interface PosRuntime {
-  store: PosStoreRef;
-  engine: SyncEngine;
-  api: PosApi;
-  /** False when IndexedDB is blocked: sales are kept in memory only and the screen says so. */
-  durable: boolean;
-  sync: SyncState;
-  online: boolean;
-  items: CatalogueItem[];
-  catalogueLoaded: boolean;
-  settings: PosSettings;
-  records: SaleRecord[];
-  reloadRecords: () => Promise<void>;
-  now: () => number;
-}
-
-const Ctx = createContext<PosRuntime | null>(null);
-
-export function usePos(): PosRuntime {
-  const v = useContext(Ctx);
-  if (!v) throw new Error('usePos must be used inside <PosProvider>');
-  return v;
-}
 
 export interface PosProviderProps {
   store: PosStoreRef;
@@ -115,7 +84,7 @@ export function PosProvider({ store, children, fallback = null, api: apiIn, stor
       setSync(s);
       void reloadRecords();
     });
-    void reloadRecords();
+    void engine.entries().then((e) => setRecords(toRecords(e)));
     return off;
   }, [engine, reloadRecords]);
 

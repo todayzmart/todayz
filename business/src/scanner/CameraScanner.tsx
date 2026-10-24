@@ -4,6 +4,7 @@
 import { Button } from '@todayz/ui';
 import { useEffect, useRef, useState } from 'react';
 import styles from './scanner.module.css';
+import { cameraScanSupported } from './support';
 
 interface DetectedBarcode {
   rawValue: string;
@@ -34,10 +35,6 @@ type Phase = 'starting' | 'live' | 'unsupported' | 'denied';
 
 const FORMATS = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'itf', 'qr_code'];
 const SAME_CODE_MS = 1500;
-
-export function cameraScanSupported(): boolean {
-  return typeof window !== 'undefined' && 'BarcodeDetector' in window && !!navigator.mediaDevices?.getUserMedia;
-}
 
 export function CameraScanner({ labels, onDetect, onClose }: CameraScannerProps) {
   const video = useRef<HTMLVideoElement>(null);
