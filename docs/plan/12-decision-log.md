@@ -1199,3 +1199,12 @@ The founder asked for the landing site and every UI to be live on GitHub and Clo
 - **Build output.** Hidden source maps are deleted before upload (error symbolication can come with Sentry later). The three Vite apps get a `_headers` file from the script: nosniff, referrer policy, frame DENY, HSTS without `includeSubDomains`, a permissions policy, and caching for `sw.js` and `/assets/*`. They have no CSP yet; the site keeps its own CSP.
 - The repository secret is the founder's admin Cloudflare token. A Pages-only token was offered; the founder chose to keep this one (2026-10-24).
 - TODO(lead): a CSP for the three apps, proved by an e2e run against a prod-mode build.
+
+**D-215 · The first green CI on GitHub: runner speed, scanner findings, Linux in the stack smoke (lead, 24 Oct).**
+
+Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each failed on something the laptop never showed.
+
+- **Search latency.** `TestSearchAtScale` measured p95 387 ms on a shared GitHub-hosted runner against the 300 ms budget (W1-06 says "p95 < 300 ms local"). On a GitHub-hosted runner the subtest now gates at a 600 ms regression ceiling, which still catches a lost index (a sequential scan over the 180k listings takes seconds). The 300 ms stays the gate in a local `make check` and in k6 `browse_peak` (08 §6), which is where the 02 §11 budget is measured. The budget was not loosened anywhere else.
+- **Trivy, vulnerabilities.** `golang.org/x/net` in `backend/tools` goes to v0.60.0 (out 16 days; the backend module already had it, D-88). Three fixes are younger than D-88's 14 days and fix code we do not call (zod 4.6.5 via codegen, undici 8.11.2 via astro's font fetcher, certifi in the Schemathesis run): each sits in `.trivyignore.yaml` with an `expired_at` the day after its fix turns 14 days old, so the gate fails again if nobody bumps it.
+- **Trivy, misconfigurations.** Trivy's AWS checks flagged three things the checkov skips already accept: SSE-S3 on the ALB log bucket (AWS-0132; log delivery cannot use KMS), the AWS-managed SNS key (AWS-0136), and HTTPS egress to 0.0.0.0/0 from the app (AWS-0104; providers have no fixed addresses, port 443 only, the egress guard allow-lists hosts). Each gets an inline `#trivy:ignore` with its reason, next to the matching checkov skip.
+- **Stack smoke on Linux.** `dev-smoke.sh` found the LAN address with macOS's `ipconfig getifaddr en0`; on Linux it now takes the source address of the default route (`ip -4 route get`), so the loopback-only check runs on the runner too.

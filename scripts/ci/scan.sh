@@ -24,7 +24,8 @@
 # Outside CI, a git worktree that a container cannot read falls back to `gitleaks dir`
 # with scripts/ci/gitleaks-dir.toml (and says so).
 #
-# Trivy gates on HIGH and CRITICAL with --ignore-unfixed. On the weekly schedule
+# Trivy gates on HIGH and CRITICAL with --ignore-unfixed. Accepted findings are in
+# .trivyignore.yaml, each with an expiry date (D-215). On the weekly schedule
 # (GITHUB_EVENT_NAME=schedule) or with TODAYZ_TRIVY_REPORT_ALL=1 it also writes a
 # report-only pass without --ignore-unfixed.
 #
@@ -134,7 +135,8 @@ scan_trivy() {
   local -a common=(fs --scanners "vuln,secret,misconfig" --severity "HIGH,CRITICAL" --skip-version-check --no-progress
                    --skip-dirs '**/node_modules' --skip-dirs .tools --skip-dirs .cache --skip-dirs ci-reports
                    --skip-dirs .claude --skip-dirs .git --skip-dirs infra/local/data
-                   --skip-dirs scripts/ci/testdata --skip-files .env.local)
+                   --skip-dirs scripts/ci/testdata --skip-files .env.local --skip-files .env.cloud.local
+                   --ignorefile .trivyignore.yaml)
   ci_log "trivy fs: gate on HIGH, CRITICAL with a fix available"
   trivy_run "$out/trivy.txt" "${common[@]}" --ignore-unfixed --exit-code 1
   if [[ "${GITHUB_EVENT_NAME:-}" == "schedule" || "${TODAYZ_TRIVY_REPORT_ALL:-0}" == "1" ]]; then

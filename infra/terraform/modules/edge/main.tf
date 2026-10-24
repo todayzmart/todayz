@@ -127,6 +127,8 @@ resource "aws_s3_bucket_ownership_controls" "alb_logs" {
   }
 }
 
+# Trivy AWS-0132: ALB log delivery supports SSE-S3 only, not KMS (CKV_AWS_145 above).
+#trivy:ignore:AWS-0132
 resource "aws_s3_bucket_server_side_encryption_configuration" "alb_logs" {
   bucket = aws_s3_bucket.alb_logs.id
   rule {

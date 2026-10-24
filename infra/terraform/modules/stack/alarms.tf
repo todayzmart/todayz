@@ -1,6 +1,8 @@
 # CloudWatch alarms. They notify an SNS topic the founders subscribe to; Grafana also shows
 # their state (A-22). Each alarm's description names its runbook in docs/runbooks/.
 
+# Trivy AWS-0136: the AWS-managed SNS key is used; a CMK adds cost for no threat-model gain (as the database and secrets modules).
+#trivy:ignore:AWS-0136
 resource "aws_sns_topic" "alarms" {
   name              = "${local.name}-alarms"
   kms_master_key_id = "alias/aws/sns"
