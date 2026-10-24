@@ -50,7 +50,7 @@
   "orders.card.rejectA11y": { "defaultMessage": "Reject order {number}", "description": "Accessible name, {number} is TZ-024817" },
   "orders.line.stock": { "defaultMessage": "{available, plural, =0 {Out of stock} other {# in stock}}", "description": "Stock for an order line, shown to the shop" },
   "orders.line.short": { "defaultMessage": "Not enough stock", "description": "Flag on an order line the shop cannot fully cover" },
-  "orders.card.shortHint": { "defaultMessage": "{count, plural, one {Not enough stock for one item. Reject the order, or update the stock.} other {Not enough stock for # items. Reject the order, or update the stock.}}", "description": "Why Accept is disabled on a new order with short lines; {count} is the number of short lines" },
+  "orders.card.shortHint": { "defaultMessage": "Not enough stock for {count, plural, one {one item} other {# items}}. Reject the order, or update the stock.", "description": "Why Accept is disabled on a new order with short lines; {count} is the number of short lines" },
   "orders.line.qty": { "defaultMessage": "{name} × {qty}", "description": "Order line, {name} is the item and {qty} the quantity" },
   "orders.status.placed": { "defaultMessage": "New", "description": "Order status pill" },
   "orders.status.awaiting_customer": { "defaultMessage": "Waiting for customer", "description": "Order status pill" },

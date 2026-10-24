@@ -223,7 +223,7 @@ test('Accept is disabled while a line is short; the shop rejects the order inste
     });
     expect(r.status(), `counted the stock: ${await r.text()}`).toBe(201);
   };
-  const before = await request.get(itemUrl, { headers: { ...managerAuth } });
+  const before = await request.get(itemUrl, { headers: managerAuth ?? {} });
   expect(before.status()).toBe(200);
   const onHand = ((await before.json()) as { onHand: number }).onHand;
   await count(1);
