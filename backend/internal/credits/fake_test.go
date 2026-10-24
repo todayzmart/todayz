@@ -73,7 +73,7 @@ func (m *ledgerMachine) actions() map[string]func(*rapid.T) {
 			key := rapid.SampledFrom(m.keys).Draw(t, "key")
 			_, err := m.p.Post(m.ctx, Posting{Kind: TxAdminAdjustment, IdempotencyKey: "debit:" + key + c.String(),
 				Legs: []Leg{{Account{Kind: CustomerWallet, Owner: c}, -n}, {Account{Kind: PlatformAdjustments}, n}}})
-			if err != nil && err != ErrInsufficient {
+			if err != nil && !errors.Is(err, ErrInsufficient) {
 				t.Fatalf("debit: %v", err)
 			}
 		},

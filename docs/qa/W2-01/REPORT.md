@@ -126,12 +126,25 @@ What orders does with it:
 | CR-13 database property run (`TestServiceInvariantsPropertyDB`) | 150 runs through the real service. After every step the reconcile finds no drift and no balance is below 0 |
 | CR-12 (`TestConcurrentSpendDB`) | 50 goroutines, 25 holds and 25 debits of 30 each on a wallet of 100: exactly 3 succeed, the wallet ends at 10, and the reconcile is clean |
 | `go test -p 2 ./internal/jobs/ ./internal/notify/` | ok |
-| `go test -p 2 ./cmd/todayz/` | see "Area checks" below |
+| `go test -p 2 ./cmd/todayz/` | ok, 67 pass. The two contract-smoke tests skip in a plain `go test`; they ran under `make check-contract` (below) |
 | `make gen` | exit 0 |
 
 ### Area checks
 
-Filled in below once the final runs finish.
+Per the lead's rule, I ran these instead of the full `make check`:
+
+| Check | Result |
+|---|---|
+| `gofmt -l` on the changed packages | clean |
+| `go vet ./...` | ok |
+| golangci-lint on credits, jobs, orders, notify, notice, authz, cmd/todayz | 0 issues. The last run fixed an errorlint finding (`errors.Is` in `fake_test.go`) and a gosec G101 false positive (the runbook path constant is now `ledgerRunbook`) |
+| settings lint (`go run ./internal/devtools/settingslint .`) | exit 0 |
+| authz policy tests | ok |
+| `make check-contract` | exit 0. Redocly lint: valid, with 10 warnings (unused components and a media-type example, none in wallet or business-credits). `apigen check`: ok. api-client: eslint and 42 tests pass. Hooks: 13 tests ok. `TestContractSmoke` (Schemathesis examples and coverage): ok, with 44 problem codes registered |
+
+A fix from the final runs: in `cmd/todayz`, the identity deletion tests build their dependencies without Settings, so `OnAccountDelete` returned "not configured" and the deletion answered 500. The deletion forfeiture now needs only the database (`Service.dbReady`), because it reads no setting.
+
+Not run here: the full `make check`, `make e2e`, gosec and govulncheck across the whole module. The lead runs `make check` on main after merging.
 
 ## Scenarios
 

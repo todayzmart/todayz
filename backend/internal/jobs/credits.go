@@ -16,7 +16,7 @@ import (
 	"github.com/todayz/backend/internal/platform/notice"
 )
 
-const creditsRunbook = "docs/runbooks/credits-ledger.md"
+const ledgerRunbook = "docs/runbooks/credits-ledger.md"
 
 // registercredits declares the credits jobs (W2-01): the hourly expiry, the
 // daily "credits expiring" reminder and the nightly ledger reconcile. Each
@@ -57,7 +57,7 @@ func registercredits(r *Registry, d Deps) {
 		return svc, nil
 	}
 	job := func(k platformjobs.Kind, run func(context.Context, *credits.Service) (map[string]int64, error)) {
-		k.Owner, k.Runbook = "W2-01", creditsRunbook
+		k.Owner, k.Runbook = "W2-01", ledgerRunbook
 		k.Timeout, k.MaxAttempts = 60*time.Second, 3
 		k.Handler = func(ctx context.Context, _ platformjobs.Run) (platformjobs.Result, error) {
 			s, err := service()
