@@ -189,7 +189,7 @@ func start() {
 // passwords derive from that URL, so every binary sets the same ones; the
 // advisory lock keeps concurrent binaries from racing on CREATE ROLE.
 func startShared(ctx context.Context, file string) {
-	b, err := os.ReadFile(file) // #nosec G304 -- a path the developer sets for tests
+	b, err := os.ReadFile(file) // #nosec G304 G703 -- a path the developer sets for tests
 	if err != nil {
 		startErr = fmt.Errorf("testkit: %s: %w (scripts/testpg.sh up)", SharedURLFileEnv, err)
 		return
