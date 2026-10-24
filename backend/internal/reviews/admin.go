@@ -66,7 +66,7 @@ func (s *Service) listAdmin(ctx context.Context, state *string, storeID *string,
 		store = ids.UUID(sid)
 	}
 	rows, err := s.q(ctx).ListAdminReviews(ctx, reviewsdb.ListAdminReviewsParams{
-		StoreID: store, State: st, BeforeAt: at, BeforeID: id, Lim: int32(lim + 1), //nolint:gosec // ≤ maxLimit+1
+		StoreID: store, State: st, BeforeAt: at, BeforeID: id, Lim: int32(lim + 1), // #nosec G115 -- lim is clamped to [1, maxLimit]
 	})
 	if err != nil {
 		return adminapi.AdminReviewList{}, err
@@ -270,7 +270,7 @@ func (s *Service) listReports(ctx context.Context, status *string, limit *int, c
 	var rows []row
 	switch st {
 	case "open":
-		rs, err := s.q(ctx).ListAdminReportsOpen(ctx, reviewsdb.ListAdminReportsOpenParams{AfterAt: at, AfterID: id, Lim: int32(lim + 1)}) //nolint:gosec // ≤ maxLimit+1
+		rs, err := s.q(ctx).ListAdminReportsOpen(ctx, reviewsdb.ListAdminReportsOpenParams{AfterAt: at, AfterID: id, Lim: int32(lim + 1)}) // #nosec G115 -- lim is clamped to [1, maxLimit]
 		if err != nil {
 			return out, err
 		}
@@ -278,7 +278,7 @@ func (s *Service) listReports(ctx context.Context, status *string, limit *int, c
 			rows = append(rows, row{r.ID, r.ReviewID, r.FromStore, r.Reason, r.Status, r.Resolution, r.ResolutionNote, r.CreatedAt, r.ResolvedAt})
 		}
 	case "resolved":
-		rs, err := s.q(ctx).ListAdminReportsResolved(ctx, reviewsdb.ListAdminReportsResolvedParams{BeforeAt: at, BeforeID: id, Lim: int32(lim + 1)}) //nolint:gosec // ≤ maxLimit+1
+		rs, err := s.q(ctx).ListAdminReportsResolved(ctx, reviewsdb.ListAdminReportsResolvedParams{BeforeAt: at, BeforeID: id, Lim: int32(lim + 1)}) // #nosec G115 -- lim is clamped to [1, maxLimit]
 		if err != nil {
 			return out, err
 		}

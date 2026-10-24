@@ -447,7 +447,7 @@ func (s *Service) listMine(ctx context.Context, userID ids.ID, limit *int, curso
 		return reviewsapi.MyReviewList{}, err
 	}
 	rows, err := s.q(ctx).ListMyReviews(ctx, reviewsdb.ListMyReviewsParams{
-		CustomerID: ids.UUID(userID), BeforeAt: at, BeforeID: id, Lim: int32(lim + 1), //nolint:gosec // ≤ maxLimit+1
+		CustomerID: ids.UUID(userID), BeforeAt: at, BeforeID: id, Lim: int32(lim + 1), // #nosec G115 -- lim is clamped to [1, maxLimit]
 	})
 	if err != nil {
 		return reviewsapi.MyReviewList{}, err
@@ -556,7 +556,7 @@ func (s *Service) listForStore(ctx context.Context, storeID ids.ID, limit *int, 
 // storePage reads one page of a store's visible reviews (lim rows and the next cursor).
 func (s *Service) storePage(ctx context.Context, store, reporting pgtype.UUID, lim int, at *time.Time, id pgtype.UUID) ([]reviewsdb.ListStoreReviewsRow, *string, error) {
 	rows, err := s.q(ctx).ListStoreReviews(ctx, reviewsdb.ListStoreReviewsParams{
-		ReportingStore: reporting, StoreID: store, BeforeAt: at, BeforeID: id, Lim: int32(lim + 1), //nolint:gosec // ≤ maxLimit+1
+		ReportingStore: reporting, StoreID: store, BeforeAt: at, BeforeID: id, Lim: int32(lim + 1), // #nosec G115 -- lim is clamped to [1, maxLimit]
 	})
 	if err != nil {
 		return nil, nil, err

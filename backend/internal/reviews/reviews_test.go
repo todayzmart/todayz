@@ -292,7 +292,7 @@ func TestValidation(t *testing.T) {
 		_, err := e.svc.create(e.ctx, u, in)
 		return err
 	}
-	tags := func(t ...reviewsapi.ReviewTag) *reviewsapi.ReviewTags { r := reviewsapi.ReviewTags(t); return &r }
+	tags := func(t ...reviewsapi.ReviewTag) *reviewsapi.ReviewTags { r := t; return &r }
 	long := strings.Repeat("a", 1001)
 	ok := strings.Repeat("ऄ", 1000) // 1000 characters, more bytes
 
@@ -720,7 +720,7 @@ func TestPaging(t *testing.T) {
 		if p.NextCursor == nil {
 			break
 		}
-		c := string(*p.NextCursor)
+		c := *p.NextCursor
 		cursor = &c
 	}
 	require.Len(t, seen, 5)
