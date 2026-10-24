@@ -190,10 +190,17 @@ func (s *Service) cookieLive(ctx context.Context, v string, now time.Time, win t
 	return !now.After(cl.CreatedAt.Add(win))
 }
 
+// cookieClick is the click id a cookie holds; a missing or malformed cookie
+// is no click.
+func cookieClick(v string) (ids.ID, bool) {
+	id, err := ids.Parse(strings.TrimSpace(v))
+	return id, v != "" && err == nil
+}
+
 // clickReferrer reads the click a cookie names; ok false when there is none.
 func (s *Service) clickReferrer(ctx context.Context, v string) (referrer, time.Time, bool, error) {
-	id, err := ids.Parse(strings.TrimSpace(v))
-	if v == "" || err != nil {
+	id, ok := cookieClick(v)
+	if !ok {
 		return referrer{}, time.Time{}, false, nil
 	}
 	cl, err := s.q(ctx).GetClick(ctx, ids.UUID(id))

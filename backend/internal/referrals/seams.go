@@ -47,6 +47,12 @@ type Reward struct {
 // post (not built yet, or switched off): the side stays unposted and the
 // sweep tries again. An error is logged and treated the same way; the
 // posting runs in a savepoint, so a failure never aborts the purchase.
+//
+// TODO(merge): W2-01 credits is not merged yet. Its credits.Poster becomes
+// the Ledger through an adapter in cmd/todayz/routes_referrals.go and
+// internal/jobs/referrals.go: Posting{Kind: TxReferralReward, legs
+// PlatformMarketing → CustomerWallet (BeneficiaryCustomer) or StoreCredit
+// (BeneficiaryStore), IdempotencyKey: r.IdempotencyKey, Ref: the referral}.
 type Ledger interface {
 	PostReward(ctx context.Context, r Reward) (txID ids.ID, posted bool, err error)
 }
@@ -55,7 +61,9 @@ type Ledger interface {
 type NoLedger struct{}
 
 // PostReward implements Ledger.
-func (NoLedger) PostReward(context.Context, Reward) (ids.ID, bool, error) { return ids.Zero, false, nil }
+func (NoLedger) PostReward(context.Context, Reward) (ids.ID, bool, error) {
+	return ids.Zero, false, nil
+}
 
 // Purchase kinds a referral can be qualified by (referrals.qualifying_ref_type).
 const (

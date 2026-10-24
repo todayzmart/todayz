@@ -98,6 +98,20 @@ var catalogue = map[string]kindDef{
 			"en": {"A shop has it", "{store} has {product}."},
 		},
 	},
+	notice.KindReferralUnlocked: {
+		// 01 §15: "Referral unlocked", in-app + push (W2-03).
+		App: AppCustomer, Channels: []notice.Channel{notice.Push}, Params: []string{"credits"},
+		Text: map[string]text{
+			"en": {"Referral unlocked", "You earned {credits} credits from a referral."},
+		},
+	},
+	notice.KindShopReferralUnlocked: {
+		// W2-03: a referral reward reached the store's credit account (in-app + push).
+		App: AppBusiness, Channels: []notice.Channel{notice.Push}, Params: []string{"credits"},
+		Text: map[string]text{
+			"en": {"Referral unlocked", "{credits} credits from a referral were added to your credit account."},
+		},
+	},
 }
 
 var (

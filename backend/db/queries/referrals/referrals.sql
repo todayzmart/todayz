@@ -153,9 +153,11 @@ SELECT * FROM referrals WHERE referee_type = @referee_type AND referee_id = @ref
 -- name: LockReferral :one
 SELECT * FROM referrals WHERE id = @id FOR UPDATE;
 
--- name: LockQualifyingReferral :one
--- The referral a purchase qualified, for a reversal (D-08).
-SELECT * FROM referrals WHERE qualifying_ref_type = @ref_type::text AND qualifying_ref_id = @ref_id FOR UPDATE;
+-- name: LockQualifyingReferrals :many
+-- The referrals a purchase qualified, for a reversal (D-08): one order can
+-- qualify its buyer's referral and complete its shop's count.
+SELECT * FROM referrals WHERE qualifying_ref_type = @ref_type::text AND qualifying_ref_id = @ref_id
+ORDER BY id FOR UPDATE;
 
 -- name: SetQualified :one
 UPDATE referrals SET status = 'qualified', qualifying_ref_type = @ref_type::text, qualifying_ref_id = @ref_id,
