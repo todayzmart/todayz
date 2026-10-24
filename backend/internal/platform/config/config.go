@@ -22,6 +22,7 @@ import (
 	"net"
 	"net/url"
 	"os"
+	"regexp"
 	"slices"
 	"sort"
 	"strings"
@@ -97,26 +98,34 @@ type AppKeys struct {
 // Providers holds provider endpoints and keys (D-17, D-19). Keys are optional
 // locally; a channel works only when its settings flag is on and its key is set.
 type Providers struct {
-	SMSAPIURL          string
-	MSG91AuthKey       Secret
-	MSG91SenderID      string
-	MSG91OTPTemplateID string
-	WhatsAppProvider   string
-	WhatsAppAPIURL     string
-	WhatsAppAPIKey     Secret
-	PushAPIURL         string
-	VAPIDPublicKey     string
-	VAPIDPrivateKey    Secret
-	TurnstileAPIURL    string
-	TurnstileSiteKey   string
-	TurnstileSecretKey Secret
-	STTAPIURL          string
-	SarvamAPIKey       Secret
-	LLMAPIURL          string
-	AnthropicAPIKey    Secret
-	MockLLM            bool
-	GeocoderProvider   string
-	GeocoderAPIKey     Secret
+	// SMS is AWS End User Messaging SMS (D-212), signed with the EC2 instance
+	// role when deployed, so there is no SMS key. SMSAPIURL overrides the
+	// endpoint (the mocks server in local and test; empty when deployed means
+	// the SDK's regional endpoint). The DLT values are not secret.
+	SMSAPIURL        string
+	SMSSenderID      string // SMS_SENDER_ID: the DLT header, sent as the origination identity
+	SMSDLTEntityID   string // SMS_DLT_ENTITY_ID: IN_ENTITY_ID on every send
+	SMSOTPTemplateID string // SMS_OTP_TEMPLATE_ID: IN_TEMPLATE_ID of the OTP text
+	// SMSNoticeTemplateIDs maps a notify catalogue template name (for
+	// example tz_order_unseen_hi) to its DLT template id
+	// (SMS_NOTICE_TEMPLATE_IDS="name=id,name=id").
+	SMSNoticeTemplateIDs map[string]string
+	WhatsAppProvider     string
+	WhatsAppAPIURL       string
+	WhatsAppAPIKey       Secret
+	PushAPIURL           string
+	VAPIDPublicKey       string
+	VAPIDPrivateKey      Secret
+	TurnstileAPIURL      string
+	TurnstileSiteKey     string
+	TurnstileSecretKey   Secret
+	STTAPIURL            string
+	SarvamAPIKey         Secret
+	LLMAPIURL            string
+	AnthropicAPIKey      Secret
+	MockLLM              bool
+	GeocoderProvider     string
+	GeocoderAPIKey       Secret
 }
 
 // Storage holds R2 (MinIO locally) settings.
@@ -148,6 +157,10 @@ type Config struct {
 
 	DatabaseURL        Secret
 	DatabaseMigrateURL Secret
+
+	// AWSRegion is AWS_REGION, for the AWS clients the app builds itself
+	// (SMS, D-212). The app reads it here; no SDK default chain runs.
+	AWSRegion string
 
 	Keys      AppKeys
 	Storage   Storage
@@ -263,27 +276,29 @@ func Load(getenv Getenv, log *slog.Logger) (*Config, error) {
 		OTLPHeaders:  r.secret("OTEL_EXPORTER_OTLP_HEADERS"),
 		SentryDSN:    r.secret("SENTRY_DSN"),
 	}
+	c.AWSRegion = r.awsRegion("AWS_REGION")
 	c.Providers = Providers{
-		SMSAPIURL:          r.url("SMS_API_URL"),
-		MSG91AuthKey:       r.secret("MSG91_AUTH_KEY"),
-		MSG91SenderID:      r.str("MSG91_SENDER_ID"),
-		MSG91OTPTemplateID: r.str("MSG91_OTP_TEMPLATE_ID"),
-		WhatsAppProvider:   r.str("WHATSAPP_PROVIDER"),
-		WhatsAppAPIURL:     r.url("WHATSAPP_API_URL"),
-		WhatsAppAPIKey:     r.secret("WHATSAPP_API_KEY"),
-		PushAPIURL:         r.url("PUSH_API_URL"),
-		VAPIDPublicKey:     r.str("VAPID_PUBLIC_KEY"),
-		VAPIDPrivateKey:    r.secret("VAPID_PRIVATE_KEY"),
-		TurnstileAPIURL:    r.url("TURNSTILE_API_URL"),
-		TurnstileSiteKey:   r.str("TURNSTILE_SITE_KEY"),
-		TurnstileSecretKey: r.secret("TURNSTILE_SECRET_KEY"),
-		STTAPIURL:          r.url("STT_API_URL"),
-		SarvamAPIKey:       r.secret("SARVAM_API_KEY"),
-		LLMAPIURL:          r.url("LLM_API_URL"),
-		AnthropicAPIKey:    r.secret("ANTHROPIC_API_KEY"),
-		MockLLM:            r.boolDefault("MOCK_LLM", true),
-		GeocoderProvider:   r.str("GEOCODER_PROVIDER"),
-		GeocoderAPIKey:     r.secret("GEOCODER_API_KEY"),
+		SMSAPIURL:            r.url("SMS_API_URL"),
+		SMSSenderID:          r.senderID("SMS_SENDER_ID"),
+		SMSDLTEntityID:       r.dltID("SMS_DLT_ENTITY_ID"),
+		SMSOTPTemplateID:     r.dltID("SMS_OTP_TEMPLATE_ID"),
+		SMSNoticeTemplateIDs: r.dltTemplates("SMS_NOTICE_TEMPLATE_IDS"),
+		WhatsAppProvider:     r.str("WHATSAPP_PROVIDER"),
+		WhatsAppAPIURL:       r.url("WHATSAPP_API_URL"),
+		WhatsAppAPIKey:       r.secret("WHATSAPP_API_KEY"),
+		PushAPIURL:           r.url("PUSH_API_URL"),
+		VAPIDPublicKey:       r.str("VAPID_PUBLIC_KEY"),
+		VAPIDPrivateKey:      r.secret("VAPID_PRIVATE_KEY"),
+		TurnstileAPIURL:      r.url("TURNSTILE_API_URL"),
+		TurnstileSiteKey:     r.str("TURNSTILE_SITE_KEY"),
+		TurnstileSecretKey:   r.secret("TURNSTILE_SECRET_KEY"),
+		STTAPIURL:            r.url("STT_API_URL"),
+		SarvamAPIKey:         r.secret("SARVAM_API_KEY"),
+		LLMAPIURL:            r.url("LLM_API_URL"),
+		AnthropicAPIKey:      r.secret("ANTHROPIC_API_KEY"),
+		MockLLM:              r.boolDefault("MOCK_LLM", true),
+		GeocoderProvider:     r.str("GEOCODER_PROVIDER"),
+		GeocoderAPIKey:       r.secret("GEOCODER_API_KEY"),
 	}
 	c.NoEgress = r.boolDefault("TODAYZ_NO_EGRESS", false) || env == EnvTest
 	c.Shutdown = Shutdown{PreStop: r.duration("SHUTDOWN_PRESTOP"), Drain: r.duration("SHUTDOWN_DRAIN")}
@@ -450,6 +465,67 @@ func (r *reader) boolDefault(name string, def bool) bool {
 	}
 	r.bad(name, "must be 0 or 1")
 	return def
+}
+
+var (
+	awsRegionRe   = regexp.MustCompile(`^[a-z]{2}(-[a-z]+)+-[0-9]$`)
+	senderIDRe    = regexp.MustCompile(`^[A-Za-z0-9]{1,11}$`)
+	dltIDRe       = regexp.MustCompile(`^[0-9]{1,32}$`)
+	templateKeyRe = regexp.MustCompile(`^[a-z][a-z0-9_]{0,63}$`)
+)
+
+// awsRegion reads an AWS region name such as ap-south-1.
+func (r *reader) awsRegion(name string) string {
+	v := r.raw(name)
+	if v != "" && !awsRegionRe.MatchString(v) {
+		r.bad(name, "must be an AWS region such as ap-south-1")
+		return ""
+	}
+	return v
+}
+
+// senderID reads an SMS sender ID (a DLT header: letters and digits, at most 11).
+func (r *reader) senderID(name string) string {
+	v := r.raw(name)
+	if v != "" && !senderIDRe.MatchString(v) {
+		r.bad(name, "must be 1 to 11 letters or digits")
+		return ""
+	}
+	return v
+}
+
+// dltID reads a DLT entity or template id (TRAI's ids are numeric).
+func (r *reader) dltID(name string) string {
+	v := r.raw(name)
+	if v != "" && !dltIDRe.MatchString(v) {
+		r.bad(name, "must be a numeric DLT id")
+		return ""
+	}
+	return v
+}
+
+// dltTemplates reads "name=id,name=id": a notify template name and its
+// numeric DLT template id. Errors name the entry's position, never its text.
+func (r *reader) dltTemplates(name string) map[string]string {
+	v := r.raw(name)
+	if v == "" {
+		return nil
+	}
+	out := map[string]string{}
+	for i, part := range strings.Split(v, ",") {
+		k, id, ok := strings.Cut(strings.TrimSpace(part), "=")
+		k, id = strings.TrimSpace(k), strings.TrimSpace(id)
+		switch {
+		case !ok || !templateKeyRe.MatchString(k) || !dltIDRe.MatchString(id):
+			r.bad(name, fmt.Sprintf("entry %d must be name=id (a lowercase template name and a numeric DLT id)", i+1))
+			return nil
+		case out[k] != "":
+			r.bad(name, fmt.Sprintf("entry %d repeats a template name", i+1))
+			return nil
+		}
+		out[k] = id
+	}
+	return out
 }
 
 // key32 reads a 32-byte key written in standard base64.

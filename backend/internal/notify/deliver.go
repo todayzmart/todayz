@@ -81,6 +81,10 @@ func (s *Service) Deliver(ctx context.Context, deliveryID ids.ID) (DeliverResult
 	if err := json.Unmarshal(row.Params, &params); err != nil {
 		return fail(prov.Name(), "params could not be read")
 	}
+	if ch == notice.SMS {
+		// DLT caps each template variable (a long store name), D-212.
+		params = smsParams(params)
+	}
 	tpl, lang := templateFor(def, pickLang(row.Lang))
 	t, _ := textFor(row.Kind, lang, params)
 	msg := Message{To: string(plain), Template: tpl, Lang: lang, Text: t.Body}

@@ -108,21 +108,13 @@ Most tokens are **shown only once**. Copy each one straight into the file before
 
 Terraform creates the rest: DNS, WAF, rate limits, the R2 buckets and their custom domains, the Turnstile widget, and the four Pages projects. The R2 S3 keys the app uses are created later, scoped to the buckets once they exist; the lead will ask for them then.
 
-## 4. Providers (prod can go up without these; real logins need MSG91)
+## 4. Providers (prod can go up without these; real logins need SMS)
 
-### SMS OTP (MSG91): `MSG91_AUTH_KEY`, `MSG91_SENDER_ID`, `MSG91_OTP_TEMPLATE_ID`
+### SMS (AWS End User Messaging): `SMS_SENDER_ID`, `SMS_DLT_ENTITY_ID`, `SMS_OTP_TEMPLATE_ID`, `SMS_NOTICE_TEMPLATE_IDS`
 
-In India every business SMS must be registered on DLT first. This takes **days**, so start it now.
+SMS goes through AWS End User Messaging SMS in the same AWS account (D-212). There is no SMS key: the api and worker instance roles sign each send, and Terraform grants them `sms-voice:SendTextMessage` on the sender ID only. Every send carries the DLT entity and template ids, as India requires.
 
-1. **Register on a DLT portal** as a **Principal Entity**: Jio TrueConnect, Airtel DLT or Vi DLT. Use the company documents: PAN, and the GST or incorporation certificate. Once approved you get an **Entity ID**.
-2. **Register a Header** (the sender ID). Use 6 letters, for example `TODAYZ`, category Transactional/Service.
-3. **Register a Content Template** (Service Implicit, OTP), for example: `{#var#} is your TodayZ login code. Do not share it.` Once approved you get a DLT template ID.
-4. **Set up MSG91.**
-   - Sign up at https://msg91.com.
-   - Add the DLT Entity ID and the sender ID.
-   - Create an **OTP template** with the DLT template ID.
-   - Copy MSG91's template id into `MSG91_OTP_TEMPLATE_ID` and the sender ID into `MSG91_SENDER_ID`.
-   - Copy the **Authkey** into `MSG91_AUTH_KEY`. It is under the account menu → **Authkey**, or API → Authkey.
+Follow [aws-founder-steps.md, part C](aws-founder-steps.md) for the whole setup: DLT registration (which takes **days**, so start it now), the exact template texts, the values for `.env.cloud.local` and the AWS console steps (sender ID, sandbox numbers, production access, spend limit). Those four values are not secrets; the lead passes them to Terraform as `TF_VAR_sms_sender_id`, `TF_VAR_sms_dlt_entity_id`, `TF_VAR_sms_otp_template_id` and `TF_VAR_sms_notice_template_ids`.
 
 ### Errors (Sentry): `SENTRY_DSN`, `SENTRY_AUTH_TOKEN`
 

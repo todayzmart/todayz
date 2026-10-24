@@ -541,7 +541,7 @@ Follows the rules for every AI feature ([11-ai-features.md](11-ai-features.md) Â
 
 | Integration | Env var names (values never printed) | Used for | Local and test | Staging and prod, key missing |
 |---|---|---|---|---|
-| SMS (MSG91) | `MSG91_AUTH_KEY`, `MSG91_SENDER_ID`, `MSG91_OTP_TEMPLATE_ID` | OTP, critical alerts | Mock SMS; messages show at `mocks.todayz.localhost`. Reserved numbers `+91 90000 000xx` accept `000000`. | Auth refuses to start |
+| SMS (AWS End User Messaging, D-212) | `SMS_SENDER_ID`, `SMS_DLT_ENTITY_ID`, `SMS_OTP_TEMPLATE_ID`, `SMS_NOTICE_TEMPLATE_IDS`, `AWS_REGION` (no key: the instance role signs; `SMS_API_URL` points at the mocks locally) | OTP, critical alerts | Mock SMS; messages show at `mocks.todayz.localhost`. Reserved numbers `+91 90000 000xx` accept `000000`. | Auth refuses to start |
 | WhatsApp (MSG91 or Gupshup) | `WHATSAPP_PROVIDER`, `WHATSAPP_API_KEY` | Receipts, order updates (opt-in) | Mock | SMS / push |
 | Web push | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Push | Mock push | In-app inbox |
 | Turnstile | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | OTP send, lead form | Test keys (always pass) | Staging and prod refuse to start without it (preflight); a build that somehow runs without it answers OTP send with 503 (D-105) |

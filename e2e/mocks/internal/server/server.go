@@ -1,5 +1,5 @@
 // Package server is the TodayZ mocks HTTP server: provider look-alikes for
-// MSG91 SMS and WhatsApp, Gupshup WhatsApp, Web Push, Cloudflare Turnstile,
+// AWS End User Messaging SMS, MSG91 WhatsApp (and legacy MSG91 SMS), Gupshup WhatsApp, Web Push, Cloudflare Turnstile,
 // Sarvam speech-to-text and the Anthropic Messages API, plus a capture UI and
 // a JSON API for tests.
 //
@@ -132,7 +132,13 @@ func (s *Server) Store() *capture.Store { return s.store }
 func (s *Server) routes() {
 	m := s.mux
 
-	// MSG91 SMS (base https://control.msg91.com -> /msg91). Provider routes take
+	// AWS End User Messaging SMS (D-212): SMS_API_URL=http://127.0.0.1:4010/sms-voice.
+	// The SDK posts to the base path itself, without a trailing slash.
+	m.HandleFunc("POST "+awsSMSRequestPath, s.awsSendTextMessage)
+	m.HandleFunc("POST "+awsSMSRequestPath+"/{$}", s.awsSendTextMessage)
+
+	// Legacy MSG91 SMS (base https://control.msg91.com -> /msg91), kept until the
+	// lead removes it; the backend no longer calls it (D-212). Provider routes take
 	// phones with the country code only (919000000001); /_mock filters are lenient.
 	m.HandleFunc("POST /msg91/api/v5/otp", s.msg91SendOTP)
 	m.HandleFunc("POST /msg91/api/v5/otp/retry", s.msg91RetryOTP)
@@ -300,7 +306,7 @@ func (s *Server) fixtureErrors() []string {
 			out = append(out, e.Error())
 		}
 	}
-	for _, name := range []string{"sms/templates.json", "whatsapp/templates.json"} {
+	for _, name := range []string{"sms/templates.json", dltTemplatesFile, "whatsapp/templates.json"} {
 		if _, err := fixtures.LoadTemplates(s.cfg.Fixtures, name); err != nil {
 			out = append(out, err.Error())
 		}

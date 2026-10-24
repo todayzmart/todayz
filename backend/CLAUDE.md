@@ -44,7 +44,7 @@ db/migrations/         goose SQL (see db/migrations/README.md: roles, numbering,
 db/queries/<domain>/   sqlc queries, one folder per domain → package gen/sqlc/<domain>db
 db/sqlc.yaml           sqlc reads the Up sections of the migrations as the schema
 internal/platform/     shared plumbing, no domain logic:
-  audit buildinfo clock config db dbenv egress health httpx(+mw, problem, route) idempotency
+  audit awssms buildinfo clock config db dbenv egress health httpx(+mw, problem, route) idempotency
   ids migrate money pgnotify queue reqctx settings telemetry testclock
 internal/jobs/         River registry: jobs.go + one <domain>.go per domain (24)
 internal/seed/         seed registry: seed.go + one <domain>.go per domain (24)

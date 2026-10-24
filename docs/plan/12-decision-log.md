@@ -1155,3 +1155,36 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 - **Kept:** the budget alarm comes first. The founder sees the prod `terraform plan` summary (resources and cost, about ₹13–17k a month) before the first apply. App keys are generated fresh for prod, straight into Secrets Manager. `make check` stays the gate before every deploy.
 - **Prod data:** reference data only (categories, places, master catalogue, admin users). Never the dev seed.
 - **Guide:** `docs/runbooks/cloud-access.md`.
+
+## SMS on AWS End User Messaging (2026-10-24)
+
+**D-212 · SMS through AWS End User Messaging, not MSG91 (lead, 24 Oct).** SMS (login OTPs and notice SMS) goes through AWS End User Messaging SMS (`pinpoint-sms-voice-v2` `SendTextMessage`) in the prod AWS account. The instance role signs each request, so no SMS key is stored anywhere (`MSG91_AUTH_KEY` is gone from config, `.env.example` and the Secrets Manager list). India DLT: every send carries `DestinationCountryParameters` `IN_ENTITY_ID` and `IN_TEMPLATE_ID`, and the DLT sender ID as the origination identity. Config: `SMS_SENDER_ID`, `SMS_DLT_ENTITY_ID`, `SMS_OTP_TEMPLATE_ID`, `SMS_NOTICE_TEMPLATE_IDS` (catalogue template name to DLT id, `name=id,name=id`), region from `AWS_REGION`; `SMS_API_URL` stays as the override, and local and test send to the mocks through it. `make check` stays offline. The SMS text must be exactly the registered DLT template (`docs/runbooks/aws-founder-steps.md` part C1), and DLT caps each `{#var#}` at 30 characters.
+
+**D-213 · How D-212 was built, and the conservative readings (W3 SMS swap).**
+- **One client for both callers.** `internal/platform/awssms` builds the SDK client once for identity (OTP) and notify (notice SMS). The client is built directly with `pinpointsmsvoicev2.New`, never `LoadDefaultConfig`. Its HTTP goes through `httpx.NewOutboundClient` (egress guard). It has no SDK retries, so each message is sent at most once, and a 10 s timeout.
+- **Credentials.** Deployed (staging, prod) credentials come from the EC2 instance role through IMDSv2 only: the endpoint is pinned to `169.254.169.254` and there is no IMDSv1 fallback. Nothing reads `~/.aws` or the default chain. Local and test sign with fixed dummy credentials and refuse any `SMS_API_URL` that is not a local host, so they can never sign for a real endpoint. Under `TODAYZ_NO_EGRESS` the IMDS call is refused before it leaves the machine.
+- **Selection.**
+  - Deployed needs `AWS_REGION`, `SMS_SENDER_ID` and `SMS_DLT_ENTITY_ID`. Local and test need `SMS_API_URL` instead of the region.
+  - Login also needs `SMS_OTP_TEMPLATE_ID`. Identity preflight names every missing variable, never a value.
+  - Locally, with `SMS_API_URL` unset, OTPs are dropped as before. With it set but the ids incomplete, login fails visibly rather than silently.
+- **Notices.**
+  - A notice template with no entry in `SMS_NOTICE_TEMPLATE_IDS` fails that delivery with a reason naming the template, and nothing is sent. The integration status lists the unmapped template names.
+  - Deliver cuts every SMS template param to 30 runes (trailing spaces dropped) before rendering. Only the SMS is cut; the inbox row keeps the full value.
+  - `TestSMSTextMatchesDLTTemplates` pins the catalogue's `order_unseen` en/hi text to the DLT texts.
+- **OTP text** is exactly `<code> is your TodayZ login code. Do not share it with anyone.` (the DLT template), with a 300 s time to live.
+- **Mocks.** `POST /sms-voice` speaks AWS JSON 1.0 and records each send in the SMS capture, so `/_mock/sms/latest-otp` works unchanged.
+  - For a `+91` number it requires the sender ID and both DLT ids.
+  - When the template id is listed in `fixtures/sms/dlt-templates.json`, the body must match that template with each `{#var#}` at most 30 characters. The real operator would drop such a message silently, so failing here shows the drift locally.
+  - The MSG91 SMS routes stay as legacy.
+- **Terraform.**
+  - `policies/sms-send.json` is attached to both the api and the worker role. It allows only `sms-voice:SendTextMessage` on `sender-id/<SMS_SENDER_ID>/IN` and this account's opt-out lists. It is created only when `sms_sender_id` is set.
+  - `check.py sms` (and `all`) keeps it strict: one Allow statement, that one action, no wildcard identity ARN, no `NotAction`, `NotResource` or `Condition`, and attached to both roles. The read-only api policy and the worker metrics policy are unchanged and still refuse it.
+  - `AWS_REGION` and the four SMS values reach both environments as plain properties; an empty one is left out.
+- TODO(lead): IAM resource types. Whether `SendTextMessage` is also authorised against the opt-out list (granted as `opt-out-list/*`) or a configuration set (not granted) is unverified without a cloud call. The first real send in prod will show an `AccessDeniedException` if a resource type is missing.
+- TODO(lead): IMDS hop limit. IMDSv2 from inside the Beanstalk Docker container needs a hop limit of 2 on the instance metadata options; confirm it in the `beanstalk_env` launch settings before the first send.
+- TODO(lead): roles. Both api (OTP) and worker (notice SMS) get the send permission. Narrow one if only one process should send.
+- TODO(lead): Devanagari cut. Cutting a store name at 30 runes can split a Devanagari grapheme cluster (a vowel sign without its consonant). It still matches DLT's 30-character cap, but may look odd.
+- TODO(lead): no WebOTP line. The OTP SMS has no WebOTP (`@app.todayz.in #code`) line, because DLT rejects any text other than the registered template. Adding autofill means registering a new template.
+- TODO(lead): removing `MSG91_AUTH_KEY` from `modules/secrets` destroys that secret if it was ever applied. Nothing has been applied yet.
+- TODO(lead): price. `CostPerUnitPaise` for SMS still needs the AWS India price per part.
+- TODO(lead): legacy routes. Remove the legacy MSG91 SMS mock routes when nothing uses them.

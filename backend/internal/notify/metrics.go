@@ -32,7 +32,7 @@ func init() {
 		ch = append(ch, string(c))
 	}
 	telemetry.RegisterLabelValues("channel", ch...)
-	telemetry.RegisterLabelValues("provider", "msg91", "none")
+	telemetry.RegisterLabelValues("provider", "aws_sms", "msg91", "none")
 	telemetry.RegisterLabelValues("outcome", OutcomeSent, OutcomeFailed, OutcomeSkippedFlag,
 		OutcomeSkippedProvider, OutcomeSkippedPref, OutcomeSkippedKind, OutcomeSkippedPhone, OutcomeSkippedJobs)
 	telemetry.RegisterLabelValues("kind", Kinds()...)

@@ -42,7 +42,7 @@ OTP (D-15): an OTP is never logged in any environment. In `local` and `test`, th
 - Production secrets live in AWS Secrets Manager and are injected into Beanstalk at deploy. Cloudflare and AWS admin credentials (the founder's IAM access keys) are used only by Terraform and the lead (later CI, through GitHub OIDC roles), never by the running app. The app uses instance profiles.
 - Provider keys live in env only. `platform_settings` holds on/off flags only; a channel works only when its flag is on and its key is set. A-17 shows each key as `set` / `missing`, never the value (D-19).
 - **Third-party services before Wave 5 (D-17, default chosen; the user can change it):**
-  - SMS, push and Sentry always use mocks or local tools before staging. Real SMS would reach real phones and needs DLT registration first. Errors go to local Grafana/Loki. `MSG91_*`, push and Sentry keys are not used locally.
+  - SMS, push and Sentry always use mocks or local tools before staging. Real SMS would reach real phones and needs DLT registration first. Errors go to local Grafana/Loki. Real SMS (the AWS instance role), push and Sentry keys are not used locally; `SMS_API_URL` must point at the mocks outside staging and prod.
   - Anthropic and Sarvam use the mocks by default. If the user chooses to put their own `ANTHROPIC_API_KEY` / `SARVAM_API_KEY` in `.env.local`, live AI evals (`make ai-eval`) and manual AI QA can run locally. That is the user's choice; `make check`, `make e2e` and every other default target never need them.
 
 ### 2.1 App keys (D-18)
@@ -233,7 +233,7 @@ GitHub Actions workflows are written in Wave 0 (W0-06) to mirror these. They wil
 - [ ] Graceful-shutdown timings set and checked (§3.7); a deploy during a load run drops no request.
 - [ ] A-21 Jobs shows every scheduled kind with a recent succeeded run; A-22 System shows the AWS panels with data.
 - [ ] Rate limits and WAF rules on; Turnstile keys set; OTP via real SMS verified on Jio, Airtel and Vi numbers.
-- [ ] DLT registration for SMS templates done (India TRAI requirement for MSG91 sender/templates).
+- [ ] DLT registration for the SMS sender ID and templates done (India TRAI requirement; AWS End User Messaging sends with the DLT entity and template ids, D-212, `docs/runbooks/aws-founder-steps.md` part C).
 - [ ] Privacy policy, terms, grievance officer contact live; consent text in sign-up.
 - [ ] Super admin accounts with TOTP; no shared accounts.
 - [ ] `platform_settings` reviewed by the founders (timers, credit caps, referral amounts).

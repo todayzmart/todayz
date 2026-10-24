@@ -10,10 +10,11 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"unicode"
 	"unicode/utf8"
 
+	"github.com/todayz/backend/internal/platform/awssms"
 	"github.com/todayz/backend/internal/platform/config"
-	"github.com/todayz/backend/internal/platform/httpx"
 	"github.com/todayz/backend/internal/platform/notice"
 )
 
@@ -27,8 +28,9 @@ type Message struct {
 	Template string
 	Lang     string
 	Vars     []Var
-	// Text is the rendered body, for the segment count only (the provider
-	// renders its own registered template).
+	// Text is the rendered body. SMS sends it as is (it must match the DLT
+	// template registered for Template, D-212); WhatsApp renders its own
+	// registered template and uses Text for nothing.
 	Text string
 }
 
@@ -42,7 +44,7 @@ type Result struct {
 
 // Provider sends one outside message on one channel.
 type Provider interface {
-	// Name is the provider label (msg91), [a-z][a-z0-9_]*.
+	// Name is the provider label (aws_sms, msg91), [a-z][a-z0-9_]*.
 	Name() string
 	Send(ctx context.Context, m Message) (Result, error)
 }
@@ -51,59 +53,58 @@ type Provider interface {
 // error type) is wrapped, never the request.
 var ErrProvider = errors.New("notify: provider call failed")
 
-// Provider paths under the configured base URLs (SMS_API_URL,
-// WHATSAPP_API_URL), as MSG91 and the local mock (e2e/mocks) serve them.
+// The WhatsApp path under WHATSAPP_API_URL, as MSG91 and the local mock
+// (e2e/mocks) serve it.
 const (
-	msg91FlowPath     = "/api/v5/flow"
 	msg91WhatsAppPath = "/api/v5/whatsapp/whatsapp-outbound-message/bulk/"
-	// mockAuthKey stands in for MSG91_AUTH_KEY in local and test: the mock
-	// checks that the header is present, never its value.
-	mockAuthKey     = "local-mock"
-	providerTimeout = 10 * time.Second
-	maxReply        = 64 << 10
+	providerTimeout   = 10 * time.Second
+	maxReply          = 64 << 10
 )
 
-// MSG91SMS sends a transactional SMS through MSG91's flow API
-// (https://docs.msg91.com/sms/send-sms). The phone travels only in the JSON
-// body.
-type MSG91SMS struct {
-	Client   *http.Client
-	BaseURL  string // SMS_API_URL
-	AuthKey  string // MSG91_AUTH_KEY
-	SenderID string // MSG91_SENDER_ID
+// dltVarRunes is the most a DLT template variable ({#var#}) may hold in
+// India; an SMS with a longer value does not match its template and is
+// refused. Deliver cuts every SMS param to it before rendering.
+const dltVarRunes = 30
+
+// AWSSMS sends a transactional SMS through AWS End User Messaging SMS
+// (awssms, D-212). The body is the rendered catalogue text, which must match
+// the DLT template registered for the catalogue's template name; Templates
+// maps that name to its DLT template id (SMS_NOTICE_TEMPLATE_IDS). The phone
+// travels only in the signed JSON body.
+type AWSSMS struct {
+	Client    *awssms.Client
+	Templates map[string]string // catalogue template name -> DLT template id
 }
 
 // Name implements Provider.
-func (*MSG91SMS) Name() string { return "msg91" }
+func (*AWSSMS) Name() string { return "aws_sms" }
 
 // Send implements Provider.
-func (p *MSG91SMS) Send(ctx context.Context, m Message) (Result, error) {
-	rcpt := map[string]string{}
-	for _, v := range m.Vars {
-		rcpt[v.Name] = v.Value
+func (p *AWSSMS) Send(ctx context.Context, m Message) (Result, error) {
+	id, ok := p.Templates[m.Template]
+	if !ok || id == "" {
+		// The template name is a catalogue constant, never user data.
+		return Result{}, fmt.Errorf("%w: aws sms: no DLT template id for %s in SMS_NOTICE_TEMPLATE_IDS", ErrProvider, m.Template)
 	}
-	rcpt["mobiles"] = strings.TrimPrefix(m.To, "+")
-	body, err := json.Marshal(map[string]any{
-		"template_id": m.Template,
-		"sender":      p.SenderID,
-		"short_url":   "0",
-		"recipients":  []map[string]string{rcpt},
-	})
+	msgID, err := p.Client.Send(ctx, awssms.Message{To: m.To, Body: m.Text, TemplateID: id})
 	if err != nil {
-		return Result{}, fmt.Errorf("%w: msg91 sms: encode", ErrProvider)
+		// The awssms error carries the AWS error code and status only.
+		return Result{}, fmt.Errorf("%w: aws sms: %w", ErrProvider, err)
 	}
-	var out struct {
-		Type    string `json:"type"`
-		Message string `json:"message"`
+	return Result{ProviderID: clip(msgID, 128), Units: smsSegments(m.Text)}, nil
+}
+
+// smsParams returns params with every value cut to dltVarRunes (trailing
+// spaces dropped), so the rendered SMS fits its DLT template.
+func smsParams(params map[string]string) map[string]string {
+	out := make(map[string]string, len(params))
+	for k, v := range params {
+		if c := clipRunes(v, dltVarRunes); c != v {
+			v = strings.TrimRightFunc(c, unicode.IsSpace)
+		}
+		out[k] = v
 	}
-	status, err := post(ctx, p.Client, strings.TrimRight(p.BaseURL, "/")+msg91FlowPath, p.AuthKey, body, &out)
-	if err != nil {
-		return Result{}, fmt.Errorf("%w: msg91 sms: %w", ErrProvider, err)
-	}
-	if status/100 != 2 || out.Type != "success" {
-		return Result{}, fmt.Errorf("%w: msg91 sms: status %d type %q", ErrProvider, status, clip(out.Type, 20))
-	}
-	return Result{ProviderID: clip(out.Message, 128), Units: smsSegments(m.Text)}, nil
+	return out
 }
 
 // MSG91WhatsApp sends a WhatsApp template message through MSG91's bulk API
@@ -160,7 +161,7 @@ func (p *MSG91WhatsApp) Send(ctx context.Context, m Message) (Result, error) {
 	return Result{ProviderID: clip(out.Data.RequestID, 128), Units: 1}, nil
 }
 
-// post sends body as JSON with MSG91's authkey header and decodes the reply
+// post sends body as JSON with MSG91's authkey header (WhatsApp) and decodes the reply
 // into out (a reply that is not JSON leaves out empty). The error names the
 // URL (no phone is ever in it) and never the body.
 func post(ctx context.Context, c *http.Client, url, key string, body []byte, out any) (int, error) {
@@ -183,8 +184,8 @@ func post(ctx context.Context, c *http.Client, url, key string, body []byte, out
 }
 
 // smsSegments estimates the SMS parts of text: GSM-7 160 (153 per part when
-// split), otherwise UCS-2 70 (67). The provider bills its registered
-// template, so this is an estimate for the cost metric.
+// split), otherwise UCS-2 70 (67). AWS bills per part, so this is the cost
+// metric's unit count.
 func smsSegments(text string) int {
 	n := utf8.RuneCountInString(text)
 	single, multi := 160, 153
@@ -216,8 +217,11 @@ func clip(s string, n int) string {
 // channel without one is "not configured": Send skips it and the integration
 // status says which variable is missing.
 //
-//   - SMS: MSG91 when SMS_API_URL is set and MSG91_AUTH_KEY is set (in local
-//     and test the key may be missing: the mock checks presence only).
+//   - SMS: AWS End User Messaging (D-212) when awssms can be built: in staging
+//     and prod AWS_REGION, SMS_SENDER_ID and SMS_DLT_ENTITY_ID (the instance
+//     role signs); in local and test SMS_API_URL on a local host (the mocks)
+//     instead of the region. SMS_NOTICE_TEMPLATE_IDS maps each catalogue
+//     template to its DLT id; an unmapped template fails its delivery.
 //   - WhatsApp: not wired. TODO(lead): MSG91's WhatsApp API needs the
 //     integrated (sender) number, which config does not carry yet (for
 //     example WHATSAPP_SENDER_NUMBER); MSG91WhatsApp is ready and tested
@@ -228,15 +232,8 @@ func providersFromConfig(cfg *config.Config) map[notice.Channel]Provider {
 	if cfg == nil {
 		return out
 	}
-	p := cfg.Providers
-	deployed := cfg.Env.IsDeployed()
-	if p.SMSAPIURL != "" && (p.MSG91AuthKey.IsSet() || !deployed) {
-		key := mockAuthKey
-		if p.MSG91AuthKey.IsSet() {
-			key = p.MSG91AuthKey.Reveal()
-		}
-		client := httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: cfg.NoEgress, Timeout: providerTimeout})
-		out[notice.SMS] = &MSG91SMS{Client: client, BaseURL: p.SMSAPIURL, AuthKey: key, SenderID: p.MSG91SenderID}
+	if c, err := awssms.New(cfg); err == nil {
+		out[notice.SMS] = &AWSSMS{Client: c, Templates: cfg.Providers.SMSNoticeTemplateIDs}
 	}
 	return out
 }

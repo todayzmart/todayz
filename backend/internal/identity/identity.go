@@ -28,6 +28,7 @@ import (
 
 	"github.com/todayz/backend/internal/platform/audit"
 	"github.com/todayz/backend/internal/platform/authn"
+	"github.com/todayz/backend/internal/platform/awssms"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/db"
@@ -167,7 +168,8 @@ func New(d Deps) (*Service, error) {
 
 // Preflight is the start-up check of the API (02 §8: auth refuses to start
 // without its provider): in staging and prod the PII, TOTP and JWT keys, the
-// SMS provider with its DLT template, and Turnstile must be configured, and
+// SMS provider (AWS region, DLT sender, entity and OTP template, D-212),
+// and Turnstile must be configured, and
 // TOTP_ENC_KEY must not be PII_ENC_KEY (one leaked key must not open both). Turnstile
 // is required too (lead decision on the W1-01 review), replacing 02 §8's
 // "stricter rate limits" fallback, which named no limits. It names
@@ -191,14 +193,11 @@ func Preflight(cfg *config.Config) error {
 	if len(k.JWTSigningKeys) == 0 {
 		missing = append(missing, "JWT_SIGNING_KEYS")
 	}
-	if p.SMSAPIURL == "" {
-		missing = append(missing, "SMS_API_URL")
-	}
-	if !p.MSG91AuthKey.IsSet() {
-		missing = append(missing, "MSG91_AUTH_KEY")
-	}
-	if strings.TrimSpace(p.MSG91OTPTemplateID) == "" {
-		missing = append(missing, "MSG91_OTP_TEMPLATE_ID")
+	// SMS is AWS End User Messaging (D-212): the instance role signs, so
+	// there is no key, but the region and the DLT ids must be set.
+	missing = append(missing, awssms.Missing(cfg)...)
+	if p.SMSOTPTemplateID == "" {
+		missing = append(missing, "SMS_OTP_TEMPLATE_ID")
 	}
 	if p.TurnstileAPIURL == "" {
 		missing = append(missing, "TURNSTILE_API_URL")
