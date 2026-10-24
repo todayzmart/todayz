@@ -199,7 +199,8 @@ type Reversed struct {
 // Reverser reverses completed purchases (a POS sale today). Reverse runs in
 // the caller's transaction and is idempotent per Ref: a repeat posts nothing
 // and returns what the first posted. A purchase with no captured credits and
-// no cashback reverses as a no-op that posts nothing.
+// no cashback (one not completed yet, say) reverses to an empty marker, so a
+// later Complete on its Ref is refused (ErrReversed; D-132, Q29).
 type Reverser interface {
 	Reverse(ctx context.Context, r Reversal) (Reversed, error)
 }
@@ -317,7 +318,8 @@ var (
 	ErrReversed = errors.New("credits: the purchase was reversed")
 	// ErrHoldOpen: Reverse found the spend's hold still held, not captured.
 	// A completed purchase has its hold captured; the reversal is refused
-	// rather than guessed at. TODO(lead): an uncaptured hold on a reversal.
+	// rather than guessed at (the lead's answer to Q28, D-132): release the
+	// hold, or complete the purchase, first.
 	ErrHoldOpen = errors.New("credits: the purchase's hold is not captured")
 )
 

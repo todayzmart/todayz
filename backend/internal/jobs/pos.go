@@ -165,13 +165,13 @@ func (c posCredits) Cashback(ctx context.Context, in pos.Cashback) (int, error) 
 	return done.Cashback, err
 }
 
-func (c posCredits) ReverseSale(ctx context.Context, r pos.SaleReversal) error {
+func (c posCredits) ReverseSale(ctx context.Context, r pos.SaleReversal) (int, error) {
 	rv := credits.Reversal{Ref: saleRef(r.SaleID), CustomerID: r.CustomerID, StoreID: r.StoreID}
 	if r.ClaimID != ids.Zero {
 		rv.Spend = claimRef(r.ClaimID)
 	}
-	_, err := c.s.Reverse(ctx, rv)
-	return err
+	out, err := c.s.Reverse(ctx, rv)
+	return out.Shortfall, err
 }
 
 // PosReferrals is referrals as pos.Referrals: a linked sale is a

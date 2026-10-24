@@ -158,15 +158,21 @@ WHERE store_id = @store_id AND sale_client_id = @sale_client_id AND id IS DISTIN
 RETURNING id, claimed_by;
 
 -- name: DueBillClaims :many
--- One page of the sweep: up to @lim live claims past their expiry after the
--- keyset (@after_at, @after_id), oldest first, so a claim left live does not
--- hold the page back; a claim a sale is binding right now is skipped and its
--- sale sees it expired.
+-- One page of the sweep's walk: up to @lim live claims past their expiry
+-- after the keyset (@after_at, @after_id), oldest first, so a claim left
+-- live does not hold the walk back. It locks nothing: LockDueBillClaim takes
+-- each claim in its own transaction.
 SELECT id, claimed_by, expires_at FROM bill_claims
 WHERE status IN ('open','claimed') AND pos_sale_id IS NULL AND expires_at <= @now
   AND (expires_at, id) > (@after_at::timestamptz, @after_id::uuid)
 ORDER BY expires_at, id
-LIMIT @lim
+LIMIT @lim;
+
+-- name: LockDueBillClaim :one
+-- One claim of the sweep, if it is still due; a claim a sale is binding
+-- right now is skipped and its sale sees it expired.
+SELECT id, claimed_by, expires_at FROM bill_claims
+WHERE id = @id AND status IN ('open','claimed') AND pos_sale_id IS NULL AND expires_at <= @now
 FOR UPDATE SKIP LOCKED;
 
 -- name: ExpireBillClaim :execrows

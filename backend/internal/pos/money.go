@@ -5,6 +5,7 @@ import (
 
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/money"
 )
 
 // The contract's limits on a bill (schemas/pos.yaml and sync.yaml).
@@ -105,10 +106,10 @@ func price(in []lineInput, billOffer, billManual int64, credits int, path string
 	}
 	b.Discount = manual + billManual
 	b.Eligible = b.Subtotal - b.Discount
-	if credits < 0 || (credits > 0 && b.Eligible-int64(credits)*100 < 100) {
+	if credits < 0 || (credits > 0 && b.Eligible-int64(credits)*money.PaisePerCredit < 100) {
 		return bill{}, fieldErr(path+".credits", "range")
 	}
-	payable := b.Eligible - int64(credits)*100
+	payable := b.Eligible - int64(credits)*money.PaisePerCredit
 	b.RoundOff = roundOff(payable)
 	b.Total = payable + int64(b.RoundOff)
 	return b, nil
@@ -130,7 +131,7 @@ func cashbackCredits(paise int64, bp int32) int {
 	if paise <= 0 || bp <= 0 {
 		return 0
 	}
-	const d = 1_000_000 // 10000 bp × 100 paise per credit
+	const d = int64(money.Whole) * money.PaisePerCredit
 	b := int64(bp)
 	return int((paise/d)*b + (paise%d)*b/d)
 }

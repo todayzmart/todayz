@@ -6,6 +6,7 @@ import (
 
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/money"
 )
 
 // The pure rules (01 §7). The database service and the Fake both decide
@@ -16,7 +17,7 @@ import (
 const floorPaise = 100
 
 // paisePerCredit: 1 credit = ₹1 (01 §7, fixed).
-const paisePerCredit = 100
+const paisePerCredit = money.PaisePerCredit
 
 // allow decides how many of requested credits a checkout may use, given the
 // customer's available balance and the cap usage. The limits are checked in

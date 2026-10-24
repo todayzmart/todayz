@@ -21,6 +21,7 @@ import (
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/money"
 	"github.com/todayz/backend/internal/platform/realtime"
 	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/platform/telemetry"
@@ -232,7 +233,8 @@ func (s *Service) cancelClaims(ctx context.Context, storeID, clientID, keep ids.
 	return nil
 }
 
-// claimSweep is how many claims one page of ExpireClaims takes.
+// claimSweep is how many claims one page of the DueBillClaims keyset reads.
+// A page holds no locks: each claim is taken again on its own.
 const claimSweep = 500
 
 // Sweep is one ExpireClaims pass: the claims it expired, the holds it
@@ -241,12 +243,16 @@ type Sweep struct{ Expired, Released, Failed int }
 
 // ExpireClaims expires the live claims past their 120 s and releases the
 // holds of those a customer confirmed (the pos_bill_claim_expiry job,
-// D-131). It pages through every claim due at the pass's now by the keyset
-// (expires_at, id), one transaction a page, until the due set is done or
-// ctx (the job's timeout) ends. Each claim is its own savepoint: a claim
-// whose release fails is logged by id, counted in
-// tz_pos_claim_release_failed_total and left live for the next pass, and
-// the page goes on past it, so failing claims never hold back younger ones.
+// D-131). It walks every claim due at the pass's now by the keyset
+// (expires_at, id) until the due set is done or ctx (the job's timeout)
+// ends. Each claim is its own transaction (D-132): the claim locked FOR
+// UPDATE SKIP LOCKED, expired, its hold released, committed. So the sweep
+// never holds one customer's ledger accounts while it waits for another's;
+// a page in one transaction did, and deadlocked with a sync batch locking
+// the same customers in the other order. A claim whose release fails is
+// logged by id, counted in tz_pos_claim_release_failed_total and left live
+// for the next pass, and the walk goes on past it, so failing claims never
+// hold back younger ones.
 func (s *Service) ExpireClaims(ctx context.Context) (Sweep, error) {
 	var out Sweep
 	if err := s.ready(ctx); err != nil {
@@ -259,39 +265,39 @@ func (s *Service) ExpireClaims(ctx context.Context) (Sweep, error) {
 		if err := ctx.Err(); err != nil {
 			return out, err
 		}
-		var page Sweep
-		n := 0
-		err := s.db.InTx(ctx, func(ctx context.Context) error {
-			page = Sweep{}
-			rows, err := s.q(ctx).DueBillClaims(ctx, after)
-			if err != nil {
-				return fmt.Errorf("pos: due bill claims: %w", err)
-			}
-			n = len(rows)
-			for _, r := range rows {
-				if err := s.expireClaim(ctx, r, now, &page); err != nil {
-					return err
-				}
-				after.AfterAt, after.AfterID = r.ExpiresAt, r.ID
-			}
-			return nil
-		})
+		rows, err := s.q(ctx).DueBillClaims(ctx, after)
 		if err != nil {
-			return out, err
+			return out, fmt.Errorf("pos: due bill claims: %w", err)
 		}
-		out.Expired, out.Released, out.Failed = out.Expired+page.Expired, out.Released+page.Released, out.Failed+page.Failed
-		if n < claimSweep {
+		for _, r := range rows {
+			if err := ctx.Err(); err != nil {
+				return out, err
+			}
+			if err := s.expireClaim(ctx, r.ID, now, &out); err != nil {
+				return out, err
+			}
+			after.AfterAt, after.AfterID = r.ExpiresAt, r.ID
+		}
+		if len(rows) < claimSweep {
 			return out, nil
 		}
 	}
 }
 
-// expireClaim expires one due claim in its own savepoint and releases its
-// hold; a failed release rolls the claim back, is counted and leaves it live.
-func (s *Service) expireClaim(ctx context.Context, r posdb.DueBillClaimsRow, now time.Time, out *Sweep) error {
-	id := mustID(r.ID)
-	released := false
+// expireClaim expires one due claim in a transaction of its own and
+// releases its hold; a failed release rolls the claim back, is counted and
+// leaves it live. A claim a sale is binding right now (locked) or that is no
+// longer due is skipped: its sale sees it expired, or it was settled.
+func (s *Service) expireClaim(ctx context.Context, claim pgtype.UUID, now time.Time, out *Sweep) error {
+	id := mustID(claim)
+	expired, released := false, false
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
+		r, err := s.q(ctx).LockDueBillClaim(ctx, posdb.LockDueBillClaimParams{ID: claim, Now: now})
+		if isNoRows(err) {
+			return nil
+		} else if err != nil {
+			return fmt.Errorf("pos: lock due bill claim: %w", err)
+		}
 		n, err := s.q(ctx).ExpireBillClaim(ctx, posdb.ExpireBillClaimParams{ID: r.ID, Now: now})
 		if err != nil || n == 0 {
 			return err
@@ -302,6 +308,7 @@ func (s *Service) expireClaim(ctx context.Context, r posdb.DueBillClaimsRow, now
 			}
 			released = true
 		}
+		expired = true
 		return nil
 	})
 	switch {
@@ -311,7 +318,7 @@ func (s *Service) expireClaim(ctx context.Context, r posdb.DueBillClaimsRow, now
 		telemetry.Logger(ctx).ErrorContext(ctx, "pos: claim hold not released; retried next pass", "claim_id", id.String(), "err", err)
 	case err != nil:
 		return fmt.Errorf("pos: expire bill claim: %w", err)
-	default:
+	case expired:
 		out.Expired++
 		if released {
 			out.Released++
@@ -326,17 +333,45 @@ var errRelease = errors.New("pos: release credits")
 var (
 	metricsOnce         sync.Once
 	mClaimReleaseFailed metric.Int64Counter
+	mSyncRetried        metric.Int64Counter
+	mReverseShortfall   metric.Int64Counter
 )
+
+// posMetrics registers the package's counters once.
+func posMetrics() {
+	metricsOnce.Do(func() {
+		m := otel.Meter("todayz/pos")
+		mClaimReleaseFailed, _ = m.Int64Counter(telemetry.MetricPrefix+"pos_claim_release_failed_total",
+			metric.WithDescription("Expired bill claims whose credit hold the sweep could not release (retried next pass)"))
+		mSyncRetried, _ = m.Int64Counter(telemetry.MetricPrefix+"pos_sync_retried_total",
+			metric.WithDescription("Sync transactions run again after a deadlock or serialization failure"))
+		mReverseShortfall, _ = m.Int64Counter(telemetry.MetricPrefix+"credits_reverse_shortfall_total",
+			metric.WithDescription("Reversed POS sales whose cashback the customer had already spent in part or whole (the store absorbs it, D-74)"))
+	})
+}
+
+// reverseShortfall counts a reversed sale that could not take all its
+// cashback back (tz_credits_reverse_shortfall_total), after it committed.
+func reverseShortfall(ctx context.Context) {
+	posMetrics()
+	if mReverseShortfall != nil {
+		mReverseShortfall.Add(ctx, 1)
+	}
+}
+
+// syncRetried counts a sync transaction run again (tz_pos_sync_retried_total).
+func syncRetried(ctx context.Context) {
+	posMetrics()
+	if mSyncRetried != nil {
+		mSyncRetried.Add(ctx, 1)
+	}
+}
 
 // claimReleaseFailed counts a claim the sweep left live because its hold's
 // release failed (tz_pos_claim_release_failed_total; alert
 // tz-pos-claim-release-failed in infra/grafana/alerts/pos.yaml).
 func claimReleaseFailed(ctx context.Context) {
-	metricsOnce.Do(func() {
-		m := otel.Meter("todayz/pos")
-		mClaimReleaseFailed, _ = m.Int64Counter(telemetry.MetricPrefix+"pos_claim_release_failed_total",
-			metric.WithDescription("Expired bill claims whose credit hold the sweep could not release (retried next pass)"))
-	})
+	posMetrics()
 	if mClaimReleaseFailed != nil {
 		mClaimReleaseFailed.Add(ctx, 1)
 	}
@@ -405,7 +440,7 @@ func (s *Service) allowance(ctx context.Context, customerID, storeID ids.ID, amo
 	if err != nil {
 		return CreditsAllowance{}, err
 	}
-	floor := int((amount - 100) / 100) // leave at least ₹1 to pay (01 §7)
+	floor := int((amount - 100) / money.PaisePerCredit) // leave at least ₹1 to pay (01 §7)
 	want := min(requested, maxPer, floor)
 	a, err := s.credits.Allow(ctx, customerID, storeID, want, amount)
 	if err != nil {
@@ -509,7 +544,7 @@ func (s *Service) ConfirmClaim(ctx context.Context, token string, creditsToUse i
 	if err != nil {
 		return posapi.BillClaimConfirmation{}, asProblem(err)
 	}
-	payable := c.AmountPaise - int64(c.CreditsUsed)*100
+	payable := c.AmountPaise - int64(c.CreditsUsed)*money.PaisePerCredit
 	return posapi.BillClaimConfirmation{
 		ClaimId: mustID(c.ID).String(), AmountPaise: int(c.AmountPaise), CreditsUsed: int(c.CreditsUsed),
 		PayablePaise: int(payable + int64(roundOff(payable))), Status: s.claimStatus(c),

@@ -109,6 +109,13 @@ func TestFakeReverse(t *testing.T) {
 		_, err = f.Hold(ctx, HoldRequest{Ref: ref(g, RefPOSSale), CustomerID: cust, StoreID: shop, Credits: 5, EligiblePaise: 50000})
 		require.ErrorIs(t, err, ErrInvalid)
 
+		// Reversed before it completed: a later Complete is refused (Q29).
+		early := ref(g, RefOrder)
+		_, err = f.Reverse(ctx, Reversal{Ref: early, CustomerID: cust, StoreID: shop})
+		require.NoError(t, err)
+		_, err = f.Complete(ctx, Completion{Ref: early, CustomerID: cust, StoreID: shop, EligiblePaise: 50000, CashbackBP: bp(500)})
+		require.ErrorIs(t, err, ErrReversed)
+
 		// RefuseReleased on a released claim: refused, nothing posted.
 		_, err = f.Release(ctx, claim)
 		require.NoError(t, err)

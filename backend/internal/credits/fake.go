@@ -479,9 +479,6 @@ func (f *Fake) Reverse(_ context.Context, r Reversal) (Reversed, error) {
 			}
 		}
 	}
-	if len(spent) == 0 && cb == 0 {
-		return Reversed{}, nil
-	}
 	back, _, backN, expiredN := splitDue(spent, now)
 	var legs []Leg
 	if n := backN + expiredN; n > 0 {

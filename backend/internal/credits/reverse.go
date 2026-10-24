@@ -18,9 +18,10 @@ import (
 // platform_expired. Then, reading the available balance after that restore
 // (D-74), it posts clawback:<Ref>: the cashback paid on Ref, up to that
 // balance, from the wallet back to the store; the store absorbs the rest.
-// reverse:<Ref> is posted (with no entries when nothing was spent) whenever
-// there is anything to reverse, so it marks the reversal: a repeat returns
-// what it posted, and Complete on Ref is refused from then on.
+// reverse:<Ref> is always posted, with no entries when nothing was spent
+// (and even when there is nothing to reverse at all), so it marks the
+// reversal: a repeat returns what it posted, and Complete on Ref is refused
+// from then on (ErrReversed), for an order as for a sale (D-132, Q29).
 func (s *Service) Reverse(ctx context.Context, r Reversal) (Reversed, error) {
 	spend := r.spend()
 	if !r.Ref.valid() || !spend.valid() || r.CustomerID == ids.Zero || r.StoreID == ids.Zero {
@@ -69,9 +70,6 @@ func (s *Service) Reverse(ctx context.Context, r Reversal) (Reversed, error) {
 		cb, err := s.cashbackPaid(ctx, q, r.Ref, w, st)
 		if err != nil {
 			return err
-		}
-		if len(spent) == 0 && cb == 0 {
-			return nil
 		}
 		back, _, backN, expiredN := splitDue(spent, now)
 		var es []entry

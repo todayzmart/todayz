@@ -14,6 +14,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
@@ -96,11 +98,11 @@ func (f *fakeCredits) Cashback(_ context.Context, in pos.Cashback) (int, error) 
 // whole credits.
 func fakeCashback(in pos.Cashback) int { return int(in.PaidPaise * int64(in.CashbackBP) / 1_000_000) }
 
-func (f *fakeCredits) ReverseSale(_ context.Context, r pos.SaleReversal) error {
+func (f *fakeCredits) ReverseSale(_ context.Context, r pos.SaleReversal) (int, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.reversed = append(f.reversed, r.SaleID)
-	return nil
+	return 0, nil
 }
 
 type qualified struct {
@@ -317,8 +319,48 @@ func (p *posShop) noSecrets(vals ...string) {
 	logs := p.logs.String()
 	for _, v := range vals {
 		require.NotEmpty(p.t, v)
-		require.False(p.t, strings.Contains(logs, v), "a code, token or phone reached the logs")
+		require.False(p.t, leaked(logs, v), "a code, token or phone reached the logs")
 	}
+}
+
+// leaked reports v standing on its own in logs: not inside a longer run of
+// letters, digits or the punctuation that ids, numbers, times and durations
+// are made of. A bare substring test flaked, since a 4-digit code can turn
+// up inside a timestamp, a latency or an id; a leaked code is a JSON string
+// ("1234") or a word in a message.
+func leaked(logs, v string) bool {
+	part := func(r rune) bool {
+		return unicode.IsLetter(r) || unicode.IsDigit(r) || strings.ContainsRune("_.:-+", r)
+	}
+	for i := 0; i <= len(logs)-len(v); {
+		j := strings.Index(logs[i:], v)
+		if j < 0 {
+			return false
+		}
+		at, end := i+j, i+j+len(v)
+		before, _ := utf8.DecodeLastRuneInString(logs[:at])
+		after, _ := utf8.DecodeRuneInString(logs[end:])
+		if (at == 0 || !part(before)) && (end == len(logs) || !part(after)) {
+			return true
+		}
+		i = at + 1
+	}
+	return false
+}
+
+func TestLeaked(t *testing.T) {
+	for logs, want := range map[string]bool{
+		`{"code":"4821"}`:                      true,
+		`{"msg":"bad code 4821 for bill"}`:     true,
+		`4821`:                                 true,
+		`{"time":"2026-10-24T10:48:21.4821Z"}`: false,
+		`{"latency_ms":4821}`:                  false,
+		`{"id":"01JB4821XYZ"}`:                 false,
+		`{"n":14821}`:                          false,
+	} {
+		require.Equal(t, want, leaked(logs, "4821"), logs)
+	}
+	require.True(t, leaked(`{"phone":"+919876500100"}`, "+919876500100"))
 }
 
 func (p *posShop) setCashback(bp int) {

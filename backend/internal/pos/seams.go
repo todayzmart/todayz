@@ -195,8 +195,10 @@ type Credits interface {
 	// Cashback posts a linked sale's cashback and returns what it posted.
 	Cashback(ctx context.Context, in Cashback) (posted int, err error)
 	// ReverseSale returns the credits a reversed sale spent and takes back
-	// its cashback; a repeat is a no-op.
-	ReverseSale(ctx context.Context, r SaleReversal) error
+	// its cashback, as much of it as the customer still has (D-74). It
+	// returns the shortfall: the cashback credits the customer had already
+	// spent, which the store absorbs. A repeat is a no-op.
+	ReverseSale(ctx context.Context, r SaleReversal) (shortfall int, err error)
 }
 
 // NoCredits is Credits until credits are live: none may be used and no
@@ -223,7 +225,7 @@ func (NoCredits) Release(context.Context, ids.ID) error { return nil }
 func (NoCredits) Cashback(context.Context, Cashback) (int, error) { return 0, nil }
 
 // ReverseSale implements Credits.
-func (NoCredits) ReverseSale(context.Context, SaleReversal) error { return nil }
+func (NoCredits) ReverseSale(context.Context, SaleReversal) (int, error) { return 0, nil }
 
 // --- referrals -----------------------------------------------------------------
 

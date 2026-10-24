@@ -19,9 +19,11 @@ import (
 	"github.com/todayz/backend/internal/platform/authz/policy"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/money"
 	"github.com/todayz/backend/internal/platform/pii"
 	"github.com/todayz/backend/internal/platform/realtime"
 	"github.com/todayz/backend/internal/platform/settings"
+	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
 // codeTries is how many wrong counter codes lock a bill (01 §6).
@@ -267,7 +269,7 @@ func (s *Service) rewards(ctx context.Context, st posdb.StoreInfoRow, row posdb.
 	}
 	err := s.referrals.Qualify(ctx, Purchase{
 		CustomerID: customerID, StoreID: storeID, SaleID: saleID, LinkMethod: deref(row.LinkMethod),
-		EligiblePaise: paid + int64(row.CreditsUsed)*100, CreditsUsed: int(row.CreditsUsed),
+		EligiblePaise: paid + int64(row.CreditsUsed)*money.PaisePerCredit, CreditsUsed: int(row.CreditsUsed),
 	})
 	if err != nil {
 		return row, fmt.Errorf("pos: referral: %w", err)
@@ -637,7 +639,9 @@ func (s *Service) ReverseSale(ctx context.Context, sc authz.Scope, saleID ids.ID
 	}
 	var row posdb.PosSale
 	var lines []posdb.PosSaleLine
+	var shortfall int // cashback credits the customer had spent (D-74)
 	err = s.db.InTx(ctx, func(ctx context.Context) error {
+		shortfall = 0
 		t, err := tx(ctx)
 		if err != nil {
 			return err
@@ -698,7 +702,7 @@ func (s *Service) ReverseSale(ctx context.Context, sc authz.Scope, saleID ids.ID
 			case !isNoRows(err):
 				return fmt.Errorf("pos: sale bill claim: %w", err)
 			}
-			if err := s.credits.ReverseSale(ctx, r); err != nil {
+			if shortfall, err = s.credits.ReverseSale(ctx, r); err != nil {
 				return fmt.Errorf("pos: reverse credits: %w", err)
 			}
 		}
@@ -711,6 +715,12 @@ func (s *Service) ReverseSale(ctx context.Context, sc authz.Scope, saleID ids.ID
 	})
 	if err != nil {
 		return posapi.PosSale{}, asProblem(err)
+	}
+	if shortfall > 0 {
+		reverseShortfall(ctx)
+		telemetry.Logger(ctx).WarnContext(ctx, "pos: reversed sale's cashback already spent; the store absorbs it",
+			"sale_id", saleID.String(), "store_id", sc.StoreID.String(), "customer_id", mustID(row.CustomerID).String(),
+			"shortfall_paise", int64(shortfall)*money.PaisePerCredit)
 	}
 	return s.saleView(ctx, row, lines, nil)
 }

@@ -727,8 +727,8 @@ func (s *Service) Complete(ctx context.Context, c Completion) (Completed, error)
 			return err
 		}
 		// Under the account locks Reverse takes too, so a reversal and a
-		// completion of one ref never interleave. Orders never reverse, so
-		// for them this finds nothing.
+		// completion of one ref never interleave. A ref reversed before it
+		// completed (an order as a sale) is refused too (D-132, Q29).
 		if _, err := q.TransactionByKey(ctx, c.Ref.key("reverse")); err == nil {
 			return ErrReversed
 		} else if !db.IsNoRows(err) {

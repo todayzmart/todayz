@@ -179,5 +179,13 @@ func IsUniqueViolation(err error, constraint string) bool {
 	return constraint == "" || pgErr.ConstraintName == constraint
 }
 
+// IsRetryable reports a 40P01 (deadlock detected) or 40001 (serialization
+// failure): Postgres rolled the transaction back, and running it again from
+// the start may succeed.
+func IsRetryable(err error) bool {
+	var pgErr *pgconn.PgError
+	return errors.As(err, &pgErr) && (pgErr.Code == "40P01" || pgErr.Code == "40001")
+}
+
 // IsNoRows reports pgx.ErrNoRows.
 func IsNoRows(err error) bool { return errors.Is(err, pgx.ErrNoRows) }

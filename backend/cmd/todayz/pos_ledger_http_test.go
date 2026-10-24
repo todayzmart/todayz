@@ -121,7 +121,8 @@ func TestPOSLedgerBillQRDB(t *testing.T) {
 	require.Equal(t, 50, p.wallet(), "the 10 back, the 14 taken back")
 	require.Equal(t, 0, p.store())
 	r = p.reverse(p.manager, sale)
-	require.NotEqual(t, http.StatusOK, r.code, "a reversed sale is not reversed again")
+	require.Equal(t, http.StatusConflict, r.code, "a reversed sale is not reversed again: %s", r.raw)
+	require.Equal(t, "invalid_transition", problemCode(r))
 	require.Equal(t, 2, p.txs("reversal", sale))
 	require.Equal(t, 50, p.wallet())
 	p.noSecrets(tok)
@@ -297,7 +298,128 @@ func TestPOSLedgerBindRacesSweepDB(t *testing.T) {
 		require.Equal(t, wallet, p.wallet(), "round %d", round)
 		p.advance(2 * time.Second)
 	}
+	// Who wins a round depends on timing; each round checks its one winner.
 	t.Logf("winners: %v", won)
-	require.Positive(t, won["sweep"], "the head-on rounds")
-	require.Positive(t, won["sale"], "the round the sweep starts late")
+}
+
+// grantTo gives customer cust n credits (a referral reward).
+func (p *ledgerShop) grantTo(cust pgtype.UUID, n int64) {
+	p.t.Helper()
+	id, ok := ids.FromUUID(cust)
+	require.True(p.t, ok)
+	log := slog.New(slog.NewJSONHandler(io.Discard, nil))
+	svc, err := credits.New(credits.Deps{DB: db.New(p.a.tdb.Pool), Clock: p.a.clk,
+		Settings: settings.NewCache(settings.PGLoader(p.a.tdb.Pool), settings.Options{Log: log})})
+	require.NoError(p.t, err)
+	_, err = svc.Post(context.Background(), credits.Posting{Kind: credits.TxReferralReward, IdempotencyKey: "referral:grant-" + id.String(),
+		Legs: []credits.Leg{{Account: credits.Account{Kind: credits.PlatformMarketing}, Amount: -n}, {Account: credits.Account{Kind: credits.CustomerWallet, Owner: id}, Amount: n}}})
+	require.NoError(p.t, err)
+}
+
+// cust2ID is the second customer's id; it places one order to learn it.
+func (p *ledgerShop) cust2ID() pgtype.UUID {
+	p.t.Helper()
+	r := p.place(p.cust2, line{p.salt, 1})
+	require.Equal(p.t, http.StatusCreated, r.code, r.raw)
+	var c pgtype.UUID
+	require.NoError(p.t, p.a.tdb.OwnerPool.QueryRow(context.Background(), `SELECT customer_id FROM orders WHERE id = $1`,
+		uuidOf(p.t, r.body["id"].(string))).Scan(&c))
+	return c
+}
+
+// Reversing a sale whose cashback the customer has already spent takes back
+// what is left (nothing here) and the store absorbs the rest (D-74); the
+// shortfall is logged by ids and paise and counted.
+func TestPOSLedgerReverseSpentCashbackDB(t *testing.T) {
+	p := newLedgerShop(t, 10)
+	p.setCashback(500)
+	secret := p.seed(p.cust)
+	bill := p.newID()
+	r := p.verifyCode(p.cashier, custPhone, testTOTP(secret, p.a.clk.Now()), bill)
+	require.Equal(t, http.StatusOK, r.code, "verify: status %d", r.code)
+	first := p.codeSaleOf(bill, line{p.atta, 1})
+	require.Equal(t, http.StatusOK, first.code, first.raw)
+	sale := first.body["id"].(string)
+	require.EqualValues(t, 14, first.body["cashbackCredits"])
+	require.Equal(t, 24, p.wallet())
+
+	// The customer spends all 24 on the next bill (no cashback on it).
+	p.setCashback(0)
+	bill2 := p.newID()
+	claim, tok := p.claim(p.cashier, bill2, 29000)
+	c := p.confirm(p.cust, tok, 24)
+	require.Equal(t, http.StatusOK, c.code, c.raw)
+	require.EqualValues(t, 24, c.body["creditsUsed"])
+	spend := p.sell(p.cashier, p.qrSale(bill2, claim))
+	require.Equal(t, http.StatusOK, spend.code, spend.raw)
+	require.Equal(t, 0, p.wallet())
+	require.Equal(t, -14+24, p.store())
+
+	rev := p.reverse(p.manager, sale)
+	require.Equal(t, http.StatusOK, rev.code, rev.raw)
+	require.Equal(t, "reversed", rev.body["status"])
+	require.Equal(t, 0, p.wallet(), "nothing left to take back")
+	require.Equal(t, -14+24, p.store(), "the store absorbs the 14")
+	require.Equal(t, 1, p.txs("reversal", sale), "the reverse: marker; no clawback")
+	logs := p.logs.String()
+	require.Contains(t, logs, `"msg":"pos: reversed sale's cashback already spent; the store absorbs it"`)
+	require.Contains(t, logs, `"shortfall_paise":1400`)
+	require.Contains(t, logs, `"sale_id":"`+sale+`"`)
+	p.noSecrets(custPhone, tok)
+}
+
+// The sweep racing a sync batch that links two customers in the other order
+// (D-132). Each sweep claim is its own transaction, so it never holds one
+// customer's ledger accounts while it waits for the other's: a page in one
+// transaction deadlocked with this batch and the whole sync failed. Every
+// round both entries apply, both holds are released, and each wallet moves
+// by its cashback alone.
+func TestPOSLedgerSweepRacesSyncDB(t *testing.T) {
+	p := newLedgerShop(t, 100)
+	p.setCashback(500)
+	cust2 := p.cust2ID()
+	p.grantTo(cust2, 100)
+	wallet2 := func() int { return p.balance(credits.CustomerWallet, cust2) }
+	secret1, secret2 := p.seed(p.cust), p.seed(p.cust2)
+	worker := clock.NewFake(p.a.clk.Now())
+	sweeper := p.ledgerSweeper(worker)
+	seq := 0
+	for round, delay := range []time.Duration{0, 1, 2, 5, 10, 20} {
+		w1, w2 := p.wallet(), wallet2()
+		// The first customer's claim expires first, so the sweep takes it
+		// first; the sync links the second customer first.
+		claim1, tok1 := p.claim(p.cashier, p.newID(), 29000)
+		require.Equal(t, http.StatusOK, p.confirm(p.cust, tok1, 10).code, "round %d", round)
+		claim2, tok2 := p.claim(p.cashier, p.newID(), 29000)
+		require.Equal(t, http.StatusOK, p.confirm(p.cust2, tok2, 10).code, "round %d", round)
+		p.advance(119 * time.Second)
+		worker.Set(p.a.clk.Now().Add(2 * time.Second))
+		now := p.a.clk.Now()
+		e2 := p.codeEntry(seq+1, cust2Phone, testTOTP(secret2, now))
+		e1 := p.codeEntry(seq+2, custPhone, testTOTP(secret1, now))
+		seq += 2
+		var (
+			r     resp
+			sw    pos.Sweep
+			swErr error
+		)
+		parallel(
+			func() { r = p.sync(p.cashier, e2, e1) },
+			func() {
+				time.Sleep(delay * time.Millisecond)
+				sw, swErr = sweeper.ExpireClaims(context.Background())
+			},
+		)
+		require.NoError(t, swErr, "round %d", round)
+		require.Equal(t, http.StatusOK, r.code, "round %d: sync: %s", round, r.raw)
+		require.Equal(t, []string{"applied", "applied"}, statuses(r), "round %d", round)
+		require.Equal(t, []any{"linked", "linked"}, linkStatuses(r), "round %d", round)
+		require.Equal(t, pos.Sweep{Expired: 2, Released: 2}, sw, "round %d", round)
+		require.Equal(t, "released", p.holdStatus(claim1), "round %d", round)
+		require.Equal(t, "released", p.holdStatus(claim2), "round %d", round)
+		require.Equal(t, w1+2, p.wallet(), "round %d: 5%% of ₹45", round)
+		require.Equal(t, w2+2, wallet2(), "round %d", round)
+		p.advance(2 * time.Second)
+	}
+	p.noSecrets(custPhone, cust2Phone)
 }

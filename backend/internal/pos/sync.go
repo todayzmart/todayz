@@ -16,6 +16,7 @@ import (
 	"github.com/todayz/backend/internal/platform/authn"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/authz/policy"
+	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/settings"
@@ -88,7 +89,8 @@ func (s *Service) Sync(ctx context.Context, sc authz.Scope, body syncapi.SyncReq
 	}
 	cursor := int64(body.Cursor)
 	var out syncapi.SyncResponse
-	err = s.db.InTx(ctx, func(ctx context.Context) error {
+	err = s.syncTx(ctx, sc.StoreID, func(ctx context.Context) error {
+		out = syncapi.SyncResponse{}
 		run := &syncRun{sc: sc, p: p, device: device, real: real, now: s.now()}
 		var err error
 		if run.st, err = s.store(ctx, sc.StoreID); err != nil {
@@ -136,6 +138,29 @@ func (s *Service) Sync(ctx context.Context, sc authz.Scope, body syncapi.SyncReq
 	}
 	out.ServerNow = s.now()
 	return out, nil
+}
+
+// syncAttempts bounds how often one sync runs its transaction: Postgres
+// rolls back a deadlock's victim (40P01) or a serialization failure (40001)
+// whole, so the batch runs again from the start. The sweep takes one claim
+// per transaction (D-132) and never waits on a second customer's accounts,
+// but a batch locks several customers' ledger accounts and claims in batch
+// order, and another sync, an online sale or an order completion may lock
+// some of them in another; one of the two is then the victim.
+const syncAttempts = 3
+
+// syncTx runs fn in a transaction, again on a retryable failure, up to
+// syncAttempts times; each retry is logged and counted in
+// tz_pos_sync_retried_total.
+func (s *Service) syncTx(ctx context.Context, storeID ids.ID, fn func(ctx context.Context) error) error {
+	for attempt := 1; ; attempt++ {
+		err := s.db.InTx(ctx, fn)
+		if err == nil || attempt == syncAttempts || !db.IsRetryable(err) || ctx.Err() != nil {
+			return err
+		}
+		syncRetried(ctx)
+		telemetry.Logger(ctx).WarnContext(ctx, "pos: sync transaction retried", "store_id", storeID.String(), "attempt", attempt, "err", err)
+	}
 }
 
 // lockSyncCodes takes, before any entry, the code locks of the cashier and

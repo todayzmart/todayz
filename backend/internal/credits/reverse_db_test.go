@@ -165,7 +165,9 @@ func TestReverseEdgesDB(t *testing.T) {
 	got, err := e.reverse(Reversal{Ref: e.sale(), Spend: e.claimRef(), CustomerID: cust, StoreID: shop})
 	require.NoError(t, err)
 	require.Equal(t, Reversed{}, got)
-	require.Zero(t, e.count(`SELECT count(*) FROM ledger_transactions WHERE kind = 'reversal'`))
+	// Only the empty marker (Q29, D-132; this test said none before it).
+	require.Equal(t, 1, e.count(`SELECT count(*) FROM ledger_transactions WHERE kind = 'reversal'`))
+	require.Zero(t, e.count(`SELECT count(*) FROM ledger_entries e JOIN ledger_transactions t ON t.id = e.transaction_id WHERE t.kind = 'reversal'`))
 
 	claim, sale := e.claimRef(), e.sale()
 	require.Equal(t, 20, e.hold(claim, cust, shop, 20, 50000).Allowed)
@@ -188,6 +190,44 @@ func TestReverseEdgesDB(t *testing.T) {
 		return err
 	})
 	require.ErrorIs(t, err, ErrInvalid)
+	e.clean()
+}
+
+// Q29 (D-132): a ref reversed before it completed gets the empty marker, and
+// a later Complete on it is refused and posts nothing, for an order (one
+// with no hold, one whose hold was released) as for a sale.
+func TestReverseBeforeCompleteDB(t *testing.T) {
+	e := newDBEnv(t)
+	cust, shop := e.user(), e.store("Lakshmi Traders", 500)
+	e.grant(cust, 30)
+
+	sale := e.sale()
+	got, err := e.reverse(Reversal{Ref: sale, CustomerID: cust, StoreID: shop})
+	require.NoError(t, err)
+	require.Equal(t, Reversed{}, got)
+	require.Equal(t, 1, e.txCount(sale.key("reverse")))
+	_, err = e.cashback(sale, cust, shop, 48000, 500)
+	require.ErrorIs(t, err, ErrReversed)
+	require.Zero(t, e.txCount(sale.key("cashback")))
+
+	bare, released := e.order(), e.order()
+	require.Equal(t, 20, e.hold(released, cust, shop, 20, 50000).Allowed)
+	require.Equal(t, 20, e.release(released))
+	for _, o := range []Ref{bare, released} {
+		got, err := e.reverse(Reversal{Ref: o, CustomerID: cust, StoreID: shop})
+		require.NoError(t, err)
+		require.Equal(t, Reversed{}, got)
+		again, err := e.reverse(Reversal{Ref: o, CustomerID: cust, StoreID: shop})
+		require.NoError(t, err, "a repeat")
+		require.Equal(t, Reversed{}, again)
+		require.Equal(t, 1, e.txCount(o.key("reverse")))
+		_, err = e.completeWith(Completion{Ref: o, CustomerID: cust, StoreID: shop, EligiblePaise: 50000, CashbackBP: bp(500)})
+		require.ErrorIs(t, err, ErrReversed)
+		require.Zero(t, e.txCount(o.key("cashback")))
+		require.Zero(t, e.txCount(o.key("capture")))
+	}
+	require.EqualValues(t, 30, e.balance(wallet(cust)))
+	require.EqualValues(t, 0, e.balance(store(shop)))
 	e.clean()
 }
 

@@ -177,6 +177,21 @@ Checks on this change (shared test Postgres, `-p 2`): `make check-contract` pass
 
 The lock order as built is pos rows, then ledger accounts, then `credit_holds`, the reverse of the brief's wording; D-132 has the analysis. Existing POS tests changed where the behaviour did: `TestPOS14` and `TestPOS22` now expect every linked sale handed to referrals (2 each), and `TestPOSCaptureOfReleasedHold` expects 409 `claim_expired` instead of 500.
 
+## Review fixes, round 4 (D-132)
+
+The lead's review of D-132: nothing blocking in the sale, capture, cashback or reverse paths, no double or lost postings. Tests are in `cmd/todayz/pos_ledger_http_test.go` unless named.
+
+| Item | What changed | Test |
+|---|---|---|
+| 1, sweep vs sync deadlock | The sweep read a page of 500 claims and released them in one transaction, holding each customer's ledger accounts until the page committed; a sync of [C2, C1] could hold C2 and want C1. Now `ExpireClaims` reads the page without locks and expires and releases each claim in its own transaction (`LockDueBillClaim`, `FOR UPDATE SKIP LOCKED`). The sync (one transaction per batch) is retried whole on `40P01`/`40001`, up to 3 attempts, logged at warn and counted in `tz_pos_sync_retried_total` (`db.IsRetryable`). Pre-locking every customer's accounts at the sync's start was not used: it takes ledger locks before later entries' claim rows, against the D-132 order | `TestPOSLedgerSweepRacesSyncDB`: two customers' confirmed claims past expiry, a sync of counter-code sales for [cust2, cust1] run against the sweep, the sweep started 0–20 ms late, 6 rounds: the sync is 200 with both entries applied and linked, the sweep `{Expired 2, Released 2}`, both holds released, each wallet +2. Not checked: that it fails on the old sweep |
+| 2, shortfall | `Credits.ReverseSale` returns the shortfall; after the reversal commits POS logs it at warn (sale, store, customer ids, `shortfall_paise`) and counts `tz_credits_reverse_shortfall_total` | `TestPOSLedgerReverseSpentCashbackDB`: 10 granted, a counter-code sale pays 14 cashback at 5%, the customer spends all 24, the reversal is 200, the wallet stays 0, one `reversal` transaction (the marker), the log line has `shortfall_paise` 1400, no secrets in the logs |
+| 3, one constant | `money.PaisePerCredit` (100) in `internal/platform/money`, used by pos (`sale.go`, `money.go`, `claims.go`), credits (`rules.go`) and referrals | Existing tests |
+| 4, tests | The second reverse asserts 409 `invalid_transition`; `TestPOSLedgerBindRacesSweepDB` keeps exactly one winner a round and drops the two timing-dependent `Positive` checks | As named |
+| 5, leak check | `noSecrets` uses `leaked`: a value with a letter, digit or `_.:-+` on either side is not a match | `TestLeaked` (table) |
+| Q28–Q31 | `ErrHoldOpen` kept, comment cites the answer; `Reverse` always posts its marker (orders too); no partial reversal; the lock order and the cross-transaction point in D-132 | `TestReverseBeforeCompleteDB` (a sale ref and an order with no hold or a released hold: reverse, reverse again, one marker, `Complete` is `ErrReversed`, nothing posted); `reverse_fake_test.go` edges; `TestReverseEdgesDB` changed (question 29) |
+
+Checks on this change (shared test Postgres, `-p 2`): `make gen` and `make check-contract` pass; gofmt and `go vet ./...` clean; golangci-lint and gosec on `internal/{pos,jobs,credits,referrals}`, `internal/platform/{money,db}` and `cmd/todayz`: 0 issues; settingslint clean; `go test -race -count=1` passes for all of those packages, `cmd/todayz` in full (225 s). Follow-up outside W2-04: `internal/orders/quote.go` still multiplies credits by a literal 100.
+
 ## Coverage of SC-POS (08-testing.md)
 
 | Scenario | Where | Notes |
@@ -235,12 +250,12 @@ Each one has the most conservative reading built, and the ones in code are marke
 25. **Offer matching is per line.** An engine bill-level discount is not spread over the lines, so an offline sale whose line discounts add up to an engine bill discount reads as unmatched. Offline matching prices as a walk-in (`ids.Zero`), as the online sale does (question 14).
 26. **Sweep starvation.** Resolved in round 3: one run pages past failing claims by `(expires_at, id)`, and alert `tz-pos-claim-release-failed` fires on the counter.
 27. **Alert rules are not tested.** Nothing checks `infra/grafana/alerts/*.yaml` against the registered metrics, as `dashboards_test.go` does for dashboards. `pos.yaml` follows `jobs.yaml`. The 05 §5 alert table does not list it yet; TODO(lead): add a row there or say where W2 alerts are listed.
-28. **Reverse of an uncaptured hold** (`credits.ErrHoldOpen`, TODO(lead)). D-08/D-74 do not say what reversing a purchase whose hold is still `held` means. It is refused. A POS sale captures in its own transaction, so it cannot reach this.
-29. **Reverse before Complete.** A `Reverse` on a ref that was never completed posts nothing, and a later `Complete` on that ref is `ErrReversed`. POS cannot reverse a sale that has not committed, so this only guards other callers. Is that the reading you want for orders too?
-30. **Partial reversal** is not supported: `Reverse` takes the whole purchase, as the POS reversal does. Refused rather than guessed (D-132).
-31. **Lock order wording.** The brief said "ledger accounts, then pos rows"; every path takes pos rows first, then the ledger accounts, then `credit_holds`. No cycle found (D-132). Please confirm the brief meant the order within the ledger.
-32. **Changed POS test expectations.** `TestPOS14`, `TestPOS22` (every linked sale now reaches referrals) and `TestPOSCaptureOfReleasedHold` (409 instead of 500). No credits test was changed.
-33. **`noSecrets` and 4-digit codes.** A counter code is 4 digits, so `strings.Contains` on the whole log can match a timestamp or an id: `TestPOSCashierCodeLock` failed once that way in the full race run. Not changed here (it guards secrets); a fix would look for the code as a JSON value or in a known field. Who wants it?
+28. **Reverse of an uncaptured hold:** answered (round 4): keep refusing it with `credits.ErrHoldOpen`; the TODO(lead) is now a comment citing the answer. A POS sale captures in its own transaction, so it cannot reach this.
+29. **Reverse before Complete:** answered (round 4): refused for orders too. `Reverse` now always posts its `reverse:<ref>` marker (no entries when there is nothing to give back), so a later `Complete` on that ref is `ErrReversed`. This changed one existing credits assertion, in `TestReverseEdgesDB` (an empty reverse posted no transaction; it now posts the one empty marker).
+30. **Partial reversal:** answered (round 4): none for now. `Reverse` takes the whole purchase, as the POS reversal does (D-132).
+31. **Lock order:** answered (round 4): pos rows, then ledger accounts, then `credit_holds` is fine as long as every path keeps it; written in D-132 with the cross-transaction point (the sweep against a sync, round 4 item 1).
+32. **Changed test expectations.** `TestPOS14`, `TestPOS22` (every linked sale now reaches referrals) and `TestPOSCaptureOfReleasedHold` (409 instead of 500). Round 4 changed one credits assertion, in `TestReverseEdgesDB` (question 29).
+33. **`noSecrets` and 4-digit codes:** fixed in round 4 (the lead gave it to W2-04). A value counts as leaked only when the characters on both sides are not letters, digits or `_.:-+`, so a code inside a timestamp or id no longer matches, and a code on its own still does (`TestLeaked`).
 
 ## The cross-package FKs
 
