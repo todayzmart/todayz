@@ -131,9 +131,29 @@ Files edited outside the owned paths (the owned paths are `backend/internal/refe
 6. **Reversal after a posting.** Once either side has posted, nothing is clawed back: the rewards stay and a risk flag is raised for admin. Should it claw back instead?
 7. **Click rate limit.** There is none beyond the platform's middleware. Should link opens have their own?
 8. **Below-minimum purchase.** It leaves the referral pending, with no expiry. Should a pending referral expire?
-9. **Shop counting.** It counts purchases, not distinct customers, so one buyer could make all 10. Should it count distinct customers?
-10. **Blocked referrer.** A blocked referrer is still paid; only a deleted one is void.
+9. **Shop counting.** *Decided (founder, D-168):* distinct customers, not purchases. Built in the follow-up below.
+10. **Blocked referrer.** *Decided (founder, D-168):* not paid while blocked; the reward stays qualified and the sweep pays it once they are unblocked. A deleted one stays void. Built in the follow-up below. Still open: should a blocked *referee*, or a suspended referrer business, be held the same way? Today both are paid.
 11. **Sweep batch.** The sweep takes 200 per list per pass; a backlog drains over several 10-minute ticks, oldest first.
 12. **Typed code vs click.** A typed code that names someone other than a live click is ignored (first touch), not refused with an error.
 13. **Delivered orders** are not hooked, because orders has no delivered transition yet.
 14. **Code constants.** The sweep cadence (10 minutes), its batch (200) and the reversal risk score (40) are code constants, not settings, since 01 §17 does not list them. The 90-day device window and the 3-account threshold are fixed by 01 §17 and §8.
+
+## Follow-up: founder decisions (24 Oct, D-168)
+
+Built after the branch merged into main (main at 6787251, fast-forwarded):
+- **Distinct customers.**
+  - Migration `20302_w2-03_shop_sale_customer.sql` adds `referral_shop_sales.customer_id`, backfilled from the order for existing order rows.
+  - `ShopSaleCount` counts distinct buyers, and `ordersCounted` reports that count.
+- **Blocked referrer.**
+  - A blocked customer referrer's side waits; the referee is still paid.
+  - The sweep's `QualifiedReferrals` skips a referral waiting only on a blocked referrer.
+  - It pays the referrer once they are unblocked.
+- **Docs:**
+  - 01 §8 states both rules;
+  - D-161, D-164 and D-165 now point to D-168;
+  - D-164 now names `counter_code`, as the code and 01 do, where it wrongly said `phone_verified`.
+
+New tests:
+- `TestShopCountingDistinctCustomers`: repeat buyers do not count, and a third buyer qualifies the shop.
+- `TestBlockedReferrerWaits`: the referee is paid while the referrer is blocked; the sweep skips the referral and then pays it after the unblock.
+- `TestShopCounting` passes unchanged, since it already used a different buyer for each counted purchase.

@@ -109,7 +109,8 @@ func (s *Service) countShop(ctx context.Context, o Outcome) error {
 		}
 	}
 	if err := q.CountShopSale(ctx, referralsdb.CountShopSaleParams{
-		ReferralID: row.ID, RefType: o.RefType, RefID: ids.UUID(o.RefID), StoreID: ids.UUID(o.StoreID), Now: s.now(),
+		ReferralID: row.ID, RefType: o.RefType, RefID: ids.UUID(o.RefID), StoreID: ids.UUID(o.StoreID),
+		CustomerID: ids.UUID(o.CustomerID), Now: s.now(),
 	}); err != nil {
 		return err
 	}
@@ -117,8 +118,8 @@ func (s *Service) countShop(ctx context.Context, o Outcome) error {
 }
 
 // tryQualifyShop qualifies a locked pending shop referral once the business
-// is verified and has ref_shop_qualifying_orders counted sales; the last
-// counted sale is the qualifying one.
+// is verified and ref_shop_qualifying_orders different customers bought
+// (D-168); the last counted sale is the qualifying one.
 func (s *Service) tryQualifyShop(ctx context.Context, row referralsdb.Referral) error {
 	if row.Status != statusPending || row.Kind != KindAnyShop {
 		return nil
@@ -156,23 +157,30 @@ func (s *Service) tryQualifyShop(ctx context.Context, row referralsdb.Referral) 
 // beneficiary states.
 const (
 	payPost = iota // post to the account
-	payWait        // no account yet (no live store): try again later
+	payWait        // not payable yet (no live store, a blocked referrer): try again later
 	payVoid        // nobody to pay (a deleted customer): mark done unposted
 )
 
 // beneficiary is the account one side's reward goes to: a customer's wallet,
 // or the primary store of a business (a store referrer's business too,
-// 01 §8, D-72).
-func (s *Service) beneficiary(ctx context.Context, partyType string, partyID pgtype.UUID) (Beneficiary, int, error) {
+// 01 §8, D-72). A deleted customer is void; a blocked customer referrer
+// waits until unblocked (D-168).
+func (s *Service) beneficiary(ctx context.Context, side, partyType string, partyID pgtype.UUID) (Beneficiary, int, error) {
 	q := s.q(ctx)
 	switch partyType {
 	case partyCustomer:
-		active, err := q.UserActive(ctx, partyID)
-		if err != nil && !db.IsNoRows(err) {
+		status, err := q.UserStatus(ctx, partyID)
+		switch {
+		case db.IsNoRows(err):
+			return Beneficiary{}, payVoid, nil
+		case err != nil:
 			return Beneficiary{}, 0, err
 		}
-		if !active {
+		switch {
+		case status == "deleted":
 			return Beneficiary{}, payVoid, nil
+		case status == "blocked" && side == SideReferrer:
+			return Beneficiary{}, payWait, nil
 		}
 		return Beneficiary{Kind: BeneficiaryCustomer, ID: idOf(partyID)}, payPost, nil
 	case partyStore, partyBusiness:
@@ -216,7 +224,7 @@ func (s *Service) reward(ctx context.Context, row referralsdb.Referral) error {
 		if side.done || row.Status != statusQualified {
 			continue
 		}
-		to, state, err := s.beneficiary(ctx, side.typ, side.id)
+		to, state, err := s.beneficiary(ctx, side.name, side.typ, side.id)
 		if err != nil {
 			return err
 		}

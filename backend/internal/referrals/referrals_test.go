@@ -842,6 +842,50 @@ func TestShopCountingSkipsCustomerReferrer(t *testing.T) {
 	assert.Equal(t, statusRewarded, st)
 }
 
+// A new shop qualifies on different customers, not purchases (D-168).
+func TestShopCountingDistinctCustomers(t *testing.T) {
+	e := newEnv(t)
+	e.setting("ref_shop_qualifying_orders", "3")
+	_, _, refCode, _, _ := e.shopWithStore()
+	biz, owner, sess, _ := e.owner("verified")
+	e.exec(`UPDATE businesses SET status = 'draft' WHERE id = $1`, ids.UUID(biz))
+	res, err := e.svc.ClaimBusiness(e.ctx, biz, owner, sess, ClaimInput{Code: refCode})
+	require.NoError(t, err)
+	e.exec(`UPDATE businesses SET status = 'verified' WHERE id = $1`, ids.UUID(biz))
+	store, _, _ := e.store(biz, "live", testNow)
+	counted := func() int {
+		t.Helper()
+		got, err := e.svc.Business(e.ctx, biz)
+		require.NoError(t, err)
+		require.NotNil(t, got.ReferredBy)
+		return got.ReferredBy.OrdersCounted
+	}
+
+	// One buyer's three purchases and a linked sale count once.
+	first, _ := e.newCustomer()
+	for range 3 {
+		e.complete(e.order(first, store, 10_000, 0))
+	}
+	e.complete(Outcome{RefType: RefPOSSale, RefID: ids.New(testNow), CustomerID: first, StoreID: store, EligiblePaise: 10_000, LinkMethod: LinkBillQR})
+	assert.Equal(t, 1, counted())
+	assert.Equal(t, 4, e.count(`SELECT count(*) FROM referral_shop_sales WHERE referral_id = $1`, ids.UUID(res.ReferralID)))
+	second, _ := e.newCustomer()
+	e.complete(e.order(second, store, 10_000, 0))
+	e.complete(e.order(second, store, 10_000, 0))
+	assert.Equal(t, 2, counted())
+	st, _, _ := e.referral(res.ReferralID)
+	assert.Equal(t, statusPending, st)
+	assert.Empty(t, e.ledger.posted)
+
+	// The third different customer qualifies it.
+	third, _ := e.newCustomer()
+	e.complete(e.order(third, store, 10_000, 0))
+	assert.Equal(t, 3, counted())
+	st, a, b := e.referral(res.ReferralID)
+	assert.Equal(t, statusRewarded, st)
+	assert.True(t, a && b)
+}
+
 // A shop with no live store yet: its reward waits for one (D-72).
 func TestShopRewardWaitsForAStore(t *testing.T) {
 	e := newEnv(t)
@@ -916,6 +960,49 @@ func TestDeletedReferrerIsVoid(t *testing.T) {
 	assert.True(t, a && b)
 	require.Len(t, e.ledger.posted, 1)
 	assert.Equal(t, SideReferee, e.ledger.posted[0].Side)
+}
+
+// A blocked referrer is not paid while blocked; the sweep pays them once
+// they are unblocked (D-168).
+func TestBlockedReferrerWaits(t *testing.T) {
+	e := newEnv(t)
+	referrer, code := e.customer(testNow.Add(-30 * 24 * time.Hour))
+	_, store, _, _, _ := e.shopWithStore()
+	u, _ := e.newCustomer()
+	res, err := e.claim(u, ClaimInput{Code: code})
+	require.NoError(t, err)
+	e.exec(`UPDATE users SET status = 'blocked' WHERE id = $1`, ids.UUID(referrer))
+
+	e.complete(e.order(u, store, 10_000, 0))
+	st, a, b := e.referral(res.ReferralID)
+	assert.Equal(t, statusQualified, st)
+	assert.False(t, a, "the blocked referrer waits")
+	assert.True(t, b, "the referee is paid now")
+	require.Len(t, e.ledger.posted, 1)
+	assert.Equal(t, SideReferee, e.ledger.posted[0].Side)
+
+	// While blocked the sweep leaves it alone.
+	out, err := e.svc.Sweep(e.ctx)
+	require.NoError(t, err)
+	assert.EqualValues(t, 0, out["rewarded"])
+	st, a, _ = e.referral(res.ReferralID)
+	assert.Equal(t, statusQualified, st)
+	assert.False(t, a)
+	assert.Len(t, e.ledger.posted, 1)
+
+	// Unblocked: the next sweep pays the referrer, once.
+	e.exec(`UPDATE users SET status = 'active' WHERE id = $1`, ids.UUID(referrer))
+	out, err = e.svc.Sweep(e.ctx)
+	require.NoError(t, err)
+	assert.EqualValues(t, 1, out["rewarded"])
+	st, a, b = e.referral(res.ReferralID)
+	assert.Equal(t, statusRewarded, st)
+	assert.True(t, a && b)
+	require.Len(t, e.ledger.posted, 2)
+	assert.Equal(t, SideReferrer, e.ledger.posted[1].Side)
+	_, err = e.svc.Sweep(e.ctx)
+	require.NoError(t, err)
+	assert.Len(t, e.ledger.posted, 2)
 }
 
 // --- reversal (D-08) ------------------------------------------------------------
