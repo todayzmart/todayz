@@ -163,6 +163,8 @@ test('a customer order goes new, accepted, ready and handed over with the pickup
   // Mark ready.
   await page.getByRole('button', { name: 'Mark ready' }).click();
   await expect(page.getByText('Ready for pickup').first()).toBeVisible();
+  await expect(page.getByText('Marked ready.')).toBeVisible();
+  if (process.env.TZ_QA_DIR) await page.screenshot({ path: `${process.env.TZ_QA_DIR}/business-order-ready-1280.png` });
 
   // A wrong code first: it says how many tries are left, and the boxes clear.
   const customerOrder = await request.get(`${API}/v1/me/orders/${orderId}`, { headers: { Authorization: `Bearer ${token}` } });
@@ -182,6 +184,7 @@ test('a customer order goes new, accepted, ready and handed over with the pickup
   await page.keyboard.type(code ?? '');
   await page.getByRole('button', { name: 'Hand over order' }).click();
   await expect(page.getByText('Order handed over.')).toBeVisible();
+  if (process.env.TZ_QA_DIR) await page.screenshot({ path: `${process.env.TZ_QA_DIR}/business-order-handed-1280.png` });
 
   // The customer's order is collected and records the payment method.
   const after = await request.get(`${API}/v1/me/orders/${orderId}`, { headers: { Authorization: `Bearer ${token}` } });

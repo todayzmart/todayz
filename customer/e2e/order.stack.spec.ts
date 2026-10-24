@@ -21,6 +21,11 @@ const SHOP_PHONE = process.env.TZ_SHOP_PHONE ?? '9000000011'; // national number
 const testPhone = () => `90000000${String(30 + Math.floor(Math.random() * 60))}`;
 const TURNSTILE_DUMMY = 'XXXX.DUMMY.TOKEN.XXXX';
 
+/** Saves a screenshot for the QA pack when TZ_QA_DIR is set (synthetic seed data only). */
+async function shot(page: Page, name: string) {
+  if (process.env.TZ_QA_DIR) await page.screenshot({ path: `${process.env.TZ_QA_DIR}/${name}-390.png` });
+}
+
 const CROCKFORD = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 function ulid(): string {
   let t = Date.now();
@@ -134,12 +139,14 @@ async function journey(page: Page, request: APIRequestContext, token: string) {
 
   // C-11 pickup checkout, then Place order.
   await expect(page.getByRole('heading', { level: 1, name: 'Checkout' })).toBeVisible();
+  await shot(page, 'customer-checkout');
   await page.getByRole('button', { name: /^Place order/ }).click();
 
   // C-12: the 400 ms check shows once, then we wait for the shop with a countdown from the server.
   await expect(page.getByTestId('placed-check')).toBeVisible();
   await expect(page).toHaveURL(/\/orders\/[0-9A-Z]{26}$/);
   await expect(page.getByText(/Waiting for .* to accept · \d+:\d{2} left/)).toBeVisible();
+  await shot(page, 'customer-waiting');
   const orderId = page.url().split('/').pop() ?? '';
 
   // The shop accepts through the API; the customer's page moves on its own (SSE, no reload).
@@ -153,6 +160,7 @@ async function journey(page: Page, request: APIRequestContext, token: string) {
   const code = ((await group.locator('.tz-code-digits [aria-hidden="true"]').textContent()) ?? '').trim();
   expect(code).toMatch(/^\d{4}$/);
   await expect(page.getByText(/Held for you · \d+:\d{2} left/)).toBeVisible();
+  await shot(page, 'customer-pickup-code');
 
   // The code is never in the URL or in browser storage.
   expect(page.url()).not.toContain(code);
@@ -167,6 +175,7 @@ async function journey(page: Page, request: APIRequestContext, token: string) {
   expect(verify.ok(), 'shop verified the code').toBe(true);
   await expect(page.getByText('Order complete')).toBeVisible({ timeout: 15_000 });
   await expect(page.getByRole('group', { name: 'Pickup code' })).toHaveCount(0);
+  await shot(page, 'customer-collected');
 
   // It shows under Earlier in the orders list.
   await page.goto('/orders');

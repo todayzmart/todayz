@@ -1,4 +1,9 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+
+/** Saves a screenshot for the QA pack when TZ_QA_DIR is set (synthetic seed data only). */
+async function shot(page: Page, name: string) {
+  if (process.env.TZ_QA_DIR) await page.screenshot({ path: `${process.env.TZ_QA_DIR}/${name}-390.png` });
+}
 
 // W2-08 journey against `make dev` and the seeded Sri Lakshmi stores (01KE0S1W6W8ZV7T1C3A6MS0001 and …MS0002).
 // Written for the seed; not run in the weekend slice (the brief forbids make dev).
@@ -14,6 +19,8 @@ test('home, search atta, open a shop, add to cart', async ({ page }) => {
   // C-03: stats and shops near you, radius defaults to 2 km.
   await expect(page.getByRole('button', { name: '2 km' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('heading', { name: 'Shops near you' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Sri Lakshmi/ }).first()).toBeVisible();
+  await shot(page, 'customer-home');
 
   // C-05: search "atta"; results are grouped by shop and carry the proof line.
   await page.getByRole('searchbox').fill('atta');
@@ -21,6 +28,7 @@ test('home, search atta, open a shop, add to cart', async ({ page }) => {
   await expect(page).toHaveURL(/\/search\?q=atta/);
   await expect(page.getByText(/Checked \d+ shops nearby/)).toBeVisible();
   await expect(page.getByText(/Sri Lakshmi/).first()).toBeVisible();
+  await shot(page, 'customer-search');
 
   // C-07: open the first shop, then C-08 is one tap away from its items.
   await page.getByRole('link', { name: /Sri Lakshmi/ }).first().click();
@@ -30,4 +38,5 @@ test('home, search atta, open a shop, add to cart', async ({ page }) => {
   // Add to cart: the cart bar appears with the shop's name.
   await page.getByRole('button', { name: /^Add/ }).first().click();
   await expect(page.getByRole('button', { name: /View cart/ })).toBeVisible();
+  await shot(page, 'customer-shop');
 });
