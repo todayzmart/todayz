@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	offersapi "github.com/todayz/backend/gen/api/offers"
+	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/ids"
 )
 
@@ -277,6 +278,49 @@ func TestCreateUpdatePreview(t *testing.T) {
 	list, err := w.svc.listOffers(w.ctx, sid, offersapi.ListOffersParams{})
 	require.NoError(t, err)
 	require.Len(t, list.Items, 1)
+}
+
+// SC-OF: a flash offer from an expiring batch covers that item, ends with the
+// batch's expiry day (IST) and is the only open flash offer on the batch.
+func TestFlashOfferFromBatch(t *testing.T) {
+	w := newWorld(t, nil)
+	store := w.store("a", 100)
+	it := w.item(store, "Curd", 5000)
+	sid := store.String()
+	batch := func(expires string) string {
+		id := w.id()
+		w.exec(`INSERT INTO stock_batches (id, store_item_id, received_quantity, quantity, expires_on, received_at) VALUES ($1, $2, 10, 10, $3::date, $4)`,
+			ids.UUID(id), ids.UUID(it), expires, testNow)
+		return id.String()
+	}
+	good, past, none := batch("2026-10-24"), batch("2026-10-22"), w.id().String()
+	val := 30
+	create := func(batchID string, items []string) (offersapi.Offer, error) {
+		o, _, err := w.svc.createOffer(w.ctx, sid, &offersapi.OfferCreate{Kind: "percent", Scope: "items", Value: &val, StoreItemIds: &items, BatchId: &batchID})
+		return o, err
+	}
+
+	o, err := create(good, nil)
+	require.NoError(t, err)
+	require.Equal(t, offersapi.FlashExpiry, o.Source)
+	require.NotNil(t, o.EndsAt)
+	require.True(t, o.EndsAt.Equal(time.Date(2026, 10, 25, 0, 0, 0, 0, clock.IST)), "ends when the batch's expiry day ends in IST")
+
+	q, err := w.svc.Price(w.ctx, Cart{StoreID: store, Lines: []Line{line(it, 5000, 1)}})
+	require.NoError(t, err)
+	require.EqualValues(t, 1500, q.ItemDiscountPaise)
+
+	_, err = create(good, nil)
+	require.Error(t, err, "one open flash offer per batch")
+	_, err = create(past, nil)
+	require.Error(t, err, "an expired batch")
+	_, err = create(none, nil)
+	require.Error(t, err, "a batch that is not this shop's")
+	_, err = create(batch("2026-10-30"), []string{w.item(store, "Milk", 4000).String()})
+	require.Error(t, err, "only the batch's own item")
+	later := time.Date(2026, 10, 26, 0, 0, 0, 0, clock.IST)
+	_, _, err = w.svc.createOffer(w.ctx, sid, &offersapi.OfferCreate{Kind: "percent", Scope: "items", Value: &val, BatchId: ptr(batch("2026-10-24")), EndsAt: &later})
+	require.Error(t, err, "may not outlive the batch")
 }
 
 // SC-OF: the feed shows nearest first, one card per shop, banner over offer.
