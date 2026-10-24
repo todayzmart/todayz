@@ -102,6 +102,9 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		if err != nil {
 			return err
 		}
+		if err := s.checkCreditsAsked(ctx, qq); err != nil {
+			return err
+		}
 		if qq.askReplyID != nil && !qq.askUsable {
 			// TODO(lead): until W3-16 gives an AskPricer, every reply is
 			// refused here (ask_price_expired) and the customer books at the
@@ -291,6 +294,29 @@ func (s *Service) holdCredits(ctx context.Context, qq quoted, orderID, customerI
 		return err
 	}
 	return problem.New(genproblems.PriceChanged, "").WithExtension("quote", fresh.view())
+}
+
+// checkCreditsAsked refuses an order that would use fewer credits than
+// asked, instead of placing it with fewer (04 §2, CR-02): more than
+// credit_max_per_order is credit_max_exceeded, another credit rule answers
+// its own problem, and anything else (the wallet, the ₹1 floor) is
+// price_changed with the quote as it is now. The quote clamps and says why
+// in creditsLimit (D-76); placing does not.
+func (s *Service) checkCreditsAsked(ctx context.Context, qq quoted) error {
+	if qq.creditsRequested <= qq.creditsUsed {
+		return nil
+	}
+	maxPer, err := s.count(ctx, settings.CreditMaxPerOrder)
+	if err != nil {
+		return err
+	}
+	if qq.creditsRequested > maxPer {
+		return problem.New(genproblems.CreditMaxExceeded, "")
+	}
+	if code, ok := creditProblems[qq.creditsLimit]; ok {
+		return problem.New(code, "")
+	}
+	return problem.New(genproblems.PriceChanged, "").WithExtension("quote", qq.view())
 }
 
 // creditProblems are the credit rules' refusals (wallet.yaml).
