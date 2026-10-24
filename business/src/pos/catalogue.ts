@@ -1,0 +1,66 @@
+// Search and lookup over the offline catalogue snapshot. Everything here is pure and runs on the
+// device, so the counter finds items with no network (02 §4.3, B-05 "search/scan bar").
+import type { CatalogueItem } from './types';
+
+export const TILE_COUNT = 24;
+
+/** The price the counter charges per unit: the offer price when the server priced one, else the shelf price. */
+export function sellPricePaise(item: CatalogueItem): number {
+  const offer = item.offerPricePaise;
+  return typeof offer === 'number' && offer >= 0 && offer < item.pricePaise ? offer : item.pricePaise;
+}
+
+export function hasOffer(item: CatalogueItem): boolean {
+  return sellPricePaise(item) < item.pricePaise;
+}
+
+function fold(s: string): string {
+  return s.toLowerCase().normalize('NFKD').replace(/\p{M}/gu, '').replace(/\s+/g, ' ').trim();
+}
+
+export function itemLabel(item: CatalogueItem): string {
+  return item.variant ? `${item.name} ${item.variant}` : item.name;
+}
+
+/** The item a scanned or typed barcode belongs to, or null. Unlisted items still sell at the counter. */
+export function findByBarcode(items: readonly CatalogueItem[], code: string): CatalogueItem | null {
+  const c = code.trim();
+  if (!c) return null;
+  return items.find((i) => i.barcodes.includes(c)) ?? null;
+}
+
+/**
+ * Ranks items for a typed query: exact barcode first, then names that start with the query, then
+ * names that contain every word. Best sellers win ties. At most `limit` results.
+ */
+export function searchItems(items: readonly CatalogueItem[], query: string, limit = 30): CatalogueItem[] {
+  const q = fold(query);
+  if (!q) return [];
+  const words = q.split(' ');
+  const scored: { item: CatalogueItem; score: number }[] = [];
+  for (const item of items) {
+    if (item.barcodes.some((b) => b === q)) {
+      scored.push({ item, score: 0 });
+      continue;
+    }
+    const label = fold(itemLabel(item));
+    if (label.startsWith(q)) scored.push({ item, score: 1 });
+    else if (words.every((w) => label.includes(w))) scored.push({ item, score: label.split(' ').some((t) => t.startsWith(words[0] ?? '')) ? 2 : 3 });
+    else if (q.length >= 3 && item.barcodes.some((b) => b.endsWith(q))) scored.push({ item, score: 4 });
+  }
+  scored.sort(
+    (a, b) =>
+      a.score - b.score ||
+      (a.item.topRank ?? Number.MAX_SAFE_INTEGER) - (b.item.topRank ?? Number.MAX_SAFE_INTEGER) ||
+      itemLabel(a.item).localeCompare(itemLabel(b.item)),
+  );
+  return scored.slice(0, limit).map((s) => s.item);
+}
+
+/** The quick tiles: the best sellers, best first (B-05). */
+export function topTiles(items: readonly CatalogueItem[], count = TILE_COUNT): CatalogueItem[] {
+  return items
+    .filter((i) => typeof i.topRank === 'number')
+    .sort((a, b) => (a.topRank ?? 0) - (b.topRank ?? 0))
+    .slice(0, count);
+}
