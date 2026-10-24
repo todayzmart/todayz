@@ -240,11 +240,11 @@ func lockCartItems(ctx context.Context, q *ordersdb.Queries, c cart) error {
 // stock and starts the pickup hold, as a shop's full accept does. A line
 // short of stock leaves the order placed for the shop to answer. create
 // has locked the items already, so the check here is exact.
-// TODO(lead): create refuses a cart with a short line (BK-02) after
-// reading the stock under that lock, so at an auto-accept store an order
-// with an unavailable item is refused with insufficient_stock rather than
-// placed; the "stays placed" branch below is the backstop for a stock that
-// moved anyway.
+// create refuses a cart with a short line (BK-02, 01 §5.3) after reading
+// the stock under that lock, at every store (lead, W2-02 finish), so at an
+// auto-accept store an order with an unavailable item is refused with
+// insufficient_stock rather than placed; the "stays placed" branch below is
+// the backstop for a stock that moved anyway.
 func (s *Service) autoAccept(ctx context.Context, orderID ids.ID, hold time.Duration, now time.Time) (bool, error) {
 	q := s.q(ctx)
 	o, err := q.LockOrder(ctx, ids.UUID(orderID))
