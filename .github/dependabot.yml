@@ -1,4 +1,5 @@
-# Dependency update pull requests (W0-06 S8). Runs only after the repos split.
+# Dependency update pull requests (W0-06 S8), live on todayzmart/todayz since D-210.
+# At most two open PRs per ecosystem: each PR runs ci, security and e2e on paid private-repo minutes.
 # Weekly, with a 14-day cooldown on every ecosystem so a release is at least two weeks
 # old before it is proposed (D-88; pnpm minimumReleaseAge says the same for npm).
 # scripts/ci/wflint checks this file: every ecosystem below, weekly, cooldown >= 14,
@@ -13,27 +14,36 @@ updates:
       interval: weekly
     cooldown:
       default-days: 14
+    open-pull-requests-limit: 2
   - package-ecosystem: docker
     directory: /
     schedule:
       interval: weekly
     cooldown:
       default-days: 14
+    open-pull-requests-limit: 2
   - package-ecosystem: docker-compose
     directory: /
     schedule:
       interval: weekly
     cooldown:
       default-days: 14
+    open-pull-requests-limit: 2
+    # Local Postgres follows prod RDS (engine_version 16 in infra/terraform/modules/database).
+    ignore:
+      - dependency-name: postgis/postgis
+        versions: [">=17"]
   - package-ecosystem: gomod
     directories: ["/backend", "/backend/tools", "/e2e/mocks", "/scripts/envtool", "/scripts/ci/wflint"]
     schedule:
       interval: weekly
     cooldown:
       default-days: 14
+    open-pull-requests-limit: 2
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
     cooldown:
       default-days: 14
+    open-pull-requests-limit: 2
