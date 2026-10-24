@@ -6,8 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"slices"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -41,8 +43,10 @@ type Deps struct {
 //
 // Lock order (every operation, so two never wait on each other in a cycle):
 // the customer and store account_balances rows in account id order (one
-// LockBalances call per operation), then the hold row (LockHold), then the
-// customer's lots. The platform accounts are not locked up front: their
+// LockBalances call per operation; accounts used for the first time are
+// created before it in (kind, owner) order), then the hold row (LockHold),
+// then the customer's lots. Hold locks the store's row as well as the
+// customer's, so the store's daily cap is counted under a lock. The platform accounts are not locked up front: their
 // entries are inserted last in each posting, so the balance trigger takes
 // their row lock after every other lock is held.
 type Service struct {
@@ -185,11 +189,21 @@ type locked struct {
 }
 
 // lock creates (on first use) and locks the customer and store accounts in
-// one statement, in account id order. Platform accounts are skipped.
+// one statement, in account id order. Platform accounts are skipped. A first
+// use creates the accounts in (kind, owner) order, so two operations creating
+// the same new accounts wait on each other's unique-index entry in one order
+// too (D-121).
 func (s *Service) lock(ctx context.Context, q *creditsdb.Queries, now time.Time, accts ...Account) (map[Account]locked, error) {
 	out := make(map[Account]locked, len(accts))
 	byID := map[pgtype.UUID]Account{}
 	var list []pgtype.UUID
+	accts = slices.Clone(accts)
+	slices.SortFunc(accts, func(a, b Account) int {
+		if c := strings.Compare(string(a.Kind), string(b.Kind)); c != 0 {
+			return c
+		}
+		return a.Owner.Compare(b.Owner)
+	})
 	for _, a := range accts {
 		if a.Kind.platform() {
 			continue
@@ -417,7 +431,9 @@ func (s *Service) Hold(ctx context.Context, req HoldRequest) (Allowance, error) 
 	var out Allowance
 	err = s.db.InTx(ctx, func(ctx context.Context) error {
 		q, now := s.q(ctx), s.now()
-		acc, err := s.lock(ctx, q, now, wallet(c), held(c))
+		// The store row too: the store's daily cap counts every customer's
+		// holds there, so holds at one store take turns (D-120).
+		acc, err := s.lock(ctx, q, now, wallet(c), held(c), store(req.StoreID))
 		if err != nil {
 			return err
 		}
@@ -499,10 +515,11 @@ func (s *Service) flag(ctx context.Context, rule string, req HoldRequest) {
 	}
 	details, _ := json.Marshal(map[string]string{"ref_type": string(req.Ref.Type), "ref_id": req.Ref.ID.String()})
 	now := s.now()
-	// TODO(lead): one flag per refused hold; the plan does not say whether
-	// repeats in a day should fold into one row. Score 0: no number given.
+	// One flag per subject and rule per IST day (D-125); the first refusal's
+	// ref is the one kept. Score 0: the plan gives no number.
 	if err := creditsdb.New(s.db.Pool).InsertRiskFlag(context.WithoutCancel(ctx), creditsdb.InsertRiskFlagParams{
 		ID: s.newID(now), SubjectType: subjectType, SubjectID: ids.UUID(subject), Rule: rule, Details: details, Now: now,
+		DayStart: clock.StartOfDayIST(now),
 	}); err != nil {
 		telemetry.Logger(ctx).ErrorContext(ctx, "credits: risk flag not written", "rule", rule, "err", err)
 	}
@@ -801,16 +818,6 @@ func (s *Service) Post(ctx context.Context, p Posting) (Posted, error) {
 		if err != nil {
 			return err
 		}
-		if id, err := q.TransactionByKey(ctx, p.IdempotencyKey); err == nil {
-			out = Posted{TransactionID: mustID(id), Duplicate: true}
-			return nil
-		} else if !db.IsNoRows(err) {
-			return wrap("posted key", err)
-		}
-		type debit struct {
-			ps []portion
-		}
-		var debits []debit
 		es := make([]entry, 0, len(p.Legs))
 		for _, l := range p.Legs {
 			id := acc[l.Account].ID
@@ -818,11 +825,23 @@ func (s *Service) Post(ctx context.Context, p Posting) (Posted, error) {
 				id = platformIDs[l.Account.Kind]
 			}
 			es = append(es, entry{Account: id, Platform: l.Account.Kind.platform(), Amount: l.Amount})
+		}
+		if id, err := q.TransactionByKey(ctx, p.IdempotencyKey); err == nil {
+			out = Posted{TransactionID: mustID(id), Duplicate: true}
+			return s.samePosting(ctx, q, p, es)
+		} else if !db.IsNoRows(err) {
+			return wrap("posted key", err)
+		}
+		type debit struct {
+			ps []portion
+		}
+		var debits []debit
+		for i, l := range p.Legs {
 			if l.Account.Kind != CustomerWallet || l.Amount > 0 {
 				continue
 			}
 			c := l.Account.Owner
-			if _, err := s.expireDue(ctx, q, now, c, id); err != nil {
+			if _, err := s.expireDue(ctx, q, now, c, es[i].Account); err != nil {
 				return err
 			}
 			rows, err := q.SpendableLots(ctx, ids.UUID(c))
@@ -844,7 +863,7 @@ func (s *Service) Post(ctx context.Context, p Posting) (Posted, error) {
 		}
 		out = Posted{TransactionID: mustID(txID), Duplicate: dup}
 		if dup {
-			return nil
+			return s.samePosting(ctx, q, p, es)
 		}
 		for _, d := range debits {
 			for _, pt := range d.ps {
@@ -866,6 +885,29 @@ func (s *Service) Post(ctx context.Context, p Posting) (Posted, error) {
 		return Posted{}, err
 	}
 	return out, nil
+}
+
+// samePosting refuses a repeated key whose first posting had another kind or
+// other legs (D-122): a repeat must be the same posting, never a new one that
+// only looks posted.
+func (s *Service) samePosting(ctx context.Context, q *creditsdb.Queries, p Posting, es []entry) error {
+	rows, err := q.PostedLegs(ctx, p.IdempotencyKey)
+	if err != nil {
+		return wrap("posted legs", err)
+	}
+	if len(rows) != len(es) {
+		return ErrKeyReused
+	}
+	want := make(map[pgtype.UUID]int64, len(es))
+	for _, e := range es {
+		want[e.Account] = e.Amount
+	}
+	for _, r := range rows {
+		if n, ok := want[r.AccountID]; !ok || n != r.Amount || r.Kind != string(p.Kind) {
+			return ErrKeyReused
+		}
+	}
+	return nil
 }
 
 // --- account deletion ------------------------------------------------------------

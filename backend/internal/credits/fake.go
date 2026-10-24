@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -434,6 +435,9 @@ func (f *Fake) Post(_ context.Context, p Posting) (Posted, error) {
 	}
 	if t, ok := f.txs[p.IdempotencyKey]; ok {
 		f.attempts++
+		if t.Kind != p.Kind || !sameLegs(t.Legs, p.Legs) {
+			return Posted{}, ErrKeyReused
+		}
 		return Posted{TransactionID: t.ID, Duplicate: true}, nil
 	}
 	now := f.now()
@@ -593,14 +597,33 @@ func capRule(l Limit) string {
 }
 
 // validatePosting checks a Poster posting's shape.
+// sameLegs reports whether two postings move the same accounts by the same
+// amounts, in any order.
+func sameLegs(a, b []Leg) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	m := make(map[Account]int64, len(a))
+	for _, l := range a {
+		m[l.Account] = l.Amount
+	}
+	for _, l := range b {
+		if n, ok := m[l.Account]; !ok || n != l.Amount {
+			return false
+		}
+	}
+	return true
+}
+
 func validatePosting(p Posting) error {
 	switch p.Kind {
 	case TxReferralReward, TxAdminAdjustment, TxPayout:
 	default:
 		return fmt.Errorf("%w: kind %q is not posted through Post", ErrInvalid, p.Kind)
 	}
-	if p.IdempotencyKey == "" || len(p.IdempotencyKey) > 200 {
-		return fmt.Errorf("%w: idempotency key", ErrInvalid)
+	if len(p.IdempotencyKey) > 200 || !strings.HasPrefix(p.IdempotencyKey, KeyPrefix[p.Kind]) ||
+		len(p.IdempotencyKey) == len(KeyPrefix[p.Kind]) {
+		return fmt.Errorf("%w: idempotency key (%q and something after it)", ErrInvalid, KeyPrefix[p.Kind])
 	}
 	if (p.RefType == "") != (p.RefID == ids.Zero) {
 		return fmt.Errorf("%w: ref type and id go together", ErrInvalid)

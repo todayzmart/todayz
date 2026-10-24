@@ -197,12 +197,23 @@ type Posting struct {
 	// request, a payout); both or neither.
 	RefType string
 	RefID   ids.ID
-	// IdempotencyKey is unique per posting (≤ 200 characters): a repeat
-	// posts nothing and returns the first.
+	// IdempotencyKey is unique per posting (≤ 200 characters) and starts
+	// with the kind's KeyPrefix, so it never meets this package's own keys:
+	// a repeat with the same kind and legs posts nothing and returns the
+	// first; a repeat with anything else is ErrKeyReused.
 	IdempotencyKey string
 	CreatedBy      ids.ID // the admin for an adjustment; zero for the system
 	Memo           string
 	Legs           []Leg
+}
+
+// KeyPrefix is the idempotency key prefix each Poster kind must use (D-122).
+// The package's own postings use hold:, capture:, release:, recap:,
+// cashback:, expiry: and forfeit: keys.
+var KeyPrefix = map[TxKind]string{
+	TxReferralReward:  "referral:",
+	TxAdminAdjustment: "adjust:",
+	TxPayout:          "payout:",
 }
 
 // Posted is the result of Post. Duplicate is true when the key had posted
@@ -233,6 +244,9 @@ var (
 	// ErrInvalid: a request breaks the rules above (unbalanced legs, a
 	// forbidden account or kind, a non-positive amount).
 	ErrInvalid = errors.New("credits: invalid request")
+	// ErrKeyReused: an idempotency key that posted before came back with a
+	// different kind or different legs; nothing was posted.
+	ErrKeyReused = errors.New("credits: idempotency key already used for another posting")
 	// ErrUnavailable: the service has no database or settings.
 	ErrUnavailable = errors.New("credits: not configured")
 )

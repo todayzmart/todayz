@@ -45,6 +45,12 @@ RETURNING id;
 SELECT id FROM ledger_transactions WHERE idempotency_key = @idempotency_key;
 
 -- KeyAmount is what accounts of a kind got from the posting with this key.
+-- PostedLegs are the kind and entries of the posting with this key.
+-- name: PostedLegs :many
+SELECT t.kind, e.account_id, e.amount FROM ledger_transactions t
+JOIN ledger_entries e ON e.transaction_id = t.id
+WHERE t.idempotency_key = @idempotency_key;
+
 -- name: KeyAmount :one
 SELECT coalesce(sum(e.amount), 0)::bigint
 FROM ledger_transactions t
@@ -168,9 +174,15 @@ SELECT
 -- name: StoreCashbackBP :one
 SELECT cashback_bp FROM stores WHERE id = @id;
 
+-- InsertRiskFlag raises one flag per subject and rule per IST day (D-125):
+-- a second refusal the same day adds nothing.
 -- name: InsertRiskFlag :exec
 INSERT INTO risk_flags (id, subject_type, subject_id, rule, score, details, created_at, updated_at)
-VALUES (@id, @subject_type, @subject_id, @rule, @score, @details, @now, @now);
+SELECT @id, @subject_type, @subject_id, @rule, @score, @details, @now, @now
+WHERE NOT EXISTS (
+  SELECT 1 FROM risk_flags f
+  WHERE f.subject_type = @subject_type AND f.subject_id = @subject_id AND f.rule = @rule
+    AND f.created_at >= @day_start);
 
 ------------------------------------------------------------------------------
 -- Reads
