@@ -473,6 +473,7 @@ func (s *Service) Hold(ctx context.Context, req HoldRequest) (Allowance, error) 
 		return Allowance{}, err
 	}
 	if rule := capRule(out.Limit); rule != "" {
+		countCapRefused(ctx, out.Limit)
 		s.flag(ctx, rule, req)
 	}
 	return out, nil
