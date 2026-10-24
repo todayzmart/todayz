@@ -102,12 +102,22 @@ type HoldRequest struct {
 // Completion settles a ref that completed (collected, delivered or a
 // completed bill QR sale): the hold, if any, is captured to the store and
 // the store's cashback is paid on EligiblePaise − credits captured × 100.
+//
+// CashbackBP is the rate to pay, 0–2000 basis points. An order passes the
+// rate it snapshotted when it was placed (orders.cashback_bp, D-124), so the
+// customer gets what the shop showed; nil takes the store's rate now (a POS
+// sale, which completes as it is made).
 type Completion struct {
 	Ref           Ref
 	CustomerID    ids.ID
 	StoreID       ids.ID
 	EligiblePaise int64
+	CashbackBP    *int
 }
+
+// maxCashbackBP is the top of a store's cashback range, 20% (01 §7,
+// ck_stores_cashback): a product bound, not a setting.
+const maxCashbackBP = 2000
 
 // Completed is what Complete posted.
 type Completed struct {

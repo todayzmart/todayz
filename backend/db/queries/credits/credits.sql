@@ -174,7 +174,7 @@ SELECT
 -- name: StoreCashbackBP :one
 SELECT cashback_bp FROM stores WHERE id = @id;
 
--- InsertRiskFlag raises one flag per subject and rule per IST day (D-125):
+-- InsertRiskFlag raises one flag per subject and rule per IST day (D-126):
 -- a second refusal the same day adds nothing.
 -- name: InsertRiskFlag :exec
 INSERT INTO risk_flags (id, subject_type, subject_id, rule, score, details, created_at, updated_at)

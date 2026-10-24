@@ -71,3 +71,26 @@ func TestCreditAccountHTTP(t *testing.T) {
 		require.Contains(t, r.raw, `"code"`, "%s: a problem body", c.name)
 	}
 }
+
+// TestCollectPaysPlacedCashbackHTTP: an order pays the cashback rate its
+// store showed when it was placed (D-124), even after the shop changes it.
+func TestCollectPaysPlacedCashbackHTTP(t *testing.T) {
+	o := newOrderShop(t)
+	o.a.exec(`UPDATE stores SET cashback_bp = 500 WHERE id = $1`, uuidOf(t, o.sid))
+	r := o.place(o.cust, line{o.butter, 2}, line{o.atta, 1})
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	id := r.body["id"].(string)
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM orders WHERE id = $1 AND cashback_bp = 500`, uuidOf(t, id)))
+
+	o.a.exec(`UPDATE stores SET cashback_bp = 1000 WHERE id = $1`, uuidOf(t, o.sid))
+	r = o.staff(o.cashier, id, "accept", map[string]any{})
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	r = o.verify(o.cashier, id, o.code(id))
+	require.Equal(t, http.StatusOK, r.code, "verify: status %d", r.code)
+	require.Equal(t, "collected", r.body["status"])
+
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM orders
+	  WHERE id = $1 AND cashback_credits > 0 AND cashback_credits = items_after_offers_paise * 500 / 1000000`, uuidOf(t, id)),
+		"5%, the placed rate, not the store's 10% now")
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM ledger_transactions WHERE kind = 'cashback' AND ref_id = $1 AND memo = 'bp:500'`, uuidOf(t, id)))
+}

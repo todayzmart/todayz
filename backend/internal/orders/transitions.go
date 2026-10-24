@@ -492,9 +492,10 @@ func (s *Service) collect(ctx context.Context, o ordersdb.Order, by ids.ID, meth
 			return fmt.Errorf("orders: consume stock: %w", err)
 		}
 	}
-	// The held credits go to the store and the store's cashback is paid on
-	// the items after offers less the credits (D-02).
-	cashback, err := s.credits.Complete(ctx, mustID(o.ID), mustID(o.CustomerID), mustID(o.StoreID), o.ItemsAfterOffersPaise)
+	// The held credits go to the store and cashback is paid on the items
+	// after offers less the credits (D-02), at the rate the order snapshotted
+	// when it was placed (D-124).
+	cashback, err := s.credits.Complete(ctx, mustID(o.ID), mustID(o.CustomerID), mustID(o.StoreID), o.ItemsAfterOffersPaise, int(o.CashbackBp))
 	if err != nil {
 		return fmt.Errorf("orders: settle credits: %w", err)
 	}

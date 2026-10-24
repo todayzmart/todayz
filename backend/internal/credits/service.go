@@ -46,9 +46,10 @@ type Deps struct {
 // LockBalances call per operation; accounts used for the first time are
 // created before it in (kind, owner) order), then the hold row (LockHold),
 // then the customer's lots. Hold locks the store's row as well as the
-// customer's, so the store's daily cap is counted under a lock. The platform accounts are not locked up front: their
-// entries are inserted last in each posting, so the balance trigger takes
-// their row lock after every other lock is held.
+// customer's, so the store's daily cap is counted under a lock (D-120). The
+// platform accounts are not locked up front: their entries are inserted last
+// in each posting, so the balance trigger takes their row lock after every
+// other lock is held.
 type Service struct {
 	db       *db.DB
 	clock    clock.Clock
@@ -516,7 +517,7 @@ func (s *Service) flag(ctx context.Context, rule string, req HoldRequest) {
 	}
 	details, _ := json.Marshal(map[string]string{"ref_type": string(req.Ref.Type), "ref_id": req.Ref.ID.String()})
 	now := s.now()
-	// One flag per subject and rule per IST day (D-125); the first refusal's
+	// One flag per subject and rule per IST day (D-126); the first refusal's
 	// ref is the one kept. Score 0: the plan gives no number.
 	if err := creditsdb.New(s.db.Pool).InsertRiskFlag(context.WithoutCancel(ctx), creditsdb.InsertRiskFlagParams{
 		ID: s.newID(now), SubjectType: subjectType, SubjectID: ids.UUID(subject), Rule: rule, Details: details, Now: now,
@@ -677,7 +678,7 @@ func (s *Service) Recap(ctx context.Context, ref Ref, eligiblePaise int64) (int,
 
 // Complete implements Holder.
 func (s *Service) Complete(ctx context.Context, c Completion) (Completed, error) {
-	if !c.Ref.valid() || c.CustomerID == ids.Zero || c.StoreID == ids.Zero || c.EligiblePaise < 0 {
+	if !c.Ref.valid() || c.CustomerID == ids.Zero || c.StoreID == ids.Zero || c.EligiblePaise < 0 || !validBP(c.CashbackBP) {
 		return Completed{}, ErrInvalid
 	}
 	r, err := s.Rules(ctx)
@@ -692,6 +693,9 @@ func (s *Service) Complete(ctx context.Context, c Completion) (Completed, error)
 			return ErrInvalid
 		} else if err != nil {
 			return wrap("cashback rate", err)
+		}
+		if c.CashbackBP != nil {
+			bp = int32(*c.CashbackBP) // #nosec G115 -- validBP bounds it to 0..2000
 		}
 		h, hasHold, err := s.holdByRef(ctx, q, c.Ref)
 		if err != nil {
@@ -990,4 +994,10 @@ func asProblem(err error) error {
 		return problem.Wrap(genproblems.ServiceUnavailable, err)
 	}
 	return problem.Wrap(genproblems.Internal, err)
+}
+
+// validBP reports whether a completion's cashback rate, when given, is in
+// the stores' range (0–2000 basis points, ck_stores_cashback).
+func validBP(bp *int) bool {
+	return bp == nil || (*bp >= 0 && *bp <= maxCashbackBP)
 }

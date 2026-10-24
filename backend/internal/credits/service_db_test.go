@@ -271,6 +271,31 @@ func TestCashbackDB(t *testing.T) {
 	before := e.count(`SELECT count(*) FROM ledger_transactions`)
 	require.Equal(t, Completed{}, e.complete(e.order(), cust, zero, 48700), "CR-07")
 	require.Equal(t, before, e.count(`SELECT count(*) FROM ledger_transactions`))
+
+	// D-124: a completion's own rate (the order's snapshot) wins over the
+	// store's rate now, both ways; a rate out of range is refused.
+	withBP := func(bp int, s ids.ID) (Completed, error) {
+		var out Completed
+		err := e.tx(func(ctx context.Context) error {
+			var err error
+			out, err = e.svc.Complete(ctx, Completion{Ref: e.order(), CustomerID: cust, StoreID: s, EligiblePaise: 48700, CashbackBP: &bp})
+			return err
+		})
+		return out, err
+	}
+	out, err := withBP(1000, shop)
+	require.NoError(t, err)
+	require.Equal(t, Completed{Cashback: 48}, out, "10% snapshotted, the store shows 5% now")
+	out, err = withBP(0, shop)
+	require.NoError(t, err)
+	require.Equal(t, Completed{}, out, "0% snapshotted pays nothing at a 5% store")
+	out, err = withBP(500, zero)
+	require.NoError(t, err)
+	require.Equal(t, Completed{Cashback: 24}, out, "5% snapshotted at a store now at 0%")
+	for _, bp := range []int{-1, 2001} {
+		_, err = withBP(bp, shop)
+		require.ErrorIs(t, err, ErrInvalid, "bp %d", bp)
+	}
 	e.clean()
 }
 

@@ -136,9 +136,10 @@ func (c ordersCredits) Release(ctx context.Context, orderID ids.ID) error {
 	return err
 }
 
-func (c ordersCredits) Complete(ctx context.Context, orderID, customerID, storeID ids.ID, eligiblePaise int64) (int, error) {
+func (c ordersCredits) Complete(ctx context.Context, orderID, customerID, storeID ids.ID, eligiblePaise int64, cashbackBP int) (int, error) {
 	r, err := c.s.Complete(ctx, credits.Completion{
 		Ref: orderRef(orderID), CustomerID: customerID, StoreID: storeID, EligiblePaise: eligiblePaise,
+		CashbackBP: &cashbackBP,
 	})
 	return r.Cashback, err
 }

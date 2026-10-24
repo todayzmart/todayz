@@ -118,7 +118,7 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 				Fulfilment: Pickup, SubtotalPaise: qq.subtotal, DiscountPaise: qq.discount,
 				ItemsAfterOffersPaise: qq.itemsAfterOffers, ItemSubtotalPaise: qq.itemSubtotal,
 				CreditsUsed: i32(qq.creditsUsed), DeliveryFeePaise: qq.fee, TotalPaise: qq.total,
-				CodeEnc: code.enc, CodeHmac: code.mac, AcceptBy: &acceptBy, PlacedAt: now,
+				CashbackBp: st.CashbackBp, CodeEnc: code.enc, CodeHmac: code.mac, AcceptBy: &acceptBy, PlacedAt: now,
 			})
 			version = v
 			return err

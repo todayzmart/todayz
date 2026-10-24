@@ -110,9 +110,10 @@ type Credits interface {
 	Hold(ctx context.Context, h CreditsHold) (CreditsAllowance, error)
 	// Release returns an order's held credits (any end but collection).
 	Release(ctx context.Context, orderID ids.ID) error
-	// Complete captures the hold to the store and pays the store's
-	// cashback; it returns the cashback credits.
-	Complete(ctx context.Context, orderID, customerID, storeID ids.ID, itemsAfterOffersPaise int64) (int, error)
+	// Complete captures the hold to the store and pays cashback at the
+	// rate the order snapshotted when it was placed (cashbackBP, D-124); it
+	// returns the cashback credits.
+	Complete(ctx context.Context, orderID, customerID, storeID ids.ID, itemsAfterOffersPaise int64, cashbackBP int) (int, error)
 }
 
 // NoCredits is Credits when credits are not live: none may be used.
@@ -132,7 +133,9 @@ func (NoCredits) Hold(context.Context, CreditsHold) (CreditsAllowance, error) {
 func (NoCredits) Release(context.Context, ids.ID) error { return nil }
 
 // Complete implements Credits.
-func (NoCredits) Complete(context.Context, ids.ID, ids.ID, ids.ID, int64) (int, error) { return 0, nil }
+func (NoCredits) Complete(context.Context, ids.ID, ids.ID, ids.ID, int64, int) (int, error) {
+	return 0, nil
+}
 
 // CompletedOrder is an order that reached collected (or delivered), for
 // referral qualification (W2-03). EligiblePaise is items after offers;

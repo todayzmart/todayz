@@ -19,7 +19,8 @@ import (
 type Fake struct {
 	Clock clock.Clock
 	Rules Rules
-	// CashbackBP is each store's cashback rate (stores.cashback_bp).
+	// CashbackBP is each store's cashback rate (stores.cashback_bp), used
+	// when a Completion carries no rate of its own.
 	CashbackBP map[ids.ID]int
 
 	mu       sync.Mutex
@@ -371,7 +372,7 @@ func (f *Fake) Complete(_ context.Context, c Completion) (Completed, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.init()
-	if !c.Ref.valid() {
+	if !c.Ref.valid() || !validBP(c.CashbackBP) {
 		return Completed{}, ErrInvalid
 	}
 	var out Completed
@@ -398,7 +399,11 @@ func (f *Fake) Complete(_ context.Context, c Completion) (Completed, error) {
 	if ok {
 		out.Captured = h.Captured
 	}
-	cb := cashback(c.EligiblePaise-int64(out.Captured)*paisePerCredit, f.CashbackBP[c.StoreID])
+	bp := f.CashbackBP[c.StoreID]
+	if c.CashbackBP != nil {
+		bp = *c.CashbackBP
+	}
+	cb := cashback(c.EligiblePaise-int64(out.Captured)*paisePerCredit, bp)
 	if cb > 0 {
 		_, dup, err := f.post(TxCashback, c.Ref.key("cashback"), []Leg{
 			{store(c.StoreID), -int64(cb)}, {wallet(c.CustomerID), int64(cb)},
