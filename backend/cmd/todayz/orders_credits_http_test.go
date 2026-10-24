@@ -11,7 +11,8 @@ import (
 // the credits asked and says why (D-76), but placing never uses fewer than
 // asked. 31 credits with the max at 30 is credit_max_exceeded even when the
 // client's total matches the clamped quote; credits on a bill under ₹100 are
-// below_credit_minimum; a wallet that no longer covers them is
+// below_credit_minimum, even when they are also over the max (the quote's
+// order of the rules); a wallet that no longer covers them is
 // price_changed. Nothing is held or placed by a refusal.
 func TestCR02PlacingRefusesCreditsItCannotUse(t *testing.T) {
 	o := newOrderShop(t)
@@ -45,6 +46,21 @@ func TestCR02PlacingRefusesCreditsItCannotUse(t *testing.T) {
 	require.Equal(t, http.StatusConflict, r.code, r.raw)
 	require.Equal(t, "below_credit_minimum", problemCode(r))
 
+	// Over the max on a bill under the minimum: the quote's order of the
+	// rules decides (the minimum first), so placing names the same rule the
+	// quote does (lead review 3).
+	sq := o.a.call(o.cust, http.MethodPost, "/v1/me/checkout/quote", func() map[string]any {
+		b := o.cart(small, 0)
+		delete(b, "expectedTotalPaise")
+		b["creditsToUse"] = 31
+		return b
+	}(), nil)
+	require.Equal(t, http.StatusOK, sq.code, sq.raw)
+	require.Equal(t, "below_credit_minimum", sq.body["creditsLimit"])
+	r = placeAsking(31, small, o.total(small))
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, "below_credit_minimum", problemCode(r))
+
 	require.Equal(t, before, orders(), "a refusal places nothing")
 	require.True(t, o.walletIs(cust, 40), "and holds nothing")
 
@@ -57,4 +73,10 @@ func TestCR02PlacingRefusesCreditsItCannotUse(t *testing.T) {
 	quote, ok := ext(r, "quote").(map[string]any)
 	require.True(t, ok, r.raw)
 	require.EqualValues(t, 10, quote["creditsUsed"])
+
+	// 31 with 10 in the wallet: the quote's limit is the wallet, which has
+	// no problem of its own, and 31 is over the max, so credit_max_exceeded.
+	r = placeAsking(31, lines, o.total(lines)-1000)
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, "credit_max_exceeded", problemCode(r))
 }

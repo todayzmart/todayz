@@ -297,14 +297,19 @@ func (s *Service) holdCredits(ctx context.Context, qq quoted, orderID, customerI
 }
 
 // checkCreditsAsked refuses an order that would use fewer credits than
-// asked, instead of placing it with fewer (04 §2, CR-02): more than
-// credit_max_per_order is credit_max_exceeded, another credit rule answers
-// its own problem, and anything else (the wallet, the ₹1 floor) is
-// price_changed with the quote as it is now. The quote clamps and says why
-// in creditsLimit (D-76); placing does not.
+// asked, instead of placing it with fewer (04 §2, CR-02, D-216). The
+// refusal is the quote's creditsLimit, in the credit rules' order (minimum,
+// store cap, monthly cap, then the max), so placing and the quote name the
+// same rule; more than credit_max_per_order with no rule limit (a short
+// wallet) is still credit_max_exceeded. Anything else (the wallet, the ₹1
+// floor) is price_changed with the quote as it is now. The quote clamps
+// and says why in creditsLimit (D-76); placing does not.
 func (s *Service) checkCreditsAsked(ctx context.Context, qq quoted) error {
 	if qq.creditsRequested <= qq.creditsUsed {
 		return nil
+	}
+	if code, ok := creditProblems[qq.creditsLimit]; ok {
+		return problem.New(code, "")
 	}
 	maxPer, err := s.count(ctx, settings.CreditMaxPerOrder)
 	if err != nil {
@@ -312,9 +317,6 @@ func (s *Service) checkCreditsAsked(ctx context.Context, qq quoted) error {
 	}
 	if qq.creditsRequested > maxPer {
 		return problem.New(genproblems.CreditMaxExceeded, "")
-	}
-	if code, ok := creditProblems[qq.creditsLimit]; ok {
-		return problem.New(code, "")
 	}
 	return problem.New(genproblems.PriceChanged, "").WithExtension("quote", qq.view())
 }
