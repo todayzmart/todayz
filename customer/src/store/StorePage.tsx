@@ -154,6 +154,7 @@ export function StorePage({ slug, state, onChange }: { slug: string; state: Stor
                 <h1 className={styles.name}>{s.name}</h1>
                 <div className="tz-meta">
                   {s.distanceM !== null && <span>{formatDistance(s.distanceM)}</span>}
+                  {s.categoryName && <span>{s.categoryName}</span>}
                   {s.locality && <span>{s.locality}</span>}
                   {s.rating !== null && (
                     <span className={styles.rating}>

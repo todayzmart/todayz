@@ -8,7 +8,7 @@ import { useIntl } from 'react-intl';
 import { AddToBasket } from '../basket/AddToBasket';
 import basketStyles from '../basket/basket.module.css';
 import { offPercent, useFmt, usePackLine, useStockProps } from '../home/format';
-import { initials } from '../home/present';
+import { imageUrl, initials } from '../home/present';
 import { RouterLink } from '../home/RouterLink';
 import { Icon } from '../shell/Icon';
 import { itemHref, useStepperLabels } from './itemUi';
@@ -34,6 +34,7 @@ export function ItemCard({ shopSlug, item, serverNow, bookable, qty, onChange, d
   const pct = offPercent(item.pricePaise, item.mrpPaise);
   const stock = stockProps(item, serverNow);
   const href = itemHref(shopSlug, item.storeItemId);
+  const img = imageUrl(item.imageKey);
 
   const toBasket = <AddToBasket productId={item.productId} name={item.name} detail={packLine(item)} compact />;
 
@@ -42,7 +43,7 @@ export function ItemCard({ shopSlug, item, serverNow, bookable, qty, onChange, d
       <div className={basketStyles.withBasket}>
         <article className="tz-pcard">
           <div className="tz-thumb">
-            <span aria-hidden="true">{initials(item.name)}</span>
+            {img ? <img className="tz-ui-thumb-img" src={img} alt="" loading="lazy" decoding="async" /> : <span aria-hidden="true">{initials(item.name)}</span>}
           </div>
           <div className="tz-pcard-name">
             <RouterLink href={href} className="tz-ui-plainlink">
@@ -79,6 +80,7 @@ export function ItemCard({ shopSlug, item, serverNow, bookable, qty, onChange, d
         name={item.name}
         unit={packLine(item)}
         initials={initials(item.name)}
+        {...(img ? { image: { src: img } } : {})}
         stock={stock}
         price={money(item.pricePaise)}
         {...(pct !== null && item.mrpPaise !== null
