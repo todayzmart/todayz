@@ -30,7 +30,7 @@ case "${1:-}" in
       echo "testpg: already up on 127.0.0.1:$PORT"
     else
       docker rm -f "$NAME" >/dev/null 2>&1 || true
-      # shellcheck source=../infra/local/lib.sh
+      # shellcheck disable=SC1091 # lib.sh only sets the pinned image names
       img="${TODAYZ_POSTGIS_IMAGE:-$(source "$ROOT/infra/local/lib.sh" && echo "$TODAYZ_POSTGIS_IMAGE")}"
       pw="$(openssl rand -hex 16)"
       docker run -d --name "$NAME" --label in.todayz.testkit=shared \
