@@ -1,9 +1,308 @@
-# Schemas: domain "offers" (owner W3-01): offers (04 §2.6).
+# Schemas: domain "offers" (owner W2-07): offers, previews and the Offers near you feed (04 §2.6).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Request objects carry `additionalProperties: false` (an unknown field is 422
+# validation_failed). Money is `*Paise`, ids are `Ulid`, times are `Timestamp`.
+# An offer's terms (kind, value, scope) cannot change after it is made: end it and make a new one.
+OfferKind:
+  type: string
+  enum: [percent, flat, bxgy, bill_min]
+  description: >-
+    `percent`: `value` whole percent off a line (1 to 90). `flat`: `value` paise off each unit.
+    `bxgy`: buy `buyQty`, get `getQty` of the same item free. `bill_min`: `value` paise off a bill
+    whose item subtotal, after item offers, reaches `minBillPaise` (inclusive, D-94).
+OfferScope:
+  type: string
+  enum: [store, items, category]
+  description: Everything in the shop, the listed `storeItemIds`, or one category with its sub-categories.
+OfferChannels:
+  type: string
+  enum: [online, pos, both]
+OfferStatus:
+  type: string
+  enum: [scheduled, live, paused, ended]
+OfferSource:
+  type: string
+  enum: [manual, flash_expiry, coach_suggestion]
+Offer:
+  type: object
+  required:
+    - id
+    - storeId
+    - title
+    - kind
+    - value
+    - buyQty
+    - getQty
+    - minBillPaise
+    - scope
+    - storeItemIds
+    - categoryId
+    - channels
+    - perCustomerLimit
+    - maxRedemptions
+    - redemptions
+    - startsAt
+    - endsAt
+    - status
+    - source
+    - batchId
+    - version
+    - createdAt
+    - updatedAt
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    storeId: {$ref: ./common.yaml#/Ulid}
+    title:
+      type: string
+      description: What customers see ("20% off"). The shop's own title, or one made from the terms.
+      maxLength: 40
+    kind: {$ref: '#/OfferKind'}
+    value:
+      type: integer
+      description: Percent for `percent`; paise for `flat` and `bill_min`; 0 for `bxgy`.
+    buyQty: {type: [integer, "null"]}
+    getQty: {type: [integer, "null"]}
+    minBillPaise: {type: [integer, "null"]}
+    scope: {$ref: '#/OfferScope'}
+    storeItemIds:
+      type: array
+      items: {$ref: ./common.yaml#/Ulid}
+      maxItems: 100
+    categoryId:
+      oneOf:
+        - {$ref: ./common.yaml#/Ulid}
+        - {type: "null"}
+    channels: {$ref: '#/OfferChannels'}
+    perCustomerLimit: {type: [integer, "null"]}
+    maxRedemptions: {type: [integer, "null"]}
+    redemptions:
+      type: integer
+      description: Uses so far (an order or sale that was placed; released when it is cancelled).
+    startsAt: {$ref: ./common.yaml#/Timestamp}
+    endsAt:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: "null"}
+    status: {$ref: '#/OfferStatus'}
+    source: {$ref: '#/OfferSource'}
+    batchId:
+      oneOf:
+        - {$ref: ./common.yaml#/Ulid}
+        - {type: "null"}
+      description: The stock batch a flash offer was made for.
+    version: {type: integer}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    updatedAt: {$ref: ./common.yaml#/Timestamp}
+OfferList:
+  type: object
+  required: [items, nextCursor]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/Offer'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+OfferCreate:
+  type: object
+  additionalProperties: false
+  required: [kind, scope]
+  description: >-
+    Make an offer. `percent` and `flat` need `value`; `bxgy` needs `buyQty` and `getQty` (1 to 20); `bill_min`
+    needs `value` and `minBillPaise` and covers the whole shop. `scope=items` needs `storeItemIds` of this shop;
+    `scope=category` needs `categoryId`. `startsAt` defaults to now; a later start makes it `scheduled`.
+    `batchId` makes a flash offer on that expiring batch's item: it takes `scope=items` with that one item, ends
+    no later than the end of the batch's expiry day (IST), and there is one open flash offer per batch.
+  properties:
+    kind: {$ref: '#/OfferKind'}
+    title:
+      type: string
+      minLength: 1
+      maxLength: 40
+    value:
+      type: integer
+      minimum: 1
+      maximum: 100000000
+    buyQty:
+      type: integer
+      minimum: 1
+      maximum: 20
+    getQty:
+      type: integer
+      minimum: 1
+      maximum: 20
+    minBillPaise:
+      type: integer
+      minimum: 1
+      maximum: 100000000
+    scope: {$ref: '#/OfferScope'}
+    storeItemIds:
+      type: array
+      items: {$ref: ./common.yaml#/Ulid}
+      minItems: 1
+      maxItems: 100
+    categoryId: {$ref: ./common.yaml#/Ulid}
+    channels: {$ref: '#/OfferChannels'}
+    perCustomerLimit:
+      type: integer
+      minimum: 1
+      maximum: 1000
+    maxRedemptions:
+      type: integer
+      minimum: 1
+      maximum: 1000000
+    startsAt: {$ref: ./common.yaml#/Timestamp}
+    endsAt: {$ref: ./common.yaml#/Timestamp}
+    batchId: {$ref: ./common.yaml#/Ulid}
+OfferUpdate:
+  type: object
+  additionalProperties: false
+  minProperties: 1
+  description: >-
+    Only the fields sent change. `status` moves live to paused and back, or any open offer to ended (final).
+    Resuming an offer whose start is still ahead makes it `scheduled`; an offer past its end cannot resume.
+    Send `title`, `endsAt`, `perCustomerLimit` or `maxRedemptions` as null to clear it.
+  properties:
+    status:
+      type: string
+      enum: [live, paused, ended]
+    title:
+      type: [string, "null"]
+      minLength: 1
+      maxLength: 40
+    channels: {$ref: '#/OfferChannels'}
+    perCustomerLimit:
+      type: [integer, "null"]
+      minimum: 1
+      maximum: 1000
+    maxRedemptions:
+      type: [integer, "null"]
+      minimum: 1
+      maximum: 1000000
+    startsAt: {$ref: ./common.yaml#/Timestamp}
+    endsAt:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: "null"}
+SampleLine:
+  type: object
+  additionalProperties: false
+  required: [storeItemId, quantity]
+  properties:
+    storeItemId: {$ref: ./common.yaml#/Ulid}
+    quantity:
+      type: integer
+      minimum: 1
+      maximum: 99
+OfferPreviewRequest:
+  type: object
+  additionalProperties: false
+  required: [offer, lines]
+  description: An unsaved offer (the terms of OfferCreate) and a sample cart of this shop's items.
+  properties:
+    offer: {$ref: '#/OfferCreate'}
+    lines:
+      type: array
+      minItems: 1
+      maxItems: 10
+      items: {$ref: '#/SampleLine'}
+OfferPreviewLine:
+  type: object
+  required: [storeItemId, quantity, unitPricePaise, grossPaise, discountPaise, totalPaise, freeUnits, byThisOffer]
+  properties:
+    storeItemId: {$ref: ./common.yaml#/Ulid}
+    quantity: {type: integer}
+    unitPricePaise: {$ref: ./common.yaml#/Paise}
+    grossPaise: {$ref: ./common.yaml#/Paise}
+    discountPaise: {$ref: ./common.yaml#/Paise}
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    freeUnits: {type: integer}
+    byThisOffer:
+      type: boolean
+      description: The line's discount comes from the previewed offer.
+OfferPreview:
+  type: object
+  required: [title, lines, grossPaise, itemDiscountPaise, billDiscountPaise, totalPaise, totalWithoutPaise, applies]
+  description: >-
+    The sample cart priced with the shop's live offers and the new one (the way a customer would be
+    charged), and the total without the new one.
+  properties:
+    title: {type: string, maxLength: 40}
+    lines:
+      type: array
+      items: {$ref: '#/OfferPreviewLine'}
+    grossPaise: {$ref: ./common.yaml#/Paise}
+    itemDiscountPaise: {$ref: ./common.yaml#/Paise}
+    billDiscountPaise: {$ref: ./common.yaml#/Paise}
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    totalWithoutPaise: {$ref: ./common.yaml#/Paise}
+    applies:
+      type: boolean
+      description: False when the new offer takes nothing off this cart.
+NearbyOfferSummary:
+  type: object
+  required: [id, title, kind, value, minBillPaise, endsAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    title: {type: string, maxLength: 40}
+    kind: {$ref: '#/OfferKind'}
+    value: {type: integer}
+    minBillPaise: {type: [integer, "null"]}
+    endsAt:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: "null"}
+NearbyBanner:
+  type: object
+  required: [id, headline, imageKey, template, targetType, targetId, targetItemIds]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    headline: {type: string, maxLength: 40}
+    imageKey:
+      type: [string, "null"]
+      maxLength: 200
+      description: Storage key of the uploaded image; null for a banner made from a template.
+    template:
+      type: [object, "null"]
+      x-open-object: true
+      description: The template the banner is drawn from; null for an uploaded image.
+    targetType:
+      type: string
+      enum: [offer, items, category, store]
+    targetId:
+      oneOf:
+        - {$ref: ./common.yaml#/Ulid}
+        - {type: "null"}
+    targetItemIds:
+      type: array
+      items: {$ref: ./common.yaml#/Ulid}
+      maxItems: 20
+NearbyOffer:
+  type: object
+  required: [kind, storeId, storeSlug, storeName, locality, tint, distanceM, offer, banner]
+  description: >-
+    One card of the carousel, a shop banner or a shop's best offer. Exactly one of `offer` and `banner` is set.
+  properties:
+    kind:
+      type: string
+      enum: [banner, offer]
+    storeId: {$ref: ./common.yaml#/Ulid}
+    storeSlug: {type: string, maxLength: 100}
+    storeName: {type: string, maxLength: 200}
+    locality: {type: [string, "null"], maxLength: 200}
+    tint: {type: [string, "null"], maxLength: 40}
+    distanceM: {type: integer, minimum: 0}
+    offer:
+      oneOf:
+        - {$ref: '#/NearbyOfferSummary'}
+        - {type: "null"}
+    banner:
+      oneOf:
+        - {$ref: '#/NearbyBanner'}
+        - {type: "null"}
+NearbyOffers:
+  type: object
+  required: [items, serverNow]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/NearbyOffer'}
+    serverNow: {$ref: ./common.yaml#/ServerNow}

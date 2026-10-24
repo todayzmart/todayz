@@ -17,6 +17,7 @@ func TestCatalogueIsComplete(t *testing.T) {
 	require.Equal(t, []string{
 		notice.KindAskReply, notice.KindCreditsEarned, notice.KindCreditsExpiring, notice.KindNewAsk,
 		notice.KindNewOrder, notice.KindOrderUnseen, notice.KindOrderUpdate,
+		notice.KindReferralUnlocked, notice.KindShopReferralUnlocked,
 	}, Kinds())
 	for kind, def := range catalogue {
 		require.Contains(t, []string{AppCustomer, AppBusiness}, def.App, kind)

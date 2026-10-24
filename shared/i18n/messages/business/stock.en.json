@@ -1,0 +1,786 @@
+{
+  "stock.title": {
+    "defaultMessage": "Stock",
+    "description": "B-07 page title"
+  },
+  "stock.loading": {
+    "defaultMessage": "Loading stock",
+    "description": "Accessible name of the loading state"
+  },
+  "stock.noStore.title": {
+    "defaultMessage": "Pick a shop first",
+    "description": "B-07 empty state: no current shop"
+  },
+  "stock.noStore.body": {
+    "defaultMessage": "Stock belongs to one shop. Choose the shop you are working in.",
+    "description": "B-07 empty state"
+  },
+  "stock.noStore.action": {
+    "defaultMessage": "Choose a shop",
+    "description": "B-07 empty state button"
+  },
+  "stock.error.title": {
+    "defaultMessage": "Couldn't load stock",
+    "description": "B-07 load error title"
+  },
+  "stock.error.body": {
+    "defaultMessage": "Check your connection and try again.",
+    "description": "B-07 load error body"
+  },
+  "stock.error.retry": {
+    "defaultMessage": "Try again",
+    "description": "B-07 load error button"
+  },
+  "stock.error.validation_failed": {
+    "defaultMessage": "Some of that was not accepted. Check the numbers and try again.",
+    "description": "Stock write failed validation (422)"
+  },
+  "stock.error.forbidden": {
+    "defaultMessage": "Your role cannot do this. Ask a manager.",
+    "description": "Stock write refused (403)"
+  },
+  "stock.error.conflict": {
+    "defaultMessage": "This changed while you were editing. Reload and try again.",
+    "description": "Stock write conflict (409)"
+  },
+  "stock.error.not_found": {
+    "defaultMessage": "This item is no longer in your shop.",
+    "description": "Stock write on a missing item (404)"
+  },
+  "stock.error.precondition_failed": {
+    "defaultMessage": "Someone else just changed this item. It has been reloaded; try again.",
+    "description": "Stock write with a stale version (412)"
+  },
+  "stock.error.precondition_required": {
+    "defaultMessage": "This item could not be checked for changes. Reload and try again.",
+    "description": "Stock write without a version (428)"
+  },
+  "stock.error.generic": {
+    "defaultMessage": "That didn't work. Try again.",
+    "description": "Stock write failed for another reason"
+  },
+  "stock.search.label": {
+    "defaultMessage": "Search stock",
+    "description": "Accessible name of the search field"
+  },
+  "stock.search.placeholder": {
+    "defaultMessage": "Search by name or barcode",
+    "description": "Search field placeholder"
+  },
+  "stock.search.clear": {
+    "defaultMessage": "Clear search",
+    "description": "Clear button of the search field"
+  },
+  "stock.filter.label": {
+    "defaultMessage": "Filter stock",
+    "description": "Accessible name of the filter chips"
+  },
+  "stock.filter.all": {
+    "defaultMessage": "All",
+    "description": "Filter chip"
+  },
+  "stock.filter.low": {
+    "defaultMessage": "Low stock",
+    "description": "Filter chip"
+  },
+  "stock.filter.out": {
+    "defaultMessage": "Out of stock",
+    "description": "Filter chip"
+  },
+  "stock.filter.stale": {
+    "defaultMessage": "Not confirmed recently",
+    "description": "Filter chip: stock older than the stale setting"
+  },
+  "stock.filter.hidden": {
+    "defaultMessage": "Hidden",
+    "description": "Filter chip: items not shown to customers"
+  },
+  "stock.category.label": {
+    "defaultMessage": "Category",
+    "description": "Accessible name of the category select"
+  },
+  "stock.category.all": {
+    "defaultMessage": "All categories",
+    "description": "Category select: no filter"
+  },
+  "stock.action.add": {
+    "defaultMessage": "Add item",
+    "description": "Header button"
+  },
+  "stock.action.import": {
+    "defaultMessage": "Import",
+    "description": "Header button: bulk import"
+  },
+  "stock.action.count": {
+    "defaultMessage": "Count stock",
+    "description": "Header button: enter count mode"
+  },
+  "stock.action.countDone": {
+    "defaultMessage": "Done counting",
+    "description": "Header button: leave count mode"
+  },
+  "stock.count.hint": {
+    "defaultMessage": "Type what is on the shelf for each item, then confirm it. Only the items you confirm change.",
+    "description": "Count mode explanation"
+  },
+  "stock.table.label": {
+    "defaultMessage": "Stock items",
+    "description": "Accessible name of the stock table"
+  },
+  "stock.col.item": {
+    "defaultMessage": "Item",
+    "description": "Table header"
+  },
+  "stock.col.stock": {
+    "defaultMessage": "Stock",
+    "description": "Table header"
+  },
+  "stock.col.onHand": {
+    "defaultMessage": "On hand",
+    "description": "Table header"
+  },
+  "stock.col.counted": {
+    "defaultMessage": "Counted",
+    "description": "Table header in count mode"
+  },
+  "stock.col.price": {
+    "defaultMessage": "Price",
+    "description": "Table header"
+  },
+  "stock.empty.none": {
+    "defaultMessage": "No items yet. Add your first item or import a sheet.",
+    "description": "Empty table, nothing in stock"
+  },
+  "stock.empty.filtered": {
+    "defaultMessage": "No items match.",
+    "description": "Empty table with a filter or search"
+  },
+  "stock.more": {
+    "defaultMessage": "Show more",
+    "description": "Load the next page"
+  },
+  "stock.level.in": {
+    "defaultMessage": "In stock",
+    "description": "Stock tag"
+  },
+  "stock.level.low": {
+    "defaultMessage": "Only {available} left",
+    "description": "Stock tag"
+  },
+  "stock.level.out": {
+    "defaultMessage": "Out of stock",
+    "description": "Stock tag"
+  },
+  "stock.fresh.confirmed": {
+    "defaultMessage": "Confirmed {time}",
+    "description": "Freshness line, time is relative such as 12 min ago"
+  },
+  "stock.fresh.stale": {
+    "defaultMessage": "Stock not confirmed recently",
+    "description": "Freshness line when older than the stale setting"
+  },
+  "stock.inline.edit": {
+    "defaultMessage": "Edit {item}",
+    "description": "Pencil button next to a value"
+  },
+  "stock.inline.save": {
+    "defaultMessage": "Save price of {item}",
+    "description": "Check button next to a price input"
+  },
+  "stock.inline.confirm": {
+    "defaultMessage": "Confirm count of {item}",
+    "description": "Check button next to a count input"
+  },
+  "stock.inline.price": {
+    "defaultMessage": "Price of {item}",
+    "description": "Accessible name of the price input"
+  },
+  "stock.inline.count": {
+    "defaultMessage": "Counted quantity of {item}",
+    "description": "Accessible name of the count input"
+  },
+  "stock.item.close": {
+    "defaultMessage": "Close",
+    "description": "Close button of the item sheets"
+  },
+  "stock.item.hidden": {
+    "defaultMessage": "Hidden from customers",
+    "description": "Sub-line of a hidden item"
+  },
+  "stock.item.onHand": {
+    "defaultMessage": "On hand",
+    "description": "Item fact"
+  },
+  "stock.item.reserved": {
+    "defaultMessage": "Held for orders",
+    "description": "Item fact: reserved by open orders, shown apart from movements"
+  },
+  "stock.item.available": {
+    "defaultMessage": "Available",
+    "description": "Item fact: on hand minus held for orders"
+  },
+  "stock.item.price": {
+    "defaultMessage": "Price",
+    "description": "Item fact"
+  },
+  "stock.item.mrp": {
+    "defaultMessage": "MRP",
+    "description": "Item fact: maximum retail price"
+  },
+  "stock.item.lowAt": {
+    "defaultMessage": "Low stock at",
+    "description": "Item fact: the threshold"
+  },
+  "stock.item.notSet": {
+    "defaultMessage": "Not set",
+    "description": "Item fact with no value"
+  },
+  "stock.item.tabs": {
+    "defaultMessage": "Item details",
+    "description": "Accessible name of the batches and history tabs"
+  },
+  "stock.tab.batches": {
+    "defaultMessage": "Batches",
+    "description": "Tab"
+  },
+  "stock.tab.history": {
+    "defaultMessage": "History",
+    "description": "Tab"
+  },
+  "stock.act.restock": {
+    "defaultMessage": "Restock",
+    "description": "Item action"
+  },
+  "stock.act.count": {
+    "defaultMessage": "Correct count",
+    "description": "Item action"
+  },
+  "stock.act.damage": {
+    "defaultMessage": "Mark damaged",
+    "description": "Item action"
+  },
+  "stock.act.expired": {
+    "defaultMessage": "Mark expired",
+    "description": "Item action"
+  },
+  "stock.act.price": {
+    "defaultMessage": "Change price",
+    "description": "Item action"
+  },
+  "stock.act.threshold": {
+    "defaultMessage": "Low stock level",
+    "description": "Item action"
+  },
+  "stock.act.hide": {
+    "defaultMessage": "Hide from customers",
+    "description": "Item action"
+  },
+  "stock.act.list": {
+    "defaultMessage": "Show to customers",
+    "description": "Item action"
+  },
+  "stock.batch.none": {
+    "defaultMessage": "No batches with stock left.",
+    "description": "Empty batches tab"
+  },
+  "stock.batch.left": {
+    "defaultMessage": "{quantity} left",
+    "description": "Batch quantity"
+  },
+  "stock.batch.expires": {
+    "defaultMessage": "Expires {date}",
+    "description": "Batch expiry"
+  },
+  "stock.batch.expiredOn": {
+    "defaultMessage": "Expired {date}",
+    "description": "Batch expiry in the past"
+  },
+  "stock.batch.noExpiry": {
+    "defaultMessage": "No expiry date",
+    "description": "Batch without expiry"
+  },
+  "stock.batch.cost": {
+    "defaultMessage": "Cost {cost}",
+    "description": "Batch cost"
+  },
+  "stock.batch.edit": {
+    "defaultMessage": "Edit",
+    "description": "Batch edit button"
+  },
+  "stock.history.none": {
+    "defaultMessage": "No stock changes yet.",
+    "description": "Empty history tab"
+  },
+  "stock.source.opening": {
+    "defaultMessage": "Opening stock",
+    "description": "History source"
+  },
+  "stock.source.restock": {
+    "defaultMessage": "Restocked",
+    "description": "History source"
+  },
+  "stock.source.supplier_bill": {
+    "defaultMessage": "Supplier bill",
+    "description": "History source"
+  },
+  "stock.source.import": {
+    "defaultMessage": "Imported",
+    "description": "History source"
+  },
+  "stock.source.count_correction": {
+    "defaultMessage": "Count corrected",
+    "description": "History source"
+  },
+  "stock.source.damage": {
+    "defaultMessage": "Damaged",
+    "description": "History source"
+  },
+  "stock.source.expired": {
+    "defaultMessage": "Expired",
+    "description": "History source"
+  },
+  "stock.source.sale_pos": {
+    "defaultMessage": "Sold at the counter",
+    "description": "History source"
+  },
+  "stock.source.sale_online": {
+    "defaultMessage": "Sold online",
+    "description": "History source"
+  },
+  "stock.source.pos_reversal": {
+    "defaultMessage": "Counter sale reversed",
+    "description": "History source"
+  },
+  "stock.source.other": {
+    "defaultMessage": "Stock change",
+    "description": "History source not known to this app"
+  },
+  "stock.form.title.restock": {
+    "defaultMessage": "Restock {item}",
+    "description": "Form heading"
+  },
+  "stock.form.title.damage": {
+    "defaultMessage": "Mark {item} as damaged",
+    "description": "Form heading"
+  },
+  "stock.form.title.expired": {
+    "defaultMessage": "Mark {item} as expired",
+    "description": "Form heading"
+  },
+  "stock.form.title.count_correction": {
+    "defaultMessage": "Correct the count of {item}",
+    "description": "Form heading"
+  },
+  "stock.form.title.price": {
+    "defaultMessage": "Change price",
+    "description": "Form heading and accessible name"
+  },
+  "stock.form.title.threshold": {
+    "defaultMessage": "Low stock level",
+    "description": "Form heading and accessible name"
+  },
+  "stock.form.title.batch": {
+    "defaultMessage": "Edit batch",
+    "description": "Form heading and accessible name"
+  },
+  "stock.form.save.restock": {
+    "defaultMessage": "Save restock",
+    "description": "Form button"
+  },
+  "stock.form.save.damage": {
+    "defaultMessage": "Save damage",
+    "description": "Form button"
+  },
+  "stock.form.save.expired": {
+    "defaultMessage": "Save expiry",
+    "description": "Form button"
+  },
+  "stock.form.save.count_correction": {
+    "defaultMessage": "Save count",
+    "description": "Form button"
+  },
+  "stock.form.save.price": {
+    "defaultMessage": "Save price",
+    "description": "Form button"
+  },
+  "stock.form.save.threshold": {
+    "defaultMessage": "Save level",
+    "description": "Form button"
+  },
+  "stock.form.save.batch": {
+    "defaultMessage": "Save batch",
+    "description": "Form button"
+  },
+  "stock.form.cancel": {
+    "defaultMessage": "Cancel",
+    "description": "Form button"
+  },
+  "stock.form.back": {
+    "defaultMessage": "Back",
+    "description": "Form button"
+  },
+  "stock.form.qty": {
+    "defaultMessage": "Quantity",
+    "description": "Form field"
+  },
+  "stock.form.qtyMax": {
+    "defaultMessage": "Up to {available} available.",
+    "description": "Form help under quantity"
+  },
+  "stock.form.qtyInvalid": {
+    "defaultMessage": "Enter a whole number of 1 or more, up to 1,000,000.",
+    "description": "Form error"
+  },
+  "stock.form.qtyTooMany": {
+    "defaultMessage": "Only {available} are available.",
+    "description": "Form error"
+  },
+  "stock.form.counted": {
+    "defaultMessage": "Counted on the shelf",
+    "description": "Form field"
+  },
+  "stock.form.countedHelp": {
+    "defaultMessage": "The system has {onHand} on hand, {reserved} of them held for orders.",
+    "description": "Form help under the count"
+  },
+  "stock.form.countInvalid": {
+    "defaultMessage": "Enter a whole number from 0 to 1,000,000.",
+    "description": "Form error"
+  },
+  "stock.form.batches": {
+    "defaultMessage": "Batches that expired",
+    "description": "Form group label"
+  },
+  "stock.form.pickBatch": {
+    "defaultMessage": "Tick at least one batch.",
+    "description": "Form error"
+  },
+  "stock.form.writeOff": {
+    "defaultMessage": "{quantity} will be written off.",
+    "description": "Form help: units that leave stock"
+  },
+  "stock.form.expiry": {
+    "defaultMessage": "Expiry date",
+    "description": "Form field"
+  },
+  "stock.form.expiryHelp": {
+    "defaultMessage": "Optional. Sells the earliest expiry first.",
+    "description": "Form help"
+  },
+  "stock.form.cost": {
+    "defaultMessage": "Cost per unit",
+    "description": "Form field"
+  },
+  "stock.form.costHelp": {
+    "defaultMessage": "Optional. Selling price is {price}.",
+    "description": "Form help"
+  },
+  "stock.form.costInvalid": {
+    "defaultMessage": "Enter an amount in rupees, such as 42 or 42.50.",
+    "description": "Form error"
+  },
+  "stock.form.note": {
+    "defaultMessage": "Note",
+    "description": "Form field, optional"
+  },
+  "stock.form.price": {
+    "defaultMessage": "Selling price",
+    "description": "Form field"
+  },
+  "stock.form.priceMrp": {
+    "defaultMessage": "MRP is {mrp}. The price cannot be higher.",
+    "description": "Form help"
+  },
+  "stock.form.priceInvalid": {
+    "defaultMessage": "Enter an amount in rupees, such as 58 or 58.50.",
+    "description": "Form error"
+  },
+  "stock.form.priceAboveMrp": {
+    "defaultMessage": "The price cannot be above the MRP of {mrp}.",
+    "description": "Form error"
+  },
+  "stock.form.priceRef": {
+    "defaultMessage": "Reference price from the insight: {price}. Nothing changes until you save.",
+    "description": "Note on a price opened from an insight"
+  },
+  "stock.form.threshold": {
+    "defaultMessage": "Low stock at",
+    "description": "Form field"
+  },
+  "stock.form.thresholdHelp": {
+    "defaultMessage": "Warn when available stock reaches this number. Leave empty to turn it off.",
+    "description": "Form help"
+  },
+  "stock.link.askManager": {
+    "defaultMessage": "Ask a manager to do this.",
+    "description": "A deep link asked for something this role cannot do"
+  },
+  "stock.toast.restock": {
+    "defaultMessage": "Restocked {item}",
+    "description": "Toast"
+  },
+  "stock.toast.damage": {
+    "defaultMessage": "Marked {item} as damaged",
+    "description": "Toast"
+  },
+  "stock.toast.expired": {
+    "defaultMessage": "Marked {item} as expired",
+    "description": "Toast"
+  },
+  "stock.toast.count_correction": {
+    "defaultMessage": "Count saved for {item}",
+    "description": "Toast"
+  },
+  "stock.toast.price": {
+    "defaultMessage": "Price changed for {item}",
+    "description": "Toast"
+  },
+  "stock.toast.threshold": {
+    "defaultMessage": "Low stock level saved for {item}",
+    "description": "Toast"
+  },
+  "stock.toast.batch": {
+    "defaultMessage": "Batch saved",
+    "description": "Toast"
+  },
+  "stock.toast.added": {
+    "defaultMessage": "Added {item}",
+    "description": "Toast"
+  },
+  "stock.add.title": {
+    "defaultMessage": "Add item",
+    "description": "Sheet title"
+  },
+  "stock.add.search": {
+    "defaultMessage": "Find a product",
+    "description": "Search field accessible name"
+  },
+  "stock.add.searchHint": {
+    "defaultMessage": "Name or barcode",
+    "description": "Search field placeholder"
+  },
+  "stock.add.hint": {
+    "defaultMessage": "Type at least 2 letters, or scan a barcode.",
+    "description": "Hint before any search"
+  },
+  "stock.add.noMatch": {
+    "defaultMessage": "No product found. You can create it.",
+    "description": "No search result"
+  },
+  "stock.add.results": {
+    "defaultMessage": "Matching products",
+    "description": "Accessible name of the result list"
+  },
+  "stock.add.pick": {
+    "defaultMessage": "Add",
+    "description": "Result button"
+  },
+  "stock.add.inStore": {
+    "defaultMessage": "Already in your shop",
+    "description": "Result already listed by this shop"
+  },
+  "stock.add.pickAgain": {
+    "defaultMessage": "Search for the product to add it.",
+    "description": "A deep link named a product that cannot be loaded directly"
+  },
+  "stock.add.create": {
+    "defaultMessage": "Create a new product",
+    "description": "Button when the product is missing"
+  },
+  "stock.add.createTitle": {
+    "defaultMessage": "New product",
+    "description": "Form heading"
+  },
+  "stock.add.createNote": {
+    "defaultMessage": "You can sell it right away. TodayZ checks new products and may correct the details.",
+    "description": "Explains D-37"
+  },
+  "stock.add.createSave": {
+    "defaultMessage": "Create and continue",
+    "description": "Form button"
+  },
+  "stock.add.name": {
+    "defaultMessage": "Product name",
+    "description": "Form field"
+  },
+  "stock.add.brand": {
+    "defaultMessage": "Brand",
+    "description": "Form field, optional"
+  },
+  "stock.add.packSize": {
+    "defaultMessage": "Pack size",
+    "description": "Form field"
+  },
+  "stock.add.unit": {
+    "defaultMessage": "Unit",
+    "description": "Form field"
+  },
+  "stock.add.category": {
+    "defaultMessage": "Category",
+    "description": "Form field"
+  },
+  "stock.add.categoryPick": {
+    "defaultMessage": "Choose a category",
+    "description": "Select placeholder"
+  },
+  "stock.add.mrp": {
+    "defaultMessage": "MRP",
+    "description": "Form field, optional"
+  },
+  "stock.add.barcode": {
+    "defaultMessage": "Barcode",
+    "description": "Form field, optional"
+  },
+  "stock.add.nameInvalid": {
+    "defaultMessage": "Enter the product name.",
+    "description": "Form error"
+  },
+  "stock.add.packInvalid": {
+    "defaultMessage": "Enter a pack size above 0.",
+    "description": "Form error"
+  },
+  "stock.add.categoryInvalid": {
+    "defaultMessage": "Choose a category.",
+    "description": "Form error"
+  },
+  "stock.add.barcodeInvalid": {
+    "defaultMessage": "A barcode has 8 to 14 digits.",
+    "description": "Form error"
+  },
+  "stock.add.priceTitle": {
+    "defaultMessage": "Price and opening stock",
+    "description": "Accessible name of the price step"
+  },
+  "stock.add.opening": {
+    "defaultMessage": "Opening stock",
+    "description": "Form field, optional"
+  },
+  "stock.add.openingHelp": {
+    "defaultMessage": "How many you have now. Leave empty to add it with no stock.",
+    "description": "Form help"
+  },
+  "stock.add.save": {
+    "defaultMessage": "Add to my shop",
+    "description": "Form button"
+  },
+  "stock.import.title": {
+    "defaultMessage": "Import items",
+    "description": "Sheet title"
+  },
+  "stock.import.body": {
+    "defaultMessage": "Upload a CSV or XLSX sheet with one item per row. You see every row checked before anything is saved.",
+    "description": "Import explanation"
+  },
+  "stock.import.choose": {
+    "defaultMessage": "Choose a file",
+    "description": "Import button"
+  },
+  "stock.import.file": {
+    "defaultMessage": "Items file",
+    "description": "Accessible name of the file input"
+  },
+  "stock.import.tooBig": {
+    "defaultMessage": "That file is larger than 5 MB. Split it and try again.",
+    "description": "Import error"
+  },
+  "stock.import.okCount": {
+    "defaultMessage": "{count, plural, one {# row ready} other {# rows ready}}",
+    "description": "Import summary"
+  },
+  "stock.import.errorCount": {
+    "defaultMessage": "{count, plural, one {# row with problems} other {# rows with problems}}",
+    "description": "Import summary"
+  },
+  "stock.import.errorNote": {
+    "defaultMessage": "Rows with problems are skipped. Fix them in your sheet and import again.",
+    "description": "Import note"
+  },
+  "stock.import.rows": {
+    "defaultMessage": "Rows in the file",
+    "description": "Accessible name of the row list"
+  },
+  "stock.import.rowNo": {
+    "defaultMessage": "Row {row}",
+    "description": "Import row label"
+  },
+  "stock.import.unnamed": {
+    "defaultMessage": "No name",
+    "description": "Import row without a name"
+  },
+  "stock.import.rowError": {
+    "defaultMessage": "{field}: {problem}",
+    "description": "Import row problem"
+  },
+  "stock.import.apply": {
+    "defaultMessage": "{count, plural, one {Import # item} other {Import # items}}",
+    "description": "Import button"
+  },
+  "stock.import.another": {
+    "defaultMessage": "Choose another file",
+    "description": "Import button"
+  },
+  "stock.import.done": {
+    "defaultMessage": "{applied, plural, one {# item imported} other {# items imported}}. {skipped, plural, =0 {No rows were skipped.} one {# row was skipped.} other {# rows were skipped.}}",
+    "description": "Import result"
+  },
+  "stock.import.close": {
+    "defaultMessage": "Close",
+    "description": "Import button"
+  },
+  "stock.import.field.name": {
+    "defaultMessage": "Name",
+    "description": "Import column"
+  },
+  "stock.import.field.barcode": {
+    "defaultMessage": "Barcode",
+    "description": "Import column"
+  },
+  "stock.import.field.pricePaise": {
+    "defaultMessage": "Price",
+    "description": "Import column"
+  },
+  "stock.import.field.mrpPaise": {
+    "defaultMessage": "MRP",
+    "description": "Import column"
+  },
+  "stock.import.field.quantity": {
+    "defaultMessage": "Quantity",
+    "description": "Import column"
+  },
+  "stock.import.field.expiresOn": {
+    "defaultMessage": "Expiry date",
+    "description": "Import column"
+  },
+  "stock.import.field.other": {
+    "defaultMessage": "Row",
+    "description": "Import column not known to this app"
+  },
+  "stock.import.code.required": {
+    "defaultMessage": "is missing",
+    "description": "Import problem"
+  },
+  "stock.import.code.invalid": {
+    "defaultMessage": "is not valid",
+    "description": "Import problem"
+  },
+  "stock.import.code.too_long": {
+    "defaultMessage": "is too long",
+    "description": "Import problem"
+  },
+  "stock.import.code.price_above_mrp": {
+    "defaultMessage": "is above the MRP",
+    "description": "Import problem"
+  },
+  "stock.import.code.unknown_product": {
+    "defaultMessage": "is not in the product list",
+    "description": "Import problem"
+  },
+  "stock.import.code.duplicate": {
+    "defaultMessage": "appears twice",
+    "description": "Import problem"
+  },
+  "stock.import.code.other": {
+    "defaultMessage": "has a problem",
+    "description": "Import problem not known to this app"
+  }
+}

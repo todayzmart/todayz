@@ -183,7 +183,8 @@ func (s *Service) price(ctx context.Context, customerID ids.ID, st ordersdb.Stor
 		}
 		l.subtotal = l.unitPrice * int64(l.qty)
 		q.lines = append(q.lines, l)
-		plines[i] = PriceLine{StoreItemID: id, ProductID: l.productID, UnitPricePaise: l.unitPrice, Quantity: l.qty}
+		plines[i] = PriceLine{StoreItemID: id, ProductID: l.productID, UnitPricePaise: l.unitPrice, Quantity: l.qty,
+			Fixed: l.priceSource == sourceAskReply}
 	}
 
 	// Offers, clamped so nothing goes below zero.

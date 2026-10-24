@@ -191,6 +191,10 @@ func (s *Service) end(ctx context.Context, o ordersdb.Order, to, reason string, 
 	if err != nil {
 		return fmt.Errorf("orders: end order: %w", err)
 	}
+	// The offers the order used go back to their limits (W2-07).
+	if err := s.redeemer.Release(ctx, mustID(o.ID)); err != nil {
+		return fmt.Errorf("orders: release offers: %w", err)
+	}
 	return s.record(ctx, o, to, v, by, &reason, t, now)
 }
 
@@ -497,6 +501,12 @@ func (s *Service) collect(ctx context.Context, o ordersdb.Order, by ids.ID, meth
 	v, err := q.SetCollected(ctx, ordersdb.SetCollectedParams{Now: &now, PaymentMethod: &method, CashbackCredits: i32(cashback), ID: o.ID})
 	if err != nil {
 		return fmt.Errorf("orders: collect: %w", err)
+	}
+	if err := s.referrals.OnOrderCompleted(ctx, CompletedOrder{
+		OrderID: mustID(o.ID), CustomerID: mustID(o.CustomerID), StoreID: mustID(o.StoreID),
+		EligiblePaise: o.ItemsAfterOffersPaise, CreditsUsed: int(o.CreditsUsed),
+	}); err != nil {
+		return fmt.Errorf("orders: referrals: %w", err)
 	}
 	return s.record(ctx, o, StatusCollected, v, staff(by), nil, silent, now)
 }

@@ -26,6 +26,11 @@ func mountOrders(r chi.Router, d *deps) {
 		Notices: newNotifyService(d), Stock: jobs.OrdersStock(d.Clock), Open: business.OpenAt,
 		CodeRand: orderCodeRand, Credits: jobs.OrdersCredits(creditsService(d)),
 	}
+	// Offers price the quote and are counted in the order's transaction (W2-07).
+	pricing := offersForOrders{newOffers(d)}
+	od.Pricer, od.Redeemer = pricing, pricing
+	// A collected order may qualify a referral (W2-03).
+	od.Referrals = referralsForOrders{newReferrals(d)}
 	if d.Queue != nil {
 		// The timers are enqueued in the order's transaction through the
 		// API's insert-only River client; without one (router tests) every

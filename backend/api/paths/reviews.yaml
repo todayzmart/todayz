@@ -1,12 +1,375 @@
-# Paths: domain "reviews" (owner W3-03): reviews (04 §2.4, §2.6).
+# Paths: domain "reviews" (owner W2-06): reviews, replies and reports (01 §10, 04 §2.3, §2.4, §2.6, D-91).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [reviews]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/reviews.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Roles per operation are in internal/platform/authz/policy/reviews.go. A review, order or sale that
+# is not the caller's is 404 `not_found`, never 403. The shop page list (`GET /v1/discover/stores/{slug}/reviews`)
+# lives here, not in discover.yaml, because W2-06 owns it; it is public and shows visible reviews only.
+/v1/discover/stores/{slug}/reviews:
+  parameters:
+    - name: slug
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Slug
+  get:
+    operationId: listDiscoverStoreReviews
+    tags: [reviews]
+    summary: A shop's reviews (C-07)
+    description: >-
+      Visible reviews of a live store of a verified business, newest first, with the store's rating
+      (Bayesian average and count, 01 §10). A hidden review never appears and does not count. Any other
+      store is 404 `not_found` (SR-01). The reviewer shows as a first name only.
+    security: []
+    parameters:
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Reviews, newest first
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/reviews.yaml#/PublicReviewList
+            example:
+              rating: {avg: 4.4, count: 23}
+              items:
+                - id: 01JB0SRV1A2B3C4D5E6F7G8H9J
+                  stars: 5
+                  text: Everything was in stock, as shown.
+                  tags: [stock_was_right, quick_service]
+                  customerName: Asha
+                  createdAt: "2026-10-24T09:30:00Z"
+                  editedAt: null
+                  reply:
+                    text: Thank you, Asha.
+                    createdAt: "2026-10-24T10:00:00Z"
+                    editedAt: null
+              nextCursor: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/reviews:
+  get:
+    operationId: listMyReviews
+    tags: [reviews]
+    summary: My reviews
+    description: >-
+      The caller's own reviews, newest first, including ones an admin has hidden (`hidden: true`) so the
+      customer can see why a review is not on the shop page. `editableUntil` is when edits stop.
+    parameters:
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: The caller's reviews
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/reviews.yaml#/MyReviewList
+            example:
+              items:
+                - id: 01JB0SRV1A2B3C4D5E6F7G8H9J
+                  storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  storeName: Annapurna Kirana
+                  orderId: 01JB0SDR1A2B3C4D5E6F7G8H9J
+                  posSaleId: null
+                  stars: 5
+                  text: Everything was in stock, as shown.
+                  tags: [stock_was_right]
+                  createdAt: "2026-10-24T09:30:00Z"
+                  editedAt: null
+                  editableUntil: "2026-10-31T09:30:00Z"
+                  hidden: false
+                  reply: null
+              nextCursor: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+  post:
+    operationId: createReview
+    tags: [reviews]
+    summary: Review a shop after an order or a POS sale
+    description: >-
+      Exactly one of `orderId` and `posSaleId`, else `422 validation_failed`. The order must be the caller's
+      and `collected` or `delivered`; the sale must be the caller's linked sale (`bill_qr` or `counter_code`).
+      Anything else is `409 review_not_eligible`; an order or sale that is not the caller's is 404. One review per
+      order or sale: a second is `409 review_exists`. Tags are all positive or all negative, at most 6.
+      Published at once.
+    x-idempotency: optional
+    x-problems: [review_not_eligible, review_exists]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/reviews.yaml#/ReviewCreate
+          example:
+            orderId: 01JB0SDR1A2B3C4D5E6F7G8H9J
+            stars: 5
+            text: Everything was in stock, as shown.
+            tags: [stock_was_right]
+    responses:
+      "201":
+        description: The review
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/reviews.yaml#/MyReview
+            example: &myreview
+              id: 01JB0SRV1A2B3C4D5E6F7G8H9J
+              storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+              storeName: Annapurna Kirana
+              orderId: 01JB0SDR1A2B3C4D5E6F7G8H9J
+              posSaleId: null
+              stars: 5
+              text: Everything was in stock, as shown.
+              tags: [stock_was_right]
+              createdAt: "2026-10-24T09:30:00Z"
+              editedAt: null
+              editableUntil: "2026-10-31T09:30:00Z"
+              hidden: false
+              reply: null
+      default: *problem
+/v1/me/reviews/{reviewId}:
+  parameters:
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  patch:
+    operationId: updateReview
+    tags: [reviews]
+    summary: Edit my review
+    description: >-
+      Own review only (another customer's is 404). Within `review_edit_window_days` of creating it; after that
+      `409 review_edit_window_passed`. A hidden review cannot be edited (`409 invalid_transition`). A change
+      that does not alter the review is a no-op and does not set `editedAt`.
+    x-idempotency: none
+    x-problems: [review_edit_window_passed]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/reviews.yaml#/ReviewPatch
+          example:
+            stars: 4
+            text: Mostly in stock.
+    responses:
+      "200":
+        description: The review after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/reviews.yaml#/MyReview
+            example:
+              id: 01JB0SRV1A2B3C4D5E6F7G8H9J
+              storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+              storeName: Annapurna Kirana
+              orderId: 01JB0SDR1A2B3C4D5E6F7G8H9J
+              posSaleId: null
+              stars: 4
+              text: Mostly in stock.
+              tags: [stock_was_right]
+              createdAt: "2026-10-24T09:30:00Z"
+              editedAt: "2026-10-25T08:00:00Z"
+              editableUntil: "2026-10-31T09:30:00Z"
+              hidden: false
+              reply: null
+      default: *problem
+/v1/me/review-reports:
+  post:
+    operationId: reportReview
+    tags: [reviews]
+    summary: Report someone else's review
+    description: >-
+      The review must be visible and another customer's (your own is `422 validation_failed` on `body.reviewId`;
+      a hidden or unknown one is 404). One report per customer per review: reporting again returns the first one.
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/reviews.yaml#/ReviewReportCreate
+          example:
+            reviewId: 01JB0SRV1A2B3C4D5E6F7G8H9J
+            reason: Abusive language
+    responses:
+      "201":
+        description: The report
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/reviews.yaml#/ReviewReportReceipt
+            example: &receipt
+              id: 01JB0SRP1A2B3C4D5E6F7G8H9J
+              reviewId: 01JB0SRV1A2B3C4D5E6F7G8H9J
+              status: open
+              createdAt: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/reviews:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listStoreReviews
+    tags: [reviews]
+    summary: The store's reviews (B-14)
+    description: >-
+      Visible reviews of this store, newest first, with the store's rating. Owner and manager only (02 §3.3);
+      so are replying and reporting. `reported` says this store already reported the review.
+    parameters:
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Reviews, newest first
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/reviews.yaml#/StoreReviewList
+            example:
+              rating: {avg: 4.4, count: 23}
+              items:
+                - id: 01JB0SRV1A2B3C4D5E6F7G8H9J
+                  stars: 2
+                  text: Item missing.
+                  tags: [item_missing]
+                  customerName: Asha
+                  createdAt: "2026-10-24T09:30:00Z"
+                  editedAt: null
+                  reply: null
+                  reported: false
+              nextCursor: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/reviews/{reviewId}/reply:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: replyToReview
+    tags: [reviews]
+    summary: Reply to a review (once)
+    description: >-
+      Owner and manager. One reply per review: a second is `409 review_reply_exists` (edit it with PATCH). A review
+      of another store, or a hidden one, is 404. The reply is published at once.
+    x-idempotency: optional
+    x-problems: [review_reply_exists]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/reviews.yaml#/ReplyRequest
+          example:
+            text: Sorry about that, we have restocked.
+    responses:
+      "201":
+        description: The reply
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/reviews.yaml#/ReviewReply
+            example: &reply
+              text: Sorry about that, we have restocked.
+              createdAt: "2026-10-24T10:00:00Z"
+              editedAt: null
+      default: *problem
+  patch:
+    operationId: updateReviewReply
+    tags: [reviews]
+    summary: Edit the reply
+    description: Owner and manager. No reply yet is 404 `not_found`; a reply an admin hid cannot be edited (`409 invalid_transition`).
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/reviews.yaml#/ReplyRequest
+          example:
+            text: Sorry about that; fresh stock has arrived.
+    responses:
+      "200":
+        description: The reply after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/reviews.yaml#/ReviewReply
+            example:
+              text: Sorry about that; fresh stock has arrived.
+              createdAt: "2026-10-24T10:00:00Z"
+              editedAt: "2026-10-24T12:00:00Z"
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/reviews/{reviewId}/report:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: reportStoreReview
+    tags: [reviews]
+    summary: Report a review of this store to admin
+    description: >-
+      Owner and manager. One report per store per review: reporting again returns the first one. A review of
+      another store, or a hidden one, is 404.
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/reviews.yaml#/StoreReviewReportCreate
+          example:
+            reason: This customer never visited the shop
+    responses:
+      "201":
+        description: The report
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/reviews.yaml#/ReviewReportReceipt
+            example: *receipt
+      default: *problem
