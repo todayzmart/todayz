@@ -46,6 +46,9 @@ const (
 	// Customer inbox.
 	KindOrderUpdate = "order_update" // accepted, partial, rejected, expired, ready, out for delivery, delivered
 	KindAskReply    = "ask_reply"    // a shop replied Yes to the customer's ask (D-101)
+	// Credits (W2-01): cashback or a reward landed; credits expire soon.
+	KindCreditsEarned   = "credits_earned"
+	KindCreditsExpiring = "credits_expiring"
 )
 
 // Ref is what a notification opens.
