@@ -33,7 +33,7 @@ func registerorders(r *Registry, d Deps) {
 	// built on the first run, not here: the API registers these kinds only
 	// to name them (A-21, and its own enqueuer over d.Queue), so it never
 	// opens a client for them.
-	enqueuer := lazyEnqueuer(r, d)
+	enqueuer := lazyEnqueuer(r, d, "orders timers")
 	svc := func() (*orders.Service, error) {
 		enq, err := enqueuer()
 		if err != nil {
@@ -77,9 +77,10 @@ func registerorders(r *Registry, d Deps) {
 
 // lazyEnqueuer returns a func that builds one insert-only client and its
 // enqueuer on first use and returns the same one after. A failed build is
-// returned (the run fails and River retries it) and tried again next time.
-// Without a pool (tests that only list kinds) it returns nil.
-func lazyEnqueuer(r *Registry, d Deps) func() (platformjobs.Enqueuer, error) {
+// returned (the run fails and River retries it, or the next tick runs it)
+// and tried again next time. Without a pool (tests that only list kinds) it
+// returns nil. who names the caller in the error.
+func lazyEnqueuer(r *Registry, d Deps, who string) func() (platformjobs.Enqueuer, error) {
 	var (
 		mu  sync.Mutex
 		enq platformjobs.Enqueuer
@@ -92,7 +93,7 @@ func lazyEnqueuer(r *Registry, d Deps) func() (platformjobs.Enqueuer, error) {
 		}
 		c, err := queue.NewInsertClient(d.Pool, queue.Options{Log: d.Log})
 		if err != nil {
-			return nil, fmt.Errorf("orders timers: queue client: %w", err)
+			return nil, fmt.Errorf("%s: queue client: %w", who, err)
 		}
 		enq = platformjobs.NewEnqueuer(r, c, d.Clock)
 		return enq, nil

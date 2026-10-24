@@ -12,7 +12,6 @@ import (
 	"github.com/todayz/backend/internal/platform/ids"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/notice"
-	"github.com/todayz/backend/internal/platform/queue"
 	"github.com/todayz/backend/internal/platform/realtime"
 )
 
@@ -117,17 +116,19 @@ func registernotify(r *Registry, d Deps) {
 	if unseen == nil || contacts == nil {
 		return
 	}
-	var enq platformjobs.Enqueuer
-	if d.Pool != nil {
-		if c, err := queue.NewInsertClient(d.Pool, queue.Options{Log: d.Log}); err == nil {
-			enq = platformjobs.NewEnqueuer(r, c, d.Clock)
-		}
-	}
+	// The escalation's enqueuer (each message it writes enqueues a send) is
+	// built on its first run, as for the orders timers: the API registers
+	// this kind only to name it and never opens a client for it.
+	enqueuer := lazyEnqueuer(r, d, "notify escalation")
 	platformjobs.Define(r, platformjobs.Kind{
 		Name: notify.KindOrderUnseen, Owner: "W2-05", Class: platformjobs.ClassNotify,
 		Description: "Messages the store once per order still unseen order_unseen_sms_after_min minutes after it was placed",
 		Schedule:    "* * * * *", UniqueBy: platformjobs.PerTick, Timeout: 50 * time.Second, MaxAttempts: 1,
 		Handler: func(ctx context.Context, run platformjobs.Run) (platformjobs.Result, error) {
+			enq, err := enqueuer()
+			if err != nil {
+				return platformjobs.Result{}, err
+			}
 			nd := notify.Deps{Clock: d.Clock, Settings: d.Settings, Config: d.Config, Log: d.Log, Jobs: enq}
 			if d.Pool != nil {
 				nd.DB = db.New(d.Pool)
