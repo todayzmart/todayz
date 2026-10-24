@@ -158,6 +158,13 @@
   color: var(--ink-3);
 }
 
+.address {
+  display: flex;
+  flex-direction: column;
+  font-style: normal;
+  color: var(--ink-2);
+}
+
 /* Accept part sheet: one row per line, the name and stock on the left, the stepper on the right. */
 .partLines {
   display: flex;

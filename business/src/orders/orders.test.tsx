@@ -82,6 +82,14 @@ function orderHandler(getOrder: () => unknown, id = 'o1'): Handler {
   return (c) => (c.method === 'GET' && c.path === `${BASE}/orders/${id}` ? json(200, getOrder()) : undefined);
 }
 
+async function typeCode(digits: string) {
+  const boxes = await screen.findAllByRole('textbox', { name: /Digit|code/i });
+  digits.split('').forEach((d, i) => {
+    const box = boxes[i];
+    if (box) fireEvent.change(box, { target: { value: d } });
+  });
+}
+
 beforeEach(() => {
   resetAlerts();
   vi.useRealTimers();
@@ -98,7 +106,7 @@ describe('B-04 orders list', () => {
       handlers: [shops('cashier'), listHandler({ new: [summary('o1'), summary('o2')] }), orderHandler(() => full('o1')), orderHandler(() => full('o2'), 'o2')],
     });
     const tabs = await screen.findByRole('tablist', { name: 'Order status' });
-    expect(within(tabs).getAllByRole('tab').map((t) => t.textContent?.replace(/\d+$/, '').trim())).toEqual(['New', 'Accepted', 'Ready', 'Done', 'Missed', 'Asks']);
+    expect(within(tabs).getAllByRole('tab').map((t) => t.textContent?.replace(/\d+$/, '').trim())).toEqual(['New', 'Accepted', 'Ready', 'Out for delivery', 'Returns to confirm', 'Done', 'Missed', 'Asks']);
     expect(within(tabs).getByRole('tab', { name: /New/ })).toHaveTextContent('2');
     const timers = await screen.findAllByTestId('countdown');
     expect(timers).toHaveLength(2);
@@ -298,14 +306,6 @@ describe('B-04 order detail', () => {
     expect(calls.find((c) => c.path.endsWith('/cancel'))?.body).toEqual({ reason: 'other', note: 'Power cut' });
   });
 
-  async function typeCode(digits: string) {
-    const boxes = await screen.findAllByRole('textbox', { name: /Digit|code/i });
-    digits.split('').forEach((d, i) => {
-      const box = boxes[i];
-      if (box) fireEvent.change(box, { target: { value: d } });
-    });
-  }
-
   it('shows the tries left after a wrong code, and clears the boxes', async () => {
     renderAt('/orders/o1', {
       messages,
@@ -367,6 +367,155 @@ describe('B-04 order detail', () => {
   it('says so when the order is not found', async () => {
     renderAt('/orders/missing', { messages, handlers: [shops('cashier')] });
     expect(await screen.findByText('This order was not found for this shop.')).toBeInTheDocument();
+  });
+});
+
+describe('B-04 delivery (BK-24–27)', () => {
+  const ADDRESS = { label: 'Home', line1: '12 3rd Cross', line2: 'HAL 2nd Stage', landmark: 'Opp. temple', pincode: '560038', lat: 12.97, lng: 77.64 };
+  const delivery = (over: Record<string, unknown> = {}) =>
+    inStock('o1', {
+      fulfilment: 'delivery',
+      status: 'accepted',
+      acceptedAt: '2026-10-23T12:31:00.000Z',
+      dispatchBy: '2026-10-23T13:01:00.000Z',
+      deliveryAddress: ADDRESS,
+      deliveryFeePaise: 2500,
+      deliveryFailedAt: null,
+      returnOutcome: null,
+      returnConfirmedAt: null,
+      ...over,
+    });
+
+  it('dispatches an accepted delivery order, with the deadline and no Mark ready or code', async () => {
+    const { calls } = renderAt('/orders/o1', {
+      messages,
+      handlers: [
+        shops('cashier'),
+        (c) => (c.method === 'POST' && c.path === `${BASE}/orders/o1/dispatch` ? json(200, delivery({ status: 'out_for_delivery' })) : undefined),
+        orderHandler(() => delivery()),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: 'Dispatch' }));
+    expect(screen.getByText(/Send it out by .*, or the order expires\./)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Mark ready' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Mark delivered' })).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Delivery address')).toHaveTextContent('12 3rd Cross, HAL 2nd Stage');
+    expect(screen.getByText('Customer pays at the door: cash or UPI.')).toBeInTheDocument();
+    await waitFor(() => expect(calls.some((c) => c.path.endsWith('/dispatch'))).toBe(true));
+    expect(calls.find((c) => c.path.endsWith('/dispatch'))?.headers.get('idempotency-key')).toMatch(/^[0-9A-Z]{26}$/);
+  });
+
+  it('shows the full phone only while out for delivery, and delivers with the code', async () => {
+    const masked = renderAt('/orders/o1', { messages, handlers: [shops('cashier'), orderHandler(() => delivery())] });
+    expect(await screen.findByText('Phone +91 98xxx xx210')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Call/ })).not.toBeInTheDocument();
+    masked.unmount();
+
+    const out = () => delivery({ status: 'out_for_delivery', customer: { name: 'Meera', phoneMasked: '+91 98xxx xx210', phone: '+919876543210' } });
+    const { calls } = renderAt('/orders/o1', {
+      messages,
+      handlers: [
+        shops('cashier'),
+        (c) => (c.method === 'POST' && c.path === `${BASE}/orders/o1/verify-code` ? json(200, delivery({ status: 'delivered', paymentMethod: 'upi' })) : undefined),
+        orderHandler(out),
+      ],
+    });
+    expect(await screen.findByRole('link', { name: 'Call +919876543210' })).toHaveAttribute('href', 'tel:+919876543210');
+    expect(screen.getByRole('heading', { name: "Deliver with the customer's code" })).toBeInTheDocument();
+    await typeCode('7315');
+    fireEvent.click(screen.getByRole('radio', { name: 'UPI' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Mark delivered' }));
+    await waitFor(() => expect(calls.some((c) => c.path.endsWith('/verify-code'))).toBe(true));
+    expect(calls.find((c) => c.path.endsWith('/verify-code'))?.body).toEqual({ code: '7315', paymentMethod: 'upi' });
+  });
+
+  it('marks a delivery failed with a reason, where "other" needs a note', async () => {
+    const { calls } = renderAt('/orders/o1', {
+      messages,
+      handlers: [
+        shops('cashier'),
+        (c) => (c.method === 'POST' && c.path === `${BASE}/orders/o1/fail-delivery` ? json(200, delivery({ status: 'delivery_failed', deliveryFailedAt: SERVER_NOW })) : undefined),
+        orderHandler(() => delivery({ status: 'out_for_delivery' })),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: 'Delivery failed' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getAllByRole('radio').map((r) => r.getAttribute('aria-label') ?? r.closest('label')?.textContent)).toEqual([
+      'Customer not reachable',
+      'Address not found',
+      'Customer refused the order',
+      'Other reason',
+    ]);
+    const confirm = within(dialog).getByRole('button', { name: 'Mark delivery failed' });
+    fireEvent.click(within(dialog).getByRole('radio', { name: 'Other reason' }));
+    expect(confirm).toBeDisabled();
+    fireEvent.change(within(dialog).getByRole('textbox'), { target: { value: 'Gate locked' } });
+    fireEvent.click(confirm);
+    await waitFor(() => expect(calls.some((c) => c.path.endsWith('/fail-delivery'))).toBe(true));
+    expect(calls.find((c) => c.path.endsWith('/fail-delivery'))?.body).toEqual({ reason: 'other', note: 'Gate locked' });
+  });
+
+  const failed = (over: Record<string, unknown> = {}) =>
+    delivery({ status: 'delivery_failed', statusReason: 'customer_unreachable', deliveryFailedAt: new Date(Date.now() - (2 * 60 + 5) * 60_000).toISOString(), ...over });
+
+  it('lets a cashier confirm the goods came back, but not record damage', async () => {
+    const { calls } = renderAt('/orders/o1', {
+      messages,
+      handlers: [
+        shops('cashier'),
+        (c) => (c.method === 'POST' && c.path === `${BASE}/orders/o1/confirm-return` ? json(200, failed({ returnOutcome: 'returned', returnConfirmedAt: SERVER_NOW })) : undefined),
+        orderHandler(() => failed()),
+      ],
+    });
+    expect(await screen.findByRole('heading', { name: 'Did the goods come back?' })).toBeInTheDocument();
+    expect(screen.getByText('Failed 2 h 5 min ago')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'No, damaged' })).not.toBeInTheDocument();
+    expect(screen.getByText('Ask a manager to record damage')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Yes, all back' }));
+    await waitFor(() => expect(calls.some((c) => c.path.endsWith('/confirm-return'))).toBe(true));
+    expect(calls.find((c) => c.path.endsWith('/confirm-return'))?.body).toEqual({ outcome: 'returned' });
+  });
+
+  it('lets a manager record damage', async () => {
+    const { calls } = renderAt('/orders/o1', {
+      messages,
+      handlers: [
+        shops('manager'),
+        (c) => (c.method === 'POST' && c.path === `${BASE}/orders/o1/confirm-return` ? json(200, failed({ returnOutcome: 'damaged', returnConfirmedAt: SERVER_NOW })) : undefined),
+        orderHandler(() => failed()),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: 'No, damaged' }));
+    await waitFor(() => expect(calls.some((c) => c.path.endsWith('/confirm-return'))).toBe(true));
+    expect(calls.find((c) => c.path.endsWith('/confirm-return'))?.body).toEqual({ outcome: 'damaged' });
+    expect(screen.queryByText('Ask a manager to record damage')).not.toBeInTheDocument();
+  });
+
+  it('says an unanswered return was auto-confirmed after 72 h', async () => {
+    renderAt('/orders/o1', { messages, handlers: [shops('owner'), orderHandler(() => failed({ returnOutcome: 'unconfirmed', returnConfirmedAt: SERVER_NOW }))] });
+    expect(await screen.findByText(/Auto-confirmed after 72 h/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Yes, all back' })).not.toBeInTheDocument();
+  });
+
+  it('lists returns to confirm with the time since the failure, and the rider phone on the way', async () => {
+    renderAt('/orders', {
+      messages,
+      handlers: [
+        shops('cashier'),
+        listHandler({
+          new: [],
+          returns: [summary('o3', { fulfilment: 'delivery', status: 'delivery_failed', statusReason: 'address_not_found', deliveryFailedAt: new Date(Date.now() - 35 * 60_000).toISOString(), returnOutcome: null, customerPhone: null })],
+          out_for_delivery: [summary('o4', { fulfilment: 'delivery', status: 'out_for_delivery', customerPhone: '+919876543210' })],
+        }),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('tab', { name: /Returns to confirm/ }));
+    const row = await screen.findByRole('article', { name: 'TZ-o3' });
+    expect(row).toHaveTextContent('Failed 35 min ago');
+    expect(row).toHaveTextContent('Address not found');
+    fireEvent.click(screen.getByRole('tab', { name: /Out for delivery/ }));
+    const out = await screen.findByRole('article', { name: 'TZ-o4' });
+    expect(within(out).getByRole('link', { name: 'Call +919876543210' })).toHaveAttribute('href', 'tel:+919876543210');
   });
 });
 

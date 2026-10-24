@@ -2,6 +2,9 @@ import { ApiError } from '@todayz/api-client';
 import {
   acceptOrder,
   cancelStoreOrder,
+  confirmOrderReturn,
+  dispatchOrder,
+  failOrderDelivery,
   getStoreOrder,
   listStoreOrders,
   readyOrder,
@@ -9,6 +12,8 @@ import {
   verifyOrderCode,
 } from '@todayz/api-client/gen/orders/orders';
 import type { AcceptLine } from '@todayz/api-client/gen/model/acceptLine';
+import type { ConfirmReturnRequestOutcome } from '@todayz/api-client/gen/model/confirmReturnRequestOutcome';
+import type { DeliveryFailedReason } from '@todayz/api-client/gen/model/deliveryFailedReason';
 import type { PaymentMethod } from '@todayz/api-client/gen/model/paymentMethod';
 import type { RejectReason } from '@todayz/api-client/gen/model/rejectReason';
 import type { ShopCancelReason } from '@todayz/api-client/gen/model/shopCancelReason';
@@ -21,8 +26,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { API_URL } from '../app/env';
 import type { CurrentStore } from './store';
 
-/** B-04 tabs backed by the API's `status` filter (delivery tabs stay hidden while delivery is off). */
-export const TABS = ['new', 'accepted', 'ready', 'done', 'missed'] as const;
+/**
+ * B-04 tabs backed by the API's `status` filter. Out for delivery and Returns to confirm (D-69) always
+ * show: the shop list does not say whether a store delivers, and an empty tab says what lands there.
+ */
+export const TABS = ['new', 'accepted', 'ready', 'out_for_delivery', 'returns', 'done', 'missed'] as const;
 export type OrderTab = (typeof TABS)[number];
 
 export const ordersKey = (sid: string) => ['orders', sid] as const;
@@ -79,7 +87,7 @@ export function applyOrder(qc: QueryClient, sid: string, order: StoreOrder): voi
   void qc.invalidateQueries({ queryKey: [...ordersKey(sid), 'list'] });
 }
 
-export type ActionKind = 'accept' | 'acceptPart' | 'reject' | 'ready' | 'cancel' | 'verify';
+export type ActionKind = 'accept' | 'acceptPart' | 'reject' | 'ready' | 'cancel' | 'verify' | 'dispatch' | 'failDelivery' | 'confirmReturn';
 
 /** The i18n key suffix for an action failure; unknown codes fall back to `generic`. */
 export function errorKey(err: unknown): string {
@@ -151,6 +159,14 @@ export const rejectCall = (s: CurrentStore, id: string, reason: RejectReason, no
 export const readyCall = (s: CurrentStore, id: string) => (headers: Record<string, string>) => readyOrder(s.bid, s.sid, id, { headers });
 export const cancelCall = (s: CurrentStore, id: string, reason: ShopCancelReason, note?: string) => (headers: Record<string, string>) =>
   cancelStoreOrder(s.bid, s.sid, id, note ? { reason, note } : { reason }, { headers });
+/** Delivery (BK-24): accepted to out_for_delivery. */
+export const dispatchCall = (s: CurrentStore, id: string) => (headers: Record<string, string>) => dispatchOrder(s.bid, s.sid, id, { headers });
+/** Delivery failed (D-60): `other` needs a note; the reservation stays until the return is confirmed (D-69). */
+export const failDeliveryCall = (s: CurrentStore, id: string, reason: DeliveryFailedReason, note?: string) => (headers: Record<string, string>) =>
+  failOrderDelivery(s.bid, s.sid, id, note ? { reason, note } : { reason }, { headers });
+/** Did the goods come back (D-69): `returned` releases the stock, `damaged` (manager and above) writes it off. */
+export const confirmReturnCall = (s: CurrentStore, id: string, outcome: ConfirmReturnRequestOutcome) => (headers: Record<string, string>) =>
+  confirmOrderReturn(s.bid, s.sid, id, { outcome }, { headers });
 export const verifyCall = (s: CurrentStore, id: string, code: string, paymentMethod: PaymentMethod) => (headers: Record<string, string>) =>
   verifyOrderCode(s.bid, s.sid, id, { code, paymentMethod }, { headers });
 
@@ -165,6 +181,16 @@ export function useServerOffset(serverNow: string | undefined, updatedAt: number
 }
 
 /** Seconds left until `deadline` by the server's clock, ticking once a second. Null when there is no deadline. */
+/** The device time, refreshed every minute: for "failed 2 h 5 min ago" labels. */
+export function useNow(everyMs = 60_000): number {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), everyMs);
+    return () => clearInterval(t);
+  }, [everyMs]);
+  return now;
+}
+
 export function useSecondsLeft(deadline: string | null | undefined, offsetMs: number): number | null {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {

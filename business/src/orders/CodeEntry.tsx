@@ -11,6 +11,8 @@ import type { CurrentStore } from './store';
 import styles from './orders.module.css';
 
 const METHODS = ['cash', 'upi', 'card', 'other'] as const;
+const PICKUP_WORDS = { title: 'orders.code.title', submit: 'orders.code.submit', done: 'orders.code.done' };
+const DELIVERY_WORDS = { title: 'orders.code.delivery.title', submit: 'orders.code.delivery.submit', done: 'orders.code.delivery.done' };
 
 /**
  * Hand-over (D-04): the shop types the customer's 4-digit code and says how they paid. The code
@@ -28,6 +30,8 @@ export function CodeEntry({ store, order }: { store: CurrentStore; order: StoreO
   const [wrongCount, setWrongCount] = useState(0);
   const [locked, setLocked] = useState(false);
 
+  // Delivery hands over at the door: same code, delivery wording (BK-24).
+  const words = order.fulfilment === 'delivery' ? DELIVERY_WORDS : PICKUP_WORDS;
   const isLocked = order.codeLocked || locked;
   const left = attemptsLeft ?? order.codeAttemptsLeft;
   const ready = code.length === 4 && method !== null && !isLocked;
@@ -38,7 +42,7 @@ export function CodeEntry({ store, order }: { store: CurrentStore; order: StoreO
     const done = await action.run('verify', verifyCall(store, order.id, sent, method));
     setCode('');
     if (done) {
-      toast.show({ message: intl.formatMessage({ id: 'orders.code.done' }) });
+      toast.show({ message: intl.formatMessage({ id: words.done }) });
       return;
     }
   };
@@ -63,7 +67,7 @@ export function CodeEntry({ store, order }: { store: CurrentStore; order: StoreO
   return (
     <section className={`tz-card ${styles.codeBox}`} aria-labelledby="code-title">
       <h2 id="code-title" className="tz-card-title">
-        {intl.formatMessage({ id: 'orders.code.title' })}
+        {intl.formatMessage({ id: words.title })}
       </h2>
       {isLocked ? (
         <Banner tone="warning" icon={LockKeyhole} title={intl.formatMessage({ id: 'orders.code.locked.title' })} live="status">
@@ -93,7 +97,7 @@ export function CodeEntry({ store, order }: { store: CurrentStore; order: StoreO
           </div>
           <ActionError error={genericError} />
           <Button variant="primary" disabled={!ready} loading={action.pending === 'verify'} onClick={() => void submit()}>
-            {intl.formatMessage({ id: 'orders.code.submit' })}
+            {intl.formatMessage({ id: words.submit })}
           </Button>
         </>
       )}
