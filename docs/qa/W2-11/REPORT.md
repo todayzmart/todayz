@@ -17,7 +17,7 @@ B-05 Sell in `business/`: the counter, an offline queue with sync status, a barc
 |---|---|
 | business typecheck | clean |
 | business eslint (`--max-warnings 0`), stylelint | clean |
-| business vitest | 359 passed (engine 34: replay, duplicates, failure, conflict and refusal; API adapter 10; Counter 17) |
+| business vitest | 358 passed in 41 files (engine 34: replay, duplicates, failure, conflict and refusal; API adapter 10; Counter 17) |
 | `@todayz/i18n` test | 197 passed |
 | `build:e2e` | ok; precache and dist checks pass |
 | size-limit | initial JS 159.38 kB gzip (limit 250), CSS 10.35 kB gzip (limit 20) |
