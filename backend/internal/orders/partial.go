@@ -74,9 +74,20 @@ func (s *Service) billFor(ctx context.Context, o ordersdb.Order, lines []ordersd
 	b.itemSubtotal = b.subtotal - lineDiscounts
 	b.discount = lineDiscounts + min(max(pr.BillDiscount, 0), b.itemSubtotal)
 	b.itemsAfterOffers = b.subtotal - b.discount
-	// TODO(lead): pickup only for now; the delivery WP recomputes the fee
-	// on the kept lines here (BK-23), and its sweep covers dispatch_by.
-	b.deliveryFee = 0
+	if o.Fulfilment == Delivery {
+		// Fewer lines only lower the item subtotal, so a fee paid at
+		// placing stays the same; an order that was free (at or above the
+		// store's free-delivery amount) may drop under it and pay the
+		// store's fee as it is now (01 §5.5).
+		b.deliveryFee = o.DeliveryFeePaise
+		if b.deliveryFee == 0 {
+			f, err := s.q(ctx).StoreDeliveryFee(ctx, o.StoreID)
+			if err != nil {
+				return partialBill{}, fmt.Errorf("orders: delivery fee: %w", err)
+			}
+			b.deliveryFee = deliveryFee(b.itemSubtotal, f.DeliveryFeePaise, f.DeliveryFreeAbovePaise)
+		}
+	}
 	return b, nil
 }
 

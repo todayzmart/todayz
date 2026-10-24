@@ -1,7 +1,9 @@
 // Package orders is online booking (W2-02; 01 §5–6, 02 §3.3, 03 §3–4, 04
 // §2.7): the checkout quote, placing an order, the shop's accept, reject,
-// ready, hand-over and cancel, the customer's cancel, extension and new
-// code, the accept and no-show timers, and the order reads both apps show.
+// ready, hand-over and cancel, delivery (dispatch, delivered, failed and
+// the return, D-69), the customer's cancel, extension and new code, the
+// accept, no-show, dispatch and return timers, and the order reads both
+// apps show.
 //
 // Rules this package keeps:
 //
@@ -28,6 +30,9 @@
 //   - Deadlines are strict: at or after accept_by a placed order cannot be
 //     accepted, rejected or cancelled, and at or after hold_until a held one
 //     cannot be handed over, cancelled or extended; the timer expires it.
+//     A delivery order has dispatch_by instead: at or after it an accepted
+//     delivery cannot be dispatched or cancelled, and the timer expires it
+//     with a store strike.
 //     A late or repeated timer run is a no-op (BK-21).
 //   - Times come from the injected clock; numbers from platform_settings.
 package orders
@@ -47,6 +52,7 @@ import (
 	"github.com/todayz/backend/gen/sqlc/ordersdb"
 	"github.com/todayz/backend/internal/platform/audit"
 	"github.com/todayz/backend/internal/platform/authn"
+	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/db"
@@ -74,7 +80,8 @@ type Deps struct {
 	// Jobs enqueues the accept and no-show timers in the order's
 	// transaction.
 	Jobs platformjobs.Enqueuer
-	// Stock sells a collected line (the catalogue's stock writer).
+	// Stock sells a collected or delivered line and writes a returned
+	// line's damage (the catalogue's stock writer).
 	Stock Stock
 	// Open reports whether a store is open at a time (business.OpenAt).
 	Open OpenFunc
@@ -92,6 +99,9 @@ type Deps struct {
 	// Audit writes the admin cancel's audit_log row; nil refuses the admin
 	// routes with 503.
 	Audit *audit.Writer
+	// Authz checks a second action inside a route (stock.damage on a
+	// damaged return, D-69); nil refuses a damaged return with 500.
+	Authz authz.Authorizer
 	// CodeRand is the randomness pickup codes are drawn from; nil means
 	// crypto/rand. Only tests set it, to force a code collision.
 	CodeRand io.Reader
@@ -104,6 +114,19 @@ type Stock interface {
 	// it idempotent: a second call with the same id returns the first
 	// movement.
 	Sell(ctx context.Context, tx pgx.Tx, s Sale) (ids.ID, error)
+	// Damage writes one damage movement of qty for the item inside tx, for
+	// a failed delivery's goods that came back damaged (D-69). clientID
+	// makes it idempotent, as for Sell.
+	Damage(ctx context.Context, tx pgx.Tx, d Damage) (ids.ID, error)
+}
+
+// Damage is one returned line written off.
+type Damage struct {
+	StoreID, ItemID ids.ID
+	Qty             int32
+	OrderID         ids.ID
+	ClientID        ids.ID // the reservation id
+	UserID          ids.ID // the manager confirming the return
 }
 
 // Sale is one collected line.
@@ -134,6 +157,7 @@ type Service struct {
 	credits   Credits
 	referrals Referrals
 	audit     *audit.Writer
+	az        authz.Authorizer
 	codes     *codeKeys // nil when either code key is missing
 	phones    *pii.Sealer
 	ids       *ids.Generator
@@ -149,7 +173,7 @@ func New(d Deps) (*Service, error) {
 	s := &Service{
 		db: d.DB, clock: d.Clock, settings: d.Settings, notices: d.Notices, jobs: d.Jobs,
 		stock: d.Stock, open: d.Open, pricer: d.Pricer, redeemer: d.Redeemer, askPricer: d.AskPricer, credits: d.Credits,
-		referrals: d.Referrals, audit: d.Audit, ids: ids.NewGenerator(),
+		referrals: d.Referrals, audit: d.Audit, az: d.Authz, ids: ids.NewGenerator(),
 	}
 	if s.pricer == nil {
 		s.pricer = NoOffers{}

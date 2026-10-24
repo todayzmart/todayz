@@ -69,8 +69,21 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		if err != nil {
 			return err
 		}
+		// A delivery cart is told the next delivery window first; the shop
+		// must be open too (its hours, or closed by the shop).
+		var address []byte
+		if c.fulfilment == Delivery {
+			if err := s.deliveryClosed(st, now); err != nil {
+				return err
+			}
+		}
 		if !s.open(st.Hours, st.ClosedUntil, now) {
 			return problem.New(genproblems.StoreClosed, "")
+		}
+		if c.fulfilment == Delivery {
+			if address, err = s.deliveryAddress(ctx, p.UserID, st, c); err != nil {
+				return err
+			}
 		}
 
 		// The customer's row, held to the end: a second order of theirs and
@@ -102,6 +115,11 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		if err != nil {
 			return err
 		}
+		if c.fulfilment == Delivery {
+			if err := belowMinimum(qq); err != nil {
+				return err
+			}
+		}
 		if err := s.checkCreditsAsked(ctx, qq); err != nil {
 			return err
 		}
@@ -127,7 +145,7 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		err = s.withFreshCode(ctx, storeID, orderID, func(ctx context.Context, code sealedCode) error {
 			v, err := s.q(ctx).InsertOrder(ctx, ordersdb.InsertOrderParams{
 				ID: ids.UUID(orderID), CustomerID: ids.UUID(p.UserID), StoreID: st.ID, AskReplyID: askReply,
-				Fulfilment: Pickup, SubtotalPaise: qq.subtotal, DiscountPaise: qq.discount,
+				Fulfilment: c.fulfilment, AddressSnapshot: address, SubtotalPaise: qq.subtotal, DiscountPaise: qq.discount,
 				ItemsAfterOffersPaise: qq.itemsAfterOffers, ItemSubtotalPaise: qq.itemSubtotal,
 				CreditsUsed: i32(qq.creditsUsed), DeliveryFeePaise: qq.fee, TotalPaise: qq.total,
 				CashbackBp: st.CashbackBp, CodeEnc: code.enc, CodeHmac: code.mac, AcceptBy: &acceptBy, PlacedAt: now,

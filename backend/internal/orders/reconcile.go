@@ -11,11 +11,13 @@ import (
 	"github.com/todayz/backend/gen/sqlc/ordersdb"
 	"github.com/todayz/backend/internal/platform/ids"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
+	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
 // KindReconcile is the timers' reconcile sweep (BK-20, BK-21): every minute
-// it finds orders past accept_by, partial_confirm_by or hold_until that are
+// it finds orders past accept_by, partial_confirm_by, hold_until or
+// dispatch_by, and failed deliveries with a return step due, that are
 // still waiting (a timer discarded after its attempts, or lost) and applies
 // the timer's outcome, through the same code, so a run that meets the
 // timer itself changes nothing twice.
@@ -83,6 +85,28 @@ func dueHolds(ctx context.Context, q *ordersdb.Queries, before time.Time, k dueK
 	return out, err
 }
 
+func dueDispatches(ctx context.Context, q *ordersdb.Queries, before time.Time, k dueKey) ([]dueRow, error) {
+	rows, err := q.DueDispatches(ctx, ordersdb.DueDispatchesParams{Before: before, AfterFailed: k.failed, AfterAt: k.at, AfterID: k.id, Lim: reconcilePage})
+	out := make([]dueRow, len(rows))
+	for i, r := range rows {
+		out[i] = dueRow{r.ID, r.Due, r.Failed}
+	}
+	return out, err
+}
+
+// dueReturns reads failed deliveries with a return step due at before.
+func dueReturns(ctx context.Context, q *ordersdb.Queries, before time.Time, k dueKey) ([]dueRow, error) {
+	rows, err := q.DueReturns(ctx, ordersdb.DueReturnsParams{
+		First: before.Add(-returnFirstAfter), Second: before.Add(-returnSecondAfter), Settle: before.Add(-returnSettleAfter),
+		Before: before, AfterFailed: k.failed, AfterAt: k.at, AfterID: k.id, Lim: reconcilePage,
+	})
+	out := make([]dueRow, len(rows))
+	for i, r := range rows {
+		out[i] = dueRow{r.ID, r.Due, r.Failed}
+	}
+	return out, err
+}
+
 type reconciled struct{ expired, noop, failed int64 }
 
 // Reconcile is the KindReconcile handler. Each order is locked and checked
@@ -99,6 +123,10 @@ func (s *Service) Reconcile(ctx context.Context, _ platformjobs.Run) (platformjo
 	if err != nil {
 		return platformjobs.Result{}, err
 	}
+	threshold, err := s.count(ctx, settings.StoreStrikeRiskThreshold)
+	if err != nil {
+		return platformjobs.Result{}, err
+	}
 	before := s.now()
 	var out reconciled
 	walks := []struct {
@@ -109,6 +137,11 @@ func (s *Service) Reconcile(ctx context.Context, _ platformjobs.Run) (platformjo
 		{KindAcceptTimeout, dueUnanswered, s.expireUnanswered},
 		{KindPartialTimeout, duePartials, s.expirePartial},
 		{KindNoShow, dueHolds, func(ctx context.Context, id ids.ID) (bool, error) { return s.expireNoShow(ctx, id, nil, rules) }},
+		{KindDispatchTimeout, dueDispatches, func(ctx context.Context, id ids.ID) (bool, error) { return s.expireDispatch(ctx, id, threshold) }},
+		{KindDeliveryReturn, dueReturns, func(ctx context.Context, id ids.ID) (bool, error) {
+			did, err := s.returnStep(ctx, id, 0)
+			return did != "", err
+		}},
 	}
 	for _, w := range walks {
 		if err := s.walk(ctx, w.name, before, w.page, w.apply, &out); err != nil {

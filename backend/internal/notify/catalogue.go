@@ -60,6 +60,13 @@ var catalogue = map[string]kindDef{
 			"hi": {"नया ऑर्डर", "{store} पर एक नया ऑर्डर इंतज़ार कर रहा है।"},
 		},
 	},
+	notice.KindDeliveryReturnPending: {
+		// D-69: in-app only; the business inbox of the store.
+		App: AppBusiness, Params: []string{"store"},
+		Text: map[string]text{
+			"en": {"Confirm a return", "A failed delivery at {store} is waiting for you to confirm the goods came back."},
+		},
+	},
 	notice.KindOrderUnseen: {
 		// 01 §15: SMS (WhatsApp when enabled, SMS the fallback), once per order.
 		App: AppBusiness, Channels: []notice.Channel{notice.SMS, notice.WhatsApp}, Params: []string{"store", "minutes"},

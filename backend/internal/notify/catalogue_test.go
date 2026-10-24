@@ -15,7 +15,7 @@ import (
 
 func TestCatalogueIsComplete(t *testing.T) {
 	require.Equal(t, []string{
-		notice.KindAskReply, notice.KindCreditsEarned, notice.KindCreditsExpiring, notice.KindNewAsk,
+		notice.KindAskReply, notice.KindCreditsEarned, notice.KindCreditsExpiring, notice.KindDeliveryReturnPending, notice.KindNewAsk,
 		notice.KindNewOrder, notice.KindOrderUnseen, notice.KindOrderUpdate,
 		notice.KindReferralUnlocked, notice.KindShopReferralUnlocked,
 	}, Kinds())

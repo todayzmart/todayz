@@ -17,9 +17,25 @@
 -- business verified (D-40, the same filter as discovery).
 SELECT s.id, s.business_id, s.slug, s.name, s.address_line1, s.address_line2, s.locality,
        s.status, (b.status = 'verified')::bool AS business_verified,
-       s.accepts_pickup, s.accepts_delivery, s.hours, s.closed_until, s.cashback_bp, s.auto_accept
+       s.accepts_pickup, s.accepts_delivery, s.hours, s.closed_until, s.cashback_bp, s.auto_accept,
+       s.delivery_radius_m, s.delivery_fee_paise, s.delivery_free_above_paise, s.delivery_min_order_paise,
+       s.delivery_hours, (s.location IS NOT NULL)::bool AS has_location
 FROM stores s JOIN businesses b ON b.id = s.business_id
 WHERE s.id = @id;
+
+-- name: AddressForDelivery :one
+-- The customer's saved address, with whether it is inside the store's
+-- delivery radius (BK-23). Another user's address is missing.
+SELECT a.label, a.line1, a.line2, a.landmark, a.pincode,
+       ST_Y(a.location::geometry)::float8 AS lat, ST_X(a.location::geometry)::float8 AS lng,
+       coalesce(ST_DWithin(a.location, s.location, s.delivery_radius_m), false)::bool AS in_radius
+FROM addresses a, stores s
+WHERE a.id = @id AND a.user_id = @user_id AND s.id = @store_id;
+
+-- name: StoreDeliveryFee :one
+-- The store's delivery fee and free-above threshold now (a partial accept
+-- recomputes the fee on the kept lines, 01 §5.2).
+SELECT delivery_fee_paise, delivery_free_above_paise FROM stores WHERE id = @id;
 
 -- name: ItemsForBooking :many
 -- The named items of the store with the product fields a line shows. An id
@@ -66,10 +82,10 @@ SELECT EXISTS (
 -- name: InsertOrder :one
 INSERT INTO orders (id, customer_id, store_id, ask_reply_id, fulfilment, subtotal_paise, discount_paise,
   items_after_offers_paise, item_subtotal_paise, credits_used, delivery_fee_paise, total_paise,
-  cashback_bp, code_enc, code_hmac, accept_by, placed_at)
+  cashback_bp, code_enc, code_hmac, accept_by, placed_at, address_snapshot)
 VALUES (@id, @customer_id, @store_id, sqlc.narg(ask_reply_id), @fulfilment, @subtotal_paise, @discount_paise,
   @items_after_offers_paise, @item_subtotal_paise, @credits_used, @delivery_fee_paise, @total_paise,
-  @cashback_bp, @code_enc, @code_hmac, @accept_by, @placed_at)
+  @cashback_bp, @code_enc, @code_hmac, @accept_by, @placed_at, sqlc.narg(address_snapshot))
 RETURNING version;
 
 -- name: InsertOrderItem :exec
@@ -124,7 +140,10 @@ WHERE u.id = @id;
 ------------------------------------------------------------------------------
 
 -- name: SetAccepted :one
-UPDATE orders SET status = 'accepted', accepted_at = @now, hold_until = @hold_until, version = version + 1
+-- A pickup order gets hold_until, a delivery order dispatch_by; the other
+-- stays null.
+UPDATE orders SET status = 'accepted', accepted_at = @now, hold_until = sqlc.narg(hold_until),
+  dispatch_by = sqlc.narg(dispatch_by), version = version + 1
 WHERE id = @id
 RETURNING version;
 
@@ -192,6 +211,49 @@ UPDATE orders SET status = 'collected', collected_at = @now, payment_status = 'p
   payment_method = @payment_method, cashback_credits = @cashback_credits, version = version + 1
 WHERE id = @id
 RETURNING version;
+
+-- name: SetDispatched :one
+UPDATE orders SET status = 'out_for_delivery', version = version + 1 WHERE id = @id
+RETURNING version;
+
+-- name: SetDelivered :one
+-- delivered; collected_at is the hand-over time for both fulfilments.
+UPDATE orders SET status = 'delivered', collected_at = @now, payment_status = 'paid',
+  payment_method = @payment_method, cashback_credits = @cashback_credits, version = version + 1
+WHERE id = @id
+RETURNING version;
+
+-- name: SetDeliveryFailed :one
+UPDATE orders SET status = 'delivery_failed', status_reason = @reason, status_note = sqlc.narg(note),
+  delivery_failed_at = @now, version = version + 1
+WHERE id = @id
+RETURNING version;
+
+-- name: SetReturnSettled :one
+-- The goods of a failed delivery came back, were damaged, or (the system,
+-- at 72 h) were never confirmed (D-69). Once: a settled return matches no
+-- row.
+UPDATE orders SET return_outcome = @outcome, return_confirmed_at = @now,
+  return_confirmed_by = sqlc.narg(confirmed_by), version = version + 1
+WHERE id = @id AND status = 'delivery_failed' AND return_confirmed_at IS NULL
+RETURNING version;
+
+-- name: SetReturnReminders :execrows
+-- Records that the reminder numbered @sent went out (2 h is 1, 24 h is 2);
+-- a second run of the same reminder matches no row.
+UPDATE orders SET return_reminders_sent = @sent
+WHERE id = @id AND return_confirmed_at IS NULL AND return_reminders_sent < @sent;
+
+-- name: InsertReturnUnconfirmedFlag :exec
+-- The risk flag a return nobody confirmed in 72 h raises (01 §5.3, D-69),
+-- one per order.
+INSERT INTO risk_flags (id, subject_type, subject_id, rule, score, details, created_at, updated_at)
+SELECT @id, 'store', @store_id, 'return_unconfirmed', @score, @details, @now, @now
+WHERE NOT EXISTS (
+  SELECT 1 FROM risk_flags rf
+  WHERE rf.subject_type = 'store' AND rf.subject_id = @store_id AND rf.rule = 'return_unconfirmed'
+    AND rf.details->>'orderId' = sqlc.arg(order_key)::text
+);
 
 -- name: SetExtended :one
 UPDATE orders SET hold_until = @hold_until, extended_at = @now, version = version + 1
@@ -263,10 +325,15 @@ LIMIT @lim;
 -- A store's orders for one B-04 tab, newest first. settled, when set, keeps
 -- only delivery_failed orders whose return is (true) or is not (false)
 -- confirmed; other statuses pass.
+-- The sealed phone is read only while the order is out for delivery (BK-27);
+-- the service opens it then and masks nothing else.
 SELECT o.id, o.display_number, o.status, o.status_reason, o.fulfilment, o.total_paise, o.placed_at,
-       o.accept_by, o.hold_until, o.version, o.seen_at, u.name AS customer_name,
+       o.accept_by, o.hold_until, o.dispatch_by, o.delivery_failed_at, o.return_outcome,
+       o.version, o.seen_at, u.name AS customer_name,
+       (CASE WHEN o.status = 'out_for_delivery' THEN pi.phone_enc END)::bytea AS phone_enc,
        (SELECT count(*) FROM order_items oi WHERE oi.order_id = o.id)::int AS item_count
 FROM orders o JOIN users u ON u.id = o.customer_id
+  LEFT JOIN phone_identities pi ON pi.user_id = o.customer_id
 WHERE o.store_id = @store_id
   AND o.status = ANY(@statuses::text[])
   AND (sqlc.narg(settled)::bool IS NULL OR o.status <> 'delivery_failed'
@@ -387,6 +454,37 @@ WHERE status IN ('accepted','ready') AND fulfilment = 'pickup' AND hold_until <=
   AND (coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), hold_until, id)
     > (@after_failed::timestamptz, @after_at::timestamptz, @after_id::uuid)
 ORDER BY coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), hold_until, id
+LIMIT @lim;
+
+-- name: DueDispatches :many
+-- The same for accepted delivery orders past dispatch_by.
+SELECT id, dispatch_by::timestamptz AS due,
+  coalesce(sweep_failed_at, '0001-01-01 00:00:00+00')::timestamptz AS failed
+FROM orders
+WHERE status = 'accepted' AND fulfilment = 'delivery' AND dispatch_by <= @before::timestamptz
+  AND coalesce(sweep_failed_at, '0001-01-01 00:00:00+00') < @before::timestamptz
+  AND (coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), dispatch_by, id)
+    > (@after_failed::timestamptz, @after_at::timestamptz, @after_id::uuid)
+ORDER BY coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), dispatch_by, id
+LIMIT @lim;
+
+-- name: DueReturns :many
+-- The same for failed deliveries whose return nobody confirmed and that
+-- have a step due: the first reminder (failed at or before @first), the
+-- second (@second) or the auto-confirm (@settle). An order between its
+-- steps is not read every minute. ix_orders_delivery_failed_at.
+SELECT id, delivery_failed_at::timestamptz AS due,
+  coalesce(sweep_failed_at, '0001-01-01 00:00:00+00')::timestamptz AS failed
+FROM orders
+WHERE status = 'delivery_failed' AND return_confirmed_at IS NULL
+  AND delivery_failed_at <= @first::timestamptz
+  AND ((return_reminders_sent = 0)
+       OR (return_reminders_sent = 1 AND delivery_failed_at <= @second::timestamptz)
+       OR delivery_failed_at <= @settle::timestamptz)
+  AND coalesce(sweep_failed_at, '0001-01-01 00:00:00+00') < @before::timestamptz
+  AND (coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), delivery_failed_at, id)
+    > (@after_failed::timestamptz, @after_at::timestamptz, @after_id::uuid)
+ORDER BY coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), delivery_failed_at, id
 LIMIT @lim;
 
 -- name: SetSweepFailed :exec

@@ -31,11 +31,13 @@ const (
 	reasonNoShow      = "no_show"
 )
 
-// TimerArgs are a timer's job arguments: the order, and for the no-show
-// timer the hold it was set for. Nothing else (no code, no customer).
+// TimerArgs are a timer's job arguments: the order, for the no-show timer
+// the hold it was set for, and for the return job its step. Nothing else
+// (no code, no customer).
 type TimerArgs struct {
 	OrderID   ids.ID     `json:"orderId"`
 	HoldUntil *time.Time `json:"holdUntil,omitempty"`
+	Step      int        `json:"step,omitempty"`
 }
 
 // errEarly is a timer run before its deadline (a clock skew between the

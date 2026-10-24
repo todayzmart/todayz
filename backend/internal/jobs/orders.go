@@ -81,12 +81,18 @@ func registerorders(r *Registry, d Deps) {
 	timer(orders.KindNoShow,
 		"Expires a held pickup order nobody collected by hold_until, returns its stock and records a no-show strike (BK-14)",
 		(*orders.Service).ExpireNoShow)
+	timer(orders.KindDispatchTimeout,
+		"Expires an accepted delivery order the shop did not dispatch by dispatch_by, returns its stock and credits and records a store strike (BK-24)",
+		(*orders.Service).ExpireDispatch)
+	timer(orders.KindDeliveryReturn,
+		"A failed delivery's return: reminds the store at 2 h and 24 h, and at 72 h settles it unconfirmed, releases the stock and flags the store (D-69, BK-26)",
+		(*orders.Service).ReturnStep)
 	timer(orders.KindPartialTimeout,
 		"Cancels a partly accepted order the customer did not confirm or decline by partial_confirm_by, releasing its credits, with no strike (BK-10)",
 		(*orders.Service).ExpirePartial)
 	platformjobs.Define(r, platformjobs.Kind{
 		Name: orders.KindReconcile, Owner: "W2-02", Class: platformjobs.ClassTimer,
-		Description: "Applies the orders timers' outcomes to orders still waiting past accept_by, partial_confirm_by or hold_until (BK-20, BK-21)",
+		Description: "Applies the orders timers' outcomes to orders still waiting past accept_by, partial_confirm_by, hold_until or dispatch_by, and failed deliveries with a return step due (BK-20, BK-21, D-69)",
 		Schedule:    "* * * * *", UniqueBy: platformjobs.PerTick, Timeout: 50 * time.Second, MaxAttempts: 3, Concurrency: 1,
 		Runbook: "docs/runbooks/orders-timers.md",
 		Handler: func(ctx context.Context, rn platformjobs.Run) (platformjobs.Result, error) {
@@ -151,7 +157,8 @@ func lazyEnqueuer(r *Registry, d Deps, who string) func() (platformjobs.Enqueuer
 }
 
 // OrdersStock is the catalogue's stock writer as orders.Stock: a collected
-// line is one sale_online movement referring to the order, idempotent on the
+// or delivered line is one sale_online movement referring to the order, a
+// line returned damaged one damage movement, each idempotent on the
 // reservation id. The API's routes file uses it too.
 func OrdersStock(c clock.Clock) orders.Stock { return ordersStock{w: catalogue.NewWriter(c)} }
 
@@ -162,6 +169,18 @@ func (s ordersStock) Sell(ctx context.Context, tx pgx.Tx, in orders.Sale) (ids.I
 		StoreID: in.StoreID, ItemID: in.ItemID, Qty: in.Qty,
 		Source: catalogue.SourceSaleOnline, RefType: "order", RefID: in.OrderID,
 		ClientID: in.ClientID, Who: catalogue.Who{UserID: in.UserID},
+	})
+	if err != nil {
+		return ids.Zero, err
+	}
+	return m.ID, nil
+}
+
+func (s ordersStock) Damage(ctx context.Context, tx pgx.Tx, in orders.Damage) (ids.ID, error) {
+	note := "Returned damaged from a failed delivery"
+	m, err := s.w.Remove(ctx, tx, catalogue.Removal{
+		StoreID: in.StoreID, ItemID: in.ItemID, Qty: in.Qty, Source: catalogue.SourceDamage,
+		ClientID: in.ClientID, Note: &note, Who: catalogue.Who{UserID: in.UserID},
 	})
 	if err != nil {
 		return ids.Zero, err

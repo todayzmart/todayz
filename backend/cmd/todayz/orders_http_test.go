@@ -1301,7 +1301,9 @@ func walkStrings(v any, f func(string)) {
 type move struct{ from, to, actor string }
 
 // planMoves is 03 §4.1: every (from, to, actor) the plan allows, with the
-// reason when it is not built in W2-02.
+// reason when this table does not reach it: it is not built yet, or (the
+// delivery moves) it needs a delivery order, and the table's orders are
+// pickup; orders_delivery_http_test covers those.
 var planMoves = map[move]string{
 	{"placed", "accepted", "staff"}:                  "",
 	{"placed", "awaiting_customer", "staff"}:         "",
@@ -1316,13 +1318,13 @@ var planMoves = map[move]string{
 	{"accepted", "ready", "staff"}:                   "",
 	{"accepted", "collected", "staff"}:               "",
 	{"ready", "collected", "staff"}:                  "",
-	{"accepted", "expired", "system"}:                "", // pickup no-show; delivery dispatch_timeout is deferred
+	{"accepted", "expired", "system"}:                "", // pickup no-show; delivery dispatch_timeout in orders_delivery_http_test
 	{"ready", "expired", "system"}:                   "",
 	{"accepted", "cancelled", "staff"}:               "",
 	{"ready", "cancelled", "staff"}:                  "",
-	{"accepted", "out_for_delivery", "staff"}:        "delivery (BK-23–25)",
-	{"out_for_delivery", "delivered", "staff"}:       "delivery (BK-23–25)",
-	{"out_for_delivery", "delivery_failed", "staff"}: "delivery (BK-23–25)",
+	{"accepted", "out_for_delivery", "staff"}:        "a delivery order (orders_delivery_http_test, BK-24–26)",
+	{"out_for_delivery", "delivered", "staff"}:       "a delivery order (orders_delivery_http_test, BK-24–26)",
+	{"out_for_delivery", "delivery_failed", "staff"}: "a delivery order (orders_delivery_http_test, BK-24–26)",
 	{"placed", "cancelled", "admin"}:                 "admin cancel (D-20)",
 	{"awaiting_customer", "cancelled", "admin"}:      "admin cancel (D-20)",
 	{"accepted", "cancelled", "admin"}:               "admin cancel (D-20)",

@@ -11,9 +11,9 @@
 # are in internal/platform/authz/policy/orders.go. Every unsafe order route
 # takes a required Idempotency-Key; order create and every transition is
 # `x-money` (04 §1.6). The checkout quote lives here, not in a checkout
-# domain: it is the orders package's pricing (W2-02 report). Pickup only for
-# now: delivery and returns are in the contract so clients can
-# build against them, and answer as each operation says until they ship.
+# domain: it is the orders package's pricing (W2-02 report). Delivery,
+# dispatch, failed deliveries and returns came with the W2-02 delivery half
+# (docs/qa/W2-02-delivery/REPORT.md).
 /v1/me/checkout/quote:
   post:
     operationId: quoteCheckout
@@ -25,13 +25,20 @@
       price; an `askReplyId` that is this customer's Yes for this store prices that item's line at the
       replied price while it is valid (`priceSource: ask_reply`, D-101) and is ignored otherwise. `orderable`
       is false while any line is short. Credits (W2-01): `creditsAllowed` is what the wallet, the per-order
-      max, the ₹1 floor and the caps allow for `creditsToUse`; `creditsLimit` says why it is less (D-76). `409 store_not_bookable` for a store that takes no pickup
-      orders (or `fulfilment: delivery` until delivery ships); `409 ask_reply_used` when the reply already
+      max, the ₹1 floor and the caps allow for `creditsToUse`; `creditsLimit` says why it is less (D-76). `409 store_not_bookable` for a store that takes no orders of this
+      fulfilment, and for delivery while `feature_delivery_enabled` is off or the address is outside the
+      delivery radius (`extensions.reason: outside_delivery_radius`). Delivery (BK-23) needs `addressId`
+      (`422 validation_failed` on `body.addressId` otherwise); `409 below_minimum` with `extensions.minimumPaise`
+      when the item subtotal is under the store's minimum (D-94); `409 delivery_closed` outside delivery hours
+      with `extensions.nextDeliveryWindow` (`NextDeliveryWindow`, null when nothing opens within 7 days);
+      the fee is 0 when the item subtotal is at or above the store's free-delivery amount. `409 ask_reply_used` when the reply already
       has an active order; `409 ordering_suspended` with `extensions.until` while no-show strikes limit the
       account and it already has an unfinished order (BK-16, 01 §5.4; placing checks it again).
     x-idempotency: none
     x-problems:
     - store_not_bookable
+    - delivery_closed
+    - below_minimum
     - ask_reply_used
     - ordering_suspended
     requestBody:
@@ -170,7 +177,8 @@
       naming the line in `extensions.storeItemId` and `extensions.available`. Sets `accept_by` from `order_accept_timeout_min`,
       notifies the store and starts the accept timer. Nothing is reserved until the shop accepts (D-01).
       `409 store_closed` outside opening hours or while closed by the shop; `409 store_not_bookable` when
-      the store takes no pickup orders or is not live (delivery is refused the same way until it ships);
+      the store takes no orders of this fulfilment or is not live; delivery is checked as in the quote
+      (`below_minimum`, `delivery_closed`, radius) and snapshots the address onto the order;
       `409 ordering_suspended` with `extensions.until` while no-show strikes limit the account and it
       already has an unfinished order (01 §5.4); with `creditsToUse` the credits are held in the same
       transaction (W2-01): `409 below_credit_minimum`, `credit_max_exceeded`, `credit_monthly_cap` or
@@ -278,6 +286,11 @@
               placedAt: '2026-10-23T05:00:00Z'
               acceptedAt: null
               collectedAt: null
+              dispatchBy: null
+              deliveryFailedAt: null
+              returnOutcome: null
+              returnConfirmedAt: null
+              deliveryAddress: null
               timeline:
               - fromStatus: null
                 toStatus: placed
@@ -369,6 +382,11 @@
               placedAt: '2026-10-23T05:00:00Z'
               acceptedAt: '2026-10-23T05:03:00Z'
               collectedAt: null
+              dispatchBy: null
+              deliveryFailedAt: null
+              returnOutcome: null
+              returnConfirmedAt: null
+              deliveryAddress: null
               timeline:
               - fromStatus: null
                 toStatus: placed
@@ -397,7 +415,8 @@
     - orders
     summary: Cancel my order
     description: >-
-      From placed, awaiting_customer, accepted or ready (03 §4.1). Releases any reserved stock. `declined_partial`
+      From placed, awaiting_customer, accepted or ready (03 §4.1); a delivery order only before its
+      `dispatchBy`, never once out_for_delivery (01 §5.2). Releases any reserved stock. `declined_partial`
       is refused here (`422 validation_failed`); `other` needs `note`. `409 invalid_transition` from any
       other state.
     x-idempotency: required
@@ -478,6 +497,11 @@
               placedAt: '2026-10-23T05:00:00Z'
               acceptedAt: null
               collectedAt: null
+              dispatchBy: null
+              deliveryFailedAt: null
+              returnOutcome: null
+              returnConfirmedAt: null
+              deliveryAddress: null
               timeline:
               - fromStatus: null
                 toStatus: placed
@@ -594,6 +618,11 @@
               placedAt: '2026-10-23T05:00:00Z'
               acceptedAt: '2026-10-23T05:03:00Z'
               collectedAt: null
+              dispatchBy: null
+              deliveryFailedAt: null
+              returnOutcome: null
+              returnConfirmedAt: null
+              deliveryAddress: null
               timeline:
               - fromStatus: null
                 toStatus: placed
@@ -695,6 +724,11 @@
               placedAt: '2026-10-23T05:00:00Z'
               acceptedAt: '2026-10-23T05:03:00Z'
               collectedAt: null
+              dispatchBy: null
+              deliveryFailedAt: null
+              returnOutcome: null
+              returnConfirmedAt: null
+              deliveryAddress: null
               timeline:
               - fromStatus: null
                 toStatus: placed
@@ -724,7 +758,7 @@
     summary: Get a new pickup code after a lock
     description: >-
       After `code_locked` (5 wrong tries at the counter): a new code, with the tries reset. `409 invalid_transition`
-      when the code is not locked or the order cannot be handed over. Read the order for the new code;
+      when the code is not locked or the order cannot be handed over (accepted, ready or out_for_delivery). Read the order for the new code;
       the response never carries it.
     x-idempotency: required
     parameters:
@@ -795,6 +829,11 @@
               placedAt: '2026-10-23T05:00:00Z'
               acceptedAt: '2026-10-23T05:03:00Z'
               collectedAt: null
+              dispatchBy: null
+              deliveryFailedAt: null
+              returnOutcome: null
+              returnConfirmedAt: null
+              deliveryAddress: null
               timeline:
               - fromStatus: null
                 toStatus: placed
@@ -831,7 +870,8 @@
       Cashier and above. Newest first. `status` picks a B-04 tab: `new` (placed), `accepted` (awaiting_customer,
       accepted), `ready`, `out_for_delivery`, `returns` (delivery_failed, not settled), `done` (collected,
       delivered, settled delivery_failed), `missed` (rejected, expired, cancelled); every order when omitted.
-      The customer's phone is masked (D-60). Listing marks the listed new orders as seen.
+      The customer's phone is masked (D-60); `customerPhone` is the full number only while out_for_delivery
+      (BK-27). Listing marks the listed new orders as seen.
     parameters:
     - name: status
       in: query
@@ -859,6 +899,7 @@
               - id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
                 number: TZ-024817
                 customerName: Asha
+                customerPhone: null
                 fulfilment: pickup
                 status: placed
                 statusReason: null
@@ -866,6 +907,9 @@
                 totalPaise: 40100
                 acceptBy: '2026-10-23T05:10:00Z'
                 holdUntil: null
+                dispatchBy: null
+                deliveryFailedAt: null
+                returnOutcome: null
                 placedAt: '2026-10-23T05:00:00Z'
                 seen: false
                 version: 1
@@ -897,6 +941,7 @@
     summary: One order with its timeline (B-04)
     description: >-
       Cashier and above. Never contains the code (D-04). An order of another store is `404 not_found`.
+      `customer.phone` is the full number only while out_for_delivery (BK-27).
       Opening an order marks it seen.
     responses:
       '200':
@@ -911,6 +956,7 @@
               customer:
                 name: Asha
                 phoneMasked: 90•••••001
+                phone: null
               fulfilment: pickup
               status: placed
               statusReason: null
@@ -960,6 +1006,11 @@
               placedAt: '2026-10-23T05:00:00Z'
               acceptedAt: null
               collectedAt: null
+              dispatchBy: null
+              deliveryFailedAt: null
+              returnOutcome: null
+              returnConfirmedAt: null
+              deliveryAddress: null
               timeline:
               - fromStatus: null
                 toStatus: placed
@@ -1033,6 +1084,7 @@
               customer:
                 name: Asha
                 phoneMasked: 90•••••001
+                phone: null
               fulfilment: pickup
               status: accepted
               statusReason: null
@@ -1082,6 +1134,11 @@
               placedAt: '2026-10-23T05:00:00Z'
               acceptedAt: '2026-10-23T05:03:00Z'
               collectedAt: null
+              dispatchBy: null
+              deliveryFailedAt: null
+              returnOutcome: null
+              returnConfirmedAt: null
+              deliveryAddress: null
               timeline:
               - fromStatus: null
                 toStatus: placed
@@ -1145,6 +1202,7 @@
               customer:
                 name: Asha
                 phoneMasked: 90•••••001
+                phone: null
               fulfilment: pickup
               status: rejected
               statusReason: out_of_stock
@@ -1194,6 +1252,11 @@
               placedAt: '2026-10-23T05:00:00Z'
               acceptedAt: null
               collectedAt: null
+              dispatchBy: null
+              deliveryFailedAt: null
+              returnOutcome: null
+              returnConfirmedAt: null
+              deliveryAddress: null
               timeline:
               - fromStatus: null
                 toStatus: placed
@@ -1250,6 +1313,7 @@
               customer:
                 name: Asha
                 phoneMasked: 90•••••001
+                phone: null
               fulfilment: pickup
               status: ready
               statusReason: null
@@ -1299,6 +1363,11 @@
               placedAt: '2026-10-23T05:00:00Z'
               acceptedAt: '2026-10-23T05:03:00Z'
               collectedAt: null
+              dispatchBy: null
+              deliveryFailedAt: null
+              returnOutcome: null
+              returnConfirmedAt: null
+              deliveryAddress: null
               timeline:
               - fromStatus: null
                 toStatus: placed
@@ -1342,8 +1411,9 @@
     - orders
     summary: Send a delivery order out
     description: >-
-      Cashier and above, accepted to out_for_delivery, delivery only. Delivery is not built yet, so this
-      answers `409 invalid_transition` (W2-02 report).
+      Cashier and above, accepted to out_for_delivery, delivery only. The customer is told. Missing
+      `dispatchBy` expires the order instead (`dispatch_timeout`, a store strike, reservations and credits
+      released). `409 invalid_transition` from any other state.
     x-idempotency: required
     x-money: true
     parameters:
@@ -1361,6 +1431,7 @@
               customer:
                 name: Asha
                 phoneMasked: 90•••••001
+                phone: null
               fulfilment: pickup
               status: accepted
               statusReason: null
@@ -1410,6 +1481,11 @@
               placedAt: '2026-10-23T05:00:00Z'
               acceptedAt: '2026-10-23T05:03:00Z'
               collectedAt: null
+              dispatchBy: null
+              deliveryFailedAt: null
+              returnOutcome: null
+              returnConfirmedAt: null
+              deliveryAddress: null
               timeline:
               - fromStatus: null
                 toStatus: placed
@@ -1448,8 +1524,10 @@
     - orders
     summary: Record a failed delivery
     description: >-
-      Cashier and above, only from out_for_delivery (D-22). Delivery is not built yet, so this answers
-      `409 invalid_transition` (W2-02 report).
+      Cashier and above, only from out_for_delivery (D-22); `other` needs `note`. The held credits are
+      released, no cashback, and the stock stays reserved until the shop confirms the return (D-69); the
+      shop is reminded in its inbox 2 h and 24 h later, and at 72 h the reservations are released as
+      `unconfirmed` and the shop is flagged. `409 invalid_transition` from any other state.
     x-idempotency: required
     x-money: true
     parameters:
@@ -1475,6 +1553,7 @@
               customer:
                 name: Asha
                 phoneMasked: 90•••••001
+                phone: null
               fulfilment: pickup
               status: accepted
               statusReason: null
@@ -1524,6 +1603,11 @@
               placedAt: '2026-10-23T05:00:00Z'
               acceptedAt: '2026-10-23T05:03:00Z'
               collectedAt: null
+              dispatchBy: null
+              deliveryFailedAt: null
+              returnOutcome: null
+              returnConfirmedAt: null
+              deliveryAddress: null
               timeline:
               - fromStatus: null
                 toStatus: placed
@@ -1562,8 +1646,10 @@
     - orders
     summary: Settle the goods of a failed delivery
     description: >-
-      `returned`: cashier and above; `damaged`: manager and above (D-69). Delivery is not built yet, so
-      this answers `409 invalid_transition` (W2-02 report).
+      `returned`: cashier and above, releases the reservations; `damaged`: manager and above (`403 forbidden`
+      for a cashier), writes one `damage` movement per line, then releases (D-69). Once per failed delivery:
+      a second confirm, or one after the 72 h auto-release, is `409 invalid_transition`. The status stays
+      delivery_failed; `returnOutcome` and `returnConfirmedAt` are set.
     x-idempotency: required
     x-money: true
     parameters:
@@ -1589,6 +1675,7 @@
               customer:
                 name: Asha
                 phoneMasked: 90•••••001
+                phone: null
               fulfilment: pickup
               status: accepted
               statusReason: null
@@ -1638,6 +1725,11 @@
               placedAt: '2026-10-23T05:00:00Z'
               acceptedAt: '2026-10-23T05:03:00Z'
               collectedAt: null
+              dispatchBy: null
+              deliveryFailedAt: null
+              returnOutcome: null
+              returnConfirmedAt: null
+              deliveryAddress: null
               timeline:
               - fromStatus: null
                 toStatus: placed
@@ -1676,7 +1768,8 @@
     - orders
     summary: Cancel an accepted order
     description: >-
-      Manager and above (D-65), from accepted or ready. Releases the reservations; no strike (D-68). `other`
+      Manager and above (D-65), from accepted or ready; a delivery order from accepted only, before its
+      `dispatchBy`. Releases the reservations; no strike (D-68). `other`
       needs `note`.
     x-idempotency: required
     x-money: true
@@ -1703,6 +1796,7 @@
               customer:
                 name: Asha
                 phoneMasked: 90•••••001
+                phone: null
               fulfilment: pickup
               status: cancelled
               statusReason: closing_soon
@@ -1752,6 +1846,11 @@
               placedAt: '2026-10-23T05:00:00Z'
               acceptedAt: '2026-10-23T05:03:00Z'
               collectedAt: null
+              dispatchBy: null
+              deliveryFailedAt: null
+              returnOutcome: null
+              returnConfirmedAt: null
+              deliveryAddress: null
               timeline:
               - fromStatus: null
                 toStatus: placed
@@ -1795,10 +1894,11 @@
     - orders
     summary: Hand over an order with the customer's code
     description: >-
-      Cashier and above, from accepted or ready. The code is checked against this order only, in constant
+      Cashier and above, from accepted or ready (pickup) or out_for_delivery (delivery, BK-26). The code is checked against this order only, in constant
       time (D-04). A wrong code is `422 code_invalid` with `extensions.attemptsLeft`; the 5th wrong code
       locks it (`409 code_locked`) until the customer gets a new one. A right code marks the order collected,
-      records the payment method and sells the reserved stock (`sale_online`, D-01).
+      records the payment method and sells the reserved stock (`sale_online`, D-01); a delivery order
+      becomes delivered.
     x-idempotency: required
     x-money: true
     x-problems:
@@ -1828,6 +1928,7 @@
               customer:
                 name: Asha
                 phoneMasked: 90•••••001
+                phone: null
               fulfilment: pickup
               status: collected
               statusReason: null
@@ -1877,6 +1978,11 @@
               placedAt: '2026-10-23T05:00:00Z'
               acceptedAt: '2026-10-23T05:03:00Z'
               collectedAt: '2026-10-23T05:25:00Z'
+              dispatchBy: null
+              deliveryFailedAt: null
+              returnOutcome: null
+              returnConfirmedAt: null
+              deliveryAddress: null
               timeline:
               - fromStatus: null
                 toStatus: placed
