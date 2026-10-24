@@ -51,8 +51,10 @@ type fakeHold struct {
 	Amount, Captured, Released int
 	Status                     string
 	CreatedAt                  time.Time
-	// portions is the net held per lot (Σ held_delta of the hold's rows).
+	// portions is the net held per lot (Σ held_delta of the hold's rows);
+	// spent is what the capture took per lot.
 	portions map[ids.ID]int
+	spent    map[ids.ID]int
 	cashback int
 	settled  bool
 }
@@ -136,6 +138,8 @@ func held(c ids.ID) Account   { return Account{Kind: CustomerHeld, Owner: c} }
 func store(s ids.ID) Account  { return Account{Kind: StoreCredit, Owner: s} }
 
 var expiredAcct = Account{Kind: PlatformExpired}
+
+var _ Reverser = (*Fake)(nil)
 
 func (f *Fake) customerLots(c ids.ID) []lotState {
 	var out []lotState
@@ -254,7 +258,7 @@ func (f *Fake) Hold(_ context.Context, req HoldRequest) (Allowance, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.init()
-	if !req.Ref.valid() || req.Credits <= 0 {
+	if !req.Ref.holdable() || req.Credits <= 0 {
 		return Allowance{}, ErrInvalid
 	}
 	if h, ok := f.holds[req.Ref]; ok {
@@ -384,6 +388,18 @@ func (f *Fake) Complete(_ context.Context, c Completion) (Completed, error) {
 	if ok && (h.Customer != c.CustomerID || h.Store != c.StoreID) {
 		return Completed{}, ErrInvalid
 	}
+	bp := f.CashbackBP[c.StoreID]
+	if c.CashbackBP != nil {
+		bp = *c.CashbackBP
+	}
+	// As the service: a ref with no hold and no cashback rate returns before
+	// it looks for a reversal.
+	if _, rev := f.txs[c.Ref.key("reverse")]; rev && ((ok && h.Status != holdNone) || bp > 0) {
+		return Completed{}, ErrReversed
+	}
+	if ok && c.RefuseReleased && h.Status == holdReleased {
+		return Completed{}, ErrReleased
+	}
 	if ok && h.settled {
 		return Completed{Captured: h.Captured, Cashback: h.cashback}, nil
 	}
@@ -394,18 +410,16 @@ func (f *Fake) Complete(_ context.Context, c Completion) (Completed, error) {
 		}); err != nil {
 			return Completed{}, err
 		}
+		h.spent = map[ids.ID]int{}
 		for _, p := range f.heldPortions(h) {
 			f.consume(f.lot(p.Lot), 0, -p.N)
 			h.portions[p.Lot] = 0
+			h.spent[p.Lot] += p.N
 		}
 		h.Captured, h.Status = n, holdCaptured
 	}
 	if ok {
 		out.Captured = h.Captured
-	}
-	bp := f.CashbackBP[c.StoreID]
-	if c.CashbackBP != nil {
-		bp = *c.CashbackBP
 	}
 	cb := cashback(c.EligiblePaise-int64(out.Captured)*paisePerCredit, bp)
 	if cb > 0 {
@@ -426,6 +440,115 @@ func (f *Fake) Complete(_ context.Context, c Completion) (Completed, error) {
 	}
 	h.settled, h.cashback = true, cb
 	return out, nil
+}
+
+// Reverse implements Reverser, as the service does.
+func (f *Fake) Reverse(_ context.Context, r Reversal) (Reversed, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.init()
+	spend := r.spend()
+	if !r.Ref.valid() || !spend.valid() || r.CustomerID == ids.Zero || r.StoreID == ids.Zero {
+		return Reversed{}, ErrInvalid
+	}
+	c, now := r.CustomerID, f.now()
+	cb, err := f.cashbackPaid(r)
+	if err != nil {
+		return Reversed{}, err
+	}
+	if t, ok := f.txs[r.Ref.key("reverse")]; ok {
+		out := Reversed{Restored: legAmount(t, wallet(c)), Expired: legAmount(t, expiredAcct)}
+		if t, ok := f.txs[r.Ref.key("clawback")]; ok {
+			out.ClawedBack = -legAmount(t, wallet(c))
+		}
+		out.Shortfall = cb - out.ClawedBack
+		return out, nil
+	}
+	var spent []portion
+	h, ok := f.holds[spend]
+	if ok && h.Status != holdNone {
+		if h.Customer != c || h.Store != r.StoreID {
+			return Reversed{}, ErrInvalid
+		}
+		switch h.Status {
+		case holdHeld:
+			return Reversed{}, ErrHoldOpen
+		case holdCaptured:
+			for id, n := range h.spent {
+				spent = append(spent, portion{Lot: id, N: n, ExpiresAt: f.lot(id).ExpiresAt})
+			}
+		}
+	}
+	if len(spent) == 0 && cb == 0 {
+		return Reversed{}, nil
+	}
+	back, _, backN, expiredN := splitDue(spent, now)
+	var legs []Leg
+	if n := backN + expiredN; n > 0 {
+		legs = append(legs, Leg{store(r.StoreID), -int64(n)})
+		if backN > 0 {
+			legs = append(legs, Leg{wallet(c), int64(backN)})
+		}
+		if expiredN > 0 {
+			legs = append(legs, Leg{expiredAcct, int64(expiredN)})
+		}
+	}
+	if _, _, err := f.post(TxReversal, r.Ref.key("reverse"), legs); err != nil {
+		return Reversed{}, err
+	}
+	for _, p := range back {
+		f.consume(f.lot(p.Lot), p.N, 0)
+	}
+	out := Reversed{Restored: backN, Expired: expiredN}
+	if cb == 0 {
+		return out, nil
+	}
+	x := min(cb, f.available(c, now))
+	out.ClawedBack, out.Shortfall = x, cb-x
+	if x == 0 {
+		return out, nil
+	}
+	ps, ok := takeFIFO(f.customerLots(c), x, now)
+	if !ok {
+		return Reversed{}, errors.New("credits fake: lots short of the balance")
+	}
+	if _, _, err := f.post(TxReversal, r.Ref.key("clawback"), []Leg{{wallet(c), -int64(x)}, {store(r.StoreID), int64(x)}}); err != nil {
+		return Reversed{}, err
+	}
+	for _, p := range ps {
+		f.consume(f.lot(p.Lot), -p.N, 0)
+	}
+	return out, nil
+}
+
+// cashbackPaid is the cashback posted on r.Ref; it must have gone from r's
+// store to r's customer.
+func (f *Fake) cashbackPaid(r Reversal) (int, error) {
+	t, ok := f.txs[r.Ref.key("cashback")]
+	if !ok {
+		return 0, nil
+	}
+	cb := 0
+	for _, l := range t.Legs {
+		switch {
+		case l.Amount > 0 && l.Account == wallet(r.CustomerID):
+			cb += int(l.Amount)
+		case l.Amount < 0 && l.Account == store(r.StoreID):
+		default:
+			return 0, ErrInvalid
+		}
+	}
+	return cb, nil
+}
+
+func legAmount(t *fakeTx, a Account) int {
+	n := 0
+	for _, l := range t.Legs {
+		if l.Account == a {
+			n += int(l.Amount)
+		}
+	}
+	return n
 }
 
 func (f *Fake) addLot(c ids.ID, kind TxKind, n int) {

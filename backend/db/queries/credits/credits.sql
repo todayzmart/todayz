@@ -160,6 +160,15 @@ WHERE c.hold_id = @hold_id
 GROUP BY c.lot_id, l.expires_at
 HAVING sum(c.held_delta) > 0;
 
+-- CapturedPortions are what a hold's capture spent, per lot: a reversal
+-- gives them back to the same lots (D-08).
+-- name: CapturedPortions :many
+SELECT c.lot_id, l.expires_at, (-sum(c.held_delta))::int AS n
+FROM credit_lot_consumptions c JOIN credit_lots l ON l.id = c.lot_id
+WHERE c.hold_id = @hold_id AND c.kind = 'capture'
+GROUP BY c.lot_id, l.expires_at
+HAVING sum(c.held_delta) < 0;
+
 -- CapUsage counts the holds that count against the caps (D-30): held or
 -- captured, taken since the start of the IST month (customer) or day (store).
 -- name: CapUsage :one

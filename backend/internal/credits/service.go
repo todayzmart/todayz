@@ -59,8 +59,9 @@ type Service struct {
 }
 
 var (
-	_ Holder = (*Service)(nil)
-	_ Poster = (*Service)(nil)
+	_ Holder   = (*Service)(nil)
+	_ Poster   = (*Service)(nil)
+	_ Reverser = (*Service)(nil)
 )
 
 // New builds the service.
@@ -406,10 +407,13 @@ func (s *Service) usage(ctx context.Context, q *creditsdb.Queries, customerID, s
 func (s *Service) holdByRef(ctx context.Context, q *creditsdb.Queries, ref Ref) (creditsdb.CreditHold, bool, error) {
 	var h creditsdb.CreditHold
 	var err error
-	if ref.Type == RefOrder {
+	switch ref.Type {
+	case RefOrder:
 		h, err = q.HoldByOrder(ctx, ids.UUID(ref.ID))
-	} else {
+	case RefBillClaim:
 		h, err = q.HoldByBillClaim(ctx, ids.UUID(ref.ID))
+	default:
+		return h, false, nil // a POS sale holds nothing itself
 	}
 	if db.IsNoRows(err) {
 		return h, false, nil
@@ -422,7 +426,7 @@ func (s *Service) holdByRef(ctx context.Context, q *creditsdb.Queries, ref Ref) 
 
 // Hold implements Holder.
 func (s *Service) Hold(ctx context.Context, req HoldRequest) (Allowance, error) {
-	if !req.Ref.valid() || req.Credits <= 0 || req.CustomerID == ids.Zero || req.StoreID == ids.Zero {
+	if !req.Ref.holdable() || req.Credits <= 0 || req.CustomerID == ids.Zero || req.StoreID == ids.Zero {
 		return Allowance{}, ErrInvalid
 	}
 	r, err := s.Rules(ctx)
@@ -722,9 +726,20 @@ func (s *Service) Complete(ctx context.Context, c Completion) (Completed, error)
 		if err != nil {
 			return err
 		}
+		// Under the account locks Reverse takes too, so a reversal and a
+		// completion of one ref never interleave. Orders never reverse, so
+		// for them this finds nothing.
+		if _, err := q.TransactionByKey(ctx, c.Ref.key("reverse")); err == nil {
+			return ErrReversed
+		} else if !db.IsNoRows(err) {
+			return wrap("reversal key", err)
+		}
 		if hasHold {
 			if h, err = q.LockHold(ctx, h.ID); err != nil {
 				return wrap("lock hold", err)
+			}
+			if c.RefuseReleased && h.Status == holdReleased {
+				return ErrReleased
 			}
 			out.Captured = int(h.Captured)
 			if h.Status == holdHeld {

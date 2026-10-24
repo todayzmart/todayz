@@ -42,19 +42,28 @@ import (
 // RefType is what a hold or a posting is for (ledger_transactions.ref_type).
 type RefType string
 
-// The hold refs (D-35): exactly one per hold.
+// The hold refs (D-35): exactly one per hold. RefPOSSale is a counter sale's
+// cashback and reversal (D-132): it never has a hold of its own, since a bill
+// QR sale spends the hold of its bill claim.
 const (
 	RefOrder     RefType = "order"
 	RefBillClaim RefType = "bill_claim"
+	RefPOSSale   RefType = "pos_sale"
 )
 
-// Ref names one order or one bill claim.
+// Ref names one order, bill claim or POS sale.
 type Ref struct {
 	Type RefType
 	ID   ids.ID
 }
 
-func (r Ref) valid() bool { return (r.Type == RefOrder || r.Type == RefBillClaim) && r.ID != ids.Zero }
+func (r Ref) valid() bool {
+	return (r.Type == RefOrder || r.Type == RefBillClaim || r.Type == RefPOSSale) && r.ID != ids.Zero
+}
+
+// holdable reports whether a hold can be taken on the ref (credit_holds has
+// an order_id or a bill_claim_id).
+func (r Ref) holdable() bool { return r.valid() && r.Type != RefPOSSale }
 
 func (r Ref) key(op string) string { return op + ":" + string(r.Type) + ":" + r.ID.String() }
 
@@ -113,6 +122,11 @@ type Completion struct {
 	StoreID       ids.ID
 	EligiblePaise int64
 	CashbackBP    *int
+	// RefuseReleased makes Complete answer ErrReleased, posting nothing, when
+	// the ref's hold was released: a bill QR sale must never spend credits
+	// the customer already got back (D-132). Off, a released hold is simply
+	// not captured, as an order's Complete has always done.
+	RefuseReleased bool
 }
 
 // maxCashbackBP is the top of a store's cashback range, 20% (01 §7,
@@ -150,6 +164,44 @@ type Holder interface {
 	// Complete captures the hold and pays cashback. A repeat posts nothing
 	// and returns what the first posted.
 	Complete(ctx context.Context, c Completion) (Completed, error)
+}
+
+// Reversal reverses a completed purchase whole (01 §7, D-08, D-74, D-132).
+// There is no partial reversal.
+type Reversal struct {
+	// Ref is the purchase: its cashback was posted on it, and the reversal
+	// posts reverse:<Ref> (the spent credits back) and clawback:<Ref> (the
+	// cashback taken back).
+	Ref Ref
+	// Spend is the ref the purchase's credits were held and captured on (a
+	// POS sale's bill claim); zero means Ref itself.
+	Spend               Ref
+	CustomerID, StoreID ids.ID
+}
+
+func (r Reversal) spend() Ref {
+	if r.Spend == (Ref{}) {
+		return r.Ref
+	}
+	return r.Spend
+}
+
+// Reversed is what Reverse posted.
+type Reversed struct {
+	// Restored went back to the lots the credits were spent from; Expired is
+	// the part whose lot has expired since, posted to platform_expired.
+	Restored, Expired int
+	// ClawedBack is the cashback taken back from the available balance;
+	// Shortfall is the rest, which the store absorbs (D-08).
+	ClawedBack, Shortfall int
+}
+
+// Reverser reverses completed purchases (a POS sale today). Reverse runs in
+// the caller's transaction and is idempotent per Ref: a repeat posts nothing
+// and returns what the first posted. A purchase with no captured credits and
+// no cashback reverses as a no-op that posts nothing.
+type Reverser interface {
+	Reverse(ctx context.Context, r Reversal) (Reversed, error)
 }
 
 // AccountKind is a ledger account kind (03 §6).
@@ -259,6 +311,14 @@ var (
 	ErrKeyReused = errors.New("credits: idempotency key already used for another posting")
 	// ErrUnavailable: the service has no database or settings.
 	ErrUnavailable = errors.New("credits: not configured")
+	// ErrReleased: a Completion with RefuseReleased found its hold released.
+	ErrReleased = errors.New("credits: the hold was released")
+	// ErrReversed: Complete on a ref that Reverse has reversed.
+	ErrReversed = errors.New("credits: the purchase was reversed")
+	// ErrHoldOpen: Reverse found the spend's hold still held, not captured.
+	// A completed purchase has its hold captured; the reversal is refused
+	// rather than guessed at. TODO(lead): an uncaptured hold on a reversal.
+	ErrHoldOpen = errors.New("credits: the purchase's hold is not captured")
 )
 
 // Rules are the credit settings in force (01 §7, §17).
