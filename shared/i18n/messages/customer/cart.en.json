@@ -23,5 +23,14 @@
   "cart.line.out": { "defaultMessage": "Out of stock", "description": "C-09 flag on a line the shop no longer has" },
   "cart.line.short": { "defaultMessage": "Only {count} left", "description": "C-09 flag on a line with less stock than asked" },
   "cart.line.reduce": { "defaultMessage": "Reduce to {count}", "description": "C-09 button to match the stock" },
-  "cart.line.remove": { "defaultMessage": "Remove item", "description": "C-09 button to drop an unavailable line" }
+  "cart.line.remove": { "defaultMessage": "Remove item", "description": "C-09 button to drop an unavailable line" },
+  "cart.creditsRow": { "defaultMessage": "Credits", "description": "C-09 and C-11 credits row in the totals" },
+  "cart.credits.use": { "defaultMessage": "Use credits", "description": "C-09 and C-11 credits switch label" },
+  "cart.credits.hint": { "defaultMessage": "You can use up to {max, plural, one {# credit} other {# credits}} on this order. Each credit is worth ₹1.", "description": "C-09 and C-11 credits hint while the switch is off; max is what the quote allows" },
+  "cart.credits.amount": { "defaultMessage": "Credits to use", "description": "C-09 and C-11 accessible name of the credits slider" },
+  "cart.credits.valueText": { "defaultMessage": "{count, plural, one {# credit} other {# credits}}, {off} off", "description": "C-09 and C-11 spoken value of the credits slider" },
+  "cart.credits.using": { "defaultMessage": "Using {count, plural, one {# credit} other {# credits}} for {off} off. Credits never pay for delivery.", "description": "C-09 and C-11 credits summary under the slider" },
+  "cart.credits.blocked.store_credit_cap": { "defaultMessage": "Credits can't be used at this shop today.", "description": "C-09 and C-11 store daily credit cap reached (D-76)" },
+  "cart.credits.blocked.credit_monthly_cap": { "defaultMessage": "You've used this month's credit limit.", "description": "C-09 and C-11 customer monthly credit cap reached (D-76)" },
+  "cart.credits.blocked.below_credit_minimum": { "defaultMessage": "Credits can be used when your items come to the shop's minimum for credits. Add more to use them.", "description": "C-09 and C-11 order too small for credits (01 §7)" }
 }

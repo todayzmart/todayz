@@ -5,6 +5,7 @@ import { formatMoney } from '@todayz/i18n';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { addToCart, getCart, resetCartForTests } from '../cart/cart';
+import { resetCreditsForTests } from '../cart/credits';
 import { setStreamFetchForTests } from '../orders/stream';
 import { json, problem, renderAt, type Call, type Handler } from './render';
 
@@ -135,6 +136,7 @@ const accepted = (over: Partial<Order> = {}) =>
 
 beforeEach(() => {
   resetCartForTests();
+  resetCreditsForTests();
   addToCart(STORE, { storeItemId: ITEM, productName: 'Toor dal', pricePaise: 2500, mrpPaise: 2500, packLabel: '1 kg' }, 2);
 });
 // The live stream never reaches a real network: by default it is a connection that stays quiet.
@@ -164,6 +166,81 @@ describe('C-09 cart', () => {
     resetCartForTests();
     renderAt('/cart', { returning: true, handlers: [signedIn] });
     expect(await screen.findByText('Your cart is empty')).toBeInTheDocument();
+  });
+});
+
+/** A quote that honours `creditsToUse` up to `max` credits, like the server (01 §7). */
+function creditsQuote(max: number, limit: CheckoutQuote['creditsLimit'] = null, seen: number[] = []): Handler {
+  return on('POST', '/v1/me/checkout/quote', (c) => {
+    const asked = (c.body as { creditsToUse: number }).creditsToUse;
+    seen.push(asked);
+    const used = Math.min(asked, max);
+    return json(
+      200,
+      quote({
+        creditsRequested: asked,
+        creditsAllowed: max,
+        creditsUsed: used,
+        creditsLimit: used < asked ? limit ?? 'credit_max_exceeded' : null,
+        totalPaise: 5000 - used * 100,
+      }),
+    );
+  });
+}
+
+describe('credits at cart and checkout', () => {
+  it('turns credits on at the most the quote allows and shows the reduced total', async () => {
+    const seen: number[] = [];
+    renderAt('/cart', { returning: true, handlers: [signedIn, creditsQuote(30, null, seen)] });
+    const toggle = await screen.findByRole('switch', { name: 'Use credits' });
+    expect(screen.getByText(/up to 30 credits/)).toBeInTheDocument();
+    fireEvent.click(toggle);
+    expect(await screen.findByText(/Using 30 credits for ₹30 off/)).toBeInTheDocument();
+    await waitFor(() => expect(screen.getAllByText(formatMoney(2000)).length).toBeGreaterThan(0));
+    expect(seen).toContain(30);
+  });
+
+  it('sends the chosen credits with the order and the total the person saw', async () => {
+    const posts: Call[] = [];
+    const { router } = renderAt('/checkout', {
+      returning: true,
+      handlers: [
+        signedIn,
+        creditsQuote(30),
+        on('POST', '/v1/me/orders', (c) => {
+          posts.push(c);
+          return json(201, order());
+        }),
+        on('GET', `/v1/me/orders/${ORDER_ID}`, () => json(200, order())),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('switch', { name: 'Use credits' }));
+    fireEvent.change(await screen.findByRole('slider', { name: 'Credits to use' }), { target: { value: '12' } });
+    const place = await screen.findByRole('button', { name: `Place order · ${formatMoney(3800)}` }, { timeout: 3000 });
+    await waitFor(() => expect(place).toBeEnabled());
+    fireEvent.click(place);
+    await waitFor(() => expect(router.state.location.pathname).toBe(`/orders/${ORDER_ID}`));
+    expect(posts[0]?.body).toMatchObject({ creditsToUse: 12, expectedTotalPaise: 3800 });
+  });
+
+  it('shows the monthly cap reason with the switch off and disabled, and still places without credits', async () => {
+    renderAt('/cart', { returning: true, handlers: [signedIn, creditsQuote(0, 'credit_monthly_cap')] });
+    const toggle = await screen.findByRole('switch', { name: 'Use credits' });
+    expect(toggle).toBeDisabled();
+    expect(toggle).not.toBeChecked();
+    expect(screen.getByText("You've used this month's credit limit.")).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Checkout/ })).toBeInTheDocument();
+  });
+
+  it("says credits can't be used at this shop today for the store's daily cap", async () => {
+    renderAt('/cart', { returning: true, handlers: [signedIn, creditsQuote(0, 'store_credit_cap')] });
+    expect(await screen.findByText("Credits can't be used at this shop today.")).toBeInTheDocument();
+  });
+
+  it('hides the control when there is no balance', async () => {
+    renderAt('/cart', { returning: true, handlers: [signedIn, creditsQuote(0, 'no_balance')] });
+    expect(await screen.findByRole('button', { name: /Checkout/ })).toBeInTheDocument();
+    expect(screen.queryByRole('switch', { name: 'Use credits' })).toBeNull();
   });
 });
 
