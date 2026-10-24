@@ -929,6 +929,16 @@ func TestPreflight(t *testing.T) {
 		}
 	}
 
+	// D-212: SMS_API_URL in staging or prod (config.Load refuses it; a config
+	// built another way is refused here), named without its value.
+	cfg = loadConfig(t, env)
+	cfg.Providers.SMSAPIURL = "https://sms.example.com/x"
+	err = Preflight(cfg)
+	require.EqualError(t, err, "identity: must be unset in staging and prod: SMS_API_URL")
+	sms, _ := providers(cfg)
+	require.IsType(t, noSMS{}, sms, "never a client that signs for the override")
+	require.ErrorContains(t, sms.SendOTP(context.Background(), "+919876543210", "123456"), "SMS_API_URL must be unset in staging and prod")
+
 	// TOTP_ENC_KEY (M2): config.Load already refuses a deployed config
 	// without it; Preflight checks it again, like the other keys.
 	cfg = loadConfig(t, env)

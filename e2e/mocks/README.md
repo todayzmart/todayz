@@ -74,6 +74,12 @@ read captured OTPs. Caddy keeps the original Host when it proxies
 The backend appends the provider's own path to the base URL, exactly as it would
 against the real host.
 
+**Upgrading from MSG91 (D-212).** An old `.env.local` with
+`SMS_API_URL=http://127.0.0.1:4010/msg91` still wins over `infra/local/local.env`, and the
+backend now posts the AWS `SendTextMessage` call to that base. The mocks answer 404, so
+login fails. Change the line to `SMS_API_URL=http://127.0.0.1:4010/sms-voice`, or delete
+it, since `local.env` already has that value. Also delete any `MSG91_*` lines.
+
 ## Provider endpoints
 
 All responses are JSON unless noted. Auth headers are checked for presence only;

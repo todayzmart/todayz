@@ -5,6 +5,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/todayz/backend/internal/platform/awssms"
 	"github.com/todayz/backend/internal/platform/notice"
 )
 
@@ -67,9 +68,14 @@ func (s *Service) IntegrationStatus(ctx context.Context) ([]ChannelStatus, error
 			KeyStatus{"SMS_DLT_ENTITY_ID", p.SMSDLTEntityID != ""},
 			KeyStatus{"SMS_NOTICE_TEMPLATE_IDS", len(p.SMSNoticeTemplateIDs) > 0},
 		)
-		if missing := unmappedSMSTemplates(p.SMSNoticeTemplateIDs); len(missing) > 0 {
-			smsNote = "no DLT template id for: " + strings.Join(missing, ", ")
+		var notes []string
+		if f := awssms.Forbidden(c); len(f) > 0 {
+			notes = append(notes, "must be unset in staging and prod: "+strings.Join(f, ", "))
 		}
+		if missing := unmappedSMSTemplates(p.SMSNoticeTemplateIDs); len(missing) > 0 {
+			notes = append(notes, "no DLT template id for: "+strings.Join(missing, ", "))
+		}
+		smsNote = strings.Join(notes, "; ")
 		waURL, waKey = p.WhatsAppAPIURL != "", p.WhatsAppAPIKey.IsSet()
 	}
 	out := []ChannelStatus{

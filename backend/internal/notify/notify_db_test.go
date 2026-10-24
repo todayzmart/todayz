@@ -712,4 +712,6 @@ func TestIntegrationStatusNeverShowsAValue(t *testing.T) {
 	st, err = e.svc.IntegrationStatus(context.Background())
 	require.NoError(t, err)
 	require.Equal(t, []KeyStatus{{"AWS_REGION", false}, {"SMS_SENDER_ID", true}, {"SMS_DLT_ENTITY_ID", true}, {"SMS_NOTICE_TEMPLATE_IDS", true}}, st[0].Keys)
+	require.Equal(t, "must be unset in staging and prod: SMS_API_URL; no DLT template id for: tz_order_unseen_hi", st[0].Note,
+		"a deployed SMS_API_URL is named, never shown")
 }

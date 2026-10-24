@@ -100,8 +100,8 @@ type AppKeys struct {
 type Providers struct {
 	// SMS is AWS End User Messaging SMS (D-212), signed with the EC2 instance
 	// role when deployed, so there is no SMS key. SMSAPIURL overrides the
-	// endpoint (the mocks server in local and test; empty when deployed means
-	// the SDK's regional endpoint). The DLT values are not secret.
+	// endpoint in local and test (the mocks server); staging and prod refuse
+	// it and use the regional AWS endpoint. The DLT values are not secret.
 	SMSAPIURL        string
 	SMSSenderID      string // SMS_SENDER_ID: the DLT header, sent as the origination identity
 	SMSDLTEntityID   string // SMS_DLT_ENTITY_ID: IN_ENTITY_ID on every send
@@ -299,6 +299,12 @@ func Load(getenv Getenv, log *slog.Logger) (*Config, error) {
 		MockLLM:              r.boolDefault("MOCK_LLM", true),
 		GeocoderProvider:     r.str("GEOCODER_PROVIDER"),
 		GeocoderAPIKey:       r.secret("GEOCODER_API_KEY"),
+	}
+	if env.IsDeployed() && c.Providers.SMSAPIURL != "" {
+		// D-212: staging and prod send to the regional AWS endpoint, signed by
+		// the instance role; an override would hand that signed request (and
+		// the phone and OTP) to another host.
+		r.bad("SMS_API_URL", "must be unset in staging and prod")
 	}
 	c.NoEgress = r.boolDefault("TODAYZ_NO_EGRESS", false) || env == EnvTest
 	c.Shutdown = Shutdown{PreStop: r.duration("SHUTDOWN_PRESTOP"), Drain: r.duration("SHUTDOWN_DRAIN")}

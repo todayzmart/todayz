@@ -108,7 +108,6 @@ func TestLoadFull(t *testing.T) {
 func TestSMSConfig(t *testing.T) {
 	env, _ := fullEnv(t, "prod")
 	env["AWS_REGION"] = "ap-south-1"
-	env["SMS_API_URL"] = "https://sms-voice.ap-south-1.amazonaws.com/"
 	env["SMS_SENDER_ID"] = "TODAYZ"
 	env["SMS_DLT_ENTITY_ID"] = "1201160000000000001"
 	env["SMS_OTP_TEMPLATE_ID"] = "1207160000000000101"
@@ -117,7 +116,7 @@ func TestSMSConfig(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "ap-south-1", c.AWSRegion)
 	p := c.Providers
-	require.Equal(t, "https://sms-voice.ap-south-1.amazonaws.com", p.SMSAPIURL)
+	require.Empty(t, p.SMSAPIURL, "deployed: the regional endpoint")
 	require.Equal(t, "TODAYZ", p.SMSSenderID)
 	require.Equal(t, "1201160000000000001", p.SMSDLTEntityID)
 	require.Equal(t, "1207160000000000101", p.SMSOTPTemplateID)
@@ -141,6 +140,29 @@ func TestSMSConfig(t *testing.T) {
 		require.ErrorContains(t, err, c.name, c.value)
 		require.NotContains(t, err.Error(), c.value, "the value is never shown")
 		require.NotContains(t, err.Error(), "4471", "no part of the value is shown")
+	}
+
+	// D-212: staging and prod refuse any SMS_API_URL, even the real AWS
+	// endpoint: the role-signed request goes only where the SDK resolves it.
+	for _, e := range []string{"prod", "staging"} {
+		for _, u := range []string{"https://sms-voice.ap-south-1.amazonaws.com/", "http://127.0.0.1:4010/sms-voice", "https://sms.example.com/4471"} {
+			bad := maps.Clone(env)
+			bad["APP_ENV"] = e
+			bad["SMS_API_URL"] = u
+			_, err := Load(get(bad), nil)
+			var ce *Error
+			require.ErrorAs(t, err, &ce, e+" "+u)
+			require.Contains(t, ce.Invalid, "SMS_API_URL: must be unset in staging and prod")
+			require.NotContains(t, err.Error(), u, "the value is never shown")
+			require.NotContains(t, err.Error(), "4471")
+		}
+	}
+	for _, e := range []string{"local", "test"} {
+		ok, _ := fullEnv(t, e)
+		ok["SMS_API_URL"] = "http://127.0.0.1:4010/sms-voice"
+		c, err := Load(get(ok), nil)
+		require.NoError(t, err, e)
+		require.Equal(t, "http://127.0.0.1:4010/sms-voice", c.Providers.SMSAPIURL)
 	}
 }
 

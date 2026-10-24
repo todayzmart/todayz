@@ -37,6 +37,10 @@ type Options struct {
 	Block bool
 	// Timeout is the whole-request timeout (default 10 s).
 	Timeout time.Duration
+	// NoProxy never uses HTTP(S)_PROXY. For link-local endpoints such as the
+	// EC2 instance metadata service (169.254.169.254), which NO_PROXY rarely
+	// lists and which must never be sent through a proxy.
+	NoProxy bool
 }
 
 // NewClient returns an HTTP client honouring opts.
@@ -45,11 +49,13 @@ func NewClient(opts Options) *http.Client {
 	if timeout <= 0 {
 		timeout = 10 * time.Second
 	}
-	return &http.Client{Timeout: timeout, Transport: NewTransport(opts.Block)}
+	return &http.Client{Timeout: timeout, Transport: newTransport(opts.Block, opts.NoProxy)}
 }
 
 // NewTransport returns a transport; with block set it only reaches loopback.
-func NewTransport(block bool) http.RoundTripper {
+func NewTransport(block bool) http.RoundTripper { return newTransport(block, false) }
+
+func newTransport(block, noProxy bool) http.RoundTripper {
 	t := &http.Transport{
 		Proxy:                 http.ProxyFromEnvironment,
 		ForceAttemptHTTP2:     true,
@@ -59,6 +65,9 @@ func NewTransport(block bool) http.RoundTripper {
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: time.Second,
 		DialContext:           (&net.Dialer{Timeout: 5 * time.Second, KeepAlive: 30 * time.Second}).DialContext,
+	}
+	if noProxy {
+		t.Proxy = nil
 	}
 	if !block {
 		return t

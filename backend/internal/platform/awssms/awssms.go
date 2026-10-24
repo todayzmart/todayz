@@ -11,7 +11,10 @@
 // environment keys):
 //
 //   - staging and prod: the EC2 instance role through IMDSv2, with no IMDSv1
-//     fallback. No SMS key is stored anywhere.
+//     fallback, on the pinned metadata address and never through a proxy.
+//     Requests go to the regional AWS endpoint only: SMS_API_URL must be
+//     unset there, so a stray override can never receive a role-signed
+//     request (session token, phone, OTP). No SMS key is stored anywhere.
 //   - local and test: static dummy credentials, so requests are SigV4-signed
 //     offline and go only to the mocks server at SMS_API_URL, which must be a
 //     local address there.
@@ -28,6 +31,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
@@ -58,6 +62,10 @@ const (
 	// imdsEndpoint is pinned so AWS_EC2_METADATA_SERVICE_ENDPOINT cannot move it.
 	imdsEndpoint = "http://169.254.169.254"
 	sendTimeout  = 10 * time.Second
+	// imdsTimeout bounds one metadata request. IMDS answers on the host in
+	// milliseconds; a token PUT that never comes back (a hop limit of 1 seen
+	// from a container) fails fast as "credentials: imds token timeout".
+	imdsTimeout = 2 * time.Second
 
 	// DLT destination country parameters (India).
 	paramEntity   = "IN_ENTITY_ID"
@@ -89,6 +97,15 @@ type Client struct {
 	entity string
 }
 
+// Forbidden names the variables cfg sets that its environment must not have:
+// SMS_API_URL in staging and prod (Preflight, integration status).
+func Forbidden(cfg *config.Config) []string {
+	if cfg.Env.IsDeployed() && cfg.Providers.SMSAPIURL != "" {
+		return []string{"SMS_API_URL"}
+	}
+	return nil
+}
+
 // Missing names the variables a send needs that cfg does not have, in a fixed
 // order (Preflight, integration status). Template ids are the caller's.
 func Missing(cfg *config.Config) []string {
@@ -112,36 +129,55 @@ func Missing(cfg *config.Config) []string {
 }
 
 // New builds the client from cfg. It errors (naming variables, never values)
-// when a variable is missing, or when SMS_API_URL outside staging and prod is
-// not a local address: dummy credentials never go to a real endpoint.
-func New(cfg *config.Config) (*Client, error) {
+// when a variable is missing, when staging or prod sets SMS_API_URL, or when
+// SMS_API_URL outside staging and prod is not a local address: role-signed
+// requests go only to AWS, and dummy credentials never go to a real endpoint.
+func New(cfg *config.Config) (*Client, error) { return newClient(cfg, nil) }
+
+// wrapTransport lets the package tests stand in for the network: it gets
+// each HTTP client's transport ("sms" or "imds") and returns the one to use.
+// New passes nil.
+type wrapTransport func(kind string, next http.RoundTripper) http.RoundTripper
+
+func newClient(cfg *config.Config, wrap wrapTransport) (*Client, error) {
 	if m := Missing(cfg); len(m) > 0 {
 		return nil, fmt.Errorf("%w: %s", ErrNotConfigured, strings.Join(m, ", "))
+	}
+	if f := Forbidden(cfg); len(f) > 0 {
+		return nil, fmt.Errorf("%w: %s must be unset in staging and prod", ErrNotConfigured, strings.Join(f, ", "))
 	}
 	p := cfg.Providers
 	deployed := cfg.Env.IsDeployed()
 	httpClient := httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: cfg.NoEgress, Timeout: sendTimeout})
+	if wrap != nil {
+		httpClient.Transport = wrap("sms", httpClient.Transport)
+	}
 	o := pinpointsmsvoicev2.Options{
 		Region:     cfg.AWSRegion,
 		HTTPClient: httpClient,
 		Retryer:    aws.NopRetryer{},
 	}
-	if p.SMSAPIURL != "" {
-		o.BaseEndpoint = aws.String(p.SMSAPIURL)
-	}
 	if deployed {
-		o.Credentials = aws.NewCredentialsCache(ec2rolecreds.New(func(eo *ec2rolecreds.Options) {
+		// The metadata client has its own transport: never a proxy (NO_PROXY
+		// rarely lists 169.254.169.254), still behind the egress guard.
+		imdsClient := httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: cfg.NoEgress, Timeout: imdsTimeout, NoProxy: true})
+		if wrap != nil {
+			imdsClient.Transport = wrap("imds", imdsClient.Transport)
+		}
+		role := ec2rolecreds.New(func(eo *ec2rolecreds.Options) {
 			eo.Client = imds.New(imds.Options{
-				HTTPClient:        httpClient,
+				HTTPClient:        imdsClient,
 				Endpoint:          imdsEndpoint,
 				ClientEnableState: imds.ClientEnabled,
 				EnableFallback:    aws.FalseTernary, // IMDSv2 tokens only
 			})
-		}))
+		})
+		o.Credentials = aws.NewCredentialsCache(tagCredentials{role})
 	} else {
 		if !isLocalURL(p.SMSAPIURL) {
 			return nil, fmt.Errorf("%w: SMS_API_URL must be a local address outside staging and prod", ErrNotConfigured)
 		}
+		o.BaseEndpoint = aws.String(p.SMSAPIURL)
 		if o.Region == "" {
 			o.Region = LocalRegion
 		}
@@ -149,6 +185,23 @@ func New(cfg *config.Config) (*Client, error) {
 	}
 	return &Client{api: pinpointsmsvoicev2.New(o), sender: p.SMSSenderID, entity: p.SMSDLTEntityID}, nil
 }
+
+// tagCredentials marks every failure to get the role's credentials, so
+// mapError can tell it from a failed send.
+type tagCredentials struct{ next aws.CredentialsProvider }
+
+func (t tagCredentials) Retrieve(ctx context.Context) (aws.Credentials, error) {
+	c, err := t.next.Retrieve(ctx)
+	if err != nil {
+		return aws.Credentials{}, &credentialsError{cause: err}
+	}
+	return c, nil
+}
+
+type credentialsError struct{ cause error }
+
+func (e *credentialsError) Error() string { return "credentials: " + e.cause.Error() }
+func (e *credentialsError) Unwrap() error { return e.cause }
 
 // Send sends m once (no retry) and returns the AWS message id.
 func (c *Client) Send(ctx context.Context, m Message) (string, error) {
@@ -175,6 +228,9 @@ func (c *Client) Send(ctx context.Context, m Message) (string, error) {
 	}
 	out, err := c.api.SendTextMessage(ctx, in)
 	if err != nil {
+		if ctx.Err() != nil {
+			err = errors.Join(err, ctx.Err())
+		}
 		return "", mapError(err)
 	}
 	return aws.ToString(out.MessageId), nil
@@ -183,17 +239,27 @@ func (c *Client) Send(ctx context.Context, m Message) (string, error) {
 var reErrorCode = regexp.MustCompile(`^[A-Za-z0-9_.]{1,64}$`)
 
 // mapError keeps only the AWS error code and HTTP status of err; the message
-// text is dropped, since AWS may echo the request back in it.
+// text is dropped, since AWS may echo the request back in it. A failure to
+// get the instance role's credentials (IMDS) reads "credentials: <reason>",
+// so the first send in a new environment says what is wrong.
 func mapError(err error) error {
+	// The IMDS token step drops the error chain (its wrapper has no Unwrap),
+	// so the egress guard's error is only in the text there; it is put back.
+	blocked := errors.Is(err, egress.ErrBlocked) || strings.Contains(err.Error(), egress.ErrBlocked.Error())
+	if blocked {
+		err = errors.Join(egress.ErrBlocked, err)
+	}
+	var ce *credentialsError
+	if errors.As(err, &ce) {
+		return &sendError{msg: "credentials: " + credentialsReason(err, blocked), cause: err}
+	}
+	if blocked {
+		return &sendError{msg: "egress blocked", cause: err}
+	}
 	status := 0
 	var hs interface{ HTTPStatusCode() int }
 	if errors.As(err, &hs) {
 		status = hs.HTTPStatusCode()
-	}
-	// The credential chain (IMDS) formats its cause with %v, so the egress
-	// guard's error is only in the text there; it is put back in the chain.
-	if errors.Is(err, egress.ErrBlocked) || strings.Contains(err.Error(), egress.ErrBlocked.Error()) {
-		return &sendError{msg: "egress blocked", cause: errors.Join(egress.ErrBlocked, err)}
 	}
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
@@ -213,6 +279,44 @@ func mapError(err error) error {
 	default:
 		return &sendError{msg: "transport", cause: err}
 	}
+}
+
+// credentialsReason names why the role's credentials could not be had, from
+// fixed words and a checked error code only. Some reasons are only in the
+// SDK's error text (the token step drops the chain), so the SDK's fixed
+// phrases "failed to get API token" and "no EC2 IMDS role found" are matched.
+func credentialsReason(err error, blocked bool) string {
+	text := err.Error()
+	timeout := errors.Is(err, context.DeadlineExceeded) ||
+		strings.Contains(text, "Client.Timeout exceeded") || strings.Contains(text, "deadline exceeded")
+	switch {
+	case blocked:
+		return "egress blocked"
+	case errors.Is(err, context.Canceled):
+		return "cancelled"
+	case strings.Contains(text, "failed to get API token"):
+		if timeout {
+			return "imds token timeout"
+		}
+		return "imds token refused"
+	case timeout:
+		return "imds timeout"
+	case strings.Contains(text, "no EC2 IMDS role found"):
+		return "no instance role"
+	}
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		code := ae.ErrorCode()
+		if !reErrorCode.MatchString(code) {
+			code = "unknown"
+		}
+		return "imds " + code
+	}
+	var hs interface{ HTTPStatusCode() int }
+	if errors.As(err, &hs) {
+		return fmt.Sprintf("imds status %d", hs.HTTPStatusCode())
+	}
+	return "imds unavailable"
 }
 
 // sendError is a failed send. Its text is built only from the fixed reasons

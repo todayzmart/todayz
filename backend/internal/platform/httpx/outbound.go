@@ -16,6 +16,8 @@ type OutboundOptions struct {
 	NoEgress bool
 	// Timeout is the whole-request timeout (default 10 s).
 	Timeout time.Duration
+	// NoProxy ignores HTTP(S)_PROXY (the EC2 instance metadata service).
+	NoProxy bool
 }
 
 // NewOutboundClient is the only way backend code makes outbound HTTP calls
@@ -23,5 +25,5 @@ type OutboundOptions struct {
 // reaches loopback only (the local mocks) and refuses everything else before
 // DNS and again at dial time (SC-PL-04, D-17).
 func NewOutboundClient(o OutboundOptions) *http.Client {
-	return egress.NewClient(egress.Options{Block: o.NoEgress, Timeout: o.Timeout})
+	return egress.NewClient(egress.Options{Block: o.NoEgress, Timeout: o.Timeout, NoProxy: o.NoProxy})
 }

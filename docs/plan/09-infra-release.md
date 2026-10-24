@@ -234,6 +234,9 @@ GitHub Actions workflows are written in Wave 0 (W0-06) to mirror these. They wil
 - [ ] A-21 Jobs shows every scheduled kind with a recent succeeded run; A-22 System shows the AWS panels with data.
 - [ ] Rate limits and WAF rules on; Turnstile keys set; OTP via real SMS verified on Jio, Airtel and Vi numbers.
 - [ ] DLT registration for the SMS sender ID and templates done (India TRAI requirement; AWS End User Messaging sends with the DLT entity and template ids, D-212, `docs/runbooks/aws-founder-steps.md` part C).
+- [ ] SMS smoke on the first prod deploy, before any real send (D-213):
+  - From an SSM session on the api instance and on the worker instance, using the instance role, run `aws pinpoint-sms-voice-v2 send-text-message --dry-run` with the sender ID as `--origination-identity`, a sandbox-verified number and both DLT ids. It must succeed, which proves the policy's IAM resource types (`sender-id`, `opt-out-list`). `AccessDeniedException` means a resource type is missing from `policies/sms-send.json`.
+  - The app's first OTP must not log `credentials: imds token timeout`. Beanstalk has no IMDS hop-limit option, so we rely on the AL2023 default of 2, and this proves it from inside the container.
 - [ ] Privacy policy, terms, grievance officer contact live; consent text in sign-up.
 - [ ] Super admin accounts with TOTP; no shared accounts.
 - [ ] `platform_settings` reviewed by the founders (timers, credit caps, referral amounts).

@@ -208,6 +208,11 @@ func Preflight(cfg *config.Config) error {
 	if len(missing) > 0 {
 		return fmt.Errorf("identity: required in staging and prod: %s", strings.Join(missing, ", "))
 	}
+	// D-212: a role-signed SMS goes only to the regional AWS endpoint
+	// (config.Load refuses it too; this covers a config built another way).
+	if f := awssms.Forbidden(cfg); len(f) > 0 {
+		return fmt.Errorf("identity: must be unset in staging and prod: %s", strings.Join(f, ", "))
+	}
 	if subtle.ConstantTimeCompare(k.TOTPEncKey.Bytes(), k.PIIEncKey.Bytes()) == 1 {
 		return errors.New("identity: TOTP_ENC_KEY must differ from PII_ENC_KEY")
 	}

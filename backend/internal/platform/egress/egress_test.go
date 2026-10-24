@@ -109,3 +109,14 @@ func TestInstallGuard(t *testing.T) {
 		require.ErrorIs(t, err, ErrBlocked, u)
 	}
 }
+
+// NoProxy (the EC2 instance metadata client) never sends through HTTP(S)_PROXY:
+// NO_PROXY rarely lists 169.254.169.254.
+func TestNoProxyIgnoresProxyEnv(t *testing.T) {
+	tr, ok := NewClient(Options{NoProxy: true}).Transport.(*http.Transport)
+	require.True(t, ok)
+	require.Nil(t, tr.Proxy)
+	tr, ok = NewClient(Options{}).Transport.(*http.Transport)
+	require.True(t, ok)
+	require.NotNil(t, tr.Proxy, "other clients keep the environment's proxy")
+}
