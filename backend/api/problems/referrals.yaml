@@ -1,0 +1,23 @@
+# Problem codes: domain "referrals" (owner W2-03; 01 §8, D-13, D-26, D-32).
+#
+# Same shape as common.yaml. A sign-up on a device tied to the referrer or to
+# another recent account is not a refusal: the claim is recorded and answers
+# status `rejected` with no reward (D-13).
+domain: referrals
+problems:
+  - code: referral_code_unknown
+    status: 422
+    i18n: problems.referral_code_unknown
+    title: That referral code does not match anyone
+  - code: referral_self
+    status: 422
+    i18n: problems.referral_self
+    title: You cannot use your own referral code
+  - code: referral_already_claimed
+    status: 409
+    i18n: problems.referral_already_claimed
+    title: A referral has already been used for this account
+  - code: referral_not_eligible
+    status: 422
+    i18n: problems.referral_not_eligible
+    title: This account can no longer use a referral code
