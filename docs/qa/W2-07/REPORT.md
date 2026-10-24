@@ -120,13 +120,13 @@ type Quote struct { Lines []LineQuote; GrossPaise, ItemDiscountPaise, ItemSubtot
 2. A flat offer is per unit (`min(value, unit price) × qty`), not per line.
 3. A `bill_min` offer is whole-shop only (scope `store`), never per item or category.
 4. An offer with a per-customer limit does not apply when no customer is known.
-5. `has_offer` on search means a live item-level offer on that item, not a bill offer.
+5. Search's `has_offer` filter and ranking term are W1-06's and unchanged here; I did not check what it counts as an offer (it should agree with `offers.Price`).
 6. Feed constants: 10 cards, 15-minute rotation, default radius 2,000 m, 200 candidate stores.
 7. Uploaded banner images are held for review (no AI image check yet).
 8. The extra `banner_taps` table, and the tap route `/v1/me/banners/{bannerId}/tap`.
 9. A flash offer applies to the whole item, not only the units in that batch.
 10. Offer terms are immutable after creation; `startsAt` is clamped to now.
-11. Feature flags are respected: offers and banners off means no price effect and an empty feed.
+11. No feature flag gates offers or banners in this package; if the plan wants one, it is a small change in the route wiring.
 12. `pending_review` banners count toward `store_banners_max`.
 13. i18n: the problem `banner_limit_reached` needs its message key in `shared/i18n`; the title is in English only for now.
 14. **Attribution:** the task said commits end with Claude Opus 5.5; this session ran on Sonnet 5.5, so every commit says `Co-Authored-By: Claude Sonnet 5.5`.
