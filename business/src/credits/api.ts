@@ -2,13 +2,13 @@
  * Credit account, business referrals and the standee PDF: endpoints in 04-api.md (W2-01, W2-03,
  * W2-10) that are not in the generated client yet.
  *
- * TODO(merge): switch to the generated client when `getCreditAccount`, `getBusinessReferrals` and
- * `getQrStandee` land (`business-credits.yaml`, `referrals.yaml`, `standee.yaml`), and delete this
- * file. The request and answer shapes below are this screen's assumption of those operations.
+ * TODO(merge): switch to the generated client when `getCreditAccount` and `getQrStandee` land
+ * (`business-credits.yaml`, `standee.yaml`), and delete this file. The request and answer shapes below
+ * are this screen's assumption of those operations. `getBusinessReferrals` is generated now
+ * (`@todayz/api-client/gen/referrals/referrals`) and was swapped in by W2-10 finish.
  *
  * Assumed endpoints (`{B}` = `/v1/biz/businesses/{bid}`, `{S}` = `{B}/stores/{sid}`):
  * - `GET {B}/credit-account?cursor=&limit=`
- * - `GET {B}/referrals`
  * - `GET {S}/qr-standee.pdf` (Blob)
  */
 import { request } from '@todayz/api-client';
@@ -36,23 +36,6 @@ export interface CreditAccount {
   nextCursor: string | null;
 }
 
-export interface ReferralStats {
-  pending: number;
-  rewarded: number;
-  /** Credits already posted to the primary store's credit account. */
-  rewardedCredits: number;
-  /** Credits waiting on the new shop's first 10 orders. */
-  pendingCredits: number;
-}
-
-export interface BusinessReferrals {
-  /** The business referral code (shop-to-shop only). Shown to the owner; never logged or put in a URL by this app. */
-  code: string;
-  /** A ready-made share link that carries the code. */
-  link: string;
-  stats: ReferralStats;
-}
-
 const biz = (bid: string) => `/v1/biz/businesses/${encodeURIComponent(bid)}`;
 
 /** `GET {B}/credit-account` (manager and above): the balance and a cursor page of lines, newest first. */
@@ -60,11 +43,6 @@ export function getCreditAccount(bid: string, cursor?: string): Promise<CreditAc
   const q = new URLSearchParams({ limit: '30' });
   if (cursor) q.set('cursor', cursor);
   return request<CreditAccount>(`${biz(bid)}/credit-account?${q.toString()}`, { method: 'GET' });
-}
-
-/** `GET {B}/referrals` (manager and above). */
-export function getBusinessReferrals(bid: string): Promise<BusinessReferrals> {
-  return request<BusinessReferrals>(`${biz(bid)}/referrals`, { method: 'GET' });
 }
 
 /**

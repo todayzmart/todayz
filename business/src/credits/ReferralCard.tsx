@@ -1,7 +1,7 @@
 import { Banner, Button, Skeleton, useToast } from '@todayz/ui';
 import { Copy, Share2 } from 'lucide-react';
 import { useIntl } from 'react-intl';
-import type { BusinessReferrals } from './api';
+import type { BusinessReferrals } from '@todayz/api-client/gen/model/businessReferrals';
 import styles from './credits.module.css';
 
 /**
@@ -79,11 +79,15 @@ export function ReferralCard({ referrals, loading, failed, retry }: Props) {
           <dl className={styles.stats}>
             <div>
               <dt>{intl.formatMessage({ id: 'credits.referral.pending' })}</dt>
-              <dd>{intl.formatMessage({ id: 'credits.referral.count' }, { count: referrals.stats.pending, credits: referrals.stats.pendingCredits })}</dd>
+              <dd>{intl.formatMessage({ id: 'credits.referral.count' }, { count: referrals.stats.pending })}</dd>
             </div>
             <div>
               <dt>{intl.formatMessage({ id: 'credits.referral.rewarded' })}</dt>
-              <dd>{intl.formatMessage({ id: 'credits.referral.count' }, { count: referrals.stats.rewarded, credits: referrals.stats.rewardedCredits })}</dd>
+              <dd>{intl.formatMessage({ id: 'credits.referral.count' }, { count: referrals.stats.rewarded })}</dd>
+            </div>
+            <div>
+              <dt>{intl.formatMessage({ id: 'credits.referral.earned' })}</dt>
+              <dd>{intl.formatMessage({ id: 'credits.referral.earnedValue' }, { credits: referrals.stats.creditsEarned })}</dd>
             </div>
           </dl>
           <p className={styles.sub}>{intl.formatMessage({ id: 'credits.referral.where' })}</p>

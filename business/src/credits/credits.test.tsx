@@ -23,7 +23,7 @@ const line = (id: string, kind: string, credits: number, ref: { kind: string; la
   ref,
 });
 
-const referrals = { code: CODE, link: `https://app.todayz.in/join?ref=${CODE}`, stats: { pending: 2, rewarded: 1, rewardedCredits: 100, pendingCredits: 60 } };
+const referrals = { code: CODE, link: `https://app.todayz.in/join?ref=${CODE}`, rewards: { referrerCredits: 100, refereeCredits: 100 }, stats: { clicks: 9, pending: 2, rewarded: 1, creditsEarned: 100 }, referredBy: null };
 
 function account(items: unknown[], nextCursor: string | null = null, balance = 340): Handler {
   return (c) => (c.method === 'GET' && c.path === `${B}/credit-account` ? json(200, { balance, items, nextCursor }) : undefined);
@@ -173,8 +173,9 @@ describe('B-10 standee and referrals', () => {
   it('shows the referral code, stats and where rewards go, and copies the code on tap', async () => {
     renderAt('/credits', { messages, handlers: [shops('owner'), account([]), refs, store] });
     expect(await screen.findByText(CODE)).toBeInTheDocument();
-    expect(screen.getByText('2 shops · 60 credits')).toBeInTheDocument();
-    expect(screen.getByText('1 shop · 100 credits')).toBeInTheDocument();
+    expect(screen.getByText('2 shops')).toBeInTheDocument();
+    expect(screen.getByText('1 shop')).toBeInTheDocument();
+    expect(screen.getByText('100 credits')).toBeInTheDocument();
     expect(screen.getByText(/primary store/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Copy code' }));
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(CODE));
