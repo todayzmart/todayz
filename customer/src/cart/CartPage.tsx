@@ -8,7 +8,8 @@ import { ShoppingBag } from 'lucide-react';
 import { useIntl } from 'react-intl';
 import { PathLink } from '../orders/ShopLink';
 import { cartCount, clearCart, setQty, useCart, type CartLine } from './cart';
-import { useCartQuote } from './quote';
+import { CreditsControl } from './CreditsControl';
+import { useCartPricing } from './quote';
 import styles from './tx.module.css';
 
 /** Problem codes the quote can answer with that the cart explains in words. */
@@ -34,7 +35,7 @@ export function CartPage() {
   const cart = useCart();
   const router = useRouter();
   const { status } = useSessionState();
-  const quote = useCartQuote(cart, status === 'signedIn');
+  const { quote, probe, choice } = useCartPricing(cart, status === 'signedIn');
   const problemText = useQuoteProblemText();
 
   if (!cart.store || cart.lines.length === 0) {
@@ -105,6 +106,12 @@ export function CartPage() {
               </div>
             </>
           )}
+          {quote.data && quote.data.creditsUsed > 0 && (
+            <div className={styles.totalRow}>
+              <dt>{intl.formatMessage({ id: 'cart.creditsRow' })}</dt>
+              <dd>−{formatMoney(quote.data.creditsUsed * 100)}</dd>
+            </div>
+          )}
           <div className={`${styles.totalRow} ${styles.grand}`}>
             <dt>{intl.formatMessage({ id: 'cart.total' })}</dt>
             <dd>{formatMoney(total)}</dd>
@@ -113,7 +120,9 @@ export function CartPage() {
         {status !== 'signedIn' && <p className={styles.meta}>{intl.formatMessage({ id: 'cart.priceNote' })}</p>}
         <p className={styles.meta}>{intl.formatMessage({ id: 'cart.pickupOnly' })}</p>
         {/* TODO(W2-03): the pickup/delivery switch appears here only when the quote says delivery is possible. */}
-        {/* TODO(W2-01): the credits toggle and amount slider are hidden; credits are not built. */}
+        {status === 'signedIn' && (
+          <CreditsControl storeId={cart.store.id} probe={probe} quote={quote.data} on={choice.on} amount={choice.amount} />
+        )}
       </section>
 
       <Button variant="ghost" onClick={() => clearCart()}>

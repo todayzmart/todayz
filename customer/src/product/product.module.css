@@ -21,6 +21,14 @@
   background: var(--surface-subtle);
   color: var(--ink-3);
   font: var(--type-display-xl);
+  overflow: hidden;
+}
+
+.mediaImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-xl);
 }
 
 .titleBlock {

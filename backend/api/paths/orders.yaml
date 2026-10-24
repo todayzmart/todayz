@@ -24,8 +24,8 @@
       Customer app. No side effects. Re-reads prices and stock now. Lines are priced from the store item's
       price; an `askReplyId` that is this customer's Yes for this store prices that item's line at the
       replied price while it is valid (`priceSource: ask_reply`, D-101) and is ignored otherwise. `orderable`
-      is false while any line is short. Credits are not live yet: `creditsAllowed` is 0 with `creditsLimit:
-      not_available` when credits are asked for. `409 store_not_bookable` for a store that takes no pickup
+      is false while any line is short. Credits (W2-01): `creditsAllowed` is what the wallet, the per-order
+      max, the ₹1 floor and the caps allow for `creditsToUse`; `creditsLimit` says why it is less (D-76). `409 store_not_bookable` for a store that takes no pickup
       orders (or `fulfilment: delivery` until delivery ships); `409 ask_reply_used` when the reply already
       has an active order.
     x-idempotency: none
@@ -170,7 +170,10 @@
       `409 store_closed` outside opening hours or while closed by the shop; `409 store_not_bookable` when
       the store takes no pickup orders or is not live (delivery is refused the same way until it ships);
       `409 ordering_suspended` with `extensions.until` while no-show strikes limit the account and it
-      already has an unfinished order (01 §5.4); `409 ask_reply_used` (with `extensions.orderId`) and
+      already has an unfinished order (01 §5.4); with `creditsToUse` the credits are held in the same
+      transaction (W2-01): `409 below_credit_minimum`, `credit_max_exceeded`, `credit_monthly_cap` or
+      `store_credit_cap` when a credit rule refuses them, `409 price_changed` when the wallet no longer
+      covers them; `409 ask_reply_used` (with `extensions.orderId`) and
       `409 ask_price_expired` (with `extensions.quote`) for a booking from an ask reply (D-101). The response
       never carries the pickup code; read the order for it.
     x-idempotency: required
@@ -185,6 +188,10 @@
     - ordering_suspended
     - ask_reply_used
     - ask_price_expired
+    - below_credit_minimum
+    - credit_max_exceeded
+    - credit_monthly_cap
+    - store_credit_cap
     parameters:
     - $ref: ../common/parameters.yaml#/IdempotencyKey
     requestBody:

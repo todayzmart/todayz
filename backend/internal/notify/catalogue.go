@@ -98,6 +98,37 @@ var catalogue = map[string]kindDef{
 			"en": {"A shop has it", "{store} has {product}."},
 		},
 	},
+	notice.KindCreditsEarned: {
+		// 01 §15: in-app (+ push) for the customer (W2-01).
+		App: AppCustomer, Channels: []notice.Channel{notice.Push}, Params: []string{"credits"},
+		Text: map[string]text{
+			"en": {"Credits earned", "{credits} credits were added to your TodayZ wallet."},
+			"hi": {"क्रेडिट मिले", "आपके TodayZ वॉलेट में {credits} क्रेडिट जोड़े गए।"},
+		},
+	},
+	notice.KindCreditsExpiring: {
+		// 01 §15: in-app (+ push) for the customer, credit_expiry_reminder_days
+		// before the lot's expiry (W2-01).
+		App: AppCustomer, Channels: []notice.Channel{notice.Push}, Params: []string{"credits", "date"},
+		Text: map[string]text{
+			"en": {"Credits expiring", "{credits} credits in your wallet expire after {date}. Use them on your next order."},
+			"hi": {"क्रेडिट समाप्त हो रहे हैं", "आपके वॉलेट के {credits} क्रेडिट {date} के बाद समाप्त हो जाएंगे। अगले ऑर्डर पर उनका उपयोग करें।"},
+		},
+	},
+	notice.KindReferralUnlocked: {
+		// 01 §15: "Referral unlocked", in-app + push (W2-03).
+		App: AppCustomer, Channels: []notice.Channel{notice.Push}, Params: []string{"credits"},
+		Text: map[string]text{
+			"en": {"Referral unlocked", "You earned {credits} credits from a referral."},
+		},
+	},
+	notice.KindShopReferralUnlocked: {
+		// W2-03: a referral reward reached the store's credit account (in-app + push).
+		App: AppBusiness, Channels: []notice.Channel{notice.Push}, Params: []string{"credits"},
+		Text: map[string]text{
+			"en": {"Referral unlocked", "{credits} credits from a referral were added to your credit account."},
+		},
+	},
 }
 
 var (

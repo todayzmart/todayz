@@ -1,0 +1,41 @@
+/* QR standee layout. Component looks come from bundle.css (tz-*) and @todayz/ui; this file only places them. Tokens only. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.sub {
+  font: var(--type-caption);
+  color: var(--ink-3);
+}
+
+.code {
+  font: var(--type-heading);
+  color: var(--ink);
+  letter-spacing: 0.08em;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.frame {
+  width: 100%;
+  aspect-ratio: 148 / 210;
+  max-height: 70vh;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}

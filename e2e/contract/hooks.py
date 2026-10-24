@@ -1,6 +1,6 @@
 """Schemathesis checks for the TodayZ contract (W0-04; 04 §1.4, 08 §3.8, SC-PL-02).
 
-run.sh loads this module through SCHEMATHESIS_HOOKS=hooks. The one check,
+run.sh loads this module through SCHEMATHESIS_HOOKS=hooks. The check,
 todayz_problem, looks at every answer with a status of 400 or more:
 
   - it is application/problem+json, unless the operation declares that status
@@ -9,8 +9,13 @@ todayz_problem, looks at every answer with a status of 400 or more:
     status the registry gives it;
   - "status" repeats the HTTP status and "type" is https://todayz.in/errors/<code>.
 
-problem_errors and load_registry are plain functions so test_hooks.py covers
-them without a server; the check itself just reports what they return.
+One hook, before_call: an operation that declares a 3xx answer is checked on
+the redirect itself, never followed. Its Location is an app page (a referral
+link goes to the customer app), which is not running under the smoke (W2-03).
+
+problem_errors, load_registry and declares_redirect are plain functions so
+test_hooks.py covers them without a server; the check and the hook just apply
+what they return.
 """
 
 from __future__ import annotations
@@ -52,6 +57,11 @@ def declared_json_statuses(raw_operation: dict[str, Any]) -> set[str]:
         if isinstance(response, dict) and "application/json" in (response.get("content") or {}):
             out.add(str(status))
     return out
+
+
+def declares_redirect(raw_operation: dict[str, Any]) -> bool:
+    """Whether the operation declares a 3xx answer."""
+    return any(str(status).startswith("3") for status in (raw_operation.get("responses") or {}))
 
 
 def problem_errors(
@@ -127,3 +137,10 @@ if schemathesis is not None:
         errors = problem_errors(status, content_type, _body(response), declared_json_statuses(raw), registry())
         if errors:
             raise AssertionError(f"{case.method} {case.path} -> {status}: " + "; ".join(errors))
+
+    @schemathesis.hook
+    def before_call(ctx: Any, case: Any, kwargs: dict[str, Any]) -> None:
+        """A declared redirect is the answer: do not follow it."""
+        raw = getattr(getattr(case.operation, "definition", None), "raw", None) or {}
+        if declares_redirect(raw):
+            kwargs["allow_redirects"] = False

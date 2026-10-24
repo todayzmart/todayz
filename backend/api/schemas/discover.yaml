@@ -337,7 +337,7 @@ DiscoverStorePage:
     The shop page (C-07): a live store of a verified business. Never the phone
     number or the stock counts. `distanceM` is set when the request carries
     `lat` and `lng`.
-  required: [storeId, storeSlug, name, locality, addressLine1, addressLine2, landmark, city, pincode, lat, lng, distanceM, open, closedUntil, hours, pickup, delivery, bookable, rating, ratingCount, cashbackPct, categoryTint, deliveryFeePaise, deliveryFreeAbovePaise, deliveryMinOrderPaise, deliveryRadiusM, serverNow]
+  required: [storeId, storeSlug, name, locality, addressLine1, addressLine2, landmark, city, pincode, lat, lng, distanceM, open, closedUntil, hours, pickup, delivery, bookable, rating, ratingCount, cashbackPct, categoryTint, categorySlug, categoryName, deliveryFeePaise, deliveryFreeAbovePaise, deliveryMinOrderPaise, deliveryRadiusM, serverNow]
   properties:
     storeId:
       $ref: ./common.yaml#/Ulid
@@ -392,6 +392,12 @@ DiscoverStorePage:
       format: double
     categoryTint:
       type: [string, "null"]
+    categorySlug:
+      type: [string, "null"]
+      description: The shop's primary category (the one `category` filters by); null when none.
+    categoryName:
+      type: [string, "null"]
+      description: English name of `categorySlug`; null when there is none.
     deliveryFeePaise:
       $ref: ./common.yaml#/Paise
     deliveryFreeAbovePaise:

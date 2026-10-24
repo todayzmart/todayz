@@ -6,6 +6,7 @@ import type { DiscoverSearchStore } from '@todayz/api-client/gen/model/discoverS
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import {
+  Banner,
   Button,
   Chip,
   ChipGroup,
@@ -235,6 +236,10 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
   const pages = useMemo(() => search.data?.pages ?? [], [search.data]);
   const first = pages[0];
   const groups = pages.flatMap((p) => p.results.map((r) => ({ r, serverNow: p.serverNow })));
+  // C-05 "none confirmed" (D-190): shops have it listed, but none has confirmed the stock lately
+  // (the server nulls `confirmedAt` past `stock_stale_after_hours`).
+  const noneConfirmed =
+    groups.length > 0 && !groups.some(({ r }) => r.items.some((i) => i.inStock && i.confirmedAt !== null));
 
   useEffect(() => {
     for (const p of pages) for (const r of p.results) seedItems(qc, r.store.storeSlug, r.items, p.serverNow);
@@ -343,6 +348,9 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
           <AskNearbySlot query={q} />
         </>
       )}
+      {search.isSuccess && !search.hasNextPage && noneConfirmed && (
+        <NoneConfirmed km={km} query={q} />
+      )}
       <ul className={styles.groups}>
         {groups.map(({ r, serverNow }) => (
           <li key={r.store.storeSlug}>
@@ -355,6 +363,38 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
           {intl.formatMessage({ id: 'search.more' })}
         </Button>
       )}
+    </>
+  );
+}
+
+/**
+ * D-190: say plainly that no shop in range has confirmed the stock, and offer the next radius up. At 20 km
+ * there is no wider option, so offer to search again later. The shops are never asked again from here:
+ * "Ask shops nearby" stays the customer's own action (AskNearbySlot).
+ */
+function NoneConfirmed({ km, query }: { km: number; query: string }) {
+  const intl = useIntl();
+  const next = RADIUS_OPTIONS_KM.find((k) => k > km);
+  const qc = useQueryClient();
+  return (
+    <>
+      <Banner
+        tone="warning"
+        live="status"
+        title={intl.formatMessage({ id: 'search.noneConfirmed.title' })}
+      >
+        {intl.formatMessage({ id: next !== undefined ? 'search.noneConfirmed.body' : 'search.noneConfirmed.bodyWidest' })}
+      </Banner>
+      {next !== undefined ? (
+        <Button variant="soft" block onClick={() => setRadiusKm(next)}>
+          {intl.formatMessage({ id: 'search.noneConfirmed.wider' }, { km: String(next) })}
+        </Button>
+      ) : (
+        <Button variant="soft" block onClick={() => void qc.invalidateQueries({ queryKey: ['discover', 'search', query] })}>
+          {intl.formatMessage({ id: 'search.noneConfirmed.later' })}
+        </Button>
+      )}
+      <AskNearbySlot query={query} />
     </>
   );
 }

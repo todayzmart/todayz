@@ -170,17 +170,5 @@
   "shop.pick.continue": {
     "defaultMessage": "Continue to overview",
     "description": "Button that skips the picker when the list is unavailable"
-  },
-  "shop.invite.title": {
-    "defaultMessage": "Join a shop",
-    "description": "Invite acceptance page title"
-  },
-  "shop.invite.soon": {
-    "defaultMessage": "Accepting an invitation is coming soon. Keep this link; it will work here.",
-    "description": "Placeholder until invitations can be accepted"
-  },
-  "shop.invite.home": {
-    "defaultMessage": "Go to overview",
-    "description": "Link out of the invite placeholder"
   }
 }

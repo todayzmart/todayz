@@ -43,9 +43,16 @@ const (
 	KindNewOrder    = "new_order"    // a new order for the store (push + in-app)
 	KindOrderUnseen = "order_unseen" // the new order was not seen in order_unseen_sms_after_min (SMS)
 	KindNewAsk      = "new_ask"      // a customer ask for the store (push + in-app; D-101)
+	// KindShopReferralUnlocked: a referral reward posted to the store's credit account (W2-03).
+	KindShopReferralUnlocked = "shop_referral_unlocked"
 	// Customer inbox.
 	KindOrderUpdate = "order_update" // accepted, partial, rejected, expired, ready, out for delivery, delivered
 	KindAskReply    = "ask_reply"    // a shop replied Yes to the customer's ask (D-101)
+	// Credits (W2-01): cashback or a reward landed; credits expire soon.
+	KindCreditsEarned   = "credits_earned"
+	KindCreditsExpiring = "credits_expiring"
+	// KindReferralUnlocked: a referral reward posted to the customer's wallet (01 §15, W2-03).
+	KindReferralUnlocked = "referral_unlocked"
 )
 
 // Ref is what a notification opens.

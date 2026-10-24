@@ -1,4 +1,4 @@
-# Schemas: domain "business-credits" (owner W2-03): business credits and statements (04 §2.6).
+# Schemas: domain "business-credits" (owner W2-01): business credits and statements (04 §2.6).
 #
 # Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
 # Schema; names are unique across every schemas/<domain>.yaml. Request objects
@@ -6,4 +6,44 @@
 # an object that must stay open says `x-open-object: true`. Money is `*Paise`
 # (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
 # timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+CreditAccount:
+  type: object
+  description: >-
+    The business's credit account (B-10, 01 §9): one balance per store, which may be negative (cashback the
+    store funded, CR-16), and the latest lines across its stores, newest first. Pass `cursor` for older lines.
+  required: [balanceCredits, stores, lines, nextCursor, serverNow]
+  properties:
+    balanceCredits:
+      type: integer
+      description: The sum of the store balances.
+    stores:
+      type: array
+      items: {$ref: '#/StoreCreditBalance'}
+    lines:
+      type: array
+      items: {$ref: '#/CreditAccountLine'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+StoreCreditBalance:
+  type: object
+  required: [storeId, name, balanceCredits]
+  properties:
+    storeId: {$ref: ./common.yaml#/Ulid}
+    name: {type: string}
+    balanceCredits: {type: integer}
+CreditAccountLineKind:
+  type: string
+  enum: [spend_capture, cashback, referral_reward, admin_adjustment, payout, reversal]
+CreditAccountLine:
+  type: object
+  description: One posting on a store's account. `credits` is signed (+ in, − out).
+  required: [id, storeId, kind, credits, text, orderNumber, createdAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    storeId: {$ref: ./common.yaml#/Ulid}
+    kind: {$ref: '#/CreditAccountLineKind'}
+    credits: {type: integer}
+    text: {type: string}
+    orderNumber: {type: [string, "null"]}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+

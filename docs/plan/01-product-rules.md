@@ -205,7 +205,7 @@ Any non-terminal state
 - **Lots:** every credit into a customer wallet creates a lot (cashback, referral reward, positive admin adjustment). Each lot expires on its own date.
 - **Holding:** credits chosen at checkout are held when the order is placed. A hold consumes lots oldest first and marks those portions as held. The hold is captured on `collected`/`delivered` and released on any other terminal state; a released hold goes back to the same lots (no new lot). A lot that expires while held does not expire then; if the hold is released after the lot's expiry date, that portion expires at once.
 - **Where spent credits go:** to the shop's credit account (customer spends 30 → shop's account +30). The shop is paid that money with its payout (§9).
-- **Purchase cashback:** each store sets a cashback rate in settings (0–20%, stored as `cashback_bp` 0–2000, step 50 bp, default 0). On `collected`/`delivered` or a linked POS sale, the customer earns `floor(base_paise × cashback_bp / 1 000 000)` credits, where base = eligible amount − credits used (the delivery fee is excluded). Shown on the shop in the customer app ("5% back"). **The shop pays for its own cashback**: it is debited from the shop's credit account (**default**; may go negative, netted at payout).
+- **Purchase cashback:** each store sets a cashback rate in settings (0–20%, stored as `cashback_bp` 0–2000, step 50 bp, default 0). On `collected`/`delivered` or a linked POS sale, the customer earns `floor(base_paise × cashback_bp / 1 000 000)` credits, where base = eligible amount − credits used (the delivery fee is excluded). Shown on the shop in the customer app ("5% back"). An order earns at the rate its store had when the order was placed, even if the shop changes it before collection (D-124). **The shop pays for its own cashback**: it is debited from the shop's credit account (**default**; may go negative, netted at payout).
 - **Referral credits** are paid by TodayZ (marketing expense), see §8.
 - **Expiry** (**default**): each lot expires 365 days after it was earned (`credit_expiry_days`); spending uses the oldest lots first; customers are told `credit_expiry_reminder_days` (7) days before. A lot earned on day X (IST) with `credit_expiry_days` = N is usable through day X+N and expires at 00:00 IST on day X+N+1.
 - **Caps** (**default**, fraud guard): one customer can spend credits on at most 10 orders per month (`credit_orders_per_month`); one store can accept at most 200 credit redemptions per day (`store_credit_redemptions_per_day`).
@@ -238,13 +238,14 @@ Keys: `ref_<kind>_referrer_credits` and `ref_<kind>_referee_credits` for each ki
 
 - A referral is **pending** at sign-up and **unlocks** when the new person completes the qualifying action:
   - a customer: their first `collected`/`delivered` order or `bill_qr`/`counter_code` POS sale whose qualifying amount (eligible amount − credits used) is at least ₹100 (`ref_qualifying_min_order_paise`);
-  - a new shop: verification plus 10 completed orders or linked sales (`ref_shop_qualifying_orders`, **default**).
-- Customer rewards post in the same transaction as the qualifying order outcome; shop rewards post after the 10th order (D-72).
+  - a new shop: verification plus completed orders or linked sales by 10 different customers (`ref_shop_qualifying_orders`, **default**; distinct customers, not purchases, D-168).
+- Customer rewards post in the same transaction as the qualifying order outcome; shop rewards post once the 10th different customer's purchase is counted (D-72, D-168).
 - **Attribution:** one referrer per new person. First touch wins, within 7 days from opening the link to signing up (`ref_attribution_window_days`).
 - Self-referral, a second claim, and the same phone are refused. A sign-up on a device already tied to the referrer, or to another account in the last 90 days, is recorded as `rejected_same_device` with no reward. 3 or more accounts on one device raises a risk flag.
 - Rewards to a shop (as referrer or as the new shop) go to the credit account of the business's primary store and are paid out in money with payouts (§9).
   - The primary store is the business's oldest store that is `live` when the reward posts (D-72).
   - If the business has no live store at that moment, the reward waits as pending and posts when one goes live.
+- A referrer whose account is blocked is not paid while blocked: their reward stays qualified and unpaid, and posts once they are unblocked. A deleted referrer's reward is void (D-168).
 
 ## 9. Retailer credit account and payouts
 

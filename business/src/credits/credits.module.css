@@ -1,0 +1,140 @@
+/* B-10 Credits and referrals layout. Component looks come from bundle.css (tz-*) and @todayz/ui;
+   this file only places them. Tokens only. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.sub {
+  font: var(--type-caption);
+  color: var(--ink-3);
+}
+
+.balance {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.balanceValue {
+  font: var(--type-heading);
+  color: var(--ink);
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--line);
+}
+
+.lineMain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.lineKind {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.plus {
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.minus {
+  font-weight: 600;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.more {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-3) 0;
+}
+
+.explain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: var(--space-4);
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.soon {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--ink-2);
+}
+
+.soon p {
+  margin: 0;
+}
+
+.codeRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.code {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  font: var(--type-label);
+  letter-spacing: 0.08em;
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.stats dt {
+  font: var(--type-caption);
+  color: var(--ink-3);
+}
+
+.stats dd {
+  margin: 0;
+  font-weight: 600;
+}

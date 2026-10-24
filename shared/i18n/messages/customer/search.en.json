@@ -118,5 +118,25 @@
   "search.deliveryFee": {
     "defaultMessage": "+{fee} delivery",
     "description": "Delivery fee tag on a result card; fee is formatted money"
+  },
+  "search.noneConfirmed.title": {
+    "defaultMessage": "None of the shops has confirmed yet.",
+    "description": "C-05 every result is stale (D-190)"
+  },
+  "search.noneConfirmed.body": {
+    "defaultMessage": "They list it, but none has confirmed stock lately, so it may not be on the shelf.",
+    "description": "C-05 none confirmed, body"
+  },
+  "search.noneConfirmed.bodyWidest": {
+    "defaultMessage": "They list it, but none has confirmed stock lately. You are already searching the widest area.",
+    "description": "C-05 none confirmed at 20 km"
+  },
+  "search.noneConfirmed.wider": {
+    "defaultMessage": "Search within {km} km",
+    "description": "C-05 next radius up"
+  },
+  "search.noneConfirmed.later": {
+    "defaultMessage": "Search again later",
+    "description": "C-05 at the widest radius: run the search again"
   }
 }
