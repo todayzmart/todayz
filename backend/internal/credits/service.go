@@ -542,9 +542,13 @@ func (s *Service) portions(ctx context.Context, q *creditsdb.Queries, h creditsd
 	return ps, nil
 }
 
+// memoRecap marks a release that cut the hold down when the order changed
+// (the wallet line's reason order_changed).
+const memoRecap = "recap"
+
 // release returns ps of hold h to their lots, or to platform_expired for
 // lots that are due (D-27), and records n released on the hold.
-func (s *Service) release(ctx context.Context, q *creditsdb.Queries, now time.Time, h creditsdb.CreditHold, acc map[Account]locked, ref Ref, ps []portion, key string, final bool) error {
+func (s *Service) release(ctx context.Context, q *creditsdb.Queries, now time.Time, h creditsdb.CreditHold, acc map[Account]locked, ref Ref, ps []portion, key, memo string, final bool) error {
 	c, _ := ids.FromUUID(h.CustomerID)
 	back, expired, backN, expiredN := splitDue(ps, now)
 	es := []entry{{Account: acc[held(c)].ID, Amount: -int64(backN + expiredN)}}
@@ -554,7 +558,7 @@ func (s *Service) release(ctx context.Context, q *creditsdb.Queries, now time.Ti
 	if expiredN > 0 {
 		es = append(es, entry{Account: platformIDs[PlatformExpired], Platform: true, Amount: int64(expiredN)})
 	}
-	txID, dup, err := s.post(ctx, q, now, txSpec{Kind: TxSpendRelease, Ref: ref, Key: key, Entries: es})
+	txID, dup, err := s.post(ctx, q, now, txSpec{Kind: TxSpendRelease, Ref: ref, Key: key, Memo: memo, Entries: es})
 	if err != nil {
 		return err
 	}
@@ -595,7 +599,7 @@ func (s *Service) Release(ctx context.Context, ref Ref) (int, error) {
 		if err != nil {
 			return err
 		}
-		if err := s.release(ctx, q, now, h, acc, ref, ps, ref.key("release"), true); err != nil {
+		if err := s.release(ctx, q, now, h, acc, ref, ps, ref.key("release"), "", true); err != nil {
 			return err
 		}
 		n = int(h.Amount - h.Released)
@@ -634,7 +638,7 @@ func (s *Service) Recap(ctx context.Context, ref Ref, eligiblePaise int64) (int,
 		if !ok {
 			return errors.New("credits: hold portions short")
 		}
-		if err := s.release(ctx, q, now, h, acc, ref, sel, fmt.Sprintf("%s:%d", ref.key("recap"), to), to == 0); err != nil {
+		if err := s.release(ctx, q, now, h, acc, ref, sel, fmt.Sprintf("%s:%d", ref.key("recap"), to), memoRecap, to == 0); err != nil {
 			return err
 		}
 		kept = to
@@ -883,7 +887,7 @@ func (s *Service) OnAccountDelete(ctx context.Context, userID ids.ID) error {
 			// TODO(lead): orders refuses deletion with an unfinished order
 			// (D-31), so nothing should be held here; refusing is the
 			// conservative reading for a hold W2-04's bill claims may add.
-			return ErrHeld
+			return problem.Wrap(genproblems.Conflict, ErrHeld)
 		}
 		lots, err := q.SpendableLots(ctx, ids.UUID(userID))
 		if err != nil {
