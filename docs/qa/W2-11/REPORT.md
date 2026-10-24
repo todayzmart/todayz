@@ -1,6 +1,6 @@
 # W2-11 POS counter and offline: QA report
 
-B-05 Sell in `business/`: the counter, an offline queue with sync status, a barcode scanner and the receipt. Branch `claude/wp-w2-11-pos-ui-7d734e`, from `7f0838e` to the head of the branch (see `git log`). Everything ran locally; nothing touched a cloud account, and `make dev`, `make e2e` and `make check` were not run (lead's rule).
+B-05 Sell in `business/`: the counter, an offline queue with sync status, a barcode scanner and the receipt. Branch `claude/wp-w2-11-pos-ui-7d734e`, from `7f0838e` to the head of the branch (see `git log`). W2-04 reached main in `65353e9`; main was merged in `7e441c2`, then `make gen` was rerun. The only conflict was `docs/plan/12-decision-log.md` (both sides appended; both kept). `backend/api` is identical to the W2-04 branch the adapter was built against, so there was no contract drift and no business code changed. Everything ran locally; nothing touched a cloud account, and `make dev`, `make e2e` and `make check` were not run (lead's rule).
 
 ## What was built
 
@@ -22,6 +22,8 @@ B-05 Sell in `business/`: the counter, an offline queue with sync status, a barc
 | `build:e2e` | ok; precache and dist checks pass |
 | size-limit | initial JS 159.38 kB gzip (limit 250), CSS 10.35 kB gzip (limit 20) |
 | `e2e/sell.spec.ts` (Playwright, preview of the e2e build, faked API) | 3 passed; no console errors, no non-local requests |
+
+All rerun after the merge with main; same results (358 and 197 tests, 159.38 kB, `build:e2e` ok).
 
 ## Screenshots
 
@@ -54,6 +56,7 @@ Seen in the offline shot: the shell's offline banner and the counter's own "Offl
 4. The add-product link from an unknown barcode goes to Stock until W2-12 offers a deep link.
 5. QR test fixtures were generated with `qrencode`; the encoder is checked against them, not against a second implementation.
 6. The shell's offline banner and the counter's notice duplicate each other.
+7. `e2e/smoke.spec.ts` has 4 failing tests on this branch (Overview on phone and desktop, the Overview tab, the More tab): the app redirects to sign-in because the spec does not set the `todayz.hasSession.business` hint the session needs before it tries a refresh. I did not change that spec or `shared/auth`; the fix is one `addInitScript` in the spec (as `sell.spec.ts` does). Needs its owner. Running it with `TZ_QA_DIR` also writes its own shots into the QA folder, so run it without that variable.
 
 ## Questions
 
