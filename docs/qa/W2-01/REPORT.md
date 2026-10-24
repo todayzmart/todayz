@@ -151,6 +151,24 @@ What orders does with it:
 | `make gen` | exit 0 |
 | `make check-contract` | Redocly lint, `apigen check` and the api-client checks pass. **`TestContractSmoke` fails on two operations that are not W2-01's** and came in with main (W2-06 and W2-03): `GET /v1/discover/stores/{slug}/reviews` answers 422 to a schema-valid very long `cursor` (the contract allows a cursor the validator or handler refuses), and `GET /v1/public/ref/{code}` is a network error (its redirect goes to the customer app, which is not running under the smoke). 132 of 134 operations pass, including wallet and business-credits. Nothing W2-01 changed touches either path; listed under Questions for those WPs |
 
+### After the second review (shared test server, `TODAYZ_TEST_PG_URL_FILE`)
+
+| Check | Result |
+|---|---|
+| `go test -p 2 -count=1 ./internal/credits/` | ok, 33 s |
+| `go test -p 2 -count=1 ./cmd/todayz/` | ok, 59 s |
+| `go test -p 2 -count=1 ./internal/jobs/ ./internal/platform/migrate/` | ok (migrate: up-down-up with the composite FK in 20102) |
+| `TestFlagNeverStallsHoldDB` | a Hold whose cap refusal must flag, on a 1-connection pool that the holding transaction already uses, returns `LimitStoreCap` in about the 300 ms test timeout and writes no flag; the same refusal on a free pool writes one. With the timeout set to 30 s it takes 30.7 s (checked by mutation) |
+| `TestEndReleasesHoldHTTP` | a real 10-credit hold with `orders.credits_used` forced to 0 is released on a customer cancel, an accept timeout and a no-show; the wallet is back at 40. With the release made conditional on `credits_used > 0` it fails (checked by mutation) |
+| `TestCollectCapturesHoldHTTP` | collection captures 10; the wallet is at 30 |
+| `go vet ./...` | ok |
+| golangci-lint on credits, orders, jobs, cmd/todayz | 0 issues |
+| settings lint | exit 0 |
+| gofmt | clean |
+| `make gen` | exit 0 (PostedLegs now selects the ref) |
+
+The contract did not change in this round, so the contract smoke was not rerun.
+
 ### Area checks
 
 Per the lead's rule, I ran these instead of the full `make check`:
@@ -204,6 +222,10 @@ Not run here: the full `make check`, `make e2e`, gosec and govulncheck across th
 | Store cap race (review, D-120) | `TestConcurrentStoreCapDB` | 12 customers hold at one store at once with `store_credit_redemptions_per_day` at 11: 11 held, exactly 1 `store_credit_cap`. With the store lock removed it holds 12 (checked by mutation) |
 | Cashback snapshot (D-124) | `TestCollectPaysPlacedCashbackHTTP`, `TestCashbackDB` | placed at 5%, store moved to 10%, collected at 5% (`bp:500`); a completion's own rate beats the store's both ways; −1 and 2001 are `ErrInvalid`. Without the rate passed through the adapter the HTTP test fails (checked by mutation) |
 | Store-limited read (D-125) | `TestCreditAccountHTTP`, `TestReadsDB` | owner and full manager see both stores, a manager of s2 sees s2; cashier 403; other business 403/404 |
+| Flag never stalls a hold (second review, D-126) | `TestFlagNeverStallsHoldDB` | the flag insert has its own 2 s timeout; on a timeout or error it is logged (rule only) and counted in `tz_credits_risk_flag_failures_total`, and the refusal stands |
+| Balance kind matches its account (second review, D-123) | `TestAppendOnlyDB` | composite FK `(account_id, kind)` → `ledger_accounts(id, kind)`; a mismatched kind is 23503 |
+| Flag dedupe (second review, D-126) | `TestCapsDB` | a second store-cap refusal on the same IST day leaves one flag (at most one, best effort) |
+| Reused key, other ref (second review, D-122) | `TestPostDB`, `TestFakeScenarios` | another ref id, or none, is `ErrKeyReused`; two legs on one account are not collapsed |
 | CR-30 (builder) | `TestHoldReleaseCaptureDB`, `TestPostDB`, `TestForfeitOnDeleteDB`, the property runs | **Idempotent repeats.** A repeated hold returns the hold; release and complete return what was posted first; `Post` with the same key gives `Duplicate: true` and writes nothing; a repeated forfeiture posts once |
 
 ## Files changed outside the owned paths
@@ -226,6 +248,9 @@ Not run here: the full `make check`, `make e2e`, gosec and govulncheck across th
 | `internal/platform/notice/notice.go` | `KindCreditsEarned` and `KindCreditsExpiring` |
 | `internal/notify/catalogue.go`, `catalogue_test.go` | the two notice kinds' catalogue entries |
 | `go.mod` | `pgregory.net/rapid` v1.2.0 becomes a direct requirement for the CR-13 property tests (already in `go.sum`; 08-testing names it). `go mod tidy` also moved `golang.org/x/text` from indirect to direct, because `internal/search` already imports it |
+| `internal/orders/seams.go` (again) | second review: the delivery hand-off note on `Credits` (D-127) |
+| `cmd/todayz/orders_http_test.go` | second review: the credits-deferred TODOs at BK-06, BK-11 and BK-14 now point to the new credits tests. What stays a TODO is not credits work: the store_reliability unaccepted counter (BK-06), the review prompt (BK-11, no WP sends it yet) and BK-16 |
+| `db/migrations/20202_w2-02_order_cashback_bp.sql` (again) | second review: the comment says the backfill bumps `updated_at` once, which the lead accepted |
 
 The owned paths are `internal/credits`, `internal/jobs/credits.go`, `cmd/todayz/routes_credits.go`, `api/{paths,schemas,problems}/{wallet,business-credits}.yaml`, `db/queries/credits`, `db/migrations/201xx_*`, `platform/authz/policy/credits.go` with its golden file, and `docs/runbooks/credits-ledger.md`.
 
@@ -244,7 +269,15 @@ The lead's session did a read-only review ("merge with follow-ups"). Its fixes a
 | 7. Store-limited managers (Q4) | the read shows only the member's stores; HTTP test | D-125 |
 | 8. Q2, Q3, Q5, Q8 | conservative defaults; Q3 dedupe built (one flag per subject, rule and IST day) | D-126 |
 
-No second independent review was done after these fixes.
+The lead's second review ("no blockers") asked for five more fixes:
+
+| Item | Fix | Entry |
+|---|---|---|
+| 1. `flag()` could stall placement | the flag insert gets its own 2 s timeout on a second connection; a timeout or error is logged and counted (`tz_credits_risk_flag_failures_total`) and never fails the hold. CR-11 still holds when the insert succeeds. `TestFlagNeverStallsHoldDB`. The API pool size is the lead's platform follow-up | D-126 |
+| 2. Release in `end()` untested | `TestEndReleasesHoldHTTP` (cancel, accept timeout, no-show with `credits_used` forced to 0), `TestCollectCapturesHoldHTTP`; the `orders_http_test.go` TODOs updated | D-127 |
+| 3. delivered and delivery_failed | the note at the `Credits` seam. 07 gives delivery transitions to W2-02, which deferred them (BK-23–25, D-69); no later WP is named yet | D-127 |
+| 4. CR-19 forged state | composite FK on `account_balances(account_id, kind)` (20102 edited in place); D-123 says CR-19 means no direct UPDATE of balances or lots, and a forged lot INSERT needs arbitrary SQL and is caught by the nightly reconcile | D-123 |
+| 5. Nits | `samePosting` compares kind, ref type and ref id and sorted legs (Fake too); same-day dedupe test; "at most one, best effort" in D-126; runbook lines for old-pod orders (`cashback_bp` 0) and flag failures; the 20202 `updated_at` comment | D-122, D-124, D-126 |
 
 ## Questions (TODO(lead) in code where it applies)
 

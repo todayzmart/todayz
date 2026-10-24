@@ -153,7 +153,8 @@ func TestEndReleasesHoldHTTP(t *testing.T) {
 	place := func() string {
 		t.Helper()
 		id := o.placeWithCredits(10)
-		o.a.exec(`UPDATE orders SET credits_used = 0 WHERE id = $1`, uuidOf(t, id))
+		// ck_orders_money ties the total to credits_used, so raise it with it.
+		o.a.exec(`UPDATE orders SET credits_used = 0, total_paise = total_paise + credits_used::bigint * 100 WHERE id = $1`, uuidOf(t, id))
 		return id
 	}
 	released := func(id string) int {
