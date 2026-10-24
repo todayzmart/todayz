@@ -273,7 +273,7 @@ function ItemTable({
           const i = row.original;
           return (
             <span className={styles.cell}>
-              <button type="button" className="tz-link" onClick={() => onOpen(i)}>
+              <button type="button" className={styles.nameButton} onClick={() => onOpen(i)}>
                 <span className={styles.name}>{itemTitle(i)}</span>
               </button>
               {!i.isListed && <span className={styles.sub}>{intl.formatMessage({ id: 'stock.item.hidden' })}</span>}

@@ -46,6 +46,20 @@
   overflow-wrap: anywhere;
 }
 
+.nameButton {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nameButton:hover .name {
+  text-decoration: underline;
+}
+
 .sub {
   font: var(--type-caption);
   color: var(--ink-3);
