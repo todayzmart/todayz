@@ -22,7 +22,7 @@ services:
     # TODAYZ_POSTGIS_IMAGE to imresamu/postgis:16-3.4 (digest in infra/local/lib.sh):
     # the same build (PostGIS 3.4, Postgres 16, bookworm) published multi-arch
     # by the docker-postgis maintainer.
-    image: ${TODAYZ_POSTGIS_IMAGE:-postgis/postgis:16-3.4@sha256:44126d872ac91993766c341e369c539e8196614321765d36a6f1bab0419a5fa5}
+    image: ${TODAYZ_POSTGIS_IMAGE:-postgis/postgis:16-3.5@sha256:94146ac37bc61e2322f88016056c5920729cb8c64c8542ed590af8fc2abdac07}
     command:
       - postgres
       - -c
