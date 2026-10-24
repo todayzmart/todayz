@@ -134,7 +134,7 @@ const summary = (id: string, status: string) => ({
 
 let guard: PageGuard;
 
-async function api(page: Page, order: () => unknown) {
+async function api(page: Page, order: () => unknown, me?: unknown) {
   const origin = 'http://127.0.0.1';
   void origin;
   await page.route('**/v1/**', (route: Route) => {
@@ -153,6 +153,7 @@ async function api(page: Page, order: () => unknown) {
     const p = url.pathname;
     if (p === '/v1/auth/refresh')
       return send(200, { accessToken: 'tok', tokenType: 'Bearer', expiresAt: new Date(Date.now() + 15 * 60_000).toISOString(), userId: '01J9ZAAAAAAAAAAAAAAAAAAAAA' });
+    if (p === '/v1/me' && me) return send(200, me);
     if (p === '/v1/me/checkout/quote') return send(200, quoteBody);
     if (p === '/v1/me/stream') return route.fulfill({ status: 200, contentType: 'text/event-stream', headers: cors, body: '' });
     if (p === '/v1/me/orders') {
@@ -251,4 +252,53 @@ test('orders list', async ({ page }) => {
   await expect(page.getByRole('region', { name: 'In progress' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Earlier' })).toBeVisible();
   await shot(page, 'w2-09-orders.png');
+});
+
+// W2-02 finish: the partial confirm (BK-09) and the C-21 order limit (BK-16).
+test('tracking: the shop can give part of the order', async ({ page }) => {
+  const [dal, oil] = orderBody().lines;
+  await api(page, () =>
+    orderBody({
+      status: 'awaiting_customer',
+      acceptBy: null,
+      partialConfirmBy: at(4),
+      lines: [
+        { ...dal, quantityAccepted: 1, lineTotalPaise: 8400 },
+        { ...oil, quantityAccepted: 1 },
+      ],
+      subtotalPaise: 22900,
+      itemSubtotalPaise: 22900,
+      itemsAfterOffersPaise: 22900,
+      creditsUsed: 10,
+      totalPaise: 21900,
+      timeline: [
+        { fromStatus: null, toStatus: 'placed', actor: 'customer', reason: null, at: NOW },
+        { fromStatus: 'placed', toStatus: 'awaiting_customer', actor: 'staff', reason: null, at: at(1) },
+      ],
+      version: 2,
+    }),
+  );
+  await page.goto(`/orders/${ORDER_ID}`);
+  await expect(page.getByRole('button', { name: /^Take it/ })).toBeVisible();
+  await expect(page.getByText('Credits used')).toBeVisible();
+  await shot(page, 'w2-02-partial-confirm.png');
+});
+
+test('checkout: the order limit after missed pickups', async ({ page }) => {
+  // The banner hides once `until` is past the time `/v1/me` was read, so the date follows the real clock.
+  const until = new Date(Date.now() + 7 * 24 * 60 * 60_000).toISOString();
+  const me = {
+    id: '01J9ZAAAAAAAAAAAAAAAAAAAAA',
+    name: null,
+    preferredLang: 'en',
+    phoneMasked: '90•••••011',
+    app: 'customer',
+    customer: { referralCode: 'ABC123', activeOrderLimit: { maxActiveOrders: 1, until, reason: 'no_show_strikes' } },
+    createdAt: NOW,
+  };
+  await api(page, () => orderBody(), me);
+  await seedCart(page);
+  await page.goto('/checkout');
+  await expect(page.getByText('Ordering is limited for now')).toBeVisible();
+  await shot(page, 'w2-02-limit-banner.png');
 });
