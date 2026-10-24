@@ -22,6 +22,9 @@ const (
 	// KindNoShow expires a held pickup order nobody collected by hold_until
 	// and gives the customer a strike (BK-14).
 	KindNoShow = "order_pickup_no_show"
+	// KindPartialTimeout cancels a partly accepted order the customer did
+	// not answer by partial_confirm_by (BK-10).
+	KindPartialTimeout = "order_partial_timeout"
 )
 
 // Reasons the system records (03 §4.2 SystemReason).
@@ -83,6 +86,43 @@ func (s *Service) ExpireUnanswered(ctx context.Context, run platformjobs.Run) (p
 		}
 		expired = true
 		return s.end(ctx, o, StatusExpired, reasonNotAccepted, nil, system, variant("expired"), now)
+	})
+	if err != nil {
+		return platformjobs.Result{}, err
+	}
+	return timerResult(expired), nil
+}
+
+// ExpirePartial is the KindPartialTimeout handler: a partly accepted order
+// the customer did not answer is cancelled partial_timeout; its credits go
+// back and nobody gets a strike (BK-10). An order already answered, or a
+// second run, is left as it is (BK-21).
+func (s *Service) ExpirePartial(ctx context.Context, run platformjobs.Run) (platformjobs.Result, error) {
+	var a TimerArgs
+	if err := run.Decode(&a); err != nil {
+		return platformjobs.Result{}, err
+	}
+	if err := s.readyToWrite(ctx); err != nil {
+		return platformjobs.Result{}, err
+	}
+	expired := false
+	err := s.db.InTx(ctx, func(ctx context.Context) error {
+		now := s.now()
+		o, err := s.q(ctx).LockOrder(ctx, ids.UUID(a.OrderID))
+		if db.IsNoRows(err) {
+			return nil
+		}
+		if err != nil {
+			return fmt.Errorf("orders: lock order: %w", err)
+		}
+		if o.Status != StatusAwaitingCustomer {
+			return nil
+		}
+		if !pastPartial(o, now) {
+			return errEarly
+		}
+		expired = true
+		return s.end(ctx, o, StatusCancelled, reasonPartialTimeout, nil, system, generic, now)
 	})
 	if err != nil {
 		return platformjobs.Result{}, err

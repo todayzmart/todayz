@@ -17,7 +17,7 @@
 -- business verified (D-40, the same filter as discovery).
 SELECT s.id, s.business_id, s.slug, s.name, s.address_line1, s.address_line2, s.locality,
        s.status, (b.status = 'verified')::bool AS business_verified,
-       s.accepts_pickup, s.accepts_delivery, s.hours, s.closed_until, s.cashback_bp
+       s.accepts_pickup, s.accepts_delivery, s.hours, s.closed_until, s.cashback_bp, s.auto_accept
 FROM stores s JOIN businesses b ON b.id = s.business_id
 WHERE s.id = @id;
 
@@ -126,6 +126,21 @@ RETURNING version;
 
 -- name: AcceptAllLines :exec
 UPDATE order_items SET quantity_accepted = quantity_requested WHERE order_id = @order_id;
+
+-- name: SetPartial :one
+-- A partial accept (BK-08): the order waits for the customer with the
+-- totals recomputed on the accepted lines (D-28). Nothing is reserved yet.
+UPDATE orders SET status = 'awaiting_customer', partial_confirm_by = @partial_confirm_by,
+  subtotal_paise = @subtotal_paise, discount_paise = @discount_paise,
+  items_after_offers_paise = @items_after_offers_paise, item_subtotal_paise = @item_subtotal_paise,
+  credits_used = @credits_used, delivery_fee_paise = @delivery_fee_paise, total_paise = @total_paise,
+  version = version + 1
+WHERE id = @id
+RETURNING version;
+
+-- name: SetLineAccepted :exec
+UPDATE order_items SET quantity_accepted = @quantity_accepted, line_total_paise = @line_total_paise
+WHERE id = @id AND order_id = @order_id;
 
 -- name: SetReady :one
 UPDATE orders SET status = 'ready', version = version + 1 WHERE id = @id

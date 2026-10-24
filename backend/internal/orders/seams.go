@@ -114,6 +114,10 @@ type Credits interface {
 	Hold(ctx context.Context, h CreditsHold) (CreditsAllowance, error)
 	// Release returns an order's held credits (any end but collection).
 	Release(ctx context.Context, orderID ids.ID) error
+	// Recap cuts an order's open hold down to what the new eligible amount
+	// allows after a partial accept (D-28): all of it under the credit
+	// minimum. It returns the credits still held (0 without a hold).
+	Recap(ctx context.Context, orderID ids.ID, eligiblePaise int64) (int, error)
 	// Complete captures the hold to the store and pays cashback at the
 	// rate the order snapshotted when it was placed (cashbackBP, D-124); it
 	// returns the cashback credits.
@@ -135,6 +139,9 @@ func (NoCredits) Hold(context.Context, CreditsHold) (CreditsAllowance, error) {
 
 // Release implements Credits.
 func (NoCredits) Release(context.Context, ids.ID) error { return nil }
+
+// Recap implements Credits.
+func (NoCredits) Recap(context.Context, ids.ID, int64) (int, error) { return 0, nil }
 
 // Complete implements Credits.
 func (NoCredits) Complete(context.Context, ids.ID, ids.ID, ids.ID, int64, int) (int, error) {

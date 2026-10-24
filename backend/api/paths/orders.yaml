@@ -12,7 +12,7 @@
 # takes a required Idempotency-Key; order create and every transition is
 # `x-money` (04 §1.6). The checkout quote lives here, not in a checkout
 # domain: it is the orders package's pricing (W2-02 report). Pickup only for
-# now: delivery, partial accept and returns are in the contract so clients can
+# now: delivery and returns are in the contract so clients can
 # build against them, and answer as each operation says until they ship.
 /v1/me/checkout/quote:
   post:
@@ -504,9 +504,11 @@
     - orders
     summary: Take or decline a partly accepted order
     description: >-
-      From awaiting_customer before `partialConfirmBy` (D-28). `accept: false` cancels with `declined_partial`.
-      Partial accept is not built yet, so no order reaches awaiting_customer and this answers `409 invalid_transition`
-      (W2-02 report).
+      From awaiting_customer before `partialConfirmBy` (D-28, strict). `accept: true` holds the accepted
+      quantities as reservations and starts the pickup hold (`pickup_hold_min`); `409 insufficient_stock` naming
+      the line when one is no longer available (the order keeps waiting). `accept: false` cancels with
+      `declined_partial`. At or after `partialConfirmBy` this is `409 invalid_transition`; the order is cancelled
+      `partial_timeout` with no strike (BK-10).
     x-idempotency: required
     x-money: true
     x-problems:
@@ -988,8 +990,11 @@
     description: >-
       Cashier and above, from placed before `acceptBy`. Holds the stock as reservations; nothing is sold
       yet (D-01). `409 insufficient_stock` naming the line when an accepted quantity is more than available.
-      A quantity below the one asked (partial accept, D-28) is not built yet and answers `422 validation_failed`
-      on that line (W2-02 report). Starts the pickup hold (`pickup_hold_min`).
+      Starts the pickup hold (`pickup_hold_min`). A quantity below the one asked on any line (0 drops it) is a
+      partial accept (D-28): nothing is reserved, the totals are recomputed on the accepted lines, held credits
+      are re-capped, and the order waits in awaiting_customer until `partialConfirmBy`
+      (`partial_confirm_timeout_min`). A line not named keeps its full quantity; leaving nothing to accept is
+      `422 validation_failed` on `body.lines` (reject the order instead).
     x-idempotency: required
     x-money: true
     x-problems:

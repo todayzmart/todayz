@@ -175,12 +175,14 @@ func (h handlers) CancelOrder(ctx context.Context, req ordersapi.CancelOrderRequ
 	return ordersapi.CancelOrder200JSONResponse(o), nil
 }
 
-// ConfirmPartialOrder implements POST /v1/me/orders/{orderId}/confirm-partial.
-// Partial accept is not built yet (BK-08–10), so no order is ever
-// awaiting_customer and the answer is always 409.
+// ConfirmPartialOrder implements POST /v1/me/orders/{orderId}/confirm-partial
+// (BK-09, BK-10).
 func (h handlers) ConfirmPartialOrder(ctx context.Context, req ordersapi.ConfirmPartialOrderRequestObject) (ordersapi.ConfirmPartialOrderResponseObject, error) {
-	_, err := h.customerAction(ctx, req.OrderId, func(u, id ids.ID) error { return h.s.notBuiltCustomer(ctx, u, id) })
-	return nil, err
+	o, err := h.customerAction(ctx, req.OrderId, func(u, id ids.ID) error { return h.s.confirmPartial(ctx, u, id, req.Body) })
+	if err != nil {
+		return nil, err
+	}
+	return ordersapi.ConfirmPartialOrder200JSONResponse(o), nil
 }
 
 // ExtendOrder implements POST /v1/me/orders/{orderId}/extend.
@@ -311,21 +313,6 @@ func (s *Service) notBuiltStore(ctx context.Context, storeID, orderID ids.ID) er
 	}
 	o, err := s.q(ctx).GetOrder(ctx, ids.UUID(orderID))
 	if db.IsNoRows(err) || (err == nil && mustID(o.StoreID) != storeID) {
-		return notFound()
-	}
-	if err != nil {
-		return problem.Wrap(genproblems.Internal, err)
-	}
-	return invalidTransition()
-}
-
-// notBuiltCustomer is notBuiltStore for the customer's confirm-partial.
-func (s *Service) notBuiltCustomer(ctx context.Context, userID, orderID ids.ID) error {
-	if err := s.ready(ctx); err != nil {
-		return err
-	}
-	o, err := s.q(ctx).GetOrder(ctx, ids.UUID(orderID))
-	if db.IsNoRows(err) || (err == nil && mustID(o.CustomerID) != userID) {
 		return notFound()
 	}
 	if err != nil {

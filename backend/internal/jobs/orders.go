@@ -25,8 +25,8 @@ import (
 const ordersTimerAttempts = 25
 
 // registerorders declares the orders timers (W2-02): the accept timeout
-// (BK-06) and the pickup no-show (BK-14). Both are event-triggered: create
-// and accept (and extend) enqueue them in the order's transaction. A late or
+// (BK-06), the pickup no-show (BK-14) and the partial-confirm timeout
+// (BK-10). All are event-triggered: create, accept (and extend) enqueue them in the order's transaction. A late or
 // repeated run finds the order moved on and does nothing (BK-21).
 func registerorders(r *Registry, d Deps) {
 	// The timers' own enqueuer (the notices they write enqueue sends) is
@@ -79,6 +79,9 @@ func registerorders(r *Registry, d Deps) {
 	timer(orders.KindNoShow,
 		"Expires a held pickup order nobody collected by hold_until, returns its stock and records a no-show strike (BK-14)",
 		(*orders.Service).ExpireNoShow)
+	timer(orders.KindPartialTimeout,
+		"Cancels a partly accepted order the customer did not confirm or decline by partial_confirm_by, releasing its credits, with no strike (BK-10)",
+		(*orders.Service).ExpirePartial)
 }
 
 // lazyEnqueuer returns a func that builds one insert-only client and its

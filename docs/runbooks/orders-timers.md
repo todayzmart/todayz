@@ -1,6 +1,6 @@
 # Orders timers
 
-Kinds `order_accept_timeout` and `order_pickup_no_show` (owner W2-02, class `timer`, code in
+Kinds `order_accept_timeout`, `order_pickup_no_show` and `order_partial_timeout` (owner W2-02, class `timer`, code in
 `backend/internal/orders/timers.go`, declared in `backend/internal/jobs/orders.go`). The general
 alert is [Job failing](jobs-job-failing.md) (`tz-jobs-failing-event`, critical for timers).
 
@@ -10,11 +10,12 @@ alert is [Job failing](jobs-job-failing.md) (`tz-jobs-failing-event`, critical f
 |---|---|---|---|
 | `order_accept_timeout` | placing an order (same transaction) | `accept_by` | A still-`placed` order becomes `expired`, reason `not_accepted` (BK-06). The customer is told (`order_update`, variant `expired`). |
 | `order_pickup_no_show` | accept, and each extension (same transaction) | `hold_until` | A held pickup order (`accepted`, `ready`) not collected becomes `expired`, reason `no_show` (BK-14). Its reservations are released, the customer gets one strike, and `noshow_limit_days` of the one-open-order limit once the strikes in `noshow_window_days` reach `noshow_strikes`. |
+| `order_partial_timeout` | a partial accept (same transaction) | `partial_confirm_by` | A still-`awaiting_customer` order becomes `cancelled`, reason `partial_timeout` (BK-10). Nothing was reserved; its credit hold and offer redemptions are released. No strike for anyone. The customer is told (variant `generic`). |
 
 The job arguments are the order id and, for the no-show timer, the hold it was set for. Never a
 code, a phone or a customer id.
 
-Both are idempotent (BK-21):
+All three are idempotent (BK-21):
 
 - A run for an order that has moved on (accepted, rejected, cancelled, collected, already
   expired) changes nothing and records `noop: 1`.
@@ -35,7 +36,7 @@ new status.
 1. **A-21 Jobs**: open the kind, then the latest failed run: the error, the attempt and the
    summary (`expired`, `noop`).
 2. **The order**: read the `orders` row and its `order_events` (read-only): status,
-   `accept_by` / `hold_until`, and whether an `expired` event is already there.
+   `accept_by` / `hold_until` / `partial_confirm_by`, and whether an `expired` or `cancelled` event is already there.
 3. **Logs**: dashboard 15 *Job logs* with the run id; follow `trace_id`. Logs carry the order id
    only.
 
