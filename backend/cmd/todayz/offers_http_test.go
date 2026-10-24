@@ -2,13 +2,18 @@ package main
 
 import (
 	"context"
+	"io"
+	"log/slog"
 	"net/http"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/settings"
+	"github.com/todayz/backend/internal/search"
 )
 
 // offerOn inserts a live store-wide percent offer for the shop (the engine
@@ -110,4 +115,35 @@ func TestOfferExpiredByClockDoesNotApply(t *testing.T) {
 	r = o.quote(line{o.butter, 2})
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.EqualValues(t, 11000, r.body["totalPaise"], "ended by the clock, label still live")
+}
+
+// Basket search prices item-level offers through the same engine as checkout
+// (search.Pricer adapter): the discount equals what the quote shows, and a
+// bill-minimum offer is left to checkout.
+func TestOfferBasketSearchAdapter(t *testing.T) {
+	o := newOrderShop(t)
+	o.offerOn("percent", 10, nil)
+	bill := ids.New(o.a.clk.Now()).String()
+	o.a.exec(`INSERT INTO offers (id, store_id, kind, value, min_bill_paise, scope, store_item_ids, channels, starts_at, status)
+	  VALUES ($1, $2, 'bill_min', 500, 1000, 'store', '{}', 'both', $3, 'live')`,
+		uuidOf(t, bill), uuidOf(t, o.sid), o.a.clk.Now().Add(-time.Hour))
+
+	d := &deps{
+		Config: o.cfg, Log: slog.New(slog.NewJSONHandler(io.Discard, nil)), Clock: o.a.clk,
+		DB:       db.New(o.a.tdb.Pool),
+		Settings: settings.NewCache(settings.PGLoader(o.a.tdb.Pool), settings.Options{}),
+	}
+	pricer := offersForSearch{newOffers(d)}
+	storeID, err := ids.Parse(o.sid)
+	require.NoError(t, err)
+	butter, err := ids.Parse(o.butter)
+	require.NoError(t, err)
+	got, err := pricer.LineDiscounts(context.Background(), ids.ID{}, storeID,
+		[]search.PriceLine{{StoreItemID: butter, UnitPricePaise: 5500, Quantity: 2}}, o.a.clk.Now())
+	require.NoError(t, err)
+	require.Equal(t, []int64{1100}, got, "10% of ₹110, no bill offer")
+	got, err = pricer.LineDiscounts(context.Background(), ids.ID{}, storeID,
+		[]search.PriceLine{{StoreItemID: butter, UnitPricePaise: 5500, Quantity: 2}}, o.a.clk.Now().Add(-2*time.Hour))
+	require.NoError(t, err)
+	require.Equal(t, []int64{0}, got, "before the offer began")
 }
