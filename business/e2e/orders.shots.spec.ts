@@ -128,6 +128,31 @@ test('desktop: a short order offers Accept part (B-04, BK-08)', async ({ page })
   await shot(page, 'w2-02-accept-part-card.png');
 });
 
+test('360 px: Reject, Accept part and Accept fit one row, none clipped or wrapped (B-04, lead review 5)', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 760 });
+  await page.goto('/orders');
+  const names = ['Reject order TZ-1042', 'Accept part of order TZ-1042', 'Accept order TZ-1042'];
+  await expect(page.getByRole('button', { name: 'Accept part of order TZ-1042', exact: true })).toBeVisible();
+  const boxes = await Promise.all(
+    names.map((name) =>
+      page.getByRole('button', { name, exact: true }).evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        const lines = new Set([...range.getClientRects()].filter((c) => c.width > 0).map((c) => Math.round(c.top))).size;
+        return { top: Math.round(r.top), right: r.right, overflow: el.scrollWidth - el.clientWidth, lines };
+      }),
+    ),
+  );
+  expect(new Set(boxes.map((b) => b.top)).size, `button tops ${JSON.stringify(boxes)}`).toBe(1);
+  for (const [i, b] of boxes.entries()) {
+    expect(b.overflow, `${names[i]} is clipped`).toBeLessThanOrEqual(0);
+    expect(b.lines, `${names[i]} wraps`).toBe(1);
+    expect(b.right, `${names[i]} runs off the screen`).toBeLessThanOrEqual(360);
+  }
+  await shot(page, 'w2-02-accept-part-card-360.png');
+});
+
 test('phone: the Accept part sheet, prefilled with what the stock covers (B-04, BK-08)', async ({ page }) => {
   await page.setViewportSize(VIEWPORTS.phone);
   await page.goto('/orders');
