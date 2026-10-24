@@ -6,12 +6,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/todayz/backend/gen/sqlc/ordersdb"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/ids"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/settings"
-	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
 // The orders timers (timer class, docs/runbooks/orders-timers.md).
@@ -22,6 +20,9 @@ const (
 	// KindNoShow expires a held pickup order nobody collected by hold_until
 	// and gives the customer a strike (BK-14).
 	KindNoShow = "order_pickup_no_show"
+	// KindPartialTimeout cancels a partly accepted order the customer did
+	// not answer by partial_confirm_by (BK-10).
+	KindPartialTimeout = "order_partial_timeout"
 )
 
 // Reasons the system records (03 §4.2 SystemReason).
@@ -65,10 +66,20 @@ func (s *Service) ExpireUnanswered(ctx context.Context, run platformjobs.Run) (p
 	if err := s.readyToWrite(ctx); err != nil {
 		return platformjobs.Result{}, err
 	}
+	expired, err := s.expireUnanswered(ctx, a.OrderID)
+	if err != nil {
+		return platformjobs.Result{}, err
+	}
+	return timerResult(expired), nil
+}
+
+// expireUnanswered expires a placed order past accept_by in a transaction
+// of its own; errEarly before it.
+func (s *Service) expireUnanswered(ctx context.Context, orderID ids.ID) (bool, error) {
 	expired := false
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
 		now := s.now()
-		o, err := s.q(ctx).LockOrder(ctx, ids.UUID(a.OrderID))
+		o, err := s.q(ctx).LockOrder(ctx, ids.UUID(orderID))
 		if db.IsNoRows(err) {
 			return nil
 		}
@@ -84,10 +95,51 @@ func (s *Service) ExpireUnanswered(ctx context.Context, run platformjobs.Run) (p
 		expired = true
 		return s.end(ctx, o, StatusExpired, reasonNotAccepted, nil, system, variant("expired"), now)
 	})
+	return expired, err
+}
+
+// ExpirePartial is the KindPartialTimeout handler: a partly accepted order
+// the customer did not answer is cancelled partial_timeout; its credits go
+// back and nobody gets a strike (BK-10). An order already answered, or a
+// second run, is left as it is (BK-21).
+func (s *Service) ExpirePartial(ctx context.Context, run platformjobs.Run) (platformjobs.Result, error) {
+	var a TimerArgs
+	if err := run.Decode(&a); err != nil {
+		return platformjobs.Result{}, err
+	}
+	if err := s.readyToWrite(ctx); err != nil {
+		return platformjobs.Result{}, err
+	}
+	expired, err := s.expirePartial(ctx, a.OrderID)
 	if err != nil {
 		return platformjobs.Result{}, err
 	}
 	return timerResult(expired), nil
+}
+
+// expirePartial cancels an awaiting_customer order past partial_confirm_by
+// in a transaction of its own; errEarly before it.
+func (s *Service) expirePartial(ctx context.Context, orderID ids.ID) (bool, error) {
+	expired := false
+	err := s.db.InTx(ctx, func(ctx context.Context) error {
+		now := s.now()
+		o, err := s.q(ctx).LockOrder(ctx, ids.UUID(orderID))
+		if db.IsNoRows(err) {
+			return nil
+		}
+		if err != nil {
+			return fmt.Errorf("orders: lock order: %w", err)
+		}
+		if o.Status != StatusAwaitingCustomer {
+			return nil
+		}
+		if !pastPartial(o, now) {
+			return errEarly
+		}
+		expired = true
+		return s.end(ctx, o, StatusCancelled, reasonPartialTimeout, nil, system, generic, now)
+	})
+	return expired, err
 }
 
 // ExpireNoShow is the KindNoShow handler: a held pickup order past its hold
@@ -103,23 +155,48 @@ func (s *Service) ExpireNoShow(ctx context.Context, run platformjobs.Run) (platf
 	if err := s.readyToWrite(ctx); err != nil {
 		return platformjobs.Result{}, err
 	}
-	window, err := s.duration(ctx, settings.NoshowWindowDays)
+	rules, err := s.noShowRules(ctx)
 	if err != nil {
 		return platformjobs.Result{}, err
+	}
+	expired, err := s.expireNoShow(ctx, a.OrderID, a.HoldUntil, rules)
+	if err != nil {
+		return platformjobs.Result{}, err
+	}
+	return timerResult(expired), nil
+}
+
+// noShow is the strike rule's settings (01 §5.4).
+type noShow struct {
+	window, limitFor time.Duration
+	strikes          int
+}
+
+func (s *Service) noShowRules(ctx context.Context) (noShow, error) {
+	window, err := s.duration(ctx, settings.NoshowWindowDays)
+	if err != nil {
+		return noShow{}, err
 	}
 	limitFor, err := s.duration(ctx, settings.NoshowLimitDays)
 	if err != nil {
-		return platformjobs.Result{}, err
+		return noShow{}, err
 	}
 	strikes, err := s.count(ctx, settings.NoshowStrikes)
 	if err != nil {
-		return platformjobs.Result{}, err
+		return noShow{}, err
 	}
+	return noShow{window: window, limitFor: limitFor, strikes: strikes}, nil
+}
+
+// expireNoShow expires a held pickup order past hold_until and strikes the
+// customer, in a transaction of its own; errEarly before it, unless the
+// hold the timer was set for (setFor) has since moved.
+func (s *Service) expireNoShow(ctx context.Context, orderID ids.ID, setFor *time.Time, r noShow) (bool, error) {
 	expired := false
-	err = s.db.InTx(ctx, func(ctx context.Context) error {
+	err := s.db.InTx(ctx, func(ctx context.Context) error {
 		now := s.now()
 		q := s.q(ctx)
-		o, err := q.LockOrder(ctx, ids.UUID(a.OrderID))
+		o, err := q.LockOrder(ctx, ids.UUID(orderID))
 		if db.IsNoRows(err) {
 			return nil
 		}
@@ -130,56 +207,20 @@ func (s *Service) ExpireNoShow(ctx context.Context, run platformjobs.Run) (platf
 			return nil
 		}
 		if !pastHold(o, now) {
-			if a.HoldUntil != nil && !a.HoldUntil.Equal(*o.HoldUntil) {
+			if setFor != nil && !setFor.Equal(*o.HoldUntil) {
 				// The hold was extended; the extension's own timer runs then.
 				return nil
 			}
 			return errEarly
 		}
 		expired = true
+		if err := lockStrikeCustomer(ctx, q, o.CustomerID); err != nil {
+			return err
+		}
 		if err := s.end(ctx, o, StatusExpired, reasonNoShow, nil, system, generic, now); err != nil {
 			return err
 		}
-		return s.strike(ctx, q, o, now, window, limitFor, strikes)
+		return s.strikeCustomer(ctx, q, o, reasonNoShow, now, r)
 	})
-	if err != nil {
-		return platformjobs.Result{}, err
-	}
-	return timerResult(expired), nil
-}
-
-// strike records the no-show against the customer, once per order, and
-// sets the limit when the window's count reaches the setting.
-func (s *Service) strike(ctx context.Context, q *ordersdb.Queries, o ordersdb.Order, now time.Time, window, limitFor time.Duration, limit int) error {
-	n, err := q.InsertStrike(ctx, ordersdb.InsertStrikeParams{
-		ID: ids.UUID(s.ids.New(now)), SubjectType: "customer", SubjectID: o.CustomerID,
-		OrderID: o.ID, Reason: reasonNoShow, CreatedAt: now,
-	})
-	if err != nil {
-		return fmt.Errorf("orders: strike: %w", err)
-	}
-	if n == 0 {
-		return nil // this order's strike is already there
-	}
-	count, err := q.CountActiveStrikes(ctx, ordersdb.CountActiveStrikesParams{
-		SubjectType: "customer", SubjectID: o.CustomerID, Reason: reasonNoShow, Since: now.Add(-window),
-	})
-	if err != nil {
-		return fmt.Errorf("orders: count strikes: %w", err)
-	}
-	var until *time.Time
-	if limit > 0 && int(count) >= limit {
-		until = ptr(now.Add(limitFor))
-	}
-	// TODO(lead): strikes_count_30d is the count at the last strike; nothing
-	// lowers it as strikes age out of the window (the limit itself is read
-	// from limited_until, which is right).
-	rows, err := q.SetCustomerStrikes(ctx, ordersdb.SetCustomerStrikesParams{Strikes: count, LimitedUntil: until, UserID: o.CustomerID})
-	if err != nil {
-		return fmt.Errorf("orders: customer strikes: %w", err)
-	}
-	if rows == 0 {
-		telemetry.Logger(ctx).WarnContext(ctx, "orders: no customer profile to record a strike on", "order_id", mustID(o.ID).String())
-	}
-	return nil
+	return expired, err
 }

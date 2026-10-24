@@ -8,6 +8,7 @@ import {
   rejectOrder,
   verifyOrderCode,
 } from '@todayz/api-client/gen/orders/orders';
+import type { AcceptLine } from '@todayz/api-client/gen/model/acceptLine';
 import type { PaymentMethod } from '@todayz/api-client/gen/model/paymentMethod';
 import type { RejectReason } from '@todayz/api-client/gen/model/rejectReason';
 import type { ShopCancelReason } from '@todayz/api-client/gen/model/shopCancelReason';
@@ -78,7 +79,7 @@ export function applyOrder(qc: QueryClient, sid: string, order: StoreOrder): voi
   void qc.invalidateQueries({ queryKey: [...ordersKey(sid), 'list'] });
 }
 
-export type ActionKind = 'accept' | 'reject' | 'ready' | 'cancel' | 'verify';
+export type ActionKind = 'accept' | 'acceptPart' | 'reject' | 'ready' | 'cancel' | 'verify';
 
 /** The i18n key suffix for an action failure; unknown codes fall back to `generic`. */
 export function errorKey(err: unknown): string {
@@ -142,6 +143,9 @@ export function useOrderAction(store: CurrentStore): ActionRunner {
 
 export const acceptCall = (s: CurrentStore, id: string) => (headers: Record<string, string>) =>
   acceptOrder(s.bid, s.sid, id, {}, { headers });
+/** Accept part (D-28): every line named with the quantity the shop gives. */
+export const acceptPartCall = (s: CurrentStore, id: string, lines: AcceptLine[]) => (headers: Record<string, string>) =>
+  acceptOrder(s.bid, s.sid, id, { lines }, { headers });
 export const rejectCall = (s: CurrentStore, id: string, reason: RejectReason, note?: string) => (headers: Record<string, string>) =>
   rejectOrder(s.bid, s.sid, id, note ? { reason, note } : { reason }, { headers });
 export const readyCall = (s: CurrentStore, id: string) => (headers: Record<string, string>) => readyOrder(s.bid, s.sid, id, { headers });

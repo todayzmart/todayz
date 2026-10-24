@@ -1094,7 +1094,7 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 
 ## POS counter and offline queue as built (W2-11, 2026-10-24)
 
-**D-170 · The offline store is raw IndexedDB behind a `PosStorage` interface, not Dexie (W2-11).** D-88 names Dexie; the build had no new dependency to spend, and the POS needs three object stores (`outbox`, `catalogue`, `meta`, the last holding the cursor, settings and the in-flight marker). `business/src/sync/idb.ts` wraps them; `memoryStorage` backs the tests. When storage cannot open (private mode), the counter keeps working in memory and says the sales are not safe if the tab closes. Swapping in Dexie later touches only `idb.ts`. TODO(lead): confirm.
+**D-170 · The offline store is raw IndexedDB behind a `PosStorage` interface, not Dexie (W2-11).** D-88 names Dexie; the build had no new dependency to spend, and the POS needs three object stores (`outbox`, `catalogue`, `meta`, the last holding the cursor, settings and the in-flight marker). `business/src/sync/idb.ts` wraps them; `memoryStorage` backs the tests. When storage cannot open (private mode), the counter keeps working in memory and says the sales are not safe if the tab closes. Swapping in Dexie later touches only `idb.ts`. Lead (24 Oct): accepted; no new dependency.
 
 **D-171 · The outbox and its send rules (W2-11).**
 - Every sale gets a client ULID and the next device sequence in the same write that saves it; nothing is shown as sold before that write succeeds. A failed write keeps the bill on screen.
@@ -1116,12 +1116,12 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 
 **D-176 · Roles on the counter (W2-11).** A cashier can ring and charge. Whole-bill and line discounts, reversal and the sales history's Reverse action are manager and above; those controls are hidden for a cashier, and the server is the gate. A reversal asks for a reason and confirms in an `alertdialog`.
 
-**D-177 · Scanner (W2-11).** The keyboard wedge (fast keystrokes ending in Enter into the search box, or anywhere on the counter) always works. Camera scanning uses the browser's `BarcodeDetector` when present and otherwise says it is not available on this device; no ZXing dependency was added. TODO(lead): decide whether iOS Safari needs the fallback in Wave 3. An unknown barcode opens "Add this product" (name, price), which saves a custom line and links to Stock for the full form (W2-12).
+**D-177 · Scanner (W2-11).** The keyboard wedge (fast keystrokes ending in Enter into the search box, or anywhere on the counter) always works. Camera scanning uses the browser's `BarcodeDetector` when present and otherwise says it is not available on this device; no ZXing dependency was added. Lead (24 Oct): the iOS Safari camera fallback is a Wave 3 decision; the keyboard wedge covers the counter until then. An unknown barcode opens "Add this product" (name, price), which saves a custom line and links to Stock for the full form (W2-12).
 
 **D-178 · Receipts (W2-11).** The receipt view is rendered from the local sale or the server's, so it also works offline; printing is the browser's (`@page` 80 mm wide with a 72 mm receipt body, fixed 297 mm tall because `auto` height is not valid CSS, so a very long receipt may paginate). Share on WhatsApp or SMS uses the receipt link only when the server returned a token (a replayed sale has none, D-130). The bill-QR URL `…/scan/{token}` and the customer scan route are assumed; TODO(lead) confirm with W2-08/09.
 
 **D-179 · What is cached on the device, and the conservative readings (W2-11).**
-- The store reference and role are cached in `localStorage` so the counter opens offline; `clearCachedPosStore` exists but is not yet wired to sign-out. TODO(lead).
+- The store reference and role are cached in `localStorage` so the counter opens offline; sign-out clears it before the logout call, so a failed call still clears it (lead, 24 Oct). Unsent sales stay in the outbox: they belong to the shop.
 - Storage is one IndexedDB per store id. The in-flight marker records the entries being sent so a reload mid-send resends them with the same ids.
 - `expectedTotalPaise` is not sent, so a price change the shop did not see is a `409 price_changed` and the sale stands at the price quoted; the line is redrawn on the next catalogue sync.
 - The update toast is held while a sale is open (`useHoldUpdates`, W1-08).
@@ -1183,3 +1183,32 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 - TODO(lead): removing `MSG91_AUTH_KEY` from `modules/secrets` destroys that secret if it was ever applied. Nothing has been applied yet.
 - TODO(lead): price. `CostPerUnitPaise` for SMS still needs the AWS India price per part.
 - TODO(lead): legacy routes. Remove the legacy MSG91 SMS mock routes when nothing uses them.
+
+## Frontends live on Cloudflare Pages before AWS (lead, 2026-10-24)
+
+**D-214 · The four Pages sites go live now, and deploy from GitHub Actions on every push to main.**
+
+The founder asked for the landing site and every UI to be live on GitHub and Cloudflare while the AWS account is still blocked.
+
+- **What is live.** Pages projects `todayz-site`, `todayz-customer`, `todayz-business` and `todayz-admin`, serving todayz.in and www.todayz.in, app., business. and admin.todayz.in. The apex A record and the www CNAME that pointed at Vercel now point at `todayz-site.pages.dev`. Mail (MX, SPF, DMARC, autodiscover, `email.`) is unchanged; the `_vercel` TXT records are left in place and can go.
+- **Until the API is on AWS**, the UIs load but sign-in and data fail: api.todayz.in has no record yet.
+- **Turnstile.** A `todayz-prod` widget (managed, for todayz.in, app., business. and api.) was created. Its site key is public and lives in `infra/cloudflare/pages.env` with the other build settings. The secret stays in Cloudflare and goes into Secrets Manager as `TURNSTILE_SECRET_KEY` with the AWS stack.
+- **Made by hand, not by Terraform.** The projects, Pages domains, DNS records and Turnstile widget were created through the Cloudflare API, because Terraform's state backend is the S3 bucket that does not exist yet. When the state bucket exists, `infra/cloudflare` imports them (import blocks with the same names) before its first apply, so nothing is recreated. The Terraform module does not yet know `www.`; add it to the site project there.
+- **Deploy.** `.github/workflows/deploy.yml` has two jobs. `build` (no secrets) runs `scripts/deploy/pages.sh prepare` and `scripts/deploy/pages.sh build`, and uploads `.cache/pages`. `prepare` installs node_modules and oapi-codegen and runs only the generators the builds use (`gen-events`, `gen-contract`, `gen-frontend`): the first run with the full `make setup` died on the GitHub runner mid-step (no log), and the sites need none of its Docker images, tiles, Terraform providers or Python tools. The make targets sit in the script because workflows may call only the canonical targets (D-56). `deploy` downloads that and runs `scripts/deploy/pages.sh deploy` (wrangler pinned, via npx) with `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` from repository secrets, so the secret never shares a job with package installs.
+- **wflint exception (amends W0-06's "no secrets").** `scripts/ci/wflint/secrets-allow.txt` lists `path NAME` pairs. A listed workflow may set a step `env:` value to exactly `${{ secrets.NAME }}` for a listed name; a secret anywhere else (run blocks, `with:`, longer strings, `if:`, `secrets:` keys, unlisted names or files) still fails. The selftest proves each case.
+- **Build output.** Hidden source maps are deleted before upload (error symbolication can come with Sentry later). The three Vite apps get a `_headers` file from the script: nosniff, referrer policy, frame DENY, HSTS without `includeSubDomains`, a permissions policy, and caching for `sw.js` and `/assets/*`. They have no CSP yet; the site keeps its own CSP.
+- The repository secret is the founder's admin Cloudflare token. A Pages-only token was offered; the founder chose to keep this one (2026-10-24).
+- TODO(lead): a CSP for the three apps, proved by an e2e run against a prod-mode build.
+
+**D-215 · The first green CI on GitHub: runner speed, scanner findings, Linux in the stack smoke (lead, 24 Oct).**
+
+Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each failed on something the laptop never showed.
+
+- **Search latency.** `TestSearchAtScale` measured p95 387 ms on a shared GitHub-hosted runner against the 300 ms budget (W1-06 says "p95 < 300 ms local"). On a GitHub-hosted runner the subtest now gates at a 600 ms regression ceiling, which still catches a lost index (a sequential scan over the 180k listings takes seconds). The 300 ms stays the gate in a local `make check` and in k6 `browse_peak` (08 §6), which is where the 02 §11 budget is measured. The budget was not loosened anywhere else.
+- **Trivy, vulnerabilities.** `golang.org/x/net` in `backend/tools` goes to v0.60.0 (out 16 days; the backend module already had it, D-88). Three fixes are younger than D-88's 14 days and fix code we do not call (zod 4.6.5 via codegen, undici 8.11.2 via astro's font fetcher, certifi in the Schemathesis run): each sits in `.trivyignore.yaml` with an `expired_at` the day after its fix turns 14 days old, so the gate fails again if nobody bumps it.
+- **Trivy, misconfigurations.** Trivy's AWS checks flagged three things the checkov skips already accept: SSE-S3 on the ALB log bucket (AWS-0132; log delivery cannot use KMS), the AWS-managed SNS key (AWS-0136), and HTTPS egress to 0.0.0.0/0 from the app (AWS-0104; providers have no fixed addresses, port 443 only, the egress guard allow-lists hosts). Each gets an inline `#trivy:ignore` with its reason, next to the matching checkov skip.
+- **Stack smoke on Linux.** `dev-smoke.sh` found the LAN address with macOS's `ipconfig getifaddr en0`; on Linux it now takes the source address of the default route (`ip -4 route get`), so the loopback-only check runs on the runner too.
+
+## Orders finish (W2-02 finish, 2026-10-24)
+
+**D-216 · The checkout quote is informational; only placing refuses credits (lead, 24 Oct, Q-1).** `POST /v1/me/orders` with `creditsToUse` above `credit_max_per_order` is refused with 409 `credit_max_exceeded` (04 §2, CR-02), never clamped. The same goes for credits on a bill under the credit minimum (409 `below_credit_minimum`). A wallet that no longer covers the credits asked is 409 `price_changed` with the current quote. `POST /v1/me/checkout/quote` keeps clamping to what the rules allow and reports why in `creditsLimit` (D-76), so the customer app's credits probe keeps working; the quote has no new `x-problems`. Test: `TestCR02PlacingRefusesCreditsItCannotUse` (quote with 31 clamps to 30 with `creditsLimit: credit_max_exceeded`; placing 31 is 409).

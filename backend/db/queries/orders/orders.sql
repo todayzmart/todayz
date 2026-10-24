@@ -17,7 +17,7 @@
 -- business verified (D-40, the same filter as discovery).
 SELECT s.id, s.business_id, s.slug, s.name, s.address_line1, s.address_line2, s.locality,
        s.status, (b.status = 'verified')::bool AS business_verified,
-       s.accepts_pickup, s.accepts_delivery, s.hours, s.closed_until, s.cashback_bp
+       s.accepts_pickup, s.accepts_delivery, s.hours, s.closed_until, s.cashback_bp, s.auto_accept
 FROM stores s JOIN businesses b ON b.id = s.business_id
 WHERE s.id = @id;
 
@@ -39,6 +39,10 @@ SELECT u.status, cp.limited_until
 FROM users u LEFT JOIN customer_profiles cp ON cp.user_id = u.id
 WHERE u.id = @id
 FOR NO KEY UPDATE OF u;
+
+-- name: CustomerLimit :one
+-- The customer's no-show limit, unlocked: the quote's early answer (BK-16).
+SELECT limited_until FROM customer_profiles WHERE user_id = @user_id;
 
 -- name: ActiveOrderCount :one
 -- Orders of the customer that are not finished.
@@ -126,6 +130,52 @@ RETURNING version;
 
 -- name: AcceptAllLines :exec
 UPDATE order_items SET quantity_accepted = quantity_requested WHERE order_id = @order_id;
+
+-- name: SetPartial :one
+-- A partial accept (BK-08): the order waits for the customer with the
+-- totals recomputed on the accepted lines (D-28). Nothing is reserved yet.
+UPDATE orders SET status = 'awaiting_customer', partial_confirm_by = @partial_confirm_by,
+  subtotal_paise = @subtotal_paise, discount_paise = @discount_paise,
+  items_after_offers_paise = @items_after_offers_paise, item_subtotal_paise = @item_subtotal_paise,
+  credits_used = @credits_used, delivery_fee_paise = @delivery_fee_paise, total_paise = @total_paise,
+  version = version + 1
+WHERE id = @id
+RETURNING version;
+
+-- name: SetPreviewCredits :one
+-- A partial accept's credits preview, lowered when the credit rules changed
+-- while the order waited, so the customer sees what a confirm would keep
+-- before taking it (lead review, W2-02 finish). The version moves: the
+-- order the customer sees changed.
+UPDATE orders SET credits_used = @credits_used, total_paise = @total_paise, version = version + 1
+WHERE id = @id
+RETURNING version;
+
+-- name: LockStoreStrikes :exec
+-- Serialises one store's strikes and its store_strikes flag (an admin
+-- cancel's store strike, the hourly job's flag), so the count a flag is
+-- raised on sees every committed strike and the store gets one open flag.
+-- An advisory lock, not the stores row: nothing else waits on it.
+SELECT pg_advisory_xact_lock(hashtextextended('store_strikes:' || sqlc.arg(store_key)::text, 0));
+
+-- name: LockStrikeCustomers :exec
+-- The daily recount's lock on the customers it recounts (every customer
+-- with a count or a limit), in id order, the users row LockCustomer takes:
+-- a strike in flight finishes first, so the recount's own statement sees it.
+SELECT u.id FROM users u JOIN customer_profiles cp ON cp.user_id = u.id
+WHERE cp.strikes_count_30d > 0 OR cp.limited_until IS NOT NULL
+ORDER BY u.id
+FOR NO KEY UPDATE OF u;
+
+-- name: SetOrderCredits :exec
+-- The credits a confirmed partial accept kept (D-28), when the ledger's
+-- re-cap differs from the preview the order showed.
+UPDATE orders SET credits_used = @credits_used, total_paise = @total_paise
+WHERE id = @id;
+
+-- name: SetLineAccepted :exec
+UPDATE order_items SET quantity_accepted = @quantity_accepted, line_total_paise = @line_total_paise
+WHERE id = @id AND order_id = @order_id;
 
 -- name: SetReady :one
 UPDATE orders SET status = 'ready', version = version + 1 WHERE id = @id
@@ -257,12 +307,179 @@ SELECT count(*)::int AS n FROM strikes
 WHERE subject_type = @subject_type AND subject_id = @subject_id AND reset_at IS NULL
   AND reason = @reason AND created_at > @since;
 
--- name: SetCustomerStrikes :execrows
--- The 30-day count, and the limit when it is reached (never shortened).
-UPDATE customer_profiles SET strikes_count_30d = @strikes,
-  limited_until = CASE
-    WHEN sqlc.narg(limited_until)::timestamptz IS NULL THEN limited_until
-    WHEN limited_until IS NULL OR limited_until < sqlc.narg(limited_until)::timestamptz THEN sqlc.narg(limited_until)::timestamptz
-    ELSE limited_until END,
-  version = version + 1
-WHERE user_id = @user_id;
+-- name: RecountCustomerStrikes :execrows
+-- Recomputes the cached strike count and the no-show limit from strikes
+-- (01 §5.4), so a strike that ages out of the window or is reset stops
+-- counting. strikes_count_30d is the customer's unreset strikes after
+-- @now - window. limited_until is the latest end of a limit: a no_show
+-- strike that, with the unreset no_show strikes in the window before it,
+-- makes @strikes, limits for limit_secs from its own time; NULL once that
+-- end has passed. It recounts @user_id (on every strike), or with @every
+-- every customer with a count or a limit, and only rows
+-- that change (the daily job).
+WITH p AS (
+  SELECT @now::timestamptz AS now, @every::boolean AS every, @user_id::uuid AS user_id,
+    @win::interval AS win, @lim::interval AS lim, @strikes::int AS strikes
+), target AS (
+  SELECT cp.user_id FROM customer_profiles cp, p
+  WHERE CASE WHEN p.every THEN cp.strikes_count_30d > 0 OR cp.limited_until IS NOT NULL
+        ELSE cp.user_id = p.user_id END
+), calc AS (
+  SELECT t.user_id,
+    (SELECT count(*) FROM strikes s
+     WHERE s.subject_type = 'customer' AND s.subject_id = t.user_id AND s.reset_at IS NULL
+       AND s.created_at > p.now - p.win)::int AS n,
+    (SELECT max(a.created_at) + p.lim FROM strikes a
+     WHERE a.subject_type = 'customer' AND a.subject_id = t.user_id AND a.reset_at IS NULL
+       AND a.reason = 'no_show' AND p.strikes > 0
+       AND (SELECT count(*) FROM strikes b
+            WHERE b.subject_type = 'customer' AND b.subject_id = t.user_id AND b.reset_at IS NULL
+              AND b.reason = 'no_show' AND b.created_at <= a.created_at
+              AND b.created_at > a.created_at - p.win) >= p.strikes
+    ) AS until,
+    p.now, p.every
+  FROM target t, p
+), next AS (
+  SELECT user_id, n, CASE WHEN until > now THEN until END AS until, every FROM calc
+)
+UPDATE customer_profiles cp SET strikes_count_30d = x.n, limited_until = x.until, version = cp.version + 1
+FROM next x
+WHERE cp.user_id = x.user_id
+  AND (NOT x.every OR cp.strikes_count_30d IS DISTINCT FROM x.n OR cp.limited_until IS DISTINCT FROM x.until);
+
+-- name: DueUnanswered :many
+-- One page of the reconcile sweep (BK-21): placed orders past accept_by by
+-- @before, in the sweep's order (orders it never failed on first, oldest
+-- deadline first, then the failed ones, least recently failed first), after
+-- the keyset (@after_failed, @after_at, @after_id). Never failed reads as
+-- 0001-01-01 UTC, Go's zero time (pgx cannot scan -infinity into a time). An order that failed at
+-- or after @before (this run) is left for the next run. It locks nothing;
+-- each order is locked and checked again in its own transaction.
+SELECT id, accept_by::timestamptz AS due,
+  coalesce(sweep_failed_at, '0001-01-01 00:00:00+00')::timestamptz AS failed
+FROM orders
+WHERE status = 'placed' AND accept_by <= @before::timestamptz
+  AND coalesce(sweep_failed_at, '0001-01-01 00:00:00+00') < @before::timestamptz
+  AND (coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), accept_by, id)
+    > (@after_failed::timestamptz, @after_at::timestamptz, @after_id::uuid)
+ORDER BY coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), accept_by, id
+LIMIT @lim;
+
+-- name: DuePartials :many
+-- The same for awaiting_customer orders past partial_confirm_by.
+SELECT id, partial_confirm_by::timestamptz AS due,
+  coalesce(sweep_failed_at, '0001-01-01 00:00:00+00')::timestamptz AS failed
+FROM orders
+WHERE status = 'awaiting_customer' AND partial_confirm_by <= @before::timestamptz
+  AND coalesce(sweep_failed_at, '0001-01-01 00:00:00+00') < @before::timestamptz
+  AND (coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), partial_confirm_by, id)
+    > (@after_failed::timestamptz, @after_at::timestamptz, @after_id::uuid)
+ORDER BY coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), partial_confirm_by, id
+LIMIT @lim;
+
+-- name: DueHolds :many
+-- The same for held pickup orders past hold_until.
+SELECT id, hold_until::timestamptz AS due,
+  coalesce(sweep_failed_at, '0001-01-01 00:00:00+00')::timestamptz AS failed
+FROM orders
+WHERE status IN ('accepted','ready') AND fulfilment = 'pickup' AND hold_until <= @before::timestamptz
+  AND coalesce(sweep_failed_at, '0001-01-01 00:00:00+00') < @before::timestamptz
+  AND (coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), hold_until, id)
+    > (@after_failed::timestamptz, @after_at::timestamptz, @after_id::uuid)
+ORDER BY coalesce(sweep_failed_at, '0001-01-01 00:00:00+00'), hold_until, id
+LIMIT @lim;
+
+-- name: SetSweepFailed :exec
+-- Marks an order the reconcile sweep could not apply at @at (the run's time).
+UPDATE orders SET sweep_failed_at = @at WHERE id = @id;
+
+-- name: StoresAtStrikeThreshold :many
+-- Stores with at least @threshold unreset strikes after @since (01 §5.4,
+-- D-67): @store_id alone, or with @every every store. oldest and newest are
+-- the oldest and newest strikes that count.
+WITH p AS (
+  SELECT @since::timestamptz AS since, @threshold::int AS threshold, @every::boolean AS every, @store_id::uuid AS store_id
+)
+SELECT s.subject_id AS store_id, count(*)::int AS n, min(s.created_at)::timestamptz AS oldest,
+  max(s.created_at)::timestamptz AS newest
+FROM strikes s, p
+WHERE s.subject_type = 'store' AND s.reset_at IS NULL AND s.created_at > p.since
+  AND (p.every OR s.subject_id = p.store_id)
+GROUP BY s.subject_id, p.threshold
+HAVING count(*) >= p.threshold
+ORDER BY s.subject_id;
+
+-- name: InsertStoreStrikeFlag :execrows
+-- Raises the store_strikes risk flag (D-67), once: not while the store has
+-- an open one, nor when one (cleared since) was raised at or after @newest,
+-- the newest strike that counts now, so clearing a flag does not raise it
+-- again from the same strikes; a strike after it does. No automatic pause:
+-- nothing else changes.
+INSERT INTO risk_flags (id, subject_type, subject_id, rule, score, details, created_at, updated_at)
+SELECT @id, 'store', @store_id, 'store_strikes', @score, @details, @now, @now
+WHERE NOT EXISTS (
+  SELECT 1 FROM risk_flags rf
+  WHERE rf.subject_type = 'store' AND rf.subject_id = @store_id AND rf.rule = 'store_strikes'
+    AND (rf.status = 'open' OR rf.created_at >= @newest)
+);
+
+-- name: RecomputeStoreReliability :execrows
+-- The store_reliability job (05 §3, D-67): writes only the reliability
+-- fields of stores (never the rating, D-52). Over orders placed after @since
+-- (30 days, D-85), the ones the shop answered or let lapse: accept_rate_30d
+-- is the share it accepted in full or in part, unaccepted_expiry_rate_30d
+-- the share that expired unanswered. reliability_score starts from the
+-- accept rate (1 with no answered order), loses the expiry rate as a factor
+-- above @expiry_bp, and loses half at @threshold unreset store strikes in
+-- the window, all of it at twice that. A store with nothing in the window
+-- goes back to NULL (ranking reads 1.0). Only rows whose values change are
+-- written; version does not move (the shop's ETag stays).
+WITH p AS (
+  SELECT @now::timestamptz AS now, @since::timestamptz AS since, @expiry_bp::int AS expiry_bp, @threshold::int AS threshold
+), answered AS (
+  SELECT o.store_id,
+    EXISTS (SELECT 1 FROM order_events e WHERE e.order_id = o.id AND e.to_status IN ('accepted','awaiting_customer')) AS took,
+    (o.status = 'expired' AND o.status_reason = 'not_accepted') AS lapsed,
+    o.status = 'rejected' AS refused
+  FROM orders o, p
+  WHERE o.placed_at > p.since
+), rates AS (
+  SELECT a.store_id,
+    count(*) FILTER (WHERE a.took)::numeric AS took,
+    count(*) FILTER (WHERE a.lapsed)::numeric AS lapsed,
+    count(*) FILTER (WHERE a.took OR a.lapsed OR a.refused)::numeric AS n
+  FROM answered a GROUP BY a.store_id
+), struck AS (
+  SELECT s.subject_id AS store_id, count(*)::numeric AS n
+  FROM strikes s, p
+  WHERE s.subject_type = 'store' AND s.reset_at IS NULL AND s.created_at > p.since
+  GROUP BY s.subject_id
+), calc AS (
+  SELECT st.id,
+    CASE WHEN r.n > 0 THEN round(r.took / r.n, 4) END AS accept_rate,
+    CASE WHEN r.n > 0 THEN round(r.lapsed / r.n, 4) END AS expiry_rate,
+    COALESCE(k.n, 0) AS strikes
+  FROM stores st
+  LEFT JOIN rates r ON r.store_id = st.id
+  LEFT JOIN struck k ON k.store_id = st.id
+  WHERE r.n > 0 OR k.n > 0 OR st.reliability_score IS NOT NULL
+    OR st.accept_rate_30d IS NOT NULL OR st.unaccepted_expiry_rate_30d IS NOT NULL
+), next AS (
+  SELECT c.id, c.accept_rate, c.expiry_rate,
+    CASE WHEN c.accept_rate IS NOT NULL OR c.strikes > 0 THEN
+      round(greatest(0, least(1,
+        COALESCE(c.accept_rate, 1)
+        * CASE WHEN c.expiry_rate * 10000 > p.expiry_bp THEN 1 - c.expiry_rate ELSE 1 END
+        * greatest(0, 1 - c.strikes / (2 * greatest(p.threshold, 1)))
+      )), 3)
+    END AS score
+  FROM calc c, p
+)
+UPDATE stores st
+SET accept_rate_30d = x.accept_rate, unaccepted_expiry_rate_30d = x.expiry_rate,
+  reliability_score = x.score, reliability_computed_at = p.now
+FROM next x, p
+WHERE st.id = x.id
+  AND (st.accept_rate_30d IS DISTINCT FROM x.accept_rate
+    OR st.unaccepted_expiry_rate_30d IS DISTINCT FROM x.expiry_rate
+    OR st.reliability_score IS DISTINCT FROM x.score);

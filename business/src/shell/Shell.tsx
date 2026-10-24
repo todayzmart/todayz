@@ -7,6 +7,7 @@ import { useIntl } from 'react-intl';
 import { useOverview } from '../overview/queries';
 import { SAMPLE_DATA } from '../overview/sample';
 import { SetupCard } from '../overview/SetupCard';
+import { clearCachedPosStore } from '../pos/store';
 import { NavLink } from './NavLink';
 import { SIDE, TABS } from './nav';
 import { useNarrow } from './useNarrow';
@@ -24,6 +25,9 @@ function SignOut() {
         variant="ghost"
         block
         onClick={() => {
+          // The counter's cached shop and role go first, even when the network call fails (D-179).
+          // Unsent sales stay in the outbox: they belong to the shop, not to the person.
+          clearCachedPosStore();
           void session.signOut().then(() => client.clear());
         }}
       >

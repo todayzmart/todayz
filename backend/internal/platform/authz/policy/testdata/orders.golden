@@ -38,3 +38,11 @@ order.cancel kind=business step-up=false
 order.cancel owner allow
 order.cancel manager allow
 order.cancel cashier -
+admin.order.cancel kind=admin step-up=false
+admin.order.cancel field_agent -
+admin.order.cancel support allow
+admin.order.cancel catalogue -
+admin.order.cancel analyst -
+admin.order.cancel finance -
+admin.order.cancel admin allow
+admin.order.cancel super_admin allow

@@ -46,6 +46,9 @@ resource "aws_security_group" "app" {
 }
 
 # Outbound: HTTPS (providers, ECR, AWS APIs through NAT or endpoints) and Postgres.
+# Trivy AWS-0104: HTTPS out must reach providers whose addresses are not fixed (SMS, WhatsApp,
+# Anthropic, Sarvam, Sentry); port 443 only, and the app's own egress guard allow-lists hosts.
+#trivy:ignore:AWS-0104
 resource "aws_vpc_security_group_egress_rule" "app_https" {
   security_group_id = aws_security_group.app.id
   description       = "HTTPS out"

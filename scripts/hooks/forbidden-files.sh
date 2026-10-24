@@ -12,10 +12,12 @@ for f in "$@"; do
       echo "refusing to commit $f: terraform state"; bad=1 ;;
   esac
 done
-if git diff --cached --name-only | grep -qx '.env.example'; then
-  # .env.example holds names only: every NAME= line must be empty.
-  if git show :.env.example | grep -E '^[A-Z][A-Z0-9_]*=.+' >/dev/null; then
-    echo "refusing to commit .env.example with a value (names only)"; bad=1
+# The example files hold names only: every NAME= line must be empty.
+for ex in .env.example .env.cloud.example; do
+  if git diff --cached --name-only | grep -qx "$ex"; then
+    if git show ":$ex" | grep -E '^[A-Z][A-Z0-9_]*=.+' >/dev/null; then
+      echo "refusing to commit $ex with a value (names only)"; bad=1
+    fi
   fi
-fi
+done
 exit $bad

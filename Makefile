@@ -111,8 +111,13 @@ ai-eval:
 demo:
 	$(call run_steps,demo,$(DEMO_STEPS))
 
+# The cloud names (D-210) are the lead's only; a missing .env.cloud.local lists them as missing.
+# Every line stays "NAME set|missing" (SC-PL-03), so there is no header, and a cloud name that
+# .env.example also lists is shown once, from the app env file.
 env-check: $(ENVTOOL)
 	@$(ENVTOOL) check -env "$(ENV_FILE)" -example "$(ROOT)/.env.example"
+	@$(ENVTOOL) check -env "$(ROOT)/.env.cloud.local" -example "$(ROOT)/.env.cloud.example" | \
+	  awk 'NR == FNR { if (match($$0, /^[A-Z][A-Z0-9_]*=/)) app[substr($$0, 1, RLENGTH - 1)] = 1; next } !($$1 in app)' "$(ROOT)/.env.example" -
 
 # A clean reset, then every suite; the report lists each step's result (no values).
 release-candidate:

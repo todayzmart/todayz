@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
+
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/gen/sqlc/ordersdb"
 	"github.com/todayz/backend/internal/platform/db"
@@ -36,10 +38,11 @@ type snapshot struct {
 }
 
 // create places an order (C-11): every check, then the order, its lines, the
-// placed event, the accept timer, the store's "new order" and the store
-// stream event, in one transaction. Nothing is reserved (D-01). Repeating
-// the request with the same Idempotency-Key replays the first answer (the
-// route's idempotency layer, 04 §1.6).
+// placed event, the store stream event, the accept timer and the store's
+// "new order", in one transaction. Nothing is reserved (D-01), unless the
+// store auto-accepts (BK-22). Repeating the request with the same
+// Idempotency-Key replays the first answer (the route's idempotency layer,
+// 04 §1.6).
 func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID, error) {
 	if err := s.readyToWrite(ctx); err != nil {
 		return ids.Zero, err
@@ -49,6 +52,10 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		return ids.Zero, err
 	}
 	acceptIn, err := s.duration(ctx, settings.OrderAcceptTimeoutMin)
+	if err != nil {
+		return ids.Zero, problem.Wrap(genproblems.Internal, err)
+	}
+	hold, err := s.duration(ctx, settings.PickupHoldMin)
 	if err != nil {
 		return ids.Zero, problem.Wrap(genproblems.Internal, err)
 	}
@@ -78,19 +85,24 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		if cu.Status != "active" {
 			return problem.New(genproblems.Forbidden, "")
 		}
-		if cu.LimitedUntil != nil && now.Before(*cu.LimitedUntil) {
-			// 01 §5.4: after the no-show limit, one open order at a time.
-			n, err := q.ActiveOrderCount(ctx, ids.UUID(p.UserID))
-			if err != nil {
-				return fmt.Errorf("orders: active orders: %w", err)
-			}
-			if n > 0 {
-				return problem.New(genproblems.OrderingSuspended, "").WithExtension("until", cu.LimitedUntil.UTC())
+		if err := orderLimit(ctx, q, p.UserID, cu.LimitedUntil, now); err != nil {
+			return err
+		}
+		if st.AutoAccept {
+			// The items are locked before the offers and the credits, the
+			// order an accept and a cancel take them in (items, then the
+			// ledger), so the instant accept below cannot deadlock with
+			// them; the price then reads the stock it will hold.
+			if err := lockCartItems(ctx, q, c); err != nil {
+				return err
 			}
 		}
 
 		qq, err := s.price(ctx, p.UserID, st, c, now)
 		if err != nil {
+			return err
+		}
+		if err := s.checkCreditsAsked(ctx, qq); err != nil {
 			return err
 		}
 		if qq.askReplyID != nil && !qq.askUsable {
@@ -167,10 +179,23 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		if err != nil {
 			return err
 		}
-		if err := s.jobs.EnqueueTx(ctx, t, KindAcceptTimeout, TimerArgs{OrderID: orderID},
-			platformjobs.EnqueueOpts{ScheduledAt: acceptBy, UniqueKey: orderID.String() + ":accept"}); err != nil {
-			return fmt.Errorf("orders: accept timer: %w", err)
+		if err := realtime.Publish(ctx, t, realtime.StoreChannel(storeID),
+			realtime.Event{Type: realtime.OrderCreated, ID: orderID, Version: int64(version)}); err != nil {
+			return err
 		}
+		accepted := false
+		if st.AutoAccept {
+			if accepted, err = s.autoAccept(ctx, orderID, hold, now); err != nil {
+				return err
+			}
+		}
+		if !accepted {
+			if err := s.jobs.EnqueueTx(ctx, t, KindAcceptTimeout, TimerArgs{OrderID: orderID},
+				platformjobs.EnqueueOpts{ScheduledAt: acceptBy, UniqueKey: orderID.String() + ":accept"}); err != nil {
+				return fmt.Errorf("orders: accept timer: %w", err)
+			}
+		}
+		// An auto-accepted order is still new to the shop: it has to pack it.
 		if _, err := s.notices.Send(ctx, t, notice.Notification{
 			Kind: notice.KindNewOrder, BusinessID: mustID(st.BusinessID), StoreID: storeID,
 			Params: map[string]string{"store": clip(st.Name, maxParamRunes)},
@@ -178,8 +203,7 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		}); err != nil {
 			return fmt.Errorf("orders: new order notice: %w", err)
 		}
-		return realtime.Publish(ctx, t, realtime.StoreChannel(storeID),
-			realtime.Event{Type: realtime.OrderCreated, ID: orderID, Version: int64(version)})
+		return nil
 	})
 	if stale {
 		// An offer ran out between the quote and the order: the transaction
@@ -194,6 +218,57 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		return ids.Zero, asProblem(err)
 	}
 	return orderID, nil
+}
+
+// lockCartItems locks the cart's items in id order (LockItems). An id that
+// does not parse is left to the price's field error.
+func lockCartItems(ctx context.Context, q *ordersdb.Queries, c cart) error {
+	itemIDs := make([]pgtype.UUID, 0, len(c.items))
+	for _, it := range c.items {
+		if id, err := ids.Parse(it.StoreItemId); err == nil {
+			itemIDs = append(itemIDs, ids.UUID(id))
+		}
+	}
+	if len(itemIDs) == 0 {
+		return nil
+	}
+	if _, err := q.LockItems(ctx, itemIDs); err != nil {
+		return fmt.Errorf("orders: lock items: %w", err)
+	}
+	return nil
+}
+
+// autoAccept accepts a new order at once for a store with auto-accept on
+// (BK-22, 01 §5) when every line is available, as the system: it holds the
+// stock and starts the pickup hold, as a shop's full accept does. A line
+// short of stock leaves the order placed for the shop to answer. create
+// has locked the items already, so the check here is exact.
+// create refuses a cart with a short line (BK-02, 01 §5.3) after reading
+// the stock under that lock, at every store (lead, W2-02 finish), so at an
+// auto-accept store an order with an unavailable item is refused with
+// insufficient_stock rather than placed; the "stays placed" branch below is
+// the backstop for a stock that moved anyway.
+func (s *Service) autoAccept(ctx context.Context, orderID ids.ID, hold time.Duration, now time.Time) (bool, error) {
+	q := s.q(ctx)
+	o, err := q.LockOrder(ctx, ids.UUID(orderID))
+	if err != nil {
+		return false, fmt.Errorf("orders: lock new order: %w", err)
+	}
+	lines, err := q.OrderLines(ctx, o.ID)
+	if err != nil {
+		return false, fmt.Errorf("orders: lines: %w", err)
+	}
+	want := make([]int32, len(lines))
+	for i, l := range lines {
+		want[i] = l.QuantityRequested
+	}
+	if err := s.lockStock(ctx, lines, want); err != nil {
+		if problem.CodeOf(err) == genproblems.InsufficientStock {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, s.holdAndStart(ctx, o, lines, want, system, variant("accepted"), hold, now)
 }
 
 // holdCredits holds the order's credits in its transaction. The quote's
@@ -219,6 +294,31 @@ func (s *Service) holdCredits(ctx context.Context, qq quoted, orderID, customerI
 		return err
 	}
 	return problem.New(genproblems.PriceChanged, "").WithExtension("quote", fresh.view())
+}
+
+// checkCreditsAsked refuses an order that would use fewer credits than
+// asked, instead of placing it with fewer (04 §2, CR-02, D-216). The
+// refusal is the quote's creditsLimit, in the credit rules' order (minimum,
+// store cap, monthly cap, then the max), so placing and the quote name the
+// same rule; more than credit_max_per_order with no rule limit (a short
+// wallet) is still credit_max_exceeded. Anything else (the wallet, the ₹1
+// floor) is price_changed with the quote as it is now. The quote clamps
+// and says why in creditsLimit (D-76); placing does not.
+func (s *Service) checkCreditsAsked(ctx context.Context, qq quoted) error {
+	if qq.creditsRequested <= qq.creditsUsed {
+		return nil
+	}
+	if code, ok := creditProblems[qq.creditsLimit]; ok {
+		return problem.New(code, "")
+	}
+	maxPer, err := s.count(ctx, settings.CreditMaxPerOrder)
+	if err != nil {
+		return err
+	}
+	if qq.creditsRequested > maxPer {
+		return problem.New(genproblems.CreditMaxExceeded, "")
+	}
+	return problem.New(genproblems.PriceChanged, "").WithExtension("quote", qq.view())
 }
 
 // creditProblems are the credit rules' refusals (wallet.yaml).

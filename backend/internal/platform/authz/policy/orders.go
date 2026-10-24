@@ -4,8 +4,9 @@ import "github.com/todayz/backend/internal/platform/authz"
 
 // Orders actions (W2-02, 02 §3.3 "orders" rows). The store stream keeps its
 // own action (store.stream, notify.go) with the same grants as order.view:
-// the lead kept them separate. The admin rows (admin.order.view,
-// admin.order.cancel) arrive with the admin console's order screens.
+// the lead kept them separate. admin.order.cancel came forward with the W2-02
+// finish (the Wave 2 gate drives it through the admin API, D-83);
+// admin.order.view arrives with the admin console's order screens (W3-05).
 const (
 	// KindCustomer: the signed-in customer (/v1/me), on their own orders.
 	MeOrdersView   = "me.orders.view"   // list, detail
@@ -22,11 +23,15 @@ const (
 	OrderFailDelivery  = "order.fail_delivery"
 	OrderConfirmReturn = "order.confirm_return"
 	OrderCancel        = "order.cancel"
+
+	// KindAdmin: support, admin and super_admin.
+	AdminOrderCancel = "admin.order.cancel"
 )
 
 func init() {
 	staff := map[authz.Role]authz.Grant{authz.Owner: authz.Allow, authz.Manager: authz.Allow, authz.Cashier: authz.Allow}
 	ownerManager := map[authz.Role]authz.Grant{authz.Owner: authz.Allow, authz.Manager: authz.Allow}
+	support := map[authz.Role]authz.Grant{authz.Support: authz.Allow, authz.Admin: authz.Allow, authz.SuperAdmin: authz.Allow}
 	Register(authz.Table{Domain: "orders", Actions: []authz.Action{
 		{Name: MeOrdersView, Kind: authz.KindCustomer, Doc: "GET /v1/me/orders, /v1/me/orders/{orderId} (C-12, C-13): own orders only"},
 		{Name: MeOrdersPlace, Kind: authz.KindCustomer, Doc: "POST /v1/me/checkout/quote, POST /v1/me/orders (C-11)"},
@@ -41,5 +46,7 @@ func init() {
 		{Name: OrderFailDelivery, Kind: authz.KindBusiness, Grants: staff, Doc: "POST {S}/orders/{orderId}/fail-delivery with a reason"},
 		{Name: OrderConfirmReturn, Kind: authz.KindBusiness, Grants: staff, Doc: "POST {S}/orders/{orderId}/confirm-return (D-69); damage needs stock.damage"},
 		{Name: OrderCancel, Kind: authz.KindBusiness, Grants: ownerManager, Doc: "POST {S}/orders/{orderId}/cancel with a ShopCancelReason (D-68)"},
+
+		{Name: AdminOrderCancel, Kind: authz.KindAdmin, Grants: support, Doc: "POST /v1/admin/orders/{orderId}/cancel with an AdminCancelReason and the side at fault (01 §5.2): audited"},
 	}})
 }

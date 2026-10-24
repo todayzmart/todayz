@@ -8,6 +8,7 @@ import (
 	"github.com/todayz/backend/internal/business"
 	"github.com/todayz/backend/internal/jobs"
 	"github.com/todayz/backend/internal/orders"
+	"github.com/todayz/backend/internal/platform/audit"
 	"github.com/todayz/backend/internal/platform/authz"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 )
@@ -17,7 +18,9 @@ import (
 var orderCodeRand io.Reader
 
 // mountOrders mounts W2-02's routes: checkout quote and create, the
-// customer's orders and actions, and the store's order inbox and actions.
+// customer's orders and actions, the store's order inbox and actions, and
+// the admin cancel (/v1/admin/orders/{orderId}/cancel, pulled forward from
+// W3-05; there is no routes_admin-orders.go).
 // It also registers the orders deletion check (BK-44: no account deletion
 // while an order is open) with identity.
 func mountOrders(r chi.Router, d *deps) {
@@ -25,6 +28,14 @@ func mountOrders(r chi.Router, d *deps) {
 		Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Settings: d.Settings,
 		Notices: newNotifyService(d), Stock: jobs.OrdersStock(d.Clock), Open: business.OpenAt,
 		CodeRand: orderCodeRand, Credits: jobs.OrdersCredits(creditsService(d)),
+	}
+	if d.DB != nil {
+		var hashKey []byte
+		if d.Config != nil {
+			hashKey = d.Config.Keys.PIIHashKey.Bytes()
+		}
+		// The admin cancel's audit row (W2-02 finish, D-83).
+		od.Audit = audit.New(d.DB, d.Clock, hashKey)
 	}
 	// Offers price the quote and are counted in the order's transaction (W2-07).
 	pricing := offersForOrders{newOffers(d)}

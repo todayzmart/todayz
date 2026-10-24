@@ -9,18 +9,21 @@ import { useIntl } from 'react-intl';
 import { PathLink } from '../orders/ShopLink';
 import { cartCount, clearCart, setQty, useCart, type CartLine } from './cart';
 import { CreditsControl } from './CreditsControl';
+import { suspendedUntil, useSuspendedText } from '../orders/limit';
 import { useCartPricing } from './quote';
 import styles from './tx.module.css';
 
 /** Problem codes the quote can answer with that the cart explains in words. */
 function useQuoteProblemText() {
   const intl = useIntl();
+  const suspendedText = useSuspendedText();
   return (err: unknown): string => {
     const code = err instanceof ApiError ? err.code : 'other';
     switch (code) {
       case 'store_closed':
       case 'store_not_bookable':
       case 'ordering_suspended':
+        return suspendedText(suspendedUntil(err));
       case 'account_has_active_order':
         return intl.formatMessage({ id: `checkout.problem.${code}` });
       default:

@@ -10,8 +10,9 @@ import { useIntl, type IntlShape } from 'react-intl';
 import { useAcknowledgeOnOpen } from './alerts';
 import { ActionError } from './ActionError';
 import { CodeEntry } from './CodeEntry';
-import { clock, isShort, lineName, reasonLabel, statusLabel } from './labels';
-import { acceptCall, cancelCall, readyCall, rejectCall, useOrder, useOrderAction } from './queries';
+import { AcceptPartSheet } from './AcceptPartSheet';
+import { canAcceptPart, clock, isShort, lineName, reasonLabel, statusLabel } from './labels';
+import { acceptCall, acceptPartCall, cancelCall, readyCall, rejectCall, useOrder, useOrderAction } from './queries';
 import { ReasonSheet } from './ReasonSheet';
 import { canCancelAccepted, useCurrentStore, type CurrentStore } from './store';
 import styles from './orders.module.css';
@@ -116,10 +117,13 @@ function OrderView({ store, order }: { store: CurrentStore; order: StoreOrder })
   const action = useOrderAction(store);
   const [rejecting, setRejecting] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [parting, setParting] = useState(false);
   const name = order.customer.name ?? intl.formatMessage({ id: 'orders.card.noName' });
   const placed = order.status === 'placed';
   // A short line makes the API refuse Accept (insufficient_stock): disable it and say why.
   const shortLines = order.lines.filter(isShort).length;
+  const partable = canAcceptPart(order.lines);
+  const waiting = order.status === 'awaiting_customer';
   const open = order.status === 'accepted' || order.status === 'ready';
   const canMarkReady = order.status === 'accepted' && order.fulfilment === 'pickup';
   const canCancel = open && canCancelAccepted(store.role);
@@ -162,7 +166,11 @@ function OrderView({ store, order }: { store: CurrentStore; order: StoreOrder })
           <ul className={styles.lines}>
             {order.lines.map((l) => (
               <li key={l.id} className={styles.line}>
-                <span>{intl.formatMessage({ id: 'orders.line.qty' }, { name: lineName(l), qty: l.quantityRequested })}</span>
+                <span>
+                  {l.quantityAccepted !== null && l.quantityAccepted !== l.quantityRequested
+                    ? intl.formatMessage({ id: 'orders.line.partQty' }, { name: lineName(l), got: l.quantityAccepted, wanted: l.quantityRequested })
+                    : intl.formatMessage({ id: 'orders.line.qty' }, { name: lineName(l), qty: l.quantityRequested })}
+                </span>
                 <span className={`${styles.lineStock} ${isShort(l) ? styles.lineShort : ''}`}>
                   {isShort(l) && l.available > 0
                     ? intl.formatMessage({ id: 'orders.line.short' })
@@ -190,15 +198,22 @@ function OrderView({ store, order }: { store: CurrentStore; order: StoreOrder })
       <div className={styles.stack}>
         {placed && shortLines > 0 && (
           <Banner tone="warning" id="short-hint">
-            {intl.formatMessage({ id: 'orders.card.shortHint' }, { count: shortLines })}
+            {intl.formatMessage({ id: partable ? 'orders.card.partHint' : 'orders.card.shortHint' }, { count: shortLines })}
           </Banner>
         )}
-        {placed && shortLines === 0 && <Banner tone="info">{intl.formatMessage({ id: 'orders.detail.acceptPartialSoon' })}</Banner>}
+        {waiting && <Banner tone="info">{intl.formatMessage({ id: 'orders.part.waiting' }, { customer: name })}</Banner>}
         <ActionError error={action.error} />
         {placed && (
           <div className={styles.actions}>
             <Button onClick={() => setRejecting(true)} disabled={action.pending !== null}>
               {intl.formatMessage({ id: 'orders.card.reject' })}
+            </Button>
+            <Button
+              onClick={() => setParting(true)}
+              disabled={!partable || action.pending !== null}
+              aria-describedby={shortLines > 0 && !partable ? 'short-hint' : undefined}
+            >
+              {intl.formatMessage({ id: 'orders.card.acceptPart' })}
             </Button>
             <Button
               variant="primary"
@@ -232,6 +247,20 @@ function OrderView({ store, order }: { store: CurrentStore; order: StoreOrder })
           </div>
         )}
       </div>
+      {parting && (
+        <AcceptPartSheet
+          order={order}
+          onClose={() => setParting(false)}
+          busy={action.pending === 'acceptPart'}
+          error={action.error}
+          onConfirm={(lines) =>
+            void action.run('acceptPart', acceptPartCall(store, order.id, lines)).then((o) => {
+              if (o) setParting(false);
+              announce('orders.action.partSent', o);
+            })
+          }
+        />
+      )}
       <ReasonSheet
         open={rejecting}
         onClose={() => setRejecting(false)}

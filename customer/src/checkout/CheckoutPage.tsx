@@ -15,6 +15,8 @@ import { clearCart, useCart } from '../cart/cart';
 import { CreditsControl } from '../cart/CreditsControl';
 import { FULFILMENT, quoteKey, todaysHours, useCartPricing } from '../cart/quote';
 import styles from '../cart/tx.module.css';
+import { LimitBanner } from '../orders/LimitBanner';
+import { suspendedUntil, useSuspendedText } from '../orders/limit';
 import { PathLink } from '../orders/ShopLink';
 import { newUlid } from '../orders/ulid';
 import { Icon } from '../shell/Icon';
@@ -52,6 +54,7 @@ function problemOf(err: unknown): PlaceProblem {
 /** C-11 Checkout (pickup): review, the pay-at-the-shop note, total, Place order. */
 export function CheckoutPage() {
   const intl = useIntl();
+  const suspendedText = useSuspendedText();
   const router = useRouter();
   const client = useQueryClient();
   const cart = useCart();
@@ -171,6 +174,7 @@ export function CheckoutPage() {
   return (
     <div className={`${styles.page} ${styles.withBar}`}>
       <h1 className="tz-page-title">{intl.formatMessage({ id: 'checkout.title' })}</h1>
+      <LimitBanner />
 
       <section className="tz-card" aria-label={intl.formatMessage({ id: 'checkout.pickup.label' })}>
         <h2 className="tz-card-title">{intl.formatMessage({ id: 'checkout.pickup.title' })}</h2>
@@ -192,11 +196,13 @@ export function CheckoutPage() {
       )}
       {quote.error instanceof ApiError && quote.error.code !== 'store_closed' && (
         <Banner tone="warning" live="status">
-          {intl.formatMessage({
-            id: ['store_not_bookable', 'ordering_suspended', 'account_has_active_order'].includes(quote.error.code)
-              ? `checkout.problem.${quote.error.code}`
-              : 'cart.quoteError',
-          })}
+          {quote.error.code === 'ordering_suspended'
+            ? suspendedText(suspendedUntil(quote.error))
+            : intl.formatMessage({
+                id: ['store_not_bookable', 'account_has_active_order'].includes(quote.error.code)
+                  ? `checkout.problem.${quote.error.code}`
+                  : 'cart.quoteError',
+              })}
         </Banner>
       )}
       {repriced.length > 0 && needsAccept && !problem && (
@@ -220,7 +226,7 @@ export function CheckoutPage() {
       )}
       {problem?.kind === 'until' && (
         <Banner tone="warning" live="status">
-          {intl.formatMessage({ id: 'checkout.problem.ordering_suspended' })}
+          {suspendedText(problem.until)}
         </Banner>
       )}
       {problem?.kind === 'code' && (

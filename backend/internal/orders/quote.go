@@ -278,11 +278,37 @@ func (s *Service) quoteCart(ctx context.Context, c cart) (ordersapi.CheckoutQuot
 	if err != nil {
 		return ordersapi.CheckoutQuote{}, asProblem(err)
 	}
-	q, err := s.price(ctx, p.UserID, st, c, s.now())
+	now := s.now()
+	until, err := s.q(ctx).CustomerLimit(ctx, ids.UUID(p.UserID))
+	if err != nil && !db.IsNoRows(err) {
+		return ordersapi.CheckoutQuote{}, problem.Wrap(genproblems.Internal, err)
+	}
+	if err := orderLimit(ctx, s.q(ctx), p.UserID, until, now); err != nil {
+		return ordersapi.CheckoutQuote{}, asProblem(err)
+	}
+	q, err := s.price(ctx, p.UserID, st, c, now)
 	if err != nil {
 		return ordersapi.CheckoutQuote{}, asProblem(err)
 	}
 	return q.view(), nil
+}
+
+// orderLimit is BK-16 (01 §5.4): while no-show strikes limit the customer
+// (limited_until in the future), a new order is allowed only with no other
+// unfinished one. The quote asks it unlocked so checkout can say so early;
+// placing asks it again under the customer's row lock.
+func orderLimit(ctx context.Context, q *ordersdb.Queries, userID ids.ID, limitedUntil *time.Time, now time.Time) error {
+	if limitedUntil == nil || !now.Before(*limitedUntil) {
+		return nil
+	}
+	n, err := q.ActiveOrderCount(ctx, ids.UUID(userID))
+	if err != nil {
+		return fmt.Errorf("orders: active orders: %w", err)
+	}
+	if n > 0 {
+		return problem.New(genproblems.OrderingSuspended, "").WithExtension("until", limitedUntil.UTC())
+	}
+	return nil
 }
 
 // displayNumber is the order number customers and shops read.

@@ -132,7 +132,7 @@ expect_rule "$tfc through a variable, quoted subcommand" forbidden "$tmp/tf.sh"
 echo "--- 3. discovery"
 rc=0; "$wflint" -root "$ci_root" -v >"$tmp/disc" 2>&1 || rc=$?
 if [[ $rc -eq 0 ]]; then ok "the repo lints clean"; else bad "the repo has wflint findings (exit $rc)"; sed 's/^/     /' "$tmp/disc"; fi
-for f in .github/workflows/ci.yml .github/workflows/e2e.yml .github/workflows/security.yml \
+for f in .github/workflows/ci.yml .github/workflows/deploy.yml .github/workflows/e2e.yml .github/workflows/security.yml \
   .github/actions/setup-toolchain/action.yml .github/actions/upload-reports/action.yml \
   .github/dependabot.yml Makefile mk/90-ci.mk scripts/ci/terraform.sh scripts/ci/scan.sh \
   scripts/ci/versions.env infra/local/stack.sh; do
@@ -144,7 +144,8 @@ if grep -qE '^wflint: linted [0-9]+ files' "$tmp/disc"; then ok "discovery print
 policy_root() { # policy_root <dir>
   mkdir -p "$1/scripts/ci/wflint"
   grep -E '^CANONICAL[[:space:]]*:?=' "$ci_root/Makefile" >"$1/Makefile"
-  cp "$ci_root/scripts/ci/wflint/allowed-owners.txt" "$ci_root/scripts/ci/wflint/id-token-allow.txt" "$1/scripts/ci/wflint/"
+  cp "$ci_root/scripts/ci/wflint/allowed-owners.txt" "$ci_root/scripts/ci/wflint/id-token-allow.txt" \
+    "$ci_root/scripts/ci/wflint/secrets-allow.txt" "$1/scripts/ci/wflint/"
 }
 mkdir -p "$tmp/no-makefile"
 expect_cmd "a root with no Makefile (fails closed)" 2 "root Makefile" "$wflint" -root "$tmp/no-makefile"
@@ -155,6 +156,22 @@ mkdir -p "$tmp/nowf/.github/workflows" "$tmp/nowf/.github/actions/a" "$tmp/nowf/
 cp "$td/actions/good/action.yml" "$tmp/nowf/.github/actions/a/action.yml"
 cp "$td/dependabot/good/dependabot.yml" "$tmp/nowf/.github/dependabot.yml"
 expect_cmd "an empty .github/workflows" 1 "no workflow files found" "$wflint" -root "$tmp/nowf"
+
+# D-214: secrets-allow.txt admits only an env: value written exactly as ${{ secrets.NAME }}, for
+# a NAME listed with that file. Copies of the real deploy.yml, linted under a scratch root.
+policy_root "$tmp/sec"
+mkdir -p "$tmp/sec/.github/workflows"
+sec_wf="$tmp/sec/.github/workflows/deploy.yml"
+cp "$ci_root/.github/workflows/deploy.yml" "$sec_wf"
+expect_cmd "deploy.yml with its listed secrets" 0 "" "$wflint" -root "$tmp/sec" "$sec_wf"
+sed 's/secrets\.CLOUDFLARE_ACCOUNT_ID/secrets.OTHER_KEY/' "$ci_root/.github/workflows/deploy.yml" >"$sec_wf"
+expect_cmd "deploy.yml reading an unlisted secret" 1 "[secrets]" "$wflint" -root "$tmp/sec" "$sec_wf"
+sed 's|run: scripts/deploy/pages.sh deploy|run: echo "${{ secrets.CLOUDFLARE_API_TOKEN }}"|' "$ci_root/.github/workflows/deploy.yml" >"$sec_wf"
+expect_cmd "deploy.yml with a listed secret in a run block" 1 "[secrets]" "$wflint" -root "$tmp/sec" "$sec_wf"
+sed 's|CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}|CLOUDFLARE_API_TOKEN: x${{ secrets.CLOUDFLARE_API_TOKEN }}|' "$ci_root/.github/workflows/deploy.yml" >"$sec_wf"
+expect_cmd "deploy.yml with a listed secret inside a longer env value" 1 "[secrets]" "$wflint" -root "$tmp/sec" "$sec_wf"
+cp "$ci_root/.github/workflows/deploy.yml" "$tmp/sec/.github/workflows/other.yml"
+expect_cmd "the same secrets in an unlisted workflow" 1 "[secrets]" "$wflint" -root "$tmp/sec" "$tmp/sec/.github/workflows/other.yml"
 
 echo "--- 4. actionlint, shellcheck, Lighthouse (D-58)"
 [[ -x "$actionlint_bin" ]] || ci_die "selftest: actionlint is not in .tools/bin; run make setup"

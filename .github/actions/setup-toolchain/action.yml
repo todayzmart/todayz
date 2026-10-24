@@ -28,6 +28,11 @@ outputs:
 runs:
   using: composite
   steps:
+    # First, so the caches below restore onto a disk with room (scripts/ci/free-disk.sh).
+    - name: Free disk on the runner
+      shell: bash
+      run: scripts/ci/free-disk.sh
+
     - name: Read toolchain versions from the repo
       id: versions
       shell: bash

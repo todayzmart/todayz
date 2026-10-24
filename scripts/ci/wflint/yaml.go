@@ -26,7 +26,7 @@ func (l *linter) parse(rel string, data []byte) *yaml.Node {
 		l.add(rel, extra.Line, "yaml", "more than one YAML document")
 	}
 	l.scanRawSecrets(rel, string(data))
-	l.walk(rel, &doc, "")
+	l.walk(rel, &doc, "", false)
 	if doc.Kind != yaml.DocumentNode || len(doc.Content) == 0 || doc.Content[0].Kind != yaml.MappingNode {
 		l.add(rel, doc.Line, "structure", "the top level must be a mapping")
 		return nil
@@ -54,14 +54,28 @@ func exprLeaksSecret(expr string) string {
 // blocks and inside any string are caught before YAML decoding drops comments.
 func (l *linter) scanRawSecrets(rel, text string) {
 	for _, m := range exprRe.FindAllStringSubmatchIndex(text, -1) {
+		// An allowed secret is checked in context (env: values only) by walk.
+		if l.allowedSecret(rel, text[m[2]:m[3]]) {
+			continue
+		}
 		if what := exprLeaksSecret(text[m[2]:m[3]]); what != "" {
 			l.add(rel, 1+strings.Count(text[:m[0]], "\n"), "secrets", "%s in ${{ }}: no secrets before Wave 5 (SC-PL-04)", what)
 		}
 	}
 }
 
+var secretRefRe = regexp.MustCompile(`^\s*secrets\.([A-Z][A-Z0-9_]*)\s*$`)
+
+// allowedSecret: expr is exactly secrets.NAME and secrets-allow.txt lets rel use NAME.
+func (l *linter) allowedSecret(rel, expr string) bool {
+	m := secretRefRe.FindStringSubmatch(expr)
+	return m != nil && l.secrets[rel][m[1]]
+}
+
 // walk visits every node: anchors, aliases, tags, duplicate keys, decoded scalars.
-func (l *linter) walk(rel string, n *yaml.Node, key string) {
+// inEnv: n is a value directly under an env: mapping, the only place an allowed
+// secret may appear.
+func (l *linter) walk(rel string, n *yaml.Node, key string, inEnv bool) {
 	if n == nil {
 		return
 	}
@@ -79,6 +93,9 @@ func (l *linter) walk(rel string, n *yaml.Node, key string) {
 	case yaml.ScalarNode:
 		// Decoded value: catches escapes such as "\x24{{ secrets.X }}".
 		for _, m := range exprRe.FindAllStringSubmatch(n.Value, -1) {
+			if inEnv && strings.TrimSpace(n.Value) == m[0] && l.allowedSecret(rel, m[1]) {
+				continue
+			}
 			if what := exprLeaksSecret(m[1]); what != "" {
 				l.add(rel, n.Line, "secrets", "%s in ${{ }}: no secrets before Wave 5 (SC-PL-04)", what)
 			}
@@ -92,7 +109,7 @@ func (l *linter) walk(rel string, n *yaml.Node, key string) {
 		keys := map[string]bool{}
 		for i := 0; i+1 < len(n.Content); i += 2 {
 			k, v := n.Content[i], n.Content[i+1]
-			l.walk(rel, k, "")
+			l.walk(rel, k, "", false)
 			if k.Kind == yaml.ScalarNode {
 				if keys[k.Value] {
 					l.add(rel, k.Line, "yaml", "duplicate key %q", k.Value)
@@ -108,12 +125,12 @@ func (l *linter) walk(rel string, n *yaml.Node, key string) {
 			} else {
 				l.add(rel, k.Line, "yaml", "a mapping key must be a plain scalar")
 			}
-			l.walk(rel, v, scalarKey(k))
+			l.walk(rel, v, scalarKey(k), key == "env" && v.Kind == yaml.ScalarNode)
 		}
 		l.checkMapping(rel, n)
 	case yaml.DocumentNode, yaml.SequenceNode:
 		for _, c := range n.Content {
-			l.walk(rel, c, "")
+			l.walk(rel, c, "", false)
 		}
 	}
 }

@@ -81,7 +81,12 @@ for h in "${HOSTS[@]}"; do
 done
 [[ "$(code https://grafana.todayz.localhost/api/health)" == 200 ]] && ok "grafana through Caddy" || bad "grafana through Caddy"
 [[ "$(code http://img.todayz.localhost/x)" == 308 ]] && ok "http redirects to https" || bad "http does not redirect"
+# macOS names the LAN interface en0/en1; on Linux (the CI runner) take the source address of
+# the default route.
 lan_ip="$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || true)"
+if [[ -z "$lan_ip" ]] && command -v ip >/dev/null; then
+  lan_ip="$(ip -4 route get 1.1.1.1 2>/dev/null | sed -n 's/.* src \([0-9.]*\).*/\1/p' | head -n1)"
+fi
 if [[ -n "$lan_ip" ]]; then
   served=""
   for h in "${HOSTS[@]}"; do
@@ -93,7 +98,7 @@ if [[ -n "$lan_ip" ]]; then
   [[ -z "$served" ]] && ok "a client on the LAN address ($lan_ip) is refused on all 10 HTTPS hosts and on :80" ||
     bad "non-loopback client was served: $served"
 else
-  bad "no LAN address (en0/en1) to test the loopback-only rule"
+  bad "no LAN address (en0/en1, or the default route's source) to test the loopback-only rule"
 fi
 
 # --- 4. Grafana hardening ---------------------------------------------------------------------

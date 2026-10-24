@@ -1,0 +1,19 @@
+# Trivy findings accepted for a fixed time (scripts/ci/scan.sh passes --ignorefile).
+# D-88 says a version is adopted only once it has been out for 14 days, unless it patches a
+# vulnerability our code calls. None of these is called: each package runs only at build or
+# test time, on our own inputs, and never in a shipped bundle or the API. Each entry expires
+# the day after its fixed version turns 14 days old; bump the package then (D-215).
+# Misconfigurations are ignored inline in the .tf files, next to their checkov skips.
+vulnerabilities:
+  - id: CVE-2023-54404
+    paths: ["pnpm-lock.yaml"]
+    expired_at: 2026-10-26
+    statement: zod 4.6.5 is pulled in only by codegen (orval, the TanStack router generator); 4.6.6 was released 11 Oct.
+  - id: CVE-2026-109869
+    paths: ["pnpm-lock.yaml"]
+    expired_at: 2026-10-30
+    statement: undici 8.11.2 comes only through astro's font fetcher at site build time; 8.12.2 was released 15 Oct.
+  - id: GHSA-6q48-6c7w-9gw2
+    paths: ["e2e/contract/requirements.txt"]
+    expired_at: 2026-11-04
+    statement: certifi in the Schemathesis contract run, which only calls the local API under no-egress; 2026.10.19 was released 20 Oct.

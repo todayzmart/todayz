@@ -1,7 +1,7 @@
 // The shop and role the counter works in. Online it is the same answer the Orders page uses; the
 // last good answer is kept on the device so the counter still opens with no network (the server
 // checks the role again when sales sync, so a stale role cannot do more than the server allows).
-// TODO(lead): confirm that caching the store and role for offline POS is acceptable (permissions).
+// Accepted by the lead (D-179): the server is the gate; sign-out clears it (Shell).
 import { useEffect } from 'react';
 import { useCurrentStore, type CurrentStore, type CurrentStoreState } from '../orders/store';
 

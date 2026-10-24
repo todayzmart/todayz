@@ -15,3 +15,9 @@ and checkov run before Wave 5 (`make check-infra`).
 - Rate-limit numbers are starting values (`TODO(lead)`); the plan gives none.
 - The Turnstile secret is a sensitive output: put it in Secrets Manager as `TURNSTILE_SECRET_KEY`.
 - Apply order with AWS: see `infra/terraform/README.md`.
+
+**Live parts made by hand (D-214).** The four Pages projects, their custom domains (including
+`www.todayz.in` on the site project, which this module does not have yet), the Pages DNS records
+and the `todayz-prod` Turnstile widget were created through the API on 2026-10-24. Import them
+before the first apply. `scripts/deploy/pages.sh` and `.github/workflows/deploy.yml` deploy the
+sites; `pages.env` holds the public build settings.
