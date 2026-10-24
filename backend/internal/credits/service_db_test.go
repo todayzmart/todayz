@@ -3,8 +3,10 @@ package credits
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -184,7 +186,7 @@ func (e *denv) post(p Posting) (Posted, error) {
 // grant credits a customer n credits (a referral reward, a fresh lot).
 func (e *denv) grant(c ids.ID, n int64) {
 	e.t.Helper()
-	_, err := e.post(Posting{Kind: TxReferralReward, IdempotencyKey: "grant:" + e.gen.New(e.clk.Now()).String(),
+	_, err := e.post(Posting{Kind: TxReferralReward, IdempotencyKey: "referral:grant:" + e.gen.New(e.clk.Now()).String(),
 		Legs: []Leg{{Account{Kind: PlatformMarketing}, -n}, {wallet(c), n}}})
 	require.NoError(e.t, err)
 }
@@ -390,7 +392,7 @@ func TestConcurrentSpendDB(t *testing.T) {
 				}
 				return
 			}
-			_, err := e.post(Posting{Kind: TxAdminAdjustment, IdempotencyKey: "race:" + refs[i].ID.String(),
+			_, err := e.post(Posting{Kind: TxAdminAdjustment, IdempotencyKey: "adjust:race:" + refs[i].ID.String(),
 				Legs: []Leg{{wallet(cust), -30}, {Account{Kind: PlatformAdjustments}, 30}}})
 			switch {
 			case err == nil:
@@ -412,6 +414,59 @@ func TestConcurrentSpendDB(t *testing.T) {
 	e.clean()
 }
 
+// D-120: N customers hold at one store at once with the store's daily cap at
+// N-1. Hold locks the store's row, so the cap is counted under the lock and
+// exactly one hold is refused.
+func TestConcurrentStoreCapDB(t *testing.T) {
+	const n = 12
+	e := newDBEnv(t)
+	e.setting(settings.StoreCreditRedemptionsPerDay, strconv.Itoa(n-1))
+	shop := e.store("Shop", 0)
+	custs := make([]ids.ID, n)
+	refs := make([]Ref, n)
+	for i := range custs {
+		custs[i], refs[i] = e.user(), e.order()
+		e.grant(custs[i], 50)
+	}
+	var held, capped atomic.Int32
+	var wg sync.WaitGroup
+	start := make(chan struct{})
+	errs := make(chan error, n)
+	for i := range n {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			<-start
+			var a Allowance
+			err := e.tx(func(ctx context.Context) error {
+				var err error
+				a, err = e.svc.Hold(ctx, HoldRequest{Ref: refs[i], CustomerID: custs[i], StoreID: shop, Credits: 20, EligiblePaise: 50000})
+				return err
+			})
+			switch {
+			case err != nil:
+				errs <- err
+			case a.Allowed == 20:
+				held.Add(1)
+			case a.Allowed == 0 && a.Limit == LimitStoreCap:
+				capped.Add(1)
+			default:
+				errs <- fmt.Errorf("unexpected allowance %+v", a)
+			}
+		}()
+	}
+	close(start)
+	wg.Wait()
+	close(errs)
+	for err := range errs {
+		require.NoError(t, err)
+	}
+	require.EqualValues(t, n-1, held.Load())
+	require.EqualValues(t, 1, capped.Load(), "exactly one hold over the cap")
+	require.Equal(t, n-1, e.count(`SELECT count(*) FROM credit_holds WHERE store_id = $1 AND status = 'held'`, ids.UUID(shop)))
+	e.clean()
+}
+
 // CR-08, CR-09: FIFO spending, expiry of what is left, the reminder once.
 func TestExpiryAndReminderDB(t *testing.T) {
 	e := newDBEnv(t)
@@ -419,7 +474,7 @@ func TestExpiryAndReminderDB(t *testing.T) {
 	e.grant(cust, 30) // L1, 1 Jun
 	e.clk.Advance(10 * 24 * time.Hour)
 	e.grant(cust, 20) // L2, 11 Jun
-	_, err := e.post(Posting{Kind: TxAdminAdjustment, IdempotencyKey: "spend5",
+	_, err := e.post(Posting{Kind: TxAdminAdjustment, IdempotencyKey: "adjust:spend5",
 		Legs: []Leg{{wallet(cust), -5}, {Account{Kind: PlatformAdjustments}, 5}}})
 	require.NoError(t, err)
 	require.Equal(t, 1, e.count(`SELECT count(*) FROM credit_lots WHERE customer_id = $1 AND original = 30 AND remaining = 25`, ids.UUID(cust)),
@@ -543,18 +598,24 @@ func TestPostDB(t *testing.T) {
 	cust, shop := e.user(), e.store("Lakshmi Traders", 0)
 	mk := Account{Kind: PlatformMarketing}
 	bad := map[string]Posting{
-		"unbalanced":    {Kind: TxReferralReward, IdempotencyKey: "u", Legs: []Leg{{mk, -10}, {wallet(cust), 9}}},
-		"held leg":      {Kind: TxAdminAdjustment, IdempotencyKey: "h", Legs: []Leg{{held(cust), 10}, {Account{Kind: PlatformAdjustments}, -10}}},
-		"zero leg":      {Kind: TxReferralReward, IdempotencyKey: "z", Legs: []Leg{{mk, 0}, {wallet(cust), 0}}},
-		"own kind":      {Kind: TxCashback, IdempotencyKey: "c", Legs: []Leg{{store(shop), -10}, {wallet(cust), 10}}},
+		"unbalanced":    {Kind: TxReferralReward, IdempotencyKey: "referral:u", Legs: []Leg{{mk, -10}, {wallet(cust), 9}}},
+		"held leg":      {Kind: TxAdminAdjustment, IdempotencyKey: "adjust:h", Legs: []Leg{{held(cust), 10}, {Account{Kind: PlatformAdjustments}, -10}}},
+		"zero leg":      {Kind: TxReferralReward, IdempotencyKey: "referral:z", Legs: []Leg{{mk, 0}, {wallet(cust), 0}}},
+		"own kind":      {Kind: TxCashback, IdempotencyKey: "cashback:c", Legs: []Leg{{store(shop), -10}, {wallet(cust), 10}}},
 		"no key":        {Kind: TxReferralReward, Legs: []Leg{{mk, -10}, {wallet(cust), 10}}},
-		"payout wallet": {Kind: TxPayout, IdempotencyKey: "p", Legs: []Leg{{wallet(cust), -10}, {Account{Kind: PlatformPayoutsCash}, 10}}},
+		"payout wallet": {Kind: TxPayout, IdempotencyKey: "payout:p", Legs: []Leg{{wallet(cust), -10}, {Account{Kind: PlatformPayoutsCash}, 10}}},
+		// D-122: each kind's own prefix, so a key never collides with the
+		// internal hold:, expiry: and forfeit: keys.
+		"no prefix":    {Kind: TxReferralReward, IdempotencyKey: "r1", Legs: []Leg{{mk, -10}, {wallet(cust), 10}}},
+		"other prefix": {Kind: TxReferralReward, IdempotencyKey: "adjust:1", Legs: []Leg{{mk, -10}, {wallet(cust), 10}}},
+		"internal key": {Kind: TxAdminAdjustment, IdempotencyKey: "hold:x", Legs: []Leg{{wallet(cust), 10}, {Account{Kind: PlatformAdjustments}, -10}}},
+		"prefix only":  {Kind: TxReferralReward, IdempotencyKey: "referral:", Legs: []Leg{{mk, -10}, {wallet(cust), 10}}},
 	}
 	for name, p := range bad {
 		_, err := e.post(p)
 		require.ErrorIs(t, err, ErrInvalid, name)
 	}
-	reward := Posting{Kind: TxReferralReward, IdempotencyKey: "ref:1", RefType: "referral", RefID: e.gen.New(e.clk.Now()),
+	reward := Posting{Kind: TxReferralReward, IdempotencyKey: "referral:1", RefType: "referral", RefID: e.gen.New(e.clk.Now()),
 		Legs: []Leg{{mk, -30}, {wallet(cust), 30}}}
 	first, err := e.post(reward)
 	require.NoError(t, err)
@@ -563,8 +624,17 @@ func TestPostDB(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, Posted{TransactionID: first.TransactionID, Duplicate: true}, again)
 	require.EqualValues(t, 30, e.balance(wallet(cust)))
+	// D-122: the same key with other legs is an error, not a duplicate.
+	other := reward
+	other.Legs = []Leg{{mk, -31}, {wallet(cust), 31}}
+	_, err = e.post(other)
+	require.ErrorIs(t, err, ErrKeyReused)
+	other.Legs = []Leg{{mk, -30}, {wallet(e.user()), 30}}
+	_, err = e.post(other)
+	require.ErrorIs(t, err, ErrKeyReused, "another customer")
+	require.EqualValues(t, 30, e.balance(wallet(cust)))
 
-	_, err = e.post(Posting{Kind: TxAdminAdjustment, IdempotencyKey: "adj:1",
+	_, err = e.post(Posting{Kind: TxAdminAdjustment, IdempotencyKey: "adjust:1",
 		Legs: []Leg{{wallet(cust), -31}, {Account{Kind: PlatformAdjustments}, 31}}})
 	require.ErrorIs(t, err, ErrInsufficient)
 
@@ -607,7 +677,8 @@ func TestForfeitOnDeleteDB(t *testing.T) {
 	e.clean()
 }
 
-// CR-19: ledger rows are append-only for the app role.
+// CR-19, D-123: ledger rows are append-only for the app role, and balances
+// and lots move only through the entry and consumption triggers.
 func TestAppendOnlyDB(t *testing.T) {
 	e := newDBEnv(t)
 	e.grant(e.user(), 10)
@@ -617,7 +688,14 @@ func TestAppendOnlyDB(t *testing.T) {
 		`UPDATE ledger_transactions SET memo = 'x'`,
 		`DELETE FROM ledger_transactions`,
 		`DELETE FROM account_balances`,
+		`UPDATE account_balances SET balance = balance + 1`,
+		`UPDATE account_balances SET kind = 'platform_expired'`,
+		`INSERT INTO account_balances (account_id, kind, balance) VALUES (gen_random_uuid(), 'customer_wallet', 5)`,
 		`UPDATE credit_lot_consumptions SET remaining_delta = 0`,
+		`DELETE FROM credit_lot_consumptions`,
+		`UPDATE credit_lots SET remaining = remaining + 1`,
+		`UPDATE credit_lots SET held = held + 1`,
+		`UPDATE credit_lots SET original = original + 1`,
 		`DELETE FROM credit_lots`,
 		`DELETE FROM credit_holds`,
 	} {

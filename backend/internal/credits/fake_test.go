@@ -44,6 +44,32 @@ type ledgerMachine struct {
 	refs      []Ref
 	keys      []string
 	holdTried map[Ref]bool
+	posted    map[string]int64 // key → amount of the posting it made (D-122)
+}
+
+// post posts p and checks the key rule: a key seen before with the same
+// amount is a duplicate, with another amount ErrKeyReused (D-122).
+func (m *ledgerMachine) post(t *rapid.T, what string, p Posting, n int64) error {
+	if m.posted == nil {
+		m.posted = map[string]int64{}
+	}
+	got, err := m.p.Post(m.ctx, p)
+	prev, seen := m.posted[p.IdempotencyKey]
+	switch {
+	case seen && prev != n:
+		if !errors.Is(err, ErrKeyReused) {
+			t.Fatalf("%s: reused key with other legs: got %v", what, err)
+		}
+		return nil
+	case seen:
+		if err != nil || !got.Duplicate {
+			t.Fatalf("%s: repeated key: got %+v, %v", what, got, err)
+		}
+		return nil
+	case err == nil:
+		m.posted[p.IdempotencyKey] = n
+	}
+	return err
 }
 
 func newMachine(t *rapid.T, gen *ids.Generator, now time.Time) []ids.ID {
@@ -61,8 +87,8 @@ func (m *ledgerMachine) actions() map[string]func(*rapid.T) {
 			c := rapid.SampledFrom(m.customers).Draw(t, "customer")
 			n := int64(rapid.IntRange(1, 150).Draw(t, "credits"))
 			key := rapid.SampledFrom(m.keys).Draw(t, "key")
-			_, err := m.p.Post(m.ctx, Posting{Kind: TxReferralReward, IdempotencyKey: "credit:" + key + c.String(),
-				Legs: []Leg{{Account{Kind: PlatformMarketing}, -n}, {Account{Kind: CustomerWallet, Owner: c}, n}}})
+			err := m.post(t, "credit", Posting{Kind: TxReferralReward, IdempotencyKey: "referral:credit:" + key + c.String(),
+				Legs: []Leg{{Account{Kind: PlatformMarketing}, -n}, {Account{Kind: CustomerWallet, Owner: c}, n}}}, n)
 			if err != nil {
 				t.Fatalf("credit: %v", err)
 			}
@@ -71,8 +97,8 @@ func (m *ledgerMachine) actions() map[string]func(*rapid.T) {
 			c := rapid.SampledFrom(m.customers).Draw(t, "customer")
 			n := int64(rapid.IntRange(1, 80).Draw(t, "credits"))
 			key := rapid.SampledFrom(m.keys).Draw(t, "key")
-			_, err := m.p.Post(m.ctx, Posting{Kind: TxAdminAdjustment, IdempotencyKey: "debit:" + key + c.String(),
-				Legs: []Leg{{Account{Kind: CustomerWallet, Owner: c}, -n}, {Account{Kind: PlatformAdjustments}, n}}})
+			err := m.post(t, "debit", Posting{Kind: TxAdminAdjustment, IdempotencyKey: "adjust:debit:" + key + c.String(),
+				Legs: []Leg{{Account{Kind: CustomerWallet, Owner: c}, -n}, {Account{Kind: PlatformAdjustments}, n}}}, n)
 			if err != nil && !errors.Is(err, ErrInsufficient) {
 				t.Fatalf("debit: %v", err)
 			}
@@ -198,9 +224,22 @@ func TestFakeScenarios(t *testing.T) {
 	g := ids.NewGenerator()
 	cust, shop := g.New(now), g.New(now)
 	f.CashbackBP[shop] = 500
-	_, err := f.Post(ctx, Posting{Kind: TxReferralReward, IdempotencyKey: "r1",
-		Legs: []Leg{{Account{Kind: PlatformMarketing}, -100}, {wallet(cust), 100}}})
+	reward := Posting{Kind: TxReferralReward, IdempotencyKey: "referral:r1",
+		Legs: []Leg{{Account{Kind: PlatformMarketing}, -100}, {wallet(cust), 100}}}
+	_, err := f.Post(ctx, reward)
 	require.NoError(t, err)
+	// D-122: a key needs its kind's prefix; a reused key needs the same legs.
+	p, err := f.Post(ctx, reward)
+	require.NoError(t, err)
+	require.True(t, p.Duplicate)
+	other := reward
+	other.Legs = []Leg{{Account{Kind: PlatformMarketing}, -99}, {wallet(cust), 99}}
+	_, err = f.Post(ctx, other)
+	require.ErrorIs(t, err, ErrKeyReused)
+	other = reward
+	other.IdempotencyKey = "hold:r1"
+	_, err = f.Post(ctx, other)
+	require.ErrorIs(t, err, ErrInvalid)
 
 	o1 := Ref{Type: RefOrder, ID: g.New(now)}
 	a, err := f.Hold(ctx, HoldRequest{Ref: o1, CustomerID: cust, StoreID: shop, Credits: 30, EligiblePaise: 25000})

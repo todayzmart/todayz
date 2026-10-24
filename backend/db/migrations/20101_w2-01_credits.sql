@@ -20,7 +20,9 @@
 --     only by inserting a consumption row (invariant 8 holds by construction;
 --     the nightly reconcile still checks it).
 --   * ledger_transactions, ledger_entries and credit_lot_consumptions are
---     append-only (trigger + REVOKE, CR-19).
+--     append-only (trigger + REVOKE, CR-19). account_balances and
+--     credit_lots lose only DELETE and TRUNCATE here; 20102 takes away the
+--     app's UPDATE of their amounts (D-123).
 
 -- +goose Up
 

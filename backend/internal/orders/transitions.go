@@ -182,10 +182,10 @@ func (s *Service) end(ctx context.Context, o ordersdb.Order, to, reason string, 
 	if _, err := q.ReleaseReservations(ctx, ordersdb.ReleaseReservationsParams{Reason: &reason, OrderID: o.ID}); err != nil {
 		return fmt.Errorf("orders: release stock: %w", err)
 	}
-	if o.CreditsUsed > 0 {
-		if err := s.credits.Release(ctx, mustID(o.ID)); err != nil {
-			return fmt.Errorf("orders: release credits: %w", err)
-		}
+	// Always, not only when CreditsUsed > 0: a hold may be open whatever the
+	// order row says, and Release is a no-op without one (D-127).
+	if err := s.credits.Release(ctx, mustID(o.ID)); err != nil {
+		return fmt.Errorf("orders: release credits: %w", err)
 	}
 	v, err := q.SetEnded(ctx, ordersdb.SetEndedParams{Status: to, Reason: &reason, Note: note, ID: o.ID})
 	if err != nil {
