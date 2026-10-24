@@ -27,11 +27,10 @@ import (
 // TODO(lead): the feed size and the rotation step are not in 01 §17; these are
 // the conservative readings (a screenful, a quarter of an hour).
 const (
-	feedCards       = 10
-	feedRotation    = 15 * time.Minute
-	feedCandidates  = 200
-	defaultRadiusM  = 2000
-	maxFeedCoordErr = "outside India"
+	feedCards      = 10
+	feedRotation   = 15 * time.Minute
+	feedCandidates = 200
+	defaultRadiusM = 2000
 )
 
 // kindRank orders offers of one shop for the card: the most visible first.

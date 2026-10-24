@@ -7,8 +7,9 @@
 SELECT id FROM stores WHERE id = @id FOR UPDATE;
 
 -- name: CountActiveBanners :one
--- Live or scheduled banners (the ones that count against store_banners_max).
-SELECT count(*)::int FROM store_banners WHERE store_id = @store_id AND status IN ('live', 'scheduled');
+-- Live, scheduled and held-for-review banners: the ones that count against
+-- store_banners_max (a held banner would take a slot once cleared).
+SELECT count(*)::int FROM store_banners WHERE store_id = @store_id AND status IN ('live', 'scheduled', 'pending_review');
 
 -- name: InsertBanner :one
 INSERT INTO store_banners (id, store_id, image_key, template, headline, target_type, target_id, target_item_ids,
