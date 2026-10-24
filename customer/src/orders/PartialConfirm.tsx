@@ -1,5 +1,5 @@
 // C-12 partial accept (`awaiting_customer`, D-28): the shop could not give everything. The customer sees
-// the changed lines, the new total (the server re-capped credits and recomputed the delivery fee) and takes
+// the changed lines, the new items total, credits, fee and total (the server re-capped credits and recomputed the delivery fee) and takes
 // it or cancels it before `partialConfirmBy`. Cancel records `declined_partial` on the server.
 import { ApiError } from '@todayz/api-client';
 import type { Order } from '@todayz/api-client/gen/model/order';
@@ -69,10 +69,20 @@ export function PartialConfirm({
         })}
       </ul>
       <dl className={styles.totals}>
+        <div className={styles.totalRow}>
+          <dt>{intl.formatMessage({ id: 'orders.partial.items' })}</dt>
+          <dd>{formatMoney(order.itemsAfterOffersPaise)}</dd>
+        </div>
         {order.creditsUsed > 0 && (
           <div className={styles.totalRow}>
             <dt>{intl.formatMessage({ id: 'orders.partial.credits' })}</dt>
             <dd>−{formatMoney(order.creditsUsed * 100)}</dd>
+          </div>
+        )}
+        {order.fulfilment === 'delivery' && (
+          <div className={styles.totalRow}>
+            <dt>{intl.formatMessage({ id: 'orders.partial.fee' })}</dt>
+            <dd>{formatMoney(order.deliveryFeePaise)}</dd>
           </div>
         )}
         <div className={`${styles.totalRow} ${styles.grand}`}>

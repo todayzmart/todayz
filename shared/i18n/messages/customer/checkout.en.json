@@ -21,6 +21,7 @@
   "checkout.problem.store_closed": { "defaultMessage": "The shop is closed right now. Your cart is kept.", "description": "Quote problem" },
   "checkout.problem.store_not_bookable": { "defaultMessage": "This shop is not taking orders right now. Your cart is kept.", "description": "Quote problem" },
   "checkout.problem.ordering_suspended": { "defaultMessage": "Ordering is paused for now. Please try again later.", "description": "Quote problem" },
+  "checkout.problem.ordering_suspended.until": { "defaultMessage": "You missed several pickups, so until {date} you can have only one open order. Finish or cancel it first.", "description": "Quote or place problem ordering_suspended with its end date (C-21)" },
   "checkout.problem.account_has_active_order": { "defaultMessage": "You already have an order in progress. Finish or cancel it first.", "description": "Quote problem" },
   "checkout.problem.other": { "defaultMessage": "We could not place the order. Please try again.", "description": "Quote problem fallback" },
   "checkout.problem.network": { "defaultMessage": "No connection. Your cart is kept; try again when you are online.", "description": "Quote problem offline" }
