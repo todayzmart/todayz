@@ -4,24 +4,21 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strconv"
-
-	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/todayz/backend/gen/sqlc/referralsdb"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/ids"
-	"github.com/todayz/backend/internal/platform/notice"
 	"github.com/todayz/backend/internal/platform/settings"
-	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
 // OnPurchaseCompleted is the hook orders and POS call inside the transaction
-// that records a completed purchase (01 §8). It qualifies the buyer's pending
-// customer referral and counts the sale toward the selling business's shop
-// referral, posting rewards that are due. A database error is returned (the
-// caller rolls back); a ledger or notification failure is logged and left to
-// the sweep.
+// that records a completed purchase (01 §8), after their own credit postings.
+// It qualifies the buyer's pending customer referral and counts the sale
+// toward the selling business's shop referral. It never posts a reward: a
+// referral it qualifies gets a referral_reward job in the same transaction,
+// which posts each side after the purchase commits (D-169), so a reward can
+// never lock ledger accounts inside a purchase or fail one. A database error
+// is returned (the caller rolls back).
 func (s *Service) OnPurchaseCompleted(ctx context.Context, o Outcome) error {
 	if s.db == nil || s.settings == nil {
 		return nil
@@ -66,7 +63,8 @@ func (s *Service) qualifyCustomer(ctx context.Context, o Outcome) error {
 	if err != nil {
 		return err
 	}
-	return s.reward(ctx, row)
+	s.enqueueReward(ctx, row.ID)
+	return nil
 }
 
 // countShop counts the sale toward the selling business's pending shop
@@ -151,151 +149,19 @@ func (s *Service) tryQualifyShop(ctx context.Context, row referralsdb.Referral) 
 	if err != nil {
 		return err
 	}
-	return s.reward(ctx, row)
-}
-
-// beneficiary states.
-const (
-	payPost = iota // post to the account
-	payWait        // not payable yet (no live store, a blocked referrer): try again later
-	payVoid        // nobody to pay (a deleted customer): mark done unposted
-)
-
-// beneficiary is the account one side's reward goes to: a customer's wallet,
-// or the primary store of a business (a store referrer's business too,
-// 01 §8, D-72). A deleted customer is void; a blocked customer referrer
-// waits until unblocked (D-168).
-func (s *Service) beneficiary(ctx context.Context, side, partyType string, partyID pgtype.UUID) (Beneficiary, int, error) {
-	q := s.q(ctx)
-	switch partyType {
-	case partyCustomer:
-		status, err := q.UserStatus(ctx, partyID)
-		switch {
-		case db.IsNoRows(err):
-			return Beneficiary{}, payVoid, nil
-		case err != nil:
-			return Beneficiary{}, 0, err
-		}
-		switch {
-		case status == "deleted":
-			return Beneficiary{}, payVoid, nil
-		case status == "blocked" && side == SideReferrer:
-			return Beneficiary{}, payWait, nil
-		}
-		return Beneficiary{Kind: BeneficiaryCustomer, ID: idOf(partyID)}, payPost, nil
-	case partyStore, partyBusiness:
-		biz := partyID
-		if partyType == partyStore {
-			b, err := q.StoreBusiness(ctx, partyID)
-			if err != nil {
-				return Beneficiary{}, 0, err
-			}
-			biz = b
-		}
-		st, err := q.PrimaryStore(ctx, biz)
-		if err != nil {
-			if db.IsNoRows(err) {
-				return Beneficiary{}, payWait, nil
-			}
-			return Beneficiary{}, 0, err
-		}
-		return Beneficiary{Kind: BeneficiaryStore, ID: idOf(st)}, payPost, nil
-	}
-	return Beneficiary{}, 0, fmt.Errorf("referrals: unknown party %q", partyType)
-}
-
-// reward posts each side of a locked qualified referral not yet posted. The
-// posting and the notification each run in a savepoint: a failure leaves the
-// side for the sweep and never aborts the caller.
-func (s *Service) reward(ctx context.Context, row referralsdb.Referral) error {
-	sides := []struct {
-		name    string
-		done    bool
-		typ     string
-		id      pgtype.UUID
-		credits int32
-	}{
-		{SideReferrer, row.ReferrerRewardedAt != nil, row.ReferrerType, row.ReferrerID, row.ReferrerCredits},
-		{SideReferee, row.RefereeRewardedAt != nil, row.RefereeType, row.RefereeID, row.RefereeCredits},
-	}
-	q := s.q(ctx)
-	log := telemetry.Logger(ctx)
-	for _, side := range sides {
-		if side.done || row.Status != statusQualified {
-			continue
-		}
-		to, state, err := s.beneficiary(ctx, side.name, side.typ, side.id)
-		if err != nil {
-			return err
-		}
-		if state == payWait {
-			continue
-		}
-		var txID ids.ID
-		if state == payPost && side.credits > 0 {
-			posted := false
-			err := s.db.InTx(ctx, func(ctx context.Context) error {
-				var err error
-				txID, posted, err = s.ledger.PostReward(ctx, Reward{
-					ReferralID: idOf(row.ID), Side: side.name, To: to, Credits: int(side.credits),
-					IdempotencyKey: "referral:" + idOf(row.ID).String() + ":" + side.name,
-				})
-				return err
-			})
-			if err != nil {
-				log.WarnContext(ctx, "referrals: reward not posted", "referral", idOf(row.ID).String(), "side", side.name, "err", err)
-				continue
-			}
-			if !posted {
-				continue
-			}
-		}
-		row, err = q.SetSideRewarded(ctx, referralsdb.SetSideRewardedParams{Side: side.name, TransactionID: optUUID(txID), Now: s.now(), ID: row.ID})
-		if err != nil {
-			return err
-		}
-		if txID != ids.Zero {
-			s.notify(ctx, row, to, int(side.credits))
-		}
-	}
+	s.enqueueReward(ctx, row.ID)
 	return nil
 }
 
-// notify sends "referral unlocked" to whoever was paid (01 §15: in-app +
-// push). It runs in a savepoint and only logs a failure.
-func (s *Service) notify(ctx context.Context, row referralsdb.Referral, to Beneficiary, credits int) {
-	if s.notices == nil {
-		return
-	}
-	n := notice.Notification{
-		Params: map[string]string{"credits": strconv.Itoa(credits)},
-		Ref:    &notice.Ref{Type: "referral", ID: idOf(row.ID)},
-	}
-	switch to.Kind {
-	case BeneficiaryCustomer:
-		n.Kind, n.UserID = notice.KindReferralUnlocked, to.ID
-	case BeneficiaryStore:
-		biz, err := s.q(ctx).StoreBusiness(ctx, ids.UUID(to.ID))
-		if err != nil {
-			telemetry.Logger(ctx).WarnContext(ctx, "referrals: notify: store business", "err", err)
-			return
-		}
-		n.Kind, n.BusinessID, n.StoreID = notice.KindShopReferralUnlocked, idOf(biz), to.ID
-	}
-	err := s.db.InTx(ctx, func(ctx context.Context) error {
-		tx, _ := db.TxFrom(ctx)
-		_, err := s.notices.Send(ctx, tx, n)
-		return err
-	})
-	if err != nil {
-		telemetry.Logger(ctx).WarnContext(ctx, "referrals: notify", "referral", idOf(row.ID).String(), "err", err)
-	}
-}
-
 // OnPurchaseReversed is the hook for a reversed purchase (a POS refund or
-// void, a reversed order; 01 §7, D-08), inside the reversal's transaction. A
-// qualification whose rewards have not posted goes back to pending; one with
-// a posted side keeps its rewards and raises referral.reversed_after_reward.
+// void, a reversed order; 01 §7, D-08), inside the reversal's transaction and
+// after its credit postings: ledger accounts first, the referral last, the
+// order a reward posting takes them in (D-169). A
+// qualification whose rewards have not posted goes back to pending, and a
+// side marked done without a posting (void, zero credits) is cleared with it:
+// posted means a ledger transaction. One with a posted side keeps its rewards
+// and raises referral.reversed_after_reward; a side still unposted then is
+// paid later all the same (01 §7: a reward stays once earned).
 // A counted shop sale of a still-pending referral is uncounted.
 func (s *Service) OnPurchaseReversed(ctx context.Context, refType string, refID ids.ID) error {
 	if s.db == nil {
@@ -309,7 +175,10 @@ func (s *Service) OnPurchaseReversed(ctx context.Context, refType string, refID 
 			return err
 		}
 		for _, row := range rows {
-			if row.ReferrerRewardedAt == nil && row.RefereeRewardedAt == nil {
+			// Posted means a ledger transaction, not a side marked done
+			// without one (a deleted beneficiary, zero credits): 01 §7 keeps
+			// only a reward that posted (D-169).
+			if !row.ReferrerTransactionID.Valid && !row.RefereeTransactionID.Valid {
 				if err := q.RevertQualified(ctx, referralsdb.RevertQualifiedParams{Now: now, ID: row.ID}); err != nil {
 					return err
 				}
@@ -327,65 +196,4 @@ func (s *Service) OnPurchaseReversed(ctx context.Context, refType string, refID 
 		_, err = q.UncountShopSale(ctx, referralsdb.UncountShopSaleParams{RefType: refType, RefID: ids.UUID(refID)})
 		return err
 	})
-}
-
-// Sweep posts rewards still due (a ledger that was down, a shop that had no
-// live store) and qualifies shops whose verification came after their last
-// counted sale. Each referral runs in its own transaction.
-func (s *Service) Sweep(ctx context.Context) (map[string]int64, error) {
-	out := map[string]int64{"rewarded": 0, "shops_qualified": 0}
-	if s.db == nil || s.settings == nil {
-		return out, errUnavailable
-	}
-	qualified, err := s.q(ctx).QualifiedReferrals(ctx, sweepBatch)
-	if err != nil {
-		return out, err
-	}
-	for _, id := range qualified {
-		var done bool
-		err := s.db.InTx(ctx, func(ctx context.Context) error {
-			row, err := s.q(ctx).LockReferral(ctx, id)
-			if err != nil {
-				return err
-			}
-			if err := s.reward(ctx, row); err != nil {
-				return err
-			}
-			after, err := s.q(ctx).LockReferral(ctx, id)
-			done = err == nil && after.Status == statusRewarded
-			return err
-		})
-		if err != nil {
-			return out, err
-		}
-		if done {
-			out["rewarded"]++
-		}
-	}
-	pending, err := s.q(ctx).PendingShopReferrals(ctx, sweepBatch)
-	if err != nil {
-		return out, err
-	}
-	for _, id := range pending {
-		var qualifiedNow bool
-		err := s.db.InTx(ctx, func(ctx context.Context) error {
-			row, err := s.q(ctx).LockReferral(ctx, id)
-			if err != nil {
-				return err
-			}
-			if err := s.tryQualifyShop(ctx, row); err != nil {
-				return err
-			}
-			after, err := s.q(ctx).LockReferral(ctx, id)
-			qualifiedNow = err == nil && after.Status != statusPending
-			return err
-		})
-		if err != nil {
-			return out, err
-		}
-		if qualifiedNow {
-			out["shops_qualified"]++
-		}
-	}
-	return out, nil
 }

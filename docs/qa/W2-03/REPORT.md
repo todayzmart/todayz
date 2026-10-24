@@ -95,13 +95,7 @@ Fraud and edge tests:
 
 ## Seams for the merger
 
-- **Credits (W2-01). TODO(merge):** `referrals.Ledger` (`internal/referrals/seams.go`). It is nil in `cmd/todayz/routes_referrals.go` (`referralsDeps`) and in `internal/jobs/referrals.go`, so rewards qualify and wait. Once credits lands, set both to an adapter over `credits.Poster`:
-  - `Posting{Kind: TxReferralReward}`;
-  - legs from `PlatformMarketing` to `CustomerWallet` (customer) or `StoreCredit` (store);
-  - the `IdempotencyKey` from the `Reward` (`referral:<id>:<side>`);
-  - `posted=false` when the ledger is unavailable.
-
-  Then the sweep posts everything already qualified.
+- **Credits (W2-01):** wired, see the addendum below (D-169).
 - **POS (W2-04):** call `referrals.Service.OnPurchaseCompleted` with `Outcome{RefType: RefPOSSale, LinkMethod, CustomerID, StoreID, EligiblePaise, CreditsUsed}` in the sale's transaction, and `OnPurchaseReversed(RefPOSSale, id)` on a void or refund.
 - **Orders:** `orders.Referrals` and `CompletedOrder` in `internal/orders/seams.go`, called from `collect`. A future "delivered" end state (W2-12) should call it too. Order refunds and returns should call `OnPurchaseReversed(RefOrder, id)`; no orders path does that yet.
 - **Standees (W2-10):** `?s=` is recorded but not checked against `qr_standees`.
@@ -157,3 +151,104 @@ New tests:
 - `TestShopCountingDistinctCustomers`: repeat buyers do not count, and a third buyer qualifies the shop.
 - `TestBlockedReferrerWaits`: the referee is paid while the referrer is blocked; the sweep skips the referral and then pays it after the unblock.
 - `TestShopCounting` passes unchanged, since it already used a different buyer for each counted purchase.
+
+## Addendum: rewards post to the credits ledger (24 Oct, D-169)
+
+Built after main (9ddd0c0) merged in, with both W2-01 credits and W2-03 referrals on it.
+- **Adapter.** `jobs.ReferralsLedger(credits.Poster)` is in `backend/internal/jobs/referrals.go`, so `internal/referrals` still imports no other domain.
+  - One `TxReferralReward` posting per side: ref `referral`/the referral id, the reward's `referral:<id>:<side>` key, legs `platform_marketing` −N → `customer_wallet` or `store_credit` +N.
+  - A duplicate counts as posted, with the first transaction id.
+  - `ErrKeyReused` and `ErrInvalid` wrap the new `referrals.ErrRewardRefused`; other errors pass through.
+- **Units.** `Reward.Credits` and `Leg.Amount` are both whole credits:
+  - 01 line 7 says "1 credit = ₹1";
+  - 03 says `bigint` whole credits;
+  - `ledger_entries` holds signed amounts in credits.
+  So the amount moves as `int64(r.Credits)`, with no conversion.
+- **One constructor.** `jobs.ReferralsService(Deps, notice.Sender)` builds the service for both the API (`newReferrals` in `cmd/todayz/routes_referrals.go`) and the `referral_sweep` job. It took over `referralsDeps` (hasher, public URL, app origins). The sweep had a nil ledger before. All three TODO(merge) comments are gone.
+- **Transaction.** `credits.Service.Post` uses `s.db.InTx`, which joins the caller's transaction from ctx as a savepoint (`outer.Begin`) and opens a pool transaction only when there is none. So the posting is part of the purchase. The referrals savepoint around it means a failure rolls back the posting only.
+- **No retry loop.** A refused posting raises a `referral.reward_refused` risk flag. `QualifiedReferrals` leaves out referrals with that flag `open` or `confirmed`, and clearing it allows one more try. A transient error is still logged and retried by the sweep, as before. No migration was needed: `risk_flags` and its subject index already exist.
+- **Runbook.** There is a new "Referral rewards" section in `docs/runbooks/credits-ledger.md`, and `referral_sweep` now names that runbook.
+
+New tests, in `backend/internal/jobs/referrals_test.go`, run against the real `credits.Service` on the shared test Postgres:
+- `TestReferralRewardsPostToCreditsDB` builds through `ReferralsService`. Both sides post once. Both wallets are credited, `platform_marketing` is debited by the sum, and the referee's lot equals the reward. The same purchase again and a re-sweep post nothing.
+- `TestReferralRewardStoreCreditDB`: a store referrer's reward lands in the primary store's `store_credit`, with no lot.
+- `TestReferralRewardFailedPostSweepsDB`: the ledger fails both postings inside an outer purchase transaction that has a write of its own. That write and the qualification commit and nothing posts. The next sweep posts both sides once, and a second sweep posts nothing.
+- `TestReferralReversedBeforePostingDB` (D-166): the purchase is reversed while both sides are unposted. The referral goes back to `pending`, the sweep posts nothing and no flag is raised. A later qualifying purchase pays.
+- `TestReferralRewardRefusedIsParkedDB`: the referee's key already exists with other legs.
+  - The referrer is still paid and the referee is flagged once.
+  - Three sweeps add nothing.
+  - After the flag is cleared, one more sweep tries once, raises one new flag, and the next sweep adds nothing.
+  - A mutation check confirmed the test catches a missing exclusion: with the `QualifiedReferrals` exclusion removed it fails with 4 flags, one per sweep.
+
+Checks, with `-p 2` on the shared test Postgres:
+- `go test -race` passes for `internal/referrals`, `internal/jobs`, `internal/credits` and `internal/notify`.
+- `cmd/todayz` passes.
+- golangci-lint reports 0 issues on referrals, jobs and cmd/todayz.
+- settingslint, gofmt and go vet are clean.
+
+Questions (the conservative reading is what is built):
+- `referral_sweep` stays `ClassMaintenance`, though it now moves money. `ClassMoney` would also make it require a runbook, and it names one anyway. Should it change class?
+- While a `referral.reward_refused` flag is open, the whole referral is parked, including the other side if that side is unposted for another reason. A per-side park would need a column (a migration).
+
+## Addendum: review fixes, rewards post after the purchase commits (24 Oct, D-169)
+
+The review of ff9a29f found no blockers. These are its fixes.
+
+**1. Deadlock: the reward is out of the purchase transaction.**
+- The purchase's transaction only qualifies the referral and enqueues `referral_reward` with `InsertTx` (`EnqueueOpts.UniqueKey` `referral:<id>`), in a savepoint. A failed enqueue is logged and the sweep posts it, since a newly qualified referral is due at once.
+- The new `referral_reward` job (ClassMoney, 3 attempts, `backend/internal/jobs/referrals.go`) calls `Service.PostRewards`. It posts each side in its own transaction, so each posting is a single `LockBalances` call. Lock order: ledger accounts, then the referral row (`FOR UPDATE`, rechecked; a change rolls the side back). `PostRewards` refuses to run inside a caller's transaction.
+- `referral_sweep` stays the backstop.
+- Reproduced first: with the posting put back inside the purchase transaction, `S` given a cashback rate so `Complete` locks it, the race failed with `40P01` in 20 of 20 rounds. With the fix, `TestReferralRewardConcurrentWithReferrersOrderDB` (20 rounds, `-race`, run 3 times) has no errors. The referrer's wallet ends at 1000 + rewards − credits spent + cashback.
+
+**2. Stuck retries.**
+- Migration `20303_w2-03_reward_attempts.sql` adds `referrals.attempts` and `next_attempt_at` (with a check and the partial index `ix_referrals_reward_due`). Already-qualified rows are backfilled with `next_attempt_at = qualified_at`.
+- The backoff is 10 min after the first failed pass, doubling, capped at 6 h.
+- `QualifiedReferrals` reads only due rows, `ORDER BY next_attempt_at, id`.
+- A payWait side (a store referrer with no live store) gets the backoff. A blocked referrer and a refused reward stay out of the batch by query until their condition changes.
+- There is a new `tz_referral_reward_failed_total{reason}` (`ledger_error`, `refused`, `error`), and `waiting` is in the sweep and job summaries.
+- `TestStuckRewardsDoNotStarveFreshOnes`: 220 stuck plus 3 fresh. The first sweep takes 200 stuck; the second takes the other 20 and posts the 3 fresh; the third has nothing due; after the backoff, 200 again.
+
+**3. Tests** (`backend/internal/jobs/referrals_test.go`, real `credits.Service`):
+- `TestReferralRewardSQLErrorRollsBackTheSideDB`: the poster posts, then runs `SELECT 1/0` on `db.TxFrom(ctx)`. The side's transaction rolls back (no ledger tx for its key, the wallet unchanged), the other side posts, and the next due sweep posts the failed side once.
+- `TestReferralRewardDuplicateDB`: an identical posting made first returns `Duplicate` with the same id. No new tx, one lot, and the referral stores the first tx id.
+- `TestReferralReversedAfterPostingDB`: both sides posted, then reversed. The flag is raised, and the wallets, lots and `platform_marketing` are unchanged.
+- `TestReferralRewardsPostToCreditsDB` now checks the exact key per side and `ref_type`/`ref_id` on the posted rows.
+- `TestReferralRewardStoreRefusedDB`: a refused store beneficiary is parked with a flag.
+- `TestShopRewardWaitsForAStore` (referrals package): reversed while the store side waits, the referral stays qualified with one flag, and the store side is paid later.
+
+**4. Guard.** `referrals.New` returns an error with a nil `Ledger`, and `NoLedger` is deleted. The tests use their own fake ledgers. The `seams.go` doc no longer says "switched off".
+
+**5. Docs.** D-161 fixed in place (posts after commit; the ledger is implemented, no longer "a seam until W2-01 merges"). D-169 extended (after-commit design, lock order, backoff, metric, the reversal-while-waiting rule). The runbook's "Referral rewards" section rewritten.
+
+Questions (the conservative reading is what is built):
+- **The backoff is code, not a setting.** 10 min, doubling, 6 h cap is operational pacing like the sweep's schedule, so it is not in `platform_settings`. Should it be configurable?
+- **A store referrer with no live store backs off.** Its reward can therefore lag up to 6 h after the store goes live. Excluding it from the batch by query, as for a blocked referrer, would need a join on stores. The backoff was the simpler choice the review allowed.
+- **Reversal while one side waits.** 01 §7 says "if it has posted, the reward stays". It is read as "if either side has posted", so the waiting side is still paid later and a flag is raised. The other reading would void the waiting side.
+- **Without the job queue** (`Deps.Jobs` nil, only in tests), the sweep posts within about 10 min. The app always passes the enqueuer.
+
+## Second review fixes (after bb557e6)
+
+**1. Posted means a ledger transaction.** `OnPurchaseReversed` and `RevertQualified` now test `referrer_transaction_id`/`referee_transaction_id IS NULL`, not `*_rewarded_at`. The revert also clears both `*_rewarded_at`, so a side marked done without a posting (a deleted beneficiary, zero credits) is undone with the qualification.
+
+**2. Tests** (`backend/internal/jobs/referrals_test.go`, real ledger):
+- `TestReferralReversedWithASideWaitingDB`: the store side waits (store paused) and the referee side posts, then the purchase is reversed. The referral stays qualified with one `reversed_after_reward` flag. Once the store is live the sweep pays the store side, the final status is `rewarded` with 2 reward transactions, and there is still one flag.
+- `TestReferralReversedWithAVoidSideDB`: the referrer is deleted (void, marked done, no transaction) and the referee side waits. After the reversal the referral is `pending` with both `*_rewarded_at` cleared and no flag. The sweep posts nothing, and the referee's balance is 0.
+- `TestReferralRewardJobAndSweepRaceDB`: the `referral_reward` job and `Sweep` run at the same moment on the same referral, 10 rounds. There are no errors, exactly 2 reward transactions per referral, and the balances are exact.
+
+**3. Beneficiary recheck under the ledger lock.** After `PostReward` (which holds the wallet lock), `postSide` reads the beneficiary again. If it is no longer payable as read, the side rolls back (`errBeneficiaryChanged`) and runs once more, which voids or waits it.
+- `TestReferralRewardBeneficiaryDeletedWhilePostingDB` deletes the referee in a deletion transaction (`credits.OnAccountDelete` plus `users.status = 'deleted'`) between the read and the posting. Result: no ledger transaction for that key, no lot, a zero balance, and the side void. The other side is paid.
+- Mutation check: with the recheck disabled, this test fails ("the deleted referee's side is void").
+
+**4. The sweep goes on.** An error on one referral is logged at error level and counted (`error`). That referral's attempt is recorded with the backoff, so it no longer heads the batch, and the sweep continues; the first error is returned at the end. The job handler returns the summary together with the error.
+- `TestRewardSweepGoesOnAfterOneFailsDB`: a trigger makes one refused referral's flag insert fail. The sweep returns an error, the other referral is rewarded, and the failing one has `attempts = 1` and a future `next_attempt_at`. A sweep 1 minute later has no error and nothing due.
+
+**5. Metric.** `tz_referral_reward_failed_total` gains `reason="waiting"` (a store referrer with no live store) and `reason="blocked"` (a blocked customer referrer). The runbook line is updated, and also says which reasons are expected.
+
+**6. One refused flag.** `flagRefused` locks the referral and then any open or confirmed `referral.reward_refused` flag for it. With no flag, it inserts one with `details: {kind, sides: [side]}`. When the side is already listed it does nothing. Otherwise it appends the side.
+- `TestReferralRewardRefusedFlagOnceDB`: both sides are refused, and the job is run 2 more times. There is 1 flag, with `sides` `["referrer", "referee"]`.
+- `TestReferralRewardStoreRefusedDB` now reads `details->'sides'`.
+
+Questions (the conservative reading is what is built):
+- **Flag shape.** The review asked to skip an insert when an open flag with the same rule *and side* exists, and for both sides refused not to raise two. These cannot both hold with one flag per side, so there is one flag per referral and rule, and its `details.sides` lists the refused sides. Admin sees one item per referral. Is that the intended shape?
+- **A `rewarded` referral with no postings.** If both sides were marked done without a posting (both void or zero credits), the referral is `rewarded`. A reversal now sends it back to `pending`. Nothing was paid, so nothing is lost, but its status changes after it showed as rewarded.
+- **Repeated reversals.** A purchase reversed twice (two partial refunds) raises `reversed_after_reward` each time. This is unchanged from before and was not in the review.

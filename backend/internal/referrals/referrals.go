@@ -25,9 +25,11 @@
 //   - Qualification: a customer's first completed order or verified POS
 //     sale with qualifying amount ≥ ref_qualifying_min_order_paise; a new
 //     shop's verification plus ref_shop_qualifying_orders completed orders
-//     or verified linked sales. Rewards post in the same transaction
-//     (customer) or once the count is reached (shop); a shop's reward goes
-//     to its business's primary store (oldest live) and waits for one.
+//     or verified linked sales. The qualifying purchase's transaction
+//     marks the referral qualified and enqueues the referral_reward job;
+//     each side posts after it commits, in its own transaction (D-169). A
+//     shop's reward goes to its business's primary store (oldest live) and
+//     waits for one.
 //   - A reversed purchase revokes a qualification whose rewards have not
 //     posted; after posting the rewards stay and a risk flag is raised (01 §7).
 package referrals
@@ -47,6 +49,7 @@ import (
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/notice"
 	"github.com/todayz/backend/internal/platform/pii"
 	"github.com/todayz/backend/internal/platform/settings"
@@ -96,18 +99,23 @@ const (
 	sweepBatch = 200
 )
 
-// Deps is what the service needs. Only Clock is required: without the
-// database, settings or the hash key every operation answers 503.
+// Deps is what the service needs. Clock and Ledger are required: without
+// the database, settings or the hash key every operation answers 503.
 type Deps struct {
 	DB       *db.DB
 	Clock    clock.Clock
 	Settings *settings.Cache
 	// Hasher keys the device, phone, ip and user-agent hashes (PII_HASH_KEY).
 	Hasher *pii.Hasher
-	// Ledger posts rewards; nil is NoLedger (rewards wait for the sweep).
+	// Ledger posts rewards (required: a missing ledger is a wiring bug,
+	// never a silent switch-off).
 	Ledger Ledger
 	// Notices sends "referral unlocked"; nil sends nothing.
 	Notices notice.Sender
+	// Jobs enqueues referral_reward in the qualifying purchase's
+	// transaction; nil leaves the posting to the sweep (router tests, a
+	// process without a queue).
+	Jobs platformjobs.Enqueuer
 	// PublicURL is the API's public base URL (the share links).
 	PublicURL string
 	// CustomerApp and BusinessApp are the apps' origins (the redirects).
@@ -124,6 +132,7 @@ type Service struct {
 	hasher      *pii.Hasher
 	ledger      Ledger
 	notices     notice.Sender
+	jobs        platformjobs.Enqueuer
 	publicURL   string
 	customerApp string
 	businessApp string
@@ -137,15 +146,15 @@ func New(d Deps) (*Service, error) {
 	if d.Clock == nil {
 		return nil, errors.New("referrals: a clock is required")
 	}
+	if d.Ledger == nil {
+		return nil, errors.New("referrals: a ledger is required")
+	}
 	s := &Service{
-		db: d.DB, clock: d.Clock, settings: d.Settings, hasher: d.Hasher, ledger: d.Ledger, notices: d.Notices,
+		db: d.DB, clock: d.Clock, settings: d.Settings, hasher: d.Hasher, ledger: d.Ledger, notices: d.Notices, jobs: d.Jobs,
 		publicURL:   strings.TrimRight(d.PublicURL, "/"),
 		customerApp: strings.TrimRight(d.CustomerApp, "/"),
 		businessApp: strings.TrimRight(d.BusinessApp, "/"),
 		ids:         ids.NewGenerator(),
-	}
-	if s.ledger == nil {
-		s.ledger = NoLedger{}
 	}
 	return s, nil
 }

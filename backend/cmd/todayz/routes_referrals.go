@@ -6,42 +6,30 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/todayz/backend/internal/identity"
+	"github.com/todayz/backend/internal/jobs"
 	"github.com/todayz/backend/internal/orders"
 	"github.com/todayz/backend/internal/platform/authz"
-	"github.com/todayz/backend/internal/platform/config"
-	"github.com/todayz/backend/internal/platform/pii"
+	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/referrals"
 )
 
-// referralsDeps is what both the API and the sweep job build the referrals
-// service from. The hasher is nil without PII_HASH_KEY (every route then
-// answers 503). Ledger is left nil (NoLedger): rewards qualify and wait.
-// TODO(merge): when W2-01 credits lands, set Ledger to an adapter over
-// credits.Poster (Posting{Kind: TxReferralReward, legs PlatformMarketing →
-// CustomerWallet / StoreCredit, IdempotencyKey from the Reward}).
-func referralsDeps(cfg *config.Config) referrals.Deps {
-	var rd referrals.Deps
-	if cfg == nil {
-		return rd
-	}
-	if cfg.Keys.PIIHashKey.IsSet() {
-		if h, err := pii.NewHasher(cfg.Keys.PIIHashKey.Bytes()); err == nil {
-			rd.Hasher = h
-		}
-	}
-	rd.PublicURL = cfg.APIPublicURL
-	if o := cfg.CORSOrigins(); len(o) >= 2 {
-		rd.CustomerApp, rd.BusinessApp = o[0], o[1]
-	}
-	return rd
-}
-
-// newReferrals builds the referrals service the API uses.
+// newReferrals builds the referrals service the API uses: the same
+// constructor as the referrals jobs, so all post rewards to the credits
+// ledger (D-169). A qualifying purchase enqueues referral_reward through the
+// API's insert-only River client; without one (router tests) the sweep
+// posts.
 func newReferrals(d *deps) *referrals.Service {
-	rd := referralsDeps(d.Config)
-	rd.DB, rd.Clock, rd.Settings = d.DB, d.Clock, d.Settings
-	rd.Notices = newNotifyService(d)
-	svc, err := referrals.New(rd)
+	jd := jobs.Deps{Clock: d.Clock, Settings: d.Settings, Config: d.Config, Log: d.Log}
+	if d.DB != nil {
+		jd.Pool = d.DB.Pool
+	}
+	var enq platformjobs.Enqueuer
+	if d.Queue != nil {
+		reg := platformjobs.NewRegistry()
+		jobs.Register(reg, jd)
+		enq = platformjobs.NewEnqueuer(reg, d.Queue, d.Clock)
+	}
+	svc, err := jobs.ReferralsService(jd, newNotifyService(d), enq)
 	if err != nil {
 		panic("referrals: " + err.Error())
 	}

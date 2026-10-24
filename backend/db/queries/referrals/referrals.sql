@@ -119,6 +119,14 @@ SELECT count(*)::int AS n FROM (
   SELECT r.referee_id FROM referrals r WHERE r.device_hash = @device_hash
 ) a;
 
+-- name: LockOpenRiskFlag :one
+-- A referral's open or confirmed flag for a rule, to add to it rather than
+-- raise a second one (D-169). The caller holds the referral's row lock.
+SELECT id, details FROM risk_flags
+WHERE subject_type = 'referral' AND subject_id = @subject_id AND rule = @rule::text AND status IN ('open', 'confirmed')
+ORDER BY created_at, id LIMIT 1 FOR UPDATE;
+-- name: SetRiskFlagDetails :exec
+UPDATE risk_flags SET details = @details, updated_at = @now::timestamptz, version = version + 1 WHERE id = @id;
 -- name: InsertRiskFlag :exec
 INSERT INTO risk_flags (id, subject_type, subject_id, rule, score, details, created_at, updated_at)
 VALUES (@id, @subject_type, @subject_id, @rule, @score, @details, @now, @now);
@@ -150,6 +158,11 @@ SELECT * FROM referrals WHERE referee_type = @referee_type AND referee_id = @ref
 -- name: LockRefereeReferral :one
 SELECT * FROM referrals WHERE referee_type = @referee_type AND referee_id = @referee_id FOR UPDATE;
 
+-- name: GetReferral :one
+-- An unlocked read: a reward posting locks its ledger accounts first and the
+-- referral last, the order a purchase and a reversal take them in (D-169).
+SELECT * FROM referrals WHERE id = @id;
+
 -- name: LockReferral :one
 SELECT * FROM referrals WHERE id = @id FOR UPDATE;
 
@@ -160,8 +173,10 @@ SELECT * FROM referrals WHERE qualifying_ref_type = @ref_type::text AND qualifyi
 ORDER BY id FOR UPDATE;
 
 -- name: SetQualified :one
+-- The rewards are due at once (the referral_reward job, the sweep as backstop).
 UPDATE referrals SET status = 'qualified', qualifying_ref_type = @ref_type::text, qualifying_ref_id = @ref_id,
-  qualified_at = @now::timestamptz, updated_at = @now::timestamptz, version = version + 1
+  qualified_at = @now::timestamptz, attempts = 0, next_attempt_at = @now::timestamptz,
+  updated_at = @now::timestamptz, version = version + 1
 WHERE id = @id AND status = 'pending'
 RETURNING *;
 
@@ -181,9 +196,14 @@ RETURNING *;
 
 -- name: RevertQualified :exec
 -- D-08: a reversed sale revokes a qualification whose reward has not posted.
+-- "Posted" is a ledger transaction: a side marked done without one (a
+-- deleted beneficiary, zero credits) is cleared with the qualification
+-- (D-169).
 UPDATE referrals SET status = 'pending', qualifying_ref_type = NULL, qualifying_ref_id = NULL, qualified_at = NULL,
-  updated_at = @now, version = version + 1
-WHERE id = @id AND status = 'qualified' AND referrer_rewarded_at IS NULL AND referee_rewarded_at IS NULL;
+  referrer_rewarded_at = NULL, referee_rewarded_at = NULL,
+  attempts = 0, next_attempt_at = NULL, updated_at = @now, version = version + 1
+WHERE id = @id AND status IN ('qualified', 'rewarded')
+  AND referrer_transaction_id IS NULL AND referee_transaction_id IS NULL;
 
 -- name: RejectReferral :exec
 UPDATE referrals SET status = 'rejected', reject_reason = @reason, updated_at = @now, version = version + 1
@@ -193,15 +213,28 @@ WHERE id = @id AND status = 'pending';
 -- Pending referrals whose referee is this user (for account deletion).
 SELECT id FROM referrals WHERE referee_type = 'customer' AND referee_id = @user_id AND status = 'pending';
 
+-- name: RecordRewardAttempt :exec
+-- A pass that left a side unposted: the sweep tries again at next (D-169).
+UPDATE referrals SET attempts = attempts + 1, next_attempt_at = @next::timestamptz, updated_at = @now::timestamptz
+WHERE id = @id AND status = 'qualified';
+
 -- name: QualifiedReferrals :many
--- Rewards still to post (the sweep), oldest first. A referral waiting only on
+-- Rewards due to post (the sweep): only rows whose next attempt is due,
+-- oldest due first, so referrals that keep failing back off and cannot
+-- starve fresh ones (D-169). A referral waiting only on
 -- a blocked customer referrer is skipped (D-168), so a pile of them cannot
--- fill every batch; it comes back once the referrer is unblocked.
+-- fill every batch; it comes back once the referrer is unblocked. A referral
+-- whose reward the ledger refused for good (an open or confirmed
+-- referral.reward_refused flag) is skipped too, until a person clears the
+-- flag (D-169).
 SELECT r.id FROM referrals r
 WHERE r.status = 'qualified'
   AND NOT (r.referee_rewarded_at IS NOT NULL AND r.referrer_type = 'customer'
     AND EXISTS (SELECT 1 FROM users u WHERE u.id = r.referrer_id AND u.status = 'blocked'))
-ORDER BY r.qualified_at, r.id LIMIT @lim;
+  AND NOT EXISTS (SELECT 1 FROM risk_flags f WHERE f.subject_type = 'referral' AND f.subject_id = r.id
+    AND f.rule = 'referral.reward_refused' AND f.status IN ('open', 'confirmed'))
+  AND r.next_attempt_at <= @now::timestamptz
+ORDER BY r.next_attempt_at, r.id LIMIT @lim;
 
 -- name: PendingShopReferrals :many
 -- New shops still counting toward qualification (the sweep).
