@@ -7,6 +7,10 @@
 # e2e:   the journeys, one worker, after the stack is up (e2e-stack-up: make dev is idempotent).
 #        Start a gate run from a fresh make reset: journeys create customers, orders and credits,
 #        and the OTP send caps (20 per IP per hour) count every sign-in.
+#        This file is 22-, so make e2e runs the journeys after e2e-stack (10-) and before
+#        e2e-contract (25-): the fuzzer sends OTPs from the same IP (13 of the 20 in one run) and
+#        writes data the journeys do not expect. After the journeys it may meet 429 rate_limited,
+#        which otp/send declares, so the contract check still holds.
 #        The JSON report goes to the git-ignored e2e/journeys/test-results/report.json; it holds
 #        titles, statuses and errors only (helpers never print a code, token or phone).
 

@@ -19,7 +19,7 @@ This report covers the Playwright multi-context journeys for Wave 2 and the gate
   - Specs are named `specs/NN-e2e-XX-*`. They run with one worker, in file order. The specs that move the test clock run last (20-*, 21-*).
   - `globalSetup` opens SL and SL2 all day. `globalTeardown` restores their hours and resets the clock.
   - Traces and videos are off.
-- **Gate:** `mk/60-journeys.mk` adds `E2E_STEPS += e2e-journeys`, which depends on `e2e-stack-up`. It also adds `CHECK_STEPS += check-journeys` (a typecheck). The root Makefile is untouched.
+- **Gate:** `mk/22-journeys.mk` (renamed from `60-journeys.mk`, see the CI order note) adds `E2E_STEPS += e2e-journeys`, which depends on `e2e-stack-up`. It also adds `CHECK_STEPS += check-journeys` (a typecheck). The root Makefile is untouched.
 - **Admin steps** go through the admin API (D-83).
 
 ## Evidence
@@ -166,7 +166,36 @@ TODAYZ_STACK_FORCE=1 scripts/no-egress.sh make gen e2e-journeys
 
 None of runs 5–8 found a new product bug. What is left is the 7 fixmes (D-3, D-4, D-5, D-6 ×3, D-8), all waiting on later work packages.
 
-## Notes
+## CI order: `make e2e` with the contract fuzz (runs 9 and 10)
+
+Local `main` 85fa910 (D-217) was merged in as 0e21fd7 before these runs.
+
+| Run | What ran, on one stack from a fresh reset | Result |
+|---|---|---|
+| 9 | `e2e-contract` (Schemathesis full) and then `e2e-journeys`, the old order | Contract: 13,370 cases, no issues. Journeys: 21 pass, 0 fail, 7 fixme. **Zero margin:** see below |
+| 10 | `make e2e` end to end, new order: `e2e-stack`, `e2e-journeys`, `e2e-contract`, `e2e-frontend-smoke`, `e2e-ui-visual` | e2e-stack ok. Journeys: 21 pass, 0 fail, 7 fixme. Contract after the journeys: 13,367 cases, no issues. `e2e-frontend-smoke` **fails** (B-2, not this WP), so `e2e-ui-visual` did not run. `make e2e` rc 2 |
+
+**Why the order changed:**
+- **What the fuzzer uses:** in run 9 it sent 13 OTPs from 127.0.0.1. That is 13 of the 20 sends per IP per hour (`backend/internal/identity/otp.go:101`), counted on the test clock.
+- **What the journeys need:** 7 sends before E2E-04 first moves the clock, and 1 after it. Run 9 reached exactly 20 before the first clock move, and its 8th sign-in passed only because E2E-04 had moved the window.
+- **Why that is fragile:** Hypothesis varies the cases, so one more fuzz send makes the journeys fail with `429 rate_limited`.
+- **The fix:** `mk/60-journeys.mk` is renamed to `mk/22-journeys.mk`. The journeys now run on the fresh seed, before the fuzzer.
+- **What did not change:** no product limit, nothing in another area's mk.
+- **The contract still holds after the journeys:** otp/send declares `429 rate_limited` (`backend/api/paths/auth.yaml:14`), and run 10's contract step passes.
+- **Rejected alternatives:**
+  - Moving the test clock in `globalSetup` would make the journeys run at a shifted time.
+  - The stack has no test-only reset of the OTP caps.
+
+### B-2: `e2e-frontend-smoke` cannot start `vite preview` (not this WP)
+
+- **Where:** `customer/playwright.config.ts:7`, `business/playwright.config.ts:7` and `admin/playwright.config.ts:7`.
+- **What happens:**
+  - Each runs `vite preview --port … --strictPort` with no `--mode`, so the preview loads `vite.config.ts` in mode `production`.
+  - `authDefines` (`shared/auth/build.mjs:33-35`) then throws: `VITE_TURNSTILE_SITE_KEY must be a real Turnstile site key for a build in mode "production"`.
+  - The `build:e2e` builds before it pass.
+  - `.github/workflows/e2e.yml` sets no Turnstile key, so this fails on GitHub as well.
+- **Fix direction (W0-05 / W1-08 owner):** `vite preview --mode e2e` in the three configs, matching `build:e2e`.
+
 
 - **Files outside the owned area:**
   - `pnpm-lock.yaml` gained importers for the two new workspace packages. They have no new external dependencies, and installs are `--frozen-lockfile --offline`.
