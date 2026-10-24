@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/todayz/backend/gen/sqlc/ordersdb"
+	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/ids"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/telemetry"
@@ -20,7 +21,9 @@ import (
 const KindStrikesRecount = "customer_strikes_recount"
 
 // strikeCustomer records a strike against the order's customer, once per
-// order, and recounts the customer's count and limit from strikes.
+// order, and recounts the customer's count and limit from strikes. The
+// caller holds the customer (lockStrikeCustomer) from before it released
+// the order's stock, so two strikes at once count each other.
 func (s *Service) strikeCustomer(ctx context.Context, q *ordersdb.Queries, o ordersdb.Order, reason string, now time.Time, r noShow) error {
 	n, err := q.InsertStrike(ctx, ordersdb.InsertStrikeParams{
 		ID: ids.UUID(s.ids.New(now)), SubjectType: "customer", SubjectID: o.CustomerID,
@@ -56,6 +59,18 @@ func recount(ctx context.Context, q *ordersdb.Queries, user pgtype.UUID, every b
 	return n, nil
 }
 
+// lockStrikeCustomer holds the order's customer to the end of the
+// transaction (LockCustomer, the users row placing an order takes), before
+// the order's stock moves: lock order customer, then store_items, then the
+// ledger. A strike or recount in flight for the same customer finishes
+// first, so the recount after it sees that strike.
+func lockStrikeCustomer(ctx context.Context, q *ordersdb.Queries, user pgtype.UUID) error {
+	if _, err := q.LockCustomer(ctx, user); err != nil && !db.IsNoRows(err) {
+		return fmt.Errorf("orders: lock customer: %w", err)
+	}
+	return nil
+}
+
 func interval(d time.Duration) pgtype.Interval {
 	return pgtype.Interval{Microseconds: d.Microseconds(), Valid: true}
 }
@@ -68,7 +83,11 @@ func (s *Service) RecountCustomerStrikes(ctx context.Context, userID ids.ID) err
 		return err
 	}
 	return s.db.InTx(ctx, func(ctx context.Context) error {
-		_, err := recount(ctx, s.q(ctx), ids.UUID(userID), false, s.now(), r)
+		q := s.q(ctx)
+		if err := lockStrikeCustomer(ctx, q, ids.UUID(userID)); err != nil {
+			return err
+		}
+		_, err := recount(ctx, q, ids.UUID(userID), false, s.now(), r)
 		return err
 	})
 }
@@ -82,7 +101,15 @@ func (s *Service) RecountStrikes(ctx context.Context, _ platformjobs.Run) (platf
 	if err != nil {
 		return platformjobs.Result{}, err
 	}
-	n, err := recount(ctx, s.q(ctx), pgtype.UUID{}, true, s.now(), r)
+	var n int64
+	err = s.db.InTx(ctx, func(ctx context.Context) error {
+		q := s.q(ctx)
+		if err := q.LockStrikeCustomers(ctx); err != nil {
+			return fmt.Errorf("orders: lock strike customers: %w", err)
+		}
+		n, err = recount(ctx, q, pgtype.UUID{}, true, s.now(), r)
+		return err
+	})
 	if err != nil {
 		return platformjobs.Result{}, err
 	}

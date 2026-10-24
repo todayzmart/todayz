@@ -13,6 +13,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/todayz/backend/internal/orders"
+	"github.com/todayz/backend/internal/platform/ids"
+	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/pii"
 )
 
@@ -328,4 +330,102 @@ func TestStoreInboxUsesIndex(t *testing.T) {
 	t.Logf("ListStoreOrders, 3 statuses, 20001 orders of S:\n%s", text)
 	require.Contains(t, text, "ix_orders_store_placed")
 	require.NotContains(t, text, "Sort", "the index gives the order")
+}
+
+// acceptedOf places lines and accepts them in full. Two orders with no item
+// in common do not wait on each other's store_items locks, so only the
+// lock under test can serialise them.
+func (o *orderShop) acceptedOf(lines ...line) string {
+	o.t.Helper()
+	id := o.orderOf(lines...)
+	r := o.staff(o.cashier, id, "accept", map[string]any{})
+	require.Equal(o.t, http.StatusOK, r.code, r.raw)
+	return id
+}
+
+// slowStrikes makes every strike of subject (customer or store) wait 300 ms
+// after its insert, inside its transaction, so two strikes at once overlap
+// between the insert and the count or recount that follows it. The write
+// after the count (a customer's recount, a store's flag) waits 300 ms too,
+// so the first is not committed when the second one counts.
+func (o *orderShop) slowStrikes(subject string) {
+	o.t.Helper()
+	o.a.exec(`CREATE FUNCTION test_slow_strike() RETURNS trigger LANGUAGE plpgsql AS $$
+		BEGIN PERFORM pg_sleep(0.3); RETURN NULL; END $$`)
+	o.a.exec(`CREATE TRIGGER test_slow_strike AFTER INSERT ON strikes
+		FOR EACH ROW WHEN (NEW.subject_type = '` + subject + `') EXECUTE FUNCTION test_slow_strike()`)
+	if subject == "customer" {
+		o.a.exec(`CREATE TRIGGER test_slow_recount AFTER UPDATE OF strikes_count_30d ON customer_profiles
+			FOR EACH ROW EXECUTE FUNCTION test_slow_strike()`)
+	} else {
+		o.a.exec(`CREATE TRIGGER test_slow_flag AFTER INSERT ON risk_flags
+			FOR EACH ROW WHEN (NEW.rule = 'store_strikes') EXECUTE FUNCTION test_slow_strike()`)
+	}
+}
+
+// Lead review 1 (BK-46 under load): with 4 store strikes, two admin cancels
+// at once, each with the store at fault, both count 5 unless they serialise
+// on the store; they do, so the store gets 6 strikes and one open flag.
+func TestStoreStrikesAtOnceRaiseOneFlag(t *testing.T) {
+	o := newOrderShop(t)
+	desk := newAdminDesk(o, "support")
+	tok := desk.token()
+	cancel := func(id string) resp {
+		return desk.cancel(tok, id, map[string]any{"reason": "store_request", "strike": "store"})
+	}
+	for range 4 {
+		r := cancel(o.accepted())
+		require.Equal(t, http.StatusOK, r.code, r.raw)
+	}
+	require.Zero(t, o.storeFlags())
+	a, b := o.acceptedOf(line{o.butter, 1}), o.acceptedOf(line{o.salt, 1})
+	o.slowStrikes("store")
+
+	var x, y resp
+	parallel(func() { x = cancel(a) }, func() { y = cancel(b) })
+	require.Equal(t, http.StatusOK, x.code, x.raw)
+	require.Equal(t, http.StatusOK, y.code, y.raw)
+	require.Equal(t, 6, o.storeStrikes())
+	require.Equal(t, 1, o.storeFlags(), "one flag, not one per cancel")
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM risk_flags WHERE rule = 'store_strikes' AND status = 'open'`))
+}
+
+// Lead review 2 (BK-16 under load): a customer with one no-show has two
+// pickups whose holds end at the same time. Both timers at once each
+// insert a strike and recount; unless they serialise on the customer, the
+// second recount, blind to the first strike, writes a count of 2 and no
+// limit. They do: the count is 3 and the customer is limited.
+func TestNoShowsAtOnceCountEachOther(t *testing.T) {
+	o := newOrderShop(t)
+	o.noShow()
+	require.Equal(t, 1, o.unlimited(1))
+	a, b := o.acceptedOf(line{o.butter, 1}), o.acceptedOf(line{o.salt, 1})
+	_, holdA := o.times(a)
+	_, holdB := o.times(b)
+	hold := *holdA
+	if holdB.After(hold) {
+		hold = *holdB
+	}
+	o.set(hold)
+	o.slowStrikes("customer")
+
+	run := func(id string, h *time.Time) func() (platformjobs.FakeRun, error) {
+		oid, err := ids.Parse(id)
+		require.NoError(t, err)
+		return func() (platformjobs.FakeRun, error) {
+			return o.runner.RunEvent(context.Background(), orders.KindNoShow, orders.TimerArgs{OrderID: oid, HoldUntil: h})
+		}
+	}
+	ra, rb := run(a, holdA), run(b, holdB)
+	var x, y platformjobs.FakeRun
+	var xe, ye error
+	parallel(func() { x, xe = ra() }, func() { y, ye = rb() })
+	require.NoError(t, xe)
+	require.NoError(t, ye)
+	expiredRun(t, x)
+	expiredRun(t, y)
+	require.Equal(t, 3, o.strikes())
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM customer_profiles cp
+	  WHERE cp.strikes_count_30d = 3 AND cp.limited_until IS NOT NULL
+	    AND EXISTS (SELECT 1 FROM strikes s WHERE s.subject_id = cp.user_id)`), "count 3 and limited")
 }

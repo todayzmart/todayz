@@ -31,8 +31,12 @@ const bpWhole = 10000 //settings:ok 100 % in basis points, not a rule
 // strikeStore records a strike against the order's store, once per order,
 // and raises the store_strikes flag when the store reaches threshold. The
 // reliability score drops on the job's next run (BK-46). No automatic
-// pause: the store stays live (D-67).
+// pause: the store stays live (D-67). The store's strike lock comes first,
+// so two strikes at once count each other and raise one flag.
 func (s *Service) strikeStore(ctx context.Context, q *ordersdb.Queries, o ordersdb.Order, reason string, now time.Time, threshold int) error {
+	if err := lockStoreStrikes(ctx, q, o.StoreID); err != nil {
+		return err
+	}
 	n, err := q.InsertStrike(ctx, ordersdb.InsertStrikeParams{
 		ID: ids.UUID(s.ids.New(now)), SubjectType: "store", SubjectID: o.StoreID,
 		OrderID: o.ID, Reason: reason, CreatedAt: now,
@@ -60,6 +64,11 @@ func (s *Service) flagStores(ctx context.Context, q *ordersdb.Queries, store pgt
 	}
 	var raised int64
 	for _, h := range hits {
+		// The flag's own check (no open flag) then sees a flag a strike
+		// in flight raised for the same store.
+		if err := lockStoreStrikes(ctx, q, h.StoreID); err != nil {
+			return raised, err
+		}
 		details, err := json.Marshal(map[string]any{
 			"strikes": h.N, "threshold": t, "windowDays": int(storeWindow / (24 * time.Hour)), "oldestStrikeAt": h.Oldest,
 		})
@@ -76,6 +85,15 @@ func (s *Service) flagStores(ctx context.Context, q *ordersdb.Queries, store pgt
 		raised += n
 	}
 	return raised, nil
+}
+
+// lockStoreStrikes holds the store's strike lock to the end of the
+// transaction (LockStoreStrikes).
+func lockStoreStrikes(ctx context.Context, q *ordersdb.Queries, store pgtype.UUID) error {
+	if err := q.LockStoreStrikes(ctx, mustID(store).String()); err != nil {
+		return fmt.Errorf("orders: lock store strikes: %w", err)
+	}
+	return nil
 }
 
 // strikeScore is the flag's score: 50 at the threshold, 100 at twice it,
@@ -109,7 +127,11 @@ func (s *Service) StoreReliability(ctx context.Context, _ platformjobs.Run) (pla
 	if err != nil {
 		return platformjobs.Result{}, fmt.Errorf("orders: store reliability: %w", err)
 	}
-	flags, err := s.flagStores(ctx, q, pgtype.UUID{}, true, now, threshold)
+	var flags int64
+	err = s.db.InTx(ctx, func(ctx context.Context) error {
+		flags, err = s.flagStores(ctx, s.q(ctx), pgtype.UUID{}, true, now, threshold)
+		return err
+	})
 	if err != nil {
 		return platformjobs.Result{}, err
 	}

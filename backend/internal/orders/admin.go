@@ -89,6 +89,11 @@ func (s *Service) adminCancel(ctx context.Context, by, orderID ids.ID, b *admino
 			return err
 		}
 		from := o.Status
+		if fault == faultCustomer {
+			if err := lockStrikeCustomer(ctx, q, o.CustomerID); err != nil {
+				return err
+			}
+		}
 		if err := s.end(ctx, o, StatusCancelled, reason, note, admin(by), generic, now); err != nil {
 			return err
 		}

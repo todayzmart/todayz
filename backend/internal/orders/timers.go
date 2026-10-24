@@ -214,6 +214,9 @@ func (s *Service) expireNoShow(ctx context.Context, orderID ids.ID, setFor *time
 			return errEarly
 		}
 		expired = true
+		if err := lockStrikeCustomer(ctx, q, o.CustomerID); err != nil {
+			return err
+		}
 		if err := s.end(ctx, o, StatusExpired, reasonNoShow, nil, system, generic, now); err != nil {
 			return err
 		}
