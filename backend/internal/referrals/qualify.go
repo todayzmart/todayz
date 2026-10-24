@@ -63,8 +63,7 @@ func (s *Service) qualifyCustomer(ctx context.Context, o Outcome) error {
 	if err != nil {
 		return err
 	}
-	s.enqueueReward(ctx, row.ID)
-	return nil
+	return s.enqueueReward(ctx, row.ID)
 }
 
 // countShop counts the sale toward the selling business's pending shop
@@ -149,8 +148,7 @@ func (s *Service) tryQualifyShop(ctx context.Context, row referralsdb.Referral) 
 	if err != nil {
 		return err
 	}
-	s.enqueueReward(ctx, row.ID)
-	return nil
+	return s.enqueueReward(ctx, row.ID)
 }
 
 // OnPurchaseReversed is the hook for a reversed purchase (a POS refund or

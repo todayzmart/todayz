@@ -323,24 +323,29 @@ func (p *posShop) noSecrets(vals ...string) {
 	}
 }
 
-// leaked reports v standing on its own in logs: not inside a longer run of
-// letters, digits or the punctuation that ids, numbers, times and durations
-// are made of. A bare substring test flaked, since a 4-digit code can turn
-// up inside a timestamp, a latency or an id; a leaked code is a JSON string
-// ("1234") or a word in a message.
+// leaked reports v in logs anywhere but inside a longer token: a digit or a
+// letter touching it (a longer number, an id, a word), a decimal point
+// before it (a fraction of a second) or hyphens on both sides (a UUID's
+// group). A bare substring test flaked, since a 4-digit code can turn up
+// inside a timestamp, a latency or an id; any other neighbour, quotes,
+// spaces, `:`, `=`, `+` included, counts as a leak.
 func leaked(logs, v string) bool {
-	part := func(r rune) bool {
-		return unicode.IsLetter(r) || unicode.IsDigit(r) || strings.ContainsRune("_.:-+", r)
-	}
 	for i := 0; i <= len(logs)-len(v); {
 		j := strings.Index(logs[i:], v)
 		if j < 0 {
 			return false
 		}
 		at, end := i+j, i+j+len(v)
-		before, _ := utf8.DecodeLastRuneInString(logs[:at])
-		after, _ := utf8.DecodeRuneInString(logs[end:])
-		if (at == 0 || !part(before)) && (end == len(logs) || !part(after)) {
+		before, after := utf8.RuneError, utf8.RuneError
+		if at > 0 {
+			before, _ = utf8.DecodeLastRuneInString(logs[:at])
+		}
+		if end < len(logs) {
+			after, _ = utf8.DecodeRuneInString(logs[end:])
+		}
+		alnum := func(r rune) bool { return unicode.IsLetter(r) || unicode.IsDigit(r) }
+		inside := alnum(before) || alnum(after) || before == '.' || (before == '-' && after == '-')
+		if !inside {
 			return true
 		}
 		i = at + 1
@@ -352,15 +357,21 @@ func TestLeaked(t *testing.T) {
 	for logs, want := range map[string]bool{
 		`{"code":"4821"}`:                      true,
 		`{"msg":"bad code 4821 for bill"}`:     true,
+		`code:4821`:                            true,
+		`code=4821,`:                           true,
+		`{"latency_ms":4821}`:                  true,
 		`4821`:                                 true,
 		`{"time":"2026-10-24T10:48:21.4821Z"}`: false,
-		`{"latency_ms":4821}`:                  false,
+		`{"took":0.4821}`:                      false,
 		`{"id":"01JB4821XYZ"}`:                 false,
+		`{"id":"0192f3a1-4821-7abc-8def"}`:     false,
 		`{"n":14821}`:                          false,
+		`{"n":48210}`:                          false,
 	} {
 		require.Equal(t, want, leaked(logs, "4821"), logs)
 	}
 	require.True(t, leaked(`{"phone":"+919876500100"}`, "+919876500100"))
+	require.True(t, leaked(`phone=919876500100`, "919876500100"))
 }
 
 func (p *posShop) setCashback(bp int) {

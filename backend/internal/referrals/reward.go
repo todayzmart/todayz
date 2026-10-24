@@ -95,10 +95,12 @@ func countFailed(ctx context.Context, reason string) {
 
 // enqueueReward enqueues KindReward for a referral the caller's transaction
 // just qualified. It runs in a savepoint and only logs a failure: the
-// referral is due at once, so the sweep posts it.
-func (s *Service) enqueueReward(ctx context.Context, id pgtype.UUID) {
+// referral is due at once, so the sweep posts it. A deadlock or
+// serialization failure is returned instead, so a caller that retries its
+// transaction (a POS sync, D-132) sees it.
+func (s *Service) enqueueReward(ctx context.Context, id pgtype.UUID) error {
 	if s.jobs == nil {
-		return
+		return nil
 	}
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
 		tx, ok := db.TxFrom(ctx)
@@ -108,9 +110,13 @@ func (s *Service) enqueueReward(ctx context.Context, id pgtype.UUID) {
 		return s.jobs.EnqueueTx(ctx, tx, KindReward, RewardArgs{ReferralID: idOf(id)},
 			platformjobs.EnqueueOpts{UniqueKey: "referral:" + idOf(id).String()})
 	})
+	if db.IsRetryable(err) {
+		return err
+	}
 	if err != nil {
 		telemetry.Logger(ctx).WarnContext(ctx, "referrals: reward job not enqueued; the sweep posts it", "referral", idOf(id).String(), "err", err)
 	}
+	return nil
 }
 
 // beneficiary states.

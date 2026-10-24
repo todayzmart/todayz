@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/rand/v2"
 	"slices"
 	"time"
 
@@ -153,14 +154,39 @@ const syncAttempts = 3
 // syncAttempts times; each retry is logged and counted in
 // tz_pos_sync_retried_total.
 func (s *Service) syncTx(ctx context.Context, storeID ids.ID, fn func(ctx context.Context) error) error {
+	return retryTx(ctx, s.db.InTx, fn, func(attempt int, err error) {
+		syncRetried(ctx)
+		telemetry.Logger(ctx).WarnContext(ctx, "pos: sync transaction retried", "store_id", storeID.String(), "attempt", attempt, "err", err)
+	})
+}
+
+// retryTx runs fn through inTx up to syncAttempts times while it fails with
+// a retryable error (db.IsRetryable), calling retried before each new
+// attempt and waiting retryBackoff, so the two sides of a deadlock do not
+// meet again at once. It returns the last error, and stops early when ctx
+// ends.
+func retryTx(ctx context.Context, inTx func(context.Context, func(context.Context) error) error, fn func(context.Context) error, retried func(attempt int, err error)) error {
 	for attempt := 1; ; attempt++ {
-		err := s.db.InTx(ctx, fn)
+		err := inTx(ctx, fn)
 		if err == nil || attempt == syncAttempts || !db.IsRetryable(err) || ctx.Err() != nil {
 			return err
 		}
-		syncRetried(ctx)
-		telemetry.Logger(ctx).WarnContext(ctx, "pos: sync transaction retried", "store_id", storeID.String(), "attempt", attempt, "err", err)
+		retried(attempt, err)
+		t := time.NewTimer(retryBackoff(attempt))
+		select {
+		case <-ctx.Done():
+			t.Stop()
+			return err
+		case <-t.C:
+		}
 	}
+}
+
+// retryBackoff is the wait before attempt+1: 20 ms a past attempt plus up to
+// 20 ms of jitter (20–40 ms, then 40–60 ms).
+func retryBackoff(attempt int) time.Duration {
+	const step = 20 * time.Millisecond
+	return time.Duration(attempt)*step + rand.N(step) // #nosec G404 -- jitter, not a secret
 }
 
 // lockSyncCodes takes, before any entry, the code locks of the cashier and
@@ -423,7 +449,9 @@ func (s *Service) syncSale(ctx context.Context, run *syncRun, clientID ids.ID, e
 // discount above what the offers engine gives that line at sold_at (clamped
 // as the sale is): a custom line gets nothing from the engine. A sale the
 // engine cannot price counts as unmatched; the engine's own failure is
-// rolled back to a savepoint so the entry can still be kept (D-131).
+// rolled back to a savepoint so the entry can still be kept (D-131), unless
+// it is a deadlock or serialization failure, which goes up so the batch is
+// retried (D-132).
 func (s *Service) offerUnmatched(ctx context.Context, run *syncRun, lines []lineInput, soldAt time.Time) (bool, error) {
 	if !slices.ContainsFunc(lines, func(l lineInput) bool { return l.Offer > 0 }) {
 		return false, nil
@@ -447,6 +475,9 @@ func (s *Service) offerUnmatched(ctx context.Context, run *syncRun, lines []line
 		if err != nil {
 			if ctx.Err() != nil {
 				return false, ctx.Err()
+			}
+			if db.IsRetryable(err) {
+				return false, err // the batch is retried (syncTx)
 			}
 			telemetry.Logger(ctx).WarnContext(ctx, "pos: offline offer not priced", "store_id", run.sc.StoreID.String(), "err", err)
 			return true, nil
