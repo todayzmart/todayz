@@ -116,6 +116,6 @@ The stack journey adds a line to "Sunday breakfast", so after one run its totals
 - **Failing, not W2-14:**
   - `business/e2e/orders.stack.spec.ts:226`: `headers` may be undefined under `exactOptionalPropertyTypes` (check-frontend-types).
   - `shared/i18n` business copy: `orders.card.shortHint` has "Reject" mid-sentence (check-frontend-unit).
-  - Both come from ebfbf90.
+  - Both came from ebfbf90 and are fixed in fdc9b88.
   - check-infra: `infra/cloudflare` is not initialised on this machine. `make setup` online prefetches the providers.
 - **Flaky under load:** `internal/platform/realtime` `TestStreamLiveThenReplayAfterReconnect` failed once in a full run. It passes alone with `-race -count=3`, and check-backend passed in the next two full runs.
