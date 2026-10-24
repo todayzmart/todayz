@@ -855,3 +855,29 @@ There is no `make seed`; use `make reset`.
 - **`lastSplit`** is written by the customer app with a PATCH after a search (the basket keeps the split until it is searched again). It must name the basket's own line ids and is refused together with a new `lines` set; a new `lines` set clears it.
 - **Logging.** One `search_log` row per line with `source = basket` (the product's id for a product line); a product id that names no product is dropped silently and logs nothing.
 - Lives in: `backend/internal/baskets/`, `backend/internal/search/basket*.go`, `backend/db/migrations/21401_w2-14_baskets.sql`, `backend/api/{paths,schemas,problems}/baskets.yaml`, `customer/src/basket/`; 01 §11.4, 03, 04 §2.3, 08 BSK-05; `docs/qa/W2-14/REPORT.md`.
+
+## Offers, discounts and banners as built (W2-07, 2026-10-24)
+
+**D-150 · Offer pricing as built: kinds, rounding, caps and what is immutable (W2-07).** Choices the build had to make where 01 §12 was silent.
+
+- **Flat is per unit.** A "₹ off" offer takes its value off each unit of a covered line, never off the line (OFFER-M.04: ₹2 off milk ×2 is ₹4). Buy X get Y gives `get_qty` free for every complete group of `buy_qty + get_qty` units of the same item (OFFER-M.05: buy 2 get 1 on ×3 pays for 2, ×6 pays for 4).
+- **Percent floors in paise** (₹58 at 10% off takes 580 paise; 33% of 100 paise takes 33) and is capped at 90, so a typo cannot give an item away. A discount never exceeds its line and a bill never goes below ₹1 (01 §12). A flat discount that would exceed the unit price takes the whole unit price.
+- **Terms are immutable after creation.** `PATCH` changes only status, title, channels, limits and dates. A change of kind, value or scope is a new offer, so an order's `offers_applied` and the shop's redemption counts always describe terms that existed.
+- **`startsAt` is clamped to now** when it is in the past; a later start makes the offer `scheduled`.
+- **The clock decides, the label follows.** Pricing reads `starts_at` and `ends_at` against the injected clock; the `offers_tidy` job (every minute) only moves the status label (scheduled to live, live to ended, spent to ended) and writes the catalogue-change record for each change. A tidy outage never leaves a stale price.
+- **Pricing is channel-agnostic.** `offers.Price(Cart)` takes a channel (`online` or `pos`); the quote and the POS call the same function, so OFFER-M.03's "same price online and at the POS" holds by construction.
+- Lives in: `backend/internal/offers/{pricing,engine,service}.go`, `01 §12`, `docs/qa/W2-07/REPORT.md`.
+
+**D-151 · Redemption is counted in the order's transaction, per customer under a lock (W2-07).** `Redeem` claims the offers an order used in offer-id order inside the order's own transaction (after the store lock the order already holds, so the platform's lock order stands). It is idempotent per order, returns `ErrUnavailable` when `max_redemptions` ran out between the quote and the place (orders turns that into `409 price_changed` with the new quote), and counts a customer's earlier unreleased uses under the same row lock, so a per-customer limit cannot be beaten by two orders at once. `Release` (cancel, reject, expiry) gives the redemption back by marking it released. An offer with a per-customer limit does not apply to a caller with no known customer.
+
+**D-152 · Banners: held uploads, the cap and taps (W2-07).**
+
+- **Template banners are ours and show at once** (`auto_ok`, live or scheduled). An uploaded `imageKey` banner is `pending_review` with moderation `needs_review` until an admin approves it (no AI image check exists yet; when it does, it moves a banner to `auto_ok` the same way).
+- **`store_banners_max` counts live, scheduled and pending_review banners**, checked under the store row lock, so a shop cannot queue five uploads behind a cap of three and have all go live. Paused, ended and removed banners do not count.
+- **Taps: `banner_taps`.** One row per customer and banner holding the last tap (`POST /v1/me/banners/{bannerId}/tap`, 204). Attribution is D-77's: the last click, same store, within 24 hours. The daily counts (`banner_daily`) are filled by W3-07 from `banner_taps` and the orders.
+- **Admin takedown** is `banners.Service.Remove(bannerID, adminID, reason)`; W3-05 calls it. A removed banner never returns.
+- Lives in: `backend/internal/banners/`, `backend/db/migrations/20702_w2-07_banners.sql`, 03 §9.
+
+**D-153 · The nearby offers feed (W2-07).** `GET /v1/discover/offers` returns at most 10 cards (`feedCards`) from live stores inside the customer's radius (default 2 km, the same chips as search; at most 200 candidate stores). A store shows one card: a banner when it has a live one (its banners take turns by rotation bucket), otherwise its best live offer; a store with neither shows nothing. Cards go nearest first, and the list starts at a different shop every 15 minutes (`feedRotation`; the bucket comes from the injected clock), so the top slots move round the shops in range. Each banner that makes the screen emits `banner_impression`. The ranking inside the 01 §12 "ranked by distance and discount" is therefore distance first; the discount only picks the store's best offer. `has_offer` on a store card means the store has a live item-level or bill offer. The constants are code constants in `internal/offers/feed.go`, not settings, until the founder asks to tune them (TODO(lead) in the report).
+
+**D-154 · Seams between offers, orders, search and banners (W2-07).** The orders package owns `Pricer` and `Redeemer` (`internal/orders/seams.go`) and basket search owns `search.Pricer`; the offers service satisfies both through adapters in `cmd/todayz/offers_seams.go`, so no domain imports another. `NoRedeem` and the `Fixed` flag (a line whose price is already final, such as a flash price) let tests and the POS skip redemption. The offers feed takes banners through `offers.BannerSource`, adapted from `banners.LiveBanner`.
