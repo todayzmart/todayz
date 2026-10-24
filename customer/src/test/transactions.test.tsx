@@ -352,6 +352,71 @@ describe('C-12 order tracking', () => {
     expect(screen.getByRole('link', { name: 'Find another shop' })).toBeInTheDocument();
   });
 
+  describe('partial confirm', () => {
+    const partial = (over: Partial<Order> = {}) => {
+      const base = order();
+      return order({
+        status: 'awaiting_customer',
+        acceptBy: null,
+        partialConfirmBy: at(3),
+        lines: [{ ...base.lines[0]!, quantityAccepted: 1, lineTotalPaise: 2500 }],
+        subtotalPaise: 2500,
+        itemSubtotalPaise: 2500,
+        totalPaise: 2500,
+        version: 2,
+        ...over,
+      });
+    };
+
+    it('shows the changed line, the new total and a countdown from the server time', async () => {
+      track(partial());
+      expect(await screen.findByText('Raju Kirana changed your order')).toBeInTheDocument();
+      expect(screen.getByText('1 instead of 2')).toBeInTheDocument();
+      expect(screen.getByText('Confirm within 3:00')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: `Take it · ${formatMoney(2500)}` })).toBeInTheDocument();
+    });
+
+    it('says a line is not available when the shop accepted none of it', async () => {
+      const base = order();
+      track(partial({ lines: [{ ...base.lines[0]!, quantityAccepted: 0, lineTotalPaise: 0 }] }));
+      expect(await screen.findByText('Not available. You asked for 2.')).toBeInTheDocument();
+    });
+
+    it('takes the changed order once with an idempotency key', async () => {
+      const calls: Call[] = [];
+      track(partial(), [
+        on('POST', `/v1/me/orders/${ORDER_ID}/confirm-partial`, (c) => {
+          calls.push(c);
+          return json(200, accepted({ totalPaise: 2500, version: 3 }));
+        }),
+      ]);
+      fireEvent.click(await screen.findByRole('button', { name: `Take it · ${formatMoney(2500)}` }));
+      expect(await screen.findByText('Pickup code')).toBeInTheDocument();
+      expect(calls).toHaveLength(1);
+      expect(calls[0]?.body).toEqual({ accept: true });
+      expect(calls[0]?.headers.get('idempotency-key')).toBeTruthy();
+    });
+
+    it('cancels the order when the customer declines the change', async () => {
+      const calls: Call[] = [];
+      track(partial(), [
+        on('POST', `/v1/me/orders/${ORDER_ID}/confirm-partial`, (c) => {
+          calls.push(c);
+          return json(200, order({ status: 'cancelled', statusReason: 'declined_partial', acceptBy: null, version: 3 }));
+        }),
+      ]);
+      fireEvent.click(await screen.findByRole('button', { name: 'Cancel order' }));
+      expect(await screen.findByText('You cancelled the changed order.')).toBeInTheDocument();
+      expect(calls[0]?.body).toEqual({ accept: false });
+    });
+
+    it('explains a 409 and keeps the page', async () => {
+      track(partial(), [on('POST', `/v1/me/orders/${ORDER_ID}/confirm-partial`, () => problem(409, 'invalid_state'))]);
+      fireEvent.click(await screen.findByRole('button', { name: `Take it · ${formatMoney(2500)}` }));
+      expect(await screen.findByText('This order has changed again. The page shows the latest.')).toBeInTheDocument();
+    });
+  });
+
   it('moves when the live stream says the order changed', async () => {
     let current = order();
     const enc = new TextEncoder();
