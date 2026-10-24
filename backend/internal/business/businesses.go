@@ -220,6 +220,9 @@ func (s *Service) createBusiness(ctx context.Context, body *businessapi.Business
 		if db.IsUniqueViolation(err, "ux_businesses_referral_code") && attempt < codeAttempts-1 {
 			continue
 		}
+		if unknown := unknownCategory(err); unknown != nil {
+			return businessapi.Business{}, 0, unknown
+		}
 		if err != nil {
 			return businessapi.Business{}, 0, fmt.Errorf("business: create: %w", err)
 		}
@@ -293,8 +296,8 @@ func (s *Service) updateBusiness(ctx context.Context, bidStr string, ifMatchHdr 
 		params.SetLegalName, params.LegalName = true, body.LegalName
 	}
 	if sent(ctx, "categoryId") {
-		// TODO(lead): the category is not checked against the catalogue
-		// until W1-05 lands the categories table.
+		// An id that names no category fails the foreign key (D-211) and is
+		// answered by unknownCategory.
 		params.SetCategoryID, params.CategoryID = true, optUUID(&v, "body.categoryId", body.CategoryId)
 	}
 	if err := v.err(); err != nil {
@@ -336,10 +339,25 @@ func (s *Service) updateBusiness(ctx context.Context, bidStr string, ifMatchHdr 
 		}
 		return s.writeAudit(ctx, p.UserID, "business.update", "business", bid.String(), before, after)
 	})
+	if unknown := unknownCategory(err); unknown != nil {
+		return businessapi.Business{}, 0, unknown
+	}
 	if err != nil {
 		return businessapi.Business{}, 0, err
 	}
 	return toBusiness(b, dec.Role), b.Version, nil
+}
+
+// unknownCategory turns the businesses.category_id foreign key failing (a
+// well-formed id that names no category) into a 422 on body.categoryId; any
+// other error gives nil.
+func unknownCategory(err error) error {
+	if !db.IsForeignKeyViolation(err, "fk_businesses_category_id") {
+		return nil
+	}
+	var v invalid
+	v.add("body.categoryId", "unknown category")
+	return v.err()
 }
 
 // --- submit ----------------------------------------------------------------------

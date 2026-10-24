@@ -227,6 +227,16 @@ func TestBusinessHTTP(t *testing.T) {
 	var category pgtype.UUID
 	require.NoError(t, a.tdb.OwnerPool.QueryRow(context.Background(), `SELECT id FROM categories WHERE parent_id IS NULL ORDER BY sort, slug LIMIT 1`).Scan(&category))
 	categoryID, _ := ids.FromUUID(category)
+	// A well-formed id that names no category is a 422, not the raw FK error.
+	const noCategory = "01J9ZZZZZZZZZZZZZZZZZZZZZZ"
+	r = a.call(owner, http.MethodPatch, B, map[string]any{"categoryId": noCategory}, ifMatch(cur))
+	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
+	require.Contains(t, fieldsOf(r), "body.categoryId")
+	n := a.count(`SELECT count(*) FROM businesses`)
+	r = a.call(owner, http.MethodPost, "/v1/biz/businesses", map[string]any{"brandName": "Nowhere Stores", "categoryId": noCategory}, nil)
+	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
+	require.Contains(t, fieldsOf(r), "body.categoryId")
+	require.Equal(t, n, a.count(`SELECT count(*) FROM businesses`), "nothing is created")
 	r = a.call(owner, http.MethodPatch, B, map[string]any{"categoryId": categoryID.String()}, ifMatch(cur))
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	r = a.call(owner, http.MethodPost, B+"/submit", nil, nil)

@@ -179,6 +179,16 @@ func IsUniqueViolation(err error, constraint string) bool {
 	return constraint == "" || pgErr.ConstraintName == constraint
 }
 
+// IsForeignKeyViolation reports a 23503 error, optionally on a named
+// constraint.
+func IsForeignKeyViolation(err error, constraint string) bool {
+	var pgErr *pgconn.PgError
+	if !errors.As(err, &pgErr) || pgErr.Code != "23503" {
+		return false
+	}
+	return constraint == "" || pgErr.ConstraintName == constraint
+}
+
 // IsRetryable reports a 40P01 (deadlock detected) or 40001 (serialization
 // failure): Postgres rolled the transaction back, and running it again from
 // the start may succeed.
