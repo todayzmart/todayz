@@ -57,10 +57,16 @@ export function searchItems(items: readonly CatalogueItem[], query: string, limi
   return scored.slice(0, limit).map((s) => s.item);
 }
 
-/** The quick tiles: the best sellers, best first (B-05). */
+/**
+ * The quick tiles (B-05): the best sellers, best first. The contract has no best-seller feed yet
+ * (TODO(lead)), so while no item carries a rank the tiles are the first listed items with stock,
+ * alphabetically, so the counter is never an empty grid.
+ */
 export function topTiles(items: readonly CatalogueItem[], count = TILE_COUNT): CatalogueItem[] {
+  const ranked = items.filter((i) => typeof i.topRank === 'number');
+  if (ranked.length > 0) return ranked.sort((a, b) => (a.topRank ?? 0) - (b.topRank ?? 0)).slice(0, count);
   return items
-    .filter((i) => typeof i.topRank === 'number')
-    .sort((a, b) => (a.topRank ?? 0) - (b.topRank ?? 0))
+    .filter((i) => i.isListed && i.available > 0)
+    .sort((a, b) => itemLabel(a).localeCompare(itemLabel(b)))
     .slice(0, count);
 }

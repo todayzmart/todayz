@@ -334,7 +334,7 @@ function PhoneOnly({ phone: initialPhone, onLink, back }: { phone: string; onLin
     >
       <TextField
         label={intl.formatMessage({ id: 'pos.link.phoneLabel' })}
-        help={intl.formatMessage({ id: 'pos.link.phoneHelp' })}
+        help={intl.formatMessage({ id: 'pos.link.phoneFieldHelp' })}
         type="tel"
         inputMode="tel"
         autoComplete="off"

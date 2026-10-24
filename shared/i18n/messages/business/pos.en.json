@@ -1,0 +1,702 @@
+{
+  "pos.title": {
+    "defaultMessage": "Sell",
+    "description": "B-05 page title"
+  },
+  "pos.loading": {
+    "defaultMessage": "Loading the counter",
+    "description": "Accessible name of the loading skeleton on B-05"
+  },
+  "pos.close": {
+    "defaultMessage": "Close",
+    "description": "Close button of the POS sheets"
+  },
+  "pos.error.title": {
+    "defaultMessage": "Couldn't open the counter",
+    "description": "B-05 error state when the shop can't be loaded and none is saved on this device"
+  },
+  "pos.error.body": {
+    "defaultMessage": "Check your connection and try again. Once the counter has opened on this device it works without a connection.",
+    "description": "B-05 error state body"
+  },
+  "pos.error.retry": {
+    "defaultMessage": "Try again",
+    "description": "B-05 error state retry button"
+  },
+  "pos.noStore.title": {
+    "defaultMessage": "Pick a shop first",
+    "description": "B-05 empty state when no shop is chosen"
+  },
+  "pos.noStore.body": {
+    "defaultMessage": "The counter sells from one shop at a time.",
+    "description": "B-05 empty state body"
+  },
+  "pos.noStore.action": {
+    "defaultMessage": "Choose a shop",
+    "description": "B-05 empty state button"
+  },
+  "pos.browse.label": {
+    "defaultMessage": "Items",
+    "description": "Accessible name of the item browsing area on B-05"
+  },
+  "pos.search.label": {
+    "defaultMessage": "Search or scan an item",
+    "description": "Accessible name of the item search field"
+  },
+  "pos.search.placeholder": {
+    "defaultMessage": "Search or scan an item",
+    "description": "Placeholder of the item search field; Enter adds the first match or a scanned barcode"
+  },
+  "pos.search.clear": {
+    "defaultMessage": "Clear search",
+    "description": "Clear button of the item search field"
+  },
+  "pos.search.none.title": {
+    "defaultMessage": "Nothing found for \"{query}\"",
+    "description": "Empty search result; {query} is what was typed"
+  },
+  "pos.search.none.body": {
+    "defaultMessage": "Add it to this bill as a one-off item with its price.",
+    "description": "Empty search result body"
+  },
+  "pos.tiles.title": {
+    "defaultMessage": "Quick items",
+    "description": "Heading above the quick item tiles"
+  },
+  "pos.tile.inStock": {
+    "defaultMessage": "{count} in stock",
+    "description": "Stock label on an item tile; {count} is the number on hand"
+  },
+  "pos.tile.out": {
+    "defaultMessage": "Out of stock",
+    "description": "Stock label on an item tile with nothing left; it can still be sold"
+  },
+  "pos.tile.countNeeded": {
+    "defaultMessage": "Count needed",
+    "description": "Stock label on an item tile whose stock went below zero"
+  },
+  "pos.catalogue.empty.title": {
+    "defaultMessage": "No items on this device yet",
+    "description": "B-05 empty state when no catalogue has loaded"
+  },
+  "pos.catalogue.empty.body": {
+    "defaultMessage": "Connect once to load your items, or add a one-off item to the bill.",
+    "description": "B-05 empty catalogue body"
+  },
+  "pos.sales.open": {
+    "defaultMessage": "Sales",
+    "description": "Button that opens the sales and sync sheet"
+  },
+  "pos.sales.openAttention": {
+    "defaultMessage": "Sales · {count} to check",
+    "description": "Button that opens the sales and sync sheet when sales need attention; {count} is how many"
+  },
+  "pos.banner.notDurable.title": {
+    "defaultMessage": "Sales are not being saved on this device",
+    "description": "Warning when IndexedDB is blocked"
+  },
+  "pos.banner.notDurable.body": {
+    "defaultMessage": "This browser blocks storage. Keep this page open until every sale has synced.",
+    "description": "Warning body when IndexedDB is blocked"
+  },
+  "pos.banner.rejected.title": {
+    "defaultMessage": "{count, plural, one {# sale needs your attention} other {# sales need your attention}}",
+    "description": "Banner when the server refused sales"
+  },
+  "pos.banner.rejected.action": {
+    "defaultMessage": "Review",
+    "description": "Button on the refused-sales banner"
+  },
+  "pos.banner.offline.title": {
+    "defaultMessage": "Offline · {count, plural, =0 {no sales waiting} one {# sale waiting to sync} other {# sales waiting to sync}}",
+    "description": "Banner while offline; {count} is the waiting sales"
+  },
+  "pos.banner.offline.body": {
+    "defaultMessage": "You can keep selling. Sales are saved here and sync when you're back online.",
+    "description": "Offline banner body"
+  },
+  "pos.banner.waiting.title": {
+    "defaultMessage": "{count, plural, one {# sale waiting to sync} other {# sales waiting to sync}}",
+    "description": "Banner while online with sales not yet synced"
+  },
+  "pos.banner.waiting.body": {
+    "defaultMessage": "They send in the background. Nothing to do.",
+    "description": "Waiting-to-sync banner body"
+  },
+  "pos.banner.short.title": {
+    "defaultMessage": "{count, plural, one {# item is} other {# items are}} more than the count on hand",
+    "description": "Banner when the bill has more of an item than stock"
+  },
+  "pos.banner.short.body": {
+    "defaultMessage": "You can still sell it. The stock count will be flagged for a recount.",
+    "description": "Short-stock banner body"
+  },
+  "pos.banner.linkDropped.title": {
+    "defaultMessage": "Customer link removed",
+    "description": "Banner when a bill QR link is dropped because the bill changed"
+  },
+  "pos.banner.linkDropped.body": {
+    "defaultMessage": "The bill changed after the QR was shown. Link the customer again to use credits.",
+    "description": "Link-dropped banner body"
+  },
+  "pos.charge.failed.title": {
+    "defaultMessage": "Couldn't save the sale",
+    "description": "Banner when recording a sale on this device failed"
+  },
+  "pos.charge.failed.body": {
+    "defaultMessage": "The bill is still here. Try charging again.",
+    "description": "Charge failure body"
+  },
+  "pos.done.synced": {
+    "defaultMessage": "Sale of {total} done",
+    "description": "Banner after a sale that the server accepted"
+  },
+  "pos.done.waiting": {
+    "defaultMessage": "Sale of {total} saved on this device. It will sync when you're online.",
+    "description": "Banner after a sale that is waiting to sync"
+  },
+  "pos.done.rejected": {
+    "defaultMessage": "Sale of {total} was refused. Open the sales list to see why.",
+    "description": "Banner after a sale the server refused"
+  },
+  "pos.done.receipt": {
+    "defaultMessage": "Receipt",
+    "description": "Button on the sale-done banner"
+  },
+  "pos.cart.label": {
+    "defaultMessage": "Current bill",
+    "description": "Accessible name and title of the bill"
+  },
+  "pos.cart.phone": {
+    "defaultMessage": "Customer phone",
+    "description": "Accessible name of the customer phone field"
+  },
+  "pos.cart.phonePlaceholder": {
+    "defaultMessage": "Customer phone (optional)",
+    "description": "Placeholder of the customer phone field"
+  },
+  "pos.cart.empty": {
+    "defaultMessage": "Scan or tap an item to start the bill.",
+    "description": "Empty bill text"
+  },
+  "pos.cart.add": {
+    "defaultMessage": "Add",
+    "description": "Add pill of the quantity stepper"
+  },
+  "pos.cart.less": {
+    "defaultMessage": "Remove one",
+    "description": "Decrement button of the quantity stepper"
+  },
+  "pos.cart.more": {
+    "defaultMessage": "Add one",
+    "description": "Increment button of the quantity stepper"
+  },
+  "pos.cart.lineDetailDiscount": {
+    "defaultMessage": "{price} each · {discount} off",
+    "description": "Bill line detail with a manual discount"
+  },
+  "pos.cart.summary": {
+    "defaultMessage": "{count, plural, one {# item} other {# items}}",
+    "description": "Bill summary and cart bar label"
+  },
+  "pos.cart.view": {
+    "defaultMessage": "View bill",
+    "description": "Cart bar button on phones"
+  },
+  "pos.cart.charge": {
+    "defaultMessage": "Charge",
+    "description": "Charge button"
+  },
+  "pos.cart.charging": {
+    "defaultMessage": "Charging",
+    "description": "Announced while a sale is being saved"
+  },
+  "pos.cart.subtotal": {
+    "defaultMessage": "Subtotal",
+    "description": "Bill total row"
+  },
+  "pos.cart.billDiscount": {
+    "defaultMessage": "Discount",
+    "description": "Bill total row"
+  },
+  "pos.cart.roundOff": {
+    "defaultMessage": "Round off",
+    "description": "Bill total row"
+  },
+  "pos.cart.credits": {
+    "defaultMessage": "Credits",
+    "description": "Bill total row for credits used"
+  },
+  "pos.cart.linkCustomer": {
+    "defaultMessage": "Link customer",
+    "description": "Button that opens the customer link panel"
+  },
+  "pos.cart.unlink": {
+    "defaultMessage": "Remove",
+    "description": "Button that removes the customer link"
+  },
+  "pos.cart.discount": {
+    "defaultMessage": "Discount",
+    "description": "Manager button that opens manual discounts"
+  },
+  "pos.cart.clear": {
+    "defaultMessage": "Clear bill",
+    "description": "Button that empties the bill"
+  },
+  "pos.cart.link.billQr": {
+    "defaultMessage": "Linked by bill QR · {credits, plural, =0 {no credits used} one {# credit used} other {# credits used}}",
+    "description": "Customer link summary for a bill QR"
+  },
+  "pos.cart.link.counterCode": {
+    "defaultMessage": "Linked by code · {phone}",
+    "description": "Customer link summary for a counter code; the phone shows the last four digits"
+  },
+  "pos.cart.link.unverified": {
+    "defaultMessage": "Phone noted, not verified · {phone}",
+    "description": "Customer link summary for an unverified phone"
+  },
+  "pos.pay.label": {
+    "defaultMessage": "Payment method",
+    "description": "Accessible name of the payment method choice"
+  },
+  "pos.pay.cash": {
+    "defaultMessage": "Cash",
+    "description": "Payment method"
+  },
+  "pos.pay.upi": {
+    "defaultMessage": "UPI",
+    "description": "Payment method"
+  },
+  "pos.pay.card": {
+    "defaultMessage": "Card",
+    "description": "Payment method"
+  },
+  "pos.add.open": {
+    "defaultMessage": "Custom item",
+    "description": "Button that adds a one-off item to the bill"
+  },
+  "pos.add.customTitle": {
+    "defaultMessage": "Add a one-off item",
+    "description": "Sheet title"
+  },
+  "pos.add.unknownTitle": {
+    "defaultMessage": "We don't know this barcode",
+    "description": "Sheet title for an unknown scanned code"
+  },
+  "pos.add.unknownBody": {
+    "defaultMessage": "Code {code} isn't in your items. Add it to this bill with a name and price.",
+    "description": "Sheet body for an unknown scanned code"
+  },
+  "pos.add.name": {
+    "defaultMessage": "Item name",
+    "description": "Field label"
+  },
+  "pos.add.nameInvalid": {
+    "defaultMessage": "Enter a name",
+    "description": "Field error"
+  },
+  "pos.add.price": {
+    "defaultMessage": "Price",
+    "description": "Field label"
+  },
+  "pos.add.priceInvalid": {
+    "defaultMessage": "Enter a price above zero",
+    "description": "Field error"
+  },
+  "pos.add.submit": {
+    "defaultMessage": "Add to bill",
+    "description": "Button"
+  },
+  "pos.add.inStock": {
+    "defaultMessage": "Add it to your stock",
+    "description": "Link to the Stock section from the unknown-barcode sheet"
+  },
+  "pos.discount.title": {
+    "defaultMessage": "Discounts",
+    "description": "Sheet title"
+  },
+  "pos.discount.help": {
+    "defaultMessage": "Enter amounts in rupees. The bill stays at ₹1 or more.",
+    "description": "Sheet help text"
+  },
+  "pos.discount.line": {
+    "defaultMessage": "{name} · {price}",
+    "description": "Line discount field label"
+  },
+  "pos.discount.bill": {
+    "defaultMessage": "Whole bill discount",
+    "description": "Field label"
+  },
+  "pos.discount.invalid": {
+    "defaultMessage": "Enter a valid amount",
+    "description": "Field error"
+  },
+  "pos.discount.apply": {
+    "defaultMessage": "Apply",
+    "description": "Button"
+  },
+  "pos.scan.open": {
+    "defaultMessage": "Scan",
+    "description": "Button that opens the camera scanner"
+  },
+  "pos.scan.title": {
+    "defaultMessage": "Scan a barcode",
+    "description": "Sheet title"
+  },
+  "pos.scan.unsupported": {
+    "defaultMessage": "This browser can't scan with the camera. Use a barcode scanner or type the code.",
+    "description": "Camera scanner message"
+  },
+  "pos.scan.denied": {
+    "defaultMessage": "Camera access is off. Allow it in your browser settings to scan.",
+    "description": "Camera scanner message"
+  },
+  "pos.scan.starting": {
+    "defaultMessage": "Starting the camera",
+    "description": "Camera scanner message"
+  },
+  "pos.scan.hint": {
+    "defaultMessage": "Point the camera at the barcode.",
+    "description": "Camera scanner hint"
+  },
+  "pos.link.title": {
+    "defaultMessage": "Link a customer",
+    "description": "Sheet title"
+  },
+  "pos.link.back": {
+    "defaultMessage": "Back",
+    "description": "Back button"
+  },
+  "pos.link.skip": {
+    "defaultMessage": "Sell without linking",
+    "description": "Button"
+  },
+  "pos.link.noCredits": {
+    "defaultMessage": "This bill is below the minimum for using credits. A customer can still earn them.",
+    "description": "Link panel notice"
+  },
+  "pos.link.qr": {
+    "defaultMessage": "Customer scans a QR",
+    "description": "Option"
+  },
+  "pos.link.qrHelp": {
+    "defaultMessage": "Lets the customer use credits and earn cashback.",
+    "description": "Option help"
+  },
+  "pos.link.qrOffline": {
+    "defaultMessage": "Needs a connection.",
+    "description": "Option help while offline"
+  },
+  "pos.link.code": {
+    "defaultMessage": "Customer reads out a code",
+    "description": "Option"
+  },
+  "pos.link.codeHelp": {
+    "defaultMessage": "The customer shows a 4-digit code from their app. They earn credits.",
+    "description": "Option help"
+  },
+  "pos.link.phone": {
+    "defaultMessage": "Just note their phone",
+    "description": "Option"
+  },
+  "pos.link.phoneHelp": {
+    "defaultMessage": "Saves the number on the sale. No credits until they verify.",
+    "description": "Option help"
+  },
+  "pos.link.phoneFieldHelp": {
+    "defaultMessage": "10-digit mobile number",
+    "description": "Field help"
+  },
+  "pos.link.qrLabel": {
+    "defaultMessage": "QR code for the customer to scan",
+    "description": "Accessible name of the QR"
+  },
+  "pos.link.qrPreparing": {
+    "defaultMessage": "Preparing the QR",
+    "description": "Status"
+  },
+  "pos.link.qrFailed": {
+    "defaultMessage": "Couldn't make the QR.",
+    "description": "Status"
+  },
+  "pos.link.qrExpired": {
+    "defaultMessage": "This QR has expired.",
+    "description": "Status"
+  },
+  "pos.link.newQr": {
+    "defaultMessage": "New QR",
+    "description": "Button"
+  },
+  "pos.link.retry": {
+    "defaultMessage": "Try again",
+    "description": "Button"
+  },
+  "pos.link.waiting": {
+    "defaultMessage": "Waiting for the customer to scan.",
+    "description": "Status"
+  },
+  "pos.link.expiresIn": {
+    "defaultMessage": "Expires in {seconds} s",
+    "description": "Countdown; {seconds} is whole seconds"
+  },
+  "pos.link.phoneLabel": {
+    "defaultMessage": "Customer phone",
+    "description": "Field label"
+  },
+  "pos.link.phoneInvalid": {
+    "defaultMessage": "Enter a 10-digit mobile number",
+    "description": "Field error"
+  },
+  "pos.link.codeLabel": {
+    "defaultMessage": "Code from the customer's app",
+    "description": "Field label"
+  },
+  "pos.link.codeHint": {
+    "defaultMessage": "4 digits",
+    "description": "Field help"
+  },
+  "pos.link.codeInvalid": {
+    "defaultMessage": "Enter the 4-digit code",
+    "description": "Field error"
+  },
+  "pos.link.codeMismatch": {
+    "defaultMessage": "That code didn't match.",
+    "description": "Field error"
+  },
+  "pos.link.codeMismatchTries": {
+    "defaultMessage": "That code didn't match. {count, plural, one {# try left} other {# tries left}}.",
+    "description": "Field error with tries left"
+  },
+  "pos.link.codeLocked": {
+    "defaultMessage": "Too many wrong codes. Try again later or link by phone.",
+    "description": "Field error when the server locks code entry"
+  },
+  "pos.link.codeOffline": {
+    "defaultMessage": "You're offline. The code is checked when the sale syncs.",
+    "description": "Notice"
+  },
+  "pos.link.codeSave": {
+    "defaultMessage": "Link with code",
+    "description": "Button"
+  },
+  "pos.link.phoneSave": {
+    "defaultMessage": "Note this phone",
+    "description": "Button"
+  },
+  "pos.history.title": {
+    "defaultMessage": "Sales on this device",
+    "description": "Sheet title"
+  },
+  "pos.history.empty.title": {
+    "defaultMessage": "No sales yet",
+    "description": "Empty state"
+  },
+  "pos.history.empty.body": {
+    "defaultMessage": "Sales you ring up appear here until they are old.",
+    "description": "Empty state body"
+  },
+  "pos.history.units": {
+    "defaultMessage": "{count, plural, one {# unit} other {# units}}",
+    "description": "Units sold in a sale"
+  },
+  "pos.history.receipt": {
+    "defaultMessage": "Receipt",
+    "description": "Button"
+  },
+  "pos.history.state.pending": {
+    "defaultMessage": "Waiting to sync",
+    "description": "Sale state"
+  },
+  "pos.history.state.sending": {
+    "defaultMessage": "Syncing",
+    "description": "Sale state"
+  },
+  "pos.history.state.synced": {
+    "defaultMessage": "Synced",
+    "description": "Sale state"
+  },
+  "pos.history.state.rejected": {
+    "defaultMessage": "Refused",
+    "description": "Sale state"
+  },
+  "pos.history.state.reversed": {
+    "defaultMessage": "Reversed",
+    "description": "Sale state"
+  },
+  "pos.history.linkFailed": {
+    "defaultMessage": "Customer link failed",
+    "description": "Tag on a sale whose link did not verify"
+  },
+  "pos.history.countNeeded": {
+    "defaultMessage": "Count needed",
+    "description": "Tag on a sale that took stock below zero"
+  },
+  "pos.history.countNeededItems": {
+    "defaultMessage": "Recount: {names}",
+    "description": "Note listing items that went below zero"
+  },
+  "pos.history.serverPrice": {
+    "defaultMessage": "Charged {device} here; the server finished at {server}.",
+    "description": "Note when totals differ"
+  },
+  "pos.history.refused": {
+    "defaultMessage": "The server refused this sale. Retry it, or dismiss it after checking with the customer.",
+    "description": "Note on a refused sale"
+  },
+  "pos.sync.title": {
+    "defaultMessage": "Sync",
+    "description": "Section name"
+  },
+  "pos.sync.status.idle": {
+    "defaultMessage": "Up to date",
+    "description": "Sync status"
+  },
+  "pos.sync.status.syncing": {
+    "defaultMessage": "Syncing",
+    "description": "Sync status"
+  },
+  "pos.sync.status.offline": {
+    "defaultMessage": "Offline",
+    "description": "Sync status"
+  },
+  "pos.sync.status.backoff": {
+    "defaultMessage": "Waiting to retry",
+    "description": "Sync status"
+  },
+  "pos.sync.status.resync": {
+    "defaultMessage": "Refreshing items",
+    "description": "Sync status"
+  },
+  "pos.sync.now": {
+    "defaultMessage": "Sync now",
+    "description": "Button"
+  },
+  "pos.sync.counts": {
+    "defaultMessage": "{pending, plural, one {# waiting} other {# waiting}} · {rejected, plural, one {# refused} other {# refused}}",
+    "description": "Sync counts"
+  },
+  "pos.sync.last": {
+    "defaultMessage": "last synced {time}",
+    "description": "Time of last sync"
+  },
+  "pos.sync.attention": {
+    "defaultMessage": "{count, plural, one {# sale needs checking} other {# sales need checking}}",
+    "description": "Banner"
+  },
+  "pos.sync.retry": {
+    "defaultMessage": "Retry",
+    "description": "Button on a refused sale"
+  },
+  "pos.sync.dismiss": {
+    "defaultMessage": "Dismiss",
+    "description": "Button on a refused sale"
+  },
+  "pos.reverse.action": {
+    "defaultMessage": "Reverse",
+    "description": "Button"
+  },
+  "pos.reverse.title": {
+    "defaultMessage": "Reverse this sale?",
+    "description": "Dialog title"
+  },
+  "pos.reverse.body": {
+    "defaultMessage": "This can't be undone.",
+    "description": "Dialog body"
+  },
+  "pos.reverse.stock": {
+    "defaultMessage": "{count, plural, one {# unit goes back to stock} other {# units go back to stock}}",
+    "description": "Dialog list"
+  },
+  "pos.reverse.credits": {
+    "defaultMessage": "{count, plural, =0 {No credits to give back} one {# credit goes back to the customer} other {# credits go back to the customer}}",
+    "description": "Dialog list"
+  },
+  "pos.reverse.cashback": {
+    "defaultMessage": "{count, plural, =0 {No cashback to take back} one {# cashback credit is taken back} other {# cashback credits are taken back}}",
+    "description": "Dialog list"
+  },
+  "pos.reverse.reason": {
+    "defaultMessage": "Reason",
+    "description": "Field label"
+  },
+  "pos.reverse.keep": {
+    "defaultMessage": "Keep sale",
+    "description": "Button"
+  },
+  "pos.reverse.confirm": {
+    "defaultMessage": "Reverse sale",
+    "description": "Button"
+  },
+  "pos.reverse.done": {
+    "defaultMessage": "Reversed. {units, plural, one {# unit} other {# units}} back in stock, {credits, plural, one {# credit} other {# credits}} given back, {cashback, plural, one {# cashback credit} other {# cashback credits}} taken back.",
+    "description": "Banner after a reversal"
+  },
+  "pos.reverse.offline": {
+    "defaultMessage": "You're offline. Reverse the sale when you're back online.",
+    "description": "Banner"
+  },
+  "pos.reverse.windowPassed": {
+    "defaultMessage": "The time to reverse this sale has passed.",
+    "description": "Banner"
+  },
+  "pos.reverse.failed": {
+    "defaultMessage": "Couldn't reverse the sale. Try again.",
+    "description": "Banner"
+  },
+  "pos.receipt.title": {
+    "defaultMessage": "Receipt",
+    "description": "Sheet title and receipt heading"
+  },
+  "pos.receipt.lineDiscount": {
+    "defaultMessage": "Discount",
+    "description": "Receipt line note"
+  },
+  "pos.receipt.subtotal": {
+    "defaultMessage": "Subtotal",
+    "description": "Receipt row"
+  },
+  "pos.receipt.discount": {
+    "defaultMessage": "Discount",
+    "description": "Receipt row"
+  },
+  "pos.receipt.roundOff": {
+    "defaultMessage": "Round off",
+    "description": "Receipt row"
+  },
+  "pos.receipt.credits": {
+    "defaultMessage": "Credits used",
+    "description": "Receipt row"
+  },
+  "pos.receipt.total": {
+    "defaultMessage": "Total",
+    "description": "Receipt row"
+  },
+  "pos.receipt.paidBy": {
+    "defaultMessage": "Paid by",
+    "description": "Receipt row"
+  },
+  "pos.receipt.thanks": {
+    "defaultMessage": "Thank you for shopping with us.",
+    "description": "Receipt footer"
+  },
+  "pos.receipt.whatsapp": {
+    "defaultMessage": "Share on WhatsApp",
+    "description": "Button"
+  },
+  "pos.receipt.sms": {
+    "defaultMessage": "Send by SMS",
+    "description": "Button"
+  },
+  "pos.receipt.print": {
+    "defaultMessage": "Print",
+    "description": "Button"
+  },
+  "pos.receipt.linkPending": {
+    "defaultMessage": "The share links work once this sale has synced.",
+    "description": "Notice"
+  },
+  "pos.receipt.shareText": {
+    "defaultMessage": "Your receipt from {shop}: {url}",
+    "description": "Text of the share message"
+  }
+}
