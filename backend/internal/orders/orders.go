@@ -77,8 +77,11 @@ type Deps struct {
 	Stock Stock
 	// Open reports whether a store is open at a time (business.OpenAt).
 	Open OpenFunc
-	// Pricer applies offers; nil means no offers (W3 brings them).
+	// Pricer applies offers; nil means no offers.
 	Pricer Pricer
+	// Redeemer counts used offers against their limits and gives them back
+	// when the order ends; nil means no offers.
+	Redeemer Redeemer
 	// AskPricer prices a line from an ask reply; nil until W3-16 (D-101).
 	AskPricer AskPricer
 	// Credits holds and settles credits; nil means credits are not live.
@@ -120,6 +123,7 @@ type Service struct {
 	stock     Stock
 	open      OpenFunc
 	pricer    Pricer
+	redeemer  Redeemer
 	askPricer AskPricer
 	credits   Credits
 	codes     *codeKeys // nil when either code key is missing
@@ -136,11 +140,14 @@ func New(d Deps) (*Service, error) {
 	}
 	s := &Service{
 		db: d.DB, clock: d.Clock, settings: d.Settings, notices: d.Notices, jobs: d.Jobs,
-		stock: d.Stock, open: d.Open, pricer: d.Pricer, askPricer: d.AskPricer, credits: d.Credits,
+		stock: d.Stock, open: d.Open, pricer: d.Pricer, redeemer: d.Redeemer, askPricer: d.AskPricer, credits: d.Credits,
 		ids: ids.NewGenerator(),
 	}
 	if s.pricer == nil {
 		s.pricer = NoOffers{}
+	}
+	if s.redeemer == nil {
+		s.redeemer = NoRedeem{}
 	}
 	if s.credits == nil {
 		s.credits = NoCredits{}
