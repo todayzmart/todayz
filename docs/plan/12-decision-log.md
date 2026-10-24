@@ -1094,7 +1094,7 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 
 ## POS counter and offline queue as built (W2-11, 2026-10-24)
 
-**D-170 · The offline store is raw IndexedDB behind a `PosStorage` interface, not Dexie (W2-11).** D-88 names Dexie; the build had no new dependency to spend, and the POS needs three object stores (`outbox`, `catalogue`, `meta`, the last holding the cursor, settings and the in-flight marker). `business/src/sync/idb.ts` wraps them; `memoryStorage` backs the tests. When storage cannot open (private mode), the counter keeps working in memory and says the sales are not safe if the tab closes. Swapping in Dexie later touches only `idb.ts`. TODO(lead): confirm.
+**D-170 · The offline store is raw IndexedDB behind a `PosStorage` interface, not Dexie (W2-11).** D-88 names Dexie; the build had no new dependency to spend, and the POS needs three object stores (`outbox`, `catalogue`, `meta`, the last holding the cursor, settings and the in-flight marker). `business/src/sync/idb.ts` wraps them; `memoryStorage` backs the tests. When storage cannot open (private mode), the counter keeps working in memory and says the sales are not safe if the tab closes. Swapping in Dexie later touches only `idb.ts`. Lead (24 Oct): accepted; no new dependency.
 
 **D-171 · The outbox and its send rules (W2-11).**
 - Every sale gets a client ULID and the next device sequence in the same write that saves it; nothing is shown as sold before that write succeeds. A failed write keeps the bill on screen.
@@ -1116,12 +1116,12 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 
 **D-176 · Roles on the counter (W2-11).** A cashier can ring and charge. Whole-bill and line discounts, reversal and the sales history's Reverse action are manager and above; those controls are hidden for a cashier, and the server is the gate. A reversal asks for a reason and confirms in an `alertdialog`.
 
-**D-177 · Scanner (W2-11).** The keyboard wedge (fast keystrokes ending in Enter into the search box, or anywhere on the counter) always works. Camera scanning uses the browser's `BarcodeDetector` when present and otherwise says it is not available on this device; no ZXing dependency was added. TODO(lead): decide whether iOS Safari needs the fallback in Wave 3. An unknown barcode opens "Add this product" (name, price), which saves a custom line and links to Stock for the full form (W2-12).
+**D-177 · Scanner (W2-11).** The keyboard wedge (fast keystrokes ending in Enter into the search box, or anywhere on the counter) always works. Camera scanning uses the browser's `BarcodeDetector` when present and otherwise says it is not available on this device; no ZXing dependency was added. Lead (24 Oct): the iOS Safari camera fallback is a Wave 3 decision; the keyboard wedge covers the counter until then. An unknown barcode opens "Add this product" (name, price), which saves a custom line and links to Stock for the full form (W2-12).
 
 **D-178 · Receipts (W2-11).** The receipt view is rendered from the local sale or the server's, so it also works offline; printing is the browser's (`@page` 80 mm wide with a 72 mm receipt body, fixed 297 mm tall because `auto` height is not valid CSS, so a very long receipt may paginate). Share on WhatsApp or SMS uses the receipt link only when the server returned a token (a replayed sale has none, D-130). The bill-QR URL `…/scan/{token}` and the customer scan route are assumed; TODO(lead) confirm with W2-08/09.
 
 **D-179 · What is cached on the device, and the conservative readings (W2-11).**
-- The store reference and role are cached in `localStorage` so the counter opens offline; `clearCachedPosStore` exists but is not yet wired to sign-out. TODO(lead).
+- The store reference and role are cached in `localStorage` so the counter opens offline; sign-out clears it before the logout call, so a failed call still clears it (lead, 24 Oct). Unsent sales stay in the outbox: they belong to the shop.
 - Storage is one IndexedDB per store id. The in-flight marker records the entries being sent so a reload mid-send resends them with the same ids.
 - `expectedTotalPaise` is not sent, so a price change the shop did not see is a `409 price_changed` and the sale stands at the price quoted; the line is redrawn on the next catalogue sync.
 - The update toast is held while a sale is open (`useHoldUpdates`, W1-08).

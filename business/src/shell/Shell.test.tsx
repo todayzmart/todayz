@@ -1,7 +1,7 @@
 import en from '@todayz/i18n/compiled/business/en.json';
 import xa from '@todayz/i18n/compiled/business/en-XA.json';
 import { asMessages, type Messages } from '@todayz/i18n';
-import { screen, within } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { json, renderAt as renderApp, type Call, type Handler } from '../test/render';
 import { MORE, NAV } from './nav';
@@ -156,5 +156,13 @@ describe('business shell', () => {
     renderAt('/', asMessages(xa));
     const h1 = await screen.findByRole('heading', { level: 1 });
     expect(h1.textContent).toMatch(/^\[.*\]$/);
+  });
+
+  it('forgets the counter\'s cached shop and role on sign out (D-179)', async () => {
+    localStorage.setItem('todayz.biz.pos.store', JSON.stringify({ bid: 'b1', sid: 's1', name: 'Indiranagar', role: 'owner' }));
+    renderAt('/');
+    const { side } = await navs();
+    fireEvent.click(within(side).getByRole('button', { name: 'Sign out' }));
+    expect(localStorage.getItem('todayz.biz.pos.store')).toBeNull();
   });
 });
