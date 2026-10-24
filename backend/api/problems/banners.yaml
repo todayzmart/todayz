@@ -1,0 +1,7 @@
+# Problem codes: domain "banners" (owner W2-07; 01 §12, store_banners_max).
+domain: banners
+problems:
+  - code: banner_limit_reached
+    status: 422
+    i18n: problems.banner_limit_reached
+    title: This shop already has the most live banners; pause or end one first

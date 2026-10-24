@@ -1,0 +1,282 @@
+{
+  "reviews.title": {
+    "defaultMessage": "Reviews",
+    "description": "B-11 page title"
+  },
+  "reviews.loading": {
+    "defaultMessage": "Loading reviews",
+    "description": "Accessible name of the loading state"
+  },
+  "reviews.noStore.title": {
+    "defaultMessage": "Pick a shop first",
+    "description": "B-11 empty state: no current shop"
+  },
+  "reviews.noStore.body": {
+    "defaultMessage": "Reviews belong to one shop. Choose the shop you are working in.",
+    "description": "B-11 empty state"
+  },
+  "reviews.noStore.action": {
+    "defaultMessage": "Choose a shop",
+    "description": "B-11 empty state button"
+  },
+  "reviews.askManager": {
+    "defaultMessage": "Ask a manager or the owner to read and reply to reviews.",
+    "description": "B-11 shown to a cashier"
+  },
+  "reviews.error.title": {
+    "defaultMessage": "Couldn't load reviews",
+    "description": "B-11 error state title"
+  },
+  "reviews.error.body": {
+    "defaultMessage": "Check your connection and try again.",
+    "description": "B-11 error state body"
+  },
+  "reviews.error.retry": {
+    "defaultMessage": "Try again",
+    "description": "B-11 error state button"
+  },
+  "reviews.error.generic": {
+    "defaultMessage": "Something went wrong. Try again.",
+    "description": "B-11 failed call"
+  },
+  "reviews.error.validation_failed": {
+    "defaultMessage": "The text is not valid. Check it and try again.",
+    "description": "B-11 failed call: 422"
+  },
+  "reviews.error.forbidden": {
+    "defaultMessage": "Only the owner and managers can do this.",
+    "description": "B-11 failed call: 403"
+  },
+  "reviews.error.not_found": {
+    "defaultMessage": "This review is no longer available.",
+    "description": "B-11 failed call: 404"
+  },
+  "reviews.stars": {
+    "defaultMessage": "{n} out of 5 stars",
+    "description": "Accessible name of a star rating"
+  },
+  "reviews.summary.label": {
+    "defaultMessage": "Rating summary",
+    "description": "B-11 summary region name"
+  },
+  "reviews.summary.count": {
+    "defaultMessage": "{count, plural, one {# review} other {# reviews}}",
+    "description": "B-11 review count"
+  },
+  "reviews.filter.label": {
+    "defaultMessage": "Filter reviews",
+    "description": "B-11 filter group name"
+  },
+  "reviews.filter.all": {
+    "defaultMessage": "All",
+    "description": "B-11 filter"
+  },
+  "reviews.filter.needsReply": {
+    "defaultMessage": "Needs a reply",
+    "description": "B-11 filter"
+  },
+  "reviews.filter.withText": {
+    "defaultMessage": "With text",
+    "description": "B-11 filter"
+  },
+  "reviews.filter.low": {
+    "defaultMessage": "Low stars",
+    "description": "B-11 filter: 2 stars or fewer"
+  },
+  "reviews.list.label": {
+    "defaultMessage": "Reviews",
+    "description": "B-11 list name"
+  },
+  "reviews.card.label": {
+    "defaultMessage": "Review by {who}, {n} out of 5 stars",
+    "description": "B-11 card name"
+  },
+  "reviews.customer": {
+    "defaultMessage": "Customer",
+    "description": "B-11 name shown when the customer has no first name"
+  },
+  "reviews.tags.label": {
+    "defaultMessage": "What the customer picked",
+    "description": "B-11 tag list name"
+  },
+  "reviews.tag.fresh_stock": {
+    "defaultMessage": "Fresh stock",
+    "description": "B-11 review tag"
+  },
+  "reviews.tag.fair_price": {
+    "defaultMessage": "Fair price",
+    "description": "B-11 review tag"
+  },
+  "reviews.tag.quick_service": {
+    "defaultMessage": "Quick service",
+    "description": "B-11 review tag"
+  },
+  "reviews.tag.friendly": {
+    "defaultMessage": "Friendly",
+    "description": "B-11 review tag"
+  },
+  "reviews.tag.stock_was_right": {
+    "defaultMessage": "Stock was right",
+    "description": "B-11 review tag"
+  },
+  "reviews.tag.well_packed": {
+    "defaultMessage": "Well packed",
+    "description": "B-11 review tag"
+  },
+  "reviews.tag.item_missing": {
+    "defaultMessage": "Item missing",
+    "description": "B-11 review tag"
+  },
+  "reviews.tag.slow": {
+    "defaultMessage": "Slow",
+    "description": "B-11 review tag"
+  },
+  "reviews.tag.rude": {
+    "defaultMessage": "Rude",
+    "description": "B-11 review tag"
+  },
+  "reviews.tag.wrong_item": {
+    "defaultMessage": "Wrong item",
+    "description": "B-11 review tag"
+  },
+  "reviews.tag.expired_item": {
+    "defaultMessage": "Expired item",
+    "description": "B-11 review tag"
+  },
+  "reviews.tag.overpriced": {
+    "defaultMessage": "Overpriced",
+    "description": "B-11 review tag"
+  },
+  "reviews.reported.pill": {
+    "defaultMessage": "Reported",
+    "description": "B-11 status after this shop reported the review"
+  },
+  "reviews.reported.button": {
+    "defaultMessage": "Reported",
+    "description": "B-11 disabled report button after reporting"
+  },
+  "reviews.report.button": {
+    "defaultMessage": "Report",
+    "description": "B-11 report button"
+  },
+  "reviews.reply.yours": {
+    "defaultMessage": "Your reply",
+    "description": "B-11 reply heading"
+  },
+  "reviews.reply.start": {
+    "defaultMessage": "Reply",
+    "description": "B-11 reply button"
+  },
+  "reviews.reply.edit": {
+    "defaultMessage": "Edit reply",
+    "description": "B-11 edit reply button"
+  },
+  "reviews.reply.label": {
+    "defaultMessage": "Your reply",
+    "description": "B-11 reply field label"
+  },
+  "reviews.reply.editLabel": {
+    "defaultMessage": "Edit your reply",
+    "description": "B-11 reply field label when editing"
+  },
+  "reviews.reply.counter": {
+    "defaultMessage": "{n} of {max}",
+    "description": "B-11 reply character counter"
+  },
+  "reviews.reply.empty": {
+    "defaultMessage": "Write a reply first.",
+    "description": "B-11 reply validation"
+  },
+  "reviews.reply.send": {
+    "defaultMessage": "Send reply",
+    "description": "B-11 reply submit"
+  },
+  "reviews.reply.save": {
+    "defaultMessage": "Save reply",
+    "description": "B-11 reply save"
+  },
+  "reviews.cancel": {
+    "defaultMessage": "Cancel",
+    "description": "B-11 cancel button"
+  },
+  "reviews.close": {
+    "defaultMessage": "Close",
+    "description": "B-11 sheet close"
+  },
+  "reviews.toast.replySent": {
+    "defaultMessage": "Reply sent",
+    "description": "B-11 toast"
+  },
+  "reviews.toast.replyUpdated": {
+    "defaultMessage": "Reply updated",
+    "description": "B-11 toast"
+  },
+  "reviews.toast.reported": {
+    "defaultMessage": "Review reported to TodayZ",
+    "description": "B-11 toast"
+  },
+  "reviews.report.title": {
+    "defaultMessage": "Report this review",
+    "description": "B-11 report sheet title"
+  },
+  "reviews.report.body": {
+    "defaultMessage": "TodayZ checks reported reviews. The review stays up until then.",
+    "description": "B-11 report sheet description"
+  },
+  "reviews.report.reason": {
+    "defaultMessage": "Why are you reporting it?",
+    "description": "B-11 report reason legend"
+  },
+  "reviews.report.reasons.abusive": {
+    "defaultMessage": "Abusive or hateful",
+    "description": "B-11 report reason"
+  },
+  "reviews.report.reasons.spam": {
+    "defaultMessage": "Spam or advertising",
+    "description": "B-11 report reason"
+  },
+  "reviews.report.reasons.fake": {
+    "defaultMessage": "Not a real customer",
+    "description": "B-11 report reason"
+  },
+  "reviews.report.reasons.not_about_shop": {
+    "defaultMessage": "Not about this shop",
+    "description": "B-11 report reason"
+  },
+  "reviews.report.reasons.other": {
+    "defaultMessage": "Something else",
+    "description": "B-11 report reason"
+  },
+  "reviews.report.note": {
+    "defaultMessage": "Note (optional)",
+    "description": "B-11 report note label"
+  },
+  "reviews.report.submit": {
+    "defaultMessage": "Report review",
+    "description": "B-11 report submit"
+  },
+  "reviews.empty.title": {
+    "defaultMessage": "No reviews yet",
+    "description": "B-11 empty state"
+  },
+  "reviews.empty.body": {
+    "defaultMessage": "Customers can review the shop after they collect an order or buy at the counter. Their reviews will appear here.",
+    "description": "B-11 empty state explanation"
+  },
+  "reviews.empty.filtered": {
+    "defaultMessage": "No reviews match this filter.",
+    "description": "B-11 empty filtered list"
+  },
+  "reviews.more": {
+    "defaultMessage": "Show more",
+    "description": "B-11 load more"
+  },
+  "reviews.error.review_reply_exists": {
+    "defaultMessage": "This review already has a reply. It has been reloaded.",
+    "description": "Error when a second reply is posted"
+  },
+  "reviews.error.invalid_transition": {
+    "defaultMessage": "This reply can no longer be edited.",
+    "description": "Error when the reply was hidden by TodayZ"
+  }
+}

@@ -1,0 +1,25 @@
+# Problem codes: domain "reviews" (owner W2-06; 01 §10, D-91).
+#
+# Same shape as common.yaml. A review, order, sale or report that is not the caller's, or a
+# review that is hidden from the caller, is the common not_found. A move that is already made
+# (hiding a hidden review, resolving a resolved report, editing a hidden review) is the common
+# invalid_transition. Bad stars, text, tags or a request that names both or neither of orderId
+# and posSaleId are validation_failed on the field.
+domain: reviews
+problems:
+  - code: review_edit_window_passed
+    status: 409
+    i18n: problems.review_edit_window_passed
+    title: This review can no longer be edited
+  - code: review_not_eligible
+    status: 409
+    i18n: problems.review_not_eligible
+    title: You can review a shop only after you have collected or received the order
+  - code: review_exists
+    status: 409
+    i18n: problems.review_exists
+    title: You have already reviewed this order
+  - code: review_reply_exists
+    status: 409
+    i18n: problems.review_reply_exists
+    title: This review already has a reply; edit it instead

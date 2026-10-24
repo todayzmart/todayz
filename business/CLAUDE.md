@@ -56,3 +56,5 @@ W2-10 (weekend slice): B-04 Orders in `src/orders/` with routes `src/routes/orde
 - `store.ts`: the current shop and the role come from the same `listBusinesses` answer the picker uses. Cancel on an accepted order is manager and above only (D-65).
 - `CodeEntry.tsx`: the pickup code lives in component state only (never in a query key, URL, storage or log), is cleared after every answer, and shows tries left on `code_invalid` and the lock on `code_locked`.
 - Stack journey: `e2e/orders.stack.spec.ts` (customer by API, shop in the browser). Passes on the seed (`docs/qa/stack-2026-10-24/`).
+
+W2-12: B-07 Stock (`src/stock/`), B-08 Offers and banners (`src/offers/`), B-11 Reviews (`src/reviews/`) and B-10 Credits (`src/credits/`), each with its route under `src/routes/<area>/`. Stock, offers and reviews use the generated client; `stock/api.ts` (create product, import) and `credits/api.ts` are adapters marked `TODO(merge)`. Reviews, Credits and Offers still need `nav.ts` entries. Report: `docs/qa/W2-12/REPORT.md`.
