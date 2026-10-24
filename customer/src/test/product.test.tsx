@@ -41,9 +41,11 @@ describe('C-08 Product detail', () => {
   });
 
   it('lists other nearby shops that have the same product', async () => {
-    renderDiscover(`/s/${SHOP_A}/i/${ID}`, routes());
+    const { calls } = renderDiscover(`/s/${SHOP_A}/i/${ID}`, routes());
     atBengaluru();
     expect(await screen.findByText('Other nearby shops')).toBeInTheDocument();
+    // The server filters on the master product; the app no longer matches by name alone.
+    expect(calls.find((c) => c.path === '/v1/discover/search')?.query.get('productId')).toBe('01KE0S1W6W8ZV7T1C3A6PROD01');
     expect(screen.getByText('Annapurna Kirana')).toBeInTheDocument();
     expect(screen.getByText('₹250')).toBeInTheDocument();
   });

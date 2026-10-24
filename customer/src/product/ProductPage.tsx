@@ -50,15 +50,14 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
   const item = found.data?.item;
   const serverNow = found.data?.serverNow ?? '';
 
-  // Other nearby shops: the discover search by name, keeping the results with the same product.
-  // TODO(lead): the search has no productId filter, so this matches by name and filters on the client.
+  // Other nearby shops: the discover search limited to this master product (`productId`; `q` stays required).
   const others = useQuery({
     queryKey: ['discover', 'others', item?.productId ?? null, coords?.lat ?? null, coords?.lng ?? null, km],
     enabled: item !== undefined && coords !== null,
     staleTime: 60_000,
     queryFn: async () => {
       if (!item || !coords) return [];
-      const r = await searchDiscover({ q: item.name, lat: coords.lat, lng: coords.lng, radius: radiusM(km), limit: 20 });
+      const r = await searchDiscover({ q: item.name, productId: item.productId, lat: coords.lat, lng: coords.lng, radius: radiusM(km), limit: 20 });
       const out = r.results.flatMap((res) =>
         res.store.storeSlug === slug
           ? []
