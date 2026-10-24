@@ -1183,3 +1183,7 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 - TODO(lead): removing `MSG91_AUTH_KEY` from `modules/secrets` destroys that secret if it was ever applied. Nothing has been applied yet.
 - TODO(lead): price. `CostPerUnitPaise` for SMS still needs the AWS India price per part.
 - TODO(lead): legacy routes. Remove the legacy MSG91 SMS mock routes when nothing uses them.
+
+## Orders finish (W2-02 finish, 2026-10-24)
+
+**D-216 · The checkout quote is informational; only placing refuses credits (lead, 24 Oct, Q-1).** `POST /v1/me/orders` with `creditsToUse` above `credit_max_per_order` is refused with 409 `credit_max_exceeded` (04 §2, CR-02), never clamped. The same goes for credits on a bill under the credit minimum (409 `below_credit_minimum`). A wallet that no longer covers the credits asked is 409 `price_changed` with the current quote. `POST /v1/me/checkout/quote` keeps clamping to what the rules allow and reports why in `creditsLimit` (D-76), so the customer app's credits probe keeps working; the quote has no new `x-problems`. Test: `TestCR02PlacingRefusesCreditsItCannotUse` (quote with 31 clamps to 30 with `creditsLimit: credit_max_exceeded`; placing 31 is 409).
