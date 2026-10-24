@@ -50,6 +50,7 @@ import (
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
+	"github.com/todayz/backend/internal/platform/money"
 	"github.com/todayz/backend/internal/platform/notice"
 	"github.com/todayz/backend/internal/platform/pii"
 	"github.com/todayz/backend/internal/platform/settings"
@@ -94,7 +95,7 @@ const (
 	// maxRewardCredits is the referrals CHECK bound on a reward snapshot.
 	maxRewardCredits = 100_000 //settings:ok the ck_referrals_credits bound, not a setting
 	// paisePerCredit: one credit is ₹1 (01 §7).
-	paisePerCredit = 100 //settings:ok ₹1 per credit, a unit not a setting
+	paisePerCredit = money.PaisePerCredit
 	// sweepBatch bounds one sweep pass per list.
 	sweepBatch = 200
 )

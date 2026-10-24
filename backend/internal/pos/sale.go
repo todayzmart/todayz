@@ -19,9 +19,11 @@ import (
 	"github.com/todayz/backend/internal/platform/authz/policy"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/money"
 	"github.com/todayz/backend/internal/platform/pii"
 	"github.com/todayz/backend/internal/platform/realtime"
 	"github.com/todayz/backend/internal/platform/settings"
+	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
 // codeTries is how many wrong counter codes lock a bill (01 §6).
@@ -208,7 +210,11 @@ func (s *Service) writeSale(ctx context.Context, st posdb.StoreInfoRow, in saleW
 		if err != nil {
 			return written{}, fmt.Errorf("pos: bind bill claim: %w", err)
 		}
-		if err := s.credits.Capture(ctx, l.claimID, saleID); err != nil {
+		err = s.credits.Capture(ctx, l.claimID, l.customerID, in.StoreID)
+		if errors.Is(err, ErrHoldReleased) {
+			return written{}, problem.New(genproblems.ClaimExpired, "")
+		}
+		if err != nil {
 			return written{}, fmt.Errorf("pos: capture credits: %w", err)
 		}
 		if err := s.publishClaim(ctx, c); err != nil {
@@ -241,13 +247,16 @@ func (s *Service) writeSale(ctx context.Context, st posdb.StoreInfoRow, in saleW
 	return written{Sale: row, Lines: lines, Receipt: &token}, nil
 }
 
-// rewards posts a linked sale's cashback and qualifies its referral on what
-// the customer paid before round-off.
+// rewards posts a linked sale's cashback on what the customer paid before
+// round-off and hands the sale to referrals, which may qualify a referral
+// (its rewards post after the sale commits, D-169).
 func (s *Service) rewards(ctx context.Context, st posdb.StoreInfoRow, row posdb.PosSale, customerID ids.ID) (posdb.PosSale, error) {
 	paid := row.TotalPaise - int64(row.RoundOffPaise)
-	saleID := mustID(row.ID)
+	saleID, storeID := mustID(row.ID), mustID(row.StoreID)
 	if c := cashbackCredits(paid, st.CashbackBp); c > 0 {
-		posted, err := s.credits.Cashback(ctx, Cashback{CustomerID: customerID, StoreID: mustID(row.StoreID), SaleID: saleID, Credits: c})
+		posted, err := s.credits.Cashback(ctx, Cashback{
+			CustomerID: customerID, StoreID: storeID, SaleID: saleID, PaidPaise: paid, CashbackBP: int(st.CashbackBp),
+		})
 		if err != nil {
 			return row, fmt.Errorf("pos: cashback: %w", err)
 		}
@@ -258,14 +267,12 @@ func (s *Service) rewards(ctx context.Context, st posdb.StoreInfoRow, row posdb.
 			}
 		}
 	}
-	minRef, err := s.paise(ctx, settings.RefQualifyingMinOrderPaise)
+	err := s.referrals.Qualify(ctx, Purchase{
+		CustomerID: customerID, StoreID: storeID, SaleID: saleID, LinkMethod: deref(row.LinkMethod),
+		EligiblePaise: paid + int64(row.CreditsUsed)*money.PaisePerCredit, CreditsUsed: int(row.CreditsUsed),
+	})
 	if err != nil {
-		return row, err
-	}
-	if paid >= minRef {
-		if err := s.referrals.Qualify(ctx, customerID, saleID, paid); err != nil {
-			return row, fmt.Errorf("pos: referral: %w", err)
-		}
+		return row, fmt.Errorf("pos: referral: %w", err)
 	}
 	return row, nil
 }
@@ -632,7 +639,9 @@ func (s *Service) ReverseSale(ctx context.Context, sc authz.Scope, saleID ids.ID
 	}
 	var row posdb.PosSale
 	var lines []posdb.PosSaleLine
+	var shortfall int // cashback credits the customer had spent (D-74)
 	err = s.db.InTx(ctx, func(ctx context.Context) error {
+		shortfall = 0
 		t, err := tx(ctx)
 		if err != nil {
 			return err
@@ -685,7 +694,15 @@ func (s *Service) ReverseSale(ctx context.Context, sc authz.Scope, saleID ids.ID
 			return fmt.Errorf("pos: release offers: %w", err)
 		}
 		if sale.CustomerID.Valid && (sale.CreditsUsed > 0 || sale.CashbackCredits > 0) {
-			if err := s.credits.ReverseSale(ctx, saleID, mustID(sale.CustomerID)); err != nil {
+			r := SaleReversal{SaleID: saleID, CustomerID: mustID(sale.CustomerID), StoreID: sc.StoreID}
+			claim, err := q.SaleBillClaim(ctx, sale.ID)
+			switch {
+			case err == nil:
+				r.ClaimID = mustID(claim)
+			case !isNoRows(err):
+				return fmt.Errorf("pos: sale bill claim: %w", err)
+			}
+			if shortfall, err = s.credits.ReverseSale(ctx, r); err != nil {
 				return fmt.Errorf("pos: reverse credits: %w", err)
 			}
 		}
@@ -698,6 +715,12 @@ func (s *Service) ReverseSale(ctx context.Context, sc authz.Scope, saleID ids.ID
 	})
 	if err != nil {
 		return posapi.PosSale{}, asProblem(err)
+	}
+	if shortfall > 0 {
+		reverseShortfall(ctx)
+		telemetry.Logger(ctx).WarnContext(ctx, "pos: reversed sale's cashback already spent; the store absorbs it",
+			"sale_id", saleID.String(), "store_id", sc.StoreID.String(), "customer_id", mustID(row.CustomerID).String(),
+			"shortfall_paise", int64(shortfall)*money.PaisePerCredit)
 	}
 	return s.saleView(ctx, row, lines, nil)
 }

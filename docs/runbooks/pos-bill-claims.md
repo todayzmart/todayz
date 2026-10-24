@@ -12,7 +12,10 @@ timers). A failed release does not fail the run, so it has its own alert:
 Every minute it expires every bill QR claim (`bill_claims`) that is `open` or `claimed`,
 has no sale and is past `expires_at` (120 s after the POS made the QR). For a claim a customer
 confirmed (`claimed_by` set), it releases the credits the confirm held (the Credits seam,
-`Release`). Each claim runs in its own savepoint, so one that fails does not hold up the rest.
+`Release`, which is the W2-01 ledger in the worker as in the API since D-132: `jobs.PosJobDeps`).
+A sale whose hold the ledger already released is refused with 409 `claim_expired` and spends
+nothing (`RefuseReleased`, D-132). Each claim runs in its own transaction, so one that fails does not hold up the rest, and the
+sweep never holds more than one customer's ledger accounts at a time (D-132).
 The summary is `expired`, `released` and `failed`.
 
 The sweep only gives holds back. The reads and the sale do not wait for it: a claim past
@@ -27,8 +30,9 @@ It is idempotent:
 - `Release` of a claim with no hold, or one released before, is a no-op (seams.go contract).
 - Rows a sale is binding right now are skipped (`FOR UPDATE SKIP LOCKED`); that sale sees the
   claim expired and refuses, and the next tick expires it.
-- It pages through the due claims by `(expires_at, id)`, 500 a page, one transaction a page, until
-  none is left or the job's 30 s timeout ends; a page that committed stays done.
+- It reads the due claims by `(expires_at, id)`, 500 a page, without locks, then expires and
+  releases each one in its own transaction (`LockDueBillClaim`), until none is left or the job's
+  30 s timeout ends; a claim that committed stays done.
 - A claim whose `Release` fails is rolled back on its own, stays live and is retried next tick
   (counted in `failed` and in `tz_pos_claim_release_failed_total`).
 
@@ -60,3 +64,12 @@ It is idempotent:
   `job_not_runnable`). Fix the cause; the next tick picks the claims up.
 - Never edit `bill_claims` or a credit hold by hand. A hold that stays after its claim expired is
   a credits incident: tell the W2-01 owner with the claim id.
+
+## Sync retries
+
+A sync batch is one transaction. If Postgres picks it as a deadlock victim (`40P01`) or a
+serialization failure (`40001`), usually against this sweep releasing a claim of a customer in
+the batch, the whole batch is retried, up to 3 attempts (D-132). Each retry logs
+`pos: sync transaction retried` (store id, attempt) and counts in `tz_pos_sync_retried_total`.
+A few a day is expected; a steady rise means a new lock-order problem: read the warn logs'
+errors and D-132's lock order before anything else.

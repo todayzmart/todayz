@@ -19,6 +19,10 @@ type BP int64
 // Whole is 100 % in basis points.
 const Whole BP = 10000
 
+// PaisePerCredit is what one TodayZ credit is worth: ₹1 (01 §7), a fixed
+// unit, not a setting, that pos, credits and referrals count credits in.
+const PaisePerCredit = 100
+
 // ErrOverflow is returned when a result does not fit in int64.
 var ErrOverflow = errors.New("money: overflow")
 

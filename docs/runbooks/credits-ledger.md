@@ -19,6 +19,8 @@ Every run is idempotent. A run works at most 20 batches of 100 customers; the ne
 Holds and spends also expire a customer's due lots inline, so a late `credits_expire` never lets
 anyone spend an expired credit. Job arguments carry no customer data.
 
+A counter sale (W2-04) posts under `ref_type` `pos_sale`: its cashback (key `cashback:pos_sale:<sale>`), and on a reversal `reversal` transactions keyed `reverse:pos_sale:<sale>` (spent credits back to their lots, the expired part to `platform_expired`) and `clawback:pos_sale:<sale>` (the cashback taken back up to the balance, the store absorbs the rest); the spend itself is the bill claim's hold (`bill_claim`). `Reverse` run twice is a no-op (D-132). `Reverse` always posts its `reverse:<ref>` marker, with no entries when there is nothing to give back, so a later `Complete` on that ref (an order or a sale) is refused with `ErrReversed`; a reversal of a hold still `held` is refused with `ErrHoldOpen`. When the customer has spent the cashback, the shortfall the store absorbs is logged at warn level (`pos: reversed sale's cashback already spent; the store absorbs it`, ids and `shortfall_paise` only) and counted in `tz_credits_reverse_shortfall_total` (emitted by pos after the reversal commits). It is not an error: a rise means customers spend cashback before stores reverse, which is a product question, not a ledger fault.
+
 ## The reconcile reasons
 
 | `reason` | Means |

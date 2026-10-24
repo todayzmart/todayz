@@ -127,6 +127,11 @@ func (NoOffers) Price(_ context.Context, _, _ ids.ID, _ time.Time, lines []Price
 // pricing the bill and writing the sale; the sale is not written.
 var ErrOfferGone = errors.New("pos: an offer is no longer available")
 
+// ErrHoldReleased is Credits.Capture's answer for a claim whose hold was
+// released (the sweep expired it): the sale is refused as claim_expired and
+// spends nothing (D-132).
+var ErrHoldReleased = errors.New("pos: the claim's credit hold was released")
+
 // Redeemer records the offers an online sale used against their limits and
 // gives them back when the sale is reversed. Both run in the sale's
 // transaction (the context's).
@@ -153,10 +158,18 @@ type CreditsAllowance struct {
 	Limit   string
 }
 
-// Cashback is the cashback a linked sale earns (D-07).
+// Cashback is the cashback a linked sale earns (D-07): CashbackBP of the
+// paise the customer paid (after offers and credits, before round-off).
 type Cashback struct {
 	CustomerID, StoreID, SaleID ids.ID
-	Credits                     int
+	PaidPaise                   int64
+	CashbackBP                  int
+}
+
+// SaleReversal is a reversed linked sale: the credits its bill claim spent
+// (ClaimID, zero without one) and the cashback it earned.
+type SaleReversal struct {
+	SaleID, CustomerID, StoreID, ClaimID ids.ID
 }
 
 // Credits is the customer's credit ledger (W2-01).
@@ -167,12 +180,13 @@ type Credits interface {
 	Allow(ctx context.Context, customerID, storeID ids.ID, requested int, eligiblePaise int64) (CreditsAllowance, error)
 	// Hold reserves credits for a confirmed bill claim and returns how many
 	// it held (at most credits). Holding the same claim again returns the
-	// first hold.
-	Hold(ctx context.Context, customerID, storeID, claimID ids.ID, credits int) (held int, err error)
+	// first hold. eligiblePaise is the bill's amount.
+	Hold(ctx context.Context, customerID, storeID, claimID ids.ID, credits int, eligiblePaise int64) (held int, err error)
 	// Capture spends a claim's hold on the sale it was bound to. It must
 	// fail (not do nothing) for a hold that was released, so a sale never
-	// takes credits the customer got back; a claim with no hold is a no-op.
-	Capture(ctx context.Context, claimID, saleID ids.ID) error
+	// takes credits the customer got back (ErrHoldReleased); a claim with no
+	// hold is a no-op.
+	Capture(ctx context.Context, claimID, customerID, storeID ids.ID) error
 	// Release returns a claim's hold that no sale used: the claim was
 	// superseded by a newer claim for the bill, another claim was bound, or
 	// it expired (D-131). A claim with no hold, or released before, is a
@@ -181,8 +195,10 @@ type Credits interface {
 	// Cashback posts a linked sale's cashback and returns what it posted.
 	Cashback(ctx context.Context, in Cashback) (posted int, err error)
 	// ReverseSale returns the credits a reversed sale spent and takes back
-	// its cashback.
-	ReverseSale(ctx context.Context, saleID, customerID ids.ID) error
+	// its cashback, as much of it as the customer still has (D-74). It
+	// returns the shortfall: the cashback credits the customer had already
+	// spent, which the store absorbs. A repeat is a no-op.
+	ReverseSale(ctx context.Context, r SaleReversal) (shortfall int, err error)
 }
 
 // NoCredits is Credits until credits are live: none may be used and no
@@ -195,10 +211,12 @@ func (NoCredits) Allow(context.Context, ids.ID, ids.ID, int, int64) (CreditsAllo
 }
 
 // Hold implements Credits.
-func (NoCredits) Hold(context.Context, ids.ID, ids.ID, ids.ID, int) (int, error) { return 0, nil }
+func (NoCredits) Hold(context.Context, ids.ID, ids.ID, ids.ID, int, int64) (int, error) {
+	return 0, nil
+}
 
 // Capture implements Credits.
-func (NoCredits) Capture(context.Context, ids.ID, ids.ID) error { return nil }
+func (NoCredits) Capture(context.Context, ids.ID, ids.ID, ids.ID) error { return nil }
 
 // Release implements Credits.
 func (NoCredits) Release(context.Context, ids.ID) error { return nil }
@@ -207,15 +225,27 @@ func (NoCredits) Release(context.Context, ids.ID) error { return nil }
 func (NoCredits) Cashback(context.Context, Cashback) (int, error) { return 0, nil }
 
 // ReverseSale implements Credits.
-func (NoCredits) ReverseSale(context.Context, ids.ID, ids.ID) error { return nil }
+func (NoCredits) ReverseSale(context.Context, SaleReversal) (int, error) { return 0, nil }
 
 // --- referrals -----------------------------------------------------------------
 
-// Referrals qualifies a referred customer's first purchase (the referrals
-// WP). The service calls Qualify only for a bill_qr or counter_code sale of
-// at least RefQualifyingMinOrderPaise after discounts and credits.
+// Purchase is a linked sale as referrals counts it (W2-03): EligiblePaise is
+// what the bill came to before credits (CreditsUsed of them), so the
+// qualifying amount is EligiblePaise − CreditsUsed × 100 (D-32).
+type Purchase struct {
+	CustomerID, StoreID, SaleID ids.ID
+	LinkMethod                  string
+	EligiblePaise               int64
+	CreditsUsed                 int
+}
+
+// Referrals qualifies a referred customer's first purchase and counts a
+// sale toward a new shop's referral (W2-03). The service calls Qualify for
+// every bill_qr or counter_code sale, in the sale's transaction; referrals
+// applies ref_qualifying_min_order_paise itself (a shop's count takes any
+// amount, D-165) and posts no reward inside it (D-169).
 type Referrals interface {
-	Qualify(ctx context.Context, customerID, saleID ids.ID, qualifyingPaise int64) error
+	Qualify(ctx context.Context, p Purchase) error
 	// Revoke undoes a qualification when the sale is reversed; a reward
 	// already paid is the referrals WP's to flag.
 	Revoke(ctx context.Context, customerID, saleID ids.ID) error
@@ -225,7 +255,7 @@ type Referrals interface {
 type NoReferrals struct{}
 
 // Qualify implements Referrals.
-func (NoReferrals) Qualify(context.Context, ids.ID, ids.ID, int64) error { return nil }
+func (NoReferrals) Qualify(context.Context, Purchase) error { return nil }
 
 // Revoke implements Referrals.
 func (NoReferrals) Revoke(context.Context, ids.ID, ids.ID) error { return nil }
