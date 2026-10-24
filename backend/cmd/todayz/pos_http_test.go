@@ -480,16 +480,19 @@ func TestPOS05DuplicateBatch(t *testing.T) {
 func TestPOS06DeviceClock(t *testing.T) {
 	p := newPosShop(t)
 	now := p.a.clk.Now()
-	for _, at := range []time.Time{now.Add(-5 * time.Hour), now.Add(2 * time.Hour)} {
+	for _, at := range []time.Time{now.Add(-5 * time.Hour), now.Add(2 * time.Hour), now.Add(-80 * time.Hour)} {
 		r := p.sync(p.cashier, p.saleEntry(1, at, nil, line{p.salt, 1}))
 		require.Equal(t, []string{"applied"}, statuses(r), r.raw)
 		var sold, received time.Time
 		require.NoError(t, p.a.tdb.OwnerPool.QueryRow(context.Background(),
 			`SELECT sold_at, received_at FROM pos_sales WHERE id = $1`, uuidOf(t, results(r)[0]["saleId"].(string))).Scan(&sold, &received))
 		require.True(t, received.Equal(p.a.clk.Now()), "received_at is the server's")
-		if at.After(now) {
+		switch {
+		case at.After(now):
 			require.True(t, sold.Equal(received), "a device ahead of the server is clamped to received_at (D-131)")
-		} else {
+		case now.Sub(at) > 72*time.Hour:
+			require.True(t, sold.Equal(received.Add(-72*time.Hour)), "at most 72 h before received_at (01 §17)")
+		default:
 			require.True(t, sold.Equal(at), "sold_at is the device's time")
 		}
 	}

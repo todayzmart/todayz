@@ -41,6 +41,11 @@ const (
 	codeCheckTTL      = 2 * time.Minute //settings:ok D-131 fixed age of a verified check
 )
 
+// soldAtMaxAge is the 01 §17 "sold_at clamp for offline sales" (72 h, a
+// fixed value). TODO(lead): 01 names the number but not the direction; read
+// as the oldest sold_at a sync records (D-131).
+const soldAtMaxAge = 72 * time.Hour
+
 // Link methods and statuses (pos_sales.link_method, link_status).
 const (
 	methodBillQR      = "bill_qr"
@@ -124,10 +129,13 @@ func (s *Service) writeSale(ctx context.Context, st posdb.StoreInfoRow, in saleW
 	saleID := s.ids.New(now)
 	l := in.Link
 	// A device's clock may run ahead: a sale is never sold after it was
-	// received (D-131).
+	// received, nor more than soldAtMaxAge before (01 §17, D-131).
 	soldAt := in.SoldAt.UTC().Truncate(time.Microsecond)
-	if soldAt.After(now) {
+	switch {
+	case soldAt.After(now):
 		soldAt = now
+	case soldAt.Before(now.Add(-soldAtMaxAge)):
+		soldAt = now.Add(-soldAtMaxAge)
 	}
 	row, err := q.InsertSale(ctx, posdb.InsertSaleParams{
 		ID: ids.UUID(saleID), StoreID: ids.UUID(in.StoreID), ClientID: ids.UUID(in.ClientID),

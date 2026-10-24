@@ -1,6 +1,6 @@
 # W2-04 POS backend and sync: QA report
 
-The Go backend for the counter: online sales, the offline outbox sync, bill QR claims, counter codes, receipts and purchases. Branch `claude/wp-w2-04-pos-421f24`, cut from `main`, with `main` merged back in at 0f2f4ed (W2-06 reviews, W2-07 offers, the shared test Postgres); not yet merged into `main`. Everything ran locally against PostGIS (testcontainers, then the shared test server); nothing touched a cloud account. Decisions are in D-130 (`docs/plan/12-decision-log.md`).
+The Go backend for the counter: online sales, the offline outbox sync, bill QR claims, counter codes, receipts and purchases. Branch `claude/wp-w2-04-pos-421f24`, cut from `main`, with `main` merged back in at 0f2f4ed (W2-06 reviews, W2-07 offers, the shared test Postgres); not yet merged into `main`. Everything ran locally against PostGIS (testcontainers, then the shared test server); nothing touched a cloud account. Decisions are in D-130 and, for the lead's review fixes, D-131 (`docs/plan/12-decision-log.md`).
 
 ## What was built
 
@@ -77,6 +77,22 @@ After merging `main` and wiring offers and reviews (64b075b), with `TODAYZ_TEST_
 | `internal/pos`, `internal/reviews`, `internal/offers` unit and DB tests | ok |
 | `go test -race -p 2 ./cmd/todayz/` (whole package) | ok, 161 s |
 
+## Review fixes (D-131)
+
+The lead's W2-04 review: no blockers. Each item was landed on this branch with a test (`cmd/todayz/pos_review_http_test.go` unless named).
+
+| Item | What changed | Test |
+|---|---|---|
+| MUST 1, code brute force | `counter_code_failures`: 5 per (store, phone) in 15 min lock the phone at the store for 15 min; 20 per cashier in an hour lock the cashier for an hour. Advisory locks: cashier, then phone. Offline wrong or reused codes count too (`source = 'sync'`); a locked phone fails the sync's remaining links | `TestPOSPhoneLockAcrossBills` (a new `saleClientId` is still locked; unlocks after 15 min), `TestPOSCashierCodeLock`, `TestPOSOfflineCodesHitTheLock` (7 wrong then the right code in one sync: all failed, 5 counted, locked online after) |
+| MUST 2, `sold_at` | Clamped to at most `received_at` (and at least 72 h before it, 01 §17). An offline sale's reversal window runs from `received_at` | `TestPOSReversalWindowFromReceived` (`at` 20 h ahead, reversal after 24 h is `reversal_window_passed`; a sale 5 h behind reverses 23 h after it arrived), `TestPOS06DeviceClock` |
+| MUST 3, guard tables | `REVOKE DELETE, TRUNCATE` on `counter_code_uses` and `counter_code_checks`; `UPDATE, DELETE, TRUNCATE` on `sync_entries`, `receipt_tokens` and `counter_code_failures`; `no_truncate` triggers; 20401 edited in place | `TestPOSGuardTablesAppendOnly` (`todayz_app` DELETE, TRUNCATE and UPDATE denied; the owner's TRUNCATE refused) |
+| SHOULD 4, offline offer discount | Accepted as sold; counts with the offline links against `pos_offline_links_risk_per_day`; a cashier without `pos.discount` also raises `pos.offline_offer_without_discount_role` | `TestPOSOfflineOfferDiscount` |
+| SHOULD 5, bill-QR retry | Same `clientId` under a new key returns the sale (replay), also when both arrive at once | `TestPOSBillQRConcurrentRetry` (3 rounds of two at once: both 200, one sale, one capture) |
+| SHOULD 6, credit holds | A new QR cancels the bill's earlier claims and releases their holds; a confirmed claim past `expires_at` is `claim_expired` at bind; the bill's sale releases the others; timer `pos_bill_claim_expiry` + runbook; `Capture` must fail on a released hold (seams.go). The test fake records each Release and Capture and refuses a capture after a release | `TestPOSClaimHoldLifecycle` (two claims for one bill; late bind; plain sale; the sweep through the service and through the registered timer) |
+| Nits | Manual discount past the offer's remainder is `422`, not clamped; a verified check binds for 2 min; `Stock.Reverse` errors are `409 invalid_transition`; the re-confirm comment fixed; receipt token on replay left open (question 17) | `TestPOSManualDiscountAndCheckAge` |
+
+`TestPOSBillQRSale` now sells within the claim's 120 s, since a late bind is refused.
+
 ## Coverage of SC-POS (08-testing.md)
 
 | Scenario | Where | Notes |
@@ -108,13 +124,13 @@ Tests never print codes, tokens or phones. `noSecrets` captures the API's log ou
 
 Each one has the most conservative reading built, and the ones in code are marked `TODO(lead):`.
 
-1. **How long a confirmed QR stays usable** (`sale.go`, TODO). Built: once confirmed inside 120 s, the sale may use it after 120 s too. Should that have a cap?
-2. **Hold release:** nothing in pos releases credits held by a claim that was confirmed but never used. Built: that sweep is assumed to live in the credits domain.
+1. **How long a confirmed QR stays usable:** resolved by the review (D-131). A sale binds a claim only before its `expires_at`.
+2. **Hold release:** resolved by the review (D-131). A new QR, the bill's sale and the `pos_bill_claim_expiry` timer release holds. Still open: the worker's Credits is the do-nothing default until W2-01 wires its ledger into `internal/jobs/pos.go` (`TODO(lead)`).
 3. **`phone_unverified` sales:** should they link later, once the customer verifies that phone? Built: they never link.
 4. **Realtime catalogue:** `bill_claim.updated` is not in `realtime.yaml` or the shared catalogue yet.
 5. **Pricer:** resolved. W2-07's `offers.Service` is wired through `offersForPos`.
 6. **Offline-link risk flag score** (`sync.go`, TODO). Built: 50.
-7. **Counter-code lockout:** it raises no risk flag. Should five wrong codes flag the store?
+7. **Counter-code lockout:** it now locks per phone and per cashier (D-131), but it still raises no risk flag. Should a phone or cashier lock flag the store?
 8. **Device secret rotation** (`totp.go`, TODO). `DEVICE_SECRET_ENC_KEY` rotation and a customer's "reset my code" are not built.
 9. **Fixed 30-day windows:** `changesKept` (cursor) and the receipt TTL are constants, not `platform_settings`. 01 lists no setting for them.
 10. **Files outside the owned folders:** `cmd/todayz/pos_http_test.go` and the `posSeams` hook in `routes_pos.go` live in `cmd/todayz`.
@@ -124,6 +140,11 @@ Each one has the most conservative reading built, and the ones in code are marke
 14. **Walk-in pricing:** the sale is priced with no customer, even when a customer is linked; the redemption records the linked customer. Per-customer offers therefore never apply at the counter. Should the sale price with the linked customer?
 15. **An offer that runs out mid-sale:** `409 price_changed` with no extension members; the POS re-sends and gets the new prices. A dedicated code may read better at the counter.
 16. **FKs to `pos_sales` and `bill_claims`:** not added here (see below).
+17. **Receipt token on a replay** (open item from the review). A replayed sale (same `clientId`, the idempotent retry or the bill-QR retry) comes back without `receiptToken`: the token is shown once and stored only hashed. The POS keeps the first one; reissuing would need a new token row per replay.
+18. **The 72 h `sold_at` clamp** (`sale.go`, TODO). 01 §17 lists "sold_at clamp for offline sales, 72 h" with no direction. Built: an offline `sold_at` is never more than 72 h before `received_at`, and never after it.
+19. **`pos.offline_offer_without_discount_role` score** (`sync.go`, TODO). Built: 50, as for `pos.offline_links`.
+20. **Plan text to update** (not W2-04's files): 03 §5 says that a reversal is allowed within the window "of `sold_at`". For an offline sale, the window now runs from `received_at`. The counter-code row in 01 §6 says "5 wrong tries per bill"; D-131 adds 5 per phone at a store in 15 minutes and 20 per cashier in an hour.
+21. **Deadlocks between syncs:** a code check locks the cashier, then the phone. Two cashiers' syncs that touch the same phones in different orders can deadlock. Postgres aborts one of them (a 500), and the device retries with the same key. Should the sync sort its counter-code entries by phone first?
 
 ## The cross-package FKs
 
