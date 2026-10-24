@@ -33,6 +33,8 @@ export interface SyncState {
   /** Epoch ms of the next automatic attempt while backing off. */
   nextAttemptAt: number | null;
   attempts: number;
+  /** Goes up whenever the stored catalogue changes, so the screen reloads it. */
+  catalogueVersion: number;
 }
 
 export interface EngineDeps {
@@ -82,6 +84,7 @@ export function createSyncEngine(deps: EngineDeps) {
     lastError: null,
     nextAttemptAt: null,
     attempts: 0,
+    catalogueVersion: 0,
   };
   let singleMode = false;
   let chain: Promise<unknown> = Promise.resolve();
@@ -216,12 +219,14 @@ export function createSyncEngine(deps: EngineDeps) {
       settings: keep,
       syncedAt: new Date(now()).toISOString(),
     });
+    set({ catalogueVersion: state.catalogueVersion + 1 });
   }
 
   async function downloadSnapshot() {
     set({ status: 'resync' });
     const snap = await api.getSnapshot();
     await storage.saveCatalogue(snap.items, { cursor: snap.cursor, settings: snap.settings, syncedAt: new Date(now()).toISOString() });
+    set({ catalogueVersion: state.catalogueVersion + 1 });
     await noteServerTime(snap.serverNow);
   }
 
