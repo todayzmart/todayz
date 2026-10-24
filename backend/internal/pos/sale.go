@@ -44,7 +44,7 @@ const (
 // soldAtMaxAge is the 01 §17 "sold_at clamp for offline sales" (72 h, a
 // fixed value). TODO(lead): 01 names the number but not the direction; read
 // as the oldest sold_at a sync records (D-131).
-const soldAtMaxAge = 72 * time.Hour
+const soldAtMaxAge = 72 * time.Hour //settings:ok 01 §17 lists this 72 h as a fixed value, not a setting
 
 // Link methods and statuses (pos_sales.link_method, link_status).
 const (
