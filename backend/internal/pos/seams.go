@@ -120,6 +120,27 @@ func (NoOffers) Price(_ context.Context, _, _ ids.ID, lines []PriceLine) (Pricin
 	return Pricing{LineDiscounts: make([]int64, len(lines))}, nil
 }
 
+// ErrOfferGone is what a Redeemer returns when an offer ran out between
+// pricing the bill and writing the sale; the sale is not written.
+var ErrOfferGone = errors.New("pos: an offer is no longer available")
+
+// Redeemer records the offers an online sale used against their limits and
+// gives them back when the sale is reversed. Both run in the sale's
+// transaction (the context's).
+type Redeemer interface {
+	Redeem(ctx context.Context, saleID, customerID ids.ID, applied []AppliedOffer) error
+	Release(ctx context.Context, saleID ids.ID) error
+}
+
+// NoRedeem is the Redeemer without offers: nothing to count.
+type NoRedeem struct{}
+
+// Redeem implements Redeemer.
+func (NoRedeem) Redeem(context.Context, ids.ID, ids.ID, []AppliedOffer) error { return nil }
+
+// Release implements Redeemer.
+func (NoRedeem) Release(context.Context, ids.ID) error { return nil }
+
 // --- credits -------------------------------------------------------------------
 
 // CreditsAllowance is how many credits a bill may use. Limit names why it

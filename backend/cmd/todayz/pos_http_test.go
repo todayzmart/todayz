@@ -1178,3 +1178,72 @@ func uuidStrings(t *testing.T, ss []string) []string {
 	}
 	return out
 }
+
+// W2-07 at the counter: the real offers service prices an online sale on the
+// POS channel, the sale redeems the offer in its transaction, a reversal
+// gives it back, and an offline sale (priced on the device) redeems nothing.
+func TestPOSOffersRedeemAndRelease(t *testing.T) {
+	p := newPosShop(t)
+	offer := p.offerOn("percent", 10, nil)
+	s := p.sell(p.cashier, p.saleBody(p.newID(), line{p.atta, 1})) // ₹290 → 10% = ₹29
+	require.Equal(t, http.StatusOK, s.code, s.raw)
+	ln := s.body["lines"].([]any)[0].(map[string]any)
+	require.EqualValues(t, 2900, ln["offerDiscountPaise"])
+	require.EqualValues(t, 26100, s.body["totalPaise"])
+	saleID := s.body["id"].(string)
+	require.Equal(t, 1, p.a.count(`SELECT count(*) FROM offer_redemptions WHERE offer_id = $1 AND pos_sale_id = $2 AND released_at IS NULL`,
+		uuidOf(t, offer), uuidOf(t, saleID)))
+
+	rv := p.reverse(p.manager, saleID)
+	require.Equal(t, http.StatusOK, rv.code, rv.raw)
+	require.Equal(t, 1, p.redemptions(offer, true))
+	require.Zero(t, p.redemptions(offer, false))
+
+	sy := p.sync(p.cashier, p.saleEntry(1, p.a.clk.Now(), nil, line{p.salt, 1}))
+	require.Equal(t, []string{"applied"}, statuses(sy), "sync: status %d", sy.code)
+	require.Equal(t, 1, p.a.count(`SELECT count(*) FROM offer_redemptions WHERE offer_id = $1`, uuidOf(t, offer)))
+
+	// An offer that has run out no longer prices the bill.
+	one := 1
+	capped := p.offerOn("flat", 1000, &one)
+	a := p.sell(p.cashier, p.saleBody(p.newID(), line{p.salt, 1}))
+	require.Equal(t, http.StatusOK, a.code, a.raw)
+	b := p.sell(p.cashier, p.saleBody(p.newID(), line{p.salt, 1}))
+	require.Equal(t, http.StatusOK, b.code, b.raw)
+	require.Equal(t, 1, p.redemptions(capped, false))
+	require.Less(t, a.body["totalPaise"].(float64), b.body["totalPaise"].(float64))
+}
+
+// W2-06 meets the POS: a customer reviews their counter-code sale once; a
+// phone-only sale is not theirs, and a reversed sale is not eligible.
+func TestPOSSaleReview(t *testing.T) {
+	p := newPosShop(t)
+	linked := func() string {
+		code := testTOTP(p.seed(p.cust), p.a.clk.Now())
+		bill := p.newID()
+		require.Equal(t, http.StatusOK, p.verifyCode(p.cashier, custPhone, code, bill).code)
+		body := p.saleBody(bill, line{p.atta, 1})
+		body["link"] = map[string]any{"method": "counter_code"}
+		s := p.sell(p.cashier, body)
+		require.Equal(t, http.StatusOK, s.code, s.raw)
+		p.a.clk.Advance(2 * time.Minute) // the next code is a new step
+		return s.body["id"].(string)
+	}
+	review := func(saleID string) resp {
+		return p.a.call(p.cust, http.MethodPost, "/v1/me/reviews", map[string]any{"posSaleId": saleID, "stars": 5}, nil)
+	}
+	sale := linked()
+	r := review(sale)
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	require.Equal(t, "review_exists", problemCode(review(sale)))
+
+	phone := p.saleBody(p.newID(), line{p.salt, 1})
+	phone["link"] = map[string]any{"method": "phone_unverified", "phone": custPhone}
+	ps := p.sell(p.cashier, phone)
+	require.Equal(t, http.StatusOK, ps.code, ps.raw)
+	require.Equal(t, http.StatusNotFound, review(ps.body["id"].(string)).code)
+
+	reversed := linked()
+	require.Equal(t, http.StatusOK, p.reverse(p.manager, reversed).code)
+	require.Equal(t, "review_not_eligible", problemCode(review(reversed)))
+}

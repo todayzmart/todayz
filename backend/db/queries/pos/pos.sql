@@ -89,6 +89,9 @@ SELECT * FROM pos_sales WHERE store_id = @store_id AND client_id = @client_id;
 -- name: GetSale :one
 SELECT * FROM pos_sales WHERE id = @id AND store_id = @store_id;
 
+-- name: SaleRef :one
+SELECT store_id, customer_id, link_method, link_status, status FROM pos_sales WHERE id = @id;
+
 -- name: LockSale :one
 SELECT * FROM pos_sales WHERE id = @id AND store_id = @store_id
 FOR UPDATE;

@@ -14,7 +14,7 @@ import (
 // routes (/v1/admin/reviews*, /v1/admin/review-reports*) pulled forward from
 // W3-05. There is no routes_admin-reviews.go (one routes file per domain).
 func mountReviews(r chi.Router, d *deps) {
-	rd := reviews.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings}
+	rd := reviews.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings, Sales: posForReviews{newPos(d)}}
 	if d.DB != nil {
 		var hashKey []byte
 		if d.Config != nil {

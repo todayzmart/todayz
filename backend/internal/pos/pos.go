@@ -74,6 +74,9 @@ type Deps struct {
 	Stock Stock
 	// Pricer applies offers to an online sale; nil means no offers.
 	Pricer Pricer
+	// Redeemer counts an online sale's offers against their limits and gives
+	// them back on reversal; nil means nothing is counted.
+	Redeemer Redeemer
 	// Credits holds, spends and returns credits and posts cashback; nil
 	// means credits are not live.
 	Credits Credits
@@ -92,6 +95,7 @@ type Service struct {
 	az        authz.Authorizer
 	stock     Stock
 	pricer    Pricer
+	redeemer  Redeemer
 	credits   Credits
 	referrals Referrals
 	rnd       io.Reader
@@ -112,11 +116,14 @@ func New(d Deps) (*Service, error) {
 	}
 	s := &Service{
 		db: d.DB, clock: d.Clock, settings: d.Settings, az: d.Authz, stock: d.Stock,
-		pricer: d.Pricer, credits: d.Credits, referrals: d.Referrals, rnd: d.Rand,
+		pricer: d.Pricer, redeemer: d.Redeemer, credits: d.Credits, referrals: d.Referrals, rnd: d.Rand,
 		ids: ids.NewGenerator(),
 	}
 	if s.pricer == nil {
 		s.pricer = NoOffers{}
+	}
+	if s.redeemer == nil {
+		s.redeemer = NoRedeem{}
 	}
 	if s.credits == nil {
 		s.credits = NoCredits{}

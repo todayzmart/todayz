@@ -80,7 +80,8 @@ type saleWrite struct {
 	Payment           string
 	SoldAt            time.Time
 	Link              link
-	Path              string // the request field of the bill, for errors
+	Offers            []AppliedOffer // online only: what the bill's offers took, redeemed with the sale
+	Path              string         // the request field of the bill, for errors
 }
 
 // errSaleExists is a sale whose (store, clientId) was already written.
@@ -148,6 +149,21 @@ func (s *Service) writeSale(ctx context.Context, st posdb.StoreInfoRow, in saleW
 		})
 		if err != nil {
 			return written{}, fmt.Errorf("pos: insert sale line: %w", err)
+		}
+	}
+	if len(in.Offers) > 0 {
+		// Priced as a walk-in (the link is not known then), so no offer with
+		// a per-customer limit applied; a linked customer is recorded.
+		var customer ids.ID
+		if l.ledger() {
+			customer = l.customerID
+		}
+		err := s.redeemer.Redeem(ctx, saleID, customer, in.Offers)
+		if errors.Is(err, ErrOfferGone) {
+			return written{}, problem.New(genproblems.PriceChanged, "")
+		}
+		if err != nil {
+			return written{}, fmt.Errorf("pos: redeem offers: %w", err)
 		}
 	}
 	if l.claimID != ids.Zero {
@@ -295,7 +311,7 @@ func (s *Service) CreateSale(ctx context.Context, sc authz.Scope, body posapi.Po
 			return posapi.PosSale{}, err
 		}
 	}
-	billOffer, err := s.offers(ctx, sc.StoreID, lines)
+	billOffer, applied, err := s.offers(ctx, sc.StoreID, lines)
 	if err != nil {
 		return posapi.PosSale{}, asProblem(err)
 	}
@@ -332,7 +348,7 @@ func (s *Service) CreateSale(ctx context.Context, sc authz.Scope, body posapi.Po
 		out, err = s.writeSale(ctx, st, saleWrite{
 			StoreID: sc.StoreID, ClientID: clientID, Cashier: p.UserID, Device: device,
 			StockDevice: realDevice(device, real), Bill: b, Payment: string(body.PaymentMethod),
-			SoldAt: s.now(), Link: l, Path: "body",
+			SoldAt: s.now(), Link: l, Offers: applied, Path: "body",
 		})
 		if errors.Is(err, errSaleExists) {
 			replay = true
@@ -441,8 +457,8 @@ func (s *Service) items(ctx context.Context, storeID ids.ID, want []pgtype.UUID)
 }
 
 // offers runs the offers engine over the catalogued lines and sets their
-// offer discounts; it returns the bill's.
-func (s *Service) offers(ctx context.Context, storeID ids.ID, lines []lineInput) (int64, error) {
+// offer discounts; it returns the bill's and the offers to redeem.
+func (s *Service) offers(ctx context.Context, storeID ids.ID, lines []lineInput) (int64, []AppliedOffer, error) {
 	var pl []PriceLine
 	var at []int
 	for i, l := range lines {
@@ -452,11 +468,11 @@ func (s *Service) offers(ctx context.Context, storeID ids.ID, lines []lineInput)
 		}
 	}
 	if len(pl) == 0 {
-		return 0, nil
+		return 0, nil, nil
 	}
 	pr, err := s.pricer.Price(ctx, ids.Zero, storeID, pl)
 	if err != nil {
-		return 0, fmt.Errorf("pos: offers: %w", err)
+		return 0, nil, fmt.Errorf("pos: offers: %w", err)
 	}
 	for j, i := range at {
 		if j < len(pr.LineDiscounts) {
@@ -465,7 +481,7 @@ func (s *Service) offers(ctx context.Context, storeID ids.ID, lines []lineInput)
 			lines[i].Manual = min(lines[i].Manual, gross-lines[i].Offer)
 		}
 	}
-	return max(pr.BillDiscount, 0), nil
+	return max(pr.BillDiscount, 0), pr.Offers, nil
 }
 
 // onlineLink locks and checks the request's link. A refusal that must
@@ -604,6 +620,9 @@ func (s *Service) ReverseSale(ctx context.Context, sc authz.Scope, saleID ids.ID
 		if row, err = q.ReverseSale(ctx, posdb.ReverseSaleParams{Now: &now, ReversedBy: ids.UUID(p.UserID), Reason: note, ID: sale.ID}); err != nil {
 			return fmt.Errorf("pos: reverse sale: %w", err)
 		}
+		if err := s.redeemer.Release(ctx, saleID); err != nil {
+			return fmt.Errorf("pos: release offers: %w", err)
+		}
 		if sale.CustomerID.Valid && (sale.CreditsUsed > 0 || sale.CashbackCredits > 0) {
 			if err := s.credits.ReverseSale(ctx, saleID, mustID(sale.CustomerID)); err != nil {
 				return fmt.Errorf("pos: reverse credits: %w", err)
@@ -685,4 +704,37 @@ func realDevice(id ids.ID, real bool) ids.ID {
 		return ids.Zero
 	}
 	return id
+}
+
+// --- reads for other domains -------------------------------------------------
+
+// SaleRef is the part of a sale another domain may read (reviews, W2-06).
+type SaleRef struct {
+	StoreID ids.ID
+	// CustomerID is the linked customer; zero when none.
+	CustomerID ids.ID
+	// LinkMethod is bill_qr or counter_code once the link is verified;
+	// empty for an unlinked, phone-only or failed link.
+	LinkMethod string
+	// Completed is false for a reversed sale.
+	Completed bool
+}
+
+// SaleRef reads a sale by id; ok is false when there is none.
+func (s *Service) SaleRef(ctx context.Context, saleID ids.ID) (SaleRef, bool, error) {
+	if err := s.ready(ctx); err != nil {
+		return SaleRef{}, false, err
+	}
+	row, err := s.q(ctx).SaleRef(ctx, ids.UUID(saleID))
+	if isNoRows(err) {
+		return SaleRef{}, false, nil
+	}
+	if err != nil {
+		return SaleRef{}, false, fmt.Errorf("pos: sale ref: %w", err)
+	}
+	out := SaleRef{StoreID: mustID(row.StoreID), CustomerID: optID(row.CustomerID), Completed: row.Status == "completed"}
+	if l := (link{method: deref(row.LinkMethod), status: deref(row.LinkStatus)}); l.ledger() {
+		out.LinkMethod = l.method
+	}
+	return out, true, nil
 }
