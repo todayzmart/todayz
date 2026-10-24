@@ -417,3 +417,217 @@ DiscoverStoreItemList:
       $ref: ./common.yaml#/NextCursor
     serverNow:
       $ref: ./common.yaml#/ServerNow
+# --- W2-14 basket search (01 §11.4, D-110, D-111) ---
+BasketSearchLine:
+  type: object
+  additionalProperties: false
+  description: A basket line. Exactly one of `productId` and `text` (422 on `body.lines[i]` otherwise).
+  required: [quantity]
+  properties:
+    productId:
+      $ref: ./common.yaml#/Ulid
+    text:
+      type: string
+      minLength: 1
+      maxLength: 120
+    quantity:
+      type: integer
+      minimum: 1
+      maximum: 99
+  oneOf:
+    - required: [productId]
+    - required: [text]
+BasketSearchRequest:
+  type: object
+  additionalProperties: false
+  required: [lat, lng, lines]
+  properties:
+    lat:
+      type: number
+      format: double
+      minimum: 6
+      maximum: 38
+      description: Latitude of the search location. Never stored.
+    lng:
+      type: number
+      format: double
+      minimum: 68
+      maximum: 98
+      description: Longitude of the search location. Never stored.
+    radius:
+      type: integer
+      enum: [1000, 2000, 5000, 10000, 20000]
+      default: 2000
+      description: 'Radius in metres: the 1, 2, 5, 10 and 20 km chips (01 §11).'
+    lines:
+      type: array
+      minItems: 1
+      maxItems: 100
+      description: At most `basket_max_items` (422 on `body.lines` beyond); 100 is the setting's maximum.
+      items:
+        $ref: "#/BasketSearchLine"
+BasketBadge:
+  type: string
+  enum: [has_everything, closest, lowest_price]
+  description: At most one per result and each on at most one result; a label only (01 §11.4).
+BasketCoveredLine:
+  type: object
+  description: One covered line at a store, with what "Fill cart" puts in the cart.
+  required: [lineIndex, storeItemId, productId, name, variant, packSize, unit, pricePaise, mrpPaise, imageKey, quantity, lineTotalPaise, confirmedAt]
+  properties:
+    lineIndex:
+      type: integer
+      minimum: 0
+    storeItemId:
+      $ref: ./common.yaml#/Ulid
+    productId:
+      $ref: ./common.yaml#/Ulid
+    name:
+      type: string
+      description: The store's local name when it set one, else the product name.
+    variant:
+      type: [string, "null"]
+    packSize:
+      type: number
+      format: double
+    unit:
+      $ref: "#/DiscoverUnit"
+    pricePaise:
+      $ref: ./common.yaml#/Paise
+    mrpPaise:
+      type: [integer, "null"]
+      minimum: 0
+    imageKey:
+      type: [string, "null"]
+    quantity:
+      type: integer
+      minimum: 1
+      maximum: 99
+    lineTotalPaise:
+      $ref: ./common.yaml#/Paise
+      description: Price times quantity less the line's item offer.
+    confirmedAt:
+      type: [string, "null"]
+      format: date-time
+      description: As in discover search (01 §11.1); null when stock was not confirmed recently.
+BasketMissingLine:
+  type: object
+  required: [lineIndex]
+  properties:
+    lineIndex:
+      type: integer
+      minimum: 0
+BasketSearchStore:
+  type: object
+  description: '"{coveredCount} of {lineCount} · {distance} · ₹{total}" (01 §11.4).'
+  required: [storeId, storeSlug, storeName, locality, distanceM, open, bookable, coveredCount, lineCount, totalPaise, badge, covered, missing]
+  properties:
+    storeId:
+      $ref: ./common.yaml#/Ulid
+      description: The id the cart and checkout use.
+    storeSlug:
+      $ref: ./common.yaml#/Slug
+    storeName:
+      type: string
+    locality:
+      type: [string, "null"]
+    distanceM:
+      type: integer
+      minimum: 0
+    open:
+      type: boolean
+    bookable:
+      type: boolean
+      description: False for an In-store only store (D-41).
+    coveredCount:
+      type: integer
+      minimum: 0
+    lineCount:
+      type: integer
+      minimum: 1
+    totalPaise:
+      $ref: ./common.yaml#/Paise
+      description: The covered lines' total; a preview, checkout reprices.
+    badge:
+      oneOf:
+        - $ref: "#/BasketBadge"
+        - type: "null"
+    covered:
+      type: array
+      items:
+        $ref: "#/BasketCoveredLine"
+    missing:
+      type: array
+      items:
+        $ref: "#/BasketMissingLine"
+BasketSplitPart:
+  type: object
+  description: One store of a split with the lines it gets (each line goes to the cheaper store).
+  required: [storeId, storeSlug, storeName, distanceM, bookable, lineIndexes, totalPaise, covered]
+  properties:
+    storeId:
+      $ref: ./common.yaml#/Ulid
+    storeSlug:
+      $ref: ./common.yaml#/Slug
+    storeName:
+      type: string
+    distanceM:
+      type: integer
+      minimum: 0
+    bookable:
+      type: boolean
+    lineIndexes:
+      type: array
+      items:
+        type: integer
+        minimum: 0
+    totalPaise:
+      $ref: ./common.yaml#/Paise
+    covered:
+      type: array
+      items:
+        $ref: "#/BasketCoveredLine"
+BasketSplitSuggestion:
+  type: object
+  description: The suggested split across two stores (01 §11.4); the first is the one "Fill cart" fills.
+  required: [stores, uncovered]
+  properties:
+    stores:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        $ref: "#/BasketSplitPart"
+    uncovered:
+      type: array
+      description: Indexes of the lines neither store covers.
+      items:
+        type: integer
+        minimum: 0
+BasketSearchSummary:
+  type: object
+  description: '"Checked {storesChecked} shops nearby · {storesWithAll} have everything" (01 §11.4).'
+  required: [storesChecked, storesWithAll]
+  properties:
+    storesChecked:
+      type: integer
+      minimum: 0
+    storesWithAll:
+      type: integer
+      minimum: 0
+BasketSearchResult:
+  type: object
+  required: [summary, results, split, serverNow]
+  properties:
+    summary:
+      $ref: "#/BasketSearchSummary"
+    results:
+      type: array
+      items:
+        $ref: "#/BasketSearchStore"
+    split:
+      oneOf:
+        - $ref: "#/BasketSplitSuggestion"
+        - type: "null"
+    serverNow:
+      $ref: ./common.yaml#/ServerNow

@@ -40,15 +40,21 @@ type logEntry struct {
 	results int // matching in-stock items
 	stores  int
 	start   time.Time
+	// product is the line's master product (a basket product line); when
+	// unset the product is matched from norm.
+	product pgtype.UUID
 }
 
 // record writes the search_log row and the events.
 func (s *Service) record(ctx context.Context, q *searchdb.Queries, e logEntry) {
 	log := telemetry.Logger(ctx)
 	now := s.now()
-	product, err := productFor(ctx, q, e.norm)
-	if err != nil {
-		log.WarnContext(ctx, "search: product match failed", slog.String("error", err.Error()))
+	product := e.product
+	if !product.Valid {
+		var err error
+		if product, err = productFor(ctx, q, e.norm); err != nil {
+			log.WarnContext(ctx, "search: product match failed", slog.String("error", err.Error()))
+		}
 	}
 	user := pgtype.UUID{}
 	if uid, err := ids.Parse(s.userID(ctx)); err == nil {
@@ -63,7 +69,7 @@ func (s *Service) record(ctx context.Context, q *searchdb.Queries, e logEntry) {
 	if utf8.RuneCountInString(queryNorm) > maxQueryRunes {
 		queryNorm = string([]rune(queryNorm)[:maxQueryRunes])
 	}
-	err = q.InsertSearchLog(ctx, searchdb.InsertSearchLogParams{
+	err := q.InsertSearchLog(ctx, searchdb.InsertSearchLogParams{
 		ID: ids.UUID(ids.New(now)), CreatedAt: now, QueryNorm: queryNorm,
 		ResultsCount: i32(e.results), StoreCount: i32(e.stores),
 		RadiusM: i32(e.req.RadiusM), Category: category, ProductID: product, UserID: user,

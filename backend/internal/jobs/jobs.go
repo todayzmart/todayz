@@ -66,6 +66,7 @@ var Domains = []Domain{
 	{"ai", registerai},
 	{"coach", registercoach},
 	{"standee", registerstandee},
+	{"baskets", registerbaskets},
 }
 
 // Register declares the platform kinds (heartbeat, maintenance, the jobs

@@ -90,6 +90,7 @@ var Domains = []Domain{
 	{"ai", seedai},
 	{"coach", seedcoach},
 	{"standee", seedstandee},
+	{"baskets", seedbaskets},
 }
 
 // ErrRefused is returned in staging and prod.

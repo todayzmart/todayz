@@ -95,6 +95,9 @@ type Deps struct {
 	Open OpenChecker
 	// Offers decides has-offer; nil is NoOffers.
 	Offers OfferLookup
+	// Pricer takes item offers off basket search totals; nil is
+	// NoLineOffers.
+	Pricer Pricer
 	// UserID returns the signed-in user's id (a ULID) or "" for an
 	// anonymous caller; search_log and the events record it. nil is
 	// always anonymous.
@@ -109,6 +112,7 @@ type Service struct {
 	log      *slog.Logger
 	open     OpenChecker
 	offers   OfferLookup
+	pricer   Pricer
 	userID   func(ctx context.Context) string
 	events   *eventcat.Catalogue
 }
@@ -124,13 +128,16 @@ func New(d Deps, cat *eventcat.Catalogue) (*Service, error) {
 	}
 	s := &Service{
 		db: d.DB, settings: d.Settings, clock: d.Clock, log: d.Log,
-		open: d.Open, offers: d.Offers, userID: d.UserID, events: cat,
+		open: d.Open, offers: d.Offers, pricer: d.Pricer, userID: d.UserID, events: cat,
 	}
 	if s.open == nil {
 		s.open = OpenFunc(func([]byte, *time.Time, time.Time) bool { return false })
 	}
 	if s.offers == nil {
 		s.offers = NoOffers{}
+	}
+	if s.pricer == nil {
+		s.pricer = NoLineOffers{}
 	}
 	if s.userID == nil {
 		s.userID = func(context.Context) string { return "" }

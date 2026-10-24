@@ -46,8 +46,8 @@ db/sqlc.yaml           sqlc reads the Up sections of the migrations as the schem
 internal/platform/     shared plumbing, no domain logic:
   audit buildinfo clock config db dbenv egress health httpx(+mw, problem, route) idempotency
   ids migrate money pgnotify queue reqctx settings telemetry testclock
-internal/jobs/         River registry: jobs.go + one <domain>.go per domain (23)
-internal/seed/         seed registry: seed.go + one <domain>.go per domain (23)
+internal/jobs/         River registry: jobs.go + one <domain>.go per domain (24)
+internal/seed/         seed registry: seed.go + one <domain>.go per domain (24)
 internal/testkit/      integration-test database (testcontainers PostGIS)
 internal/devtools/     problemgen, settingslint, vulngate (build/check tools, not shipped)
 tools/                 separate go.mod pinning the Go tools (sqlc, goose, golangci-lint, gosec, govulncheck)
@@ -171,7 +171,7 @@ on each other's internals; a cross-domain call goes through a small interface in
 W0-03 built the skeleton: platform packages, the middleware slots (`httpx/mw/doc.go` lists them;
 13–15 run after chi has routed, D-100), `/healthz`, `/readyz`,
 `/version`, `/v1/test/clock` (local/test), the goose baseline (00001, 00002) and River (version 3),
-sqlc, testkit, the jobs and seed registries for the 23 domains, and the SC-PL-06 checks. W0-04
+sqlc, testkit, the jobs and seed registries for the 23 domains (24 since W2-14 added baskets), and the SC-PL-06 checks. W0-04
 built `api/` (root, common, one `paths`/`schemas` file per domain, `api/README.md`), `apigen`
 (root, check, codegen), the request validator (`httpx/openapi`) with spec-driven route policies,
 `gen/api/spec` + per-domain oapi-codegen stubs, the Schemathesis smoke and fixture, and goose

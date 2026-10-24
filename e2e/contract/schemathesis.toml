@@ -8,3 +8,12 @@
 [[operations]]
 include-operation-id = ["listDiscoverStores", "listDiscoverStoreItems", "searchDiscover"]
 checks.positive_data_acceptance.expected-statuses = ["2xx", "401", "403", "404", "409", "422", "429", "5xx"]
+
+# Basket search caps its lines at basket_max_items, a platform setting (01 §17,
+# default 30, min 5, max 100). The contract can only carry the setting's
+# maximum (maxItems: 100), so the coverage phase sends a schema-valid basket
+# longer than today's setting, and 422 validation_failed (body.lines) is the
+# right answer (W2-14). The saved-basket routes answer 401 first.
+[[operations]]
+include-operation-id = ["searchBasket"]
+checks.positive_data_acceptance.expected-statuses = ["2xx", "401", "403", "404", "409", "422", "429", "5xx"]

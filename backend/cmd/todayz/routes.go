@@ -71,4 +71,5 @@ func routes(r chi.Router, d deps) {
 	mountAI(r, &d)
 	mountCoach(r, &d)
 	mountStandee(r, &d)
+	mountBaskets(r, &d)
 }

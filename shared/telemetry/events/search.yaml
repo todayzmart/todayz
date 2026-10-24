@@ -22,7 +22,7 @@ events:
       latency_ms: { type: int, min: 0 }
       product_id: { type: ulid, optional: true }
       chips: { type: token }
-      source: { type: enum, values: [typed, voice] }
+      source: { type: enum, values: [typed, voice, basket] }
   search_zero_results:
     emitter: server
     description: A search with no in-stock result in the radius (01 §11 zero-result capture).
@@ -30,4 +30,4 @@ events:
       radius: { type: int, min: 1, max: 50000 }
       category: { type: token, optional: true }
       product_id: { type: ulid, optional: true }
-      source: { type: enum, values: [typed, voice] }
+      source: { type: enum, values: [typed, voice, basket] }

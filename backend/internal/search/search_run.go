@@ -254,14 +254,20 @@ func (s *Service) find(ctx context.Context, q *searchdb.Queries, req searchReq, 
 	if err != nil {
 		return nil, false, err
 	}
-	stores, err := s.group(ctx, rows, req, pq, core, exact, rs, now)
+	named := make(map[[16]byte]bool, len(params.TypoIds))
+	for _, id := range params.TypoIds {
+		named[id.Bytes] = true
+	}
+	stores, err := s.group(ctx, rows, req, pq, core, exact, named, rs, now)
 	return stores, true, err
 }
 
 // group turns the rows into stores with their items, applying the filters
 // the query does not: the pack size, open now, pickup, delivery and has
-// offer. Each item gets its text score and offer flag.
-func (s *Service) group(ctx context.Context, rows []searchdb.SearchItemsRow, req searchReq, pq parsed, core string, exact map[[16]byte]bool, rs rankSettings, now time.Time) ([]*candStore, error) {
+// offer. Each item gets its text score and offer flag. named holds the
+// products the trigram fallback or a barcode added; a row with no full-text
+// match outside it came in only by its category.
+func (s *Service) group(ctx context.Context, rows []searchdb.SearchItemsRow, req searchReq, pq parsed, core string, exact, named map[[16]byte]bool, rs rankSettings, now time.Time) ([]*candStore, error) {
 	itemIDs := make([]ids.ID, 0, len(rows))
 	for _, r := range rows {
 		if id, ok := ids.FromUUID(r.StoreItemID); ok {
@@ -322,9 +328,10 @@ func (s *Service) group(ctx context.Context, rows []searchdb.SearchItemsRow, req
 		}
 		st.Items = append(st.Items, candItem{
 			ID: iid, ProductID: pid, Name: name, Variant: r.Variant, Brand: r.BrandName,
-			PackSize: r.PackSize, Unit: r.Unit, Price: r.PricePaise, Mrp: r.MrpPaise,
+			PackSize: r.PackSize, Unit: r.Unit, Price: r.PricePaise, Mrp: r.MrpPaise, Available: r.Available,
 			StockUpdatedAt: r.StockUpdatedAt, ImageKey: r.ImageKey, Offer: offer,
-			Text: textScore(core, r, exact[r.ProductID.Bytes]),
+			Text:     textScore(core, r, exact[r.ProductID.Bytes]),
+			Category: !r.Fts && !named[r.ProductID.Bytes],
 		})
 	}
 	out := order[:0]

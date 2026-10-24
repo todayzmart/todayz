@@ -57,9 +57,11 @@ type candItem struct {
 	Unit           string
 	Price          int64
 	Mrp            *int64
+	Available      int32 // on hand less reserved (basket coverage)
 	StockUpdatedAt *time.Time
 	ImageKey       *string
 	Text           float64 // text match, 0–1
+	Category       bool    // matched only because the query names its category
 	Offer          bool
 }
 

@@ -251,3 +251,39 @@ VALUES (@id, @created_at, @query_norm, @results_count, @store_count, @radius_m,
 INSERT INTO events (id, name, occurred_at, app, user_id, props)
 VALUES (@id, @name, @occurred_at, 'api', @user_id, @props)
 ON CONFLICT (id, occurred_at) DO NOTHING;
+
+-- name: BasketProductItems :many
+-- W2-14 basket search, the product lines: listings of these master products
+-- under SearchItems's filter (in stock, listed, live store of a verified
+-- business, within the radius). The columns are SearchItems's, in its order,
+-- so Go reads both row types the same way; fts and sim are constant (a named
+-- product is an exact match).
+SELECT si.id AS store_item_id, si.product_id, si.local_name, si.price_paise, si.mrp_paise,
+  (si.on_hand - si.reserved)::int AS available, si.stock_updated_at,
+  p.name AS product_name, p.variant, p.pack_size::float8 AS pack_size, p.unit, p.image_key,
+  p.category_id, p.brand_id, br.name AS brand_name,
+  true AS fts,
+  1::float8 AS sim,
+  s.id AS store_id, s.slug AS store_slug, s.name AS store_name, s.locality AS store_locality,
+  s.hours, s.closed_until, s.accepts_pickup, s.accepts_delivery,
+  s.delivery_fee_paise, s.delivery_free_above_paise, s.cashback_bp,
+  (s.rating_avg IS NOT NULL)::bool AS has_rating, COALESCE(s.rating_avg, 0)::float8 AS rating_avg, s.rating_count,
+  c.tint AS category_tint,
+  (s.reliability_score IS NOT NULL)::bool AS has_reliability, COALESCE(s.reliability_score, 0)::float8 AS reliability,
+  ST_Distance(s.location, ST_SetSRID(ST_MakePoint(@lng::float8, @lat::float8), 4326)::geography)::float8 AS distance_m
+FROM stores s
+JOIN businesses b ON b.id = s.business_id
+JOIN store_items si ON si.store_id = s.id
+JOIN products p ON p.id = si.product_id
+LEFT JOIN brands br ON br.id = p.brand_id
+LEFT JOIN categories c ON c.id = b.category_id
+WHERE s.status = 'live' AND b.status = 'verified'
+  AND ST_DWithin(s.location, ST_SetSRID(ST_MakePoint(@lng::float8, @lat::float8), 4326)::geography, @radius_m::float8)
+  AND si.is_listed AND si.on_hand - si.reserved > 0
+  AND p.status IN ('active', 'pending_review')
+  AND si.product_id = ANY(@product_ids::uuid[])
+LIMIT @lim;
+
+-- name: BasketProductNames :many
+-- The names of a basket's product lines, for the search log (any status).
+SELECT id, name FROM products WHERE id = ANY(@ids::uuid[]);

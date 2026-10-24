@@ -498,3 +498,91 @@
                 brandSlug: null
                 categorySlug: null
       default: *id001
+# W2-14 (D-110, D-111): basket search. POST only because the lines are a body;
+# it changes nothing. Coordinates and radius as discover search takes them.
+/v1/discover/basket-search:
+  post:
+    operationId: searchBasket
+    tags:
+    - discover
+    summary: Find the shops nearby that have a whole basket
+    description: 'Basket search (C-22, 01 §11.4). The filter of discover search (in stock, a live store
+      of a verified business, inside the radius); a line is covered when the store lists the product
+      (free text: the store''s top search match) with `available` at least the quantity. Ranked by
+      every line covered, then lines covered, then the basket total (store prices and item offers;
+      credits never count), then distance, then store id. At most `basket_results_max` results;
+      `badge` is a label only. `split` appears only when no store covers every line and
+      `basket_split_max_shops` is above 1. At most `basket_max_items` lines (`422 validation_failed` on
+      `body.lines` beyond); exactly one of `productId` and `text` per line. Read-only, never calls a
+      model; each line is logged as a search (`source: basket`). Rate-limited per IP like discover
+      search.'
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/discover.yaml#/BasketSearchRequest
+          example:
+            lat: 12.9719
+            lng: 77.6412
+            radius: 2000
+            lines:
+            - productId: 01JB0S4A5B6C7D8E9F0G1H2J3K
+              quantity: 2
+            - text: amul butter
+              quantity: 1
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/discover.yaml#/BasketSearchResult
+            example:
+              summary:
+                storesChecked: 4
+                storesWithAll: 1
+              results:
+              - storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                storeSlug: fresh-mart-indiranagar
+                storeName: Fresh Mart
+                locality: Indiranagar
+                distanceM: 650
+                open: true
+                bookable: true
+                coveredCount: 2
+                lineCount: 2
+                totalPaise: 64800
+                badge: has_everything
+                covered:
+                - lineIndex: 0
+                  storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                  productId: 01JB0S4A5B6C7D8E9F0G1H2J3K
+                  name: Aashirvaad Atta
+                  variant: Whole wheat
+                  packSize: 5
+                  unit: kg
+                  pricePaise: 29500
+                  mrpPaise: 31000
+                  imageKey: null
+                  quantity: 2
+                  lineTotalPaise: 59000
+                  confirmedAt: '2026-10-24T04:00:00Z'
+                - lineIndex: 1
+                  storeItemId: 01JB0SA2T3E4M5S6H7D8X9Y0Z1
+                  productId: 01JB0S4B5C6D7E8F9G0H1J2K3M
+                  name: Amul Butter
+                  variant: null
+                  packSize: 100
+                  unit: g
+                  pricePaise: 5800
+                  mrpPaise: 6000
+                  imageKey: null
+                  quantity: 1
+                  lineTotalPaise: 5800
+                  confirmedAt: null
+                missing: []
+              split: null
+              serverNow: '2026-10-24T05:30:00Z'
+      default: *id001

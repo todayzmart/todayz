@@ -136,9 +136,15 @@ const (
 	RefineAiMinWords        Key = "refine_ai_min_words"        // count, default 4
 	AiVoicesearchEnabled    Key = "ai_voicesearch_enabled"     // bool, default false
 	ShareCardCreatePerHour  Key = "share_card_create_per_hour" // count, default 30
+
+	// Added by saved baskets (D-110; seeded by 21401_w2-14_baskets.sql)
+	BasketMaxSaved      Key = "basket_max_saved"       // count, default 10
+	BasketMaxItems      Key = "basket_max_items"       // count, default 30
+	BasketSplitMaxShops Key = "basket_split_max_shops" // count, default 2
+	BasketResultsMax    Key = "basket_results_max"     // count, default 10
 )
 
-// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101).
+// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101, D-110).
 var AllKeys = []Key{
 	OrderAcceptTimeoutMin,
 	PickupHoldMin,
@@ -254,4 +260,8 @@ var AllKeys = []Key{
 	RefineAiMinWords,
 	AiVoicesearchEnabled,
 	ShareCardCreatePerHour,
+	BasketMaxSaved,
+	BasketMaxItems,
+	BasketSplitMaxShops,
+	BasketResultsMax,
 }

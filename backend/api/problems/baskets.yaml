@@ -1,0 +1,11 @@
+# Problem codes: domain "baskets" (owner W2-14; 01 §11.4, D-110, D-111).
+#
+# Same shape as common.yaml. Too many lines, a bad line or a bad name is the
+# common validation_failed on the field; another customer's or a deleted
+# basket is not_found.
+domain: baskets
+problems:
+  - code: basket_limit_reached
+    status: 422
+    i18n: problems.basket_limit_reached
+    title: You already keep the most saved baskets; delete one first

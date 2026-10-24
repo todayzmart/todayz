@@ -1,0 +1,3 @@
+# domain baskets: one line per (role x action); regenerate with -update
+me.baskets.view kind=customer step-up=false
+me.baskets.manage kind=customer step-up=false

@@ -363,7 +363,7 @@ A customer who cannot find an item in stock asks the shops near them, and the sh
 
 A customer who wants several things builds a basket, and search finds a shop that has the whole list, or the best two-shop split.
 
-- **Saved baskets.** A signed-in customer keeps up to `basket_max_saved` baskets on their account (`422 validation_failed` on the field when one more is created). A basket has a name of at most 40 characters and up to `basket_max_items` lines (`422 validation_failed` on `lines`). A line is a master product or free text, with a quantity of 1 to 99. Free text goes through the same normalisation as search (§11, §11.2). A basket can be edited, renamed, deleted and searched again at any time.
+- **Saved baskets.** A signed-in customer keeps up to `basket_max_saved` baskets on their account (`422 basket_limit_reached` when one more is created, D-111). A basket has a name of at most 40 characters and up to `basket_max_items` lines (`422 validation_failed` on `lines`). A line is a master product or free text, with a quantity of 1 to 99. Free text goes through the same normalisation as search (§11, §11.2). A basket can be edited, renamed, deleted and searched again at any time.
 - **Signed out.** A signed-out customer builds one unsaved basket on this device only, like the cart. Signing in offers to save it. Browsing and basket search never need sign-in (§2).
 - **Where it starts.** "Add to basket" on a search result, the product page (C-08) and the shop page (C-07), and the basket screen (C-22).
 - **Basket search.** It uses the customer's location and radius chips (§11) and the same filter as search: in stock, a `live` store of a `verified` business, within the radius. It is read-only and never calls a model.

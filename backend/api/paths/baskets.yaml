@@ -1,0 +1,170 @@
+# Paths: domain "baskets" (owner W2-14): the customer's saved baskets (01 §11.4, 04 §2.5, D-110).
+#
+# Every operation: `tags: [baskets]`, an operationId unique across the API, an
+# example per request and success response, and the default problem response.
+# A basket is the caller's own: another customer's or a deleted basket is 404,
+# never 403. Basket search itself is public and lives in discover.yaml
+# (`POST /v1/discover/basket-search`). Roles per operation are in
+# internal/platform/authz/policy/baskets.go.
+/v1/me/baskets:
+  get:
+    operationId: listMyBaskets
+    tags: [baskets]
+    summary: My saved baskets (C-22)
+    description: Newest change first. Deleted baskets never appear.
+    responses:
+      "200":
+        description: The caller's saved baskets
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/baskets.yaml#/BasketList
+            example:
+              baskets:
+                - basketId: 01JB0SB1A2S3K4E5T6M7N8P9Q0
+                  name: Monthly groceries
+                  lineCount: 4
+                  updatedAt: "2026-10-24T09:30:00Z"
+                  version: 3
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: createBasket
+    tags: [baskets]
+    summary: Save a new basket
+    description: >-
+      Exactly one of `productId` and `text` per line. `422 validation_failed` on `body.name`,
+      `body.lines` (more than `basket_max_items`) or the line's field; `422 basket_limit_reached`
+      when the caller already keeps `basket_max_saved` baskets (deleted ones do not count).
+    x-idempotency: optional
+    x-problems: [basket_limit_reached]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/baskets.yaml#/BasketCreate
+          example:
+            name: Monthly groceries
+            lines:
+              - productId: 01JB0SP1R2Q3D4V5C6T7A8B9C0
+                quantity: 2
+              - text: amul butter
+                quantity: 1
+    responses:
+      "201":
+        description: The basket
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/baskets.yaml#/Basket
+            example: &basket
+              basketId: 01JB0SB1A2S3K4E5T6M7N8P9Q0
+              name: Monthly groceries
+              lines:
+                - lineId: 01JB0SN1A2B3C4D5E6F7G8H9J0
+                  productId: 01JB0SP1R2Q3D4V5C6T7A8B9C0
+                  productName: Aashirvaad Atta
+                  variant: Whole wheat
+                  packSize: 5
+                  unit: kg
+                  text: null
+                  quantity: 2
+                  position: 0
+                - lineId: 01JB0SN2A3B4C5D6E7F8G9H0J1
+                  productId: null
+                  productName: null
+                  variant: null
+                  packSize: null
+                  unit: null
+                  text: amul butter
+                  quantity: 1
+                  position: 1
+              lastSplit: null
+              updatedAt: "2026-10-24T09:30:00Z"
+              version: 1
+      default: *problem
+/v1/me/baskets/{basketId}:
+  parameters:
+    - name: basketId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getMyBasket
+    tags: [baskets]
+    summary: One saved basket with its lines
+    responses:
+      "200":
+        description: The basket
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/baskets.yaml#/Basket
+            example: *basket
+      default: *problem
+  patch:
+    operationId: updateBasket
+    tags: [baskets]
+    summary: Rename a basket, replace its lines or keep the last split
+    description: >-
+      `If-Match` is required (428 without it, 412 when stale). `lines` replaces the whole set in
+      one transaction (same limits and errors as create) and clears `lastSplit`; `lastSplit` may
+      not be sent with `lines`. The version rises by one.
+    x-idempotency: none
+    parameters:
+      - $ref: ../common/parameters.yaml#/IfMatch
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/baskets.yaml#/BasketPatch
+          example:
+            name: Weekly groceries
+    responses:
+      "200":
+        description: The basket after the change
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/baskets.yaml#/Basket
+            example:
+              basketId: 01JB0SB1A2S3K4E5T6M7N8P9Q0
+              name: Weekly groceries
+              lines:
+                - lineId: 01JB0SN1A2B3C4D5E6F7G8H9J0
+                  productId: 01JB0SP1R2Q3D4V5C6T7A8B9C0
+                  productName: Aashirvaad Atta
+                  variant: Whole wheat
+                  packSize: 5
+                  unit: kg
+                  text: null
+                  quantity: 2
+                  position: 0
+              lastSplit: null
+              updatedAt: "2026-10-24T10:00:00Z"
+              version: 2
+      default: *problem
+  delete:
+    operationId: deleteBasket
+    tags: [baskets]
+    summary: Delete a saved basket
+    description: Soft delete; the basket no longer counts towards `basket_max_saved`.
+    x-idempotency: none
+    responses:
+      "204":
+        description: Deleted
+      default: *problem

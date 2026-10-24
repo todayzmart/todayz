@@ -199,3 +199,10 @@ sql:
         <<: *go
         package: standeedb
         out: ../gen/sqlc/standeedb
+  - <<: *pkg
+    queries: queries/baskets
+    gen:
+      go:
+        <<: *go
+        package: basketsdb
+        out: ../gen/sqlc/basketsdb

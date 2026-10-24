@@ -21,6 +21,7 @@ var discoverOps = map[string]string{
 	"GetDiscoverStore":       authz.Public,
 	"ListDiscoverStoreItems": authz.Public,
 	"GetDiscoverSummary":     authz.Public,
+	"SearchBasket":           authz.Public,
 }
 
 // Register mounts /v1/places/* and /v1/discover/* on r. az may be nil: every
@@ -97,4 +98,15 @@ func (h handlers) GetDiscoverSummary(ctx context.Context, req discoverapi.GetDis
 		return nil, err
 	}
 	return discoverapi.GetDiscoverSummary200JSONResponse(out), nil
+}
+
+func (h handlers) SearchBasket(ctx context.Context, req discoverapi.SearchBasketRequestObject) (discoverapi.SearchBasketResponseObject, error) {
+	if req.Body == nil {
+		return nil, fieldProblem("body", "required")
+	}
+	out, err := h.s.SearchBasket(ctx, *req.Body)
+	if err != nil {
+		return nil, err
+	}
+	return discoverapi.SearchBasket200JSONResponse(out), nil
 }
