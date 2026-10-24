@@ -10,11 +10,15 @@
     - name: code
       in: path
       required: true
-      description: A customer's or business's referral code, or a store short code (any case).
+      description: >-
+        A customer's or business's referral code, or a store short code (any case). Letters and
+        digits only: every issued code is six of `[A-HJKMNP-Z2-9]`, and an unknown code still
+        answers `302` to the customer app.
       schema:
         type: string
         minLength: 1
         maxLength: 16
+        pattern: ^[A-Za-z0-9]+$
       example: ASHA22
   get:
     operationId: openReferralLink

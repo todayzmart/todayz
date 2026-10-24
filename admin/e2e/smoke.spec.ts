@@ -44,9 +44,14 @@ async function answerRefresh(page: Page, signedIn: boolean) {
     : answer(page, '/v1/auth/refresh', 401, problem(401, 'unauthorized')));
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page }, info) => {
   guard = await guardPage(page);
   await answerRefresh(page, true);
+  // Without the session hint a cold start skips the refresh and opens sign-in (shared/auth), as for a
+  // visitor; the signed-out tests keep it off, so no 401 reaches the console.
+  if (!info.title.startsWith('signed out')) {
+    await page.addInitScript(() => localStorage.setItem('todayz.hasSession.admin', '1'));
+  }
   // Routing hint only (the API checks the token): this tab already passed the authenticator step.
   await page.addInitScript(() => sessionStorage.setItem('todayz.admin.2fa', String(Date.now())));
 });

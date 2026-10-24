@@ -1,0 +1,15 @@
+{
+  "name": "@todayz/e2e-journeys",
+  "private": true,
+  "description": "Cross-app Playwright journeys against make dev (W2-13 gate). See e2e/CLAUDE.md.",
+  "type": "module",
+  "scripts": {
+    "journeys": "playwright test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "@types/node": "26.6.4",
+    "typescript": "6.0.3"
+  }
+}

@@ -58,15 +58,17 @@
 
 /* Below 1024px: icon rail. Labels are visually hidden but stay the links' accessible names. */
 @media (width < 1024px) {
-  /* Shrink-wrap the 44px links plus the sidebar's padding and border (no 1px overflow scrollbar). */
-  .side {
+  /* `.side.side` outranks the design bundle's `.tz-side` and `.tz-side a`, whatever order the shell
+     chunk's stylesheet loads in. Shrink-wrap the 44px links plus the sidebar's padding and border
+     (no 1px overflow scrollbar). */
+  .side.side {
     width: auto;
     overflow-x: hidden;
   }
 
   /* 44px touch targets on the rail (the design's 32px rows are for a mouse). */
-  .side a,
-  .side button {
+  .side.side a,
+  .side.side button {
     justify-content: center;
     height: var(--control-lg);
     min-width: var(--control-lg);

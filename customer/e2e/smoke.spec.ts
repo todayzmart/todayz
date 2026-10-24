@@ -45,13 +45,13 @@ test('home on desktop', async ({ page }) => {
   await shot(page, 'customer-desktop.png');
 });
 
-test('bottom nav opens a section placeholder', async ({ page }) => {
+test('bottom nav opens Search', async ({ page }) => {
   await page.setViewportSize(VIEWPORTS.phone);
   await page.goto('/');
   await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Search' }).click();
   await expect(page).toHaveURL(/\/search$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Search' })).toBeVisible();
-  await expect(page.getByText('Coming soon')).toBeVisible();
+  await expect(page.getByRole('searchbox', { name: 'Search products' })).toBeVisible();
 });
 
 test('pseudo-locale via ?locale=pseudo', async ({ page }) => {

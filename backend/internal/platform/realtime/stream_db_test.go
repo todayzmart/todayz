@@ -236,12 +236,24 @@ func TestStreamLiveThenReplayAfterReconnect(t *testing.T) {
 	_ = conn.resp.Body.Close()
 	conn.ended(t)
 
-	// Missed while away: two events here, one on another store.
+	// Missed while away: two events here, one on another store. The probe
+	// waits for their real NOTIFYs, so the only late copy of e3 is the one
+	// sent by hand below (each seq is notified once).
+	probe, err := h.Subscribe(c)
+	require.NoError(t, err)
 	e2 := Event{Type: OrderUpdated, ID: e1.ID, Version: 2}
 	e3 := Event{Type: AskCreated, ID: newID(), Version: 1}
 	publish(t, db.Pool, c, e2)
 	publish(t, db.Pool, StoreChannel(newID()), Event{Type: OrderCreated, ID: newID(), Version: 1})
 	publish(t, db.Pool, c, e3)
+	for range 2 {
+		select {
+		case <-probe.q:
+		case <-time.After(10 * time.Second):
+			t.Fatal("the hub never got the NOTIFYs for e2 and e3")
+		}
+	}
+	h.Unsubscribe(probe)
 
 	again := dial(t, srv.URL, last)
 	replayed, rd := again.ready(t)
