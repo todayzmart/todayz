@@ -56,6 +56,11 @@ jobs:
           TODAYZ_CI_BROWSER_DEPS: "1"
         run: make setup
 
+      # The journeys (W2-13) need the seeded shops and people: a gate run starts from a fresh
+      # reset (as release-candidate does). reset starts Postgres on its own.
+      - name: make reset
+        run: make reset
+
       # e2e-stack starts and stops the stack itself; no make dev here.
       - name: make e2e
         run: make e2e

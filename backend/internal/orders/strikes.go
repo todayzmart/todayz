@@ -50,7 +50,7 @@ func (s *Service) strikeCustomer(ctx context.Context, q *ordersdb.Queries, o ord
 func recount(ctx context.Context, q *ordersdb.Queries, user pgtype.UUID, every bool, now time.Time, r noShow) (int64, error) {
 	p := ordersdb.RecountCustomerStrikesParams{
 		Now: now, Every: every, UserID: user, Win: interval(r.window), Lim: interval(r.limitFor),
-		Strikes: int32(min(r.strikes, math.MaxInt32)), //nolint:gosec // capped just above
+		Strikes: int32(min(r.strikes, math.MaxInt32)), // #nosec G115 -- capped just above
 	}
 	n, err := q.RecountCustomerStrikes(ctx, p)
 	if err != nil {
