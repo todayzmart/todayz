@@ -69,9 +69,10 @@
   color: var(--warning);
 }
 
+/* A link drawn as a ghost button; the kit's .tz-btn does not reset the anchor underline. */
 .cardLink {
   align-self: flex-start;
-  font: var(--type-label);
+  text-decoration: none;
 }
 
 .reasons {

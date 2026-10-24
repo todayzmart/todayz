@@ -99,7 +99,7 @@ describe('B-04 orders list', () => {
     // acceptBy is 4m30s after serverNow, whatever the device clock says.
     expect(timers[0]).toHaveTextContent(/4:[23]\d|5:00/);
     expect(Date.now() - t0).toBeLessThan(5000);
-    expect(await screen.findByText('Toor dal · 1 kg × 1')).toBeInTheDocument();
+    expect(await screen.findAllByText('Toor dal · 1 kg × 1')).not.toHaveLength(0);
   });
 
   it('asks for a tap before it can play the alert sound', async () => {

@@ -150,6 +150,7 @@ test('a customer order goes new, accepted, ready and handed over with the pickup
   const card = page.getByRole('article', { name: number });
   await expect(card).toBeVisible({ timeout: 20_000 });
   await expect(card.getByTestId('countdown')).toBeVisible();
+  await expect(card.getByText(/\d+ in stock$/).first()).toBeVisible();
   if (process.env.TZ_QA_DIR) await page.screenshot({ path: `${process.env.TZ_QA_DIR}/business-orders-new-1280.png` });
 
   // Accept it; it leaves New and appears under Accepted.

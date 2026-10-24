@@ -18,9 +18,15 @@ export function clock(iso: string): string {
   return formatClock(iso);
 }
 
-/** "Amul Butter · 100 g" style line name: name, variant, then pack. */
+/**
+ * "Amul Butter · 100 g" style line name: name, variant, then pack. Shops often type the pack into
+ * the name ("Amul Butter 100 g", "Atta 5kg"); then the pack is not repeated.
+ */
 export function lineName(l: Pick<StoreOrderLine, 'name' | 'variant' | 'packSize' | 'unit'>): string {
-  return [l.name, l.variant, `${l.packSize} ${l.unit}`].filter(Boolean).join(' · ');
+  const pack = `${l.packSize} ${l.unit}`;
+  const squash = (s: string) => s.replace(/\s+/g, '').toLowerCase();
+  const named = squash(l.name).endsWith(squash(pack));
+  return [l.name, l.variant, named ? null : pack].filter(Boolean).join(' · ');
 }
 
 export function isShort(l: Pick<StoreOrderLine, 'available' | 'quantityRequested'>): boolean {

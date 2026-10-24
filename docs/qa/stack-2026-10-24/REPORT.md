@@ -52,11 +52,11 @@ The counts live in the database. When the cap is reached, `make reset` clears it
 
 ## Follow-ups seen in the run
 
-- **Business order card** (W2-10):
-  - the item line repeats the size ("Amul Butter 100 g · 100 g × 1");
-  - "View order" is an unstyled browser link instead of a `tz-` link;
-  - the sidebar's Orders badge says 2 while the New tab says 1. Check what the badge counts.
-- **Setup card:** "Add opening hours" shows while the shop has hours set. Check the setup rule for all-day hours.
+- **Business order card** (W2-10), fixed the same day (screenshot refreshed):
+  - ~~the item line repeats the size ("Amul Butter 100 g · 100 g × 1")~~: `lineName` drops the pack when the name already ends with it (`orders/labels.test.ts`);
+  - ~~"View order" is an unstyled browser link~~: it is a small ghost `tz-btn` (the kit's `.tz-btn` does not reset the anchor underline, so the card CSS does);
+  - ~~the sidebar's Orders badge says 2 while the New tab says 1~~: the badge counted the Overview's sample data. It now counts the live New list (same query as the tab, refreshed by the stream).
+- **Setup card:** ~~"Add opening hours" shows while the shop has hours set~~: that was the Overview's sample data too. The sidebar card and the Stock badge stay hidden while `SAMPLE_DATA` is on; the real setup rule (all-day hours included) comes with W3-03.
 - **Not covered by these journeys:** delivery, credits, partial confirm, the QR code, and calling the shop. These were deferred in W2-09 and W2-10.
 
 ## How to rerun

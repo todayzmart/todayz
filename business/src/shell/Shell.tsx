@@ -5,6 +5,7 @@ import { Button } from '@todayz/ui';
 import { Fragment } from 'react';
 import { useIntl } from 'react-intl';
 import { useOverview } from '../overview/queries';
+import { SAMPLE_DATA } from '../overview/sample';
 import { SetupCard } from '../overview/SetupCard';
 import { NavLink } from './NavLink';
 import { SIDE, TABS } from './nav';
@@ -12,13 +13,6 @@ import { useNarrow } from './useNarrow';
 import { useNavCounts } from './useNavCounts';
 import styles from './shell.module.css';
 
-/**
- * Business frame: white sidebar with the mint active item from 1024px (Sidebar in the design
- * system), phone bottom tabs below it (BottomNav). Only one of the two is rendered visible.
- * The sidebar carries the Orders and Stock counts and, until setup is complete, the shop setup
- * card at its foot (B-03). Below 1024px the Overview shows that card under its KPIs instead, so it
- * is rendered in one place only.
- */
 /** Ends this device's session and drops everything cached for the person who was signed in. */
 function SignOut() {
   const intl = useIntl();
@@ -39,6 +33,14 @@ function SignOut() {
   );
 }
 
+/**
+ * Business frame: white sidebar with the mint active item from 1024px (Sidebar in the design
+ * system), phone bottom tabs below it (BottomNav). Only one of the two is rendered visible.
+ * The sidebar carries the counts (`useNavCounts`: Orders from the live New list) and, until setup
+ * is complete, the shop setup card at its foot (B-03). The card stays hidden while the Overview
+ * runs on sample data, so it never contradicts the real shop. Below 1024px the Overview shows that
+ * card under its KPIs instead, so it is rendered in one place only.
+ */
 export function Shell() {
   const intl = useIntl();
   const label = intl.formatMessage({ id: 'shell.nav.label' });
@@ -67,7 +69,7 @@ export function Shell() {
             </Fragment>
           );
         })}
-        {!narrow && data && <SetupCard setup={data.setup} />}
+        {!SAMPLE_DATA && !narrow && data && <SetupCard setup={data.setup} />}
         {!narrow && <SignOut />}
       </nav>
       <main id="main" className={styles.main} tabIndex={-1} data-density={narrow ? 'touch' : undefined}>

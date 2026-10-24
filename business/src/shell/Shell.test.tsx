@@ -3,12 +3,30 @@ import xa from '@todayz/i18n/compiled/business/en-XA.json';
 import { asMessages, type Messages } from '@todayz/i18n';
 import { screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { renderAt as renderApp } from '../test/render';
+import { json, renderAt as renderApp, type Call, type Handler } from '../test/render';
 import { MORE, NAV } from './nav';
 import { NARROW_QUERY } from './useNarrow';
 
-function renderAt(path: string, messages: Messages = asMessages(en)) {
-  return renderApp(path, { messages });
+function renderAt(path: string, messages: Messages = asMessages(en), handlers: Handler[] = []) {
+  return renderApp(path, { messages, handlers });
+}
+
+const BASE = '/v1/biz/businesses/b1/stores/s1';
+
+function shops(c: Call) {
+  return c.path === '/v1/biz/businesses'
+    ? json(200, { items: [{ id: 'b1', status: 'verified', brandName: 'Sri Lakshmi', role: 'owner', stores: [{ id: 's1', name: 'Indiranagar', slug: 'indiranagar', status: 'live' }] }], nextCursor: null })
+    : undefined;
+}
+
+/** The New list with `n` orders; the other tabs are empty. */
+function newOrders(n: number): Handler {
+  return (c) => {
+    if (c.method !== 'GET' || c.path !== `${BASE}/orders`) return undefined;
+    const isNew = (new URLSearchParams(c.search).get('status') ?? 'new') === 'new';
+    const items = isNew ? Array.from({ length: n }, (_, i) => ({ id: `o${i}`, number: `TZ-${i}`, customerName: 'Meera', fulfilment: 'pickup', status: 'placed', statusReason: null, itemCount: 1, totalPaise: 5800, acceptBy: '2026-10-23T12:34:30.000Z', holdUntil: null, placedAt: '2026-10-23T12:29:30.000Z', seen: true, version: 1 })) : [];
+    return json(200, { items, nextCursor: null, serverNow: '2026-10-23T12:30:00.000Z' });
+  };
 }
 
 function mockWidth(width: number) {
@@ -42,16 +60,18 @@ describe('business shell', () => {
     expect(within(side).getByRole('link', { name: /^Orders\b/ })).not.toHaveAttribute('aria-current');
   });
 
-  it('shows neutral counts on Orders and Stock in the sidebar only, read out in words', async () => {
-    renderAt('/orders');
+  it('counts the live New orders on Orders in the sidebar only, read out in words', async () => {
+    // The live stream uses the global fetch; it falls back to polling here.
+    vi.stubGlobal('fetch', () => Promise.resolve(new Response(null, { status: 404 })));
+    renderAt('/orders', asMessages(en), [shops, newOrders(2)]);
     const { side, tabs } = await navs();
     const orders = await within(side).findByRole('link', { name: /2 orders waiting$/ });
     expect(orders).toHaveAccessibleName(/^Orders\W+2 orders waiting$/);
     expect(orders.querySelector('.tz-count')).toHaveTextContent('2');
     expect(orders.querySelector('.tz-count')).toHaveAttribute('aria-hidden', 'true');
-    const stock = within(side).getByRole('link', { name: /^Stock\W+5 items sell out by tomorrow$/ });
-    expect(stock.querySelector('.tz-count')).toHaveTextContent('5');
-    expect(side.querySelectorAll('.tz-count')).toHaveLength(2);
+    // Stock's number comes from the Overview, which still runs on sample data: no badge.
+    expect(within(side).getByRole('link', { name: 'Stock' }).querySelector('.tz-count')).toBeNull();
+    expect(side.querySelectorAll('.tz-count')).toHaveLength(1);
     expect(tabs.querySelectorAll('.tz-count')).toHaveLength(0);
   });
 
@@ -95,11 +115,10 @@ describe('business shell', () => {
     expect(within(side).getByText('Grow')).toHaveClass('tz-side-group');
     expect(within(side).getByText('Shop')).toHaveClass('tz-side-group');
     expect(within(side).queryByRole('link', { name: 'More' })).toBeNull();
-    // Nav items, plus Finish setup on the setup card at the foot.
-    await within(side).findByRole('link', { name: 'Finish setup' });
-    const links = within(side).getAllByRole('link');
-    expect(links.filter((l) => !l.closest('.tz-side-card'))).toHaveLength(NAV.filter((n) => n.side).length);
-    expect(links.at(-1)).toHaveAccessibleName('Finish setup');
+    // Nav items only: the setup card stays hidden while the Overview runs on sample data.
+    await screen.findByRole('heading', { level: 1, name: /^Good / });
+    expect(side.querySelector('.tz-side-card')).toBeNull();
+    expect(within(side).getAllByRole('link')).toHaveLength(NAV.filter((n) => n.side).length);
   });
 
   // Sections that have a real page (orders: W2-10) no longer show the placeholder.

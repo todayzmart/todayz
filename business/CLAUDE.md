@@ -22,7 +22,7 @@ Read first: the root `CLAUDE.md`, `docs/plan/README.md`, `docs/plan/01-product-r
 Same structure as `customer/` (see its CLAUDE.md): `src/main.tsx`, `src/app/`, `src/shell/`, `src/routes/`, `e2e/smoke.spec.ts`.
 
 - `src/routes/index.tsx`: `/` is B-03 Overview (`src/overview/`, sample data for now behind `queries.ts`); the D-84 redirect to `/orders` is gone. `src/routes/overview.tsx` replaces `/overview` with `/` (query kept), and `NavLink` points the Overview entry at `/` (exact match).
-- `src/shell/Shell.tsx`: a `tz-side` sidebar (≥1024px, "Business" tag, Grow/Shop groups) and `tz-bnav` bottom tabs (<1024px: Overview, Orders, Sell, Stock, More). Below 1024px the content area gets `data-density="touch"` (44px controls) via `useNarrow()`. The sidebar shows neutral `.tz-count` badges on Orders and Stock (`useNavCounts`, read from the Overview's `today` query) and the shop setup card (`overview/SetupCard.tsx`, hidden at 100%) at its foot; below 1024px that card sits under the Overview KPIs instead and the Overview top bar starts with the mark and store name.
+- `src/shell/Shell.tsx`: a `tz-side` sidebar (≥1024px, "Business" tag, Grow/Shop groups) and `tz-bnav` bottom tabs (<1024px: Overview, Orders, Sell, Stock, More). Below 1024px the content area gets `data-density="touch"` (44px controls) via `useNarrow()`. The sidebar shows neutral `.tz-count` badges (`useNavCounts`): Orders counts the live New list (`listKey(sid, 'new')`, refreshed by the store stream), Stock reads the Overview's `today` query. The Stock badge and the shop setup card at the sidebar foot (`overview/SetupCard.tsx`, hidden at 100%) stay hidden while the Overview runs on sample data (`SAMPLE_DATA` in `overview/sample.ts`), so made-up numbers never sit next to real orders; below 1024px that card sits under the Overview KPIs instead and the Overview top bar starts with the mark and store name.
 - `src/shell/nav.ts`: each item says whether it is a tab, a sidebar entry or both. "More" lists the sidebar-only sections on phones.
 
 ## Conventions
@@ -55,4 +55,4 @@ W2-10 (weekend slice): B-04 Orders in `src/orders/` with routes `src/routes/orde
 - `sound.ts` and `alerts.ts`: a Web Audio chime that repeats until the order is opened, accepted or rejected; "Allow sound" unlocks it. Orders already seen on the server at first load do not alert.
 - `store.ts`: the current shop and the role come from the same `listBusinesses` answer the picker uses. Cancel on an accepted order is manager and above only (D-65).
 - `CodeEntry.tsx`: the pickup code lives in component state only (never in a query key, URL, storage or log), is cleared after every answer, and shows tries left on `code_invalid` and the lock on `code_locked`.
-- Stack journey: `e2e/orders.stack.spec.ts` (customer by API, shop in the browser). Written, not run.
+- Stack journey: `e2e/orders.stack.spec.ts` (customer by API, shop in the browser). Passes on the seed (`docs/qa/stack-2026-10-24/`).

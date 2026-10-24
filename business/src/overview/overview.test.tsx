@@ -142,17 +142,14 @@ describe('B-03 Overview', () => {
     expect(within(kpis).getByText('Sales')).toBeInTheDocument();
   });
 
-  it('shows the shop setup card at the foot of the sidebar on desktop', async () => {
+  it('keeps the sample setup card out of the desktop sidebar', async () => {
+    // The sidebar frames every page, real ones included; a sample "80%" there would contradict the
+    // real shop. The card returns at the sidebar foot when SAMPLE_DATA goes false (W3-03).
     mockWidth(1280);
     renderOverview();
-    const title = await screen.findByText('Shop setup 80%');
-    const card = title.closest('.tz-side-card');
-    if (!(card instanceof HTMLElement)) throw new Error('no setup card');
-    expect(card.closest('nav.tz-side')).not.toBeNull();
-    expect(card.querySelector('.tz-progress > i')).toHaveStyle({ width: '80%' });
-    expect(within(card).getByText('Add opening hours to appear in “Open now” searches.')).toBeInTheDocument();
-    expect(within(card).getByRole('link', { name: 'Finish setup' })).toHaveAttribute('href', '/settings');
-    expect(screen.getAllByText(/^Shop setup/)).toHaveLength(1);
+    await screen.findByRole('heading', { level: 1, name: /^Good / });
+    expect(document.querySelector('nav.tz-side .tz-side-card')).toBeNull();
+    expect(screen.queryByText(/^Shop setup/)).toBeNull();
   });
 
   it('moves the setup card under the KPIs on phones and shows the shop in the top bar', async () => {

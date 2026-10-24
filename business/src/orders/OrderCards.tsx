@@ -101,7 +101,7 @@ export function NewOrderCard({ store, order, offsetMs }: { store: CurrentStore; 
       <Link
         to="/orders/$orderId"
         params={{ orderId: order.id }}
-        className={styles.cardLink}
+        className={`tz-btn tz-btn-ghost tz-btn-sm ${styles.cardLink}`}
         onClick={() => acknowledgeOrder(store.sid, order.id)}
         aria-label={intl.formatMessage({ id: 'orders.card.openA11y' }, { number: order.number })}
       >
@@ -152,7 +152,7 @@ export function OrderRow({ order }: { order: StoreOrderSummary }) {
       <Link
         to="/orders/$orderId"
         params={{ orderId: order.id }}
-        className={styles.cardLink}
+        className={`tz-btn tz-btn-ghost tz-btn-sm ${styles.cardLink}`}
         aria-label={intl.formatMessage({ id: 'orders.card.openA11y' }, { number: order.number })}
       >
         {intl.formatMessage({ id: 'orders.card.open' })}
