@@ -3,7 +3,7 @@
 # workflow once the AWS account is open.
 #
 # Two jobs so the secret never shares a job with third-party install code: `build` (no
-# secrets) runs make setup, make gen and the production builds and uploads the output;
+# secrets) installs, generates and runs the production builds and uploads the output;
 # `deploy` checks out only the script, downloads that output and uploads it with wrangler.
 # scripts/ci/wflint/secrets-allow.txt lists the two secrets this file may read.
 name: deploy
@@ -41,11 +41,10 @@ jobs:
       - name: Set up Go, Node, pnpm and CI tools
         uses: ./.github/actions/setup-toolchain
 
-      - name: make setup
-        run: make setup
-
-      - name: make gen
-        run: make gen
+      # Only what the four builds need (see the script). The full `make setup` (Docker images,
+      # map tiles, Terraform providers, the Python contract tools) is for ci.yml.
+      - name: Install and generate the shared frontend code
+        run: scripts/deploy/pages.sh prepare
 
       - name: Build the sites
         run: scripts/deploy/pages.sh build

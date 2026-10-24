@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 # Build and upload the prod Pages sites (D-214): site → todayz-site, customer → todayz-customer,
-# business → todayz-business, admin → todayz-admin. .github/workflows/deploy.yml runs `build`
-# and `deploy` in separate jobs on every push to main; the lead can run both by hand.
+# business → todayz-business, admin → todayz-admin. .github/workflows/deploy.yml runs `prepare`
+# and `build` in one job and `deploy` in another on every push to main; the lead can run them by hand.
 #
+#   scripts/deploy/pages.sh prepare
 #   scripts/deploy/pages.sh build  [site|customer|business|admin ...]   (default: all four)
 #   scripts/deploy/pages.sh deploy [site|customer|business|admin ...]
 #
-# build needs the generated shared code (`make gen`) and node_modules; it writes .cache/pages/<app>
+# prepare installs node_modules and oapi-codegen and generates only the shared code the builds
+# use (event map, contract and api-client, tokens, i18n, route trees), not the full `make setup`
+# and `make gen` (Docker images, map tiles, Terraform providers, Python tools, sqlc).
+# build needs the generated shared code (prepare or `make gen`); it writes .cache/pages/<app>
 # with the public settings in infra/cloudflare/pages.env. deploy needs Node 22+, npx and
 # CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in the environment (never printed).
 set -euo pipefail
@@ -16,7 +20,7 @@ OUT="$ROOT/.cache/pages"
 WRANGLER_VERSION=4.152.0
 
 usage() {
-  echo "usage: scripts/deploy/pages.sh build|deploy [site|customer|business|admin ...]" >&2
+  echo "usage: scripts/deploy/pages.sh prepare | build|deploy [site|customer|business|admin ...]" >&2
   exit 2
 }
 
@@ -77,6 +81,12 @@ deploy() {
 [[ $# -ge 1 ]] || usage
 cmd="$1"
 shift
+if [[ "$cmd" == prepare ]]; then
+  [[ $# -eq 0 ]] || usage
+  make -C "$ROOT" setup-node setup-contract-codegen
+  make -C "$ROOT" gen-events gen-contract gen-frontend
+  exit 0
+fi
 case "$cmd" in
   build | deploy) ;;
   *) usage ;;

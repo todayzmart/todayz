@@ -63,12 +63,10 @@ _check: export TODAYZ_CHECK = 1
 _check: export TODAYZ_OAPI_CODEGEN = $(TOOLS)/oapi-codegen
 _check: export TODAYZ_REDOCLY = $(REDOCLY_BIN)
 
-.PHONY: setup-contract gen-contract check-contract check-contract-lint check-contract-client \
+.PHONY: setup-contract setup-contract-codegen gen-contract check-contract check-contract-lint check-contract-client \
         check-contract-hooks contract-smoke e2e-stack-up e2e-contract contract-lock
 
-setup-contract:
-	@mkdir -p $(TOOLS)
-	@go -C $(BACKEND)/tools build -trimpath -o $(TOOLS)/ github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen
+setup-contract: setup-contract-codegen
 	@$(ROOT)/scripts/install-uv.sh $(UV_VERSION) $(UV)
 	@$(uv) python install -q $(CONTRACT_PYTHON)
 	@if [ -f $(CONTRACT_VENV)/pyvenv.cfg ] && ! { grep -q "^version_info = $(CONTRACT_PYTHON)$$" $(CONTRACT_VENV)/pyvenv.cfg \
@@ -77,6 +75,11 @@ setup-contract:
 	  echo "recreating .tools/schemathesis for Python $(CONTRACT_PYTHON) / uv $(UV_VERSION)"; rm -rf $(CONTRACT_VENV); fi
 	@$(uv) venv -q --python $(CONTRACT_PYTHON) --allow-existing $(CONTRACT_VENV)
 	@$(uv) pip install -q --python $(CONTRACT_PY) --require-hashes -r $(CONTRACT_DIR)/requirements.txt
+
+# Only the generator gen-contract needs (the Pages deploy builds without the Python tools).
+setup-contract-codegen:
+	@mkdir -p $(TOOLS)
+	@go -C $(BACKEND)/tools build -trimpath -o $(TOOLS)/ github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen
 
 gen-contract:
 	@$(apigen) root -api $(CONTRACT_API) -out $(CONTRACT_ROOT)
