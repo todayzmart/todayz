@@ -192,6 +192,16 @@ The lead's review of D-132: nothing blocking in the sale, capture, cashback or r
 
 Checks on this change (shared test Postgres, `-p 2`): `make gen` and `make check-contract` pass; gofmt and `go vet ./...` clean; golangci-lint and gosec on `internal/{pos,jobs,credits,referrals}`, `internal/platform/{money,db}` and `cmd/todayz`: 0 issues; settingslint clean; `go test -race -count=1` passes for all of those packages, `cmd/todayz` in full (225 s). Follow-up outside W2-04: `internal/orders/quote.go` still multiplies credits by a literal 100.
 
+## Follow-ups after the merge (D-132)
+
+The lead merged round 4 (969f40b) and asked for three small follow-ups.
+
+| Item | What changed | Test |
+|---|---|---|
+| 1, retry test and backoff | `syncTx` calls `retryTx(ctx, inTx, fn, retried)`, which waits `retryBackoff` between attempts: 20 ms per past attempt plus up to 20 ms of jitter, cut short if the context ends | `TestRetryTx` (unit, in `internal/pos`): two 40P01 then success is 3 calls and 2 retries; four failures stop at 3 calls and return the last; another error is not retried; a context cancelled during the backoff stops it. `TestRetryBackoff`, `TestIsRetryable` (wrapped, other codes, nil) |
+| 2, leak check | `leaked` now skips a match only inside a longer token: a digit or letter touching it, a `.` before it (a fraction), or `-` on both sides (a UUID group). `code:4821`, `code=4821` and a bare JSON number count. Letters stay a boundary, since with digits alone a code inside a UUID's hex or a timestamp's `.4821Z` would flag, which was the original flake | `TestLeaked` (table) |
+| 3, savepoint errors | `offerUnmatched` returns a 40P01/40001 instead of flagging the sale unmatched; `referrals.enqueueReward` returns it instead of logging, and `OnPurchaseCompleted` passes it up (other enqueue failures are still logged, and the sweep posts the reward) | Covered by the existing pos, referrals and sync tests (no fault injection for a deadlock inside the savepoint) |
+
 ## Coverage of SC-POS (08-testing.md)
 
 | Scenario | Where | Notes |
