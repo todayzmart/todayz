@@ -3,19 +3,68 @@ package jobs
 import (
 	"context"
 	"errors"
+	"sync"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 
 	"github.com/todayz/backend/internal/catalogue"
 	"github.com/todayz/backend/internal/platform/clock"
+	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/ids"
+	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/pos"
 )
 
-// registerpos declares the pos domain's job kinds. W2-04 has none: a bill
-// claim expires by its own time (the reads compare expires_at), and the
-// credits held at confirm are released by the credits domain's sweep.
-func registerpos(r *Registry, d Deps) {}
+// KindPosBillClaimExpiry expires bill claims past their 120 s and releases
+// the credits a confirmed one held (D-131).
+const KindPosBillClaimExpiry = "pos_bill_claim_expiry"
+
+// registerpos declares the pos domain's job kinds: the bill-claim sweep. A
+// claim's reads and its sale already treat it as expired at expires_at; the
+// sweep only gives the held credits back.
+func registerpos(r *Registry, d Deps) {
+	var (
+		mu  sync.Mutex
+		svc *pos.Service
+	)
+	service := func() (*pos.Service, error) {
+		mu.Lock()
+		defer mu.Unlock()
+		if svc != nil {
+			return svc, nil
+		}
+		pd := pos.Deps{Config: d.Config, Clock: d.Clock, Log: d.Log, Settings: d.Settings}
+		if d.Pool != nil {
+			pd.DB = db.New(d.Pool)
+		}
+		// TODO(lead): Credits is the do-nothing default until W2-01 wires
+		// its ledger here as in routes_pos.go; until then no hold exists.
+		s, err := pos.New(pd)
+		if err != nil {
+			return nil, err
+		}
+		svc = s
+		return s, nil
+	}
+	platformjobs.Define(r, platformjobs.Kind{
+		Name: KindPosBillClaimExpiry, Owner: "W2-04", Class: platformjobs.ClassTimer,
+		Description: "Expires bill QR claims past their 120 s and releases the credits a confirmed one held",
+		Schedule:    "* * * * *", UniqueBy: platformjobs.PerTick, Timeout: 30 * time.Second, MaxAttempts: 3,
+		Runbook: "docs/runbooks/pos-bill-claims.md",
+		Handler: func(ctx context.Context, _ platformjobs.Run) (platformjobs.Result, error) {
+			s, err := service()
+			if err != nil {
+				return platformjobs.Result{}, err
+			}
+			expired, released, err := s.ExpireClaims(ctx)
+			if err != nil {
+				return platformjobs.Result{}, err
+			}
+			return platformjobs.Result{Summary: map[string]int64{"expired": int64(expired), "released": int64(released)}}, nil
+		},
+	})
+}
 
 // PosStock is the catalogue's stock writer as pos.Stock: a sale line is one
 // sale_pos movement referring to the sale, idempotent on the line's client

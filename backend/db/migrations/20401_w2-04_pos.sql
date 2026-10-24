@@ -1,7 +1,8 @@
 -- W2-04 point of sale and offline sync (03 §5; 01 §6, §7; 02 §4.3; 04 §2.6;
 -- D-07, D-08, D-12, D-30, D-36, D-45, D-65, D-74, D-75, D-84, D-92, D-94).
 -- pos_sales, pos_sale_lines, bill_claims, counter_code_checks,
--- counter_code_uses, receipt_tokens, sync_cursors and sync_entries.
+-- counter_code_failures, counter_code_uses, receipt_tokens, sync_cursors and
+-- sync_entries.
 --
 -- Foreign keys go to lower blocks only: users and devices (10101), stores
 -- (10401), store_items and stock_movements (10501). reviews.pos_sale_id,
@@ -20,6 +21,8 @@
 --   * counter_code_checks: the per-bill attempt counter (5 wrong tries lock
 --     the bill, 01 §6) and the verified customer device a counter-code sale
 --     links to.
+--   * counter_code_failures: every wrong counter code, online or at sync,
+--     for the per-phone and per-cashier locks (D-131).
 --   * sync_entries: every outbox entry a sync applied, so a replayed entry
 --     answers `duplicate` with what it made, even a count that wrote nothing.
 --
@@ -125,6 +128,8 @@ CREATE INDEX ix_pos_sales_phone ON pos_sales (store_id, link_phone_hash) WHERE l
 CREATE TRIGGER trg_pos_sales_touch BEFORE UPDATE ON pos_sales
   FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
 REVOKE DELETE, TRUNCATE ON pos_sales FROM todayz_app;
+CREATE TRIGGER trg_pos_sales_no_truncate BEFORE TRUNCATE ON pos_sales
+  FOR EACH STATEMENT EXECUTE FUNCTION append_only_truncate();
 
 ------------------------------------------------------------------------------
 -- pos_sale_lines: the lines as sold. client_id is the device's line ULID and
@@ -159,13 +164,18 @@ CREATE UNIQUE INDEX ux_pos_sale_lines_sale_client ON pos_sale_lines (sale_id, cl
 CREATE INDEX ix_pos_sale_lines_store_item_id ON pos_sale_lines (store_item_id) WHERE store_item_id IS NOT NULL;
 CREATE INDEX ix_pos_sale_lines_movement_id ON pos_sale_lines (movement_id) WHERE movement_id IS NOT NULL;
 REVOKE UPDATE, DELETE, TRUNCATE ON pos_sale_lines FROM todayz_app;
+CREATE TRIGGER trg_pos_sale_lines_no_truncate BEFORE TRUNCATE ON pos_sale_lines
+  FOR EACH STATEMENT EXECUTE FUNCTION append_only_truncate();
 
 ------------------------------------------------------------------------------
 -- bill_claims: the bill QR (01 §6). The token is signed with
 -- BILL_QR_SIGNING_KEY over (claim id, store, amount, expiry, nonce); only the
 -- nonce is stored. A claim is made for the sale the POS is about to ring
 -- (sale_client_id, amount = the bill after discounts) and is bound to the
--- sale when it is rung. One claim per bill: the first confirm wins.
+-- sale when it is rung. One claim per bill: the first confirm wins, a new
+-- claim for the bill cancels the earlier ones, and a claim not used by
+-- expires_at expires (D-131; the hold of a cancelled or expired claim is
+-- released).
 ------------------------------------------------------------------------------
 CREATE TABLE bill_claims (
   id                uuid PRIMARY KEY,
@@ -191,7 +201,11 @@ CREATE TABLE bill_claims (
   CONSTRAINT ck_bill_claims_amount CHECK (amount_paise > 0),
   CONSTRAINT ck_bill_claims_nonce CHECK (octet_length(token_nonce) = 16),
   CONSTRAINT ck_bill_claims_status CHECK (status IN ('open','claimed','expired','cancelled')),
-  CONSTRAINT ck_bill_claims_claimed CHECK ((status = 'claimed' OR pos_sale_id IS NOT NULL) = (claimed_by IS NOT NULL)
+  -- An open claim has no customer; a claimed or used one has. A cancelled or
+  -- expired claim keeps the customer who had confirmed it, if any.
+  CONSTRAINT ck_bill_claims_claimed CHECK ((status <> 'open' OR claimed_by IS NULL)
+    AND ((status <> 'claimed' AND pos_sale_id IS NULL) OR claimed_by IS NOT NULL)
+    AND (pos_sale_id IS NULL OR status = 'claimed')
     AND (claimed_by IS NULL) = (claimed_at IS NULL)),
   CONSTRAINT ck_bill_claims_credits CHECK (credits_requested >= 0 AND credits_used >= 0
     AND credits_used <= credits_requested AND (claimed_by IS NOT NULL OR credits_requested = 0))
@@ -204,6 +218,8 @@ CREATE INDEX ix_bill_claims_claimed_by ON bill_claims (claimed_by) WHERE claimed
 CREATE TRIGGER trg_bill_claims_touch BEFORE UPDATE ON bill_claims
   FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
 REVOKE DELETE, TRUNCATE ON bill_claims FROM todayz_app;
+CREATE TRIGGER trg_bill_claims_no_truncate BEFORE TRUNCATE ON bill_claims
+  FOR EACH STATEMENT EXECUTE FUNCTION append_only_truncate();
 
 ------------------------------------------------------------------------------
 -- counter_code_checks: one per bill a cashier typed a counter code for
@@ -235,6 +251,40 @@ CREATE INDEX ix_counter_code_checks_customer ON counter_code_checks (customer_id
 CREATE INDEX ix_counter_code_checks_device ON counter_code_checks (customer_device_id) WHERE customer_device_id IS NOT NULL;
 CREATE TRIGGER trg_counter_code_checks_touch BEFORE UPDATE ON counter_code_checks
   FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
+REVOKE DELETE, TRUNCATE ON counter_code_checks FROM todayz_app;
+CREATE TRIGGER trg_counter_code_checks_no_truncate BEFORE TRUNCATE ON counter_code_checks
+  FOR EACH STATEMENT EXECUTE FUNCTION append_only_truncate();
+
+------------------------------------------------------------------------------
+-- counter_code_failures (D-131): one row per wrong counter code, online or
+-- at sync, at the server's time. 5 in 15 minutes for a phone at a store lock
+-- that phone there for 15 minutes; 20 in an hour by a cashier (any store)
+-- lock their code checks for an hour. The failure that reaches a limit
+-- carries the lock's end, so a lock is "a row whose *_locked_until is still
+-- ahead". phone_hash is NULL for a phone that is not a phone number.
+------------------------------------------------------------------------------
+CREATE TABLE counter_code_failures (
+  id                   uuid PRIMARY KEY,
+  store_id             uuid NOT NULL,
+  cashier_user_id      uuid NOT NULL,
+  phone_hash           bytea,
+  source               text NOT NULL,
+  phone_locked_until   timestamptz,
+  cashier_locked_until timestamptz,
+  failed_at            timestamptz NOT NULL,
+  CONSTRAINT fk_counter_code_failures_store_id FOREIGN KEY (store_id) REFERENCES stores (id),
+  CONSTRAINT fk_counter_code_failures_cashier FOREIGN KEY (cashier_user_id) REFERENCES users (id),
+  CONSTRAINT ck_counter_code_failures_phone CHECK (phone_hash IS NULL OR octet_length(phone_hash) = 32),
+  CONSTRAINT ck_counter_code_failures_source CHECK (source IN ('online', 'sync')),
+  CONSTRAINT ck_counter_code_failures_locks CHECK ((phone_locked_until IS NULL OR (phone_hash IS NOT NULL AND phone_locked_until > failed_at))
+    AND (cashier_locked_until IS NULL OR cashier_locked_until > failed_at))
+);
+CREATE INDEX ix_counter_code_failures_phone ON counter_code_failures (store_id, phone_hash, failed_at)
+  WHERE phone_hash IS NOT NULL;
+CREATE INDEX ix_counter_code_failures_cashier ON counter_code_failures (cashier_user_id, failed_at);
+REVOKE UPDATE, DELETE, TRUNCATE ON counter_code_failures FROM todayz_app;
+CREATE TRIGGER trg_counter_code_failures_no_truncate BEFORE TRUNCATE ON counter_code_failures
+  FOR EACH STATEMENT EXECUTE FUNCTION append_only_truncate();
 
 ------------------------------------------------------------------------------
 -- counter_code_uses (D-12): a counter code (device, 60 s step) is accepted
@@ -254,6 +304,9 @@ CREATE TABLE counter_code_uses (
 );
 CREATE INDEX ix_counter_code_uses_store_id ON counter_code_uses (store_id);
 CREATE INDEX ix_counter_code_uses_pos_sale_id ON counter_code_uses (pos_sale_id) WHERE pos_sale_id IS NOT NULL;
+REVOKE DELETE, TRUNCATE ON counter_code_uses FROM todayz_app;
+CREATE TRIGGER trg_counter_code_uses_no_truncate BEFORE TRUNCATE ON counter_code_uses
+  FOR EACH STATEMENT EXECUTE FUNCTION append_only_truncate();
 
 ------------------------------------------------------------------------------
 -- receipt_tokens (D-45): a 128-bit random token per sale, stored as its
@@ -272,6 +325,9 @@ CREATE TABLE receipt_tokens (
 );
 CREATE UNIQUE INDEX ux_receipt_tokens_hash ON receipt_tokens (token_hash);
 CREATE UNIQUE INDEX ux_receipt_tokens_pos_sale ON receipt_tokens (pos_sale_id);
+REVOKE UPDATE, DELETE, TRUNCATE ON receipt_tokens FROM todayz_app;
+CREATE TRIGGER trg_receipt_tokens_no_truncate BEFORE TRUNCATE ON receipt_tokens
+  FOR EACH STATEMENT EXECUTE FUNCTION append_only_truncate();
 
 ------------------------------------------------------------------------------
 -- sync_cursors (D-36): each POS device's catalogue cursor per store.
@@ -314,12 +370,16 @@ CREATE TABLE sync_entries (
   CONSTRAINT ck_sync_entries_sale CHECK ((kind = 'sale') = (pos_sale_id IS NOT NULL))
 );
 CREATE INDEX ix_sync_entries_pos_sale_id ON sync_entries (pos_sale_id) WHERE pos_sale_id IS NOT NULL;
+REVOKE UPDATE, DELETE, TRUNCATE ON sync_entries FROM todayz_app;
+CREATE TRIGGER trg_sync_entries_no_truncate BEFORE TRUNCATE ON sync_entries
+  FOR EACH STATEMENT EXECUTE FUNCTION append_only_truncate();
 
 -- +goose Down
 DROP TABLE IF EXISTS sync_entries;
 DROP TABLE IF EXISTS sync_cursors;
 DROP TABLE IF EXISTS receipt_tokens;
 DROP TABLE IF EXISTS counter_code_uses;
+DROP TABLE IF EXISTS counter_code_failures;
 DROP TABLE IF EXISTS counter_code_checks;
 DROP TABLE IF EXISTS bill_claims;
 DROP TABLE IF EXISTS pos_sale_lines;

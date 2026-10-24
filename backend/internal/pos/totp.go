@@ -7,6 +7,7 @@ import (
 	"crypto/subtle"
 	"encoding/base32"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -104,6 +105,68 @@ func (s *Service) matchCode(ctx context.Context, phone, code string, at time.Tim
 	return codeMatch{}, false, nil
 }
 
+// codeGuard is who a counter-code check counts against (D-131): the phone
+// at the store and the cashier. phone is nil when it does not parse.
+type codeGuard struct {
+	store, cashier ids.ID
+	phone          []byte
+}
+
+func (s *Service) guard(store, cashier ids.ID, phone string) codeGuard {
+	g := codeGuard{store: store, cashier: cashier}
+	if e164, ok := pii.NormalizePhone(phone); ok {
+		g.phone = s.hasher.Phone(e164)
+	}
+	return g
+}
+
+// codeLocks serialises the guard's counts until commit (the cashier, then
+// the phone, always in that order) and reads them.
+func (s *Service) codeLocks(ctx context.Context, g codeGuard, now time.Time) (posdb.CodeLocksRow, error) {
+	q := s.q(ctx)
+	keys := []string{"pos.code.cashier:" + g.cashier.String()}
+	if g.phone != nil {
+		keys = append(keys, "pos.code.phone:"+g.store.String()+":"+hex.EncodeToString(g.phone))
+	}
+	for _, k := range keys {
+		if err := q.LockCodeKey(ctx, k); err != nil {
+			return posdb.CodeLocksRow{}, fmt.Errorf("pos: lock code key: %w", err)
+		}
+	}
+	r, err := q.CodeLocks(ctx, posdb.CodeLocksParams{
+		StoreID: ids.UUID(g.store), PhoneHash: g.phone, CashierUserID: ids.UUID(g.cashier), Now: now,
+		PhoneLockSince: now.Add(-phoneLock), CashierLockSince: now.Add(-cashierLock),
+		PhoneWindowSince: now.Add(-phoneFailWindow), CashierWindowSince: now.Add(-cashierFailWindow),
+	})
+	if err != nil {
+		return r, fmt.Errorf("pos: code locks: %w", err)
+	}
+	return r, nil
+}
+
+func codeLocked(r posdb.CodeLocksRow) bool { return r.PhoneLocked || r.CashierLocked }
+
+// codeFailed records a wrong code against the guard (source online or
+// sync); the failure that reaches a limit locks the phone or the cashier,
+// and locked reports that it did.
+func (s *Service) codeFailed(ctx context.Context, g codeGuard, r posdb.CodeLocksRow, source string, now time.Time) (locked bool, err error) {
+	var phoneUntil, cashierUntil *time.Time
+	if g.phone != nil && int(r.PhoneFailures)+1 >= phoneFailMax {
+		phoneUntil = ptr(now.Add(phoneLock))
+	}
+	if int(r.CashierFailures)+1 >= cashierFailMax {
+		cashierUntil = ptr(now.Add(cashierLock))
+	}
+	err = s.q(ctx).InsertCodeFailure(ctx, posdb.InsertCodeFailureParams{
+		ID: ids.UUID(s.ids.New(now)), StoreID: ids.UUID(g.store), CashierUserID: ids.UUID(g.cashier),
+		PhoneHash: g.phone, Source: source, PhoneLockedUntil: phoneUntil, CashierLockedUntil: cashierUntil, Now: now,
+	})
+	if err != nil {
+		return false, fmt.Errorf("pos: code failure: %w", err)
+	}
+	return phoneUntil != nil || cashierUntil != nil, nil
+}
+
 // codeReady also needs the device and phone keys.
 func (s *Service) codeReady(ctx context.Context) error {
 	if err := s.ready(ctx); err != nil {
@@ -177,8 +240,10 @@ func (s *Service) Seed(ctx context.Context) (posapi.CounterCodeSeed, error) {
 // --- the POS check -----------------------------------------------------------
 
 // VerifyCode checks a customer's counter code for a bill
-// (POST {S}/counter-code/verify). Five wrong codes lock the bill; a wrong
-// code's attempt is committed even though the call fails.
+// (POST {S}/counter-code/verify). Five wrong codes lock the bill, five in
+// 15 minutes lock the phone at the store and twenty in an hour lock the
+// cashier (D-131); a wrong code's attempt is committed even though the call
+// fails.
 func (s *Service) VerifyCode(ctx context.Context, sc authz.Scope, body posapi.CounterCodeVerifyRequest) (posapi.CounterCodeVerification, error) {
 	if err := s.codeReady(ctx); err != nil {
 		return posapi.CounterCodeVerification{}, err
@@ -187,13 +252,22 @@ func (s *Service) VerifyCode(ctx context.Context, sc authz.Scope, body posapi.Co
 	if err != nil {
 		return posapi.CounterCodeVerification{}, fieldErr("body.saleClientId", "ulid")
 	}
+	p, err := principal(ctx)
+	if err != nil {
+		return posapi.CounterCodeVerification{}, err
+	}
+	g := s.guard(sc.StoreID, p.UserID, body.Phone)
 	key := posdb.LockCounterCheckParams{StoreID: ids.UUID(sc.StoreID), SaleClientID: ids.UUID(clientID)}
 	var out posapi.CounterCodeVerification
 	var refused *problem.Error
 	err = s.db.InTx(ctx, func(ctx context.Context) error {
 		q := s.q(ctx)
 		now := s.now()
-		err := q.EnsureCounterCheck(ctx, posdb.EnsureCounterCheckParams{StoreID: key.StoreID, SaleClientID: key.SaleClientID, Now: now})
+		locks, err := s.codeLocks(ctx, g, now)
+		if err != nil {
+			return err
+		}
+		err = q.EnsureCounterCheck(ctx, posdb.EnsureCounterCheckParams{StoreID: key.StoreID, SaleClientID: key.SaleClientID, Now: now})
 		if err != nil {
 			return fmt.Errorf("pos: counter check: %w", err)
 		}
@@ -205,13 +279,19 @@ func (s *Service) VerifyCode(ctx context.Context, sc authz.Scope, body posapi.Co
 			refused = problem.New(genproblems.CodeLocked, "")
 			return nil
 		}
-		if c.VerifiedAt != nil {
+		if c.VerifiedAt != nil && now.Sub(*c.VerifiedAt) <= codeCheckTTL {
 			// Already right for this bill: answer the same customer again.
+			// An older check is checked again (it would not ring a sale).
 			name, err := q.UserName(ctx, c.CustomerID)
 			if err != nil {
 				return fmt.Errorf("pos: customer name: %w", err)
 			}
 			out = posapi.CounterCodeVerification{CustomerName: name, SaleClientId: clientID.String()}
+			return nil
+		}
+		if codeLocked(locks) {
+			// The phone or the cashier is locked: no code is checked.
+			refused = problem.New(genproblems.CodeLocked, "")
 			return nil
 		}
 		m, ok, err := s.matchCode(ctx, body.Phone, body.Code, now)
@@ -237,7 +317,11 @@ func (s *Service) VerifyCode(ctx context.Context, sc authz.Scope, body posapi.Co
 			if err != nil {
 				return fmt.Errorf("pos: fail counter check: %w", err)
 			}
-			if r.LockedAt != nil {
+			locked, err := s.codeFailed(ctx, g, locks, "online", now)
+			if err != nil {
+				return err
+			}
+			if r.LockedAt != nil || locked {
 				refused = problem.New(genproblems.CodeLocked, "")
 			} else {
 				refused = problem.New(genproblems.CodeInvalid, "").WithExtension("attemptsLeft", max(codeTries-int(r.Attempts), 0))

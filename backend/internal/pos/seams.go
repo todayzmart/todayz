@@ -166,9 +166,14 @@ type Credits interface {
 	// it held (at most credits). Holding the same claim again returns the
 	// first hold.
 	Hold(ctx context.Context, customerID, storeID, claimID ids.ID, credits int) (held int, err error)
-	// Capture spends a claim's hold on the sale it was bound to.
+	// Capture spends a claim's hold on the sale it was bound to. It must
+	// fail (not do nothing) for a hold that was released, so a sale never
+	// takes credits the customer got back; a claim with no hold is a no-op.
 	Capture(ctx context.Context, claimID, saleID ids.ID) error
-	// Release returns a claim's hold that no sale used.
+	// Release returns a claim's hold that no sale used: the claim was
+	// superseded by a newer claim for the bill, another claim was bound, or
+	// it expired (D-131). A claim with no hold, or released before, is a
+	// no-op.
 	Release(ctx context.Context, claimID ids.ID) error
 	// Cashback posts a linked sale's cashback and returns what it posted.
 	Cashback(ctx context.Context, in Cashback) (posted int, err error)

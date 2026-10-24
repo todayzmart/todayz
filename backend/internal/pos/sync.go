@@ -50,6 +50,9 @@ type syncRun struct {
 	st      posdb.StoreInfoRow
 	now     time.Time
 	offline int // counter-code links made offline by this sync
+	// offers are this sync's sales with an offer discount the device
+	// applied; noRole those rung by a user without pos.discount (D-131).
+	offers, noRole int
 }
 
 // Sync applies a device's outbox in deviceSeq order and returns the
@@ -98,8 +101,13 @@ func (s *Service) Sync(ctx context.Context, sc authz.Scope, body syncapi.SyncReq
 				return err
 			}
 		}
-		if run.offline > 0 {
+		if run.offline > 0 || run.offers > 0 {
 			if err := s.offlineRisk(ctx, run); err != nil {
+				return err
+			}
+		}
+		if run.noRole > 0 {
+			if err := s.offerRoleRisk(ctx, run); err != nil {
 				return err
 			}
 		}
@@ -317,6 +325,20 @@ func (s *Service) syncSale(ctx context.Context, run *syncRun, clientID ids.ID, e
 	if l.method == methodCounterCode && l.status == linkLinked {
 		run.offline++
 	}
+	if slices.ContainsFunc(lines, func(l lineInput) bool { return l.Offer > 0 }) {
+		// The device's offer discount is kept as sold (no offer id reaches
+		// the server), so it counts as offline risk, and as a flag for the
+		// manager when the cashier could not discount by hand (D-131).
+		run.offers++
+		err := s.also(ctx, policy.PosDiscount, run.sc)
+		var pe *problem.Error
+		switch {
+		case errors.As(err, &pe) && (pe.Code == genproblems.Forbidden || pe.Code == genproblems.Unauthorized):
+			run.noRole++
+		case err != nil:
+			return res, err
+		}
+	}
 	err = s.q(ctx).InsertSyncEntry(ctx, posdb.InsertSyncEntryParams{
 		StoreID: ids.UUID(run.sc.StoreID), ClientID: ids.UUID(clientID), DeviceID: ids.UUID(run.device),
 		DeviceSeq: int64(e.DeviceSeq), Kind: string(e.Kind), PosSaleID: w.Sale.ID, Now: run.now,
@@ -354,7 +376,7 @@ func (s *Service) offlineLink(ctx context.Context, run *syncRun, in *syncapi.Syn
 		return link{}, reject(syncapi.Invalid)
 	}
 	failed := link{method: methodCounterCode, status: linkFailed}
-	if in.Code == nil || in.ClockOffsetMs == nil || s.devices == nil {
+	if in.Code == nil || in.ClockOffsetMs == nil || s.devices == nil || s.hasher == nil {
 		return failed, nil
 	}
 	offset := time.Duration(*in.ClockOffsetMs) * time.Millisecond
@@ -371,18 +393,36 @@ func (s *Service) offlineLink(ctx context.Context, run *syncRun, in *syncapi.Syn
 	if offset > maxClockOffset || offset < -maxClockOffset || run.now.Sub(typed) > maxAge || typed.After(run.now.Add(totpPeriod)) {
 		return failed, nil
 	}
-	m, ok, err := s.matchCode(ctx, in.Phone, *in.Code, typed)
-	if err != nil || !ok {
-		return failed, err
+	// Wrong codes count into the online locks at the sync's time, and a
+	// locked phone or cashier fails the sync's remaining links (D-131).
+	g := s.guard(run.sc.StoreID, run.p.UserID, in.Phone)
+	locks, err := s.codeLocks(ctx, g, run.now)
+	if err != nil {
+		return link{}, err
 	}
-	_, err = s.q(ctx).InsertCodeUse(ctx, posdb.InsertCodeUseParams{
-		CustomerDeviceID: ids.UUID(m.deviceID), TimeStep: m.step, StoreID: ids.UUID(run.sc.StoreID), Now: run.now,
-	})
-	switch {
-	case isNoRows(err):
-		return failed, nil // the code was used before
-	case err != nil:
-		return link{}, fmt.Errorf("pos: code use: %w", err)
+	if codeLocked(locks) {
+		return failed, nil
+	}
+	m, ok, err := s.matchCode(ctx, in.Phone, *in.Code, typed)
+	if err != nil {
+		return link{}, err
+	}
+	if ok {
+		_, err = s.q(ctx).InsertCodeUse(ctx, posdb.InsertCodeUseParams{
+			CustomerDeviceID: ids.UUID(m.deviceID), TimeStep: m.step, StoreID: ids.UUID(run.sc.StoreID), Now: run.now,
+		})
+		switch {
+		case isNoRows(err):
+			ok = false // the code was used before: as wrong as a guess
+		case err != nil:
+			return link{}, fmt.Errorf("pos: code use: %w", err)
+		}
+	}
+	if !ok {
+		if _, err := s.codeFailed(ctx, g, locks, "sync", run.now); err != nil {
+			return link{}, err
+		}
+		return failed, nil
 	}
 	return link{
 		method: methodCounterCode, status: linkLinked, customerID: m.customerID,
@@ -390,27 +430,54 @@ func (s *Service) offlineLink(ctx context.Context, run *syncRun, in *syncapi.Syn
 	}, nil
 }
 
+// istDay is the start of run.now's day in IST, in UTC.
+func istDay(now time.Time) time.Time {
+	local := now.In(ist)
+	return time.Date(local.Year(), local.Month(), local.Day(), 0, 0, 0, 0, ist).UTC()
+}
+
 // offlineRisk flags the store once a day when its offline counter-code
-// links pass pos_offline_links_risk_per_day (01 §6).
+// links and offline sales with a device-applied offer discount (D-131)
+// together pass pos_offline_links_risk_per_day (01 §6).
 func (s *Service) offlineRisk(ctx context.Context, run *syncRun) error {
 	limit, err := s.count(ctx, settings.PosOfflineLinksRiskPerDay)
 	if err != nil {
 		return err
 	}
-	local := run.now.In(ist)
-	since := time.Date(local.Year(), local.Month(), local.Day(), 0, 0, 0, 0, ist).UTC()
+	since := istDay(run.now)
 	q := s.q(ctx)
 	n, err := q.OfflineLinksSince(ctx, posdb.OfflineLinksSinceParams{StoreID: ids.UUID(run.sc.StoreID), Since: since})
 	if err != nil {
 		return fmt.Errorf("pos: offline links: %w", err)
 	}
-	if int(n) <= limit {
+	o, err := q.OfflineOfferSalesSince(ctx, posdb.OfflineOfferSalesSinceParams{StoreID: ids.UUID(run.sc.StoreID), Since: since})
+	if err != nil {
+		return fmt.Errorf("pos: offline offer sales: %w", err)
+	}
+	if int(n)+int(o) <= limit {
 		return nil
 	}
-	details, _ := json.Marshal(map[string]int{"offlineLinks": int(n), "limit": limit})
+	details, _ := json.Marshal(map[string]int{"offlineLinks": int(n), "offlineOfferSales": int(o), "limit": limit})
 	err = q.InsertRiskFlagOnce(ctx, posdb.InsertRiskFlagOnceParams{
 		ID: ids.UUID(s.ids.New(run.now)), StoreID: ids.UUID(run.sc.StoreID), Rule: "pos.offline_links",
 		// TODO(lead): the plan gives no score for this flag; 50 is a middle value.
+		Score: 50, Details: details, Now: run.now, Since: since,
+	})
+	if err != nil {
+		return fmt.Errorf("pos: risk flag: %w", err)
+	}
+	return nil
+}
+
+// offerRoleRisk flags the store once a day when a cashier without
+// pos.discount synced a sale with an offer discount the device applied
+// (D-131): the sale is kept as sold, the manager looks at it.
+func (s *Service) offerRoleRisk(ctx context.Context, run *syncRun) error {
+	since := istDay(run.now)
+	details, _ := json.Marshal(map[string]any{"cashierUserId": run.p.UserID.String(), "sales": run.noRole})
+	err := s.q(ctx).InsertRiskFlagOnce(ctx, posdb.InsertRiskFlagOnceParams{
+		ID: ids.UUID(s.ids.New(run.now)), StoreID: ids.UUID(run.sc.StoreID), Rule: "pos.offline_offer_without_discount_role",
+		// TODO(lead): no score in the plan; 50 as for pos.offline_links.
 		Score: 50, Details: details, Now: run.now, Since: since,
 	})
 	if err != nil {

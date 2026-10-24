@@ -27,6 +27,20 @@ import (
 // codeTries is how many wrong counter codes lock a bill (01 §6).
 const codeTries = 5 //settings:ok 01 §6 fixes the lock at 5 tries; no platform setting exists
 
+// Counter-code brute force across bills (D-131): wrong codes are counted per
+// (store, phone) and per cashier on a rolling window, online and offline
+// alike, so a new saleClientId does not reset them. codeCheckTTL is how long
+// a verified check may wait for its sale.
+const (
+	phoneFailMax      = 5                //settings:ok D-131 fixes 5 wrong codes per phone at a store; no platform setting exists
+	phoneFailWindow   = 15 * time.Minute //settings:ok D-131 fixed window
+	phoneLock         = 15 * time.Minute //settings:ok D-131 fixed lock
+	cashierFailMax    = 20               //settings:ok D-131 fixes 20 wrong codes per cashier; no platform setting exists
+	cashierFailWindow = time.Hour
+	cashierLock       = time.Hour
+	codeCheckTTL      = 2 * time.Minute //settings:ok D-131 fixed age of a verified check
+)
+
 // Link methods and statuses (pos_sales.link_method, link_status).
 const (
 	methodBillQR      = "bill_qr"
@@ -109,6 +123,12 @@ func (s *Service) writeSale(ctx context.Context, st posdb.StoreInfoRow, in saleW
 	b := in.Bill
 	saleID := s.ids.New(now)
 	l := in.Link
+	// A device's clock may run ahead: a sale is never sold after it was
+	// received (D-131).
+	soldAt := in.SoldAt.UTC().Truncate(time.Microsecond)
+	if soldAt.After(now) {
+		soldAt = now
+	}
 	row, err := q.InsertSale(ctx, posdb.InsertSaleParams{
 		ID: ids.UUID(saleID), StoreID: ids.UUID(in.StoreID), ClientID: ids.UUID(in.ClientID),
 		DeviceID: ids.UUID(in.Device), DeviceSeq: in.DeviceSeq, CashierUserID: ids.UUID(in.Cashier),
@@ -117,7 +137,7 @@ func (s *Service) writeSale(ctx context.Context, st posdb.StoreInfoRow, in saleW
 		LinkPhoneHash: l.phoneHash, LinkPhoneEnc: l.phoneEnc,
 		ItemSubtotalPaise: b.ItemSubtotal, BillOfferDiscountPaise: b.BillOffer, SubtotalPaise: b.Subtotal,
 		DiscountPaise: b.Discount, RoundOffPaise: b.RoundOff, CreditsUsed: i32(int64(b.Credits)),
-		TotalPaise: b.Total, PaymentMethod: in.Payment, SoldAt: in.SoldAt.UTC().Truncate(time.Microsecond), Now: now,
+		TotalPaise: b.Total, PaymentMethod: in.Payment, SoldAt: soldAt, Now: now,
 	})
 	if isNoRows(err) {
 		return written{}, errSaleExists
@@ -177,6 +197,10 @@ func (s *Service) writeSale(ctx context.Context, st posdb.StoreInfoRow, in saleW
 		if err := s.publishClaim(ctx, c); err != nil {
 			return written{}, err
 		}
+	}
+	// The bill is rung: its other QRs are dead and their holds go back.
+	if err := s.cancelClaims(ctx, in.StoreID, in.ClientID, l.claimID, now); err != nil {
+		return written{}, err
 	}
 	if l.codeDevice != ids.Zero {
 		err := q.BindCodeUse(ctx, posdb.BindCodeUseParams{PosSaleID: row.ID, CustomerDeviceID: ids.UUID(l.codeDevice), TimeStep: l.codeStep})
@@ -328,6 +352,10 @@ func (s *Service) CreateSale(ctx context.Context, sc authz.Scope, body posapi.Po
 	var linkFail *problem.Error
 	err = s.db.InTx(ctx, func(ctx context.Context) error {
 		l, credits, perr, err := s.onlineLink(ctx, sc.StoreID, clientID, body.Link, b0.Eligible)
+		if errors.Is(err, errSaleExists) {
+			replay = true
+			return nil
+		}
 		if err != nil {
 			return err
 		}
@@ -477,8 +505,9 @@ func (s *Service) offers(ctx context.Context, storeID ids.ID, lines []lineInput)
 	for j, i := range at {
 		if j < len(pr.LineDiscounts) {
 			gross := lines[i].Unit * int64(lines[i].Qty)
+			// A manual discount past what the offer left is refused by
+			// price (manualDiscountPaise: range), never cut down.
 			lines[i].Offer = min(max(pr.LineDiscounts[j], 0), gross)
-			lines[i].Manual = min(lines[i].Manual, gross-lines[i].Offer)
 		}
 	}
 	return max(pr.BillDiscount, 0), pr.Offers, nil
@@ -508,19 +537,22 @@ func (s *Service) onlineLink(ctx context.Context, storeID, clientID ids.ID, in *
 			return l, 0, nil, fmt.Errorf("pos: lock bill claim: %w", err)
 		}
 		switch {
+		case c.PosSaleID.Valid && mustID(c.SaleClientID) == clientID:
+			// This bill's own sale took it: a concurrent retry waited on
+			// the claim's lock and replays that sale.
+			return l, 0, nil, errSaleExists
 		case c.PosSaleID.Valid:
 			return l, 0, nil, problem.New(genproblems.ClaimAlreadyUsed, "")
 		case mustID(c.SaleClientID) != clientID || c.AmountPaise != eligible:
 			return l, 0, nil, problem.New(genproblems.ClaimMismatch, "")
-		case c.Status == "open" && !s.now().Before(c.ExpiresAt), c.Status == "expired", c.Status == "cancelled":
+		case !s.now().Before(c.ExpiresAt), c.Status == "expired", c.Status == "cancelled":
+			// A confirmed claim expires too (D-131): the sweep gives its
+			// hold back.
 			return l, 0, nil, problem.New(genproblems.ClaimExpired, "")
 		case c.Status != "claimed":
 			// Shown but not yet confirmed by the customer.
 			return l, 0, nil, problem.New(genproblems.Conflict, "")
 		}
-		// TODO(lead): a claimed QR stays usable for the sale after its 120 s
-		// expiry (the customer already confirmed); how long a held claim
-		// lives before its credits are released is not in the plan.
 		return link{method: methodBillQR, status: linkLinked, customerID: mustID(c.ClaimedBy), claimID: id}, int(c.CreditsUsed), nil, nil
 	case methodCounterCode:
 		c, err := q.LockCounterCheck(ctx, posdb.LockCounterCheckParams{StoreID: ids.UUID(storeID), SaleClientID: ids.UUID(clientID)})
@@ -533,7 +565,8 @@ func (s *Service) onlineLink(ctx context.Context, storeID, clientID ids.ID, in *
 		switch {
 		case c.LockedAt != nil:
 			return l, 0, problem.New(genproblems.CodeLocked, ""), nil
-		case c.VerifiedAt == nil:
+		case c.VerifiedAt == nil, s.now().Sub(*c.VerifiedAt) > codeCheckTTL:
+			// Not verified, or verified too long ago for this sale (D-131).
 			return l, 0, problem.New(genproblems.CodeInvalid, "").WithExtension("attemptsLeft", max(codeTries-int(c.Attempts), 0)), nil
 		}
 		return link{method: methodCounterCode, status: linkLinked, customerID: mustID(c.CustomerID),
@@ -599,7 +632,13 @@ func (s *Service) ReverseSale(ctx context.Context, sc authz.Scope, saleID ids.ID
 		if sale.Status != "completed" {
 			return problem.New(genproblems.InvalidTransition, "")
 		}
-		if now.Sub(sale.SoldAt) > window {
+		// An offline sale's window runs from when it reached the server:
+		// the device's own time is not trusted for it (D-131).
+		from := sale.SoldAt
+		if sale.DeviceSeq != nil {
+			from = sale.ReceivedAt
+		}
+		if now.Sub(from) > window {
 			return problem.New(genproblems.ReversalWindowPassed, "")
 		}
 		if lines, err = q.SaleLines(ctx, sale.ID); err != nil {
@@ -613,7 +652,12 @@ func (s *Service) ReverseSale(ctx context.Context, sc authz.Scope, saleID ids.ID
 			_, err := s.stock.Reverse(ctx, t, StockReversal{
 				StoreID: sc.StoreID, MovementID: mustID(ln.MovementID), Qty: ln.Quantity, UserID: p.UserID, Note: note,
 			})
-			if err != nil {
+			switch {
+			case errors.Is(err, ErrItemNotFound), errors.Is(err, ErrStockInvalid):
+				// The item or its movement is gone or can no longer take
+				// the units back.
+				return problem.New(genproblems.InvalidTransition, "")
+			case err != nil:
 				return fmt.Errorf("pos: reverse line: %w", err)
 			}
 		}

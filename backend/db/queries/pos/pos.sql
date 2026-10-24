@@ -144,6 +144,28 @@ UPDATE bill_claims SET pos_sale_id = @pos_sale_id, version = version + 1, update
 WHERE id = @id AND status = 'claimed' AND pos_sale_id IS NULL
 RETURNING *;
 
+-- name: CancelBillClaims :many
+-- The bill's other live claims (a new claim for it, or its sale rung) are
+-- cancelled; the caller releases the holds of those a customer confirmed.
+UPDATE bill_claims SET status = 'cancelled', version = version + 1, updated_at = @now
+WHERE store_id = @store_id AND sale_client_id = @sale_client_id AND id IS DISTINCT FROM sqlc.narg(keep_id)
+  AND status IN ('open','claimed') AND pos_sale_id IS NULL
+RETURNING id, claimed_by;
+
+-- name: ExpireBillClaims :many
+-- Up to @lim live claims past their expiry (the sweep); a claim a sale is
+-- binding right now is skipped and its sale sees it expired.
+WITH due AS (
+  SELECT id FROM bill_claims
+  WHERE status IN ('open','claimed') AND pos_sale_id IS NULL AND expires_at <= @now
+  ORDER BY expires_at
+  LIMIT @lim
+  FOR UPDATE SKIP LOCKED
+)
+UPDATE bill_claims bc SET status = 'expired', version = bc.version + 1, updated_at = @now
+FROM due WHERE bc.id = due.id
+RETURNING bc.id, bc.claimed_by;
+
 ------------------------------------------------------------------------------
 -- Counter codes
 ------------------------------------------------------------------------------
@@ -172,6 +194,32 @@ RETURNING attempts, locked_at;
 UPDATE counter_code_checks SET customer_id = @customer_id, customer_device_id = @customer_device_id,
   time_step = @time_step, verified_at = @now, updated_at = @now
 WHERE store_id = @store_id AND sale_client_id = @sale_client_id;
+
+-- name: LockCodeKey :exec
+-- Serialises the failure count of one phone or cashier until commit.
+SELECT pg_advisory_xact_lock(hashtextextended(@key::text, 0));
+
+-- name: CodeLocks :one
+-- Whether a phone at a store, or a cashier, is locked, and their failures
+-- in the windows (D-131).
+SELECT
+  EXISTS (SELECT 1 FROM counter_code_failures f
+    WHERE f.store_id = @store_id AND f.phone_hash = sqlc.narg(phone_hash)
+      AND f.failed_at > @phone_lock_since AND f.phone_locked_until > @now::timestamptz) AS phone_locked,
+  EXISTS (SELECT 1 FROM counter_code_failures f
+    WHERE f.cashier_user_id = @cashier_user_id
+      AND f.failed_at > @cashier_lock_since AND f.cashier_locked_until > @now::timestamptz) AS cashier_locked,
+  (SELECT count(*) FROM counter_code_failures f
+    WHERE f.store_id = @store_id AND f.phone_hash = sqlc.narg(phone_hash)
+      AND f.failed_at > @phone_window_since)::int AS phone_failures,
+  (SELECT count(*) FROM counter_code_failures f
+    WHERE f.cashier_user_id = @cashier_user_id AND f.failed_at > @cashier_window_since)::int AS cashier_failures;
+
+-- name: InsertCodeFailure :exec
+INSERT INTO counter_code_failures (id, store_id, cashier_user_id, phone_hash, source,
+  phone_locked_until, cashier_locked_until, failed_at)
+VALUES (@id, @store_id, @cashier_user_id, sqlc.narg(phone_hash), @source,
+  sqlc.narg(phone_locked_until), sqlc.narg(cashier_locked_until), @now);
 
 -- name: InsertCodeUse :one
 -- A (device, step) is accepted once (D-12): a second use returns no row.
@@ -275,6 +323,13 @@ LIMIT @lim;
 SELECT count(*)::int AS n FROM pos_sales
 WHERE store_id = @store_id AND offline_link_at IS NOT NULL AND link_status = 'linked'
   AND received_at >= @since;
+
+-- name: OfflineOfferSalesSince :one
+-- Offline sales carrying an offer discount the device applied (no offer id
+-- reaches the server, D-131).
+SELECT count(*)::int AS n FROM pos_sales s
+WHERE s.store_id = @store_id AND s.device_seq IS NOT NULL AND s.received_at >= @since
+  AND EXISTS (SELECT 1 FROM pos_sale_lines l WHERE l.sale_id = s.id AND l.offer_discount_paise > 0);
 
 -- name: InsertRiskFlagOnce :exec
 -- One open flag per store, rule and IST day.

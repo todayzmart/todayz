@@ -98,15 +98,16 @@ func (s *Service) claimsReady(ctx context.Context) error {
 	return nil
 }
 
-// claimStatus is the API status: used once a sale took it, expired once an
-// open claim is past its 120 s (or was cancelled).
+// claimStatus is the API status: used once a sale took it, expired once it
+// is past its 120 s, confirmed or not (D-131), or was cancelled.
 func (s *Service) claimStatus(c posdb.BillClaim) posapi.BillClaimStatus {
+	live := s.now().Before(c.ExpiresAt)
 	switch {
 	case c.PosSaleID.Valid:
 		return posapi.Used
-	case c.Status == "claimed":
+	case c.Status == "claimed" && live:
 		return posapi.Claimed
-	case c.Status == "open" && s.now().Before(c.ExpiresAt):
+	case c.Status == "open" && live:
 		return posapi.Open
 	}
 	return posapi.Expired
@@ -144,14 +145,28 @@ func (s *Service) CreateClaim(ctx context.Context, sc authz.Scope, body posapi.B
 	if err != nil {
 		return posapi.BillClaim{}, asProblem(err)
 	}
-	now := s.now()
-	c, err := s.q(ctx).InsertBillClaim(ctx, posdb.InsertBillClaimParams{
-		ID: ids.UUID(s.ids.New(now)), StoreID: ids.UUID(sc.StoreID), SaleClientID: ids.UUID(clientID),
-		AmountPaise: int64(body.AmountPaise), TokenNonce: nonce, ExpiresAt: now.Add(claimTTL),
-		CreatedBy: ids.UUID(p.UserID), Now: now,
+	var c posdb.BillClaim
+	err = s.db.InTx(ctx, func(ctx context.Context) error {
+		now := s.now()
+		id := s.ids.New(now)
+		// A new QR for the bill supersedes the earlier ones (D-131): one
+		// live claim per bill, and no hold left behind.
+		if err := s.cancelClaims(ctx, sc.StoreID, clientID, id, now); err != nil {
+			return err
+		}
+		var err error
+		c, err = s.q(ctx).InsertBillClaim(ctx, posdb.InsertBillClaimParams{
+			ID: ids.UUID(id), StoreID: ids.UUID(sc.StoreID), SaleClientID: ids.UUID(clientID),
+			AmountPaise: int64(body.AmountPaise), TokenNonce: nonce, ExpiresAt: now.Add(claimTTL),
+			CreatedBy: ids.UUID(p.UserID), Now: now,
+		})
+		if err != nil {
+			return fmt.Errorf("pos: insert bill claim: %w", err)
+		}
+		return nil
 	})
 	if err != nil {
-		return posapi.BillClaim{}, asProblem(fmt.Errorf("pos: insert bill claim: %w", err))
+		return posapi.BillClaim{}, asProblem(err)
 	}
 	v := s.claimView(c, nil)
 	v.Token = ptr(s.claimToken(c))
@@ -191,6 +206,59 @@ func (s *Service) claimView(c posdb.BillClaim, customer *string) posapi.BillClai
 	return v
 }
 
+// cancelClaims cancels the bill's live claims other than keep (zero keeps
+// none) and releases the holds of those a customer confirmed (D-131).
+func (s *Service) cancelClaims(ctx context.Context, storeID, clientID, keep ids.ID, now time.Time) error {
+	rows, err := s.q(ctx).CancelBillClaims(ctx, posdb.CancelBillClaimsParams{
+		Now: now, StoreID: ids.UUID(storeID), SaleClientID: ids.UUID(clientID), KeepID: nullID(keep),
+	})
+	if err != nil {
+		return fmt.Errorf("pos: cancel bill claims: %w", err)
+	}
+	for _, r := range rows {
+		if !r.ClaimedBy.Valid {
+			continue
+		}
+		if err := s.credits.Release(ctx, mustID(r.ID)); err != nil {
+			return fmt.Errorf("pos: release credits: %w", err)
+		}
+	}
+	return nil
+}
+
+// claimSweep is how many claims one ExpireClaims pass expires.
+const claimSweep = 500
+
+// ExpireClaims expires the live claims past their 120 s and releases the
+// holds of those a customer confirmed (the pos_bill_claim_expiry job,
+// D-131). It returns how many it expired and how many holds it released.
+func (s *Service) ExpireClaims(ctx context.Context) (expired, released int, err error) {
+	if err := s.ready(ctx); err != nil {
+		return 0, 0, err
+	}
+	err = s.db.InTx(ctx, func(ctx context.Context) error {
+		rows, err := s.q(ctx).ExpireBillClaims(ctx, posdb.ExpireBillClaimsParams{Now: s.now(), Lim: claimSweep})
+		if err != nil {
+			return fmt.Errorf("pos: expire bill claims: %w", err)
+		}
+		expired, released = len(rows), 0
+		for _, r := range rows {
+			if !r.ClaimedBy.Valid {
+				continue
+			}
+			if err := s.credits.Release(ctx, mustID(r.ID)); err != nil {
+				return fmt.Errorf("pos: release credits: %w", err)
+			}
+			released++
+		}
+		return nil
+	})
+	if err != nil {
+		return 0, 0, err
+	}
+	return expired, released, nil
+}
+
 // --- the customer side -------------------------------------------------------
 
 // claimByToken reads (or locks) the claim a token names and checks the
@@ -227,9 +295,8 @@ func (s *Service) claimByToken(ctx context.Context, token string, lock bool) (po
 }
 
 // claimOpen refuses a claim that is no longer open to the customer: used or
-// confirmed by someone (claim_already_used), past 120 s or cancelled
-// (claim_expired). A customer re-confirming their own claim is answered
-// by the caller.
+// confirmed by anyone, the same customer included (claim_already_used), past
+// 120 s or cancelled (claim_expired).
 func (s *Service) claimOpen(c posdb.BillClaim) error {
 	switch {
 	case c.PosSaleID.Valid || c.Status == "claimed":
