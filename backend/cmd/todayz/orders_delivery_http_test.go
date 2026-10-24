@@ -629,6 +629,42 @@ func TestBK26ReturnSweep(t *testing.T) {
 	require.Equal(t, "returned", *out)
 }
 
+// BK-26 (D-218): the two reminders follow delivery_return_first_reminder_hours
+// and delivery_return_second_reminder_hours, for the timers and the sweep;
+// the 72 h auto-confirm does not move.
+func TestBK26ReturnReminderSettings(t *testing.T) {
+	d := newDeliveryShop(t)
+	d.a.exec(`UPDATE platform_settings SET value = '3' WHERE key = 'delivery_return_first_reminder_hours'`)
+	d.a.exec(`UPDATE platform_settings SET value = '30' WHERE key = 'delivery_return_second_reminder_hours'`)
+	d.settings.Invalidate()
+	id, at := d.failed()
+	require.Equal(t, 1, d.timerJobs(orders.KindDeliveryReturn, id, at.Add(3*time.Hour)))
+
+	d.set(at.Add(2 * time.Hour))
+	require.Equal(t, platformjobs.StatusFailed, d.returnRun(id, 1).Status, "2 h: early under a 3 h setting")
+	d.set(at.Add(3 * time.Hour))
+	fr := d.returnRun(id, 1)
+	require.EqualValues(t, 1, fr.Result.Summary["reminded"], "%v", fr.Err)
+	require.Equal(t, 1, d.timerJobs(orders.KindDeliveryReturn, id, at.Add(30*time.Hour)))
+
+	swept, sat := d.failed()
+	d.a.exec(`DELETE FROM river_job WHERE kind = $1`, orders.KindDeliveryReturn)
+	d.set(sat.Add(24 * time.Hour))
+	d.sweep()
+	require.Equal(t, 1, d.reminders(swept), "24 h: only the first reminder under a 30 h setting")
+	d.set(sat.Add(30 * time.Hour))
+	d.sweep()
+	require.Equal(t, 2, d.reminders(swept))
+	d.set(sat.Add(72*time.Hour - time.Minute))
+	d.sweep()
+	require.Nil(t, d.returnOutcome(swept))
+	d.set(sat.Add(72 * time.Hour))
+	d.sweep()
+	out := d.returnOutcome(swept)
+	require.NotNil(t, out)
+	require.Equal(t, "unconfirmed", *out)
+}
+
 // BK-27: the shop sees the customer's full phone (detail and list) only
 // while the order is out_for_delivery; masked before and after.
 func TestBK27PhoneOnlyWhileOutForDelivery(t *testing.T) {

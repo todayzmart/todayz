@@ -85,7 +85,7 @@ func registerorders(r *Registry, d Deps) {
 		"Expires an accepted delivery order the shop did not dispatch by dispatch_by, returns its stock and credits and records a store strike (BK-24)",
 		(*orders.Service).ExpireDispatch)
 	timer(orders.KindDeliveryReturn,
-		"A failed delivery's return: reminds the store at 2 h and 24 h, and at 72 h settles it unconfirmed, releases the stock and flags the store (D-69, BK-26)",
+		"A failed delivery's return: reminds the store twice (settings, 2 h and 24 h by default, D-218), and at 72 h settles it unconfirmed, releases the stock and flags the store (D-69, BK-26)",
 		(*orders.Service).ReturnStep)
 	timer(orders.KindPartialTimeout,
 		"Cancels a partly accepted order the customer did not confirm or decline by partial_confirm_by, releasing its credits, with no strike (BK-10)",

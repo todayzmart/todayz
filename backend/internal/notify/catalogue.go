@@ -65,6 +65,7 @@ var catalogue = map[string]kindDef{
 		App: AppBusiness, Params: []string{"store"},
 		Text: map[string]text{
 			"en": {"Confirm a return", "A failed delivery at {store} is waiting for you to confirm the goods came back."},
+			"hi": {"वापसी की पुष्टि करें", "{store} की एक असफल डिलीवरी का सामान वापस आया या नहीं, इसकी पुष्टि बाकी है।"},
 		},
 	},
 	notice.KindOrderUnseen: {

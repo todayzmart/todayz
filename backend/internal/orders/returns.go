@@ -32,7 +32,7 @@ const (
 	// not dispatch by dispatch_by and gives the store a strike (BK-24).
 	KindDispatchTimeout = "order_dispatch_timeout"
 	// KindDeliveryReturn is a failed delivery's return step: the reminders
-	// to the shop at 2 h and 24 h, the auto-confirm at 72 h (D-69, BK-26).
+	// to the shop (2 h and 24 h by default, D-218), the auto-confirm at 72 h (D-69, BK-26).
 	KindDeliveryReturn = "order_delivery_return"
 )
 
@@ -45,11 +45,9 @@ const (
 	returnUnconfirmed = "unconfirmed"
 )
 
-// The return's steps after delivery_failed_at (D-69; fixed by the decision,
-// not settings).
+// The return's auto-confirm after delivery_failed_at (D-69; a constant,
+// D-85). The two reminders before it are settings (D-218, returnTimes).
 const (
-	returnFirstAfter  = 2 * time.Hour  //settings:ok D-85
-	returnSecondAfter = 24 * time.Hour //settings:ok D-85
 	returnSettleAfter = 72 * time.Hour //settings:ok D-85
 
 	// returnFlagScore is the return_unconfirmed risk flag's score (0–100).
@@ -77,22 +75,40 @@ func (s *Service) dispatchTimer(ctx context.Context, orderID ids.ID, by time.Tim
 
 // returnTimer schedules the return's step (1: first reminder, 2: second,
 // 3: auto-confirm) at its time after the failure.
-func (s *Service) returnTimer(ctx context.Context, orderID ids.ID, step int, failedAt time.Time) error {
+func (s *Service) returnTimer(ctx context.Context, orderID ids.ID, step int, failedAt time.Time, rt returnTimes) error {
 	t, err := tx(ctx)
 	if err != nil {
 		return err
 	}
 	return s.jobs.EnqueueTx(ctx, t, KindDeliveryReturn, TimerArgs{OrderID: orderID, Step: step},
-		platformjobs.EnqueueOpts{ScheduledAt: failedAt.Add(returnDue(step)), UniqueKey: fmt.Sprintf("%s:return:%d", orderID, step)})
+		platformjobs.EnqueueOpts{ScheduledAt: failedAt.Add(rt.due(step)), UniqueKey: fmt.Sprintf("%s:return:%d", orderID, step)})
 }
 
-// returnDue is how long after the failure a step is due.
-func returnDue(step int) time.Duration {
+// returnTimes are the two reminders' times after the failure, from
+// delivery_return_first_reminder_hours and
+// delivery_return_second_reminder_hours (D-218; their bounds keep
+// first < second < 72 h).
+type returnTimes struct{ first, second time.Duration }
+
+func (s *Service) returnTimes(ctx context.Context) (returnTimes, error) {
+	first, err := s.duration(ctx, settings.DeliveryReturnFirstReminderHours)
+	if err != nil {
+		return returnTimes{}, err
+	}
+	second, err := s.duration(ctx, settings.DeliveryReturnSecondReminderHours)
+	if err != nil {
+		return returnTimes{}, err
+	}
+	return returnTimes{first, second}, nil
+}
+
+// due is how long after the failure a step is due.
+func (rt returnTimes) due(step int) time.Duration {
 	switch step {
 	case 1:
-		return returnFirstAfter
+		return rt.first
 	case 2:
-		return returnSecondAfter
+		return rt.second
 	default:
 		return returnSettleAfter
 	}
@@ -184,7 +200,11 @@ func (s *Service) failDelivery(ctx context.Context, by, storeID, orderID ids.ID,
 		if err := s.record(ctx, o, StatusDeliveryFailed, v, staff(by), &reason, generic, now); err != nil {
 			return err
 		}
-		return s.returnTimer(ctx, orderID, 1, now)
+		rt, err := s.returnTimes(ctx)
+		if err != nil {
+			return err
+		}
+		return s.returnTimer(ctx, orderID, 1, now, rt)
 	}))
 }
 
@@ -337,8 +357,8 @@ const (
 	outcomeSettled  = "settled"
 )
 
-// ReturnStep is the KindDeliveryReturn handler: the reminders at 2 h and
-// 24 h to the store's inbox, then at 72 h the return is settled
+// ReturnStep is the KindDeliveryReturn handler: the reminders (2 h and
+// 24 h by default, D-218) to the store's inbox, then at 72 h the return is settled
 // unconfirmed (nobody confirmed it), the held stock goes back and the store
 // gets a return_unconfirmed risk flag (D-69). A settled return, or a second
 // run, does nothing.
@@ -370,7 +390,11 @@ func (s *Service) ReturnStep(ctx context.Context, run platformjobs.Run) (platfor
 // passes 0 and takes whatever is due.
 func (s *Service) returnStep(ctx context.Context, orderID ids.ID, step int) (string, error) {
 	did := ""
-	err := s.db.InTx(ctx, func(ctx context.Context) error {
+	rt, err := s.returnTimes(ctx)
+	if err != nil {
+		return "", err
+	}
+	err = s.db.InTx(ctx, func(ctx context.Context) error {
 		now := s.now()
 		q := s.q(ctx)
 		o, err := q.LockOrder(ctx, ids.UUID(orderID))
@@ -385,7 +409,7 @@ func (s *Service) returnStep(ctx context.Context, orderID ids.ID, step int) (str
 		}
 		failed := *o.DeliveryFailedAt
 		age := now.Sub(failed)
-		if step > 0 && age < returnDue(step) {
+		if step > 0 && age < rt.due(step) {
 			return errEarly
 		}
 		switch {
@@ -402,18 +426,18 @@ func (s *Service) returnStep(ctx context.Context, orderID ids.ID, step int) (str
 			}
 			did = outcomeSettled
 			return s.settleReturn(ctx, o, returnUnconfirmed, system, now)
-		case age >= returnSecondAfter && o.ReturnRemindersSent < 2:
+		case age >= rt.second && o.ReturnRemindersSent < 2:
 			did = outcomeReminded
 			if err := s.remindReturn(ctx, o, 2); err != nil {
 				return err
 			}
-			return s.returnTimer(ctx, orderID, 3, failed)
-		case age >= returnFirstAfter && o.ReturnRemindersSent < 1:
+			return s.returnTimer(ctx, orderID, 3, failed, rt)
+		case age >= rt.first && o.ReturnRemindersSent < 1:
 			did = outcomeReminded
 			if err := s.remindReturn(ctx, o, 1); err != nil {
 				return err
 			}
-			return s.returnTimer(ctx, orderID, 2, failed)
+			return s.returnTimer(ctx, orderID, 2, failed, rt)
 		}
 		return nil
 	})

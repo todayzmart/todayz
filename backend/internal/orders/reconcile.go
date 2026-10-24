@@ -95,16 +95,18 @@ func dueDispatches(ctx context.Context, q *ordersdb.Queries, before time.Time, k
 }
 
 // dueReturns reads failed deliveries with a return step due at before.
-func dueReturns(ctx context.Context, q *ordersdb.Queries, before time.Time, k dueKey) ([]dueRow, error) {
-	rows, err := q.DueReturns(ctx, ordersdb.DueReturnsParams{
-		First: before.Add(-returnFirstAfter), Second: before.Add(-returnSecondAfter), Settle: before.Add(-returnSettleAfter),
-		Before: before, AfterFailed: k.failed, AfterAt: k.at, AfterID: k.id, Lim: reconcilePage,
-	})
-	out := make([]dueRow, len(rows))
-	for i, r := range rows {
-		out[i] = dueRow{r.ID, r.Due, r.Failed}
+func dueReturns(rt returnTimes) duePage {
+	return func(ctx context.Context, q *ordersdb.Queries, before time.Time, k dueKey) ([]dueRow, error) {
+		rows, err := q.DueReturns(ctx, ordersdb.DueReturnsParams{
+			First: before.Add(-rt.first), Second: before.Add(-rt.second), Settle: before.Add(-returnSettleAfter),
+			Before: before, AfterFailed: k.failed, AfterAt: k.at, AfterID: k.id, Lim: reconcilePage,
+		})
+		out := make([]dueRow, len(rows))
+		for i, r := range rows {
+			out[i] = dueRow{r.ID, r.Due, r.Failed}
+		}
+		return out, err
 	}
-	return out, err
 }
 
 type reconciled struct{ expired, noop, failed int64 }
@@ -127,6 +129,10 @@ func (s *Service) Reconcile(ctx context.Context, _ platformjobs.Run) (platformjo
 	if err != nil {
 		return platformjobs.Result{}, err
 	}
+	rt, err := s.returnTimes(ctx)
+	if err != nil {
+		return platformjobs.Result{}, err
+	}
 	before := s.now()
 	var out reconciled
 	walks := []struct {
@@ -138,7 +144,7 @@ func (s *Service) Reconcile(ctx context.Context, _ platformjobs.Run) (platformjo
 		{KindPartialTimeout, duePartials, s.expirePartial},
 		{KindNoShow, dueHolds, func(ctx context.Context, id ids.ID) (bool, error) { return s.expireNoShow(ctx, id, nil, rules) }},
 		{KindDispatchTimeout, dueDispatches, func(ctx context.Context, id ids.ID) (bool, error) { return s.expireDispatch(ctx, id, threshold) }},
-		{KindDeliveryReturn, dueReturns, func(ctx context.Context, id ids.ID) (bool, error) {
+		{KindDeliveryReturn, dueReturns(rt), func(ctx context.Context, id ids.ID) (bool, error) {
 			did, err := s.returnStep(ctx, id, 0)
 			return did != "", err
 		}},

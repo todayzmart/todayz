@@ -551,7 +551,7 @@ There is no `make seed`; use `make reset`.
 - New admin-editable, non-money keys (01 §17): `order_unseen_sms_after_min` (3), `pickup_hold_reminder_min` (10), `credit_expiry_reminder_days` (7), `review_edit_window_days` (7), `risk_code_lockouts_store_per_day` (10; precedent `pos_offline_links_risk_per_day` in D-12).
 - Everything else that looked like a loose number is a fixed constant in code, listed in 01 §17 "Fixed constants".
 - Why: numbers that protect security (code tries, bill QR and counter-code validity, step-up window, OTP limits), define a protocol (sync cursor, SSE poll, device clock tolerance, `sold_at` clamp, receipt token life) or feed an alert rule change through code review. Operational timings an operator may need to tune are settings.
-- The 2 h / 24 h / 72 h failed-delivery values and the 30-day store-strike window stay constants (D-85). The customer no-show window is the setting `noshow_window_days`.
+- The 2 h / 24 h / 72 h failed-delivery values and the 30-day store-strike window stay constants (D-85). (D-218 later made the 2 h and 24 h reminders settings; 72 h stays a constant.) The customer no-show window is the setting `noshow_window_days`.
 
 **D-93 · Other rules settled from the QA book review.**
 - Q-03: `productsInRadius` counts in-stock listings (`store_products` with qty > 0) in `live` stores within the radius, not distinct products (04 §2.3).
@@ -1212,3 +1212,7 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
 ## Orders finish (W2-02 finish, 2026-10-24)
 
 **D-216 · The checkout quote is informational; only placing refuses credits (lead, 24 Oct, Q-1).** `POST /v1/me/orders` with `creditsToUse` above `credit_max_per_order` is refused with 409 `credit_max_exceeded` (04 §2, CR-02), never clamped. The same goes for credits on a bill under the credit minimum (409 `below_credit_minimum`). A wallet that no longer covers the credits asked is 409 `price_changed` with the current quote. `POST /v1/me/checkout/quote` keeps clamping to what the rules allow and reports why in `creditsLimit` (D-76), so the customer app's credits probe keeps working; the quote has no new `x-problems`. Test: `TestCR02PlacingRefusesCreditsItCannotUse` (quote with 31 clamps to 30 with `creditsLimit: credit_max_exceeded`; placing 31 is 409).
+
+## Orders delivery (W2-02 delivery, 2026-10-24)
+
+**D-218 · The failed-delivery reminders are settings; the 72 h auto-confirm stays a constant (lead, 24 Oct).** The two inbox reminders for an unconfirmed return (D-69) read `delivery_return_first_reminder_hours` (2, min 1, max 12) and `delivery_return_second_reminder_hours` (24, min 13, max 71) from `platform_settings`, seeded by `20204_w2-02_return_reminder_settings.sql`. The bounds keep the order first < second < 72 h. The 72 h auto-confirm and its risk flag score stay fixed constants (D-85, 01 §17 "Fixed constants"). This narrows D-92's last line. The reminder is the new business notice kind `delivery_return_pending` (in-app only). Until the business inbox can filter by role, every staff member sees it, cashiers included.
