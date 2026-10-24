@@ -12,7 +12,7 @@ alert is [Job failing](jobs-job-failing.md) (`tz-jobs-failing-event`, critical f
 | `order_accept_timeout` | placing an order (same transaction) | `accept_by` | A still-`placed` order becomes `expired`, reason `not_accepted` (BK-06). The customer is told (`order_update`, variant `expired`). |
 | `order_pickup_no_show` | accept, and each extension (same transaction) | `hold_until` | A held pickup order (`accepted`, `ready`) not collected becomes `expired`, reason `no_show` (BK-14). Its reservations are released, the customer gets one strike, and `noshow_limit_days` of the one-open-order limit once the strikes in `noshow_window_days` reach `noshow_strikes`. |
 | `order_partial_timeout` | a partial accept (same transaction) | `partial_confirm_by` | A still-`awaiting_customer` order becomes `cancelled`, reason `partial_timeout` (BK-10). Nothing was reserved; its credit hold and offer redemptions are released. No strike for anyone. The customer is told (variant `generic`). |
-| `order_timer_reconcile` | the schedule, every minute (one run per minute, one at a time) | — | Finds orders still `placed` past `accept_by`, `awaiting_customer` past `partial_confirm_by`, or held for pickup past `hold_until`, by more than 2 minutes (the timer's own time), and applies the same outcome through the same code (BK-20, BK-21). Oldest first, at most 500 per deadline per run; the next minute takes the rest. Summary: `expired`, `noop`, `failed`. |
+| `order_timer_reconcile` | the schedule, every minute (one run per minute, one at a time) | — | Finds orders still `placed` past `accept_by`, `awaiting_customer` past `partial_confirm_by`, or held for pickup past `hold_until` (at the deadline itself, no grace), and applies the same outcome through the same code (BK-20, BK-21). Oldest first, at most 500 per deadline per run; the next minute takes the rest. Summary: `expired`, `noop`, `failed`. |
 
 The job arguments are the order id and, for the no-show timer, the hold it was set for. Never a
 code, a phone or a customer id.
@@ -65,7 +65,7 @@ new status.
   `job_not_runnable`). Fix the cause; River's retries pick the run up.
 - A run that exhausted its 25 attempts is discarded. The order stays in `placed` (or held, or
   `awaiting_customer`) past its deadline only until the next `order_timer_reconcile` run picks it
-  up (2 minutes past the deadline at the earliest). If the sweep's `failed` count stays above 0
+  up (within a minute of the deadline). If the sweep's `failed` count stays above 0
   for the same order, its log line names the order and the error: fix the cause (often the same
   as the timer's) and the next minute applies it. Do not edit `orders` by hand (the guard
   trigger and the reservations must move together).

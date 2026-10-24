@@ -24,12 +24,12 @@ func (o *orderShop) sweep() platformjobs.FakeRun {
 }
 
 // BK-20/BK-21: orders whose timers never ran (lost or discarded) are found
-// by the reconcile sweep once past their deadline and its grace, and get
+// by the reconcile sweep at their deadline (no grace), and get
 // the timer's own outcome: a placed order expires not_accepted, a partial
 // accept is cancelled partial_timeout with no strike, a held pickup expires
-// no_show with one strike. An order not yet past the grace is left to its
-// timer, a second sweep changes nothing, and the timer running after the
-// sweep is a no-op.
+// no_show with one strike. An order before its deadline is left,
+// a second sweep changes nothing, and the timer running after the sweep is
+// a no-op.
 func TestBK21ReconcileSweep(t *testing.T) {
 	o := newOrderShop(t)
 	unanswered := o.order()
@@ -39,8 +39,8 @@ func TestBK21ReconcileSweep(t *testing.T) {
 	held := o.accepted()
 	_, hold := o.times(held)
 
-	// Past every deadline (the hold is the last) and the grace.
-	o.set(hold.Add(3 * time.Minute))
+	// Past every deadline (the hold is the last).
+	o.set(hold.Add(time.Minute))
 	fresh := o.order()
 
 	fr := o.sweep()
@@ -66,14 +66,15 @@ func TestBK21ReconcileSweep(t *testing.T) {
 	noopRun(t, o.timer(orders.KindNoShow, held, hold))
 	require.Equal(t, 1, o.strikes())
 
-	// One minute past accept_by is still the timer's; past the grace it is
-	// the sweep's.
+	// The minute before accept_by the order is left; at accept_by itself
+	// the sweep expires it (a scheduled minute runs once, so the two runs
+	// are a minute apart).
 	acceptBy, _ := o.times(fresh)
-	o.set(acceptBy.Add(time.Minute))
+	o.set(acceptBy.Add(-time.Minute))
 	fr = o.sweep()
 	require.Zero(t, fr.Result.Summary["expired"])
 	require.Equal(t, "placed", o.status(fresh))
-	o.set(acceptBy.Add(2 * time.Minute))
+	o.set(*acceptBy)
 	fr = o.sweep()
 	require.EqualValues(t, 1, fr.Result.Summary["expired"])
 	require.Equal(t, "expired", o.status(fresh))

@@ -21,10 +21,11 @@ import (
 // timer itself changes nothing twice.
 const KindReconcile = "order_timer_reconcile"
 
+// The sweep acts at the deadline itself, with no grace (lead, W2-02
+// finish): a timer that runs too meets an order already moved on and is a
+// no-op, and since every transition refuses after its deadline, the lag is
+// at most the sweep's minute.
 const (
-	// reconcileGrace is how long past a deadline an order is left to its
-	// own timer, which normally runs within seconds of it.
-	reconcileGrace = 2 * time.Minute
 	// reconcilePage is one query's page; reconcileMax caps one walk per run
 	// (the next minute's run takes the rest).
 	reconcilePage = 100
@@ -85,7 +86,7 @@ func (s *Service) Reconcile(ctx context.Context, _ platformjobs.Run) (platformjo
 	if err != nil {
 		return platformjobs.Result{}, err
 	}
-	before := s.now().Add(-reconcileGrace)
+	before := s.now()
 	var out reconciled
 	walks := []struct {
 		name  string
