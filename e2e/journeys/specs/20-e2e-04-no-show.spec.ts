@@ -39,8 +39,12 @@ test('E2E-04 three no-shows → strikes → the open-order limit and its banner'
   });
 
   await test.step('one open order is allowed, a second is refused', async () => {
-    const first = await c.place(STORES.SL, items);
+    // Priced before the first order: with one open order, the quote refuses too (orders.yaml, BK-16).
     const q = await c.quote(STORES.SL, items);
+    const first = await c.place(STORES.SL, items);
+    const quote2 = await c.api.post('/v1/me/checkout/quote', { storeId: STORES.SL.id, fulfilment: 'pickup', items, creditsToUse: 0 }, { idem: false });
+    expect(quote2.status).toBe(409);
+    expect(quote2.code).toBe('ordering_suspended');
     const second = await c.api.post('/v1/me/orders', { storeId: STORES.SL.id, fulfilment: 'pickup', items, creditsToUse: 0, expectedTotalPaise: q.totalPaise });
     expect(second.status).toBe(409);
     expect(second.code).toBe('ordering_suspended');
