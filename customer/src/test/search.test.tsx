@@ -59,6 +59,39 @@ describe('C-05 Search', () => {
     expect(screen.getByText(/looking for this/)).toBeInTheDocument();
   });
 
+  it('says none of the shops has confirmed yet and offers the next radius, without asking the shops', async () => {
+    const stale = result({
+      results: result().results.map((g) => ({ ...g, items: g.items.map((it) => ({ ...it, confirmedAt: null })) })),
+    });
+    const { calls } = renderDiscover('/search?q=atta', routes(stale));
+    atBengaluru();
+    expect(await screen.findByText('None of the shops has confirmed yet.')).toBeInTheDocument();
+    expect(screen.getByText(/none has confirmed stock lately/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Search within 5 km' }));
+    await waitFor(() => expect(calls.some((c) => c.path === '/v1/discover/search' && c.query.get('radius') === '5000')).toBe(true));
+    expect(calls.every((c) => !c.path.includes('ask'))).toBe(true);
+  });
+
+  it('at 20 km there is no wider radius, so it offers to search again later', async () => {
+    const stale = result({
+      results: result().results.map((g) => ({ ...g, items: g.items.map((it) => ({ ...it, confirmedAt: null })) })),
+    });
+    renderDiscover('/search?q=atta', routes(stale));
+    atBengaluru();
+    fireEvent.click(await screen.findByRole('button', { name: '20 km' }));
+    await waitFor(() => expect(screen.queryByRole('button', { name: /Search within/ })).not.toBeInTheDocument());
+    expect(await screen.findByText('None of the shops has confirmed yet.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Search within/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Search again later' })).toBeInTheDocument();
+  });
+
+  it('does not show it while some shop has confirmed', async () => {
+    renderDiscover('/search?q=atta', routes());
+    atBengaluru();
+    expect(await screen.findByText('Sri Lakshmi Stores')).toBeInTheDocument();
+    expect(screen.queryByText('None of the shops has confirmed yet.')).not.toBeInTheDocument();
+  });
+
   it('a filter chip goes into the request', async () => {
     const { calls } = renderDiscover('/search?q=atta', routes());
     atBengaluru();
