@@ -22,6 +22,7 @@ import { Check, Clock, MapPin } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useIntl, type IntlShape } from 'react-intl';
 import styles from '../cart/tx.module.css';
+import { NextFromSplit } from '../basket/NextFromSplit';
 import { Icon } from '../shell/Icon';
 import { formatMmSs, useServerCountdown } from './clock';
 import { PathLink } from './ShopLink';
@@ -262,6 +263,7 @@ function OrderView({ order, showCheck }: { order: Order; showCheck: boolean }) {
         </section>
       )}
 
+      <NextFromSplit storeId={order.store.id} status={status} />
       {FAILED.has(status) && <Outcome order={order} />}
       {(status === 'collected' || status === 'delivered') && (
         <section className={`tz-card ${styles.stack}`}>

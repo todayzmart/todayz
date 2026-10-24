@@ -166,6 +166,12 @@ function Profile({ me, note, setNote }: { me: Me; note: Note; setNote: (n: Note)
             {place_} <Link to="/location">{intl.formatMessage({ id: 'account.change' })}</Link>
           </dd>
         </div>
+        <div>
+          <dt>{intl.formatMessage({ id: 'basket.entry' })}</dt>
+          <dd>
+            <Link to="/baskets">{intl.formatMessage({ id: 'basket.entry.body' })}</Link>
+          </dd>
+        </div>
       </dl>
 
       <Button variant="soft-danger" block onClick={() => void signOut()}>

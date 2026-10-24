@@ -55,7 +55,7 @@ describe('C-07 Shop page', () => {
     renderDiscover(`/s/${SHOP_A}`, routes(page({ bookable: false, pickup: false, delivery: false })));
     atBengaluru();
     await screen.findByText('Aashirvaad Atta');
-    expect(screen.queryByRole('button', { name: /^Add/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Add(?! to basket)/ })).not.toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: /Get directions/ }).length).toBeGreaterThan(0);
     expect(screen.getByText(/sells in store only/)).toBeInTheDocument();
   });

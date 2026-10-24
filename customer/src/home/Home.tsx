@@ -5,7 +5,7 @@ import { getDiscoverSummary, listDiscoverStores } from '@todayz/api-client/gen/d
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import { CategoryRow, EmptyState, RadiusChips, SearchField, Skeleton, StoreCard, Button } from '@todayz/ui';
-import { MapPin, Store as StoreIcon } from 'lucide-react';
+import { MapPin, ShoppingBasket, Store as StoreIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { usePlace } from '../app/place';
@@ -67,6 +67,13 @@ export function Home({ category }: { category?: string | undefined }) {
         </form>
       </header>
       <div className={styles.body}>
+        <Link to="/baskets" className={`tz-card ${styles.basketEntry}`}>
+          <Icon icon={ShoppingBasket} />
+          <span className={styles.basketText}>
+            <span className="tz-card-title">{intl.formatMessage({ id: 'basket.entry' })}</span>
+            <span className="tz-meta">{intl.formatMessage({ id: 'basket.entry.body' })}</span>
+          </span>
+        </Link>
         {coords.status === 'none' && (
           <EmptyState
             icon={MapPin}

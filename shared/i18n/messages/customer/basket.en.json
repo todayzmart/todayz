@@ -1,0 +1,358 @@
+{
+  "basket.title": {
+    "defaultMessage": "Basket",
+    "description": "C-22 title fallback for a saved basket"
+  },
+  "basket.back": {
+    "defaultMessage": "Baskets",
+    "description": "Back link to the baskets list"
+  },
+  "basket.loading": {
+    "defaultMessage": "Loading your baskets",
+    "description": "Session pending label on C-22"
+  },
+  "basket.error": {
+    "defaultMessage": "Could not load your baskets",
+    "description": "C-22 load failure"
+  },
+  "basket.gone.title": {
+    "defaultMessage": "This basket is no longer here",
+    "description": "C-22 basket not found (deleted or another account)"
+  },
+  "basket.defaultName": {
+    "defaultMessage": "My basket",
+    "description": "Name given to a new basket"
+  },
+  "basket.signIn": {
+    "defaultMessage": "Sign in to save it",
+    "description": "C-22 signed-out link"
+  },
+  "basket.device.title": {
+    "defaultMessage": "Basket on this device",
+    "description": "Title of the signed-out customer's unsaved basket"
+  },
+  "basket.device.note": {
+    "defaultMessage": "This basket is kept on this device only. Sign in to save it to your account.",
+    "description": "C-22 signed-out note"
+  },
+  "basket.device.clear": {
+    "defaultMessage": "Clear basket",
+    "description": "Empties the basket on this device"
+  },
+  "basket.saving": {
+    "defaultMessage": "Saving",
+    "description": "Autosave status"
+  },
+  "basket.saved": {
+    "defaultMessage": "Saved",
+    "description": "Autosave status"
+  },
+  "basket.conflict": {
+    "defaultMessage": "This basket changed on another device. Showing the latest.",
+    "description": "C-22 412 on save"
+  },
+  "basket.full": {
+    "defaultMessage": "This basket is full. Remove an item to add another.",
+    "description": "C-22 basket_max_items reached"
+  },
+  "basket.limit": {
+    "defaultMessage": "You have the most baskets you can save. Delete one to make a new one.",
+    "description": "C-22 basket_max_saved reached"
+  },
+  "basket.saveError": {
+    "defaultMessage": "Could not save. Check your connection and try again.",
+    "description": "C-22 save failure"
+  },
+  "basket.lastSplit": {
+    "defaultMessage": "Last time: {a} and {b}",
+    "description": "C-22 the last split kept with the basket"
+  },
+  "basket.ask.label": {
+    "defaultMessage": "Add an item",
+    "description": "Label of the just-ask box"
+  },
+  "basket.ask.placeholder": {
+    "defaultMessage": "Add atta, milk, bread…",
+    "description": "Placeholder of the just-ask box"
+  },
+  "basket.ask.clear": {
+    "defaultMessage": "Clear",
+    "description": "Clears the just-ask box"
+  },
+  "basket.ask.try": {
+    "defaultMessage": "Try: {example}",
+    "description": "Changing example row under the box"
+  },
+  "basket.ask.example1": {
+    "defaultMessage": "Aashirvaad atta 5 kg",
+    "description": "Example basket item"
+  },
+  "basket.ask.example2": {
+    "defaultMessage": "Amul milk 500 ml",
+    "description": "Example basket item"
+  },
+  "basket.ask.example3": {
+    "defaultMessage": "Dolo 650",
+    "description": "Example basket item"
+  },
+  "basket.ask.example4": {
+    "defaultMessage": "Tata salt 1 kg",
+    "description": "Example basket item"
+  },
+  "basket.ask.suggestions": {
+    "defaultMessage": "Suggestions",
+    "description": "List label for suggestions"
+  },
+  "basket.ask.addText": {
+    "defaultMessage": "Add “{text}”",
+    "description": "Adds the typed words as a free-text line"
+  },
+  "basket.lines.empty": {
+    "defaultMessage": "Your basket is empty. Add what you need above.",
+    "description": "C-22 empty editor"
+  },
+  "basket.lines.label": {
+    "defaultMessage": "Items in this basket",
+    "description": "List label"
+  },
+  "basket.lines.anyBrand": {
+    "defaultMessage": "Any brand",
+    "description": "Shown on a free-text line"
+  },
+  "basket.lines.remove": {
+    "defaultMessage": "Remove {name}",
+    "description": "Remove line button label"
+  },
+  "basket.name.label": {
+    "defaultMessage": "Basket name",
+    "description": "Name field label"
+  },
+  "basket.name.placeholder": {
+    "defaultMessage": "Weekly groceries",
+    "description": "Name field placeholder"
+  },
+  "basket.results.title": {
+    "defaultMessage": "Where to get it",
+    "description": "C-22 results heading"
+  },
+  "basket.search": {
+    "defaultMessage": "Search shops",
+    "description": "Runs the basket search"
+  },
+  "basket.search.again": {
+    "defaultMessage": "Search again",
+    "description": "Runs the basket search again"
+  },
+  "basket.search.running": {
+    "defaultMessage": "Searching",
+    "description": "Loading label of the search button"
+  },
+  "basket.search.checking": {
+    "defaultMessage": "Checking {n} shops…",
+    "description": "Progress while the basket search runs"
+  },
+  "basket.search.checkingNearby": {
+    "defaultMessage": "Checking shops nearby…",
+    "description": "Progress on the first search, before the count is known"
+  },
+  "basket.search.error": {
+    "defaultMessage": "Could not search right now. Try again.",
+    "description": "Basket search failure"
+  },
+  "basket.search.stale": {
+    "defaultMessage": "The basket changed. Search again to see shops for it.",
+    "description": "Shown when results belong to an older basket"
+  },
+  "basket.summary": {
+    "defaultMessage": "Checked {checked} shops nearby · {all, plural, one {# has everything} other {# have everything}}",
+    "description": "Proof line above basket results"
+  },
+  "basket.zero.title": {
+    "defaultMessage": "No shop nearby has these items in stock",
+    "description": "No basket results"
+  },
+  "basket.zero.body": {
+    "defaultMessage": "Try a wider radius, or ask shops nearby.",
+    "description": "No basket results body"
+  },
+  "basket.noPlace.title": {
+    "defaultMessage": "Set your location to search",
+    "description": "No location yet"
+  },
+  "basket.noPlace.body": {
+    "defaultMessage": "We check the shops near you for every item.",
+    "description": "No location body"
+  },
+  "basket.preview": {
+    "defaultMessage": "Totals are a preview. Checkout shows the final price.",
+    "description": "Basket totals note"
+  },
+  "basket.badge.everything": {
+    "defaultMessage": "Has everything",
+    "description": "Badge"
+  },
+  "basket.badge.closest": {
+    "defaultMessage": "Closest",
+    "description": "Badge"
+  },
+  "basket.badge.lowest": {
+    "defaultMessage": "Lowest price",
+    "description": "Badge"
+  },
+  "basket.card.meta": {
+    "defaultMessage": "{n} of {m} · {distance} · {total}",
+    "description": "Store card line: covered of total, distance, total"
+  },
+  "basket.card.qty": {
+    "defaultMessage": "× {qty} · {price}",
+    "description": "Covered line quantity and line total"
+  },
+  "basket.card.missing": {
+    "defaultMessage": "Missing: {items}",
+    "description": "Lines this shop does not have"
+  },
+  "basket.fill": {
+    "defaultMessage": "Fill cart",
+    "description": "Puts this shop's lines in the cart"
+  },
+  "basket.split.title": {
+    "defaultMessage": "Get it all from two shops",
+    "description": "Split card title"
+  },
+  "basket.split.body": {
+    "defaultMessage": "No single shop has everything. These two together do.",
+    "description": "Split card body"
+  },
+  "basket.split.meta": {
+    "defaultMessage": "{n} items · {distance}",
+    "description": "Split part detail"
+  },
+  "basket.split.uncovered": {
+    "defaultMessage": "No shop nearby has: {items}",
+    "description": "Lines no shop covers"
+  },
+  "basket.split.fill": {
+    "defaultMessage": "Fill cart from {shop}",
+    "description": "Fills the cart for the first shop of the split"
+  },
+  "basket.split.inStore": {
+    "defaultMessage": "One of these shops is in store only. Visit it for those items.",
+    "description": "Split with a non-bookable shop"
+  },
+  "basket.list.title": {
+    "defaultMessage": "Baskets",
+    "description": "C-22 list title"
+  },
+  "basket.list.sub": {
+    "defaultMessage": "Save the things you buy often and find a shop that has them all.",
+    "description": "C-22 list subtitle"
+  },
+  "basket.list.new": {
+    "defaultMessage": "New basket",
+    "description": "Creates a basket"
+  },
+  "basket.list.count": {
+    "defaultMessage": "{n, plural, one {# item} other {# items}}",
+    "description": "Line count"
+  },
+  "basket.list.updated": {
+    "defaultMessage": "updated {time}",
+    "description": "Last change"
+  },
+  "basket.list.open": {
+    "defaultMessage": "Open",
+    "description": "Opens the device basket"
+  },
+  "basket.list.searchAgain": {
+    "defaultMessage": "Search again",
+    "description": "Opens a saved basket to search"
+  },
+  "basket.list.delete": {
+    "defaultMessage": "Delete {name}",
+    "description": "Delete basket button label"
+  },
+  "basket.list.empty.title": {
+    "defaultMessage": "No baskets yet",
+    "description": "Empty list"
+  },
+  "basket.list.empty.body": {
+    "defaultMessage": "Make a basket of what you buy often, then search for a shop that has it all.",
+    "description": "Empty list body"
+  },
+  "basket.deleted": {
+    "defaultMessage": "Deleted {name}",
+    "description": "Toast after delete"
+  },
+  "basket.undo": {
+    "defaultMessage": "Undo",
+    "description": "Undo delete"
+  },
+  "basket.saveOffer.title": {
+    "defaultMessage": "You have a basket on this device",
+    "description": "Offer to save the device basket after sign-in"
+  },
+  "basket.saveOffer.body": {
+    "defaultMessage": "Save its {n} items to your account to use it anywhere.",
+    "description": "Save offer body"
+  },
+  "basket.saveOffer.save": {
+    "defaultMessage": "Save",
+    "description": "Saves the device basket"
+  },
+  "basket.saveOffer.notNow": {
+    "defaultMessage": "Not now",
+    "description": "Dismisses the save offer"
+  },
+  "basket.add": {
+    "defaultMessage": "Add to basket",
+    "description": "Button on result cards, shop and product pages"
+  },
+  "basket.add.labelFor": {
+    "defaultMessage": "Add to basket: {name}",
+    "description": "Accessible label of the compact button"
+  },
+  "basket.add.title": {
+    "defaultMessage": "Add to which basket?",
+    "description": "Basket picker sheet title"
+  },
+  "basket.add.close": {
+    "defaultMessage": "Close",
+    "description": "Closes the basket picker"
+  },
+  "basket.add.new": {
+    "defaultMessage": "New basket",
+    "description": "Creates a basket with this item"
+  },
+  "basket.add.done": {
+    "defaultMessage": "Added {name} to {basket}",
+    "description": "Toast after adding"
+  },
+  "basket.add.view": {
+    "defaultMessage": "View",
+    "description": "Toast action to open the basket"
+  },
+  "basket.next.title": {
+    "defaultMessage": "Next: the rest from {shop}",
+    "description": "C-12 offer after the first order of a split"
+  },
+  "basket.next.body": {
+    "defaultMessage": "{n, plural, one {# item} other {# items}} from your basket are waiting at {shop}.",
+    "description": "C-12 offer body"
+  },
+  "basket.next.fill": {
+    "defaultMessage": "Fill cart from {shop}",
+    "description": "Fills the cart for the second shop"
+  },
+  "basket.next.dismiss": {
+    "defaultMessage": "Not now",
+    "description": "Drops the second half of the split"
+  },
+  "basket.entry": {
+    "defaultMessage": "Baskets",
+    "description": "Entry to C-22 on Home and in the profile"
+  },
+  "basket.entry.body": {
+    "defaultMessage": "Find one shop for your whole list",
+    "description": "Home entry detail"
+  }
+}

@@ -12,6 +12,7 @@ import { offPercent, useFmt, usePackLine, useStockProps } from '../home/format';
 import { directionsUrl, initials, radiusM } from '../home/present';
 import { RouterLink } from '../home/RouterLink';
 import { useRadiusKm } from '../home/radius';
+import { AddToBasket } from '../basket/AddToBasket';
 import { AskNearbySlot } from '../search/slots';
 import { Icon } from '../shell/Icon';
 import { CartBarLink } from '../store/CartBarLink';
@@ -174,6 +175,7 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
       ) : null}
 
       <div className={styles.actions}>
+        <AddToBasket productId={item.productId} name={item.name} detail={packLine(item)} />
         <Button variant="ghost" size="sm" icon={Link2} onClick={copyLink}>
           {intl.formatMessage({ id: 'product.share' })}
         </Button>

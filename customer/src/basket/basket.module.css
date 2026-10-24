@@ -1,0 +1,343 @@
+/* C-22 baskets (W2-14). Tokens only. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-4) var(--space-6);
+  padding-inline: max(var(--space-4), calc((100% - var(--column)) / 2 + var(--space-4)));
+}
+
+.title {
+  margin: 0;
+  font: var(--type-headline);
+  letter-spacing: var(--type-headline-tracking);
+  color: var(--ink);
+}
+
+.sub {
+  margin: 0;
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.body {
+  width: 100%;
+  max-width: var(--column);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.sectionTitle {
+  margin: 0;
+  font: var(--type-title);
+  color: var(--ink);
+}
+
+.hint {
+  margin: 0;
+  font: var(--type-body-sm);
+  color: var(--ink-2);
+}
+
+.error {
+  margin: 0;
+  font: var(--type-body-sm);
+  color: var(--ink);
+}
+
+/* List */
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+/* Editor */
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ask {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.example {
+  margin: 0;
+  font: var(--type-body-sm);
+  color: var(--ink-3);
+}
+
+.suggestions {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-1);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.suggestion {
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font: var(--type-body);
+  color: var(--ink);
+  text-align: start;
+  cursor: pointer;
+}
+
+.suggestion:hover,
+.suggestion:focus-visible {
+  background: var(--brand-soft);
+}
+
+.lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.line:last-child {
+  border-bottom: 0;
+}
+
+.lineText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.lineName {
+  font: var(--type-body);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+/* Results */
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.summary {
+  margin: 0;
+  font: var(--type-body-sm);
+  color: var(--ink-2);
+}
+
+.cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.storeName {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.storeName:hover {
+  text-decoration: underline;
+}
+
+.cardMeta {
+  margin: 0;
+  font: var(--type-body-sm);
+  color: var(--ink-2);
+}
+
+.covered {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.covered > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+}
+
+.coveredName {
+  flex: 1 1 auto;
+  font: var(--type-body-sm);
+  color: var(--ink);
+}
+
+.coveredQty {
+  font: var(--type-body-sm);
+  color: var(--ink-2);
+}
+
+.missing {
+  margin: 0;
+  font: var(--type-body-sm);
+  color: var(--ink-2);
+}
+
+.split {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--tint-green);
+}
+
+.parts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.part {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.partTotal {
+  font: var(--type-heading);
+  color: var(--ink);
+}
+
+.partLines {
+  margin: 0;
+  font: var(--type-body-sm);
+  color: var(--ink-2);
+}
+
+.uncovered {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Add to basket */
+
+.addCompact {
+  align-self: flex-start;
+}
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.pickList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pickName {
+  flex: 1;
+  text-align: start;
+}
+
+/* C-12 next from split */
+
+.next {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Item card with Add to basket under it (C-05, C-07). */
+
+.withBasket {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.withBasket > :first-child {
+  flex: 1;
+}
