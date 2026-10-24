@@ -250,11 +250,12 @@ func (s *Service) createBanner(ctx context.Context, sid string, b *bannersapi.Ba
 		if b.TargetId != nil {
 			v.add("body.targetId", "does not apply to an items banner")
 		}
-		if b.TargetItemIds == nil || len(*b.TargetItemIds) == 0 {
+		switch {
+		case b.TargetItemIds == nil || len(*b.TargetItemIds) == 0:
 			v.add("body.targetItemIds", "needs at least one item")
-		} else if len(*b.TargetItemIds) > maxTargetItems {
+		case len(*b.TargetItemIds) > maxTargetItems:
 			v.add("body.targetItemIds", fmt.Sprintf("at most %d items", maxTargetItems))
-		} else {
+		default:
 			for i, raw := range *b.TargetItemIds {
 				id, err := ids.Parse(raw)
 				if err != nil {

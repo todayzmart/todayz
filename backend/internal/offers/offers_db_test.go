@@ -257,6 +257,7 @@ func TestCreateUpdatePreview(t *testing.T) {
 	v2 := `"v2"`
 	_, ver, err = w.svc.updateOffer(w.ctx, sid, created.Id, &v2, &offersapi.OfferUpdate{Status: &live}, func(k string) bool { return k == "status" })
 	require.NoError(t, err)
+	require.EqualValues(t, 3, ver)
 	q, _ = w.svc.Price(w.ctx, Cart{StoreID: store, Lines: []Line{line(it, 20000, 1)}})
 	require.EqualValues(t, 2000, q.ItemDiscountPaise)
 	ended := offersapi.OfferUpdateStatus("ended")

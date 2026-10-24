@@ -30,7 +30,7 @@ const (
 	feedCards      = 10
 	feedRotation   = 15 * time.Minute
 	feedCandidates = 200
-	defaultRadiusM = 2000
+	defaultRadiusM = 2000 //settings:ok discover search's default radius chip (01 §11), not insight_wanted_nearby_radius_m
 )
 
 // kindRank orders offers of one shop for the card: the most visible first.
@@ -105,7 +105,6 @@ func (s *Service) listNearby(ctx context.Context, p offersapi.ListNearbyOffersPa
 
 	bucket := int(now.Unix() / int64(feedRotation.Seconds()))
 	var cards []offersapi.NearbyOffer
-	var shown []ids.ID
 	for _, st := range stores {
 		sid := idOf(st.ID)
 		card := offersapi.NearbyOffer{
@@ -120,7 +119,6 @@ func (s *Service) listNearby(ctx context.Context, p offersapi.ListNearbyOffersPa
 			b := list[bucket%len(list)]
 			card.Kind = offersapi.NearbyOfferKindBanner
 			card.Banner = nearbyBanner(b)
-			shown = append(shown, b.ID)
 		case len(live[sid]) > 0:
 			o := bestOffer(live[sid])
 			card.Kind = offersapi.NearbyOfferKindOffer
