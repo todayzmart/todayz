@@ -24,8 +24,8 @@ import (
 	"github.com/todayz/backend/internal/platform/settings"
 )
 
-// TODO(lead): the feed size and the rotation step are not in 01 §17; these are
-// the conservative readings (a screenful, a quarter of an hour).
+// The feed size and the rotation step are not in 01 §17: a screenful and a
+// quarter of an hour, accepted by the founder (D-155).
 const (
 	feedCards      = 10
 	feedRotation   = 15 * time.Minute

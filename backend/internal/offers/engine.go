@@ -52,8 +52,8 @@ const (
 	StatusEnded     Status = "ended"
 )
 
-// MaxPercent is the largest percent an offer may take off. TODO(lead): a safe
-// limit the plan does not number; 90 keeps a typo from giving an item away.
+// MaxPercent is the largest percent an offer may take off (D-155): 90 keeps a
+// typo from giving an item away.
 const MaxPercent = 90
 
 // minTotalPaise is the floor of a bill: never below ₹1 (01 §12).

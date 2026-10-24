@@ -881,3 +881,17 @@ There is no `make seed`; use `make reset`.
 **D-153 · The nearby offers feed (W2-07).** `GET /v1/discover/offers` returns at most 10 cards (`feedCards`) from live stores inside the customer's radius (default 2 km, the same chips as search; at most 200 candidate stores). A store shows one card: a banner when it has a live one (its banners take turns by rotation bucket), otherwise its best live offer; a store with neither shows nothing. Cards go nearest first, and the list starts at a different shop every 15 minutes (`feedRotation`; the bucket comes from the injected clock), so the top slots move round the shops in range. Each banner that makes the screen emits `banner_impression`. The ranking inside the 01 §12 "ranked by distance and discount" is therefore distance first; the discount only picks the store's best offer. `has_offer` on a store card means the store has a live item-level or bill offer. The constants are code constants in `internal/offers/feed.go`, not settings, until the founder asks to tune them (TODO(lead) in the report).
 
 **D-154 · Seams between offers, orders, search and banners (W2-07).** The orders package owns `Pricer` and `Redeemer` (`internal/orders/seams.go`) and basket search owns `search.Pricer`; the offers service satisfies both through adapters in `cmd/todayz/offers_seams.go`, so no domain imports another. `NoRedeem` and the `Fixed` flag (a line whose price is already final, such as a flash price) let tests and the POS skip redemption. The offers feed takes banners through `offers.BannerSource`, adapted from `banners.LiveBanner`.
+
+**D-155 · W2-07's open questions take the conservative readings (founder, 24 Oct).** The founder accepted what W2-07 built for each question in `docs/qa/W2-07/REPORT.md`:
+- A percent offer is at most 90% (`MaxPercent`), and its discount floors to the paisa.
+- A flat offer is per unit: `min(value, unit price) × qty`.
+- A `bill_min` offer is whole-shop only.
+- An offer with a per-customer limit does not apply when no customer is known.
+- A flash offer applies to the whole item, not only the batch's units.
+- Offer terms cannot change after creation; only the status changes (pause, resume, end). `startsAt` is clamped to now.
+- The nearby feed shows 10 cards, rotates every 15 minutes, uses a 2 km default radius and looks at 200 candidate stores. These stay code constants (D-153).
+- Uploaded banner images wait in the review queue until an AI image check exists, and a held banner counts toward `store_banners_max` (D-152).
+- Banner taps are kept in `banner_taps`; the tap route is `/v1/me/banners/{bannerId}/tap`.
+- No feature flag gates offers or banners.
+
+Still open as work, not decisions: `has_offer` in search must agree with `offers.Price`, and the `banner_limit_reached` problem needs its i18n key.
