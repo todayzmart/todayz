@@ -582,8 +582,8 @@ func TestBK06AcceptTimeout(t *testing.T) {
 	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM notifications WHERE kind = 'order_update' AND ref_id = $1 AND params->>'variant' = 'expired'`, uuidOf(t, id)))
 	r := o.staff(o.cashier, id, "accept", map[string]any{})
 	require.Equal(t, http.StatusConflict, r.code, r.raw)
-	// TODO(lead): credits and the store's unaccepted counter are deferred
-	// (credits, store_reliability).
+	// The credit hold's release is TestEndReleasesHoldHTTP's.
+	// TODO(lead): the store's unaccepted counter is deferred (store_reliability).
 }
 
 // BK-07: the store rejects with a reason; the customer sees it.
@@ -641,7 +641,9 @@ func TestBK11CollectWithCode(t *testing.T) {
 	r = o.verify(o.cashier, id, code)
 	require.Equal(t, http.StatusConflict, r.code, "a second hand-over")
 	require.Equal(t, "invalid_transition", problemCode(r))
-	// TODO(lead): credits capture, cashback and the review prompt are deferred.
+	// Credits capture and cashback are TestCollectCapturesHoldHTTP's and
+	// TestCollectPaysPlacedCashbackHTTP's.
+	// TODO(lead): the review prompt is deferred (no WP sends it yet).
 }
 
 // BK-12: four wrong codes then the right one collects; five wrong lock the
@@ -740,8 +742,9 @@ func TestBK14NoShow(t *testing.T) {
 	require.Equal(t, 500, onHand)
 	require.Zero(t, reserved)
 	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM customer_profiles WHERE strikes_count_30d = 1 AND limited_until IS NULL`))
-	// TODO(lead): credits release is deferred; BK-16 (the limit after
-	// noshow_strikes) is deferred to its own test with the banner.
+	// The credit hold's release is TestEndReleasesHoldHTTP's.
+	// TODO(lead): BK-16 (the limit after noshow_strikes) is deferred to its
+	// own test with the banner.
 }
 
 // BK-15: "+10 min" before the hold ends adds pickup_extension_min once; a

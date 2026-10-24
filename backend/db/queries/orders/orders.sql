@@ -62,10 +62,10 @@ SELECT EXISTS (
 -- name: InsertOrder :one
 INSERT INTO orders (id, customer_id, store_id, ask_reply_id, fulfilment, subtotal_paise, discount_paise,
   items_after_offers_paise, item_subtotal_paise, credits_used, delivery_fee_paise, total_paise,
-  code_enc, code_hmac, accept_by, placed_at)
+  cashback_bp, code_enc, code_hmac, accept_by, placed_at)
 VALUES (@id, @customer_id, @store_id, sqlc.narg(ask_reply_id), @fulfilment, @subtotal_paise, @discount_paise,
   @items_after_offers_paise, @item_subtotal_paise, @credits_used, @delivery_fee_paise, @total_paise,
-  @code_enc, @code_hmac, @accept_by, @placed_at)
+  @cashback_bp, @code_enc, @code_hmac, @accept_by, @placed_at)
 RETURNING version;
 
 -- name: InsertOrderItem :exec

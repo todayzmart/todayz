@@ -15,7 +15,8 @@ import (
 
 func TestCatalogueIsComplete(t *testing.T) {
 	require.Equal(t, []string{
-		notice.KindAskReply, notice.KindNewAsk, notice.KindNewOrder, notice.KindOrderUnseen, notice.KindOrderUpdate,
+		notice.KindAskReply, notice.KindCreditsEarned, notice.KindCreditsExpiring, notice.KindNewAsk,
+		notice.KindNewOrder, notice.KindOrderUnseen, notice.KindOrderUpdate,
 		notice.KindReferralUnlocked, notice.KindShopReferralUnlocked,
 	}, Kinds())
 	for kind, def := range catalogue {

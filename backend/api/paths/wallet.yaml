@@ -1,4 +1,4 @@
-# Paths: domain "wallet" (owner W2-03): customer wallet, purchases and credits under /v1/me (04 §2.4).
+# Paths: domain "wallet" (owner W2-01; W2-03 adds referrals elsewhere): customer wallet, purchases and credits under /v1/me (04 §2.4).
 #
 # Pre-created empty by W0-04 so parallel work packages never edit the same file
 # (D-50). Fill it as a map of path -> path item. Every operation: `tags: [wallet]`,
@@ -9,4 +9,80 @@
 # Mark idempotent operations `x-idempotency: required|optional` and uploads
 # `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
 # List the domain problem codes an operation can return under `x-problems`.
-{}
+#
+# W2-01. Read-only: credits move through orders (hold at placement, capture and
+# cashback on collection, release on cancel), the expiry job and admin
+# adjustments, never through a wallet write route.
+/v1/me/wallet:
+  get:
+    operationId: getMyWallet
+    tags: [wallet]
+    summary: My credits (C-16)
+    description: >-
+      Customer app. The balance, what is held for open orders, what expires within
+      `credit_expiry_reminder_days` (soonest first), and this IST month's credit-using orders against the
+      cap (D-30). Lots past their expiry are left out of `availableCredits` even before the nightly job
+      posts them.
+    responses:
+      '200':
+        description: My wallet
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/wallet.yaml#/Wallet
+            example:
+              availableCredits: 120
+              heldCredits: 30
+              expiringSoon:
+              - credits: 20
+                expiresAt: '2026-11-01T18:30:00Z'
+              creditOrdersThisMonth: 2
+              creditOrdersPerMonth: 10
+              maxCreditsPerOrder: 30
+              minOrderPaise: 10000
+              serverNow: '2026-10-25T10:00:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/wallet/transactions:
+  get:
+    operationId: listMyWalletTransactions
+    tags: [wallet]
+    summary: My credit history (C-16)
+    description: >-
+      Customer app. Newest first, one line per ledger transaction that touched my wallet or held credits
+      (01 §7: "Held for order TZ-…", "5% back at …", "Expired"). Pass `nextCursor` back as `cursor`.
+    parameters:
+    - $ref: ../common/parameters.yaml#/Limit
+    - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      '200':
+        description: My wallet lines
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/wallet.yaml#/WalletLineList
+            example:
+              items:
+              - id: 01JB0W1M2N3E4S5A6B7C8D9E0F
+                kind: cashback
+                credits: 24
+                availableCredits: 24
+                text: 5% back at Sri Lakshmi Stores
+                params:
+                  shopName: Sri Lakshmi Stores
+                  orderNumber: TZ-024817
+                  percent: '5'
+                createdAt: '2026-10-24T12:10:00Z'
+              - id: 01JB0W0M2N3E4S5A6B7C8D9E0F
+                kind: spend_capture
+                credits: -30
+                availableCredits: 0
+                text: Spent at Sri Lakshmi Stores · order TZ-024817
+                params:
+                  shopName: Sri Lakshmi Stores
+                  orderNumber: TZ-024817
+                createdAt: '2026-10-24T12:10:00Z'
+              nextCursor: null
+      default:
+        $ref: ../common/responses.yaml#/Problem
+

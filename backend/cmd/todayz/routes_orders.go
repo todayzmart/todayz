@@ -24,7 +24,7 @@ func mountOrders(r chi.Router, d *deps) {
 	od := orders.Deps{
 		Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Settings: d.Settings,
 		Notices: newNotifyService(d), Stock: jobs.OrdersStock(d.Clock), Open: business.OpenAt,
-		CodeRand: orderCodeRand,
+		CodeRand: orderCodeRand, Credits: jobs.OrdersCredits(creditsService(d)),
 	}
 	// Offers price the quote and are counted in the order's transaction (W2-07).
 	pricing := offersForOrders{newOffers(d)}

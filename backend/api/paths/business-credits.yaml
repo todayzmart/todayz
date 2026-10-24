@@ -1,4 +1,4 @@
-# Paths: domain "business-credits" (owner W2-03): business credits and statements (04 §2.6).
+# Paths: domain "business-credits" (owner W2-01): business credits and statements (04 §2.6).
 #
 # Pre-created empty by W0-04 so parallel work packages never edit the same file
 # (D-50). Fill it as a map of path -> path item. Every operation: `tags: [business-credits]`,
@@ -9,4 +9,56 @@
 # Mark idempotent operations `x-idempotency: required|optional` and uploads
 # `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
 # List the domain problem codes an operation can return under `x-problems`.
-{}
+#
+# W2-01. Read-only; payouts and statements come later (W3).
+/v1/biz/businesses/{bid}/credit-account:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getBusinessCreditAccount
+    tags: [business-credits]
+    summary: The business's credit account (B-10)
+    description: >-
+      Owner and manager. Each store's balance (credits redeemed at the store in, cashback it funded out,
+      so it may be negative: CR-16) and the latest lines across the business's stores, newest first. Pass
+      `nextCursor` back as `cursor` for older lines.
+    parameters:
+    - $ref: ../common/parameters.yaml#/Limit
+    - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      '200':
+        description: The credit account
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/business-credits.yaml#/CreditAccount
+            example:
+              balanceCredits: 6
+              stores:
+              - storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                name: Sri Lakshmi Stores
+                balanceCredits: 6
+              lines:
+              - id: 01JB0W2M2N3E4S5A6B7C8D9E0F
+                storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                kind: cashback
+                credits: -24
+                text: Cashback paid · order TZ-024817
+                orderNumber: TZ-024817
+                createdAt: '2026-10-24T12:10:00Z'
+              - id: 01JB0W3M2N3E4S5A6B7C8D9E0F
+                storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                kind: spend_capture
+                credits: 30
+                text: Credits redeemed · order TZ-024817
+                orderNumber: TZ-024817
+                createdAt: '2026-10-24T12:10:00Z'
+              nextCursor: null
+              serverNow: '2026-10-25T10:00:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+
