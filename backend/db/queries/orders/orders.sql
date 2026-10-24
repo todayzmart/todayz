@@ -40,6 +40,10 @@ FROM users u LEFT JOIN customer_profiles cp ON cp.user_id = u.id
 WHERE u.id = @id
 FOR NO KEY UPDATE OF u;
 
+-- name: CustomerLimit :one
+-- The customer's no-show limit, unlocked: the quote's early answer (BK-16).
+SELECT limited_until FROM customer_profiles WHERE user_id = @user_id;
+
 -- name: ActiveOrderCount :one
 -- Orders of the customer that are not finished.
 SELECT count(*)::int AS n FROM orders

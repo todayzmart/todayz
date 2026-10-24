@@ -756,9 +756,54 @@ func TestBK14NoShow(t *testing.T) {
 	require.Equal(t, 500, onHand)
 	require.Zero(t, reserved)
 	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM customer_profiles WHERE strikes_count_30d = 1 AND limited_until IS NULL`))
-	// The credit hold's release is TestEndReleasesHoldHTTP's.
-	// TODO(lead): BK-16 (the limit after noshow_strikes) is deferred to its
-	// own test with the banner.
+	// The credit hold's release is TestEndReleasesHoldHTTP's; the limit
+	// after noshow_strikes is TestBK16NoShowLimit's.
+}
+
+// BK-16: after noshow_strikes no-shows in noshow_window_days the customer
+// may place one more order only with no other unfinished: the quote and
+// the place both answer 409 ordering_suspended with extensions.until, and
+// the limit ends after noshow_limit_days.
+func TestBK16NoShowLimit(t *testing.T) {
+	o := newOrderShop(t)
+	for i := range 3 {
+		id := o.accepted()
+		_, hold := o.times(id)
+		o.advance(30 * time.Minute)
+		expiredRun(t, o.timer(orders.KindNoShow, id, hold))
+		if i < 2 {
+			require.Zero(t, o.a.count(`SELECT count(*) FROM customer_profiles WHERE limited_until IS NOT NULL`), "strike %d", i+1)
+		}
+	}
+	now := o.a.clk.Now()
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM customer_profiles WHERE strikes_count_30d = 3 AND limited_until = $1`, now.Add(14*24*time.Hour)))
+
+	// No other open order: the 4th is allowed.
+	q := o.quote(line{o.butter, 1})
+	require.Equal(t, http.StatusOK, q.code, q.raw)
+	open := o.order()
+
+	q = o.quote(line{o.butter, 1})
+	require.Equal(t, http.StatusConflict, q.code, q.raw)
+	require.Equal(t, "ordering_suspended", problemCode(q))
+	require.Equal(t, now.Add(14*24*time.Hour).UTC().Format(time.RFC3339), ext(q, "until"))
+	r := o.place(o.cust, line{o.butter, 1})
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, "ordering_suspended", problemCode(r))
+	r = o.place(o.cust2, line{o.butter, 1})
+	require.Equal(t, http.StatusCreated, r.code, "another customer is not limited: %s", r.raw)
+
+	// The open order finishing frees the one slot again.
+	r = o.me(o.cust, open, "cancel", map[string]any{"reason": "changed_mind"})
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	o.order()
+
+	// After noshow_limit_days the limit is over.
+	o.set(now.Add(14 * 24 * time.Hour))
+	q = o.quote(line{o.butter, 1})
+	require.Equal(t, http.StatusOK, q.code, q.raw)
+	r = o.place(o.cust, line{o.butter, 1})
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
 }
 
 // BK-15: "+10 min" before the hold ends adds pickup_extension_min once; a

@@ -78,15 +78,8 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		if cu.Status != "active" {
 			return problem.New(genproblems.Forbidden, "")
 		}
-		if cu.LimitedUntil != nil && now.Before(*cu.LimitedUntil) {
-			// 01 §5.4: after the no-show limit, one open order at a time.
-			n, err := q.ActiveOrderCount(ctx, ids.UUID(p.UserID))
-			if err != nil {
-				return fmt.Errorf("orders: active orders: %w", err)
-			}
-			if n > 0 {
-				return problem.New(genproblems.OrderingSuspended, "").WithExtension("until", cu.LimitedUntil.UTC())
-			}
+		if err := orderLimit(ctx, q, p.UserID, cu.LimitedUntil, now); err != nil {
+			return err
 		}
 
 		qq, err := s.price(ctx, p.UserID, st, c, now)
