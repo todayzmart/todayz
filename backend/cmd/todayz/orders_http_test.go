@@ -1084,15 +1084,48 @@ func TestBK21TimerLateAndDuplicate(t *testing.T) {
 	noopRun(t, o.timer(orders.KindNoShow, ids.New(o.a.clk.Now()).String(), nil))
 }
 
-// BK-22: auto-accept is deferred, so an order at an auto_accept store stays
-// placed for a manual decision.
-func TestBK22AutoAcceptStoreStaysPlaced(t *testing.T) {
+// BK-22: a store with auto-accept accepts an order at once when every item
+// is available: accepted by the system, stock held, the hold and its
+// no-show timer started, no accept timer, the customer told and the shop
+// still told of the new order. A short item never becomes an order (BK-02),
+// and a store without auto-accept leaves the order placed.
+func TestBK22AutoAccept(t *testing.T) {
 	o := newOrderShop(t)
 	o.a.exec(`UPDATE stores SET auto_accept = true WHERE id = $1`, uuidOf(t, o.sid))
-	id := o.order()
+	now := o.a.clk.Now()
+	r := o.place(o.cust, line{o.butter, 2}, line{o.salt, 1})
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	require.Equal(t, "accepted", r.body["status"])
+	noCode(t, r.body, "the create answer never carries the code")
+	id := r.body["id"].(string)
+	_, hold := o.times(id)
+	require.NotNil(t, hold)
+	require.True(t, hold.Equal(now.Add(30*time.Minute)), "hold_until = placed_at + pickup_hold_min")
+	require.Equal(t, 2, o.held(id))
+	_, reserved := o.stock(o.butter)
+	require.Equal(t, 2, reserved)
+	require.Equal(t, 1, o.timerJobs(orders.KindNoShow, id, *hold))
+	require.Zero(t, o.a.count(`SELECT count(*) FROM river_job WHERE kind = $1 AND args->'a'->>'orderId' = $2`, orders.KindAcceptTimeout, id))
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM order_events WHERE order_id = $1 AND from_status = 'placed' AND to_status = 'accepted' AND actor_kind = 'system'`, uuidOf(t, id)))
+	require.Equal(t, 2, o.a.count(`SELECT count(*) FROM order_items WHERE order_id = $1 AND quantity_accepted = quantity_requested`, uuidOf(t, id)))
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM notifications WHERE kind = 'order_update' AND ref_id = $1 AND params->>'variant' = 'accepted'`, uuidOf(t, id)))
+	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM notifications WHERE kind = 'new_order' AND ref_id = $1`, uuidOf(t, id)))
+	o.code(id)
+
+	// A short item: refused at place, nothing placed or held.
+	before := o.a.count(`SELECT count(*) FROM orders`)
+	r = o.a.call(o.manager, http.MethodPost, o.S+"/items/"+o.butter+"/movements", map[string]any{"kind": "damage", "quantity": 497}, idem(o.a))
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	r = o.place(o.cust2, line{o.butter, 3})
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, "insufficient_stock", problemCode(r))
+	require.Equal(t, before, o.a.count(`SELECT count(*) FROM orders`))
+
+	// Auto-accept off: the order waits for the shop.
+	o.a.exec(`UPDATE stores SET auto_accept = false WHERE id = $1`, uuidOf(t, o.sid))
+	id = o.order()
 	require.Equal(t, "placed", o.status(id))
 	require.Zero(t, o.held(id))
-	// TODO(lead): auto-accept (BK-22's accepted-instantly half) is deferred.
 }
 
 // --- deletion, tenancy, roles, the code ----------------------------------------------
