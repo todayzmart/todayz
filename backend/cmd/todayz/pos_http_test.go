@@ -590,9 +590,15 @@ func TestPOS08ClaimExpiry(t *testing.T) {
 	require.Nil(t, p.getClaim(id).body["token"], "the token comes back on create only")
 	require.Empty(t, p.credits.holds)
 
-	// A token that does not verify is a plain 404.
+	// A token that does not verify is a plain 404. The swapped character
+	// stays inside the contract's [A-Za-z0-9_-], so the request reaches the
+	// handler instead of failing validation (a bit flip turned 'A' into '@').
 	bad := []byte(tok)
-	bad[60] ^= 1
+	if bad[60] == 'A' {
+		bad[60] = 'B'
+	} else {
+		bad[60] = 'A'
+	}
 	r = p.preview(p.cust, string(bad))
 	require.Equal(t, http.StatusNotFound, r.code, "tampered token: status %d", r.code)
 	p.noSecrets(tok, live)
