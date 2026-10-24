@@ -1,12 +1,286 @@
-# Paths: domain "admin-reviews" (owner W3-03): admin reviews (04 §2.7).
+# Paths: domain "admin-reviews" (owner W2-06): admin review moderation (01 §10, 04 §2.7, D-41).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-reviews]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-reviews.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# `support`, `admin` and `super_admin` list, hide and restore a review or its reply and work the report
+# queue; each hide, restore and resolve is audited. Roles per operation are in
+# internal/platform/authz/policy/reviews.go. Pulled forward from W3-05 with the moderation rules (the
+# admin console screens stay W3-05).
+/v1/admin/reviews:
+  get:
+    operationId: listAdminReviews
+    tags: [admin-reviews]
+    summary: Reviews, newest first
+    description: >-
+      `state` picks `visible`, `hidden` or `reported` (visible with an open report); every review when omitted.
+      `storeId` narrows to one store.
+    parameters:
+      - name: state
+        in: query
+        schema:
+          type: string
+          enum: [visible, hidden, reported]
+      - name: storeId
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Ulid
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Reviews
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-reviews.yaml#/AdminReviewList
+            example:
+              items:
+                - id: 01JB0SRV1A2B3C4D5E6F7G8H9J
+                  storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  storeName: Annapurna Kirana
+                  customerId: 01JB0SCS1A2B3C4D5E6F7G8H9J
+                  orderId: 01JB0SDR1A2B3C4D5E6F7G8H9J
+                  posSaleId: null
+                  stars: 1
+                  text: Rude staff.
+                  tags: [rude]
+                  createdAt: "2026-10-24T09:30:00Z"
+                  hidden: false
+                  hiddenAt: null
+                  hideReason: null
+                  openReports: 1
+                  reply: null
+              nextCursor: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/reviews/{reviewId}/hide:
+  parameters:
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: hideReview
+    tags: [admin-reviews]
+    summary: Hide a review (soft delete, audited)
+    description: >-
+      Needs a reason. The review leaves the shop page and the store rating is recalculated in the same
+      transaction. Open reports on it close as `upheld`. Hiding a hidden review is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-reviews.yaml#/ModerationRequest
+          example:
+            reason: Abusive language
+    responses:
+      "200":
+        description: The review after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-reviews.yaml#/AdminReview
+            example: &adminreview
+              id: 01JB0SRV1A2B3C4D5E6F7G8H9J
+              storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+              storeName: Annapurna Kirana
+              customerId: 01JB0SCS1A2B3C4D5E6F7G8H9J
+              orderId: 01JB0SDR1A2B3C4D5E6F7G8H9J
+              posSaleId: null
+              stars: 1
+              text: Rude staff.
+              tags: [rude]
+              createdAt: "2026-10-24T09:30:00Z"
+              hidden: true
+              hiddenAt: "2026-10-24T11:00:00Z"
+              hideReason: Abusive language
+              openReports: 0
+              reply: null
+      default: *problem
+/v1/admin/reviews/{reviewId}/restore:
+  parameters:
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: restoreReview
+    tags: [admin-reviews]
+    summary: Restore a hidden review (audited)
+    description: >-
+      Needs a reason (D-41). The review is back on the shop page and the store rating is recalculated.
+      Restoring a visible review is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-reviews.yaml#/ModerationRequest
+          example:
+            reason: Hidden by mistake
+    responses:
+      "200":
+        description: The review after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-reviews.yaml#/AdminReview
+            example:
+              id: 01JB0SRV1A2B3C4D5E6F7G8H9J
+              storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+              storeName: Annapurna Kirana
+              customerId: 01JB0SCS1A2B3C4D5E6F7G8H9J
+              orderId: 01JB0SDR1A2B3C4D5E6F7G8H9J
+              posSaleId: null
+              stars: 1
+              text: Rude staff.
+              tags: [rude]
+              createdAt: "2026-10-24T09:30:00Z"
+              hidden: false
+              hiddenAt: null
+              hideReason: null
+              openReports: 0
+              reply: null
+      default: *problem
+/v1/admin/reviews/{reviewId}/reply/hide:
+  parameters:
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: hideReviewReply
+    tags: [admin-reviews]
+    summary: Hide a shop's reply (soft delete, audited)
+    description: Needs a reason. No reply, or a reply already hidden, is `409 invalid_transition`. The shop may not post a new reply while it is hidden.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-reviews.yaml#/ModerationRequest
+          example:
+            reason: Abusive language
+    responses:
+      "200":
+        description: The review after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-reviews.yaml#/AdminReview
+            example: *adminreview
+      default: *problem
+/v1/admin/reviews/{reviewId}/reply/restore:
+  parameters:
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: restoreReviewReply
+    tags: [admin-reviews]
+    summary: Restore a hidden reply (audited)
+    description: Needs a reason. A reply that is not hidden is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-reviews.yaml#/ModerationRequest
+          example:
+            reason: Hidden by mistake
+    responses:
+      "200":
+        description: The review after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-reviews.yaml#/AdminReview
+            example: *adminreview
+      default: *problem
+/v1/admin/review-reports:
+  get:
+    operationId: listAdminReviewReports
+    tags: [admin-reviews]
+    summary: The review report queue
+    description: Oldest open first when `status=open` (the default); newest first for `resolved`.
+    parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum: [open, resolved]
+          default: open
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Reports
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-reviews.yaml#/AdminReviewReportList
+            example:
+              items:
+                - id: 01JB0SRP1A2B3C4D5E6F7G8H9J
+                  reviewId: 01JB0SRV1A2B3C4D5E6F7G8H9J
+                  reporterKind: store
+                  reason: This customer never visited the shop
+                  status: open
+                  resolution: null
+                  resolutionNote: null
+                  createdAt: "2026-10-24T11:00:00Z"
+                  resolvedAt: null
+              nextCursor: null
+              serverNow: "2026-10-24T11:30:00Z"
+      default: *problem
+/v1/admin/review-reports/{reportId}/resolve:
+  parameters:
+    - name: reportId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: resolveReviewReport
+    tags: [admin-reviews]
+    summary: Close a report
+    description: >-
+      `dismissed` leaves the review as it is; `upheld` closes the report as justified. Hide the review with its own call.
+      Resolving a resolved report is `409 invalid_transition`. Audited.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-reviews.yaml#/ResolveReportRequest
+          example:
+            resolution: dismissed
+            note: Within the guidelines
+    responses:
+      "200":
+        description: The report after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-reviews.yaml#/AdminReviewReport
+            example:
+              id: 01JB0SRP1A2B3C4D5E6F7G8H9J
+              reviewId: 01JB0SRV1A2B3C4D5E6F7G8H9J
+              reporterKind: store
+              reason: This customer never visited the shop
+              status: resolved
+              resolution: dismissed
+              resolutionNote: Within the guidelines
+              createdAt: "2026-10-24T11:00:00Z"
+              resolvedAt: "2026-10-24T11:30:00Z"
+      default: *problem
