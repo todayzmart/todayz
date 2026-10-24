@@ -11,6 +11,7 @@ import (
 	"github.com/todayz/backend/gen/sqlc/posdb"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/pii"
 )
 
 // D-94: a bill rounds to the nearest ₹1, half up.
@@ -160,4 +161,35 @@ func TestPurchasesCursorRoundTrip(t *testing.T) {
 	require.Equal(t, id, gotID)
 	_, _, err = decodeCursor("not-a-cursor")
 	require.Error(t, err)
+}
+
+// Every spelling of one Indian mobile is one phone, and so one lock key
+// (D-131); anything else is not a phone.
+// Every spelling of one number counts and locks as one phone (D-131).
+func TestGuardPhoneVariantsShareKey(t *testing.T) {
+	h, err := pii.NewHasher(bytes.Repeat([]byte{7}, 32))
+	require.NoError(t, err)
+	s := &Service{hasher: h}
+	at := time.Date(2026, 10, 23, 6, 0, 0, 0, time.UTC)
+	store, cashier := ids.New(at), ids.New(at.Add(time.Millisecond))
+	want := s.guard(store, cashier, "+919876543210").phone
+	require.NotNil(t, want)
+	for _, v := range []string{"+91 98765 43210", "+91-98765-43210", "(+91) 98765.43210", "919876543210", "09876543210", "9876543210"} {
+		require.Equal(t, want, s.guard(store, cashier, v).phone, v)
+	}
+	require.NotEqual(t, want, s.guard(store, cashier, "+919876543211").phone)
+	require.Nil(t, s.guard(store, cashier, "+449876543210").phone)
+}
+
+func TestCanonPhone(t *testing.T) {
+	for _, v := range []string{"+919876543210", "+91 98765 43210", "+91-98765-43210", "(+91) 98765.43210",
+		"919876543210", "09876543210", "9876543210"} {
+		got, ok := canonPhone(v)
+		require.True(t, ok, v)
+		require.Equal(t, "+919876543210", got, v)
+	}
+	for _, v := range []string{"", "+9198765", "+915876543210", "+449876543210", "98765432100"} {
+		_, ok := canonPhone(v)
+		require.False(t, ok, v)
+	}
 }
