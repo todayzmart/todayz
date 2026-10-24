@@ -1020,3 +1020,13 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 - **Pickup-code QR:** waits; no dependency is added in Wave 2. The code is shown as text.
 - **Production tiles and the `IMAGE_BASE_URL` key form** are settled in Wave 5 with the infra. Locally they are per-city tiles and `<base>/<imageKey>`.
 - **C-05 when no shop confirmed** (founder, 24 Oct): say none of the shops has confirmed yet and offer a wider radius. The shops are not asked again automatically.
+
+## Cloud go-live (founder, 2026-10-24)
+
+**D-210 · One repo, prod only, cloud now (founder, 24 Oct).** Supersedes the "local first until the release candidate" rule (09 intro, D-96 §5 order) and the "no GitHub repos" rule.
+- **GitHub:** one private repo `todayz` (this monorepo) in a TodayZ GitHub organization, not the founder's personal account. A later split into the per-app repos stays possible because every app folder builds on its own.
+- **No staging.** `envs/staging` is not applied. Every merge or push to `main` deploys straight to prod (founder: "on main branch merge/push"): the API and worker to Beanstalk, and the four apps (site, customer, business, admin) to their Cloudflare Pages projects. GitHub Actions decides what to deploy from the folders a merge changed. A `shared/` or contract change rebuilds every app that uses it.
+- **Credentials:** cloud admin credentials live in `.env.cloud.local` (git-ignored, read only by the lead's shell for gh, Terraform and wrangler, never exported to app processes). This replaces `.env.local` for the cloud names, so the app processes never see them. The founder's plugins and connectors are not used. CI then deploys through a GitHub OIDC role.
+- **Kept:** the budget alarm comes first. The founder sees the prod `terraform plan` summary (resources and cost, about ₹13–17k a month) before the first apply. App keys are generated fresh for prod, straight into Secrets Manager. `make check` stays the gate before every deploy.
+- **Prod data:** reference data only (categories, places, master catalogue, admin users). Never the dev seed.
+- **Guide:** `docs/runbooks/cloud-access.md`.
