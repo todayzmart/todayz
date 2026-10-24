@@ -4,6 +4,7 @@
 #                           the same prefetch setup-ci does for infra/terraform
 #   check-infra             (offline) the policy checks: the A-22 read-only IAM action
 #                           allow-list and the worker's PutMetricData namespace (SC-OPS-05), the
+#                           SMS send policy scoped to the DLT sender ID (D-212), the
 #                           shutdown and health-check timings (SC-GS-10), with their own tests;
 #                           and fmt, validate, tflint, checkov on infra/cloudflare
 #                           (infra/terraform is covered by check-tf-static in 90-ci.mk)

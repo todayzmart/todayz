@@ -11,13 +11,15 @@ type Meta struct {
 	At time.Time `json:"at"`
 }
 
-// SMS is one message accepted by the MSG91 mock.
+// SMS is one message accepted by the SMS mocks: AWS End User Messaging
+// SendTextMessage (D-212) or the legacy MSG91 routes.
 type SMS struct {
 	Meta
-	API        string            `json:"api"` // otp, otp_retry, flow
+	API        string            `json:"api"` // send_text_message (AWS); otp, otp_retry, flow (legacy MSG91)
 	To         string            `json:"to"`  // E.164, e.g. +919000000001
 	Sender     string            `json:"sender,omitempty"`
-	TemplateID string            `json:"template_id"`
+	EntityID   string            `json:"entity_id,omitempty"` // DLT IN_ENTITY_ID (AWS)
+	TemplateID string            `json:"template_id"`         // DLT IN_TEMPLATE_ID (AWS) or MSG91 template
 	Variables  map[string]string `json:"variables"`
 	Body       string            `json:"body"`
 	OTP        string            `json:"otp"` // extracted code, "" when the message has none

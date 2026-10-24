@@ -56,7 +56,7 @@ type Deps struct {
 	Providers map[notice.Channel]Provider
 	// CostPerUnitPaise is the estimated price of one billable unit per
 	// channel, for tz_notify_cost_paise_total and the delivery row.
-	// TODO(lead): the MSG91 contract price is not in the plan; until it is,
+	// TODO(lead): the AWS SMS price for India (D-212) is not in the plan; until it is,
 	// the cost is 0 and only tz_notify_units_total is meaningful. It is an
 	// accounting estimate, not a product rule, so it is not a setting.
 	CostPerUnitPaise map[notice.Channel]int64

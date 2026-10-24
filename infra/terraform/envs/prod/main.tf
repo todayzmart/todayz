@@ -62,6 +62,27 @@ variable "alarm_email" {
   default = ""
 }
 
+# SMS (D-212): the DLT ids, not secrets; set as TF_VAR_sms_* from .env.cloud.local.
+variable "sms_sender_id" {
+  type    = string
+  default = ""
+}
+
+variable "sms_dlt_entity_id" {
+  type    = string
+  default = ""
+}
+
+variable "sms_otp_template_id" {
+  type    = string
+  default = ""
+}
+
+variable "sms_notice_template_ids" {
+  type    = string
+  default = ""
+}
+
 module "stack" {
   source = "../../modules/stack"
   providers = {
@@ -74,6 +95,11 @@ module "stack" {
   ecr_repository_arn = var.ecr_repository_arn
   ecr_repository_url = var.ecr_repository_url
   alarm_email        = var.alarm_email
+
+  sms_sender_id           = var.sms_sender_id
+  sms_dlt_entity_id       = var.sms_dlt_entity_id
+  sms_otp_template_id     = var.sms_otp_template_id
+  sms_notice_template_ids = var.sms_notice_template_ids
 
   # D-96: db.t4g.medium Single-AZ. `db_multi_az = true` is the one-flag switch.
   db_instance_class = "db.t4g.medium"

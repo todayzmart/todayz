@@ -83,6 +83,73 @@ class Worker(unittest.TestCase):
         self.assertTrue(check.check_worker_policy(doc))
 
 
+class Sms(unittest.TestCase):
+    def setUp(self):
+        self.good = json.loads(check.SMS_POLICY.read_text())
+        self.main = check.STACK_MAIN.read_text()
+
+    def test_repo_policy_passes(self):
+        self.assertEqual(check.check_sms_policy(self.good, main_text=self.main), [])
+
+    def test_literal_arns_pass(self):
+        doc = copy.deepcopy(self.good)
+        doc["Statement"][0]["Resource"] = [
+            "arn:aws:sms-voice:ap-south-1:123456789012:sender-id/TODAYZ/IN",
+            "arn:aws:sms-voice:ap-south-1:123456789012:pool/pool-abc123",
+            "arn:aws:sms-voice:ap-south-1:123456789012:opt-out-list/Default",
+        ]
+        self.assertEqual(check.check_sms_policy(doc), [])
+
+    def test_extra_action_fails(self):
+        for extra in ("sms-voice:SendVoiceMessage", "sms-voice:*", "*", "sms-voice:DeleteOptedOutNumber"):
+            doc = copy.deepcopy(self.good)
+            doc["Statement"][0]["Action"].append(extra)
+            self.assertTrue(check.check_sms_policy(doc), extra)
+
+    def test_wildcard_or_foreign_resource_fails(self):
+        for bad in (
+            "*",
+            "arn:aws:sms-voice:*:*:*",
+            "arn:aws:sms-voice:${region}:${account_id}:sender-id/*",
+            "arn:aws:sms-voice:${region}:${account_id}:sender-id/TODAYZ/*",
+            "arn:aws:sms-voice:${region}:*:sender-id/TODAYZ/IN",
+            "arn:aws:sms-voice:${region}:${account_id}:configuration-set/x",
+            "arn:aws:sns:${region}:${account_id}:topic",
+        ):
+            doc = copy.deepcopy(self.good)
+            doc["Statement"][0]["Resource"] = [doc["Statement"][0]["Resource"][0], bad]
+            self.assertTrue(check.check_sms_policy(doc), bad)
+
+    def test_opt_out_only_fails(self):
+        doc = copy.deepcopy(self.good)
+        doc["Statement"][0]["Resource"] = ["arn:aws:sms-voice:${region}:${account_id}:opt-out-list/*"]
+        self.assertTrue(check.check_sms_policy(doc))
+
+    def test_not_resource_deny_condition_and_extra_statement_fail(self):
+        for mutate in (
+            lambda st: st.update(NotResource="*"),
+            lambda st: st.update(NotAction="iam:*"),
+            lambda st: st.update(Effect="Deny"),
+            lambda st: st.update(Condition={"StringEquals": {"aws:RequestedRegion": "ap-south-1"}}),
+        ):
+            doc = copy.deepcopy(self.good)
+            mutate(doc["Statement"][0])
+            self.assertTrue(check.check_sms_policy(doc))
+        doc = copy.deepcopy(self.good)
+        doc["Statement"].append(copy.deepcopy(doc["Statement"][0]))
+        self.assertTrue(check.check_sms_policy(doc))
+
+    def test_unattached_role_fails(self):
+        main = self.main.replace('resource "aws_iam_role_policy" "worker_sms_send"', 'resource "aws_iam_role_policy" "worker_x"', 1)
+        self.assertTrue(check.check_sms_policy(self.good, main_text=main))
+
+    def test_readonly_and_worker_checks_still_refuse_it(self):
+        # The SMS write lives in its own document: the api's read-only and the worker's
+        # metrics documents must never absorb it.
+        self.assertTrue(check.check_readonly_policy(self.good))
+        self.assertTrue(check.check_worker_policy(self.good))
+
+
 class Timings(unittest.TestCase):
     def setUp(self):
         self.text = check.TIMINGS.read_text()

@@ -1,0 +1,16 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "SendSmsFromTheDltSenderId",
+      "Effect": "Allow",
+      "Action": [
+        "sms-voice:SendTextMessage"
+      ],
+      "Resource": [
+        "arn:aws:sms-voice:${region}:${account_id}:sender-id/${sender_id}/IN",
+        "arn:aws:sms-voice:${region}:${account_id}:opt-out-list/*"
+      ]
+    }
+  ]
+}

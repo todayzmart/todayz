@@ -32,6 +32,9 @@ func TestLogsNeverHoldSensitiveValues(t *testing.T) {
 	wantStatus(t, h.postJSON("/msg91/api/v5/otp?template_id=tz_otp_login&mobile=91"+phone+"&otp="+otp, `{"name":"Asha"}`, map[string]string{"authkey": authkey}), 200)
 	wantStatus(t, h.postJSON("/msg91/api/v5/otp", map[string]string{"mobile": "91" + phone, "otp": otp}, map[string]string{"authkey": authkey}), 200)
 	wantStatus(t, h.postJSON("/msg91/api/v5/otp?mobile=91"+phone+"&otp="+otp+"&authkey="+authkey, "", nil), 200)
+	// The AWS SendTextMessage path (D-212), accepted and refused.
+	wantStatus(t, h.postAWS("/sms-voice", awsBody("+91"+phone, otp+" is your TodayZ login code. Do not share it with anyone.", awsOTPTpl), awsHeaders()), 200)
+	wantStatus(t, h.postAWS("/sms-voice", awsBody("+91"+phone, otp+" is your code", awsOTPTpl), awsHeaders()), 400)
 	// Errors must not echo either.
 	wantStatus(t, h.postJSON("/msg91/api/v5/otp?mobile=91"+phone+"&otp=12ab", "", map[string]string{"authkey": authkey}), 400)
 	// Reads of the OTP.

@@ -39,9 +39,10 @@ type kindDef struct {
 	// new status), per language with the same fallback.
 	Variants map[string]map[string]text
 	// Templates name the SMS/WhatsApp template per language ("en" is the
-	// fallback). TODO(lead): these are logical names; the DLT template ids
-	// registered with MSG91 replace them in Wave 5 (a mapping from these
-	// names, through config, never platform_settings).
+	// fallback). For SMS each name maps to its DLT template id through
+	// SMS_NOTICE_TEMPLATE_IDS (D-212), never platform_settings, and the
+	// kind's text in that language must stay exactly the registered DLT
+	// text (docs/runbooks/aws-founder-steps.md, part C1).
 	Templates map[string]string
 }
 

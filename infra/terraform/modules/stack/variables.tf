@@ -144,3 +144,46 @@ variable "worker_scale_out_age_seconds" {
   type    = number
   default = 30
 }
+
+# ---- SMS: AWS End User Messaging, India DLT (D-212) ----------------------------------
+# Not secrets. Values come from the founder's DLT registration
+# (docs/runbooks/aws-founder-steps.md part C). Empty sender ID: no SMS permission.
+
+variable "sms_sender_id" {
+  type        = string
+  default     = ""
+  description = "The DLT-registered sender ID (header), e.g. TODAYZ."
+
+  validation {
+    condition     = can(regex("^([A-Za-z0-9]{1,11})?$", var.sms_sender_id))
+    error_message = "sms_sender_id must be 1 to 11 letters or digits (or empty)."
+  }
+}
+
+variable "sms_dlt_entity_id" {
+  type        = string
+  default     = ""
+  description = "The DLT principal entity id (IN_ENTITY_ID)."
+
+  validation {
+    condition     = can(regex("^[0-9]{0,32}$", var.sms_dlt_entity_id))
+    error_message = "sms_dlt_entity_id must be a numeric DLT id (or empty)."
+  }
+}
+
+variable "sms_otp_template_id" {
+  type        = string
+  default     = ""
+  description = "The DLT template id of the login OTP SMS (IN_TEMPLATE_ID)."
+
+  validation {
+    condition     = can(regex("^[0-9]{0,32}$", var.sms_otp_template_id))
+    error_message = "sms_otp_template_id must be a numeric DLT id (or empty)."
+  }
+}
+
+variable "sms_notice_template_ids" {
+  type        = string
+  default     = ""
+  description = "name=id pairs for the notice SMS templates, e.g. tz_order_unseen=<id>,tz_order_unseen_hi=<id>."
+}

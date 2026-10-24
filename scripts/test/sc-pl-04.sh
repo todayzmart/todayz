@@ -34,10 +34,10 @@ fi
 grep -qx "api.anthropic.com" "$work/go.hosts" 2>/dev/null || { echo "FAIL: Go attempt not reported"; fail=1; }
 
 # 3. Node fetch is refused and reported.
-if TODAYZ_EGRESS_REPORT="$work/node.hosts" "$ne" node -e 'fetch("https://control.msg91.com/api").then(()=>process.exit(0),()=>process.exit(7))' 2>/dev/null; then
-  echo "FAIL: Node reached control.msg91.com"; fail=1
+if TODAYZ_EGRESS_REPORT="$work/node.hosts" "$ne" node -e 'fetch("https://sms-voice.ap-south-1.amazonaws.com/").then(()=>process.exit(0),()=>process.exit(7))' 2>/dev/null; then
+  echo "FAIL: Node reached sms-voice.ap-south-1.amazonaws.com"; fail=1
 fi
-grep -qx "control.msg91.com" "$work/node.hosts" 2>/dev/null || { echo "FAIL: Node attempt not reported"; fail=1; }
+grep -qx "sms-voice.ap-south-1.amazonaws.com" "$work/node.hosts" 2>/dev/null || { echo "FAIL: Node attempt not reported"; fail=1; }
 
 # 4. Local hosts go direct and the run passes with nothing reported.
 python3 -u -m http.server 0 --bind 127.0.0.1 --directory "$work" >"$work/srv.log" 2>&1 &
@@ -51,10 +51,10 @@ fi
 
 # 5. Provider keys are unset inside the wrapper; markers are set.
 sa="sentinel-pl04-anthropic" # gitleaks:allow (test sentinel)
-sm="sentinel-pl04-msg91" # gitleaks:allow (test sentinel)
+sm="sentinel-pl04-aws" # gitleaks:allow (test sentinel)
 # shellcheck disable=SC2016 # the inner bash expands these
-env ANTHROPIC_API_KEY="$sa" MSG91_AUTH_KEY="$sm" SENTRY_DSN=sentinel-pl04 \
-  "$ne" bash -c '[[ -z "${ANTHROPIC_API_KEY:-}${MSG91_AUTH_KEY:-}${SENTRY_DSN:-}" && "$TODAYZ_NO_EGRESS" == 1 && "$MOCK_LLM" == 1 ]]' \
+env ANTHROPIC_API_KEY="$sa" AWS_SECRET_ACCESS_KEY="$sm" SENTRY_DSN=sentinel-pl04 \
+  "$ne" bash -c '[[ -z "${ANTHROPIC_API_KEY:-}${AWS_SECRET_ACCESS_KEY:-}${SENTRY_DSN:-}" && "$TODAYZ_NO_EGRESS" == 1 && "$MOCK_LLM" == 1 ]]' \
   || { echo "FAIL: provider keys leak into the default suite"; fail=1; }
 
 # 6. A failing command still fails.

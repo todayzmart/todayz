@@ -1,7 +1,8 @@
 # tz-mocks: provider mocks (W0-07)
 
 One Go service (stdlib only) that stands in for every outside provider the
-backend calls in local and test: MSG91 SMS, WhatsApp (MSG91 and Gupshup), Web
+backend calls in local and test: AWS End User Messaging SMS (and the legacy
+MSG91 SMS routes), WhatsApp (MSG91 and Gupshup), Web
 Push, Cloudflare Turnstile, Sarvam speech-to-text and the Anthropic Messages API.
 It answers in each provider's own request and response shapes, keeps what it
 received in memory, and shows it in a small web UI and a JSON API, so tests can
@@ -63,7 +64,7 @@ read captured OTPs. Caddy keeps the original Host when it proxies
 
 | Backend variable | Value in local/test | Real provider |
 |---|---|---|
-| `SMS_API_URL` | `http://127.0.0.1:4010/msg91` | `https://control.msg91.com` |
+| `SMS_API_URL` | `http://127.0.0.1:4010/sms-voice` | none: deployed, the SDK uses the AWS regional endpoint for `AWS_REGION` and the instance role (D-212) |
 | `WHATSAPP_API_URL` | `http://127.0.0.1:4010/whatsapp` | MSG91 WhatsApp: `https://api.msg91.com` (not `control.msg91.com`, which is SMS/OTP); Gupshup: `https://api.gupshup.io` |
 | `PUSH_API_URL` | `http://127.0.0.1:4010/push` | the subscription's own endpoint |
 | `TURNSTILE_API_URL` | `http://127.0.0.1:4010/turnstile` | `https://challenges.cloudflare.com` |
@@ -72,6 +73,12 @@ read captured OTPs. Caddy keeps the original Host when it proxies
 
 The backend appends the provider's own path to the base URL, exactly as it would
 against the real host.
+
+**Upgrading from MSG91 (D-212).** An old `.env.local` with
+`SMS_API_URL=http://127.0.0.1:4010/msg91` still wins over `infra/local/local.env`, and the
+backend now posts the AWS `SendTextMessage` call to that base. The mocks answer 404, so
+login fails. Change the line to `SMS_API_URL=http://127.0.0.1:4010/sms-voice`, or delete
+it, since `local.env` already has that value. Also delete any `MSG91_*` lines.
 
 ## Provider endpoints
 
@@ -88,7 +95,31 @@ digits. A bare 10-digit number is refused with 400, so a backend that drops the
 **Body limits.** Over a route's limit is 413 in the provider's error shape;
 any other unreadable body is 400 (Turnstile: 200 with `bad-request`).
 
-### MSG91 SMS (`/msg91`)
+### AWS End User Messaging SMS (`/sms-voice`)
+
+Docs: https://docs.aws.amazon.com/pinpoint/latest/apireference_smsvoicev2/API_SendTextMessage.html
+
+| Route | Notes |
+|---|---|
+| `POST /sms-voice` (and `/sms-voice/`) | `SendTextMessage`, AWS JSON 1.0: `X-Amz-Target: PinpointSMSVoiceV2.SendTextMessage`, `Content-Type: application/x-amz-json-1.0`, a SigV4 `Authorization` header (presence only; the backend signs with dummy credentials locally). Body `DestinationPhoneNumber` (E.164 with `+`), `MessageBody` (1 to 1600 characters), `OriginationIdentity`, `MessageType` (`TRANSACTIONAL`/`PROMOTIONAL`), `TimeToLive` (5 to 259200 s), `DestinationCountryParameters`, `DryRun`. 200 `{"MessageId"}`; `DryRun` records nothing. |
+
+A `+91` number also needs `OriginationIdentity` (the DLT sender ID) and
+`IN_ENTITY_ID` plus `IN_TEMPLATE_ID`, as India's DLT rules require. When
+`IN_TEMPLATE_ID` is listed in `fixtures/sms/dlt-templates.json` (the local ids
+from `infra/local/local.env`), `MessageBody` must be that template with each
+`{#var#}` filled by at most 30 characters, or the mock answers 400 (the real
+operator would drop it silently after AWS accepted it). Unlisted ids are accepted.
+Errors use the AWS JSON 1.0 shape: `X-Amzn-ErrorType` and
+`{"__type","Message"}`; 403 `MissingAuthenticationTokenException` without a
+signature, 400 `UnknownOperationException`, `SerializationException` or
+`ValidationException`. Messages never repeat the phone or the text. Each send
+is captured with `api: "send_text_message"`, `sender`, `entity_id`,
+`template_id` and `body`; the OTP is extracted from the body (below).
+
+### Legacy MSG91 SMS (`/msg91`)
+
+The backend no longer calls these routes (D-212); they stay until the lead
+removes them.
 
 Docs: https://docs.msg91.com/otp/sendotp, https://docs.msg91.com/otp/verify-otp,
 https://docs.msg91.com/otp/retry-otp, https://docs.msg91.com/sms/send-sms
@@ -105,7 +136,7 @@ authkey, 400 for a missing or invalid mobile, a non-digit OTP or bad JSON.
 Template text comes from `fixtures/sms/templates.json` (`##VAR##` placeholders);
 an unknown OTP template falls back to "##OTP## is your TodayZ verification code. Do not share it with anyone."
 
-**OTP extraction.** Each captured SMS stores `otp`: the `otp` parameter if
+**OTP extraction.** Each captured SMS stores `otp`: the MSG91 `otp` parameter if
 given (4 to 9 digits), else a template variable whose name contains "otp",
 else the only 6-digit run in a text that mentions an OTP, code or verification. `GET /_mock/sms/latest-otp?to=` reads it back.
 

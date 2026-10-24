@@ -11,7 +11,10 @@ import (
 	"fmt"
 	"log/slog"
 	"maps"
+	"net/http"
+	"net/http/httptest"
 	"strconv"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -896,17 +899,19 @@ func TestPreflight(t *testing.T) {
 	env["API_PUBLIC_URL"] = "https://api.staging.todayz.in"
 	cfg := loadConfig(t, env)
 	err := Preflight(cfg)
-	for _, name := range []string{"SMS_API_URL", "MSG91_AUTH_KEY", "MSG91_OTP_TEMPLATE_ID", "TURNSTILE_API_URL", "TURNSTILE_SECRET_KEY"} {
+	for _, name := range []string{"AWS_REGION", "SMS_SENDER_ID", "SMS_DLT_ENTITY_ID", "SMS_OTP_TEMPLATE_ID", "TURNSTILE_API_URL", "TURNSTILE_SECRET_KEY"} {
 		require.ErrorContains(t, err, name)
 	}
 	require.NotContains(t, err.Error(), "PII_ENC_KEY")
+	require.NotContains(t, err.Error(), "SMS_API_URL", "D-212: deployed SMS needs no endpoint override")
 
 	values := map[string]string{
-		"SMS_API_URL":           "https://control.msg91.com",
-		"MSG91_AUTH_KEY":        "staging-key-value",
-		"MSG91_OTP_TEMPLATE_ID": "staging-template-value",
-		"TURNSTILE_API_URL":     "https://challenges.cloudflare.com",
-		"TURNSTILE_SECRET_KEY":  "staging-turnstile-value",
+		"AWS_REGION":           "ap-south-1",
+		"SMS_SENDER_ID":        "TODAYZ",
+		"SMS_DLT_ENTITY_ID":    "1201169999000000001",
+		"SMS_OTP_TEMPLATE_ID":  "1207169999000000101",
+		"TURNSTILE_API_URL":    "https://challenges.cloudflare.com",
+		"TURNSTILE_SECRET_KEY": "staging-turnstile-value",
 	}
 	for k, v := range values {
 		env[k] = v
@@ -923,6 +928,16 @@ func TestPreflight(t *testing.T) {
 			require.NotContains(t, err.Error(), v, "values are never named")
 		}
 	}
+
+	// D-212: SMS_API_URL in staging or prod (config.Load refuses it; a config
+	// built another way is refused here), named without its value.
+	cfg = loadConfig(t, env)
+	cfg.Providers.SMSAPIURL = "https://sms.example.com/x"
+	err = Preflight(cfg)
+	require.EqualError(t, err, "identity: must be unset in staging and prod: SMS_API_URL")
+	sms, _ := providers(cfg)
+	require.IsType(t, noSMS{}, sms, "never a client that signs for the override")
+	require.ErrorContains(t, sms.SendOTP(context.Background(), "+919876543210", "123456"), "SMS_API_URL must be unset in staging and prod")
 
 	// TOTP_ENC_KEY (M2): config.Load already refuses a deployed config
 	// without it; Preflight checks it again, like the other keys.
@@ -960,9 +975,58 @@ func TestProviders(t *testing.T) {
 	cfg.Providers.TurnstileAPIURL = "http://127.0.0.1:1"
 	cfg.Env = config.EnvTest
 	sms, h = providers(cfg)
-	require.IsType(t, &msg91{}, sms)
+	require.IsType(t, noSMS{}, sms, "SMS_API_URL without the DLT ids fails visibly, never drops")
+	require.ErrorContains(t, sms.SendOTP(context.Background(), "+919876543210", "123456"), "SMS_SENDER_ID")
 	require.IsType(t, &turnstile{}, h)
 	require.Equal(t, turnstileTestSecret, h.(*turnstile).secret, "the mock is checked with the public test secret")
+
+	cfg.Providers.SMSSenderID = "TODAYZ"
+	cfg.Providers.SMSDLTEntityID = "1000000000000000001"
+	sms, _ = providers(cfg)
+	require.Equal(t, noSMS{reason: "SMS_OTP_TEMPLATE_ID is unset"}, sms)
+	cfg.Providers.SMSOTPTemplateID = "1000000000000000101"
+	sms, _ = providers(cfg)
+	require.IsType(t, &awsOTP{}, sms)
+
+	cfg.Providers.SMSAPIURL = "https://sms-voice.ap-south-1.amazonaws.com"
+	sms, _ = providers(cfg)
+	require.IsType(t, noSMS{}, sms, "local and test never sign for a real endpoint")
+	require.ErrorContains(t, sms.SendOTP(context.Background(), "+919876543210", "123456"), "SMS_API_URL must be a local address")
+}
+
+// D-212: the OTP goes to AWS End User Messaging with the DLT ids, as the
+// exact registered text, and expires with the code.
+func TestAWSOTP(t *testing.T) {
+	type sent struct {
+		Target, Auth string
+		Body         map[string]any
+	}
+	got := make(chan sent, 1)
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var b map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&b)
+		got <- sent{Target: r.Header.Get("X-Amz-Target"), Auth: r.Header.Get("Authorization"), Body: b}
+		w.Header().Set("Content-Type", "application/x-amz-json-1.0")
+		_, _ = w.Write([]byte(`{"MessageId":"m-1"}`))
+	}))
+	t.Cleanup(srv.Close)
+
+	cfg := loadConfig(t, map[string]string{"APP_ENV": "test"})
+	cfg.Providers.SMSAPIURL = srv.URL
+	cfg.Providers.SMSSenderID = "TODAYZ"
+	cfg.Providers.SMSDLTEntityID = "1000000000000000001"
+	cfg.Providers.SMSOTPTemplateID = "1000000000000000101"
+	sms, _ := providers(cfg)
+	require.NoError(t, sms.SendOTP(context.Background(), "+919876543210", "482913"))
+	s := <-got
+	require.Equal(t, "PinpointSMSVoiceV2.SendTextMessage", s.Target)
+	require.True(t, strings.HasPrefix(s.Auth, "AWS4-HMAC-SHA256 "), "SigV4-signed offline with dummy credentials")
+	require.Equal(t, "482913 is your TodayZ login code. Do not share it with anyone.", s.Body["MessageBody"], "the DLT template text, exactly")
+	require.Equal(t, "+919876543210", s.Body["DestinationPhoneNumber"])
+	require.Equal(t, "TODAYZ", s.Body["OriginationIdentity"])
+	require.Equal(t, "TRANSACTIONAL", s.Body["MessageType"])
+	require.EqualValues(t, OTPTTL/time.Second, s.Body["TimeToLive"])
+	require.Equal(t, map[string]any{"IN_ENTITY_ID": "1000000000000000001", "IN_TEMPLATE_ID": "1000000000000000101"}, s.Body["DestinationCountryParameters"])
 }
 
 func TestHelpers(t *testing.T) {

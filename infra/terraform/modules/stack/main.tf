@@ -191,6 +191,16 @@ resource "aws_iam_role_policy" "api_ops_readonly" {
   })
 }
 
+# SMS (D-212): both processes send through AWS End User Messaging with the instance role
+# (OTPs from the api, notices from the worker), only from the DLT sender ID. The JSON file is
+# checked by infra/terraform/checks/check.py (sms). No sender ID set: no SMS permission.
+resource "aws_iam_role_policy" "api_sms_send" {
+  count  = var.sms_sender_id == "" ? 0 : 1
+  name   = "sms-send"
+  role   = aws_iam_role.api.id
+  policy = local.sms_send_policy
+}
+
 resource "aws_iam_instance_profile" "api" {
   name_prefix = "${local.name}-api-"
   role        = aws_iam_role.api.name
@@ -220,6 +230,13 @@ resource "aws_iam_role_policy" "worker_metrics" {
   policy = file("${path.module}/policies/worker-metrics.json")
 }
 
+resource "aws_iam_role_policy" "worker_sms_send" {
+  count  = var.sms_sender_id == "" ? 0 : 1
+  name   = "sms-send"
+  role   = aws_iam_role.worker.id
+  policy = local.sms_send_policy
+}
+
 resource "aws_iam_instance_profile" "worker" {
   name_prefix = "${local.name}-worker-"
   role        = aws_iam_role.worker.name
@@ -238,13 +255,28 @@ resource "aws_elastic_beanstalk_application" "this" {
 }
 
 locals {
+  sms_send_policy = templatefile("${path.module}/policies/sms-send.json", {
+    region     = data.aws_region.current.region
+    account_id = data.aws_caller_identity.current.account_id
+    sender_id  = var.sms_sender_id
+  })
+  # SMS (D-212): the SDK signs in AWS_REGION with the instance role; the DLT ids are not
+  # secrets. SMS_API_URL is never set deployed (the regional endpoint is the default). An
+  # unset value is left out (the app's preflight then names it) rather than set to "".
+  sms_properties = { for k, v in {
+    AWS_REGION              = data.aws_region.current.region
+    SMS_SENDER_ID           = var.sms_sender_id
+    SMS_DLT_ENTITY_ID       = var.sms_dlt_entity_id
+    SMS_OTP_TEMPLATE_ID     = var.sms_otp_template_id
+    SMS_NOTICE_TEMPLATE_IDS = var.sms_notice_template_ids
+  } : k => v if v != "" }
   # Non-secret configuration both processes share (names from backend/CLAUDE.md).
-  common_properties = {
+  common_properties = merge(local.sms_properties, {
     APP_ENV                    = var.environment
     API_PUBLIC_URL             = "https://${var.api_hostname}"
     LOG_LEVEL                  = "info"
     CONTAINER_IMAGE_REPOSITORY = var.ecr_repository_url
-  }
+  })
   api_properties = merge(local.common_properties, {
     API_ADDR                       = ":8080"
     SHUTDOWN_PRESTOP               = "${local.api_prestop_seconds}s"

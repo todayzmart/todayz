@@ -9,6 +9,11 @@
                              wildcard-resource rule.
   check.py worker [FILE...]  the worker policy holds exactly one write, cloudwatch:PutMetricData,
                              and only with the cloudwatch:namespace condition TodayZ/Worker.
+  check.py sms [FILE...]     D-212: the SMS policy (api and worker) holds exactly one Allow
+                             statement whose only action is sms-voice:SendTextMessage, on
+                             sms-voice sender-id, pool or phone-number ARNs (no wildcard) and
+                             opt-out lists, never "*", NotAction or NotResource; main.tf
+                             attaches it to both roles.
   check.py timings [FILE]    SC-GS-10: deploy and health-check timings in modules/stack/timings.tf
                              and their wiring in main.tf.
   check.py all               everything above on the repository files.
@@ -24,6 +29,7 @@ HERE = Path(__file__).resolve().parent
 STACK = HERE.parent / "modules" / "stack"
 API_POLICY = STACK / "policies" / "api-ops-readonly.json"
 WORKER_POLICY = STACK / "policies" / "worker-metrics.json"
+SMS_POLICY = STACK / "policies" / "sms-send.json"
 TIMINGS = STACK / "timings.tf"
 STACK_MAIN = STACK / "main.tf"
 
@@ -86,6 +92,56 @@ def check_worker_policy(doc, label="worker policy"):
         for op in st.get("Condition", {}):
             if op != "StringEquals":
                 out.append(f"{where}: unexpected condition operator {op}")
+    return out
+
+
+# An origination identity the app sends from: no wildcard anywhere. Region and account are
+# templatefile placeholders or literals, never "*".
+SMS_IDENTITY_ARN = re.compile(
+    r"^arn:aws:sms-voice:(\$\{region\}|[a-z0-9-]+):(\$\{account_id\}|[0-9]{12}):"
+    r"(sender-id|pool|phone-number)/[^*?]+$"
+)
+# SendTextMessage is also authorised against the opt-out list in use: any list of this
+# account and region (a list name may be "*", nothing else may).
+SMS_OPT_OUT_ARN = re.compile(
+    r"^arn:aws:sms-voice:(\$\{region\}|[a-z0-9-]+):(\$\{account_id\}|[0-9]{12}):"
+    r"opt-out-list/([A-Za-z0-9_-]+|\*)$"
+)
+SMS_WIRING = [
+    'templatefile("${path.module}/policies/sms-send.json"',
+    'resource "aws_iam_role_policy" "api_sms_send"',
+    'resource "aws_iam_role_policy" "worker_sms_send"',
+]
+
+
+def check_sms_policy(doc, label="sms policy", main_text=None):
+    out = []
+    stmts = _as_list(doc.get("Statement", []))
+    if len(stmts) != 1:
+        out.append(f"{label}: expected exactly one statement, found {len(stmts)}")
+    for st in stmts:
+        where = f"{label}: statement {st.get('Sid', '?')}"
+        if st.get("Effect") != "Allow":
+            out.append(f"{where}: Effect must be Allow")
+        for k in ("NotAction", "NotResource", "NotPrincipal"):
+            if k in st:
+                out.append(f"{where}: {k} is not allowed")
+        if _as_list(st.get("Action", [])) != ["sms-voice:SendTextMessage"]:
+            out.append(f"{where}: the only action allowed is sms-voice:SendTextMessage")
+        resources = _as_list(st.get("Resource", []))
+        if not resources:
+            out.append(f"{where}: no Resource")
+        if not any(SMS_IDENTITY_ARN.match(r) for r in resources if isinstance(r, str)):
+            out.append(f"{where}: needs a sender-id, pool or phone-number ARN")
+        for r in resources:
+            if not isinstance(r, str) or not (SMS_IDENTITY_ARN.match(r) or SMS_OPT_OUT_ARN.match(r)):
+                out.append(f"{where}: resource {r!r} is not an sms-voice sender-id, pool, phone-number or opt-out-list ARN")
+        if "Condition" in st:
+            out.append(f"{where}: unexpected Condition (scope by Resource)")
+    if main_text is not None:
+        for w in SMS_WIRING:
+            if w not in main_text:
+                out.append(f"modules/stack/main.tf: missing wiring {w!r}")
     return out
 
 
@@ -165,11 +221,15 @@ def run(argv):
     if cmd in ("worker", "all"):
         for f in files if cmd == "worker" and files else [WORKER_POLICY]:
             findings += check_worker_policy(_load(f), Path(f).name)
+    if cmd in ("sms", "all"):
+        for f in files if cmd == "sms" and files else [SMS_POLICY]:
+            main = STACK_MAIN.read_text() if Path(f) == SMS_POLICY else None
+            findings += check_sms_policy(_load(f), Path(f).name, main)
     if cmd in ("timings", "all"):
         t = Path(files[0]) if cmd == "timings" and files else TIMINGS
         main = STACK_MAIN.read_text() if t == TIMINGS else None
         findings += check_timings(t.read_text(), main)
-    if cmd not in ("iam", "worker", "timings", "all"):
+    if cmd not in ("iam", "worker", "sms", "timings", "all"):
         print(__doc__)
         return 2
     for line in findings:

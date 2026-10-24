@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"maps"
 	"reflect"
 	"strings"
 	"testing"
@@ -98,7 +99,71 @@ func TestLoadFull(t *testing.T) {
 	requireNoLeak(t, buf.String(), secrets)
 
 	// Unset optional names are logged by name.
-	require.Contains(t, buf.String(), "MSG91_AUTH_KEY")
+	require.Contains(t, buf.String(), "SMS_SENDER_ID")
+	require.NotContains(t, buf.String(), "MSG91", "D-212: the MSG91 names are gone")
+}
+
+// D-212: SMS goes through AWS End User Messaging; its config is non-secret
+// DLT ids, checked for shape, and a bad value is named, never shown.
+func TestSMSConfig(t *testing.T) {
+	env, _ := fullEnv(t, "prod")
+	env["AWS_REGION"] = "ap-south-1"
+	env["SMS_SENDER_ID"] = "TODAYZ"
+	env["SMS_DLT_ENTITY_ID"] = "1201160000000000001"
+	env["SMS_OTP_TEMPLATE_ID"] = "1207160000000000101"
+	env["SMS_NOTICE_TEMPLATE_IDS"] = " tz_order_unseen=1207160000000000201, tz_order_unseen_hi = 1207160000000000202 "
+	c, err := Load(get(env), nil)
+	require.NoError(t, err)
+	require.Equal(t, "ap-south-1", c.AWSRegion)
+	p := c.Providers
+	require.Empty(t, p.SMSAPIURL, "deployed: the regional endpoint")
+	require.Equal(t, "TODAYZ", p.SMSSenderID)
+	require.Equal(t, "1201160000000000001", p.SMSDLTEntityID)
+	require.Equal(t, "1207160000000000101", p.SMSOTPTemplateID)
+	require.Equal(t, map[string]string{"tz_order_unseen": "1207160000000000201", "tz_order_unseen_hi": "1207160000000000202"}, p.SMSNoticeTemplateIDs)
+
+	for _, c := range []struct{ name, value string }{
+		{"AWS_REGION", "Mumbai-7q"},
+		{"SMS_SENDER_ID", "TODAYZ-SMS-77"},
+		{"SMS_SENDER_ID", "TODAY Z"},
+		{"SMS_DLT_ENTITY_ID", "ent-4471"},
+		{"SMS_OTP_TEMPLATE_ID", "1207x4471"},
+		{"SMS_NOTICE_TEMPLATE_IDS", "tz_order_unseen"},
+		{"SMS_NOTICE_TEMPLATE_IDS", "tz_order_unseen=abc4471"},
+		{"SMS_NOTICE_TEMPLATE_IDS", "Tz_Order=4471"},
+		{"SMS_NOTICE_TEMPLATE_IDS", "tz_a=4471,tz_a=4472"},
+		{"SMS_NOTICE_TEMPLATE_IDS", "tz_a=4471,"},
+	} {
+		bad := maps.Clone(env)
+		bad[c.name] = c.value
+		_, err := Load(get(bad), nil)
+		require.ErrorContains(t, err, c.name, c.value)
+		require.NotContains(t, err.Error(), c.value, "the value is never shown")
+		require.NotContains(t, err.Error(), "4471", "no part of the value is shown")
+	}
+
+	// D-212: staging and prod refuse any SMS_API_URL, even the real AWS
+	// endpoint: the role-signed request goes only where the SDK resolves it.
+	for _, e := range []string{"prod", "staging"} {
+		for _, u := range []string{"https://sms-voice.ap-south-1.amazonaws.com/", "http://127.0.0.1:4010/sms-voice", "https://sms.example.com/4471"} {
+			bad := maps.Clone(env)
+			bad["APP_ENV"] = e
+			bad["SMS_API_URL"] = u
+			_, err := Load(get(bad), nil)
+			var ce *Error
+			require.ErrorAs(t, err, &ce, e+" "+u)
+			require.Contains(t, ce.Invalid, "SMS_API_URL: must be unset in staging and prod")
+			require.NotContains(t, err.Error(), u, "the value is never shown")
+			require.NotContains(t, err.Error(), "4471")
+		}
+	}
+	for _, e := range []string{"local", "test"} {
+		ok, _ := fullEnv(t, e)
+		ok["SMS_API_URL"] = "http://127.0.0.1:4010/sms-voice"
+		c, err := Load(get(ok), nil)
+		require.NoError(t, err, e)
+		require.Equal(t, "http://127.0.0.1:4010/sms-voice", c.Providers.SMSAPIURL)
+	}
 }
 
 func TestAppEnv(t *testing.T) {

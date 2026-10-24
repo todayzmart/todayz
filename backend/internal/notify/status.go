@@ -2,7 +2,10 @@ package notify
 
 import (
 	"context"
+	"slices"
+	"strings"
 
+	"github.com/todayz/backend/internal/platform/awssms"
 	"github.com/todayz/backend/internal/platform/notice"
 )
 
@@ -27,19 +30,56 @@ type ChannelStatus struct {
 	Note string `json:"note,omitempty"`
 }
 
+// unmappedSMSTemplates lists, sorted, the catalogue's SMS template names
+// that ids does not map to a DLT template id; their deliveries would fail.
+func unmappedSMSTemplates(ids map[string]string) []string {
+	var out []string
+	for _, def := range catalogue {
+		if !slices.Contains(def.Channels, notice.SMS) {
+			continue
+		}
+		for _, name := range def.Templates {
+			if ids[name] == "" && !slices.Contains(out, name) {
+				out = append(out, name)
+			}
+		}
+	}
+	slices.Sort(out)
+	return out
+}
+
 // IntegrationStatus reports each outside channel as set/missing (for the
 // admin integrations view and the startup log), never a value.
 func (s *Service) IntegrationStatus(ctx context.Context) ([]ChannelStatus, error) {
-	var smsURL, smsKey, sender, waURL, waKey bool
+	var smsKeys []KeyStatus
+	var smsNote string
+	var waURL, waKey bool
 	if c := s.d.Config; c != nil {
 		p := c.Providers
-		smsURL, smsKey, sender = p.SMSAPIURL != "", p.MSG91AuthKey.IsSet(), p.MSG91SenderID != ""
+		// D-212: deployed SMS signs with the instance role in AWS_REGION;
+		// local and test send only to the mocks at SMS_API_URL.
+		if c.Env.IsDeployed() {
+			smsKeys = append(smsKeys, KeyStatus{"AWS_REGION", c.AWSRegion != ""})
+		} else {
+			smsKeys = append(smsKeys, KeyStatus{"SMS_API_URL", p.SMSAPIURL != ""})
+		}
+		smsKeys = append(smsKeys,
+			KeyStatus{"SMS_SENDER_ID", p.SMSSenderID != ""},
+			KeyStatus{"SMS_DLT_ENTITY_ID", p.SMSDLTEntityID != ""},
+			KeyStatus{"SMS_NOTICE_TEMPLATE_IDS", len(p.SMSNoticeTemplateIDs) > 0},
+		)
+		var notes []string
+		if f := awssms.Forbidden(c); len(f) > 0 {
+			notes = append(notes, "must be unset in staging and prod: "+strings.Join(f, ", "))
+		}
+		if missing := unmappedSMSTemplates(p.SMSNoticeTemplateIDs); len(missing) > 0 {
+			notes = append(notes, "no DLT template id for: "+strings.Join(missing, ", "))
+		}
+		smsNote = strings.Join(notes, "; ")
 		waURL, waKey = p.WhatsAppAPIURL != "", p.WhatsAppAPIKey.IsSet()
 	}
 	out := []ChannelStatus{
-		{Channel: notice.SMS, Keys: []KeyStatus{
-			{"SMS_API_URL", smsURL}, {"MSG91_AUTH_KEY", smsKey}, {"MSG91_SENDER_ID", sender},
-		}},
+		{Channel: notice.SMS, Keys: smsKeys, Note: smsNote},
 		{Channel: notice.WhatsApp, Keys: []KeyStatus{
 			{"WHATSAPP_API_URL", waURL}, {"WHATSAPP_API_KEY", waKey},
 		}, Note: "the WhatsApp sender number is not configurable yet"},

@@ -32,7 +32,8 @@ locals {
   # provider keys (02 §9, names from internal/platform/config).
   other = [
     "DATABASE_URL", "DATABASE_MIGRATE_URL",
-    "ANTHROPIC_API_KEY", "SARVAM_API_KEY", "MSG91_AUTH_KEY", "TURNSTILE_SECRET_KEY",
+    # No SMS key: AWS End User Messaging is signed by the instance role (D-212).
+    "ANTHROPIC_API_KEY", "SARVAM_API_KEY", "TURNSTILE_SECRET_KEY",
     "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "SENTRY_DSN", "VAPID_PRIVATE_KEY",
     "WHATSAPP_API_KEY", "OTEL_EXPORTER_OTLP_HEADERS", "GEOCODER_API_KEY",
   ]

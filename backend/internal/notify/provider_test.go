@@ -4,13 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
 	"time"
+	"unicode/utf8"
 
 	"github.com/stretchr/testify/require"
 
@@ -64,67 +67,137 @@ func unseenMessage() Message {
 	}
 }
 
-func TestMSG91SMS(t *testing.T) {
-	srv, got := fakeMSG91(t, http.StatusOK, `{"type":"success","message":"3567686e6f6d313233343536"}`)
-	p := &MSG91SMS{Client: loopback, BaseURL: srv.URL + "/", AuthKey: "test-auth", SenderID: "TODAYZ"}
-	require.Equal(t, "msg91", p.Name())
-	res, err := p.Send(context.Background(), unseenMessage())
-	require.NoError(t, err)
-	require.Equal(t, "3567686e6f6d313233343536", res.ProviderID)
-	require.Equal(t, 1, res.Units)
-
-	reqs := got()
-	require.Len(t, reqs, 1)
-	r := reqs[0]
-	require.Equal(t, "/api/v5/flow", r.Path)
-	require.Empty(t, r.Query, "nothing in the URL")
-	require.Equal(t, "test-auth", r.AuthKey)
-	require.Equal(t, "application/json", r.ContentType)
-	require.Equal(t, "tz_order_unseen", r.Body["template_id"])
-	require.Equal(t, "TODAYZ", r.Body["sender"])
-	rcpt := r.Body["recipients"].([]any)[0].(map[string]any)
-	require.Equal(t, "919000000011", rcpt["mobiles"], "MSG91 takes the number without +")
-	require.Equal(t, "Lakshmi Traders", rcpt["store"])
-	require.Equal(t, "3", rcpt["minutes"])
+// awsSMSRequest is one SendTextMessage a fake AWS endpoint received.
+type awsSMSRequest struct {
+	Target, Auth string
+	Body         map[string]any
 }
 
-func TestMSG91SMSFailuresNeverCarryThePhone(t *testing.T) {
+// fakeAWSSMS answers SendTextMessage as AWS JSON 1.0 does: 200 with a
+// MessageId, or status with an error type and a message that echoes the phone.
+func fakeAWSSMS(t *testing.T, status int, errType string) (*httptest.Server, func() []awsSMSRequest) {
+	t.Helper()
+	var mu sync.Mutex
+	var got []awsSMSRequest
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var b map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&b)
+		mu.Lock()
+		got = append(got, awsSMSRequest{Target: r.Header.Get("X-Amz-Target"), Auth: r.Header.Get("Authorization"), Body: b})
+		mu.Unlock()
+		w.Header().Set("Content-Type", "application/x-amz-json-1.0")
+		if status != http.StatusOK {
+			w.Header().Set("X-Amzn-ErrorType", errType)
+			w.WriteHeader(status)
+			_, _ = io.WriteString(w, `{"__type":"`+errType+`","Message":"rejected `+testPhone+`"}`)
+			return
+		}
+		_, _ = io.WriteString(w, `{"MessageId":"aws-msg-1"}`)
+	}))
+	t.Cleanup(srv.Close)
+	return srv, func() []awsSMSRequest {
+		mu.Lock()
+		defer mu.Unlock()
+		return append([]awsSMSRequest(nil), got...)
+	}
+}
+
+// testSMSConfig is a test config whose SMS goes to url (the mocks or httptest).
+func testSMSConfig(url string) *config.Config {
+	return &config.Config{Env: config.EnvTest, NoEgress: true, Providers: config.Providers{
+		SMSAPIURL: url, SMSSenderID: "TODAYZ", SMSDLTEntityID: "1000000000000000001",
+		SMSNoticeTemplateIDs: map[string]string{"tz_order_unseen": "1000000000000000201", "tz_order_unseen_hi": "1000000000000000202"},
+	}}
+}
+
+func awsSMSFor(t *testing.T, url string) *AWSSMS {
+	t.Helper()
+	p, ok := providersFromConfig(testSMSConfig(url))[notice.SMS].(*AWSSMS)
+	require.True(t, ok)
+	return p
+}
+
+func TestAWSSMS(t *testing.T) {
+	srv, got := fakeAWSSMS(t, http.StatusOK, "")
+	p := awsSMSFor(t, srv.URL)
+	require.Equal(t, "aws_sms", p.Name())
+	res, err := p.Send(context.Background(), unseenMessage())
+	require.NoError(t, err)
+	require.Equal(t, Result{ProviderID: "aws-msg-1", Units: 1}, res)
+
+	m := unseenMessage()
+	m.Template, m.Lang = "tz_order_unseen_hi", "hi"
+	m.Text = "Lakshmi Traders पर एक नया ऑर्डर 3 मिनट से खोला नहीं गया है। स्वीकार करने के लिए TodayZ बिज़नेस ऐप खोलें।"
+	res, err = p.Send(context.Background(), m)
+	require.NoError(t, err)
+	require.Equal(t, 2, res.Units, "UCS-2: 70 per single part, 67 per part")
+
+	reqs := got()
+	require.Len(t, reqs, 2)
+	r := reqs[0]
+	require.Equal(t, "PinpointSMSVoiceV2.SendTextMessage", r.Target)
+	require.True(t, strings.HasPrefix(r.Auth, "AWS4-HMAC-SHA256 "))
+	require.Equal(t, testPhone, r.Body["DestinationPhoneNumber"])
+	require.Equal(t, "TODAYZ", r.Body["OriginationIdentity"])
+	require.Equal(t, "TRANSACTIONAL", r.Body["MessageType"])
+	require.Equal(t, unseenMessage().Text, r.Body["MessageBody"], "the rendered catalogue text is the body")
+	require.Equal(t, map[string]any{"IN_ENTITY_ID": "1000000000000000001", "IN_TEMPLATE_ID": "1000000000000000201"}, r.Body["DestinationCountryParameters"])
+	require.Equal(t, "1000000000000000202", reqs[1].Body["DestinationCountryParameters"].(map[string]any)["IN_TEMPLATE_ID"], "the Hindi template's DLT id")
+	require.Equal(t, m.Text, reqs[1].Body["MessageBody"])
+}
+
+func TestAWSSMSUnmappedTemplateFails(t *testing.T) {
+	srv, got := fakeAWSSMS(t, http.StatusOK, "")
+	p := awsSMSFor(t, srv.URL)
+	m := unseenMessage()
+	m.Template = "tz_something_new"
+	_, err := p.Send(context.Background(), m)
+	require.ErrorIs(t, err, ErrProvider)
+	require.EqualError(t, err, "notify: provider call failed: aws sms: no DLT template id for tz_something_new in SMS_NOTICE_TEMPLATE_IDS")
+	require.Empty(t, got(), "nothing is sent without a DLT template id")
+}
+
+func TestAWSSMSFailuresNeverCarryThePhone(t *testing.T) {
 	for _, c := range []struct {
-		name   string
-		status int
-		reply  string
+		status  int
+		errType string
 	}{
-		{"an error status", http.StatusInternalServerError, `{"type":"error","message":"invalid mobile 919000000011"}`},
-		{"a 200 that is not success", http.StatusOK, `{"type":"error","message":"919000000011 is DND"}`},
-		{"not JSON", http.StatusBadGateway, `<html>919000000011</html>`},
-		{"a long type", http.StatusOK, `{"type":"` + strings.Repeat("x", 500) + `"}`},
+		{http.StatusBadRequest, "ValidationException"},
+		{http.StatusTooManyRequests, "ThrottlingException"},
+		{http.StatusForbidden, "AccessDeniedException"},
+		{http.StatusInternalServerError, "InternalServerException"},
 	} {
-		srv, _ := fakeMSG91(t, c.status, c.reply)
-		p := &MSG91SMS{Client: loopback, BaseURL: srv.URL, AuthKey: "test-auth", SenderID: "TODAYZ"}
+		srv, got := fakeAWSSMS(t, c.status, c.errType)
+		p := awsSMSFor(t, srv.URL)
 		_, err := p.Send(context.Background(), unseenMessage())
-		require.Error(t, err, c.name)
-		require.ErrorIs(t, err, ErrProvider, c.name)
-		require.NotContains(t, err.Error(), "9000000011", c.name)
-		require.NotContains(t, err.Error(), "test-auth", c.name)
-		require.Less(t, len(err.Error()), 200, c.name)
+		require.ErrorIs(t, err, ErrProvider, c.errType)
+		require.ErrorContains(t, err, c.errType, "the AWS error code is kept")
+		require.ErrorContains(t, err, fmt.Sprintf("status %d", c.status))
+		require.NotContains(t, err.Error(), "9000000011", c.errType)
+		require.NotContains(t, err.Error(), "Lakshmi", "never the body")
+		require.Less(t, len(err.Error()), 200, c.errType)
+		require.Len(t, got(), 1, "never retried: a notice is sent at most once")
 	}
 
-	// A provider that is down: the transport error names the URL, never the body.
-	srv, _ := fakeMSG91(t, http.StatusOK, `{}`)
-	url := srv.URL
+	// An endpoint that is down: the transport error carries no phone.
+	srv, _ := fakeAWSSMS(t, http.StatusOK, "")
+	p := awsSMSFor(t, srv.URL)
 	srv.Close()
-	p := &MSG91SMS{Client: loopback, BaseURL: url, AuthKey: "test-auth"}
 	_, err := p.Send(context.Background(), unseenMessage())
 	require.ErrorIs(t, err, ErrProvider)
 	require.NotContains(t, err.Error(), "9000000011")
 }
 
-func TestMSG91SMSRefusedUnderNoEgress(t *testing.T) {
-	// The egress guard refuses any host that is not loopback.
-	p := &MSG91SMS{Client: loopback, BaseURL: "https://control.msg91.com", AuthKey: "test-auth"}
+func TestAWSSMSRefusedUnderNoEgress(t *testing.T) {
+	// Deployed, egress blocked: the guard refuses the instance-role (IMDS)
+	// call and the regional endpoint before anything leaves the machine.
+	cfg := testSMSConfig("")
+	cfg.Env, cfg.AWSRegion = config.EnvProd, "ap-south-1"
+	p, ok := providersFromConfig(cfg)[notice.SMS].(*AWSSMS)
+	require.True(t, ok)
 	_, err := p.Send(context.Background(), unseenMessage())
 	require.ErrorIs(t, err, ErrProvider)
-	require.ErrorIs(t, err, egress.ErrBlocked, "refused before any lookup")
+	require.ErrorIs(t, err, egress.ErrBlocked)
 	require.NotContains(t, err.Error(), "9000000011")
 }
 
@@ -161,27 +234,69 @@ func TestMSG91WhatsApp(t *testing.T) {
 func TestProvidersFromConfig(t *testing.T) {
 	require.Empty(t, providersFromConfig(nil))
 
-	local := &config.Config{Env: config.EnvLocal, NoEgress: true, Providers: config.Providers{SMSAPIURL: "https://mocks.todayz.localhost/msg91"}}
+	local := testSMSConfig("https://mocks.todayz.localhost/sms-voice")
+	local.Env = config.EnvLocal
 	ps := providersFromConfig(local)
 	require.Len(t, ps, 1, "SMS only: WhatsApp needs the sender number, push is a later slice")
-	sms := ps[notice.SMS].(*MSG91SMS)
-	require.Equal(t, mockAuthKey, sms.AuthKey, "the local mock checks the header's presence only")
+	require.Equal(t, local.Providers.SMSNoticeTemplateIDs, ps[notice.SMS].(*AWSSMS).Templates)
 
-	withKey := *local
-	withKey.Providers.MSG91AuthKey = config.NewSecret([]byte("k-from-env"))
-	require.Equal(t, "k-from-env", providersFromConfig(&withKey)[notice.SMS].(*MSG91SMS).AuthKey)
+	outward := testSMSConfig("https://sms-voice.ap-south-1.amazonaws.com")
+	require.Empty(t, providersFromConfig(outward), "local and test never sign for a real endpoint")
 
-	prod := &config.Config{Env: config.EnvProd, Providers: config.Providers{SMSAPIURL: "https://control.msg91.com"}}
-	require.Empty(t, providersFromConfig(prod), "deployed without the key: not configured, never the mock key")
+	noIDs := testSMSConfig("http://127.0.0.1:4010/sms-voice")
+	noIDs.Providers.SMSSenderID = ""
+	require.Empty(t, providersFromConfig(noIDs), "no sender ID: not configured")
 
-	none := &config.Config{Env: config.EnvLocal}
-	require.Empty(t, providersFromConfig(none))
+	prod := testSMSConfig("")
+	prod.Env = config.EnvProd
+	require.Empty(t, providersFromConfig(prod), "deployed without AWS_REGION: not configured")
+	prod.AWSRegion = "ap-south-1"
+	require.IsType(t, &AWSSMS{}, providersFromConfig(prod)[notice.SMS], "deployed: the instance role, no endpoint needed")
+
+	require.Empty(t, providersFromConfig(&config.Config{Env: config.EnvLocal}))
 }
 
 func TestErrProviderIsTheOnlyWrap(t *testing.T) {
-	srv, _ := fakeMSG91(t, http.StatusTeapot, `{"type":"error"}`)
-	p := &MSG91SMS{Client: loopback, BaseURL: srv.URL, AuthKey: "k"}
-	_, err := p.Send(context.Background(), unseenMessage())
+	srv, _ := fakeAWSSMS(t, http.StatusTeapot, "SomethingOdd")
+	_, err := awsSMSFor(t, srv.URL).Send(context.Background(), unseenMessage())
 	require.True(t, errors.Is(err, ErrProvider))
 	require.Contains(t, err.Error(), "status 418")
+}
+
+// DLT caps each {#var#} at 30 characters (D-212): Deliver cuts every SMS
+// param to 30 runes, so a long store name still matches its template.
+func TestSMSParamsFitDLT(t *testing.T) {
+	long := "Sri Lakshmi Venkateswara General Stores and Provisions" // 54 runes
+	got := smsParams(map[string]string{"store": long, "minutes": "3"})
+	require.Equal(t, "Sri Lakshmi Venkateswara Gener", got["store"])
+	require.Equal(t, 30, utf8.RuneCountInString(got["store"]))
+	require.Equal(t, "3", got["minutes"])
+
+	hi := strings.Repeat("दुकान", 8) // 40 runes, Devanagari
+	require.Equal(t, 30, utf8.RuneCountInString(smsParams(map[string]string{"store": hi})["store"]), "runes, not bytes")
+	require.Equal(t, "Ramu Kirana", smsParams(map[string]string{"store": "Ramu Kirana"})["store"], "short values untouched")
+	require.Equal(t, strings.Repeat("a", 29), smsParams(map[string]string{"store": strings.Repeat("a", 29) + "  tail"})["store"], "no trailing space at the cut")
+
+	tx, ok := textFor(notice.KindOrderUnseen, "en", smsParams(map[string]string{"store": long, "minutes": "3"}))
+	require.True(t, ok)
+	require.Equal(t, "A new order at Sri Lakshmi Venkateswara Gener has not been opened for 3 minutes. Open the TodayZ business app to accept it.", tx.Body)
+}
+
+// The SMS kinds' text must be the DLT-registered template text exactly
+// (docs/runbooks/aws-founder-steps.md C1): DLT refuses anything else.
+func TestSMSTextMatchesDLTTemplates(t *testing.T) {
+	dlt := map[string]string{
+		"en": "A new order at {#var#} has not been opened for {#var#} minutes. Open the TodayZ business app to accept it.",
+		"hi": "{#var#} पर एक नया ऑर्डर {#var#} मिनट से खोला नहीं गया है। स्वीकार करने के लिए TodayZ बिज़नेस ऐप खोलें।",
+	}
+	def := catalogue[notice.KindOrderUnseen]
+	require.Equal(t, map[string]string{"en": "tz_order_unseen", "hi": "tz_order_unseen_hi"}, def.Templates)
+	for lang, want := range dlt {
+		require.Equal(t, want, rePlace.ReplaceAllString(def.Text[lang].Body, "{#var#}"), lang)
+	}
+	for kind, d := range catalogue {
+		if slices.Contains(d.Channels, notice.SMS) {
+			require.Equal(t, notice.KindOrderUnseen, kind, "a new SMS kind needs its DLT template registered and listed here")
+		}
+	}
 }

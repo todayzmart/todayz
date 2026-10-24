@@ -460,6 +460,28 @@ func TestDeliverSendsAtMostOnce(t *testing.T) {
 	require.False(t, res.Claimed)
 }
 
+// D-212: DLT caps each template variable at 30 characters, so the SMS cuts
+// a long store name to 30 runes, in the variables and the body alike; the
+// in-app row keeps the full name.
+func TestDeliverCutsSMSParamsForDLT(t *testing.T) {
+	if testing.Short() {
+		t.Skip("needs the database")
+	}
+	e := newEnv(t)
+	n := e.unseenNote(testPhone, "en")
+	n.Params["store"] = "Sri Lakshmi Venkateswara General Stores and Provisions"
+	id := e.mustSend(n)
+	did, _ := ids.FromUUID(e.deliveriesOf(id)[0].ID)
+	_, err := e.svc.Deliver(context.Background(), did)
+	require.NoError(t, err)
+	m := e.sms.messages()[0]
+	require.Equal(t, []Var{{"store", "Sri Lakshmi Venkateswara Gener"}, {"minutes", "3"}}, m.Vars)
+	require.Equal(t, "A new order at Sri Lakshmi Venkateswara Gener has not been opened for 3 minutes. Open the TodayZ business app to accept it.", m.Text)
+	var params string
+	require.NoError(t, e.tdb.OwnerPool.QueryRow(context.Background(), `SELECT params::text FROM notifications WHERE id = $1`, ids.UUID(id)).Scan(&params))
+	require.Contains(t, params, "General Stores and Provisions", "the inbox keeps the full name")
+}
+
 func TestDeliverFailureIsFinalAndCarriesNoPhone(t *testing.T) {
 	if testing.Short() {
 		t.Skip("needs the database")
@@ -655,8 +677,10 @@ func TestIntegrationStatusNeverShowsAValue(t *testing.T) {
 	}
 	e := newEnv(t, func(d *Deps) {
 		d.Config.Providers = config.Providers{
-			SMSAPIURL: "https://mocks.todayz.localhost/msg91", MSG91AuthKey: config.NewSecret([]byte("sms-secret-value")),
-			WhatsAppAPIKey: config.NewSecret([]byte("wa-secret-value")),
+			SMSAPIURL: "https://mocks.todayz.localhost/sms-voice", SMSSenderID: "TODAYZ",
+			SMSDLTEntityID:       "1201169999000000001",
+			SMSNoticeTemplateIDs: map[string]string{"tz_order_unseen": "1207169999000000201"},
+			WhatsAppAPIKey:       config.NewSecret([]byte("wa-secret-value")),
 		}
 		d.Providers = map[notice.Channel]Provider{notice.SMS: &fakeProvider{}}
 	})
@@ -664,7 +688,7 @@ func TestIntegrationStatusNeverShowsAValue(t *testing.T) {
 	require.NoError(t, err)
 	b, err := json.Marshal(st)
 	require.NoError(t, err)
-	for _, v := range []string{"sms-secret-value", "wa-secret-value", "mocks.todayz.localhost", "TODAYZ"} {
+	for _, v := range []string{"wa-secret-value", "mocks.todayz.localhost", "TODAYZ", "1201169999000000001", "1207169999000000201"} {
 		require.NotContains(t, string(b), v)
 	}
 	byCh := map[notice.Channel]ChannelStatus{}
@@ -675,10 +699,19 @@ func TestIntegrationStatusNeverShowsAValue(t *testing.T) {
 	require.True(t, sms.Enabled)
 	require.True(t, sms.Configured)
 	require.True(t, sms.Active)
-	require.Equal(t, []KeyStatus{{"SMS_API_URL", true}, {"MSG91_AUTH_KEY", true}, {"MSG91_SENDER_ID", false}}, sms.Keys)
+	require.Equal(t, []KeyStatus{{"SMS_API_URL", true}, {"SMS_SENDER_ID", true}, {"SMS_DLT_ENTITY_ID", true}, {"SMS_NOTICE_TEMPLATE_IDS", true}}, sms.Keys)
+	require.Equal(t, "no DLT template id for: tz_order_unseen_hi", sms.Note, "names the catalogue template, never an id")
 	wa := byCh[notice.WhatsApp]
 	require.False(t, wa.Enabled, "notify_whatsapp_enabled defaults to off")
 	require.False(t, wa.Active)
 	require.Equal(t, []KeyStatus{{"WHATSAPP_API_URL", false}, {"WHATSAPP_API_KEY", true}}, wa.Keys)
 	require.False(t, byCh[notice.Push].Configured)
+
+	// Deployed (D-212): the instance role signs in AWS_REGION; no endpoint.
+	e.svc.d.Config.Env = config.EnvProd
+	st, err = e.svc.IntegrationStatus(context.Background())
+	require.NoError(t, err)
+	require.Equal(t, []KeyStatus{{"AWS_REGION", false}, {"SMS_SENDER_ID", true}, {"SMS_DLT_ENTITY_ID", true}, {"SMS_NOTICE_TEMPLATE_IDS", true}}, st[0].Keys)
+	require.Equal(t, "must be unset in staging and prod: SMS_API_URL; no DLT template id for: tz_order_unseen_hi", st[0].Note,
+		"a deployed SMS_API_URL is named, never shown")
 }

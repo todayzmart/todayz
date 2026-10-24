@@ -1,4 +1,4 @@
-# W0-07: provider mocks (MSG91 SMS, WhatsApp, Web Push, Turnstile, Sarvam STT,
+# W0-07: provider mocks (AWS SMS, WhatsApp, Web Push, Turnstile, Sarvam STT,
 # Anthropic) as one stdlib Go service in e2e/mocks. See e2e/mocks/README.md.
 
 SETUP_STEPS += setup-mocks
