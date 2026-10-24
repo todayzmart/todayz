@@ -111,8 +111,11 @@ ai-eval:
 demo:
 	$(call run_steps,demo,$(DEMO_STEPS))
 
+# The cloud names (D-210) are the lead's only; a missing .env.cloud.local lists them as missing.
 env-check: $(ENVTOOL)
 	@$(ENVTOOL) check -env "$(ENV_FILE)" -example "$(ROOT)/.env.example"
+	@echo "-- cloud (.env.cloud.local, lead only)"
+	@$(ENVTOOL) check -env "$(ROOT)/.env.cloud.local" -example "$(ROOT)/.env.cloud.example"
 
 # A clean reset, then every suite; the report lists each step's result (no values).
 release-candidate:
