@@ -196,11 +196,16 @@ SELECT id FROM referrals WHERE referee_type = 'customer' AND referee_id = @user_
 -- name: QualifiedReferrals :many
 -- Rewards still to post (the sweep), oldest first. A referral waiting only on
 -- a blocked customer referrer is skipped (D-168), so a pile of them cannot
--- fill every batch; it comes back once the referrer is unblocked.
+-- fill every batch; it comes back once the referrer is unblocked. A referral
+-- whose reward the ledger refused for good (an open or confirmed
+-- referral.reward_refused flag) is skipped too, until a person clears the
+-- flag (D-169).
 SELECT r.id FROM referrals r
 WHERE r.status = 'qualified'
   AND NOT (r.referee_rewarded_at IS NOT NULL AND r.referrer_type = 'customer'
     AND EXISTS (SELECT 1 FROM users u WHERE u.id = r.referrer_id AND u.status = 'blocked'))
+  AND NOT EXISTS (SELECT 1 FROM risk_flags f WHERE f.subject_type = 'referral' AND f.subject_id = r.id
+    AND f.rule = 'referral.reward_refused' AND f.status IN ('open', 'confirmed'))
 ORDER BY r.qualified_at, r.id LIMIT @lim;
 
 -- name: PendingShopReferrals :many

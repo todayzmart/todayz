@@ -3,6 +3,7 @@ package referrals
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -154,6 +155,10 @@ func (s *Service) tryQualifyShop(ctx context.Context, row referralsdb.Referral) 
 	return s.reward(ctx, row)
 }
 
+// ruleRewardRefused is the risk flag on a referral whose reward the ledger
+// refused for good (D-169).
+const ruleRewardRefused = "referral.reward_refused"
+
 // beneficiary states.
 const (
 	payPost = iota // post to the account
@@ -242,6 +247,13 @@ func (s *Service) reward(ctx context.Context, row referralsdb.Referral) error {
 				})
 				return err
 			})
+			if errors.Is(err, ErrRewardRefused) {
+				log.ErrorContext(ctx, "referrals: reward refused by the ledger", "referral", idOf(row.ID).String(), "side", side.name, "err", err)
+				if err := s.flagRefused(ctx, row, side.name); err != nil {
+					return err
+				}
+				continue
+			}
 			if err != nil {
 				log.WarnContext(ctx, "referrals: reward not posted", "referral", idOf(row.ID).String(), "side", side.name, "err", err)
 				continue
@@ -259,6 +271,18 @@ func (s *Service) reward(ctx context.Context, row referralsdb.Referral) error {
 		}
 	}
 	return nil
+}
+
+// flagRefused raises referral.reward_refused for a side the ledger refused
+// for good (D-169). The sweep skips a referral with that flag open or
+// confirmed; a person clears it once the cause is fixed.
+func (s *Service) flagRefused(ctx context.Context, row referralsdb.Referral, side string) error {
+	now := s.now()
+	details, _ := json.Marshal(map[string]any{"side": side, "kind": row.Kind})
+	return s.q(ctx).InsertRiskFlag(ctx, referralsdb.InsertRiskFlagParams{
+		ID: ids.UUID(s.ids.New(now)), SubjectType: "referral", SubjectID: row.ID,
+		Rule: ruleRewardRefused, Score: 50, Details: details, Now: now, //settings:ok a risk score
+	})
 }
 
 // notify sends "referral unlocked" to whoever was paid (01 §15: in-app +

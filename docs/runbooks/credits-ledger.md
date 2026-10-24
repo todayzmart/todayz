@@ -1,7 +1,8 @@
 # Credits ledger
 
 Kinds `credits_expire`, `credits_expiry_reminder` and `ledger_reconcile` (owner W2-01, code in
-`backend/internal/credits/jobs.go`, declared in `backend/internal/jobs/credits.go`). The general
+`backend/internal/credits/jobs.go`, declared in `backend/internal/jobs/credits.go`), and the
+referral rewards that `referral_sweep` posts (owner W2-03, see [Referral rewards](#referral-rewards)). The general
 alert is [Job failing](jobs-job-failing.md). The ledger's own alert is **Ledger invariant**
 (05 §6): `tz_ledger_reconcile_drift` above 0 for any `reason`, or a log line with
 `event=ledger_invariant`. It is critical.
@@ -67,3 +68,25 @@ anyone spend an expired credit. Job arguments carry no customer data.
   bring the gauge back to 0.
 - `credits_expire` and `credits_expiry_reminder` catch up on their next run; running them by hand
   is safe.
+
+## Referral rewards
+
+Each side of a qualified referral is one `referral_reward` transaction (D-169):
+- `platform_marketing` −N to the customer's `customer_wallet` (with a lot) or the store's `store_credit`, +N;
+- `ref_type` is `referral` and `ref_id` the referral;
+- the key is `referral:<referral id>:<referrer|referee>`.
+
+It posts in the purchase's transaction. If it fails, the purchase still commits and the side waits.
+`referral_sweep` (every 10 minutes, `backend/internal/jobs/referrals.go`) posts what is waiting. Its summary `rewarded` counts the referrals it finished.
+
+- **Rewards waiting a long time** (`referrals.status = 'qualified'` with a `*_rewarded_at` still empty):
+  - Look for the log line `referrals: reward not posted`. It carries the referral id, the side and the error. A database or ledger outage clears itself on the next sweep.
+  - A blocked customer referrer waits by design (D-168).
+  - A store referrer whose business has no live store waits by design too.
+- **`referral.reward_refused` risk flag** (the log line `referrals: reward refused by the ledger`, at error level): the ledger will never accept this posting as it is. Usually the key is already used by a transaction with other legs (`credits: idempotency key reused`).
+  1. Read the existing transaction for that key and its entries, read-only, as `todayz_owner`.
+  2. Compare it with the referral's `referrer_credits`/`referee_credits` and its beneficiary.
+  3. The sweep skips the whole referral while the flag is `open` or `confirmed`. Never edit or delete the ledger rows. If money is owed or was overpaid, correct it with an `admin_adjustment` (two people).
+  4. Then either:
+     - set the flag to `confirmed` to keep the referral parked for good; or
+     - fix the cause and clear the flag, and the next sweep tries once more. If it is refused again, a new flag is raised; the sweep does not loop.

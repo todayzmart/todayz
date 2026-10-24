@@ -2,6 +2,7 @@ package referrals
 
 import (
 	"context"
+	"errors"
 
 	"github.com/todayz/backend/internal/platform/ids"
 )
@@ -44,18 +45,23 @@ type Reward struct {
 // Ledger posts referral rewards. PostReward runs inside the caller's
 // transaction (ctx carries it, db.TxFrom) and returns the ledger
 // transaction id. posted false with a nil error means the ledger did not
-// post (not built yet, or switched off): the side stays unposted and the
-// sweep tries again. An error is logged and treated the same way; the
-// posting runs in a savepoint, so a failure never aborts the purchase.
+// post (switched off): the side stays unposted and the sweep tries again.
+// An error is logged and treated the same way; the posting runs in a
+// savepoint, so a failure never aborts the purchase. An error wrapping
+// ErrRewardRefused is permanent: the referral gets a
+// referral.reward_refused risk flag and the sweep leaves it until a person
+// clears the flag (D-169).
 //
-// TODO(merge): W2-01 credits is not merged yet. Its credits.Poster becomes
-// the Ledger through an adapter in cmd/todayz/routes_referrals.go and
-// internal/jobs/referrals.go: Posting{Kind: TxReferralReward, legs
-// PlatformMarketing → CustomerWallet (BeneficiaryCustomer) or StoreCredit
-// (BeneficiaryStore), IdempotencyKey: r.IdempotencyKey, Ref: the referral}.
+// W2-01's credits.Poster is the Ledger through jobs.ReferralsLedger, which
+// the API and the sweep both get from jobs.ReferralsService.
 type Ledger interface {
 	PostReward(ctx context.Context, r Reward) (txID ids.ID, posted bool, err error)
 }
+
+// ErrRewardRefused marks a posting the ledger will never accept as it is
+// (an idempotency key reused for other legs, an invalid posting): retrying
+// cannot help, so the side waits for a person (D-169).
+var ErrRewardRefused = errors.New("referrals: reward refused by the ledger")
 
 // NoLedger posts nothing: referrals qualify and wait for a ledger.
 type NoLedger struct{}

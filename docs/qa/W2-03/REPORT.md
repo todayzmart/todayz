@@ -95,13 +95,7 @@ Fraud and edge tests:
 
 ## Seams for the merger
 
-- **Credits (W2-01). TODO(merge):** `referrals.Ledger` (`internal/referrals/seams.go`). It is nil in `cmd/todayz/routes_referrals.go` (`referralsDeps`) and in `internal/jobs/referrals.go`, so rewards qualify and wait. Once credits lands, set both to an adapter over `credits.Poster`:
-  - `Posting{Kind: TxReferralReward}`;
-  - legs from `PlatformMarketing` to `CustomerWallet` (customer) or `StoreCredit` (store);
-  - the `IdempotencyKey` from the `Reward` (`referral:<id>:<side>`);
-  - `posted=false` when the ledger is unavailable.
-
-  Then the sweep posts everything already qualified.
+- **Credits (W2-01):** wired, see the addendum below (D-169).
 - **POS (W2-04):** call `referrals.Service.OnPurchaseCompleted` with `Outcome{RefType: RefPOSSale, LinkMethod, CustomerID, StoreID, EligiblePaise, CreditsUsed}` in the sale's transaction, and `OnPurchaseReversed(RefPOSSale, id)` on a void or refund.
 - **Orders:** `orders.Referrals` and `CompletedOrder` in `internal/orders/seams.go`, called from `collect`. A future "delivered" end state (W2-12) should call it too. Order refunds and returns should call `OnPurchaseReversed(RefOrder, id)`; no orders path does that yet.
 - **Standees (W2-10):** `?s=` is recorded but not checked against `qr_standees`.
@@ -157,3 +151,41 @@ New tests:
 - `TestShopCountingDistinctCustomers`: repeat buyers do not count, and a third buyer qualifies the shop.
 - `TestBlockedReferrerWaits`: the referee is paid while the referrer is blocked; the sweep skips the referral and then pays it after the unblock.
 - `TestShopCounting` passes unchanged, since it already used a different buyer for each counted purchase.
+
+## Addendum: rewards post to the credits ledger (24 Oct, D-169)
+
+Built after main (9ddd0c0) merged in, with both W2-01 credits and W2-03 referrals on it.
+- **Adapter.** `jobs.ReferralsLedger(credits.Poster)` is in `backend/internal/jobs/referrals.go`, so `internal/referrals` still imports no other domain.
+  - One `TxReferralReward` posting per side: ref `referral`/the referral id, the reward's `referral:<id>:<side>` key, legs `platform_marketing` −N → `customer_wallet` or `store_credit` +N.
+  - A duplicate counts as posted, with the first transaction id.
+  - `ErrKeyReused` and `ErrInvalid` wrap the new `referrals.ErrRewardRefused`; other errors pass through.
+- **Units.** `Reward.Credits` and `Leg.Amount` are both whole credits:
+  - 01 line 7 says "1 credit = ₹1";
+  - 03 says `bigint` whole credits;
+  - `ledger_entries` holds signed amounts in credits.
+  So the amount moves as `int64(r.Credits)`, with no conversion.
+- **One constructor.** `jobs.ReferralsService(Deps, notice.Sender)` builds the service for both the API (`newReferrals` in `cmd/todayz/routes_referrals.go`) and the `referral_sweep` job. It took over `referralsDeps` (hasher, public URL, app origins). The sweep had a nil ledger before. All three TODO(merge) comments are gone.
+- **Transaction.** `credits.Service.Post` uses `s.db.InTx`, which joins the caller's transaction from ctx as a savepoint (`outer.Begin`) and opens a pool transaction only when there is none. So the posting is part of the purchase. The referrals savepoint around it means a failure rolls back the posting only.
+- **No retry loop.** A refused posting raises a `referral.reward_refused` risk flag. `QualifiedReferrals` leaves out referrals with that flag `open` or `confirmed`, and clearing it allows one more try. A transient error is still logged and retried by the sweep, as before. No migration was needed: `risk_flags` and its subject index already exist.
+- **Runbook.** There is a new "Referral rewards" section in `docs/runbooks/credits-ledger.md`, and `referral_sweep` now names that runbook.
+
+New tests, in `backend/internal/jobs/referrals_test.go`, run against the real `credits.Service` on the shared test Postgres:
+- `TestReferralRewardsPostToCreditsDB` builds through `ReferralsService`. Both sides post once. Both wallets are credited, `platform_marketing` is debited by the sum, and the referee's lot equals the reward. The same purchase again and a re-sweep post nothing.
+- `TestReferralRewardStoreCreditDB`: a store referrer's reward lands in the primary store's `store_credit`, with no lot.
+- `TestReferralRewardFailedPostSweepsDB`: the ledger fails both postings inside an outer purchase transaction that has a write of its own. That write and the qualification commit and nothing posts. The next sweep posts both sides once, and a second sweep posts nothing.
+- `TestReferralReversedBeforePostingDB` (D-166): the purchase is reversed while both sides are unposted. The referral goes back to `pending`, the sweep posts nothing and no flag is raised. A later qualifying purchase pays.
+- `TestReferralRewardRefusedIsParkedDB`: the referee's key already exists with other legs.
+  - The referrer is still paid and the referee is flagged once.
+  - Three sweeps add nothing.
+  - After the flag is cleared, one more sweep tries once, raises one new flag, and the next sweep adds nothing.
+  - A mutation check confirmed the test catches a missing exclusion: with the `QualifiedReferrals` exclusion removed it fails with 4 flags, one per sweep.
+
+Checks, with `-p 2` on the shared test Postgres:
+- `go test -race` passes for `internal/referrals`, `internal/jobs`, `internal/credits` and `internal/notify`.
+- `cmd/todayz` passes.
+- golangci-lint reports 0 issues on referrals, jobs and cmd/todayz.
+- settingslint, gofmt and go vet are clean.
+
+Questions (the conservative reading is what is built):
+- `referral_sweep` stays `ClassMaintenance`, though it now moves money. `ClassMoney` would also make it require a runbook, and it names one anyway. Should it change class?
+- While a `referral.reward_refused` flag is open, the whole referral is parked, including the other side if that side is unposted for another reason. A per-side park would need a column (a migration).

@@ -983,6 +983,18 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 - **A blocked referrer is not paid.** When a referral qualifies while its customer referrer is blocked, that side stays qualified and unpaid. The referee is still paid. The `referral_sweep` job pays the referrer once they are unblocked. A referral waiting only on a blocked referrer is left out of the sweep's batch, so a pile of them cannot hold up other rewards. A deleted referrer stays void (D-161).
 - Lives in: `backend/internal/referrals/qualify.go`, `backend/db/queries/referrals/referrals.sql`, `backend/db/migrations/20302_w2-03_shop_sale_customer.sql`, 01 §8.
 
+**D-169 · Referral rewards post to the credits ledger (W2-03 × W2-01).** `referrals.Ledger` is wired to W2-01's `credits.Poster` through `jobs.ReferralsLedger`. `NoLedger` is no longer used in the app.
+- **One constructor.** The API (`newReferrals`) and the `referral_sweep` job both build the service with `jobs.ReferralsService`, so both post through the same ledger.
+- **The posting.** Each side is one `referral_reward` transaction, `ref_type` `referral`, `ref_id` the referral, key `referral:<id>:<side>`. It moves `platform_marketing` −N to the customer's `customer_wallet` (which gets a lot that expires like any other) or the store's `store_credit` +N.
+- **Units.** N is the snapshotted `referrer_credits`/`referee_credits`. Rewards and ledger amounts are both whole credits (01 §7: 1 credit = ₹1), so there is no conversion.
+- **Transaction.** The posting runs in the purchase's transaction as a savepoint (`credits.Service.Post` joins the caller's transaction through `db.InTx`). A failed posting rolls back only itself: the purchase and the qualification commit, the side stays unposted, and the sweep retries it. A duplicate key with the same legs counts as posted, with the first transaction id.
+- **Refused for good.** `credits.ErrKeyReused` and `ErrInvalid` (and an unknown beneficiary kind) wrap `referrals.ErrRewardRefused`. Retrying cannot help, so:
+  - the referral gets a `referral.reward_refused` risk flag (score 50, details: side and kind), and the error is logged at error level;
+  - the sweep leaves out any referral with that flag `open` or `confirmed`, so it never retries in a loop and never fills its batch with them;
+  - clearing the flag in admin lets the next sweep try once more. If the cause is still there, it raises a new flag.
+  - The whole referral waits, including a side that is unposted for another reason.
+- Lives in: `backend/internal/jobs/referrals.go`, `backend/cmd/todayz/routes_referrals.go`, `backend/internal/referrals/seams.go`, `backend/internal/referrals/qualify.go`, `backend/db/queries/referrals/referrals.sql`, `docs/runbooks/credits-ledger.md`.
+
 ## Business setup screens as built (W2-10 finish, 2026-10-24)
 
 **D-200 · Business onboarding, stores and settings screens (W2-10 finish).** B-02 is a single resumable page at `/onboarding` (not a step-by-step flow): the business, its first store, hours, payout and tax details, documents and "Send for review", each saved on its own. Resume is by reading the server's state.
