@@ -987,4 +987,4 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 - **Credits copy** ("30 credits on ₹100+") stays out until a public settings endpoint exists.
 - **Pickup-code QR:** waits; no dependency is added in Wave 2. The code is shown as text.
 - **Production tiles and the `IMAGE_BASE_URL` key form** are settled in Wave 5 with the infra. Locally they are per-city tiles and `<base>/<imageKey>`.
-- **C-05 when no shop confirmed:** goes to the founder. Until they answer, the screen says none of the shops has confirmed yet and offers a wider radius. It does not ask the shops again automatically.
+- **C-05 when no shop confirmed:** goes to the founder and is not built yet. Proposed default: say none of the shops has confirmed and offer a wider radius, without asking the shops again automatically.
