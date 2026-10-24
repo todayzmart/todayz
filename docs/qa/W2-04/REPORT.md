@@ -88,6 +88,19 @@ Review round (D-131), at df6d08e, shared test server:
 | `TestContractProblemCheckFires` | PASS |
 | `TestContractSmoke` | FAIL, 136/137 operations pass. The one failure is not W2-04's: `GET /v1/discover/stores/{slug}/reviews` (W2-06, `api/paths/reviews.yaml`) answers 422 `query.cursor: not a cursor from this list` to a schema-valid long cursor in the coverage phase. This round changed no contract file. For the reviews owner: either give the cursor parameter a `pattern`/`maxLength` the server keeps, or treat an unknown cursor as allowed by the schema. |
 
+Review round 2, at 2702ec8, shared test server:
+
+| Check | Result |
+|---|---|
+| gofmt, `go vet` | clean |
+| golangci-lint, gosec (`internal/pos`, `internal/jobs`, `cmd/todayz`, `internal/platform/settings`) | 0 issues |
+| settings lint | exit 0 |
+| `make gen` | exit 0 |
+| `go test -race -p 2 -count=1 ./cmd/todayz ./internal/pos ./internal/jobs ./internal/platform/settings ./internal/platform/migrate` | ok (cmd/todayz 277 s), `TestSettingsMatchProductRules` included |
+| `TestGuardPhoneVariantsShareKey` (added after the race run started) | ok |
+| `TestContractProblemCheckFires` | PASS |
+| `TestContractSmoke` | FAIL, 136/137: the same W2-06 failure as above (`GET /v1/discover/stores/{slug}/reviews`, 422 on a long cursor). Round 2 changed no contract file |
+
 ## Review fixes (D-131)
 
 The lead's W2-04 review: no blockers. Each item was landed on this branch with a test (`cmd/todayz/pos_review_http_test.go` unless named).
@@ -103,6 +116,23 @@ The lead's W2-04 review: no blockers. Each item was landed on this branch with a
 | Nits | Manual discount past the offer's remainder is `422`, not clamped; a verified check binds for 2 min; `Stock.Reverse` errors are `409 invalid_transition`; the re-confirm comment fixed; receipt token on replay left open (question 17) | `TestPOSManualDiscountAndCheckAge` |
 
 `TestPOSBillQRSale` now sells within the claim's 120 s, since a late bind is refused.
+
+## Review fixes, round 2 (D-131)
+
+The lead's fix review: no blockers. 20401 was edited in place again. Tests are in `cmd/todayz/pos_round2_http_test.go` unless named.
+
+| Item | What changed | Test |
+|---|---|---|
+| 1, sync deadlock | At the start of a sync, `lockSyncCodes` collects every counter-code phone in the batch and takes the cashier lock, then the phone locks (per store and across stores) sorted and deduplicated (`lockCodeKeys`). The per-entry checks re-enter locks already held | `TestPOSSyncCodeLocksNoDeadlock`: a cashier and a manager sync the same two phones in opposite orders at once, 6 rounds, both 200 every time. With the pre-lock disabled, both syncs got 500 (deadlock), so the test catches the bug |
+| 2, one Credits | `jobs.PosDeps(base)` sets Stock, Credits and Referrals; the worker's `PosJobDeps` and the API's `posDeps` both call it (the API adds the offers adapter) | `TestPOSDepsShared`: the Stock, Credits and Referrals types match |
+| 3, poison claim | `ExpireClaims` returns `Sweep{Expired, Released, Failed}`. Each due claim runs in its own savepoint; a failing `Release` rolls back that claim, is logged with the claim id only, counted in `tz_pos_claim_release_failed_total` and in the run summary's `failed`, and stays live for the next run | `TestPOSSweepPoisonClaim`: three confirmed claims past `expires_at`, the poison one first: `{Expired: 2, Released: 2, Failed: 1}`, the poison row still `claimed`, the other two `expired`; once the fault clears, the next run gives `{Expired: 1, Released: 1}` |
+| 4, cross-store ceiling | `pos_code_phone_failures_per_hour` (10, range 5–100) in `platform_settings` and 01 §17; `ix_counter_code_failures_phone_any (phone_hash, failed_at)`; `codeLocks` counts a phone's failures in the last hour at any store. Phones are canonicalised (`canonPhone`) before hashing and locking | `TestPOSPhoneCeilingAcrossStores` (4 wrong at store S, 16 min later 4 more at S, then at a second store the 9th is `code_invalid` and the 10th `code_locked`; the right code is then `code_locked` at both stores, another phone is not; 44 min later the phone is under the ceiling again), `TestGuardPhoneVariantsShareKey` (unit: `+91 98765 43210`, `+91-98765-43210`, `(+91) 98765.43210`, `919876543210`, `09876543210` and `9876543210` give the E.164 number's hash, the key that is locked and counted), `TestCanonPhone`, `TestPOSPhoneVariantsRefused` (the contract refuses a non-E.164 phone with 422 before any count) |
+| 5, offline offer risk | A synced sale is priced by the engine at the clamped `sold_at`; it is `offline_offer_unmatched` only when a line's offer discount is over the engine's for that line. `OfflineRiskSalesSince` counts each sale once (linked or unmatched). `pos.offline_offer_without_discount_role` only for an unmatched sale | `TestPOSOfflineOfferMatchesEngine`: a 10% store offer, a 2900 discount on a 29000 line is not flagged and a 3000 one is; 19 linked sales plus an unmatched linked sale make 20 (no flag); the 21st flags `pos.offline_links` once |
+| 6, VerifyCode order | Locks, then the bill's check; a locked phone or cashier is `code_locked` before `EnsureCounterCheck`, so no `counter_code_checks` row is added. The fresh-verified answer now needs the same phone (item 8) | `TestPOSPhoneLockEndsAt15` (no new check row while locked), `TestPOSFreshVerifiedNeedsSamePhone` |
+| 7, missing tests | — | `TestPOSCaptureOfReleasedHold` (500, nothing written, the claim stays `claimed`), `TestPOSStockReverseRefused` (409 `invalid_transition`), `TestPOSRejectedEntryRollsBackFailure` (`rejected:invalid`, no `counter_code_failures` and no `sync_entries` row), `TestPOSPhoneLockEndsAt15` (locked at 14:59.999, open at exactly 15:00) |
+| 8, report items | See questions 22 and 23 | — |
+
+`TestPOSClaimHoldLifecycle` now expects `Sweep{Expired: 1, Released: 1}`.
 
 ## Coverage of SC-POS (08-testing.md)
 
@@ -136,7 +166,7 @@ Tests never print codes, tokens or phones. `noSecrets` captures the API's log ou
 Each one has the most conservative reading built, and the ones in code are marked `TODO(lead):`.
 
 1. **How long a confirmed QR stays usable:** resolved by the review (D-131). A sale binds a claim only before its `expires_at`.
-2. **Hold release:** resolved by the review (D-131). A new QR, the bill's sale and the `pos_bill_claim_expiry` timer release holds. Still open: the worker's Credits is the do-nothing default until W2-01 wires its ledger into `internal/jobs/pos.go` (`TODO(lead)`).
+2. **Hold release:** resolved by the review (D-131). A new QR, the bill's sale and the `pos_bill_claim_expiry` timer release holds. The routes and the worker now share one constructor (`jobs.PosDeps`); W2-01 wires its ledger there (`TODO(lead)`).
 3. **`phone_unverified` sales:** should they link later, once the customer verifies that phone? Built: they never link.
 4. **Realtime catalogue:** `bill_claim.updated` is not in `realtime.yaml` or the shared catalogue yet.
 5. **Pricer:** resolved. W2-07's `offers.Service` is wired through `offersForPos`.
@@ -155,7 +185,12 @@ Each one has the most conservative reading built, and the ones in code are marke
 18. **The 72 h `sold_at` clamp** (`sale.go`, TODO). 01 §17 lists "sold_at clamp for offline sales, 72 h" with no direction. Built: an offline `sold_at` is never more than 72 h before `received_at`, and never after it.
 19. **`pos.offline_offer_without_discount_role` score** (`sync.go`, TODO). Built: 50, as for `pos.offline_links`.
 20. **Plan text to update** (not W2-04's files): 03 §5 says that a reversal is allowed within the window "of `sold_at`". For an offline sale, the window now runs from `received_at`. The counter-code row in 01 §6 says "5 wrong tries per bill"; D-131 adds 5 per phone at a store in 15 minutes and 20 per cashier in an hour.
-21. **Deadlocks between syncs:** a code check locks the cashier, then the phone. Two cashiers' syncs that touch the same phones in different orders can deadlock. Postgres aborts one of them (a 500), and the device retries with the same key. Should the sync sort its counter-code entries by phone first?
+21. **Deadlocks between syncs:** resolved in round 2. A sync takes all its code locks at its start, in sorted order.
+22. **Retention of `counter_code_*` rows.** `counter_code_checks`, `counter_code_uses` and `counter_code_failures` keep `phone_hash` forever, and `todayz_app` has no `DELETE` on them (and the owner cannot truncate them). Nothing removes them, not even account deletion (W1-01's `OnAccountDelete`). Proposed owner: **W3-02 Risk and fraud**, which owns the abuse signals these rows are: a retention kind through `jobs.Define`, run as the owner (or a `SECURITY DEFINER` function, as `drop_old_partitions`), with a `platform_settings` key for the days (the lockout only needs one hour of failures; checks and uses need the 2-minute bind and the offline replay window of `pos_offline_link_max_hours`). W4-03 Security should check it under DPDP. Not built here.
+23. **Fresh-verified branch and the body's phone:** tightened in round 2. A verified check under 2 minutes old answers again only when the body's phone (canonicalised) belongs to the verified customer; the code is not re-checked, since that (device, step) is already used. Another phone falls through to a new check with the usual locks.
+24. **Capture of a released hold** is a 500 (the seam's error is not a problem code). The sale rolls back. Should it be `409 claim_expired`? (TODO(lead))
+25. **Offer matching is per line.** An engine bill-level discount is not spread over the lines, so an offline sale whose line discounts add up to an engine bill discount reads as unmatched. Offline matching prices as a walk-in (`ids.Zero`), as the online sale does (question 14).
+26. **Sweep starvation.** More than `claimSweep` (500) poison rows due at once would fill every run, and the rows behind them would wait. Each failure is counted in `tz_pos_claim_release_failed_total`; an alert on it is W3-07's or the ops runbook's call.
 
 ## The cross-package FKs
 

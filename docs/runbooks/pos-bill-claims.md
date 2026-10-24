@@ -10,7 +10,8 @@ timers).
 Every minute it expires up to 500 bill QR claims (`bill_claims`) that are `open` or `claimed`,
 have no sale and are past `expires_at` (120 s after the POS made the QR). For a claim a customer
 confirmed (`claimed_by` set), it releases the credits the confirm held (the Credits seam,
-`Release`). The summary is `expired` and `released`.
+`Release`). Each claim runs in its own savepoint, so one that fails does not hold up the rest.
+The summary is `expired`, `released` and `failed`.
 
 The sweep only gives holds back. The reads and the sale do not wait for it: a claim past
 `expires_at` already shows `expired`, and a sale that tries to bind it gets `claim_expired`
@@ -25,11 +26,13 @@ It is idempotent:
 - Rows a sale is binding right now are skipped (`FOR UPDATE SKIP LOCKED`); that sale sees the
   claim expired and refuses, and the next tick expires it.
 - More than 500 due claims are taken over the following ticks, oldest first.
+- A claim whose `Release` fails is rolled back on its own, stays live and is retried next tick
+  (counted in `failed` and in `tz_pos_claim_release_failed_total`).
 
 ## First three checks
 
 1. **A-21 Jobs**: open the kind, then the latest failed run: the error, the attempt and the
-   summary (`expired`, `released`).
+   summary (`expired`, `released`, `failed`).
 2. **The claims**: read `bill_claims` (read-only) for live rows past `expires_at`:
    `status`, `claimed_by`, `credits_used`, `pos_sale_id`.
 3. **Logs**: dashboard 15 *Job logs* with the run id; follow `trace_id`. Logs carry claim ids only,
@@ -39,9 +42,11 @@ It is idempotent:
 
 - **503 "pos: not configured"**: the worker started without the database or settings. Check the
   worker's boot log and `make env-check` names.
-- **"pos: release credits"**: the credits ledger refused the release. That is the credits
-  owner's (W2-01) to read with the claim id; the whole batch rolls back and the next tick
-  retries it.
+- **`failed` above 0, or `tz_pos_claim_release_failed_total` rising** (log line "pos: claim hold
+  not released; retried next pass" with the claim id): the credits ledger refused that release.
+  Only that claim is rolled back; the run still succeeds and the next tick retries it. A claim
+  that fails every tick is the credits owner's (W2-01) to read with the claim id. If more than 500
+  such claims are due at once they fill every run and newer claims wait: fix the ledger first.
 - **Live claims pile up past `expires_at` with no failed runs**: the kind is not scheduled on the
   worker (check A-21 for recent runs and the [missed cron](jobs-cron-missed.md) alert).
 
