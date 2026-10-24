@@ -8,6 +8,10 @@ import (
 	"github.com/todayz/backend/internal/pos"
 )
 
+// posSeams lets a test swap in recording offers, credits and referrals
+// seams; nil in the binary.
+var posSeams func(*pos.Deps)
+
 // mountPos mounts W2-04's routes: the online sale and its reversal, bill
 // claims and counter codes, the offline sync, the public receipt and the
 // customer's purchases (the pos, sync and receipts domains). Offers,
@@ -18,10 +22,14 @@ func mountPos(r chi.Router, d *deps) {
 	if d.Authz != nil {
 		az = d.Authz
 	}
-	svc, err := pos.New(pos.Deps{
+	pd := pos.Deps{
 		Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Settings: d.Settings,
 		Authz: az, Stock: jobs.PosStock(d.Clock),
-	})
+	}
+	if posSeams != nil {
+		posSeams(&pd)
+	}
+	svc, err := pos.New(pd)
 	if err != nil {
 		// A missing clock or a malformed key; boot and buildSecurity refuse
 		// those before the routes mount.
