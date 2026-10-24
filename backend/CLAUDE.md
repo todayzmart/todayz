@@ -159,6 +159,15 @@ on each other's internals; a cross-domain call goes through a small interface in
   same as `infra/local/lib.sh`. `internal/testkit/database.sql` runs the same privilege statements
   as init.sql's `todayz_test` block (`TestMatchesLocalInitSQL`); test databases record
   `platform_environment = test`. Containers carry the label `in.todayz.testkit`; Ryuk is the backstop.
+- Shared mode (opt-in, saves RAM when several checkouts test at once): `make testpg-up` starts one
+  PostGIS (`todayz-testpg`, 127.0.0.1:5439, tmpfs, fsync off) and writes its URL to
+  `.cache/testpg.url` (mode 600, never printed). With `TODAYZ_TEST_PG_URL_FILE` set to that file,
+  testkit uses the server instead of a container per package: each test binary migrates its own
+  template `tz_template_<tag>` (worktrees carry different migrations) and drops it on exit; every
+  test still gets a fresh database. `make testpg-down` removes the server and every leftover
+  database. `make check` does not set the variable, so it keeps the container per package.
+  A package whose tests depend on cluster-wide transaction ids or snapshots uses
+  `testkit.MainOwnServer(m)` (realtime does), which keeps a container of its own.
 - Platform tests that guard the plan: `TestSettingsMatchProductRules` (01 §17 ↔ migrations, both
   ways), `TestNoSecretSettings` (D-19), `TestUpDownUp`, `TestRiverVersionIsLatest`, the problem
   code registry test, and the settings lint fixture.

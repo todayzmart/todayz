@@ -855,3 +855,67 @@ There is no `make seed`; use `make reset`.
 - **`lastSplit`** is written by the customer app with a PATCH after a search (the basket keeps the split until it is searched again). It must name the basket's own line ids and is refused together with a new `lines` set; a new `lines` set clears it.
 - **Logging.** One `search_log` row per line with `source = basket` (the product's id for a product line); a product id that names no product is dropped silently and logs nothing.
 - Lives in: `backend/internal/baskets/`, `backend/internal/search/basket*.go`, `backend/db/migrations/21401_w2-14_baskets.sql`, `backend/api/{paths,schemas,problems}/baskets.yaml`, `customer/src/basket/`; 01 §11.4, 03, 04 §2.3, 08 BSK-05; `docs/qa/W2-14/REPORT.md`.
+
+## Reviews and ratings as built (W2-06, 2026-10-24)
+
+**D-140 · Reviews and ratings as built (W2-06).** Choices the build had to make where 01 §10, 03 and 04 were silent.
+- **Single writer.** `reviews` is the only code that writes `stores.rating_avg` and `rating_count` (D-59). The rating is the Bayesian average of the visible reviews, prior 4.0 with weight 5, computed in SQL and rounded to 2 places (`round`, half away from zero); `BayesAvg` in Go is the test oracle. Both numbers are fixed constants in code (D-92). Every review write recomputes its store inside the same transaction, under a per-store advisory lock taken after the row lock; the hourly `store_rating` job (rollup class) heals any drift.
+- **Eligibility.** The order must be the caller's and `collected` or `delivered`. A POS sale needs the W2-04 `SaleSource`; until it lands, a `posSaleId` is not eligible (`422`). One review per order or sale (unique index); a second is `409`. Someone else's order, review or report is `404`, never `403`.
+- **Edit window.** An edit is allowed while `now <= created_at + review_edit_window_days`; after that `409 review_edit_window_passed`. Stars, text and tags can change; the order cannot. A hidden review cannot be edited.
+- **Reply.** One reply per review, editable, by an owner or manager of the store (cashiers do not see reviews). A reply is published at once.
+- **Reports.** A customer may report a review that is not their own (`422` for their own); a manager may report a review of their store. One report per reporter per review; a duplicate returns `201` with the first report. A report never hides anything on its own.
+- **Moderation.** Hide and restore (of a review or of its reply) need a reason, are soft deletes (`hidden_at`), write an audit row in the same transaction and recalculate the rating. `support`, `admin` and `super_admin` can hide and restore (D-41). Hiding twice or restoring a visible one is `409 invalid_transition`. Hiding a review marks its open reports `upheld`. Resolving a report as `upheld` does not hide the review by itself; hiding is the separate act.
+- **Public list.** `GET /v1/discover/stores/{slug}/reviews` shows visible reviews only, newest first, with the customer's first name. A hidden reply is dropped from a visible review.
+- **Added beyond 04.** `GET /v1/me/reviews` (my reviews), `POST /v1/admin/reviews/{id}/reply/hide` and `.../reply/restore`, and the admin review endpoints, pulled forward from W3-05 and mounted from `routes_reviews.go` so the moderation flow is testable end to end. W3-05 builds the console screens on them.
+- **Not built.** The "New review" in-app notification (01 §10 table) waits for the W2-05 outbox consumer; nothing sends it yet.
+- Lives in: `backend/internal/reviews/`, `backend/internal/jobs/reviews.go`, `backend/cmd/todayz/routes_reviews.go`, `backend/db/migrations/20601_w2-06_reviews.sql`, `backend/api/{paths,schemas,problems}/{reviews,admin-reviews}.yaml`, `authz/policy/reviews.go`; 01 §10, 03, 04 §2.3, §2.4, §2.6; `docs/qa/W2-06/REPORT.md`.
+
+**D-141 · W2-06's open questions take the conservative defaults (lead, 24 Oct, following the founder's call in D-155).** As built:
+- A review can be edited while `now <= created_at + review_edit_window_days`.
+- A deleted customer's reviews stay, showing the first name only.
+- Cashiers cannot see or reply to reviews.
+- Upholding a report does not hide the review; hiding is a separate action, and it upholds open reports.
+- A duplicate report returns `201` with the first report.
+- Reporting your own review is `422`.
+- Hiding or restoring twice is `409 invalid_transition`.
+- The "New review" notification waits for the W2-05 consumer.
+
+## Offers, discounts and banners as built (W2-07, 2026-10-24)
+
+**D-150 · Offer pricing as built: kinds, rounding, caps and what is immutable (W2-07).** Choices the build had to make where 01 §12 was silent.
+
+- **Flat is per unit.** A "₹ off" offer takes its value off each unit of a covered line, never off the line (OFFER-M.04: ₹2 off milk ×2 is ₹4). Buy X get Y gives `get_qty` free for every complete group of `buy_qty + get_qty` units of the same item (OFFER-M.05: buy 2 get 1 on ×3 pays for 2, ×6 pays for 4).
+- **Percent floors in paise** (₹58 at 10% off takes 580 paise; 33% of 100 paise takes 33) and is capped at 90, so a typo cannot give an item away. A discount never exceeds its line and a bill never goes below ₹1 (01 §12). A flat discount that would exceed the unit price takes the whole unit price.
+- **Terms are immutable after creation.** `PATCH` changes only status, title, channels, limits and dates. A change of kind, value or scope is a new offer, so an order's `offers_applied` and the shop's redemption counts always describe terms that existed.
+- **`startsAt` is clamped to now** when it is in the past; a later start makes the offer `scheduled`.
+- **The clock decides, the label follows.** Pricing reads `starts_at` and `ends_at` against the injected clock; the `offers_tidy` job (every minute) only moves the status label (scheduled to live, live to ended, spent to ended) and writes the catalogue-change record for each change. A tidy outage never leaves a stale price.
+- **Pricing is channel-agnostic.** `offers.Price(Cart)` takes a channel (`online` or `pos`); the quote and the POS call the same function, so OFFER-M.03's "same price online and at the POS" holds by construction.
+- Lives in: `backend/internal/offers/{pricing,engine,service}.go`, `01 §12`, `docs/qa/W2-07/REPORT.md`.
+
+**D-151 · Redemption is counted in the order's transaction, per customer under a lock (W2-07).** `Redeem` claims the offers an order used in offer-id order inside the order's own transaction (after the store lock the order already holds, so the platform's lock order stands). It is idempotent per order, returns `ErrUnavailable` when `max_redemptions` ran out between the quote and the place (orders turns that into `409 price_changed` with the new quote), and counts a customer's earlier unreleased uses under the same row lock, so a per-customer limit cannot be beaten by two orders at once. `Release` (cancel, reject, expiry) gives the redemption back by marking it released. An offer with a per-customer limit does not apply to a caller with no known customer.
+
+**D-152 · Banners: held uploads, the cap and taps (W2-07).**
+
+- **Template banners are ours and show at once** (`auto_ok`, live or scheduled). An uploaded `imageKey` banner is `pending_review` with moderation `needs_review` until an admin approves it (no AI image check exists yet; when it does, it moves a banner to `auto_ok` the same way).
+- **`store_banners_max` counts live, scheduled and pending_review banners**, checked under the store row lock, so a shop cannot queue five uploads behind a cap of three and have all go live. Paused, ended and removed banners do not count.
+- **Taps: `banner_taps`.** One row per customer and banner holding the last tap (`POST /v1/me/banners/{bannerId}/tap`, 204). Attribution is D-77's: the last click, same store, within 24 hours. The daily counts (`banner_daily`) are filled by W3-07 from `banner_taps` and the orders.
+- **Admin takedown** is `banners.Service.Remove(bannerID, adminID, reason)`; W3-05 calls it. A removed banner never returns.
+- Lives in: `backend/internal/banners/`, `backend/db/migrations/20702_w2-07_banners.sql`, 03 §9.
+
+**D-153 · The nearby offers feed (W2-07).** `GET /v1/discover/offers` returns at most 10 cards (`feedCards`) from live stores inside the customer's radius (default 2 km, the same chips as search; at most 200 candidate stores). A store shows one card: a banner when it has a live one (its banners take turns by rotation bucket), otherwise its best live offer; a store with neither shows nothing. Cards go nearest first, and the list starts at a different shop every 15 minutes (`feedRotation`; the bucket comes from the injected clock), so the top slots move round the shops in range. Each banner that makes the screen emits `banner_impression`. The ranking inside the 01 §12 "ranked by distance and discount" is therefore distance first; the discount only picks the store's best offer. `has_offer` on a store card means the store has a live item-level or bill offer. The constants are code constants in `internal/offers/feed.go`, not settings, until the founder asks to tune them (TODO(lead) in the report).
+
+**D-154 · Seams between offers, orders, search and banners (W2-07).** The orders package owns `Pricer` and `Redeemer` (`internal/orders/seams.go`) and basket search owns `search.Pricer`; the offers service satisfies both through adapters in `cmd/todayz/offers_seams.go`, so no domain imports another. `NoRedeem` and the `Fixed` flag (a line whose price is already final, such as a flash price) let tests and the POS skip redemption. The offers feed takes banners through `offers.BannerSource`, adapted from `banners.LiveBanner`.
+
+**D-155 · W2-07's open questions take the conservative readings (founder, 24 Oct).** The founder accepted what W2-07 built for each question in `docs/qa/W2-07/REPORT.md`:
+- A percent offer is at most 90% (`MaxPercent`), and its discount floors to the paisa.
+- A flat offer is per unit: `min(value, unit price) × qty`.
+- A `bill_min` offer is whole-shop only.
+- An offer with a per-customer limit does not apply when no customer is known.
+- A flash offer applies to the whole item, not only the batch's units.
+- Offer terms cannot change after creation; only the status changes (pause, resume, end). `startsAt` is clamped to now.
+- The nearby feed shows 10 cards, rotates every 15 minutes, uses a 2 km default radius and looks at 200 candidate stores. These stay code constants (D-153).
+- Uploaded banner images wait in the review queue until an AI image check exists, and a held banner counts toward `store_banners_max` (D-152).
+- Banner taps are kept in `banner_taps`; the tap route is `/v1/me/banners/{bannerId}/tap`.
+- No feature flag gates offers or banners.
+
+Still open as work, not decisions: `has_offer` in search must agree with `offers.Price`, and the `banner_limit_reached` problem needs its i18n key.

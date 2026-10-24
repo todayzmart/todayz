@@ -3,6 +3,7 @@ package orders
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	genproblems "github.com/todayz/backend/gen/problems"
@@ -51,6 +52,8 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		return ids.Zero, problem.Wrap(genproblems.Internal, err)
 	}
 	var orderID ids.ID
+	var stale bool
+	var quoteStore ordersdb.StoreForBookingRow
 	err = s.db.InTx(ctx, func(ctx context.Context) error {
 		now := s.now()
 		q := s.q(ctx)
@@ -125,6 +128,13 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		if err != nil {
 			return fmt.Errorf("orders: insert order: %w", err)
 		}
+		if err := s.redeemer.Redeem(ctx, orderID, p.UserID, qq.offers); err != nil {
+			if errors.Is(err, ErrOfferGone) {
+				stale, quoteStore = true, st
+				return errStaleOffers
+			}
+			return fmt.Errorf("orders: redeem offers: %w", err)
+		}
 		for _, l := range qq.lines {
 			snap, err := json.Marshal(snapshot{
 				ProductID: l.productID.String(), Name: l.row.Name, Variant: l.row.Variant, PackSize: l.row.PackSize,
@@ -165,8 +175,21 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		return realtime.Publish(ctx, t, realtime.StoreChannel(storeID),
 			realtime.Event{Type: realtime.OrderCreated, ID: orderID, Version: int64(version)})
 	})
+	if stale {
+		// An offer ran out between the quote and the order: the transaction
+		// is rolled back, so price again and show the customer the new total.
+		qq, qerr := s.price(ctx, p.UserID, quoteStore, c, s.now())
+		if qerr != nil {
+			return ids.Zero, asProblem(qerr)
+		}
+		return ids.Zero, problem.New(genproblems.PriceChanged, "").WithExtension("quote", qq.view())
+	}
 	if err != nil {
 		return ids.Zero, asProblem(err)
 	}
 	return orderID, nil
 }
+
+// errStaleOffers rolls the order back when an offer ran out; create then
+// answers price_changed with a fresh quote.
+var errStaleOffers = errors.New("orders: an offer ran out")

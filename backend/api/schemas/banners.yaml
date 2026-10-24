@@ -1,9 +1,146 @@
-# Schemas: domain "banners" (owner W3-02): banners (04 §2.6).
+# Schemas: domain "banners" (owner W2-07): shop banners (04 §2.6, 01 §12).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Request objects carry `additionalProperties: false`. A banner is a 16:9 image
+# (uploaded: `imageKey`) or a template (colour, sub-line, product photo) plus a
+# headline of at most 40 characters and a target. It is published at once;
+# an uploaded image waits in `pending_review` until the safety check clears it.
+BannerStatus:
+  type: string
+  enum: [pending_review, live, scheduled, paused, ended, removed]
+BannerModeration:
+  type: string
+  enum: [auto_ok, needs_review, rejected]
+BannerTargetType:
+  type: string
+  enum: [offer, items, category, store]
+  description: >-
+    Where a tap goes. `offer`: `targetId` is the offer. `items`: `targetItemIds`. `category`: `targetId` is the
+    category. `store`: the shop page.
+BannerTemplate:
+  type: object
+  additionalProperties: false
+  required: [tint]
+  properties:
+    tint:
+      type: string
+      enum: [green, amber, rose, sky, lilac, peach]
+    subline:
+      type: string
+      maxLength: 60
+    productImageKey:
+      type: string
+      maxLength: 200
+      description: Storage key of a photo from the shop's own catalogue images.
+Banner:
+  type: object
+  required:
+    - id
+    - storeId
+    - headline
+    - imageKey
+    - template
+    - targetType
+    - targetId
+    - targetItemIds
+    - startsAt
+    - endsAt
+    - status
+    - moderation
+    - removeReason
+    - impressions
+    - clicks
+    - attributedOrders
+    - version
+    - createdAt
+    - updatedAt
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    storeId: {$ref: ./common.yaml#/Ulid}
+    headline: {type: string, maxLength: 40}
+    imageKey: {type: [string, "null"], maxLength: 200}
+    template:
+      oneOf:
+        - {$ref: '#/BannerTemplate'}
+        - {type: "null"}
+    targetType: {$ref: '#/BannerTargetType'}
+    targetId:
+      oneOf:
+        - {$ref: ./common.yaml#/Ulid}
+        - {type: "null"}
+    targetItemIds:
+      type: array
+      items: {$ref: ./common.yaml#/Ulid}
+      maxItems: 20
+    startsAt: {$ref: ./common.yaml#/Timestamp}
+    endsAt:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: "null"}
+    status: {$ref: '#/BannerStatus'}
+    moderation: {$ref: '#/BannerModeration'}
+    removeReason:
+      type: [string, "null"]
+      maxLength: 500
+      description: Why an admin took the banner down (status `removed`).
+    impressions:
+      type: integer
+      description: Times it was shown, from the daily roll-up.
+    clicks: {type: integer}
+    attributedOrders:
+      type: integer
+      description: Orders placed within 24 h of a tap, last click wins (D-77).
+    version: {type: integer}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    updatedAt: {$ref: ./common.yaml#/Timestamp}
+BannerList:
+  type: object
+  required: [items, nextCursor]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/Banner'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+BannerCreate:
+  type: object
+  additionalProperties: false
+  required: [headline, targetType]
+  description: >-
+    Make a banner: send exactly one of `imageKey` (an uploaded 16:9 image) and `template`. `targetType=offer` and
+    `category` need `targetId`; `items` needs 1 to 20 `targetItemIds` of this shop. It goes live at once, or
+    `scheduled` when `startsAt` is later; an uploaded image is `pending_review` until the safety check clears it.
+    A shop keeps at most `store_banners_max` live or scheduled banners (`422 banner_limit_reached`).
+  properties:
+    headline:
+      type: string
+      minLength: 1
+      maxLength: 40
+    imageKey:
+      type: string
+      minLength: 1
+      maxLength: 200
+    template: {$ref: '#/BannerTemplate'}
+    targetType: {$ref: '#/BannerTargetType'}
+    targetId: {$ref: ./common.yaml#/Ulid}
+    targetItemIds:
+      type: array
+      items: {$ref: ./common.yaml#/Ulid}
+      minItems: 1
+      maxItems: 20
+    startsAt: {$ref: ./common.yaml#/Timestamp}
+    endsAt: {$ref: ./common.yaml#/Timestamp}
+BannerUpdate:
+  type: object
+  additionalProperties: false
+  minProperties: 1
+  description: >-
+    Only the fields sent change. `status` moves live to paused and back, or any open banner to ended (final).
+    The picture, headline and target cannot change: end the banner and make a new one.
+  properties:
+    status:
+      type: string
+      enum: [live, paused, ended]
+    startsAt: {$ref: ./common.yaml#/Timestamp}
+    endsAt:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: "null"}
