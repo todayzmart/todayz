@@ -120,6 +120,11 @@ test('desktop: a short order offers Accept part (B-04, BK-08)', async ({ page })
   await page.goto('/orders');
   await expect(page.getByText(/Accept part, reject the order, or update the stock/)).toBeVisible();
   await expect(page.getByRole('button', { name: 'Accept part of order TZ-1042' })).toBeEnabled();
+  // Reject, Accept part and Accept share one row (lead, W2-02 finish).
+  const tops = await Promise.all(
+    ['Reject order TZ-1042', 'Accept part of order TZ-1042', 'Accept order TZ-1042'].map(async (name) => (await page.getByRole('button', { name, exact: true }).boundingBox())?.y),
+  );
+  expect(new Set(tops).size, `button tops ${tops.join(', ')}`).toBe(1);
   await shot(page, 'w2-02-accept-part-card.png');
 });
 

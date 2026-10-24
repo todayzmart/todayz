@@ -86,7 +86,7 @@ export function NewOrderCard({ store, order, offsetMs }: { store: CurrentStore; 
           {intl.formatMessage({ id: partable ? 'orders.card.partHint' : 'orders.card.shortHint' }, { count: shortLines })}
         </p>
       )}
-      <div className="tz-ocard-actions">
+      <div className={`tz-ocard-actions ${styles.threeActions}`}>
         <Button
           size="sm"
           onClick={() => setRejecting(true)}

@@ -126,6 +126,12 @@
   align-self: flex-start;
 }
 
+/* The New card's Reject, Accept part and Accept share one row (the design's
+   .tz-ocard-actions has two columns, which put Accept on a row of its own). */
+:global(.tz-ocard-actions).threeActions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
