@@ -25,6 +25,9 @@ const KindStoreReliability = "store_reliability"
 // a setting (01 §17 "Fixed", D-85).
 const storeWindow = 30 * 24 * time.Hour //settings:ok D-85 fixed 30-day store window
 
+// bpWhole is 100 % in basis points.
+const bpWhole = 10000 //settings:ok 100 % in basis points, not a rule
+
 // strikeStore records a strike against the order's store, once per order,
 // and raises the store_strikes flag when the store reaches threshold. The
 // reliability score drops on the job's next run (BK-46). No automatic
@@ -101,7 +104,7 @@ func (s *Service) StoreReliability(ctx context.Context, _ platformjobs.Run) (pla
 	q := s.q(ctx)
 	n, err := q.RecomputeStoreReliability(ctx, ordersdb.RecomputeStoreReliabilityParams{
 		Now: now, Since: now.Add(-storeWindow),
-		ExpiryBp: int32(min(max(expiryBp, 0), 10000)), Threshold: int32(max(threshold, 1)), //nolint:gosec // both clamped
+		ExpiryBp: int32(min(max(expiryBp, 0), bpWhole)), Threshold: int32(max(threshold, 1)), //nolint:gosec // both clamped
 	})
 	if err != nil {
 		return platformjobs.Result{}, fmt.Errorf("orders: store reliability: %w", err)
