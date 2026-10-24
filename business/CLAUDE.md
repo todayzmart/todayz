@@ -63,3 +63,9 @@ W2-10 finish: B-02 onboarding (`src/onboarding/`, `/onboarding`), B-13 stores an
 
 - Edits send `If-Match` (read first when the ETag is unknown; a 412 refetches). Create, invite, submit and document calls carry an `Idempotency-Key`. Roles are in `src/stores/perm.ts`; the server is the gate (D-200 to D-205).
 - Documents: the file is checked in the browser, registered, then PUT to the presigned URL with only `Content-Type`. A failed PUT leaves a `pending` document (no confirm route in 04).
+
+W2-11: B-05 Sell, the counter and offline POS. Modules: `src/pos/` (cart, checkout, money, links, history, the `PosApi` adapter on the generated client, `PosProvider` runtime, `Counter`, `SellPage`, the link, discount, add-product and sales sheets, `QrCode`), `src/sync/` (the outbox engine and the raw-IndexedDB `PosStorage`, D-170), `src/scanner/` (keyboard wedge and camera) and `src/receipt/`; route `src/routes/sell/index.tsx`; copy in `shared/i18n/messages/business/pos.en.json`. Decisions D-170 to D-179. Report: `docs/qa/W2-11/REPORT.md`.
+
+- Every sale is saved to the device first (client ULID, device sequence), then sent by itself when online or by `syncStore` otherwise; the server's `(store_id, client_id)` idempotency makes a repeat safe. Refused sales stay in the list for a person to look at.
+- Tests build the screen with a fake `PosApi` and `memoryStorage` (`PosProvider` takes `api`, `storage`, `now`); `user-event` is not installed, so `Counter.test.tsx` uses a small `fireEvent` shim.
+- Screenshots: `e2e/sell.spec.ts` fakes `/v1/**` and writes to `docs/qa/W2-11/` with `TZ_QA_DIR=docs/qa/W2-11`. The preview config needs placeholder `VITE_TURNSTILE_SITE_KEY` and `VITE_API_URL` set in the shell (the bundle is already built with `build:e2e`), and the app only tries the session refresh when `localStorage` has `todayz.hasSession.business`.
