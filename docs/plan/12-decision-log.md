@@ -920,6 +920,8 @@ There is no `make seed`; use `make reset`.
 
 Still open as work, not decisions: `has_offer` in search must agree with `offers.Price`, and the `banner_limit_reached` problem needs its i18n key.
 
+## Referrals as built (W2-03, 2026-10-24)
+
 **D-160 · A business claims its referral itself, owner only, before verification (W2-03).** 01 §8 lets a new shop be referred but names no claim step. A business claims through `POST /v1/biz/businesses/{bid}/referrals/claim`, which needs `referrals.claim` (owner only; owner and manager hold `referrals.view`). The window (`ref_attribution_window_days`) runs from the business's `created_at`, and a claim is refused once the business is verified (draft, submitted and needs_info may claim). A business takes a customer or business code, never a store code; a customer takes a customer or store code, never a business code (`referral_not_eligible`). Self covers the business's own code, its staff's customer codes, and a business sharing any staff member.
 - Lives in: `backend/internal/referrals/claim.go`, `backend/internal/platform/authz/policy/referrals.go`, `backend/api/paths/referrals.yaml`.
 
@@ -948,3 +950,23 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
 - **Distinct customers.** A referred shop qualifies after purchases by `ref_shop_qualifying_orders` different customers, not that many purchases. Each counted purchase stores its buyer (`referral_shop_sales.customer_id`, migration 20302), and the count is distinct buyers. A customer's second purchase is recorded but adds nothing. The exclusions of D-165 still apply. `ordersCounted` in the business's referral stats is that count.
 - **A blocked referrer is not paid.** When a referral qualifies while its customer referrer is blocked, that side stays qualified and unpaid. The referee is still paid. The `referral_sweep` job pays the referrer once they are unblocked. A referral waiting only on a blocked referrer is left out of the sweep's batch, so a pile of them cannot hold up other rewards. A deleted referrer stays void (D-161).
 - Lives in: `backend/internal/referrals/qualify.go`, `backend/db/queries/referrals/referrals.sql`, `backend/db/migrations/20302_w2-03_shop_sale_customer.sql`, 01 §8.
+
+## Business setup screens as built (W2-10 finish, 2026-10-24)
+
+**D-200 · Business onboarding, stores and settings screens (W2-10 finish).** B-02 is a single resumable page at `/onboarding` (not a step-by-step flow): the business, its first store, hours, payout and tax details, documents and "Send for review", each saved on its own. Resume is by reading the server's state.
+- Hours for the first store are saved through the settings endpoint, so a wizard run never creates the store twice.
+- Skipped for now: language step, starter catalogue, notification prefs, custom delivery hours, photos, field-agent confirm (W3-06).
+- Lives in: `business/src/onboarding/`, `business/src/stores/`, `business/src/settings/`.
+
+**D-201 · Roles on the business screens (W2-10 finish).** Owner: onboarding, payout and tax edits, invite manager or cashier, edit staff, remove a non-owner. Manager: sees stores and settings, edits the store and settings, invites and removes cashiers, mutes asks, sees payout masked. Cashier: none of these. The server is the real gate; the screens only hide what the person cannot do.
+- Lives in: `business/src/stores/perm.ts`, `business/src/credits/permissions.ts`.
+
+**D-202 · Reads before writes with If-Match (W2-10 finish).** Business, store and settings edits send `If-Match` from the ETag of the last read; when none is known the screen reads first. A `412 precondition_failed` refetches and asks the person to try again. Create, invite, submit and document routes carry an `Idempotency-Key`.
+
+**D-203 · Documents (W2-10 finish).** The file is checked in the browser (type, 10 MB, not empty) before any call. The screen registers the document, then PUTs the file to the presigned URL with only the signed `Content-Type`. There is no confirm call in 04, so a failed PUT leaves a `pending` document that uses one of the five slots until support clears it.
+- Open question for the lead: should 04 add a confirm or delete route for a failed upload?
+
+**D-204 · Conservative readings (W2-10 finish).** Where the plan is silent the screen takes the stricter reading: the map pin is latitude and longitude inputs plus "Use my location"; closing or moving a store says "contact support"; a manager scoped to some stores cannot add a store; the delivery radius limit of 20 km follows the API schema, not `platform_settings`; the invitation page treats the link token as the staff id (04 has no get-invitation-by-token route).
+
+**D-205 · Standee page (W2-10 finish).** `/standee` previews the A5 PDF in a frame and downloads it, for owner and manager. The PDF is fetched with the session token and shown from a blob URL, so no token is ever in a URL. It uses the `getStandeePdf` adapter in `credits/api.ts` until `getQrStandee` is generated (`standee.yaml` is still a stub, owner W3-04 per its header, though D-51 gives the PDF to W2-10).
+- Lives in: `business/src/standee/`.

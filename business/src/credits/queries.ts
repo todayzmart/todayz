@@ -1,6 +1,7 @@
 import { getStore } from '@todayz/api-client/gen/business/business';
+import { getBusinessReferrals } from '@todayz/api-client/gen/referrals/referrals';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { getBusinessReferrals, getCreditAccount, type CreditAccount } from './api';
+import { getCreditAccount, type CreditAccount } from './api';
 
 // Keys carry only the business and store ids; the referral code is data, never part of a key.
 export const creditsKey = (bid: string) => ['credits', bid] as const;

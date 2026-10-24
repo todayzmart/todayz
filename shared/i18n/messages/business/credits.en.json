@@ -240,7 +240,7 @@
     "description": "B-10 stat label"
   },
   "credits.referral.count": {
-    "defaultMessage": "{count, plural, one {# shop} other {# shops}} · {credits, plural, one {# credit} other {# credits}}",
+    "defaultMessage": "{count, plural, one {# shop} other {# shops}}",
     "description": "B-10 stat value"
   },
   "credits.referral.where": {
@@ -250,5 +250,13 @@
   "credits.referral.error": {
     "defaultMessage": "Could not load your referral code.",
     "description": "B-10 referral load error"
+  },
+  "credits.referral.earned": {
+    "defaultMessage": "Credits earned",
+    "description": "B-10 stat label"
+  },
+  "credits.referral.earnedValue": {
+    "defaultMessage": "{credits, plural, one {# credit} other {# credits}}",
+    "description": "B-10 stat value"
   }
 }

@@ -1,0 +1,218 @@
+{
+  "settings.title": {
+    "defaultMessage": "Settings",
+    "description": "Page title"
+  },
+  "settings.loading": {
+    "defaultMessage": "Loading settings",
+    "description": "Loading label"
+  },
+  "settings.loadFailed.title": {
+    "defaultMessage": "We could not load your settings",
+    "description": "Load failed"
+  },
+  "settings.loadFailed.body": {
+    "defaultMessage": "Check your connection and try again.",
+    "description": "Load failed"
+  },
+  "settings.retry": {
+    "defaultMessage": "Try again",
+    "description": "Button"
+  },
+  "settings.none.title": {
+    "defaultMessage": "No shop yet",
+    "description": "Empty state"
+  },
+  "settings.none.body": {
+    "defaultMessage": "Set up your shop first, then come back here.",
+    "description": "Empty state"
+  },
+  "settings.none.action": {
+    "defaultMessage": "Set up your shop",
+    "description": "Link"
+  },
+  "settings.noAccess.title": {
+    "defaultMessage": "Settings are for owners and managers",
+    "description": "No access"
+  },
+  "settings.noAccess.body": {
+    "defaultMessage": "Ask your shop owner if something needs to change.",
+    "description": "No access"
+  },
+  "settings.links": {
+    "defaultMessage": "Related pages",
+    "description": "Nav label"
+  },
+  "settings.link.stores": {
+    "defaultMessage": "Stores and staff",
+    "description": "Link"
+  },
+  "settings.link.onboarding": {
+    "defaultMessage": "Continue shop setup",
+    "description": "Link"
+  },
+  "settings.noStore.title": {
+    "defaultMessage": "No store to set up yet",
+    "description": "Banner"
+  },
+  "settings.noStore.body": {
+    "defaultMessage": "Add a store under “Stores and staff”. Its settings will show here.",
+    "description": "Banner"
+  },
+  "settings.forStore": {
+    "defaultMessage": "Settings for {name}",
+    "description": "Which store the settings are for"
+  },
+  "settings.saved": {
+    "defaultMessage": "Saved",
+    "description": "Toast"
+  },
+  "settings.save": {
+    "defaultMessage": "Save",
+    "description": "Button"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Store profile",
+    "description": "Section"
+  },
+  "settings.profile.body": {
+    "defaultMessage": "Name, address, map location and phone customers see.",
+    "description": "Section"
+  },
+  "settings.hours.title": {
+    "defaultMessage": "Opening hours",
+    "description": "Section"
+  },
+  "settings.hours.body": {
+    "defaultMessage": "Customers can book only while you are open. Add holidays when you will be closed.",
+    "description": "Section"
+  },
+  "settings.delivery.title": {
+    "defaultMessage": "Pickup and delivery",
+    "description": "Section"
+  },
+  "settings.delivery.pickup": {
+    "defaultMessage": "Customers can pick up from the store",
+    "description": "Switch"
+  },
+  "settings.delivery.delivery": {
+    "defaultMessage": "Deliver to customers",
+    "description": "Switch"
+  },
+  "settings.delivery.inStoreOnly.title": {
+    "defaultMessage": "In-store only",
+    "description": "Banner"
+  },
+  "settings.delivery.inStoreOnly.body": {
+    "defaultMessage": "With pickup and delivery both off, customers can see your store but cannot book.",
+    "description": "Banner"
+  },
+  "settings.delivery.radius": {
+    "defaultMessage": "Delivery radius (km)",
+    "description": "Field"
+  },
+  "settings.delivery.radiusHelp": {
+    "defaultMessage": "From 0.1 km to 20 km.",
+    "description": "Field help"
+  },
+  "settings.delivery.fee": {
+    "defaultMessage": "Delivery fee",
+    "description": "Field"
+  },
+  "settings.delivery.freeAbove": {
+    "defaultMessage": "Free delivery above",
+    "description": "Field"
+  },
+  "settings.delivery.freeAboveHelp": {
+    "defaultMessage": "Leave empty to always charge the fee.",
+    "description": "Field help"
+  },
+  "settings.delivery.minOrder": {
+    "defaultMessage": "Minimum order",
+    "description": "Field"
+  },
+  "settings.delivery.err.radius": {
+    "defaultMessage": "Enter a distance from 0.1 to 20 km.",
+    "description": "Field error"
+  },
+  "settings.delivery.err.money": {
+    "defaultMessage": "Enter an amount in rupees, up to two decimals.",
+    "description": "Field error"
+  },
+  "settings.rewards.title": {
+    "defaultMessage": "Rewards and orders",
+    "description": "Section"
+  },
+  "settings.rewards.cashback": {
+    "defaultMessage": "Cashback on bills",
+    "description": "Field"
+  },
+  "settings.rewards.example": {
+    "defaultMessage": "On a {amount} bill the customer earns {credits, plural, one {# credit} other {# credits}}.",
+    "description": "Cashback example"
+  },
+  "settings.rewards.autoAccept": {
+    "defaultMessage": "Accept orders automatically when everything is in stock",
+    "description": "Switch"
+  },
+  "settings.rewards.asks": {
+    "defaultMessage": "Take asks from customers",
+    "description": "Switch"
+  },
+  "settings.payout.title": {
+    "defaultMessage": "Payout and tax details",
+    "description": "Section"
+  },
+  "settings.payout.managerNote": {
+    "defaultMessage": "Only the owner can change these. You see the last digits only.",
+    "description": "Note"
+  },
+  "settings.payout.legalName": {
+    "defaultMessage": "Legal name",
+    "description": "Field"
+  },
+  "settings.payout.pan": {
+    "defaultMessage": "PAN",
+    "description": "Field"
+  },
+  "settings.payout.gstin": {
+    "defaultMessage": "GSTIN",
+    "description": "Field"
+  },
+  "settings.payout.upi": {
+    "defaultMessage": "UPI ID",
+    "description": "Field"
+  },
+  "settings.payout.bank": {
+    "defaultMessage": "Bank account",
+    "description": "Label"
+  },
+  "settings.payout.bankAccount": {
+    "defaultMessage": "Bank account number",
+    "description": "Field"
+  },
+  "settings.payout.ifsc": {
+    "defaultMessage": "IFSC",
+    "description": "Field"
+  },
+  "settings.payout.savedEnding": {
+    "defaultMessage": "Saved, ending {last4}",
+    "description": "Masked value"
+  },
+  "settings.payout.notSet": {
+    "defaultMessage": "Not added",
+    "description": "Masked value"
+  },
+  "settings.payout.replaceHelp": {
+    "defaultMessage": "Fill in only what you want to add or replace. Empty fields keep what is saved.",
+    "description": "Help"
+  },
+  "settings.payout.err.format": {
+    "defaultMessage": "This does not look right. Check it and try again.",
+    "description": "Field error"
+  },
+  "settings.payout.err.pair": {
+    "defaultMessage": "These details go together. Add both, or check that the GSTIN carries your PAN.",
+    "description": "Field error"
+  }
+}

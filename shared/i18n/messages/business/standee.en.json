@@ -1,0 +1,78 @@
+{
+  "standee.title": {
+    "defaultMessage": "QR standee",
+    "description": "B-02/B-10 standee page title"
+  },
+  "standee.loading": {
+    "defaultMessage": "Loading your shop",
+    "description": "standee loading status"
+  },
+  "standee.retry": {
+    "defaultMessage": "Try again",
+    "description": "standee retry"
+  },
+  "standee.error.title": {
+    "defaultMessage": "Could not load your shop",
+    "description": "standee error"
+  },
+  "standee.error.body": {
+    "defaultMessage": "Check your connection and try again.",
+    "description": "standee error"
+  },
+  "standee.noStore.title": {
+    "defaultMessage": "Pick a shop first",
+    "description": "standee no store"
+  },
+  "standee.noStore.body": {
+    "defaultMessage": "The standee is printed for one shop at a time.",
+    "description": "standee no store"
+  },
+  "standee.noStore.action": {
+    "defaultMessage": "Choose a shop",
+    "description": "standee no store"
+  },
+  "standee.manager.title": {
+    "defaultMessage": "The standee is for owners and managers",
+    "description": "standee shown to cashiers"
+  },
+  "standee.manager.body": {
+    "defaultMessage": "Ask your owner or manager to print it.",
+    "description": "standee shown to cashiers"
+  },
+  "standee.card.title": {
+    "defaultMessage": "Print your standee",
+    "description": "standee card title"
+  },
+  "standee.card.body": {
+    "defaultMessage": "An A5 sheet with your shop's QR code. Customers scan it to open your shop and earn cashback.",
+    "description": "standee card body"
+  },
+  "standee.shortCode": {
+    "defaultMessage": "Short code",
+    "description": "standee short code label"
+  },
+  "standee.preview": {
+    "defaultMessage": "Preview",
+    "description": "standee button"
+  },
+  "standee.download": {
+    "defaultMessage": "Download A5 PDF",
+    "description": "standee button"
+  },
+  "standee.preparing": {
+    "defaultMessage": "Preparing the PDF",
+    "description": "standee button busy label"
+  },
+  "standee.pdfError": {
+    "defaultMessage": "Could not prepare the standee. Try again.",
+    "description": "standee banner"
+  },
+  "standee.frameTitle": {
+    "defaultMessage": "Standee preview",
+    "description": "standee preview frame title"
+  },
+  "standee.printTip": {
+    "defaultMessage": "Print on A5 at 100% size, with no margins added by the printer, so the QR code stays sharp.",
+    "description": "standee print tip"
+  }
+}

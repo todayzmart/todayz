@@ -1,4 +1,5 @@
 import { Button, useToast } from '@todayz/ui';
+import { Link } from '@tanstack/react-router';
 import { Download, Eye } from 'lucide-react';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -62,10 +63,9 @@ export function StandeeCard({ store }: { store: CurrentStore }) {
           <Button icon={Download} loading={busy === 'download'} loadingLabel={intl.formatMessage({ id: 'credits.standee.preparing' })} onClick={() => void run('download')}>
             {intl.formatMessage({ id: 'credits.standee.download' })}
           </Button>
-          {/* TODO(merge): W2-10 owns business/src/standee/ (the route may not exist on this branch, so no typed Link). */}
-          <a href="/standee" className="tz-btn">
+          <Link to="/standee" className="tz-btn">
             {intl.formatMessage({ id: 'credits.standee.open' })}
-          </a>
+          </Link>
         </div>
       </div>
     </section>
