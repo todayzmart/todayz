@@ -18,15 +18,22 @@ import (
 )
 
 // KindReferralSweep posts referral rewards that are due but not yet posted
-// (a ledger that was down, a shop with no live store yet) and qualifies new
-// shops whose verification came after their last counted sale (W2-03).
+// (a job that never ran, a side whose retry backoff has passed: a ledger
+// that was down, a shop with no live store yet) and qualifies new shops
+// whose verification came after their last counted sale (W2-03).
 const KindReferralSweep = "referral_sweep"
+
+// referralRewardAttempts: a run that hits a database error retries, then the
+// sweep takes over. A ledger failure is not one: PostRewards records the
+// attempt and the run succeeds.
+const referralRewardAttempts = 3
 
 // registerreferrals declares the referrals domain's job kinds.
 func registerreferrals(r *Registry, d Deps) {
-	// The "referral unlocked" notices enqueue sends, so the enqueuer is
-	// built on the first run (as the orders timers do).
-	enqueuer := lazyEnqueuer(r, d, "referral sweep")
+	// The "referral unlocked" notices enqueue sends and a shop the sweep
+	// qualifies enqueues its referral_reward, so the enqueuer is built on the
+	// first run (as the orders timers do).
+	enqueuer := lazyEnqueuer(r, d, "referrals jobs")
 	svc := func() (*referrals.Service, error) {
 		enq, err := enqueuer()
 		if err != nil {
@@ -41,8 +48,32 @@ func registerreferrals(r *Registry, d Deps) {
 		if err != nil {
 			return nil, err
 		}
-		return ReferralsService(d, ns)
+		return ReferralsService(d, ns, enq)
 	}
+	platformjobs.Define(r, platformjobs.Kind{
+		Name: referrals.KindReward, Owner: "W2-03", Class: platformjobs.ClassMoney, Runbook: ledgerRunbook,
+		Description: "Posts a qualified referral's rewards after the purchase commits, each side in its own transaction (D-169)",
+		Timeout:     30 * time.Second, MaxAttempts: referralRewardAttempts,
+		Handler: func(ctx context.Context, rn platformjobs.Run) (platformjobs.Result, error) {
+			var args referrals.RewardArgs
+			if err := rn.Decode(&args); err != nil {
+				return platformjobs.Result{}, err
+			}
+			s, err := svc()
+			if err != nil {
+				return platformjobs.Result{}, err
+			}
+			res, err := s.PostRewards(ctx, args.ReferralID)
+			if err != nil {
+				return platformjobs.Result{}, err
+			}
+			waiting := int64(0)
+			if res.Waiting {
+				waiting = 1
+			}
+			return platformjobs.Result{Summary: map[string]int64{"posted": int64(res.Posted), "waiting": waiting}}, nil
+		},
+	})
 	platformjobs.Define(r, platformjobs.Kind{
 		Name: KindReferralSweep, Owner: "W2-03", Class: platformjobs.ClassMaintenance, Runbook: ledgerRunbook,
 		Description: "Posts due referral rewards that have not posted yet and qualifies new shops that reached their count",
@@ -61,11 +92,13 @@ func registerreferrals(r *Registry, d Deps) {
 	})
 }
 
-// ReferralsService builds the referrals service the API and the sweep both
-// use, so both post rewards through the same ledger (D-169). The hasher is
-// nil without PII_HASH_KEY (every route then answers 503).
-func ReferralsService(d Deps, ns notice.Sender) (*referrals.Service, error) {
-	rd := referrals.Deps{Clock: d.Clock, Settings: d.Settings, Notices: ns}
+// ReferralsService builds the referrals service the API and the referrals
+// jobs all use, so all post rewards through the same ledger (D-169). enq
+// enqueues referral_reward in the qualifying purchase's transaction (nil:
+// the sweep posts). The hasher is nil without PII_HASH_KEY (every route
+// then answers 503).
+func ReferralsService(d Deps, ns notice.Sender, enq platformjobs.Enqueuer) (*referrals.Service, error) {
+	rd := referrals.Deps{Clock: d.Clock, Settings: d.Settings, Notices: ns, Jobs: enq}
 	if d.Pool != nil {
 		rd.DB = db.New(d.Pool)
 	}

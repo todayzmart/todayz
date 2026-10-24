@@ -2,7 +2,7 @@
 
 Kinds `credits_expire`, `credits_expiry_reminder` and `ledger_reconcile` (owner W2-01, code in
 `backend/internal/credits/jobs.go`, declared in `backend/internal/jobs/credits.go`), and the
-referral rewards that `referral_sweep` posts (owner W2-03, see [Referral rewards](#referral-rewards)). The general
+referral rewards that `referral_reward` and `referral_sweep` post (owner W2-03, see [Referral rewards](#referral-rewards)). The general
 alert is [Job failing](jobs-job-failing.md). The ledger's own alert is **Ledger invariant**
 (05 §6): `tz_ledger_reconcile_drift` above 0 for any `reason`, or a log line with
 `event=ledger_invariant`. It is critical.
@@ -76,13 +76,19 @@ Each side of a qualified referral is one `referral_reward` transaction (D-169):
 - `ref_type` is `referral` and `ref_id` the referral;
 - the key is `referral:<referral id>:<referrer|referee>`.
 
-It posts in the purchase's transaction. If it fails, the purchase still commits and the side waits.
-`referral_sweep` (every 10 minutes, `backend/internal/jobs/referrals.go`) posts what is waiting. Its summary `rewarded` counts the referrals it finished.
+Nothing posts in the purchase's transaction: it only marks the referral `qualified` and enqueues `referral_reward` (unique per referral, ClassMoney). That job posts each side in a transaction of its own after the purchase commits, so a reward never fails or deadlocks a purchase. Its summary is `posted` and `waiting`.
+`referral_sweep` (every 10 minutes, `backend/internal/jobs/referrals.go`) is the backstop. It posts referrals whose `next_attempt_at` is due, oldest due first, 200 a pass. Its summary: `rewarded` (referrals finished), `waiting` (passed over with a side still unposted), `shops_qualified`.
+
+A pass that leaves a side unposted adds 1 to `referrals.attempts` and sets `next_attempt_at`: 10 minutes after the first, doubling, at most 6 hours.
 
 - **Rewards waiting a long time** (`referrals.status = 'qualified'` with a `*_rewarded_at` still empty):
-  - Look for the log line `referrals: reward not posted`. It carries the referral id, the side and the error. A database or ledger outage clears itself on the next sweep.
-  - A blocked customer referrer waits by design (D-168).
-  - A store referrer whose business has no live store waits by design too.
+  - Watch `tz_referral_reward_failed_total{reason}`: `ledger_error` (the ledger errored or posted nothing), `error` (another database error), `refused` (see below).
+  - Look for the log line `referrals: reward not posted`. It carries the referral id, the side and the reason. A database or ledger outage clears itself once it is over, within the backoff (at most 6 hours). To retry one sooner, set its `next_attempt_at` to now; never touch `*_rewarded_at`.
+  - Read `attempts` and `next_attempt_at` to see how long it has been failing.
+  - A blocked customer referrer waits by design (D-168); the sweep leaves it out until they are unblocked.
+  - A store referrer whose business has no live store waits by design too, with the backoff.
+  - A purchase reversed after one side posted keeps the referral (01 §7, D-166, a `referral.reversed_after_reward` flag). The other side still posts when it can.
+- **`referral_reward` failing** (the general [Job failing](jobs-job-failing.md) alert): a ledger failure does not fail the run (it is recorded and backed off); only a database error recording the outcome does. After 3 attempts the sweep takes over, so no money is lost.
 - **`referral.reward_refused` risk flag** (the log line `referrals: reward refused by the ledger`, at error level): the ledger will never accept this posting as it is. Usually the key is already used by a transaction with other legs (`credits: idempotency key reused`).
   1. Read the existing transaction for that key and its entries, read-only, as `todayz_owner`.
   2. Compare it with the referral's `referrer_credits`/`referee_credits` and its beneficiary.

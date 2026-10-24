@@ -9,18 +9,27 @@ import (
 	"github.com/todayz/backend/internal/jobs"
 	"github.com/todayz/backend/internal/orders"
 	"github.com/todayz/backend/internal/platform/authz"
+	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/referrals"
 )
 
 // newReferrals builds the referrals service the API uses: the same
-// constructor as the sweep job, so both post rewards to the credits ledger
-// (D-169).
+// constructor as the referrals jobs, so all post rewards to the credits
+// ledger (D-169). A qualifying purchase enqueues referral_reward through the
+// API's insert-only River client; without one (router tests) the sweep
+// posts.
 func newReferrals(d *deps) *referrals.Service {
 	jd := jobs.Deps{Clock: d.Clock, Settings: d.Settings, Config: d.Config, Log: d.Log}
 	if d.DB != nil {
 		jd.Pool = d.DB.Pool
 	}
-	svc, err := jobs.ReferralsService(jd, newNotifyService(d))
+	var enq platformjobs.Enqueuer
+	if d.Queue != nil {
+		reg := platformjobs.NewRegistry()
+		jobs.Register(reg, jd)
+		enq = platformjobs.NewEnqueuer(reg, d.Queue, d.Clock)
+	}
+	svc, err := jobs.ReferralsService(jd, newNotifyService(d), enq)
 	if err != nil {
 		panic("referrals: " + err.Error())
 	}

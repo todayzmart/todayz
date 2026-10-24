@@ -42,15 +42,17 @@ type Reward struct {
 	IdempotencyKey string
 }
 
-// Ledger posts referral rewards. PostReward runs inside the caller's
-// transaction (ctx carries it, db.TxFrom) and returns the ledger
-// transaction id. posted false with a nil error means the ledger did not
-// post (switched off): the side stays unposted and the sweep tries again.
-// An error is logged and treated the same way; the posting runs in a
-// savepoint, so a failure never aborts the purchase. An error wrapping
-// ErrRewardRefused is permanent: the referral gets a
-// referral.reward_refused risk flag and the sweep leaves it until a person
-// clears the flag (D-169).
+// Ledger posts referral rewards. PostReward runs inside the side's own
+// posting transaction (ctx carries it, db.TxFrom), never a purchase's: the
+// referral_reward job and the sweep call it after the purchase committed
+// (D-169), and it must take its accounts' locks in one call. It returns the
+// ledger transaction id; a repeat of the same key returns the first
+// posting's id. posted false with a nil error means the ledger did not post
+// this time: like an error, the side's transaction rolls back, the failure
+// is counted in tz_referral_reward_failed_total and the side is retried
+// with the backoff. An error wrapping ErrRewardRefused is permanent: the
+// referral gets a referral.reward_refused risk flag and the sweep leaves it
+// until a person clears the flag.
 //
 // W2-01's credits.Poster is the Ledger through jobs.ReferralsLedger, which
 // the API and the sweep both get from jobs.ReferralsService.
@@ -62,14 +64,6 @@ type Ledger interface {
 // (an idempotency key reused for other legs, an invalid posting): retrying
 // cannot help, so the side waits for a person (D-169).
 var ErrRewardRefused = errors.New("referrals: reward refused by the ledger")
-
-// NoLedger posts nothing: referrals qualify and wait for a ledger.
-type NoLedger struct{}
-
-// PostReward implements Ledger.
-func (NoLedger) PostReward(context.Context, Reward) (ids.ID, bool, error) {
-	return ids.Zero, false, nil
-}
 
 // Purchase kinds a referral can be qualified by (referrals.qualifying_ref_type).
 const (
@@ -87,7 +81,7 @@ const (
 
 // Outcome is a completed purchase: an order that reached collected or
 // delivered, or a POS sale. The caller passes it inside the transaction
-// that records the outcome, so customer rewards post with it (01 §8).
+// that records the outcome; the rewards post after it commits (D-169).
 type Outcome struct {
 	RefType string // RefOrder or RefPOSSale
 	RefID   ids.ID

@@ -20,6 +20,7 @@ import (
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/notice"
 	"github.com/todayz/backend/internal/platform/pii"
 	"github.com/todayz/backend/internal/platform/settings"
@@ -36,8 +37,9 @@ var testNow = time.Date(2026, 10, 24, 6, 0, 0, 0, time.UTC)
 // fakeLedger stands in for W2-01's credits.Poster.
 type fakeLedger struct {
 	mu     sync.Mutex
-	down   bool  // posted false
-	err    error // an error from the ledger
+	down   bool            // posted false
+	err    error           // an error from the ledger
+	fail   map[ids.ID]bool // referrals whose postings error
 	posted []Reward
 	keys   map[string]ids.ID
 }
@@ -47,6 +49,9 @@ func (l *fakeLedger) PostReward(_ context.Context, r Reward) (ids.ID, bool, erro
 	defer l.mu.Unlock()
 	if l.err != nil {
 		return ids.Zero, false, l.err
+	}
+	if l.fail[r.ReferralID] {
+		return ids.Zero, false, errors.New("ledger: this posting fails")
 	}
 	if l.down {
 		return ids.Zero, false, nil
@@ -76,6 +81,42 @@ func (f *fakeNotices) Send(_ context.Context, _ pgx.Tx, n notice.Notification) (
 	return ids.New(testNow), nil
 }
 
+// fakeJobs stands in for the queue: it records referral_reward enqueues,
+// unique per key while pending as River's are, and run posts them as the
+// job does (internal/jobs registers the real kind).
+type fakeJobs struct {
+	mu       sync.Mutex
+	pending  []RewardArgs
+	keys     map[string]bool
+	enqueues int
+}
+
+func (f *fakeJobs) EnqueueTx(_ context.Context, tx pgx.Tx, kind string, args any, o platformjobs.EnqueueOpts) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if tx == nil || kind != KindReward || o.UniqueKey == "" {
+		return errors.New("fakeJobs: unexpected enqueue")
+	}
+	f.enqueues++
+	if f.keys == nil {
+		f.keys = map[string]bool{}
+	}
+	if f.keys[o.UniqueKey] {
+		return nil
+	}
+	f.keys[o.UniqueKey] = true
+	f.pending = append(f.pending, args.(RewardArgs))
+	return nil
+}
+
+func (f *fakeJobs) take() []RewardArgs {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	p := f.pending
+	f.pending, f.keys = nil, nil
+	return p
+}
+
 type env struct {
 	t       *testing.T
 	tdb     *testkit.DB
@@ -84,6 +125,7 @@ type env struct {
 	clk     *clock.Fake
 	ledger  *fakeLedger
 	notices *fakeNotices
+	jobs    *fakeJobs
 	ctx     context.Context
 	codes   int
 }
@@ -94,12 +136,12 @@ func newEnv(t *testing.T) *env {
 		t.Skip("needs the database")
 	}
 	tdb := testkit.NewDB(t)
-	e := &env{t: t, tdb: tdb, ctx: context.Background(), clk: clock.NewFake(testNow), ledger: &fakeLedger{}, notices: &fakeNotices{}}
+	e := &env{t: t, tdb: tdb, ctx: context.Background(), clk: clock.NewFake(testNow), ledger: &fakeLedger{}, notices: &fakeNotices{}, jobs: &fakeJobs{}}
 	e.cache = settings.NewCache(settings.PGLoader(tdb.Pool), settings.Options{})
 	h, err := pii.NewHasher(make([]byte, pii.KeySize))
 	require.NoError(t, err)
 	e.svc, err = New(Deps{
-		DB: db.New(tdb.Pool), Clock: e.clk, Settings: e.cache, Hasher: h, Ledger: e.ledger, Notices: e.notices,
+		DB: db.New(tdb.Pool), Clock: e.clk, Settings: e.cache, Hasher: h, Ledger: e.ledger, Notices: e.notices, Jobs: e.jobs,
 		PublicURL: "https://api.todayz.localhost", CustomerApp: "https://app.todayz.localhost", BusinessApp: "https://business.todayz.localhost",
 	})
 	require.NoError(t, err)
@@ -227,9 +269,30 @@ func (e *env) order(customer, store ids.ID, paise int64, credits int) Outcome {
 	return Outcome{RefType: RefOrder, RefID: ids.New(testNow), CustomerID: customer, StoreID: store, EligiblePaise: paise, CreditsUsed: credits}
 }
 
+// complete records a completed purchase and then runs the reward jobs it
+// enqueued, as the worker does once the purchase has committed.
 func (e *env) complete(o Outcome) {
 	e.t.Helper()
 	require.NoError(e.t, e.svc.OnPurchaseCompleted(e.ctx, o))
+	e.runJobs()
+}
+
+// runJobs runs the pending referral_reward jobs.
+func (e *env) runJobs() {
+	e.t.Helper()
+	for _, a := range e.jobs.take() {
+		_, err := e.svc.PostRewards(e.ctx, a.ReferralID)
+		require.NoError(e.t, err)
+	}
+}
+
+// sweep runs the sweep at the clock's time plus d.
+func (e *env) sweep(d time.Duration) map[string]int64 {
+	e.t.Helper()
+	e.clk.Advance(d)
+	out, err := e.svc.Sweep(e.ctx)
+	require.NoError(e.t, err)
+	return out
 }
 
 func requireProblem(t *testing.T, err error, code string) {
@@ -813,11 +876,16 @@ func TestShopCounting(t *testing.T) {
 	assert.Equal(t, statusPending, st)
 	assert.Empty(t, e.ledger.posted)
 
-	// Verification comes later: the sweep qualifies and pays.
+	// Verification comes later: the sweep qualifies and enqueues the
+	// reward, which the job pays.
 	e.exec(`UPDATE businesses SET status = 'verified' WHERE id = $1`, ids.UUID(biz))
 	out, err := e.svc.Sweep(e.ctx)
 	require.NoError(t, err)
 	assert.EqualValues(t, 1, out["shops_qualified"])
+	st, _, _ = e.referral(res.ReferralID)
+	assert.Equal(t, statusQualified, st)
+	assert.Empty(t, e.ledger.posted, "the sweep's own transaction posts nothing")
+	e.runJobs()
 	st, a, b := e.referral(res.ReferralID)
 	assert.Equal(t, statusRewarded, st)
 	assert.True(t, a && b)
@@ -899,15 +967,22 @@ func TestShopRewardWaitsForAStore(t *testing.T) {
 	require.NoError(t, err)
 	_ = code
 	_, other, _, _, _ := e.shopWithStore()
-	e.complete(e.order(u, other, 10_000, 0))
+	o := e.order(u, other, 10_000, 0)
+	e.complete(o)
 	st, a, b := e.referral(res.ReferralID)
 	assert.Equal(t, statusQualified, st)
 	assert.False(t, a, "the store side waits")
 	assert.True(t, b, "the customer is paid now")
+	// Reversed while the store side waits: one side posted, so the reward
+	// stays (01 §7) and the waiting side is still paid later.
+	require.NoError(t, e.svc.OnPurchaseReversed(e.ctx, RefOrder, o.RefID))
+	st, _, _ = e.referral(res.ReferralID)
+	assert.Equal(t, statusQualified, st)
+	assert.Equal(t, 1, e.flags("referral.reversed_after_reward"))
 	e.exec(`UPDATE stores SET status = 'live' WHERE business_id = $1`, ids.UUID(biz))
-	out, err := e.svc.Sweep(e.ctx)
-	require.NoError(t, err)
-	assert.EqualValues(t, 1, out["rewarded"])
+	// The waiting side backs off: not due yet, then due.
+	assert.Zero(t, e.sweep(time.Minute)["rewarded"])
+	assert.EqualValues(t, 1, e.sweep(rewardRetryBase)["rewarded"])
 	st, _, _ = e.referral(res.ReferralID)
 	assert.Equal(t, statusRewarded, st)
 }
@@ -927,22 +1002,157 @@ func TestLedgerDownThenSweep(t *testing.T) {
 	st, a, b := e.referral(res.ReferralID)
 	assert.Equal(t, statusQualified, st)
 	assert.False(t, a || b)
+	assert.Equal(t, []int{1, 10}, e.attempt(res.ReferralID), "one attempt, retried in 10 min")
+
+	// Not due yet: the sweep leaves it alone.
 	e.ledger.err, e.ledger.down = nil, true
-	_, err = e.svc.Sweep(e.ctx)
-	require.NoError(t, err)
+	out := e.sweep(time.Minute)
+	assert.Zero(t, out["rewarded"]+out["waiting"])
+	// Due: posted false is a failure too, and backs off further.
+	out = e.sweep(rewardRetryBase)
+	assert.EqualValues(t, 1, out["waiting"])
+	assert.Equal(t, []int{2, 20}, e.attempt(res.ReferralID))
 	st, _, _ = e.referral(res.ReferralID)
 	assert.Equal(t, statusQualified, st)
+
 	e.ledger.down = false
-	out, err := e.svc.Sweep(e.ctx)
-	require.NoError(t, err)
+	out = e.sweep(2 * rewardRetryBase)
 	assert.EqualValues(t, 1, out["rewarded"])
+	assert.Zero(t, out["waiting"])
 	st, _, _ = e.referral(res.ReferralID)
 	assert.Equal(t, statusRewarded, st)
 	assert.Len(t, e.ledger.posted, 2)
 	// A further sweep posts nothing again.
-	_, err = e.svc.Sweep(e.ctx)
-	require.NoError(t, err)
+	e.sweep(rewardRetryMax)
 	assert.Len(t, e.ledger.posted, 2)
+}
+
+// attempt is a qualified referral's attempts and minutes until its next try.
+func (e *env) attempt(id ids.ID) []int {
+	e.t.Helper()
+	var n int
+	var next time.Time
+	require.NoError(e.t, e.tdb.OwnerPool.QueryRow(e.ctx, `SELECT attempts, next_attempt_at FROM referrals WHERE id = $1`, ids.UUID(id)).Scan(&n, &next))
+	return []int{n, int(next.Sub(e.clk.Now()).Minutes())}
+}
+
+func TestRewardBackoff(t *testing.T) {
+	assert.Equal(t, 10*time.Minute, rewardBackoff(0))
+	assert.Equal(t, 20*time.Minute, rewardBackoff(1))
+	assert.Equal(t, 160*time.Minute, rewardBackoff(4))
+	assert.Equal(t, 6*time.Hour, rewardBackoff(6))
+	assert.Equal(t, 6*time.Hour, rewardBackoff(1000))
+}
+
+// The purchase never posts: it marks the referral qualified and enqueues one
+// referral_reward job, unique per referral, in its own transaction (D-169).
+func TestPurchaseEnqueuesTheReward(t *testing.T) {
+	e := newEnv(t)
+	_, code := e.customer(testNow.Add(-30 * 24 * time.Hour))
+	_, store, _, _, _ := e.shopWithStore()
+	u, _ := e.newCustomer()
+	res, err := e.claim(u, ClaimInput{Code: code})
+	require.NoError(t, err)
+
+	pool := db.New(e.tdb.Pool)
+	o := e.order(u, store, 10_000, 0)
+	require.NoError(t, pool.InTx(e.ctx, func(ctx context.Context) error {
+		if err := e.svc.OnPurchaseCompleted(ctx, o); err != nil {
+			return err
+		}
+		return e.svc.OnPurchaseCompleted(ctx, o) // a repeat in the same transaction
+	}))
+	assert.Empty(t, e.ledger.posted, "the purchase posts nothing")
+	st, _, _ := e.referral(res.ReferralID)
+	assert.Equal(t, statusQualified, st)
+	assert.Equal(t, []int{0, 0}, e.attempt(res.ReferralID), "due at once")
+	require.Len(t, e.jobs.pending, 1)
+	assert.Equal(t, res.ReferralID, e.jobs.pending[0].ReferralID)
+
+	// PostRewards refuses to run inside a caller's transaction.
+	err = pool.InTx(e.ctx, func(ctx context.Context) error {
+		_, err := e.svc.PostRewards(ctx, res.ReferralID)
+		return err
+	})
+	require.Error(t, err)
+
+	e.runJobs()
+	st, a, b := e.referral(res.ReferralID)
+	assert.Equal(t, statusRewarded, st)
+	assert.True(t, a && b)
+	require.Len(t, e.ledger.posted, 2)
+	for _, r := range e.ledger.posted {
+		assert.Equal(t, RewardKey(res.ReferralID, r.Side), r.IdempotencyKey)
+		assert.Equal(t, "referral:"+res.ReferralID.String()+":"+r.Side, r.IdempotencyKey)
+	}
+	// A job run again (a retry) posts nothing more.
+	got, err := e.svc.PostRewards(e.ctx, res.ReferralID)
+	require.NoError(t, err)
+	assert.Equal(t, RewardResult{Done: true}, got)
+	assert.Len(t, e.ledger.posted, 2)
+}
+
+// Without a queue the sweep alone posts: the referral is due at once.
+func TestNoQueueTheSweepPosts(t *testing.T) {
+	e := newEnv(t)
+	e.svc.jobs = nil
+	_, code := e.customer(testNow.Add(-30 * 24 * time.Hour))
+	_, store, _, _, _ := e.shopWithStore()
+	u, _ := e.newCustomer()
+	res, err := e.claim(u, ClaimInput{Code: code})
+	require.NoError(t, err)
+	e.complete(e.order(u, store, 10_000, 0))
+	assert.Empty(t, e.ledger.posted)
+	assert.EqualValues(t, 1, e.sweep(0)["rewarded"])
+	st, _, _ := e.referral(res.ReferralID)
+	assert.Equal(t, statusRewarded, st)
+}
+
+// Stuck referrals back off and the sweep reads due rows oldest first, so
+// more than a batch of stuck ones cannot starve fresh ones.
+func TestStuckRewardsDoNotStarveFreshOnes(t *testing.T) {
+	e := newEnv(t)
+	e.svc.jobs = nil // the sweep alone posts
+	_, code := e.customer(testNow.Add(-30 * 24 * time.Hour))
+	_, store, _, _, _ := e.shopWithStore()
+	e.ledger.fail = map[ids.ID]bool{}
+	stuck := sweepBatch + 20
+	for range stuck {
+		e.clk.Advance(time.Second)
+		u, _ := e.newCustomer()
+		res, err := e.claim(u, ClaimInput{Code: code})
+		require.NoError(t, err)
+		e.ledger.fail[res.ReferralID] = true
+		e.complete(e.order(u, store, 10_000, 0))
+	}
+	var fresh []ids.ID
+	for range 3 {
+		e.clk.Advance(time.Second)
+		u, _ := e.newCustomer()
+		res, err := e.claim(u, ClaimInput{Code: code})
+		require.NoError(t, err)
+		e.complete(e.order(u, store, 10_000, 0))
+		fresh = append(fresh, res.ReferralID)
+	}
+
+	// The first pass takes the oldest due batch: all stuck, all fail.
+	out := e.sweep(0)
+	assert.EqualValues(t, sweepBatch, out["waiting"])
+	assert.Zero(t, out["rewarded"])
+	// Those back off, so the next pass reaches the rest and the fresh ones.
+	out = e.sweep(time.Minute)
+	assert.EqualValues(t, stuck-sweepBatch, out["waiting"])
+	assert.EqualValues(t, len(fresh), out["rewarded"])
+	for _, id := range fresh {
+		st, a, b := e.referral(id)
+		assert.Equal(t, statusRewarded, st)
+		assert.True(t, a && b)
+	}
+	// Nothing is due until the backoff passes.
+	out = e.sweep(time.Minute)
+	assert.Zero(t, out["waiting"]+out["rewarded"])
+	assert.Equal(t, stuck, e.count(`SELECT count(*) FROM referrals WHERE status = 'qualified' AND attempts = 1`))
+	assert.EqualValues(t, sweepBatch, e.sweep(rewardRetryBase)["waiting"])
 }
 
 // A deleted referrer is not paid; the side is closed without a posting.
@@ -1123,15 +1333,20 @@ func TestAccountDelete(t *testing.T) {
 	assert.Equal(t, statusRejected, st)
 }
 
-// Without the database, settings or the hash key every route answers 503.
+// Without the database, settings or the hash key every route answers 503;
+// a missing clock or ledger is a wiring error.
 func TestNotConfigured(t *testing.T) {
-	svc, err := New(Deps{Clock: clock.NewFake(testNow)})
+	svc, err := New(Deps{Clock: clock.NewFake(testNow), Ledger: &fakeLedger{}})
 	require.NoError(t, err)
+	_, err = svc.PostRewards(context.Background(), ids.New(testNow))
+	require.Error(t, err)
 	_, err = svc.Open(context.Background(), Click{Code: "ABCDEF"})
 	requireProblem(t, err, genproblems.ServiceUnavailable)
 	_, err = svc.ClaimCustomer(context.Background(), ids.New(testNow), ids.New(testNow), ClaimInput{Code: "ABCDEF"})
 	requireProblem(t, err, genproblems.ServiceUnavailable)
 	require.NoError(t, svc.OnPurchaseCompleted(context.Background(), Outcome{}), "the purchase hook is a no-op")
-	_, err = New(Deps{})
-	require.Error(t, err)
+	_, err = New(Deps{Ledger: &fakeLedger{}})
+	require.Error(t, err, "no clock")
+	_, err = New(Deps{Clock: clock.NewFake(testNow)})
+	require.Error(t, err, "no ledger")
 }

@@ -189,3 +189,39 @@ Checks, with `-p 2` on the shared test Postgres:
 Questions (the conservative reading is what is built):
 - `referral_sweep` stays `ClassMaintenance`, though it now moves money. `ClassMoney` would also make it require a runbook, and it names one anyway. Should it change class?
 - While a `referral.reward_refused` flag is open, the whole referral is parked, including the other side if that side is unposted for another reason. A per-side park would need a column (a migration).
+
+## Addendum: review fixes, rewards post after the purchase commits (24 Oct, D-169)
+
+The review of ff9a29f found no blockers. These are its fixes.
+
+**1. Deadlock: the reward is out of the purchase transaction.**
+- The purchase's transaction only qualifies the referral and enqueues `referral_reward` with `InsertTx` (`EnqueueOpts.UniqueKey` `referral:<id>`), in a savepoint. A failed enqueue is logged and the sweep posts it, since a newly qualified referral is due at once.
+- The new `referral_reward` job (ClassMoney, 3 attempts, `backend/internal/jobs/referrals.go`) calls `Service.PostRewards`. It posts each side in its own transaction, so each posting is a single `LockBalances` call. Lock order: ledger accounts, then the referral row (`FOR UPDATE`, rechecked; a change rolls the side back). `PostRewards` refuses to run inside a caller's transaction.
+- `referral_sweep` stays the backstop.
+- Reproduced first: with the posting put back inside the purchase transaction, `S` given a cashback rate so `Complete` locks it, the race failed with `40P01` in 20 of 20 rounds. With the fix, `TestReferralRewardConcurrentWithReferrersOrderDB` (20 rounds, `-race`, run 3 times) has no errors. The referrer's wallet ends at 1000 + rewards − credits spent + cashback.
+
+**2. Stuck retries.**
+- Migration `20303_w2-03_reward_attempts.sql` adds `referrals.attempts` and `next_attempt_at` (with a check and the partial index `ix_referrals_reward_due`). Already-qualified rows are backfilled with `next_attempt_at = qualified_at`.
+- The backoff is 10 min after the first failed pass, doubling, capped at 6 h.
+- `QualifiedReferrals` reads only due rows, `ORDER BY next_attempt_at, id`.
+- A payWait side (a store referrer with no live store) gets the backoff. A blocked referrer and a refused reward stay out of the batch by query until their condition changes.
+- There is a new `tz_referral_reward_failed_total{reason}` (`ledger_error`, `refused`, `error`), and `waiting` is in the sweep and job summaries.
+- `TestStuckRewardsDoNotStarveFreshOnes`: 220 stuck plus 3 fresh. The first sweep takes 200 stuck; the second takes the other 20 and posts the 3 fresh; the third has nothing due; after the backoff, 200 again.
+
+**3. Tests** (`backend/internal/jobs/referrals_test.go`, real `credits.Service`):
+- `TestReferralRewardSQLErrorRollsBackTheSideDB`: the poster posts, then runs `SELECT 1/0` on `db.TxFrom(ctx)`. The side's transaction rolls back (no ledger tx for its key, the wallet unchanged), the other side posts, and the next due sweep posts the failed side once.
+- `TestReferralRewardDuplicateDB`: an identical posting made first returns `Duplicate` with the same id. No new tx, one lot, and the referral stores the first tx id.
+- `TestReferralReversedAfterPostingDB`: both sides posted, then reversed. The flag is raised, and the wallets, lots and `platform_marketing` are unchanged.
+- `TestReferralRewardsPostToCreditsDB` now checks the exact key per side and `ref_type`/`ref_id` on the posted rows.
+- `TestReferralRewardStoreRefusedDB`: a refused store beneficiary is parked with a flag.
+- `TestShopRewardWaitsForAStore` (referrals package): reversed while the store side waits, the referral stays qualified with one flag, and the store side is paid later.
+
+**4. Guard.** `referrals.New` returns an error with a nil `Ledger`, and `NoLedger` is deleted. The tests use their own fake ledgers. The `seams.go` doc no longer says "switched off".
+
+**5. Docs.** D-161 fixed in place (posts after commit; the ledger is implemented, no longer "a seam until W2-01 merges"). D-169 extended (after-commit design, lock order, backoff, metric, the reversal-while-waiting rule). The runbook's "Referral rewards" section rewritten.
+
+Questions (the conservative reading is what is built):
+- **The backoff is code, not a setting.** 10 min, doubling, 6 h cap is operational pacing like the sweep's schedule, so it is not in `platform_settings`. Should it be configurable?
+- **A store referrer with no live store backs off.** Its reward can therefore lag up to 6 h after the store goes live. Excluding it from the batch by query, as for a blocked referrer, would need a join on stores. The backoff was the simpler choice the review allowed.
+- **Reversal while one side waits.** 01 §7 says "if it has posted, the reward stays". It is read as "if either side has posted", so the waiting side is still paid later and a flag is raised. The other reading would void the waiting side.
+- **Without the job queue** (`Deps.Jobs` nil, only in tests), the sweep posts within about 10 min. The app always passes the enqueuer.
