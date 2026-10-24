@@ -176,7 +176,7 @@
     "description": "C-06 empty state when the category slug is unknown"
   },
   "category.notFound.body": {
-    "defaultMessage": "It may have been renamed. Pick a category from Home.",
+    "defaultMessage": "It may have been renamed. Pick a category on the home screen.",
     "description": "C-06 unknown category body"
   },
   "category.shops": {
@@ -192,7 +192,7 @@
     "description": "C-06 empty state body"
   },
   "category.home": {
-    "defaultMessage": "Back to Home",
+    "defaultMessage": "Back to home",
     "description": "C-06 link back to Home"
   },
   "home.category.page": {
