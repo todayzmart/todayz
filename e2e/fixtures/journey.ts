@@ -283,9 +283,38 @@ export async function openApp(browser: Browser, who: Principal, baseURL: string)
   };
 }
 
+/**
+ * Waits until the customer app's saved cart (IndexedDB `todayz-customer`, customer/src/cart/storage.ts)
+ * holds at least one line. The app writes after each change; a full page load before the write lands
+ * aborts it, so a journey calls this before it navigates or reloads.
+ */
+export async function cartSaved(page: Page) {
+  await expect
+    .poll(
+      () =>
+        page.evaluate(
+          () =>
+            new Promise<number>((done) => {
+              const req = indexedDB.open('todayz-customer');
+              req.onerror = () => done(0);
+              req.onsuccess = () => {
+                const db = req.result;
+                if (!db.objectStoreNames.contains('cart')) return done(0);
+                const get = db.transaction('cart', 'readonly').objectStore('cart').get('current');
+                get.onsuccess = () => done((get.result as { lines?: unknown[] } | undefined)?.lines?.length ?? 0);
+                get.onerror = () => done(0);
+              };
+            }),
+        ),
+      { message: 'the cart is saved in the browser' },
+    )
+    .toBeGreaterThan(0);
+}
+
 /** C-09 → C-11 → C-12: checks out the cart for pickup and returns the new order's id. */
 export async function checkoutCart(page: Page): Promise<string> {
-  await page.goto('/cart');
+  await cartSaved(page);
+  if (new URL(page.url()).pathname !== '/cart') await page.goto('/cart');
   await expect(page.getByRole('heading', { level: 1, name: 'Cart' })).toBeVisible();
   await page.getByRole('button', { name: /Checkout/ }).first().click();
   await expect(page.getByRole('heading', { level: 1, name: 'Checkout' })).toBeVisible();

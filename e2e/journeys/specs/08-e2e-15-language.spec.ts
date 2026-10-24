@@ -1,4 +1,4 @@
-import { Customer, checkoutCart, customerFirstRun, expect, openApp, Shop, test, URLS } from '../../fixtures/journey';
+import { Customer, cartSaved, checkoutCart, customerFirstRun, expect, openApp, Shop, test, URLS } from '../../fixtures/journey';
 import { STORES } from '../../fixtures/seed';
 
 // E2E-15 (builder-written): the customer switches language in the middle of a journey. The cart
@@ -14,8 +14,10 @@ test('E2E-15 language switch mid-journey keeps the cart and finishes the order',
     await test.step('put an item in the cart from search', async () => {
       await page.goto('/search?q=milk');
       await page.getByRole('button', { name: /^Add, / }).first().click();
+      await cartSaved(page);
       await page.goto('/cart');
       await expect(page.getByRole('heading', { level: 1, name: 'Cart' })).toBeVisible();
+      await expect(page.getByRole('button', { name: /Checkout/ }).first(), 'the cart holds the item').toBeVisible();
     });
     const cartText = await page.locator('main').innerText();
 
@@ -47,7 +49,7 @@ test('E2E-15 language switch mid-journey keeps the cart and finishes the order',
     await test.step('switch back to English', async () => {
       await page.goto('/language');
       await page.getByRole('button', { name: /English/ }).click();
-      await expect.poll(() => page.evaluate(() => document.documentElement.lang)).toBe('en');
+      await expect.poll(() => page.evaluate(() => document.documentElement.lang), 'English keeps the en-IN tag (shared/i18n locales.ts)').toBe('en-IN');
     });
   } finally {
     await app.close();
