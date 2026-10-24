@@ -1,0 +1,286 @@
+{
+  "onboarding.title": {
+    "defaultMessage": "Shop setup",
+    "description": "Page title"
+  },
+  "onboarding.loading": {
+    "defaultMessage": "Loading your shop setup",
+    "description": "Loading label"
+  },
+  "onboarding.loadFailed.title": {
+    "defaultMessage": "We could not load your shop",
+    "description": "Load failed"
+  },
+  "onboarding.loadFailed.body": {
+    "defaultMessage": "Check your connection and try again.",
+    "description": "Load failed"
+  },
+  "onboarding.retry": {
+    "defaultMessage": "Try again",
+    "description": "Button"
+  },
+  "onboarding.ownerOnly.title": {
+    "defaultMessage": "Only the owner can set up the shop",
+    "description": "No access"
+  },
+  "onboarding.ownerOnly.body": {
+    "defaultMessage": "Ask your shop owner to finish the setup.",
+    "description": "No access"
+  },
+  "onboarding.step": {
+    "defaultMessage": "Step {n}: {title}",
+    "description": "Step heading"
+  },
+  "onboarding.done": {
+    "defaultMessage": "Done",
+    "description": "Step done pill"
+  },
+  "onboarding.saved": {
+    "defaultMessage": "Saved",
+    "description": "Toast"
+  },
+  "onboarding.save": {
+    "defaultMessage": "Save",
+    "description": "Button"
+  },
+  "onboarding.business.title": {
+    "defaultMessage": "About your shop",
+    "description": "Step title"
+  },
+  "onboarding.business.brandName": {
+    "defaultMessage": "Shop name",
+    "description": "Field"
+  },
+  "onboarding.business.brandNameHelp": {
+    "defaultMessage": "The name customers see.",
+    "description": "Field help"
+  },
+  "onboarding.business.brandNameRequired": {
+    "defaultMessage": "Enter your shop name.",
+    "description": "Field error"
+  },
+  "onboarding.business.legalName": {
+    "defaultMessage": "Registered business name",
+    "description": "Field"
+  },
+  "onboarding.business.legalNameHelp": {
+    "defaultMessage": "As on your PAN or GST certificate. You can add it later.",
+    "description": "Field help"
+  },
+  "onboarding.business.category": {
+    "defaultMessage": "What do you sell",
+    "description": "Field"
+  },
+  "onboarding.business.categoryNone": {
+    "defaultMessage": "Choose a category",
+    "description": "Select placeholder"
+  },
+  "onboarding.store.title": {
+    "defaultMessage": "Your first store",
+    "description": "Step title"
+  },
+  "onboarding.store.have": {
+    "defaultMessage": "Store added: {name}.",
+    "description": "Store step done"
+  },
+  "onboarding.store.manage": {
+    "defaultMessage": "Manage stores",
+    "description": "Link"
+  },
+  "onboarding.store.create": {
+    "defaultMessage": "Add store",
+    "description": "Button"
+  },
+  "onboarding.hours.title": {
+    "defaultMessage": "Opening hours",
+    "description": "Step title"
+  },
+  "onboarding.payout.title": {
+    "defaultMessage": "Payout details",
+    "description": "Step title"
+  },
+  "onboarding.payout.body": {
+    "defaultMessage": "Where we pay you. You can add this now or later; it is not needed to send your shop for review.",
+    "description": "Step help"
+  },
+  "onboarding.docs.title": {
+    "defaultMessage": "Documents",
+    "description": "Step title"
+  },
+  "onboarding.docs.help": {
+    "defaultMessage": "Photos or PDFs, up to 10 MB each. Documents are kept private and only our review team sees them.",
+    "description": "Help"
+  },
+  "onboarding.docs.kind.pan": {
+    "defaultMessage": "PAN card",
+    "description": "Document kind"
+  },
+  "onboarding.docs.kind.gst": {
+    "defaultMessage": "GST certificate",
+    "description": "Document kind"
+  },
+  "onboarding.docs.kind.shop_photo": {
+    "defaultMessage": "Photo of the inside of the shop",
+    "description": "Document kind"
+  },
+  "onboarding.docs.kind.storefront": {
+    "defaultMessage": "Photo of the shop front",
+    "description": "Document kind"
+  },
+  "onboarding.docs.kind.license": {
+    "defaultMessage": "Trade licence",
+    "description": "Document kind"
+  },
+  "onboarding.docs.status.pending": {
+    "defaultMessage": "Uploading",
+    "description": "Document status"
+  },
+  "onboarding.docs.status.uploaded": {
+    "defaultMessage": "Received",
+    "description": "Document status"
+  },
+  "onboarding.docs.status.accepted": {
+    "defaultMessage": "Accepted",
+    "description": "Document status"
+  },
+  "onboarding.docs.status.rejected": {
+    "defaultMessage": "Rejected",
+    "description": "Document status"
+  },
+  "onboarding.docs.add": {
+    "defaultMessage": "Add {name}",
+    "description": "Button"
+  },
+  "onboarding.docs.added": {
+    "defaultMessage": "{name} added",
+    "description": "Toast"
+  },
+  "onboarding.docs.err.type": {
+    "defaultMessage": "Use a JPG, PNG or WebP photo, or a PDF.",
+    "description": "File error"
+  },
+  "onboarding.docs.err.size": {
+    "defaultMessage": "This file is bigger than 10 MB.",
+    "description": "File error"
+  },
+  "onboarding.docs.err.empty": {
+    "defaultMessage": "This file is empty.",
+    "description": "File error"
+  },
+  "onboarding.docs.uploadFailed": {
+    "defaultMessage": "The file did not upload. Check your connection and add it again.",
+    "description": "File error"
+  },
+  "onboarding.submit.title": {
+    "defaultMessage": "Send for review",
+    "description": "Step title"
+  },
+  "onboarding.submit.body": {
+    "defaultMessage": "We check your details and call if we need anything. You can keep using TodayZ for orders while we review.",
+    "description": "Step help"
+  },
+  "onboarding.submit.action": {
+    "defaultMessage": "Send for review",
+    "description": "Button"
+  },
+  "onboarding.submit.sent": {
+    "defaultMessage": "Sent for review",
+    "description": "Toast"
+  },
+  "onboarding.status.submitted.title": {
+    "defaultMessage": "Your shop is in review",
+    "description": "Banner"
+  },
+  "onboarding.status.submitted.body": {
+    "defaultMessage": "We will tell you when it is done.",
+    "description": "Banner"
+  },
+  "onboarding.status.needs_info.title": {
+    "defaultMessage": "We need a little more from you",
+    "description": "Banner"
+  },
+  "onboarding.status.needs_info.body": {
+    "defaultMessage": "Please fix these and send for review again.",
+    "description": "Banner"
+  },
+  "onboarding.status.verified.title": {
+    "defaultMessage": "Your shop is verified",
+    "description": "Banner"
+  },
+  "onboarding.status.verified.body": {
+    "defaultMessage": "Customers can find your live stores.",
+    "description": "Banner"
+  },
+  "onboarding.status.rejected.title": {
+    "defaultMessage": "Your shop was not approved",
+    "description": "Banner"
+  },
+  "onboarding.status.rejected.body": {
+    "defaultMessage": "Contact support if you think this is a mistake.",
+    "description": "Banner"
+  },
+  "onboarding.status.suspended.title": {
+    "defaultMessage": "Your shop is suspended",
+    "description": "Banner"
+  },
+  "onboarding.status.suspended.body": {
+    "defaultMessage": "Contact support to find out why.",
+    "description": "Banner"
+  },
+  "onboarding.field.categoryId": {
+    "defaultMessage": "What you sell",
+    "description": "Missing detail"
+  },
+  "onboarding.field.stores": {
+    "defaultMessage": "A store",
+    "description": "Missing detail"
+  },
+  "onboarding.field.addressLine1": {
+    "defaultMessage": "Store address",
+    "description": "Missing detail"
+  },
+  "onboarding.field.city": {
+    "defaultMessage": "City",
+    "description": "Missing detail"
+  },
+  "onboarding.field.pincode": {
+    "defaultMessage": "Pincode",
+    "description": "Missing detail"
+  },
+  "onboarding.field.location": {
+    "defaultMessage": "Map location",
+    "description": "Missing detail"
+  },
+  "onboarding.field.phone": {
+    "defaultMessage": "Store phone",
+    "description": "Missing detail"
+  },
+  "onboarding.field.hours": {
+    "defaultMessage": "Opening hours",
+    "description": "Missing detail"
+  },
+  "onboarding.field.brandName": {
+    "defaultMessage": "Shop name",
+    "description": "Missing detail"
+  },
+  "onboarding.field.legalName": {
+    "defaultMessage": "Registered business name",
+    "description": "Missing detail"
+  },
+  "onboarding.field.pan": {
+    "defaultMessage": "PAN",
+    "description": "Missing detail"
+  },
+  "onboarding.field.gstin": {
+    "defaultMessage": "GSTIN",
+    "description": "Missing detail"
+  },
+  "onboarding.field.documents": {
+    "defaultMessage": "Documents",
+    "description": "Missing detail"
+  },
+  "onboarding.field.other": {
+    "defaultMessage": "Some other detail",
+    "description": "Missing detail"
+  }
+}
