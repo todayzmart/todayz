@@ -2,6 +2,7 @@ package orders
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/todayz/backend/internal/platform/ids"
@@ -15,6 +16,9 @@ type PriceLine struct {
 	StoreItemID, ProductID ids.ID
 	UnitPricePaise         int64
 	Quantity               int
+	// Fixed marks an ask reply's price: no item offer applies to the line
+	// (D-101).
+	Fixed bool
 }
 
 // AppliedOffer is one offer that took money off the bill.
@@ -46,6 +50,27 @@ type NoOffers struct{}
 func (NoOffers) Price(_ context.Context, _, _ ids.ID, lines []PriceLine) (Pricing, error) {
 	return Pricing{LineDiscounts: make([]int64, len(lines))}, nil
 }
+
+// ErrOfferGone is what a Redeemer returns when an offer ran out between the
+// quote and the order; the checkout prices again and answers price_changed.
+var ErrOfferGone = errors.New("orders: an offer is no longer available")
+
+// Redeemer counts the offers an order used against their limits, in the
+// order's transaction (W2-07). Release gives them back when the order ends
+// without being collected.
+type Redeemer interface {
+	Redeem(ctx context.Context, orderID, customerID ids.ID, applied []AppliedOffer) error
+	Release(ctx context.Context, orderID ids.ID) error
+}
+
+// NoRedeem is the Redeemer when there are no offers: nothing to count.
+type NoRedeem struct{}
+
+// Redeem implements Redeemer.
+func (NoRedeem) Redeem(context.Context, ids.ID, ids.ID, []AppliedOffer) error { return nil }
+
+// Release implements Redeemer.
+func (NoRedeem) Release(context.Context, ids.ID) error { return nil }
 
 // AskPrice is a shop's replied price for one item (D-101).
 type AskPrice struct {

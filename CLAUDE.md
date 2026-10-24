@@ -54,6 +54,7 @@ Caddy runs on the host (`brew` caddy, local CA via `caddy trust`) and terminates
 | OTLP gRPC / HTTP | 4317 / 4318 | |
 | Prometheus (otel-lgtm) | 9390 | |
 | postgres_exporter | 9187 | |
+| Shared test Postgres (opt-in, `make testpg-up`) | 5439 | Go tests only, via `TODAYZ_TEST_PG_URL_FILE` |
 | API (`todayz api`) | 8180 | https://api.todayz.localhost |
 | Worker health (`todayz worker`) | 8181 | (loopback only, `/healthz`, `/readyz`) |
 | Mocks server | 4010 | https://mocks.todayz.localhost |

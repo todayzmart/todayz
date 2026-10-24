@@ -1,12 +1,360 @@
-# Paths: domain "offers" (owner W3-01): offers (04 §2.6).
+# Paths: domain "offers" (owner W2-07): offers, offer previews and Offers near you (04 §2.6).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [offers]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/offers.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Manager and above (`offers.manage`, 02 §3.3). An offer's terms cannot change after it is made:
+# pause or end it and make a new one. `GET /v1/discover/offers` is public.
+/v1/biz/businesses/{bid}/stores/{sid}/offers:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listOffers
+    tags: [offers]
+    summary: The store's offers (B-08)
+    description: >-
+      Manager and above. Newest first. `status` keeps one state.
+    parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: ../schemas/offers.yaml#/OfferStatus
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: One page of offers
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/offers.yaml#/OfferList
+            example:
+              items:
+                - id: 01KE0F1A2B3C4D5E6F7G8H9J0K
+                  storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                  title: 20% off
+                  kind: percent
+                  value: 20
+                  buyQty: null
+                  getQty: null
+                  minBillPaise: null
+                  scope: store
+                  storeItemIds: []
+                  categoryId: null
+                  channels: both
+                  perCustomerLimit: null
+                  maxRedemptions: null
+                  redemptions: 3
+                  startsAt: "2026-10-24T05:00:00Z"
+                  endsAt: "2026-10-31T18:29:59Z"
+                  status: live
+                  source: manual
+                  batchId: null
+                  version: 1
+                  createdAt: "2026-10-24T05:00:00Z"
+                  updatedAt: "2026-10-24T05:00:00Z"
+              nextCursor: null
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: createOffer
+    tags: [offers]
+    summary: Make an offer
+    description: >-
+      Manager and above (`offers.manage`). Percent, flat, buy X get Y, minimum bill and flash (`batchId`).
+      The offer is live at once, or `scheduled` when `startsAt` is later. `422 validation_failed` names the
+      field when the terms do not make sense (a percent over 90, an item of another shop, a second open flash
+      offer on the batch).
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/offers.yaml#/OfferCreate
+          example:
+            kind: percent
+            value: 20
+            scope: store
+            endsAt: "2026-10-31T18:29:59Z"
+    responses:
+      "201":
+        description: The offer
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/offers.yaml#/Offer
+            example:
+              id: 01KE0F1A2B3C4D5E6F7G8H9J0K
+              storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              title: 20% off
+              kind: percent
+              value: 20
+              buyQty: null
+              getQty: null
+              minBillPaise: null
+              scope: store
+              storeItemIds: []
+              categoryId: null
+              channels: both
+              perCustomerLimit: null
+              maxRedemptions: null
+              redemptions: 3
+              startsAt: "2026-10-24T05:00:00Z"
+              endsAt: "2026-10-31T18:29:59Z"
+              status: live
+              source: manual
+              batchId: null
+              version: 1
+              createdAt: "2026-10-24T05:00:00Z"
+              updatedAt: "2026-10-24T05:00:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/offers/{offerId}:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: offerId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getOffer
+    tags: [offers]
+    summary: One offer
+    description: Manager and above.
+    responses:
+      "200":
+        description: The offer
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/offers.yaml#/Offer
+            example:
+              id: 01KE0F1A2B3C4D5E6F7G8H9J0K
+              storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              title: 20% off
+              kind: percent
+              value: 20
+              buyQty: null
+              getQty: null
+              minBillPaise: null
+              scope: store
+              storeItemIds: []
+              categoryId: null
+              channels: both
+              perCustomerLimit: null
+              maxRedemptions: null
+              redemptions: 3
+              startsAt: "2026-10-24T05:00:00Z"
+              endsAt: "2026-10-31T18:29:59Z"
+              status: live
+              source: manual
+              batchId: null
+              version: 1
+              createdAt: "2026-10-24T05:00:00Z"
+              updatedAt: "2026-10-24T05:00:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  patch:
+    operationId: updateOffer
+    tags: [offers]
+    summary: Pause, resume or end an offer, or change its dates and limits
+    description: >-
+      Manager and above (`offers.manage`). Needs `If-Match`. Pausing an offer takes it out of every price at
+      once; an order already placed keeps its price. `ended` is final (`409 invalid_transition` from it).
+    x-idempotency: none
+    parameters:
+      - $ref: ../common/parameters.yaml#/IfMatch
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/offers.yaml#/OfferUpdate
+          example:
+            status: paused
+    responses:
+      "200":
+        description: The offer after the change
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/offers.yaml#/Offer
+            example:
+              id: 01KE0F1A2B3C4D5E6F7G8H9J0K
+              storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              title: 20% off
+              kind: percent
+              value: 20
+              buyQty: null
+              getQty: null
+              minBillPaise: null
+              scope: store
+              storeItemIds: []
+              categoryId: null
+              channels: both
+              perCustomerLimit: null
+              maxRedemptions: null
+              redemptions: 3
+              startsAt: "2026-10-24T05:00:00Z"
+              endsAt: "2026-10-31T18:29:59Z"
+              status: paused
+              source: manual
+              batchId: null
+              version: 2
+              createdAt: "2026-10-24T05:00:00Z"
+              updatedAt: "2026-10-24T05:00:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/offer-previews:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: previewOffer
+    tags: [offers]
+    summary: How an unsaved offer looks
+    description: >-
+      Manager and above. Prices a sample cart of this shop's items with the shop's live offers and the new
+      one, through the same code the checkout and the POS use. Saves nothing.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/offers.yaml#/OfferPreviewRequest
+          example:
+            offer:
+              kind: percent
+              value: 20
+              scope: store
+            lines:
+              - storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                quantity: 2
+    responses:
+      "200":
+        description: The sample cart priced
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/offers.yaml#/OfferPreview
+            example:
+              title: 20% off
+              lines:
+                - storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                  quantity: 2
+                  unitPricePaise: 5800
+                  grossPaise: 11600
+                  discountPaise: 2320
+                  totalPaise: 9280
+                  freeUnits: 0
+                  byThisOffer: true
+              grossPaise: 11600
+              itemDiscountPaise: 2320
+              billDiscountPaise: 0
+              totalPaise: 9280
+              totalWithoutPaise: 11600
+              applies: true
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/discover/offers:
+  get:
+    operationId: listNearbyOffers
+    tags: [offers]
+    summary: Offers near you (C-03)
+    description: >-
+      Public. Shop banners and the best offer of each shop inside the radius, with at most one card per shop,
+      rotating fairly among nearby shops (01 §5.5). Banners shown here count as impressions. Coordinates are
+      never stored or logged. `limit` is the carousel size (default and maximum are the page size of the feed).
+    security: []
+    parameters:
+      - name: lat
+        in: query
+        required: true
+        description: Latitude of the customer's location (WGS 84, inside India). Never stored.
+        schema:
+          type: number
+          format: double
+          minimum: 6
+          maximum: 38
+        example: 12.9719
+      - name: lng
+        in: query
+        required: true
+        description: Longitude of the customer's location. Never stored.
+        schema:
+          type: number
+          format: double
+          minimum: 68
+          maximum: 98
+        example: 77.6412
+      - name: radius
+        in: query
+        description: 'Radius in metres: the 1, 2, 5, 10 and 20 km chips (01 §11).'
+        schema:
+          type: integer
+          enum: [1000, 2000, 5000, 10000, 20000]
+          default: 2000
+    responses:
+      "200":
+        description: The carousel
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/offers.yaml#/NearbyOffers
+            example:
+              items:
+                - kind: offer
+                  storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                  storeSlug: lakshmi-traders-indiranagar
+                  storeName: Lakshmi Traders
+                  locality: Indiranagar
+                  tint: green
+                  distanceM: 640
+                  offer:
+                    id: 01KE0F1A2B3C4D5E6F7G8H9J0K
+                    title: 20% off
+                    kind: percent
+                    value: 20
+                    minBillPaise: null
+                    endsAt: "2026-10-31T18:29:59Z"
+                  banner: null
+              serverNow: "2026-10-24T05:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem

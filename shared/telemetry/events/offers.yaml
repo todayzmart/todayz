@@ -1,0 +1,23 @@
+# Product events: offers (05 §2.6). Owner W2-07. Emitted by the API (app 'api').
+# One file per domain (D-50); an event name may be defined in only one file.
+domain: offers
+owner: W2-07
+events:
+  offer_created:
+    emitter: server
+    description: A shop made an offer (POST {S}/offers), or the flash-expiry flow made one from a batch.
+    props:
+      kind: { type: enum, values: [percent, flat, bxgy, bill_min] }
+      scope: { type: enum, values: [store, items, category] }
+      channels: { type: enum, values: [online, pos, both] }
+      source: { type: enum, values: [manual, flash_expiry, coach_suggestion] }
+  offer_redeemed:
+    emitter: server
+    description: >-
+      An offer took money off an order or a POS sale that was placed (not a quote).
+      Released redemptions (a cancelled order) are not events; discount_paise is
+      this offer's share of the bill.
+    props:
+      offer_id: { type: ulid }
+      channel: { type: enum, values: [online, pos] }
+      discount_paise: { type: int, min: 1 }
