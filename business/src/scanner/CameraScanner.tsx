@@ -3,6 +3,7 @@
 // TODO(lead): a ZXing fallback for the remaining browsers needs a new dependency (D-88); not added.
 import { Button } from '@todayz/ui';
 import { useEffect, useRef, useState } from 'react';
+import styles from './scanner.module.css';
 
 interface DetectedBarcode {
   rawValue: string;
@@ -98,7 +99,7 @@ export function CameraScanner({ labels, onDetect, onClose }: CameraScannerProps)
     <div>
       {(phase === 'starting' || phase === 'live') && (
         <>
-          <video ref={video} muted playsInline aria-label={labels.hint} style={{ width: '100%', borderRadius: 'var(--radius-md)', background: 'var(--ink-1)' }} />
+          <video ref={video} muted playsInline aria-label={labels.hint} className={styles.video} />
           <p className="tz-sub" role="status">
             {phase === 'starting' ? labels.starting : labels.hint}
           </p>

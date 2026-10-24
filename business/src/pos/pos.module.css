@@ -1,0 +1,241 @@
+/* B-05 Sell layout. Looks come from bundle.css (tz-*) and @todayz/ui; this file only places them.
+   Tokens only. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.headActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.counter {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@media (width >= 1024px) {
+  .counter {
+    grid-template-columns: minmax(0, 1fr) 380px;
+  }
+}
+
+.browse {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.searchRow > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tileMeta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.tileDim {
+  opacity: 0.55;
+}
+
+.tileWarn {
+  color: var(--warning);
+}
+
+.cart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.cartHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.cartSheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.totals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  color: var(--ink-2);
+  font: var(--type-body);
+}
+
+.totalsRow {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.linkRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  font: var(--type-body-sm);
+  color: var(--ink-2);
+}
+
+.linkRow strong {
+  color: var(--ink);
+}
+
+.cartBar {
+  position: sticky;
+  bottom: var(--space-3);
+  z-index: 1;
+}
+
+.statusLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--type-caption);
+  color: var(--ink-3);
+}
+
+.sheetBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.option {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.qrBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.qr {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.formRow {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.formRow > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.history {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sale {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.saleTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.saleTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+}
+
+.saleActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.notes {
+  margin: 0;
+  padding-left: var(--space-4);
+  color: var(--ink-2);
+  font: var(--type-body-sm);
+}
+
+.success {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
