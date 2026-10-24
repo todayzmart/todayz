@@ -200,6 +200,7 @@ How it works (W0-03, `platform/idempotency`):
 | POST | /v1/me/referrals/claim | W2-03 | `{code}` at sign-up (also auto from the attribution cookie; first touch, 7-day window: D-32) |
 | POST | /v1/me/bill-claims/{token}/preview | W2-04 | scanned bill QR → store, amount, max credits |
 | POST | /v1/me/bill-claims/{token}/confirm | W2-04 | `{creditsToUse}` → links sale (`bill_qr`), holds/captures credits |
+| GET | /v1/me/reviews | W2-06 | my reviews, newest first (added by D-140) |
 | POST | /v1/me/reviews | W2-06 | `{orderId|posSaleId, stars, text, tags: ReviewTagPositive[] | ReviewTagNegative[]}` |
 | PATCH | /v1/me/reviews/{reviewId} | W2-06 | own review, within `review_edit_window_days`; `409 review_edit_window_passed` after that |
 | POST | /v1/me/review-reports | W2-06 | `{reviewId, reason}`; report someone else's review |
@@ -410,11 +411,12 @@ Priced above nearby is returned only while `insight_price_compare_enabled` is tr
 | Banners | GET | /v1/admin/banners?moderation= | support, admin | W3-05 | A-20 queue: image check unsure, reported (D-46); banner moderation is support and above (D-64) |
 | Banners | POST | /v1/admin/banners/{bannerId}/approve | support, admin | W3-05 | |
 | Banners | POST | /v1/admin/banners/{bannerId}/takedown | support, admin | W3-05 | `{reason}`; audited |
-| Reviews | GET | /v1/admin/reviews | support, admin | W3-05 | |
-| Reviews | POST | /v1/admin/reviews/{reviewId}/hide | support, admin | W3-05 | `{reason}`; audited |
-| Reviews | POST | /v1/admin/reviews/{reviewId}/restore | support, admin | W3-05 | `{reason}`; audited (D-41) |
-| Reviews | GET | /v1/admin/review-reports | support, admin | W3-05 | |
-| Reviews | POST | /v1/admin/review-reports/{reportId}/resolve | support, admin | W3-05 | |
+| Reviews | GET | /v1/admin/reviews | support, admin | W2-06 (console: W3-05) | |
+| Reviews | POST | /v1/admin/reviews/{reviewId}/hide | support, admin | W2-06 (console: W3-05) | `{reason}`; audited |
+| Reviews | POST | /v1/admin/reviews/{reviewId}/restore | support, admin | W2-06 (console: W3-05) | `{reason}`; audited (D-41) |
+| Reviews | POST | /v1/admin/reviews/{reviewId}/reply/hide, .../reply/restore | support, admin | W2-06 (console: W3-05) | `{reason}`; audited (D-140) |
+| Reviews | GET | /v1/admin/review-reports | support, admin | W2-06 (console: W3-05) | |
+| Reviews | POST | /v1/admin/review-reports/{reportId}/resolve | support, admin | W2-06 (console: W3-05) | |
 | Credits | GET | /v1/admin/ledger/accounts?q= | finance, admin | W3-01 | |
 | Credits | GET | /v1/admin/ledger/accounts/{accountId}/entries | finance, admin | W3-01 | |
 | Credits | GET | /v1/admin/credits/expiry-preview | finance, admin | W3-01 | |

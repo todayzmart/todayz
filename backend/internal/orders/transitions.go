@@ -186,6 +186,10 @@ func (s *Service) end(ctx context.Context, o ordersdb.Order, to, reason string, 
 	if err != nil {
 		return fmt.Errorf("orders: end order: %w", err)
 	}
+	// The offers the order used go back to their limits (W2-07).
+	if err := s.redeemer.Release(ctx, mustID(o.ID)); err != nil {
+		return fmt.Errorf("orders: release offers: %w", err)
+	}
 	return s.record(ctx, o, to, v, by, &reason, t, now)
 }
 

@@ -1,0 +1,35 @@
+# Product events: banners (05 §2.6). Owner W2-07. Emitted by the API (app 'api').
+# One file per domain (D-50); an event name may be defined in only one file.
+domain: banners
+owner: W2-07
+events:
+  banner_created:
+    emitter: server
+    description: A shop made a banner (POST {S}/banners).
+    props:
+      banner_id: { type: ulid }
+      target: { type: enum, values: [offer, items, category, store] }
+      origin: { type: enum, values: [template, upload] }
+      moderation: { type: enum, values: [auto_ok, needs_review] }
+  banner_impression:
+    emitter: server
+    description: >-
+      A banner was returned to a customer in the Offers near you feed. W3-07 counts
+      these exactly into banner_daily; the raw event may be sampled.
+    props:
+      banner_id: { type: ulid }
+  banner_tapped:
+    emitter: server
+    description: >-
+      A signed-in customer tapped a banner (POST /v1/me/banners/{bannerId}/tap). It
+      feeds attribution: the same customer ordering at the same store within 24 h,
+      last click wins (D-77).
+    props:
+      banner_id: { type: ulid }
+      target: { type: enum, values: [offer, items, category, store] }
+  banner_removed:
+    emitter: server
+    description: A banner was taken down by moderation (W3-05 through the banners service).
+    props:
+      banner_id: { type: ulid }
+      by: { type: enum, values: [moderation] }

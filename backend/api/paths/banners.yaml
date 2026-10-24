@@ -1,12 +1,239 @@
-# Paths: domain "banners" (owner W3-02): banners (04 §2.6).
+# Paths: domain "banners" (owner W2-07): shop banners and the banner tap (04 §2.6).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [banners]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/banners.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Manager and above (`banners.manage`, 02 §3.3). A banner goes live at once; an
+# uploaded image waits for the safety check. Admin takedown is W3-05.
+/v1/biz/businesses/{bid}/stores/{sid}/banners:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listBanners
+    tags: [banners]
+    summary: The store's banners (B-08)
+    description: Manager and above. Newest first, with impressions, clicks and attributed orders. `status` keeps one state.
+    parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: ../schemas/banners.yaml#/BannerStatus
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: One page of banners
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/banners.yaml#/BannerList
+            example:
+              items:
+                - id: 01KE0G2B3C4D5E6F7G8H9J0K1M
+                  storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                  headline: "Diwali sale: 20% off"
+                  imageKey: null
+                  template: {tint: amber, subline: On sweets and dry fruits}
+                  targetType: store
+                  targetId: null
+                  targetItemIds: []
+                  startsAt: "2026-10-24T05:00:00Z"
+                  endsAt: "2026-10-31T18:29:59Z"
+                  status: live
+                  moderation: auto_ok
+                  removeReason: null
+                  impressions: 420
+                  clicks: 31
+                  attributedOrders: 4
+                  version: 1
+                  createdAt: "2026-10-24T05:00:00Z"
+                  updatedAt: "2026-10-24T05:00:00Z"
+              nextCursor: null
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: createBanner
+    tags: [banners]
+    summary: Make a banner
+    description: >-
+      Manager and above (`banners.manage`). Send `imageKey` or `template`, a headline of at most 40 characters and a
+      target. Live at once, or `scheduled` when `startsAt` is later; an uploaded image is `pending_review` until the
+      safety check clears it.
+    x-idempotency: optional
+    x-problems: [banner_limit_reached]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/banners.yaml#/BannerCreate
+          example:
+            headline: "Diwali sale: 20% off"
+            template: {tint: amber, subline: On sweets and dry fruits}
+            targetType: store
+            endsAt: "2026-10-31T18:29:59Z"
+    responses:
+      "201":
+        description: The banner
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/banners.yaml#/Banner
+            example:
+              id: 01KE0G2B3C4D5E6F7G8H9J0K1M
+              storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              headline: "Diwali sale: 20% off"
+              imageKey: null
+              template: {tint: amber, subline: On sweets and dry fruits}
+              targetType: store
+              targetId: null
+              targetItemIds: []
+              startsAt: "2026-10-24T05:00:00Z"
+              endsAt: "2026-10-31T18:29:59Z"
+              status: live
+              moderation: auto_ok
+              removeReason: null
+              impressions: 420
+              clicks: 31
+              attributedOrders: 4
+              version: 1
+              createdAt: "2026-10-24T05:00:00Z"
+              updatedAt: "2026-10-24T05:00:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/banners/{bannerId}:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: bannerId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getBanner
+    tags: [banners]
+    summary: One banner
+    description: Manager and above.
+    responses:
+      "200":
+        description: The banner
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/banners.yaml#/Banner
+            example:
+              id: 01KE0G2B3C4D5E6F7G8H9J0K1M
+              storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              headline: "Diwali sale: 20% off"
+              imageKey: null
+              template: {tint: amber, subline: On sweets and dry fruits}
+              targetType: store
+              targetId: null
+              targetItemIds: []
+              startsAt: "2026-10-24T05:00:00Z"
+              endsAt: "2026-10-31T18:29:59Z"
+              status: live
+              moderation: auto_ok
+              removeReason: null
+              impressions: 420
+              clicks: 31
+              attributedOrders: 4
+              version: 1
+              createdAt: "2026-10-24T05:00:00Z"
+              updatedAt: "2026-10-24T05:00:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  patch:
+    operationId: updateBanner
+    tags: [banners]
+    summary: Pause, resume or end a banner, or change its dates
+    description: >-
+      Manager and above (`banners.manage`). Needs `If-Match`. Resuming counts against `store_banners_max`
+      (`422 banner_limit_reached`). `ended` and `removed` are final (`409 invalid_transition`).
+    x-idempotency: none
+    x-problems: [banner_limit_reached]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IfMatch
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/banners.yaml#/BannerUpdate
+          example:
+            status: paused
+    responses:
+      "200":
+        description: The banner after the change
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/banners.yaml#/Banner
+            example:
+              id: 01KE0G2B3C4D5E6F7G8H9J0K1M
+              storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              headline: "Diwali sale: 20% off"
+              imageKey: null
+              template: {tint: amber, subline: On sweets and dry fruits}
+              targetType: store
+              targetId: null
+              targetItemIds: []
+              startsAt: "2026-10-24T05:00:00Z"
+              endsAt: "2026-10-31T18:29:59Z"
+              status: paused
+              moderation: auto_ok
+              removeReason: null
+              impressions: 420
+              clicks: 31
+              attributedOrders: 4
+              version: 2
+              createdAt: "2026-10-24T05:00:00Z"
+              updatedAt: "2026-10-24T05:00:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/banners/{bannerId}/tap:
+  parameters:
+    - name: bannerId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: tapBanner
+    tags: [banners]
+    summary: The customer tapped a banner
+    description: >-
+      Signed-in customers. Records the tap (the last tap per banner counts, D-77) so an order at the same shop
+      within 24 hours is attributed to the banner. A banner that is not showing answers `404 not_found`.
+    x-idempotency: none
+    responses:
+      "204":
+        description: Recorded
+      default:
+        $ref: ../common/responses.yaml#/Problem
