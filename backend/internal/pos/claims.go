@@ -8,7 +8,11 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"sync"
 	"time"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/metric"
 
 	posapi "github.com/todayz/backend/gen/api/pos"
 	genproblems "github.com/todayz/backend/gen/problems"
@@ -18,6 +22,7 @@ import (
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/realtime"
 	"github.com/todayz/backend/internal/platform/settings"
+	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
 // claimTTL is how long a bill QR can be confirmed (01 §6: 120 s).
@@ -229,34 +234,83 @@ func (s *Service) cancelClaims(ctx context.Context, storeID, clientID, keep ids.
 // claimSweep is how many claims one ExpireClaims pass expires.
 const claimSweep = 500
 
+// Sweep is one ExpireClaims pass: the claims it expired, the holds it
+// released and the claims it left live because their release failed.
+type Sweep struct{ Expired, Released, Failed int }
+
 // ExpireClaims expires the live claims past their 120 s and releases the
 // holds of those a customer confirmed (the pos_bill_claim_expiry job,
-// D-131). It returns how many it expired and how many holds it released.
-func (s *Service) ExpireClaims(ctx context.Context) (expired, released int, err error) {
+// D-131). Each claim is its own savepoint: a claim whose release fails is
+// logged by id, counted in tz_pos_claim_release_failed_total and left live
+// for the next pass, and the claims behind it still expire.
+func (s *Service) ExpireClaims(ctx context.Context) (Sweep, error) {
+	var out Sweep
 	if err := s.ready(ctx); err != nil {
-		return 0, 0, err
+		return out, err
 	}
-	err = s.db.InTx(ctx, func(ctx context.Context) error {
-		rows, err := s.q(ctx).ExpireBillClaims(ctx, posdb.ExpireBillClaimsParams{Now: s.now(), Lim: claimSweep})
+	err := s.db.InTx(ctx, func(ctx context.Context) error {
+		now := s.now()
+		rows, err := s.q(ctx).DueBillClaims(ctx, posdb.DueBillClaimsParams{Now: now, Lim: claimSweep})
 		if err != nil {
-			return fmt.Errorf("pos: expire bill claims: %w", err)
+			return fmt.Errorf("pos: due bill claims: %w", err)
 		}
-		expired, released = len(rows), 0
 		for _, r := range rows {
-			if !r.ClaimedBy.Valid {
-				continue
+			id := mustID(r.ID)
+			released := false
+			err := s.db.InTx(ctx, func(ctx context.Context) error {
+				n, err := s.q(ctx).ExpireBillClaim(ctx, posdb.ExpireBillClaimParams{ID: r.ID, Now: now})
+				if err != nil || n == 0 {
+					return err
+				}
+				if r.ClaimedBy.Valid {
+					if err := s.credits.Release(ctx, id); err != nil {
+						return fmt.Errorf("%w: %w", errRelease, err)
+					}
+					released = true
+				}
+				return nil
+			})
+			switch {
+			case errors.Is(err, errRelease):
+				out.Failed++
+				claimReleaseFailed(ctx)
+				telemetry.Logger(ctx).ErrorContext(ctx, "pos: claim hold not released; retried next pass", "claim_id", id.String(), "err", err)
+			case err != nil:
+				return fmt.Errorf("pos: expire bill claim: %w", err)
+			default:
+				out.Expired++
+				if released {
+					out.Released++
+				}
 			}
-			if err := s.credits.Release(ctx, mustID(r.ID)); err != nil {
-				return fmt.Errorf("pos: release credits: %w", err)
-			}
-			released++
 		}
 		return nil
 	})
 	if err != nil {
-		return 0, 0, err
+		return Sweep{}, err
 	}
-	return expired, released, nil
+	return out, nil
+}
+
+// errRelease marks a claim whose hold the ledger did not release.
+var errRelease = errors.New("pos: release credits")
+
+var (
+	metricsOnce         sync.Once
+	mClaimReleaseFailed metric.Int64Counter
+)
+
+// claimReleaseFailed counts a claim the sweep left live because its hold's
+// release failed (tz_pos_claim_release_failed_total; the runbook alerts on it).
+func claimReleaseFailed(ctx context.Context) {
+	metricsOnce.Do(func() {
+		m := otel.Meter("todayz/pos")
+		mClaimReleaseFailed, _ = m.Int64Counter(telemetry.MetricPrefix+"pos_claim_release_failed_total",
+			metric.WithDescription("Expired bill claims whose credit hold the sweep could not release (retried next pass)"))
+	})
+	if mClaimReleaseFailed != nil {
+		mClaimReleaseFailed.Add(ctx, 1)
+	}
 }
 
 // --- the customer side -------------------------------------------------------

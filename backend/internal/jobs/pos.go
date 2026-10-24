@@ -34,13 +34,7 @@ func registerpos(r *Registry, d Deps) {
 		if svc != nil {
 			return svc, nil
 		}
-		pd := pos.Deps{Config: d.Config, Clock: d.Clock, Log: d.Log, Settings: d.Settings}
-		if d.Pool != nil {
-			pd.DB = db.New(d.Pool)
-		}
-		// TODO(lead): Credits is the do-nothing default until W2-01 wires
-		// its ledger here as in routes_pos.go; until then no hold exists.
-		s, err := pos.New(pd)
+		s, err := pos.New(PosJobDeps(d))
 		if err != nil {
 			return nil, err
 		}
@@ -57,13 +51,38 @@ func registerpos(r *Registry, d Deps) {
 			if err != nil {
 				return platformjobs.Result{}, err
 			}
-			expired, released, err := s.ExpireClaims(ctx)
+			r, err := s.ExpireClaims(ctx)
 			if err != nil {
 				return platformjobs.Result{}, err
 			}
-			return platformjobs.Result{Summary: map[string]int64{"expired": int64(expired), "released": int64(released)}}, nil
+			return platformjobs.Result{Summary: map[string]int64{
+				"expired": int64(r.Expired), "released": int64(r.Released), "failed": int64(r.Failed),
+			}}, nil
 		},
 	})
+}
+
+// PosDeps completes base with the pos seams the API's routes and the worker
+// must share: the stock writer, credits and referrals. Both build their
+// service through it, so the sweep releases a hold through the same ledger
+// the routes held it with (D-131).
+func PosDeps(base pos.Deps) pos.Deps {
+	base.Stock = PosStock(base.Clock)
+	// TODO(lead): W2-01 wires its credits ledger here and W2-03 its
+	// referrals; until then the do-nothing defaults (no hold exists).
+	base.Credits = pos.NoCredits{}
+	base.Referrals = pos.NoReferrals{}
+	return base
+}
+
+// PosJobDeps is the pos service's deps in the worker (the bill-claim
+// sweep): PosDeps over the job deps.
+func PosJobDeps(d Deps) pos.Deps {
+	pd := pos.Deps{Config: d.Config, Clock: d.Clock, Log: d.Log, Settings: d.Settings}
+	if d.Pool != nil {
+		pd.DB = db.New(d.Pool)
+	}
+	return PosDeps(pd)
 }
 
 // PosStock is the catalogue's stock writer as pos.Stock: a sale line is one

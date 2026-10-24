@@ -569,6 +569,7 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | `pos_reversal_window_hours` | hours | 24 | §7 |
 | `pos_offline_link_max_hours` | hours | 12 | §6 |
 | `pos_offline_links_risk_per_day` | count | 20 | §6 |
+| `pos_code_phone_failures_per_hour` | count | 10 | §6 (D-131): wrong counter codes for one phone across all stores in an hour; at this count the phone is refused at every store until the hour's count drops below it. Min 5, max 100. |
 
 **Search ranking** (§11). Unit `bp`, therefore super_admin-only (§13), by design: ranking weights change every shop's visibility.
 

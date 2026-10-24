@@ -19,6 +19,7 @@ import (
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/settings"
+	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
 // The sync's fixed limits (sync.yaml, 02 §4.3, D-36).
@@ -50,8 +51,9 @@ type syncRun struct {
 	st      posdb.StoreInfoRow
 	now     time.Time
 	offline int // counter-code links made offline by this sync
-	// offers are this sync's sales with an offer discount the device
-	// applied; noRole those rung by a user without pos.discount (D-131).
+	// offers are this sync's sales with a device offer discount the offers
+	// engine would not give at sold_at; noRole those of them rung by a user
+	// without pos.discount (D-131).
 	offers, noRole int
 }
 
@@ -95,6 +97,9 @@ func (s *Service) Sync(ctx context.Context, sc authz.Scope, body syncapi.SyncReq
 		if err := s.checkCursor(ctx, run, cursor); err != nil {
 			return err
 		}
+		if err := s.lockSyncCodes(ctx, run, body.Entries); err != nil {
+			return err
+		}
 		out.Results = make([]syncapi.SyncEntryResult, len(body.Entries))
 		for i, e := range body.Entries {
 			if out.Results[i], err = s.syncEntry(ctx, run, i, e); err != nil {
@@ -131,6 +136,30 @@ func (s *Service) Sync(ctx context.Context, sc authz.Scope, body syncapi.SyncReq
 	}
 	out.ServerNow = s.now()
 	return out, nil
+}
+
+// lockSyncCodes takes, before any entry, the code locks of the cashier and
+// of every phone the batch's counter codes name, in sorted order (D-131).
+// Taken entry by entry, two cashiers syncing the same phones in opposite
+// order would deadlock and one sync would fail; held to commit, the locks
+// taken again by each entry are no-ops.
+func (s *Service) lockSyncCodes(ctx context.Context, run *syncRun, entries []syncapi.SyncEntry) error {
+	if s.hasher == nil {
+		return nil
+	}
+	var phones [][]byte
+	for _, e := range entries {
+		if e.Sale == nil || e.Sale.Link == nil || e.Sale.Link.Method != syncapi.CounterCode || e.Sale.Link.Code == nil {
+			continue
+		}
+		if g := s.guard(run.sc.StoreID, run.p.UserID, e.Sale.Link.Phone); g.phone != nil {
+			phones = append(phones, g.phone)
+		}
+	}
+	if len(phones) == 0 {
+		return nil
+	}
+	return s.lockCodeKeys(ctx, run.p.UserID, phones...)
 }
 
 // checkCursor refuses (410 resync_required) a cursor the changes cannot
@@ -311,10 +340,15 @@ func (s *Service) syncSale(ctx context.Context, run *syncRun, clientID ids.ID, e
 	if err != nil {
 		return res, err
 	}
+	unmatched, err := s.offerUnmatched(ctx, run, lines, e.At)
+	if err != nil {
+		return res, err
+	}
 	w, err := s.writeSale(ctx, run.st, saleWrite{
 		StoreID: run.sc.StoreID, ClientID: clientID, Cashier: run.p.UserID, Device: run.device,
 		StockDevice: realDevice(run.device, run.real), DeviceSeq: ptr(int64(e.DeviceSeq)), Bill: b,
 		Payment: string(in.PaymentMethod), SoldAt: e.At, Link: l, Path: path + ".sale",
+		OfferUnmatched: unmatched,
 	})
 	switch {
 	case errors.Is(err, errSaleExists):
@@ -325,10 +359,11 @@ func (s *Service) syncSale(ctx context.Context, run *syncRun, clientID ids.ID, e
 	if l.method == methodCounterCode && l.status == linkLinked {
 		run.offline++
 	}
-	if slices.ContainsFunc(lines, func(l lineInput) bool { return l.Offer > 0 }) {
+	if unmatched {
 		// The device's offer discount is kept as sold (no offer id reaches
-		// the server), so it counts as offline risk, and as a flag for the
-		// manager when the cashier could not discount by hand (D-131).
+		// the server). One the engine would not give counts as offline risk
+		// (once per sale), and as a flag for the manager when the cashier
+		// could not discount by hand (D-131).
 		run.offers++
 		err := s.also(ctx, policy.PosDiscount, run.sc)
 		var pe *problem.Error
@@ -350,6 +385,52 @@ func (s *Service) syncSale(ctx context.Context, run *syncRun, clientID ids.ID, e
 	res.ReceiptToken = w.Receipt
 	res.LinkStatus = syncLinkStatus(w.Sale.LinkMethod, w.Sale.LinkStatus)
 	return res, nil
+}
+
+// offerUnmatched reports whether an offline sale carries a line offer
+// discount above what the offers engine gives that line at sold_at (clamped
+// as the sale is): a custom line gets nothing from the engine. A sale the
+// engine cannot price counts as unmatched; the engine's own failure is
+// rolled back to a savepoint so the entry can still be kept (D-131).
+func (s *Service) offerUnmatched(ctx context.Context, run *syncRun, lines []lineInput, soldAt time.Time) (bool, error) {
+	if !slices.ContainsFunc(lines, func(l lineInput) bool { return l.Offer > 0 }) {
+		return false, nil
+	}
+	var pl []PriceLine
+	var at []int
+	for i, l := range lines {
+		if l.ItemID != ids.Zero {
+			pl = append(pl, PriceLine{StoreItemID: l.ItemID, ProductID: l.ProductID, UnitPricePaise: l.Unit, Quantity: l.Qty})
+			at = append(at, i)
+		}
+	}
+	engine := make([]int64, len(lines))
+	if len(pl) > 0 {
+		var pr Pricing
+		err := s.db.InTx(ctx, func(ctx context.Context) error {
+			var err error
+			pr, err = s.pricer.Price(ctx, ids.Zero, run.sc.StoreID, clampSoldAt(soldAt, run.now), pl)
+			return err
+		})
+		if err != nil {
+			if ctx.Err() != nil {
+				return false, ctx.Err()
+			}
+			telemetry.Logger(ctx).WarnContext(ctx, "pos: offline offer not priced", "store_id", run.sc.StoreID.String(), "err", err)
+			return true, nil
+		}
+		for j, i := range at {
+			if j < len(pr.LineDiscounts) {
+				engine[i] = max(pr.LineDiscounts[j], 0)
+			}
+		}
+	}
+	for i, l := range lines {
+		if l.Offer > engine[i] {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 // offlineLink checks a sale's offline link. A counter code links only when
@@ -400,7 +481,7 @@ func (s *Service) offlineLink(ctx context.Context, run *syncRun, in *syncapi.Syn
 	if err != nil {
 		return link{}, err
 	}
-	if codeLocked(locks) {
+	if locks.locked() {
 		return failed, nil
 	}
 	m, ok, err := s.matchCode(ctx, in.Phone, *in.Code, typed)
@@ -436,9 +517,10 @@ func istDay(now time.Time) time.Time {
 	return time.Date(local.Year(), local.Month(), local.Day(), 0, 0, 0, 0, ist).UTC()
 }
 
-// offlineRisk flags the store once a day when its offline counter-code
-// links and offline sales with a device-applied offer discount (D-131)
-// together pass pos_offline_links_risk_per_day (01 §6).
+// offlineRisk flags the store once a day when its offline sales with a
+// counter-code link or a device offer discount the engine would not give
+// (D-131), each sale counted once, pass pos_offline_links_risk_per_day
+// (01 §6).
 func (s *Service) offlineRisk(ctx context.Context, run *syncRun) error {
 	limit, err := s.count(ctx, settings.PosOfflineLinksRiskPerDay)
 	if err != nil {
@@ -446,18 +528,14 @@ func (s *Service) offlineRisk(ctx context.Context, run *syncRun) error {
 	}
 	since := istDay(run.now)
 	q := s.q(ctx)
-	n, err := q.OfflineLinksSince(ctx, posdb.OfflineLinksSinceParams{StoreID: ids.UUID(run.sc.StoreID), Since: since})
+	r, err := q.OfflineRiskSalesSince(ctx, posdb.OfflineRiskSalesSinceParams{StoreID: ids.UUID(run.sc.StoreID), Since: since})
 	if err != nil {
-		return fmt.Errorf("pos: offline links: %w", err)
+		return fmt.Errorf("pos: offline risk sales: %w", err)
 	}
-	o, err := q.OfflineOfferSalesSince(ctx, posdb.OfflineOfferSalesSinceParams{StoreID: ids.UUID(run.sc.StoreID), Since: since})
-	if err != nil {
-		return fmt.Errorf("pos: offline offer sales: %w", err)
-	}
-	if int(n)+int(o) <= limit {
+	if int(r.N) <= limit {
 		return nil
 	}
-	details, _ := json.Marshal(map[string]int{"offlineLinks": int(n), "offlineOfferSales": int(o), "limit": limit})
+	details, _ := json.Marshal(map[string]int{"offlineSales": int(r.N), "offlineLinks": int(r.Links), "offlineOfferSales": int(r.Offers), "limit": limit})
 	err = q.InsertRiskFlagOnce(ctx, posdb.InsertRiskFlagOnceParams{
 		ID: ids.UUID(s.ids.New(run.now)), StoreID: ids.UUID(run.sc.StoreID), Rule: "pos.offline_links",
 		// TODO(lead): the plan gives no score for this flag; 50 is a middle value.
