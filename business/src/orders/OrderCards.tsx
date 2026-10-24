@@ -9,8 +9,9 @@ import { mmss } from '../overview/format';
 import { Icon } from '../shell/Icon';
 import { acknowledgeOrder } from './alerts';
 import { ActionError } from './ActionError';
-import { clock, isShort, lineName, reasonLabel, statusLabel } from './labels';
-import { acceptCall, rejectCall, useOrder, useOrderAction, useSecondsLeft } from './queries';
+import { AcceptPartSheet } from './AcceptPartSheet';
+import { canAcceptPart, clock, isShort, lineName, reasonLabel, statusLabel } from './labels';
+import { acceptCall, acceptPartCall, rejectCall, useOrder, useOrderAction, useSecondsLeft } from './queries';
 import { ReasonSheet } from './ReasonSheet';
 import type { CurrentStore } from './store';
 import styles from './orders.module.css';
@@ -28,21 +29,22 @@ function FulfilmentPill({ fulfilment }: { fulfilment: StoreOrderSummary['fulfilm
 
 /**
  * A new order: the time left to accept (from the server's clock), the items with their stock, and
- * Accept and Reject. Accept part is not here: partial accept is deferred in W2-02. While a line is
- * short, Accept is disabled with a hint (the API refuses it with `insufficient_stock`), so the shop
- * rejects the order or fixes the stock.
- * TODO(W2-02): "Accept part" opens a quantity editor once the API takes `lines` below the quantity asked.
+ * Accept, Accept part and Reject. While a line is short, Accept is disabled with a hint (the API
+ * refuses it with `insufficient_stock`): the shop accepts part (D-28), rejects or fixes the stock.
+ * When the stock covers nothing, Accept part is disabled too and the hint says reject or restock.
  */
 export function NewOrderCard({ store, order, offsetMs }: { store: CurrentStore; order: StoreOrderSummary; offsetMs: number }) {
   const intl = useIntl();
   const detail = useOrder(store, order.id);
   const action = useOrderAction(store);
   const [rejecting, setRejecting] = useState(false);
+  const [parting, setParting] = useState(false);
   const left = useSecondsLeft(order.acceptBy, offsetMs);
   const expired = left === 0;
   const name = order.customerName ?? intl.formatMessage({ id: 'orders.card.noName' });
   const time = mmss(left ?? 0);
   const shortLines = detail.data?.lines.filter(isShort).length ?? 0;
+  const partable = detail.data ? canAcceptPart(detail.data.lines) : false;
   const hintId = `${order.id}-short`;
   return (
     <article className="tz-ocard" aria-label={order.number}>
@@ -81,7 +83,7 @@ export function NewOrderCard({ store, order, offsetMs }: { store: CurrentStore; 
       <ActionError error={action.error} />
       {shortLines > 0 && (
         <p id={hintId} className={styles.shortHint}>
-          {intl.formatMessage({ id: 'orders.card.shortHint' }, { count: shortLines })}
+          {intl.formatMessage({ id: partable ? 'orders.card.partHint' : 'orders.card.shortHint' }, { count: shortLines })}
         </p>
       )}
       <div className="tz-ocard-actions">
@@ -92,6 +94,15 @@ export function NewOrderCard({ store, order, offsetMs }: { store: CurrentStore; 
           aria-label={intl.formatMessage({ id: 'orders.card.rejectA11y' }, { number: order.number })}
         >
           {intl.formatMessage({ id: 'orders.card.reject' })}
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => setParting(true)}
+          disabled={!partable || action.pending !== null}
+          aria-describedby={shortLines > 0 && !partable ? hintId : undefined}
+          aria-label={intl.formatMessage({ id: 'orders.card.acceptPartA11y' }, { number: order.number })}
+        >
+          {intl.formatMessage({ id: 'orders.card.acceptPart' })}
         </Button>
         <Button
           size="sm"
@@ -117,6 +128,20 @@ export function NewOrderCard({ store, order, offsetMs }: { store: CurrentStore; 
       >
         {intl.formatMessage({ id: 'orders.card.open' })}
       </Link>
+      {parting && detail.data && (
+        <AcceptPartSheet
+          order={detail.data}
+          onClose={() => setParting(false)}
+          busy={action.pending === 'acceptPart'}
+          error={action.error}
+          onConfirm={(lines) => {
+            acknowledgeOrder(store.sid, order.id);
+            void action.run('acceptPart', acceptPartCall(store, order.id, lines)).then((o) => {
+              if (o) setParting(false);
+            });
+          }}
+        />
+      )}
       <ReasonSheet
         open={rejecting}
         onClose={() => setRejecting(false)}

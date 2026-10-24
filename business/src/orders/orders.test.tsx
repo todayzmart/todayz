@@ -139,13 +139,66 @@ describe('B-04 orders list', () => {
     expect(post?.headers.get('idempotency-key')).toMatch(/^[0-9A-Z]{26}$/);
   });
 
-  it('disables Accept while a line is short and says why; Reject still works', async () => {
+  it('disables Accept while a line is short and offers Accept part; Reject still works', async () => {
     renderAt('/orders', { messages, handlers: [shops('cashier'), listHandler({ new: [summary('o1')] }), orderHandler(() => full('o1'))] });
-    const hint = await screen.findByText('Not enough stock for one item. Reject the order, or update the stock.');
+    const hint = await screen.findByText('Not enough stock for one item. Accept part, reject the order, or update the stock.');
     const accept = screen.getByRole('button', { name: 'Accept order TZ-o1' });
     expect(accept).toBeDisabled();
     expect(accept).toHaveAttribute('aria-describedby', hint.id);
+    expect(screen.getByRole('button', { name: 'Accept part of order TZ-o1' })).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Reject order TZ-o1' })).toBeEnabled();
+  });
+
+  it('keeps the reject-or-restock hint and disables Accept part when the stock covers nothing', async () => {
+    const empty = () => {
+      const o = full('o1');
+      return { ...o, lines: o.lines.map((l) => ({ ...l, available: 0 })) };
+    };
+    renderAt('/orders', { messages, handlers: [shops('cashier'), listHandler({ new: [summary('o1')] }), orderHandler(empty)] });
+    const hint = await screen.findByText('Not enough stock for 2 items. Reject the order, or update the stock.');
+    const part = screen.getByRole('button', { name: 'Accept part of order TZ-o1' });
+    expect(part).toBeDisabled();
+    expect(part).toHaveAttribute('aria-describedby', hint.id);
+  });
+
+  it('accept part prefills what the stock covers and sends every line with an Idempotency-Key', async () => {
+    const { calls } = renderAt('/orders', {
+      messages,
+      handlers: [
+        shops('cashier'),
+        (c) =>
+          c.method === 'POST' && c.path === `${BASE}/orders/o1/accept`
+            ? json(200, full('o1', { status: 'awaiting_customer', partialConfirmBy: '2026-10-23T12:35:30.000Z' }))
+            : undefined,
+        listHandler({ new: [summary('o1')] }),
+        orderHandler(() => full('o1')),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: 'Accept part of order TZ-o1' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Accept part of TZ-o1' });
+    expect(within(dialog).getByText('Asked 2 · 9 in stock')).toBeInTheDocument();
+    expect(within(dialog).getByText('Asked 1 · out of stock')).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Send to customer' }));
+    await waitFor(() => expect(calls.some((c) => c.path.endsWith('/accept'))).toBe(true));
+    const post = calls.find((c) => c.path.endsWith('/accept'));
+    expect(post?.body).toEqual({ lines: [{ orderItemId: 'l1', quantity: 2 }, { orderItemId: 'l2', quantity: 0 }] });
+    expect(post?.headers.get('idempotency-key')).toMatch(/^[0-9A-Z]{26}$/);
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Accept part of TZ-o1' })).not.toBeInTheDocument());
+  });
+
+  it('accept part needs a lowered quantity and refuses giving nothing', async () => {
+    renderAt('/orders', { messages, handlers: [shops('cashier'), listHandler({ new: [summary('o1')] }), orderHandler(() => inStock('o1'))] });
+    fireEvent.click(await screen.findByRole('button', { name: 'Accept part of order TZ-o1' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Accept part of TZ-o1' });
+    const send = within(dialog).getByRole('button', { name: 'Send to customer' });
+    expect(send).toBeDisabled();
+    expect(send).toHaveAccessibleDescription('Lower a quantity to accept part, or accept the whole order.');
+    const less = within(dialog).getByRole('button', { name: /One less/ });
+    fireEvent.click(less);
+    expect(send).toBeEnabled();
+    fireEvent.click(less);
+    expect(send).toBeDisabled();
+    expect(send).toHaveAccessibleDescription('Keep at least one item. To give nothing, reject the order.');
   });
 
   it('reject needs a reason, and sends it with an Idempotency-Key', async () => {
@@ -188,14 +241,26 @@ describe('B-04 order detail', () => {
     const short = renderAt('/orders/o1', { messages, handlers: [shops('cashier'), orderHandler(() => full('o1'))] });
     await screen.findByRole('heading', { level: 1, name: 'Order TZ-o1' });
     expect(screen.getByRole('button', { name: 'Accept' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Accept' })).toHaveAccessibleDescription('Not enough stock for one item. Reject the order, or update the stock.');
-    expect(screen.queryByText('Accepting part of an order is not available yet.')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Accept' })).toHaveAccessibleDescription('Not enough stock for one item. Accept part, reject the order, or update the stock.');
+    expect(screen.getByRole('button', { name: 'Accept part' })).toBeEnabled();
     short.unmount();
 
     renderAt('/orders/o1', { messages, handlers: [shops('cashier'), orderHandler(() => inStock('o1'))] });
     await screen.findByRole('heading', { level: 1, name: 'Order TZ-o1' });
     expect(screen.getByRole('button', { name: 'Accept' })).toBeEnabled();
     expect(screen.queryByText(/Not enough stock for/)).not.toBeInTheDocument();
+  });
+
+  it('shows the changed quantities while the customer decides', async () => {
+    const waiting = () => {
+      const o = full('o1', { status: 'awaiting_customer', partialConfirmBy: '2026-10-23T12:35:30.000Z' });
+      return { ...o, lines: [{ ...o.lines[0], quantityAccepted: 1, lineTotalPaise: 5800 }, { ...o.lines[1], quantityAccepted: 0, lineTotalPaise: 0 }] };
+    };
+    renderAt('/orders/o1', { messages, handlers: [shops('cashier'), orderHandler(waiting)] });
+    expect(await screen.findByText('Waiting for Meera to take the changed order or cancel it.')).toBeInTheDocument();
+    expect(screen.getByText('Amul Butter · 100 g × 1 (asked 2)')).toBeInTheDocument();
+    expect(screen.getByText('Toor dal · 1 kg × 0 (asked 1)')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Accept part' })).not.toBeInTheDocument();
   });
 
   it('shows the timeline, the customer and the masked phone', async () => {
