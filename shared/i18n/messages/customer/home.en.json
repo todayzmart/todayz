@@ -82,5 +82,121 @@
   "home.empty.widen": {
     "defaultMessage": "Search within {km} km",
     "description": "Button that widens the radius to the next option"
+  },
+  "home.map.label": {
+    "defaultMessage": "Shops on the map",
+    "description": "Accessible name of the map card"
+  },
+  "home.map.mapLabel": {
+    "defaultMessage": "Map: {shops} shops within {km} km, {open} open now",
+    "description": "Summary read for the map area; shops, km and open are numbers written as text"
+  },
+  "home.map.you": {
+    "defaultMessage": "You are here",
+    "description": "Name of the customer's dot on the map"
+  },
+  "home.map.legend.open": {
+    "defaultMessage": "Open",
+    "description": "Map legend: open shop pin"
+  },
+  "home.map.legend.closed": {
+    "defaultMessage": "Closed",
+    "description": "Map legend: closed shop pin"
+  },
+  "home.map.legend.you": {
+    "defaultMessage": "You",
+    "description": "Map legend: the customer's dot"
+  },
+  "home.map.live": {
+    "defaultMessage": "Live near you",
+    "description": "Badge on the map card"
+  },
+  "home.map.expand": {
+    "defaultMessage": "Open full map",
+    "description": "Button on the Home map card that opens the full map"
+  },
+  "home.map.pinOpen": {
+    "defaultMessage": "{name}, open",
+    "description": "Name of an open shop pin on the map"
+  },
+  "home.map.pinClosed": {
+    "defaultMessage": "{name}, closed",
+    "description": "Name of a closed shop pin on the map"
+  },
+  "home.map.cluster": {
+    "defaultMessage": "{count} shops, zoom in",
+    "description": "Name of a cluster of shop pins"
+  },
+  "home.map.shopFallback": {
+    "defaultMessage": "Shop",
+    "description": "Name of a map pin whose shop name is not loaded yet"
+  },
+  "map.title": {
+    "defaultMessage": "Shops near you",
+    "description": "Heading of the full map screen (C-04)"
+  },
+  "map.back": {
+    "defaultMessage": "Back",
+    "description": "Back link on the full map and category screens"
+  },
+  "map.view.label": {
+    "defaultMessage": "View",
+    "description": "Accessible name of the map or list switch"
+  },
+  "map.view.map": {
+    "defaultMessage": "Map",
+    "description": "Map or list switch: map"
+  },
+  "map.view.list": {
+    "defaultMessage": "List",
+    "description": "Map or list switch: list"
+  },
+  "map.truncated": {
+    "defaultMessage": "The map shows the nearest {count} shops. Use the list to see all of them.",
+    "description": "Note when the map has more shops than pins"
+  },
+  "map.sheet.view": {
+    "defaultMessage": "View shop",
+    "description": "Button in the shop sheet on the map"
+  },
+  "map.sheet.directions": {
+    "defaultMessage": "Directions",
+    "description": "Link in the shop sheet on the map"
+  },
+  "map.sheet.close": {
+    "defaultMessage": "Close",
+    "description": "Close button of the shop sheet on the map"
+  },
+  "map.sheet.error": {
+    "defaultMessage": "We could not load this shop.",
+    "description": "Shop sheet error on the map"
+  },
+  "category.notFound.title": {
+    "defaultMessage": "We could not find that category",
+    "description": "C-06 empty state when the category slug is unknown"
+  },
+  "category.notFound.body": {
+    "defaultMessage": "It may have been renamed. Pick a category from Home.",
+    "description": "C-06 unknown category body"
+  },
+  "category.shops": {
+    "defaultMessage": "Shops in {name}",
+    "description": "C-06 heading above the list of shops"
+  },
+  "category.empty.title": {
+    "defaultMessage": "No shops in {name} within {km} km",
+    "description": "C-06 empty state title"
+  },
+  "category.empty.body": {
+    "defaultMessage": "Try a wider radius.",
+    "description": "C-06 empty state body"
+  },
+  "category.home": {
+    "defaultMessage": "Back to Home",
+    "description": "C-06 link back to Home"
+  },
+  "home.category.page": {
+    "defaultMessage": "Open category",
+    "description": "Link from the Home category filter to the category page (C-06)"
   }
 }
