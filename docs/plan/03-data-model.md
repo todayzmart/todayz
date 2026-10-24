@@ -302,6 +302,17 @@ Rules in [01-product-rules.md](01-product-rules.md) §11.1–§11.3. W3-16 creat
 
 `stores.asks_muted` (bool, default false) is created by W1-04 with the `stores` table and changed only through `PATCH S/settings` (`asks.manage`, audited). `orders.ask_reply_id` is created by W2-02 as a plain `uuid` (§13). Retention: the `asks_retention` maintenance kind deletes `asks` older than `ask_retention_days`; `ask_recipients` and `ask_store_blocks` go with them (`on delete cascade` on both `ask_id` FKs). `orders.ask_reply_id` is set to null by its FK (`on delete set null`), and the order keeps its lines, `price_source` and the prices it was placed at. Account deletion runs the same delete for one customer's asks (W3-16's `OnAccountDelete` hook).
 
+### Baskets (W2-14, D-110)
+
+Rules in [01-product-rules.md](01-product-rules.md) §11.4. W2-14 creates these in its own migrations in the 21401–21499 block (D-89).
+
+| Table | Key columns | Notes | Owner |
+|---|---|---|---|
+| `baskets` | id, customer_id (FK `users`), name text (1–40 characters), version, created_at, updated_at, deleted_at (nullable), last_split jsonb (nullable: the split the last search suggested, two store ids with their line ids, kept until the basket is searched again) | Owned by the customer: every query filters on `customer_id` from the session, and another customer's basket is `404`. Soft delete: `DELETE` sets `deleted_at`, and the row is hidden from every read and from the `basket_max_saved` count. A purge job is not needed for v1; the row and its lines are deleted with the account. `ck_baskets_name` (`char_length(btrim(name)) between 1 and 40`). The limit `basket_max_saved` is checked in Go in the create transaction (`422 validation_failed` on `baskets`, 04) | W2-14 |
+| `basket_lines` | id, basket_id (FK `baskets`, `on delete cascade`), product_id (nullable, FK `products`), text text (nullable, 1–120 characters, stored normalised as search does, 01 §11), quantity int (1–99), position int, created_at | `ck_basket_lines_one_of` (exactly one of `product_id` and `text` is not null), `ck_basket_lines_quantity` (`quantity between 1 and 99`). Unique (basket_id, position). The limit `basket_max_items` is checked in Go in the same transaction as the write (`422 validation_failed` on `lines`). Lines are replaced as a set by `PATCH`, in one transaction with the version bump | W2-14 |
+
+Retention and privacy: baskets are private to the customer and are deleted with the account (01 §16): the same transaction that anonymises `users` deletes the customer's `baskets` (their `basket_lines` go by cascade) through an `OnAccountDelete` hook W2-14 registers. No shop and no analytics table reads `baskets`; basket searches are logged as any search is (`search_log`, 01 §11.4).
+
 ## 10. Analytics tables (see [05-observability.md](05-observability.md))
 
 | Table | Purpose | Owner |
@@ -338,6 +349,7 @@ Demand insights data (D-99):
 - partial `orders (delivery_failed_at) where status='delivery_failed' and return_confirmed_at is null` (§4.3)
 - `rollup_daily_search_demand (geo_cell, date)` (§10); partial `rollup_daily_search_demand (product_id, geo_cell, date) where product_id is not null` (D-99)
 - `ask_recipients (store_id, reply_by) where answer is null` (the inbox); `ask_recipients (store_id, sent_at)` (the store's daily limit and the inbox list); `ask_recipients (ask_id)`; `ask_store_blocks (ask_id)` (the cascade); `asks (customer_id, created_at desc)`; `asks (city_place_id, product_id, created_at) where status = 'closed'` (demand gaps); `rollup_daily_ask_demand (store_id, date)`; unique `share_cards (code)`, `share_cards (store_item_id)` (W3-16, D-101)
+- `baskets (customer_id, updated_at desc) where deleted_at is null` (the list and the `basket_max_saved` count); `basket_lines (basket_id, position)`; `basket_lines (product_id) where product_id is not null` (the FK index) (W2-14, D-110)
 - `rollup_item_pairs (store_id, lift_bp desc)`; unique `insight_feedback (store_id, kind, subject_ref)`; `stock_movement_batches (batch_id)`; partial `stock_batches (store_item_id, expires_on) where quantity > 0` (W1-05, D-99)
 
 ## 12. Seed data

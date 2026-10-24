@@ -359,6 +359,29 @@ A customer who cannot find an item in stock asks the shops near them, and the sh
   - The visitor picks the city in the strip; there is no IP location.
 - **Comparison section:** "Search engines, chatbots and directories vs TodayZ", written for India (JustDial-style directories), in the site's copy style. English source keys only; the other languages follow the i18n process.
 
+### 11.4 Saved baskets and basket search (D-110)
+
+A customer who wants several things builds a basket, and search finds a shop that has the whole list, or the best two-shop split.
+
+- **Saved baskets.** A signed-in customer keeps up to `basket_max_saved` baskets on their account (`422 validation_failed` on the field when one more is created). A basket has a name of at most 40 characters and up to `basket_max_items` lines (`422 validation_failed` on `lines`). A line is a master product or free text, with a quantity of 1 to 99. Free text goes through the same normalisation as search (§11, §11.2). A basket can be edited, renamed, deleted and searched again at any time.
+- **Signed out.** A signed-out customer builds one unsaved basket on this device only, like the cart. Signing in offers to save it. Browsing and basket search never need sign-in (§2).
+- **Where it starts.** "Add to basket" on a search result, the product page (C-08) and the shop page (C-07), and the basket screen (C-22).
+- **Basket search.** It uses the customer's location and radius chips (§11) and the same filter as search: in stock, a `live` store of a `verified` business, within the radius. It is read-only and never calls a model.
+  - **Covered.** A line is covered when the store lists that product (for free text, the top search match in that store) with `available` at least the quantity.
+  - **Ranking.** Stores that cover every line first, then more lines covered, then the lower basket total, then the nearer store. The total uses store prices and item-level offers through `offers.Price`; credits never count. At most `basket_results_max` stores are shown.
+  - **Result card.** "{n} of {m} · {distance} · ₹{total}", what is missing, and the freshness label of each line (§11.1).
+  - **Badges.** At most one per card, labels only, the rules of §11.1: **Has everything** (a store that covers every line), **Closest** and **Lowest price**. They never change the order.
+  - **Summary line.** "Checked {N} shops nearby · {k} have everything". N is counted as in §11.1; k is the stores that cover every line.
+  - **Preview only.** The total is a preview. Checkout reprices and rechecks stock as usual (§5.3, §5.5).
+- **No full match.** When no store covers every line, the results show the best partial matches and one suggested split across at most `basket_split_max_shops` stores (at most 2).
+  - It picks the pair that covers the most lines, then the lower combined total, then the lower combined distance. Each line goes to the cheaper of the two stores that cover it.
+  - An order has one store (§5), so a split is two orders. "Fill cart" fills the cart for the first store. After that order is placed, its tracking page (C-12) offers "Next: the rest from {shop}", which fills the cart for the second. The basket keeps the split until it is searched again.
+  - `basket_split_max_shops` = 1 turns splits off. A full match always wins over a split, even when it costs more (TODO for the founder, Q-59).
+  - Lines no store covers show "Ask shops nearby" (§11.2), prefilled.
+- **Fill cart.** One tap puts the covered lines, at their quantities, into the cart for that store. The cart stays one store. Replacing a non-empty cart for another store asks first, as adding from another shop does.
+- **Not in v1.** Phone calls to shops (D-101), splits across three or more stores, delivery for a split (each order follows its own pickup or delivery rules), sharing a basket with another customer, and reminders on a saved basket (Q-60). A shop never sees that a customer keeps baskets (Q-61); basket searches feed "Wanted nearby" and "Missed sales" like any search (§11, D-99).
+- **Privacy.** Baskets are private to the customer and are deleted with the account (§16).
+
 ## 12. Business app features (v1)
 
 Overview (KPI strip, sales by hour, new orders, demand insights, top items), Orders, Asks (§11.2, D-101), Sell (POS), Voice update, Stock and products, Offers, Customers, Credits and referrals (credit account, statements, QR standee), Reviews, Analytics, Stores and staff, Settings (profile, hours, pickup/delivery, cashback %, auto-accept, mute asks, payout details, notifications, language), Help.
@@ -474,6 +497,7 @@ WhatsApp, when enabled, carries the same events as the SMS column; SMS is the fa
   - Deletion is blocked while the customer has an order that is not finished.
   - On deletion, the wallet balance is forfeited to TodayZ (ledger kind `forfeit_deletion`).
   - On deletion, the customer's asks are deleted with their replies and the store blocks that came from them (D-101, §11.2); orders booked from a reply keep their lines, only the link to the reply is cleared.
+  - On deletion, the customer's saved baskets and their lines are deleted (D-110, §11.4).
 - **Asks (D-101).** An ask a shop sees is the customer's own request, sent at their choice; it carries the item, quantity, "need by" and a distance band, never the customer's name, phone, address or exact distance. A customer is never told that a store blocked them. Unanswered asks used as demand data follow the k ≥ 10 rules above. Demand gaps (A-23) need at least `ask_gap_min_customers` (never below 10) distinct customers. Asks, their replies and their blocks are deleted after `ask_retention_days`, or when the account is deleted.
 - **Search proof (D-101).** The summary line "Checked N shops · M have it" counts stores, not people, and only stores whose listings the customer can already see, so it needs no k floor. A share link and its preview carry no customer data and never a distance, and a card of a store that is no longer live stops resolving.
 - **Site search strip (D-101).** Built only from master product names searched by at least `site_marquee_min_searchers` (never below 10) distinct signed-in customers in a city (anonymous devices never count towards the floor), after a denylist, and shown only after an admin approves it. Free-text queries never reach the site.
@@ -618,6 +642,15 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | `site_marquee_max_items` | count | 20 | §11.3: products proposed per city. Min 5, max 50. |
 | `refine_ai_min_words` | count | 4 | §11.1: words a query with no chip needs before search sets `refineHint` and the app may call search assist (AI-C2). Min 2, max 20. |
 | `share_card_create_per_hour` | count | 30 | §11.1: share cards one IP or anonymous device can create per hour (`429`); re-creating an existing card does not count. Min 5, max 300. |
+
+**Baskets** (§11.4, D-110)
+
+| Key | Unit | Default | Rule |
+|---|---|---|---|
+| `basket_max_saved` | count | 10 | §11.4: saved baskets one customer can keep. Min 1, max 50. |
+| `basket_max_items` | count | 30 | §11.4: lines in one basket. Min 5, max 100. |
+| `basket_split_max_shops` | count | 2 | §11.4: stores in a suggested split; 1 turns splits off. Min 1, max 2. |
+| `basket_results_max` | count | 10 | §11.4: stores shown in basket search results. Min 3, max 30. |
 
 **Feature flags** (turn a feature off without a deploy)
 

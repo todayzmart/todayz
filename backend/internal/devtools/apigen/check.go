@@ -85,7 +85,7 @@ var moneyOperations = []string{
 	// AI draft confirms (11): shop, customer, admin
 	"confirmVoiceStockDraft", "confirmSupplierBillDraft", "confirmShelfPhotoDraft",
 	"confirmReviewReplyDraft", "confirmBannerCopyDraft",
-	"confirmListSearchDraft",
+	"confirmListParseDraft",
 	"confirmCatalogueCleanupDraft", "confirmTicketTriageDraft", "confirmRiskSummaryDraft",
 }
 
