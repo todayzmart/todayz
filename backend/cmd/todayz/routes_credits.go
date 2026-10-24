@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/go-chi/chi/v5"
 
+	"github.com/todayz/backend/internal/business"
 	"github.com/todayz/backend/internal/credits"
 	"github.com/todayz/backend/internal/jobs"
 	"github.com/todayz/backend/internal/platform/authz"
@@ -17,7 +18,11 @@ func mountCredits(r chi.Router, d *deps) {
 	if d.Authz != nil {
 		az = d.Authz
 	}
-	credits.Register(r, svc, az)
+	var staff authz.StaffResolver
+	if d.DB != nil {
+		staff = business.NewStaffResolver(d.DB)
+	}
+	credits.Register(r, svc, az, staff)
 	if d.Identity != nil {
 		d.Identity.AddDeletionHook(svc)
 	}

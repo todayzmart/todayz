@@ -79,7 +79,8 @@ func (s *Service) ready(ctx context.Context) error {
 }
 
 // dbReady is ready for the paths that read no settings (the deletion
-// forfeiture), so an API built without settings can still delete accounts.
+// forfeiture, the business credit account), so an API built without
+// settings can still delete accounts and show the account.
 func (s *Service) dbReady(ctx context.Context) error {
 	if s.db == nil {
 		telemetry.Logger(ctx).ErrorContext(ctx, "credits: not configured (needs the database)")

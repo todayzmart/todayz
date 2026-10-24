@@ -231,9 +231,11 @@ func percent(memo *string) string {
 }
 
 // CreditAccount is GET {B}/credit-account: the business's store credit
-// balances and the postings on them, newest first.
-func (s *Service) CreditAccount(ctx context.Context, businessID ids.ID, limit *int, cursor *string) (businesscreditsapi.CreditAccount, error) {
-	if err := s.ready(ctx); err != nil {
+// balances and the postings on them, newest first. stores limits both to
+// those stores (a member limited to some stores, D-125); nil is every store
+// of the business.
+func (s *Service) CreditAccount(ctx context.Context, businessID ids.ID, stores []ids.ID, limit *int, cursor *string) (businesscreditsapi.CreditAccount, error) {
+	if err := s.dbReady(ctx); err != nil {
 		return businesscreditsapi.CreditAccount{}, err
 	}
 	lim, at, after, err := pageArgs(limit, cursor)
@@ -241,18 +243,25 @@ func (s *Service) CreditAccount(ctx context.Context, businessID ids.ID, limit *i
 		return businesscreditsapi.CreditAccount{}, err
 	}
 	q, b := s.q(ctx), ids.UUID(businessID)
-	stores, err := q.BusinessStoreBalances(ctx, b)
+	var only []pgtype.UUID
+	if stores != nil {
+		only = make([]pgtype.UUID, len(stores))
+		for i, st := range stores {
+			only[i] = ids.UUID(st)
+		}
+	}
+	balances, err := q.BusinessStoreBalances(ctx, creditsdb.BusinessStoreBalancesParams{BusinessID: b, StoreIds: only})
 	if err != nil {
 		return businesscreditsapi.CreditAccount{}, wrap("store balances", err)
 	}
-	rows, err := q.StoreLines(ctx, creditsdb.StoreLinesParams{BusinessID: b, CursorAt: at, CursorID: after, Lim: i32(lim + 1)})
+	rows, err := q.StoreLines(ctx, creditsdb.StoreLinesParams{BusinessID: b, StoreIds: only, CursorAt: at, CursorID: after, Lim: i32(lim + 1)})
 	if err != nil {
 		return businesscreditsapi.CreditAccount{}, wrap("store lines", err)
 	}
 	out := businesscreditsapi.CreditAccount{
 		Stores: []businesscreditsapi.StoreCreditBalance{}, Lines: []businesscreditsapi.CreditAccountLine{}, ServerNow: s.now(),
 	}
-	for _, st := range stores {
+	for _, st := range balances {
 		out.BalanceCredits += int(st.Balance)
 		out.Stores = append(out.Stores, businesscreditsapi.StoreCreditBalance{
 			StoreId: mustID(st.ID).String(), Name: st.Name, BalanceCredits: int(st.Balance),

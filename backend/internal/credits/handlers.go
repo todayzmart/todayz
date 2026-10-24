@@ -28,11 +28,13 @@ var (
 	}
 )
 
-// Register mounts the wallet and business credit-account reads.
-func Register(r chi.Router, s *Service, az authz.Authorizer) {
+// Register mounts the wallet and business credit-account reads. staff
+// gives the member's stores for the account view (D-125); without it the
+// view answers 503.
+func Register(r chi.Router, s *Service, az authz.Authorizer, staff authz.StaffResolver) {
 	walletapi.Register(r, walletHandlers{s},
 		walletapi.StrictMiddlewareFunc(authz.Strict[walletapi.StrictHandlerFunc](az, WalletOps)))
-	businesscreditsapi.Register(r, accountHandlers{s},
+	businesscreditsapi.Register(r, accountHandlers{s, staff},
 		businesscreditsapi.StrictMiddlewareFunc(authz.Strict[businesscreditsapi.StrictHandlerFunc](az, AccountOps)))
 }
 
@@ -74,24 +76,37 @@ func (h walletHandlers) ListMyWalletTransactions(ctx context.Context, req wallet
 	return walletapi.ListMyWalletTransactions200JSONResponse(l), nil
 }
 
-type accountHandlers struct{ s *Service }
+type accountHandlers struct {
+	s     *Service
+	staff authz.StaffResolver
+}
 
 var _ businesscreditsapi.StrictServerInterface = accountHandlers{}
 
 // GetBusinessCreditAccount implements GET /v1/businesses/{bid}/credit-account.
-// The business is the one the route's check passed.
-//
-// TODO(lead): a manager limited to some stores sees every store of the
-// business here; 04 does not say whether the account view is per store.
+// The business is the one the route's check passed; a member limited to some
+// stores sees only those stores' balances and lines (D-125).
 func (h accountHandlers) GetBusinessCreditAccount(ctx context.Context, req businesscreditsapi.GetBusinessCreditAccountRequestObject) (businesscreditsapi.GetBusinessCreditAccountResponseObject, error) {
-	if _, err := customer(ctx); err != nil {
+	user, err := customer(ctx)
+	if err != nil {
 		return nil, err
 	}
 	d, ok := authz.DecisionFrom(ctx)
 	if !ok || d.Scope.BusinessID == ids.Zero {
 		return nil, problem.Wrap(genproblems.Internal, errors.New("credits: no business in the authz decision"))
 	}
-	a, err := h.s.CreditAccount(ctx, d.Scope.BusinessID, req.Params.Limit, req.Params.Cursor)
+	if h.staff == nil {
+		return nil, problem.Wrap(genproblems.ServiceUnavailable, errors.New("credits: no staff resolver"))
+	}
+	m, ok, err := h.staff.Membership(ctx, user, d.Scope.BusinessID)
+	if err != nil {
+		return nil, problem.Wrap(genproblems.Internal, err)
+	}
+	if !ok {
+		// authz allowed a moment ago; the membership ended in between.
+		return nil, problem.New(genproblems.NotFound, "")
+	}
+	a, err := h.s.CreditAccount(ctx, d.Scope.BusinessID, m.StoreIDs, req.Params.Limit, req.Params.Cursor)
 	if err != nil {
 		return nil, asProblem(err)
 	}

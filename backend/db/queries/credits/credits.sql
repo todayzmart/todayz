@@ -225,9 +225,11 @@ FROM stores s
 LEFT JOIN ledger_accounts a ON a.kind = 'store_credit' AND a.owner_id = s.id
 LEFT JOIN account_balances b ON b.account_id = a.id
 WHERE s.business_id = @business_id
+  AND (sqlc.narg(store_ids)::uuid[] IS NULL OR s.id = ANY(sqlc.narg(store_ids)::uuid[]))
 ORDER BY s.created_at, s.id;
 
 -- StoreLines are the postings on the business's store accounts, newest first.
+-- store_ids, when set, limits both reads to a member's stores (D-125).
 -- name: StoreLines :many
 SELECT e.id, e.amount, a.owner_id AS store_id, t.kind, t.ref_type, t.ref_id, t.memo, e.created_at,
   o.display_number AS order_number
@@ -237,6 +239,7 @@ JOIN stores s ON s.id = a.owner_id
 JOIN ledger_transactions t ON t.id = e.transaction_id
 LEFT JOIN orders o ON t.ref_type = 'order' AND o.id = t.ref_id
 WHERE s.business_id = @business_id
+  AND (sqlc.narg(store_ids)::uuid[] IS NULL OR s.id = ANY(sqlc.narg(store_ids)::uuid[]))
   AND (sqlc.narg(cursor_at)::timestamptz IS NULL
     OR (e.created_at, e.id) < (sqlc.narg(cursor_at)::timestamptz, @cursor_id::uuid))
 ORDER BY e.created_at DESC, e.id DESC
