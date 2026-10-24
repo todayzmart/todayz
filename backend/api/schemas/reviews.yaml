@@ -1,9 +1,219 @@
-# Schemas: domain "reviews" (owner W3-03): reviews (04 §2.4, §2.6).
+# Schemas: domain "reviews" (owner W2-06): reviews, replies and reports (04 §2.4, §2.6; 01 §10).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Tags (D-60): a review carries tags of one family, all positive or all negative; a mix is 422
+# validation_failed on `tags`. The 12 values below are ReviewTagPositive and ReviewTagNegative
+# of common.yaml, listed here as one enum so the generated type is a plain string.
+ReviewTag:
+  type: string
+  description: A review tag (D-60). Positive - `fresh_stock`, `fair_price`, `quick_service`, `friendly`, `stock_was_right`, `well_packed`; negative - `item_missing`, `slow`, `rude`, `wrong_item`, `expired_item`, `overpriced`.
+  enum: [fresh_stock, fair_price, quick_service, friendly, stock_was_right, well_packed,
+    item_missing, slow, rude, wrong_item, expired_item, overpriced]
+ReviewTags:
+  type: array
+  description: Up to 6 tags, all positive or all negative, no repeats.
+  maxItems: 6
+  uniqueItems: true
+  items: {$ref: ./reviews.yaml#/ReviewTag}
+ReviewStars:
+  type: integer
+  minimum: 1
+  maximum: 5
+ReviewText:
+  type: string
+  description: What the customer wrote, at most 1000 characters. An empty string clears the text on an edit.
+  maxLength: 1000
+ReviewCreate:
+  type: object
+  description: >-
+    Exactly one of `orderId` (a `collected` or `delivered` order of the caller) and `posSaleId` (the caller's
+    linked POS sale, `bill_qr` or `counter_code`). One review per order or sale.
+  additionalProperties: false
+  required: [stars]
+  properties:
+    orderId: {$ref: ./common.yaml#/Ulid}
+    posSaleId: {$ref: ./common.yaml#/Ulid}
+    stars: {$ref: ./reviews.yaml#/ReviewStars}
+    text: {$ref: ./reviews.yaml#/ReviewText}
+    tags: {$ref: ./reviews.yaml#/ReviewTags}
+ReviewPatch:
+  type: object
+  description: Fields to change; a field left out stays as it is. Tags replace the whole set.
+  additionalProperties: false
+  minProperties: 1
+  properties:
+    stars: {$ref: ./reviews.yaml#/ReviewStars}
+    text: {$ref: ./reviews.yaml#/ReviewText}
+    tags: {$ref: ./reviews.yaml#/ReviewTags}
+ReviewReply:
+  type: object
+  additionalProperties: false
+  required: [text, createdAt, editedAt]
+  properties:
+    text: {type: string, minLength: 1, maxLength: 1000}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    editedAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+ReplyRequest:
+  type: object
+  additionalProperties: false
+  required: [text]
+  properties:
+    text: {type: string, minLength: 1, maxLength: 1000}
+MyReview:
+  type: object
+  description: One of the caller's reviews. `editableUntil` is when edits stop; `hidden` says an admin took it down.
+  additionalProperties: false
+  required: [id, storeId, storeName, orderId, posSaleId, stars, text, tags, createdAt, editedAt, editableUntil, hidden, reply]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    storeId: {$ref: ./common.yaml#/Ulid}
+    storeName: {type: string, maxLength: 200}
+    orderId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    posSaleId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    stars: {$ref: ./reviews.yaml#/ReviewStars}
+    text:
+      type: [string, 'null']
+      maxLength: 1000
+    tags: {$ref: ./reviews.yaml#/ReviewTags}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    editedAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    editableUntil: {$ref: ./common.yaml#/Timestamp}
+    hidden: {type: boolean}
+    reply:
+      oneOf:
+      - {$ref: ./reviews.yaml#/ReviewReply}
+      - {type: 'null'}
+MyReviewList:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: ./reviews.yaml#/MyReview}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+StoreRating:
+  type: object
+  description: >-
+    The store's Bayesian rating (prior 4.0 with weight 5, 01 §10) and its count of visible reviews.
+    `avg` is null while the store has no review. Written by the hourly `store_rating` job and by a hide or restore.
+  additionalProperties: false
+  required: [avg, count]
+  properties:
+    avg:
+      type: [number, 'null']
+      minimum: 0
+      maximum: 5
+    count: {type: integer, minimum: 0}
+PublicReview:
+  type: object
+  additionalProperties: false
+  required: [id, stars, text, tags, customerName, createdAt, editedAt, reply]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    stars: {$ref: ./reviews.yaml#/ReviewStars}
+    text:
+      type: [string, 'null']
+      maxLength: 1000
+    tags: {$ref: ./reviews.yaml#/ReviewTags}
+    customerName:
+      type: [string, 'null']
+      description: The customer's first name only; null when they gave none.
+      maxLength: 80
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    editedAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    reply:
+      oneOf:
+      - {$ref: ./reviews.yaml#/ReviewReply}
+      - {type: 'null'}
+PublicReviewList:
+  type: object
+  additionalProperties: false
+  required: [rating, items, nextCursor, serverNow]
+  properties:
+    rating: {$ref: ./reviews.yaml#/StoreRating}
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: ./reviews.yaml#/PublicReview}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+StoreReview:
+  type: object
+  description: A visible review as the shop sees it. `reported` says this shop already reported it.
+  additionalProperties: false
+  required: [id, stars, text, tags, customerName, createdAt, editedAt, reply, reported]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    stars: {$ref: ./reviews.yaml#/ReviewStars}
+    text:
+      type: [string, 'null']
+      maxLength: 1000
+    tags: {$ref: ./reviews.yaml#/ReviewTags}
+    customerName:
+      type: [string, 'null']
+      maxLength: 80
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    editedAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    reply:
+      oneOf:
+      - {$ref: ./reviews.yaml#/ReviewReply}
+      - {type: 'null'}
+    reported: {type: boolean}
+StoreReviewList:
+  type: object
+  additionalProperties: false
+  required: [rating, items, nextCursor, serverNow]
+  properties:
+    rating: {$ref: ./reviews.yaml#/StoreRating}
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: ./reviews.yaml#/StoreReview}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+ReportText:
+  type: string
+  description: Why the review is reported (free text, at most 500 characters).
+  minLength: 1
+  maxLength: 500
+ReviewReportCreate:
+  type: object
+  additionalProperties: false
+  required: [reviewId, reason]
+  properties:
+    reviewId: {$ref: ./common.yaml#/Ulid}
+    reason: {$ref: ./reviews.yaml#/ReportText}
+StoreReviewReportCreate:
+  type: object
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason: {$ref: ./reviews.yaml#/ReportText}
+ReviewReportReceipt:
+  type: object
+  description: What the reporter gets back. Reporting a review again returns the first report.
+  additionalProperties: false
+  required: [id, reviewId, status, createdAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    reviewId: {$ref: ./common.yaml#/Ulid}
+    status: {type: string, enum: [open, resolved]}
+    createdAt: {$ref: ./common.yaml#/Timestamp}

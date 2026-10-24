@@ -16,11 +16,13 @@ function routes(shop = page(), items = [item(), item({ storeItemId: '01KE0S1W6W8
 
 describe('C-07 Shop page', () => {
   it('shows the header, today\'s hours and the items with stock freshness', async () => {
-    renderDiscover(`/s/${SHOP_A}`, routes());
+    renderDiscover(`/s/${SHOP_A}`, routes(page({ categoryName: 'Kirana' })));
     atBengaluru();
     expect(await screen.findByRole('heading', { level: 1, name: 'Sri Lakshmi Stores' })).toBeInTheDocument();
     expect(screen.getByText('Open')).toBeInTheDocument();
     expect(screen.getByText(/^Today /)).toBeInTheDocument();
+    // The category name comes from the shop page (the business's category).
+    expect(screen.getByText('Kirana')).toBeInTheDocument();
     expect(await screen.findByText('Aashirvaad Atta')).toBeInTheDocument();
     expect(screen.getByText('Toor Dal')).toBeInTheDocument();
     expect(screen.getAllByText(/Confirmed 12 min/).length).toBeGreaterThan(0);

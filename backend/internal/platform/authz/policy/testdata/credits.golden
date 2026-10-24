@@ -1,0 +1,6 @@
+# domain credits: one line per (role x action); regenerate with -update
+me.wallet.view kind=customer step-up=false
+credit_account.view kind=business step-up=false
+credit_account.view owner allow
+credit_account.view manager allow
+credit_account.view cashier -

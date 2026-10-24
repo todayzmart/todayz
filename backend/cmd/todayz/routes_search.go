@@ -22,8 +22,10 @@ func mountSearch(r chi.Router, d *deps) {
 	if err != nil {
 		panic("search: event catalogue: " + err.Error())
 	}
+	offs := newOffers(d)
 	svc, err := search.New(search.Deps{
 		DB: d.DB, Settings: d.Settings, Clock: d.Clock, Log: d.Log,
+		Offers: offs, Pricer: offersForSearch{offs},
 		Open:   search.OpenFunc(business.OpenAt),
 		UserID: func(ctx context.Context) string { return reqctx.PrincipalFrom(ctx).UserID },
 	}, cat)

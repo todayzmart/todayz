@@ -130,8 +130,9 @@ describe('business shell', () => {
     expect(within(side).getAllByRole('link')).toHaveLength(NAV.filter((n) => n.side).length);
   });
 
-  // Sections that have a real page (orders: W2-10) no longer show the placeholder.
-  it.each(NAV.filter((n) => n.section !== 'more' && n.section !== 'overview' && n.section !== 'orders'))('shows the placeholder for /$section', async ({ section }) => {
+  // Sections that have a real page (orders, settings: W2-10; stock, offers: W2-12) no longer show the placeholder.
+  const BUILT = new Set(['more', 'overview', 'orders', 'stock', 'offers', 'reviews', 'credits', 'settings']);
+  it.each(NAV.filter((n) => !BUILT.has(n.section)))('shows the placeholder for /$section', async ({ section }) => {
     renderAt(`/${section}`);
     const { side } = await navs();
     const active = within(side).getAllByRole('link').find((l) => l.getAttribute('aria-current') === 'page');

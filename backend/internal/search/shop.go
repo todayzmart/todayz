@@ -123,6 +123,9 @@ func (s *Service) GetStore(ctx context.Context, slug string, p discoverapi.GetDi
 		DeliveryFeePaise: int(r.DeliveryFeePaise), DeliveryMinOrderPaise: int(r.DeliveryMinOrderPaise),
 		DeliveryRadiusM: int(r.DeliveryRadiusM), ServerNow: now,
 	}
+	if r.CategorySlug != nil { // the store has no category: both stay null
+		out.CategorySlug, out.CategoryName = r.CategorySlug, &r.CategoryName
+	}
 	if r.DeliveryFreeAbovePaise != nil {
 		v := int(*r.DeliveryFreeAbovePaise)
 		out.DeliveryFreeAbovePaise = &v

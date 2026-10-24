@@ -23,6 +23,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useIntl, type IntlShape } from 'react-intl';
 import styles from '../cart/tx.module.css';
 import { NextFromSplit } from '../basket/NextFromSplit';
+import { PartialConfirm } from './PartialConfirm';
 import { Icon } from '../shell/Icon';
 import { formatMmSs, useServerCountdown } from './clock';
 import { PathLink } from './ShopLink';
@@ -114,17 +115,18 @@ function OrderView({ order, showCheck }: { order: Order; showCheck: boolean }) {
   // acceptBy is the shop's answer deadline; holdUntil is how long an accepted order is kept.
   const acceptLeft = useServerCountdown(status === 'placed' ? order.acceptBy : null, order.serverNow);
   const holdLeft = useServerCountdown(open ? order.holdUntil : null, order.serverNow);
+  const partialLeft = useServerCountdown(status === 'awaiting_customer' ? order.partialConfirmBy : null, order.serverNow);
 
   // When a countdown runs out the server decides what happens: ask it once.
   const expiredFor = useRef<string | null>(null);
   useEffect(() => {
-    const out = (status === 'placed' && acceptLeft === 0) || (open && holdLeft === 0);
+    const out = (status === 'placed' && acceptLeft === 0) || (open && holdLeft === 0) || (status === 'awaiting_customer' && partialLeft === 0);
     const key = `${status}:${order.version}`;
     if (out && expiredFor.current !== key) {
       expiredFor.current = key;
       void client.invalidateQueries({ queryKey: ['order', order.id] });
     }
-  }, [status, acceptLeft, holdLeft, open, order.version, order.id, client]);
+  }, [status, acceptLeft, holdLeft, partialLeft, open, order.version, order.id, client]);
 
   const store = useQuery({
     queryKey: ['store-page', order.store.slug],
@@ -207,10 +209,16 @@ function OrderView({ order, showCheck }: { order: Order; showCheck: boolean }) {
       )}
 
       {status === 'awaiting_customer' && (
-        // TODO(W2-02): the partial-confirm screen (confirm or decline the changed order) is deferred; the shop cannot send it yet.
-        <Banner tone="info" title={intl.formatMessage({ id: 'orders.partial.title' })}>
-          {intl.formatMessage({ id: 'orders.partial.body' })}
-        </Banner>
+        <PartialConfirm
+          order={order}
+          left={partialLeft}
+          keyFor={keyFor}
+          done={done}
+          onNext={(next) => {
+            apply(next);
+            void client.invalidateQueries({ queryKey: ['orders'] });
+          }}
+        />
       )}
 
       {open && (
@@ -333,7 +341,9 @@ function OrderView({ order, showCheck }: { order: Order; showCheck: boolean }) {
 function Outcome({ order }: { order: Order }) {
   const intl = useIntl();
   const reason = order.statusReason;
-  const known = reason && ['out_of_stock', 'closing_soon', 'too_busy', 'other', 'changed_mind', 'too_slow', 'no_response'].includes(reason);
+  const known =
+    reason &&
+    ['out_of_stock', 'closing_soon', 'too_busy', 'other', 'changed_mind', 'too_slow', 'no_response', 'partial_timeout', 'declined_partial'].includes(reason);
   return (
     <section className={`tz-card ${styles.stack}`}>
       <h2 className="tz-card-title">{intl.formatMessage({ id: `orders.outcome.${order.status}` }, { shop: order.store.name })}</h2>

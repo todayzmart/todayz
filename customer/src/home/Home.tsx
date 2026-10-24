@@ -6,17 +6,20 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import { CategoryRow, EmptyState, RadiusChips, SearchField, Skeleton, StoreCard, Button } from '@todayz/ui';
 import { MapPin, ShoppingBasket, Store as StoreIcon } from 'lucide-react';
-import { useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { usePlace } from '../app/place';
 import { Icon } from '../shell/Icon';
 import { CartBarLink } from '../store/CartBarLink';
 import { categoryIcon } from './categories';
 import { useCoords, type Coords } from './coords';
-import { asTint, radiusM, useStoreCardProps } from './present';
+import { asTint, radiusM, storeHref, useStoreCardProps } from './present';
 import { RouterLink } from './RouterLink';
 import { RADIUS_OPTIONS_KM, setRadiusKm, useRadiusKm } from './radius';
 import styles from './home.module.css';
+
+// MapLibre stays out of the first load: the card is its own chunk.
+const StoreMapCard = lazy(() => import('./StoreMapCard'));
 
 export function Home({ category }: { category?: string | undefined }) {
   const intl = useIntl();
@@ -104,6 +107,7 @@ export function Home({ category }: { category?: string | undefined }) {
 
 function Nearby({ coords, category }: { coords: Coords; category: string | undefined }) {
   const intl = useIntl();
+  const router = useRouter();
   const km = useRadiusKm();
   const cardProps = useStoreCardProps();
   const { lat, lng } = coords;
@@ -133,6 +137,10 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
   });
 
   const items = stores.data?.pages.flatMap((p) => p.items) ?? [];
+  const names = useMemo(
+    () => new Map((stores.data?.pages.flatMap((p) => p.items) ?? []).map((s) => [s.storeSlug, s.name] as const)),
+    [stores.data],
+  );
   const nextKm = RADIUS_OPTIONS_KM.find((k) => k > km);
   const num = (n: number) => n.toLocaleString('en-IN');
 
@@ -178,6 +186,9 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
               <span className="tz-tag">
                 {intl.formatMessage({ id: 'home.category.active' }, { name: categories.data.items.find((c) => c.slug === category)?.name ?? category })}
               </span>
+              <RouterLink href={`/c/${encodeURIComponent(category)}`} className="tz-btn tz-btn-ghost tz-btn-sm">
+                {intl.formatMessage({ id: 'home.category.page' })}
+              </RouterLink>
               <RouterLink href="/" className="tz-btn tz-btn-ghost tz-btn-sm">
                 {intl.formatMessage({ id: 'home.category.clear' })}
               </RouterLink>
@@ -186,7 +197,19 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
         </section>
       )}
 
-      {/* TODO(W2-08 follow-up): StoreMap card. Map tiles are not wired into the customer app's env and offline availability is unverified. */}
+      <section className={styles.section} aria-label={intl.formatMessage({ id: 'home.map.label' })}>
+        <Suspense fallback={<Skeleton shape="block" height="220px" />}>
+          <StoreMapCard
+            coords={coords}
+            km={km}
+            summary={summary.data}
+            names={names}
+            interactive={false}
+            onExpand={() => router.history.push('/map')}
+            onSelectShop={(slug) => router.history.push(storeHref(slug))}
+          />
+        </Suspense>
+      </section>
 
       <section className={styles.section} aria-labelledby="home-shops">
         <h2 id="home-shops" className={styles.sectionTitle}>

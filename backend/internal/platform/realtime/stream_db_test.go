@@ -28,7 +28,8 @@ import (
 	"github.com/todayz/backend/internal/testkit"
 )
 
-func TestMain(m *testing.M) { testkit.Main(m) }
+// Cursors are snapshot xmins, which are cluster-wide: keep a server of our own.
+func TestMain(m *testing.M) { testkit.MainOwnServer(m) }
 
 const waitFor = 10 * time.Second
 

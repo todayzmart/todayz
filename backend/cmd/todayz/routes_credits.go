@@ -1,8 +1,43 @@
 package main
 
-import "github.com/go-chi/chi/v5"
+import (
+	"github.com/go-chi/chi/v5"
 
-// mountCredits mounts the credits domain's routes. Only the work package that builds
-// internal/credits edits this file (D-50): build the domain's service from d and
-// call its Register, e.g. credits.Register(r, credits.Deps{DB: d.DB, Clock: d.Clock}).
-func mountCredits(r chi.Router, d *deps) {}
+	"github.com/todayz/backend/internal/business"
+	"github.com/todayz/backend/internal/credits"
+	"github.com/todayz/backend/internal/jobs"
+	"github.com/todayz/backend/internal/platform/authz"
+)
+
+// mountCredits mounts W2-01's reads (the customer's wallet and lines, the
+// business credit account) and registers the deletion forfeiture (D-31)
+// with identity. Orders gets the same ledger through creditsService.
+func mountCredits(r chi.Router, d *deps) {
+	svc := creditsService(d)
+	var az authz.Authorizer
+	if d.Authz != nil {
+		az = d.Authz
+	}
+	var staff authz.StaffResolver
+	if d.DB != nil {
+		staff = business.NewStaffResolver(d.DB)
+	}
+	credits.Register(r, svc, az, staff)
+	if d.Identity != nil {
+		d.Identity.AddDeletionHook(svc)
+	}
+}
+
+// creditsService builds the ledger on the API's pool, settings and notices.
+func creditsService(d *deps) *credits.Service {
+	jd := jobs.Deps{Clock: d.Clock, Settings: d.Settings, Config: d.Config, Log: d.Log}
+	if d.DB != nil {
+		jd.Pool = d.DB.Pool
+	}
+	svc, err := jobs.CreditsService(jd, newNotifyService(d))
+	if err != nil {
+		// Only a missing clock, which boot refuses before the routes mount.
+		panic("credits: " + err.Error())
+	}
+	return svc
+}

@@ -298,6 +298,8 @@
               ratingCount: 128
               cashbackPct: 2.5
               categoryTint: green
+              categorySlug: grocery
+              categoryName: Grocery
               deliveryFeePaise: 2000
               deliveryFreeAbovePaise: 49900
               deliveryMinOrderPaise: 0
@@ -392,6 +394,15 @@
       in: query
       description: A brand slug.
       schema: *id013
+    - name: productId
+      in: query
+      description: Only listings of this master product (a ULID, `DiscoverSearchItem.productId`), with
+        the same filters as the rest (live stores of verified businesses inside the radius, in stock).
+        `q` is still required and still scores the results; send the product name. The product page uses
+        it for "Other nearby shops". `summary` counts the filtered set.
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+      example: 01JB0S4A5B6C7D8E9F0G1H2J3K
     - name: maxPricePaise
       in: query
       description: Items priced at most this.

@@ -47,6 +47,10 @@
     "defaultMessage": "Offers",
     "description": "Navigation item"
   },
+  "shell.nav.reviews": {
+    "defaultMessage": "Reviews",
+    "description": "Navigation item"
+  },
   "shell.nav.analytics": {
     "defaultMessage": "Analytics",
     "description": "Navigation item"
@@ -54,6 +58,10 @@
   "shell.nav.groupShop": {
     "defaultMessage": "Shop",
     "description": "Sidebar group heading"
+  },
+  "shell.nav.credits": {
+    "defaultMessage": "Credits",
+    "description": "Navigation item: credit account and referrals"
   },
   "shell.nav.settings": {
     "defaultMessage": "Settings",

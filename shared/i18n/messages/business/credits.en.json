@@ -1,0 +1,262 @@
+{
+  "credits.title": {
+    "defaultMessage": "Credits and referrals",
+    "description": "B-10 page title"
+  },
+  "credits.loading": {
+    "defaultMessage": "Loading credits",
+    "description": "Accessible name of the loading state"
+  },
+  "credits.retry": {
+    "defaultMessage": "Try again",
+    "description": "B-10 retry button"
+  },
+  "credits.error.title": {
+    "defaultMessage": "Could not load your shops",
+    "description": "B-10 error state: the shop list failed"
+  },
+  "credits.error.body": {
+    "defaultMessage": "Check your connection and try again.",
+    "description": "B-10 error state"
+  },
+  "credits.noStore.title": {
+    "defaultMessage": "Pick a shop first",
+    "description": "B-10 empty state: no current shop"
+  },
+  "credits.noStore.body": {
+    "defaultMessage": "Credits belong to one shop. Choose the shop you are working in.",
+    "description": "B-10 empty state"
+  },
+  "credits.noStore.action": {
+    "defaultMessage": "Choose a shop",
+    "description": "B-10 empty state button"
+  },
+  "credits.manager.title": {
+    "defaultMessage": "Ask a manager",
+    "description": "B-10 shown to cashiers"
+  },
+  "credits.manager.body": {
+    "defaultMessage": "Credits, referrals and the standee are for owners and managers.",
+    "description": "B-10 shown to cashiers"
+  },
+  "credits.account.title": {
+    "defaultMessage": "Credit account",
+    "description": "B-10 card title"
+  },
+  "credits.account.balance": {
+    "defaultMessage": "Balance",
+    "description": "B-10 balance label"
+  },
+  "credits.account.credits": {
+    "defaultMessage": "{count, plural, one {# credit} other {# credits}}",
+    "description": "B-10 balance; 1 credit = 1 rupee"
+  },
+  "credits.account.negative": {
+    "defaultMessage": "Negative balances carry forward and are netted at payout.",
+    "description": "B-10 hint under a negative balance"
+  },
+  "credits.account.error": {
+    "defaultMessage": "Could not load your credit account.",
+    "description": "B-10 account load error"
+  },
+  "credits.lines.label": {
+    "defaultMessage": "Credit account lines",
+    "description": "Accessible name of the list of credit lines"
+  },
+  "credits.lines.empty.title": {
+    "defaultMessage": "No credit activity yet",
+    "description": "B-10 empty list title"
+  },
+  "credits.lines.empty.body": {
+    "defaultMessage": "Credits customers spend at your shop and cashback you give will show here.",
+    "description": "B-10 empty list body"
+  },
+  "credits.lines.more": {
+    "defaultMessage": "Show older lines",
+    "description": "B-10 load more button"
+  },
+  "credits.lines.loading": {
+    "defaultMessage": "Loading older lines",
+    "description": "B-10 load more busy label"
+  },
+  "credits.lines.error": {
+    "defaultMessage": "Could not load more lines. Try again.",
+    "description": "B-10 load more error"
+  },
+  "credits.line.spent": {
+    "defaultMessage": "Credits spent at your shop",
+    "description": "B-10 line label"
+  },
+  "credits.line.cashback": {
+    "defaultMessage": "Cashback you gave",
+    "description": "B-10 line label"
+  },
+  "credits.line.referral_reward": {
+    "defaultMessage": "Referral reward",
+    "description": "B-10 line label"
+  },
+  "credits.line.pos_reversal": {
+    "defaultMessage": "Sale reversed",
+    "description": "B-10 line label: a POS sale was reversed"
+  },
+  "credits.line.payout": {
+    "defaultMessage": "Payout",
+    "description": "B-10 line label"
+  },
+  "credits.line.adjustment": {
+    "defaultMessage": "Adjustment",
+    "description": "B-10 line label"
+  },
+  "credits.line.added": {
+    "defaultMessage": "Added",
+    "description": "Screen reader text before a positive amount"
+  },
+  "credits.line.taken": {
+    "defaultMessage": "Taken off",
+    "description": "Screen reader text before a negative amount"
+  },
+  "credits.ref.order": {
+    "defaultMessage": "Order {ref}",
+    "description": "B-10 line reference"
+  },
+  "credits.ref.sale": {
+    "defaultMessage": "Sale {ref}",
+    "description": "B-10 line reference"
+  },
+  "credits.payouts.title": {
+    "defaultMessage": "How payouts work",
+    "description": "B-10 card title"
+  },
+  "credits.payouts.in": {
+    "defaultMessage": "Credits come in when customers spend them at your shop and when your referrals earn a reward.",
+    "description": "B-10 payout explainer"
+  },
+  "credits.payouts.out": {
+    "defaultMessage": "Credits go out as cashback you give, reversed sales and payouts.",
+    "description": "B-10 payout explainer"
+  },
+  "credits.payouts.statement": {
+    "defaultMessage": "Statements close on the 1st of each month.",
+    "description": "B-10 payout explainer"
+  },
+  "credits.payouts.amount": {
+    "defaultMessage": "Your payout is your credit balance minus any payout not yet paid.",
+    "description": "B-10 payout explainer"
+  },
+  "credits.payouts.paid": {
+    "defaultMessage": "A payout shows as paid only after TodayZ has paid you by UPI and recorded the reference.",
+    "description": "B-10 payout explainer"
+  },
+  "credits.payouts.holds": {
+    "defaultMessage": "A payout is held when KYC is incomplete, there is a fraud flag or the business is suspended.",
+    "description": "B-10 payout explainer"
+  },
+  "credits.statements.title": {
+    "defaultMessage": "Monthly statements",
+    "description": "B-10 card title"
+  },
+  "credits.statements.soon": {
+    "defaultMessage": "Monthly statements are coming soon.",
+    "description": "B-10 placeholder until statements ship"
+  },
+  "credits.standee.title": {
+    "defaultMessage": "QR standee",
+    "description": "B-10 card title"
+  },
+  "credits.standee.body": {
+    "defaultMessage": "A printable A5 standee for {store}. Customers scan it to open your shop.",
+    "description": "B-10 standee card"
+  },
+  "credits.standee.shortCode": {
+    "defaultMessage": "Short code",
+    "description": "B-10 standee short code label"
+  },
+  "credits.standee.preview": {
+    "defaultMessage": "Preview PDF",
+    "description": "B-10 button"
+  },
+  "credits.standee.download": {
+    "defaultMessage": "Download A5 PDF",
+    "description": "B-10 button"
+  },
+  "credits.standee.preparing": {
+    "defaultMessage": "Preparing the PDF",
+    "description": "B-10 button busy label"
+  },
+  "credits.standee.open": {
+    "defaultMessage": "Standee options",
+    "description": "B-10 link to the standee screen"
+  },
+  "credits.standee.error": {
+    "defaultMessage": "Could not prepare the standee. Try again.",
+    "description": "B-10 toast"
+  },
+  "credits.referral.title": {
+    "defaultMessage": "Refer a shop",
+    "description": "B-10 card title"
+  },
+  "credits.referral.body": {
+    "defaultMessage": "Share your code with another shop owner. You earn credits when their shop gets its first orders.",
+    "description": "B-10 referral explainer"
+  },
+  "credits.referral.codeLabel": {
+    "defaultMessage": "Your referral code",
+    "description": "Accessible name of the code"
+  },
+  "credits.referral.copy": {
+    "defaultMessage": "Copy code",
+    "description": "B-10 button"
+  },
+  "credits.referral.copied": {
+    "defaultMessage": "Code copied",
+    "description": "B-10 toast"
+  },
+  "credits.referral.copyLink": {
+    "defaultMessage": "Copy link",
+    "description": "B-10 button"
+  },
+  "credits.referral.linkCopied": {
+    "defaultMessage": "Link copied",
+    "description": "B-10 toast"
+  },
+  "credits.referral.copyFailed": {
+    "defaultMessage": "Could not copy. Select the text and copy it by hand.",
+    "description": "B-10 toast"
+  },
+  "credits.referral.share": {
+    "defaultMessage": "Share",
+    "description": "B-10 button"
+  },
+  "credits.referral.shareTitle": {
+    "defaultMessage": "Join TodayZ",
+    "description": "Title passed to the share sheet"
+  },
+  "credits.referral.pending": {
+    "defaultMessage": "Waiting for first orders",
+    "description": "B-10 stat label"
+  },
+  "credits.referral.rewarded": {
+    "defaultMessage": "Rewarded",
+    "description": "B-10 stat label"
+  },
+  "credits.referral.count": {
+    "defaultMessage": "{count, plural, one {# shop} other {# shops}}",
+    "description": "B-10 stat value"
+  },
+  "credits.referral.where": {
+    "defaultMessage": "Rewards are added to your primary store's credit account.",
+    "description": "B-10 note"
+  },
+  "credits.referral.error": {
+    "defaultMessage": "Could not load your referral code.",
+    "description": "B-10 referral load error"
+  },
+  "credits.referral.earned": {
+    "defaultMessage": "Credits earned",
+    "description": "B-10 stat label"
+  },
+  "credits.referral.earnedValue": {
+    "defaultMessage": "{credits, plural, one {# credit} other {# credits}}",
+    "description": "B-10 stat value"
+  }
+}

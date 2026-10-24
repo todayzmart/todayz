@@ -1,9 +1,140 @@
-# Schemas: domain "referrals" (owner W3-04): referrals (04 §2.4, §2.6).
+# Schemas: domain "referrals" (owner W2-03): referrals (01 §8, 04 §2.4, §2.6; D-13, D-26, D-32).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Request objects carry `additionalProperties: false` (an unknown field is 422
+# validation_failed). Ids are `Ulid`, times are `Timestamp`.
+ReferralCode:
+  type: string
+  description: A 6-character referral code or store short code (no 0, O, 1, I or L).
+  pattern: ^[A-HJKMNP-Z2-9]{6}$
+  minLength: 6
+  maxLength: 6
+  examples:
+    - K7M2QX
+ReferralKind:
+  type: string
+  enum: [retailer_customer, customer_customer, any_shop]
+  description: >-
+    `retailer_customer`: a store (standee or link) referred a customer; `customer_customer`: a
+    customer referred a customer; `any_shop`: a customer or a business referred a new business.
+ReferralStats:
+  type: object
+  required: [clicks, pending, rewarded, creditsEarned]
+  properties:
+    clicks:
+      type: integer
+      minimum: 0
+      description: Opens of the link or standee URL that resolved to this referrer.
+    pending:
+      type: integer
+      minimum: 0
+      description: Sign-ups that have not completed the qualifying action yet (or whose reward is still posting).
+    rewarded:
+      type: integer
+      minimum: 0
+    creditsEarned:
+      $ref: ./common.yaml#/Credits
+RewardAmounts:
+  type: object
+  description: The rewards a referral made now would earn (read from settings; a referral keeps the amounts of the day it was claimed).
+  required: [referrerCredits, refereeCredits]
+  properties:
+    referrerCredits:
+      $ref: ./common.yaml#/Credits
+    refereeCredits:
+      $ref: ./common.yaml#/Credits
+MyReferredBy:
+  type: object
+  description: The referral this account joined through, if any.
+  required: [kind, status]
+  properties:
+    kind:
+      $ref: '#/ReferralKind'
+    status:
+      $ref: '#/ReferralClaimStatus'
+MyReferrals:
+  type: object
+  required: [code, link, rewards, stats, referredBy]
+  properties:
+    code:
+      $ref: '#/ReferralCode'
+    link:
+      type: string
+      format: uri
+      maxLength: 200
+      description: The share link (`GET /v1/public/ref/{code}`).
+    rewards:
+      $ref: '#/RewardAmounts'
+    stats:
+      $ref: '#/ReferralStats'
+    referredBy:
+      oneOf:
+        - $ref: '#/MyReferredBy'
+        - type: 'null'
+ReferralClaim:
+  type: object
+  additionalProperties: false
+  description: >-
+    `code` when the person typed one; without it the attribution cookie set by the referral link
+    is used. `referrer` picks which code a typed code is when it could be more than one (a
+    customer's code or a store's short code; for a business, a customer's code or a business code).
+  properties:
+    code:
+      $ref: '#/ReferralCode'
+    referrer:
+      type: string
+      enum: [customer, store, business]
+ReferralClaimStatus:
+  type: string
+  enum: [pending, qualified, rewarded, rejected]
+  description: >-
+    `pending` until the qualifying action; `rejected` when the claim was recorded but earns no
+    reward (the reason is not shown).
+ReferralClaimResult:
+  type: object
+  required: [referralId, kind, status, rewardCredits]
+  properties:
+    referralId:
+      $ref: ./common.yaml#/Ulid
+    kind:
+      $ref: '#/ReferralKind'
+    status:
+      $ref: '#/ReferralClaimStatus'
+    rewardCredits:
+      $ref: ./common.yaml#/Credits
+      description: What the new person gets when the referral unlocks (0 when rejected).
+ShopReferredBy:
+  type: object
+  description: The referral this business joined through, with its qualification progress.
+  required: [status, ordersCounted, ordersNeeded, verified]
+  properties:
+    status:
+      $ref: '#/ReferralClaimStatus'
+    ordersCounted:
+      type: integer
+      minimum: 0
+      description: Different customers with a counted completed order or linked sale so far (D-168).
+    ordersNeeded:
+      type: integer
+      minimum: 0
+    verified:
+      type: boolean
+BusinessReferrals:
+  type: object
+  required: [code, link, rewards, stats, referredBy]
+  properties:
+    code:
+      $ref: '#/ReferralCode'
+    link:
+      type: string
+      format: uri
+      maxLength: 200
+      description: The shop-to-shop share link.
+    rewards:
+      $ref: '#/RewardAmounts'
+    stats:
+      description: Shops referred with the business code plus customers referred by its stores (standees and links).
+      $ref: '#/ReferralStats'
+    referredBy:
+      oneOf:
+        - $ref: '#/ShopReferredBy'
+        - type: 'null'

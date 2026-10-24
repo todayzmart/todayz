@@ -1,4 +1,4 @@
-# Schemas: domain "wallet" (owner W2-03): customer wallet, purchases and credits under /v1/me (04 §2.4).
+# Schemas: domain "wallet" (owner W2-01): customer wallet, purchases and credits under /v1/me (04 §2.4).
 #
 # Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
 # Schema; names are unique across every schemas/<domain>.yaml. Request objects
@@ -6,4 +6,72 @@
 # an object that must stay open says `x-open-object: true`. Money is `*Paise`
 # (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
 # timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+Wallet:
+  type: object
+  description: >-
+    The customer's credits (C-16). `availableCredits` can be spent now (lots past their expiry are left
+    out); `heldCredits` are held for open orders or bill claims. `expiringSoon` is what expires within
+    `credit_expiry_reminder_days`. `creditOrdersThisMonth` counts this IST month's credit-using orders
+    against `creditOrdersPerMonth` (D-30).
+  required: [availableCredits, heldCredits, expiringSoon, creditOrdersThisMonth, creditOrdersPerMonth,
+    maxCreditsPerOrder, minOrderPaise, serverNow]
+  properties:
+    availableCredits: {$ref: ./common.yaml#/Credits}
+    heldCredits: {$ref: ./common.yaml#/Credits}
+    expiringSoon:
+      type: array
+      maxItems: 50
+      items: {$ref: '#/ExpiringCredits'}
+    creditOrdersThisMonth: {type: integer, minimum: 0}
+    creditOrdersPerMonth: {type: integer, minimum: 0}
+    maxCreditsPerOrder: {$ref: ./common.yaml#/Credits}
+    minOrderPaise: {$ref: ./common.yaml#/Paise}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+ExpiringCredits:
+  type: object
+  description: Credits that expire at `expiresAt` (00:00 IST on the day after the last usable day).
+  required: [credits, expiresAt]
+  properties:
+    credits: {$ref: ./common.yaml#/Credits}
+    expiresAt: {$ref: ./common.yaml#/Timestamp}
+WalletLineKind:
+  type: string
+  description: The ledger transaction kind behind a wallet line (03 §6).
+  enum: [spend_hold, spend_capture, spend_release, cashback, referral_reward, expiry, admin_adjustment,
+    reversal, forfeit_deletion]
+WalletLine:
+  type: object
+  description: >-
+    One wallet history line (01 §7). `credits` is the change in the customer's total (available + held);
+    `availableCredits` the change in what can be spent. `text` is the English line; `params` carries the
+    values a client puts in its own translation of the line.
+  required: [id, kind, credits, availableCredits, text, params, createdAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    kind: {$ref: '#/WalletLineKind'}
+    credits: {type: integer}
+    availableCredits: {type: integer}
+    text: {type: string}
+    params: {$ref: '#/WalletLineParams'}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+WalletLineParams:
+  type: object
+  properties:
+    shopName: {type: string}
+    orderNumber: {type: string}
+    percent:
+      type: string
+      description: The cashback rate as shown, e.g. "5" or "2.5".
+    reason:
+      type: string
+      description: Why held credits came back, for spend_release lines.
+      enum: [order_cancelled, order_rejected, order_expired, order_changed, bill_claim_expired, released]
+WalletLineList:
+  type: object
+  required: [items, nextCursor]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/WalletLine'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+

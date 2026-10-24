@@ -130,12 +130,18 @@ func (a *app) closePool(ctx context.Context, pool *pgxpool.Pool) {
 	lifecycle.StepWithin(ctx, a.log, "db pool", lifecycle.PoolClose, pool.Close)
 }
 
+// minPoolConns is the smallest pool the api and worker run with. pgx's default
+// (max(4, CPUs)) is too small once order placement holds row locks for the
+// length of its transaction: a few queued requests would take every
+// connection. A larger pool_max_conns in DATABASE_URL still wins.
+const minPoolConns = 16 //settings:ok pool sizing is deployment config, not a product rule
+
 // appPool opens DATABASE_URL (todayz_app: DML only).
 func (a *app) appPool(ctx context.Context, name string) (*pgxpool.Pool, error) {
 	if !a.cfg.DatabaseURL.IsSet() {
 		return nil, errors.New("DATABASE_URL is not set")
 	}
-	pool, err := db.Open(ctx, a.cfg.DatabaseURL.Reveal(), db.Options{AppName: "todayz-" + name, Tracer: telemetry.NewPgxTracer(nil)})
+	pool, err := db.Open(ctx, a.cfg.DatabaseURL.Reveal(), db.Options{AppName: "todayz-" + name, MinMaxConns: minPoolConns, Tracer: telemetry.NewPgxTracer(nil)})
 	if err != nil {
 		return nil, err
 	}

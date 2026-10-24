@@ -102,7 +102,8 @@ SELECT s.id, s.slug, s.name, s.locality, s.address_line1, s.address_line2, s.lan
   s.hours, s.closed_until, s.accepts_pickup, s.accepts_delivery,
   s.delivery_fee_paise, s.delivery_free_above_paise, s.delivery_min_order_paise, s.delivery_radius_m,
   s.cashback_bp, (s.rating_avg IS NOT NULL)::bool AS has_rating, COALESCE(s.rating_avg, 0)::float8 AS rating_avg,
-  s.rating_count, c.tint AS category_tint,
+  s.rating_count, c.tint AS category_tint, c.slug AS category_slug,
+  COALESCE(NULLIF(c.names->>'en', ''), c.slug) AS category_name,
   ST_Y(s.location::geometry)::float8 AS lat, ST_X(s.location::geometry)::float8 AS lng,
   (sqlc.narg(lng)::float8 IS NOT NULL AND sqlc.narg(lat)::float8 IS NOT NULL)::bool AS has_distance,
   COALESCE(ST_Distance(s.location, ST_SetSRID(ST_MakePoint(sqlc.narg(lng)::float8, sqlc.narg(lat)::float8), 4326)::geography), 0)::float8 AS distance_m
@@ -139,7 +140,9 @@ LIMIT @lim OFFSET @off;
 -- normalised words with their synonyms), or its product is one of typo_ids
 -- (trigram on the product name), or its product is in match_category_ids (the
 -- query names a category). brand_id, max_price and category_ids are the
--- request's filters. fts and sim feed the text score in Go. lim is a safety cap.
+-- request's filters. product_id (optional) limits it to one master product and
+-- also lets that product match without the text. fts and sim feed the text
+-- score in Go. lim is a safety cap.
 SELECT si.id AS store_item_id, si.product_id, si.local_name, si.price_paise, si.mrp_paise,
   (si.on_hand - si.reserved)::int AS available, si.stock_updated_at,
   p.name AS product_name, p.variant, p.pack_size::float8 AS pack_size, p.unit, p.image_key,
@@ -165,7 +168,9 @@ WHERE s.status = 'live' AND b.status = 'verified'
   AND p.status IN ('active', 'pending_review')
   AND (si.search @@ to_tsquery('simple', @tsq::text)
        OR si.product_id = ANY(@typo_ids::uuid[])
-       OR p.category_id = ANY(@match_category_ids::uuid[]))
+       OR p.category_id = ANY(@match_category_ids::uuid[])
+       OR si.product_id = sqlc.narg(product_id)::uuid)
+  AND (sqlc.narg(product_id)::uuid IS NULL OR si.product_id = sqlc.narg(product_id)::uuid)
   AND (sqlc.narg(brand_id)::uuid IS NULL OR p.brand_id = sqlc.narg(brand_id)::uuid)
   AND (sqlc.narg(max_price)::bigint IS NULL OR si.price_paise <= sqlc.narg(max_price)::bigint)
   AND (sqlc.narg(category_ids)::uuid[] IS NULL OR p.category_id = ANY(sqlc.narg(category_ids)::uuid[]))

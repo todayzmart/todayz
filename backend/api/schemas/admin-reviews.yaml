@@ -1,9 +1,112 @@
-# Schemas: domain "admin-reviews" (owner W3-03): admin reviews (04 §2.7).
-#
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Schemas: domain "admin-reviews" (owner W2-06): admin review moderation (04 §2.7; 01 §10; D-41).
+# support, admin and super_admin hide and restore a review or its reply, always with a reason; each is audited.
+ModerationNote:
+  type: string
+  description: Why, at most 300 characters. Kept on the row and in the audit log.
+  minLength: 1
+  maxLength: 300
+ModerationRequest:
+  type: object
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason: {$ref: ./admin-reviews.yaml#/ModerationNote}
+AdminReviewReply:
+  type: object
+  additionalProperties: false
+  required: [text, createdAt, hidden, hideReason]
+  properties:
+    text: {type: string, maxLength: 1000}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    hidden: {type: boolean}
+    hideReason:
+      type: [string, 'null']
+      maxLength: 300
+AdminReview:
+  type: object
+  additionalProperties: false
+  required: [id, storeId, storeName, customerId, orderId, posSaleId, stars, text, tags, createdAt, hidden, hiddenAt, hideReason, openReports, reply]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    storeId: {$ref: ./common.yaml#/Ulid}
+    storeName: {type: string, maxLength: 200}
+    customerId: {$ref: ./common.yaml#/Ulid}
+    orderId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    posSaleId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    stars: {type: integer, minimum: 1, maximum: 5}
+    text:
+      type: [string, 'null']
+      maxLength: 1000
+    tags:
+      type: array
+      maxItems: 6
+      items: {type: string, maxLength: 40}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    hidden: {type: boolean}
+    hiddenAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    hideReason:
+      type: [string, 'null']
+      maxLength: 300
+    openReports: {type: integer, minimum: 0}
+    reply:
+      oneOf:
+      - {$ref: ./admin-reviews.yaml#/AdminReviewReply}
+      - {type: 'null'}
+AdminReviewList:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: ./admin-reviews.yaml#/AdminReview}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminReviewReport:
+  type: object
+  additionalProperties: false
+  required: [id, reviewId, reporterKind, reason, status, resolution, resolutionNote, createdAt, resolvedAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    reviewId: {$ref: ./common.yaml#/Ulid}
+    reporterKind: {type: string, enum: [customer, store]}
+    reason: {type: string, maxLength: 500}
+    status: {type: string, enum: [open, resolved]}
+    resolution:
+      type: [string, 'null']
+      enum: [dismissed, upheld, null]
+    resolutionNote:
+      type: [string, 'null']
+      maxLength: 500
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    resolvedAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+AdminReviewReportList:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: ./admin-reviews.yaml#/AdminReviewReport}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+ResolveReportRequest:
+  type: object
+  description: '`dismissed` closes the report and leaves the review; `upheld` closes it as justified (hide the review separately, or it is already hidden).'
+  additionalProperties: false
+  required: [resolution]
+  properties:
+    resolution: {type: string, enum: [dismissed, upheld]}
+    note: {type: string, minLength: 1, maxLength: 500}

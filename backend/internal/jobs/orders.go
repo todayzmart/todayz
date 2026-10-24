@@ -51,6 +51,12 @@ func registerorders(r *Registry, d Deps) {
 			return nil, err
 		}
 		od.Notices = ns
+		// An expired order's held credits go back (W2-01).
+		cs, err := CreditsService(d, ns)
+		if err != nil {
+			return nil, err
+		}
+		od.Credits = OrdersCredits(cs)
 		return orders.New(od)
 	}
 	timer := func(name, desc string, run func(*orders.Service, context.Context, platformjobs.Run) (platformjobs.Result, error)) {
