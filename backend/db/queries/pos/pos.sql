@@ -65,13 +65,13 @@ WHERE id = @id AND counter_secret_enc IS NULL;
 INSERT INTO pos_sales (
   id, store_id, client_id, device_id, device_seq, cashier_user_id, customer_id,
   link_method, link_status, offline_link_code, offline_link_at, device_clock_skew_ms,
-  link_phone_hash, link_phone_enc,
+  link_phone_hash, link_phone_enc, offline_offer_unmatched,
   item_subtotal_paise, bill_offer_discount_paise, subtotal_paise, discount_paise, round_off_paise,
   credits_used, cashback_credits, total_paise, payment_method, sold_at, received_at, created_at, updated_at
 ) VALUES (
   @id, @store_id, @client_id, @device_id, sqlc.narg(device_seq), @cashier_user_id, sqlc.narg(customer_id),
   sqlc.narg(link_method), sqlc.narg(link_status), sqlc.narg(offline_link_code), sqlc.narg(offline_link_at),
-  sqlc.narg(device_clock_skew_ms), sqlc.narg(link_phone_hash), sqlc.narg(link_phone_enc),
+  sqlc.narg(device_clock_skew_ms), sqlc.narg(link_phone_hash), sqlc.narg(link_phone_enc), @offline_offer_unmatched,
   @item_subtotal_paise, @bill_offer_discount_paise, @subtotal_paise, @discount_paise, @round_off_paise,
   @credits_used, 0, @total_paise, @payment_method, @sold_at, @now, @now, @now
 )
@@ -152,19 +152,21 @@ WHERE store_id = @store_id AND sale_client_id = @sale_client_id AND id IS DISTIN
   AND status IN ('open','claimed') AND pos_sale_id IS NULL
 RETURNING id, claimed_by;
 
--- name: ExpireBillClaims :many
--- Up to @lim live claims past their expiry (the sweep); a claim a sale is
--- binding right now is skipped and its sale sees it expired.
-WITH due AS (
-  SELECT id FROM bill_claims
-  WHERE status IN ('open','claimed') AND pos_sale_id IS NULL AND expires_at <= @now
-  ORDER BY expires_at
-  LIMIT @lim
-  FOR UPDATE SKIP LOCKED
-)
-UPDATE bill_claims bc SET status = 'expired', version = bc.version + 1, updated_at = @now
-FROM due WHERE bc.id = due.id
-RETURNING bc.id, bc.claimed_by;
+-- name: DueBillClaims :many
+-- One page of the sweep: up to @lim live claims past their expiry after the
+-- keyset (@after_at, @after_id), oldest first, so a claim left live does not
+-- hold the page back; a claim a sale is binding right now is skipped and its
+-- sale sees it expired.
+SELECT id, claimed_by, expires_at FROM bill_claims
+WHERE status IN ('open','claimed') AND pos_sale_id IS NULL AND expires_at <= @now
+  AND (expires_at, id) > (@after_at::timestamptz, @after_id::uuid)
+ORDER BY expires_at, id
+LIMIT @lim
+FOR UPDATE SKIP LOCKED;
+
+-- name: ExpireBillClaim :execrows
+UPDATE bill_claims SET status = 'expired', version = version + 1, updated_at = @now
+WHERE id = @id AND status IN ('open','claimed') AND pos_sale_id IS NULL;
 
 ------------------------------------------------------------------------------
 -- Counter codes
@@ -201,7 +203,8 @@ SELECT pg_advisory_xact_lock(hashtextextended(@key::text, 0));
 
 -- name: CodeLocks :one
 -- Whether a phone at a store, or a cashier, is locked, and their failures
--- in the windows (D-131).
+-- in the windows: the phone at the store, the phone at any store, the
+-- cashier (D-131).
 SELECT
   EXISTS (SELECT 1 FROM counter_code_failures f
     WHERE f.store_id = @store_id AND f.phone_hash = sqlc.narg(phone_hash)
@@ -212,6 +215,8 @@ SELECT
   (SELECT count(*) FROM counter_code_failures f
     WHERE f.store_id = @store_id AND f.phone_hash = sqlc.narg(phone_hash)
       AND f.failed_at > @phone_window_since)::int AS phone_failures,
+  (SELECT count(*) FROM counter_code_failures f
+    WHERE f.phone_hash = sqlc.narg(phone_hash) AND f.failed_at > @phone_any_since)::int AS phone_any_failures,
   (SELECT count(*) FROM counter_code_failures f
     WHERE f.cashier_user_id = @cashier_user_id AND f.failed_at > @cashier_window_since)::int AS cashier_failures;
 
@@ -319,17 +324,17 @@ LIMIT @lim;
 -- Risk
 ------------------------------------------------------------------------------
 
--- name: OfflineLinksSince :one
-SELECT count(*)::int AS n FROM pos_sales
-WHERE store_id = @store_id AND offline_link_at IS NOT NULL AND link_status = 'linked'
-  AND received_at >= @since;
-
--- name: OfflineOfferSalesSince :one
--- Offline sales carrying an offer discount the device applied (no offer id
--- reaches the server, D-131).
-SELECT count(*)::int AS n FROM pos_sales s
-WHERE s.store_id = @store_id AND s.device_seq IS NOT NULL AND s.received_at >= @since
-  AND EXISTS (SELECT 1 FROM pos_sale_lines l WHERE l.sale_id = s.id AND l.offer_discount_paise > 0);
+-- name: OfflineRiskSalesSince :one
+-- Offline sales that count toward pos_offline_links_risk_per_day, each once:
+-- a counter code linked offline, or a device offer discount the offers
+-- engine would not give (D-12, D-131).
+SELECT
+  count(*)::int AS n,
+  count(*) FILTER (WHERE offline_link_at IS NOT NULL AND link_status = 'linked')::int AS links,
+  count(*) FILTER (WHERE offline_offer_unmatched)::int AS offers
+FROM pos_sales
+WHERE store_id = @store_id AND received_at >= @since
+  AND ((offline_link_at IS NOT NULL AND link_status = 'linked') OR offline_offer_unmatched);
 
 -- name: InsertRiskFlagOnce :exec
 -- One open flag per store, rule and IST day.

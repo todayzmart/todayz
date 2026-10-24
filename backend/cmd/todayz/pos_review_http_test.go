@@ -277,10 +277,9 @@ func TestPOSClaimHoldLifecycle(t *testing.T) {
 		Settings: settings.NewCache(settings.PGLoader(p.a.tdb.Pool), settings.Options{Log: log}),
 	})
 	require.NoError(t, err)
-	expired, released, err := svc.ExpireClaims(context.Background())
+	sw, err := svc.ExpireClaims(context.Background())
 	require.NoError(t, err)
-	require.Equal(t, 1, expired)
-	require.Equal(t, 1, released)
+	require.Equal(t, pos.Sweep{Expired: 1, Released: 1}, sw)
 	require.Equal(t, []ids.ID{idOf(t, a), idOf(t, d), idOf(t, c)}, p.credits.released)
 	require.Equal(t, []ids.ID{idOf(t, b)}, p.credits.captured, "no hold is both")
 	require.Empty(t, p.credits.holds)

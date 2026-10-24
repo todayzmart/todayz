@@ -33,8 +33,7 @@ Each app folder must build and test on its own (no imports into a sibling app), 
 ## Rules
 
 - **Never print, echo or log secret values** (AWS, RDS, Beanstalk, Cloudflare, SMS, WhatsApp, Sentry, Grafana, Anthropic, Sarvam keys). Refer to variables by name. Use `make env-check`, which prints only set/missing.
-- **Local first.** Build and test everything locally (`make dev`) until the whole product is done and tested end to end. Do not create or touch cloud resources until the user has provided credentials for Wave 5.
-- **No GitHub repos and no pushing.** One local git repo at this root. The user will say when to split and give repo names.
+- **Cloud (D-210, founder 24 Oct):** one private GitHub repo `todayz` in the TodayZ org. No staging: merges to `main` deploy straight to prod (API and worker on Beanstalk, the four apps on Cloudflare Pages). Cloud admin credentials are only in `.env.cloud.local`, read by the lead's shell; never use the founder's personal plugins or connectors. Only the lead pushes, creates cloud resources or applies Terraform, and the first prod apply waits for the founder's yes on the plan summary. Worker sessions stay local: no push, no cloud calls.
 - The API contract is `backend/api/` (split per domain, bundled by `make gen`). The bundled `openapi.yaml` is generated: edit only your own domain's files in `backend/api/paths/` and `backend/api/schemas/`, and run `make gen` in the same change.
 - **Generated code is not committed.** `backend/gen`, `shared/api-client` and the bundled `openapi.yaml` are git-ignored; `make gen` produces them, and every build and check runs `make gen` first. `routeTree.gen.ts` is git-ignored and generated too.
 - Database changes only through new migration files.

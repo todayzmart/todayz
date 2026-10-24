@@ -9,7 +9,11 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"slices"
+	"strings"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 
 	posapi "github.com/todayz/backend/gen/api/pos"
 	genproblems "github.com/todayz/backend/gen/problems"
@@ -18,6 +22,7 @@ import (
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/pii"
+	"github.com/todayz/backend/internal/platform/settings"
 )
 
 // The counter code (01 §6, D-12): RFC 6238 TOTP with SHA-1, 60 s steps and
@@ -76,7 +81,7 @@ type codeMatch struct {
 // with the phone. ok is false for a wrong code or a phone with no account
 // (the caller cannot tell which, D-12).
 func (s *Service) matchCode(ctx context.Context, phone, code string, at time.Time) (codeMatch, bool, error) {
-	e164, ok := pii.NormalizePhone(phone)
+	e164, ok := canonPhone(phone)
 	if !ok {
 		return codeMatch{}, false, nil
 	}
@@ -105,8 +110,31 @@ func (s *Service) matchCode(ctx context.Context, phone, code string, at time.Tim
 	return codeMatch{}, false, nil
 }
 
+// canonPhone is phone in E.164, or false when it is not an Indian mobile.
+// The contract only lets E.164 through; the spaces, dashes, a 0 or 91 in
+// front are taken off anyway, so no spelling of one number gets a lock key of
+// its own (D-131).
+func canonPhone(phone string) (string, bool) {
+	d := strings.Map(func(r rune) rune {
+		switch r {
+		case ' ', '-', '.', '(', ')':
+			return -1
+		}
+		return r
+	}, phone)
+	d = strings.TrimPrefix(d, "+91")
+	switch {
+	case len(d) == 12 && strings.HasPrefix(d, "91"):
+		d = d[2:]
+	case len(d) == 11 && strings.HasPrefix(d, "0"):
+		d = d[1:]
+	}
+	return pii.NormalizePhone("+91" + d)
+}
+
 // codeGuard is who a counter-code check counts against (D-131): the phone
-// at the store and the cashier. phone is nil when it does not parse.
+// (at the store and at any store) and the cashier. phone is nil when it is
+// not a phone number.
 type codeGuard struct {
 	store, cashier ids.ID
 	phone          []byte
@@ -114,45 +142,89 @@ type codeGuard struct {
 
 func (s *Service) guard(store, cashier ids.ID, phone string) codeGuard {
 	g := codeGuard{store: store, cashier: cashier}
-	if e164, ok := pii.NormalizePhone(phone); ok {
+	if e164, ok := canonPhone(phone); ok {
 		g.phone = s.hasher.Phone(e164)
 	}
 	return g
 }
 
-// codeLocks serialises the guard's counts until commit (the cashier, then
-// the phone, always in that order) and reads them.
-func (s *Service) codeLocks(ctx context.Context, g codeGuard, now time.Time) (posdb.CodeLocksRow, error) {
-	q := s.q(ctx)
-	keys := []string{"pos.code.cashier:" + g.cashier.String()}
-	if g.phone != nil {
-		keys = append(keys, "pos.code.phone:"+g.store.String()+":"+hex.EncodeToString(g.phone))
-	}
-	for _, k := range keys {
-		if err := q.LockCodeKey(ctx, k); err != nil {
-			return posdb.CodeLocksRow{}, fmt.Errorf("pos: lock code key: %w", err)
+// lockCodeKeys takes the advisory locks that serialise the code counts of a
+// cashier and of phones until commit: the cashier first, then the phones in
+// sorted order, so two transactions never wait on each other in a circle
+// (D-131). A phone's lock is one key for every store, as its ceiling is. A
+// lock taken again in the same transaction is a no-op.
+func (s *Service) lockCodeKeys(ctx context.Context, cashier ids.ID, phones ...[]byte) error {
+	return s.lockKeys(ctx, codeKeys(cashier, phones...))
+}
+
+// codeKeys is the advisory keys of a cashier and phones in lock order: the
+// cashier, then the phones sorted, each once. A nil phone has no key.
+func codeKeys(cashier ids.ID, phones ...[]byte) []string {
+	keys := make([]string, 0, len(phones))
+	for _, p := range phones {
+		if p != nil {
+			keys = append(keys, "pos.code.phone:"+hex.EncodeToString(p))
 		}
 	}
-	r, err := q.CodeLocks(ctx, posdb.CodeLocksParams{
+	slices.Sort(keys)
+	return append([]string{"pos.code.cashier:" + cashier.String()}, slices.Compact(keys)...)
+}
+
+func (s *Service) lockKeys(ctx context.Context, keys []string) error {
+	q := s.q(ctx)
+	for _, k := range keys {
+		if err := q.LockCodeKey(ctx, k); err != nil {
+			return fmt.Errorf("pos: lock code key: %w", err)
+		}
+	}
+	return nil
+}
+
+// codeState is a guard's counts, read under its locks.
+type codeState struct {
+	posdb.CodeLocksRow
+	phoneCeiling int // pos_code_phone_failures_per_hour
+}
+
+// locked reports whether no code may be checked for the guard: the phone is
+// locked at the store, the cashier is locked, or the phone reached its
+// ceiling across stores.
+func (c codeState) locked() bool {
+	return c.PhoneLocked || c.CashierLocked || int(c.PhoneAnyFailures) >= c.phoneCeiling
+}
+
+// codeLocks serialises the guard's counts until commit and reads them.
+func (s *Service) codeLocks(ctx context.Context, g codeGuard, now time.Time) (codeState, error) {
+	if err := s.lockCodeKeys(ctx, g.cashier, g.phone); err != nil {
+		return codeState{}, err
+	}
+	ceiling, err := s.count(ctx, settings.PosCodePhoneFailuresPerHour)
+	if err != nil {
+		return codeState{}, err
+	}
+	r, err := s.q(ctx).CodeLocks(ctx, posdb.CodeLocksParams{
 		StoreID: ids.UUID(g.store), PhoneHash: g.phone, CashierUserID: ids.UUID(g.cashier), Now: now,
 		PhoneLockSince: now.Add(-phoneLock), CashierLockSince: now.Add(-cashierLock),
 		PhoneWindowSince: now.Add(-phoneFailWindow), CashierWindowSince: now.Add(-cashierFailWindow),
+		PhoneAnySince: now.Add(-phoneAnyWindow),
 	})
 	if err != nil {
-		return r, fmt.Errorf("pos: code locks: %w", err)
+		return codeState{}, fmt.Errorf("pos: code locks: %w", err)
 	}
-	return r, nil
+	return codeState{CodeLocksRow: r, phoneCeiling: ceiling}, nil
 }
 
-func codeLocked(r posdb.CodeLocksRow) bool { return r.PhoneLocked || r.CashierLocked }
-
 // codeFailed records a wrong code against the guard (source online or
-// sync); the failure that reaches a limit locks the phone or the cashier,
-// and locked reports that it did.
-func (s *Service) codeFailed(ctx context.Context, g codeGuard, r posdb.CodeLocksRow, source string, now time.Time) (locked bool, err error) {
+// sync); the failure that reaches a limit locks the phone or the cashier, or
+// takes the phone to its ceiling, and locked reports that it did.
+func (s *Service) codeFailed(ctx context.Context, g codeGuard, r codeState, source string, now time.Time) (locked bool, err error) {
 	var phoneUntil, cashierUntil *time.Time
-	if g.phone != nil && int(r.PhoneFailures)+1 >= phoneFailMax {
-		phoneUntil = ptr(now.Add(phoneLock))
+	ceiling := false
+	if g.phone != nil {
+		if int(r.PhoneFailures)+1 >= phoneFailMax {
+			phoneUntil = ptr(now.Add(phoneLock))
+		}
+		ceiling = int(r.PhoneAnyFailures)+1 >= r.phoneCeiling
 	}
 	if int(r.CashierFailures)+1 >= cashierFailMax {
 		cashierUntil = ptr(now.Add(cashierLock))
@@ -164,7 +236,23 @@ func (s *Service) codeFailed(ctx context.Context, g codeGuard, r posdb.CodeLocks
 	if err != nil {
 		return false, fmt.Errorf("pos: code failure: %w", err)
 	}
-	return phoneUntil != nil || cashierUntil != nil, nil
+	return phoneUntil != nil || cashierUntil != nil || ceiling, nil
+}
+
+// checkPhone reports whether the guard's phone is the phone of the
+// customer a counter check verified.
+func (s *Service) checkPhone(ctx context.Context, g codeGuard, customer pgtype.UUID) (bool, error) {
+	if g.phone == nil {
+		return false, nil
+	}
+	u, err := s.q(ctx).UserByPhoneHash(ctx, g.phone)
+	switch {
+	case isNoRows(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("pos: user by phone: %w", err)
+	}
+	return u.ID == customer, nil
 }
 
 // codeReady also needs the device and phone keys.
@@ -241,9 +329,10 @@ func (s *Service) Seed(ctx context.Context) (posapi.CounterCodeSeed, error) {
 
 // VerifyCode checks a customer's counter code for a bill
 // (POST {S}/counter-code/verify). Five wrong codes lock the bill, five in
-// 15 minutes lock the phone at the store and twenty in an hour lock the
+// 15 minutes lock the phone at the store, pos_code_phone_failures_per_hour
+// in an hour refuse the phone at every store and twenty in an hour lock the
 // cashier (D-131); a wrong code's attempt is committed even though the call
-// fails.
+// fails. A locked phone or cashier adds no counter check.
 func (s *Service) VerifyCode(ctx context.Context, sc authz.Scope, body posapi.CounterCodeVerifyRequest) (posapi.CounterCodeVerification, error) {
 	if err := s.codeReady(ctx); err != nil {
 		return posapi.CounterCodeVerification{}, err
@@ -267,32 +356,47 @@ func (s *Service) VerifyCode(ctx context.Context, sc authz.Scope, body posapi.Co
 		if err != nil {
 			return err
 		}
-		err = q.EnsureCounterCheck(ctx, posdb.EnsureCounterCheckParams{StoreID: key.StoreID, SaleClientID: key.SaleClientID, Now: now})
-		if err != nil {
-			return fmt.Errorf("pos: counter check: %w", err)
-		}
 		c, err := q.LockCounterCheck(ctx, key)
-		if err != nil {
+		exists := err == nil
+		if err != nil && !isNoRows(err) {
 			return fmt.Errorf("pos: lock counter check: %w", err)
 		}
-		if c.LockedAt != nil {
+		if exists && c.LockedAt != nil {
 			refused = problem.New(genproblems.CodeLocked, "")
 			return nil
 		}
-		if c.VerifiedAt != nil && now.Sub(*c.VerifiedAt) <= codeCheckTTL {
-			// Already right for this bill: answer the same customer again.
-			// An older check is checked again (it would not ring a sale).
-			name, err := q.UserName(ctx, c.CustomerID)
+		verified := exists && c.VerifiedAt != nil && now.Sub(*c.VerifiedAt) <= codeCheckTTL
+		if verified {
+			// Already right for this bill: answer the same customer again,
+			// for the same phone only (the code itself was used up). Another
+			// phone, or an older check, is checked again (D-131).
+			same, err := s.checkPhone(ctx, g, c.CustomerID)
 			if err != nil {
-				return fmt.Errorf("pos: customer name: %w", err)
+				return err
 			}
-			out = posapi.CounterCodeVerification{CustomerName: name, SaleClientId: clientID.String()}
-			return nil
+			if same {
+				name, err := q.UserName(ctx, c.CustomerID)
+				if err != nil {
+					return fmt.Errorf("pos: customer name: %w", err)
+				}
+				out = posapi.CounterCodeVerification{CustomerName: name, SaleClientId: clientID.String()}
+				return nil
+			}
 		}
-		if codeLocked(locks) {
-			// The phone or the cashier is locked: no code is checked.
+		if locks.locked() {
+			// The phone or the cashier is locked: no code is checked and no
+			// counter check is added.
 			refused = problem.New(genproblems.CodeLocked, "")
 			return nil
+		}
+		if !exists {
+			err = q.EnsureCounterCheck(ctx, posdb.EnsureCounterCheckParams{StoreID: key.StoreID, SaleClientID: key.SaleClientID, Now: now})
+			if err != nil {
+				return fmt.Errorf("pos: counter check: %w", err)
+			}
+			if _, err = q.LockCounterCheck(ctx, key); err != nil {
+				return fmt.Errorf("pos: lock counter check: %w", err)
+			}
 		}
 		m, ok, err := s.matchCode(ctx, body.Phone, body.Code, now)
 		if err != nil {
@@ -311,11 +415,17 @@ func (s *Service) VerifyCode(ctx context.Context, sc authz.Scope, body posapi.Co
 			}
 		}
 		if !ok {
-			r, err := q.FailCounterCheck(ctx, posdb.FailCounterCheckParams{
-				MaxAttempts: codeTries, Now: now, StoreID: key.StoreID, SaleClientID: key.SaleClientID,
-			})
-			if err != nil {
-				return fmt.Errorf("pos: fail counter check: %w", err)
+			// A wrong code against a fresh verified check leaves its attempts
+			// alone (another phone cannot lock the verified bill); the phone
+			// and cashier still count it (D-131).
+			r := posdb.FailCounterCheckRow{Attempts: c.Attempts}
+			if !verified {
+				r, err = q.FailCounterCheck(ctx, posdb.FailCounterCheckParams{
+					MaxAttempts: codeTries, Now: now, StoreID: key.StoreID, SaleClientID: key.SaleClientID,
+				})
+				if err != nil {
+					return fmt.Errorf("pos: fail counter check: %w", err)
+				}
 			}
 			locked, err := s.codeFailed(ctx, g, locks, "online", now)
 			if err != nil {

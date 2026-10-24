@@ -54,6 +54,7 @@ CREATE TABLE pos_sales (
   offline_link_code         text,
   offline_link_at           timestamptz,
   device_clock_skew_ms      int,
+  offline_offer_unmatched   boolean NOT NULL DEFAULT false,
   link_phone_hash           bytea,
   link_phone_enc            bytea,
   item_subtotal_paise       bigint NOT NULL,
@@ -90,6 +91,9 @@ CREATE TABLE pos_sales (
     (link_status IS DISTINCT FROM 'linked' OR link_method = 'phone_unverified' OR customer_id IS NOT NULL)
     AND (link_status IS DISTINCT FROM 'failed' OR customer_id IS NULL)
     AND (link_method IS NOT NULL OR customer_id IS NULL)),
+  -- D-131: an offline sale whose device offer discount on a line is more
+  -- than the offers engine gives that line at sold_at.
+  CONSTRAINT ck_pos_sales_offline_offer CHECK (NOT offline_offer_unmatched OR device_seq IS NOT NULL),
   CONSTRAINT ck_pos_sales_offline_code CHECK (offline_link_code IS NULL OR offline_link_code ~ '^[0-9]{4}$'),
   CONSTRAINT ck_pos_sales_phone CHECK ((link_phone_hash IS NULL) = (link_phone_enc IS NULL)
     AND (link_phone_hash IS NULL OR octet_length(link_phone_hash) = 32)),
@@ -119,9 +123,10 @@ CREATE INDEX ix_pos_sales_store_sold ON pos_sales (store_id, sold_at DESC);
 -- /v1/me/purchases (D-45, D-75): never phone_unverified.
 CREATE INDEX ix_pos_sales_customer_sold ON pos_sales (customer_id, sold_at DESC)
   WHERE link_method IN ('bill_qr','counter_code');
--- D-12 risk count: offline counter-code links per store per IST day.
+-- D-12, D-131 risk count: offline counter-code links and unmatched offline
+-- offer discounts per store per IST day.
 CREATE INDEX ix_pos_sales_offline_links ON pos_sales (store_id, received_at)
-  WHERE offline_link_at IS NOT NULL;
+  WHERE offline_link_at IS NOT NULL OR offline_offer_unmatched;
 CREATE INDEX ix_pos_sales_cashier ON pos_sales (cashier_user_id);
 CREATE INDEX ix_pos_sales_reversed_by ON pos_sales (reversed_by) WHERE reversed_by IS NOT NULL;
 CREATE INDEX ix_pos_sales_phone ON pos_sales (store_id, link_phone_hash) WHERE link_phone_hash IS NOT NULL;
@@ -258,8 +263,10 @@ CREATE TRIGGER trg_counter_code_checks_no_truncate BEFORE TRUNCATE ON counter_co
 ------------------------------------------------------------------------------
 -- counter_code_failures (D-131): one row per wrong counter code, online or
 -- at sync, at the server's time. 5 in 15 minutes for a phone at a store lock
--- that phone there for 15 minutes; 20 in an hour by a cashier (any store)
--- lock their code checks for an hour. The failure that reaches a limit
+-- that phone there for 15 minutes; pos_code_phone_failures_per_hour (10) for
+-- a phone across all stores refuse it everywhere until the hour's count is
+-- below that again; 20 in an hour by a cashier (any store) lock their code
+-- checks for an hour. The failure that reaches a limit
 -- carries the lock's end, so a lock is "a row whose *_locked_until is still
 -- ahead". phone_hash is NULL for a phone that is not a phone number.
 ------------------------------------------------------------------------------
@@ -280,6 +287,8 @@ CREATE TABLE counter_code_failures (
     AND (cashier_locked_until IS NULL OR cashier_locked_until > failed_at))
 );
 CREATE INDEX ix_counter_code_failures_phone ON counter_code_failures (store_id, phone_hash, failed_at)
+  WHERE phone_hash IS NOT NULL;
+CREATE INDEX ix_counter_code_failures_phone_any ON counter_code_failures (phone_hash, failed_at)
   WHERE phone_hash IS NOT NULL;
 CREATE INDEX ix_counter_code_failures_cashier ON counter_code_failures (cashier_user_id, failed_at);
 REVOKE UPDATE, DELETE, TRUNCATE ON counter_code_failures FROM todayz_app;
@@ -374,7 +383,12 @@ REVOKE UPDATE, DELETE, TRUNCATE ON sync_entries FROM todayz_app;
 CREATE TRIGGER trg_sync_entries_no_truncate BEFORE TRUNCATE ON sync_entries
   FOR EACH STATEMENT EXECUTE FUNCTION append_only_truncate();
 
+-- 01 §17 (D-131). TestSettingsMatchProductRules reads these inserts (D-95).
+INSERT INTO platform_settings (key, value, unit, min, max, description) VALUES
+  ('pos_code_phone_failures_per_hour', '10', 'count', 5, 100, 'POS. Wrong counter codes for one phone across all stores in an hour before the phone is refused everywhere (D-131)');
+
 -- +goose Down
+DELETE FROM platform_settings WHERE key IN ('pos_code_phone_failures_per_hour');
 DROP TABLE IF EXISTS sync_entries;
 DROP TABLE IF EXISTS sync_cursors;
 DROP TABLE IF EXISTS receipt_tokens;

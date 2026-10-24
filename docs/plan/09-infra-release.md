@@ -1,5 +1,7 @@
 # 09 · Environments, infrastructure and release
 
+> **Amended by D-210 (founder, 24 Oct):** one GitHub repo, no staging, merges deploy straight to prod, cloud work starts now. Where this file says staging or "after the local release candidate", D-210 wins. Cloud credentials live in `.env.cloud.local` (`docs/runbooks/cloud-access.md`).
+
 **Rule (user, 2026-10-22):** everything runs and is tested locally until the product is implemented end to end and fully tested. No cloud resource is created, and no cloud credential is needed, before Wave 5. When the local release candidate passes, the lead tells the user "ready for cloud" with the evidence pack. The user then puts the AWS IAM access keys (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`) and the Cloudflare credentials in the environment (D-96).
 
 ## 1. Environments

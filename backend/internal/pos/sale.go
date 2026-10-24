@@ -28,7 +28,8 @@ import (
 const codeTries = 5 //settings:ok 01 §6 fixes the lock at 5 tries; no platform setting exists
 
 // Counter-code brute force across bills (D-131): wrong codes are counted per
-// (store, phone) and per cashier on a rolling window, online and offline
+// (store, phone), per phone across stores (pos_code_phone_failures_per_hour
+// in phoneAnyWindow) and per cashier on a rolling window, online and offline
 // alike, so a new saleClientId does not reset them. codeCheckTTL is how long
 // a verified check may wait for its sale.
 const (
@@ -38,6 +39,7 @@ const (
 	cashierFailMax    = 20               //settings:ok D-131 fixes 20 wrong codes per cashier; no platform setting exists
 	cashierFailWindow = time.Hour
 	cashierLock       = time.Hour
+	phoneAnyWindow    = time.Hour
 	codeCheckTTL      = 2 * time.Minute //settings:ok D-131 fixed age of a verified check
 )
 
@@ -100,7 +102,22 @@ type saleWrite struct {
 	SoldAt            time.Time
 	Link              link
 	Offers            []AppliedOffer // online only: what the bill's offers took, redeemed with the sale
+	OfferUnmatched    bool           // offline only: a device offer discount the engine would not give (D-131)
 	Path              string         // the request field of the bill, for errors
+}
+
+// clampSoldAt is the sold_at a sale records. A device's clock may run ahead:
+// a sale is never sold after it was received, nor more than soldAtMaxAge
+// before (01 §17, D-131).
+func clampSoldAt(at, now time.Time) time.Time {
+	at = at.UTC().Truncate(time.Microsecond)
+	switch {
+	case at.After(now):
+		return now
+	case at.Before(now.Add(-soldAtMaxAge)):
+		return now.Add(-soldAtMaxAge)
+	}
+	return at
 }
 
 // errSaleExists is a sale whose (store, clientId) was already written.
@@ -128,21 +145,13 @@ func (s *Service) writeSale(ctx context.Context, st posdb.StoreInfoRow, in saleW
 	b := in.Bill
 	saleID := s.ids.New(now)
 	l := in.Link
-	// A device's clock may run ahead: a sale is never sold after it was
-	// received, nor more than soldAtMaxAge before (01 §17, D-131).
-	soldAt := in.SoldAt.UTC().Truncate(time.Microsecond)
-	switch {
-	case soldAt.After(now):
-		soldAt = now
-	case soldAt.Before(now.Add(-soldAtMaxAge)):
-		soldAt = now.Add(-soldAtMaxAge)
-	}
+	soldAt := clampSoldAt(in.SoldAt, now)
 	row, err := q.InsertSale(ctx, posdb.InsertSaleParams{
 		ID: ids.UUID(saleID), StoreID: ids.UUID(in.StoreID), ClientID: ids.UUID(in.ClientID),
 		DeviceID: ids.UUID(in.Device), DeviceSeq: in.DeviceSeq, CashierUserID: ids.UUID(in.Cashier),
 		CustomerID: nullID(l.customerID), LinkMethod: optString(l.method), LinkStatus: optString(l.status),
 		OfflineLinkAt: l.offlineAt, DeviceClockSkewMs: l.skewMs,
-		LinkPhoneHash: l.phoneHash, LinkPhoneEnc: l.phoneEnc,
+		LinkPhoneHash: l.phoneHash, LinkPhoneEnc: l.phoneEnc, OfflineOfferUnmatched: in.OfferUnmatched,
 		ItemSubtotalPaise: b.ItemSubtotal, BillOfferDiscountPaise: b.BillOffer, SubtotalPaise: b.Subtotal,
 		DiscountPaise: b.Discount, RoundOffPaise: b.RoundOff, CreditsUsed: i32(int64(b.Credits)),
 		TotalPaise: b.Total, PaymentMethod: in.Payment, SoldAt: soldAt, Now: now,
@@ -506,7 +515,7 @@ func (s *Service) offers(ctx context.Context, storeID ids.ID, lines []lineInput)
 	if len(pl) == 0 {
 		return 0, nil, nil
 	}
-	pr, err := s.pricer.Price(ctx, ids.Zero, storeID, pl)
+	pr, err := s.pricer.Price(ctx, ids.Zero, storeID, time.Time{}, pl)
 	if err != nil {
 		return 0, nil, fmt.Errorf("pos: offers: %w", err)
 	}

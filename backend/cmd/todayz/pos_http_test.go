@@ -40,7 +40,8 @@ type fakeCredits struct {
 	captured []ids.ID       // claims captured by a sale
 	released []ids.ID       // claims whose hold was given back, once each
 	cashback []pos.Cashback
-	reversed []ids.ID // sales whose credits were reversed
+	reversed []ids.ID         // sales whose credits were reversed
+	poison   map[ids.ID]error // claims whose release fails
 }
 
 func (f *fakeCredits) Allow(_ context.Context, _, _ ids.ID, requested int, _ int64) (pos.CreditsAllowance, error) {
@@ -74,6 +75,9 @@ func (f *fakeCredits) Capture(_ context.Context, claimID, _ ids.ID) error {
 func (f *fakeCredits) Release(_ context.Context, claimID ids.ID) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
+	if err := f.poison[claimID]; err != nil {
+		return err
+	}
 	if !slices.Contains(f.released, claimID) {
 		f.released = append(f.released, claimID)
 	}
@@ -131,9 +135,20 @@ type posShop struct {
 
 func newPosShop(t *testing.T) *posShop {
 	t.Helper()
-	fc := &fakeCredits{balance: 50, holds: map[ids.ID]int{}}
+	return newPosShopWith(t, nil)
+}
+
+// newPosShopWith is newPosShop with more seams set after the recording ones.
+func newPosShopWith(t *testing.T, more func(*pos.Deps)) *posShop {
+	t.Helper()
+	fc := &fakeCredits{balance: 50, holds: map[ids.ID]int{}, poison: map[ids.ID]error{}}
 	fr := &fakeReferrals{}
-	posSeams = func(d *pos.Deps) { d.Credits, d.Referrals = fc, fr }
+	posSeams = func(d *pos.Deps) {
+		d.Credits, d.Referrals = fc, fr
+		if more != nil {
+			more(d)
+		}
+	}
 	t.Cleanup(func() { posSeams = nil })
 	return &posShop{orderShop: newOrderShop(t), credits: fc, refs: fr}
 }

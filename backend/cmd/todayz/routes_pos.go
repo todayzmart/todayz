@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 
@@ -18,19 +19,23 @@ import (
 // seams; nil in the binary.
 var posSeams func(*pos.Deps)
 
-// newPos builds the pos service. Offers are W2-07's (the POS channel);
-// credits and referrals are the package's do-nothing defaults until W2-01
-// and W2-03 wire theirs here.
-func newPos(d *deps) *pos.Service {
+// posDeps is the pos service's deps in the API. Offers are W2-07's (the
+// POS channel); stock, credits and referrals come from jobs.PosDeps, which
+// the worker's sweep shares (W2-01 and W2-03 wire theirs there).
+func posDeps(d *deps) pos.Deps {
 	var az authz.Authorizer
 	if d.Authz != nil {
 		az = d.Authz
 	}
 	off := offersForPos{newOffers(d)}
-	pd := pos.Deps{
-		Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Settings: d.Settings,
-		Authz: az, Stock: jobs.PosStock(d.Clock), Pricer: off, Redeemer: off,
-	}
+	pd := jobs.PosDeps(pos.Deps{Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Settings: d.Settings, Authz: az})
+	pd.Pricer, pd.Redeemer = off, off
+	return pd
+}
+
+// newPos builds the pos service.
+func newPos(d *deps) *pos.Service {
+	pd := posDeps(d)
 	if posSeams != nil {
 		posSeams(&pd)
 	}
@@ -63,10 +68,11 @@ var (
 	_ pos.Redeemer = offersForPos{}
 )
 
-// Price implements pos.Pricer. An online sale's catalogued lines carry the
-// catalogue price (anything else is price_changed), so no line is Fixed.
-func (a offersForPos) Price(ctx context.Context, customerID, storeID ids.ID, lines []pos.PriceLine) (pos.Pricing, error) {
-	cart := offers.Cart{StoreID: storeID, CustomerID: customerID, Channel: offers.ChannelPOS, Lines: make([]offers.Line, len(lines))}
+// Price implements pos.Pricer at at (the zero time is the offers clock's
+// now). An online sale's catalogued lines carry the catalogue price
+// (anything else is price_changed), so no line is Fixed.
+func (a offersForPos) Price(ctx context.Context, customerID, storeID ids.ID, at time.Time, lines []pos.PriceLine) (pos.Pricing, error) {
+	cart := offers.Cart{StoreID: storeID, CustomerID: customerID, Channel: offers.ChannelPOS, Lines: make([]offers.Line, len(lines)), At: at}
 	for i, l := range lines {
 		cart.Lines[i] = offers.Line{StoreItemID: l.StoreItemID, UnitPricePaise: l.UnitPricePaise, Quantity: l.Quantity}
 	}

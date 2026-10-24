@@ -3,6 +3,7 @@ package pos
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 
@@ -106,17 +107,19 @@ type Pricing struct {
 	Offers        []AppliedOffer
 }
 
-// Pricer applies the store's offers to an online counter sale. customerID
-// is zero for a walk-in (the link is not known when the bill is priced).
+// Pricer applies the store's offers to a counter sale. customerID is zero
+// for a walk-in (the link is not known when the bill is priced). at is the
+// time to price at: the zero time for an online sale (now), the sale's
+// sold_at for an offline one, to check what the device took off (D-131).
 type Pricer interface {
-	Price(ctx context.Context, customerID, storeID ids.ID, lines []PriceLine) (Pricing, error)
+	Price(ctx context.Context, customerID, storeID ids.ID, at time.Time, lines []PriceLine) (Pricing, error)
 }
 
 // NoOffers is the Pricer until offers land: nothing off.
 type NoOffers struct{}
 
 // Price implements Pricer.
-func (NoOffers) Price(_ context.Context, _, _ ids.ID, lines []PriceLine) (Pricing, error) {
+func (NoOffers) Price(_ context.Context, _, _ ids.ID, _ time.Time, lines []PriceLine) (Pricing, error) {
 	return Pricing{LineDiscounts: make([]int64, len(lines))}, nil
 }
 
