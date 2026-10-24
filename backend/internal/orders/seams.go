@@ -105,3 +105,25 @@ type NoCredits struct{}
 func (NoCredits) Allow(context.Context, ids.ID, ids.ID, int, int64) (CreditsAllowance, error) {
 	return CreditsAllowance{Limit: "not_available"}, nil
 }
+
+// CompletedOrder is an order that reached collected (or delivered), for
+// referral qualification (W2-03). EligiblePaise is items after offers;
+// CreditsUsed the credits spent on it.
+type CompletedOrder struct {
+	OrderID, CustomerID, StoreID ids.ID
+	EligiblePaise                int64
+	CreditsUsed                  int
+}
+
+// Referrals is told of a completed order inside the order's transaction
+// (01 §8: customer rewards post in the same transaction). An error rolls the
+// handover back.
+type Referrals interface {
+	OnOrderCompleted(ctx context.Context, o CompletedOrder) error
+}
+
+// NoReferrals is Referrals when the referrals domain is not wired.
+type NoReferrals struct{}
+
+// OnOrderCompleted implements Referrals.
+func (NoReferrals) OnOrderCompleted(context.Context, CompletedOrder) error { return nil }

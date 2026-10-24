@@ -86,6 +86,8 @@ type Deps struct {
 	AskPricer AskPricer
 	// Credits holds and settles credits; nil means credits are not live.
 	Credits Credits
+	// Referrals qualifies referrals on a collected order (W2-03); nil means none.
+	Referrals Referrals
 	// CodeRand is the randomness pickup codes are drawn from; nil means
 	// crypto/rand. Only tests set it, to force a code collision.
 	CodeRand io.Reader
@@ -126,6 +128,7 @@ type Service struct {
 	redeemer  Redeemer
 	askPricer AskPricer
 	credits   Credits
+	referrals Referrals
 	codes     *codeKeys // nil when either code key is missing
 	phones    *pii.Sealer
 	ids       *ids.Generator
@@ -141,7 +144,7 @@ func New(d Deps) (*Service, error) {
 	s := &Service{
 		db: d.DB, clock: d.Clock, settings: d.Settings, notices: d.Notices, jobs: d.Jobs,
 		stock: d.Stock, open: d.Open, pricer: d.Pricer, redeemer: d.Redeemer, askPricer: d.AskPricer, credits: d.Credits,
-		ids: ids.NewGenerator(),
+		referrals: d.Referrals, ids: ids.NewGenerator(),
 	}
 	if s.pricer == nil {
 		s.pricer = NoOffers{}
@@ -151,6 +154,9 @@ func New(d Deps) (*Service, error) {
 	}
 	if s.credits == nil {
 		s.credits = NoCredits{}
+	}
+	if s.referrals == nil {
+		s.referrals = NoReferrals{}
 	}
 	if d.Config != nil {
 		k, err := newCodeKeys(d.Config.Keys.OrderCodeEncKey, d.Config.Keys.OrderCodeHMACKey)

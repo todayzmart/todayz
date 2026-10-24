@@ -494,6 +494,12 @@ func (s *Service) collect(ctx context.Context, o ordersdb.Order, by ids.ID, meth
 	if err != nil {
 		return fmt.Errorf("orders: collect: %w", err)
 	}
+	if err := s.referrals.OnOrderCompleted(ctx, CompletedOrder{
+		OrderID: mustID(o.ID), CustomerID: mustID(o.CustomerID), StoreID: mustID(o.StoreID),
+		EligiblePaise: o.ItemsAfterOffersPaise, CreditsUsed: int(o.CreditsUsed),
+	}); err != nil {
+		return fmt.Errorf("orders: referrals: %w", err)
+	}
 	return s.record(ctx, o, StatusCollected, v, staff(by), nil, silent, now)
 }
 
