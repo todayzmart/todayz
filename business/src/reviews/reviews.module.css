@@ -28,7 +28,7 @@
   background: var(--surface);
 }
 
-@media (min-width: 40rem) {
+@media (width >= 40rem) {
   .summary {
     grid-template-columns: auto minmax(0, 1fr);
     align-items: center;

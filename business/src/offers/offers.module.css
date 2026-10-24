@@ -1,0 +1,236 @@
+/* B-08 Offers and banners layout. Component looks come from bundle.css (tz-*) and @todayz/ui; this
+   file only places them. Tokens only. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.sub {
+  font: var(--type-caption);
+  color: var(--ink-3);
+}
+
+.note {
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.grow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.meta {
+  font: var(--type-caption);
+  color: var(--ink-3);
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.rowHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.more {
+  display: flex;
+  justify-content: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--type-body);
+  color: var(--ink);
+}
+
+.pair {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.picked,
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pickedRow,
+.resultRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  font: var(--type-body);
+}
+
+.phone {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 22rem;
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: var(--surface-subtle);
+}
+
+.phoneTitle {
+  font: var(--type-label);
+  color: var(--ink-2);
+}
+
+.cart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cartRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font: var(--type-body);
+}
+
+.free {
+  color: var(--ink-3);
+}
+
+.was {
+  color: var(--ink-3);
+}
+
+.totals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  font: var(--type-body);
+}
+
+.totalRow dd {
+  margin: 0;
+}
+
+.bannerPreview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  font: var(--type-body);
+}
+
+.bannerPreview[data-tint='green'] {
+  background: var(--tint-green);
+  color: var(--tint-green-ink);
+}
+
+.bannerPreview[data-tint='amber'] {
+  background: var(--tint-amber);
+  color: var(--tint-amber-ink);
+}
+
+.bannerPreview[data-tint='rose'] {
+  background: var(--tint-rose);
+  color: var(--tint-rose-ink);
+}
+
+.bannerPreview[data-tint='sky'] {
+  background: var(--tint-sky);
+  color: var(--tint-sky-ink);
+}
+
+.bannerPreview[data-tint='lilac'] {
+  background: var(--tint-lilac);
+  color: var(--tint-lilac-ink);
+}
+
+.bannerPreview[data-tint='peach'] {
+  background: var(--tint-peach);
+  color: var(--tint-peach-ink);
+}
