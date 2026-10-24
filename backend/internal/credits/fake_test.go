@@ -99,9 +99,14 @@ func (m *ledgerMachine) actions() map[string]func(*rapid.T) {
 				}
 			}
 		},
-		"reduce": func(t *rapid.T) {
-			if _, err := m.h.Reduce(m.ctx, rapid.SampledFrom(m.refs).Draw(t, "ref"), rapid.IntRange(0, 30).Draw(t, "to")); err != nil {
-				t.Fatalf("reduce: %v", err)
+		"recap": func(t *rapid.T) {
+			eligible := int64(rapid.IntRange(9000, 60000).Draw(t, "eligible"))
+			n, err := m.h.Recap(m.ctx, rapid.SampledFrom(m.refs).Draw(t, "ref"), eligible)
+			if err != nil {
+				t.Fatalf("recap: %v", err)
+			}
+			if n > 0 && (eligible < m.rules.MinOrderPaise || n > m.rules.MaxPerOrder || int64(n)*100 > eligible-100) {
+				t.Fatalf("invariant 5: kept %d on %d paise", n, eligible)
 			}
 		},
 		"release": func(t *rapid.T) {

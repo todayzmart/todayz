@@ -6,7 +6,7 @@
 // Two small interfaces are the whole surface other packages build on:
 //
 //   - Holder: what a checkout does with credits (orders W2-02, bill claims
-//     W2-04). Allow answers without writing; Hold, Reduce, Release and
+//     W2-04). Allow answers without writing; Hold, Recap, Release and
 //     Complete run in the caller's transaction (db.TxFrom(ctx)).
 //   - Poster: one balanced posting of kind referral_reward (W2-03),
 //     admin_adjustment (W3-01) or payout (W3). Spend, cashback, expiry and
@@ -112,7 +112,7 @@ type Completed struct {
 	Cashback int
 }
 
-// Holder is the checkout side of credits. Hold, Reduce, Release and
+// Holder is the checkout side of credits. Hold, Recap, Release and
 // Complete must run inside the caller's transaction; each is idempotent per
 // Ref.
 type Holder interface {
@@ -124,10 +124,12 @@ type Holder interface {
 	// cap refusal also raises a risk flag that survives the caller's
 	// rollback). A repeat for a ref already held returns its amount.
 	Hold(ctx context.Context, req HoldRequest) (Allowance, error)
-	// Reduce lowers the held amount to `to` (a partial accept re-cap, D-28),
-	// releasing the difference to the same lots, latest expiry first. to 0
-	// is Release. It returns the credits released (0 when nothing changed).
-	Reduce(ctx context.Context, ref Ref, to int) (int, error)
+	// Recap re-caps an open hold against a new eligible amount (a partial
+	// accept, D-28, CR-17): it keeps min(held, credit_max_per_order, the ₹1
+	// floor), or nothing under credit_min_order_value_paise, and releases
+	// the rest to the same lots, latest expiry first. The caps are not
+	// counted again. It returns the credits still held.
+	Recap(ctx context.Context, ref Ref, eligiblePaise int64) (int, error)
 	// Release returns the whole hold (any terminal state but completion). A
 	// ref with no open hold releases nothing.
 	Release(ctx context.Context, ref Ref) (int, error)

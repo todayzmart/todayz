@@ -321,30 +321,31 @@ func (f *Fake) release(h *fakeHold, ps []portion, key string) error {
 	return nil
 }
 
-// Reduce implements Holder.
-func (f *Fake) Reduce(_ context.Context, ref Ref, to int) (int, error) {
+// Recap implements Holder.
+func (f *Fake) Recap(_ context.Context, ref Ref, eligiblePaise int64) (int, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.init()
 	h, ok := f.holds[ref]
-	if !ok || h.Status != holdHeld || to < 0 {
+	if !ok || h.Status != holdHeld {
 		return 0, nil
 	}
 	open := h.Amount - h.Released
-	if to >= open {
-		return 0, nil
+	to := keep(f.Rules, open, eligiblePaise)
+	if to == open {
+		return open, nil
 	}
 	ps, ok := takeLatest(f.heldPortions(h), open-to)
 	if !ok {
 		return 0, errors.New("credits fake: hold portions short")
 	}
-	if err := f.release(h, ps, fmt.Sprintf("%s:%d", ref.key("reduce"), to)); err != nil {
+	if err := f.release(h, ps, fmt.Sprintf("%s:%d", ref.key("recap"), to)); err != nil {
 		return 0, err
 	}
 	if to == 0 {
 		h.Status = holdReleased
 	}
-	return open - to, nil
+	return to, nil
 }
 
 // Release implements Holder.

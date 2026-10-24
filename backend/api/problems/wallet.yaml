@@ -1,0 +1,24 @@
+# Problem codes: domain "wallet" (owner W2-01; 01 §7, D-30, D-76, D-91).
+#
+# Same shape as common.yaml. Placing an order (or confirming a bill QR) with
+# credits answers one of these when the credit rules refuse them; the order
+# can still be placed without credits. A cap refusal also raises a
+# risk_flags row (CR-11).
+domain: wallet
+problems:
+  - code: below_credit_minimum
+    status: 409
+    i18n: problems.below_credit_minimum
+    title: Credits can be used only when the items come to the credit minimum or more
+  - code: credit_max_exceeded
+    status: 409
+    i18n: problems.credit_max_exceeded
+    title: That is more credits than one order can use
+  - code: credit_monthly_cap
+    status: 409
+    i18n: problems.credit_monthly_cap
+    title: You've used this month's credit limit
+  - code: store_credit_cap
+    status: 409
+    i18n: problems.store_credit_cap
+    title: Credits can't be used at this shop today

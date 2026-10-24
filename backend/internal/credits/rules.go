@@ -53,6 +53,17 @@ func allow(r Rules, requested int, eligiblePaise int64, available int, u usage) 
 	return a
 }
 
+// keep is how many of open held credits a re-cap against eligiblePaise
+// keeps (D-28): the per-order max and the ₹1 floor, nothing under the
+// credit minimum. The caps are not counted again: the hold already counts.
+func keep(r Rules, open int, eligiblePaise int64) int {
+	if eligiblePaise < r.MinOrderPaise {
+		return 0
+	}
+	ceiling := max(min(int64(r.MaxPerOrder), (eligiblePaise-floorPaise)/paisePerCredit), 0)
+	return int(min(int64(open), ceiling))
+}
+
 // cashback is floor(base × bp / 1 000 000) credits (01 §7): base is in
 // paise, bp in basis points, so paise × bp / 10 000 is paise of cashback and
 // a further / 100 is credits.
