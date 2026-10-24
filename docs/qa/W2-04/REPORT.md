@@ -77,6 +77,17 @@ After merging `main` and wiring offers and reviews (64b075b), with `TODAYZ_TEST_
 | `internal/pos`, `internal/reviews`, `internal/offers` unit and DB tests | ok |
 | `go test -race -p 2 ./cmd/todayz/` (whole package) | ok, 161 s |
 
+Review round (D-131), at df6d08e, shared test server:
+
+| Check | Result |
+|---|---|
+| golangci-lint, gosec, settings lint (`internal/pos`, `internal/jobs`, `cmd/todayz`) | clean, 0 issues |
+| `make gen` | exit 0 |
+| `go test -race -p 2 ./cmd/todayz/ ./internal/pos/ ./internal/jobs/` | ok (cmd/todayz 195 s); `internal/platform/migrate` ok at a6c7ba0 |
+| `TestMigrationFileNames`, `TestRoutesAreInTheContract` | ok |
+| `TestContractProblemCheckFires` | PASS |
+| `TestContractSmoke` | FAIL, 136/137 operations pass. The one failure is not W2-04's: `GET /v1/discover/stores/{slug}/reviews` (W2-06, `api/paths/reviews.yaml`) answers 422 `query.cursor: not a cursor from this list` to a schema-valid long cursor in the coverage phase. This round changed no contract file. For the reviews owner: either give the cursor parameter a `pattern`/`maxLength` the server keeps, or treat an unknown cursor as allowed by the schema. |
+
 ## Review fixes (D-131)
 
 The lead's W2-04 review: no blockers. Each item was landed on this branch with a test (`cmd/todayz/pos_review_http_test.go` unless named).
