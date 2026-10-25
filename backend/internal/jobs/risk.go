@@ -31,11 +31,10 @@ func registerrisk(r *Registry, d Deps) {
 		Description: "Runs the risk rules and raises a deduplicated risk flag for each new finding (D-78, D-225)",
 		Schedule:    "*/5 * * * *", UniqueBy: platformjobs.PerTick, Timeout: time.Minute, MaxAttempts: 3,
 		Handler: func(ctx context.Context, _ platformjobs.Run) (platformjobs.Result, error) {
+			// The summary goes back even on an error, so job_runs keeps the per-rule
+			// counts of a run where only some rules failed.
 			sum, err := svc.Scan(ctx)
-			if err != nil {
-				return platformjobs.Result{}, err
-			}
-			return platformjobs.Result{Summary: sum}, nil
+			return platformjobs.Result{Summary: sum}, err
 		},
 	})
 }

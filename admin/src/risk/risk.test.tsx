@@ -201,7 +201,7 @@ describe('A-13 risk', () => {
     const held = renderAt(`/risk?flag=${FLAG_ID}`, { roles: ['admin'], handlers: [api({ ...store, status: 'confirmed' })] });
     expect(await screen.findByText(/^Holds payout/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
-    expect(within(await screen.findByRole('dialog')).getByText(/payout is released once no other flag holds it/)).toBeInTheDocument();
+    expect(within(await screen.findByRole('dialog')).getByText(/Clearing lifts this flag's hold\. Finance then releases the payout from Payouts once nothing else holds it\./)).toBeInTheDocument();
     held.unmount();
     renderAt(`/risk?status=cleared&flag=${FLAG_ID}`, { roles: ['admin'], handlers: [api({ ...store, status: 'cleared' })] });
     expect(await screen.findByRole('heading', { name: /Sri Lakshmi Stores/ })).toBeInTheDocument();

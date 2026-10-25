@@ -257,7 +257,7 @@ Keys: `ref_<kind>_referrer_credits` and `ref_<kind>_referee_credits` for each ki
   - A business has at most one open payout (`pending` or `held`).
   - If the open payout is still unpaid when the next statement closes, its amount is recomputed; no second payout is created.
 - Finance in the admin console reviews (fraud flags shown), pays by UPI outside TodayZ, then marks it paid with the UTR reference. Only then does the business app show "Paid". Negative balances carry forward.
-- Payout holds: unverified KYC, open fraud flag, suspended business.
+- Payout holds: unverified KYC, open or confirmed risk flag, suspended business.
 
 ## 10. Reviews
 

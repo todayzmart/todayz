@@ -1,9 +1,13 @@
 package risk
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -175,4 +179,13 @@ func TestFacts(t *testing.T) {
 		{"day", "2026-10-25"}, {"lockouts", "11"}, {"ok", "true"}, {"signals", `["own_shop"]`},
 	}, fs, "sorted, id lists and keys the contract cannot carry left out")
 	assert.Nil(t, Facts([]byte("not json")))
+}
+
+// A failed rule is logged by its SQLSTATE or error type, never its text.
+func TestFailCauseHasNoErrorText(t *testing.T) {
+	pg := &pgconn.PgError{Code: "42501", Message: "permission denied for table order_code_lockouts", Detail: "Key (id)=(01J...)"}
+	assert.Equal(t, "sqlstate 42501", failCause(fmt.Errorf("find: %w", pg)))
+	assert.Equal(t, "deadline_exceeded", failCause(fmt.Errorf("find: %w", context.DeadlineExceeded)))
+	assert.Equal(t, "canceled", failCause(context.Canceled))
+	assert.Equal(t, "*errors.errorString", failCause(errors.New("rule text with a value")))
 }

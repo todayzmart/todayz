@@ -1,6 +1,6 @@
 {
   "risk.sub": {
-    "defaultMessage": "Flags the rules raised, with what they counted. Clear or confirm each with a reason. A flag blocks no one by itself; one on a business or store holds that business's payout until it is cleared.",
+    "defaultMessage": "Flags the rules raised, with what they counted. Clear or confirm each with a reason. A flag blocks no one by itself; one on a business or store holds that business's payout while it is open or confirmed.",
     "description": "A-13 Risk: Page subtitle"
   },
   "risk.filter.status": {
@@ -224,7 +224,7 @@
     "description": "A-13 Risk: Who reviewed the flag and why"
   },
   "risk.holdsPayout": {
-    "defaultMessage": "Holds payout: this business's payout stays held until the flag is cleared.",
+    "defaultMessage": "Holds payout: this business's payout stays held while this flag is open or confirmed.",
     "description": "A-13 Risk: Note on an open or confirmed business or store flag"
   },
   "risk.detail.subjectStatus": {
@@ -252,11 +252,11 @@
     "description": "A-13 Risk: Dialog title"
   },
   "risk.clearBody": {
-    "defaultMessage": "Clearing closes the flag. Your reason is kept on the flag and in the audit log.{hold, select, payout { The business's payout is released once no other flag holds it.} other {}}",
+    "defaultMessage": "Clearing closes the flag. Your reason is kept on the flag and in the audit log.{hold, select, payout { Clearing lifts this flag's hold. Finance then releases the payout from Payouts once nothing else holds it.} other {}}",
     "description": "A-13 Risk: Dialog body"
   },
   "risk.confirmBody": {
-    "defaultMessage": "Confirming records that this was abuse. It blocks no one; a block or suspension is its own step. {hold, select, payout {The business's payout stays held until someone clears this flag.} reward {The referral reward stays held until someone clears this flag.} other {The flag stays on the record until someone clears it.}}",
+    "defaultMessage": "Confirming records that this was abuse. It blocks no one; a block or suspension is its own step. {hold, select, payout {This flag keeps holding the business's payout until someone clears it.} reward {The referral reward stays held until someone clears this flag.} other {The flag stays on the record until someone clears it.}}",
     "description": "A-13 Risk: Dialog body"
   },
   "risk.clearRewardWarning": {

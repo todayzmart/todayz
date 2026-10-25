@@ -53,7 +53,7 @@ Base `main` f033f31, branch `claude/hopeful-zhukovsky-51926d`, local only (not p
   - detail with both parties, the credits, timestamps, links to the open flags in A-13, and the History panel
   - Reject while pending, or while qualified and unpaid; never after a payout
 
-No flag blocks a person automatically. A flag's one money effect is the payout hold (01 §9, D-225): a flag on a business or one of its stores holds that business's payout while it is open **or confirmed**. Close, unhold and mark-paid all check it, and only Clear releases it. `referral.reward_refused` also holds that referral's reward until it is cleared. Every threshold is read from `platform_settings`. No flag, fact, evidence line or log holds a phone number, an OTP or a code.
+No flag blocks a person automatically. A flag's one money effect is the payout hold (01 §9, D-225): a flag on a business or one of its stores holds that business's payout while it is open **or confirmed**. Close, unhold and mark-paid all check it. Clearing lifts that flag's hold; finance then releases the payout with Unhold in A-11 once nothing else holds it. `referral.reward_refused` also holds that referral's reward until it is cleared. Every threshold is read from `platform_settings`. No flag, fact, evidence line or log holds a phone number, an OTP or a code.
 
 ## SC-RK scenarios
 
@@ -76,8 +76,8 @@ The plan says "SC-RK-01…15" without listing them. The list below is how W3-02 
 | SC-RK-13 | OTP fan-out: `risk_otp_phones_per_ip_hour` phones from one IP | TestScanOTPAbuse; TestOTPRulesHoldNoNumberOTPOrCode; TestOTPFlagsDoNotComeBackAtMidnight |
 | SC-RK-14 | Failed OTPs for one phone in 24 h; a phone with an account is flagged on the user; never a number, OTP or code | TestScanOTPAbuse; TestOTPRulesHoldNoNumberOTPOrCode; TestOTPFlagsDoNotComeBackAtMidnight |
 | SC-RK-15 | Clear and confirm need a reason and `from`, are audited and change nothing else; clear works from confirmed; concurrent clear and confirm: one wins, the other is 409; support gets 403 | TestClearAndConfirm; TestConcurrentClearAndConfirm; `cmd/todayz` TestAdminRiskHTTP; `risk.golden`; `admin/src/risk/risk.test.tsx`; `admin/e2e/risk.spec.ts` |
-| (payout hold) | A confirmed business or store flag keeps holding the payout; only Clear releases it | `payouts` TestConfirmedRiskFlagKeepsTheHoldDB; risk.test.tsx (the "Holds payout" note on open and confirmed store and business flags only) |
-| (scan) | One scan at a time; a failing rule does not stop the others | TestScanRunsOneAtATime; TestScanKeepsGoingPastAFailedRule |
+| (payout hold) | A confirmed business or store flag keeps holding the payout; only Clear lifts it, and Unhold in A-11 is still finance's step | `payouts` TestConfirmedRiskFlagKeepsTheHoldDB; risk.test.tsx (the "Holds payout" note on open and confirmed store and business flags only) |
+| (scan) | One scan at a time; a failing rule does not stop the others, is logged by rule name and SQLSTATE (or error type) only, and the job result keeps the other rules' counts | TestScanRunsOneAtATime; TestScanKeepsGoingPastAFailedRule; TestFailCauseHasNoErrorText |
 | (A-10) | Reject before any reward, 409 after; audited; a reject racing the reward posting either wins with no credit kept or is 409 with both sides paid; support gets 403 | TestRejectReferral; `jobs` TestRejectRacesPostRewardsDB; TestAdminRiskHTTP; `admin/src/referrals/referrals.test.tsx`; `admin/e2e/risk.spec.ts` |
 | (held reward) | `referral.reward_refused` holds the reward until the flag is cleared | `jobs/referrals_test.go`; A-13 warns before clearing (risk.test.tsx) |
 

@@ -33,10 +33,12 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
 
 	genproblems "github.com/todayz/backend/gen/problems"
@@ -178,7 +180,7 @@ func (s *Service) Scan(ctx context.Context) (map[string]int64, error) {
 				return err
 			})
 			if err != nil {
-				telemetry.Logger(ctx).ErrorContext(ctx, "risk_scan: rule failed", "rule", r.name)
+				telemetry.Logger(ctx).ErrorContext(ctx, "risk_scan: rule failed", "rule", r.name, "cause", failCause(err))
 				failed = append(failed, r.name)
 				continue
 			}
@@ -193,6 +195,22 @@ func (s *Service) Scan(ctx context.Context) (map[string]int64, error) {
 		return sum, errors.New("risk_scan: rules failed: " + strings.Join(failed, ", "))
 	}
 	return sum, nil
+}
+
+// failCause names a failed rule's error for the log without its text or
+// parameters: the SQLSTATE for a database error, else the error's Go type.
+func failCause(err error) string {
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) {
+		return "sqlstate " + pgErr.Code
+	}
+	if errors.Is(err, context.DeadlineExceeded) {
+		return "deadline_exceeded"
+	}
+	if errors.Is(err, context.Canceled) {
+		return "canceled"
+	}
+	return fmt.Sprintf("%T", err)
 }
 
 // raise inserts each finding unless its subject already has one (InsertFlagOnce).
