@@ -1,0 +1,636 @@
+{
+  "uid": "todayz-14",
+  "title": "14 · AI quality and cost",
+  "description": "AI spend against the daily cap, calls, latency, rejected outputs and what people did with the drafts (05 §4 dashboard 14; owner W3-10).",
+  "tags": [
+    "todayz",
+    "w3-10",
+    "ai",
+    "cost"
+  ],
+  "timezone": "Asia/Kolkata",
+  "editable": false,
+  "graphTooltip": 1,
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5m",
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "fiscalYearStartMonth": 0,
+  "liveNow": false,
+  "links": [
+    {
+      "title": "00 · What to fix today",
+      "type": "link",
+      "url": "/d/todayz-00",
+      "icon": "dashboard"
+    },
+    {
+      "title": "13 · Cost",
+      "type": "link",
+      "url": "/d/todayz-13",
+      "icon": "dashboard"
+    },
+    {
+      "title": "Alerts",
+      "type": "link",
+      "url": "/alerting/list",
+      "icon": "bolt",
+      "tooltip": "Every alert links its runbook in docs/runbooks/"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "type": "text",
+      "title": "How to read this",
+      "datasource": null,
+      "targets": [
+        {
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "mode": "markdown",
+        "content": "Every AI call passes the cost guard (11 §1 rule 7): it stops for the rest of the IST day when today's spend reaches `ai_daily_cost_cap_paise`, and the *AI spend at 80 % of the daily cap* alert fires before that (runbook `docs/runbooks/ai-cost.md`). Spend is list price at ₹88/$ (`internal/ai/client/price.go`). Quality is what people did with the drafts: accepted and edited lines against discarded ones. Locally every provider is a mock (D-17), so the numbers are the mock's."
+      },
+      "id": 1,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Spend today (₹)",
+      "description": "Today's AI spend (IST day), every feature.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT coalesce((SELECT cost_paise FROM ai_usage_daily WHERE day = (now() AT TIME ZONE 'Asia/Kolkata')::date AND scope = 'platform'), 0) / 100.0 AS value"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyINR"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "id": 2,
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Daily cap used",
+      "description": "Today's spend over ai_daily_cost_cap_paise. The alert fires at 80 %; calls stop at 100 % (a cap of 0 is the kill switch and shows 100 %).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT CASE WHEN (SELECT (value #>> '{}')::bigint FROM platform_settings WHERE key = 'ai_daily_cost_cap_paise') > 0 THEN coalesce((SELECT cost_paise FROM ai_usage_daily WHERE day = (now() AT TIME ZONE 'Asia/Kolkata')::date AND scope = 'platform'), 0)::float8 / (SELECT (value #>> '{}')::bigint FROM platform_settings WHERE key = 'ai_daily_cost_cap_paise') ELSE 1 END AS value"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.8
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "id": 3,
+      "gridPos": {
+        "x": 6,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Calls today",
+      "description": "Calls the guard let through today (IST day), every feature.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT coalesce((SELECT calls FROM ai_usage_daily WHERE day = (now() AT TIME ZONE 'Asia/Kolkata')::date AND scope = 'platform'), 0) AS value"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "id": 4,
+      "gridPos": {
+        "x": 12,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Calls refused by a cap (24 h)",
+      "description": "Calls the guard refused (429 ai_daily_cap_reached), all caps.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(increase(tz_ai_capped_total[24h]))",
+          "legendFormat": "refused",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "id": 5,
+      "gridPos": {
+        "x": 18,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Spend per day against the cap (₹)",
+      "description": "Platform spend per IST day and today's cap.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT day::timestamptz AS time, cost_paise / 100.0 AS \"spend\", (SELECT (value #>> '{}')::bigint FROM platform_settings WHERE key = 'ai_daily_cost_cap_paise') / 100.0 AS \"cap (today's value)\"\nFROM ai_usage_daily WHERE scope = 'platform' AND $__timeFilter(day::timestamptz) ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyINR"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 6,
+      "gridPos": {
+        "x": 0,
+        "y": 7,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Spend by feature (₹ per hour)",
+      "description": "List-price spend per feature.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (feature) (increase(tz_ai_cost_paise_total[1h])) / 100",
+          "legendFormat": "{{feature}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyINR"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 7,
+      "gridPos": {
+        "x": 12,
+        "y": 7,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Calls by feature and outcome",
+      "description": "ok, invalid (no tool call), refused, truncated, timeout, rate_limited, error, capped (never reached the provider).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (feature, outcome) (rate(tz_ai_calls_total[5m]))",
+          "legendFormat": "{{feature}} {{outcome}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 8,
+      "gridPos": {
+        "x": 0,
+        "y": 15,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Latency p95 by feature",
+      "description": "Provider call latency, 95th percentile.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "histogram_quantile(0.95, sum by (feature) (rate(tz_ai_latency_seconds[5m])))",
+          "legendFormat": "{{feature}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 9,
+      "gridPos": {
+        "x": 12,
+        "y": 15,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Outputs rejected by the server checks",
+      "description": "schema: the tool input failed the Go schema check; grounding: a number in the output is in none of the inputs (11 §1 rule 6). The draft fails or the template text shows.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (feature, reason) (increase(tz_ai_rejected_total[1h]))",
+          "legendFormat": "{{feature}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 10,
+      "gridPos": {
+        "x": 0,
+        "y": 23,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Calls refused by cap",
+      "description": "Which cap refused: customer (ai_daily_calls_customer), store (ai_daily_calls_store) or platform (ai_daily_cost_cap_paise).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (reason) (increase(tz_ai_capped_total[1h]))",
+          "legendFormat": "{{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 11,
+      "gridPos": {
+        "x": 12,
+        "y": 23,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "Draft line outcomes by feature (range)",
+      "description": "What people did with each drafted line: accepted, edited, discarded, not_permitted. Accepted share is the feature's quality signal.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT d.feature, l->>'outcome' AS outcome, count(*) AS lines\nFROM ai_drafts d CROSS JOIN LATERAL jsonb_array_elements(coalesce(d.line_outcomes, '[]'::jsonb)) l\nWHERE $__timeFilter(d.created_at) GROUP BY 1, 2 ORDER BY 1, 3 DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "id": 12,
+      "gridPos": {
+        "x": 0,
+        "y": 31,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "Drafts by feature and status (range)",
+      "description": "processing, ready (waiting for a person), confirmed, discarded, failed (with the failure code).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT feature, status, coalesce(failure, '') AS failure, count(*) AS drafts, sum(cost_paise) / 100.0 AS rupees,\n  percentile_cont(0.95) WITHIN GROUP (ORDER BY latency_ms) AS p95_ms\nFROM ai_drafts WHERE $__timeFilter(created_at) GROUP BY 1, 2, 3 ORDER BY 1, 4 DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "id": 13,
+      "gridPos": {
+        "x": 12,
+        "y": 31,
+        "w": 12,
+        "h": 8
+      }
+    }
+  ]
+}

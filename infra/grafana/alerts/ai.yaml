@@ -1,0 +1,93 @@
+# AI alerts (11 §1 rule 7, §5; owner W3-10). Grafana alerting file provisioning, same layout and datasource uids as jobs.yaml.
+# Alert files are not wired into the local stack yet; routing (05 §5) is W5's contact points. The firing test is
+# backend/internal/ai/guard/alerts_test.go.
+#
+#   AI spend at 80 % of the daily cap   today's spend >= 80 % of ai_daily_cost_cap_paise. warning
+#   AI daily cap reached                today's spend >= the cap; every AI call is refused until IST midnight. critical
+#
+# The source is Postgres, not tz_ai_cost_cap_used_ratio: the gauge is per process, ai_usage_daily is the one
+# count every API and worker process adds to. A cap of 0 (the kill switch) is a choice, not an overrun, so it
+# reads 0 here; dashboard 14 shows it as 100 %. Grafana's threshold has no >=, so 80 % and 100 % are
+# written as > 0.7999 and > 0.9999.
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: ai
+    folder: TodayZ
+    interval: 1m
+    rules:
+      # value = today's platform spend over today's cap (IST day), 0 when the cap is 0 or unset.
+      - uid: tz-ai-cost-80
+        title: 'AI spend at 80 % of the daily cap'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: todayz-postgres
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              editorMode: code
+              rawSql: |-
+                SELECT CASE WHEN coalesce(cap, 0) <= 0 THEN 0 ELSE spend::float8 / cap END AS value
+                FROM (SELECT coalesce((SELECT cost_paise FROM ai_usage_daily
+                                       WHERE day = (now() AT TIME ZONE 'Asia/Kolkata')::date AND scope = 'platform'), 0) AS spend,
+                             (SELECT (value #>> '{}')::bigint FROM platform_settings WHERE key = 'ai_daily_cost_cap_paise') AS cap) s
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0.7999]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          area: ai
+          severity: warning
+        annotations:
+          summary: 'AI spend is at {{ $values.A.Value | humanizePercentage }} of today''s cap'
+          description: 'Today''s AI spend has reached 80 % of ai_daily_cost_cap_paise. At 100 % every AI feature falls back to its manual flow until IST midnight. 14 · AI quality and cost shows which feature is spending.'
+          runbook_url: docs/runbooks/ai-cost.md
+          __dashboardUid__: todayz-14
+        isPaused: false
+      - uid: tz-ai-cost-cap-reached
+        title: 'AI daily cap reached'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: todayz-postgres
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              editorMode: code
+              rawSql: |-
+                SELECT CASE WHEN coalesce(cap, 0) <= 0 THEN 0 ELSE spend::float8 / cap END AS value
+                FROM (SELECT coalesce((SELECT cost_paise FROM ai_usage_daily
+                                       WHERE day = (now() AT TIME ZONE 'Asia/Kolkata')::date AND scope = 'platform'), 0) AS spend,
+                             (SELECT (value #>> '{}')::bigint FROM platform_settings WHERE key = 'ai_daily_cost_cap_paise') AS cap) s
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0.9999]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          area: ai
+          severity: critical
+        annotations:
+          summary: 'AI daily cap reached: AI calls are refused until IST midnight'
+          description: 'Today''s AI spend has reached ai_daily_cost_cap_paise. Every AI call gets 429 ai_daily_cap_reached and the screens show their manual flow. 14 · AI quality and cost shows which feature spent it.'
+          runbook_url: docs/runbooks/ai-cost.md
+          __dashboardUid__: todayz-14
+        isPaused: false

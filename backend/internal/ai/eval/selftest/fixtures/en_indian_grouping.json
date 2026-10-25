@@ -1,0 +1,53 @@
+{
+  "name": "en_indian_grouping",
+  "input": {
+    "note": "1,200 g jeera and 2.5 kg dal"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "jeera",
+        "qty": 1200,
+        "unit": "g"
+      },
+      {
+        "name": "dal",
+        "qty": 2.5,
+        "unit": "kg"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_selftest",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_selftest",
+        "name": "record_stock_lines",
+        "input": {
+          "lines": [
+            {
+              "name": "jeera",
+              "qty": 1200,
+              "unit": "g"
+            },
+            {
+              "name": "dal",
+              "qty": 2.5,
+              "unit": "kg"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 400,
+      "output_tokens": 60
+    }
+  }
+}

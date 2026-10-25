@@ -1,0 +1,38 @@
+{
+  "name": "schema_extra_field",
+  "input": {
+    "note": "3 packs maggi"
+  },
+  "expect": {
+    "reject": "schema"
+  },
+  "reply": {
+    "id": "msg_selftest",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_selftest",
+        "name": "record_stock_lines",
+        "input": {
+          "lines": [
+            {
+              "name": "maggi",
+              "qty": 3,
+              "unit": "pack",
+              "price": 14
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 400,
+      "output_tokens": 60
+    }
+  }
+}

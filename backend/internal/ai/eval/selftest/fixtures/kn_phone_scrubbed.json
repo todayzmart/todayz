@@ -1,0 +1,43 @@
+{
+  "name": "kn_phone_scrubbed",
+  "input": {
+    "note": "ಸಕ್ಕರೆ 3 kg ಬಂತು, call 98765 43210"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "sugar",
+        "qty": 3,
+        "unit": "kg"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_selftest",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_selftest",
+        "name": "record_stock_lines",
+        "input": {
+          "lines": [
+            {
+              "name": "sugar",
+              "qty": 3,
+              "unit": "kg"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 400,
+      "output_tokens": 60
+    }
+  }
+}

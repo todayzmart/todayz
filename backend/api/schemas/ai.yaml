@@ -1,9 +1,75 @@
-# Schemas: domain "ai" (owner W3-10 and each feature's WP): AI draft envelope and feature drafts (04 §2.8, D-46).
+# Schemas: domain "ai" (owner W3-10 and each feature's WP): the shared AI draft envelope (04 §2.8, D-46).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# W3-10 owns the base below; each feature package (W3-04, W3-11, W3-12, W3-13) adds its own
+# paths and its own line and value schemas, and builds its responses from these pieces: a
+# create answers AiDraftCreated, a read carries draftId, feature, status, promptVersion and its
+# own lines (each with lineId and, when the caller may not confirm it, disabled), and a confirm
+# takes lines of {lineId, outcome, value?} and answers AiConfirmResult.
+AiDraftStatus:
+  type: string
+  description: >-
+    processing - the model is still working; ready - lines to review; confirmed - a person confirmed it
+    (some lines may be discarded); discarded - every line was discarded; failed - the model call or a
+    server-side check failed, nothing to review.
+  enum: [processing, ready, confirmed, discarded, failed]
+AiDraftCreated:
+  type: object
+  description: A draft was accepted for processing (202). Poll its read endpoint.
+  additionalProperties: false
+  required: [draftId, status]
+  properties:
+    draftId: {$ref: ./common.yaml#/Ulid}
+    status:
+      type: string
+      enum: [processing]
+  example: {draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0D, status: processing}
+AiDraftLineId:
+  type: string
+  description: A line's id inside its draft, set by the server (`l1`, `l2`, …).
+  pattern: '^l[0-9]{1,3}$'
+  maxLength: 4
+AiConfirmOutcome:
+  type: string
+  description: What the person did with one line. Every line of the draft is sent once.
+  enum: [accepted, edited, discarded]
+AiLineOutcome:
+  type: string
+  description: >-
+    The recorded outcome of one line. not_permitted - the confirmer lacks the permission the line needs
+    (D-06), so nothing of it was applied.
+  enum: [accepted, edited, discarded, not_permitted]
+AiLineDisabled:
+  type: string
+  description: Why the caller cannot confirm a line; ask_manager - it needs a manager's permission (D-06, D-65).
+  enum: [ask_manager]
+AiLineResult:
+  type: object
+  additionalProperties: false
+  required: [lineId, outcome]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    outcome: {$ref: ./ai.yaml#/AiLineOutcome}
+AiConfirmResult:
+  type: object
+  description: The answer to a confirm, the same on a repeat (confirm is idempotent).
+  additionalProperties: false
+  required: [draftId, status, lines]
+  properties:
+    draftId: {$ref: ./common.yaml#/Ulid}
+    status:
+      type: string
+      enum: [confirmed, discarded]
+    lines:
+      type: array
+      maxItems: 200
+      items: {$ref: ./ai.yaml#/AiLineResult}
+  example:
+    draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0D
+    status: confirmed
+    lines:
+      - {lineId: l1, outcome: accepted}
+      - {lineId: l2, outcome: discarded}
+AiCapScope:
+  type: string
+  description: Which daily cap an ai_daily_cap_reached problem hit (its `scope` extension).
+  enum: [customer, store, platform]

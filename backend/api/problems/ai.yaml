@@ -1,0 +1,11 @@
+# Problem codes: domain "ai" (owner W3-10; 11 §1 rule 7, D-70, D-101).
+#
+# Same shape as common.yaml. A feature whose flag is off or whose provider key is missing is
+# hidden: the common not_found (11 §1 rule 2). A draft that is not the caller's is not_found;
+# confirming a draft that is still processing or has failed is the common invalid_transition.
+domain: ai
+problems:
+  - code: ai_daily_cap_reached
+    status: 429
+    i18n: problems.ai_daily_cap_reached
+    title: AI help is paused until tomorrow.
