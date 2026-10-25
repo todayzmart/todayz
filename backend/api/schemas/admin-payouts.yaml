@@ -219,8 +219,11 @@ AdminPayoutNote:
 AdminPayoutMarkPaid:
   type: object
   additionalProperties: false
-  required: [utr, reason]
+  required: [utr, amountPaise, reason]
   properties:
+    amountPaise:
+      allOf: [{$ref: ./common.yaml#/Paise}]
+      description: The amount transferred, as shown when the payout was loaded; a payout recomputed since is refused with payout_amount_changed.
     utr:
       type: string
       pattern: ^[A-Za-z0-9]{6,30}$

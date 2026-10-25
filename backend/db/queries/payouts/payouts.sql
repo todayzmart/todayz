@@ -188,12 +188,21 @@ FOR UPDATE OF p;
 -- name: StampExported :exec
 UPDATE payouts SET exported_at = @now, updated_at = @now WHERE id = ANY(@ids::uuid[]);
 
--- AdminStatements lists one period's statements with the business and its
--- payout, in business name order.
+-- AdminStatements lists one period's statements with the business, its KYC
+-- and risk state now and its payout, in business name order.
 -- name: AdminStatements :many
-SELECT ps.*, b.brand_name, p.status AS payout_status, p.amount AS payout_amount, p.utr AS payout_utr
+SELECT ps.*, b.brand_name, b.status AS business_status,
+  coalesce(k.status, 'missing')::text AS kyc_status,
+  EXISTS (
+    SELECT 1 FROM risk_flags f
+    WHERE f.status = 'open' AND (
+      (f.subject_type = 'business' AND f.subject_id = b.id) OR
+      (f.subject_type = 'store' AND f.subject_id IN (SELECT st.id FROM stores st WHERE st.business_id = b.id)))
+  )::boolean AS open_risk_flag,
+  p.status AS payout_status, p.amount AS payout_amount, p.utr AS payout_utr, p.hold_reason AS payout_hold_reason
 FROM payout_statements ps
 JOIN businesses b ON b.id = ps.business_id
+LEFT JOIN business_kyc k ON k.business_id = ps.business_id
 LEFT JOIN payouts p ON p.id = ps.payout_id
 WHERE ps.period = @period
   AND (sqlc.narg(cursor_name)::text IS NULL
@@ -201,10 +210,28 @@ WHERE ps.period = @period
 ORDER BY b.brand_name, ps.id
 LIMIT @lim;
 
+-- AdminStatement is one statement, as AdminStatements.
+-- name: AdminStatement :one
+SELECT ps.*, b.brand_name, b.status AS business_status,
+  coalesce(k.status, 'missing')::text AS kyc_status,
+  EXISTS (
+    SELECT 1 FROM risk_flags f
+    WHERE f.status = 'open' AND (
+      (f.subject_type = 'business' AND f.subject_id = b.id) OR
+      (f.subject_type = 'store' AND f.subject_id IN (SELECT st.id FROM stores st WHERE st.business_id = b.id)))
+  )::boolean AS open_risk_flag,
+  p.status AS payout_status, p.amount AS payout_amount, p.utr AS payout_utr, p.hold_reason AS payout_hold_reason
+FROM payout_statements ps
+JOIN businesses b ON b.id = ps.business_id
+LEFT JOIN business_kyc k ON k.business_id = ps.business_id
+LEFT JOIN payouts p ON p.id = ps.payout_id
+WHERE ps.id = @id;
+
 -- BusinessStatements lists a business's statements, newest period first,
 -- with the payout each one computed.
 -- name: BusinessStatements :many
-SELECT ps.*, p.status AS payout_status, p.amount AS payout_amount, p.utr AS payout_utr, p.paid_at AS payout_paid_at
+SELECT ps.*, p.status AS payout_status, p.amount AS payout_amount, p.utr AS payout_utr, p.paid_at AS payout_paid_at,
+  p.hold_reason AS payout_hold_reason
 FROM payout_statements ps
 LEFT JOIN payouts p ON p.id = ps.payout_id
 WHERE ps.business_id = @business_id
@@ -213,7 +240,8 @@ ORDER BY ps.period DESC
 LIMIT @lim;
 
 -- name: BusinessStatement :one
-SELECT ps.*, p.status AS payout_status, p.amount AS payout_amount, p.utr AS payout_utr, p.paid_at AS payout_paid_at
+SELECT ps.*, p.status AS payout_status, p.amount AS payout_amount, p.utr AS payout_utr, p.paid_at AS payout_paid_at,
+  p.hold_reason AS payout_hold_reason
 FROM payout_statements ps
 LEFT JOIN payouts p ON p.id = ps.payout_id
 WHERE ps.business_id = @business_id AND ps.period = @period;

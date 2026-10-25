@@ -254,10 +254,12 @@
       Posts the payout to the ledger (each store's credit account down by its line, the platform's payouts
       cash up by the total) and records the UTR. Only a pending payout (`409 payout_not_payable`). The same
       UTR again returns the paid payout; another UTR on a paid payout is `409 payout_already_paid`; a UTR
-      that pays another payout is `409 utr_in_use`.
+      that pays another payout is `409 utr_in_use`. `amountPaise` must be the payout's amount now: one
+      recomputed by a close after it was loaded is `409 payout_amount_changed`, and a hold cause opened
+      since the close (suspension, KYC, a risk flag) is `409 payout_hold_cause_open`.
     x-idempotency: required
     x-money: true
-    x-problems: [step_up_required, payout_not_payable, payout_already_paid, utr_in_use]
+    x-problems: [step_up_required, payout_not_payable, payout_already_paid, utr_in_use, payout_amount_changed, payout_hold_cause_open]
     parameters:
       - $ref: ../common/parameters.yaml#/IdempotencyKey
     requestBody:
@@ -268,6 +270,7 @@
             $ref: ../schemas/admin-payouts.yaml#/AdminPayoutMarkPaid
           example:
             utr: SBIN226301234567
+            amountPaise: 267000
             reason: Paid by UPI from the current account
     responses:
       "200":

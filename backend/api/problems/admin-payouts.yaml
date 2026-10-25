@@ -21,3 +21,7 @@ problems:
     status: 409
     i18n: problems.payout_hold_cause_open
     title: The hold's cause is still open
+  - code: payout_amount_changed
+    status: 409
+    i18n: problems.payout_amount_changed
+    title: The payout amount changed since it was loaded
