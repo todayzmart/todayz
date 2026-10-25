@@ -8,7 +8,7 @@
     "description": "One line under the coach title"
   },
   "coach.foot": {
-    "defaultMessage": "Done and Not useful teach the coach what helps you",
+    "defaultMessage": "“Done” and “Not useful” teach the coach what helps you",
     "description": "Coach card footer on Overview"
   },
   "coach.all": {

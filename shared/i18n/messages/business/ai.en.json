@@ -4,7 +4,7 @@
     "description": "Button: start the AI step again"
   },
   "ai.backToStock": {
-    "defaultMessage": "Go to Stock",
+    "defaultMessage": "Go to “Stock”",
     "description": "Link to the Stock page from an AI scan page"
   },
   "ai.closed": {
@@ -156,7 +156,7 @@
     "description": "A line that matches no item of the shop"
   },
   "ai.bill.unmatchedHelp": {
-    "defaultMessage": "Lines that are not your items are left out. Add the item in Stock first, then scan again.",
+    "defaultMessage": "Lines that are not your items are left out. Add the item on the “Stock” page first, then scan again.",
     "description": "Under the list when some lines match nothing"
   },
   "ai.bill.mrp": {
@@ -300,7 +300,7 @@
     "description": "Line refused: the person's role may not make this change"
   },
   "ai.partial": {
-    "defaultMessage": "{n, plural, =0 {Nothing was added yet.} one {# line was added.} other {# lines were added.}} Fix the lines marked below and confirm them again.",
+    "defaultMessage": "Fix the lines marked below and confirm them again. {n, plural, =0 {Nothing was added yet.} one {# line was added.} other {# lines were added.}}",
     "description": "After a partial confirm; n is the lines already added, the refused lines stay open"
   },
   "ai.line.added": {
