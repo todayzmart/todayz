@@ -173,7 +173,7 @@ func albPanel(now time.Time, st ALBStats, err error) api.AdminSystemAlb {
 			if st.HTTP5xx != nil {
 				errs = *st.HTTP5xx
 			}
-			bp := min(int(errs*10000 / *st.Requests + 0.5), 10000)
+			bp := min(int(errs*10000 / *st.Requests + 0.5), 10000) //settings:ok 10000 basis points = 100%
 			p.Http5xxRateBp = &bp
 		}
 	}

@@ -20,7 +20,7 @@ const (
 	maxStatementText = 500
 	// readStatementText is how much of a statement is read before its
 	// comments are taken out and it is cut to maxStatementText.
-	readStatementText = 2000
+	readStatementText = 2000 //settings:ok characters read from pg_stat_statements, not a product rule
 )
 
 type dbSnapshot struct {
