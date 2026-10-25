@@ -104,7 +104,7 @@
     "description": "new standee campaign field label"
   },
   "standee.campaigns.nameHelp": {
-    "defaultMessage": "For example Counter or Diwali gate. Up to {max} characters.",
+    "defaultMessage": "For example “Counter” or “Diwali gate”. Up to {max} characters.",
     "description": "new standee campaign field help"
   },
   "standee.campaigns.err.required": {
