@@ -105,6 +105,23 @@ async function sendOtp(request: APIRequestContext, person: Person): Promise<{ re
   }
 }
 
+/**
+ * One OTP sign-in attempt that keeps no session: the verify's status and problem code (a blocked
+ * account answers 403 account_blocked). Uses one of the phone's OTP sends.
+ */
+export async function trySignIn(person: Person): Promise<{ status: number; code: string }> {
+  const request = await newRequest();
+  try {
+    const { requestId, since } = await sendOtp(request, person);
+    const code = await latestOtp(request, person.national, since);
+    const v = await request.post(`${URLS.api}/v1/auth/otp/verify`, { data: { requestId, code, app: person.app, deviceId: ulid() } });
+    const body = (await v.json().catch(() => ({}))) as { code?: string };
+    return { status: v.status(), code: v.status() >= 400 ? (body.code ?? '') : '' };
+  } finally {
+    await request.dispose();
+  }
+}
+
 /** One person's session. Use `api` for calls; `attach` lends the session to a browser context. */
 export class Principal implements Bearer {
   readonly api: Api;
