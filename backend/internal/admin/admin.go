@@ -17,6 +17,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/jackc/pgx/v5/pgtype"
 
@@ -168,18 +169,44 @@ func cleanReason(r string) (string, error) {
 	return r, noPhone("body.reason", r)
 }
 
-// rePhone is an Indian mobile number in free text, the same shape the log
-// redactor masks (telemetry's rePhone).
-var rePhone = regexp.MustCompile(`(^|[^0-9A-Za-z+])((?:\+91|91|0)?[\s-]?[6-9]\d{4}[\s-]?\d{5})($|[^0-9A-Za-z])`)
+// rePhone is an Indian mobile number once every non-digit is gone: 6-9 then
+// nine more digits anywhere in the run.
+var rePhone = regexp.MustCompile(`[6-9][0-9]{9}`)
 
 // noPhone refuses free text an admin typed (a reason or a note) that holds a
 // phone number: it is stored in the audit log and shown to other roles, and
 // writers never put a phone there (the subject already names the person).
+// It is strict on purpose: digits in any script count, and every other
+// character is dropped first, so spacing, dots, slashes, letters or a 0091
+// prefix do not hide a number. A reason that strings many numbers together
+// can be refused too; the writer rewords it.
 func noPhone(path, s string) error {
-	if rePhone.MatchString(s) {
+	if rePhone.MatchString(digitsOnly(s)) {
 		return fieldErr(path, "no phone numbers")
 	}
 	return nil
+}
+
+// digitsOnly keeps the decimal digits of s, in any script, as ASCII 0-9.
+func digitsOnly(s string) string {
+	var b strings.Builder
+	for _, r := range s {
+		if unicode.IsDigit(r) {
+			b.WriteRune('0' + digitValue(r))
+		}
+	}
+	return b.String()
+}
+
+// digitValue is the value of a Unicode decimal digit. Each script's digits are
+// one run of ten (some runs sit back to back), so the value is the distance
+// from the start of the run, mod 10.
+func digitValue(r rune) rune {
+	start := r
+	for unicode.IsDigit(start - 1) {
+		start--
+	}
+	return (r - start) % 10
 }
 
 func pageArgs(limit *int, cursor *string) (int, *time.Time, pgtype.UUID, error) {

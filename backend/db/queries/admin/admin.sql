@@ -26,16 +26,15 @@ WHERE u.id = @id;
 
 -- name: LockCustomer :one
 -- Lock order is the users row before its sessions (identity's refresh does the same).
--- is_admin and is_customer are read under the same lock, so a guard on them holds
--- for the rest of the transaction.
-SELECT u.status,
-  (au.user_id IS NOT NULL AND au.disabled_at IS NULL)::bool AS is_admin,
-  (cp.user_id IS NOT NULL)::bool AS is_customer
-FROM users u
-  LEFT JOIN admin_users au ON au.user_id = u.id
-  LEFT JOIN customer_profiles cp ON cp.user_id = u.id
-WHERE u.id = @id
-FOR UPDATE OF u;
+SELECT status FROM users WHERE id = @id FOR UPDATE;
+
+-- name: CustomerRoles :one
+-- Read after LockCustomer, in a statement of its own: under read committed it
+-- takes a fresh snapshot, so an admin grant, re-enable or customer profile that
+-- committed while LockCustomer waited for the lock is seen.
+SELECT
+  EXISTS (SELECT 1 FROM admin_users au WHERE au.user_id = @id AND au.disabled_at IS NULL)::bool AS is_admin,
+  EXISTS (SELECT 1 FROM customer_profiles cp WHERE cp.user_id = @id)::bool AS is_customer;
 
 -- name: SetCustomerStatus :exec
 UPDATE users SET status = @status, updated_at = @now, version = version + 1 WHERE id = @id;

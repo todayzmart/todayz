@@ -115,6 +115,10 @@ func TestAdminCustomersHTTP(t *testing.T) {
 	adminBase := "/v1/admin/customers/" + adminID
 	r = post(tok, adminBase+"/block", block)
 	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	// Nor unblocked: the admin guard answers before the status is read.
+	r = post(tok, adminBase+"/unblock", map[string]any{"reason": "spoke to the customer"})
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Contains(t, r.body["detail"], "A-18")
 	r = get(tok, adminBase)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.Equal(t, true, r.body["isAdmin"])
@@ -142,6 +146,12 @@ func TestAdminCustomersHTTP(t *testing.T) {
 	require.Equal(t, http.StatusConflict, r.code, r.raw)
 	require.Equal(t, "invalid_transition", problemCode(r))
 	require.Equal(t, 0, a.count(`SELECT count(*) FROM users WHERE id = $1 AND status = 'blocked'`, uuidOf(t, ownerID)))
+	a.exec(`UPDATE users SET status = 'blocked' WHERE id = $1`, uuidOf(t, ownerID))
+	r = post(tok, "/v1/admin/customers/"+ownerID+"/unblock", map[string]any{"reason": "spoke to the owner"})
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Contains(t, r.body["detail"], "customer account")
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM users WHERE id = $1 AND status = 'blocked'`, uuidOf(t, ownerID)))
+	a.exec(`UPDATE users SET status = 'active' WHERE id = $1`, uuidOf(t, ownerID))
 
 	r = post(tok, base+"/unblock", map[string]any{"reason": "spoke to the customer"})
 	require.Equal(t, http.StatusOK, r.code, r.raw)
