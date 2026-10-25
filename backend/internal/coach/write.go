@@ -97,7 +97,7 @@ func Rewrite(ctx context.Context, llm client.LLM, model, ref string, in Input) (
 	}
 	if schema.Decode(resp.ToolInput, &out) != nil {
 		client.RecordRejected(ctx, Feature, client.RejectSchema)
-		return Output{}, resp, client.RejectSchema, nil
+		return Output{}, resp, client.RejectSchema, nil //nolint:nilerr // the card keeps its template
 	}
 	out.Title, out.Body = strings.TrimSpace(out.Title), strings.TrimSpace(out.Body)
 	// Every number in the card must be one of the fact's (11 §1 rule 6).
@@ -150,5 +150,5 @@ func (s *Service) writeAI(ctx context.Context, storeID ids.ID, f detectors.Fact,
 	if m == "" {
 		m = model
 	}
-	return Text{Title: out.Title, Body: out.Body}, generated{By: "ai", PromptVersion: &v, Model: &m}, true
+	return Text(out), generated{By: "ai", PromptVersion: &v, Model: &m}, true
 }

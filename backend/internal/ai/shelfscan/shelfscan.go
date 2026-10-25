@@ -34,7 +34,7 @@ const Feature = "shelf_photo"
 // Fixed numbers (the contract's limits, not settings).
 const (
 	// MaxLines bounds the products of one photo (ShelfPhotoDraft.lines maxItems).
-	MaxLines = 40
+	MaxLines = 40 //settings:ok the contract's ShelfPhotoDraft.lines maxItems
 	// MaxOpening bounds the opening stock of a line (ShelfPhotoLineValue.openingStock).
 	MaxOpening = 9999
 	// MaxPaise bounds a price (₹10,00,000).

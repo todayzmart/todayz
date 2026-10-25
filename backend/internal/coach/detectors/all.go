@@ -467,7 +467,7 @@ func expiryPenalty(ctx context.Context, in *Input) ([]Fact, error) {
 	}
 	f, err := in.Store.UnacceptedExpiryRate30d.Float64Value()
 	if err != nil || !f.Valid {
-		return nil, nil
+		return nil, nil //nolint:nilerr // an unreadable rate is no card, not a failed run
 	}
 	rateBp := int64(math.Round(f.Float64 * bpScale))
 	threshold, err := in.Settings.BP(ctx, settings.ShopExpiryPenaltyThresholdBp)

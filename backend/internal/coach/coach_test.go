@@ -373,11 +373,11 @@ func TestFeed(t *testing.T) {
 	_, err = s.Dismiss(e.ctx, owner, storeSL, id)
 	var pe *problem.Error
 	require.ErrorAs(t, err, &pe)
-	require.Equal(t, "invalid_transition", string(pe.Code))
+	require.Equal(t, "invalid_transition", pe.Code)
 
 	_, err = s.Done(e.ctx, owner, storeSL2, id)
 	require.ErrorAs(t, err, &pe)
-	require.Equal(t, "not_found", string(pe.Code))
+	require.Equal(t, "not_found", pe.Code)
 
 	d, err := s.List(e.ctx, storeSL, coachapi.CoachCardFilter("done"), nil, nil)
 	require.NoError(t, err)

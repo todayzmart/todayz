@@ -24,7 +24,7 @@ func init() { prompts.MustRegister(Feature, promptFS) }
 const (
 	maxName  = 120
 	maxBrand = 80
-	maxSize  = 40
+	maxSize  = 40 //settings:ok the tool schema's size maxLength
 )
 
 // Tool is the strict tool the model answers with.

@@ -32,7 +32,7 @@ const Feature = "banner_copy"
 const (
 	MaxItems    = 10 // BannerCopyDraftRequest.itemIds maxItems
 	Options     = 3  // the options one draft carries
-	MaxHeadline = 40 // BannerCopyLine.headline maxLength (the banner template's)
+	MaxHeadline = 40 //settings:ok BannerCopyLine.headline maxLength (the banner template's)
 	MaxSubline  = 60 // BannerCopyLine.subline maxLength
 )
 
