@@ -1,12 +1,375 @@
-# Paths: domain "admin-payouts" (owner W3-09): admin payouts (04 §2.7).
+# Paths: domain "admin-payouts" (owner W3-01): A-11 Payouts (statements,
+# payouts, hold, unhold, mark paid, the bank/UPI export) and the business's
+# own monthly statements, B-10 (04 §2.6, §2.7; 01 §9; D-09, D-51, D-85, D-93).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-payouts]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-payouts.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# 04 §2.6 lists {B}/statements under business-credits.yaml; they are here so
+# the payouts package serves them without editing W2-01's credits handlers
+# (W3-01 report, Questions). Admin reads need admin.payout.view (finance, admin,
+# super_admin); hold, unhold, mark paid and export are finance and super_admin
+# with step-up (D-64). The business reads need credit_account.view (owner,
+# manager).
+/v1/admin/statements:
+  get:
+    operationId: listAdminStatements
+    tags: [admin-payouts]
+    summary: One month's statements, by business name (A-11)
+    parameters:
+      - name: period
+        in: query
+        required: true
+        schema:
+          $ref: ../schemas/admin-payouts.yaml#/PayoutPeriod
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: A page of statements
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-payouts.yaml#/AdminStatementList
+            example:
+              period: "2026-09"
+              items:
+                - &statement
+                  id: 01JB0PS1A2B3C4D5E6F7G8H9J0
+                  businessId: 01JB0BZ1A2B3C4D5E6F7G8H9J0
+                  businessName: Sri Lakshmi Stores
+                  businessStatus: verified
+                  period: "2026-09"
+                  totals: &totals
+                    openingPaise: 0
+                    creditsInPaise: 300000
+                    referralInPaise: 10000
+                    cashbackOutPaise: 40000
+                    reversalsPaise: -3000
+                    adjustmentsPaise: 0
+                    payoutsOutPaise: 0
+                    closingPaise: 267000
+                  kycStatus: verified
+                  openRiskFlag: false
+                  closedAt: "2026-09-30T19:00:00Z"
+                  payout:
+                    id: 01JB0P01A2B3C4D5E6F7G8H9J0
+                    status: pending
+                    amountPaise: 267000
+                    holdReason: null
+                    utr: null
+              nextCursor: null
+              serverNow: "2026-10-25T10:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/statements/{statementId}:
+  parameters:
+    - name: statementId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getAdminStatement
+    tags: [admin-payouts]
+    summary: One statement with its per-store lines; `format=csv` for the CSV
+    parameters:
+      - &format
+        name: format
+        in: query
+        required: false
+        schema:
+          $ref: ../schemas/admin-payouts.yaml#/StatementFormat
+    responses:
+      "200":
+        description: The statement
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-payouts.yaml#/AdminStatementDetail
+            example:
+              statement: *statement
+              stores:
+                - &store
+                  storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                  storeName: Sri Lakshmi Stores
+                  totals: *totals
+                  entries: 42
+              serverNow: "2026-10-25T10:00:00Z"
+          text/csv:
+            schema:
+              type: string
+            example: &csv |
+              period,store_id,store_name,opening_inr,credits_in_inr,referral_in_inr,cashback_out_inr,reversals_inr,adjustments_inr,payouts_out_inr,closing_inr,entries
+              2026-09,01JB0S3M4N5P6Q7R8S9T0V1W2X,Sri Lakshmi Stores,0.00,3000.00,100.00,400.00,-30.00,0.00,0.00,2670.00,42
+      default: *problem
+/v1/admin/payouts:
+  get:
+    operationId: listAdminPayouts
+    tags: [admin-payouts]
+    summary: Payouts, newest first; at most one open per business (D-09)
+    parameters:
+      - name: period
+        in: query
+        required: false
+        schema:
+          $ref: ../schemas/admin-payouts.yaml#/PayoutPeriod
+      - name: status
+        in: query
+        required: false
+        schema:
+          $ref: ../schemas/admin-payouts.yaml#/PayoutStatus
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: A page of payouts
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-payouts.yaml#/AdminPayoutList
+            example:
+              items:
+                - &payout
+                  id: 01JB0P01A2B3C4D5E6F7G8H9J0
+                  businessId: 01JB0BZ1A2B3C4D5E6F7G8H9J0
+                  businessName: Sri Lakshmi Stores
+                  amountPaise: 267000
+                  status: pending
+                  holdReason: null
+                  holdNote: null
+                  statementId: 01JB0PS1A2B3C4D5E6F7G8H9J0
+                  period: "2026-09"
+                  exportedAt: null
+                  computedAt: "2026-09-30T19:00:00Z"
+                  utr: null
+                  paidAt: null
+                  paidBy: null
+                  createdAt: "2026-09-30T19:00:00Z"
+                  version: 1
+              nextCursor: null
+              serverNow: "2026-10-25T10:00:00Z"
+      default: *problem
+/v1/admin/payouts/{payoutId}:
+  parameters:
+    - &payoutId
+      name: payoutId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getAdminPayout
+    tags: [admin-payouts]
+    summary: One payout with its store lines, hold causes and the masked payee
+    responses:
+      "200":
+        description: The payout
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-payouts.yaml#/AdminPayoutDetail
+            example: &payoutDetail
+              payout: *payout
+              lines:
+                - storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                  storeName: Sri Lakshmi Stores
+                  amountPaise: 267000
+              causes:
+                businessSuspended: false
+                kycVerified: true
+                openRiskFlag: false
+              payee:
+                kycStatus: verified
+                upiIdLast4: "@okx"
+                bankAccountLast4: "4321"
+                ifsc: SBIN0001234
+              serverNow: "2026-10-25T10:00:00Z"
+      default: *problem
+/v1/admin/payouts/{payoutId}/hold:
+  parameters:
+    - *payoutId
+  post:
+    operationId: holdPayout
+    tags: [admin-payouts]
+    summary: Hold a pending payout, with a reason (step-up)
+    description: Only a pending payout; anything else is `409 invalid_transition`. The hold reason is `manual`.
+    x-idempotency: optional
+    x-problems: [step_up_required, invalid_transition]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-payouts.yaml#/AdminPayoutNote
+          example:
+            reason: Customer complaints this month, checking before paying
+    responses:
+      "200":
+        description: The held payout
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-payouts.yaml#/AdminPayoutDetail
+            example: *payoutDetail
+      default: *problem
+/v1/admin/payouts/{payoutId}/unhold:
+  parameters:
+    - *payoutId
+  post:
+    operationId: unholdPayout
+    tags: [admin-payouts]
+    summary: Release a held payout, with a reason (step-up)
+    description: >-
+      Only a held payout (else `409 invalid_transition`), and only once its automatic cause has cleared:
+      KYC verified, no open risk flag, business not suspended (else `409 payout_hold_cause_open`).
+    x-idempotency: optional
+    x-problems: [step_up_required, invalid_transition, payout_hold_cause_open]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-payouts.yaml#/AdminPayoutNote
+          example:
+            reason: KYC verified today
+    responses:
+      "200":
+        description: The pending payout
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-payouts.yaml#/AdminPayoutDetail
+            example: *payoutDetail
+      default: *problem
+/v1/admin/payouts/{payoutId}/mark-paid:
+  parameters:
+    - *payoutId
+  post:
+    operationId: markPayoutPaid
+    tags: [admin-payouts]
+    summary: Mark a pending payout paid with the transfer's UTR (step-up)
+    description: >-
+      Posts the payout to the ledger (each store's credit account down by its line, the platform's payouts
+      cash up by the total) and records the UTR. Only a pending payout (`409 payout_not_payable`). The same
+      UTR again returns the paid payout; another UTR on a paid payout is `409 payout_already_paid`; a UTR
+      that pays another payout is `409 utr_in_use`.
+    x-idempotency: required
+    x-money: true
+    x-problems: [step_up_required, payout_not_payable, payout_already_paid, utr_in_use]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-payouts.yaml#/AdminPayoutMarkPaid
+          example:
+            utr: SBIN226301234567
+            reason: Paid by UPI from the current account
+    responses:
+      "200":
+        description: The paid payout
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-payouts.yaml#/AdminPayoutDetail
+            example: *payoutDetail
+      default: *problem
+/v1/admin/payout-exports:
+  get:
+    operationId: exportPayouts
+    tags: [admin-payouts]
+    summary: The bank/UPI batch CSV of a month's pending payouts (step-up)
+    description: >-
+      Pending payouts only; held and paid ones are left out. Decrypted UPI ID and bank account (D-85), cells
+      neutralised against formula injection (D-93). Exporting stamps `exported_at` on the rows and writes an
+      audit row with the payout ids only.
+    x-problems: [step_up_required]
+    parameters:
+      - name: period
+        in: query
+        required: true
+        schema:
+          $ref: ../schemas/admin-payouts.yaml#/PayoutPeriod
+    responses:
+      "200":
+        description: The CSV
+        content:
+          text/csv:
+            schema:
+              type: string
+            example: |
+              payout_id,period,business_id,legal_name,beneficiary_name,amount_inr,upi_id,bank_account_number,ifsc
+              01JB0P01A2B3C4D5E6F7G8H9J0,2026-09,01JB0BZ1A2B3C4D5E6F7G8H9J0,Sri Lakshmi Stores,Lakshmi R,2670.00,lakshmi@okx,,
+      default: *problem
+/v1/biz/businesses/{bid}/statements:
+  parameters:
+    - &bid
+      name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listBusinessStatements
+    tags: [admin-payouts]
+    summary: The business's monthly statements, newest first (B-10)
+    description: Owner and manager. A member limited to some stores sees only those stores' totals.
+    parameters:
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: A page of statements
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-payouts.yaml#/BusinessStatementList
+            example:
+              items:
+                - &bizStatement
+                  period: "2026-09"
+                  totals: *totals
+                  closedAt: "2026-09-30T19:00:00Z"
+                  payout:
+                    status: paid
+                    amountPaise: 267000
+                    utr: SBIN226301234567
+                    paidAt: "2026-10-03T06:30:00Z"
+              nextCursor: null
+              serverNow: "2026-10-25T10:00:00Z"
+      default: *problem
+/v1/biz/businesses/{bid}/statements/{period}:
+  parameters:
+    - *bid
+    - name: period
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/admin-payouts.yaml#/PayoutPeriod
+  get:
+    operationId: getBusinessStatement
+    tags: [admin-payouts]
+    summary: One month's statement by store; `format=csv` for the CSV
+    parameters:
+      - *format
+    responses:
+      "200":
+        description: The statement
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-payouts.yaml#/BusinessStatementDetail
+            example:
+              statement: *bizStatement
+              stores:
+                - *store
+              serverNow: "2026-10-25T10:00:00Z"
+          text/csv:
+            schema:
+              type: string
+            example: *csv
+      default: *problem

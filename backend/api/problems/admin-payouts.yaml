@@ -1,0 +1,23 @@
+# Problem codes: domain "admin-payouts" (owner W3-01; 01 §9, D-09).
+#
+# Same shape as common.yaml. step_up_required (403) is auth.yaml's; a hold on a
+# payout that is not pending, or an unhold of one that is not held, is
+# common.yaml's invalid_transition.
+domain: admin-payouts
+problems:
+  - code: payout_not_payable
+    status: 409
+    i18n: problems.payout_not_payable
+    title: Only a pending payout can be marked paid
+  - code: payout_already_paid
+    status: 409
+    i18n: problems.payout_already_paid
+    title: This payout is already paid with another UTR
+  - code: utr_in_use
+    status: 409
+    i18n: problems.utr_in_use
+    title: That UTR already pays another payout
+  - code: payout_hold_cause_open
+    status: 409
+    i18n: problems.payout_hold_cause_open
+    title: The hold's cause is still open
