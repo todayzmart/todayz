@@ -2,6 +2,7 @@
 // client-rendered app cannot give. This Pages Function reads GET /v1/public/share-cards/{code} and
 // returns a small page with the tags that then opens C-08 with `ref=share`. On any failure (410,
 // 404, the API down) it falls through to the app, whose `/x/$code` route shows the right state.
+// Without `API_URL` it logs and redirects instead (onRequestGet), so a missing setting is seen.
 // Locally the same `renderShare` runs as Vite dev middleware (vite.config.ts). Never a distance.
 
 export interface SharePreviewLike {
@@ -80,10 +81,23 @@ interface PagesContext {
   next: () => Promise<Response>;
 }
 
-// TODO(lead): the Pages project needs the plain env var API_URL (https://api.todayz.in); without it
-// every link falls through to the app, which still resolves it client-side.
+/** The query flag on the app's own copy of the link: the function lets it through to the app. */
+export const APP_FLAG = 'app';
+
+/**
+ * Without `API_URL` no link can have a preview, so the function says so: it logs an error and answers
+ * a plain 302 to the same link with `?app=1`, which it lets through to the app's `/x/$code` route (that
+ * still resolves the code). The 302 shows in the Pages logs and analytics, where a silent fall-through
+ * would not. The lead sets `API_URL` (https://api.todayz.in) on the Pages project.
+ */
 export async function onRequestGet(ctx: PagesContext): Promise<Response> {
   const code = typeof ctx.params.code === 'string' ? ctx.params.code : '';
-  const origin = new URL(ctx.request.url).origin;
-  return (await renderShare(code, origin, (ctx.env.API_URL ?? '').replace(/\/$/, ''))) ?? ctx.next();
+  const url = new URL(ctx.request.url);
+  if (url.searchParams.has(APP_FLAG) || !CODE.test(code)) return ctx.next();
+  const apiBase = (ctx.env.API_URL ?? '').replace(/\/$/, '');
+  if (!apiBase) {
+    console.error('share link: API_URL is not set on the Pages project; no preview, sending the link to the app');
+    return new Response(null, { status: 302, headers: { location: `/x/${code}?${APP_FLAG}=1`, 'cache-control': 'no-store' } });
+  }
+  return (await renderShare(code, url.origin, apiBase)) ?? ctx.next();
 }

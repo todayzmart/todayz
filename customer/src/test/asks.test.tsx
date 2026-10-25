@@ -3,14 +3,14 @@ import type { Ask } from '@todayz/api-client/gen/model/ask';
 import type { AskDetail } from '@todayz/api-client/gen/model/askDetail';
 import type { AskReply } from '@todayz/api-client/gen/model/askReply';
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { setPlace } from '../app/place';
 import { addToCart, getCart, resetCartForTests, setQty } from '../cart/cart';
 import { lineFor } from '../asks/book';
 import { setAskStreamFetchForTests } from '../asks/api';
 import { setStreamFetchForTests } from '../orders/stream';
 import { isAndroid, whatsappHref } from '../share/links';
-import { itemPath, renderShare, shareHtml } from '../../functions/x/[code]';
+import { itemPath, onRequestGet, renderShare, shareHtml } from '../../functions/x/[code]';
 import { NOW, SHOP_A, item, page, pageOf } from './discover-fixtures';
 import { json, renderAt, type Call, type Handler } from './render';
 
@@ -310,6 +310,24 @@ describe('Share link /x/{code}', () => {
     expect(await renderShare(CODE, 'https://app.todayz.in', 'https://api.todayz.in', gone)).toBeNull();
     expect(await renderShare('bad', 'https://app.todayz.in', 'https://api.todayz.in', ok)).toBeNull();
     expect(shareHtml({ ...preview, itemName: '<b>"x"</b>' }, 'https://app.todayz.in', CODE)).not.toContain('<b>');
+  });
+
+  it('the Pages Function without API_URL logs and answers a plain 302 to the app, which it then lets through', async () => {
+    const app = new Response('app');
+    const next = vi.fn(() => Promise.resolve(app));
+    const err = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const ctx = (url: string, env: { API_URL?: string } = {}) => ({ request: new Request(url), params: { code: CODE }, env, next });
+
+    const r = await onRequestGet(ctx(`https://app.todayz.in/x/${CODE}`));
+    expect(r.status).toBe(302);
+    expect(r.headers.get('location')).toBe(`/x/${CODE}?app=1`);
+    expect(err).toHaveBeenCalledWith(expect.stringContaining('API_URL is not set'));
+    expect(next).not.toHaveBeenCalled();
+
+    expect(await onRequestGet(ctx(`https://app.todayz.in/x/${CODE}?app=1`))).toBe(app);
+    expect(await onRequestGet({ ...ctx('https://app.todayz.in/x/bad'), params: { code: 'bad' } })).toBe(app);
+    expect(err).toHaveBeenCalledTimes(1);
+    err.mockRestore();
   });
 
   it('WhatsApp first only on Android, with the text and the link', () => {
