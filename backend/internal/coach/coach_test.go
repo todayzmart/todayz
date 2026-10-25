@@ -508,3 +508,33 @@ func TestRealtime(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "expired", e.cards(t, storeSL)[0].Status)
 }
+
+// TestActOtherStore: Done or Not useful on another store's card is 404 and
+// changes nothing (the card, its quiet window, the detector's weight).
+func TestActOtherStore(t *testing.T) {
+	e := newEnv(t)
+	s := e.service(t, false)
+	_, err := s.RunStore(e.ctx, detectors.Daily, storeSL)
+	require.NoError(t, err)
+	cs := e.cards(t, storeSL)
+	require.NotEmpty(t, cs)
+	tid, _ := ids.FromUUID(cs[0].ID)
+	weights := func() string {
+		var w string
+		require.NoError(t, e.tdb.Pool.QueryRow(e.ctx, `SELECT coalesce(string_agg(
+			store_id::text || detector || weight_bp || done || dismissed, ',' ORDER BY store_id, detector), '')
+			FROM coach_weights`).Scan(&w))
+		return w
+	}
+	before := weights()
+
+	_, err = s.Done(e.ctx, owner, storeSL2, tid)
+	require.Equal(t, "not_found", problem.CodeOf(err))
+	_, err = s.Dismiss(e.ctx, owner, storeSL2, tid)
+	require.Equal(t, "not_found", problem.CodeOf(err))
+
+	after := e.cards(t, storeSL)
+	require.Equal(t, cs[0].Status, after[0].Status)
+	require.Nil(t, after[0].QuietUntil)
+	require.Equal(t, before, weights(), "no weight moved")
+}
