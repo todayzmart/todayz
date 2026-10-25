@@ -37,7 +37,7 @@ const Feature = "list_parse"
 // Fixed numbers (the contract's limits, not settings).
 const (
 	// MaxInput bounds the list (ListParseDraftRequest.text maxLength).
-	MaxInput = 2000
+	MaxInput = 2000 //settings:ok the contract's maxLength, not a radius or share
 	// MaxText bounds one line (ListParseLine.text, BasketLineInput.text maxLength).
 	MaxText = 120
 	// MaxQuantity bounds one line's count (BasketLineInput.quantity maximum).
