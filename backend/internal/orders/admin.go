@@ -22,6 +22,9 @@ import (
 // AdminOps maps the admin-orders operations to their authz actions.
 var AdminOps = map[string]string{
 	"CancelAdminOrder": policy.AdminOrderCancel,
+	// A-07 (W3-05)
+	"ListAdminOrders": policy.AdminOrderView,
+	"GetAdminOrder":   policy.AdminOrderView,
 }
 
 // The side at fault for an admin cancel.

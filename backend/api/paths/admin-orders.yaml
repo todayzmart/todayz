@@ -1,4 +1,4 @@
-# Paths: domain "admin-orders" (owner W3-06): admin orders (04 §2.7).
+# Paths: domain "admin-orders" (owner W3-05): admin orders (04 §2.7).
 #
 # Pre-created empty by W0-04 so parallel work packages never edit the same file
 # (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-orders]`,
@@ -62,6 +62,136 @@
               statusNote: Shop called; item not available
               strike: store
               version: 4
+              serverNow: "2026-10-24T11:00:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/orders:
+  get:
+    operationId: listAdminOrders
+    tags: [admin-orders]
+    summary: Find orders, newest first (A-07)
+    description: >-
+      `number` is an exact order number (`TZ-024817`). The other filters narrow by store, customer, status and
+      the placed time (`from` inclusive, `to` exclusive).
+    parameters:
+      - name: number
+        in: query
+        schema:
+          type: string
+          maxLength: 20
+          pattern: ^(TZ-)?[0-9]{1,12}$
+      - name: storeId
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Ulid
+      - name: customerId
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Ulid
+      - name: status
+        in: query
+        schema:
+          $ref: ../schemas/admin-orders.yaml#/AdminOrderStatus
+      - name: from
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Timestamp
+      - name: to
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Timestamp
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Orders
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-orders.yaml#/AdminOrderList
+            example:
+              items:
+                - id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+                  number: TZ-024817
+                  storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                  storeName: Annapurna Kirana
+                  customerId: 01JB0SCS1A2B3C4D5E6F7G8H9J
+                  customerName: Priya
+                  fulfilment: pickup
+                  status: ready
+                  statusReason: null
+                  totalPaise: 24500
+                  placedAt: "2026-10-24T10:00:00Z"
+              nextCursor: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/orders/{orderId}:
+  parameters:
+    - name: orderId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getAdminOrder
+    tags: [admin-orders]
+    summary: One order with lines, timeline, notifications and credit holds (A-07)
+    responses:
+      "200":
+        description: The order
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-orders.yaml#/AdminOrder
+            example:
+              id: 01JB0T0RD3R5N6Q7W8X9Y0Z1A2
+              number: TZ-024817
+              storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              storeName: Annapurna Kirana
+              customerId: 01JB0SCS1A2B3C4D5E6F7G8H9J
+              customerName: Priya
+              fulfilment: pickup
+              status: ready
+              statusReason: null
+              statusNote: null
+              subtotalPaise: 26000
+              discountPaise: 1500
+              creditsUsed: 0
+              deliveryFeePaise: 0
+              totalPaise: 24500
+              cashbackCredits: 2
+              paymentStatus: unpaid
+              codeAttempts: 0
+              codeLocked: false
+              acceptBy: null
+              holdUntil: "2026-10-24T14:00:00Z"
+              dispatchBy: null
+              placedAt: "2026-10-24T10:00:00Z"
+              version: 3
+              items:
+                - id: 01JB0T0M1A2B3C4D5E6F7G8H9J
+                  name: Aashirvaad Atta
+                  variant: 5 kg
+                  unitPricePaise: 26000
+                  quantityRequested: 1
+                  quantityAccepted: 1
+                  lineTotalPaise: 26000
+              events:
+                - id: 01JB0T0E1A2B3C4D5E6F7G8H9J
+                  fromStatus: null
+                  toStatus: placed
+                  actorKind: customer
+                  actorId: 01JB0SCS1A2B3C4D5E6F7G8H9J
+                  reason: null
+                  createdAt: "2026-10-24T10:00:00Z"
+              notifications:
+                - id: 01JB0T0N1A2B3C4D5E6F7G8H9J
+                  app: business
+                  kind: order_new
+                  createdAt: "2026-10-24T10:00:01Z"
+                  readAt: "2026-10-24T10:02:00Z"
+              creditHolds: []
               serverNow: "2026-10-24T11:00:00Z"
       default:
         $ref: ../common/responses.yaml#/Problem

@@ -1,9 +1,124 @@
-# Schemas: domain "admin-customers" (owner W3-06): admin customers (04 §2.7).
-#
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Schemas: domain "admin-customers" (owner W3-05): A-06 Customers (04 §2.7, 01 §5.4, D-41, D-64).
+# The phone is never returned in full: `phoneMasked` is the 01 R-16.2 mask.
+AdminCustomerChange:
+  type: object
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason:
+      type: string
+      description: Why, 1 to 500 characters. Kept in the audit log (and on a strike reset, on the strike).
+      minLength: 1
+      maxLength: 500
+AdminCustomerStatus:
+  type: string
+  description: '`blocked` refuses sign-in (`403 account_blocked`) and every signed-in call; `deleted` is an erased account.'
+  enum: [active, blocked, deleted]
+AdminCustomerSummary:
+  type: object
+  additionalProperties: false
+  required: [id, name, phoneMasked, status, activeStrikes, createdAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name:
+      type: [string, 'null']
+      maxLength: 80
+    phoneMasked:
+      type: [string, 'null']
+      maxLength: 20
+    status: {$ref: ./admin-customers.yaml#/AdminCustomerStatus}
+    activeStrikes: {type: integer, minimum: 0}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+AdminCustomerSearch:
+  type: object
+  additionalProperties: false
+  required: [items, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 1
+      items: {$ref: ./admin-customers.yaml#/AdminCustomerSummary}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminStrike:
+  type: object
+  additionalProperties: false
+  required: [id, reason, orderId, createdAt, resetAt, resetReason]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    reason:
+      type: string
+      enum: [no_show, dispatch_timeout, admin_cancel]
+    orderId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    resetAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    resetReason:
+      type: [string, 'null']
+      maxLength: 500
+AdminCustomerSession:
+  type: object
+  additionalProperties: false
+  required: [id, app, userAgent, createdAt, lastUsedAt, expiresAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    app:
+      type: string
+      enum: [customer, business, admin]
+    userAgent:
+      type: [string, 'null']
+      maxLength: 256
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    lastUsedAt: {$ref: ./common.yaml#/Timestamp}
+    expiresAt: {$ref: ./common.yaml#/Timestamp}
+AdminCustomerOrder:
+  type: object
+  additionalProperties: false
+  required: [id, number, storeId, storeName, status, totalPaise, placedAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    number: {type: string, maxLength: 20}
+    storeId: {$ref: ./common.yaml#/Ulid}
+    storeName: {type: string, maxLength: 80}
+    status: {type: string, maxLength: 32}
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    placedAt: {$ref: ./common.yaml#/Timestamp}
+AdminCustomer:
+  type: object
+  additionalProperties: false
+  required: [id, name, phoneMasked, status, preferredLang, createdAt, activeStrikes, strikes, sessions, recentOrders, serverNow]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name:
+      type: [string, 'null']
+      maxLength: 80
+    phoneMasked:
+      type: [string, 'null']
+      maxLength: 20
+    status: {$ref: ./admin-customers.yaml#/AdminCustomerStatus}
+    preferredLang:
+      type: string
+      enum: [en, hi, kn, te, ta]
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    activeStrikes:
+      type: integer
+      minimum: 0
+      description: Strikes not reset, all time. The booking limit counts them inside its own window (01 §5.4).
+    strikes:
+      type: array
+      maxItems: 50
+      description: The 50 newest strikes, reset ones included.
+      items: {$ref: ./admin-customers.yaml#/AdminStrike}
+    sessions:
+      type: array
+      maxItems: 50
+      description: Live sessions (not revoked, not expired) in every app.
+      items: {$ref: ./admin-customers.yaml#/AdminCustomerSession}
+    recentOrders:
+      type: array
+      maxItems: 20
+      items: {$ref: ./admin-customers.yaml#/AdminCustomerOrder}
+    serverNow: {$ref: ./common.yaml#/ServerNow}

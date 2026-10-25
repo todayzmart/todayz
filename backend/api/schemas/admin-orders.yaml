@@ -1,4 +1,4 @@
-# Schemas: domain "admin-orders" (owner W3-06): admin orders (04 §2.7).
+# Schemas: domain "admin-orders" (owner W3-05): admin orders (04 §2.7).
 #
 # Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
 # Schema; names are unique across every schemas/<domain>.yaml. Request objects
@@ -39,4 +39,173 @@ AdminCancelledOrder:
     statusNote: {type: [string, "null"]}
     strike: {$ref: '#/AdminStrikeSide'}
     version: {type: integer}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+# W3-05: A-07 order search and detail. The pickup code and the delivery address never leave the server.
+AdminOrderStatus:
+  type: string
+  enum: [placed, awaiting_customer, accepted, ready, out_for_delivery, collected, delivered, rejected, expired,
+    cancelled, delivery_failed]
+AdminOrderSummary:
+  type: object
+  additionalProperties: false
+  required: [id, number, storeId, storeName, customerId, customerName, fulfilment, status, statusReason, totalPaise,
+    placedAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    number: {type: string, maxLength: 20}
+    storeId: {$ref: ./common.yaml#/Ulid}
+    storeName: {type: string, maxLength: 80}
+    customerId: {$ref: ./common.yaml#/Ulid}
+    customerName:
+      type: [string, 'null']
+      maxLength: 80
+    fulfilment:
+      type: string
+      enum: [pickup, delivery]
+    status: {$ref: '#/AdminOrderStatus'}
+    statusReason:
+      type: [string, 'null']
+      maxLength: 40
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    placedAt: {$ref: ./common.yaml#/Timestamp}
+AdminOrderList:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: '#/AdminOrderSummary'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminOrderLine:
+  type: object
+  additionalProperties: false
+  required: [id, name, variant, unitPricePaise, quantityRequested, quantityAccepted, lineTotalPaise]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name: {type: string, maxLength: 200}
+    variant:
+      type: [string, 'null']
+      maxLength: 120
+    unitPricePaise: {$ref: ./common.yaml#/Paise}
+    quantityRequested: {type: integer, minimum: 1}
+    quantityAccepted:
+      type: [integer, 'null']
+      minimum: 0
+    lineTotalPaise: {$ref: ./common.yaml#/Paise}
+AdminOrderEvent:
+  type: object
+  additionalProperties: false
+  required: [id, fromStatus, toStatus, actorKind, actorId, reason, createdAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    fromStatus:
+      oneOf:
+        - {$ref: '#/AdminOrderStatus'}
+        - {type: 'null'}
+    toStatus: {$ref: '#/AdminOrderStatus'}
+    actorKind:
+      type: string
+      enum: [customer, staff, system, admin]
+    actorId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    reason:
+      type: [string, 'null']
+      maxLength: 40
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+AdminOrderNotification:
+  type: object
+  additionalProperties: false
+  required: [id, app, kind, createdAt, readAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    app:
+      type: string
+      enum: [customer, business, admin]
+    kind: {type: string, maxLength: 63}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    readAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+AdminOrderCreditHold:
+  type: object
+  additionalProperties: false
+  required: [id, amount, captured, released, status, createdAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    amount: {$ref: ./common.yaml#/Credits}
+    captured: {$ref: ./common.yaml#/Credits}
+    released: {$ref: ./common.yaml#/Credits}
+    status: {type: string, maxLength: 20}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+AdminOrder:
+  type: object
+  description: One order for support. The pickup code and the address are never included.
+  additionalProperties: false
+  required: [id, number, storeId, storeName, customerId, customerName, fulfilment, status, statusReason, statusNote,
+    subtotalPaise, discountPaise, creditsUsed, deliveryFeePaise, totalPaise, cashbackCredits, paymentStatus,
+    codeAttempts, codeLocked, acceptBy, holdUntil, dispatchBy, placedAt, version, items, events, notifications,
+    creditHolds, serverNow]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    number: {type: string, maxLength: 20}
+    storeId: {$ref: ./common.yaml#/Ulid}
+    storeName: {type: string, maxLength: 80}
+    customerId: {$ref: ./common.yaml#/Ulid}
+    customerName:
+      type: [string, 'null']
+      maxLength: 80
+    fulfilment:
+      type: string
+      enum: [pickup, delivery]
+    status: {$ref: '#/AdminOrderStatus'}
+    statusReason:
+      type: [string, 'null']
+      maxLength: 40
+    statusNote:
+      type: [string, 'null']
+      maxLength: 200
+    subtotalPaise: {$ref: ./common.yaml#/Paise}
+    discountPaise: {$ref: ./common.yaml#/Paise}
+    creditsUsed: {$ref: ./common.yaml#/Credits}
+    deliveryFeePaise: {$ref: ./common.yaml#/Paise}
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    cashbackCredits: {$ref: ./common.yaml#/Credits}
+    paymentStatus: {type: string, maxLength: 20}
+    codeAttempts: {type: integer, minimum: 0}
+    codeLocked: {type: boolean}
+    acceptBy:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    holdUntil:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    dispatchBy:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    placedAt: {$ref: ./common.yaml#/Timestamp}
+    version: {type: integer}
+    items:
+      type: array
+      maxItems: 200
+      items: {$ref: '#/AdminOrderLine'}
+    events:
+      type: array
+      maxItems: 200
+      items: {$ref: '#/AdminOrderEvent'}
+    notifications:
+      type: array
+      maxItems: 100
+      items: {$ref: '#/AdminOrderNotification'}
+    creditHolds:
+      type: array
+      maxItems: 20
+      items: {$ref: '#/AdminOrderCreditHold'}
     serverNow: {$ref: ./common.yaml#/ServerNow}

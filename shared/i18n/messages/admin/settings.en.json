@@ -1,0 +1,266 @@
+{
+  "settings.sub": {
+    "defaultMessage": "Platform rules and limits. Every change needs a reason and your authenticator code.",
+    "description": "Subtitle of the settings screen (A-17)"
+  },
+  "settings.loadFailed": {
+    "defaultMessage": "Settings could not be loaded.",
+    "description": "Settings list failed to load"
+  },
+  "settings.filter.group": {
+    "defaultMessage": "Group",
+    "description": "Label of the group filter"
+  },
+  "settings.filter.all": {
+    "defaultMessage": "All groups",
+    "description": "Group filter option showing every group"
+  },
+  "settings.group.orders": {
+    "defaultMessage": "Orders",
+    "description": "Settings group heading: orders"
+  },
+  "settings.group.stock": {
+    "defaultMessage": "Stock and holds",
+    "description": "Settings group heading: stock"
+  },
+  "settings.group.credits": {
+    "defaultMessage": "Credits and payouts",
+    "description": "Settings group heading: credits"
+  },
+  "settings.group.reviews": {
+    "defaultMessage": "Reviews",
+    "description": "Settings group heading: reviews"
+  },
+  "settings.group.referrals": {
+    "defaultMessage": "Referrals",
+    "description": "Settings group heading: referrals"
+  },
+  "settings.group.pos": {
+    "defaultMessage": "Counter (POS)",
+    "description": "Settings group heading: pos"
+  },
+  "settings.group.search": {
+    "defaultMessage": "Search",
+    "description": "Settings group heading: search"
+  },
+  "settings.group.insights": {
+    "defaultMessage": "Insights",
+    "description": "Settings group heading: insights"
+  },
+  "settings.group.field": {
+    "defaultMessage": "Field team",
+    "description": "Settings group heading: field"
+  },
+  "settings.group.jobs": {
+    "defaultMessage": "Background jobs",
+    "description": "Settings group heading: jobs"
+  },
+  "settings.group.asks": {
+    "defaultMessage": "Asks",
+    "description": "Settings group heading: asks"
+  },
+  "settings.group.baskets": {
+    "defaultMessage": "Baskets",
+    "description": "Settings group heading: baskets"
+  },
+  "settings.group.features": {
+    "defaultMessage": "Features",
+    "description": "Settings group heading: features"
+  },
+  "settings.group.ai": {
+    "defaultMessage": "AI",
+    "description": "Settings group heading: ai"
+  },
+  "settings.group.clients": {
+    "defaultMessage": "App versions",
+    "description": "Settings group heading: clients"
+  },
+  "settings.group.other": {
+    "defaultMessage": "Other",
+    "description": "Settings group heading: other"
+  },
+  "settings.col.setting": {
+    "defaultMessage": "Setting",
+    "description": "Column: setting key and description"
+  },
+  "settings.col.value": {
+    "defaultMessage": "Value",
+    "description": "Column: current value"
+  },
+  "settings.col.range": {
+    "defaultMessage": "Allowed",
+    "description": "Column: min and max"
+  },
+  "settings.col.updated": {
+    "defaultMessage": "Last changed",
+    "description": "Column: last change time and who"
+  },
+  "settings.col.actions": {
+    "defaultMessage": "Actions",
+    "description": "Column: actions"
+  },
+  "settings.updatedBy": {
+    "defaultMessage": "{when} by {name}",
+    "description": "Last change with who made it"
+  },
+  "settings.change": {
+    "defaultMessage": "Change",
+    "description": "Button opening the edit dialog"
+  },
+  "settings.change.named": {
+    "defaultMessage": "Change {key}",
+    "description": "Accessible name of the change button for one setting"
+  },
+  "settings.superOnly": {
+    "defaultMessage": "Super admin only",
+    "description": "Shown instead of Change on a money setting for an admin"
+  },
+  "settings.readOnly": {
+    "defaultMessage": "View only",
+    "description": "Shown instead of Change when the role cannot edit"
+  },
+  "settings.done": {
+    "defaultMessage": "{key} saved. Every server picks it up within moments.",
+    "description": "Toast after a setting change"
+  },
+  "settings.providers": {
+    "defaultMessage": "Provider keys",
+    "description": "Heading of the provider key states card"
+  },
+  "settings.providers.sub": {
+    "defaultMessage": "Keys live in the server environment. Only whether each is set is shown, never the key.",
+    "description": "Explains provider keys are never shown"
+  },
+  "settings.providers.set": {
+    "defaultMessage": "Set",
+    "description": "Provider key is set"
+  },
+  "settings.providers.missing": {
+    "defaultMessage": "Missing",
+    "description": "Provider key is not set"
+  },
+  "settings.value.on": {
+    "defaultMessage": "On",
+    "description": "Boolean setting on"
+  },
+  "settings.value.off": {
+    "defaultMessage": "Off",
+    "description": "Boolean setting off"
+  },
+  "settings.value.credits": {
+    "defaultMessage": "{n, plural, one {# credit} other {# credits}}",
+    "description": "A credits value"
+  },
+  "settings.value.minutes": {
+    "defaultMessage": "{n, plural, one {# minute} other {# minutes}}",
+    "description": "A minutes value"
+  },
+  "settings.value.hours": {
+    "defaultMessage": "{n, plural, one {# hour} other {# hours}}",
+    "description": "An hours value"
+  },
+  "settings.value.days": {
+    "defaultMessage": "{n, plural, one {# day} other {# days}}",
+    "description": "A days value"
+  },
+  "settings.value.meters": {
+    "defaultMessage": "{n} m",
+    "description": "A distance in meters"
+  },
+  "settings.range.both": {
+    "defaultMessage": "{min} to {max}",
+    "description": "Allowed range with both ends"
+  },
+  "settings.range.min": {
+    "defaultMessage": "At least {min}",
+    "description": "Allowed range with only a minimum"
+  },
+  "settings.range.max": {
+    "defaultMessage": "At most {max}",
+    "description": "Allowed range with only a maximum"
+  },
+  "settings.edit.title": {
+    "defaultMessage": "Change {key}",
+    "description": "Title of the edit dialog"
+  },
+  "settings.edit.current": {
+    "defaultMessage": "Now {value}. Allowed: {range}.",
+    "description": "Current value and range in the edit dialog"
+  },
+  "settings.edit.money": {
+    "defaultMessage": "This is a money setting. It changes what customers pay or earn.",
+    "description": "Warning on a money setting"
+  },
+  "settings.edit.value": {
+    "defaultMessage": "New value",
+    "description": "Label of the value field"
+  },
+  "settings.edit.valuePercent": {
+    "defaultMessage": "New value (%)",
+    "description": "Label of the value field for a percent setting"
+  },
+  "settings.edit.help.rupees": {
+    "defaultMessage": "In rupees, up to 2 decimals.",
+    "description": "Help for a rupee value"
+  },
+  "settings.edit.help.percent": {
+    "defaultMessage": "In percent, up to 2 decimals.",
+    "description": "Help for a percent value"
+  },
+  "settings.edit.help.whole": {
+    "defaultMessage": "A whole number.",
+    "description": "Help for a whole number value"
+  },
+  "settings.edit.help.text": {
+    "defaultMessage": "Up to {max} characters.",
+    "description": "Help for a text value"
+  },
+  "settings.edit.error.whole": {
+    "defaultMessage": "Enter a whole number.",
+    "description": "Value is not a whole number"
+  },
+  "settings.edit.error.decimal": {
+    "defaultMessage": "Enter a number with up to 2 decimals.",
+    "description": "Value is not a decimal with 2 places"
+  },
+  "settings.edit.error.range": {
+    "defaultMessage": "Allowed: {range}.",
+    "description": "Value outside min and max"
+  },
+  "settings.edit.error.text": {
+    "defaultMessage": "Enter between 1 and {max} characters.",
+    "description": "Text value empty or too long"
+  },
+  "settings.edit.error.version": {
+    "defaultMessage": "Enter a release number like 1.4.0.",
+    "description": "Client version not semver"
+  },
+  "settings.edit.error.same": {
+    "defaultMessage": "That is the current value.",
+    "description": "Value unchanged"
+  },
+  "settings.edit.save": {
+    "defaultMessage": "Save change",
+    "description": "Confirm button of the edit dialog"
+  },
+  "settings.history.title": {
+    "defaultMessage": "Changes to {key}",
+    "description": "Side panel heading for one setting"
+  },
+  "settings.history.pick": {
+    "defaultMessage": "Choose a setting to see its changes.",
+    "description": "Side panel when no setting is chosen"
+  },
+  "settings.history.none": {
+    "defaultMessage": "No changes yet.",
+    "description": "Setting never changed"
+  },
+  "settings.history.change": {
+    "defaultMessage": "{from} → {to}",
+    "description": "One change, old value to new value"
+  },
+  "settings.none": {
+    "defaultMessage": "No settings in this group.",
+    "description": "Empty settings group"
+  }
+}

@@ -1,0 +1,414 @@
+{
+  "orders.status.placed": {
+    "defaultMessage": "Placed",
+    "description": "Order status"
+  },
+  "orders.status.awaitingCustomer": {
+    "defaultMessage": "Waiting for customer",
+    "description": "Order status"
+  },
+  "orders.status.accepted": {
+    "defaultMessage": "Accepted",
+    "description": "Order status"
+  },
+  "orders.status.ready": {
+    "defaultMessage": "Ready",
+    "description": "Order status"
+  },
+  "orders.status.outForDelivery": {
+    "defaultMessage": "Out for delivery",
+    "description": "Order status"
+  },
+  "orders.status.collected": {
+    "defaultMessage": "Collected",
+    "description": "Order status"
+  },
+  "orders.status.delivered": {
+    "defaultMessage": "Delivered",
+    "description": "Order status"
+  },
+  "orders.status.rejected": {
+    "defaultMessage": "Rejected",
+    "description": "Order status"
+  },
+  "orders.status.expired": {
+    "defaultMessage": "Expired",
+    "description": "Order status"
+  },
+  "orders.status.cancelled": {
+    "defaultMessage": "Cancelled",
+    "description": "Order status"
+  },
+  "orders.status.deliveryFailed": {
+    "defaultMessage": "Delivery failed",
+    "description": "Order status"
+  },
+  "orders.sub": {
+    "defaultMessage": "Search every order by number, shop, customer, status or day.",
+    "description": "Subtitle of the orders screen (A-07)"
+  },
+  "orders.table": {
+    "defaultMessage": "Orders",
+    "description": "Accessible name of the orders table"
+  },
+  "orders.none": {
+    "defaultMessage": "—",
+    "description": "Shown for an empty value"
+  },
+  "orders.noName": {
+    "defaultMessage": "No name yet",
+    "description": "A customer without a name"
+  },
+  "orders.filters": {
+    "defaultMessage": "Order filters",
+    "description": "Accessible name of the filter form"
+  },
+  "orders.filter.number": {
+    "defaultMessage": "Order number",
+    "description": "Filter"
+  },
+  "orders.filter.status": {
+    "defaultMessage": "Status",
+    "description": "Filter"
+  },
+  "orders.filter.anyStatus": {
+    "defaultMessage": "Any status",
+    "description": "Status filter option: no filter"
+  },
+  "orders.filter.store": {
+    "defaultMessage": "Shop ID",
+    "description": "Filter"
+  },
+  "orders.filter.customer": {
+    "defaultMessage": "Customer ID",
+    "description": "Filter"
+  },
+  "orders.filter.from": {
+    "defaultMessage": "Placed from",
+    "description": "Filter: first day (IST)"
+  },
+  "orders.filter.to": {
+    "defaultMessage": "Placed to",
+    "description": "Filter: last day (IST), included"
+  },
+  "orders.filter.apply": {
+    "defaultMessage": "Apply",
+    "description": "Button: apply the filters"
+  },
+  "orders.filter.clear": {
+    "defaultMessage": "Clear",
+    "description": "Button: remove every filter"
+  },
+  "orders.col.number": {
+    "defaultMessage": "Order",
+    "description": "Table column"
+  },
+  "orders.col.store": {
+    "defaultMessage": "Shop",
+    "description": "Table column"
+  },
+  "orders.col.customer": {
+    "defaultMessage": "Customer",
+    "description": "Table column"
+  },
+  "orders.col.fulfilment": {
+    "defaultMessage": "Pickup or delivery",
+    "description": "Table column"
+  },
+  "orders.col.status": {
+    "defaultMessage": "Status",
+    "description": "Table column"
+  },
+  "orders.col.total": {
+    "defaultMessage": "Total",
+    "description": "Table column"
+  },
+  "orders.col.placed": {
+    "defaultMessage": "Placed",
+    "description": "Table column"
+  },
+  "orders.col.item": {
+    "defaultMessage": "Item",
+    "description": "Items table column"
+  },
+  "orders.col.price": {
+    "defaultMessage": "Price",
+    "description": "Items table column"
+  },
+  "orders.col.asked": {
+    "defaultMessage": "Asked",
+    "description": "Items table column: quantity the customer asked for"
+  },
+  "orders.col.accepted": {
+    "defaultMessage": "Accepted",
+    "description": "Items table column: quantity the shop accepted"
+  },
+  "orders.col.amount": {
+    "defaultMessage": "Held",
+    "description": "Credit holds column: credits held"
+  },
+  "orders.col.captured": {
+    "defaultMessage": "Used",
+    "description": "Credit holds column"
+  },
+  "orders.col.released": {
+    "defaultMessage": "Returned",
+    "description": "Credit holds column"
+  },
+  "orders.col.when": {
+    "defaultMessage": "When",
+    "description": "Table column"
+  },
+  "orders.col.app": {
+    "defaultMessage": "App",
+    "description": "Notifications column"
+  },
+  "orders.col.kind": {
+    "defaultMessage": "Kind",
+    "description": "Notifications column"
+  },
+  "orders.col.read": {
+    "defaultMessage": "Read",
+    "description": "Notifications column"
+  },
+  "orders.unread": {
+    "defaultMessage": "Not read",
+    "description": "Notification not read yet"
+  },
+  "orders.fulfilment.pickup": {
+    "defaultMessage": "Pickup",
+    "description": "Fulfilment"
+  },
+  "orders.fulfilment.delivery": {
+    "defaultMessage": "Delivery",
+    "description": "Fulfilment"
+  },
+  "orders.actor.customer": {
+    "defaultMessage": "customer",
+    "description": "Who moved the order, inside a timeline line"
+  },
+  "orders.actor.staff": {
+    "defaultMessage": "shop",
+    "description": "Who moved the order"
+  },
+  "orders.actor.admin": {
+    "defaultMessage": "admin",
+    "description": "Who moved the order"
+  },
+  "orders.actor.system": {
+    "defaultMessage": "automatic",
+    "description": "Who moved the order: a timer or job"
+  },
+  "orders.back": {
+    "defaultMessage": "Back to orders",
+    "description": "Link back to the order search"
+  },
+  "orders.missing": {
+    "defaultMessage": "This order doesn't exist",
+    "description": "Detail: not found"
+  },
+  "orders.loadFailed": {
+    "defaultMessage": "We couldn't load this order",
+    "description": "Detail: load failure"
+  },
+  "orders.detail.title": {
+    "defaultMessage": "Order {number}",
+    "description": "Detail heading"
+  },
+  "orders.detail.sub": {
+    "defaultMessage": "{fulfilment} · placed {placed}",
+    "description": "Line under the heading"
+  },
+  "orders.detail.reason": {
+    "defaultMessage": "{reason, select, none {} other {Reason: {reason}}}{note, select, none {} other { · {note}}}",
+    "description": "Why the order ended, with the note"
+  },
+  "orders.facts": {
+    "defaultMessage": "Summary",
+    "description": "Heading of the summary card"
+  },
+  "orders.money.subtotal": {
+    "defaultMessage": "Subtotal",
+    "description": "Money row"
+  },
+  "orders.money.discount": {
+    "defaultMessage": "Discount",
+    "description": "Money row"
+  },
+  "orders.money.credits": {
+    "defaultMessage": "Credits used",
+    "description": "Money row"
+  },
+  "orders.money.delivery": {
+    "defaultMessage": "Delivery fee",
+    "description": "Money row"
+  },
+  "orders.money.total": {
+    "defaultMessage": "Total",
+    "description": "Money row"
+  },
+  "orders.money.cashback": {
+    "defaultMessage": "Cashback credits",
+    "description": "Money row"
+  },
+  "orders.money.payment": {
+    "defaultMessage": "Payment",
+    "description": "Money row: payment status"
+  },
+  "orders.code.attempts": {
+    "defaultMessage": "Code tries",
+    "description": "Wrong pickup-code tries"
+  },
+  "orders.code.count": {
+    "defaultMessage": "{count, plural, one {# wrong try} other {# wrong tries}}",
+    "description": "Wrong code tries"
+  },
+  "orders.code.locked": {
+    "defaultMessage": "{count, plural, one {# wrong try} other {# wrong tries}}, locked",
+    "description": "Wrong code tries; the code is locked"
+  },
+  "orders.timer.acceptBy": {
+    "defaultMessage": "Accept by",
+    "description": "Timer row"
+  },
+  "orders.timer.holdUntil": {
+    "defaultMessage": "Held until",
+    "description": "Timer row"
+  },
+  "orders.timer.dispatchBy": {
+    "defaultMessage": "Dispatch by",
+    "description": "Timer row"
+  },
+  "orders.items": {
+    "defaultMessage": "Items",
+    "description": "Heading and table name"
+  },
+  "orders.items.none": {
+    "defaultMessage": "No items.",
+    "description": "Empty items table"
+  },
+  "orders.timeline": {
+    "defaultMessage": "Timeline",
+    "description": "Heading and list name of the order's events"
+  },
+  "orders.event.detail": {
+    "defaultMessage": "{when} · {actor}{reason, select, none {} other { · {reason}}}",
+    "description": "Line under a timeline step"
+  },
+  "orders.step.done": {
+    "defaultMessage": "done",
+    "description": "Read after a finished step"
+  },
+  "orders.step.upcoming": {
+    "defaultMessage": "not yet",
+    "description": "Read after a step to come"
+  },
+  "orders.step.failed": {
+    "defaultMessage": "failed",
+    "description": "Read after a failed step"
+  },
+  "orders.holds": {
+    "defaultMessage": "Credit holds",
+    "description": "Heading and table name"
+  },
+  "orders.holds.none": {
+    "defaultMessage": "No credits held.",
+    "description": "Empty credit holds table"
+  },
+  "orders.notices": {
+    "defaultMessage": "Notifications",
+    "description": "Heading and table name"
+  },
+  "orders.notices.none": {
+    "defaultMessage": "No notifications sent.",
+    "description": "Empty notifications table"
+  },
+  "orders.cancel": {
+    "defaultMessage": "Cancel order",
+    "description": "Button: admin cancel"
+  },
+  "orders.cancel.title": {
+    "defaultMessage": "Cancel order {number}?",
+    "description": "Cancel dialog title"
+  },
+  "orders.cancel.body": {
+    "defaultMessage": "Credits held for this order go back to the customer. The customer and the shop are told.",
+    "description": "Cancel dialog body"
+  },
+  "orders.cancel.reason": {
+    "defaultMessage": "Reason",
+    "description": "Cancel dialog field"
+  },
+  "orders.cancel.pickReason": {
+    "defaultMessage": "Choose a reason",
+    "description": "Reason select placeholder"
+  },
+  "orders.cancel.reasonRequired": {
+    "defaultMessage": "Choose a reason.",
+    "description": "Error: no reason chosen"
+  },
+  "orders.cancel.reason.customerRequest": {
+    "defaultMessage": "Customer asked",
+    "description": "Cancel reason"
+  },
+  "orders.cancel.reason.storeRequest": {
+    "defaultMessage": "Shop asked",
+    "description": "Cancel reason"
+  },
+  "orders.cancel.reason.fraudSuspected": {
+    "defaultMessage": "Suspected fraud",
+    "description": "Cancel reason"
+  },
+  "orders.cancel.reason.technicalIssue": {
+    "defaultMessage": "Technical problem",
+    "description": "Cancel reason"
+  },
+  "orders.cancel.reason.other": {
+    "defaultMessage": "Other",
+    "description": "Cancel reason; needs a note"
+  },
+  "orders.cancel.strike": {
+    "defaultMessage": "Strike",
+    "description": "Cancel dialog field: who gets a strike"
+  },
+  "orders.cancel.strike.none": {
+    "defaultMessage": "No one",
+    "description": "Strike option"
+  },
+  "orders.cancel.strike.customer": {
+    "defaultMessage": "Customer",
+    "description": "Strike option"
+  },
+  "orders.cancel.strike.store": {
+    "defaultMessage": "Shop",
+    "description": "Strike option"
+  },
+  "orders.cancel.strikeHelp": {
+    "defaultMessage": "Only give a strike when one side is clearly at fault.",
+    "description": "Help under the strike choice"
+  },
+  "orders.cancel.note": {
+    "defaultMessage": "Note",
+    "description": "Cancel dialog field"
+  },
+  "orders.cancel.noteHelp": {
+    "defaultMessage": "Up to 200 characters. Needed when the reason is other.",
+    "description": "Help under the note"
+  },
+  "orders.cancel.noteRequired": {
+    "defaultMessage": "Write a note when the reason is other.",
+    "description": "Error: note missing for reason other"
+  },
+  "orders.cancel.keep": {
+    "defaultMessage": "Keep order",
+    "description": "Button: close the dialog without cancelling"
+  },
+  "orders.cancel.confirm": {
+    "defaultMessage": "Cancel order",
+    "description": "Button: confirm the admin cancel"
+  },
+  "orders.cancel.done": {
+    "defaultMessage": "Order {number} cancelled",
+    "description": "Toast after cancelling"
+  }
+}

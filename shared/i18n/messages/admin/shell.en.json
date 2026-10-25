@@ -67,6 +67,86 @@
     "defaultMessage": "Settings",
     "description": "Navigation item"
   },
+  "shell.nav.reviews": {
+    "defaultMessage": "Reviews",
+    "description": "Navigation item: review moderation (A-12)"
+  },
+  "shell.nav.banners": {
+    "defaultMessage": "Banner moderation",
+    "description": "Navigation item (A-20)"
+  },
+  "shell.nav.demand": {
+    "defaultMessage": "Demand",
+    "description": "Navigation item: demand gaps and the site search strip (A-23)"
+  },
+  "shell.nav.audit": {
+    "defaultMessage": "Audit log",
+    "description": "Navigation item (A-19)"
+  },
+  "shell.nav.groupSystem": {
+    "defaultMessage": "System",
+    "description": "Sidebar group heading"
+  },
+  "shell.nav.notifications": {
+    "defaultMessage": "Notifications",
+    "description": "Navigation item: message templates and integrations (A-16)"
+  },
+  "shell.nav.jobs": {
+    "defaultMessage": "Jobs",
+    "description": "Navigation item: scheduled and background jobs (A-21)"
+  },
+  "shell.nav.system": {
+    "defaultMessage": "System health",
+    "description": "Navigation item: AWS and database health (A-22)"
+  },
+  "shell.access.title": {
+    "defaultMessage": "You don't have access to this screen",
+    "description": "Shown when the signed-in admin's roles do not open the page"
+  },
+  "shell.access.body": {
+    "defaultMessage": "Your roles: {roles}. Ask a super admin if you need this screen.",
+    "description": "No-access body. {roles} is a comma-separated list such as Support, Finance."
+  },
+  "shell.access.noRoles": {
+    "defaultMessage": "Your account has no admin role yet. Ask a super admin to give you one.",
+    "description": "No-access body when the account has no role at all"
+  },
+  "shell.access.loadFailed": {
+    "defaultMessage": "We couldn't load your access",
+    "description": "Shown when the account and its roles could not be loaded"
+  },
+  "shell.access.retry": {
+    "defaultMessage": "Try again",
+    "description": "Button to reload the account and its roles"
+  },
+  "shell.role.field_agent": {
+    "defaultMessage": "Field agent",
+    "description": "Admin role name"
+  },
+  "shell.role.support": {
+    "defaultMessage": "Support",
+    "description": "Admin role name"
+  },
+  "shell.role.catalogue": {
+    "defaultMessage": "Catalogue",
+    "description": "Admin role name"
+  },
+  "shell.role.analyst": {
+    "defaultMessage": "Analyst",
+    "description": "Admin role name"
+  },
+  "shell.role.finance": {
+    "defaultMessage": "Finance",
+    "description": "Admin role name"
+  },
+  "shell.role.admin": {
+    "defaultMessage": "Admin",
+    "description": "Admin role name"
+  },
+  "shell.role.super_admin": {
+    "defaultMessage": "Super admin",
+    "description": "Admin role name"
+  },
   "shell.page.sub": {
     "defaultMessage": "Admin console for TodayZ operations",
     "description": "Sub-line under the page title"

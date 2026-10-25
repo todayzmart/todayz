@@ -1,0 +1,142 @@
+{
+  "audit.sub": {
+    "defaultMessage": "Every admin change and sign-in, newest first.",
+    "description": "Subtitle of the audit log screen (A-19)"
+  },
+  "audit.table": {
+    "defaultMessage": "Audit log",
+    "description": "Accessible name of the audit log table"
+  },
+  "audit.none": {
+    "defaultMessage": "Nothing matches these filters.",
+    "description": "Empty audit log table"
+  },
+  "audit.filters": {
+    "defaultMessage": "Audit log filters",
+    "description": "Accessible name of the audit filter form"
+  },
+  "audit.filter.actor": {
+    "defaultMessage": "Actor ID",
+    "description": "Filter: the ID of who did it"
+  },
+  "audit.filter.action": {
+    "defaultMessage": "Action",
+    "description": "Filter: an action code, e.g. customer.block"
+  },
+  "audit.filter.type": {
+    "defaultMessage": "Subject type",
+    "description": "Filter: the kind of record changed"
+  },
+  "audit.filter.anyType": {
+    "defaultMessage": "Any type",
+    "description": "Subject type filter option: no filter"
+  },
+  "audit.filter.subject": {
+    "defaultMessage": "Subject ID",
+    "description": "Filter: the ID of the record changed"
+  },
+  "audit.filter.from": {
+    "defaultMessage": "From",
+    "description": "Filter: first day (IST)"
+  },
+  "audit.filter.to": {
+    "defaultMessage": "To",
+    "description": "Filter: last day (IST), included"
+  },
+  "audit.filter.apply": {
+    "defaultMessage": "Apply",
+    "description": "Button: apply the filters"
+  },
+  "audit.filter.clear": {
+    "defaultMessage": "Clear",
+    "description": "Button: remove every filter"
+  },
+  "audit.col.when": {
+    "defaultMessage": "When",
+    "description": "Audit table column"
+  },
+  "audit.col.actor": {
+    "defaultMessage": "Who",
+    "description": "Audit table column"
+  },
+  "audit.col.action": {
+    "defaultMessage": "Action",
+    "description": "Audit table column; each cell opens the change"
+  },
+  "audit.col.subject": {
+    "defaultMessage": "Record",
+    "description": "Audit table column: type and ID of the record"
+  },
+  "audit.panel.title": {
+    "defaultMessage": "History",
+    "description": "Heading of the audit side panel on a detail screen"
+  },
+  "audit.panel.empty": {
+    "defaultMessage": "No changes yet.",
+    "description": "Audit side panel with no rows"
+  },
+  "audit.panel.failed": {
+    "defaultMessage": "We couldn't load the history.",
+    "description": "Audit side panel load failure"
+  },
+  "audit.panel.by": {
+    "defaultMessage": "{actor} · {when}",
+    "description": "Who made a change and when"
+  },
+  "audit.noChange": {
+    "defaultMessage": "No fields changed.",
+    "description": "An audit row with no before/after difference"
+  },
+  "audit.was": {
+    "defaultMessage": "was {value}",
+    "description": "Screen-reader text for a struck-through old value"
+  },
+  "audit.action.customerBlock": {
+    "defaultMessage": "Customer blocked",
+    "description": "Audit action label"
+  },
+  "audit.action.customerUnblock": {
+    "defaultMessage": "Customer unblocked",
+    "description": "Audit action label"
+  },
+  "audit.action.strikesReset": {
+    "defaultMessage": "Strikes reset",
+    "description": "Audit action label"
+  },
+  "audit.action.sessionRevoke": {
+    "defaultMessage": "Device signed out",
+    "description": "Audit action label"
+  },
+  "audit.action.orderCancel": {
+    "defaultMessage": "Order cancelled by admin",
+    "description": "Audit action label"
+  },
+  "audit.actor.admin": {
+    "defaultMessage": "An admin",
+    "description": "Audit actor without a name"
+  },
+  "audit.actor.staff": {
+    "defaultMessage": "Shop staff",
+    "description": "Audit actor kind"
+  },
+  "audit.actor.user": {
+    "defaultMessage": "The customer",
+    "description": "Audit actor kind"
+  },
+  "audit.actor.device": {
+    "defaultMessage": "A POS device",
+    "description": "Audit actor kind"
+  },
+  "audit.actor.system": {
+    "defaultMessage": "TodayZ (automatic)",
+    "description": "Audit actor kind: a job or timer"
+  },
+  "audit.removed": {
+    "defaultMessage": "removed",
+    "description": "Audit diff (A-06, A-08, A-19): a field the change removed"
+  },
+  "audit.action.settingsUpdate": {
+    "defaultMessage": "Setting changed",
+    "description": "Audit action: a platform setting changed"
+  }
+}

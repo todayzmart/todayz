@@ -1,12 +1,235 @@
-# Paths: domain "admin-customers" (owner W3-06): admin customers (04 §2.7).
+# Paths: domain "admin-customers" (owner W3-05): A-06 Customers (04 §2.7, 01 §5.4, D-41, D-64).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-customers]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-customers.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Search is an exact phone match through the keyed phone hash (there is no partial phone search,
+# so the console never lists phones). Every change is audited with its reason. Roles per
+# operation are in internal/platform/authz/policy/admin.go.
+/v1/admin/customers:
+  get:
+    operationId: searchAdminCustomers
+    tags: [admin-customers]
+    summary: Find a customer by phone (exact match)
+    description: >-
+      `phone` is a 10-digit Indian mobile number, with or without `+91`. Answers zero or one customer;
+      the phone comes back masked.
+    parameters:
+      - name: phone
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 10
+          maxLength: 16
+          pattern: ^[+0-9 ]{10,16}$
+    responses:
+      "200":
+        description: Zero or one customer
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-customers.yaml#/AdminCustomerSearch
+            example:
+              items:
+                - id: 01JB0SCS1A2B3C4D5E6F7G8H9J
+                  name: Priya
+                  phoneMasked: "98•••••210"
+                  status: active
+                  activeStrikes: 1
+                  createdAt: "2026-10-01T09:30:00Z"
+              serverNow: "2026-10-24T11:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/customers/{customerId}:
+  parameters:
+    - name: customerId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getAdminCustomer
+    tags: [admin-customers]
+    summary: One customer with strikes, live sessions and recent orders
+    responses:
+      "200":
+        description: The customer
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-customers.yaml#/AdminCustomer
+            example: &customer
+              id: 01JB0SCS1A2B3C4D5E6F7G8H9J
+              name: Priya
+              phoneMasked: "98•••••210"
+              status: active
+              preferredLang: en
+              createdAt: "2026-10-01T09:30:00Z"
+              activeStrikes: 1
+              strikes:
+                - id: 01JB0SKS1A2B3C4D5E6F7G8H9J
+                  reason: no_show
+                  orderId: 01JB0SDR1A2B3C4D5E6F7G8H9J
+                  createdAt: "2026-10-20T18:00:00Z"
+                  resetAt: null
+                  resetReason: null
+              sessions:
+                - id: 01JB0SSN1A2B3C4D5E6F7G8H9J
+                  app: customer
+                  userAgent: Mozilla/5.0 (Linux; Android 14)
+                  createdAt: "2026-10-01T09:30:00Z"
+                  lastUsedAt: "2026-10-24T10:00:00Z"
+                  expiresAt: "2026-12-30T10:00:00Z"
+              recentOrders:
+                - id: 01JB0SDR1A2B3C4D5E6F7G8H9J
+                  number: TZ-024817
+                  storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  storeName: Annapurna Kirana
+                  status: no_show
+                  totalPaise: 24500
+                  placedAt: "2026-10-20T16:00:00Z"
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/customers/{customerId}/block:
+  parameters:
+    - name: customerId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: blockAdminCustomer
+    tags: [admin-customers]
+    summary: Block a customer (audited)
+    description: >-
+      `admin` and `super_admin`, with a reason. The account's live sessions are revoked at once, in every app,
+      and sign-in answers `403 account_blocked` until it is unblocked. Open orders are not cancelled (use the
+      admin cancel). Blocking a blocked or deleted account is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-customers.yaml#/AdminCustomerChange
+          example:
+            reason: Repeated fake bookings
+    responses:
+      "200":
+        description: The customer after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-customers.yaml#/AdminCustomer
+            example:
+              id: 01JB0SCS1A2B3C4D5E6F7G8H9J
+              name: Priya
+              phoneMasked: "98•••••210"
+              status: blocked
+              preferredLang: en
+              createdAt: "2026-10-01T09:30:00Z"
+              activeStrikes: 1
+              strikes: []
+              sessions: []
+              recentOrders: []
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/customers/{customerId}/unblock:
+  parameters:
+    - name: customerId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: unblockAdminCustomer
+    tags: [admin-customers]
+    summary: Unblock a customer (audited)
+    description: With a reason. An account that is not blocked is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-customers.yaml#/AdminCustomerChange
+          example:
+            reason: Verified by phone
+    responses:
+      "200":
+        description: The customer after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-customers.yaml#/AdminCustomer
+            example: *customer
+      default: *problem
+/v1/admin/customers/{customerId}/strikes/reset:
+  parameters:
+    - name: customerId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: resetAdminCustomerStrikes
+    tags: [admin-customers]
+    summary: Reset a customer's strikes (audited)
+    description: >-
+      Marks every strike not yet reset as reset, with the reason and the admin (D-41). The booking limit stops
+      counting them at once. No strike to reset is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-customers.yaml#/AdminCustomerChange
+          example:
+            reason: Shop confirmed the no-show was its mistake
+    responses:
+      "200":
+        description: The customer after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-customers.yaml#/AdminCustomer
+            example:
+              id: 01JB0SCS1A2B3C4D5E6F7G8H9J
+              name: Priya
+              phoneMasked: "98•••••210"
+              status: active
+              preferredLang: en
+              createdAt: "2026-10-01T09:30:00Z"
+              activeStrikes: 0
+              strikes:
+                - id: 01JB0SKS1A2B3C4D5E6F7G8H9J
+                  reason: no_show
+                  orderId: 01JB0SDR1A2B3C4D5E6F7G8H9J
+                  createdAt: "2026-10-20T18:00:00Z"
+                  resetAt: "2026-10-24T11:00:00Z"
+                  resetReason: Shop confirmed the no-show was its mistake
+              sessions: []
+              recentOrders: []
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/customers/{customerId}/sessions/{sessionId}:
+  parameters:
+    - name: customerId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sessionId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  delete:
+    operationId: revokeAdminCustomerSession
+    tags: [admin-customers]
+    summary: Sign a customer out of one device (audited)
+    description: A session that is already revoked or expired, or belongs to someone else, is `404 not_found`.
+    x-idempotency: none
+    responses:
+      "204":
+        description: Revoked
+      default: *problem

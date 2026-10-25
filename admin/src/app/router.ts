@@ -1,3 +1,4 @@
+import { ApiError } from '@todayz/api-client';
 import { QueryClient } from '@tanstack/react-query';
 import { createRouter, type RouterHistory } from '@tanstack/react-router';
 import { routeTree } from '../routeTree.gen';
@@ -9,7 +10,8 @@ export interface RouterContext {
 export function makeQueryClient(): QueryClient {
   return new QueryClient({
     defaultOptions: {
-      queries: { staleTime: 30_000, retry: 1, refetchOnWindowFocus: false },
+      // A 4xx answer (missing, forbidden) will not change on a second try; a 5xx or network error might.
+      queries: { staleTime: 30_000, retry: (n, e) => n < 1 && !(e instanceof ApiError && e.status < 500), refetchOnWindowFocus: false },
     },
   });
 }

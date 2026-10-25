@@ -5,11 +5,14 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
+	"github.com/todayz/backend/internal/admin"
 	"github.com/todayz/backend/internal/jobs"
+	"github.com/todayz/backend/internal/orders"
 	"github.com/todayz/backend/internal/platform/audit"
 	"github.com/todayz/backend/internal/platform/authz"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/jobs/adminapi"
+	"github.com/todayz/backend/internal/platform/pii"
 )
 
 // mountAdmin mounts the admin domain's routes. Only the work package that builds
@@ -21,6 +24,64 @@ import (
 // file per domain, TestOneMountPerDomain).
 func mountAdmin(r chi.Router, d *deps) {
 	mountAdminJobs(r, d)
+	mountAdminConsole(r, d)
+}
+
+// mountAdminConsole mounts W3-05's admin-customers, admin-settings and admin-audit routes.
+// The strike reset recounts through a minimal orders service (its strike
+// rules read only the database and settings).
+func mountAdminConsole(r chi.Router, d *deps) {
+	ad := admin.Deps{DB: d.DB, Clock: d.Clock}
+	if d.Authz != nil {
+		ad.Authz = d.Authz
+	}
+	if d.Config != nil {
+		if k := d.Config.Keys.PIIEncKey; k.IsSet() {
+			seal, err := pii.NewSealer(k.Bytes())
+			if err != nil {
+				panic("admin: PII_ENC_KEY must be 32 bytes")
+			}
+			ad.Seal = seal
+		}
+		if k := d.Config.Keys.PIIHashKey; k.IsSet() {
+			h, err := pii.NewHasher(k.Bytes())
+			if err != nil {
+				panic("admin: PII_HASH_KEY must be 32 bytes")
+			}
+			ad.Hash = h
+		}
+		pr := d.Config.Providers
+		// A-17 shows set or missing only (D-19); the values never leave config.
+		ad.Providers = []admin.ProviderKey{
+			{Name: "WHATSAPP_API_KEY", Set: pr.WhatsAppAPIKey.IsSet()},
+			{Name: "VAPID_PRIVATE_KEY", Set: pr.VAPIDPrivateKey.IsSet()},
+			{Name: "TURNSTILE_SECRET_KEY", Set: pr.TurnstileSecretKey.IsSet()},
+			{Name: "SARVAM_API_KEY", Set: pr.SarvamAPIKey.IsSet()},
+			{Name: "ANTHROPIC_API_KEY", Set: pr.AnthropicAPIKey.IsSet()},
+			{Name: "GEOCODER_API_KEY", Set: pr.GeocoderAPIKey.IsSet()},
+		}
+	}
+	if d.DB != nil {
+		var hashKey []byte
+		if d.Config != nil {
+			hashKey = d.Config.Keys.PIIHashKey.Bytes()
+		}
+		ad.Audit = audit.New(d.DB, d.Clock, hashKey)
+		ord, err := orders.New(orders.Deps{Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Settings: d.Settings})
+		if err != nil {
+			panic("admin: " + err.Error())
+		}
+		ad.Strikes = ord
+	}
+	svc, err := admin.New(ad)
+	if err != nil {
+		panic("admin: " + err.Error())
+	}
+	var az authz.Authorizer
+	if d.Authz != nil {
+		az = d.Authz
+	}
+	admin.Register(r, svc, az)
 }
 
 // mountAdminJobs builds the same job registry as the worker (so A-21 lists
