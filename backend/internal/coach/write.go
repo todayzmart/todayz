@@ -152,4 +152,3 @@ func (s *Service) writeAI(ctx context.Context, storeID ids.ID, f detectors.Fact,
 	}
 	return Text{Title: out.Title, Body: out.Body}, generated{By: "ai", PromptVersion: &v, Model: &m}, true
 }
-

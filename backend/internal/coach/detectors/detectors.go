@@ -92,7 +92,7 @@ const (
 	// topLeaders is how many items a record-day card names.
 	topLeaders = 2 //settings:ok "Maggi and Amul milk led" names two (11 §2.1)
 	// itemNameMax keeps a product name short enough for a 200-character body.
-	itemNameMax = 48 //settings:ok display limit of a name inside a card body
+	itemNameMax = 48    //settings:ok display limit of a name inside a card body
 	bpScale     = 10000 //settings:ok basis points per whole
 	// penaltyDays is the window of the stored unaccepted-expiry rate (D-46).
 	penaltyDays = 30 //settings:ok the 30-day rate of 01 §5 and D-46
