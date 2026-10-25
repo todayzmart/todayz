@@ -36,6 +36,8 @@ interface Saved {
   userId: string;
   isNewUser: boolean;
   cookies: Cookie[];
+  /** An admin's last accepted TOTP step: the server takes each 30 s step once. */
+  totpStep?: number;
 }
 
 interface State {
@@ -162,26 +164,50 @@ export class Principal implements Bearer {
     const v = await this.ctx.post(`${URLS.api}/v1/auth/otp/verify`, { data: { requestId, code, app: this.person.app, deviceId: ulid() } });
     expect(v.status(), `OTP verify for ${this.person.key}`).toBe(200);
     const body = (await v.json()) as { accessToken: string; expiresAt: string; userId: string; isNewUser: boolean; nextStep?: string };
-    let token = body.accessToken;
-    let expiresAt = Date.parse(body.expiresAt);
+    this.saved = { token: body.accessToken, expiresAt: Date.parse(body.expiresAt), userId: body.userId, isNewUser: body.isNewUser, cookies: [] };
     if (this.person.app === 'admin') {
       expect(body.nextStep, `${this.person.key} is an enrolled admin`).toBe('totp_verify');
-      const secret = adminTotpSecret(this.person.admin ?? '');
-      // Not in the last seconds of a 30 s step, so the code is still current when it arrives.
-      const left = 30 - (Math.floor(Date.now() / 1000) % 30);
-      if (left < 4) await new Promise((done) => setTimeout(done, left * 1000 + 300));
-      const t = await this.ctx.post(`${URLS.api}/v1/auth/totp/verify`, {
-        headers: { Authorization: `Bearer ${token}` },
-        data: { code: totp(secret), purpose: 'login' },
-      });
-      expect(t.status(), `TOTP verify for ${this.person.key}`).toBe(200);
-      const tb = (await t.json()) as { accessToken: string; expiresAt: string };
-      token = tb.accessToken;
-      expiresAt = Date.parse(tb.expiresAt);
+      await this.totpVerify('login');
     }
-    this.saved = { token, expiresAt, userId: body.userId, isNewUser: body.isNewUser, cookies: [] };
     await this.persist();
     return this;
+  }
+
+  /**
+   * A fresh authenticator code for a † admin action (D-64): the API stamps this sign-in as checked
+   * for 10 minutes and answers a new access token.
+   */
+  async stepUp(): Promise<void> {
+    if (this.person.app !== 'admin') throw new Error(`${this.person.key} is not an admin`);
+    await this.totpVerify('step_up');
+    await this.persist();
+  }
+
+  private async totpVerify(purpose: 'login' | 'step_up'): Promise<void> {
+    if (!this.saved || !this.ctx) throw new Error(`${this.person.key} is not signed in`);
+    const secret = adminTotpSecret(this.person.admin ?? '');
+    const wait = (ms: number) => new Promise((done) => setTimeout(done, ms));
+    // Not in the last seconds of a 30 s step, so the code is still current when it arrives; and a
+    // step after the last one used, since the server refuses a step twice.
+    for (;;) {
+      const now = Date.now();
+      const left = 30_000 - (now % 30_000);
+      const step = Math.floor(now / 30_000);
+      if (left < 4_000 || (this.saved.totpStep !== undefined && step <= this.saved.totpStep)) {
+        await wait(left + 300);
+        continue;
+      }
+      const t = await this.request().post(`${URLS.api}/v1/auth/totp/verify`, {
+        headers: { Authorization: `Bearer ${purpose === 'login' ? this.saved.token : await this.token()}` },
+        data: { code: totp(secret, now), purpose },
+      });
+      expect(t.status(), `TOTP ${purpose} for ${this.person.key}`).toBe(200);
+      const tb = (await t.json()) as { accessToken: string; expiresAt: string };
+      this.saved.token = tb.accessToken;
+      this.saved.expiresAt = Date.parse(tb.expiresAt);
+      this.saved.totpStep = step;
+      return;
+    }
   }
 
   async token(): Promise<string> {
