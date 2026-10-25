@@ -492,8 +492,6 @@ func (s *Service) Export(ctx context.Context, by authn.Principal, period string)
 		}
 		if _, err := s.audit.Write(ctx, audit.Entry{
 			ActorKind: audit.ActorAdmin, ActorID: by.UserID, Action: "payouts.export",
-			// TODO(W3-05): payout, payout_period and credit_adjustment are not in
-			// AdminAuditSubjectType yet; the lead coordinates the enum with W3-05.
 			SubjectType: "payout_period", SubjectID: periodKey(pd), After: map[string]any{"payout_ids": paid, "count": len(paid)},
 		}); err != nil {
 			return internal("audit", err)
