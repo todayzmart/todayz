@@ -1,9 +1,480 @@
-# Schemas: domain "admin-field" (owner W3-05): admin field operations and field agents (04 §2.7).
+# Schemas: domain "admin-field" (owner W3-06): field agents onboarding shops (A-04) and their stats
+# (A-15), 04 §2.7, D-39, D-64.
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# The store, hours and item shapes repeat the business and catalogue ones (a schema file may not
+# $ref another domain's file); the handlers reuse the business and catalogue rules behind them.
+FieldText80:
+  type: string
+  minLength: 1
+  maxLength: 80
+  pattern: ^\S(.*\S)?$
+FieldText120:
+  type: string
+  minLength: 1
+  maxLength: 120
+  pattern: ^\S(.*\S)?$
+FieldText200:
+  type: string
+  minLength: 1
+  maxLength: 200
+  pattern: ^\S(.*\S)?$
+FieldPhone:
+  type: string
+  description: An Indian mobile number in E.164.
+  pattern: ^\+91[6-9][0-9]{9}$
+  maxLength: 13
+FieldBusinessStatus:
+  type: string
+  enum: [draft, submitted, needs_info, verified, rejected, suspended]
+FieldStoreStatus:
+  type: string
+  enum: [draft, pending_review, live, paused, suspended]
+FieldStoreSummary:
+  type: object
+  required: [id, name, status, locality, itemCount]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name: {type: string}
+    status: {$ref: "#/FieldStoreStatus"}
+    locality: {type: [string, "null"]}
+    itemCount:
+      type: integer
+      minimum: 0
+FieldBusiness:
+  type: object
+  description: >-
+    A business as the field agent who onboarded it sees it. `ownerConfirmed` is true once the
+    owner gave the code from their phone (`owner-confirm/verify`). `itemsEditable` says whether
+    the caller may add and change items now (D-39): while the business is onboarding, and until
+    `editableUntil` (`verifiedAt` + `field_agent_edit_window_days`) once it is verified; admins
+    always may. `onboardedBy` is the agent's user id.
+  required: [id, brandName, legalName, categoryId, status, ownerPhoneMasked, ownerConfirmed, onboardedBy,
+    verifiedAt, editableUntil, itemsEditable, stores, photoCount, createdAt, updatedAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    brandName: {type: string}
+    legalName: {type: [string, "null"]}
+    categoryId:
+      type: [string, "null"]
+    status: {$ref: "#/FieldBusinessStatus"}
+    ownerPhoneMasked:
+      type: [string, "null"]
+      description: The owner's number masked to the last 3 digits; null once nothing is held.
+    ownerConfirmed: {type: boolean}
+    onboardedBy:
+      type: [string, "null"]
+    verifiedAt:
+      type: [string, "null"]
+      format: date-time
+    editableUntil:
+      type: [string, "null"]
+      format: date-time
+      description: When the agent's item window closes; null while the business is not verified.
+    itemsEditable: {type: boolean}
+    stores:
+      type: array
+      items: {$ref: "#/FieldStoreSummary"}
+    photoCount:
+      type: integer
+      minimum: 0
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    updatedAt: {$ref: ./common.yaml#/Timestamp}
+FieldBusinessList:
+  type: object
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      items: {$ref: "#/FieldBusiness"}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+FieldBusinessCreate:
+  type: object
+  additionalProperties: false
+  description: >-
+    Create a business for a shop (A-04). The agent becomes `onboardedBy`; the owner's number is
+    held for the owner OTP and an owner invite, never shown in full again.
+  required: [brandName, ownerPhone]
+  properties:
+    brandName: {$ref: "#/FieldText120"}
+    legalName: {$ref: "#/FieldText200"}
+    categoryId: {$ref: ./common.yaml#/Ulid}
+    ownerPhone: {$ref: "#/FieldPhone"}
+FieldBusinessUpdate:
+  type: object
+  additionalProperties: false
+  description: >-
+    Only the fields present change; null clears `legalName` or `categoryId`. `ownerPhone` changes
+    only before the owner confirmed, and ends any code already sent.
+  minProperties: 1
+  properties:
+    brandName: {$ref: "#/FieldText120"}
+    legalName:
+      type: [string, "null"]
+      minLength: 1
+      maxLength: 200
+      pattern: ^\S(.*\S)?$
+    categoryId:
+      type: [string, "null"]
+      pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+      maxLength: 26
+    ownerPhone: {$ref: "#/FieldPhone"}
+FieldOwnerCode:
+  type: object
+  description: >-
+    A code went to the owner's phone by SMS. The agent asks the owner for it; it is never shown
+    here, logged or kept in plain text.
+  required: [phoneMasked, expiresAt, resendAfterSeconds]
+  properties:
+    phoneMasked: {type: string}
+    expiresAt: {$ref: ./common.yaml#/Timestamp}
+    resendAfterSeconds:
+      type: integer
+      minimum: 0
+FieldOwnerVerify:
+  type: object
+  additionalProperties: false
+  required: [code]
+  properties:
+    code:
+      type: string
+      pattern: ^[0-9]{6}$
+      maxLength: 6
+FieldDocumentKind:
+  type: string
+  description: Field agents upload shop photos only; KYC documents stay with the owner (B-02).
+  enum: [shop_photo, storefront]
+FieldPhotoContentType:
+  type: string
+  enum: [image/jpeg, image/png, image/webp]
+FieldDocumentCreate:
+  type: object
+  additionalProperties: false
+  required: [kind, contentType, sizeBytes]
+  properties:
+    kind: {$ref: "#/FieldDocumentKind"}
+    contentType: {$ref: "#/FieldPhotoContentType"}
+    sizeBytes:
+      type: integer
+      minimum: 1
+      maximum: 10485760
+    storeId: {$ref: ./common.yaml#/Ulid}
+FieldDocument:
+  type: object
+  required: [id, kind, contentType, storeId, status, createdAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    kind: {$ref: "#/FieldDocumentKind"}
+    contentType: {$ref: "#/FieldPhotoContentType"}
+    storeId:
+      type: [string, "null"]
+    status:
+      type: string
+      enum: [pending, uploaded, accepted, rejected]
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+FieldUploadHeaders:
+  type: object
+  required: [Content-Type, Content-Length]
+  properties:
+    Content-Type: {$ref: "#/FieldPhotoContentType"}
+    Content-Length:
+      type: string
+      pattern: ^[1-9][0-9]*$
+FieldUploadTarget:
+  type: object
+  description: A presigned PUT into the private bucket (D-46, D-203). Send the photo with exactly these headers before `expiresAt`.
+  required: [url, method, headers, expiresAt]
+  properties:
+    url: {type: string}
+    method:
+      type: string
+      enum: [PUT]
+    headers: {$ref: "#/FieldUploadHeaders"}
+    expiresAt: {$ref: ./common.yaml#/Timestamp}
+FieldDocumentUpload:
+  type: object
+  required: [document, upload]
+  properties:
+    document: {$ref: "#/FieldDocument"}
+    upload: {$ref: "#/FieldUploadTarget"}
+FieldHoursRange:
+  type: object
+  description: "Open from `open` to `close`, IST; a `close` at or before `open` runs past midnight; `24:00` is midnight."
+  additionalProperties: false
+  required: [open, close]
+  properties:
+    open:
+      type: string
+      pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+      maxLength: 5
+    close:
+      type: string
+      pattern: ^(([01][0-9]|2[0-3]):[0-5][0-9]|24:00)$
+      maxLength: 5
+FieldHoursDay:
+  type: array
+  maxItems: 4
+  items: {$ref: "#/FieldHoursRange"}
+FieldStoreWeek:
+  type: object
+  additionalProperties: false
+  properties:
+    mon: {$ref: "#/FieldHoursDay"}
+    tue: {$ref: "#/FieldHoursDay"}
+    wed: {$ref: "#/FieldHoursDay"}
+    thu: {$ref: "#/FieldHoursDay"}
+    fri: {$ref: "#/FieldHoursDay"}
+    sat: {$ref: "#/FieldHoursDay"}
+    sun: {$ref: "#/FieldHoursDay"}
+FieldStoreHours:
+  type: object
+  description: Weekly opening hours, IST (01 §3). Holidays are the owner's to add later.
+  additionalProperties: false
+  required: [weekly]
+  properties:
+    weekly: {$ref: "#/FieldStoreWeek"}
+FieldStoreLocation:
+  type: object
+  description: The map pin (WGS 84), inside India.
+  additionalProperties: false
+  required: [lat, lng]
+  properties:
+    lat:
+      type: number
+      format: double
+      minimum: 6
+      maximum: 38
+    lng:
+      type: number
+      format: double
+      minimum: 68
+      maximum: 98
+FieldStoreCreate:
+  type: object
+  additionalProperties: false
+  description: A store of the business, with what the review needs (address, pin, phone, hours).
+  required: [name]
+  properties:
+    name: {$ref: "#/FieldText80"}
+    addressLine1: {$ref: "#/FieldText200"}
+    addressLine2: {$ref: "#/FieldText200"}
+    landmark: {$ref: "#/FieldText120"}
+    locality: {$ref: "#/FieldText80"}
+    city: {$ref: "#/FieldText80"}
+    pincode:
+      type: string
+      pattern: ^[1-9][0-9]{5}$
+      maxLength: 6
+    location: {$ref: "#/FieldStoreLocation"}
+    phone: {$ref: "#/FieldPhone"}
+    hours: {$ref: "#/FieldStoreHours"}
+FieldStore:
+  type: object
+  required: [id, businessId, name, status, locality, city, pincode, hasLocation, hasPhone, hasHours, createdAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    businessId: {$ref: ./common.yaml#/Ulid}
+    name: {type: string}
+    status: {$ref: "#/FieldStoreStatus"}
+    locality: {type: [string, "null"]}
+    city: {type: [string, "null"]}
+    pincode: {type: [string, "null"]}
+    hasLocation: {type: boolean}
+    hasPhone: {type: boolean}
+    hasHours: {type: boolean}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+FieldUnit:
+  type: string
+  enum: [g, kg, ml, l, pc, pack]
+FieldProductMatch:
+  type: object
+  description: A master catalogue product (D-37) the agent can list in the store.
+  required: [id, name, brand, variant, packSize, unit, mrpPaise, categoryId, inStore]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name: {type: string}
+    brand: {type: [string, "null"]}
+    variant: {type: [string, "null"]}
+    packSize:
+      type: number
+      exclusiveMinimum: 0
+    unit: {$ref: "#/FieldUnit"}
+    mrpPaise:
+      type: [integer, "null"]
+      minimum: 0
+    categoryId: {$ref: ./common.yaml#/Ulid}
+    inStore:
+      type: boolean
+      description: The store already lists this product.
+FieldProductMatchList:
+  type: object
+  required: [items]
+  properties:
+    items:
+      type: array
+      items: {$ref: "#/FieldProductMatch"}
+FieldItem:
+  type: object
+  description: >-
+    One item of the store. `productStatus` is `pending_review` for a product the agent added as
+    new: it waits in the A-08 review queue.
+  required: [id, storeId, productId, name, brand, variant, packSize, unit, pricePaise, mrpPaise, productMrpPaise,
+    onHand, isListed, productStatus, createdAt, updatedAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    storeId: {$ref: ./common.yaml#/Ulid}
+    productId: {$ref: ./common.yaml#/Ulid}
+    name: {type: string}
+    brand: {type: [string, "null"]}
+    variant: {type: [string, "null"]}
+    packSize:
+      type: number
+      exclusiveMinimum: 0
+    unit: {$ref: "#/FieldUnit"}
+    pricePaise: {$ref: ./common.yaml#/Paise}
+    mrpPaise:
+      type: [integer, "null"]
+      minimum: 0
+    productMrpPaise:
+      type: [integer, "null"]
+      minimum: 0
+    onHand: {type: integer}
+    isListed: {type: boolean}
+    productStatus:
+      type: string
+      enum: [active, pending_review, merged, retired]
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    updatedAt: {$ref: ./common.yaml#/Timestamp}
+FieldItemList:
+  type: object
+  required: [items, nextCursor, itemsEditable, editableUntil, serverNow]
+  properties:
+    items:
+      type: array
+      items: {$ref: "#/FieldItem"}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    itemsEditable: {type: boolean}
+    editableUntil:
+      type: [string, "null"]
+      format: date-time
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+FieldNewProduct:
+  type: object
+  additionalProperties: false
+  description: A product the master catalogue does not have yet. It is created as `pending_review` for the A-08 queue.
+  required: [name, categoryId, packSize, unit]
+  properties:
+    name: {$ref: "#/FieldText120"}
+    categoryId: {$ref: ./common.yaml#/Ulid}
+    variant: {$ref: "#/FieldText80"}
+    packSize:
+      type: number
+      exclusiveMinimum: 0
+      maximum: 100000
+    unit: {$ref: "#/FieldUnit"}
+    mrpPaise:
+      type: integer
+      minimum: 1
+      maximum: 100000000
+    barcode:
+      type: string
+      pattern: ^[0-9]{8,14}$
+      maxLength: 14
+FieldItemCreate:
+  type: object
+  additionalProperties: false
+  description: >-
+    List one product in the store: send `productId` (from the master catalogue) or `newProduct`,
+    not both. The price may not be above the MRP. `openingStock` above 0 writes an `opening`
+    movement.
+  required: [pricePaise]
+  properties:
+    productId: {$ref: ./common.yaml#/Ulid}
+    newProduct: {$ref: "#/FieldNewProduct"}
+    pricePaise:
+      type: integer
+      minimum: 1
+      maximum: 100000000
+    mrpPaise:
+      type: integer
+      minimum: 1
+      maximum: 100000000
+    openingStock:
+      type: integer
+      minimum: 0
+      maximum: 1000000
+    isListed: {type: boolean}
+FieldItemUpdate:
+  type: object
+  additionalProperties: false
+  description: Only the fields present change; `mrpPaise` null clears the store's MRP. Stock never changes here.
+  minProperties: 1
+  properties:
+    pricePaise:
+      type: integer
+      minimum: 1
+      maximum: 100000000
+    mrpPaise:
+      type: [integer, "null"]
+      minimum: 1
+      maximum: 100000000
+    isListed: {type: boolean}
+FieldStatusCounts:
+  type: object
+  required: [total, draft, submitted, needsInfo, verified, rejected, suspended]
+  properties:
+    total: {type: integer, minimum: 0}
+    draft: {type: integer, minimum: 0}
+    submitted: {type: integer, minimum: 0}
+    needsInfo: {type: integer, minimum: 0}
+    verified: {type: integer, minimum: 0}
+    rejected: {type: integer, minimum: 0}
+    suspended: {type: integer, minimum: 0}
+FieldWeek:
+  type: object
+  description: One IST week, Monday first.
+  required: [weekStart, onboarded, verified, itemsAdded]
+  properties:
+    weekStart:
+      type: string
+      format: date
+    onboarded: {type: integer, minimum: 0}
+    verified: {type: integer, minimum: 0}
+    itemsAdded: {type: integer, minimum: 0}
+FieldAgentStats:
+  type: object
+  description: >-
+    One agent's numbers (01 §14). `firstOrderRate` is the share of their verified businesses that
+    have at least one collected or delivered order; null when none is verified. `inWindow` counts
+    their businesses whose items they may still edit. `weekly` is the last 8 IST weeks, oldest
+    first.
+  required: [agentId, name, businesses, storesLive, itemsAdded, inWindow, firstOrderRate, weekly]
+  properties:
+    agentId: {$ref: ./common.yaml#/Ulid}
+    name: {type: [string, "null"]}
+    businesses: {$ref: "#/FieldStatusCounts"}
+    storesLive: {type: integer, minimum: 0}
+    itemsAdded: {type: integer, minimum: 0}
+    inWindow: {type: integer, minimum: 0}
+    firstOrderRate:
+      type: [number, "null"]
+      minimum: 0
+      maximum: 1
+    weekly:
+      type: array
+      items: {$ref: "#/FieldWeek"}
+FieldMyStats:
+  type: object
+  required: [stats, serverNow]
+  properties:
+    stats: {$ref: "#/FieldAgentStats"}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+FieldAgentStatsList:
+  type: object
+  description: Every agent who onboarded a business or holds the field_agent role, most businesses first.
+  required: [items, serverNow]
+  properties:
+    items:
+      type: array
+      items: {$ref: "#/FieldAgentStats"}
+    serverNow: {$ref: ./common.yaml#/ServerNow}

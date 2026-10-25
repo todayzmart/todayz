@@ -1,12 +1,488 @@
-# Paths: domain "admin-field" (owner W3-05): admin field operations and field agents (04 §2.7).
+# Paths: domain "admin-field" (owner W3-06): field agents onboarding shops (A-04) and their
+# numbers (A-15), 04 §2.7, 01 §14, D-39.
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-field]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-field.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# A field agent creates a business for a shop on their phone, adds a store, shop photos and the
+# products one by one, then the owner confirms with the code sent to their phone, which submits
+# the business for verification. The agent sees and changes only businesses they onboarded
+# (`onboardedBy`); items only while the business is onboarding or inside
+# `field_agent_edit_window_days` after it is verified (D-39). Admin and super_admin see every
+# agent's. Roles per operation are in internal/platform/authz/policy/field.go.
+/v1/admin/field/businesses:
+  get:
+    operationId: listFieldBusinesses
+    tags: [admin-field]
+    summary: The businesses the caller onboarded, newest first
+    description: A field agent sees their own; admin and super_admin see every agent's, or one agent's with `agentId`.
+    parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: ../schemas/admin-field.yaml#/FieldBusinessStatus
+      - name: agentId
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Ulid
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Businesses
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-field.yaml#/FieldBusinessList
+            example:
+              items:
+                - &fieldBusiness
+                  id: 01JB0S3A4B5C6D7E8F9G0H1J2K
+                  brandName: Ravi Medicals
+                  legalName: null
+                  categoryId: 01JB0RZ0A1B2C3D4E5F6G7H8J9
+                  status: draft
+                  ownerPhoneMasked: "•••••••210"
+                  ownerConfirmed: false
+                  onboardedBy: 01JB0R9X1Y2Z3A4B5C6D7E8F9G
+                  verifiedAt: null
+                  editableUntil: null
+                  itemsEditable: true
+                  stores:
+                    - id: 01JB0S4B5C6D7E8F9G0H1J2K3M
+                      name: Ravi Medicals
+                      status: draft
+                      locality: Kuvempunagar
+                      itemCount: 12
+                  photoCount: 2
+                  createdAt: "2026-10-25T05:00:00Z"
+                  updatedAt: "2026-10-25T05:20:00Z"
+              nextCursor: null
+              serverNow: "2026-10-25T05:30:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: createFieldBusiness
+    tags: [admin-field]
+    summary: Create a business for a shop (A-04)
+    description: >-
+      The caller becomes `onboardedBy`. The owner's number is held sealed for the owner code and as
+      an owner invite, so the owner can also take over from the business app with that number.
+      The owner's number may not be the caller's own.
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-field.yaml#/FieldBusinessCreate
+          example:
+            brandName: Ravi Medicals
+            categoryId: 01JB0RZ0A1B2C3D4E5F6G7H8J9
+            ownerPhone: "+919876543210"
+    responses:
+      "201":
+        description: The new business, in draft
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-field.yaml#/FieldBusiness
+            example:
+              <<: *fieldBusiness
+              stores: []
+              photoCount: 0
+      default: *problem
+/v1/admin/field/me/stats:
+  get:
+    operationId: getFieldMyStats
+    tags: [admin-field]
+    summary: The caller's own field numbers (A-15)
+    responses:
+      "200":
+        description: The caller's numbers
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-field.yaml#/FieldMyStats
+            example:
+              stats: &agentStats
+                agentId: 01JB0R9X1Y2Z3A4B5C6D7E8F9G
+                name: Asha
+                businesses: {total: 14, draft: 2, submitted: 3, needsInfo: 1, verified: 8, rejected: 0, suspended: 0}
+                storesLive: 7
+                itemsAdded: 412
+                inWindow: 6
+                firstOrderRate: 0.75
+                weekly:
+                  - {weekStart: "2026-10-19", onboarded: 4, verified: 2, itemsAdded: 96}
+              serverNow: "2026-10-25T05:30:00Z"
+      default: *problem
+/v1/admin/field/businesses/{bid}:
+  parameters:
+    - &bid
+      name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getFieldBusiness
+    tags: [admin-field]
+    summary: One business the caller onboarded
+    responses:
+      "200":
+        description: The business
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-field.yaml#/FieldBusiness
+            example: *fieldBusiness
+      default: *problem
+  patch:
+    operationId: updateFieldBusiness
+    tags: [admin-field]
+    summary: Change the business while it is in draft or needs info
+    description: >-
+      Only before the business is submitted (draft) or while it needs info. `ownerPhone` changes
+      only before the owner confirmed; it ends any code already sent. Other states are
+      `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-field.yaml#/FieldBusinessUpdate
+          example:
+            legalName: Ravi Medicals Private Limited
+    responses:
+      "200":
+        description: The business after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-field.yaml#/FieldBusiness
+            example: *fieldBusiness
+      default: *problem
+/v1/admin/field/businesses/{bid}/owner-confirm:
+  parameters:
+    - *bid
+  post:
+    operationId: sendFieldOwnerCode
+    tags: [admin-field]
+    summary: Send the owner a code to confirm the business
+    description: >-
+      The business must be ready to submit (a category and one store with address, pin, phone and
+      hours), else `409 submit_incomplete` with the missing fields. Sends a 6-digit code by SMS to
+      the owner's number; the same limits as the sign-in code apply (`429 rate_limited` with
+      `Retry-After`). The code is never returned or logged.
+    x-idempotency: none
+    x-problems: [submit_incomplete]
+    responses:
+      "200":
+        description: The code is on its way
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-field.yaml#/FieldOwnerCode
+            example:
+              phoneMasked: "•••••••210"
+              expiresAt: "2026-10-25T05:35:00Z"
+              resendAfterSeconds: 30
+      default: *problem
+/v1/admin/field/businesses/{bid}/owner-confirm/verify:
+  parameters:
+    - *bid
+  post:
+    operationId: verifyFieldOwnerCode
+    tags: [admin-field]
+    summary: Check the owner's code and submit the business
+    description: >-
+      On the right code the owner becomes the business's owner (their account is made from the
+      number if they have none) and the business is submitted for verification. A wrong code is
+      `422 code_invalid` with `attemptsLeft`; after 5 wrong codes `423 otp_locked`; a lapsed code
+      `410 otp_expired`.
+    x-idempotency: none
+    x-problems: [code_invalid, otp_locked, otp_expired, submit_incomplete]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-field.yaml#/FieldOwnerVerify
+          example:
+            code: "482913"
+    responses:
+      "200":
+        description: The business, now submitted
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-field.yaml#/FieldBusiness
+            example:
+              <<: *fieldBusiness
+              status: submitted
+              ownerConfirmed: true
+      default: *problem
+/v1/admin/field/businesses/{bid}/documents:
+  parameters:
+    - *bid
+  post:
+    operationId: createFieldDocument
+    tags: [admin-field]
+    summary: Add a shop photo and get its upload URL
+    description: >-
+      Shop photos only (`shop_photo`, `storefront`). Returns a presigned PUT into the private bucket
+      (D-46), valid for 15 minutes, signed for the declared type and size. A business holds at most
+      5 photos of one kind that are not rejected (`409 conflict` past that).
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-field.yaml#/FieldDocumentCreate
+          example:
+            kind: storefront
+            contentType: image/jpeg
+            sizeBytes: 482113
+    responses:
+      "201":
+        description: The photo record and where to upload it
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-field.yaml#/FieldDocumentUpload
+            example:
+              document:
+                id: 01JB0S5K6M7N8P9Q0R1S2T3V4W
+                kind: storefront
+                contentType: image/jpeg
+                storeId: null
+                status: pending
+                createdAt: "2026-10-25T05:10:00Z"
+              upload:
+                url: https://s3.todayz.localhost/todayz-private/upload
+                method: PUT
+                headers:
+                  Content-Type: image/jpeg
+                  Content-Length: "482113"
+                expiresAt: "2026-10-25T05:25:00Z"
+      default: *problem
+/v1/admin/field/businesses/{bid}/stores:
+  parameters:
+    - *bid
+  post:
+    operationId: createFieldStore
+    tags: [admin-field]
+    summary: Add a store to the business
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-field.yaml#/FieldStoreCreate
+          example:
+            name: Ravi Medicals
+            addressLine1: 12, 4th Cross, Kuvempunagar
+            locality: Kuvempunagar
+            city: Mysuru
+            pincode: "570023"
+            location: {lat: 12.2958, lng: 76.6394}
+            phone: "+919876543210"
+            hours:
+              weekly:
+                mon: [{open: "09:00", close: "21:00"}]
+    responses:
+      "201":
+        description: The new store, in draft
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-field.yaml#/FieldStore
+            example:
+              id: 01JB0S4B5C6D7E8F9G0H1J2K3M
+              businessId: 01JB0S3A4B5C6D7E8F9G0H1J2K
+              name: Ravi Medicals
+              status: draft
+              locality: Kuvempunagar
+              city: Mysuru
+              pincode: "570023"
+              hasLocation: true
+              hasPhone: true
+              hasHours: true
+              createdAt: "2026-10-25T05:05:00Z"
+      default: *problem
+/v1/admin/field/businesses/{bid}/stores/{sid}/products:
+  parameters:
+    - *bid
+    - &sid
+      name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: searchFieldProducts
+    tags: [admin-field]
+    summary: Find master catalogue products to list in the store
+    description: Active products only, by name or by barcode. `inStore` marks the ones the store already lists.
+    parameters:
+      - name: q
+        in: query
+        schema:
+          type: string
+          minLength: 2
+          maxLength: 80
+      - name: barcode
+        in: query
+        schema:
+          type: string
+          pattern: ^[0-9]{8,14}$
+          maxLength: 14
+    responses:
+      "200":
+        description: Up to 20 matches
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-field.yaml#/FieldProductMatchList
+            example:
+              items:
+                - id: 01JB0RZ9A1B2C3D4E5F6G7H8J9
+                  name: Dolo 650 tablets
+                  brand: Micro Labs
+                  variant: null
+                  packSize: 15
+                  unit: pc
+                  mrpPaise: 3400
+                  categoryId: 01JB0RZ0A1B2C3D4E5F6G7H8J9
+                  inStore: false
+      default: *problem
+/v1/admin/field/businesses/{bid}/stores/{sid}/items:
+  parameters:
+    - *bid
+    - *sid
+  get:
+    operationId: listFieldItems
+    tags: [admin-field]
+    summary: The store's items, newest first
+    description: Readable after the edit window too; `itemsEditable` says whether the caller may still change them.
+    parameters:
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Items
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-field.yaml#/FieldItemList
+            example:
+              items:
+                - &fieldItem
+                  id: 01JB0S6C7D8E9F0G1H2J3K4M5N
+                  storeId: 01JB0S4B5C6D7E8F9G0H1J2K3M
+                  productId: 01JB0RZ9A1B2C3D4E5F6G7H8J9
+                  name: Dolo 650 tablets
+                  brand: Micro Labs
+                  variant: null
+                  packSize: 15
+                  unit: pc
+                  pricePaise: 3200
+                  mrpPaise: null
+                  productMrpPaise: 3400
+                  onHand: 20
+                  isListed: true
+                  productStatus: active
+                  createdAt: "2026-10-25T05:15:00Z"
+                  updatedAt: "2026-10-25T05:15:00Z"
+              nextCursor: null
+              itemsEditable: true
+              editableUntil: null
+              serverNow: "2026-10-25T05:30:00Z"
+      default: *problem
+  post:
+    operationId: createFieldItem
+    tags: [admin-field]
+    summary: Add one product to the store
+    description: >-
+      From the master catalogue (`productId`) or as a new product (`newProduct`, sent to the A-08
+      review queue). Only while the caller may edit the business's items (D-39), else
+      `403 forbidden`. A product the store already lists is `409 conflict`.
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-field.yaml#/FieldItemCreate
+          example:
+            productId: 01JB0RZ9A1B2C3D4E5F6G7H8J9
+            pricePaise: 3200
+            openingStock: 20
+    responses:
+      "201":
+        description: The new item
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-field.yaml#/FieldItem
+            example: *fieldItem
+      default: *problem
+/v1/admin/field/businesses/{bid}/stores/{sid}/items/{itemId}:
+  parameters:
+    - *bid
+    - *sid
+    - name: itemId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  patch:
+    operationId: updateFieldItem
+    tags: [admin-field]
+    summary: Change an item's price, MRP or listing
+    description: Only while the caller may edit the business's items (D-39), else `403 forbidden`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-field.yaml#/FieldItemUpdate
+          example:
+            pricePaise: 3100
+    responses:
+      "200":
+        description: The item after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-field.yaml#/FieldItem
+            example:
+              <<: *fieldItem
+              pricePaise: 3100
+      default: *problem
+/v1/admin/field-agents:
+  get:
+    operationId: listFieldAgents
+    tags: [admin-field]
+    summary: Every field agent's numbers (A-15)
+    description: Admin and super_admin; a field agent reads their own at `/v1/admin/field/me/stats`.
+    responses:
+      "200":
+        description: One row per agent
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-field.yaml#/FieldAgentStatsList
+            example:
+              items:
+                - *agentStats
+              serverNow: "2026-10-25T05:30:00Z"
+      default: *problem
