@@ -92,8 +92,10 @@ func (s *Service) customerView(ctx context.Context, d detail, st ordersdb.OrderS
 		PlacedAt: o.PlacedAt.UTC(), AcceptBy: utc(o.AcceptBy), AcceptedAt: utc(o.AcceptedAt),
 		PartialConfirmBy: utc(o.PartialConfirmBy), HoldUntil: utc(o.HoldUntil), ExtendedAt: utc(o.ExtendedAt),
 		CollectedAt: utc(o.CollectedAt), CodeLocked: o.CodeLockedAt != nil,
-		CanExtend: o.Fulfilment == Pickup && handable(o.Status) && o.ExtendedAt == nil && o.HoldUntil != nil && now.Before(*o.HoldUntil),
-		Lines:     make([]ordersapi.OrderLine, 0, len(d.lines)), Timeline: timeline(d.timeline),
+		CanExtend:  o.Fulfilment == Pickup && handable(o.Status) && o.ExtendedAt == nil && o.HoldUntil != nil && now.Before(*o.HoldUntil),
+		DispatchBy: utc(o.DispatchBy), DeliveryFailedAt: utc(o.DeliveryFailedAt), ReturnOutcome: returnOutcome(o.ReturnOutcome),
+		ReturnConfirmedAt: utc(o.ReturnConfirmedAt), DeliveryAddress: readAddress(o.AddressSnapshot),
+		Lines: make([]ordersapi.OrderLine, 0, len(d.lines)), Timeline: timeline(statusChanges(d.timeline)),
 		ServerNow: now, Version: int(o.Version),
 	}
 	if id, ok := ids.FromUUID(o.AskReplyID); ok {
@@ -108,7 +110,7 @@ func (s *Service) customerView(ctx context.Context, d detail, st ordersdb.OrderS
 			LineTotalPaise: int(l.LineTotalPaise), PriceSource: ordersapi.PriceSource(l.PriceSource),
 		})
 	}
-	if bool(code) && handable(o.Status) && o.CodeLockedAt == nil && s.codes != nil && len(o.CodeEnc) > 0 {
+	if bool(code) && codeShown(o.Status) && o.CodeLockedAt == nil && s.codes != nil && len(o.CodeEnc) > 0 {
 		c, err := s.codes.open(mustID(o.ID), o.CodeEnc)
 		if err != nil {
 			// The order is still shown; the error names no code.
@@ -154,7 +156,9 @@ func (s *Service) storeOrderView(ctx context.Context, o ordersdb.Order) (ordersa
 	out := ordersapi.StoreOrder{
 		Id: mustID(o.ID).String(), Number: displayNumber(o), Status: ordersapi.OrderStatus(o.Status),
 		StatusReason: o.StatusReason, StatusNote: o.StatusNote, Fulfilment: ordersapi.Fulfilment(o.Fulfilment),
-		Customer:      ordersapi.OrderCustomer{Name: cu.Name, PhoneMasked: s.maskedPhone(ctx, cu.PhoneEnc)},
+		Customer: ordersapi.OrderCustomer{
+			Name: cu.Name, PhoneMasked: s.maskedPhone(ctx, cu.PhoneEnc), Phone: s.deliveryPhone(ctx, o.Status, cu.PhoneEnc),
+		},
 		SubtotalPaise: int(o.SubtotalPaise), DiscountPaise: int(o.DiscountPaise), ItemSubtotalPaise: int(o.ItemSubtotalPaise),
 		ItemsAfterOffersPaise: int(o.ItemsAfterOffersPaise), DeliveryFeePaise: int(o.DeliveryFeePaise),
 		TotalPaise: int(o.TotalPaise), CreditsUsed: int(o.CreditsUsed),
@@ -163,7 +167,9 @@ func (s *Service) storeOrderView(ctx context.Context, o ordersdb.Order) (ordersa
 		PartialConfirmBy: utc(o.PartialConfirmBy), HoldUntil: utc(o.HoldUntil), ExtendedAt: utc(o.ExtendedAt),
 		CollectedAt: utc(o.CollectedAt), CodeLocked: o.CodeLockedAt != nil,
 		CodeAttemptsLeft: max(codeTries-int(o.CodeAttempts), 0),
-		Lines:            make([]ordersapi.StoreOrderLine, 0, len(d.lines)), Timeline: timeline(d.timeline),
+		DispatchBy:       utc(o.DispatchBy), DeliveryFailedAt: utc(o.DeliveryFailedAt), ReturnOutcome: returnOutcome(o.ReturnOutcome),
+		ReturnConfirmedAt: utc(o.ReturnConfirmedAt), DeliveryAddress: readAddress(o.AddressSnapshot),
+		Lines: make([]ordersapi.StoreOrderLine, 0, len(d.lines)), Timeline: timeline(d.timeline),
 		ServerNow: s.now(), Version: int(o.Version),
 	}
 	for _, l := range d.lines {
@@ -187,6 +193,22 @@ func (s *Service) storeOrderAfter(ctx context.Context, orderID ids.ID) (ordersap
 		return ordersapi.StoreOrder{}, problem.Wrap(genproblems.Internal, err)
 	}
 	return s.storeOrderView(ctx, o)
+}
+
+// deliveryPhone is the customer's full phone while their delivery order is
+// out for delivery, so the rider can call (BK-27); null in every other
+// status and without the PII key. Never logged.
+func (s *Service) deliveryPhone(ctx context.Context, status string, enc []byte) *string {
+	if status != StatusOutForDelivery || s.phones == nil || len(enc) == 0 {
+		return nil
+	}
+	plain, err := s.phones.Open("phone", enc)
+	if err != nil {
+		telemetry.Logger(ctx).WarnContext(ctx, "orders: customer phone does not open")
+		return nil
+	}
+	p := string(plain)
+	return &p
 }
 
 // maskedPhone is the customer's phone as a shop sees it (D-60): masked, or
@@ -217,6 +239,20 @@ func orderStore(st ordersdb.OrderStoreRow) ordersapi.OrderStore {
 	}
 }
 
+// statusChanges keeps the events that move the status: the customer's
+// timeline leaves out a store-side note on the same status, such as a
+// failed delivery's return being settled (returned, damaged, unconfirmed).
+func statusChanges(rows []ordersdb.OrderTimelineRow) []ordersdb.OrderTimelineRow {
+	out := make([]ordersdb.OrderTimelineRow, 0, len(rows))
+	for _, r := range rows {
+		if r.FromStatus != nil && *r.FromStatus == r.ToStatus {
+			continue
+		}
+		out = append(out, r)
+	}
+	return out
+}
+
 func timeline(rows []ordersdb.OrderTimelineRow) []ordersapi.OrderTimelineEvent {
 	out := make([]ordersapi.OrderTimelineEvent, len(rows))
 	for i, r := range rows {
@@ -236,6 +272,25 @@ func readSnapshot(raw json.RawMessage) snapshot {
 	var sn snapshot
 	_ = json.Unmarshal(raw, &sn) // written by create; a bad row shows blanks
 	return sn
+}
+
+func returnOutcome(o *string) *ordersapi.ReturnOutcome {
+	if o == nil {
+		return nil
+	}
+	return ptr(ordersapi.ReturnOutcome(*o))
+}
+
+// readAddress is a delivery order's address snapshot; nil for pickup.
+func readAddress(raw []byte) *ordersapi.OrderAddress {
+	if len(raw) == 0 {
+		return nil
+	}
+	var a ordersapi.OrderAddress
+	if json.Unmarshal(raw, &a) != nil {
+		return nil // written by create; a bad row shows none
+	}
+	return &a
 }
 
 func paymentMethod(m *string) *ordersapi.PaymentMethod {
@@ -319,6 +374,8 @@ func (s *Service) storeOrders(ctx context.Context, storeID ids.ID, p ordersapi.L
 			StatusReason: r.StatusReason, Fulfilment: ordersapi.Fulfilment(r.Fulfilment), TotalPaise: int(r.TotalPaise),
 			PlacedAt: r.PlacedAt.UTC(), AcceptBy: utc(r.AcceptBy), HoldUntil: utc(r.HoldUntil), Version: int(r.Version),
 			Seen: r.SeenAt != nil, CustomerName: r.CustomerName, ItemCount: int(r.ItemCount),
+			CustomerPhone: s.deliveryPhone(ctx, r.Status, r.PhoneEnc), DispatchBy: utc(r.DispatchBy),
+			DeliveryFailedAt: utc(r.DeliveryFailedAt), ReturnOutcome: returnOutcome(r.ReturnOutcome),
 		})
 	}
 	if len(unseen) > 0 {

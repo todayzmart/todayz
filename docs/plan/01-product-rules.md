@@ -145,7 +145,7 @@ Any non-terminal state
 - On `collected`/`delivered`: a `sale_online` movement is written and consumes the reservation (on hand drops).
 - On `delivery_failed` (D-69): the reservation stays until the shop confirms the goods came back, or records them as `damage`. Either one releases the reservation.
   - A cashier can confirm the return. Recording damage needs manager or above; a cashier asks a manager.
-  - The shop gets an inbox reminder 2 h and 24 h after the failure while it is unresolved.
+  - The shop gets an inbox reminder 2 h and 24 h after the failure while it is unresolved (`delivery_return_first_reminder_hours`, `delivery_return_second_reminder_hours`, D-218).
   - After 72 h with no answer, the system confirms the goods as returned (`return_outcome = unconfirmed`), releases the reservation, and raises a risk flag.
 - On any other terminal state: the reservation is released.
 
@@ -527,6 +527,8 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | `order_unseen_sms_after_min` | minutes | 3 | §15: SMS to the shop if a new order is not seen |
 | `pickup_hold_reminder_min` | minutes | 10 | §15: "Hold ending" push to the customer |
 | `risk_code_lockouts_store_per_day` | count | 10 | §6: order-code lockouts at one store in an IST day that raise a risk flag |
+| `delivery_return_first_reminder_hours` | hours | 2 | §5.3: first inbox reminder after a failed delivery while the return is unconfirmed. Min 1, max 12 (D-218). |
+| `delivery_return_second_reminder_hours` | hours | 24 | §5.3: second reminder. Min 13, max 71, so it stays before the 72 h auto-confirm (D-218). |
 
 **Stock and catalogue**
 
@@ -711,7 +713,7 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | `sold_at` clamp for offline sales | 72 h | 02 §4.3 |
 | Order SSE poll interval | 15 s | 02 |
 | "3 or more orders expired in 2 h" alert | 3 in 2 h | 05 §5 |
-| Failed-delivery reminders and auto-confirm | 2 h, 24 h, 72 h | §5.3, D-85 |
+| Failed-delivery auto-confirm | 72 h | §5.3, D-85 (the 2 h and 24 h reminders are settings, D-218) |
 | Store-strike window (risk flag and reliability) | 30 days | §5.4, D-85 |
 | Jobs watchdog interval | 5 min | §13, D-95 |
 | "Cron missed" threshold | no succeeded run within 2× the schedule interval (daily kinds: 15 min grace after the expected time) | §13, D-95 |

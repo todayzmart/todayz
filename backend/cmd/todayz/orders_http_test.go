@@ -1197,8 +1197,8 @@ func TestOrdersTenancyHTTP(t *testing.T) {
 	r = o.verify(o.cashier, id, o.code(id))
 	require.Equal(t, http.StatusOK, r.code)
 
-	// Delivery and return actions are not built: 409 for a visible order,
-	// 404 for another store's.
+	// A picked-up pickup order takes no delivery or return action: 409 for
+	// a visible order, 404 on another store's path.
 	for _, act := range []struct {
 		path string
 		body any
@@ -1301,7 +1301,9 @@ func walkStrings(v any, f func(string)) {
 type move struct{ from, to, actor string }
 
 // planMoves is 03 §4.1: every (from, to, actor) the plan allows, with the
-// reason when it is not built in W2-02.
+// reason when this table does not reach it: it is not built yet, or (the
+// delivery moves) it needs a delivery order, and the table's orders are
+// pickup; orders_delivery_http_test covers those.
 var planMoves = map[move]string{
 	{"placed", "accepted", "staff"}:                  "",
 	{"placed", "awaiting_customer", "staff"}:         "",
@@ -1316,13 +1318,13 @@ var planMoves = map[move]string{
 	{"accepted", "ready", "staff"}:                   "",
 	{"accepted", "collected", "staff"}:               "",
 	{"ready", "collected", "staff"}:                  "",
-	{"accepted", "expired", "system"}:                "", // pickup no-show; delivery dispatch_timeout is deferred
+	{"accepted", "expired", "system"}:                "", // pickup no-show; delivery dispatch_timeout in orders_delivery_http_test
 	{"ready", "expired", "system"}:                   "",
 	{"accepted", "cancelled", "staff"}:               "",
 	{"ready", "cancelled", "staff"}:                  "",
-	{"accepted", "out_for_delivery", "staff"}:        "delivery (BK-23–25)",
-	{"out_for_delivery", "delivered", "staff"}:       "delivery (BK-23–25)",
-	{"out_for_delivery", "delivery_failed", "staff"}: "delivery (BK-23–25)",
+	{"accepted", "out_for_delivery", "staff"}:        "a delivery order (orders_delivery_http_test, BK-24–26)",
+	{"out_for_delivery", "delivered", "staff"}:       "a delivery order (orders_delivery_http_test, BK-24–26)",
+	{"out_for_delivery", "delivery_failed", "staff"}: "a delivery order (orders_delivery_http_test, BK-24–26)",
 	{"placed", "cancelled", "admin"}:                 "admin cancel (D-20)",
 	{"awaiting_customer", "cancelled", "admin"}:      "admin cancel (D-20)",
 	{"accepted", "cancelled", "admin"}:               "admin cancel (D-20)",
@@ -1450,18 +1452,27 @@ func TestMachineMatchesTheGuard(t *testing.T) {
 	o := newOrderShop(t)
 	ctx := context.Background()
 	pick := o.order()
-	// A delivery order cannot be booked yet; insert one as placed.
+	// A delivery order, inserted as placed (no store delivery setup needed).
 	del := ids.New(o.a.clk.Now()).String()
 	o.a.exec(`INSERT INTO orders (id, customer_id, store_id, fulfilment, subtotal_paise, items_after_offers_paise,
 	  item_subtotal_paise, total_paise, code_enc, code_hmac, placed_at)
 	  SELECT $1, customer_id, store_id, 'delivery', 100, 100, 100, 100, '\x00', decode(repeat('ab', 32), 'hex'), placed_at
 	  FROM orders WHERE id = $2`, uuidOf(t, del), uuidOf(t, pick))
 
+	// A failed require leaves the transaction open, and the database drop
+	// at cleanup would wait on it until the test timeout: roll it back first.
+	var rollback func()
+	t.Cleanup(func() {
+		if rollback != nil {
+			rollback()
+		}
+	})
 	for _, c := range []struct{ id, fulfilment string }{{pick, orders.Pickup}, {del, orders.Delivery}} {
 		for _, from := range orders.Statuses() {
 			for _, to := range orders.Statuses() {
 				tx, err := o.a.tdb.OwnerPool.Begin(ctx)
 				require.NoError(t, err)
+				rollback = func() { _ = tx.Rollback(context.Background()) }
 				_, err = tx.Exec(ctx, `ALTER TABLE orders DISABLE TRIGGER trg_orders_guard`)
 				require.NoError(t, err)
 				_, err = tx.Exec(ctx, `UPDATE orders SET status = $1, status_reason = $2 WHERE id = $3`, from, reasonFor(from), uuidOf(t, c.id))
@@ -1476,6 +1487,7 @@ func TestMachineMatchesTheGuard(t *testing.T) {
 					require.ErrorContains(t, err, "invalid transition", "%s %s → %s", c.fulfilment, from, to)
 				}
 				require.NoError(t, tx.Rollback(ctx))
+				rollback = nil
 			}
 		}
 	}

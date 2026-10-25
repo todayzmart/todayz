@@ -112,16 +112,16 @@ type CreditsHold struct {
 // Credits is the credits ledger as orders uses it (W2-01). Hold, Release and
 // Complete run in the order's transaction and are idempotent per order.
 //
-// The delivery WP must call Complete on delivered and Release on
-// delivery_failed (D-127): no transition reaches either yet, so a delivery
-// order's hold is neither captured nor released and earns no cashback.
+// A delivered order calls Complete (as collected does) and a failed
+// delivery calls Release, with no cashback (D-127).
 type Credits interface {
 	// Allow answers how many credits a checkout may use; it writes nothing.
 	Allow(ctx context.Context, customerID, storeID ids.ID, requested int, itemsAfterOffersPaise int64) (CreditsAllowance, error)
 	// Hold holds all of h.Credits or none: a refusal is Allowed 0 and the
 	// Limit, with a nil error.
 	Hold(ctx context.Context, h CreditsHold) (CreditsAllowance, error)
-	// Release returns an order's held credits (any end but collection).
+	// Release returns an order's held credits (any end but collection or
+	// delivery).
 	Release(ctx context.Context, orderID ids.ID) error
 	// Recap cuts an order's open hold down to what the new eligible amount
 	// allows after a partial accept (D-28): all of it under the credit

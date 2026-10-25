@@ -145,9 +145,13 @@ const (
 
 	// Added by the POS counter-code locks (D-131; seeded by 20401_w2-04_pos.sql)
 	PosCodePhoneFailuresPerHour Key = "pos_code_phone_failures_per_hour" // count, default 10
+
+	// Added by the delivery returns (D-218; seeded by 20204_w2-02_return_reminder_settings.sql)
+	DeliveryReturnFirstReminderHours  Key = "delivery_return_first_reminder_hours"  // hours, default 2
+	DeliveryReturnSecondReminderHours Key = "delivery_return_second_reminder_hours" // hours, default 24
 )
 
-// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101, D-110, D-131).
+// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101, D-110, D-131, D-218).
 var AllKeys = []Key{
 	OrderAcceptTimeoutMin,
 	PickupHoldMin,
@@ -268,4 +272,6 @@ var AllKeys = []Key{
 	BasketSplitMaxShops,
 	BasketResultsMax,
 	PosCodePhoneFailuresPerHour,
+	DeliveryReturnFirstReminderHours,
+	DeliveryReturnSecondReminderHours,
 }

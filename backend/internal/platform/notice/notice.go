@@ -45,6 +45,9 @@ const (
 	KindNewAsk      = "new_ask"      // a customer ask for the store (push + in-app; D-101)
 	// KindShopReferralUnlocked: a referral reward posted to the store's credit account (W2-03).
 	KindShopReferralUnlocked = "shop_referral_unlocked"
+	// KindDeliveryReturnPending: a failed delivery's goods are not yet
+	// confirmed back at the store, at 2 h and 24 h (D-69, W2-02 delivery).
+	KindDeliveryReturnPending = "delivery_return_pending"
 	// Customer inbox.
 	KindOrderUpdate = "order_update" // accepted, partial, rejected, expired, ready, out for delivery, delivered
 	KindAskReply    = "ask_reply"    // a shop replied Yes to the customer's ask (D-101)

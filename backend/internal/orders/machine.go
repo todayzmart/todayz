@@ -71,3 +71,8 @@ func CanMove(from, to, fulfilment string) bool {
 
 // handable reports whether a pickup order can be handed over now.
 func handable(status string) bool { return status == StatusAccepted || status == StatusReady }
+
+// codeShown reports whether the customer is shown the hand-over code: while
+// a pickup order can be collected, or a delivery order is accepted or on its
+// way (03 §4.1).
+func codeShown(status string) bool { return handable(status) || status == StatusOutForDelivery }

@@ -9,7 +9,7 @@
 # response, a list, an event or an error (D-04).
 Fulfilment:
   type: string
-  description: How the customer gets the order. Delivery is refused with `409 store_not_bookable` until W2 delivery ships (W2-02 report).
+  description: How the customer gets the order. Delivery needs `addressId`, a store that takes delivery and the `feature_delivery_enabled` setting on (W2-02 delivery).
   enum: [pickup, delivery]
 OrderStatus:
   type: string
@@ -367,6 +367,31 @@ OrderTimelineEvent:
       description: The reason recorded with the change (03 §4.2), as `statusReason`.
       maxLength: 40
     at: {$ref: ./common.yaml#/Timestamp}
+ReturnOutcome:
+  type: string
+  description: >-
+    How a failed delivery's goods were settled (D-69): `returned` or `damaged` by the shop,
+    `unconfirmed` when nobody confirmed within 72 hours and the system released them.
+  enum: [returned, damaged, unconfirmed]
+OrderAddress:
+  type: object
+  description: The delivery address as it was when the order was placed.
+  required: [label, line1, line2, landmark, pincode, lat, lng]
+  properties:
+    label: {type: string}
+    line1: {type: string}
+    line2: {type: [string, "null"]}
+    landmark: {type: [string, "null"]}
+    pincode: {type: string}
+    lat: {type: number}
+    lng: {type: number}
+NextDeliveryWindow:
+  type: object
+  description: The next time the shop delivers, in `409 delivery_closed` `extensions.nextDeliveryWindow`.
+  required: [opensAt, closesAt]
+  properties:
+    opensAt: {$ref: ./common.yaml#/Timestamp}
+    closesAt: {$ref: ./common.yaml#/Timestamp}
 NullableTimestamp:
   oneOf:
     - $ref: ./common.yaml#/Timestamp
@@ -384,7 +409,8 @@ Order:
     discountPaise, itemSubtotalPaise, itemsAfterOffersPaise, creditsUsed, deliveryFeePaise,
     totalPaise, cashbackCredits, paymentStatus, paymentMethod, code, codeLocked, canExtend,
     askReplyId, acceptBy, partialConfirmBy, holdUntil, extendedAt, placedAt, acceptedAt,
-    collectedAt, timeline, version, serverNow]
+    collectedAt, dispatchBy, deliveryFailedAt, returnOutcome, returnConfirmedAt, deliveryAddress,
+    timeline, version, serverNow]
   properties:
     id: {$ref: ./common.yaml#/Ulid}
     number: {$ref: '#/OrderNumber'}
@@ -434,6 +460,22 @@ Order:
     placedAt: {$ref: ./common.yaml#/Timestamp}
     acceptedAt: {$ref: '#/NullableTimestamp'}
     collectedAt: {$ref: '#/NullableTimestamp'}
+    dispatchBy:
+      description: Delivery only. The shop must dispatch by then (`delivery_dispatch_timeout_min` after accept).
+      oneOf:
+        - $ref: ./common.yaml#/Timestamp
+        - type: "null"
+    deliveryFailedAt: {$ref: '#/NullableTimestamp'}
+    returnOutcome:
+      oneOf:
+        - $ref: '#/ReturnOutcome'
+        - type: "null"
+    returnConfirmedAt: {$ref: '#/NullableTimestamp'}
+    deliveryAddress:
+      description: The address snapshot taken when a delivery order was placed; null for pickup.
+      oneOf:
+        - $ref: '#/OrderAddress'
+        - type: "null"
     timeline:
       type: array
       items: {$ref: '#/OrderTimelineEvent'}
@@ -483,11 +525,14 @@ OrderList:
 # --- orders: store view --------------------------------------------------------------
 OrderCustomer:
   type: object
-  description: The customer as the shop sees them; the phone is masked (D-60).
-  required: [name, phoneMasked]
+  description: >-
+    The customer as the shop sees them; the phone is masked (D-60). `phone` is the full
+    number only while a delivery order is out_for_delivery (BK-27), null otherwise.
+  required: [name, phoneMasked, phone]
   properties:
     name: {type: [string, "null"]}
     phoneMasked: {type: [string, "null"]}
+    phone: {type: [string, "null"]}
 StoreOrder:
   type: object
   description: >-
@@ -497,7 +542,8 @@ StoreOrder:
     subtotalPaise, discountPaise, itemSubtotalPaise, itemsAfterOffersPaise, creditsUsed,
     deliveryFeePaise, totalPaise, paymentStatus, paymentMethod, codeLocked, codeAttemptsLeft,
     acceptBy, partialConfirmBy, holdUntil, extendedAt, placedAt, acceptedAt, collectedAt,
-    timeline, version, serverNow]
+    dispatchBy, deliveryFailedAt, returnOutcome, returnConfirmedAt, deliveryAddress, timeline,
+    version, serverNow]
   properties:
     id: {$ref: ./common.yaml#/Ulid}
     number: {$ref: '#/OrderNumber'}
@@ -540,6 +586,22 @@ StoreOrder:
     placedAt: {$ref: ./common.yaml#/Timestamp}
     acceptedAt: {$ref: '#/NullableTimestamp'}
     collectedAt: {$ref: '#/NullableTimestamp'}
+    dispatchBy:
+      description: Delivery only. The shop must dispatch by then (`delivery_dispatch_timeout_min` after accept).
+      oneOf:
+        - $ref: ./common.yaml#/Timestamp
+        - type: "null"
+    deliveryFailedAt: {$ref: '#/NullableTimestamp'}
+    returnOutcome:
+      oneOf:
+        - $ref: '#/ReturnOutcome'
+        - type: "null"
+    returnConfirmedAt: {$ref: '#/NullableTimestamp'}
+    deliveryAddress:
+      description: The address snapshot taken when a delivery order was placed; null for pickup.
+      oneOf:
+        - $ref: '#/OrderAddress'
+        - type: "null"
     timeline:
       type: array
       items: {$ref: '#/OrderTimelineEvent'}
@@ -550,12 +612,16 @@ StoreOrder:
 StoreOrderSummary:
   type: object
   description: '`seen` is false until a staff member first opens the order or a list that shows it.'
-  required: [id, number, customerName, fulfilment, status, statusReason, itemCount, totalPaise,
-    acceptBy, holdUntil, placedAt, seen, version]
+  required: [id, number, customerName, customerPhone, fulfilment, status, statusReason, itemCount,
+    totalPaise, acceptBy, holdUntil, dispatchBy, deliveryFailedAt, returnOutcome, placedAt, seen,
+    version]
   properties:
     id: {$ref: ./common.yaml#/Ulid}
     number: {$ref: '#/OrderNumber'}
     customerName: {type: [string, "null"]}
+    customerPhone:
+      description: The full phone only while out_for_delivery (BK-27); null otherwise.
+      type: [string, "null"]
     fulfilment: {$ref: '#/Fulfilment'}
     status: {$ref: '#/OrderStatus'}
     statusReason:
@@ -573,6 +639,12 @@ StoreOrderSummary:
     totalPaise: {$ref: ./common.yaml#/Paise}
     acceptBy: {$ref: '#/NullableTimestamp'}
     holdUntil: {$ref: '#/NullableTimestamp'}
+    dispatchBy: {$ref: '#/NullableTimestamp'}
+    deliveryFailedAt: {$ref: '#/NullableTimestamp'}
+    returnOutcome:
+      oneOf:
+        - $ref: '#/ReturnOutcome'
+        - type: "null"
     placedAt: {$ref: ./common.yaml#/Timestamp}
     seen: {type: boolean}
     version:

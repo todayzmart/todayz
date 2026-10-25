@@ -4,7 +4,7 @@ import type { StoreOrder } from '@todayz/api-client/gen/model/storeOrder';
 import { formatMoney } from '@todayz/i18n';
 import { Banner, Button, EmptyState, OrderTimeline, Skeleton, StatusPill, orderStatusTone, useToast, type TimelineStep } from '@todayz/ui';
 import { Link } from '@tanstack/react-router';
-import { ArrowLeft, Inbox, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Bike, Inbox, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import { useIntl, type IntlShape } from 'react-intl';
 import { useAcknowledgeOnOpen } from './alerts';
@@ -12,14 +12,16 @@ import { ActionError } from './ActionError';
 import { CodeEntry } from './CodeEntry';
 import { AcceptPartSheet } from './AcceptPartSheet';
 import { canAcceptPart, clock, isShort, lineName, reasonLabel, statusLabel } from './labels';
-import { acceptCall, acceptPartCall, cancelCall, readyCall, rejectCall, useOrder, useOrderAction } from './queries';
+import { acceptCall, acceptPartCall, cancelCall, dispatchCall, failDeliveryCall, readyCall, rejectCall, useOrder, useOrderAction } from './queries';
 import { ReasonSheet } from './ReasonSheet';
+import { ReturnPanel } from './ReturnPanel';
 import { canCancelAccepted, useCurrentStore, type CurrentStore } from './store';
 import styles from './orders.module.css';
 
 const REJECT_REASONS = ['out_of_stock', 'closing_soon', 'too_busy', 'cannot_deliver_address', 'price_changed', 'other'] as const;
 const CANCEL_REASONS = ['out_of_stock', 'customer_unreachable', 'closing_soon', 'other'] as const;
-const ENDED: readonly OrderStatus[] = ['rejected', 'expired', 'cancelled'];
+const DELIVERY_FAILED_REASONS = ['customer_unreachable', 'address_not_found', 'customer_refused', 'other'] as const;
+const ENDED: readonly OrderStatus[] = ['rejected', 'expired', 'cancelled', 'delivery_failed'];
 
 /** Steps from the order's own timeline: what happened, then what is still to come. */
 function buildSteps(intl: IntlShape, order: StoreOrder): TimelineStep[] {
@@ -35,11 +37,16 @@ function buildSteps(intl: IntlShape, order: StoreOrder): TimelineStep[] {
     label: intl.formatMessage({ id }),
     state: reached(key) ? (order.status === key && !ended ? 'now' : 'done') : 'upcoming',
     detail: detail(at(key)),
-    icon: key === 'ready' ? ShoppingBag : undefined,
+    icon: key === 'ready' ? ShoppingBag : key === 'out_for_delivery' ? Bike : undefined,
   });
   steps.push(step('accepted', 'orders.detail.step.accepted'));
-  if (!ended || reached('ready')) steps.push(step('ready', 'orders.detail.step.ready'));
-  if (!ended) steps.push(step('collected', 'orders.detail.step.collected'));
+  if (order.fulfilment === 'delivery') {
+    if (!ended || reached('out_for_delivery')) steps.push(step('out_for_delivery', 'orders.detail.step.out_for_delivery'));
+    if (!ended) steps.push(step('delivered', 'orders.detail.step.delivered'));
+  } else {
+    if (!ended || reached('ready')) steps.push(step('ready', 'orders.detail.step.ready'));
+    if (!ended) steps.push(step('collected', 'orders.detail.step.collected'));
+  }
   if (ended) {
     steps.push({
       key: ended.toStatus,
@@ -118,6 +125,7 @@ function OrderView({ store, order }: { store: CurrentStore; order: StoreOrder })
   const [rejecting, setRejecting] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [parting, setParting] = useState(false);
+  const [failing, setFailing] = useState(false);
   const name = order.customer.name ?? intl.formatMessage({ id: 'orders.card.noName' });
   const placed = order.status === 'placed';
   // A short line makes the API refuse Accept (insufficient_stock): disable it and say why.
@@ -125,8 +133,14 @@ function OrderView({ store, order }: { store: CurrentStore; order: StoreOrder })
   const partable = canAcceptPart(order.lines);
   const waiting = order.status === 'awaiting_customer';
   const open = order.status === 'accepted' || order.status === 'ready';
-  const canMarkReady = order.status === 'accepted' && order.fulfilment === 'pickup';
+  const delivery = order.fulfilment === 'delivery';
+  const canMarkReady = order.status === 'accepted' && !delivery;
+  const canDispatch = order.status === 'accepted' && delivery;
+  const outForDelivery = order.status === 'out_for_delivery';
+  // Pickup hands over while accepted or ready; delivery only at the door (BK-24).
+  const canHandOver = delivery ? outForDelivery : open;
   const canCancel = open && canCancelAccepted(store.role);
+  const addr = order.deliveryAddress;
 
   const announce = (id: string, o: StoreOrder | null) => {
     if (o) toast.show({ message: intl.formatMessage({ id }) });
@@ -155,8 +169,23 @@ function OrderView({ store, order }: { store: CurrentStore; order: StoreOrder })
             {intl.formatMessage({ id: 'orders.detail.customer' })}
           </h2>
           <p>{name}</p>
-          {order.customer.phoneMasked && (
-            <p className={styles.muted}>{intl.formatMessage({ id: 'orders.detail.phone' }, { phone: order.customer.phoneMasked })}</p>
+          {order.customer.phone ? (
+            // The full number only while out for delivery (BK-27, D-60), so the rider can call.
+            <p>
+              <a href={`tel:${order.customer.phone}`}>{intl.formatMessage({ id: 'orders.detail.call' }, { phone: order.customer.phone })}</a>
+            </p>
+          ) : (
+            order.customer.phoneMasked && (
+              <p className={styles.muted}>{intl.formatMessage({ id: 'orders.detail.phone' }, { phone: order.customer.phoneMasked })}</p>
+            )
+          )}
+          {addr && (
+            <address className={styles.address} aria-label={intl.formatMessage({ id: 'orders.detail.address' })}>
+              <b>{addr.label}</b>
+              <span>{[addr.line1, addr.line2].filter(Boolean).join(', ')}</span>
+              {addr.landmark && <span>{intl.formatMessage({ id: 'orders.detail.landmark' }, { landmark: addr.landmark })}</span>}
+              <span>{addr.pincode}</span>
+            </address>
           )}
         </section>
         <section className="tz-card" aria-labelledby="items-title">
@@ -179,6 +208,14 @@ function OrderView({ store, order }: { store: CurrentStore; order: StoreOrder })
               </li>
             ))}
           </ul>
+          {delivery && (
+            <div className={styles.meta}>
+              <span>{intl.formatMessage({ id: 'orders.detail.deliveryFee' })}</span>
+              <span>
+                {order.deliveryFeePaise > 0 ? formatMoney(order.deliveryFeePaise, 'dashboard') : intl.formatMessage({ id: 'orders.detail.deliveryFree' })}
+              </span>
+            </div>
+          )}
           <div className={styles.meta}>
             <b>{intl.formatMessage({ id: 'orders.detail.total' })}</b>
             <span className="tz-price">{formatMoney(order.totalPaise, 'dashboard')}</span>
@@ -188,7 +225,7 @@ function OrderView({ store, order }: { store: CurrentStore; order: StoreOrder })
               {intl.formatMessage({ id: 'orders.detail.paidWith' }, { method: intl.formatMessage({ id: `orders.code.pay.${order.paymentMethod}` }) })}
             </p>
           ) : (
-            <p className={styles.muted}>{intl.formatMessage({ id: 'orders.detail.payAtShop' })}</p>
+            <p className={styles.muted}>{intl.formatMessage({ id: delivery ? 'orders.detail.payAtDoor' : 'orders.detail.payAtShop' })}</p>
           )}
           {order.holdUntil && open && (
             <p className={styles.muted}>{intl.formatMessage({ id: 'orders.detail.holdUntil' }, { time: clock(order.holdUntil) })}</p>
@@ -238,7 +275,29 @@ function OrderView({ store, order }: { store: CurrentStore; order: StoreOrder })
             <p className={styles.muted}>{intl.formatMessage({ id: 'orders.detail.readyHelp' })}</p>
           </div>
         )}
-        {open && <CodeEntry store={store} order={order} />}
+        {canDispatch && (
+          <div className={styles.stack}>
+            <Button
+              variant="primary"
+              loading={action.pending === 'dispatch'}
+              onClick={() => void action.run('dispatch', dispatchCall(store, order.id)).then((o) => announce('orders.action.dispatched', o))}
+            >
+              {intl.formatMessage({ id: 'orders.detail.dispatch' })}
+            </Button>
+            {order.dispatchBy && (
+              <p className={styles.muted}>{intl.formatMessage({ id: 'orders.detail.dispatchBy' }, { time: clock(order.dispatchBy) })}</p>
+            )}
+          </div>
+        )}
+        {canHandOver && <CodeEntry store={store} order={order} />}
+        {outForDelivery && (
+          <div className={styles.actions}>
+            <Button variant="danger" onClick={() => setFailing(true)} disabled={action.pending !== null}>
+              {intl.formatMessage({ id: 'orders.failed.open' })}
+            </Button>
+          </div>
+        )}
+        {order.status === 'delivery_failed' && <ReturnPanel store={store} order={order} />}
         {canCancel && (
           <div className={styles.actions}>
             <Button variant="danger" onClick={() => setCancelling(true)} disabled={action.pending !== null}>
@@ -274,6 +333,22 @@ function OrderView({ store, order }: { store: CurrentStore; order: StoreOrder })
           void action.run('reject', rejectCall(store, order.id, reason, note)).then((o) => {
             if (o) setRejecting(false);
             announce('orders.action.rejected', o);
+          })
+        }
+      />
+      <ReasonSheet
+        open={failing}
+        onClose={() => setFailing(false)}
+        title={intl.formatMessage({ id: 'orders.failed.title' }, { number: order.number })}
+        body={intl.formatMessage({ id: 'orders.failed.body' })}
+        reasons={DELIVERY_FAILED_REASONS}
+        confirmLabel={intl.formatMessage({ id: 'orders.failed.confirm' })}
+        busy={action.pending === 'failDelivery'}
+        error={action.error}
+        onConfirm={(reason, note) =>
+          void action.run('failDelivery', failDeliveryCall(store, order.id, reason, note)).then((o) => {
+            if (o) setFailing(false);
+            announce('orders.action.failed', o);
           })
         }
       />

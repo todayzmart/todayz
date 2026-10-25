@@ -11,7 +11,6 @@ import (
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/authz/policy"
-	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
 )
@@ -108,6 +107,7 @@ func (h handlers) QuoteCheckout(ctx context.Context, req ordersapi.QuoteCheckout
 	b := req.Body
 	q, err := h.s.quoteCart(ctx, cart{
 		storeID: b.StoreId, fulfilment: string(b.Fulfilment), items: b.Items, askReplyID: b.AskReplyId, credits: b.CreditsToUse,
+		addressID: b.AddressId,
 	})
 	if err != nil {
 		return nil, err
@@ -123,6 +123,7 @@ func (h handlers) CreateOrder(ctx context.Context, req ordersapi.CreateOrderRequ
 	b := req.Body
 	id, err := h.s.create(ctx, cart{
 		storeID: b.StoreId, fulfilment: string(b.Fulfilment), items: b.Items, askReplyID: b.AskReplyId, credits: b.CreditsToUse,
+		addressID: b.AddressId,
 	}, b.ExpectedTotalPaise)
 	if err != nil {
 		return nil, err
@@ -284,42 +285,34 @@ func (h handlers) CancelStoreOrder(ctx context.Context, req ordersapi.CancelStor
 	return ordersapi.CancelStoreOrder200JSONResponse(o), nil
 }
 
-// DispatchOrder implements POST {S}/orders/{orderId}/dispatch. Delivery is
-// not built yet (BK-23–25): no order is a delivery order, so it is 409.
+// DispatchOrder implements POST {S}/orders/{orderId}/dispatch.
 func (h handlers) DispatchOrder(ctx context.Context, req ordersapi.DispatchOrderRequestObject) (ordersapi.DispatchOrderResponseObject, error) {
-	_, err := h.staffAction(ctx, req.OrderId, func(_, sid, id ids.ID) error { return h.s.notBuiltStore(ctx, sid, id) })
-	return nil, err
+	o, err := h.staffAction(ctx, req.OrderId, func(by, sid, id ids.ID) error { return h.s.dispatch(ctx, by, sid, id) })
+	if err != nil {
+		return nil, err
+	}
+	// The full phone stays out of this response: an idempotent replay would
+	// return it long after delivery. The order read gates it on
+	// out_for_delivery (BK-27).
+	o.Customer.Phone = nil
+	return ordersapi.DispatchOrder200JSONResponse(o), nil
 }
 
-// FailOrderDelivery implements POST {S}/orders/{orderId}/fail-delivery (409
-// until delivery is built).
+// FailOrderDelivery implements POST {S}/orders/{orderId}/fail-delivery.
 func (h handlers) FailOrderDelivery(ctx context.Context, req ordersapi.FailOrderDeliveryRequestObject) (ordersapi.FailOrderDeliveryResponseObject, error) {
-	_, err := h.staffAction(ctx, req.OrderId, func(_, sid, id ids.ID) error { return h.s.notBuiltStore(ctx, sid, id) })
-	return nil, err
+	o, err := h.staffAction(ctx, req.OrderId, func(by, sid, id ids.ID) error { return h.s.failDelivery(ctx, by, sid, id, req.Body) })
+	if err != nil {
+		return nil, err
+	}
+	return ordersapi.FailOrderDelivery200JSONResponse(o), nil
 }
 
 // ConfirmOrderReturn implements POST {S}/orders/{orderId}/confirm-return
-// (409 until delivery and D-69 returns are built).
+// (D-69).
 func (h handlers) ConfirmOrderReturn(ctx context.Context, req ordersapi.ConfirmOrderReturnRequestObject) (ordersapi.ConfirmOrderReturnResponseObject, error) {
-	_, err := h.staffAction(ctx, req.OrderId, func(_, sid, id ids.ID) error { return h.s.notBuiltStore(ctx, sid, id) })
-	return nil, err
-}
-
-// --- not built yet ------------------------------------------------------------
-
-// notBuiltStore answers a delivery or return action: 404 for an order the
-// store cannot see, else 409 invalid_transition (no order can be in the
-// state the action needs yet).
-func (s *Service) notBuiltStore(ctx context.Context, storeID, orderID ids.ID) error {
-	if err := s.ready(ctx); err != nil {
-		return err
-	}
-	o, err := s.q(ctx).GetOrder(ctx, ids.UUID(orderID))
-	if db.IsNoRows(err) || (err == nil && mustID(o.StoreID) != storeID) {
-		return notFound()
-	}
+	o, err := h.staffAction(ctx, req.OrderId, func(by, sid, id ids.ID) error { return h.s.confirmReturn(ctx, by, sid, id, req.Body) })
 	if err != nil {
-		return problem.Wrap(genproblems.Internal, err)
+		return nil, err
 	}
-	return invalidTransition()
+	return ordersapi.ConfirmOrderReturn200JSONResponse(o), nil
 }

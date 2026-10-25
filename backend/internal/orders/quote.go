@@ -29,13 +29,15 @@ type cart struct {
 	items      []ordersapi.CheckoutItem
 	askReplyID *string
 	credits    int
+	addressID  *string // delivery only
 }
 
 // quoted is a priced cart.
 type quoted struct {
-	store ordersdb.StoreForBookingRow
-	now   time.Time
-	lines []quotedLine
+	store      ordersdb.StoreForBookingRow
+	now        time.Time
+	fulfilment string
+	lines      []quotedLine
 
 	subtotal, lineDiscounts, discount, itemsAfterOffers, itemSubtotal, fee, total int64
 
@@ -77,8 +79,9 @@ func (l quotedLine) availability() ordersapi.LineAvailability {
 }
 
 // bookableStore loads the cart's store and refuses one that cannot take an
-// order: unknown (404), not live or not verified, no pickup, or a delivery
-// cart (delivery is not built yet, BK-23–25): 409 store_not_bookable.
+// order: unknown (404), not live or not verified, or not taking the cart's
+// fulfilment (no pickup, or no delivery, or delivery switched off by
+// feature_delivery_enabled): 409 store_not_bookable.
 func (s *Service) bookableStore(ctx context.Context, c cart) (ordersdb.StoreForBookingRow, ids.ID, error) {
 	sid, err := ids.Parse(c.storeID)
 	if err != nil {
@@ -91,7 +94,18 @@ func (s *Service) bookableStore(ctx context.Context, c cart) (ordersdb.StoreForB
 	if err != nil {
 		return ordersdb.StoreForBookingRow{}, ids.Zero, fmt.Errorf("orders: store: %w", err)
 	}
-	if st.Status != "live" || !st.BusinessVerified || !st.AcceptsPickup || c.fulfilment != Pickup {
+	takes := false
+	switch c.fulfilment {
+	case Pickup:
+		takes = st.AcceptsPickup
+	case Delivery:
+		if takes = st.AcceptsDelivery; takes {
+			if takes, err = s.deliveryOn(ctx); err != nil {
+				return ordersdb.StoreForBookingRow{}, ids.Zero, err
+			}
+		}
+	}
+	if st.Status != "live" || !st.BusinessVerified || !takes {
 		return ordersdb.StoreForBookingRow{}, ids.Zero, problem.New(genproblems.StoreNotBookable, "")
 	}
 	return st, sid, nil
@@ -102,7 +116,7 @@ func (s *Service) bookableStore(ctx context.Context, c cart) (ordersdb.StoreForB
 // nothing. A reply that cannot price a line is ignored here (the quote's
 // rule); create refuses it.
 func (s *Service) price(ctx context.Context, customerID ids.ID, st ordersdb.StoreForBookingRow, c cart, now time.Time) (quoted, error) {
-	q := quoted{store: st, now: now, creditsRequested: max(c.credits, 0), firstShort: -1}
+	q := quoted{store: st, now: now, fulfilment: c.fulfilment, creditsRequested: max(c.credits, 0), firstShort: -1}
 	storeID := mustID(st.ID)
 
 	// The items: each a valid id, at most once, of this store.
@@ -220,7 +234,9 @@ func (s *Service) price(ctx context.Context, customerID ids.ID, st ordersdb.Stor
 	if q.creditsRequested > q.creditsUsed {
 		q.creditsLimit = al.Limit
 	}
-	q.fee = 0 // pickup only
+	if c.fulfilment == Delivery {
+		q.fee = deliveryFee(q.itemSubtotal, st.DeliveryFeePaise, st.DeliveryFreeAbovePaise)
+	}
 	q.total = q.itemsAfterOffers - int64(q.creditsUsed)*100 + q.fee
 	q.notOrderable = q.firstShort >= 0
 	return q, nil
@@ -232,7 +248,7 @@ const maxLineQuantity = 99
 // view is the quote as the contract shows it.
 func (q quoted) view() ordersapi.CheckoutQuote {
 	out := ordersapi.CheckoutQuote{
-		StoreId: mustID(q.store.ID).String(), Fulfilment: ordersapi.Pickup, ServerNow: q.now,
+		StoreId: mustID(q.store.ID).String(), Fulfilment: ordersapi.Fulfilment(q.fulfilment), ServerNow: q.now,
 		Lines: make([]ordersapi.QuoteLine, len(q.lines)), OffersApplied: []ordersapi.OfferApplied{},
 		SubtotalPaise: int(q.subtotal), DiscountPaise: int(q.discount), ItemSubtotalPaise: int(q.itemSubtotal),
 		ItemsAfterOffersPaise: int(q.itemsAfterOffers), DeliveryFeePaise: int(q.fee), TotalPaise: int(q.total),
@@ -278,6 +294,11 @@ func (s *Service) quoteCart(ctx context.Context, c cart) (ordersapi.CheckoutQuot
 	if err != nil {
 		return ordersapi.CheckoutQuote{}, asProblem(err)
 	}
+	if c.fulfilment == Delivery {
+		if _, err := s.deliveryAddress(ctx, p.UserID, st, c); err != nil {
+			return ordersapi.CheckoutQuote{}, asProblem(err)
+		}
+	}
 	now := s.now()
 	until, err := s.q(ctx).CustomerLimit(ctx, ids.UUID(p.UserID))
 	if err != nil && !db.IsNoRows(err) {
@@ -289,6 +310,14 @@ func (s *Service) quoteCart(ctx context.Context, c cart) (ordersapi.CheckoutQuot
 	q, err := s.price(ctx, p.UserID, st, c, now)
 	if err != nil {
 		return ordersapi.CheckoutQuote{}, asProblem(err)
+	}
+	if c.fulfilment == Delivery {
+		if err := belowMinimum(q); err != nil {
+			return ordersapi.CheckoutQuote{}, err
+		}
+		if err := s.closedFor(st, c.fulfilment, now); err != nil {
+			return ordersapi.CheckoutQuote{}, err
+		}
 	}
 	return q.view(), nil
 }

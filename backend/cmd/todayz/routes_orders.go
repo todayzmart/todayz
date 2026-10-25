@@ -54,15 +54,17 @@ func mountOrders(r chi.Router, d *deps) {
 		jobs.Register(reg, jd)
 		od.Jobs = platformjobs.NewEnqueuer(reg, d.Queue, d.Clock)
 	}
+	var az authz.Authorizer
+	if d.Authz != nil {
+		az = d.Authz
+	}
+	// A damaged return also needs stock.damage (D-69).
+	od.Authz = az
 	svc, err := orders.New(od)
 	if err != nil {
 		// A missing clock or a malformed order-code or PII key; boot and
 		// buildSecurity refuse those before the routes mount.
 		panic("orders: " + err.Error())
-	}
-	var az authz.Authorizer
-	if d.Authz != nil {
-		az = d.Authz
 	}
 	orders.Register(r, svc, az)
 	if d.Identity != nil {

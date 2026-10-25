@@ -274,8 +274,9 @@ func (s *Service) accept(ctx context.Context, by ids.ID, storeID, orderID ids.ID
 
 // holdAndStart moves a placed or awaiting_customer order to accepted: it
 // holds want[i] of each line (the items locked and checked by lockStock),
-// records the accepted quantities, starts the pickup hold and its no-show
-// timer.
+// records the accepted quantities, and starts the pickup hold and its
+// no-show timer, or for a delivery order dispatch_by
+// (delivery_dispatch_timeout_min) and its dispatch timer (BK-24).
 func (s *Service) holdAndStart(ctx context.Context, o ordersdb.Order, lines []ordersdb.OrderLinesRow, want []int32, by actor, t tell, hold time.Duration, now time.Time) error {
 	q := s.q(ctx)
 	for i, l := range lines {
@@ -289,8 +290,19 @@ func (s *Service) holdAndStart(ctx context.Context, o ordersdb.Order, lines []or
 			return fmt.Errorf("orders: reserve: %w", err)
 		}
 	}
-	holdUntil := now.Add(hold)
-	v, err := q.SetAccepted(ctx, ordersdb.SetAcceptedParams{Now: &now, HoldUntil: &holdUntil, ID: o.ID})
+	p := ordersdb.SetAcceptedParams{Now: &now, ID: o.ID}
+	until := now.Add(hold)
+	if o.Fulfilment == Delivery {
+		in, err := s.duration(ctx, settings.DeliveryDispatchTimeoutMin)
+		if err != nil {
+			return err
+		}
+		until = now.Add(in)
+		p.DispatchBy = &until
+	} else {
+		p.HoldUntil = &until
+	}
+	v, err := q.SetAccepted(ctx, p)
 	if err != nil {
 		return fmt.Errorf("orders: accept: %w", err)
 	}
@@ -303,7 +315,10 @@ func (s *Service) holdAndStart(ctx context.Context, o ordersdb.Order, lines []or
 	if err := s.record(ctx, o, StatusAccepted, v, by, nil, t, now); err != nil {
 		return err
 	}
-	return s.noShowTimer(ctx, mustID(o.ID), holdUntil)
+	if o.Fulfilment == Delivery {
+		return s.dispatchTimer(ctx, mustID(o.ID), until)
+	}
+	return s.noShowTimer(ctx, mustID(o.ID), until)
 }
 
 // lockStock locks the items of the lines with a quantity in want, in id
@@ -426,7 +441,9 @@ func (s *Service) markReady(ctx context.Context, by, storeID, orderID ids.ID) er
 }
 
 // storeCancel is a manager's cancel of a held order (D-68): stock goes
-// back, the customer gets no strike.
+// back, the customer gets no strike. A delivery order can be cancelled
+// while accepted, before dispatch_by; once out for delivery it can only
+// fail (BK-25).
 func (s *Service) storeCancel(ctx context.Context, by, storeID, orderID ids.ID, b *ordersapi.StoreCancelOrderRequest) error {
 	if err := s.readyToWrite(ctx); err != nil {
 		return err
@@ -445,14 +462,15 @@ func (s *Service) storeCancel(ctx context.Context, by, storeID, orderID ids.ID, 
 		if err != nil {
 			return err
 		}
-		if !handable(o.Status) || pastHold(o, now) {
+		if !cancellable(o, now) {
 			return invalidTransition()
 		}
 		return s.end(ctx, o, StatusCancelled, reason, note, staff(by), generic, now)
 	}))
 }
 
-// verify is the counter hand-over (B-04): the right code collects the
+// verify is the counter hand-over (B-04), or the doorstep one for a
+// delivery out for delivery (BK-24): the right code collects (delivers) the
 // order, sells each held line (sale_online) and records the payment method.
 // A wrong code counts, and the fifth locks the code; the count is committed
 // even though the answer is an error.
@@ -479,7 +497,9 @@ func (s *Service) verify(ctx context.Context, by, storeID, orderID ids.ID, b *or
 		if err != nil {
 			return err
 		}
-		if !handable(o.Status) || o.Fulfilment != Pickup || pastHold(o, now) {
+		pickup := o.Fulfilment == Pickup && handable(o.Status) && !pastHold(o, now)
+		delivery := o.Fulfilment == Delivery && o.Status == StatusOutForDelivery
+		if !pickup && !delivery {
 			return invalidTransition()
 		}
 		if o.CodeLockedAt != nil {
@@ -517,7 +537,8 @@ func (s *Service) verify(ctx context.Context, by, storeID, orderID ids.ID, b *or
 
 // collect hands a locked order over: each held line is sold through the
 // stock writer (stores row, then the item; in store_item_id order) and its
-// reservation marked consumed, then the order is collected.
+// reservation marked consumed, then the order is collected, or delivered
+// for a delivery order.
 func (s *Service) collect(ctx context.Context, o ordersdb.Order, by ids.ID, method string, now time.Time) error {
 	q := s.q(ctx)
 	t, err := tx(ctx)
@@ -547,9 +568,16 @@ func (s *Service) collect(ctx context.Context, o ordersdb.Order, by ids.ID, meth
 	if err != nil {
 		return fmt.Errorf("orders: settle credits: %w", err)
 	}
-	v, err := q.SetCollected(ctx, ordersdb.SetCollectedParams{Now: &now, PaymentMethod: &method, CashbackCredits: i32(cashback), ID: o.ID})
+	to, t2 := StatusCollected, silent
+	var v int32
+	if o.Fulfilment == Delivery {
+		to, t2 = StatusDelivered, variant("delivered")
+		v, err = q.SetDelivered(ctx, ordersdb.SetDeliveredParams{Now: &now, PaymentMethod: &method, CashbackCredits: i32(cashback), ID: o.ID})
+	} else {
+		v, err = q.SetCollected(ctx, ordersdb.SetCollectedParams{Now: &now, PaymentMethod: &method, CashbackCredits: i32(cashback), ID: o.ID})
+	}
 	if err != nil {
-		return fmt.Errorf("orders: collect: %w", err)
+		return fmt.Errorf("orders: %s: %w", to, err)
 	}
 	if err := s.referrals.OnOrderCompleted(ctx, CompletedOrder{
 		OrderID: mustID(o.ID), CustomerID: mustID(o.CustomerID), StoreID: mustID(o.StoreID),
@@ -557,13 +585,24 @@ func (s *Service) collect(ctx context.Context, o ordersdb.Order, by ids.ID, meth
 	}); err != nil {
 		return fmt.Errorf("orders: referrals: %w", err)
 	}
-	return s.record(ctx, o, StatusCollected, v, staff(by), nil, silent, now)
+	return s.record(ctx, o, to, v, staff(by), nil, t2, now)
+}
+
+// cancellable: a held order the customer or a manager may still cancel: a
+// pickup order before its hold ends, a delivery order accepted and not
+// past dispatch_by. Never once out for delivery.
+func cancellable(o ordersdb.Order, now time.Time) bool {
+	if o.Fulfilment == Delivery {
+		return o.Status == StatusAccepted && o.DispatchBy != nil && !pastDispatch(o, now)
+	}
+	return handable(o.Status) && !pastHold(o, now)
 }
 
 // --- customer -------------------------------------------------------------------
 
 // customerCancel is the customer's cancel (C-13): before the shop's
-// deadline while placed, or before the hold ends once accepted. Stock goes
+// deadline while placed, or before the hold ends once accepted (a delivery
+// order: before dispatch_by, never once out for delivery). Stock goes
 // back.
 func (s *Service) customerCancel(ctx context.Context, userID, orderID ids.ID, b *ordersapi.CancelOrderRequest) error {
 	if err := s.readyToWrite(ctx); err != nil {
@@ -590,7 +629,7 @@ func (s *Service) customerCancel(ctx context.Context, userID, orderID ids.ID, b 
 		switch {
 		case o.Status == StatusPlaced && !pastAcceptBy(o, now):
 		case o.Status == StatusAwaitingCustomer && !pastPartial(o, now):
-		case handable(o.Status) && !pastHold(o, now):
+		case cancellable(o, now):
 		default:
 			return invalidTransition()
 		}
@@ -645,7 +684,8 @@ func (s *Service) newCode(ctx context.Context, userID, orderID ids.ID) error {
 		if err != nil {
 			return err
 		}
-		if !handable(o.Status) || o.CodeLockedAt == nil || pastHold(o, now) {
+		live := cancellable(o, now) || (o.Fulfilment == Delivery && o.Status == StatusOutForDelivery)
+		if !live || o.CodeLockedAt == nil {
 			return invalidTransition()
 		}
 		var v int32

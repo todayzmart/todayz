@@ -4,14 +4,14 @@ import { Button, orderStatusTone, StatusPill, VisuallyHidden } from '@todayz/ui'
 import { Link } from '@tanstack/react-router';
 import { Clock } from 'lucide-react';
 import { useState } from 'react';
-import { useIntl } from 'react-intl';
+import { useIntl, type IntlShape } from 'react-intl';
 import { mmss } from '../overview/format';
 import { Icon } from '../shell/Icon';
 import { acknowledgeOrder } from './alerts';
 import { ActionError } from './ActionError';
 import { AcceptPartSheet } from './AcceptPartSheet';
-import { canAcceptPart, clock, isShort, lineName, reasonLabel, statusLabel } from './labels';
-import { acceptCall, acceptPartCall, rejectCall, useOrder, useOrderAction, useSecondsLeft } from './queries';
+import { canAcceptPart, clock, isShort, lineName, reasonLabel, since, statusLabel } from './labels';
+import { acceptCall, acceptPartCall, rejectCall, useNow, useOrder, useOrderAction, useSecondsLeft } from './queries';
 import { ReasonSheet } from './ReasonSheet';
 import type { CurrentStore } from './store';
 import styles from './orders.module.css';
@@ -162,9 +162,24 @@ export function NewOrderCard({ store, order, offsetMs }: { store: CurrentStore; 
   );
 }
 
-/** A row on the Accepted, Ready, Done and Missed tabs. */
+/** The row's time: the hold or dispatch deadline while open, the time since a failed delivery
+ * while its return waits, the return's outcome once settled, else when it was placed. */
+function rowTime(intl: IntlShape, order: StoreOrderSummary, now: number): string {
+  const open = order.status === 'accepted' || order.status === 'ready';
+  if (open && order.fulfilment === 'delivery' && order.dispatchBy)
+    return intl.formatMessage({ id: 'orders.card.dispatchBy' }, { time: clock(order.dispatchBy) });
+  if (open && order.holdUntil) return intl.formatMessage({ id: 'orders.card.holdLeft' }, { time: clock(order.holdUntil) });
+  if (order.status === 'delivery_failed' && order.returnOutcome)
+    return intl.formatMessage({ id: `orders.return.short.${order.returnOutcome}` });
+  if (order.status === 'delivery_failed' && order.deliveryFailedAt)
+    return intl.formatMessage({ id: 'orders.return.failedAgo' }, { time: since(intl, order.deliveryFailedAt, now) });
+  return clock(order.placedAt);
+}
+
+/** A row on every tab but New. */
 export function OrderRow({ order }: { order: StoreOrderSummary }) {
   const intl = useIntl();
+  const now = useNow();
   const name = order.customerName ?? intl.formatMessage({ id: 'orders.card.noName' });
   return (
     <article className="tz-ocard" aria-label={order.number}>
@@ -178,12 +193,14 @@ export function OrderRow({ order }: { order: StoreOrderSummary }) {
       </div>
       <div className={styles.meta}>
         <span className="tz-price">{formatMoney(order.totalPaise, 'dashboard')}</span>
-        <span className={styles.lineStock}>
-          {order.holdUntil && (order.status === 'accepted' || order.status === 'ready')
-            ? intl.formatMessage({ id: 'orders.card.holdLeft' }, { time: clock(order.holdUntil) })
-            : clock(order.placedAt)}
-        </span>
+        <span className={styles.lineStock}>{rowTime(intl, order, now)}</span>
       </div>
+      {order.customerPhone && (
+        // The full number only while out for delivery (BK-27), so the rider can call.
+        <a href={`tel:${order.customerPhone}`} className={styles.lineStock}>
+          {intl.formatMessage({ id: 'orders.detail.call' }, { phone: order.customerPhone })}
+        </a>
+      )}
       <Link
         to="/orders/$orderId"
         params={{ orderId: order.id }}

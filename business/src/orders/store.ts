@@ -20,6 +20,11 @@ export function canCancelAccepted(role: ShopRole): boolean {
   return role === 'owner' || role === 'manager';
 }
 
+/** Recording returned goods as damaged writes stock off: manager and above (D-65, D-69). */
+export function canRecordDamage(role: ShopRole): boolean {
+  return role === 'owner' || role === 'manager';
+}
+
 /**
  * The shop this device works in, and the signed-in person's role there. The role comes from the same
  * `listBusinesses` answer the shop picker uses (W1-04, W1-08), so there is no second source. The

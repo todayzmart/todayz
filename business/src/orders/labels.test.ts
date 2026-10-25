@@ -1,5 +1,22 @@
+import en from '@todayz/i18n/compiled/business/en.json';
+import { asMessages } from '@todayz/i18n';
+import { createIntl } from 'react-intl';
 import { describe, expect, it } from 'vitest';
-import { lineName } from './labels';
+import { lineName, reasonLabel } from './labels';
+
+const intl = createIntl({ locale: 'en-IN', messages: asMessages(en), onError: () => undefined });
+
+describe('reasonLabel', () => {
+  it('names the reasons the backend records for system expiries', () => {
+    expect(reasonLabel(intl, 'not_accepted')).toBe('Not accepted in time');
+    expect(reasonLabel(intl, 'no_show')).toBe('Not collected in time');
+    expect(reasonLabel(intl, 'dispatch_timeout')).not.toBe(reasonLabel(intl, 'other'));
+  });
+
+  it('falls back to "other" for a reason it does not know', () => {
+    expect(reasonLabel(intl, 'accept_timeout')).toBe(reasonLabel(intl, 'other'));
+  });
+});
 
 describe('lineName', () => {
   it('adds the pack after the name', () => {

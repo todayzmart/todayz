@@ -43,3 +43,12 @@ export function canAcceptPart(lines: readonly Pick<StoreOrderLine, 'available' |
 export function isShort(l: Pick<StoreOrderLine, 'available' | 'quantityRequested'>): boolean {
   return l.available < l.quantityRequested;
 }
+
+/** How long ago iso was, as "2 h 5 min" / "35 min" (never negative). */
+export function since(intl: IntlShape, iso: string, nowMs: number): string {
+  const mins = Math.max(0, Math.floor((nowMs - Date.parse(iso)) / 60_000));
+  const h = Math.floor(mins / 60);
+  return h > 0
+    ? intl.formatMessage({ id: 'orders.since.hours' }, { h, m: mins % 60 })
+    : intl.formatMessage({ id: 'orders.since.minutes' }, { m: mins });
+}
