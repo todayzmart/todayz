@@ -355,6 +355,31 @@ func TestAIConsumerSearchAssistFailuresLeaveSearchAlone(t *testing.T) {
 	assert.Zero(t, o.rows("ai_drafts"))
 }
 
+// D-101 through the API: search reads the refine chips with the querynorm parser (no
+// model), searches what is left and sets refineHint only when a long query had none.
+func TestAIConsumerSearchReadsRefineChips(t *testing.T) {
+	o := newConsumerShop(t, false)
+	r := o.search("amul butter open now")
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	kinds := map[string]string{}
+	chips, _ := r.body["chips"].([]any)
+	for _, c := range chips {
+		m := c.(map[string]any)
+		v, _ := m["value"].(string)
+		kinds[m["kind"].(string)] = v
+	}
+	assert.Equal(t, map[string]string{"brand": "amul", "openNow": ""}, kinds, r.raw)
+	assert.Equal(t, "butter", r.body["query"])
+	assert.Equal(t, false, r.body["refineHint"])
+
+	r = o.search("butter for the evening tea")
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	assert.Empty(t, r.body["chips"])
+	assert.Equal(t, true, r.body["refineHint"])
+	assert.Equal(t, false, o.search("butter").body["refineHint"])
+	assert.Zero(t, o.llm.count("search_assist"), "search never calls a model")
+}
+
 // --- flags and features -----------------------------------------------------------
 
 // Each helper is 404 while its flag is off; the features read says which are on.

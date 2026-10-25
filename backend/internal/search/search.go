@@ -102,6 +102,8 @@ type Deps struct {
 	// anonymous caller; search_log and the events record it. nil is
 	// always anonymous.
 	UserID func(ctx context.Context) string
+	// Chips reads refine chips from a query (D-101); nil reads none.
+	Chips ChipReader
 }
 
 // Service implements the discover routes.
@@ -114,6 +116,7 @@ type Service struct {
 	offers   OfferLookup
 	pricer   Pricer
 	userID   func(ctx context.Context) string
+	chips    ChipReader
 	events   *eventcat.Catalogue
 }
 
@@ -128,7 +131,7 @@ func New(d Deps, cat *eventcat.Catalogue) (*Service, error) {
 	}
 	s := &Service{
 		db: d.DB, settings: d.Settings, clock: d.Clock, log: d.Log,
-		open: d.Open, offers: d.Offers, pricer: d.Pricer, userID: d.UserID, events: cat,
+		open: d.Open, offers: d.Offers, pricer: d.Pricer, userID: d.UserID, chips: d.Chips, events: cat,
 	}
 	if s.open == nil {
 		s.open = OpenFunc(func([]byte, *time.Time, time.Time) bool { return false })

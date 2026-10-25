@@ -5,8 +5,7 @@
 # example per success response and the default problem response.
 #
 # W1-06. Coordinates come in as query parameters and are never stored or
-# logged. Not built yet: the refine-chip parser (`chips` is always [] and
-# `refineHint` false, D-101), clusters by zoom (the app clusters the pins), and
+# logged. The refine-chip parser is W3-12's (D-101, D-233). Not built yet: clusters by zoom (the app clusters the pins), and
 # the standee scan on the shop page (`?s=`, W2-10).
 /v1/discover/places/search:
   get:
@@ -369,8 +368,11 @@
       verified business, inside the radius, then the request''s filters), then the score with weights
       from `search_w_*`; equal scores go to the nearer store. `sort=nearest` orders by distance and `sort=cheapest`
       by the cheapest matching item. D-101: `summary` (absent when no store has it), `confirmedAt` per
-      item, at most one `badge` per store on the first page, and `deliveryFeePaise`. The refine-chip parser
-      is not built yet: `parse` is accepted, `chips` is always empty and `refineHint` false. Every search
+      item, at most one `badge` per store on the first page, and `deliveryFeePaise`. Unless `parse=false`,
+      the deterministic refine-chip parser (no model) reads price caps, open now, pickup, delivery, offers,
+      near me and brands out of `q`; each chip it applies is a filter, is listed in `chips`, and `query` is
+      what is left to search for. A chip whose filter the request sets itself is not applied. `refineHint`
+      is true when parsing was on, no chip was read and `q` has at least `refine_ai_min_words` words. Every search
       is logged to `search_log`, zero results too. Search never calls a model.'
     security: []
     parameters:
@@ -423,7 +425,7 @@
         default: relevance
     - name: parse
       in: query
-      description: Run the refine-chip parser on `q` (D-101). Accepted; the parser comes later.
+      description: Run the refine-chip parser on `q` (D-101). The app sends false after the customer removes a chip.
       schema:
         type: boolean
         default: true

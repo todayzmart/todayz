@@ -22,7 +22,6 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/todayz/backend/gen/sqlc/aiconsumerdb"
 	"github.com/todayz/backend/internal/ai/client"
 	"github.com/todayz/backend/internal/ai/guard"
 	"github.com/todayz/backend/internal/ai/querynorm"
@@ -90,15 +89,9 @@ func (s *Service) Search(ctx context.Context, customer ids.ID, rec voice.Recordi
 		return Result{}, ErrUnavailable
 	}
 	text := Clean(tr.Text)
-	var brands []querynorm.Brand
-	if text != "" {
-		rows, err := aiconsumerdb.New(s.d.DB.Q(ctx)).BrandsNamedIn(ctx, text)
-		if err != nil {
-			return Result{}, err
-		}
-		for _, r := range rows {
-			brands = append(brands, querynorm.Brand{Name: r.Name, Slug: r.Slug})
-		}
+	brands, err := querynorm.BrandsNamedIn(ctx, s.d.DB, text)
+	if err != nil {
+		return Result{}, err
 	}
 	return Read(text, tr.Language, rec.Language, brands), nil
 }

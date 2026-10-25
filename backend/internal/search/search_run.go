@@ -49,12 +49,15 @@ type searchReq struct {
 	Source    string
 	Limit     int
 	Cursor    *string
+	// Parse is false when the customer turned the refine-chip parser off (parse=false).
+	Parse bool
 }
 
 func searchReqFrom(p discoverapi.SearchDiscoverParams) searchReq {
 	r := searchReq{
 		Q: p.Q, Lat: p.Lat, Lng: p.Lng, RadiusM: defaultRadiusM,
 		Sort: sortRelevance, Source: "typed", Limit: pageLimit(p.Limit, defaultLimit), Cursor: p.Cursor,
+		Parse: p.Parse == nil || *p.Parse,
 	}
 	if p.Radius != nil {
 		r.RadiusM = int(*p.Radius)
@@ -80,7 +83,6 @@ func searchReqFrom(p discoverapi.SearchDiscoverParams) searchReq {
 	if p.Source != nil {
 		r.Source = string(*p.Source)
 	}
-	// p.Parse is accepted; the refine-chip parser is not built yet (D-101).
 	return r
 }
 
@@ -129,12 +131,14 @@ func (s *Service) Search(ctx context.Context, p discoverapi.SearchDiscoverParams
 		Query: strings.TrimSpace(req.Q), Results: []discoverapi.DiscoverSearchStore{},
 		Chips: []discoverapi.DiscoverChip{}, ServerNow: start,
 	}
-	// TODO(lead): refineHint stays false and chips empty until the D-101
-	// refine-chip parser lands (chips*.go); `parse` is accepted and ignored.
 	q, err := s.ready(ctx)
 	if err != nil {
 		return out, err
 	}
+	if out.Chips, out.RefineHint, err = s.refine(ctx, &req); err != nil {
+		return out, internal(err)
+	}
+	out.Query = strings.TrimSpace(req.Q)
 	offset, err := decodeCursor(cursorSearch, req.Cursor)
 	if err != nil {
 		return out, err
