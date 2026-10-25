@@ -47,7 +47,7 @@ func (s *Service) Statements(ctx context.Context, period string, limit *int, cur
 		return api.AdminStatementList{}, err
 	}
 	lim := pageLimit(limit)
-	p := payoutsdb.AdminStatementsParams{Period: pd, Lim: int32(lim + 1)} //nolint:gosec // lim ≤ maxLimit
+	p := payoutsdb.AdminStatementsParams{Period: pd, Lim: int32(lim + 1)} // #nosec G115 -- pageLimit clamps lim to [1, maxLimit]
 	if cursor != nil && *cursor != "" {
 		name, id, err := nameCursor(*cursor)
 		if err != nil {
@@ -130,7 +130,7 @@ func (s *Service) Payouts(ctx context.Context, period *string, status *string, l
 		return api.AdminPayoutList{}, err
 	}
 	lim := pageLimit(limit)
-	p := payoutsdb.PayoutRowsParams{Status: status, Lim: int32(lim + 1)} //nolint:gosec // lim ≤ maxLimit
+	p := payoutsdb.PayoutRowsParams{Status: status, Lim: int32(lim + 1)} // #nosec G115 -- pageLimit clamps lim to [1, maxLimit]
 	if period != nil {
 		pd, err := parsePeriod("query.period", *period)
 		if err != nil {

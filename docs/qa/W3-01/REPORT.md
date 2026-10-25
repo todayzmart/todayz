@@ -78,7 +78,8 @@ The work covers the backend in `backend/internal/payouts` and `backend/internal/
 | Business vitest | B-10 7 tests; `language.test.tsx` passes after the translation approval (see Open 1) |
 | Business tsc, eslint, stylelint | clean |
 | `@todayz/i18n` `lint:messages` | 0 errors in every app; business hi/kn/te/ta 1433/1433 reviewed |
-| `make check` | MAKE_CHECK |
+| `make check` (merged with local `main` d1bbcab) | **not green, for reasons outside W3-01.** Three runs, each stopped in check-backend's `go test -race ./...` by a load flake in another area, with load average 19–34 from other worker sessions. Run 1: `internal/admin` `TestSettingGroupCoversEveryKey` (fixed on main by 915a8fb, gone after the merge) and `internal/search` `TestSearchAtScale/latency` (p95 302 ms against the 300 ms budget). Run 2: `cmd/todayz` `TestPOSOfflineOfferMatchesEngine` ("entry 9: linked, got failed"; passes 3 of 3 alone). Run 3: `TestSearchAtScale/latency` again (p95 348 ms; passes alone). Every W3-01 package passed in all three runs. |
+| Steps after check-backend, run one by one under `scripts/no-egress.sh` | pass: gosec (after the `#nosec G115` fix), govulncheck (offline DB from the main checkout; this worktree has no `.cache/govulndb`), settings lint, check-journeys, check-contract (lint, client, hooks, Schemathesis smoke), check-mocks, check-frontend, check-i18n-messages, check-ui, check-auth, check-realtime, check-ci. check-infra's own checks are ok. **check-infra's `terraform validate` and check-tf-static fail: "not initialised; run make setup"**. The providers exist only in the main checkout, `make setup` needs the network, and this branch changes nothing under `infra/`. |
 
 ## Screenshots
 

@@ -24,7 +24,7 @@ func (s *Service) BusinessStatements(ctx context.Context, business ids.ID, store
 		return api.BusinessStatementList{}, err
 	}
 	lim := pageLimit(limit)
-	p := payoutsdb.BusinessStatementsParams{BusinessID: ids.UUID(business), Lim: int32(lim + 1)} //nolint:gosec // lim ≤ maxLimit
+	p := payoutsdb.BusinessStatementsParams{BusinessID: ids.UUID(business), Lim: int32(lim + 1)} // #nosec G115 -- pageLimit clamps lim to [1, maxLimit]
 	if cursor != nil && *cursor != "" {
 		b, err := base64.RawURLEncoding.DecodeString(*cursor)
 		if err != nil {
