@@ -199,8 +199,8 @@
     description: >-
       On the right code the owner becomes the business's owner (their account is made from the
       number if they have none) and the business is submitted for verification. A wrong code is
-      `422 code_invalid` with `attemptsLeft`; after 5 wrong codes `423 otp_locked`; a lapsed code
-      `410 otp_expired`.
+      `422 code_invalid` with `attemptsLeft`; after 5 wrong codes `429 otp_locked`; a lapsed or
+      replaced code `401 otp_expired` (the registered sign-in codes).
     x-idempotency: none
     x-problems: [code_invalid, otp_locked, otp_expired, submit_incomplete]
     requestBody:
@@ -248,6 +248,11 @@
     responses:
       "201":
         description: The photo record and where to upload it
+        headers:
+          Cache-Control:
+            description: "`no-store`: the upload URL is a credential."
+            schema:
+              type: string
         content:
           application/json:
             schema:
