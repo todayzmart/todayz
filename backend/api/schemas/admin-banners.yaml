@@ -1,9 +1,99 @@
-# Schemas: domain "admin-banners" (owner W3-02): admin banners (04 §2.7).
+# Schemas: domain "admin-banners" (owner W3-05): A-20 banner moderation (04 §2.7, D-46, D-47).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Names are unique across every schemas/<domain>.yaml. Request objects carry
+# `additionalProperties: false`. Ids are `Ulid`, times are `Timestamp`.
+AdminBannerState:
+  type: string
+  description: >-
+    `review`: uploads the automatic check did not clear, waiting for a person (oldest first).
+    `live`: cleared banners that are live, scheduled or paused. `removed`: banners taken down (newest first).
+  enum: [review, live, removed]
+AdminBannerTemplate:
+  type: object
+  additionalProperties: false
+  required: [tint]
+  properties:
+    tint:
+      type: string
+      enum: [green, amber, rose, sky, lilac, peach]
+    subline:
+      type: string
+      maxLength: 60
+    productImageKey:
+      type: string
+      maxLength: 200
+AdminBanner:
+  type: object
+  additionalProperties: false
+  required: [id, storeId, storeName, storeCity, headline, imageKey, template, targetType, targetLabel, targetItemCount, startsAt, endsAt, status, moderation, removeReason, removedAt, createdAt, updatedAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    storeId: {$ref: ./common.yaml#/Ulid}
+    storeName: {type: string, maxLength: 80}
+    storeCity:
+      type: [string, 'null']
+      maxLength: 80
+    headline: {type: string, maxLength: 40}
+    imageKey:
+      type: [string, 'null']
+      description: The uploaded picture's key in the images bucket; null for a template banner.
+      maxLength: 200
+    template:
+      oneOf:
+        - {$ref: '#/AdminBannerTemplate'}
+        - {type: 'null'}
+    targetType:
+      type: string
+      enum: [offer, items, category, store]
+    targetLabel:
+      type: [string, 'null']
+      description: The offer's title or the category's English name; null for items and the shop page.
+      maxLength: 120
+    targetItemCount:
+      type: integer
+      minimum: 0
+      maximum: 20
+    startsAt: {$ref: ./common.yaml#/Timestamp}
+    endsAt:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: 'null'}
+    status:
+      type: string
+      enum: [pending_review, live, scheduled, paused, ended, removed]
+    moderation:
+      type: string
+      description: "`auto_ok` cleared (by the automatic check or a person); `needs_review` waiting; `rejected` refused."
+      enum: [auto_ok, needs_review, rejected]
+    removeReason:
+      type: [string, 'null']
+      description: Shown to the shop as "Removed by TodayZ".
+      maxLength: 500
+    removedAt:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: 'null'}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    updatedAt: {$ref: ./common.yaml#/Timestamp}
+AdminBannerList:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: '#/AdminBanner'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminBannerApprove:
+  type: object
+  additionalProperties: false
+  properties:
+    reason: {type: string, minLength: 1, maxLength: 500}
+AdminBannerTakedown:
+  type: object
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason: {type: string, minLength: 1, maxLength: 500}

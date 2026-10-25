@@ -29,9 +29,10 @@ func mountAdmin(r chi.Router, d *deps) {
 }
 
 // mountAdminConsole mounts W3-05's admin-customers, admin-businesses,
-// admin-stores, admin-leads, admin-settings and admin-audit routes.
-// The strike reset recounts through a minimal orders service (its strike
-// rules read only the database and settings).
+// admin-stores, admin-leads, admin-catalogue, admin-banners, admin-settings
+// and admin-audit routes. The strike reset recounts through a minimal orders
+// service (its strike rules read only the database and settings); a banner
+// takedown goes through the banners service (it owns the removal).
 func mountAdminConsole(r chi.Router, d *deps) {
 	ad := admin.Deps{DB: d.DB, Clock: d.Clock, Hours: storeHours}
 	if d.Authz != nil {
@@ -74,6 +75,7 @@ func mountAdminConsole(r chi.Router, d *deps) {
 			panic("admin: " + err.Error())
 		}
 		ad.Strikes = ord
+		ad.Banners = newBanners(d)
 	}
 	svc, err := admin.New(ad)
 	if err != nil {

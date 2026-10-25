@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	auditapi "github.com/todayz/backend/gen/api/admin-audit"
+	bannersapi "github.com/todayz/backend/gen/api/admin-banners"
 	bizapi "github.com/todayz/backend/gen/api/admin-businesses"
 	catalogueapi "github.com/todayz/backend/gen/api/admin-catalogue"
 	customersapi "github.com/todayz/backend/gen/api/admin-customers"
@@ -45,8 +46,8 @@ var SettingsOps = map[string]string{
 }
 
 // Register mounts the admin-customers, admin-businesses, admin-stores,
-// admin-leads, admin-catalogue, admin-settings and admin-audit routes behind
-// slot 15.
+// admin-leads, admin-catalogue, admin-banners, admin-settings and admin-audit
+// routes behind slot 15.
 func Register(r chi.Router, s *Service, az authz.Authorizer) {
 	customersapi.Register(r, customerHandlers{s},
 		customersapi.StrictMiddlewareFunc(authz.Strict[customersapi.StrictHandlerFunc](az, CustomerOps)))
@@ -58,6 +59,8 @@ func Register(r chi.Router, s *Service, az authz.Authorizer) {
 		leadsapi.StrictMiddlewareFunc(authz.Strict[leadsapi.StrictHandlerFunc](az, LeadOps)))
 	catalogueapi.Register(r.With(bodyKeys), catalogueHandlers{s},
 		catalogueapi.StrictMiddlewareFunc(authz.Strict[catalogueapi.StrictHandlerFunc](az, CatalogueOps)))
+	bannersapi.Register(r, bannerHandlers{s},
+		bannersapi.StrictMiddlewareFunc(authz.Strict[bannersapi.StrictHandlerFunc](az, BannerOps)))
 	settingsapi.Register(r, settingHandlers{s},
 		settingsapi.StrictMiddlewareFunc(authz.Strict[settingsapi.StrictHandlerFunc](az, SettingsOps)))
 	auditapi.Register(r, auditHandlers{s},

@@ -65,6 +65,8 @@ type Deps struct {
 	// Hours checks and normalises store hours for an A-05 edit
 	// (internal/business owns the rules). Without it an hours edit answers 503.
 	Hours HoursNormaliser
+	// Banners is internal/banners' takedown (A-20). Without it a takedown answers 503.
+	Banners BannerRemover
 }
 
 // HoursNormaliser validates store hours given in the stored JSON shape and
@@ -88,6 +90,7 @@ type Service struct {
 	strikes   StrikeRecounter
 	providers []ProviderKey
 	hours     HoursNormaliser
+	banners   BannerRemover
 }
 
 // New builds the service.
@@ -95,7 +98,7 @@ func New(d Deps) (*Service, error) {
 	if d.Clock == nil {
 		return nil, errors.New("admin: a clock is required")
 	}
-	return &Service{db: d.DB, clock: d.Clock, audit: d.Audit, az: d.Authz, seal: d.Seal, hash: d.Hash, strikes: d.Strikes, providers: d.Providers, hours: d.Hours}, nil
+	return &Service{db: d.DB, clock: d.Clock, audit: d.Audit, az: d.Authz, seal: d.Seal, hash: d.Hash, strikes: d.Strikes, providers: d.Providers, hours: d.Hours, banners: d.Banners}, nil
 }
 
 func (s *Service) ready(ctx context.Context) error {

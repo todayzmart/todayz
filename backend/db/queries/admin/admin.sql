@@ -462,3 +462,47 @@ VALUES (@id, @term, @synonym, @lang, sqlc.narg(product_id), @now);
 -- name: DeleteSynonym :one
 DELETE FROM product_synonyms WHERE id = @id
 RETURNING term, synonym, lang, product_id;
+
+-- A-20 banner moderation (W3-05). The takedown goes through the banners
+-- service (it owns the removal and the shop's event); the approve is here.
+
+-- name: ListAdminBanners :many
+-- review: waiting uploads, oldest first. live: cleared live, scheduled or paused,
+-- newest first. removed: taken down, newest first. Keyset on (created_at, id).
+SELECT sb.id, sb.store_id, s.name AS store_name, s.city AS store_city, sb.headline, sb.image_key, sb.template,
+  sb.target_type, cardinality(sb.target_item_ids)::int AS target_item_count,
+  COALESCE(CASE sb.target_type WHEN 'offer' THEN o.title WHEN 'category' THEN (c.names ->> 'en') END, '')::text AS target_label,
+  sb.starts_at, sb.ends_at, sb.status, sb.moderation, sb.remove_reason, sb.removed_at, sb.created_at, sb.updated_at
+FROM store_banners sb JOIN stores s ON s.id = sb.store_id
+LEFT JOIN offers o ON sb.target_type = 'offer' AND o.id = sb.target_id
+LEFT JOIN categories c ON sb.target_type = 'category' AND c.id = sb.target_id
+WHERE CASE @state::text
+    WHEN 'review' THEN sb.status = 'pending_review' AND sb.moderation = 'needs_review'
+    WHEN 'live' THEN sb.status IN ('live', 'scheduled', 'paused') AND sb.moderation = 'auto_ok'
+    ELSE sb.status = 'removed' END
+  AND (sqlc.narg(store_id)::uuid IS NULL OR sb.store_id = sqlc.narg(store_id)::uuid)
+  AND (sqlc.narg(after_at)::timestamptz IS NULL
+       OR (@state::text = 'review' AND (sb.created_at, sb.id) > (sqlc.narg(after_at)::timestamptz, sqlc.narg(after_id)::uuid))
+       OR (@state::text <> 'review' AND (sb.created_at, sb.id) < (sqlc.narg(after_at)::timestamptz, sqlc.narg(after_id)::uuid)))
+ORDER BY CASE WHEN @state::text = 'review' THEN sb.created_at END,
+  CASE WHEN @state::text = 'review' THEN sb.id END,
+  sb.created_at DESC, sb.id DESC
+LIMIT @lim;
+
+-- name: GetAdminBanner :one
+SELECT sb.id, sb.store_id, s.name AS store_name, s.city AS store_city, sb.headline, sb.image_key, sb.template,
+  sb.target_type, cardinality(sb.target_item_ids)::int AS target_item_count,
+  COALESCE(CASE sb.target_type WHEN 'offer' THEN o.title WHEN 'category' THEN (c.names ->> 'en') END, '')::text AS target_label,
+  sb.starts_at, sb.ends_at, sb.status, sb.moderation, sb.remove_reason, sb.removed_at, sb.created_at, sb.updated_at
+FROM store_banners sb JOIN stores s ON s.id = sb.store_id
+LEFT JOIN offers o ON sb.target_type = 'offer' AND o.id = sb.target_id
+LEFT JOIN categories c ON sb.target_type = 'category' AND c.id = sb.target_id
+WHERE sb.id = @id;
+
+-- name: LockBanner :one
+SELECT id, status, moderation, starts_at, ends_at FROM store_banners WHERE id = @id FOR UPDATE;
+
+-- name: ClearBanner :execrows
+-- A person cleared a held upload: it shows from now on, like an automatic pass.
+UPDATE store_banners SET moderation = 'auto_ok', status = @status, version = version + 1, updated_at = @now
+WHERE id = @id AND status = 'pending_review' AND moderation = 'needs_review';
