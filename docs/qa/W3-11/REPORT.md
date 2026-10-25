@@ -1,6 +1,6 @@
 # W3-11 Retailer AI and shop coach: QA report
 
-Branch `claude/w3-11-coach-1a5eea`, 26 Oct 2026. There are 32 commits from `fbe6a53` (`git log main..HEAD`), with current `main` merged in at `17bef82`; the last is this report's update. Nothing has been pushed or merged.
+Branch `claude/w3-11-coach-1a5eea`, 26 Oct 2026. There are 34 commits from `fbe6a53` (`git log main..HEAD`), with current `main` merged in at `17bef82` and again at `6a2c248`; the last is this report's update. Nothing has been pushed or merged.
 
 - **Work package:** W3-11, scenarios SC-AI-10…42 (`e2e/scenarios/AI.md`).
 - **Features:** AI-R2 supplier bill scan, AI-R3 shelf photo onboarding, AI-R4 insight sentences, AI-R5 review reply draft, AI-R6 shop coach wording, AI-R9 banner copy and AI-R10 banner image check, plus the coach (11 §2.1).
@@ -14,14 +14,14 @@ Every AI output is a draft that a person confirms. A bill, shelf photo, reply or
 |---|---|---|
 | Background wording took the owner's calls | Its own budget `ai_daily_calls_store_background` (migration 31102) and a negative cache `ai_text_misses`; a spent budget shows the template, never a 429 (D-228). Answers Q15 | `f54deed` |
 | A resolved coach card counted as ignored | A card closed because its subject resolved is neutral and does not lower the shop's weight | `b73f1a5` |
-| One bad line refused the whole confirm | Confirm is per line in the same transaction and row lock: a refused line is `not_permitted` with `not_permitted` or an `invalid_*` reason, the good lines are applied, every line's outcome is returned, and the draft stays `ready` while any line is open (D-229) | `25da53a`, `982b811` |
+| One bad line refused the whole confirm | Confirm is per line in the same transaction and row lock: a refused line is `not_permitted` with `not_permitted` or an `invalid_*` reason, the good lines are applied, every line's outcome is returned, and the draft stays `ready` while any line is open (D-230) | `25da53a`, `982b811` |
 | B-17 and B-18 showed one error for the whole confirm | Settled lines are locked ("Added", "Left out"); each refused line shows its reason, can be edited, and the next confirm sends only the open lines | `b40863c` |
 | A tied match was guessed | A bill line whose best match ties stays unmatched | `25da53a` |
 | Photos trusted `Content-Type`; scans uncapped | The bytes must be JPEG, PNG or WebP (`retail.Sniff`); at most 2 bill and shelf scans processing per store, a third is 429 `rate_limited` with `Retry-After: 90` | `25da53a` |
 | AI creates were not keyed | The four draft creates are `x-idempotency: required`; the app sends one `Idempotency-Key` per photo, review or request and says "busy" on 429 | `25da53a`, `b40863c` |
-| Grounding ignored units | `schema.UngroundedFacts` matches % to percent facts and ₹ to money facts; index and id fields ground nothing (D-229) | `8ffae21` |
+| Grounding ignored units | `schema.UngroundedFacts` matches % to percent facts and ₹ to money facts; index and id fields ground nothing (D-230) | `8ffae21` |
 | Missing tests | Route tests (per line, double confirm, cashier, flag off, other store, injection) and coach done and dismiss on another store's card (404, nothing changes, `TestActOtherStore`) | `982b811`, `86009e0` |
-| Drafts left `processing` at shutdown | No change: the existing `StaleAfter` rule (3 min) closes such a draft as failed (timeout) when it is next read, and the in-flight cap counts only drafts made within `StaleAfter`, so a stuck one never holds a slot (noted in D-229) | — |
+| Drafts left `processing` at shutdown | No change: the existing `StaleAfter` rule (3 min) closes such a draft as failed (timeout) when it is next read, and the in-flight cap counts only drafts made within `StaleAfter`, so a stuck one never holds a slot (noted in D-230) | — |
 
 ## What was built
 
@@ -55,10 +55,10 @@ Every AI output is a draft that a person confirms. A bill, shelf photo, reply or
   | Banner copy | `banners.manage` |
   | Insight text | `insights.view` |
 - **Bill scan.** It matches each line to the store's items; a tie stays unmatched. The confirm is per line: an unmatched accepted line, a cost above MRP or a past expiry is refused with its reason and the other lines go in. Stock goes in through `catalogue/ai_seam.go`.
-- **Photos.** Checked by their first bytes, at most 2 scans in flight per store (D-229).
+- **Photos.** Checked by their first bytes, at most 2 scans in flight per store (D-230).
 - **Shelf photo.** It matches products in the catalogue and adds only the ticked ones at MRP or the edited price, per line like the bill scan.
 - **Reply draft.** It posts only on confirm, through `reviews/ai_seam.go`.
-- **Banner copy.** It drops any option with a price or % the facts do not hold (unit-aware, D-229). The confirm returns the copy and writes no banner.
+- **Banner copy.** It drops any option with a price or % the facts do not hold (unit-aware, D-230). The confirm returns the copy and writes no banner.
 - **Insight text.** It writes `text` on `GET {S}/insights` rows (`insights/service.go`, `list.go`). An ungrounded sentence falls back to its template.
 - **Image check.** It returns ok, reject or unsure with reasons. It is not wired into the upload yet (see Questions).
 - **Recorded evals for every feature (`*eval/`).** They are registered for `todayz ai eval` and run in `go test` under no-egress. The fixtures are synthetic: generated images and replies, not real shop bills (see "Not verified").
@@ -184,6 +184,6 @@ Run: `scripts/no-egress.sh make gen check-contract`, `go test -race ./internal/a
 
 **Lead review (26 Oct)**
 
-24. **Scans in flight.** `retail.MaxScansInFlight` is a fixed 2 (`TODO(lead)`). Should it be a `platform_settings` key?
-25. **Count fields in grounding.** A count fact is plain: it grounds "Buy 2 get 1" but never "2%" or "₹2" (D-229). Is that the reading you want?
-26. **Shelf `not_permitted`.** A shelf line is refused for permission when the create needs `item.price.edit` and the confirmer lacks it. No seeded role has `item.manage` without `item.price.edit`, so the app cannot reach it today; `TestShelfRefusal` checks the mapping and the UI test uses a fake.
+24. **Scans in flight.** Answered (D-230): `retail.MaxScansInFlight` stays a constant of 2, since 01 does not mark it configurable.
+25. **Count fields in grounding.** Answered (D-230): a count may ground "Buy 2 get 1", never a % or a ₹ amount.
+26. **Shelf `not_permitted`.** Answered: fine as tested. A shelf line is refused for permission when the create needs `item.price.edit` and the confirmer lacks it; no seeded role has `item.manage` without `item.price.edit`, so `TestShelfRefusal` checks the mapping and the UI test uses a fake.

@@ -103,7 +103,7 @@ func Rewrite(ctx context.Context, llm client.LLM, model, ref string, in Input) (
 		return Output{}, resp, client.RejectSchema, nil //nolint:nilerr // the card keeps its template
 	}
 	out.Title, out.Body = strings.TrimSpace(out.Title), strings.TrimSpace(out.Body)
-	// Every number in the card must be one of the fact's, in its unit (11 §1 rule 6, D-229).
+	// Every number in the card must be one of the fact's, in its unit (11 §1 rule 6, D-230).
 	if len(schema.UngroundedFacts(out.Title+"\n"+out.Body, in.Numbers)) > 0 {
 		client.RecordRejected(ctx, Feature, client.RejectGrounding)
 		return Output{}, resp, client.RejectGrounding, nil

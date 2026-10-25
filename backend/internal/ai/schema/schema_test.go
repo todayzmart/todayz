@@ -38,7 +38,7 @@ func TestUngrounded(t *testing.T) {
 	}
 }
 
-// D-229: a percent needs a percent fact, an amount a money fact, and an
+// D-230: a percent needs a percent fact, an amount a money fact, and an
 // item's place in the list grounds nothing.
 func TestUngroundedFacts(t *testing.T) {
 	banner := `{"shop":"Om Sai","offer":{"kind":"percent","percentOff":10,"endsOn":"25 Oct"},` +

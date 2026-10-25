@@ -247,7 +247,7 @@ func fromPaise(key, c string) string {
 	return out
 }
 
-// UngroundedFacts is Ungrounded with units (rule 5, D-229). facts is the JSON the model was
+// UngroundedFacts is Ungrounded with units (rule 5, D-230). facts is the JSON the model was
 // given: a number under a percent key (pct, …Pct, percentOff) grounds only a percent, one
 // under a money key (…Paise as rupees, …Rupees, price, mrp, cost, sales, amount) only an
 // amount, and an index or id (n, …Id) nothing, so banner copy cannot turn item 2 into "2%

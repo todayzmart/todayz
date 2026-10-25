@@ -49,7 +49,7 @@ const (
 	StaleAfter = 3 * time.Minute
 	// MaxScansInFlight bounds a store's photo scans processing at once (bill and shelf
 	// together); a third start is 429 until one finishes or goes stale.
-	// TODO(lead): a fixed number for now; move to platform_settings if shops need more.
+	// A constant, not a setting: 01 does not mark it configurable (D-230).
 	MaxScansInFlight = 2
 )
 

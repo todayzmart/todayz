@@ -82,7 +82,7 @@ type Input struct {
 // Readable is a row's facts as the model reads them (and as grounding checks
 // them): keys naming ids are left out, a *Paise number becomes rupees
 // ("valueAtCostPaise": 18240 → "valueAtCostRupees": "182.40", so grounding
-// still reads it as money, D-229), and the action payload's numbers join
+// still reads it as money, D-230), and the action payload's numbers join
 // under "action".
 func Readable(r facts.Row) map[string]any {
 	out := readable(r.Facts)
