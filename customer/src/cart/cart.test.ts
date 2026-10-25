@@ -139,6 +139,20 @@ describe('cart', () => {
     expect(dropped.map((l) => l.qty)).toEqual([3, 1, 1]);
   });
 
+  it('adding a line with another reply replaces the old ask fields, and a plain add keeps them', () => {
+    addToCart(shopA, { ...atta, askReplyId: 'R1', askQty: 3, askPriced: true });
+    addToCart(shopA, atta);
+    expect(getCart().lines[0]).toMatchObject({ qty: 2, askReplyId: 'R1', askQty: 3, askPriced: true });
+
+    addToCart(shopA, { ...atta, askReplyId: 'R2', askQty: 5 });
+    const [line] = getCart().lines;
+    expect(line).toMatchObject({ qty: 3, askReplyId: 'R2', askQty: 5 });
+    expect(line).not.toHaveProperty('askPriced');
+
+    addToCart(shopA, { ...atta, askReplyId: 'R3', askQty: 9, askPriced: true });
+    expect(getCart().lines[0]).toMatchObject({ qty: 4, askReplyId: 'R3', askQty: 9, askPriced: true });
+  });
+
   it('ignores damaged records and works without IndexedDB', async () => {
     await attachCartStorage(memoryStorage({ store: shopA, lines: [{ storeItemId: 'x', qty: 'many' }] } as unknown as CartState));
     expect(getCart().lines).toHaveLength(0);

@@ -85,8 +85,10 @@ export async function renderShare(
     headers[PREVIEW_KEY_HEADER] = forward.key;
   }
   try {
-    const r = await fetcher(`${apiBase}/v1/public/share-cards/${code}`, { headers });
-    if (!r.ok) return null;
+    // `manual`: a redirect is never followed, so the key never reaches another host; any non-2xx
+    // (a 3xx, or a browser's opaque redirect) is no preview.
+    const r = await fetcher(`${apiBase}/v1/public/share-cards/${code}`, { headers, redirect: 'manual' });
+    if (r.type === 'opaqueredirect' || !r.ok) return null;
     const p = (await r.json()) as SharePreviewLike;
     if (!p.storeSlug || !p.storeItemId) return null;
     return new Response(shareHtml(p, origin, code), {

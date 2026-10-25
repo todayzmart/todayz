@@ -58,7 +58,7 @@ OTP (D-15): an OTP is never logged in any environment. In `local` and `test`, th
 | `PII_HASH_KEY` | HMAC for PII lookups |
 | `DEVICE_SECRET_ENC_KEY` | Counter-code device secrets |
 | `TOTP_ENC_KEY` | Admin TOTP secrets |
-| `SHARE_PREVIEW_KEY` | Shared with the customer Pages Function: a share-link preview read forwards the visitor's IP with it, so the API rate-limits and counts opens per visitor, not per Cloudflare IP (W3-16). Optional: without it the API never trusts the forwarded IP. Also set on the Pages project |
+| `SHARE_PREVIEW_KEY` | Shared with the customer Pages Function: a share-link preview read forwards the visitor's IP with it, so the API rate-limits and counts opens per visitor, not per Cloudflare IP (W3-16). `make setup` generates it locally and `make env-check` lists it with the other app keys. The API starts without it (it is not in `config.AppKeyNames`); previews are then counted by Cloudflare IP. Prod needs the same value set on both the Pages project and the API |
 
 - `make setup` generates any missing key into `.env.local` and prints only `generated: NAME`, never the value.
 - In staging and prod these keys live in Secrets Manager.

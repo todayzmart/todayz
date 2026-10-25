@@ -141,11 +141,28 @@ export function getCart(): CartState {
   return state;
 }
 
+/**
+ * Adding to a line already in the cart: a line that brings a reply replaces all of the old line's ask fields
+ * (an `askPriced` the new reply lacks is cleared); a plain add keeps the old line's reply.
+ */
+function mergeLine(l: CartLine, line: Omit<CartLine, 'qty'>, qty: number): CartLine {
+  if (line.askReplyId === undefined) return { ...l, ...line, qty: l.qty + qty };
+  const { askReplyId, askQty, askPriced, ...rest } = line;
+  return {
+    ...plainLine(l),
+    ...rest,
+    askReplyId,
+    ...(askQty !== undefined ? { askQty } : {}),
+    ...(askPriced ? { askPriced } : {}),
+    qty: l.qty + qty,
+  };
+}
+
 export function addToCart(store: CartStore, line: Omit<CartLine, 'qty'>, qty = 1): AddResult {
   if (state.store && state.store.id !== store.id) return { ok: false, reason: 'other_store', current: state.store };
   const existing = state.lines.find((l) => l.storeItemId === line.storeItemId);
   const lines = existing
-    ? state.lines.map((l) => (l === existing ? { ...l, ...line, qty: l.qty + qty } : l))
+    ? state.lines.map((l) => (l === existing ? mergeLine(l, line, qty) : l))
     : [...state.lines, { ...line, qty }];
   set({ store, lines });
   return { ok: true };

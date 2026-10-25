@@ -313,6 +313,19 @@ describe('Share link /x/{code}', () => {
     expect(shareHtml({ ...preview, itemName: '<b>"x"</b>' }, 'https://app.todayz.in', CODE)).not.toContain('<b>');
   });
 
+  it('the Pages Function never follows a redirect, so the key stays with the API, and a 3xx is no preview', async () => {
+    const inits: (RequestInit | undefined)[] = [];
+    const moved = ((_: RequestInfo | URL, init?: RequestInit) => {
+      inits.push(init);
+      return Promise.resolve(new Response(null, { status: 302, headers: { location: 'https://elsewhere.example/x' } }));
+    }) as typeof fetch;
+    const forward = { ip: '203.0.113.9', key: 'k3y=' };
+    expect(await renderShare(CODE, 'https://app.todayz.in', 'https://api.todayz.in', moved, forward)).toBeNull();
+    expect(inits[0]?.redirect).toBe('manual');
+    const opaque = (() => Promise.resolve({ type: 'opaqueredirect', ok: false, status: 0 } as Response)) as typeof fetch;
+    expect(await renderShare(CODE, 'https://app.todayz.in', 'https://api.todayz.in', opaque, forward)).toBeNull();
+  });
+
   it('the Pages Function without API_URL logs and answers a plain 302 to the app, which it then lets through', async () => {
     const app = new Response('app');
     const next = vi.fn(() => Promise.resolve(app));

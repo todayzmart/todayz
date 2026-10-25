@@ -95,8 +95,10 @@ type AppKeys struct {
 	TOTPEncKey         Secret
 	// SharePreviewKey is SHARE_PREVIEW_KEY, the secret the customer Pages
 	// Function sends with a link preview read so the API counts the visitor's
-	// IP, not Cloudflare's (W3-16). Optional: without it the forwarded IP is
-	// never trusted. make setup generates it like the D-18 keys.
+	// IP, not Cloudflare's (W3-16). make setup generates it locally like the
+	// D-18 keys, but it is not in AppKeyNames: the API starts without it and
+	// then never trusts the forwarded IP (previews count by Cloudflare IP).
+	// Prod sets the same value on the Pages project and the API.
 	SharePreviewKey Secret
 }
 
