@@ -133,5 +133,10 @@
     "message": "{count, plural, one {# பொருள் நாளைக்குள் தீர்ந்துவிடும்} other {# பொருட்கள் நாளைக்குள் தீர்ந்துவிடும்}}",
     "review": "reviewed",
     "enHash": "a905b14b"
+  },
+  "shell.nav.help": {
+    "message": "உதவி",
+    "review": "reviewed",
+    "enHash": "c47ae153"
   }
 }

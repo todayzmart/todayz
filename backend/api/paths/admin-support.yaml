@@ -1,12 +1,355 @@
-# Paths: domain "admin-support" (owner W3-06): admin support (04 §2.7).
+# Paths: domain "admin-support" (owner W3-08): the support ticket inbox (01 §13, 04 §2.7, 06 A-14, D-226).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-support]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-support.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# `support`, `admin` and `super_admin` (action admin.support.tickets, internal/platform/authz/policy/support.go)
+# list tickets, read one with its notes, assign, reply, add an internal note, resolve or close, and upload an
+# attachment. Assign, resolve and close are audited. The SLA due time comes from the support_sla_*_min settings.
+/v1/admin/tickets:
+  get:
+    operationId: listAdminTickets
+    tags: [admin-support]
+    summary: The ticket inbox
+    description: >-
+      `status` defaults to `open`. Open tickets come by due time, soonest (and overdue) first; the other
+      statuses by latest message, newest first. `assignee` is `me` or `unassigned`; `opener` narrows to
+      customer or business tickets. `counts` gives each status under the same assignee and opener filters.
+    parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: ../schemas/admin-support.yaml#/TicketStatus
+      - name: assignee
+        in: query
+        schema:
+          type: string
+          enum: [me, unassigned]
+      - name: opener
+        in: query
+        schema:
+          $ref: ../schemas/admin-support.yaml#/TicketOpenerType
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Tickets
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-support.yaml#/TicketList
+            example:
+              items:
+                - &summary
+                  id: 01JB0SKT1A2B3C4D5E6F7G8H9J
+                  number: SUP-001042
+                  subject: Payout for September not received
+                  category: payouts
+                  status: open
+                  priority: normal
+                  openerType: business
+                  opener: {id: 01JB0SWN1A2B3C4D5E6F7G8H9J, name: Ravi Sharma}
+                  businessId: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+                  businessName: Annapurna Kirana
+                  storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  storeName: Annapurna Kirana, Koramangala
+                  orderId: null
+                  orderNumber: null
+                  assignee: null
+                  slaDueAt: "2026-10-25T09:30:00Z"
+                  overdue: false
+                  lastMessageAt: "2026-10-24T09:30:00Z"
+                  createdAt: "2026-10-24T09:30:00Z"
+              counts: {open: 4, waiting: 2, resolved: 9, closed: 3, overdue: 1}
+              nextCursor: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/tickets/{ticketId}:
+  parameters:
+    - name: ticketId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getAdminTicket
+    tags: [admin-support]
+    summary: One ticket with its thread, notes included
+    description: >-
+      Messages oldest first, internal notes included, each attachment with a presigned GET valid for
+      15 minutes. `agents` lists who it can be assigned to. `assistEnabled` is `ai_triage_enabled`.
+    responses:
+      "200":
+        description: The ticket
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-support.yaml#/TicketDetail
+            example: &detail
+              ticket:
+                id: 01JB0SKT1A2B3C4D5E6F7G8H9J
+                number: SUP-001042
+                subject: Payout for September not received
+                category: payouts
+                status: open
+                priority: normal
+                openerType: business
+                opener: {id: 01JB0SWN1A2B3C4D5E6F7G8H9J, name: Ravi Sharma}
+                businessId: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+                businessName: Annapurna Kirana
+                storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                storeName: Annapurna Kirana, Koramangala
+                orderId: null
+                orderNumber: null
+                assignee: null
+                slaDueAt: "2026-10-25T09:30:00Z"
+                overdue: false
+                lastMessageAt: "2026-10-24T09:30:00Z"
+                createdAt: "2026-10-24T09:30:00Z"
+              order: null
+              firstResponseAt: null
+              resolvedAt: null
+              closedAt: null
+              closeReason: null
+              messages:
+                - id: 01JB0SMS1A2B3C4D5E6F7G8H9J
+                  kind: reply
+                  authorType: business
+                  author: {id: 01JB0SWN1A2B3C4D5E6F7G8H9J, name: Ravi Sharma}
+                  body: The September statement says paid but nothing reached my bank.
+                  createdAt: "2026-10-24T09:30:00Z"
+                  attachments:
+                    - id: 01JB0SAT1A2B3C4D5E6F7G8H9J
+                      fileName: bank-statement.pdf
+                      contentType: application/pdf
+                      sizeBytes: 182113
+                      url: https://s3.todayz.localhost/private/support/01JB0SAT1A2B3C4D5E6F7G8H9J?X-Amz-Algorithm=AWS4-HMAC-SHA256
+              agents:
+                - {id: 01JB0SAG1A2B3C4D5E6F7G8H9J, name: Priya (support)}
+              assistEnabled: false
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/tickets/{ticketId}/assign:
+  parameters:
+    - name: ticketId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: assignAdminTicket
+    tags: [admin-support]
+    summary: Assign or unassign a ticket (audited)
+    description: >-
+      `assigneeId` is an active support, admin or super_admin user (`422 validation_failed` otherwise); null
+      unassigns. A closed ticket is `409 invalid_transition`. Audited.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-support.yaml#/TicketAssignRequest
+          example:
+            assigneeId: 01JB0SAG1A2B3C4D5E6F7G8H9J
+    responses:
+      "200":
+        description: The ticket after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-support.yaml#/TicketDetail
+            example: *detail
+      default: *problem
+/v1/admin/tickets/{ticketId}/priority:
+  parameters:
+    - name: ticketId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: setAdminTicketPriority
+    tags: [admin-support]
+    summary: Change a ticket's priority (audited)
+    description: >-
+      On an open ticket the due time becomes the time its SLA timer started plus the new priority's
+      `support_sla_*_min`, read now (D-226); it may already be past. A waiting or resolved ticket keeps no
+      timer. A closed ticket is `409 invalid_transition`. The same priority changes nothing. Audited.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-support.yaml#/TicketPriorityRequest
+          example:
+            priority: urgent
+    responses:
+      "200":
+        description: The ticket after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-support.yaml#/TicketDetail
+            example: *detail
+      default: *problem
+/v1/admin/tickets/{ticketId}/reply:
+  parameters:
+    - name: ticketId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: replyAdminTicket
+    tags: [admin-support]
+    summary: Reply to the opener
+    description: >-
+      The opener sees it. The ticket moves to `waiting` and its SLA stops; the first reply sets
+      `firstResponseAt`. An unassigned ticket is assigned to the caller. `attachmentIds` are the caller's
+      own uploads that no message holds yet. A closed ticket is `409 invalid_transition`.
+    x-idempotency: required
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-support.yaml#/TicketMessageRequest
+          example:
+            body: We have raised it with the bank. You will hear from us within two working days.
+            attachmentIds: []
+    responses:
+      "200":
+        description: The ticket after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-support.yaml#/TicketDetail
+            example: *detail
+      default: *problem
+/v1/admin/tickets/{ticketId}/notes:
+  parameters:
+    - name: ticketId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: addAdminTicketNote
+    tags: [admin-support]
+    summary: Add an internal note
+    description: >-
+      Support only: the opener never sees it. Status and SLA do not change. A closed ticket still takes
+      notes.
+    x-idempotency: required
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-support.yaml#/TicketMessageRequest
+          example:
+            body: UTR checked with finance, payout file went on 2 Oct.
+    responses:
+      "200":
+        description: The ticket after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-support.yaml#/TicketDetail
+            example: *detail
+      default: *problem
+/v1/admin/tickets/{ticketId}/close:
+  parameters:
+    - name: ticketId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: closeAdminTicket
+    tags: [admin-support]
+    summary: Resolve or close a ticket (audited)
+    description: >-
+      `resolved`: done, but the opener's reply reopens it. `closed`: final, no more messages. Needs a
+      reason; the SLA stops. Resolving a resolved ticket or closing a closed one is `409 invalid_transition`.
+      Audited.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-support.yaml#/TicketCloseRequest
+          example:
+            outcome: resolved
+            reason: Payout re-sent, UTR shared
+    responses:
+      "200":
+        description: The ticket after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-support.yaml#/TicketDetail
+            example: *detail
+      default: *problem
+/v1/admin/tickets/{ticketId}/attachments:
+  parameters:
+    - name: ticketId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: createAdminTicketAttachment
+    tags: [admin-support]
+    summary: Get an upload URL for an attachment
+    description: >-
+      Records the attachment and returns a presigned PUT into the private bucket, valid for 15 minutes.
+      The URL signs the Content-Type and the size, so the PUT sends exactly the returned headers. Send its
+      id in the next reply or note on this ticket. JPEG, PNG, WebP or PDF, at most 10 MB. At most
+      `support_uploads_per_hour` uploads per person in a rolling hour (`429 rate_limited`); on claim the
+      object must exist with the declared size and type (`422 validation_failed` otherwise).
+      `503 service_unavailable` while storage is not configured.
+    x-idempotency: none
+    x-problems: [rate_limited]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-support.yaml#/TicketAttachmentCreate
+          example:
+            fileName: utr-screenshot.png
+            contentType: image/png
+            sizeBytes: 48211
+    responses:
+      "201":
+        description: The attachment and where to upload it
+        headers:
+          Cache-Control:
+            description: "`no-store`: the upload URL is a credential."
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-support.yaml#/TicketAttachmentUpload
+            example:
+              attachment:
+                id: 01JB0SAV1A2B3C4D5E6F7G8H9J
+                fileName: utr-screenshot.png
+                contentType: image/png
+                sizeBytes: 48211
+                url: null
+              upload:
+                url: https://s3.todayz.localhost/private/support/01JB0SAV1A2B3C4D5E6F7G8H9J?X-Amz-Algorithm=AWS4-HMAC-SHA256
+                method: PUT
+                headers:
+                  Content-Type: image/png
+                  Content-Length: "48211"
+                expiresAt: "2026-10-24T11:15:00Z"
+      default: *problem

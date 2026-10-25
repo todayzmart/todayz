@@ -137,8 +137,8 @@ describe('business shell', () => {
   });
 
   // Sections that have a real page (orders, settings: W2-10; stock, offers: W2-12; sell: W2-11;
-  // customers, analytics: W3-03) no longer show the placeholder.
-  const BUILT = new Set(['more', 'overview', 'orders', 'sell', 'stock', 'offers', 'reviews', 'credits', 'settings', 'customers', 'analytics']);
+  // customers, analytics: W3-03; help: W3-08) no longer show the placeholder.
+  const BUILT = new Set(['more', 'overview', 'orders', 'sell', 'stock', 'offers', 'reviews', 'credits', 'settings', 'customers', 'analytics', 'help']);
   it.each(NAV.filter((n) => !BUILT.has(n.section)))('shows the placeholder for /$section', async ({ section }) => {
     renderAt(`/${section}`);
     const { side } = await navs();

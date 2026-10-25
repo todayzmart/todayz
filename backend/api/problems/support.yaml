@@ -1,0 +1,11 @@
+# Problem codes: domain "support" (owner W3-08; 01 §13, D-226).
+#
+# Same shape as common.yaml. Used by the customer's and the business's ticket
+# openings (support.yaml, biz-support.yaml). The hourly limits are common.yaml's
+# rate_limited.
+domain: support
+problems:
+  - code: support_ticket_limit_reached
+    status: 422
+    i18n: problems.support_ticket_limit_reached
+    title: Too many tickets are open

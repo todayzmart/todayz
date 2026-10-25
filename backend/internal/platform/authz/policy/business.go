@@ -3,8 +3,8 @@ package policy
 import "github.com/todayz/backend/internal/platform/authz"
 
 // Business actions (W1-04, 02 §3.3 "Business" rows). standee.manage,
-// inbox.view and support.tickets are business-domain rows of the matrix that
-// arrive with their own work packages; asks.view and asks.reply come with
+// inbox.view and support.tickets (support.go) are business-domain rows of the
+// matrix that arrive with their own work packages; asks.view and asks.reply come with
 // W3-16. asks.manage is here because the store settings carry asksMuted.
 const (
 	// KindBusinessUser: any signed-in business-app user, no business scope.

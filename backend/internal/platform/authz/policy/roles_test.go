@@ -67,6 +67,10 @@ func TestAdminRoleMatrix(t *testing.T) {
 		only("admin.pulse.view", "support", "catalogue", "analyst", "finance", "admin", "super_admin")
 	})
 
+	t.Run("support tickets are support, admin and super_admin (A-14)", func(t *testing.T) {
+		only("admin.support.tickets", "support", "admin", "super_admin")
+	})
+
 	t.Run("KYC verify is admin and super_admin only", func(t *testing.T) {
 		only("admin.business.verify", "admin", "super_admin")
 	})

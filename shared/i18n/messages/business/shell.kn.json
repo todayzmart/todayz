@@ -133,5 +133,10 @@
     "message": "{count, plural, one {# ಐಟಂ ನಾಳೆಯೊಳಗೆ ಖಾಲಿಯಾಗುತ್ತದೆ} other {# ಐಟಂಗಳು ನಾಳೆಯೊಳಗೆ ಖಾಲಿಯಾಗುತ್ತವೆ}}",
     "review": "reviewed",
     "enHash": "a905b14b"
+  },
+  "shell.nav.help": {
+    "message": "ಸಹಾಯ",
+    "review": "reviewed",
+    "enHash": "c47ae153"
   }
 }
