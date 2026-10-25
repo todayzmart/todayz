@@ -292,11 +292,11 @@
     "description": "A-13 Risk: Dialog title"
   },
   "risk.next.blockBody": {
-    "defaultMessage": "{party, select, referee {The referee} referrer {The referrer} other {This customer}} is signed out and cannot order until unblocked from Customers.",
+    "defaultMessage": "{party, select, referee {The referee} referrer {The referrer} other {This customer}} is signed out and cannot order until unblocked from “Customers”.",
     "description": "A-13 Risk: Dialog body"
   },
   "risk.next.suspendBody": {
-    "defaultMessage": "{party, select, referee {The referee's business} referrer {The referrer's business} other {This business}}: its stores go offline until it is reinstated from Businesses.",
+    "defaultMessage": "{party, select, referee {The referee's business} referrer {The referrer's business} other {This business}}: its stores go offline until it is reinstated from “Businesses”.",
     "description": "A-13 Risk: Dialog body"
   },
   "risk.next.blockDone": {
