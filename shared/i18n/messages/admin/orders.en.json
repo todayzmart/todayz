@@ -392,11 +392,11 @@
     "description": "Cancel dialog field"
   },
   "orders.cancel.noteHelp": {
-    "defaultMessage": "Up to 200 characters. Needed for Other.",
+    "defaultMessage": "Up to 200 characters. Needed when the reason is other.",
     "description": "Help under the note"
   },
   "orders.cancel.noteRequired": {
-    "defaultMessage": "Write a note for Other.",
+    "defaultMessage": "Write a note when the reason is other.",
     "description": "Error: note missing for reason other"
   },
   "orders.cancel.keep": {

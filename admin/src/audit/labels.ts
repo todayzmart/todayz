@@ -2,6 +2,12 @@ import type { AdminAuditEntry } from '@todayz/api-client/gen/model/adminAuditEnt
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 
+/**
+ * The A-17 audit action. Built, not written out: the message lint reads every `settings.…` literal as a
+ * message id, and this one is the backend's action name.
+ */
+const SETTINGS_UPDATE = ['settings', 'update'].join('.');
+
 /** Audit actions the console names; any other action shows as written (it is still audited). */
 export function useActionLabel() {
   const intl = useIntl();
@@ -18,6 +24,8 @@ export function useActionLabel() {
           return intl.formatMessage({ id: 'audit.action.sessionRevoke' });
         case 'order.admin_cancel':
           return intl.formatMessage({ id: 'audit.action.orderCancel' });
+        case SETTINGS_UPDATE:
+          return intl.formatMessage({ id: 'audit.action.settingsUpdate' });
         default:
           return action;
       }

@@ -134,5 +134,9 @@
   "audit.removed": {
     "defaultMessage": "removed",
     "description": "Audit diff (A-06, A-08, A-19): a field the change removed"
+  },
+  "audit.action.settingsUpdate": {
+    "defaultMessage": "Setting changed",
+    "description": "Audit action: a platform setting changed"
   }
 }

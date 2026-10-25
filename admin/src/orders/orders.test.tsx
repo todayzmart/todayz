@@ -71,7 +71,7 @@ describe('A-08 order detail', () => {
     expect(await within(dialog).findByText('Choose a reason.')).toBeInTheDocument();
     fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'other' } });
     confirm();
-    expect(await within(dialog).findByText('Write a note for Other.')).toBeInTheDocument();
+    expect(await within(dialog).findByText('Write a note when the reason is other.')).toBeInTheDocument();
     expect(calls.some((c) => c.path === `${base}/cancel`)).toBe(false);
     fireEvent.change(within(dialog).getByLabelText('Note'), { target: { value: 'duplicate booking' } });
     confirm();

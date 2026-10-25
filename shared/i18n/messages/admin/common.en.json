@@ -54,5 +54,17 @@
   "common.error.network": {
     "defaultMessage": "We couldn't reach TodayZ. Check the connection and try again.",
     "description": "Error: the request did not reach the server"
+  },
+  "common.stepUp.title": {
+    "defaultMessage": "Confirm it is you",
+    "description": "Title of the step-up dialog before a sensitive admin change"
+  },
+  "common.stepUp.body": {
+    "defaultMessage": "Enter the 6-digit code from your authenticator app. It covers changes for the next 10 minutes.",
+    "description": "Body of the step-up dialog"
+  },
+  "common.stepUp.confirm": {
+    "defaultMessage": "Confirm",
+    "description": "Confirm button of the step-up dialog"
   }
 }
