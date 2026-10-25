@@ -15,7 +15,7 @@ const cors = (origin: string) => ({
   'access-control-allow-origin': origin,
   'access-control-allow-credentials': 'true',
   'access-control-allow-headers': 'authorization, content-type, x-tz-client, accept-language, accept',
-  'access-control-allow-methods': 'POST, OPTIONS',
+  'access-control-allow-methods': 'GET, POST, OPTIONS',
 });
 
 async function answer(page: Page, path: string, status: number, body: unknown) {
@@ -47,6 +47,16 @@ async function answerRefresh(page: Page, signedIn: boolean) {
 test.beforeEach(async ({ page }, info) => {
   guard = await guardPage(page);
   await answerRefresh(page, true);
+  // The sidebar follows the caller's roles (GET /v1/me, D-64): a super_admin sees every section.
+  await answer(page, '/v1/me', 200, {
+    id: '01J9ZAAAAAAAAAAAAAAAAAAAAA',
+    name: 'Smoke Admin',
+    preferredLang: 'en',
+    phoneMasked: '90•••••001',
+    app: 'admin',
+    roles: ['super_admin'],
+    createdAt: '2026-10-01T00:00:00Z',
+  });
   // Without the session hint a cold start skips the refresh and opens sign-in (shared/auth), as for a
   // visitor; the signed-out tests keep it off, so no 401 reaches the console.
   if (!info.title.startsWith('signed out')) {
