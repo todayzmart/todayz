@@ -1,0 +1,68 @@
+{
+  "name": "refund_grounded",
+  "input": {
+    "number": "SUP-001202",
+    "subject": "Cancelled but no refund",
+    "opener": "customer",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "My order was cancelled by the shop. When do I get my money back?"
+      }
+    ],
+    "orders": [
+      {
+        "number": "TZ-004601",
+        "status": "cancelled",
+        "fulfilment": "pickup",
+        "totalPaise": 25000,
+        "placedOn": "2026-10-20",
+        "linked": true,
+        "timeline": [
+          {
+            "from": "accepted",
+            "to": "cancelled",
+            "by": "business",
+            "at": "2026-10-21 18:40",
+            "reason": "Out of stock"
+          }
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "category": "order",
+    "order": "o1",
+    "summary": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_tt_refund_grounded",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_refund_grounded",
+        "name": "triage_ticket",
+        "input": {
+          "category": "order",
+          "priority": "normal",
+          "orderRef": "o1",
+          "reason": "Order TZ-004601 was cancelled by the shop as out of stock.",
+          "summary": null,
+          "reply": "The shop cancelled order TZ-004601 because an item was out of stock. The ₹250 you paid goes back to your original payment method."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}

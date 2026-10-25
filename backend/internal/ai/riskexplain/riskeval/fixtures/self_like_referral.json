@@ -1,0 +1,62 @@
+{
+  "name": "self_like_referral",
+  "input": {
+    "rule": "referral.self_like",
+    "subjectType": "referral",
+    "score": 70,
+    "status": "open",
+    "facts": [
+      {
+        "Key": "kind",
+        "Value": "any_shop"
+      },
+      {
+        "Key": "signals",
+        "Value": "referee_staff, shared_device"
+      },
+      {
+        "Key": "qualifyingRefType",
+        "Value": "order"
+      },
+      {
+        "Key": "qualifyingRefId",
+        "Value": "01JA0000000000000000000001"
+      },
+      {
+        "Key": "businessId",
+        "Value": "01JA0000000000000000000002"
+      }
+    ],
+    "otherFlags": {
+      "open": 0,
+      "confirmed": 1,
+      "cleared": 0
+    }
+  },
+  "expect": {
+    "text": "The referral qualified with an order where the referred person works at a shop and shared a device with the referrer. The subject has been confirmed once before.",
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_rs_self_like_referral",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rs_self_like_referral",
+        "name": "summarise_risk_flag",
+        "input": {
+          "text": "The referral qualified with an order where the referred person works at a shop and shared a device with the referrer. The subject has been confirmed once before."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 600,
+      "output_tokens": 90
+    }
+  }
+}

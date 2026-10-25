@@ -1,0 +1,50 @@
+{
+  "name": "credits_missing",
+  "input": {
+    "number": "SUP-001203",
+    "subject": "Credits not added",
+    "opener": "customer",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "I referred my friend last week but the credits are not showing in my wallet."
+      }
+    ],
+    "orders": []
+  },
+  "expect": {
+    "category": "credits",
+    "order": "none",
+    "summary": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_tt_credits_missing",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_credits_missing",
+        "name": "triage_ticket",
+        "input": {
+          "category": "credits",
+          "priority": "normal",
+          "orderRef": "none",
+          "reason": "A referral reward the customer expected is missing from their wallet.",
+          "summary": null,
+          "reply": "Thanks for telling us. We are checking your referral and will add the credits once it is confirmed."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}

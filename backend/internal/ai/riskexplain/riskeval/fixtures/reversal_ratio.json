@@ -1,0 +1,66 @@
+{
+  "name": "reversal_ratio",
+  "input": {
+    "rule": "pos.reversal_ratio",
+    "subjectType": "store",
+    "score": 50,
+    "status": "open",
+    "facts": [
+      {
+        "Key": "sales",
+        "Value": "40"
+      },
+      {
+        "Key": "reversed",
+        "Value": "16"
+      },
+      {
+        "Key": "ratioPercent",
+        "Value": "40"
+      },
+      {
+        "Key": "limitPercent",
+        "Value": "25"
+      },
+      {
+        "Key": "minSales",
+        "Value": "20"
+      },
+      {
+        "Key": "windowDays",
+        "Value": "7"
+      }
+    ],
+    "otherFlags": {
+      "open": 1,
+      "confirmed": 0,
+      "cleared": 0
+    }
+  },
+  "expect": {
+    "text": "The store reversed 16 of its 40 linked counter sales in 7 days, a 40% share against a limit of 25%. It has one other open flag.",
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_rs_reversal_ratio",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rs_reversal_ratio",
+        "name": "summarise_risk_flag",
+        "input": {
+          "text": "The store reversed 16 of its 40 linked counter sales in 7 days, a 40% share against a limit of 25%. It has one other open flag."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 600,
+      "output_tokens": 90
+    }
+  }
+}

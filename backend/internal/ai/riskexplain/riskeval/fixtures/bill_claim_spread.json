@@ -1,0 +1,66 @@
+{
+  "name": "bill_claim_spread",
+  "input": {
+    "rule": "pos.bill_claim_spread",
+    "subjectType": "user",
+    "score": 50,
+    "status": "open",
+    "facts": [
+      {
+        "Key": "stores",
+        "Value": "4"
+      },
+      {
+        "Key": "claims",
+        "Value": "5"
+      },
+      {
+        "Key": "limit",
+        "Value": "3"
+      },
+      {
+        "Key": "windowMinutes",
+        "Value": "60"
+      },
+      {
+        "Key": "day",
+        "Value": "2026-10-21"
+      },
+      {
+        "Key": "claimIds",
+        "Value": "01JA0000000000000000000000"
+      }
+    ],
+    "otherFlags": {
+      "open": 0,
+      "confirmed": 0,
+      "cleared": 1
+    }
+  },
+  "expect": {
+    "text": "This customer claimed bills at 4 stores within 60 minutes on 2026-10-21, past the limit of 3, with 5 claims in all. One earlier flag was cleared.",
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_rs_bill_claim_spread",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rs_bill_claim_spread",
+        "name": "summarise_risk_flag",
+        "input": {
+          "text": "This customer claimed bills at 4 stores within 60 minutes on 2026-10-21, past the limit of 3, with 5 claims in all. One earlier flag was cleared."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 600,
+      "output_tokens": 90
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "name": "other_feedback",
+  "input": {
+    "number": "SUP-001209",
+    "subject": "Suggestion",
+    "opener": "customer",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "It would be nice to see shop opening hours on the map."
+      }
+    ],
+    "orders": []
+  },
+  "expect": {
+    "category": "other",
+    "order": "none",
+    "summary": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_tt_other_feedback",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_other_feedback",
+        "name": "triage_ticket",
+        "input": {
+          "category": "other",
+          "priority": "normal",
+          "orderRef": "none",
+          "reason": "A product suggestion, not a problem.",
+          "summary": null,
+          "reply": "Thanks for the idea. We have shared it with our product team."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}

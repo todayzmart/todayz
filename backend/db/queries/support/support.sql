@@ -297,3 +297,11 @@ FROM support_tickets t
 LEFT JOIN stores s ON s.id = t.store_id
 LEFT JOIN orders o ON o.id = t.order_id
 WHERE t.id = @id AND t.opener_type = 'customer' AND t.opener_user_id = @user_id;
+
+-- name: SetTicketTriage :exec
+-- The A-14 triage assistant's confirmed category and linked order (W3-13): the
+-- caller checked the order is the opener's and passes its store.
+UPDATE support_tickets
+SET category = @category, order_id = COALESCE(sqlc.narg('order_id')::uuid, order_id),
+    store_id = COALESCE(sqlc.narg('store_id')::uuid, store_id), version = version + 1
+WHERE id = @id;

@@ -1,0 +1,75 @@
+{
+  "name": "dup_curd_names",
+  "input": {
+    "product": {
+      "name": "milky mist curd",
+      "brandName": "Milky Mist",
+      "variant": null,
+      "packSize": 400,
+      "unit": "g"
+    },
+    "category": "Dairy",
+    "candidates": [
+      {
+        "name": "Curd",
+        "brandName": "Milky Mist",
+        "variant": null,
+        "packSize": 400,
+        "unit": "g",
+        "similarity": 0.81
+      }
+    ],
+    "categories": [
+      "Dairy",
+      "Staples",
+      "Snacks",
+      "Beverages",
+      "Personal care",
+      "Household"
+    ],
+    "namesNow": {
+      "en": "Dairy"
+    }
+  },
+  "expect": {
+    "duplicate": "p1",
+    "names": true,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_cc_dup_curd_names",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_cc_dup_curd_names",
+        "name": "clean_up_product",
+        "input": {
+          "name": "Curd",
+          "brandName": "Milky Mist",
+          "variant": null,
+          "packSize": 400,
+          "unit": "g",
+          "categoryRef": "c1",
+          "duplicateRef": "p1",
+          "duplicateReason": "Same brand, same kind and the same pack and unit.",
+          "categoryNames": {
+            "en": "Dairy",
+            "hi": "डेयरी",
+            "kn": "ಹಾಲಿನ ಉತ್ಪನ್ನಗಳು",
+            "te": "పాల ఉత్పత్తులు",
+            "ta": "பால் பொருட்கள்"
+          }
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 900,
+      "output_tokens": 160
+    }
+  }
+}

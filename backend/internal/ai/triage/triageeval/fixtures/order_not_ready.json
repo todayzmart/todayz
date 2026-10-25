@@ -1,0 +1,82 @@
+{
+  "name": "order_not_ready",
+  "input": {
+    "number": "SUP-001201",
+    "subject": "Order not ready at pickup",
+    "opener": "customer",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "I reached the shop for TZ-004512 but they said it is not packed yet."
+      }
+    ],
+    "orders": [
+      {
+        "number": "TZ-004512",
+        "status": "accepted",
+        "fulfilment": "pickup",
+        "totalPaise": 25000,
+        "placedOn": "2026-10-20",
+        "linked": false,
+        "timeline": [
+          {
+            "from": null,
+            "to": "placed",
+            "by": "customer",
+            "at": "2026-10-20 10:02"
+          },
+          {
+            "from": "placed",
+            "to": "accepted",
+            "by": "business",
+            "at": "2026-10-20 10:05"
+          }
+        ]
+      },
+      {
+        "number": "TZ-004377",
+        "status": "completed",
+        "fulfilment": "pickup",
+        "totalPaise": 12000,
+        "placedOn": "2026-10-12",
+        "linked": false,
+        "timeline": []
+      }
+    ]
+  },
+  "expect": {
+    "category": "order",
+    "order": "o1",
+    "summary": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_tt_order_not_ready",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_order_not_ready",
+        "name": "triage_ticket",
+        "input": {
+          "category": "order",
+          "priority": "high",
+          "orderRef": "o1",
+          "reason": "The customer is at the shop and order TZ-004512 is still accepted, not ready.",
+          "summary": null,
+          "reply": "Sorry for the wait. We have asked the shop to pack order TZ-004512 now and will update you here."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "name": "schema_latin_hindi_name",
+  "input": {
+    "product": {
+      "name": "amul paneer",
+      "brandName": "Amul",
+      "variant": null,
+      "packSize": 200,
+      "unit": "g"
+    },
+    "category": "Dairy",
+    "candidates": [
+      {
+        "name": "Paneer",
+        "brandName": "Amul",
+        "variant": null,
+        "packSize": 1,
+        "unit": "kg",
+        "similarity": 0.6
+      }
+    ],
+    "categories": [
+      "Dairy",
+      "Staples",
+      "Snacks",
+      "Beverages",
+      "Personal care",
+      "Household"
+    ],
+    "namesNow": {
+      "en": "Dairy"
+    }
+  },
+  "expect": {
+    "duplicate": "none",
+    "names": false,
+    "reject": "schema"
+  },
+  "reply": {
+    "id": "msg_cc_schema_latin_hindi_name",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_cc_schema_latin_hindi_name",
+        "name": "clean_up_product",
+        "input": {
+          "name": "Paneer",
+          "brandName": "Amul",
+          "variant": null,
+          "packSize": 200,
+          "unit": "g",
+          "categoryRef": "c1",
+          "duplicateRef": "none",
+          "duplicateReason": null,
+          "categoryNames": {
+            "en": "Dairy",
+            "hi": "Dairy",
+            "kn": "ಹಾಲಿನ ಉತ್ಪನ್ನಗಳು",
+            "te": "పాల ఉత్పత్తులు",
+            "ta": "பால் பொருட்கள்"
+          }
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 900,
+      "output_tokens": 160
+    }
+  }
+}

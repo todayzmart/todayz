@@ -20,11 +20,14 @@ import (
 	// Eval suites register themselves; a feature package adds its import here.
 	_ "github.com/todayz/backend/internal/ai/bannercopy/bannereval"
 	_ "github.com/todayz/backend/internal/ai/billscan/billeval"
+	_ "github.com/todayz/backend/internal/ai/catalogue/catalogueeval"
 	_ "github.com/todayz/backend/internal/ai/eval/selftest"
 	_ "github.com/todayz/backend/internal/ai/imagecheck/imageeval"
 	_ "github.com/todayz/backend/internal/ai/insighttext/insighteval"
 	_ "github.com/todayz/backend/internal/ai/replydraft/replyeval"
+	_ "github.com/todayz/backend/internal/ai/riskexplain/riskeval"
 	_ "github.com/todayz/backend/internal/ai/shelfscan/shelfeval"
+	_ "github.com/todayz/backend/internal/ai/triage/triageeval"
 	_ "github.com/todayz/backend/internal/coach/coacheval"
 	_ "github.com/todayz/backend/internal/voice/voiceeval"
 )

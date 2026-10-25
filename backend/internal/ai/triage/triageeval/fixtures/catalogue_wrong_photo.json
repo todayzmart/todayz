@@ -1,0 +1,50 @@
+{
+  "name": "catalogue_wrong_photo",
+  "input": {
+    "number": "SUP-001205",
+    "subject": "Wrong photo on my product",
+    "opener": "business",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "The photo on our Amul butter listing shows a different brand."
+      }
+    ],
+    "orders": []
+  },
+  "expect": {
+    "category": "catalogue",
+    "order": "none",
+    "summary": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_tt_catalogue_wrong_photo",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_catalogue_wrong_photo",
+        "name": "triage_ticket",
+        "input": {
+          "category": "catalogue",
+          "priority": "normal",
+          "orderRef": "none",
+          "reason": "The shop reports a wrong product photo on a listing.",
+          "summary": null,
+          "reply": "Thanks, we will review the photo on your Amul butter listing and fix it in the catalogue."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}
