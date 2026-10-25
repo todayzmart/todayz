@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/todayz/backend/gen/sqlc/searchdb"
+	"github.com/todayz/backend/internal/platform/geo/h3"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
@@ -17,8 +18,9 @@ import (
 // The search log (01 §11, D-99): one search_log row per answered search,
 // zero results too, and the search_performed / search_zero_results events.
 // Only the first page of a search is recorded (a next page is the same
-// search). Neither the row nor the events carry the customer's location;
-// the events carry no query text. A failure here is logged (without the
+// search). Neither the row nor the events carry the customer's location:
+// the row keeps only the H3 res-8 cell (D-59); the events carry no query
+// text. A failure here is logged (without the
 // query) and never fails the search.
 
 // Barcode lengths D-99 treats as "an exact barcode" (EAN-8 to GTIN-14).
@@ -69,10 +71,15 @@ func (s *Service) record(ctx context.Context, q *searchdb.Queries, e logEntry) {
 	if utf8.RuneCountInString(queryNorm) > maxQueryRunes {
 		queryNorm = string([]rune(queryNorm)[:maxQueryRunes])
 	}
+	var cell *int64
+	if c, err := h3.LatLngToCell(e.req.Lat, e.req.Lng, h3.AnalyticsRes); err == nil {
+		v := c.Int64()
+		cell = &v
+	}
 	err := q.InsertSearchLog(ctx, searchdb.InsertSearchLogParams{
 		ID: ids.UUID(ids.New(now)), CreatedAt: now, QueryNorm: queryNorm,
 		ResultsCount: i32(e.results), StoreCount: i32(e.stores),
-		RadiusM: i32(e.req.RadiusM), Category: category, ProductID: product, UserID: user,
+		RadiusM: i32(e.req.RadiusM), GeoCell: cell, Category: category, ProductID: product, UserID: user,
 		Source: e.req.Source,
 	})
 	if err != nil {

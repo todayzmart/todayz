@@ -22,6 +22,7 @@ import (
 	"github.com/todayz/backend/gen/sqlc/rollupsdb"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/db"
+	"github.com/todayz/backend/internal/platform/geo/h3"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/platform/telemetry"
@@ -150,13 +151,29 @@ func (s *Service) ComputeDay(ctx context.Context, d Day) (DayResult, error) {
 	return res, err
 }
 
-// ComputeDemand recomputes day d's search demand (05 §3, rollup_demand).
+// ComputeDemand recomputes day d's search demand (05 §3, rollup_demand) and
+// gives insight_geo_cells the centre of every new cell it uses, which the
+// "Wanted nearby" and "Missed sales" insights match by distance (D-81).
 func (s *Service) ComputeDemand(ctx context.Context, d Day) (int64, error) {
-	n, err := s.q(ctx).UpsertDemandDay(ctx, rollupsdb.UpsertDemandDayParams{
+	q := s.q(ctx)
+	n, err := q.UpsertDemandDay(ctx, rollupsdb.UpsertDemandDayParams{
 		OnDate: d.pg(), DayStart: d.Start(), DayEnd: d.End(),
 	})
 	if err != nil {
 		return 0, fmt.Errorf("rollups: demand %s: %w", d, err)
+	}
+	cells, err := q.MissingGeoCells(ctx, d.pg())
+	if err != nil {
+		return 0, fmt.Errorf("rollups: demand cells %s: %w", d, err)
+	}
+	for _, v := range cells {
+		lat, lng, err := h3.CellToLatLng(h3.FromInt64(v))
+		if err != nil {
+			continue // not an H3 cell (a hand-made seed value); nothing to place
+		}
+		if err := q.InsertGeoCell(ctx, rollupsdb.InsertGeoCellParams{GeoCell: v, Lat: lat, Lng: lng}); err != nil {
+			return 0, fmt.Errorf("rollups: demand cell %s: %w", d, err)
+		}
 	}
 	return n, nil
 }

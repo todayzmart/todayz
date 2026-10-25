@@ -25,6 +25,10 @@ type Cell uint64
 // MaxRes is the finest H3 resolution.
 const MaxRes = 15
 
+// AnalyticsRes is the resolution analytics stores locations at (D-59):
+// search_log, asks and events keep a res-8 cell, never coordinates.
+const AnalyticsRes = 8 //settings:ok fixed by D-59, not a product rule
+
 var (
 	ErrResolution = errors.New("h3: resolution out of range")
 	ErrLatLng     = errors.New("h3: latitude or longitude not finite")
