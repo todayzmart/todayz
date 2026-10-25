@@ -1,0 +1,666 @@
+{
+  "field.sub": {
+    "defaultMessage": "Shops you are onboarding. Each one needs its details, a store, photos and products, then the owner confirms with a code.",
+    "description": "A-04: page subtitle"
+  },
+  "field.add": {
+    "defaultMessage": "Add a shop",
+    "description": "A-04: button that starts a new shop"
+  },
+  "field.list": {
+    "defaultMessage": "Your shops",
+    "description": "Accessible name of the A-04 list of shops"
+  },
+  "field.empty.title": {
+    "defaultMessage": "No shops yet",
+    "description": "A-04: empty list title"
+  },
+  "field.empty.body": {
+    "defaultMessage": "Add the first shop you visit. You can finish it later.",
+    "description": "A-04: empty list body"
+  },
+  "field.shop.counts": {
+    "defaultMessage": "{stores, plural, one {# store} other {# stores}} · {items, plural, one {# product} other {# products}}",
+    "description": "A-04 list row: store and product counts"
+  },
+  "field.back": {
+    "defaultMessage": "Back to your shops",
+    "description": "A-04: link back to the list"
+  },
+  "field.next": {
+    "defaultMessage": "Next",
+    "description": "A-04: go to the next step"
+  },
+  "field.saveNext": {
+    "defaultMessage": "Save and continue",
+    "description": "A-04: save the step and go on"
+  },
+  "field.readOnly": {
+    "defaultMessage": "The edit window for this shop has closed, so this is read-only.",
+    "description": "A-04: shown when the agent can no longer change the shop (D-39)"
+  },
+  "field.window.open": {
+    "defaultMessage": "You can edit this shop until {until}.",
+    "description": "A-04: banner while the edit window is open; until is a date"
+  },
+  "field.window.closed": {
+    "defaultMessage": "The edit window closed on {until}.",
+    "description": "A-04: banner after the edit window; until is a date"
+  },
+  "field.needsInfo": {
+    "defaultMessage": "The review team asked for more information. Fix what they asked for, then ask the owner to confirm again.",
+    "description": "A-04: banner when the business is needs_info"
+  },
+  "field.status.draft": {
+    "defaultMessage": "Draft",
+    "description": "Business status"
+  },
+  "field.status.submitted": {
+    "defaultMessage": "Waiting for review",
+    "description": "Business status: submitted"
+  },
+  "field.status.needsInfo": {
+    "defaultMessage": "Needs info",
+    "description": "Business status"
+  },
+  "field.status.verified": {
+    "defaultMessage": "Verified",
+    "description": "Business status"
+  },
+  "field.status.rejected": {
+    "defaultMessage": "Rejected",
+    "description": "Business status"
+  },
+  "field.status.suspended": {
+    "defaultMessage": "Suspended",
+    "description": "Business status"
+  },
+  "field.new.title": {
+    "defaultMessage": "Add a shop",
+    "description": "A-04 new shop: page title"
+  },
+  "field.new.sub": {
+    "defaultMessage": "Start with the shop's name and the owner's mobile number. The rest can follow.",
+    "description": "A-04 new shop: subtitle"
+  },
+  "field.new.brand": {
+    "defaultMessage": "Shop name",
+    "description": "A-04: brand name field"
+  },
+  "field.new.brand.required": {
+    "defaultMessage": "Enter the shop's name.",
+    "description": "A-04: brand name missing"
+  },
+  "field.new.legal": {
+    "defaultMessage": "Legal name",
+    "description": "A-04: legal name field"
+  },
+  "field.new.legal.help": {
+    "defaultMessage": "As on the GST or shop licence, if different. Optional.",
+    "description": "A-04: legal name help"
+  },
+  "field.new.category": {
+    "defaultMessage": "Category",
+    "description": "A-04: business category field"
+  },
+  "field.new.category.later": {
+    "defaultMessage": "Choose later",
+    "description": "A-04: empty category option on the first form"
+  },
+  "field.new.phone": {
+    "defaultMessage": "Owner's mobile number",
+    "description": "A-04: owner phone field"
+  },
+  "field.new.phone.help": {
+    "defaultMessage": "The owner gets a code on this number at the end.",
+    "description": "A-04: owner phone help"
+  },
+  "field.new.phone.invalid": {
+    "defaultMessage": "Enter a 10-digit Indian mobile number.",
+    "description": "A-04: phone invalid"
+  },
+  "field.new.submit": {
+    "defaultMessage": "Create shop",
+    "description": "A-04 new shop: submit"
+  },
+  "field.shop.missing.title": {
+    "defaultMessage": "Shop not found",
+    "description": "A-04: the business does not exist or is not the agent's"
+  },
+  "field.shop.missing.body": {
+    "defaultMessage": "It may have been onboarded by someone else.",
+    "description": "A-04: missing shop body"
+  },
+  "field.steps": {
+    "defaultMessage": "Steps",
+    "description": "Accessible name of the A-04 step list"
+  },
+  "field.step.details": {
+    "defaultMessage": "Details",
+    "description": "A-04 step 1"
+  },
+  "field.step.store": {
+    "defaultMessage": "Store",
+    "description": "A-04 step 2"
+  },
+  "field.step.photos": {
+    "defaultMessage": "Photos",
+    "description": "A-04 step 3"
+  },
+  "field.step.items": {
+    "defaultMessage": "Products",
+    "description": "A-04 step 4"
+  },
+  "field.step.owner": {
+    "defaultMessage": "Owner",
+    "description": "A-04 step 5: owner confirmation"
+  },
+  "field.step.done": {
+    "defaultMessage": "Done",
+    "description": "Accessible name of the check mark on a finished step"
+  },
+  "field.details.category.pick": {
+    "defaultMessage": "Choose a category",
+    "description": "Empty option of a category select"
+  },
+  "field.details.category.required": {
+    "defaultMessage": "Choose a category.",
+    "description": "Category missing"
+  },
+  "field.details.phone": {
+    "defaultMessage": "New owner number",
+    "description": "A-04: change the owner's number before they confirm"
+  },
+  "field.details.phone.help": {
+    "defaultMessage": "Now {masked}. Leave empty to keep it.",
+    "description": "A-04: help under the new owner number; masked is like +91 ••••••3210"
+  },
+  "field.owner.number": {
+    "defaultMessage": "Owner's number",
+    "description": "A-04 details: label of the masked owner number"
+  },
+  "field.store.form": {
+    "defaultMessage": "Store details",
+    "description": "Accessible name of the A-04 store form"
+  },
+  "field.store.name": {
+    "defaultMessage": "Store name",
+    "description": "A-04 store field"
+  },
+  "field.store.line1": {
+    "defaultMessage": "Address",
+    "description": "A-04 store field: address line 1"
+  },
+  "field.store.line2": {
+    "defaultMessage": "Address line 2",
+    "description": "A-04 store field, optional"
+  },
+  "field.store.landmark": {
+    "defaultMessage": "Landmark",
+    "description": "A-04 store field, optional"
+  },
+  "field.store.locality": {
+    "defaultMessage": "Area",
+    "description": "A-04 store field: locality"
+  },
+  "field.store.city": {
+    "defaultMessage": "City",
+    "description": "A-04 store field"
+  },
+  "field.store.pincode": {
+    "defaultMessage": "PIN code",
+    "description": "A-04 store field"
+  },
+  "field.store.pincode.invalid": {
+    "defaultMessage": "Enter the 6-digit PIN code.",
+    "description": "A-04 store: PIN code invalid"
+  },
+  "field.store.locate": {
+    "defaultMessage": "Use my location",
+    "description": "A-04 store: fills the pin from the phone's location"
+  },
+  "field.store.locate.failed": {
+    "defaultMessage": "Could not get the location. Enter it, or allow location and try again.",
+    "description": "A-04 store: geolocation failed"
+  },
+  "field.store.lat": {
+    "defaultMessage": "Latitude",
+    "description": "A-04 store field"
+  },
+  "field.store.lng": {
+    "defaultMessage": "Longitude",
+    "description": "A-04 store field"
+  },
+  "field.store.pin.invalid": {
+    "defaultMessage": "Stand at the shop and use your location, or enter a point in India.",
+    "description": "A-04 store: map pin missing or outside India"
+  },
+  "field.store.phone": {
+    "defaultMessage": "Store phone",
+    "description": "A-04 store field"
+  },
+  "field.store.hours": {
+    "defaultMessage": "Opening hours",
+    "description": "A-04 store: hours group"
+  },
+  "field.store.open": {
+    "defaultMessage": "Opens",
+    "description": "A-04 store: opening time"
+  },
+  "field.store.close": {
+    "defaultMessage": "Closes",
+    "description": "A-04 store: closing time"
+  },
+  "field.store.hours.invalid": {
+    "defaultMessage": "Enter both times.",
+    "description": "A-04 store: a time is missing"
+  },
+  "field.store.days": {
+    "defaultMessage": "Open on",
+    "description": "A-04 store: days the shop is open"
+  },
+  "field.store.days.required": {
+    "defaultMessage": "Choose at least one day.",
+    "description": "A-04 store: no day chosen"
+  },
+  "field.store.required": {
+    "defaultMessage": "Required.",
+    "description": "A required field is empty"
+  },
+  "field.store.save": {
+    "defaultMessage": "Save store",
+    "description": "A-04 store: submit"
+  },
+  "field.store.addAnother": {
+    "defaultMessage": "Add another store",
+    "description": "A-04 store: add a second store"
+  },
+  "field.store.status.draft": {
+    "defaultMessage": "Draft",
+    "description": "Store status"
+  },
+  "field.store.status.pendingReview": {
+    "defaultMessage": "In review",
+    "description": "Store status"
+  },
+  "field.store.status.live": {
+    "defaultMessage": "Live",
+    "description": "Store status"
+  },
+  "field.store.status.paused": {
+    "defaultMessage": "Paused",
+    "description": "Store status"
+  },
+  "field.store.status.suspended": {
+    "defaultMessage": "Suspended",
+    "description": "Store status"
+  },
+  "field.day.mon": {
+    "defaultMessage": "Mon",
+    "description": "Day"
+  },
+  "field.day.tue": {
+    "defaultMessage": "Tue",
+    "description": "Day"
+  },
+  "field.day.wed": {
+    "defaultMessage": "Wed",
+    "description": "Day"
+  },
+  "field.day.thu": {
+    "defaultMessage": "Thu",
+    "description": "Day"
+  },
+  "field.day.fri": {
+    "defaultMessage": "Fri",
+    "description": "Day"
+  },
+  "field.day.sat": {
+    "defaultMessage": "Sat",
+    "description": "Day"
+  },
+  "field.day.sun": {
+    "defaultMessage": "Sun",
+    "description": "Day"
+  },
+  "field.photos.count": {
+    "defaultMessage": "{n, plural, =0 {No photos yet.} one {# photo added.} other {# photos added.}}",
+    "description": "A-04 photos: how many are uploaded"
+  },
+  "field.photos.storefront": {
+    "defaultMessage": "Photo of the front",
+    "description": "A-04 photos: take a storefront photo"
+  },
+  "field.photos.inside": {
+    "defaultMessage": "Photo inside",
+    "description": "A-04 photos: take a photo inside the shop"
+  },
+  "field.photos.type": {
+    "defaultMessage": "Use a JPEG, PNG or WebP photo.",
+    "description": "A-04 photos: wrong file type"
+  },
+  "field.photos.size": {
+    "defaultMessage": "The photo must be under 10 MB.",
+    "description": "A-04 photos: file too large"
+  },
+  "field.photos.added": {
+    "defaultMessage": "Photo added",
+    "description": "Toast after a photo uploads"
+  },
+  "field.photos.uploadFailed": {
+    "defaultMessage": "The photo did not upload. Check the connection and try again.",
+    "description": "A-04 photos: the upload to storage failed"
+  },
+  "field.photos.tooMany": {
+    "defaultMessage": "This shop already has the most photos of that kind.",
+    "description": "A-04 photos: 409 over the limit"
+  },
+  "field.photos.skip": {
+    "defaultMessage": "Skip for now",
+    "description": "A-04 photos: go on without photos"
+  },
+  "field.items.noStore": {
+    "defaultMessage": "Add a store first.",
+    "description": "A-04 products: no store yet"
+  },
+  "field.items.store": {
+    "defaultMessage": "Store",
+    "description": "A-04 products: store select"
+  },
+  "field.items.search": {
+    "defaultMessage": "Find a product",
+    "description": "A-04 products: search field label"
+  },
+  "field.items.search.hint": {
+    "defaultMessage": "Name or barcode",
+    "description": "A-04 products: search placeholder"
+  },
+  "field.items.matches": {
+    "defaultMessage": "Matching products",
+    "description": "Accessible name of the search results"
+  },
+  "field.items.noMatch": {
+    "defaultMessage": "No match. Add it as a new product.",
+    "description": "A-04 products: nothing found"
+  },
+  "field.items.mrp": {
+    "defaultMessage": "MRP {mrp}",
+    "description": "A-04 products: MRP of a match"
+  },
+  "field.items.add": {
+    "defaultMessage": "Add",
+    "description": "A-04 products: add a product"
+  },
+  "field.items.addNamed": {
+    "defaultMessage": "Add {name}",
+    "description": "Accessible name of the add button for one product"
+  },
+  "field.items.added": {
+    "defaultMessage": "{name} added",
+    "description": "Toast after a product is added"
+  },
+  "field.items.already": {
+    "defaultMessage": "Already listed",
+    "description": "A-04 products: the store already lists it"
+  },
+  "field.items.new": {
+    "defaultMessage": "New product",
+    "description": "A-04 products: add a product not in the catalogue"
+  },
+  "field.items.new.help": {
+    "defaultMessage": "It is listed now and checked by the catalogue team.",
+    "description": "A-04 products: new product help"
+  },
+  "field.items.name": {
+    "defaultMessage": "Product name",
+    "description": "A-04 new product field"
+  },
+  "field.items.category": {
+    "defaultMessage": "Category",
+    "description": "A-04 new product field"
+  },
+  "field.items.variant": {
+    "defaultMessage": "Variant",
+    "description": "A-04 new product field, optional, e.g. Masala"
+  },
+  "field.items.pack": {
+    "defaultMessage": "Pack size",
+    "description": "A-04 new product field"
+  },
+  "field.items.pack.invalid": {
+    "defaultMessage": "Enter the pack size.",
+    "description": "A-04 new product: pack size invalid"
+  },
+  "field.items.unit": {
+    "defaultMessage": "Unit",
+    "description": "A-04 new product field"
+  },
+  "field.items.mrpField": {
+    "defaultMessage": "MRP",
+    "description": "A-04 new product field, optional"
+  },
+  "field.items.barcode": {
+    "defaultMessage": "Barcode",
+    "description": "A-04 new product field, optional"
+  },
+  "field.items.barcode.invalid": {
+    "defaultMessage": "A barcode has 8 to 14 digits.",
+    "description": "A-04 new product: barcode invalid"
+  },
+  "field.items.price": {
+    "defaultMessage": "Price",
+    "description": "A-04 products: selling price"
+  },
+  "field.items.price.invalid": {
+    "defaultMessage": "Enter a price in rupees.",
+    "description": "A-04 products: price invalid"
+  },
+  "field.items.price.aboveMrp": {
+    "defaultMessage": "The price cannot be above the MRP.",
+    "description": "A-04 products: price above MRP"
+  },
+  "field.items.stock": {
+    "defaultMessage": "Opening stock",
+    "description": "A-04 products: opening stock, optional"
+  },
+  "field.items.stock.invalid": {
+    "defaultMessage": "Enter a whole number.",
+    "description": "A-04 products: stock invalid"
+  },
+  "field.items.listed": {
+    "defaultMessage": "{n, plural, one {# product} other {# products}} in this store",
+    "description": "A-04 products: list heading"
+  },
+  "field.items.list": {
+    "defaultMessage": "Products in this store",
+    "description": "Accessible name of the product list"
+  },
+  "field.items.empty": {
+    "defaultMessage": "No products yet.",
+    "description": "A-04 products: empty list"
+  },
+  "field.items.inReview": {
+    "defaultMessage": "In review",
+    "description": "A-04 products: a new product waiting for catalogue review"
+  },
+  "field.items.edit": {
+    "defaultMessage": "Edit",
+    "description": "A-04 products: edit a price"
+  },
+  "field.items.editPrice": {
+    "defaultMessage": "Edit the price of {name}",
+    "description": "Accessible name of the price edit"
+  },
+  "field.items.save": {
+    "defaultMessage": "Save",
+    "description": "A-04 products: save a price"
+  },
+  "field.owner.help": {
+    "defaultMessage": "When everything is ready, send a code to the owner's phone and ask them to read it out. The shop then goes for review.",
+    "description": "A-04 owner: what this step does"
+  },
+  "field.owner.send": {
+    "defaultMessage": "Send code to owner",
+    "description": "A-04 owner: send the code"
+  },
+  "field.owner.sent": {
+    "defaultMessage": "Code sent to {masked}. It works until {until}.",
+    "description": "A-04 owner: after sending; masked phone and a time"
+  },
+  "field.owner.code": {
+    "defaultMessage": "Owner's code",
+    "description": "A-04 owner: label of the code boxes"
+  },
+  "field.owner.digit": {
+    "defaultMessage": "Digit {i}",
+    "description": "A-04 owner: name of code box i"
+  },
+  "field.owner.confirm": {
+    "defaultMessage": "Confirm",
+    "description": "A-04 owner: check the code"
+  },
+  "field.owner.resend": {
+    "defaultMessage": "Send a new code",
+    "description": "A-04 owner: resend"
+  },
+  "field.owner.resendIn": {
+    "defaultMessage": "Send a new code in {s, plural, one {# second} other {# seconds}}",
+    "description": "A-04 owner: resend countdown"
+  },
+  "field.owner.wrong": {
+    "defaultMessage": "That code is not right.",
+    "description": "A-04 owner: wrong code"
+  },
+  "field.owner.wrong.left": {
+    "defaultMessage": "That code is not right. {n, plural, one {# try left.} other {# tries left.}}",
+    "description": "A-04 owner: wrong code with tries left"
+  },
+  "field.owner.locked": {
+    "defaultMessage": "Too many wrong codes. Send a new code.",
+    "description": "A-04 owner: locked"
+  },
+  "field.owner.expired": {
+    "defaultMessage": "This code has expired. Send a new code.",
+    "description": "A-04 owner: expired, or no code yet"
+  },
+  "field.owner.wait": {
+    "defaultMessage": "Too many codes. Try again in {s, plural, one {# second} other {# seconds}}.",
+    "description": "A-04 owner: rate limited with a wait"
+  },
+  "field.owner.waitShort": {
+    "defaultMessage": "Too many codes. Try again in a few minutes.",
+    "description": "A-04 owner: rate limited"
+  },
+  "field.owner.gone": {
+    "defaultMessage": "This shop can no longer be confirmed here. Refresh to see its status.",
+    "description": "A-04 owner: invalid_transition"
+  },
+  "field.owner.incomplete": {
+    "defaultMessage": "Some details are missing before the owner can confirm.",
+    "description": "A-04 owner: submit_incomplete"
+  },
+  "field.owner.fixDetails": {
+    "defaultMessage": "Add the category",
+    "description": "A-04 owner: go to step 1"
+  },
+  "field.owner.fixStore": {
+    "defaultMessage": "Finish the store",
+    "description": "A-04 owner: go to step 2"
+  },
+  "field.owner.confirmed": {
+    "defaultMessage": "Owner confirmed. The shop is sent for review.",
+    "description": "Toast after the owner's code is right"
+  },
+  "field.owner.done.title": {
+    "defaultMessage": "The owner has confirmed",
+    "description": "A-04 owner: already confirmed"
+  },
+  "field.owner.done.body": {
+    "defaultMessage": "The shop is with the review team. You can still add products until the edit window closes.",
+    "description": "A-04 owner: already confirmed body"
+  },
+  "field.owner.notOpen": {
+    "defaultMessage": "Nothing to do here while the shop is in review.",
+    "description": "A-04 owner: business not draft or needs_info"
+  },
+  "field.stats.subMine": {
+    "defaultMessage": "Your onboarding over the last 8 weeks.",
+    "description": "A-15 subtitle for a field agent"
+  },
+  "field.stats.subAll": {
+    "defaultMessage": "Every field agent's onboarding and weekly trend.",
+    "description": "A-15 subtitle for admins"
+  },
+  "field.stats.mine": {
+    "defaultMessage": "Your numbers",
+    "description": "Accessible name of the stat tiles"
+  },
+  "field.stats.onboarded": {
+    "defaultMessage": "Onboarded",
+    "description": "A-15: businesses onboarded"
+  },
+  "field.stats.verified": {
+    "defaultMessage": "Verified",
+    "description": "A-15: businesses verified"
+  },
+  "field.stats.live": {
+    "defaultMessage": "Stores live",
+    "description": "A-15: stores live"
+  },
+  "field.stats.items": {
+    "defaultMessage": "Products added",
+    "description": "A-15: items added"
+  },
+  "field.stats.inWindow": {
+    "defaultMessage": "In edit window",
+    "description": "A-15: verified businesses still in the edit window"
+  },
+  "field.stats.firstOrder": {
+    "defaultMessage": "First-order rate",
+    "description": "A-15: share of verified businesses with a first order"
+  },
+  "field.stats.weekly": {
+    "defaultMessage": "Shops onboarded per week",
+    "description": "A-15: weekly chart title"
+  },
+  "field.stats.weekly.help": {
+    "defaultMessage": "Bars show shops onboarded each week, oldest first.",
+    "description": "A-15: chart caption"
+  },
+  "field.stats.week": {
+    "defaultMessage": "Week of {week}: {onboarded} onboarded, {verified} verified, {items} products added",
+    "description": "Accessible name of one week's bar"
+  },
+  "field.stats.empty.title": {
+    "defaultMessage": "No shops yet",
+    "description": "A-15: agent with no businesses"
+  },
+  "field.stats.empty.body": {
+    "defaultMessage": "Your numbers show here after your first shop.",
+    "description": "A-15: empty body"
+  },
+  "field.stats.none": {
+    "defaultMessage": "No field agents yet.",
+    "description": "A-15: empty table"
+  },
+  "field.stats.col.agent": {
+    "defaultMessage": "Agent",
+    "description": "A-15 column"
+  },
+  "field.stats.col.trend": {
+    "defaultMessage": "Trend",
+    "description": "A-15 column"
+  },
+  "field.stats.trend": {
+    "defaultMessage": "Show",
+    "description": "A-15: show this agent's trend"
+  },
+  "field.stats.showTrend": {
+    "defaultMessage": "Show the weekly trend of {name}",
+    "description": "Accessible name of the trend button"
+  },
+  "field.stats.trendOf": {
+    "defaultMessage": "Weekly trend: {name}",
+    "description": "A-15: chart heading for one agent"
+  }
+}
