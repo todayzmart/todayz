@@ -95,7 +95,7 @@ func init() {
 		{Name: AdminBannerModerate, Kind: authz.KindAdmin, Grants: support, Doc: "GET /v1/admin/banners, POST .../approve, .../takedown (A-20): audited"},
 
 		{Name: AdminNotifyView, Kind: authz.KindAdmin, Grants: admins, Doc: "GET /v1/admin/notification-templates, /v1/admin/integrations (A-16): keys set or missing only (D-19)"},
-		{Name: AdminNotifyManage, Kind: authz.KindAdmin, Grants: admins, Doc: "PATCH /v1/admin/notification-templates/{templateId}, POST .../test-send (to the caller's own phone): audited"},
+		{Name: AdminNotifyManage, Kind: authz.KindAdmin, Grants: admins, Doc: "POST /v1/admin/notification-templates/test-send: to the caller's own in-app inbox only, never SMS; audited. No PATCH: texts stay code-owned (D-224)"},
 
 		{Name: AdminSettingsView, Kind: authz.KindAdmin, Grants: admins, Doc: "GET /v1/admin/settings, .../{key}/history (A-17)"},
 		{Name: AdminSettingsEdit, Kind: authz.KindAdmin, Grants: admins, StepUp: true, Doc: "PATCH /v1/admin/settings/{key}: keys that are not money settings; audited"},

@@ -282,5 +282,9 @@
   "audit.action.adminUserTotpReset": {
     "defaultMessage": "Authenticator reset",
     "description": "Audit action: an admin cleared another admin's authenticator"
+  },
+  "audit.action.notificationTestSend": {
+    "defaultMessage": "Test notification sent",
+    "description": "Audit action: an admin sent a notification of one kind to their own in-app inbox"
   }
 }

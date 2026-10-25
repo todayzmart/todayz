@@ -531,3 +531,81 @@ test('A-02: an analyst reads Pulse, switches to 30 days and sees a store needing
   await expect(main.getByRole('img', { name: /from 26 Sept? to 25 Oct/ })).toBeVisible();
   expect(ranges).toContain('30d');
 });
+
+test('A-16: an admin reads the channels and a kind in Hindi, then sends a test to their own inbox', async ({ page }) => {
+  await signIn(page, ['admin']);
+  const text = (lang: string, variant: string | null, body: string, fallback = false) => ({ lang, variant, title: variant ? 'Order ready' : 'Order update', body, fallback });
+  const orderUpdate = {
+    kind: 'order_update',
+    app: 'customer',
+    channels: ['push'],
+    params: ['store', 'variant'],
+    texts: [
+      text('en', null, 'Your order from {store} has an update.'),
+      text('en', 'ready', 'Your order at {store} is ready to collect.'),
+      text('hi', null, '{store} से आपके ऑर्डर में बदलाव है।'),
+      text('hi', 'ready', '{store} पर आपका ऑर्डर तैयार है।'),
+      ...['kn', 'te', 'ta'].flatMap((l) => [text(l, null, 'Your order from {store} has an update.', true), text(l, 'ready', 'Your order at {store} is ready to collect.', true)]),
+    ],
+    providerTemplates: [],
+    testable: true,
+  };
+  const orderUnseen = {
+    kind: 'order_unseen',
+    app: 'business',
+    channels: ['sms', 'whatsapp'],
+    params: ['code'],
+    texts: [text('en', null, 'Order {code} is waiting for you.')],
+    providerTemplates: [{ lang: 'en', name: 'tz_order_unseen_en', smsTemplateIdSet: false }],
+    testable: false,
+  };
+  await fake(page, '/v1/admin/integrations', () => ({
+    status: 200,
+    body: {
+      items: [
+        { channel: 'push', enabled: false, senderBuilt: false, vars: [{ name: 'VAPID_PRIVATE_KEY', set: false }], lastError: null },
+        {
+          channel: 'sms',
+          enabled: true,
+          senderBuilt: true,
+          vars: [
+            { name: 'SMS_API_URL', set: true },
+            { name: 'SMS_SENDER_ID', set: true },
+            { name: 'SMS_DLT_ENTITY_ID', set: false },
+          ],
+          lastError: { at: '2026-10-25T05:50:00Z', error: 'throttled' },
+        },
+        { channel: 'whatsapp', enabled: false, senderBuilt: false, vars: [{ name: 'WHATSAPP_API_KEY', set: false }], lastError: null },
+      ],
+      serverNow: NOW,
+    },
+  }));
+  const sent = await fake(page, '/v1/admin/notification-templates**', (method, url, body) => {
+    if (url.pathname === '/v1/admin/notification-templates' && method === 'GET') {
+      const app = url.searchParams.get('app');
+      return { status: 200, body: { items: [orderUnseen, orderUpdate].filter((t) => !app || t.app === app), serverNow: NOW } };
+    }
+    if (url.pathname === '/v1/admin/notification-templates/test-send') {
+      const b = body as { kind: string; variant?: string | null };
+      return { status: 201, body: { notificationId: '01JN0T1F000000000000000001', kind: b.kind, variant: b.variant ?? null, sentAt: NOW } };
+    }
+    return undefined;
+  });
+
+  await page.goto('/notifications');
+  const sms = page.getByRole('listitem', { name: 'SMS' });
+  await expect(sms.getByText('SMS_DLT_ENTITY_ID')).toBeVisible();
+  await expect(sms.getByText(/^Last failure .*: throttled$/)).toBeVisible();
+
+  await page.getByRole('radio', { name: 'Customer' }).click();
+  await page.getByRole('table', { name: 'Notification kinds' }).getByRole('button', { name: 'Order update' }).click();
+  const card = page.getByRole('region', { name: 'Order update' });
+  await card.getByRole('tab', { name: 'Hindi' }).click();
+  await expect(page).toHaveURL(/[?&]lang=hi/);
+  await expect(card.getByRole('article', { name: 'ready' })).toContainText('पर आपका ऑर्डर तैयार है।');
+  await shot(page, 'admin-a16-notifications.png', { fullPage: true });
+
+  await card.getByRole('article', { name: 'ready' }).getByRole('button', { name: 'Send a test to me' }).click();
+  await expect(page.getByText('Test sent to your in-app inbox')).toBeVisible();
+  expect(sent).toEqual([{ path: '/v1/admin/notification-templates/test-send', body: { kind: 'order_update', variant: 'ready' } }]);
+});

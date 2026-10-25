@@ -30,6 +30,7 @@ import (
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/notice"
 	"github.com/todayz/backend/internal/platform/pii"
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
@@ -71,6 +72,14 @@ type Deps struct {
 	// Accounts finds or makes a phone number's account for an A-18 invite
 	// (internal/identity owns accounts). Without it an invite answers 503.
 	Accounts PhoneAccounts
+	// NotifyTemplates copies internal/notify's catalogue for A-16; without
+	// it the list is empty and a test send answers 503.
+	NotifyTemplates func() []NotifyTemplate
+	// Integrations are A-16's outside channels and the variables each needs.
+	Integrations []Integration
+	// Notices writes A-16's test send to the caller's own inbox. Without it
+	// a test send answers 503.
+	Notices notice.Sender
 }
 
 // PhoneAccounts finds or makes the account of an E.164 phone in the caller's
@@ -109,6 +118,10 @@ type Service struct {
 	hours     HoursNormaliser
 	banners   BannerRemover
 	accounts  PhoneAccounts
+
+	notifyTemplates func() []NotifyTemplate
+	integrations    []Integration
+	notices         notice.Sender
 }
 
 // New builds the service.
@@ -116,7 +129,8 @@ func New(d Deps) (*Service, error) {
 	if d.Clock == nil {
 		return nil, errors.New("admin: a clock is required")
 	}
-	return &Service{db: d.DB, clock: d.Clock, audit: d.Audit, az: d.Authz, seal: d.Seal, hash: d.Hash, strikes: d.Strikes, providers: d.Providers, hours: d.Hours, banners: d.Banners, accounts: d.Accounts}, nil
+	return &Service{db: d.DB, clock: d.Clock, audit: d.Audit, az: d.Authz, seal: d.Seal, hash: d.Hash, strikes: d.Strikes, providers: d.Providers, hours: d.Hours, banners: d.Banners, accounts: d.Accounts,
+		notifyTemplates: d.NotifyTemplates, integrations: d.Integrations, notices: d.Notices}, nil
 }
 
 func (s *Service) ready(ctx context.Context) error {

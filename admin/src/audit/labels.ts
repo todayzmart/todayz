@@ -93,6 +93,8 @@ export function useActionLabel() {
           return intl.formatMessage({ id: 'audit.action.adminUserEnable' });
         case 'admin_user.totp_reset':
           return intl.formatMessage({ id: 'audit.action.adminUserTotpReset' });
+        case 'notification.test_send':
+          return intl.formatMessage({ id: 'audit.action.notificationTestSend' });
         default: {
           const id = BUILT_ACTIONS[action];
           return id ? intl.formatMessage({ id }) : action;

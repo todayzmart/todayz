@@ -50,10 +50,11 @@ func TestCleanReason(t *testing.T) {
 func TestEverySubjectTypeHasAViewOrIsRefused(t *testing.T) {
 	// Every subject a panel can show has the action that views it; the A-03
 	// queue's view covers business.
-	for _, typ := range []api.AdminAuditSubjectType{"order", "user", "store", "business", "review", "banner", "lead", "platform_setting", "admin_user", "product", "category", "synonym"} {
+	for _, typ := range []api.AdminAuditSubjectType{"order", "user", "store", "business", "review", "banner", "lead", "platform_setting", "admin_user", "product", "category", "synonym", "notification_template"} {
 		require.Contains(t, subjectView, typ)
 	}
 	require.Equal(t, policy.AdminBusinessView, subjectView["business"])
 	require.Equal(t, policy.AdminCatalogueView, subjectView["product"])
-	require.Len(t, subjectView, 12)
+	require.Equal(t, policy.AdminNotifyView, subjectView["notification_template"])
+	require.Len(t, subjectView, 13)
 }

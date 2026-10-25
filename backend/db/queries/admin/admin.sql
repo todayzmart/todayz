@@ -573,3 +573,21 @@ DELETE FROM admin_recovery_codes WHERE admin_id = @admin_id;
 -- name: RevokeAdminSessions :execrows
 UPDATE sessions SET revoked_at = @now::timestamptz, revoked_reason = 'admin'
 WHERE user_id = @user_id AND app = 'admin' AND revoked_at IS NULL;
+
+------------------------------------------------------------------------------
+-- notifications (A-16)
+------------------------------------------------------------------------------
+
+-- name: NotifyChannelSwitches :many
+-- The notify_<channel>_enabled settings; a missing row reads as off.
+SELECT key, (value = 'true'::jsonb)::bool AS enabled
+FROM platform_settings
+WHERE key IN ('notify_push_enabled', 'notify_sms_enabled', 'notify_whatsapp_enabled');
+
+-- name: LastFailedDelivery :one
+-- The channel's latest failed delivery (ix_notification_deliveries_failed).
+SELECT updated_at, coalesce(error, '')::text AS error
+FROM notification_deliveries
+WHERE channel = @channel AND status = 'failed'
+ORDER BY updated_at DESC
+LIMIT 1;

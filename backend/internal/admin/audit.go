@@ -25,18 +25,19 @@ import (
 // subjectView is the action that lets a caller see a subject, and so its
 // history. A subject type missing here is refused.
 var subjectView = map[api.AdminAuditSubjectType]string{
-	api.AdminAuditSubjectTypeBusiness:        policy.AdminBusinessView,
-	api.AdminAuditSubjectTypeOrder:           policy.AdminOrderView,
-	api.AdminAuditSubjectTypeUser:            policy.AdminCustomerView,
-	api.AdminAuditSubjectTypeStore:           policy.AdminStoreView,
-	api.AdminAuditSubjectTypeReview:          policy.AdminReviewModerate,
-	api.AdminAuditSubjectTypeBanner:          policy.AdminBannerModerate,
-	api.AdminAuditSubjectTypeLead:            policy.AdminLeadView,
-	api.AdminAuditSubjectTypePlatformSetting: policy.AdminSettingsView,
-	api.AdminAuditSubjectTypeAdminUser:       policy.AdminUsersView,
-	api.AdminAuditSubjectTypeProduct:         policy.AdminCatalogueView,
-	api.AdminAuditSubjectTypeCategory:        policy.AdminCatalogueView,
-	api.AdminAuditSubjectTypeSynonym:         policy.AdminCatalogueView,
+	api.AdminAuditSubjectTypeBusiness:             policy.AdminBusinessView,
+	api.AdminAuditSubjectTypeOrder:                policy.AdminOrderView,
+	api.AdminAuditSubjectTypeUser:                 policy.AdminCustomerView,
+	api.AdminAuditSubjectTypeStore:                policy.AdminStoreView,
+	api.AdminAuditSubjectTypeReview:               policy.AdminReviewModerate,
+	api.AdminAuditSubjectTypeBanner:               policy.AdminBannerModerate,
+	api.AdminAuditSubjectTypeLead:                 policy.AdminLeadView,
+	api.AdminAuditSubjectTypePlatformSetting:      policy.AdminSettingsView,
+	api.AdminAuditSubjectTypeAdminUser:            policy.AdminUsersView,
+	api.AdminAuditSubjectTypeProduct:              policy.AdminCatalogueView,
+	api.AdminAuditSubjectTypeCategory:             policy.AdminCatalogueView,
+	api.AdminAuditSubjectTypeSynonym:              policy.AdminCatalogueView,
+	api.AdminAuditSubjectTypeNotificationTemplate: policy.AdminNotifyView,
 }
 
 type auditFilter struct {

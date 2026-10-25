@@ -60,6 +60,8 @@ const READS: [RegExp, string[]][] = [
   [/^\/v1\/admin\/(businesses|stores|customers|customer-search|orders|reviews|review-reports|banners)(\/|$)/, SUPPORT_UP],
   [/^\/v1\/admin\/audit-log\/subject$/, ['field_agent', 'support', 'catalogue', 'finance', 'admin', 'super_admin']],
   [/^\/v1\/admin\/(audit-log|settings)(\/|$)/, ['admin', 'super_admin']],
+  [/^\/v1\/admin\/(notification-templates|integrations)(\/|$)/, ['admin', 'super_admin']],
+  [/^\/v1\/admin\/(ledger|credits|credit-adjustments|statements|payouts|payout-exports)(\/|$)/, ['finance', 'admin', 'super_admin']],
   [/^\/v1\/admin\/(jobs|job-runs)(\/|$)/, ['support', 'analyst', 'finance', 'admin', 'super_admin']],
   [/^\/v1\/admin\/(products|pending-products|categories|synonyms)(\/|$)/, ['catalogue', 'admin', 'super_admin']],
   [/^\/v1\/admin\/users(\/|$)/, ['super_admin']],
