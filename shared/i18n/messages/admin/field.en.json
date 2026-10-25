@@ -479,6 +479,10 @@
     "defaultMessage": "No products yet.",
     "description": "A-04 products: empty list"
   },
+  "field.items.shopItem": {
+    "defaultMessage": "Added by the shop",
+    "description": "A-04 products: shown instead of Edit on an item the shop added; a field agent changes only the items they added"
+  },
   "field.items.inReview": {
     "defaultMessage": "In review",
     "description": "A-04 products: a new product waiting for catalogue review"
@@ -554,6 +558,10 @@
   "field.owner.gone": {
     "defaultMessage": "This shop can no longer be confirmed here. Refresh to see its status.",
     "description": "A-04 owner: invalid_transition"
+  },
+  "field.owner.refused": {
+    "defaultMessage": "This number cannot own a shop on TodayZ. Use another number for the owner.",
+    "description": "A-04 owner: the API refused the owner number (validation_failed on body.ownerPhone, for example a blocked account)"
   },
   "field.owner.incomplete": {
     "defaultMessage": "Some details are missing before the owner can confirm.",

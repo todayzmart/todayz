@@ -93,6 +93,7 @@ async function fieldApi(page: Page) {
       productMrpPaise: p?.mrpPaise ?? null,
       isListed: true,
       productStatus: 'active',
+      editable: true,
     };
   };
   await answer(page, '/v1/discover/categories', 200, categories);

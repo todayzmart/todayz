@@ -86,6 +86,7 @@ export function OwnerStep({ business: b, goTo }: { business: FieldBusiness; goTo
     const e = codeError(send.error);
     if (e.kind === 'wait') return e.retryAfter ? t('field.owner.wait', { s: e.retryAfter }) : t('field.owner.waitShort');
     if (e.kind === 'gone') return t('field.owner.gone');
+    if (e.kind === 'number') return t('field.owner.refused');
     return problemText(send.error);
   })();
   const verifyError = (() => {
@@ -102,6 +103,8 @@ export function OwnerStep({ business: b, goTo }: { business: FieldBusiness; goTo
         return t('field.owner.waitShort');
       case 'gone':
         return t('field.owner.gone');
+      case 'number':
+        return t('field.owner.refused');
       default:
         return verify.error instanceof ApiError && verify.error.code === 'submit_incomplete' ? t('field.owner.incomplete') : problemText(verify.error);
     }

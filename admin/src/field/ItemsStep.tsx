@@ -76,7 +76,8 @@ function StoreItems({ bid, sid, editable }: { bid: string; sid: string; editable
       {!open && <p className={css.muted}>{intl.formatMessage({ id: 'field.readOnly' })}</p>}
       <ul className={css.list} aria-label={intl.formatMessage({ id: 'field.items.list' })}>
         {items.map((it) => (
-          <ItemRow key={it.id} item={it} bid={bid} sid={sid} editable={open} />
+          // D-232: an agent changes only the items they added; the server says which.
+          <ItemRow key={it.id} item={it} bid={bid} sid={sid} editable={open && it.editable} shopItem={open && !it.editable} />
         ))}
       </ul>
       {q.hasNextPage && (
@@ -88,7 +89,7 @@ function StoreItems({ bid, sid, editable }: { bid: string; sid: string; editable
   );
 }
 
-function ItemRow({ item: it, bid, sid, editable }: { item: FieldItem; bid: string; sid: string; editable: boolean }) {
+function ItemRow({ item: it, bid, sid, editable, shopItem }: { item: FieldItem; bid: string; sid: string; editable: boolean; shopItem: boolean }) {
   const intl = useIntl();
   const problemText = useProblemText();
   const update = useUpdateItem(bid, sid);
@@ -133,6 +134,7 @@ function ItemRow({ item: it, bid, sid, editable }: { item: FieldItem; bid: strin
       ) : (
         <span className={css.head}>
           <span className={css.price}>{money(it.pricePaise)}</span>
+          {shopItem && <span className={css.muted}>{intl.formatMessage({ id: 'field.items.shopItem' })}</span>}
           {editable && (
             <Button size="sm" variant="ghost" onClick={() => setEditing(true)} aria-label={intl.formatMessage({ id: 'field.items.editPrice' }, { name: it.name })}>
               {intl.formatMessage({ id: 'field.items.edit' })}

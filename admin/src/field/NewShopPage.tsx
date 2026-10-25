@@ -93,7 +93,7 @@ export function NewShopPage() {
           maxLength={14}
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          error={(shown && errors.phone) || (server['body.ownerPhone'] && intl.formatMessage({ id: 'field.new.phone.invalid' }))}
+          error={(shown && errors.phone) || (server['body.ownerPhone'] && intl.formatMessage({ id: 'field.owner.refused' }))}
         />
         {create.isError && !(create.error instanceof ApiError && Object.keys(create.error.fields).length > 0) && (
           <p role="alert" className="tz-field-error">

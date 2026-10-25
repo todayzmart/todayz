@@ -53,9 +53,12 @@ export function toPaise(raw: string): number | null {
   return p > 0 ? p : null;
 }
 
-export type CodeError = { kind: 'wrong'; attemptsLeft?: number } | { kind: 'locked' | 'expired' | 'wait' | 'gone' | 'other' };
+export type CodeError = { kind: 'wrong'; attemptsLeft?: number } | { kind: 'locked' | 'expired' | 'wait' | 'gone' | 'number' | 'other' };
 
-/** The owner-code answers (04 §2.7): code_invalid 422, otp_locked 429, otp_expired 401, rate_limited 429. */
+/**
+ * The owner-code answers (04 §2.7): code_invalid 422, otp_locked 429, otp_expired 401, rate_limited 429,
+ * and validation_failed on body.ownerPhone (422) for a number that cannot own a business.
+ */
 export function codeError(e: unknown): CodeError & { retryAfter?: number } {
   if (e instanceof ApiError) {
     switch (e.code) {
@@ -71,6 +74,8 @@ export function codeError(e: unknown): CodeError & { retryAfter?: number } {
         return e.retryAfterSeconds ? { kind: 'wait', retryAfter: e.retryAfterSeconds } : { kind: 'wait' };
       case 'invalid_transition':
         return { kind: 'gone' };
+      case 'validation_failed':
+        if (e.fields['body.ownerPhone']) return { kind: 'number' };
     }
   }
   return { kind: 'other' };

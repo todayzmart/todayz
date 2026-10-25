@@ -39,6 +39,9 @@ export function DetailsStep({ business: b, onDone }: { business: FieldBusiness; 
     phone: owner === null ? intl.formatMessage({ id: 'field.new.phone.invalid' }) : undefined,
   };
 
+  // The API refuses a number that cannot own a business (422 on body.ownerPhone).
+  const refused = save.error instanceof ApiError && !!save.error.fields['body.ownerPhone'];
+
   const submit = (e: FormEvent) => {
     e.preventDefault();
     setShown(true);
@@ -108,10 +111,10 @@ export function DetailsStep({ business: b, onDone }: { business: FieldBusiness; 
           maxLength={14}
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          error={shown ? errors.phone : undefined}
+          error={(shown && errors.phone) || (refused ? intl.formatMessage({ id: 'field.owner.refused' }) : undefined)}
         />
       )}
-      {save.isError && (
+      {save.isError && !refused && (
         <p role="alert" className="tz-field-error">
           {save.error instanceof ApiError && Object.keys(save.error.fields).length > 0
             ? intl.formatMessage({ id: 'common.error.invalid' })

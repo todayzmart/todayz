@@ -51,6 +51,7 @@ function item(over: Partial<FieldItem> = {}): FieldItem {
     onHand: 12,
     isListed: true,
     productStatus: 'active',
+    editable: true,
     ...over,
   } as FieldItem;
 }
@@ -66,7 +67,7 @@ function stats(over: Partial<FieldAgentStats> = {}): FieldAgentStats {
     disabled: false,
     firstOrderRate: 0.5,
     weekly: Array.from({ length: 8 }, (_, i) => ({
-      weekStart: `2026-09-${String(7 + i * 7 > 30 ? 30 : 7 + i * 7).padStart(2, '0')}`,
+      weekStart: new Date(Date.UTC(2026, 8, 7 + i * 7)).toISOString().slice(0, 10),
       onboarded: i % 3,
       verified: i % 2,
       itemsAdded: i * 3,
@@ -200,6 +201,16 @@ describe('A-04 field onboarding', () => {
     expect(await screen.findByText('The owner has confirmed')).toBeInTheDocument();
   });
 
+  it('says when the owner number cannot own a shop', async () => {
+    const refused: Handler = (c) =>
+      c.path.endsWith('/owner-confirm')
+        ? json(422, { type: 'about:blank', title: 'x', status: 422, code: 'validation_failed', fields: { 'body.ownerPhone': 'this number cannot own a business' } })
+        : undefined;
+    renderAt(`/field/${BID}`, { roles: ['field_agent'], handlers: [refused, api()] });
+    fireEvent.click(await screen.findByRole('button', { name: 'Send code to owner' }));
+    expect(await screen.findByText('This number cannot own a shop on TodayZ. Use another number for the owner.')).toBeInTheDocument();
+  });
+
   it('points to the missing store details when the code cannot be sent yet', async () => {
     const incomplete: Handler = (c) =>
       c.path.endsWith('/owner-confirm')
@@ -236,6 +247,16 @@ describe('A-04 field onboarding', () => {
     expect(screen.getByText('The edit window for this shop has closed, so this is read-only.')).toBeInTheDocument();
     expect(screen.queryByRole('searchbox', { name: 'Find a product' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Edit the price/ })).not.toBeInTheDocument();
+  });
+
+  it('offers Edit only on the items the agent added (D-232)', async () => {
+    const shopOwn = item({ id: '01JF1E1D1TEM00000000000I03', name: 'Moong dal', editable: false });
+    renderAt(`/field/${BID}`, { roles: ['field_agent'], handlers: [api(shop(), [item(), shopOwn])] });
+    fireEvent.click(await screen.findByRole('button', { name: /Products/ }));
+    expect(await screen.findByText('Moong dal')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Edit the price of Toor dal' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Edit the price of Moong dal' })).not.toBeInTheDocument();
+    expect(screen.getByText('Added by the shop')).toBeInTheDocument();
   });
 
   it('refuses a large photo before asking for an upload', async () => {
@@ -310,7 +331,9 @@ describe('A-15 field agents', () => {
     const table = await screen.findByRole('table', { name: 'Field agents' });
     expect(await within(table).findByText('Divya')).toBeInTheDocument();
     expect(within(table).getAllByText('Disabled')).toHaveLength(1);
-    expect(within(within(table).getByText('Divya').closest('tr')!).getByText('Disabled')).toBeInTheDocument();
+    const row = within(table).getByText('Divya').closest('tr');
+    expect(row).not.toBeNull();
+    expect(within(row as HTMLElement).getByText('Disabled')).toBeInTheDocument();
     fireEvent.click(within(table).getByRole('button', { name: 'Show the weekly trend of Divya' }));
     expect(await screen.findByRole('heading', { name: 'Weekly trend: Divya' })).toBeInTheDocument();
     expect(calls.some((c) => c.path === '/v1/admin/field/me/stats')).toBe(false);
