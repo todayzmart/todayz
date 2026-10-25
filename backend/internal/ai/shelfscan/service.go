@@ -29,7 +29,7 @@ type inputMeta struct {
 // Create stores a processing draft for one shelf photo and reads it in the background.
 func (s *Service) Create(ctx context.Context, sc authz.Scope, actor ids.ID, img client.Image) (ids.ID, error) {
 	return s.d.Kit.Start(ctx, retail.New{
-		Feature: Feature, Store: sc.StoreID, Actor: actor, PromptVersion: prompts.Version(Feature),
+		Feature: Feature, Store: sc.StoreID, Actor: actor, PromptVersion: prompts.Version(Feature), Scan: true,
 		Meta: inputMeta{Bytes: len(img.Data), MediaType: img.MediaType},
 	}, func(ctx context.Context, id ids.ID) { s.process(ctx, id, img) })
 }
@@ -169,7 +169,10 @@ func (s *Service) Get(ctx context.Context, sc authz.Scope, id ids.ID) (aiapi.She
 	return v, nil
 }
 
-// Confirm lists the accepted and edited lines as store items in one transaction.
+// Confirm lists the accepted and edited lines as store items in one transaction. A line that
+// does not fit (no such product, already listed, above the MRP) or that the confirmer may not
+// make (item.price.edit) is refused alone, not_permitted with its reason, and the draft stays
+// ready so it can be edited and confirmed again; the other lines are listed.
 func (s *Service) Confirm(ctx context.Context, sc authz.Scope, p authn.Principal, draftID ids.ID, in []aiapi.ShelfPhotoDecision) (drafts.Result, error) {
 	if err := s.d.Kit.Guard.Require(ctx, Feature); err != nil {
 		return drafts.Result{}, err
@@ -190,7 +193,7 @@ func (s *Service) Confirm(ctx context.Context, sc authz.Scope, p authn.Principal
 	}
 	index := retail.Index(lineIDs)
 	return s.d.Kit.Drafts.Confirm(ctx, drafts.Confirmation{
-		Feature: Feature, DraftID: draftID, By: p.UserID, Decisions: ds, Check: retail.OwnStore(sc.StoreID),
+		Feature: Feature, DraftID: draftID, By: p.UserID, Decisions: ds, Check: retail.OwnStore(sc.StoreID), KeepOpen: true,
 		Apply: func(ctx context.Context, d drafts.Draft, ds []drafts.Decision) ([]drafts.LineResult, error) {
 			return s.apply(ctx, sc, d, ds, index)
 		},
@@ -199,7 +202,6 @@ func (s *Service) Confirm(ctx context.Context, sc authz.Scope, p authn.Principal
 
 type change struct {
 	lineID  string
-	path    string
 	outcome drafts.Outcome
 	product string
 	price   *int64 // nil: the product's MRP
@@ -215,10 +217,15 @@ func (s *Service) apply(ctx context.Context, sc authz.Scope, d drafts.Draft, ds 
 	for _, l := range out.Lines {
 		byID[l.LineID] = l
 	}
+	results := make([]drafts.LineResult, 0, len(ds))
 	todo := make([]change, 0, len(ds))
 	want := make([]string, 0, len(ds))
 	for _, dc := range ds {
 		c, err := decide(dc, byID[dc.LineID], fmt.Sprintf("body.lines[%d]", index[dc.LineID]))
+		if r, ok := retail.Refused(dc.LineID, err); ok {
+			results = append(results, r)
+			continue
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -229,46 +236,59 @@ func (s *Service) apply(ctx context.Context, sc authz.Scope, d drafts.Draft, ds 
 	if err != nil {
 		return nil, err
 	}
-	seen := map[string]bool{}
-	results := make([]drafts.LineResult, 0, len(todo))
+	seen := map[string]bool{} // products listed by an earlier line of this confirm
 	for _, c := range todo {
-		p, ok := ps[c.product]
-		switch {
-		case !ok || !p.active:
-			return nil, retail.FieldErr(c.path+".value.productId", "no_product")
-		case p.listed:
-			return nil, retail.FieldErr(c.path+".value.productId", "already_listed")
-		case seen[c.product]:
-			return nil, retail.FieldErr(c.path+".value.productId", "duplicate")
+		err := s.write(ctx, sc, c, ps, seen)
+		if r, ok := retail.Refused(c.lineID, err); ok {
+			results = append(results, r)
+			continue
 		}
-		seen[c.product] = true
-		price := c.price
-		if price == nil {
-			if p.mrp == nil {
-				return nil, retail.FieldErr(c.path+".value.pricePaise", "required")
-			}
-			price = p.mrp
-		}
-		if p.mrp != nil && *price > *p.mrp {
-			return nil, retail.FieldErr(c.path+".value.pricePaise", "above_mrp")
-		}
-		pid, _ := ids.Parse(c.product)
-		if err := s.d.Items.Add(ctx, sc, NewItem{ProductID: pid, PricePaise: *price, OpeningStock: c.opening}); err != nil {
+		if err != nil {
 			return nil, err
 		}
+		seen[c.product] = true
 		results = append(results, drafts.LineResult{LineID: c.lineID, Outcome: c.outcome})
 	}
 	return results, nil
 }
 
+// write lists one line, in a savepoint of the confirm's transaction, so a line the catalogue
+// refuses rolls back alone.
+func (s *Service) write(ctx context.Context, sc authz.Scope, c change, ps map[string]product, seen map[string]bool) error {
+	p, ok := ps[c.product]
+	switch {
+	case !ok || !p.active:
+		return retail.RefuseProduct
+	case seen[c.product]:
+		return retail.RefuseDuplicate
+	case p.listed:
+		return retail.RefuseListed
+	}
+	price := c.price
+	if price == nil {
+		if p.mrp == nil {
+			return retail.RefusePrice
+		}
+		price = p.mrp
+	}
+	if p.mrp != nil && *price > *p.mrp {
+		return retail.RefusePriceAboveMRP
+	}
+	pid, _ := ids.Parse(c.product)
+	return s.d.DB.InTx(ctx, func(ctx context.Context) error {
+		return s.d.Items.Add(ctx, sc, NewItem{ProductID: pid, PricePaise: *price, OpeningStock: c.opening})
+	})
+}
+
 // decide is one decision as a change: an accepted line at its matched product's MRP with no
-// opening stock, an edited line as the person wrote it.
+// opening stock, an edited line as the person wrote it. A value that does not fit is a
+// retail.Refusal; only a value that is not the line's shape is a 422 for the request.
 func decide(dc drafts.Decision, l Line, path string) (change, error) {
-	c := change{lineID: dc.LineID, path: path, outcome: dc.Outcome}
+	c := change{lineID: dc.LineID, outcome: dc.Outcome}
 	switch dc.Outcome {
 	case drafts.Accepted:
 		if l.ProductID == nil {
-			return change{}, retail.FieldErr(path+".value.productId", "required")
+			return change{}, retail.RefuseProduct
 		}
 		c.product = *l.ProductID
 	case drafts.Edited:
@@ -277,7 +297,7 @@ func decide(dc drafts.Decision, l Line, path string) (change, error) {
 			return change{}, retail.FieldErr(path+".value", "invalid")
 		}
 		if _, err := ids.Parse(v.ProductId); err != nil {
-			return change{}, retail.FieldErr(path+".value.productId", "no_product")
+			return change{}, retail.RefuseProduct
 		}
 		price := int64(v.PricePaise)
 		c.product, c.price = v.ProductId, &price
@@ -285,10 +305,10 @@ func decide(dc drafts.Decision, l Line, path string) (change, error) {
 			c.opening = *v.OpeningStock
 		}
 		if price < 1 || price > MaxPaise {
-			return change{}, retail.FieldErr(path+".value.pricePaise", "range")
+			return change{}, retail.RefusePrice
 		}
 		if c.opening < 0 || c.opening > MaxOpening {
-			return change{}, retail.FieldErr(path+".value.openingStock", "range")
+			return change{}, retail.RefuseOpeningStock
 		}
 	default:
 		return change{}, fmt.Errorf("shelfscan: outcome %q", dc.Outcome)

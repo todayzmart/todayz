@@ -64,7 +64,7 @@ func New(d Deps) (*Service, error) {
 	if d.Clock == nil {
 		return nil, errors.New("replydraft: a clock is required")
 	}
-	d.Kit.Clock = d.Clock
+	d.Kit.Clock, d.Kit.DB = d.Clock, d.DB
 	return &Service{d: d}, nil
 }
 

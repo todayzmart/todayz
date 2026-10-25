@@ -35,13 +35,24 @@ AiConfirmOutcome:
 AiLineOutcome:
   type: string
   description: >-
-    The recorded outcome of one line. not_permitted - the confirmer lacks the permission the line needs
-    (D-06), so nothing of it was applied.
+    The recorded outcome of one line. not_permitted - the line was refused (the confirmer lacks the permission it
+    needs, D-06, or its values do not fit; see reason), so nothing of it was applied.
   enum: [accepted, edited, discarded, not_permitted]
 AiLineDisabled:
   type: string
   description: Why the caller cannot confirm a line; ask_manager - it needs a manager's permission (D-06, D-65).
   enum: [ask_manager]
+AiLineRefusal:
+  type: string
+  description: >-
+    Why a confirm refused one line (its outcome is not_permitted; the other lines were applied). not_permitted - the
+    confirmer lacks the permission the line needs (a manager can confirm it); invalid_item - no such item in the store
+    (or none matched); invalid_quantity, invalid_cost, invalid_price, invalid_opening_stock - out of range;
+    invalid_cost_above_mrp, invalid_price_above_mrp - above the MRP; invalid_expiry - a past or unreadable date;
+    invalid_product - no such active product (or none matched); invalid_listed - the store already lists it;
+    invalid_duplicate - another line of the same confirm lists it. Edit the line and confirm it again.
+  enum: [not_permitted, invalid_item, invalid_quantity, invalid_cost, invalid_cost_above_mrp, invalid_expiry,
+    invalid_product, invalid_listed, invalid_duplicate, invalid_price, invalid_price_above_mrp, invalid_opening_stock]
 AiLineResult:
   type: object
   additionalProperties: false
@@ -49,6 +60,7 @@ AiLineResult:
   properties:
     lineId: {$ref: ./ai.yaml#/AiDraftLineId}
     outcome: {$ref: ./ai.yaml#/AiLineOutcome}
+    reason: {$ref: ./ai.yaml#/AiLineRefusal}
 AiConfirmResult:
   type: object
   description: The answer to a confirm, the same on a repeat (confirm is idempotent).
@@ -58,7 +70,10 @@ AiConfirmResult:
     draftId: {$ref: ./common.yaml#/Ulid}
     status:
       type: string
-      enum: [confirmed, discarded]
+      description: >-
+        confirmed or discarded once every line is settled; ready when a line was refused (not_permitted with a
+        reason): the other lines are applied and kept, and the refused ones can be edited and confirmed again.
+      enum: [confirmed, discarded, ready]
     lines:
       type: array
       maxItems: 200

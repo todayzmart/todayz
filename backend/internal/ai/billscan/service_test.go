@@ -2,6 +2,7 @@ package billscan_test
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"testing"
 	"time"
@@ -12,6 +13,7 @@ import (
 	aiapi "github.com/todayz/backend/gen/api/ai"
 	"github.com/todayz/backend/internal/ai/billscan"
 	"github.com/todayz/backend/internal/ai/drafts"
+	"github.com/todayz/backend/internal/ai/retail"
 	"github.com/todayz/backend/internal/ai/retail/retailtest"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/settings"
@@ -24,11 +26,16 @@ func TestMain(m *testing.M) { testkit.Main(m) }
 type stock struct {
 	mu  sync.Mutex
 	ins []billscan.StockIn
+	// gone is an item the catalogue answers ErrItemGone for.
+	gone ids.ID
 }
 
 func (s *stock) AddFromBill(_ context.Context, in billscan.StockIn) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if in.ItemID == s.gone {
+		return billscan.ErrItemGone
+	}
 	s.ins = append(s.ins, in)
 	return nil
 }
@@ -122,47 +129,138 @@ func TestDraftWritesNothingUntilConfirm(t *testing.T) {
 	require.Len(t, st.calls(), 2, "a repeat writes nothing")
 }
 
-// TestConfirmRefuses (SC-AI-12): an accepted line with no match, a cost above the item's MRP
-// and an expiry before today are 422s that write nothing and leave the draft ready.
+// TestConfirmRefuses (SC-AI-12): a line that does not fit (no match, a cost above the item's
+// MRP, an expiry before today, an item the catalogue refuses) is refused alone with its
+// reason; the good lines among it are written, the draft stays ready, and the next confirm
+// writes only the corrected lines (the settled ones are never written twice).
 func TestConfirmRefuses(t *testing.T) {
 	e := retailtest.New(t)
-	st := &stock{}
-	s := newService(t, e, st)
 	items := e.Items(t, 2)
 	a, b := items[0], items[1]
 	e.LLM.Reply = bill(a, b)
-	id, err := s.Create(e.Ctx, e.Scope, retailtest.Owner, retailtest.Photo())
-	require.NoError(t, err)
-
 	over := int(a.MrpPaise + 1)
 	yesterday := openapi_types.Date{Time: e.Clock.Now().Add(-48 * time.Hour)}
-	discard := aiapi.SupplierBillDecision{LineId: "l2", Outcome: aiapi.AiConfirmOutcomeDiscarded}
+	accept := func(l string) aiapi.SupplierBillDecision {
+		return aiapi.SupplierBillDecision{LineId: l, Outcome: aiapi.AiConfirmOutcomeAccepted}
+	}
+	edit := func(l string, v aiapi.SupplierBillLineValue) aiapi.SupplierBillDecision {
+		return aiapi.SupplierBillDecision{LineId: l, Outcome: aiapi.AiConfirmOutcomeEdited, Value: &v}
+	}
 	for _, tc := range []struct {
 		name   string
-		l1, l3 aiapi.SupplierBillDecision
-		field  string
+		l1     aiapi.SupplierBillDecision
 		reason string
+		gone   bool
 	}{
-		{"unmatched accepted", aiapi.SupplierBillDecision{LineId: "l1", Outcome: aiapi.AiConfirmOutcomeDiscarded},
-			aiapi.SupplierBillDecision{LineId: "l3", Outcome: aiapi.AiConfirmOutcomeAccepted},
-			"body.lines[2].value.storeItemId", "required"},
-		{"above mrp", aiapi.SupplierBillDecision{LineId: "l1", Outcome: aiapi.AiConfirmOutcomeEdited,
-			Value: &aiapi.SupplierBillLineValue{StoreItemId: a.ID.String(), Quantity: 1, CostPaise: &over}},
-			aiapi.SupplierBillDecision{LineId: "l3", Outcome: aiapi.AiConfirmOutcomeDiscarded},
-			"body.lines[0].value.costPaise", "above_mrp"},
-		{"past expiry", aiapi.SupplierBillDecision{LineId: "l1", Outcome: aiapi.AiConfirmOutcomeEdited,
-			Value: &aiapi.SupplierBillLineValue{StoreItemId: a.ID.String(), Quantity: 1, ExpiresOn: &yesterday}},
-			aiapi.SupplierBillDecision{LineId: "l3", Outcome: aiapi.AiConfirmOutcomeDiscarded},
-			"body.lines[0].value.expiresOn", "past"},
+		{"above mrp", edit("l1", aiapi.SupplierBillLineValue{StoreItemId: a.ID.String(), Quantity: 1, CostPaise: &over}), "invalid_cost_above_mrp", false},
+		{"past expiry", edit("l1", aiapi.SupplierBillLineValue{StoreItemId: a.ID.String(), Quantity: 1, ExpiresOn: &yesterday}), "invalid_expiry", false},
+		{"no quantity", edit("l1", aiapi.SupplierBillLineValue{StoreItemId: a.ID.String(), Quantity: 0}), "invalid_quantity", false},
+		{"another store's item", edit("l1", aiapi.SupplierBillLineValue{StoreItemId: ids.New(e.Clock.Now()).String(), Quantity: 1}), "invalid_item", false},
+		{"catalogue refuses", accept("l1"), "invalid_item", true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := s.Confirm(e.Ctx, e.Scope, e.Owner, id, []aiapi.SupplierBillDecision{tc.l1, discard, tc.l3})
-			pe := retailtest.Problem(t, err)
-			require.Equal(t, tc.reason, pe.Fields[tc.field], pe.Fields)
-			require.Empty(t, st.calls())
+			st := &stock{}
+			if tc.gone {
+				st.gone = a.ID
+			}
+			s := newService(t, e, st)
+			id, err := s.Create(e.Ctx, e.Scope, retailtest.Owner, retailtest.Photo())
+			require.NoError(t, err)
+
+			// One bad line among good ones: l1 is refused, l2 is written, l3 (accepted with
+			// no match) is refused.
+			res, err := s.Confirm(e.Ctx, e.Scope, e.Owner, id, []aiapi.SupplierBillDecision{tc.l1, accept("l2"), accept("l3")})
+			require.NoError(t, err)
+			require.Equal(t, drafts.StatusReady, res.Status)
+			require.Equal(t, []drafts.LineResult{
+				{LineID: "l1", Outcome: drafts.NotPermitted, Reason: tc.reason},
+				{LineID: "l2", Outcome: drafts.Accepted},
+				{LineID: "l3", Outcome: drafts.NotPermitted, Reason: "invalid_item"},
+			}, res.Lines)
+			ins := st.calls()
+			require.Len(t, ins, 1, "only the good line is written")
+			require.Equal(t, b.ID, ins[0].ItemID)
 			require.Equal(t, drafts.StatusReady, e.Draft(t, billscan.Feature, id).Status)
+
+			// The person corrects l1 and drops l3; l2 is not written again.
+			st.gone = ids.Zero
+			res, err = s.Confirm(e.Ctx, e.Scope, e.Owner, id, []aiapi.SupplierBillDecision{
+				edit("l1", aiapi.SupplierBillLineValue{StoreItemId: a.ID.String(), Quantity: 2}), accept("l2"),
+				{LineId: "l3", Outcome: aiapi.AiConfirmOutcomeDiscarded},
+			})
+			require.NoError(t, err)
+			require.Equal(t, drafts.StatusConfirmed, res.Status)
+			require.Equal(t, []drafts.LineResult{
+				{LineID: "l1", Outcome: drafts.Edited}, {LineID: "l2", Outcome: drafts.Accepted}, {LineID: "l3", Outcome: drafts.Discarded},
+			}, res.Lines)
+			ins = st.calls()
+			require.Len(t, ins, 2)
+			require.Equal(t, a.ID, ins[1].ItemID)
+			require.Equal(t, 2, ins[1].Qty)
 		})
 	}
+}
+
+// TestGuardBalanced: every create reserves one call and settles its cost on every path (a
+// read, a provider error, a schema reject, an empty bill), so the day's calls equal the
+// creates and the cost booked equals what the model calls cost.
+func TestGuardBalanced(t *testing.T) {
+	e := retailtest.New(t)
+	s := newService(t, e, &stock{})
+	items := e.Items(t, 2)
+	replies := []struct {
+		reply any
+		err   error
+	}{
+		{bill(items[0], items[1]), nil},
+		{nil, errors.New("provider down")},
+		{map[string]any{"lines": "not a list"}, nil},
+		{billscan.ToolOutput{Lines: []billscan.ToolLine{}}, nil},
+	}
+	for _, r := range replies {
+		e.LLM.Reply, e.LLM.Err = r.reply, r.err
+		_, err := s.Create(e.Ctx, e.Scope, retailtest.Owner, retailtest.Photo())
+		require.NoError(t, err)
+	}
+	require.Equal(t, len(replies), e.LLM.Calls())
+	require.Equal(t, len(replies), e.Count(t, `SELECT coalesce(sum(calls), 0)::int FROM ai_usage_daily WHERE scope = 'store'`))
+	require.Equal(t, 0, e.Count(t, `SELECT count(*) FROM ai_drafts WHERE feature = $1 AND status = 'processing'`, billscan.Feature))
+	require.Equal(t, 3, e.Count(t, `SELECT count(*) FROM ai_drafts WHERE feature = $1 AND status = 'failed'`, billscan.Feature))
+	require.Equal(t,
+		e.Count(t, `SELECT coalesce(sum(cost_paise), 0)::int FROM ai_drafts WHERE feature = $1`, billscan.Feature),
+		e.Count(t, `SELECT coalesce(sum(cost_paise), 0)::int FROM ai_usage_daily WHERE scope = 'platform'`))
+}
+
+// TestScansInFlight: a store reads at most two photos at once (bill and shelf together); a
+// third start is 429 rate_limited, takes nothing from the daily cap and calls no model, and
+// a stale draft no longer counts.
+func TestScansInFlight(t *testing.T) {
+	e := retailtest.New(t)
+	held := []func(){}
+	e.Kit.Go = func(f func()) { held = append(held, f) }
+	s := newService(t, e, &stock{})
+	items := e.Items(t, 2)
+	e.LLM.Reply = bill(items[0], items[1])
+	for range retail.MaxScansInFlight {
+		_, err := s.Create(e.Ctx, e.Scope, retailtest.Owner, retailtest.Photo())
+		require.NoError(t, err)
+	}
+	_, err := s.Create(e.Ctx, e.Scope, retailtest.Owner, retailtest.Photo())
+	pe := retailtest.Problem(t, err)
+	require.Equal(t, "rate_limited", pe.Code)
+	require.NotEmpty(t, pe.Header.Get("Retry-After"))
+	require.Equal(t, retail.MaxScansInFlight, e.Count(t, `SELECT coalesce(sum(calls), 0)::int FROM ai_usage_daily WHERE scope = 'store'`))
+
+	// One finishes: the next start is taken.
+	held[0]()
+	_, err = s.Create(e.Ctx, e.Scope, retailtest.Owner, retailtest.Photo())
+	require.NoError(t, err)
+
+	// Past StaleAfter the stuck ones no longer hold the store.
+	e.Clock.Advance(retail.StaleAfter + time.Second)
+	_, err = s.Create(e.Ctx, e.Scope, retailtest.Owner, retailtest.Photo())
+	require.NoError(t, err)
+	require.Equal(t, 1, e.LLM.Calls(), "only the run that was let go called the model")
 }
 
 // TestHiddenWhenOff (SC-AI-24): with ai_billscan_enabled off every call is the common 404 and
@@ -220,4 +318,22 @@ func TestFailedRead(t *testing.T) {
 	_, err = s.Confirm(e.Ctx, e.Scope, e.Owner, id, []aiapi.SupplierBillDecision{{LineId: "l1", Outcome: aiapi.AiConfirmOutcomeAccepted}})
 	require.Error(t, err)
 	require.Empty(t, st.calls())
+}
+
+// TestTiedMatchIsLeftUnmatched (W3-11 review): when two of the store's items fit a line
+// equally well the server does not pick one; the line has no match and the person chooses.
+func TestTiedMatchIsLeftUnmatched(t *testing.T) {
+	e := retailtest.New(t)
+	s := newService(t, e, &stock{})
+	items := e.Items(t, 2)
+	a, b := items[0], items[1]
+	_, err := e.TDB.OwnerPool.Exec(e.Ctx, `UPDATE store_items SET local_name = $1 WHERE id = $2`, a.Name, ids.UUID(b.ID))
+	require.NoError(t, err)
+	e.LLM.Reply = billscan.ToolOutput{Lines: []billscan.ToolLine{{Name: a.Name, Quantity: 1, Confidence: 0.9}}}
+	id, err := s.Create(e.Ctx, e.Scope, retailtest.Owner, retailtest.Photo())
+	require.NoError(t, err)
+	v, err := s.Get(e.Ctx, e.Scope, id)
+	require.NoError(t, err)
+	require.Len(t, v.Lines, 1)
+	require.Nil(t, v.Lines[0].Match, "a tie is not guessed")
 }

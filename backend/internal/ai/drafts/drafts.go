@@ -85,6 +85,8 @@ type Decision struct {
 type LineResult struct {
 	LineID  string  `json:"lineId"`
 	Outcome Outcome `json:"outcome"`
+	// Reason is why a not_permitted line was refused (the feature's code); empty otherwise.
+	Reason string `json:"reason,omitempty"`
 }
 
 // Draft is one ai_drafts row.
@@ -217,7 +219,7 @@ func (s *Service) MarkFailed(ctx context.Context, id ids.ID, reason string, r cl
 // ApplyFunc writes the accepted and edited lines through the owning domain, inside Confirm's
 // transaction, and returns every decided line's outcome: the person's outcome, or
 // not_permitted for a line the confirmer may not make or that no longer fits the current
-// state. An error rolls the whole confirm back. It is not called when every line is discarded.
+// state, with a Reason the person reads (W3-11). An error rolls the whole confirm back. It is not called when every line is discarded.
 type ApplyFunc func(ctx context.Context, d Draft, decisions []Decision) ([]LineResult, error)
 
 // Confirmation is one confirm request.
@@ -309,18 +311,21 @@ func (s *Service) Confirm(ctx context.Context, c Confirmation) (Result, error) {
 			res = Result{DraftID: d.ID, Status: d.Status, Lines: d.Lines}
 			return nil
 		}
-		applied := map[string]Outcome{}
+		applied := map[string]LineResult{}
 		if len(toApply) > 0 {
 			out, err := c.Apply(ctx, d, toApply)
 			if err != nil {
 				return err
 			}
 			for _, r := range out {
-				applied[r.LineID] = r.Outcome
+				if r.Outcome != NotPermitted {
+					r.Reason = ""
+				}
+				applied[r.LineID] = r
 			}
 			for _, dc := range toApply {
-				o, ok := applied[dc.LineID]
-				if !ok || (o != dc.Outcome && o != NotPermitted) {
+				r, ok := applied[dc.LineID]
+				if o := r.Outcome; !ok || (o != dc.Outcome && o != NotPermitted) {
 					return fmt.Errorf("drafts: %s apply returned no valid outcome for %s", c.Feature, dc.LineID)
 				}
 			}
@@ -332,10 +337,11 @@ func (s *Service) Confirm(ctx context.Context, c Confirmation) (Result, error) {
 		lines := make([]LineResult, 0, len(known))
 		for _, id := range known {
 			o, done := settled[id]
+			var reason string
 			if !done {
 				o = Discarded
 				if dc, ok := decided[id]; ok && dc.Outcome != Discarded {
-					o = applied[id]
+					o, reason = applied[id].Outcome, applied[id].Reason
 				}
 			}
 			switch o {
@@ -344,7 +350,7 @@ func (s *Service) Confirm(ctx context.Context, c Confirmation) (Result, error) {
 			case NotPermitted:
 				open = true
 			}
-			lines = append(lines, LineResult{LineID: id, Outcome: o})
+			lines = append(lines, LineResult{LineID: id, Outcome: o, Reason: reason})
 		}
 		b, err := json.Marshal(lines)
 		if err != nil {

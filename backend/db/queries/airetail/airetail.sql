@@ -7,18 +7,30 @@
 -- The best store item for each line the model read off a supplier bill
 -- (AI-R2): pg_trgm word similarity of the line's words against the item's
 -- name, brand, variant and pack, at least min_score. A line with no item
--- that close is left out (the person picks the item).
-SELECT DISTINCT ON (n.ord) n.ord::int AS ord, si.id,
-       coalesce(si.local_name, p.name)::text AS name, p.variant,
-       p.pack_size::text AS pack_size, p.unit, si.on_hand,
-       coalesce(si.mrp_paise, p.mrp_paise) AS mrp_paise,
-       word_similarity(lower(n.name), lower(concat_ws(' ', coalesce(si.local_name, p.name), b.name, p.variant, p.pack_size::text, p.unit)))::float8 AS score
-FROM unnest(@names::text[]) WITH ORDINALITY AS n(name, ord)
-JOIN store_items si ON si.store_id = @store_id
-JOIN products p ON p.id = si.product_id
-LEFT JOIN brands b ON b.id = p.brand_id
-WHERE word_similarity(lower(n.name), lower(concat_ws(' ', coalesce(si.local_name, p.name), b.name, p.variant, p.pack_size::text, p.unit))) >= @min_score::float8
-ORDER BY n.ord, score DESC, si.id;
+-- that close is left out (the person picks the item), and so is a line whose
+-- two best items score the same: the server never guesses between them.
+WITH scored AS (
+  SELECT n.ord::int AS ord, si.id,
+         coalesce(si.local_name, p.name)::text AS name, p.variant,
+         p.pack_size::text AS pack_size, p.unit, si.on_hand,
+         coalesce(si.mrp_paise, p.mrp_paise) AS mrp_paise,
+         word_similarity(lower(n.name), lower(concat_ws(' ', coalesce(si.local_name, p.name), b.name, p.variant, p.pack_size::text, p.unit)))::float8 AS score
+  FROM unnest(@names::text[]) WITH ORDINALITY AS n(name, ord)
+  JOIN store_items si ON si.store_id = @store_id
+  JOIN products p ON p.id = si.product_id
+  LEFT JOIN brands b ON b.id = p.brand_id
+  WHERE word_similarity(lower(n.name), lower(concat_ws(' ', coalesce(si.local_name, p.name), b.name, p.variant, p.pack_size::text, p.unit))) >= @min_score::float8
+), ranked AS (
+  SELECT scored.*,
+         row_number() OVER (PARTITION BY scored.ord ORDER BY scored.score DESC, scored.id) AS rn,
+         lead(scored.score) OVER (PARTITION BY scored.ord ORDER BY scored.score DESC, scored.id) AS next_score
+  FROM scored
+)
+SELECT ranked.ord, ranked.id, ranked.name, ranked.variant, ranked.pack_size, ranked.unit,
+       ranked.on_hand, ranked.mrp_paise, ranked.score
+FROM ranked
+WHERE ranked.rn = 1 AND (ranked.next_score IS NULL OR ranked.next_score < ranked.score - 1e-9)
+ORDER BY ranked.ord;
 
 -- name: StoreItemsByIDs :many
 -- The named items of the store as a bill review shows them now; an id of
@@ -32,17 +44,29 @@ WHERE si.store_id = @store_id AND si.id = ANY(@ids::uuid[]);
 -- name: MatchProducts :many
 -- The best active master product for each product the model saw on a shelf
 -- (AI-R3), as SearchProducts matches (name, variant and brand), at least
--- min_score. listed is true when the store already has the product.
-SELECT DISTINCT ON (n.ord) n.ord::int AS ord, p.id, p.name, b.name AS brand_name,
-       p.variant, p.pack_size::text AS pack_size, p.unit, p.mrp_paise,
-       EXISTS (SELECT 1 FROM store_items si WHERE si.product_id = p.id AND si.store_id = @store_id)::bool AS listed,
-       word_similarity(lower(n.name), lower(concat_ws(' ', b.name, p.name, p.variant, p.pack_size::text, p.unit)))::float8 AS score
-FROM unnest(@names::text[]) WITH ORDINALITY AS n(name, ord)
-CROSS JOIN products p
-LEFT JOIN brands b ON b.id = p.brand_id
-WHERE p.status = 'active'
-  AND word_similarity(lower(n.name), lower(concat_ws(' ', b.name, p.name, p.variant, p.pack_size::text, p.unit))) >= @min_score::float8
-ORDER BY n.ord, score DESC, p.id;
+-- min_score; a tie between the two best is left out, as for a bill line.
+-- listed is true when the store already has the product.
+WITH scored AS (
+  SELECT n.ord::int AS ord, p.id, p.name, b.name AS brand_name,
+         p.variant, p.pack_size::text AS pack_size, p.unit, p.mrp_paise,
+         EXISTS (SELECT 1 FROM store_items si WHERE si.product_id = p.id AND si.store_id = @store_id)::bool AS listed,
+         word_similarity(lower(n.name), lower(concat_ws(' ', b.name, p.name, p.variant, p.pack_size::text, p.unit)))::float8 AS score
+  FROM unnest(@names::text[]) WITH ORDINALITY AS n(name, ord)
+  CROSS JOIN products p
+  LEFT JOIN brands b ON b.id = p.brand_id
+  WHERE p.status = 'active'
+    AND word_similarity(lower(n.name), lower(concat_ws(' ', b.name, p.name, p.variant, p.pack_size::text, p.unit))) >= @min_score::float8
+), ranked AS (
+  SELECT scored.*,
+         row_number() OVER (PARTITION BY scored.ord ORDER BY scored.score DESC, scored.id) AS rn,
+         lead(scored.score) OVER (PARTITION BY scored.ord ORDER BY scored.score DESC, scored.id) AS next_score
+  FROM scored
+)
+SELECT ranked.ord, ranked.id, ranked.name, ranked.brand_name, ranked.variant, ranked.pack_size,
+       ranked.unit, ranked.mrp_paise, ranked.listed, ranked.score
+FROM ranked
+WHERE ranked.rn = 1 AND (ranked.next_score IS NULL OR ranked.next_score < ranked.score - 1e-9)
+ORDER BY ranked.ord;
 
 -- name: ProductsByIDs :many
 -- Master products as a shelf review shows them now, with whether the store
@@ -122,3 +146,15 @@ INSERT INTO ai_text_misses (feature, store_id, ref, lang, facts_hash, reason, cr
 VALUES (@feature, @store_id, @ref, @lang, @facts_hash, @reason, @now)
 ON CONFLICT (feature, store_id, ref, lang) DO UPDATE
 SET facts_hash = EXCLUDED.facts_hash, reason = EXCLUDED.reason, created_at = EXCLUDED.created_at;
+
+-- name: LockStoreScans :exec
+-- Serialises the start of a store's photo scans for the rest of the
+-- transaction, so two creates cannot both pass the in-flight count.
+SELECT pg_advisory_xact_lock(hashtextextended(@lock_key::text, 0));
+
+-- name: ScansInFlight :one
+-- A store's photo drafts still processing and not yet stale.
+SELECT count(*)::int AS n
+FROM ai_drafts
+WHERE store_id = @store_id AND feature = ANY(@features::text[])
+  AND status = 'processing' AND created_at > @since;

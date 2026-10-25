@@ -51,7 +51,9 @@ type NewItem struct {
 }
 
 // Items creates a store item through the catalogue's create, inside the confirm's
-// transaction. Its problems carry the items route's field paths.
+// transaction. A line the catalogue refuses is a retail.Refusal (not_permitted without
+// item.price.edit, invalid_product, invalid_listed, invalid_price_above_mrp); any other error
+// fails the whole confirm.
 type Items interface {
 	Add(ctx context.Context, sc authz.Scope, it NewItem) error
 }
@@ -74,6 +76,6 @@ func New(d Deps) (*Service, error) {
 	if d.Clock == nil {
 		return nil, errors.New("shelfscan: a clock is required")
 	}
-	d.Kit.Clock = d.Clock
+	d.Kit.Clock, d.Kit.DB = d.Clock, d.DB
 	return &Service{d: d}, nil
 }

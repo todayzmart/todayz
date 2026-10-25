@@ -58,10 +58,10 @@
       Owner and manager. A multipart form with `photo` (one photo of a distributor bill: image/jpeg,
       image/png or image/webp, at most 4 MB). Answers 202 at once; the model reads the lines in the
       background and the draft turns ready (lines matched to the store's items) or failed. The photo
-      is not stored. One call against the store's daily AI cap (`429 ai_daily_cap_reached`).
+      is not stored. One call against the store's daily AI cap (`429 ai_daily_cap_reached`). At most two photo scans (bill and shelf together) are read at once per store; a third is `429 rate_limited` until one finishes.
     x-upload: true
-    x-idempotency: optional
-    x-problems: [ai_daily_cap_reached]
+    x-idempotency: required
+    x-problems: [ai_daily_cap_reached, rate_limited]
     parameters:
       - $ref: ../common/parameters.yaml#/IdempotencyKey
     requestBody:
@@ -195,10 +195,10 @@
       Owner and manager. A multipart form with `photo` (one shelf photo: image/jpeg, image/png or
       image/webp, at most 4 MB). Answers 202 at once; the model names the products it sees and the
       server matches them to the master catalogue in the background. The photo is not stored. One
-      call against the store's daily AI cap (`429 ai_daily_cap_reached`).
+      call against the store's daily AI cap (`429 ai_daily_cap_reached`). At most two photo scans (bill and shelf together) are read at once per store; a third is `429 rate_limited` until one finishes.
     x-upload: true
-    x-idempotency: optional
-    x-problems: [ai_daily_cap_reached]
+    x-idempotency: required
+    x-problems: [ai_daily_cap_reached, rate_limited]
     parameters:
       - $ref: ../common/parameters.yaml#/IdempotencyKey
     requestBody:
@@ -304,7 +304,7 @@
       Owner and manager. `{reviewId}` of a review of this store without a reply. Answers 202; the
       model drafts one polite reply in the review's language in the background. One call against
       the store's daily AI cap (`429 ai_daily_cap_reached`).
-    x-idempotency: optional
+    x-idempotency: required
     x-problems: [ai_daily_cap_reached]
     parameters:
       - $ref: ../common/parameters.yaml#/IdempotencyKey
@@ -400,7 +400,7 @@
       of its items). Answers 202; the model drafts three headline and sub-line options in the
       shop's language and in English, each with a tint and one of the items for the photo. One
       call against the store's daily AI cap (`429 ai_daily_cap_reached`).
-    x-idempotency: optional
+    x-idempotency: required
     x-problems: [ai_daily_cap_reached]
     parameters:
       - $ref: ../common/parameters.yaml#/IdempotencyKey

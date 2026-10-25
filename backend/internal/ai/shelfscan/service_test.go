@@ -10,6 +10,7 @@ import (
 
 	aiapi "github.com/todayz/backend/gen/api/ai"
 	"github.com/todayz/backend/internal/ai/drafts"
+	"github.com/todayz/backend/internal/ai/retail"
 	"github.com/todayz/backend/internal/ai/retail/retailtest"
 	"github.com/todayz/backend/internal/ai/shelfscan"
 	"github.com/todayz/backend/internal/platform/authz"
@@ -24,11 +25,16 @@ func TestMain(m *testing.M) { testkit.Main(m) }
 type items struct {
 	mu   sync.Mutex
 	adds []shelfscan.NewItem
+	// refuse is a product the catalogue refuses for want of a permission.
+	refuse ids.ID
 }
 
 func (f *items) Add(_ context.Context, _ authz.Scope, it shelfscan.NewItem) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
+	if it.ProductID == f.refuse {
+		return retail.RefuseNotPermitted
+	}
 	f.adds = append(f.adds, it)
 	return nil
 }
@@ -126,40 +132,61 @@ func TestShelfDraftCreatesNothingUntilConfirm(t *testing.T) {
 	}, adds)
 }
 
-// TestShelfConfirmRefuses (SC-AI-16): a product the store already sells, a price above MRP and
-// an unmatched accepted line are 422s that create nothing.
+// TestShelfConfirmRefuses (SC-AI-16): a product the store already sells, a price above MRP,
+// an unmatched accepted line and a line the catalogue refuses for want of a permission
+// (item.price.edit, W3-11 review) are refused alone with their reason; the good line among
+// them is created, the draft stays ready, and the next confirm creates only the fixed line.
 func TestShelfConfirmRefuses(t *testing.T) {
 	e := retailtest.New(t)
-	f := &items{}
-	s := newService(t, e, f)
-	ps := products(t, e, 1, false)
+	ps := products(t, e, 2, false)
 	listed := products(t, e, 1, true)
-	e.LLM.Reply = shelf(ps[0].Name, "Qzxv Wjk Plorb")
-	id, err := s.Create(e.Ctx, e.Scope, retailtest.Owner, retailtest.Photo())
-	require.NoError(t, err)
-
-	discard := aiapi.ShelfPhotoDecision{LineId: "l2", Outcome: aiapi.AiConfirmOutcomeDiscarded}
+	e.LLM.Reply = shelf(ps[0].Name, ps[1].Name, "Qzxv Wjk Plorb")
+	accept := func(l string) aiapi.ShelfPhotoDecision {
+		return aiapi.ShelfPhotoDecision{LineId: l, Outcome: aiapi.AiConfirmOutcomeAccepted}
+	}
 	edit := func(p product, price int64) aiapi.ShelfPhotoDecision {
 		return aiapi.ShelfPhotoDecision{LineId: "l1", Outcome: aiapi.AiConfirmOutcomeEdited,
 			Value: &aiapi.ShelfPhotoLineValue{ProductId: p.ID.String(), PricePaise: int(price)}}
 	}
 	for _, tc := range []struct {
 		name   string
-		in     []aiapi.ShelfPhotoDecision
-		field  string
+		l1     aiapi.ShelfPhotoDecision
 		reason string
+		refuse bool
 	}{
-		{"already listed", []aiapi.ShelfPhotoDecision{edit(listed[0], listed[0].MrpPaise), discard}, "body.lines[0].value.productId", "already_listed"},
-		{"above mrp", []aiapi.ShelfPhotoDecision{edit(ps[0], ps[0].MrpPaise+1), discard}, "body.lines[0].value.pricePaise", "above_mrp"},
-		{"unmatched accepted", []aiapi.ShelfPhotoDecision{{LineId: "l1", Outcome: aiapi.AiConfirmOutcomeDiscarded},
-			{LineId: "l2", Outcome: aiapi.AiConfirmOutcomeAccepted}}, "body.lines[1].value.productId", "required"},
+		{"already listed", edit(listed[0], listed[0].MrpPaise), "invalid_listed", false},
+		{"above mrp", edit(ps[0], ps[0].MrpPaise+1), "invalid_price_above_mrp", false},
+		{"no price edit permission", accept("l1"), "not_permitted", true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := s.Confirm(e.Ctx, e.Scope, e.Owner, id, tc.in)
-			pe := retailtest.Problem(t, err)
-			require.Equal(t, tc.reason, pe.Fields[tc.field], pe.Fields)
-			require.Empty(t, f.calls())
+			f := &items{}
+			if tc.refuse {
+				f.refuse = ps[0].ID
+			}
+			s := newService(t, e, f)
+			id, err := s.Create(e.Ctx, e.Scope, retailtest.Owner, retailtest.Photo())
+			require.NoError(t, err)
+
+			res, err := s.Confirm(e.Ctx, e.Scope, e.Owner, id, []aiapi.ShelfPhotoDecision{tc.l1, accept("l2"), accept("l3")})
+			require.NoError(t, err)
+			require.Equal(t, drafts.StatusReady, res.Status)
+			require.Equal(t, []drafts.LineResult{
+				{LineID: "l1", Outcome: drafts.NotPermitted, Reason: tc.reason},
+				{LineID: "l2", Outcome: drafts.Accepted},
+				{LineID: "l3", Outcome: drafts.NotPermitted, Reason: "invalid_product"},
+			}, res.Lines)
+			require.Equal(t, []shelfscan.NewItem{{ProductID: ps[1].ID, PricePaise: ps[1].MrpPaise}}, f.calls())
 			require.Equal(t, drafts.StatusReady, e.Draft(t, shelfscan.Feature, id).Status)
+
+			f.refuse = ids.Zero
+			res, err = s.Confirm(e.Ctx, e.Scope, e.Owner, id, []aiapi.ShelfPhotoDecision{
+				edit(ps[0], ps[0].MrpPaise), accept("l2"), {LineId: "l3", Outcome: aiapi.AiConfirmOutcomeDiscarded},
+			})
+			require.NoError(t, err)
+			require.Equal(t, drafts.StatusConfirmed, res.Status)
+			require.Equal(t, []shelfscan.NewItem{
+				{ProductID: ps[1].ID, PricePaise: ps[1].MrpPaise}, {ProductID: ps[0].ID, PricePaise: ps[0].MrpPaise},
+			}, f.calls(), "l2 is not created twice")
 		})
 	}
 }

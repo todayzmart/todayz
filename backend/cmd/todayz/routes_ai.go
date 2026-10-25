@@ -30,6 +30,10 @@ import (
 	"github.com/todayz/backend/internal/reviews"
 )
 
+// aiRetailSeams lets a test swap the retail AI kit and model (a fake model, a
+// guard that counts the providers as configured, an inline runner).
+var aiRetailSeams func(d *deps, kit *retail.Kit, llm *client.LLM)
+
 // mountAI mounts the ai domain's routes. Only the work packages that build
 // internal/ai edit this file (D-50). W3-10 serves no route of its own; W3-11
 // mounts the retailer helpers under {S}/ai (04 §2.8): supplier bill (AI-R2),
@@ -53,7 +57,10 @@ func mountAI(r chi.Router, d *deps) {
 		return
 	}
 	k := aiKitFor(d)
-	kit := retail.Kit{Guard: k.Guard, Drafts: k.Drafts}
+	kit, llm := retail.Kit{Guard: k.Guard, Drafts: k.Drafts}, k.LLM
+	if aiRetailSeams != nil {
+		aiRetailSeams(d, &kit, &llm)
+	}
 	cd := catalogue.Deps{Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Settings: d.Settings, Authz: d.Authz}
 	cat, err := catalogue.New(cd)
 	if err != nil {
@@ -63,21 +70,21 @@ func mountAI(r chi.Router, d *deps) {
 	if err != nil {
 		panic("ai: reviews: " + err.Error())
 	}
-	bill, err := billscan.New(billscan.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings, LLM: k.LLM, Kit: kit,
+	bill, err := billscan.New(billscan.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings, LLM: llm, Kit: kit,
 		Stock: aiBillStock{w: catalogue.NewWriter(d.Clock), db: d.DB}})
 	if err != nil {
 		panic("ai: billscan: " + err.Error())
 	}
-	shelf, err := shelfscan.New(shelfscan.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings, LLM: k.LLM, Kit: kit,
+	shelf, err := shelfscan.New(shelfscan.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings, LLM: llm, Kit: kit,
 		Items: aiShelfItems{cat}})
 	if err != nil {
 		panic("ai: shelfscan: " + err.Error())
 	}
-	reply, err := replydraft.New(replydraft.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings, LLM: k.LLM, Kit: kit, Replies: rv})
+	reply, err := replydraft.New(replydraft.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings, LLM: llm, Kit: kit, Replies: rv})
 	if err != nil {
 		panic("ai: replydraft: " + err.Error())
 	}
-	banner, err := bannercopy.New(bannercopy.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings, LLM: k.LLM, Kit: kit})
+	banner, err := bannercopy.New(bannercopy.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings, LLM: llm, Kit: kit})
 	if err != nil {
 		panic("ai: bannercopy: " + err.Error())
 	}
@@ -86,7 +93,7 @@ func mountAI(r chi.Router, d *deps) {
 		shelf:    shelfscan.Handlers{S: shelf},
 		reply:    replydraft.Handlers{S: reply},
 		banner:   bannercopy.Handlers{S: banner},
-		guard:    k.Guard,
+		guard:    kit.Guard,
 	}, mws...)
 }
 
@@ -189,7 +196,9 @@ func (a aiBillStock) AddFromBill(ctx context.Context, in billscan.StockIn) error
 }
 
 // aiShelfItems creates a confirmed shelf line through the catalogue's own
-// create (its price and permission checks), in the confirm's transaction.
+// create (its price and permission checks), in a savepoint of the confirm's
+// transaction. What the catalogue refuses for this line alone (no
+// item.price.edit, the product, the listing, the price) refuses the line.
 type aiShelfItems struct{ s *catalogue.Service }
 
 func (a aiShelfItems) Add(ctx context.Context, sc authz.Scope, it shelfscan.NewItem) error {
@@ -197,6 +206,30 @@ func (a aiShelfItems) Add(ctx context.Context, sc authz.Scope, it shelfscan.NewI
 	_, err := a.s.CreateItem(ctx, sc.BusinessID.String(), sc.StoreID.String(), &catalogueapi.StoreItemCreate{
 		ProductId: it.ProductID.String(), PricePaise: price, OpeningStock: &opening,
 	})
+	return shelfRefusal(err)
+}
+
+// shelfRefusal is the catalogue's answer for one shelf line as a line refusal: a missing
+// permission (a createItem without item.price.edit) is not_permitted, a listed product, a
+// price above MRP or a bad product is that line's invalid_* code. Anything else fails the
+// confirm.
+func shelfRefusal(err error) error {
+	var pe *problem.Error
+	switch {
+	case err == nil:
+		return nil
+	case problem.CodeOf(err) == genproblems.Forbidden:
+		return retail.RefuseNotPermitted
+	case problem.CodeOf(err) == genproblems.Conflict:
+		return retail.RefuseListed
+	case errors.As(err, &pe) && pe.Code == genproblems.ValidationFailed:
+		if _, ok := pe.Fields["body.pricePaise"]; ok {
+			return retail.RefusePriceAboveMRP
+		}
+		if _, ok := pe.Fields["body.productId"]; ok {
+			return retail.RefuseProduct
+		}
+	}
 	return err
 }
 

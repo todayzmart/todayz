@@ -74,7 +74,7 @@ func New(t *testing.T) *Env {
 	clk := clock.NewFake(seed.Epoch)
 	g := guard.New(d, st, clk, guard.Providers{LLM: true})
 	e := &Env{Ctx: ctx, TDB: tdb, DB: d, Settings: st, Clock: clk, Guard: g, LLM: &LLM{},
-		Kit:   retail.Kit{Clock: clk, Guard: g, Drafts: drafts.New(d, clk), Go: func(f func()) { f() }},
+		Kit:   retail.Kit{DB: d, Clock: clk, Guard: g, Drafts: drafts.New(d, clk), Go: func(f func()) { f() }},
 		Owner: authn.Principal{UserID: Owner, App: authn.AppBusiness}}
 	var biz pgtype.UUID
 	require.NoError(t, tdb.OwnerPool.QueryRow(ctx, `SELECT business_id FROM stores WHERE id = $1`, ids.UUID(Store)).Scan(&biz))

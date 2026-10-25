@@ -9,6 +9,7 @@
 package retail
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -17,12 +18,14 @@ import (
 	"mime"
 	"mime/multipart"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
 
 	aiapi "github.com/todayz/backend/gen/api/ai"
 	genproblems "github.com/todayz/backend/gen/problems"
+	"github.com/todayz/backend/gen/sqlc/airetaildb"
 	"github.com/todayz/backend/internal/ai/client"
 	"github.com/todayz/backend/internal/ai/drafts"
 	"github.com/todayz/backend/internal/ai/guard"
@@ -30,6 +33,7 @@ import (
 	"github.com/todayz/backend/internal/platform/authn"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/clock"
+	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/telemetry"
@@ -43,7 +47,14 @@ const (
 	ProcessTimeout = 90 * time.Second
 	// StaleAfter closes a draft still processing this long after it was made.
 	StaleAfter = 3 * time.Minute
+	// MaxScansInFlight bounds a store's photo scans processing at once (bill and shelf
+	// together); a third start is 429 until one finishes or goes stale.
+	// TODO(lead): a fixed number for now; move to platform_settings if shops need more.
+	MaxScansInFlight = 2
 )
+
+// ScanFeatures are the photo features MaxScansInFlight counts together.
+var ScanFeatures = []string{"supplier_bill", "shelf_photo"}
 
 // PhotoTypes are the photo media types the contract takes (the model reads all three).
 var PhotoTypes = []string{"image/jpeg", "image/png", "image/webp"}
@@ -53,6 +64,8 @@ const FailEmpty = "empty"
 
 // Kit is the drafts plumbing a feature runs on.
 type Kit struct {
+	// DB holds the in-flight count of a scan start (New.Scan).
+	DB     *db.DB
 	Clock  clock.Clock
 	Guard  *guard.Guard
 	Drafts *drafts.Service
@@ -89,7 +102,8 @@ func FieldErr(path, reason string) *problem.Error {
 func NotFound() *problem.Error { return problem.New(genproblems.NotFound, "") }
 
 // ReadPhoto reads an AiPhotoUpload form: exactly one photo part of an allowed type and at
-// most MaxPhotoBytes. Any other part, or a second photo, is refused. The photo is never stored.
+// most MaxPhotoBytes, whose bytes are that type (the part's Content-Type is not trusted
+// alone). Any other part, or a second photo, is refused. The photo is never stored.
 func ReadPhoto(mr *multipart.Reader) (client.Image, error) {
 	if mr == nil {
 		return client.Image{}, FieldErr("body", "required")
@@ -123,12 +137,28 @@ func ReadPhoto(mr *multipart.Reader) (client.Image, error) {
 		if len(b) == 0 {
 			return client.Image{}, FieldErr("body.photo", "required")
 		}
+		if Sniff(b) != mt {
+			return client.Image{}, FieldErr("body.photo", "media_type")
+		}
 		img = client.Image{MediaType: mt, Data: b}
 	}
 	if img.Data == nil {
 		return client.Image{}, FieldErr("body.photo", "required")
 	}
 	return img, nil
+}
+
+// Sniff is the photo type b's first bytes say (JPEG, PNG or WebP), or "".
+func Sniff(b []byte) string {
+	switch {
+	case bytes.HasPrefix(b, []byte{0xff, 0xd8, 0xff}):
+		return "image/jpeg"
+	case bytes.HasPrefix(b, []byte{0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n'}):
+		return "image/png"
+	case len(b) >= 12 && bytes.Equal(b[:4], []byte("RIFF")) && bytes.Equal(b[8:12], []byte("WEBP")):
+		return "image/webp"
+	}
+	return ""
 }
 
 // New is one draft to start.
@@ -138,6 +168,8 @@ type New struct {
 	InputRef      string // what the draft is about (a review or offer id); "" for a photo
 	Meta          any    // small facts, never the photo or a person's words
 	PromptVersion string
+	// Scan counts the draft against MaxScansInFlight.
+	Scan bool
 }
 
 // Start checks the switches and the daily cap, stores a processing draft and runs work in
@@ -146,17 +178,45 @@ func (k Kit) Start(ctx context.Context, n New, work func(ctx context.Context, id
 	if err := k.Guard.Require(ctx, n.Feature); err != nil {
 		return ids.Zero, err
 	}
-	if err := k.Guard.Reserve(ctx, n.Feature, guard.Subject{Store: n.Store}); err != nil {
-		var ce *guard.CapError
-		if errors.As(err, &ce) {
-			return ids.Zero, ce.Problem()
+	create := func(ctx context.Context) (ids.ID, error) {
+		if err := k.Guard.Reserve(ctx, n.Feature, guard.Subject{Store: n.Store}); err != nil {
+			var ce *guard.CapError
+			if errors.As(err, &ce) {
+				return ids.Zero, ce.Problem()
+			}
+			return ids.Zero, err
 		}
-		return ids.Zero, err
+		return k.Drafts.Create(ctx, drafts.NewDraft{
+			Feature: n.Feature, Store: n.Store, Actor: n.Actor, InputRef: n.InputRef,
+			InputMeta: n.Meta, PromptVersion: n.PromptVersion,
+		})
 	}
-	id, err := k.Drafts.Create(ctx, drafts.NewDraft{
-		Feature: n.Feature, Store: n.Store, Actor: n.Actor, InputRef: n.InputRef,
-		InputMeta: n.Meta, PromptVersion: n.PromptVersion,
-	})
+	var id ids.ID
+	var err error
+	if n.Scan {
+		// The count, the reserve and the insert hold the store's scan lock, so a refused
+		// start takes nothing from the daily cap and two starts cannot both pass.
+		err = k.DB.InTx(ctx, func(ctx context.Context) error {
+			q := airetaildb.New(k.DB.Q(ctx))
+			if err := q.LockStoreScans(ctx, "ai_scans:"+n.Store.String()); err != nil {
+				return err
+			}
+			busy, err := q.ScansInFlight(ctx, airetaildb.ScansInFlightParams{
+				StoreID: ids.UUID(n.Store), Features: ScanFeatures, Since: k.Clock.Now().Add(-StaleAfter),
+			})
+			if err != nil {
+				return err
+			}
+			if busy >= MaxScansInFlight {
+				return problem.New(genproblems.RateLimited, "two scans are still being read").
+					WithHeader("Retry-After", strconv.Itoa(int(ProcessTimeout/time.Second)))
+			}
+			id, err = create(ctx)
+			return err
+		})
+	} else {
+		id, err = create(ctx)
+	}
 	if err != nil {
 		return ids.Zero, err
 	}
@@ -239,11 +299,49 @@ func Failure(d drafts.Draft) *aiapi.AiDraftFailure {
 	return &f
 }
 
-// Outcomes are the stored line outcomes of a confirmed or discarded draft.
+// Refusal is why a confirm refused one line (AiLineRefusal). A line refused is not_permitted
+// with this reason; the other lines are applied, and the draft stays ready so the person can
+// edit the refused line and confirm it again.
+type Refusal string
+
+// The refusal codes.
+const (
+	RefuseNotPermitted  Refusal = "not_permitted"
+	RefuseItem          Refusal = "invalid_item"
+	RefuseQuantity      Refusal = "invalid_quantity"
+	RefuseCost          Refusal = "invalid_cost"
+	RefuseCostAboveMRP  Refusal = "invalid_cost_above_mrp"
+	RefuseExpiry        Refusal = "invalid_expiry"
+	RefuseProduct       Refusal = "invalid_product"
+	RefuseListed        Refusal = "invalid_listed"
+	RefuseDuplicate     Refusal = "invalid_duplicate"
+	RefusePrice         Refusal = "invalid_price"
+	RefusePriceAboveMRP Refusal = "invalid_price_above_mrp"
+	RefuseOpeningStock  Refusal = "invalid_opening_stock"
+)
+
+func (r Refusal) Error() string { return "ai: line refused: " + string(r) }
+
+// Refused is the line's not_permitted result when err is a Refusal.
+func Refused(lineID string, err error) (drafts.LineResult, bool) {
+	var r Refusal
+	if !errors.As(err, &r) {
+		return drafts.LineResult{}, false
+	}
+	return drafts.LineResult{LineID: lineID, Outcome: drafts.NotPermitted, Reason: string(r)}, true
+}
+
+// Outcomes are the stored line outcomes of a draft: every line once confirmed or discarded,
+// the lines a partial confirm settled while it is ready.
 func Outcomes(lines []drafts.LineResult) aiapi.AiOutcomes {
 	out := make(aiapi.AiOutcomes, 0, len(lines))
 	for _, l := range lines {
-		out = append(out, aiapi.AiLineResult{LineId: l.LineID, Outcome: aiapi.AiLineOutcome(l.Outcome)})
+		r := aiapi.AiLineResult{LineId: l.LineID, Outcome: aiapi.AiLineOutcome(l.Outcome)}
+		if l.Reason != "" {
+			reason := aiapi.AiLineRefusal(l.Reason)
+			r.Reason = &reason
+		}
+		out = append(out, r)
 	}
 	return out
 }

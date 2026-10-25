@@ -34,7 +34,7 @@ type inputMeta struct {
 // Create stores a processing draft for one bill photo and reads it in the background.
 func (s *Service) Create(ctx context.Context, sc authz.Scope, actor ids.ID, img client.Image) (ids.ID, error) {
 	return s.d.Kit.Start(ctx, retail.New{
-		Feature: Feature, Store: sc.StoreID, Actor: actor, PromptVersion: prompts.Version(Feature),
+		Feature: Feature, Store: sc.StoreID, Actor: actor, PromptVersion: prompts.Version(Feature), Scan: true,
 		Meta: inputMeta{Bytes: len(img.Data), MediaType: img.MediaType},
 	}, func(ctx context.Context, id ids.ID) { s.process(ctx, id, sc.StoreID, img) })
 }
@@ -169,7 +169,10 @@ func (s *Service) itemsByUUID(ctx context.Context, storeID ids.ID, want []pgtype
 }
 
 // Confirm applies the person's decisions: one supplier_bill stock in per accepted or
-// edited line, in the draft's transaction. A repeat answers the first result.
+// edited line, in the draft's transaction. A line that does not fit (no such item, a past
+// expiry, a cost above the MRP …) is refused alone, not_permitted with its reason, and the
+// draft stays ready so the person can edit it and confirm it again; the other lines are
+// applied. A repeat answers the first result.
 func (s *Service) Confirm(ctx context.Context, sc authz.Scope, p authn.Principal, draftID ids.ID, in []aiapi.SupplierBillDecision) (drafts.Result, error) {
 	if err := s.d.Kit.Guard.Require(ctx, Feature); err != nil {
 		return drafts.Result{}, err
@@ -190,7 +193,7 @@ func (s *Service) Confirm(ctx context.Context, sc authz.Scope, p authn.Principal
 	}
 	index := retail.Index(lineIDs)
 	return s.d.Kit.Drafts.Confirm(ctx, drafts.Confirmation{
-		Feature: Feature, DraftID: draftID, By: p.UserID, Decisions: ds, Check: retail.OwnStore(sc.StoreID),
+		Feature: Feature, DraftID: draftID, By: p.UserID, Decisions: ds, Check: retail.OwnStore(sc.StoreID), KeepOpen: true,
 		Apply: func(ctx context.Context, d drafts.Draft, ds []drafts.Decision) ([]drafts.LineResult, error) {
 			return s.apply(ctx, sc, p, d, ds, index)
 		},
@@ -200,7 +203,6 @@ func (s *Service) Confirm(ctx context.Context, sc authz.Scope, p authn.Principal
 // change is one decided line as it will be written.
 type change struct {
 	lineID  string
-	path    string
 	outcome drafts.Outcome
 	item    ids.ID
 	qty     int
@@ -218,10 +220,15 @@ func (s *Service) apply(ctx context.Context, sc authz.Scope, p authn.Principal, 
 		byID[l.LineID] = l
 	}
 	today := clock.StartOfDayIST(s.d.Clock.Now()).In(clock.IST)
+	results := make([]drafts.LineResult, 0, len(ds))
 	todo := make([]change, 0, len(ds))
 	var want []pgtype.UUID
 	for _, dc := range ds {
 		c, err := decide(dc, byID[dc.LineID], fmt.Sprintf("body.lines[%d]", index[dc.LineID]), today)
+		if r, ok := retail.Refused(dc.LineID, err); ok {
+			results = append(results, r)
+			continue
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -232,25 +239,13 @@ func (s *Service) apply(ctx context.Context, sc authz.Scope, p authn.Principal, 
 	if err != nil {
 		return nil, err
 	}
-	results := make([]drafts.LineResult, 0, len(todo))
 	for _, c := range todo {
-		it, ok := items[c.item.String()]
-		if !ok {
-			return nil, retail.FieldErr(c.path+".value.storeItemId", "not_in_store")
+		err := s.write(ctx, sc, p, d, c, items)
+		if r, ok := retail.Refused(c.lineID, err); ok {
+			results = append(results, r)
+			continue
 		}
-		if c.cost != nil && it.mrpPaise != nil && *c.cost > *it.mrpPaise {
-			return nil, retail.FieldErr(c.path+".value.costPaise", "above_mrp")
-		}
-		err := s.d.Stock.AddFromBill(ctx, StockIn{
-			StoreID: sc.StoreID, ItemID: c.item, DraftID: d.ID, Who: p.UserID,
-			Qty: c.qty, CostPaise: c.cost, ExpiresOn: c.expires,
-		})
-		switch {
-		case errors.Is(err, ErrItemGone):
-			return nil, retail.FieldErr(c.path+".value.storeItemId", "not_in_store")
-		case errors.Is(err, ErrQuantity):
-			return nil, retail.FieldErr(c.path+".value.quantity", "range")
-		case err != nil:
+		if err != nil {
 			return nil, err
 		}
 		results = append(results, drafts.LineResult{LineID: c.lineID, Outcome: c.outcome})
@@ -258,24 +253,51 @@ func (s *Service) apply(ctx context.Context, sc authz.Scope, p authn.Principal, 
 	return results, nil
 }
 
+// write is one line's stock in, in a savepoint of the confirm's transaction, so a line the
+// catalogue refuses rolls back alone.
+func (s *Service) write(ctx context.Context, sc authz.Scope, p authn.Principal, d drafts.Draft, c change, items map[string]item) error {
+	it, ok := items[c.item.String()]
+	if !ok {
+		return retail.RefuseItem
+	}
+	if c.cost != nil && it.mrpPaise != nil && *c.cost > *it.mrpPaise {
+		return retail.RefuseCostAboveMRP
+	}
+	return s.d.DB.InTx(ctx, func(ctx context.Context) error {
+		err := s.d.Stock.AddFromBill(ctx, StockIn{
+			StoreID: sc.StoreID, ItemID: c.item, DraftID: d.ID, Who: p.UserID,
+			Qty: c.qty, CostPaise: c.cost, ExpiresOn: c.expires,
+		})
+		switch {
+		case errors.Is(err, ErrItemGone):
+			return retail.RefuseItem
+		case errors.Is(err, ErrQuantity):
+			return retail.RefuseQuantity
+		}
+		return err
+	})
+}
+
 // decide is one decision as a change: an accepted line as the model read it (it must have a
-// matched item), an edited line as the person wrote it.
+// matched item), an edited line as the person wrote it. A value that does not fit is a
+// retail.Refusal (the line alone is refused); only a value that is not the line's shape is a
+// 422 for the request.
 func decide(dc drafts.Decision, l Line, path string, today time.Time) (change, error) {
-	c := change{lineID: dc.LineID, path: path, outcome: dc.Outcome}
+	c := change{lineID: dc.LineID, outcome: dc.Outcome}
 	switch dc.Outcome {
 	case drafts.Accepted:
 		if l.StoreItemID == nil {
-			return change{}, retail.FieldErr(path+".value.storeItemId", "required")
+			return change{}, retail.RefuseItem
 		}
 		id, err := ids.Parse(*l.StoreItemID)
 		if err != nil {
-			return change{}, retail.FieldErr(path+".value.storeItemId", "required")
+			return change{}, retail.RefuseItem
 		}
 		c.item, c.qty, c.cost = id, l.Quantity, l.CostPaise
 		if l.ExpiresOn != nil {
 			t, err := time.Parse(dateLayout, *l.ExpiresOn)
 			if err != nil {
-				return change{}, retail.FieldErr(path+".value.expiresOn", "date")
+				return change{}, retail.RefuseExpiry
 			}
 			c.expires = &t
 		}
@@ -286,7 +308,7 @@ func decide(dc drafts.Decision, l Line, path string, today time.Time) (change, e
 		}
 		id, err := ids.Parse(v.StoreItemId)
 		if err != nil {
-			return change{}, retail.FieldErr(path+".value.storeItemId", "not_in_store")
+			return change{}, retail.RefuseItem
 		}
 		c.item, c.qty = id, v.Quantity
 		if v.CostPaise != nil {
@@ -301,13 +323,13 @@ func decide(dc drafts.Decision, l Line, path string, today time.Time) (change, e
 		return change{}, fmt.Errorf("billscan: outcome %q", dc.Outcome)
 	}
 	if c.qty < 1 || c.qty > MaxQuantity {
-		return change{}, retail.FieldErr(path+".value.quantity", "range")
+		return change{}, retail.RefuseQuantity
 	}
 	if c.cost != nil && (*c.cost < 1 || *c.cost > MaxPaise) {
-		return change{}, retail.FieldErr(path+".value.costPaise", "range")
+		return change{}, retail.RefuseCost
 	}
 	if c.expires != nil && c.expires.Before(time.Date(today.Year(), today.Month(), today.Day(), 0, 0, 0, 0, time.UTC)) {
-		return change{}, retail.FieldErr(path+".value.expiresOn", "past")
+		return change{}, retail.RefuseExpiry
 	}
 	return c, nil
 }
