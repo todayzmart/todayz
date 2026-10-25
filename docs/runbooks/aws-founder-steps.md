@@ -56,6 +56,7 @@ India requires every business SMS to be registered on DLT first. AWS only sends 
    | OTP | Service Implicit, OTP | English | `{#var#} is your TodayZ login code. Do not share it with anyone.` |
    | `tz_order_unseen` | Service Implicit | English | `A new order at {#var#} has not been opened for {#var#} minutes. Open the TodayZ business app to accept it.` |
    | `tz_order_unseen_hi` | Service Implicit | Hindi (Unicode) | `{#var#} पर एक नया ऑर्डर {#var#} मिनट से खोला नहीं गया है। स्वीकार करने के लिए TodayZ बिज़नेस ऐप खोलें।` |
+   | `tz_owner_code` | Service Implicit, OTP | English | `{#var#} is your TodayZ code to confirm your shop with our field agent. Share it only with that agent.` |
 
    Each approved template gets a **Template ID** (a long number).
 4. **Telemarketer chain.** If the portal asks for a telemarketer or "chain binding", add the telemarketer IDs AWS uses for India. They are in the AWS India registration guide, or you can ask for them in the support case in C3.
@@ -66,7 +67,7 @@ India requires every business SMS to be registered on DLT first. AWS only sends 
 SMS_SENDER_ID=TODAYZ
 SMS_DLT_ENTITY_ID=<Entity ID>
 SMS_OTP_TEMPLATE_ID=<OTP template ID>
-SMS_NOTICE_TEMPLATE_IDS=tz_order_unseen=<ID>,tz_order_unseen_hi=<ID>
+SMS_NOTICE_TEMPLATE_IDS=tz_order_unseen=<ID>,tz_order_unseen_hi=<ID>,tz_owner_code=<ID>
 ```
 
 These are not secret, but keep them in that file anyway. There is no SMS key: the API signs with its AWS role.

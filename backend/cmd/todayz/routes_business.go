@@ -62,7 +62,7 @@ func fieldDeps(d *deps) business.FieldDeps {
 		ResendGap: identity.OTPResendGap, Window: identity.OTPWindow, PerPhone: identity.OTPPerPhone,
 	}}
 	if d.Identity != nil {
-		fd.SMS, fd.AllowTestCode = d.Identity.OTPSender(), d.Identity.AllowsTestCode()
+		fd.SMS, fd.AllowTestCode = d.Identity.OwnerCodeSender(), d.Identity.AllowsTestCode()
 	}
 	if d.DB == nil || d.Config == nil {
 		return fd

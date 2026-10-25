@@ -1029,6 +1029,17 @@ func TestAWSOTP(t *testing.T) {
 	require.Equal(t, "TRANSACTIONAL", s.Body["MessageType"])
 	require.EqualValues(t, OTPTTL/time.Second, s.Body["TimeToLive"])
 	require.Equal(t, map[string]any{"IN_ENTITY_ID": "1000000000000000001", "IN_TEMPLATE_ID": "1000000000000000101"}, s.Body["DestinationCountryParameters"])
+
+	// The field owner code uses the sign-in template until tz_owner_code has
+	// a DLT id, then its own registered text and id.
+	svc, err := New(Deps{Config: cfg, Clock: clock.NewFake(time.Date(2026, 10, 26, 9, 0, 0, 0, time.UTC))})
+	require.NoError(t, err)
+	require.Same(t, svc.OTPSender(), svc.OwnerCodeSender())
+	cfg.Providers.SMSNoticeTemplateIDs = map[string]string{"tz_owner_code": "1000000000000000203"}
+	require.NoError(t, svc.OwnerCodeSender().SendOTP(context.Background(), "+919876543210", "482913"))
+	s = <-got
+	require.Equal(t, "482913 is your TodayZ code to confirm your shop with our field agent. Share it only with that agent.", s.Body["MessageBody"])
+	require.Equal(t, map[string]any{"IN_ENTITY_ID": "1000000000000000001", "IN_TEMPLATE_ID": "1000000000000000203"}, s.Body["DestinationCountryParameters"])
 }
 
 func TestHelpers(t *testing.T) {
