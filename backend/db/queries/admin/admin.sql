@@ -506,3 +506,83 @@ SELECT id, status, moderation, starts_at, ends_at FROM store_banners WHERE id = 
 -- A person cleared a held upload: it shows from now on, like an automatic pass.
 UPDATE store_banners SET moderation = 'auto_ok', status = @status, version = version + 1, updated_at = @now
 WHERE id = @id AND status = 'pending_review' AND moderation = 'needs_review';
+
+------------------------------------------------------------------------------
+-- admin users (A-18)
+------------------------------------------------------------------------------
+
+-- name: ListAdminUsers :many
+-- Newest first, keyset on (created_at, user_id). lastActiveAt is the latest
+-- use of any admin session.
+SELECT au.user_id, u.name, pi.phone_enc, au.roles, au.totp_enabled_at, au.created_by, cb.name AS created_by_name,
+  au.created_at, au.disabled_at, au.version,
+  (SELECT max(s.last_used_at) FROM sessions s WHERE s.user_id = au.user_id AND s.app = 'admin') AS last_active_at
+FROM admin_users au JOIN users u ON u.id = au.user_id
+LEFT JOIN phone_identities pi ON pi.user_id = au.user_id
+LEFT JOIN users cb ON cb.id = au.created_by
+WHERE (au.disabled_at IS NOT NULL) = @disabled::bool
+  AND (sqlc.narg(after_at)::timestamptz IS NULL
+       OR (au.created_at, au.user_id) < (sqlc.narg(after_at)::timestamptz, sqlc.narg(after_id)::uuid))
+ORDER BY au.created_at DESC, au.user_id DESC
+LIMIT @lim;
+
+-- name: GetAdminUser :one
+SELECT au.user_id, u.name, pi.phone_enc, au.roles, au.totp_enabled_at, au.created_by, cb.name AS created_by_name,
+  au.created_at, au.disabled_at, au.version,
+  (SELECT max(s.last_used_at) FROM sessions s WHERE s.user_id = au.user_id AND s.app = 'admin') AS last_active_at
+FROM admin_users au JOIN users u ON u.id = au.user_id
+LEFT JOIN phone_identities pi ON pi.user_id = au.user_id
+LEFT JOIN users cb ON cb.id = au.created_by
+WHERE au.user_id = @id;
+
+-- name: LockAdminUsers :exec
+-- Serialises every A-18 change, so two super_admins acting at once cannot
+-- together leave no active super_admin.
+SELECT pg_advisory_xact_lock(hashtextextended('admin:admin_users', 0));
+
+-- name: LockAdminUser :one
+SELECT roles, disabled_at, version FROM admin_users WHERE user_id = @id FOR UPDATE;
+
+-- name: CountActiveSuperAdmins :one
+SELECT count(*)::int FROM admin_users au JOIN users u ON u.id = au.user_id
+WHERE au.disabled_at IS NULL AND 'super_admin' = ANY (au.roles) AND u.status = 'active';
+
+-- name: UserByPhoneHash :one
+SELECT u.id, u.status, u.name, (au.user_id IS NOT NULL)::bool AS is_admin
+FROM phone_identities pi JOIN users u ON u.id = pi.user_id
+LEFT JOIN admin_users au ON au.user_id = u.id
+WHERE pi.phone_hash = @phone_hash
+FOR UPDATE OF u;
+
+-- name: InsertInvitedUser :exec
+-- A number that has never signed in: the account is made here (identity makes
+-- one at a first customer or shop sign-in; an admin is never made by signing in).
+INSERT INTO users (id, name, created_at, updated_at) VALUES (@id, @name, @now, @now);
+
+-- name: InsertInvitedPhone :exec
+INSERT INTO phone_identities (id, user_id, phone_enc, phone_hash, verified_at, created_at)
+VALUES (@id, @user_id, @phone_enc, @phone_hash, @now, @now);
+
+-- name: NameUserIfUnnamed :exec
+UPDATE users SET name = @name, version = version + 1 WHERE id = @id AND name IS NULL;
+
+-- name: InsertAdminUser :exec
+INSERT INTO admin_users (user_id, roles, created_by, created_at, updated_at)
+VALUES (@user_id, @roles::text[], @created_by, @now, @now);
+
+-- name: UpdateAdminUser :exec
+UPDATE admin_users SET roles = @roles::text[], disabled_at = sqlc.narg(disabled_at)::timestamptz,
+  version = version + 1, updated_at = @now
+WHERE user_id = @id;
+
+-- name: ResetAdminTOTP :exec
+UPDATE admin_users SET totp_secret_enc = NULL, totp_enabled_at = NULL, totp_last_step = NULL, totp_failures = 0,
+  version = version + 1, updated_at = @now
+WHERE user_id = @id;
+
+-- name: DeleteAdminRecoveryCodes :execrows
+DELETE FROM admin_recovery_codes WHERE admin_id = @admin_id;
+
+-- name: RevokeAdminSessions :execrows
+UPDATE sessions SET revoked_at = @now::timestamptz, revoked_reason = 'admin'
+WHERE user_id = @user_id AND app = 'admin' AND revoked_at IS NULL;

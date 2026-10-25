@@ -1,9 +1,110 @@
-# Schemas: domain "admin-users" (owner W3-09): admin users and roles (04 §2.7).
+# Schemas: domain "admin-users" (owner W3-05): A-18 admin users and roles (04 §2.7, D-64).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Names are unique across every schemas/<domain>.yaml. Request objects carry
+# `additionalProperties: false`. Ids are `Ulid`, times are `Timestamp`. A phone
+# comes in only in a request body and goes out only masked.
+AdminRole:
+  type: string
+  description: One of the 7 admin roles (D-64).
+  enum: [field_agent, support, catalogue, analyst, finance, admin, super_admin]
+AdminUserStatus:
+  type: string
+  description: "`active` can sign in; `disabled` cannot, and every admin session it had was ended."
+  enum: [active, disabled]
+AdminUser:
+  type: object
+  additionalProperties: false
+  required: [id, name, phoneMasked, roles, status, totpEnrolled, createdBy, createdByName, createdAt, disabledAt, lastActiveAt, version]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name:
+      type: [string, 'null']
+      maxLength: 80
+    phoneMasked:
+      type: [string, 'null']
+      description: The phone with the middle five digits hidden; null when it cannot be opened.
+      maxLength: 16
+    roles:
+      type: array
+      minItems: 1
+      maxItems: 7
+      uniqueItems: true
+      items: {$ref: '#/AdminRole'}
+    status: {$ref: '#/AdminUserStatus'}
+    totpEnrolled:
+      type: boolean
+      description: False until the person sets up their authenticator at their next sign-in.
+    createdBy:
+      type: [string, 'null']
+      description: The admin who invited this one; null for a seeded admin.
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    createdByName:
+      type: [string, 'null']
+      maxLength: 80
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    disabledAt:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: 'null'}
+    lastActiveAt:
+      description: The latest use of any of this person's admin sessions; null when they have never signed in.
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: 'null'}
+    version: {type: integer, minimum: 1}
+AdminUserList:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: '#/AdminUser'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminUserInvite:
+  type: object
+  additionalProperties: false
+  required: [phone, name, roles, reason]
+  properties:
+    phone:
+      type: string
+      description: A 10-digit Indian mobile number, with or without `+91`.
+      minLength: 10
+      maxLength: 16
+      pattern: ^[+0-9 ]{10,16}$
+    name:
+      type: string
+      description: Used only when the account has no name yet.
+      minLength: 1
+      maxLength: 80
+    roles:
+      type: array
+      minItems: 1
+      maxItems: 7
+      uniqueItems: true
+      items: {$ref: '#/AdminRole'}
+    reason: {type: string, minLength: 1, maxLength: 500}
+AdminUserChange:
+  type: object
+  additionalProperties: false
+  description: At least one of `roles` and `status`. `version` is the one read; a newer one is `409 conflict`.
+  required: [version, reason]
+  minProperties: 3
+  properties:
+    roles:
+      type: array
+      minItems: 1
+      maxItems: 7
+      uniqueItems: true
+      items: {$ref: '#/AdminRole'}
+    status: {$ref: '#/AdminUserStatus'}
+    version: {type: integer, minimum: 1}
+    reason: {type: string, minLength: 1, maxLength: 500}
+AdminUserTOTPReset:
+  type: object
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason: {type: string, minLength: 1, maxLength: 500}

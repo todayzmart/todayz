@@ -13,6 +13,7 @@ import (
 	leadsapi "github.com/todayz/backend/gen/api/admin-leads"
 	settingsapi "github.com/todayz/backend/gen/api/admin-settings"
 	storesapi "github.com/todayz/backend/gen/api/admin-stores"
+	usersapi "github.com/todayz/backend/gen/api/admin-users"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/authz/policy"
 	"github.com/todayz/backend/internal/platform/ids"
@@ -46,8 +47,8 @@ var SettingsOps = map[string]string{
 }
 
 // Register mounts the admin-customers, admin-businesses, admin-stores,
-// admin-leads, admin-catalogue, admin-banners, admin-settings and admin-audit
-// routes behind slot 15.
+// admin-leads, admin-catalogue, admin-banners, admin-settings, admin-users and
+// admin-audit routes behind slot 15.
 func Register(r chi.Router, s *Service, az authz.Authorizer) {
 	customersapi.Register(r, customerHandlers{s},
 		customersapi.StrictMiddlewareFunc(authz.Strict[customersapi.StrictHandlerFunc](az, CustomerOps)))
@@ -63,6 +64,8 @@ func Register(r chi.Router, s *Service, az authz.Authorizer) {
 		bannersapi.StrictMiddlewareFunc(authz.Strict[bannersapi.StrictHandlerFunc](az, BannerOps)))
 	settingsapi.Register(r, settingHandlers{s},
 		settingsapi.StrictMiddlewareFunc(authz.Strict[settingsapi.StrictHandlerFunc](az, SettingsOps)))
+	usersapi.Register(r, userHandlers{s},
+		usersapi.StrictMiddlewareFunc(authz.Strict[usersapi.StrictHandlerFunc](az, UserOps)))
 	auditapi.Register(r, auditHandlers{s},
 		auditapi.StrictMiddlewareFunc(authz.Strict[auditapi.StrictHandlerFunc](az, AuditOps)))
 }
