@@ -1,0 +1,390 @@
+{
+  "support.sub": {
+    "defaultMessage": "Tickets from businesses and customers. Open tickets come soonest-due first; notes stay inside TodayZ.",
+    "description": "A-14 subtitle"
+  },
+  "support.tabs": {
+    "defaultMessage": "Ticket status",
+    "description": "Accessible name of the status tabs"
+  },
+  "support.status.open": {
+    "defaultMessage": "Open",
+    "description": "Ticket status: waiting for support"
+  },
+  "support.status.waiting": {
+    "defaultMessage": "Waiting",
+    "description": "Ticket status: support replied, waiting for the opener"
+  },
+  "support.status.resolved": {
+    "defaultMessage": "Resolved",
+    "description": "Ticket status: resolved; the opener can still reply and reopen it"
+  },
+  "support.status.closed": {
+    "defaultMessage": "Closed",
+    "description": "Ticket status: closed for good"
+  },
+  "support.priority.label": {
+    "defaultMessage": "Set priority",
+    "description": "Label of the priority picker on a ticket"
+  },
+  "support.priority.change": {
+    "defaultMessage": "Change",
+    "description": "Button: save the picked priority"
+  },
+  "support.priority.done": {
+    "defaultMessage": "Priority set to {priority}",
+    "description": "Toast after changing the priority"
+  },
+  "support.priority.help": {
+    "defaultMessage": "The due time counts from when the timer started, so it may turn overdue at once.",
+    "description": "Hint under the priority picker"
+  },
+  "support.priority.normal": {
+    "defaultMessage": "Normal",
+    "description": "Ticket priority"
+  },
+  "support.priority.high": {
+    "defaultMessage": "High",
+    "description": "Ticket priority"
+  },
+  "support.priority.urgent": {
+    "defaultMessage": "Urgent",
+    "description": "Ticket priority"
+  },
+  "support.category.order": {
+    "defaultMessage": "Order",
+    "description": "Ticket category"
+  },
+  "support.category.credits": {
+    "defaultMessage": "Credits",
+    "description": "Ticket category"
+  },
+  "support.category.payouts": {
+    "defaultMessage": "Payouts",
+    "description": "Ticket category"
+  },
+  "support.category.catalogue": {
+    "defaultMessage": "Catalogue",
+    "description": "Ticket category"
+  },
+  "support.category.account": {
+    "defaultMessage": "Account",
+    "description": "Ticket category"
+  },
+  "support.category.verification": {
+    "defaultMessage": "Verification",
+    "description": "Ticket category"
+  },
+  "support.category.app": {
+    "defaultMessage": "App",
+    "description": "Ticket category"
+  },
+  "support.category.other": {
+    "defaultMessage": "Other",
+    "description": "Ticket category"
+  },
+  "support.opener.customer": {
+    "defaultMessage": "Customer",
+    "description": "Who wrote: a customer"
+  },
+  "support.opener.business": {
+    "defaultMessage": "Business",
+    "description": "Who wrote: a business owner or manager"
+  },
+  "support.author.admin": {
+    "defaultMessage": "Support",
+    "description": "Who wrote: a TodayZ support agent"
+  },
+  "support.noName": {
+    "defaultMessage": "No name",
+    "description": "A person without a name on file"
+  },
+  "support.unassigned": {
+    "defaultMessage": "Unassigned",
+    "description": "No agent holds the ticket"
+  },
+  "support.filters": {
+    "defaultMessage": "Ticket filters",
+    "description": "Accessible name of the filter row"
+  },
+  "support.filter.whose": {
+    "defaultMessage": "Whose tickets",
+    "description": "Accessible name of the assignee filter"
+  },
+  "support.filter.all": {
+    "defaultMessage": "All",
+    "description": "Assignee filter: every ticket"
+  },
+  "support.filter.me": {
+    "defaultMessage": "Mine",
+    "description": "Assignee filter: tickets assigned to me"
+  },
+  "support.filter.unassigned": {
+    "defaultMessage": "Unassigned",
+    "description": "Assignee filter: tickets nobody holds"
+  },
+  "support.filter.opener": {
+    "defaultMessage": "Opened by",
+    "description": "Label of the opener filter"
+  },
+  "support.filter.anyOpener": {
+    "defaultMessage": "Anyone",
+    "description": "Opener filter: businesses and customers"
+  },
+  "support.overdueCount": {
+    "defaultMessage": "{count, plural, one {# open ticket is past its reply time.} other {# open tickets are past their reply time.}}",
+    "description": "Count of overdue tickets in the current filter"
+  },
+  "support.table": {
+    "defaultMessage": "Tickets",
+    "description": "Accessible name of the ticket table"
+  },
+  "support.none": {
+    "defaultMessage": "No tickets here.",
+    "description": "Empty ticket table"
+  },
+  "support.col.ticket": {
+    "defaultMessage": "Ticket",
+    "description": "Column: number and subject"
+  },
+  "support.col.from": {
+    "defaultMessage": "From",
+    "description": "Column: who opened the ticket"
+  },
+  "support.col.category": {
+    "defaultMessage": "Category",
+    "description": "Column / fact: ticket category"
+  },
+  "support.col.priority": {
+    "defaultMessage": "Priority",
+    "description": "Column: ticket priority"
+  },
+  "support.col.sla": {
+    "defaultMessage": "Reply due",
+    "description": "Column: the SLA chip"
+  },
+  "support.col.assignee": {
+    "defaultMessage": "Assigned to",
+    "description": "Column / card title: the agent holding the ticket"
+  },
+  "support.col.last": {
+    "defaultMessage": "Last message",
+    "description": "Column: when the last message came"
+  },
+  "support.from.business": {
+    "defaultMessage": "{name} · {business}",
+    "description": "Business opener and their business"
+  },
+  "support.from.customer": {
+    "defaultMessage": "{name}",
+    "description": "Customer opener"
+  },
+  "support.sla.span": {
+    "defaultMessage": "{h, plural, =0 {{m} min} other {# h {m} min}}",
+    "description": "A span of hours and minutes"
+  },
+  "support.sla.due": {
+    "defaultMessage": "Due in {span}",
+    "description": "SLA chip: time left for support's reply"
+  },
+  "support.sla.overdue": {
+    "defaultMessage": "Overdue by {span}",
+    "description": "SLA chip: support's reply is late"
+  },
+  "support.back": {
+    "defaultMessage": "Back to support",
+    "description": "Link back to the inbox"
+  },
+  "support.missing": {
+    "defaultMessage": "This ticket does not exist.",
+    "description": "Ticket not found"
+  },
+  "support.loadFailed": {
+    "defaultMessage": "The ticket did not load.",
+    "description": "Ticket failed to load"
+  },
+  "support.detail.title": {
+    "defaultMessage": "Ticket {number}",
+    "description": "Ticket page heading"
+  },
+  "support.resolve": {
+    "defaultMessage": "Resolve",
+    "description": "Button: mark the ticket resolved"
+  },
+  "support.close": {
+    "defaultMessage": "Close",
+    "description": "Button: close the ticket for good"
+  },
+  "support.resolve.title": {
+    "defaultMessage": "Resolve {number}?",
+    "description": "Resolve dialog title"
+  },
+  "support.resolve.body": {
+    "defaultMessage": "The opener sees it as resolved and can still reply, which reopens it. The reason is kept in the audit log.",
+    "description": "Resolve dialog body"
+  },
+  "support.resolve.done": {
+    "defaultMessage": "{number} resolved",
+    "description": "Toast after resolving"
+  },
+  "support.close.title": {
+    "defaultMessage": "Close {number}?",
+    "description": "Close dialog title"
+  },
+  "support.close.body": {
+    "defaultMessage": "Closing is final: nobody can reply again, only internal notes can be added. The reason is kept in the audit log.",
+    "description": "Close dialog body"
+  },
+  "support.close.done": {
+    "defaultMessage": "{number} closed",
+    "description": "Toast after closing"
+  },
+  "support.thread": {
+    "defaultMessage": "Conversation",
+    "description": "Card title: the messages"
+  },
+  "support.noteTag": {
+    "defaultMessage": "Internal note",
+    "description": "Tag on a note the opener never sees"
+  },
+  "support.facts": {
+    "defaultMessage": "Details",
+    "description": "Card title: ticket facts"
+  },
+  "support.business": {
+    "defaultMessage": "Business",
+    "description": "Fact: the business"
+  },
+  "support.store": {
+    "defaultMessage": "Store",
+    "description": "Fact: the store"
+  },
+  "support.order": {
+    "defaultMessage": "Order",
+    "description": "Fact: the linked order"
+  },
+  "support.opened": {
+    "defaultMessage": "Opened",
+    "description": "Fact: when the ticket was opened"
+  },
+  "support.dueAt": {
+    "defaultMessage": "Reply due",
+    "description": "Fact: when support's reply is due"
+  },
+  "support.firstResponse": {
+    "defaultMessage": "First reply",
+    "description": "Fact: support's first reply"
+  },
+  "support.dueAt.waiting": {
+    "defaultMessage": "Paused until the opener replies",
+    "description": "Fact value: no reply is due because support answered and the ticket waits on the opener"
+  },
+  "support.dueAt.none": {
+    "defaultMessage": "None",
+    "description": "Fact value: no reply is due on a resolved or closed ticket"
+  },
+  "support.never": {
+    "defaultMessage": "Not yet",
+    "description": "A time that has not happened"
+  },
+  "support.closeReason": {
+    "defaultMessage": "Reason",
+    "description": "Fact: why it was resolved or closed"
+  },
+  "support.assign": {
+    "defaultMessage": "Assign",
+    "description": "Button: assign the ticket to the chosen agent"
+  },
+  "support.assign.label": {
+    "defaultMessage": "Agent",
+    "description": "Label of the agent picker"
+  },
+  "support.assign.me": {
+    "defaultMessage": "Assign to me",
+    "description": "Button: take the ticket"
+  },
+  "support.assign.done": {
+    "defaultMessage": "Assigned to {name}",
+    "description": "Toast after assigning"
+  },
+  "support.assign.cleared": {
+    "defaultMessage": "Ticket unassigned",
+    "description": "Toast after unassigning"
+  },
+  "support.compose.title": {
+    "defaultMessage": "Write",
+    "description": "Card title: the composer"
+  },
+  "support.compose.kind": {
+    "defaultMessage": "Message type",
+    "description": "Accessible name of the reply/note switch"
+  },
+  "support.compose.reply": {
+    "defaultMessage": "Reply",
+    "description": "Composer mode: a reply the opener sees"
+  },
+  "support.compose.note": {
+    "defaultMessage": "Internal note",
+    "description": "Composer mode: a note only TodayZ sees"
+  },
+  "support.compose.replyLabel": {
+    "defaultMessage": "Reply to the opener",
+    "description": "Label of the reply box"
+  },
+  "support.compose.noteLabel": {
+    "defaultMessage": "Internal note",
+    "description": "Label of the note box"
+  },
+  "support.compose.replyHelp": {
+    "defaultMessage": "The opener sees this. Sending it moves the ticket to waiting.",
+    "description": "Help under the reply box"
+  },
+  "support.compose.noteHelp": {
+    "defaultMessage": "Only TodayZ staff see notes. The ticket's status does not change.",
+    "description": "Help under the note box"
+  },
+  "support.compose.required": {
+    "defaultMessage": "Write a message, up to 4,000 characters.",
+    "description": "Error: empty or too long message"
+  },
+  "support.compose.sendReply": {
+    "defaultMessage": "Send reply",
+    "description": "Button: send the reply"
+  },
+  "support.compose.addNote": {
+    "defaultMessage": "Add note",
+    "description": "Button: add the internal note"
+  },
+  "support.files.add": {
+    "defaultMessage": "Attach file",
+    "description": "Button: pick files to attach"
+  },
+  "support.files.uploading": {
+    "defaultMessage": "Uploading",
+    "description": "Loading label while a file uploads"
+  },
+  "support.files.list": {
+    "defaultMessage": "Attachments",
+    "description": "Accessible name of an attachment list"
+  },
+  "support.files.remove": {
+    "defaultMessage": "Remove {name}",
+    "description": "Button: drop an attachment before sending"
+  },
+  "support.files.tooMany": {
+    "defaultMessage": "At most {max} files per message.",
+    "description": "Error: too many files"
+  },
+  "support.files.type": {
+    "defaultMessage": "{name} is not a JPEG, PNG, WebP or PDF.",
+    "description": "Error: wrong file type"
+  },
+  "support.files.size": {
+    "defaultMessage": "{name} is larger than 10 MB.",
+    "description": "Error: file too large"
+  },
+  "support.files.failed": {
+    "defaultMessage": "{name} did not upload. Try again.",
+    "description": "Error: upload failed"
+  }
+}

@@ -1,0 +1,183 @@
+# Schemas: domain "biz-support" (owner W3-08): a business's own support tickets (01 §13, 04 §2.6, 06 B-15, D-226).
+#
+# Request objects carry `additionalProperties: false`. Internal notes never appear here.
+BizTicketCategory:
+  type: string
+  enum: [order, credits, payouts, catalogue, account, verification, app, other]
+BizTicketStatus:
+  type: string
+  description: "`open`: with support. `waiting`: support replied. `resolved`: done, a reply reopens it. `closed`: final; open a new ticket."
+  enum: [open, waiting, resolved, closed]
+BizTicket:
+  type: object
+  required: [id, number, subject, category, status, storeId, storeName, orderId, orderNumber, lastMessageAt, createdAt]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    number:
+      type: string
+    subject:
+      type: string
+    category:
+      $ref: "#/BizTicketCategory"
+    status:
+      $ref: "#/BizTicketStatus"
+    storeId:
+      type: [string, "null"]
+    storeName:
+      type: [string, "null"]
+    orderId:
+      type: [string, "null"]
+    orderNumber:
+      type: [string, "null"]
+    lastMessageAt:
+      $ref: ./common.yaml#/Timestamp
+    createdAt:
+      $ref: ./common.yaml#/Timestamp
+BizTicketList:
+  type: object
+  required: [items, nextCursor]
+  properties:
+    items:
+      type: array
+      items:
+        $ref: "#/BizTicket"
+    nextCursor:
+      $ref: ./common.yaml#/NextCursor
+BizAttachmentContentType:
+  type: string
+  enum: [image/jpeg, image/png, image/webp, application/pdf]
+BizTicketAttachment:
+  type: object
+  required: [id, fileName, contentType, sizeBytes, url]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    fileName:
+      type: string
+    contentType:
+      $ref: "#/BizAttachmentContentType"
+    sizeBytes:
+      type: integer
+    url:
+      type: [string, "null"]
+      description: A presigned GET, valid for 15 minutes; null while storage is not configured.
+BizTicketMessage:
+  type: object
+  required: [id, from, authorName, body, createdAt, attachments]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    from:
+      type: string
+      enum: [business, support]
+    authorName:
+      type: [string, "null"]
+      description: The business user's name; support replies show no agent name.
+    body:
+      type: string
+    createdAt:
+      $ref: ./common.yaml#/Timestamp
+    attachments:
+      type: array
+      items:
+        $ref: "#/BizTicketAttachment"
+BizTicketThread:
+  type: object
+  required: [ticket, messages, serverNow]
+  properties:
+    ticket:
+      $ref: "#/BizTicket"
+    messages:
+      type: array
+      description: Oldest first.
+      items:
+        $ref: "#/BizTicketMessage"
+    serverNow:
+      $ref: ./common.yaml#/ServerNow
+BizTicketCreate:
+  type: object
+  additionalProperties: false
+  required: [category, subject, body]
+  properties:
+    category:
+      $ref: "#/BizTicketCategory"
+    subject:
+      type: string
+      minLength: 3
+      maxLength: 120
+    body:
+      type: string
+      minLength: 1
+      maxLength: 4000
+    storeId:
+      $ref: ./common.yaml#/Ulid
+    orderId:
+      $ref: ./common.yaml#/Ulid
+    attachmentIds:
+      type: array
+      maxItems: 5
+      items:
+        $ref: ./common.yaml#/Ulid
+BizTicketMessageCreate:
+  type: object
+  additionalProperties: false
+  required: [body]
+  properties:
+    body:
+      type: string
+      minLength: 1
+      maxLength: 4000
+    attachmentIds:
+      type: array
+      maxItems: 5
+      items:
+        $ref: ./common.yaml#/Ulid
+BizAttachmentCreate:
+  type: object
+  additionalProperties: false
+  required: [fileName, contentType, sizeBytes]
+  properties:
+    fileName:
+      type: string
+      minLength: 1
+      maxLength: 120
+    contentType:
+      $ref: "#/BizAttachmentContentType"
+    sizeBytes:
+      type: integer
+      format: int64
+      minimum: 1
+      maximum: 10485760
+      description: The file's exact size in bytes (at most 10 MB). The upload URL signs it.
+BizUploadHeaders:
+  type: object
+  required: [Content-Type, Content-Length]
+  properties:
+    Content-Type:
+      $ref: "#/BizAttachmentContentType"
+    Content-Length:
+      type: string
+      pattern: ^[1-9][0-9]*$
+BizUploadTarget:
+  type: object
+  description: A presigned PUT into the private bucket. Send the file with exactly these headers before `expiresAt`.
+  required: [url, method, headers, expiresAt]
+  properties:
+    url:
+      type: string
+    method:
+      type: string
+      enum: [PUT]
+    headers:
+      $ref: "#/BizUploadHeaders"
+    expiresAt:
+      $ref: ./common.yaml#/Timestamp
+BizAttachmentUpload:
+  type: object
+  required: [attachment, upload]
+  properties:
+    attachment:
+      $ref: "#/BizTicketAttachment"
+    upload:
+      $ref: "#/BizUploadTarget"

@@ -1,0 +1,407 @@
+{
+  "help.back": {
+    "message": "సహాయానికి వెనక్కి",
+    "review": "reviewed",
+    "enHash": "45dd3b17"
+  },
+  "help.category.account": {
+    "message": "నా ఖాతా",
+    "review": "reviewed",
+    "enHash": "61909817"
+  },
+  "help.category.app": {
+    "message": "యాప్",
+    "review": "reviewed",
+    "enHash": "9445c325"
+  },
+  "help.category.credits": {
+    "message": "క్రెడిట్‌లు",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "help.category.order": {
+    "message": "ఒక ఆర్డర్",
+    "review": "reviewed",
+    "enHash": "40eb87b7"
+  },
+  "help.category.other": {
+    "message": "ఇంకేదైనా",
+    "review": "reviewed",
+    "enHash": "48f88ac3"
+  },
+  "help.error.body": {
+    "message": "మీ కనెక్షన్ చూసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "help.error.generic": {
+    "message": "అది జరగలేదు. మీ కనెక్షన్ చూసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "462c8c1d"
+  },
+  "help.error.invalid_transition": {
+    "message": "ఈ టికెట్ మూసివేయబడింది, ఇకపై మెసేజ్‌లు తీసుకోదు. కొత్త టికెట్ తెరవండి.",
+    "review": "reviewed",
+    "enHash": "7bfa6828"
+  },
+  "help.error.not_found": {
+    "message": "ఈ టికెట్ ఇప్పుడు అందుబాటులో లేదు.",
+    "review": "reviewed",
+    "enHash": "9c3df5fd"
+  },
+  "help.error.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "help.error.validation_failed": {
+    "message": "కొన్ని వివరాలు అంగీకరించబడలేదు. ఫారమ్ చూసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "f1164913"
+  },
+  "help.files.add": {
+    "message": "ఫోటో లేదా PDF జోడించండి",
+    "review": "reviewed",
+    "enHash": "ef72b016"
+  },
+  "help.files.empty": {
+    "message": "{name} ఖాళీగా ఉంది.",
+    "review": "reviewed",
+    "enHash": "83f58457"
+  },
+  "help.files.failed": {
+    "message": "{name} అప్‌లోడ్ కాలేదు. మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "cd16e9c2"
+  },
+  "help.files.help": {
+    "message": "JPEG, PNG, WebP లేదా PDF, ఒక్కొక్కటి {mb} MB వరకు, గరిష్ఠంగా {max} ఫైల్‌లు.",
+    "review": "reviewed",
+    "enHash": "8a7ca2f9"
+  },
+  "help.files.list": {
+    "message": "ఫైల్‌లు",
+    "review": "reviewed",
+    "enHash": "6ce6c512"
+  },
+  "help.files.remove": {
+    "message": "{name} తీసివేయండి",
+    "review": "reviewed",
+    "enHash": "df7193a5"
+  },
+  "help.files.size": {
+    "message": "{name} {mb} MB కంటే పెద్దది.",
+    "review": "reviewed",
+    "enHash": "24ccdc18"
+  },
+  "help.files.tooMany": {
+    "message": "ఒక మెసేజ్‌కు గరిష్ఠంగా {max} ఫైల్‌లు.",
+    "review": "reviewed",
+    "enHash": "d7a902ec"
+  },
+  "help.files.type": {
+    "message": "{name} ఫోటో లేదా PDF కాదు.",
+    "review": "reviewed",
+    "enHash": "0299449c"
+  },
+  "help.files.uploading": {
+    "message": "అప్‌లోడ్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "de272409"
+  },
+  "help.intro": {
+    "message": "ఆర్డర్, మీ క్రెడిట్‌లు లేదా యాప్‌లో ఏదైనా సమస్యా? టికెట్ తెరవండి, TodayZ సహాయం ఇక్కడే జవాబిస్తుంది.",
+    "review": "reviewed",
+    "enHash": "c4fa2cf6"
+  },
+  "help.loading": {
+    "message": "సహాయం లోడ్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "c72413f7"
+  },
+  "help.new.body": {
+    "message": "ఏం జరిగింది?",
+    "review": "reviewed",
+    "enHash": "e9ef659a"
+  },
+  "help.new.body.help": {
+    "message": "ఎంత ఎక్కువ వివరం ఉంటే, అంత త్వరగా సహాయం చేయగలం.",
+    "review": "reviewed",
+    "enHash": "2f8737b5"
+  },
+  "help.new.body.required": {
+    "message": "ఒక మెసేజ్ రాయండి.",
+    "review": "reviewed",
+    "enHash": "c8e96b81"
+  },
+  "help.new.category": {
+    "message": "ఇది దేని గురించి?",
+    "review": "reviewed",
+    "enHash": "23a5beeb"
+  },
+  "help.new.category.pick": {
+    "message": "ఒకటి ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "4238dc41"
+  },
+  "help.new.category.required": {
+    "message": "ఇది దేని గురించో ఎంచుకోండి.",
+    "review": "reviewed",
+    "enHash": "079e2dcc"
+  },
+  "help.new.intro": {
+    "message": "ఏం జరిగిందో చెప్పండి. సపోర్ట్ టికెట్‌పై జవాబిస్తుంది, మీరు అక్కడ ఇంకా జోడించవచ్చు.",
+    "review": "reviewed",
+    "enHash": "5b8aa383"
+  },
+  "help.new.order": {
+    "message": "ఏ ఆర్డర్? (ఐచ్ఛికం)",
+    "review": "reviewed",
+    "enHash": "cb115a09"
+  },
+  "help.new.order.failed": {
+    "message": "ఆర్డర్‌లు లోడ్ కాలేదు. అయినా మీరు టికెట్ పంపి, మెసేజ్‌లో ఆర్డర్ చెప్పవచ్చు.",
+    "review": "reviewed",
+    "enHash": "f7796d10"
+  },
+  "help.new.order.help": {
+    "message": "మీ ఇటీవలి ఆర్డర్‌లు.",
+    "review": "reviewed",
+    "enHash": "ea27e86c"
+  },
+  "help.new.order.none": {
+    "message": "ఒక ఆర్డర్ గురించి కాదు",
+    "review": "reviewed",
+    "enHash": "f29403b4"
+  },
+  "help.new.order.refused": {
+    "message": "ఈ ఆర్డర్ అంగీకరించబడలేదు. వేరేది ఎంచుకోండి లేదా ఏదీ వద్దు.",
+    "review": "reviewed",
+    "enHash": "a47c2ce8"
+  },
+  "help.new.order.this": {
+    "message": "ఈ ఆర్డర్",
+    "review": "reviewed",
+    "enHash": "a25622f7"
+  },
+  "help.new.send": {
+    "message": "సపోర్ట్‌కు పంపండి",
+    "review": "reviewed",
+    "enHash": "e0b3861b"
+  },
+  "help.new.sent": {
+    "message": "టికెట్ {number} పంపబడింది",
+    "review": "reviewed",
+    "enHash": "99303bb3"
+  },
+  "help.new.subject": {
+    "message": "విషయం",
+    "review": "reviewed",
+    "enHash": "8d183dbd"
+  },
+  "help.new.subject.help": {
+    "message": "ఒక చిన్న లైన్, ఉదా. “నా ఆర్డర్‌లో ఆటా లేదు”.",
+    "review": "reviewed",
+    "enHash": "2db268e5"
+  },
+  "help.new.subject.required": {
+    "message": "{min} నుండి {max} అక్షరాల విషయం రాయండి.",
+    "review": "reviewed",
+    "enHash": "2583925c"
+  },
+  "help.new.title": {
+    "message": "కొత్త టికెట్",
+    "review": "reviewed",
+    "enHash": "b8bf9c88"
+  },
+  "help.reply.help": {
+    "message": "సపోర్ట్ దీన్ని ఈ టికెట్‌పై చూస్తుంది.",
+    "review": "reviewed",
+    "enHash": "0b3c7ee4"
+  },
+  "help.reply.label": {
+    "message": "మీ మెసేజ్",
+    "review": "reviewed",
+    "enHash": "f190c98e"
+  },
+  "help.reply.reopens": {
+    "message": "జవాబు పంపితే టికెట్ మళ్ళీ తెరుచుకుంటుంది.",
+    "review": "reviewed",
+    "enHash": "afd6995f"
+  },
+  "help.reply.send": {
+    "message": "జవాబు పంపండి",
+    "review": "reviewed",
+    "enHash": "7f7e603a"
+  },
+  "help.reply.title": {
+    "message": "జవాబు",
+    "review": "reviewed",
+    "enHash": "6c2bb735"
+  },
+  "help.sending": {
+    "message": "పంపుతోంది",
+    "review": "reviewed",
+    "enHash": "ceafde86"
+  },
+  "help.signedOut.body": {
+    "message": "మీ టికెట్‌లు మీ ఖాతాతో ఉంటాయి, కాబట్టి టికెట్ తెరవడానికి లేదా జవాబులు చూడటానికి సైన్ ఇన్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "8f10756a"
+  },
+  "help.signedOut.cta": {
+    "message": "సైన్ ఇన్",
+    "review": "reviewed",
+    "enHash": "ada2e9e9"
+  },
+  "help.signedOut.title": {
+    "message": "సహాయం కోసం సైన్ ఇన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "e9c9d810"
+  },
+  "help.status.closed": {
+    "message": "మూసివేయబడింది",
+    "review": "reviewed",
+    "enHash": "88d86b77"
+  },
+  "help.status.open": {
+    "message": "తెరిచి ఉంది",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "help.status.resolved": {
+    "message": "పరిష్కరించబడింది",
+    "review": "reviewed",
+    "enHash": "e1d35505"
+  },
+  "help.status.waiting": {
+    "message": "జవాబిచ్చారు",
+    "review": "reviewed",
+    "enHash": "7d688ab4"
+  },
+  "help.ticket.error.title": {
+    "message": "టికెట్ లోడ్ కాలేదు",
+    "review": "reviewed",
+    "enHash": "51a4c349"
+  },
+  "help.ticket.fromSupport": {
+    "message": "TodayZ సపోర్ట్",
+    "review": "reviewed",
+    "enHash": "f0829b0f"
+  },
+  "help.ticket.fromYou": {
+    "message": "మీరు",
+    "review": "reviewed",
+    "enHash": "905cb326"
+  },
+  "help.ticket.loading": {
+    "message": "టికెట్ లోడ్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "ee58be8e"
+  },
+  "help.ticket.messages": {
+    "message": "మెసేజ్‌లు",
+    "review": "reviewed",
+    "enHash": "f1702b46"
+  },
+  "help.ticket.newInstead": {
+    "message": "కొత్త టికెట్ తెరవండి",
+    "review": "reviewed",
+    "enHash": "c36c110e"
+  },
+  "help.ticket.notFound.action": {
+    "message": "మీ టికెట్‌లు చూడండి",
+    "review": "reviewed",
+    "enHash": "2a142fb0"
+  },
+  "help.ticket.notFound.body": {
+    "message": "లింక్ తప్పు కావచ్చు, లేదా ఈ టికెట్ మీది కాదు.",
+    "review": "reviewed",
+    "enHash": "cb8501bc"
+  },
+  "help.ticket.notFound.title": {
+    "message": "టికెట్ కనిపించలేదు",
+    "review": "reviewed",
+    "enHash": "fb25ca39"
+  },
+  "help.ticket.state.closed": {
+    "message": "ఈ టికెట్ మూసివేయబడింది, ఇకపై మెసేజ్‌లు తీసుకోదు.",
+    "review": "reviewed",
+    "enHash": "7e6e9eca"
+  },
+  "help.ticket.state.open": {
+    "message": "సపోర్ట్ ఇక్కడ జవాబిస్తుంది.",
+    "review": "reviewed",
+    "enHash": "fcb604cd"
+  },
+  "help.ticket.state.resolved": {
+    "message": "సపోర్ట్ దీన్ని పరిష్కరించినట్లు గుర్తించింది. కాకపోతే కింద జవాబివ్వండి, టికెట్ మళ్ళీ తెరుచుకుంటుంది.",
+    "review": "reviewed",
+    "enHash": "22fde542"
+  },
+  "help.ticket.state.waiting": {
+    "message": "సపోర్ట్ జవాబిచ్చింది. ఇంకా సహాయం కావాలంటే కింద జవాబివ్వండి, టికెట్ మళ్ళీ తెరుచుకుంటుంది.",
+    "review": "reviewed",
+    "enHash": "e360387a"
+  },
+  "help.ticket.title": {
+    "message": "టికెట్ {number}",
+    "review": "reviewed",
+    "enHash": "fc0bae40"
+  },
+  "help.tickets.empty.body": {
+    "message": "ఆర్డర్, మీ క్రెడిట్‌లు లేదా యాప్‌లో ఏదైనా తప్పు జరిగితే, టికెట్ తెరవండి, సహాయం ఇక్కడే జవాబిస్తుంది.",
+    "review": "reviewed",
+    "enHash": "f3dab2ec"
+  },
+  "help.tickets.empty.title": {
+    "message": "ఇంకా టికెట్‌లు లేవు",
+    "review": "reviewed",
+    "enHash": "16baa0a9"
+  },
+  "help.tickets.error.title": {
+    "message": "టికెట్‌లు లోడ్ కాలేదు",
+    "review": "reviewed",
+    "enHash": "cf7d483b"
+  },
+  "help.tickets.list": {
+    "message": "టికెట్‌లు",
+    "review": "reviewed",
+    "enHash": "5c622a51"
+  },
+  "help.tickets.loading": {
+    "message": "టికెట్‌లు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "b603c74a"
+  },
+  "help.tickets.more": {
+    "message": "మరిన్ని చూపించు",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "help.tickets.new": {
+    "message": "కొత్త టికెట్",
+    "review": "reviewed",
+    "enHash": "b8bf9c88"
+  },
+  "help.tickets.updated": {
+    "message": "{when} అప్‌డేట్ అయింది",
+    "review": "reviewed",
+    "enHash": "f734128f"
+  },
+  "help.title": {
+    "message": "సహాయం",
+    "review": "reviewed",
+    "enHash": "c47ae153"
+  },
+  "help.entry": {
+    "message": "సహాయం పొందండి లేదా మీ టికెట్‌లు చూడండి",
+    "review": "reviewed",
+    "enHash": "059b3f04"
+  },
+  "help.orderLink": {
+    "message": "ఈ ఆర్డర్‌కు సహాయం పొందండి",
+    "review": "reviewed",
+    "enHash": "cf024239"
+  }
+}
