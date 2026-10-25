@@ -1,0 +1,66 @@
+# Ledger alerts (05 §5; owner W3-07, the reconcile is W2-04's). Grafana alerting file provisioning, same layout and datasource uids as jobs.yaml. Alert files
+# are not wired into the local stack yet; routing (05 §5) is W5's contact points. The firing test is
+# backend/internal/rollups/alerts_test.go.
+#
+#   Ledger invariant  reconcile drift ≠ 0 (tz_ledger_reconcile_drift, any reason) or an
+#                     event=ledger_invariant line logged in 15 min. critical
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: ledger
+    folder: TodayZ
+    interval: 1m
+    rules:
+      # A: the drift gauge ledger_reconcile records on every run. B: the worker's error line, which
+      # also carries the counts. Either fires; the math keeps the larger.
+      - uid: tz-ledger-invariant
+        title: 'Ledger invariant'
+        condition: D
+        data:
+          - refId: A
+            relativeTimeRange: {from: 900, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                max(tz_ledger_reconcile_drift)
+          - refId: B
+            relativeTimeRange: {from: 900, to: 0}
+            datasourceUid: loki
+            model:
+              refId: B
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                sum(count_over_time({service_name=~"todayz-.*"} | json | event="ledger_invariant" [15m]))
+              queryType: instant
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: math
+              expression: '($A > 0) || ($B > 0)'
+          - refId: D
+            datasourceUid: __expr__
+            model:
+              refId: D
+              type: threshold
+              expression: C
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          area: ledger
+          severity: critical
+        annotations:
+          summary: 'The credit ledger breaks an invariant'
+          description: 'ledger_reconcile found rows breaking a ledger invariant. Money may be wrong: stop and read the runbook before any adjustment.'
+          runbook_url: docs/runbooks/ledger-invariant.md
+          __dashboardUid__: todayz-11
+        isPaused: false

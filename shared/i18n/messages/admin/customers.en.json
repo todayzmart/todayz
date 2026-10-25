@@ -200,7 +200,7 @@
     "description": "Sessions table of an admin account (they are managed from Admin users)"
   },
   "customers.adminAccount": {
-    "defaultMessage": "This is an admin account. Disable it from Admin users; it cannot be blocked, struck off or signed out here.",
+    "defaultMessage": "This is an admin account. Disable it from “Admin users”; it cannot be blocked, struck off or signed out here.",
     "description": "Notice on the detail of an admin account"
   },
   "customers.notCustomer": {

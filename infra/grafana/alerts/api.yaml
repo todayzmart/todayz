@@ -1,0 +1,166 @@
+# API alerts (05 §5, §6; owner W3-07). Grafana alerting file provisioning, same layout and datasource uids as jobs.yaml. Alert files
+# are not wired into the local stack yet; routing (05 §5) is W5's contact points. The firing test is
+# backend/internal/rollups/alerts_test.go.
+#
+#   API availability SLO fast burn  5xx ratio burns the 0.5 % budget > 14.4× over 1 h and over 5 m. critical
+#   API availability SLO slow burn  > 6× over 6 h and over 30 m. warning
+#   API latency                     p95 reads (GET) > 400 ms or writes > 800 ms for 10 min. warning
+#   Idempotency completion failed   tz_idempotency_complete_failures > 0 in 10 min (owner W1-07). warning
+#
+# The availability SLI excludes 429s (05 §6): the two problem codes answered with 429 are
+# rate_limited and otp_locked.
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: api
+    folder: TodayZ
+    interval: 1m
+    rules:
+      # Multi-window burn rate: both the 1 h and the 5 m 5xx ratios above 14.4 × 0.5 % (2 % of the
+      # 30-day budget in an hour). The 5 m window makes it clear once the errors stop.
+      - uid: tz-api-availability-fast-burn
+        title: 'API availability SLO fast burn'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 3600, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                (sum(rate(tz_http_server_requests_total{status_class="5xx"}[1h])) / sum(rate(tz_http_server_requests_total{code!~"rate_limited|otp_locked"}[1h])) > 14.4 * 0.005)
+                and on () (sum(rate(tz_http_server_requests_total{status_class="5xx"}[5m])) / sum(rate(tz_http_server_requests_total{code!~"rate_limited|otp_locked"}[5m])) > 14.4 * 0.005)
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 2m
+        labels:
+          area: api
+          severity: critical
+        annotations:
+          summary: 'API 5xx are burning the availability budget fast'
+          description: 'The 1 h 5xx ratio is {{ $values.A.Value | humanizePercentage }} (budget 0.5 %), and the last 5 min agree. At this rate the 30-day budget is gone in about two days.'
+          runbook_url: docs/runbooks/api-availability-burn.md
+          __dashboardUid__: todayz-00
+        isPaused: false
+
+      # Both the 6 h and the 30 m 5xx ratios above 6 × 0.5 %.
+      - uid: tz-api-availability-slow-burn
+        title: 'API availability SLO slow burn'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 21600, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                (sum(rate(tz_http_server_requests_total{status_class="5xx"}[6h])) / sum(rate(tz_http_server_requests_total{code!~"rate_limited|otp_locked"}[6h])) > 6 * 0.005)
+                and on () (sum(rate(tz_http_server_requests_total{status_class="5xx"}[30m])) / sum(rate(tz_http_server_requests_total{code!~"rate_limited|otp_locked"}[30m])) > 6 * 0.005)
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 15m
+        labels:
+          area: api
+          severity: warning
+        annotations:
+          summary: 'API 5xx are burning the availability budget'
+          description: 'The 6 h 5xx ratio is {{ $values.A.Value | humanizePercentage }} (budget 0.5 %), and the last 30 min agree.'
+          runbook_url: docs/runbooks/api-availability-burn.md
+          __dashboardUid__: todayz-00
+        isPaused: false
+
+      # p95 over 10 min; reads are GET, writes everything else (05 §6 budgets are 200 / 400 ms; this alerts at twice).
+      - uid: tz-api-latency
+        title: 'API latency'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                histogram_quantile(0.95, sum(rate(tz_http_server_duration_seconds{method="GET"}[10m]))) > 0.4
+                or histogram_quantile(0.95, sum(rate(tz_http_server_duration_seconds{method!="GET"}[10m]))) > 0.8
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        labels:
+          area: api
+          severity: warning
+        annotations:
+          summary: 'API p95 latency is over budget'
+          description: 'p95 is {{ $values.A.Value | humanizeDuration }} (alert lines: reads 400 ms, writes 800 ms). 00 · What to fix today ranks the routes by impact.'
+          runbook_url: docs/runbooks/api-latency.md
+          __dashboardUid__: todayz-00
+        isPaused: false
+
+      # The OTLP → Prometheus translation adds _total to a counter, so the name is matched with or
+      # without it (W1-07 registers tz_idempotency_complete_failures).
+      - uid: tz-idempotency-complete-failed
+        title: 'Idempotency completion failed'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                sum(increase({__name__=~"tz_idempotency_complete_failures(_total)?"}[10m]))
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          area: api
+          severity: warning
+        annotations:
+          summary: 'Idempotency records could not be stored'
+          description: '{{ $values.A.Value }} responses in 10 min were sent but their idempotency record was not stored; a retry with the same key gets 409 until the 3-minute lease runs out.'
+          runbook_url: docs/runbooks/api-idempotency-complete-failed.md
+          __dashboardUid__: todayz-02
+        isPaused: false

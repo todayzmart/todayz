@@ -1,0 +1,91 @@
+# Risk alerts (05 §5; owner W3-07). Grafana alerting file provisioning, same layout and datasource uids as jobs.yaml. Alert files
+# are not wired into the local stack yet; routing (05 §5) is W5's contact points. The firing test is
+# backend/internal/rollups/alerts_test.go.
+#
+#   Store strikes        a store_strikes risk flag was raised (store reached store_strike_risk_threshold
+#                        strikes in 30 days; no automatic pause, D-67). ops warning (risk queue)
+#   Unconfirmed returns  a return_unconfirmed risk flag was raised (a delivery-failed return auto-
+#                        confirmed after 72 h, D-69). ops info
+#
+# Both read the flags their WPs raise, so the threshold lives in one place (platform_settings).
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: risk
+    folder: TodayZ
+    interval: 1m
+    rules:
+      # Open store_strikes flags raised in the last hour, per store.
+      - uid: tz-risk-store-strikes
+        title: 'Store strikes'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 3600, to: 0}
+            datasourceUid: todayz-postgres
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              editorMode: code
+              rawSql: |-
+                SELECT subject_id::text AS store_id, count(*) AS value FROM risk_flags
+                WHERE rule = 'store_strikes' AND status = 'open' AND created_at > now() - interval '1 hour'
+                GROUP BY subject_id
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          area: risk
+          severity: ops
+        annotations:
+          summary: 'A store reached the strike threshold'
+          description: 'Store {{ $labels.store_id }} reached store_strike_risk_threshold strikes in 30 days. Review it in the risk queue; nothing is paused automatically.'
+          runbook_url: docs/runbooks/risk-store-strikes.md
+          __dashboardUid__: todayz-10
+        isPaused: false
+
+      # return_unconfirmed flags raised in the last hour.
+      - uid: tz-risk-unconfirmed-returns
+        title: 'Unconfirmed returns'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 3600, to: 0}
+            datasourceUid: todayz-postgres
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              editorMode: code
+              rawSql: |-
+                SELECT count(*) AS value FROM risk_flags
+                WHERE rule = 'return_unconfirmed' AND created_at > now() - interval '1 hour'
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          area: risk
+          severity: info
+        annotations:
+          summary: '{{ $values.A.Value }} failed-delivery returns were auto-confirmed'
+          description: 'Returns nobody confirmed within 72 h were auto-confirmed as unconfirmed and flagged (D-69).'
+          runbook_url: docs/runbooks/risk-unconfirmed-returns.md
+          __dashboardUid__: todayz-08
+        isPaused: false

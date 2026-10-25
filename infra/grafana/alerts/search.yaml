@@ -1,0 +1,51 @@
+# Search alerts (05 §5; owner W3-07). Grafana alerting file provisioning, same layout and datasource uids as jobs.yaml. Alert files
+# are not wired into the local stack yet; routing (05 §5) is W5's contact points. The firing test is
+# backend/internal/rollups/alerts_test.go.
+#
+#   Zero-result spike  zero-result rate > 40 % for 1 h. ops info
+#
+# Searches carry an H3 cell, not a city, so the rate is platform-wide (TODO(lead): per city once
+# cells map to cities), with a floor of 50 searches in the hour.
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: search
+    folder: TodayZ
+    interval: 1m
+    rules:
+      # value = the zero-result share of the last hour's searches, 0 under the floor.
+      - uid: tz-search-zero-result-spike
+        title: 'Zero-result spike'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 3600, to: 0}
+            datasourceUid: todayz-postgres
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              editorMode: code
+              rawSql: |-
+                SELECT CASE WHEN count(*) >= 50 THEN avg((NOT has_results)::int) ELSE 0 END AS value
+                FROM v_metric_searches WHERE created_at > now() - interval '1 hour'
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0.4]}
+        noDataState: OK
+        execErrState: Error
+        for: 1h
+        labels:
+          area: search
+          severity: info
+        annotations:
+          summary: '{{ $values.A.Value | humanizePercentage }} of searches find nothing'
+          description: 'Over 40 % of the last hour''s searches found nothing in radius. 07 · Customer funnel lists the queries and 08 · Marketplace the under-supplied cells.'
+          runbook_url: docs/runbooks/search-zero-result-spike.md
+          __dashboardUid__: todayz-07
+        isPaused: false

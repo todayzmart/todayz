@@ -1,0 +1,89 @@
+# Queue alerts (05 §5; owner W3-07). Grafana alerting file provisioning, same layout and datasource uids as jobs.yaml. Alert files
+# are not wired into the local stack yet; routing (05 §5) is W5's contact points. The firing test is
+# backend/internal/rollups/alerts_test.go.
+#
+#   Order timers late  tz_job_lateness_seconds p99 > 30 s for 5 min on timer-class kinds. critical
+#   Job backlog        oldest available job > 2 min. warning
+#
+# 05 §5 asks for the timer kind list generated from the registry. The lateness histogram carries
+# only kind, but jobs.Define stamps tz_job_runs_total with kind and class, so joining on kind against
+# class="timer" is that list and cannot drift from it (the same join as 15 · Jobs). Job failing, Cron missed
+# and hard-cancelled stay in W1-11's jobs.yaml.
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: queue
+    folder: TodayZ
+    interval: 1m
+    rules:
+      # p99 lateness per timer kind over 5 min.
+      - uid: tz-order-timers-late
+        title: 'Order timers late'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 300, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                histogram_quantile(0.99, sum by (kind) (rate(tz_job_lateness_seconds[5m]) and on (kind) tz_job_runs_total{class="timer"})) > 30
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        labels:
+          area: queue
+          severity: critical
+        annotations:
+          summary: 'Timer {{ $labels.kind }} runs more than 30 s late'
+          description: 'p99 lateness of {{ $labels.kind }} is {{ $values.A.Value | humanizeDuration }}: orders expire, cancel or release later than the customer was told.'
+          runbook_url: docs/runbooks/queue-order-timers-late.md
+          __dashboardUid__: tz-jobs
+        isPaused: false
+
+      # The oldest available (not yet started) job per queue.
+      - uid: tz-job-backlog
+        title: 'Job backlog'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 120, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                max by (queue) (tz_queue_oldest_available_age_seconds) > 120
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        labels:
+          area: queue
+          severity: warning
+        annotations:
+          summary: 'Queue {{ $labels.queue }} has a job waiting over 2 min'
+          description: 'The oldest available job on {{ $labels.queue }} has waited {{ $values.A.Value | humanizeDuration }}.'
+          runbook_url: docs/runbooks/queue-job-backlog.md
+          __dashboardUid__: tz-jobs
+        isPaused: false

@@ -50,6 +50,10 @@ export const ACTION_ROLES = {
   leads: ['field_agent', ...SUPPORT_UP],
   catalogueReview: ['catalogue', ...ADMINS],
   catalogueManage: ADMINS,
+  /** A-11 hold, unhold, mark paid and export; the admin role reads only (06 A-11). */
+  payoutManage: ['finance', 'super_admin'],
+  /** A-09 adjustment request, approve and reject; the admin role cannot adjust credits (06 A-09). */
+  creditAdjust: ['finance', 'super_admin'],
 } as const satisfies Record<string, readonly Role[]>;
 export type Action = keyof typeof ACTION_ROLES;
 

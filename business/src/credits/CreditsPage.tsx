@@ -11,7 +11,7 @@ import { canSeeCredits } from './permissions';
 import { useCreditAccount, useReferrals } from './queries';
 import { ReferralCard } from './ReferralCard';
 import { StandeeCard } from './StandeeCard';
-import { StatementsSlot } from './StatementsSlot';
+import { StatementsCard } from '../statements/StatementsCard';
 
 /** B-10 Credits and referrals: the credit account, how payouts work, statements, the standee and referrals. */
 export function CreditsPage() {
@@ -109,7 +109,7 @@ function Desk({ store }: { store: CurrentStore }) {
         )}
       </section>
       <PayoutsCard />
-      <StatementsSlot />
+      <StatementsCard bid={store.bid} />
       <StandeeCard store={store} />
       <ReferralCard
         referrals={referrals.data}

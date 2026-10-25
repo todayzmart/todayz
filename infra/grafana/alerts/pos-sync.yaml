@@ -1,0 +1,53 @@
+# POS sync alerts (05 §5; owner W3-07; pos.yaml is W2's). Grafana alerting file provisioning, same layout and datasource uids as jobs.yaml. Alert files
+# are not wired into the local stack yet; routing (05 §5) is W5's contact points. The firing test is
+# backend/internal/rollups/alerts_test.go.
+#
+#   POS sync lag  ≥ 5 devices with an outbox over 1 h old, in business hours. warning
+#
+# The server cannot see a device's outbox, so "outbox over 1 h old" is read as a device of a live
+# store that synced in the last 24 h (it is in use) but not in the last hour, between 10:00 and
+# 21:00 IST (TODO(lead): the device could report its oldest unsent entry on sync).
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: pos-sync
+    folder: TodayZ
+    interval: 1m
+    rules:
+      # Devices in use that stopped syncing an hour ago.
+      - uid: tz-pos-sync-lag
+        title: 'POS sync lag'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 3600, to: 0}
+            datasourceUid: todayz-postgres
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              editorMode: code
+              rawSql: |-
+                SELECT CASE WHEN extract(hour FROM now() AT TIME ZONE 'Asia/Kolkata') BETWEEN 10 AND 20 THEN count(*) ELSE 0 END AS value
+                FROM sync_cursors c JOIN stores s ON s.id = c.store_id
+                WHERE s.status = 'live' AND c.last_synced_at < now() - interval '1 hour' AND c.last_synced_at > now() - interval '24 hours'
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [4]}
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        labels:
+          area: pos
+          severity: warning
+        annotations:
+          summary: '{{ $values.A.Value }} POS devices have not synced for over an hour'
+          description: 'Devices of live stores that were syncing today have sent nothing for an hour; their sales wait in the outbox.'
+          runbook_url: docs/runbooks/pos-sync-lag.md
+          __dashboardUid__: todayz-06
+        isPaused: false

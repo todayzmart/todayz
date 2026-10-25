@@ -1,0 +1,1008 @@
+{
+  "uid": "todayz-10",
+  "title": "10 · Retailer health (supply side)",
+  "description": "Store onboarding funnel, activity, POS use, stock, reliability, features and the store table (05 §4 dashboard 10; owner W3-07).",
+  "tags": [
+    "todayz",
+    "w3-07",
+    "retailers",
+    "supply"
+  ],
+  "timezone": "Asia/Kolkata",
+  "editable": false,
+  "graphTooltip": 1,
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5m",
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "fiscalYearStartMonth": 0,
+  "liveNow": false,
+  "links": [
+    {
+      "title": "00 · What to fix today",
+      "type": "link",
+      "url": "/d/todayz-00",
+      "icon": "dashboard"
+    },
+    {
+      "title": "Alerts",
+      "type": "link",
+      "url": "/alerting/list",
+      "icon": "bolt",
+      "tooltip": "Every alert links its runbook in docs/runbooks/"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "city",
+        "label": "City",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "todayz-postgres"
+        },
+        "query": "SELECT DISTINCT city FROM v_metric_store_supply WHERE city <> '' ORDER BY 1",
+        "definition": "SELECT DISTINCT city FROM v_metric_store_supply WHERE city <> '' ORDER BY 1",
+        "refresh": 1,
+        "includeAll": true,
+        "allValue": "__all",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "text",
+      "title": "How to read this",
+      "datasource": null,
+      "targets": [
+        {
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "mode": "markdown",
+        "content": "The store table at the bottom is sortable; its \"needs attention\" column feeds the field agents' follow-up list. Reliability thresholds come from `platform_settings` (`shop_expiry_penalty_threshold_bp`, `store_strike_risk_threshold`). Runbook: `docs/runbooks/risk-store-strikes.md`."
+      },
+      "id": 1,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      }
+    },
+    {
+      "id": 2,
+      "type": "row",
+      "title": "Onboarding funnel",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "type": "bargauge",
+      "title": "Store funnel (businesses created in range)",
+      "description": "Businesses created in range and how far they got. Active in week 4 is the store cohort grid on 09.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH b AS (SELECT b.* FROM businesses b WHERE $__timeFilter(b.created_at)),\nst AS (SELECT s.id, s.business_id, (SELECT count(*) FROM store_items i WHERE i.store_id = s.id AND i.is_listed) AS items,\n              (SELECT min(placed_at) FROM orders o WHERE o.store_id = s.id) AS first_order FROM stores s WHERE s.business_id IN (SELECT id FROM b) AND ('${city}' = '__all' OR s.city = '${city}'))\nSELECT 'Created' AS step, 1 AS n, count(*) AS businesses FROM b\nUNION ALL SELECT 'Submitted', 2, count(*) FROM b WHERE submitted_at IS NOT NULL\nUNION ALL SELECT 'Verified', 3, count(*) FROM b WHERE verified_at IS NOT NULL\nUNION ALL SELECT 'First product', 4, count(DISTINCT business_id) FROM st WHERE items >= 1\nUNION ALL SELECT '50 products', 5, count(DISTINCT business_id) FROM st WHERE items >= 50\nUNION ALL SELECT 'First order', 6, count(DISTINCT business_id) FROM st WHERE first_order IS NOT NULL\nORDER BY n"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "n": true
+            }
+          }
+        }
+      ],
+      "id": 3,
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "Time between steps (median hours)",
+      "description": "Median hours between onboarding steps.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT 'created → submitted' AS step, round(percentile_cont(0.5) WITHIN GROUP (ORDER BY extract(epoch FROM submitted_at - created_at) / 3600)::numeric, 1) AS median_h\nFROM businesses WHERE submitted_at IS NOT NULL AND $__timeFilter(created_at)\nUNION ALL SELECT 'submitted → verified', round(percentile_cont(0.5) WITHIN GROUP (ORDER BY extract(epoch FROM verified_at - submitted_at) / 3600)::numeric, 1)\nFROM businesses WHERE verified_at IS NOT NULL AND submitted_at IS NOT NULL AND $__timeFilter(created_at)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 4,
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "By onboarding route",
+      "description": "Self-serve vs agent-onboarded businesses.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT CASE WHEN onboarded_by IS NULL THEN 'self-serve' ELSE 'field agent' END AS route, count(*) AS created,\n       count(*) FILTER (WHERE verified_at IS NOT NULL) AS verified FROM businesses WHERE $__timeFilter(created_at) GROUP BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 5,
+      "gridPos": {
+        "x": 18,
+        "y": 4,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "id": 6,
+      "type": "row",
+      "title": "Activity and POS",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "Active and live stores per day",
+      "description": "Active: verified with a staff app open or POS sale that day. Live: active with ≥ 50 listed items, stock updated in 72 h.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT (date::timestamp AT TIME ZONE 'Asia/Kolkata') AS time, active_stores AS active, live_stores AS live, verified_stores AS verified FROM rollup_daily_platform WHERE $__timeFilter(date) ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 7,
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "POS sales per day by link method",
+      "description": "bill_qr and counter_code are linked sales; phone_unverified only adds the customer to the shop's list (D-07).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT $__timeGroupAlias(sold_at, '1d'), coalesce(link_method, 'none') AS metric, count(*) AS value FROM pos_sales\nWHERE status = 'completed' AND $__timeFilter(sold_at) GROUP BY 1, 2 ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 8,
+      "gridPos": {
+        "x": 12,
+        "y": 13,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Stores with POS sales (range)",
+      "description": "Distinct stores ringing up sales.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT count(DISTINCT p.store_id) AS value FROM v_metric_pos_sales p JOIN stores s ON s.id = p.store_id WHERE $__timeFilter(p.sold_at) AND ('${city}' = '__all' OR s.city = '${city}')"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 9,
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Linked share of POS sales",
+      "description": "Share of POS sales linked by bill_qr or counter_code.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT avg(p.linked::int) AS value FROM v_metric_pos_sales p JOIN stores s ON s.id = p.store_id WHERE $__timeFilter(p.sold_at) AND ('${city}' = '__all' OR s.city = '${city}')"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 10,
+      "gridPos": {
+        "x": 6,
+        "y": 21,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "table",
+      "title": "Stock updates by source and route",
+      "description": "Movements by D-01 source and by how they came in (device = POS; ref_type for bill scan, voice, import).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT source, CASE WHEN device_id IS NOT NULL THEN 'pos' ELSE coalesce(ref_type, 'manual') END AS via, count(*) AS movements\nFROM stock_movements WHERE $__timeFilter(created_at) GROUP BY 1, 2 ORDER BY 3 DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 11,
+      "gridPos": {
+        "x": 12,
+        "y": 21,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "id": 12,
+      "type": "row",
+      "title": "Reliability",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 29,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "type": "bargauge",
+      "title": "Acceptance rate distribution (30 d)",
+      "description": "stores.accept_rate_30d (written by store_reliability).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT CASE WHEN accept_rate_30d >= 0.9 THEN '90 %+' WHEN accept_rate_30d >= 0.75 THEN '75–90 %' WHEN accept_rate_30d >= 0.5 THEN '50–75 %' ELSE '< 50 %' END AS bucket,\n       count(*) AS stores, min(accept_rate_30d) AS o\nFROM stores s WHERE s.accept_rate_30d IS NOT NULL AND ('${city}' = '__all' OR s.city = '${city}') GROUP BY 1 ORDER BY o DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal"
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "o": true
+            }
+          }
+        }
+      ],
+      "id": 13,
+      "gridPos": {
+        "x": 0,
+        "y": 30,
+        "w": 8,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "Stores above the expiry penalty threshold",
+      "description": "Unaccepted-expiry rate over shop_expiry_penalty_threshold_bp (from platform_settings).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT s.name AS store, s.id AS store_id, round(100 * s.unaccepted_expiry_rate_30d, 1) AS expiry_pct\nFROM stores s, platform_settings ps\nWHERE ps.key = 'shop_expiry_penalty_threshold_bp' AND s.unaccepted_expiry_rate_30d * 10000 > (ps.value #>> '{}')::numeric AND ('${city}' = '__all' OR s.city = '${city}')\nORDER BY s.unaccepted_expiry_rate_30d DESC LIMIT 20"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "links": [
+            {
+              "title": "Open the store in admin",
+              "url": "https://admin.todayz.localhost/stores/${__data.fields.store_id}",
+              "targetBlank": true
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 14,
+      "gridPos": {
+        "x": 8,
+        "y": 30,
+        "w": 8,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "Store strikes in 30 days",
+      "description": "Strikes per store; at_threshold when it reaches store_strike_risk_threshold (D-67).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT s.name AS store, s.id AS store_id, count(*) AS strikes,\n       count(*) >= max((ps.value #>> '{}')::int) AS at_threshold\nFROM strikes k JOIN stores s ON s.id = k.subject_id, platform_settings ps\nWHERE k.subject_type = 'store' AND k.reset_at IS NULL AND k.created_at > now() - interval '30 days' AND ps.key = 'store_strike_risk_threshold' AND ('${city}' = '__all' OR s.city = '${city}')\nGROUP BY s.id ORDER BY strikes DESC LIMIT 20"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "links": [
+            {
+              "title": "Open the store in admin",
+              "url": "https://admin.todayz.localhost/stores/${__data.fields.store_id}",
+              "targetBlank": true
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 15,
+      "gridPos": {
+        "x": 16,
+        "y": 30,
+        "w": 8,
+        "h": 8
+      }
+    },
+    {
+      "type": "bargauge",
+      "title": "Rating distribution",
+      "description": "Stores by rounded Bayesian rating.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT round(s.rating_avg)::int::text || '★' AS rating, count(*) AS stores FROM stores s WHERE s.rating_count > 0 AND ('${city}' = '__all' OR s.city = '${city}') GROUP BY 1 ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal"
+      },
+      "id": 16,
+      "gridPos": {
+        "x": 0,
+        "y": 38,
+        "w": 8,
+        "h": 6
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Review reply rate (range)",
+      "description": "Share of reviews the shop replied to.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT avg((rr.review_id IS NOT NULL AND rr.deleted_at IS NULL)::int) AS value FROM reviews r LEFT JOIN review_replies rr ON rr.review_id = r.id WHERE $__timeFilter(r.created_at)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 17,
+      "gridPos": {
+        "x": 8,
+        "y": 38,
+        "w": 8,
+        "h": 6
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Median time to accept (range, s)",
+      "description": "Placed → accepted, all stores.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY o.accept_seconds) AS value FROM v_metric_orders o JOIN stores s ON s.id = o.store_id WHERE o.accepted AND $__timeFilter(o.placed_at) AND ('${city}' = '__all' OR s.city = '${city}')"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 18,
+      "gridPos": {
+        "x": 16,
+        "y": 38,
+        "w": 8,
+        "h": 6
+      }
+    },
+    {
+      "id": 19,
+      "type": "row",
+      "title": "Features",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 44,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "type": "table",
+      "title": "Banners (banner_daily)",
+      "description": "Impressions, taps and orders attributed by last tap within 24 h (D-77).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT b.store_id, s.name AS store, sum(d.impressions) AS impressions, sum(d.clicks) AS clicks, sum(d.attributed_orders) AS attributed_orders\nFROM banner_daily d JOIN store_banners b ON b.id = d.banner_id JOIN stores s ON s.id = b.store_id\nWHERE $__timeFilter(d.date) GROUP BY 1, 2 ORDER BY impressions DESC LIMIT 20"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 20,
+      "gridPos": {
+        "x": 0,
+        "y": 45,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "Offers created and redeemed",
+      "description": "Offers by kind. Uplift (orders on offer items vs before) needs per-item order history per offer window (TODO(lead): add when W3-03 lands its offer insight).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT kind, count(*) AS offers, sum(redemptions) AS redemptions FROM offers WHERE $__timeFilter(created_at) GROUP BY 1 ORDER BY 2 DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 21,
+      "gridPos": {
+        "x": 12,
+        "y": 45,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "type": "bargauge",
+      "title": "Cashback % distribution",
+      "description": "Live stores by cashback setting.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT (s.cashback_bp / 100)::text || ' %' AS cashback, count(*) AS stores FROM stores s WHERE s.status = 'live' AND ('${city}' = '__all' OR s.city = '${city}') GROUP BY s.cashback_bp ORDER BY s.cashback_bp"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal"
+      },
+      "id": 22,
+      "gridPos": {
+        "x": 18,
+        "y": 45,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "type": "text",
+      "title": "Insights, coach and voice — TODO(lead)",
+      "datasource": null,
+      "targets": [
+        {
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "mode": "markdown",
+        "content": "Demand insights viewed / actions / \"Not useful\" per kind (D-99) and voice update confirmation rate come from `insight_*` and `ai_draft_*` events, which are not catalogued yet (W3-03, W3-10). **TODO(lead).**"
+      },
+      "id": 23,
+      "gridPos": {
+        "x": 0,
+        "y": 53,
+        "w": 24,
+        "h": 3
+      }
+    },
+    {
+      "id": 24,
+      "type": "row",
+      "title": "Store table",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 56,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "type": "table",
+      "title": "Stores (7 d)",
+      "description": "Sortable. needs_attention: more than half the stock stale, unaccepted-expiry rate above 20 % (TODO(lead): confirm these two lines; they are not in 01), or no activity in 7 days.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH r AS (SELECT store_id, sum(orders) AS orders, sum(completed) AS completed, avg(avg_accept_seconds) AS avg_accept_s, sum(pos_sales) AS pos_sales\n           FROM rollup_daily_store WHERE date > (now() AT TIME ZONE 'Asia/Kolkata')::date - 7 GROUP BY store_id),\nt AS (SELECT store_id, items_listed, items_fresh_24h, items_stale FROM rollup_daily_store WHERE date = (now() AT TIME ZONE 'Asia/Kolkata')::date),\na AS (SELECT store_id, max(at) AS last_active FROM v_metric_store_activity WHERE at > now() - interval '90 days' GROUP BY store_id)\nSELECT s.name AS store, s.id AS store_id, s.city, coalesce(c.names->>'en', '') AS category,\n       coalesce(r.orders, 0) AS orders_7d, round(100.0 * r.completed / nullif(r.orders, 0)) AS success_pct, round(r.avg_accept_s) AS avg_accept_s,\n       round(100.0 * t.items_fresh_24h / nullif(t.items_listed, 0)) AS fresh_24h_pct, s.rating_avg AS rating, coalesce(r.pos_sales, 0) AS pos_sales_7d,\n       a.last_active,\n       (coalesce(t.items_stale::float / nullif(t.items_listed, 0), 0) > 0.5 OR coalesce(s.unaccepted_expiry_rate_30d, 0) > 0.2\n        OR a.last_active IS NULL OR a.last_active < now() - interval '7 days') AS needs_attention\nFROM stores s JOIN businesses b ON b.id = s.business_id LEFT JOIN categories c ON c.id = b.category_id\nLEFT JOIN r ON r.store_id = s.id LEFT JOIN t ON t.store_id = s.id LEFT JOIN a ON a.store_id = s.id\nWHERE b.status = 'verified' AND ('${city}' = '__all' OR s.city = '${city}')\nORDER BY needs_attention DESC, orders_7d DESC LIMIT 500"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "links": [
+            {
+              "title": "Open the store in admin",
+              "url": "https://admin.todayz.localhost/stores/${__data.fields.store_id}",
+              "targetBlank": true
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 25,
+      "gridPos": {
+        "x": 0,
+        "y": 57,
+        "w": 24,
+        "h": 12
+      }
+    },
+    {
+      "type": "table",
+      "title": "Field agents: shops per agent per week",
+      "description": "Businesses an agent created, by IST week. The agent is shown by user id (no names on dashboards).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT date_trunc('week', b.created_at AT TIME ZONE 'Asia/Kolkata')::date AS week, b.onboarded_by AS agent_user_id, count(*) AS onboarded,\n       count(*) FILTER (WHERE b.verified_at IS NOT NULL) AS verified,\n       count(*) FILTER (WHERE EXISTS (SELECT 1 FROM stores s WHERE s.business_id = b.id AND s.status = 'live')) AS live\nFROM businesses b WHERE b.onboarded_by IS NOT NULL AND $__timeFilter(b.created_at) GROUP BY 1, 2 ORDER BY 1 DESC, 3 DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 26,
+      "gridPos": {
+        "x": 0,
+        "y": 69,
+        "w": 24,
+        "h": 8
+      }
+    }
+  ]
+}

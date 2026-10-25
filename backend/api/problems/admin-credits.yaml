@@ -1,0 +1,14 @@
+# Problem codes: domain "admin-credits" (owner W3-01; 01 §7, D-05, D-73).
+#
+# Same shape as common.yaml. step_up_required (403) is auth.yaml's; a request
+# that is no longer pending is common.yaml's invalid_transition.
+domain: admin-credits
+problems:
+  - code: approver_is_requester
+    status: 403
+    i18n: problems.approver_is_requester
+    title: A second person has to approve this adjustment
+  - code: adjustment_insufficient_balance
+    status: 409
+    i18n: problems.adjustment_insufficient_balance
+    title: The wallet does not hold that many credits

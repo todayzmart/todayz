@@ -1,12 +1,304 @@
-# Paths: domain "admin-credits" (owner W3-06): admin credit adjustments (04 §2.7).
+# Paths: domain "admin-credits" (owner W3-01): A-09 Credits, the ledger browser,
+# expiry preview and credit adjustments (04 §2.7, D-05, D-73).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-credits]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-credits.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Every operation: `tags: [admin-credits]`, an example per request and success
+# response, and the `default` problem. Reads need admin.ledger.view (finance,
+# admin, super_admin); a request needs admin.adjustment.request and an approve
+# or reject admin.adjustment.approve (finance, super_admin, step-up).
+/v1/admin/ledger/accounts:
+  get:
+    operationId: listAdminLedgerAccounts
+    tags: [admin-credits]
+    summary: Find ledger accounts (A-09)
+    description: >-
+      `q` is a customer's phone (exact, matched by its keyed hash), a store short code, or a customer,
+      store or account id. `platform` lists the platform accounts. Balances are in paise (credits × 100).
+    parameters:
+      - name: q
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 40
+    responses:
+      "200":
+        description: The matching accounts
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-credits.yaml#/AdminLedgerAccountList
+            example:
+              items:
+                - id: 01JB0AA1A2B3C4D5E6F7G8H9J0
+                  kind: customer_wallet
+                  ownerType: customer
+                  ownerId: 01JB0CW1A2B3C4D5E6F7G8H9J0
+                  ownerName: Priya
+                  balancePaise: 4000
+              serverNow: "2026-10-25T10:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/ledger/accounts/{accountId}/entries:
+  parameters:
+    - name: accountId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listAdminLedgerEntries
+    tags: [admin-credits]
+    summary: One account's ledger entries, newest first
+    parameters:
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: The account and a page of its entries
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-credits.yaml#/AdminLedgerEntryPage
+            example:
+              account:
+                id: 01JB0AA1A2B3C4D5E6F7G8H9J0
+                kind: customer_wallet
+                ownerType: customer
+                ownerId: 01JB0CW1A2B3C4D5E6F7G8H9J0
+                ownerName: Priya
+                balancePaise: 4000
+              items:
+                - id: 01JB0EE1A2B3C4D5E6F7G8H9J0
+                  transactionId: 01JB0TT1A2B3C4D5E6F7G8H9J0
+                  kind: cashback
+                  refType: order
+                  refId: 01JB0RR1A2B3C4D5E6F7G8H9J0
+                  memo: null
+                  amountPaise: 2500
+                  createdBy: null
+                  createdAt: "2026-10-24T12:10:00Z"
+              nextCursor: null
+              serverNow: "2026-10-25T10:00:00Z"
+      default: *problem
+/v1/admin/credits/expiry-preview:
+  get:
+    operationId: getAdminCreditExpiryPreview
+    tags: [admin-credits]
+    summary: Credits that will expire in the next days, per IST day
+    description: What is left on unexpired lots whose expiry falls in the next `days` days (default 30, at most 90).
+    parameters:
+      - name: days
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 90
+    responses:
+      "200":
+        description: The expiry preview
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-credits.yaml#/AdminExpiryPreview
+            example:
+              from: "2026-10-25T10:00:00Z"
+              to: "2026-11-24T10:00:00Z"
+              totalPaise: 120000
+              days:
+                - day: "2026-10-28"
+                  expiringPaise: 120000
+                  lots: 14
+                  customers: 9
+              serverNow: "2026-10-25T10:00:00Z"
+      default: *problem
+/v1/admin/credit-adjustments:
+  get:
+    operationId: listCreditAdjustments
+    tags: [admin-credits]
+    summary: Adjustment requests, newest first (Pending approvals tab)
+    parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          $ref: ../schemas/admin-credits.yaml#/CreditAdjustmentStatus
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: A page of requests
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-credits.yaml#/CreditAdjustmentList
+            example:
+              items:
+                - &request
+                  id: 01JB0AR1A2B3C4D5E6F7G8H9J0
+                  customerId: 01JB0CW1A2B3C4D5E6F7G8H9J0
+                  customerName: Priya
+                  amountPaise: 80000
+                  reason: Goodwill after a failed delivery
+                  link: TZ-024817
+                  status: pending
+                  requestedBy: 01JB0ADM1A2B3C4D5E6F7G8H9J
+                  requestedByName: Asha
+                  requestedAt: "2026-10-25T09:00:00Z"
+                  mine: true
+                  approvedBy: null
+                  approvedByName: null
+                  decidedAt: null
+                  decisionNote: null
+                  transactionId: null
+              nextCursor: null
+              serverNow: "2026-10-25T10:00:00Z"
+      default: *problem
+  post:
+    operationId: createCreditAdjustment
+    tags: [admin-credits]
+    summary: Adjust a customer's wallet, with a reason (audited, step-up)
+    description: >-
+      Finance and super_admin, with a TOTP step-up younger than 10 minutes. When the absolute amount is at
+      or under `admin_adjust_dual_approval_above_paise` it posts at once (`outcome: posted`, no request
+      row); above it a pending request waits for a second person (`outcome: pending`), for super_admin
+      too (D-05, D-73). A debit larger than the wallet's balance is `409 adjustment_insufficient_balance`.
+      The amount is a whole number of credits in paise (a multiple of 100), never 0.
+    x-idempotency: required
+    x-money: true
+    x-problems: [step_up_required, adjustment_insufficient_balance]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-credits.yaml#/CreditAdjustmentCreate
+          example:
+            accountId: 01JB0AA1A2B3C4D5E6F7G8H9J0
+            amountPaise: 80000
+            reason: Goodwill after a failed delivery
+            link: TZ-024817
+    responses:
+      "201":
+        description: Posted, or a pending request
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-credits.yaml#/CreditAdjustmentResult
+            example:
+              outcome: pending
+              request: *request
+              transactionId: null
+              serverNow: "2026-10-25T09:00:00Z"
+      default: *problem
+/v1/admin/credit-adjustments/{requestId}/approve:
+  parameters:
+    - &requestId
+      name: requestId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: approveCreditAdjustment
+    tags: [admin-credits]
+    summary: Approve a pending adjustment and post it (step-up)
+    description: >-
+      A second finance or super_admin: the requester gets `403 approver_is_requester` (D-05). Posts the
+      adjustment once; a request no longer pending is `409 invalid_transition`.
+    x-idempotency: required
+    x-money: true
+    x-problems: [step_up_required, approver_is_requester, adjustment_insufficient_balance, invalid_transition]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-credits.yaml#/CreditAdjustmentDecision
+          example:
+            note: Checked the order, approved
+    responses:
+      "200":
+        description: The approved request and its transaction
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-credits.yaml#/CreditAdjustmentResult
+            example:
+              outcome: approved
+              request:
+                id: 01JB0AR1A2B3C4D5E6F7G8H9J0
+                customerId: 01JB0CW1A2B3C4D5E6F7G8H9J0
+                customerName: Priya
+                amountPaise: 80000
+                reason: Goodwill after a failed delivery
+                link: TZ-024817
+                status: approved
+                requestedBy: 01JB0ADM1A2B3C4D5E6F7G8H9J
+                requestedByName: Asha
+                requestedAt: "2026-10-25T09:00:00Z"
+                mine: false
+                approvedBy: 01JB0ADM2A2B3C4D5E6F7G8H9J
+                approvedByName: Ravi
+                decidedAt: "2026-10-25T10:00:00Z"
+                decisionNote: Checked the order, approved
+                transactionId: 01JB0TT2A2B3C4D5E6F7G8H9J0
+              transactionId: 01JB0TT2A2B3C4D5E6F7G8H9J0
+              serverNow: "2026-10-25T10:00:00Z"
+      default: *problem
+/v1/admin/credit-adjustments/{requestId}/reject:
+  parameters:
+    - *requestId
+  post:
+    operationId: rejectCreditAdjustment
+    tags: [admin-credits]
+    summary: Reject a pending adjustment, or cancel your own (step-up)
+    description: >-
+      Another finance or super_admin rejects it (`rejected`); the requester rejecting their own request
+      withdraws it (`cancelled`). Nothing posts. A request no longer pending is `409 invalid_transition`.
+    x-idempotency: optional
+    x-problems: [step_up_required, invalid_transition]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-credits.yaml#/CreditAdjustmentDecision
+          example:
+            note: No ticket for this, rejected
+    responses:
+      "200":
+        description: The closed request
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-credits.yaml#/CreditAdjustmentResult
+            example:
+              outcome: rejected
+              request:
+                id: 01JB0AR1A2B3C4D5E6F7G8H9J0
+                customerId: 01JB0CW1A2B3C4D5E6F7G8H9J0
+                customerName: Priya
+                amountPaise: 80000
+                reason: Goodwill after a failed delivery
+                link: TZ-024817
+                status: rejected
+                requestedBy: 01JB0ADM1A2B3C4D5E6F7G8H9J
+                requestedByName: Asha
+                requestedAt: "2026-10-25T09:00:00Z"
+                mine: false
+                approvedBy: 01JB0ADM2A2B3C4D5E6F7G8H9J
+                approvedByName: Ravi
+                decidedAt: "2026-10-25T10:00:00Z"
+                decisionNote: No ticket for this, rejected
+                transactionId: null
+              transactionId: null
+              serverNow: "2026-10-25T10:00:00Z"
+      default: *problem

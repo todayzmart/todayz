@@ -924,7 +924,7 @@ func TestServiceInvariantsPropertyDB(t *testing.T) {
 	e := newDBEnv(t)
 	e.setting(settings.CreditOrdersPerMonth, "4")
 	e.setting(settings.StoreCreditRedemptionsPerDay, "4")
-	e.setting(settings.CreditExpiryDays, "3")
+	e.setting(settings.CreditExpiryDays, "30") // the lowest 01 §17 allows; steps move the clock up to 20 days
 	rules, err := e.svc.Rules(e.ctx)
 	require.NoError(t, err)
 	propertyChecks(t, 150)
