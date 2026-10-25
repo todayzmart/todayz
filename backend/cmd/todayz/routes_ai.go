@@ -182,7 +182,7 @@ type aiBillStock struct {
 
 func (a aiBillStock) AddFromBill(ctx context.Context, in billscan.StockIn) error {
 	_, err := a.w.AddStock(ctx, a.db.Q(ctx), catalogue.StockIn{
-		StoreID: in.StoreID, ItemID: in.ItemID, Qty: int32(in.Qty), //nolint:gosec // bounded by billscan.MaxQuantity
+		StoreID: in.StoreID, ItemID: in.ItemID, Qty: int32(in.Qty), // #nosec G115 -- bounded by billscan.MaxQuantity
 		Source: catalogue.SourceSupplierBill, ExpiresOn: in.ExpiresOn, CostPaise: in.CostPaise,
 		RefType: "ai_draft", RefID: in.DraftID, Who: catalogue.Who{UserID: in.Who},
 	})

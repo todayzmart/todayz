@@ -56,7 +56,7 @@ func (s *Service) RunBatched(ctx context.Context, j detectors.Job, period string
 			sum.Add(r)
 		}
 		after = stores[len(stores)-1].ID
-		done += int32(len(stores)) //nolint:gosec // a batch is at most batchSize
+		done += int32(len(stores)) // #nosec G115 -- a batch is at most batchSize
 		if err := q.PutCheckpoint(ctx, coachdb.PutCheckpointParams{
 			Job: string(j), Period: period, After: after, Stores: done, Now: s.d.Clock.Now(),
 		}); err != nil {

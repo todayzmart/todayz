@@ -70,7 +70,7 @@ func (s *Service) List(ctx context.Context, storeID ids.ID, f coachapi.CoachCard
 	now := s.d.Clock.Now()
 	sid := ids.UUID(storeID)
 	q := coachdb.New(s.d.DB.Q(ctx))
-	rows, err := q.ListCards(ctx, coachdb.ListCardsParams{StoreID: sid, Statuses: st, Off: int32(off), Lim: int32(lim + 1)}) //nolint:gosec // bounded above
+	rows, err := q.ListCards(ctx, coachdb.ListCardsParams{StoreID: sid, Statuses: st, Off: int32(off), Lim: int32(lim + 1)}) // #nosec G115 -- bounded above
 	if err != nil {
 		return coachapi.CoachCardList{}, err
 	}

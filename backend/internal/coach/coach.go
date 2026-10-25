@@ -321,7 +321,7 @@ func (s *Service) write(ctx context.Context, j detectors.Job, in *detectors.Inpu
 	_, err = coachdb.New(s.d.DB.Q(ctx)).InsertCard(ctx, coachdb.InsertCardParams{
 		ID: ids.UUID(id), StoreID: sid, Detector: f.Detector, SubjectRef: f.Subject,
 		Kind: string(f.Kind), Topic: f.Topic, Title: text.Title, Body: text.Body, Numbers: nums,
-		ActionType: act, ActionPayload: payload, Priority: int32(f.Severity), //nolint:gosec // 1–3
+		ActionType: act, ActionPayload: payload, Priority: int32(f.Severity), // #nosec G115 -- 1–3
 		GeneratedBy: gen.By, PromptVersion: gen.PromptVersion, Model: gen.Model,
 		Lang: lang, Job: string(j), Day: in.Today.PG(), ValidUntil: now.Add(validFor[j]), Now: now,
 	})
