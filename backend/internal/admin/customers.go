@@ -19,8 +19,9 @@ import (
 // A-06 Customers (01 §13, §5.4, D-41). Search is by exact phone only (the
 // keyed hash), so there is no customer list to scroll. Block is global: the
 // account's status refuses sign-in in every app and every live session is
-// revoked in the same transaction. An admin account is never blocked here
-// (A-18 disables an admin).
+// revoked in the same transaction. Only a customer account (one with a
+// customer profile) is blocked here, never an admin: A-18 disables an admin,
+// and an admin's sessions are neither listed nor revoked here.
 
 func (s *Service) search(ctx context.Context, phone string) (api.AdminCustomerSearch, error) {
 	if err := s.ready(ctx); err != nil {
@@ -32,7 +33,7 @@ func (s *Service) search(ctx context.Context, phone string) (api.AdminCustomerSe
 	}
 	p, ok := e164(phone)
 	if !ok {
-		return api.AdminCustomerSearch{}, fieldErr("query.phone", "an Indian mobile number")
+		return api.AdminCustomerSearch{}, fieldErr("body.phone", "an Indian mobile number")
 	}
 	out := api.AdminCustomerSearch{Items: []api.AdminCustomerSummary{}, ServerNow: s.now()}
 	r, err := s.q(ctx).CustomerByPhoneHash(ctx, s.hash.Phone(p))
@@ -66,6 +67,7 @@ func (s *Service) customer(ctx context.Context, id ids.ID) (api.AdminCustomer, e
 	out := api.AdminCustomer{
 		Id: idString(r.ID), Name: r.Name, PhoneMasked: s.maskedPhone(ctx, r.PhoneEnc),
 		Status: api.AdminCustomerStatus(r.Status), PreferredLang: api.AdminCustomerPreferredLang(r.PreferredLang),
+		IsAdmin: r.IsAdmin, IsCustomer: r.IsCustomer,
 		CreatedAt: r.CreatedAt.UTC(), ActiveStrikes: int(r.ActiveStrikes), ServerNow: now,
 		Strikes: []api.AdminStrike{}, Sessions: []api.AdminCustomerSession{}, RecentOrders: []api.AdminCustomerOrder{},
 	}
@@ -79,9 +81,11 @@ func (s *Service) customer(ctx context.Context, id ids.ID) (api.AdminCustomer, e
 			CreatedAt: k.CreatedAt.UTC(), ResetAt: utcPtr(k.ResetAt), ResetReason: k.ResetReason,
 		})
 	}
-	sessions, err := q.LiveSessions(ctx, admindb.LiveSessionsParams{UserID: u, Now: now})
-	if err != nil {
-		return api.AdminCustomer{}, err
+	var sessions []admindb.LiveSessionsRow
+	if !r.IsAdmin {
+		if sessions, err = q.LiveSessions(ctx, admindb.LiveSessionsParams{UserID: u, Now: now}); err != nil {
+			return api.AdminCustomer{}, err
+		}
 	}
 	for _, x := range sessions {
 		out.Sessions = append(out.Sessions, api.AdminCustomerSession{
@@ -122,22 +126,21 @@ func (s *Service) setStatus(ctx context.Context, actor, id ids.ID, to, reason st
 	err = s.db.InTx(ctx, func(ctx context.Context) error {
 		q := s.q(ctx)
 		u := ids.UUID(id)
-		r, err := q.GetCustomer(ctx, u)
+		// Lock the user before its sessions, as identity's refresh does.
+		l, err := q.LockCustomer(ctx, u)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return notFound()
 		}
 		if err != nil {
 			return err
 		}
-		if to == "blocked" && r.IsAdmin {
-			return invalidTransition("An admin account is disabled from A-18, not blocked here.")
+		if to == "blocked" && l.IsAdmin {
+			return invalidTransition(adminAccount)
 		}
-		// Lock the user before its sessions, as identity's refresh does.
-		status, err := q.LockCustomer(ctx, u)
-		if err != nil {
-			return err
+		if to == "blocked" && !l.IsCustomer {
+			return invalidTransition("Only a customer account can be blocked here.")
 		}
-		if status != from {
+		if l.Status != from {
 			return invalidTransition("")
 		}
 		now := s.now()
@@ -182,9 +185,7 @@ func (s *Service) resetStrikes(ctx context.Context, actor, id ids.ID, reason str
 	err = s.db.InTx(ctx, func(ctx context.Context) error {
 		q := s.q(ctx)
 		u := ids.UUID(id)
-		if _, err := q.LockCustomer(ctx, u); errors.Is(err, pgx.ErrNoRows) {
-			return notFound()
-		} else if err != nil {
+		if err := lockNonAdmin(ctx, q, u); err != nil {
 			return err
 		}
 		now := s.now()
@@ -222,9 +223,7 @@ func (s *Service) revokeSession(ctx context.Context, actor, id, session ids.ID) 
 	return s.db.InTx(ctx, func(ctx context.Context) error {
 		q := s.q(ctx)
 		u := ids.UUID(id)
-		if _, err := q.LockCustomer(ctx, u); errors.Is(err, pgx.ErrNoRows) {
-			return notFound()
-		} else if err != nil {
+		if err := lockNonAdmin(ctx, q, u); err != nil {
 			return err
 		}
 		n, err := q.RevokeUserSession(ctx, admindb.RevokeUserSessionParams{Now: s.now(), ID: ids.UUID(session), UserID: u})
@@ -241,6 +240,25 @@ func (s *Service) revokeSession(ctx context.Context, actor, id, session ids.ID) 
 		})
 		return err
 	})
+}
+
+// adminAccount is why the customer console refuses an admin account: A-18
+// disables an admin instead.
+const adminAccount = "An admin account is disabled from A-18, not changed here."
+
+// lockNonAdmin locks the user row and refuses an admin account under that lock.
+func lockNonAdmin(ctx context.Context, q *admindb.Queries, u pgtype.UUID) error {
+	l, err := q.LockCustomer(ctx, u)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return notFound()
+	}
+	if err != nil {
+		return err
+	}
+	if l.IsAdmin {
+		return invalidTransition(adminAccount)
+	}
+	return nil
 }
 
 func uuidStrings(us []pgtype.UUID) []string {

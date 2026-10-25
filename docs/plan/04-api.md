@@ -390,9 +390,9 @@ Priced above nearby is returned only while `insight_price_compare_enabled` is tr
 | Stores | POST | /v1/admin/stores/{sid}/review | admin | W3-05 | `pending_review` → `live` or back with a note (D-40) |
 | Stores | POST | /v1/admin/stores/{sid}/force-close | admin | W3-05 | |
 | Stores | POST | /v1/admin/stores/{sid}/strikes/reset | support, admin | W3-05 | `{reason}`; audited (D-41) |
-| Customers | GET | /v1/admin/customers?phone= | support, admin | W3-05 | exact match on the keyed hash |
+| Customers | POST | /v1/admin/customer-search | support, admin | W3-05 | `{phone}`, exact match on the keyed hash; a POST so the phone never sits in a URL or an access log (W3-05 review). Its own resource by the 1.2 path rule, like `basket-search` |
 | Customers | GET | /v1/admin/customers/{customerId} | support, admin | W3-05 | |
-| Customers | POST | /v1/admin/customers/{customerId}/block | admin | W3-05 | |
+| Customers | POST | /v1/admin/customers/{customerId}/block | admin | W3-05 | customer accounts only: an admin or a staff-only account is `409` |
 | Customers | POST | /v1/admin/customers/{customerId}/unblock | admin | W3-05 | |
 | Customers | POST | /v1/admin/customers/{customerId}/strikes/reset | support, admin | W3-05 | `{reason}`; audited (D-41) |
 | Customers | DELETE | /v1/admin/customers/{customerId}/sessions/{sessionId} | admin | W3-05 | revoke a device session |

@@ -10,6 +10,17 @@ AdminCustomerChange:
       description: Why, 1 to 500 characters. Kept in the audit log (and on a strike reset, on the strike).
       minLength: 1
       maxLength: 500
+AdminCustomerSearchRequest:
+  type: object
+  additionalProperties: false
+  required: [phone]
+  properties:
+    phone:
+      type: string
+      description: A 10-digit Indian mobile number, with or without `+91`.
+      minLength: 10
+      maxLength: 16
+      pattern: ^[+0-9 ]{10,16}$
 AdminCustomerStatus:
   type: string
   description: '`blocked` refuses sign-in (`403 account_blocked`) and every signed-in call; `deleted` is an erased account.'
@@ -89,7 +100,7 @@ AdminCustomerOrder:
 AdminCustomer:
   type: object
   additionalProperties: false
-  required: [id, name, phoneMasked, status, preferredLang, createdAt, activeStrikes, strikes, sessions, recentOrders, serverNow]
+  required: [id, name, phoneMasked, status, preferredLang, isAdmin, isCustomer, createdAt, activeStrikes, strikes, sessions, recentOrders, serverNow]
   properties:
     id: {$ref: ./common.yaml#/Ulid}
     name:
@@ -102,6 +113,12 @@ AdminCustomer:
     preferredLang:
       type: string
       enum: [en, hi, kn, te, ta]
+    isAdmin:
+      type: boolean
+      description: An active admin account. It is managed from A-18, so its sessions are not listed and it cannot be blocked, struck off or signed out here.
+    isCustomer:
+      type: boolean
+      description: The account has a customer profile. Only a customer can be blocked here (shop staff only is `409`).
     createdAt: {$ref: ./common.yaml#/Timestamp}
     activeStrikes:
       type: integer
@@ -115,7 +132,7 @@ AdminCustomer:
     sessions:
       type: array
       maxItems: 50
-      description: Live sessions (not revoked, not expired) in every app.
+      description: Live sessions (not revoked, not expired) in every app; always empty for an admin account.
       items: {$ref: ./admin-customers.yaml#/AdminCustomerSession}
     recentOrders:
       type: array

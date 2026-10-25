@@ -13,6 +13,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -161,7 +162,21 @@ func cleanReason(r string) (string, error) {
 	if r == "" || len([]rune(r)) > maxReason {
 		return "", fieldErr("body.reason", "1 to 500 characters")
 	}
-	return r, nil
+	return r, noPhone("body.reason", r)
+}
+
+// rePhone is an Indian mobile number in free text, the same shape the log
+// redactor masks (telemetry's rePhone).
+var rePhone = regexp.MustCompile(`(^|[^0-9A-Za-z+])((?:\+91|91|0)?[\s-]?[6-9]\d{4}[\s-]?\d{5})($|[^0-9A-Za-z])`)
+
+// noPhone refuses free text an admin typed (a reason or a note) that holds a
+// phone number: it is stored in the audit log and shown to other roles, and
+// writers never put a phone there (the subject already names the person).
+func noPhone(path, s string) error {
+	if rePhone.MatchString(s) {
+		return fieldErr(path, "no phone numbers")
+	}
+	return nil
 }
 
 func pageArgs(limit *int, cursor *string) (int, *time.Time, pgtype.UUID, error) {

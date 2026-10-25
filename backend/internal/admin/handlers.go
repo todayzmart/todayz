@@ -64,9 +64,9 @@ type customerHandlers struct{ s *Service }
 
 var _ customersapi.StrictServerInterface = customerHandlers{}
 
-// SearchAdminCustomers implements GET /v1/admin/customers?phone=.
+// SearchAdminCustomers implements POST /v1/admin/customer-search.
 func (h customerHandlers) SearchAdminCustomers(ctx context.Context, req customersapi.SearchAdminCustomersRequestObject) (customersapi.SearchAdminCustomersResponseObject, error) {
-	out, err := h.s.search(ctx, req.Params.Phone)
+	out, err := h.s.search(ctx, req.Body.Phone)
 	if err != nil {
 		return nil, asProblem(err)
 	}

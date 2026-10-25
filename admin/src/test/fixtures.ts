@@ -15,6 +15,8 @@ export function customer(over: Partial<AdminCustomer> = {}): AdminCustomer {
     phoneMasked: '98•••••210',
     status: 'active',
     preferredLang: 'en',
+    isAdmin: false,
+    isCustomer: true,
     createdAt: '2026-09-01T04:30:00Z',
     activeStrikes: 2,
     strikes: [

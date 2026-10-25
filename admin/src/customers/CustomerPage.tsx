@@ -57,8 +57,9 @@ function Detail({ c }: { c: AdminCustomer }) {
   const revoke = useRevokeSession(c.id);
   const [open, setOpen] = useState<CustomerChange | null>(null);
   const [revoking, setRevoking] = useState<AdminCustomerSession | null>(null);
-  const mayBlock = can(roles, 'customerBlock');
-  const mayReset = can(roles, 'strikesReset');
+  // An admin account is managed from A-18; only a customer account is blocked here.
+  const mayBlock = can(roles, 'customerBlock') && !c.isAdmin;
+  const mayReset = can(roles, 'strikesReset') && !c.isAdmin;
   const now = c.serverNow;
 
   const confirm = (reason: string) => {
@@ -176,6 +177,9 @@ function Detail({ c }: { c: AdminCustomer }) {
           <p className="tz-page-sub">
             {intl.formatMessage({ id: 'customers.detail.sub' }, { phone: c.phoneMasked ?? '—', joined: when(c.createdAt, now), strikes: c.activeStrikes })}
           </p>
+          {(c.isAdmin || !c.isCustomer) && (
+            <p className={css.muted}>{intl.formatMessage({ id: c.isAdmin ? 'customers.adminAccount' : 'customers.notCustomer' })}</p>
+          )}
         </div>
         <div className={css.actions}>
           {mayReset && (
@@ -183,7 +187,7 @@ function Detail({ c }: { c: AdminCustomer }) {
               {intl.formatMessage({ id: 'customers.reset' })}
             </Button>
           )}
-          {mayBlock && c.status === 'active' && (
+          {mayBlock && c.isCustomer && c.status === 'active' && (
             <Button variant="danger" icon={Ban} onClick={() => setOpen('block')}>
               {intl.formatMessage({ id: 'customers.block' })}
             </Button>
@@ -218,7 +222,7 @@ function Detail({ c }: { c: AdminCustomer }) {
               columns={sessionCols}
               data={c.sessions}
               getRowId={(s) => s.id}
-              emptyLabel={intl.formatMessage({ id: 'customers.sessions.none' })}
+              emptyLabel={intl.formatMessage({ id: c.isAdmin ? 'customers.sessions.admin' : 'customers.sessions.none' })}
             />
           </section>
           <section className="tz-card" aria-labelledby="orders-title">

@@ -57,7 +57,7 @@ const CASES: { roles: string[]; nav: string[]; hidden?: string }[] = [
 const SUPPORT_UP = ['support', 'admin', 'super_admin'];
 const READS: [RegExp, string[]][] = [
   [/^\/v1\/admin\/leads(\/|$)/, ['field_agent', ...SUPPORT_UP]],
-  [/^\/v1\/admin\/(businesses|stores|customers|orders|reviews|review-reports)(\/|$)/, SUPPORT_UP],
+  [/^\/v1\/admin\/(businesses|stores|customers|customer-search|orders|reviews|review-reports)(\/|$)/, SUPPORT_UP],
   [/^\/v1\/admin\/audit-log\/subject$/, ['field_agent', 'support', 'catalogue', 'finance', 'admin', 'super_admin']],
   [/^\/v1\/admin\/(audit-log|settings)(\/|$)/, ['admin', 'super_admin']],
   [/^\/v1\/admin\/(jobs|job-runs)(\/|$)/, ['support', 'analyst', 'finance', 'admin', 'super_admin']],

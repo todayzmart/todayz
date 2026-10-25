@@ -239,6 +239,9 @@ func (s *Service) requestBusinessInfo(ctx context.Context, actor, id ids.ID, bod
 	if note == "" || len([]rune(note)) > maxReason {
 		return api.AdminBusiness{}, fieldErr("body.note", "1 to 500 characters")
 	}
+	if err := noPhone("body.note", note); err != nil {
+		return api.AdminBusiness{}, err
+	}
 	fields := make([]string, 0, len(body.Fields))
 	for _, f := range body.Fields {
 		if !slices.Contains(fields, string(f)) {
@@ -405,5 +408,5 @@ func optNote(n *string, path string) (*string, error) {
 	if len([]rune(v)) > maxReason {
 		return nil, fieldErr(path, "at most 500 characters")
 	}
-	return &v, nil
+	return &v, noPhone(path, v)
 }

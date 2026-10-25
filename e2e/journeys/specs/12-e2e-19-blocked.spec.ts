@@ -27,8 +27,9 @@ test('E2E-19 blocked customer cannot sign in or order; unblock restores them', a
     const open = await test.step('the customer has an open order', async () => c.place(STORES.SL, items));
 
     const id = await test.step('admin finds the customer by phone (A-06)', async () => {
-      const found = await admin.api.ok<Found>('admin searches the phone', 'GET', '/v1/admin/customers', undefined, {
-        params: { phone: PEOPLE.blocked.national },
+      // The phone goes in the body, never in a URL (W3-05 review).
+      const found = await admin.api.ok<Found>('admin searches the phone', 'POST', '/v1/admin/customer-search', {
+        phone: PEOPLE.blocked.national,
       });
       expect(found.items, 'one customer has the number').toHaveLength(1);
       expect(found.items[0]?.id).toBe(c.who.userId);

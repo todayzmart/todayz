@@ -16,15 +16,26 @@ WHERE pi.phone_hash = @phone_hash;
 SELECT u.id, u.name, u.status, u.preferred_lang, u.created_at, u.version, pi.phone_enc,
   (SELECT count(*) FROM strikes s
    WHERE s.subject_type = 'customer' AND s.subject_id = u.id AND s.reset_at IS NULL)::int AS active_strikes,
-  (au.user_id IS NOT NULL AND au.disabled_at IS NULL)::bool AS is_admin
+  (au.user_id IS NOT NULL AND au.disabled_at IS NULL)::bool AS is_admin,
+  (cp.user_id IS NOT NULL)::bool AS is_customer
 FROM users u
   LEFT JOIN phone_identities pi ON pi.user_id = u.id
   LEFT JOIN admin_users au ON au.user_id = u.id
+  LEFT JOIN customer_profiles cp ON cp.user_id = u.id
 WHERE u.id = @id;
 
 -- name: LockCustomer :one
 -- Lock order is the users row before its sessions (identity's refresh does the same).
-SELECT u.status FROM users u WHERE u.id = @id FOR UPDATE;
+-- is_admin and is_customer are read under the same lock, so a guard on them holds
+-- for the rest of the transaction.
+SELECT u.status,
+  (au.user_id IS NOT NULL AND au.disabled_at IS NULL)::bool AS is_admin,
+  (cp.user_id IS NOT NULL)::bool AS is_customer
+FROM users u
+  LEFT JOIN admin_users au ON au.user_id = u.id
+  LEFT JOIN customer_profiles cp ON cp.user_id = u.id
+WHERE u.id = @id
+FOR UPDATE OF u;
 
 -- name: SetCustomerStatus :exec
 UPDATE users SET status = @status, updated_at = @now, version = version + 1 WHERE id = @id;
