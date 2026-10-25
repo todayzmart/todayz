@@ -1,0 +1,68 @@
+{
+  "name": "shelf_17",
+  "input": {
+    "image": "images/shelf_17.jpg"
+  },
+  "expect": {
+    "products": [
+      "Good Knight Refill",
+      "Horlicks 500g",
+      "Surf Excel 1kg",
+      "Amul Butter 100g",
+      "Britannia Good Day 100g"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_17",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_17",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Knight Refill",
+              "brand": "Good",
+              "size": null,
+              "confidence": 0.89
+            },
+            {
+              "name": "Horlicks",
+              "brand": "Horlicks",
+              "size": "500g",
+              "confidence": 0.89
+            },
+            {
+              "name": "Excel",
+              "brand": "Surf",
+              "size": "1kg",
+              "confidence": 0.79
+            },
+            {
+              "name": "Butter",
+              "brand": "Amul",
+              "size": "100g",
+              "confidence": 0.94
+            },
+            {
+              "name": "Good Day",
+              "brand": "Britannia",
+              "size": "100g",
+              "confidence": 0.6
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

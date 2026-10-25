@@ -1,0 +1,141 @@
+{
+  "name": "handwritten_hi_04",
+  "input": {
+    "image": "images/handwritten_hi_04.jpg",
+    "kind": "handwritten",
+    "lang": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "हॉर्लिक्स 500g",
+        "quantity": 4,
+        "costPaise": 22115,
+        "mrpPaise": 26000,
+        "expiresOn": null
+      },
+      {
+        "name": "आशीर्वाद आटा 5kg",
+        "quantity": 2,
+        "costPaise": 26730,
+        "mrpPaise": 29500,
+        "expiresOn": null
+      },
+      {
+        "name": "सर्फ एक्सेल 1kg",
+        "quantity": 5,
+        "costPaise": 13200,
+        "mrpPaise": 14500,
+        "expiresOn": null
+      },
+      {
+        "name": "डेटॉल साबुन 125g",
+        "quantity": 5,
+        "costPaise": 4885,
+        "mrpPaise": 5500,
+        "expiresOn": null
+      },
+      {
+        "name": "अमूल बटर 100g",
+        "quantity": 12,
+        "costPaise": 5120,
+        "mrpPaise": 6200,
+        "expiresOn": "2027-08-28"
+      },
+      {
+        "name": "टाटा नमक 1kg",
+        "quantity": 4,
+        "costPaise": 2470,
+        "mrpPaise": 2800,
+        "expiresOn": null
+      },
+      {
+        "name": "लक्स साबुन 100g",
+        "quantity": 6,
+        "costPaise": 3470,
+        "mrpPaise": 3800,
+        "expiresOn": "2027-09-28"
+      },
+      {
+        "name": "रेड लेबल चाय 250g",
+        "quantity": 12,
+        "costPaise": 12665,
+        "mrpPaise": 15500,
+        "expiresOn": "2027-12-28"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_handwritten_hi_04",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_handwritten_hi_04",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "श्री गणेश एजेंसी",
+          "bill_date": "2026-10-02",
+          "lines": [
+            {
+              "name": "हॉर्लिक्स 500g",
+              "quantity": 5,
+              "cost_rupees": 221.15,
+              "mrp_rupees": 260.0,
+              "expires_on": null,
+              "confidence": 0.61
+            },
+            {
+              "name": "आशीर्वाद आटा 5kg",
+              "quantity": 2,
+              "cost_rupees": 267.3,
+              "mrp_rupees": 295.0,
+              "expires_on": null,
+              "confidence": 0.89
+            },
+            {
+              "name": "सर्फ एक्सेल 1kg",
+              "quantity": 5,
+              "cost_rupees": 132.0,
+              "mrp_rupees": 145.0,
+              "expires_on": null,
+              "confidence": 0.66
+            },
+            {
+              "name": "डेटॉल साबुन 125g",
+              "quantity": 5,
+              "cost_rupees": 48.85,
+              "mrp_rupees": 55.0,
+              "expires_on": null,
+              "confidence": 0.78
+            },
+            {
+              "name": "अमूल बटर 100g",
+              "quantity": 12,
+              "cost_rupees": 51.2,
+              "mrp_rupees": 62.0,
+              "expires_on": "2027-08-28",
+              "confidence": 0.83
+            },
+            {
+              "name": "टाटा नमक 1kg",
+              "quantity": 4,
+              "cost_rupees": 24.7,
+              "mrp_rupees": 28.0,
+              "expires_on": null,
+              "confidence": 0.67
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

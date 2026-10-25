@@ -1,0 +1,21 @@
+[
+  {
+    "detector": "expiry_penalty",
+    "subject": "store",
+    "kind": "high",
+    "topic": "reliability",
+    "severity": 3,
+    "stake": 4000,
+    "ageDays": 0,
+    "numbers": {
+      "days": 30,
+      "pct": 40,
+      "threshold": 30
+    },
+    "action": "turn_on_auto_accept",
+    "payload": {
+      "also": "order_sound",
+      "setting": "auto_accept"
+    }
+  }
+]

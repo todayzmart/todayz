@@ -1,0 +1,104 @@
+{
+  "name": "printed_hi_02",
+  "input": {
+    "image": "images/printed_hi_02.jpg",
+    "kind": "printed",
+    "lang": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "मैगी नूडल्स 70g",
+        "quantity": 24,
+        "costPaise": 1240,
+        "mrpPaise": 1400,
+        "expiresOn": "2027-10-15"
+      },
+      {
+        "name": "रेड लेबल चाय 250g",
+        "quantity": 10,
+        "costPaise": 13495,
+        "mrpPaise": 15500,
+        "expiresOn": null
+      },
+      {
+        "name": "अमूल ताज़ा 500ml",
+        "quantity": 5,
+        "costPaise": 2630,
+        "mrpPaise": 2900,
+        "expiresOn": "2027-06-15"
+      },
+      {
+        "name": "विम बार 200g",
+        "quantity": 12,
+        "costPaise": 1570,
+        "mrpPaise": 2000,
+        "expiresOn": null
+      },
+      {
+        "name": "कोलगेट 200g",
+        "quantity": 5,
+        "costPaise": 10250,
+        "mrpPaise": 12000,
+        "expiresOn": null
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_hi_02",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_hi_02",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "शिव एंटरप्राइज़",
+          "bill_date": "2026-10-24",
+          "lines": [
+            {
+              "name": "मैगी नूडल्स 70g",
+              "quantity": 24,
+              "cost_rupees": 12.4,
+              "mrp_rupees": 14.0,
+              "expires_on": "2027-10-15",
+              "confidence": 0.83
+            },
+            {
+              "name": "रेड लेबल चाय 250g",
+              "quantity": 10,
+              "cost_rupees": 134.95,
+              "mrp_rupees": 155.0,
+              "expires_on": null,
+              "confidence": 0.89
+            },
+            {
+              "name": "अमूल ताज़ा 500ml",
+              "quantity": 5,
+              "cost_rupees": 26.3,
+              "mrp_rupees": 29.0,
+              "expires_on": "2027-06-15",
+              "confidence": 0.88
+            },
+            {
+              "name": "विम बार 200g",
+              "quantity": 12,
+              "cost_rupees": 15.7,
+              "mrp_rupees": 20.0,
+              "expires_on": null,
+              "confidence": 0.84
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

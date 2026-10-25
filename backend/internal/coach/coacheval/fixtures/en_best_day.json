@@ -1,0 +1,44 @@
+{
+  "name": "en_best_day",
+  "input": {
+    "detector": "best_day_record",
+    "lang": "en",
+    "kind": "high",
+    "title": "Best Sunday in 6 weeks",
+    "body": "Sales were ₹18,240, 55% above your usual Sunday. Maggi and Amul milk led.",
+    "numbers": {
+      "weekday": "Sunday",
+      "weeks": 6,
+      "sales": "₹18,240",
+      "pct": 55,
+      "leaders": "Maggi · Amul milk"
+    }
+  },
+  "expect": {
+    "title": "Your best Sunday in 6 weeks",
+    "body": "₹18,240 in sales, 55% above a usual Sunday. Maggi and Amul milk did the most. Keep them well stocked."
+  },
+  "reply": {
+    "id": "msg_coach",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_coach",
+        "name": "write_coach_card",
+        "input": {
+          "title": "Your best Sunday in 6 weeks",
+          "body": "₹18,240 in sales, 55% above a usual Sunday. Maggi and Amul milk did the most. Keep them well stocked."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 90
+    }
+  }
+}

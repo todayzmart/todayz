@@ -1,0 +1,318 @@
+{
+  "ai.again": {
+    "defaultMessage": "Try again",
+    "description": "Button: start the AI step again"
+  },
+  "ai.backToStock": {
+    "defaultMessage": "Go to Stock",
+    "description": "Link to the Stock page from an AI scan page"
+  },
+  "ai.closed": {
+    "defaultMessage": "This draft is closed. Start a new one.",
+    "description": "A draft that was already confirmed or discarded"
+  },
+  "ai.discard": {
+    "defaultMessage": "Discard draft",
+    "description": "Button: throw the AI draft away, nothing is written"
+  },
+  "ai.draftNote": {
+    "defaultMessage": "Suggested by AI. Check every line; nothing changes until you confirm.",
+    "description": "Note on every AI draft: the model only proposes"
+  },
+  "ai.insight.worded": {
+    "defaultMessage": "Worded by AI",
+    "description": "Small mark after an insight sentence the AI wrote from the shop's own numbers"
+  },
+  "ai.photo.help": {
+    "defaultMessage": "A clear photo in good light, up to {mb} MB",
+    "description": "Help under the photo button; mb is a whole number"
+  },
+  "ai.photo.type": {
+    "defaultMessage": "This file is not a photo we can read. Take or pick a photo.",
+    "description": "The picked file is not an allowed image type"
+  },
+  "ai.photo.size": {
+    "defaultMessage": "This photo is over {mb} MB. Pick a smaller one.",
+    "description": "The picked photo is too big; mb is a whole number"
+  },
+  "ai.error.cap": {
+    "defaultMessage": "You have used today's AI help for this shop. Try again later.",
+    "description": "Daily AI limit reached, no retry time known"
+  },
+  "ai.error.capFor": {
+    "defaultMessage": "You have used the AI help for now. Try again in {mins, plural, one {# minute} other {# minutes}}.",
+    "description": "Daily AI limit reached; mins until it lifts"
+  },
+  "ai.error.off": {
+    "defaultMessage": "This AI help is not on for your shop.",
+    "description": "The feature is switched off"
+  },
+  "ai.error.changed": {
+    "defaultMessage": "This draft has changed. Start again to see what is true now.",
+    "description": "Draft no longer ready (409)"
+  },
+  "ai.error.photo": {
+    "defaultMessage": "This photo could not be sent. Check its type and size.",
+    "description": "Server refused the photo (413 or 415)"
+  },
+  "ai.error.invalid": {
+    "defaultMessage": "Some details need a fix. Check the lines marked below.",
+    "description": "Validation failed with no line to point at"
+  },
+  "ai.error.offline": {
+    "defaultMessage": "You seem to be offline. Check the connection and try again.",
+    "description": "Network failure"
+  },
+  "ai.error.generic": {
+    "defaultMessage": "Something went wrong. Try again.",
+    "description": "Any other failure"
+  },
+  "ai.err.range": {
+    "defaultMessage": "Check this number",
+    "description": "Line error: number out of range"
+  },
+  "ai.err.above_mrp": {
+    "defaultMessage": "More than the MRP",
+    "description": "Line error: price or cost above the MRP"
+  },
+  "ai.err.past": {
+    "defaultMessage": "This date has passed",
+    "description": "Line error: expiry before today"
+  },
+  "ai.err.date": {
+    "defaultMessage": "Enter a date",
+    "description": "Line error: not a date"
+  },
+  "ai.err.required": {
+    "defaultMessage": "Needed",
+    "description": "Line error: a value is missing"
+  },
+  "ai.err.not_in_store": {
+    "defaultMessage": "Not an item of this shop",
+    "description": "Line error: the item belongs to another shop"
+  },
+  "ai.err.invalid": {
+    "defaultMessage": "Check this line",
+    "description": "Line error: any other problem"
+  },
+  "ai.err.no_product": {
+    "defaultMessage": "Not in the catalogue",
+    "description": "Line error: the product is not in the master catalogue"
+  },
+  "ai.err.duplicate": {
+    "defaultMessage": "Already on this list",
+    "description": "Line error: the same product twice"
+  },
+  "ai.err.already_listed": {
+    "defaultMessage": "Already in your stock",
+    "description": "Line error: the shop already sells this product"
+  },
+  "ai.err.quantity": {
+    "defaultMessage": "Enter a whole number",
+    "description": "Line error: quantity not a whole number"
+  },
+  "ai.err.price": {
+    "defaultMessage": "Enter a price in rupees",
+    "description": "Line error: price not a rupee amount"
+  },
+  "ai.bill.title": {
+    "defaultMessage": "Scan supplier bill",
+    "description": "B-17 page title"
+  },
+  "ai.bill.desc": {
+    "defaultMessage": "Take a photo of the bill. We match its lines to your items; you check them and add the stock.",
+    "description": "One line under the B-17 title"
+  },
+  "ai.bill.pick": {
+    "defaultMessage": "Take or pick a photo",
+    "description": "Photo button on B-17"
+  },
+  "ai.bill.reading": {
+    "defaultMessage": "Reading the bill…",
+    "description": "While the model reads the bill"
+  },
+  "ai.bill.failed": {
+    "defaultMessage": "We could not read this bill. Try a clearer photo, flat and in good light.",
+    "description": "The draft failed"
+  },
+  "ai.bill.off": {
+    "defaultMessage": "Bill scan is not on for your shop",
+    "description": "Empty state when the feature is off"
+  },
+  "ai.bill.from": {
+    "defaultMessage": "From {supplier}",
+    "description": "Supplier name read from the bill"
+  },
+  "ai.bill.lines": {
+    "defaultMessage": "Bill lines",
+    "description": "Accessible name of the list of bill lines"
+  },
+  "ai.bill.matched": {
+    "defaultMessage": "On the bill: {bill} · {n} in stock now",
+    "description": "A line matched to one of the shop's items; bill is the bill's wording, n the count on hand"
+  },
+  "ai.bill.unmatched": {
+    "defaultMessage": "On the bill: {bill} · not one of your items",
+    "description": "A line that matches no item of the shop"
+  },
+  "ai.bill.unmatchedHelp": {
+    "defaultMessage": "Lines that are not your items are left out. Add the item in Stock first, then scan again.",
+    "description": "Under the list when some lines match nothing"
+  },
+  "ai.bill.mrp": {
+    "defaultMessage": "MRP {mrp}",
+    "description": "MRP printed on the bill or the product; mrp is a formatted amount"
+  },
+  "ai.bill.qty": {
+    "defaultMessage": "Quantity",
+    "description": "Field label"
+  },
+  "ai.bill.cost": {
+    "defaultMessage": "Cost price",
+    "description": "Field label: what the shop paid per unit"
+  },
+  "ai.bill.expiry": {
+    "defaultMessage": "Expiry",
+    "description": "Field label: expiry date"
+  },
+  "ai.bill.confirm": {
+    "defaultMessage": "{n, plural, =0 {Nothing to add} one {Add stock for # item} other {Add stock for # items}}",
+    "description": "Confirm button; n is the ticked lines"
+  },
+  "ai.bill.done": {
+    "defaultMessage": "{n, plural, =0 {No stock added} one {Stock added for # item} other {Stock added for # items}}",
+    "description": "After the confirm"
+  },
+  "ai.bill.discarded": {
+    "defaultMessage": "Draft discarded. Nothing was added.",
+    "description": "After Discard draft"
+  },
+  "ai.bill.another": {
+    "defaultMessage": "Scan another bill",
+    "description": "Button after the confirm"
+  },
+  "ai.shelf.title": {
+    "defaultMessage": "Add stock from a shelf photo",
+    "description": "B-18 page title"
+  },
+  "ai.shelf.desc": {
+    "defaultMessage": "Take a photo of a shelf. We find the products in the catalogue; you pick which to sell and at what price.",
+    "description": "One line under the B-18 title"
+  },
+  "ai.shelf.pick": {
+    "defaultMessage": "Take or pick a photo",
+    "description": "Photo button on B-18"
+  },
+  "ai.shelf.reading": {
+    "defaultMessage": "Looking at the shelf…",
+    "description": "While the model reads the photo"
+  },
+  "ai.shelf.failed": {
+    "defaultMessage": "We could not find products in this photo. Try a closer, clearer photo.",
+    "description": "The draft failed"
+  },
+  "ai.shelf.off": {
+    "defaultMessage": "Shelf photo is not on for your shop",
+    "description": "Empty state when the feature is off"
+  },
+  "ai.shelf.lines": {
+    "defaultMessage": "Products found",
+    "description": "Accessible name of the list"
+  },
+  "ai.shelf.unmatched": {
+    "defaultMessage": "Seen: {seen} · not in the catalogue",
+    "description": "A product read from the photo that matches no catalogue product"
+  },
+  "ai.shelf.listed": {
+    "defaultMessage": "Already in your stock",
+    "description": "The shop already sells this product"
+  },
+  "ai.shelf.price": {
+    "defaultMessage": "Your price",
+    "description": "Field label: selling price, starts at the MRP"
+  },
+  "ai.shelf.opening": {
+    "defaultMessage": "Opening stock",
+    "description": "Field label: how many the shop has now"
+  },
+  "ai.shelf.openingHelp": {
+    "defaultMessage": "Optional. Leave empty to count later.",
+    "description": "Help under opening stock"
+  },
+  "ai.shelf.confirm": {
+    "defaultMessage": "{n, plural, =0 {Nothing to add} one {Add # product} other {Add # products}}",
+    "description": "Confirm button; n is the ticked lines"
+  },
+  "ai.shelf.done": {
+    "defaultMessage": "{n, plural, =0 {No products added} one {# product added to your stock} other {# products added to your stock}}",
+    "description": "After the confirm"
+  },
+  "ai.shelf.discarded": {
+    "defaultMessage": "Draft discarded. Nothing was added.",
+    "description": "After Discard draft"
+  },
+  "ai.shelf.another": {
+    "defaultMessage": "Scan another shelf",
+    "description": "Button after the confirm"
+  },
+  "ai.reply.draft": {
+    "defaultMessage": "Draft a reply",
+    "description": "Button in the review reply box"
+  },
+  "ai.reply.note": {
+    "defaultMessage": "Drafted by AI. Edit it as you like; it goes only when you send it.",
+    "description": "Under the reply box once a draft filled it"
+  },
+  "ai.reply.failed": {
+    "defaultMessage": "No draft this time. Write your own reply.",
+    "description": "The reply draft failed"
+  },
+  "ai.banner.suggest": {
+    "defaultMessage": "Suggest wording",
+    "description": "Button in the banner editor"
+  },
+  "ai.banner.writing": {
+    "defaultMessage": "Writing options…",
+    "description": "While the model writes banner options"
+  },
+  "ai.banner.failed": {
+    "defaultMessage": "No suggestions this time. Write your own.",
+    "description": "The banner copy draft failed"
+  },
+  "ai.banner.options": {
+    "defaultMessage": "Pick a wording",
+    "description": "Legend over the banner options"
+  },
+  "ai.banner.use": {
+    "defaultMessage": "Use this",
+    "description": "Button: fill the banner fields with the picked option"
+  },
+  "ai.banner.none": {
+    "defaultMessage": "None of these",
+    "description": "Button: discard every option"
+  },
+  "ai.error.busy": {
+    "defaultMessage": "Other photos are still being read. Try again in a minute or two.",
+    "description": "Too many AI requests in flight for the store (429); wait and try again"
+  },
+  "ai.err.not_permitted": {
+    "defaultMessage": "Your role cannot add this line. Ask the owner or a manager.",
+    "description": "Line refused: the person's role may not make this change"
+  },
+  "ai.partial": {
+    "defaultMessage": "{n, plural, =0 {Nothing was added yet.} one {# line was added.} other {# lines were added.}} Fix the lines marked below and confirm them again.",
+    "description": "After a partial confirm; n is the lines already added, the refused lines stay open"
+  },
+  "ai.line.added": {
+    "defaultMessage": "Added",
+    "description": "Note on a line a partial confirm already added"
+  },
+  "ai.line.left": {
+    "defaultMessage": "Left out",
+    "description": "Note on a line a partial confirm left out"
+  },
+  "ai.discardRest": {
+    "defaultMessage": "Discard the rest",
+    "description": "Button after a partial confirm: leave out the lines still open"
+  }
+}

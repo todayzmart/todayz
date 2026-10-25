@@ -1,0 +1,48 @@
+{
+  "name": "schema_text_too_long",
+  "input": {
+    "lang": "en",
+    "rows": [
+      {
+        "ref": "r1",
+        "kind": "stock_check_due",
+        "facts": {
+          "items": 5,
+          "daysSinceCount": 45
+        }
+      }
+    ]
+  },
+  "expect": {
+    "texts": {},
+    "dropped": 0,
+    "reject": "schema"
+  },
+  "reply": {
+    "id": "msg_it_long",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_it_long",
+        "name": "write_insight_texts",
+        "input": {
+          "texts": [
+            {
+              "ref": "r1",
+              "text": "Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. Count them. "
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

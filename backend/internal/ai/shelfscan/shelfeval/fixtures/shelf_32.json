@@ -1,0 +1,75 @@
+{
+  "name": "shelf_32",
+  "input": {
+    "image": "images/shelf_32.jpg"
+  },
+  "expect": {
+    "products": [
+      "Horlicks 500g",
+      "Kurkure Masala 90g",
+      "Bournvita 500g",
+      "Parle-G 250g",
+      "Maggi Noodles 70g",
+      "Good Knight Refill"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_32",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_32",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Horlicks",
+              "brand": "Horlicks",
+              "size": "500g",
+              "confidence": 0.92
+            },
+            {
+              "name": "Masala",
+              "brand": "Kurkure",
+              "size": "90g",
+              "confidence": 0.6
+            },
+            {
+              "name": "Bournvita",
+              "brand": "Bournvita",
+              "size": "500g",
+              "confidence": 0.71
+            },
+            {
+              "name": "Parle-G",
+              "brand": "Parle-G",
+              "size": "250g",
+              "confidence": 0.71
+            },
+            {
+              "name": "Noodles",
+              "brand": "Maggi",
+              "size": "70g",
+              "confidence": 0.67
+            },
+            {
+              "name": "Knight Refill",
+              "brand": "Good",
+              "size": null,
+              "confidence": 0.74
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

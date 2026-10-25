@@ -1,0 +1,68 @@
+{
+  "name": "shelf_03",
+  "input": {
+    "image": "images/shelf_03.jpg"
+  },
+  "expect": {
+    "products": [
+      "Kurkure Masala 90g",
+      "Maggi Noodles 70g",
+      "Tata Salt 1kg",
+      "Bournvita 500g",
+      "Fortune Sunflower Oil 1L"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_03",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_03",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Masala",
+              "brand": "Kurkure",
+              "size": "90g",
+              "confidence": 0.9
+            },
+            {
+              "name": "Noodles",
+              "brand": "Maggi",
+              "size": "70g",
+              "confidence": 0.95
+            },
+            {
+              "name": "Salt",
+              "brand": "Tata",
+              "size": "1kg",
+              "confidence": 0.69
+            },
+            {
+              "name": "Bournvita",
+              "brand": "Bournvita",
+              "size": "500g",
+              "confidence": 0.87
+            },
+            {
+              "name": "Sunflower Oil",
+              "brand": "Fortune",
+              "size": "1L",
+              "confidence": 0.91
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

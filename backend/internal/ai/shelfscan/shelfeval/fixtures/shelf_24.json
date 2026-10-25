@@ -1,0 +1,75 @@
+{
+  "name": "shelf_24",
+  "input": {
+    "image": "images/shelf_24.jpg"
+  },
+  "expect": {
+    "products": [
+      "Aashirvaad Atta 5kg",
+      "Vim Bar 200g",
+      "Kurkure Masala 90g",
+      "Brooke Bond Red Label 250g",
+      "Lux Soap 100g",
+      "Dettol Soap 125g"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_24",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_24",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Atta",
+              "brand": "Aashirvaad",
+              "size": "5kg",
+              "confidence": 0.63
+            },
+            {
+              "name": "Bar",
+              "brand": "Vim",
+              "size": "200g",
+              "confidence": 0.66
+            },
+            {
+              "name": "Masala",
+              "brand": "Kurkure",
+              "size": "90g",
+              "confidence": 0.83
+            },
+            {
+              "name": "Bond Red Label",
+              "brand": "Brooke",
+              "size": "250g",
+              "confidence": 0.87
+            },
+            {
+              "name": "Soap",
+              "brand": "Lux",
+              "size": "100g",
+              "confidence": 0.92
+            },
+            {
+              "name": "Soap",
+              "brand": "Dettol",
+              "size": "125g",
+              "confidence": 0.95
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

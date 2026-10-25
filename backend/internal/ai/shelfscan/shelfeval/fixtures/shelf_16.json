@@ -1,0 +1,61 @@
+{
+  "name": "shelf_16",
+  "input": {
+    "image": "images/shelf_16.jpg"
+  },
+  "expect": {
+    "products": [
+      "Amul Taaza 500ml",
+      "Horlicks 500g",
+      "Parle-G 250g",
+      "Aashirvaad Atta 5kg"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_16",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_16",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Taaza",
+              "brand": "Amul",
+              "size": "500ml",
+              "confidence": 0.74
+            },
+            {
+              "name": "Horlicks",
+              "brand": "Horlicks",
+              "size": "500g",
+              "confidence": 0.77
+            },
+            {
+              "name": "Parle-G",
+              "brand": "Parle-G",
+              "size": "250g",
+              "confidence": 0.82
+            },
+            {
+              "name": "Atta",
+              "brand": "Aashirvaad",
+              "size": "5kg",
+              "confidence": 0.96
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

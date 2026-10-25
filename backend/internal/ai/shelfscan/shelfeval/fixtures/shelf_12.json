@@ -1,0 +1,68 @@
+{
+  "name": "shelf_12",
+  "input": {
+    "image": "images/shelf_12.jpg"
+  },
+  "expect": {
+    "products": [
+      "Dettol Soap 125g",
+      "Bournvita 500g",
+      "Brooke Bond Red Label 250g",
+      "Nescafe Classic 50g",
+      "Surf Excel 1kg"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_12",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_12",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Soap",
+              "brand": "Dettol",
+              "size": "125g",
+              "confidence": 0.85
+            },
+            {
+              "name": "Bournvita",
+              "brand": "Bournvita",
+              "size": "500g",
+              "confidence": 0.85
+            },
+            {
+              "name": "Bond Red Label",
+              "brand": "Brooke",
+              "size": "250g",
+              "confidence": 0.92
+            },
+            {
+              "name": "Classic",
+              "brand": "Nescafe",
+              "size": "50g",
+              "confidence": 0.62
+            },
+            {
+              "name": "Excel",
+              "brand": "Surf",
+              "size": "1kg",
+              "confidence": 0.65
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

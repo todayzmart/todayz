@@ -1,0 +1,142 @@
+{
+  "name": "printed_en_01",
+  "input": {
+    "image": "images/printed_en_01.jpg",
+    "kind": "printed",
+    "lang": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "Colgate Strong Teeth 200g",
+        "quantity": 3,
+        "costPaise": 9570,
+        "mrpPaise": 12000,
+        "expiresOn": "2027-07-15"
+      },
+      {
+        "name": "Lux Soap 100g",
+        "quantity": 2,
+        "costPaise": 3410,
+        "mrpPaise": 3800,
+        "expiresOn": "2027-08-15"
+      },
+      {
+        "name": "Surf Excel 1kg",
+        "quantity": 3,
+        "costPaise": 11745,
+        "mrpPaise": 14500,
+        "expiresOn": null
+      },
+      {
+        "name": "Amul Taaza 500ml",
+        "quantity": 10,
+        "costPaise": 2280,
+        "mrpPaise": 2900,
+        "expiresOn": "2027-12-28"
+      },
+      {
+        "name": "Real Mango Juice 1L",
+        "quantity": 4,
+        "costPaise": 10620,
+        "mrpPaise": 12000,
+        "expiresOn": null
+      },
+      {
+        "name": "Nescafe Classic 50g",
+        "quantity": 24,
+        "costPaise": 16555,
+        "mrpPaise": 19000,
+        "expiresOn": null
+      },
+      {
+        "name": "Amul Butter 100g",
+        "quantity": 24,
+        "costPaise": 5095,
+        "mrpPaise": 6200,
+        "expiresOn": "2027-06-28"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_en_01",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_en_01",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "Om Sai Enterprises",
+          "bill_date": "2026-10-23",
+          "lines": [
+            {
+              "name": "Colgate Strong Teeth 200g",
+              "quantity": 3,
+              "cost_rupees": 95.7,
+              "mrp_rupees": 120.0,
+              "expires_on": "2027-07-15",
+              "confidence": 0.94
+            },
+            {
+              "name": "Lux Soap 100g",
+              "quantity": 2,
+              "cost_rupees": 34.1,
+              "mrp_rupees": 38.0,
+              "expires_on": "2027-08-15",
+              "confidence": 0.99
+            },
+            {
+              "name": "Surf Excel 1kg",
+              "quantity": 2,
+              "cost_rupees": 117.45,
+              "mrp_rupees": 145.0,
+              "expires_on": null,
+              "confidence": 0.92
+            },
+            {
+              "name": "Amul Taaza 500ml",
+              "quantity": 10,
+              "cost_rupees": 22.8,
+              "mrp_rupees": 29.0,
+              "expires_on": "2027-12-28",
+              "confidence": 0.91
+            },
+            {
+              "name": "Real Mango Juice 1L",
+              "quantity": 4,
+              "cost_rupees": 106.2,
+              "mrp_rupees": 120.0,
+              "expires_on": null,
+              "confidence": 0.93
+            },
+            {
+              "name": "Nescafe Classic 50g",
+              "quantity": 24,
+              "cost_rupees": 165.55,
+              "mrp_rupees": 190.0,
+              "expires_on": null,
+              "confidence": 0.9
+            },
+            {
+              "name": "Amul Butter 100g",
+              "quantity": 24,
+              "cost_rupees": 50.95,
+              "mrp_rupees": 62.0,
+              "expires_on": "2027-06-28",
+              "confidence": 0.97
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

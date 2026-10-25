@@ -1,0 +1,21 @@
+[
+  {
+    "detector": "accept_time_vs_benchmark",
+    "subject": "store",
+    "kind": "low",
+    "topic": "orders",
+    "severity": 1,
+    "stake": 780,
+    "ageDays": 0,
+    "numbers": {
+      "mine": 15,
+      "nearby": 2
+    },
+    "action": "turn_on_auto_accept",
+    "payload": {
+      "setting": "auto_accept"
+    },
+    "aboutOthers": true,
+    "others": 10
+  }
+]

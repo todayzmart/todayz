@@ -1,0 +1,142 @@
+{
+  "name": "printed_kn_07",
+  "input": {
+    "image": "images/printed_kn_07.jpg",
+    "kind": "printed",
+    "lang": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "ಟಾಟಾ ಉಪ್ಪು 1kg",
+        "quantity": 10,
+        "costPaise": 2285,
+        "mrpPaise": 2800,
+        "expiresOn": "2027-02-28"
+      },
+      {
+        "name": "ಗುಡ್ ಡೇ 100g",
+        "quantity": 6,
+        "costPaise": 2465,
+        "mrpPaise": 3000,
+        "expiresOn": "2027-07-28"
+      },
+      {
+        "name": "ಫಾರ್ಚೂನ್ ಎಣ್ಣೆ 1L",
+        "quantity": 5,
+        "costPaise": 16575,
+        "mrpPaise": 18500,
+        "expiresOn": "2027-07-28"
+      },
+      {
+        "name": "ಡೆಟಾಲ್ ಸೋಪು 125g",
+        "quantity": 3,
+        "costPaise": 4960,
+        "mrpPaise": 5500,
+        "expiresOn": null
+      },
+      {
+        "name": "ಅಮುಲ್ ಬೆಣ್ಣೆ 100g",
+        "quantity": 24,
+        "costPaise": 5655,
+        "mrpPaise": 6200,
+        "expiresOn": null
+      },
+      {
+        "name": "ರೆಡ್ ಲೇಬಲ್ ಟೀ 250g",
+        "quantity": 3,
+        "costPaise": 12295,
+        "mrpPaise": 15500,
+        "expiresOn": null
+      },
+      {
+        "name": "ನೆಸ್ಕೆಫೆ 50g",
+        "quantity": 24,
+        "costPaise": 15120,
+        "mrpPaise": 19000,
+        "expiresOn": "2027-11-28"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_kn_07",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_kn_07",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "ಓಂ ಸಾಯಿ ಎಂಟರ್‌ಪ್ರೈಸಸ್",
+          "bill_date": "2026-10-12",
+          "lines": [
+            {
+              "name": "ಟಾಟಾ ಉಪ್ಪು 1kg",
+              "quantity": 10,
+              "cost_rupees": 22.85,
+              "mrp_rupees": 28.0,
+              "expires_on": "2027-02-28",
+              "confidence": 0.98
+            },
+            {
+              "name": "ಗುಡ್ ಡೇ 100g",
+              "quantity": 6,
+              "cost_rupees": 25.65,
+              "mrp_rupees": 30.0,
+              "expires_on": "2027-07-28",
+              "confidence": 0.87
+            },
+            {
+              "name": "ಫಾರ್ಚೂನ್ ಎಣ್ಣೆ 1L",
+              "quantity": 5,
+              "cost_rupees": 165.75,
+              "mrp_rupees": 185.0,
+              "expires_on": "2027-07-28",
+              "confidence": 0.96
+            },
+            {
+              "name": "ಡೆಟಾಲ್ ಸೋಪು 125g",
+              "quantity": 3,
+              "cost_rupees": 49.6,
+              "mrp_rupees": 55.0,
+              "expires_on": null,
+              "confidence": 0.95
+            },
+            {
+              "name": "ಅಮುಲ್ ಬೆಣ್ಣೆ 100g",
+              "quantity": 24,
+              "cost_rupees": 56.55,
+              "mrp_rupees": 62.0,
+              "expires_on": null,
+              "confidence": 0.91
+            },
+            {
+              "name": "ರೆಡ್ ಲೇಬಲ್ ಟೀ 250g",
+              "quantity": 3,
+              "cost_rupees": 122.95,
+              "mrp_rupees": 155.0,
+              "expires_on": null,
+              "confidence": 0.93
+            },
+            {
+              "name": "ನೆಸ್ಕೆಫೆ 50g",
+              "quantity": 24,
+              "cost_rupees": 151.2,
+              "mrp_rupees": 190.0,
+              "expires_on": "2027-11-28",
+              "confidence": 0.85
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

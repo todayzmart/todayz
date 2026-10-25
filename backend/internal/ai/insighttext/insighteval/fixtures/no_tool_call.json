@@ -1,0 +1,39 @@
+{
+  "name": "no_tool_call",
+  "input": {
+    "lang": "en",
+    "rows": [
+      {
+        "ref": "r1",
+        "kind": "stock_check_due",
+        "facts": {
+          "items": 5,
+          "daysSinceCount": 45
+        }
+      }
+    ]
+  },
+  "expect": {
+    "texts": {},
+    "dropped": 0,
+    "reject": "invalid"
+  },
+  "reply": {
+    "id": "msg_it_notool",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "text",
+        "text": "5 items need counting."
+      }
+    ],
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 30
+    }
+  }
+}

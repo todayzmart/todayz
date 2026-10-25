@@ -68,22 +68,45 @@ func (s *Service) List(ctx context.Context, storeID ids.ID, o ListOpts) (insight
 	}
 	if !o.All {
 		// The card: firing rows only, never a needs-data line (IN-18).
-		for _, r := range facts.Card(rows, cardRows) {
-			out.Items = append(out.Items, rowOut(r))
+		card := facts.Card(rows, cardRows)
+		texts := s.textsFor(ctx, storeID, card)
+		for i, r := range card {
+			out.Items = append(out.Items, rowOut(r, texts[i]))
 		}
 		return out, nil
 	}
-	all := grouped(rows, needs)
+	all, src := grouped(rows, needs)
 	from, to, next := window(len(all), lim, off)
+	// AI-R4 sentences for the page's rows only.
+	var pageRows []facts.Row
+	var at []int
+	for i := from; i < to; i++ {
+		if src[i] != nil {
+			pageRows = append(pageRows, *src[i])
+			at = append(at, i)
+		}
+	}
+	for j, t := range s.textsFor(ctx, storeID, pageRows) {
+		all[at[j]].Text = t
+	}
 	out.Items = append(out.Items, all[from:to]...)
 	out.NextCursor = next
 	return out, nil
 }
 
+// textsFor is the AI-R4 sentence of each row, or none without a Texter.
+func (s *Service) textsFor(ctx context.Context, storeID ids.ID, rows []facts.Row) []*string {
+	if s.texts == nil || len(rows) == 0 {
+		return make([]*string, len(rows))
+	}
+	return s.texts.Texts(ctx, storeID, rows)
+}
+
 // grouped is every firing row grouped by kind in the 01 §12 order (rows of a
 // kind in their sorted order), with one needs-data entry for a kind that has
-// no row and is below its minimum evidence.
-func grouped(rows []facts.Row, needs []facts.Need) []insightsapi.Insight {
+// no row and is below its minimum evidence. src is each entry's row (nil for
+// a needs-data entry).
+func grouped(rows []facts.Row, needs []facts.Need) (out []insightsapi.Insight, src []*facts.Row) {
 	byKind := map[facts.Kind][]facts.Row{}
 	for _, r := range rows {
 		byKind[r.Kind] = append(byKind[r.Kind], r)
@@ -94,22 +117,23 @@ func grouped(rows []facts.Row, needs []facts.Need) []insightsapi.Insight {
 			need[n.Kind] = n
 		}
 	}
-	var out []insightsapi.Insight
 	for _, k := range facts.Kinds {
 		if rs := byKind[k]; len(rs) > 0 {
-			for _, r := range rs {
-				out = append(out, rowOut(r))
+			for i := range rs {
+				out = append(out, rowOut(rs[i], nil))
+				src = append(src, &rs[i])
 			}
 			continue
 		}
 		if n, ok := need[k]; ok {
 			out = append(out, needOut(n))
+			src = append(src, nil)
 		}
 	}
-	return out
+	return out, src
 }
 
-func rowOut(r facts.Row) insightsapi.Insight {
+func rowOut(r facts.Row, text *string) insightsapi.Insight {
 	sub, sev, f := r.SubjectRef, insightsapi.InsightSeverity(r.Severity), r.Facts
 	if f == nil {
 		f = map[string]any{}
@@ -123,6 +147,7 @@ func rowOut(r facts.Row) insightsapi.Insight {
 		Evidence: insightsapi.InsightEvidence{State: insightsapi.Ready},
 		Facts:    &f,
 		Action:   &insightsapi.InsightAction{Type: insightsapi.InsightActionType(r.Action.Type), Payload: payload},
+		Text:     text,
 	}
 }
 

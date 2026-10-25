@@ -1,0 +1,69 @@
+{
+  "name": "shelf_39",
+  "input": {
+    "image": "images/shelf_39.jpg"
+  },
+  "expect": {
+    "products": [
+      "Lux Soap 100g",
+      "Amul Taaza 500ml",
+      "Tata Salt 1kg",
+      "Maggi Noodles 70g",
+      "Haldiram Bhujia 200g",
+      "Vim Bar 200g"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_39",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_39",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Soap",
+              "brand": "Lux",
+              "size": "100g",
+              "confidence": 0.93
+            },
+            {
+              "name": "Taaza",
+              "brand": "Amul",
+              "size": "500ml",
+              "confidence": 0.7
+            },
+            {
+              "name": "Noodles",
+              "brand": "Maggi",
+              "size": "70g",
+              "confidence": 0.92
+            },
+            {
+              "name": "Bhujia",
+              "brand": "Haldiram",
+              "size": "200g",
+              "confidence": 0.9
+            },
+            {
+              "name": "Bar",
+              "brand": "Vim",
+              "size": "200g",
+              "confidence": 0.74
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

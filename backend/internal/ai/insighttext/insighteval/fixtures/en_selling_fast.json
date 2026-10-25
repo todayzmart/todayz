@@ -1,0 +1,53 @@
+{
+  "name": "en_selling_fast",
+  "input": {
+    "lang": "en",
+    "rows": [
+      {
+        "ref": "r1",
+        "kind": "selling_fast",
+        "facts": {
+          "itemName": "Amul Butter 100g",
+          "daysOfCover": 2,
+          "soldLast7Days": 18,
+          "action": {
+            "quantity": 24
+          }
+        }
+      }
+    ]
+  },
+  "expect": {
+    "texts": {
+      "r1": "Amul Butter 100g sold 18 in the last week and lasts about 2 more days; restock 24."
+    },
+    "dropped": 0
+  },
+  "reply": {
+    "id": "msg_it_en_selling_fast",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_it_en_selling_fast",
+        "name": "write_insight_texts",
+        "input": {
+          "texts": [
+            {
+              "ref": "r1",
+              "text": "Amul Butter 100g sold 18 in the last week and lasts about 2 more days; restock 24."
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

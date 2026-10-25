@@ -72,24 +72,25 @@ const (
 	NotifySmsEnabled       Key = "notify_sms_enabled"       // bool, default true
 	NotifyWhatsappEnabled  Key = "notify_whatsapp_enabled"  // bool, default false
 	// AI
-	AiVoiceStockEnabled  Key = "ai_voice_stock_enabled"  // bool, default false
-	AiBillscanEnabled    Key = "ai_billscan_enabled"     // bool, default false
-	AiShelfscanEnabled   Key = "ai_shelfscan_enabled"    // bool, default false
-	AiInsighttextEnabled Key = "ai_insighttext_enabled"  // bool, default false
-	AiCoachEnabled       Key = "ai_coach_enabled"        // bool, default false
-	AiReplydraftEnabled  Key = "ai_replydraft_enabled"   // bool, default false
-	AiBannercopyEnabled  Key = "ai_bannercopy_enabled"   // bool, default false
-	AiImagecheckEnabled  Key = "ai_imagecheck_enabled"   // bool, default false
-	AiListparseEnabled   Key = "ai_listparse_enabled"    // bool, default false
-	AiQuerynormEnabled   Key = "ai_querynorm_enabled"    // bool, default false
-	AiCatalogueEnabled   Key = "ai_catalogue_enabled"    // bool, default false
-	AiTriageEnabled      Key = "ai_triage_enabled"       // bool, default false
-	AiRiskexplainEnabled Key = "ai_riskexplain_enabled"  // bool, default false
-	AiModelFast          Key = "ai_model_fast"           // text, default claude-haiku-5-5
-	AiModelSmart         Key = "ai_model_smart"          // text, default claude-sonnet-5-5
-	AiDailyCallsStore    Key = "ai_daily_calls_store"    // count, default 100
-	AiDailyCallsCustomer Key = "ai_daily_calls_customer" // count, default 30
-	AiDailyCostCapPaise  Key = "ai_daily_cost_cap_paise" // paise, default 50000
+	AiVoiceStockEnabled         Key = "ai_voice_stock_enabled"          // bool, default false
+	AiBillscanEnabled           Key = "ai_billscan_enabled"             // bool, default false
+	AiShelfscanEnabled          Key = "ai_shelfscan_enabled"            // bool, default false
+	AiInsighttextEnabled        Key = "ai_insighttext_enabled"          // bool, default false
+	AiCoachEnabled              Key = "ai_coach_enabled"                // bool, default false
+	AiReplydraftEnabled         Key = "ai_replydraft_enabled"           // bool, default false
+	AiBannercopyEnabled         Key = "ai_bannercopy_enabled"           // bool, default false
+	AiImagecheckEnabled         Key = "ai_imagecheck_enabled"           // bool, default false
+	AiListparseEnabled          Key = "ai_listparse_enabled"            // bool, default false
+	AiQuerynormEnabled          Key = "ai_querynorm_enabled"            // bool, default false
+	AiCatalogueEnabled          Key = "ai_catalogue_enabled"            // bool, default false
+	AiTriageEnabled             Key = "ai_triage_enabled"               // bool, default false
+	AiRiskexplainEnabled        Key = "ai_riskexplain_enabled"          // bool, default false
+	AiModelFast                 Key = "ai_model_fast"                   // text, default claude-haiku-5-5
+	AiModelSmart                Key = "ai_model_smart"                  // text, default claude-sonnet-5-5
+	AiDailyCallsStore           Key = "ai_daily_calls_store"            // count, default 100
+	AiDailyCallsStoreBackground Key = "ai_daily_calls_store_background" // count, default 20 (D-228)
+	AiDailyCallsCustomer        Key = "ai_daily_calls_customer"         // count, default 30
+	AiDailyCostCapPaise         Key = "ai_daily_cost_cap_paise"         // paise, default 50000
 	// Client versions
 	MinClientVersionCustomer Key = "min_client_version_customer" // text, default 0.0.0
 	MinClientVersionBusiness Key = "min_client_version_business" // text, default 0.0.0
@@ -247,6 +248,7 @@ var AllKeys = []Key{
 	AiModelFast,
 	AiModelSmart,
 	AiDailyCallsStore,
+	AiDailyCallsStoreBackground,
 	AiDailyCallsCustomer,
 	AiDailyCostCapPaise,
 	MinClientVersionCustomer,

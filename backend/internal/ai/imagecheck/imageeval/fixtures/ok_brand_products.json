@@ -1,0 +1,34 @@
+{
+  "name": "ok_brand_products",
+  "input": {
+    "image": "images/ok_brand_products.jpg"
+  },
+  "expect": {
+    "verdict": "ok",
+    "reasons": []
+  },
+  "reply": {
+    "id": "msg_img_ok_brand_products",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_img_ok_brand_products",
+        "name": "check_banner_image",
+        "input": {
+          "verdict": "ok",
+          "reasons": [],
+          "confidence": 0.9
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 900,
+      "output_tokens": 40
+    }
+  }
+}

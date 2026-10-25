@@ -1,0 +1,20 @@
+[
+  {
+    "detector": "best_day_record",
+    "subject": "2026-01-04",
+    "kind": "high",
+    "topic": "sales",
+    "severity": 3,
+    "stake": 1824000,
+    "ageDays": 0,
+    "variant": "leaders",
+    "numbers": {
+      "leaders": "Amul Butter 100 g",
+      "pct": 55,
+      "sales": "₹18,240",
+      "weekday": "Sunday",
+      "weeks": 6
+    },
+    "action": "none"
+  }
+]

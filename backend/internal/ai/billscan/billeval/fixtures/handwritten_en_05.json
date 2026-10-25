@@ -1,0 +1,172 @@
+{
+  "name": "handwritten_en_05",
+  "input": {
+    "image": "images/handwritten_en_05.jpg",
+    "kind": "handwritten",
+    "lang": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "Clinic Plus Shampoo 175ml",
+        "quantity": 2,
+        "costPaise": 10620,
+        "mrpPaise": 13500,
+        "expiresOn": "2027-02-28"
+      },
+      {
+        "name": "Bournvita 500g",
+        "quantity": 5,
+        "costPaise": 20935,
+        "mrpPaise": 24900,
+        "expiresOn": "2027-03-15"
+      },
+      {
+        "name": "Maggi Noodles 70g",
+        "quantity": 10,
+        "costPaise": 1160,
+        "mrpPaise": 1400,
+        "expiresOn": null
+      },
+      {
+        "name": "Real Mango Juice 1L",
+        "quantity": 2,
+        "costPaise": 10470,
+        "mrpPaise": 12000,
+        "expiresOn": "2027-05-15"
+      },
+      {
+        "name": "Haldiram Bhujia 200g",
+        "quantity": 3,
+        "costPaise": 4700,
+        "mrpPaise": 5500,
+        "expiresOn": null
+      },
+      {
+        "name": "Aashirvaad Atta 5kg",
+        "quantity": 4,
+        "costPaise": 25910,
+        "mrpPaise": 29500,
+        "expiresOn": null
+      },
+      {
+        "name": "MDH Chana Masala 100g",
+        "quantity": 24,
+        "costPaise": 6435,
+        "mrpPaise": 8200,
+        "expiresOn": "2027-10-28"
+      },
+      {
+        "name": "Vim Bar 200g",
+        "quantity": 6,
+        "costPaise": 1775,
+        "mrpPaise": 2000,
+        "expiresOn": "2027-12-28"
+      },
+      {
+        "name": "Amul Butter 100g",
+        "quantity": 12,
+        "costPaise": 5360,
+        "mrpPaise": 6200,
+        "expiresOn": null
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_handwritten_en_05",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_handwritten_en_05",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "Ganesh Distributors",
+          "bill_date": "2026-10-20",
+          "lines": [
+            {
+              "name": "Clinic Plus Shampoo 175ml",
+              "quantity": 2,
+              "cost_rupees": 106.2,
+              "mrp_rupees": 135.0,
+              "expires_on": "2027-02-28",
+              "confidence": 0.82
+            },
+            {
+              "name": "Bournvita 500g",
+              "quantity": 5,
+              "cost_rupees": 209.35,
+              "mrp_rupees": 249.0,
+              "expires_on": "2027-03-15",
+              "confidence": 0.76
+            },
+            {
+              "name": "Maggi Noodles 70g",
+              "quantity": 10,
+              "cost_rupees": 11.6,
+              "mrp_rupees": 14.0,
+              "expires_on": null,
+              "confidence": 0.75
+            },
+            {
+              "name": "Real Mango Juice 1L",
+              "quantity": 2,
+              "cost_rupees": 104.7,
+              "mrp_rupees": 120.0,
+              "expires_on": "2027-05-15",
+              "confidence": 0.63
+            },
+            {
+              "name": "Haldiram Bhujia 200g",
+              "quantity": 3,
+              "cost_rupees": 47.0,
+              "mrp_rupees": 55.0,
+              "expires_on": null,
+              "confidence": 0.83
+            },
+            {
+              "name": "Aashirvaad Mini",
+              "quantity": 4,
+              "cost_rupees": 259.1,
+              "mrp_rupees": 295.0,
+              "expires_on": null,
+              "confidence": 0.72
+            },
+            {
+              "name": "MDH Chana Masala 100g",
+              "quantity": 24,
+              "cost_rupees": 64.35,
+              "mrp_rupees": 82.0,
+              "expires_on": "2027-10-28",
+              "confidence": 0.72
+            },
+            {
+              "name": "Vim Bar 200g",
+              "quantity": 6,
+              "cost_rupees": 17.75,
+              "mrp_rupees": 30.0,
+              "expires_on": "2027-12-28",
+              "confidence": 0.76
+            },
+            {
+              "name": "Amul Butter 100g",
+              "quantity": 12,
+              "cost_rupees": 53.6,
+              "mrp_rupees": 62.0,
+              "expires_on": null,
+              "confidence": 0.67
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

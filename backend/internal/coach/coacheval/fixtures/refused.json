@@ -1,0 +1,32 @@
+{
+  "name": "refused",
+  "input": {
+    "detector": "weekly_summary",
+    "lang": "en",
+    "kind": "tip",
+    "title": "₹17,500 this week",
+    "body": "Up 25% on the last 4 weeks.",
+    "numbers": {
+      "sales": "₹17,500",
+      "bills": 70,
+      "pct": 25,
+      "weeks": 4
+    }
+  },
+  "expect": {
+    "reject": "refused"
+  },
+  "reply": {
+    "id": "msg_coach",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [],
+    "stop_reason": "refusal",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 90
+    }
+  }
+}

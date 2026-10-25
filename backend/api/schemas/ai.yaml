@@ -35,13 +35,24 @@ AiConfirmOutcome:
 AiLineOutcome:
   type: string
   description: >-
-    The recorded outcome of one line. not_permitted - the confirmer lacks the permission the line needs
-    (D-06), so nothing of it was applied.
+    The recorded outcome of one line. not_permitted - the line was refused (the confirmer lacks the permission it
+    needs, D-06, or its values do not fit; see reason), so nothing of it was applied.
   enum: [accepted, edited, discarded, not_permitted]
 AiLineDisabled:
   type: string
   description: Why the caller cannot confirm a line; ask_manager - it needs a manager's permission (D-06, D-65).
   enum: [ask_manager]
+AiLineRefusal:
+  type: string
+  description: >-
+    Why a confirm refused one line (its outcome is not_permitted; the other lines were applied). not_permitted - the
+    confirmer lacks the permission the line needs (a manager can confirm it); invalid_item - no such item in the store
+    (or none matched); invalid_quantity, invalid_cost, invalid_price, invalid_opening_stock - out of range;
+    invalid_cost_above_mrp, invalid_price_above_mrp - above the MRP; invalid_expiry - a past or unreadable date;
+    invalid_product - no such active product (or none matched); invalid_listed - the store already lists it;
+    invalid_duplicate - another line of the same confirm lists it. Edit the line and confirm it again.
+  enum: [not_permitted, invalid_item, invalid_quantity, invalid_cost, invalid_cost_above_mrp, invalid_expiry,
+    invalid_product, invalid_listed, invalid_duplicate, invalid_price, invalid_price_above_mrp, invalid_opening_stock]
 AiLineResult:
   type: object
   additionalProperties: false
@@ -49,6 +60,7 @@ AiLineResult:
   properties:
     lineId: {$ref: ./ai.yaml#/AiDraftLineId}
     outcome: {$ref: ./ai.yaml#/AiLineOutcome}
+    reason: {$ref: ./ai.yaml#/AiLineRefusal}
 AiConfirmResult:
   type: object
   description: The answer to a confirm, the same on a repeat (confirm is idempotent).
@@ -58,7 +70,10 @@ AiConfirmResult:
     draftId: {$ref: ./common.yaml#/Ulid}
     status:
       type: string
-      enum: [confirmed, discarded]
+      description: >-
+        confirmed or discarded once every line is settled; ready when a line was refused (not_permitted with a
+        reason): the other lines are applied and kept, and the refused ones can be edited and confirmed again.
+      enum: [confirmed, discarded, ready]
     lines:
       type: array
       maxItems: 200
@@ -73,3 +88,330 @@ AiCapScope:
   type: string
   description: Which daily cap an ai_daily_cap_reached problem hit (its `scope` extension).
   enum: [customer, store, platform]
+# W3-11 retailer AI (AI-R2, R3, R6, R9). Each draft read carries draftId, feature, status,
+# promptVersion, createdAt, its lines, the recorded outcomes (empty until confirmed) and the
+# failure code (null unless failed).
+AiRetailFeatures:
+  type: object
+  additionalProperties: false
+  required: [supplierBill, shelfPhoto, reviewReply, bannerCopy, maxPhotoBytes, photoTypes]
+  properties:
+    supplierBill: {type: boolean}
+    shelfPhoto: {type: boolean}
+    reviewReply: {type: boolean}
+    bannerCopy: {type: boolean}
+    maxPhotoBytes: {type: integer, minimum: 1}
+    photoTypes:
+      type: array
+      maxItems: 5
+      items: {type: string, maxLength: 40}
+AiPhotoUpload:
+  type: object
+  additionalProperties: false
+  required: [photo]
+  properties:
+    photo:
+      type: string
+      contentMediaType: application/octet-stream
+      maxLength: 4194304
+AiDraftFailure:
+  type: [string, "null"]
+  maxLength: 40
+  description: >-
+    Why a draft failed: timeout, provider, invalid (the model gave nothing usable), refused, grounding
+    (a number the input does not hold), empty (nothing to read in the photo).
+AiOutcomes:
+  type: array
+  maxItems: 200
+  items: {$ref: ./ai.yaml#/AiLineResult}
+AiDate:
+  type: [string, "null"]
+  format: date
+  maxLength: 10
+SupplierBillMatch:
+  type: object
+  additionalProperties: false
+  required: [storeItemId, itemName, onHand]
+  properties:
+    storeItemId: {$ref: ./common.yaml#/Ulid}
+    itemName: {type: string, maxLength: 200}
+    onHand: {type: integer}
+SupplierBillLine:
+  type: object
+  additionalProperties: false
+  required: [lineId, name, quantity, costPaise, mrpPaise, expiresOn, confidence, match]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    name: {type: string, maxLength: 120, description: The line as printed or written on the bill.}
+    quantity: {type: integer, minimum: 1, maximum: 9999}
+    costPaise: {type: [integer, "null"], minimum: 0, maximum: 100000000, description: Cost per unit.}
+    mrpPaise: {type: [integer, "null"], minimum: 0, maximum: 100000000}
+    expiresOn: {$ref: ./ai.yaml#/AiDate}
+    confidence: {type: number, minimum: 0, maximum: 1}
+    match:
+      oneOf:
+        - {$ref: ./ai.yaml#/SupplierBillMatch}
+        - {type: "null"}
+SupplierBillDraft:
+  type: object
+  additionalProperties: false
+  required: [draftId, feature, status, promptVersion, createdAt, supplier, billDate, lines, outcomes, failure]
+  properties:
+    draftId: {$ref: ./common.yaml#/Ulid}
+    feature: {type: string, enum: [supplier_bill]}
+    status: {$ref: ./ai.yaml#/AiDraftStatus}
+    promptVersion: {type: string, maxLength: 80}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    supplier: {type: [string, "null"], maxLength: 120}
+    billDate: {$ref: ./ai.yaml#/AiDate}
+    lines:
+      type: array
+      maxItems: 200
+      items: {$ref: ./ai.yaml#/SupplierBillLine}
+    outcomes: {$ref: ./ai.yaml#/AiOutcomes}
+    failure: {$ref: ./ai.yaml#/AiDraftFailure}
+SupplierBillLineValue:
+  type: object
+  additionalProperties: false
+  required: [storeItemId, quantity]
+  properties:
+    storeItemId: {$ref: ./common.yaml#/Ulid}
+    quantity: {type: integer, minimum: 1, maximum: 9999}
+    costPaise: {type: [integer, "null"], minimum: 0, maximum: 100000000}
+    expiresOn: {$ref: ./ai.yaml#/AiDate}
+SupplierBillDecision:
+  type: object
+  additionalProperties: false
+  required: [lineId, outcome]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    outcome: {$ref: ./ai.yaml#/AiConfirmOutcome}
+    value: {$ref: ./ai.yaml#/SupplierBillLineValue}
+SupplierBillConfirmRequest:
+  type: object
+  additionalProperties: false
+  required: [lines]
+  properties:
+    lines:
+      type: array
+      minItems: 1
+      maxItems: 200
+      items: {$ref: ./ai.yaml#/SupplierBillDecision}
+ShelfPhotoProduct:
+  type: object
+  additionalProperties: false
+  required: [productId, name, brand, size, mrpPaise]
+  properties:
+    productId: {$ref: ./common.yaml#/Ulid}
+    name: {type: string, maxLength: 200}
+    brand: {type: [string, "null"], maxLength: 120}
+    size: {type: [string, "null"], maxLength: 60}
+    mrpPaise: {type: [integer, "null"], minimum: 0}
+ShelfPhotoLine:
+  type: object
+  additionalProperties: false
+  required: [lineId, name, brand, size, confidence, product, listed, pricePaise]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    name: {type: string, maxLength: 120, description: What the model read on the pack.}
+    brand: {type: [string, "null"], maxLength: 80}
+    size: {type: [string, "null"], maxLength: 40}
+    confidence: {type: number, minimum: 0, maximum: 1}
+    product:
+      oneOf:
+        - {$ref: ./ai.yaml#/ShelfPhotoProduct}
+        - {type: "null"}
+    listed: {type: boolean, description: The store already sells this product.}
+    pricePaise: {type: [integer, "null"], minimum: 0, description: The price to add at (the MRP).}
+ShelfPhotoDraft:
+  type: object
+  additionalProperties: false
+  required: [draftId, feature, status, promptVersion, createdAt, lines, outcomes, failure]
+  properties:
+    draftId: {$ref: ./common.yaml#/Ulid}
+    feature: {type: string, enum: [shelf_photo]}
+    status: {$ref: ./ai.yaml#/AiDraftStatus}
+    promptVersion: {type: string, maxLength: 80}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    lines:
+      type: array
+      maxItems: 200
+      items: {$ref: ./ai.yaml#/ShelfPhotoLine}
+    outcomes: {$ref: ./ai.yaml#/AiOutcomes}
+    failure: {$ref: ./ai.yaml#/AiDraftFailure}
+ShelfPhotoLineValue:
+  type: object
+  additionalProperties: false
+  required: [productId, pricePaise]
+  properties:
+    productId: {$ref: ./common.yaml#/Ulid}
+    pricePaise: {type: integer, minimum: 1, maximum: 100000000}
+    openingStock: {type: integer, minimum: 0, maximum: 9999}
+ShelfPhotoDecision:
+  type: object
+  additionalProperties: false
+  required: [lineId, outcome]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    outcome: {$ref: ./ai.yaml#/AiConfirmOutcome}
+    value: {$ref: ./ai.yaml#/ShelfPhotoLineValue}
+ShelfPhotoConfirmRequest:
+  type: object
+  additionalProperties: false
+  required: [lines]
+  properties:
+    lines:
+      type: array
+      minItems: 1
+      maxItems: 200
+      items: {$ref: ./ai.yaml#/ShelfPhotoDecision}
+AiLanguage:
+  type: string
+  description: A language of the five the apps ship.
+  enum: [en, hi, kn, te, ta]
+ReviewReplyDraftRequest:
+  type: object
+  additionalProperties: false
+  required: [reviewId]
+  properties:
+    reviewId: {$ref: ./common.yaml#/Ulid}
+ReviewReplyLine:
+  type: object
+  additionalProperties: false
+  required: [lineId, text, language]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    text: {type: string, minLength: 1, maxLength: 500}
+    language: {$ref: ./ai.yaml#/AiLanguage}
+ReviewReplyDraft:
+  type: object
+  additionalProperties: false
+  required: [draftId, feature, status, promptVersion, createdAt, reviewId, lines, outcomes, failure]
+  properties:
+    draftId: {$ref: ./common.yaml#/Ulid}
+    feature: {type: string, enum: [review_reply]}
+    status: {$ref: ./ai.yaml#/AiDraftStatus}
+    promptVersion: {type: string, maxLength: 80}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    reviewId: {$ref: ./common.yaml#/Ulid}
+    lines:
+      type: array
+      maxItems: 1
+      items: {$ref: ./ai.yaml#/ReviewReplyLine}
+    outcomes: {$ref: ./ai.yaml#/AiOutcomes}
+    failure: {$ref: ./ai.yaml#/AiDraftFailure}
+ReviewReplyLineValue:
+  type: object
+  additionalProperties: false
+  required: [text]
+  properties:
+    text: {type: string, minLength: 1, maxLength: 1000}
+ReviewReplyDecision:
+  type: object
+  additionalProperties: false
+  required: [lineId, outcome]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    outcome: {$ref: ./ai.yaml#/AiConfirmOutcome}
+    value: {$ref: ./ai.yaml#/ReviewReplyLineValue}
+ReviewReplyConfirmRequest:
+  type: object
+  additionalProperties: false
+  required: [lines]
+  properties:
+    lines:
+      type: array
+      minItems: 1
+      maxItems: 1
+      items: {$ref: ./ai.yaml#/ReviewReplyDecision}
+BannerTint:
+  type: string
+  description: The banner template tints (banners.yaml BannerTemplate).
+  enum: [green, amber, rose, sky, lilac, peach]
+BannerCopyDraftRequest:
+  type: object
+  additionalProperties: false
+  description: Exactly one of offerId and itemIds.
+  properties:
+    offerId: {$ref: ./common.yaml#/Ulid}
+    itemIds:
+      type: array
+      minItems: 1
+      maxItems: 10
+      items: {$ref: ./common.yaml#/Ulid}
+BannerCopyLine:
+  type: object
+  additionalProperties: false
+  required: [lineId, headline, subline, headlineEn, sublineEn, tint, storeItemId]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    headline: {type: string, minLength: 1, maxLength: 40}
+    subline: {type: string, maxLength: 60}
+    headlineEn: {type: string, minLength: 1, maxLength: 40}
+    sublineEn: {type: string, maxLength: 60}
+    tint: {$ref: ./ai.yaml#/BannerTint}
+    storeItemId:
+      oneOf:
+        - {$ref: ./common.yaml#/Ulid}
+        - {type: "null"}
+BannerCopyDraft:
+  type: object
+  additionalProperties: false
+  required: [draftId, feature, status, promptVersion, createdAt, language, lines, outcomes, failure]
+  properties:
+    draftId: {$ref: ./common.yaml#/Ulid}
+    feature: {type: string, enum: [banner_copy]}
+    status: {$ref: ./ai.yaml#/AiDraftStatus}
+    promptVersion: {type: string, maxLength: 80}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    language: {$ref: ./ai.yaml#/AiLanguage}
+    lines:
+      type: array
+      maxItems: 3
+      items: {$ref: ./ai.yaml#/BannerCopyLine}
+    outcomes: {$ref: ./ai.yaml#/AiOutcomes}
+    failure: {$ref: ./ai.yaml#/AiDraftFailure}
+BannerCopyValue:
+  type: object
+  additionalProperties: false
+  required: [headline, subline, tint]
+  properties:
+    headline: {type: string, minLength: 1, maxLength: 40}
+    subline: {type: string, maxLength: 60}
+    tint: {$ref: ./ai.yaml#/BannerTint}
+    storeItemId:
+      oneOf:
+        - {$ref: ./common.yaml#/Ulid}
+        - {type: "null"}
+BannerCopyDecision:
+  type: object
+  additionalProperties: false
+  required: [lineId, outcome]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    outcome: {$ref: ./ai.yaml#/AiConfirmOutcome}
+    value: {$ref: ./ai.yaml#/BannerCopyValue}
+BannerCopyConfirmRequest:
+  type: object
+  additionalProperties: false
+  required: [lines]
+  properties:
+    lines:
+      type: array
+      minItems: 1
+      maxItems: 3
+      items: {$ref: ./ai.yaml#/BannerCopyDecision}
+BannerCopyConfirmResult:
+  type: object
+  additionalProperties: false
+  required: [draftId, status, lines, copy]
+  properties:
+    draftId: {$ref: ./common.yaml#/Ulid}
+    status:
+      type: string
+      enum: [confirmed, discarded]
+    lines: {$ref: ./ai.yaml#/AiOutcomes}
+    copy:
+      oneOf:
+        - {$ref: ./ai.yaml#/BannerCopyValue}
+        - {type: "null"}

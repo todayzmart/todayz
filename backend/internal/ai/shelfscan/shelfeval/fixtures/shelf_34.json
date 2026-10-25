@@ -1,0 +1,55 @@
+{
+  "name": "shelf_34",
+  "input": {
+    "image": "images/shelf_34.jpg"
+  },
+  "expect": {
+    "products": [
+      "Tata Salt 1kg",
+      "Colgate Strong Teeth 200g",
+      "Kurkure Masala 90g",
+      "Clinic Plus Shampoo 175ml"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_34",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_34",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Salt",
+              "brand": "Tata",
+              "size": "1kg",
+              "confidence": 0.89
+            },
+            {
+              "name": "Strong Teeth",
+              "brand": "Colgate",
+              "size": "200g",
+              "confidence": 0.89
+            },
+            {
+              "name": "Masala",
+              "brand": "Kurkure",
+              "size": "90g",
+              "confidence": 0.62
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

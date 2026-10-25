@@ -1,0 +1,112 @@
+{
+  "name": "handwritten_hi_03",
+  "input": {
+    "image": "images/handwritten_hi_03.jpg",
+    "kind": "handwritten",
+    "lang": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "पारले-जी 250g",
+        "quantity": 5,
+        "costPaise": 2435,
+        "mrpPaise": 3000,
+        "expiresOn": "2027-02-28"
+      },
+      {
+        "name": "विम बार 200g",
+        "quantity": 3,
+        "costPaise": 1655,
+        "mrpPaise": 2000,
+        "expiresOn": null
+      },
+      {
+        "name": "बॉर्नविटा 500g",
+        "quantity": 10,
+        "costPaise": 20385,
+        "mrpPaise": 24900,
+        "expiresOn": "2027-07-28"
+      },
+      {
+        "name": "टाटा नमक 1kg",
+        "quantity": 12,
+        "costPaise": 2320,
+        "mrpPaise": 2800,
+        "expiresOn": null
+      },
+      {
+        "name": "गुड डे 100g",
+        "quantity": 2,
+        "costPaise": 2485,
+        "mrpPaise": 3000,
+        "expiresOn": "2027-09-15"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_handwritten_hi_03",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_handwritten_hi_03",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "शिव एंटरप्राइज़",
+          "bill_date": "2026-10-09",
+          "lines": [
+            {
+              "name": "पारले-जी 250g",
+              "quantity": 5,
+              "cost_rupees": 24.35,
+              "mrp_rupees": 40.0,
+              "expires_on": "2027-02-28",
+              "confidence": 0.59
+            },
+            {
+              "name": "विम बार 200g",
+              "quantity": 3,
+              "cost_rupees": 16.55,
+              "mrp_rupees": 20.0,
+              "expires_on": null,
+              "confidence": 0.8
+            },
+            {
+              "name": "बॉर्नविटा 500g",
+              "quantity": 10,
+              "cost_rupees": 203.85,
+              "mrp_rupees": 249.0,
+              "expires_on": "2027-07-28",
+              "confidence": 0.65
+            },
+            {
+              "name": "टाटा नमक 1kg",
+              "quantity": 12,
+              "cost_rupees": 23.2,
+              "mrp_rupees": 28.0,
+              "expires_on": null,
+              "confidence": 0.83
+            },
+            {
+              "name": "गुड डे 100g",
+              "quantity": 2,
+              "cost_rupees": 24.85,
+              "mrp_rupees": 30.0,
+              "expires_on": "2027-09-15",
+              "confidence": 0.62
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

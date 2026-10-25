@@ -1,0 +1,21 @@
+[
+  {
+    "detector": "rating_drop",
+    "subject": "store",
+    "kind": "low",
+    "topic": "reviews",
+    "severity": 2,
+    "stake": 20,
+    "ageDays": 0,
+    "numbers": {
+      "before": "5.0",
+      "count": 20,
+      "days": 30,
+      "now": "3.0"
+    },
+    "action": "reply_reviews",
+    "payload": {
+      "filter": "low"
+    }
+  }
+]

@@ -1,0 +1,112 @@
+{
+  "name": "handwritten_hi_02",
+  "input": {
+    "image": "images/handwritten_hi_02.jpg",
+    "kind": "handwritten",
+    "lang": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "कोलगेट 200g",
+        "quantity": 2,
+        "costPaise": 10845,
+        "mrpPaise": 12000,
+        "expiresOn": "2027-09-15"
+      },
+      {
+        "name": "रियल आम जूस 1L",
+        "quantity": 12,
+        "costPaise": 10090,
+        "mrpPaise": 12000,
+        "expiresOn": null
+      },
+      {
+        "name": "हॉर्लिक्स 500g",
+        "quantity": 6,
+        "costPaise": 20315,
+        "mrpPaise": 26000,
+        "expiresOn": "2027-06-15"
+      },
+      {
+        "name": "नेस्कैफे 50g",
+        "quantity": 3,
+        "costPaise": 16705,
+        "mrpPaise": 19000,
+        "expiresOn": "2027-07-15"
+      },
+      {
+        "name": "रेड लेबल चाय 250g",
+        "quantity": 4,
+        "costPaise": 14020,
+        "mrpPaise": 15500,
+        "expiresOn": "2027-07-15"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_handwritten_hi_02",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_handwritten_hi_02",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "राम वितरक",
+          "bill_date": "2026-10-21",
+          "lines": [
+            {
+              "name": "कोलगेट 200g",
+              "quantity": 2,
+              "cost_rupees": 108.45,
+              "mrp_rupees": 120.0,
+              "expires_on": null,
+              "confidence": 0.62
+            },
+            {
+              "name": "रियल आम जूस 1L",
+              "quantity": 12,
+              "cost_rupees": 100.9,
+              "mrp_rupees": 120.0,
+              "expires_on": null,
+              "confidence": 0.68
+            },
+            {
+              "name": "हॉर्लिक्स 500g",
+              "quantity": 6,
+              "cost_rupees": 203.15,
+              "mrp_rupees": 260.0,
+              "expires_on": "2027-06-15",
+              "confidence": 0.59
+            },
+            {
+              "name": "नेस्कैफे 50g",
+              "quantity": 3,
+              "cost_rupees": 167.05,
+              "mrp_rupees": 190.0,
+              "expires_on": "2027-07-15",
+              "confidence": 0.72
+            },
+            {
+              "name": "रेड लेबल चाय 250g",
+              "quantity": 4,
+              "cost_rupees": 141.2,
+              "mrp_rupees": 155.0,
+              "expires_on": "2027-07-15",
+              "confidence": 0.89
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

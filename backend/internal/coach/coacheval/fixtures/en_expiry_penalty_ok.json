@@ -1,0 +1,42 @@
+{
+  "name": "en_expiry_penalty_ok",
+  "input": {
+    "detector": "expiry_penalty",
+    "lang": "en",
+    "kind": "action",
+    "title": "Orders are expiring",
+    "body": "40% of your orders expired unaccepted in the last 30 days (limit 25%). Shops above it show lower in search.",
+    "numbers": {
+      "pct": 40,
+      "threshold": 25,
+      "days": 30
+    }
+  },
+  "expect": {
+    "title": "Too many orders expire unaccepted",
+    "body": "In the last 30 days 40% of orders were not accepted in time, above the 25% limit. Turn on auto-accept."
+  },
+  "reply": {
+    "id": "msg_coach",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_coach",
+        "name": "write_coach_card",
+        "input": {
+          "title": "Too many orders expire unaccepted",
+          "body": "In the last 30 days 40% of orders were not accepted in time, above the 25% limit. Turn on auto-accept."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 90
+    }
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "name": "printed_hi_01",
+  "input": {
+    "image": "images/printed_hi_01.jpg",
+    "kind": "printed",
+    "lang": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "लक्स साबुन 100g",
+        "quantity": 24,
+        "costPaise": 3485,
+        "mrpPaise": 3800,
+        "expiresOn": null
+      },
+      {
+        "name": "कुरकुरे 90g",
+        "quantity": 4,
+        "costPaise": 1660,
+        "mrpPaise": 2000,
+        "expiresOn": null
+      },
+      {
+        "name": "गुड नाइट रिफिल",
+        "quantity": 4,
+        "costPaise": 7765,
+        "mrpPaise": 8500,
+        "expiresOn": null
+      },
+      {
+        "name": "फॉर्च्यून तेल 1L",
+        "quantity": 24,
+        "costPaise": 16195,
+        "mrpPaise": 18500,
+        "expiresOn": null
+      },
+      {
+        "name": "अमूल बटर 100g",
+        "quantity": 6,
+        "costPaise": 5590,
+        "mrpPaise": 6200,
+        "expiresOn": null
+      },
+      {
+        "name": "कोलगेट 200g",
+        "quantity": 10,
+        "costPaise": 9785,
+        "mrpPaise": 12000,
+        "expiresOn": "2027-04-15"
+      },
+      {
+        "name": "पारले-जी 250g",
+        "quantity": 24,
+        "costPaise": 2480,
+        "mrpPaise": 3000,
+        "expiresOn": "2027-10-15"
+      },
+      {
+        "name": "मैगी नूडल्स 70g",
+        "quantity": 24,
+        "costPaise": 1285,
+        "mrpPaise": 1400,
+        "expiresOn": "2027-12-15"
+      },
+      {
+        "name": "अमूल ताज़ा 500ml",
+        "quantity": 2,
+        "costPaise": 2370,
+        "mrpPaise": 2900,
+        "expiresOn": "2027-02-28"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_hi_01",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_hi_01",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "बालाजी ट्रेडर्स",
+          "bill_date": "2026-10-24",
+          "lines": [
+            {
+              "name": "लक्स साबुन 100g",
+              "quantity": 24,
+              "cost_rupees": 34.85,
+              "mrp_rupees": 38.0,
+              "expires_on": null,
+              "confidence": 0.96
+            },
+            {
+              "name": "कुरकुरे 90g",
+              "quantity": 4,
+              "cost_rupees": 16.6,
+              "mrp_rupees": 20.0,
+              "expires_on": null,
+              "confidence": 0.84
+            },
+            {
+              "name": "गुड नाइट रिफिल",
+              "quantity": 4,
+              "cost_rupees": 77.65,
+              "mrp_rupees": 85.0,
+              "expires_on": null,
+              "confidence": 0.9
+            },
+            {
+              "name": "फॉर्च्यून तेल 1L",
+              "quantity": 24,
+              "cost_rupees": 161.95,
+              "mrp_rupees": 185.0,
+              "expires_on": null,
+              "confidence": 0.85
+            },
+            {
+              "name": "अमूल बटर 100g",
+              "quantity": 6,
+              "cost_rupees": 55.9,
+              "mrp_rupees": 62.0,
+              "expires_on": null,
+              "confidence": 0.98
+            },
+            {
+              "name": "कोलगेट 200g",
+              "quantity": 10,
+              "cost_rupees": 97.85,
+              "mrp_rupees": 120.0,
+              "expires_on": "2027-04-15",
+              "confidence": 0.82
+            },
+            {
+              "name": "पारले-जी 250g",
+              "quantity": 24,
+              "cost_rupees": 24.8,
+              "mrp_rupees": 30.0,
+              "expires_on": "2027-10-15",
+              "confidence": 0.9
+            },
+            {
+              "name": "मैगी नूडल्स 70g",
+              "quantity": 24,
+              "cost_rupees": 12.85,
+              "mrp_rupees": 14.0,
+              "expires_on": "2027-12-15",
+              "confidence": 0.92
+            },
+            {
+              "name": "अमूल ताज़ा 500ml",
+              "quantity": 2,
+              "cost_rupees": 23.7,
+              "mrp_rupees": 29.0,
+              "expires_on": "2027-02-28",
+              "confidence": 0.92
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

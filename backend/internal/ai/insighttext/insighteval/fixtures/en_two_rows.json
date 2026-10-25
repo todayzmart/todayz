@@ -1,0 +1,63 @@
+{
+  "name": "en_two_rows",
+  "input": {
+    "lang": "en",
+    "rows": [
+      {
+        "ref": "r1",
+        "kind": "expired_on_shelf",
+        "facts": {
+          "itemName": "Real Mango Juice 1L",
+          "units": 3
+        }
+      },
+      {
+        "ref": "r2",
+        "kind": "bought_together",
+        "facts": {
+          "itemName": "Bread",
+          "withItemName": "Amul Butter 100g",
+          "bills": 26
+        }
+      }
+    ]
+  },
+  "expect": {
+    "texts": {
+      "r1": "3 packs of Real Mango Juice 1L are past expiry; take them off the shelf.",
+      "r2": "Bread and Amul Butter 100g were on 26 bills together; try a pair offer."
+    },
+    "dropped": 0
+  },
+  "reply": {
+    "id": "msg_it_en_two_rows",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_it_en_two_rows",
+        "name": "write_insight_texts",
+        "input": {
+          "texts": [
+            {
+              "ref": "r1",
+              "text": "3 packs of Real Mango Juice 1L are past expiry; take them off the shelf."
+            },
+            {
+              "ref": "r2",
+              "text": "Bread and Amul Butter 100g were on 26 bills together; try a pair offer."
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

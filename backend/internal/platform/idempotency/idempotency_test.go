@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"net/textproto"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -499,4 +501,72 @@ func TestScopeByPrincipal(t *testing.T) {
 	require.Equal(t, "ip:203.0.113.1", principal(ctx))
 	ctx = reqctx.WithPrincipal(ctx, reqctx.Principal{Kind: "customer", UserID: "01J0000000000000000000000C"})
 	require.Equal(t, "user:01J0000000000000000000000C", principal(ctx))
+}
+
+// formBody is a multipart body as a browser builds it: a new boundary each time.
+func formBody(t *testing.T, boundary string, fields [][3]string) (string, string) {
+	t.Helper()
+	var b strings.Builder
+	mw := multipart.NewWriter(&b)
+	require.NoError(t, mw.SetBoundary(boundary))
+	for _, f := range fields {
+		h := textproto.MIMEHeader{}
+		if f[2] != "" {
+			h.Set("Content-Disposition", `form-data; name="`+f[0]+`"; filename="bill.jpg"`)
+			h.Set("Content-Type", f[2])
+		} else {
+			h.Set("Content-Disposition", `form-data; name="`+f[0]+`"`)
+		}
+		pw, err := mw.CreatePart(h)
+		require.NoError(t, err)
+		_, _ = pw.Write([]byte(f[1]))
+	}
+	require.NoError(t, mw.Close())
+	return b.String(), mw.FormDataContentType()
+}
+
+func TestRequestHashMultipart(t *testing.T) {
+	hash := func(body, ct string) []byte {
+		r := httptest.NewRequest(http.MethodPost, "/v1/x?a=1", strings.NewReader(body))
+		r.Header.Set("Content-Type", ct)
+		return requestHash(r, []byte(body))
+	}
+	photo := [3]string{"photo", "\xff\xd8jpeg-bytes", "image/jpeg"}
+	note := [3]string{"note", "rice", ""}
+	b1, ct1 := formBody(t, "fetch-a", [][3]string{photo, note})
+	b2, ct2 := formBody(t, "fetch-bb", [][3]string{note, photo})
+	require.NotEqual(t, b1, b2)
+	require.Equal(t, hash(b1, ct1), hash(b2, ct2), "a rebuilt FormData (new boundary, any field order) is the same request")
+
+	b3, ct3 := formBody(t, "fetch-c", [][3]string{{"photo", "\xff\xd8other", "image/jpeg"}, note})
+	require.NotEqual(t, hash(b1, ct1), hash(b3, ct3), "other file bytes")
+	b4, ct4 := formBody(t, "fetch-d", [][3]string{{"photo", "\xff\xd8jpeg-bytes", "image/png"}, note})
+	require.NotEqual(t, hash(b1, ct1), hash(b4, ct4), "other content type")
+	b5, ct5 := formBody(t, "fetch-e", [][3]string{photo, {"note", "dal", ""}})
+	require.NotEqual(t, hash(b1, ct1), hash(b5, ct5), "other field value")
+
+	// JSON and a multipart body that does not parse keep the raw bytes.
+	require.NotEqual(t, hash(`{"a":1}`, "application/json"), hash(`{"a": 1}`, "application/json"))
+	require.NotEqual(t, hash("junk1", "multipart/form-data; boundary=x"), hash("junk2", "multipart/form-data; boundary=x"))
+}
+
+func TestMiddlewareMultipartRetry(t *testing.T) {
+	hs := newHarness(route.IdempotencyRequired)
+	key := ids.New(t0).String()
+	send := func(boundary string) *httptest.ResponseRecorder {
+		body, ct := formBody(t, boundary, [][3]string{{"photo", "\xff\xd8jpeg", "image/jpeg"}})
+		r := httptest.NewRequest(http.MethodPost, "/v1/me/orders", strings.NewReader(body))
+		r.Header.Set(HeaderKey, key)
+		r.Header.Set("Content-Type", ct)
+		w := httptest.NewRecorder()
+		hs.h.ServeHTTP(w, r)
+		return w
+	}
+	first := send("first-fetch")
+	require.Equal(t, 201, first.Code)
+	again := send("retry-fetch")
+	require.Equal(t, 201, again.Code, again.Body.String())
+	require.Equal(t, "true", again.Header().Get(HeaderReplayed))
+	require.Equal(t, first.Body.String(), again.Body.String())
+	require.Equal(t, int32(1), hs.calls.Load(), "the handler ran once")
 }

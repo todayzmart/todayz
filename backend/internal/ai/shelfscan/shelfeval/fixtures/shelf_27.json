@@ -1,0 +1,55 @@
+{
+  "name": "shelf_27",
+  "input": {
+    "image": "images/shelf_27.jpg"
+  },
+  "expect": {
+    "products": [
+      "Brooke Bond Red Label 250g",
+      "MDH Chana Masala 100g",
+      "Tata Salt 1kg",
+      "Kurkure Masala 90g"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_27",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_27",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Bond Red Label",
+              "brand": "Brooke",
+              "size": "250g",
+              "confidence": 0.74
+            },
+            {
+              "name": "Chana Masala",
+              "brand": "MDH",
+              "size": "100g",
+              "confidence": 0.66
+            },
+            {
+              "name": "Salt",
+              "brand": "Tata",
+              "size": "1kg",
+              "confidence": 0.64
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}
