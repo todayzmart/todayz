@@ -1,0 +1,9 @@
+# domain coach: one line per (role x action); regenerate with -update
+coach.view kind=business step-up=false
+coach.view owner allow
+coach.view manager allow
+coach.view cashier -
+coach.act kind=business step-up=false
+coach.act owner allow
+coach.act manager allow
+coach.act cashier -
