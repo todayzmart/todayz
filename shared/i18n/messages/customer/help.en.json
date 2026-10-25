@@ -164,7 +164,7 @@
     "description": "Subject field label"
   },
   "help.new.subject.help": {
-    "defaultMessage": "A short line, like \"Atta missing from my order\".",
+    "defaultMessage": "A short line, like “Atta missing from my order”.",
     "description": "Subject field help"
   },
   "help.new.subject.required": {

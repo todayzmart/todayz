@@ -2,6 +2,7 @@ import {
   ChartColumn,
   ChartLine,
   Ellipsis,
+  LifeBuoy,
   Package,
   ReceiptText,
   ScanBarcode,
@@ -39,6 +40,7 @@ export const NAV: readonly NavItem[] = [
   { section: 'analytics', label: 'shell.nav.analytics', icon: ChartLine, tab: false, side: true, group: 'shell.nav.groupGrow' },
   { section: 'credits', label: 'shell.nav.credits', icon: WalletCards, tab: false, side: true, group: 'shell.nav.groupShop' },
   { section: 'settings', label: 'shell.nav.settings', icon: Settings, tab: false, side: true, group: 'shell.nav.groupShop' },
+  { section: 'help', label: 'shell.nav.help', icon: LifeBuoy, tab: false, side: true, group: 'shell.nav.groupShop' },
   { section: 'more', label: 'shell.nav.more', icon: Ellipsis, tab: true, side: false, group: null },
 ];
 

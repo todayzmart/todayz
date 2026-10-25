@@ -1,592 +1,592 @@
 {
   "help.title": {
     "message": "सहायता",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c47ae153"
   },
   "help.loading": {
     "message": "सहायता लोड हो रही है",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c72413f7"
   },
   "help.back": {
     "message": "सहायता पर वापस",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "45dd3b17"
   },
   "help.noBusiness": {
     "message": "आपका बिज़नेस सेट अप होने के बाद टिकट से सहायता मिलेगी।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f5f5a982"
   },
   "help.askManager": {
     "message": "टिकट मालिक या मैनेजर खोलते हैं। उनमें से किसी से कहें कि वे आपके लिए सपोर्ट से संपर्क करें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f7592e44"
   },
   "help.error.title": {
     "message": "आपका बिज़नेस लोड नहीं हो सका",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4bfa8553"
   },
   "help.error.body": {
     "message": "अपना कनेक्शन जाँचें और फिर से कोशिश करें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "563862b7"
   },
   "help.error.retry": {
     "message": "फिर से कोशिश करें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "042c862e"
   },
   "help.sending": {
     "message": "भेजा जा रहा है",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ceafde86"
   },
   "help.tabs.label": {
     "message": "सहायता के भाग",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1689f4a4"
   },
   "help.tabs.guide": {
     "message": "गाइड",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bf073fae"
   },
   "help.tabs.tickets": {
     "message": "टिकट",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5c622a51"
   },
   "help.how.title": {
     "message": "TodayZ आपकी दुकान के लिए कैसे काम करता है",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "51eee93d"
   },
   "help.how.stock.title": {
     "message": "अपना स्टॉक ऑनलाइन डालें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3da87e1e"
   },
   "help.how.stock.body": {
     "message": "प्रोडक्ट उनकी कीमत और आपके पास कितने हैं, इसके साथ जोड़ें। पास के ग्राहक देखते हैं कि क्या स्टॉक में है।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "92183b71"
   },
   "help.how.orders.title": {
     "message": "ऑर्डर समय पर स्वीकार करें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fbf2a640"
   },
   "help.how.orders.body": {
     "message": "नया ऑर्डर ऑर्डर स्क्रीन पर बजता है। उसका टाइमर ख़त्म होने से पहले उसे स्वीकार करें, उसका कुछ हिस्सा लें, या बताएँ कि आप क्यों नहीं ले सकते।",
-    "review": "machine",
-    "enHash": "19618d44"
+    "review": "reviewed",
+    "enHash": "d3742177"
   },
   "help.how.pickup.title": {
     "message": "कोड से सामान दें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "dae79fb9"
   },
   "help.how.pickup.body": {
     "message": "पिकअप पर ग्राहक एक कोड दिखाता है। सामान देना पूरा करने के लिए उसे ऑर्डर में डालें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fd9928c1"
   },
   "help.how.counter.title": {
     "message": "काउंटर पर बेचें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "db51c22c"
   },
   "help.how.counter.body": {
     "message": "दुकान पर आए ग्राहकों की बिक्री 'बेचें' में दर्ज करें, ऑफ़लाइन भी। बेचते ही स्टॉक कम हो जाता है।",
-    "review": "machine",
-    "enHash": "3b0c40dc"
+    "review": "reviewed",
+    "enHash": "48604958"
   },
   "help.how.credits.title": {
     "message": "क्रेडिट ग्राहकों को वापस लाते हैं",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fdbf56ad"
   },
   "help.how.credits.body": {
     "message": "ग्राहक TodayZ क्रेडिट कमाते और खर्च करते हैं। आपकी दुकान पर वे जो खर्च करते हैं, वह आपके क्रेडिट खाते में जुड़ता है।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "183c358e"
   },
   "help.how.payouts.title": {
     "message": "पैसे पाएँ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d68abf9e"
   },
   "help.how.payouts.body": {
     "message": "हर महीने एक स्टेटमेंट बंद होता है और आपका बकाया UPI से भेजा जाता है।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ddfb737e"
   },
   "help.faq.title": {
     "message": "आम सवाल",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f07ac22a"
   },
   "help.faq.timer.q": {
     "message": "अगर मैं ऑर्डर समय पर स्वीकार न करूँ तो क्या होगा?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a5eda5e3"
   },
   "help.faq.timer.a": {
     "message": "ऑर्डर का समय निकल जाता है और ग्राहक को बता दिया जाता है। छूटे ऑर्डर से सर्च में आपकी दुकान नीचे दिखती है, इसलिए दुकान खुली रहने तक ऑर्डर स्क्रीन खुली रखें।",
-    "review": "machine",
-    "enHash": "d7f43596"
+    "review": "reviewed",
+    "enHash": "084873c7"
   },
   "help.faq.code.q": {
     "message": "पिकअप कोड काम नहीं कर रहा",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e7c8c075"
   },
   "help.faq.code.a": {
-    "message": "कोड सिर्फ़ तभी काम करता है जब ऑर्डर स्वीकार या तैयार हो, और सिर्फ़ एक बार। बहुत ग़लत कोशिशों के बाद वह लॉक हो जाता है: ग्राहक से उनके ऐप में \"नया कोड\" दबाने को कहें।",
-    "review": "machine",
-    "enHash": "b5440c50"
+    "message": "कोड सिर्फ़ तभी काम करता है जब ऑर्डर स्वीकार या तैयार हो, और सिर्फ़ एक बार। बहुत ग़लत कोशिशों के बाद वह लॉक हो जाता है: ग्राहक से उनके ऐप में “नया कोड लें” दबाने को कहें।",
+    "review": "reviewed",
+    "enHash": "a5eb9cf2"
   },
   "help.faq.credits.q": {
     "message": "ग्राहक जो क्रेडिट खर्च करते हैं, वे कहाँ जाते हैं?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1f93d430"
   },
   "help.faq.credits.a": {
     "message": "ग्राहक आपकी दुकान पर जो क्रेडिट खर्च करता है, वे आपके क्रेडिट खाते में जाते हैं और आपके पेआउट के साथ दिए जाते हैं। आपका दिया कैशबैक भी इसी खाते से जाता है।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f50ee125"
   },
   "help.faq.payout.q": {
     "message": "मुझे पैसे कब मिलेंगे?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "dcac7e28"
   },
   "help.faq.payout.a": {
     "message": "हर महीने की 1 तारीख़ को स्टेटमेंट बंद होता है। आपका बकाया UPI से भेजा जाता है, और क्रेडिट स्क्रीन पर वह UTR नंबर के साथ भेजा गया दिखता है। आपका वेरिफ़िकेशन अधूरा रहने तक पेआउट रुका रहता है।",
-    "review": "machine",
-    "enHash": "7854109f"
+    "review": "reviewed",
+    "enHash": "a7d7b298"
   },
   "help.faq.visible.q": {
     "message": "ग्राहकों को मेरी दुकान क्यों नहीं दिखती?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1b41376a"
   },
   "help.faq.visible.a": {
     "message": "आपकी दुकान तभी दिखती है जब वह मंज़ूर, लाइव और खुली हो, और सर्च में सिर्फ़ स्टॉक वाले प्रोडक्ट दिखते हैं।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f4e2ecf1"
   },
   "help.faq.staff.q": {
     "message": "मेरा स्टाफ़ क्या कर सकता है?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b8db285c"
   },
   "help.faq.staff.a": {
     "message": "कैशियर बेचता है और ऑर्डर संभालता है। मैनेजर स्टॉक, ऑफ़र और कैशियर भी संभालता है। मालिक सब कुछ कर सकता है, पेआउट और मैनेजर भी।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3fa92516"
   },
   "help.faq.close.q": {
     "message": "मैं अपना बिज़नेस कैसे बंद करूँ?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9cbd77ce"
   },
   "help.faq.close.a": {
     "message": "ऐप में हटाने का विकल्प नहीं है। सपोर्ट से संपर्क करें, हम आपकी मदद करेंगे।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c0c9b9a3"
   },
   "help.contact.title": {
     "message": "सपोर्ट से संपर्क करें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2b658ffd"
   },
   "help.contact.body": {
     "message": "टिकट खोलें, सपोर्ट यहीं ऐप में जवाब देगा। मदद हो तो ऑर्डर और फ़ोटो जोड़ें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6005ef8c"
   },
   "help.contact.bodyCashier": {
     "message": "मालिक या मैनेजर से सपोर्ट के साथ टिकट खोलने को कहें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "dfa6938a"
   },
   "help.contact.call": {
     "message": "{phone} पर कॉल करें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f9ea1a72"
   },
   "help.tickets.new": {
     "message": "नया टिकट",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b8bf9c88"
   },
   "help.tickets.loading": {
     "message": "टिकट लोड हो रहे हैं",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b603c74a"
   },
   "help.tickets.list": {
     "message": "टिकट",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5c622a51"
   },
   "help.tickets.more": {
     "message": "और दिखाएँ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "dfe60ca9"
   },
   "help.tickets.updated": {
     "message": "{when} अपडेट हुआ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f734128f"
   },
   "help.tickets.empty.title": {
     "message": "अभी कोई टिकट नहीं",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "16baa0a9"
   },
   "help.tickets.empty.body": {
     "message": "जब किसी ऑर्डर, पेआउट या ऐप में कुछ गड़बड़ हो, तो टिकट खोलें और सपोर्ट यहाँ जवाब देगा।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "87f97a5c"
   },
   "help.tickets.error.title": {
     "message": "टिकट लोड नहीं हो सके",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cf7d483b"
   },
   "help.status.open": {
     "message": "खुला",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cf9b7706"
   },
   "help.status.waiting": {
     "message": "जवाब मिला",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7d688ab4"
   },
   "help.status.resolved": {
     "message": "हल हुआ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e1d35505"
   },
   "help.status.closed": {
     "message": "बंद",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "88d86b77"
   },
   "help.category.order": {
     "message": "कोई ऑर्डर",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "40eb87b7"
   },
   "help.category.credits": {
     "message": "क्रेडिट",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bfac50d6"
   },
   "help.category.payouts": {
     "message": "पेआउट",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e0e7ea13"
   },
   "help.category.catalogue": {
     "message": "प्रोडक्ट और स्टॉक",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5934f5ac"
   },
   "help.category.account": {
     "message": "मेरा अकाउंट या स्टाफ़",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "caed2475"
   },
   "help.category.verification": {
     "message": "वेरिफ़िकेशन",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "03128bed"
   },
   "help.category.app": {
     "message": "ऐप",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9445c325"
   },
   "help.category.other": {
     "message": "कुछ और",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "48f88ac3"
   },
   "help.new.title": {
     "message": "नया टिकट",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b8bf9c88"
   },
   "help.new.intro": {
     "message": "बताएँ क्या हुआ। सपोर्ट टिकट पर जवाब देगा, और आप वहाँ और जोड़ सकते हैं।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5b8aa383"
   },
   "help.new.category": {
     "message": "यह किस बारे में है?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "23a5beeb"
   },
   "help.new.category.pick": {
     "message": "एक चुनें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4238dc41"
   },
   "help.new.category.required": {
     "message": "चुनें कि यह किस बारे में है।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "079e2dcc"
   },
   "help.new.subject": {
     "message": "विषय",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8d183dbd"
   },
   "help.new.subject.help": {
-    "message": "एक छोटी लाइन, जैसे \"मार्च का पेआउट नहीं मिला\"।",
-    "review": "machine",
-    "enHash": "056a26d6"
+    "message": "एक छोटी लाइन, जैसे “मार्च का पेआउट नहीं मिला”।",
+    "review": "reviewed",
+    "enHash": "08192782"
   },
   "help.new.subject.required": {
     "message": "{min} से {max} अक्षरों का विषय लिखें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2583925c"
   },
   "help.new.store": {
     "message": "कौन सी दुकान?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "54f0dfee"
   },
   "help.new.store.none": {
     "message": "किसी एक दुकान के बारे में नहीं",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "98a3c63e"
   },
   "help.new.order": {
     "message": "कौन सा ऑर्डर?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "21813ae5"
   },
   "help.new.order.none": {
     "message": "किसी एक ऑर्डर के बारे में नहीं",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f29403b4"
   },
   "help.new.order.help": {
     "message": "इस दुकान के हाल के ऑर्डर।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "45dd645c"
   },
   "help.new.order.failed": {
     "message": "ऑर्डर लोड नहीं हो सके। आप फिर भी टिकट भेज सकते हैं और मैसेज में ऑर्डर बता सकते हैं।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f7796d10"
   },
   "help.new.body": {
     "message": "क्या हुआ?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e9ef659a"
   },
   "help.new.body.help": {
     "message": "जितनी ज़्यादा जानकारी, उतनी जल्दी हम मदद कर पाएँगे।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2f8737b5"
   },
   "help.new.body.required": {
     "message": "एक मैसेज लिखें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c8e96b81"
   },
   "help.new.fieldRefused": {
     "message": "यह स्वीकार नहीं हुआ। फिर से चुनें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f557af62"
   },
   "help.new.send": {
     "message": "सपोर्ट को भेजें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e0b3861b"
   },
   "help.new.sent": {
     "message": "टिकट {number} भेजा गया",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "99303bb3"
   },
   "help.ticket.loading": {
     "message": "टिकट लोड हो रहा है",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ee58be8e"
   },
   "help.ticket.title": {
     "message": "टिकट {number}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fc0bae40"
   },
   "help.ticket.messages": {
     "message": "मैसेज",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f1702b46"
   },
   "help.ticket.fromSupport": {
     "message": "TodayZ सपोर्ट",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f0829b0f"
   },
   "help.ticket.fromYou": {
     "message": "आपका बिज़नेस",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d8f3e8b6"
   },
   "help.ticket.state.open": {
     "message": "सपोर्ट यहाँ जवाब देगा।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fcb604cd"
   },
   "help.ticket.state.waiting": {
     "message": "सपोर्ट ने जवाब दिया। अगर अब भी मदद चाहिए, तो नीचे जवाब दें और टिकट फिर से खुल जाएगा।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e360387a"
   },
   "help.ticket.state.resolved": {
     "message": "सपोर्ट ने इसे हल मान लिया है। अगर नहीं हुआ, तो नीचे जवाब दें और टिकट फिर से खुल जाएगा।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "22fde542"
   },
   "help.ticket.state.closed": {
     "message": "यह टिकट बंद है और इसमें अब मैसेज नहीं जा सकते।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7e6e9eca"
   },
   "help.ticket.newInstead": {
     "message": "नया टिकट खोलें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c36c110e"
   },
   "help.ticket.notFound.title": {
     "message": "टिकट नहीं मिला",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fb25ca39"
   },
   "help.ticket.notFound.body": {
     "message": "हो सकता है यह किसी दूसरे बिज़नेस का हो, या लिंक ग़लत हो।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "08e62202"
   },
   "help.ticket.notFound.action": {
     "message": "अपने टिकट देखें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2a142fb0"
   },
   "help.ticket.error.title": {
     "message": "टिकट लोड नहीं हो सका",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "51a4c349"
   },
   "help.reply.title": {
     "message": "जवाब",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6c2bb735"
   },
   "help.reply.label": {
     "message": "आपका मैसेज",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f190c98e"
   },
   "help.reply.help": {
     "message": "सपोर्ट इसे इसी टिकट पर देखेगा।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0b3c7ee4"
   },
   "help.reply.reopens": {
     "message": "जवाब भेजने से टिकट फिर से खुल जाएगा।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "afd6995f"
   },
   "help.reply.send": {
     "message": "जवाब भेजें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7f7e603a"
   },
   "help.files.add": {
     "message": "फ़ोटो या PDF जोड़ें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ef72b016"
   },
   "help.files.uploading": {
     "message": "अपलोड हो रहा है",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "de272409"
   },
   "help.files.help": {
     "message": "JPEG, PNG, WebP या PDF, हर एक {mb} MB तक, ज़्यादा से ज़्यादा {max} फ़ाइलें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8a7ca2f9"
   },
   "help.files.list": {
     "message": "फ़ाइलें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6ce6c512"
   },
   "help.files.remove": {
     "message": "{name} हटाएँ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "df7193a5"
   },
   "help.files.type": {
     "message": "{name} फ़ोटो या PDF नहीं है।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0299449c"
   },
   "help.files.size": {
     "message": "{name} {mb} MB से बड़ी है।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "24ccdc18"
   },
   "help.files.tooMany": {
     "message": "एक मैसेज में ज़्यादा से ज़्यादा {max} फ़ाइलें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d7a902ec"
   },
   "help.files.failed": {
     "message": "{name} अपलोड नहीं हुई। फिर से कोशिश करें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cd16e9c2"
   },
   "help.error.validation_failed": {
     "message": "कुछ जानकारी स्वीकार नहीं हुई। फ़ॉर्म जाँचें और फिर से कोशिश करें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f1164913"
   },
   "help.error.forbidden": {
     "message": "यह सिर्फ़ मालिक या मैनेजर कर सकते हैं।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "53dd9bab"
   },
   "help.error.not_found": {
     "message": "यह टिकट अब उपलब्ध नहीं है।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9c3df5fd"
   },
   "help.error.invalid_transition": {
     "message": "यह टिकट बंद है और इसमें अब मैसेज नहीं जा सकते। नया टिकट खोलें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7bfa6828"
   },
   "help.error.generic": {
     "message": "यह नहीं हो सका। अपना कनेक्शन जाँचें और फिर से कोशिश करें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "462c8c1d"
   },
   "help.files.empty": {
     "message": "{name} खाली है।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "83f58457"
   }
 }

@@ -1,592 +1,592 @@
 {
   "help.title": {
     "message": "సహాయం",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c47ae153"
   },
   "help.loading": {
     "message": "సహాయం లోడ్ అవుతోంది",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c72413f7"
   },
   "help.back": {
     "message": "సహాయానికి వెనక్కి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "45dd3b17"
   },
   "help.noBusiness": {
     "message": "మీ బిజినెస్ సెటప్ అయిన తర్వాత టికెట్‌ల ద్వారా సహాయం లభిస్తుంది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f5f5a982"
   },
   "help.askManager": {
     "message": "టికెట్‌లను యజమాని లేదా మేనేజర్ తెరుస్తారు. మీ తరఫున సపోర్ట్‌ను సంప్రదించమని వారిలో ఒకరిని అడగండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f7592e44"
   },
   "help.error.title": {
     "message": "మీ బిజినెస్ లోడ్ కాలేదు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4bfa8553"
   },
   "help.error.body": {
     "message": "మీ కనెక్షన్ చూసి మళ్ళీ ప్రయత్నించండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "563862b7"
   },
   "help.error.retry": {
     "message": "మళ్ళీ ప్రయత్నించండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "042c862e"
   },
   "help.sending": {
     "message": "పంపుతోంది",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ceafde86"
   },
   "help.tabs.label": {
     "message": "సహాయ విభాగాలు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1689f4a4"
   },
   "help.tabs.guide": {
     "message": "గైడ్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bf073fae"
   },
   "help.tabs.tickets": {
     "message": "టికెట్‌లు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5c622a51"
   },
   "help.how.title": {
     "message": "TodayZ మీ దుకాణం కోసం ఎలా పనిచేస్తుంది",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "51eee93d"
   },
   "help.how.stock.title": {
     "message": "మీ స్టాక్‌ను ఆన్‌లైన్‌లో పెట్టండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3da87e1e"
   },
   "help.how.stock.body": {
     "message": "ధర, మీ దగ్గర ఎన్ని ఉన్నాయో చెప్పి ప్రొడక్ట్‌లు జోడించండి. దగ్గర్లోని కస్టమర్‌లు స్టాక్‌లో ఏమున్నాయో చూస్తారు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "92183b71"
   },
   "help.how.orders.title": {
     "message": "ఆర్డర్‌లను సమయానికి అంగీకరించండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fbf2a640"
   },
   "help.how.orders.body": {
     "message": "కొత్త ఆర్డర్ ఆర్డర్‌ల స్క్రీన్‌పై మోగుతుంది. దాని టైమర్ అయిపోయేలోపు దాన్ని అంగీకరించండి, అందులో కొంత భాగం తీసుకోండి, లేదా ఎందుకు కుదరదో చెప్పండి.",
-    "review": "machine",
-    "enHash": "19618d44"
+    "review": "reviewed",
+    "enHash": "d3742177"
   },
   "help.how.pickup.title": {
     "message": "కోడ్‌తో అందజేయండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "dae79fb9"
   },
   "help.how.pickup.body": {
     "message": "పికప్ సమయంలో కస్టమర్ ఒక కోడ్ చూపిస్తారు. అందజేయడం పూర్తి చేయడానికి దాన్ని ఆర్డర్‌లో నమోదు చేయండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fd9928c1"
   },
   "help.how.counter.title": {
     "message": "కౌంటర్ వద్ద అమ్మండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "db51c22c"
   },
   "help.how.counter.body": {
     "message": "దుకాణానికి వచ్చిన కస్టమర్‌ల అమ్మకాలను 'అమ్మండి'లో నమోదు చేయండి, ఆఫ్‌లైన్‌లో కూడా. అమ్మినకొద్దీ స్టాక్ తగ్గుతుంది.",
-    "review": "machine",
-    "enHash": "3b0c40dc"
+    "review": "reviewed",
+    "enHash": "48604958"
   },
   "help.how.credits.title": {
     "message": "క్రెడిట్‌లు కస్టమర్‌లను మళ్ళీ తీసుకొస్తాయి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fdbf56ad"
   },
   "help.how.credits.body": {
     "message": "కస్టమర్‌లు TodayZ క్రెడిట్‌లు సంపాదిస్తారు, ఖర్చు చేస్తారు. మీ దుకాణంలో వారు ఖర్చు చేసింది మీ క్రెడిట్ ఖాతాలో చేరుతుంది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "183c358e"
   },
   "help.how.payouts.title": {
     "message": "డబ్బు పొందండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d68abf9e"
   },
   "help.how.payouts.body": {
     "message": "ప్రతి నెలా ఒక స్టేట్‌మెంట్ ముగుస్తుంది, మీకు రావలసిన మొత్తం UPI ద్వారా పంపబడుతుంది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ddfb737e"
   },
   "help.faq.title": {
     "message": "సాధారణ ప్రశ్నలు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f07ac22a"
   },
   "help.faq.timer.q": {
     "message": "నేను ఆర్డర్‌ను సమయానికి అంగీకరించకపోతే ఏమవుతుంది?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a5eda5e3"
   },
   "help.faq.timer.a": {
     "message": "ఆర్డర్ గడువు ముగుస్తుంది, కస్టమర్‌కు తెలియజేయబడుతుంది. మిస్ అయిన ఆర్డర్‌ల వల్ల సెర్చ్‌లో మీ దుకాణం కిందికి వెళ్తుంది, కాబట్టి దుకాణం తెరిచి ఉన్నంతసేపు ఆర్డర్‌ల స్క్రీన్ తెరిచి ఉంచండి.",
-    "review": "machine",
-    "enHash": "d7f43596"
+    "review": "reviewed",
+    "enHash": "084873c7"
   },
   "help.faq.code.q": {
     "message": "పికప్ కోడ్ పనిచేయడం లేదు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e7c8c075"
   },
   "help.faq.code.a": {
-    "message": "ఆర్డర్ అంగీకరించబడినప్పుడు లేదా సిద్ధంగా ఉన్నప్పుడు మాత్రమే కోడ్ పనిచేస్తుంది, అది కూడా ఒక్కసారే. చాలా తప్పు ప్రయత్నాల తర్వాత అది లాక్ అవుతుంది: కస్టమర్‌ను వారి యాప్‌లో \"కొత్త కోడ్\" నొక్కమని చెప్పండి.",
-    "review": "machine",
-    "enHash": "b5440c50"
+    "message": "ఆర్డర్ అంగీకరించబడినప్పుడు లేదా సిద్ధంగా ఉన్నప్పుడు మాత్రమే కోడ్ పనిచేస్తుంది, అది కూడా ఒక్కసారే. చాలా తప్పు ప్రయత్నాల తర్వాత అది లాక్ అవుతుంది: కస్టమర్‌ను వారి యాప్‌లో “కొత్త కోడ్ తీసుకోండి” నొక్కమని చెప్పండి.",
+    "review": "reviewed",
+    "enHash": "a5eb9cf2"
   },
   "help.faq.credits.q": {
     "message": "కస్టమర్‌లు ఖర్చు చేసే క్రెడిట్‌లు ఎక్కడికి వెళ్తాయి?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1f93d430"
   },
   "help.faq.credits.a": {
     "message": "కస్టమర్ మీ దుకాణంలో ఖర్చు చేసే క్రెడిట్‌లు మీ క్రెడిట్ ఖాతాకు వెళ్తాయి, మీ పేఅవుట్‌తో పాటు చెల్లించబడతాయి. మీరు ఇచ్చే క్యాష్‌బ్యాక్ కూడా ఇదే ఖాతా నుండి వెళ్తుంది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f50ee125"
   },
   "help.faq.payout.q": {
     "message": "నాకు డబ్బు ఎప్పుడు వస్తుంది?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "dcac7e28"
   },
   "help.faq.payout.a": {
     "message": "ప్రతి నెలా 1వ తేదీన స్టేట్‌మెంట్ ముగుస్తుంది. మీకు రావలసిన మొత్తం UPI ద్వారా పంపబడుతుంది, క్రెడిట్‌ల స్క్రీన్ దాన్ని UTR నంబర్‌తో పంపబడినట్లు చూపిస్తుంది. మీ వెరిఫికేషన్ పూర్తయ్యే వరకు పేఅవుట్ నిలిపివేయబడుతుంది.",
-    "review": "machine",
-    "enHash": "7854109f"
+    "review": "reviewed",
+    "enHash": "a7d7b298"
   },
   "help.faq.visible.q": {
     "message": "కస్టమర్‌లకు నా దుకాణం ఎందుకు కనిపించడం లేదు?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1b41376a"
   },
   "help.faq.visible.a": {
     "message": "మీ దుకాణం ఆమోదించబడి, లైవ్‌లో ఉండి, తెరిచి ఉన్నప్పుడు మాత్రమే కనిపిస్తుంది, సెర్చ్‌లో స్టాక్ ఉన్న ప్రొడక్ట్‌లు మాత్రమే కనిపిస్తాయి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f4e2ecf1"
   },
   "help.faq.staff.q": {
     "message": "నా సిబ్బంది ఏం చేయగలరు?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b8db285c"
   },
   "help.faq.staff.a": {
     "message": "క్యాషియర్ అమ్ముతారు, ఆర్డర్‌లు చూసుకుంటారు. మేనేజర్ స్టాక్, ఆఫర్‌లు, క్యాషియర్‌లను కూడా చూసుకుంటారు. యజమాని పేఅవుట్‌లు, మేనేజర్‌లతో సహా అన్నీ చేయగలరు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3fa92516"
   },
   "help.faq.close.q": {
     "message": "నా బిజినెస్‌ను ఎలా మూసివేయాలి?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9cbd77ce"
   },
   "help.faq.close.a": {
     "message": "యాప్‌లో తొలగించే ఆప్షన్ లేదు. సపోర్ట్‌ను సంప్రదించండి, మేము సహాయం చేస్తాం.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c0c9b9a3"
   },
   "help.contact.title": {
     "message": "సపోర్ట్‌ను సంప్రదించండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2b658ffd"
   },
   "help.contact.body": {
     "message": "టికెట్ తెరవండి, సపోర్ట్ ఇక్కడే యాప్‌లో జవాబిస్తుంది. ఉపయోగపడితే ఆర్డర్, ఫోటో జోడించండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6005ef8c"
   },
   "help.contact.bodyCashier": {
     "message": "సపోర్ట్‌తో టికెట్ తెరవమని యజమాని లేదా మేనేజర్‌ను అడగండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "dfa6938a"
   },
   "help.contact.call": {
     "message": "{phone} కి కాల్ చేయండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f9ea1a72"
   },
   "help.tickets.new": {
     "message": "కొత్త టికెట్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b8bf9c88"
   },
   "help.tickets.loading": {
     "message": "టికెట్‌లు లోడ్ అవుతున్నాయి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b603c74a"
   },
   "help.tickets.list": {
     "message": "టికెట్‌లు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5c622a51"
   },
   "help.tickets.more": {
     "message": "మరిన్ని చూపించు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "dfe60ca9"
   },
   "help.tickets.updated": {
     "message": "{when} అప్‌డేట్ అయింది",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f734128f"
   },
   "help.tickets.empty.title": {
     "message": "ఇంకా టికెట్‌లు లేవు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "16baa0a9"
   },
   "help.tickets.empty.body": {
     "message": "ఆర్డర్, పేఅవుట్ లేదా యాప్‌లో ఏదైనా తప్పు జరిగితే, టికెట్ తెరవండి, సపోర్ట్ ఇక్కడ జవాబిస్తుంది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "87f97a5c"
   },
   "help.tickets.error.title": {
     "message": "టికెట్‌లు లోడ్ కాలేదు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cf7d483b"
   },
   "help.status.open": {
     "message": "తెరిచి ఉంది",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cf9b7706"
   },
   "help.status.waiting": {
     "message": "జవాబిచ్చారు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7d688ab4"
   },
   "help.status.resolved": {
     "message": "పరిష్కరించబడింది",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e1d35505"
   },
   "help.status.closed": {
     "message": "మూసివేయబడింది",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "88d86b77"
   },
   "help.category.order": {
     "message": "ఒక ఆర్డర్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "40eb87b7"
   },
   "help.category.credits": {
     "message": "క్రెడిట్‌లు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bfac50d6"
   },
   "help.category.payouts": {
     "message": "పేఅవుట్‌లు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e0e7ea13"
   },
   "help.category.catalogue": {
     "message": "ప్రొడక్ట్‌లు, స్టాక్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5934f5ac"
   },
   "help.category.account": {
     "message": "నా అకౌంట్ లేదా సిబ్బంది",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "caed2475"
   },
   "help.category.verification": {
     "message": "వెరిఫికేషన్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "03128bed"
   },
   "help.category.app": {
     "message": "యాప్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9445c325"
   },
   "help.category.other": {
     "message": "ఇంకేదైనా",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "48f88ac3"
   },
   "help.new.title": {
     "message": "కొత్త టికెట్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b8bf9c88"
   },
   "help.new.intro": {
     "message": "ఏం జరిగిందో చెప్పండి. సపోర్ట్ టికెట్‌పై జవాబిస్తుంది, మీరు అక్కడ ఇంకా జోడించవచ్చు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5b8aa383"
   },
   "help.new.category": {
     "message": "ఇది దేని గురించి?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "23a5beeb"
   },
   "help.new.category.pick": {
     "message": "ఒకటి ఎంచుకోండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4238dc41"
   },
   "help.new.category.required": {
     "message": "ఇది దేని గురించో ఎంచుకోండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "079e2dcc"
   },
   "help.new.subject": {
     "message": "విషయం",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8d183dbd"
   },
   "help.new.subject.help": {
-    "message": "ఒక చిన్న లైన్, ఉదాహరణకు \"మార్చి పేఅవుట్ రాలేదు\".",
-    "review": "machine",
-    "enHash": "056a26d6"
+    "message": "ఒక చిన్న లైన్, ఉదాహరణకు “మార్చి పేఅవుట్ రాలేదు”.",
+    "review": "reviewed",
+    "enHash": "08192782"
   },
   "help.new.subject.required": {
     "message": "{min} నుండి {max} అక్షరాల విషయం రాయండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2583925c"
   },
   "help.new.store": {
     "message": "ఏ దుకాణం?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "54f0dfee"
   },
   "help.new.store.none": {
     "message": "ఒక దుకాణం గురించి కాదు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "98a3c63e"
   },
   "help.new.order": {
     "message": "ఏ ఆర్డర్?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "21813ae5"
   },
   "help.new.order.none": {
     "message": "ఒక ఆర్డర్ గురించి కాదు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f29403b4"
   },
   "help.new.order.help": {
     "message": "ఈ దుకాణం యొక్క ఇటీవలి ఆర్డర్‌లు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "45dd645c"
   },
   "help.new.order.failed": {
     "message": "ఆర్డర్‌లు లోడ్ కాలేదు. అయినా మీరు టికెట్ పంపి, మెసేజ్‌లో ఆర్డర్ చెప్పవచ్చు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f7796d10"
   },
   "help.new.body": {
     "message": "ఏం జరిగింది?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e9ef659a"
   },
   "help.new.body.help": {
     "message": "ఎంత ఎక్కువ వివరం ఉంటే, అంత త్వరగా సహాయం చేయగలం.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2f8737b5"
   },
   "help.new.body.required": {
     "message": "ఒక మెసేజ్ రాయండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c8e96b81"
   },
   "help.new.fieldRefused": {
     "message": "ఇది అంగీకరించబడలేదు. మళ్ళీ ఎంచుకోండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f557af62"
   },
   "help.new.send": {
     "message": "సపోర్ట్‌కు పంపండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e0b3861b"
   },
   "help.new.sent": {
     "message": "టికెట్ {number} పంపబడింది",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "99303bb3"
   },
   "help.ticket.loading": {
     "message": "టికెట్ లోడ్ అవుతోంది",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ee58be8e"
   },
   "help.ticket.title": {
     "message": "టికెట్ {number}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fc0bae40"
   },
   "help.ticket.messages": {
     "message": "మెసేజ్‌లు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f1702b46"
   },
   "help.ticket.fromSupport": {
     "message": "TodayZ సపోర్ట్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f0829b0f"
   },
   "help.ticket.fromYou": {
     "message": "మీ బిజినెస్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d8f3e8b6"
   },
   "help.ticket.state.open": {
     "message": "సపోర్ట్ ఇక్కడ జవాబిస్తుంది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fcb604cd"
   },
   "help.ticket.state.waiting": {
     "message": "సపోర్ట్ జవాబిచ్చింది. ఇంకా సహాయం కావాలంటే కింద జవాబివ్వండి, టికెట్ మళ్ళీ తెరుచుకుంటుంది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e360387a"
   },
   "help.ticket.state.resolved": {
     "message": "సపోర్ట్ దీన్ని పరిష్కరించినట్లు గుర్తించింది. కాకపోతే కింద జవాబివ్వండి, టికెట్ మళ్ళీ తెరుచుకుంటుంది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "22fde542"
   },
   "help.ticket.state.closed": {
     "message": "ఈ టికెట్ మూసివేయబడింది, ఇకపై మెసేజ్‌లు తీసుకోదు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7e6e9eca"
   },
   "help.ticket.newInstead": {
     "message": "కొత్త టికెట్ తెరవండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c36c110e"
   },
   "help.ticket.notFound.title": {
     "message": "టికెట్ కనిపించలేదు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fb25ca39"
   },
   "help.ticket.notFound.body": {
     "message": "ఇది వేరే బిజినెస్‌ది కావచ్చు, లేదా లింక్ తప్పు కావచ్చు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "08e62202"
   },
   "help.ticket.notFound.action": {
     "message": "మీ టికెట్‌లు చూడండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2a142fb0"
   },
   "help.ticket.error.title": {
     "message": "టికెట్ లోడ్ కాలేదు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "51a4c349"
   },
   "help.reply.title": {
     "message": "జవాబు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6c2bb735"
   },
   "help.reply.label": {
     "message": "మీ మెసేజ్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f190c98e"
   },
   "help.reply.help": {
     "message": "సపోర్ట్ దీన్ని ఈ టికెట్‌పై చూస్తుంది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0b3c7ee4"
   },
   "help.reply.reopens": {
     "message": "జవాబు పంపితే టికెట్ మళ్ళీ తెరుచుకుంటుంది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "afd6995f"
   },
   "help.reply.send": {
     "message": "జవాబు పంపండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7f7e603a"
   },
   "help.files.add": {
     "message": "ఫోటో లేదా PDF జోడించండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ef72b016"
   },
   "help.files.uploading": {
     "message": "అప్‌లోడ్ అవుతోంది",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "de272409"
   },
   "help.files.help": {
     "message": "JPEG, PNG, WebP లేదా PDF, ఒక్కొక్కటి {mb} MB వరకు, గరిష్ఠంగా {max} ఫైల్‌లు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8a7ca2f9"
   },
   "help.files.list": {
     "message": "ఫైల్‌లు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6ce6c512"
   },
   "help.files.remove": {
     "message": "{name} తీసివేయండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "df7193a5"
   },
   "help.files.type": {
     "message": "{name} ఫోటో లేదా PDF కాదు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0299449c"
   },
   "help.files.size": {
     "message": "{name} {mb} MB కంటే పెద్దది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "24ccdc18"
   },
   "help.files.tooMany": {
     "message": "ఒక మెసేజ్‌కు గరిష్ఠంగా {max} ఫైల్‌లు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d7a902ec"
   },
   "help.files.failed": {
     "message": "{name} అప్‌లోడ్ కాలేదు. మళ్ళీ ప్రయత్నించండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cd16e9c2"
   },
   "help.error.validation_failed": {
     "message": "కొన్ని వివరాలు అంగీకరించబడలేదు. ఫారమ్ చూసి మళ్ళీ ప్రయత్నించండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f1164913"
   },
   "help.error.forbidden": {
     "message": "ఇది యజమాని లేదా మేనేజర్ మాత్రమే చేయగలరు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "53dd9bab"
   },
   "help.error.not_found": {
     "message": "ఈ టికెట్ ఇప్పుడు అందుబాటులో లేదు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9c3df5fd"
   },
   "help.error.invalid_transition": {
     "message": "ఈ టికెట్ మూసివేయబడింది, ఇకపై మెసేజ్‌లు తీసుకోదు. కొత్త టికెట్ తెరవండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7bfa6828"
   },
   "help.error.generic": {
     "message": "అది జరగలేదు. మీ కనెక్షన్ చూసి మళ్ళీ ప్రయత్నించండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "462c8c1d"
   },
   "help.files.empty": {
     "message": "{name} ఖాళీగా ఉంది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "83f58457"
   }
 }

@@ -64,7 +64,7 @@
     "description": "Guide step 2 title"
   },
   "help.how.orders.body": {
-    "defaultMessage": "A new order rings on the Orders screen. Accept it, take part of it, or say why you cannot before its timer runs out.",
+    "defaultMessage": "A new order rings on the “Orders” screen. Accept it, take part of it, or say why you cannot before its timer runs out.",
     "description": "Guide step 2"
   },
   "help.how.pickup.title": {
@@ -80,7 +80,7 @@
     "description": "Guide step 4 title"
   },
   "help.how.counter.body": {
-    "defaultMessage": "Ring up walk-in sales on Sell, even offline. Stock goes down as you sell.",
+    "defaultMessage": "Ring up walk-in sales on “Sell”, even offline. Stock goes down as you sell.",
     "description": "Guide step 4"
   },
   "help.how.credits.title": {
@@ -108,7 +108,7 @@
     "description": "FAQ question"
   },
   "help.faq.timer.a": {
-    "defaultMessage": "The order lapses and the customer is told. Missed orders lower where your shop shows in search, so keep the Orders screen open while you are open.",
+    "defaultMessage": "The order lapses and the customer is told. Missed orders lower where your shop shows in search, so keep the “Orders” screen open while you are open.",
     "description": "FAQ answer"
   },
   "help.faq.code.q": {
@@ -116,7 +116,7 @@
     "description": "FAQ question"
   },
   "help.faq.code.a": {
-    "defaultMessage": "A code works only while the order is accepted or ready, and only once. After too many wrong tries it locks: ask the customer to tap \"New code\" in their app.",
+    "defaultMessage": "A code works only while the order is accepted or ready, and only once. After too many wrong tries it locks: ask the customer to tap “Get a new code” in their app.",
     "description": "FAQ answer"
   },
   "help.faq.credits.q": {
@@ -132,7 +132,7 @@
     "description": "FAQ question"
   },
   "help.faq.payout.a": {
-    "defaultMessage": "A statement closes on the 1st of each month. What you are owed is paid by UPI, and the Credits screen shows it as paid with the UTR reference. A payout waits while your verification is incomplete.",
+    "defaultMessage": "A statement closes on the 1st of each month. What you are owed is paid by UPI, and the “Credits” screen shows it as paid with the UTR reference. A payout waits while your verification is incomplete.",
     "description": "FAQ answer"
   },
   "help.faq.visible.q": {
@@ -280,7 +280,7 @@
     "description": "Subject field label"
   },
   "help.new.subject.help": {
-    "defaultMessage": "A short line, like \"Payout for March not received\".",
+    "defaultMessage": "A short line, like “Payout for March not received”.",
     "description": "Subject field help"
   },
   "help.new.subject.required": {

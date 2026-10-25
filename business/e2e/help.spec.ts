@@ -1,5 +1,6 @@
 import { VIEWPORTS, guardPage, shot, type PageGuard } from '@todayz/config/playwright';
 import { expect, test, type Page, type Route } from '@playwright/test';
+import { overview } from '../src/test/insightsData';
 
 // B-15 help and tickets (W3-08) on the production-shaped build with a faked API (no stack): the
 // guide for every role, opening a ticket with a store, an order and a photo (SC-SP-01, SP-07),
@@ -123,6 +124,8 @@ async function fakeApi(page: Page, role: 'owner' | 'cashier' = 'owner') {
         invitations: [],
       });
     }
+    // The owner's sidebar reads today's overview for the Stock badge and the setup card (W3-03).
+    if (p === `${biz}/stores/${SID}/overview`) return ok(route, overview({ newOrders: [] }));
     if (p === `${biz}/stores/${SID}/orders`) {
       const status = url.searchParams.get('status');
       return ok(route, { items: ORDERS.filter((o) => o.status === status), nextCursor: null, serverNow: new Date().toISOString() });
