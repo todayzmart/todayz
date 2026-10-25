@@ -110,6 +110,8 @@ Branch `claude/w3-16-asks-457dd8`, from merge base `1465e58`. Scenarios: [e2e/sc
 
 I did not run the full `make check` or `make e2e`; the lead runs those after merge.
 
+After merging main at `e279f31`: `make gen`, `go build`, golangci-lint (0 issues), and the `cmd/todayz`, `insights`, `share` and `asks` DB tests all pass. Business typecheck passes, and i18n vitest passes (198/198). Business vitest is 496/498. The 2 failures are on main, not this branch: `src/ai-drafts/ai.test.tsx` (W3-11) still expects the wording that lead commit `3965a70` changed in `ai.en.json` ("Add the item in Stock first", and the plural sentence that moved to the end of `ai.partial`).
+
 ## Screenshots (`docs/qa/W3-16/`)
 
 - **Customer:**
