@@ -171,9 +171,12 @@ const (
 	SupportTicketsPerHour Key = "support_tickets_per_hour" // count, default 5
 	SupportUploadsPerHour Key = "support_uploads_per_hour" // count, default 30
 	SupportUploadTTLHours Key = "support_upload_ttl_hours" // hours, default 24
+
+	// Added by field agents (seeded by 30602_w3-06_field_limits.sql)
+	FieldOwnerCodesPerAgentHour Key = "field_owner_codes_per_agent_hour" // count, default 10
 )
 
-// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101, D-110, D-131, D-218, D-222, D-225, D-226).
+// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101, D-110, D-131, D-218, D-222, D-225, D-226, D-232).
 var AllKeys = []Key{
 	OrderAcceptTimeoutMin,
 	PickupHoldMin,
@@ -312,4 +315,5 @@ var AllKeys = []Key{
 	SupportTicketsPerHour,
 	SupportUploadsPerHour,
 	SupportUploadTTLHours,
+	FieldOwnerCodesPerAgentHour,
 }

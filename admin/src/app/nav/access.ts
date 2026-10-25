@@ -15,6 +15,8 @@ const SUPPORT_UP: readonly Role[] = ['support', ...ADMINS];
  */
 export const SECTION_ROLES: Readonly<Record<string, readonly Role[]>> = {
   '': ['support', 'catalogue', 'analyst', 'finance', ...ADMINS],
+  /** A-04 (admin.field.*): agents and admins. */
+  field: ['field_agent', ...ADMINS],
   businesses: ['field_agent', ...SUPPORT_UP],
   stores: SUPPORT_UP,
   customers: SUPPORT_UP,
@@ -29,6 +31,8 @@ export const SECTION_ROLES: Readonly<Record<string, readonly Role[]>> = {
   referrals: ADMINS,
   catalogue: ['catalogue', ...ADMINS],
   demand: ['field_agent', 'catalogue', 'analyst', ...ADMINS],
+  /** A-15: an agent sees only their own row (D-64). */
+  'field-agents': ['field_agent', ...ADMINS],
   payouts: ['finance', ...ADMINS],
   'admin-users': ['super_admin'],
   settings: ADMINS,
@@ -66,6 +70,8 @@ export const ACTION_ROLES = {
   jobAct: ADMINS,
   /** A-21 on a `money` kind: super_admin, after step-up (06 A-21). */
   jobMoneyAct: ['super_admin'],
+  /** A-15 every agent's row (`/v1/admin/field-agents`); an agent reads only `/field/me/stats`. */
+  fieldAgentsAll: ADMINS,
 } as const satisfies Record<string, readonly Role[]>;
 export type Action = keyof typeof ACTION_ROLES;
 

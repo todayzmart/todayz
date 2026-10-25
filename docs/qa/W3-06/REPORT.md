@@ -1,0 +1,175 @@
+# W3-06 Field agents: QA report
+
+This covers A-04 (a field agent creates a business for a shop) and A-15 (field agent stats), on the backend and in the admin console. The branch is `claude/w3-06-field-a8ac7f`, with local `main` 6a2c248 merged in (no fetch). Everything ran locally: nothing was pushed, and no cloud account or provider was called.
+
+## What was built
+
+**Contract (`backend/api/{paths,schemas}/admin-field.yaml`)** These routes sit under `/v1/admin/field/businesses`:
+- create, list, read and update;
+- stores;
+- photos (`documents`, which answers a presigned PUT);
+- owner code send and verify (`owner-confirm`, `owner-confirm/verify`);
+- store items: list, add one, edit;
+- catalogue search per store (`products`).
+
+Stats come from `/v1/admin/field/me/stats` (the agent's own row) and `/v1/admin/field-agents` (admins).
+
+**Database** Migration 30601 adds two tables:
+- `field_owner_codes`: only a keyed hash of each code, plus the hash of the phone it went to;
+- `field_item_adds`: which agent added which item, for A-15.
+
+`businesses.onboarded_by` (from W1-04) is the attribution. Field policy actions are in `platform/authz/policy/field.go`, with the golden file `field.golden`.
+
+**Backend (`internal/business/agent*.go`)**
+- *Ownership:* an agent sees and changes only the businesses they onboarded. Another agent's business is 403. A business the shop created itself is 404 on these routes.
+- *Edit window (D-39):* items, stores and photos are open to the agent until `field_agent_edit_window_days` after verification. The number is read from `platform_settings`, the end is inclusive (`verified_at + window` itself is still open), and admins are not windowed. Rejected and suspended businesses are closed to everyone, admins included.
+- *Items (D-232):* an agent changes only the items it added (recorded in `field_item_adds`). An owner-added item is 403 for the agent; admins change any item.
+- *Owner code:*
+  - 6 digits, sent by SMS to the owner's number.
+  - `submit_incomplete` (409, with the missing fields) is returned before any SMS.
+  - Tries left are in `extensions.attemptsLeft`. After the last try the code is `otp_locked` (429). An old code is `otp_expired` (401). Too many sends are `rate_limited` with Retry-After.
+  - A new owner number ends the old code. The owner's number cannot be the agent's own (422). A number that already belongs to another business's staff is not checked up front: it surfaces as a 409 when the correct code is read out, and the code stays unused.
+  - When the right code is read out, the business goes `draft` → `submitted` with `ownerConfirmed`, and the owner can see it in the business app.
+- *Items:* added one by one, either from the master catalogue or as a new product, which goes to A-08 review as `pending_review`. Adding an item already in the store is a conflict.
+- *Audit:* every write is audited with the agent as an admin actor. No audit row, log line or response carries the full number or a code.
+- *A-15 numbers:* onboarded, verified, stores live, products added, shops in the edit window, first-order rate, and an 8-week trend.
+
+**Admin console**
+- *A-04 (`admin/src/field/`):*
+  - Routes are `/field`, `/field/new` and `/field/$businessId`.
+  - The phone-first wizard has five steps: details; store (address, a "Use my location" pin or typed coordinates, phone, one opening range for the chosen days); photos (camera capture, type and size checked on the phone, PUT straight to the presigned URL); products (search, add with price and opening stock, or a new product, then edit the price inline); and owner.
+  - The owner step sends the code and shows the masked number and the expiry. It has six code boxes, says how many tries are left, and shows a resend countdown.
+  - On `submit_incomplete` the wizard sends the agent to the step that fixes it.
+  - When the window has closed, the steps are read-only.
+- *A-15 (`/field-agents`):* an agent sees only their own tiles and trend, and the page never calls `/field-agents`. Admins get a table of every agent and pick whose weekly trend to show.
+- *Sidebar:* "Add shops" sits right after Pulse, and "Field agents" sits in the Growth group. Both show to `field_agent`, `admin` and `super_admin`. A field agent now starts at `/field`.
+- *Width:* built for 360 px. The code boxes shrink to share the row beside the icon rail, and on a phone only every other week is labelled on the chart.
+
+**Copy:** `shared/i18n/messages/admin/field.en.json` (166 keys) and two keys in `shell.en.json`. The admin console is English-only, so there are no hi/kn/te/ta drafts.
+
+## Evidence
+
+All of this ran on the merged tree, at the head this report is committed in.
+
+| Check | Result |
+|---|---|
+| `make gen` | exit 0 |
+| `go build ./...`, `go vet` (business, cmd/todayz) | clean |
+| `gofmt -l`, `golangci-lint run` (business, catalogue, identity, authz, cmd/todayz) | clean, 0 issues |
+| `go test` business, catalogue, identity, authz, authz/policy (via `TODAYZ_TEST_PG_URL_FILE`) | ok (6 packages) |
+| `go test ./cmd/todayz/...`, which includes `TestFieldOnboardingHTTP`, `TestFieldOwnerCodeLimitsHTTP`, `TestFieldOwnerCodeGuardsHTTP`, `TestFieldEditWindowHTTP`, `TestFieldPhotosHTTP` and `TestFieldStatsHTTP` | ok |
+| Admin `lint`, `lint:css`, `typecheck` | clean |
+| Admin unit (`vitest run`) | 25 files, 224 tests passed (13 in `src/field/field.test.tsx`) |
+| Admin `build:e2e` | ok; precache check and dist-check pass |
+| Admin `build` (production mode) | ok with a placeholder `VITE_TURNSTILE_SITE_KEY` and an https `VITE_API_URL` set in the shell (it refuses the local test key) |
+| Admin Playwright, whole suite | 30 passed. `e2e/field.spec.ts` (3 tests) runs at 360 × 812 and fails on any sideways scroll. `e2e/roles.spec.ts` (AD-02) has the new sidebar for every role. |
+| `@todayz/i18n` vitest | 4 files, 198 tests passed |
+
+Scenarios: `e2e/scenarios/FA.md` (SC-FA-01…10), each with the tests that cover it.
+
+## Screenshots
+
+These are in `docs/qa/W3-06/`. They are from `TZ_QA_DIR=docs/qa/W3-06 pnpm exec playwright test e2e/field.spec.ts`, run in `admin/` after `pnpm run build:e2e`, against the faked API.
+
+| File | What |
+|---|---|
+| `admin-a04-new.png` | New shop on a 360 px phone |
+| `admin-a04-store.png` | Store step filled (full page) |
+| `admin-a04-items.png` | Products: a product added and "Already listed" in search |
+| `admin-a04-owner.png` | Owner code after a wrong code ("4 tries left"), resend counting down |
+| `admin-a04-confirmed.png` | Owner confirmed, shop waiting for review |
+| `admin-a04-list.png` | The agent's list of shops |
+| `admin-a15-mine.png` | A-15 for a field agent: own tiles and the 8-week trend |
+| `admin-a15-all.png` | A-15 for an admin at 1280 px: every agent (a disabled one marked "Disabled"), Lakshmi's trend picked |
+
+The owner's number in the screenshots is a masked fixture. No real number, code or token appears in any of them.
+
+## Files changed outside the owned paths
+
+The owned paths are `admin/src/field`, `internal/business/agent*.go` and `backend/api/{paths,schemas}/admin-field.yaml`.
+
+- **Backend:**
+  - `backend/cmd/todayz/routes_business.go`: mounts the field routes.
+  - `backend/cmd/todayz/field_http_test.go`: new.
+  - `backend/internal/business/{businesses,stores,documents}.go`: the writes take the actor, and store and document inserts are shared with the field routes. `documents.go` sets `confirm_by` on field uploads only. The per-kind count, which both routes use, skips `pending` rows past their `confirm_by`. Owner uploads keep `confirm_by` NULL, so the owner routes count their own pending rows as before, and stale field photos no longer count against the owner. (The b42d9ee fix put the skip in a field-only count, so an owner still got a permanent 409. This line said the skip was shared, which was wrong until the re-review.)
+  - `backend/internal/catalogue/field.go`: item adds for agents, including a new product as pending.
+  - `backend/internal/identity/field.go`: account lookup for the owner number and the SMS sender.
+  - `backend/db/queries/{business/agent,catalogue/field}.sql`
+  - `backend/db/migrations/30601_w3-06_field.sql`, `30602_w3-06_field_limits.sql` (the per-agent cap setting) `30603_w3-06_field_photo_confirm_by.sql` (`business_documents.confirm_by` and its partial index) and `30604_w3-06_owner_code_expired_audit.sql` (`field_owner_codes.expired_audited_at`)
+  - `backend/db/queries/business/business.sql`: `InsertDocument` takes `confirm_by`; `CountDocumentsOfKind` takes `now` and skips stale field photos.
+  - `backend/internal/jobs/business.go`: the `business_field_photos_sweep` job (the business domain's registry file).
+  - `backend/internal/platform/settings/keys.go`: `FieldOwnerCodesPerAgentHour`.
+  - `backend/internal/business/{business,presign}.go`: the upload URL's life is a named constant, a HEAD check for the photo confirm, and a signed DELETE for the sweep.
+  - `backend/internal/platform/authz/policy/field.go` and `testdata/field.golden`
+- **Admin:**
+  - routes `admin/src/routes/field/{index,new,$businessId}.tsx` and `admin/src/routes/field-agents/index.tsx`
+  - `admin/src/shell/nav.ts`: two entries and `BUILT_SECTIONS`. At the merge this conflicted with main's `support`; both lists are kept.
+  - `admin/src/app/nav/access.ts` and `access.test.tsx`
+  - `admin/e2e/{roles.spec,fake-api}.ts`, plus the new `admin/e2e/field.spec.ts`
+  - `admin/CLAUDE.md`: the status line. The old "edit nothing in `nav.ts`" convention now says how W3-05 and W3-06 add a section.
+- **Shared and docs:**
+  - `shared/i18n/messages/admin/field.en.json` (new) and `shell.en.json`; `field.{hi,kn,te,ta}.json` (new: `field.items.notMine` only, machine drafts with `enHash`, not reviewed by a person)
+  - `e2e/scenarios/FA.md` (new)
+  - `docs/plan/01-product-rules.md` (§17: the per-agent cap; the agent edits only its own items) and `docs/plan/12-decision-log.md` (D-232)
+
+## Lead review of b42d9ee
+
+1. **Per-agent cap on owner codes.** `field_owner_codes_per_agent_hour` (migration 30602) caps the codes one agent sends in a rolling hour, over all shops and numbers. Default **10**, bounds 1–30. Over the cap is `429 rate_limited` with Retry-After.
+   - *Sign-in OTPs:* the per-number count (5 an hour) now includes sign-in codes to the same number. The reverse is not done: identity's sign-in limiter does not count owner codes, because that would make identity read a business table. The two paths take different locks, so at the edge one extra code across the two is possible.
+   - *Blocked accounts:* no invite and no code. Create, the owner-number change, the send and a correct code are all `422 validation_failed` on `body.ownerPhone` (changed from 403 in the re-review, so the answer does not tell a blocked account apart from another refused number). A correct code for an account blocked after the send stays unused. A deleted account has lost its `phone_identities` row, so its number is treated as a new owner.
+2. **Photos.** A photo stays `pending` until the new `POST .../documents/{docId}/confirm` finds it in storage (HEAD; size and type checked) and makes it `uploaded`; the wizard calls it after the PUT. The wizard counts only `uploaded` and `accepted`. The 5-per-kind cap ignores `pending` rows older than 20 minutes (the 15-minute upload URL plus 5), and such a row can no longer be confirmed (409). The test makes four failed uploads, gets a 409 on the 6th, then a 201 once they are stale.
+3. **D-232.** An agent PATCHes only items `field_item_adds` records as its own; an owner-added item is 403. Admins change any item.
+4. **Staff numbers.** The wording above is corrected: only the agent's own number is refused up front; a staff number is a 409 after a correct code.
+5. **Admins and closed businesses.** `guard()` now refuses photos and items on a rejected or suspended business for admins too (403). A store on such a business is a 409 `invalid_transition` from the shared store insert, which checks first.
+6. **Failed tries.** Each wrong code, the one that locks, and a try on a locked code writes `business.owner_code_fail` (`outcome`, `attemptsLeft`; no number, no code) and adds to `tz_field_owner_code_failures_total{outcome}`. The metric is not on a dashboard, so `dashboards_test.go` is unchanged.
+7. **Disabled agents in A-15.** They are **marked**, not filtered out: the row stays (their shops still count) with a "Disabled" pill. `FieldAgentStats` has a new `disabled` field.
+8. **Idempotency-Key on create** is now required (400 without it). A replay with the same key returns the same draft, and there is one business, one staff row and one invite.
+9. **Tests added:** item PATCH and photo POST after the window; the exact instant `verified_at + window` (open) and one second after (closed); another agent on send and verify (403); changing the owner's number after submit (409); a correct code after a failed `submitReady` and on a blocked account (code unused); photo and item on rejected and suspended businesses; two concurrent verifies (one 200, one 409, one submit audit row).
+
+The DLT template for the owner SMS stays with the lead.
+
+## Lead re-review of 88e4624
+
+1. **Edit on owner-added items (medium).** `FieldItem` has a required `editable`: the list's `itemsEditable` and, for an agent, only the items `field_item_adds` records as theirs (D-232; one `FieldItemsAddedByAgent` query per page). It is true for admins while the list is open. The wizard shows Edit only when `editable` is true; on any item the agent did not add it shows "Added by someone else" instead. Create and update return `editable: true`. Tests: the wizard unit test, and the HTTP test checks the flag for the agent (own true, owner item false) and for an admin (all true).
+2. **Stale field photos and the owner's cap (medium).** Migration 30603 adds `business_documents.confirm_by`. Only field uploads set it (now + 20 minutes: the 15-minute URL plus 5). `CountDocumentsOfKind` serves both routes and skips `pending` rows past it, so the owner's upload on `/v1/biz/.../documents` is no longer blocked. The owner routes have no confirm step, so their rows keep `confirm_by` NULL and are never treated as stale.
+   - *Sweep:* `business_field_photos_sweep`, class maintenance, hourly at :41 IST, one run per tick, one attempt, one minute. In batches of 200 it locks the stale field rows (`FOR UPDATE SKIP LOCKED`, so a confirm and the sweep cannot both take a row), deletes each object (a missing object is fine), and marks the deleted ones `rejected` with the reason "not uploaded in time". When a delete fails, the row is left `pending` for the next run and counted in the job summary as `failed`.
+   - The REPORT line that said the skip was shared is corrected (see "Files changed outside the owned paths").
+3. **Low items, all done:**
+   - *Retry-After:* both limits use the (count − cap + 1)-th oldest send in the window (`OwnerCodeAgentSendAt`, `OwnerCodePhoneSendAt` with OFFSET count − cap), so the answer stays right after the cap is lowered.
+   - *Blocked owner:* 422 on `body.ownerPhone`, as above. The wizard shows "This number cannot own a shop on TodayZ…" on create, on the details step, on send and on verify.
+   - *Audit:* a try on a locked code writes its `locked` row once per code (the first such try bumps `attempts` past the maximum; later ones are only counted in the metric). An expired code, or one sent to an earlier owner number, is audited as `expired` with the tries left; the metric has the new `expired` outcome.
+   - *A-15:* removing the `field_agent` role hides the agent from A-15 (`FieldAgents` lists only users who hold the role), and their shops drop out of the totals. A disabled agent who keeps the role stays, marked. This is noted in `e2e/scenarios/FA.md` (FA-15). The query is unchanged.
+4. **Tests added:** an owner-route upload succeeds after four stale field photos plus one confirmed one (the cap of 5); the sweep rejects only the stale field rows, deletes their objects (one stored, three not), and leaves the confirmed photo, the owner's pending upload and a fresh field photo alone; a second sweep finds nothing; another agent's confirm is 403; a stored file of another type, or larger than declared, is 422 and the photo stays pending; at cap − 1, two concurrent sends give one 200 and one 429 (the per-agent lock); Retry-After is checked against the oldest send at cap 2 and the second oldest after the cap drops to 1; a second try on a locked code writes no second row; two expired tries are audited.
+
+## Lead review of 9152967
+
+1. **Contract wording.** `admin-field.yaml` no longer says a blocked owner account is `403`: create, patch, send and verify describe the `422 validation_failed` on `body.ownerPhone` the code returns. The item-update description says an agent's `403` covers any item they did not add, not only the shop's. `make gen` ran.
+2. **Expired tries audited once per code.** Migration 30604 adds `field_owner_codes.expired_audited_at`. The first verify on a lapsed code, or on one sent to an earlier owner number, sets it (`MarkOwnerCodeExpiredAudited`, on the row already locked `FOR UPDATE`) and writes the `expired` audit row; later tries on that code still answer `401 otp_expired` and count in `tz_field_owner_code_failures_total{outcome="expired"}`, but write no row. A marker column rather than bumping `attempts` as the locked path does, because more attempts would turn a lapsed code into `otp_locked`. Test: `TestFieldOwnerCodeLimitsHTTP` tries each expired code three times and checks one row per code (1, then 2).
+3. **"Added by the shop".** `!editable` also covers items another agent or an admin added, and the list does not say who, so the wizard now shows the neutral "Added by someone else" (`field.items.notMine`, renamed from `field.items.shopItem`). Hindi, Kannada, Telugu and Tamil are imported as machine drafts with `enHash` (`translations.mjs import`); they need a person's review. The admin app has no other translations yet.
+4. Not done, logged by the lead as follow-ups: the sweep stalling under a persistent DELETE failure, and backfilling `confirm_by` for older pending rows.
+
+## Open
+
+- **TODO(lead) `agent.go:727`:** 02 §3.3 gives stores and photos `admin.business.onboard` (own shops, no window). The code also applies the D-39 window to stores and photos. This is the conservative reading: an agent cannot add a store to a shop verified months ago.
+- **TODO(lead) `catalogue/field.go:189`:** 01 §5 does not say whether a store item of a pending product is visible to customers before A-08 approves it. The code follows the search rule, which shows active products only.
+- **TODO(lead) `identity/field.go:7`:** the owner code reuses the sign-in DLT template text. A dedicated "confirm your shop on TodayZ" template has to be registered with DLT first.
+- **Admin CSP:** the admin console has no CSP yet. When it gets one, `connect-src` needs the S3 or MinIO upload host for the photo PUT, and Permissions-Policy needs `geolocation=(self)` for "Use my location".
+- **Photos:** photos are attached to the business's first store only. With several stores the wizard does not ask which one.
+- **Hours:** the wizard has one opening range for all chosen days. Split hours or different hours per day need A-05 or the business app.
+- **Stores:** a store cannot be edited from the wizard after it is created, because the contract has no field store update. A-05 can edit the pin and hours.
+- **Owner-code expiry:** the code response has no `serverNow`, so the expiry is shown as an IST clock time from `expiresAt` rather than as a relative "in 5 minutes".
+- **Error codes:** the contract keeps sign-in's codes for the owner code: `otp_locked` 429 and `otp_expired` 401.
+
+- **Business-app uploads:** the W1-04 owner upload has the same gap the field photos had (nothing moves a document from `pending` to `uploaded`). The field routes now have a confirm step; the business app does not.
+
+## Questions for the lead
+
+1. Should the edit window apply to stores and photos (as built), or only to items (02 §3.3 as written)?
+2. Can customers see an item of a pending product before A-08 approves it? It is hidden for now.
+
+## Not verified
+
+- A real SMS to the owner's phone: no provider is called in worker sessions. Locally, the owner code goes to the log-only sender, and reserved test numbers take 000000.
+- Photo capture with a real phone camera, and "Use my location" on a device. Both were checked only with a set file and typed coordinates.
+- The journey against the running stack (`make dev`): the Playwright journeys run against a faked API. The real API is covered by the Go HTTP tests.
+- `make check`, `make e2e`, `make reset`: these are not run in worker sessions.

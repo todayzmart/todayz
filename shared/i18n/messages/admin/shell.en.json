@@ -19,6 +19,10 @@
     "defaultMessage": "Pulse",
     "description": "Navigation item: platform overview"
   },
+  "shell.nav.field": {
+    "defaultMessage": "Add shops",
+    "description": "Navigation item: field agents onboard shops (A-04)"
+  },
   "shell.nav.businesses": {
     "defaultMessage": "Businesses",
     "description": "Navigation item"
@@ -86,6 +90,10 @@
   "shell.nav.demand": {
     "defaultMessage": "Demand",
     "description": "Navigation item: demand gaps and the site search strip (A-23)"
+  },
+  "shell.nav.fieldAgents": {
+    "defaultMessage": "Field agents",
+    "description": "Navigation item: field agent stats (A-15)"
   },
   "shell.nav.audit": {
     "defaultMessage": "Audit log",

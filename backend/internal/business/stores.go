@@ -13,6 +13,7 @@ import (
 	businessapi "github.com/todayz/backend/gen/api/business"
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/gen/sqlc/businessdb"
+	"github.com/todayz/backend/internal/platform/audit"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/authz/policy"
 	"github.com/todayz/backend/internal/platform/db"
@@ -290,7 +291,18 @@ func (s *Service) createStore(ctx context.Context, bidStr string, body *business
 		// new store would sit outside their own scope); 02 §3.3 does not say.
 		return businessapi.Store{}, 0, problem.New(genproblems.Forbidden, "")
 	}
+	st, err := s.insertStore(ctx, audit.ActorStaff, p.UserID, bid, body, nil)
+	if err != nil {
+		return businessapi.Store{}, 0, err
+	}
+	out, err := s.toStore(st, s.clock.Now())
+	return out, st.Version, err
+}
 
+// insertStore adds a draft store to the business and audits it as the actor
+// (kind, uid). check, when set, runs first in the store's transaction (a
+// field agent's edit window).
+func (s *Service) insertStore(ctx context.Context, kind string, uid, bid ids.ID, body *businessapi.StoreCreate, check func(context.Context) error) (businessdb.GetStoreRow, error) {
 	// The id comes first: the phone is sealed for it, and every retry below
 	// reuses it (a failed attempt rolled back, so the id is still free).
 	sid := ids.New(s.clock.Now())
@@ -308,7 +320,7 @@ func (s *Service) createStore(ctx context.Context, bidStr string, body *business
 		hours = storedHours(&v, "body.hours", *body.Hours)
 	}
 	if err := v.err(); err != nil {
-		return businessapi.Store{}, 0, err
+		return businessdb.GetStoreRow{}, err
 	}
 	var lat, lng *float64
 	if body.Location != nil {
@@ -323,11 +335,16 @@ func (s *Service) createStore(ctx context.Context, bidStr string, body *business
 	for attempt := 0; ; attempt++ {
 		slug, code, err := s.storeCodes(ctx, base, attempt)
 		if err != nil {
-			return businessapi.Store{}, 0, err
+			return businessdb.GetStoreRow{}, err
 		}
 		err = s.db.InTx(ctx, func(ctx context.Context) error {
 			if err := s.businessOpen(ctx, bid); err != nil {
 				return err
+			}
+			if check != nil {
+				if err := check(ctx); err != nil {
+					return err
+				}
 			}
 			now := s.clock.Now()
 			if err := s.q(ctx).InsertStore(ctx, businessdb.InsertStoreParams{
@@ -338,7 +355,7 @@ func (s *Service) createStore(ctx context.Context, bidStr string, body *business
 			}); err != nil {
 				return err
 			}
-			return s.writeAudit(ctx, p.UserID, "store.create", "store", sid.String(), nil,
+			return s.writeAuditAs(ctx, kind, uid, "store.create", "store", sid.String(), nil,
 				map[string]any{"name": body.Name, "slug": slug, "shortCode": code, "businessId": bid.String()})
 		})
 		retry := db.IsUniqueViolation(err, "ux_stores_slug") || db.IsUniqueViolation(err, "ux_stores_short_code")
@@ -346,16 +363,11 @@ func (s *Service) createStore(ctx context.Context, bidStr string, body *business
 			continue
 		}
 		if err != nil {
-			return businessapi.Store{}, 0, fmt.Errorf("business: create store: %w", err)
+			return businessdb.GetStoreRow{}, fmt.Errorf("business: create store: %w", err)
 		}
 		break
 	}
-	st, err := s.loadStore(ctx, bid, sid)
-	if err != nil {
-		return businessapi.Store{}, 0, err
-	}
-	out, err := s.toStore(st, s.clock.Now())
-	return out, st.Version, err
+	return s.loadStore(ctx, bid, sid)
 }
 
 // storeCodes picks a slug (base, or base plus a random suffix when base is

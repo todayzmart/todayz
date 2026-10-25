@@ -80,6 +80,12 @@ func (s *Service) membership(ctx context.Context, uid, bid ids.ID) (authz.Member
 
 func (s *Service) writeAudit(ctx context.Context, uid ids.ID, action, subjectType, subjectID string, before, after any) error {
 	kind, id := actor(uid)
+	return s.writeAuditAs(ctx, kind, id, action, subjectType, subjectID, before, after)
+}
+
+// writeAuditAs writes an audit row for an actor kind (a field agent's change
+// is an admin's, audit.ActorAdmin).
+func (s *Service) writeAuditAs(ctx context.Context, kind string, id ids.ID, action, subjectType, subjectID string, before, after any) error {
 	if _, err := s.audit.Write(ctx, audit.Entry{
 		ActorKind: kind, ActorID: id, Action: action,
 		SubjectType: subjectType, SubjectID: subjectID, Before: before, After: after,
@@ -396,6 +402,40 @@ func incomplete(fields []string) error {
 	return p
 }
 
+// submitReady checks a business has what a review needs: the category and
+// at least one store with every detail (409 submit_incomplete naming what is
+// missing).
+func submitReady(ctx context.Context, q *businessdb.Queries, cur businessdb.Business) error {
+	var missing []string
+	if !cur.CategoryID.Valid {
+		missing = append(missing, "categoryId")
+	}
+	stores, err := q.CountSubmitStores(ctx, cur.ID)
+	if err != nil {
+		return err
+	}
+	complete := false
+	var storeMissing []string
+	for i, st := range stores {
+		gaps := storeGaps(fmt.Sprintf("stores[%d].", i), st)
+		if len(gaps) == 0 {
+			complete = true
+			break
+		}
+		storeMissing = append(storeMissing, gaps...)
+	}
+	switch {
+	case len(stores) == 0:
+		missing = append(missing, "stores")
+	case !complete:
+		missing = append(missing, storeMissing...)
+	}
+	if len(missing) > 0 {
+		return incomplete(missing)
+	}
+	return nil
+}
+
 // submitBusiness sends a draft or needs_info business for verification. It
 // needs the category and at least one store with every detail a review needs.
 func (s *Service) submitBusiness(ctx context.Context, bidStr string) (businessapi.Business, int32, error) {
@@ -427,32 +467,8 @@ func (s *Service) submitBusiness(ctx context.Context, bidStr string) (businessap
 		if cur.Status != businessDraft && cur.Status != businessNeedsInfo {
 			return problem.New(genproblems.InvalidTransition, "")
 		}
-		var missing []string
-		if !cur.CategoryID.Valid {
-			missing = append(missing, "categoryId")
-		}
-		stores, err := q.CountSubmitStores(ctx, cur.ID)
-		if err != nil {
+		if err := submitReady(ctx, q, cur); err != nil {
 			return err
-		}
-		complete := false
-		var storeMissing []string
-		for i, st := range stores {
-			gaps := storeGaps(fmt.Sprintf("stores[%d].", i), st)
-			if len(gaps) == 0 {
-				complete = true
-				break
-			}
-			storeMissing = append(storeMissing, gaps...)
-		}
-		switch {
-		case len(stores) == 0:
-			missing = append(missing, "stores")
-		case !complete:
-			missing = append(missing, storeMissing...)
-		}
-		if len(missing) > 0 {
-			return incomplete(missing)
 		}
 		b, err = q.SubmitBusiness(ctx, businessdb.SubmitBusinessParams{Now: s.clock.Now(), ID: cur.ID})
 		if db.IsNoRows(err) {
