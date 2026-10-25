@@ -103,9 +103,10 @@ func (r CloseResult) Summary() map[string]int64 {
 }
 
 // ClosePeriod returns the month a run at t closes: the IST month before the
-// one holding t.
+// one holding t. The month is stepped in IST: stepping the UTC instant of
+// 1 July 00:00 IST (30 June 18:30 UTC) would land on 31 May IST.
 func ClosePeriod(t time.Time) time.Time {
-	return clock.StartOfMonthIST(t).AddDate(0, -1, 0).In(clock.IST)
+	return clock.StartOfMonthIST(t).In(clock.IST).AddDate(0, -1, 0)
 }
 
 // CloseMonth writes the statement of the IST month holding month for every
