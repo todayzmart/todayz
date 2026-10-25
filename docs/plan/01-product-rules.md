@@ -474,7 +474,8 @@ Admin roles (D-64; summary, the full permission matrix is in 02). There are 7 ro
 - TodayZ employees with a `field_agent` admin login (phone-friendly screens). No commission.
 - They create a business on the shop's behalf (shop owner confirms by OTP on their own phone), capture photos and documents, add products from the master catalogue (or create missing ones), and print/hand over the QR standee.
 - They can add and edit items only for businesses they onboarded, until `field_agent_edit_window_days` (30) after that business is verified. They edit only the items they added themselves; an item the shop added is the shop's (D-232).
-- The owner's code follows the sign-in OTP rules (§2). The per-number send limit counts the sign-in codes sent to that number too. One agent may send at most `field_owner_codes_per_agent_hour` owner codes in any rolling hour (`429 rate_limited`). No invite or code goes to a number whose account is blocked (`403`).
+- The owner's code follows the sign-in OTP rules (§2). The per-number send limit counts the sign-in codes sent to that number too. One agent may send at most `field_owner_codes_per_agent_hour` owner codes in any rolling hour (`429 rate_limited`). No invite or code goes to a number whose account is blocked (`422` on the owner number, the same answer as any number that cannot own a business).
+- A field photo counts only once the agent's app confirms it is stored. One never confirmed within the upload URL's life plus 5 minutes does not count toward the 5-per-kind cap (on the business app either), and the hourly `business_field_photos_sweep` job (`maintenance`) deletes its file and marks it rejected (D-232).
 - Every business records `onboarded_by`; admin sees per agent: shops onboarded, verified, products added, first-order rate. Each field agent sees the same numbers for themselves only.
 
 ## 15. Notifications

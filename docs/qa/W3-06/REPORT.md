@@ -91,13 +91,15 @@ The owned paths are `admin/src/field`, `internal/business/agent*.go` and `backen
 - **Backend:**
   - `backend/cmd/todayz/routes_business.go`: mounts the field routes.
   - `backend/cmd/todayz/field_http_test.go`: new.
-  - `backend/internal/business/{businesses,stores,documents}.go`: the writes take the actor, and store and document inserts are shared with the field routes. `documents.go`'s per-kind count now skips `pending` rows past the upload URL's life plus 5 minutes, which the owner routes share. Otherwise there is no behaviour change for the owner routes.
+  - `backend/internal/business/{businesses,stores,documents}.go`: the writes take the actor, and store and document inserts are shared with the field routes. `documents.go` sets `confirm_by` on field uploads only. The per-kind count, which both routes use, skips `pending` rows past their `confirm_by`. Owner uploads keep `confirm_by` NULL, so the owner routes count their own pending rows as before, and stale field photos no longer count against the owner. (The b42d9ee fix put the skip in a field-only count, so an owner still got a permanent 409. This line said the skip was shared, which was wrong until the re-review.)
   - `backend/internal/catalogue/field.go`: item adds for agents, including a new product as pending.
   - `backend/internal/identity/field.go`: account lookup for the owner number and the SMS sender.
   - `backend/db/queries/{business/agent,catalogue/field}.sql`
-  - `backend/db/migrations/30601_w3-06_field.sql` and `30602_w3-06_field_limits.sql` (the per-agent cap setting)
+  - `backend/db/migrations/30601_w3-06_field.sql`, `30602_w3-06_field_limits.sql` (the per-agent cap setting) and `30603_w3-06_field_photo_confirm_by.sql` (`business_documents.confirm_by` and its partial index)
+  - `backend/db/queries/business/business.sql`: `InsertDocument` takes `confirm_by`; `CountDocumentsOfKind` takes `now` and skips stale field photos.
+  - `backend/internal/jobs/business.go`: the `business_field_photos_sweep` job (the business domain's registry file).
   - `backend/internal/platform/settings/keys.go`: `FieldOwnerCodesPerAgentHour`.
-  - `backend/internal/business/{business,presign}.go`: the upload URL's life is a named constant, and a HEAD check for the photo confirm.
+  - `backend/internal/business/{business,presign}.go`: the upload URL's life is a named constant, a HEAD check for the photo confirm, and a signed DELETE for the sweep.
   - `backend/internal/platform/authz/policy/field.go` and `testdata/field.golden`
 - **Admin:**
   - routes `admin/src/routes/field/{index,new,$businessId}.tsx` and `admin/src/routes/field-agents/index.tsx`
@@ -114,7 +116,7 @@ The owned paths are `admin/src/field`, `internal/business/agent*.go` and `backen
 
 1. **Per-agent cap on owner codes.** `field_owner_codes_per_agent_hour` (migration 30602) caps the codes one agent sends in a rolling hour, over all shops and numbers. Default **10**, bounds 1–30. Over the cap is `429 rate_limited` with Retry-After.
    - *Sign-in OTPs:* the per-number count (5 an hour) now includes sign-in codes to the same number. The reverse is not done: identity's sign-in limiter does not count owner codes, because that would make identity read a business table. The two paths take different locks, so at the edge one extra code across the two is possible.
-   - *Blocked accounts:* no invite and no code. Create, the owner-number change and the send are 403. A correct code for an account blocked after the send is 403 and the code stays unused. A deleted account has lost its `phone_identities` row, so its number is treated as a new owner.
+   - *Blocked accounts:* no invite and no code. Create, the owner-number change, the send and a correct code are all `422 validation_failed` on `body.ownerPhone` (changed from 403 in the re-review, so the answer does not tell a blocked account apart from another refused number). A correct code for an account blocked after the send stays unused. A deleted account has lost its `phone_identities` row, so its number is treated as a new owner.
 2. **Photos.** A photo stays `pending` until the new `POST .../documents/{docId}/confirm` finds it in storage (HEAD; size and type checked) and makes it `uploaded`; the wizard calls it after the PUT. The wizard counts only `uploaded` and `accepted`. The 5-per-kind cap ignores `pending` rows older than 20 minutes (the 15-minute upload URL plus 5), and such a row can no longer be confirmed (409). The test makes four failed uploads, gets a 409 on the 6th, then a 201 once they are stale.
 3. **D-232.** An agent PATCHes only items `field_item_adds` records as its own; an owner-added item is 403. Admins change any item.
 4. **Staff numbers.** The wording above is corrected: only the agent's own number is refused up front; a staff number is a 409 after a correct code.
@@ -125,6 +127,19 @@ The owned paths are `admin/src/field`, `internal/business/agent*.go` and `backen
 9. **Tests added:** item PATCH and photo POST after the window; the exact instant `verified_at + window` (open) and one second after (closed); another agent on send and verify (403); changing the owner's number after submit (409); a correct code after a failed `submitReady` and on a blocked account (code unused); photo and item on rejected and suspended businesses; two concurrent verifies (one 200, one 409, one submit audit row).
 
 The DLT template for the owner SMS stays with the lead.
+
+## Lead re-review of 88e4624
+
+1. **Edit on owner-added items (medium).** `FieldItem` has a required `editable`: the list's `itemsEditable` and, for an agent, only the items `field_item_adds` records as theirs (D-232; one `FieldItemsAddedByAgent` query per page). It is true for admins while the list is open. The wizard shows Edit only when `editable` is true; on a shop's own item it shows "Added by the shop" instead. Create and update return `editable: true`. Tests: the wizard unit test, and the HTTP test checks the flag for the agent (own true, owner item false) and for an admin (all true).
+2. **Stale field photos and the owner's cap (medium).** Migration 30603 adds `business_documents.confirm_by`. Only field uploads set it (now + 20 minutes: the 15-minute URL plus 5). `CountDocumentsOfKind` serves both routes and skips `pending` rows past it, so the owner's upload on `/v1/biz/.../documents` is no longer blocked. The owner routes have no confirm step, so their rows keep `confirm_by` NULL and are never treated as stale.
+   - *Sweep:* `business_field_photos_sweep`, class maintenance, hourly at :41 IST, one run per tick, one attempt, one minute. In batches of 200 it locks the stale field rows (`FOR UPDATE SKIP LOCKED`, so a confirm and the sweep cannot both take a row), deletes each object (a missing object is fine), and marks the deleted ones `rejected` with the reason "not uploaded in time". When a delete fails, the row is left `pending` for the next run and counted in the job summary as `failed`.
+   - The REPORT line that said the skip was shared is corrected (see "Files changed outside the owned paths").
+3. **Low items, all done:**
+   - *Retry-After:* both limits use the (count − cap + 1)-th oldest send in the window (`OwnerCodeAgentSendAt`, `OwnerCodePhoneSendAt` with OFFSET count − cap), so the answer stays right after the cap is lowered.
+   - *Blocked owner:* 422 on `body.ownerPhone`, as above. The wizard shows "This number cannot own a shop on TodayZ…" on create, on the details step, on send and on verify.
+   - *Audit:* a try on a locked code writes its `locked` row once per code (the first such try bumps `attempts` past the maximum; later ones are only counted in the metric). An expired code, or one sent to an earlier owner number, is audited as `expired` with the tries left; the metric has the new `expired` outcome.
+   - *A-15:* removing the `field_agent` role hides the agent from A-15 (`FieldAgents` lists only users who hold the role), and their shops drop out of the totals. A disabled agent who keeps the role stays, marked. This is noted in `e2e/scenarios/FA.md` (FA-15). The query is unchanged.
+4. **Tests added:** an owner-route upload succeeds after four stale field photos plus one confirmed one (the cap of 5); the sweep rejects only the stale field rows, deletes their objects (one stored, three not), and leaves the confirmed photo, the owner's pending upload and a fresh field photo alone; a second sweep finds nothing; another agent's confirm is 403; a stored file of another type, or larger than declared, is 422 and the photo stays pending; at cap − 1, two concurrent sends give one 200 and one 429 (the per-agent lock); Retry-After is checked against the oldest send at cap 2 and the second oldest after the cap drops to 1; a second try on a locked code writes no second row; two expired tries are audited.
 
 ## Open
 
