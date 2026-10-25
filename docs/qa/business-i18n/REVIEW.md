@@ -9,6 +9,7 @@ Claude machine-wrote the translations in `shared/i18n/messages/business/*.{hi,kn
 | Date | Approver | What | Note |
 |---|---|---|---|
 | 2026-10-25 | founder (Rahul) | Business app Hindi, Kannada, Telugu and Tamil: all 1374 keys each (`review: reviewed`) (including the 23 W2-16 keys), then the 30 W3-09 standee keys (1404 each) | Released on the founder's instruction (25 Oct) without a native-speaker review. Argument checks pass (`lint:messages`: business 0 errors, 1404/1404 reviewed per language). Each language's uncertain strings are listed below and still need a native speaker's read. |
+| 2026-10-25 | founder (Rahul), relayed by the W2-14 lead | W3-01 B-10 monthly statements: the 30 `statements.*` keys in hi, kn, te and ta (1433 each on this branch) | Approved under the founder's 25 Oct release instruction; no native-speaker review yet. Placeholders (`{amount}`, `{date}`, `{utr}`, `{month}`) are unchanged and ₹ comes from `{amount}`. The money wording to spot-check is listed below. |
 
 `translations.mjs approve` only sets `review: reviewed` in the catalogue. This table is the record of who approved and when.
 
@@ -24,6 +25,17 @@ The 30 keys W3-09 added to `standee.en.json` (QR standee campaigns and the scan 
 | `standee.campaigns.title` | Campaigns | hi कैंपेन · kn ಅಭಿಯಾನಗಳು · te క్యాంపెయిన్‌లు · ta பிரச்சாரங்கள் | ಅಭಿಯಾನ and பிரச்சாரம் are formal; shop staff may prefer a transliteration. |
 | `standee.campaigns.nameHelp` | For example “Counter” or “Diwali gate”… | ta “கவுண்டர்”, “தீபாவளி வாயில்” | Tamil gate is வாயில் (the other three transliterate "gate"). Owners may type English names anyway. |
 | `standee.campaigns.reorder` | Reorder printed standee | "order again" in each language (ta …ஆர்டர் செய்) | Uses the order term; check it does not read as a customer order. |
+
+The 30 keys W3-01 added to `statements.en.json` (B-10 monthly statements, payout state and CSV) went through the same approval. They reuse the credits terms: statement is स्टेटमेंट · ಸ್ಟೇಟ್‌ಮೆಂಟ್ · స్టేట్‌మెంట్ · ஸ்டேட்மென்ட், and payout is पेआउट · ಪೇಔಟ್ · పేఅవుట్ · பணம் வழங்கல். "UTR" and "CSV" stay as written. Money wording to spot-check:
+
+| Key | English | Choice | Why |
+|---|---|---|---|
+| `statements.closing`, `statements.totals.closing` | Closing {amount} / Closing balance | hi अंतिम बैलेंस · kn ಮುಕ್ತಾಯ ಬ್ಯಾಲೆನ್ಸ್ · te ముగింపు బ్యాలెన్స్ · ta இறுதி இருப்பு | "Final balance". Check that a shop owner reads it as the month-end balance. |
+| `statements.negative` | A negative balance carries forward to next month. | hi माइनस बैलेंस अगले महीने में जुड़ जाता है · kn/te "minus balance continues to next month" · ta மைனஸ் இருப்பு அடுத்த மாதத்துக்குத் தொடரும் | "Minus" in place of the formal word for negative. The Hindi says "is added to next month"; check it doesn't read as a charge. |
+| `statements.status.needsKyc`, `statements.payout.needsKyc` | On hold / …on hold until your payout details are complete | hi रुका हुआ · kn ತಡೆಹಿಡಿಯಲಾಗಿದೆ · te నిలిపివేయబడింది · ta நிறுத்திவைக்கப்பட்டது | "Stopped or held". Check that it doesn't sound like money taken away. |
+| `statements.status.paid`, `statements.payout.paid` | Paid / {amount} paid on {date}. | hi भेज दिया गया / {amount} आपको भेजा गया · kn ಪಾವತಿಸಲಾಗಿದೆ · te చెల్లించబడింది · ta வழங்கப்பட்டது | The direction is TodayZ paying the shop. Hindi says "sent to you" (चुकाया गया could read as "the shop paid"). Check that kn, te and ta "paid" don't read as the shop paying. |
+| `statements.totals.reversals` | Reversed sales | hi वापस हुई बिक्री · kn ಹಿಂತಿರುಗಿಸಿದ ಮಾರಾಟಗಳು · te రివర్స్ అయిన అమ్మకాలు · ta திரும்பப் பெறப்பட்ட விற்பனைகள் | Sales returned or cancelled. Telugu transliterates "reverse". |
+| `statements.totals.adjustments` | Adjustments | hi सुधार · kn ಹೊಂದಾಣಿಕೆಗಳು · te సవరణలు · ta சரிசெய்தல்கள் | Admin corrections. Hindi सुधार means "corrections". |
 
 What this changes on release:
 
