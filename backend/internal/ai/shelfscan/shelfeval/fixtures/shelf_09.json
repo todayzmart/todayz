@@ -1,0 +1,76 @@
+{
+  "name": "shelf_09",
+  "input": {
+    "image": "images/shelf_09.jpg"
+  },
+  "expect": {
+    "products": [
+      "Clinic Plus Shampoo 175ml",
+      "Brooke Bond Red Label 250g",
+      "Real Mango Juice 1L",
+      "Maggi Noodles 70g",
+      "Vim Bar 200g",
+      "Haldiram Bhujia 200g",
+      "Aashirvaad Atta 5kg"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_09",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_09",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Plus Shampoo",
+              "brand": "Clinic",
+              "size": "175ml",
+              "confidence": 0.68
+            },
+            {
+              "name": "Bond Red Label",
+              "brand": "Brooke",
+              "size": "250g",
+              "confidence": 0.65
+            },
+            {
+              "name": "Mango Juice",
+              "brand": "Real",
+              "size": "1L",
+              "confidence": 0.65
+            },
+            {
+              "name": "Bar",
+              "brand": "Vim",
+              "size": "200g",
+              "confidence": 0.77
+            },
+            {
+              "name": "Bhujia",
+              "brand": "Haldiram",
+              "size": "200g",
+              "confidence": 0.71
+            },
+            {
+              "name": "Atta",
+              "brand": "Aashirvaad",
+              "size": "5kg",
+              "confidence": 0.92
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

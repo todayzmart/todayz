@@ -1,0 +1,97 @@
+{
+  "name": "handwritten_hi_07",
+  "input": {
+    "image": "images/handwritten_hi_07.jpg",
+    "kind": "handwritten",
+    "lang": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "गुड नाइट रिफिल",
+        "quantity": 2,
+        "costPaise": 7705,
+        "mrpPaise": 8500,
+        "expiresOn": null
+      },
+      {
+        "name": "हल्दीराम भुजिया 200g",
+        "quantity": 6,
+        "costPaise": 5045,
+        "mrpPaise": 5500,
+        "expiresOn": "2027-03-15"
+      },
+      {
+        "name": "क्लिनिक प्लस 175ml",
+        "quantity": 2,
+        "costPaise": 11625,
+        "mrpPaise": 13500,
+        "expiresOn": null
+      },
+      {
+        "name": "आशीर्वाद आटा 5kg",
+        "quantity": 5,
+        "costPaise": 26640,
+        "mrpPaise": 29500,
+        "expiresOn": "2027-05-28"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_handwritten_hi_07",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_handwritten_hi_07",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "श्री गणेश एजेंसी",
+          "bill_date": "2026-10-13",
+          "lines": [
+            {
+              "name": "गुड नाइट रिफिल",
+              "quantity": 2,
+              "cost_rupees": 77.05,
+              "mrp_rupees": 85.0,
+              "expires_on": null,
+              "confidence": 0.58
+            },
+            {
+              "name": "हल्दीराम भुजिया 200g",
+              "quantity": 6,
+              "cost_rupees": 50.45,
+              "mrp_rupees": 55.0,
+              "expires_on": "2027-03-15",
+              "confidence": 0.66
+            },
+            {
+              "name": "क्लिनिक प्लस 175ml",
+              "quantity": 2,
+              "cost_rupees": 116.25,
+              "mrp_rupees": 135.0,
+              "expires_on": null,
+              "confidence": 0.59
+            },
+            {
+              "name": "आशीर्वाद आटा 5kg",
+              "quantity": 5,
+              "cost_rupees": 266.4,
+              "mrp_rupees": 295.0,
+              "expires_on": "2027-05-28",
+              "confidence": 0.79
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

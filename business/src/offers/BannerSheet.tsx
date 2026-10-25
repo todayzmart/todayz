@@ -7,6 +7,7 @@ import { Banner, Button, Chip, Segmented, Sheet, TextField, useToast } from '@to
 import { useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { BannerCopy } from '../ai-drafts/BannerCopy';
 import type { CurrentStore } from '../orders/store';
 import { useCategories } from '../stock/queries';
 import { checkSchedule, type PickedItem } from './form';
@@ -83,6 +84,7 @@ export function BannerSheet({ store, onClose }: { store: CurrentStore; onClose: 
     }
   };
 
+  const copyFor = target === 'offer' && offerId ? { offerId } : target === 'items' && items.length > 0 ? { itemIds: items.map((i) => i.id) } : null;
   const liveOffers = (offers.data?.pages.flatMap((p) => p.items) ?? []).filter((o) => o.status === 'live' || o.status === 'scheduled');
   const flat = (categories.data?.items ?? []).flatMap((c) => [{ id: c.id, name: c.name }, ...c.children.map((k) => ({ id: k.id, name: `${c.name} · ${k.name}` }))]);
 
@@ -141,6 +143,17 @@ export function BannerSheet({ store, onClose }: { store: CurrentStore; onClose: 
         )}
         {target === 'items' && <ItemPicker store={store} picked={items} max={BANNER_LIMITS.maxItems} onChange={setItems} />}
         {errs.target && showErrors && <p className="tz-field-error">{say(errs.target)}</p>}
+        {/* W3-11 AI-R9: wording for the picked offer or items; "Use this" only fills the fields above. */}
+        <BannerCopy
+          key={JSON.stringify(copyFor)}
+          store={store}
+          request={copyFor}
+          onUse={(c) => {
+            setHeadline(c.headline);
+            setSubline(c.subline);
+            setTint(c.tint);
+          }}
+        />
 
         <div className={styles.pair}>
           <TextField label={intl.formatMessage({ id: 'offers.starts.label' })} help={intl.formatMessage({ id: 'offers.starts.help' })} error={showErrors && sched.errors.startsAt ? intl.formatMessage({ id: `offers.err.${sched.errors.startsAt.code}` }) : undefined} type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} />

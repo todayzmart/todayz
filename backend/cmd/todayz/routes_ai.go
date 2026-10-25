@@ -1,22 +1,237 @@
 package main
 
 import (
+	"context"
+	"errors"
+	"maps"
+	"net/http"
 	"sync"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 
+	aiapi "github.com/todayz/backend/gen/api/ai"
+	catalogueapi "github.com/todayz/backend/gen/api/catalogue"
+	genproblems "github.com/todayz/backend/gen/problems"
+	"github.com/todayz/backend/internal/ai/bannercopy"
+	"github.com/todayz/backend/internal/ai/billscan"
 	"github.com/todayz/backend/internal/ai/client"
 	"github.com/todayz/backend/internal/ai/drafts"
 	"github.com/todayz/backend/internal/ai/guard"
+	"github.com/todayz/backend/internal/ai/replydraft"
+	"github.com/todayz/backend/internal/ai/retail"
+	"github.com/todayz/backend/internal/ai/shelfscan"
+	"github.com/todayz/backend/internal/catalogue"
+	"github.com/todayz/backend/internal/platform/authz"
+	"github.com/todayz/backend/internal/platform/authz/policy"
+	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx"
+	"github.com/todayz/backend/internal/platform/httpx/problem"
+	"github.com/todayz/backend/internal/reviews"
 )
 
-// mountAI mounts the ai domain's routes. Only the work package that builds
-// internal/ai edits this file (D-50). W3-10 serves no route of its own: each
-// feature mounts its draft endpoints under its own prefix (04 §2.8) and builds
-// them from aiKitFor(d).
-func mountAI(r chi.Router, d *deps) {}
+// aiRetailSeams lets a test swap the retail AI kit and model (a fake model, a
+// guard that counts the providers as configured, an inline runner).
+var aiRetailSeams func(d *deps, kit *retail.Kit, llm *client.LLM)
+
+// mountAI mounts the ai domain's routes. Only the work packages that build
+// internal/ai edit this file (D-50). W3-10 serves no route of its own; W3-11
+// mounts the retailer helpers under {S}/ai (04 §2.8): supplier bill (AI-R2),
+// shelf photo (AI-R3), review reply (AI-R6) and banner copy (AI-R9) drafts,
+// each confirmed by a person before anything is written (11 §1 rule 1).
+// Without a database or config (a route-only test) every call is 503.
+func mountAI(r chi.Router, d *deps) {
+	var az authz.Authorizer
+	if d.Authz != nil {
+		az = d.Authz
+	}
+	ops := aiRetailOps()
+	mws := []aiapi.StrictMiddlewareFunc{aiapi.StrictMiddlewareFunc(authz.Strict[aiapi.StrictHandlerFunc](az, ops))}
+	if d.DB == nil || d.Config == nil || d.Settings == nil {
+		mws = append(mws, func(aiapi.StrictHandlerFunc, string) aiapi.StrictHandlerFunc {
+			return func(context.Context, http.ResponseWriter, *http.Request, any) (any, error) {
+				return nil, problem.New(genproblems.ServiceUnavailable, "")
+			}
+		})
+		aiapi.Register(r, aiServer{}, mws...)
+		return
+	}
+	k := aiKitFor(d)
+	kit, llm := retail.Kit{Guard: k.Guard, Drafts: k.Drafts}, k.LLM
+	if aiRetailSeams != nil {
+		aiRetailSeams(d, &kit, &llm)
+	}
+	cd := catalogue.Deps{Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Settings: d.Settings, Authz: d.Authz}
+	cat, err := catalogue.New(cd)
+	if err != nil {
+		panic("ai: catalogue: " + err.Error())
+	}
+	rv, err := reviews.New(reviews.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings, Sales: posForReviews{newPos(d)}})
+	if err != nil {
+		panic("ai: reviews: " + err.Error())
+	}
+	bill, err := billscan.New(billscan.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings, LLM: llm, Kit: kit,
+		Stock: aiBillStock{w: catalogue.NewWriter(d.Clock), db: d.DB}})
+	if err != nil {
+		panic("ai: billscan: " + err.Error())
+	}
+	shelf, err := shelfscan.New(shelfscan.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings, LLM: llm, Kit: kit,
+		Items: aiShelfItems{cat}})
+	if err != nil {
+		panic("ai: shelfscan: " + err.Error())
+	}
+	reply, err := replydraft.New(replydraft.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings, LLM: llm, Kit: kit, Replies: rv})
+	if err != nil {
+		panic("ai: replydraft: " + err.Error())
+	}
+	banner, err := bannercopy.New(bannercopy.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings, LLM: llm, Kit: kit})
+	if err != nil {
+		panic("ai: bannercopy: " + err.Error())
+	}
+	aiapi.Register(r, aiServer{
+		Handlers: billscan.Handlers{S: bill},
+		shelf:    shelfscan.Handlers{S: shelf},
+		reply:    replydraft.Handlers{S: reply},
+		banner:   bannercopy.Handlers{S: banner},
+		guard:    kit.Guard,
+	}, mws...)
+}
+
+// aiRetailOps is every ai operation's route check.
+func aiRetailOps() map[string]string {
+	ops := map[string]string{"GetStoreAiRetailFeatures": policy.InsightsView}
+	for _, m := range []map[string]string{billscan.Ops, shelfscan.Ops, replydraft.Ops, bannercopy.Ops} {
+		maps.Copy(ops, m)
+	}
+	return ops
+}
+
+// aiServer is the ai domain's strict server: one embedded handler set per
+// feature, plus the features switch read.
+type aiServer struct {
+	billscan.Handlers
+	shelf  shelfscan.Handlers
+	reply  replydraft.Handlers
+	banner bannercopy.Handlers
+	guard  *guard.Guard
+}
+
+var _ aiapi.StrictServerInterface = aiServer{}
+
+func (s aiServer) GetStoreAiRetailFeatures(ctx context.Context, _ aiapi.GetStoreAiRetailFeaturesRequestObject) (aiapi.GetStoreAiRetailFeaturesResponseObject, error) {
+	on := func(feature string) (bool, error) { return s.guard.Available(ctx, feature) }
+	out := aiapi.AiRetailFeatures{MaxPhotoBytes: retail.MaxPhotoBytes, PhotoTypes: retail.PhotoTypes}
+	for _, f := range []struct {
+		name string
+		to   *bool
+	}{
+		{billscan.Feature, &out.SupplierBill}, {shelfscan.Feature, &out.ShelfPhoto},
+		{replydraft.Feature, &out.ReviewReply}, {bannercopy.Feature, &out.BannerCopy},
+	} {
+		v, err := on(f.name)
+		if err != nil {
+			return nil, err
+		}
+		*f.to = v
+	}
+	return aiapi.GetStoreAiRetailFeatures200JSONResponse(out), nil
+}
+
+func (s aiServer) CreateShelfPhotoDraft(ctx context.Context, req aiapi.CreateShelfPhotoDraftRequestObject) (aiapi.CreateShelfPhotoDraftResponseObject, error) {
+	return s.shelf.CreateShelfPhotoDraft(ctx, req)
+}
+
+func (s aiServer) GetShelfPhotoDraft(ctx context.Context, req aiapi.GetShelfPhotoDraftRequestObject) (aiapi.GetShelfPhotoDraftResponseObject, error) {
+	return s.shelf.GetShelfPhotoDraft(ctx, req)
+}
+
+func (s aiServer) ConfirmShelfPhotoDraft(ctx context.Context, req aiapi.ConfirmShelfPhotoDraftRequestObject) (aiapi.ConfirmShelfPhotoDraftResponseObject, error) {
+	return s.shelf.ConfirmShelfPhotoDraft(ctx, req)
+}
+
+func (s aiServer) CreateReviewReplyDraft(ctx context.Context, req aiapi.CreateReviewReplyDraftRequestObject) (aiapi.CreateReviewReplyDraftResponseObject, error) {
+	return s.reply.CreateReviewReplyDraft(ctx, req)
+}
+
+func (s aiServer) GetReviewReplyDraft(ctx context.Context, req aiapi.GetReviewReplyDraftRequestObject) (aiapi.GetReviewReplyDraftResponseObject, error) {
+	return s.reply.GetReviewReplyDraft(ctx, req)
+}
+
+func (s aiServer) ConfirmReviewReplyDraft(ctx context.Context, req aiapi.ConfirmReviewReplyDraftRequestObject) (aiapi.ConfirmReviewReplyDraftResponseObject, error) {
+	return s.reply.ConfirmReviewReplyDraft(ctx, req)
+}
+
+func (s aiServer) CreateBannerCopyDraft(ctx context.Context, req aiapi.CreateBannerCopyDraftRequestObject) (aiapi.CreateBannerCopyDraftResponseObject, error) {
+	return s.banner.CreateBannerCopyDraft(ctx, req)
+}
+
+func (s aiServer) GetBannerCopyDraft(ctx context.Context, req aiapi.GetBannerCopyDraftRequestObject) (aiapi.GetBannerCopyDraftResponseObject, error) {
+	return s.banner.GetBannerCopyDraft(ctx, req)
+}
+
+func (s aiServer) ConfirmBannerCopyDraft(ctx context.Context, req aiapi.ConfirmBannerCopyDraftRequestObject) (aiapi.ConfirmBannerCopyDraftResponseObject, error) {
+	return s.banner.ConfirmBannerCopyDraft(ctx, req)
+}
+
+// aiBillStock writes a confirmed bill line as a supplier_bill stock in, in
+// the confirm's transaction, referencing the draft.
+type aiBillStock struct {
+	w  *catalogue.Writer
+	db *db.DB
+}
+
+func (a aiBillStock) AddFromBill(ctx context.Context, in billscan.StockIn) error {
+	_, err := a.w.AddStock(ctx, a.db.Q(ctx), catalogue.StockIn{
+		StoreID: in.StoreID, ItemID: in.ItemID, Qty: int32(in.Qty), // #nosec G115 -- bounded by billscan.MaxQuantity
+		Source: catalogue.SourceSupplierBill, ExpiresOn: in.ExpiresOn, CostPaise: in.CostPaise,
+		RefType: "ai_draft", RefID: in.DraftID, Who: catalogue.Who{UserID: in.Who},
+	})
+	switch {
+	case errors.Is(err, catalogue.ErrItemNotFound):
+		return billscan.ErrItemGone
+	case errors.Is(err, catalogue.ErrQuantity):
+		return billscan.ErrQuantity
+	}
+	return err
+}
+
+// aiShelfItems creates a confirmed shelf line through the catalogue's own
+// create (its price and permission checks), in a savepoint of the confirm's
+// transaction. What the catalogue refuses for this line alone (no
+// item.price.edit, the product, the listing, the price) refuses the line.
+type aiShelfItems struct{ s *catalogue.Service }
+
+func (a aiShelfItems) Add(ctx context.Context, sc authz.Scope, it shelfscan.NewItem) error {
+	price, opening := int(it.PricePaise), it.OpeningStock
+	_, err := a.s.CreateItem(ctx, sc.BusinessID.String(), sc.StoreID.String(), &catalogueapi.StoreItemCreate{
+		ProductId: it.ProductID.String(), PricePaise: price, OpeningStock: &opening,
+	})
+	return shelfRefusal(err)
+}
+
+// shelfRefusal is the catalogue's answer for one shelf line as a line refusal: a missing
+// permission (a createItem without item.price.edit) is not_permitted, a listed product, a
+// price above MRP or a bad product is that line's invalid_* code. Anything else fails the
+// confirm.
+func shelfRefusal(err error) error {
+	var pe *problem.Error
+	switch {
+	case err == nil:
+		return nil
+	case problem.CodeOf(err) == genproblems.Forbidden:
+		return retail.RefuseNotPermitted
+	case problem.CodeOf(err) == genproblems.Conflict:
+		return retail.RefuseListed
+	case errors.As(err, &pe) && pe.Code == genproblems.ValidationFailed:
+		if _, ok := pe.Fields["body.pricePaise"]; ok {
+			return retail.RefusePriceAboveMRP
+		}
+		if _, ok := pe.Fields["body.productId"]; ok {
+			return retail.RefuseProduct
+		}
+	}
+	return err
+}
 
 // aiProviderTimeout bounds one provider call; a feature with a tighter budget
 // (search assist, 3 s) sets a context deadline.

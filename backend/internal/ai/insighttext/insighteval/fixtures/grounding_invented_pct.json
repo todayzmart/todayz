@@ -1,0 +1,65 @@
+{
+  "name": "grounding_invented_pct",
+  "input": {
+    "lang": "en",
+    "rows": [
+      {
+        "ref": "r1",
+        "kind": "sitting_on_shelf",
+        "facts": {
+          "itemName": "Lux Soap 100g",
+          "daysWithoutSale": 21,
+          "units": 6
+        }
+      },
+      {
+        "ref": "r2",
+        "kind": "selling_fast",
+        "facts": {
+          "itemName": "Tata Salt 1kg",
+          "daysOfCover": 3,
+          "action": {
+            "quantity": 10
+          }
+        }
+      }
+    ]
+  },
+  "expect": {
+    "texts": {
+      "r2": "Tata Salt 1kg lasts 3 more days; restock 10."
+    },
+    "dropped": 1
+  },
+  "reply": {
+    "id": "msg_it_grounding_invented_pct",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_it_grounding_invented_pct",
+        "name": "write_insight_texts",
+        "input": {
+          "texts": [
+            {
+              "ref": "r1",
+              "text": "Lux Soap 100g has not sold in 21 days; a 15% offer would clear the 6 left."
+            },
+            {
+              "ref": "r2",
+              "text": "Tata Salt 1kg lasts 3 more days; restock 10."
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

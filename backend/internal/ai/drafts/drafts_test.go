@@ -107,7 +107,7 @@ func TestConfirmFlow(t *testing.T) {
 	res, err := e.s.Confirm(ctx, c)
 	require.NoError(t, err)
 	assert.Equal(t, StatusConfirmed, res.Status)
-	assert.Equal(t, []LineResult{{"l1", Accepted}, {"l2", Edited}, {"l3", Discarded}}, res.Lines)
+	assert.Equal(t, []LineResult{{LineID: "l1", Outcome: Accepted}, {LineID: "l2", Outcome: Edited}, {LineID: "l3", Outcome: Discarded}}, res.Lines)
 	assert.Equal(t, 1, a.calls)
 
 	again, err := e.s.Confirm(ctx, c)
@@ -139,7 +139,7 @@ func TestAllDiscarded(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, StatusDiscarded, res.Status)
 	assert.Zero(t, a.calls, "nothing to apply")
-	assert.Equal(t, []LineResult{{"l1", Discarded}, {"l2", Discarded}, {"l3", Discarded}}, res.Lines)
+	assert.Equal(t, []LineResult{{LineID: "l1", Outcome: Discarded}, {LineID: "l2", Outcome: Discarded}, {LineID: "l3", Outcome: Discarded}}, res.Lines)
 }
 
 // A line the confirmer may not make is recorded as not_permitted; if no line went through the
@@ -270,9 +270,9 @@ func (a *byRole) apply(_ context.Context, d Draft, ds []Decision) ([]LineResult,
 	r := make([]LineResult, len(ds))
 	for i, dc := range ds {
 		a.seen = append(a.seen, dc.LineID)
-		r[i] = LineResult{LineID: dc.LineID, Outcome: dc.Outcome}
+		r[i] = LineResult{LineID: dc.LineID, Outcome: dc.Outcome, Reason: "kept only when refused"}
 		if !a.allowed[names[dc.LineID]] {
-			r[i].Outcome = NotPermitted
+			r[i].Outcome, r[i].Reason = NotPermitted, "not_permitted"
 		}
 	}
 	return r, nil
@@ -292,7 +292,7 @@ func TestKeepOpen(t *testing.T) {
 	res, err := e.s.Confirm(ctx, c)
 	require.NoError(t, err)
 	assert.Equal(t, StatusReady, res.Status)
-	assert.Equal(t, []LineResult{{"l1", Accepted}, {"l2", NotPermitted}, {"l3", Discarded}}, res.Lines)
+	assert.Equal(t, []LineResult{{LineID: "l1", Outcome: Accepted}, {LineID: "l2", Outcome: NotPermitted, Reason: "not_permitted"}, {LineID: "l3", Outcome: Discarded}}, res.Lines)
 	assert.Equal(t, []string{"l1", "l2"}, cashier.seen)
 	d, err := e.s.Get(ctx, "voice_stock", id)
 	require.NoError(t, err)
@@ -320,7 +320,7 @@ func TestKeepOpen(t *testing.T) {
 	done, err := e.s.Confirm(ctx, m)
 	require.NoError(t, err)
 	assert.Equal(t, StatusConfirmed, done.Status)
-	assert.Equal(t, []LineResult{{"l1", Accepted}, {"l2", Edited}, {"l3", Discarded}}, done.Lines)
+	assert.Equal(t, []LineResult{{LineID: "l1", Outcome: Accepted}, {LineID: "l2", Outcome: Edited}, {LineID: "l3", Outcome: Discarded}}, done.Lines)
 	assert.Equal(t, []string{"l2"}, manager.seen)
 	d, err = e.s.Get(ctx, "voice_stock", id)
 	require.NoError(t, err)
@@ -343,5 +343,5 @@ func TestKeepOpen(t *testing.T) {
 		Decisions: []Decision{{LineID: "l1", Outcome: Discarded}}})
 	require.NoError(t, err)
 	assert.Equal(t, StatusDiscarded, closed.Status)
-	assert.Equal(t, []LineResult{{"l1", Discarded}, {"l2", Discarded}, {"l3", Discarded}}, closed.Lines)
+	assert.Equal(t, []LineResult{{LineID: "l1", Outcome: Discarded}, {LineID: "l2", Outcome: Discarded}, {LineID: "l3", Outcome: Discarded}}, closed.Lines)
 }

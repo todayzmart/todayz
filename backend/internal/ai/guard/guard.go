@@ -8,7 +8,9 @@
 //   - Reserve runs before every model or speech call, including the customer features that keep
 //     no draft. It refuses when today's platform spend has reached ai_daily_cost_cap_paise, or
 //     the store or customer has used ai_daily_calls_store / ai_daily_calls_customer calls
-//     today (IST day). A refusal is 429 ai_daily_cap_reached with extensions.scope customer,
+//     today (IST day). Background wording (Subject.Background: insight sentences, coach
+//     cards) counts against ai_daily_calls_store_background under scope store_background
+//     instead, never against the calls the owner starts (D-228). A refusal is 429 ai_daily_cap_reached with extensions.scope customer,
 //     store or platform and Retry-After at the next IST midnight, and no call is made.
 //   - A reserved call counts even when the provider then fails (it may have been billed).
 //   - Settle adds the call's cost to the day. Today's spend over the cap is published as
@@ -49,6 +51,9 @@ const (
 	ScopeCustomer = "customer"
 	ScopeStore    = "store"
 	ScopePlatform = "platform"
+	// ScopeStoreBackground counts a store's background wording (D-228). Its refusal is never
+	// an answer: the caller keeps the template.
+	ScopeStoreBackground = "store_background"
 )
 
 // AlertRatio is the share of the daily cost cap at which the warning fires (01 §17
@@ -56,7 +61,7 @@ const (
 const AlertRatio = 0.8
 
 func init() {
-	telemetry.RegisterLabelValues("reason", ScopeCustomer, ScopeStore, ScopePlatform)
+	telemetry.RegisterLabelValues("reason", ScopeCustomer, ScopeStore, ScopePlatform, ScopeStoreBackground)
 }
 
 // ErrUnknownFeature is a feature name with no Spec (a programming error).
@@ -102,6 +107,9 @@ func ProvidersFrom(c *config.Config) Providers {
 type Subject struct {
 	Store    ids.ID
 	Customer ids.ID
+	// Background marks wording nobody asked for (insight sentences, coach cards): Store's
+	// call counts against ai_daily_calls_store_background, not ai_daily_calls_store.
+	Background bool
 }
 
 // Guard checks switches and caps.
@@ -218,7 +226,11 @@ func (g *Guard) Reserve(ctx context.Context, feature string, s Subject) error {
 			}
 			return err
 		}
-		if err := take(ScopeStore, s.Store, settings.AiDailyCallsStore); err != nil {
+		storeScope, storeKey := ScopeStore, settings.AiDailyCallsStore
+		if s.Background {
+			storeScope, storeKey = ScopeStoreBackground, settings.AiDailyCallsStoreBackground
+		}
+		if err := take(storeScope, s.Store, storeKey); err != nil {
 			return err
 		}
 		if err := take(ScopeCustomer, s.Customer, settings.AiDailyCallsCustomer); err != nil {

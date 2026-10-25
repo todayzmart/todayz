@@ -1,0 +1,38 @@
+{
+  "name": "kn_no_text",
+  "input": {
+    "stars": 4,
+    "tags": [
+      "friendly"
+    ],
+    "text": null,
+    "language": "kn",
+    "shop": "Sri Lakshmi Stores"
+  },
+  "expect": {
+    "text": "ನಿಮ್ಮ ರೇಟಿಂಗ್‌ಗೆ ಧನ್ಯವಾದಗಳು. ಮತ್ತೆ ನಮ್ಮ ಅಂಗಡಿಗೆ ಬನ್ನಿ.",
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_rr_kn_no_text",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rr_kn_no_text",
+        "name": "draft_review_reply",
+        "input": {
+          "text": "ನಿಮ್ಮ ರೇಟಿಂಗ್‌ಗೆ ಧನ್ಯವಾದಗಳು. ಮತ್ತೆ ನಮ್ಮ ಅಂಗಡಿಗೆ ಬನ್ನಿ."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

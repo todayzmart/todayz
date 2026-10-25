@@ -1,0 +1,72 @@
+{
+  "name": "kn_items",
+  "input": {
+    "shop": "ಗಣೇಶ್ ಸ್ಟೋರ್ಸ್",
+    "language": "kn",
+    "items": [
+      {
+        "n": 1,
+        "name": "Amul Butter 100g",
+        "priceRupees": "58",
+        "mrpRupees": "62"
+      },
+      {
+        "n": 2,
+        "name": "Maggi Noodles 70g",
+        "priceRupees": "14"
+      }
+    ]
+  },
+  "expect": {
+    "kept": 3,
+    "dropped": 0,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_bc_kn_items",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bc_kn_items",
+        "name": "draft_banner_copy",
+        "input": {
+          "options": [
+            {
+              "headline": "Amul Butter 100g ಈಗ ₹58",
+              "subline": "MRP ₹62",
+              "headline_en": "Amul Butter 100g now ₹58",
+              "subline_en": "MRP ₹62",
+              "tint": "amber",
+              "item": 1
+            },
+            {
+              "headline": "ತಾಜಾ ಸ್ಟಾಕ್ ಬಂದಿದೆ",
+              "subline": "Maggi Noodles 70g ₹14",
+              "headline_en": "Fresh stock is in",
+              "subline_en": "Maggi Noodles 70g ₹14",
+              "tint": "lilac",
+              "item": 2
+            },
+            {
+              "headline": "ನಿಮ್ಮ ಹತ್ತಿರದ ಅಂಗಡಿ",
+              "subline": "ಬುಕ್ ಮಾಡಿ, ಬಂದು ತೆಗೆದುಕೊಳ್ಳಿ",
+              "headline_en": "Your shop nearby",
+              "subline_en": "Book and pick up",
+              "tint": "green",
+              "item": null
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

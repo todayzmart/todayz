@@ -1,0 +1,38 @@
+{
+  "name": "unsure_not_banner",
+  "input": {
+    "image": "images/unsure_not_banner.jpg"
+  },
+  "expect": {
+    "verdict": "unsure",
+    "reasons": [
+      "not_a_banner"
+    ]
+  },
+  "reply": {
+    "id": "msg_img_unsure_not_banner",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_img_unsure_not_banner",
+        "name": "check_banner_image",
+        "input": {
+          "verdict": "unsure",
+          "reasons": [
+            "not_a_banner"
+          ],
+          "confidence": 0.9
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 900,
+      "output_tokens": 40
+    }
+  }
+}

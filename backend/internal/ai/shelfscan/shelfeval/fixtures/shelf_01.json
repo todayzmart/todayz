@@ -1,0 +1,61 @@
+{
+  "name": "shelf_01",
+  "input": {
+    "image": "images/shelf_01.jpg"
+  },
+  "expect": {
+    "products": [
+      "Horlicks 500g",
+      "Maggi Noodles 70g",
+      "Dettol Soap 125g",
+      "Real Mango Juice 1L"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_01",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_01",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Horlicks",
+              "brand": "Horlicks",
+              "size": "500g",
+              "confidence": 0.84
+            },
+            {
+              "name": "Noodles",
+              "brand": "Maggi",
+              "size": "70g",
+              "confidence": 0.89
+            },
+            {
+              "name": "Soap",
+              "brand": "Dettol",
+              "size": "125g",
+              "confidence": 0.6
+            },
+            {
+              "name": "Mango Juice",
+              "brand": "Real",
+              "size": "1L",
+              "confidence": 0.65
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

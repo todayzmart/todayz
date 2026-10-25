@@ -1,0 +1,172 @@
+{
+  "name": "printed_kn_09",
+  "input": {
+    "image": "images/printed_kn_09.jpg",
+    "kind": "printed",
+    "lang": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "ರಿಯಲ್ ಮಾವು ಜ್ಯೂಸ್ 1L",
+        "quantity": 2,
+        "costPaise": 10575,
+        "mrpPaise": 12000,
+        "expiresOn": null
+      },
+      {
+        "name": "ಫಾರ್ಚೂನ್ ಎಣ್ಣೆ 1L",
+        "quantity": 6,
+        "costPaise": 15470,
+        "mrpPaise": 18500,
+        "expiresOn": null
+      },
+      {
+        "name": "ಅಮುಲ್ ತಾಜಾ 500ml",
+        "quantity": 5,
+        "costPaise": 2545,
+        "mrpPaise": 2900,
+        "expiresOn": null
+      },
+      {
+        "name": "ಸರ್ಫ್ ಎಕ್ಸೆಲ್ 1kg",
+        "quantity": 5,
+        "costPaise": 13285,
+        "mrpPaise": 14500,
+        "expiresOn": null
+      },
+      {
+        "name": "ಕ್ಲಿನಿಕ್ ಪ್ಲಸ್ 175ml",
+        "quantity": 5,
+        "costPaise": 11870,
+        "mrpPaise": 13500,
+        "expiresOn": "2027-07-28"
+      },
+      {
+        "name": "ಲಕ್ಸ್ ಸೋಪು 100g",
+        "quantity": 12,
+        "costPaise": 3380,
+        "mrpPaise": 3800,
+        "expiresOn": null
+      },
+      {
+        "name": "ಸಫೋಲಾ ಗೋಲ್ಡ್ 1L",
+        "quantity": 2,
+        "costPaise": 17980,
+        "mrpPaise": 21000,
+        "expiresOn": "2027-09-28"
+      },
+      {
+        "name": "ಎಂಡಿಎಚ್ ಚನಾ ಮಸಾಲ 100g",
+        "quantity": 6,
+        "costPaise": 7155,
+        "mrpPaise": 8200,
+        "expiresOn": "2027-11-28"
+      },
+      {
+        "name": "ಮ್ಯಾಗಿ ನೂಡಲ್ಸ್ 70g",
+        "quantity": 3,
+        "costPaise": 1255,
+        "mrpPaise": 1400,
+        "expiresOn": null
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_kn_09",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_kn_09",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "ಓಂ ಸಾಯಿ ಎಂಟರ್‌ಪ್ರೈಸಸ್",
+          "bill_date": "2026-10-09",
+          "lines": [
+            {
+              "name": "ರಿಯಲ್ ಮಾವು ಜ್ಯೂಸ್ 1L",
+              "quantity": 2,
+              "cost_rupees": 105.75,
+              "mrp_rupees": 120.0,
+              "expires_on": null,
+              "confidence": 0.83
+            },
+            {
+              "name": "ಫಾರ್ಚೂನ್ ಎಣ್ಣೆ 1L",
+              "quantity": 6,
+              "cost_rupees": 154.7,
+              "mrp_rupees": 185.0,
+              "expires_on": null,
+              "confidence": 0.9
+            },
+            {
+              "name": "ಅಮುಲ್ ತಾಜಾ 500ml",
+              "quantity": 5,
+              "cost_rupees": 25.45,
+              "mrp_rupees": 29.0,
+              "expires_on": null,
+              "confidence": 0.96
+            },
+            {
+              "name": "ಸರ್ಫ್ ಎಕ್ಸೆಲ್ 1kg",
+              "quantity": 5,
+              "cost_rupees": 132.85,
+              "mrp_rupees": 145.0,
+              "expires_on": null,
+              "confidence": 0.95
+            },
+            {
+              "name": "ಕ್ಲಿನಿಕ್ ಪ್ಲಸ್ 175ml",
+              "quantity": 5,
+              "cost_rupees": 118.7,
+              "mrp_rupees": 135.0,
+              "expires_on": "2027-07-28",
+              "confidence": 0.87
+            },
+            {
+              "name": "ಲಕ್ಸ್ ಸೋಪು 100g",
+              "quantity": 12,
+              "cost_rupees": 33.8,
+              "mrp_rupees": 38.0,
+              "expires_on": null,
+              "confidence": 0.83
+            },
+            {
+              "name": "ಸಫೋಲಾ ಗೋಲ್ಡ್ 1L",
+              "quantity": 2,
+              "cost_rupees": 179.8,
+              "mrp_rupees": 210.0,
+              "expires_on": "2027-09-28",
+              "confidence": 0.98
+            },
+            {
+              "name": "ಎಂಡಿಎಚ್ ಚನಾ ಮಸಾಲ 100g",
+              "quantity": 6,
+              "cost_rupees": 71.55,
+              "mrp_rupees": 82.0,
+              "expires_on": "2027-11-28",
+              "confidence": 0.93
+            },
+            {
+              "name": "ಮ್ಯಾಗಿ ನೂಡಲ್ಸ್ 70g",
+              "quantity": 3,
+              "cost_rupees": 12.55,
+              "mrp_rupees": 14.0,
+              "expires_on": null,
+              "confidence": 0.92
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

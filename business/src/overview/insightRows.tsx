@@ -3,6 +3,7 @@ import { formatDistance, formatMoney } from '@todayz/i18n';
 import type { InsightRow } from '@todayz/ui';
 import type { ReactNode } from 'react';
 import type { IntlShape } from 'react-intl';
+import { InsightText } from '../insights/text/InsightText';
 import { weekday } from './format';
 import type { InsightData } from './types';
 
@@ -126,7 +127,7 @@ export function kindLabel(intl: IntlShape, kind: InsightData['kind']): string {
 
 /** The 01 §12 sentence of a row, from its facts. An AI-R4 sentence (W3-11) replaces it when present. */
 export function sentence(intl: IntlShape, d: InsightData): ReactNode {
-  if (d.text) return d.text;
+  if (d.text) return <InsightText text={d.text} />;
   const f = d.facts as Bag | null;
   const item = named(str(f, 'item'), str(f, 'size'));
   switch (d.kind) {

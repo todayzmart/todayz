@@ -1,0 +1,40 @@
+[
+  {
+    "detector": "bought_together",
+    "subject": "01KE0S1W6W8ZV7T1C3A6MQ006T:01KE0S1W6W8ZV7T1C3A6MQ006V",
+    "kind": "tip",
+    "topic": "offers",
+    "severity": 1,
+    "stake": 21428,
+    "ageDays": 0,
+    "numbers": {
+      "itemA": "Bread 400 g",
+      "itemB": "Eggs tray 12 12 pc",
+      "oneIn": 4
+    },
+    "action": "create_offer",
+    "payload": {
+      "storeItemIds": [
+        "01KE0S1W6W8ZV7T1C3A6MQ006T",
+        "01KE0S1W6W8ZV7T1C3A6MQ006V"
+      ]
+    }
+  },
+  {
+    "detector": "regulars_slipping",
+    "subject": "store",
+    "kind": "tip",
+    "topic": "sales",
+    "severity": 2,
+    "stake": 8,
+    "ageDays": 0,
+    "numbers": {
+      "count": 8,
+      "lapseDays": 21
+    },
+    "action": "see_customers",
+    "payload": {
+      "segment": "slipping"
+    }
+  }
+]

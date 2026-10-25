@@ -1,0 +1,17 @@
+[
+  {
+    "detector": "setup_incomplete",
+    "subject": "hours",
+    "kind": "tip",
+    "topic": "setup",
+    "severity": 1,
+    "stake": 0,
+    "ageDays": 0,
+    "variant": "hours",
+    "numbers": {},
+    "action": "none",
+    "payload": {
+      "step": "hours"
+    }
+  }
+]

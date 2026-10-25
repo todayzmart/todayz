@@ -1,0 +1,97 @@
+{
+  "name": "handwritten_hi_05",
+  "input": {
+    "image": "images/handwritten_hi_05.jpg",
+    "kind": "handwritten",
+    "lang": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "आशीर्वाद आटा 5kg",
+        "quantity": 10,
+        "costPaise": 25920,
+        "mrpPaise": 29500,
+        "expiresOn": "2027-08-28"
+      },
+      {
+        "name": "विम बार 200g",
+        "quantity": 2,
+        "costPaise": 1705,
+        "mrpPaise": 2000,
+        "expiresOn": null
+      },
+      {
+        "name": "अमूल बटर 100g",
+        "quantity": 2,
+        "costPaise": 5450,
+        "mrpPaise": 6200,
+        "expiresOn": "2027-04-15"
+      },
+      {
+        "name": "सफोला गोल्ड 1L",
+        "quantity": 12,
+        "costPaise": 19060,
+        "mrpPaise": 21000,
+        "expiresOn": "2027-02-28"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_handwritten_hi_05",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_handwritten_hi_05",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "शिव एंटरप्राइज़",
+          "bill_date": "2026-10-11",
+          "lines": [
+            {
+              "name": "आशीर्वाद आटा 5kg",
+              "quantity": 10,
+              "cost_rupees": 259.2,
+              "mrp_rupees": 295.0,
+              "expires_on": "2027-08-28",
+              "confidence": 0.55
+            },
+            {
+              "name": "विम बार 200g",
+              "quantity": 2,
+              "cost_rupees": 17.05,
+              "mrp_rupees": 20.0,
+              "expires_on": null,
+              "confidence": 0.66
+            },
+            {
+              "name": "अमूल बटर 100g",
+              "quantity": 2,
+              "cost_rupees": 54.5,
+              "mrp_rupees": 62.0,
+              "expires_on": "2027-04-15",
+              "confidence": 0.74
+            },
+            {
+              "name": "सफोला गोल्ड 1L",
+              "quantity": 12,
+              "cost_rupees": 190.6,
+              "mrp_rupees": 210.0,
+              "expires_on": "2027-02-28",
+              "confidence": 0.9
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

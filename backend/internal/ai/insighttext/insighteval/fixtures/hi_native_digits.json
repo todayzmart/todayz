@@ -1,0 +1,49 @@
+{
+  "name": "hi_native_digits",
+  "input": {
+    "lang": "hi",
+    "rows": [
+      {
+        "ref": "r1",
+        "kind": "stock_check_due",
+        "facts": {
+          "items": 14,
+          "daysSinceCount": 30
+        }
+      }
+    ]
+  },
+  "expect": {
+    "texts": {
+      "r1": "१४ सामानों की गिनती ३० दिन से नहीं हुई है; आज इन्हें गिन लें।"
+    },
+    "dropped": 0
+  },
+  "reply": {
+    "id": "msg_it_hi_native_digits",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_it_hi_native_digits",
+        "name": "write_insight_texts",
+        "input": {
+          "texts": [
+            {
+              "ref": "r1",
+              "text": "१४ सामानों की गिनती ३० दिन से नहीं हुई है; आज इन्हें गिन लें।"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

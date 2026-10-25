@@ -1,0 +1,97 @@
+{
+  "name": "handwritten_hi_08",
+  "input": {
+    "image": "images/handwritten_hi_08.jpg",
+    "kind": "handwritten",
+    "lang": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "अमूल बटर 100g",
+        "quantity": 3,
+        "costPaise": 5125,
+        "mrpPaise": 6200,
+        "expiresOn": null
+      },
+      {
+        "name": "एमडीएच चना मसाला 100g",
+        "quantity": 2,
+        "costPaise": 6655,
+        "mrpPaise": 8200,
+        "expiresOn": null
+      },
+      {
+        "name": "बॉर्नविटा 500g",
+        "quantity": 12,
+        "costPaise": 21720,
+        "mrpPaise": 24900,
+        "expiresOn": null
+      },
+      {
+        "name": "रेड लेबल चाय 250g",
+        "quantity": 24,
+        "costPaise": 12900,
+        "mrpPaise": 15500,
+        "expiresOn": null
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_handwritten_hi_08",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_handwritten_hi_08",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "बालाजी ट्रेडर्स",
+          "bill_date": "2026-10-18",
+          "lines": [
+            {
+              "name": "अमूल बटर 100g",
+              "quantity": 3,
+              "cost_rupees": 51.25,
+              "mrp_rupees": 62.0,
+              "expires_on": null,
+              "confidence": 0.82
+            },
+            {
+              "name": "एमडीएच चना मसाला 100g",
+              "quantity": 2,
+              "cost_rupees": 66.55,
+              "mrp_rupees": 82.0,
+              "expires_on": null,
+              "confidence": 0.84
+            },
+            {
+              "name": "बॉर्नविटा 500g",
+              "quantity": 12,
+              "cost_rupees": 217.2,
+              "mrp_rupees": 249.0,
+              "expires_on": null,
+              "confidence": 0.83
+            },
+            {
+              "name": "रेड लेबल चाय 250g",
+              "quantity": 24,
+              "cost_rupees": 129.0,
+              "mrp_rupees": 165.0,
+              "expires_on": null,
+              "confidence": 0.75
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "name": "shelf_38",
+  "input": {
+    "image": "images/shelf_38.jpg"
+  },
+  "expect": {
+    "products": [
+      "Good Knight Refill",
+      "Maggi Noodles 70g",
+      "Britannia Good Day 100g",
+      "Real Mango Juice 1L"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_38",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_38",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Knight Refill",
+              "brand": "Good",
+              "size": null,
+              "confidence": 0.68
+            },
+            {
+              "name": "Noodles",
+              "brand": "Maggi",
+              "size": "70g",
+              "confidence": 0.69
+            },
+            {
+              "name": "Mango Juice",
+              "brand": "Real",
+              "size": "1L",
+              "confidence": 0.77
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

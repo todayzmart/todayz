@@ -1,0 +1,48 @@
+{
+  "name": "grounding_arithmetic",
+  "input": {
+    "lang": "en",
+    "rows": [
+      {
+        "ref": "r1",
+        "kind": "going_to_waste",
+        "facts": {
+          "itemName": "Amul Taaza 500ml",
+          "units": 12,
+          "price": "29"
+        }
+      }
+    ]
+  },
+  "expect": {
+    "texts": {},
+    "dropped": 1
+  },
+  "reply": {
+    "id": "msg_it_grounding_arithmetic",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_it_grounding_arithmetic",
+        "name": "write_insight_texts",
+        "input": {
+          "texts": [
+            {
+              "ref": "r1",
+              "text": "12 packs of Amul Taaza 500ml worth 348 expire soon; run a flash offer."
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

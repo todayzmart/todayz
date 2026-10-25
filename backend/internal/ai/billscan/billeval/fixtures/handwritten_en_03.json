@@ -1,0 +1,172 @@
+{
+  "name": "handwritten_en_03",
+  "input": {
+    "image": "images/handwritten_en_03.jpg",
+    "kind": "handwritten",
+    "lang": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "Haldiram Bhujia 200g",
+        "quantity": 3,
+        "costPaise": 5015,
+        "mrpPaise": 5500,
+        "expiresOn": "2027-06-15"
+      },
+      {
+        "name": "Fortune Sunflower Oil 1L",
+        "quantity": 24,
+        "costPaise": 15865,
+        "mrpPaise": 18500,
+        "expiresOn": null
+      },
+      {
+        "name": "Tata Salt 1kg",
+        "quantity": 5,
+        "costPaise": 2545,
+        "mrpPaise": 2800,
+        "expiresOn": "2027-07-28"
+      },
+      {
+        "name": "Good Knight Refill",
+        "quantity": 10,
+        "costPaise": 7715,
+        "mrpPaise": 8500,
+        "expiresOn": null
+      },
+      {
+        "name": "Saffola Gold Oil 1L",
+        "quantity": 10,
+        "costPaise": 18300,
+        "mrpPaise": 21000,
+        "expiresOn": null
+      },
+      {
+        "name": "Brooke Bond Red Label 250g",
+        "quantity": 3,
+        "costPaise": 12515,
+        "mrpPaise": 15500,
+        "expiresOn": null
+      },
+      {
+        "name": "Nescafe Classic 50g",
+        "quantity": 4,
+        "costPaise": 16105,
+        "mrpPaise": 19000,
+        "expiresOn": null
+      },
+      {
+        "name": "Amul Taaza 500ml",
+        "quantity": 5,
+        "costPaise": 2555,
+        "mrpPaise": 2900,
+        "expiresOn": null
+      },
+      {
+        "name": "MDH Chana Masala 100g",
+        "quantity": 4,
+        "costPaise": 7025,
+        "mrpPaise": 8200,
+        "expiresOn": "2027-02-15"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_handwritten_en_03",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_handwritten_en_03",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "Ganesh Distributors",
+          "bill_date": "2026-10-09",
+          "lines": [
+            {
+              "name": "Haldiram Bhujia 200g",
+              "quantity": 3,
+              "cost_rupees": 50.15,
+              "mrp_rupees": 55.0,
+              "expires_on": "2027-06-15",
+              "confidence": 0.9
+            },
+            {
+              "name": "Fortune Sunflower Oil 1L",
+              "quantity": 24,
+              "cost_rupees": 158.65,
+              "mrp_rupees": 185.0,
+              "expires_on": null,
+              "confidence": 0.67
+            },
+            {
+              "name": "Tata Salt 1kg",
+              "quantity": 5,
+              "cost_rupees": 25.45,
+              "mrp_rupees": 28.0,
+              "expires_on": "2027-07-28",
+              "confidence": 0.81
+            },
+            {
+              "name": "Good Knight Refill",
+              "quantity": 10,
+              "cost_rupees": 77.15,
+              "mrp_rupees": 85.0,
+              "expires_on": null,
+              "confidence": 0.56
+            },
+            {
+              "name": "Saffola Gold Oil 1L",
+              "quantity": 10,
+              "cost_rupees": 183.0,
+              "mrp_rupees": 210.0,
+              "expires_on": null,
+              "confidence": 0.73
+            },
+            {
+              "name": "Brooke Bond Red Label 250g",
+              "quantity": 3,
+              "cost_rupees": 125.15,
+              "mrp_rupees": 155.0,
+              "expires_on": null,
+              "confidence": 0.61
+            },
+            {
+              "name": "Nescafe Classic 50g",
+              "quantity": 4,
+              "cost_rupees": 161.05,
+              "mrp_rupees": 190.0,
+              "expires_on": null,
+              "confidence": 0.76
+            },
+            {
+              "name": "Amul Taaza 500ml",
+              "quantity": 5,
+              "cost_rupees": 25.55,
+              "mrp_rupees": 29.0,
+              "expires_on": null,
+              "confidence": 0.59
+            },
+            {
+              "name": "MDH Chana Masala 100g",
+              "quantity": 4,
+              "cost_rupees": 70.25,
+              "mrp_rupees": 82.0,
+              "expires_on": "2027-02-15",
+              "confidence": 0.86
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

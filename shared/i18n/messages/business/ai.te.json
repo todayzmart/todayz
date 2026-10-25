@@ -1,0 +1,397 @@
+{
+  "ai.again": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "ai.backToStock": {
+    "message": "స్టాక్‌కు వెళ్ళండి",
+    "review": "reviewed",
+    "enHash": "059cd0f6"
+  },
+  "ai.closed": {
+    "message": "ఈ డ్రాఫ్ట్ ముగిసింది. కొత్తది మొదలుపెట్టండి.",
+    "review": "reviewed",
+    "enHash": "a661d472"
+  },
+  "ai.discard": {
+    "message": "డ్రాఫ్ట్ తీసేయండి",
+    "review": "reviewed",
+    "enHash": "3a09ce0d"
+  },
+  "ai.draftNote": {
+    "message": "AI సూచన. ప్రతి లైన్ చూసుకోండి; మీరు నిర్ధారించే వరకు ఏదీ మారదు.",
+    "review": "reviewed",
+    "enHash": "df75a916"
+  },
+  "ai.insight.worded": {
+    "message": "AI రాసింది",
+    "review": "reviewed",
+    "enHash": "e1ec3954"
+  },
+  "ai.photo.help": {
+    "message": "మంచి వెలుతురులో స్పష్టమైన ఫోటో, {mb} MB వరకు",
+    "review": "reviewed",
+    "enHash": "a821e356"
+  },
+  "ai.photo.type": {
+    "message": "ఈ ఫైల్‌ను చదవలేం. ఫోటో తీయండి లేదా ఎంచుకోండి.",
+    "review": "reviewed",
+    "enHash": "845632a4"
+  },
+  "ai.photo.size": {
+    "message": "ఈ ఫోటో {mb} MB కంటే పెద్దది. చిన్నది ఎంచుకోండి.",
+    "review": "reviewed",
+    "enHash": "65d63829"
+  },
+  "ai.error.cap": {
+    "message": "ఈ దుకాణానికి ఈరోజు AI సహాయం అయిపోయింది. తర్వాత ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "fb85c9e3"
+  },
+  "ai.error.capFor": {
+    "message": "ప్రస్తుతానికి AI సహాయం అయిపోయింది. {mins, plural, one {# నిమిషం} other {# నిమిషాల}} తర్వాత ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "084d0337"
+  },
+  "ai.error.off": {
+    "message": "ఈ AI సహాయం మీ దుకాణానికి ఆన్‌లో లేదు.",
+    "review": "reviewed",
+    "enHash": "68a74895"
+  },
+  "ai.error.changed": {
+    "message": "ఈ డ్రాఫ్ట్ మారింది. ఇప్పటి సమాచారం చూడటానికి మళ్ళీ మొదలుపెట్టండి.",
+    "review": "reviewed",
+    "enHash": "6d898345"
+  },
+  "ai.error.photo": {
+    "message": "ఈ ఫోటో పంపలేకపోయాం. దాని రకం, సైజు చూడండి.",
+    "review": "reviewed",
+    "enHash": "60551ac4"
+  },
+  "ai.error.invalid": {
+    "message": "కొన్ని వివరాలు సరిచేయాలి. కింద గుర్తించిన లైన్లు చూడండి.",
+    "review": "reviewed",
+    "enHash": "28db3711"
+  },
+  "ai.error.offline": {
+    "message": "మీరు ఆఫ్‌లైన్‌లో ఉన్నట్టున్నారు. కనెక్షన్ చూసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "81b7d772"
+  },
+  "ai.error.generic": {
+    "message": "ఏదో పొరపాటు జరిగింది. మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "4244e822"
+  },
+  "ai.err.range": {
+    "message": "ఈ సంఖ్య చూడండి",
+    "review": "reviewed",
+    "enHash": "239355d1"
+  },
+  "ai.err.above_mrp": {
+    "message": "MRP కంటే ఎక్కువ",
+    "review": "reviewed",
+    "enHash": "8f3be78d"
+  },
+  "ai.err.past": {
+    "message": "ఈ తేదీ దాటిపోయింది",
+    "review": "reviewed",
+    "enHash": "6792f0a7"
+  },
+  "ai.err.date": {
+    "message": "తేదీ ఇవ్వండి",
+    "review": "reviewed",
+    "enHash": "64ceee5b"
+  },
+  "ai.err.required": {
+    "message": "అవసరం",
+    "review": "reviewed",
+    "enHash": "27c0ee6e"
+  },
+  "ai.err.not_in_store": {
+    "message": "ఇది ఈ దుకాణం ఐటమ్ కాదు",
+    "review": "reviewed",
+    "enHash": "59f405fb"
+  },
+  "ai.err.invalid": {
+    "message": "ఈ లైన్ చూడండి",
+    "review": "reviewed",
+    "enHash": "698e45b4"
+  },
+  "ai.err.no_product": {
+    "message": "క్యాటలాగ్‌లో లేదు",
+    "review": "reviewed",
+    "enHash": "940e8a73"
+  },
+  "ai.err.duplicate": {
+    "message": "ఈ జాబితాలో ఇప్పటికే ఉంది",
+    "review": "reviewed",
+    "enHash": "15b6db98"
+  },
+  "ai.err.already_listed": {
+    "message": "మీ స్టాక్‌లో ఇప్పటికే ఉంది",
+    "review": "reviewed",
+    "enHash": "6762efb2"
+  },
+  "ai.err.quantity": {
+    "message": "పూర్తి సంఖ్య ఇవ్వండి",
+    "review": "reviewed",
+    "enHash": "b394c9ca"
+  },
+  "ai.err.price": {
+    "message": "రూపాయల్లో ధర ఇవ్వండి",
+    "review": "reviewed",
+    "enHash": "c223f02c"
+  },
+  "ai.bill.title": {
+    "message": "సప్లయర్ బిల్ స్కాన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "4c70718c"
+  },
+  "ai.bill.desc": {
+    "message": "బిల్ ఫోటో తీయండి. దాని లైన్లను మీ ఐటమ్‌లతో సరిపోలుస్తాం; మీరు చూసి స్టాక్ జోడించండి.",
+    "review": "reviewed",
+    "enHash": "c5ae78ac"
+  },
+  "ai.bill.pick": {
+    "message": "ఫోటో తీయండి లేదా ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "097ac225"
+  },
+  "ai.bill.reading": {
+    "message": "బిల్ చదువుతున్నాం…",
+    "review": "reviewed",
+    "enHash": "65179e5a"
+  },
+  "ai.bill.failed": {
+    "message": "ఈ బిల్ చదవలేకపోయాం. చదునుగా పెట్టి మంచి వెలుతురులో స్పష్టమైన ఫోటో తీయండి.",
+    "review": "reviewed",
+    "enHash": "d2ec5dac"
+  },
+  "ai.bill.off": {
+    "message": "బిల్ స్కాన్ మీ దుకాణానికి ఆన్‌లో లేదు",
+    "review": "reviewed",
+    "enHash": "d6fe4a22"
+  },
+  "ai.bill.from": {
+    "message": "{supplier} నుండి",
+    "review": "reviewed",
+    "enHash": "c70f3f37"
+  },
+  "ai.bill.lines": {
+    "message": "బిల్ లైన్లు",
+    "review": "reviewed",
+    "enHash": "cfd6514f"
+  },
+  "ai.bill.matched": {
+    "message": "బిల్‌లో: {bill} · ఇప్పుడు స్టాక్‌లో {n}",
+    "review": "reviewed",
+    "enHash": "d08ba258"
+  },
+  "ai.bill.unmatched": {
+    "message": "బిల్‌లో: {bill} · మీ ఐటమ్ కాదు",
+    "review": "reviewed",
+    "enHash": "0a5ff5e2"
+  },
+  "ai.bill.unmatchedHelp": {
+    "message": "మీ ఐటమ్‌లు కాని లైన్లు వదిలేస్తాం. ముందు స్టాక్‌లో ఐటమ్ జోడించి, మళ్ళీ స్కాన్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "0aa512cf"
+  },
+  "ai.bill.mrp": {
+    "message": "MRP {mrp}",
+    "review": "reviewed",
+    "enHash": "5f2751fd"
+  },
+  "ai.bill.qty": {
+    "message": "పరిమాణం",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "ai.bill.cost": {
+    "message": "కొనుగోలు ధర",
+    "review": "reviewed",
+    "enHash": "b0e0a2d5"
+  },
+  "ai.bill.expiry": {
+    "message": "గడువు తేదీ",
+    "review": "reviewed",
+    "enHash": "ba8f571e"
+  },
+  "ai.bill.confirm": {
+    "message": "{n, plural, =0 {జోడించడానికి ఏమీ లేదు} one {# ఐటమ్‌కు స్టాక్ జోడించండి} other {# ఐటమ్‌లకు స్టాక్ జోడించండి}}",
+    "review": "reviewed",
+    "enHash": "14c7e60e"
+  },
+  "ai.bill.done": {
+    "message": "{n, plural, =0 {స్టాక్ ఏదీ జోడించలేదు} one {# ఐటమ్‌కు స్టాక్ జోడించాం} other {# ఐటమ్‌లకు స్టాక్ జోడించాం}}",
+    "review": "reviewed",
+    "enHash": "e1105ab3"
+  },
+  "ai.bill.discarded": {
+    "message": "డ్రాఫ్ట్ తీసేశాం. ఏమీ జోడించలేదు.",
+    "review": "reviewed",
+    "enHash": "581cb8d0"
+  },
+  "ai.bill.another": {
+    "message": "ఇంకో బిల్ స్కాన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "3bb2cbfa"
+  },
+  "ai.shelf.title": {
+    "message": "షెల్ఫ్ ఫోటో నుండి స్టాక్ జోడించండి",
+    "review": "reviewed",
+    "enHash": "7499282c"
+  },
+  "ai.shelf.desc": {
+    "message": "షెల్ఫ్ ఫోటో తీయండి. క్యాటలాగ్‌లో ప్రోడక్ట్‌లు వెతుకుతాం; ఏవి, ఏ ధరకు అమ్మాలో మీరు ఎంచుకోండి.",
+    "review": "reviewed",
+    "enHash": "66d96c07"
+  },
+  "ai.shelf.pick": {
+    "message": "ఫోటో తీయండి లేదా ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "097ac225"
+  },
+  "ai.shelf.reading": {
+    "message": "షెల్ఫ్ చూస్తున్నాం…",
+    "review": "reviewed",
+    "enHash": "d0780c4f"
+  },
+  "ai.shelf.failed": {
+    "message": "ఈ ఫోటోలో ప్రోడక్ట్‌లు కనిపించలేదు. దగ్గరగా స్పష్టమైన ఫోటో తీయండి.",
+    "review": "reviewed",
+    "enHash": "1266f886"
+  },
+  "ai.shelf.off": {
+    "message": "షెల్ఫ్ ఫోటో మీ దుకాణానికి ఆన్‌లో లేదు",
+    "review": "reviewed",
+    "enHash": "cce50c9f"
+  },
+  "ai.shelf.lines": {
+    "message": "కనిపించిన ప్రోడక్ట్‌లు",
+    "review": "reviewed",
+    "enHash": "0e4425df"
+  },
+  "ai.shelf.unmatched": {
+    "message": "కనిపించింది: {seen} · క్యాటలాగ్‌లో లేదు",
+    "review": "reviewed",
+    "enHash": "a21072af"
+  },
+  "ai.shelf.listed": {
+    "message": "మీ స్టాక్‌లో ఇప్పటికే ఉంది",
+    "review": "reviewed",
+    "enHash": "6762efb2"
+  },
+  "ai.shelf.price": {
+    "message": "మీ ధర",
+    "review": "reviewed",
+    "enHash": "16a067af"
+  },
+  "ai.shelf.opening": {
+    "message": "ప్రారంభ స్టాక్",
+    "review": "reviewed",
+    "enHash": "38b7df56"
+  },
+  "ai.shelf.openingHelp": {
+    "message": "ఐచ్ఛికం. తర్వాత లెక్కించడానికి ఖాళీగా వదిలేయండి.",
+    "review": "reviewed",
+    "enHash": "be82f640"
+  },
+  "ai.shelf.confirm": {
+    "message": "{n, plural, =0 {జోడించడానికి ఏమీ లేదు} one {# ప్రోడక్ట్ జోడించండి} other {# ప్రోడక్ట్‌లు జోడించండి}}",
+    "review": "reviewed",
+    "enHash": "b40a6a21"
+  },
+  "ai.shelf.done": {
+    "message": "{n, plural, =0 {ప్రోడక్ట్ ఏదీ జోడించలేదు} one {# ప్రోడక్ట్ మీ స్టాక్‌లో జోడించాం} other {# ప్రోడక్ట్‌లు మీ స్టాక్‌లో జోడించాం}}",
+    "review": "reviewed",
+    "enHash": "1d716271"
+  },
+  "ai.shelf.discarded": {
+    "message": "డ్రాఫ్ట్ తీసేశాం. ఏమీ జోడించలేదు.",
+    "review": "reviewed",
+    "enHash": "581cb8d0"
+  },
+  "ai.shelf.another": {
+    "message": "ఇంకో షెల్ఫ్ స్కాన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "3cbbbf0c"
+  },
+  "ai.reply.draft": {
+    "message": "జవాబు డ్రాఫ్ట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "d7d6d9c7"
+  },
+  "ai.reply.note": {
+    "message": "AI డ్రాఫ్ట్ చేసింది. మీకు నచ్చినట్టు మార్చండి; మీరు పంపినప్పుడే వెళ్తుంది.",
+    "review": "reviewed",
+    "enHash": "f1f53f11"
+  },
+  "ai.reply.failed": {
+    "message": "ఈసారి డ్రాఫ్ట్ రాలేదు. మీ జవాబు రాయండి.",
+    "review": "reviewed",
+    "enHash": "a4f32319"
+  },
+  "ai.banner.suggest": {
+    "message": "పదాలు సూచించండి",
+    "review": "reviewed",
+    "enHash": "fa02e971"
+  },
+  "ai.banner.writing": {
+    "message": "ఆప్షన్‌లు రాస్తున్నాం…",
+    "review": "reviewed",
+    "enHash": "7ce53a62"
+  },
+  "ai.banner.failed": {
+    "message": "ఈసారి సూచనలు రాలేదు. మీరే రాయండి.",
+    "review": "reviewed",
+    "enHash": "a307457c"
+  },
+  "ai.banner.options": {
+    "message": "పదాలు ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "5890d694"
+  },
+  "ai.banner.use": {
+    "message": "ఇదే వాడండి",
+    "review": "reviewed",
+    "enHash": "b80ded59"
+  },
+  "ai.banner.none": {
+    "message": "వీటిలో ఏదీ వద్దు",
+    "review": "reviewed",
+    "enHash": "175ed947"
+  },
+  "ai.error.busy": {
+    "message": "ఇతర ఫోటోలు ఇంకా చదువుతున్నాం. ఒకటి రెండు నిమిషాల్లో మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "cc92d5e7"
+  },
+  "ai.err.not_permitted": {
+    "message": "మీ పాత్రతో ఈ లైన్ జోడించలేరు. యజమాని లేదా మేనేజర్‌ని అడగండి.",
+    "review": "reviewed",
+    "enHash": "6d6a02fa"
+  },
+  "ai.partial": {
+    "message": "{n, plural, =0 {ఇంకా ఏదీ జోడించలేదు.} one {# లైన్ జోడించాం.} other {# లైన్‌లు జోడించాం.}} కింద గుర్తు పెట్టిన లైన్‌లు సరిచేసి మళ్లీ నిర్ధారించండి.",
+    "review": "reviewed",
+    "enHash": "4d47904c"
+  },
+  "ai.line.added": {
+    "message": "జోడించాం",
+    "review": "reviewed",
+    "enHash": "b68734c2"
+  },
+  "ai.line.left": {
+    "message": "వదిలేశాం",
+    "review": "reviewed",
+    "enHash": "e3b33f3c"
+  },
+  "ai.discardRest": {
+    "message": "మిగతావి తీసేయండి",
+    "review": "reviewed",
+    "enHash": "7f43c378"
+  }
+}

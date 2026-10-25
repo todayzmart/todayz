@@ -1,0 +1,75 @@
+{
+  "name": "shelf_13",
+  "input": {
+    "image": "images/shelf_13.jpg"
+  },
+  "expect": {
+    "products": [
+      "Kurkure Masala 90g",
+      "Clinic Plus Shampoo 175ml",
+      "Amul Butter 100g",
+      "MDH Chana Masala 100g",
+      "Horlicks 500g",
+      "Amul Taaza 500ml"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_13",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_13",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Masala",
+              "brand": "Kurkure",
+              "size": "90g",
+              "confidence": 0.82
+            },
+            {
+              "name": "Plus Shampoo",
+              "brand": "Clinic",
+              "size": "175ml",
+              "confidence": 0.89
+            },
+            {
+              "name": "Butter",
+              "brand": "Amul",
+              "size": "100g",
+              "confidence": 0.82
+            },
+            {
+              "name": "Chana Masala",
+              "brand": "MDH",
+              "size": "100g",
+              "confidence": 0.68
+            },
+            {
+              "name": "Horlicks",
+              "brand": "Horlicks",
+              "size": "500g",
+              "confidence": 0.61
+            },
+            {
+              "name": "Taaza",
+              "brand": "Amul",
+              "size": "500ml",
+              "confidence": 0.62
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

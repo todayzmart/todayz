@@ -1,0 +1,187 @@
+{
+  "coach.title": {
+    "message": "கடை கோச்",
+    "review": "reviewed",
+    "enHash": "33c8c0a8"
+  },
+  "coach.desc": {
+    "message": "உங்கள் கடையின் விற்பனை, ஸ்டாக், ஆர்டர்கள், விமர்சனங்களிலிருந்து குறிப்புகள்",
+    "review": "reviewed",
+    "enHash": "35c78622"
+  },
+  "coach.foot": {
+    "message": "முடிந்தது, பயனில்லை என்பவை உங்களுக்கு எது உதவும் என்று கோச்சுக்குக் கற்றுத்தருகின்றன",
+    "review": "reviewed",
+    "enHash": "c65915a2"
+  },
+  "coach.all": {
+    "message": "எல்லா குறிப்புகளும்",
+    "review": "reviewed",
+    "enHash": "033ca611"
+  },
+  "coach.kind.high": {
+    "message": "நல்ல செய்தி",
+    "review": "reviewed",
+    "enHash": "b1a5954a"
+  },
+  "coach.kind.low": {
+    "message": "கவனிக்கவும்",
+    "review": "reviewed",
+    "enHash": "a124947c"
+  },
+  "coach.kind.action": {
+    "message": "இதைச் செய்யுங்கள்",
+    "review": "reviewed",
+    "enHash": "abd606c2"
+  },
+  "coach.kind.tip": {
+    "message": "குறிப்பு",
+    "review": "reviewed",
+    "enHash": "d19ceca5"
+  },
+  "coach.action.reply_reviews": {
+    "message": "விமர்சனங்களுக்குப் பதிலளிக்கவும்",
+    "review": "reviewed",
+    "enHash": "7deef731"
+  },
+  "coach.action.turn_on_auto_accept": {
+    "message": "தானியங்கி ஏற்பை இயக்கவும்",
+    "review": "reviewed",
+    "enHash": "d3830c7c"
+  },
+  "coach.action.update_stock": {
+    "message": "ஸ்டாக்கைப் புதுப்பிக்கவும்",
+    "review": "reviewed",
+    "enHash": "1d3a00ca"
+  },
+  "coach.action.enable_delivery": {
+    "message": "டெலிவரியை இயக்கவும்",
+    "review": "reviewed",
+    "enHash": "17a56f4b"
+  },
+  "coach.action.none": {
+    "message": "திற",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "coach.done": {
+    "message": "முடிந்தது",
+    "review": "reviewed",
+    "enHash": "e9b450d1"
+  },
+  "coach.notUseful": {
+    "message": "பயனில்லை",
+    "review": "reviewed",
+    "enHash": "33d21a37"
+  },
+  "coach.doneToast": {
+    "message": "முடிந்தது எனக் குறிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "43216298"
+  },
+  "coach.hiddenUntil": {
+    "message": "{date} வரை மறைக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "41cd334f"
+  },
+  "coach.hidden": {
+    "message": "மறைக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "d4c2792a"
+  },
+  "coach.error.changed": {
+    "message": "இந்தக் குறிப்பு மாறிவிட்டது. பட்டியல் இப்போது புதுப்பிக்கப்பட்டுள்ளது.",
+    "review": "reviewed",
+    "enHash": "da073162"
+  },
+  "coach.error.generic": {
+    "message": "சேமிக்க முடியவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "848e72d4"
+  },
+  "coach.error.load": {
+    "message": "கோச்சை ஏற்ற முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "644e4638"
+  },
+  "coach.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "coach.loading": {
+    "message": "குறிப்புகள் ஏற்றப்படுகின்றன",
+    "review": "reviewed",
+    "enHash": "6f06eea1"
+  },
+  "coach.aiWording": {
+    "message": "உங்கள் கடையின் எண்களிலிருந்து AI எழுதியது",
+    "review": "reviewed",
+    "enHash": "b03a713b"
+  },
+  "coach.status.new": {
+    "message": "புதியது",
+    "review": "reviewed",
+    "enHash": "6403f2b7"
+  },
+  "coach.status.seen": {
+    "message": "பார்க்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "56564dcb"
+  },
+  "coach.status.done": {
+    "message": "{date} அன்று முடிந்தது",
+    "review": "reviewed",
+    "enHash": "0d22a262"
+  },
+  "coach.status.dismissed": {
+    "message": "{date} அன்று பயனில்லை எனக் குறிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "30b18cc8"
+  },
+  "coach.status.expired": {
+    "message": "{date} அன்று முடிவடைந்தது",
+    "review": "reviewed",
+    "enHash": "3a6ae6bd"
+  },
+  "coach.tabs": {
+    "message": "கோச் கார்டுகள்",
+    "review": "reviewed",
+    "enHash": "9bc76ddd"
+  },
+  "coach.tab.live": {
+    "message": "உங்களுக்காக",
+    "review": "reviewed",
+    "enHash": "7e13d94a"
+  },
+  "coach.tab.done": {
+    "message": "முடிந்தது",
+    "review": "reviewed",
+    "enHash": "e9b450d1"
+  },
+  "coach.tab.dismissed": {
+    "message": "பயனில்லை",
+    "review": "reviewed",
+    "enHash": "33d21a37"
+  },
+  "coach.empty.live": {
+    "message": "இப்போது கோச்சிடமிருந்து எதுவும் இல்லை",
+    "review": "reviewed",
+    "enHash": "e3d22a87"
+  },
+  "coach.empty.done": {
+    "message": "இதுவரை எதுவும் முடிந்தது எனக் குறிக்கப்படவில்லை",
+    "review": "reviewed",
+    "enHash": "93f38022"
+  },
+  "coach.empty.dismissed": {
+    "message": "எதுவும் பயனில்லை எனக் குறிக்கப்படவில்லை",
+    "review": "reviewed",
+    "enHash": "c301e918"
+  },
+  "coach.more": {
+    "message": "மேலும் ஏற்றவும்",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  }
+}

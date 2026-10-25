@@ -1,0 +1,142 @@
+{
+  "name": "printed_hi_07",
+  "input": {
+    "image": "images/printed_hi_07.jpg",
+    "kind": "printed",
+    "lang": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "एमडीएच चना मसाला 100g",
+        "quantity": 3,
+        "costPaise": 7185,
+        "mrpPaise": 8200,
+        "expiresOn": null
+      },
+      {
+        "name": "लक्स साबुन 100g",
+        "quantity": 6,
+        "costPaise": 3260,
+        "mrpPaise": 3800,
+        "expiresOn": null
+      },
+      {
+        "name": "कुरकुरे 90g",
+        "quantity": 24,
+        "costPaise": 1665,
+        "mrpPaise": 2000,
+        "expiresOn": null
+      },
+      {
+        "name": "रेड लेबल चाय 250g",
+        "quantity": 2,
+        "costPaise": 12565,
+        "mrpPaise": 15500,
+        "expiresOn": null
+      },
+      {
+        "name": "अमूल ताज़ा 500ml",
+        "quantity": 2,
+        "costPaise": 2430,
+        "mrpPaise": 2900,
+        "expiresOn": null
+      },
+      {
+        "name": "अमूल बटर 100g",
+        "quantity": 12,
+        "costPaise": 5000,
+        "mrpPaise": 6200,
+        "expiresOn": null
+      },
+      {
+        "name": "कोलगेट 200g",
+        "quantity": 2,
+        "costPaise": 9410,
+        "mrpPaise": 12000,
+        "expiresOn": null
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_hi_07",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_hi_07",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "श्री गणेश एजेंसी",
+          "bill_date": "2026-10-19",
+          "lines": [
+            {
+              "name": "एमडीएच चना मसाला 100g",
+              "quantity": 3,
+              "cost_rupees": 71.85,
+              "mrp_rupees": 82.0,
+              "expires_on": null,
+              "confidence": 0.9
+            },
+            {
+              "name": "लक्स साबुन 100g",
+              "quantity": 6,
+              "cost_rupees": 32.6,
+              "mrp_rupees": 38.0,
+              "expires_on": null,
+              "confidence": 0.84
+            },
+            {
+              "name": "कुरकुरे 90g",
+              "quantity": 24,
+              "cost_rupees": 16.65,
+              "mrp_rupees": 20.0,
+              "expires_on": null,
+              "confidence": 0.98
+            },
+            {
+              "name": "रेड लेबल चाय 250g",
+              "quantity": 2,
+              "cost_rupees": 125.65,
+              "mrp_rupees": 155.0,
+              "expires_on": null,
+              "confidence": 0.84
+            },
+            {
+              "name": "अमूल ताज़ा 500ml",
+              "quantity": 2,
+              "cost_rupees": 24.3,
+              "mrp_rupees": 29.0,
+              "expires_on": null,
+              "confidence": 0.95
+            },
+            {
+              "name": "अमूल बटर 100g",
+              "quantity": 12,
+              "cost_rupees": 50.0,
+              "mrp_rupees": 62.0,
+              "expires_on": null,
+              "confidence": 0.87
+            },
+            {
+              "name": "कोलगेट 200g",
+              "quantity": 2,
+              "cost_rupees": 94.1,
+              "mrp_rupees": 120.0,
+              "expires_on": null,
+              "confidence": 0.95
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

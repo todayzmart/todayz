@@ -186,6 +186,13 @@ sql:
         package: aidb
         out: ../gen/sqlc/aidb
   - <<: *pkg
+    queries: queries/airetail
+    gen:
+      go:
+        <<: *go
+        package: airetaildb
+        out: ../gen/sqlc/airetaildb
+  - <<: *pkg
     queries: queries/coach
     gen:
       go:

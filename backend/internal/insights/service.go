@@ -49,6 +49,15 @@ type Deps struct {
 	// Asks adds the unanswered asks to the nearby searches (D-101); nil is
 	// zero asks until W3-16's asks.Demand lands.
 	Asks facts.AskDemand
+	// Texts gives the AI-R4 sentence of each row (W3-11's insighttext); nil
+	// leaves Insight.text null and the client renders its template.
+	Texts Texter
+}
+
+// Texter gives the kept sentence of each row, in order (nil for none). It
+// never waits for a model.
+type Texter interface {
+	Texts(ctx context.Context, storeID ids.ID, rows []facts.Row) []*string
 }
 
 // Service implements the insights routes.
@@ -58,6 +67,7 @@ type Service struct {
 	settings *settings.Cache
 	seal     *pii.Sealer
 	asks     facts.AskDemand
+	texts    Texter
 	ids      *ids.Generator
 }
 
@@ -72,7 +82,7 @@ func New(d Deps) (*Service, error) {
 	if asks == nil {
 		asks = facts.NoAsks{}
 	}
-	return &Service{db: d.DB, clock: d.Clock, settings: d.Settings, seal: d.Seal, asks: asks, ids: ids.NewGenerator()}, nil
+	return &Service{db: d.DB, clock: d.Clock, settings: d.Settings, seal: d.Seal, asks: asks, texts: d.Texts, ids: ids.NewGenerator()}, nil
 }
 
 func (s *Service) ready(ctx context.Context) error {

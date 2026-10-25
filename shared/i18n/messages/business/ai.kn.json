@@ -1,0 +1,397 @@
+{
+  "ai.again": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "ai.backToStock": {
+    "message": "ಸ್ಟಾಕ್‌ಗೆ ಹೋಗಿ",
+    "review": "reviewed",
+    "enHash": "059cd0f6"
+  },
+  "ai.closed": {
+    "message": "ಈ ಡ್ರಾಫ್ಟ್ ಮುಗಿದಿದೆ. ಹೊಸದನ್ನು ಪ್ರಾರಂಭಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "a661d472"
+  },
+  "ai.discard": {
+    "message": "ಡ್ರಾಫ್ಟ್ ತೆಗೆದುಹಾಕಿ",
+    "review": "reviewed",
+    "enHash": "3a09ce0d"
+  },
+  "ai.draftNote": {
+    "message": "AI ಸಲಹೆ. ಪ್ರತಿ ಸಾಲನ್ನೂ ಪರಿಶೀಲಿಸಿ; ನೀವು ಖಚಿತಪಡಿಸುವವರೆಗೆ ಏನೂ ಬದಲಾಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "df75a916"
+  },
+  "ai.insight.worded": {
+    "message": "AI ಬರೆದದ್ದು",
+    "review": "reviewed",
+    "enHash": "e1ec3954"
+  },
+  "ai.photo.help": {
+    "message": "ಉತ್ತಮ ಬೆಳಕಿನಲ್ಲಿ ಸ್ಪಷ್ಟ ಫೋಟೋ, {mb} MB ವರೆಗೆ",
+    "review": "reviewed",
+    "enHash": "a821e356"
+  },
+  "ai.photo.type": {
+    "message": "ಈ ಫೈಲ್ ಅನ್ನು ಓದಲು ಆಗುವುದಿಲ್ಲ. ಫೋಟೋ ತೆಗೆಯಿರಿ ಅಥವಾ ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "845632a4"
+  },
+  "ai.photo.size": {
+    "message": "ಈ ಫೋಟೋ {mb} MB ಗಿಂತ ದೊಡ್ಡದಾಗಿದೆ. ಚಿಕ್ಕದನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "65d63829"
+  },
+  "ai.error.cap": {
+    "message": "ಈ ಅಂಗಡಿಗೆ ಇಂದಿನ AI ಸಹಾಯ ಮುಗಿದಿದೆ. ನಂತರ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "fb85c9e3"
+  },
+  "ai.error.capFor": {
+    "message": "ಸದ್ಯಕ್ಕೆ AI ಸಹಾಯ ಮುಗಿದಿದೆ. {mins, plural, one {# ನಿಮಿಷ} other {# ನಿಮಿಷಗಳ}} ನಂತರ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "084d0337"
+  },
+  "ai.error.off": {
+    "message": "ಈ AI ಸಹಾಯ ನಿಮ್ಮ ಅಂಗಡಿಗೆ ಆನ್ ಆಗಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "68a74895"
+  },
+  "ai.error.changed": {
+    "message": "ಈ ಡ್ರಾಫ್ಟ್ ಬದಲಾಗಿದೆ. ಈಗಿನ ಮಾಹಿತಿ ನೋಡಲು ಮತ್ತೆ ಪ್ರಾರಂಭಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "6d898345"
+  },
+  "ai.error.photo": {
+    "message": "ಈ ಫೋಟೋ ಕಳುಹಿಸಲು ಆಗಲಿಲ್ಲ. ಅದರ ಪ್ರಕಾರ ಮತ್ತು ಗಾತ್ರ ಪರಿಶೀಲಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "60551ac4"
+  },
+  "ai.error.invalid": {
+    "message": "ಕೆಲವು ವಿವರಗಳನ್ನು ಸರಿಪಡಿಸಬೇಕು. ಕೆಳಗೆ ಗುರುತಿಸಿದ ಸಾಲುಗಳನ್ನು ನೋಡಿ.",
+    "review": "reviewed",
+    "enHash": "28db3711"
+  },
+  "ai.error.offline": {
+    "message": "ನೀವು ಆಫ್‌ಲೈನ್ ಇರುವಂತಿದೆ. ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "81b7d772"
+  },
+  "ai.error.generic": {
+    "message": "ಏನೋ ತಪ್ಪಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "4244e822"
+  },
+  "ai.err.range": {
+    "message": "ಈ ಸಂಖ್ಯೆ ಪರಿಶೀಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "239355d1"
+  },
+  "ai.err.above_mrp": {
+    "message": "MRP ಗಿಂತ ಹೆಚ್ಚು",
+    "review": "reviewed",
+    "enHash": "8f3be78d"
+  },
+  "ai.err.past": {
+    "message": "ಈ ದಿನಾಂಕ ಕಳೆದಿದೆ",
+    "review": "reviewed",
+    "enHash": "6792f0a7"
+  },
+  "ai.err.date": {
+    "message": "ದಿನಾಂಕ ನಮೂದಿಸಿ",
+    "review": "reviewed",
+    "enHash": "64ceee5b"
+  },
+  "ai.err.required": {
+    "message": "ಅಗತ್ಯ",
+    "review": "reviewed",
+    "enHash": "27c0ee6e"
+  },
+  "ai.err.not_in_store": {
+    "message": "ಇದು ಈ ಅಂಗಡಿಯ ಐಟಂ ಅಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "59f405fb"
+  },
+  "ai.err.invalid": {
+    "message": "ಈ ಸಾಲು ಪರಿಶೀಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "698e45b4"
+  },
+  "ai.err.no_product": {
+    "message": "ಕ್ಯಾಟಲಾಗ್‌ನಲ್ಲಿ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "940e8a73"
+  },
+  "ai.err.duplicate": {
+    "message": "ಈ ಪಟ್ಟಿಯಲ್ಲಿ ಈಗಾಗಲೇ ಇದೆ",
+    "review": "reviewed",
+    "enHash": "15b6db98"
+  },
+  "ai.err.already_listed": {
+    "message": "ನಿಮ್ಮ ಸ್ಟಾಕ್‌ನಲ್ಲಿ ಈಗಾಗಲೇ ಇದೆ",
+    "review": "reviewed",
+    "enHash": "6762efb2"
+  },
+  "ai.err.quantity": {
+    "message": "ಪೂರ್ಣ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ",
+    "review": "reviewed",
+    "enHash": "b394c9ca"
+  },
+  "ai.err.price": {
+    "message": "ರೂಪಾಯಿಯಲ್ಲಿ ಬೆಲೆ ನಮೂದಿಸಿ",
+    "review": "reviewed",
+    "enHash": "c223f02c"
+  },
+  "ai.bill.title": {
+    "message": "ಸಪ್ಲೈಯರ್ ಬಿಲ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "4c70718c"
+  },
+  "ai.bill.desc": {
+    "message": "ಬಿಲ್‌ನ ಫೋಟೋ ತೆಗೆಯಿರಿ. ಅದರ ಸಾಲುಗಳನ್ನು ನಿಮ್ಮ ಐಟಂಗಳಿಗೆ ಹೊಂದಿಸುತ್ತೇವೆ; ನೀವು ಪರಿಶೀಲಿಸಿ ಸ್ಟಾಕ್ ಸೇರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "c5ae78ac"
+  },
+  "ai.bill.pick": {
+    "message": "ಫೋಟೋ ತೆಗೆಯಿರಿ ಅಥವಾ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "097ac225"
+  },
+  "ai.bill.reading": {
+    "message": "ಬಿಲ್ ಓದಲಾಗುತ್ತಿದೆ…",
+    "review": "reviewed",
+    "enHash": "65179e5a"
+  },
+  "ai.bill.failed": {
+    "message": "ಈ ಬಿಲ್ ಓದಲು ಆಗಲಿಲ್ಲ. ಸಮತಟ್ಟಾಗಿ ಇಟ್ಟು ಉತ್ತಮ ಬೆಳಕಿನಲ್ಲಿ ಸ್ಪಷ್ಟ ಫೋಟೋ ತೆಗೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "d2ec5dac"
+  },
+  "ai.bill.off": {
+    "message": "ಬಿಲ್ ಸ್ಕ್ಯಾನ್ ನಿಮ್ಮ ಅಂಗಡಿಗೆ ಆನ್ ಆಗಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "d6fe4a22"
+  },
+  "ai.bill.from": {
+    "message": "{supplier} ಅವರಿಂದ",
+    "review": "reviewed",
+    "enHash": "c70f3f37"
+  },
+  "ai.bill.lines": {
+    "message": "ಬಿಲ್ ಸಾಲುಗಳು",
+    "review": "reviewed",
+    "enHash": "cfd6514f"
+  },
+  "ai.bill.matched": {
+    "message": "ಬಿಲ್‌ನಲ್ಲಿ: {bill} · ಈಗ ಸ್ಟಾಕ್‌ನಲ್ಲಿ {n}",
+    "review": "reviewed",
+    "enHash": "d08ba258"
+  },
+  "ai.bill.unmatched": {
+    "message": "ಬಿಲ್‌ನಲ್ಲಿ: {bill} · ನಿಮ್ಮ ಐಟಂ ಅಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "0a5ff5e2"
+  },
+  "ai.bill.unmatchedHelp": {
+    "message": "ನಿಮ್ಮ ಐಟಂಗಳಲ್ಲದ ಸಾಲುಗಳನ್ನು ಬಿಡಲಾಗುತ್ತದೆ. ಮೊದಲು ಸ್ಟಾಕ್‌ನಲ್ಲಿ ಐಟಂ ಸೇರಿಸಿ, ನಂತರ ಮತ್ತೆ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "0aa512cf"
+  },
+  "ai.bill.mrp": {
+    "message": "MRP {mrp}",
+    "review": "reviewed",
+    "enHash": "5f2751fd"
+  },
+  "ai.bill.qty": {
+    "message": "ಪ್ರಮಾಣ",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "ai.bill.cost": {
+    "message": "ಖರೀದಿ ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "b0e0a2d5"
+  },
+  "ai.bill.expiry": {
+    "message": "ಅವಧಿ ಮುಗಿಯುವ ದಿನಾಂಕ",
+    "review": "reviewed",
+    "enHash": "ba8f571e"
+  },
+  "ai.bill.confirm": {
+    "message": "{n, plural, =0 {ಸೇರಿಸಲು ಏನೂ ಇಲ್ಲ} one {# ಐಟಂಗೆ ಸ್ಟಾಕ್ ಸೇರಿಸಿ} other {# ಐಟಂಗಳಿಗೆ ಸ್ಟಾಕ್ ಸೇರಿಸಿ}}",
+    "review": "reviewed",
+    "enHash": "14c7e60e"
+  },
+  "ai.bill.done": {
+    "message": "{n, plural, =0 {ಯಾವುದೇ ಸ್ಟಾಕ್ ಸೇರಿಸಿಲ್ಲ} one {# ಐಟಂಗೆ ಸ್ಟಾಕ್ ಸೇರಿಸಲಾಗಿದೆ} other {# ಐಟಂಗಳಿಗೆ ಸ್ಟಾಕ್ ಸೇರಿಸಲಾಗಿದೆ}}",
+    "review": "reviewed",
+    "enHash": "e1105ab3"
+  },
+  "ai.bill.discarded": {
+    "message": "ಡ್ರಾಫ್ಟ್ ತೆಗೆದುಹಾಕಲಾಗಿದೆ. ಏನೂ ಸೇರಿಸಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "581cb8d0"
+  },
+  "ai.bill.another": {
+    "message": "ಇನ್ನೊಂದು ಬಿಲ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "3bb2cbfa"
+  },
+  "ai.shelf.title": {
+    "message": "ಶೆಲ್ಫ್ ಫೋಟೋದಿಂದ ಸ್ಟಾಕ್ ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "7499282c"
+  },
+  "ai.shelf.desc": {
+    "message": "ಶೆಲ್ಫ್‌ನ ಫೋಟೋ ತೆಗೆಯಿರಿ. ಕ್ಯಾಟಲಾಗ್‌ನಲ್ಲಿ ಉತ್ಪನ್ನಗಳನ್ನು ಹುಡುಕುತ್ತೇವೆ; ಯಾವುದನ್ನು ಯಾವ ಬೆಲೆಗೆ ಮಾರಬೇಕು ಎಂದು ನೀವು ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "66d96c07"
+  },
+  "ai.shelf.pick": {
+    "message": "ಫೋಟೋ ತೆಗೆಯಿರಿ ಅಥವಾ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "097ac225"
+  },
+  "ai.shelf.reading": {
+    "message": "ಶೆಲ್ಫ್ ನೋಡಲಾಗುತ್ತಿದೆ…",
+    "review": "reviewed",
+    "enHash": "d0780c4f"
+  },
+  "ai.shelf.failed": {
+    "message": "ಈ ಫೋಟೋದಲ್ಲಿ ಉತ್ಪನ್ನಗಳು ಸಿಗಲಿಲ್ಲ. ಹತ್ತಿರದಿಂದ ಸ್ಪಷ್ಟ ಫೋಟೋ ತೆಗೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "1266f886"
+  },
+  "ai.shelf.off": {
+    "message": "ಶೆಲ್ಫ್ ಫೋಟೋ ನಿಮ್ಮ ಅಂಗಡಿಗೆ ಆನ್ ಆಗಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "cce50c9f"
+  },
+  "ai.shelf.lines": {
+    "message": "ಸಿಕ್ಕ ಉತ್ಪನ್ನಗಳು",
+    "review": "reviewed",
+    "enHash": "0e4425df"
+  },
+  "ai.shelf.unmatched": {
+    "message": "ಕಂಡದ್ದು: {seen} · ಕ್ಯಾಟಲಾಗ್‌ನಲ್ಲಿ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "a21072af"
+  },
+  "ai.shelf.listed": {
+    "message": "ನಿಮ್ಮ ಸ್ಟಾಕ್‌ನಲ್ಲಿ ಈಗಾಗಲೇ ಇದೆ",
+    "review": "reviewed",
+    "enHash": "6762efb2"
+  },
+  "ai.shelf.price": {
+    "message": "ನಿಮ್ಮ ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "16a067af"
+  },
+  "ai.shelf.opening": {
+    "message": "ಆರಂಭಿಕ ಸ್ಟಾಕ್",
+    "review": "reviewed",
+    "enHash": "38b7df56"
+  },
+  "ai.shelf.openingHelp": {
+    "message": "ಐಚ್ಛಿಕ. ನಂತರ ಎಣಿಸಲು ಖಾಲಿ ಬಿಡಿ.",
+    "review": "reviewed",
+    "enHash": "be82f640"
+  },
+  "ai.shelf.confirm": {
+    "message": "{n, plural, =0 {ಸೇರಿಸಲು ಏನೂ ಇಲ್ಲ} one {# ಉತ್ಪನ್ನ ಸೇರಿಸಿ} other {# ಉತ್ಪನ್ನಗಳನ್ನು ಸೇರಿಸಿ}}",
+    "review": "reviewed",
+    "enHash": "b40a6a21"
+  },
+  "ai.shelf.done": {
+    "message": "{n, plural, =0 {ಯಾವುದೇ ಉತ್ಪನ್ನ ಸೇರಿಸಿಲ್ಲ} one {# ಉತ್ಪನ್ನ ನಿಮ್ಮ ಸ್ಟಾಕ್‌ಗೆ ಸೇರಿದೆ} other {# ಉತ್ಪನ್ನಗಳು ನಿಮ್ಮ ಸ್ಟಾಕ್‌ಗೆ ಸೇರಿವೆ}}",
+    "review": "reviewed",
+    "enHash": "1d716271"
+  },
+  "ai.shelf.discarded": {
+    "message": "ಡ್ರಾಫ್ಟ್ ತೆಗೆದುಹಾಕಲಾಗಿದೆ. ಏನೂ ಸೇರಿಸಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "581cb8d0"
+  },
+  "ai.shelf.another": {
+    "message": "ಇನ್ನೊಂದು ಶೆಲ್ಫ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "3cbbbf0c"
+  },
+  "ai.reply.draft": {
+    "message": "ಉತ್ತರದ ಡ್ರಾಫ್ಟ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "d7d6d9c7"
+  },
+  "ai.reply.note": {
+    "message": "AI ಡ್ರಾಫ್ಟ್ ಮಾಡಿದೆ. ಬೇಕಾದಂತೆ ಬದಲಿಸಿ; ನೀವು ಕಳುಹಿಸಿದಾಗ ಮಾತ್ರ ಹೋಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "f1f53f11"
+  },
+  "ai.reply.failed": {
+    "message": "ಈ ಬಾರಿ ಡ್ರಾಫ್ಟ್ ಆಗಲಿಲ್ಲ. ನಿಮ್ಮ ಉತ್ತರ ಬರೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "a4f32319"
+  },
+  "ai.banner.suggest": {
+    "message": "ಪದಗಳನ್ನು ಸೂಚಿಸಿ",
+    "review": "reviewed",
+    "enHash": "fa02e971"
+  },
+  "ai.banner.writing": {
+    "message": "ಆಯ್ಕೆಗಳನ್ನು ಬರೆಯಲಾಗುತ್ತಿದೆ…",
+    "review": "reviewed",
+    "enHash": "7ce53a62"
+  },
+  "ai.banner.failed": {
+    "message": "ಈ ಬಾರಿ ಸಲಹೆಗಳು ಬಂದಿಲ್ಲ. ನಿಮ್ಮದೇ ಬರೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "a307457c"
+  },
+  "ai.banner.options": {
+    "message": "ಪದಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "5890d694"
+  },
+  "ai.banner.use": {
+    "message": "ಇದನ್ನು ಬಳಸಿ",
+    "review": "reviewed",
+    "enHash": "b80ded59"
+  },
+  "ai.banner.none": {
+    "message": "ಇವುಗಳಲ್ಲಿ ಯಾವುದೂ ಬೇಡ",
+    "review": "reviewed",
+    "enHash": "175ed947"
+  },
+  "ai.error.busy": {
+    "message": "ಇತರ ಫೋಟೋಗಳನ್ನು ಇನ್ನೂ ಓದಲಾಗುತ್ತಿದೆ. ಒಂದೆರಡು ನಿಮಿಷದಲ್ಲಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "cc92d5e7"
+  },
+  "ai.err.not_permitted": {
+    "message": "ನಿಮ್ಮ ಪಾತ್ರಕ್ಕೆ ಈ ಸಾಲು ಸೇರಿಸಲು ಆಗುವುದಿಲ್ಲ. ಮಾಲೀಕರು ಅಥವಾ ಮ್ಯಾನೇಜರ್‌ಗೆ ಕೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "6d6a02fa"
+  },
+  "ai.partial": {
+    "message": "{n, plural, =0 {ಇನ್ನೂ ಏನೂ ಸೇರಿಸಿಲ್ಲ.} one {# ಸಾಲು ಸೇರಿಸಲಾಗಿದೆ.} other {# ಸಾಲುಗಳನ್ನು ಸೇರಿಸಲಾಗಿದೆ.}} ಕೆಳಗೆ ಗುರುತಿಸಿದ ಸಾಲುಗಳನ್ನು ಸರಿಪಡಿಸಿ ಮತ್ತೆ ದೃಢೀಕರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "4d47904c"
+  },
+  "ai.line.added": {
+    "message": "ಸೇರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "b68734c2"
+  },
+  "ai.line.left": {
+    "message": "ಬಿಡಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "e3b33f3c"
+  },
+  "ai.discardRest": {
+    "message": "ಉಳಿದವನ್ನು ತೆಗೆದುಹಾಕಿ",
+    "review": "reviewed",
+    "enHash": "7f43c378"
+  }
+}

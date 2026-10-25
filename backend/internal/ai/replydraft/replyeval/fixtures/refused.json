@@ -1,0 +1,27 @@
+{
+  "name": "refused",
+  "input": {
+    "stars": 5,
+    "tags": [],
+    "text": null,
+    "language": "en",
+    "shop": "Sri Lakshmi Stores"
+  },
+  "expect": {
+    "text": "",
+    "reject": "refused"
+  },
+  "reply": {
+    "id": "msg_rr_refused",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [],
+    "stop_reason": "refusal",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 30
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "te_wrong_item",
+  "input": {
+    "stars": 1,
+    "tags": [
+      "wrong_item"
+    ],
+    "text": "Got the wrong brand of oil.",
+    "language": "te",
+    "shop": "Sri Lakshmi Stores"
+  },
+  "expect": {
+    "text": "తప్పు బ్రాండ్ నూనె వచ్చినందుకు క్షమించండి. దయచేసి అంగడికి రండి, మేము మార్చి ఇస్తాం.",
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_rr_te_wrong_item",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rr_te_wrong_item",
+        "name": "draft_review_reply",
+        "input": {
+          "text": "తప్పు బ్రాండ్ నూనె వచ్చినందుకు క్షమించండి. దయచేసి అంగడికి రండి, మేము మార్చి ఇస్తాం."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

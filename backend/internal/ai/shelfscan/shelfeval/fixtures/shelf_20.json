@@ -1,0 +1,68 @@
+{
+  "name": "shelf_20",
+  "input": {
+    "image": "images/shelf_20.jpg"
+  },
+  "expect": {
+    "products": [
+      "Amul Butter 100g",
+      "Aashirvaad Atta 5kg",
+      "Britannia Good Day 100g",
+      "Real Mango Juice 1L",
+      "Parle-G 250g"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_20",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_20",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Butter",
+              "brand": "Amul",
+              "size": "100g",
+              "confidence": 0.72
+            },
+            {
+              "name": "Atta",
+              "brand": "Aashirvaad",
+              "size": "5kg",
+              "confidence": 0.75
+            },
+            {
+              "name": "Good Day",
+              "brand": "Britannia",
+              "size": "100g",
+              "confidence": 0.76
+            },
+            {
+              "name": "Mango Juice",
+              "brand": "Real",
+              "size": "1L",
+              "confidence": 0.6
+            },
+            {
+              "name": "Parle-G",
+              "brand": "Parle-G",
+              "size": "250g",
+              "confidence": 0.62
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

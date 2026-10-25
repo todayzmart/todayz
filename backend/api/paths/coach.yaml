@@ -1,12 +1,152 @@
-# Paths: domain "coach" (owner W3-10): the business coach (04 §2.6).
+# Paths: domain "coach" (owner W3-11): the shop coach feed, B-19 (04 §2.6, 11 §2.1, D-48).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [coach]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/coach.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Owner and manager only (`coach.view`, `coach.act`). Cards are written by the coach jobs
+# (coach_daily, coach_weekly, coach_realtime_rules); the API only lists them and records Done
+# and Not useful. A card's action is a prefill the client opens (06 "Insight deep links" and the
+# coach actions); the API applies nothing. Every number in a card's text is in its `numbers`
+# (11 §1 rule 5), and no card speaks about fewer than 10 other people or shops (D-71).
+/v1/biz/businesses/{bid}/stores/{sid}/coach/cards:
+  parameters: &store
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listCoachCards
+    tags: [coach]
+    summary: The coach feed (B-19, and the newest cards on B-03)
+    description: >-
+      `status=live` (default) is the cards still showing (new and seen), newest first; `done`,
+      `dismissed` and `all` are the history. Reading the live feed marks its new cards seen.
+      A card leaves the live feed when it is acted on, when `validUntil` passes, or when its
+      detector no longer fires.
+    parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: ../schemas/coach.yaml#/CoachCardFilter
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Coach cards, newest first
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/coach.yaml#/CoachCardList
+            example:
+              items:
+                - id: 01JB2R4K8M3V6Y4K2T9W5R1C0D
+                  detector: missed_orders_peak_hour
+                  subjectRef: store
+                  kind: low
+                  topic: orders
+                  title: 3 orders expired yesterday
+                  body: Nobody accepted them within 10 minutes (7–9 pm). Turn on auto-accept for in-stock items?
+                  numbers: {count: 3, minutes: 10, window: 7–9 pm}
+                  action: {type: turn_on_auto_accept, payload: {setting: auto_accept}}
+                  status: seen
+                  generatedBy: rule
+                  lang: en
+                  createdAt: "2026-10-25T00:30:00Z"
+                  validUntil: "2026-10-27T00:30:00Z"
+                  actedAt: null
+                  quietUntil: null
+              nextCursor: null
+              serverNow: "2026-10-25T09:30:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/coach/cards/{cardId}/done:
+  parameters: &card
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: cardId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: markCoachCardDone
+    tags: [coach]
+    summary: Done on a live card
+    description: >-
+      Records that the shop acted on the card; the detector's weight for this shop goes up
+      (11 §2.1 step 5). Done on a card already done answers the card again; on a dismissed or
+      expired card it is `409 invalid_transition`. Nothing else changes: the card's action was
+      only a prefill.
+    x-idempotency: none
+    responses:
+      "200":
+        description: The card, done
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/coach.yaml#/CoachCard
+            example:
+              id: 01JB2R4K8M3V6Y4K2T9W5R1C0D
+              detector: top_seller_low_days_of_cover
+              subjectRef: 01JB0S5T1A2B3C4D5E6F7G8H9J
+              kind: action
+              topic: stock
+              title: Amul butter 100 g is running out
+              body: 2 days of stock left at the current pace. Restock 15.
+              numbers: {item: Amul butter 100 g, days: 2, qty: 15}
+              action: {type: restock, payload: {storeItemId: 01JB0S5T1A2B3C4D5E6F7G8H9J, qty: 15}}
+              status: done
+              generatedBy: rule
+              lang: en
+              createdAt: "2026-10-25T00:30:00Z"
+              validUntil: "2026-10-27T00:30:00Z"
+              actedAt: "2026-10-25T09:30:00Z"
+              quietUntil: null
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/coach/cards/{cardId}/dismiss:
+  parameters: *card
+  post:
+    operationId: dismissCoachCard
+    tags: [coach]
+    summary: Not useful on a live card
+    description: >-
+      Quiets that subject of that detector, not the whole detector, for
+      `coach_dismiss_quiet_days`, and lowers the detector's weight for this shop. A repeat answers
+      the card again with its `quietUntil`; on a done or expired card it is `409 invalid_transition`.
+    x-idempotency: none
+    responses:
+      "200":
+        description: The card, dismissed
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/coach.yaml#/CoachCard
+            example:
+              id: 01JB2R4K8M3V6Y4K2T9W5R1C0D
+              detector: wanted_nearby
+              subjectRef: 01JB0S7P1A2B3C4D5E6F7G8H9J
+              kind: tip
+              topic: demand
+              title: People nearby want Amul Taaza 500 ml
+              body: 12 searches within 2 km in the last 7 days. Add it to your shop?
+              numbers: {item: Amul Taaza 500 ml, searches: 12, km: 2 km, periodDays: 7}
+              action: {type: add_product, payload: {masterProductId: 01JB0S7P1A2B3C4D5E6F7G8H9J}}
+              status: dismissed
+              generatedBy: ai
+              lang: en
+              createdAt: "2026-10-25T00:30:00Z"
+              validUntil: "2026-10-27T00:30:00Z"
+              actedAt: "2026-10-25T09:30:00Z"
+              quietUntil: "2026-11-01T09:30:00Z"
+      default: *problem

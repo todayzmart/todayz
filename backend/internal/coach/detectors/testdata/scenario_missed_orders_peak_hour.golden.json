@@ -1,0 +1,20 @@
+[
+  {
+    "detector": "missed_orders_peak_hour",
+    "subject": "store",
+    "kind": "low",
+    "topic": "orders",
+    "severity": 2,
+    "stake": 3,
+    "ageDays": 0,
+    "numbers": {
+      "count": 3,
+      "minutes": 10,
+      "window": "7–9 pm"
+    },
+    "action": "turn_on_auto_accept",
+    "payload": {
+      "setting": "auto_accept"
+    }
+  }
+]

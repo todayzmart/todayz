@@ -1,0 +1,150 @@
+{
+  "coach.title": {
+    "defaultMessage": "Shop coach",
+    "description": "B-19 page title and the Overview coach card title"
+  },
+  "coach.desc": {
+    "defaultMessage": "Tips from your shop's own sales, stock, orders and reviews",
+    "description": "One line under the coach title"
+  },
+  "coach.foot": {
+    "defaultMessage": "“Done” and “Not useful” teach the coach what helps you",
+    "description": "Coach card footer on Overview"
+  },
+  "coach.all": {
+    "defaultMessage": "All tips",
+    "description": "Link from the Overview coach card to B-19"
+  },
+  "coach.kind.high": {
+    "defaultMessage": "High",
+    "description": "Card type: good news, e.g. a best day"
+  },
+  "coach.kind.low": {
+    "defaultMessage": "Low",
+    "description": "Card type: something went wrong, e.g. missed orders"
+  },
+  "coach.kind.action": {
+    "defaultMessage": "Do this",
+    "description": "Card type: a suggested action"
+  },
+  "coach.kind.tip": {
+    "defaultMessage": "Tip",
+    "description": "Card type: a general tip"
+  },
+  "coach.action.reply_reviews": {
+    "defaultMessage": "Reply to reviews",
+    "description": "Coach card action: opens the reviews list"
+  },
+  "coach.action.turn_on_auto_accept": {
+    "defaultMessage": "Turn on auto-accept",
+    "description": "Coach card action: opens order settings"
+  },
+  "coach.action.update_stock": {
+    "defaultMessage": "Update stock",
+    "description": "Coach card action: opens stock"
+  },
+  "coach.action.enable_delivery": {
+    "defaultMessage": "Turn on delivery",
+    "description": "Coach card action: opens delivery settings"
+  },
+  "coach.action.none": {
+    "defaultMessage": "Open",
+    "description": "Fallback action label; cards without an action show no button"
+  },
+  "coach.done": {
+    "defaultMessage": "Done",
+    "description": "Button: the shop acted on the card"
+  },
+  "coach.notUseful": {
+    "defaultMessage": "Not useful",
+    "description": "Button: hide this card's subject for a while"
+  },
+  "coach.doneToast": {
+    "defaultMessage": "Marked done",
+    "description": "Toast after Done"
+  },
+  "coach.hiddenUntil": {
+    "defaultMessage": "Hidden until {date}",
+    "description": "Toast after Not useful; date like 1 Nov"
+  },
+  "coach.hidden": {
+    "defaultMessage": "Hidden",
+    "description": "Toast after Not useful when the server sends no date"
+  },
+  "coach.error.changed": {
+    "defaultMessage": "This tip has changed. The list is up to date now.",
+    "description": "Toast when the card was already done or ended"
+  },
+  "coach.error.generic": {
+    "defaultMessage": "Could not save that. Try again.",
+    "description": "Toast when Done or Not useful failed"
+  },
+  "coach.error.load": {
+    "defaultMessage": "Could not load the coach",
+    "description": "Banner when the feed failed to load"
+  },
+  "coach.retry": {
+    "defaultMessage": "Try again",
+    "description": "Retry button"
+  },
+  "coach.loading": {
+    "defaultMessage": "Loading tips",
+    "description": "Screen reader label while the feed loads"
+  },
+  "coach.aiWording": {
+    "defaultMessage": "Worded by AI from your shop's numbers",
+    "description": "Note on a card whose wording a model wrote"
+  },
+  "coach.status.new": {
+    "defaultMessage": "New",
+    "description": "History line for a card that is still new"
+  },
+  "coach.status.seen": {
+    "defaultMessage": "Seen",
+    "description": "History line for a card that was seen"
+  },
+  "coach.status.done": {
+    "defaultMessage": "Done {date}",
+    "description": "History line; date like 24 Oct"
+  },
+  "coach.status.dismissed": {
+    "defaultMessage": "Marked not useful {date}",
+    "description": "History line; date like 24 Oct"
+  },
+  "coach.status.expired": {
+    "defaultMessage": "Ended {date}",
+    "description": "History line for a card that ran out; date like 24 Oct"
+  },
+  "coach.tabs": {
+    "defaultMessage": "Coach cards",
+    "description": "Accessible name of the tab list"
+  },
+  "coach.tab.live": {
+    "defaultMessage": "For you",
+    "description": "Tab: live cards"
+  },
+  "coach.tab.done": {
+    "defaultMessage": "Done",
+    "description": "Tab: cards marked done"
+  },
+  "coach.tab.dismissed": {
+    "defaultMessage": "Not useful",
+    "description": "Tab: cards marked not useful"
+  },
+  "coach.empty.live": {
+    "defaultMessage": "Nothing from the coach right now",
+    "description": "Empty live tab"
+  },
+  "coach.empty.done": {
+    "defaultMessage": "Nothing marked done yet",
+    "description": "Empty Done tab"
+  },
+  "coach.empty.dismissed": {
+    "defaultMessage": "Nothing marked not useful",
+    "description": "Empty Not useful tab"
+  },
+  "coach.more": {
+    "defaultMessage": "Load more",
+    "description": "Button: next page of cards"
+  }
+}

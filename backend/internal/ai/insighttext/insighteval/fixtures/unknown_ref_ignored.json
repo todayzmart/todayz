@@ -1,0 +1,53 @@
+{
+  "name": "unknown_ref_ignored",
+  "input": {
+    "lang": "en",
+    "rows": [
+      {
+        "ref": "r1",
+        "kind": "stock_check_due",
+        "facts": {
+          "items": 5,
+          "daysSinceCount": 45
+        }
+      }
+    ]
+  },
+  "expect": {
+    "texts": {
+      "r1": "5 items were last counted 45 days ago; count them today."
+    },
+    "dropped": 0
+  },
+  "reply": {
+    "id": "msg_it_unknown_ref_ignored",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_it_unknown_ref_ignored",
+        "name": "write_insight_texts",
+        "input": {
+          "texts": [
+            {
+              "ref": "r9",
+              "text": "Count 5 items."
+            },
+            {
+              "ref": "r1",
+              "text": "5 items were last counted 45 days ago; count them today."
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

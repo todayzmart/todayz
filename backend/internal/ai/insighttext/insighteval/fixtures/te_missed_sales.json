@@ -1,0 +1,49 @@
+{
+  "name": "te_missed_sales",
+  "input": {
+    "lang": "te",
+    "rows": [
+      {
+        "ref": "r1",
+        "kind": "missed_sales",
+        "facts": {
+          "itemName": "Maggi Noodles 70g",
+          "searchDaysOutOfStock": 4
+        }
+      }
+    ]
+  },
+  "expect": {
+    "texts": {
+      "r1": "Maggi Noodles 70g స్టాక్ లేని 4 రోజుల్లో దీని కోసం వెతికారు; మళ్లీ స్టాక్ చేయండి."
+    },
+    "dropped": 0
+  },
+  "reply": {
+    "id": "msg_it_te_missed_sales",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_it_te_missed_sales",
+        "name": "write_insight_texts",
+        "input": {
+          "texts": [
+            {
+              "ref": "r1",
+              "text": "Maggi Noodles 70g స్టాక్ లేని 4 రోజుల్లో దీని కోసం వెతికారు; మళ్లీ స్టాక్ చేయండి."
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

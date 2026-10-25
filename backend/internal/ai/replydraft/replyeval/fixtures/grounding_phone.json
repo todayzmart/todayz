@@ -1,0 +1,38 @@
+{
+  "name": "grounding_phone",
+  "input": {
+    "stars": 2,
+    "tags": [
+      "late"
+    ],
+    "text": "Late again.",
+    "language": "en",
+    "shop": "Sri Lakshmi Stores"
+  },
+  "expect": {
+    "text": "",
+    "reject": "grounding"
+  },
+  "reply": {
+    "id": "msg_rr_grounding_phone",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rr_grounding_phone",
+        "name": "draft_review_reply",
+        "input": {
+          "text": "Sorry for the delay. Please call us on 98450 12345 so we can make it right."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

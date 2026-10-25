@@ -1,0 +1,63 @@
+{
+  "name": "shelf_04",
+  "input": {
+    "image": "images/shelf_04.jpg"
+  },
+  "expect": {
+    "products": [
+      "Haldiram Bhujia 200g",
+      "Clinic Plus Shampoo 175ml",
+      "Parle-G 250g",
+      "Dettol Soap 125g",
+      "Fortune Sunflower Oil 1L",
+      "Surf Excel 1kg"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_04",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_04",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Bhujia",
+              "brand": "Haldiram",
+              "size": "200g",
+              "confidence": 0.66
+            },
+            {
+              "name": "Plus Shampoo",
+              "brand": "Clinic",
+              "size": "175ml",
+              "confidence": 0.67
+            },
+            {
+              "name": "Soap",
+              "brand": "Dettol",
+              "size": "125g",
+              "confidence": 0.68
+            },
+            {
+              "name": "Excel",
+              "brand": "Surf",
+              "size": "1kg",
+              "confidence": 0.66
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

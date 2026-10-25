@@ -1,0 +1,68 @@
+{
+  "name": "shelf_36",
+  "input": {
+    "image": "images/shelf_36.jpg"
+  },
+  "expect": {
+    "products": [
+      "Colgate Strong Teeth 200g",
+      "Brooke Bond Red Label 250g",
+      "Bournvita 500g",
+      "Kurkure Masala 90g",
+      "Good Knight Refill"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_36",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_36",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Strong Teeth",
+              "brand": "Colgate",
+              "size": "200g",
+              "confidence": 0.82
+            },
+            {
+              "name": "Bond Red Label",
+              "brand": "Brooke",
+              "size": "250g",
+              "confidence": 0.8
+            },
+            {
+              "name": "Bournvita",
+              "brand": "Bournvita",
+              "size": "500g",
+              "confidence": 0.61
+            },
+            {
+              "name": "Masala",
+              "brand": "Kurkure",
+              "size": "90g",
+              "confidence": 0.84
+            },
+            {
+              "name": "Knight Refill",
+              "brand": "Good",
+              "size": null,
+              "confidence": 0.89
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}
