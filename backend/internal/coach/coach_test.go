@@ -374,6 +374,44 @@ func TestAIWriterMissCache(t *testing.T) {
 	require.Equal(t, 2, e.llm.calls)
 }
 
+// A card closed because its condition resolved is neutral for the
+// detector's weight; only a card that ran out unacted counts as ignored.
+func TestResolvedIsNotIgnored(t *testing.T) {
+	e := newEnv(t)
+	s := e.service(t, false)
+	_, err := s.RunStore(e.ctx, detectors.Daily, storeSL)
+	require.NoError(t, err)
+	live := e.cards(t, storeSL)
+	require.GreaterOrEqual(t, len(live), 2)
+	resolved, due := live[0], live[1]
+	ignored := func(det string) (n int) {
+		require.NoError(t, e.tdb.OwnerPool.QueryRow(e.ctx, `SELECT coalesce((SELECT ignored FROM coach_weights WHERE store_id = $1 AND detector = $2), 0)`, ids.UUID(storeSL), det).Scan(&n))
+		return n
+	}
+	weight := func(det string) (n int) {
+		require.NoError(t, e.tdb.OwnerPool.QueryRow(e.ctx, `SELECT coalesce((SELECT weight_bp FROM coach_weights WHERE store_id = $1 AND detector = $2), 10000)`, ids.UUID(storeSL), det).Scan(&n))
+		return n
+	}
+	w0, i0 := weight(resolved.Detector), ignored(resolved.Detector)
+
+	// The subject no longer fires: the card closes, the weight stays.
+	e.exec(t, `UPDATE coach_suggestions SET subject_ref = 'resolved-subject' WHERE id = $1`, resolved.ID)
+	_, err = s.RunStore(e.ctx, detectors.Daily, storeSL)
+	require.NoError(t, err)
+	var status string
+	require.NoError(t, e.tdb.OwnerPool.QueryRow(e.ctx, `SELECT status FROM coach_suggestions WHERE id = $1`, resolved.ID).Scan(&status))
+	require.Equal(t, "expired", status)
+	require.Equal(t, w0, weight(resolved.Detector))
+	require.Equal(t, i0, ignored(resolved.Detector))
+
+	// A card that ran out unacted is an ignore.
+	i1 := ignored(due.Detector)
+	e.exec(t, `UPDATE coach_suggestions SET valid_until = $2 WHERE id = $1`, due.ID, e.clk.Now().Add(-time.Second))
+	_, err = s.RunStore(e.ctx, detectors.Daily, storeSL)
+	require.NoError(t, err)
+	require.Equal(t, i1+1, ignored(due.Detector))
+}
+
 // TestFeed: List marks new cards seen; Done and Dismiss are one-way, repeat
 // safely and answer not_found for another store's card.
 func TestFeed(t *testing.T) {

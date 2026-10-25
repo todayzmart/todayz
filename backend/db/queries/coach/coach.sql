@@ -185,14 +185,14 @@ UPDATE coach_suggestions SET status = 'expired', updated_at = sqlc.arg(now)
 WHERE store_id = sqlc.arg(store_id) AND status IN ('new', 'seen') AND valid_until <= sqlc.arg(now)
 RETURNING detector;
 
--- name: ExpireNotFiring :many
+-- name: ExpireNotFiring :exec
 -- Closes the live cards of the given detectors whose subject no longer fires
--- (cards expire when they stop being true, 11 §2.1).
+-- (cards expire when they stop being true, 11 §2.1). A resolved card is
+-- neutral for the detector's weight.
 UPDATE coach_suggestions SET status = 'expired', updated_at = sqlc.arg(now)
 WHERE store_id = sqlc.arg(store_id) AND status IN ('new', 'seen')
   AND detector = ANY(sqlc.arg(detectors)::text[])
-  AND NOT ((detector || '|' || subject_ref) = ANY(sqlc.arg(firing)::text[]))
-RETURNING detector;
+  AND NOT ((detector || '|' || subject_ref) = ANY(sqlc.arg(firing)::text[]));
 
 -- Weights --------------------------------------------------------------------
 

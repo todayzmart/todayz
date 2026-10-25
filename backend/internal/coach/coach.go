@@ -167,11 +167,9 @@ func (s *Service) RunStore(ctx context.Context, j detectors.Job, storeID ids.ID)
 		}
 		all = append(all, fs...)
 	}
-	gone, err := q.ExpireNotFiring(ctx, coachdb.ExpireNotFiringParams{Now: now, StoreID: sid, Detectors: names, Firing: firing})
-	if err != nil {
-		return sum, err
-	}
-	if err := s.ignored(ctx, q, sid, gone, now); err != nil {
+	// A card whose condition resolved is closed without a weight change: only
+	// a card that ran out unacted (ExpireDue) counts as ignored.
+	if err := q.ExpireNotFiring(ctx, coachdb.ExpireNotFiringParams{Now: now, StoreID: sid, Detectors: names, Firing: firing}); err != nil {
 		return sum, err
 	}
 
