@@ -23,6 +23,8 @@ export type AssistPick = { kind: 'query'; query: string } | { kind: 'chip'; chip
 export interface SearchAssistProps {
   query: string;
   refineHint: boolean;
+  /** Chips that would change nothing on this search (the filter is already on). */
+  hide?: (chip: AiSearchChip) => boolean;
   onPick: (pick: AssistPick) => void;
 }
 
@@ -57,7 +59,7 @@ async function ask(q: string, signal: AbortSignal): Promise<SearchAssistResult |
   }
 }
 
-export function SearchAssist({ query, refineHint, onPick }: SearchAssistProps) {
+export function SearchAssist({ query, refineHint, hide, onPick }: SearchAssistProps) {
   const features = useAiFeatures();
   const on = Boolean(features?.searchAssist) && refineHint && query.trim().length >= 2;
   const assist = useQuery({
@@ -70,10 +72,13 @@ export function SearchAssist({ query, refineHint, onPick }: SearchAssistProps) {
     queryFn: ({ signal }) => ask(query, signal),
   });
   if (!on || !assist.data) return null;
-  return <Suggestions result={assist.data} query={query} onPick={onPick} />;
+  const chips = assist.data.chips.filter((c) => (c.kind !== 'maxPrice' || Number(c.value) > 0) && !hide?.(c));
+  const better = assist.data.query && assist.data.query !== query ? assist.data.query : null;
+  if (chips.length === 0 && !better) return null;
+  return <Suggestions better={better} chips={chips} onPick={onPick} />;
 }
 
-function Suggestions({ result, query, onPick }: { result: SearchAssistResult; query: string; onPick: (p: AssistPick) => void }) {
+function Suggestions({ better, chips, onPick }: { better: string | null; chips: AiSearchChip[]; onPick: (p: AssistPick) => void }) {
   const intl = useIntl();
   const { money } = useFmt();
   const label = (c: AiSearchChip): string => {
@@ -98,12 +103,11 @@ function Suggestions({ result, query, onPick }: { result: SearchAssistResult; qu
     track('search_assist_used', { outcome: 'tapped', latency_ms: 0 });
     onPick(p);
   };
-  const chips = result.chips.filter((c) => c.kind !== 'maxPrice' || Number(c.value) > 0);
   return (
     <div className="tz-chips" role="group" aria-label={intl.formatMessage({ id: 'search.assist.label' })}>
-      {result.query && result.query !== query && (
-        <Chip pressed={false} icon={Search} onPressedChange={() => pick({ kind: 'query', query: result.query as string })}>
-          {intl.formatMessage({ id: 'search.assist.query' }, { query: result.query })}
+      {better && (
+        <Chip pressed={false} icon={Search} onPressedChange={() => pick({ kind: 'query', query: better })}>
+          {intl.formatMessage({ id: 'search.assist.query' }, { query: better })}
         </Chip>
       )}
       {chips.map((c, i) => (

@@ -1,11 +1,11 @@
 // Slots for features that land from other work packages, so the screens keep their layout. The ask
 // flow is W3-16; search assist and voice search are W3-12 (D-101).
 import { AskNearby } from '../asks/AskNearby';
-import { SearchAssist, type AssistPick } from '../search-assist/SearchAssist';
+import { SearchAssist, type SearchAssistProps } from '../search-assist/SearchAssist';
 import { VoiceSearch, type Heard } from '../voice-search/VoiceSearch';
 
 /** AI-C2 search assist: suggestion chips under the summary line when the response says `refineHint`. */
-export function SearchAssistSlot(props: { query: string; refineHint: boolean; onPick: (pick: AssistPick) => void }) {
+export function SearchAssistSlot(props: SearchAssistProps) {
   return <SearchAssist {...props} />;
 }
 

@@ -307,6 +307,35 @@ describe('AI-C2 search assist', () => {
     const applied = await screen.findByRole('group', { name: 'Added filters' });
     expect(within(applied).getByRole('button', { name: /Under ₹300/ })).toBeInTheDocument();
     expect(events.map((e) => (e.props as { outcome: string }).outcome)).toEqual(['shown', 'tapped']);
+    // The suggestions stay, without the filter that is now on.
+    const after = await screen.findByRole('group', { name: 'Suggestions for this search' });
+    expect(within(after).queryByRole('button', { name: /Under ₹300/ })).not.toBeInTheDocument();
+    expect(within(after).getByRole('button', { name: 'Open now' })).toBeInTheDocument();
+  });
+
+  it('hides chips for filters that are already on, and the group when none is left', async () => {
+    renderAt('/search?q=atta&open=true&maxPricePaise=30000&brand=aashirvaad', {
+      returning: true,
+      handlers: [
+        signedIn,
+        featuresOn(),
+        on('POST', '/v1/me/ai/search-assist', () =>
+          json(200, {
+            query: 'atta',
+            chips: [
+              { kind: 'maxPrice', value: '30000', text: 'under 300' },
+              { kind: 'openNow', value: null, text: 'open now' },
+              { kind: 'brand', value: 'aashirvaad', text: 'Aashirvaad' },
+            ],
+          }),
+        ),
+        ...discover(() => result({ refineHint: true })),
+      ],
+    });
+    atBengaluru();
+    expect(await screen.findByText('Sri Lakshmi Stores')).toBeInTheDocument();
+    await waitFor(() => expect(events[0]).toMatchObject({ props: { outcome: 'shown' } }));
+    expect(screen.queryByRole('group', { name: 'Suggestions for this search' })).not.toBeInTheDocument();
   });
 
   it('shows nothing on a 204, and the results stay', async () => {

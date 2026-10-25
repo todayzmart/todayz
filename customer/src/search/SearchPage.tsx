@@ -30,6 +30,7 @@ import { ItemCard } from '../store/ItemCard';
 import { seedItems } from '../store/itemCache';
 import { useCartActions } from '../store/useCartActions';
 import { addRecent, clearRecent, getRecent } from './recent';
+import type { AiSearchChip } from '@todayz/api-client/gen/model/aiSearchChip';
 import type { AssistPick } from '../search-assist/SearchAssist';
 import { useVoiceOutcome } from '../voice-search/session';
 import { AskNearbySlot, SearchAssistSlot, VoiceSearchSlot } from './slots';
@@ -97,6 +98,15 @@ function applyPick(state: SearchState, pick: AssistPick): SearchState {
 }
 
 const BRAND_SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+/** True when tapping the chip would change no filter (already applied, or not usable). */
+function chipChangesNothing(state: SearchState, chip: AiSearchChip): boolean {
+  const next = applyPick(state, { kind: 'chip', chip });
+  const keys = new Set([...Object.keys(state), ...Object.keys(next)] as (keyof SearchState)[]);
+  keys.delete('parse');
+  keys.delete('source');
+  return [...keys].every((k) => next[k] === state[k]);
+}
 
 export function SearchPage({ state, onChange }: { state: SearchState; onChange: (next: SearchState) => void }) {
   const intl = useIntl();
@@ -397,7 +407,14 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
           )}
         </p>
       )}
-      {first && <SearchAssistSlot query={q} refineHint={first.refineHint} onPick={(p) => onChange(applyPick(state, p))} />}
+      {first && (
+        <SearchAssistSlot
+          query={q}
+          refineHint={first.refineHint}
+          hide={(c) => chipChangesNothing(state, c)}
+          onPick={(p) => onChange(applyPick(state, p))}
+        />
+      )}
 
       {search.isPending && (
         <div aria-busy="true" className={styles.groups}>
