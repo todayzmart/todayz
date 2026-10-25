@@ -40,6 +40,7 @@ export const ACTION_ROLES = {
   strikesReset: SUPPORT_UP,
   orderCancel: SUPPORT_UP,
   reviewModerate: SUPPORT_UP,
+  bannerModerate: SUPPORT_UP,
   auditLog: ADMINS,
   businessView: SUPPORT_UP,
   businessVerify: ADMINS,

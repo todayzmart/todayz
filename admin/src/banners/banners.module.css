@@ -1,0 +1,63 @@
+/* A-20 banner previews: the shop's photo, or its template on the category tint. Tokens only. */
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  aspect-ratio: 16 / 7;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+  background: var(--surface-sunken);
+  color: var(--ink);
+  font: var(--type-body);
+}
+
+.preview img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.headline {
+  font: var(--type-title);
+  margin: 0;
+}
+
+.subline {
+  margin: 0;
+}
+
+.preview[data-tint='green'] {
+  background: var(--tint-green);
+  color: var(--tint-green-ink);
+}
+
+.preview[data-tint='amber'] {
+  background: var(--tint-amber);
+  color: var(--tint-amber-ink);
+}
+
+.preview[data-tint='rose'] {
+  background: var(--tint-rose);
+  color: var(--tint-rose-ink);
+}
+
+.preview[data-tint='sky'] {
+  background: var(--tint-sky);
+  color: var(--tint-sky-ink);
+}
+
+.preview[data-tint='lilac'] {
+  background: var(--tint-lilac);
+  color: var(--tint-lilac-ink);
+}
+
+.preview[data-tint='peach'] {
+  background: var(--tint-peach);
+  color: var(--tint-peach-ink);
+}

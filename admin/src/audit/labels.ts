@@ -8,9 +8,10 @@ import { useIntl } from 'react-intl';
  */
 const SETTINGS_UPDATE = ['settings', 'update'].join('.');
 
-/** The A-08 actions, built the same way (`catalogue.…` is a message namespace too). */
+/** The A-08 and A-20 actions, built the same way (`catalogue.…` and `banners.…` are message namespaces too). */
 const CATALOGUE = (...parts: string[]) => ['catalogue', ...parts].join('.');
-const CATALOGUE_ACTIONS: Readonly<Record<string, string>> = {
+const BANNERS = (...parts: string[]) => ['banners', ...parts].join('.');
+const BUILT_ACTIONS: Readonly<Record<string, string>> = {
   [CATALOGUE('product', 'create')]: 'audit.action.catalogueProductCreate',
   [CATALOGUE('product', 'update')]: 'audit.action.catalogueProductUpdate',
   [CATALOGUE('pending', 'approve')]: 'audit.action.catalogueApprove',
@@ -20,6 +21,8 @@ const CATALOGUE_ACTIONS: Readonly<Record<string, string>> = {
   [CATALOGUE('category', 'update')]: 'audit.action.catalogueCategoryUpdate',
   [CATALOGUE('synonym', 'create')]: 'audit.action.catalogueSynonymCreate',
   [CATALOGUE('synonym', 'delete')]: 'audit.action.catalogueSynonymDelete',
+  [BANNERS('approve')]: 'audit.action.bannerApprove',
+  [BANNERS('remove')]: 'audit.action.bannerRemove',
 };
 
 /** Audit actions the console names; any other action shows as written (it is still audited). */
@@ -81,7 +84,7 @@ export function useActionLabel() {
         case SETTINGS_UPDATE:
           return intl.formatMessage({ id: 'audit.action.settingsUpdate' });
         default: {
-          const id = CATALOGUE_ACTIONS[action];
+          const id = BUILT_ACTIONS[action];
           return id ? intl.formatMessage({ id }) : action;
         }
       }

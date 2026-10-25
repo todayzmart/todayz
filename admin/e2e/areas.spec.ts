@@ -251,3 +251,65 @@ test('A-08: the catalogue desk merges a store-made duplicate into the master pro
   await expect(page.getByText('This product is no longer waiting for review. Its history is below.')).toBeVisible();
   expect(sent).toEqual([{ path: `/v1/admin/pending-products/${PENDING}/merge`, body: { intoProductId: TOOR } }]);
 });
+
+test('A-20: support clears a held banner, then takes it down with a reason', async ({ page }) => {
+  await signIn(page, ['support']);
+  const BANNER = '01JBANNER00000000000000B01';
+  let status = 'pending_review';
+  let moderation = 'needs_review';
+  let removeReason: string | null = null;
+  const banner = () => ({
+    id: BANNER,
+    storeId: STORE_ID,
+    storeName: 'Sri Lakshmi Stores',
+    storeCity: 'Bengaluru',
+    headline: 'Diwali sweets 20% off',
+    imageKey: null,
+    template: { tint: 'amber', subline: 'Kaju katli, laddoo and more' },
+    targetType: 'offer',
+    targetLabel: 'Diwali sweets',
+    targetItemCount: 0,
+    startsAt: '2026-10-24T00:00:00Z',
+    endsAt: '2026-11-02T00:00:00Z',
+    status,
+    moderation,
+    removeReason,
+    removedAt: removeReason ? NOW : null,
+    createdAt: '2026-10-24T10:00:00Z',
+    updatedAt: NOW,
+  });
+  const tab = () => (status === 'pending_review' ? 'review' : status === 'removed' ? 'removed' : 'live');
+  const sent = await fake(page, '/v1/admin/banners**', (method, url, body) => {
+    if (url.pathname === '/v1/admin/banners') return page1(tab() === (url.searchParams.get('state') ?? 'review') ? [banner()] : []);
+    if (url.pathname.endsWith('/approve')) {
+      status = 'live';
+      moderation = 'auto_ok';
+      return { status: 200, body: banner() };
+    }
+    if (url.pathname.endsWith('/takedown')) {
+      if (status === 'removed') return { status: 409, body: problem(409, 'invalid_transition') };
+      status = 'removed';
+      removeReason = (body as { reason: string }).reason;
+      return { status: 200, body: banner() };
+    }
+    return method === 'GET' ? { status: 200, body: banner() } : undefined;
+  });
+
+  await page.goto('/banners');
+  await page.getByRole('table', { name: 'Waiting for review' }).getByRole('button', { name: 'Diwali sweets 20% off' }).click();
+  await expect(page.getByRole('complementary', { name: 'History' }).getByText('No changes yet.')).toBeVisible();
+  await shot(page, 'admin-a20-banners.png');
+  await page.getByRole('button', { name: 'Clear banner' }).click();
+  await page.getByRole('dialog', { name: 'Clear the banner from Sri Lakshmi Stores?' }).getByRole('button', { name: 'Clear banner' }).click();
+  await page.getByRole('tab', { name: 'Live and scheduled' }).click();
+  await page.getByRole('table', { name: 'Live and scheduled' }).getByRole('button', { name: 'Diwali sweets 20% off' }).click();
+  await page.getByRole('button', { name: 'Take down' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Take down the banner from Sri Lakshmi Stores?' });
+  await dialog.getByLabel('Reason').fill('Price on the banner is misleading');
+  await dialog.getByRole('button', { name: 'Take down' }).click();
+  await expect(page.getByText('That banner is not in this list. It may have moved to another tab.')).toBeVisible();
+  expect(sent).toEqual([
+    { path: `/v1/admin/banners/${BANNER}/approve`, body: {} },
+    { path: `/v1/admin/banners/${BANNER}/takedown`, body: { reason: 'Price on the banner is misleading' } },
+  ]);
+});

@@ -254,5 +254,13 @@
   "audit.action.catalogueSynonymDelete": {
     "defaultMessage": "Search word removed",
     "description": "Audit action: a search synonym was removed"
+  },
+  "audit.action.bannerApprove": {
+    "defaultMessage": "Banner cleared",
+    "description": "Audit action: an admin cleared a banner the automatic check held"
+  },
+  "audit.action.bannerRemove": {
+    "defaultMessage": "Banner taken down",
+    "description": "Audit action: an admin took a shop's banner down"
   }
 }
