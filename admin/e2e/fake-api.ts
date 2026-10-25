@@ -73,6 +73,10 @@ export async function answerEmptyLists(page: Page) {
   );
   // A-17 lists every setting at once, with the provider keys beside them.
   await answerWith(page, '/v1/admin/settings', (req) => (req.method() === 'GET' ? { status: 200, body: { items: [], providers: [], serverNow: NOW } } : undefined));
+  // A-09 shows the coming week's expiry as a total and its days.
+  await answerWith(page, '/v1/admin/credits/expiry-preview', (req) =>
+    req.method() === 'GET' ? { status: 200, body: { from: NOW, to: NOW, totalPaise: 0, days: [], serverNow: NOW } } : undefined,
+  );
 }
 
 /**
