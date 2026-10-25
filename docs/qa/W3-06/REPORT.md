@@ -54,6 +54,7 @@ All of this ran on the merged tree, at the head this report is committed in.
 |---|---|
 | `make gen` | exit 0 |
 | `go build ./...`, `go vet` (business, cmd/todayz) | clean |
+| `gofmt -l`, `golangci-lint run` (business, catalogue, identity, authz, cmd/todayz) | clean, 0 issues |
 | `go test` business, catalogue, identity, authz, authz/policy (via `TODAYZ_TEST_PG_URL_FILE`) | ok (6 packages) |
 | `go test ./cmd/todayz/...`, which includes `TestFieldOnboardingHTTP`, `TestFieldOwnerCodeLimitsHTTP`, `TestFieldEditWindowHTTP` and `TestFieldStatsHTTP` ok (79 s) |
 | Admin `lint`, `lint:css`, `typecheck` | clean |
