@@ -1,0 +1,13 @@
+{
+  "description": "A search with \"open now\" in it: the open now chip and the words before it as the query.",
+  "match": {"contains": ["open now"], "tool": "suggest_search"},
+  "response": {
+    "content": [
+      {
+        "type": "tool_use",
+        "name": "suggest_search",
+        "input": {"query": null, "chips": [{"kind": "openNow", "value": null, "text": "open now"}]}
+      }
+    ]
+  }
+}

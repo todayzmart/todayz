@@ -1,0 +1,9 @@
+{
+  "description": "Any other search_assist call: nothing to suggest, so the API answers 204 and the app shows nothing.",
+  "match": {},
+  "response": {
+    "content": [
+      {"type": "tool_use", "name": "suggest_search", "input": {"query": null, "chips": []}}
+    ]
+  }
+}
