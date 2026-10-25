@@ -1,0 +1,327 @@
+{
+  "credits.title": {
+    "message": "क्रेडिट और रेफ़रल",
+    "review": "reviewed",
+    "enHash": "e9796059"
+  },
+  "credits.loading": {
+    "message": "क्रेडिट लोड हो रहे हैं",
+    "review": "reviewed",
+    "enHash": "1ff7a2d9"
+  },
+  "credits.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "credits.error.title": {
+    "message": "आपकी दुकानें लोड नहीं हो सकीं",
+    "review": "reviewed",
+    "enHash": "427c23ba"
+  },
+  "credits.error.body": {
+    "message": "अपना इंटरनेट देखें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "credits.noStore.title": {
+    "message": "पहले दुकान चुनें",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "credits.noStore.body": {
+    "message": "क्रेडिट एक दुकान के होते हैं। वह दुकान चुनें जिसमें आप काम कर रहे हैं।",
+    "review": "reviewed",
+    "enHash": "ffdf45d1"
+  },
+  "credits.noStore.action": {
+    "message": "दुकान चुनें",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "credits.manager.title": {
+    "message": "मैनेजर से पूछें",
+    "review": "reviewed",
+    "enHash": "aa2dd365"
+  },
+  "credits.manager.body": {
+    "message": "क्रेडिट, रेफ़रल और स्टैंडी मालिक और मैनेजर के लिए हैं।",
+    "review": "reviewed",
+    "enHash": "3a43a3e3"
+  },
+  "credits.account.title": {
+    "message": "क्रेडिट खाता",
+    "review": "reviewed",
+    "enHash": "1a59b98e"
+  },
+  "credits.account.balance": {
+    "message": "बैलेंस",
+    "review": "reviewed",
+    "enHash": "90eef613"
+  },
+  "credits.account.credits": {
+    "message": "{count, plural, one {# क्रेडिट} other {# क्रेडिट}}",
+    "review": "reviewed",
+    "enHash": "699b6117"
+  },
+  "credits.account.negative": {
+    "message": "माइनस बैलेंस आगे जुड़ता रहता है और पेआउट के समय घटा दिया जाता है।",
+    "review": "reviewed",
+    "enHash": "89430656"
+  },
+  "credits.account.error": {
+    "message": "आपका क्रेडिट खाता लोड नहीं हो सका।",
+    "review": "reviewed",
+    "enHash": "5c888d41"
+  },
+  "credits.lines.label": {
+    "message": "क्रेडिट खाते की एंट्री",
+    "review": "reviewed",
+    "enHash": "0106aad6"
+  },
+  "credits.lines.empty.title": {
+    "message": "अभी तक कोई क्रेडिट एंट्री नहीं",
+    "review": "reviewed",
+    "enHash": "aa1820ee"
+  },
+  "credits.lines.empty.body": {
+    "message": "ग्राहक आपकी दुकान पर जो क्रेडिट खर्च करते हैं और आप जो कैशबैक देते हैं, वे यहाँ दिखेंगे।",
+    "review": "reviewed",
+    "enHash": "84011ab9"
+  },
+  "credits.lines.more": {
+    "message": "पुरानी एंट्री दिखाएँ",
+    "review": "reviewed",
+    "enHash": "d99d5681"
+  },
+  "credits.lines.loading": {
+    "message": "पुरानी एंट्री लोड हो रही हैं",
+    "review": "reviewed",
+    "enHash": "fb0e4bcf"
+  },
+  "credits.lines.error": {
+    "message": "और एंट्री लोड नहीं हो सकीं। फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "25d59ed3"
+  },
+  "credits.line.spent": {
+    "message": "आपकी दुकान पर खर्च हुए क्रेडिट",
+    "review": "reviewed",
+    "enHash": "577a1d99"
+  },
+  "credits.line.cashback": {
+    "message": "आपका दिया कैशबैक",
+    "review": "reviewed",
+    "enHash": "b448f6f5"
+  },
+  "credits.line.referral_reward": {
+    "message": "रेफ़रल इनाम",
+    "review": "reviewed",
+    "enHash": "6fc3bbab"
+  },
+  "credits.line.pos_reversal": {
+    "message": "बिक्री वापस हुई",
+    "review": "reviewed",
+    "enHash": "e17f3704"
+  },
+  "credits.line.payout": {
+    "message": "पेआउट",
+    "review": "reviewed",
+    "enHash": "9bb39694"
+  },
+  "credits.line.adjustment": {
+    "message": "सुधार",
+    "review": "reviewed",
+    "enHash": "7f0496ac"
+  },
+  "credits.line.added": {
+    "message": "जोड़ा गया",
+    "review": "reviewed",
+    "enHash": "b68734c2"
+  },
+  "credits.line.taken": {
+    "message": "घटाया गया",
+    "review": "reviewed",
+    "enHash": "7ee5528e"
+  },
+  "credits.ref.order": {
+    "message": "ऑर्डर {ref}",
+    "review": "reviewed",
+    "enHash": "6b45f123"
+  },
+  "credits.ref.sale": {
+    "message": "बिक्री {ref}",
+    "review": "reviewed",
+    "enHash": "aae9dff8"
+  },
+  "credits.payouts.title": {
+    "message": "पेआउट कैसे होता है",
+    "review": "reviewed",
+    "enHash": "8bc68cc7"
+  },
+  "credits.payouts.in": {
+    "message": "क्रेडिट तब आते हैं जब ग्राहक उन्हें आपकी दुकान पर खर्च करते हैं और जब आपके रेफ़रल पर इनाम मिलता है।",
+    "review": "reviewed",
+    "enHash": "e43f875a"
+  },
+  "credits.payouts.out": {
+    "message": "क्रेडिट आपके दिए कैशबैक, वापस हुई बिक्री और पेआउट में जाते हैं।",
+    "review": "reviewed",
+    "enHash": "50227aac"
+  },
+  "credits.payouts.statement": {
+    "message": "स्टेटमेंट हर महीने की 1 तारीख़ को बंद होता है।",
+    "review": "reviewed",
+    "enHash": "b06786bc"
+  },
+  "credits.payouts.amount": {
+    "message": "आपका पेआउट आपका क्रेडिट बैलेंस है, उसमें से अभी तक न चुकाया गया पेआउट घटाकर।",
+    "review": "reviewed",
+    "enHash": "a7ae6425"
+  },
+  "credits.payouts.paid": {
+    "message": "पेआउट तभी 'चुकाया गया' दिखता है जब TodayZ आपको UPI से पैसे भेज दे और उसका रेफ़रेंस दर्ज कर ले।",
+    "review": "reviewed",
+    "enHash": "eef9c25d"
+  },
+  "credits.payouts.holds": {
+    "message": "KYC अधूरा होने, धोखाधड़ी का शक होने या बिज़नेस रुका होने पर पेआउट रोक दिया जाता है।",
+    "review": "reviewed",
+    "enHash": "78983e75"
+  },
+  "credits.statements.title": {
+    "message": "मासिक स्टेटमेंट",
+    "review": "reviewed",
+    "enHash": "f4d5c628"
+  },
+  "credits.statements.soon": {
+    "message": "मासिक स्टेटमेंट जल्द आ रहे हैं।",
+    "review": "reviewed",
+    "enHash": "8916c368"
+  },
+  "credits.standee.title": {
+    "message": "QR स्टैंडी",
+    "review": "reviewed",
+    "enHash": "db442fbd"
+  },
+  "credits.standee.body": {
+    "message": "{store} के लिए प्रिंट करने लायक A5 स्टैंडी। ग्राहक इसे स्कैन करके आपकी दुकान खोलते हैं।",
+    "review": "reviewed",
+    "enHash": "662cecd3"
+  },
+  "credits.standee.shortCode": {
+    "message": "छोटा कोड",
+    "review": "reviewed",
+    "enHash": "7545309d"
+  },
+  "credits.standee.preview": {
+    "message": "PDF देखें",
+    "review": "reviewed",
+    "enHash": "37b66fde"
+  },
+  "credits.standee.download": {
+    "message": "A5 PDF डाउनलोड करें",
+    "review": "reviewed",
+    "enHash": "d5f56067"
+  },
+  "credits.standee.preparing": {
+    "message": "PDF तैयार हो रही है",
+    "review": "reviewed",
+    "enHash": "cc44de09"
+  },
+  "credits.standee.open": {
+    "message": "स्टैंडी के विकल्प",
+    "review": "reviewed",
+    "enHash": "62238373"
+  },
+  "credits.standee.error": {
+    "message": "स्टैंडी तैयार नहीं हो सकी। फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "9f51d4bd"
+  },
+  "credits.referral.title": {
+    "message": "किसी दुकान को रेफ़र करें",
+    "review": "reviewed",
+    "enHash": "f3669d74"
+  },
+  "credits.referral.body": {
+    "message": "अपना कोड किसी दूसरे दुकान मालिक के साथ शेयर करें। उनकी दुकान को पहले ऑर्डर मिलने पर आपको क्रेडिट मिलते हैं।",
+    "review": "reviewed",
+    "enHash": "839b007c"
+  },
+  "credits.referral.codeLabel": {
+    "message": "आपका रेफ़रल कोड",
+    "review": "reviewed",
+    "enHash": "4b8a4a39"
+  },
+  "credits.referral.copy": {
+    "message": "कोड कॉपी करें",
+    "review": "reviewed",
+    "enHash": "6c106927"
+  },
+  "credits.referral.copied": {
+    "message": "कोड कॉपी हो गया",
+    "review": "reviewed",
+    "enHash": "1cca33a6"
+  },
+  "credits.referral.copyLink": {
+    "message": "लिंक कॉपी करें",
+    "review": "reviewed",
+    "enHash": "2f84eea5"
+  },
+  "credits.referral.linkCopied": {
+    "message": "लिंक कॉपी हो गया",
+    "review": "reviewed",
+    "enHash": "c2e98476"
+  },
+  "credits.referral.copyFailed": {
+    "message": "कॉपी नहीं हो सका। टेक्स्ट चुनकर ख़ुद कॉपी करें।",
+    "review": "reviewed",
+    "enHash": "2a15aec7"
+  },
+  "credits.referral.share": {
+    "message": "शेयर करें",
+    "review": "reviewed",
+    "enHash": "09ca55ca"
+  },
+  "credits.referral.shareTitle": {
+    "message": "TodayZ से जुड़ें",
+    "review": "reviewed",
+    "enHash": "84e86c58"
+  },
+  "credits.referral.pending": {
+    "message": "पहले ऑर्डर का इंतज़ार",
+    "review": "reviewed",
+    "enHash": "ec114479"
+  },
+  "credits.referral.rewarded": {
+    "message": "इनाम मिला",
+    "review": "reviewed",
+    "enHash": "8e773327"
+  },
+  "credits.referral.count": {
+    "message": "{count, plural, one {# दुकान} other {# दुकानें}}",
+    "review": "reviewed",
+    "enHash": "ac03bc4f"
+  },
+  "credits.referral.where": {
+    "message": "इनाम आपकी मुख्य दुकान के क्रेडिट खाते में जुड़ते हैं।",
+    "review": "reviewed",
+    "enHash": "e023e087"
+  },
+  "credits.referral.error": {
+    "message": "आपका रेफ़रल कोड लोड नहीं हो सका।",
+    "review": "reviewed",
+    "enHash": "8b449a2b"
+  },
+  "credits.referral.earned": {
+    "message": "कमाए गए क्रेडिट",
+    "review": "reviewed",
+    "enHash": "89e38aea"
+  },
+  "credits.referral.earnedValue": {
+    "message": "{credits, plural, one {# क्रेडिट} other {# क्रेडिट}}",
+    "review": "reviewed",
+    "enHash": "4854c909"
+  }
+}

@@ -1,0 +1,357 @@
+{
+  "onboarding.title": {
+    "message": "దుకాణం సెటప్",
+    "review": "reviewed",
+    "enHash": "0857f615"
+  },
+  "onboarding.loading": {
+    "message": "మీ దుకాణం సెటప్ లోడ్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "97135be6"
+  },
+  "onboarding.loadFailed.title": {
+    "message": "మీ దుకాణాన్ని లోడ్ చేయలేకపోయాం",
+    "review": "reviewed",
+    "enHash": "775cadd8"
+  },
+  "onboarding.loadFailed.body": {
+    "message": "మీ ఇంటర్నెట్ చూసుకుని మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "onboarding.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "onboarding.ownerOnly.title": {
+    "message": "దుకాణాన్ని యజమాని మాత్రమే సెటప్ చేయగలరు",
+    "review": "reviewed",
+    "enHash": "ce1ffa3e"
+  },
+  "onboarding.ownerOnly.body": {
+    "message": "సెటప్ పూర్తి చేయమని మీ దుకాణం యజమానిని అడగండి.",
+    "review": "reviewed",
+    "enHash": "ed6b1f38"
+  },
+  "onboarding.step": {
+    "message": "దశ {n}: {title}",
+    "review": "reviewed",
+    "enHash": "1133cf5c"
+  },
+  "onboarding.done": {
+    "message": "పూర్తయింది",
+    "review": "reviewed",
+    "enHash": "e9b450d1"
+  },
+  "onboarding.saved": {
+    "message": "సేవ్ అయింది",
+    "review": "reviewed",
+    "enHash": "c0ae8f6e"
+  },
+  "onboarding.save": {
+    "message": "సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "onboarding.business.title": {
+    "message": "మీ దుకాణం గురించి",
+    "review": "reviewed",
+    "enHash": "6291f190"
+  },
+  "onboarding.business.brandName": {
+    "message": "దుకాణం పేరు",
+    "review": "reviewed",
+    "enHash": "6a5cc02e"
+  },
+  "onboarding.business.brandNameHelp": {
+    "message": "కస్టమర్లు చూసే పేరు.",
+    "review": "reviewed",
+    "enHash": "6680c228"
+  },
+  "onboarding.business.brandNameRequired": {
+    "message": "మీ దుకాణం పేరు ఇవ్వండి.",
+    "review": "reviewed",
+    "enHash": "00a41eb3"
+  },
+  "onboarding.business.legalName": {
+    "message": "నమోదైన బిజినెస్ పేరు",
+    "review": "reviewed",
+    "enHash": "9deda141"
+  },
+  "onboarding.business.legalNameHelp": {
+    "message": "మీ PAN లేదా GST సర్టిఫికెట్‌లో ఉన్నట్లు. దీన్ని తర్వాత కూడా జోడించవచ్చు.",
+    "review": "reviewed",
+    "enHash": "fcbd36b3"
+  },
+  "onboarding.business.category": {
+    "message": "మీరు ఏమి అమ్ముతారు",
+    "review": "reviewed",
+    "enHash": "99f2197d"
+  },
+  "onboarding.business.categoryNone": {
+    "message": "కేటగిరీ ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "b91bf5d4"
+  },
+  "onboarding.store.title": {
+    "message": "మీ మొదటి దుకాణం",
+    "review": "reviewed",
+    "enHash": "c1b36766"
+  },
+  "onboarding.store.have": {
+    "message": "దుకాణం జోడించబడింది: {name}.",
+    "review": "reviewed",
+    "enHash": "ff206dca"
+  },
+  "onboarding.store.manage": {
+    "message": "దుకాణాలను నిర్వహించండి",
+    "review": "reviewed",
+    "enHash": "e0b3455b"
+  },
+  "onboarding.store.create": {
+    "message": "దుకాణం జోడించండి",
+    "review": "reviewed",
+    "enHash": "a0df4ca0"
+  },
+  "onboarding.hours.title": {
+    "message": "తెరిచే సమయాలు",
+    "review": "reviewed",
+    "enHash": "6117e118"
+  },
+  "onboarding.payout.title": {
+    "message": "చెల్లింపు వివరాలు",
+    "review": "reviewed",
+    "enHash": "ad5e1a85"
+  },
+  "onboarding.payout.body": {
+    "message": "మేము మీకు డబ్బు ఎక్కడ పంపాలి. దీన్ని ఇప్పుడు లేదా తర్వాత జోడించవచ్చు; దుకాణాన్ని రివ్యూకు పంపడానికి ఇది అవసరం లేదు.",
+    "review": "reviewed",
+    "enHash": "16c98dff"
+  },
+  "onboarding.docs.title": {
+    "message": "డాక్యుమెంట్లు",
+    "review": "reviewed",
+    "enHash": "687c8286"
+  },
+  "onboarding.docs.help": {
+    "message": "ఫోటోలు లేదా PDF, ఒక్కొక్కటి 10 MB వరకు. డాక్యుమెంట్లు గోప్యంగా ఉంచుతాం, మా రివ్యూ టీమ్ మాత్రమే చూస్తుంది.",
+    "review": "reviewed",
+    "enHash": "5285e84b"
+  },
+  "onboarding.docs.kind.pan": {
+    "message": "PAN కార్డ్",
+    "review": "reviewed",
+    "enHash": "1a5fa132"
+  },
+  "onboarding.docs.kind.gst": {
+    "message": "GST సర్టిఫికెట్",
+    "review": "reviewed",
+    "enHash": "1d4b2467"
+  },
+  "onboarding.docs.kind.shop_photo": {
+    "message": "దుకాణం లోపలి ఫోటో",
+    "review": "reviewed",
+    "enHash": "043fa414"
+  },
+  "onboarding.docs.kind.storefront": {
+    "message": "దుకాణం ముందు భాగం ఫోటో",
+    "review": "reviewed",
+    "enHash": "2c113b69"
+  },
+  "onboarding.docs.kind.license": {
+    "message": "ట్రేడ్ లైసెన్స్",
+    "review": "reviewed",
+    "enHash": "42559b25"
+  },
+  "onboarding.docs.status.pending": {
+    "message": "అప్‌లోడ్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "de272409"
+  },
+  "onboarding.docs.status.uploaded": {
+    "message": "అందింది",
+    "review": "reviewed",
+    "enHash": "27548c4f"
+  },
+  "onboarding.docs.status.accepted": {
+    "message": "అంగీకరించబడింది",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "onboarding.docs.status.rejected": {
+    "message": "తిరస్కరించబడింది",
+    "review": "reviewed",
+    "enHash": "27eeb7a2"
+  },
+  "onboarding.docs.add": {
+    "message": "{name} జోడించండి",
+    "review": "reviewed",
+    "enHash": "3796d1b1"
+  },
+  "onboarding.docs.added": {
+    "message": "{name} జోడించబడింది",
+    "review": "reviewed",
+    "enHash": "dae4c24a"
+  },
+  "onboarding.docs.err.type": {
+    "message": "JPG, PNG లేదా WebP ఫోటో, లేదా PDF వాడండి.",
+    "review": "reviewed",
+    "enHash": "78549188"
+  },
+  "onboarding.docs.err.size": {
+    "message": "ఈ ఫైల్ 10 MB కంటే పెద్దది.",
+    "review": "reviewed",
+    "enHash": "7be70506"
+  },
+  "onboarding.docs.err.empty": {
+    "message": "ఈ ఫైల్ ఖాళీగా ఉంది.",
+    "review": "reviewed",
+    "enHash": "f9256174"
+  },
+  "onboarding.docs.uploadFailed": {
+    "message": "ఫైల్ అప్‌లోడ్ కాలేదు. మీ ఇంటర్నెట్ చూసుకుని మళ్ళీ జోడించండి.",
+    "review": "reviewed",
+    "enHash": "dd02b2ad"
+  },
+  "onboarding.submit.title": {
+    "message": "రివ్యూకు పంపండి",
+    "review": "reviewed",
+    "enHash": "ddc87345"
+  },
+  "onboarding.submit.body": {
+    "message": "మేము మీ వివరాలు చెక్ చేస్తాం, ఏదైనా కావాలంటే కాల్ చేస్తాం. రివ్యూ జరుగుతున్నప్పుడు కూడా మీరు ఆర్డర్ల కోసం TodayZ వాడవచ్చు.",
+    "review": "reviewed",
+    "enHash": "6dc86397"
+  },
+  "onboarding.submit.action": {
+    "message": "రివ్యూకు పంపండి",
+    "review": "reviewed",
+    "enHash": "ddc87345"
+  },
+  "onboarding.submit.sent": {
+    "message": "రివ్యూకు పంపబడింది",
+    "review": "reviewed",
+    "enHash": "ef78972f"
+  },
+  "onboarding.status.submitted.title": {
+    "message": "మీ దుకాణం రివ్యూలో ఉంది",
+    "review": "reviewed",
+    "enHash": "eaec7e93"
+  },
+  "onboarding.status.submitted.body": {
+    "message": "పూర్తయ్యాక మీకు తెలియజేస్తాం.",
+    "review": "reviewed",
+    "enHash": "01dd0eb4"
+  },
+  "onboarding.status.needs_info.title": {
+    "message": "మాకు మీ నుంచి ఇంకొంచెం సమాచారం కావాలి",
+    "review": "reviewed",
+    "enHash": "4bc026eb"
+  },
+  "onboarding.status.needs_info.body": {
+    "message": "దయచేసి వీటిని సరిచేసి మళ్ళీ రివ్యూకు పంపండి.",
+    "review": "reviewed",
+    "enHash": "f7322f3e"
+  },
+  "onboarding.status.verified.title": {
+    "message": "మీ దుకాణం వెరిఫై అయింది",
+    "review": "reviewed",
+    "enHash": "f69ca01e"
+  },
+  "onboarding.status.verified.body": {
+    "message": "కస్టమర్లు మీ లైవ్ దుకాణాలను కనుగొనగలరు.",
+    "review": "reviewed",
+    "enHash": "ca169a4c"
+  },
+  "onboarding.status.rejected.title": {
+    "message": "మీ దుకాణం ఆమోదం పొందలేదు",
+    "review": "reviewed",
+    "enHash": "75e8f563"
+  },
+  "onboarding.status.rejected.body": {
+    "message": "ఇది పొరపాటు అని మీకు అనిపిస్తే సపోర్ట్‌ను సంప్రదించండి.",
+    "review": "reviewed",
+    "enHash": "9e413826"
+  },
+  "onboarding.status.suspended.title": {
+    "message": "మీ దుకాణం నిలిపివేయబడింది",
+    "review": "reviewed",
+    "enHash": "655adb75"
+  },
+  "onboarding.status.suspended.body": {
+    "message": "కారణం తెలుసుకోవడానికి సపోర్ట్‌ను సంప్రదించండి.",
+    "review": "reviewed",
+    "enHash": "1943d6db"
+  },
+  "onboarding.field.categoryId": {
+    "message": "మీరు ఏమి అమ్ముతారు",
+    "review": "reviewed",
+    "enHash": "32d50307"
+  },
+  "onboarding.field.stores": {
+    "message": "ఒక దుకాణం",
+    "review": "reviewed",
+    "enHash": "73ea649e"
+  },
+  "onboarding.field.addressLine1": {
+    "message": "దుకాణం చిరునామా",
+    "review": "reviewed",
+    "enHash": "93458909"
+  },
+  "onboarding.field.city": {
+    "message": "నగరం",
+    "review": "reviewed",
+    "enHash": "4271627f"
+  },
+  "onboarding.field.pincode": {
+    "message": "పిన్‌కోడ్",
+    "review": "reviewed",
+    "enHash": "f2c5ca7b"
+  },
+  "onboarding.field.location": {
+    "message": "మ్యాప్‌లో స్థలం",
+    "review": "reviewed",
+    "enHash": "9a333493"
+  },
+  "onboarding.field.phone": {
+    "message": "దుకాణం ఫోన్",
+    "review": "reviewed",
+    "enHash": "5bd971a7"
+  },
+  "onboarding.field.hours": {
+    "message": "తెరిచే సమయాలు",
+    "review": "reviewed",
+    "enHash": "6117e118"
+  },
+  "onboarding.field.brandName": {
+    "message": "దుకాణం పేరు",
+    "review": "reviewed",
+    "enHash": "6a5cc02e"
+  },
+  "onboarding.field.legalName": {
+    "message": "నమోదైన బిజినెస్ పేరు",
+    "review": "reviewed",
+    "enHash": "9deda141"
+  },
+  "onboarding.field.pan": {
+    "message": "PAN",
+    "review": "reviewed",
+    "enHash": "ad2967ed"
+  },
+  "onboarding.field.gstin": {
+    "message": "GSTIN",
+    "review": "reviewed",
+    "enHash": "da7751f5"
+  },
+  "onboarding.field.documents": {
+    "message": "డాక్యుమెంట్లు",
+    "review": "reviewed",
+    "enHash": "687c8286"
+  },
+  "onboarding.field.other": {
+    "message": "ఇంకేదో వివరం",
+    "review": "reviewed",
+    "enHash": "61052ba2"
+  }
+}

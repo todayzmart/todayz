@@ -1,0 +1,97 @@
+{
+  "standee.title": {
+    "message": "QR ಸ್ಟ್ಯಾಂಡಿ",
+    "review": "reviewed",
+    "enHash": "db442fbd"
+  },
+  "standee.loading": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಲೋಡ್ ಆಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "accd3e95"
+  },
+  "standee.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "standee.error.title": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "0980057d"
+  },
+  "standee.error.body": {
+    "message": "ನಿಮ್ಮ ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "standee.noStore.title": {
+    "message": "ಮೊದಲು ಒಂದು ಅಂಗಡಿ ಆರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "standee.noStore.body": {
+    "message": "ಸ್ಟ್ಯಾಂಡಿಯನ್ನು ಒಮ್ಮೆಗೆ ಒಂದು ಅಂಗಡಿಗೆ ಮಾತ್ರ ಪ್ರಿಂಟ್ ಮಾಡಲಾಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "0949921e"
+  },
+  "standee.noStore.action": {
+    "message": "ಅಂಗಡಿ ಆರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "standee.manager.title": {
+    "message": "ಸ್ಟ್ಯಾಂಡಿ ಮಾಲೀಕರು ಮತ್ತು ಮ್ಯಾನೇಜರ್‌ಗಳಿಗೆ ಮಾತ್ರ",
+    "review": "reviewed",
+    "enHash": "7bdf789c"
+  },
+  "standee.manager.body": {
+    "message": "ಇದನ್ನು ಪ್ರಿಂಟ್ ಮಾಡಲು ನಿಮ್ಮ ಮಾಲೀಕರು ಅಥವಾ ಮ್ಯಾನೇಜರ್‌ಗೆ ಹೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "1ee19220"
+  },
+  "standee.card.title": {
+    "message": "ನಿಮ್ಮ ಸ್ಟ್ಯಾಂಡಿ ಪ್ರಿಂಟ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "455a10fb"
+  },
+  "standee.card.body": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿಯ QR ಕೋಡ್ ಇರುವ A5 ಹಾಳೆ. ಗ್ರಾಹಕರು ಇದನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ತೆರೆಯುತ್ತಾರೆ ಮತ್ತು ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್ ಪಡೆಯುತ್ತಾರೆ.",
+    "review": "reviewed",
+    "enHash": "4dc14021"
+  },
+  "standee.shortCode": {
+    "message": "ಚಿಕ್ಕ ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "7545309d"
+  },
+  "standee.preview": {
+    "message": "ಪ್ರಿವ್ಯೂ",
+    "review": "reviewed",
+    "enHash": "f1fbb2b4"
+  },
+  "standee.download": {
+    "message": "A5 PDF ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "d5f56067"
+  },
+  "standee.preparing": {
+    "message": "PDF ತಯಾರಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "cc44de09"
+  },
+  "standee.pdfError": {
+    "message": "ಸ್ಟ್ಯಾಂಡಿ ತಯಾರಿಸಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "9f51d4bd"
+  },
+  "standee.frameTitle": {
+    "message": "ಸ್ಟ್ಯಾಂಡಿ ಪ್ರಿವ್ಯೂ",
+    "review": "reviewed",
+    "enHash": "d22dd779"
+  },
+  "standee.printTip": {
+    "message": "QR ಕೋಡ್ ಸ್ಪಷ್ಟವಾಗಿರಲು A5 ನಲ್ಲಿ 100% ಗಾತ್ರದಲ್ಲಿ, ಪ್ರಿಂಟರ್ ಮಾರ್ಜಿನ್ ಸೇರಿಸದೆ ಪ್ರಿಂಟ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "079abaf2"
+  }
+}

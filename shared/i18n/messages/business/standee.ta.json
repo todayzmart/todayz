@@ -1,0 +1,97 @@
+{
+  "standee.title": {
+    "message": "QR ஸ்டாண்டி",
+    "review": "reviewed",
+    "enHash": "db442fbd"
+  },
+  "standee.loading": {
+    "message": "உங்கள் கடை ஏற்றப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "accd3e95"
+  },
+  "standee.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "standee.error.title": {
+    "message": "உங்கள் கடையை ஏற்ற முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "0980057d"
+  },
+  "standee.error.body": {
+    "message": "உங்கள் இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "standee.noStore.title": {
+    "message": "முதலில் ஒரு கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "standee.noStore.body": {
+    "message": "ஸ்டாண்டி ஒரு நேரத்தில் ஒரு கடைக்கு மட்டுமே அச்சிடப்படும்.",
+    "review": "reviewed",
+    "enHash": "0949921e"
+  },
+  "standee.noStore.action": {
+    "message": "கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "standee.manager.title": {
+    "message": "ஸ்டாண்டி உரிமையாளர்கள், மேலாளர்களுக்கு மட்டும்",
+    "review": "reviewed",
+    "enHash": "7bdf789c"
+  },
+  "standee.manager.body": {
+    "message": "இதை அச்சிட உங்கள் உரிமையாளர் அல்லது மேலாளரிடம் கேளுங்கள்.",
+    "review": "reviewed",
+    "enHash": "1ee19220"
+  },
+  "standee.card.title": {
+    "message": "உங்கள் ஸ்டாண்டியை அச்சிடுங்கள்",
+    "review": "reviewed",
+    "enHash": "455a10fb"
+  },
+  "standee.card.body": {
+    "message": "உங்கள் கடையின் QR குறியீடு உள்ள A5 தாள். வாடிக்கையாளர்கள் இதை ஸ்கேன் செய்து உங்கள் கடையைத் திறந்து கேஷ்பேக் பெறுவார்கள்.",
+    "review": "reviewed",
+    "enHash": "4dc14021"
+  },
+  "standee.shortCode": {
+    "message": "சிறு குறியீடு",
+    "review": "reviewed",
+    "enHash": "7545309d"
+  },
+  "standee.preview": {
+    "message": "முன்னோட்டம்",
+    "review": "reviewed",
+    "enHash": "f1fbb2b4"
+  },
+  "standee.download": {
+    "message": "A5 PDF பதிவிறக்கவும்",
+    "review": "reviewed",
+    "enHash": "d5f56067"
+  },
+  "standee.preparing": {
+    "message": "PDF தயாராகிறது",
+    "review": "reviewed",
+    "enHash": "cc44de09"
+  },
+  "standee.pdfError": {
+    "message": "ஸ்டாண்டியைத் தயாரிக்க முடியவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "9f51d4bd"
+  },
+  "standee.frameTitle": {
+    "message": "ஸ்டாண்டி முன்னோட்டம்",
+    "review": "reviewed",
+    "enHash": "d22dd779"
+  },
+  "standee.printTip": {
+    "message": "QR குறியீடு தெளிவாக இருக்க, A5 இல் 100% அளவில், பிரிண்டர் ஓரங்கள் சேர்க்காமல் அச்சிடுங்கள்.",
+    "review": "reviewed",
+    "enHash": "079abaf2"
+  }
+}

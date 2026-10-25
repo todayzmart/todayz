@@ -1,0 +1,217 @@
+{
+  "app.offline.title": {
+    "message": "நீங்கள் ஆஃப்லைனில் உள்ளீர்கள்.",
+    "review": "reviewed",
+    "enHash": "4a2a6452"
+  },
+  "app.offline.body": {
+    "message": "சேமித்த பக்கங்கள் இப்போதும் திறக்கும். நீங்கள் ஆன்லைனுக்கு வந்ததும் எல்லாம் புதுப்பிக்கப்படும்.",
+    "review": "reviewed",
+    "enHash": "6019fada"
+  },
+  "app.update.message": {
+    "message": "TodayZ Business இன் புதிய பதிப்பு தயாராக உள்ளது.",
+    "review": "reviewed",
+    "enHash": "9744d22a"
+  },
+  "app.update.action": {
+    "message": "புதுப்பிக்கவும்",
+    "review": "reviewed",
+    "enHash": "fb91e24f"
+  },
+  "app.error.title": {
+    "message": "ஏதோ தவறு நடந்துவிட்டது",
+    "review": "reviewed",
+    "enHash": "8d886c0b"
+  },
+  "app.error.body": {
+    "message": "மீண்டும் முயலவும். தொடர்ந்து நடந்தால் பக்கத்தை ரீலோட் செய்யவும்.",
+    "review": "reviewed",
+    "enHash": "f081bc24"
+  },
+  "app.error.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "app.pending.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "app.loading": {
+    "message": "ஏற்றப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "8f26c652"
+  },
+  "auth.signIn.title": {
+    "message": "TodayZ Business இல் உள்நுழையவும்",
+    "review": "reviewed",
+    "enHash": "4337b537"
+  },
+  "auth.signIn.sub": {
+    "message": "உங்கள் கடை பதிவுசெய்யப்பட்ட மொபைல் எண்ணைப் பயன்படுத்தவும். SMS மூலம் குறியீடு அனுப்புவோம்.",
+    "review": "reviewed",
+    "enHash": "f63d01a7"
+  },
+  "auth.phone.label": {
+    "message": "மொபைல் எண்",
+    "review": "reviewed",
+    "enHash": "8e5c12de"
+  },
+  "auth.phone.help": {
+    "message": "உள்நுழையவும் ஆர்டர் அறிவிப்புகளுக்கும் இதைப் பயன்படுத்துவோம்.",
+    "review": "reviewed",
+    "enHash": "766d916b"
+  },
+  "auth.phone.invalid": {
+    "message": "6, 7, 8 அல்லது 9 இல் தொடங்கும் 10 இலக்க மொபைல் எண்ணை உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "6be55a3e"
+  },
+  "auth.code.send": {
+    "message": "குறியீட்டை அனுப்பவும்",
+    "review": "reviewed",
+    "enHash": "313503fa"
+  },
+  "auth.code.sending": {
+    "message": "குறியீடு அனுப்பப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "28de53b3"
+  },
+  "auth.code.label": {
+    "message": "6 இலக்கக் குறியீட்டை உள்ளிடவும்",
+    "review": "reviewed",
+    "enHash": "d148321a"
+  },
+  "auth.code.digit": {
+    "message": "இலக்கம் {position}",
+    "review": "reviewed",
+    "enHash": "1e73e888"
+  },
+  "auth.code.sentTo": {
+    "message": "{phone} க்குக் குறியீடு அனுப்பியுள்ளோம்.",
+    "review": "reviewed",
+    "enHash": "c8aa6d25"
+  },
+  "auth.code.verifying": {
+    "message": "குறியீடு சரிபார்க்கப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "90adc49f"
+  },
+  "auth.code.resend": {
+    "message": "குறியீட்டை மீண்டும் அனுப்பவும்",
+    "review": "reviewed",
+    "enHash": "1d3cb8a9"
+  },
+  "auth.code.resendIn": {
+    "message": "{seconds} s இல் மீண்டும் அனுப்பலாம்",
+    "review": "reviewed",
+    "enHash": "f0589eca"
+  },
+  "auth.code.change": {
+    "message": "எண்ணை மாற்றவும்",
+    "review": "reviewed",
+    "enHash": "6c3b4080"
+  },
+  "auth.error.wrongCode": {
+    "message": "இந்தக் குறியீடு சரியில்லை. சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "47948633"
+  },
+  "auth.error.expired": {
+    "message": "இந்தக் குறியீட்டின் காலம் முடிந்துவிட்டது. புதிய குறியீட்டைக் கேளுங்கள்.",
+    "review": "reviewed",
+    "enHash": "6a90a6f9"
+  },
+  "auth.error.locked": {
+    "message": "பலமுறை தவறான குறியீடு உள்ளிடப்பட்டது. புதிய குறியீட்டைக் கேளுங்கள்.",
+    "review": "reviewed",
+    "enHash": "371d1276"
+  },
+  "auth.error.rateLimited": {
+    "message": "அதிக முயற்சிகள். சற்று காத்திருந்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "c32bd496"
+  },
+  "auth.error.blocked": {
+    "message": "இந்தக் கணக்கில் இப்போது உள்நுழைய முடியாது. ஆதரவுக் குழுவைத் தொடர்புகொள்ளவும்.",
+    "review": "reviewed",
+    "enHash": "10997ecd"
+  },
+  "auth.error.network": {
+    "message": "TodayZ ஐ அடைய முடியவில்லை. உங்கள் இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "470230be"
+  },
+  "auth.error.generic": {
+    "message": "ஏதோ தவறு நடந்துவிட்டது. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "9a3ea059"
+  },
+  "auth.error.captcha": {
+    "message": "நீங்கள் மனிதர் என்பதைச் சரிபார்க்க முடியவில்லை. பக்கத்தை ரீலோட் செய்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "bc612d87"
+  },
+  "auth.signOut": {
+    "message": "வெளியேறு",
+    "review": "reviewed",
+    "enHash": "dc1649a1"
+  },
+  "shop.pick.title": {
+    "message": "கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "shop.pick.sub": {
+    "message": "நீங்கள் வேலை செய்ய வேண்டிய பிசினஸையும் கடையையும் தேர்ந்தெடுக்கவும். இந்தச் சாதனத்தில் இதை நினைவில் வைப்போம்.",
+    "review": "reviewed",
+    "enHash": "73012255"
+  },
+  "shop.pick.loading": {
+    "message": "உங்கள் கடைகள் ஏற்றப்படுகின்றன",
+    "review": "reviewed",
+    "enHash": "97200491"
+  },
+  "shop.pick.group": {
+    "message": "{business} இன் கடைகள்",
+    "review": "reviewed",
+    "enHash": "f0b111f6"
+  },
+  "shop.pick.role.owner": {
+    "message": "உரிமையாளர்",
+    "review": "reviewed",
+    "enHash": "89ff3122"
+  },
+  "shop.pick.role.manager": {
+    "message": "மேலாளர்",
+    "review": "reviewed",
+    "enHash": "babe3050"
+  },
+  "shop.pick.role.cashier": {
+    "message": "காசாளர்",
+    "review": "reviewed",
+    "enHash": "78c07270"
+  },
+  "shop.pick.empty": {
+    "message": "இந்த எண்ணுடன் இன்னும் எந்தக் கடையும் இணைக்கப்படவில்லை. உங்களை அழைக்குமாறு உரிமையாளரிடம் கேளுங்கள், அல்லது ஆதரவுக் குழுவைத் தொடர்புகொள்ளவும்.",
+    "review": "reviewed",
+    "enHash": "95e9e70b"
+  },
+  "shop.pick.unavailable": {
+    "message": "உங்கள் கடைகளை இன்னும் ஏற்ற முடியவில்லை. நீங்கள் சுருக்கத்துக்குத் தொடரலாம்.",
+    "review": "reviewed",
+    "enHash": "8d7dd013"
+  },
+  "shop.pick.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "shop.pick.continue": {
+    "message": "சுருக்கத்துக்குத் தொடரவும்",
+    "review": "reviewed",
+    "enHash": "bc5e5ad7"
+  }
+}

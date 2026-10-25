@@ -1,0 +1,752 @@
+{
+  "stores.title": {
+    "message": "दुकानें और स्टाफ़",
+    "review": "reviewed",
+    "enHash": "68c41031"
+  },
+  "stores.loading": {
+    "message": "दुकानें लोड हो रही हैं",
+    "review": "reviewed",
+    "enHash": "17cdf55c"
+  },
+  "stores.loadFailed.title": {
+    "message": "आपकी दुकानें लोड नहीं हो सकीं",
+    "review": "reviewed",
+    "enHash": "427c23ba"
+  },
+  "stores.loadFailed.body": {
+    "message": "अपना कनेक्शन जाँचें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "stores.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "stores.none.title": {
+    "message": "अभी कोई दुकान नहीं",
+    "review": "reviewed",
+    "enHash": "4830b3b7"
+  },
+  "stores.none.body": {
+    "message": "पहले अपनी दुकान सेट अप करें। इसमें कुछ ही मिनट लगते हैं।",
+    "review": "reviewed",
+    "enHash": "8d0d1409"
+  },
+  "stores.none.action": {
+    "message": "अपनी दुकान सेट अप करें",
+    "review": "reviewed",
+    "enHash": "f54cfff6"
+  },
+  "stores.noAccess.title": {
+    "message": "सिर्फ़ मालिक और मैनेजर के लिए",
+    "review": "reviewed",
+    "enHash": "bc1e6be2"
+  },
+  "stores.noAccess.body": {
+    "message": "अगर किसी दुकान या व्यक्ति में बदलाव करना है, तो मालिक या मैनेजर से कहें।",
+    "review": "reviewed",
+    "enHash": "863358ff"
+  },
+  "stores.section.stores": {
+    "message": "दुकानें",
+    "review": "reviewed",
+    "enHash": "983fd7bc"
+  },
+  "stores.section.staff": {
+    "message": "स्टाफ़",
+    "review": "reviewed",
+    "enHash": "a4730a22"
+  },
+  "stores.add": {
+    "message": "दुकान जोड़ें",
+    "review": "reviewed",
+    "enHash": "cb12b4d8"
+  },
+  "stores.edit": {
+    "message": "बदलें",
+    "review": "reviewed",
+    "enHash": "5301648d"
+  },
+  "stores.editNamed": {
+    "message": "{name} बदलें",
+    "review": "reviewed",
+    "enHash": "3dfae1cc"
+  },
+  "stores.submit": {
+    "message": "रिव्यू के लिए भेजें",
+    "review": "reviewed",
+    "enHash": "ddc87345"
+  },
+  "stores.submitNamed": {
+    "message": "{name} को रिव्यू के लिए भेजें",
+    "review": "reviewed",
+    "enHash": "dea3da71"
+  },
+  "stores.empty": {
+    "message": "अभी कोई दुकान नहीं",
+    "review": "reviewed",
+    "enHash": "2c84cc3e"
+  },
+  "stores.addTitle": {
+    "message": "दुकान जोड़ें",
+    "review": "reviewed",
+    "enHash": "cb12b4d8"
+  },
+  "stores.addBody": {
+    "message": "ग्राहक यह पता और पिन देखते हैं। आप इसे बाद में बदल सकते हैं।",
+    "review": "reviewed",
+    "enHash": "5b3d5bfd"
+  },
+  "stores.editTitle": {
+    "message": "दुकान बदलें",
+    "review": "reviewed",
+    "enHash": "7d9a0d7b"
+  },
+  "stores.editBody": {
+    "message": "नाम या पता बदलने पर ग्राहकों को दिखने से पहले रिव्यू की ज़रूरत हो सकती है।",
+    "review": "reviewed",
+    "enHash": "657aa458"
+  },
+  "stores.sheet.close": {
+    "message": "बंद करें",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "stores.save": {
+    "message": "दुकान सेव करें",
+    "review": "reviewed",
+    "enHash": "2a44ecc7"
+  },
+  "stores.create": {
+    "message": "दुकान जोड़ें",
+    "review": "reviewed",
+    "enHash": "a0df4ca0"
+  },
+  "stores.cancel": {
+    "message": "रद्द करें",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "stores.saved": {
+    "message": "सेव हो गया",
+    "review": "reviewed",
+    "enHash": "c0ae8f6e"
+  },
+  "stores.submitted": {
+    "message": "रिव्यू के लिए भेज दिया",
+    "review": "reviewed",
+    "enHash": "ef78972f"
+  },
+  "stores.status.draft": {
+    "message": "ड्राफ़्ट",
+    "review": "reviewed",
+    "enHash": "23d33e22"
+  },
+  "stores.status.pending_review": {
+    "message": "रिव्यू में",
+    "review": "reviewed",
+    "enHash": "c49bceb8"
+  },
+  "stores.status.live": {
+    "message": "लाइव",
+    "review": "reviewed",
+    "enHash": "65c821a5"
+  },
+  "stores.status.paused": {
+    "message": "रुका हुआ",
+    "review": "reviewed",
+    "enHash": "c7dfb6f1"
+  },
+  "stores.status.suspended": {
+    "message": "निलंबित",
+    "review": "reviewed",
+    "enHash": "794696a7"
+  },
+  "stores.business.draft": {
+    "message": "सेटअप अभी भेजा नहीं गया",
+    "review": "reviewed",
+    "enHash": "260faafc"
+  },
+  "stores.business.submitted": {
+    "message": "आपकी दुकान रिव्यू में है",
+    "review": "reviewed",
+    "enHash": "eaec7e93"
+  },
+  "stores.business.needs_info": {
+    "message": "हमें आपसे थोड़ी और जानकारी चाहिए",
+    "review": "reviewed",
+    "enHash": "4bc026eb"
+  },
+  "stores.business.verified": {
+    "message": "आपकी दुकान वेरिफ़ाइड है",
+    "review": "reviewed",
+    "enHash": "f69ca01e"
+  },
+  "stores.business.rejected": {
+    "message": "आपकी दुकान मंज़ूर नहीं हुई",
+    "review": "reviewed",
+    "enHash": "75e8f563"
+  },
+  "stores.business.suspended": {
+    "message": "आपकी दुकान निलंबित है",
+    "review": "reviewed",
+    "enHash": "655adb75"
+  },
+  "stores.business.continue": {
+    "message": "सेटअप जारी रखें",
+    "review": "reviewed",
+    "enHash": "7a4e54ca"
+  },
+  "stores.support": {
+    "message": "कोई दुकान बंद करने या उसकी जगह बदलने के लिए सपोर्ट से संपर्क करें।",
+    "review": "reviewed",
+    "enHash": "b8984ea0"
+  },
+  "stores.staff.invite": {
+    "message": "किसी को आमंत्रित करें",
+    "review": "reviewed",
+    "enHash": "9768ea31"
+  },
+  "stores.staff.empty": {
+    "message": "टीम में अभी और कोई नहीं",
+    "review": "reviewed",
+    "enHash": "838669f3"
+  },
+  "stores.staff.you": {
+    "message": "आप",
+    "review": "reviewed",
+    "enHash": "905cb326"
+  },
+  "stores.staff.role.owner": {
+    "message": "मालिक",
+    "review": "reviewed",
+    "enHash": "89ff3122"
+  },
+  "stores.staff.role.manager": {
+    "message": "मैनेजर",
+    "review": "reviewed",
+    "enHash": "babe3050"
+  },
+  "stores.staff.role.cashier": {
+    "message": "कैशियर",
+    "review": "reviewed",
+    "enHash": "78c07270"
+  },
+  "stores.staff.status.invited": {
+    "message": "आमंत्रित",
+    "review": "reviewed",
+    "enHash": "53469df1"
+  },
+  "stores.staff.status.active": {
+    "message": "सक्रिय",
+    "review": "reviewed",
+    "enHash": "a733b809"
+  },
+  "stores.staff.expires": {
+    "message": "आमंत्रण {date} को ख़त्म होगा",
+    "review": "reviewed",
+    "enHash": "40474351"
+  },
+  "stores.staff.allStores": {
+    "message": "सभी दुकानें",
+    "review": "reviewed",
+    "enHash": "4aea024a"
+  },
+  "stores.staff.someStores": {
+    "message": "{count, plural, one {# दुकान} other {# दुकानें}}",
+    "review": "reviewed",
+    "enHash": "b4813240"
+  },
+  "stores.staff.delivers": {
+    "message": "ऑर्डर डिलीवर करते हैं",
+    "review": "reviewed",
+    "enHash": "9844b2eb"
+  },
+  "stores.staff.unnamed": {
+    "message": "टीम के नए सदस्य",
+    "review": "reviewed",
+    "enHash": "6c3776c7"
+  },
+  "stores.staff.edit": {
+    "message": "बदलें",
+    "review": "reviewed",
+    "enHash": "5301648d"
+  },
+  "stores.staff.editNamed": {
+    "message": "{name} बदलें",
+    "review": "reviewed",
+    "enHash": "3dfae1cc"
+  },
+  "stores.staff.remove": {
+    "message": "हटाएँ",
+    "review": "reviewed",
+    "enHash": "e963907d"
+  },
+  "stores.staff.removeNamed": {
+    "message": "{name} को हटाएँ",
+    "review": "reviewed",
+    "enHash": "df7193a5"
+  },
+  "stores.staff.inviteTitle": {
+    "message": "किसी को आमंत्रित करें",
+    "review": "reviewed",
+    "enHash": "9768ea31"
+  },
+  "stores.staff.inviteBody": {
+    "message": "उन्हें जुड़ने का एक लिंक मिलेगा। यह 7 दिन तक चलता है।",
+    "review": "reviewed",
+    "enHash": "05081a2a"
+  },
+  "stores.staff.phone": {
+    "message": "मोबाइल नंबर",
+    "review": "reviewed",
+    "enHash": "8e5c12de"
+  },
+  "stores.staff.phoneHelp": {
+    "message": "वह नंबर जिससे वे TodayZ इस्तेमाल करते हैं।",
+    "review": "reviewed",
+    "enHash": "e7e3b1fe"
+  },
+  "stores.staff.role": {
+    "message": "भूमिका",
+    "review": "reviewed",
+    "enHash": "c3f104d1"
+  },
+  "stores.staff.roleHelp.manager": {
+    "message": "मैनेजर: स्टॉक, ऑफ़र और कैशियर स्टाफ़ संभालते हैं।",
+    "review": "reviewed",
+    "enHash": "60001af2"
+  },
+  "stores.staff.roleHelp.cashier": {
+    "message": "कैशियर: ऑर्डर लेते हैं और काउंटर चलाते हैं।",
+    "review": "reviewed",
+    "enHash": "e94b3ce4"
+  },
+  "stores.staff.scope": {
+    "message": "वे कौन-सी दुकानें खोल सकते हैं",
+    "review": "reviewed",
+    "enHash": "1dc2497e"
+  },
+  "stores.staff.scopeAll": {
+    "message": "हर दुकान",
+    "review": "reviewed",
+    "enHash": "228a32f6"
+  },
+  "stores.staff.scopeSome": {
+    "message": "सिर्फ़ कुछ दुकानें",
+    "review": "reviewed",
+    "enHash": "51713c52"
+  },
+  "stores.staff.scopeNone": {
+    "message": "कम से कम एक दुकान चुनें।",
+    "review": "reviewed",
+    "enHash": "41ff6724"
+  },
+  "stores.staff.canDeliver": {
+    "message": "ऑर्डर डिलीवर कर सकते हैं",
+    "review": "reviewed",
+    "enHash": "474e8f96"
+  },
+  "stores.staff.sendInvite": {
+    "message": "आमंत्रण भेजें",
+    "review": "reviewed",
+    "enHash": "11a4b1af"
+  },
+  "stores.staff.invited": {
+    "message": "आमंत्रण भेज दिया",
+    "review": "reviewed",
+    "enHash": "c484ac06"
+  },
+  "stores.staff.editTitle": {
+    "message": "{name} बदलें",
+    "review": "reviewed",
+    "enHash": "3dfae1cc"
+  },
+  "stores.staff.editBody": {
+    "message": "किसी की भूमिका या उनकी दुकानें सिर्फ़ मालिक बदल सकते हैं।",
+    "review": "reviewed",
+    "enHash": "0bb1419c"
+  },
+  "stores.staff.saveChanges": {
+    "message": "बदलाव सेव करें",
+    "review": "reviewed",
+    "enHash": "179359b3"
+  },
+  "stores.staff.removeTitle": {
+    "message": "{name} को हटाएँ?",
+    "review": "reviewed",
+    "enHash": "b085591b"
+  },
+  "stores.staff.removeBody": {
+    "message": "उनकी दुकान तक पहुँच तुरंत बंद हो जाएगी। आप उन्हें बाद में फिर से आमंत्रित कर सकते हैं।",
+    "review": "reviewed",
+    "enHash": "649fe57a"
+  },
+  "stores.staff.removeInvite": {
+    "message": "इससे आमंत्रण रद्द हो जाएगा।",
+    "review": "reviewed",
+    "enHash": "79c14927"
+  },
+  "stores.staff.removeConfirm": {
+    "message": "हटाएँ",
+    "review": "reviewed",
+    "enHash": "e963907d"
+  },
+  "stores.staff.removed": {
+    "message": "हटा दिया",
+    "review": "reviewed",
+    "enHash": "b5e77c5c"
+  },
+  "stores.form.name": {
+    "message": "दुकान का नाम",
+    "review": "reviewed",
+    "enHash": "e01ddbc8"
+  },
+  "stores.form.address1": {
+    "message": "पता पंक्ति 1",
+    "review": "reviewed",
+    "enHash": "1686199f"
+  },
+  "stores.form.address2": {
+    "message": "पता पंक्ति 2",
+    "review": "reviewed",
+    "enHash": "88d41938"
+  },
+  "stores.form.landmark": {
+    "message": "लैंडमार्क",
+    "review": "reviewed",
+    "enHash": "8f625382"
+  },
+  "stores.form.locality": {
+    "message": "इलाक़ा",
+    "review": "reviewed",
+    "enHash": "2745deba"
+  },
+  "stores.form.city": {
+    "message": "शहर",
+    "review": "reviewed",
+    "enHash": "4271627f"
+  },
+  "stores.form.pincode": {
+    "message": "पिनकोड",
+    "review": "reviewed",
+    "enHash": "f2c5ca7b"
+  },
+  "stores.form.phone": {
+    "message": "दुकान का फ़ोन",
+    "review": "reviewed",
+    "enHash": "5bd971a7"
+  },
+  "stores.form.lat": {
+    "message": "अक्षांश (Latitude)",
+    "review": "reviewed",
+    "enHash": "ced3905e"
+  },
+  "stores.form.lng": {
+    "message": "देशांतर (Longitude)",
+    "review": "reviewed",
+    "enHash": "6f9f011c"
+  },
+  "stores.form.phoneHelp": {
+    "message": "ग्राहक इस नंबर पर कॉल कर सकते हैं।",
+    "review": "reviewed",
+    "enHash": "f5b64624"
+  },
+  "stores.form.pin": {
+    "message": "मैप पिन",
+    "review": "reviewed",
+    "enHash": "a2b2f4b3"
+  },
+  "stores.form.pinHelp": {
+    "message": "ग्राहक इसी पिन से आपको ढूँढते हैं। अपने काउंटर पर खड़े होकर “मेरी लोकेशन इस्तेमाल करें” दबाएँ।",
+    "review": "reviewed",
+    "enHash": "a8b3d527"
+  },
+  "stores.form.locate": {
+    "message": "मेरी लोकेशन इस्तेमाल करें",
+    "review": "reviewed",
+    "enHash": "0132375d"
+  },
+  "stores.form.locateFailed": {
+    "message": "आपकी लोकेशन नहीं मिल सकी। इसके बजाय अक्षांश और देशांतर टाइप करें।",
+    "review": "reviewed",
+    "enHash": "2d1c9342"
+  },
+  "stores.form.err.required": {
+    "message": "दुकान का नाम डालें।",
+    "review": "reviewed",
+    "enHash": "47032205"
+  },
+  "stores.form.err.pincode": {
+    "message": "6 अंकों का पिनकोड डालें।",
+    "review": "reviewed",
+    "enHash": "682b3d31"
+  },
+  "stores.form.err.phone": {
+    "message": "10 अंकों का मोबाइल नंबर डालें।",
+    "review": "reviewed",
+    "enHash": "a2dd77f6"
+  },
+  "stores.form.err.pinBoth": {
+    "message": "अक्षांश और देशांतर दोनों डालें।",
+    "review": "reviewed",
+    "enHash": "64b0f50c"
+  },
+  "stores.form.err.pinRange": {
+    "message": "यह भारत के बाहर है। नंबर जाँचें।",
+    "review": "reviewed",
+    "enHash": "6a9045e6"
+  },
+  "stores.error.forbidden": {
+    "message": "आपको इसकी अनुमति नहीं है।",
+    "review": "reviewed",
+    "enHash": "b89b6eee"
+  },
+  "stores.error.conflict": {
+    "message": "यह पहले से मौजूद है।",
+    "review": "reviewed",
+    "enHash": "cf0dcd12"
+  },
+  "stores.error.validation_failed": {
+    "message": "कुछ जानकारी सही नहीं है। फ़ॉर्म जाँचें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "ce3d095b"
+  },
+  "stores.error.submit_incomplete": {
+    "message": "कुछ ज़रूरी जानकारी बाक़ी है।",
+    "review": "reviewed",
+    "enHash": "250e4d68"
+  },
+  "stores.error.precondition_failed": {
+    "message": "आपके बदलते समय किसी और ने इसे बदल दिया। हमने इसे फिर से लोड किया है; जाँचें और फिर से सेव करें।",
+    "review": "reviewed",
+    "enHash": "267c2485"
+  },
+  "stores.error.precondition_required": {
+    "message": "पेज फिर से लोड करें और दोबारा कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "fbc0d16c"
+  },
+  "stores.error.invalid_transition": {
+    "message": "यह अभी नहीं किया जा सकता।",
+    "review": "reviewed",
+    "enHash": "0113a4c0"
+  },
+  "stores.error.service_unavailable": {
+    "message": "यह अभी उपलब्ध नहीं है। एक मिनट बाद फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "7dbf1cb9"
+  },
+  "stores.error.not_found": {
+    "message": "यह हमें नहीं मिला। हो सकता है इसे हटा दिया गया हो।",
+    "review": "reviewed",
+    "enHash": "ffeda4a2"
+  },
+  "stores.error.generic": {
+    "message": "कुछ गड़बड़ हो गई। अपना कनेक्शन जाँचें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "246bd53b"
+  },
+  "stores.hours.day.mon": {
+    "message": "सोमवार",
+    "review": "reviewed",
+    "enHash": "932eeb10"
+  },
+  "stores.hours.day.tue": {
+    "message": "मंगलवार",
+    "review": "reviewed",
+    "enHash": "42e43b61"
+  },
+  "stores.hours.day.wed": {
+    "message": "बुधवार",
+    "review": "reviewed",
+    "enHash": "5656b9b7"
+  },
+  "stores.hours.day.thu": {
+    "message": "गुरुवार",
+    "review": "reviewed",
+    "enHash": "76031ddf"
+  },
+  "stores.hours.day.fri": {
+    "message": "शुक्रवार",
+    "review": "reviewed",
+    "enHash": "d166e844"
+  },
+  "stores.hours.day.sat": {
+    "message": "शनिवार",
+    "review": "reviewed",
+    "enHash": "17063c50"
+  },
+  "stores.hours.day.sun": {
+    "message": "रविवार",
+    "review": "reviewed",
+    "enHash": "bc5dd045"
+  },
+  "stores.hours.open": {
+    "message": "खुला",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "stores.hours.closed": {
+    "message": "बंद",
+    "review": "reviewed",
+    "enHash": "88d86b77"
+  },
+  "stores.hours.allDay": {
+    "message": "24 घंटे खुला",
+    "review": "reviewed",
+    "enHash": "c853651b"
+  },
+  "stores.hours.from": {
+    "message": "खुलता है",
+    "review": "reviewed",
+    "enHash": "54c374d4"
+  },
+  "stores.hours.to": {
+    "message": "बंद होता है",
+    "review": "reviewed",
+    "enHash": "ab16b985"
+  },
+  "stores.hours.addRange": {
+    "message": "ब्रेक जोड़ें",
+    "review": "reviewed",
+    "enHash": "f00f16d0"
+  },
+  "stores.hours.removeRange": {
+    "message": "{day} का एक समय हटाएँ",
+    "review": "reviewed",
+    "enHash": "cf5d0ecb"
+  },
+  "stores.hours.copyMonday": {
+    "message": "हर दिन के लिए सोमवार का समय लगाएँ",
+    "review": "reviewed",
+    "enHash": "2c6e4053"
+  },
+  "stores.hours.holidays": {
+    "message": "छुट्टियाँ",
+    "review": "reviewed",
+    "enHash": "80729cc5"
+  },
+  "stores.hours.holidaysHelp": {
+    "message": "वे दिन जब दुकान बंद रहती है या अलग समय पर खुलती है।",
+    "review": "reviewed",
+    "enHash": "778c7980"
+  },
+  "stores.hours.holidayDate": {
+    "message": "तारीख़",
+    "review": "reviewed",
+    "enHash": "eb9a4bc1"
+  },
+  "stores.hours.holidayClosed": {
+    "message": "पूरे दिन बंद",
+    "review": "reviewed",
+    "enHash": "c09ef94b"
+  },
+  "stores.hours.addHoliday": {
+    "message": "छुट्टी जोड़ें",
+    "review": "reviewed",
+    "enHash": "5df722e4"
+  },
+  "stores.hours.removeHoliday": {
+    "message": "छुट्टी {date} हटाएँ",
+    "review": "reviewed",
+    "enHash": "adfabaab"
+  },
+  "stores.hours.err.time": {
+    "message": "सही समय डालें।",
+    "review": "reviewed",
+    "enHash": "a467197f"
+  },
+  "stores.hours.err.order": {
+    "message": "बंद होने का समय खुलने के समय के बाद होना चाहिए।",
+    "review": "reviewed",
+    "enHash": "0587d490"
+  },
+  "stores.hours.err.overlap": {
+    "message": "ये समय आपस में टकरा रहे हैं।",
+    "review": "reviewed",
+    "enHash": "f7994f9e"
+  },
+  "stores.hours.err.tooMany": {
+    "message": "एक दिन में ज़्यादा से ज़्यादा 4 समय।",
+    "review": "reviewed",
+    "enHash": "3ba9fba0"
+  },
+  "stores.hours.err.date": {
+    "message": "तारीख़ चुनें।",
+    "review": "reviewed",
+    "enHash": "ded67515"
+  },
+  "stores.hours.err.duplicate": {
+    "message": "यह तारीख़ पहले से सूची में है।",
+    "review": "reviewed",
+    "enHash": "1c832220"
+  },
+  "stores.invite.title": {
+    "message": "किसी दुकान से जुड़ें",
+    "review": "reviewed",
+    "enHash": "90bb4c2d"
+  },
+  "stores.invite.loading": {
+    "message": "आपका आमंत्रण जाँचा जा रहा है",
+    "review": "reviewed",
+    "enHash": "2f2b9395"
+  },
+  "stores.invite.none.title": {
+    "message": "कोई आमंत्रण नहीं मिला",
+    "review": "reviewed",
+    "enHash": "52b5cbcf"
+  },
+  "stores.invite.none.body": {
+    "message": "लिंक की समय-सीमा ख़त्म हो गई होगी, या यह किसी दूसरे नंबर पर भेजा गया था। मालिक से फिर से आमंत्रित करने को कहें।",
+    "review": "reviewed",
+    "enHash": "e90ebf51"
+  },
+  "stores.invite.for": {
+    "message": "{brand} ने आपको {role} के रूप में जुड़ने के लिए आमंत्रित किया है।",
+    "review": "reviewed",
+    "enHash": "08537a1e"
+  },
+  "stores.invite.others": {
+    "message": "दूसरे आमंत्रण",
+    "review": "reviewed",
+    "enHash": "0df5d19e"
+  },
+  "stores.invite.accept": {
+    "message": "स्वीकार करें और जुड़ें",
+    "review": "reviewed",
+    "enHash": "7405f28d"
+  },
+  "stores.invite.acceptNamed": {
+    "message": "{brand} स्वीकार करें",
+    "review": "reviewed",
+    "enHash": "fc846884"
+  },
+  "stores.invite.accepted": {
+    "message": "आप {brand} से जुड़ गए",
+    "review": "reviewed",
+    "enHash": "a3b06401"
+  },
+  "stores.invite.home": {
+    "message": "मेरी दुकान पर जाएँ",
+    "review": "reviewed",
+    "enHash": "3d6fa073"
+  },
+  "stores.invite.failed.title": {
+    "message": "आपके आमंत्रण लोड नहीं हो सके",
+    "review": "reviewed",
+    "enHash": "9e21dd8d"
+  },
+  "stores.invite.err.conflict": {
+    "message": "आप पहले ही जुड़ चुके हैं, या यह आमंत्रण इस्तेमाल हो चुका है।",
+    "review": "reviewed",
+    "enHash": "b4fcc203"
+  },
+  "stores.invite.err.not_found": {
+    "message": "यह आमंत्रण ख़त्म हो गया है। मालिक से नया भेजने को कहें।",
+    "review": "reviewed",
+    "enHash": "1bfb7292"
+  }
+}

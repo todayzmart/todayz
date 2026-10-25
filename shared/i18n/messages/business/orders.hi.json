@@ -1,0 +1,997 @@
+{
+  "orders.title": {
+    "message": "ऑर्डर",
+    "review": "reviewed",
+    "enHash": "cded0933"
+  },
+  "orders.tabs.label": {
+    "message": "ऑर्डर की स्थिति",
+    "review": "reviewed",
+    "enHash": "22edd6c1"
+  },
+  "orders.tab.new": {
+    "message": "नए",
+    "review": "reviewed",
+    "enHash": "6403f2b7"
+  },
+  "orders.tab.accepted": {
+    "message": "स्वीकार किए",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "orders.tab.ready": {
+    "message": "तैयार",
+    "review": "reviewed",
+    "enHash": "20c7c552"
+  },
+  "orders.tab.out_for_delivery": {
+    "message": "डिलीवरी पर",
+    "review": "reviewed",
+    "enHash": "111fb997"
+  },
+  "orders.tab.returns": {
+    "message": "पक्की करने वाली वापसी",
+    "review": "reviewed",
+    "enHash": "c27fa514"
+  },
+  "orders.tab.done": {
+    "message": "पूरे",
+    "review": "reviewed",
+    "enHash": "e9b450d1"
+  },
+  "orders.tab.missed": {
+    "message": "छूटे",
+    "review": "reviewed",
+    "enHash": "b564001a"
+  },
+  "orders.tab.asks": {
+    "message": "माँगें",
+    "review": "reviewed",
+    "enHash": "2c5548cf"
+  },
+  "orders.asks.empty.title": {
+    "message": "अभी कोई माँग नहीं",
+    "review": "reviewed",
+    "enHash": "f9782d98"
+  },
+  "orders.asks.empty.body": {
+    "message": "जब पास का कोई ग्राहक कोई आइटम माँगेगा, वह यहाँ दिखेगा।",
+    "review": "reviewed",
+    "enHash": "04ceb186"
+  },
+  "orders.empty.new.title": {
+    "message": "कोई नया ऑर्डर नहीं",
+    "review": "reviewed",
+    "enHash": "74edcd15"
+  },
+  "orders.empty.new.body": {
+    "message": "ग्राहक के बुक करते ही नए ऑर्डर यहाँ दिखते हैं। यह पेज अपने आप अपडेट होता है।",
+    "review": "reviewed",
+    "enHash": "22554196"
+  },
+  "orders.empty.accepted.title": {
+    "message": "कुछ स्वीकार नहीं किया",
+    "review": "reviewed",
+    "enHash": "08e732c1"
+  },
+  "orders.empty.accepted.body": {
+    "message": "आपके स्वीकार किए ऑर्डर ग्राहक के आने तक यहाँ रहते हैं।",
+    "review": "reviewed",
+    "enHash": "337b23d7"
+  },
+  "orders.empty.ready.title": {
+    "message": "कुछ तैयार नहीं",
+    "review": "reviewed",
+    "enHash": "1a92d685"
+  },
+  "orders.empty.ready.body": {
+    "message": "आपके तैयार बताए ऑर्डर पिकअप तक यहाँ रहते हैं।",
+    "review": "reviewed",
+    "enHash": "22ede753"
+  },
+  "orders.empty.out_for_delivery.title": {
+    "message": "रास्ते में कुछ नहीं",
+    "review": "reviewed",
+    "enHash": "c26724bb"
+  },
+  "orders.empty.out_for_delivery.body": {
+    "message": "आपके भेजे डिलीवरी ऑर्डर तब तक यहाँ रहते हैं जब तक ग्राहक कोड नहीं देता।",
+    "review": "reviewed",
+    "enHash": "2c77a998"
+  },
+  "orders.empty.returns.title": {
+    "message": "पक्की करने को कोई वापसी नहीं",
+    "review": "reviewed",
+    "enHash": "a5e30f69"
+  },
+  "orders.empty.returns.body": {
+    "message": "डिलीवरी न हो पाने पर यहाँ पक्का करें कि सामान वापस आया या नहीं।",
+    "review": "reviewed",
+    "enHash": "2d4bf306"
+  },
+  "orders.empty.done.title": {
+    "message": "कोई पूरा ऑर्डर नहीं",
+    "review": "reviewed",
+    "enHash": "8d34898a"
+  },
+  "orders.empty.done.body": {
+    "message": "सौंपे गए ऑर्डर यहाँ दिखते हैं।",
+    "review": "reviewed",
+    "enHash": "b382e9d8"
+  },
+  "orders.empty.missed.title": {
+    "message": "कोई छूटा ऑर्डर नहीं",
+    "review": "reviewed",
+    "enHash": "76145583"
+  },
+  "orders.empty.missed.body": {
+    "message": "अस्वीकार, एक्सपायर और रद्द ऑर्डर यहाँ दिखते हैं।",
+    "review": "reviewed",
+    "enHash": "2102a5f8"
+  },
+  "orders.loading": {
+    "message": "ऑर्डर लोड हो रहे हैं",
+    "review": "reviewed",
+    "enHash": "58246f0e"
+  },
+  "orders.error.title": {
+    "message": "ऑर्डर लोड नहीं हो सके",
+    "review": "reviewed",
+    "enHash": "c64fbfa9"
+  },
+  "orders.error.body": {
+    "message": "अपना कनेक्शन जाँचें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "orders.error.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "orders.noStore.title": {
+    "message": "पहले एक दुकान चुनें",
+    "review": "reviewed",
+    "enHash": "946fa8f4"
+  },
+  "orders.noStore.body": {
+    "message": "ऑर्डर किसी एक दुकान के होते हैं। जिस दुकान में आप काम कर रहे हैं, उसे चुनें।",
+    "review": "reviewed",
+    "enHash": "2d1b92a4"
+  },
+  "orders.noStore.action": {
+    "message": "दुकान चुनें",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "orders.live.polling": {
+    "message": "लाइव अपडेट रुके हुए हैं। हर 15 सेकंड में नए ऑर्डर देखे जा रहे हैं।",
+    "review": "reviewed",
+    "enHash": "c8f8e69b"
+  },
+  "orders.sound.title": {
+    "message": "नए ऑर्डर सुनें।",
+    "review": "reviewed",
+    "enHash": "39f6bd17"
+  },
+  "orders.sound.body": {
+    "message": "अलर्ट की आवाज़ चलाने से पहले आपके ब्राउज़र को एक टैप चाहिए।",
+    "review": "reviewed",
+    "enHash": "42e19ab9"
+  },
+  "orders.sound.allow": {
+    "message": "आवाज़ चालू करें",
+    "review": "reviewed",
+    "enHash": "c0feb3a5"
+  },
+  "orders.sound.on": {
+    "message": "आवाज़ अलर्ट चालू है",
+    "review": "reviewed",
+    "enHash": "927c9a28"
+  },
+  "orders.sound.off": {
+    "message": "आवाज़ बंद करें",
+    "review": "reviewed",
+    "enHash": "6a4e1b9b"
+  },
+  "orders.sound.muted": {
+    "message": "आवाज़ अलर्ट बंद है",
+    "review": "reviewed",
+    "enHash": "f04f5a47"
+  },
+  "orders.sound.unmute": {
+    "message": "आवाज़ चालू करें",
+    "review": "reviewed",
+    "enHash": "92a0dbc1"
+  },
+  "orders.card.head": {
+    "message": "{number} · {customer}",
+    "review": "reviewed",
+    "enHash": "5993d96e"
+  },
+  "orders.card.noName": {
+    "message": "ग्राहक",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "orders.card.items": {
+    "message": "{count, plural, one {# आइटम} other {# आइटम}}",
+    "review": "reviewed",
+    "enHash": "f34cfa9c"
+  },
+  "orders.card.pickup": {
+    "message": "पिकअप",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "orders.card.delivery": {
+    "message": "डिलीवरी",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "orders.card.timeLeft": {
+    "message": "स्वीकार करने के लिए {time} बचे",
+    "review": "reviewed",
+    "enHash": "ff56fa39"
+  },
+  "orders.card.expired": {
+    "message": "समय ख़त्म",
+    "review": "reviewed",
+    "enHash": "54b7f365"
+  },
+  "orders.card.holdLeft": {
+    "message": "{time} तक रखा है",
+    "review": "reviewed",
+    "enHash": "deb0b1e1"
+  },
+  "orders.card.dispatchBy": {
+    "message": "{time} तक भेजें",
+    "review": "reviewed",
+    "enHash": "6116684a"
+  },
+  "orders.card.open": {
+    "message": "ऑर्डर देखें",
+    "review": "reviewed",
+    "enHash": "0df27975"
+  },
+  "orders.card.openA11y": {
+    "message": "ऑर्डर {number} देखें",
+    "review": "reviewed",
+    "enHash": "40e56958"
+  },
+  "orders.card.accept": {
+    "message": "स्वीकार करें",
+    "review": "reviewed",
+    "enHash": "bb54db51"
+  },
+  "orders.card.acceptA11y": {
+    "message": "ऑर्डर {number} स्वीकार करें",
+    "review": "reviewed",
+    "enHash": "0a165e85"
+  },
+  "orders.card.reject": {
+    "message": "अस्वीकार करें",
+    "review": "reviewed",
+    "enHash": "2b03b592"
+  },
+  "orders.card.rejectA11y": {
+    "message": "ऑर्डर {number} अस्वीकार करें",
+    "review": "reviewed",
+    "enHash": "36ba391b"
+  },
+  "orders.line.stock": {
+    "message": "{available, plural, =0 {स्टॉक ख़त्म} other {# स्टॉक में}}",
+    "review": "reviewed",
+    "enHash": "7855eb20"
+  },
+  "orders.line.short": {
+    "message": "स्टॉक काफ़ी नहीं",
+    "review": "reviewed",
+    "enHash": "357cd443"
+  },
+  "orders.card.partHint": {
+    "message": "{count, plural, one {एक आइटम} other {# आइटम}} के लिए स्टॉक काफ़ी नहीं। कुछ हिस्सा स्वीकार करें, ऑर्डर अस्वीकार करें, या स्टॉक अपडेट करें।",
+    "review": "reviewed",
+    "enHash": "5becf839"
+  },
+  "orders.card.acceptPart": {
+    "message": "कुछ हिस्सा स्वीकार करें",
+    "review": "reviewed",
+    "enHash": "85461124"
+  },
+  "orders.card.acceptPartA11y": {
+    "message": "ऑर्डर {number} का कुछ हिस्सा स्वीकार करें",
+    "review": "reviewed",
+    "enHash": "d5ce1cd5"
+  },
+  "orders.part.title": {
+    "message": "{number} का कुछ हिस्सा स्वीकार करें",
+    "review": "reviewed",
+    "enHash": "e3ff275a"
+  },
+  "orders.part.body": {
+    "message": "बताएँ कि आप कितने दे सकते हैं। ग्राहक बदला हुआ ऑर्डर लेगा या उसे रद्द करेगा। उनके लेने तक कुछ भी रखा नहीं जाता।",
+    "review": "reviewed",
+    "enHash": "557cf769"
+  },
+  "orders.part.asked": {
+    "message": "माँगे {wanted} · {available, plural, =0 {स्टॉक ख़त्म} other {# स्टॉक में}}",
+    "review": "reviewed",
+    "enHash": "486e6d3e"
+  },
+  "orders.part.add": {
+    "message": "जोड़ें",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "orders.part.less": {
+    "message": "एक कम",
+    "review": "reviewed",
+    "enHash": "05892c7d"
+  },
+  "orders.part.more": {
+    "message": "एक ज़्यादा",
+    "review": "reviewed",
+    "enHash": "8c87ebbd"
+  },
+  "orders.part.none": {
+    "message": "कम से कम एक आइटम रखें। कुछ न देना हो तो ऑर्डर अस्वीकार करें।",
+    "review": "reviewed",
+    "enHash": "0a99dc18"
+  },
+  "orders.part.full": {
+    "message": "कुछ हिस्सा स्वीकार करने के लिए कोई मात्रा घटाएँ, या पूरा ऑर्डर स्वीकार करें।",
+    "review": "reviewed",
+    "enHash": "986cfc79"
+  },
+  "orders.part.confirm": {
+    "message": "ग्राहक को भेजें",
+    "review": "reviewed",
+    "enHash": "37a27bbf"
+  },
+  "orders.part.waiting": {
+    "message": "{customer} के बदला हुआ ऑर्डर लेने या रद्द करने का इंतज़ार है।",
+    "review": "reviewed",
+    "enHash": "ef6bbe9e"
+  },
+  "orders.line.partQty": {
+    "message": "{name} × {got} (माँगे {wanted})",
+    "review": "reviewed",
+    "enHash": "37ce8600"
+  },
+  "orders.action.partSent": {
+    "message": "पक्का करने के लिए ग्राहक को भेजा गया।",
+    "review": "reviewed",
+    "enHash": "071f5405"
+  },
+  "orders.card.shortHint": {
+    "message": "{count, plural, one {एक आइटम} other {# आइटम}} के लिए स्टॉक काफ़ी नहीं। ऑर्डर अस्वीकार करें, या स्टॉक अपडेट करें।",
+    "review": "reviewed",
+    "enHash": "d8d167db"
+  },
+  "orders.line.qty": {
+    "message": "{name} × {qty}",
+    "review": "reviewed",
+    "enHash": "8c65377b"
+  },
+  "orders.status.placed": {
+    "message": "नया",
+    "review": "reviewed",
+    "enHash": "6403f2b7"
+  },
+  "orders.status.awaiting_customer": {
+    "message": "ग्राहक का इंतज़ार",
+    "review": "reviewed",
+    "enHash": "43bce849"
+  },
+  "orders.status.accepted": {
+    "message": "स्वीकार किया",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "orders.status.ready": {
+    "message": "पिकअप के लिए तैयार",
+    "review": "reviewed",
+    "enHash": "f1ebfd93"
+  },
+  "orders.status.out_for_delivery": {
+    "message": "डिलीवरी पर",
+    "review": "reviewed",
+    "enHash": "111fb997"
+  },
+  "orders.status.collected": {
+    "message": "ले लिया गया",
+    "review": "reviewed",
+    "enHash": "5b0f7590"
+  },
+  "orders.status.delivered": {
+    "message": "डिलीवर हुआ",
+    "review": "reviewed",
+    "enHash": "eea956cd"
+  },
+  "orders.status.rejected": {
+    "message": "अस्वीकार",
+    "review": "reviewed",
+    "enHash": "27eeb7a2"
+  },
+  "orders.status.expired": {
+    "message": "एक्सपायर",
+    "review": "reviewed",
+    "enHash": "a689a999"
+  },
+  "orders.status.cancelled": {
+    "message": "रद्द",
+    "review": "reviewed",
+    "enHash": "a1bf92ef"
+  },
+  "orders.status.delivery_failed": {
+    "message": "डिलीवरी नहीं हुई",
+    "review": "reviewed",
+    "enHash": "5a954eb2"
+  },
+  "orders.reason.out_of_stock": {
+    "message": "स्टॉक ख़त्म",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "orders.reason.closing_soon": {
+    "message": "जल्द बंद हो रहा है",
+    "review": "reviewed",
+    "enHash": "7ad45de1"
+  },
+  "orders.reason.too_busy": {
+    "message": "अभी बहुत व्यस्त",
+    "review": "reviewed",
+    "enHash": "89ccd171"
+  },
+  "orders.reason.cannot_deliver_address": {
+    "message": "इस पते पर डिलीवरी नहीं हो सकती",
+    "review": "reviewed",
+    "enHash": "b84133a5"
+  },
+  "orders.reason.price_changed": {
+    "message": "क़ीमत बदल गई",
+    "review": "reviewed",
+    "enHash": "13faa9f2"
+  },
+  "orders.reason.customer_unreachable": {
+    "message": "ग्राहक से संपर्क नहीं हो रहा",
+    "review": "reviewed",
+    "enHash": "e8851107"
+  },
+  "orders.reason.other": {
+    "message": "दूसरी वजह",
+    "review": "reviewed",
+    "enHash": "98ed119c"
+  },
+  "orders.reason.changed_mind": {
+    "message": "ग्राहक ने मन बदल लिया",
+    "review": "reviewed",
+    "enHash": "870c267b"
+  },
+  "orders.reason.declined_partial": {
+    "message": "ग्राहक ने बदलाव नहीं माने",
+    "review": "reviewed",
+    "enHash": "7a478210"
+  },
+  "orders.reason.too_slow": {
+    "message": "ग्राहक को जवाब बहुत धीमा लगा",
+    "review": "reviewed",
+    "enHash": "e7314a3d"
+  },
+  "orders.reason.partial_timeout": {
+    "message": "ग्राहक ने समय पर जवाब नहीं दिया",
+    "review": "reviewed",
+    "enHash": "de5941fb"
+  },
+  "orders.reason.not_accepted": {
+    "message": "समय पर स्वीकार नहीं किया",
+    "review": "reviewed",
+    "enHash": "54be7649"
+  },
+  "orders.reason.no_show": {
+    "message": "समय पर नहीं लिया गया",
+    "review": "reviewed",
+    "enHash": "40a35d5a"
+  },
+  "orders.reason.address_not_found": {
+    "message": "पता नहीं मिला",
+    "review": "reviewed",
+    "enHash": "849594a1"
+  },
+  "orders.reason.customer_refused": {
+    "message": "ग्राहक ने ऑर्डर लेने से मना किया",
+    "review": "reviewed",
+    "enHash": "1b2f2106"
+  },
+  "orders.reason.dispatch_timeout": {
+    "message": "समय पर नहीं भेजा गया",
+    "review": "reviewed",
+    "enHash": "a3af10da"
+  },
+  "orders.reason.label": {
+    "message": "वजह: {reason}",
+    "review": "reviewed",
+    "enHash": "f147508d"
+  },
+  "orders.reject.title": {
+    "message": "ऑर्डर {number} अस्वीकार करें",
+    "review": "reviewed",
+    "enHash": "36ba391b"
+  },
+  "orders.reject.body": {
+    "message": "वजह चुनें। ग्राहक को बताया जाएगा।",
+    "review": "reviewed",
+    "enHash": "9a803948"
+  },
+  "orders.reject.confirm": {
+    "message": "ऑर्डर अस्वीकार करें",
+    "review": "reviewed",
+    "enHash": "3f825b9d"
+  },
+  "orders.cancel.title": {
+    "message": "ऑर्डर {number} रद्द करें",
+    "review": "reviewed",
+    "enHash": "225bf193"
+  },
+  "orders.cancel.body": {
+    "message": "रखा हुआ स्टॉक छोड़ दिया जाएगा और ग्राहक को बताया जाएगा। वजह चुनें।",
+    "review": "reviewed",
+    "enHash": "24d10967"
+  },
+  "orders.cancel.confirm": {
+    "message": "ऑर्डर रद्द करें",
+    "review": "reviewed",
+    "enHash": "5ae39c4a"
+  },
+  "orders.cancel.open": {
+    "message": "ऑर्डर रद्द करें",
+    "review": "reviewed",
+    "enHash": "5ae39c4a"
+  },
+  "orders.sheet.reason": {
+    "message": "वजह",
+    "review": "reviewed",
+    "enHash": "f219cc06"
+  },
+  "orders.sheet.note": {
+    "message": "नोट",
+    "review": "reviewed",
+    "enHash": "2c924e30"
+  },
+  "orders.sheet.noteHelp": {
+    "message": "बताएँ क्या हुआ। ग्राहक यह देखेगा।",
+    "review": "reviewed",
+    "enHash": "62165778"
+  },
+  "orders.sheet.back": {
+    "message": "ऑर्डर रखें",
+    "review": "reviewed",
+    "enHash": "3017312f"
+  },
+  "orders.sheet.close": {
+    "message": "बंद करें",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "orders.detail.back": {
+    "message": "ऑर्डर पर वापस",
+    "review": "reviewed",
+    "enHash": "f02399a1"
+  },
+  "orders.detail.title": {
+    "message": "ऑर्डर {number}",
+    "review": "reviewed",
+    "enHash": "2daa0733"
+  },
+  "orders.detail.customer": {
+    "message": "ग्राहक",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "orders.detail.phone": {
+    "message": "फ़ोन {phone}",
+    "review": "reviewed",
+    "enHash": "f415f3a6"
+  },
+  "orders.detail.call": {
+    "message": "{phone} पर कॉल करें",
+    "review": "reviewed",
+    "enHash": "f9ea1a72"
+  },
+  "orders.detail.address": {
+    "message": "डिलीवरी का पता",
+    "review": "reviewed",
+    "enHash": "beacd3ba"
+  },
+  "orders.detail.landmark": {
+    "message": "{landmark} के पास",
+    "review": "reviewed",
+    "enHash": "a5d54d44"
+  },
+  "orders.detail.deliveryFee": {
+    "message": "डिलीवरी शुल्क",
+    "review": "reviewed",
+    "enHash": "733b6148"
+  },
+  "orders.detail.deliveryFree": {
+    "message": "मुफ़्त",
+    "review": "reviewed",
+    "enHash": "75f52718"
+  },
+  "orders.detail.payAtDoor": {
+    "message": "ग्राहक दरवाज़े पर भुगतान करेगा: नकद या UPI।",
+    "review": "reviewed",
+    "enHash": "fd0e5690"
+  },
+  "orders.detail.dispatch": {
+    "message": "भेजें",
+    "review": "reviewed",
+    "enHash": "840e1b36"
+  },
+  "orders.detail.dispatchBy": {
+    "message": "{time} तक भेजें, नहीं तो ऑर्डर एक्सपायर हो जाएगा।",
+    "review": "reviewed",
+    "enHash": "f5c76435"
+  },
+  "orders.detail.items": {
+    "message": "आइटम",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "orders.detail.total": {
+    "message": "कुल",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "orders.detail.payAtShop": {
+    "message": "ग्राहक काउंटर पर भुगतान करेगा: नकद या UPI।",
+    "review": "reviewed",
+    "enHash": "45f597ab"
+  },
+  "orders.detail.paidWith": {
+    "message": "{method} से भुगतान",
+    "review": "reviewed",
+    "enHash": "b91f821a"
+  },
+  "orders.detail.progress": {
+    "message": "ऑर्डर की प्रगति",
+    "review": "reviewed",
+    "enHash": "fcbc4a3a"
+  },
+  "orders.detail.state.done": {
+    "message": "हो गया",
+    "review": "reviewed",
+    "enHash": "e5fd9cfe"
+  },
+  "orders.detail.state.upcoming": {
+    "message": "अभी नहीं",
+    "review": "reviewed",
+    "enHash": "3a230353"
+  },
+  "orders.detail.state.failed": {
+    "message": "नहीं हुआ",
+    "review": "reviewed",
+    "enHash": "aff78aa4"
+  },
+  "orders.detail.step.placed": {
+    "message": "ऑर्डर दिया गया",
+    "review": "reviewed",
+    "enHash": "bb5d68da"
+  },
+  "orders.detail.step.accepted": {
+    "message": "स्वीकार किया",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "orders.detail.step.ready": {
+    "message": "पिकअप के लिए तैयार",
+    "review": "reviewed",
+    "enHash": "f1ebfd93"
+  },
+  "orders.detail.step.collected": {
+    "message": "सौंप दिया",
+    "review": "reviewed",
+    "enHash": "435cd69c"
+  },
+  "orders.detail.step.out_for_delivery": {
+    "message": "डिलीवरी पर",
+    "review": "reviewed",
+    "enHash": "111fb997"
+  },
+  "orders.detail.step.delivered": {
+    "message": "डिलीवर हुआ",
+    "review": "reviewed",
+    "enHash": "eea956cd"
+  },
+  "orders.detail.step.ended": {
+    "message": "{status}",
+    "review": "reviewed",
+    "enHash": "11e758b6"
+  },
+  "orders.detail.notFound": {
+    "message": "यह ऑर्डर इस दुकान में नहीं मिला।",
+    "review": "reviewed",
+    "enHash": "3bb68e08"
+  },
+  "orders.detail.ready": {
+    "message": "तैयार बताएँ",
+    "review": "reviewed",
+    "enHash": "e6c9229a"
+  },
+  "orders.detail.readyHelp": {
+    "message": "ज़रूरी नहीं। ग्राहक को बताएँ कि पैक हो गया है।",
+    "review": "reviewed",
+    "enHash": "dbb77885"
+  },
+  "orders.detail.holdUntil": {
+    "message": "ग्राहक के लिए {time} तक रखा है",
+    "review": "reviewed",
+    "enHash": "f1170404"
+  },
+  "orders.code.title": {
+    "message": "ग्राहक के कोड से सौंपें",
+    "review": "reviewed",
+    "enHash": "220b2fb7"
+  },
+  "orders.code.label": {
+    "message": "ग्राहक का 4 अंकों का कोड",
+    "review": "reviewed",
+    "enHash": "dafa146c"
+  },
+  "orders.code.digit": {
+    "message": "अंक {n}",
+    "review": "reviewed",
+    "enHash": "095a7075"
+  },
+  "orders.code.help": {
+    "message": "ग्राहक से अपने फ़ोन पर कोड दिखाने को कहें।",
+    "review": "reviewed",
+    "enHash": "711d2b81"
+  },
+  "orders.code.payment": {
+    "message": "उन्होंने कैसे भुगतान किया?",
+    "review": "reviewed",
+    "enHash": "492418af"
+  },
+  "orders.code.pay.cash": {
+    "message": "नकद",
+    "review": "reviewed",
+    "enHash": "758ec54e"
+  },
+  "orders.code.pay.upi": {
+    "message": "UPI",
+    "review": "reviewed",
+    "enHash": "f295b2cd"
+  },
+  "orders.code.pay.card": {
+    "message": "कार्ड",
+    "review": "reviewed",
+    "enHash": "4d4ce73b"
+  },
+  "orders.code.pay.other": {
+    "message": "दूसरा",
+    "review": "reviewed",
+    "enHash": "6e6a6f20"
+  },
+  "orders.code.submit": {
+    "message": "ऑर्डर सौंपें",
+    "review": "reviewed",
+    "enHash": "0f29d329"
+  },
+  "orders.code.submitting": {
+    "message": "कोड जाँचा जा रहा है",
+    "review": "reviewed",
+    "enHash": "90adc49f"
+  },
+  "orders.code.invalid": {
+    "message": "यह कोड सही नहीं है। {left, plural, =0 {कोई कोशिश नहीं बची।} one {# कोशिश बची है।} other {# कोशिशें बची हैं।}}",
+    "review": "reviewed",
+    "enHash": "41870020"
+  },
+  "orders.code.locked.title": {
+    "message": "कोड डालना बंद है",
+    "review": "reviewed",
+    "enHash": "3208ad4c"
+  },
+  "orders.code.locked.body": {
+    "message": "बहुत ज़्यादा ग़लत कोड। ग्राहक अपने ऐप में नया कोड माँग सकता है, फिर आप दोबारा कोशिश कर सकते हैं।",
+    "review": "reviewed",
+    "enHash": "90ce4e8c"
+  },
+  "orders.code.attemptsLeft": {
+    "message": "{left, plural, one {# कोशिश बची} other {# कोशिशें बचीं}}",
+    "review": "reviewed",
+    "enHash": "e128755c"
+  },
+  "orders.code.done": {
+    "message": "ऑर्डर सौंप दिया।",
+    "review": "reviewed",
+    "enHash": "6bc4370b"
+  },
+  "orders.code.delivery.title": {
+    "message": "ग्राहक के कोड से डिलीवर करें",
+    "review": "reviewed",
+    "enHash": "1661f447"
+  },
+  "orders.code.delivery.submit": {
+    "message": "डिलीवर हुआ बताएँ",
+    "review": "reviewed",
+    "enHash": "2a90783e"
+  },
+  "orders.code.delivery.done": {
+    "message": "ऑर्डर डिलीवर हुआ।",
+    "review": "reviewed",
+    "enHash": "3e326553"
+  },
+  "orders.failed.open": {
+    "message": "डिलीवरी नहीं हुई",
+    "review": "reviewed",
+    "enHash": "5a954eb2"
+  },
+  "orders.failed.title": {
+    "message": "{number} की डिलीवरी नहीं हुई?",
+    "review": "reviewed",
+    "enHash": "e7d49a1b"
+  },
+  "orders.failed.body": {
+    "message": "ग्राहक को वजह बताएँ। फिर आप पक्का करेंगे कि सामान वापस आया या नहीं।",
+    "review": "reviewed",
+    "enHash": "0b239d43"
+  },
+  "orders.failed.confirm": {
+    "message": "डिलीवरी नहीं हुई बताएँ",
+    "review": "reviewed",
+    "enHash": "1fe1e5fd"
+  },
+  "orders.return.title": {
+    "message": "वापसी",
+    "review": "reviewed",
+    "enHash": "24f096b2"
+  },
+  "orders.return.question": {
+    "message": "क्या सामान वापस आया?",
+    "review": "reviewed",
+    "enHash": "1886718f"
+  },
+  "orders.return.failedAgo": {
+    "message": "{time} पहले डिलीवरी नहीं हुई",
+    "review": "reviewed",
+    "enHash": "77ee2377"
+  },
+  "orders.return.help": {
+    "message": "हाँ से स्टॉक फिर से बिक्री पर आता है। नहीं से उसे ख़राब दर्ज किया जाता है।",
+    "review": "reviewed",
+    "enHash": "a6ad9693"
+  },
+  "orders.return.yes": {
+    "message": "हाँ, सब वापस आया",
+    "review": "reviewed",
+    "enHash": "6619727c"
+  },
+  "orders.return.no": {
+    "message": "नहीं, ख़राब है",
+    "review": "reviewed",
+    "enHash": "04f22e97"
+  },
+  "orders.return.askManager": {
+    "message": "ख़राबी दर्ज करने के लिए किसी मैनेजर से कहें",
+    "review": "reviewed",
+    "enHash": "0bf657cb"
+  },
+  "orders.return.askManagerBody": {
+    "message": "अगर सामान पूरा वापस नहीं आया, तो सिर्फ़ मैनेजर या मालिक ही ख़राबी दर्ज कर सकते हैं।",
+    "review": "reviewed",
+    "enHash": "4e4bbf79"
+  },
+  "orders.return.outcome.returned": {
+    "message": "सामान वापस आया। स्टॉक फिर से बिक्री पर है।",
+    "review": "reviewed",
+    "enHash": "b39d86eb"
+  },
+  "orders.return.outcome.damaged": {
+    "message": "ख़राब दर्ज किया गया।",
+    "review": "reviewed",
+    "enHash": "250593a6"
+  },
+  "orders.return.outcome.unconfirmed": {
+    "message": "72 h बाद अपने आप पक्का हुआ। किसी ने जवाब नहीं दिया, इसलिए स्टॉक फिर से बिक्री पर आ गया।",
+    "review": "reviewed",
+    "enHash": "8db405ce"
+  },
+  "orders.return.short.returned": {
+    "message": "वापस आया",
+    "review": "reviewed",
+    "enHash": "870770a9"
+  },
+  "orders.return.short.damaged": {
+    "message": "ख़राब",
+    "review": "reviewed",
+    "enHash": "052fc798"
+  },
+  "orders.return.short.unconfirmed": {
+    "message": "72 h बाद अपने आप पक्का हुआ",
+    "review": "reviewed",
+    "enHash": "1b5b5825"
+  },
+  "orders.since.hours": {
+    "message": "{h} h {m} min",
+    "review": "reviewed",
+    "enHash": "2a46291f"
+  },
+  "orders.since.minutes": {
+    "message": "{m} min",
+    "review": "reviewed",
+    "enHash": "a47d8efb"
+  },
+  "orders.action.accepted": {
+    "message": "ऑर्डर स्वीकार किया।",
+    "review": "reviewed",
+    "enHash": "b987ceeb"
+  },
+  "orders.action.rejected": {
+    "message": "ऑर्डर अस्वीकार किया।",
+    "review": "reviewed",
+    "enHash": "40985d86"
+  },
+  "orders.action.ready": {
+    "message": "तैयार बताया।",
+    "review": "reviewed",
+    "enHash": "d4bce752"
+  },
+  "orders.action.cancelled": {
+    "message": "ऑर्डर रद्द किया।",
+    "review": "reviewed",
+    "enHash": "c3ca8f89"
+  },
+  "orders.action.dispatched": {
+    "message": "ऑर्डर डिलीवरी के लिए भेजा गया।",
+    "review": "reviewed",
+    "enHash": "12e340d8"
+  },
+  "orders.action.failed": {
+    "message": "डिलीवरी नहीं हुई बताया।",
+    "review": "reviewed",
+    "enHash": "113e6ed7"
+  },
+  "orders.action.return.returned": {
+    "message": "स्टॉक फिर से बिक्री पर है।",
+    "review": "reviewed",
+    "enHash": "44085f11"
+  },
+  "orders.action.return.damaged": {
+    "message": "ख़राबी दर्ज हुई।",
+    "review": "reviewed",
+    "enHash": "18ce297f"
+  },
+  "orders.error.generic": {
+    "message": "यह नहीं हुआ। कृपया फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "13555662"
+  },
+  "orders.error.insufficient_stock": {
+    "message": "किसी एक आइटम का स्टॉक काफ़ी नहीं है। स्टॉक जाँचें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "849a244f"
+  },
+  "orders.error.invalid_transition": {
+    "message": "यह ऑर्डर पहले ही बदल चुका है। नई जानकारी दिखाई गई है।",
+    "review": "reviewed",
+    "enHash": "1e269238"
+  },
+  "orders.error.forbidden": {
+    "message": "आपको यह करने की अनुमति नहीं है।",
+    "review": "reviewed",
+    "enHash": "c89b024b"
+  },
+  "orders.error.validation_failed": {
+    "message": "जानकारी जाँचें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "7f48376a"
+  },
+  "orders.error.expired": {
+    "message": "इस ऑर्डर को स्वीकार करने का समय ख़त्म हो गया है।",
+    "review": "reviewed",
+    "enHash": "2ae054b1"
+  }
+}

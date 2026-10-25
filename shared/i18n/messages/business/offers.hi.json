@@ -1,0 +1,847 @@
+{
+  "offers.title": {
+    "message": "ऑफ़र",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "offers.loading": {
+    "message": "ऑफ़र लोड हो रहे हैं",
+    "review": "reviewed",
+    "enHash": "526c1854"
+  },
+  "offers.noStore.title": {
+    "message": "पहले एक दुकान चुनें",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "offers.noStore.body": {
+    "message": "ऑफ़र किसी दुकान के होते हैं। उन्हें देखने के लिए एक दुकान चुनें।",
+    "review": "reviewed",
+    "enHash": "6be0bd92"
+  },
+  "offers.noStore.action": {
+    "message": "दुकान चुनें",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "offers.askManager": {
+    "message": "ऑफ़र और बैनर मालिक और मैनेजर के लिए हैं। किसी मैनेजर से कहें।",
+    "review": "reviewed",
+    "enHash": "87d93a07"
+  },
+  "offers.error.title": {
+    "message": "ऑफ़र लोड नहीं हो सके",
+    "review": "reviewed",
+    "enHash": "70d93621"
+  },
+  "offers.error.body": {
+    "message": "अपना कनेक्शन जाँचें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "offers.error.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "offers.error.generic": {
+    "message": "कुछ गड़बड़ हो गई। फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "4244e822"
+  },
+  "offers.error.validation_failed": {
+    "message": "कुछ जानकारी की अनुमति नहीं है। फ़ॉर्म जाँचें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "5ef5c8bb"
+  },
+  "offers.error.forbidden": {
+    "message": "आपको यह करने की अनुमति नहीं है। किसी मैनेजर से कहें।",
+    "review": "reviewed",
+    "enHash": "f827c99e"
+  },
+  "offers.error.not_found": {
+    "message": "यह नहीं मिला। हो सकता है इसे हटा दिया गया हो।",
+    "review": "reviewed",
+    "enHash": "db0134f3"
+  },
+  "offers.error.invalid_transition": {
+    "message": "इसे अब बदला नहीं जा सकता।",
+    "review": "reviewed",
+    "enHash": "2d020016"
+  },
+  "offers.error.banner_limit_reached": {
+    "message": "आप बैनर की सीमा तक पहुँच गए हैं। नया जोड़ने के लिए कोई एक ख़त्म करें।",
+    "review": "reviewed",
+    "enHash": "0fefea0d"
+  },
+  "offers.error.precondition_failed": {
+    "message": "यह किसी दूसरे डिवाइस पर बदल गया। सूची अब अपडेट है, फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "8e2fd84f"
+  },
+  "offers.error.precondition_required": {
+    "message": "यह सेव नहीं हो सका। पेज फिर से लोड करें और दोबारा कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "2c6544e0"
+  },
+  "offers.error.conflict": {
+    "message": "यह ऑफ़र पहले से मौजूद है। सूची देखें।",
+    "review": "reviewed",
+    "enHash": "6dc784a9"
+  },
+  "offers.tabs.label": {
+    "message": "ऑफ़र और बैनर",
+    "review": "reviewed",
+    "enHash": "70b265ae"
+  },
+  "offers.tabs.offers": {
+    "message": "ऑफ़र",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "offers.tabs.banners": {
+    "message": "बैनर",
+    "review": "reviewed",
+    "enHash": "b64085ed"
+  },
+  "offers.new": {
+    "message": "नया ऑफ़र",
+    "review": "reviewed",
+    "enHash": "ad43a620"
+  },
+  "offers.close": {
+    "message": "बंद करें",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "offers.cancel": {
+    "message": "रद्द करें",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "offers.create": {
+    "message": "ऑफ़र बनाएँ",
+    "review": "reviewed",
+    "enHash": "c6af210c"
+  },
+  "offers.created": {
+    "message": "{count, plural, one {ऑफ़र बन गया} other {# ऑफ़र बन गए}}",
+    "review": "reviewed",
+    "enHash": "70b3ffa7"
+  },
+  "offers.more": {
+    "message": "और दिखाएँ",
+    "review": "reviewed",
+    "enHash": "25911d48"
+  },
+  "offers.empty.title": {
+    "message": "अभी कोई ऑफ़र नहीं",
+    "review": "reviewed",
+    "enHash": "0a61eeaf"
+  },
+  "offers.empty.body": {
+    "message": "ऑफ़र बनाएँ, ग्राहक उसे आपकी दुकान के पेज और काउंटर पर देखेंगे।",
+    "review": "reviewed",
+    "enHash": "211bb98c"
+  },
+  "offers.empty.filtered": {
+    "message": "यहाँ कोई ऑफ़र नहीं।",
+    "review": "reviewed",
+    "enHash": "3efa4da7"
+  },
+  "offers.filter.label": {
+    "message": "ऑफ़र फ़िल्टर करें",
+    "review": "reviewed",
+    "enHash": "93688736"
+  },
+  "offers.filter.all": {
+    "message": "सभी",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "offers.filter.live": {
+    "message": "लाइव",
+    "review": "reviewed",
+    "enHash": "65c821a5"
+  },
+  "offers.filter.scheduled": {
+    "message": "शेड्यूल्ड",
+    "review": "reviewed",
+    "enHash": "1cd1bdad"
+  },
+  "offers.filter.paused": {
+    "message": "रुके हुए",
+    "review": "reviewed",
+    "enHash": "c7dfb6f1"
+  },
+  "offers.filter.ended": {
+    "message": "ख़त्म",
+    "review": "reviewed",
+    "enHash": "90303d8d"
+  },
+  "offers.status.scheduled": {
+    "message": "शेड्यूल्ड",
+    "review": "reviewed",
+    "enHash": "1cd1bdad"
+  },
+  "offers.status.live": {
+    "message": "लाइव",
+    "review": "reviewed",
+    "enHash": "65c821a5"
+  },
+  "offers.status.paused": {
+    "message": "रुका हुआ",
+    "review": "reviewed",
+    "enHash": "c7dfb6f1"
+  },
+  "offers.status.ended": {
+    "message": "ख़त्म",
+    "review": "reviewed",
+    "enHash": "90303d8d"
+  },
+  "offers.list.label": {
+    "message": "ऑफ़र",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "offers.row.redemptions": {
+    "message": "{max, plural, =0 {{count} बार इस्तेमाल} other {{max} में से {count} इस्तेमाल}}",
+    "review": "reviewed",
+    "enHash": "c0e682c6"
+  },
+  "offers.row.until": {
+    "message": "{when} तक",
+    "review": "reviewed",
+    "enHash": "38e41287"
+  },
+  "offers.row.noEnd": {
+    "message": "कोई आख़िरी तारीख़ नहीं",
+    "review": "reviewed",
+    "enHash": "58fb5578"
+  },
+  "offers.pause": {
+    "message": "रोकें",
+    "review": "reviewed",
+    "enHash": "781961bc"
+  },
+  "offers.resume": {
+    "message": "फिर शुरू करें",
+    "review": "reviewed",
+    "enHash": "b3bd0b5a"
+  },
+  "offers.end": {
+    "message": "ख़त्म करें",
+    "review": "reviewed",
+    "enHash": "a2bb9d34"
+  },
+  "offers.end.confirm": {
+    "message": "इसे हमेशा के लिए ख़त्म करें?",
+    "review": "reviewed",
+    "enHash": "bbd0c3d7"
+  },
+  "offers.end.keep": {
+    "message": "रहने दें",
+    "review": "reviewed",
+    "enHash": "d9f36924"
+  },
+  "offers.end.yes": {
+    "message": "ख़त्म करें",
+    "review": "reviewed",
+    "enHash": "02deb283"
+  },
+  "offers.new.title": {
+    "message": "नया ऑफ़र",
+    "review": "reviewed",
+    "enHash": "ad43a620"
+  },
+  "offers.kind.label": {
+    "message": "ऑफ़र का प्रकार",
+    "review": "reviewed",
+    "enHash": "e1388365"
+  },
+  "offers.kind.percent": {
+    "message": "प्रतिशत छूट",
+    "review": "reviewed",
+    "enHash": "23f77d15"
+  },
+  "offers.kind.flat": {
+    "message": "रुपये की छूट",
+    "review": "reviewed",
+    "enHash": "edfaf2b2"
+  },
+  "offers.kind.bxgy": {
+    "message": "ख़रीदें और मुफ़्त पाएँ",
+    "review": "reviewed",
+    "enHash": "9cceb7bb"
+  },
+  "offers.kind.bill_min": {
+    "message": "बिल पर छूट",
+    "review": "reviewed",
+    "enHash": "6555d928"
+  },
+  "offers.kind.flash": {
+    "message": "एक्सपायर होने वाला स्टॉक",
+    "review": "reviewed",
+    "enHash": "5a5f2759"
+  },
+  "offers.kind.summary": {
+    "message": "{kind, select, percent {{pct}% छूट} flat {हर एक पर {amount} छूट} bxgy {{buy} ख़रीदें {get} पाएँ} bill_min {{min} से ज़्यादा के बिल पर {amount} छूट} other {ऑफ़र}}",
+    "review": "reviewed",
+    "enHash": "61c65366"
+  },
+  "offers.scope.label": {
+    "message": "किस पर लागू",
+    "review": "reviewed",
+    "enHash": "0c9d314d"
+  },
+  "offers.scope.items": {
+    "message": "आइटम",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "offers.scope.category": {
+    "message": "कैटेगरी",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "offers.scope.store": {
+    "message": "पूरी दुकान",
+    "review": "reviewed",
+    "enHash": "ed76ecfe"
+  },
+  "offers.scope.storeNote": {
+    "message": "पूरी दुकान पर लागू होता है।",
+    "review": "reviewed",
+    "enHash": "437ea9db"
+  },
+  "offers.scope.summary": {
+    "message": "{scope, select, store {पूरी दुकान} category {एक कैटेगरी} other {{count, plural, one {# आइटम} other {# आइटम}}}}",
+    "review": "reviewed",
+    "enHash": "f8213bd0"
+  },
+  "offers.items.one": {
+    "message": "आइटम",
+    "review": "reviewed",
+    "enHash": "ecdda59a"
+  },
+  "offers.items.many": {
+    "message": "आइटम",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "offers.category.label": {
+    "message": "कैटेगरी",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "offers.category.choose": {
+    "message": "कैटेगरी चुनें",
+    "review": "reviewed",
+    "enHash": "b91bf5d4"
+  },
+  "offers.picker.search": {
+    "message": "आइटम खोजें",
+    "review": "reviewed",
+    "enHash": "daeea688"
+  },
+  "offers.picker.searchHint": {
+    "message": "अपने आइटम खोजें",
+    "review": "reviewed",
+    "enHash": "81e7c045"
+  },
+  "offers.picker.picked": {
+    "message": "चुने गए आइटम",
+    "review": "reviewed",
+    "enHash": "35b59db9"
+  },
+  "offers.picker.results": {
+    "message": "मिले हुए आइटम",
+    "review": "reviewed",
+    "enHash": "db1ba24e"
+  },
+  "offers.picker.none": {
+    "message": "कोई आइटम नहीं मिला।",
+    "review": "reviewed",
+    "enHash": "4b775dcf"
+  },
+  "offers.picker.add": {
+    "message": "जोड़ें",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "offers.picker.added": {
+    "message": "जोड़ा गया",
+    "review": "reviewed",
+    "enHash": "b68734c2"
+  },
+  "offers.picker.remove": {
+    "message": "{name} हटाएँ",
+    "review": "reviewed",
+    "enHash": "df7193a5"
+  },
+  "offers.flash.batches": {
+    "message": "निकालने वाले बैच",
+    "review": "reviewed",
+    "enHash": "ef42f5b5"
+  },
+  "offers.flash.none": {
+    "message": "स्टॉक में एक्सपायरी तारीख़ वाला कोई बैच नहीं है।",
+    "review": "reviewed",
+    "enHash": "0c83fe51"
+  },
+  "offers.flash.batchMeta": {
+    "message": "{qty} बचे, {date} को एक्सपायर",
+    "review": "reviewed",
+    "enHash": "1ef5226e"
+  },
+  "offers.flash.help": {
+    "message": "हर बैच का अपना ऑफ़र बनता है, जो उसकी एक्सपायरी तारीख़ पर ख़त्म होता है।",
+    "review": "reviewed",
+    "enHash": "a7c5b28b"
+  },
+  "offers.value.percent": {
+    "message": "प्रतिशत छूट",
+    "review": "reviewed",
+    "enHash": "23f77d15"
+  },
+  "offers.value.percentHelp": {
+    "message": "1 से {max} तक की पूरी संख्या।",
+    "review": "reviewed",
+    "enHash": "06b3600d"
+  },
+  "offers.value.flatOff": {
+    "message": "हर एक पर रुपये की छूट",
+    "review": "reviewed",
+    "enHash": "54353916"
+  },
+  "offers.value.flatHelp": {
+    "message": "हर यूनिट पर घटती है, इसलिए क़ीमत से कम होनी चाहिए।",
+    "review": "reviewed",
+    "enHash": "978487d2"
+  },
+  "offers.value.billOff": {
+    "message": "बिल पर रुपये की छूट",
+    "review": "reviewed",
+    "enHash": "a421742a"
+  },
+  "offers.value.billHelp": {
+    "message": "बिल न्यूनतम रकम तक पहुँचने पर पूरे बिल से एक बार घटती है।",
+    "review": "reviewed",
+    "enHash": "37ca1ac1"
+  },
+  "offers.minBill.label": {
+    "message": "न्यूनतम बिल",
+    "review": "reviewed",
+    "enHash": "6a0bea5b"
+  },
+  "offers.buy.label": {
+    "message": "ख़रीदें",
+    "review": "reviewed",
+    "enHash": "7ceca51f"
+  },
+  "offers.get.label": {
+    "message": "मुफ़्त पाएँ",
+    "review": "reviewed",
+    "enHash": "c8e927a1"
+  },
+  "offers.title.label": {
+    "message": "नाम (ज़रूरी नहीं)",
+    "review": "reviewed",
+    "enHash": "9c9f03a8"
+  },
+  "offers.title.help": {
+    "message": "ग्राहकों को दिखता है। ख़ाली छोड़ें तो हम नाम रख देंगे।",
+    "review": "reviewed",
+    "enHash": "d52d3b9a"
+  },
+  "offers.channels.label": {
+    "message": "कहाँ लागू",
+    "review": "reviewed",
+    "enHash": "f32914e5"
+  },
+  "offers.channels.both": {
+    "message": "ऑनलाइन और काउंटर",
+    "review": "reviewed",
+    "enHash": "f1974487"
+  },
+  "offers.channels.online": {
+    "message": "ऑनलाइन",
+    "review": "reviewed",
+    "enHash": "c3e839df"
+  },
+  "offers.channels.pos": {
+    "message": "काउंटर",
+    "review": "reviewed",
+    "enHash": "f4018045"
+  },
+  "offers.once.label": {
+    "message": "हर ग्राहक के लिए एक बार",
+    "review": "reviewed",
+    "enHash": "f5df284e"
+  },
+  "offers.max.label": {
+    "message": "सिर्फ़ पहले ऑर्डर (ज़रूरी नहीं)",
+    "review": "reviewed",
+    "enHash": "6a64b0e0"
+  },
+  "offers.max.help": {
+    "message": "इतने ऑर्डर के बाद रुक जाता है। कोई सीमा न हो तो ख़ाली छोड़ें।",
+    "review": "reviewed",
+    "enHash": "20603623"
+  },
+  "offers.starts.label": {
+    "message": "शुरू",
+    "review": "reviewed",
+    "enHash": "fc612a2f"
+  },
+  "offers.starts.help": {
+    "message": "अभी शुरू करने के लिए ख़ाली छोड़ें।",
+    "review": "reviewed",
+    "enHash": "a515e52d"
+  },
+  "offers.ends.label": {
+    "message": "ख़त्म",
+    "review": "reviewed",
+    "enHash": "91856dcb"
+  },
+  "offers.ends.help": {
+    "message": "जब तक आप ख़त्म न करें तब तक चलाने के लिए ख़ाली छोड़ें।",
+    "review": "reviewed",
+    "enHash": "85330a45"
+  },
+  "offers.err.percent": {
+    "message": "{min} से {max} तक की पूरी संख्या डालें।",
+    "review": "reviewed",
+    "enHash": "329d1c3b"
+  },
+  "offers.err.flatMin": {
+    "message": "रुपये में रकम डालें।",
+    "review": "reviewed",
+    "enHash": "2b198b3b"
+  },
+  "offers.err.flatTooHigh": {
+    "message": "रकम आइटम की क़ीमत से कम होनी चाहिए।",
+    "review": "reviewed",
+    "enHash": "ddda7614"
+  },
+  "offers.err.buy": {
+    "message": "{min} से {max} तक की पूरी संख्या डालें।",
+    "review": "reviewed",
+    "enHash": "329d1c3b"
+  },
+  "offers.err.get": {
+    "message": "{min} से {max} तक की पूरी संख्या डालें।",
+    "review": "reviewed",
+    "enHash": "329d1c3b"
+  },
+  "offers.err.minBill": {
+    "message": "न्यूनतम बिल रुपये में डालें।",
+    "review": "reviewed",
+    "enHash": "09828023"
+  },
+  "offers.err.discountAboveBill": {
+    "message": "छूट न्यूनतम बिल से कम होनी चाहिए।",
+    "review": "reviewed",
+    "enHash": "e19e4174"
+  },
+  "offers.err.itemsRequired": {
+    "message": "कम से कम एक आइटम चुनें।",
+    "review": "reviewed",
+    "enHash": "9df870a1"
+  },
+  "offers.err.oneItem": {
+    "message": "एक आइटम चुनें।",
+    "review": "reviewed",
+    "enHash": "f2a32296"
+  },
+  "offers.err.tooManyItems": {
+    "message": "ज़्यादा से ज़्यादा {max} आइटम चुनें।",
+    "review": "reviewed",
+    "enHash": "83109741"
+  },
+  "offers.err.categoryRequired": {
+    "message": "कैटेगरी चुनें।",
+    "review": "reviewed",
+    "enHash": "1ae9839f"
+  },
+  "offers.err.batchesRequired": {
+    "message": "कम से कम एक बैच चुनें।",
+    "review": "reviewed",
+    "enHash": "43146d7c"
+  },
+  "offers.err.title": {
+    "message": "ज़्यादा से ज़्यादा {max} अक्षर इस्तेमाल करें।",
+    "review": "reviewed",
+    "enHash": "67e6cbb4"
+  },
+  "offers.err.maxRedemptions": {
+    "message": "{max} तक की पूरी संख्या डालें, या ख़ाली छोड़ें।",
+    "review": "reviewed",
+    "enHash": "69e7d68c"
+  },
+  "offers.err.dateInvalid": {
+    "message": "सही तारीख़ और समय डालें।",
+    "review": "reviewed",
+    "enHash": "808fd49b"
+  },
+  "offers.err.startPast": {
+    "message": "शुरू होने का समय बीत चुका है।",
+    "review": "reviewed",
+    "enHash": "925c2101"
+  },
+  "offers.err.endBeforeStart": {
+    "message": "ख़त्म होने का समय शुरू होने के बाद होना चाहिए।",
+    "review": "reviewed",
+    "enHash": "172f86fc"
+  },
+  "offers.preview.label": {
+    "message": "प्रीव्यू",
+    "review": "reviewed",
+    "enHash": "f1fbb2b4"
+  },
+  "offers.preview.title": {
+    "message": "चेकआउट पर कैसा दिखेगा",
+    "review": "reviewed",
+    "enHash": "5b885ef8"
+  },
+  "offers.preview.waiting": {
+    "message": "ऑफ़र भरें, फिर उसके साथ एक सैंपल कार्ट की क़ीमत दिखेगी।",
+    "review": "reviewed",
+    "enHash": "d28ce48f"
+  },
+  "offers.preview.failed": {
+    "message": "प्रीव्यू अभी उपलब्ध नहीं है। आप फिर भी ऑफ़र बना सकते हैं।",
+    "review": "reviewed",
+    "enHash": "960080c9"
+  },
+  "offers.preview.item": {
+    "message": "आइटम",
+    "review": "reviewed",
+    "enHash": "ecdda59a"
+  },
+  "offers.preview.free": {
+    "message": "({count} मुफ़्त)",
+    "review": "reviewed",
+    "enHash": "ed65304a"
+  },
+  "offers.preview.without": {
+    "message": "ऑफ़र के बिना",
+    "review": "reviewed",
+    "enHash": "439e16ce"
+  },
+  "offers.preview.with": {
+    "message": "ऑफ़र के साथ",
+    "review": "reviewed",
+    "enHash": "b8bd6327"
+  },
+  "offers.preview.noEffect": {
+    "message": "यह ऑफ़र इस सैंपल कार्ट पर कोई छूट नहीं देता।",
+    "review": "reviewed",
+    "enHash": "9b954cf6"
+  },
+  "offers.banner.new": {
+    "message": "नया बैनर",
+    "review": "reviewed",
+    "enHash": "b729b1ae"
+  },
+  "offers.banner.create": {
+    "message": "बैनर बनाएँ",
+    "review": "reviewed",
+    "enHash": "8d17d922"
+  },
+  "offers.banner.created": {
+    "message": "बैनर बन गया",
+    "review": "reviewed",
+    "enHash": "7605d111"
+  },
+  "offers.banner.list": {
+    "message": "बैनर",
+    "review": "reviewed",
+    "enHash": "b64085ed"
+  },
+  "offers.banner.empty.title": {
+    "message": "अभी कोई बैनर नहीं",
+    "review": "reviewed",
+    "enHash": "278fb106"
+  },
+  "offers.banner.empty.body": {
+    "message": "बैनर आपकी दुकान के पेज के ऊपर एक हेडलाइन दिखाता है।",
+    "review": "reviewed",
+    "enHash": "eae2ee77"
+  },
+  "offers.banner.headline": {
+    "message": "हेडलाइन",
+    "review": "reviewed",
+    "enHash": "442250df"
+  },
+  "offers.banner.headlineHelp": {
+    "message": "ज़्यादा से ज़्यादा {max} अक्षर।",
+    "review": "reviewed",
+    "enHash": "5776685a"
+  },
+  "offers.banner.subline": {
+    "message": "छोटी लाइन (ज़रूरी नहीं)",
+    "review": "reviewed",
+    "enHash": "f419d0bf"
+  },
+  "offers.banner.sampleHeadline": {
+    "message": "आपकी हेडलाइन",
+    "review": "reviewed",
+    "enHash": "9f13632f"
+  },
+  "offers.banner.tint": {
+    "message": "रंग",
+    "review": "reviewed",
+    "enHash": "f28563a4"
+  },
+  "offers.banner.tint.green": {
+    "message": "हरा",
+    "review": "reviewed",
+    "enHash": "933bf21a"
+  },
+  "offers.banner.tint.amber": {
+    "message": "पीला",
+    "review": "reviewed",
+    "enHash": "27a01d47"
+  },
+  "offers.banner.tint.rose": {
+    "message": "गुलाबी",
+    "review": "reviewed",
+    "enHash": "51ad0eae"
+  },
+  "offers.banner.tint.sky": {
+    "message": "आसमानी",
+    "review": "reviewed",
+    "enHash": "b3d97fd6"
+  },
+  "offers.banner.tint.lilac": {
+    "message": "बैंगनी",
+    "review": "reviewed",
+    "enHash": "a742758d"
+  },
+  "offers.banner.tint.peach": {
+    "message": "पीच",
+    "review": "reviewed",
+    "enHash": "9d572da1"
+  },
+  "offers.banner.target": {
+    "message": "क्या खुलेगा",
+    "review": "reviewed",
+    "enHash": "54c374d4"
+  },
+  "offers.banner.target.store": {
+    "message": "आपकी दुकान",
+    "review": "reviewed",
+    "enHash": "8f808a7d"
+  },
+  "offers.banner.target.offer": {
+    "message": "एक ऑफ़र",
+    "review": "reviewed",
+    "enHash": "32321cab"
+  },
+  "offers.banner.target.category": {
+    "message": "एक कैटेगरी",
+    "review": "reviewed",
+    "enHash": "d07bae3f"
+  },
+  "offers.banner.target.items": {
+    "message": "कुछ आइटम",
+    "review": "reviewed",
+    "enHash": "03e595cf"
+  },
+  "offers.banner.pickOffer": {
+    "message": "ऑफ़र",
+    "review": "reviewed",
+    "enHash": "3898b9aa"
+  },
+  "offers.banner.chooseOffer": {
+    "message": "ऑफ़र चुनें",
+    "review": "reviewed",
+    "enHash": "955b9baf"
+  },
+  "offers.banner.err.headlineRequired": {
+    "message": "हेडलाइन डालें।",
+    "review": "reviewed",
+    "enHash": "4ae29c9b"
+  },
+  "offers.banner.err.headlineMax": {
+    "message": "ज़्यादा से ज़्यादा {max} अक्षर इस्तेमाल करें।",
+    "review": "reviewed",
+    "enHash": "67e6cbb4"
+  },
+  "offers.banner.err.sublineMax": {
+    "message": "ज़्यादा से ज़्यादा {max} अक्षर इस्तेमाल करें।",
+    "review": "reviewed",
+    "enHash": "67e6cbb4"
+  },
+  "offers.banner.err.offerRequired": {
+    "message": "ऑफ़र चुनें।",
+    "review": "reviewed",
+    "enHash": "87f686ca"
+  },
+  "offers.banner.err.categoryRequired": {
+    "message": "कैटेगरी चुनें।",
+    "review": "reviewed",
+    "enHash": "1ae9839f"
+  },
+  "offers.banner.err.itemsRequired": {
+    "message": "कम से कम एक आइटम चुनें।",
+    "review": "reviewed",
+    "enHash": "9df870a1"
+  },
+  "offers.banner.uploadLater": {
+    "message": "फ़ोटो बैनर इस वर्ज़न में उपलब्ध नहीं हैं।",
+    "review": "reviewed",
+    "enHash": "803b2c52"
+  },
+  "offers.banner.status.pending_review": {
+    "message": "जाँच हो रही है",
+    "review": "reviewed",
+    "enHash": "97876b83"
+  },
+  "offers.banner.status.live": {
+    "message": "लाइव",
+    "review": "reviewed",
+    "enHash": "65c821a5"
+  },
+  "offers.banner.status.scheduled": {
+    "message": "शेड्यूल्ड",
+    "review": "reviewed",
+    "enHash": "1cd1bdad"
+  },
+  "offers.banner.status.paused": {
+    "message": "रुका हुआ",
+    "review": "reviewed",
+    "enHash": "c7dfb6f1"
+  },
+  "offers.banner.status.ended": {
+    "message": "ख़त्म",
+    "review": "reviewed",
+    "enHash": "90303d8d"
+  },
+  "offers.banner.status.removed": {
+    "message": "हटाया गया",
+    "review": "reviewed",
+    "enHash": "b5e77c5c"
+  },
+  "offers.banner.checking": {
+    "message": "इमेज जाँची जा रही है…",
+    "review": "reviewed",
+    "enHash": "e1134f27"
+  },
+  "offers.banner.removed": {
+    "message": "TodayZ ने हटाया।",
+    "review": "reviewed",
+    "enHash": "7f206588"
+  },
+  "offers.banner.removedWhy": {
+    "message": "TodayZ ने हटाया: {reason}",
+    "review": "reviewed",
+    "enHash": "cce1e45f"
+  },
+  "offers.banner.reach": {
+    "message": "{views, plural, one {# व्यू} other {# व्यू}} · {taps, plural, one {# टैप} other {# टैप}} · {orders, plural, one {# ऑर्डर} other {# ऑर्डर}}",
+    "review": "reviewed",
+    "enHash": "09e518c2"
+  }
+}

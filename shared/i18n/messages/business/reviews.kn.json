@@ -1,0 +1,352 @@
+{
+  "reviews.title": {
+    "message": "ರಿವ್ಯೂಗಳು",
+    "review": "reviewed",
+    "enHash": "b83c4cda"
+  },
+  "reviews.loading": {
+    "message": "ರಿವ್ಯೂಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ",
+    "review": "reviewed",
+    "enHash": "61702287"
+  },
+  "reviews.noStore.title": {
+    "message": "ಮೊದಲು ಅಂಗಡಿ ಆರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "reviews.noStore.body": {
+    "message": "ರಿವ್ಯೂಗಳು ಒಂದು ಅಂಗಡಿಗೆ ಸೇರಿರುತ್ತವೆ. ನೀವು ಕೆಲಸ ಮಾಡುತ್ತಿರುವ ಅಂಗಡಿಯನ್ನು ಆರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "f9ec0e16"
+  },
+  "reviews.noStore.action": {
+    "message": "ಅಂಗಡಿ ಆರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "reviews.askManager": {
+    "message": "ರಿವ್ಯೂಗಳನ್ನು ಓದಲು ಮತ್ತು ಉತ್ತರಿಸಲು ಮ್ಯಾನೇಜರ್ ಅಥವಾ ಮಾಲೀಕರಿಗೆ ಹೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "2c2e609d"
+  },
+  "reviews.error.title": {
+    "message": "ರಿವ್ಯೂಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "de866185"
+  },
+  "reviews.error.body": {
+    "message": "ನಿಮ್ಮ ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "reviews.error.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "reviews.error.generic": {
+    "message": "ಏನೋ ತಪ್ಪಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "4244e822"
+  },
+  "reviews.error.validation_failed": {
+    "message": "ಈ ಪಠ್ಯ ಸರಿಯಿಲ್ಲ. ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "4adef4cf"
+  },
+  "reviews.error.forbidden": {
+    "message": "ಇದನ್ನು ಮಾಲೀಕರು ಮತ್ತು ಮ್ಯಾನೇಜರ್‌ಗಳು ಮಾತ್ರ ಮಾಡಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "6cfcc92b"
+  },
+  "reviews.error.not_found": {
+    "message": "ಈ ರಿವ್ಯೂ ಈಗ ಲಭ್ಯವಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "272ac09f"
+  },
+  "reviews.stars": {
+    "message": "5 ರಲ್ಲಿ {n} ಸ್ಟಾರ್",
+    "review": "reviewed",
+    "enHash": "9f1228f8"
+  },
+  "reviews.summary.label": {
+    "message": "ರೇಟಿಂಗ್ ಸಾರಾಂಶ",
+    "review": "reviewed",
+    "enHash": "1beac453"
+  },
+  "reviews.summary.count": {
+    "message": "{count, plural, one {# ರಿವ್ಯೂ} other {# ರಿವ್ಯೂಗಳು}}",
+    "review": "reviewed",
+    "enHash": "1686d1f3"
+  },
+  "reviews.filter.label": {
+    "message": "ರಿವ್ಯೂಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "5d0564c8"
+  },
+  "reviews.filter.all": {
+    "message": "ಎಲ್ಲಾ",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "reviews.filter.needsReply": {
+    "message": "ಉತ್ತರ ಬಾಕಿ",
+    "review": "reviewed",
+    "enHash": "1876f7a3"
+  },
+  "reviews.filter.withText": {
+    "message": "ಪಠ್ಯ ಇರುವವು",
+    "review": "reviewed",
+    "enHash": "2edd6b89"
+  },
+  "reviews.filter.low": {
+    "message": "ಕಡಿಮೆ ಸ್ಟಾರ್",
+    "review": "reviewed",
+    "enHash": "e1711be2"
+  },
+  "reviews.list.label": {
+    "message": "ರಿವ್ಯೂಗಳು",
+    "review": "reviewed",
+    "enHash": "b83c4cda"
+  },
+  "reviews.card.label": {
+    "message": "{who} ಅವರ ರಿವ್ಯೂ, 5 ರಲ್ಲಿ {n} ಸ್ಟಾರ್",
+    "review": "reviewed",
+    "enHash": "156b0978"
+  },
+  "reviews.customer": {
+    "message": "ಗ್ರಾಹಕರು",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "reviews.tags.label": {
+    "message": "ಗ್ರಾಹಕರು ಆರಿಸಿದ್ದು",
+    "review": "reviewed",
+    "enHash": "313df17b"
+  },
+  "reviews.tag.fresh_stock": {
+    "message": "ತಾಜಾ ಸ್ಟಾಕ್",
+    "review": "reviewed",
+    "enHash": "fc1a8787"
+  },
+  "reviews.tag.fair_price": {
+    "message": "ನ್ಯಾಯವಾದ ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "ec8540d9"
+  },
+  "reviews.tag.quick_service": {
+    "message": "ವೇಗದ ಸೇವೆ",
+    "review": "reviewed",
+    "enHash": "43b39cae"
+  },
+  "reviews.tag.friendly": {
+    "message": "ಸ್ನೇಹಪರ",
+    "review": "reviewed",
+    "enHash": "bf567dc7"
+  },
+  "reviews.tag.stock_was_right": {
+    "message": "ಸ್ಟಾಕ್ ಸರಿಯಾಗಿತ್ತು",
+    "review": "reviewed",
+    "enHash": "f8f0444f"
+  },
+  "reviews.tag.well_packed": {
+    "message": "ಚೆನ್ನಾಗಿ ಪ್ಯಾಕ್ ಮಾಡಲಾಗಿತ್ತು",
+    "review": "reviewed",
+    "enHash": "0e3f2961"
+  },
+  "reviews.tag.item_missing": {
+    "message": "ಐಟಂ ಕಾಣೆಯಾಗಿತ್ತು",
+    "review": "reviewed",
+    "enHash": "0855e85b"
+  },
+  "reviews.tag.slow": {
+    "message": "ನಿಧಾನ",
+    "review": "reviewed",
+    "enHash": "33dcec9c"
+  },
+  "reviews.tag.rude": {
+    "message": "ಒರಟು ವರ್ತನೆ",
+    "review": "reviewed",
+    "enHash": "ce184411"
+  },
+  "reviews.tag.wrong_item": {
+    "message": "ತಪ್ಪು ಐಟಂ",
+    "review": "reviewed",
+    "enHash": "4acb91e2"
+  },
+  "reviews.tag.expired_item": {
+    "message": "ಅವಧಿ ಮುಗಿದ ಐಟಂ",
+    "review": "reviewed",
+    "enHash": "4ae5e2f6"
+  },
+  "reviews.tag.overpriced": {
+    "message": "ಹೆಚ್ಚು ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "41032e5c"
+  },
+  "reviews.reported.pill": {
+    "message": "ವರದಿ ಮಾಡಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "73c20ded"
+  },
+  "reviews.reported.button": {
+    "message": "ವರದಿ ಮಾಡಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "73c20ded"
+  },
+  "reviews.report.button": {
+    "message": "ವರದಿ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "ee45c303"
+  },
+  "reviews.reply.yours": {
+    "message": "ನಿಮ್ಮ ಉತ್ತರ",
+    "review": "reviewed",
+    "enHash": "bf9a79bf"
+  },
+  "reviews.reply.start": {
+    "message": "ಉತ್ತರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "6c2bb735"
+  },
+  "reviews.reply.edit": {
+    "message": "ಉತ್ತರ ಬದಲಾಯಿಸಿ",
+    "review": "reviewed",
+    "enHash": "a4bf4d45"
+  },
+  "reviews.reply.label": {
+    "message": "ನಿಮ್ಮ ಉತ್ತರ",
+    "review": "reviewed",
+    "enHash": "bf9a79bf"
+  },
+  "reviews.reply.editLabel": {
+    "message": "ನಿಮ್ಮ ಉತ್ತರವನ್ನು ಬದಲಾಯಿಸಿ",
+    "review": "reviewed",
+    "enHash": "97ac1ab6"
+  },
+  "reviews.reply.counter": {
+    "message": "{max} ರಲ್ಲಿ {n}",
+    "review": "reviewed",
+    "enHash": "f0c3ff89"
+  },
+  "reviews.reply.empty": {
+    "message": "ಮೊದಲು ಉತ್ತರ ಬರೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "2fe86de8"
+  },
+  "reviews.reply.send": {
+    "message": "ಉತ್ತರ ಕಳುಹಿಸಿ",
+    "review": "reviewed",
+    "enHash": "7f7e603a"
+  },
+  "reviews.reply.save": {
+    "message": "ಉತ್ತರ ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "c250061d"
+  },
+  "reviews.cancel": {
+    "message": "ರದ್ದುಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "reviews.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "reviews.toast.replySent": {
+    "message": "ಉತ್ತರ ಕಳುಹಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "94295a73"
+  },
+  "reviews.toast.replyUpdated": {
+    "message": "ಉತ್ತರ ಅಪ್‌ಡೇಟ್ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "19cf979f"
+  },
+  "reviews.toast.reported": {
+    "message": "ರಿವ್ಯೂ ಅನ್ನು TodayZ ಗೆ ವರದಿ ಮಾಡಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "00e2c963"
+  },
+  "reviews.report.title": {
+    "message": "ಈ ರಿವ್ಯೂ ವರದಿ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "abad10bb"
+  },
+  "reviews.report.body": {
+    "message": "TodayZ ವರದಿಯಾದ ರಿವ್ಯೂಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತದೆ. ಅಲ್ಲಿಯವರೆಗೆ ರಿವ್ಯೂ ಕಾಣಿಸುತ್ತಿರುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "e386cb2f"
+  },
+  "reviews.report.reason": {
+    "message": "ನೀವು ಇದನ್ನು ಏಕೆ ವರದಿ ಮಾಡುತ್ತಿದ್ದೀರಿ?",
+    "review": "reviewed",
+    "enHash": "2e7a55fa"
+  },
+  "reviews.report.reasons.abusive": {
+    "message": "ನಿಂದನೀಯ ಅಥವಾ ದ್ವೇಷಪೂರಿತ",
+    "review": "reviewed",
+    "enHash": "192ce604"
+  },
+  "reviews.report.reasons.spam": {
+    "message": "ಸ್ಪ್ಯಾಮ್ ಅಥವಾ ಜಾಹೀರಾತು",
+    "review": "reviewed",
+    "enHash": "faaa5e25"
+  },
+  "reviews.report.reasons.fake": {
+    "message": "ನಿಜವಾದ ಗ್ರಾಹಕರಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "97d094f4"
+  },
+  "reviews.report.reasons.not_about_shop": {
+    "message": "ಈ ಅಂಗಡಿಯ ಬಗ್ಗೆ ಅಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "b18e3075"
+  },
+  "reviews.report.reasons.other": {
+    "message": "ಬೇರೆ ಏನೋ",
+    "review": "reviewed",
+    "enHash": "48f88ac3"
+  },
+  "reviews.report.note": {
+    "message": "ಟಿಪ್ಪಣಿ (ಐಚ್ಛಿಕ)",
+    "review": "reviewed",
+    "enHash": "4e395670"
+  },
+  "reviews.report.submit": {
+    "message": "ರಿವ್ಯೂ ವರದಿ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "f5cbfaf7"
+  },
+  "reviews.empty.title": {
+    "message": "ಇನ್ನೂ ರಿವ್ಯೂಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "e4d2123a"
+  },
+  "reviews.empty.body": {
+    "message": "ಗ್ರಾಹಕರು ಆರ್ಡರ್ ಪಡೆದ ನಂತರ ಅಥವಾ ಕೌಂಟರ್‌ನಲ್ಲಿ ಖರೀದಿಸಿದ ನಂತರ ಅಂಗಡಿಗೆ ರಿವ್ಯೂ ನೀಡಬಹುದು. ಅವರ ರಿವ್ಯೂಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "8b7325bb"
+  },
+  "reviews.empty.filtered": {
+    "message": "ಈ ಫಿಲ್ಟರ್‌ಗೆ ಹೊಂದುವ ರಿವ್ಯೂಗಳಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "d4009a35"
+  },
+  "reviews.more": {
+    "message": "ಇನ್ನಷ್ಟು ತೋರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "25911d48"
+  },
+  "reviews.error.review_reply_exists": {
+    "message": "ಈ ರಿವ್ಯೂಗೆ ಈಗಾಗಲೇ ಉತ್ತರವಿದೆ. ಅದನ್ನು ಮತ್ತೆ ಲೋಡ್ ಮಾಡಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "26e93ce0"
+  },
+  "reviews.error.invalid_transition": {
+    "message": "ಈ ಉತ್ತರವನ್ನು ಇನ್ನು ಬದಲಾಯಿಸಲು ಆಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "228ab362"
+  }
+}

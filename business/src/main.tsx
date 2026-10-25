@@ -1,7 +1,7 @@
 import '@todayz/tokens/styles.css';
 import '@todayz/ui/styles.css';
 import { createUpdateController } from '@todayz/auth';
-import { htmlLang } from '@todayz/i18n';
+import { applyLocale } from '@todayz/i18n';
 import { configFromEnv, initTelemetry } from '@todayz/telemetry';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -11,7 +11,8 @@ import { makeQueryClient, makeRouter } from './app/router';
 import { makeSession } from './app/session';
 
 const locale = initialLocale();
-document.documentElement.lang = htmlLang(locale);
+// <html lang> and the script's fonts; a stored choice from B-14 Settings wins over the browser's languages.
+void applyLocale(locale);
 
 const queryClient = makeQueryClient();
 const router = makeRouter(queryClient);
@@ -29,7 +30,7 @@ if (!root) throw new Error('#root is missing from index.html');
 void loadMessages(locale).then((messages) => {
   createRoot(root).render(
     <StrictMode>
-      <App messages={messages} router={router} queryClient={queryClient} session={session} update={update} />
+      <App locale={locale} messages={messages} router={router} queryClient={queryClient} session={session} update={update} />
     </StrictMode>,
   );
 });

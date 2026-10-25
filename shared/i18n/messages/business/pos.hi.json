@@ -1,0 +1,992 @@
+{
+  "pos.title": {
+    "message": "बेचें",
+    "review": "reviewed",
+    "enHash": "fa3cf2ad"
+  },
+  "pos.loading": {
+    "message": "काउंटर लोड हो रहा है",
+    "review": "reviewed",
+    "enHash": "f1beca55"
+  },
+  "pos.close": {
+    "message": "बंद करें",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "pos.error.title": {
+    "message": "काउंटर नहीं खुल सका",
+    "review": "reviewed",
+    "enHash": "74b273cf"
+  },
+  "pos.error.body": {
+    "message": "अपना कनेक्शन जाँचें और फिर से कोशिश करें। इस डिवाइस पर एक बार काउंटर खुल जाए तो वह बिना कनेक्शन के भी चलता है।",
+    "review": "reviewed",
+    "enHash": "09c4858a"
+  },
+  "pos.error.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "pos.noStore.title": {
+    "message": "पहले एक दुकान चुनें",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "pos.noStore.body": {
+    "message": "काउंटर एक समय में एक ही दुकान से बेचता है।",
+    "review": "reviewed",
+    "enHash": "3fb740a8"
+  },
+  "pos.noStore.action": {
+    "message": "दुकान चुनें",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "pos.browse.label": {
+    "message": "आइटम",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "pos.search.label": {
+    "message": "आइटम खोजें या स्कैन करें",
+    "review": "reviewed",
+    "enHash": "c002e92e"
+  },
+  "pos.search.placeholder": {
+    "message": "आइटम खोजें या स्कैन करें",
+    "review": "reviewed",
+    "enHash": "c002e92e"
+  },
+  "pos.search.clear": {
+    "message": "खोज साफ़ करें",
+    "review": "reviewed",
+    "enHash": "67300d0f"
+  },
+  "pos.search.none.title": {
+    "message": "\"{query}\" के लिए कुछ नहीं मिला",
+    "review": "reviewed",
+    "enHash": "31fd2b2b"
+  },
+  "pos.search.none.body": {
+    "message": "इसे क़ीमत के साथ इस बिल में एक बार के आइटम की तरह जोड़ें।",
+    "review": "reviewed",
+    "enHash": "84cd59bd"
+  },
+  "pos.tiles.title": {
+    "message": "झटपट आइटम",
+    "review": "reviewed",
+    "enHash": "9d4bbb51"
+  },
+  "pos.tile.inStock": {
+    "message": "{count} स्टॉक में",
+    "review": "reviewed",
+    "enHash": "9ffca181"
+  },
+  "pos.tile.out": {
+    "message": "स्टॉक ख़त्म",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "pos.tile.countNeeded": {
+    "message": "गिनती ज़रूरी",
+    "review": "reviewed",
+    "enHash": "a5bead5a"
+  },
+  "pos.catalogue.empty.title": {
+    "message": "इस डिवाइस पर अभी कोई आइटम नहीं",
+    "review": "reviewed",
+    "enHash": "c9c7b252"
+  },
+  "pos.catalogue.empty.body": {
+    "message": "अपने आइटम लोड करने के लिए एक बार कनेक्ट करें, या बिल में एक बार का आइटम जोड़ें।",
+    "review": "reviewed",
+    "enHash": "259cd91d"
+  },
+  "pos.sales.open": {
+    "message": "बिक्री",
+    "review": "reviewed",
+    "enHash": "d0edfb6e"
+  },
+  "pos.sales.openAttention": {
+    "message": "बिक्री · {count} जाँचनी हैं",
+    "review": "reviewed",
+    "enHash": "3e248677"
+  },
+  "pos.banner.notDurable.title": {
+    "message": "इस डिवाइस पर बिक्री सेव नहीं हो रही",
+    "review": "reviewed",
+    "enHash": "a00687ff"
+  },
+  "pos.banner.notDurable.body": {
+    "message": "यह ब्राउज़र स्टोरेज रोकता है। हर बिक्री सिंक होने तक यह पेज खुला रखें।",
+    "review": "reviewed",
+    "enHash": "cb5f1125"
+  },
+  "pos.banner.rejected.title": {
+    "message": "{count, plural, one {# बिक्री पर आपका ध्यान चाहिए} other {# बिक्री पर आपका ध्यान चाहिए}}",
+    "review": "reviewed",
+    "enHash": "8841a4a7"
+  },
+  "pos.banner.rejected.action": {
+    "message": "देखें",
+    "review": "reviewed",
+    "enHash": "e29a79fe"
+  },
+  "pos.banner.offline.title": {
+    "message": "ऑफ़लाइन · {count, plural, =0 {कोई बिक्री इंतज़ार में नहीं} one {# बिक्री सिंक के इंतज़ार में} other {# बिक्री सिंक के इंतज़ार में}}",
+    "review": "reviewed",
+    "enHash": "3d9ecc43"
+  },
+  "pos.banner.offline.body": {
+    "message": "आप बेचना जारी रख सकते हैं। बिक्री यहाँ सेव होती है और ऑनलाइन आने पर सिंक होती है।",
+    "review": "reviewed",
+    "enHash": "a3fbeb75"
+  },
+  "pos.banner.waiting.title": {
+    "message": "{count, plural, one {# बिक्री सिंक के इंतज़ार में} other {# बिक्री सिंक के इंतज़ार में}}",
+    "review": "reviewed",
+    "enHash": "fca44f24"
+  },
+  "pos.banner.waiting.body": {
+    "message": "ये बैकग्राउंड में भेजी जाती हैं। आपको कुछ नहीं करना है।",
+    "review": "reviewed",
+    "enHash": "46a8c0dc"
+  },
+  "pos.banner.short.title": {
+    "message": "{count, plural, one {# आइटम} other {# आइटम}} मौजूद गिनती से ज़्यादा है",
+    "review": "reviewed",
+    "enHash": "96a4287f"
+  },
+  "pos.banner.short.body": {
+    "message": "आप फिर भी इसे बेच सकते हैं। स्टॉक गिनती दोबारा गिनने के लिए चिह्नित होगी।",
+    "review": "reviewed",
+    "enHash": "6f3c3731"
+  },
+  "pos.banner.linkDropped.title": {
+    "message": "ग्राहक लिंक हटाया गया",
+    "review": "reviewed",
+    "enHash": "9d6196d7"
+  },
+  "pos.banner.linkDropped.body": {
+    "message": "QR दिखाने के बाद बिल बदल गया। क्रेडिट इस्तेमाल करने के लिए ग्राहक को फिर से लिंक करें।",
+    "review": "reviewed",
+    "enHash": "1d0ce2ea"
+  },
+  "pos.charge.failed.title": {
+    "message": "बिक्री सेव नहीं हो सकी",
+    "review": "reviewed",
+    "enHash": "e427f06a"
+  },
+  "pos.charge.failed.body": {
+    "message": "बिल अभी यहीं है। फिर से चार्ज करें।",
+    "review": "reviewed",
+    "enHash": "ce0f5f1e"
+  },
+  "pos.done.synced": {
+    "message": "{total} की बिक्री हो गई",
+    "review": "reviewed",
+    "enHash": "02042f91"
+  },
+  "pos.done.waiting": {
+    "message": "{total} की बिक्री इस डिवाइस पर सेव है। ऑनलाइन होने पर सिंक होगी।",
+    "review": "reviewed",
+    "enHash": "6fb0cfc5"
+  },
+  "pos.done.rejected": {
+    "message": "{total} की बिक्री अस्वीकार हुई। वजह देखने के लिए बिक्री सूची खोलें।",
+    "review": "reviewed",
+    "enHash": "1ad691cd"
+  },
+  "pos.done.receipt": {
+    "message": "रसीद",
+    "review": "reviewed",
+    "enHash": "f6ce3b6f"
+  },
+  "pos.cart.label": {
+    "message": "मौजूदा बिल",
+    "review": "reviewed",
+    "enHash": "a64c72ef"
+  },
+  "pos.cart.phone": {
+    "message": "ग्राहक का फ़ोन",
+    "review": "reviewed",
+    "enHash": "7689682e"
+  },
+  "pos.cart.phonePlaceholder": {
+    "message": "ग्राहक का फ़ोन (ज़रूरी नहीं)",
+    "review": "reviewed",
+    "enHash": "60d44f84"
+  },
+  "pos.cart.empty": {
+    "message": "बिल शुरू करने के लिए कोई आइटम स्कैन करें या टैप करें।",
+    "review": "reviewed",
+    "enHash": "8eba9230"
+  },
+  "pos.cart.add": {
+    "message": "जोड़ें",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "pos.cart.less": {
+    "message": "एक कम करें",
+    "review": "reviewed",
+    "enHash": "afbcf5f3"
+  },
+  "pos.cart.more": {
+    "message": "एक और जोड़ें",
+    "review": "reviewed",
+    "enHash": "bb49f016"
+  },
+  "pos.cart.lineDetailDiscount": {
+    "message": "{price} हर एक · {discount} छूट",
+    "review": "reviewed",
+    "enHash": "7922a98a"
+  },
+  "pos.cart.summary": {
+    "message": "{count, plural, one {# आइटम} other {# आइटम}}",
+    "review": "reviewed",
+    "enHash": "f34cfa9c"
+  },
+  "pos.cart.view": {
+    "message": "बिल देखें",
+    "review": "reviewed",
+    "enHash": "ee721f1b"
+  },
+  "pos.cart.charge": {
+    "message": "चार्ज करें",
+    "review": "reviewed",
+    "enHash": "d4e1aee4"
+  },
+  "pos.cart.charging": {
+    "message": "चार्ज हो रहा है",
+    "review": "reviewed",
+    "enHash": "5f99fe21"
+  },
+  "pos.cart.subtotal": {
+    "message": "उप-योग",
+    "review": "reviewed",
+    "enHash": "97f7359e"
+  },
+  "pos.cart.billDiscount": {
+    "message": "छूट",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.cart.roundOff": {
+    "message": "राउंड ऑफ़",
+    "review": "reviewed",
+    "enHash": "3aa7ebde"
+  },
+  "pos.cart.credits": {
+    "message": "क्रेडिट",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "pos.cart.linkCustomer": {
+    "message": "ग्राहक लिंक करें",
+    "review": "reviewed",
+    "enHash": "e051d869"
+  },
+  "pos.cart.unlink": {
+    "message": "हटाएँ",
+    "review": "reviewed",
+    "enHash": "e963907d"
+  },
+  "pos.cart.discount": {
+    "message": "छूट",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.cart.clear": {
+    "message": "बिल साफ़ करें",
+    "review": "reviewed",
+    "enHash": "bbb4902a"
+  },
+  "pos.cart.link.billQr": {
+    "message": "बिल QR से लिंक · {credits, plural, =0 {कोई क्रेडिट इस्तेमाल नहीं} one {# क्रेडिट इस्तेमाल} other {# क्रेडिट इस्तेमाल}}",
+    "review": "reviewed",
+    "enHash": "f26e079e"
+  },
+  "pos.cart.link.counterCode": {
+    "message": "कोड से लिंक · {phone}",
+    "review": "reviewed",
+    "enHash": "81e24f8e"
+  },
+  "pos.cart.link.unverified": {
+    "message": "फ़ोन नोट किया, वेरिफ़ाई नहीं · {phone}",
+    "review": "reviewed",
+    "enHash": "28a8d23b"
+  },
+  "pos.pay.label": {
+    "message": "भुगतान का तरीका",
+    "review": "reviewed",
+    "enHash": "0e55fb3b"
+  },
+  "pos.pay.cash": {
+    "message": "नकद",
+    "review": "reviewed",
+    "enHash": "758ec54e"
+  },
+  "pos.pay.upi": {
+    "message": "UPI",
+    "review": "reviewed",
+    "enHash": "f295b2cd"
+  },
+  "pos.pay.card": {
+    "message": "कार्ड",
+    "review": "reviewed",
+    "enHash": "4d4ce73b"
+  },
+  "pos.add.open": {
+    "message": "अलग आइटम",
+    "review": "reviewed",
+    "enHash": "b7757e4a"
+  },
+  "pos.add.customTitle": {
+    "message": "एक बार का आइटम जोड़ें",
+    "review": "reviewed",
+    "enHash": "8a3608cb"
+  },
+  "pos.add.unknownTitle": {
+    "message": "यह बारकोड हमें नहीं पता",
+    "review": "reviewed",
+    "enHash": "2da821a4"
+  },
+  "pos.add.unknownBody": {
+    "message": "कोड {code} आपके आइटम में नहीं है। इसे नाम और क़ीमत के साथ इस बिल में जोड़ें।",
+    "review": "reviewed",
+    "enHash": "7131a281"
+  },
+  "pos.add.name": {
+    "message": "आइटम का नाम",
+    "review": "reviewed",
+    "enHash": "b56b71bb"
+  },
+  "pos.add.nameInvalid": {
+    "message": "नाम डालें",
+    "review": "reviewed",
+    "enHash": "7e5fe97f"
+  },
+  "pos.add.price": {
+    "message": "क़ीमत",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "pos.add.priceInvalid": {
+    "message": "शून्य से ज़्यादा क़ीमत डालें",
+    "review": "reviewed",
+    "enHash": "8d0c1181"
+  },
+  "pos.add.submit": {
+    "message": "बिल में जोड़ें",
+    "review": "reviewed",
+    "enHash": "73cd5e5d"
+  },
+  "pos.add.inStock": {
+    "message": "इसे अपने स्टॉक में जोड़ें",
+    "review": "reviewed",
+    "enHash": "4792eee5"
+  },
+  "pos.discount.title": {
+    "message": "छूट",
+    "review": "reviewed",
+    "enHash": "e5a40077"
+  },
+  "pos.discount.help": {
+    "message": "रकम रुपये में डालें। बिल ₹1 या उससे ज़्यादा रहता है।",
+    "review": "reviewed",
+    "enHash": "fe6d51ad"
+  },
+  "pos.discount.line": {
+    "message": "{name} · {price}",
+    "review": "reviewed",
+    "enHash": "6c125f94"
+  },
+  "pos.discount.bill": {
+    "message": "पूरे बिल पर छूट",
+    "review": "reviewed",
+    "enHash": "74870af9"
+  },
+  "pos.discount.invalid": {
+    "message": "सही रकम डालें",
+    "review": "reviewed",
+    "enHash": "a45acfd3"
+  },
+  "pos.discount.apply": {
+    "message": "लागू करें",
+    "review": "reviewed",
+    "enHash": "cfea419c"
+  },
+  "pos.scan.open": {
+    "message": "स्कैन",
+    "review": "reviewed",
+    "enHash": "28cba55d"
+  },
+  "pos.scan.title": {
+    "message": "बारकोड स्कैन करें",
+    "review": "reviewed",
+    "enHash": "7276e973"
+  },
+  "pos.scan.unsupported": {
+    "message": "यह ब्राउज़र कैमरे से स्कैन नहीं कर सकता। बारकोड स्कैनर इस्तेमाल करें या कोड टाइप करें।",
+    "review": "reviewed",
+    "enHash": "5c26f8e7"
+  },
+  "pos.scan.denied": {
+    "message": "कैमरा एक्सेस बंद है। स्कैन करने के लिए ब्राउज़र सेटिंग्स में इसकी अनुमति दें।",
+    "review": "reviewed",
+    "enHash": "253b57db"
+  },
+  "pos.scan.starting": {
+    "message": "कैमरा शुरू हो रहा है",
+    "review": "reviewed",
+    "enHash": "d6293a9d"
+  },
+  "pos.scan.hint": {
+    "message": "कैमरा बारकोड की तरफ़ करें।",
+    "review": "reviewed",
+    "enHash": "9abc9dc4"
+  },
+  "pos.link.title": {
+    "message": "ग्राहक लिंक करें",
+    "review": "reviewed",
+    "enHash": "f86c83df"
+  },
+  "pos.link.back": {
+    "message": "वापस",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "pos.link.skip": {
+    "message": "बिना लिंक किए बेचें",
+    "review": "reviewed",
+    "enHash": "a26d2e6c"
+  },
+  "pos.link.noCredits": {
+    "message": "यह बिल क्रेडिट इस्तेमाल करने की न्यूनतम रकम से कम है। ग्राहक फिर भी क्रेडिट कमा सकते हैं।",
+    "review": "reviewed",
+    "enHash": "4e4f339e"
+  },
+  "pos.link.qr": {
+    "message": "ग्राहक QR स्कैन करें",
+    "review": "reviewed",
+    "enHash": "fae4c5ca"
+  },
+  "pos.link.qrHelp": {
+    "message": "ग्राहक क्रेडिट इस्तेमाल कर सकते हैं और कैशबैक कमा सकते हैं।",
+    "review": "reviewed",
+    "enHash": "da188dd6"
+  },
+  "pos.link.qrOffline": {
+    "message": "कनेक्शन ज़रूरी है।",
+    "review": "reviewed",
+    "enHash": "1e270e64"
+  },
+  "pos.link.code": {
+    "message": "ग्राहक कोड बोलें",
+    "review": "reviewed",
+    "enHash": "3f13bff1"
+  },
+  "pos.link.codeHelp": {
+    "message": "ग्राहक अपने ऐप से 4 अंकों का कोड दिखाते हैं। वे क्रेडिट कमाते हैं।",
+    "review": "reviewed",
+    "enHash": "e9acea8e"
+  },
+  "pos.link.phone": {
+    "message": "सिर्फ़ फ़ोन नोट करें",
+    "review": "reviewed",
+    "enHash": "504991bf"
+  },
+  "pos.link.phoneHelp": {
+    "message": "नंबर बिक्री पर सेव होता है। वेरिफ़ाई करने तक कोई क्रेडिट नहीं।",
+    "review": "reviewed",
+    "enHash": "5daaea7a"
+  },
+  "pos.link.phoneFieldHelp": {
+    "message": "10 अंकों का मोबाइल नंबर",
+    "review": "reviewed",
+    "enHash": "3f114e30"
+  },
+  "pos.link.qrLabel": {
+    "message": "ग्राहक के स्कैन करने के लिए QR कोड",
+    "review": "reviewed",
+    "enHash": "1457d7c6"
+  },
+  "pos.link.qrPreparing": {
+    "message": "QR तैयार हो रहा है",
+    "review": "reviewed",
+    "enHash": "12ab2a36"
+  },
+  "pos.link.qrFailed": {
+    "message": "QR नहीं बन सका।",
+    "review": "reviewed",
+    "enHash": "f41ca6be"
+  },
+  "pos.link.qrExpired": {
+    "message": "यह QR एक्सपायर हो गया है।",
+    "review": "reviewed",
+    "enHash": "00efed4d"
+  },
+  "pos.link.newQr": {
+    "message": "नया QR",
+    "review": "reviewed",
+    "enHash": "16d87a7a"
+  },
+  "pos.link.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "pos.link.waiting": {
+    "message": "ग्राहक के स्कैन करने का इंतज़ार है।",
+    "review": "reviewed",
+    "enHash": "a47155e3"
+  },
+  "pos.link.expiresIn": {
+    "message": "{seconds} s में एक्सपायर",
+    "review": "reviewed",
+    "enHash": "d965684d"
+  },
+  "pos.link.phoneLabel": {
+    "message": "ग्राहक का फ़ोन",
+    "review": "reviewed",
+    "enHash": "7689682e"
+  },
+  "pos.link.phoneInvalid": {
+    "message": "10 अंकों का मोबाइल नंबर डालें",
+    "review": "reviewed",
+    "enHash": "63c5f1b7"
+  },
+  "pos.link.codeLabel": {
+    "message": "ग्राहक के ऐप का कोड",
+    "review": "reviewed",
+    "enHash": "dd3257a4"
+  },
+  "pos.link.codeHint": {
+    "message": "4 अंक",
+    "review": "reviewed",
+    "enHash": "a970a484"
+  },
+  "pos.link.codeInvalid": {
+    "message": "4 अंकों का कोड डालें",
+    "review": "reviewed",
+    "enHash": "d99fedc4"
+  },
+  "pos.link.codeMismatch": {
+    "message": "वह कोड मेल नहीं खाया।",
+    "review": "reviewed",
+    "enHash": "d8ae7e1c"
+  },
+  "pos.link.codeMismatchTries": {
+    "message": "वह कोड मेल नहीं खाया। {count, plural, one {# कोशिश बाकी} other {# कोशिशें बाकी}}।",
+    "review": "reviewed",
+    "enHash": "21be7fcb"
+  },
+  "pos.link.codeLocked": {
+    "message": "बहुत ज़्यादा ग़लत कोड। बाद में कोशिश करें या फ़ोन से लिंक करें।",
+    "review": "reviewed",
+    "enHash": "abbbdb33"
+  },
+  "pos.link.codeOffline": {
+    "message": "आप ऑफ़लाइन हैं। बिक्री सिंक होने पर कोड जाँचा जाएगा।",
+    "review": "reviewed",
+    "enHash": "df15f601"
+  },
+  "pos.link.codeSave": {
+    "message": "कोड से लिंक करें",
+    "review": "reviewed",
+    "enHash": "c9f2a2ec"
+  },
+  "pos.link.phoneSave": {
+    "message": "यह फ़ोन नोट करें",
+    "review": "reviewed",
+    "enHash": "bca7b443"
+  },
+  "pos.history.title": {
+    "message": "इस डिवाइस की बिक्री",
+    "review": "reviewed",
+    "enHash": "ea829991"
+  },
+  "pos.history.empty.title": {
+    "message": "अभी कोई बिक्री नहीं",
+    "review": "reviewed",
+    "enHash": "f2a3f161"
+  },
+  "pos.history.empty.body": {
+    "message": "आपकी की गई बिक्री पुरानी होने तक यहाँ दिखती है।",
+    "review": "reviewed",
+    "enHash": "ef0aab5c"
+  },
+  "pos.history.units": {
+    "message": "{count, plural, one {# यूनिट} other {# यूनिट}}",
+    "review": "reviewed",
+    "enHash": "55edb2e2"
+  },
+  "pos.history.receipt": {
+    "message": "रसीद",
+    "review": "reviewed",
+    "enHash": "f6ce3b6f"
+  },
+  "pos.history.state.pending": {
+    "message": "सिंक के इंतज़ार में",
+    "review": "reviewed",
+    "enHash": "e8f3a099"
+  },
+  "pos.history.state.sending": {
+    "message": "सिंक हो रही है",
+    "review": "reviewed",
+    "enHash": "4ae6fa22"
+  },
+  "pos.history.state.synced": {
+    "message": "सिंक हो गई",
+    "review": "reviewed",
+    "enHash": "b2ef6af6"
+  },
+  "pos.history.state.rejected": {
+    "message": "अस्वीकार",
+    "review": "reviewed",
+    "enHash": "735ec50d"
+  },
+  "pos.history.state.reversed": {
+    "message": "वापस की गई",
+    "review": "reviewed",
+    "enHash": "307404eb"
+  },
+  "pos.history.linkFailed": {
+    "message": "ग्राहक लिंक नहीं हुआ",
+    "review": "reviewed",
+    "enHash": "b2a064c7"
+  },
+  "pos.history.countNeeded": {
+    "message": "गिनती ज़रूरी",
+    "review": "reviewed",
+    "enHash": "a5bead5a"
+  },
+  "pos.history.countNeededItems": {
+    "message": "दोबारा गिनें: {names}",
+    "review": "reviewed",
+    "enHash": "7f5c83fa"
+  },
+  "pos.history.serverPrice": {
+    "message": "यहाँ {device} चार्ज हुआ; सर्वर पर {server} पर पूरा हुआ।",
+    "review": "reviewed",
+    "enHash": "237a255b"
+  },
+  "pos.history.refused": {
+    "message": "सर्वर ने यह बिक्री अस्वीकार की। फिर से कोशिश करें, या ग्राहक से पूछकर इसे हटा दें।",
+    "review": "reviewed",
+    "enHash": "e61a6e2b"
+  },
+  "pos.sync.title": {
+    "message": "सिंक",
+    "review": "reviewed",
+    "enHash": "905f6309"
+  },
+  "pos.sync.status.idle": {
+    "message": "अप टू डेट",
+    "review": "reviewed",
+    "enHash": "82fb1d51"
+  },
+  "pos.sync.status.syncing": {
+    "message": "सिंक हो रहा है",
+    "review": "reviewed",
+    "enHash": "4ae6fa22"
+  },
+  "pos.sync.status.offline": {
+    "message": "ऑफ़लाइन",
+    "review": "reviewed",
+    "enHash": "e01fa717"
+  },
+  "pos.sync.status.backoff": {
+    "message": "दोबारा कोशिश का इंतज़ार",
+    "review": "reviewed",
+    "enHash": "ac710fd8"
+  },
+  "pos.sync.status.resync": {
+    "message": "आइटम रीफ़्रेश हो रहे हैं",
+    "review": "reviewed",
+    "enHash": "912875eb"
+  },
+  "pos.sync.now": {
+    "message": "अभी सिंक करें",
+    "review": "reviewed",
+    "enHash": "2b7d938e"
+  },
+  "pos.sync.counts": {
+    "message": "{pending, plural, one {# इंतज़ार में} other {# इंतज़ार में}} · {rejected, plural, one {# अस्वीकार} other {# अस्वीकार}}",
+    "review": "reviewed",
+    "enHash": "4127fbe7"
+  },
+  "pos.sync.last": {
+    "message": "आख़िरी सिंक {time}",
+    "review": "reviewed",
+    "enHash": "83c122a7"
+  },
+  "pos.sync.attention": {
+    "message": "{count, plural, one {# बिक्री जाँचनी है} other {# बिक्री जाँचनी हैं}}",
+    "review": "reviewed",
+    "enHash": "00315455"
+  },
+  "pos.sync.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "9f5cd8a2"
+  },
+  "pos.sync.dismiss": {
+    "message": "हटाएँ",
+    "review": "reviewed",
+    "enHash": "70afe9ef"
+  },
+  "pos.reverse.action": {
+    "message": "वापस करें",
+    "review": "reviewed",
+    "enHash": "57f99337"
+  },
+  "pos.reverse.title": {
+    "message": "यह बिक्री वापस करें?",
+    "review": "reviewed",
+    "enHash": "31c561b0"
+  },
+  "pos.reverse.body": {
+    "message": "इसे पलटा नहीं जा सकता।",
+    "review": "reviewed",
+    "enHash": "fe63a123"
+  },
+  "pos.reverse.stock": {
+    "message": "{count, plural, one {# यूनिट स्टॉक में वापस जाएगी} other {# यूनिट स्टॉक में वापस जाएँगी}}",
+    "review": "reviewed",
+    "enHash": "fb6ecb00"
+  },
+  "pos.reverse.credits": {
+    "message": "{count, plural, =0 {वापस देने के लिए कोई क्रेडिट नहीं} one {# क्रेडिट ग्राहक को वापस मिलेगा} other {# क्रेडिट ग्राहक को वापस मिलेंगे}}",
+    "review": "reviewed",
+    "enHash": "7f6a019b"
+  },
+  "pos.reverse.cashback": {
+    "message": "{count, plural, =0 {वापस लेने के लिए कोई कैशबैक नहीं} one {# कैशबैक क्रेडिट वापस लिया जाएगा} other {# कैशबैक क्रेडिट वापस लिए जाएँगे}}",
+    "review": "reviewed",
+    "enHash": "bd10f749"
+  },
+  "pos.reverse.reason": {
+    "message": "वजह",
+    "review": "reviewed",
+    "enHash": "f219cc06"
+  },
+  "pos.reverse.keep": {
+    "message": "बिक्री रहने दें",
+    "review": "reviewed",
+    "enHash": "0403484b"
+  },
+  "pos.reverse.confirm": {
+    "message": "बिक्री वापस करें",
+    "review": "reviewed",
+    "enHash": "a8309a05"
+  },
+  "pos.reverse.done": {
+    "message": "वापस हो गई। {units, plural, one {# यूनिट} other {# यूनिट}} स्टॉक में वापस, {credits, plural, one {# क्रेडिट} other {# क्रेडिट}} वापस दिए, {cashback, plural, one {# कैशबैक क्रेडिट} other {# कैशबैक क्रेडिट}} वापस लिए।",
+    "review": "reviewed",
+    "enHash": "6e36bd13"
+  },
+  "pos.reverse.offline": {
+    "message": "आप ऑफ़लाइन हैं। ऑनलाइन आने पर बिक्री वापस करें।",
+    "review": "reviewed",
+    "enHash": "92a58c40"
+  },
+  "pos.reverse.windowPassed": {
+    "message": "यह बिक्री वापस करने का समय निकल गया है।",
+    "review": "reviewed",
+    "enHash": "dd1ffab9"
+  },
+  "pos.reverse.failed": {
+    "message": "बिक्री वापस नहीं हो सकी। फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "f2e7f12b"
+  },
+  "pos.receipt.title": {
+    "message": "रसीद",
+    "review": "reviewed",
+    "enHash": "f6ce3b6f"
+  },
+  "pos.receipt.lineDiscount": {
+    "message": "छूट",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.receipt.subtotal": {
+    "message": "उप-योग",
+    "review": "reviewed",
+    "enHash": "97f7359e"
+  },
+  "pos.receipt.discount": {
+    "message": "छूट",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.receipt.roundOff": {
+    "message": "राउंड ऑफ़",
+    "review": "reviewed",
+    "enHash": "3aa7ebde"
+  },
+  "pos.receipt.credits": {
+    "message": "इस्तेमाल किए क्रेडिट",
+    "review": "reviewed",
+    "enHash": "385686f7"
+  },
+  "pos.receipt.total": {
+    "message": "कुल",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "pos.receipt.paidBy": {
+    "message": "भुगतान",
+    "review": "reviewed",
+    "enHash": "70c115d7"
+  },
+  "pos.receipt.thanks": {
+    "message": "हमारे यहाँ ख़रीदारी के लिए धन्यवाद।",
+    "review": "reviewed",
+    "enHash": "feb21b25"
+  },
+  "pos.receipt.whatsapp": {
+    "message": "WhatsApp पर भेजें",
+    "review": "reviewed",
+    "enHash": "7e03939f"
+  },
+  "pos.receipt.sms": {
+    "message": "SMS से भेजें",
+    "review": "reviewed",
+    "enHash": "6c0b2af6"
+  },
+  "pos.receipt.print": {
+    "message": "प्रिंट करें",
+    "review": "reviewed",
+    "enHash": "5b221e9c"
+  },
+  "pos.receipt.linkPending": {
+    "message": "शेयर लिंक इस बिक्री के सिंक होने के बाद काम करेंगे।",
+    "review": "reviewed",
+    "enHash": "29db9a75"
+  },
+  "pos.receipt.shareText": {
+    "message": "{shop} से आपकी रसीद: {url}",
+    "review": "reviewed",
+    "enHash": "b72276cf"
+  },
+  "pos.pay.other": {
+    "message": "अन्य",
+    "review": "reviewed",
+    "enHash": "6e6a6f20"
+  },
+  "pos.storeSales.open": {
+    "message": "दुकान की बिक्री",
+    "review": "reviewed",
+    "enHash": "26e31c8a"
+  },
+  "pos.storeSales.title": {
+    "message": "दुकान की बिक्री",
+    "review": "reviewed",
+    "enHash": "26e31c8a"
+  },
+  "pos.storeSales.sub": {
+    "message": "इस दुकान की हर डिवाइस से हुई सारी बिक्री, सबसे नई पहले।",
+    "review": "reviewed",
+    "enHash": "bb528425"
+  },
+  "pos.storeSales.refresh": {
+    "message": "रीफ़्रेश करें",
+    "review": "reviewed",
+    "enHash": "56e3badc"
+  },
+  "pos.storeSales.more": {
+    "message": "और दिखाएँ",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "pos.storeSales.loading": {
+    "message": "बिक्री लोड हो रही है",
+    "review": "reviewed",
+    "enHash": "2723eba7"
+  },
+  "pos.storeSales.offline": {
+    "message": "आप ऑफ़लाइन हैं। दुकान की बिक्री देखने के लिए इंटरनेट से जुड़ें; इस डिवाइस की बिक्री “बिक्री” में है।",
+    "review": "reviewed",
+    "enHash": "61c05b4d"
+  },
+  "pos.storeSales.failed": {
+    "message": "बिक्री लोड नहीं हो सकी। “रीफ़्रेश करें” दबाकर देखें।",
+    "review": "reviewed",
+    "enHash": "64c16cab"
+  },
+  "pos.storeSales.forbidden": {
+    "message": "आप इस दुकान की बिक्री नहीं देख सकते।",
+    "review": "reviewed",
+    "enHash": "4d8a5236"
+  },
+  "pos.storeSales.empty.title": {
+    "message": "अभी कोई बिक्री नहीं",
+    "review": "reviewed",
+    "enHash": "f2a3f161"
+  },
+  "pos.storeSales.empty.body": {
+    "message": "इस दुकान पर हुई बिक्री सर्वर तक पहुँचने के बाद यहाँ दिखेगी।",
+    "review": "reviewed",
+    "enHash": "d6d582c5"
+  },
+  "pos.storeSales.offlineSale": {
+    "message": "ऑफ़लाइन बिकी",
+    "review": "reviewed",
+    "enHash": "1080acf7"
+  },
+  "pos.storeSales.link.none": {
+    "message": "कोई ग्राहक नहीं",
+    "review": "reviewed",
+    "enHash": "871e3df8"
+  },
+  "pos.storeSales.link.linked": {
+    "message": "ग्राहक लिंक हुआ",
+    "review": "reviewed",
+    "enHash": "d731c875"
+  },
+  "pos.storeSales.link.linkedTo": {
+    "message": "{name} से लिंक",
+    "review": "reviewed",
+    "enHash": "50f407f3"
+  },
+  "pos.storeSales.link.pending": {
+    "message": "लिंक बाकी",
+    "review": "reviewed",
+    "enHash": "18990b4f"
+  },
+  "pos.storeSales.failure.code_used": {
+    "message": "काउंटर कोड पहले ही इस्तेमाल हो चुका था।",
+    "review": "reviewed",
+    "enHash": "6ba38a1c"
+  },
+  "pos.storeSales.failure.code_wrong": {
+    "message": "काउंटर कोड मेल नहीं खाया।",
+    "review": "reviewed",
+    "enHash": "3d77b8d3"
+  },
+  "pos.storeSales.failure.clock_off": {
+    "message": "डिवाइस की घड़ी गलत थी।",
+    "review": "reviewed",
+    "enHash": "7f280bf4"
+  },
+  "pos.storeSales.failure.too_late": {
+    "message": "बिक्री इतनी देर से सिंक हुई कि कोड जाँचा नहीं जा सका।",
+    "review": "reviewed",
+    "enHash": "3e897c4c"
+  },
+  "pos.storeSales.failure.locked": {
+    "message": "बहुत बार गलत कोड; जाँच रोक दी गई है।",
+    "review": "reviewed",
+    "enHash": "74daacba"
+  },
+  "pos.storeSales.failure.unverified": {
+    "message": "कोड जाँचा नहीं जा सका।",
+    "review": "reviewed",
+    "enHash": "15c74c7c"
+  }
+}

@@ -1,0 +1,327 @@
+{
+  "credits.title": {
+    "message": "ಕ್ರೆಡಿಟ್‌ಗಳು ಮತ್ತು ರೆಫರಲ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "e9796059"
+  },
+  "credits.loading": {
+    "message": "ಕ್ರೆಡಿಟ್‌ಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ",
+    "review": "reviewed",
+    "enHash": "1ff7a2d9"
+  },
+  "credits.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "credits.error.title": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "427c23ba"
+  },
+  "credits.error.body": {
+    "message": "ನಿಮ್ಮ ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "credits.noStore.title": {
+    "message": "ಮೊದಲು ಅಂಗಡಿ ಆರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "credits.noStore.body": {
+    "message": "ಕ್ರೆಡಿಟ್‌ಗಳು ಒಂದು ಅಂಗಡಿಗೆ ಸೇರಿರುತ್ತವೆ. ನೀವು ಕೆಲಸ ಮಾಡುತ್ತಿರುವ ಅಂಗಡಿಯನ್ನು ಆರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "ffdf45d1"
+  },
+  "credits.noStore.action": {
+    "message": "ಅಂಗಡಿ ಆರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "credits.manager.title": {
+    "message": "ಮ್ಯಾನೇಜರ್ ಅನ್ನು ಕೇಳಿ",
+    "review": "reviewed",
+    "enHash": "aa2dd365"
+  },
+  "credits.manager.body": {
+    "message": "ಕ್ರೆಡಿಟ್‌ಗಳು, ರೆಫರಲ್‌ಗಳು ಮತ್ತು ಸ್ಟ್ಯಾಂಡಿ ಮಾಲೀಕರು ಮತ್ತು ಮ್ಯಾನೇಜರ್‌ಗಳಿಗೆ ಮಾತ್ರ.",
+    "review": "reviewed",
+    "enHash": "3a43a3e3"
+  },
+  "credits.account.title": {
+    "message": "ಕ್ರೆಡಿಟ್ ಖಾತೆ",
+    "review": "reviewed",
+    "enHash": "1a59b98e"
+  },
+  "credits.account.balance": {
+    "message": "ಬ್ಯಾಲೆನ್ಸ್",
+    "review": "reviewed",
+    "enHash": "90eef613"
+  },
+  "credits.account.credits": {
+    "message": "{count, plural, one {# ಕ್ರೆಡಿಟ್} other {# ಕ್ರೆಡಿಟ್‌ಗಳು}}",
+    "review": "reviewed",
+    "enHash": "699b6117"
+  },
+  "credits.account.negative": {
+    "message": "ಮೈನಸ್ ಬ್ಯಾಲೆನ್ಸ್ ಮುಂದಕ್ಕೆ ಹೋಗುತ್ತದೆ ಮತ್ತು ಪೇಔಟ್ ಸಮಯದಲ್ಲಿ ಕಳೆಯಲಾಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "89430656"
+  },
+  "credits.account.error": {
+    "message": "ನಿಮ್ಮ ಕ್ರೆಡಿಟ್ ಖಾತೆಯನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "5c888d41"
+  },
+  "credits.lines.label": {
+    "message": "ಕ್ರೆಡಿಟ್ ಖಾತೆಯ ಎಂಟ್ರಿಗಳು",
+    "review": "reviewed",
+    "enHash": "0106aad6"
+  },
+  "credits.lines.empty.title": {
+    "message": "ಇನ್ನೂ ಯಾವುದೇ ಕ್ರೆಡಿಟ್ ಚಟುವಟಿಕೆ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "aa1820ee"
+  },
+  "credits.lines.empty.body": {
+    "message": "ಗ್ರಾಹಕರು ನಿಮ್ಮ ಅಂಗಡಿಯಲ್ಲಿ ಖರ್ಚು ಮಾಡುವ ಕ್ರೆಡಿಟ್‌ಗಳು ಮತ್ತು ನೀವು ನೀಡುವ ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "84011ab9"
+  },
+  "credits.lines.more": {
+    "message": "ಹಳೆಯ ಎಂಟ್ರಿಗಳನ್ನು ತೋರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "d99d5681"
+  },
+  "credits.lines.loading": {
+    "message": "ಹಳೆಯ ಎಂಟ್ರಿಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ",
+    "review": "reviewed",
+    "enHash": "fb0e4bcf"
+  },
+  "credits.lines.error": {
+    "message": "ಇನ್ನಷ್ಟು ಎಂಟ್ರಿಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "25d59ed3"
+  },
+  "credits.line.spent": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿಯಲ್ಲಿ ಖರ್ಚಾದ ಕ್ರೆಡಿಟ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "577a1d99"
+  },
+  "credits.line.cashback": {
+    "message": "ನೀವು ನೀಡಿದ ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್",
+    "review": "reviewed",
+    "enHash": "b448f6f5"
+  },
+  "credits.line.referral_reward": {
+    "message": "ರೆಫರಲ್ ಬಹುಮಾನ",
+    "review": "reviewed",
+    "enHash": "6fc3bbab"
+  },
+  "credits.line.pos_reversal": {
+    "message": "ಮಾರಾಟ ಹಿಂತಿರುಗಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "e17f3704"
+  },
+  "credits.line.payout": {
+    "message": "ಪೇಔಟ್",
+    "review": "reviewed",
+    "enHash": "9bb39694"
+  },
+  "credits.line.adjustment": {
+    "message": "ಹೊಂದಾಣಿಕೆ",
+    "review": "reviewed",
+    "enHash": "7f0496ac"
+  },
+  "credits.line.added": {
+    "message": "ಸೇರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "b68734c2"
+  },
+  "credits.line.taken": {
+    "message": "ಕಳೆಯಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "7ee5528e"
+  },
+  "credits.ref.order": {
+    "message": "ಆರ್ಡರ್ {ref}",
+    "review": "reviewed",
+    "enHash": "6b45f123"
+  },
+  "credits.ref.sale": {
+    "message": "ಮಾರಾಟ {ref}",
+    "review": "reviewed",
+    "enHash": "aae9dff8"
+  },
+  "credits.payouts.title": {
+    "message": "ಪೇಔಟ್ ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "8bc68cc7"
+  },
+  "credits.payouts.in": {
+    "message": "ಗ್ರಾಹಕರು ನಿಮ್ಮ ಅಂಗಡಿಯಲ್ಲಿ ಕ್ರೆಡಿಟ್‌ಗಳನ್ನು ಖರ್ಚು ಮಾಡಿದಾಗ ಮತ್ತು ನಿಮ್ಮ ರೆಫರಲ್‌ಗಳಿಗೆ ಬಹುಮಾನ ಬಂದಾಗ ಕ್ರೆಡಿಟ್‌ಗಳು ಬರುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "e43f875a"
+  },
+  "credits.payouts.out": {
+    "message": "ನೀವು ನೀಡುವ ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್, ಹಿಂತಿರುಗಿಸಿದ ಮಾರಾಟಗಳು ಮತ್ತು ಪೇಔಟ್‌ಗಳಲ್ಲಿ ಕ್ರೆಡಿಟ್‌ಗಳು ಹೋಗುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "50227aac"
+  },
+  "credits.payouts.statement": {
+    "message": "ಸ್ಟೇಟ್‌ಮೆಂಟ್‌ಗಳು ಪ್ರತಿ ತಿಂಗಳ 1 ನೇ ತಾರೀಖು ಮುಚ್ಚುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "b06786bc"
+  },
+  "credits.payouts.amount": {
+    "message": "ನಿಮ್ಮ ಪೇಔಟ್ ಎಂದರೆ ನಿಮ್ಮ ಕ್ರೆಡಿಟ್ ಬ್ಯಾಲೆನ್ಸ್‌ನಿಂದ ಇನ್ನೂ ಪಾವತಿಯಾಗದ ಪೇಔಟ್ ಕಳೆದ ಮೊತ್ತ.",
+    "review": "reviewed",
+    "enHash": "a7ae6425"
+  },
+  "credits.payouts.paid": {
+    "message": "TodayZ ನಿಮಗೆ UPI ಮೂಲಕ ಹಣ ಕಳುಹಿಸಿ ರೆಫರೆನ್ಸ್ ದಾಖಲಿಸಿದ ನಂತರವೇ ಪೇಔಟ್ 'ಪಾವತಿಸಲಾಗಿದೆ' ಎಂದು ಕಾಣಿಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "eef9c25d"
+  },
+  "credits.payouts.holds": {
+    "message": "KYC ಅಪೂರ್ಣವಾಗಿದ್ದರೆ, ವಂಚನೆಯ ಶಂಕೆ ಇದ್ದರೆ ಅಥವಾ ಬಿಸಿನೆಸ್ ತಡೆಹಿಡಿದಿದ್ದರೆ ಪೇಔಟ್ ನಿಲ್ಲಿಸಲಾಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "78983e75"
+  },
+  "credits.statements.title": {
+    "message": "ಮಾಸಿಕ ಸ್ಟೇಟ್‌ಮೆಂಟ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "f4d5c628"
+  },
+  "credits.statements.soon": {
+    "message": "ಮಾಸಿಕ ಸ್ಟೇಟ್‌ಮೆಂಟ್‌ಗಳು ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿವೆ.",
+    "review": "reviewed",
+    "enHash": "8916c368"
+  },
+  "credits.standee.title": {
+    "message": "QR ಸ್ಟ್ಯಾಂಡಿ",
+    "review": "reviewed",
+    "enHash": "db442fbd"
+  },
+  "credits.standee.body": {
+    "message": "{store} ಗಾಗಿ ಪ್ರಿಂಟ್ ಮಾಡಬಹುದಾದ A5 ಸ್ಟ್ಯಾಂಡಿ. ಗ್ರಾಹಕರು ಇದನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ತೆರೆಯುತ್ತಾರೆ.",
+    "review": "reviewed",
+    "enHash": "662cecd3"
+  },
+  "credits.standee.shortCode": {
+    "message": "ಚಿಕ್ಕ ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "7545309d"
+  },
+  "credits.standee.preview": {
+    "message": "PDF ಮುನ್ನೋಟ",
+    "review": "reviewed",
+    "enHash": "37b66fde"
+  },
+  "credits.standee.download": {
+    "message": "A5 PDF ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "d5f56067"
+  },
+  "credits.standee.preparing": {
+    "message": "PDF ಸಿದ್ಧವಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "cc44de09"
+  },
+  "credits.standee.open": {
+    "message": "ಸ್ಟ್ಯಾಂಡಿ ಆಯ್ಕೆಗಳು",
+    "review": "reviewed",
+    "enHash": "62238373"
+  },
+  "credits.standee.error": {
+    "message": "ಸ್ಟ್ಯಾಂಡಿ ಸಿದ್ಧಪಡಿಸಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "9f51d4bd"
+  },
+  "credits.referral.title": {
+    "message": "ಒಂದು ಅಂಗಡಿಯನ್ನು ರೆಫರ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "f3669d74"
+  },
+  "credits.referral.body": {
+    "message": "ನಿಮ್ಮ ಕೋಡ್ ಅನ್ನು ಇನ್ನೊಬ್ಬ ಅಂಗಡಿ ಮಾಲೀಕರೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳಿ. ಅವರ ಅಂಗಡಿಗೆ ಮೊದಲ ಆರ್ಡರ್‌ಗಳು ಬಂದಾಗ ನಿಮಗೆ ಕ್ರೆಡಿಟ್‌ಗಳು ಸಿಗುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "839b007c"
+  },
+  "credits.referral.codeLabel": {
+    "message": "ನಿಮ್ಮ ರೆಫರಲ್ ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "4b8a4a39"
+  },
+  "credits.referral.copy": {
+    "message": "ಕೋಡ್ ಕಾಪಿ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "6c106927"
+  },
+  "credits.referral.copied": {
+    "message": "ಕೋಡ್ ಕಾಪಿ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "1cca33a6"
+  },
+  "credits.referral.copyLink": {
+    "message": "ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "2f84eea5"
+  },
+  "credits.referral.linkCopied": {
+    "message": "ಲಿಂಕ್ ಕಾಪಿ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "c2e98476"
+  },
+  "credits.referral.copyFailed": {
+    "message": "ಕಾಪಿ ಮಾಡಲು ಆಗಲಿಲ್ಲ. ಪಠ್ಯವನ್ನು ಆರಿಸಿ ನೀವೇ ಕಾಪಿ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "2a15aec7"
+  },
+  "credits.referral.share": {
+    "message": "ಹಂಚಿಕೊಳ್ಳಿ",
+    "review": "reviewed",
+    "enHash": "09ca55ca"
+  },
+  "credits.referral.shareTitle": {
+    "message": "TodayZ ಗೆ ಸೇರಿ",
+    "review": "reviewed",
+    "enHash": "84e86c58"
+  },
+  "credits.referral.pending": {
+    "message": "ಮೊದಲ ಆರ್ಡರ್‌ಗಳಿಗಾಗಿ ಕಾಯುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "ec114479"
+  },
+  "credits.referral.rewarded": {
+    "message": "ಬಹುಮಾನ ನೀಡಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "8e773327"
+  },
+  "credits.referral.count": {
+    "message": "{count, plural, one {# ಅಂಗಡಿ} other {# ಅಂಗಡಿಗಳು}}",
+    "review": "reviewed",
+    "enHash": "ac03bc4f"
+  },
+  "credits.referral.where": {
+    "message": "ಬಹುಮಾನಗಳನ್ನು ನಿಮ್ಮ ಮುಖ್ಯ ಅಂಗಡಿಯ ಕ್ರೆಡಿಟ್ ಖಾತೆಗೆ ಸೇರಿಸಲಾಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "e023e087"
+  },
+  "credits.referral.error": {
+    "message": "ನಿಮ್ಮ ರೆಫರಲ್ ಕೋಡ್ ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "8b449a2b"
+  },
+  "credits.referral.earned": {
+    "message": "ಗಳಿಸಿದ ಕ್ರೆಡಿಟ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "89e38aea"
+  },
+  "credits.referral.earnedValue": {
+    "message": "{credits, plural, one {# ಕ್ರೆಡಿಟ್} other {# ಕ್ರೆಡಿಟ್‌ಗಳು}}",
+    "review": "reviewed",
+    "enHash": "4854c909"
+  }
+}

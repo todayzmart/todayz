@@ -1,0 +1,982 @@
+{
+  "stock.title": {
+    "message": "ஸ்டாக்",
+    "review": "reviewed",
+    "enHash": "bcecf456"
+  },
+  "stock.loading": {
+    "message": "ஸ்டாக் ஏற்றப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "a1a29595"
+  },
+  "stock.noStore.title": {
+    "message": "முதலில் ஒரு கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "stock.noStore.body": {
+    "message": "ஸ்டாக் ஒரு கடைக்குச் சொந்தமானது. நீங்கள் வேலை செய்யும் கடையைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "3ad8aef4"
+  },
+  "stock.noStore.action": {
+    "message": "கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "stock.error.title": {
+    "message": "ஸ்டாக்கை ஏற்ற முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "d98f90d7"
+  },
+  "stock.error.body": {
+    "message": "உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "stock.error.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "stock.error.validation_failed": {
+    "message": "அதில் சில ஏற்கப்படவில்லை. எண்களைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "a29c601a"
+  },
+  "stock.error.forbidden": {
+    "message": "உங்கள் பணியால் இதைச் செய்ய முடியாது. ஒரு மேலாளரிடம் கேளுங்கள்.",
+    "review": "reviewed",
+    "enHash": "7c035098"
+  },
+  "stock.error.conflict": {
+    "message": "நீங்கள் மாற்றும்போது இது மாறியது. மீண்டும் ஏற்றி முயலவும்.",
+    "review": "reviewed",
+    "enHash": "d32da861"
+  },
+  "stock.error.not_found": {
+    "message": "இந்தப் பொருள் இப்போது உங்கள் கடையில் இல்லை.",
+    "review": "reviewed",
+    "enHash": "bac42b30"
+  },
+  "stock.error.precondition_failed": {
+    "message": "வேறொருவர் இப்போதுதான் இந்தப் பொருளை மாற்றினார். அது மீண்டும் ஏற்றப்பட்டது; மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "16a84f1b"
+  },
+  "stock.error.precondition_required": {
+    "message": "இந்தப் பொருளின் மாற்றங்களைச் சரிபார்க்க முடியவில்லை. மீண்டும் ஏற்றி முயலவும்.",
+    "review": "reviewed",
+    "enHash": "996ab7c1"
+  },
+  "stock.error.generic": {
+    "message": "அது நடக்கவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "9ae914fa"
+  },
+  "stock.search.label": {
+    "message": "ஸ்டாக்கைத் தேடவும்",
+    "review": "reviewed",
+    "enHash": "63960fa1"
+  },
+  "stock.search.placeholder": {
+    "message": "பெயர் அல்லது பார்கோடு மூலம் தேடவும்",
+    "review": "reviewed",
+    "enHash": "01f9e331"
+  },
+  "stock.search.clear": {
+    "message": "தேடலை அழிக்கவும்",
+    "review": "reviewed",
+    "enHash": "67300d0f"
+  },
+  "stock.filter.label": {
+    "message": "ஸ்டாக்கை வடிகட்டவும்",
+    "review": "reviewed",
+    "enHash": "5b642716"
+  },
+  "stock.filter.all": {
+    "message": "அனைத்தும்",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "stock.filter.low": {
+    "message": "குறைந்த ஸ்டாக்",
+    "review": "reviewed",
+    "enHash": "a6e1fef1"
+  },
+  "stock.filter.out": {
+    "message": "ஸ்டாக் இல்லை",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "stock.filter.stale": {
+    "message": "சமீபத்தில் உறுதிசெய்யப்படவில்லை",
+    "review": "reviewed",
+    "enHash": "09fece23"
+  },
+  "stock.filter.hidden": {
+    "message": "மறைக்கப்பட்டவை",
+    "review": "reviewed",
+    "enHash": "d4c2792a"
+  },
+  "stock.category.label": {
+    "message": "வகை",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "stock.category.all": {
+    "message": "அனைத்து வகைகளும்",
+    "review": "reviewed",
+    "enHash": "060be00f"
+  },
+  "stock.action.add": {
+    "message": "பொருளைச் சேர்",
+    "review": "reviewed",
+    "enHash": "5bcf4db4"
+  },
+  "stock.action.import": {
+    "message": "இறக்குமதி",
+    "review": "reviewed",
+    "enHash": "d6fbc9d2"
+  },
+  "stock.action.count": {
+    "message": "ஸ்டாக்கை எண்ணவும்",
+    "review": "reviewed",
+    "enHash": "82d76c10"
+  },
+  "stock.action.countDone": {
+    "message": "எண்ணுதல் முடிந்தது",
+    "review": "reviewed",
+    "enHash": "152e7d90"
+  },
+  "stock.count.hint": {
+    "message": "ஒவ்வொரு பொருளுக்கும் அலமாரியில் உள்ளதைத் தட்டச்சு செய்து, பிறகு உறுதிசெய்யவும். நீங்கள் உறுதிசெய்த பொருட்கள் மட்டுமே மாறும்.",
+    "review": "reviewed",
+    "enHash": "d36c7bbf"
+  },
+  "stock.table.label": {
+    "message": "ஸ்டாக் பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "51ae889f"
+  },
+  "stock.col.item": {
+    "message": "பொருள்",
+    "review": "reviewed",
+    "enHash": "ecdda59a"
+  },
+  "stock.col.stock": {
+    "message": "ஸ்டாக்",
+    "review": "reviewed",
+    "enHash": "bcecf456"
+  },
+  "stock.col.onHand": {
+    "message": "கையிருப்பு",
+    "review": "reviewed",
+    "enHash": "d94c32d4"
+  },
+  "stock.col.counted": {
+    "message": "எண்ணியது",
+    "review": "reviewed",
+    "enHash": "319a2b6e"
+  },
+  "stock.col.price": {
+    "message": "விலை",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "stock.empty.none": {
+    "message": "இன்னும் பொருட்கள் இல்லை. உங்கள் முதல் பொருளைச் சேர்க்கவும் அல்லது ஒரு ஷீட்டை இறக்குமதி செய்யவும்.",
+    "review": "reviewed",
+    "enHash": "97b326b4"
+  },
+  "stock.empty.filtered": {
+    "message": "எந்தப் பொருளும் பொருந்தவில்லை.",
+    "review": "reviewed",
+    "enHash": "911453d6"
+  },
+  "stock.more": {
+    "message": "மேலும் காட்டு",
+    "review": "reviewed",
+    "enHash": "25911d48"
+  },
+  "stock.level.in": {
+    "message": "ஸ்டாக்கில் உள்ளது",
+    "review": "reviewed",
+    "enHash": "3f1356ad"
+  },
+  "stock.level.low": {
+    "message": "{available} மட்டுமே மீதம்",
+    "review": "reviewed",
+    "enHash": "8a4dc0ee"
+  },
+  "stock.level.out": {
+    "message": "ஸ்டாக் இல்லை",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "stock.fresh.confirmed": {
+    "message": "உறுதிசெய்தது {time}",
+    "review": "reviewed",
+    "enHash": "7d1ac5a7"
+  },
+  "stock.fresh.stale": {
+    "message": "ஸ்டாக் சமீபத்தில் உறுதிசெய்யப்படவில்லை",
+    "review": "reviewed",
+    "enHash": "c8a47c2d"
+  },
+  "stock.inline.edit": {
+    "message": "{item} ஐ மாற்றவும்",
+    "review": "reviewed",
+    "enHash": "0a705d55"
+  },
+  "stock.inline.save": {
+    "message": "{item} இன் விலையைச் சேமிக்கவும்",
+    "review": "reviewed",
+    "enHash": "2b9d7bee"
+  },
+  "stock.inline.confirm": {
+    "message": "{item} இன் எண்ணிக்கையை உறுதிசெய்யவும்",
+    "review": "reviewed",
+    "enHash": "0ffca104"
+  },
+  "stock.inline.price": {
+    "message": "{item} இன் விலை",
+    "review": "reviewed",
+    "enHash": "f96e0600"
+  },
+  "stock.inline.count": {
+    "message": "{item} இன் எண்ணிய அளவு",
+    "review": "reviewed",
+    "enHash": "3f1068a2"
+  },
+  "stock.item.close": {
+    "message": "மூடவும்",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "stock.item.hidden": {
+    "message": "வாடிக்கையாளர்களிடமிருந்து மறைக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "f9800cca"
+  },
+  "stock.item.onHand": {
+    "message": "கையிருப்பு",
+    "review": "reviewed",
+    "enHash": "d94c32d4"
+  },
+  "stock.item.reserved": {
+    "message": "ஆர்டர்களுக்காக வைக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "df36c2b4"
+  },
+  "stock.item.available": {
+    "message": "கிடைப்பது",
+    "review": "reviewed",
+    "enHash": "7c62a142"
+  },
+  "stock.item.price": {
+    "message": "விலை",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "stock.item.mrp": {
+    "message": "MRP",
+    "review": "reviewed",
+    "enHash": "cd74a166"
+  },
+  "stock.item.lowAt": {
+    "message": "குறைந்த ஸ்டாக் வரம்பு",
+    "review": "reviewed",
+    "enHash": "7ba9fd9d"
+  },
+  "stock.item.notSet": {
+    "message": "அமைக்கப்படவில்லை",
+    "review": "reviewed",
+    "enHash": "93039e60"
+  },
+  "stock.item.tabs": {
+    "message": "பொருள் விவரங்கள்",
+    "review": "reviewed",
+    "enHash": "12e853a0"
+  },
+  "stock.tab.batches": {
+    "message": "பேட்ச்கள்",
+    "review": "reviewed",
+    "enHash": "30925eec"
+  },
+  "stock.tab.history": {
+    "message": "வரலாறு",
+    "review": "reviewed",
+    "enHash": "90ccd649"
+  },
+  "stock.act.restock": {
+    "message": "மீண்டும் ஸ்டாக் செய்",
+    "review": "reviewed",
+    "enHash": "3ccf7127"
+  },
+  "stock.act.count": {
+    "message": "எண்ணிக்கையைத் திருத்து",
+    "review": "reviewed",
+    "enHash": "afc22be8"
+  },
+  "stock.act.damage": {
+    "message": "சேதமடைந்ததாகக் குறி",
+    "review": "reviewed",
+    "enHash": "cb521b7a"
+  },
+  "stock.act.expired": {
+    "message": "காலாவதியானதாகக் குறி",
+    "review": "reviewed",
+    "enHash": "310c38b2"
+  },
+  "stock.act.price": {
+    "message": "விலையை மாற்று",
+    "review": "reviewed",
+    "enHash": "1eac205f"
+  },
+  "stock.act.threshold": {
+    "message": "குறைந்த ஸ்டாக் நிலை",
+    "review": "reviewed",
+    "enHash": "50344aed"
+  },
+  "stock.act.hide": {
+    "message": "வாடிக்கையாளர்களிடமிருந்து மறை",
+    "review": "reviewed",
+    "enHash": "2f8bd03c"
+  },
+  "stock.act.list": {
+    "message": "வாடிக்கையாளர்களுக்குக் காட்டு",
+    "review": "reviewed",
+    "enHash": "1f13846d"
+  },
+  "stock.batch.none": {
+    "message": "ஸ்டாக் மீதமுள்ள பேட்ச் எதுவும் இல்லை.",
+    "review": "reviewed",
+    "enHash": "3458ae7c"
+  },
+  "stock.batch.left": {
+    "message": "{quantity} மீதம்",
+    "review": "reviewed",
+    "enHash": "62abbdae"
+  },
+  "stock.batch.expires": {
+    "message": "{date} அன்று காலாவதி",
+    "review": "reviewed",
+    "enHash": "dde25e8f"
+  },
+  "stock.batch.expiredOn": {
+    "message": "{date} அன்று காலாவதியானது",
+    "review": "reviewed",
+    "enHash": "7cd25a6a"
+  },
+  "stock.batch.noExpiry": {
+    "message": "காலாவதித் தேதி இல்லை",
+    "review": "reviewed",
+    "enHash": "8fbd9bfa"
+  },
+  "stock.batch.cost": {
+    "message": "அடக்கவிலை {cost}",
+    "review": "reviewed",
+    "enHash": "7703b083"
+  },
+  "stock.batch.edit": {
+    "message": "மாற்றவும்",
+    "review": "reviewed",
+    "enHash": "5301648d"
+  },
+  "stock.history.none": {
+    "message": "இன்னும் ஸ்டாக் மாற்றங்கள் இல்லை.",
+    "review": "reviewed",
+    "enHash": "1fdb9f2a"
+  },
+  "stock.source.opening": {
+    "message": "தொடக்க ஸ்டாக்",
+    "review": "reviewed",
+    "enHash": "38b7df56"
+  },
+  "stock.source.restock": {
+    "message": "மீண்டும் ஸ்டாக் செய்யப்பட்டது",
+    "review": "reviewed",
+    "enHash": "12d85280"
+  },
+  "stock.source.supplier_bill": {
+    "message": "சப்ளையர் பில்",
+    "review": "reviewed",
+    "enHash": "58997110"
+  },
+  "stock.source.import": {
+    "message": "இறக்குமதி செய்யப்பட்டது",
+    "review": "reviewed",
+    "enHash": "434eb26f"
+  },
+  "stock.source.count_correction": {
+    "message": "எண்ணிக்கை திருத்தப்பட்டது",
+    "review": "reviewed",
+    "enHash": "97f5f111"
+  },
+  "stock.source.damage": {
+    "message": "சேதமடைந்தது",
+    "review": "reviewed",
+    "enHash": "052fc798"
+  },
+  "stock.source.expired": {
+    "message": "காலாவதியானது",
+    "review": "reviewed",
+    "enHash": "a689a999"
+  },
+  "stock.source.sale_pos": {
+    "message": "கவுண்டரில் விற்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "ab1d9837"
+  },
+  "stock.source.sale_online": {
+    "message": "ஆன்லைனில் விற்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "5320465a"
+  },
+  "stock.source.pos_reversal": {
+    "message": "கவுண்டர் விற்பனை திரும்பப் பெறப்பட்டது",
+    "review": "reviewed",
+    "enHash": "da366a69"
+  },
+  "stock.source.other": {
+    "message": "ஸ்டாக் மாற்றம்",
+    "review": "reviewed",
+    "enHash": "78a9fe7e"
+  },
+  "stock.form.title.restock": {
+    "message": "{item} ஐ மீண்டும் ஸ்டாக் செய்யவும்",
+    "review": "reviewed",
+    "enHash": "5b448a60"
+  },
+  "stock.form.title.damage": {
+    "message": "{item} ஐ சேதமடைந்ததாகக் குறிக்கவும்",
+    "review": "reviewed",
+    "enHash": "0e204bbc"
+  },
+  "stock.form.title.expired": {
+    "message": "{item} ஐ காலாவதியானதாகக் குறிக்கவும்",
+    "review": "reviewed",
+    "enHash": "3d31bd67"
+  },
+  "stock.form.title.count_correction": {
+    "message": "{item} இன் எண்ணிக்கையைத் திருத்தவும்",
+    "review": "reviewed",
+    "enHash": "465989a3"
+  },
+  "stock.form.title.price": {
+    "message": "விலையை மாற்றவும்",
+    "review": "reviewed",
+    "enHash": "1eac205f"
+  },
+  "stock.form.title.threshold": {
+    "message": "குறைந்த ஸ்டாக் நிலை",
+    "review": "reviewed",
+    "enHash": "50344aed"
+  },
+  "stock.form.title.batch": {
+    "message": "பேட்ச்சை மாற்றவும்",
+    "review": "reviewed",
+    "enHash": "6c57d40d"
+  },
+  "stock.form.save.restock": {
+    "message": "ஸ்டாக்கைச் சேமி",
+    "review": "reviewed",
+    "enHash": "0e0572ab"
+  },
+  "stock.form.save.damage": {
+    "message": "சேதத்தைச் சேமி",
+    "review": "reviewed",
+    "enHash": "d3f690ca"
+  },
+  "stock.form.save.expired": {
+    "message": "காலாவதியைச் சேமி",
+    "review": "reviewed",
+    "enHash": "f6053561"
+  },
+  "stock.form.save.count_correction": {
+    "message": "எண்ணிக்கையைச் சேமி",
+    "review": "reviewed",
+    "enHash": "b64c0a4d"
+  },
+  "stock.form.save.price": {
+    "message": "விலையைச் சேமி",
+    "review": "reviewed",
+    "enHash": "6a897ddb"
+  },
+  "stock.form.save.threshold": {
+    "message": "நிலையைச் சேமி",
+    "review": "reviewed",
+    "enHash": "fbddda1e"
+  },
+  "stock.form.save.batch": {
+    "message": "பேட்ச்சைச் சேமி",
+    "review": "reviewed",
+    "enHash": "1de2c092"
+  },
+  "stock.form.cancel": {
+    "message": "ரத்துசெய்",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "stock.form.back": {
+    "message": "பின்செல்",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "stock.form.qty": {
+    "message": "அளவு",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "stock.form.qtyMax": {
+    "message": "{available} வரை கிடைக்கும்.",
+    "review": "reviewed",
+    "enHash": "63f7abc0"
+  },
+  "stock.form.qtyInvalid": {
+    "message": "1 அல்லது அதற்கு மேல், 10,00,000 வரையிலான முழு எண்ணை உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "b0cf53e4"
+  },
+  "stock.form.qtyTooMany": {
+    "message": "{available} மட்டுமே கிடைக்கும்.",
+    "review": "reviewed",
+    "enHash": "f86ab2b0"
+  },
+  "stock.form.counted": {
+    "message": "அலமாரியில் எண்ணியது",
+    "review": "reviewed",
+    "enHash": "3757174e"
+  },
+  "stock.form.countedHelp": {
+    "message": "சிஸ்டத்தில் {onHand} கையிருப்பில் உள்ளன, அவற்றில் {reserved} ஆர்டர்களுக்காக வைக்கப்பட்டுள்ளன.",
+    "review": "reviewed",
+    "enHash": "71147153"
+  },
+  "stock.form.countInvalid": {
+    "message": "0 முதல் 10,00,000 வரையிலான முழு எண்ணை உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "2d52188c"
+  },
+  "stock.form.batches": {
+    "message": "காலாவதியான பேட்ச்கள்",
+    "review": "reviewed",
+    "enHash": "d2c336ef"
+  },
+  "stock.form.pickBatch": {
+    "message": "குறைந்தது ஒரு பேட்ச்சைத் தேர்வுசெய்யவும்.",
+    "review": "reviewed",
+    "enHash": "636d30b3"
+  },
+  "stock.form.writeOff": {
+    "message": "{quantity} ஸ்டாக்கிலிருந்து கழிக்கப்படும்.",
+    "review": "reviewed",
+    "enHash": "25b017b9"
+  },
+  "stock.form.expiry": {
+    "message": "காலாவதித் தேதி",
+    "review": "reviewed",
+    "enHash": "6b440cd5"
+  },
+  "stock.form.expiryHelp": {
+    "message": "விருப்பத்தேர்வு. முதலில் காலாவதியாவது முதலில் விற்கப்படும்.",
+    "review": "reviewed",
+    "enHash": "16368f0b"
+  },
+  "stock.form.cost": {
+    "message": "ஒரு யூனிட்டின் அடக்கவிலை",
+    "review": "reviewed",
+    "enHash": "4f9ae67f"
+  },
+  "stock.form.costHelp": {
+    "message": "விருப்பத்தேர்வு. விற்பனை விலை {price}.",
+    "review": "reviewed",
+    "enHash": "f3898983"
+  },
+  "stock.form.costInvalid": {
+    "message": "ரூபாயில் தொகையை உள்ளிடவும், எ.கா. 42 அல்லது 42.50.",
+    "review": "reviewed",
+    "enHash": "60cbee53"
+  },
+  "stock.form.note": {
+    "message": "குறிப்பு",
+    "review": "reviewed",
+    "enHash": "2c924e30"
+  },
+  "stock.form.price": {
+    "message": "விற்பனை விலை",
+    "review": "reviewed",
+    "enHash": "7657ccd6"
+  },
+  "stock.form.priceMrp": {
+    "message": "MRP {mrp}. விலை இதை விட அதிகமாக இருக்கக்கூடாது.",
+    "review": "reviewed",
+    "enHash": "42107931"
+  },
+  "stock.form.priceInvalid": {
+    "message": "ரூபாயில் தொகையை உள்ளிடவும், எ.கா. 58 அல்லது 58.50.",
+    "review": "reviewed",
+    "enHash": "1f25c621"
+  },
+  "stock.form.priceAboveMrp": {
+    "message": "விலை {mrp} என்ற MRP ஐ விட அதிகமாக இருக்கக்கூடாது.",
+    "review": "reviewed",
+    "enHash": "7a0650ec"
+  },
+  "stock.form.priceRef": {
+    "message": "பரிந்துரையிலிருந்து குறிப்பு விலை: {price}. நீங்கள் சேமிக்கும் வரை எதுவும் மாறாது.",
+    "review": "reviewed",
+    "enHash": "188c481e"
+  },
+  "stock.form.threshold": {
+    "message": "குறைந்த ஸ்டாக் வரம்பு",
+    "review": "reviewed",
+    "enHash": "7ba9fd9d"
+  },
+  "stock.form.thresholdHelp": {
+    "message": "கிடைக்கும் ஸ்டாக் இந்த எண்ணை அடையும்போது எச்சரிக்கவும். முடக்க காலியாக விடவும்.",
+    "review": "reviewed",
+    "enHash": "5f13e007"
+  },
+  "stock.link.askManager": {
+    "message": "இதைச் செய்ய ஒரு மேலாளரிடம் கேளுங்கள்.",
+    "review": "reviewed",
+    "enHash": "9c4dbb1f"
+  },
+  "stock.toast.restock": {
+    "message": "{item} மீண்டும் ஸ்டாக் செய்யப்பட்டது",
+    "review": "reviewed",
+    "enHash": "d480fd84"
+  },
+  "stock.toast.damage": {
+    "message": "{item} சேதமடைந்ததாகக் குறிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "371b429f"
+  },
+  "stock.toast.expired": {
+    "message": "{item} காலாவதியானதாகக் குறிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "2680d0cd"
+  },
+  "stock.toast.count_correction": {
+    "message": "{item} இன் எண்ணிக்கை சேமிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "4494f38a"
+  },
+  "stock.toast.price": {
+    "message": "{item} இன் விலை மாற்றப்பட்டது",
+    "review": "reviewed",
+    "enHash": "b8e3449e"
+  },
+  "stock.toast.threshold": {
+    "message": "{item} இன் குறைந்த ஸ்டாக் நிலை சேமிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "fde3bc47"
+  },
+  "stock.toast.batch": {
+    "message": "பேட்ச் சேமிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "aa30e481"
+  },
+  "stock.toast.added": {
+    "message": "{item} சேர்க்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "29e20351"
+  },
+  "stock.add.title": {
+    "message": "பொருளைச் சேர்",
+    "review": "reviewed",
+    "enHash": "5bcf4db4"
+  },
+  "stock.add.search": {
+    "message": "தயாரிப்பைக் கண்டறியவும்",
+    "review": "reviewed",
+    "enHash": "1a413f0c"
+  },
+  "stock.add.searchHint": {
+    "message": "பெயர் அல்லது பார்கோடு",
+    "review": "reviewed",
+    "enHash": "d529b5fb"
+  },
+  "stock.add.hint": {
+    "message": "குறைந்தது 2 எழுத்துகளைத் தட்டச்சு செய்யவும், அல்லது பார்கோடை ஸ்கேன் செய்யவும்.",
+    "review": "reviewed",
+    "enHash": "405c2949"
+  },
+  "stock.add.noMatch": {
+    "message": "தயாரிப்பு எதுவும் கிடைக்கவில்லை. நீங்கள் அதை உருவாக்கலாம்.",
+    "review": "reviewed",
+    "enHash": "b73e927b"
+  },
+  "stock.add.results": {
+    "message": "பொருந்தும் தயாரிப்புகள்",
+    "review": "reviewed",
+    "enHash": "894ed0db"
+  },
+  "stock.add.pick": {
+    "message": "சேர்",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "stock.add.inStore": {
+    "message": "ஏற்கெனவே உங்கள் கடையில் உள்ளது",
+    "review": "reviewed",
+    "enHash": "d008bf38"
+  },
+  "stock.add.pickAgain": {
+    "message": "சேர்க்க தயாரிப்பைத் தேடவும்.",
+    "review": "reviewed",
+    "enHash": "77422308"
+  },
+  "stock.add.create": {
+    "message": "புதிய தயாரிப்பை உருவாக்கவும்",
+    "review": "reviewed",
+    "enHash": "48e2e613"
+  },
+  "stock.add.createTitle": {
+    "message": "புதிய தயாரிப்பு",
+    "review": "reviewed",
+    "enHash": "1bc965f3"
+  },
+  "stock.add.createNote": {
+    "message": "இதை உடனே விற்கலாம். TodayZ புதிய தயாரிப்புகளைச் சரிபார்த்து விவரங்களைத் திருத்தக்கூடும்.",
+    "review": "reviewed",
+    "enHash": "b17b44e7"
+  },
+  "stock.add.createSave": {
+    "message": "உருவாக்கித் தொடரவும்",
+    "review": "reviewed",
+    "enHash": "8fb3ba33"
+  },
+  "stock.add.name": {
+    "message": "தயாரிப்பின் பெயர்",
+    "review": "reviewed",
+    "enHash": "63c0fe8e"
+  },
+  "stock.add.brand": {
+    "message": "பிராண்ட்",
+    "review": "reviewed",
+    "enHash": "62b4aa57"
+  },
+  "stock.add.packSize": {
+    "message": "பேக் அளவு",
+    "review": "reviewed",
+    "enHash": "87dd2c97"
+  },
+  "stock.add.unit": {
+    "message": "யூனிட்",
+    "review": "reviewed",
+    "enHash": "f6b935ab"
+  },
+  "stock.add.category": {
+    "message": "வகை",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "stock.add.categoryPick": {
+    "message": "வகையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "b91bf5d4"
+  },
+  "stock.add.mrp": {
+    "message": "MRP",
+    "review": "reviewed",
+    "enHash": "cd74a166"
+  },
+  "stock.add.barcode": {
+    "message": "பார்கோடு",
+    "review": "reviewed",
+    "enHash": "8e54dc53"
+  },
+  "stock.add.nameInvalid": {
+    "message": "தயாரிப்பின் பெயரை உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "156b98ba"
+  },
+  "stock.add.packInvalid": {
+    "message": "0 ஐ விட அதிகமான பேக் அளவை உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "c518b9fb"
+  },
+  "stock.add.categoryInvalid": {
+    "message": "வகையைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "1ae9839f"
+  },
+  "stock.add.barcodeInvalid": {
+    "message": "பார்கோடில் 8 முதல் 14 இலக்கங்கள் இருக்கும்.",
+    "review": "reviewed",
+    "enHash": "6afd70c1"
+  },
+  "stock.add.priceTitle": {
+    "message": "விலை மற்றும் தொடக்க ஸ்டாக்",
+    "review": "reviewed",
+    "enHash": "ef3f7094"
+  },
+  "stock.add.opening": {
+    "message": "தொடக்க ஸ்டாக்",
+    "review": "reviewed",
+    "enHash": "38b7df56"
+  },
+  "stock.add.openingHelp": {
+    "message": "இப்போது உங்களிடம் எத்தனை உள்ளன. ஸ்டாக் இல்லாமல் சேர்க்க காலியாக விடவும்.",
+    "review": "reviewed",
+    "enHash": "56e87302"
+  },
+  "stock.add.save": {
+    "message": "என் கடையில் சேர்",
+    "review": "reviewed",
+    "enHash": "6bcff51f"
+  },
+  "stock.import.title": {
+    "message": "பொருட்களை இறக்குமதி செய்யவும்",
+    "review": "reviewed",
+    "enHash": "71475145"
+  },
+  "stock.import.body": {
+    "message": "ஒரு வரிசைக்கு ஒரு பொருள் உள்ள CSV அல்லது XLSX ஷீட்டைப் பதிவேற்றவும். எதுவும் சேமிக்கப்படும் முன் ஒவ்வொரு வரிசையின் சரிபார்ப்பையும் பார்ப்பீர்கள்.",
+    "review": "reviewed",
+    "enHash": "52306a4f"
+  },
+  "stock.import.choose": {
+    "message": "கோப்பைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "74b1d89d"
+  },
+  "stock.import.file": {
+    "message": "பொருட்கள் கோப்பு",
+    "review": "reviewed",
+    "enHash": "2486c8be"
+  },
+  "stock.import.tooBig": {
+    "message": "அந்தக் கோப்பு 5 MB ஐ விடப் பெரியது. அதைப் பிரித்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "074bff0d"
+  },
+  "stock.import.okCount": {
+    "message": "{count, plural, one {# வரிசை தயார்} other {# வரிசைகள் தயார்}}",
+    "review": "reviewed",
+    "enHash": "454bd309"
+  },
+  "stock.import.errorCount": {
+    "message": "{count, plural, one {# வரிசையில் சிக்கல்} other {# வரிசைகளில் சிக்கல்}}",
+    "review": "reviewed",
+    "enHash": "6f89d2ee"
+  },
+  "stock.import.errorNote": {
+    "message": "சிக்கல் உள்ள வரிசைகள் தவிர்க்கப்படும். அவற்றை உங்கள் ஷீட்டில் சரிசெய்து மீண்டும் இறக்குமதி செய்யவும்.",
+    "review": "reviewed",
+    "enHash": "8199a9f2"
+  },
+  "stock.import.rows": {
+    "message": "கோப்பில் உள்ள வரிசைகள்",
+    "review": "reviewed",
+    "enHash": "ccfb8479"
+  },
+  "stock.import.rowNo": {
+    "message": "வரிசை {row}",
+    "review": "reviewed",
+    "enHash": "b8e5d89e"
+  },
+  "stock.import.unnamed": {
+    "message": "பெயர் இல்லை",
+    "review": "reviewed",
+    "enHash": "b78fd250"
+  },
+  "stock.import.rowError": {
+    "message": "{field}: {problem}",
+    "review": "reviewed",
+    "enHash": "c181bee1"
+  },
+  "stock.import.apply": {
+    "message": "{count, plural, one {# பொருளை இறக்குமதி செய்} other {# பொருட்களை இறக்குமதி செய்}}",
+    "review": "reviewed",
+    "enHash": "f6fda5f5"
+  },
+  "stock.import.another": {
+    "message": "வேறு கோப்பைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "62352371"
+  },
+  "stock.import.done": {
+    "message": "{applied, plural, one {# பொருள் இறக்குமதி செய்யப்பட்டது} other {# பொருட்கள் இறக்குமதி செய்யப்பட்டன}}. {skipped, plural, =0 {எந்த வரிசையும் தவிர்க்கப்படவில்லை.} one {# வரிசை தவிர்க்கப்பட்டது.} other {# வரிசைகள் தவிர்க்கப்பட்டன.}}",
+    "review": "reviewed",
+    "enHash": "87eae7f4"
+  },
+  "stock.import.close": {
+    "message": "மூடவும்",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "stock.import.field.name": {
+    "message": "பெயர்",
+    "review": "reviewed",
+    "enHash": "709a2322"
+  },
+  "stock.import.field.barcode": {
+    "message": "பார்கோடு",
+    "review": "reviewed",
+    "enHash": "8e54dc53"
+  },
+  "stock.import.field.pricePaise": {
+    "message": "விலை",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "stock.import.field.mrpPaise": {
+    "message": "MRP",
+    "review": "reviewed",
+    "enHash": "cd74a166"
+  },
+  "stock.import.field.quantity": {
+    "message": "அளவு",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "stock.import.field.expiresOn": {
+    "message": "காலாவதித் தேதி",
+    "review": "reviewed",
+    "enHash": "6b440cd5"
+  },
+  "stock.import.field.other": {
+    "message": "வரிசை",
+    "review": "reviewed",
+    "enHash": "9bf7a8e8"
+  },
+  "stock.import.code.required": {
+    "message": "இல்லை",
+    "review": "reviewed",
+    "enHash": "cf6f06e2"
+  },
+  "stock.import.code.invalid": {
+    "message": "சரியானது இல்லை",
+    "review": "reviewed",
+    "enHash": "e3fac096"
+  },
+  "stock.import.code.too_long": {
+    "message": "மிக நீளமாக உள்ளது",
+    "review": "reviewed",
+    "enHash": "306aee6f"
+  },
+  "stock.import.code.price_above_mrp": {
+    "message": "MRP ஐ விட அதிகம்",
+    "review": "reviewed",
+    "enHash": "54e32832"
+  },
+  "stock.import.code.unknown_product": {
+    "message": "தயாரிப்புப் பட்டியலில் இல்லை",
+    "review": "reviewed",
+    "enHash": "dae05f63"
+  },
+  "stock.import.code.duplicate": {
+    "message": "இருமுறை வருகிறது",
+    "review": "reviewed",
+    "enHash": "d5620f6c"
+  },
+  "stock.import.code.other": {
+    "message": "சிக்கல் உள்ளது",
+    "review": "reviewed",
+    "enHash": "1547a58d"
+  }
+}
