@@ -1,0 +1,230 @@
+{
+  "adminUsers.sub": {
+    "defaultMessage": "Who can open this console and with which roles. Every change needs a fresh authenticator code and a reason.",
+    "description": "A-18 Admin users: Page subtitle"
+  },
+  "adminUsers.invite": {
+    "defaultMessage": "Invite admin",
+    "description": "A-18 Admin users: Button: give a phone number admin access"
+  },
+  "adminUsers.tabs": {
+    "defaultMessage": "Admin accounts",
+    "description": "A-18 Admin users: Tab list label"
+  },
+  "adminUsers.tab.active": {
+    "defaultMessage": "Active",
+    "description": "A-18 Admin users: Tab and table label: accounts that can sign in"
+  },
+  "adminUsers.tab.disabled": {
+    "defaultMessage": "Disabled",
+    "description": "A-18 Admin users: Tab and table label: accounts that cannot sign in"
+  },
+  "adminUsers.col.person": {
+    "defaultMessage": "Person",
+    "description": "A-18 Admin users: Column: name and masked phone"
+  },
+  "adminUsers.col.roles": {
+    "defaultMessage": "Roles",
+    "description": "A-18 Admin users: Column and detail label: the admin roles"
+  },
+  "adminUsers.col.totp": {
+    "defaultMessage": "Authenticator",
+    "description": "A-18 Admin users: Column and detail label: whether the authenticator app is set up"
+  },
+  "adminUsers.col.lastActive": {
+    "defaultMessage": "Last active",
+    "description": "A-18 Admin users: Column and detail label: last use of an admin session"
+  },
+  "adminUsers.col.disabled": {
+    "defaultMessage": "Disabled",
+    "description": "A-18 Admin users: Column and detail label: when the account was disabled"
+  },
+  "adminUsers.col.status": {
+    "defaultMessage": "Status",
+    "description": "A-18 Admin users: Detail label: active or disabled"
+  },
+  "adminUsers.noName": {
+    "defaultMessage": "No name yet",
+    "description": "A-18 Admin users: Shown instead of a name the account does not have"
+  },
+  "adminUsers.never": {
+    "defaultMessage": "Never",
+    "description": "A-18 Admin users: Last active: never signed in"
+  },
+  "adminUsers.empty": {
+    "defaultMessage": "No admin accounts.",
+    "description": "A-18 Admin users: Empty active list"
+  },
+  "adminUsers.empty.disabled": {
+    "defaultMessage": "No disabled accounts.",
+    "description": "A-18 Admin users: Empty disabled list"
+  },
+  "adminUsers.pick": {
+    "defaultMessage": "Pick a person to see their access and history.",
+    "description": "A-18 Admin users: Side panel before a row is chosen"
+  },
+  "adminUsers.pick.notListed": {
+    "defaultMessage": "That account is not in this list. Try the other tab.",
+    "description": "A-18 Admin users: Side panel when the chosen account is not in the loaded list"
+  },
+  "adminUsers.totp.on": {
+    "defaultMessage": "Set up",
+    "description": "A-18 Admin users: Pill: authenticator set up"
+  },
+  "adminUsers.totp.off": {
+    "defaultMessage": "Not set up",
+    "description": "A-18 Admin users: Pill: authenticator not set up yet; asked at next sign-in"
+  },
+  "adminUsers.status.active": {
+    "defaultMessage": "Active",
+    "description": "A-18 Admin users: Pill: account can sign in"
+  },
+  "adminUsers.status.disabled": {
+    "defaultMessage": "Disabled",
+    "description": "A-18 Admin users: Pill: account cannot sign in"
+  },
+  "adminUsers.roles": {
+    "defaultMessage": "Roles",
+    "description": "A-18 Admin users: Role tick boxes legend"
+  },
+  "adminUsers.roles.help": {
+    "defaultMessage": "Each role opens the screens in the role table. Give the fewest that do the job.",
+    "description": "A-18 Admin users: Role tick boxes help"
+  },
+  "adminUsers.roles.pick": {
+    "defaultMessage": "Pick at least one role.",
+    "description": "A-18 Admin users: Role tick boxes error when none is ticked"
+  },
+  "adminUsers.roles.same": {
+    "defaultMessage": "These are the roles they have now.",
+    "description": "A-18 Admin users: Change roles: nothing changed yet"
+  },
+  "adminUsers.roles.title": {
+    "defaultMessage": "Change roles for {name}",
+    "description": "A-18 Admin users: Change roles dialog title. {name} is the person"
+  },
+  "adminUsers.roles.body": {
+    "defaultMessage": "The new roles take effect on their next request. The reason goes to the audit log.",
+    "description": "A-18 Admin users: Change roles dialog body"
+  },
+  "adminUsers.changeRoles": {
+    "defaultMessage": "Change roles",
+    "description": "A-18 Admin users: Button: change an admin's roles"
+  },
+  "adminUsers.invite.title": {
+    "defaultMessage": "Invite an admin",
+    "description": "A-18 Admin users: Invite dialog title"
+  },
+  "adminUsers.invite.body": {
+    "defaultMessage": "They sign in with an SMS code to this number and set up their authenticator on first sign-in. A number that already has a TodayZ account keeps it.",
+    "description": "A-18 Admin users: Invite dialog body"
+  },
+  "adminUsers.invite.phone": {
+    "defaultMessage": "Mobile number",
+    "description": "A-18 Admin users: Invite: phone field label"
+  },
+  "adminUsers.invite.phoneHelp": {
+    "defaultMessage": "10-digit Indian mobile number. It is never shown in full again.",
+    "description": "A-18 Admin users: Invite: phone field help"
+  },
+  "adminUsers.invite.phoneBad": {
+    "defaultMessage": "Enter a 10-digit mobile number.",
+    "description": "A-18 Admin users: Invite: phone field error"
+  },
+  "adminUsers.invite.name": {
+    "defaultMessage": "Name",
+    "description": "A-18 Admin users: Invite: name field label"
+  },
+  "adminUsers.invite.nameHelp": {
+    "defaultMessage": "Used only if the account has no name yet.",
+    "description": "A-18 Admin users: Invite: name field help"
+  },
+  "adminUsers.detail.phone": {
+    "defaultMessage": "Phone",
+    "description": "A-18 Admin users: Detail label: masked phone"
+  },
+  "adminUsers.detail.invited": {
+    "defaultMessage": "Added",
+    "description": "A-18 Admin users: Detail label: who added the account and when"
+  },
+  "adminUsers.detail.invitedBy": {
+    "defaultMessage": "By {name}, {when}",
+    "description": "A-18 Admin users: Detail value. {name} is the admin who invited, {when} a date"
+  },
+  "adminUsers.detail.seeded": {
+    "defaultMessage": "At setup, {when}",
+    "description": "A-18 Admin users: Detail value for an account made by the seed. {when} is a date"
+  },
+  "adminUsers.self": {
+    "defaultMessage": "This is your account. Another super admin changes your access.",
+    "description": "A-18 Admin users: Shown instead of the actions on the caller's own account"
+  },
+  "adminUsers.disable": {
+    "defaultMessage": "Disable",
+    "description": "A-18 Admin users: Button: stop an admin signing in"
+  },
+  "adminUsers.disable.title": {
+    "defaultMessage": "Disable {name}?",
+    "description": "A-18 Admin users: Disable dialog title"
+  },
+  "adminUsers.disable.body": {
+    "defaultMessage": "They are signed out of the console at once and cannot sign in until a super admin enables them.",
+    "description": "A-18 Admin users: Disable dialog body"
+  },
+  "adminUsers.enable": {
+    "defaultMessage": "Enable",
+    "description": "A-18 Admin users: Button: let a disabled admin sign in again"
+  },
+  "adminUsers.enable.title": {
+    "defaultMessage": "Enable {name}?",
+    "description": "A-18 Admin users: Enable dialog title"
+  },
+  "adminUsers.enable.body": {
+    "defaultMessage": "They can sign in again with the same roles.",
+    "description": "A-18 Admin users: Enable dialog body"
+  },
+  "adminUsers.reset": {
+    "defaultMessage": "Reset authenticator",
+    "description": "A-18 Admin users: Button: clear an admin's authenticator and recovery codes"
+  },
+  "adminUsers.reset.title": {
+    "defaultMessage": "Reset the authenticator for {name}?",
+    "description": "A-18 Admin users: Reset dialog title"
+  },
+  "adminUsers.reset.body": {
+    "defaultMessage": "For a lost phone. Their authenticator and recovery codes stop working, they are signed out, and they set up a new authenticator at next sign-in.",
+    "description": "A-18 Admin users: Reset dialog body"
+  },
+  "adminUsers.done.invite": {
+    "defaultMessage": "{name} can now sign in to the console.",
+    "description": "A-18 Admin users: Toast after an invite"
+  },
+  "adminUsers.done.roles": {
+    "defaultMessage": "Roles changed for {name}.",
+    "description": "A-18 Admin users: Toast after a role change"
+  },
+  "adminUsers.done.disable": {
+    "defaultMessage": "{name} is disabled and signed out.",
+    "description": "A-18 Admin users: Toast after disabling"
+  },
+  "adminUsers.done.enable": {
+    "defaultMessage": "{name} can sign in again.",
+    "description": "A-18 Admin users: Toast after enabling"
+  },
+  "adminUsers.done.reset": {
+    "defaultMessage": "Authenticator reset for {name}.",
+    "description": "A-18 Admin users: Toast after an authenticator reset"
+  },
+  "adminUsers.error.exists": {
+    "defaultMessage": "This number already has admin access.",
+    "description": "A-18 Admin users: Invite error: the number is already an admin"
+  },
+  "adminUsers.error.stale": {
+    "defaultMessage": "Someone changed this account a moment ago. Close this, check it again, then retry.",
+    "description": "A-18 Admin users: Change error: the account changed since it was read"
+  },
+  "adminUsers.error.refused": {
+    "defaultMessage": "Not allowed: nobody changes their own access, and one active super admin must remain.",
+    "description": "A-18 Admin users: Change error: self-change or last super admin"
+  }
+}

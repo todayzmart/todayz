@@ -62,6 +62,7 @@ const READS: [RegExp, string[]][] = [
   [/^\/v1\/admin\/(audit-log|settings)(\/|$)/, ['admin', 'super_admin']],
   [/^\/v1\/admin\/(jobs|job-runs)(\/|$)/, ['support', 'analyst', 'finance', 'admin', 'super_admin']],
   [/^\/v1\/admin\/(products|pending-products|categories|synonyms)(\/|$)/, ['catalogue', 'admin', 'super_admin']],
+  [/^\/v1\/admin\/users(\/|$)/, ['super_admin']],
 ];
 
 let guard: PageGuard;

@@ -350,3 +350,80 @@ test('A-17: on a phone each setting reads as a card, with its value, range and c
   await expect(row.getByRole('button', { name: 'Change hold_minutes' })).toBeInViewport();
   await shot(page, 'admin-a17-phone.png', { fullPage: true });
 });
+
+test('A-18: a super admin invites a desk member, then disables another after a fresh code', async ({ page }) => {
+  await signIn(page, ['super_admin']);
+  const MEERA = '01JADM1N0000000000000000M1';
+  const RAVI = '01JADM1N0000000000000000N2';
+  const account = (id: string, name: string, roles: string[], status: string, version: number) => ({
+    id,
+    name,
+    phoneMasked: id === MEERA ? '90•••••311' : '90•••••412',
+    roles,
+    status,
+    totpEnrolled: id === MEERA,
+    createdBy: '01JADMIN0000000000000000AD',
+    createdByName: 'Asha Rao',
+    createdAt: '2026-10-20T09:30:00Z',
+    disabledAt: status === 'disabled' ? NOW : null,
+    lastActiveAt: id === MEERA ? '2026-10-25T05:12:00Z' : null,
+    version,
+  });
+  let meera = account(MEERA, 'Meera', ['support'], 'active', 1);
+  let ravi: ReturnType<typeof account> | null = null;
+  let freshCode = false;
+  const sent = await fake(page, '/v1/admin/users**', (method, url, body) => {
+    if (url.pathname === '/v1/admin/users' && method === 'GET') {
+      const want = url.searchParams.get('status') ?? 'active';
+      return page1([meera, ...(ravi ? [ravi] : [])].filter((a) => a.status === want));
+    }
+    if (url.pathname === '/v1/admin/users' && method === 'POST') {
+      const b = body as { name: string; roles: string[] };
+      ravi = account(RAVI, b.name, b.roles, 'active', 1);
+      return { status: 201, body: ravi };
+    }
+    if (url.pathname === `/v1/admin/users/${MEERA}` && method === 'PATCH') {
+      if (!freshCode) return { status: 403, body: problem(403, 'step_up_required') };
+      meera = account(MEERA, 'Meera', ['support'], 'disabled', 2);
+      return { status: 200, body: meera };
+    }
+    return undefined;
+  });
+  await answerWith(page, '/v1/auth/totp/verify', () => {
+    freshCode = true;
+    return { status: 200, body: { accessToken: 'stepped-up', expiresAt: new Date(Date.now() + 15 * 60_000).toISOString(), tokenType: 'Bearer' } };
+  });
+
+  await page.goto('/admin-users');
+  await page.getByRole('table', { name: 'Active' }).getByRole('button', { name: 'Meera' }).click();
+  await expect(page.getByRole('complementary', { name: 'History' }).getByText('No changes yet.')).toBeVisible();
+  await shot(page, 'admin-a18-admin-users.png');
+
+  await page.getByRole('button', { name: 'Invite admin' }).click();
+  const invite = page.getByRole('dialog', { name: 'Invite an admin' });
+  await invite.getByLabel('Mobile number').fill('90000 00412');
+  await invite.getByLabel('Name').fill('Ravi');
+  await invite.getByLabel('Catalogue').check();
+  await invite.getByLabel('Reason').fill('Joins the catalogue desk');
+  await invite.getByRole('button', { name: 'Invite admin' }).click();
+  await expect(page.getByText('Ravi can now sign in to the console.')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Ravi', level: 2 })).toBeVisible();
+
+  await page.getByRole('table', { name: 'Active' }).getByRole('button', { name: 'Meera' }).click();
+  await page.getByRole('button', { name: 'Disable' }).click();
+  const disable = page.getByRole('dialog', { name: 'Disable Meera?' });
+  await disable.getByLabel('Reason').fill('Left the team');
+  await disable.getByRole('button', { name: 'Disable' }).click();
+  const boxes = page.getByRole('dialog', { name: 'Confirm it is you' }).getByRole('group', { name: 'Authenticator code' }).locator('input');
+  for (const [i, d] of '123456'.split('').entries()) await boxes.nth(i).fill(d);
+  await expect(page.getByText('Meera is disabled and signed out.')).toBeVisible();
+  expect(sent).toEqual([
+    { path: '/v1/admin/users', body: { phone: '90000 00412', name: 'Ravi', roles: ['catalogue'], reason: 'Joins the catalogue desk' } },
+    { path: `/v1/admin/users/${MEERA}`, body: { status: 'disabled', version: 1, reason: 'Left the team' } },
+    { path: `/v1/admin/users/${MEERA}`, body: { status: 'disabled', version: 1, reason: 'Left the team' } },
+  ]);
+  // The browser logs the faked 403 step_up_required; that one is the point of the journey.
+  const stepUp = guard.errors.findIndex((e) => e.includes('status of 403'));
+  expect(stepUp).toBeGreaterThanOrEqual(0);
+  guard.errors.splice(stepUp, 1);
+});

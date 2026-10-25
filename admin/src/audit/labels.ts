@@ -83,6 +83,16 @@ export function useActionLabel() {
           return intl.formatMessage({ id: 'audit.action.leadStatus' });
         case SETTINGS_UPDATE:
           return intl.formatMessage({ id: 'audit.action.settingsUpdate' });
+        case 'admin_user.invite':
+          return intl.formatMessage({ id: 'audit.action.adminUserInvite' });
+        case 'admin_user.update':
+          return intl.formatMessage({ id: 'audit.action.adminUserUpdate' });
+        case 'admin_user.disable':
+          return intl.formatMessage({ id: 'audit.action.adminUserDisable' });
+        case 'admin_user.enable':
+          return intl.formatMessage({ id: 'audit.action.adminUserEnable' });
+        case 'admin_user.totp_reset':
+          return intl.formatMessage({ id: 'audit.action.adminUserTotpReset' });
         default: {
           const id = BUILT_ACTIONS[action];
           return id ? intl.formatMessage({ id }) : action;

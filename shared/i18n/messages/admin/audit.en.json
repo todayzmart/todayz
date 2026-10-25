@@ -262,5 +262,25 @@
   "audit.action.bannerRemove": {
     "defaultMessage": "Banner taken down",
     "description": "Audit action: an admin took a shop's banner down"
+  },
+  "audit.action.adminUserInvite": {
+    "defaultMessage": "Admin invited",
+    "description": "Audit action: an admin gave a phone number admin access"
+  },
+  "audit.action.adminUserUpdate": {
+    "defaultMessage": "Admin roles changed",
+    "description": "Audit action: an admin changed another admin's roles"
+  },
+  "audit.action.adminUserDisable": {
+    "defaultMessage": "Admin disabled",
+    "description": "Audit action: an admin disabled another admin"
+  },
+  "audit.action.adminUserEnable": {
+    "defaultMessage": "Admin enabled",
+    "description": "Audit action: an admin re-enabled another admin"
+  },
+  "audit.action.adminUserTotpReset": {
+    "defaultMessage": "Authenticator reset",
+    "description": "Audit action: an admin cleared another admin's authenticator"
   }
 }
