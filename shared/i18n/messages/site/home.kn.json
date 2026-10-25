@@ -1,997 +1,997 @@
 {
   "home.meta.title": {
     "message": "TodayZ: ನಿಮ್ಮ ಹತ್ತಿರದ ಅಂಗಡಿಗಳಲ್ಲಿ ಹುಡುಕಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cd0d038a"
   },
   "home.meta.description": {
     "message": "TodayZ ಹತ್ತಿರದ ಅಂಗಡಿಗಳ ಸ್ಟಾಕ್ ಅನ್ನು ಆನ್‌ಲೈನ್‌ಗೆ ತರುತ್ತದೆ, ಹತ್ತಿರದವರು ಅದನ್ನು ಹುಡುಕಿ, ಬುಕ್ ಮಾಡಿ, ತಾವೇ ತೆಗೆದುಕೊಂಡು ಹೋಗಬಹುದು ಅಥವಾ ಮನೆಗೆ ತರಿಸಬಹುದು.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "db78764a"
   },
   "home.hero.kicker": {
     "message": "ಭಾರತದಾದ್ಯಂತ ಹತ್ತಿರದ ಅಂಗಡಿಗಳಿಗಾಗಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "73d64763"
   },
   "home.hero.title": {
     "message": "ನಿಮ್ಮ ಬಡಾವಣೆಯ ಅಂಗಡಿ, {em} ಸಿದ್ಧ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b83fa4d2"
   },
   "home.hero.title_em": {
     "message": "ಹೆಚ್ಚು ಗ್ರಾಹಕರಿಗಾಗಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9194981c"
   },
   "home.hero.body": {
     "message": "ನಿಮ್ಮ ಸ್ಟಾಕ್ ಅನ್ನು ಆನ್‌ಲೈನ್‌ಗೆ ತನ್ನಿ, ಕೌಂಟರ್ ನಡೆಸಿ, ನಿಮ್ಮ ಶೆಲ್ಫ್‌ನಲ್ಲಿ ಈಗಾಗಲೇ ಇರುವುದನ್ನು ಹತ್ತಿರದವರು ಕಂಡುಕೊಳ್ಳಲಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e1ce6218"
   },
   "home.hero.cta": {
     "message": "ಉಚಿತವಾಗಿ ಪ್ರಾರಂಭಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a99da3b9"
   },
   "home.hero.cta_secondary": {
     "message": "ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ ನೋಡಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f7b38f07"
   },
   "home.hero.tick.1": {
     "message": "ಅಂಗಡಿಗಳಿಗೆ ಉಚಿತ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a2839388"
   },
   "home.hero.tick.2": {
     "message": "ಇಂಟರ್ನೆಟ್ ಹೋದರೂ ಕೆಲಸ ಮಾಡುತ್ತದೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "18aca7ee"
   },
   "home.hero.tick.3": {
     "message": "5 ಭಾರತೀಯ ಭಾಷೆಗಳಲ್ಲಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8cfef760"
   },
   "home.hero.tick.4": {
     "message": "ಪಿಕಪ್ ಅಥವಾ ಡೆಲಿವರಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8a9547f9"
   },
   "home.hero.scene": {
     "message": "ಉದಾಹರಣೆ: ಹತ್ತಿರದ ಗ್ರಾಹಕರೊಬ್ಬರು Sharma General Store ನಲ್ಲಿ ಹಾಲು ಹುಡುಕುತ್ತಾರೆ, ಅಂಗಡಿಗೆ ಆರ್ಡರ್ ಬರುತ್ತದೆ ಮತ್ತು ಹತ್ತಿರದವರು ಇನ್ನೇನು ಹುಡುಕುತ್ತಾರೆ ಎಂದು ಕಾಣುತ್ತದೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9ee19e50"
   },
   "home.hero.note": {
     "message": "ಈ ಪುಟದಲ್ಲಿರುವ ಅಂಗಡಿಗಳು, ಐಟಂಗಳು ಮತ್ತು ಸಂಖ್ಯೆಗಳು ಉದಾಹರಣೆಗಳು.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "673f32fb"
   },
   "home.mock.shops_have": {
     "message": "ನಿಮ್ಮ ಹತ್ತಿರದ {count} ಅಂಗಡಿಗಳಲ್ಲಿ ಇದೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "97ce7209"
   },
   "home.mock.dist_pickup": {
     "message": "{distance} · ಪಿಕಪ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "48cd9361"
   },
   "home.mock.dist_delivery": {
     "message": "{distance} · ಡೆಲಿವರಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e99aab7a"
   },
   "home.mock.fresh_min": {
     "message": "ಸ್ಟಾಕ್‌ನಲ್ಲಿದೆ · {n} ನಿಮಿಷದ ಹಿಂದೆ ಅಪ್‌ಡೇಟ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bc9fe70a"
   },
   "home.mock.fresh_h": {
     "message": "ಸ್ಟಾಕ್‌ನಲ್ಲಿದೆ · {n} ಗಂಟೆಯ ಹಿಂದೆ ಅಪ್‌ಡೇಟ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "79117543"
   },
   "home.mock.stale": {
     "message": "ಸ್ಟಾಕ್ ಇತ್ತೀಚೆಗೆ ದೃಢಪಟ್ಟಿಲ್ಲ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c8a47c2d"
   },
   "home.mock.book_pickup": {
     "message": "ಪಿಕಪ್‌ಗೆ ಬುಕ್ ಮಾಡಿ · {amount}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1e5e5edf"
   },
   "home.mock.new_order": {
     "message": "ಹೊಸ ಆರ್ಡರ್ {number}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "93fdc4bf"
   },
   "home.mock.pickup": {
     "message": "ಪಿಕಪ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a51122c1"
   },
   "home.mock.delivery": {
     "message": "ಡೆಲಿವರಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9631af52"
   },
   "home.mock.accept": {
     "message": "ಒಪ್ಪಿಕೊಳ್ಳಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bb54db51"
   },
   "home.mock.reject": {
     "message": "ನಿರಾಕರಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2b03b592"
   },
   "home.mock.add": {
     "message": "ಸೇರಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "61cc55aa"
   },
   "home.mock.todays_sales": {
     "message": "ಇಂದಿನ ಮಾರಾಟ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "23b9b8de"
   },
   "home.mock.wanted_line": {
     "message": "ಈ ವಾರ {distance} ಒಳಗೆ {count} ಹುಡುಕಾಟ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9fff406b"
   },
   "home.problem.eyebrow": {
     "message": "ಸಮಸ್ಯೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8a940000"
   },
   "home.problem.title": {
     "message": "ಒಳ್ಳೆಯ ಅಂಗಡಿಗಳು. ದೊಡ್ಡ ಸವಾಲುಗಳು.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fd3d5075"
   },
   "home.problem.intro": {
     "message": "ಭಾರತದ ಬಡಾವಣೆ ಅಂಗಡಿಗಳಲ್ಲಿ ಜನರಿಗೆ ಬೇಕಾದದ್ದು ಈಗಾಗಲೇ ಇದೆ. ಆದರೆ ಕೌಂಟರ್, ಸ್ಟಾಕ್ ಮತ್ತು ಗ್ರಾಹಕರನ್ನು ಕೈಯಿಂದಲೇ ನೋಡಿಕೊಳ್ಳುವಾಗ ಗಳಿಕೆ ಶೆಲ್ಫ್‌ನಲ್ಲೇ ಉಳಿದುಬಿಡುತ್ತದೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c98749ea"
   },
   "home.problem.1.title": {
     "message": "ಸ್ಟಾಕ್ ಲೆಕ್ಕ ಇಡುವುದು ಕಷ್ಟ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c972354e"
   },
   "home.problem.1.body": {
     "message": "ಐಟಂಗಳು ತಪ್ಪಿಹೋಗುತ್ತವೆ, ಎಣಿಕೆ ಏರುಪೇರಾಗುತ್ತದೆ, ಹಾಗಾಗಿ ಏನು ಮಾರಾಟವಾಗುತ್ತಿದೆ ಎಂದು ತಿಳಿಯುವುದು ಕಷ್ಟ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f2a7e83c"
   },
   "home.problem.2.title": {
     "message": "ನಿಮ್ಮಲ್ಲಿದೆ ಎಂದು ಹತ್ತಿರದವರಿಗೆ ಗೊತ್ತಿಲ್ಲ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "394c25ed"
   },
   "home.problem.2.body": {
     "message": "ಕೆಲವು ನಿಮಿಷ ದೂರದಲ್ಲಿ ನಿಮ್ಮ ಶೆಲ್ಫ್‌ನಲ್ಲಿರುವ ವಸ್ತು ಯಾರಿಗೋ ಬೇಕಾಗಬಹುದು, ಆದರೆ ಅವರಿಗೆ ಗೊತ್ತೇ ಆಗುವುದಿಲ್ಲ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cff44d11"
   },
   "home.problem.3.title": {
     "message": "ಸ್ಟಾಕ್ ಮಾರಾಟವಾಗದೆ ಉಳಿಯುತ್ತದೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7f0971df"
   },
   "home.problem.3.body": {
     "message": "ಬೇಡಿಕೆ ಗೊತ್ತಿಲ್ಲದಿದ್ದರೆ ತಪ್ಪು ವಸ್ತುಗಳನ್ನು ಹೆಚ್ಚು ತರಿಸುವುದು ಸುಲಭ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "aea1fac2"
   },
   "home.problem.4.title": {
     "message": "ಜನರಿಗೆ ಏನು ಬೇಕು ಎಂದು ಕಾಣುವುದಿಲ್ಲ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ca5cc745"
   },
   "home.problem.4.body": {
     "message": "ಸುತ್ತಲಿನವರು ಏನು ಹುಡುಕುತ್ತಿದ್ದಾರೆ ಎಂದು ಅಂಗಡಿಗಳಿಗೆ ಅಪರೂಪಕ್ಕೆ ಗೊತ್ತಾಗುತ್ತದೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8e04ffe9"
   },
   "home.problem.no_shops": {
     "message": "ಹತ್ತಿರ ಯಾವುದೇ ಅಂಗಡಿ ಸಿಗಲಿಲ್ಲ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b75d7b5d"
   },
   "home.problem.shelf_weeks": {
     "message": "{n} ವಾರಗಳಿಂದ ಶೆಲ್ಫ್‌ನಲ್ಲಿದೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b336c6e4"
   },
   "home.problem.ask.1": {
     "message": "ನಿಮ್ಮಲ್ಲಿ {item} ಇದೆಯೇ?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "13192ad7"
   },
   "home.problem.ask.2": {
     "message": "ಸೆನ್ಸಿಟಿವ್ ಟೂತ್‌ಪೇಸ್ಟ್ ಇದೆಯೇ?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7c097792"
   },
   "home.problem.ask.3": {
     "message": "ಕಸೂರಿ ಮೇಥಿ?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e84eae02"
   },
   "home.insight.eyebrow": {
     "message": "ಐಡಿಯಾ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "43e19816"
   },
   "home.insight.title": {
     "message": "ಅಂಗಡಿಗಳಿವೆ. ಸ್ಟಾಕ್ ಇದೆ. {em}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d7f0208d"
   },
   "home.insight.title_em": {
     "message": "ಹುಡುಕಾಟ ಮಾತ್ರ ಇಲ್ಲ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1d313870"
   },
   "home.insight.body": {
     "message": "ಜನರಿಗೆ ಬೇಕಾದದ್ದರಲ್ಲಿ ಬಹಳಷ್ಟು ಕೆಲವು ನಿಮಿಷ ದೂರದ ಶೆಲ್ಫ್‌ನಲ್ಲಿ ಈಗಾಗಲೇ ಇದೆ. ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಸಿಗುವುದಿಲ್ಲ ಅಷ್ಟೇ. TodayZ ಇವೆರಡನ್ನು ಜೋಡಿಸುತ್ತದೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7a11ad45"
   },
   "home.insight.flow.1.title": {
     "message": "ಹತ್ತಿರದ ಜನರು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a80df8f3"
   },
   "home.insight.flow.1.body": {
     "message": "ತಮಗೆ ಬೇಕಾದದ್ದನ್ನು ಹುಡುಕುತ್ತಾರೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "81ccd64a"
   },
   "home.insight.flow.2.title": {
     "message": "ಹತ್ತಿರದಲ್ಲೇ ಸಿಗುತ್ತದೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b1923d37"
   },
   "home.insight.flow.2.body": {
     "message": "ಸ್ಟಾಕ್, ಬೆಲೆ, ದೂರ, ತಾಜಾತನ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "72f87ea4"
   },
   "home.insight.flow.3.title": {
     "message": "ಸ್ಥಳೀಯ ಅಂಗಡಿಗಳ ಶೆಲ್ಫ್‌ಗಳು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1b3fdc74"
   },
   "home.insight.flow.3.body": {
     "message": "ಆರ್ಡರ್ ಪಡೆದು ಬೇಡಿಕೆ ನೋಡುತ್ತವೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a4c8429f"
   },
   "home.insight.loop.1": {
     "message": "ಹುಡುಕಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bce06414"
   },
   "home.insight.loop.2": {
     "message": "ಸಿಗುತ್ತದೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "df251b06"
   },
   "home.insight.loop.3": {
     "message": "ಬುಕ್ ಮಾಡಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f69f2330"
   },
   "home.insight.loop.4": {
     "message": "ತೆಗೆದುಕೊಳ್ಳಿ ಅಥವಾ ಡೆಲಿವರಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b0214dcb"
   },
   "home.insight.loop.5": {
     "message": "ಏನು ಮಾರಾಟವಾಗುತ್ತದೆ ತಿಳಿಯಿರಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7bb646b4"
   },
   "home.features.eyebrow": {
     "message": "ಅಂಗಡಿಗಳಿಗಾಗಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "673d17e5"
   },
   "home.features.title": {
     "message": "ಅಂಗಡಿ ಬೆಳೆಸಲು ಸರಳ ದಾರಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5f2c440a"
   },
   "home.features.intro": {
     "message": "ಕೌಂಟರ್, ಸ್ಟಾಕ್ ಮತ್ತು ಗ್ರಾಹಕರಿಗೆ ಒಂದೇ ಆ್ಯಪ್. ದಿನನಿತ್ಯದ ಅಂಗಡಿ ಕೆಲಸಕ್ಕಾಗಿ, ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "259da520"
   },
   "home.features.1.title": {
     "message": "ನಿಮ್ಮ ಕೌಂಟರ್ ನಡೆಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3de6c082"
   },
   "home.features.1.body": {
     "message": "ಒಂದೇ ಆ್ಯಪ್‌ನಲ್ಲಿ ಕೌಂಟರ್‌ನಲ್ಲಿ ಬಿಲ್ ಮಾಡಿ, ಸ್ಟಾಕ್ ಅಪ್‌ಡೇಟ್ ಆಗಿಡಿ, ಗ್ರಾಹಕರನ್ನು ನೋಡಿ. ಇಂಟರ್ನೆಟ್ ಹೋದರೂ ಕೆಲಸ ಮಾಡುತ್ತಲೇ ಇರುತ್ತದೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9a5e7d93"
   },
   "home.features.2.title": {
     "message": "ಹತ್ತಿರದವರಿಂದ ಆರ್ಡರ್ ಪಡೆಯಿರಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "34ccd1e9"
   },
   "home.features.2.body": {
     "message": "ಗ್ರಾಹಕರು ನಿಮ್ಮ ಸ್ಟಾಕ್ ಹುಡುಕಿ, ಬುಕ್ ಮಾಡಿ, ತಾವೇ ತೆಗೆದುಕೊಂಡು ಹೋಗುತ್ತಾರೆ ಅಥವಾ ಡೆಲಿವರಿ ಕೇಳುತ್ತಾರೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "405258e5"
   },
   "home.features.3.title": {
     "message": "ಸತ್ಯ ಹೇಳುವ ಸ್ಟಾಕ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "65484a6d"
   },
   "home.features.3.body": {
     "message": "ಪ್ರತಿ ಮಾರಾಟವೂ ನಿಮ್ಮ ಸ್ಟಾಕ್ ಅನ್ನು ಅಪ್‌ಡೇಟ್ ಮಾಡುತ್ತದೆ, ಮತ್ತು ಗ್ರಾಹಕರು ಬರುವ ಮೊದಲೇ ಅದು ಎಷ್ಟು ತಾಜಾ ಎಂದು ನೋಡುತ್ತಾರೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ead82d37"
   },
   "home.features.4.title": {
     "message": "ಗ್ರಾಹಕರನ್ನು ಮತ್ತೆ ಕರೆತನ್ನಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "21e48b9d"
   },
   "home.features.4.body": {
     "message": "ಆಫರ್‌ಗಳು ಮತ್ತು ಕ್ರೆಡಿಟ್‌ಗಳು ಜನರಿಗೆ ನಿಮ್ಮ ಅಂಗಡಿಗೆ ಮತ್ತೆ ಬರಲು ಕಾರಣ ಕೊಡುತ್ತವೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "192b570e"
   },
   "home.pos.search": {
     "message": "ಹುಡುಕಿ ಅಥವಾ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a7407992"
   },
   "home.pos.bill": {
     "message": "ಬಿಲ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3d734614"
   },
   "home.pos.offline": {
     "message": "ಆಫ್‌ಲೈನ್ · ನಂತರ ಸಿಂಕ್ ಆಗುತ್ತದೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4be5bc3e"
   },
   "home.pos.cash": {
     "message": "ನಗದು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "758ec54e"
   },
   "home.pos.upi": {
     "message": "UPI",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f295b2cd"
   },
   "home.pos.card": {
     "message": "ಕಾರ್ಡ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4d4ce73b"
   },
   "home.pos.total": {
     "message": "ಒಟ್ಟು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b25928c6"
   },
   "home.pos.charge": {
     "message": "ಪಡೆಯಿರಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d4e1aee4"
   },
   "home.orders.new": {
     "message": "ಹೊಸದು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6403f2b7"
   },
   "home.orders.preparing": {
     "message": "ತಯಾರಾಗುತ್ತಿದೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "96a9b7cd"
   },
   "home.orders.ready": {
     "message": "ಸಿದ್ಧ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "20c7c552"
   },
   "home.orders.accept_within": {
     "message": "{time} ಒಳಗೆ ಒಪ್ಪಿಕೊಳ್ಳಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ec988822"
   },
   "home.orders.waiting": {
     "message": "ಪಿಕಪ್‌ಗಾಗಿ ಕಾಯುತ್ತಿದೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1323a7f6"
   },
   "home.stock.updated_min": {
     "message": "{n} ನಿಮಿಷದ ಹಿಂದೆ ಅಪ್‌ಡೇಟ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bc8f82ef"
   },
   "home.stock.updated_h": {
     "message": "{n} ಗಂಟೆಯ ಹಿಂದೆ ಅಪ್‌ಡೇಟ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b19204d8"
   },
   "home.stock.low": {
     "message": "ಕಡಿಮೆ ಇದೆ · {n} ಗಂಟೆಯ ಹಿಂದೆ ಅಪ್‌ಡೇಟ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8be3a9d0"
   },
   "home.offers.week": {
     "message": "ಈ ವಾರ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7b72883e"
   },
   "home.offers.off": {
     "message": "{item} ಮೇಲೆ {off} ರಿಯಾಯಿತಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "84319622"
   },
   "home.offers.regular": {
     "message": "ನಿಯಮಿತ ಗ್ರಾಹಕ · ಈ ತಿಂಗಳು {n} ಬಾರಿ ಬಂದಿದ್ದಾರೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7ebeb72a"
   },
   "home.offers.credits": {
     "message": "+{n} ಕ್ರೆಡಿಟ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5b03b4e6"
   },
   "home.showcase.eyebrow": {
     "message": "ಬ್ಯುಸಿನೆಸ್ ಆ್ಯಪ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "66468763"
   },
   "home.showcase.title": {
     "message": "ಇಡೀ ಅಂಗಡಿ, ಒಂದೇ ನೋಟದಲ್ಲಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e0eb3462"
   },
   "home.showcase.intro": {
     "message": "ಬೆಳಿಗ್ಗೆ ಆ್ಯಪ್ ತೆರೆಯಿರಿ, ಯಾವುದಕ್ಕೆ ಗಮನ ಬೇಕು ಎಂದು ನೋಡಿ: ಒಪ್ಪಿಕೊಳ್ಳಬೇಕಾದ ಆರ್ಡರ್‌ಗಳು, ಕಡಿಮೆಯಾಗುತ್ತಿರುವ ಐಟಂಗಳು, ಹತ್ತಿರದವರು ಕೇಳುತ್ತಿರುವುದು.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c24545a9"
   },
   "home.app.nav.1": {
     "message": "ಅವಲೋಕನ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0efc2e6b"
   },
   "home.app.nav.2": {
     "message": "ಆರ್ಡರ್‌ಗಳು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cded0933"
   },
   "home.app.nav.3": {
     "message": "ಮಾರಾಟ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fa3cf2ad"
   },
   "home.app.nav.4": {
     "message": "ಸ್ಟಾಕ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bcecf456"
   },
   "home.app.nav.5": {
     "message": "ಆಫರ್‌ಗಳು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "43c94306"
   },
   "home.app.nav.6": {
     "message": "ಗ್ರಾಹಕರು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "035eae60"
   },
   "home.app.nav.7": {
     "message": "ಇನ್‌ಸೈಟ್ಸ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b4510362"
   },
   "home.app.date": {
     "message": "ಗುರುವಾರ, 23 ಅಕ್ಟೋಬರ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a377ff45"
   },
   "home.app.greet": {
     "message": "ಶುಭೋದಯ, {shop}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ccd50e36"
   },
   "home.app.synced": {
     "message": "{time} ಕ್ಕೆ ಸಿಂಕ್ ಆಯಿತು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "01d62c94"
   },
   "home.app.sales_delta": {
     "message": "ಕಳೆದ ಗುರುವಾರಕ್ಕಿಂತ {pct}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "adef0b35"
   },
   "home.app.orders": {
     "message": "ಆರ್ಡರ್‌ಗಳು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cded0933"
   },
   "home.app.waiting": {
     "message": "{n} ಕಾಯುತ್ತಿವೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e4536212"
   },
   "home.app.low": {
     "message": "ಕಡಿಮೆ ಐಟಂಗಳು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3f83eddd"
   },
   "home.app.low_note": {
     "message": "ಬೇಗ ತರಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "384c0929"
   },
   "home.app.searches": {
     "message": "ಹತ್ತಿರದ ಹುಡುಕಾಟಗಳು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2c9b6552"
   },
   "home.app.searches_note": {
     "message": "ನೀವು ಇಡದ ಐಟಂಗಳಿಗೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d4521c69"
   },
   "home.app.act.orders": {
     "message": "{n} ಹೊಸ ಆರ್ಡರ್‌ಗಳು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "675b510a"
   },
   "home.app.act.orders_cta": {
     "message": "ಆರ್ಡರ್ ಒಪ್ಪಿಕೊಳ್ಳಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1fc40062"
   },
   "home.app.act.low": {
     "message": "{n} ಪ್ರಾಡಕ್ಟ್ ಕಡಿಮೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "837e3fec"
   },
   "home.app.act.low_cta": {
     "message": "ಈಗ ತರಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bb595184"
   },
   "home.app.act.expiring": {
     "message": "{n} ಬೇಗ ಎಕ್ಸ್‌ಪೈರ್ ಆಗುತ್ತವೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5be326eb"
   },
   "home.app.act.expiring_cta": {
     "message": "ಆಫರ್ ಮಾಡಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c6af210c"
   },
   "home.app.act.searches": {
     "message": "{n} ಹುಡುಕಾಟಗಳು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "92a1e12c"
   },
   "home.app.act.searches_cta": {
     "message": "ಬೇಡಿಕೆ ನೋಡಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "44537575"
   },
   "home.app.chart": {
     "message": "ಗಂಟೆವಾರು ಮಾರಾಟ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "162aeab3"
   },
   "home.app.today": {
     "message": "ಇಂದು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "24345a14"
   },
   "home.app.top": {
     "message": "ಹೆಚ್ಚು ಮಾರಾಟವಾದ ಐಟಂಗಳು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "79ec189d"
   },
   "home.insights.eyebrow": {
     "message": "ಬೇಡಿಕೆ ಮಾಹಿತಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "750bb313"
   },
   "home.insights.title": {
     "message": "ಹತ್ತಿರದವರು ಏನು ಹುಡುಕುತ್ತಿದ್ದಾರೆ ನೋಡಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9d1c4606"
   },
   "home.insights.intro": {
     "message": "ಹತ್ತಿರದವರು ಯಾವ ಐಟಂಗಳನ್ನು ಹುಡುಕಿ ಕಾಣದೆ ಹೋಗುತ್ತಾರೆ, ಯಾವುದು ಖಾಲಿಯಾಗುತ್ತಿದೆ, ಯಾವ ನಿಯಮಿತ ಗ್ರಾಹಕರು ಮತ್ತೆ ಬಂದಿಲ್ಲ ಎಂದು ಬೇಡಿಕೆ ಮಾಹಿತಿ ಅಂಗಡಿಗೆ ಹೇಳುತ್ತದೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8f9a9203"
   },
   "home.insights.kind.1.title": {
     "message": "ಹತ್ತಿರ ಬೇಕಾಗಿವೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4e90f3e0"
   },
   "home.insights.kind.1.body": {
     "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಹತ್ತಿರದ ಜನರು ಹುಡುಕುವ, ನೀವು ಇನ್ನೂ ಇಡದ ಐಟಂಗಳು.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "18d9f53a"
   },
   "home.insights.kind.2.title": {
     "message": "ತಪ್ಪಿದ ಮಾರಾಟ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7e65c327"
   },
   "home.insights.kind.2.body": {
     "message": "ಹತ್ತಿರದವರು ಹುಡುಕುತ್ತಿದ್ದಾಗ ಖಾಲಿಯಾಗಿದ್ದ ಐಟಂಗಳು.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9cf19971"
   },
   "home.insights.kind.3.title": {
     "message": "ವೇಗವಾಗಿ ಮಾರಾಟ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5cbd2b13"
   },
   "home.insights.kind.3.body": {
     "message": "ಸಾಮಾನ್ಯಕ್ಕಿಂತ ವೇಗವಾಗಿ ಮಾರಾಟವಾಗುವ ಐಟಂಗಳು, ಸಮಯಕ್ಕೆ ಸರಿಯಾಗಿ ತರಿಸಬಹುದು.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a437058d"
   },
   "home.insights.kind.4.title": {
     "message": "ದೂರವಾಗುತ್ತಿರುವ ನಿಯಮಿತ ಗ್ರಾಹಕರು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "55ae88e6"
   },
   "home.insights.kind.4.body": {
     "message": "ಸ್ವಲ್ಪ ಸಮಯದಿಂದ ಮತ್ತೆ ಬಂದಿಲ್ಲದ ನಿಯಮಿತ ಗ್ರಾಹಕರು.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "09c1326e"
   },
   "home.insights.period": {
     "message": "ಕಳೆದ 7 ದಿನಗಳು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "df833fe8"
   },
   "home.insights.missed_line": {
     "message": "{days} ದಿನಗಳಿಂದ ಸ್ಟಾಕ್ ಇಲ್ಲ; ಹತ್ತಿರ {count} ಹುಡುಕಾಟಗಳು ಇದಕ್ಕೆ ಹೊಂದಿದವು.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1253e1c2"
   },
   "home.insights.add": {
     "message": "ಪ್ರಾಡಕ್ಟ್ ಸೇರಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7c37958a"
   },
   "home.insights.restock": {
     "message": "ಮತ್ತೆ ತರಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3ccf7127"
   },
   "home.shoppers.eyebrow": {
     "message": "ಗ್ರಾಹಕರಿಗಾಗಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b88dfd14"
   },
   "home.shoppers.title": {
     "message": "ಏನಾದರೂ ಬೇಕೇ? ಹತ್ತಿರದಲ್ಲೇ ಹುಡುಕಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d1036fc0"
   },
   "home.shoppers.intro": {
     "message": "ನಿಮ್ಮ ಸುತ್ತ ಯಾವ ಅಂಗಡಿಯಲ್ಲಿ ಇದೆ, ಯಾವ ಬೆಲೆಗೆ, ಅಂಗಡಿ ಸ್ಟಾಕ್ ಅನ್ನು ಎಷ್ಟು ಇತ್ತೀಚೆಗೆ ಅಪ್‌ಡೇಟ್ ಮಾಡಿದೆ ಎಂದು ನೋಡಿ. ನಂತರ ಮನೆಯಿಂದ ಹೊರಡುವ ಮೊದಲೇ ಬುಕ್ ಮಾಡಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c2ee387e"
   },
   "home.shoppers.1": {
     "message": "ನಿಮಗೆ ಬೇಕಾದದ್ದನ್ನು ಹುಡುಕಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7d5bd0fc"
   },
   "home.shoppers.2": {
     "message": "ಹತ್ತಿರದ ಯಾವ ಅಂಗಡಿಗಳಲ್ಲಿ ಇದೆ ನೋಡಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5177cb50"
   },
   "home.shoppers.3": {
     "message": "ಬುಕ್ ಮಾಡಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b016aa80"
   },
   "home.shoppers.4": {
     "message": "ತೆಗೆದುಕೊಂಡು ಹೋಗಿ ಅಥವಾ ಡೆಲಿವರಿ ಪಡೆಯಿರಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "61974e58"
   },
   "home.shoppers.body.1": {
     "message": "ದಿನಸಿ, ಔಷಧಿ, ಸ್ಟೇಷನರಿ, ಚಾರ್ಜರ್, ನಲ್ಲಿಯ ವಾಷರ್.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "15fa5ef8"
   },
   "home.shoppers.body.2": {
     "message": "ಬೆಲೆ, ದೂರ ಮತ್ತು ಸ್ಟಾಕ್ ಎಷ್ಟು ತಾಜಾ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b7f275ee"
   },
   "home.shoppers.body.3": {
     "message": "ಅಂಗಡಿ ನಿಮಗಾಗಿ ತೆಗೆದಿಡುತ್ತದೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "19cd1f93"
   },
   "home.shoppers.body.4": {
     "message": "ಯಾವಾಗಲೂ ಕೊಡುವಂತೆಯೇ ಅಂಗಡಿಗೆ ಹಣ ಕೊಡಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f5248dcf"
   },
   "home.shoppers.cta": {
     "message": "ಗ್ರಾಹಕ ಆ್ಯಪ್ ತೆರೆಯಿರಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ebb9af61"
   },
   "home.shoppers.avail": {
     "message": "ನಿಮ್ಮ ಹತ್ತಿರದ {count} ಅಂಗಡಿಗಳಲ್ಲಿ ಲಭ್ಯ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8a80f660"
   },
   "home.shoppers.book": {
     "message": "ಬುಕ್ ಮಾಡಿ · ಅಂಗಡಿಯಲ್ಲಿ ಪಾವತಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e4fb86ee"
   },
   "home.shoppers.ready": {
     "message": "ಆರ್ಡರ್ {number} ಸಿದ್ಧವಾಗಿದೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fd16fe5b"
   },
   "home.shoppers.code": {
     "message": "ಆರ್ಡರ್ ಕೋಡ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bc91748b"
   },
   "home.shoppers.show": {
     "message": "{shop} ನಲ್ಲಿ ಇದನ್ನು ತೋರಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "94d28e88"
   },
   "home.shoppers.tl.booked": {
     "message": "ಬುಕ್ ಆಯಿತು · {time}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "210c37a3"
   },
   "home.shoppers.tl.accepted": {
     "message": "ಒಪ್ಪಿಕೊಂಡರು · {time}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "71950c1f"
   },
   "home.shoppers.tl.ready": {
     "message": "ಸಿದ್ಧ · {time}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "75e8b56e"
   },
   "home.shoppers.tl.collected": {
     "message": "ತೆಗೆದುಕೊಂಡರು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "924a70ff"
   },
   "home.steps.eyebrow": {
     "message": "ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1dd6a17c"
   },
   "home.steps.title": {
     "message": "ಮೂರು ಹಂತಗಳಲ್ಲಿ ಪ್ರಾರಂಭಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a1af60ea"
   },
   "home.steps.1.title": {
     "message": "ನಿಮ್ಮ ಅಂಗಡಿ ರಚಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f5508ea0"
   },
   "home.steps.1.body": {
     "message": "ಫೋನ್ ನಂಬರ್‌ನಿಂದ ಸೈನ್ ಅಪ್ ಮಾಡಿ, ಅಂಗಡಿಯ ವಿವರ ಸೇರಿಸಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "872900c2"
   },
   "home.steps.2.title": {
     "message": "ನಿಮ್ಮ ಸ್ಟಾಕ್ ಸೇರಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "05a92e78"
   },
   "home.steps.2.body": {
     "message": "ಕೆಲವು ಐಟಂಗಳಿಂದ ಶುರು ಮಾಡಿ. ಉಳಿದದ್ದನ್ನು ಮಾರಾಟ ಮಾಡುತ್ತಾ ಸೇರಿಸಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fe0d0fdd"
   },
   "home.steps.3.title": {
     "message": "ಗ್ರಾಹಕರು ಬರಲು ಶುರುವಾಗುತ್ತದೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6014332c"
   },
   "home.steps.3.body": {
     "message": "ಹತ್ತಿರದವರು ನಿಮ್ಮ ಸ್ಟಾಕ್ ಹುಡುಕಿ ಬುಕ್ ಮಾಡುತ್ತಾರೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "38f7c00b"
   },
   "home.steps.shop_name": {
     "message": "ಅಂಗಡಿಯ ಹೆಸರು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6a5cc02e"
   },
   "home.steps.area": {
     "message": "ಪ್ರದೇಶ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2745deba"
   },
   "home.steps.add_item": {
     "message": "ಐಟಂ ಸೇರಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5bcf4db4"
   },
   "home.steps.new_order": {
     "message": "ಹತ್ತಿರ ಹೊಸ ಆರ್ಡರ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0fd71c2f"
   },
   "home.types.eyebrow": {
     "message": "ಯಾರಿಗಾಗಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0c5ba882"
   },
   "home.types.title": {
     "message": "ಎಲ್ಲಾ ರೀತಿಯ ಅಂಗಡಿಗಳಿಗಾಗಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "76a8ff39"
   },
   "home.types.intro": {
     "message": "ಜನರ ಮನೆಗಳ ಹತ್ತಿರದ ಅಂಗಡಿಯಿಂದ ವಸ್ತುಗಳನ್ನು ಮಾರುತ್ತಿದ್ದರೆ, TodayZ ನಿಮಗಾಗಿಯೇ ಮಾಡಿದ್ದು.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "38933281"
   },
   "home.types.strip": {
     "message": "ಎಲ್ಲಾ ರೀತಿಯ ಅಂಗಡಿಗಳಿಗಾಗಿ ಮಾಡಿದ್ದು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f8180338"
   },
   "home.types.1": {
     "message": "ಜನರಲ್ ಮತ್ತು ದಿನಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "37823308"
   },
   "home.types.2": {
     "message": "ಮೆಡಿಕಲ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a9a24cd1"
   },
   "home.types.3": {
     "message": "ಕಾಸ್ಮೆಟಿಕ್ಸ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9555b604"
   },
   "home.types.4": {
     "message": "ಸ್ಟೇಷನರಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f6211e63"
   },
   "home.types.5": {
     "message": "ಎಲೆಕ್ಟ್ರಾನಿಕ್ಸ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "89f1ebf5"
   },
   "home.types.6": {
     "message": "ಹಾರ್ಡ್‌ವೇರ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b76ab659"
   },
   "home.types.desc.1": {
     "message": "ದಿನನಿತ್ಯದ ಅಗತ್ಯಗಳು, ಧಾನ್ಯ-ದಿನಸಿ ಮತ್ತು ಪ್ಯಾಕೆಟ್ ಆಹಾರ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3a4cd0b8"
   },
   "home.types.desc.2": {
     "message": "ಔಷಧಿ, ಆರೋಗ್ಯ ಮತ್ತು ಮಗುವಿನ ಆರೈಕೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b525a650"
   },
   "home.types.desc.3": {
     "message": "ಬ್ಯೂಟಿ, ಚರ್ಮದ ಆರೈಕೆ ಮತ್ತು ವೈಯಕ್ತಿಕ ಆರೈಕೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b5574763"
   },
   "home.types.desc.4": {
     "message": "ಶಾಲೆ, ಆಫೀಸ್ ಮತ್ತು ಆರ್ಟ್ ಸಾಮಗ್ರಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f4dce562"
   },
   "home.types.desc.5": {
     "message": "ಚಾರ್ಜರ್, ಬಲ್ಬ್, ಕೇಬಲ್ ಮತ್ತು ಸಣ್ಣ ಉಪಕರಣಗಳು.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7a6e702f"
   },
   "home.types.desc.6": {
     "message": "ಉಪಕರಣಗಳು, ಫಿಟ್ಟಿಂಗ್, ಪೇಂಟ್ ಮತ್ತು ಪ್ಲಂಬಿಂಗ್.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5e7cad99"
   },
   "home.testimonials.title": {
     "message": "ಅಂಗಡಿ ಮಾಲೀಕರು ಏನು ಹೇಳುತ್ತಾರೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a9b676a9"
   },
   "home.faq.eyebrow": {
     "message": "ಪ್ರಶ್ನೋತ್ತರ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "03688ba6"
   },
   "home.faq.title": {
     "message": "ಅಂಗಡಿಯವರು ಕೇಳುವ ಪ್ರಶ್ನೆಗಳು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "18e2d52e"
   },
   "home.faq.intro": {
     "message": "ಇನ್ನೇನಾದರೂ ಕೇಳಬೇಕೇ? ಕೆಳಗೆ ನಿಮ್ಮ ವಿವರಗಳನ್ನು ಬಿಡಿ, TodayZ ತಂಡ ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸುತ್ತದೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a6c2f090"
   },
   "home.faq.1.q": {
     "message": "ಇದಕ್ಕೆ ಎಷ್ಟು ಖರ್ಚು?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ed90bcad"
   },
   "home.faq.1.a": {
     "message": "ಸದ್ಯಕ್ಕೆ TodayZ ಅಂಗಡಿಗಳಿಗೆ ಉಚಿತ. ಇತ್ತೀಚಿನ ಮಾಹಿತಿಗಾಗಿ ಬೆಲೆ ಪುಟ ನೋಡಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9f35ab56"
   },
   "home.faq.2.q": {
     "message": "ನನಗೆ ಫೋನ್ ಚೆನ್ನಾಗಿ ಬರಬೇಕೇ?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bb61bdaa"
   },
   "home.faq.2.a": {
     "message": "ಇಲ್ಲ. ಬ್ಯುಸಿನೆಸ್ ಆ್ಯಪ್ ದಿನನಿತ್ಯದ ಅಂಗಡಿ ಕೆಲಸಕ್ಕಾಗಿ ಮಾಡಿದ್ದು, ಕೆಲವು ಐಟಂಗಳಿಂದ ಶುರು ಮಾಡಬಹುದು.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "90ac0fa2"
   },
   "home.faq.3.q": {
     "message": "ಗ್ರಾಹಕರಿಗೆ ವಸ್ತುಗಳು ಹೇಗೆ ಸಿಗುತ್ತವೆ?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0c54ae3e"
   },
   "home.faq.3.a": {
     "message": "ಅವರು TodayZ ನಲ್ಲಿ ಐಟಂ ಬುಕ್ ಮಾಡಿ, ನಿಮ್ಮ ಅಂಗಡಿಯಿಂದ ತೆಗೆದುಕೊಂಡು ಹೋಗುತ್ತಾರೆ ಅಥವಾ ಡೆಲಿವರಿ ಕೇಳುತ್ತಾರೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b722f805"
   },
   "home.faq.4.q": {
     "message": "ಯಾವ ಅಂಗಡಿಗಳು ಸೇರಬಹುದು?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c5b54c7f"
   },
   "home.faq.4.a": {
     "message": "ದಿನಸಿಯಿಂದ ಹಾರ್ಡ್‌ವೇರ್‌ವರೆಗೆ, ಭೌತಿಕ ವಸ್ತುಗಳನ್ನು ಮಾರುವ ಯಾವುದೇ ಬಡಾವಣೆ ಅಂಗಡಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "de090547"
   },
   "home.types.pause": {
     "message": "ಚಲಿಸುವ ಪಟ್ಟಿಯನ್ನು ನಿಲ್ಲಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8cd44034"
   }
 }

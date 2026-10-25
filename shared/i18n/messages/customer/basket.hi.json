@@ -1,0 +1,447 @@
+{
+  "basket.title": {
+    "message": "बास्केट",
+    "review": "reviewed",
+    "enHash": "020b4183"
+  },
+  "basket.back": {
+    "message": "बास्केट",
+    "review": "reviewed",
+    "enHash": "d368818f"
+  },
+  "basket.loading": {
+    "message": "आपकी बास्केट लोड हो रही हैं",
+    "review": "reviewed",
+    "enHash": "077179d4"
+  },
+  "basket.error": {
+    "message": "आपकी बास्केट लोड नहीं हो सकीं",
+    "review": "reviewed",
+    "enHash": "eff7d45d"
+  },
+  "basket.gone.title": {
+    "message": "यह बास्केट अब यहाँ नहीं है",
+    "review": "reviewed",
+    "enHash": "8e3f494b"
+  },
+  "basket.defaultName": {
+    "message": "मेरी बास्केट",
+    "review": "reviewed",
+    "enHash": "49c9899b"
+  },
+  "basket.signIn": {
+    "message": "सेव करने के लिए साइन इन करें",
+    "review": "reviewed",
+    "enHash": "61198591"
+  },
+  "basket.device.title": {
+    "message": "इस डिवाइस की बास्केट",
+    "review": "reviewed",
+    "enHash": "5a9b9d21"
+  },
+  "basket.device.note": {
+    "message": "यह बास्केट सिर्फ़ इसी डिवाइस पर है। इसे अपने खाते में सेव करने के लिए साइन इन करें।",
+    "review": "reviewed",
+    "enHash": "c06180e4"
+  },
+  "basket.device.clear": {
+    "message": "बास्केट खाली करें",
+    "review": "reviewed",
+    "enHash": "81f53e3e"
+  },
+  "basket.saving": {
+    "message": "सेव हो रहा है",
+    "review": "reviewed",
+    "enHash": "369c534d"
+  },
+  "basket.saved": {
+    "message": "सेव हो गया",
+    "review": "reviewed",
+    "enHash": "c0ae8f6e"
+  },
+  "basket.conflict": {
+    "message": "यह बास्केट दूसरे डिवाइस पर बदली गई थी। नई वाली दिखा रहे हैं।",
+    "review": "reviewed",
+    "enHash": "fb4aceb3"
+  },
+  "basket.full": {
+    "message": "यह बास्केट भर गई है। दूसरा सामान जोड़ने के लिए कोई सामान हटाएँ।",
+    "review": "reviewed",
+    "enHash": "52d00466"
+  },
+  "basket.limit": {
+    "message": "आप जितनी बास्केट सेव कर सकते हैं, उतनी हो गई हैं। नई बनाने के लिए एक डिलीट करें।",
+    "review": "reviewed",
+    "enHash": "907b9c23"
+  },
+  "basket.saveError": {
+    "message": "सेव नहीं हो सका। अपना कनेक्शन देखें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "69f52210"
+  },
+  "basket.lastSplit": {
+    "message": "पिछली बार: {a} और {b}",
+    "review": "reviewed",
+    "enHash": "d062b8ed"
+  },
+  "basket.ask.label": {
+    "message": "सामान जोड़ें",
+    "review": "reviewed",
+    "enHash": "fc1290c0"
+  },
+  "basket.ask.placeholder": {
+    "message": "आटा, दूध, ब्रेड जोड़ें…",
+    "review": "reviewed",
+    "enHash": "7f9a11af"
+  },
+  "basket.ask.clear": {
+    "message": "हटाएँ",
+    "review": "reviewed",
+    "enHash": "719ea396"
+  },
+  "basket.ask.try": {
+    "message": "जैसे: {example}",
+    "review": "reviewed",
+    "enHash": "f69e58c6"
+  },
+  "basket.ask.example1": {
+    "message": "Aashirvaad atta 5 kg",
+    "review": "reviewed",
+    "enHash": "43f36ca4"
+  },
+  "basket.ask.example2": {
+    "message": "Amul milk 500 ml",
+    "review": "reviewed",
+    "enHash": "c84bc4b6"
+  },
+  "basket.ask.example3": {
+    "message": "Dolo 650",
+    "review": "reviewed",
+    "enHash": "a8c97442"
+  },
+  "basket.ask.example4": {
+    "message": "Tata salt 1 kg",
+    "review": "reviewed",
+    "enHash": "59a93d2a"
+  },
+  "basket.ask.suggestions": {
+    "message": "सुझाव",
+    "review": "reviewed",
+    "enHash": "861edba0"
+  },
+  "basket.ask.addText": {
+    "message": "“{text}” जोड़ें",
+    "review": "reviewed",
+    "enHash": "944e1cc0"
+  },
+  "basket.lines.empty": {
+    "message": "आपकी बास्केट खाली है। ऊपर जो चाहिए वह जोड़ें।",
+    "review": "reviewed",
+    "enHash": "42192d50"
+  },
+  "basket.lines.label": {
+    "message": "इस बास्केट का सामान",
+    "review": "reviewed",
+    "enHash": "01c3b088"
+  },
+  "basket.lines.anyBrand": {
+    "message": "कोई भी ब्रांड",
+    "review": "reviewed",
+    "enHash": "b7e880d1"
+  },
+  "basket.lines.remove": {
+    "message": "{name} हटाएँ",
+    "review": "reviewed",
+    "enHash": "df7193a5"
+  },
+  "basket.name.label": {
+    "message": "बास्केट का नाम",
+    "review": "reviewed",
+    "enHash": "e14e97bc"
+  },
+  "basket.name.placeholder": {
+    "message": "हफ़्ते का राशन",
+    "review": "reviewed",
+    "enHash": "a7fa990b"
+  },
+  "basket.results.title": {
+    "message": "कहाँ मिलेगा",
+    "review": "reviewed",
+    "enHash": "e5a2bb5a"
+  },
+  "basket.search": {
+    "message": "दुकानें खोजें",
+    "review": "reviewed",
+    "enHash": "fdb699b0"
+  },
+  "basket.search.again": {
+    "message": "फिर से खोजें",
+    "review": "reviewed",
+    "enHash": "1178a4ff"
+  },
+  "basket.search.running": {
+    "message": "खोज रहे हैं",
+    "review": "reviewed",
+    "enHash": "98cc363c"
+  },
+  "basket.search.checking": {
+    "message": "{n} दुकानें देख रहे हैं…",
+    "review": "reviewed",
+    "enHash": "24f87468"
+  },
+  "basket.search.checkingNearby": {
+    "message": "पास की दुकानें देख रहे हैं…",
+    "review": "reviewed",
+    "enHash": "14a6970d"
+  },
+  "basket.search.error": {
+    "message": "अभी खोज नहीं हो सकी। फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "cf8b0750"
+  },
+  "basket.search.stale": {
+    "message": "बास्केट बदल गई है। इसके लिए दुकानें देखने को फिर से खोजें।",
+    "review": "reviewed",
+    "enHash": "87db2770"
+  },
+  "basket.summary": {
+    "message": "पास की {checked} दुकानें देखीं · {all, plural, one {# में सब कुछ है} other {# में सब कुछ है}}",
+    "review": "reviewed",
+    "enHash": "a5faa10a"
+  },
+  "basket.zero.title": {
+    "message": "पास की किसी दुकान में ये सामान स्टॉक में नहीं हैं",
+    "review": "reviewed",
+    "enHash": "039f6096"
+  },
+  "basket.zero.body": {
+    "message": "दूरी बढ़ाकर देखें, या पास की दुकानों से पूछें।",
+    "review": "reviewed",
+    "enHash": "59090928"
+  },
+  "basket.noPlace.title": {
+    "message": "खोजने के लिए अपनी लोकेशन चुनें",
+    "review": "reviewed",
+    "enHash": "4c765aeb"
+  },
+  "basket.noPlace.body": {
+    "message": "हम हर सामान के लिए आपके पास की दुकानें देखते हैं।",
+    "review": "reviewed",
+    "enHash": "e397a455"
+  },
+  "basket.preview": {
+    "message": "ये रकम सिर्फ़ अंदाज़ा है। आख़िरी दाम चेकआउट पर दिखेगा।",
+    "review": "reviewed",
+    "enHash": "4b932981"
+  },
+  "basket.badge.everything": {
+    "message": "सब कुछ है",
+    "review": "reviewed",
+    "enHash": "b5b23177"
+  },
+  "basket.badge.closest": {
+    "message": "सबसे पास",
+    "review": "reviewed",
+    "enHash": "e596de54"
+  },
+  "basket.badge.lowest": {
+    "message": "सबसे कम दाम",
+    "review": "reviewed",
+    "enHash": "ead8b64d"
+  },
+  "basket.card.meta": {
+    "message": "{m} में से {n} · {distance} · {total}",
+    "review": "reviewed",
+    "enHash": "4d9c283a"
+  },
+  "basket.card.qty": {
+    "message": "× {qty} · {price}",
+    "review": "reviewed",
+    "enHash": "1db182ec"
+  },
+  "basket.card.missing": {
+    "message": "नहीं है: {items}",
+    "review": "reviewed",
+    "enHash": "be599cea"
+  },
+  "basket.fill": {
+    "message": "कार्ट भरें",
+    "review": "reviewed",
+    "enHash": "46e70f01"
+  },
+  "basket.split.title": {
+    "message": "सब कुछ दो दुकानों से लें",
+    "review": "reviewed",
+    "enHash": "1b03c4c5"
+  },
+  "basket.split.body": {
+    "message": "किसी एक दुकान में सब कुछ नहीं है। ये दो दुकानें मिलकर सब दे सकती हैं।",
+    "review": "reviewed",
+    "enHash": "cbf2227f"
+  },
+  "basket.split.meta": {
+    "message": "{n} आइटम · {distance}",
+    "review": "reviewed",
+    "enHash": "9c9d421e"
+  },
+  "basket.split.uncovered": {
+    "message": "पास की किसी दुकान में नहीं है: {items}",
+    "review": "reviewed",
+    "enHash": "3eb9d0e8"
+  },
+  "basket.split.fill": {
+    "message": "{shop} से कार्ट भरें",
+    "review": "reviewed",
+    "enHash": "2c6b30da"
+  },
+  "basket.split.inStore": {
+    "message": "इनमें से एक दुकान सिर्फ़ दुकान पर ही बेचती है। वह सामान लेने वहाँ जाएँ।",
+    "review": "reviewed",
+    "enHash": "7722cded"
+  },
+  "basket.list.title": {
+    "message": "बास्केट",
+    "review": "reviewed",
+    "enHash": "d368818f"
+  },
+  "basket.list.sub": {
+    "message": "जो चीज़ें आप अक्सर खरीदते हैं उन्हें सेव करें, और ऐसी दुकान ढूँढें जिसमें सब हो।",
+    "review": "reviewed",
+    "enHash": "d0bd4a33"
+  },
+  "basket.list.new": {
+    "message": "नई बास्केट",
+    "review": "reviewed",
+    "enHash": "41876bb5"
+  },
+  "basket.list.count": {
+    "message": "{n, plural, one {# आइटम} other {# आइटम}}",
+    "review": "reviewed",
+    "enHash": "5160c4b2"
+  },
+  "basket.list.updated": {
+    "message": "{time} बदली गई",
+    "review": "reviewed",
+    "enHash": "d5a788b6"
+  },
+  "basket.list.open": {
+    "message": "खोलें",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "basket.list.searchAgain": {
+    "message": "फिर से खोजें",
+    "review": "reviewed",
+    "enHash": "1178a4ff"
+  },
+  "basket.list.delete": {
+    "message": "{name} डिलीट करें",
+    "review": "reviewed",
+    "enHash": "1164a628"
+  },
+  "basket.list.empty.title": {
+    "message": "अभी कोई बास्केट नहीं है",
+    "review": "reviewed",
+    "enHash": "6de1a7b9"
+  },
+  "basket.list.empty.body": {
+    "message": "जो आप अक्सर खरीदते हैं उसकी बास्केट बनाएँ, फिर ऐसी दुकान खोजें जिसमें सब हो।",
+    "review": "reviewed",
+    "enHash": "ddad8049"
+  },
+  "basket.deleted": {
+    "message": "{name} डिलीट हो गई",
+    "review": "reviewed",
+    "enHash": "94f9867b"
+  },
+  "basket.undo": {
+    "message": "वापस लाएँ",
+    "review": "reviewed",
+    "enHash": "39fc7212"
+  },
+  "basket.saveOffer.title": {
+    "message": "इस डिवाइस पर आपकी एक बास्केट है",
+    "review": "reviewed",
+    "enHash": "1fd9dc0e"
+  },
+  "basket.saveOffer.body": {
+    "message": "इसके {n} आइटम अपने खाते में सेव करें, ताकि कहीं से भी इस्तेमाल कर सकें।",
+    "review": "reviewed",
+    "enHash": "e1ee01a7"
+  },
+  "basket.saveOffer.save": {
+    "message": "सेव करें",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "basket.saveOffer.notNow": {
+    "message": "अभी नहीं",
+    "review": "reviewed",
+    "enHash": "e4571490"
+  },
+  "basket.add": {
+    "message": "बास्केट में जोड़ें",
+    "review": "reviewed",
+    "enHash": "1d978ebd"
+  },
+  "basket.add.labelFor": {
+    "message": "बास्केट में जोड़ें: {name}",
+    "review": "reviewed",
+    "enHash": "fb174f2b"
+  },
+  "basket.add.title": {
+    "message": "किस बास्केट में जोड़ें?",
+    "review": "reviewed",
+    "enHash": "5c27d993"
+  },
+  "basket.add.close": {
+    "message": "बंद करें",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "basket.add.new": {
+    "message": "नई बास्केट",
+    "review": "reviewed",
+    "enHash": "41876bb5"
+  },
+  "basket.add.done": {
+    "message": "{name} को {basket} में जोड़ दिया",
+    "review": "reviewed",
+    "enHash": "69b59b15"
+  },
+  "basket.add.view": {
+    "message": "देखें",
+    "review": "reviewed",
+    "enHash": "69bd4ef9"
+  },
+  "basket.next.title": {
+    "message": "अगला: बाकी सामान {shop} से",
+    "review": "reviewed",
+    "enHash": "a080388e"
+  },
+  "basket.next.body": {
+    "message": "आपकी बास्केट के {n, plural, one {# आइटम} other {# आइटम}} {shop} पर बाकी हैं।",
+    "review": "reviewed",
+    "enHash": "76b54dad"
+  },
+  "basket.next.fill": {
+    "message": "{shop} से कार्ट भरें",
+    "review": "reviewed",
+    "enHash": "2c6b30da"
+  },
+  "basket.next.dismiss": {
+    "message": "अभी नहीं",
+    "review": "reviewed",
+    "enHash": "e4571490"
+  },
+  "basket.entry": {
+    "message": "बास्केट",
+    "review": "reviewed",
+    "enHash": "d368818f"
+  },
+  "basket.entry.body": {
+    "message": "अपनी पूरी लिस्ट के लिए एक दुकान ढूँढें",
+    "review": "reviewed",
+    "enHash": "f8cab370"
+  }
+}

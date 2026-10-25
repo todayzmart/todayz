@@ -1,0 +1,132 @@
+{
+  "checkout.title": {
+    "message": "चेकआउट",
+    "review": "reviewed",
+    "enHash": "3ac8e9e5"
+  },
+  "checkout.loading": {
+    "message": "आपका आख़िरी दाम निकाल रहे हैं",
+    "review": "reviewed",
+    "enHash": "aa803be7"
+  },
+  "checkout.pickup.label": {
+    "message": "पिकअप",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "checkout.pickup.title": {
+    "message": "दुकान से पिकअप करें",
+    "review": "reviewed",
+    "enHash": "0932df77"
+  },
+  "checkout.review.label": {
+    "message": "ऑर्डर का सारांश",
+    "review": "reviewed",
+    "enHash": "db14f498"
+  },
+  "checkout.review.title": {
+    "message": "आपका ऑर्डर",
+    "review": "reviewed",
+    "enHash": "d2467b40"
+  },
+  "checkout.payNote": {
+    "message": "सामान लेते समय दुकान पर पैसे दें। अभी कोई पैसा नहीं कटेगा।",
+    "review": "reviewed",
+    "enHash": "926a2db6"
+  },
+  "checkout.placing": {
+    "message": "ऑर्डर हो रहा है",
+    "review": "reviewed",
+    "enHash": "690ad028"
+  },
+  "checkout.place": {
+    "message": "ऑर्डर करें · {total}",
+    "review": "reviewed",
+    "enHash": "e92a92f1"
+  },
+  "checkout.accept": {
+    "message": "नया कुल मंज़ूर करें · {total}",
+    "review": "reviewed",
+    "enHash": "186c12fa"
+  },
+  "checkout.hoursToday": {
+    "message": "दुकान अभी बंद है। आज का समय: {hours}। आपका कार्ट सेव है।",
+    "review": "reviewed",
+    "enHash": "cfb7d4d9"
+  },
+  "checkout.closedToday": {
+    "message": "दुकान आज बंद है। आपका कार्ट सेव है।",
+    "review": "reviewed",
+    "enHash": "f9683a6c"
+  },
+  "checkout.cartKept": {
+    "message": "आपका कार्ट सेव है।",
+    "review": "reviewed",
+    "enHash": "8161928a"
+  },
+  "checkout.priceChanged.title": {
+    "message": "कुल रकम बदल गई",
+    "review": "reviewed",
+    "enHash": "07a22be8"
+  },
+  "checkout.priceChanged.body": {
+    "message": "सामान जोड़ने के बाद दाम या स्टॉक बदल गया है। नया कुल देखें, फिर दोबारा टैप करें।",
+    "review": "reviewed",
+    "enHash": "dff0fad1"
+  },
+  "checkout.stock.title": {
+    "message": "स्टॉक काफ़ी नहीं है",
+    "review": "reviewed",
+    "enHash": "357cd443"
+  },
+  "checkout.stock.body": {
+    "message": "{item}: {count, plural, =0 {कुछ नहीं बचा} other {सिर्फ़ # बचे}}।",
+    "review": "reviewed",
+    "enHash": "1e731b21"
+  },
+  "checkout.stock.anItem": {
+    "message": "एक सामान",
+    "review": "reviewed",
+    "enHash": "21906e27"
+  },
+  "checkout.stock.fix": {
+    "message": "कार्ट में बदलें",
+    "review": "reviewed",
+    "enHash": "dce1e662"
+  },
+  "checkout.problem.store_closed": {
+    "message": "दुकान अभी बंद है। आपका कार्ट सेव है।",
+    "review": "reviewed",
+    "enHash": "fbb7fa58"
+  },
+  "checkout.problem.store_not_bookable": {
+    "message": "यह दुकान अभी ऑर्डर नहीं ले रही है। आपका कार्ट सेव है।",
+    "review": "reviewed",
+    "enHash": "f36b1126"
+  },
+  "checkout.problem.ordering_suspended": {
+    "message": "ऑर्डर करना अभी रुका हुआ है। कृपया बाद में कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "e96f3604"
+  },
+  "checkout.problem.ordering_suspended.until": {
+    "message": "आपने कई बार पिकअप नहीं किया, इसलिए {date} तक आपका एक ही ऑर्डर खुला रह सकता है। पहले उसे पूरा करें या कैंसल करें।",
+    "review": "reviewed",
+    "enHash": "f69d5a61"
+  },
+  "checkout.problem.account_has_active_order": {
+    "message": "आपका एक ऑर्डर पहले से चल रहा है। पहले उसे पूरा करें या कैंसल करें।",
+    "review": "reviewed",
+    "enHash": "42b3618c"
+  },
+  "checkout.problem.other": {
+    "message": "ऑर्डर नहीं हो सका। कृपया फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "5f3ebf19"
+  },
+  "checkout.problem.network": {
+    "message": "इंटरनेट नहीं है। आपका कार्ट सेव है; ऑनलाइन होने पर फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "392cd811"
+  }
+}

@@ -1,0 +1,512 @@
+{
+  "orders.title": {
+    "message": "ఆర్డర్‌లు",
+    "review": "reviewed",
+    "enHash": "cded0933"
+  },
+  "orders.tabs.label": {
+    "message": "ఆర్డర్ రకం",
+    "review": "reviewed",
+    "enHash": "7f77efd5"
+  },
+  "orders.tabs.online": {
+    "message": "ఆన్‌లైన్",
+    "review": "reviewed",
+    "enHash": "c3e839df"
+  },
+  "orders.tabs.store": {
+    "message": "దుకాణంలో",
+    "review": "reviewed",
+    "enHash": "1ef58227"
+  },
+  "orders.store.title": {
+    "message": "దుకాణం బిల్లులు త్వరలో వస్తాయి",
+    "review": "reviewed",
+    "enHash": "2aa4d33f"
+  },
+  "orders.store.body": {
+    "message": "మీరు వెళ్లే దుకాణాల బిల్లులు ఇక్కడ కనిపిస్తాయి.",
+    "review": "reviewed",
+    "enHash": "087de36b"
+  },
+  "orders.signedOut.title": {
+    "message": "మీ ఆర్డర్‌లు చూడడానికి సైన్ ఇన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "360bead5"
+  },
+  "orders.signedOut.body": {
+    "message": "మీ ఆర్డర్‌లు, పికప్ కోడ్‌లు మీ ఖాతాలో ఉంటాయి.",
+    "review": "reviewed",
+    "enHash": "db1c00fe"
+  },
+  "orders.signedOut.cta": {
+    "message": "సైన్ ఇన్",
+    "review": "reviewed",
+    "enHash": "ada2e9e9"
+  },
+  "orders.empty.title": {
+    "message": "ఇంకా ఆర్డర్‌లు లేవు",
+    "review": "reviewed",
+    "enHash": "9f61f6df"
+  },
+  "orders.empty.body": {
+    "message": "దగ్గరలో ఏదైనా బుక్ చేయండి, అది ఇక్కడ కనిపిస్తుంది.",
+    "review": "reviewed",
+    "enHash": "4b6fc830"
+  },
+  "orders.empty.cta": {
+    "message": "దగ్గరి దుకాణాలు కనుగొనండి",
+    "review": "reviewed",
+    "enHash": "ae63ad8c"
+  },
+  "orders.group.active": {
+    "message": "నడుస్తున్నవి",
+    "review": "reviewed",
+    "enHash": "b6bd42e4"
+  },
+  "orders.group.past": {
+    "message": "గతంలోవి",
+    "review": "reviewed",
+    "enHash": "13f7aee7"
+  },
+  "orders.row.meta": {
+    "message": "ఆర్డర్ {number} · {count, plural, one {# ఐటమ్} other {# ఐటమ్‌లు}}",
+    "review": "reviewed",
+    "enHash": "595ea451"
+  },
+  "orders.loading": {
+    "message": "ఆర్డర్‌లు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "58246f0e"
+  },
+  "orders.loadError": {
+    "message": "మీ ఆర్డర్‌లు లోడ్ కాలేదు.",
+    "review": "reviewed",
+    "enHash": "bd6d09a0"
+  },
+  "orders.retry": {
+    "message": "మళ్లీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "orders.status.placed": {
+    "message": "దుకాణం జవాబు కోసం",
+    "review": "reviewed",
+    "enHash": "dbe678e2"
+  },
+  "orders.status.awaiting_customer": {
+    "message": "మీ జవాబు కావాలి",
+    "review": "reviewed",
+    "enHash": "c838ea1a"
+  },
+  "orders.status.accepted": {
+    "message": "అంగీకరించారు",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "orders.status.ready": {
+    "message": "సిద్ధంగా ఉంది",
+    "review": "reviewed",
+    "enHash": "20c7c552"
+  },
+  "orders.status.out_for_delivery": {
+    "message": "దారిలో ఉంది",
+    "review": "reviewed",
+    "enHash": "7884d39a"
+  },
+  "orders.status.collected": {
+    "message": "తీసుకున్నారు",
+    "review": "reviewed",
+    "enHash": "5b0f7590"
+  },
+  "orders.status.delivered": {
+    "message": "డెలివరీ అయింది",
+    "review": "reviewed",
+    "enHash": "eea956cd"
+  },
+  "orders.status.rejected": {
+    "message": "తిరస్కరించారు",
+    "review": "reviewed",
+    "enHash": "ff59b80f"
+  },
+  "orders.status.expired": {
+    "message": "గడువు ముగిసింది",
+    "review": "reviewed",
+    "enHash": "a689a999"
+  },
+  "orders.status.cancelled": {
+    "message": "క్యాన్సిల్ అయింది",
+    "review": "reviewed",
+    "enHash": "a1bf92ef"
+  },
+  "orders.status.delivery_failed": {
+    "message": "డెలివరీ కాలేదు",
+    "review": "reviewed",
+    "enHash": "5a954eb2"
+  },
+  "orders.detail.title": {
+    "message": "ఆర్డర్ {number}",
+    "review": "reviewed",
+    "enHash": "2daa0733"
+  },
+  "orders.placed.title": {
+    "message": "ఆర్డర్ అయింది",
+    "review": "reviewed",
+    "enHash": "bb5d68da"
+  },
+  "orders.waiting": {
+    "message": "{shop} అంగీకరించడం కోసం ఎదురుచూస్తున్నాం · {left} మిగిలింది",
+    "review": "reviewed",
+    "enHash": "5fea1503"
+  },
+  "orders.waitingLong": {
+    "message": "{shop} అంగీకరించడం కోసం ఎదురుచూస్తున్నాం",
+    "review": "reviewed",
+    "enHash": "400bdc79"
+  },
+  "orders.waiting.note": {
+    "message": "ఏమీ కట్ కాలేదు. దుకాణం జవాబు ఇవ్వగానే మీకు చెబుతాం.",
+    "review": "reviewed",
+    "enHash": "6c6a366f"
+  },
+  "orders.code.label": {
+    "message": "పికప్ కోడ్",
+    "review": "reviewed",
+    "enHash": "28950dc9"
+  },
+  "orders.code.note": {
+    "message": "ఈ కోడ్‌ను {shop} లో చూపించండి.",
+    "review": "reviewed",
+    "enHash": "288a7b53"
+  },
+  "orders.code.brightness": {
+    "message": "సులభంగా చదవడానికి మీ స్క్రీన్ బ్రైట్‌నెస్ పెంచండి.",
+    "review": "reviewed",
+    "enHash": "6e3e8674"
+  },
+  "orders.code.locked.title": {
+    "message": "కోడ్ లాక్ అయింది",
+    "review": "reviewed",
+    "enHash": "519bcadd"
+  },
+  "orders.code.locked.body": {
+    "message": "కౌంటర్‌లో చాలా సార్లు తప్పు కోడ్ ఇచ్చారు. కొనసాగడానికి కొత్త కోడ్ తీసుకోండి.",
+    "review": "reviewed",
+    "enHash": "1e8635b8"
+  },
+  "orders.code.new": {
+    "message": "కొత్త కోడ్ తీసుకోండి",
+    "review": "reviewed",
+    "enHash": "a3ee77aa"
+  },
+  "orders.accepted.note": {
+    "message": "{shop} మీ ఆర్డర్ అంగీకరించింది, మీ కోసం ఉంచుతోంది.",
+    "review": "reviewed",
+    "enHash": "335f3a2a"
+  },
+  "orders.ready.note": {
+    "message": "మీ ఆర్డర్ {shop} లో సిద్ధంగా ఉంది.",
+    "review": "reviewed",
+    "enHash": "ec74cacd"
+  },
+  "orders.hold": {
+    "message": "మీ కోసం ఉంచాం · {left} మిగిలింది",
+    "review": "reviewed",
+    "enHash": "eb3928c3"
+  },
+  "orders.hold.over": {
+    "message": "ఉంచే సమయం ముగిసింది.",
+    "review": "reviewed",
+    "enHash": "e7808725"
+  },
+  "orders.extend": {
+    "message": "నేను దారిలో ఉన్నాను (+10 నిమి)",
+    "review": "reviewed",
+    "enHash": "3a45d2cb"
+  },
+  "orders.extend.done": {
+    "message": "10 నిమిషాలు పెంచాం.",
+    "review": "reviewed",
+    "enHash": "caf0f39e"
+  },
+  "orders.extend.used": {
+    "message": "ఈ ఆర్డర్‌కు మీరు ఇప్పటికే సమయం పెంచారు.",
+    "review": "reviewed",
+    "enHash": "596630ff"
+  },
+  "orders.directions": {
+    "message": "దారి",
+    "review": "reviewed",
+    "enHash": "f814a9fb"
+  },
+  "orders.actionError": {
+    "message": "అది జరగలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "e5e00d17"
+  },
+  "orders.timeline.label": {
+    "message": "ఆర్డర్ ఎంతవరకు వచ్చింది",
+    "review": "reviewed",
+    "enHash": "fcbc4a3a"
+  },
+  "orders.timeline.done": {
+    "message": "అయింది",
+    "review": "reviewed",
+    "enHash": "e9b450d1"
+  },
+  "orders.timeline.upcoming": {
+    "message": "తర్వాత",
+    "review": "reviewed",
+    "enHash": "bc981983"
+  },
+  "orders.timeline.failed": {
+    "message": "పూర్తి కాలేదు",
+    "review": "reviewed",
+    "enHash": "a9166287"
+  },
+  "orders.step.placed": {
+    "message": "ఆర్డర్ అయింది",
+    "review": "reviewed",
+    "enHash": "bb5d68da"
+  },
+  "orders.step.accepted": {
+    "message": "దుకాణం అంగీకరించింది",
+    "review": "reviewed",
+    "enHash": "0dbdd9b3"
+  },
+  "orders.step.ready": {
+    "message": "తీసుకోవడానికి సిద్ధం",
+    "review": "reviewed",
+    "enHash": "26d1c653"
+  },
+  "orders.step.collected": {
+    "message": "తీసుకున్నారు",
+    "review": "reviewed",
+    "enHash": "5b0f7590"
+  },
+  "orders.items.label": {
+    "message": "ఈ ఆర్డర్‌లోని వస్తువులు",
+    "review": "reviewed",
+    "enHash": "a8022691"
+  },
+  "orders.collected.title": {
+    "message": "ఆర్డర్ పూర్తయింది",
+    "review": "reviewed",
+    "enHash": "cd00866a"
+  },
+  "orders.again": {
+    "message": "ఈ దుకాణం నుండి మళ్లీ ఆర్డర్ చేయండి",
+    "review": "reviewed",
+    "enHash": "cce0300b"
+  },
+  "orders.findElsewhere": {
+    "message": "వేరే దుకాణం కనుగొనండి",
+    "review": "reviewed",
+    "enHash": "2e88b7b6"
+  },
+  "orders.outcome.rejected": {
+    "message": "{shop} ఈ ఆర్డర్ తీసుకోలేకపోయింది",
+    "review": "reviewed",
+    "enHash": "c52431a8"
+  },
+  "orders.outcome.expired": {
+    "message": "{shop} సమయానికి జవాబు ఇవ్వలేదు",
+    "review": "reviewed",
+    "enHash": "c6dd94ef"
+  },
+  "orders.outcome.cancelled": {
+    "message": "ఈ ఆర్డర్ క్యాన్సిల్ అయింది",
+    "review": "reviewed",
+    "enHash": "a929b876"
+  },
+  "orders.outcome.delivery_failed": {
+    "message": "ఈ ఆర్డర్ డెలివరీ కాలేదు",
+    "review": "reviewed",
+    "enHash": "fb3b71a2"
+  },
+  "orders.limit.title": {
+    "message": "ప్రస్తుతానికి ఆర్డర్‌లపై పరిమితి ఉంది",
+    "review": "reviewed",
+    "enHash": "b2afda5a"
+  },
+  "orders.limit.body": {
+    "message": "మీరు చాలాసార్లు పికప్ చేయలేదు, కాబట్టి {date} వరకు ఒకేసారి {max, plural, one {ఒక్క ఓపెన్ ఆర్డర్ మాత్రమే} other {# ఓపెన్ ఆర్డర్‌లు}} ఉండగలవు.",
+    "review": "reviewed",
+    "enHash": "8d1ad358"
+  },
+  "orders.partial.title": {
+    "message": "{shop} మీ ఆర్డర్ మార్చింది",
+    "review": "reviewed",
+    "enHash": "d708f1aa"
+  },
+  "orders.partial.body": {
+    "message": "{shop} అన్నీ ఇవ్వలేకపోయింది. మార్పులు చూసి ఆర్డర్ తీసుకోండి లేదా క్యాన్సిల్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "baa8947b"
+  },
+  "orders.partial.none": {
+    "message": "అందుబాటులో లేదు. మీరు {wanted} అడిగారు.",
+    "review": "reviewed",
+    "enHash": "352b8ded"
+  },
+  "orders.partial.fewer": {
+    "message": "{wanted} బదులు {got}",
+    "review": "reviewed",
+    "enHash": "e1e12c18"
+  },
+  "orders.partial.items": {
+    "message": "వస్తువులు",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "orders.partial.fee": {
+    "message": "డెలివరీ ఛార్జీ",
+    "review": "reviewed",
+    "enHash": "733b6148"
+  },
+  "orders.partial.credits": {
+    "message": "వాడిన క్రెడిట్‌లు",
+    "review": "reviewed",
+    "enHash": "385686f7"
+  },
+  "orders.partial.total": {
+    "message": "కొత్త మొత్తం",
+    "review": "reviewed",
+    "enHash": "ff02751a"
+  },
+  "orders.partial.left": {
+    "message": "{left} లోపు నిర్ధారించండి",
+    "review": "reviewed",
+    "enHash": "c6052032"
+  },
+  "orders.partial.over": {
+    "message": "మారిన ఆర్డర్ సమయానికి నిర్ధారించలేదు.",
+    "review": "reviewed",
+    "enHash": "0b8be72b"
+  },
+  "orders.partial.late": {
+    "message": "ఈ ఆర్డర్ మళ్లీ మారింది. పేజీలో తాజా సమాచారం ఉంది.",
+    "review": "reviewed",
+    "enHash": "1eb7b376"
+  },
+  "orders.partial.confirm": {
+    "message": "తీసుకోండి · {total}",
+    "review": "reviewed",
+    "enHash": "3d78bd7c"
+  },
+  "orders.partial.decline": {
+    "message": "ఆర్డర్ క్యాన్సిల్ చేయండి",
+    "review": "reviewed",
+    "enHash": "5ae39c4a"
+  },
+  "orders.reason.partial_timeout": {
+    "message": "మారిన ఆర్డర్ సమయానికి నిర్ధారించలేదు.",
+    "review": "reviewed",
+    "enHash": "0b8be72b"
+  },
+  "orders.reason.declined_partial": {
+    "message": "మీరు మారిన ఆర్డర్ క్యాన్సిల్ చేశారు.",
+    "review": "reviewed",
+    "enHash": "e235344e"
+  },
+  "orders.reason.out_of_stock": {
+    "message": "కొన్ని వస్తువులు స్టాక్‌లో లేవు.",
+    "review": "reviewed",
+    "enHash": "de1eaf5a"
+  },
+  "orders.reason.closing_soon": {
+    "message": "దుకాణం త్వరలో మూసేస్తోంది.",
+    "review": "reviewed",
+    "enHash": "a3c1d92e"
+  },
+  "orders.reason.too_busy": {
+    "message": "దుకాణం చాలా బిజీగా ఉంది.",
+    "review": "reviewed",
+    "enHash": "6619752e"
+  },
+  "orders.reason.other": {
+    "message": "వేరే కారణం.",
+    "review": "reviewed",
+    "enHash": "165e1b4a"
+  },
+  "orders.reason.changed_mind": {
+    "message": "మీరు మనసు మార్చుకున్నారు.",
+    "review": "reviewed",
+    "enHash": "72a98cc7"
+  },
+  "orders.reason.too_slow": {
+    "message": "చాలా ఆలస్యం అవుతోంది.",
+    "review": "reviewed",
+    "enHash": "098eebd8"
+  },
+  "orders.reason.no_response": {
+    "message": "దుకాణం జవాబు ఇవ్వలేదు.",
+    "review": "reviewed",
+    "enHash": "731bf199"
+  },
+  "orders.cancel": {
+    "message": "ఆర్డర్ క్యాన్సిల్ చేయండి",
+    "review": "reviewed",
+    "enHash": "5ae39c4a"
+  },
+  "orders.cancel.title": {
+    "message": "ఈ ఆర్డర్ క్యాన్సిల్ చేయాలా?",
+    "review": "reviewed",
+    "enHash": "e0d45206"
+  },
+  "orders.cancel.body": {
+    "message": "దుకాణం దాన్ని సిద్ధం చేయడం ఆపేస్తుంది.",
+    "review": "reviewed",
+    "enHash": "0e07b9c9"
+  },
+  "orders.cancel.why": {
+    "message": "ఎందుకు క్యాన్సిల్ చేస్తున్నారు?",
+    "review": "reviewed",
+    "enHash": "6133e7de"
+  },
+  "orders.cancel.reason.changed_mind": {
+    "message": "నేను మనసు మార్చుకున్నాను",
+    "review": "reviewed",
+    "enHash": "8bc3b888"
+  },
+  "orders.cancel.reason.too_slow": {
+    "message": "దుకాణం చాలా ఆలస్యం చేస్తోంది",
+    "review": "reviewed",
+    "enHash": "547c3220"
+  },
+  "orders.cancel.reason.declined_partial": {
+    "message": "నాకు మారిన ఆర్డర్ వద్దు",
+    "review": "reviewed",
+    "enHash": "e5184f50"
+  },
+  "orders.cancel.reason.other": {
+    "message": "వేరే ఏదో",
+    "review": "reviewed",
+    "enHash": "48f88ac3"
+  },
+  "orders.cancel.note": {
+    "message": "ఏం జరిగిందో మాకు చెప్పండి",
+    "review": "reviewed",
+    "enHash": "52f84f8e"
+  },
+  "orders.cancel.keep": {
+    "message": "ఆర్డర్ ఉంచండి",
+    "review": "reviewed",
+    "enHash": "3017312f"
+  },
+  "orders.cancel.confirm": {
+    "message": "ఆర్డర్ క్యాన్సిల్ చేయండి",
+    "review": "reviewed",
+    "enHash": "5ae39c4a"
+  },
+  "orders.cancel.error": {
+    "message": "ఆర్డర్ క్యాన్సిల్ చేయలేకపోయాం. దయచేసి మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "aa980a9a"
+  },
+  "orders.close": {
+    "message": "మూసివేయండి",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "product.add": {
+    "message": "చేర్చండి",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "product.remove": {
+    "message": "ఒకటి తీసేయండి",
+    "review": "reviewed",
+    "enHash": "afbcf5f3"
+  },
+  "product.addOne": {
+    "message": "ఒకటి చేర్చండి",
+    "review": "reviewed",
+    "enHash": "bb49f016"
+  },
+  "product.max": {
+    "message": "స్టాక్‌లో {max} మాత్రమే ఉన్నాయి",
+    "review": "reviewed",
+    "enHash": "adffd51d"
+  },
+  "product.off": {
+    "message": "{pct}% తగ్గింపు",
+    "review": "reviewed",
+    "enHash": "76fb0776"
+  },
+  "product.unit.pc": {
+    "message": "{size} పీస్",
+    "review": "reviewed",
+    "enHash": "ae6eb2b9"
+  },
+  "product.unit.pack": {
+    "message": "{size} ప్యాక్",
+    "review": "reviewed",
+    "enHash": "8423135e"
+  },
+  "product.stock.in": {
+    "message": "స్టాక్‌లో ఉంది",
+    "review": "reviewed",
+    "enHash": "3f1356ad"
+  },
+  "product.stock.out": {
+    "message": "స్టాక్‌లో లేదు",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "product.confirmed": {
+    "message": "{time} నిర్ధారించారు",
+    "review": "reviewed",
+    "enHash": "7d1ac5a7"
+  },
+  "product.confirmedNow": {
+    "message": "ఇప్పుడే నిర్ధారించారు",
+    "review": "reviewed",
+    "enHash": "d966a28f"
+  },
+  "product.back": {
+    "message": "{shop} కి వెనక్కి",
+    "review": "reviewed",
+    "enHash": "841d2259"
+  },
+  "product.sold.by": {
+    "message": "అమ్మేవారు",
+    "review": "reviewed",
+    "enHash": "12c71f0a"
+  },
+  "product.addToCart": {
+    "message": "కార్ట్‌లో చేర్చండి",
+    "review": "reviewed",
+    "enHash": "f8893b91"
+  },
+  "product.added": {
+    "message": "{name} మీ కార్ట్‌లో చేరింది",
+    "review": "reviewed",
+    "enHash": "d89cc3a3"
+  },
+  "product.share": {
+    "message": "లింక్ కాపీ చేయండి",
+    "review": "reviewed",
+    "enHash": "2f84eea5"
+  },
+  "product.share.copied": {
+    "message": "లింక్ కాపీ అయింది",
+    "review": "reviewed",
+    "enHash": "c2e98476"
+  },
+  "product.share.failed": {
+    "message": "లింక్ కాపీ కాలేదు",
+    "review": "reviewed",
+    "enHash": "7a456d6f"
+  },
+  "product.others.title": {
+    "message": "దగ్గరి ఇతర దుకాణాలు",
+    "review": "reviewed",
+    "enHash": "7f93304b"
+  },
+  "product.gone.title": {
+    "message": "ఈ వస్తువు దొరకలేదు",
+    "review": "reviewed",
+    "enHash": "88e0e3ac"
+  },
+  "product.gone.body": {
+    "message": "దుకాణం దీన్ని తీసేసి ఉండవచ్చు.",
+    "review": "reviewed",
+    "enHash": "65f93253"
+  },
+  "product.gone.action": {
+    "message": "దుకాణానికి వెళ్లండి",
+    "review": "reviewed",
+    "enHash": "349df3f4"
+  }
+}

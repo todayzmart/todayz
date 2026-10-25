@@ -8,7 +8,7 @@ SETUP_STEPS += setup-frontend
 GEN_STEPS += gen-frontend
 CHECK_STEPS += check-frontend
 E2E_STEPS += e2e-frontend-smoke
-DEV_STEPS += dev-frontend
+DEV_STEPS += dev-i18n dev-frontend
 
 FE_SHARED := @todayz/config @todayz/tokens @todayz/i18n @todayz/telemetry
 FE_VITE := @todayz/customer @todayz/business @todayz/admin
@@ -21,7 +21,7 @@ fe_run = pnpm -C $(ROOT) $(3) $(foreach p,$(1),--filter $(p)) --if-present run $
 # app:port:package for the dev servers (fixed ports, strictPort; Caddy fronts them on 443).
 FE_DEV := customer:5301:@todayz/customer business:5302:@todayz/business admin:5303:@todayz/admin site:5304:@todayz/site
 
-.PHONY: setup-frontend gen-frontend check-frontend e2e-frontend-smoke dev-frontend \
+.PHONY: setup-frontend gen-frontend check-frontend e2e-frontend-smoke dev-i18n dev-frontend \
         check-frontend-lint check-frontend-types check-frontend-unit check-frontend-build check-frontend-size
 
 # Playwright's Chromium (headless shell) for the smoke tests. This is the only download.
@@ -69,6 +69,16 @@ e2e-frontend-smoke:
 	@$(call fe_run,$(FE_VITE),build:e2e)
 	@$(call fe_run,@todayz/site,build:e2e)
 	@$(call fe_run,$(FE_APPS),e2e:smoke,--workspace-concurrency=1)
+
+# Machine-draft translations (W4-05) show in the local stack and the e2e gate only: `make dev`
+# and `make e2e` export TODAYZ_I18N_DRAFTS=1 to every step (so `_e2e: gen` and the e2e builds
+# compile them), and dev-i18n recompiles the catalogues with drafts before the dev servers start.
+# Plain `make gen`, `make check` and the Pages build (scripts/deploy/pages.sh) ship reviewed
+# translations only; nothing unreviewed reaches prod (shared/i18n/docs/translation-workflow.md).
+dev e2e: export TODAYZ_I18N_DRAFTS := 1
+
+dev-i18n:
+	@$(call fe_run,@todayz/i18n,gen)
 
 # Dev servers under the local stack's process supervisor (W0-02).
 dev-frontend:

@@ -140,8 +140,8 @@ describe('verify-dist', () => {
       expect(checkFile('kn/index.html', '<html lang="kn-IN"></html>', prod)).toEqual([]);
       expect(checkFile('og/home.png', '', prod)).toEqual([]);
     });
-    it('treats every non-English locale as a draft today', () => {
-      expect(LOCALES.filter((l) => isMachineDraft(l))).toEqual(['hi', 'kn', 'te', 'ta']);
+    it('treats no locale as a draft since W4-05 approved them', () => {
+      expect(LOCALES.filter((l) => isMachineDraft(l))).toEqual([]);
     });
   });
 });

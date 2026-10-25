@@ -1,0 +1,512 @@
+{
+  "orders.title": {
+    "message": "ಆರ್ಡರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "cded0933"
+  },
+  "orders.tabs.label": {
+    "message": "ಆರ್ಡರ್ ಪ್ರಕಾರ",
+    "review": "reviewed",
+    "enHash": "7f77efd5"
+  },
+  "orders.tabs.online": {
+    "message": "ಆನ್‌ಲೈನ್",
+    "review": "reviewed",
+    "enHash": "c3e839df"
+  },
+  "orders.tabs.store": {
+    "message": "ಅಂಗಡಿಯಲ್ಲಿ",
+    "review": "reviewed",
+    "enHash": "1ef58227"
+  },
+  "orders.store.title": {
+    "message": "ಅಂಗಡಿ ಬಿಲ್‌ಗಳು ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿವೆ",
+    "review": "reviewed",
+    "enHash": "2aa4d33f"
+  },
+  "orders.store.body": {
+    "message": "ನೀವು ಹೋಗುವ ಅಂಗಡಿಗಳ ಬಿಲ್‌ಗಳು ಇಲ್ಲಿ ಕಾಣುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "087de36b"
+  },
+  "orders.signedOut.title": {
+    "message": "ನಿಮ್ಮ ಆರ್ಡರ್‌ಗಳನ್ನು ನೋಡಲು ಸೈನ್ ಇನ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "360bead5"
+  },
+  "orders.signedOut.body": {
+    "message": "ನಿಮ್ಮ ಆರ್ಡರ್‌ಗಳು ಮತ್ತು ಪಿಕಪ್ ಕೋಡ್‌ಗಳು ನಿಮ್ಮ ಖಾತೆಯಲ್ಲಿರುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "db1c00fe"
+  },
+  "orders.signedOut.cta": {
+    "message": "ಸೈನ್ ಇನ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "ada2e9e9"
+  },
+  "orders.empty.title": {
+    "message": "ಇನ್ನೂ ಯಾವುದೇ ಆರ್ಡರ್ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "9f61f6df"
+  },
+  "orders.empty.body": {
+    "message": "ಹತ್ತಿರದಲ್ಲಿ ಏನನ್ನಾದರೂ ಬುಕ್ ಮಾಡಿ, ಅದು ಇಲ್ಲಿ ಕಾಣುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "4b6fc830"
+  },
+  "orders.empty.cta": {
+    "message": "ಹತ್ತಿರದ ಅಂಗಡಿಗಳನ್ನು ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "ae63ad8c"
+  },
+  "orders.group.active": {
+    "message": "ನಡೆಯುತ್ತಿರುವವು",
+    "review": "reviewed",
+    "enHash": "b6bd42e4"
+  },
+  "orders.group.past": {
+    "message": "ಹಿಂದಿನವು",
+    "review": "reviewed",
+    "enHash": "13f7aee7"
+  },
+  "orders.row.meta": {
+    "message": "ಆರ್ಡರ್ {number} · {count, plural, one {# ಐಟಂ} other {# ಐಟಂಗಳು}}",
+    "review": "reviewed",
+    "enHash": "595ea451"
+  },
+  "orders.loading": {
+    "message": "ಆರ್ಡರ್‌ಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ",
+    "review": "reviewed",
+    "enHash": "58246f0e"
+  },
+  "orders.loadError": {
+    "message": "ನಿಮ್ಮ ಆರ್ಡರ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "bd6d09a0"
+  },
+  "orders.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "orders.status.placed": {
+    "message": "ಅಂಗಡಿಯ ಉತ್ತರಕ್ಕೆ ಕಾಯುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "dbe678e2"
+  },
+  "orders.status.awaiting_customer": {
+    "message": "ನಿಮ್ಮ ಉತ್ತರ ಬೇಕು",
+    "review": "reviewed",
+    "enHash": "c838ea1a"
+  },
+  "orders.status.accepted": {
+    "message": "ಒಪ್ಪಿಕೊಳ್ಳಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "orders.status.ready": {
+    "message": "ಸಿದ್ಧವಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "20c7c552"
+  },
+  "orders.status.out_for_delivery": {
+    "message": "ದಾರಿಯಲ್ಲಿದೆ",
+    "review": "reviewed",
+    "enHash": "7884d39a"
+  },
+  "orders.status.collected": {
+    "message": "ತೆಗೆದುಕೊಳ್ಳಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "5b0f7590"
+  },
+  "orders.status.delivered": {
+    "message": "ಡೆಲಿವರಿ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "eea956cd"
+  },
+  "orders.status.rejected": {
+    "message": "ನಿರಾಕರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "ff59b80f"
+  },
+  "orders.status.expired": {
+    "message": "ಸಮಯ ಮುಗಿದಿದೆ",
+    "review": "reviewed",
+    "enHash": "a689a999"
+  },
+  "orders.status.cancelled": {
+    "message": "ಕ್ಯಾನ್ಸಲ್ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "a1bf92ef"
+  },
+  "orders.status.delivery_failed": {
+    "message": "ಡೆಲಿವರಿ ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "5a954eb2"
+  },
+  "orders.detail.title": {
+    "message": "ಆರ್ಡರ್ {number}",
+    "review": "reviewed",
+    "enHash": "2daa0733"
+  },
+  "orders.placed.title": {
+    "message": "ಆರ್ಡರ್ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "bb5d68da"
+  },
+  "orders.waiting": {
+    "message": "{shop} ಒಪ್ಪಿಕೊಳ್ಳಲು ಕಾಯುತ್ತಿದೆ · {left} ಉಳಿದಿದೆ",
+    "review": "reviewed",
+    "enHash": "5fea1503"
+  },
+  "orders.waitingLong": {
+    "message": "{shop} ಒಪ್ಪಿಕೊಳ್ಳಲು ಕಾಯುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "400bdc79"
+  },
+  "orders.waiting.note": {
+    "message": "ಏನೂ ಹಣ ಕಡಿತವಾಗಿಲ್ಲ. ಅಂಗಡಿ ಉತ್ತರಿಸಿದ ತಕ್ಷಣ ನಿಮಗೆ ತಿಳಿಸುತ್ತೇವೆ.",
+    "review": "reviewed",
+    "enHash": "6c6a366f"
+  },
+  "orders.code.label": {
+    "message": "ಪಿಕಪ್ ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "28950dc9"
+  },
+  "orders.code.note": {
+    "message": "{shop} ನಲ್ಲಿ ಈ ಕೋಡ್ ತೋರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "288a7b53"
+  },
+  "orders.code.brightness": {
+    "message": "ಕೋಡ್ ಸುಲಭವಾಗಿ ಓದಲು ನಿಮ್ಮ ಸ್ಕ್ರೀನ್ ಬ್ರೈಟ್‌ನೆಸ್ ಹೆಚ್ಚಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "6e3e8674"
+  },
+  "orders.code.locked.title": {
+    "message": "ಕೋಡ್ ಲಾಕ್ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "519bcadd"
+  },
+  "orders.code.locked.body": {
+    "message": "ಕೌಂಟರ್‌ನಲ್ಲಿ ತುಂಬಾ ಬಾರಿ ತಪ್ಪು ಕೋಡ್ ಹಾಕಲಾಗಿದೆ. ಮುಂದುವರಿಯಲು ಹೊಸ ಕೋಡ್ ಪಡೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "1e8635b8"
+  },
+  "orders.code.new": {
+    "message": "ಹೊಸ ಕೋಡ್ ಪಡೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "a3ee77aa"
+  },
+  "orders.accepted.note": {
+    "message": "{shop} ನಿಮ್ಮ ಆರ್ಡರ್ ಒಪ್ಪಿಕೊಂಡಿದೆ ಮತ್ತು ನಿಮಗಾಗಿ ಇಟ್ಟುಕೊಂಡಿದೆ.",
+    "review": "reviewed",
+    "enHash": "335f3a2a"
+  },
+  "orders.ready.note": {
+    "message": "ನಿಮ್ಮ ಆರ್ಡರ್ {shop} ನಲ್ಲಿ ಸಿದ್ಧವಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "ec74cacd"
+  },
+  "orders.hold": {
+    "message": "ನಿಮಗಾಗಿ ಇಡಲಾಗಿದೆ · {left} ಉಳಿದಿದೆ",
+    "review": "reviewed",
+    "enHash": "eb3928c3"
+  },
+  "orders.hold.over": {
+    "message": "ಇಟ್ಟುಕೊಳ್ಳುವ ಸಮಯ ಮುಗಿದಿದೆ.",
+    "review": "reviewed",
+    "enHash": "e7808725"
+  },
+  "orders.extend": {
+    "message": "ನಾನು ದಾರಿಯಲ್ಲಿದ್ದೇನೆ (+10 ನಿಮಿಷ)",
+    "review": "reviewed",
+    "enHash": "3a45d2cb"
+  },
+  "orders.extend.done": {
+    "message": "10 ನಿಮಿಷ ಸೇರಿಸಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "caf0f39e"
+  },
+  "orders.extend.used": {
+    "message": "ಈ ಆರ್ಡರ್‌ಗೆ ನೀವು ಈಗಾಗಲೇ ಸಮಯ ಸೇರಿಸಿದ್ದೀರಿ.",
+    "review": "reviewed",
+    "enHash": "596630ff"
+  },
+  "orders.directions": {
+    "message": "ದಾರಿ",
+    "review": "reviewed",
+    "enHash": "f814a9fb"
+  },
+  "orders.actionError": {
+    "message": "ಅದು ಆಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "e5e00d17"
+  },
+  "orders.timeline.label": {
+    "message": "ಆರ್ಡರ್ ಎಲ್ಲಿಯವರೆಗೆ ಬಂದಿದೆ",
+    "review": "reviewed",
+    "enHash": "fcbc4a3a"
+  },
+  "orders.timeline.done": {
+    "message": "ಆಯಿತು",
+    "review": "reviewed",
+    "enHash": "e9b450d1"
+  },
+  "orders.timeline.upcoming": {
+    "message": "ಮುಂದಿನದು",
+    "review": "reviewed",
+    "enHash": "bc981983"
+  },
+  "orders.timeline.failed": {
+    "message": "ಪೂರ್ಣವಾಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "a9166287"
+  },
+  "orders.step.placed": {
+    "message": "ಆರ್ಡರ್ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "bb5d68da"
+  },
+  "orders.step.accepted": {
+    "message": "ಅಂಗಡಿ ಒಪ್ಪಿಕೊಂಡಿದೆ",
+    "review": "reviewed",
+    "enHash": "0dbdd9b3"
+  },
+  "orders.step.ready": {
+    "message": "ತೆಗೆದುಕೊಳ್ಳಲು ಸಿದ್ಧ",
+    "review": "reviewed",
+    "enHash": "26d1c653"
+  },
+  "orders.step.collected": {
+    "message": "ತೆಗೆದುಕೊಳ್ಳಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "5b0f7590"
+  },
+  "orders.items.label": {
+    "message": "ಈ ಆರ್ಡರ್‌ನ ವಸ್ತುಗಳು",
+    "review": "reviewed",
+    "enHash": "a8022691"
+  },
+  "orders.collected.title": {
+    "message": "ಆರ್ಡರ್ ಪೂರ್ಣವಾಯಿತು",
+    "review": "reviewed",
+    "enHash": "cd00866a"
+  },
+  "orders.again": {
+    "message": "ಈ ಅಂಗಡಿಯಿಂದ ಮತ್ತೆ ಆರ್ಡರ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "cce0300b"
+  },
+  "orders.findElsewhere": {
+    "message": "ಬೇರೆ ಅಂಗಡಿ ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "2e88b7b6"
+  },
+  "orders.outcome.rejected": {
+    "message": "{shop} ಈ ಆರ್ಡರ್ ತೆಗೆದುಕೊಳ್ಳಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "c52431a8"
+  },
+  "orders.outcome.expired": {
+    "message": "{shop} ಸಮಯಕ್ಕೆ ಉತ್ತರಿಸಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "c6dd94ef"
+  },
+  "orders.outcome.cancelled": {
+    "message": "ಈ ಆರ್ಡರ್ ಕ್ಯಾನ್ಸಲ್ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "a929b876"
+  },
+  "orders.outcome.delivery_failed": {
+    "message": "ಈ ಆರ್ಡರ್ ಡೆಲಿವರಿ ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "fb3b71a2"
+  },
+  "orders.limit.title": {
+    "message": "ಸದ್ಯಕ್ಕೆ ಆರ್ಡರ್ ಮಾಡುವುದಕ್ಕೆ ಮಿತಿ ಇದೆ",
+    "review": "reviewed",
+    "enHash": "b2afda5a"
+  },
+  "orders.limit.body": {
+    "message": "ನೀವು ಹಲವು ಬಾರಿ ಪಿಕಪ್ ಮಾಡಿಲ್ಲ, ಹಾಗಾಗಿ {date} ವರೆಗೆ ಒಂದೇ ಸಮಯದಲ್ಲಿ {max, plural, one {ಒಂದು ಆರ್ಡರ್ ಮಾತ್ರ} other {# ಆರ್ಡರ್‌ಗಳು}} ತೆರೆದಿರಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "8d1ad358"
+  },
+  "orders.partial.title": {
+    "message": "{shop} ನಿಮ್ಮ ಆರ್ಡರ್ ಬದಲಿಸಿದೆ",
+    "review": "reviewed",
+    "enHash": "d708f1aa"
+  },
+  "orders.partial.body": {
+    "message": "{shop} ಎಲ್ಲವನ್ನೂ ಕೊಡಲು ಆಗಲಿಲ್ಲ. ಬದಲಾವಣೆಗಳನ್ನು ನೋಡಿ, ಆರ್ಡರ್ ತೆಗೆದುಕೊಳ್ಳಿ ಅಥವಾ ಕ್ಯಾನ್ಸಲ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "baa8947b"
+  },
+  "orders.partial.none": {
+    "message": "ಲಭ್ಯವಿಲ್ಲ. ನೀವು {wanted} ಕೇಳಿದ್ದೀರಿ.",
+    "review": "reviewed",
+    "enHash": "352b8ded"
+  },
+  "orders.partial.fewer": {
+    "message": "{wanted} ಬದಲು {got}",
+    "review": "reviewed",
+    "enHash": "e1e12c18"
+  },
+  "orders.partial.items": {
+    "message": "ವಸ್ತುಗಳು",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "orders.partial.fee": {
+    "message": "ಡೆಲಿವರಿ ಶುಲ್ಕ",
+    "review": "reviewed",
+    "enHash": "733b6148"
+  },
+  "orders.partial.credits": {
+    "message": "ಬಳಸಿದ ಕ್ರೆಡಿಟ್",
+    "review": "reviewed",
+    "enHash": "385686f7"
+  },
+  "orders.partial.total": {
+    "message": "ಹೊಸ ಒಟ್ಟು",
+    "review": "reviewed",
+    "enHash": "ff02751a"
+  },
+  "orders.partial.left": {
+    "message": "{left} ಒಳಗೆ ಖಚಿತಪಡಿಸಿ",
+    "review": "reviewed",
+    "enHash": "c6052032"
+  },
+  "orders.partial.over": {
+    "message": "ಬದಲಾದ ಆರ್ಡರ್ ಸಮಯಕ್ಕೆ ಖಚಿತವಾಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "0b8be72b"
+  },
+  "orders.partial.late": {
+    "message": "ಈ ಆರ್ಡರ್ ಮತ್ತೆ ಬದಲಾಗಿದೆ. ಪುಟದಲ್ಲಿ ಇತ್ತೀಚಿನ ಮಾಹಿತಿ ಇದೆ.",
+    "review": "reviewed",
+    "enHash": "1eb7b376"
+  },
+  "orders.partial.confirm": {
+    "message": "ತೆಗೆದುಕೊಳ್ಳಿ · {total}",
+    "review": "reviewed",
+    "enHash": "3d78bd7c"
+  },
+  "orders.partial.decline": {
+    "message": "ಆರ್ಡರ್ ಕ್ಯಾನ್ಸಲ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "5ae39c4a"
+  },
+  "orders.reason.partial_timeout": {
+    "message": "ಬದಲಾದ ಆರ್ಡರ್ ಸಮಯಕ್ಕೆ ಖಚಿತವಾಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "0b8be72b"
+  },
+  "orders.reason.declined_partial": {
+    "message": "ನೀವು ಬದಲಾದ ಆರ್ಡರ್ ಕ್ಯಾನ್ಸಲ್ ಮಾಡಿದಿರಿ.",
+    "review": "reviewed",
+    "enHash": "e235344e"
+  },
+  "orders.reason.out_of_stock": {
+    "message": "ಕೆಲವು ವಸ್ತುಗಳು ಸ್ಟಾಕ್‌ನಲ್ಲಿರಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "de1eaf5a"
+  },
+  "orders.reason.closing_soon": {
+    "message": "ಅಂಗಡಿ ಬೇಗ ಮುಚ್ಚುತ್ತಿತ್ತು.",
+    "review": "reviewed",
+    "enHash": "a3c1d92e"
+  },
+  "orders.reason.too_busy": {
+    "message": "ಅಂಗಡಿ ತುಂಬಾ ಬ್ಯುಸಿಯಾಗಿತ್ತು.",
+    "review": "reviewed",
+    "enHash": "6619752e"
+  },
+  "orders.reason.other": {
+    "message": "ಬೇರೆ ಕಾರಣ.",
+    "review": "reviewed",
+    "enHash": "165e1b4a"
+  },
+  "orders.reason.changed_mind": {
+    "message": "ನೀವು ಮನಸ್ಸು ಬದಲಿಸಿದಿರಿ.",
+    "review": "reviewed",
+    "enHash": "72a98cc7"
+  },
+  "orders.reason.too_slow": {
+    "message": "ತುಂಬಾ ತಡವಾಗುತ್ತಿತ್ತು.",
+    "review": "reviewed",
+    "enHash": "098eebd8"
+  },
+  "orders.reason.no_response": {
+    "message": "ಅಂಗಡಿ ಉತ್ತರಿಸಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "731bf199"
+  },
+  "orders.cancel": {
+    "message": "ಆರ್ಡರ್ ಕ್ಯಾನ್ಸಲ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "5ae39c4a"
+  },
+  "orders.cancel.title": {
+    "message": "ಈ ಆರ್ಡರ್ ಕ್ಯಾನ್ಸಲ್ ಮಾಡಬೇಕೇ?",
+    "review": "reviewed",
+    "enHash": "e0d45206"
+  },
+  "orders.cancel.body": {
+    "message": "ಅಂಗಡಿ ಅದನ್ನು ಸಿದ್ಧಪಡಿಸುವುದನ್ನು ನಿಲ್ಲಿಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "0e07b9c9"
+  },
+  "orders.cancel.why": {
+    "message": "ನೀವು ಯಾಕೆ ಕ್ಯಾನ್ಸಲ್ ಮಾಡುತ್ತಿದ್ದೀರಿ?",
+    "review": "reviewed",
+    "enHash": "6133e7de"
+  },
+  "orders.cancel.reason.changed_mind": {
+    "message": "ನಾನು ಮನಸ್ಸು ಬದಲಿಸಿದೆ",
+    "review": "reviewed",
+    "enHash": "8bc3b888"
+  },
+  "orders.cancel.reason.too_slow": {
+    "message": "ಅಂಗಡಿ ತುಂಬಾ ತಡ ಮಾಡುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "547c3220"
+  },
+  "orders.cancel.reason.declined_partial": {
+    "message": "ನನಗೆ ಬದಲಾದ ಆರ್ಡರ್ ಬೇಡ",
+    "review": "reviewed",
+    "enHash": "e5184f50"
+  },
+  "orders.cancel.reason.other": {
+    "message": "ಬೇರೆ ಏನೋ",
+    "review": "reviewed",
+    "enHash": "48f88ac3"
+  },
+  "orders.cancel.note": {
+    "message": "ಏನಾಯಿತು ಎಂದು ನಮಗೆ ತಿಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "52f84f8e"
+  },
+  "orders.cancel.keep": {
+    "message": "ಆರ್ಡರ್ ಇರಲಿ",
+    "review": "reviewed",
+    "enHash": "3017312f"
+  },
+  "orders.cancel.confirm": {
+    "message": "ಆರ್ಡರ್ ಕ್ಯಾನ್ಸಲ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "5ae39c4a"
+  },
+  "orders.cancel.error": {
+    "message": "ಆರ್ಡರ್ ಕ್ಯಾನ್ಸಲ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "aa980a9a"
+  },
+  "orders.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  }
+}

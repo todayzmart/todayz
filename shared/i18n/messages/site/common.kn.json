@@ -1,252 +1,252 @@
 {
   "nav.retailers": {
     "message": "ಅಂಗಡಿಗಳಿಗಾಗಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "673d17e5"
   },
   "nav.shoppers": {
     "message": "ಗ್ರಾಹಕರಿಗಾಗಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b88dfd14"
   },
   "nav.how": {
     "message": "ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1dd6a17c"
   },
   "nav.pricing": {
     "message": "ಬೆಲೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a0d9bbad"
   },
   "nav.about": {
     "message": "ನಮ್ಮ ಬಗ್ಗೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6b21fb79"
   },
   "nav.contact": {
     "message": "ಸಂಪರ್ಕ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b37456c4"
   },
   "nav.cta": {
     "message": "ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು TodayZ ನಲ್ಲಿ ಸೇರಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c24d8be6"
   },
   "nav.menu": {
     "message": "ಮೆನು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "57f5f5ef"
   },
   "a11y.skip": {
     "message": "ನೇರವಾಗಿ ವಿಷಯಕ್ಕೆ ಹೋಗಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0a4470d6"
   },
   "a11y.language": {
     "message": "ಭಾಷೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "89b86ab0"
   },
   "a11y.home": {
     "message": "TodayZ ಮುಖಪುಟ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7365855c"
   },
   "draft.notice": {
     "message": "ಈ ಪುಟ ಯಂತ್ರ ಅನುವಾದವಾಗಿದ್ದು ಇನ್ನೂ ಪರಿಶೀಲನೆಗಾಗಿ ಕಾಯುತ್ತಿದೆ. ಇಂಗ್ಲಿಷ್ ಪುಟವೇ ಮೂಲ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d1b692d6"
   },
   "draft.switch": {
     "message": "ಇಂಗ್ಲಿಷ್ ಪುಟ ಓದಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a0390598"
   },
   "footer.tagline": {
     "message": "ಸುತ್ತಲಿನ ನಿಜ ಜಗತ್ತನ್ನು ಹುಡುಕಬಹುದಾಗಿಸುವುದು.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d87dd890"
   },
   "footer.company": {
     "message": "ಕಂಪನಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7a199499"
   },
   "footer.legal": {
     "message": "ಕಾನೂನು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "902c91d9"
   },
   "footer.privacy": {
     "message": "ಗೌಪ್ಯತೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cf01481f"
   },
   "footer.terms_shoppers": {
     "message": "ಗ್ರಾಹಕರಿಗೆ ನಿಯಮಗಳು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1ed20291"
   },
   "footer.terms_shops": {
     "message": "ಅಂಗಡಿಗಳಿಗೆ ನಿಯಮಗಳು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "43b1e64b"
   },
   "footer.refunds": {
     "message": "ಮರುಪಾವತಿ ಮತ್ತು ಕ್ರೆಡಿಟ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1f2dac46"
   },
   "footer.copy": {
     "message": "© {year} TodayZ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "04b1a988"
   },
   "lead.title": {
     "message": "ನಿಮ್ಮ ಅಂಗಡಿಯ ಬಗ್ಗೆ ಹೇಳಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "709fb0ad"
   },
   "lead.intro": {
     "message": "ನಿಮ್ಮ ವಿವರಗಳನ್ನು ಬಿಡಿ, TodayZ ತಂಡ ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸುತ್ತದೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d4d02e2c"
   },
   "lead.name": {
     "message": "ನಿಮ್ಮ ಹೆಸರು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ab42293e"
   },
   "lead.shop": {
     "message": "ಅಂಗಡಿಯ ಹೆಸರು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6a5cc02e"
   },
   "lead.phone": {
     "message": "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8e5c12de"
   },
   "lead.city": {
     "message": "ನಗರ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4271627f"
   },
   "lead.submit": {
     "message": "ವಿವರ ಕಳುಹಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "08568274"
   },
   "lead.sending": {
     "message": "ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ…",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cf765512"
   },
   "lead.success": {
     "message": "ಧನ್ಯವಾದಗಳು. ನಿಮ್ಮ ವಿವರಗಳು ನಮಗೆ ಸಿಕ್ಕಿವೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3ec987c4"
   },
   "lead.error": {
     "message": "ಏನೋ ತಪ್ಪಾಯಿತು. ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c9e1a4fb"
   },
   "lead.err_name": {
     "message": "ನಿಮ್ಮ ಹೆಸರು ನಮೂದಿಸಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "dacddcd9"
   },
   "lead.err_shop": {
     "message": "ಅಂಗಡಿಯ ಹೆಸರು ನಮೂದಿಸಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "00a41eb3"
   },
   "lead.err_phone": {
     "message": "10 ಅಂಕಿಗಳ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a2dd77f6"
   },
   "lead.err_city": {
     "message": "ನಿಮ್ಮ ನಗರ ನಮೂದಿಸಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "91141962"
   },
   "lead.err_captcha": {
     "message": "ದಯವಿಟ್ಟು ಮೇಲಿನ ಪರಿಶೀಲನೆ ಪೂರ್ಣಗೊಳಿಸಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "52b00d89"
   },
   "lead.consent": {
     "message": "ಈ ವಿವರಗಳನ್ನು TodayZ ಬಗ್ಗೆ ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಲು ಮಾತ್ರ ಬಳಸುತ್ತೇವೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5c1c2ace"
   },
   "nav.start": {
     "message": "ಪ್ರಾರಂಭಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "90e40d50"
   },
   "nav.login": {
     "message": "ಲಾಗ್ ಇನ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f7c400ed"
   },
   "nav.english_only": {
     "message": "ಇಂಗ್ಲಿಷ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "649df08a"
   },
   "cta.eyebrow": {
     "message": "ಪ್ರಾರಂಭಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "90e40d50"
   },
   "cta.title": {
     "message": "ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ಇಂದೇ ಆನ್‌ಲೈನ್‌ಗೆ ತನ್ನಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4aab645b"
   },
   "cta.body": {
     "message": "ನಿಮ್ಮ ವಿವರಗಳನ್ನು ಬಿಡಿ, ಅಂಗಡಿ ಸೆಟಪ್ ಮಾಡಲು TodayZ ತಂಡ ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸುತ್ತದೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4931e9ff"
   },
   "cta.tick.1": {
     "message": "ಅಂಗಡಿಗಳಿಗೆ ಉಚಿತ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a2839388"
   },
   "cta.tick.2": {
     "message": "ಕೆಲವು ಐಟಂಗಳಿಂದ ಶುರು ಮಾಡಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9e8a5dec"
   },
   "cta.tick.3": {
     "message": "ಆ್ಯಪ್ ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "dfe5627d"
   },
   "lead.err_rejected": {
     "message": "ಈ ವಿವರಗಳನ್ನು ಸ್ವೀಕರಿಸಲು ಆಗಲಿಲ್ಲ. ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d7e0a3cb"
   },
   "lead.nojs": {
     "message": "ಈ ಫಾರ್ಮ್‌ಗೆ JavaScript ಬೇಕು. ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಅದನ್ನು ಆನ್ ಮಾಡಿ ಪುಟವನ್ನು ಮತ್ತೆ ತೆರೆಯಿರಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7d142906"
   },
   "nav.label": {
     "message": "ಮುಖ್ಯ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "62bce942"
   },
   "lead.err_captcha_load": {
     "message": "ಭದ್ರತಾ ಪರಿಶೀಲನೆ ಲೋಡ್ ಆಗಲಿಲ್ಲ. ಪುಟವನ್ನು ಮರುಲೋಡ್ ಮಾಡಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "15c3e9e7"
   }
 }

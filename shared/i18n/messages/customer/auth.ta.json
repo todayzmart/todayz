@@ -1,0 +1,412 @@
+{
+  "app.offline.title": {
+    "message": "நீங்கள் ஆஃப்லைனில் உள்ளீர்கள்.",
+    "review": "reviewed",
+    "enHash": "4a2a6452"
+  },
+  "app.offline.body": {
+    "message": "சேமித்த பக்கங்கள் இன்னும் திறக்கும். மீண்டும் ஆன்லைனுக்கு வந்ததும் எல்லாம் அப்டேட் ஆகும்.",
+    "review": "reviewed",
+    "enHash": "6019fada"
+  },
+  "app.pending.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "app.update.message": {
+    "message": "TodayZ-இன் புதிய வெர்ஷன் தயார்.",
+    "review": "reviewed",
+    "enHash": "d7dccfc5"
+  },
+  "app.update.action": {
+    "message": "அப்டேட் செய்",
+    "review": "reviewed",
+    "enHash": "fb91e24f"
+  },
+  "app.error.title": {
+    "message": "ஏதோ தவறு நடந்தது",
+    "review": "reviewed",
+    "enHash": "8d886c0b"
+  },
+  "app.error.body": {
+    "message": "மீண்டும் முயலவும். இப்படியே நடந்தால், பக்கத்தை ரீலோட் செய்யவும்.",
+    "review": "reviewed",
+    "enHash": "f081bc24"
+  },
+  "app.error.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "auth.signIn.title": {
+    "message": "சைன் இன்",
+    "review": "reviewed",
+    "enHash": "ada2e9e9"
+  },
+  "auth.signIn.sub": {
+    "message": "உங்கள் மொபைல் எண்ணைத் தரவும். SMS மூலம் ஒரு கோடு அனுப்புவோம்.",
+    "review": "reviewed",
+    "enHash": "64b55666"
+  },
+  "auth.phone.label": {
+    "message": "மொபைல் எண்",
+    "review": "reviewed",
+    "enHash": "8e5c12de"
+  },
+  "auth.phone.help": {
+    "message": "உங்களை சைன் இன் செய்யவும், ஆர்டர் அப்டேட்டுகளுக்கும் இதைப் பயன்படுத்துவோம்.",
+    "review": "reviewed",
+    "enHash": "c656d92e"
+  },
+  "auth.phone.invalid": {
+    "message": "6, 7, 8 அல்லது 9 இல் தொடங்கும் 10 இலக்க மொபைல் எண்ணைத் தரவும்.",
+    "review": "reviewed",
+    "enHash": "6be55a3e"
+  },
+  "auth.code.send": {
+    "message": "கோடு அனுப்பு",
+    "review": "reviewed",
+    "enHash": "313503fa"
+  },
+  "auth.code.sending": {
+    "message": "கோடு அனுப்புகிறோம்",
+    "review": "reviewed",
+    "enHash": "28de53b3"
+  },
+  "auth.code.label": {
+    "message": "6 இலக்க கோடைத் தரவும்",
+    "review": "reviewed",
+    "enHash": "d148321a"
+  },
+  "auth.code.digit": {
+    "message": "இலக்கம் {position}",
+    "review": "reviewed",
+    "enHash": "1e73e888"
+  },
+  "auth.code.sentTo": {
+    "message": "{phone} க்கு கோடு அனுப்பினோம்.",
+    "review": "reviewed",
+    "enHash": "c8aa6d25"
+  },
+  "auth.code.verifying": {
+    "message": "கோடைச் சரிபார்க்கிறோம்",
+    "review": "reviewed",
+    "enHash": "90adc49f"
+  },
+  "auth.code.resend": {
+    "message": "கோடை மீண்டும் அனுப்பு",
+    "review": "reviewed",
+    "enHash": "1d3cb8a9"
+  },
+  "auth.code.resendIn": {
+    "message": "{seconds} s இல் மீண்டும் அனுப்பலாம்",
+    "review": "reviewed",
+    "enHash": "f0589eca"
+  },
+  "auth.code.change": {
+    "message": "எண்ணை மாற்று",
+    "review": "reviewed",
+    "enHash": "6c3b4080"
+  },
+  "auth.error.wrongCode": {
+    "message": "அந்தக் கோடு சரியில்லை. சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "47948633"
+  },
+  "auth.error.expired": {
+    "message": "அந்தக் கோடு காலாவதியானது. புதிய கோடு கேட்கவும்.",
+    "review": "reviewed",
+    "enHash": "6a90a6f9"
+  },
+  "auth.error.locked": {
+    "message": "பல முறை தவறான கோடு. புதிய கோடு கேட்கவும்.",
+    "review": "reviewed",
+    "enHash": "371d1276"
+  },
+  "auth.error.rateLimited": {
+    "message": "பல முயற்சிகள் ஆகிவிட்டன. சிறிது நேரம் கழித்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "c32bd496"
+  },
+  "auth.error.blocked": {
+    "message": "இந்தக் கணக்கு இப்போது சைன் இன் செய்ய முடியாது. சப்போர்ட்டைத் தொடர்பு கொள்ளவும்.",
+    "review": "reviewed",
+    "enHash": "10997ecd"
+  },
+  "auth.error.network": {
+    "message": "TodayZ-ஐ அடைய முடியவில்லை. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "470230be"
+  },
+  "auth.error.generic": {
+    "message": "ஏதோ தவறு நடந்தது. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "9a3ea059"
+  },
+  "auth.error.captcha": {
+    "message": "நீங்கள் மனிதர் என்பதைச் சரிபார்க்க முடியவில்லை. பக்கத்தை ரீலோட் செய்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "bc612d87"
+  },
+  "auth.welcome.title": {
+    "message": "TodayZ-க்கு வரவேற்கிறோம்",
+    "review": "reviewed",
+    "enHash": "941d65fc"
+  },
+  "auth.welcome.sub": {
+    "message": "கடைகள் உங்களை எந்தப் பெயரில் அழைக்க வேண்டும் என்று சொல்லுங்கள். இதைத் தவிர்க்கலாம்.",
+    "review": "reviewed",
+    "enHash": "9856b46a"
+  },
+  "auth.welcome.name": {
+    "message": "உங்கள் பெயர் (விருப்பம்)",
+    "review": "reviewed",
+    "enHash": "32861acd"
+  },
+  "auth.welcome.continue": {
+    "message": "தொடரவும்",
+    "review": "reviewed",
+    "enHash": "2e026239"
+  },
+  "auth.welcome.skip": {
+    "message": "இப்போதைக்குத் தவிர்",
+    "review": "reviewed",
+    "enHash": "6fc09607"
+  },
+  "auth.welcome.error": {
+    "message": "உங்கள் பெயரைச் சேமிக்க முடியவில்லை. பிறகு “கணக்கு” இல் சேர்க்கலாம்.",
+    "review": "reviewed",
+    "enHash": "b471ab4d"
+  },
+  "lang.title": {
+    "message": "உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "1ee9cc37"
+  },
+  "lang.sub": {
+    "message": "“கணக்கு” இல் எப்போது வேண்டுமானாலும் மாற்றலாம்.",
+    "review": "reviewed",
+    "enHash": "47df9e8c"
+  },
+  "lang.group": {
+    "message": "மொழி",
+    "review": "reviewed",
+    "enHash": "89b86ab0"
+  },
+  "lang.name.en": {
+    "message": "ஆங்கிலம்",
+    "review": "reviewed",
+    "enHash": "649df08a"
+  },
+  "lang.name.hi": {
+    "message": "இந்தி",
+    "review": "reviewed",
+    "enHash": "c9e6b253"
+  },
+  "lang.name.kn": {
+    "message": "கன்னடம்",
+    "review": "reviewed",
+    "enHash": "c3ed6655"
+  },
+  "lang.name.te": {
+    "message": "தெலுங்கு",
+    "review": "reviewed",
+    "enHash": "ea6c0346"
+  },
+  "lang.name.ta": {
+    "message": "தமிழ்",
+    "review": "reviewed",
+    "enHash": "86c2b627"
+  },
+  "lang.continue": {
+    "message": "தொடரவும்",
+    "review": "reviewed",
+    "enHash": "2e026239"
+  },
+  "lang.skip": {
+    "message": "தவிர்",
+    "review": "reviewed",
+    "enHash": "3da47453"
+  },
+  "location.title": {
+    "message": "எங்கே தேட வேண்டும்?",
+    "review": "reviewed",
+    "enHash": "78c38f9c"
+  },
+  "location.sub": {
+    "message": "இந்த இடத்துக்கு அருகில் உள்ள கடைகளையும் ஸ்டாக்கையும் காட்டுவோம்.",
+    "review": "reviewed",
+    "enHash": "7bd0799d"
+  },
+  "location.gps.title": {
+    "message": "என் தற்போதைய இருப்பிடத்தைப் பயன்படுத்து",
+    "review": "reviewed",
+    "enHash": "9aee0641"
+  },
+  "location.gps.explain": {
+    "message": "உங்கள் பிரவுசர் இருப்பிடத்தைப் பகிரக் கேட்கும். உங்கள் அருகில் உள்ள கடைகளைக் கண்டுபிடிக்க மட்டுமே அதைப் பயன்படுத்துவோம்.",
+    "review": "reviewed",
+    "enHash": "aaf1690a"
+  },
+  "location.gps.button": {
+    "message": "என் இருப்பிடத்தைப் பகிர்",
+    "review": "reviewed",
+    "enHash": "fb3c7092"
+  },
+  "location.gps.locating": {
+    "message": "உங்கள் இருப்பிடத்தைக் கண்டுபிடிக்கிறோம்",
+    "review": "reviewed",
+    "enHash": "4bd91431"
+  },
+  "location.gps.denied": {
+    "message": "TodayZ-க்கு இருப்பிடம் ஆஃப் ஆக உள்ளது. அதற்குப் பதில் உங்கள் PIN கோடைத் தரவும்.",
+    "review": "reviewed",
+    "enHash": "f054ea82"
+  },
+  "location.gps.unavailable": {
+    "message": "உங்கள் இருப்பிடத்தைக் கண்டுபிடிக்க முடியவில்லை. அதற்குப் பதில் உங்கள் PIN கோடைத் தரவும்.",
+    "review": "reviewed",
+    "enHash": "1f4ba08f"
+  },
+  "location.gps.label": {
+    "message": "தற்போதைய இருப்பிடம்",
+    "review": "reviewed",
+    "enHash": "75ea6a18"
+  },
+  "location.pin.title": {
+    "message": "PIN கோடைத் தரவும்",
+    "review": "reviewed",
+    "enHash": "58808d4f"
+  },
+  "location.pin.label": {
+    "message": "PIN கோடு",
+    "review": "reviewed",
+    "enHash": "3c52e572"
+  },
+  "location.pin.help": {
+    "message": "6 இலக்கங்கள்",
+    "review": "reviewed",
+    "enHash": "ab7fee7a"
+  },
+  "location.pin.invalid": {
+    "message": "6 இலக்க PIN கோடைத் தரவும்.",
+    "review": "reviewed",
+    "enHash": "b8ed22d9"
+  },
+  "location.pin.save": {
+    "message": "இந்த PIN கோடைப் பயன்படுத்து",
+    "review": "reviewed",
+    "enHash": "08e45709"
+  },
+  "location.pin.saved": {
+    "message": "PIN {pin}",
+    "review": "reviewed",
+    "enHash": "61d3ad30"
+  },
+  "location.search.title": {
+    "message": "உங்கள் பகுதியைத் தேடவும்",
+    "review": "reviewed",
+    "enHash": "df3ba7c9"
+  },
+  "location.search.soon": {
+    "message": "பகுதி தேடல் விரைவில் வரும். இப்போதைக்கு உங்கள் PIN கோடைப் பயன்படுத்தவும்.",
+    "review": "reviewed",
+    "enHash": "06cde99d"
+  },
+  "location.current": {
+    "message": "{place} அருகில் ஷாப்பிங்",
+    "review": "reviewed",
+    "enHash": "ef0894d4"
+  },
+  "location.set": {
+    "message": "உங்கள் இருப்பிடத்தை அமைக்கவும்",
+    "review": "reviewed",
+    "enHash": "bd10f419"
+  },
+  "account.title": {
+    "message": "கணக்கு",
+    "review": "reviewed",
+    "enHash": "85dfa32c"
+  },
+  "account.signedOut.title": {
+    "message": "TodayZ-இல் சைன் இன் செய்யவும்",
+    "review": "reviewed",
+    "enHash": "f9480b08"
+  },
+  "account.signedOut.body": {
+    "message": "பொருட்களை புக் செய்ய, உங்கள் ஆர்டர்களைப் பார்க்க, உங்கள் வாலெட்டை வைத்திருக்க சைன் இன் செய்யவும்.",
+    "review": "reviewed",
+    "enHash": "2bd55cd8"
+  },
+  "account.signIn": {
+    "message": "சைன் இன்",
+    "review": "reviewed",
+    "enHash": "ada2e9e9"
+  },
+  "account.loading": {
+    "message": "உங்கள் கணக்கு லோட் ஆகிறது",
+    "review": "reviewed",
+    "enHash": "f6f58e00"
+  },
+  "account.loadError": {
+    "message": "உங்கள் கணக்கை லோட் செய்ய முடியவில்லை. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "93afdf48"
+  },
+  "account.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "account.name.label": {
+    "message": "பெயர்",
+    "review": "reviewed",
+    "enHash": "709a2322"
+  },
+  "account.name.save": {
+    "message": "சேமி",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "account.name.saved": {
+    "message": "சேமிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "c0ae8f6e"
+  },
+  "account.name.conflict": {
+    "message": "உங்கள் விவரங்கள் வேறு சாதனத்தில் மாறின. மீண்டும் லோட் செய்தோம். மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "3e1db0b1"
+  },
+  "account.name.error": {
+    "message": "அதைச் சேமிக்க முடியவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "b1ecaf57"
+  },
+  "account.phone": {
+    "message": "மொபைல் எண்",
+    "review": "reviewed",
+    "enHash": "8e5c12de"
+  },
+  "account.language": {
+    "message": "மொழி",
+    "review": "reviewed",
+    "enHash": "89b86ab0"
+  },
+  "account.location": {
+    "message": "இருப்பிடம்",
+    "review": "reviewed",
+    "enHash": "d219c681"
+  },
+  "account.change": {
+    "message": "மாற்று",
+    "review": "reviewed",
+    "enHash": "64fbd995"
+  },
+  "account.signOut": {
+    "message": "சைன் அவுட்",
+    "review": "reviewed",
+    "enHash": "dc1649a1"
+  }
+}

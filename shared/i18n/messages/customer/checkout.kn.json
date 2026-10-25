@@ -1,0 +1,132 @@
+{
+  "checkout.title": {
+    "message": "ಚೆಕ್‌ಔಟ್",
+    "review": "reviewed",
+    "enHash": "3ac8e9e5"
+  },
+  "checkout.loading": {
+    "message": "ನಿಮ್ಮ ಅಂತಿಮ ಬೆಲೆ ಪಡೆಯುತ್ತಿದ್ದೇವೆ",
+    "review": "reviewed",
+    "enHash": "aa803be7"
+  },
+  "checkout.pickup.label": {
+    "message": "ಪಿಕಪ್",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "checkout.pickup.title": {
+    "message": "ಅಂಗಡಿಯಿಂದ ತೆಗೆದುಕೊಳ್ಳಿ",
+    "review": "reviewed",
+    "enHash": "0932df77"
+  },
+  "checkout.review.label": {
+    "message": "ಆರ್ಡರ್ ಸಾರಾಂಶ",
+    "review": "reviewed",
+    "enHash": "db14f498"
+  },
+  "checkout.review.title": {
+    "message": "ನಿಮ್ಮ ಆರ್ಡರ್",
+    "review": "reviewed",
+    "enHash": "d2467b40"
+  },
+  "checkout.payNote": {
+    "message": "ತೆಗೆದುಕೊಳ್ಳುವಾಗ ಅಂಗಡಿಯಲ್ಲಿ ಹಣ ಕೊಡಿ. ಈಗ ಏನೂ ಕಡಿತವಾಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "926a2db6"
+  },
+  "checkout.placing": {
+    "message": "ಆರ್ಡರ್ ಮಾಡಲಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "690ad028"
+  },
+  "checkout.place": {
+    "message": "ಆರ್ಡರ್ ಮಾಡಿ · {total}",
+    "review": "reviewed",
+    "enHash": "e92a92f1"
+  },
+  "checkout.accept": {
+    "message": "ಹೊಸ ಒಟ್ಟು ಒಪ್ಪಿ · {total}",
+    "review": "reviewed",
+    "enHash": "186c12fa"
+  },
+  "checkout.hoursToday": {
+    "message": "ಅಂಗಡಿ ಈಗ ಮುಚ್ಚಿದೆ. ಇಂದಿನ ಸಮಯ: {hours}. ನಿಮ್ಮ ಕಾರ್ಟ್ ಹಾಗೆಯೇ ಇದೆ.",
+    "review": "reviewed",
+    "enHash": "cfb7d4d9"
+  },
+  "checkout.closedToday": {
+    "message": "ಅಂಗಡಿ ಇಂದು ಮುಚ್ಚಿದೆ. ನಿಮ್ಮ ಕಾರ್ಟ್ ಹಾಗೆಯೇ ಇದೆ.",
+    "review": "reviewed",
+    "enHash": "f9683a6c"
+  },
+  "checkout.cartKept": {
+    "message": "ನಿಮ್ಮ ಕಾರ್ಟ್ ಹಾಗೆಯೇ ಇದೆ.",
+    "review": "reviewed",
+    "enHash": "8161928a"
+  },
+  "checkout.priceChanged.title": {
+    "message": "ಒಟ್ಟು ಮೊತ್ತ ಬದಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "07a22be8"
+  },
+  "checkout.priceChanged.body": {
+    "message": "ನೀವು ಈ ವಸ್ತುಗಳನ್ನು ಸೇರಿಸಿದ ನಂತರ ಬೆಲೆ ಅಥವಾ ಸ್ಟಾಕ್ ಬದಲಾಗಿದೆ. ಹೊಸ ಒಟ್ಟು ನೋಡಿ, ನಂತರ ಮತ್ತೆ ಟ್ಯಾಪ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "dff0fad1"
+  },
+  "checkout.stock.title": {
+    "message": "ಸಾಕಷ್ಟು ಸ್ಟಾಕ್ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "357cd443"
+  },
+  "checkout.stock.body": {
+    "message": "{item}: {count, plural, =0 {ಏನೂ ಉಳಿದಿಲ್ಲ} other {# ಮಾತ್ರ ಉಳಿದಿವೆ}}.",
+    "review": "reviewed",
+    "enHash": "1e731b21"
+  },
+  "checkout.stock.anItem": {
+    "message": "ಒಂದು ವಸ್ತು",
+    "review": "reviewed",
+    "enHash": "21906e27"
+  },
+  "checkout.stock.fix": {
+    "message": "ಕಾರ್ಟ್‌ನಲ್ಲಿ ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "dce1e662"
+  },
+  "checkout.problem.store_closed": {
+    "message": "ಅಂಗಡಿ ಈಗ ಮುಚ್ಚಿದೆ. ನಿಮ್ಮ ಕಾರ್ಟ್ ಹಾಗೆಯೇ ಇದೆ.",
+    "review": "reviewed",
+    "enHash": "fbb7fa58"
+  },
+  "checkout.problem.store_not_bookable": {
+    "message": "ಈ ಅಂಗಡಿ ಈಗ ಆರ್ಡರ್ ತೆಗೆದುಕೊಳ್ಳುತ್ತಿಲ್ಲ. ನಿಮ್ಮ ಕಾರ್ಟ್ ಹಾಗೆಯೇ ಇದೆ.",
+    "review": "reviewed",
+    "enHash": "f36b1126"
+  },
+  "checkout.problem.ordering_suspended": {
+    "message": "ಆರ್ಡರ್ ಮಾಡುವುದು ಸದ್ಯಕ್ಕೆ ನಿಂತಿದೆ. ದಯವಿಟ್ಟು ನಂತರ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "e96f3604"
+  },
+  "checkout.problem.ordering_suspended.until": {
+    "message": "ನೀವು ಹಲವು ಬಾರಿ ಪಿಕಪ್ ಮಾಡಿಲ್ಲ, ಹಾಗಾಗಿ {date} ವರೆಗೆ ನಿಮ್ಮ ಒಂದೇ ಆರ್ಡರ್ ತೆರೆದಿರಬಹುದು. ಮೊದಲು ಅದನ್ನು ಮುಗಿಸಿ ಅಥವಾ ಕ್ಯಾನ್ಸಲ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "f69d5a61"
+  },
+  "checkout.problem.account_has_active_order": {
+    "message": "ನಿಮ್ಮ ಒಂದು ಆರ್ಡರ್ ಈಗಾಗಲೇ ನಡೆಯುತ್ತಿದೆ. ಮೊದಲು ಅದನ್ನು ಮುಗಿಸಿ ಅಥವಾ ಕ್ಯಾನ್ಸಲ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "42b3618c"
+  },
+  "checkout.problem.other": {
+    "message": "ಆರ್ಡರ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "5f3ebf19"
+  },
+  "checkout.problem.network": {
+    "message": "ಕನೆಕ್ಷನ್ ಇಲ್ಲ. ನಿಮ್ಮ ಕಾರ್ಟ್ ಹಾಗೆಯೇ ಇದೆ; ಆನ್‌ಲೈನ್ ಬಂದಾಗ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "392cd811"
+  }
+}

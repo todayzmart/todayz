@@ -1,0 +1,172 @@
+{
+  "store.rating": {
+    "message": "{rating} ({count})",
+    "review": "reviewed",
+    "enHash": "21c8385b"
+  },
+  "store.open": {
+    "message": "ತೆರೆದಿದೆ",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "store.closed": {
+    "message": "ಮುಚ್ಚಿದೆ",
+    "review": "reviewed",
+    "enHash": "88d86b77"
+  },
+  "store.cashback": {
+    "message": "{pct}% ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್",
+    "review": "reviewed",
+    "enHash": "73d039a2"
+  },
+  "store.delivery": {
+    "message": "ಡೆಲಿವರಿ",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "store.pickup": {
+    "message": "ಪಿಕಪ್",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "store.inStoreOnly": {
+    "message": "ಅಂಗಡಿಯಲ್ಲಿ ಮಾತ್ರ",
+    "review": "reviewed",
+    "enHash": "c72090ec"
+  },
+  "store.directions": {
+    "message": "ದಾರಿ ನೋಡಿ",
+    "review": "reviewed",
+    "enHash": "648d8058"
+  },
+  "store.viewShop": {
+    "message": "ಅಂಗಡಿ ನೋಡಿ",
+    "review": "reviewed",
+    "enHash": "c55061ee"
+  },
+  "store.hours.today": {
+    "message": "ಇಂದು {hours}",
+    "review": "reviewed",
+    "enHash": "4552054b"
+  },
+  "store.hours.range": {
+    "message": "{from} ರಿಂದ {to}",
+    "review": "reviewed",
+    "enHash": "06f3df10"
+  },
+  "store.hours.closedToday": {
+    "message": "ಇಂದು ಮುಚ್ಚಿದೆ",
+    "review": "reviewed",
+    "enHash": "57130ea5"
+  },
+  "store.deliveryNote": {
+    "message": "ಡೆಲಿವರಿ {fee} · ಕನಿಷ್ಠ ಆರ್ಡರ್ {min}",
+    "review": "reviewed",
+    "enHash": "88de204f"
+  },
+  "store.deliveryFree": {
+    "message": "ಉಚಿತ",
+    "review": "reviewed",
+    "enHash": "4ff88aad"
+  },
+  "store.inStoreOnly.banner": {
+    "message": "ಈ ಅಂಗಡಿ ಅಂಗಡಿಯಲ್ಲಿ ಮಾತ್ರ ಮಾರುತ್ತದೆ. ಇದರಲ್ಲಿ ಏನಿದೆ ಎಂದು ನೋಡಬಹುದು ಮತ್ತು ದಾರಿ ಪಡೆಯಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "6a4677c2"
+  },
+  "store.search.label": {
+    "message": "ಈ ಅಂಗಡಿಯಲ್ಲಿ ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "1857f271"
+  },
+  "store.search.placeholder": {
+    "message": "ಈ ಅಂಗಡಿಯಲ್ಲಿ ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "98336b8e"
+  },
+  "store.items.error": {
+    "message": "ವಸ್ತುಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "1df81be5"
+  },
+  "store.items.more": {
+    "message": "ಇನ್ನಷ್ಟು ವಸ್ತುಗಳನ್ನು ತೋರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "312e726c"
+  },
+  "store.items.none": {
+    "message": "ಇನ್ನೂ ಯಾವುದೇ ವಸ್ತು ಪಟ್ಟಿಯಲ್ಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "ba47f17e"
+  },
+  "store.items.noneBody": {
+    "message": "ಈ ಅಂಗಡಿ ಇನ್ನೂ ಏನನ್ನೂ ಪಟ್ಟಿ ಮಾಡಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "232b5f33"
+  },
+  "store.items.noMatch": {
+    "message": "ಯಾವುದೇ ವಸ್ತು ಹೊಂದುತ್ತಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "22e14472"
+  },
+  "store.items.noMatchBody": {
+    "message": "ಬೇರೆ ಪದ ಅಥವಾ ವರ್ಗ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "486ad6c8"
+  },
+  "store.gone.title": {
+    "message": "ಈ ಅಂಗಡಿ ಈಗ TodayZ ನಲ್ಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "2e224436"
+  },
+  "store.gone.body": {
+    "message": "ಅದು ಸದ್ಯಕ್ಕೆ ಮುಚ್ಚಿರಬಹುದು ಅಥವಾ ಈಗ ಪಟ್ಟಿಯಲ್ಲಿ ಇಲ್ಲದಿರಬಹುದು. ನಿಮಗೆ ಬೇಕಾದ್ದನ್ನು ಹತ್ತಿರದಲ್ಲಿ ಹುಡುಕಿ.",
+    "review": "reviewed",
+    "enHash": "6d941326"
+  },
+  "store.gone.action": {
+    "message": "ಹತ್ತಿರದಲ್ಲಿ ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "ad3bae31"
+  },
+  "store.replace.title": {
+    "message": "ಹೊಸ ಕಾರ್ಟ್ ಶುರು ಮಾಡಬೇಕೇ?",
+    "review": "reviewed",
+    "enHash": "eb083d82"
+  },
+  "store.replace.body": {
+    "message": "ನಿಮ್ಮ ಕಾರ್ಟ್‌ನಲ್ಲಿ {current} ನ ವಸ್ತುಗಳಿವೆ. {next} ನಿಂದ ಸೇರಿಸಿದರೆ ಹಳೆಯ ಕಾರ್ಟ್ ಬದಲಾಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "4bd5cb81"
+  },
+  "store.replace.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "store.replace.keep": {
+    "message": "ನನ್ನ ಕಾರ್ಟ್ ಇರಲಿ",
+    "review": "reviewed",
+    "enHash": "66c34609"
+  },
+  "store.replace.confirm": {
+    "message": "ಕಾರ್ಟ್ ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "815bb0ba"
+  },
+  "store.cart.count": {
+    "message": "{count} ಐಟಂಗಳು",
+    "review": "reviewed",
+    "enHash": "e3cc227e"
+  },
+  "store.cart.from": {
+    "message": "{shop} ನಿಂದ",
+    "review": "reviewed",
+    "enHash": "156e12b4"
+  },
+  "store.cart.open": {
+    "message": "ಕಾರ್ಟ್ ನೋಡಿ",
+    "review": "reviewed",
+    "enHash": "e6d55733"
+  }
+}

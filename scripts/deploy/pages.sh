@@ -14,6 +14,8 @@
 # with the public settings in infra/cloudflare/pages.env. deploy needs Node 22+, npx and
 # CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in the environment (never printed).
 set -euo pipefail
+# Prod ships reviewed translations only; machine drafts wait for a person's review (translation-workflow.md, W4-05).
+unset TODAYZ_I18N_DRAFTS
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUT="$ROOT/.cache/pages"
