@@ -32,13 +32,14 @@ The choice is kept on this device only. Saving it on the server (`preferredLang`
 
 ## Evidence
 
-- `business/src/settings/language.test.tsx` (3 tests, pass):
-  - Every language (en, hi, kn, te, ta, en-XA) has exactly the English key set, so nothing falls back to English.
+- `business/src/settings/language.test.tsx` (4 tests, pass):
+  - Every English key has a `reviewed` translation in hi, kn, te and ta whose `enHash` matches the current English. This is read from the source files, because compiled catalogues fill a missing or stale translation with English. Setting one Tamil key back to `machine` makes it fail (`ta pos.pay.other`), so a new English key without translations fails `make check`.
+  - Every compiled catalogue (en, hi, kn, te, ta, en-XA) has the English key set.
   - The hi, kn, te and ta catalogues are translated, not English copies.
   - A cashier opens Settings in English and picks हिन्दी. The page re-renders in Hindi (the section heading "भाषा" and the role notice), the English heading is gone, the button is pressed, `<html lang="hi">` is set and `todayz.lang` is `hi`.
 - `pnpm --filter @todayz/i18n lint:messages`: business 0 errors, 307 warnings (all "not referenced by a literal id", meaning the id is built at run time; these come from the English catalogue). hi/kn/te/ta 1374/1374 reviewed.
 - `@todayz/i18n`: lint, typecheck, test pass (4 files, 198 tests).
-- `@todayz/business`: lint, lint:css, typecheck pass; tests pass (42 files, 378 tests); build passes (precache check and dist check pass); size: initial JS 162.24 kB gzip of 250 kB, initial CSS 10.35 kB of 20 kB.
+- `@todayz/business`: lint, lint:css, typecheck pass; tests pass (42 files, 379 tests); build passes (precache check and dist check pass); size: initial JS 162.24 kB gzip of 250 kB, initial CSS 10.35 kB of 20 kB.
 
 ## How to review
 
