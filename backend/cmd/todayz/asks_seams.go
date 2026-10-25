@@ -17,7 +17,10 @@ import (
 // asksForOrders adapts asks.Service to orders.AskPricer.
 type asksForOrders struct{ s *asks.Service }
 
-var _ orders.AskPricer = asksForOrders{}
+var (
+	_ orders.AskPricer = asksForOrders{}
+	_ orders.AskEvents = asksForOrders{}
+)
 
 // AskPrice implements orders.AskPricer.
 func (a asksForOrders) AskPrice(ctx context.Context, customerID, storeID, replyID ids.ID, now time.Time) (orders.AskPrice, bool, error) {
@@ -28,6 +31,16 @@ func (a asksForOrders) AskPrice(ctx context.Context, customerID, storeID, replyI
 	return orders.AskPrice{
 		StoreItemID: p.StoreItemID, UnitPricePaise: p.UnitPaise, ValidUntil: p.ValidUntil, MaxQuantity: p.MaxQuantity,
 	}, true, nil
+}
+
+// AskBooked implements orders.AskEvents.
+func (a asksForOrders) AskBooked(ctx context.Context, customerID, storeID, replyID ids.ID, now time.Time) {
+	a.s.AskBooked(ctx, customerID, storeID, replyID, now)
+}
+
+// AskPriceExpired implements orders.AskEvents.
+func (a asksForOrders) AskPriceExpired(ctx context.Context, customerID, storeID, replyID ids.ID, now time.Time) {
+	a.s.AskPriceExpired(ctx, customerID, storeID, replyID, now)
 }
 
 // asksForInsights adapts asks.Service to facts.AskDemand. The rollup counts

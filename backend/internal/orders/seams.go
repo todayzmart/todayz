@@ -98,6 +98,15 @@ type AskPricer interface {
 	AskPrice(ctx context.Context, customerID, storeID, askReplyID ids.ID, now time.Time) (p AskPrice, ok bool, err error)
 }
 
+// AskEvents is told, after the fact, what became of a booking from an ask
+// reply: an order placed from it, or a placement refused with
+// ask_price_expired. An AskPricer may implement it; it never fails the
+// request.
+type AskEvents interface {
+	AskBooked(ctx context.Context, customerID, storeID, askReplyID ids.ID, now time.Time)
+	AskPriceExpired(ctx context.Context, customerID, storeID, askReplyID ids.ID, now time.Time)
+}
+
 // CreditsAllowance is how many credits a checkout may use. Limit names why
 // it is capped (a CreditsLimit value), "" when it is not.
 type CreditsAllowance struct {

@@ -252,7 +252,7 @@ WHERE ask_id = @ask_id AND store_id = @store_id AND answer = 'yes' AND store_ite
 -- name: ReplyPrice :one
 SELECT coalesce(r.store_item_id, (SELECT si.id FROM store_items si
                 WHERE si.store_id = r.store_id AND si.product_id = a.product_id))::uuid AS store_item_id,
-       r.price_paise, r.price_valid_until, a.quantity
+       r.price_paise, r.price_valid_until, a.quantity, r.replied_at
 FROM ask_recipients r JOIN asks a ON a.id = r.ask_id
 WHERE r.id = @id AND r.store_id = @store_id AND a.customer_id = @customer_id AND r.answer = 'yes';
 

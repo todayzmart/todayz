@@ -7,6 +7,7 @@ package asks
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -14,6 +15,7 @@ import (
 
 	"github.com/todayz/backend/gen/sqlc/asksdb"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
 // Price is a Yes reply as a booking reads it. UnitPaise 0 is a Yes with no
@@ -51,6 +53,53 @@ func (s *Service) AskPrice(ctx context.Context, customerID, storeID, replyID ids
 		p.UnitPaise, p.ValidUntil = *r.PricePaise, r.PriceValidUntil.UTC()
 	}
 	return p, true, nil
+}
+
+// AskBooked writes ask_booked for an order placed from the customer's Yes:
+// price_source is ask_reply for a priced Yes (orders books one only while its
+// price holds) and catalogue for a Yes without a price.
+func (s *Service) AskBooked(ctx context.Context, customerID, storeID, replyID ids.ID, now time.Time) {
+	r, ok := s.replyFor(ctx, customerID, storeID, replyID)
+	if !ok {
+		return
+	}
+	props := map[string]any{"price_source": "catalogue", "minutes_since_reply": 0}
+	if r.PricePaise != nil {
+		props["price_source"] = "ask_reply"
+	}
+	if r.RepliedAt != nil {
+		props["minutes_since_reply"] = max(0, int(now.Sub(*r.RepliedAt)/time.Minute))
+	}
+	s.event(ctx, s.q(ctx), pgtype.UUID{}, "ask_booked", props)
+}
+
+// AskPriceExpired writes ask_price_expired when a placement from the
+// customer's priced Yes was refused because the price had ended. A refusal
+// for any other reason (another customer's reply, a No, the item not in the
+// cart) writes nothing.
+func (s *Service) AskPriceExpired(ctx context.Context, customerID, storeID, replyID ids.ID, now time.Time) {
+	r, ok := s.replyFor(ctx, customerID, storeID, replyID)
+	if !ok || r.PricePaise == nil || r.PriceValidUntil == nil || now.Before(*r.PriceValidUntil) {
+		return
+	}
+	s.event(ctx, s.q(ctx), pgtype.UUID{}, "ask_price_expired", map[string]any{})
+}
+
+// replyFor reads the customer's Yes for an event; a failure is logged.
+func (s *Service) replyFor(ctx context.Context, customerID, storeID, replyID ids.ID) (asksdb.ReplyPriceRow, bool) {
+	if s.db == nil {
+		return asksdb.ReplyPriceRow{}, false
+	}
+	r, err := s.q(ctx).ReplyPrice(ctx, asksdb.ReplyPriceParams{
+		ID: ids.UUID(replyID), StoreID: ids.UUID(storeID), CustomerID: ids.UUID(customerID),
+	})
+	if err != nil {
+		if !errors.Is(err, pgx.ErrNoRows) {
+			telemetry.Logger(ctx).WarnContext(ctx, "asks: reply for event", slog.String("error", err.Error()))
+		}
+		return asksdb.ReplyPriceRow{}, false
+	}
+	return r, true
 }
 
 // DemandCount is one day of a store's unanswered asks for a product (or, with

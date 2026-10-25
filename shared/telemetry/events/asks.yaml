@@ -36,17 +36,19 @@ events:
   ask_booked:
     emitter: server
     description: >-
-      An order was placed from an ask reply. Not emitted yet: orders (W2-02) has no
-      placed-order hook for the asks domain (TODO(lead), W3-16 REPORT.md).
+      An order was placed from the customer's Yes reply (orders tells asks through
+      orders.AskEvents once the order has committed). price_source is ask_reply for a
+      priced Yes and catalogue for a Yes without a price.
     props:
       minutes_since_reply: { type: int, min: 0 }
       price_source: { type: enum, values: [ask_reply, catalogue] }
   ask_price_expired:
     emitter: server
     description: >-
-      A booking from an ask reply was refused because the replied price had expired.
-      Not emitted yet: the refusal is in orders (W2-02), which the pricer cannot tell
-      from a quote (TODO(lead), W3-16 REPORT.md).
+      Placing an order from the customer's priced Yes was refused (409
+      ask_price_expired) because the replied price had ended. Quotes never emit it;
+      a refusal for another reason (another customer's reply, the item not in the
+      cart) is not counted.
     props: {}
   ask_reported:
     emitter: server
