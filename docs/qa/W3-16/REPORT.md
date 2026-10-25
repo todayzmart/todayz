@@ -81,12 +81,13 @@ Branch `claude/w3-16-asks-457dd8`, from merge base `1465e58`. Scenarios: [e2e/sc
 
 | Area | Command | Result |
 |---|---|---|
-| Go | `go test` for asks, share, seed, rollups, search, jobs, platform/geo/h3, platform/authz/policy, cmd/todayz (DB tests on the shared test Postgres) | ok |
-| Go lint | `golangci-lint run ./...` | 0 issues |
-| Customer | lint, lint:css, typecheck, vitest | pass, 152/152 (18 files) |
-| Business | vitest | 422/422 (47 files) |
-| Admin | vitest; i18n | 207/207; 198 |
-| Playwright (fake API) | `customer/e2e/asks.shots.spec.ts` (6), `business/e2e/asks.spec.ts` (2), `admin/e2e/demand.spec.ts` (2) | pass |
+| Go | `go test` for asks, share, seed, rollups, search, jobs, admin, platform/geo/h3, platform/authz/policy, cmd/todayz (DB tests on the shared test Postgres) | ok |
+| Go lint | `golangci-lint run ./...`; settings lint | 0 issues; ok |
+| Customer | lint, lint:css, typecheck, vitest, `build:e2e` | pass, 162/162 (19 files), built |
+| Business | vitest | 468/468 (50 files) |
+| Admin | typecheck, vitest | pass, 220/220 (25 files) |
+| i18n | vitest; `lint:messages` | 198/198; customer 0 errors |
+| Playwright (fake API) | `customer/e2e/asks.shots.spec.ts` (7), `business/e2e/asks.spec.ts` (2, run before the review; no business change since), `admin/e2e/demand.spec.ts` and `roles.spec.ts` (10) | pass |
 
 I did not run the full `make check` or `make e2e`; the lead runs those after merge.
 
