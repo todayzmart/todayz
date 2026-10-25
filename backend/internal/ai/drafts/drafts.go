@@ -7,6 +7,11 @@
 // the draft confirmed, or discarded when every line was discarded. Confirm is idempotent: a
 // repeat returns the outcomes stored the first time and applies nothing again.
 //
+// A feature whose lines need different roles may confirm in parts (Confirmation.KeepOpen):
+// while any line comes back not_permitted the draft stays ready, the applied and discarded
+// lines are stored as settled, and a later confirm by someone allowed decides only the lines
+// still open. A settled line is never applied again.
+//
 // Output convention: a draft's output is a JSON object. A feature with several lines puts
 // them in "lines", each with a "lineId" (l1…l999, AiDraftLineId); an output without "lines"
 // is one line, l1. Confirm refuses a decision for a line the draft does not have, and a line
@@ -94,7 +99,7 @@ type Draft struct {
 	Model         string
 	Status        string
 	Output        json.RawMessage // nil while processing and when failed
-	Lines         []LineResult    // set once confirmed or discarded
+	Lines         []LineResult    // set once confirmed or discarded; on a ready draft, the lines settled by a partial confirm (the open ones not_permitted)
 	Failure       string
 	ConfirmedBy   ids.ID
 	ConfirmedAt   *time.Time
@@ -226,16 +231,20 @@ type Confirmation struct {
 	// An error is returned as it is (the caller answers 404 for another store's draft).
 	Check func(Draft) error
 	Apply ApplyFunc
+	// KeepOpen keeps the draft ready while any line is not_permitted (the package doc). A
+	// decision for a line already settled is ignored: the line keeps its first outcome.
+	KeepOpen bool
 }
 
-// Result is a closed draft's outcomes (AiConfirmResult).
+// Result is a draft's outcomes after a confirm (AiConfirmResult).
 type Result struct {
 	DraftID ids.ID
-	Status  string // confirmed or discarded
+	Status  string // confirmed or discarded; ready after a partial confirm (KeepOpen)
 	Lines   []LineResult
 }
 
-// Confirm closes a ready draft with the person's decisions.
+// Confirm closes a ready draft with the person's decisions (or, with KeepOpen, settles the
+// lines it may and leaves the rest open).
 func (s *Service) Confirm(ctx context.Context, c Confirmation) (Result, error) {
 	if c.Apply == nil || c.By == ids.Zero {
 		return Result{}, errors.New("drafts: confirm needs Apply and By")
@@ -272,16 +281,33 @@ func (s *Service) Confirm(ctx context.Context, c Confirmation) (Result, error) {
 		if err != nil {
 			return err
 		}
-		decided, err := checkDecisions(c.Decisions, known)
-		if err != nil {
+		if _, err := checkDecisions(c.Decisions, known); err != nil {
 			return err
 		}
-		var lines []LineResult
+		// Lines a partial confirm settled keep their outcome; only the open ones are decided.
+		settled := map[string]Outcome{}
+		if c.KeepOpen {
+			for _, l := range d.Lines {
+				if l.Outcome != NotPermitted {
+					settled[l.LineID] = l.Outcome
+				}
+			}
+		}
+		decided := map[string]Decision{}
 		var toApply []Decision
 		for _, dc := range c.Decisions {
+			if _, done := settled[dc.LineID]; done {
+				continue
+			}
+			decided[dc.LineID] = dc
 			if dc.Outcome != Discarded {
 				toApply = append(toApply, dc)
 			}
+		}
+		if len(decided) == 0 {
+			// Every decision was for a settled line (a repeat of the partial confirm).
+			res = Result{DraftID: d.ID, Status: d.Status, Lines: d.Lines}
+			return nil
 		}
 		applied := map[string]Outcome{}
 		if len(toApply) > 0 {
@@ -302,14 +328,21 @@ func (s *Service) Confirm(ctx context.Context, c Confirmation) (Result, error) {
 				return fmt.Errorf("drafts: %s apply returned %d outcomes for %d lines", c.Feature, len(out), len(toApply))
 			}
 		}
-		status := StatusDiscarded
+		status, open := StatusDiscarded, false
+		lines := make([]LineResult, 0, len(known))
 		for _, id := range known {
-			o := Discarded
-			if dc, ok := decided[id]; ok && dc.Outcome != Discarded {
-				o = applied[id]
+			o, done := settled[id]
+			if !done {
+				o = Discarded
+				if dc, ok := decided[id]; ok && dc.Outcome != Discarded {
+					o = applied[id]
+				}
 			}
-			if o == Accepted || o == Edited {
+			switch o {
+			case Accepted, Edited:
 				status = StatusConfirmed
+			case NotPermitted:
+				open = true
 			}
 			lines = append(lines, LineResult{LineID: id, Outcome: o})
 		}
@@ -318,6 +351,13 @@ func (s *Service) Confirm(ctx context.Context, c Confirmation) (Result, error) {
 			return err
 		}
 		now := s.clock.Now()
+		if c.KeepOpen && open {
+			if err := q.SettleDraftLines(ctx, aidb.SettleDraftLinesParams{LineOutcomes: b, Now: now, ID: row.ID}); err != nil {
+				return fmt.Errorf("drafts: settle: %w", err)
+			}
+			res = Result{DraftID: d.ID, Status: StatusReady, Lines: lines}
+			return nil
+		}
 		if err := q.CloseDraft(ctx, aidb.CloseDraftParams{Status: status, LineOutcomes: b, ConfirmedBy: ids.UUID(c.By), Now: &now, ID: row.ID}); err != nil {
 			return fmt.Errorf("drafts: close: %w", err)
 		}

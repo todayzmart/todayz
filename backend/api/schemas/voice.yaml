@@ -1,0 +1,214 @@
+# Schemas: domain "voice" (owner W3-04): voice stock update drafts, feature voice_stock (B-06,
+# AI-R1, 04 §2.8, D-65).
+#
+# The shapes follow the shared AI draft envelope in schemas/ai.yaml (W3-10). A domain file may
+# not $ref another domain's schemas (D-100), so the envelope pieces are restated here under
+# VoiceStock names with the same types, enums and bounds.
+VoiceStockLanguage:
+  type: string
+  description: >-
+    The language the person spoke, as a BCP-47 code the speech provider takes. Absent on create means
+    "detect it" (mixed speech, such as Hindi with English item names, is detected too).
+  enum: [en-IN, hi-IN, kn-IN, te-IN, ta-IN]
+VoiceStockLineKind:
+  type: string
+  description: >-
+    sale - a quick POS sale with no customer (a `sale_pos` movement; cashier and above, `pos.sell`);
+    restock - stock received (a `restock` movement; manager and above, `stock.restock`);
+    count - the number on the shelf now, a `count_correction` movement for the difference ("out of stock"
+    is a count of 0; cashier and above, `stock.count`); set_price - a new selling price (manager and
+    above, `item.price.edit`). D-06, D-65.
+  enum: [sale, restock, count, set_price]
+VoiceStockDraftStatus:
+  type: string
+  description: >-
+    processing - speech and the model are still working; ready - lines to review; confirmed - a person
+    confirmed it (some lines may be discarded); discarded - every line was discarded; failed - the speech
+    or model call or a server-side check failed, nothing to review.
+  enum: [processing, ready, confirmed, discarded, failed]
+VoiceStockLineId:
+  type: string
+  description: A line's id inside its draft, set by the server (`l1`, `l2`, …).
+  pattern: '^l[0-9]{1,3}$'
+  maxLength: 4
+VoiceStockAvailability:
+  type: object
+  description: Voice update is on for this store; the recording limits (01 §17 fixed constants).
+  additionalProperties: false
+  required: [maxSeconds, maxBytes, languages]
+  properties:
+    maxSeconds:
+      type: integer
+      minimum: 1
+      maximum: 60
+    maxBytes:
+      type: integer
+      minimum: 1
+      maximum: 1048576
+    languages:
+      type: array
+      maxItems: 10
+      items: {$ref: ./voice.yaml#/VoiceStockLanguage}
+  example: {maxSeconds: 15, maxBytes: 1048576, languages: [en-IN, hi-IN, kn-IN, te-IN, ta-IN]}
+VoiceStockDraftCreated:
+  type: object
+  description: The recording was accepted for processing (202). Poll the draft.
+  additionalProperties: false
+  required: [draftId, status]
+  properties:
+    draftId: {$ref: ./common.yaml#/Ulid}
+    status:
+      type: string
+      enum: [processing]
+  example: {draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0D, status: processing}
+VoiceStockLine:
+  type: object
+  description: >-
+    One interpreted change. A line with `matched: false` names no item yet ("pick item"): the person picks
+    one and confirms it as edited. `quantity` is set for sale, restock and count and null for set_price;
+    `pricePaise` is set for set_price only. `currentPricePaise` and `onHand` are the item's values now, for
+    the review screen. `disabled` is set when the caller may not confirm this line kind.
+  additionalProperties: false
+  required: [lineId, kind, storeItemId, itemName, heard, quantity, pricePaise, currentPricePaise, onHand, confidence, matched, disabled]
+  properties:
+    lineId: {$ref: ./voice.yaml#/VoiceStockLineId}
+    kind: {$ref: ./voice.yaml#/VoiceStockLineKind}
+    storeItemId:
+      oneOf:
+        - {$ref: ./common.yaml#/Ulid}
+        - {type: 'null'}
+    itemName:
+      type: [string, 'null']
+      maxLength: 200
+    heard:
+      type: string
+      description: The words this line came from, as heard (after the PII scrubber).
+      maxLength: 120
+    quantity:
+      type: [integer, 'null']
+      minimum: 0
+      maximum: 9999
+    pricePaise:
+      type: [integer, 'null']
+      minimum: 1
+      maximum: 100000000
+    currentPricePaise:
+      type: [integer, 'null']
+      minimum: 1
+      maximum: 100000000
+    onHand:
+      type: [integer, 'null']
+      minimum: -2147483648
+      maximum: 2147483647
+    confidence:
+      type: number
+      minimum: 0
+      maximum: 1
+    matched:
+      type: boolean
+    disabled:
+      type: [string, 'null']
+      description: ask_manager - this line needs a manager's permission; the caller's Confirm does not apply it.
+      enum: [ask_manager, null]
+VoiceStockLineResult:
+  type: object
+  additionalProperties: false
+  required: [lineId, outcome]
+  properties:
+    lineId: {$ref: ./voice.yaml#/VoiceStockLineId}
+    outcome:
+      type: string
+      description: >-
+        not_permitted - the confirmer lacks the permission the line needs (D-06), so nothing of it was
+        applied.
+      enum: [accepted, edited, discarded, not_permitted]
+VoiceStockDraft:
+  type: object
+  description: >-
+    A voice stock draft. `transcript` and `lines` are set once it is ready; `outcomes` once it is confirmed
+    or discarded, and on a ready draft after a partial confirm (the lines settled so far; a not_permitted
+    line is still open for a manager); `failure` when it failed (a short code, never model text).
+  additionalProperties: false
+  required: [draftId, feature, status, promptVersion, createdAt, language, transcript, lines, outcomes, failure]
+  properties:
+    draftId: {$ref: ./common.yaml#/Ulid}
+    feature:
+      type: string
+      enum: [voice_stock]
+    status: {$ref: ./voice.yaml#/VoiceStockDraftStatus}
+    promptVersion:
+      type: string
+      maxLength: 80
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    language:
+      type: [string, 'null']
+      maxLength: 16
+    transcript:
+      type: [string, 'null']
+      maxLength: 2000
+    lines:
+      type: array
+      maxItems: 200
+      items: {$ref: ./voice.yaml#/VoiceStockLine}
+    outcomes:
+      type: array
+      maxItems: 200
+      items: {$ref: ./voice.yaml#/VoiceStockLineResult}
+    failure:
+      type: [string, 'null']
+      maxLength: 40
+VoiceStockLineValue:
+  type: object
+  description: >-
+    An edited line: the item, kind and number the person chose. `quantity` for sale (1…9999), restock
+    (1…9999) and count (0…9999); `pricePaise` for set_price (never above the item's MRP).
+  additionalProperties: false
+  required: [kind, storeItemId]
+  properties:
+    kind: {$ref: ./voice.yaml#/VoiceStockLineKind}
+    storeItemId: {$ref: ./common.yaml#/Ulid}
+    quantity:
+      type: [integer, 'null']
+      minimum: 0
+      maximum: 9999
+    pricePaise:
+      type: [integer, 'null']
+      minimum: 1
+      maximum: 100000000
+VoiceStockDecision:
+  type: object
+  additionalProperties: false
+  required: [lineId, outcome]
+  properties:
+    lineId: {$ref: ./voice.yaml#/VoiceStockLineId}
+    outcome:
+      type: string
+      description: What the person did with the line. Every line of the draft is sent once.
+      enum: [accepted, edited, discarded]
+    value: {$ref: ./voice.yaml#/VoiceStockLineValue}
+VoiceStockConfirmRequest:
+  type: object
+  additionalProperties: false
+  required: [lines]
+  properties:
+    lines:
+      type: array
+      minItems: 1
+      maxItems: 200
+      items: {$ref: ./voice.yaml#/VoiceStockDecision}
+VoiceStockConfirmResult:
+  type: object
+  description: >-
+    The answer to a confirm, the same on a repeat (confirm is idempotent). `ready` when some lines need a
+    manager (not_permitted): the permitted lines are applied and the draft stays open with the rest.
+  additionalProperties: false
+  required: [draftId, status, lines]
+  properties:
+    draftId: {$ref: ./common.yaml#/Ulid}
+    status:
+      type: string
+      enum: [ready, confirmed, discarded]
+    lines:
+      type: array
+      maxItems: 200
+      items: {$ref: ./voice.yaml#/VoiceStockLineResult}

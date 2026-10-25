@@ -32,6 +32,13 @@ SET status = @status, line_outcomes = @line_outcomes, confirmed_by = @confirmed_
     confirmed_at = @now, updated_at = @now
 WHERE id = @id AND status = 'ready';
 
+-- name: SettleDraftLines :exec
+-- A partial confirm (Confirmation.KeepOpen): the lines settled so far, the draft stays ready.
+-- The caller holds the row lock (LockDraft) and has checked it is ready.
+UPDATE ai_drafts
+SET line_outcomes = @line_outcomes, updated_at = @now
+WHERE id = @id AND status = 'ready';
+
 -- name: ReserveCall :one
 -- Counts one call for (day, scope, subject) unless the count is already at the cap. No row back
 -- means the cap is reached. A first call inserts calls = 1, so the caller checks cap >= 1 first.

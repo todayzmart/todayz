@@ -1,0 +1,9 @@
+# domain voice: one line per (role x action); regenerate with -update
+voice.draft kind=business step-up=false
+voice.draft owner allow
+voice.draft manager allow
+voice.draft cashier allow
+voice.draft.others kind=business step-up=false
+voice.draft.others owner allow
+voice.draft.others manager allow
+voice.draft.others cashier -

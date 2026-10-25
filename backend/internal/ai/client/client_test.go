@@ -176,6 +176,14 @@ func TestCostPaise(t *testing.T) {
 	assert.Equal(t, CostPaise("claude-fable-5-1", Usage{InputTokens: 1000}), CostPaise("some-new-model", Usage{InputTokens: 1000}))
 }
 
+func TestSpeechCostPaise(t *testing.T) {
+	assert.Equal(t, int64(0), SpeechCostPaise(0))
+	assert.Equal(t, int64(3000), SpeechCostPaise(time.Hour))
+	// 15 s is 12.5 paise, rounded up; any audio at all costs at least a paisa.
+	assert.Equal(t, int64(13), SpeechCostPaise(15*time.Second))
+	assert.Equal(t, int64(1), SpeechCostPaise(time.Millisecond))
+}
+
 func TestSarvamTranscribe(t *testing.T) {
 	var gotKey, gotLang, gotFile string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

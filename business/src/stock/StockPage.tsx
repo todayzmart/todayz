@@ -15,6 +15,7 @@ import { ImportSheet } from './ImportSheet';
 import { InlineEdit } from './InlineEdit';
 import { ItemSheet, type SheetMode } from './ItemSheet';
 import { freshnessProps, levelLabel } from './labels';
+import { VoiceLink } from '../voice/VoiceLink';
 import { canStock } from './permissions';
 import { patchItem, sendMovement, useCategories, useItems, useItemsById, type ItemFilters } from './queries';
 import styles from './stock.module.css';
@@ -135,6 +136,7 @@ function StockDesk({ store, search }: { store: CurrentStore; search: StockSearch
       <div className={styles.head}>
         <p className={styles.sub}>{store.name}</p>
         <div className={styles.headActions}>
+          <VoiceLink store={store} />
           <Button icon={ClipboardCheck} variant={counting ? 'primary' : 'default'} onClick={() => setCounting((c) => !c)} aria-pressed={counting}>
             {intl.formatMessage({ id: counting ? 'stock.action.countDone' : 'stock.action.count' })}
           </Button>
