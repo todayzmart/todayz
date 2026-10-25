@@ -7,7 +7,8 @@
 -- code); phone_hash ties the code to the number it went to, so a changed owner
 -- number cannot be confirmed with an older code. A row is spent once
 -- (consumed_at) or after the attempts run out. Rows are kept for the audit
--- trail; the send limits count them per business.
+-- trail; the send limits count them per owner number, as sign-in counts
+-- otp_requests.
 --
 -- field_item_adds: the store items a field agent added (A-15 "products added").
 -- One row per item, written in the same transaction as the item; an item the
@@ -29,6 +30,7 @@ CREATE TABLE field_owner_codes (
   CONSTRAINT ck_field_owner_codes_attempts CHECK (attempts >= 0)
 );
 CREATE INDEX ix_field_owner_codes_business ON field_owner_codes (business_id, created_at DESC);
+CREATE INDEX ix_field_owner_codes_phone ON field_owner_codes (phone_hash, created_at);
 CREATE INDEX ix_field_owner_codes_sent_by ON field_owner_codes (sent_by);
 
 CREATE TABLE field_item_adds (
