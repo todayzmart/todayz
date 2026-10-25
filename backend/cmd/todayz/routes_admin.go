@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/todayz/backend/internal/admin"
+	"github.com/todayz/backend/internal/business"
 	"github.com/todayz/backend/internal/jobs"
 	"github.com/todayz/backend/internal/orders"
 	"github.com/todayz/backend/internal/platform/audit"
@@ -27,11 +28,12 @@ func mountAdmin(r chi.Router, d *deps) {
 	mountAdminConsole(r, d)
 }
 
-// mountAdminConsole mounts W3-05's admin-customers, admin-settings and admin-audit routes.
+// mountAdminConsole mounts W3-05's admin-customers, admin-businesses,
+// admin-stores, admin-leads, admin-settings and admin-audit routes.
 // The strike reset recounts through a minimal orders service (its strike
 // rules read only the database and settings).
 func mountAdminConsole(r chi.Router, d *deps) {
-	ad := admin.Deps{DB: d.DB, Clock: d.Clock}
+	ad := admin.Deps{DB: d.DB, Clock: d.Clock, Hours: storeHours}
 	if d.Authz != nil {
 		ad.Authz = d.Authz
 	}
@@ -130,4 +132,22 @@ func (a adminJobsGate) Require(ctx context.Context, anyOf []adminapi.Role, stepU
 		}
 	}
 	return adminapi.Admin{ID: p.UserID, Roles: held}, nil
+}
+
+// storeHours checks an A-05 hours edit by internal/business's rules and
+// returns the stored form.
+func storeHours(raw []byte, prefix string) ([]byte, []admin.FieldError, error) {
+	h, err := business.ParseHours(raw)
+	if err != nil {
+		return nil, []admin.FieldError{{Path: prefix, Reason: "not valid hours"}}, nil //nolint:nilerr // bad hours are the caller's field error, not a failure
+	}
+	if errs := h.Validate(prefix); len(errs) > 0 {
+		out := make([]admin.FieldError, len(errs))
+		for i, e := range errs {
+			out[i] = admin.FieldError{Path: e.Path, Reason: e.Reason}
+		}
+		return nil, out, nil
+	}
+	stored, err := h.Marshal()
+	return stored, nil, err
 }

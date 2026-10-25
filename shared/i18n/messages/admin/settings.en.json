@@ -63,6 +63,10 @@
     "defaultMessage": "Baskets",
     "description": "Settings group heading: baskets"
   },
+  "settings.group.addresses": {
+    "defaultMessage": "Saved addresses",
+    "description": "Settings group heading: saved addresses"
+  },
   "settings.group.features": {
     "defaultMessage": "Features",
     "description": "Settings group heading: features"

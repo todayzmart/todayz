@@ -1,9 +1,46 @@
-# Schemas: domain "admin-leads" (owner W3-05): admin leads (04 §2.7).
-#
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Schemas: domain "admin-leads" (owner W3-05): the Leads tab on A-03 (04 §2.7).
+# Leads come from the site's "list your shop" form; the phone is shown masked (01 R-16.2).
+AdminLeadStatus:
+  type: string
+  enum: [new, contacted, closed]
+AdminLead:
+  type: object
+  additionalProperties: false
+  required: [id, name, shopName, city, source, phoneMasked, status, statusChangedAt, createdAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name: {type: string, maxLength: 80}
+    shopName: {type: string, maxLength: 120}
+    city: {type: string, maxLength: 80}
+    source: {type: string, maxLength: 64}
+    phoneMasked:
+      type: [string, 'null']
+      maxLength: 20
+    status: {$ref: ./admin-leads.yaml#/AdminLeadStatus}
+    statusChangedAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+AdminLeadList:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: ./admin-leads.yaml#/AdminLead}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminLeadStatusChange:
+  type: object
+  additionalProperties: false
+  required: [status]
+  properties:
+    status: {$ref: ./admin-leads.yaml#/AdminLeadStatus}
+    note:
+      type: string
+      description: Optional, kept in the audit log.
+      minLength: 1
+      maxLength: 500

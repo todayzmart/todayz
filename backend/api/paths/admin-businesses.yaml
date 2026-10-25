@@ -1,12 +1,675 @@
-# Paths: domain "admin-businesses" (owner W3-05): admin business queue and KYC (04 §2.7).
+# Paths: domain "admin-businesses" (owner W3-05): A-03 Businesses, the KYC queue (04 §2.7, 01 §3, D-40, D-44).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-businesses]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-businesses.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# `support` reads (the queue and the detail, KYC masked); `admin` and `super_admin` verify, ask for
+# information, reject, suspend, reinstate, review KYC and documents, and reveal one KYC value. Every
+# change is audited with its reason. Roles per operation are in internal/platform/authz/policy/admin.go.
+/v1/admin/businesses:
+  get:
+    operationId: listAdminBusinesses
+    tags: [admin-businesses]
+    summary: The business queue, newest first
+    description: "`status` picks a queue tab (A-03: submitted, needs_info, verified, suspended); every business when omitted."
+    parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: ../schemas/admin-businesses.yaml#/AdminBusinessStatus
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Businesses
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-businesses.yaml#/AdminBusinessList
+            example:
+              items:
+                - id: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+                  brandName: Annapurna Kirana
+                  legalName: Annapurna Traders
+                  status: submitted
+                  city: Bengaluru
+                  storeCount: 1
+                  submittedAt: "2026-10-23T09:00:00Z"
+                  createdAt: "2026-10-20T09:00:00Z"
+              nextCursor: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/businesses/{businessId}:
+  parameters:
+    - name: businessId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getAdminBusiness
+    tags: [admin-businesses]
+    summary: One business with KYC (masked), stores, staff and documents
+    responses:
+      "200":
+        description: The business
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-businesses.yaml#/AdminBusiness
+            example:
+              id: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+              brandName: Annapurna Kirana
+              legalName: Annapurna Traders
+              status: submitted
+              needsInfoFields: []
+              needsInfoNote: null
+              submittedAt: "2026-10-23T09:00:00Z"
+              verifiedAt: null
+              createdAt: "2026-10-20T09:00:00Z"
+              kyc:
+                status: submitted
+                legalName: Annapurna Traders
+                panLast4: "234F"
+                gstinLast4: "1Z5X"
+                upiLast4: null
+                bankLast4: "6789"
+                bankIfsc: HDFC0001234
+                notes: null
+                verifiedAt: null
+              stores:
+                - id: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  name: Annapurna Kirana
+                  status: pending_review
+                  locality: Jayanagar
+                  city: Bengaluru
+                  liveAt: null
+                  createdAt: "2026-10-20T09:00:00Z"
+              staff:
+                - id: 01JB0SSF1A2B3C4D5E6F7G8H9J
+                  name: Lakshmi
+                  role: owner
+                  status: active
+                  phoneMasked: "98•••••210"
+              documents:
+                - id: 01JB0SDC1A2B3C4D5E6F7G8H9J
+                  kind: storefront
+                  contentType: image/jpeg
+                  sizeBytes: 482113
+                  storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  status: uploaded
+                  rejectReason: null
+                  createdAt: "2026-10-21T09:00:00Z"
+                  reviewedAt: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/businesses/{businessId}/verify:
+  parameters:
+    - name: businessId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: verifyAdminBusiness
+    tags: [admin-businesses]
+    summary: Verify a business (audited)
+    description: >-
+      From `submitted` only. The business turns `verified` and each of its stores in `pending_review` goes `live` in the same change (D-40: the first stores are reviewed with the business; a later store has its own review on A-05). Any other status is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-businesses.yaml#/AdminBusinessVerify
+          example:
+            note: PAN and storefront checked
+    responses:
+      "200":
+        description: The business after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-businesses.yaml#/AdminBusiness
+            example:
+              id: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+              brandName: Annapurna Kirana
+              legalName: Annapurna Traders
+              status: verified
+              needsInfoFields: []
+              needsInfoNote: null
+              submittedAt: "2026-10-23T09:00:00Z"
+              verifiedAt: "2026-10-24T11:00:00Z"
+              createdAt: "2026-10-20T09:00:00Z"
+              kyc:
+                status: submitted
+                legalName: Annapurna Traders
+                panLast4: "234F"
+                gstinLast4: "1Z5X"
+                upiLast4: null
+                bankLast4: "6789"
+                bankIfsc: HDFC0001234
+                notes: null
+                verifiedAt: null
+              stores:
+                - id: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  name: Annapurna Kirana
+                  status: live
+                  locality: Jayanagar
+                  city: Bengaluru
+                  liveAt: "2026-10-24T11:00:00Z"
+                  createdAt: "2026-10-20T09:00:00Z"
+              staff:
+                - id: 01JB0SSF1A2B3C4D5E6F7G8H9J
+                  name: Lakshmi
+                  role: owner
+                  status: active
+                  phoneMasked: "98•••••210"
+              documents:
+                - id: 01JB0SDC1A2B3C4D5E6F7G8H9J
+                  kind: storefront
+                  contentType: image/jpeg
+                  sizeBytes: 482113
+                  storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  status: uploaded
+                  rejectReason: null
+                  createdAt: "2026-10-21T09:00:00Z"
+                  reviewedAt: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/businesses/{businessId}/request-info:
+  parameters:
+    - name: businessId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: requestAdminBusinessInfo
+    tags: [admin-businesses]
+    summary: Ask the owner for more information (audited)
+    description: >-
+      From `submitted`. The business turns `needs_info` with the fields and the note the owner sees; the owner submits again to return it to the queue.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-businesses.yaml#/AdminBusinessInfoRequest
+          example:
+            fields: [documents]
+            note: The storefront photo is blurred; please upload a clearer one.
+    responses:
+      "200":
+        description: The business after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-businesses.yaml#/AdminBusiness
+            example:
+              id: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+              brandName: Annapurna Kirana
+              legalName: Annapurna Traders
+              status: needs_info
+              needsInfoFields: [documents]
+              needsInfoNote: The storefront photo is blurred; please upload a clearer one.
+              submittedAt: "2026-10-23T09:00:00Z"
+              verifiedAt: null
+              createdAt: "2026-10-20T09:00:00Z"
+              kyc:
+                status: submitted
+                legalName: Annapurna Traders
+                panLast4: "234F"
+                gstinLast4: "1Z5X"
+                upiLast4: null
+                bankLast4: "6789"
+                bankIfsc: HDFC0001234
+                notes: null
+                verifiedAt: null
+              stores:
+                - id: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  name: Annapurna Kirana
+                  status: pending_review
+                  locality: Jayanagar
+                  city: Bengaluru
+                  liveAt: null
+                  createdAt: "2026-10-20T09:00:00Z"
+              staff:
+                - id: 01JB0SSF1A2B3C4D5E6F7G8H9J
+                  name: Lakshmi
+                  role: owner
+                  status: active
+                  phoneMasked: "98•••••210"
+              documents:
+                - id: 01JB0SDC1A2B3C4D5E6F7G8H9J
+                  kind: storefront
+                  contentType: image/jpeg
+                  sizeBytes: 482113
+                  storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  status: uploaded
+                  rejectReason: null
+                  createdAt: "2026-10-21T09:00:00Z"
+                  reviewedAt: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/businesses/{businessId}/reject:
+  parameters:
+    - name: businessId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: rejectAdminBusiness
+    tags: [admin-businesses]
+    summary: Reject a business (audited)
+    description: >-
+      From `submitted` or `needs_info`, with a reason. Its stores stay as they are and are never shown to customers.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-businesses.yaml#/AdminBusinessChange
+          example:
+            reason: The documents belong to another shop
+    responses:
+      "200":
+        description: The business after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-businesses.yaml#/AdminBusiness
+            example:
+              id: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+              brandName: Annapurna Kirana
+              legalName: Annapurna Traders
+              status: rejected
+              needsInfoFields: []
+              needsInfoNote: null
+              submittedAt: "2026-10-23T09:00:00Z"
+              verifiedAt: null
+              createdAt: "2026-10-20T09:00:00Z"
+              kyc:
+                status: submitted
+                legalName: Annapurna Traders
+                panLast4: "234F"
+                gstinLast4: "1Z5X"
+                upiLast4: null
+                bankLast4: "6789"
+                bankIfsc: HDFC0001234
+                notes: null
+                verifiedAt: null
+              stores:
+                - id: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  name: Annapurna Kirana
+                  status: pending_review
+                  locality: Jayanagar
+                  city: Bengaluru
+                  liveAt: null
+                  createdAt: "2026-10-20T09:00:00Z"
+              staff:
+                - id: 01JB0SSF1A2B3C4D5E6F7G8H9J
+                  name: Lakshmi
+                  role: owner
+                  status: active
+                  phoneMasked: "98•••••210"
+              documents:
+                - id: 01JB0SDC1A2B3C4D5E6F7G8H9J
+                  kind: storefront
+                  contentType: image/jpeg
+                  sizeBytes: 482113
+                  storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  status: uploaded
+                  rejectReason: null
+                  createdAt: "2026-10-21T09:00:00Z"
+                  reviewedAt: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/businesses/{businessId}/suspend:
+  parameters:
+    - name: businessId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: suspendAdminBusiness
+    tags: [admin-businesses]
+    summary: Suspend a verified business (audited)
+    description: >-
+      From `verified`, with a reason. Its stores leave search at once (only stores of a verified business are shown); open orders are not cancelled.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-businesses.yaml#/AdminBusinessChange
+          example:
+            reason: Repeated fake listings
+    responses:
+      "200":
+        description: The business after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-businesses.yaml#/AdminBusiness
+            example:
+              id: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+              brandName: Annapurna Kirana
+              legalName: Annapurna Traders
+              status: suspended
+              needsInfoFields: []
+              needsInfoNote: null
+              submittedAt: "2026-10-23T09:00:00Z"
+              verifiedAt: null
+              createdAt: "2026-10-20T09:00:00Z"
+              kyc:
+                status: submitted
+                legalName: Annapurna Traders
+                panLast4: "234F"
+                gstinLast4: "1Z5X"
+                upiLast4: null
+                bankLast4: "6789"
+                bankIfsc: HDFC0001234
+                notes: null
+                verifiedAt: null
+              stores:
+                - id: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  name: Annapurna Kirana
+                  status: pending_review
+                  locality: Jayanagar
+                  city: Bengaluru
+                  liveAt: null
+                  createdAt: "2026-10-20T09:00:00Z"
+              staff:
+                - id: 01JB0SSF1A2B3C4D5E6F7G8H9J
+                  name: Lakshmi
+                  role: owner
+                  status: active
+                  phoneMasked: "98•••••210"
+              documents:
+                - id: 01JB0SDC1A2B3C4D5E6F7G8H9J
+                  kind: storefront
+                  contentType: image/jpeg
+                  sizeBytes: 482113
+                  storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  status: uploaded
+                  rejectReason: null
+                  createdAt: "2026-10-21T09:00:00Z"
+                  reviewedAt: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/businesses/{businessId}/reinstate:
+  parameters:
+    - name: businessId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: reinstateAdminBusiness
+    tags: [admin-businesses]
+    summary: Reinstate a suspended business (audited)
+    description: >-
+      From `suspended`, with a reason. The business is `verified` again and its live stores return to search.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-businesses.yaml#/AdminBusinessChange
+          example:
+            reason: Owner corrected the listings
+    responses:
+      "200":
+        description: The business after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-businesses.yaml#/AdminBusiness
+            example:
+              id: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+              brandName: Annapurna Kirana
+              legalName: Annapurna Traders
+              status: verified
+              needsInfoFields: []
+              needsInfoNote: null
+              submittedAt: "2026-10-23T09:00:00Z"
+              verifiedAt: "2026-10-24T11:00:00Z"
+              createdAt: "2026-10-20T09:00:00Z"
+              kyc:
+                status: submitted
+                legalName: Annapurna Traders
+                panLast4: "234F"
+                gstinLast4: "1Z5X"
+                upiLast4: null
+                bankLast4: "6789"
+                bankIfsc: HDFC0001234
+                notes: null
+                verifiedAt: null
+              stores:
+                - id: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  name: Annapurna Kirana
+                  status: live
+                  locality: Jayanagar
+                  city: Bengaluru
+                  liveAt: "2026-10-24T11:00:00Z"
+                  createdAt: "2026-10-20T09:00:00Z"
+              staff:
+                - id: 01JB0SSF1A2B3C4D5E6F7G8H9J
+                  name: Lakshmi
+                  role: owner
+                  status: active
+                  phoneMasked: "98•••••210"
+              documents:
+                - id: 01JB0SDC1A2B3C4D5E6F7G8H9J
+                  kind: storefront
+                  contentType: image/jpeg
+                  sizeBytes: 482113
+                  storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  status: uploaded
+                  rejectReason: null
+                  createdAt: "2026-10-21T09:00:00Z"
+                  reviewedAt: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/businesses/{businessId}/kyc/review:
+  parameters:
+    - name: businessId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: reviewAdminBusinessKyc
+    tags: [admin-businesses]
+    summary: Mark the KYC verified or rejected (audited)
+    description: >-
+      The KYC record has one status (01 §13). From `submitted` (or `rejected`, to verify after a fix). Rejecting needs a note, which the owner sees. No KYC record, or a status that does not allow the move, is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-businesses.yaml#/AdminKycReviewRequest
+          example:
+            decision: verified
+    responses:
+      "200":
+        description: The business after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-businesses.yaml#/AdminBusiness
+            example:
+              id: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+              brandName: Annapurna Kirana
+              legalName: Annapurna Traders
+              status: submitted
+              needsInfoFields: []
+              needsInfoNote: null
+              submittedAt: "2026-10-23T09:00:00Z"
+              verifiedAt: null
+              createdAt: "2026-10-20T09:00:00Z"
+              kyc:
+                status: submitted
+                legalName: Annapurna Traders
+                panLast4: "234F"
+                gstinLast4: "1Z5X"
+                upiLast4: null
+                bankLast4: "6789"
+                bankIfsc: HDFC0001234
+                notes: null
+                verifiedAt: null
+              stores:
+                - id: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  name: Annapurna Kirana
+                  status: pending_review
+                  locality: Jayanagar
+                  city: Bengaluru
+                  liveAt: null
+                  createdAt: "2026-10-20T09:00:00Z"
+              staff:
+                - id: 01JB0SSF1A2B3C4D5E6F7G8H9J
+                  name: Lakshmi
+                  role: owner
+                  status: active
+                  phoneMasked: "98•••••210"
+              documents:
+                - id: 01JB0SDC1A2B3C4D5E6F7G8H9J
+                  kind: storefront
+                  contentType: image/jpeg
+                  sizeBytes: 482113
+                  storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  status: uploaded
+                  rejectReason: null
+                  createdAt: "2026-10-21T09:00:00Z"
+                  reviewedAt: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/businesses/{businessId}/kyc/reveal:
+  parameters:
+    - name: businessId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: revealAdminBusinessKyc
+    tags: [admin-businesses]
+    summary: Show one KYC value in full (audited)
+    description: >-
+      Writes an audit row naming the field (never the value) before answering. The response is
+      `Cache-Control: no-store`. A field the owner has not given is `404 not_found`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-businesses.yaml#/AdminKycRevealRequest
+          example:
+            field: pan
+    responses:
+      "200":
+        description: The value
+        headers:
+          Cache-Control:
+            schema:
+              type: string
+              enum: [no-store]
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-businesses.yaml#/AdminKycReveal
+            example:
+              field: pan
+              value: ABCDE1234F
+      default: *problem
+/v1/admin/businesses/{businessId}/documents/{docId}/review:
+  parameters:
+    - name: businessId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: docId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: reviewAdminBusinessDocument
+    tags: [admin-businesses]
+    summary: Accept or reject an uploaded document (audited)
+    description: >-
+      From `uploaded` (or the other decision, to correct one). Rejecting needs a reason, which the owner sees.
+      A document still `pending` (never uploaded) is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-businesses.yaml#/AdminDocumentReviewRequest
+          example:
+            decision: rejected
+            reason: The photo is blurred
+    responses:
+      "200":
+        description: The business after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-businesses.yaml#/AdminBusiness
+            example:
+              id: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+              brandName: Annapurna Kirana
+              legalName: Annapurna Traders
+              status: submitted
+              needsInfoFields: []
+              needsInfoNote: null
+              submittedAt: "2026-10-23T09:00:00Z"
+              verifiedAt: null
+              createdAt: "2026-10-20T09:00:00Z"
+              kyc:
+                status: submitted
+                legalName: Annapurna Traders
+                panLast4: "234F"
+                gstinLast4: "1Z5X"
+                upiLast4: null
+                bankLast4: "6789"
+                bankIfsc: HDFC0001234
+                notes: null
+                verifiedAt: null
+              stores:
+                - id: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  name: Annapurna Kirana
+                  status: pending_review
+                  locality: Jayanagar
+                  city: Bengaluru
+                  liveAt: null
+                  createdAt: "2026-10-20T09:00:00Z"
+              staff:
+                - id: 01JB0SSF1A2B3C4D5E6F7G8H9J
+                  name: Lakshmi
+                  role: owner
+                  status: active
+                  phoneMasked: "98•••••210"
+              documents:
+                - id: 01JB0SDC1A2B3C4D5E6F7G8H9J
+                  kind: storefront
+                  contentType: image/jpeg
+                  sizeBytes: 482113
+                  storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  status: uploaded
+                  rejectReason: null
+                  createdAt: "2026-10-21T09:00:00Z"
+                  reviewedAt: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem

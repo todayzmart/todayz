@@ -61,6 +61,19 @@ type Deps struct {
 	Strikes StrikeRecounter
 	// Providers are the provider keys A-17 shows as set or missing.
 	Providers []ProviderKey
+	// Hours checks and normalises store hours for an A-05 edit
+	// (internal/business owns the rules). Without it an hours edit answers 503.
+	Hours HoursNormaliser
+}
+
+// HoursNormaliser validates store hours given in the stored JSON shape and
+// returns the bytes to store, or one field error per problem under prefix.
+type HoursNormaliser func(raw []byte, prefix string) (stored []byte, errs []FieldError, err error)
+
+// FieldError is one invalid field of a request.
+type FieldError struct {
+	Path   string
+	Reason string
 }
 
 // Service implements the admin-customers and admin-audit routes.
@@ -73,6 +86,7 @@ type Service struct {
 	hash      *pii.Hasher
 	strikes   StrikeRecounter
 	providers []ProviderKey
+	hours     HoursNormaliser
 }
 
 // New builds the service.
@@ -80,7 +94,7 @@ func New(d Deps) (*Service, error) {
 	if d.Clock == nil {
 		return nil, errors.New("admin: a clock is required")
 	}
-	return &Service{db: d.DB, clock: d.Clock, audit: d.Audit, az: d.Authz, seal: d.Seal, hash: d.Hash, strikes: d.Strikes, providers: d.Providers}, nil
+	return &Service{db: d.DB, clock: d.Clock, audit: d.Audit, az: d.Authz, seal: d.Seal, hash: d.Hash, strikes: d.Strikes, providers: d.Providers, hours: d.Hours}, nil
 }
 
 func (s *Service) ready(ctx context.Context) error {
@@ -110,10 +124,16 @@ func (s *Service) q(ctx context.Context) *admindb.Queries { return admindb.New(s
 // maskedPhone opens a sealed phone and masks it; nil when there is none or
 // it cannot be opened (the error is logged without the value).
 func (s *Service) maskedPhone(ctx context.Context, enc []byte) *string {
+	return s.maskSealed(ctx, "phone", enc)
+}
+
+// maskSealed is maskedPhone for a phone sealed under another field name
+// (business phones are sealed per owner: "phone:<id>").
+func (s *Service) maskSealed(ctx context.Context, field string, enc []byte) *string {
 	if len(enc) == 0 || s.seal == nil {
 		return nil
 	}
-	plain, err := s.seal.Open("phone", enc)
+	plain, err := s.seal.Open(field, enc)
 	if err != nil {
 		telemetry.Logger(ctx).WarnContext(ctx, "admin: a stored phone did not open")
 		return nil
@@ -234,6 +254,10 @@ func fieldErr(path, reason string) *problem.Error {
 }
 
 func notFound() *problem.Error { return problem.New(genproblems.NotFound, "") }
+
+func unavailable() *problem.Error {
+	return problem.Wrap(genproblems.ServiceUnavailable, errUnavailable)
+}
 
 func invalidTransition(detail string) *problem.Error {
 	return problem.New(genproblems.InvalidTransition, detail)

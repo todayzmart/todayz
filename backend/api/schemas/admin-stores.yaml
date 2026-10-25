@@ -1,9 +1,255 @@
-# Schemas: domain "admin-stores" (owner W3-05): admin stores (04 §2.7).
-#
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Schemas: domain "admin-stores" (owner W3-05): A-05 Stores (04 §2.7, D-40, D-41).
+# The hours shapes repeat the business app's StoreHours (business.yaml) so this domain's client stays self-contained;
+# the server checks them with the same rules.
+AdminStoreStatus:
+  type: string
+  description: "Only `live` stores of `verified` businesses are visible to customers (D-40)."
+  enum: [draft, pending_review, live, paused, suspended]
+AdminStoreChange:
+  type: object
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason:
+      type: string
+      description: Why, 1 to 500 characters. Kept in the audit log.
+      minLength: 1
+      maxLength: 500
+AdminStoreReviewRequest:
+  type: object
+  additionalProperties: false
+  required: [decision]
+  properties:
+    decision:
+      type: string
+      enum: [approve, send_back]
+    note:
+      type: string
+      description: Required to send back; kept on the store for the owner (address and photos, D-40).
+      minLength: 1
+      maxLength: 500
+AdminStoreForceClose:
+  type: object
+  additionalProperties: false
+  required: [reason, until]
+  properties:
+    reason:
+      type: string
+      description: Why, 1 to 500 characters. Kept in the audit log.
+      minLength: 1
+      maxLength: 500
+    until:
+      $ref: ./common.yaml#/Timestamp
+      description: The store shows closed and takes no orders until then; must be in the future.
+AdminHoursRange:
+  type: object
+  description: "Open from `open` to `close`, IST. A `close` at or before `open` runs past midnight; `24:00` is midnight."
+  additionalProperties: false
+  required: [open, close]
+  properties:
+    open:
+      type: string
+      pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+      maxLength: 5
+    close:
+      type: string
+      pattern: ^(([01][0-9]|2[0-3]):[0-5][0-9]|24:00)$
+      maxLength: 5
+AdminHoursDay:
+  type: array
+  description: The day's ranges; empty or absent means closed. At most 4, not overlapping.
+  maxItems: 4
+  items: {$ref: ./admin-stores.yaml#/AdminHoursRange}
+AdminStoreHoliday:
+  type: object
+  additionalProperties: false
+  required: [date, ranges]
+  properties:
+    date:
+      type: string
+      pattern: ^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$
+      maxLength: 10
+    ranges: {$ref: ./admin-stores.yaml#/AdminHoursDay}
+AdminStoreWeek:
+  type: object
+  additionalProperties: false
+  properties:
+    mon: {$ref: ./admin-stores.yaml#/AdminHoursDay}
+    tue: {$ref: ./admin-stores.yaml#/AdminHoursDay}
+    wed: {$ref: ./admin-stores.yaml#/AdminHoursDay}
+    thu: {$ref: ./admin-stores.yaml#/AdminHoursDay}
+    fri: {$ref: ./admin-stores.yaml#/AdminHoursDay}
+    sat: {$ref: ./admin-stores.yaml#/AdminHoursDay}
+    sun: {$ref: ./admin-stores.yaml#/AdminHoursDay}
+AdminStoreHours:
+  type: object
+  description: Weekly opening hours and holidays, IST (01 §3).
+  additionalProperties: false
+  required: [weekly, holidays]
+  properties:
+    weekly: {$ref: ./admin-stores.yaml#/AdminStoreWeek}
+    holidays:
+      type: array
+      maxItems: 60
+      items: {$ref: ./admin-stores.yaml#/AdminStoreHoliday}
+AdminStorePin:
+  type: object
+  description: The map pin (WGS 84), inside India.
+  additionalProperties: false
+  required: [lat, lng]
+  properties:
+    lat: {type: number, format: double, minimum: 6, maximum: 38}
+    lng: {type: number, format: double, minimum: 68, maximum: 98}
+AdminStoreUpdate:
+  type: object
+  description: A pin, hours or both, with a reason.
+  additionalProperties: false
+  required: [reason]
+  minProperties: 2
+  properties:
+    reason:
+      type: string
+      description: Why, 1 to 500 characters. Kept in the audit log.
+      minLength: 1
+      maxLength: 500
+    location: {$ref: ./admin-stores.yaml#/AdminStorePin}
+    hours: {$ref: ./admin-stores.yaml#/AdminStoreHours}
+AdminStoreSummary:
+  type: object
+  additionalProperties: false
+  required: [id, name, businessId, businessName, businessStatus, status, locality, city, closedUntil, activeStrikes, reliabilityScore, createdAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name: {type: string, maxLength: 80}
+    businessId: {$ref: ./common.yaml#/Ulid}
+    businessName: {type: string, maxLength: 80}
+    businessStatus:
+      type: string
+      enum: [draft, submitted, needs_info, verified, rejected, suspended]
+    status: {$ref: ./admin-stores.yaml#/AdminStoreStatus}
+    locality:
+      type: [string, 'null']
+      maxLength: 80
+    city:
+      type: [string, 'null']
+      maxLength: 80
+    closedUntil:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    activeStrikes: {type: integer, minimum: 0}
+    reliabilityScore:
+      type: [number, 'null']
+      format: double
+      minimum: 0
+      maximum: 1
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+AdminStoreList:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: ./admin-stores.yaml#/AdminStoreSummary}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminStoreStrike:
+  type: object
+  additionalProperties: false
+  required: [id, reason, orderId, createdAt, resetAt, resetReason]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    reason: {type: string, maxLength: 40}
+    orderId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    resetAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    resetReason:
+      type: [string, 'null']
+      maxLength: 500
+AdminStore:
+  type: object
+  additionalProperties: false
+  required: [id, name, businessId, businessName, businessStatus, status, addressLine1, addressLine2, landmark, locality, city, pincode, location, hours, closedUntil, reviewNote, liveAt, reviewedAt, ratingAvg, ratingCount, acceptRate30d, unacceptedExpiryRate30d, reliabilityScore, reliabilityComputedAt, activeStrikes, strikes, createdAt, serverNow]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name: {type: string, maxLength: 80}
+    businessId: {$ref: ./common.yaml#/Ulid}
+    businessName: {type: string, maxLength: 80}
+    businessStatus:
+      type: string
+      enum: [draft, submitted, needs_info, verified, rejected, suspended]
+    status: {$ref: ./admin-stores.yaml#/AdminStoreStatus}
+    addressLine1:
+      type: [string, 'null']
+      maxLength: 200
+    addressLine2:
+      type: [string, 'null']
+      maxLength: 200
+    landmark:
+      type: [string, 'null']
+      maxLength: 120
+    locality:
+      type: [string, 'null']
+      maxLength: 80
+    city:
+      type: [string, 'null']
+      maxLength: 80
+    pincode:
+      type: [string, 'null']
+      maxLength: 6
+    location:
+      description: Null until the owner drops a pin.
+      type: [object, 'null']
+      additionalProperties: false
+      required: [lat, lng]
+      properties:
+        lat: {type: number, format: double}
+        lng: {type: number, format: double}
+    hours: {$ref: ./admin-stores.yaml#/AdminStoreHours}
+    closedUntil:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    reviewNote:
+      type: [string, 'null']
+      description: The note of the last send-back, until the store is approved.
+      maxLength: 500
+    liveAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    reviewedAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    ratingAvg:
+      type: [number, 'null']
+      format: double
+    ratingCount: {type: integer, minimum: 0}
+    acceptRate30d:
+      type: [number, 'null']
+      format: double
+    unacceptedExpiryRate30d:
+      type: [number, 'null']
+      format: double
+    reliabilityScore:
+      type: [number, 'null']
+      format: double
+    reliabilityComputedAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    activeStrikes: {type: integer, minimum: 0}
+    strikes:
+      type: array
+      maxItems: 50
+      items: {$ref: ./admin-stores.yaml#/AdminStoreStrike}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
