@@ -1,10 +1,13 @@
 package schema
 
 import (
+	"bytes"
+	"encoding/json"
 	"math/big"
 	"regexp"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 // Number grounding (11 §1 rule 5): free text a model writes (insight sentences, coach cards,
@@ -74,6 +77,208 @@ func Ungrounded(text string, inputs ...string) []string {
 	for _, n := range Numbers(text) {
 		if !have[n] {
 			bad = append(bad, n)
+		}
+	}
+	return bad
+}
+
+// Unit is what a number measures.
+type Unit uint8
+
+const (
+	Plain Unit = iota
+	Percent
+	Money
+)
+
+// Marks of a percent or a rupee amount around a number. Text uses the same forms the prompts
+// ask for; a percent or an amount written another way ("das pratishat") reads as plain.
+var (
+	moneyBefore   = []string{"₹", "rs.", "rs", "inr", "रु.", "रु", "रू.", "रू", "ರೂ.", "ರೂ", "రూ.", "రూ", "ரூ.", "ரூ"}
+	moneyAfter    = []string{"/-", "rupees", "rupee", "rs", "रुपये", "रुपए", "रुपया"}
+	percentBefore = []string{"ಶೇ.", "ಶೇ"}
+	percentAfter  = []string{"%", "percent", "per cent", "प्रतिशत", "శాతం", "சதவீதம்", "ಪ್ರತಿಶತ"}
+)
+
+type unitNumber struct {
+	n string
+	u Unit
+}
+
+// numbersWithUnits is Numbers with each number's unit read from the marks around it.
+func numbersWithUnits(s string) []unitNumber {
+	s = asciiDigits(s)
+	var out []unitNumber
+	for _, ix := range reNumber.FindAllStringIndex(s, -1) {
+		m := strings.TrimRight(s[ix[0]:ix[1]], ",")
+		c, ok := canonical(m)
+		if !ok {
+			continue
+		}
+		before := strings.ToLower(strings.TrimRightFunc(s[:ix[0]], unicode.IsSpace))
+		after := strings.ToLower(strings.TrimLeftFunc(s[ix[0]+len(m):], unicode.IsSpace))
+		u := Plain
+		switch {
+		case endsWithMark(before, percentBefore) || startsWithMark(after, percentAfter):
+			u = Percent
+		case endsWithMark(before, moneyBefore) || startsWithMark(after, moneyAfter):
+			u = Money
+		}
+		out = append(out, unitNumber{c, u})
+	}
+	return out
+}
+
+// A mark that is a word ("rs") must stand alone: "hours 5" is not "rs 5".
+func endsWithMark(s string, marks []string) bool {
+	for _, w := range marks {
+		if !strings.HasSuffix(s, w) {
+			continue
+		}
+		rest := s[:len(s)-len(w)]
+		first, _ := utf8.DecodeRuneInString(w)
+		last, _ := utf8.DecodeLastRuneInString(rest)
+		if rest == "" || !unicode.IsLetter(first) || !unicode.IsLetter(last) {
+			return true
+		}
+	}
+	return false
+}
+
+func startsWithMark(s string, marks []string) bool {
+	for _, w := range marks {
+		if !strings.HasPrefix(s, w) {
+			continue
+		}
+		rest := s[len(w):]
+		end, _ := utf8.DecodeLastRuneInString(w)
+		next, _ := utf8.DecodeRuneInString(rest)
+		if rest == "" || !unicode.IsLetter(end) || !unicode.IsLetter(next) {
+			return true
+		}
+	}
+	return false
+}
+
+// keyUnit is the unit of a fact by its JSON key; skip is an index or id, which grounds
+// nothing (an item's place in the list is not a number the model may say).
+func keyUnit(key string) (u Unit, skip bool) {
+	k := strings.ToLower(key)
+	switch {
+	case k == "n" || k == "index" || k == "idx" || k == "rank" || k == "id" ||
+		strings.HasSuffix(key, "Id") || strings.HasSuffix(key, "Ids"):
+		return Plain, true
+	case strings.Contains(k, "pct") || strings.Contains(k, "percent"):
+		return Percent, false
+	}
+	for _, w := range []string{"paise", "rupees", "price", "mrp", "cost", "sales", "amount"} {
+		if strings.Contains(k, w) {
+			return Money, false
+		}
+	}
+	return Plain, false
+}
+
+// grounds is the set of numbers a model was given, by unit.
+type grounds map[Unit]map[string]bool
+
+func (g grounds) add(n string, u Unit) {
+	if g[u] == nil {
+		g[u] = map[string]bool{}
+	}
+	g[u][n] = true
+}
+
+// has: a percent or an amount needs a fact of its unit; a plain number may be any fact's.
+func (g grounds) has(x unitNumber) bool {
+	if x.u != Plain {
+		return g[x.u][x.n]
+	}
+	return g[Plain][x.n] || g[Percent][x.n] || g[Money][x.n]
+}
+
+func (g grounds) walk(key string, v any) {
+	switch t := v.(type) {
+	case map[string]any:
+		for k, x := range t {
+			g.walk(k, x)
+		}
+	case []any:
+		for _, x := range t {
+			g.walk(key, x)
+		}
+	case json.Number:
+		u, skip := keyUnit(key)
+		if skip {
+			return
+		}
+		if c, ok := canonical(t.String()); ok {
+			g.add(fromPaise(key, c), u)
+		}
+	case string:
+		u, skip := keyUnit(key)
+		if skip {
+			return
+		}
+		ns := numbersWithUnits(t)
+		// A string that is only a number ("55" under priceRupees) takes its key's unit;
+		// otherwise (a name, a date) its numbers keep their own marks.
+		bare := strings.TrimSpace(asciiDigits(t))
+		whole := bare != "" && reNumber.FindString(bare) == bare
+		for _, x := range ns {
+			if whole {
+				x.u, x.n = u, fromPaise(key, x.n)
+			}
+			g.add(x.n, x.u)
+		}
+	}
+}
+
+// fromPaise reads a …Paise fact as rupees, the way text says it.
+func fromPaise(key, c string) string {
+	if !strings.HasSuffix(strings.ToLower(key), "paise") {
+		return c
+	}
+	r, ok := new(big.Rat).SetString(c)
+	if !ok {
+		return c
+	}
+	out, _ := canonical(r.Quo(r, big.NewRat(100, 1)).FloatString(2))
+	return out
+}
+
+// UngroundedFacts is Ungrounded with units (rule 5, D-229). facts is the JSON the model was
+// given: a number under a percent key (pct, …Pct, percentOff) grounds only a percent, one
+// under a money key (…Paise as rupees, …Rupees, price, mrp, cost, sales, amount) only an
+// amount, and an index or id (n, …Id) nothing, so banner copy cannot turn item 2 into "2%
+// off" or a 10 % offer into "₹10 off". In text, "N%" must match a percent fact and "₹N" a
+// money fact; a plain number may match any fact. extra are free strings the model was given
+// (a review's text), whose numbers carry their own marks.
+func UngroundedFacts(text string, facts []byte, extra ...string) []string {
+	g := grounds{}
+	if len(bytes.TrimSpace(facts)) > 0 {
+		dec := json.NewDecoder(bytes.NewReader(facts))
+		dec.UseNumber()
+		var v any
+		if dec.Decode(&v) != nil {
+			return Numbers(text) // facts that do not parse ground nothing
+		}
+		g.walk("", v)
+	}
+	for _, s := range extra {
+		for _, x := range numbersWithUnits(s) {
+			g.add(x.n, x.u)
+		}
+	}
+	seen := map[unitNumber]bool{}
+	var bad []string
+	for _, x := range numbersWithUnits(text) {
+		if seen[x] {
+			continue
+		}
+		seen[x] = true
+		if !g.has(x) {
+			bad = append(bad, x.n)
 		}
 	}
 	return bad

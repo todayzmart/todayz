@@ -104,7 +104,7 @@ func Write(ctx context.Context, llm client.LLM, model, ref string, rv Review) (D
 		return Draft{Resp: resp, Reject: reject}, err
 	}
 	text := strings.TrimSpace(out.Text)
-	if bad := schema.Ungrounded(text, string(facts)); len(bad) > 0 || !scrub.Clean(text) {
+	if bad := schema.UngroundedFacts(text, facts); len(bad) > 0 || !scrub.Clean(text) {
 		client.RecordRejected(ctx, Feature, client.RejectGrounding)
 		return Draft{Resp: resp, Reject: client.RejectGrounding}, nil
 	}

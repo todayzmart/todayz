@@ -171,7 +171,7 @@ func Write(ctx context.Context, llm client.LLM, model, ref string, f Facts) (Dra
 		texts := []string{op.Headline, op.Subline, op.HeadlineEn, op.SublineEn}
 		grounded := true
 		for _, t := range texts {
-			if len(schema.Ungrounded(t, string(facts))) > 0 || !scrub.Clean(t) {
+			if len(schema.UngroundedFacts(t, facts)) > 0 || !scrub.Clean(t) {
 				grounded = false
 			}
 		}

@@ -81,8 +81,9 @@ type Input struct {
 
 // Readable is a row's facts as the model reads them (and as grounding checks
 // them): keys naming ids are left out, a *Paise number becomes rupees
-// ("valueAtCostPaise": 18240 → "valueAtCost": "182.40"), and the action
-// payload's numbers join under "action".
+// ("valueAtCostPaise": 18240 → "valueAtCostRupees": "182.40", so grounding
+// still reads it as money, D-229), and the action payload's numbers join
+// under "action".
 func Readable(r facts.Row) map[string]any {
 	out := readable(r.Facts)
 	if a := readable(r.Action.Payload); len(a) > 0 {
@@ -99,7 +100,7 @@ func readable(m map[string]any) map[string]any {
 		}
 		if base, ok := strings.CutSuffix(k, "Paise"); ok {
 			if p, ok := paise(v); ok {
-				out[base] = rupees(p)
+				out[base+"Rupees"] = rupees(p)
 				continue
 			}
 		}
@@ -226,5 +227,5 @@ func Grounded(text string, row Row) bool {
 	if err != nil {
 		return false
 	}
-	return len(schema.Ungrounded(text, string(f))) == 0 && scrub.Clean(text)
+	return len(schema.UngroundedFacts(text, f)) == 0 && scrub.Clean(text)
 }

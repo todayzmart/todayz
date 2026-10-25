@@ -64,7 +64,7 @@ func TestTemplatesAreGrounded(t *testing.T) {
 					require.LessOrEqual(t, utf8.RuneCountInString(out.Body), bodyMax)
 					b, err := json.Marshal(nums)
 					require.NoError(t, err)
-					require.Empty(t, schema.Ungrounded(out.Title+"\n"+out.Body, string(b)),
+					require.Empty(t, schema.UngroundedFacts(out.Title+"\n"+out.Body, b),
 						"%s/%s/%s: %q %q", det, variant, lang, out.Title, out.Body)
 				}
 			}

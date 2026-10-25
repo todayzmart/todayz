@@ -35,7 +35,8 @@ func TestBannerCopyWritesNoBanner(t *testing.T) {
 	items := e.Items(t, 2)
 	e.LLM.Reply = bannercopy.ToolOutput{Options: []bannercopy.ToolOption{
 		{Headline: "Fresh stock is in", Subline: "Pick up today", HeadlineEn: "Fresh stock is in", SublineEn: "Pick up today", Tint: "green", Item: one(1)},
-		{Headline: "37% off everything", Subline: "", HeadlineEn: "37% off everything", SublineEn: "", Tint: "rose"},
+		// D-229: item 2 of the list is not a discount (only a percent fact grounds "N%").
+		{Headline: "2% off everything", Subline: "", HeadlineEn: "2% off everything", SublineEn: "", Tint: "rose"},
 		{Headline: "Your daily needs", Subline: "Near you", HeadlineEn: "Your daily needs", SublineEn: "Near you", Tint: "sky"},
 	}}
 	banners := func() int {

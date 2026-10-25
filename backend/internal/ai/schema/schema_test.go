@@ -38,6 +38,50 @@ func TestUngrounded(t *testing.T) {
 	}
 }
 
+// D-229: a percent needs a percent fact, an amount a money fact, and an
+// item's place in the list grounds nothing.
+func TestUngroundedFacts(t *testing.T) {
+	banner := `{"shop":"Om Sai","offer":{"kind":"percent","percentOff":10,"endsOn":"25 Oct"},` +
+		`"items":[{"n":1,"name":"Tata Salt 1kg","priceRupees":"28"},{"n":2,"name":"Lux 100g","priceRupees":"38","mrpRupees":"40"}]}`
+	cases := []struct {
+		name, text, facts string
+		extra             []string
+		want              []string
+	}{
+		{"percent fact", "10% off everything", banner, nil, nil},
+		{"percent word", "10 percent off", banner, nil, nil},
+		{"money fact", "Tata Salt at ₹28", banner, nil, nil},
+		{"rs prefix", "Lux at Rs.38, MRP Rs 40", banner, nil, nil},
+		{"rupees suffix", "only 28 rupees", banner, nil, nil},
+		{"slash dash", "Salt 28/-", banner, nil, nil},
+		{"plain matches any unit", "10 off, 28 each", banner, nil, nil},
+		{"percent is not money", "₹10 off", banner, nil, []string{"10"}},
+		{"money is not percent", "28% off", banner, nil, []string{"28"}},
+		{"index grounds nothing", "2% off Lux", banner, nil, []string{"2"}},
+		{"index plain", "Buy 2", banner, nil, []string{"2"}},
+		{"date is not percent", "25% off", banner, nil, []string{"25"}},
+		{"date plain", "till 25 Oct", banner, nil, nil},
+		{"name number plain", "1kg packs", banner, nil, nil},
+		{"name number is not money", "₹1 only", banner, nil, []string{"1"}},
+		{"paise as rupees", "₹146 nearby", `{"refPaise":14600}`, nil, nil},
+		{"paise string", "sales ₹182.40", `{"salesPaise":"18240"}`, nil, nil},
+		{"coach pct", "up 12%, ₹4,200 in sales", `{"pct":12,"sales":"4200","bills":31}`, nil, nil},
+		{"count is not percent", "31% more", `{"pct":12,"sales":"4200","bills":31}`, nil, []string{"31"}},
+		{"buy get plain", "Buy 2 get 1", `{"kind":"bxgy","buy":2,"get":1}`, nil, nil},
+		{"hours is not rs", "open 5 hours 5 days", `{"days":5}`, nil, nil},
+		{"native digits", "१०% छूट", banner, nil, nil},
+		{"kannada percent", "ಶೇ 10 ರಿಯಾಯಿತಿ", banner, nil, nil},
+		{"extra review text", "sorry about the ₹50 charge", `{"stars":2}`, []string{"charged me ₹50"}, nil},
+		{"extra plain is not money", "₹2 back", `{"stars":2}`, []string{"waited 2 days"}, []string{"2"}},
+		{"bad facts ground nothing", "3 left", `{`, nil, []string{"3"}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			assert.Equal(t, c.want, UngroundedFacts(c.text, []byte(c.facts), c.extra...))
+		})
+	}
+}
+
 func TestHasDigits(t *testing.T) {
 	assert.True(t, HasDigits("x 3"))
 	assert.True(t, HasDigits("೩"))
