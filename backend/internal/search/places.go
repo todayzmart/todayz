@@ -91,7 +91,7 @@ func (s *Service) SearchPlaces(ctx context.Context, p discoverapi.SearchPlacesPa
 		return out, err
 	}
 	lim := i32(pageLimit(p.Limit, defaultPlaceLimit))
-	text := strings.Join(strings.Fields(p.Q), " ")
+	text := typedText(p.Q)
 	if text == "" {
 		return out, nil
 	}
