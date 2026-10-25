@@ -27,8 +27,6 @@ github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.22 h1:qHfXn1
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.22/go.mod h1:D4ytxJbGXu82l+2XF0q60bibysf+KkIbWfAOldAQwf8=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.14.7 h1:6MSlRo7aiUVBftQ8XmW7XIh3EZqCbkN9zI0YlGW8nl0=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.14.7/go.mod h1:OqapjZfp6VW4YJKKO4l68UdPvS4FIEYuEoq1JNkxCL0=
-github.com/aws/aws-sdk-go-v2/service/pi v1.46.3 h1:Ky38p8oFT1+w9gYTaqdA/4Cb3ciOfC9dT5evkZ/RtJE=
-github.com/aws/aws-sdk-go-v2/service/pi v1.46.3/go.mod h1:t0g4bFmayY0KaCHd2ovPhr7otrNHKUd0Uh+tUGBOLjw=
 github.com/aws/aws-sdk-go-v2/service/pinpointsmsvoicev2 v1.42.2 h1:G5bTqn6PQ4wEciOVHGppsoLxAwYeT8Yw/m4/JdgoSrA=
 github.com/aws/aws-sdk-go-v2/service/pinpointsmsvoicev2 v1.42.2/go.mod h1:0x7ZbAKttJ7yXq+zekPX+sw7tRy7PNKN8wLbjwH/67c=
 github.com/aws/aws-sdk-go-v2/service/rds v1.131.1 h1:CAVL+rJiNapbZawRFDJFMHsk3Uya5Mag/GMYJVFvNho=

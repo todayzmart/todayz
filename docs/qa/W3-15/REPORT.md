@@ -133,5 +133,5 @@ In `docs/qa/W3-15/`, at desktop 1280×800, written by Playwright with `TZ_QA_DIR
 - **`backend/cmd/todayz/routes_admin.go`:** mounts `internal/ops`.
 - **`backend/internal/platform/authz/policy/ops.go` and `testdata/ops.golden`:** the new `ops` domain.
 - **`backend/internal/testkit/testkit.go` and `scripts/testpg.sh`:** start Postgres with `shared_preload_libraries=pg_stat_statements`. Other packages are unaffected; the shared server needs a restart (`make testpg-up` after it is stopped) to pick this up.
-- **`backend/go.mod`:** the AWS SDK modules were pinned by the lead in 006d394 (D-227); W3-15 made no change to it.
+- **`backend/go.mod`, `go.sum`:** the lead pinned the AWS SDK modules in 006d394 (D-227). `go mod tidy` then marked `service/cloudwatch`, `elasticbeanstalk` and `rds` as direct requirements. It also dropped `service/pi` v1.46.3, because nothing imports it: the top-10 panel reads `pg_stat_statements` (Question 4). If Performance Insights is wanted later, it comes back at the same pin. Versions are unchanged, and `go mod verify` is ok.
 - **`admin/CLAUDE.md`, `backend/CLAUDE.md`:** W3-15 status lines.
