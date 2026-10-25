@@ -169,10 +169,15 @@ func TestOrderCodeCollisionRedraws(t *testing.T) {
 	defer func() { _ = tx.Rollback(ctx) }()
 	_, err = tx.Exec(ctx, `UPDATE orders SET code_hmac = $1 WHERE id = $2`, o.codeHMAC("3333"), uuidOf(t, a))
 	require.NoError(t, err)
+	var txPID int
+	require.NoError(t, tx.QueryRow(ctx, `SELECT pg_backend_pid()`).Scan(&txPID))
 	done := make(chan resp, 1)
 	go func() { done <- o.place(o.cust2, line{o.atta, 1}) }()
+	// Blocked by this transaction, not by any lock in the cluster: an
+	// unrelated waiter let the commit run before C's insert, so C's check
+	// saw the code (in_use) and the test flaked.
 	require.Eventually(t, func() bool {
-		return o.a.count(`SELECT count(*) FROM pg_locks WHERE NOT granted`) > 0
+		return o.a.count(`SELECT count(*) FROM pg_stat_activity WHERE $1::int = ANY(pg_blocking_pids(pid))`, txPID) > 0
 	}, 10*time.Second, 10*time.Millisecond, "the insert waits on the open transaction")
 	require.NoError(t, tx.Commit(ctx))
 	r = <-done

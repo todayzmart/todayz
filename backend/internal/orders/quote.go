@@ -14,6 +14,7 @@ import (
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/money"
 )
 
 // Price sources (order_items.price_source).
@@ -230,14 +231,14 @@ func (s *Service) price(ctx context.Context, customerID ids.ID, st ordersdb.Stor
 		return quoted{}, fmt.Errorf("orders: credits: %w", err)
 	}
 	q.creditsAllowed = max(al.Allowed, 0)
-	q.creditsUsed = min(q.creditsRequested, q.creditsAllowed, int(q.itemsAfterOffers/100))
+	q.creditsUsed = min(q.creditsRequested, q.creditsAllowed, int(q.itemsAfterOffers/money.PaisePerCredit))
 	if q.creditsRequested > q.creditsUsed {
 		q.creditsLimit = al.Limit
 	}
 	if c.fulfilment == Delivery {
 		q.fee = deliveryFee(q.itemSubtotal, st.DeliveryFeePaise, st.DeliveryFreeAbovePaise)
 	}
-	q.total = q.itemsAfterOffers - int64(q.creditsUsed)*100 + q.fee
+	q.total = q.itemsAfterOffers - int64(q.creditsUsed)*money.PaisePerCredit + q.fee
 	q.notOrderable = q.firstShort >= 0
 	return q, nil
 }
