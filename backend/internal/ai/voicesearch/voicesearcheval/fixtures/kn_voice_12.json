@@ -1,0 +1,58 @@
+{
+  "name": "kn_voice_12",
+  "input": {
+    "language": "",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "ರಾಗಿ ಹಿಟ್ಟು",
+    "language": "kn",
+    "chips": []
+  },
+  "reply": {
+    "request_id": "rec_vs_kn_voice_12",
+    "transcript": "ರಾಗಿ ಹಿಟ್ಟು",
+    "language_code": "kn-IN"
+  }
+}

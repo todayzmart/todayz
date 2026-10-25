@@ -1,0 +1,64 @@
+{
+  "name": "en_ungrounded_words",
+  "input": {
+    "q": "toor dal open now please",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "open now"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_en_ungrounded_words",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_en_ungrounded_words",
+        "name": "suggest_search",
+        "input": {
+          "query": "toor dal 500 g",
+          "chips": [
+            {
+              "kind": "delivery",
+              "value": null,
+              "text": "free delivery in 10 minutes"
+            },
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "open now"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "name": "ta_assist_11",
+  "input": {
+    "q": "துவரம் பருப்பு எங்கே கிடைக்கும் அருகில்",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "துவரம் பருப்பு",
+    "chips": [
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "அருகில்"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_ta_assist_11",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_ta_assist_11",
+        "name": "suggest_search",
+        "input": {
+          "query": "துவரம் பருப்பு",
+          "chips": [
+            {
+              "kind": "nearest",
+              "value": null,
+              "text": "அருகில்"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 85
+    }
+  }
+}

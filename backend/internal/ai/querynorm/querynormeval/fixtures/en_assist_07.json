@@ -1,0 +1,69 @@
+{
+  "name": "en_assist_07",
+  "input": {
+    "q": "tata salt on offer please",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "tata salt",
+    "chips": [
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "on offer"
+      },
+      {
+        "kind": "brand",
+        "value": "tata",
+        "text": "tata"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_en_assist_07",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_en_assist_07",
+        "name": "suggest_search",
+        "input": {
+          "query": "tata salt",
+          "chips": [
+            {
+              "kind": "offers",
+              "value": null,
+              "text": "on offer"
+            },
+            {
+              "kind": "brand",
+              "value": "tata",
+              "text": "tata"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

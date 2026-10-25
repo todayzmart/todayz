@@ -1,0 +1,59 @@
+{
+  "name": "ta_list_28",
+  "input": {
+    "text": "தயிர் 500 கிராம்\npaal rendu\nஉப்பு",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "தயிர் 500 கிராம்",
+        "quantity": 1
+      },
+      {
+        "text": "paal",
+        "quantity": 2
+      },
+      {
+        "text": "உப்பு",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_list_28",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_list_28",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "தயிர் 500 கிராம்",
+              "quantity": 1
+            },
+            {
+              "text": "paal",
+              "quantity": 2
+            },
+            {
+              "text": "உப்பு",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 457,
+      "output_tokens": 130
+    }
+  }
+}

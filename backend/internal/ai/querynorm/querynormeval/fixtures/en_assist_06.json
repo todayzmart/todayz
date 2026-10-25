@@ -1,0 +1,59 @@
+{
+  "name": "en_assist_06",
+  "input": {
+    "q": "baby diapers near me please",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "baby diapers",
+    "chips": [
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "near me"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_en_assist_06",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_en_assist_06",
+        "name": "suggest_search",
+        "input": {
+          "query": "baby diapers",
+          "chips": [
+            {
+              "kind": "nearest",
+              "value": null,
+              "text": "near me"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 85
+    }
+  }
+}

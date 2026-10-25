@@ -1,0 +1,67 @@
+{
+  "name": "en_list_16",
+  "input": {
+    "text": "Colgate 100 g, 1 kg atta, Red Label tea 250 g, a dozen bananas",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "Colgate 100 g",
+        "quantity": 1
+      },
+      {
+        "text": "1 kg atta",
+        "quantity": 1
+      },
+      {
+        "text": "Red Label tea 250 g",
+        "quantity": 1
+      },
+      {
+        "text": "bananas",
+        "quantity": 12
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_16",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_16",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "Colgate 100 g",
+              "quantity": 1
+            },
+            {
+              "text": "1 kg atta",
+              "quantity": 1
+            },
+            {
+              "text": "Red Label tea 250 g",
+              "quantity": 1
+            },
+            {
+              "text": "bananas",
+              "quantity": 12
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 475,
+      "output_tokens": 160
+    }
+  }
+}

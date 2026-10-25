@@ -1,0 +1,75 @@
+{
+  "name": "kn_list_16",
+  "input": {
+    "text": "ಟೊಮೆಟೊ 1 ಕೆಜಿ, ಬ್ರೆಡ್, ಬೆಣ್ಣೆ 100 ಗ್ರಾಂ, ಕೊತ್ತಂಬರಿ, ಮೊಸರು 500 ಗ್ರಾಂ",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಟೊಮೆಟೊ 1 ಕೆಜಿ",
+        "quantity": 1
+      },
+      {
+        "text": "ಬ್ರೆಡ್",
+        "quantity": 1
+      },
+      {
+        "text": "ಬೆಣ್ಣೆ 100 ಗ್ರಾಂ",
+        "quantity": 1
+      },
+      {
+        "text": "ಕೊತ್ತಂಬರಿ",
+        "quantity": 1
+      },
+      {
+        "text": "ಮೊಸರು 500 ಗ್ರಾಂ",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_16",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_16",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಟೊಮೆಟೊ 1 ಕೆಜಿ",
+              "quantity": 1
+            },
+            {
+              "text": "ಬ್ರೆಡ್",
+              "quantity": 1
+            },
+            {
+              "text": "ಬೆಣ್ಣೆ 100 ಗ್ರಾಂ",
+              "quantity": 1
+            },
+            {
+              "text": "ಕೊತ್ತಂಬರಿ",
+              "quantity": 1
+            },
+            {
+              "text": "ಮೊಸರು 500 ಗ್ರಾಂ",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 488,
+      "output_tokens": 190
+    }
+  }
+}

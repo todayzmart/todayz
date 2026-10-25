@@ -1,0 +1,67 @@
+{
+  "name": "kn_list_25",
+  "input": {
+    "text": "ಬ್ರೆಡ್\nಟೊಮೆಟೊ 1 ಕೆಜಿ\n1 kg ಅಕ್ಕಿ\nಮೊಸರು 500 ಗ್ರಾಂ",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಬ್ರೆಡ್",
+        "quantity": 1
+      },
+      {
+        "text": "ಟೊಮೆಟೊ 1 ಕೆಜಿ",
+        "quantity": 1
+      },
+      {
+        "text": "1 kg ಅಕ್ಕಿ",
+        "quantity": 1
+      },
+      {
+        "text": "ಮೊಸರು 500 ಗ್ರಾಂ",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_25",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_25",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಬ್ರೆಡ್",
+              "quantity": 1
+            },
+            {
+              "text": "ಟೊಮೆಟೊ 1 ಕೆಜಿ",
+              "quantity": 1
+            },
+            {
+              "text": "1 kg ಅಕ್ಕಿ",
+              "quantity": 1
+            },
+            {
+              "text": "ಮೊಸರು 500 ಗ್ರಾಂ",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 473,
+      "output_tokens": 160
+    }
+  }
+}

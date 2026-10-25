@@ -1,0 +1,74 @@
+{
+  "name": "te_voice_05",
+  "input": {
+    "language": "",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "Aashirvaad ఆటా ఇప్పుడు తెరిచి ఉన్న షాపు పికప్",
+    "language": "te",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "తెరిచి"
+      },
+      {
+        "kind": "pickup",
+        "value": "",
+        "text": "పికప్"
+      },
+      {
+        "kind": "brand",
+        "value": "aashirvaad",
+        "text": "Aashirvaad"
+      }
+    ]
+  },
+  "reply": {
+    "request_id": "rec_vs_te_voice_05",
+    "transcript": "Aashirvaad ఆటా ఇప్పుడు తెరిచి ఉన్న షాపు పికప్",
+    "language_code": "te-IN"
+  }
+}

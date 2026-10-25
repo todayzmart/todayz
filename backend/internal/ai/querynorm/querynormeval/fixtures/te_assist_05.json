@@ -1,0 +1,69 @@
+{
+  "name": "te_assist_05",
+  "input": {
+    "q": "నాకు ఆశీర్వాద్ ఆటా కావాలి 60 రూపాయల లోపు",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "ఆశీర్వాద్ ఆటా",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "6000",
+        "text": "60 రూపాయల లోపు"
+      },
+      {
+        "kind": "brand",
+        "value": "aashirvaad",
+        "text": "ఆశీర్వాద్"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_te_assist_05",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_te_assist_05",
+        "name": "suggest_search",
+        "input": {
+          "query": "ఆశీర్వాద్ ఆటా",
+          "chips": [
+            {
+              "kind": "maxPrice",
+              "value": "6000",
+              "text": "60 రూపాయల లోపు"
+            },
+            {
+              "kind": "brand",
+              "value": "aashirvaad",
+              "text": "ఆశీర్వాద్"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

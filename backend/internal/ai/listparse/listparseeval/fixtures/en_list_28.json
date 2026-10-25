@@ -1,0 +1,59 @@
+{
+  "name": "en_list_28",
+  "input": {
+    "text": "Good Day biscuits 2 packets\nonions 2 kg\n4 lemons",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "Good Day biscuits",
+        "quantity": 2
+      },
+      {
+        "text": "onions 2 kg",
+        "quantity": 1
+      },
+      {
+        "text": "lemons",
+        "quantity": 4
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_28",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_28",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "Good Day biscuits",
+              "quantity": 2
+            },
+            {
+              "text": "onions 2 kg",
+              "quantity": 1
+            },
+            {
+              "text": "lemons",
+              "quantity": 4
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 460,
+      "output_tokens": 130
+    }
+  }
+}

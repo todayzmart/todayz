@@ -1,0 +1,59 @@
+{
+  "name": "mx_list_14",
+  "input": {
+    "text": "biyyam 5 kg, ನಾಲ್ಕು ನಿಂಬೆಹಣ್ಣು, haalu eradu",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "biyyam 5 kg",
+        "quantity": 1
+      },
+      {
+        "text": "ನಿಂಬೆಹಣ್ಣು",
+        "quantity": 4
+      },
+      {
+        "text": "haalu",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_mx_list_14",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_mx_list_14",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "biyyam 5 kg",
+              "quantity": 1
+            },
+            {
+              "text": "ನಿಂಬೆಹಣ್ಣು",
+              "quantity": 4
+            },
+            {
+              "text": "haalu",
+              "quantity": 2
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 457,
+      "output_tokens": 130
+    }
+  }
+}

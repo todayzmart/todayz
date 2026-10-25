@@ -1,0 +1,64 @@
+{
+  "name": "ta_voice_15",
+  "input": {
+    "language": "",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "அமுல் வெண்ணெய் அருகில்",
+    "language": "ta",
+    "chips": [
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "அருகில்"
+      }
+    ]
+  },
+  "reply": {
+    "request_id": "rec_vs_ta_voice_15",
+    "transcript": "அமுல் வெண்ணெய் அருகில்",
+    "language_code": "ta-IN"
+  }
+}

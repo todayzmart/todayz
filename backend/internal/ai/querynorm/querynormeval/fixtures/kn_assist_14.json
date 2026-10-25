@@ -1,0 +1,59 @@
+{
+  "name": "kn_assist_14",
+  "input": {
+    "q": "ರಾಗಿ ಹಿಟ್ಟು ಎಲ್ಲಿ ಸಿಗುತ್ತೆ ಮನೆಗೆ ಡೆಲಿವರಿ",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "ರಾಗಿ ಹಿಟ್ಟು",
+    "chips": [
+      {
+        "kind": "delivery",
+        "value": "",
+        "text": "ಮನೆಗೆ ಡೆಲಿವರಿ"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_kn_assist_14",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_kn_assist_14",
+        "name": "suggest_search",
+        "input": {
+          "query": "ರಾಗಿ ಹಿಟ್ಟು",
+          "chips": [
+            {
+              "kind": "delivery",
+              "value": null,
+              "text": "ಮನೆಗೆ ಡೆಲಿವರಿ"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 85
+    }
+  }
+}

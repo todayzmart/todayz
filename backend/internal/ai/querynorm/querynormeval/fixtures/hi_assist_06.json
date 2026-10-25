@@ -1,0 +1,59 @@
+{
+  "name": "hi_assist_06",
+  "input": {
+    "q": "कोई दुकान जहाँ ताज़ा पनीर मिले पिकअप",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "ताज़ा पनीर",
+    "chips": [
+      {
+        "kind": "pickup",
+        "value": "",
+        "text": "पिकअप"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_hi_assist_06",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_hi_assist_06",
+        "name": "suggest_search",
+        "input": {
+          "query": "ताज़ा पनीर",
+          "chips": [
+            {
+              "kind": "pickup",
+              "value": null,
+              "text": "पिकअप"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 85
+    }
+  }
+}

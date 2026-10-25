@@ -1,0 +1,51 @@
+{
+  "name": "en_list_24",
+  "input": {
+    "text": "4 lemons, 6 eggs",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "lemons",
+        "quantity": 4
+      },
+      {
+        "text": "eggs",
+        "quantity": 6
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_24",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_24",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "lemons",
+              "quantity": 4
+            },
+            {
+              "text": "eggs",
+              "quantity": 6
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 442,
+      "output_tokens": 100
+    }
+  }
+}

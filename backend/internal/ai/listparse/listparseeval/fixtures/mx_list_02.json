@@ -1,0 +1,67 @@
+{
+  "name": "mx_list_02",
+  "input": {
+    "text": "ತೊಗರಿ ಬೇಳೆ 1 ಕೆಜಿ, ಆಲೂಗಡ್ಡೆ 2 ಕೆಜಿ, curd 500 g, Good Day biscuits 2 packets",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ತೊಗರಿ ಬೇಳೆ 1 ಕೆಜಿ",
+        "quantity": 1
+      },
+      {
+        "text": "ಆಲೂಗಡ್ಡೆ 2 ಕೆಜಿ",
+        "quantity": 1
+      },
+      {
+        "text": "curd 500 g",
+        "quantity": 1
+      },
+      {
+        "text": "Good Day biscuits",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_mx_list_02",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_mx_list_02",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ತೊಗರಿ ಬೇಳೆ 1 ಕೆಜಿ",
+              "quantity": 1
+            },
+            {
+              "text": "ಆಲೂಗಡ್ಡೆ 2 ಕೆಜಿ",
+              "quantity": 1
+            },
+            {
+              "text": "curd 500 g",
+              "quantity": 1
+            },
+            {
+              "text": "Good Day biscuits",
+              "quantity": 2
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 478,
+      "output_tokens": 160
+    }
+  }
+}

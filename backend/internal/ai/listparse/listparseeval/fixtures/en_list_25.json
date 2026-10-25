@@ -1,0 +1,59 @@
+{
+  "name": "en_list_25",
+  "input": {
+    "text": "tomato 1 kg, two Lux soap, Dolo 650",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "tomato 1 kg",
+        "quantity": 1
+      },
+      {
+        "text": "Lux soap",
+        "quantity": 2
+      },
+      {
+        "text": "Dolo 650",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_25",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_25",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "tomato 1 kg",
+              "quantity": 1
+            },
+            {
+              "text": "Lux soap",
+              "quantity": 2
+            },
+            {
+              "text": "Dolo 650",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 458,
+      "output_tokens": 130
+    }
+  }
+}

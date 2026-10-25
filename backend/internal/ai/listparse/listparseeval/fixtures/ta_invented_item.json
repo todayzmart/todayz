@@ -1,0 +1,63 @@
+{
+  "name": "ta_invented_item",
+  "input": {
+    "text": "கொத்தமல்லி, தயிர் 500 கிராம், இரண்டு பால்",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "கொத்தமல்லி",
+        "quantity": 1
+      },
+      {
+        "text": "தயிர் 500 கிராம்",
+        "quantity": 1
+      },
+      {
+        "text": "பால்",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_invented_item",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_invented_item",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "கொத்தமல்லி",
+              "quantity": 1
+            },
+            {
+              "text": "தயிர் 500 கிராம்",
+              "quantity": 1
+            },
+            {
+              "text": "பால்",
+              "quantity": 2
+            },
+            {
+              "text": "Maggi 70 g",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 472,
+      "output_tokens": 160
+    }
+  }
+}

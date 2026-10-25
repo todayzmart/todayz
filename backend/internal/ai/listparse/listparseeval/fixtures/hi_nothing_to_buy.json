@@ -1,0 +1,33 @@
+{
+  "name": "hi_nothing_to_buy",
+  "input": {
+    "text": "नमस्ते, आप कैसे हैं?",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [],
+    "reject": "empty"
+  },
+  "reply": {
+    "id": "msg_lp_hi_nothing_to_buy",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_nothing_to_buy",
+        "name": "record_list_items",
+        "input": {
+          "lines": []
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 420,
+      "output_tokens": 40
+    }
+  }
+}

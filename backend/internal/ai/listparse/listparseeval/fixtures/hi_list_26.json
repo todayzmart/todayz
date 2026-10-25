@@ -1,0 +1,75 @@
+{
+  "name": "hi_list_26",
+  "input": {
+    "text": "२ साबुन, चीनी आधा किलो, तीन अमूल बटर, हल्दी पाउडर 100 ग्राम, paanch Parle-G",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "साबुन",
+        "quantity": 2
+      },
+      {
+        "text": "चीनी आधा किलो",
+        "quantity": 1
+      },
+      {
+        "text": "अमूल बटर",
+        "quantity": 3
+      },
+      {
+        "text": "हल्दी पाउडर 100 ग्राम",
+        "quantity": 1
+      },
+      {
+        "text": "Parle-G",
+        "quantity": 5
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_26",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_26",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "साबुन",
+              "quantity": 2
+            },
+            {
+              "text": "चीनी आधा किलो",
+              "quantity": 1
+            },
+            {
+              "text": "अमूल बटर",
+              "quantity": 3
+            },
+            {
+              "text": "हल्दी पाउडर 100 ग्राम",
+              "quantity": 1
+            },
+            {
+              "text": "Parle-G",
+              "quantity": 5
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 486,
+      "output_tokens": 190
+    }
+  }
+}

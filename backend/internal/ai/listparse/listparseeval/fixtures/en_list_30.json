@@ -1,0 +1,67 @@
+{
+  "name": "en_list_30",
+  "input": {
+    "text": "Good Day biscuits 2 packets\ntomato 1 kg\ncoriander\n5 kg rice",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "Good Day biscuits",
+        "quantity": 2
+      },
+      {
+        "text": "tomato 1 kg",
+        "quantity": 1
+      },
+      {
+        "text": "coriander",
+        "quantity": 1
+      },
+      {
+        "text": "5 kg rice",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_30",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_30",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "Good Day biscuits",
+              "quantity": 2
+            },
+            {
+              "text": "tomato 1 kg",
+              "quantity": 1
+            },
+            {
+              "text": "coriander",
+              "quantity": 1
+            },
+            {
+              "text": "5 kg rice",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 474,
+      "output_tokens": 160
+    }
+  }
+}

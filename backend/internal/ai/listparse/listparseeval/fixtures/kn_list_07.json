@@ -1,0 +1,67 @@
+{
+  "name": "kn_list_07",
+  "input": {
+    "text": "- ಸೋಪು ೩\n- ಸಕ್ಕರೆ ಅರ್ಧ ಕೆಜಿ\n- ಐದು ಪಾರ್ಲೆ-ಜಿ\n- ಬಾಳೆಹಣ್ಣು ಒಂದು ಡಜನ್",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಸೋಪು",
+        "quantity": 3
+      },
+      {
+        "text": "ಸಕ್ಕರೆ ಅರ್ಧ ಕೆಜಿ",
+        "quantity": 1
+      },
+      {
+        "text": "ಪಾರ್ಲೆ-ಜಿ",
+        "quantity": 5
+      },
+      {
+        "text": "ಬಾಳೆಹಣ್ಣು",
+        "quantity": 12
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_07",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_07",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಸೋಪು",
+              "quantity": 3
+            },
+            {
+              "text": "ಸಕ್ಕರೆ ಅರ್ಧ ಕೆಜಿ",
+              "quantity": 1
+            },
+            {
+              "text": "ಪಾರ್ಲೆ-ಜಿ",
+              "quantity": 5
+            },
+            {
+              "text": "ಬಾಳೆಹಣ್ಣು",
+              "quantity": 12
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 471,
+      "output_tokens": 160
+    }
+  }
+}

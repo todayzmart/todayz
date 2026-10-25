@@ -1,0 +1,67 @@
+{
+  "name": "ta_list_18",
+  "input": {
+    "text": "ஒரு டஜன் வாழைப்பழம், டோலோ 650, நான்கு எலுமிச்சை, வெங்காயம் 2 கிலோ",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "வாழைப்பழம்",
+        "quantity": 12
+      },
+      {
+        "text": "டோலோ 650",
+        "quantity": 1
+      },
+      {
+        "text": "எலுமிச்சை",
+        "quantity": 4
+      },
+      {
+        "text": "வெங்காயம் 2 கிலோ",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_list_18",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_list_18",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "வாழைப்பழம்",
+              "quantity": 12
+            },
+            {
+              "text": "டோலோ 650",
+              "quantity": 1
+            },
+            {
+              "text": "எலுமிச்சை",
+              "quantity": 4
+            },
+            {
+              "text": "வெங்காயம் 2 கிலோ",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 473,
+      "output_tokens": 160
+    }
+  }
+}

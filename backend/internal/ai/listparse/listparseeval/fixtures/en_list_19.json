@@ -1,0 +1,75 @@
+{
+  "name": "en_list_19",
+  "input": {
+    "text": "2 Nandini milk, 2 Parle-G, 1 kg atta, Tata salt, half kg sugar",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "Nandini milk",
+        "quantity": 2
+      },
+      {
+        "text": "Parle-G",
+        "quantity": 2
+      },
+      {
+        "text": "1 kg atta",
+        "quantity": 1
+      },
+      {
+        "text": "Tata salt",
+        "quantity": 1
+      },
+      {
+        "text": "half kg sugar",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_19",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_19",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "Nandini milk",
+              "quantity": 2
+            },
+            {
+              "text": "Parle-G",
+              "quantity": 2
+            },
+            {
+              "text": "1 kg atta",
+              "quantity": 1
+            },
+            {
+              "text": "Tata salt",
+              "quantity": 1
+            },
+            {
+              "text": "half kg sugar",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 485,
+      "output_tokens": 190
+    }
+  }
+}

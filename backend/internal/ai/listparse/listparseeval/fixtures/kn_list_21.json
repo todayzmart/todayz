@@ -1,0 +1,59 @@
+{
+  "name": "kn_list_21",
+  "input": {
+    "text": "ಸೋಪು ೩\nಬ್ರೆಡ್\nಎರಡು ಹಾಲು",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಸೋಪು",
+        "quantity": 3
+      },
+      {
+        "text": "ಬ್ರೆಡ್",
+        "quantity": 1
+      },
+      {
+        "text": "ಹಾಲು",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_21",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_21",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಸೋಪು",
+              "quantity": 3
+            },
+            {
+              "text": "ಬ್ರೆಡ್",
+              "quantity": 1
+            },
+            {
+              "text": "ಹಾಲು",
+              "quantity": 2
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 453,
+      "output_tokens": 130
+    }
+  }
+}

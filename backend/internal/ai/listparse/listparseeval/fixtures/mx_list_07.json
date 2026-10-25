@@ -1,0 +1,59 @@
+{
+  "name": "mx_list_07",
+  "input": {
+    "text": "ఉల్లిపాయలు ౨ కిలోలు, paal rendu, బంగాళాదుంపలు 2 కిలోలు",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ఉల్లిపాయలు ౨ కిలోలు",
+        "quantity": 1
+      },
+      {
+        "text": "paal",
+        "quantity": 2
+      },
+      {
+        "text": "బంగాళాదుంపలు 2 కిలోలు",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_mx_list_07",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_mx_list_07",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ఉల్లిపాయలు ౨ కిలోలు",
+              "quantity": 1
+            },
+            {
+              "text": "paal",
+              "quantity": 2
+            },
+            {
+              "text": "బంగాళాదుంపలు 2 కిలోలు",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 463,
+      "output_tokens": 130
+    }
+  }
+}

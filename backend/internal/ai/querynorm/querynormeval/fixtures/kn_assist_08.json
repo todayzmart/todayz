@@ -1,0 +1,69 @@
+{
+  "name": "kn_assist_08",
+  "input": {
+    "q": "ಆಫರ್ ಈಗ ತೆರೆದಿರುವ ತಾಜಾ ತರಕಾರಿ ಇರುವ ಅಂಗಡಿ",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "ತಾಜಾ ತರಕಾರಿ",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "ಈಗ ತೆರೆದಿರುವ"
+      },
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "ಆಫರ್"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_kn_assist_08",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_kn_assist_08",
+        "name": "suggest_search",
+        "input": {
+          "query": "ತಾಜಾ ತರಕಾರಿ",
+          "chips": [
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "ಈಗ ತೆರೆದಿರುವ"
+            },
+            {
+              "kind": "offers",
+              "value": null,
+              "text": "ಆಫರ್"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

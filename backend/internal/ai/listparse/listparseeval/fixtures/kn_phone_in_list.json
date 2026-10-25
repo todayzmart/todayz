@@ -1,0 +1,55 @@
+{
+  "name": "kn_phone_in_list",
+  "input": {
+    "text": "ರಾಗಿ ಹಿಟ್ಟು 1 ಕೆಜಿ, ತೊಗರಿ ಬೇಳೆ 1 ಕೆಜಿ, call 9845012345",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ರಾಗಿ ಹಿಟ್ಟು 1 ಕೆಜಿ",
+        "quantity": 1
+      },
+      {
+        "text": "ತೊಗರಿ ಬೇಳೆ 1 ಕೆಜಿ",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_phone_in_list",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_phone_in_list",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ರಾಗಿ ಹಿಟ್ಟು 1 ಕೆಜಿ",
+              "quantity": 1
+            },
+            {
+              "text": "ತೊಗರಿ ಬೇಳೆ 1 ಕೆಜಿ",
+              "quantity": 1
+            },
+            {
+              "text": "call 9845012345",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 465,
+      "output_tokens": 130
+    }
+  }
+}

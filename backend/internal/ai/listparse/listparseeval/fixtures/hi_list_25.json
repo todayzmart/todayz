@@ -1,0 +1,75 @@
+{
+  "name": "hi_list_25",
+  "input": {
+    "text": "Dolo 650 ek patta, paanch Parle-G, दही 500 ग्राम, आलू ३ किलो, प्याज़ २ किलो",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "Dolo 650 ek patta",
+        "quantity": 1
+      },
+      {
+        "text": "Parle-G",
+        "quantity": 5
+      },
+      {
+        "text": "दही 500 ग्राम",
+        "quantity": 1
+      },
+      {
+        "text": "आलू ३ किलो",
+        "quantity": 1
+      },
+      {
+        "text": "प्याज़ २ किलो",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_25",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_25",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "Dolo 650 ek patta",
+              "quantity": 1
+            },
+            {
+              "text": "Parle-G",
+              "quantity": 5
+            },
+            {
+              "text": "दही 500 ग्राम",
+              "quantity": 1
+            },
+            {
+              "text": "आलू ३ किलो",
+              "quantity": 1
+            },
+            {
+              "text": "प्याज़ २ किलो",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 488,
+      "output_tokens": 190
+    }
+  }
+}

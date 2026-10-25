@@ -1,0 +1,64 @@
+{
+  "name": "mx_phone_scrubbed",
+  "input": {
+    "language": "",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "amul butter call [phone]",
+    "language": "en",
+    "chips": [
+      {
+        "kind": "brand",
+        "value": "amul",
+        "text": "amul"
+      }
+    ]
+  },
+  "reply": {
+    "request_id": "rec_vs_mx_phone_scrubbed",
+    "transcript": "amul butter call 9845012345",
+    "language_code": "en-IN"
+  }
+}

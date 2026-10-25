@@ -1,0 +1,59 @@
+{
+  "name": "hi_assist_13",
+  "input": {
+    "q": "मुझे बासमती चावल चाहिए पिकअप",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "बासमती चावल",
+    "chips": [
+      {
+        "kind": "pickup",
+        "value": "",
+        "text": "पिकअप"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_hi_assist_13",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_hi_assist_13",
+        "name": "suggest_search",
+        "input": {
+          "query": "बासमती चावल",
+          "chips": [
+            {
+              "kind": "pickup",
+              "value": null,
+              "text": "पिकअप"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 85
+    }
+  }
+}

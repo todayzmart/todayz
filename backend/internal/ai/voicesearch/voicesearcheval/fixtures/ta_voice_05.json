@@ -1,0 +1,69 @@
+{
+  "name": "ta_voice_05",
+  "input": {
+    "language": "",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "Tata உப்பு பிக்கப்",
+    "language": "ta",
+    "chips": [
+      {
+        "kind": "pickup",
+        "value": "",
+        "text": "பிக்கப்"
+      },
+      {
+        "kind": "brand",
+        "value": "tata",
+        "text": "Tata"
+      }
+    ]
+  },
+  "reply": {
+    "request_id": "rec_vs_ta_voice_05",
+    "transcript": "Tata உப்பு பிக்கப்",
+    "language_code": "ta-IN"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "name": "ta_list_09",
+  "input": {
+    "text": "- வெங்காயம் 2 கிலோ\n- உப்பு",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "வெங்காயம் 2 கிலோ",
+        "quantity": 1
+      },
+      {
+        "text": "உப்பு",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_list_09",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_list_09",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "வெங்காயம் 2 கிலோ",
+              "quantity": 1
+            },
+            {
+              "text": "உப்பு",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 446,
+      "output_tokens": 100
+    }
+  }
+}

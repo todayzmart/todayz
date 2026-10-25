@@ -1,0 +1,75 @@
+{
+  "name": "ta_list_23",
+  "input": {
+    "text": "தக்காளி 1 கிலோ; சர்க்கரை அரை கிலோ; உப்பு; 1 kg அரிசி; முட்டை 6",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "தக்காளி 1 கிலோ",
+        "quantity": 1
+      },
+      {
+        "text": "சர்க்கரை அரை கிலோ",
+        "quantity": 1
+      },
+      {
+        "text": "உப்பு",
+        "quantity": 1
+      },
+      {
+        "text": "1 kg அரிசி",
+        "quantity": 1
+      },
+      {
+        "text": "முட்டை",
+        "quantity": 6
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_list_23",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_list_23",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "தக்காளி 1 கிலோ",
+              "quantity": 1
+            },
+            {
+              "text": "சர்க்கரை அரை கிலோ",
+              "quantity": 1
+            },
+            {
+              "text": "உப்பு",
+              "quantity": 1
+            },
+            {
+              "text": "1 kg அரிசி",
+              "quantity": 1
+            },
+            {
+              "text": "முட்டை",
+              "quantity": 6
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 485,
+      "output_tokens": 190
+    }
+  }
+}

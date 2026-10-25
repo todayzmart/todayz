@@ -23,8 +23,11 @@ import (
 	_ "github.com/todayz/backend/internal/ai/eval/selftest"
 	_ "github.com/todayz/backend/internal/ai/imagecheck/imageeval"
 	_ "github.com/todayz/backend/internal/ai/insighttext/insighteval"
+	_ "github.com/todayz/backend/internal/ai/listparse/listparseeval"
+	_ "github.com/todayz/backend/internal/ai/querynorm/querynormeval"
 	_ "github.com/todayz/backend/internal/ai/replydraft/replyeval"
 	_ "github.com/todayz/backend/internal/ai/shelfscan/shelfeval"
+	_ "github.com/todayz/backend/internal/ai/voicesearch/voicesearcheval"
 	_ "github.com/todayz/backend/internal/coach/coacheval"
 	_ "github.com/todayz/backend/internal/voice/voiceeval"
 )

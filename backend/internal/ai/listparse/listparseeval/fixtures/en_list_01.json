@@ -1,0 +1,59 @@
+{
+  "name": "en_list_01",
+  "input": {
+    "text": "curd 500 g; half kg sugar; Surf Excel 1 kg",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "curd 500 g",
+        "quantity": 1
+      },
+      {
+        "text": "half kg sugar",
+        "quantity": 1
+      },
+      {
+        "text": "Surf Excel 1 kg",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_01",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_01",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "curd 500 g",
+              "quantity": 1
+            },
+            {
+              "text": "half kg sugar",
+              "quantity": 1
+            },
+            {
+              "text": "Surf Excel 1 kg",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 461,
+      "output_tokens": 130
+    }
+  }
+}

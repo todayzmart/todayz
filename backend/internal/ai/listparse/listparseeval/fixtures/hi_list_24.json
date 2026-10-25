@@ -1,0 +1,51 @@
+{
+  "name": "hi_list_24",
+  "input": {
+    "text": "1 किलो आटा, दही 500 ग्राम",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "1 किलो आटा",
+        "quantity": 1
+      },
+      {
+        "text": "दही 500 ग्राम",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_24",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_24",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "1 किलो आटा",
+              "quantity": 1
+            },
+            {
+              "text": "दही 500 ग्राम",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 447,
+      "output_tokens": 100
+    }
+  }
+}

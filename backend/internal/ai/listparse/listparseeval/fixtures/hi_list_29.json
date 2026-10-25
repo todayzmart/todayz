@@ -1,0 +1,51 @@
+{
+  "name": "hi_list_29",
+  "input": {
+    "text": "सरसों का तेल 1 लीटर; 1 किलो आटा",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "सरसों का तेल 1 लीटर",
+        "quantity": 1
+      },
+      {
+        "text": "1 किलो आटा",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_29",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_29",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "सरसों का तेल 1 लीटर",
+              "quantity": 1
+            },
+            {
+              "text": "1 किलो आटा",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 449,
+      "output_tokens": 100
+    }
+  }
+}

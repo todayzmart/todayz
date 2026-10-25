@@ -1,0 +1,79 @@
+{
+  "name": "te_assist_15",
+  "input": {
+    "q": "నాకు డాబర్ తేనె కావాలి ఆఫర్ ఇప్పుడు తెరిచి ఉన్న",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "డాబర్ తేనె",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "ఇప్పుడు తెరిచి ఉన్న"
+      },
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "ఆఫర్"
+      },
+      {
+        "kind": "brand",
+        "value": "dabur",
+        "text": "డాబర్"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_te_assist_15",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_te_assist_15",
+        "name": "suggest_search",
+        "input": {
+          "query": "డాబర్ తేనె",
+          "chips": [
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "ఇప్పుడు తెరిచి ఉన్న"
+            },
+            {
+              "kind": "offers",
+              "value": null,
+              "text": "ఆఫర్"
+            },
+            {
+              "kind": "brand",
+              "value": "dabur",
+              "text": "డాబర్"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 135
+    }
+  }
+}

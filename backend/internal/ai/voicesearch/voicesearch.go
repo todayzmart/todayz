@@ -103,8 +103,8 @@ func (s *Service) Search(ctx context.Context, customer ids.ID, rec voice.Recordi
 	return Read(text, tr.Language, rec.Language, brands), nil
 }
 
-// Clean is the transcript as the customer may see it: phones, codes and ids scrubbed (the
-// [bracketed] marks dropped), spaces collapsed, at most MaxTranscript characters.
+// Clean is the transcript as the customer may see it: phones, codes and ids replaced by their
+// [marks], spaces collapsed, at most MaxTranscript characters.
 func Clean(text string) string {
 	t := scrub.Text(text, scrub.Options{}).Text
 	t = strings.Join(strings.Fields(t), " ")

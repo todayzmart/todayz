@@ -1,0 +1,69 @@
+{
+  "name": "te_assist_16",
+  "input": {
+    "q": "నాకు బాస్మతి బియ్యం కావాలి పికప్ దగ్గర",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "బాస్మతి బియ్యం",
+    "chips": [
+      {
+        "kind": "pickup",
+        "value": "",
+        "text": "పికప్"
+      },
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "దగ్గర"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_te_assist_16",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_te_assist_16",
+        "name": "suggest_search",
+        "input": {
+          "query": "బాస్మతి బియ్యం",
+          "chips": [
+            {
+              "kind": "pickup",
+              "value": null,
+              "text": "పికప్"
+            },
+            {
+              "kind": "nearest",
+              "value": null,
+              "text": "దగ్గర"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "name": "en_list_22",
+  "input": {
+    "text": "two Lux soap\nSurf Excel 1 kg\n4 lemons\ntoor dal 1 kg\n6 eggs",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "Lux soap",
+        "quantity": 2
+      },
+      {
+        "text": "Surf Excel 1 kg",
+        "quantity": 1
+      },
+      {
+        "text": "lemons",
+        "quantity": 4
+      },
+      {
+        "text": "toor dal 1 kg",
+        "quantity": 1
+      },
+      {
+        "text": "eggs",
+        "quantity": 6
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_22",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_22",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "Lux soap",
+              "quantity": 2
+            },
+            {
+              "text": "Surf Excel 1 kg",
+              "quantity": 1
+            },
+            {
+              "text": "lemons",
+              "quantity": 4
+            },
+            {
+              "text": "toor dal 1 kg",
+              "quantity": 1
+            },
+            {
+              "text": "eggs",
+              "quantity": 6
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 483,
+      "output_tokens": 190
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "name": "hi_list_04",
+  "input": {
+    "text": "चीनी आधा किलो, 3 मैगी",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "चीनी आधा किलो",
+        "quantity": 1
+      },
+      {
+        "text": "मैगी",
+        "quantity": 3
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_04",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_04",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "चीनी आधा किलो",
+              "quantity": 1
+            },
+            {
+              "text": "मैगी",
+              "quantity": 3
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 445,
+      "output_tokens": 100
+    }
+  }
+}

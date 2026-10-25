@@ -1,0 +1,59 @@
+{
+  "name": "mx_list_19",
+  "input": {
+    "text": "two Lux soap, బ్రెడ్, Amul butter 100 g",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "Lux soap",
+        "quantity": 2
+      },
+      {
+        "text": "బ్రెడ్",
+        "quantity": 1
+      },
+      {
+        "text": "Amul butter 100 g",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_mx_list_19",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_mx_list_19",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "Lux soap",
+              "quantity": 2
+            },
+            {
+              "text": "బ్రెడ్",
+              "quantity": 1
+            },
+            {
+              "text": "Amul butter 100 g",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 459,
+      "output_tokens": 130
+    }
+  }
+}

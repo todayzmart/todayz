@@ -1,0 +1,63 @@
+{
+  "name": "hi_invented_item",
+  "input": {
+    "text": "3 मैगी, टमाटर 1 किलो, प्याज़ २ किलो",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "मैगी",
+        "quantity": 3
+      },
+      {
+        "text": "टमाटर 1 किलो",
+        "quantity": 1
+      },
+      {
+        "text": "प्याज़ २ किलो",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_invented_item",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_invented_item",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "मैगी",
+              "quantity": 3
+            },
+            {
+              "text": "टमाटर 1 किलो",
+              "quantity": 1
+            },
+            {
+              "text": "प्याज़ २ किलो",
+              "quantity": 1
+            },
+            {
+              "text": "Maggi 70 g",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 471,
+      "output_tokens": 160
+    }
+  }
+}

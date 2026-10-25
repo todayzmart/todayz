@@ -1,0 +1,64 @@
+{
+  "name": "ta_ungrounded_words",
+  "input": {
+    "q": "எனக்கு தலைவலி மாத்திரை வேண்டும் இப்போது திறந்திருக்கும்",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "இப்போது திறந்திருக்கும்"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_ta_ungrounded_words",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_ta_ungrounded_words",
+        "name": "suggest_search",
+        "input": {
+          "query": "தலைவலி மாத்திரை 500 g",
+          "chips": [
+            {
+              "kind": "delivery",
+              "value": null,
+              "text": "free delivery in 10 minutes"
+            },
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "இப்போது திறந்திருக்கும்"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "name": "en_list_02",
+  "input": {
+    "text": "a dozen bananas\n4 lemons\n5 kg rice",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "bananas",
+        "quantity": 12
+      },
+      {
+        "text": "lemons",
+        "quantity": 4
+      },
+      {
+        "text": "5 kg rice",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_02",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_02",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "bananas",
+              "quantity": 12
+            },
+            {
+              "text": "lemons",
+              "quantity": 4
+            },
+            {
+              "text": "5 kg rice",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 456,
+      "output_tokens": 130
+    }
+  }
+}

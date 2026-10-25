@@ -1,0 +1,69 @@
+{
+  "name": "te_assist_10",
+  "input": {
+    "q": "ఆఫర్ ఇంటికి డెలివరీ తలనొప్పి మాత్రలు ఉన్న షాపు",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "తలనొప్పి మాత్రలు",
+    "chips": [
+      {
+        "kind": "delivery",
+        "value": "",
+        "text": "ఇంటికి డెలివరీ"
+      },
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "ఆఫర్"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_te_assist_10",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_te_assist_10",
+        "name": "suggest_search",
+        "input": {
+          "query": "తలనొప్పి మాత్రలు",
+          "chips": [
+            {
+              "kind": "delivery",
+              "value": null,
+              "text": "ఇంటికి డెలివరీ"
+            },
+            {
+              "kind": "offers",
+              "value": null,
+              "text": "ఆఫర్"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "name": "en_list_03",
+  "input": {
+    "text": "- 6 eggs\n- 2 Parle-G",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "eggs",
+        "quantity": 6
+      },
+      {
+        "text": "Parle-G",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_03",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_03",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "eggs",
+              "quantity": 6
+            },
+            {
+              "text": "Parle-G",
+              "quantity": 2
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 443,
+      "output_tokens": 100
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "name": "ta_list_01",
+  "input": {
+    "text": "டோலோ 650, கோதுமை மாவு 1 கிலோ, ஐந்து பார்லே-ஜி, மூன்று மேகி, தயிர் 500 கிராம்",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "டோலோ 650",
+        "quantity": 1
+      },
+      {
+        "text": "கோதுமை மாவு 1 கிலோ",
+        "quantity": 1
+      },
+      {
+        "text": "பார்லே-ஜி",
+        "quantity": 5
+      },
+      {
+        "text": "மேகி",
+        "quantity": 3
+      },
+      {
+        "text": "தயிர் 500 கிராம்",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_list_01",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_list_01",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "டோலோ 650",
+              "quantity": 1
+            },
+            {
+              "text": "கோதுமை மாவு 1 கிலோ",
+              "quantity": 1
+            },
+            {
+              "text": "பார்லே-ஜி",
+              "quantity": 5
+            },
+            {
+              "text": "மேகி",
+              "quantity": 3
+            },
+            {
+              "text": "தயிர் 500 கிராம்",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 486,
+      "output_tokens": 190
+    }
+  }
+}

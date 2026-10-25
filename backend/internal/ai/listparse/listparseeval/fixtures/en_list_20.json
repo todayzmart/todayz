@@ -1,0 +1,75 @@
+{
+  "name": "en_list_20",
+  "input": {
+    "text": "toor dal 1 kg\nDolo 650\ntwo Lux soap\n4 lemons\nsunflower oil 1 litre",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "toor dal 1 kg",
+        "quantity": 1
+      },
+      {
+        "text": "Dolo 650",
+        "quantity": 1
+      },
+      {
+        "text": "Lux soap",
+        "quantity": 2
+      },
+      {
+        "text": "lemons",
+        "quantity": 4
+      },
+      {
+        "text": "sunflower oil 1 litre",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_20",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_20",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "toor dal 1 kg",
+              "quantity": 1
+            },
+            {
+              "text": "Dolo 650",
+              "quantity": 1
+            },
+            {
+              "text": "Lux soap",
+              "quantity": 2
+            },
+            {
+              "text": "lemons",
+              "quantity": 4
+            },
+            {
+              "text": "sunflower oil 1 litre",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 487,
+      "output_tokens": 190
+    }
+  }
+}

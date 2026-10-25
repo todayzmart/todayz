@@ -1,0 +1,64 @@
+{
+  "name": "te_voice_03",
+  "input": {
+    "language": "",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "కందిపప్పు 200 రూపాయల లోపు",
+    "language": "te",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "20000",
+        "text": "200 రూపాయల లోపు"
+      }
+    ]
+  },
+  "reply": {
+    "request_id": "rec_vs_te_voice_03",
+    "transcript": "కందిపప్పు 200 రూపాయల లోపు",
+    "language_code": "te-IN"
+  }
+}

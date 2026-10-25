@@ -1,0 +1,67 @@
+{
+  "name": "en_list_13",
+  "input": {
+    "text": "2 Parle-G; bread; Colgate 100 g; curd 500 g",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "Parle-G",
+        "quantity": 2
+      },
+      {
+        "text": "bread",
+        "quantity": 1
+      },
+      {
+        "text": "Colgate 100 g",
+        "quantity": 1
+      },
+      {
+        "text": "curd 500 g",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_13",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_13",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "Parle-G",
+              "quantity": 2
+            },
+            {
+              "text": "bread",
+              "quantity": 1
+            },
+            {
+              "text": "Colgate 100 g",
+              "quantity": 1
+            },
+            {
+              "text": "curd 500 g",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 470,
+      "output_tokens": 160
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "name": "en_list_10",
+  "input": {
+    "text": "half kg sugar, coriander",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "half kg sugar",
+        "quantity": 1
+      },
+      {
+        "text": "coriander",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_10",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_10",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "half kg sugar",
+              "quantity": 1
+            },
+            {
+              "text": "coriander",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 446,
+      "output_tokens": 100
+    }
+  }
+}

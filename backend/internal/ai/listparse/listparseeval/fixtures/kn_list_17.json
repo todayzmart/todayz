@@ -1,0 +1,51 @@
+{
+  "name": "kn_list_17",
+  "input": {
+    "text": "ಬಾಳೆಹಣ್ಣು ಒಂದು ಡಜನ್, ಮೊಟ್ಟೆ 6",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಬಾಳೆಹಣ್ಣು",
+        "quantity": 12
+      },
+      {
+        "text": "ಮೊಟ್ಟೆ",
+        "quantity": 6
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_17",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_17",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಬಾಳೆಹಣ್ಣು",
+              "quantity": 12
+            },
+            {
+              "text": "ಮೊಟ್ಟೆ",
+              "quantity": 6
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 444,
+      "output_tokens": 100
+    }
+  }
+}

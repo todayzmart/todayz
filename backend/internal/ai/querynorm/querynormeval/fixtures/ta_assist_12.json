@@ -1,0 +1,69 @@
+{
+  "name": "ta_assist_12",
+  "input": {
+    "q": "எனக்கு பிரிட்டானியா பிஸ்கட் வேண்டும் 60 ரூபாய்க்குள்",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "பிரிட்டானியா பிஸ்கட்",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "6000",
+        "text": "60 ரூபாய்க்குள்"
+      },
+      {
+        "kind": "brand",
+        "value": "britannia",
+        "text": "பிரிட்டானியா"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_ta_assist_12",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_ta_assist_12",
+        "name": "suggest_search",
+        "input": {
+          "query": "பிரிட்டானியா பிஸ்கட்",
+          "chips": [
+            {
+              "kind": "maxPrice",
+              "value": "6000",
+              "text": "60 ரூபாய்க்குள்"
+            },
+            {
+              "kind": "brand",
+              "value": "britannia",
+              "text": "பிரிட்டானியா"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "name": "te_list_14",
+  "input": {
+    "text": "బ్రెడ్; సబ్బు ౩",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "బ్రెడ్",
+        "quantity": 1
+      },
+      {
+        "text": "సబ్బు",
+        "quantity": 3
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_te_list_14",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_te_list_14",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "బ్రెడ్",
+              "quantity": 1
+            },
+            {
+              "text": "సబ్బు",
+              "quantity": 3
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 443,
+      "output_tokens": 100
+    }
+  }
+}

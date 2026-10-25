@@ -1,0 +1,79 @@
+{
+  "name": "te_assist_13",
+  "input": {
+    "q": "ఆఫర్ 99 రూపాయల లోపు ఆశీర్వాద్ ఆటా ఉన్న షాపు",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "ఆశీర్వాద్ ఆటా",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "9900",
+        "text": "99 రూపాయల లోపు"
+      },
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "ఆఫర్"
+      },
+      {
+        "kind": "brand",
+        "value": "aashirvaad",
+        "text": "ఆశీర్వాద్"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_te_assist_13",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_te_assist_13",
+        "name": "suggest_search",
+        "input": {
+          "query": "ఆశీర్వాద్ ఆటా",
+          "chips": [
+            {
+              "kind": "maxPrice",
+              "value": "9900",
+              "text": "99 రూపాయల లోపు"
+            },
+            {
+              "kind": "offers",
+              "value": null,
+              "text": "ఆఫర్"
+            },
+            {
+              "kind": "brand",
+              "value": "aashirvaad",
+              "text": "ఆశీర్వాద్"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 135
+    }
+  }
+}

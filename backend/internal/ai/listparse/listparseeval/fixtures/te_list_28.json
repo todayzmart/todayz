@@ -1,0 +1,75 @@
+{
+  "name": "te_list_28",
+  "input": {
+    "text": "ఇడ్లీ రవ్వ అర కిలో, గుడ్లు 6, రెండు పాలు, మూడు మ్యాగీ, పంచదార అర కిలో",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ఇడ్లీ రవ్వ అర కిలో",
+        "quantity": 1
+      },
+      {
+        "text": "గుడ్లు",
+        "quantity": 6
+      },
+      {
+        "text": "పాలు",
+        "quantity": 2
+      },
+      {
+        "text": "మ్యాగీ",
+        "quantity": 3
+      },
+      {
+        "text": "పంచదార అర కిలో",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_te_list_28",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_te_list_28",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ఇడ్లీ రవ్వ అర కిలో",
+              "quantity": 1
+            },
+            {
+              "text": "గుడ్లు",
+              "quantity": 6
+            },
+            {
+              "text": "పాలు",
+              "quantity": 2
+            },
+            {
+              "text": "మ్యాగీ",
+              "quantity": 3
+            },
+            {
+              "text": "పంచదార అర కిలో",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 484,
+      "output_tokens": 190
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "name": "mx_list_10",
+  "input": {
+    "text": "ಐದು ಪಾರ್ಲೆ-ಜಿ, 6 eggs, onions 2 kg",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಪಾರ್ಲೆ-ಜಿ",
+        "quantity": 5
+      },
+      {
+        "text": "eggs",
+        "quantity": 6
+      },
+      {
+        "text": "onions 2 kg",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_mx_list_10",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_mx_list_10",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಪಾರ್ಲೆ-ಜಿ",
+              "quantity": 5
+            },
+            {
+              "text": "eggs",
+              "quantity": 6
+            },
+            {
+              "text": "onions 2 kg",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 457,
+      "output_tokens": 130
+    }
+  }
+}

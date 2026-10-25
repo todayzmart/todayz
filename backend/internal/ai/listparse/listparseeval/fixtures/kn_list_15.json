@@ -1,0 +1,59 @@
+{
+  "name": "kn_list_15",
+  "input": {
+    "text": "ಸೋಪು ೩\nಈರುಳ್ಳಿ ೨ ಕೆಜಿ\nಐದು ಪಾರ್ಲೆ-ಜಿ",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಸೋಪು",
+        "quantity": 3
+      },
+      {
+        "text": "ಈರುಳ್ಳಿ ೨ ಕೆಜಿ",
+        "quantity": 1
+      },
+      {
+        "text": "ಪಾರ್ಲೆ-ಜಿ",
+        "quantity": 5
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_15",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_15",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಸೋಪು",
+              "quantity": 3
+            },
+            {
+              "text": "ಈರುಳ್ಳಿ ೨ ಕೆಜಿ",
+              "quantity": 1
+            },
+            {
+              "text": "ಪಾರ್ಲೆ-ಜಿ",
+              "quantity": 5
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 458,
+      "output_tokens": 130
+    }
+  }
+}

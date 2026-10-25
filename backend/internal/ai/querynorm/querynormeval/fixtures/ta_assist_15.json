@@ -1,0 +1,79 @@
+{
+  "name": "ta_assist_15",
+  "input": {
+    "q": "வீட்டுக்கு டெலிவரி இப்போது திறந்திருக்கும் டாடா உப்பு உள்ள கடை",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "டாடா உப்பு",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "இப்போது திறந்திருக்கும்"
+      },
+      {
+        "kind": "delivery",
+        "value": "",
+        "text": "வீட்டுக்கு டெலிவரி"
+      },
+      {
+        "kind": "brand",
+        "value": "tata",
+        "text": "டாடா"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_ta_assist_15",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_ta_assist_15",
+        "name": "suggest_search",
+        "input": {
+          "query": "டாடா உப்பு",
+          "chips": [
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "இப்போது திறந்திருக்கும்"
+            },
+            {
+              "kind": "delivery",
+              "value": null,
+              "text": "வீட்டுக்கு டெலிவரி"
+            },
+            {
+              "kind": "brand",
+              "value": "tata",
+              "text": "டாடா"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 135
+    }
+  }
+}

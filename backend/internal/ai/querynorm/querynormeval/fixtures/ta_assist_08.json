@@ -1,0 +1,59 @@
+{
+  "name": "ta_assist_08",
+  "input": {
+    "q": "இப்போது திறந்திருக்கும் இட்லி மாவு உள்ள கடை",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "இட்லி மாவு",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "இப்போது திறந்திருக்கும்"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_ta_assist_08",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_ta_assist_08",
+        "name": "suggest_search",
+        "input": {
+          "query": "இட்லி மாவு",
+          "chips": [
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "இப்போது திறந்திருக்கும்"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 85
+    }
+  }
+}

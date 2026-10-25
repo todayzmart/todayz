@@ -1,0 +1,67 @@
+{
+  "name": "hi_list_03",
+  "input": {
+    "text": "- अंडे 6\n- 1 किलो आटा\n- 3 मैगी\n- एक दर्जन केले",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "अंडे",
+        "quantity": 6
+      },
+      {
+        "text": "1 किलो आटा",
+        "quantity": 1
+      },
+      {
+        "text": "मैगी",
+        "quantity": 3
+      },
+      {
+        "text": "केले",
+        "quantity": 12
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_03",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_03",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "अंडे",
+              "quantity": 6
+            },
+            {
+              "text": "1 किलो आटा",
+              "quantity": 1
+            },
+            {
+              "text": "मैगी",
+              "quantity": 3
+            },
+            {
+              "text": "केले",
+              "quantity": 12
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 466,
+      "output_tokens": 160
+    }
+  }
+}

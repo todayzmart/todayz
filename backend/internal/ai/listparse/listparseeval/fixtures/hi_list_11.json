@@ -1,0 +1,59 @@
+{
+  "name": "hi_list_11",
+  "input": {
+    "text": "धनिया, प्याज़ २ किलो, अंडे 6",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "धनिया",
+        "quantity": 1
+      },
+      {
+        "text": "प्याज़ २ किलो",
+        "quantity": 1
+      },
+      {
+        "text": "अंडे",
+        "quantity": 6
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_11",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_11",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "धनिया",
+              "quantity": 1
+            },
+            {
+              "text": "प्याज़ २ किलो",
+              "quantity": 1
+            },
+            {
+              "text": "अंडे",
+              "quantity": 6
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 456,
+      "output_tokens": 130
+    }
+  }
+}

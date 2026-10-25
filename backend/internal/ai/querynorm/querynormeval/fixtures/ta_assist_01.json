@@ -1,0 +1,69 @@
+{
+  "name": "ta_assist_01",
+  "input": {
+    "q": "60 ரூபாய்க்குள் அமுல் வெண்ணெய் உள்ள கடை",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "அமுல் வெண்ணெய்",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "6000",
+        "text": "60 ரூபாய்க்குள்"
+      },
+      {
+        "kind": "brand",
+        "value": "amul",
+        "text": "அமுல்"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_ta_assist_01",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_ta_assist_01",
+        "name": "suggest_search",
+        "input": {
+          "query": "அமுல் வெண்ணெய்",
+          "chips": [
+            {
+              "kind": "maxPrice",
+              "value": "6000",
+              "text": "60 ரூபாய்க்குள்"
+            },
+            {
+              "kind": "brand",
+              "value": "amul",
+              "text": "அமுல்"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

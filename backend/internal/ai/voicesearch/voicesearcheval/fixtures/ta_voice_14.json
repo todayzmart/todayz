@@ -1,0 +1,69 @@
+{
+  "name": "ta_voice_14",
+  "input": {
+    "language": "",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "இட்லி மாவு பிக்கப் 150 ரூபாய்க்குள்",
+    "language": "ta",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "15000",
+        "text": "150 ரூபாய்க்குள்"
+      },
+      {
+        "kind": "pickup",
+        "value": "",
+        "text": "பிக்கப்"
+      }
+    ]
+  },
+  "reply": {
+    "request_id": "rec_vs_ta_voice_14",
+    "transcript": "இட்லி மாவு பிக்கப் 150 ரூபாய்க்குள்",
+    "language_code": "ta-IN"
+  }
+}

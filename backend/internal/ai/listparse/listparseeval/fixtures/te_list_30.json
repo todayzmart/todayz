@@ -1,0 +1,67 @@
+{
+  "name": "te_list_30",
+  "input": {
+    "text": "ఉప్పు, నూనె 1 లీటరు, రెండు పాలు, గోధుమ పిండి 1 కిలో",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ఉప్పు",
+        "quantity": 1
+      },
+      {
+        "text": "నూనె 1 లీటరు",
+        "quantity": 1
+      },
+      {
+        "text": "పాలు",
+        "quantity": 2
+      },
+      {
+        "text": "గోధుమ పిండి 1 కిలో",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_te_list_30",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_te_list_30",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ఉప్పు",
+              "quantity": 1
+            },
+            {
+              "text": "నూనె 1 లీటరు",
+              "quantity": 1
+            },
+            {
+              "text": "పాలు",
+              "quantity": 2
+            },
+            {
+              "text": "గోధుమ పిండి 1 కిలో",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 471,
+      "output_tokens": 160
+    }
+  }
+}

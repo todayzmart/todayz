@@ -1,0 +1,51 @@
+{
+  "name": "en_list_12",
+  "input": {
+    "text": "2 Nandini milk, tomato 1 kg",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "Nandini milk",
+        "quantity": 2
+      },
+      {
+        "text": "tomato 1 kg",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_12",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_12",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "Nandini milk",
+              "quantity": 2
+            },
+            {
+              "text": "tomato 1 kg",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 447,
+      "output_tokens": 100
+    }
+  }
+}

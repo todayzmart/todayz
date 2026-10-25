@@ -1,0 +1,75 @@
+{
+  "name": "hi_list_01",
+  "input": {
+    "text": "ब्रेड; 3 मैगी; 1 किलो आटा; चार नींबू; चायपत्ती 250 ग्राम",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ब्रेड",
+        "quantity": 1
+      },
+      {
+        "text": "मैगी",
+        "quantity": 3
+      },
+      {
+        "text": "1 किलो आटा",
+        "quantity": 1
+      },
+      {
+        "text": "नींबू",
+        "quantity": 4
+      },
+      {
+        "text": "चायपत्ती 250 ग्राम",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_01",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_01",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ब्रेड",
+              "quantity": 1
+            },
+            {
+              "text": "मैगी",
+              "quantity": 3
+            },
+            {
+              "text": "1 किलो आटा",
+              "quantity": 1
+            },
+            {
+              "text": "नींबू",
+              "quantity": 4
+            },
+            {
+              "text": "चायपत्ती 250 ग्राम",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 482,
+      "output_tokens": 190
+    }
+  }
+}

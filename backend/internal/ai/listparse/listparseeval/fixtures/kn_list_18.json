@@ -1,0 +1,59 @@
+{
+  "name": "kn_list_18",
+  "input": {
+    "text": "ಟೊಮೆಟೊ 1 ಕೆಜಿ; haalu eradu; ಬಾಳೆಹಣ್ಣು ಒಂದು ಡಜನ್",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಟೊಮೆಟೊ 1 ಕೆಜಿ",
+        "quantity": 1
+      },
+      {
+        "text": "haalu",
+        "quantity": 2
+      },
+      {
+        "text": "ಬಾಳೆಹಣ್ಣು",
+        "quantity": 12
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_18",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_18",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಟೊಮೆಟೊ 1 ಕೆಜಿ",
+              "quantity": 1
+            },
+            {
+              "text": "haalu",
+              "quantity": 2
+            },
+            {
+              "text": "ಬಾಳೆಹಣ್ಣು",
+              "quantity": 12
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 458,
+      "output_tokens": 130
+    }
+  }
+}

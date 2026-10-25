@@ -1,0 +1,67 @@
+{
+  "name": "en_list_29",
+  "input": {
+    "text": "sunflower oil 1 litre\n1 kg atta\nhalf kg sugar\nGood Day biscuits 2 packets",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "sunflower oil 1 litre",
+        "quantity": 1
+      },
+      {
+        "text": "1 kg atta",
+        "quantity": 1
+      },
+      {
+        "text": "half kg sugar",
+        "quantity": 1
+      },
+      {
+        "text": "Good Day biscuits",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_29",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_29",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "sunflower oil 1 litre",
+              "quantity": 1
+            },
+            {
+              "text": "1 kg atta",
+              "quantity": 1
+            },
+            {
+              "text": "half kg sugar",
+              "quantity": 1
+            },
+            {
+              "text": "Good Day biscuits",
+              "quantity": 2
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 478,
+      "output_tokens": 160
+    }
+  }
+}

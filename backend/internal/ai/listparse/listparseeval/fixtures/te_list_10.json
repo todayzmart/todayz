@@ -1,0 +1,75 @@
+{
+  "name": "te_list_10",
+  "input": {
+    "text": "వెన్న 100 గ్రాములు; పంచదార అర కిలో; రెండు పాలు; గుడ్లు 6; పెరుగు 500 గ్రాములు",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "వెన్న 100 గ్రాములు",
+        "quantity": 1
+      },
+      {
+        "text": "పంచదార అర కిలో",
+        "quantity": 1
+      },
+      {
+        "text": "పాలు",
+        "quantity": 2
+      },
+      {
+        "text": "గుడ్లు",
+        "quantity": 6
+      },
+      {
+        "text": "పెరుగు 500 గ్రాములు",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_te_list_10",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_te_list_10",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "వెన్న 100 గ్రాములు",
+              "quantity": 1
+            },
+            {
+              "text": "పంచదార అర కిలో",
+              "quantity": 1
+            },
+            {
+              "text": "పాలు",
+              "quantity": 2
+            },
+            {
+              "text": "గుడ్లు",
+              "quantity": 6
+            },
+            {
+              "text": "పెరుగు 500 గ్రాములు",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 488,
+      "output_tokens": 190
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "name": "kn_invented_count",
+  "input": {
+    "text": "ಉಪ್ಪು, ಮೊಸರು 500 ಗ್ರಾಂ, ಡೋಲೋ 650",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಮೊಸರು 500 ಗ್ರಾಂ",
+        "quantity": 1
+      },
+      {
+        "text": "ಡೋಲೋ 650",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_invented_count",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_invented_count",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಉಪ್ಪು",
+              "quantity": 9
+            },
+            {
+              "text": "ಮೊಸರು 500 ಗ್ರಾಂ",
+              "quantity": 1
+            },
+            {
+              "text": "ಡೋಲೋ 650",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 458,
+      "output_tokens": 130
+    }
+  }
+}

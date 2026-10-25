@@ -1,0 +1,59 @@
+{
+  "name": "hi_list_20",
+  "input": {
+    "text": "नमक, प्याज़ २ किलो, चायपत्ती 250 ग्राम",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "नमक",
+        "quantity": 1
+      },
+      {
+        "text": "प्याज़ २ किलो",
+        "quantity": 1
+      },
+      {
+        "text": "चायपत्ती 250 ग्राम",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_20",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_20",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "नमक",
+              "quantity": 1
+            },
+            {
+              "text": "प्याज़ २ किलो",
+              "quantity": 1
+            },
+            {
+              "text": "चायपत्ती 250 ग्राम",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 460,
+      "output_tokens": 130
+    }
+  }
+}

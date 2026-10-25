@@ -1,0 +1,74 @@
+{
+  "name": "kn_voice_11",
+  "input": {
+    "language": "",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "MTR ರವೆ ಇಡ್ಲಿ ಹತ್ತಿರದ ಆಫರ್ ಇರುವ",
+    "language": "kn",
+    "chips": [
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "ಆಫರ್"
+      },
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "ಹತ್ತಿರದ"
+      },
+      {
+        "kind": "brand",
+        "value": "mtr",
+        "text": "MTR"
+      }
+    ]
+  },
+  "reply": {
+    "request_id": "rec_vs_kn_voice_11",
+    "transcript": "MTR ರವೆ ಇಡ್ಲಿ ಹತ್ತಿರದ ಆಫರ್ ಇರುವ",
+    "language_code": "kn-IN"
+  }
+}

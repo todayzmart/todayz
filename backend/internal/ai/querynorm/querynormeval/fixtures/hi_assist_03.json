@@ -1,0 +1,69 @@
+{
+  "name": "hi_assist_03",
+  "input": {
+    "q": "अभी खुली होम डिलीवरी बासमती चावल वाली दुकान",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "बासमती चावल",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "अभी खुली"
+      },
+      {
+        "kind": "delivery",
+        "value": "",
+        "text": "होम डिलीवरी"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_hi_assist_03",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_hi_assist_03",
+        "name": "suggest_search",
+        "input": {
+          "query": "बासमती चावल",
+          "chips": [
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "अभी खुली"
+            },
+            {
+              "kind": "delivery",
+              "value": null,
+              "text": "होम डिलीवरी"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

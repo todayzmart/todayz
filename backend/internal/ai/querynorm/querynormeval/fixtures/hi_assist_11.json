@@ -1,0 +1,69 @@
+{
+  "name": "hi_assist_11",
+  "input": {
+    "q": "मेरे पास अमूल घी वाली दुकान",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "अमूल घी",
+    "chips": [
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "मेरे पास"
+      },
+      {
+        "kind": "brand",
+        "value": "amul",
+        "text": "अमूल"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_hi_assist_11",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_hi_assist_11",
+        "name": "suggest_search",
+        "input": {
+          "query": "अमूल घी",
+          "chips": [
+            {
+              "kind": "nearest",
+              "value": null,
+              "text": "मेरे पास"
+            },
+            {
+              "kind": "brand",
+              "value": "amul",
+              "text": "अमूल"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

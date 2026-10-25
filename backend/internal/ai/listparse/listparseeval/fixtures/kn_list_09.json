@@ -1,0 +1,51 @@
+{
+  "name": "kn_list_09",
+  "input": {
+    "text": "- ಕೊತ್ತಂಬರಿ\n- ಎಣ್ಣೆ 1 ಲೀಟರ್",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಕೊತ್ತಂಬರಿ",
+        "quantity": 1
+      },
+      {
+        "text": "ಎಣ್ಣೆ 1 ಲೀಟರ್",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_09",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_09",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಕೊತ್ತಂಬರಿ",
+              "quantity": 1
+            },
+            {
+              "text": "ಎಣ್ಣೆ 1 ಲೀಟರ್",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 446,
+      "output_tokens": 100
+    }
+  }
+}

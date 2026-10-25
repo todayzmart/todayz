@@ -1,0 +1,64 @@
+{
+  "name": "hi_voice_02",
+  "input": {
+    "language": "",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "सिर दर्द की गोली 30 रुपये से कम",
+    "language": "hi",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "3000",
+        "text": "30 रुपये से कम"
+      }
+    ]
+  },
+  "reply": {
+    "request_id": "rec_vs_hi_voice_02",
+    "transcript": "सिर दर्द की गोली 30 रुपये से कम",
+    "language_code": "hi-IN"
+  }
+}

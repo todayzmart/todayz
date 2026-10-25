@@ -1,0 +1,59 @@
+{
+  "name": "te_list_16",
+  "input": {
+    "text": "- ఉల్లిపాయలు ౨ కిలోలు\n- గోధుమ పిండి 1 కిలో\n- సబ్బు ౩",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ఉల్లిపాయలు ౨ కిలోలు",
+        "quantity": 1
+      },
+      {
+        "text": "గోధుమ పిండి 1 కిలో",
+        "quantity": 1
+      },
+      {
+        "text": "సబ్బు",
+        "quantity": 3
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_te_list_16",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_te_list_16",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ఉల్లిపాయలు ౨ కిలోలు",
+              "quantity": 1
+            },
+            {
+              "text": "గోధుమ పిండి 1 కిలో",
+              "quantity": 1
+            },
+            {
+              "text": "సబ్బు",
+              "quantity": 3
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 463,
+      "output_tokens": 130
+    }
+  }
+}

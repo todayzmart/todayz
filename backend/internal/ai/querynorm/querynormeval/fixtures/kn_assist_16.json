@@ -1,0 +1,59 @@
+{
+  "name": "kn_assist_16",
+  "input": {
+    "q": "ನನಗೆ ತಾಜಾ ತರಕಾರಿ ಬೇಕು ಆಫರ್",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "ತಾಜಾ ತರಕಾರಿ",
+    "chips": [
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "ಆಫರ್"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_kn_assist_16",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_kn_assist_16",
+        "name": "suggest_search",
+        "input": {
+          "query": "ತಾಜಾ ತರಕಾರಿ",
+          "chips": [
+            {
+              "kind": "offers",
+              "value": null,
+              "text": "ಆಫರ್"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 85
+    }
+  }
+}

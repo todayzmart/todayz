@@ -1,0 +1,51 @@
+{
+  "name": "hi_list_05",
+  "input": {
+    "text": "Dolo 650 ek patta\nअरहर दाल 1 किलो",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "Dolo 650 ek patta",
+        "quantity": 1
+      },
+      {
+        "text": "अरहर दाल 1 किलो",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_05",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_05",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "Dolo 650 ek patta",
+              "quantity": 1
+            },
+            {
+              "text": "अरहर दाल 1 किलो",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 450,
+      "output_tokens": 100
+    }
+  }
+}

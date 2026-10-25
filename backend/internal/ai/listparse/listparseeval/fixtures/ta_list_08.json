@@ -1,0 +1,67 @@
+{
+  "name": "ta_list_08",
+  "input": {
+    "text": "1 kg அரிசி, arisi 5 kg, மூன்று மேகி, ஒரு டஜன் வாழைப்பழம்",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "1 kg அரிசி",
+        "quantity": 1
+      },
+      {
+        "text": "arisi 5 kg",
+        "quantity": 1
+      },
+      {
+        "text": "மேகி",
+        "quantity": 3
+      },
+      {
+        "text": "வாழைப்பழம்",
+        "quantity": 12
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_list_08",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_list_08",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "1 kg அரிசி",
+              "quantity": 1
+            },
+            {
+              "text": "arisi 5 kg",
+              "quantity": 1
+            },
+            {
+              "text": "மேகி",
+              "quantity": 3
+            },
+            {
+              "text": "வாழைப்பழம்",
+              "quantity": 12
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 470,
+      "output_tokens": 160
+    }
+  }
+}

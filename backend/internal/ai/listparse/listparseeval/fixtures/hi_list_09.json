@@ -1,0 +1,67 @@
+{
+  "name": "hi_list_09",
+  "input": {
+    "text": "चीनी आधा किलो; दो दूध; नमक; आलू ३ किलो",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "चीनी आधा किलो",
+        "quantity": 1
+      },
+      {
+        "text": "दूध",
+        "quantity": 2
+      },
+      {
+        "text": "नमक",
+        "quantity": 1
+      },
+      {
+        "text": "आलू ३ किलो",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_09",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_09",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "चीनी आधा किलो",
+              "quantity": 1
+            },
+            {
+              "text": "दूध",
+              "quantity": 2
+            },
+            {
+              "text": "नमक",
+              "quantity": 1
+            },
+            {
+              "text": "आलू ३ किलो",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 468,
+      "output_tokens": 160
+    }
+  }
+}

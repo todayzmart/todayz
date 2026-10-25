@@ -1,0 +1,89 @@
+{
+  "name": "hi_assist_01",
+  "input": {
+    "q": "कोई दुकान जहाँ अमूल घी मिले होम डिलीवरी ऑफ़र अभी खुली",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "अमूल घी",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "अभी खुली"
+      },
+      {
+        "kind": "delivery",
+        "value": "",
+        "text": "होम डिलीवरी"
+      },
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "ऑफ़र"
+      },
+      {
+        "kind": "brand",
+        "value": "amul",
+        "text": "अमूल"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_hi_assist_01",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_hi_assist_01",
+        "name": "suggest_search",
+        "input": {
+          "query": "अमूल घी",
+          "chips": [
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "अभी खुली"
+            },
+            {
+              "kind": "delivery",
+              "value": null,
+              "text": "होम डिलीवरी"
+            },
+            {
+              "kind": "offers",
+              "value": null,
+              "text": "ऑफ़र"
+            },
+            {
+              "kind": "brand",
+              "value": "amul",
+              "text": "अमूल"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 160
+    }
+  }
+}

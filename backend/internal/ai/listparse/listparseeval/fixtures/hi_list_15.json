@@ -1,0 +1,51 @@
+{
+  "name": "hi_list_15",
+  "input": {
+    "text": "नमक\npaanch Parle-G",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "नमक",
+        "quantity": 1
+      },
+      {
+        "text": "Parle-G",
+        "quantity": 5
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_15",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_15",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "नमक",
+              "quantity": 1
+            },
+            {
+              "text": "Parle-G",
+              "quantity": 5
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 442,
+      "output_tokens": 100
+    }
+  }
+}

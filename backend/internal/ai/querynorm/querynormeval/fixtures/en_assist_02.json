@@ -1,0 +1,69 @@
+{
+  "name": "en_assist_02",
+  "input": {
+    "q": "nandini curd open now please",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "nandini curd",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "open now"
+      },
+      {
+        "kind": "brand",
+        "value": "nandini",
+        "text": "nandini"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_en_assist_02",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_en_assist_02",
+        "name": "suggest_search",
+        "input": {
+          "query": "nandini curd",
+          "chips": [
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "open now"
+            },
+            {
+              "kind": "brand",
+              "value": "nandini",
+              "text": "nandini"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

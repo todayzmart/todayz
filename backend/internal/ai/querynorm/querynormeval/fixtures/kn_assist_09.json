@@ -1,0 +1,79 @@
+{
+  "name": "kn_assist_09",
+  "input": {
+    "q": "ನನಗೆ ನಂದಿನಿ ಹಾಲು ಬೇಕು ಈಗ ತೆರೆದಿರುವ ಆಫರ್",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "ನಂದಿನಿ ಹಾಲು",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "ಈಗ ತೆರೆದಿರುವ"
+      },
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "ಆಫರ್"
+      },
+      {
+        "kind": "brand",
+        "value": "nandini",
+        "text": "ನಂದಿನಿ"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_kn_assist_09",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_kn_assist_09",
+        "name": "suggest_search",
+        "input": {
+          "query": "ನಂದಿನಿ ಹಾಲು",
+          "chips": [
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "ಈಗ ತೆರೆದಿರುವ"
+            },
+            {
+              "kind": "offers",
+              "value": null,
+              "text": "ಆಫರ್"
+            },
+            {
+              "kind": "brand",
+              "value": "nandini",
+              "text": "ನಂದಿನಿ"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 135
+    }
+  }
+}

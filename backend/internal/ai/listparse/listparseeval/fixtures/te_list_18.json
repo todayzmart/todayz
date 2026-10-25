@@ -1,0 +1,59 @@
+{
+  "name": "te_list_18",
+  "input": {
+    "text": "ఇడ్లీ రవ్వ అర కిలో, కొత్తిమీర, వెన్న 100 గ్రాములు",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ఇడ్లీ రవ్వ అర కిలో",
+        "quantity": 1
+      },
+      {
+        "text": "కొత్తిమీర",
+        "quantity": 1
+      },
+      {
+        "text": "వెన్న 100 గ్రాములు",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_te_list_18",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_te_list_18",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ఇడ్లీ రవ్వ అర కిలో",
+              "quantity": 1
+            },
+            {
+              "text": "కొత్తిమీర",
+              "quantity": 1
+            },
+            {
+              "text": "వెన్న 100 గ్రాములు",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 464,
+      "output_tokens": 130
+    }
+  }
+}

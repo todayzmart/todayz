@@ -1,0 +1,51 @@
+{
+  "name": "ta_filler_skipped",
+  "input": {
+    "text": "அண்ணா சீக்கிரம் அனுப்புங்கள்: தயிர் 500 கிராம், எண்ணெய் 1 லிட்டர்",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "தயிர் 500 கிராம்",
+        "quantity": 1
+      },
+      {
+        "text": "எண்ணெய் 1 லிட்டர்",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_filler_skipped",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_filler_skipped",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "தயிர் 500 கிராம்",
+              "quantity": 1
+            },
+            {
+              "text": "எண்ணெய் 1 லிட்டர்",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 450,
+      "output_tokens": 100
+    }
+  }
+}
