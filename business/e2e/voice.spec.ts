@@ -1,5 +1,6 @@
 import { VIEWPORTS, guardPage, shot, type PageGuard } from '@todayz/config/playwright';
 import { expect, test, type Page, type Route } from '@playwright/test';
+import { overview } from '../src/test/insightsData';
 
 // B-06 Voice update on the production-shaped build with a faked API (no stack, no model): hold to
 // talk, processing, the draft with a cashier's "Ask manager" and "Pick item" lines, the edit sheet,
@@ -133,6 +134,8 @@ async function fakeApi(page: Page, role: string): Promise<Fake> {
     }
     if (url.pathname === '/v1/discover/categories') return ok(route, { items: [], nextCursor: null });
     if (url.pathname === `${base}/orders`) return ok(route, { items: [], nextCursor: null, serverNow: NOW() });
+    // The owner's sidebar reads today's overview for the Stock badge and the setup card (W3-03).
+    if (url.pathname === `${base}/overview`) return ok(route, overview({ newOrders: [] }));
     if (url.pathname === `${base}/items`) {
       const q = (url.searchParams.get('q') ?? '').toLowerCase();
       return ok(route, { items: ITEMS.filter((i) => i.name.toLowerCase().includes(q)), nextCursor: null });
