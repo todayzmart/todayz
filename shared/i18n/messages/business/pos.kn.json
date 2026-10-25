@@ -873,5 +873,120 @@
     "message": "{shop} ನಿಂದ ನಿಮ್ಮ ರಸೀದಿ: {url}",
     "review": "reviewed",
     "enHash": "b72276cf"
+  },
+  "pos.pay.other": {
+    "message": "ಇತರೆ",
+    "review": "reviewed",
+    "enHash": "6e6a6f20"
+  },
+  "pos.storeSales.open": {
+    "message": "ಅಂಗಡಿಯ ಮಾರಾಟಗಳು",
+    "review": "reviewed",
+    "enHash": "26e31c8a"
+  },
+  "pos.storeSales.title": {
+    "message": "ಅಂಗಡಿಯ ಮಾರಾಟಗಳು",
+    "review": "reviewed",
+    "enHash": "26e31c8a"
+  },
+  "pos.storeSales.sub": {
+    "message": "ಎಲ್ಲಾ ಸಾಧನಗಳಿಂದ ಈ ಅಂಗಡಿಯ ಪ್ರತಿ ಮಾರಾಟ, ಹೊಸದು ಮೊದಲು.",
+    "review": "reviewed",
+    "enHash": "bb528425"
+  },
+  "pos.storeSales.refresh": {
+    "message": "ರಿಫ್ರೆಶ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "56e3badc"
+  },
+  "pos.storeSales.more": {
+    "message": "ಇನ್ನಷ್ಟು ತೋರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "pos.storeSales.loading": {
+    "message": "ಮಾರಾಟಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ",
+    "review": "reviewed",
+    "enHash": "2723eba7"
+  },
+  "pos.storeSales.offline": {
+    "message": "ನೀವು ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿದ್ದೀರಿ. ಅಂಗಡಿಯ ಮಾರಾಟಗಳನ್ನು ನೋಡಲು ಸಂಪರ್ಕಿಸಿ; ಈ ಸಾಧನದ ಮಾರಾಟಗಳು “ಮಾರಾಟಗಳು” ಅಡಿಯಲ್ಲಿವೆ.",
+    "review": "reviewed",
+    "enHash": "61c05b4d"
+  },
+  "pos.storeSales.failed": {
+    "message": "ಮಾರಾಟಗಳು ಲೋಡ್ ಆಗಲಿಲ್ಲ. “ರಿಫ್ರೆಶ್ ಮಾಡಿ” ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "64c16cab"
+  },
+  "pos.storeSales.forbidden": {
+    "message": "ಈ ಅಂಗಡಿಯ ಮಾರಾಟಗಳನ್ನು ನೀವು ನೋಡಲು ಸಾಧ್ಯವಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "4d8a5236"
+  },
+  "pos.storeSales.empty.title": {
+    "message": "ಇನ್ನೂ ಮಾರಾಟಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "f2a3f161"
+  },
+  "pos.storeSales.empty.body": {
+    "message": "ಈ ಅಂಗಡಿಯಲ್ಲಿ ಮಾಡಿದ ಮಾರಾಟಗಳು ಸರ್ವರ್ ತಲುಪಿದ ನಂತರ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "d6d582c5"
+  },
+  "pos.storeSales.offlineSale": {
+    "message": "ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಮಾರಾಟ",
+    "review": "reviewed",
+    "enHash": "1080acf7"
+  },
+  "pos.storeSales.link.none": {
+    "message": "ಗ್ರಾಹಕರಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "871e3df8"
+  },
+  "pos.storeSales.link.linked": {
+    "message": "ಗ್ರಾಹಕರು ಲಿಂಕ್ ಆಗಿದ್ದಾರೆ",
+    "review": "reviewed",
+    "enHash": "d731c875"
+  },
+  "pos.storeSales.link.linkedTo": {
+    "message": "{name} ಅವರಿಗೆ ಲಿಂಕ್ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "50f407f3"
+  },
+  "pos.storeSales.link.pending": {
+    "message": "ಲಿಂಕ್ ಬಾಕಿ ಇದೆ",
+    "review": "reviewed",
+    "enHash": "18990b4f"
+  },
+  "pos.storeSales.failure.code_used": {
+    "message": "ಕೌಂಟರ್ ಕೋಡ್ ಈಗಾಗಲೇ ಬಳಕೆಯಾಗಿತ್ತು.",
+    "review": "reviewed",
+    "enHash": "6ba38a1c"
+  },
+  "pos.storeSales.failure.code_wrong": {
+    "message": "ಕೌಂಟರ್ ಕೋಡ್ ಹೊಂದಿಕೆಯಾಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "3d77b8d3"
+  },
+  "pos.storeSales.failure.clock_off": {
+    "message": "ಸಾಧನದ ಗಡಿಯಾರ ತಪ್ಪಾಗಿತ್ತು.",
+    "review": "reviewed",
+    "enHash": "7f280bf4"
+  },
+  "pos.storeSales.failure.too_late": {
+    "message": "ಕೋಡ್ ಪರಿಶೀಲಿಸಲು ಆಗದಷ್ಟು ತಡವಾಗಿ ಮಾರಾಟ ಸಿಂಕ್ ಆಯಿತು.",
+    "review": "reviewed",
+    "enHash": "3e897c4c"
+  },
+  "pos.storeSales.failure.locked": {
+    "message": "ಹಲವು ತಪ್ಪು ಕೋಡ್‌ಗಳು; ಪರಿಶೀಲನೆ ನಿಲ್ಲಿಸಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "74daacba"
+  },
+  "pos.storeSales.failure.unverified": {
+    "message": "ಕೋಡ್ ಪರಿಶೀಲಿಸಲು ಆಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "15c74c7c"
   }
 }

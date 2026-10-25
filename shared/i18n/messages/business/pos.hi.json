@@ -873,5 +873,120 @@
     "message": "{shop} से आपकी रसीद: {url}",
     "review": "reviewed",
     "enHash": "b72276cf"
+  },
+  "pos.pay.other": {
+    "message": "अन्य",
+    "review": "reviewed",
+    "enHash": "6e6a6f20"
+  },
+  "pos.storeSales.open": {
+    "message": "दुकान की बिक्री",
+    "review": "reviewed",
+    "enHash": "26e31c8a"
+  },
+  "pos.storeSales.title": {
+    "message": "दुकान की बिक्री",
+    "review": "reviewed",
+    "enHash": "26e31c8a"
+  },
+  "pos.storeSales.sub": {
+    "message": "इस दुकान की हर डिवाइस से हुई सारी बिक्री, सबसे नई पहले।",
+    "review": "reviewed",
+    "enHash": "bb528425"
+  },
+  "pos.storeSales.refresh": {
+    "message": "रीफ़्रेश करें",
+    "review": "reviewed",
+    "enHash": "56e3badc"
+  },
+  "pos.storeSales.more": {
+    "message": "और दिखाएँ",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "pos.storeSales.loading": {
+    "message": "बिक्री लोड हो रही है",
+    "review": "reviewed",
+    "enHash": "2723eba7"
+  },
+  "pos.storeSales.offline": {
+    "message": "आप ऑफ़लाइन हैं। दुकान की बिक्री देखने के लिए इंटरनेट से जुड़ें; इस डिवाइस की बिक्री “बिक्री” में है।",
+    "review": "reviewed",
+    "enHash": "61c05b4d"
+  },
+  "pos.storeSales.failed": {
+    "message": "बिक्री लोड नहीं हो सकी। “रीफ़्रेश करें” दबाकर देखें।",
+    "review": "reviewed",
+    "enHash": "64c16cab"
+  },
+  "pos.storeSales.forbidden": {
+    "message": "आप इस दुकान की बिक्री नहीं देख सकते।",
+    "review": "reviewed",
+    "enHash": "4d8a5236"
+  },
+  "pos.storeSales.empty.title": {
+    "message": "अभी कोई बिक्री नहीं",
+    "review": "reviewed",
+    "enHash": "f2a3f161"
+  },
+  "pos.storeSales.empty.body": {
+    "message": "इस दुकान पर हुई बिक्री सर्वर तक पहुँचने के बाद यहाँ दिखेगी।",
+    "review": "reviewed",
+    "enHash": "d6d582c5"
+  },
+  "pos.storeSales.offlineSale": {
+    "message": "ऑफ़लाइन बिकी",
+    "review": "reviewed",
+    "enHash": "1080acf7"
+  },
+  "pos.storeSales.link.none": {
+    "message": "कोई ग्राहक नहीं",
+    "review": "reviewed",
+    "enHash": "871e3df8"
+  },
+  "pos.storeSales.link.linked": {
+    "message": "ग्राहक लिंक हुआ",
+    "review": "reviewed",
+    "enHash": "d731c875"
+  },
+  "pos.storeSales.link.linkedTo": {
+    "message": "{name} से लिंक",
+    "review": "reviewed",
+    "enHash": "50f407f3"
+  },
+  "pos.storeSales.link.pending": {
+    "message": "लिंक बाकी",
+    "review": "reviewed",
+    "enHash": "18990b4f"
+  },
+  "pos.storeSales.failure.code_used": {
+    "message": "काउंटर कोड पहले ही इस्तेमाल हो चुका था।",
+    "review": "reviewed",
+    "enHash": "6ba38a1c"
+  },
+  "pos.storeSales.failure.code_wrong": {
+    "message": "काउंटर कोड मेल नहीं खाया।",
+    "review": "reviewed",
+    "enHash": "3d77b8d3"
+  },
+  "pos.storeSales.failure.clock_off": {
+    "message": "डिवाइस की घड़ी गलत थी।",
+    "review": "reviewed",
+    "enHash": "7f280bf4"
+  },
+  "pos.storeSales.failure.too_late": {
+    "message": "बिक्री इतनी देर से सिंक हुई कि कोड जाँचा नहीं जा सका।",
+    "review": "reviewed",
+    "enHash": "3e897c4c"
+  },
+  "pos.storeSales.failure.locked": {
+    "message": "बहुत बार गलत कोड; जाँच रोक दी गई है।",
+    "review": "reviewed",
+    "enHash": "74daacba"
+  },
+  "pos.storeSales.failure.unverified": {
+    "message": "कोड जाँचा नहीं जा सका।",
+    "review": "reviewed",
+    "enHash": "15c74c7c"
   }
 }

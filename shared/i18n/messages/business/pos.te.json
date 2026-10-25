@@ -873,5 +873,120 @@
     "message": "{shop} నుంచి మీ రసీదు: {url}",
     "review": "reviewed",
     "enHash": "b72276cf"
+  },
+  "pos.pay.other": {
+    "message": "ఇతర",
+    "review": "reviewed",
+    "enHash": "6e6a6f20"
+  },
+  "pos.storeSales.open": {
+    "message": "దుకాణం అమ్మకాలు",
+    "review": "reviewed",
+    "enHash": "26e31c8a"
+  },
+  "pos.storeSales.title": {
+    "message": "దుకాణం అమ్మకాలు",
+    "review": "reviewed",
+    "enHash": "26e31c8a"
+  },
+  "pos.storeSales.sub": {
+    "message": "అన్ని పరికరాల నుండి ఈ దుకాణంలో జరిగిన ప్రతి అమ్మకం, కొత్తవి ముందు.",
+    "review": "reviewed",
+    "enHash": "bb528425"
+  },
+  "pos.storeSales.refresh": {
+    "message": "రిఫ్రెష్ చేయండి",
+    "review": "reviewed",
+    "enHash": "56e3badc"
+  },
+  "pos.storeSales.more": {
+    "message": "మరిన్ని చూపించు",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "pos.storeSales.loading": {
+    "message": "అమ్మకాలు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "2723eba7"
+  },
+  "pos.storeSales.offline": {
+    "message": "మీరు ఆఫ్‌లైన్‌లో ఉన్నారు. దుకాణం అమ్మకాలు చూడటానికి కనెక్ట్ అవ్వండి; ఈ పరికరంలోని అమ్మకాలు “అమ్మకాలు” లో ఉన్నాయి.",
+    "review": "reviewed",
+    "enHash": "61c05b4d"
+  },
+  "pos.storeSales.failed": {
+    "message": "అమ్మకాలు లోడ్ కాలేదు. “రిఫ్రెష్ చేయండి” ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "64c16cab"
+  },
+  "pos.storeSales.forbidden": {
+    "message": "ఈ దుకాణం అమ్మకాలను మీరు చూడలేరు.",
+    "review": "reviewed",
+    "enHash": "4d8a5236"
+  },
+  "pos.storeSales.empty.title": {
+    "message": "ఇంకా అమ్మకాలు లేవు",
+    "review": "reviewed",
+    "enHash": "f2a3f161"
+  },
+  "pos.storeSales.empty.body": {
+    "message": "ఈ దుకాణంలో జరిగిన అమ్మకాలు సర్వర్‌కు చేరిన తర్వాత ఇక్కడ కనిపిస్తాయి.",
+    "review": "reviewed",
+    "enHash": "d6d582c5"
+  },
+  "pos.storeSales.offlineSale": {
+    "message": "ఆఫ్‌లైన్‌లో అమ్మినది",
+    "review": "reviewed",
+    "enHash": "1080acf7"
+  },
+  "pos.storeSales.link.none": {
+    "message": "కస్టమర్ లేరు",
+    "review": "reviewed",
+    "enHash": "871e3df8"
+  },
+  "pos.storeSales.link.linked": {
+    "message": "కస్టమర్ లింక్ అయ్యారు",
+    "review": "reviewed",
+    "enHash": "d731c875"
+  },
+  "pos.storeSales.link.linkedTo": {
+    "message": "{name} కు లింక్ అయింది",
+    "review": "reviewed",
+    "enHash": "50f407f3"
+  },
+  "pos.storeSales.link.pending": {
+    "message": "లింక్ పెండింగ్‌లో ఉంది",
+    "review": "reviewed",
+    "enHash": "18990b4f"
+  },
+  "pos.storeSales.failure.code_used": {
+    "message": "కౌంటర్ కోడ్ ఇప్పటికే వాడబడింది.",
+    "review": "reviewed",
+    "enHash": "6ba38a1c"
+  },
+  "pos.storeSales.failure.code_wrong": {
+    "message": "కౌంటర్ కోడ్ సరిపోలలేదు.",
+    "review": "reviewed",
+    "enHash": "3d77b8d3"
+  },
+  "pos.storeSales.failure.clock_off": {
+    "message": "పరికరం గడియారం తప్పుగా ఉంది.",
+    "review": "reviewed",
+    "enHash": "7f280bf4"
+  },
+  "pos.storeSales.failure.too_late": {
+    "message": "కోడ్ తనిఖీ చేయలేనంత ఆలస్యంగా అమ్మకం సింక్ అయింది.",
+    "review": "reviewed",
+    "enHash": "3e897c4c"
+  },
+  "pos.storeSales.failure.locked": {
+    "message": "చాలా తప్పు కోడ్‌లు; తనిఖీలు ఆపివేయబడ్డాయి.",
+    "review": "reviewed",
+    "enHash": "74daacba"
+  },
+  "pos.storeSales.failure.unverified": {
+    "message": "కోడ్‌ను తనిఖీ చేయలేకపోయాం.",
+    "review": "reviewed",
+    "enHash": "15c74c7c"
   }
 }
