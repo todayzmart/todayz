@@ -47,8 +47,9 @@ ORDER BY s.id;
 
 -- HoldCauses reads the automatic hold causes (01 §9): a suspended
 -- business, KYC not verified, no payout destination (neither a UPI id nor a
--- bank account), an open risk flag on the business or one of its stores. TODO(lead): every open flag holds, not only fraud rules (W3-02 owns
--- the rule list).
+-- bank account), a risk flag on the business or one of its stores that is
+-- open or confirmed (01 §256: fraud that has not been cleared; D-225). Only
+-- clearing the flag releases the hold.
 -- name: HoldCauses :one
 SELECT
   (b.status = 'suspended')::boolean AS suspended,
@@ -59,7 +60,7 @@ SELECT
   ))::boolean AS details_missing,
   EXISTS (
     SELECT 1 FROM risk_flags f
-    WHERE f.status = 'open' AND (
+    WHERE f.status IN ('open', 'confirmed') AND (
       (f.subject_type = 'business' AND f.subject_id = b.id) OR
       (f.subject_type = 'store' AND f.subject_id IN (SELECT st.id FROM stores st WHERE st.business_id = b.id)))
   )::boolean AS risk_flag
@@ -217,7 +218,7 @@ SELECT ps.*, b.brand_name, b.status AS business_status,
   coalesce(k.status, 'missing')::text AS kyc_status,
   EXISTS (
     SELECT 1 FROM risk_flags f
-    WHERE f.status = 'open' AND (
+    WHERE f.status IN ('open', 'confirmed') AND (
       (f.subject_type = 'business' AND f.subject_id = b.id) OR
       (f.subject_type = 'store' AND f.subject_id IN (SELECT st.id FROM stores st WHERE st.business_id = b.id)))
   )::boolean AS open_risk_flag,
@@ -239,7 +240,7 @@ SELECT ps.*, b.brand_name, b.status AS business_status,
   coalesce(k.status, 'missing')::text AS kyc_status,
   EXISTS (
     SELECT 1 FROM risk_flags f
-    WHERE f.status = 'open' AND (
+    WHERE f.status IN ('open', 'confirmed') AND (
       (f.subject_type = 'business' AND f.subject_id = b.id) OR
       (f.subject_type = 'store' AND f.subject_id IN (SELECT st.id FROM stores st WHERE st.business_id = b.id)))
   )::boolean AS open_risk_flag,

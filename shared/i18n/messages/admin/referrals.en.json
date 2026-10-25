@@ -1,0 +1,178 @@
+{
+  "referrals.sub": {
+    "defaultMessage": "Every referral with its parties, credits and status. Reject one before either side is paid.",
+    "description": "A-10 Referrals: Page subtitle"
+  },
+  "referrals.filters": {
+    "defaultMessage": "Referral filters",
+    "description": "A-10 Referrals: Filter form label"
+  },
+  "referrals.table": {
+    "defaultMessage": "Referrals",
+    "description": "A-10 Referrals: Table label"
+  },
+  "referrals.flagged": {
+    "defaultMessage": "Only with open risk flags",
+    "description": "A-10 Referrals: Checkbox"
+  },
+  "referrals.col.code": {
+    "defaultMessage": "Code",
+    "description": "A-10 Referrals: Column: the referrer's public code"
+  },
+  "referrals.col.kind": {
+    "defaultMessage": "Kind",
+    "description": "A-10 Referrals: Column"
+  },
+  "referrals.col.parties": {
+    "defaultMessage": "Referrer → referee",
+    "description": "A-10 Referrals: Column"
+  },
+  "referrals.col.credits": {
+    "defaultMessage": "Credits",
+    "description": "A-10 Referrals: Column"
+  },
+  "referrals.col.status": {
+    "defaultMessage": "Status",
+    "description": "A-10 Referrals: Column"
+  },
+  "referrals.col.flags": {
+    "defaultMessage": "Open flags",
+    "description": "A-10 Referrals: Column"
+  },
+  "referrals.col.created": {
+    "defaultMessage": "Created",
+    "description": "A-10 Referrals: Column"
+  },
+  "referrals.parties": {
+    "defaultMessage": "{from} → {to}",
+    "description": "A-10 Referrals: Referrer to referee"
+  },
+  "referrals.credits": {
+    "defaultMessage": "{referrer} / {referee}",
+    "description": "A-10 Referrals: Referrer's and referee's credits"
+  },
+  "referrals.empty": {
+    "defaultMessage": "No referrals match.",
+    "description": "A-10 Referrals: Empty list"
+  },
+  "referrals.pick": {
+    "defaultMessage": "Pick a referral to see its details.",
+    "description": "A-10 Referrals: Side panel placeholder"
+  },
+  "referrals.notInList": {
+    "defaultMessage": "That referral is not in this list. Change the filters or pick another.",
+    "description": "A-10 Referrals: Side panel when the chosen referral is filtered out"
+  },
+  "referrals.none": {
+    "defaultMessage": "None",
+    "description": "A-10 Referrals: Empty value"
+  },
+  "referrals.status.all": {
+    "defaultMessage": "All statuses",
+    "description": "A-10 Referrals: Filter option"
+  },
+  "referrals.status.pending": {
+    "defaultMessage": "Pending",
+    "description": "A-10 Referrals: Referral status"
+  },
+  "referrals.status.qualified": {
+    "defaultMessage": "Qualified",
+    "description": "A-10 Referrals: Referral status"
+  },
+  "referrals.status.rewarded": {
+    "defaultMessage": "Rewarded",
+    "description": "A-10 Referrals: Referral status"
+  },
+  "referrals.status.rejected": {
+    "defaultMessage": "Rejected",
+    "description": "A-10 Referrals: Referral status"
+  },
+  "referrals.status.rejectedSameDevice": {
+    "defaultMessage": "Rejected: same device",
+    "description": "A-10 Referrals: Referral status"
+  },
+  "referrals.kind.all": {
+    "defaultMessage": "All kinds",
+    "description": "A-10 Referrals: Filter option"
+  },
+  "referrals.kind.retailerCustomer": {
+    "defaultMessage": "Shop invites customer",
+    "description": "A-10 Referrals: Referral kind"
+  },
+  "referrals.kind.customerCustomer": {
+    "defaultMessage": "Customer invites friend",
+    "description": "A-10 Referrals: Referral kind"
+  },
+  "referrals.kind.anyShop": {
+    "defaultMessage": "Any-shop invite",
+    "description": "A-10 Referrals: Referral kind"
+  },
+  "referrals.source.qrStandee": {
+    "defaultMessage": "QR standee",
+    "description": "A-10 Referrals: Referral source"
+  },
+  "referrals.source.link": {
+    "defaultMessage": "Link",
+    "description": "A-10 Referrals: Referral source"
+  },
+  "referrals.source.code": {
+    "defaultMessage": "Typed code",
+    "description": "A-10 Referrals: Referral source"
+  },
+  "referrals.party.store": {
+    "defaultMessage": "Store",
+    "description": "A-10 Referrals: Party kind when it has no name"
+  },
+  "referrals.party.customer": {
+    "defaultMessage": "Customer",
+    "description": "A-10 Referrals: Party kind when they have no name"
+  },
+  "referrals.party.business": {
+    "defaultMessage": "Business",
+    "description": "A-10 Referrals: Party kind when it has no name"
+  },
+  "referrals.detail.title": {
+    "defaultMessage": "Referral {code}",
+    "description": "A-10 Referrals: Card title"
+  },
+  "referrals.detail.source": {
+    "defaultMessage": "Came from",
+    "description": "A-10 Referrals: Fact label"
+  },
+  "referrals.detail.referrer": {
+    "defaultMessage": "Referrer",
+    "description": "A-10 Referrals: Fact label"
+  },
+  "referrals.detail.referee": {
+    "defaultMessage": "Referee",
+    "description": "A-10 Referrals: Fact label"
+  },
+  "referrals.detail.party": {
+    "defaultMessage": "{name}, {credits} credits",
+    "description": "A-10 Referrals: A party and what they get"
+  },
+  "referrals.detail.qualified": {
+    "defaultMessage": "Qualified",
+    "description": "A-10 Referrals: Fact label"
+  },
+  "referrals.detail.rewarded": {
+    "defaultMessage": "Rewarded",
+    "description": "A-10 Referrals: Fact label"
+  },
+  "referrals.reject": {
+    "defaultMessage": "Reject",
+    "description": "A-10 Referrals: Button"
+  },
+  "referrals.rejectTitle": {
+    "defaultMessage": "Reject referral {code}?",
+    "description": "A-10 Referrals: Dialog title"
+  },
+  "referrals.rejectBody": {
+    "defaultMessage": "Neither side will be rewarded. Credits already paid come back only through a credits reversal.",
+    "description": "A-10 Referrals: Dialog body"
+  },
+  "referrals.rejectDone": {
+    "defaultMessage": "Referral rejected",
+    "description": "A-10 Referrals: Toast"
+  }
+}

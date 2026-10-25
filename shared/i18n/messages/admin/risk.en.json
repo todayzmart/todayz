@@ -1,0 +1,326 @@
+{
+  "risk.sub": {
+    "defaultMessage": "Flags the rules raised, with what they counted. Clear or confirm each with a reason. A flag blocks no one by itself; one on a business or store holds that business's payout while it is open or confirmed.",
+    "description": "A-13 Risk: Page subtitle"
+  },
+  "risk.filter.status": {
+    "defaultMessage": "Flag status",
+    "description": "A-13 Risk: Status switch label"
+  },
+  "risk.tabs": {
+    "defaultMessage": "Rules",
+    "description": "A-13 Risk: Rule tab list label"
+  },
+  "risk.table": {
+    "defaultMessage": "Risk flags",
+    "description": "A-13 Risk: Flags table label"
+  },
+  "risk.rule.all": {
+    "defaultMessage": "All rules",
+    "description": "A-13 Risk: Tab for every rule"
+  },
+  "risk.col.rule": {
+    "defaultMessage": "Rule",
+    "description": "A-13 Risk: Column"
+  },
+  "risk.col.subject": {
+    "defaultMessage": "Subject",
+    "description": "A-13 Risk: Column: what the flag is about"
+  },
+  "risk.col.score": {
+    "defaultMessage": "Score",
+    "description": "A-13 Risk: Column: how strong the signal is"
+  },
+  "risk.col.status": {
+    "defaultMessage": "Status",
+    "description": "A-13 Risk: Column"
+  },
+  "risk.col.raised": {
+    "defaultMessage": "Raised",
+    "description": "A-13 Risk: Column: when the flag was raised"
+  },
+  "risk.emptyOpen": {
+    "defaultMessage": "No open flags. The rules run every few minutes.",
+    "description": "A-13 Risk: Empty open queue"
+  },
+  "risk.empty": {
+    "defaultMessage": "No flags here.",
+    "description": "A-13 Risk: Empty list"
+  },
+  "risk.pick": {
+    "defaultMessage": "Pick a flag to see its evidence.",
+    "description": "A-13 Risk: Side panel placeholder"
+  },
+  "risk.none": {
+    "defaultMessage": "None",
+    "description": "A-13 Risk: Empty value"
+  },
+  "risk.status.open": {
+    "defaultMessage": "Open",
+    "description": "A-13 Risk: Flag status"
+  },
+  "risk.status.cleared": {
+    "defaultMessage": "Cleared",
+    "description": "A-13 Risk: Flag status"
+  },
+  "risk.status.confirmed": {
+    "defaultMessage": "Confirmed",
+    "description": "A-13 Risk: Flag status"
+  },
+  "risk.rule.codeLockouts": {
+    "defaultMessage": "Code lockouts at a store",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.rule.billClaimSpread": {
+    "defaultMessage": "Bill claims from one phone at many shops",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.rule.reversalRatio": {
+    "defaultMessage": "High refunds and reversals at a store",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.rule.offlineLinks": {
+    "defaultMessage": "Many offline links in a day",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.rule.offlineOffer": {
+    "defaultMessage": "Offline offer without the discount role",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.rule.selfLike": {
+    "defaultMessage": "Referral looks like self-referral",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.rule.deviceAccounts": {
+    "defaultMessage": "One device, many referral accounts",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.rule.reversedAfterReward": {
+    "defaultMessage": "Qualifying order reversed after reward",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.rule.rewardRefused": {
+    "defaultMessage": "Referral reward held",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.rule.otpIpFanout": {
+    "defaultMessage": "One network asking codes for many phones",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.rule.otpFailedPhone": {
+    "defaultMessage": "Many wrong codes for one phone",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.rule.storeDailyCap": {
+    "defaultMessage": "Credits over the store's daily cap",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.rule.customerMonthlyCap": {
+    "defaultMessage": "Credits over the customer's monthly cap at one shop",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.rule.storeStrikes": {
+    "defaultMessage": "Store strikes",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.rule.returnUnconfirmed": {
+    "defaultMessage": "Return auto-confirmed after 72 hours",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.rule.askReported": {
+    "defaultMessage": "Shop reported an ask",
+    "description": "A-13 Risk: Rule name"
+  },
+  "risk.subject.store": {
+    "defaultMessage": "Store",
+    "description": "A-13 Risk: Subject type"
+  },
+  "risk.subject.user": {
+    "defaultMessage": "Customer",
+    "description": "A-13 Risk: Subject type"
+  },
+  "risk.subject.referral": {
+    "defaultMessage": "Referral",
+    "description": "A-13 Risk: Subject type"
+  },
+  "risk.subject.business": {
+    "defaultMessage": "Business",
+    "description": "A-13 Risk: Subject type"
+  },
+  "risk.subject.ip": {
+    "defaultMessage": "Network address",
+    "description": "A-13 Risk: Subject type"
+  },
+  "risk.subject.phone": {
+    "defaultMessage": "Phone (hidden)",
+    "description": "A-13 Risk: Subject type; the number is never shown"
+  },
+  "risk.evidence.title": {
+    "defaultMessage": "Evidence",
+    "description": "A-13 Risk: Card title: the rows the rule counted"
+  },
+  "risk.evidence.empty": {
+    "defaultMessage": "No rows recorded.",
+    "description": "A-13 Risk: Empty evidence"
+  },
+  "risk.evidence.order": {
+    "defaultMessage": "Order",
+    "description": "A-13 Risk: Evidence kind"
+  },
+  "risk.evidence.posSale": {
+    "defaultMessage": "Counter sale",
+    "description": "A-13 Risk: Evidence kind"
+  },
+  "risk.evidence.billClaim": {
+    "defaultMessage": "Bill claim",
+    "description": "A-13 Risk: Evidence kind"
+  },
+  "risk.evidence.strike": {
+    "defaultMessage": "Strike",
+    "description": "A-13 Risk: Evidence kind"
+  },
+  "risk.evidence.codeLockout": {
+    "defaultMessage": "Code lockout",
+    "description": "A-13 Risk: Evidence kind"
+  },
+  "risk.evidence.referral": {
+    "defaultMessage": "Referral",
+    "description": "A-13 Risk: Evidence kind"
+  },
+  "risk.evidence.otpRequest": {
+    "defaultMessage": "Code request",
+    "description": "A-13 Risk: Evidence kind"
+  },
+  "risk.ev.kind": {
+    "defaultMessage": "Kind",
+    "description": "A-13 Risk: Evidence column"
+  },
+  "risk.ev.what": {
+    "defaultMessage": "What",
+    "description": "A-13 Risk: Evidence column"
+  },
+  "risk.ev.store": {
+    "defaultMessage": "Shop",
+    "description": "A-13 Risk: Evidence column"
+  },
+  "risk.ev.amount": {
+    "defaultMessage": "Amount",
+    "description": "A-13 Risk: Evidence column"
+  },
+  "risk.ev.note": {
+    "defaultMessage": "Note",
+    "description": "A-13 Risk: Evidence column"
+  },
+  "risk.ev.at": {
+    "defaultMessage": "When",
+    "description": "A-13 Risk: Evidence column"
+  },
+  "risk.detail.title": {
+    "defaultMessage": "{rule}: {subject}",
+    "description": "A-13 Risk: Flag card title"
+  },
+  "risk.detail.reviewed": {
+    "defaultMessage": "By {who}: {reason}",
+    "description": "A-13 Risk: Who reviewed the flag and why"
+  },
+  "risk.holdsPayout": {
+    "defaultMessage": "Holds payout: this business's payout stays held while this flag is open or confirmed.",
+    "description": "A-13 Risk: Note on an open or confirmed business or store flag"
+  },
+  "risk.detail.subjectStatus": {
+    "defaultMessage": "Now: {status}",
+    "description": "A-13 Risk: The subject's current status"
+  },
+  "risk.others.title": {
+    "defaultMessage": "Other flags on this subject",
+    "description": "A-13 Risk: Card title"
+  },
+  "risk.clear": {
+    "defaultMessage": "Clear",
+    "description": "A-13 Risk: Button: the flag was not abuse"
+  },
+  "risk.confirm": {
+    "defaultMessage": "Confirm",
+    "description": "A-13 Risk: Button: the flag was abuse"
+  },
+  "risk.clearTitle": {
+    "defaultMessage": "Clear {rule} on {subject}?",
+    "description": "A-13 Risk: Dialog title"
+  },
+  "risk.confirmTitle": {
+    "defaultMessage": "Confirm {rule} on {subject}?",
+    "description": "A-13 Risk: Dialog title"
+  },
+  "risk.clearBody": {
+    "defaultMessage": "Clearing closes the flag. Your reason is kept on the flag and in the audit log.{hold, select, payout { Clearing lifts this flag's hold. Finance then releases the payout from Payouts once nothing else holds it.} other {}}",
+    "description": "A-13 Risk: Dialog body"
+  },
+  "risk.confirmBody": {
+    "defaultMessage": "Confirming records that this was abuse. It blocks no one; a block or suspension is its own step. {hold, select, payout {This flag keeps holding the business's payout until someone clears it.} reward {The referral reward stays held until someone clears this flag.} other {The flag stays on the record until someone clears it.}}",
+    "description": "A-13 Risk: Dialog body"
+  },
+  "risk.clearRewardWarning": {
+    "defaultMessage": "Clearing this lets the held referral reward post on the next sweep.",
+    "description": "A-13 Risk: Warning when clearing a held reward"
+  },
+  "risk.clearDone": {
+    "defaultMessage": "Flag cleared",
+    "description": "A-13 Risk: Toast"
+  },
+  "risk.confirmDone": {
+    "defaultMessage": "Flag confirmed",
+    "description": "A-13 Risk: Toast"
+  },
+  "risk.next.body": {
+    "defaultMessage": "Confirmed. Any block or suspension is a separate, audited step.",
+    "description": "A-13 Risk: Follow-up note after a confirm"
+  },
+  "risk.next.block": {
+    "defaultMessage": "Block customer",
+    "description": "A-13 Risk: Button"
+  },
+  "risk.next.suspend": {
+    "defaultMessage": "Suspend business",
+    "description": "A-13 Risk: Button"
+  },
+  "risk.next.blockTitle": {
+    "defaultMessage": "{party, select, referee {Block the referee?} referrer {Block the referrer?} other {Block this customer?}}",
+    "description": "A-13 Risk: Dialog title"
+  },
+  "risk.next.suspendTitle": {
+    "defaultMessage": "{party, select, referee {Suspend the referee's business?} referrer {Suspend the referrer's business?} other {Suspend this business?}}",
+    "description": "A-13 Risk: Dialog title"
+  },
+  "risk.next.blockBody": {
+    "defaultMessage": "{party, select, referee {The referee} referrer {The referrer} other {This customer}} is signed out and cannot order until unblocked from Customers.",
+    "description": "A-13 Risk: Dialog body"
+  },
+  "risk.next.suspendBody": {
+    "defaultMessage": "{party, select, referee {The referee's business} referrer {The referrer's business} other {This business}}: its stores go offline until it is reinstated from Businesses.",
+    "description": "A-13 Risk: Dialog body"
+  },
+  "risk.next.blockDone": {
+    "defaultMessage": "Customer blocked",
+    "description": "A-13 Risk: Toast"
+  },
+  "risk.next.suspendDone": {
+    "defaultMessage": "Business suspended",
+    "description": "A-13 Risk: Toast"
+  },
+  "risk.dialog.keep": {
+    "defaultMessage": "Keep as is",
+    "description": "A-13 Risk: Dialog cancel"
+  },
+  "risk.dialog.reason": {
+    "defaultMessage": "Reason",
+    "description": "A-13 Risk: Field label"
+  },
+  "risk.dialog.reasonRequired": {
+    "defaultMessage": "Give a reason.",
+    "description": "A-13 Risk: Field error"
+  },
+  "risk.dialog.reasonHelp": {
+    "defaultMessage": "Required, up to {max} characters. Kept in the audit log.",
+    "description": "A-13 Risk: Field help"
+  }
+}

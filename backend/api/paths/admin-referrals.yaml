@@ -1,12 +1,98 @@
-# Paths: domain "admin-referrals" (owner W3-04): admin referrals (04 §2.7).
+# Paths: domain "admin-referrals" (owner W3-02): A-10 Referrals (04 §2.7; 01 §8; D-78, D-225).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-referrals]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-referrals.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# `admin` and `super_admin` only (internal/platform/authz/policy/risk.go). Rejecting stops a reward that has
+# not posted; a posted reward is reversed only through the ledger's own correction, never from here.
+/v1/admin/referrals:
+  get:
+    operationId: listAdminReferrals
+    tags: [admin-referrals]
+    summary: Referrals, newest first (A-10)
+    description: '`flagged=true` keeps only referrals with an open risk flag.'
+    parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: ../schemas/admin-referrals.yaml#/AdminReferralStatus
+      - name: kind
+        in: query
+        schema:
+          $ref: ../schemas/admin-referrals.yaml#/AdminReferralKind
+      - name: flagged
+        in: query
+        schema:
+          type: boolean
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: A page of referrals
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-referrals.yaml#/AdminReferralList
+            example:
+              items:
+                - &referral
+                  id: 01JB0RR1A2B3C4D5E6F7G8H9J0
+                  kind: customer_customer
+                  status: qualified
+                  source: link
+                  code: K7M2QX
+                  referrer:
+                    type: customer
+                    id: 01JB0SCX1A2B3C4D5E6F7G8H9J
+                    label: Ravi
+                  referee:
+                    type: customer
+                    id: 01JB0SCX2A2B3C4D5E6F7G8H9J
+                    label: Meena
+                  referrerCredits: 50
+                  refereeCredits: 50
+                  rejectReason: null
+                  qualifiedAt: "2026-10-25T08:00:00Z"
+                  rewardedAt: null
+                  createdAt: "2026-10-24T12:00:00Z"
+                  openFlags: 1
+                  flagRules: [referral.self_like]
+              nextCursor: null
+              serverNow: "2026-10-25T10:00:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/referrals/{referralId}/reject:
+  parameters:
+    - name: referralId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: rejectAdminReferral
+    tags: [admin-referrals]
+    summary: Reject a referral before its reward posts (audited)
+    description: >-
+      From `pending`, or from `qualified` while neither side's reward has posted. The referral earns no reward
+      and its open flags stay for A-13. Anything else is `409 invalid_transition`.
+    x-idempotency: none
+    x-problems: [invalid_transition]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-referrals.yaml#/AdminReferralRejectRequest
+          example:
+            reason: The new customer is the shop owner's brother on the same phone
+    responses:
+      "200":
+        description: The referral after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-referrals.yaml#/AdminReferral
+            example:
+              <<: *referral
+              status: rejected
+              rejectReason: admin_rejected
+              qualifiedAt: null
+      default:
+        $ref: ../common/responses.yaml#/Problem

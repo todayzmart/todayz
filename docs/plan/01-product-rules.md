@@ -253,11 +253,11 @@ Keys: `ref_<kind>_referrer_credits` and `ref_<kind>_referee_credits` for each ki
 - Each business has a credit account per store (statement is per business, broken down by store).
 - Credits in: customer credits spent at the store, referral rewards earned by the business. Credits out: cashback the store gave, payouts. Reversals (§7) and admin adjustments post here too.
 - **Monthly statement** (manual payout): statements close on the 1st of each month at 00:30 IST. The system closes the previous month's statement per business: opening balance + credits in − cashback ± reversals and adjustments − payouts paid = closing balance.
-- **Payout amount** = the business's store credit balance − its unpaid payouts. If the closing amount is above 0, a payout is created for finance. It is `pending` when KYC is verified, there is no open fraud flag and the business is not suspended. Otherwise it is `held` with `hold_reason` `kyc_incomplete`, `risk_flag` or `business_suspended`, and finance unholds it when the cause clears.
+- **Payout amount** = the business's store credit balance − its unpaid payouts. If the closing amount is above 0, a payout is created for finance. It is `pending` when KYC is verified, there is no open fraud flag (a risk flag on the business or one of its stores that nobody has cleared: `open` or `confirmed`, D-225) and the business is not suspended. Otherwise it is `held` with `hold_reason` `kyc_incomplete`, `risk_flag` or `business_suspended`, and finance unholds it when the cause clears.
   - A business has at most one open payout (`pending` or `held`).
   - If the open payout is still unpaid when the next statement closes, its amount is recomputed; no second payout is created.
 - Finance in the admin console reviews (fraud flags shown), pays by UPI outside TodayZ, then marks it paid with the UTR reference. Only then does the business app show "Paid". Negative balances carry forward.
-- Payout holds: unverified KYC, open fraud flag, suspended business.
+- Payout holds: unverified KYC, open or confirmed risk flag, suspended business.
 
 ## 10. Reviews
 
@@ -666,6 +666,18 @@ Every numeric key has a min and a max (the Rule column, or after the default). A
 |---|---|---|---|
 | `customer_max_saved_addresses` | count | 20 | §5.5: saved addresses one customer can keep (`422 validation_failed` on one more). Min 1, max 50. |
 
+**Risk** (A-13, D-225). Each raises a `risk_flags` row only; no one is blocked or suspended because of it. The one money effect is §9's payout hold: a flag on a business or one of its stores holds that business's payout while it is open or confirmed, until someone clears it.
+
+| Key | Unit | Default | Rule |
+|---|---|---|---|
+| `risk_bill_claim_stores` | count | 3 | §6: different stores one customer confirms bill QRs at within `risk_bill_claim_window_minutes` that raise a risk flag. Min 2, max 20. |
+| `risk_bill_claim_window_minutes` | minutes | 10 | §6: the window for `risk_bill_claim_stores`. Min 1, max 240. |
+| `risk_reversal_ratio_percent` | count | 20 | §7: share of a store's linked POS sales (bill QR or counter code) reversed within `risk_reversal_window_days` that raises a risk flag, in percent. Min 1, max 100. |
+| `risk_reversal_min_sales` | count | 30 | §7: linked sales a store needs in the window before the ratio counts. Min 1, max 1000. |
+| `risk_reversal_window_days` | days | 7 | §7: the window for the reversal ratio. Min 1, max 30. |
+| `risk_otp_phones_per_ip_hour` | count | 10 | §2: different phone numbers one IP asks OTPs for within an hour that raise a risk flag. Min 2, max 100. |
+| `risk_otp_failed_per_phone_day` | count | 3 | §2: OTPs for one phone that used every attempt without the right code within 24 h that raise a risk flag. Min 1, max 50. |
+
 **Feature flags** (turn a feature off without a deploy)
 
 | Key | Unit | Default |
@@ -725,6 +737,7 @@ Every numeric key has a min and a max (the Rule column, or after the default). A
 | "3 or more orders expired in 2 h" alert | 3 in 2 h | 05 §5 |
 | Failed-delivery auto-confirm | 72 h | §5.3, D-85 (the 2 h and 24 h reminders are settings, D-218) |
 | Store-strike window (risk flag and reliability) | 30 days | §5.4, D-85 |
+| Risk flag scores (0–100, shown in A-13) | fixed per rule in `internal/risk` | §13, D-225 |
 | Jobs watchdog interval | 5 min | §13, D-95 |
 | "Cron missed" threshold | no succeeded run within 2× the schedule interval (daily kinds: 15 min grace after the expected time) | §13, D-95 |
 | Job error text stored | scrubbed, at most 2 kB | §13, D-95 |
