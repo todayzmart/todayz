@@ -195,3 +195,11 @@ func (h handlers) ConfirmVoiceStockDraft(ctx context.Context, req voiceapi.Confi
 	}
 	return out, nil
 }
+
+// ReadRecording reads one voice form (audio and an optional language) with the same rules
+// as voice stock update: an allowed type, at most MaxAudioBytes and MaxSeconds. Voice search
+// (W3-12, AI-C5) reads its form with it; the recording is never stored.
+func ReadRecording(mr *multipart.Reader) (Recording, error) { return readRecording(mr) }
+
+// Filename is the file name the speech provider is sent for a recording of mediaType.
+func Filename(mediaType string) string { return "voice" + extension(mediaType) }
