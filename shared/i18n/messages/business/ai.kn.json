@@ -7,7 +7,7 @@
   "ai.backToStock": {
     "message": "ಸ್ಟಾಕ್‌ಗೆ ಹೋಗಿ",
     "review": "reviewed",
-    "enHash": "55742732"
+    "enHash": "059cd0f6"
   },
   "ai.closed": {
     "message": "ಈ ಡ್ರಾಫ್ಟ್ ಮುಗಿದಿದೆ. ಹೊಸದನ್ನು ಪ್ರಾರಂಭಿಸಿ.",
@@ -197,7 +197,7 @@
   "ai.bill.unmatchedHelp": {
     "message": "ನಿಮ್ಮ ಐಟಂಗಳಲ್ಲದ ಸಾಲುಗಳನ್ನು ಬಿಡಲಾಗುತ್ತದೆ. ಮೊದಲು ಸ್ಟಾಕ್‌ನಲ್ಲಿ ಐಟಂ ಸೇರಿಸಿ, ನಂತರ ಮತ್ತೆ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ.",
     "review": "reviewed",
-    "enHash": "83d28323"
+    "enHash": "0aa512cf"
   },
   "ai.bill.mrp": {
     "message": "MRP {mrp}",
@@ -377,7 +377,7 @@
   "ai.partial": {
     "message": "{n, plural, =0 {ಇನ್ನೂ ಏನೂ ಸೇರಿಸಿಲ್ಲ.} one {# ಸಾಲು ಸೇರಿಸಲಾಗಿದೆ.} other {# ಸಾಲುಗಳನ್ನು ಸೇರಿಸಲಾಗಿದೆ.}} ಕೆಳಗೆ ಗುರುತಿಸಿದ ಸಾಲುಗಳನ್ನು ಸರಿಪಡಿಸಿ ಮತ್ತೆ ದೃಢೀಕರಿಸಿ.",
     "review": "reviewed",
-    "enHash": "5c64cef8"
+    "enHash": "4d47904c"
   },
   "ai.line.added": {
     "message": "ಸೇರಿಸಲಾಗಿದೆ",

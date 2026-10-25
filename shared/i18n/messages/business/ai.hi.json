@@ -7,7 +7,7 @@
   "ai.backToStock": {
     "message": "स्टॉक पर जाएं",
     "review": "reviewed",
-    "enHash": "55742732"
+    "enHash": "059cd0f6"
   },
   "ai.closed": {
     "message": "यह ड्राफ़्ट बंद हो चुका है। नया शुरू करें।",
@@ -197,7 +197,7 @@
   "ai.bill.unmatchedHelp": {
     "message": "जो लाइनें आपके आइटम नहीं हैं, वे छोड़ दी जाती हैं। पहले स्टॉक में आइटम जोड़ें, फिर दोबारा स्कैन करें।",
     "review": "reviewed",
-    "enHash": "83d28323"
+    "enHash": "0aa512cf"
   },
   "ai.bill.mrp": {
     "message": "MRP {mrp}",
@@ -377,7 +377,7 @@
   "ai.partial": {
     "message": "{n, plural, =0 {अभी कुछ नहीं जुड़ा।} one {# लाइन जुड़ गई।} other {# लाइनें जुड़ गईं।}} नीचे चिह्नित लाइनें ठीक करें और फिर से पक्का करें।",
     "review": "reviewed",
-    "enHash": "5c64cef8"
+    "enHash": "4d47904c"
   },
   "ai.line.added": {
     "message": "जुड़ गया",

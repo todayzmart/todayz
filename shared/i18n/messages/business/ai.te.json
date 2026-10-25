@@ -7,7 +7,7 @@
   "ai.backToStock": {
     "message": "స్టాక్‌కు వెళ్ళండి",
     "review": "reviewed",
-    "enHash": "55742732"
+    "enHash": "059cd0f6"
   },
   "ai.closed": {
     "message": "ఈ డ్రాఫ్ట్ ముగిసింది. కొత్తది మొదలుపెట్టండి.",
@@ -197,7 +197,7 @@
   "ai.bill.unmatchedHelp": {
     "message": "మీ ఐటమ్‌లు కాని లైన్లు వదిలేస్తాం. ముందు స్టాక్‌లో ఐటమ్ జోడించి, మళ్ళీ స్కాన్ చేయండి.",
     "review": "reviewed",
-    "enHash": "83d28323"
+    "enHash": "0aa512cf"
   },
   "ai.bill.mrp": {
     "message": "MRP {mrp}",
@@ -377,7 +377,7 @@
   "ai.partial": {
     "message": "{n, plural, =0 {ఇంకా ఏదీ జోడించలేదు.} one {# లైన్ జోడించాం.} other {# లైన్‌లు జోడించాం.}} కింద గుర్తు పెట్టిన లైన్‌లు సరిచేసి మళ్లీ నిర్ధారించండి.",
     "review": "reviewed",
-    "enHash": "5c64cef8"
+    "enHash": "4d47904c"
   },
   "ai.line.added": {
     "message": "జోడించాం",
