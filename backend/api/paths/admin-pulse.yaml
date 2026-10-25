@@ -1,12 +1,154 @@
-# Paths: domain "admin-pulse" (owner W3-07): admin Pulse (04 §2.7).
-#
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-pulse]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-pulse.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Paths: domain "admin-pulse" (owner W3-07): admin Pulse, A-02 (04 §2.7, 05 §3 and "Admin console Pulse").
+# Every admin role except `field_agent` (action `admin.pulse.view`, internal/platform/authz/policy/rollups.go).
+# The numbers come from the rollup tables and the `v_metric_*` views that dashboards 07–11 read, so
+# Pulse and Grafana agree within rounding. Days are IST calendar days; today is partial and refreshed
+# by `rollup_today` every 5 minutes (`asOf` says when).
+/v1/admin/pulse:
+  get:
+    operationId: getAdminPulse
+    tags: [admin-pulse]
+    summary: Pulse for a period, A-02
+    description: >-
+      The KPI strip (each with the value for the previous period of the same length), the daily trend,
+      the funnel, where orders leak, retention, credits, the top zero-result searches and the stores
+      that need attention. `range` is `today` or the last 7, 30 or 90 IST days including today; the
+      default is `7d`. An optional `city` limits everything to stores in that city (customers by the
+      city of the stores they ordered from).
+    parameters:
+      - name: range
+        in: query
+        schema:
+          $ref: ../schemas/admin-pulse.yaml#/AdminPulseRange
+      - name: city
+        in: query
+        schema:
+          type: string
+          maxLength: 60
+          pattern: ^[A-Za-z][A-Za-z .'-]{0,59}$
+    responses:
+      "200":
+        description: Pulse for the period
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-pulse.yaml#/AdminPulse
+            example:
+              range: 7d
+              city: null
+              from: "2026-10-19"
+              to: "2026-10-25"
+              asOf: "2026-10-25T06:25:00Z"
+              kpis:
+                gmvPaise: {value: 18452000, previous: 15120000}
+                onlineGmvPaise: {value: 12400000, previous: 10300000}
+                posGmvPaise: {value: 6052000, previous: 4820000}
+                orders: {value: 1240, previous: 1010}
+                completedOrders: {value: 1068, previous: 851}
+                successRateBp: {value: 8612, previous: 8425}
+                activeCustomers: {value: 3820, previous: 3410}
+                transactingCustomers: {value: 980, previous: 802}
+                liveStores: {value: 212, previous: 198}
+                activeStores: {value: 260, previous: 244}
+                newStores: {value: 14, previous: 9}
+                searches: {value: 22140, previous: 19800}
+                searchSuccessRateBp: {value: 8731, previous: 8650}
+                d7RetentionBp: {value: 3120, previous: 2980}
+              trend:
+                - date: "2026-10-25"
+                  gmvPaise: 2120000
+                  posGmvPaise: 830000
+                  orders: 140
+                  completedOrders: 101
+                  activeCustomers: 1120
+                  newCustomers: 64
+                  liveStores: 212
+                  searches: 2410
+                  zeroResultSearches: 290
+              funnel:
+                searches: 22140
+                searchesWithResults: 19331
+                storeViews: 8450
+                ordersPlaced: 1240
+                ordersAccepted: 1150
+                ordersCompleted: 1068
+              leaks:
+                - status: expired
+                  reason: not_accepted
+                  count: 52
+                - status: rejected
+                  reason: out_of_stock
+                  count: 31
+              retention:
+                d1Bp: 4210
+                d7Bp: 3120
+                d30Bp: 1980
+                cohorts:
+                  - cohortWeek: "2026-09-28"
+                    size: 412
+                    weeksBp: [10000, 4120, 3380, 3010, 2890]
+              credits:
+                issued: 48200
+                spent: 31050
+                expired: 1200
+              zeroResultSearches:
+                - queryNorm: kokum syrup
+                  searches: 42
+              storesNeedingAttention:
+                - storeId: 01JB0ST11A2B3C4D5E6F7G8H9J
+                  name: Sri Lakshmi Stores
+                  city: Bengaluru
+                  reason: not_accepting
+                  expiredUnaccepted: 4
+                  strikes30d: 1
+                  acceptRateBp: 6200
+                  stockUpdatedAt: "2026-10-24T03:10:00Z"
+              serverNow: "2026-10-25T06:27:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/pulse/map:
+  get:
+    operationId: getAdminPulseMap
+    tags: [admin-pulse]
+    summary: Pulse city map, stores and demand heat, A-02
+    description: >-
+      Read-only for every role that may see Pulse. Stores carry their public pin; demand is H3
+      resolution-8 cells (15 hex digits) with search counts over the last `range` (default `7d`), and
+      a cell with fewer than 10 searches in the period is left out (k ≥ 10, 01 §16). No query text,
+      person or exact location is in the response.
+    parameters:
+      - name: range
+        in: query
+        schema:
+          $ref: ../schemas/admin-pulse.yaml#/AdminPulseRange
+      - name: city
+        in: query
+        schema:
+          type: string
+          maxLength: 60
+          pattern: ^[A-Za-z][A-Za-z .'-]{0,59}$
+    responses:
+      "200":
+        description: Stores and demand cells
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-pulse.yaml#/AdminPulseMap
+            example:
+              range: 7d
+              city: Bengaluru
+              from: "2026-10-19"
+              to: "2026-10-25"
+              stores:
+                - storeId: 01JB0ST11A2B3C4D5E6F7G8H9J
+                  name: Sri Lakshmi Stores
+                  city: Bengaluru
+                  status: live
+                  lat: 12.9716
+                  lng: 77.5946
+                  live: true
+              demand:
+                - cell: 8861892653fffff
+                  searches: 140
+                  zeroResultSearches: 22
+              serverNow: "2026-10-25T06:27:00Z"
+      default: *problem
