@@ -15,7 +15,12 @@
 // string, a zero byte, and the request body exactly as sent. Two bodies that
 // mean the same JSON but differ in whitespace or key order are different
 // requests (422 idempotency_mismatch): a client retries by resending the same
-// bytes, never by re-serialising.
+// bytes, never by re-serialising. A multipart/form-data body is the one
+// exception: a browser picks a new boundary on every fetch, so it is hashed in
+// a canonical form instead (its parts sorted by field name, each part's name,
+// file name, Content-Type and bytes, without the boundary), and a retry that
+// rebuilds the same FormData is the same request. A multipart body that does
+// not parse, or has more than 64 parts, is hashed as raw bytes.
 //
 // Every claim carries a random claim id. Complete and Release match on it, so
 // a request whose lease ran out (and whose key another request then took) can

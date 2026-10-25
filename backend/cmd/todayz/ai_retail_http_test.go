@@ -104,8 +104,18 @@ var jpegPhoto = []byte{0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 'J', 'F', 'I', 'F'}
 // photo posts one photo to a scan's drafts.
 func (o *retailShop) photo(tok, path string) resp {
 	o.t.Helper()
+	return o.photoWith(tok, path, idem(o.a)["Idempotency-Key"], "")
+}
+
+// photoWith posts the photo under key; a boundary other than "" stands in for a browser
+// rebuilding the FormData on a retry.
+func (o *retailShop) photoWith(tok, path, key, boundary string) resp {
+	o.t.Helper()
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
+	if boundary != "" {
+		require.NoError(o.t, w.SetBoundary(boundary))
+	}
 	h := textproto.MIMEHeader{}
 	h.Set("Content-Disposition", `form-data; name="photo"; filename="bill.jpg"`)
 	h.Set("Content-Type", "image/jpeg")
@@ -114,8 +124,7 @@ func (o *retailShop) photo(tok, path string) resp {
 	_, err = p.Write(jpegPhoto)
 	require.NoError(o.t, err)
 	require.NoError(o.t, w.Close())
-	hdr := idem(o.a)
-	hdr["Content-Type"] = w.FormDataContentType()
+	hdr := map[string]string{"Idempotency-Key": key, "Content-Type": w.FormDataContentType()}
 	return o.a.call(tok, http.MethodPost, path, b.String(), hdr)
 }
 
@@ -244,6 +253,21 @@ func TestAIRetailBillConcurrentConfirm(t *testing.T) {
 	assert.Equal(t, 506, o.onHand(o.atta))
 	assert.Equal(t, 512, o.onHand(o.butter))
 	assert.Equal(t, 2, o.a.count(`SELECT count(*) FROM stock_movements WHERE store_id = $1 AND source = 'supplier_bill'`, uuidOf(t, o.sid)))
+}
+
+// A lost 202 retried with the same key and a rebuilt FormData (a new boundary) replays the
+// first answer: one draft, one model call, one use of the cap.
+func TestAIRetailScanRetryRebuiltForm(t *testing.T) {
+	o := newRetailShop(t, true)
+	o.llm.reply("supplier_bill", billReply())
+	key := idem(o.a)["Idempotency-Key"]
+	first := o.photoWith(o.manager, billDrafts(o.S), key, "first-fetch")
+	require.Equal(t, http.StatusAccepted, first.code, first.raw)
+	again := o.photoWith(o.manager, billDrafts(o.S), key, "retry-fetch")
+	require.Equal(t, http.StatusAccepted, again.code, again.raw)
+	assert.Equal(t, first.body["draftId"], again.body["draftId"])
+	assert.Equal(t, 1, o.a.count(`SELECT count(*) FROM ai_drafts`))
+	assert.Equal(t, 1, o.llm.count())
 }
 
 // A cashier may not confirm any retail draft (stock.restock, item.manage, review.reply,
