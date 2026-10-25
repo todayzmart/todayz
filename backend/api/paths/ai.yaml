@@ -493,3 +493,217 @@
                 - {lineId: l3, outcome: discarded}
               copy: {headline: ಹಾಲು ಮತ್ತು ಬೆಣ್ಣೆ ಮೇಲೆ 10% ರಿಯಾಯಿತಿ, subline: ಈ ವಾರ ಮಾತ್ರ, tint: green, storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z1}
       default: *problem
+# W3-12 (consumer AI, AI-C1, C2, C5; D-101, D-110): the signed-in customer's own helpers under
+# /v1/me/ai. Each is the common 404 while its flag is off or its provider key is missing, and
+# each call counts against the customer's daily AI cap (`ai_daily_calls_customer`). List parse
+# is a draft confirmed line by line; voice search and search assist keep nothing (no draft, no
+# audio, no transcript, no query text; 11 §1 rule 11). The features read is D-233.
+/v1/me/ai/features:
+  get:
+    operationId: getMyAiFeatures
+    tags: [ai]
+    summary: Which customer AI helpers are on
+    description: >-
+      Signed-in customer. One flag per W3-12 helper (on only while its switch is on and its provider
+      key is set), so the app shows or hides the "just ask" paste and voice help (C-22), the mic
+      (C-23) and search assist (C-05), and the recording limits. Counts nothing against the cap.
+    responses:
+      "200":
+        description: The features
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiCustomerFeatures
+            example:
+              listParse: true
+              voiceSearch: true
+              searchAssist: true
+              maxAudioSeconds: 15
+              maxAudioBytes: 1048576
+              audioTypes: [audio/webm, audio/ogg, audio/wav, audio/mpeg, audio/mp4]
+      default: *problem
+/v1/me/ai/list-parse/drafts:
+  post:
+    operationId: createListParseDraft
+    tags: [ai]
+    summary: Turn a typed, pasted or spoken list into basket lines (AI-C1)
+    description: >-
+      Signed-in customer. `{text}` (at most 2000 characters, any of the five languages or mixed).
+      Answers 202; the model splits it into basket lines (item words and pack as written, and a
+      quantity) in the background, and the draft turns ready or failed. Nothing is saved to a
+      basket and nothing is searched (D-110). The text is not stored: the draft keeps only its
+      lines. One call against the customer's daily AI cap (`429 ai_daily_cap_reached`).
+    x-idempotency: required
+    x-problems: [ai_daily_cap_reached]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/ai.yaml#/ListParseDraftRequest
+          example: {text: '1 kg atta, 2 Nandini milk, Dolo 650'}
+    responses:
+      "202":
+        description: Accepted for processing
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiDraftCreated
+            example: {draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C1A, status: processing}
+      default: *problem
+/v1/me/ai/list-parse/drafts/{draftId}:
+  parameters: &meDraft
+    - name: draftId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getListParseDraft
+    tags: [ai]
+    summary: A list parse draft
+    description: The customer who made it (another customer's is 404). The lines to accept, edit or discard.
+    responses:
+      "200":
+        description: The draft
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/ListParseDraft
+            example:
+              draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C1A
+              feature: list_parse
+              status: ready
+              promptVersion: list_parse/prompt@1
+              createdAt: "2026-10-26T05:30:00Z"
+              lines:
+                - {lineId: l1, text: atta 1 kg, quantity: 1}
+                - {lineId: l2, text: Nandini milk, quantity: 2}
+                - {lineId: l3, text: Dolo 650, quantity: 1}
+              outcomes: []
+              failure: null
+      default: *problem
+/v1/me/ai/list-parse/drafts/{draftId}/confirm:
+  parameters: *meDraft
+  post:
+    operationId: confirmListParseDraft
+    tags: [ai]
+    summary: Take the confirmed lines into the basket editor
+    description: >-
+      The customer who made it. Every line once: `accepted`, `edited` (with the text and quantity)
+      or `discarded`. Answers the outcomes and `basketLines`, the accepted and edited lines only (a
+      discarded line is dropped), for the basket editor. Confirm saves no basket and runs no search:
+      the customer saves the basket and searches it themselves (BSK-15). Idempotent. A draft not
+      ready is `409 invalid_transition`.
+    x-idempotency: required
+    x-money: true
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/ai.yaml#/ListParseConfirmRequest
+          example:
+            lines:
+              - {lineId: l1, outcome: accepted}
+              - lineId: l2
+                outcome: edited
+                value: {text: Nandini toned milk 500 ml, quantity: 2}
+              - {lineId: l3, outcome: discarded}
+    responses:
+      "200":
+        description: The outcome and the lines for the basket
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/ListParseConfirmResult
+            example:
+              draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C1A
+              status: confirmed
+              lines:
+                - {lineId: l1, outcome: accepted}
+                - {lineId: l2, outcome: edited}
+                - {lineId: l3, outcome: discarded}
+              basketLines:
+                - {lineId: l1, text: atta 1 kg, quantity: 1}
+                - {lineId: l2, text: Nandini toned milk 500 ml, quantity: 2}
+      default: *problem
+/v1/me/ai/voice-search:
+  post:
+    operationId: voiceSearch
+    tags: [ai]
+    summary: Speak a search (AI-C5)
+    description: >-
+      Signed-in customer. A multipart form with `audio` (one recording of at most 15 s: audio/webm,
+      audio/ogg, audio/wav, audio/mpeg or audio/mp4, at most 1 MB; longer is `422 validation_failed`
+      `body.audio: too_long`) and an optional `language` (absent detects it). Answers the transcript
+      for the search box and the refine chips read from it. It never searches: the app fills the box
+      and the customer searches (`GET /v1/discover/search?source=voice`). Nothing is kept: no draft,
+      no audio, no transcript, and no log line or trace carries either (ASK-16). One call against the
+      customer's daily AI cap (`429 ai_daily_cap_reached`); a speech provider failure is
+      `503 service_unavailable` (C-23 hides the mic for the session). Takes no Idempotency-Key, so
+      no answer is cached with its transcript.
+    x-upload: true
+    x-idempotency: none
+    x-problems: [ai_daily_cap_reached]
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            $ref: ../schemas/ai.yaml#/VoiceSearchUpload
+          example:
+            audio: '<15 s of audio/webm>'
+    responses:
+      "200":
+        description: The transcript and its chips
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/VoiceSearchResult
+            example:
+              transcript: amul butter under 60 rupees
+              language: en
+              chips:
+                - {kind: maxPrice, value: '6000', text: under 60 rupees}
+      default: *problem
+/v1/me/ai/search-assist:
+  post:
+    operationId: searchAssist
+    tags: [ai]
+    summary: Suggest refine chips for a search sentence (AI-C2)
+    description: >-
+      Signed-in customer, called by the app only after the results of a search with `refineHint`
+      have rendered (D-101). `{q}` as searched. Answers suggestion chips of the allowed kinds (a top
+      price, open now, pickup, delivery, offers, near me, a brand in the master catalogue) and the
+      cleaned `query`; nothing applies until the customer taps one. On a model timeout (3 s), a
+      provider error or output that fails validation it is `204` and the app shows nothing; at the
+      daily cap `429 ai_daily_cap_reached`. Stores nothing (no draft, no query text) and never
+      touches search. Takes no Idempotency-Key.
+    x-idempotency: none
+    x-problems: [ai_daily_cap_reached]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/ai.yaml#/SearchAssistRequest
+          example: {q: something for a headache that is open now}
+    responses:
+      "200":
+        description: Suggestions
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/SearchAssistResult
+            example:
+              query: headache tablet
+              chips:
+                - {kind: openNow, value: null, text: open now}
+      "204":
+        description: Nothing to suggest (timeout, provider error, invalid output, or no chip)
+      default: *problem

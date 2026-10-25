@@ -1,0 +1,2 @@
+# domain ai: one line per (role x action); regenerate with -update
+me.ai.use kind=customer step-up=false
