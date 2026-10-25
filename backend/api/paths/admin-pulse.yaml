@@ -12,19 +12,13 @@
       The KPI strip (each with the value for the previous period of the same length), the daily trend,
       the funnel, where orders leak, retention, credits, the top zero-result searches and the stores
       that need attention. `range` is `today` or the last 7, 30 or 90 IST days including today; the
-      default is `7d`. An optional `city` limits everything to stores in that city (customers by the
-      city of the stores they ordered from).
+      default is `7d`. Platform-wide: searches carry only an H3 cell, not a city, so there is no city
+      filter; the map's store pins carry the city.
     parameters:
       - name: range
         in: query
         schema:
           $ref: ../schemas/admin-pulse.yaml#/AdminPulseRange
-      - name: city
-        in: query
-        schema:
-          type: string
-          maxLength: 60
-          pattern: ^[A-Za-z][A-Za-z .'-]{0,59}$
     responses:
       "200":
         description: Pulse for the period
@@ -34,7 +28,6 @@
               $ref: ../schemas/admin-pulse.yaml#/AdminPulse
             example:
               range: 7d
-              city: null
               from: "2026-10-19"
               to: "2026-10-25"
               asOf: "2026-10-25T06:25:00Z"
@@ -120,12 +113,6 @@
         in: query
         schema:
           $ref: ../schemas/admin-pulse.yaml#/AdminPulseRange
-      - name: city
-        in: query
-        schema:
-          type: string
-          maxLength: 60
-          pattern: ^[A-Za-z][A-Za-z .'-]{0,59}$
     responses:
       "200":
         description: Stores and demand cells
@@ -135,7 +122,6 @@
               $ref: ../schemas/admin-pulse.yaml#/AdminPulseMap
             example:
               range: 7d
-              city: Bengaluru
               from: "2026-10-19"
               to: "2026-10-25"
               stores:

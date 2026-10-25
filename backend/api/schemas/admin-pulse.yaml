@@ -192,13 +192,10 @@ AdminPulseAttention:
 AdminPulse:
   type: object
   additionalProperties: false
-  required: [range, city, from, to, asOf, kpis, trend, funnel, leaks, retention, credits, zeroResultSearches,
+  required: [range, from, to, asOf, kpis, trend, funnel, leaks, retention, credits, zeroResultSearches,
     storesNeedingAttention, serverNow]
   properties:
     range: {$ref: '#/AdminPulseRange'}
-    city:
-      type: [string, 'null']
-      maxLength: 60
     from: {$ref: '#/AdminPulseDate'}
     to: {$ref: '#/AdminPulseDate'}
     asOf:
@@ -258,12 +255,9 @@ AdminPulseDemandCell:
 AdminPulseMap:
   type: object
   additionalProperties: false
-  required: [range, city, from, to, stores, demand, serverNow]
+  required: [range, from, to, stores, demand, serverNow]
   properties:
     range: {$ref: '#/AdminPulseRange'}
-    city:
-      type: [string, 'null']
-      maxLength: 60
     from: {$ref: '#/AdminPulseDate'}
     to: {$ref: '#/AdminPulseDate'}
     stores:
