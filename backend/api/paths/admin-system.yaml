@@ -1,13 +1,60 @@
 # Paths: domain "admin-system" (owner W3-15): A-22 System screen: Beanstalk, ALB, RDS, River,
 # CloudWatch alarm states and the top SQL statements, read-only (04 §2.7, D-97).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-system]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-system.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Roles: admin and super_admin (action `admin.system.view`, internal/platform/authz/policy/ops.go).
+# The API reads AWS with its EC2 instance role only in staging and prod, read-only actions only
+# (the IAM policy is W1-10's Terraform); in local and test it builds no AWS client and the AWS
+# panels say `not_configured`, while the database and River panels are real.
+"/v1/admin/system":
+  get:
+    operationId: getAdminSystem
+    tags: [admin-system]
+    summary: System health, A-22
+    description: >-
+      Beanstalk environments (health, running version, instance count, last 10 deploys), the ALB
+      (requests per minute, 5xx rate, p95 latency over the last 5 minutes), RDS (status, Multi-AZ,
+      CPU, connections, free storage), CloudWatch alarm states, the database (connections, size and
+      the 10 most expensive statements from pg_stat_statements) and River (running jobs, due depth
+      and oldest job age per queue). AWS panels are cached 60 s per API instance, the database and
+      River panels at most 5 s; each panel says when it was read. A panel that fails says so with
+      an error class and the response is still 200. Roles: admin, super_admin.
+    responses:
+      "200":
+        description: Every panel, each with its own status
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-system.yaml#/AdminSystem
+            example:
+              env: local
+              awsConfigured: false
+              beanstalk: {status: not_configured, errorClass: null, fetchedAt: "2026-10-25T06:30:00Z", environments: []}
+              alb: {status: not_configured, errorClass: null, fetchedAt: "2026-10-25T06:30:00Z", windowMinutes: 5,
+                requestsPerMinute: null, http5xxRateBp: null, p95Ms: null}
+              rds: {status: not_configured, errorClass: null, fetchedAt: "2026-10-25T06:30:00Z", instances: []}
+              alarms: {status: not_configured, errorClass: null, fetchedAt: "2026-10-25T06:30:00Z", items: []}
+              database:
+                status: ok
+                errorClass: null
+                fetchedAt: "2026-10-25T06:30:00Z"
+                connections: 14
+                maxConnections: 100
+                sizeBytes: 48234496
+                multiAz: false
+                statementsStatus: ok
+                statements:
+                  - query: SELECT pg_sleep($1::float8) IS NOT NULL AS slept
+                    calls: 1
+                    meanMs: 501.2
+                    totalMs: 501.2
+                    rows: 1
+              river:
+                status: ok
+                errorClass: null
+                fetchedAt: "2026-10-25T06:30:00Z"
+                running: 0
+                queues:
+                  - {queue: default, depth: 2, oldestAgeSeconds: 4}
+              serverNow: "2026-10-25T06:30:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem

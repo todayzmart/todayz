@@ -165,7 +165,7 @@ func start() {
 		tcpg.BasicWaitStrategies(),
 		testcontainers.WithLabels(map[string]string{Label: "1"}),
 		testcontainers.WithTmpfs(map[string]string{"/var/lib/postgresql/data": "rw"}),
-		testcontainers.WithCmdArgs("-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off", "-c", "max_connections=300"),
+		testcontainers.WithCmdArgs("-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off", "-c", "max_connections=300", "-c", "shared_preload_libraries=pg_stat_statements"),
 	)
 	if err != nil {
 		startErr = fmt.Errorf("testkit: start %s (is Docker running? colima start): %w", Image(), err)

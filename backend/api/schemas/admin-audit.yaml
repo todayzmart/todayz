@@ -42,4 +42,4 @@ AdminAuditList:
 AdminAuditSubjectType:
   type: string
   description: The subjects a screen's audit panel can show.
-  enum: [order, user, store, business, review, banner, lead, platform_setting, admin_user, product, category, synonym, notification_template, payout, payout_period, credit_adjustment, risk_flag, referral]
+  enum: [order, user, store, business, review, banner, lead, platform_setting, admin_user, product, category, synonym, notification_template, payout, payout_period, credit_adjustment, risk_flag, referral, job_kind, job_run]

@@ -338,5 +338,21 @@
   "audit.action.referralReject": {
     "defaultMessage": "Referral rejected",
     "description": "Audit action: an admin rejected a referral before its reward posted (A-10)"
+  },
+  "audit.action.jobRun": {
+    "defaultMessage": "Job run by hand",
+    "description": "Audit action: an admin ran a scheduled job now, with a reason (A-21)"
+  },
+  "audit.action.jobPause": {
+    "defaultMessage": "Job paused",
+    "description": "Audit action: an admin paused a job kind, with a reason (A-21)"
+  },
+  "audit.action.jobResume": {
+    "defaultMessage": "Job resumed",
+    "description": "Audit action: an admin resumed a paused job kind, with a reason (A-21)"
+  },
+  "audit.action.jobRetry": {
+    "defaultMessage": "Job run retried",
+    "description": "Audit action: an admin retried a failed, discarded or missed job run, with a reason (A-21)"
   }
 }

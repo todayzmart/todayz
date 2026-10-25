@@ -71,6 +71,8 @@ const READS: [RegExp, string[]][] = [
   // admin.ledger.view and admin.payout.view (credits.golden, payouts.golden).
   [/^\/v1\/admin\/(credits|credit-adjustments|payouts|statements)(\/|$)/, ['finance', 'admin', 'super_admin']],
   [/^\/v1\/admin\/(jobs|job-runs)(\/|$)/, ['support', 'analyst', 'finance', 'admin', 'super_admin']],
+  // admin.system.view (ops.golden): A-22.
+  [/^\/v1\/admin\/system$/, ['admin', 'super_admin']],
   [/^\/v1\/admin\/(products|pending-products|categories|synonyms)(\/|$)/, ['catalogue', 'admin', 'super_admin']],
   [/^\/v1\/admin\/users(\/|$)/, ['super_admin']],
   [/^\/v1\/admin\/pulse(\/|$)/, ['support', 'catalogue', 'analyst', 'finance', 'admin', 'super_admin']],

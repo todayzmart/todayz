@@ -62,6 +62,10 @@ export const ACTION_ROLES = {
   riskResolve: ADMINS,
   /** A-10 reject (admin.referral.reject). */
   referralReject: ADMINS,
+  /** A-21 run now, pause, resume and retry (W1-11's adminapi gate); a `money` kind needs `jobMoneyAct` too. */
+  jobAct: ADMINS,
+  /** A-21 on a `money` kind: super_admin, after step-up (06 A-21). */
+  jobMoneyAct: ['super_admin'],
 } as const satisfies Record<string, readonly Role[]>;
 export type Action = keyof typeof ACTION_ROLES;
 

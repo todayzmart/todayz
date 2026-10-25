@@ -87,6 +87,8 @@ export async function answerEmptyLists(page: Page) {
   await answerWith(page, '/v1/admin/risk/flags**', (req, url) =>
     req.method() === 'GET' && url.pathname === '/v1/admin/risk/flags' ? { status: 200, body: { items: [], openByRule: [], nextCursor: null, serverNow: NOW } } : undefined,
   );
+  // A-22 is one summary: locally the AWS panels are not configured.
+  await answerWith(page, '/v1/admin/system', (req) => (req.method() === 'GET' ? { status: 200, body: localSystem } : undefined));
   // A-02 Pulse is one summary, not a list: a platform with nothing in it yet.
   await answerWith(page, '/v1/admin/pulse**', (_req, url) => ({ status: 200, body: url.pathname.endsWith('/map') ? emptyPulseMap : emptyPulse }));
 }
@@ -123,6 +125,21 @@ export const emptyPulse = {
   credits: { issued: 0, spent: 0, expired: 0 },
   zeroResultSearches: [],
   storesNeedingAttention: [],
+  serverNow: NOW,
+};
+
+const offPanel = { status: 'not_configured', errorClass: null, fetchedAt: NOW };
+
+/** A-22 on a local stack: no AWS calls, an empty database and no queued jobs. */
+export const localSystem = {
+  env: 'local',
+  awsConfigured: false,
+  beanstalk: { ...offPanel, environments: [] },
+  alb: { ...offPanel, windowMinutes: 5, requestsPerMinute: null, http5xxRateBp: null, p95Ms: null },
+  rds: { ...offPanel, instances: [] },
+  alarms: { ...offPanel, items: [] },
+  database: { status: 'ok', errorClass: null, fetchedAt: NOW, connections: 4, maxConnections: 100, sizeBytes: 0, multiAz: false, statementsStatus: 'ok', statements: [] },
+  river: { status: 'ok', errorClass: null, fetchedAt: NOW, running: 0, queues: [] },
   serverNow: NOW,
 };
 

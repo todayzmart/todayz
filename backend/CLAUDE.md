@@ -209,3 +209,11 @@ per-person limits from settings (`support_open_tickets_max`, `support_tickets_pe
 upload tied to its ticket, the `support_uploads_sweep` maintenance job (`support_upload_ttl_hours`),
 and the identity deletion hook (`retention.go`) that closes, blanks and deletes a deleted customer's
 support data.
+
+W3-15 built `internal/ops` (A-22, `GET /v1/admin/system`, policy `admin.system.view` for admin and
+super_admin): Beanstalk, ALB, RDS and CloudWatch alarm panels read from AWS only when `APP_ENV` is
+staging or prod, through an explicit EC2 instance-role (IMDSv2) provider, never the default chain; in
+local and test there is no AWS adapter, so nothing calls AWS whatever `AWS_*` is set. AWS panels are
+cached 60 s per instance (failures too), database (`pg_stat_statements` top 10, DML only, guarded when
+the extension is absent) and River panels 5 s. A failing panel carries an error class; the response
+stays 200. `job_kind` and `job_run` are audit subjects for the jobs actions.

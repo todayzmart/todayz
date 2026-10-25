@@ -1,0 +1,286 @@
+{
+  "system.sub": {
+    "defaultMessage": "How the servers, database and job queues are doing. Each panel is at most a minute old. Read-only.",
+    "description": "A-22 System health: sub"
+  },
+  "system.refresh": {
+    "defaultMessage": "Refresh",
+    "description": "A-22 System health: refresh"
+  },
+  "system.none": {
+    "defaultMessage": "—",
+    "description": "A-22 System health: none"
+  },
+  "system.ms": {
+    "defaultMessage": "{n} ms",
+    "description": "A-22 System health: ms"
+  },
+  "system.gb": {
+    "defaultMessage": "{n} GB",
+    "description": "A-22 System health: gb"
+  },
+  "system.age.s": {
+    "defaultMessage": "{n} s old",
+    "description": "A-22 System health: age s"
+  },
+  "system.age.min": {
+    "defaultMessage": "{n} min old",
+    "description": "A-22 System health: age min"
+  },
+  "system.notConfigured": {
+    "defaultMessage": "Not configured (local)",
+    "description": "A-22 System health: notConfigured"
+  },
+  "system.error": {
+    "defaultMessage": "Could not load",
+    "description": "A-22 System health: error"
+  },
+  "system.beanstalk": {
+    "defaultMessage": "Beanstalk app servers",
+    "description": "A-22 System health: beanstalk"
+  },
+  "system.eb.status": {
+    "defaultMessage": "State",
+    "description": "A-22 System health: eb status"
+  },
+  "system.eb.version": {
+    "defaultMessage": "Version",
+    "description": "A-22 System health: eb version"
+  },
+  "system.eb.instances": {
+    "defaultMessage": "Instances",
+    "description": "A-22 System health: eb instances"
+  },
+  "system.eb.updated": {
+    "defaultMessage": "Updated",
+    "description": "A-22 System health: eb updated"
+  },
+  "system.eb.deploys": {
+    "defaultMessage": "Last deploys",
+    "description": "A-22 System health: eb deploys"
+  },
+  "system.deploy.succeeded": {
+    "defaultMessage": "Succeeded",
+    "description": "A-22 System health: deploy succeeded"
+  },
+  "system.deploy.failed": {
+    "defaultMessage": "Failed",
+    "description": "A-22 System health: deploy failed"
+  },
+  "system.health.green": {
+    "defaultMessage": "Healthy",
+    "description": "A-22 System health: health green"
+  },
+  "system.health.yellow": {
+    "defaultMessage": "Warning",
+    "description": "A-22 System health: health yellow"
+  },
+  "system.health.red": {
+    "defaultMessage": "Unhealthy",
+    "description": "A-22 System health: health red"
+  },
+  "system.health.grey": {
+    "defaultMessage": "Updating",
+    "description": "A-22 System health: health grey"
+  },
+  "system.health.unknown": {
+    "defaultMessage": "Unknown",
+    "description": "A-22 System health: health unknown"
+  },
+  "system.alb": {
+    "defaultMessage": "Load balancer",
+    "description": "A-22 System health: alb"
+  },
+  "system.alb.window": {
+    "defaultMessage": "Last {n} minutes",
+    "description": "A-22 System health: alb window"
+  },
+  "system.alb.rpm": {
+    "defaultMessage": "Requests a minute",
+    "description": "A-22 System health: alb rpm"
+  },
+  "system.alb.5xx": {
+    "defaultMessage": "Server errors (5xx)",
+    "description": "A-22 System health: alb 5xx"
+  },
+  "system.alb.p95": {
+    "defaultMessage": "Slowest 5% above",
+    "description": "A-22 System health: alb p95"
+  },
+  "system.rds": {
+    "defaultMessage": "RDS database server",
+    "description": "A-22 System health: rds"
+  },
+  "system.rds.status": {
+    "defaultMessage": "State",
+    "description": "A-22 System health: rds status"
+  },
+  "system.rds.class": {
+    "defaultMessage": "Size and version",
+    "description": "A-22 System health: rds class"
+  },
+  "system.rds.cpu": {
+    "defaultMessage": "CPU",
+    "description": "A-22 System health: rds cpu"
+  },
+  "system.rds.connections": {
+    "defaultMessage": "Connections",
+    "description": "A-22 System health: rds connections"
+  },
+  "system.rds.free": {
+    "defaultMessage": "Free / total storage",
+    "description": "A-22 System health: rds free"
+  },
+  "system.multiAz": {
+    "defaultMessage": "Multi-AZ",
+    "description": "A-22 System health: multiAz"
+  },
+  "system.multiAz.on": {
+    "defaultMessage": "On",
+    "description": "A-22 System health: multiAz on"
+  },
+  "system.multiAz.off": {
+    "defaultMessage": "Off",
+    "description": "A-22 System health: multiAz off"
+  },
+  "system.alarms": {
+    "defaultMessage": "CloudWatch alarms",
+    "description": "A-22 System health: alarms"
+  },
+  "system.alarms.none": {
+    "defaultMessage": "No alarms are set up.",
+    "description": "A-22 System health: alarms none"
+  },
+  "system.alarm.ok": {
+    "defaultMessage": "OK",
+    "description": "A-22 System health: alarm ok"
+  },
+  "system.alarm.alarm": {
+    "defaultMessage": "In alarm",
+    "description": "A-22 System health: alarm alarm"
+  },
+  "system.alarm.insufficient": {
+    "defaultMessage": "No data",
+    "description": "A-22 System health: alarm insufficient"
+  },
+  "system.river": {
+    "defaultMessage": "Job queues",
+    "description": "A-22 System health: river"
+  },
+  "system.river.running": {
+    "defaultMessage": "{n, plural, one {# job running} other {# jobs running}}",
+    "description": "A-22 System health: river running"
+  },
+  "system.river.table": {
+    "defaultMessage": "Job queues",
+    "description": "A-22 System health: river table"
+  },
+  "system.river.queue": {
+    "defaultMessage": "Queue",
+    "description": "A-22 System health: river queue"
+  },
+  "system.river.depth": {
+    "defaultMessage": "Waiting",
+    "description": "A-22 System health: river depth"
+  },
+  "system.river.oldest": {
+    "defaultMessage": "Oldest waiting",
+    "description": "A-22 System health: river oldest"
+  },
+  "system.river.empty": {
+    "defaultMessage": "No jobs are waiting.",
+    "description": "A-22 System health: river empty"
+  },
+  "system.db": {
+    "defaultMessage": "Database",
+    "description": "A-22 System health: db"
+  },
+  "system.eb.detailError": {
+    "defaultMessage": "Instances, load balancers or deploys could not be read for this environment.",
+    "description": "A-22 System health: eb detailError, followed by the error class"
+  },
+  "system.db.connections": {
+    "defaultMessage": "Connections in use / allowed",
+    "description": "A-22 System health: db connections"
+  },
+  "system.db.size": {
+    "defaultMessage": "Size",
+    "description": "A-22 System health: db size"
+  },
+  "system.db.notInstalled": {
+    "defaultMessage": "Top statements are off: the pg_stat_statements extension is not installed.",
+    "description": "A-22 System health: db notInstalled"
+  },
+  "system.db.notPreloaded": {
+    "defaultMessage": "Top statements are off: pg_stat_statements is not loaded when the database starts.",
+    "description": "A-22 System health: db notPreloaded"
+  },
+  "system.db.needsPrivilege": {
+    "defaultMessage": "Some top statements are hidden: the API's database role needs pg_read_all_stats to see other roles' statements. Only the ones it can see are listed.",
+    "description": "A-22 System health: db needsPrivilege"
+  },
+  "system.db.statementsError": {
+    "defaultMessage": "Could not load the top statements.",
+    "description": "A-22 System health: db statementsError"
+  },
+  "system.sql.table": {
+    "defaultMessage": "Top 10 SQL statements by total time",
+    "description": "A-22 System health: sql table"
+  },
+  "system.sql.query": {
+    "defaultMessage": "Statement",
+    "description": "A-22 System health: sql query"
+  },
+  "system.sql.calls": {
+    "defaultMessage": "Calls",
+    "description": "A-22 System health: sql calls"
+  },
+  "system.sql.mean": {
+    "defaultMessage": "Average",
+    "description": "A-22 System health: sql mean"
+  },
+  "system.sql.total": {
+    "defaultMessage": "Total",
+    "description": "A-22 System health: sql total"
+  },
+  "system.sql.rows": {
+    "defaultMessage": "Rows",
+    "description": "A-22 System health: sql rows"
+  },
+  "system.sql.empty": {
+    "defaultMessage": "No statements recorded yet.",
+    "description": "A-22 System health: sql empty"
+  },
+  "system.grafana": {
+    "defaultMessage": "Grafana dashboards",
+    "description": "A-22 System health: grafana"
+  },
+  "system.grafana.none": {
+    "defaultMessage": "Grafana links are off in this build.",
+    "description": "A-22 System health: grafana none"
+  },
+  "system.dash.fix": {
+    "defaultMessage": "What to fix today",
+    "description": "A-22 System health: dash fix"
+  },
+  "system.dash.service": {
+    "defaultMessage": "Service overview",
+    "description": "A-22 System health: dash service"
+  },
+  "system.dash.api": {
+    "defaultMessage": "API endpoints",
+    "description": "A-22 System health: dash api"
+  },
+  "system.dash.database": {
+    "defaultMessage": "Database",
+    "description": "A-22 System health: dash database"
+  },
+  "system.dash.jobs": {
+    "defaultMessage": "Jobs",
+    "description": "A-22 System health: dash jobs"
+  },
+  "system.dash.security": {
+    "defaultMessage": "Security and abuse",
+    "description": "A-22 System health: dash security"
+  }
+}

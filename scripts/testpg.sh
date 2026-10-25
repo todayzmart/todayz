@@ -37,7 +37,7 @@ case "${1:-}" in
         -e POSTGRES_PASSWORD="$pw" -p "127.0.0.1:$PORT:5432" \
         --tmpfs /var/lib/postgresql/data:rw --shm-size 256m \
         "$img" -c fsync=off -c synchronous_commit=off -c full_page_writes=off \
-        -c max_connections=1000 -c shared_buffers=256MB >/dev/null
+        -c max_connections=1000 -c shared_buffers=256MB -c shared_preload_libraries=pg_stat_statements >/dev/null
       for _ in $(seq 1 60); do
         docker exec "$NAME" pg_isready -U postgres -q 2>/dev/null && break
         sleep 1
