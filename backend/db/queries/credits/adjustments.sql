@@ -86,8 +86,16 @@ VALUES (@id, @customer_id, @amount, @reason, sqlc.narg(link), @requested_by, @no
 -- name: LockAdjustmentRequest :one
 SELECT * FROM admin_adjustment_requests WHERE id = @id FOR UPDATE;
 
+-- AdjustmentRequest is one request with the customer's, requester's and
+-- approver's names.
 -- name: AdjustmentRequest :one
-SELECT * FROM admin_adjustment_requests WHERE id = @id;
+SELECT r.*, coalesce(u.name, '')::text AS customer_name,
+  coalesce(rq.name, '')::text AS requested_by_name, ap.name AS approved_by_name
+FROM admin_adjustment_requests r
+LEFT JOIN users u ON u.id = r.customer_id
+LEFT JOIN users rq ON rq.id = r.requested_by
+LEFT JOIN users ap ON ap.id = r.approved_by
+WHERE r.id = @id;
 
 -- name: ApproveAdjustmentRequest :exec
 UPDATE admin_adjustment_requests SET status = 'approved', approved_by = @approved_by, decided_at = @now,
@@ -102,9 +110,12 @@ UPDATE admin_adjustment_requests SET status = @status, approved_by = sqlc.narg(a
 WHERE id = @id AND status = 'pending';
 
 -- name: AdjustmentRequests :many
-SELECT r.*, coalesce(u.name, '')::text AS customer_name
+SELECT r.*, coalesce(u.name, '')::text AS customer_name,
+  coalesce(rq.name, '')::text AS requested_by_name, ap.name AS approved_by_name
 FROM admin_adjustment_requests r
 LEFT JOIN users u ON u.id = r.customer_id
+LEFT JOIN users rq ON rq.id = r.requested_by
+LEFT JOIN users ap ON ap.id = r.approved_by
 WHERE (sqlc.narg(status)::text IS NULL OR r.status = sqlc.narg(status)::text)
   AND (sqlc.narg(cursor_at)::timestamptz IS NULL
     OR (r.requested_at, r.id) < (sqlc.narg(cursor_at)::timestamptz, @cursor_id::uuid))
