@@ -1,10 +1,265 @@
 # Schemas: domain "admin-system" (owner W3-15): A-22 System screen: Beanstalk, ALB, RDS, River,
 # CloudWatch alarm states and the top SQL statements, read-only (04 §2.7, D-97).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Every panel carries `status`: `ok`, `not_configured` (the AWS panels off AWS: APP_ENV local or test
+# builds no AWS client, D-97) or `error` (the panel could not be read; `errorClass` names the kind of
+# failure, such as `AccessDenied` or `Timeout`, never a message, ARN or account id). One panel failing
+# never fails the response. `fetchedAt` is when the panel's data was read: the AWS panels are cached
+# 60 s per API instance, the database and River panels at most 5 s.
+AdminSystemPanelStatus:
+  type: string
+  enum: [ok, not_configured, error]
+AdminSystemErrorClass:
+  type: [string, 'null']
+  description: The kind of failure when `status` is `error` (an AWS error code, `Timeout` or `Error`); null otherwise.
+  pattern: '^[A-Za-z][A-Za-z0-9]{0,63}$'
+  maxLength: 64
+AdminSystemEnv:
+  type: string
+  description: The API's APP_ENV.
+  enum: [local, test, staging, prod]
+AdminSystemHealth:
+  type: string
+  description: Beanstalk's environment health colour; `unknown` when Beanstalk reports none.
+  enum: [green, yellow, red, grey, unknown]
+AdminSystemDeploy:
+  type: object
+  additionalProperties: false
+  required: [at, versionLabel, outcome]
+  properties:
+    at: {$ref: ./common.yaml#/Timestamp}
+    versionLabel:
+      type: [string, 'null']
+      maxLength: 200
+    outcome:
+      type: string
+      description: How the environment update ended, from the Beanstalk event (the event text is not sent).
+      enum: [succeeded, failed]
+AdminSystemEnvironment:
+  type: object
+  additionalProperties: false
+  required: [name, health, status, versionLabel, instanceCount, updatedAt, deploys]
+  properties:
+    name: {type: string, maxLength: 100}
+    health: {$ref: '#/AdminSystemHealth'}
+    status:
+      type: string
+      description: Beanstalk's environment status (Ready, Updating, Launching, Terminating, …).
+      maxLength: 40
+    versionLabel:
+      type: [string, 'null']
+      description: The application version running now.
+      maxLength: 200
+    instanceCount:
+      type: [integer, 'null']
+      minimum: 0
+    updatedAt:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: 'null'}
+    deploys:
+      type: array
+      description: The last 10 environment updates, newest first.
+      maxItems: 10
+      items: {$ref: '#/AdminSystemDeploy'}
+AdminSystemBeanstalk:
+  type: object
+  additionalProperties: false
+  required: [status, errorClass, fetchedAt, environments]
+  properties:
+    status: {$ref: '#/AdminSystemPanelStatus'}
+    errorClass: {$ref: '#/AdminSystemErrorClass'}
+    fetchedAt: {$ref: ./common.yaml#/Timestamp}
+    environments:
+      type: array
+      maxItems: 20
+      items: {$ref: '#/AdminSystemEnvironment'}
+AdminSystemAlb:
+  type: object
+  additionalProperties: false
+  required: [status, errorClass, fetchedAt, windowMinutes, requestsPerMinute, http5xxRateBp, p95Ms]
+  properties:
+    status: {$ref: '#/AdminSystemPanelStatus'}
+    errorClass: {$ref: '#/AdminSystemErrorClass'}
+    fetchedAt: {$ref: ./common.yaml#/Timestamp}
+    windowMinutes:
+      type: integer
+      description: The figures cover the last this many minutes.
+      minimum: 1
+    requestsPerMinute:
+      type: [number, 'null']
+      format: double
+      minimum: 0
+    http5xxRateBp:
+      type: [integer, 'null']
+      description: Target and load balancer 5xx responses ÷ requests, in basis points; null with no requests.
+      minimum: 0
+      maximum: 10000
+    p95Ms:
+      type: [integer, 'null']
+      description: p95 target response time in milliseconds.
+      minimum: 0
+AdminSystemRdsInstance:
+  type: object
+  additionalProperties: false
+  required: [name, status, instanceClass, engineVersion, multiAz, allocatedStorageGb, cpuPercent, connections, freeStorageBytes]
+  properties:
+    name: {type: string, maxLength: 100}
+    status:
+      type: string
+      description: RDS instance status (available, backing-up, modifying, …).
+      maxLength: 40
+    instanceClass: {type: string, maxLength: 40}
+    engineVersion: {type: string, maxLength: 40}
+    multiAz:
+      type: boolean
+      description: Shown as a fact; single-AZ is the plan's default (D-96), not a warning.
+    allocatedStorageGb: {type: integer, minimum: 0}
+    cpuPercent:
+      type: [number, 'null']
+      format: double
+      minimum: 0
+      maximum: 100
+    connections:
+      type: [integer, 'null']
+      minimum: 0
+    freeStorageBytes:
+      type: [integer, 'null']
+      format: int64
+      minimum: 0
+AdminSystemRds:
+  type: object
+  additionalProperties: false
+  required: [status, errorClass, fetchedAt, instances]
+  properties:
+    status: {$ref: '#/AdminSystemPanelStatus'}
+    errorClass: {$ref: '#/AdminSystemErrorClass'}
+    fetchedAt: {$ref: ./common.yaml#/Timestamp}
+    instances:
+      type: array
+      maxItems: 20
+      items: {$ref: '#/AdminSystemRdsInstance'}
+AdminSystemAlarm:
+  type: object
+  additionalProperties: false
+  required: [name, state, updatedAt]
+  properties:
+    name: {type: string, maxLength: 255}
+    state:
+      type: string
+      enum: [ok, alarm, insufficient_data]
+    updatedAt:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: 'null'}
+AdminSystemAlarms:
+  type: object
+  additionalProperties: false
+  required: [status, errorClass, fetchedAt, items]
+  properties:
+    status: {$ref: '#/AdminSystemPanelStatus'}
+    errorClass: {$ref: '#/AdminSystemErrorClass'}
+    fetchedAt: {$ref: ./common.yaml#/Timestamp}
+    items:
+      type: array
+      description: Alarms in state alarm first, then insufficient data, then ok; by name within each.
+      maxItems: 100
+      items: {$ref: '#/AdminSystemAlarm'}
+AdminSystemStatement:
+  type: object
+  additionalProperties: false
+  required: [query, calls, meanMs, totalMs, rows]
+  properties:
+    query:
+      type: string
+      description: The normalised statement text from pg_stat_statements (literals are `$n`), cut at 500 characters.
+      maxLength: 500
+    calls: {type: integer, format: int64, minimum: 0}
+    meanMs: {type: number, format: double, minimum: 0}
+    totalMs: {type: number, format: double, minimum: 0}
+    rows: {type: integer, format: int64, minimum: 0}
+AdminSystemStatementsStatus:
+  type: string
+  description: >-
+    `ok`; `not_installed` when the pg_stat_statements extension is absent; `not_preloaded` when it is
+    installed but not in shared_preload_libraries; `error` when the read failed.
+  enum: [ok, not_installed, not_preloaded, error]
+AdminSystemDatabase:
+  type: object
+  additionalProperties: false
+  required: [status, errorClass, fetchedAt, connections, maxConnections, sizeBytes, multiAz, statementsStatus, statements]
+  properties:
+    status: {$ref: '#/AdminSystemPanelStatus'}
+    errorClass: {$ref: '#/AdminSystemErrorClass'}
+    fetchedAt: {$ref: ./common.yaml#/Timestamp}
+    connections:
+      type: [integer, 'null']
+      description: Server connections now (pg_stat_activity).
+      minimum: 0
+    maxConnections:
+      type: [integer, 'null']
+      minimum: 0
+    sizeBytes:
+      type: [integer, 'null']
+      format: int64
+      minimum: 0
+    multiAz:
+      type: [boolean, 'null']
+      description: >-
+        false off AWS (one local server); on AWS the RDS panel's answer for the instance; null when
+        the RDS panel could not be read.
+    statementsStatus: {$ref: '#/AdminSystemStatementsStatus'}
+    statements:
+      type: array
+      description: The 10 statements with the most total execution time in this database, data and DML only.
+      maxItems: 10
+      items: {$ref: '#/AdminSystemStatement'}
+AdminSystemQueue:
+  type: object
+  additionalProperties: false
+  required: [queue, depth, oldestAgeSeconds]
+  properties:
+    queue: {type: string, maxLength: 100}
+    depth:
+      type: integer
+      format: int64
+      description: Jobs available or retryable and due now.
+      minimum: 0
+    oldestAgeSeconds:
+      type: integer
+      description: Seconds since the oldest due job was scheduled.
+      minimum: 0
+AdminSystemRiver:
+  type: object
+  additionalProperties: false
+  required: [status, errorClass, fetchedAt, running, queues]
+  properties:
+    status: {$ref: '#/AdminSystemPanelStatus'}
+    errorClass: {$ref: '#/AdminSystemErrorClass'}
+    fetchedAt: {$ref: ./common.yaml#/Timestamp}
+    running:
+      type: [integer, 'null']
+      format: int64
+      description: Jobs running now, every queue.
+      minimum: 0
+    queues:
+      type: array
+      description: Queues with due jobs, deepest first.
+      maxItems: 50
+      items: {$ref: '#/AdminSystemQueue'}
+AdminSystem:
+  type: object
+  additionalProperties: false
+  required: [env, awsConfigured, beanstalk, alb, rds, alarms, database, river, serverNow]
+  properties:
+    env: {$ref: '#/AdminSystemEnv'}
+    awsConfigured:
+      type: boolean
+      description: True only in staging and prod, where the API reads AWS with its instance role.
+    beanstalk: {$ref: '#/AdminSystemBeanstalk'}
+    alb: {$ref: '#/AdminSystemAlb'}
+    rds: {$ref: '#/AdminSystemRds'}
+    alarms: {$ref: '#/AdminSystemAlarms'}
+    database: {$ref: '#/AdminSystemDatabase'}
+    river: {$ref: '#/AdminSystemRiver'}
+    serverNow: {$ref: ./common.yaml#/ServerNow}

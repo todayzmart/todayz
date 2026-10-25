@@ -5,12 +5,14 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/todayz/backend/internal/admin"
 	"github.com/todayz/backend/internal/business"
 	"github.com/todayz/backend/internal/identity"
 	"github.com/todayz/backend/internal/jobs"
 	"github.com/todayz/backend/internal/notify"
+	"github.com/todayz/backend/internal/ops"
 	"github.com/todayz/backend/internal/orders"
 	"github.com/todayz/backend/internal/platform/audit"
 	"github.com/todayz/backend/internal/platform/authz"
@@ -32,6 +34,22 @@ import (
 func mountAdmin(r chi.Router, d *deps) {
 	mountAdminJobs(r, d)
 	mountAdminConsole(r, d)
+	mountAdminSystem(r, d)
+}
+
+// mountAdminSystem mounts W3-15's admin-system route (A-22, GET
+// /v1/admin/system) behind admin.system.view. internal/ops reads AWS only
+// in staging and prod, with the instance role (D-97).
+func mountAdminSystem(r chi.Router, d *deps) {
+	var pool *pgxpool.Pool
+	if d.DB != nil {
+		pool = d.DB.Pool
+	}
+	var az authz.Authorizer
+	if d.Authz != nil {
+		az = d.Authz
+	}
+	ops.Register(r, ops.NewFromConfig(d.Config, pool, d.Clock), az)
 }
 
 // mountAdminConsole mounts W3-05's admin-customers, admin-businesses,

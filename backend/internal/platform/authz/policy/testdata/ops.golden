@@ -1,0 +1,9 @@
+# domain ops: one line per (role x action); regenerate with -update
+admin.system.view kind=admin step-up=false
+admin.system.view field_agent -
+admin.system.view support -
+admin.system.view catalogue -
+admin.system.view analyst -
+admin.system.view finance -
+admin.system.view admin allow
+admin.system.view super_admin allow
