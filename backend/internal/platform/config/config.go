@@ -376,6 +376,27 @@ func (c *Config) PublicCORSOrigins() []string {
 	}
 }
 
+// CustomerAppOrigin is the customer app's origin, which share links point at
+// (W3-16). It is the first of CORSOrigins.
+func (c *Config) CustomerAppOrigin() string {
+	return c.CORSOrigins()[0]
+}
+
+// ImagesOrigin is the public images origin (the R2 images bucket behind
+// Cloudflare; MinIO through Caddy locally) that share card images are served
+// from (W3-16).
+func (c *Config) ImagesOrigin() string {
+	switch c.Env {
+	case EnvProd:
+		return "https://img.todayz.in"
+	case EnvStaging:
+		// Placeholder host name, like CORSOrigins, until Wave 5 fixes the staging domains.
+		return "https://img.staging.todayz.in"
+	default:
+		return "https://img.todayz.localhost"
+	}
+}
+
 // ---------------------------------------------------------------- reader
 
 type reader struct {

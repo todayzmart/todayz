@@ -7,6 +7,8 @@ import (
 	"github.com/todayz/backend/internal/asks"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/db"
+	"github.com/todayz/backend/internal/platform/httpx"
+	"github.com/todayz/backend/internal/platform/ids"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/share"
 )
@@ -22,6 +24,9 @@ const (
 	KindRollupAskDemand = "rollup_ask_demand"
 	// KindSiteMarqueeBuild proposes each city's site strip for A-23.
 	KindSiteMarqueeBuild = "site_marquee_build"
+	// KindShareCardRender redraws a share card whose image shows another
+	// price; a card read queues it (event kind, no schedule).
+	KindShareCardRender = share.KindRender
 )
 
 const asksRunbook = "docs/runbooks/asks-timers.md"
@@ -31,6 +36,20 @@ func registerasks(r *Registry, d Deps) {
 	svc, err := asks.New(asks.Deps{DB: db.New(d.Pool), Clock: d.Clock, Settings: d.Settings})
 	if err != nil {
 		panic("jobs: asks: " + err.Error())
+	}
+	sd := share.Deps{
+		DB: db.New(d.Pool), Clock: d.Clock, Settings: d.Settings,
+		// The jobs never link a card; the origins are unused.
+		AppURL: "-", ImageURL: "-",
+	}
+	if c := d.Config; c != nil {
+		if st := share.NewS3Store(c.Storage, httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: c.NoEgress}), d.Clock); st != nil {
+			sd.Images = st
+		}
+	}
+	marquee, err := share.New(sd)
+	if err != nil {
+		panic("jobs: share: " + err.Error())
 	}
 	platformjobs.Define(r, platformjobs.Kind{
 		Name: KindAsksCloseWindow, Owner: "W3-16", Class: platformjobs.ClassTimer, Runbook: asksRunbook,
@@ -53,7 +72,11 @@ func registerasks(r *Registry, d Deps) {
 			if err != nil {
 				return platformjobs.Result{}, err
 			}
-			return platformjobs.Result{Summary: map[string]int64{"deleted": n}}, nil
+			opens, err := marquee.RetainOpens(ctx)
+			if err != nil {
+				return platformjobs.Result{}, err
+			}
+			return platformjobs.Result{Summary: map[string]int64{"deleted": n, "share_opens_deleted": opens}}, nil
 		},
 	})
 	platformjobs.Define(r, platformjobs.Kind{
@@ -77,14 +100,22 @@ func registerasks(r *Registry, d Deps) {
 			return platformjobs.Result{Summary: map[string]int64{"rows": rows}}, nil
 		},
 	})
-	marquee, err := share.New(share.Deps{
-		DB: db.New(d.Pool), Clock: d.Clock, Settings: d.Settings,
-		// The build never renders or links a card; the origins are unused.
-		AppURL: "-", ImageURL: "-",
+	platformjobs.Define(r, platformjobs.Kind{
+		Name: KindShareCardRender, Owner: "W3-16", Class: platformjobs.ClassMaintenance, Runbook: asksRunbook,
+		Description: "Redraws a share card image that shows another price than the item's; a card read queues it and serves the old image",
+		Timeout:     30 * time.Second, MaxAttempts: 5,
+		Handler: func(ctx context.Context, run platformjobs.Run) (platformjobs.Result, error) {
+			var a share.RenderArgs
+			if err := run.Decode(&a); err != nil {
+				return platformjobs.Result{}, err
+			}
+			id, err := ids.Parse(a.CardID)
+			if err != nil {
+				return platformjobs.Result{}, err
+			}
+			return platformjobs.Result{}, marquee.Render(ctx, id)
+		},
 	})
-	if err != nil {
-		panic("jobs: share: " + err.Error())
-	}
 	platformjobs.Define(r, platformjobs.Kind{
 		Name: KindSiteMarqueeBuild, Owner: "W3-16", Class: platformjobs.ClassRollup, Runbook: asksRunbook,
 		Description: "Proposes each city's site strip from the last site_marquee_window_days of searches (A-23 approves it)",

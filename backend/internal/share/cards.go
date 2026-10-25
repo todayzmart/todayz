@@ -6,9 +6,11 @@ package share
 import (
 	"context"
 	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"log/slog"
+	"math"
 	"math/big"
 	"strconv"
 	"time"
@@ -18,9 +20,12 @@ import (
 	shareapi "github.com/todayz/backend/gen/api/share"
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/gen/sqlc/asksdb"
+	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	platformjobs "github.com/todayz/backend/internal/platform/jobs"
+	"github.com/todayz/backend/internal/platform/ratelimit"
 	"github.com/todayz/backend/internal/platform/reqctx"
 	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/platform/telemetry"
@@ -36,7 +41,30 @@ const (
 	// codeTries bounds retries on a code collision (62^10 codes: a retry is
 	// already vanishingly rare).
 	codeTries = 5 //settings:ok retry bound, not a product rule
+
+	// renderCooldown is how long a queued render holds off the next one for
+	// the same card, so reads of a card whose storage keeps failing do not
+	// queue a job each.
+	renderCooldown = 10 * time.Minute
+	// keepOpenDays: RetainOpens deletes share_card_opens rows from before
+	// yesterday (IST).
+	keepOpenDays = 2 //settings:ok dedupe window of share_opened, not a product rule
+	readGroup    = "share_read"
 )
+
+// readRule bounds card reads and re-creates per IP HMAC. Like
+// ratelimit.DefaultRules it stops a script, never a person, and is not a
+// product number.
+var readRule = ratelimit.Rule{PerMinute: 60, Burst: 60} //settings:ok coarse abuse guard, like ratelimit.DefaultRules
+
+// KindRender is the event job that redraws a card whose image shows another
+// price (internal/jobs/asks.go declares it).
+const KindRender = "share_card_render"
+
+// RenderArgs are share_card_render's arguments.
+type RenderArgs struct {
+	CardID string `json:"card_id"`
+}
 
 var errCodeTaken = errors.New("share: code collision")
 
@@ -45,6 +73,10 @@ func unavailable() error { return problem.New(genproblems.ShareCardUnavailable, 
 // create returns the item's card, creating it (and its image) on first use.
 func (s *Service) create(ctx context.Context, body *shareapi.ShareCardCreate) (shareapi.ShareCard, error) {
 	if err := s.ready(ctx); err != nil {
+		return shareapi.ShareCard{}, err
+	}
+	ipKey, err := s.limitReads(ctx)
+	if err != nil {
 		return shareapi.ShareCard{}, err
 	}
 	if s.hash == nil {
@@ -61,7 +93,7 @@ func (s *Service) create(ctx context.Context, body *shareapi.ShareCardCreate) (s
 	}
 	card, err := s.q(ctx).CardByItem(ctx, ids.UUID(itemID))
 	if err == nil {
-		s.renderIfStale(ctx, idOf(card.ID), card.Code, card.PricePaiseRendered, item)
+		s.requestRender(ctx, idOf(card.ID), card.PricePaiseRendered, item)
 		return s.cardView(card.Code, item), nil
 	}
 	if !errors.Is(err, pgx.ErrNoRows) {
@@ -69,11 +101,16 @@ func (s *Service) create(ctx context.Context, body *shareapi.ShareCardCreate) (s
 	}
 
 	var keys [][]byte
-	if k := s.hash.IPLimit(reqctx.ClientIP(ctx)); k != nil {
-		keys = append(keys, k)
+	if ipKey != nil {
+		keys = append(keys, ipKey)
 	}
 	if body.AnonId != nil {
 		keys = append(keys, s.hash.Sum("share:anon:"+body.AnonId.String()))
+	}
+	// A create with neither an IP nor a device cannot be counted, so it is
+	// refused like one over the limit.
+	if len(keys) == 0 {
+		return shareapi.ShareCard{}, problem.New(genproblems.RateLimited, "").WithHeader("Retry-After", strconv.Itoa(int(createWindow/time.Second)))
 	}
 	limit, err := s.settings.Int(ctx, settings.ShareCardCreatePerHour)
 	if err != nil {
@@ -91,8 +128,31 @@ func (s *Service) create(ctx context.Context, body *shareapi.ShareCardCreate) (s
 	if err != nil {
 		return shareapi.ShareCard{}, err
 	}
-	s.render(ctx, cardID, code, item)
+	// The first image is drawn here, so the share sheet has it; creates are
+	// counted. A failure is logged and a later read queues the render.
+	if err := s.render(ctx, cardID, code, item); err != nil {
+		telemetry.Logger(ctx).ErrorContext(ctx, "share: render card", slog.String("error", err.Error()))
+	}
 	return s.cardView(code, item), nil
+}
+
+// limitReads takes a token from the caller's read bucket, keyed by the IP
+// HMAC, and returns the key (nil without an IP or a hash key: those callers
+// share one bucket).
+func (s *Service) limitReads(ctx context.Context) ([]byte, error) {
+	var key []byte
+	if s.hash != nil {
+		key = s.hash.IPLimit(reqctx.ClientIP(ctx))
+	}
+	bucket := "-"
+	if key != nil {
+		bucket = hex.EncodeToString(key)
+	}
+	if r := s.limit.Allow(readGroup, bucket); !r.Allowed {
+		return nil, problem.New(genproblems.RateLimited, "").
+			WithHeader("Retry-After", strconv.Itoa(max(1, int(math.Ceil(r.RetryAfter.Seconds())))))
+	}
+	return key, nil
 }
 
 // insertCard counts the caller's creates, inserts the card and records the
@@ -152,6 +212,10 @@ func (s *Service) get(ctx context.Context, code string) (shareapi.SharePreview, 
 	if err := s.ready(ctx); err != nil {
 		return shareapi.SharePreview{}, err
 	}
+	ipKey, err := s.limitReads(ctx)
+	if err != nil {
+		return shareapi.SharePreview{}, err
+	}
 	card, err := s.q(ctx).CardByCode(ctx, code)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return shareapi.SharePreview{}, problem.New(genproblems.NotFound, "")
@@ -163,8 +227,8 @@ func (s *Service) get(ctx context.Context, code string) (shareapi.SharePreview, 
 	if err != nil {
 		return shareapi.SharePreview{}, err
 	}
-	s.renderIfStale(ctx, idOf(card.ID), card.Code, card.PricePaiseRendered, item)
-	s.event(ctx, "share_opened", map[string]any{})
+	s.requestRender(ctx, idOf(card.ID), card.PricePaiseRendered, item)
+	s.opened(ctx, idOf(card.ID), ipKey)
 	mrp := item.MrpPaise
 	if mrp == nil {
 		mrp = item.ProductMrpPaise
@@ -192,37 +256,112 @@ func (s *Service) item(ctx context.Context, id ids.ID) (asksdb.ItemForCardRow, e
 	return item, nil
 }
 
-func (s *Service) renderIfStale(ctx context.Context, cardID ids.ID, code string, rendered *int64, item asksdb.ItemForCardRow) {
-	if rendered != nil && *rendered == item.PricePaise {
+// opened records share_opened the first time this IP reads the card's
+// preview on an IST day. Without an IP key it records nothing, so a read
+// never writes an unbounded row. A failure is logged.
+func (s *Service) opened(ctx context.Context, cardID ids.ID, key []byte) {
+	if key == nil || s.events == nil {
 		return
 	}
-	s.render(ctx, cardID, code, item)
+	n, err := s.q(ctx).RecordOpen(ctx, asksdb.RecordOpenParams{
+		CardID: ids.UUID(cardID), KeyHash: key, Day: pgDate(s.now().In(clock.IST)),
+	})
+	if err != nil {
+		telemetry.Logger(ctx).WarnContext(ctx, "share: record open", slog.String("error", err.Error()))
+		return
+	}
+	if n == 1 {
+		s.event(ctx, "share_opened", map[string]any{})
+	}
 }
 
-// render draws the preview, stores it and records the price it shows. A
-// failure is logged: the card still works, and the next read tries again.
-func (s *Service) render(ctx context.Context, cardID ids.ID, code string, item asksdb.ItemForCardRow) {
-	if s.images == nil {
+// RetainOpens deletes share_card_opens rows from before yesterday (IST).
+func (s *Service) RetainOpens(ctx context.Context) (int64, error) {
+	if err := s.ready(ctx); err != nil {
+		return 0, err
+	}
+	before := s.now().In(clock.IST).AddDate(0, 0, 1-keepOpenDays)
+	n, err := s.q(ctx).DeleteOldOpens(ctx, pgDate(before))
+	if err != nil {
+		return 0, fmt.Errorf("share: delete old opens: %w", err)
+	}
+	return n, nil
+}
+
+// requestRender queues share_card_render when the card's image shows another
+// price, at most once per card in renderCooldown; the read serves the old
+// image meanwhile. A failure is logged: the preview still works.
+func (s *Service) requestRender(ctx context.Context, cardID ids.ID, rendered *int64, item asksdb.ItemForCardRow) {
+	if s.jobs == nil || s.images == nil || (rendered != nil && *rendered == item.PricePaise) {
 		return
 	}
-	log := telemetry.Logger(ctx)
+	now := s.now()
+	before := now.Add(-renderCooldown)
+	err := s.db.InTx(ctx, func(ctx context.Context) error {
+		n, err := s.q(ctx).ClaimRender(ctx, asksdb.ClaimRenderParams{ID: ids.UUID(cardID), Now: &now, CooldownBefore: &before})
+		if err != nil || n == 0 {
+			return err
+		}
+		tx, _ := db.TxFrom(ctx)
+		return s.jobs.EnqueueTx(ctx, tx, KindRender, RenderArgs{CardID: cardID.String()},
+			platformjobs.EnqueueOpts{UniqueKey: cardID.String()})
+	})
+	if err != nil {
+		telemetry.Logger(ctx).ErrorContext(ctx, "share: queue card render", slog.String("error", err.Error()))
+	}
+}
+
+// Render is share_card_render: it redraws the card's image when it shows
+// another price than the item's. A card that is gone, or whose item or store
+// is, needs nothing. A storage failure is returned, so the job retries with
+// River's backoff, and the card row is left as it was.
+func (s *Service) Render(ctx context.Context, cardID ids.ID) error {
+	if err := s.ready(ctx); err != nil {
+		return err
+	}
+	card, err := s.q(ctx).CardByID(ctx, ids.UUID(cardID))
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil
+	}
+	if err != nil {
+		return fmt.Errorf("share: card by id: %w", err)
+	}
+	item, err := s.item(ctx, idOf(card.StoreItemID))
+	var p *problem.Error
+	if errors.As(err, &p) && p.Code == string(genproblems.ShareCardUnavailable) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if card.PricePaiseRendered != nil && *card.PricePaiseRendered == item.PricePaise {
+		return nil
+	}
+	return s.render(ctx, cardID, card.Code, item)
+}
+
+// render draws the preview, stores it and records the price it shows. On any
+// failure the card row is left as it was.
+func (s *Service) render(ctx context.Context, cardID ids.ID, code string, item asksdb.ItemForCardRow) error {
+	if s.images == nil {
+		return nil
+	}
 	png, err := RenderCard(CardImage{Item: item.ItemName, Store: item.StoreName, Locality: deref(item.Locality), PricePaise: item.PricePaise})
 	if err != nil {
-		log.ErrorContext(ctx, "share: render card", slog.String("error", err.Error()))
-		return
+		return fmt.Errorf("share: render card: %w", err)
 	}
 	key := imageKey(code)
 	if err := s.images.Put(ctx, key, "image/png", png); err != nil {
-		log.ErrorContext(ctx, "share: store card image", slog.String("error", err.Error()))
-		return
+		return fmt.Errorf("share: store card image: %w", err)
 	}
 	now := s.now()
 	price := item.PricePaise
 	if err := s.q(ctx).SetCardRendered(ctx, asksdb.SetCardRenderedParams{
 		ImageKey: &key, PricePaise: &price, Now: &now, ID: ids.UUID(cardID),
 	}); err != nil {
-		log.ErrorContext(ctx, "share: set card rendered", slog.String("error", err.Error()))
+		return fmt.Errorf("share: set card rendered: %w", err)
 	}
+	return nil
 }
 
 func (s *Service) cardView(code string, item asksdb.ItemForCardRow) shareapi.ShareCard {

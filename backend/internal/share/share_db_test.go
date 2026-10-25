@@ -24,6 +24,7 @@ import (
 	"github.com/todayz/backend/internal/platform/geo/h3"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/pii"
 	"github.com/todayz/backend/internal/platform/reqctx"
 	"github.com/todayz/backend/internal/platform/settings"
@@ -47,6 +48,7 @@ const qaLat, qaLng = 12.9719, 77.6412
 type memStore struct {
 	mu   sync.Mutex
 	puts map[string]int
+	fail bool
 }
 
 func (m *memStore) Put(_ context.Context, key, contentType string, body []byte) error {
@@ -55,6 +57,9 @@ func (m *memStore) Put(_ context.Context, key, contentType string, body []byte) 
 	}
 	m.mu.Lock()
 	defer m.mu.Unlock()
+	if m.fail {
+		return errors.New("storage down")
+	}
 	m.puts[key]++
 	return nil
 }
@@ -71,6 +76,7 @@ type world struct {
 	svc    *Service
 	clk    *clock.Fake
 	images *memStore
+	jobs   *platformjobs.Fake
 	admin  ids.ID
 	n      int
 }
@@ -95,6 +101,26 @@ func newWorld(t *testing.T) *world {
 		Images: w.images, AppURL: "https://app.todayz.localhost", ImageURL: "https://img.todayz.localhost",
 	})
 	require.NoError(t, err)
+	// share_card_render as internal/jobs/asks.go declares it (that package
+	// imports this one).
+	reg := platformjobs.NewRegistry()
+	platformjobs.Define(reg, platformjobs.Kind{
+		Name: KindRender, Owner: "W3-16", Class: platformjobs.ClassMaintenance, Runbook: "docs/runbooks/asks-timers.md",
+		Description: "test", Timeout: 30 * time.Second, MaxAttempts: 5,
+		Handler: func(ctx context.Context, run platformjobs.Run) (platformjobs.Result, error) {
+			var a RenderArgs
+			if err := run.Decode(&a); err != nil {
+				return platformjobs.Result{}, err
+			}
+			id, err := ids.Parse(a.CardID)
+			if err != nil {
+				return platformjobs.Result{}, err
+			}
+			return platformjobs.Result{}, w.svc.Render(ctx, id)
+		},
+	})
+	w.jobs = platformjobs.NewFake(reg, w.clk)
+	w.svc.jobs = w.jobs
 	return w
 }
 
@@ -291,7 +317,7 @@ func TestGapsFloor(t *testing.T) {
 			ids.UUID(id), ids.UUID(w.user()), ids.UUID(p), ids.UUID(city), testNow.Add(-30*time.Hour))
 		if yes {
 			w.exec(`INSERT INTO ask_recipients (id, ask_id, store_id, sent_at, distance_m, distance_band, reply_by, answer, replied_at)
-			  VALUES ($1, $2, $3, $4, 100, 'lt_1km', $4, 'yes', $4)`, ids.UUID(w.id()), ids.UUID(id), ids.UUID(st), testNow.Add(-24*time.Hour))
+			  VALUES ($1, $2, $3, $4, 500, 'lt_1km', $4, 'yes', $4)`, ids.UUID(w.id()), ids.UUID(id), ids.UUID(st), testNow.Add(-24*time.Hour))
 		}
 	}
 	for i := range 10 {
@@ -349,13 +375,24 @@ func TestCards(t *testing.T) {
 	require.NotContains(t, string(raw), "distance")
 	require.Equal(t, 1, w.count(`SELECT count(*) FROM events WHERE name = 'share_opened'`))
 
-	// A price change re-renders on the next read.
+	// A price change: the read serves the old image and queues one render,
+	// which redraws it.
 	w.exec(`UPDATE store_items SET price_paise = 3600 WHERE id = $1`, ids.UUID(it))
 	p, err = w.svc.get(ctx, c.Code)
 	require.NoError(t, err)
 	require.Equal(t, 3600, p.PricePaise)
+	require.Equal(t, 1, w.images.count("share/"+c.Code+".png"))
+	require.Len(t, w.jobs.Pending(), 1)
+	runs := w.jobs.RunDue(ctx)
+	require.Len(t, runs, 1)
+	require.NoError(t, runs[0].Err)
 	require.Equal(t, 2, w.images.count("share/"+c.Code+".png"))
 	require.Equal(t, 1, w.count(`SELECT count(*) FROM share_cards WHERE price_paise_rendered = 3600`))
+	// Rendered: the next read queues nothing.
+	_, err = w.svc.get(ctx, c.Code)
+	require.NoError(t, err)
+	require.Empty(t, w.jobs.Pending())
+	require.Equal(t, 1, w.count(`SELECT count(*) FROM events WHERE name = 'share_opened'`))
 
 	_, err = w.svc.get(ctx, "ZZZZZZZZZZ")
 	require.Equal(t, genproblems.NotFound, code(t, err))
@@ -391,6 +428,152 @@ func TestCardCreateLimit(t *testing.T) {
 	it := w.item(st, w.product("Late", catStaples), 1000)
 	_, err = w.svc.create(ctx, &shareapi.ShareCardCreate{StoreItemId: it.String()})
 	require.NoError(t, err)
+}
+
+// L4: a create that carries neither an IP nor a device cannot be counted, so
+// it is refused like one over the limit.
+func TestCardCreateWithoutKeysIsRefused(t *testing.T) {
+	w := newWorld(t)
+	it := w.item(w.store("keyless-shop"), w.product("Rice", catStaples), 1000)
+	_, err := w.svc.create(context.Background(), &shareapi.ShareCardCreate{StoreItemId: it.String()})
+	require.Equal(t, genproblems.RateLimited, code(t, err))
+	require.Zero(t, w.count(`SELECT count(*) FROM share_cards`))
+
+	anon := openapi_types.UUID(ids.UUID(w.id()).Bytes)
+	_, err = w.svc.create(context.Background(), &shareapi.ShareCardCreate{StoreItemId: it.String(), AnonId: &anon})
+	require.NoError(t, err)
+}
+
+// M3: share_opened is recorded once per card, IP and IST day; repeated reads
+// write nothing more.
+func TestCardOpenedOncePerIPADay(t *testing.T) {
+	w := newWorld(t)
+	ctx := reqctx.WithClientIP(context.Background(), "203.0.113.20")
+	it := w.item(w.store("open-shop"), w.product("Jaggery", catStaples), 1200)
+	c, err := w.svc.create(ctx, &shareapi.ShareCardCreate{StoreItemId: it.String()})
+	require.NoError(t, err)
+	opened := func() int { return w.count(`SELECT count(*) FROM events WHERE name = 'share_opened'`) }
+
+	for range 5 {
+		_, err = w.svc.get(ctx, c.Code)
+		require.NoError(t, err)
+	}
+	require.Equal(t, 1, opened())
+	require.Equal(t, 1, w.count(`SELECT count(*) FROM share_card_opens`))
+
+	_, err = w.svc.get(reqctx.WithClientIP(context.Background(), "198.51.100.20"), c.Code)
+	require.NoError(t, err)
+	require.Equal(t, 2, opened())
+
+	// Without an IP nothing is recorded.
+	_, err = w.svc.get(context.Background(), c.Code)
+	require.NoError(t, err)
+	require.Equal(t, 2, opened())
+
+	// The next IST day counts again; retention keeps yesterday and today.
+	w.clk.Advance(24 * time.Hour)
+	_, err = w.svc.get(ctx, c.Code)
+	require.NoError(t, err)
+	require.Equal(t, 3, opened())
+	n, err := w.svc.RetainOpens(context.Background())
+	require.NoError(t, err)
+	require.Zero(t, n)
+	w.clk.Advance(24 * time.Hour)
+	n, err = w.svc.RetainOpens(context.Background())
+	require.NoError(t, err)
+	require.EqualValues(t, 2, n)
+	require.Equal(t, 1, w.count(`SELECT count(*) FROM share_card_opens`))
+}
+
+// M3: card reads and re-creates are rate-limited per IP HMAC.
+func TestCardReadsAreRateLimitedPerIP(t *testing.T) {
+	w := newWorld(t)
+	ctx := reqctx.WithClientIP(context.Background(), "203.0.113.30")
+	it := w.item(w.store("busy-shop"), w.product("Ghee", catStaples), 52000)
+	c, err := w.svc.create(ctx, &shareapi.ShareCardCreate{StoreItemId: it.String()})
+	require.NoError(t, err)
+	for i := 1; i < readRule.Burst; i++ {
+		_, err = w.svc.get(ctx, c.Code)
+		require.NoError(t, err, i)
+	}
+	_, err = w.svc.get(ctx, c.Code)
+	require.Equal(t, genproblems.RateLimited, code(t, err))
+	_, err = w.svc.create(ctx, &shareapi.ShareCardCreate{StoreItemId: it.String()})
+	require.Equal(t, genproblems.RateLimited, code(t, err))
+
+	// Another IP has its own bucket; a minute later the first may again.
+	_, err = w.svc.get(reqctx.WithClientIP(context.Background(), "198.51.100.30"), c.Code)
+	require.NoError(t, err)
+	w.clk.Advance(time.Minute)
+	_, err = w.svc.get(ctx, c.Code)
+	require.NoError(t, err)
+}
+
+// M3: a stale card is redrawn by the job, never by the read. While storage
+// fails, reads keep serving the old image, write no image and leave the card
+// row as it was, and queue at most one render per renderCooldown.
+func TestStaleCardRenderIsAsync(t *testing.T) {
+	w := newWorld(t)
+	ctx := reqctx.WithClientIP(context.Background(), "203.0.113.40")
+	it := w.item(w.store("stale-shop"), w.product("Poha", catStaples), 4000)
+	c, err := w.svc.create(ctx, &shareapi.ShareCardCreate{StoreItemId: it.String()})
+	require.NoError(t, err)
+	key := "share/" + c.Code + ".png"
+	require.Equal(t, 1, w.images.count(key))
+	rendered := func() int {
+		return w.count(`SELECT price_paise_rendered::int FROM share_cards WHERE code = $1`, c.Code)
+	}
+	requested := func() time.Time {
+		var at time.Time
+		require.NoError(t, w.tdb.OwnerPool.QueryRow(context.Background(),
+			`SELECT render_requested_at FROM share_cards WHERE code = $1`, c.Code).Scan(&at))
+		return at
+	}
+
+	w.images.fail = true
+	w.exec(`UPDATE store_items SET price_paise = 3500 WHERE id = $1`, ids.UUID(it))
+	p, err := w.svc.get(ctx, c.Code)
+	require.NoError(t, err)
+	require.Equal(t, 3500, p.PricePaise)
+	require.Equal(t, c.ImageUrl, p.ImageUrl)
+	require.Equal(t, 4000, rendered())
+	first := requested()
+	require.Len(t, w.jobs.Pending(), 1)
+
+	runs := w.jobs.RunDue(context.Background())
+	require.Len(t, runs, 1)
+	require.Error(t, runs[0].Err)
+	require.Equal(t, 4000, rendered())
+	require.Equal(t, 1, w.images.count(key))
+
+	// Within the cooldown neither a read nor a re-create claims a new render.
+	w.clk.Advance(time.Minute)
+	_, err = w.svc.get(ctx, c.Code)
+	require.NoError(t, err)
+	_, err = w.svc.create(ctx, &shareapi.ShareCardCreate{StoreItemId: it.String()})
+	require.NoError(t, err)
+	require.True(t, first.Equal(requested()))
+
+	// Storage back: the retried job draws the new price.
+	w.images.fail = false
+	w.clk.Advance(renderCooldown)
+	for range 5 {
+		w.jobs.RunDue(context.Background())
+		w.clk.Advance(time.Minute)
+	}
+	require.Equal(t, 3500, rendered())
+	require.Equal(t, 2, w.images.count(key))
+
+	// A card whose store is gone needs no render.
+	w.exec(`UPDATE store_items SET price_paise = 3400 WHERE id = $1`, ids.UUID(it))
+	w.exec(`UPDATE stores SET status = 'paused' WHERE id = (SELECT store_id FROM store_items WHERE id = $1)`, ids.UUID(it))
+	cardID := idOf(func() pgtype.UUID {
+		var u pgtype.UUID
+		require.NoError(t, w.tdb.OwnerPool.QueryRow(context.Background(), `SELECT id FROM share_cards WHERE code = $1`, c.Code).Scan(&u))
+		return u
+	}())
+	require.NoError(t, w.svc.Render(context.Background(), cardID))
+	require.Equal(t, 3500, rendered())
 }
 
 func TestCardCreateNeedsHashKey(t *testing.T) {

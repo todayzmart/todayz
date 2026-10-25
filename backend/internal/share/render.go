@@ -55,10 +55,10 @@ func RenderCard(c CardImage) ([]byte, error) {
 	drawText(img, "TodayZ", pill.Min.X+24, pill.Min.Y+12, 4, colOnMark)
 
 	// Item name, up to two lines.
-	y := pill.Max.Y + 40
+	y := pill.Max.Y + 40 //settings:ok card layout pixels
 	for _, line := range wrap(c.Item, 7, inner, 2) {
 		drawText(img, line, x, y, 7, colInk)
-		y += glyphH*7 + 14
+		y += glyphH*7 + 14 //settings:ok card layout pixels
 	}
 
 	// Price.

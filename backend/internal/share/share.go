@@ -10,6 +10,11 @@
 //   - A preview never carries a distance or anything about who shared it.
 //   - New cards are counted per IP and per anonymous device by an HMAC of the
 //     value (share_card_creates), never the value itself.
+//   - Reads are public, so a read writes as little as it can: card reads and
+//     re-creates are rate-limited per IP HMAC, share_opened is recorded once
+//     per card, IP and IST day (share_card_opens), and a stale image is
+//     redrawn by the share_card_render job, at most one queued per card in
+//     renderCooldown, while the old image is served.
 //   - The strip is master product names only, after the k-floor (distinct
 //     signed-in searchers, never below 10) and the category denylist, and the
 //     site sees only what an admin approved.
@@ -34,7 +39,9 @@ import (
 	"github.com/todayz/backend/internal/platform/eventcat"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/pii"
+	"github.com/todayz/backend/internal/platform/ratelimit"
 	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
@@ -77,6 +84,9 @@ type Deps struct {
 	// Images stores the preview PNGs; nil renders nothing (the URL is still
 	// the card's key, which the Pages Function falls back from).
 	Images ImageStore
+	// Jobs queues share_card_render for a stale image; nil queues nothing
+	// (the old image stays).
+	Jobs platformjobs.Enqueuer
 	// AppURL is the customer app's origin (https://app.todayz.in).
 	AppURL string
 	// ImageURL is the public images origin (https://img.todayz.in).
@@ -91,6 +101,8 @@ type Service struct {
 	events   *eventcat.Catalogue
 	hash     *pii.Hasher
 	images   ImageStore
+	jobs     platformjobs.Enqueuer
+	limit    *ratelimit.Limiter
 	audit    *audit.Writer
 	appURL   string
 	imageURL string
@@ -108,7 +120,8 @@ func New(d Deps) (*Service, error) {
 		return nil, errors.New("share: the app and image origins are required")
 	}
 	s := &Service{
-		db: d.DB, clock: d.Clock, settings: d.Settings, events: d.Events, hash: d.Hash, images: d.Images,
+		db: d.DB, clock: d.Clock, settings: d.Settings, events: d.Events, hash: d.Hash, images: d.Images, jobs: d.Jobs,
+		limit:  ratelimit.New(d.Clock, map[string]ratelimit.Rule{readGroup: readRule}),
 		appURL: d.AppURL, imageURL: d.ImageURL, ids: ids.NewGenerator(),
 	}
 	if d.DB != nil {

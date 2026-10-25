@@ -161,6 +161,9 @@ CREATE TABLE share_cards (
   image_key            text,
   price_paise_rendered bigint,
   rendered_at          timestamptz,
+  -- when a read last queued share_card_render for a stale image: a read
+  -- queues at most one render per card in ten minutes (share.renderCooldown)
+  render_requested_at  timestamptz,
   created_at           timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT ck_share_cards_code CHECK (code ~ '^[0-9A-Za-z]{10}$'),
   CONSTRAINT ck_share_cards_image_key CHECK (image_key IS NULL OR image_key = 'share/' || code || '.png')
@@ -212,8 +215,21 @@ CREATE TABLE share_card_creates (
 );
 CREATE INDEX ix_share_card_creates_key ON share_card_creates (key_hash, created_at);
 
+-- Card previews read, one row per card, IP and IST day: share_opened is
+-- recorded once per row, so repeated reads write nothing. key_hash is
+-- pii.Hasher.IPLimit of the IP, never the IP; rows go after two days
+-- (asks_retention).
+CREATE TABLE share_card_opens (
+  card_id  uuid NOT NULL REFERENCES share_cards (id) ON DELETE CASCADE,
+  key_hash bytea NOT NULL,
+  day      date NOT NULL,
+  PRIMARY KEY (card_id, key_hash, day)
+);
+CREATE INDEX ix_share_card_opens_day ON share_card_opens (day);
+
 -- +goose Down
 
+DROP TABLE share_card_opens;
 DROP TABLE share_card_creates;
 DROP TABLE rollup_daily_ask_demand;
 DROP TABLE site_demand_marquee;

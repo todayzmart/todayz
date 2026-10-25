@@ -1,9 +1,10 @@
 # Asks timers
 
 Kinds `asks_close_window` (class `timer`), `asks_retention` (class `maintenance`),
-`rollup_ask_demand` (class `rollup`) and `site_marquee_build` (class `rollup`), owner W3-16, all declared in
+`rollup_ask_demand` (class `rollup`), `site_marquee_build` (class `rollup`) and the event kind
+`share_card_render` (class `maintenance`), owner W3-16, all declared in
 `backend/internal/jobs/asks.go`. Code: `backend/internal/asks/maintenance.go` and
-`backend/internal/share/marquee.go`. The general alert is [Job failing](jobs-job-failing.md)
+`backend/internal/share/marquee.go` and `cards.go`. The general alert is [Job failing](jobs-job-failing.md)
 (`tz-jobs-failing-event`, critical for timers).
 
 ## What they do
@@ -11,13 +12,14 @@ Kinds `asks_close_window` (class `timer`), `asks_retention` (class `maintenance`
 | Kind | Runs at | Outcome |
 |---|---|---|
 | `asks_close_window` | every minute (one run per minute) | Closes each open ask that every recipient has answered (`all_replied`) or whose last reply window (`ask_reply_window_min`) is over (`window_ended`). The customer's C-26 sees the close on `/me/stream` (`ask.updated`; each recipient shop gets `ask.closed`) or on its next poll. At most 500 asks per run; the next minute takes the rest. Summary: `closed`. |
-| `asks_retention` | daily at 03:20 IST | Deletes asks older than `ask_retention_days` with their recipients, replies and the store blocks that came from them (01 §11.2). Orders booked from a reply keep their lines; the reply link clears. Batches of 500 until none are left. Summary: `deleted`. |
+| `asks_retention` | daily at 03:20 IST | Deletes asks older than `ask_retention_days` with their recipients, replies and the store blocks that came from them (01 §11.2). Orders booked from a reply keep their lines; the reply link clears. Batches of 500 until none are left. Also deletes `share_card_opens` rows from before yesterday (IST), which only dedupe `share_opened`. Summary: `deleted`, `share_opens_deleted`. |
 | `rollup_ask_demand` | every 15 minutes | Recomputes yesterday's and today's (IST) unanswered ask demand per receiving store and per H3 cell (`rollup_daily_ask_demand`), and adds the centre of any new cell to `insight_geo_cells`. A day is deleted and rewritten in one transaction, so a rerun gives the same rows. Summary: `rows`. |
 | `site_marquee_build` | daily at 04:10 IST | Builds the proposed "people near you searched for" strip per city from the last 7 days of `search_log`, with the category denylist and the k-floor applied. A strip is never shown until an admin approves it on A-23; an already decided strip for the day is left alone. Summary: `cities`. |
+| `share_card_render` | when a card read finds its image showing another price | Redraws the card image and stores it in the images bucket, then records the price it shows. A read queues at most one per card in 10 minutes and serves the old image meanwhile. A storage failure retries with River's backoff (5 attempts); the card row is left as it was. A card, item or store that is gone needs nothing. Args: the card id only. |
 
 The job arguments carry no customer id, phone, address or query text.
 
-All four are idempotent:
+All five are idempotent:
 
 - `asks_close_window` closes an ask under its row lock; an ask another run (or the customer)
   already closed is skipped and not counted.
@@ -26,6 +28,8 @@ All four are idempotent:
 - The rollup and the marquee build recompute from source rows; reruns overwrite with the same
   result.
 - Retention deletes by age only; a second run finds nothing.
+- `share_card_render` redraws only while the stored price differs; a rerun after a success does
+  nothing.
 
 ## First three checks
 

@@ -20,6 +20,23 @@ SELECT id, code, image_key, price_paise_rendered FROM share_cards WHERE store_it
 -- name: CardByCode :one
 SELECT id, store_item_id, code, image_key, price_paise_rendered FROM share_cards WHERE code = @code;
 
+-- name: CardByID :one
+SELECT id, store_item_id, code, image_key, price_paise_rendered FROM share_cards WHERE id = @id;
+
+-- name: ClaimRender :execrows
+-- Claims a stale card's render for a read: 1 when the caller should queue
+-- share_card_render, 0 while an earlier claim is inside the cooldown.
+UPDATE share_cards SET render_requested_at = @now
+WHERE id = @id AND (render_requested_at IS NULL OR render_requested_at <= @cooldown_before);
+
+-- name: RecordOpen :execrows
+-- 1 the first time this IP reads this card's preview on an IST day.
+INSERT INTO share_card_opens (card_id, key_hash, day) VALUES (@card_id, @key_hash, @day)
+ON CONFLICT DO NOTHING;
+
+-- name: DeleteOldOpens :execrows
+DELETE FROM share_card_opens WHERE day < @before;
+
 -- name: InsertCard :execrows
 INSERT INTO share_cards (id, store_item_id, code, created_at)
 VALUES (@id, @store_item_id, @code, @now)

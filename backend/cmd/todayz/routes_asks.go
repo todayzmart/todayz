@@ -6,9 +6,11 @@ import (
 	"github.com/todayz/backend/internal/asks"
 	"github.com/todayz/backend/internal/business"
 	"github.com/todayz/backend/internal/identity"
+	"github.com/todayz/backend/internal/jobs"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/httpx"
+	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/pii"
 	"github.com/todayz/backend/internal/search"
 	"github.com/todayz/backend/internal/share"
@@ -35,12 +37,14 @@ func newAsks(d *deps) *asks.Service {
 }
 
 // newShare builds the share cards, site strip and A-23 Demand service. The
-// card origins follow the environment, like the CORS origins.
+// card origins come from config; a stale card image is redrawn by the
+// share_card_render job when the API has a queue.
 func newShare(d *deps) *share.Service {
 	sd := share.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings, Events: eventCatalogue("share")}
-	env := config.EnvLocal
-	if c := d.Config; c != nil {
-		env = c.Env
+	c := d.Config
+	if c == nil {
+		c = &config.Config{Env: config.EnvLocal}
+	} else {
 		if k := c.Keys.PIIHashKey; k.IsSet() {
 			h, err := pii.NewHasher(k.Bytes())
 			if err != nil {
@@ -53,25 +57,21 @@ func newShare(d *deps) *share.Service {
 			sd.Images = st
 		}
 	}
-	sd.AppURL, sd.ImageURL = shareOrigins(env)
+	if d.Queue != nil {
+		reg := platformjobs.NewRegistry()
+		jd := jobs.Deps{Clock: d.Clock, Settings: d.Settings, Config: d.Config, Log: d.Log}
+		if d.DB != nil {
+			jd.Pool = d.DB.Pool
+		}
+		jobs.Register(reg, jd)
+		sd.Jobs = platformjobs.NewEnqueuer(reg, d.Queue, d.Clock)
+	}
+	sd.AppURL, sd.ImageURL = c.CustomerAppOrigin(), c.ImagesOrigin()
 	svc, err := share.New(sd)
 	if err != nil {
 		panic("share: " + err.Error())
 	}
 	return svc
-}
-
-// shareOrigins are the customer app's and the public images origins.
-// TODO(lead): the image origin belongs in config with the R2 public host.
-func shareOrigins(env config.Env) (app, img string) {
-	switch env {
-	case config.EnvProd:
-		return "https://app.todayz.in", "https://img.todayz.in"
-	case config.EnvStaging:
-		return "https://app.staging.todayz.in", "https://img.staging.todayz.in"
-	default:
-		return "https://app.todayz.localhost", "https://img.todayz.localhost"
-	}
 }
 
 // mountAsks mounts W3-16's routes: the customer's asks under /v1/me/asks,
