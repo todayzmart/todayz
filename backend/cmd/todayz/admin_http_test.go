@@ -5,9 +5,12 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/todayz/backend/internal/identity"
+	"github.com/todayz/backend/internal/platform/authn"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/pii"
 )
@@ -193,4 +196,138 @@ func TestAdminOrdersReadHTTP(t *testing.T) {
 	a.exec(`UPDATE admin_users SET roles = ARRAY['catalogue']`)
 	r = a.call(tok, http.MethodGet, "/v1/admin/orders/"+id, nil, nil)
 	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+}
+
+// W3-05 A-17: settings list with groups and provider key states, a change
+// needs a fresh step-up and a reason, money keys are super_admin only, the
+// value is checked against its unit and range, the current value is a no-op,
+// each change is audited and listed in the key's history, and the settings
+// cache reads the new value.
+func TestAdminSettingsHTTP(t *testing.T) {
+	o := newOrderShop(t)
+	desk := newAdminDesk(o, "support")
+	tok := desk.token()
+	a := o.a
+	get := func(path string) resp { t.Helper(); return a.call(tok, http.MethodGet, path, nil, nil) }
+	patch := func(key string, body any) resp {
+		t.Helper()
+		return a.call(tok, http.MethodPatch, "/v1/admin/settings/"+key, body, nil)
+	}
+	change := func(v any) map[string]any { return map[string]any{"value": v, "reason": "W3-05 test"} }
+
+	// Support sees no settings.
+	r := get("/v1/admin/settings")
+	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+
+	a.exec(`UPDATE admin_users SET roles = ARRAY['admin']`)
+	r = get("/v1/admin/settings")
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	byKey := map[string]map[string]any{}
+	for _, it := range r.body["items"].([]any) {
+		m := it.(map[string]any)
+		byKey[m["key"].(string)] = m
+	}
+	require.Equal(t, a.count(`SELECT count(*) FROM platform_settings`), len(byKey))
+	cm := byKey["credit_max_per_order"]
+	require.Equal(t, "credits", cm["group"])
+	require.Equal(t, true, cm["money"])
+	require.Equal(t, false, cm["editable"], "an admin may not change a money setting")
+	require.Equal(t, true, byKey["ask_max_stores"]["editable"])
+	require.Equal(t, "asks", byKey["ask_max_stores"]["group"])
+	require.Equal(t, "clients", byKey["min_client_version_admin"]["group"])
+	require.Equal(t, "orders", r.body["items"].([]any)[0].(map[string]any)["group"], "01 §17 order of groups")
+	names := []string{}
+	for _, p := range r.body["providers"].([]any) {
+		names = append(names, p.(map[string]any)["name"].(string))
+	}
+	require.Contains(t, names, "ANTHROPIC_API_KEY")
+
+	// Admin: a money key is refused; a plain key within range is changed.
+	r = patch("credit_max_per_order", change(40))
+	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+	require.Equal(t, "forbidden", problemCode(r))
+	r = patch("ask_max_stores", map[string]any{"value": 9})
+	require.Equal(t, http.StatusUnprocessableEntity, r.code, "a reason is required")
+	for _, bad := range []any{0, 21, 8.5, "9", true} {
+		r = patch("ask_max_stores", change(bad))
+		require.Equal(t, http.StatusUnprocessableEntity, r.code, "%v: %s", bad, r.raw)
+		require.Contains(t, r.raw, "body.value")
+	}
+	r = patch("feature_voice_enabled", change(1))
+	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
+	r = patch("min_client_version_admin", change("latest"))
+	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
+	r = patch("no_such_setting", change(1))
+	require.Equal(t, http.StatusNotFound, r.code, r.raw)
+
+	r = patch("ask_max_stores", change(9))
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	s := r.body["setting"].(map[string]any)
+	require.EqualValues(t, 9, s["value"])
+	require.EqualValues(t, 2, s["version"])
+	require.NotNil(t, s["updatedBy"])
+	o.settings.Invalidate()
+	n, err := o.settings.Int(t.Context(), "ask_max_stores")
+	require.NoError(t, err)
+	require.EqualValues(t, 9, n, "the cache reads the new value")
+
+	// The current value again changes nothing and is not audited.
+	r = patch("ask_max_stores", change(9))
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.EqualValues(t, 2, r.body["setting"].(map[string]any)["version"])
+	r = patch("min_client_version_admin", change(" 1.4.0 "))
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.Equal(t, "1.4.0", r.body["setting"].(map[string]any)["value"])
+	r = patch("feature_voice_enabled", change(false))
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+
+	// A stale step-up is asked again; a step_up verify re-confirms it.
+	a.clk.Advance(authn.StepUpWindow + time.Second)
+	r = patch("ask_max_stores", change(10))
+	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+	require.Equal(t, "step_up_required", problemCode(r))
+	r = get("/v1/admin/settings")
+	require.Equal(t, http.StatusOK, r.code, "reading needs no step-up")
+	a.clk.Advance(31 * time.Second)
+	v := a.call(tok, http.MethodPost, "/v1/auth/totp/verify", map[string]string{"code": identity.TOTPCode(desk.secret, a.clk.Now()), "purpose": "step_up"}, nil)
+	require.Equal(t, http.StatusOK, v.code, v.raw)
+	r = patch("ask_max_stores", change(10))
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+
+	// super_admin changes the money key.
+	a.exec(`UPDATE admin_users SET roles = ARRAY['super_admin']`)
+	r = get("/v1/admin/settings")
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	for _, it := range r.body["items"].([]any) {
+		require.Equal(t, true, it.(map[string]any)["editable"])
+	}
+	r = patch("credit_max_per_order", change(40))
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.EqualValues(t, 40, r.body["setting"].(map[string]any)["value"])
+
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM audit_log WHERE action = 'settings.update' AND subject_type = 'platform_setting'
+	  AND subject_id = 'credit_max_per_order' AND before->>'value' = '30' AND after->>'value' = '40' AND after->>'reason' = 'W3-05 test'`))
+	require.Equal(t, 2, a.count(`SELECT count(*) FROM audit_log WHERE action = 'settings.update' AND subject_id = 'ask_max_stores'`))
+
+	// History: newest first, paged, with the actor's name and the reason.
+	r = get("/v1/admin/settings/ask_max_stores/history?limit=1")
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	items := r.body["items"].([]any)
+	require.Len(t, items, 1)
+	h := items[0].(map[string]any)
+	require.EqualValues(t, 9, h["from"])
+	require.EqualValues(t, 10, h["to"])
+	require.Equal(t, "W3-05 test", h["reason"])
+	cur := r.body["nextCursor"].(string)
+	r = get("/v1/admin/settings/ask_max_stores/history?limit=1&cursor=" + url.QueryEscape(cur))
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.EqualValues(t, 8, r.body["items"].([]any)[0].(map[string]any)["from"])
+	require.Nil(t, r.body["nextCursor"])
+	r = get("/v1/admin/settings/no_such_setting/history")
+	require.Equal(t, http.StatusNotFound, r.code, r.raw)
+
+	// The audit side panel shows the same rows to an admin.
+	r = get("/v1/admin/audit-log/subject?subjectType=platform_setting&subjectId=ask_max_stores")
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.Len(t, r.body["items"], 2)
 }

@@ -7,6 +7,7 @@ import (
 
 	auditapi "github.com/todayz/backend/gen/api/admin-audit"
 	customersapi "github.com/todayz/backend/gen/api/admin-customers"
+	settingsapi "github.com/todayz/backend/gen/api/admin-settings"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/authz/policy"
 	"github.com/todayz/backend/internal/platform/ids"
@@ -30,10 +31,21 @@ var AuditOps = map[string]string{
 	"ListAdminSubjectAudit": policy.AdminAuditSubject,
 }
 
-// Register mounts the admin-customers and admin-audit routes behind slot 15.
+// SettingsOps maps the admin-settings operations to their authz actions. A
+// change needs a fresh step-up here; the service also checks the money
+// action for a paise, bp or credits key.
+var SettingsOps = map[string]string{
+	"ListAdminSettings":       policy.AdminSettingsView,
+	"ListAdminSettingHistory": policy.AdminSettingsView,
+	"UpdateAdminSetting":      policy.AdminSettingsEdit,
+}
+
+// Register mounts the admin-customers, admin-settings and admin-audit routes behind slot 15.
 func Register(r chi.Router, s *Service, az authz.Authorizer) {
 	customersapi.Register(r, customerHandlers{s},
 		customersapi.StrictMiddlewareFunc(authz.Strict[customersapi.StrictHandlerFunc](az, CustomerOps)))
+	settingsapi.Register(r, settingHandlers{s},
+		settingsapi.StrictMiddlewareFunc(authz.Strict[settingsapi.StrictHandlerFunc](az, SettingsOps)))
 	auditapi.Register(r, auditHandlers{s},
 		auditapi.StrictMiddlewareFunc(authz.Strict[auditapi.StrictHandlerFunc](az, AuditOps)))
 }
@@ -152,6 +164,48 @@ func (h auditHandlers) ListAdminSubjectAudit(ctx context.Context, req auditapi.L
 		return nil, asProblem(err)
 	}
 	return auditapi.ListAdminSubjectAudit200JSONResponse(out), nil
+}
+
+type settingHandlers struct{ s *Service }
+
+var _ settingsapi.StrictServerInterface = settingHandlers{}
+
+// ListAdminSettings implements GET /v1/admin/settings.
+func (h settingHandlers) ListAdminSettings(ctx context.Context, _ settingsapi.ListAdminSettingsRequestObject) (settingsapi.ListAdminSettingsResponseObject, error) {
+	p, err := principal(ctx)
+	if err != nil {
+		return nil, err
+	}
+	out, err := h.s.listSettings(ctx, p)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return settingsapi.ListAdminSettings200JSONResponse(out), nil
+}
+
+// UpdateAdminSetting implements PATCH /v1/admin/settings/{key}.
+func (h settingHandlers) UpdateAdminSetting(ctx context.Context, req settingsapi.UpdateAdminSettingRequestObject) (settingsapi.UpdateAdminSettingResponseObject, error) {
+	p, err := principal(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if req.Body == nil {
+		return nil, fieldErr("body", "required")
+	}
+	out, err := h.s.updateSetting(ctx, p, req.Key, *req.Body)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return settingsapi.UpdateAdminSetting200JSONResponse(out), nil
+}
+
+// ListAdminSettingHistory implements GET /v1/admin/settings/{key}/history.
+func (h settingHandlers) ListAdminSettingHistory(ctx context.Context, req settingsapi.ListAdminSettingHistoryRequestObject) (settingsapi.ListAdminSettingHistoryResponseObject, error) {
+	out, err := h.s.settingHistory(ctx, req.Key, req.Params.Limit, req.Params.Cursor)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return settingsapi.ListAdminSettingHistory200JSONResponse(out), nil
 }
 
 func adminCall(ctx context.Context, id string, hasBody bool) (actor, target ids.ID, err error) {

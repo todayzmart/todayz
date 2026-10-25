@@ -27,7 +27,7 @@ func mountAdmin(r chi.Router, d *deps) {
 	mountAdminConsole(r, d)
 }
 
-// mountAdminConsole mounts W3-05's admin-customers and admin-audit routes.
+// mountAdminConsole mounts W3-05's admin-customers, admin-settings and admin-audit routes.
 // The strike reset recounts through a minimal orders service (its strike
 // rules read only the database and settings).
 func mountAdminConsole(r chi.Router, d *deps) {
@@ -49,6 +49,16 @@ func mountAdminConsole(r chi.Router, d *deps) {
 				panic("admin: PII_HASH_KEY must be 32 bytes")
 			}
 			ad.Hash = h
+		}
+		pr := d.Config.Providers
+		// A-17 shows set or missing only (D-19); the values never leave config.
+		ad.Providers = []admin.ProviderKey{
+			{Name: "WHATSAPP_API_KEY", Set: pr.WhatsAppAPIKey.IsSet()},
+			{Name: "VAPID_PRIVATE_KEY", Set: pr.VAPIDPrivateKey.IsSet()},
+			{Name: "TURNSTILE_SECRET_KEY", Set: pr.TurnstileSecretKey.IsSet()},
+			{Name: "SARVAM_API_KEY", Set: pr.SarvamAPIKey.IsSet()},
+			{Name: "ANTHROPIC_API_KEY", Set: pr.AnthropicAPIKey.IsSet()},
+			{Name: "GEOCODER_API_KEY", Set: pr.GeocoderAPIKey.IsSet()},
 		}
 	}
 	if d.DB != nil {

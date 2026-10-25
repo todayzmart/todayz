@@ -1,12 +1,122 @@
-# Paths: domain "admin-settings" (owner W3-09): admin platform settings (04 §2.7).
-#
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-settings]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-settings.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Paths: domain "admin-settings" (owner W3-05): A-17 platform settings (04 §2.7, 01 §17).
+# Roles are in internal/platform/authz/policy/admin.go: `admin` and `super_admin` read and change
+# settings with a fresh step-up; money settings (unit paise, bp or credits) are super_admin only (D-64).
+/v1/admin/settings:
+  get:
+    operationId: listAdminSettings
+    tags: [admin-settings]
+    summary: Every platform setting with its unit, range and group (A-17)
+    description: >-
+      Every `platform_settings` row in 01 §17 order of groups, then by key. `editable` says whether the
+      caller may change it (money settings are super_admin only). `providers` lists each provider key's
+      environment variable name with whether it is set, never the value or any part of it (D-19).
+    responses:
+      "200":
+        description: The settings and the provider key states
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-settings.yaml#/AdminSettingList
+            example:
+              items:
+                - key: credit_max_per_order
+                  group: credits
+                  unit: credits
+                  value: 30
+                  min: 0
+                  max: 1000
+                  description: Credits and payouts. 01 §7
+                  money: true
+                  editable: true
+                  updatedBy: null
+                  updatedByName: null
+                  updatedAt: "2026-10-20T09:30:00Z"
+                  version: 1
+              providers:
+                - name: ANTHROPIC_API_KEY
+                  set: false
+              serverNow: "2026-10-24T11:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/settings/{key}:
+  parameters:
+    - &key
+      name: key
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/admin-settings.yaml#/AdminSettingKey
+  patch:
+    operationId: updateAdminSetting
+    tags: [admin-settings]
+    summary: Change one setting, with a reason (audited, step-up)
+    description: >-
+      Needs a TOTP step-up younger than 10 minutes (else `403 step_up_required`). A money setting (unit
+      `paise`, `bp` or `credits`) needs `super_admin` (else `403 forbidden`). The value must match the unit
+      (a whole number, `true`/`false`, or text) and lie within the setting's min and max, else
+      `422 validation_failed` on `body.value`. Sending the current value changes nothing and writes no
+      audit row. Every API and worker instance picks the new value up within moments.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-settings.yaml#/AdminSettingChange
+          example:
+            value: 40
+            reason: Festival week, more credits per order
+    responses:
+      "200":
+        description: The setting after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-settings.yaml#/AdminSettingDetail
+            example:
+              setting:
+                key: credit_max_per_order
+                group: credits
+                unit: credits
+                value: 40
+                min: 0
+                max: 1000
+                description: Credits and payouts. 01 §7
+                money: true
+                editable: true
+                updatedBy: 01JB0ADM1A2B3C4D5E6F7G8H9J
+                updatedByName: Asha
+                updatedAt: "2026-10-24T11:00:00Z"
+                version: 2
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/settings/{key}/history:
+  parameters:
+    - *key
+  get:
+    operationId: listAdminSettingHistory
+    tags: [admin-settings]
+    summary: One setting's changes, newest first
+    description: Each change from the audit log with who made it, the old and new value and the reason.
+    parameters:
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: A page of changes
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-settings.yaml#/AdminSettingHistory
+            example:
+              items:
+                - id: 01JB0A0D1A2B3C4D5E6F7G8H9J
+                  actorId: 01JB0ADM1A2B3C4D5E6F7G8H9J
+                  actorName: Asha
+                  from: 30
+                  to: 40
+                  reason: Festival week, more credits per order
+                  createdAt: "2026-10-24T11:00:00Z"
+              nextCursor: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem

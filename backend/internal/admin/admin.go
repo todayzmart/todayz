@@ -1,6 +1,7 @@
 // Package admin is the admin console's own domain (W3-05, 04 §2.7): customers
-// (A-06: exact phone search, block, unblock, strike reset, session revoke) and
-// the audit log (A-19 and every screen's audit side panel). Admin order reads
+// (A-06: exact phone search, block, unblock, strike reset, session revoke),
+// platform settings (A-17) and the audit log (A-19 and every screen's audit
+// side panel). Admin order reads
 // and the admin cancel live in internal/orders, review moderation in
 // internal/reviews and the jobs console in platform/jobs/adminapi.
 //
@@ -58,17 +59,20 @@ type Deps struct {
 	Hash *pii.Hasher
 	// Strikes is internal/orders' recount.
 	Strikes StrikeRecounter
+	// Providers are the provider keys A-17 shows as set or missing.
+	Providers []ProviderKey
 }
 
 // Service implements the admin-customers and admin-audit routes.
 type Service struct {
-	db      *db.DB
-	clock   clock.Clock
-	audit   *audit.Writer
-	az      authz.Authorizer
-	seal    *pii.Sealer
-	hash    *pii.Hasher
-	strikes StrikeRecounter
+	db        *db.DB
+	clock     clock.Clock
+	audit     *audit.Writer
+	az        authz.Authorizer
+	seal      *pii.Sealer
+	hash      *pii.Hasher
+	strikes   StrikeRecounter
+	providers []ProviderKey
 }
 
 // New builds the service.
@@ -76,7 +80,7 @@ func New(d Deps) (*Service, error) {
 	if d.Clock == nil {
 		return nil, errors.New("admin: a clock is required")
 	}
-	return &Service{db: d.DB, clock: d.Clock, audit: d.Audit, az: d.Authz, seal: d.Seal, hash: d.Hash, strikes: d.Strikes}, nil
+	return &Service{db: d.DB, clock: d.Clock, audit: d.Audit, az: d.Authz, seal: d.Seal, hash: d.Hash, strikes: d.Strikes, providers: d.Providers}, nil
 }
 
 func (s *Service) ready(ctx context.Context) error {

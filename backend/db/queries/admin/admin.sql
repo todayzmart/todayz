@@ -81,3 +81,30 @@ WHERE (sqlc.narg(actor_id)::uuid IS NULL OR a.actor_id = sqlc.narg(actor_id)::uu
        OR (a.created_at, a.id) < (sqlc.narg(before_at)::timestamptz, sqlc.narg(before_id)::uuid))
 ORDER BY a.created_at DESC, a.id DESC
 LIMIT @lim;
+
+------------------------------------------------------------------------------
+-- platform settings (A-17)
+------------------------------------------------------------------------------
+
+-- name: ListSettings :many
+SELECT ps.key, ps.value, ps.unit, ps.min, ps.max, ps.description, ps.updated_by, u.name AS updated_by_name,
+  ps.updated_at, ps.version
+FROM platform_settings ps LEFT JOIN users u ON u.id = ps.updated_by
+ORDER BY ps.key;
+
+-- name: GetSettingForUpdate :one
+SELECT key, value, unit, min, max, version FROM platform_settings WHERE key = @key FOR UPDATE;
+
+-- name: UpdateSetting :exec
+-- touch_updated_at sets updated_at; the NOTIFY trigger reloads every settings cache.
+UPDATE platform_settings SET value = @value, updated_by = @updated_by, version = version + 1
+WHERE key = @key;
+
+-- name: GetSetting :one
+SELECT ps.key, ps.value, ps.unit, ps.min, ps.max, ps.description, ps.updated_by, u.name AS updated_by_name,
+  ps.updated_at, ps.version
+FROM platform_settings ps LEFT JOIN users u ON u.id = ps.updated_by
+WHERE ps.key = @key;
+
+-- name: SettingExists :one
+SELECT EXISTS (SELECT 1 FROM platform_settings WHERE key = @key)::bool;
