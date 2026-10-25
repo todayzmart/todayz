@@ -473,7 +473,8 @@ Admin roles (D-64; summary, the full permission matrix is in 02). There are 7 ro
 
 - TodayZ employees with a `field_agent` admin login (phone-friendly screens). No commission.
 - They create a business on the shop's behalf (shop owner confirms by OTP on their own phone), capture photos and documents, add products from the master catalogue (or create missing ones), and print/hand over the QR standee.
-- They can add and edit items only for businesses they onboarded, until `field_agent_edit_window_days` (30) after that business is verified.
+- They can add and edit items only for businesses they onboarded, until `field_agent_edit_window_days` (30) after that business is verified. They edit only the items they added themselves; an item the shop added is the shop's (D-232).
+- The owner's code follows the sign-in OTP rules (§2). The per-number send limit counts the sign-in codes sent to that number too. One agent may send at most `field_owner_codes_per_agent_hour` owner codes in any rolling hour (`429 rate_limited`). No invite or code goes to a number whose account is blocked (`403`).
 - Every business records `onboarded_by`; admin sees per agent: shops onboarded, verified, products added, first-order rate. Each field agent sees the same numbers for themselves only.
 
 ## 15. Notifications
@@ -630,6 +631,7 @@ Every numeric key has a min and a max (the Rule column, or after the default). A
 | Key | Unit | Default | Rule |
 |---|---|---|---|
 | `field_agent_edit_window_days` | days | 30 | §14. Min 1, max 90. |
+| `field_owner_codes_per_agent_hour` | count | 10 | §14: owner codes one field agent may send in a rolling hour, over every shop and number. Min 1, max 30. |
 
 **Jobs** (D-95)
 
