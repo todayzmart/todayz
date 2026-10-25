@@ -13,6 +13,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
+
 	adminfieldapi "github.com/todayz/backend/gen/api/admin-field"
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/gen/sqlc/businessdb"
@@ -226,7 +228,7 @@ func (f *Field) verifyCode(ctx context.Context, bidStr string, body *adminfielda
 		if !hmac.Equal(row.PhoneHash, f.s.hash.Phone(e164)) {
 			outcome = problem.New(genproblems.OtpExpired, "")
 			failure = ownerCodeExpired
-			return f.ownerCodeFailed(ctx, c, bid, ownerCodeExpired, 0)
+			return f.ownerCodeExpiredOnce(ctx, c, bid, row.ID, now, 0)
 		}
 		if int(row.Attempts) >= rules.MaxAttempts {
 			outcome = problem.New(genproblems.OtpLocked, "")
@@ -244,7 +246,7 @@ func (f *Field) verifyCode(ctx context.Context, bidStr string, body *adminfielda
 		if !now.Before(row.ExpiresAt) {
 			outcome = problem.New(genproblems.OtpExpired, "")
 			failure = ownerCodeExpired
-			return f.ownerCodeFailed(ctx, c, bid, ownerCodeExpired, max(rules.MaxAttempts-int(row.Attempts), 0))
+			return f.ownerCodeExpiredOnce(ctx, c, bid, row.ID, now, max(rules.MaxAttempts-int(row.Attempts), 0))
 		}
 		attempts, err := q.RecordOwnerCodeAttempt(ctx, row.ID)
 		if err != nil {
@@ -313,6 +315,17 @@ func (f *Field) verifyCode(ctx context.Context, bidStr string, body *adminfielda
 		return adminfieldapi.FieldBusiness{}, outcome
 	}
 	return f.view(ctx, c, b)
+}
+
+// ownerCodeExpiredOnce audits the first expired try on a code (lapsed, or
+// sent to an earlier owner number) and marks it; later tries on that code are
+// only counted in the metric.
+func (f *Field) ownerCodeExpiredOnce(ctx context.Context, c fieldCall, bid ids.ID, code pgtype.UUID, now time.Time, left int) error {
+	n, err := f.s.q(ctx).MarkOwnerCodeExpiredAudited(ctx, businessdb.MarkOwnerCodeExpiredAuditedParams{Now: now, ID: code})
+	if err != nil || n == 0 {
+		return err
+	}
+	return f.ownerCodeFailed(ctx, c, bid, ownerCodeExpired, left)
 }
 
 // ownerCodeFailed audits a failed owner-code try (kept: the transaction

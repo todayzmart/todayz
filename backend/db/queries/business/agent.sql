@@ -135,6 +135,12 @@ FOR UPDATE;
 -- name: RecordOwnerCodeAttempt :one
 UPDATE field_owner_codes SET attempts = attempts + 1 WHERE id = @id RETURNING attempts;
 
+-- name: MarkOwnerCodeExpiredAudited :execrows
+-- The first expired try on a code: 1 when this call marked it, 0 when an
+-- earlier one had (that try is then only counted).
+UPDATE field_owner_codes SET expired_audited_at = @now::timestamptz
+WHERE id = @id AND expired_audited_at IS NULL;
+
 -- name: ConsumeOwnerCode :exec
 UPDATE field_owner_codes SET consumed_at = @now::timestamptz WHERE id = @id;
 

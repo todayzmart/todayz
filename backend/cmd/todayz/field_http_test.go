@@ -320,7 +320,7 @@ func TestFieldOnboardingHTTP(t *testing.T) {
 }
 
 // SC-FA-06: five wrong codes lock it; a lapsed code is expired; a new owner
-// number ends the old code.
+// number ends the old code. A locked or expired code is audited once.
 func TestFieldOwnerCodeLimitsHTTP(t *testing.T) {
 	f := newFieldAPI(t)
 	agent := f.user(agentPhone, "field_agent")
@@ -357,9 +357,13 @@ func TestFieldOwnerCodeLimitsHTTP(t *testing.T) {
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	f.clk.Advance(5*time.Minute + time.Second)
 	tok = agent.token()
-	r = f.call(tok, http.MethodPost, B+"/owner-confirm/verify", map[string]any{"code": "000000"}, nil)
-	require.Equal(t, http.StatusUnauthorized, r.code, r.raw)
-	require.Equal(t, "otp_expired", problemCode(r))
+	for range 3 {
+		r = f.call(tok, http.MethodPost, B+"/owner-confirm/verify", map[string]any{"code": "000000"}, nil)
+		require.Equal(t, http.StatusUnauthorized, r.code, r.raw)
+		require.Equal(t, "otp_expired", problemCode(r))
+	}
+	// Audited once per code, however often it is tried.
+	require.Equal(t, 1, fails("expired"))
 
 	// A code sent, then the number changed: the code no longer confirms.
 	r = f.call(tok, http.MethodPost, B+"/owner-confirm", nil, nil)
@@ -367,10 +371,13 @@ func TestFieldOwnerCodeLimitsHTTP(t *testing.T) {
 	r = f.call(tok, http.MethodPatch, B, map[string]any{"ownerPhone": shop2OwnerPhone}, nil)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.Equal(t, pii.MaskPhone(shop2OwnerPhone), r.body["ownerPhoneMasked"])
-	r = f.call(tok, http.MethodPost, B+"/owner-confirm/verify", map[string]any{"code": "000000"}, nil)
-	require.Equal(t, http.StatusUnauthorized, r.code, r.raw)
-	require.Equal(t, "otp_expired", problemCode(r))
-	// The lapsed code and the one for the old number are audited as expired.
+	for range 3 {
+		r = f.call(tok, http.MethodPost, B+"/owner-confirm/verify", map[string]any{"code": "000000"}, nil)
+		require.Equal(t, http.StatusUnauthorized, r.code, r.raw)
+		require.Equal(t, "otp_expired", problemCode(r))
+	}
+	// The lapsed code and the one for the old number are audited as expired,
+	// once each.
 	require.Equal(t, 2, fails("expired"))
 }
 
