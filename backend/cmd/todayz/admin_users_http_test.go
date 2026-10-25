@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"net/http"
+	"sync"
 	"testing"
 	"time"
 
@@ -179,23 +181,7 @@ func TestAdminUsersDisabledTokenHTTP(t *testing.T) {
 	require.Equal(t, 0, a.count(`SELECT count(*) FROM audit_log WHERE after::text LIKE '%9000000041%' OR before::text LIKE '%9000000041%'`))
 
 	// Asha signs in with both steps and can read orders.
-	w := a.call("", http.MethodPost, "/v1/auth/otp/send", map[string]string{
-		"phone": "+919000000041", "app": "admin", "purpose": "login", "turnstileToken": "XXXX.DUMMY.TOKEN.XXXX",
-	}, nil)
-	require.Equal(t, http.StatusOK, w.code, w.raw)
-	w = a.call("", http.MethodPost, "/v1/auth/otp/verify", map[string]string{
-		"app": "admin", "requestId": w.body["requestId"].(string), "code": testOTP, "deviceId": ids.New(a.clk.Now()).String(),
-	}, nil)
-	require.Equal(t, http.StatusOK, w.code, w.raw)
-	first := w.body["accessToken"].(string)
-	e := a.call(first, http.MethodPost, "/v1/auth/totp/enrol", nil, nil)
-	require.Equal(t, http.StatusOK, e.code, e.raw)
-	secret, err := identity.DecodeTOTPSecret(e.body["secret"].(string))
-	require.NoError(t, err)
-	a.clk.Advance(31 * time.Second)
-	v := a.call(first, http.MethodPost, "/v1/auth/totp/verify", map[string]string{"code": identity.TOTPCode(secret, a.clk.Now()), "purpose": "login"}, nil)
-	require.Equal(t, http.StatusOK, v.code, v.raw)
-	ashaTok := v.body["accessToken"].(string)
+	ashaTok, ashaCookie := adminSignIn(o, "+919000000041")
 	r = a.call(ashaTok, http.MethodGet, "/v1/admin/orders", nil, nil)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 
@@ -221,4 +207,165 @@ func TestAdminUsersDisabledTokenHTTP(t *testing.T) {
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	r = a.call(ashaTok, http.MethodGet, "/v1/admin/orders", nil, nil)
 	require.Equal(t, http.StatusUnauthorized, r.code, r.raw)
+	// Nor does her refresh token: every admin session stays revoked.
+	r = adminRefresh(o, ashaCookie)
+	require.Equal(t, http.StatusUnauthorized, r.code, r.raw)
+	require.Equal(t, 0, a.count(`SELECT count(*) FROM sessions WHERE user_id = $1 AND revoked_at IS NULL`, uuidOf(t, asha)))
+}
+
+// adminSignIn signs an invited number into the admin app with both steps
+// (first sign-in: it enrols the authenticator) and returns the access token
+// and the refresh cookie.
+func adminSignIn(o *orderShop, phone string) (string, *http.Cookie) {
+	t, a := o.t, o.a
+	t.Helper()
+	w := a.call("", http.MethodPost, "/v1/auth/otp/send", map[string]string{
+		"phone": phone, "app": "admin", "purpose": "login", "turnstileToken": "XXXX.DUMMY.TOKEN.XXXX",
+	}, nil)
+	require.Equal(t, http.StatusOK, w.code, w.raw)
+	w = a.call("", http.MethodPost, "/v1/auth/otp/verify", map[string]string{
+		"app": "admin", "requestId": w.body["requestId"].(string), "code": testOTP, "deviceId": ids.New(a.clk.Now()).String(),
+	}, nil)
+	require.Equal(t, http.StatusOK, w.code, w.raw)
+	first := w.body["accessToken"].(string)
+	e := a.call(first, http.MethodPost, "/v1/auth/totp/enrol", nil, nil)
+	require.Equal(t, http.StatusOK, e.code, e.raw)
+	secret, err := identity.DecodeTOTPSecret(e.body["secret"].(string))
+	require.NoError(t, err)
+	a.clk.Advance(31 * time.Second)
+	v := a.call(first, http.MethodPost, "/v1/auth/totp/verify", map[string]string{"code": identity.TOTPCode(secret, a.clk.Now()), "purpose": "login"}, nil)
+	require.Equal(t, http.StatusOK, v.code, v.raw)
+	return v.body["accessToken"].(string), cookieOf(t, v)
+}
+
+func adminRefresh(o *orderShop, c *http.Cookie) resp {
+	o.t.Helper()
+	return o.a.call("", http.MethodPost, "/v1/auth/refresh", map[string]string{"app": "admin"}, map[string]string{
+		"Origin": "https://admin.todayz.localhost", "X-TZ-Client": "admin-users-test/1.0", "Cookie": c.Name + "=" + c.Value,
+	})
+}
+
+// adminVersions reads every admin's version from A-18.
+func adminVersions(o *orderShop, tok string) map[string]any {
+	o.t.Helper()
+	r := o.a.call(tok, http.MethodGet, "/v1/admin/users", nil, nil)
+	require.Equal(o.t, http.StatusOK, r.code, r.raw)
+	out := map[string]any{}
+	for _, it := range r.body["items"].([]any) {
+		m := it.(map[string]any)
+		out[m["id"].(string)] = m["version"]
+	}
+	return out
+}
+
+// Two super_admins disable each other at the same moment: the advisory lock
+// orders them, the second finds itself disabled (403, or 401 if its request
+// had not yet passed the session check), and one active super_admin remains.
+func TestAdminUsersMutualDisableHTTP(t *testing.T) {
+	o := newOrderShop(t)
+	desk := newAdminDesk(o, "super_admin")
+	a := o.a
+	tokA := desk.token()
+	r := a.call(tokA, http.MethodPost, "/v1/admin/users", map[string]any{"phone": "9000000051", "name": "Kiran", "roles": []string{"super_admin"}, "reason": "second super admin"}, nil)
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	idB := r.body["id"].(string)
+	tokB, _ := adminSignIn(o, "+919000000051")
+	tokA = desk.token()
+	vs := adminVersions(o, tokA)
+	var idA string
+	for id := range vs {
+		if id != idB {
+			idA = id
+		}
+	}
+
+	codes := make([]int, 2)
+	var wg sync.WaitGroup
+	for i, c := range []struct{ tok, target string }{{tokA, idB}, {tokB, idA}} {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			codes[i] = a.call(c.tok, http.MethodPatch, "/v1/admin/users/"+c.target, map[string]any{"status": "disabled", "version": vs[c.target], "reason": "race"}, nil).code
+		}()
+	}
+	wg.Wait()
+	ok, refused := 0, 0
+	for _, c := range codes {
+		switch c {
+		case http.StatusOK:
+			ok++
+		case http.StatusForbidden, http.StatusUnauthorized:
+			refused++
+		}
+	}
+	require.Equal(t, 1, ok, "codes %v", codes)
+	require.Equal(t, 1, refused, "codes %v", codes)
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM admin_users au JOIN users u ON u.id = au.user_id
+		WHERE au.disabled_at IS NULL AND 'super_admin' = ANY (au.roles) AND u.status = 'active'`))
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM audit_log WHERE action = 'admin_user.disable'`))
+}
+
+// A super_admin who is disabled, demoted or blocked while their request is
+// already past authz makes no change: the actor is read again under the
+// advisory lock. The test holds that lock, changes the actor, then lets the
+// request through.
+func TestAdminUsersActorRecheckHTTP(t *testing.T) {
+	o := newOrderShop(t)
+	desk := newAdminDesk(o, "super_admin")
+	a := o.a
+	tok := desk.token()
+	r := a.call(tok, http.MethodPost, "/v1/admin/users", map[string]any{"phone": "9000000061", "name": "Dev", "roles": []string{"support"}, "reason": "joins"}, nil)
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	dev := r.body["id"].(string)
+	var self string
+	for id := range adminVersions(o, tok) {
+		if id != dev {
+			self = id
+		}
+	}
+	ctx := context.Background()
+	waiting := func() int {
+		return a.count(`SELECT count(*) FROM pg_locks WHERE locktype = 'advisory' AND NOT granted`)
+	}
+	restore := func() {
+		a.exec(`UPDATE admin_users SET disabled_at = NULL, roles = ARRAY['super_admin'] WHERE user_id = $1`, uuidOf(t, self))
+		a.exec(`UPDATE users SET status = 'active' WHERE id = $1`, uuidOf(t, self))
+	}
+	before := a.count(`SELECT count(*) FROM audit_log WHERE subject_type = 'admin_user'`)
+	for _, c := range []struct {
+		name, change string
+		send         func() resp
+	}{
+		{"invite, actor disabled", `UPDATE admin_users SET disabled_at = now() WHERE user_id = $1`, func() resp {
+			return a.call(tok, http.MethodPost, "/v1/admin/users", map[string]any{"phone": "9000000062", "name": "Late", "roles": []string{"support"}, "reason": "late"}, nil)
+		}},
+		{"update, actor demoted", `UPDATE admin_users SET roles = ARRAY['admin'] WHERE user_id = $1`, func() resp {
+			return a.call(tok, http.MethodPatch, "/v1/admin/users/"+dev, map[string]any{"status": "disabled", "version": 1, "reason": "late"}, nil)
+		}},
+		{"reset, actor blocked", `UPDATE users SET status = 'blocked' WHERE id = $1`, func() resp {
+			return a.call(tok, http.MethodPost, "/v1/admin/users/"+dev+"/reset-totp", map[string]any{"reason": "late"}, nil)
+		}},
+	} {
+		tx, err := a.tdb.OwnerPool.Begin(ctx)
+		require.NoError(t, err)
+		defer func() { _ = tx.Rollback(ctx) }()
+		_, err = tx.Exec(ctx, `SELECT pg_advisory_xact_lock(hashtextextended('admin:admin_users', 0))`)
+		require.NoError(t, err)
+		done := make(chan resp, 1)
+		go func() { done <- c.send() }()
+		deadline := time.Now().Add(10 * time.Second)
+		for waiting() == 0 {
+			require.True(t, time.Now().Before(deadline), "%s: the request never reached the lock", c.name)
+			time.Sleep(10 * time.Millisecond)
+		}
+		_, err = tx.Exec(ctx, c.change, uuidOf(t, self))
+		require.NoError(t, err)
+		require.NoError(t, tx.Commit(ctx))
+		got := <-done
+		require.Equal(t, http.StatusForbidden, got.code, "%s: %s", c.name, got.raw)
+		restore()
+	}
+	require.Equal(t, before, a.count(`SELECT count(*) FROM audit_log WHERE subject_type = 'admin_user'`))
+	require.Equal(t, 0, a.count(`SELECT count(*) FROM phone_identities pi JOIN users u ON u.id = pi.user_id WHERE u.name = 'Late'`))
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM admin_users WHERE user_id = $1 AND disabled_at IS NULL`, uuidOf(t, dev)))
 }

@@ -33,7 +33,8 @@ This report covers the admin console work package so far. It lists the backend a
 | 046b55c, 30e0781 | Main merged in (W3-01 payouts and admin money); admin copy names no product, for the i18n sentence-case test |
 | 84ee55d | A-18 invite goes through `identity.Accounts.FindOrCreateByPhone` (the same normalisation, hash, seal and per-number lock as OTP sign-in) instead of admin-written identity rows; the invite is audited with the phone masked; a disabled admin's token stops on the next request |
 | ba6fb02 | A-16 notifications, read-only (D-224): API, screen, journey. Details below |
-| 43685a3, (this commit) | Main (92d9055) merged in, keeping the lead's AD-02 reads and the expiry-preview fake. The audit subjects `payout`, `payout_period` and `credit_adjustment` added for W3-01, plus labels for its ten actions. Details below |
+| 43685a3, b0d74ce | Main (92d9055) merged in, keeping the lead's AD-02 reads and the expiry-preview fake. The audit subjects `payout`, `payout_period` and `credit_adjustment` added for W3-01, plus labels for its ten actions. Details below |
+| (this commit) | A-18 review hardening. Disable and reset take the target's `users` row (FOR NO KEY UPDATE, as identity's `LockUser` does) after the A-18 advisory lock and before its `admin_users` row, so a refresh in flight can't slip past the session revoke. Lock order: advisory, users, admin_users, sessions. Invite, update and reset read the actor again under that lock; a disabled, demoted or non-active actor gets 403. The last-super_admin guard counts the target only if its user is active. Tests: two super_admins disabling each other at once (one succeeds, one active super_admin remains); actor disabled, demoted or blocked mid-flight (403, no change, no audit row); re-enable leaves the old refresh token at 401 and no session unrevoked |
 
 ## Evidence
 

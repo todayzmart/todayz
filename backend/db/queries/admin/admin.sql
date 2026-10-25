@@ -539,6 +539,20 @@ WHERE au.user_id = @id;
 -- together leave no active super_admin.
 SELECT pg_advisory_xact_lock(hashtextextended('admin:admin_users', 0));
 
+-- name: AdminActor :one
+-- The acting super_admin as it is now, read after LockAdminUsers: a change
+-- that disabled, demoted or blocked them committed before this one started.
+SELECT au.roles, au.disabled_at, u.status FROM admin_users au JOIN users u ON u.id = au.user_id
+WHERE au.user_id = @id;
+
+-- name: LockAdminTargetUser :one
+-- The target's users row, taken as identity's LockUser takes it. Disable and
+-- the authenticator reset revoke the target's sessions, so they run one at a
+-- time with refresh and every other revoke path, and no revocation misses a
+-- row a concurrent rotation inserts. Lock order: the A-18 advisory lock,
+-- users, admin_users, sessions.
+SELECT status FROM users WHERE id = @id FOR NO KEY UPDATE;
+
 -- name: LockAdminUser :one
 SELECT roles, disabled_at, version FROM admin_users WHERE user_id = @id FOR UPDATE;
 
