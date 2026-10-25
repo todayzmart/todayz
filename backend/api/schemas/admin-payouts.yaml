@@ -56,8 +56,13 @@ StatementStore:
       description: Ledger entries in the period.
 AdminPayoutBrief:
   type: object
-  required: [id, status, amountPaise, holdReason, utr]
+  required: [id, status, amountPaise, holdReason, utr, carried]
   properties:
+    carried:
+      type: boolean
+      description: >-
+        A later close recomputed (or cancelled) this payout, so this statement's amount went on into it.
+        status, amountPaise and utr are then the payout's live state, not this statement's.
     id: {$ref: ./common.yaml#/Ulid}
     status: {$ref: '#/PayoutStatus'}
     amountPaise: {$ref: ./common.yaml#/Paise}
@@ -240,12 +245,16 @@ BusinessPayoutState:
   required: [status, amountPaise, utr, paidAt]
   description: >-
     The business sees `processing` until finance marks the payout paid, `needs_kyc` while it is held for
-    incomplete KYC or payout details, and `paid` with the UTR after (01 §9).
+    incomplete KYC or payout details, and `paid` with the UTR after (01 §9). An earlier statement whose
+    payout a later close recomputed (D-09: one open payout per business) is `carried`: its amount went on
+    into the next statement's payout, which shows the live state.
   properties:
     status:
       type: string
-      enum: [processing, needs_kyc, paid]
-    amountPaise: {$ref: ./common.yaml#/Paise}
+      enum: [processing, needs_kyc, paid, carried]
+    amountPaise:
+      $ref: ./common.yaml#/Paise
+      description: What this statement's close computed when `carried`; else the payout's amount.
     utr:
       type: [string, 'null']
       maxLength: 30

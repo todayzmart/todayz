@@ -95,6 +95,10 @@
     "defaultMessage": "Nothing to pay",
     "description": "Statement row without a payout"
   },
+  "payouts.carried": {
+    "defaultMessage": "Carried to a later statement",
+    "description": "Statement row whose payout a later month's close recomputed; the payout opens with its live state"
+  },
   "payouts.pill": {
     "defaultMessage": "{status} · {amount}",
     "description": "Payout status pill with the amount, e.g. Pending · ₹2,670"

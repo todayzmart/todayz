@@ -123,8 +123,12 @@ CREATE TABLE payout_statements (
   status       text NOT NULL,
   closed_at    timestamptz,
   payout_id    uuid REFERENCES payouts (id),
+  -- What this close computed for payout_id. A later close recomputes the same
+  -- open payout (D-09), so the payout row holds only the latest amount.
+  computed_payout bigint,
   created_at   timestamptz NOT NULL,
   CONSTRAINT ck_payout_statements_status CHECK (status IN ('open','closed')),
+  CONSTRAINT ck_payout_statements_computed CHECK ((payout_id IS NULL) = (computed_payout IS NULL) AND (computed_payout IS NULL OR computed_payout > 0)),
   CONSTRAINT ck_payout_statements_closed CHECK ((status = 'closed') = (closed_at IS NOT NULL)),
   CONSTRAINT ck_payout_statements_period CHECK (extract(day FROM period) = 1),
   -- 01 §9: opening + credits in − cashback ± reversals and adjustments − payouts paid = closing.

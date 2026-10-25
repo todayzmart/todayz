@@ -44,6 +44,7 @@ const october = {
 const september = { period: '2026-09', closedAt: '2026-09-30T19:00:00Z', totals: totals(120000), payout: { status: 'processing', amountPaise: 120000, utr: null, paidAt: null } };
 const august = { period: '2026-08', closedAt: '2026-08-31T19:00:00Z', totals: totals(90000), payout: { status: 'needs_kyc', amountPaise: 90000, utr: null, paidAt: null } };
 const july = { period: '2026-07', closedAt: '2026-07-31T19:00:00Z', totals: totals(-30000, { cashbackOutPaise: 30000 }) };
+const june = { period: '2026-06', closedAt: '2026-06-30T19:00:00Z', totals: totals(50000), payout: { status: 'carried', amountPaise: 50000, utr: null, paidAt: null } };
 
 function list(items: unknown[], nextCursor: string | null = null): Handler {
   return (c) => (c.method === 'GET' && c.path === `${B}/statements` ? json(200, { items, nextCursor, serverNow: NOW }) : undefined);
@@ -53,7 +54,7 @@ afterEach(() => vi.restoreAllMocks());
 
 describe('B-10 monthly statements', () => {
   it('shows each month with its closing, the payout state and the UTR once paid', async () => {
-    renderAt('/credits', { messages, handlers: [shops('owner'), page, list([october, september, august, july])] });
+    renderAt('/credits', { messages, handlers: [shops('owner'), page, list([october, september, august, july, june])] });
 
     const oct = await screen.findByTestId('statement-2026-10');
     expect(oct).toHaveTextContent('October 2026');
@@ -76,6 +77,11 @@ describe('B-10 monthly statements', () => {
     expect(jul).toHaveTextContent(`Closing ${formatMoney(-30000)}`);
     expect(jul).toHaveTextContent('No payout this month.');
     expect(jul).toHaveTextContent('A negative balance carries forward to next month.');
+
+    // A later close took this month's payout over: it shows what this month computed, carried on.
+    const jun = screen.getByTestId('statement-2026-06');
+    expect(within(jun).getByText('Carried over')).toBeInTheDocument();
+    expect(jun).toHaveTextContent(`Payout of ${formatMoney(50000)} carried to the next statement.`);
   });
 
   it('breaks a month down, showing cashback and payouts as taken away', async () => {

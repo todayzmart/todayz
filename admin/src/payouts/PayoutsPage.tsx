@@ -188,6 +188,7 @@ function Statements({ period, selected, onOpen }: { period: string; selected?: s
         cell: ({ row }) => {
           const p = row.original.payout;
           if (!p) return <span className={css.muted}>{intl.formatMessage({ id: 'payouts.noPayout' })}</span>;
+          if (p.carried) return <StatusPill tone="neutral">{intl.formatMessage({ id: 'payouts.carried' })}</StatusPill>;
           return (
             <StatusPill tone={statusTone(p.status)}>
               {intl.formatMessage({ id: 'payouts.pill' }, { status: labels.status(p.status), amount: money(p.amountPaise) })}

@@ -622,3 +622,42 @@ func TestCloseJobDB(t *testing.T) {
 	require.Zero(t, out.Result.Summary["closed"], "a rerun closes nothing")
 	require.Equal(t, 1, e.count(`SELECT count(*) FROM payouts`))
 }
+
+// F: July's close recomputes June's open payout (D-09). June's statement then
+// reads carried with what June's close computed; July's shows the live payout,
+// and keeps showing it once paid. A-11 marks June's carried too.
+func TestStatementCarriedToTheNextDB(t *testing.T) {
+	e := newEnv(t)
+	pid := e.pendingJune(100)
+	e.at(ist(2026, 7, 10, 12, 0))
+	e.storeReferral(e.s1, 30)
+	e.close(time.July, 2026)
+	require.Equal(t, pid.String(), e.openPayout().Payout.Id)
+
+	june, err := e.svc.BusinessStatement(e.ctx, e.biz, nil, "2026-06")
+	require.NoError(t, err)
+	require.Equal(t, api.BusinessPayoutStateStatusCarried, june.Statement.Payout.Status)
+	require.Equal(t, 10000, june.Statement.Payout.AmountPaise)
+	july, err := e.svc.BusinessStatement(e.ctx, e.biz, nil, "2026-07")
+	require.NoError(t, err)
+	require.Equal(t, api.BusinessPayoutStateStatusProcessing, july.Statement.Payout.Status)
+	require.Equal(t, 13000, july.Statement.Payout.AmountPaise)
+
+	admin, err := e.svc.Statements(e.ctx, "2026-06", nil, nil)
+	require.NoError(t, err)
+	require.True(t, admin.Items[0].Payout.Carried)
+	admin, err = e.svc.Statements(e.ctx, "2026-07", nil, nil)
+	require.NoError(t, err)
+	require.False(t, admin.Items[0].Payout.Carried)
+
+	e.at(ist(2026, 8, 2, 12, 0))
+	_, err = e.svc.MarkPaid(e.ctx, e.finance, pid, "AXIS12345678", 13000, "July payout")
+	require.NoError(t, err)
+	list, err := e.svc.BusinessStatements(e.ctx, e.biz, nil, nil, nil)
+	require.NoError(t, err)
+	require.Len(t, list.Items, 2)
+	require.Equal(t, api.BusinessPayoutStateStatusPaid, list.Items[0].Payout.Status)
+	require.Equal(t, "AXIS12345678", *list.Items[0].Payout.Utr)
+	require.Equal(t, api.BusinessPayoutStateStatusCarried, list.Items[1].Payout.Status)
+	require.Nil(t, list.Items[1].Payout.Utr)
+}

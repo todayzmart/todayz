@@ -148,5 +148,15 @@
     "message": "पुराने स्टेटमेंट लोड नहीं हो सके।",
     "review": "reviewed",
     "enHash": "d8e87af4"
+  },
+  "statements.status.carried": {
+    "message": "आगे ले जाया गया",
+    "review": "reviewed",
+    "enHash": "d65c9a05"
+  },
+  "statements.payout.carried": {
+    "message": "{amount} का पेआउट अगले स्टेटमेंट में जोड़ा गया।",
+    "review": "reviewed",
+    "enHash": "17e54cde"
   }
 }

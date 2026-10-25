@@ -79,7 +79,7 @@ function api(opts: { stepUp?: boolean; amountNow?: number } = {}): Api {
             kycStatus: 'verified',
             openRiskFlag: false,
             closedAt: '2026-09-30T19:00:00Z',
-            payout: { id: PID, status: state.current.status, amountPaise: state.current.amountPaise, holdReason: null, utr: state.current.utr },
+            payout: { id: PID, status: state.current.status, amountPaise: state.current.amountPaise, holdReason: null, utr: state.current.utr, carried: false },
           },
         ],
         nextCursor: null,

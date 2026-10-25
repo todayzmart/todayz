@@ -359,7 +359,7 @@ func (s *Service) computePayout(ctx context.Context, q *payoutsdb.Queries, now t
 			return ids.Zero, fmt.Errorf("payouts: payout line: %w", err)
 		}
 	}
-	if err := q.SetStatementPayout(ctx, payoutsdb.SetStatementPayoutParams{PayoutID: ids.UUID(id), ID: ids.UUID(statement)}); err != nil {
+	if err := q.SetStatementPayout(ctx, payoutsdb.SetStatementPayoutParams{PayoutID: ids.UUID(id), Amount: &amount, ID: ids.UUID(statement)}); err != nil {
 		return ids.Zero, fmt.Errorf("payouts: statement payout: %w", err)
 	}
 	r.Payouts = 1

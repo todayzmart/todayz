@@ -10,6 +10,7 @@ Claude machine-wrote the translations in `shared/i18n/messages/business/*.{hi,kn
 |---|---|---|---|
 | 2026-10-25 | founder (Rahul) | Business app Hindi, Kannada, Telugu and Tamil: all 1374 keys each (`review: reviewed`) (including the 23 W2-16 keys), then the 30 W3-09 standee keys (1404 each) | Released on the founder's instruction (25 Oct) without a native-speaker review. Argument checks pass (`lint:messages`: business 0 errors, 1404/1404 reviewed per language). Each language's uncertain strings are listed below and still need a native speaker's read. |
 | 2026-10-25 | founder (Rahul), relayed by the W2-14 lead | W3-01 B-10 monthly statements: the 30 `statements.*` keys in hi, kn, te and ta (1433 each on this branch) | Approved under the founder's 25 Oct release instruction; no native-speaker review yet. Placeholders (`{amount}`, `{date}`, `{utr}`, `{month}`) are unchanged and ₹ comes from `{amount}`. The money wording to spot-check is listed below. |
+| 2026-10-25 | founder (Rahul), relayed by the W3-01 lead | W3-01 review fix F: `statements.status.carried` and `statements.payout.carried` in hi, kn, te and ta (32 `statements.*` keys) | Same release instruction; no native-speaker review yet. `{amount}` unchanged. Wording to spot-check is in the statements table below. |
 
 `translations.mjs approve` only sets `review: reviewed` in the catalogue. This table is the record of who approved and when.
 
@@ -35,6 +36,7 @@ The 30 keys W3-01 added to `statements.en.json` (B-10 monthly statements, payout
 | `statements.status.needsKyc`, `statements.payout.needsKyc` | On hold / …on hold until your payout details are complete | hi रुका हुआ · kn ತಡೆಹಿಡಿಯಲಾಗಿದೆ · te నిలిపివేయబడింది · ta நிறுத்திவைக்கப்பட்டது | "Stopped or held". Check that it doesn't sound like money taken away. |
 | `statements.status.paid`, `statements.payout.paid` | Paid / {amount} paid on {date}. | hi भेज दिया गया / {amount} आपको भेजा गया · kn ಪಾವತಿಸಲಾಗಿದೆ · te చెల్లించబడింది · ta வழங்கப்பட்டது | The direction is TodayZ paying the shop. Hindi says "sent to you" (चुकाया गया could read as "the shop paid"). Check that kn, te and ta "paid" don't read as the shop paying. |
 | `statements.totals.reversals` | Reversed sales | hi वापस हुई बिक्री · kn ಹಿಂತಿರುಗಿಸಿದ ಮಾರಾಟಗಳು · te రివర్స్ అయిన అమ్మకాలు · ta திரும்பப் பெறப்பட்ட விற்பனைகள் | Sales returned or cancelled. Telugu transliterates "reverse". |
+| `statements.status.carried`, `statements.payout.carried` | Carried over / Payout of {amount} carried to the next statement. | hi आगे ले जाया गया / …अगले स्टेटमेंट में जोड़ा गया · kn ಮುಂದಕ್ಕೆ ಸಾಗಿಸಲಾಗಿದೆ · te ముందుకు తీసుకెళ్లబడింది · ta அடுத்ததற்கு மாற்றப்பட்டது | This month's payout was folded into next month's. Check it does not read as money lost or as a delay penalty. |
 | `statements.totals.adjustments` | Adjustments | hi सुधार · kn ಹೊಂದಾಣಿಕೆಗಳು · te సవరణలు · ta சரிசெய்தல்கள் | Admin corrections. Hindi सुधार means "corrections". |
 
 What this changes on release:

@@ -16,11 +16,13 @@ const PAYOUT = {
   processing: { pill: 'statements.status.processing', line: 'statements.payout.processing', tone: 'pending' },
   needs_kyc: { pill: 'statements.status.needsKyc', line: 'statements.payout.needsKyc', tone: 'cancelled' },
   paid: { pill: 'statements.status.paid', line: 'statements.payout.paid', tone: 'completed' },
+  carried: { pill: 'statements.status.carried', line: 'statements.payout.carried', tone: 'neutral' },
 } as const satisfies Record<string, { pill: string; line: string; tone: PillTone }>;
 
 /**
  * B-10 monthly statements (01 §9): each closed IST month with its closing balance, the payout's state
- * (processing, on hold for payout details, or paid with the UTR), the breakdown and the CSV. Owner and
+ * (processing, on hold for payout details, paid with the UTR, or carried into the next statement's
+ * payout when a later close recomputed it), the breakdown and the CSV. Owner and
  * manager; a member limited to some stores gets only those stores' totals from the server.
  */
 export function StatementsCard({ bid }: { bid: string }) {

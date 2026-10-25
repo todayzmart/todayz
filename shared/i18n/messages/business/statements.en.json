@@ -47,6 +47,14 @@
     "defaultMessage": "{amount} paid on {date}.",
     "description": "B-10 monthly statements"
   },
+  "statements.status.carried": {
+    "defaultMessage": "Carried over",
+    "description": "B-10 monthly statements: payout status pill on an earlier month whose payout a later month's close took over"
+  },
+  "statements.payout.carried": {
+    "defaultMessage": "Payout of {amount} carried to the next statement.",
+    "description": "B-10 monthly statements: this month's payout was added into the next month's payout, shown on that statement"
+  },
   "statements.payout.utr": {
     "defaultMessage": "UTR {utr}",
     "description": "B-10 monthly statements: bank transfer reference"

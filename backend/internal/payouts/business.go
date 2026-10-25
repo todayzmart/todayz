@@ -111,7 +111,15 @@ func (s *Service) businessStatement(ctx context.Context, q *payoutsdb.Queries, r
 	if r.ClosedAt != nil {
 		out.ClosedAt = r.ClosedAt.UTC()
 	}
-	if stores == nil && r.PayoutStatus != nil && r.PayoutAmount != nil && *r.PayoutStatus != statusCancelled {
+	// F: each statement shows its own payout. Once a later close recomputed
+	// (or cancelled) the payout, this statement's amount went on into it, so
+	// it reads carried with what this close computed; only the payout's last
+	// statement shows the live state.
+	switch {
+	case stores != nil || r.PayoutStatus == nil || r.PayoutAmount == nil:
+	case !r.PayoutCurrent && r.ComputedPayout != nil:
+		out.Payout = &api.BusinessPayoutState{AmountPaise: paise(*r.ComputedPayout), Status: api.BusinessPayoutStateStatusCarried}
+	case r.PayoutCurrent && *r.PayoutStatus != statusCancelled:
 		ps := &api.BusinessPayoutState{AmountPaise: paise(*r.PayoutAmount), Status: api.BusinessPayoutStateStatusProcessing}
 		switch {
 		case *r.PayoutStatus == statusPaid:

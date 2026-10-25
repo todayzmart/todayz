@@ -55,6 +55,7 @@
                     amountPaise: 267000
                     holdReason: null
                     utr: null
+                    carried: false
               nextCursor: null
               serverNow: "2026-10-25T10:00:00Z"
       default: &problem

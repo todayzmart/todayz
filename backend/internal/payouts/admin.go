@@ -116,6 +116,7 @@ func adminStatement(r payoutsdb.AdminStatementRow) api.AdminStatement {
 		out.Payout = &api.AdminPayoutBrief{
 			Id: mustID(r.PayoutID).String(), Status: api.PayoutStatus(*r.PayoutStatus),
 			AmountPaise: paise(*r.PayoutAmount), Utr: r.PayoutUtr, HoldReason: holdCause(r.PayoutHoldReason),
+			Carried: !r.PayoutCurrent,
 		}
 	}
 	return out

@@ -83,7 +83,7 @@ INSERT INTO payout_statement_lines (statement_id, store_id, kind, amount, count)
 VALUES (@statement_id, @store_id, @kind, @amount, @count);
 
 -- name: SetStatementPayout :exec
-UPDATE payout_statements SET payout_id = @payout_id WHERE id = @id;
+UPDATE payout_statements SET payout_id = @payout_id, computed_payout = @amount WHERE id = @id;
 
 ------------------------------------------------------------------------------
 -- Payout rows
@@ -221,7 +221,8 @@ SELECT ps.*, b.brand_name, b.status AS business_status,
       (f.subject_type = 'business' AND f.subject_id = b.id) OR
       (f.subject_type = 'store' AND f.subject_id IN (SELECT st.id FROM stores st WHERE st.business_id = b.id)))
   )::boolean AS open_risk_flag,
-  p.status AS payout_status, p.amount AS payout_amount, p.utr AS payout_utr, p.hold_reason AS payout_hold_reason
+  p.status AS payout_status, p.amount AS payout_amount, p.utr AS payout_utr, p.hold_reason AS payout_hold_reason,
+  (p.last_statement_id IS NOT DISTINCT FROM ps.id)::boolean AS payout_current
 FROM payout_statements ps
 JOIN businesses b ON b.id = ps.business_id
 LEFT JOIN business_kyc k ON k.business_id = ps.business_id
@@ -242,7 +243,8 @@ SELECT ps.*, b.brand_name, b.status AS business_status,
       (f.subject_type = 'business' AND f.subject_id = b.id) OR
       (f.subject_type = 'store' AND f.subject_id IN (SELECT st.id FROM stores st WHERE st.business_id = b.id)))
   )::boolean AS open_risk_flag,
-  p.status AS payout_status, p.amount AS payout_amount, p.utr AS payout_utr, p.hold_reason AS payout_hold_reason
+  p.status AS payout_status, p.amount AS payout_amount, p.utr AS payout_utr, p.hold_reason AS payout_hold_reason,
+  (p.last_statement_id IS NOT DISTINCT FROM ps.id)::boolean AS payout_current
 FROM payout_statements ps
 JOIN businesses b ON b.id = ps.business_id
 LEFT JOIN business_kyc k ON k.business_id = ps.business_id
@@ -250,10 +252,12 @@ LEFT JOIN payouts p ON p.id = ps.payout_id
 WHERE ps.id = @id;
 
 -- BusinessStatements lists a business's statements, newest period first,
--- with the payout each one computed.
+-- with the payout each one computed. payout_current is false once a later
+-- close recomputed (or cancelled) that payout: the amount was carried on.
 -- name: BusinessStatements :many
 SELECT ps.*, p.status AS payout_status, p.amount AS payout_amount, p.utr AS payout_utr, p.paid_at AS payout_paid_at,
-  p.hold_reason AS payout_hold_reason
+  p.hold_reason AS payout_hold_reason,
+  (p.last_statement_id IS NOT DISTINCT FROM ps.id)::boolean AS payout_current
 FROM payout_statements ps
 LEFT JOIN payouts p ON p.id = ps.payout_id
 WHERE ps.business_id = @business_id
@@ -263,7 +267,8 @@ LIMIT @lim;
 
 -- name: BusinessStatement :one
 SELECT ps.*, p.status AS payout_status, p.amount AS payout_amount, p.utr AS payout_utr, p.paid_at AS payout_paid_at,
-  p.hold_reason AS payout_hold_reason
+  p.hold_reason AS payout_hold_reason,
+  (p.last_statement_id IS NOT DISTINCT FROM ps.id)::boolean AS payout_current
 FROM payout_statements ps
 LEFT JOIN payouts p ON p.id = ps.payout_id
 WHERE ps.business_id = @business_id AND ps.period = @period;
