@@ -4,12 +4,12 @@
 -- A store item with what its card and preview show. available is false once
 -- the store is not live or its business not verified (D-40).
 SELECT si.id, si.price_paise, si.mrp_paise, si.product_id,
-       coalesce(si.local_name, p.name || coalesce(' ' || p.variant, ''))::text AS item_name,
+       coalesce(si.local_name, p.name || coalesce(' ' || p.variant, ''), '')::text AS item_name,
        p.mrp_paise AS product_mrp_paise,
        s.name AS store_name, s.slug AS store_slug, s.locality,
        (s.status = 'live' AND b.status = 'verified')::bool AS available
 FROM store_items si
-JOIN products p ON p.id = si.product_id
+LEFT JOIN products p ON p.id = si.product_id
 JOIN stores s ON s.id = si.store_id
 JOIN businesses b ON b.id = s.business_id
 WHERE si.id = @store_item_id;
@@ -126,7 +126,7 @@ WITH latest AS (
 SELECT m.city_place_id, c.name AS city_name,
        trim(BOTH '-' FROM regexp_replace(lower(c.name), '[^a-z0-9]+', '-', 'g'))::text AS city_slug,
        m.built_on, m.product_id, (pr.name || coalesce(' ' || pr.variant, ''))::text AS product_name,
-       (cat.names ->> 'en')::text AS category_name,
+       coalesce(cat.names ->> 'en', '')::text AS category_name,
        m.searchers, m.searches_total, m.rank, m.status, m.decided_at,
        (m.built_on = l.built_on)::bool AS is_latest,
        (a.built_on IS NOT NULL AND m.built_on = a.built_on)::bool AS is_approved

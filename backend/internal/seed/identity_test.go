@@ -55,7 +55,9 @@ func TestIdentitySeedsSealedPhones(t *testing.T) {
 	require.NoError(t, err)
 
 	var users, profiles int
-	require.NoError(t, tdb.Pool.QueryRow(ctx, `SELECT count(*) FROM users`).Scan(&users))
+	// Accounts with a phone; the asks seed adds bare shopper users (W3-16).
+	require.NoError(t, tdb.Pool.QueryRow(ctx, `SELECT count(*) FROM users u
+	  WHERE EXISTS (SELECT 1 FROM phone_identities p WHERE p.user_id = u.id)`).Scan(&users))
 	require.NoError(t, tdb.Pool.QueryRow(ctx, `SELECT count(*) FROM customer_profiles`).Scan(&profiles))
 	require.Equal(t, len(identityUsers), users)
 	require.Equal(t, 3, profiles)
@@ -78,6 +80,8 @@ func TestIdentitySkipsWithoutKeys(t *testing.T) {
 	ctx := context.Background()
 	require.NoError(t, Run(ctx, config.EnvTest, Test, Deps{DB: db.New(tdb.Pool)}))
 	var users int
-	require.NoError(t, tdb.Pool.QueryRow(ctx, `SELECT count(*) FROM users`).Scan(&users))
+	// Accounts with a phone; the asks seed adds bare shopper users (W3-16).
+	require.NoError(t, tdb.Pool.QueryRow(ctx, `SELECT count(*) FROM users u
+	  WHERE EXISTS (SELECT 1 FROM phone_identities p WHERE p.user_id = u.id)`).Scan(&users))
 	require.Zero(t, users)
 }

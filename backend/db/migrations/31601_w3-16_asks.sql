@@ -198,7 +198,8 @@ CREATE TABLE rollup_daily_ask_demand (
 CREATE INDEX ix_rollup_daily_ask_demand_store ON rollup_daily_ask_demand (store_id, date);
 
 -- New share cards per IP or anonymous device (share_card_create_per_hour,
--- 01 §11.1). key_hash is an HMAC of "ip:<ip>" or "anon:<id>", never the value;
+-- 01 §11.1). key_hash is pii.Hasher.IPLimit of the IP or an HMAC of
+-- "share:anon:<id>", never the value;
 -- rows older than two hours are deleted as new ones arrive.
 CREATE TABLE share_card_creates (
   key_hash   bytea NOT NULL,

@@ -316,14 +316,16 @@ ORDER BY 1, 2, 3;
 SELECT a.city_place_id, c.name AS city_name, a.product_id, p.name AS product_name, p.variant AS product_variant,
        (CASE WHEN a.product_id IS NULL THEN a.query_norm ELSE '' END)::text AS query_key,
        count(DISTINCT a.customer_id)::int AS customers, count(*)::int AS asks,
-       sum(a.recipients_count)::int AS shops_asked, max(a.created_at)::timestamptz AS last_asked_at
+       sum(a.recipients_count)::int AS shops_asked, max(a.created_at)::timestamptz AS last_asked_at,
+       coalesce(cat.names ->> 'en', '')::text AS category_name
 FROM asks a
 JOIN places c ON c.id = a.city_place_id
 LEFT JOIN products p ON p.id = a.product_id
+LEFT JOIN categories cat ON cat.id = p.category_id
 WHERE a.status = 'closed' AND a.created_at >= @since
   AND (sqlc.narg(city_place_id)::uuid IS NULL OR a.city_place_id = sqlc.narg(city_place_id)::uuid)
   AND NOT EXISTS (SELECT 1 FROM ask_recipients r WHERE r.ask_id = a.id AND r.answer = 'yes')
-GROUP BY 1, 2, 3, 4, 5, 6
+GROUP BY 1, 2, 3, 4, 5, 6, cat.names
 HAVING count(DISTINCT a.customer_id) >= sqlc.arg(min_customers)::int
 ORDER BY customers DESC, asks DESC, 6
 LIMIT 500;
