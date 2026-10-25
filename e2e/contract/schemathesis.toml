@@ -39,3 +39,10 @@ checks.positive_data_acceptance.expected-statuses = ["2xx", "302", "401", "403",
 [[operations]]
 include-operation-id = ["createLead"]
 checks.positive_data_acceptance.expected-statuses = ["2xx", "401", "403", "404", "409", "422", "429", "5xx"]
+
+# A share card is only for a live store of a verified business (W3-16): the coverage
+# phase sends a schema-valid storeItemId the server does not know as live, and
+# 410 share_card_unavailable is the documented answer on both share-card routes.
+[[operations]]
+include-operation-id = ["createShareCard", "getShareCard"]
+checks.positive_data_acceptance.expected-statuses = ["2xx", "401", "403", "404", "409", "410", "429", "5xx"]
