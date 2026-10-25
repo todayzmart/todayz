@@ -1,15 +1,16 @@
 {
   "name": "grounding_arithmetic",
   "input": {
+    "detector": "weekly_summary",
     "lang": "en",
     "kind": "tip",
     "title": "₹17,500 this week",
     "body": "Up 25% on the last 4 weeks, 70 bills.",
     "numbers": {
-      "amount": "₹17,500",
-      "pct": "25%",
-      "weeks": 4,
-      "bills": 70
+      "sales": "₹17,500",
+      "bills": 70,
+      "pct": 25,
+      "weeks": 4
     }
   },
   "expect": {

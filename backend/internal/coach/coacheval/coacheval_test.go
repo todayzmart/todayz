@@ -18,14 +18,16 @@ import (
 )
 
 // SC-AI-14: the recorded coach_card suite passes in full: grounded rewrites in all five
-// languages (native digits too) are used, and an invented number, a worked-out sum, a schema
-// break, a missing tool call and a refusal are rejected, so the card keeps its template.
+// languages (native digits too) are used, and an invented number, a worked-out sum, a plain
+// fact said as a percent, a schema break, a missing tool call and a refusal are rejected, so
+// the card keeps its template. Every case carries its detector's real fact shape, so a percent
+// whose key does not say so (expiry_penalty's threshold) grounds "25%" (D-230).
 func TestCoachCardRecorded(t *testing.T) {
 	s, ok := eval.Get(coach.Feature)
 	require.True(t, ok)
 	cases, err := eval.LoadCases(s, true)
 	require.NoError(t, err)
-	require.Len(t, cases, 14)
+	require.Len(t, cases, 16)
 	rp := eval.NewReplay(s.Feature, cases)
 	t.Cleanup(rp.Close)
 	hc := httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: true})
@@ -35,6 +37,6 @@ func TestCoachCardRecorded(t *testing.T) {
 	}
 	rep, err := eval.Run(context.Background(), s, cases, env, "recorded")
 	require.NoError(t, err)
-	assert.Equal(t, 14, rep.Passed, rep.Failures)
+	assert.Equal(t, 16, rep.Passed, rep.Failures)
 	assert.True(t, rep.OK)
 }

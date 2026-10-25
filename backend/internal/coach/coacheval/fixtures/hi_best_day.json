@@ -1,16 +1,17 @@
 {
   "name": "hi_best_day",
   "input": {
+    "detector": "best_day_record",
     "lang": "hi",
     "kind": "high",
     "title": "6 हफ़्तों में सबसे अच्छा रविवार",
     "body": "बिक्री ₹18,240 रही, आम रविवार से 55% ज़्यादा।",
     "numbers": {
-      "amount": "₹18,240",
-      "pct": "55%",
       "weekday": "Sunday",
       "weeks": 6,
-      "leaders": "Maggi and Amul milk"
+      "sales": "₹18,240",
+      "pct": 55,
+      "leaders": "Maggi · Amul milk"
     }
   },
   "expect": {

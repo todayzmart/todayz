@@ -67,12 +67,14 @@ type generated struct {
 }
 
 // Input is what the model sees for one card: no store name, no person.
+// Detector is not sent; it picks the units Numbers is grounded in.
 type Input struct {
-	Lang    string          `json:"lang"`
-	Kind    string          `json:"kind"`
-	Title   string          `json:"title"`
-	Body    string          `json:"body"`
-	Numbers json.RawMessage `json:"numbers"`
+	Detector string          `json:"-"`
+	Lang     string          `json:"lang"`
+	Kind     string          `json:"kind"`
+	Title    string          `json:"title"`
+	Body     string          `json:"body"`
+	Numbers  json.RawMessage `json:"numbers"`
 }
 
 // Rewrite asks the model for the card's wording and checks it. reject is ""
@@ -104,11 +106,38 @@ func Rewrite(ctx context.Context, llm client.LLM, model, ref string, in Input) (
 	}
 	out.Title, out.Body = strings.TrimSpace(out.Title), strings.TrimSpace(out.Body)
 	// Every number in the card must be one of the fact's, in its unit (11 §1 rule 6, D-230).
-	if len(schema.UngroundedFacts(out.Title+"\n"+out.Body, in.Numbers)) > 0 {
+	if len(schema.UngroundedFactsIn(out.Title+"\n"+out.Body, in.Numbers, factUnits[in.Detector])) > 0 {
 		client.RecordRejected(ctx, Feature, client.RejectGrounding)
 		return Output{}, resp, client.RejectGrounding, nil
 	}
 	return out, resp, "", nil
+}
+
+// factUnits is the unit of every number each detector's card carries (D-230), so grounding
+// does not depend on a key's name saying it: expiry_penalty's threshold is a percent ("limit
+// 30%"), which its name alone would read as a plain count. Text-only keys (item, itemA,
+// itemB, leaders, weekday) are not listed; their numbers keep their own marks.
+// TestFactUnitsCoverEveryNumber keeps this complete against the templates and the goldens.
+var factUnits = map[string]schema.Units{
+	"top_seller_low_days_of_cover": {"days": schema.Plain, "qty": schema.Plain, "sold": schema.Plain, "periodDays": schema.Plain},
+	"slow_mover_21d":               {"days": schema.Plain, "onHand": schema.Plain, "pct": schema.Percent},
+	"expiring_batch_value":         {"count": schema.Plain, "withinDays": schema.Plain},
+	"wanted_nearby":                {"searches": schema.Plain, "km": schema.Plain, "periodDays": schema.Plain},
+	"missed_sales":                 {"searches": schema.Plain, "zeroDays": schema.Plain},
+	"expired_on_shelf":             {"qty": schema.Plain, "daysAgo": schema.Plain},
+	"selling_below_cost":           {"price": schema.Money, "cost": schema.Money},
+	"stale_stock_share":            {"count": schema.Plain, "days": schema.Plain},
+	"bought_together":              {"oneIn": schema.Plain},
+	"regulars_slipping":            {"count": schema.Plain, "lapseDays": schema.Plain},
+	"missed_orders_peak_hour":      {"count": schema.Plain, "minutes": schema.Plain, "window": schema.Plain},
+	"best_day_record":              {"weeks": schema.Plain, "sales": schema.Money, "pct": schema.Percent},
+	"reviews_unanswered":           {"count": schema.Plain, "days": schema.Plain},
+	"weekly_summary":               {"sales": schema.Money, "bills": schema.Plain, "pct": schema.Percent, "weeks": schema.Plain},
+	"rating_drop":                  {"now": schema.Plain, "before": schema.Plain, "count": schema.Plain, "days": schema.Plain},
+	"accept_time_vs_benchmark":     {"mine": schema.Plain, "nearby": schema.Plain},
+	"setup_incomplete":             {},
+	"expiry_penalty": {"pct": schema.Percent, "threshold": schema.Percent, "days": schema.Plain,
+		"expired": schema.Plain, "orders": schema.Plain},
 }
 
 // writeAI returns the model's wording when the feature is on, the caps allow
@@ -122,7 +151,7 @@ func (s *Service) writeAI(ctx context.Context, storeID ids.ID, f detectors.Fact,
 	if err != nil || !on {
 		return Text{}, generated{}, false
 	}
-	in := Input{Lang: lang, Kind: string(f.Kind), Title: tpl.Title, Body: tpl.Body, Numbers: nums}
+	in := Input{Detector: f.Detector, Lang: lang, Kind: string(f.Kind), Title: tpl.Title, Body: tpl.Body, Numbers: nums}
 	ref, hash, err := missKey(f, in)
 	if err != nil {
 		return Text{}, generated{}, false

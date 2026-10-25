@@ -1,6 +1,7 @@
 {
   "name": "kn_reviews",
   "input": {
+    "detector": "reviews_unanswered",
     "lang": "kn",
     "kind": "action",
     "title": "2 ವಿಮರ್ಶೆಗಳಿಗೆ ಉತ್ತರ ಬಾಕಿ",

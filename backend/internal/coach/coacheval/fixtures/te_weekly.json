@@ -1,15 +1,16 @@
 {
   "name": "te_weekly",
   "input": {
+    "detector": "weekly_summary",
     "lang": "te",
     "kind": "tip",
     "title": "ఈ వారం ₹17,500 అమ్మకాలు",
     "body": "గత 4 వారాల కంటే 25% ఎక్కువ, 70 బిల్లులు.",
     "numbers": {
-      "amount": "₹17,500",
-      "pct": "25%",
-      "weeks": 4,
-      "bills": 70
+      "sales": "₹17,500",
+      "bills": 70,
+      "pct": 25,
+      "weeks": 4
     }
   },
   "expect": {

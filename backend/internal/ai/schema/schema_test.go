@@ -82,6 +82,16 @@ func TestUngroundedFacts(t *testing.T) {
 	}
 }
 
+// A key whose name does not say its unit takes the one the caller names.
+func TestUngroundedFactsIn(t *testing.T) {
+	facts := []byte(`{"pct":40,"threshold":30,"days":30,"n":2}`)
+	text := "40% of orders expired (limit 30%) in 30 days"
+	assert.Equal(t, []string{"30"}, UngroundedFacts(text, facts), "threshold reads as plain by its name")
+	assert.Empty(t, UngroundedFactsIn(text, facts, Units{"threshold": Percent}))
+	assert.Equal(t, []string{"40"}, UngroundedFactsIn("₹40 off", facts, Units{"threshold": Percent}), "pct is still not money")
+	assert.Empty(t, UngroundedFactsIn("2 left", facts, Units{"n": Plain}), "a named key is never skipped")
+}
+
 func TestHasDigits(t *testing.T) {
 	assert.True(t, HasDigits("x 3"))
 	assert.True(t, HasDigits("೩"))

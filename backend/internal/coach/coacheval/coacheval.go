@@ -36,15 +36,24 @@ type expect struct {
 }
 
 func run(ctx context.Context, env eval.Env, c eval.Case) (eval.Verdict, error) {
-	var in coach.Input
+	// A case's input is the card as the model sees it plus the detector, which picks
+	// the units its numbers are grounded in (and is not sent).
+	var in struct {
+		coach.Input
+		Detector string `json:"detector"`
+	}
 	var want expect
 	if err := json.Unmarshal(c.Input, &in); err != nil {
 		return eval.Verdict{}, err
 	}
+	if in.Detector == "" {
+		return eval.Verdict{}, fmt.Errorf("%s: no detector", c.Name)
+	}
+	in.Input.Detector = in.Detector
 	if err := json.Unmarshal(c.Expect, &want); err != nil {
 		return eval.Verdict{}, err
 	}
-	got, _, reject, err := coach.Rewrite(ctx, env.LLM, env.Model(settings.AiModelFast), c.Name, in)
+	got, _, reject, err := coach.Rewrite(ctx, env.LLM, env.Model(settings.AiModelFast), c.Name, in.Input)
 	if err != nil {
 		return eval.Verdict{}, err
 	}

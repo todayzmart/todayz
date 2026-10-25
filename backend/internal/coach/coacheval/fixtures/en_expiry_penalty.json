@@ -1,13 +1,14 @@
 {
   "name": "en_expiry_penalty",
   "input": {
+    "detector": "expiry_penalty",
     "lang": "en",
     "kind": "action",
     "title": "Orders are expiring",
-    "body": "40 in 1000 orders expired unaccepted in 30 days; the limit is 30.",
+    "body": "40% of your orders expired unaccepted in the last 30 days (limit 25%). Shops above it show lower in search.",
     "numbers": {
-      "rate": 40,
-      "threshold": 30,
+      "pct": 40,
+      "threshold": 25,
       "days": 30
     }
   },
@@ -26,7 +27,7 @@
         "name": "write_coach_card",
         "input": {
           "title": "Too many orders expire unaccepted",
-          "body": "In the last 30 days 40 in 1000 orders were not accepted in time, above the limit of 30. Turn on auto-accept."
+          "body": "In the last 30 days 40 in 1000 orders were not accepted in time, above the 25% limit. Turn on auto-accept."
         }
       }
     ],

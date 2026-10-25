@@ -1,13 +1,15 @@
 {
   "name": "no_tool_call",
   "input": {
+    "detector": "weekly_summary",
     "lang": "en",
     "kind": "tip",
     "title": "₹17,500 this week",
     "body": "Up 25% on the last 4 weeks.",
     "numbers": {
-      "amount": "₹17,500",
-      "pct": "25%",
+      "sales": "₹17,500",
+      "bills": 70,
+      "pct": 25,
       "weeks": 4
     }
   },

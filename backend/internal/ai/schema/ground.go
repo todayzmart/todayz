@@ -197,18 +197,29 @@ func (g grounds) has(x unitNumber) bool {
 	return g[Plain][x.n] || g[Percent][x.n] || g[Money][x.n]
 }
 
-func (g grounds) walk(key string, v any) {
+// Units names the unit of fact keys whose names do not say it ("threshold" is a percent).
+// A key listed here takes that unit and is never skipped; any other key is read by keyUnit.
+type Units map[string]Unit
+
+func (us Units) of(key string) (Unit, bool) {
+	if u, ok := us[key]; ok {
+		return u, false
+	}
+	return keyUnit(key)
+}
+
+func (g grounds) walk(us Units, key string, v any) {
 	switch t := v.(type) {
 	case map[string]any:
 		for k, x := range t {
-			g.walk(k, x)
+			g.walk(us, k, x)
 		}
 	case []any:
 		for _, x := range t {
-			g.walk(key, x)
+			g.walk(us, key, x)
 		}
 	case json.Number:
-		u, skip := keyUnit(key)
+		u, skip := us.of(key)
 		if skip {
 			return
 		}
@@ -216,7 +227,7 @@ func (g grounds) walk(key string, v any) {
 			g.add(fromPaise(key, c), u)
 		}
 	case string:
-		u, skip := keyUnit(key)
+		u, skip := us.of(key)
 		if skip {
 			return
 		}
@@ -255,6 +266,12 @@ func fromPaise(key, c string) string {
 // money fact; a plain number may match any fact. extra are free strings the model was given
 // (a review's text), whose numbers carry their own marks.
 func UngroundedFacts(text string, facts []byte, extra ...string) []string {
+	return UngroundedFactsIn(text, facts, nil, extra...)
+}
+
+// UngroundedFactsIn is UngroundedFacts with the units of keys a caller names (us), for
+// facts whose key names do not carry their unit.
+func UngroundedFactsIn(text string, facts []byte, us Units, extra ...string) []string {
 	g := grounds{}
 	if len(bytes.TrimSpace(facts)) > 0 {
 		dec := json.NewDecoder(bytes.NewReader(facts))
@@ -263,7 +280,7 @@ func UngroundedFacts(text string, facts []byte, extra ...string) []string {
 		if dec.Decode(&v) != nil {
 			return Numbers(text) // facts that do not parse ground nothing
 		}
-		g.walk("", v)
+		g.walk(us, "", v)
 	}
 	for _, s := range extra {
 		for _, x := range numbersWithUnits(s) {

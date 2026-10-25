@@ -1,14 +1,15 @@
 {
   "name": "ta_missed",
   "input": {
+    "detector": "missed_orders_peak_hour",
     "lang": "ta",
     "kind": "low",
     "title": "3 ஆர்டர்கள் தவறின",
     "body": "7–9 pm இடையே 3 ஆர்டர்கள் 10 நிமிடத்தில் ஏற்கப்படவில்லை.",
     "numbers": {
       "count": 3,
-      "hours": "7–9 pm",
-      "minutes": 10
+      "minutes": 10,
+      "window": "7–9 pm"
     }
   },
   "expect": {
