@@ -23,9 +23,9 @@ import (
 // view that subject (the subject's own view action decides).
 
 // subjectView is the action that lets a caller see a subject, and so its
-// history. A subject type missing here is refused (business: A-02 has no
-// view action yet).
+// history. A subject type missing here is refused.
 var subjectView = map[api.AdminAuditSubjectType]string{
+	api.AdminAuditSubjectTypeBusiness:        policy.AdminBusinessView,
 	api.AdminAuditSubjectTypeOrder:           policy.AdminOrderView,
 	api.AdminAuditSubjectTypeUser:            policy.AdminCustomerView,
 	api.AdminAuditSubjectTypeStore:           policy.AdminStoreView,

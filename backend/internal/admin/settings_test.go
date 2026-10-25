@@ -46,3 +46,13 @@ func TestSettingValue(t *testing.T) {
 	require.NoError(t, err)
 	require.JSONEq(t, `"1.4.0"`, string(got))
 }
+
+func TestNoPhone(t *testing.T) {
+	for _, s := range []string{"9876543210", "call +91 98765 43210", "+919876543210.", "ph 098765-43210"} {
+		require.Error(t, noPhone("body.reason", s), s)
+	}
+	// Order numbers, amounts, PIN codes and dates stay allowed.
+	for _, s := range []string{"order TZ-48213 was the shop's mistake", "refund 1234567890 paise", "pincode 560011", "on 2026-10-24", "5 no-shows in 30 days"} {
+		require.NoError(t, noPhone("body.reason", s), s)
+	}
+}

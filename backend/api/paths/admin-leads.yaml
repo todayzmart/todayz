@@ -1,12 +1,79 @@
-# Paths: domain "admin-leads" (owner W3-05): admin leads (04 §2.7).
+# Paths: domain "admin-leads" (owner W3-05): the Leads tab on A-03 (04 §2.7).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-leads]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-leads.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Field agents, support, admin and super_admin list the site's shop leads and move them new →
+# contacted → closed; each move is audited. The phone shows masked. Roles per operation are in
+# internal/platform/authz/policy/admin.go.
+/v1/admin/leads:
+  get:
+    operationId: listAdminLeads
+    tags: [admin-leads]
+    summary: Shop leads, newest first
+    parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: ../schemas/admin-leads.yaml#/AdminLeadStatus
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Leads
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-leads.yaml#/AdminLeadList
+            example:
+              items:
+                - id: 01JB0SQD1A2B3C4D5E6F7G8H9J
+                  name: Ravi
+                  shopName: Ravi Medicals
+                  city: Mysuru
+                  source: site
+                  phoneMasked: "98•••••210"
+                  status: new
+                  statusChangedAt: null
+                  createdAt: "2026-10-23T08:00:00Z"
+              nextCursor: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/leads/{leadId}/status:
+  parameters:
+    - name: leadId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: setAdminLeadStatus
+    tags: [admin-leads]
+    summary: Move a lead (audited)
+    description: Any status to any other; setting the status it already has is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-leads.yaml#/AdminLeadStatusChange
+          example:
+            status: contacted
+            note: Called; visiting on Monday
+    responses:
+      "200":
+        description: The lead after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-leads.yaml#/AdminLead
+            example:
+              id: 01JB0SQD1A2B3C4D5E6F7G8H9J
+              name: Ravi
+              shopName: Ravi Medicals
+              city: Mysuru
+              source: site
+              phoneMasked: "98•••••210"
+              status: contacted
+              statusChangedAt: "2026-10-24T11:00:00Z"
+              createdAt: "2026-10-23T08:00:00Z"
+      default: *problem

@@ -10,7 +10,7 @@ const base = `/v1/admin/customers/${CUSTOMER_ID}`;
 function api(): Handler {
   let current = customer();
   return (c) => {
-    if (c.path === '/v1/admin/customers' && c.method === 'GET') {
+    if (c.path === '/v1/admin/customer-search' && c.method === 'POST') {
       const { id, name, phoneMasked, status, activeStrikes, createdAt } = current;
       return json(200, { items: [{ id, name, phoneMasked, status, activeStrikes, createdAt }], serverNow: current.serverNow });
     }
@@ -55,7 +55,9 @@ describe('A-06 customers', () => {
     const table = await screen.findByRole('table', { name: 'Search results' });
     expect(within(table).getByRole('link', { name: 'Meera K' })).toHaveAttribute('href', `/customers/${CUSTOMER_ID}`);
     expect(within(table).getByText('98•••••210')).toBeInTheDocument();
-    expect(calls.find((c) => c.path === '/v1/admin/customers')?.search).toBe('?phone=9876543210');
+    const sent = calls.find((c) => c.path === '/v1/admin/customer-search');
+    expect(sent?.body).toEqual({ phone: '9876543210' });
+    expect(calls.every((c) => !`${c.path}${c.search}`.includes('9876543210'))).toBe(true);
     expect(router.state.location.href).toBe('/customers');
   });
 
@@ -64,7 +66,7 @@ describe('A-06 customers', () => {
     fireEvent.change(await screen.findByLabelText('Phone number'), { target: { value: '12345' } });
     fireEvent.click(screen.getByRole('button', { name: 'Search' }));
     expect(await screen.findByText('Enter a 10-digit Indian mobile number.')).toBeInTheDocument();
-    expect(calls.some((c) => c.path === '/v1/admin/customers')).toBe(false);
+    expect(calls.some((c) => c.path === '/v1/admin/customer-search')).toBe(false);
   });
 
   it('support may reset strikes, with a reason, but not block', async () => {
@@ -114,6 +116,23 @@ describe('A-06 customers', () => {
     fireEvent.click(within(dialog).getByRole('button', { name: 'Sign out' }));
     expect(await screen.findByText('Not signed in anywhere.')).toBeInTheDocument();
     expect(calls.some((c) => c.method === 'DELETE' && c.path === `${base}/sessions/01JSESS0000000000000000E01`)).toBe(true);
+  });
+
+  it('an admin account offers no block, strike reset or sign-out', async () => {
+    const admin = customer({ isAdmin: true, sessions: [] });
+    renderAt(`/customers/${CUSTOMER_ID}`, { roles: ['super_admin'], handlers: [(c) => (c.path === base ? json(200, admin) : undefined), api()] });
+    expect(await screen.findByText(/This is an admin account/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Block' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Reset strikes' })).not.toBeInTheDocument();
+    expect(screen.getByText("An admin account's devices are not shown here.")).toBeInTheDocument();
+  });
+
+  it('a staff-only account cannot be blocked here', async () => {
+    const staff = customer({ isCustomer: false });
+    renderAt(`/customers/${CUSTOMER_ID}`, { roles: ['admin'], handlers: [(c) => (c.path === base ? json(200, staff) : undefined), api()] });
+    expect(await screen.findByText(/no customer profile/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Block' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Reset strikes' })).toBeInTheDocument();
   });
 
   it('a missing customer says so', async () => {

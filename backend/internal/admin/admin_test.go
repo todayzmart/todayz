@@ -6,6 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	api "github.com/todayz/backend/gen/api/admin-audit"
+	"github.com/todayz/backend/internal/platform/authz/policy"
 	"github.com/todayz/backend/internal/platform/ids"
 )
 
@@ -46,8 +48,11 @@ func TestCleanReason(t *testing.T) {
 }
 
 func TestEverySubjectTypeHasAViewOrIsRefused(t *testing.T) {
-	// business has no view action yet (A-02): refused, never unchecked.
-	_, ok := subjectView["business"]
-	require.False(t, ok)
-	require.Len(t, subjectView, 8)
+	// Every subject a panel can show has the action that views it; the A-03
+	// queue's view covers business.
+	for _, typ := range []api.AdminAuditSubjectType{"order", "user", "store", "business", "review", "banner", "lead", "platform_setting", "admin_user"} {
+		require.Contains(t, subjectView, typ)
+	}
+	require.Equal(t, policy.AdminBusinessView, subjectView["business"])
+	require.Len(t, subjectView, 9)
 }

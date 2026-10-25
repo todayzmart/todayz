@@ -39,7 +39,14 @@ export const ACTION_ROLES = {
   customerBlock: ADMINS,
   strikesReset: SUPPORT_UP,
   orderCancel: SUPPORT_UP,
+  reviewModerate: SUPPORT_UP,
   auditLog: ADMINS,
+  businessView: SUPPORT_UP,
+  businessVerify: ADMINS,
+  kycReveal: ADMINS,
+  storeReview: ADMINS,
+  storeEdit: ADMINS,
+  leads: ['field_agent', ...SUPPORT_UP],
 } as const satisfies Record<string, readonly Role[]>;
 export type Action = keyof typeof ACTION_ROLES;
 

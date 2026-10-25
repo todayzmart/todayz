@@ -15,6 +15,11 @@ const (
 	// orders (A-07)
 	AdminOrderView = "admin.order.view" // search, detail with timeline
 
+	// businesses (A-03); KYC verification is admin and super_admin only (01 §13)
+	AdminBusinessView   = "admin.business.view"   // queue, detail with KYC masked
+	AdminBusinessVerify = "admin.business.verify" // verify, request info, reject, suspend, reinstate, KYC and document review
+	AdminKycReveal      = "admin.kyc.reveal"      // open one KYC field in full; audited
+
 	// stores (A-05)
 	AdminStoreView   = "admin.store.view"   // list, detail
 	AdminStoreReview = "admin.store.review" // a new store at a verified business: approve or send back (D-40)
@@ -60,6 +65,10 @@ func init() {
 		{Name: AdminStrikesReset, Kind: authz.KindAdmin, Grants: support, Doc: "POST .../customers/{customerId}/strikes/reset, .../stores/{sid}/strikes/reset: with a reason, audited (D-41)"},
 
 		{Name: AdminOrderView, Kind: authz.KindAdmin, Grants: support, Doc: "GET /v1/admin/orders, /v1/admin/orders/{orderId} (A-07)"},
+
+		{Name: AdminBusinessView, Kind: authz.KindAdmin, Grants: support, Doc: "GET /v1/admin/businesses, /v1/admin/businesses/{businessId} (A-03; support read-only)"},
+		{Name: AdminBusinessVerify, Kind: authz.KindAdmin, Grants: admins, Doc: "POST .../businesses/{businessId}/verify, /request-info, /reject, /suspend, /reinstate, /kyc/review, /documents/{docId}/review: audited"},
+		{Name: AdminKycReveal, Kind: authz.KindAdmin, Grants: admins, Doc: "POST .../businesses/{businessId}/kyc/reveal: one field in full, never stored by the client; audited"},
 
 		{Name: AdminStoreView, Kind: authz.KindAdmin, Grants: support, Doc: "GET /v1/admin/stores, /v1/admin/stores/{sid} (A-05)"},
 		{Name: AdminStoreReview, Kind: authz.KindAdmin, Grants: admins, Doc: "POST /v1/admin/stores/{sid}/review: pending_review to live, or back with a note (D-40); audited"},

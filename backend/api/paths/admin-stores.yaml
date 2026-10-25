@@ -1,12 +1,422 @@
-# Paths: domain "admin-stores" (owner W3-05): admin stores (04 §2.7).
+# Paths: domain "admin-stores" (owner W3-05): A-05 Stores (04 §2.7, D-40, D-41).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-stores]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-stores.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# `support` lists, opens and resets a store's strikes; `admin` and `super_admin` review a new store,
+# move its pin or hours and force-close it. Every change is audited with its reason. Roles per
+# operation are in internal/platform/authz/policy/admin.go.
+/v1/admin/stores:
+  get:
+    operationId: listAdminStores
+    tags: [admin-stores]
+    summary: Stores, newest first
+    description: >-
+      `status` narrows to one store status (`pending_review` is the Review tab); `city` is an exact,
+      case-insensitive match.
+    parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: ../schemas/admin-stores.yaml#/AdminStoreStatus
+      - name: city
+        in: query
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Stores
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-stores.yaml#/AdminStoreList
+            example:
+              items:
+                - id: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  name: Annapurna Kirana
+                  businessId: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+                  businessName: Annapurna Kirana
+                  businessStatus: verified
+                  status: pending_review
+                  locality: Jayanagar
+                  city: Bengaluru
+                  closedUntil: null
+                  activeStrikes: 0
+                  reliabilityScore: null
+                  createdAt: "2026-10-18T09:00:00Z"
+              nextCursor: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/stores/{storeId}:
+  parameters:
+    - name: storeId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getAdminStore
+    tags: [admin-stores]
+    summary: One store with address, hours, reliability and strikes
+    responses:
+      "200":
+        description: The store
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-stores.yaml#/AdminStore
+            example:
+              id: 01JB0SST1A2B3C4D5E6F7G8H9J
+              name: Annapurna Kirana
+              businessId: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+              businessName: Annapurna Kirana
+              businessStatus: verified
+              status: live
+              addressLine1: 12, 4th Cross
+              addressLine2: null
+              landmark: Near the temple
+              locality: Jayanagar
+              city: Bengaluru
+              pincode: "560041"
+              location:
+                lat: 12.925
+                lng: 77.583
+              hours:
+                weekly:
+                  mon: [{open: "09:00", close: "21:00"}]
+                holidays: []
+              closedUntil: null
+              reviewNote: null
+              liveAt: "2026-10-20T10:00:00Z"
+              reviewedAt: "2026-10-20T10:00:00Z"
+              ratingAvg: 4.4
+              ratingCount: 38
+              acceptRate30d: 0.96
+              unacceptedExpiryRate30d: 0.02
+              reliabilityScore: 0.91
+              reliabilityComputedAt: "2026-10-24T02:00:00Z"
+              activeStrikes: 1
+              strikes: []
+              createdAt: "2026-10-18T09:00:00Z"
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+  patch:
+    operationId: updateAdminStore
+    tags: [admin-stores]
+    summary: Move a store's pin or change its hours (audited)
+    description: >-
+      With a reason. Hours follow the business app's rules (at most 4 ranges a day, not overlapping);
+      a broken rule is `422 validation_failed` naming the field.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-stores.yaml#/AdminStoreUpdate
+          example:
+            reason: Owner called; the pin was on the next street
+            location:
+              lat: 12.925
+              lng: 77.583
+    responses:
+      "200":
+        description: The store after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-stores.yaml#/AdminStore
+            example:
+              id: 01JB0SST1A2B3C4D5E6F7G8H9J
+              name: Annapurna Kirana
+              businessId: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+              businessName: Annapurna Kirana
+              businessStatus: verified
+              status: live
+              addressLine1: 12, 4th Cross
+              addressLine2: null
+              landmark: Near the temple
+              locality: Jayanagar
+              city: Bengaluru
+              pincode: "560041"
+              location:
+                lat: 12.925
+                lng: 77.583
+              hours:
+                weekly:
+                  mon: [{open: "09:00", close: "21:00"}]
+                holidays: []
+              closedUntil: null
+              reviewNote: null
+              liveAt: "2026-10-20T10:00:00Z"
+              reviewedAt: "2026-10-20T10:00:00Z"
+              ratingAvg: 4.4
+              ratingCount: 38
+              acceptRate30d: 0.96
+              unacceptedExpiryRate30d: 0.02
+              reliabilityScore: 0.91
+              reliabilityComputedAt: "2026-10-24T02:00:00Z"
+              activeStrikes: 1
+              strikes: []
+              createdAt: "2026-10-18T09:00:00Z"
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/stores/{storeId}/review:
+  parameters:
+    - name: storeId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: reviewAdminStore
+    tags: [admin-stores]
+    summary: Approve a new store or send it back (audited)
+    description: >-
+      From `pending_review` (D-40). Approve makes the store `live`, and needs its business `verified` (a first store goes live with the business on A-03). Send back returns it to `draft` with a note for the owner. Any other status, or approving at a business that is not verified, is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-stores.yaml#/AdminStoreReviewRequest
+          example:
+            decision: approve
+    responses:
+      "200":
+        description: The store after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-stores.yaml#/AdminStore
+            example:
+              id: 01JB0SST1A2B3C4D5E6F7G8H9J
+              name: Annapurna Kirana
+              businessId: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+              businessName: Annapurna Kirana
+              businessStatus: verified
+              status: live
+              addressLine1: 12, 4th Cross
+              addressLine2: null
+              landmark: Near the temple
+              locality: Jayanagar
+              city: Bengaluru
+              pincode: "560041"
+              location:
+                lat: 12.925
+                lng: 77.583
+              hours:
+                weekly:
+                  mon: [{open: "09:00", close: "21:00"}]
+                holidays: []
+              closedUntil: null
+              reviewNote: null
+              liveAt: "2026-10-20T10:00:00Z"
+              reviewedAt: "2026-10-20T10:00:00Z"
+              ratingAvg: 4.4
+              ratingCount: 38
+              acceptRate30d: 0.96
+              unacceptedExpiryRate30d: 0.02
+              reliabilityScore: 0.91
+              reliabilityComputedAt: "2026-10-24T02:00:00Z"
+              activeStrikes: 1
+              strikes: []
+              createdAt: "2026-10-18T09:00:00Z"
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/stores/{storeId}/force-close:
+  parameters:
+    - name: storeId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: forceCloseAdminStore
+    tags: [admin-stores]
+    summary: Close a store until a time (audited)
+    description: >-
+      With a reason. The store shows closed and takes no orders until `until`, which must be in the future. Open orders are not cancelled.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-stores.yaml#/AdminStoreForceClose
+          example:
+            reason: Health inspection
+            until: "2026-10-25T09:00:00Z"
+    responses:
+      "200":
+        description: The store after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-stores.yaml#/AdminStore
+            example:
+              id: 01JB0SST1A2B3C4D5E6F7G8H9J
+              name: Annapurna Kirana
+              businessId: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+              businessName: Annapurna Kirana
+              businessStatus: verified
+              status: live
+              addressLine1: 12, 4th Cross
+              addressLine2: null
+              landmark: Near the temple
+              locality: Jayanagar
+              city: Bengaluru
+              pincode: "560041"
+              location:
+                lat: 12.925
+                lng: 77.583
+              hours:
+                weekly:
+                  mon: [{open: "09:00", close: "21:00"}]
+                holidays: []
+              closedUntil: "2026-10-25T09:00:00Z"
+              reviewNote: null
+              liveAt: "2026-10-20T10:00:00Z"
+              reviewedAt: "2026-10-20T10:00:00Z"
+              ratingAvg: 4.4
+              ratingCount: 38
+              acceptRate30d: 0.96
+              unacceptedExpiryRate30d: 0.02
+              reliabilityScore: 0.91
+              reliabilityComputedAt: "2026-10-24T02:00:00Z"
+              activeStrikes: 1
+              strikes: []
+              createdAt: "2026-10-18T09:00:00Z"
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/stores/{storeId}/reopen:
+  parameters:
+    - name: storeId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: reopenAdminStore
+    tags: [admin-stores]
+    summary: Lift a store's closure early (audited)
+    description: >-
+      With a reason. Clears the closure (an admin force-close or the owner's own); a store that is not closed is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-stores.yaml#/AdminStoreChange
+          example:
+            reason: Inspection passed
+    responses:
+      "200":
+        description: The store after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-stores.yaml#/AdminStore
+            example:
+              id: 01JB0SST1A2B3C4D5E6F7G8H9J
+              name: Annapurna Kirana
+              businessId: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+              businessName: Annapurna Kirana
+              businessStatus: verified
+              status: live
+              addressLine1: 12, 4th Cross
+              addressLine2: null
+              landmark: Near the temple
+              locality: Jayanagar
+              city: Bengaluru
+              pincode: "560041"
+              location:
+                lat: 12.925
+                lng: 77.583
+              hours:
+                weekly:
+                  mon: [{open: "09:00", close: "21:00"}]
+                holidays: []
+              closedUntil: null
+              reviewNote: null
+              liveAt: "2026-10-20T10:00:00Z"
+              reviewedAt: "2026-10-20T10:00:00Z"
+              ratingAvg: 4.4
+              ratingCount: 38
+              acceptRate30d: 0.96
+              unacceptedExpiryRate30d: 0.02
+              reliabilityScore: 0.91
+              reliabilityComputedAt: "2026-10-24T02:00:00Z"
+              activeStrikes: 1
+              strikes: []
+              createdAt: "2026-10-18T09:00:00Z"
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem
+/v1/admin/stores/{storeId}/strikes/reset:
+  parameters:
+    - name: storeId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: resetAdminStoreStrikes
+    tags: [admin-stores]
+    summary: Reset a store's strikes (audited)
+    description: >-
+      Marks every strike not yet reset as reset, with the reason and the admin (D-41). The reliability job recounts them on its next run. No strike to reset is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-stores.yaml#/AdminStoreChange
+          example:
+            reason: The dispatch timeouts were a rider outage
+    responses:
+      "200":
+        description: The store after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-stores.yaml#/AdminStore
+            example:
+              id: 01JB0SST1A2B3C4D5E6F7G8H9J
+              name: Annapurna Kirana
+              businessId: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+              businessName: Annapurna Kirana
+              businessStatus: verified
+              status: live
+              addressLine1: 12, 4th Cross
+              addressLine2: null
+              landmark: Near the temple
+              locality: Jayanagar
+              city: Bengaluru
+              pincode: "560041"
+              location:
+                lat: 12.925
+                lng: 77.583
+              hours:
+                weekly:
+                  mon: [{open: "09:00", close: "21:00"}]
+                holidays: []
+              closedUntil: null
+              reviewNote: null
+              liveAt: "2026-10-20T10:00:00Z"
+              reviewedAt: "2026-10-20T10:00:00Z"
+              ratingAvg: 4.4
+              ratingCount: 38
+              acceptRate30d: 0.96
+              unacceptedExpiryRate30d: 0.02
+              reliabilityScore: 0.91
+              reliabilityComputedAt: "2026-10-24T02:00:00Z"
+              activeStrikes: 0
+              strikes: []
+              createdAt: "2026-10-18T09:00:00Z"
+              serverNow: "2026-10-24T11:00:00Z"
+      default: *problem

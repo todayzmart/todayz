@@ -82,6 +82,25 @@ func settingGroup(key string) api.AdminSettingGroup {
 func moneyUnit(unit string) bool { return unit == "paise" || unit == "bp" || unit == "credits" }
 
 // semver is the form min_client_version_* takes (the apps compare it).
+// unitRange is the widest value any key of a unit may take, whatever its own min and max say: a
+// timer is at least a minute and at most a week, an hour count a year, a day count ten years, and
+// every other number fits an int32 column (W3-05 review). 30503 gives each key its own range
+// inside these.
+var unitRange = map[string][2]int64{
+	"minutes": {1, 10080},         //settings:ok unit cap (one week)
+	"hours":   {1, 8760},          //settings:ok unit cap (one year)
+	"days":    {1, 3650},          //settings:ok unit cap (ten years)
+	"bp":      {0, 10000},         //settings:ok unit cap (100%)
+	"count":   {0, math.MaxInt32}, //settings:ok unit cap (int32)
+	"credits": {0, math.MaxInt32}, //settings:ok unit cap (int32)
+	"paise":   {0, math.MaxInt32}, //settings:ok unit cap (int32)
+	"meters":  {0, math.MaxInt32}, //settings:ok unit cap (int32)
+}
+
+// aiModels are the model ids ai_model_fast and ai_model_smart may name; a typo would break every
+// AI call (W3-05 review). A new model is added here with a code review.
+var aiModels = []string{"claude-haiku-5-5", "claude-sonnet-5-5", "claude-opus-5-5"}
+
 var semver = regexp.MustCompile(`^(0|[1-9][0-9]{0,3})\.(0|[1-9][0-9]{0,3})\.(0|[1-9][0-9]{0,3})$`)
 
 // canEdit says whether p's roles may change a setting of this unit; a stale
@@ -202,7 +221,14 @@ func settingValue(key, unit string, lo, hi *int64, v any) (json.RawMessage, erro
 		if strings.HasPrefix(key, "min_client_version") && !semver.MatchString(t) {
 			return nil, bad("must be a version like 1.4.0")
 		}
+		if strings.HasPrefix(key, "ai_model_") && !slices.Contains(aiModels, t) {
+			return nil, bad("must be one of " + strings.Join(aiModels, ", "))
+		}
 		return json.Marshal(t)
+	}
+	wide, ok := unitRange[unit]
+	if !ok {
+		return nil, bad("this unit cannot be edited here")
 	}
 	f, ok := v.(float64)
 	if !ok {
@@ -220,6 +246,9 @@ func settingValue(key, unit string, lo, hi *int64, v any) (json.RawMessage, erro
 		return nil, bad("must be a whole number")
 	}
 	n := int64(f)
+	if n < wide[0] || n > wide[1] {
+		return nil, bad("outside the allowed range")
+	}
 	if lo != nil && n < *lo {
 		return nil, bad("below the minimum")
 	}

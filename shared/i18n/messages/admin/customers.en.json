@@ -195,6 +195,18 @@
     "defaultMessage": "Not signed in anywhere.",
     "description": "Empty sessions table"
   },
+  "customers.sessions.admin": {
+    "defaultMessage": "An admin account's devices are not shown here.",
+    "description": "Sessions table of an admin account (they are managed from Admin users)"
+  },
+  "customers.adminAccount": {
+    "defaultMessage": "This is an admin account. Disable it from Admin users; it cannot be blocked, struck off or signed out here.",
+    "description": "Notice on the detail of an admin account"
+  },
+  "customers.notCustomer": {
+    "defaultMessage": "This account has no customer profile (shop staff only), so it cannot be blocked here.",
+    "description": "Notice on the detail of an account that is not a customer"
+  },
   "customers.orders": {
     "defaultMessage": "Recent orders",
     "description": "Heading of the recent orders card"

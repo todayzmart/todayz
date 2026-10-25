@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"math"
 	"sync"
 	"time"
 
@@ -337,14 +338,19 @@ func (c *Cache) Duration(ctx context.Context, key Key) (time.Duration, error) {
 	if err != nil {
 		return 0, err
 	}
+	step := 24 * time.Hour
 	switch u {
 	case UnitMinutes:
-		return time.Duration(n) * time.Minute, nil
+		step = time.Minute
 	case UnitHours:
-		return time.Duration(n) * time.Hour, nil
-	default:
-		return time.Duration(n) * 24 * time.Hour, nil
+		step = time.Hour
 	}
+	// A value past what time.Duration holds (about 292 years) would wrap to garbage; a negative one
+	// would put every deadline in the past. Neither is a duration.
+	if n < 0 || n > int64(math.MaxInt64/step) {
+		return 0, fmt.Errorf("%w: %s is out of range", ErrBadValue, key)
+	}
+	return time.Duration(n) * step, nil
 }
 
 // Bool reads an on/off flag.

@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { NAV } from '../../shell/nav';
 import { renderAt } from '../../test/render';
@@ -26,13 +26,16 @@ describe('role-aware sidebar (D-64)', () => {
     expect(screen.getByText(/Your roles: Support, Finance\./)).toBeInTheDocument();
   });
 
-  it('a field agent lands on no access at Pulse but sees their sections', async () => {
-    renderAt('/', { roles: ['field_agent'] });
-    expect(await screen.findByRole('heading', { name: "You don't have access to this screen" })).toBeInTheDocument();
+  it('a field agent starts at Businesses (Pulse is not theirs) and sees no access on a hidden screen', async () => {
+    const { router, unmount } = renderAt('/', { roles: ['field_agent'] });
+    await waitFor(() => expect(router.state.location.pathname).toBe('/businesses'));
     const side = await sidebar();
-    expect(side.getByRole('link', { name: 'Businesses' })).toBeInTheDocument();
-    expect(side.getByRole('link', { name: 'Demand' })).toBeInTheDocument();
-    expect(side.queryByRole('link', { name: 'Pulse' })).not.toBeInTheDocument();
+    expect(side.getAllByRole('link').map((l) => l.textContent)).toEqual(['Businesses', 'Demand']);
+    unmount();
+
+    renderAt('/orders', { roles: ['field_agent'] });
+    expect(await screen.findByRole('heading', { name: "You don't have access to this screen" })).toBeInTheDocument();
+    expect(screen.getByText('Your roles: Field agent. Ask a super admin if you need this screen.')).toBeInTheDocument();
   });
 
   it('an account with no role sees nothing to open', async () => {

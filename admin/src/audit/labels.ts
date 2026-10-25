@@ -24,6 +24,46 @@ export function useActionLabel() {
           return intl.formatMessage({ id: 'audit.action.sessionRevoke' });
         case 'order.admin_cancel':
           return intl.formatMessage({ id: 'audit.action.orderCancel' });
+        case 'review.hide':
+          return intl.formatMessage({ id: 'audit.action.reviewHide' });
+        case 'review.restore':
+          return intl.formatMessage({ id: 'audit.action.reviewRestore' });
+        case 'review.reply_hide':
+          return intl.formatMessage({ id: 'audit.action.replyHide' });
+        case 'review.reply_restore':
+          return intl.formatMessage({ id: 'audit.action.replyRestore' });
+        case 'review.report_resolve':
+          return intl.formatMessage({ id: 'audit.action.reportResolve' });
+        case 'business.verify':
+          return intl.formatMessage({ id: 'audit.action.businessVerify' });
+        case 'business.request_info':
+          return intl.formatMessage({ id: 'audit.action.businessRequestInfo' });
+        case 'business.reject':
+          return intl.formatMessage({ id: 'audit.action.businessReject' });
+        case 'business.suspend':
+          return intl.formatMessage({ id: 'audit.action.businessSuspend' });
+        case 'business.reinstate':
+          return intl.formatMessage({ id: 'audit.action.businessReinstate' });
+        case 'business.kyc_review':
+          return intl.formatMessage({ id: 'audit.action.kycReview' });
+        case 'business.kyc_reveal':
+          return intl.formatMessage({ id: 'audit.action.kycReveal' });
+        case 'business.document_review':
+          return intl.formatMessage({ id: 'audit.action.documentReview' });
+        case 'store.update':
+          return intl.formatMessage({ id: 'audit.action.storeUpdate' });
+        case 'store.force_close':
+          return intl.formatMessage({ id: 'audit.action.storeForceClose' });
+        case 'store.reopen':
+          return intl.formatMessage({ id: 'audit.action.storeReopen' });
+        case 'store.approve':
+          return intl.formatMessage({ id: 'audit.action.storeApprove' });
+        case 'store.send_back':
+          return intl.formatMessage({ id: 'audit.action.storeSendBack' });
+        case 'store.strikes_reset':
+          return intl.formatMessage({ id: 'audit.action.storeStrikesReset' });
+        case 'lead.status':
+          return intl.formatMessage({ id: 'audit.action.leadStatus' });
         case SETTINGS_UPDATE:
           return intl.formatMessage({ id: 'audit.action.settingsUpdate' });
         default:

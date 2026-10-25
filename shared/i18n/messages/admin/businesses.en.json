@@ -1,0 +1,566 @@
+{
+  "businesses.sub": {
+    "defaultMessage": "Verify new businesses, ask for missing details, and suspend or reinstate them. Every change needs a reason and is audited.",
+    "description": "A-03 Businesses: page subtitle"
+  },
+  "businesses.sub.leads": {
+    "defaultMessage": "Shops that asked to join from the site. Phones stay masked.",
+    "description": "A-03 Businesses: subtitle for a field agent, who sees only leads"
+  },
+  "businesses.tabs": {
+    "defaultMessage": "Business queues",
+    "description": "Accessible name of the A-03 tab list"
+  },
+  "businesses.tab.leads": {
+    "defaultMessage": "Leads",
+    "description": "A-03 tab: site leads"
+  },
+  "businesses.table": {
+    "defaultMessage": "Businesses: {status}",
+    "description": "Accessible name of the business table, with the queue"
+  },
+  "businesses.empty": {
+    "defaultMessage": "No businesses in this queue.",
+    "description": "Empty business queue"
+  },
+  "businesses.col.name": {
+    "defaultMessage": "Business",
+    "description": "Column: brand name"
+  },
+  "businesses.col.legal": {
+    "defaultMessage": "Legal name",
+    "description": "Column and fact: legal name"
+  },
+  "businesses.col.city": {
+    "defaultMessage": "City",
+    "description": "Column: city"
+  },
+  "businesses.col.stores": {
+    "defaultMessage": "Stores",
+    "description": "Column: store count"
+  },
+  "businesses.col.status": {
+    "defaultMessage": "Status",
+    "description": "Column: status"
+  },
+  "businesses.col.submitted": {
+    "defaultMessage": "Submitted",
+    "description": "Column and fact: when the business was submitted"
+  },
+  "businesses.col.store": {
+    "defaultMessage": "Store",
+    "description": "Column: store name"
+  },
+  "businesses.col.place": {
+    "defaultMessage": "Area",
+    "description": "Column: locality and city"
+  },
+  "businesses.col.liveAt": {
+    "defaultMessage": "Live since",
+    "description": "Column: when the store went live"
+  },
+  "businesses.col.person": {
+    "defaultMessage": "Name",
+    "description": "Column: staff name"
+  },
+  "businesses.col.role": {
+    "defaultMessage": "Role",
+    "description": "Column: staff role"
+  },
+  "businesses.col.document": {
+    "defaultMessage": "Document",
+    "description": "Column: document kind"
+  },
+  "businesses.col.uploaded": {
+    "defaultMessage": "Uploaded",
+    "description": "Column: upload time"
+  },
+  "businesses.col.actions": {
+    "defaultMessage": "Review",
+    "description": "Column: document review buttons"
+  },
+  "businesses.status.draft": {
+    "defaultMessage": "Draft",
+    "description": "Business status"
+  },
+  "businesses.status.submitted": {
+    "defaultMessage": "Submitted",
+    "description": "Business status and queue"
+  },
+  "businesses.status.needsInfo": {
+    "defaultMessage": "Needs info",
+    "description": "Business status and queue"
+  },
+  "businesses.status.verified": {
+    "defaultMessage": "Verified",
+    "description": "Business status and queue"
+  },
+  "businesses.status.rejected": {
+    "defaultMessage": "Rejected",
+    "description": "Business status and queue"
+  },
+  "businesses.status.suspended": {
+    "defaultMessage": "Suspended",
+    "description": "Business status and queue"
+  },
+  "businesses.missing": {
+    "defaultMessage": "This business does not exist.",
+    "description": "Business detail: not found"
+  },
+  "businesses.loadFailed": {
+    "defaultMessage": "The business could not be loaded.",
+    "description": "Business detail: load failed"
+  },
+  "businesses.back": {
+    "defaultMessage": "Back to businesses",
+    "description": "Link back to the A-03 list"
+  },
+  "businesses.detail.sub": {
+    "defaultMessage": "{legal} · created {created} · {stores, plural, one {# store} other {# stores}}",
+    "description": "Line under the business name"
+  },
+  "businesses.profile": {
+    "defaultMessage": "Profile",
+    "description": "Business detail card: profile"
+  },
+  "businesses.verifiedAt": {
+    "defaultMessage": "Verified",
+    "description": "Fact: when the business was verified"
+  },
+  "businesses.asked": {
+    "defaultMessage": "Asked for",
+    "description": "Fact: fields requested from the owner, with the note"
+  },
+  "businesses.verify": {
+    "defaultMessage": "Verify",
+    "description": "Action: verify the business"
+  },
+  "businesses.verify.title": {
+    "defaultMessage": "Verify {name}?",
+    "description": "Verify dialog title"
+  },
+  "businesses.verify.body": {
+    "defaultMessage": "The business is verified and its stores waiting for review go live. Draft stores stay as drafts.",
+    "description": "Verify dialog body"
+  },
+  "businesses.requestInfo": {
+    "defaultMessage": "Ask for info",
+    "description": "Action: send the business back for missing details"
+  },
+  "businesses.requestInfo.title": {
+    "defaultMessage": "Ask {name} for details?",
+    "description": "Request info dialog title"
+  },
+  "businesses.requestInfo.body": {
+    "defaultMessage": "The owner sees what to fix and your note, then submits again.",
+    "description": "Request info dialog body"
+  },
+  "businesses.requestInfo.fields": {
+    "defaultMessage": "What needs fixing",
+    "description": "Request info: field checklist legend"
+  },
+  "businesses.requestInfo.pick": {
+    "defaultMessage": "Pick at least one.",
+    "description": "Request info: no field picked yet"
+  },
+  "businesses.requestInfo.note": {
+    "defaultMessage": "Note to the owner",
+    "description": "Request info: note label"
+  },
+  "businesses.requestInfo.noteHelp": {
+    "defaultMessage": "The owner reads this. It is also kept in the audit log.",
+    "description": "Request info: note help"
+  },
+  "businesses.reject": {
+    "defaultMessage": "Reject",
+    "description": "Action: reject the business"
+  },
+  "businesses.reject.title": {
+    "defaultMessage": "Reject {name}?",
+    "description": "Reject dialog title"
+  },
+  "businesses.reject.body": {
+    "defaultMessage": "The business cannot go live. The reason is kept in the audit log.",
+    "description": "Reject dialog body"
+  },
+  "businesses.suspend": {
+    "defaultMessage": "Suspend",
+    "description": "Action: suspend the business"
+  },
+  "businesses.suspend.title": {
+    "defaultMessage": "Suspend {name}?",
+    "description": "Suspend dialog title"
+  },
+  "businesses.suspend.body": {
+    "defaultMessage": "Its stores stop showing to customers until it is reinstated.",
+    "description": "Suspend dialog body"
+  },
+  "businesses.reinstate": {
+    "defaultMessage": "Reinstate",
+    "description": "Action: reinstate a suspended business"
+  },
+  "businesses.reinstate.title": {
+    "defaultMessage": "Reinstate {name}?",
+    "description": "Reinstate dialog title"
+  },
+  "businesses.reinstate.body": {
+    "defaultMessage": "The business is verified again.",
+    "description": "Reinstate dialog body"
+  },
+  "businesses.note.label": {
+    "defaultMessage": "Note",
+    "description": "Optional note label"
+  },
+  "businesses.note.optional": {
+    "defaultMessage": "Optional. Kept in the audit log.",
+    "description": "Optional note help"
+  },
+  "businesses.done.verify": {
+    "defaultMessage": "Business verified",
+    "description": "Toast"
+  },
+  "businesses.done.requestInfo": {
+    "defaultMessage": "Sent back to the owner",
+    "description": "Toast"
+  },
+  "businesses.done.reject": {
+    "defaultMessage": "Business rejected",
+    "description": "Toast"
+  },
+  "businesses.done.suspend": {
+    "defaultMessage": "Business suspended",
+    "description": "Toast"
+  },
+  "businesses.done.reinstate": {
+    "defaultMessage": "Business reinstated",
+    "description": "Toast"
+  },
+  "businesses.done.kyc": {
+    "defaultMessage": "KYC review saved",
+    "description": "Toast"
+  },
+  "businesses.done.document": {
+    "defaultMessage": "Document review saved",
+    "description": "Toast"
+  },
+  "businesses.info.brandName": {
+    "defaultMessage": "Brand name",
+    "description": "Request info field"
+  },
+  "businesses.info.legalName": {
+    "defaultMessage": "Legal name",
+    "description": "Request info field"
+  },
+  "businesses.info.category": {
+    "defaultMessage": "Category",
+    "description": "Request info field"
+  },
+  "businesses.info.pan": {
+    "defaultMessage": "PAN",
+    "description": "Request info field"
+  },
+  "businesses.info.gstin": {
+    "defaultMessage": "GSTIN",
+    "description": "Request info field"
+  },
+  "businesses.info.documents": {
+    "defaultMessage": "Documents",
+    "description": "Request info field"
+  },
+  "businesses.info.stores": {
+    "defaultMessage": "Stores",
+    "description": "Request info field"
+  },
+  "businesses.info.city": {
+    "defaultMessage": "City",
+    "description": "Request info field"
+  },
+  "businesses.info.pincode": {
+    "defaultMessage": "PIN code",
+    "description": "Request info field"
+  },
+  "businesses.info.location": {
+    "defaultMessage": "Map pin",
+    "description": "Request info field"
+  },
+  "businesses.info.hours": {
+    "defaultMessage": "Opening hours",
+    "description": "Request info field"
+  },
+  "businesses.info.phone": {
+    "defaultMessage": "Phone",
+    "description": "Request info field"
+  },
+  "businesses.kyc": {
+    "defaultMessage": "KYC",
+    "description": "Business detail card: KYC"
+  },
+  "businesses.kyc.status.missing": {
+    "defaultMessage": "Not given",
+    "description": "KYC status"
+  },
+  "businesses.kyc.status.submitted": {
+    "defaultMessage": "To review",
+    "description": "KYC status"
+  },
+  "businesses.kyc.status.verified": {
+    "defaultMessage": "Verified",
+    "description": "KYC status"
+  },
+  "businesses.kyc.status.rejected": {
+    "defaultMessage": "Rejected",
+    "description": "KYC status"
+  },
+  "businesses.kyc.legalName": {
+    "defaultMessage": "Name on KYC",
+    "description": "KYC fact"
+  },
+  "businesses.kyc.pan": {
+    "defaultMessage": "PAN",
+    "description": "KYC field"
+  },
+  "businesses.kyc.gstin": {
+    "defaultMessage": "GSTIN",
+    "description": "KYC field"
+  },
+  "businesses.kyc.upi": {
+    "defaultMessage": "UPI ID",
+    "description": "KYC field"
+  },
+  "businesses.kyc.bank": {
+    "defaultMessage": "Bank account",
+    "description": "KYC field"
+  },
+  "businesses.kyc.ifsc": {
+    "defaultMessage": "IFSC",
+    "description": "KYC fact"
+  },
+  "businesses.kyc.notes": {
+    "defaultMessage": "Review note",
+    "description": "KYC fact: the last rejection note"
+  },
+  "businesses.kyc.masked": {
+    "defaultMessage": "•••• {last4}",
+    "description": "A masked KYC value: only the last four characters"
+  },
+  "businesses.kyc.reveal": {
+    "defaultMessage": "Show",
+    "description": "Reveal one KYC value in full"
+  },
+  "businesses.kyc.revealOne": {
+    "defaultMessage": "Show {field} in full",
+    "description": "Accessible name of a reveal button"
+  },
+  "businesses.kyc.hide": {
+    "defaultMessage": "Hide",
+    "description": "Hide a revealed KYC value"
+  },
+  "businesses.kyc.hideOne": {
+    "defaultMessage": "Hide {field}",
+    "description": "Accessible name of a hide button"
+  },
+  "businesses.kyc.revealNote": {
+    "defaultMessage": "Showing a value in full is recorded in the audit log.",
+    "description": "KYC card: reveal is audited"
+  },
+  "businesses.kyc.verify": {
+    "defaultMessage": "Verify KYC",
+    "description": "Action: verify KYC"
+  },
+  "businesses.kyc.verify.title": {
+    "defaultMessage": "Verify KYC?",
+    "description": "KYC verify dialog title"
+  },
+  "businesses.kyc.verify.body": {
+    "defaultMessage": "The PAN, GSTIN and payout details are marked as checked.",
+    "description": "KYC verify dialog body"
+  },
+  "businesses.kyc.reject": {
+    "defaultMessage": "Reject KYC",
+    "description": "Action: reject KYC"
+  },
+  "businesses.kyc.reject.title": {
+    "defaultMessage": "Reject KYC?",
+    "description": "KYC reject dialog title"
+  },
+  "businesses.kyc.reject.body": {
+    "defaultMessage": "The owner sees your reason and fixes the details.",
+    "description": "KYC reject dialog body"
+  },
+  "businesses.documents": {
+    "defaultMessage": "Documents",
+    "description": "Business detail card: documents"
+  },
+  "businesses.documents.none": {
+    "defaultMessage": "No documents uploaded.",
+    "description": "No documents"
+  },
+  "businesses.doc.pan": {
+    "defaultMessage": "PAN card",
+    "description": "Document kind"
+  },
+  "businesses.doc.gst": {
+    "defaultMessage": "GST certificate",
+    "description": "Document kind"
+  },
+  "businesses.doc.shopPhoto": {
+    "defaultMessage": "Shop photo",
+    "description": "Document kind"
+  },
+  "businesses.doc.storefront": {
+    "defaultMessage": "Storefront",
+    "description": "Document kind"
+  },
+  "businesses.doc.license": {
+    "defaultMessage": "Licence",
+    "description": "Document kind"
+  },
+  "businesses.doc.other": {
+    "defaultMessage": "Other",
+    "description": "Document kind"
+  },
+  "businesses.doc.status.pending": {
+    "defaultMessage": "Not uploaded",
+    "description": "Document status"
+  },
+  "businesses.doc.status.uploaded": {
+    "defaultMessage": "To review",
+    "description": "Document status"
+  },
+  "businesses.doc.status.accepted": {
+    "defaultMessage": "Accepted",
+    "description": "Document status"
+  },
+  "businesses.doc.status.rejected": {
+    "defaultMessage": "Rejected",
+    "description": "Document status"
+  },
+  "businesses.doc.accept": {
+    "defaultMessage": "Accept",
+    "description": "Action: accept a document"
+  },
+  "businesses.doc.acceptOne": {
+    "defaultMessage": "Accept {kind}",
+    "description": "Accessible name of a document accept button"
+  },
+  "businesses.doc.reject": {
+    "defaultMessage": "Reject",
+    "description": "Action: reject a document"
+  },
+  "businesses.doc.rejectOne": {
+    "defaultMessage": "Reject {kind}",
+    "description": "Accessible name of a document reject button"
+  },
+  "businesses.doc.reject.title": {
+    "defaultMessage": "Reject the {kind}?",
+    "description": "Document reject dialog title"
+  },
+  "businesses.doc.reject.body": {
+    "defaultMessage": "The owner sees your reason and uploads it again.",
+    "description": "Document reject dialog body"
+  },
+  "businesses.stores": {
+    "defaultMessage": "Stores",
+    "description": "Business detail card: stores"
+  },
+  "businesses.stores.none": {
+    "defaultMessage": "No stores yet.",
+    "description": "No stores"
+  },
+  "businesses.staff": {
+    "defaultMessage": "Staff",
+    "description": "Business detail card: staff"
+  },
+  "businesses.staff.none": {
+    "defaultMessage": "No staff.",
+    "description": "No staff"
+  },
+  "businesses.staff.owner": {
+    "defaultMessage": "Owner",
+    "description": "Staff role"
+  },
+  "businesses.staff.manager": {
+    "defaultMessage": "Manager",
+    "description": "Staff role"
+  },
+  "businesses.staff.cashier": {
+    "defaultMessage": "Cashier",
+    "description": "Staff role"
+  },
+  "businesses.staff.status.invited": {
+    "defaultMessage": "Invited",
+    "description": "Staff status"
+  },
+  "businesses.staff.status.active": {
+    "defaultMessage": "Active",
+    "description": "Staff status"
+  },
+  "businesses.leads.filter": {
+    "defaultMessage": "Lead status",
+    "description": "Leads filter label"
+  },
+  "businesses.leads.all": {
+    "defaultMessage": "All",
+    "description": "Leads filter: every status"
+  },
+  "businesses.leads.table": {
+    "defaultMessage": "Leads",
+    "description": "Accessible name of the leads table"
+  },
+  "businesses.leads.empty": {
+    "defaultMessage": "No leads.",
+    "description": "Empty leads list"
+  },
+  "businesses.leads.col.shop": {
+    "defaultMessage": "Shop",
+    "description": "Leads column"
+  },
+  "businesses.leads.col.name": {
+    "defaultMessage": "Name",
+    "description": "Leads column"
+  },
+  "businesses.leads.col.phone": {
+    "defaultMessage": "Phone",
+    "description": "Column: masked phone"
+  },
+  "businesses.leads.col.source": {
+    "defaultMessage": "Source",
+    "description": "Leads column"
+  },
+  "businesses.leads.col.at": {
+    "defaultMessage": "Received",
+    "description": "Leads column"
+  },
+  "businesses.leads.status.new": {
+    "defaultMessage": "New",
+    "description": "Lead status"
+  },
+  "businesses.leads.status.contacted": {
+    "defaultMessage": "Contacted",
+    "description": "Lead status"
+  },
+  "businesses.leads.status.closed": {
+    "defaultMessage": "Closed",
+    "description": "Lead status"
+  },
+  "businesses.leads.move": {
+    "defaultMessage": "Status of {shop}",
+    "description": "Accessible name of a lead's status control"
+  },
+  "businesses.leads.moveTitle": {
+    "defaultMessage": "Mark {shop} as {status}?",
+    "description": "Lead status dialog title"
+  },
+  "businesses.leads.moveBody": {
+    "defaultMessage": "The change is kept in the audit log.",
+    "description": "Lead status dialog body"
+  },
+  "businesses.leads.moveConfirm": {
+    "defaultMessage": "Save status",
+    "description": "Lead status dialog confirm"
+  },
+  "businesses.leads.moved": {
+    "defaultMessage": "Lead updated",
+    "description": "Toast"
+  }
+}

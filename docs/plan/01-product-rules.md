@@ -512,23 +512,25 @@ This is the complete, canonical list of `platform_settings` keys, with unit and 
 
 Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin` can change them (§13, D-64).
 
+Every numeric key has a min and a max (the Rule column, or after the default). A change outside them is refused, never clamped; the console also caps each unit (minutes at one week, hours at one year, days at ten years, everything else at 2^31−1) so no key can overflow a timer.
+
 **Orders and strikes**
 
 | Key | Unit | Default | Rule |
 |---|---|---|---|
-| `order_accept_timeout_min` | minutes | 10 | §5.1 |
-| `pickup_hold_min` | minutes | 30 | §5.1 |
-| `pickup_extension_min` | minutes | 10 | §5.1 |
-| `partial_confirm_timeout_min` | minutes | 5 | §5.1 |
-| `delivery_dispatch_timeout_min` | minutes | 60 | §5.1 |
-| `noshow_strikes` | count | 3 | §5.4 |
-| `noshow_window_days` | days | 30 | §5.4 |
-| `noshow_limit_days` | days | 14 | §5.4 |
+| `order_accept_timeout_min` | minutes | 10 | §5.1. Min 2, max 60. |
+| `pickup_hold_min` | minutes | 30 | §5.1. Min 10, max 240. |
+| `pickup_extension_min` | minutes | 10 | §5.1. Min 5, max 60. |
+| `partial_confirm_timeout_min` | minutes | 5 | §5.1. Min 2, max 30. |
+| `delivery_dispatch_timeout_min` | minutes | 60 | §5.1. Min 15, max 240. |
+| `noshow_strikes` | count | 3 | §5.4. Min 1, max 10. |
+| `noshow_window_days` | days | 30 | §5.4. Min 7, max 90. |
+| `noshow_limit_days` | days | 14 | §5.4. Min 1, max 90. |
 | `shop_expiry_penalty_threshold_bp` | bp | 3000 | §5.4 |
-| `store_strike_risk_threshold` | count | 5 | §5.4: store strikes in 30 days that raise a risk flag |
-| `order_unseen_sms_after_min` | minutes | 3 | §15: SMS to the shop if a new order is not seen |
-| `pickup_hold_reminder_min` | minutes | 10 | §15: "Hold ending" push to the customer |
-| `risk_code_lockouts_store_per_day` | count | 10 | §6: order-code lockouts at one store in an IST day that raise a risk flag |
+| `store_strike_risk_threshold` | count | 5 | §5.4: store strikes in 30 days that raise a risk flag. Min 1, max 50. |
+| `order_unseen_sms_after_min` | minutes | 3 | §15: SMS to the shop if a new order is not seen. Min 1, max 30. |
+| `pickup_hold_reminder_min` | minutes | 10 | §15: "Hold ending" push to the customer. Min 1, max 60. |
+| `risk_code_lockouts_store_per_day` | count | 10 | §6: order-code lockouts at one store in an IST day that raise a risk flag. Min 1, max 100. |
 | `delivery_return_first_reminder_hours` | hours | 2 | §5.3: first inbox reminder after a failed delivery while the return is unconfirmed. Min 1, max 12 (D-218). |
 | `delivery_return_second_reminder_hours` | hours | 24 | §5.3: second reminder. Min 13, max 71, so it stays before the 72 h auto-confirm (D-218). |
 
@@ -536,44 +538,44 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 
 | Key | Unit | Default | Rule |
 |---|---|---|---|
-| `stock_stale_after_hours` | hours | 72 | §4; also the moment "Stock check due" (§12) fires |
-| `low_stock_default` | count | 5 | §4 |
-| `store_banners_max` | count | 3 | §12 |
+| `stock_stale_after_hours` | hours | 72 | §4; also the moment "Stock check due" (§12) fires. Min 12, max 720. |
+| `low_stock_default` | count | 5 | §4. Min 0, max 1000. |
+| `store_banners_max` | count | 3 | §12. Min 1, max 10. |
 
 **Credits and payouts**
 
 | Key | Unit | Default | Rule |
 |---|---|---|---|
-| `credit_max_per_order` | credits | 30 | §7 |
-| `credit_min_order_value_paise` | paise | 10000 | §7 |
-| `credit_expiry_days` | days | 365 | §7 |
-| `credit_expiry_reminder_days` | days | 7 | §7: customers are told this many days before a lot expires |
-| `review_edit_window_days` | days | 7 | §10 |
-| `credit_orders_per_month` | count | 10 | §7 |
-| `store_credit_redemptions_per_day` | count | 200 | §7 |
-| `admin_adjust_dual_approval_above_paise` | paise | 50000 | §7 |
+| `credit_max_per_order` | credits | 30 | §7. Min 0, max 1000. |
+| `credit_min_order_value_paise` | paise | 10000 | §7. Min 0, max 500000. |
+| `credit_expiry_days` | days | 365 | §7. Min 30, max 1095. |
+| `credit_expiry_reminder_days` | days | 7 | §7: customers are told this many days before a lot expires. Min 1, max 30. |
+| `review_edit_window_days` | days | 7 | §10. Min 1, max 30. |
+| `credit_orders_per_month` | count | 10 | §7. Min 1, max 100. |
+| `store_credit_redemptions_per_day` | count | 200 | §7. Min 1, max 10000. |
+| `admin_adjust_dual_approval_above_paise` | paise | 50000 | §7. Min 0, max 500000. |
 
 **Referrals**
 
 | Key | Unit | Default | Rule |
 |---|---|---|---|
-| `ref_retailer_customer_referrer_credits` | credits | 30 | §8 |
-| `ref_retailer_customer_referee_credits` | credits | 100 | §8 |
-| `ref_customer_customer_referrer_credits` | credits | 30 | §8 |
-| `ref_customer_customer_referee_credits` | credits | 100 | §8 |
-| `ref_any_shop_referrer_credits` | credits | 30 | §8 |
-| `ref_any_shop_referee_credits` | credits | 100 | §8 |
-| `ref_qualifying_min_order_paise` | paise | 10000 | §8 |
-| `ref_shop_qualifying_orders` | count | 10 | §8 |
-| `ref_attribution_window_days` | days | 7 | §8 |
+| `ref_retailer_customer_referrer_credits` | credits | 30 | §8. Min 0, max 1000. |
+| `ref_retailer_customer_referee_credits` | credits | 100 | §8. Min 0, max 1000. |
+| `ref_customer_customer_referrer_credits` | credits | 30 | §8. Min 0, max 1000. |
+| `ref_customer_customer_referee_credits` | credits | 100 | §8. Min 0, max 1000. |
+| `ref_any_shop_referrer_credits` | credits | 30 | §8. Min 0, max 1000. |
+| `ref_any_shop_referee_credits` | credits | 100 | §8. Min 0, max 1000. |
+| `ref_qualifying_min_order_paise` | paise | 10000 | §8. Min 0, max 500000. |
+| `ref_shop_qualifying_orders` | count | 10 | §8. Min 1, max 100. |
+| `ref_attribution_window_days` | days | 7 | §8. Min 1, max 30. |
 
 **POS**
 
 | Key | Unit | Default | Rule |
 |---|---|---|---|
-| `pos_reversal_window_hours` | hours | 24 | §7 |
-| `pos_offline_link_max_hours` | hours | 12 | §6 |
-| `pos_offline_links_risk_per_day` | count | 20 | §6 |
+| `pos_reversal_window_hours` | hours | 24 | §7. Min 1, max 72. |
+| `pos_offline_link_max_hours` | hours | 12 | §6. Min 1, max 72. |
+| `pos_offline_links_risk_per_day` | count | 20 | §6. Min 1, max 500. |
 | `pos_code_phone_failures_per_hour` | count | 10 | §6 (D-131): wrong counter codes for one phone across all stores in an hour; at this count the phone is refused at every store until the hour's count drops below it. Min 5, max 100. |
 
 **Search ranking** (§11). Unit `bp`, therefore super_admin-only (§13), by design: ranking weights change every shop's visibility.
@@ -590,18 +592,18 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 
 | Key | Unit | Default | Rule |
 |---|---|---|---|
-| `insight_no_sale_days` | days | 21 | "Sitting on the shelf": no sale in this many days |
-| `insight_min_days_listed` | days | 21 | Listing history needed before "sitting on the shelf" (equal to the no-sale rule) |
-| `insight_expiring_within_days` | days | 5 | "Going to waste": batch expiry window |
-| `insight_wanted_nearby_radius_m` | meters | 2000 | "Wanted nearby" search radius |
-| `insight_min_searches` | count | 10 | Searches needed before "wanted nearby" shows (never below 10, §16). Min 10. |
-| `insight_min_sales_lines` | count | 20 | Sales lines in the period for share-of-sales claims |
-| `insight_min_units_selling_fast` | count | 5 | Units sold before "selling fast" shows |
-| `insight_min_events_for_percent` | count | 20 | Events behind any percentage shown |
-| `insight_period_days` | days | 7 | Insight period ("Last 7 days") and the window for the average daily pace |
+| `insight_no_sale_days` | days | 21 | "Sitting on the shelf": no sale in this many days. Min 7, max 90. |
+| `insight_min_days_listed` | days | 21 | Listing history needed before "sitting on the shelf" (equal to the no-sale rule). Min 7, max 90. |
+| `insight_expiring_within_days` | days | 5 | "Going to waste": batch expiry window. Min 1, max 30. |
+| `insight_wanted_nearby_radius_m` | meters | 2000 | "Wanted nearby" search radius. Min 500, max 10000. |
+| `insight_min_searches` | count | 10 | Searches needed before "wanted nearby" shows (never below 10, §16). Min 10. Min 10, max 1000. |
+| `insight_min_sales_lines` | count | 20 | Sales lines in the period for share-of-sales claims. Min 5, max 1000. |
+| `insight_min_units_selling_fast` | count | 5 | Units sold before "selling fast" shows. Min 1, max 1000. |
+| `insight_min_events_for_percent` | count | 20 | Events behind any percentage shown. Min 10, max 1000. |
+| `insight_period_days` | days | 7 | Insight period ("Last 7 days") and the window for the average daily pace. Min 1, max 90. |
 | `insight_cover_days` | days | 7 | "Selling fast": the restock quantity covers this many days at the current pace, and a row fires below this many days of stock. Min 1, max 30. |
 | `insight_missed_sales_min_zero_days` | days | 1 | "Missed sales": whole IST days with closing stock of 0 or below in the period before the row can fire. Min 1, max 30. |
-| `insight_missed_sales_min_searches` | count | 10 | "Missed sales": nearby searches matching the product on those days (never below 10, §16). Min 10. |
+| `insight_missed_sales_min_searches` | count | 10 | "Missed sales": nearby searches matching the product on those days (never below 10, §16). Min 10. Min 10, max 1000. |
 | `insight_pair_min_bills` | count | 20 | "Bought together": bills containing both items in the window. Min 5, max 1000. |
 | `insight_pair_window_days` | days | 60 | "Bought together": bill window for the pair counts. Min 14, max 180. |
 | `insight_pair_min_share_bp` | bp | 2000 | "Bought together": share of item A's bills that also contain B (2000 bp = 20%); unit `bp`, so super_admin-only (§13). Min 500, max 10000. |
@@ -609,23 +611,23 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | `insight_regular_min_visits` | count | 3 | "Regulars slipping away": visits (distinct IST purchase days) needed in the regular window. Min 2, max 20. |
 | `insight_regular_window_days` | days | 60 | "Regulars slipping away": window in which the visits are counted. Min 14, max 180. |
 | `insight_regular_lapse_days` | days | 21 | "Regulars slipping away": no purchase for at least this many days. Min 7, max 90. |
-| `insight_regular_min_linked_customers` | count | 10 | "Regulars slipping away": phone-linked customers who bought in the regular window before the kind shows anything; walk-ins without a phone are not counted. Min 1. |
+| `insight_regular_min_linked_customers` | count | 10 | "Regulars slipping away": phone-linked customers who bought in the regular window before the kind shows anything; walk-ins without a phone are not counted. Min 1. Min 1, max 1000. |
 | `insight_price_compare_enabled` | bool | false | "Priced above nearby" on or off (Q-52); needs at least 10 other live verified stores of distinct businesses in the radius whatever the setting |
-| `coach_max_cards_per_day` | count | 5 | New coach cards per store per day |
-| `coach_max_push_per_day` | count | 1 | Coach pushes per store per day |
-| `coach_dismiss_quiet_days` | days | 7 | A dismissed subject (an item, a pair, a batch or the store; never a whole kind) stays quiet |
+| `coach_max_cards_per_day` | count | 5 | New coach cards per store per day. Min 0, max 20. |
+| `coach_max_push_per_day` | count | 1 | Coach pushes per store per day. Min 0, max 5. |
+| `coach_dismiss_quiet_days` | days | 7 | A dismissed subject (an item, a pair, a batch or the store; never a whole kind) stays quiet. Min 1, max 90. |
 
 **Field agents**
 
 | Key | Unit | Default | Rule |
 |---|---|---|---|
-| `field_agent_edit_window_days` | days | 30 | §14 |
+| `field_agent_edit_window_days` | days | 30 | §14. Min 1, max 90. |
 
 **Jobs** (D-95)
 
 | Key | Unit | Default | Rule |
 |---|---|---|---|
-| `job_runs_retention_days` | days | 90 | §13: how long `job_runs` rows are kept (the `job_runs_retention` maintenance kind drops older months, 03 §9) |
+| `job_runs_retention_days` | days | 90 | §13: how long `job_runs` rows are kept (the `job_runs_retention` maintenance kind drops older months, 03 §9). Min 30, max 730. |
 
 **Asks and search proof** (§11.1–§11.3, D-101)
 
@@ -641,9 +643,9 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | `ask_low_yield_max_stores` | count | 3 | §11.2: stores a narrowed customer's ask goes to, until one of their online orders is `collected` or `delivered`. Min 1, max 20. |
 | `ask_retention_days` | days | 90 | §11.2: asks are deleted after this with their recipients, replies and the store blocks that came from them (the `asks_retention` maintenance kind); also how long a shop can report an ask. Min 30, max 365. |
 | `ask_whatsapp_enabled` | bool | false | §11.2: WhatsApp delivery of asks to shops; a Wave 5 option, off in v1 (Q-55) |
-| `ask_gap_min_customers` | count | 10 | §11.2: distinct customers who asked for a product in a city before it shows in Demand gaps (never below 10, §16). Min 10. |
+| `ask_gap_min_customers` | count | 10 | §11.2: distinct customers who asked for a product in a city before it shows in Demand gaps (never below 10, §16). Min 10. Min 10, max 1000. |
 | `ask_gap_window_days` | days | 7 | §11.2: Demand gaps window. Min 1, max 30. |
-| `site_marquee_min_searchers` | count | 10 | §11.3: distinct signed-in customers (`customer_id`s; anonymous devices never count) who searched a product in a city before the nightly build proposes it (never below 10, §16). Min 10. |
+| `site_marquee_min_searchers` | count | 10 | §11.3: distinct signed-in customers (`customer_id`s; anonymous devices never count) who searched a product in a city before the nightly build proposes it (never below 10, §16). Min 10. Min 10, max 1000. |
 | `site_marquee_window_days` | days | 7 | §11.3: search window for the site strip. Min 1, max 30. |
 | `site_marquee_max_items` | count | 20 | §11.3: products proposed per city. Min 5, max 50. |
 | `refine_ai_min_words` | count | 4 | §11.1: words a query with no chip needs before search sets `refineHint` and the app may call search assist (AI-C2). Min 2, max 20. |
@@ -695,11 +697,11 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | `ai_catalogue_enabled` (AI-A1) | bool | false |
 | `ai_triage_enabled` (AI-A2) | bool | false |
 | `ai_riskexplain_enabled` (AI-A3) | bool | false |
-| `ai_model_fast` | text | `claude-haiku-5-5` |
-| `ai_model_smart` | text | `claude-sonnet-5-5` |
-| `ai_daily_calls_store` | count | 100 |
-| `ai_daily_calls_customer` | count | 30 |
-| `ai_daily_cost_cap_paise` | paise | 50000 (₹500 a day; AI calls stop for the rest of the IST day when reached, alert at 80%, D-70) |
+| `ai_model_fast` | text | `claude-haiku-5-5` (one of `claude-haiku-5-5`, `claude-sonnet-5-5`, `claude-opus-5-5`) |
+| `ai_model_smart` | text | `claude-sonnet-5-5` (one of `claude-haiku-5-5`, `claude-sonnet-5-5`, `claude-opus-5-5`) |
+| `ai_daily_calls_store` | count | 100 (min 0, max 1000) |
+| `ai_daily_calls_customer` | count | 30 (min 0, max 300) |
+| `ai_daily_cost_cap_paise` | paise | 50000 (₹500 a day; AI calls stop for the rest of the IST day when reached, alert at 80%, D-70; min 0, max 1000000) |
 
 **Fixed constants (code, not settings)** (D-92). These protect security, define a protocol, or feed an alert rule, so they change through code review, not in the console. Operational timings that an operator may need to tune are settings (the tables above).
 

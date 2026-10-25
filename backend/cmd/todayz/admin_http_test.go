@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
 
 	"github.com/todayz/backend/internal/identity"
@@ -24,6 +26,11 @@ func TestAdminCustomersHTTP(t *testing.T) {
 	a := o.a
 	get := func(tk, path string) resp { t.Helper(); return a.call(tk, http.MethodGet, path, nil, nil) }
 	post := func(tk, path string, body any) resp { t.Helper(); return a.call(tk, http.MethodPost, path, body, nil) }
+	// The phone travels in the body, never in a URL (W3-05 review).
+	search := func(tk, phone string) resp {
+		t.Helper()
+		return post(tk, "/v1/admin/customer-search", map[string]any{"phone": phone})
+	}
 
 	me := get(o.cust, "/v1/me")
 	require.Equal(t, http.StatusOK, me.code, me.raw)
@@ -32,7 +39,7 @@ func TestAdminCustomersHTTP(t *testing.T) {
 
 	// Search: exact phone in the forms an operator types; never the whole number back.
 	for _, q := range []string{custPhone, strings.TrimPrefix(custPhone, "+91"), "+91 " + custPhone[3:8] + " " + custPhone[8:]} {
-		r := get(tok, "/v1/admin/customers?phone="+url.QueryEscape(q))
+		r := search(tok, q)
 		require.Equal(t, http.StatusOK, r.code, r.raw)
 		items := r.body["items"].([]any)
 		require.Len(t, items, 1, q)
@@ -41,15 +48,19 @@ func TestAdminCustomersHTTP(t *testing.T) {
 		require.Equal(t, pii.MaskPhone(custPhone), it["phoneMasked"])
 		require.NotContains(t, r.raw, custPhone[3:])
 	}
-	r := get(tok, "/v1/admin/customers?phone=9000000099")
+	r := search(tok, "9000000099")
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.Empty(t, r.body["items"])
-	r = get(tok, "/v1/admin/customers?phone=12345")
+	r = search(tok, "12345")
 	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
+	r = get(tok, "/v1/admin/customers?phone="+url.QueryEscape(custPhone))
+	require.Equal(t, http.StatusNotFound, r.code, r.raw, "the old GET search is gone")
 
 	r = get(tok, base)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.Equal(t, "active", r.body["status"])
+	require.Equal(t, false, r.body["isAdmin"])
+	require.Equal(t, true, r.body["isCustomer"])
 	require.NotEmpty(t, r.body["sessions"])
 	require.NotContains(t, r.raw, custPhone[3:])
 	r = get(tok, "/v1/admin/customers/"+ids.New(a.clk.Now()).String())
@@ -64,6 +75,13 @@ func TestAdminCustomersHTTP(t *testing.T) {
 	reason := map[string]any{"reason": "no-shows were a shop mix-up"}
 	r = post(tok, base+"/strikes/reset", map[string]any{})
 	require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
+	// A phone in a reason would sit in the audit log, shown to other roles.
+	for _, bad := range []string{"customer called from 9876543210", "ring +91 98765-43210 back", "her number is 098765 43210"} {
+		r = post(tok, base+"/strikes/reset", map[string]any{"reason": bad})
+		require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
+		require.Contains(t, fieldsOf(r), "body.reason")
+		require.NotContains(t, r.raw, "43210")
+	}
 	r = post(tok, base+"/strikes/reset", reason)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.EqualValues(t, 0, r.body["activeStrikes"])
@@ -89,12 +107,41 @@ func TestAdminCustomersHTTP(t *testing.T) {
 	r = post(tok, base+"/block", block)
 	require.Equal(t, http.StatusConflict, r.code, r.raw)
 
-	// An admin account is not blocked here (A-18 disables it).
-	r = get(tok, "/v1/admin/customers?phone="+url.QueryEscape(adminPhone))
+	// An admin account is not changed here (A-18 disables it): not blocked, its
+	// strikes not reset, its sessions neither listed nor revoked.
+	r = search(tok, adminPhone)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	adminID := r.body["items"].([]any)[0].(map[string]any)["id"].(string)
-	r = post(tok, "/v1/admin/customers/"+adminID+"/block", block)
+	adminBase := "/v1/admin/customers/" + adminID
+	r = post(tok, adminBase+"/block", block)
 	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	r = get(tok, adminBase)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.Equal(t, true, r.body["isAdmin"])
+	require.Empty(t, r.body["sessions"])
+	var adminSession pgtype.UUID
+	require.NoError(t, a.tdb.OwnerPool.QueryRow(context.Background(),
+		`SELECT id FROM sessions WHERE user_id = $1 AND revoked_at IS NULL LIMIT 1`, uuidOf(t, adminID)).Scan(&adminSession))
+	asid, _ := ids.FromUUID(adminSession)
+	d := a.call(tok, http.MethodDelete, adminBase+"/sessions/"+asid.String(), nil, nil)
+	require.Equal(t, http.StatusConflict, d.code, d.raw)
+	a.exec(`INSERT INTO strikes (id, subject_type, subject_id, reason, created_at) VALUES ($1, 'customer', $2, 'no_show', $3)`,
+		uuidOf(t, ids.New(a.clk.Now()).String()), uuidOf(t, adminID), a.clk.Now())
+	r = post(tok, adminBase+"/strikes/reset", reason)
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, 0, a.count(`SELECT count(*) FROM sessions WHERE user_id = $1 AND revoked_reason = 'admin'`, uuidOf(t, adminID)))
+
+	// Block is for customers only: a shop owner with no customer profile is 409.
+	r = search(tok, ownerPhone)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	ownerID := r.body["items"].([]any)[0].(map[string]any)["id"].(string)
+	a.exec(`DELETE FROM customer_profiles WHERE user_id = $1`, uuidOf(t, ownerID))
+	r = get(tok, "/v1/admin/customers/"+ownerID)
+	require.Equal(t, false, r.body["isCustomer"])
+	r = post(tok, "/v1/admin/customers/"+ownerID+"/block", block)
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, "invalid_transition", problemCode(r))
+	require.Equal(t, 0, a.count(`SELECT count(*) FROM users WHERE id = $1 AND status = 'blocked'`, uuidOf(t, ownerID)))
 
 	r = post(tok, base+"/unblock", map[string]any{"reason": "spoke to the customer"})
 	require.Equal(t, http.StatusOK, r.code, r.raw)
@@ -107,7 +154,7 @@ func TestAdminCustomersHTTP(t *testing.T) {
 	sessions := r.body["sessions"].([]any)
 	require.Len(t, sessions, 1)
 	sid := sessions[0].(map[string]any)["id"].(string)
-	d := a.call(tok, http.MethodDelete, base+"/sessions/"+sid, nil, nil)
+	d = a.call(tok, http.MethodDelete, base+"/sessions/"+sid, nil, nil)
 	require.Equal(t, http.StatusNoContent, d.code, d.raw)
 	d = a.call(tok, http.MethodDelete, base+"/sessions/"+sid, nil, nil)
 	require.Equal(t, http.StatusNotFound, d.code, d.raw)
@@ -305,6 +352,29 @@ func TestAdminSettingsHTTP(t *testing.T) {
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.EqualValues(t, 40, r.body["setting"].(map[string]any)["value"])
 
+	// Every number has a real range (30503), and values outside it, or past what the unit can
+	// carry, are refused even for a super_admin (W3-05 review).
+	require.Zero(t, a.count(`SELECT count(*) FROM platform_settings WHERE unit NOT IN ('bool','text') AND (min IS NULL OR max IS NULL)`),
+		"every numeric key has a min and a max")
+	require.Zero(t, a.count(`SELECT count(*) FROM platform_settings WHERE unit IN ('minutes','hours','days') AND min < 1`),
+		"no timer can be 0")
+	for key, bad := range map[string][]any{
+		"admin_adjust_dual_approval_above_paise": {float64(1 << 53), 500001, -1},
+		"ref_customer_customer_referee_credits":  {9e15, 1001},
+		"order_accept_timeout_min":               {0, 61, 200000000},
+		"ai_daily_cost_cap_paise":                {float64(1<<31) + 1},
+		"ai_model_fast":                          {"claude-haiku-5", "gpt-5"},
+	} {
+		for _, v := range bad {
+			r = patch(key, change(v))
+			require.Equal(t, http.StatusUnprocessableEntity, r.code, "%s=%v: %s", key, v, r.raw)
+			require.Contains(t, r.raw, "body.value")
+		}
+	}
+	r = patch("ai_model_fast", change("claude-sonnet-5-5"))
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.EqualValues(t, 0, a.count(`SELECT count(*) FROM audit_log WHERE subject_id = 'order_accept_timeout_min'`), "a refused change is not audited")
+
 	require.Equal(t, 1, a.count(`SELECT count(*) FROM audit_log WHERE action = 'settings.update' AND subject_type = 'platform_setting'
 	  AND subject_id = 'credit_max_per_order' AND before->>'value' = '30' AND after->>'value' = '40' AND after->>'reason' = 'W3-05 test'`))
 	require.Equal(t, 2, a.count(`SELECT count(*) FROM audit_log WHERE action = 'settings.update' AND subject_id = 'ask_max_stores'`))
@@ -330,4 +400,13 @@ func TestAdminSettingsHTTP(t *testing.T) {
 	r = get("/v1/admin/audit-log/subject?subjectType=platform_setting&subjectId=ask_max_stores")
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.Len(t, r.body["items"], 2)
+
+	// A stale step-up is asked again for a money key too, even of a super_admin (a fresh sign-in,
+	// so the access token outlives the step-up window).
+	tok = desk.token()
+	a.clk.Advance(authn.StepUpWindow + time.Second)
+	r = patch("credit_max_per_order", change(41))
+	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+	require.Equal(t, "step_up_required", problemCode(r))
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM platform_settings WHERE key = 'credit_max_per_order' AND value = '40'`))
 }

@@ -66,12 +66,12 @@
     overflow-x: hidden;
   }
 
-  /* 44px touch targets on the rail (the design's 32px rows are for a mouse); `flex: none` keeps them
-     44px when a super_admin's full list is taller than the screen (the rail scrolls instead). */
+  /* 44px touch targets on the rail (the design's 32px rows are for a mouse). They never shrink: a
+     super admin's full list is taller than a phone, and the rail scrolls instead. */
   .side.side a,
   .side.side button {
-    justify-content: center;
     flex: none;
+    justify-content: center;
     height: var(--control-lg);
     min-width: var(--control-lg);
     padding: 0;

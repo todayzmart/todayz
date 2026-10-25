@@ -3,23 +3,24 @@
 # Search is an exact phone match through the keyed phone hash (there is no partial phone search,
 # so the console never lists phones). Every change is audited with its reason. Roles per
 # operation are in internal/platform/authz/policy/admin.go.
-/v1/admin/customers:
-  get:
+/v1/admin/customer-search:
+  post:
     operationId: searchAdminCustomers
     tags: [admin-customers]
     summary: Find a customer by phone (exact match)
     description: >-
-      `phone` is a 10-digit Indian mobile number, with or without `+91`. Answers zero or one customer;
-      the phone comes back masked.
-    parameters:
-      - name: phone
-        in: query
-        required: true
-        schema:
-          type: string
-          minLength: 10
-          maxLength: 16
-          pattern: ^[+0-9 ]{10,16}$
+      A POST so the phone never sits in a URL (access, proxy and edge logs, browser history); it changes
+      nothing. `phone` is a 10-digit Indian mobile number, with or without `+91`. Answers zero or one
+      customer; the phone comes back masked.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-customers.yaml#/AdminCustomerSearchRequest
+          example:
+            phone: "9000000210"
     responses:
       "200":
         description: Zero or one customer
@@ -31,7 +32,7 @@
               items:
                 - id: 01JB0SCS1A2B3C4D5E6F7G8H9J
                   name: Priya
-                  phoneMasked: "98•••••210"
+                  phoneMasked: "90•••••210"
                   status: active
                   activeStrikes: 1
                   createdAt: "2026-10-01T09:30:00Z"
@@ -62,6 +63,8 @@
               phoneMasked: "98•••••210"
               status: active
               preferredLang: en
+              isAdmin: false
+              isCustomer: true
               createdAt: "2026-10-01T09:30:00Z"
               activeStrikes: 1
               strikes:
@@ -102,7 +105,8 @@
     description: >-
       `admin` and `super_admin`, with a reason. The account's live sessions are revoked at once, in every app,
       and sign-in answers `403 account_blocked` until it is unblocked. Open orders are not cancelled (use the
-      admin cancel). Blocking a blocked or deleted account is `409 invalid_transition`.
+      admin cancel). Blocking a blocked or deleted account is `409 invalid_transition`, and so is blocking an
+      admin account (A-18 disables it) or an account with no customer profile (shop staff only).
     x-idempotency: none
     requestBody:
       required: true
@@ -125,6 +129,8 @@
               phoneMasked: "98•••••210"
               status: blocked
               preferredLang: en
+              isAdmin: false
+              isCustomer: true
               createdAt: "2026-10-01T09:30:00Z"
               activeStrikes: 1
               strikes: []
@@ -175,7 +181,7 @@
     summary: Reset a customer's strikes (audited)
     description: >-
       Marks every strike not yet reset as reset, with the reason and the admin (D-41). The booking limit stops
-      counting them at once. No strike to reset is `409 invalid_transition`.
+      counting them at once. No strike to reset, or an admin account, is `409 invalid_transition`.
     x-idempotency: none
     requestBody:
       required: true
@@ -198,6 +204,8 @@
               phoneMasked: "98•••••210"
               status: active
               preferredLang: en
+              isAdmin: false
+              isCustomer: true
               createdAt: "2026-10-01T09:30:00Z"
               activeStrikes: 0
               strikes:
@@ -227,7 +235,9 @@
     operationId: revokeAdminCustomerSession
     tags: [admin-customers]
     summary: Sign a customer out of one device (audited)
-    description: A session that is already revoked or expired, or belongs to someone else, is `404 not_found`.
+    description: >-
+      A session that is already revoked or expired, or belongs to someone else, is `404 not_found`. An admin
+      account's sessions are not listed here and revoking one is `409 invalid_transition` (A-18 disables it).
     x-idempotency: none
     responses:
       "204":

@@ -2,9 +2,10 @@ import { ErrorBoundary, SessionProvider, UpdateToastHost, type Session, type Upd
 import { FORMAT_LOCALE, type Messages } from '@todayz/i18n';
 import { QueryClientProvider, type QueryClient } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';
-import { Button, ToastProvider } from '@todayz/ui';
+import { ToastProvider } from '@todayz/ui';
 import { useEffect } from 'react';
-import { IntlProvider, useIntl } from 'react-intl';
+import { IntlProvider } from 'react-intl';
+import { CrashFallback } from './CrashFallback';
 import { useUpdateLabels } from './labels';
 import type { makeRouter } from './router';
 import { SecondFactorContext, type SecondFactor } from './second-factor';
@@ -27,19 +28,6 @@ interface AppProps {
 
 function UpdateToast({ update }: { update: UpdateController }) {
   return <UpdateToastHost controller={update} labels={useUpdateLabels()} />;
-}
-
-function CrashFallback({ reset }: { reset: () => void }) {
-  const intl = useIntl();
-  return (
-    <div role="alert" style={{ padding: 'var(--space-4)' }}>
-      <h1 className="tz-page-title">{intl.formatMessage({ id: 'app.error.title' })}</h1>
-      <p>{intl.formatMessage({ id: 'app.error.body' })}</p>
-      <Button variant="primary" onClick={reset}>
-        {intl.formatMessage({ id: 'app.error.retry' })}
-      </Button>
-    </div>
-  );
 }
 
 /**
