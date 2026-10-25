@@ -3,8 +3,12 @@ package voice
 import (
 	"bytes"
 	"context"
+	"encoding/binary"
 	"encoding/json"
+	"errors"
+	"math"
 	"mime/multipart"
+	"net/http"
 	"net/textproto"
 	"strings"
 	"testing"
@@ -239,7 +243,8 @@ func multipartOf(t *testing.T, parts ...[3]string) *multipart.Reader {
 func TestReadRecording(t *testing.T) {
 	rec, err := readRecording(multipartOf(t, [3]string{"audio", "audio/webm;codecs=opus", "abc"}, [3]string{"language", "", "kn-IN"}))
 	require.NoError(t, err)
-	assert.Equal(t, Recording{Data: []byte("abc"), MediaType: "audio/webm", Language: "kn-IN"}, rec)
+	assert.Equal(t, Recording{Data: []byte("abc"), MediaType: "audio/webm", Language: "kn-IN", Length: MaxSeconds * time.Second}, rec,
+		"a length the container does not say is charged as the limit")
 
 	for name, c := range map[string]struct {
 		parts [][3]string
@@ -260,6 +265,15 @@ func TestReadRecording(t *testing.T) {
 	var pe *problem.Error
 	require.ErrorAs(t, err, &pe)
 	assert.Equal(t, genproblems.PayloadTooLarge, pe.Code)
+
+	rec, err = readRecording(multipartOf(t, [3]string{"audio", "audio/wav", string(wavOf(3 * time.Second))}))
+	require.NoError(t, err)
+	assert.Equal(t, 3*time.Second, rec.Length)
+	assert.True(t, rec.Measured)
+	_, err = readRecording(multipartOf(t, [3]string{"audio", "audio/wav", string(wavOf(16 * time.Second))}))
+	assert.Equal(t, map[string]string{"body.audio": "too_long"}, fieldOf(t, err))
+	_, err = readRecording(multipartOf(t, [3]string{"audio", "audio/mpeg", strings.Repeat("a", maxBytes("audio/mpeg")+1)}))
+	assert.Equal(t, map[string]string{"body.audio": "too_long"}, fieldOf(t, err), "past the byte cap when the length is not stated")
 }
 
 func TestCandidateName(t *testing.T) {
@@ -280,4 +294,117 @@ func TestSmallHelpers(t *testing.T) {
 		assert.Equal(t, ext, extension(mt))
 	}
 	assert.Len(t, MediaTypes, 5)
+}
+
+// wavOf is a 16 kHz 16-bit mono wav of length d.
+func wavOf(d time.Duration) []byte {
+	const rate = 32_000 // bytes per second
+	n := int(d.Seconds() * rate)
+	b := []byte("RIFF\x00\x00\x00\x00WAVEfmt ")
+	b = binary.LittleEndian.AppendUint32(b, 16)
+	b = append(b, 1, 0, 1, 0)                       // PCM, mono
+	b = binary.LittleEndian.AppendUint32(b, 16_000) // sample rate
+	b = binary.LittleEndian.AppendUint32(b, rate)   // byte rate
+	b = append(b, 2, 0, 16, 0)                      // block align, bits
+	b = append(b, "data"...)
+	b = binary.LittleEndian.AppendUint32(b, uint32(n)) // #nosec G115 -- a test length
+	return append(b, make([]byte, n)...)
+}
+
+// webmOf is a recorder-style webm: unknown-size segment and cluster, Info with the scale and,
+// when stated > 0, a Duration in ms, then one cluster at clusterMs with blocks at the times.
+func webmOf(stated float64, clusterMs uint16, blocks ...int16) []byte {
+	b := []byte{0x1A, 0x45, 0xDF, 0xA3, 0x80}
+	b = append(b, 0x18, 0x53, 0x80, 0x67, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF)
+	info := []byte{0x2A, 0xD7, 0xB1, 0x83, 0x0F, 0x42, 0x40}
+	if stated > 0 {
+		info = append(info, 0x44, 0x89, 0x88)
+		info = binary.BigEndian.AppendUint64(info, math.Float64bits(stated))
+	}
+	b = append(b, 0x15, 0x49, 0xA9, 0x66, 0x80|byte(len(info)))
+	b = append(b, info...)
+	b = append(b, 0x1F, 0x43, 0xB6, 0x75, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF)
+	b = append(b, 0xE7, 0x82)
+	b = binary.BigEndian.AppendUint16(b, clusterMs)
+	for _, t := range blocks {
+		b = append(b, 0xA3, 0x85, 0x81)
+		b = binary.BigEndian.AppendUint16(b, uint16(t)) // #nosec G115 -- the field is a signed 16-bit value
+		b = append(b, 0x80, 0x00)
+	}
+	return b
+}
+
+func oggPage(granule uint64, body []byte) []byte {
+	b := []byte("OggS\x00\x02")
+	b = binary.LittleEndian.AppendUint64(b, granule)
+	b = append(b, make([]byte, 12)...) // serial, sequence, crc
+	b = append(b, 1, byte(len(body)))
+	return append(b, body...)
+}
+
+func mp4Of(scale, dur uint32) []byte {
+	box := func(t string, body []byte) []byte {
+		b := binary.BigEndian.AppendUint32(nil, uint32(8+len(body))) // #nosec G115 -- a test box
+		return append(append(b, t...), body...)
+	}
+	mvhd := make([]byte, 12)
+	mvhd = binary.BigEndian.AppendUint32(mvhd, scale)
+	mvhd = binary.BigEndian.AppendUint32(mvhd, dur)
+	return append(box("ftyp", []byte("M4A \x00\x00\x00\x00")), box("moov", box("mvhd", mvhd))...)
+}
+
+func TestAudioDuration(t *testing.T) {
+	opus := append([]byte("OpusHead\x01\x01"), 0x38, 0x01, 0x80, 0xBB, 0, 0)     // pre-skip 312
+	vorbis := append([]byte("\x01vorbis\x00\x00\x00\x00\x01"), 0x80, 0x3E, 0, 0) // 16 kHz
+	for name, c := range map[string]struct {
+		mt   string
+		data []byte
+		want time.Duration
+		ok   bool
+	}{
+		"wav":                {"audio/wav", wavOf(2500 * time.Millisecond), 2500 * time.Millisecond, true},
+		"webm duration":      {"audio/webm", webmOf(16_000, 0, 0, 20), 16 * time.Second, true},
+		"webm last block":    {"audio/webm", webmOf(0, 15_000, 0, 980), 15980 * time.Millisecond, true},
+		"webm no blocks":     {"audio/webm", webmOf(0, 0), 0, false},
+		"webm cut short":     {"audio/webm", webmOf(0, 0, 10)[:60], 0, false},
+		"ogg opus":           {"audio/ogg", append(oggPage(0, opus), oggPage(48_000*4+312, []byte("x"))...), 4 * time.Second, true},
+		"ogg vorbis":         {"audio/ogg", append(oggPage(0, vorbis), oggPage(16_000*20, []byte("x"))...), 20 * time.Second, true},
+		"ogg no packet ends": {"audio/ogg", append(oggPage(0, opus), oggPage(math.MaxUint64, []byte("x"))...), 0, false},
+		"mp4":                {"audio/mp4", mp4Of(1000, 14_200), 14200 * time.Millisecond, true},
+		"mp4 fragmented":     {"audio/mp4", mp4Of(1000, 0), 0, false},
+		"mpeg":               {"audio/mpeg", []byte("ID3"), 0, false},
+		"not that container": {"audio/wav", []byte("OggS not a wav"), 0, false},
+	} {
+		got, ok := audioDuration(c.data, c.mt)
+		assert.Equal(t, c.ok, ok, name)
+		assert.Equal(t, c.want, got, name)
+	}
+
+	long, length, measured := tooLong(Recording{Data: webmOf(15_400, 0, 0), MediaType: "audio/webm"})
+	assert.False(t, long, "inside the grace")
+	assert.Equal(t, 15400*time.Millisecond, length)
+	assert.True(t, measured)
+	long, _, _ = tooLong(Recording{Data: webmOf(15_600, 0, 0), MediaType: "audio/webm"})
+	assert.True(t, long)
+	long, length, measured = tooLong(Recording{Data: make([]byte, maxBytes("audio/webm")), MediaType: "audio/webm"})
+	assert.False(t, long, "at the byte cap")
+	assert.Equal(t, MaxSeconds*time.Second, length)
+	assert.False(t, measured)
+	long, _, _ = tooLong(Recording{Data: make([]byte, maxBytes("audio/webm")+1), MediaType: "audio/webm"})
+	assert.True(t, long)
+	for _, mt := range MediaTypes {
+		assert.Positive(t, maxBytes(mt), mt)
+		assert.Less(t, maxBytes(mt), MaxAudioBytes+1, mt)
+	}
+}
+
+func TestStockErr(t *testing.T) {
+	c := change{path: "body.lines[2]", item: ids.New(time.Unix(0, 0))}
+	var pe *problem.Error
+	require.ErrorAs(t, stockErr(c, ErrStale), &pe)
+	assert.Equal(t, genproblems.Conflict, pe.Code)
+	assert.Equal(t, http.StatusConflict, problem.Status(pe))
+	assert.NoError(t, stockErr(c, nil))
+	other := errors.New("boom")
+	assert.Equal(t, other, stockErr(c, other))
 }

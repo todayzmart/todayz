@@ -67,7 +67,7 @@ const LINES = [
 ];
 
 /** The server reads the caller's role: only a cashier gets `ask_manager` on the restock and the price. */
-function draft(status: string, role: string) {
+function draft(status: string, role: string, partial = false) {
   return {
     draftId: DRAFT,
     feature: 'voice_stock',
@@ -77,10 +77,19 @@ function draft(status: string, role: string) {
     language: status === 'processing' ? null : 'en-IN',
     transcript: status === 'processing' ? null : 'sold 2 Maggi, 10 Amul milk came in, Parle-G is out of stock, Surf Excel price 128, 3 kurkure',
     lines: status === 'processing' ? [] : LINES.map((l) => (role === 'cashier' ? l : { ...l, disabled: null })),
-    outcomes: [],
+    // After a cashier's confirm: their lines applied, the restock and the price wait for a manager.
+    outcomes: partial ? PARTIAL : [],
     failure: null,
   };
 }
+
+const PARTIAL = [
+  { lineId: 'l1', outcome: 'accepted' },
+  { lineId: 'l2', outcome: 'not_permitted' },
+  { lineId: 'l3', outcome: 'accepted' },
+  { lineId: 'l4', outcome: 'not_permitted' },
+  { lineId: 'l5', outcome: 'edited' },
+];
 
 const cors = (route: Route) => {
   const req = route.request();
@@ -100,13 +109,15 @@ interface Fake {
   ready: boolean;
   /** Voice is on for the shop. */
   on: boolean;
+  /** The draft is one a cashier already confirmed in part. */
+  partial: boolean;
   confirm: unknown;
   uploads: number;
   idempotencyKey: string | undefined;
 }
 
 async function fakeApi(page: Page, role: string): Promise<Fake> {
-  const fake: Fake = { ready: false, on: true, confirm: undefined, uploads: 0, idempotencyKey: undefined };
+  const fake: Fake = { ready: false, on: true, partial: false, confirm: undefined, uploads: 0, idempotencyKey: undefined };
   await page.route('**/v1/**', (route) => {
     const req = route.request();
     const url = new URL(req.url());
@@ -131,20 +142,16 @@ async function fakeApi(page: Page, role: string): Promise<Fake> {
       fake.uploads++;
       return ok(route, { draftId: DRAFT, status: 'processing' }, 202);
     }
-    if (url.pathname === `${voice}/drafts/${DRAFT}`) return ok(route, draft(fake.ready ? 'ready' : 'processing', role));
+    if (url.pathname === `${voice}/drafts/${DRAFT}`) return ok(route, draft(fake.ready ? 'ready' : 'processing', role, fake.partial));
     if (url.pathname === `${voice}/drafts/${DRAFT}/confirm`) {
       fake.confirm = req.postDataJSON();
       fake.idempotencyKey = req.headers()['idempotency-key'];
+      // A cashier's lines are applied and the draft stays open for the rest; a manager closes it.
+      if (role === 'cashier') return ok(route, { draftId: DRAFT, status: 'ready', lines: PARTIAL });
       return ok(route, {
         draftId: DRAFT,
         status: 'confirmed',
-        lines: [
-          { lineId: 'l1', outcome: 'accepted' },
-          { lineId: 'l2', outcome: 'not_permitted' },
-          { lineId: 'l3', outcome: 'accepted' },
-          { lineId: 'l4', outcome: 'not_permitted' },
-          { lineId: 'l5', outcome: 'edited' },
-        ],
+        lines: PARTIAL.map((o) => (o.outcome === 'not_permitted' ? { ...o, outcome: 'accepted' } : o)),
       });
     }
     return route.fulfill({ status: 404, contentType: 'application/problem+json', headers: cors(route), body: JSON.stringify({ type: 'about:blank#not_found', title: 'Not found', status: 404, code: 'not_found' }) });
@@ -233,7 +240,7 @@ test('phone 360: a cashier speaks, checks the draft, picks an item and confirms 
   await expect(confirm).toBeEnabled();
   await shot(page, 'voice-ready-360.png', { fullPage: true });
   await confirm.click();
-  await expect(page.getByText('Draft confirmed')).toBeVisible();
+  await expect(page.getByText('Ask a manager to confirm the rest')).toBeVisible();
   await expect(page.getByText('3 changes applied, 2 left for a manager.')).toBeVisible();
   expect(fake.idempotencyKey).toBeTruthy();
   expect(fake.confirm).toEqual({
@@ -247,6 +254,43 @@ test('phone 360: a cashier speaks, checks the draft, picks an item and confirms 
   });
   await noSideScroll(page);
   await shot(page, 'voice-done-360.png', { fullPage: true });
+});
+
+test('phone 360: a cashier reopens a draft confirmed in part: done lines shown, the rest wait for a manager (B-06)', async ({ page }) => {
+  const cashier = await fakeApi(page, 'cashier');
+  cashier.ready = true;
+  cashier.partial = true;
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto(`/voice?draft=${DRAFT}`);
+  const done = page.getByRole('region', { name: 'Already done' });
+  await expect(done.getByRole('listitem')).toHaveCount(3);
+  const list = page.getByRole('list', { name: 'Draft lines' });
+  await expect(list.getByRole('listitem')).toHaveCount(2);
+  await expect(list.getByText('Ask manager')).toHaveCount(2);
+  await expect(page.getByRole('button', { name: /^Confirm/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Speak again' })).toBeVisible();
+  await noSideScroll(page);
+  await shot(page, 'voice-partial-cashier-360.png', { fullPage: true });
+});
+
+test('phone 360: a manager reopens the draft and confirms only the open lines (B-06)', async ({ page }) => {
+  const fake = await fakeApi(page, 'manager');
+  fake.ready = true;
+  fake.partial = true;
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto(`/voice?draft=${DRAFT}`);
+  const list = page.getByRole('list', { name: 'Draft lines' });
+  await expect(list.getByRole('listitem')).toHaveCount(2);
+  await expect(list.getByText('Ask manager')).toHaveCount(0);
+  await shot(page, 'voice-partial-manager-360.png', { fullPage: true });
+  await page.getByRole('button', { name: 'Confirm 2 changes' }).click();
+  await expect(page.getByText('Draft confirmed')).toBeVisible();
+  expect(fake.confirm).toEqual({
+    lines: [
+      { lineId: 'l2', outcome: 'accepted' },
+      { lineId: 'l4', outcome: 'accepted' },
+    ],
+  });
 });
 
 test('phone 360: editing a line, a manager sees no ask-manager flags (B-06)', async ({ page }) => {

@@ -57,7 +57,7 @@ func mountVoice(r chi.Router, d *deps) {
 }
 
 // posSeller adapts pos.Service to voice.Seller: one cash sale with no
-// customer, its client id the draft's id (a replay finds the same sale).
+// customer under the client id voice gives it (a replay finds the same sale).
 type posSeller struct{ s *pos.Service }
 
 var _ voice.Seller = posSeller{}
@@ -117,6 +117,8 @@ func voiceStockErr(err error) error {
 		return voice.ErrAboveMRP
 	case errors.Is(err, catalogue.ErrItemNotFound):
 		return voice.ErrItemGone
+	case errors.Is(err, catalogue.ErrStale):
+		return voice.ErrStale
 	case errors.Is(err, catalogue.ErrQuantity), errors.As(err, &over):
 		return voice.ErrQuantity
 	}

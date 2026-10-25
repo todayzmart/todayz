@@ -11,11 +11,12 @@
 //     that the backend maps back to store item ids, so an id the store does not have can
 //     never come out of the model. A ref not in the list becomes an unmatched line.
 //   - Line kinds are sale, restock, count and set_price (D-65). "Out of stock" is a count
-//     of 0. A sale is one POS sale with no customer (cash, at the items' prices at confirm).
+//     of 0. A sale is a POS sale with no customer (cash, at the items' prices at confirm).
 //   - Confirm checks every line against the confirmer's permission: sale needs pos.sell,
 //     count stock.count (cashier and above), restock stock.restock and set_price
 //     item.price.edit (manager and above). A line the confirmer may not make is
-//     not_permitted and not applied; the draft shows it disabled ("Ask a manager").
+//     not_permitted and not applied; the draft shows it disabled ("Ask a manager") and stays
+//     open with those lines until a manager confirms or someone discards them.
 //   - Every endpoint is the common 404 while ai_voice_stock_enabled or feature_voice_enabled
 //     is off or a provider key is missing (guard.Require).
 //   - Transcripts are kept TranscriptRetention for quality review, then removed from the
@@ -86,6 +87,7 @@ var (
 	ErrAboveMRP = errors.New("voice: the price is above the item's MRP")
 	ErrItemGone = errors.New("voice: the item is not in the store")
 	ErrQuantity = errors.New("voice: quantity out of range")
+	ErrStale    = errors.New("voice: the item changed under the confirm")
 	errNullID   = errors.New("voice: an item row has no id")
 )
 

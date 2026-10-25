@@ -1,6 +1,18 @@
 import type { VoiceStockLine } from '@todayz/api-client/gen/model/voiceStockLine';
 import { describe, expect, it } from 'vitest';
-import { canConfirmKind, decisions, discardAll, initialChoices, lineState, numberOk, percent, summarise, type Choice } from './lines';
+import {
+  canConfirmKind,
+  decisions,
+  discardAll,
+  initialChoices,
+  lineState,
+  numberOk,
+  percent,
+  splitDraft,
+  summarise,
+  validateVoiceSearch,
+  type Choice,
+} from './lines';
 import { baseType, level } from './recorder';
 
 function line(id: string, over: Partial<VoiceStockLine> = {}): VoiceStockLine {
@@ -117,6 +129,32 @@ describe('the confirm body', () => {
     expect(percent(0.923)).toBe(92);
     expect(percent(1.4)).toBe(100);
     expect(percent(-1)).toBe(0);
+  });
+});
+
+describe('a draft confirmed in part', () => {
+  it('keeps only the lines a manager still has to confirm open', () => {
+    const lines = [line('a'), line('b', { kind: 'restock' }), line('c'), line('d', { kind: 'set_price' })];
+    expect(splitDraft({ lines, outcomes: [] })).toEqual({ open: lines, settled: [] });
+    const out = splitDraft({
+      lines,
+      outcomes: [
+        { lineId: 'a', outcome: 'accepted' },
+        { lineId: 'b', outcome: 'not_permitted' },
+        { lineId: 'c', outcome: 'discarded' },
+        { lineId: 'd', outcome: 'not_permitted' },
+      ],
+    });
+    expect(out.open.map((l) => l.lineId)).toEqual(['b', 'd']);
+    expect(out.settled.map((o) => o.lineId)).toEqual(['a', 'c']);
+  });
+
+  it('reads ?draft= only when it is a ULID', () => {
+    expect(validateVoiceSearch({ draft: '01JB2Q7Z8M3V6Y4K2T9W5R1C0D' })).toEqual({ draft: '01JB2Q7Z8M3V6Y4K2T9W5R1C0D' });
+    expect(validateVoiceSearch({ draft: '../x' })).toEqual({});
+    expect(validateVoiceSearch({ draft: '91JB2Q7Z8M3V6Y4K2T9W5R1C0D' })).toEqual({});
+    expect(validateVoiceSearch({ draft: 7 })).toEqual({});
+    expect(validateVoiceSearch({})).toEqual({});
   });
 });
 

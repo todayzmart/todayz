@@ -26,6 +26,11 @@ type Recording struct {
 	Data      []byte
 	MediaType string
 	Language  string // a VoiceStockLanguage, or "" to detect
+	// Length is what the container says, or MaxSeconds when it does not (tooLong); the
+	// speech cost is charged on it.
+	Length time.Duration
+	// Measured is whether Length came from the container.
+	Measured bool
 }
 
 // inputMeta is the draft's input_meta: small facts, never the audio or its words.
@@ -33,6 +38,8 @@ type inputMeta struct {
 	Language  string `json:"language,omitempty"`
 	Bytes     int    `json:"bytes"`
 	MediaType string `json:"mediaType"`
+	// DurationMs is the length the container states (absent when it does not say).
+	DurationMs int64 `json:"durationMs,omitempty"`
 }
 
 // Create checks the switches and the daily cap, stores a processing draft and starts the
@@ -41,18 +48,29 @@ func (s *Service) Create(ctx context.Context, sc authz.Scope, actor ids.ID, rec 
 	if err := s.d.Guard.Require(ctx, Feature); err != nil {
 		return ids.Zero, err
 	}
-	if err := s.d.Guard.Reserve(ctx, Feature, guard.Subject{Store: sc.StoreID}); err != nil {
+	meta := inputMeta{Language: rec.Language, Bytes: len(rec.Data), MediaType: rec.MediaType}
+	if rec.Measured {
+		meta.DurationMs = rec.Length.Milliseconds()
+	}
+	// The call is counted and the draft stored together: a draft that cannot be stored does
+	// not use up one of the store's calls for the day.
+	var id ids.ID
+	err := s.d.DB.InTx(ctx, func(ctx context.Context) error {
+		if err := s.d.Guard.Reserve(ctx, Feature, guard.Subject{Store: sc.StoreID}); err != nil {
+			return err
+		}
+		var err error
+		id, err = s.d.Drafts.Create(ctx, drafts.NewDraft{
+			Feature: Feature, Store: sc.StoreID, Actor: actor, PromptVersion: prompts.Version(Feature),
+			InputMeta: meta,
+		})
+		return err
+	})
+	if err != nil {
 		var ce *guard.CapError
 		if errors.As(err, &ce) {
 			return ids.Zero, ce.Problem()
 		}
-		return ids.Zero, err
-	}
-	id, err := s.d.Drafts.Create(ctx, drafts.NewDraft{
-		Feature: Feature, Store: sc.StoreID, Actor: actor, PromptVersion: prompts.Version(Feature),
-		InputMeta: inputMeta{Language: rec.Language, Bytes: len(rec.Data), MediaType: rec.MediaType},
-	})
-	if err != nil {
 		return ids.Zero, err
 	}
 	// The work outlives the request: it keeps the request's values (logger, trace) but not
@@ -78,25 +96,36 @@ func (s *Service) process(ctx context.Context, id, storeID ids.ID, rec Recording
 	}
 
 	tr, err := s.d.STT.Transcribe(ctx, client.Audio{Data: rec.Data, MediaType: rec.MediaType, Filename: "voice" + extension(rec.MediaType), Language: rec.Language})
+	// Speech is charged by length whenever the provider took the recording, answered or not
+	// (a call that never left, not configured or refused here, costs nothing).
+	speech := client.Response{}
+	if !errors.Is(err, client.ErrNotConfigured) && !errors.Is(err, client.ErrBadRequest) {
+		speech.CostPaise = client.SpeechCostPaise(rec.Length)
+		if serr := s.d.Guard.Settle(ctx, speech.CostPaise); serr != nil {
+			log.ErrorContext(ctx, "voice: settle speech", slog.Any("err", serr))
+		}
+	}
 	if err != nil {
-		fail(client.Outcome(err), client.Response{})
+		fail(client.Outcome(err), speech)
 		return
 	}
 	transcript := truncate(strings.TrimSpace(scrub.Text(tr.Text, scrub.Options{}).Text), MaxTranscript)
 	if transcript == "" {
-		fail(FailEmpty, client.Response{})
+		fail(FailEmpty, speech)
 		return
 	}
 	cands, err := s.candidates(ctx, storeID)
 	if err != nil {
 		log.ErrorContext(ctx, "voice: candidates", slog.String("draft_id", id.String()), slog.Any("err", err))
-		fail(client.OutcomeError, client.Response{})
+		fail(client.OutcomeError, speech)
 		return
 	}
 	p, err := Parse(ctx, s.d.LLM, s.model(ctx), transcript, cands)
 	if serr := s.d.Guard.Settle(ctx, p.Resp.CostPaise); serr != nil {
 		log.ErrorContext(ctx, "voice: settle", slog.Any("err", serr))
 	}
+	// The draft's cost is both calls'.
+	p.Resp.CostPaise += speech.CostPaise
 	switch {
 	case err != nil:
 		log.ErrorContext(ctx, "voice: model call", slog.String("draft_id", id.String()), slog.Any("err", err))

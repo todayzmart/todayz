@@ -52,7 +52,7 @@
   "voice.off.body": {
     "message": "ಈ ಅಂಗಡಿಗೆ ಈಗ ಧ್ವನಿಯಿಂದ ಅಪ್‌ಡೇಟ್ ಲಭ್ಯವಿಲ್ಲ. ಸ್ಟಾಕ್ ಪುಟದಲ್ಲಿ ಸ್ಟಾಕ್ ಅಪ್‌ಡೇಟ್ ಮಾಡಬಹುದು.",
     "review": "reviewed",
-    "enHash": "46616079"
+    "enHash": "4b6d60aa"
   },
   "voice.openStock": {
     "message": "ಸ್ಟಾಕ್ ತೆರೆಯಿರಿ",
@@ -107,7 +107,7 @@
   "voice.talk.error.unsupported": {
     "message": "ಈ ಬ್ರೌಸರ್ ಧ್ವನಿ ರೆಕಾರ್ಡ್ ಮಾಡಲಾರದು. ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ Chrome ಪ್ರಯತ್ನಿಸಿ.",
     "review": "reviewed",
-    "enHash": "1def2eda"
+    "enHash": "2a109179"
   },
   "voice.talk.error.denied": {
     "message": "ಈ ಸೈಟ್‌ಗೆ ಮೈಕ್ರೋಫೋನ್ ಅನುಮತಿ ನೀಡಿ, ನಂತರ ಬಟನ್ ಮತ್ತೆ ಒತ್ತಿ ಹಿಡಿಯಿರಿ.",
@@ -167,7 +167,7 @@
   "voice.error.ai_daily_cap_reached": {
     "message": "ಈ ಅಂಗಡಿಗೆ ಇಂದಿನ ಧ್ವನಿಯಿಂದ ಅಪ್‌ಡೇಟ್ ಮಿತಿ ಮುಗಿದಿದೆ. ಸ್ಟಾಕ್ ಪುಟದಲ್ಲಿ ಸ್ಟಾಕ್ ಅಪ್‌ಡೇಟ್ ಮಾಡಬಹುದು.",
     "review": "reviewed",
-    "enHash": "920c511b"
+    "enHash": "f12504e6"
   },
   "voice.error.validation_failed": {
     "message": "ಒಂದು ಸಾಲನ್ನು ಸರಿಪಡಿಸಬೇಕು. ಹೈಲೈಟ್ ಮಾಡಿದ ಸಾಲುಗಳನ್ನು ನೋಡಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
@@ -210,9 +210,9 @@
     "enHash": "e838c9b9"
   },
   "voice.review.manager": {
-    "message": "{n, plural, one {# ಸಾಲಿಗೆ ಮ್ಯಾನೇಜರ್ ಬೇಕು, ಅದು ಅನ್ವಯವಾಗುವುದಿಲ್ಲ.} other {# ಸಾಲುಗಳಿಗೆ ಮ್ಯಾನೇಜರ್ ಬೇಕು, ಅವು ಅನ್ವಯವಾಗುವುದಿಲ್ಲ.}}",
+    "message": "{n, plural, one {# ಸಾಲಿಗೆ ಮ್ಯಾನೇಜರ್ ಬೇಕು. ಮ್ಯಾನೇಜರ್ ಖಚಿತಪಡಿಸುವವರೆಗೆ ಅದು ಈ ಡ್ರಾಫ್ಟ್‌ನಲ್ಲೇ ಇರುತ್ತದೆ.} other {# ಸಾಲುಗಳಿಗೆ ಮ್ಯಾನೇಜರ್ ಬೇಕು. ಮ್ಯಾನೇಜರ್ ಖಚಿತಪಡಿಸುವವರೆಗೆ ಅವು ಈ ಡ್ರಾಫ್ಟ್‌ನಲ್ಲೇ ಇರುತ್ತವೆ.}}",
     "review": "reviewed",
-    "enHash": "ddc2967b"
+    "enHash": "7c06ed60"
   },
   "voice.review.lines": {
     "message": "ಡ್ರಾಫ್ಟ್ ಸಾಲುಗಳು",
@@ -340,9 +340,9 @@
     "enHash": "4a9667be"
   },
   "voice.line.managerNote": {
-    "message": "ಮ್ಯಾನೇಜರ್ ಅಥವಾ ಮಾಲೀಕರು ಮಾತ್ರ ಇದನ್ನು ಖಚಿತಪಡಿಸಬಹುದು. ಇದು ಅನ್ವಯವಾಗುವುದಿಲ್ಲ.",
+    "message": "ಮ್ಯಾನೇಜರ್ ಅಥವಾ ಮಾಲೀಕರು ಮಾತ್ರ ಇದನ್ನು ಖಚಿತಪಡಿಸಬಹುದು. ಇದು ಈ ಡ್ರಾಫ್ಟ್‌ನಲ್ಲಿ ಅವರಿಗಾಗಿ ಕಾಯುತ್ತದೆ.",
     "review": "reviewed",
-    "enHash": "b9ff8aa5"
+    "enHash": "b7af692b"
   },
   "voice.line.restore": {
     "message": "ಹಿಂಪಡೆಯಿರಿ",
@@ -467,7 +467,7 @@
   "voice.edit.noItems": {
     "message": "ಯಾವುದೇ ಐಟಂ ಸಿಗಲಿಲ್ಲ. ಮೊದಲು ಸ್ಟಾಕ್ ಪುಟದಲ್ಲಿ ಸೇರಿಸಿ.",
     "review": "reviewed",
-    "enHash": "79cbb0fb"
+    "enHash": "e1944bba"
   },
   "voice.edit.results": {
     "message": "ಹೊಂದುವ ಐಟಂಗಳು",
@@ -528,5 +528,15 @@
     "message": "ಸರಿಯಾದ ಹೊಂದಾಣಿಕೆಗೆ ಇದೇ ಭಾಷೆಯಲ್ಲಿ ಮಾತನಾಡಿ.",
     "review": "reviewed",
     "enHash": "0adf1be4"
+  },
+  "voice.review.settled": {
+    "message": "ಈಗಾಗಲೇ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "0022bedc"
+  },
+  "voice.done.partial": {
+    "message": "ಉಳಿದವನ್ನು ಖಚಿತಪಡಿಸಲು ಮ್ಯಾನೇಜರ್‌ಗೆ ಹೇಳಿ",
+    "review": "reviewed",
+    "enHash": "d6fd25cc"
   }
 }

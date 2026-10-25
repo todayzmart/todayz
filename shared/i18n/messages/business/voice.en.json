@@ -40,7 +40,7 @@
     "description": "Voice integration is off for this shop"
   },
   "voice.off.body": {
-    "defaultMessage": "Voice update isn't available for this shop right now. You can still update stock on the Stock page.",
+    "defaultMessage": "Voice update isn't available for this shop right now. You can still update stock on the “Stock” page.",
     "description": "Body under voice.off.title"
   },
   "voice.openStock": {
@@ -88,7 +88,7 @@
     "description": "Screen reader status while recording"
   },
   "voice.talk.error.unsupported": {
-    "defaultMessage": "This browser can't record sound. Try Chrome on your phone.",
+    "defaultMessage": "This browser can't record sound. Try “Chrome” on your phone.",
     "description": "No MediaRecorder or microphone API"
   },
   "voice.talk.error.denied": {
@@ -136,7 +136,7 @@
     "description": "Upload over the size limit"
   },
   "voice.error.ai_daily_cap_reached": {
-    "defaultMessage": "Voice update has reached today's limit for this shop. You can still update stock on the Stock page.",
+    "defaultMessage": "Voice update has reached today's limit for this shop. You can still update stock on the “Stock” page.",
     "description": "Daily AI cap reached"
   },
   "voice.error.validation_failed": {
@@ -172,12 +172,16 @@
     "description": "Banner: lines still need a pick or a fix"
   },
   "voice.review.manager": {
-    "defaultMessage": "{n, plural, one {# line needs a manager and won't be applied.} other {# lines need a manager and won't be applied.}}",
+    "defaultMessage": "{n, plural, one {# line needs a manager. It stays on this draft until a manager confirms it.} other {# lines need a manager. They stay on this draft until a manager confirms them.}}",
     "description": "Banner for a cashier: lines they may not confirm"
   },
   "voice.review.lines": {
     "defaultMessage": "Draft lines",
     "description": "Accessible name of the line list"
+  },
+  "voice.review.settled": {
+    "defaultMessage": "Already done",
+    "description": "Heading over lines a cashier already confirmed on this draft"
   },
   "voice.review.discard": {
     "defaultMessage": "Discard",
@@ -276,7 +280,7 @@
     "description": "Low model confidence"
   },
   "voice.line.managerNote": {
-    "defaultMessage": "Only a manager or owner can confirm this. It won't be applied.",
+    "defaultMessage": "Only a manager or owner can confirm this. It waits on this draft for them.",
     "description": "Note on a line the caller may not confirm"
   },
   "voice.line.restore": {
@@ -376,7 +380,7 @@
     "description": "Item search placeholder"
   },
   "voice.edit.noItems": {
-    "defaultMessage": "No items found. Add it on the Stock page first.",
+    "defaultMessage": "No items found. Add it on the “Stock” page first.",
     "description": "Item search found nothing"
   },
   "voice.edit.results": {
@@ -398,6 +402,10 @@
   "voice.done.discarded": {
     "defaultMessage": "Draft discarded. Nothing changed.",
     "description": "Result heading after Discard"
+  },
+  "voice.done.partial": {
+    "defaultMessage": "Ask a manager to confirm the rest",
+    "description": "Result heading when some lines wait for a manager"
   },
   "voice.done.body": {
     "defaultMessage": "{applied, plural, one {# change applied} other {# changes applied}}{held, plural, =0 {.} other {, # left for a manager.}}",

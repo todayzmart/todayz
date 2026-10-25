@@ -95,8 +95,8 @@ func (h handlers) CreateVoiceStockDraft(ctx context.Context, req voiceapi.Create
 	return voiceapi.CreateVoiceStockDraft202JSONResponse{DraftId: id.String(), Status: voiceapi.VoiceStockDraftCreatedStatusProcessing}, nil
 }
 
-// readRecording reads the form: one audio part of an allowed type and at most MaxAudioBytes,
-// and an optional language. Any other part, or a second one, is refused.
+// readRecording reads the form: one audio part of an allowed type, at most MaxAudioBytes and
+// no longer than MaxSeconds (tooLong), and an optional language. Any other part, or a second one, is refused.
 func readRecording(mr *multipart.Reader) (Recording, error) {
 	var rec Recording
 	seen := map[string]bool{}
@@ -146,6 +146,11 @@ func readRecording(mr *multipart.Reader) (Recording, error) {
 	if rec.Data == nil {
 		return Recording{}, fieldErr("body.audio", "required")
 	}
+	long, length, measured := tooLong(rec)
+	if long {
+		return Recording{}, fieldErr("body.audio", "too_long")
+	}
+	rec.Length, rec.Measured = length, measured
 	return rec, nil
 }
 

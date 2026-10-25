@@ -52,7 +52,7 @@
   "voice.off.body": {
     "message": "ఈ షాప్‌కు ఇప్పుడు వాయిస్‌తో అప్‌డేట్ అందుబాటులో లేదు. స్టాక్ పేజీలో స్టాక్ అప్‌డేట్ చేయవచ్చు.",
     "review": "reviewed",
-    "enHash": "46616079"
+    "enHash": "4b6d60aa"
   },
   "voice.openStock": {
     "message": "స్టాక్ తెరవండి",
@@ -107,7 +107,7 @@
   "voice.talk.error.unsupported": {
     "message": "ఈ బ్రౌజర్ శబ్దాన్ని రికార్డ్ చేయలేదు. మీ ఫోన్‌లో Chrome ప్రయత్నించండి.",
     "review": "reviewed",
-    "enHash": "1def2eda"
+    "enHash": "2a109179"
   },
   "voice.talk.error.denied": {
     "message": "ఈ సైట్‌కు మైక్రోఫోన్ అనుమతి ఇవ్వండి, తర్వాత బటన్‌ను మళ్ళీ నొక్కి పట్టుకోండి.",
@@ -167,7 +167,7 @@
   "voice.error.ai_daily_cap_reached": {
     "message": "ఈ షాప్‌కు ఈరోజు వాయిస్‌తో అప్‌డేట్ పరిమితి అయిపోయింది. స్టాక్ పేజీలో స్టాక్ అప్‌డేట్ చేయవచ్చు.",
     "review": "reviewed",
-    "enHash": "920c511b"
+    "enHash": "f12504e6"
   },
   "voice.error.validation_failed": {
     "message": "ఒక లైన్ సరిచేయాలి. హైలైట్ చేసిన లైన్‌లు చూసి మళ్ళీ ప్రయత్నించండి.",
@@ -210,9 +210,9 @@
     "enHash": "e838c9b9"
   },
   "voice.review.manager": {
-    "message": "{n, plural, one {# లైన్‌కు మేనేజర్ కావాలి, అది అమలు కాదు.} other {# లైన్‌లకు మేనేజర్ కావాలి, అవి అమలు కావు.}}",
+    "message": "{n, plural, one {# లైన్‌కు మేనేజర్ కావాలి. మేనేజర్ నిర్ధారించే వరకు అది ఈ డ్రాఫ్ట్‌లోనే ఉంటుంది.} other {# లైన్‌లకు మేనేజర్ కావాలి. మేనేజర్ నిర్ధారించే వరకు అవి ఈ డ్రాఫ్ట్‌లోనే ఉంటాయి.}}",
     "review": "reviewed",
-    "enHash": "ddc2967b"
+    "enHash": "7c06ed60"
   },
   "voice.review.lines": {
     "message": "డ్రాఫ్ట్ లైన్‌లు",
@@ -340,9 +340,9 @@
     "enHash": "4a9667be"
   },
   "voice.line.managerNote": {
-    "message": "మేనేజర్ లేదా యజమాని మాత్రమే దీన్ని నిర్ధారించగలరు. ఇది అమలు కాదు.",
+    "message": "మేనేజర్ లేదా యజమాని మాత్రమే దీన్ని నిర్ధారించగలరు. ఇది ఈ డ్రాఫ్ట్‌లో వారి కోసం వేచి ఉంటుంది.",
     "review": "reviewed",
-    "enHash": "b9ff8aa5"
+    "enHash": "b7af692b"
   },
   "voice.line.restore": {
     "message": "వెనక్కి తీసుకురండి",
@@ -467,7 +467,7 @@
   "voice.edit.noItems": {
     "message": "ఏ ఐటమ్ దొరకలేదు. ముందుగా స్టాక్ పేజీలో జోడించండి.",
     "review": "reviewed",
-    "enHash": "79cbb0fb"
+    "enHash": "e1944bba"
   },
   "voice.edit.results": {
     "message": "సరిపోయే ఐటమ్‌లు",
@@ -528,5 +528,15 @@
     "message": "సరైన మ్యాచ్ కోసం ఇదే భాషలో మాట్లాడండి.",
     "review": "reviewed",
     "enHash": "0adf1be4"
+  },
+  "voice.review.settled": {
+    "message": "ఇప్పటికే అయింది",
+    "review": "reviewed",
+    "enHash": "0022bedc"
+  },
+  "voice.done.partial": {
+    "message": "మిగతావాటిని నిర్ధారించమని మేనేజర్‌ను అడగండి",
+    "review": "reviewed",
+    "enHash": "d6fd25cc"
   }
 }

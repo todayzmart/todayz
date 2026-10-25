@@ -52,7 +52,7 @@
   "voice.off.body": {
     "message": "இந்தக் கடைக்கு இப்போது குரல் மூலம் புதுப்பிப்பு கிடைக்கவில்லை. ஸ்டாக் பக்கத்தில் ஸ்டாக்கைப் புதுப்பிக்கலாம்.",
     "review": "reviewed",
-    "enHash": "46616079"
+    "enHash": "4b6d60aa"
   },
   "voice.openStock": {
     "message": "ஸ்டாக்கைத் திறக்கவும்",
@@ -107,7 +107,7 @@
   "voice.talk.error.unsupported": {
     "message": "இந்த உலாவியால் ஒலியைப் பதிவு செய்ய முடியாது. உங்கள் ஃபோனில் Chrome முயலவும்.",
     "review": "reviewed",
-    "enHash": "1def2eda"
+    "enHash": "2a109179"
   },
   "voice.talk.error.denied": {
     "message": "இந்தத் தளத்துக்கு மைக்ரோஃபோன் அனுமதி கொடுத்து, பொத்தானை மீண்டும் அழுத்திப் பிடிக்கவும்.",
@@ -167,7 +167,7 @@
   "voice.error.ai_daily_cap_reached": {
     "message": "இந்தக் கடைக்கு இன்றைய குரல் மூலம் புதுப்பிப்பு வரம்பு முடிந்தது. ஸ்டாக் பக்கத்தில் ஸ்டாக்கைப் புதுப்பிக்கலாம்.",
     "review": "reviewed",
-    "enHash": "920c511b"
+    "enHash": "f12504e6"
   },
   "voice.error.validation_failed": {
     "message": "ஒரு வரியைச் சரிசெய்ய வேண்டும். குறிக்கப்பட்ட வரிகளைப் பார்த்து மீண்டும் முயலவும்.",
@@ -210,9 +210,9 @@
     "enHash": "e838c9b9"
   },
   "voice.review.manager": {
-    "message": "{n, plural, one {# வரிக்கு மேனேஜர் தேவை, அது செயல்படுத்தப்படாது.} other {# வரிகளுக்கு மேனேஜர் தேவை, அவை செயல்படுத்தப்படாது.}}",
+    "message": "{n, plural, one {# வரிக்கு மேனேஜர் தேவை. மேனேஜர் உறுதிசெய்யும் வரை அது இந்த வரைவிலேயே இருக்கும்.} other {# வரிகளுக்கு மேனேஜர் தேவை. மேனேஜர் உறுதிசெய்யும் வரை அவை இந்த வரைவிலேயே இருக்கும்.}}",
     "review": "reviewed",
-    "enHash": "ddc2967b"
+    "enHash": "7c06ed60"
   },
   "voice.review.lines": {
     "message": "வரைவு வரிகள்",
@@ -340,9 +340,9 @@
     "enHash": "4a9667be"
   },
   "voice.line.managerNote": {
-    "message": "மேனேஜர் அல்லது உரிமையாளர் மட்டுமே இதை உறுதிசெய்ய முடியும். இது செயல்படுத்தப்படாது.",
+    "message": "மேனேஜர் அல்லது உரிமையாளர் மட்டுமே இதை உறுதிசெய்ய முடியும். இது இந்த வரைவில் அவர்களுக்காகக் காத்திருக்கும்.",
     "review": "reviewed",
-    "enHash": "b9ff8aa5"
+    "enHash": "b7af692b"
   },
   "voice.line.restore": {
     "message": "திரும்பக் கொண்டுவா",
@@ -467,7 +467,7 @@
   "voice.edit.noItems": {
     "message": "பொருள் எதுவும் கிடைக்கவில்லை. முதலில் ஸ்டாக் பக்கத்தில் சேர்க்கவும்.",
     "review": "reviewed",
-    "enHash": "79cbb0fb"
+    "enHash": "e1944bba"
   },
   "voice.edit.results": {
     "message": "பொருந்தும் பொருட்கள்",
@@ -528,5 +528,15 @@
     "message": "சரியான பொருத்தத்திற்கு இதே மொழியில் பேசுங்கள்.",
     "review": "reviewed",
     "enHash": "0adf1be4"
+  },
+  "voice.review.settled": {
+    "message": "ஏற்கெனவே முடிந்தது",
+    "review": "reviewed",
+    "enHash": "0022bedc"
+  },
+  "voice.done.partial": {
+    "message": "மீதியை உறுதிசெய்ய மேனேஜரிடம் சொல்லுங்கள்",
+    "review": "reviewed",
+    "enHash": "d6fd25cc"
   }
 }

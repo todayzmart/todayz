@@ -65,6 +65,24 @@ function voiceHandlers(then: ReturnType<typeof draft>): Handler[] {
   ];
 }
 
+/** A draft a cashier has confirmed in part: the sale applied, the restock waiting for a manager. */
+const PARTIAL = '01JB2Q7Z8M3V6Y4K2T9W5R1C0D';
+function partialHandlers(role: 'cashier' | 'manager'): Handler[] {
+  // The server flags a line ask_manager only for a viewer who may not confirm its kind.
+  const disabled = role === 'cashier' ? 'ask_manager' : null;
+  const d = draft('ready', [line('a'), line('b', { kind: 'restock', quantity: 10, disabled, heard: '10 milk came' })], {
+    draftId: PARTIAL,
+    outcomes: [
+      { lineId: 'a', outcome: 'accepted' },
+      { lineId: 'b', outcome: 'not_permitted' },
+    ],
+  });
+  return [
+    (c) => (c.method === 'GET' && c.path === VOICE ? json(200, AVAILABLE) : undefined),
+    (c) => (c.method === 'GET' && c.path === `${VOICE}/drafts/${PARTIAL}` ? json(200, d) : undefined),
+  ];
+}
+
 /** A MediaRecorder that hands back one small chunk on stop; jsdom has none. */
 class FakeRecorder {
   static isTypeSupported(t: string) {
@@ -172,7 +190,7 @@ describe('SC-VO-03 a cashier sees ask manager', () => {
           body = c.body;
           return json(200, {
             draftId: 'd1',
-            status: 'confirmed',
+            status: 'ready',
             lines: [
               { lineId: 'a', outcome: 'accepted' },
               { lineId: 'b', outcome: 'not_permitted' },
@@ -184,11 +202,12 @@ describe('SC-VO-03 a cashier sees ask manager', () => {
     await speak();
     const list = await screen.findByRole('list', { name: 'Draft lines' }, { timeout: 3000 });
     expect(within(list).getByText('Ask manager')).toBeInTheDocument();
-    expect(within(list).getByText("Only a manager or owner can confirm this. It won't be applied.")).toBeInTheDocument();
-    expect(screen.getByText("1 line needs a manager and won't be applied.")).toBeInTheDocument();
+    expect(within(list).getByText('Only a manager or owner can confirm this. It waits on this draft for them.')).toBeInTheDocument();
+    expect(screen.getByText('1 line needs a manager. It stays on this draft until a manager confirms it.')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Confirm 1 change' }));
-    expect(await screen.findByText('Draft confirmed')).toBeInTheDocument();
+    // The server applied the sale and kept the draft open for the restock.
+    expect(await screen.findByText('Ask a manager to confirm the rest')).toBeInTheDocument();
     expect(screen.getByText('1 change applied, 1 left for a manager.')).toBeInTheDocument();
     expect(screen.getByText('Needs a manager')).toBeInTheDocument();
     expect(body).toEqual({
@@ -199,6 +218,52 @@ describe('SC-VO-03 a cashier sees ask manager', () => {
     });
     const confirm = calls.find((c) => c.path.endsWith('/confirm'));
     expect(confirm?.headers.get('Idempotency-Key')).toBeTruthy();
+  });
+
+  it('reopens a draft a cashier confirmed in part: done lines are shown, the cashier can only speak again', async () => {
+    const { calls, router } = renderAt(`/voice?draft=${PARTIAL}`, { messages, handlers: [shops('cashier'), ...partialHandlers('cashier')] });
+    const done = await screen.findByRole('region', { name: 'Already done' }, { timeout: 3000 });
+    expect(within(done).getByText('Item a')).toBeInTheDocument();
+    expect(within(done).getByText('Applied')).toBeInTheDocument();
+    const list = screen.getByRole('list', { name: 'Draft lines' });
+    expect(within(list).queryByText('Item a')).not.toBeInTheDocument();
+    expect(within(list).getByText('Ask manager')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Discard' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Confirm/ })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Speak again' }));
+    expect(await screen.findByRole('button', { name: 'Hold to talk' })).toBeInTheDocument();
+    await waitFor(() => expect(router.state.location.search).toEqual({}));
+    expect(calls.some((c) => c.path.endsWith('/confirm'))).toBe(false);
+  });
+
+  it('lets a manager finish it: only the open line is sent', async () => {
+    let body: unknown;
+    renderAt(`/voice?draft=${PARTIAL}`, {
+      messages,
+      handlers: [
+        shops('manager'),
+        ...partialHandlers('manager'),
+        (c) => {
+          if (c.method !== 'POST' || c.path !== `${VOICE}/drafts/${PARTIAL}/confirm`) return undefined;
+          body = c.body;
+          return json(200, {
+            draftId: PARTIAL,
+            status: 'confirmed',
+            lines: [
+              { lineId: 'a', outcome: 'accepted' },
+              { lineId: 'b', outcome: 'accepted' },
+            ],
+          });
+        },
+      ],
+    });
+    await screen.findByRole('region', { name: 'Already done' }, { timeout: 3000 });
+    const list = screen.getByRole('list', { name: 'Draft lines' });
+    expect(within(list).queryByText('Ask manager')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm 1 change' }));
+    expect(await screen.findByText('Draft confirmed')).toBeInTheDocument();
+    expect(body).toEqual({ lines: [{ lineId: 'b', outcome: 'accepted' }] });
   });
 
   it('gives a manager every kind without the flag', async () => {
@@ -324,7 +389,7 @@ describe('SC-VO-06 editing a line', () => {
     fireEvent.click(within(list).getByRole('button', { name: 'Edit' }));
     const sheet = await screen.findByRole('dialog', { name: 'Edit line' });
     fireEvent.click(within(sheet).getByRole('radio', { name: 'Restock' }));
-    expect(within(sheet).getByText("Only a manager or owner can confirm this. It won't be applied.")).toBeInTheDocument();
+    expect(within(sheet).getByText('Only a manager or owner can confirm this. It waits on this draft for them.')).toBeInTheDocument();
   });
 });
 
@@ -384,7 +449,7 @@ describe('SC-VO-08/09/10 refusals and failures', () => {
       ],
     });
     await speak();
-    expect(await screen.findByText("Voice update has reached today's limit for this shop. You can still update stock on the Stock page.")).toBeInTheDocument();
+    expect(await screen.findByText("Voice update has reached today's limit for this shop. You can still update stock on the “Stock” page.")).toBeInTheDocument();
   });
 
   it('refuses a recording above the size limit without sending it', async () => {

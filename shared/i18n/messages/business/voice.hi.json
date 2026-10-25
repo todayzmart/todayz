@@ -52,7 +52,7 @@
   "voice.off.body": {
     "message": "इस दुकान के लिए अभी आवाज़ से अपडेट उपलब्ध नहीं है। आप स्टॉक पेज पर स्टॉक अपडेट कर सकते हैं।",
     "review": "reviewed",
-    "enHash": "46616079"
+    "enHash": "4b6d60aa"
   },
   "voice.openStock": {
     "message": "स्टॉक खोलें",
@@ -107,7 +107,7 @@
   "voice.talk.error.unsupported": {
     "message": "यह ब्राउज़र आवाज़ रिकॉर्ड नहीं कर सकता। अपने फ़ोन पर Chrome आज़माएँ।",
     "review": "reviewed",
-    "enHash": "1def2eda"
+    "enHash": "2a109179"
   },
   "voice.talk.error.denied": {
     "message": "इस साइट के लिए माइक्रोफ़ोन की अनुमति दें, फिर बटन दोबारा दबाए रखें।",
@@ -167,7 +167,7 @@
   "voice.error.ai_daily_cap_reached": {
     "message": "इस दुकान के लिए आज की आवाज़ से अपडेट की सीमा पूरी हो गई। आप स्टॉक पेज पर स्टॉक अपडेट कर सकते हैं।",
     "review": "reviewed",
-    "enHash": "920c511b"
+    "enHash": "f12504e6"
   },
   "voice.error.validation_failed": {
     "message": "एक लाइन ठीक करनी है। हाइलाइट की गई लाइनें देखें और फिर से कोशिश करें।",
@@ -210,9 +210,9 @@
     "enHash": "e838c9b9"
   },
   "voice.review.manager": {
-    "message": "{n, plural, one {# लाइन के लिए मैनेजर चाहिए, यह लागू नहीं होगी।} other {# लाइनों के लिए मैनेजर चाहिए, ये लागू नहीं होंगी।}}",
+    "message": "{n, plural, one {# लाइन के लिए मैनेजर चाहिए। मैनेजर के कन्फ़र्म करने तक यह इसी ड्राफ़्ट में रहेगी।} other {# लाइनों के लिए मैनेजर चाहिए। मैनेजर के कन्फ़र्म करने तक ये इसी ड्राफ़्ट में रहेंगी।}}",
     "review": "reviewed",
-    "enHash": "ddc2967b"
+    "enHash": "7c06ed60"
   },
   "voice.review.lines": {
     "message": "ड्राफ़्ट की लाइनें",
@@ -340,9 +340,9 @@
     "enHash": "4a9667be"
   },
   "voice.line.managerNote": {
-    "message": "इसे सिर्फ़ मैनेजर या मालिक कन्फ़र्म कर सकते हैं। यह लागू नहीं होगा।",
+    "message": "इसे सिर्फ़ मैनेजर या मालिक कन्फ़र्म कर सकते हैं। यह इसी ड्राफ़्ट में उनका इंतज़ार करेगी।",
     "review": "reviewed",
-    "enHash": "b9ff8aa5"
+    "enHash": "b7af692b"
   },
   "voice.line.restore": {
     "message": "वापस लाएँ",
@@ -467,7 +467,7 @@
   "voice.edit.noItems": {
     "message": "कोई आइटम नहीं मिला। पहले स्टॉक पेज पर इसे जोड़ें।",
     "review": "reviewed",
-    "enHash": "79cbb0fb"
+    "enHash": "e1944bba"
   },
   "voice.edit.results": {
     "message": "मिलते-जुलते आइटम",
@@ -528,5 +528,15 @@
     "message": "सबसे सही मिलान के लिए इसी भाषा में बोलें।",
     "review": "reviewed",
     "enHash": "0adf1be4"
+  },
+  "voice.review.settled": {
+    "message": "हो चुका",
+    "review": "reviewed",
+    "enHash": "0022bedc"
+  },
+  "voice.done.partial": {
+    "message": "बाकी को कन्फ़र्म करने के लिए मैनेजर से कहें",
+    "review": "reviewed",
+    "enHash": "d6fd25cc"
   }
 }

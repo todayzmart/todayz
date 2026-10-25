@@ -59,7 +59,9 @@
     summary: Send a voice stock update (B-06)
     description: >-
       Cashier and above (`voice.draft`). A multipart form with `audio` (one recording of at most 15 s:
-      audio/webm, audio/ogg, audio/wav, audio/mpeg or audio/mp4, at most 1 MB) and an optional `language`
+      audio/webm, audio/ogg, audio/wav, audio/mpeg or audio/mp4, at most 1 MB; past 15 s by the container's
+      length, or past that type's top bit rate for 15 s when it does not say, is `422 validation_failed`
+      `body.audio: too_long`) and an optional `language`
       (VoiceStockLanguage; absent detects it). Answers 202 with the draft id at once; speech to text and the
       model run in the background and the draft turns ready or failed (poll the draft). The recording is
       not stored. Counts one call against the store's daily AI cap (`429 ai_daily_cap_reached`).
@@ -197,11 +199,16 @@
       `edited` with its value, `discarded`); a line with no decision is discarded. Each line is checked
       against the confirmer's permission (`pos.sell` for sale, `stock.count` for count, `stock.restock` for
       restock, `item.price.edit` for set_price): a line they may not confirm is recorded `not_permitted` and
-      not applied. Accepted lines are applied in one transaction through their own domains: restock and
-      count movements and price edits first, then one POS sale with no customer (cash, at the items'
-      prices now) holding every sale line. An accepted line that names no item, or a number out of range,
-      or a price above MRP, is `422 validation_failed` and nothing is applied. Idempotent: a repeat
-      answers the first result and applies nothing again. A draft not ready is `409 invalid_transition`.
+      not applied. Accepted lines are applied in one transaction through their own domains: price edits
+      first (a sale is at the new price wherever it was spoken), then restock and count movements and
+      sales in the order spoken ("sold 3, only 5 left" leaves 5), each run of adjacent sale lines one POS
+      sale with no customer (cash, at the items' prices then). An accepted line that names no item, or a
+      number out of range, or a price above MRP, is `422 validation_failed` and nothing is applied; an
+      item changed under the confirm is `409 conflict`. When a line is `not_permitted` the others are
+      applied and the draft stays `ready` with that line open: a manager's confirm then applies only the
+      open lines (decisions for settled lines are ignored), and discarding them closes the draft.
+      Idempotent: a repeat answers the first result and applies nothing again. A draft not ready is
+      `409 invalid_transition`.
     x-idempotency: required
     x-money: true
     parameters:
@@ -232,7 +239,7 @@
               $ref: ../schemas/voice.yaml#/VoiceStockConfirmResult
             example:
               draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0D
-              status: confirmed
+              status: ready
               lines:
               - lineId: l1
                 outcome: accepted

@@ -2,6 +2,7 @@ package voice
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -86,8 +87,12 @@ type change struct {
 
 // Confirm applies the person's decisions (B-06): every line is checked against the
 // confirmer's permission, accepted and edited lines are applied through their domains in
-// the draft's transaction (restocks, counts and prices first, then one sale), and the
+// the draft's transaction (prices first, then the rest in the order spoken), and the
 // outcomes are stored on the draft. A repeat answers the first result.
+//
+// A line the confirmer may not make keeps the draft open (drafts.Confirmation.KeepOpen): the
+// cashier's lines are applied and settled, the draft stays ready with the manager's lines,
+// and a manager's confirm then applies only those. A settled line is never applied again.
 func (s *Service) Confirm(ctx context.Context, sc authz.Scope, p authn.Principal, draftID ids.ID, in []voiceapi.VoiceStockDecision) (drafts.Result, error) {
 	if err := s.d.Guard.Require(ctx, Feature); err != nil {
 		return drafts.Result{}, err
@@ -110,7 +115,8 @@ func (s *Service) Confirm(ctx context.Context, sc authz.Scope, p authn.Principal
 	}
 	return s.d.Drafts.Confirm(ctx, drafts.Confirmation{
 		Feature: Feature, DraftID: draftID, By: p.UserID, Decisions: ds,
-		Check: func(d drafts.Draft) error { return s.owns(ctx, p, sc, d) },
+		KeepOpen: true,
+		Check:    func(d drafts.Draft) error { return s.owns(ctx, p, sc, d) },
 		Apply: func(ctx context.Context, d drafts.Draft, ds []drafts.Decision) ([]drafts.LineResult, error) {
 			return s.apply(ctx, sc, p, d, ds, index)
 		},
@@ -160,53 +166,88 @@ func (s *Service) apply(ctx context.Context, sc authz.Scope, p authn.Principal, 
 		}
 	}
 
-	// Restocks, counts and prices first, in the order spoken.
+	// Prices first: a sale in the same recording is at the new price wherever it was spoken
+	// ("teen butter becha, butter ka rate 58 karo" sells at ₹58; the shop states today's
+	// price, and the POS sale is written now). A price changes no quantity, so this cannot
+	// change what the stock lines leave.
+	for _, c := range todo {
+		if c.kind == KindSetPrice {
+			if err := stockErr(c, s.d.Stock.SetPrice(ctx, sc.StoreID, c.item, c.price)); err != nil {
+				return nil, err
+			}
+		}
+	}
+	// Then restocks, counts and sales in the order spoken, so "sold 3 Maggi, only 5 left"
+	// leaves 5 and "only 5 left, sold 3" leaves 2. Sale lines spoken one after another are
+	// one POS sale.
+	var run []change
+	flush := func() error {
+		if len(run) == 0 {
+			return nil
+		}
+		now, err := s.items(ctx, sc.StoreID, run)
+		if err != nil {
+			return err
+		}
+		lines := make([]SaleLine, 0, len(run))
+		for _, c := range run {
+			lines = append(lines, SaleLine{ItemID: c.item, Quantity: c.qty, UnitPricePaise: now[c.item].PricePaise})
+		}
+		err = s.d.Seller.Sell(ctx, sc, SaleClientID(d.ID, run[0].lineID), lines)
+		run = nil
+		return err
+	}
 	for _, c := range todo {
 		var err error
 		switch c.kind {
-		case KindRestock:
-			err = s.d.Stock.Restock(ctx, sc.StoreID, c.item, c.qty, d.ID, p.UserID)
-		case KindCount:
-			err = s.d.Stock.Count(ctx, sc.StoreID, c.item, c.qty, p.UserID)
-		case KindSetPrice:
-			err = s.d.Stock.SetPrice(ctx, sc.StoreID, c.item, c.price)
-		default:
+		case KindSale:
+			run = append(run, c)
 			continue
+		case KindRestock:
+			if err = flush(); err == nil {
+				err = s.d.Stock.Restock(ctx, sc.StoreID, c.item, c.qty, d.ID, p.UserID)
+			}
+		case KindCount:
+			if err = flush(); err == nil {
+				err = s.d.Stock.Count(ctx, sc.StoreID, c.item, c.qty, p.UserID)
+			}
 		}
-		switch {
-		case errors.Is(err, ErrAboveMRP):
-			return nil, fieldErr(c.valuePath("pricePaise"), "above_mrp")
-		case errors.Is(err, ErrItemGone):
-			return nil, fieldErr(c.itemPath(), "not_found")
-		case errors.Is(err, ErrQuantity):
-			return nil, fieldErr(c.valuePath("quantity"), "range")
-		case err != nil:
+		if err := stockErr(c, err); err != nil {
 			return nil, err
 		}
 	}
-
-	// Then one sale with every sale line, at the prices now (after this draft's own price
-	// changes).
-	var sale []change
-	for _, c := range todo {
-		if c.kind == KindSale {
-			sale = append(sale, c)
-		}
-	}
-	if len(sale) > 0 {
-		now, err := s.items(ctx, sc.StoreID, sale)
-		if err != nil {
-			return nil, err
-		}
-		lines := make([]SaleLine, 0, len(sale))
-		for _, c := range sale {
-			lines = append(lines, SaleLine{ItemID: c.item, Quantity: c.qty, UnitPricePaise: now[c.item].PricePaise})
-		}
-		if err := s.d.Seller.Sell(ctx, sc, d.ID, lines); err != nil {
-			return nil, err
-		}
+	if err := flush(); err != nil {
+		return nil, err
 	}
 	return results, nil
+}
+
+// stockErr answers a Stock adapter's error for line c: a 422 on the line, a 409 when the item
+// changed under the confirm (the person reads the draft again), else the error.
+func stockErr(c change, err error) error {
+	switch {
+	case err == nil:
+		return nil
+	case errors.Is(err, ErrAboveMRP):
+		return fieldErr(c.valuePath("pricePaise"), "above_mrp")
+	case errors.Is(err, ErrItemGone):
+		return fieldErr(c.itemPath(), "not_found")
+	case errors.Is(err, ErrQuantity):
+		return fieldErr(c.valuePath("quantity"), "range")
+	case errors.Is(err, ErrStale):
+		return problem.New(genproblems.Conflict, "The item changed while confirming. Try again.")
+	}
+	return err
+}
+
+// SaleClientID is the POS client id of the sale that starts at lineID: the draft's time and a
+// hash of the draft and line, so each sale of a draft has its own id and a replay the same one.
+func SaleClientID(draft ids.ID, lineID string) ids.ID {
+	sum := sha256.Sum256(append(draft[:], lineID...))
+	var id ids.ID
+	copy(id[:6], draft[:6])
+	copy(id[6:], sum[:10])
+	return id
 }
 
 // decide turns one decision into the change it asks for, or a 422.

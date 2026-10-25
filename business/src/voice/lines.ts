@@ -1,6 +1,8 @@
 import type { VoiceStockDecision } from '@todayz/api-client/gen/model/voiceStockDecision';
+import type { VoiceStockDraft } from '@todayz/api-client/gen/model/voiceStockDraft';
 import type { VoiceStockLine } from '@todayz/api-client/gen/model/voiceStockLine';
 import type { VoiceStockLineKind } from '@todayz/api-client/gen/model/voiceStockLineKind';
+import type { VoiceStockLineResult } from '@todayz/api-client/gen/model/voiceStockLineResult';
 import type { ShopRole } from '../app/shop';
 
 /** The kinds in the order the edit sheet offers them. */
@@ -22,6 +24,28 @@ export const LOW_CONFIDENCE = 0.6;
 export function canConfirmKind(role: ShopRole, kind: VoiceStockLineKind): boolean {
   if (kind === 'sale' || kind === 'count') return true;
   return role === 'owner' || role === 'manager';
+}
+
+const DRAFT_ID = /^[0-7][0-9A-HJKMNP-TV-Z]{25}$/;
+
+/** `/voice?draft=<id>`: an id that is not a ULID is dropped (the screen starts a new recording). */
+export function validateVoiceSearch(search: Record<string, unknown>): { draft?: string } {
+  const d = search.draft;
+  return typeof d === 'string' && DRAFT_ID.test(d) ? { draft: d } : {};
+}
+
+/**
+ * A ready draft a cashier has already confirmed in part: the lines they could confirm are
+ * settled (applied or removed) and only the `not_permitted` ones are still open for a manager.
+ * A fresh draft has no outcomes, so every line is open.
+ */
+export function splitDraft(draft: Pick<VoiceStockDraft, 'lines' | 'outcomes'>): {
+  open: VoiceStockLine[];
+  settled: VoiceStockLineResult[];
+} {
+  const settled = draft.outcomes.filter((o) => o.outcome !== 'not_permitted');
+  const done = new Set(settled.map((o) => o.lineId));
+  return { open: draft.lines.filter((l) => !done.has(l.lineId)), settled };
 }
 
 /** What the person has done with one line so far. */
@@ -105,9 +129,10 @@ export function summarise(lines: readonly VoiceStockLine[], choices: Record<stri
 }
 
 /**
- * The confirm body: one decision per line. A line that still needs a pick or a fix is never sent
- * as accepted (Confirm is disabled while any is left); a manager line is sent as the person left it,
- * so the server records it `not_permitted` and applies nothing.
+ * The confirm body: one decision per open line. A line that still needs a pick or a fix is never
+ * sent as accepted (Confirm is disabled while any is left); a manager line is sent as the person
+ * left it, so the server records it `not_permitted`, applies nothing and keeps the draft open with
+ * it for a manager.
  */
 export function decisions(lines: readonly VoiceStockLine[], choices: Record<string, Choice>, role: ShopRole): VoiceStockDecision[] {
   return lines.map((l) => {

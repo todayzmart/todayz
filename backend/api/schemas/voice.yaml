@@ -126,7 +126,8 @@ VoiceStockDraft:
   type: object
   description: >-
     A voice stock draft. `transcript` and `lines` are set once it is ready; `outcomes` once it is confirmed
-    or discarded; `failure` when it failed (a short code, never model text).
+    or discarded, and on a ready draft after a partial confirm (the lines settled so far; a not_permitted
+    line is still open for a manager); `failure` when it failed (a short code, never model text).
   additionalProperties: false
   required: [draftId, feature, status, promptVersion, createdAt, language, transcript, lines, outcomes, failure]
   properties:
@@ -197,14 +198,16 @@ VoiceStockConfirmRequest:
       items: {$ref: ./voice.yaml#/VoiceStockDecision}
 VoiceStockConfirmResult:
   type: object
-  description: The answer to a confirm, the same on a repeat (confirm is idempotent).
+  description: >-
+    The answer to a confirm, the same on a repeat (confirm is idempotent). `ready` when some lines need a
+    manager (not_permitted): the permitted lines are applied and the draft stays open with the rest.
   additionalProperties: false
   required: [draftId, status, lines]
   properties:
     draftId: {$ref: ./common.yaml#/Ulid}
     status:
       type: string
-      enum: [confirmed, discarded]
+      enum: [ready, confirmed, discarded]
     lines:
       type: array
       maxItems: 200

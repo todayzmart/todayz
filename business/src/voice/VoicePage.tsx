@@ -5,7 +5,7 @@ import type { VoiceStockLanguage } from '@todayz/api-client/gen/model/voiceStock
 import type { VoiceStockLineResult } from '@todayz/api-client/gen/model/voiceStockLineResult';
 import { NATIVE_NAMES, isLocale } from '@todayz/i18n';
 import { Banner, Button, ChipGroup, EmptyState, Skeleton, StatusPill } from '@todayz/ui';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { Inbox, Mic, MicOff, Store as StoreIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -15,7 +15,7 @@ import { useIdempotentAction } from '../stock/action';
 import { HoldToTalk } from './HoldToTalk';
 import { LineCard } from './LineCard';
 import { LineEditor } from './LineEditor';
-import { decisions, discardAll, initialChoices, lineState, summarise, type Choice } from './lines';
+import { decisions, discardAll, initialChoices, lineState, splitDraft, summarise, type Choice } from './lines';
 import { confirmDraft, failureKey, sendRecording, useVoiceAvailability, useVoiceDraft, voiceErrorKey } from './queries';
 import type { Recording } from './recorder';
 import styles from './voice.module.css';
@@ -24,7 +24,7 @@ import styles from './voice.module.css';
 const AUTO = 'und';
 
 /** B-06 Voice update: speak a stock change, check the draft, confirm it. Nothing changes before Confirm. */
-export function VoicePage() {
+export function VoicePage({ draft }: { draft?: string | undefined }) {
   const intl = useIntl();
   const current = useCurrentStore();
   return (
@@ -55,12 +55,12 @@ export function VoicePage() {
           }
         />
       )}
-      {current.status === 'ready' && <VoiceDesk store={current.store} />}
+      {current.status === 'ready' && <VoiceDesk store={current.store} draft={draft} />}
     </div>
   );
 }
 
-function VoiceDesk({ store }: { store: CurrentStore }) {
+function VoiceDesk({ store, draft }: { store: CurrentStore; draft: string | undefined }) {
   const intl = useIntl();
   const avail = useVoiceAvailability(store);
   if (avail.isPending) {
@@ -95,13 +95,27 @@ function VoiceDesk({ store }: { store: CurrentStore }) {
       />
     );
   }
-  return <VoiceSession store={store} limits={avail.data} />;
+  return <VoiceSession store={store} limits={avail.data} initialDraft={draft ?? null} />;
 }
 
-function VoiceSession({ store, limits }: { store: CurrentStore; limits: VoiceStockAvailability }) {
+function VoiceSession({
+  store,
+  limits,
+  initialDraft,
+}: {
+  store: CurrentStore;
+  limits: VoiceStockAvailability;
+  initialDraft: string | null;
+}) {
   const intl = useIntl();
+  const navigate = useNavigate();
   const [lang, setLang] = useState<string>(AUTO);
-  const [draftId, setDraftId] = useState<string | null>(null);
+  const [draftId, setDraft] = useState<string | null>(initialDraft);
+  // The draft is in the address too, so a reload or a manager on this device can reopen it.
+  const setDraftId = (id: string | null) => {
+    setDraft(id);
+    void navigate({ to: '/voice', search: id ? { draft: id } : {}, replace: true });
+  };
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
   const [result, setResult] = useState<VoiceStockConfirmResult | null>(null);
@@ -225,11 +239,19 @@ function Review({
   const intl = useIntl();
   const qc = useQueryClient();
   const action = useIdempotentAction();
-  const [choices, setChoices] = useState<Record<string, Choice>>(() => initialChoices(draft.lines));
+  // After a cashier's partial confirm only the manager's lines are still open.
+  const { open, settled } = splitDraft(draft);
+  const [choices, setChoices] = useState<Record<string, Choice>>(() => initialChoices(open));
   const [editing, setEditing] = useState<string | null>(null);
-  const sum = summarise(draft.lines, choices, store.role);
+  const sum = summarise(open, choices, store.role);
   const set = (id: string, c: Choice) => setChoices((old) => ({ ...old, [id]: c }));
-  const editLine = editing ? draft.lines.find((l) => l.lineId === editing) : undefined;
+  const editLine = editing ? open.find((l) => l.lineId === editing) : undefined;
+  // Every open line needs a manager and this person is not one: nothing to send.
+  const waiting = sum.manager > 0 && sum.ready + sum.blocked + sum.discarded === 0;
+  const name = (id: string) => {
+    const l = draft.lines.find((x) => x.lineId === id);
+    return l?.itemName ?? l?.heard ?? intl.formatMessage({ id: 'voice.line.noItem' });
+  };
 
   const send = async (lines: ReturnType<typeof discardAll>) => {
     const out = await action.run(JSON.stringify(lines), (key) => confirmDraft(qc, store, draft, lines, key));
@@ -268,8 +290,23 @@ function Review({
           {intl.formatMessage({ id: 'voice.review.manager' }, { n: sum.manager })}
         </Banner>
       )}
+      {settled.length > 0 && (
+        <section aria-labelledby="voice-settled">
+          <h2 id="voice-settled" className={styles.label}>
+            {intl.formatMessage({ id: 'voice.review.settled' })}
+          </h2>
+          <ul className={styles.results}>
+            {settled.map((o) => (
+              <li key={o.lineId} className={styles.resultRow}>
+                <span className={styles.grow}>{name(o.lineId)}</span>
+                <StatusPill tone={OUTCOME_TONE[o.outcome]}>{intl.formatMessage({ id: `voice.outcome.${o.outcome}` })}</StatusPill>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <ul className={styles.lines} aria-label={intl.formatMessage({ id: 'voice.review.lines' })}>
-        {draft.lines.map((l) => {
+        {open.map((l) => {
           const c = choices[l.lineId] ?? { outcome: 'accepted' };
           return (
             <LineCard
@@ -290,17 +327,26 @@ function Review({
         </Banner>
       )}
       <div className={styles.footer}>
-        <Button variant="ghost" disabled={action.pending} onClick={() => void send(discardAll(draft.lines))}>
-          {intl.formatMessage({ id: 'voice.review.discard' })}
-        </Button>
-        <Button
-          variant="primary"
-          loading={action.pending}
-          disabled={sum.blocked > 0 || sum.ready + sum.manager === 0}
-          onClick={() => void send(decisions(draft.lines, choices, store.role))}
-        >
-          {intl.formatMessage({ id: 'voice.review.confirm' }, { n: sum.ready })}
-        </Button>
+        {waiting ? (
+          // Nothing here this person may apply or discard: the draft waits for a manager.
+          <Button variant="primary" icon={Mic} onClick={onAgain}>
+            {intl.formatMessage({ id: 'voice.again' })}
+          </Button>
+        ) : (
+          <>
+          <Button variant="ghost" disabled={action.pending} onClick={() => void send(discardAll(open))}>
+            {intl.formatMessage({ id: 'voice.review.discard' })}
+          </Button>
+          <Button
+            variant="primary"
+            loading={action.pending}
+            disabled={sum.blocked > 0 || sum.ready + sum.manager === 0}
+            onClick={() => void send(decisions(open, choices, store.role))}
+          >
+            {intl.formatMessage({ id: 'voice.review.confirm' }, { n: sum.ready })}
+          </Button>
+          </>
+        )}
       </div>
       {editLine && (
         <LineEditor
@@ -332,6 +378,9 @@ function Transcript({ text }: { text: string }) {
 
 const OUTCOME_TONE = { accepted: 'completed', edited: 'completed', discarded: 'cancelled', not_permitted: 'pending' } as const;
 
+/** `ready` is a cashier's partial confirm: their lines are applied, the rest wait for a manager. */
+const TITLE = { confirmed: 'voice.done.title', ready: 'voice.done.partial', discarded: 'voice.done.discarded' } as const;
+
 function Results({
   draft,
   status,
@@ -339,7 +388,7 @@ function Results({
   onAgain,
 }: {
   draft: VoiceStockDraft | null;
-  status: 'confirmed' | 'discarded';
+  status: VoiceStockConfirmResult['status'];
   outcomes: readonly VoiceStockLineResult[];
   onAgain: () => void;
 }) {
@@ -352,10 +401,10 @@ function Results({
   };
   return (
     <>
-      <Banner tone="info" live="status" title={intl.formatMessage({ id: status === 'discarded' ? 'voice.done.discarded' : 'voice.done.title' })}>
-        {status === 'confirmed' && intl.formatMessage({ id: 'voice.done.body' }, { applied, held })}
+      <Banner tone="info" live="status" title={intl.formatMessage({ id: TITLE[status] })}>
+        {status !== 'discarded' && intl.formatMessage({ id: 'voice.done.body' }, { applied, held })}
       </Banner>
-      {status === 'confirmed' && outcomes.length > 0 && (
+      {status !== 'discarded' && outcomes.length > 0 && (
         <ul className={styles.results} aria-label={intl.formatMessage({ id: 'voice.done.lines' })}>
           {outcomes.map((o) => (
             <li key={o.lineId} className={styles.resultRow}>

@@ -3,7 +3,10 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/binary"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
@@ -13,11 +16,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/todayz/backend/internal/ai/client"
 	"github.com/todayz/backend/internal/ai/guard"
+	"github.com/todayz/backend/internal/catalogue"
 	"github.com/todayz/backend/internal/jobs"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/voice"
@@ -249,6 +254,14 @@ func (v *voiceShop) writes() int {
 		v.a.count(`SELECT count(*) FROM stock_movements WHERE store_id = $1 AND source <> 'opening'`, uuidOf(v.t, v.sid))
 }
 
+// saleID is the POS client id of the draft's sale that starts at lineID.
+func (v *voiceShop) saleID(draft, lineID string) pgtype.UUID {
+	v.t.Helper()
+	d, err := ids.Parse(draft)
+	require.NoError(v.t, err)
+	return ids.UUID(voice.SaleClientID(d, lineID))
+}
+
 func (v *voiceShop) onHand(item string) int {
 	return v.a.count(`SELECT on_hand FROM store_items WHERE id = $1`, uuidOf(v.t, item))
 }
@@ -318,7 +331,8 @@ func TestVoiceStockConfirmAllKinds(t *testing.T) {
 	assert.Equal(t, map[string]string{"l1": "accepted", "l2": "accepted", "l3": "accepted", "l4": "accepted"}, outcomesOf(c))
 
 	sid := uuidOf(t, v.sid)
-	assert.Equal(t, 1, v.a.count(`SELECT count(*) FROM pos_sales WHERE store_id = $1 AND customer_id IS NULL AND client_id = $2`, sid, uuidOf(t, id)))
+	sale := v.saleID(id, "l1")
+	assert.Equal(t, 1, v.a.count(`SELECT count(*) FROM pos_sales WHERE store_id = $1 AND customer_id IS NULL AND client_id = $2`, sid, sale))
 	assert.Equal(t, 1, v.a.count(`SELECT count(*) FROM stock_movements WHERE store_item_id = $1 AND source = 'sale_pos' AND delta = -3`, uuidOf(t, v.butter)))
 	assert.Equal(t, 1, v.a.count(`SELECT count(*) FROM stock_movements WHERE store_item_id = $1 AND source = 'restock' AND delta = 12
 	  AND ref_type = 'ai_draft' AND ref_id = $2`, uuidOf(t, v.salt), uuidOf(t, id)))
@@ -328,7 +342,7 @@ func TestVoiceStockConfirmAllKinds(t *testing.T) {
 	assert.Equal(t, 497, v.onHand(v.butter))
 	assert.Equal(t, 5800, v.priceOf(v.butter))
 	assert.Equal(t, 1, v.a.count(`SELECT count(*) FROM pos_sale_lines l JOIN pos_sales s ON s.id = l.sale_id
-	  WHERE s.client_id = $1 AND l.unit_price_paise = 5800 AND l.quantity = 3`, uuidOf(t, id)), "the sale is at the price after the draft's own change")
+	  WHERE s.client_id = $1 AND l.unit_price_paise = 5800 AND l.quantity = 3`, sale), "the sale is at the price after the draft's own change")
 
 	// SC-VO-11: a repeat confirm answers the first result and writes nothing again.
 	after := v.writes()
@@ -365,9 +379,10 @@ func TestVoiceStockCashierAskManager(t *testing.T) {
 		assert.Nil(t, l["disabled"])
 	}
 
+	before := v.writes()
 	c := v.confirm(v.cashier, id, accept("l1"), accept("l2"), accept("l3"), accept("l4"))
 	require.Equal(t, http.StatusOK, c.code, c.raw)
-	assert.Equal(t, "confirmed", c.body["status"])
+	assert.Equal(t, "ready", c.body["status"], "the manager's lines keep the draft open")
 	assert.Equal(t, map[string]string{"l1": "accepted", "l2": "not_permitted", "l3": "accepted", "l4": "not_permitted"}, outcomesOf(c))
 	assert.Equal(t, 0, v.a.count(`SELECT count(*) FROM stock_movements WHERE ref_id = $1`, uuidOf(t, id)), "no restock")
 	assert.Equal(t, 500, v.onHand(v.salt))
@@ -375,15 +390,120 @@ func TestVoiceStockCashierAskManager(t *testing.T) {
 	assert.Equal(t, 0, v.onHand(v.atta), "the count is applied")
 	assert.Equal(t, 497, v.onHand(v.butter), "the sale is applied")
 	assert.Equal(t, 1, v.a.count(`SELECT count(*) FROM pos_sale_lines l JOIN pos_sales s ON s.id = l.sale_id
-	  WHERE s.client_id = $1 AND l.unit_price_paise = 5500`, uuidOf(t, id)))
+	  WHERE s.client_id = $1 AND l.unit_price_paise = 5500`, v.saleID(id, "l1")))
+	afterCashier := v.writes()
+	assert.Equal(t, before+3, afterCashier, "one sale, its movement and the count")
+
+	// The draft stays open with the two lines: the cashier sees them still asking for a
+	// manager, a repeat by the cashier applies nothing again.
+	r = v.get(v.cashier, id)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	assert.Equal(t, "ready", r.body["status"])
+	assert.Len(t, r.body["outcomes"], 4)
+	again := v.confirm(v.cashier, id, accept("l1"), accept("l2"), accept("l3"), accept("l4"))
+	require.Equal(t, http.StatusOK, again.code, again.raw)
+	assert.Equal(t, "ready", again.body["status"])
+	assert.Equal(t, outcomesOf(c), outcomesOf(again))
+	assert.Equal(t, afterCashier, v.writes())
+
+	// The manager's confirm applies only the open lines; the settled ones are not applied twice.
+	m = v.confirm(v.manager, id, accept("l1"), accept("l2"), accept("l3"), accept("l4"))
+	require.Equal(t, http.StatusOK, m.code, m.raw)
+	assert.Equal(t, "confirmed", m.body["status"])
+	assert.Equal(t, map[string]string{"l1": "accepted", "l2": "accepted", "l3": "accepted", "l4": "accepted"}, outcomesOf(m))
+	assert.Equal(t, 512, v.onHand(v.salt), "the restock")
+	assert.Equal(t, 5800, v.priceOf(v.butter), "the price")
+	assert.Equal(t, 497, v.onHand(v.butter), "the sale once")
+	assert.Equal(t, 0, v.onHand(v.atta), "the count once")
+	assert.Equal(t, afterCashier+1, v.writes(), "only the restock movement")
+	assert.Equal(t, 1, v.a.count(`SELECT count(*) FROM ai_drafts WHERE id = $1 AND confirmed_by IS NOT NULL`, uuidOf(t, id)))
+
+	// A replay after the draft closed, by either of them, answers the closed result.
+	closed := v.writes()
+	for _, tok := range []string{v.manager, v.cashier} {
+		rp := v.confirm(tok, id, accept("l1"), accept("l2"), accept("l3"), accept("l4"))
+		require.Equal(t, http.StatusOK, rp.code, rp.raw)
+		assert.Equal(t, "confirmed", rp.body["status"])
+		assert.Equal(t, outcomesOf(m), outcomesOf(rp))
+	}
+	assert.Equal(t, closed, v.writes())
 
 	// An edit cannot turn a refused kind into an allowed one's write either: a cashier's
-	// edited restock is not_permitted too.
+	// edited restock is not_permitted too, and the draft waits for a manager.
 	id2 := v.speak(v.cashier, "do salt bika", reply{lines: []said{{kind: "sale", item: "Tata Salt", heard: "do salt bika", qty: qty(2), conf: 0.9}}})
 	c = v.confirm(v.cashier, id2, edit("l1", map[string]any{"kind": "restock", "storeItemId": v.salt, "quantity": 40}))
 	require.Equal(t, http.StatusOK, c.code, c.raw)
+	assert.Equal(t, "ready", c.body["status"])
 	assert.Equal(t, map[string]string{"l1": "not_permitted"}, outcomesOf(c))
-	assert.Equal(t, 500, v.onHand(v.salt))
+	assert.Equal(t, 512, v.onHand(v.salt))
+	// Discarding the open line closes it.
+	c = v.confirm(v.manager, id2, discard("l1"))
+	require.Equal(t, http.StatusOK, c.code, c.raw)
+	assert.Equal(t, "discarded", c.body["status"])
+	assert.Equal(t, 512, v.onHand(v.salt))
+}
+
+// A count and a sale on the same item apply in the order spoken: "sold 3, only 5 left"
+// leaves 5, "5 left, then sold 3" leaves 2. Sales split by another kind are separate POS
+// sales, each with its own client id.
+func TestVoiceStockSpokenOrder(t *testing.T) {
+	v := newVoiceShop(t)
+	id := v.speak(v.manager, "teen butter becha, sirf paanch bache", reply{lines: []said{
+		{kind: "sale", item: "Amul Butter", heard: "teen butter becha", qty: qty(3), conf: 0.9},
+		{kind: "count", item: "Amul Butter", heard: "sirf paanch bache", qty: qty(5), conf: 0.9},
+	}})
+	c := v.confirm(v.manager, id, accept("l1"), accept("l2"))
+	require.Equal(t, http.StatusOK, c.code, c.raw)
+	assert.Equal(t, 5, v.onHand(v.butter), "the count after the sale")
+
+	id = v.speak(v.manager, "butter dus bache, phir teen becha", reply{lines: []said{
+		{kind: "count", item: "Amul Butter", heard: "butter dus bache", qty: qty(10), conf: 0.9},
+		{kind: "sale", item: "Amul Butter", heard: "phir teen becha", qty: qty(3), conf: 0.9},
+	}})
+	c = v.confirm(v.manager, id, accept("l1"), accept("l2"))
+	require.Equal(t, http.StatusOK, c.code, c.raw)
+	assert.Equal(t, 7, v.onHand(v.butter), "the sale after the count")
+
+	sales := v.a.count(`SELECT count(*) FROM pos_sales WHERE store_id = $1`, uuidOf(t, v.sid))
+	id = v.speak(v.manager, "do salt bika, bees salt aaya, ek salt bika", reply{lines: []said{
+		{kind: "sale", item: "Tata Salt", heard: "do salt bika", qty: qty(2), conf: 0.9},
+		{kind: "restock", item: "Tata Salt", heard: "bees salt aaya", qty: qty(20), conf: 0.9},
+		{kind: "sale", item: "Tata Salt", heard: "ek salt bika", qty: qty(1), conf: 0.9},
+	}})
+	c = v.confirm(v.manager, id, accept("l1"), accept("l2"), accept("l3"))
+	require.Equal(t, http.StatusOK, c.code, c.raw)
+	assert.Equal(t, 517, v.onHand(v.salt))
+	assert.Equal(t, sales+2, v.a.count(`SELECT count(*) FROM pos_sales WHERE store_id = $1`, uuidOf(t, v.sid)))
+	assert.Equal(t, 1, v.a.count(`SELECT count(*) FROM pos_sales WHERE client_id = $1`, v.saleID(id, "l1")))
+	assert.Equal(t, 1, v.a.count(`SELECT count(*) FROM pos_sales WHERE client_id = $1`, v.saleID(id, "l3")))
+}
+
+// Two confirms of one draft at once: the row lock lets one apply and the other answers the
+// closed result, so the lines are written once.
+func TestVoiceStockConcurrentConfirm(t *testing.T) {
+	v := newVoiceShop(t)
+	id := v.speak(v.manager, fourKinds, fourKindsReply)
+	before := v.writes()
+	const n = 4
+	codes, statuses := make([]int, n), make([]string, n)
+	var wg sync.WaitGroup
+	for i := range n {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			r := v.confirm(v.manager, id, accept("l1"), accept("l2"), accept("l3"), accept("l4"))
+			codes[i] = r.code
+			statuses[i], _ = r.body["status"].(string)
+		}()
+	}
+	wg.Wait()
+	for i := range n {
+		assert.Equal(t, http.StatusOK, codes[i], i)
+		assert.Equal(t, "confirmed", statuses[i], i)
+	}
+	assert.Equal(t, before+4, v.writes(), "one sale, its movement, the restock and the count, once")
+	assert.Equal(t, 512, v.onHand(v.salt))
+	assert.Equal(t, 497, v.onHand(v.butter))
 }
 
 // SC-VO-05: an item the model could not match (no candidate, or a ref the list does not
@@ -502,6 +622,8 @@ func TestVoiceStockUploadRules(t *testing.T) {
 		{"a language off the list", []byte("hello"), "audio/ogg", "fr-FR", nil, http.StatusUnprocessableEntity, "body.language"},
 		{"another field", []byte("hello"), "audio/ogg", "", []string{"note"}, http.StatusUnprocessableEntity, "body"},
 		{"past 1 MB", bytes.Repeat([]byte("a"), voice.MaxAudioBytes+1), "audio/webm", "", nil, http.StatusRequestEntityTooLarge, ""},
+		{"past 15 s by its header", wav(16), "audio/wav", "", nil, http.StatusUnprocessableEntity, "body.audio"},
+		{"past 15 s at the top bit rate", bytes.Repeat([]byte("a"), voice.MaxBitrate["audio/webm"]/8*voice.MaxSeconds+1), "audio/webm", "", nil, http.StatusUnprocessableEntity, "body.audio"},
 	}
 	for _, c := range cases {
 		r := v.upload(v.cashier, c.audio, c.mediaType, c.lang, c.extra...)
@@ -519,6 +641,70 @@ func TestVoiceStockUploadRules(t *testing.T) {
 		v.speak(v.cashier, "ek salt bika "+mt, reply{lines: []said{{kind: "sale", item: "Tata Salt", heard: "ek salt bika", qty: qty(1), conf: 0.9}}})
 	}
 	assert.Equal(t, "hi-IN", v.stt.langs[0])
+}
+
+// wav is a 16 kHz 16-bit mono wav of secs seconds of silence.
+func wav(secs int) []byte {
+	const rate = 32_000
+	b := []byte("RIFF\x00\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00\x80\x3e\x00\x00")
+	b = binary.LittleEndian.AppendUint32(b, rate)
+	b = append(b, 2, 0, 16, 0)
+	b = append(b, "data"...)
+	b = binary.LittleEndian.AppendUint32(b, uint32(secs*rate)) // #nosec G115 -- a test length
+	return append(b, make([]byte, secs*rate)...)
+}
+
+// The speech call is charged against ai_daily_cost_cap_paise by length whether it answered,
+// failed or heard nothing (a recording whose container does not say is charged 15 s), and
+// the draft's cost is both calls'.
+func TestVoiceStockSpeechCost(t *testing.T) {
+	v := newVoiceShop(t)
+	spend := func() int {
+		return v.a.count(`SELECT coalesce(sum(cost_paise), 0) FROM ai_usage_daily WHERE scope = 'platform'`)
+	}
+	draftCost := func(id string) int {
+		return v.a.count(`SELECT cost_paise FROM ai_drafts WHERE id = $1`, uuidOf(t, id))
+	}
+	speech := int(client.SpeechCostPaise(voice.MaxSeconds * time.Second))
+	require.Positive(t, speech)
+
+	id := v.speak(v.cashier, "ERR", reply{})
+	assert.Equal(t, "failed", v.get(v.cashier, id).body["status"])
+	assert.Equal(t, speech, spend(), "a speech error is charged")
+	assert.Equal(t, speech, draftCost(id))
+
+	id = v.speak(v.cashier, "   ", reply{})
+	assert.Equal(t, "empty", v.get(v.cashier, id).body["failure"])
+	assert.Equal(t, 2*speech, spend(), "nothing heard is charged")
+
+	id = v.speak(v.cashier, "do salt bika", reply{lines: []said{{kind: "sale", item: "Tata Salt", heard: "do salt bika", qty: qty(2), conf: 0.9}}})
+	assert.Equal(t, "ready", v.get(v.cashier, id).body["status"])
+	assert.Equal(t, 3*speech+2, spend(), "speech and the model")
+	assert.Equal(t, speech+2, draftCost(id))
+
+	// A recording whose header states 3 s is charged 3 s, and the length is kept.
+	w := v.upload(v.cashier, wav(3), "audio/wav", "")
+	require.Equal(t, http.StatusAccepted, w.code, w.raw)
+	assert.Equal(t, 3*speech+2+int(client.SpeechCostPaise(3*time.Second))+2, spend())
+	assert.Equal(t, 3000, v.a.count(`SELECT (input_meta->>'durationMs')::int FROM ai_drafts WHERE id = $1`, uuidOf(t, w.body["draftId"].(string))))
+}
+
+// A draft that cannot be stored does not use up one of the store's calls: the call is
+// counted in the draft's transaction.
+func TestVoiceStockReserveRollsBack(t *testing.T) {
+	v := newVoiceShop(t)
+	calls := func() int {
+		return v.a.count(`SELECT coalesce(sum(calls), 0) FROM ai_usage_daily WHERE scope = $1 AND subject = $2`, guard.ScopeStore, uuidOf(t, v.sid))
+	}
+	v.a.exec(`ALTER TABLE ai_drafts ADD CONSTRAINT tz_test_refuse CHECK (false) NOT VALID`)
+	r := v.upload(v.cashier, []byte("do salt bika"), "audio/webm", "")
+	assert.Equal(t, http.StatusInternalServerError, r.code, r.raw)
+	assert.Equal(t, 0, calls())
+	assert.Empty(t, v.stt.langs, "no provider call")
+
+	v.a.exec(`ALTER TABLE ai_drafts DROP CONSTRAINT tz_test_refuse`)
+	v.speak(v.cashier, "do salt bika", reply{lines: []said{{kind: "sale", item: "Tata Salt", heard: "do salt bika", qty: qty(2), conf: 0.9}}})
+	assert.Equal(t, 1, calls())
 }
 
 // SC-VO-10: a failed step fails the draft with a short code and no lines: speech error,
@@ -577,6 +763,11 @@ func TestVoiceStockOwnership(t *testing.T) {
 	assert.Equal(t, http.StatusUnprocessableEntity, v.get(v.owner, "not-an-id").code, "the contract's path check")
 	other := v.a.call(v.cashierS2, http.MethodGet, v.S2+"/ai/voice-stock/drafts/"+id, nil, nil)
 	assert.Equal(t, http.StatusNotFound, other.code, "the draft is in store S")
+	// The owner may act in both stores, but store S's draft is not in S2.
+	viaS2 := v.a.call(v.owner, http.MethodPost, v.S2+"/ai/voice-stock/drafts/"+id+"/confirm", map[string]any{"lines": []any{accept("l1")}}, idem(v.a))
+	assert.Equal(t, http.StatusNotFound, viaS2.code, viaS2.raw)
+	assert.Equal(t, http.StatusNotFound, v.a.call(v.owner, http.MethodGet, v.S2+"/ai/voice-stock/drafts/"+id, nil, nil).code)
+	assert.Equal(t, 0, v.a.count(`SELECT count(*) FROM pos_sales`))
 	stranger := v.a.call(v.owner2, http.MethodGet, v.drafts()+"/"+id, nil, nil)
 	assert.Contains(t, []int{http.StatusForbidden, http.StatusNotFound}, stranger.code)
 
@@ -636,4 +827,17 @@ func TestVoiceStockPrivacyAndRetention(t *testing.T) {
 	n, err := voice.DropTranscripts(context.Background(), v.a.tdb.Pool, v.a.clk.Now())
 	require.NoError(t, err)
 	assert.Zero(t, n, "the job is idempotent")
+}
+
+// The catalogue's errors reach voice as its own: a price edit that lost a race is a 409
+// conflict on confirm, not a 500.
+func TestVoiceStockErrMapping(t *testing.T) {
+	assert.NoError(t, voiceStockErr(nil))
+	assert.ErrorIs(t, voiceStockErr(catalogue.ErrStale), voice.ErrStale)
+	assert.ErrorIs(t, voiceStockErr(fmt.Errorf("set price: %w", catalogue.ErrStale)), voice.ErrStale)
+	assert.ErrorIs(t, voiceStockErr(catalogue.ErrAboveMRP), voice.ErrAboveMRP)
+	assert.ErrorIs(t, voiceStockErr(catalogue.ErrItemNotFound), voice.ErrItemGone)
+	assert.ErrorIs(t, voiceStockErr(catalogue.ErrQuantity), voice.ErrQuantity)
+	other := errors.New("boom")
+	assert.Equal(t, other, voiceStockErr(other))
 }
