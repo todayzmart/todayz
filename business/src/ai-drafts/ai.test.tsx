@@ -71,7 +71,7 @@ describe('B-17 supplier bill scan', () => {
     expect(screen.getByText('From Sri Venkateshwara Agencies')).toBeInTheDocument();
     expect(screen.getByText(/Suggested by AI/)).toBeInTheDocument();
     expect(within(list).getByRole('checkbox', { name: /QZXV WJK/ })).toBeDisabled();
-    expect(screen.getByText(/Add the item in Stock first/)).toBeInTheDocument();
+    expect(screen.getByText(/Add the item on the “Stock” page first/)).toBeInTheDocument();
     expect(calls.filter((c) => c.path.endsWith('/confirm'))).toHaveLength(0);
 
     // The salt line gets a new quantity; the butter line stays as read.
@@ -131,7 +131,7 @@ describe('B-17 supplier bill scan', () => {
     const list = await screen.findByRole('list', { name: 'Bill lines' }, { timeout: 4000 });
     fireEvent.click(screen.getByRole('button', { name: 'Add stock for 2 items' }));
 
-    expect(await screen.findByText(/1 line was added\. Fix the lines marked below/)).toBeInTheDocument();
+    expect(await screen.findByText(/Fix the lines marked below and confirm them again\. 1 line was added\./)).toBeInTheDocument();
     const butter = within(list).getByRole('listitem', { name: 'Amul Butter 100 g' });
     const salt = within(list).getByRole('listitem', { name: 'Tata Salt 1 kg' });
     expect(within(butter).getByRole('alert')).toHaveTextContent('More than the MRP');
