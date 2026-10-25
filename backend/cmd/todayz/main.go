@@ -30,6 +30,7 @@ commands:
   migrate up|down|status    run schema migrations (DATABASE_MIGRATE_URL)
   seed dev|demo|test        load seed data (DATABASE_URL); local and test only
   rollup --from D [--to D]  recompute the analytics rollups for IST days D (DATABASE_URL)
+  rollup demo [--for 10m]   synthetic traffic against the local API for make demo (APP_ENV local)
   version                   print build info
 `
 

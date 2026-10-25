@@ -25,7 +25,12 @@ const maxBackfillDays = 400 //settings:ok an operator guard, not a product numbe
 // item pairs, as todayz_app. Rollups are recomputed from the raw tables, so
 // running it twice writes the same rows. In local and test it runs on the
 // database's test clock, like the worker.
+//
+// `todayz rollup demo` is the synthetic traffic generator (rollup_demo.go).
 func runRollup(ctx context.Context, args []string, getenv func(string) string, out io.Writer) error {
+	if len(args) > 0 && args[0] == "demo" {
+		return runRollupDemo(ctx, args[1:], getenv, out)
+	}
 	fs := flag.NewFlagSet("rollup", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	fromS := fs.String("from", "", "first IST day, YYYY-MM-DD")
