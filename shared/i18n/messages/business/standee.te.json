@@ -93,5 +93,155 @@
     "message": "QR కోడ్ స్పష్టంగా ఉండేలా A5 మీద 100% సైజులో, ప్రింటర్ మార్జిన్లు జోడించకుండా ప్రింట్ చేయండి.",
     "review": "reviewed",
     "enHash": "079abaf2"
+  },
+  "standee.campaigns.title": {
+    "message": "క్యాంపెయిన్‌లు",
+    "review": "reviewed",
+    "enHash": "01a23a28"
+  },
+  "standee.campaigns.body": {
+    "message": "ప్రతి స్టాండీకి దాని సొంత QR ఉంటుంది. ఏది కస్టమర్లను తెస్తుందో చూడటానికి ప్రతి చోటు లేదా క్యాంపెయిన్‌కు ఒకటి ప్రింట్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "525cba58"
+  },
+  "standee.campaigns.loading": {
+    "message": "మీ స్టాండీలు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "af5ab91c"
+  },
+  "standee.campaigns.loadError": {
+    "message": "మీ స్టాండీలను లోడ్ చేయలేకపోయాం.",
+    "review": "reviewed",
+    "enHash": "f5a6fadd"
+  },
+  "standee.campaigns.empty.title": {
+    "message": "ఇంకా స్టాండీలు లేవు",
+    "review": "reviewed",
+    "enHash": "e3777350"
+  },
+  "standee.campaigns.empty.body": {
+    "message": "మీ కౌంటర్, గేట్ లేదా పండుగ క్యాంపెయిన్ కోసం ఒకటి జోడించండి.",
+    "review": "reviewed",
+    "enHash": "36f42fd2"
+  },
+  "standee.campaigns.name": {
+    "message": "క్యాంపెయిన్ పేరు",
+    "review": "reviewed",
+    "enHash": "aa5d0e72"
+  },
+  "standee.campaigns.nameHelp": {
+    "message": "ఉదాహరణకు “కౌంటర్” లేదా “దీపావళి గేట్”. గరిష్ఠంగా {max} అక్షరాలు.",
+    "review": "reviewed",
+    "enHash": "d6535339"
+  },
+  "standee.campaigns.err.required": {
+    "message": "స్టాండీకి క్యాంపెయిన్ పేరు ఇవ్వండి",
+    "review": "reviewed",
+    "enHash": "924d38d2"
+  },
+  "standee.campaigns.err.max": {
+    "message": "{max} లేదా అంతకంటే తక్కువ అక్షరాలు వాడండి",
+    "review": "reviewed",
+    "enHash": "ad4867fd"
+  },
+  "standee.campaigns.add": {
+    "message": "స్టాండీ జోడించండి",
+    "review": "reviewed",
+    "enHash": "26c34834"
+  },
+  "standee.campaigns.adding": {
+    "message": "స్టాండీ జోడిస్తోంది",
+    "review": "reviewed",
+    "enHash": "2c8fa29b"
+  },
+  "standee.campaigns.created": {
+    "message": "స్టాండీ జోడించబడింది",
+    "review": "reviewed",
+    "enHash": "cca5d3a0"
+  },
+  "standee.campaigns.full": {
+    "message": "ఈ దుకాణానికి {limit} స్టాండీలు ఉన్నాయి, ఇదే గరిష్ఠం.",
+    "review": "reviewed",
+    "enHash": "e68ad8fd"
+  },
+  "standee.campaigns.lastScan": {
+    "message": "చివరి స్కాన్ {date}",
+    "review": "reviewed",
+    "enHash": "c7782aaa"
+  },
+  "standee.campaigns.noScans": {
+    "message": "ఇంకా స్కాన్ కాలేదు",
+    "review": "reviewed",
+    "enHash": "d4543dd1"
+  },
+  "standee.campaigns.reorder": {
+    "message": "ప్రింట్ చేసిన స్టాండీని మళ్ళీ ఆర్డర్ చేయండి",
+    "review": "reviewed",
+    "enHash": "abf828c2"
+  },
+  "standee.campaigns.reordering": {
+    "message": "అభ్యర్థన పంపుతోంది",
+    "review": "reviewed",
+    "enHash": "b13d58b1"
+  },
+  "standee.campaigns.reorderPending": {
+    "message": "మళ్ళీ ఆర్డర్ అభ్యర్థించారు",
+    "review": "reviewed",
+    "enHash": "ef2bd121"
+  },
+  "standee.campaigns.reorderSince": {
+    "message": "{date} న మళ్ళీ ప్రింట్ అభ్యర్థించారు. QR అదే ఉంటుంది, కాబట్టి దాని లెక్కలు కొనసాగుతాయి.",
+    "review": "reviewed",
+    "enHash": "5ca10fd0"
+  },
+  "standee.campaigns.error.validation_failed": {
+    "message": "క్యాంపెయిన్ పేరు చెక్ చేసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "ec28d190"
+  },
+  "standee.campaigns.error.forbidden": {
+    "message": "యజమానులు, మేనేజర్లు మాత్రమే స్టాండీలను మార్చగలరు.",
+    "review": "reviewed",
+    "enHash": "9f3d0031"
+  },
+  "standee.campaigns.error.not_found": {
+    "message": "ఈ స్టాండీ ఇప్పుడు ఇక్కడ లేదు. పేజీని రీలోడ్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "77ba8a53"
+  },
+  "standee.campaigns.error.standee_limit_reached": {
+    "message": "ఈ దుకాణానికి ఇప్పటికే గరిష్ఠ సంఖ్యలో స్టాండీలు ఉన్నాయి.",
+    "review": "reviewed",
+    "enHash": "eacd2973"
+  },
+  "standee.campaigns.error.generic": {
+    "message": "ఏదో తప్పు జరిగింది. మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "4244e822"
+  },
+  "standee.funnel.scans": {
+    "message": "స్కాన్‌లు",
+    "review": "reviewed",
+    "enHash": "71faf749"
+  },
+  "standee.funnel.signUps": {
+    "message": "సైన్-అప్‌లు",
+    "review": "reviewed",
+    "enHash": "609b0516"
+  },
+  "standee.funnel.qualified": {
+    "message": "అర్హత పొందినవి",
+    "review": "reviewed",
+    "enHash": "4f12dc10"
+  },
+  "standee.funnel.totals": {
+    "message": "అన్ని స్టాండీలు",
+    "review": "reviewed",
+    "enHash": "b86351be"
+  },
+  "standee.funnel.one": {
+    "message": "{campaign} లెక్కలు",
+    "review": "reviewed",
+    "enHash": "bdbb16a3"
   }
 }

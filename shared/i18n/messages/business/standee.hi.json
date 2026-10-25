@@ -93,5 +93,155 @@
     "message": "A5 पर 100% साइज़ में प्रिंट करें, प्रिंटर की तरफ़ से कोई मार्जिन न जोड़ें, ताकि QR कोड साफ़ रहे।",
     "review": "reviewed",
     "enHash": "079abaf2"
+  },
+  "standee.campaigns.title": {
+    "message": "कैंपेन",
+    "review": "reviewed",
+    "enHash": "01a23a28"
+  },
+  "standee.campaigns.body": {
+    "message": "हर स्टैंडी का अपना QR होता है। हर जगह या कैंपेन के लिए एक प्रिंट करें, ताकि दिखे कि कौन-सी ग्राहक लाती है।",
+    "review": "reviewed",
+    "enHash": "525cba58"
+  },
+  "standee.campaigns.loading": {
+    "message": "आपकी स्टैंडी लोड हो रही हैं",
+    "review": "reviewed",
+    "enHash": "af5ab91c"
+  },
+  "standee.campaigns.loadError": {
+    "message": "आपकी स्टैंडी लोड नहीं हो सकीं।",
+    "review": "reviewed",
+    "enHash": "f5a6fadd"
+  },
+  "standee.campaigns.empty.title": {
+    "message": "अभी कोई स्टैंडी नहीं",
+    "review": "reviewed",
+    "enHash": "e3777350"
+  },
+  "standee.campaigns.empty.body": {
+    "message": "अपने काउंटर, गेट या किसी त्योहार कैंपेन के लिए एक जोड़ें।",
+    "review": "reviewed",
+    "enHash": "36f42fd2"
+  },
+  "standee.campaigns.name": {
+    "message": "कैंपेन का नाम",
+    "review": "reviewed",
+    "enHash": "aa5d0e72"
+  },
+  "standee.campaigns.nameHelp": {
+    "message": "जैसे “काउंटर” या “दिवाली गेट”। ज़्यादा से ज़्यादा {max} अक्षर।",
+    "review": "reviewed",
+    "enHash": "d6535339"
+  },
+  "standee.campaigns.err.required": {
+    "message": "स्टैंडी को कैंपेन का नाम दें",
+    "review": "reviewed",
+    "enHash": "924d38d2"
+  },
+  "standee.campaigns.err.max": {
+    "message": "{max} या उससे कम अक्षर इस्तेमाल करें",
+    "review": "reviewed",
+    "enHash": "ad4867fd"
+  },
+  "standee.campaigns.add": {
+    "message": "स्टैंडी जोड़ें",
+    "review": "reviewed",
+    "enHash": "26c34834"
+  },
+  "standee.campaigns.adding": {
+    "message": "स्टैंडी जोड़ी जा रही है",
+    "review": "reviewed",
+    "enHash": "2c8fa29b"
+  },
+  "standee.campaigns.created": {
+    "message": "स्टैंडी जोड़ी गई",
+    "review": "reviewed",
+    "enHash": "cca5d3a0"
+  },
+  "standee.campaigns.full": {
+    "message": "इस दुकान की {limit} स्टैंडी हैं, इससे ज़्यादा नहीं हो सकतीं।",
+    "review": "reviewed",
+    "enHash": "e68ad8fd"
+  },
+  "standee.campaigns.lastScan": {
+    "message": "आख़िरी स्कैन {date}",
+    "review": "reviewed",
+    "enHash": "c7782aaa"
+  },
+  "standee.campaigns.noScans": {
+    "message": "अभी तक स्कैन नहीं हुई",
+    "review": "reviewed",
+    "enHash": "d4543dd1"
+  },
+  "standee.campaigns.reorder": {
+    "message": "प्रिंटेड स्टैंडी फिर से मँगाएँ",
+    "review": "reviewed",
+    "enHash": "abf828c2"
+  },
+  "standee.campaigns.reordering": {
+    "message": "अनुरोध भेजा जा रहा है",
+    "review": "reviewed",
+    "enHash": "b13d58b1"
+  },
+  "standee.campaigns.reorderPending": {
+    "message": "फिर से मँगाने का अनुरोध भेजा गया",
+    "review": "reviewed",
+    "enHash": "ef2bd121"
+  },
+  "standee.campaigns.reorderSince": {
+    "message": "{date} को दोबारा प्रिंट का अनुरोध किया गया। QR वही रहता है, इसलिए उसकी गिनती जारी रहती है।",
+    "review": "reviewed",
+    "enHash": "5ca10fd0"
+  },
+  "standee.campaigns.error.validation_failed": {
+    "message": "कैंपेन का नाम जाँचें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "ec28d190"
+  },
+  "standee.campaigns.error.forbidden": {
+    "message": "स्टैंडी सिर्फ़ मालिक और मैनेजर बदल सकते हैं।",
+    "review": "reviewed",
+    "enHash": "9f3d0031"
+  },
+  "standee.campaigns.error.not_found": {
+    "message": "यह स्टैंडी अब यहाँ नहीं है। पेज रीलोड करें।",
+    "review": "reviewed",
+    "enHash": "77ba8a53"
+  },
+  "standee.campaigns.error.standee_limit_reached": {
+    "message": "इस दुकान की पहले से ही जितनी हो सकती हैं उतनी स्टैंडी हैं।",
+    "review": "reviewed",
+    "enHash": "eacd2973"
+  },
+  "standee.campaigns.error.generic": {
+    "message": "कुछ गड़बड़ हो गई। फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "4244e822"
+  },
+  "standee.funnel.scans": {
+    "message": "स्कैन",
+    "review": "reviewed",
+    "enHash": "71faf749"
+  },
+  "standee.funnel.signUps": {
+    "message": "साइन-अप",
+    "review": "reviewed",
+    "enHash": "609b0516"
+  },
+  "standee.funnel.qualified": {
+    "message": "क्वालिफ़ाइड",
+    "review": "reviewed",
+    "enHash": "4f12dc10"
+  },
+  "standee.funnel.totals": {
+    "message": "सभी स्टैंडी",
+    "review": "reviewed",
+    "enHash": "b86351be"
+  },
+  "standee.funnel.one": {
+    "message": "{campaign} की गिनती",
+    "review": "reviewed",
+    "enHash": "bdbb16a3"
   }
 }

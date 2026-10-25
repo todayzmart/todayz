@@ -93,5 +93,155 @@
     "message": "QR ಕೋಡ್ ಸ್ಪಷ್ಟವಾಗಿರಲು A5 ನಲ್ಲಿ 100% ಗಾತ್ರದಲ್ಲಿ, ಪ್ರಿಂಟರ್ ಮಾರ್ಜಿನ್ ಸೇರಿಸದೆ ಪ್ರಿಂಟ್ ಮಾಡಿ.",
     "review": "reviewed",
     "enHash": "079abaf2"
+  },
+  "standee.campaigns.title": {
+    "message": "ಅಭಿಯಾನಗಳು",
+    "review": "reviewed",
+    "enHash": "01a23a28"
+  },
+  "standee.campaigns.body": {
+    "message": "ಪ್ರತಿ ಸ್ಟ್ಯಾಂಡಿಗೆ ತನ್ನದೇ QR ಇದೆ. ಯಾವುದು ಗ್ರಾಹಕರನ್ನು ತರುತ್ತದೆ ಎಂದು ನೋಡಲು ಪ್ರತಿ ಜಾಗ ಅಥವಾ ಅಭಿಯಾನಕ್ಕೆ ಒಂದನ್ನು ಪ್ರಿಂಟ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "525cba58"
+  },
+  "standee.campaigns.loading": {
+    "message": "ನಿಮ್ಮ ಸ್ಟ್ಯಾಂಡಿಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ",
+    "review": "reviewed",
+    "enHash": "af5ab91c"
+  },
+  "standee.campaigns.loadError": {
+    "message": "ನಿಮ್ಮ ಸ್ಟ್ಯಾಂಡಿಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "f5a6fadd"
+  },
+  "standee.campaigns.empty.title": {
+    "message": "ಇನ್ನೂ ಸ್ಟ್ಯಾಂಡಿಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "e3777350"
+  },
+  "standee.campaigns.empty.body": {
+    "message": "ನಿಮ್ಮ ಕೌಂಟರ್, ಗೇಟ್ ಅಥವಾ ಹಬ್ಬದ ಅಭಿಯಾನಕ್ಕೆ ಒಂದನ್ನು ಸೇರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "36f42fd2"
+  },
+  "standee.campaigns.name": {
+    "message": "ಅಭಿಯಾನದ ಹೆಸರು",
+    "review": "reviewed",
+    "enHash": "aa5d0e72"
+  },
+  "standee.campaigns.nameHelp": {
+    "message": "ಉದಾಹರಣೆಗೆ “ಕೌಂಟರ್” ಅಥವಾ “ದೀಪಾವಳಿ ಗೇಟ್”. ಗರಿಷ್ಠ {max} ಅಕ್ಷರಗಳು.",
+    "review": "reviewed",
+    "enHash": "d6535339"
+  },
+  "standee.campaigns.err.required": {
+    "message": "ಸ್ಟ್ಯಾಂಡಿಗೆ ಅಭಿಯಾನದ ಹೆಸರು ನೀಡಿ",
+    "review": "reviewed",
+    "enHash": "924d38d2"
+  },
+  "standee.campaigns.err.max": {
+    "message": "{max} ಅಥವಾ ಕಡಿಮೆ ಅಕ್ಷರಗಳನ್ನು ಬಳಸಿ",
+    "review": "reviewed",
+    "enHash": "ad4867fd"
+  },
+  "standee.campaigns.add": {
+    "message": "ಸ್ಟ್ಯಾಂಡಿ ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "26c34834"
+  },
+  "standee.campaigns.adding": {
+    "message": "ಸ್ಟ್ಯಾಂಡಿ ಸೇರಿಸಲಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "2c8fa29b"
+  },
+  "standee.campaigns.created": {
+    "message": "ಸ್ಟ್ಯಾಂಡಿ ಸೇರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "cca5d3a0"
+  },
+  "standee.campaigns.full": {
+    "message": "ಈ ಅಂಗಡಿಯಲ್ಲಿ {limit} ಸ್ಟ್ಯಾಂಡಿಗಳಿವೆ, ಇದು ಗರಿಷ್ಠ ಮಿತಿ.",
+    "review": "reviewed",
+    "enHash": "e68ad8fd"
+  },
+  "standee.campaigns.lastScan": {
+    "message": "ಕೊನೆಯ ಸ್ಕ್ಯಾನ್ {date}",
+    "review": "reviewed",
+    "enHash": "c7782aaa"
+  },
+  "standee.campaigns.noScans": {
+    "message": "ಇನ್ನೂ ಸ್ಕ್ಯಾನ್ ಆಗಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "d4543dd1"
+  },
+  "standee.campaigns.reorder": {
+    "message": "ಪ್ರಿಂಟ್ ಮಾಡಿದ ಸ್ಟ್ಯಾಂಡಿಯನ್ನು ಮತ್ತೆ ಆರ್ಡರ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "abf828c2"
+  },
+  "standee.campaigns.reordering": {
+    "message": "ವಿನಂತಿ ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "b13d58b1"
+  },
+  "standee.campaigns.reorderPending": {
+    "message": "ಮರು ಆರ್ಡರ್ ವಿನಂತಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "ef2bd121"
+  },
+  "standee.campaigns.reorderSince": {
+    "message": "{date} ರಂದು ಮರುಮುದ್ರಣ ವಿನಂತಿಸಲಾಗಿದೆ. QR ಬದಲಾಗುವುದಿಲ್ಲ, ಆದ್ದರಿಂದ ಅದರ ಎಣಿಕೆ ಮುಂದುವರಿಯುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "5ca10fd0"
+  },
+  "standee.campaigns.error.validation_failed": {
+    "message": "ಅಭಿಯಾನದ ಹೆಸರನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "ec28d190"
+  },
+  "standee.campaigns.error.forbidden": {
+    "message": "ಮಾಲೀಕರು ಮತ್ತು ಮ್ಯಾನೇಜರ್‌ಗಳು ಮಾತ್ರ ಸ್ಟ್ಯಾಂಡಿಗಳನ್ನು ಬದಲಾಯಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "9f3d0031"
+  },
+  "standee.campaigns.error.not_found": {
+    "message": "ಈ ಸ್ಟ್ಯಾಂಡಿ ಈಗ ಇಲ್ಲಿ ಇಲ್ಲ. ಪುಟವನ್ನು ರಿಲೋಡ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "77ba8a53"
+  },
+  "standee.campaigns.error.standee_limit_reached": {
+    "message": "ಈ ಅಂಗಡಿಯಲ್ಲಿ ಈಗಾಗಲೇ ಗರಿಷ್ಠ ಸಂಖ್ಯೆಯ ಸ್ಟ್ಯಾಂಡಿಗಳಿವೆ.",
+    "review": "reviewed",
+    "enHash": "eacd2973"
+  },
+  "standee.campaigns.error.generic": {
+    "message": "ಏನೋ ತಪ್ಪಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "4244e822"
+  },
+  "standee.funnel.scans": {
+    "message": "ಸ್ಕ್ಯಾನ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "71faf749"
+  },
+  "standee.funnel.signUps": {
+    "message": "ಸೈನ್-ಅಪ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "609b0516"
+  },
+  "standee.funnel.qualified": {
+    "message": "ಅರ್ಹರು",
+    "review": "reviewed",
+    "enHash": "4f12dc10"
+  },
+  "standee.funnel.totals": {
+    "message": "ಎಲ್ಲಾ ಸ್ಟ್ಯಾಂಡಿಗಳು",
+    "review": "reviewed",
+    "enHash": "b86351be"
+  },
+  "standee.funnel.one": {
+    "message": "{campaign} ಎಣಿಕೆಗಳು",
+    "review": "reviewed",
+    "enHash": "bdbb16a3"
   }
 }

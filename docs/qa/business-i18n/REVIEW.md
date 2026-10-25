@@ -1,6 +1,6 @@
 # Business app languages (Hindi, Kannada, Telugu, Tamil): review
 
-Claude machine-wrote the translations in `shared/i18n/messages/business/*.{hi,kn,te,ta}.json`. They cover all 1374 business keys in each language (13 areas). **They were released on the founder's instruction (25 Oct) without a native-speaker review.** Nobody fluent in Hindi, Kannada, Telugu or Tamil has read them yet. Each language section below lists the strings I was unsure of.
+Claude machine-wrote the translations in `shared/i18n/messages/business/*.{hi,kn,te,ta}.json`. They cover all 1404 business keys in each language (13 areas). **They were released on the founder's instruction (25 Oct) without a native-speaker review.** Nobody fluent in Hindi, Kannada, Telugu or Tamil has read them yet. Each language section below lists the strings I was unsure of.
 
 **Reviewer: none yet (native speaker needed). Approver: founder.**
 
@@ -8,11 +8,22 @@ Claude machine-wrote the translations in `shared/i18n/messages/business/*.{hi,kn
 
 | Date | Approver | What | Note |
 |---|---|---|---|
-| 2026-10-25 | founder (Rahul) | Business app Hindi, Kannada, Telugu and Tamil: all 1374 keys each (`review: reviewed`) | Released on the founder's instruction (25 Oct) without a native-speaker review. Argument checks pass (`lint:messages`: business 0 errors, 1374/1374 reviewed per language). Each language's uncertain strings are listed below and still need a native speaker's read. |
+| 2026-10-25 | founder (Rahul) | Business app Hindi, Kannada, Telugu and Tamil: all 1374 keys each (`review: reviewed`) (including the 23 W2-16 keys), then the 30 W3-09 standee keys (1404 each) | Released on the founder's instruction (25 Oct) without a native-speaker review. Argument checks pass (`lint:messages`: business 0 errors, 1404/1404 reviewed per language). Each language's uncertain strings are listed below and still need a native speaker's read. |
 
 `translations.mjs approve` only sets `review: reviewed` in the catalogue. This table is the record of who approved and when.
 
 The 23 keys W2-16 added to `pos.en.json` (the "Other" payment method and the store sales sheet) were translated after merging `main` into this branch. They went through the same approval.
+
+The 30 keys W3-09 added to `standee.en.json` (QR standee campaigns and the scan funnel) were translated after merging `main` (0bb9d14). They went through the same approval: released on the founder's instruction (25 Oct) without a native-speaker review. "Campaign" is कैंपेन (hi), ಅಭಿಯಾನ (kn), క్యాంపెయిన్ (te) and பிரச்சாரம் (ta). The example names in `standee.campaigns.nameHelp` (“Counter”, “Diwali gate”) are translated inside the quotes. Strings to check:
+
+| Key | English | Choice | Why |
+|---|---|---|---|
+| `standee.funnel.qualified` | Qualified | hi क्वालिफ़ाइड · kn ಅರ್ಹರು · te అర్హత పొందినవి · ta தகுதி பெற்றவை | Funnel step for sign-ups whose first qualifying purchase is done. Hindi is transliterated; the other three say "eligible", which may not carry "purchase done". |
+| `standee.funnel.signUps` | Sign-ups | hi साइन-अप · kn ಸೈನ್-ಅಪ್‌ಗಳು · te సైన్-అప్‌లు · ta பதிவுகள் | Tamil uses பதிவுகள் ("registrations"); the others transliterate. |
+| `standee.funnel.one` | {campaign} counts | hi {campaign} की गिनती · kn {campaign} ಎಣಿಕೆಗಳು · te {campaign} లెక్కలు · ta {campaign} எண்ணிக்கைகள் | Heading over one standee's funnel; check it reads as a heading, not a verb. |
+| `standee.campaigns.title` | Campaigns | hi कैंपेन · kn ಅಭಿಯಾನಗಳು · te క్యాంపెయిన్‌లు · ta பிரச்சாரங்கள் | ಅಭಿಯಾನ and பிரச்சாரம் are formal; shop staff may prefer a transliteration. |
+| `standee.campaigns.nameHelp` | For example “Counter” or “Diwali gate”… | ta “கவுண்டர்”, “தீபாவளி வாயில்” | Tamil gate is வாயில் (the other three transliterate "gate"). Owners may type English names anyway. |
+| `standee.campaigns.reorder` | Reorder printed standee | "order again" in each language (ta …ஆர்டர் செய்) | Uses the order term; check it does not read as a customer order. |
 
 What this changes on release:
 
@@ -37,7 +48,7 @@ The choice is kept on this device only. Saving it on the server (`preferredLang`
   - Every compiled catalogue (en, hi, kn, te, ta, en-XA) has the English key set.
   - The hi, kn, te and ta catalogues are translated, not English copies.
   - A cashier opens Settings in English and picks हिन्दी. The page re-renders in Hindi (the section heading "भाषा" and the role notice), the English heading is gone, the button is pressed, `<html lang="hi">` is set and `todayz.lang` is `hi`.
-- `pnpm --filter @todayz/i18n lint:messages`: business 0 errors, 307 warnings (all "not referenced by a literal id", meaning the id is built at run time; these come from the English catalogue). hi/kn/te/ta 1374/1374 reviewed.
+- `pnpm --filter @todayz/i18n lint:messages`: business 0 errors, 317 warnings (all "not referenced by a literal id", meaning the id is built at run time; these come from the English catalogue). hi/kn/te/ta 1404/1404 reviewed.
 - `@todayz/i18n`: lint, typecheck, test pass (4 files, 198 tests).
 - `@todayz/business`: lint, lint:css, typecheck pass; tests pass (42 files, 379 tests); build passes (precache check and dist check pass); size: initial JS 162.24 kB gzip of 250 kB, initial CSS 10.35 kB of 20 kB.
 

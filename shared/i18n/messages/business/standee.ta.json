@@ -93,5 +93,155 @@
     "message": "QR குறியீடு தெளிவாக இருக்க, A5 இல் 100% அளவில், பிரிண்டர் ஓரங்கள் சேர்க்காமல் அச்சிடுங்கள்.",
     "review": "reviewed",
     "enHash": "079abaf2"
+  },
+  "standee.campaigns.title": {
+    "message": "பிரச்சாரங்கள்",
+    "review": "reviewed",
+    "enHash": "01a23a28"
+  },
+  "standee.campaigns.body": {
+    "message": "ஒவ்வொரு ஸ்டாண்டிக்கும் தனி QR உண்டு. எது வாடிக்கையாளர்களைக் கொண்டுவருகிறது என்று பார்க்க, ஒவ்வொரு இடத்துக்கும் பிரச்சாரத்துக்கும் ஒன்றை அச்சிடுங்கள்.",
+    "review": "reviewed",
+    "enHash": "525cba58"
+  },
+  "standee.campaigns.loading": {
+    "message": "உங்கள் ஸ்டாண்டிகள் ஏற்றப்படுகின்றன",
+    "review": "reviewed",
+    "enHash": "af5ab91c"
+  },
+  "standee.campaigns.loadError": {
+    "message": "உங்கள் ஸ்டாண்டிகளை ஏற்ற முடியவில்லை.",
+    "review": "reviewed",
+    "enHash": "f5a6fadd"
+  },
+  "standee.campaigns.empty.title": {
+    "message": "இன்னும் ஸ்டாண்டிகள் இல்லை",
+    "review": "reviewed",
+    "enHash": "e3777350"
+  },
+  "standee.campaigns.empty.body": {
+    "message": "உங்கள் கவுண்டர், வாயில் அல்லது ஒரு பண்டிகைப் பிரச்சாரத்துக்கு ஒன்றைச் சேர்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "36f42fd2"
+  },
+  "standee.campaigns.name": {
+    "message": "பிரச்சாரத்தின் பெயர்",
+    "review": "reviewed",
+    "enHash": "aa5d0e72"
+  },
+  "standee.campaigns.nameHelp": {
+    "message": "எடுத்துக்காட்டாக “கவுண்டர்” அல்லது “தீபாவளி வாயில்”. அதிகபட்சம் {max} எழுத்துகள்.",
+    "review": "reviewed",
+    "enHash": "d6535339"
+  },
+  "standee.campaigns.err.required": {
+    "message": "ஸ்டாண்டிக்கு ஒரு பிரச்சாரப் பெயர் கொடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "924d38d2"
+  },
+  "standee.campaigns.err.max": {
+    "message": "{max} அல்லது அதற்குக் குறைவான எழுத்துகளைப் பயன்படுத்தவும்",
+    "review": "reviewed",
+    "enHash": "ad4867fd"
+  },
+  "standee.campaigns.add": {
+    "message": "ஸ்டாண்டியைச் சேர்",
+    "review": "reviewed",
+    "enHash": "26c34834"
+  },
+  "standee.campaigns.adding": {
+    "message": "ஸ்டாண்டி சேர்க்கப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "2c8fa29b"
+  },
+  "standee.campaigns.created": {
+    "message": "ஸ்டாண்டி சேர்க்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "cca5d3a0"
+  },
+  "standee.campaigns.full": {
+    "message": "இந்தக் கடையில் {limit} ஸ்டாண்டிகள் உள்ளன, இதுவே அதிகபட்சம்.",
+    "review": "reviewed",
+    "enHash": "e68ad8fd"
+  },
+  "standee.campaigns.lastScan": {
+    "message": "கடைசி ஸ்கேன் {date}",
+    "review": "reviewed",
+    "enHash": "c7782aaa"
+  },
+  "standee.campaigns.noScans": {
+    "message": "இன்னும் ஸ்கேன் செய்யப்படவில்லை",
+    "review": "reviewed",
+    "enHash": "d4543dd1"
+  },
+  "standee.campaigns.reorder": {
+    "message": "அச்சிட்ட ஸ்டாண்டியை மீண்டும் ஆர்டர் செய்",
+    "review": "reviewed",
+    "enHash": "abf828c2"
+  },
+  "standee.campaigns.reordering": {
+    "message": "கோரிக்கை அனுப்பப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "b13d58b1"
+  },
+  "standee.campaigns.reorderPending": {
+    "message": "மீண்டும் ஆர்டர் கோரப்பட்டது",
+    "review": "reviewed",
+    "enHash": "ef2bd121"
+  },
+  "standee.campaigns.reorderSince": {
+    "message": "{date} அன்று மறு அச்சு கோரப்பட்டது. QR மாறாது, எனவே அதன் எண்ணிக்கை தொடரும்.",
+    "review": "reviewed",
+    "enHash": "5ca10fd0"
+  },
+  "standee.campaigns.error.validation_failed": {
+    "message": "பிரச்சாரப் பெயரைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "ec28d190"
+  },
+  "standee.campaigns.error.forbidden": {
+    "message": "உரிமையாளர்களும் மேலாளர்களும் மட்டுமே ஸ்டாண்டிகளை மாற்ற முடியும்.",
+    "review": "reviewed",
+    "enHash": "9f3d0031"
+  },
+  "standee.campaigns.error.not_found": {
+    "message": "இந்த ஸ்டாண்டி இப்போது இங்கே இல்லை. பக்கத்தை ரீலோட் செய்யவும்.",
+    "review": "reviewed",
+    "enHash": "77ba8a53"
+  },
+  "standee.campaigns.error.standee_limit_reached": {
+    "message": "இந்தக் கடையில் ஏற்கெனவே அதிகபட்ச எண்ணிக்கையில் ஸ்டாண்டிகள் உள்ளன.",
+    "review": "reviewed",
+    "enHash": "eacd2973"
+  },
+  "standee.campaigns.error.generic": {
+    "message": "ஏதோ தவறு நடந்தது. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "4244e822"
+  },
+  "standee.funnel.scans": {
+    "message": "ஸ்கேன்கள்",
+    "review": "reviewed",
+    "enHash": "71faf749"
+  },
+  "standee.funnel.signUps": {
+    "message": "பதிவுகள்",
+    "review": "reviewed",
+    "enHash": "609b0516"
+  },
+  "standee.funnel.qualified": {
+    "message": "தகுதி பெற்றவை",
+    "review": "reviewed",
+    "enHash": "4f12dc10"
+  },
+  "standee.funnel.totals": {
+    "message": "எல்லா ஸ்டாண்டிகளும்",
+    "review": "reviewed",
+    "enHash": "b86351be"
+  },
+  "standee.funnel.one": {
+    "message": "{campaign} எண்ணிக்கைகள்",
+    "review": "reviewed",
+    "enHash": "bdbb16a3"
   }
 }
