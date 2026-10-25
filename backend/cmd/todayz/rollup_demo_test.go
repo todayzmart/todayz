@@ -44,11 +44,11 @@ func TestRollupDemoRefusesNonLocal(t *testing.T) {
 	require.ErrorContains(t, err, "APP_ENV local or test")
 }
 
-// handlerTransport serves the demo's requests from the in-process router,
-// as if from loopback.
-type handlerTransport struct{ h http.Handler }
+// handlerDoer serves the demo's requests from the in-process router, as if
+// from loopback.
+type handlerDoer struct{ h http.Handler }
 
-func (ht handlerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+func (ht handlerDoer) Do(req *http.Request) (*http.Response, error) {
 	req.RemoteAddr = "127.0.0.1:5555"
 	w := httptest.NewRecorder()
 	ht.h.ServeHTTP(w, req)
@@ -72,7 +72,7 @@ func TestRollupDemoTraffic(t *testing.T) {
 	require.NoError(t, cfg.check())
 	var out strings.Builder
 	otp := func(context.Context, string, time.Time) (string, error) { return testOTP, nil }
-	d := newDemoRun(cfg, &http.Client{Transport: handlerTransport{o.a.h}}, o.a.clk, otp, &out)
+	d := newDemoRun(cfg, handlerDoer{o.a.h}, o.a.clk, otp, &out)
 	ctx := context.Background()
 
 	o.a.clk.Advance(31 * time.Second) // past the OTP resend cooldown of the shop's own sign-ins

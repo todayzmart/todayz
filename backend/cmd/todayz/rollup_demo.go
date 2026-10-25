@@ -92,9 +92,15 @@ type demoSession struct {
 	cookie *http.Cookie
 }
 
+// demoDoer sends the demo's requests: the egress-guarded client in the
+// binary, the in-process router in tests.
+type demoDoer interface {
+	Do(*http.Request) (*http.Response, error)
+}
+
 type demoRun struct {
 	cfg    demoConfig
-	hc     *http.Client
+	hc     demoDoer
 	clk    clock.Clock
 	rnd    *rand.Rand
 	otp    demoOTP
@@ -150,7 +156,7 @@ func (c demoConfig) check() error {
 	return nil
 }
 
-func newDemoRun(cfg demoConfig, hc *http.Client, clk clock.Clock, otp demoOTP, out io.Writer) *demoRun {
+func newDemoRun(cfg demoConfig, hc demoDoer, clk clock.Clock, otp demoOTP, out io.Writer) *demoRun {
 	cfg.API = strings.TrimSuffix(cfg.API, "/")
 	seed := uint64(clk.Now().UnixNano()) //nolint:gosec // a demo's random seed
 	return &demoRun{
