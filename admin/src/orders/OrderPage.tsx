@@ -18,7 +18,7 @@ import { TERMINAL, useOrderLabels } from './labels';
 import { useCancelOrder, useOrder } from './queries';
 import css from '../app/page.module.css';
 
-/** A-08 order detail: lines, money, timers, the event timeline, holds and notifications; admin cancel. */
+/** A-07 order detail: lines, money, timers, the event timeline, holds and notifications; admin cancel. */
 export function OrderPage({ id }: { id: string }) {
   const intl = useIntl();
   const q = useOrder(id);

@@ -54,7 +54,7 @@ describe('A-07 orders', () => {
   });
 });
 
-describe('A-08 order detail', () => {
+describe('A-07 order detail', () => {
   it('shows the timeline and never a code', async () => {
     renderAt(`/orders/${ORDER_ID}`, { roles: ['support'], handlers: [api()] });
     expect(await screen.findByRole('heading', { level: 1, name: /Order TZ-1042/ })).toBeInTheDocument();

@@ -47,4 +47,4 @@ W1-08: sign-in gate, A-01 SMS step and two-step check (TOTP calls on the generat
 
 Offline first load: the gate shows `SessionPending` (offline notice and "Try again") while the session is `unknown` and the API cannot be reached.
 
-W3-05: role-aware sidebar (7 roles), A-06 customers (block, unblock, strike reset, session revoke), A-07/A-08 orders (admin cancel with reason), A-19 audit log and the shared audit side panel (`src/audit/`), A-17 settings (`src/settings/`: groups, values by unit, ranges, provider keys set/missing, edit with reason, step-up, change history; money keys super_admin only).
+W3-05: role-aware sidebar (7 roles), A-06 customers (block, unblock, strike reset, session revoke), A-07 orders, list and detail (admin cancel with reason), A-19 audit log and the shared audit side panel (`src/audit/`), A-17 settings (`src/settings/`: groups, values by unit, ranges, provider keys set/missing, edit with reason, step-up, change history; money keys super_admin only).
