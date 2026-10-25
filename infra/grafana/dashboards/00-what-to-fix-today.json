@@ -821,7 +821,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "1 - (1 - histogram_fraction(0, 30, sum(increase(tz_job_lateness_seconds{class=\"timer\"}[30d])))) / 0.001",
+          "expr": "1 - (1 - histogram_fraction(0, 30, sum(increase(tz_job_lateness_seconds[30d]) and on (kind) tz_job_runs_total{class=\"timer\"}))) / 0.001",
           "legendFormat": "__auto",
           "range": false,
           "instant": true
