@@ -47,9 +47,21 @@ var ErrNoRegion = errors.New("ops: AWS_REGION is not set")
 // awsClient reads Beanstalk, CloudWatch and RDS with the instance role. Every
 // call is a read: Describe*, GetMetricData (the IAM policy is W1-10's).
 type awsClient struct {
-	eb  *elasticbeanstalk.Client
-	cw  *cloudwatch.Client
+	eb  ebAPI
+	cw  cwAPI
 	rds *rds.Client
+}
+
+// ebAPI and cwAPI are the reads used, so tests can answer them.
+type ebAPI interface {
+	DescribeEnvironments(context.Context, *elasticbeanstalk.DescribeEnvironmentsInput, ...func(*elasticbeanstalk.Options)) (*elasticbeanstalk.DescribeEnvironmentsOutput, error)
+	DescribeEnvironmentResources(context.Context, *elasticbeanstalk.DescribeEnvironmentResourcesInput, ...func(*elasticbeanstalk.Options)) (*elasticbeanstalk.DescribeEnvironmentResourcesOutput, error)
+	DescribeEvents(context.Context, *elasticbeanstalk.DescribeEventsInput, ...func(*elasticbeanstalk.Options)) (*elasticbeanstalk.DescribeEventsOutput, error)
+}
+
+type cwAPI interface {
+	cloudwatch.GetMetricDataAPIClient
+	cloudwatch.DescribeAlarmsAPIClient
 }
 
 // NewAWS builds the deployed adapter. It refuses outside staging and prod, so
@@ -122,6 +134,8 @@ type credentialsError struct{ cause error }
 func (e *credentialsError) Error() string { return "ops: instance role credentials unavailable" }
 func (e *credentialsError) Unwrap() error { return e.cause }
 
+// Environments lists the environments. One whose details cannot be read keeps
+// its name, health and status and carries the error class; the others stand.
 func (c *awsClient) Environments(ctx context.Context) ([]Environment, error) {
 	out, err := c.eb.DescribeEnvironments(ctx, &elasticbeanstalk.DescribeEnvironmentsInput{IncludeDeleted: aws.Bool(false)})
 	if err != nil {
@@ -132,7 +146,6 @@ func (c *awsClient) Environments(ctx context.Context) ([]Environment, error) {
 		descs = descs[:maxEnvironments]
 	}
 	envs := make([]Environment, len(descs))
-	errs := make([]error, len(descs))
 	var wg sync.WaitGroup
 	for i, d := range descs {
 		name := aws.ToString(d.EnvironmentName)
@@ -145,15 +158,12 @@ func (c *awsClient) Environments(ctx context.Context) ([]Environment, error) {
 			Deploys:      []api.AdminSystemDeploy{},
 		}}
 		wg.Add(1)
-		go func(e *Environment, errp *error) {
+		go func(e *Environment) {
 			defer wg.Done()
-			*errp = c.environmentDetail(ctx, e)
-		}(&envs[i], &errs[i])
+			e.ErrorClass = errClassPtr(c.environmentDetail(ctx, e))
+		}(&envs[i])
 	}
 	wg.Wait()
-	if err := errors.Join(errs...); err != nil {
-		return nil, err
-	}
 	return envs, nil
 }
 
@@ -367,22 +377,29 @@ func (c *awsClient) RDS(ctx context.Context, now time.Time) ([]api.AdminSystemRd
 	return insts, nil
 }
 
+// alarmStates is the order alarms are read in, so the maxAlarms cap drops
+// quiet alarms before a firing one.
+var alarmStates = []cwtypes.StateValue{cwtypes.StateValueAlarm, cwtypes.StateValueInsufficientData, cwtypes.StateValueOk}
+
 func (c *awsClient) Alarms(ctx context.Context) ([]api.AdminSystemAlarm, error) {
 	out := []api.AdminSystemAlarm{}
-	p := cloudwatch.NewDescribeAlarmsPaginator(c.cw, &cloudwatch.DescribeAlarmsInput{
-		AlarmTypes: []cwtypes.AlarmType{cwtypes.AlarmTypeMetricAlarm, cwtypes.AlarmTypeCompositeAlarm},
-		MaxRecords: aws.Int32(maxAlarms),
-	})
-	for p.HasMorePages() && len(out) < maxAlarms {
-		page, err := p.NextPage(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, a := range page.MetricAlarms {
-			out = appendAlarm(out, aws.ToString(a.AlarmName), string(a.StateValue), a.StateUpdatedTimestamp)
-		}
-		for _, a := range page.CompositeAlarms {
-			out = appendAlarm(out, aws.ToString(a.AlarmName), string(a.StateValue), a.StateUpdatedTimestamp)
+	for _, state := range alarmStates {
+		p := cloudwatch.NewDescribeAlarmsPaginator(c.cw, &cloudwatch.DescribeAlarmsInput{
+			AlarmTypes: []cwtypes.AlarmType{cwtypes.AlarmTypeMetricAlarm, cwtypes.AlarmTypeCompositeAlarm},
+			StateValue: state,
+			MaxRecords: aws.Int32(maxAlarms),
+		})
+		for p.HasMorePages() && len(out) < maxAlarms {
+			page, err := p.NextPage(ctx)
+			if err != nil {
+				return nil, err
+			}
+			for _, a := range page.MetricAlarms {
+				out = appendAlarm(out, aws.ToString(a.AlarmName), string(a.StateValue), a.StateUpdatedTimestamp)
+			}
+			for _, a := range page.CompositeAlarms {
+				out = appendAlarm(out, aws.ToString(a.AlarmName), string(a.StateValue), a.StateUpdatedTimestamp)
+			}
 		}
 	}
 	return out, nil

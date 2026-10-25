@@ -3,6 +3,7 @@ package ops
 import (
 	"context"
 	"errors"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -14,8 +15,13 @@ import (
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
-// maxStatementText is where a statement's text is cut.
-const maxStatementText = 500
+const (
+	// maxStatementText is where a shown statement's text is cut (characters).
+	maxStatementText = 500
+	// readStatementText is how much of a statement is read before its
+	// comments are taken out and it is cut to maxStatementText.
+	readStatementText = 2000
+)
 
 type dbSnapshot struct {
 	at       time.Time
@@ -25,10 +31,11 @@ type dbSnapshot struct {
 
 // dbPanels returns the database and River panels, read again once the last
 // read is DBCacheTTL old.
-func (s *Service) dbPanels(ctx context.Context, now time.Time) *dbSnapshot {
+func (s *Service) dbPanels(ctx context.Context) *dbSnapshot {
 	s.dbMu.Lock()
 	defer s.dbMu.Unlock()
-	if s.db != nil && now.Sub(s.db.at) < DBCacheTTL && !now.Before(s.db.at) {
+	now := s.d.Clock.Now() // under the lock, as in awsPanels
+	if s.db != nil && fresh(now, s.db.at, DBCacheTTL) {
 		return s.db
 	}
 	c, cancel := context.WithTimeout(context.WithoutCancel(ctx), fetchTimeout)
@@ -73,19 +80,21 @@ func failDatabase(p api.AdminSystemDatabase, err error) api.AdminSystemDatabase 
 // statementsSQL lists the most expensive statements of this database from
 // pg_stat_statements (in schema %s). Only data and DML statements are kept:
 // their text is normalised (every literal is $n), while a utility statement
-// (SET, CREATE, …) is stored as written and may hold a value. A leading
-// `-- name:` comment (sqlc) is kept, since it names the query.
-const statementsSQL = `SELECT left(query, $1), calls, mean_exec_time, total_exec_time, rows
+// (SET, CREATE, …) is stored as written and may hold a value. Statements the
+// role may not see (another role's, without pg_read_all_stats) come back with
+// a null queryid and no text; they compete for the top 10 too, so the caller
+// can tell the list is incomplete.
+const statementsSQL = `SELECT queryid, left(query, $1), calls, mean_exec_time, total_exec_time, rows
 FROM %s.pg_stat_statements
 WHERE dbid = (SELECT oid FROM pg_database WHERE datname = current_database())
   AND toplevel
-  AND queryid IS NOT NULL
-  AND query ~* '^(\s*--[^\n]*\n)*\s*\(*\s*(select|insert|update|delete|with|merge|values)\M'
+  AND (queryid IS NULL
+    OR query ~* '^(\s*--[^\n]*\n)*\s*\(*\s*(select|insert|update|delete|with|merge|values)\M')
 ORDER BY total_exec_time DESC
 LIMIT 10`
 
-// readStatements reads the top 10; an absent or not-preloaded extension is a
-// status, not a failure of the panel.
+// readStatements reads the top 10; an absent or not-preloaded extension, or a
+// role that cannot see every statement, is a status, not a failure of the panel.
 func (s *Service) readStatements(ctx context.Context) (api.AdminSystemStatementsStatus, []api.AdminSystemStatement) {
 	none := []api.AdminSystemStatement{}
 	var schema string
@@ -97,28 +106,120 @@ WHERE e.extname = 'pg_stat_statements'`).Scan(&schema)
 	if err != nil {
 		return api.AdminSystemStatementsStatusError, none
 	}
-	rows, err := s.d.DB.Query(ctx, sprintfSchema(statementsSQL, schema), maxStatementText)
+	rows, err := s.d.DB.Query(ctx, sprintfSchema(statementsSQL, schema), readStatementText)
 	if err != nil {
-		var pe *pgconn.PgError
-		// 55000 object_not_in_prerequisite_state: not in shared_preload_libraries.
-		if errors.As(err, &pe) && pe.Code == "55000" {
-			return api.AdminSystemStatementsStatusNotPreloaded, none
-		}
-		return api.AdminSystemStatementsStatusError, none
+		return statementsErr(err), none
 	}
-	out, err := pgx.CollectRows(rows, func(r pgx.CollectableRow) (api.AdminSystemStatement, error) {
-		var st api.AdminSystemStatement
-		err := r.Scan(&st.Query, &st.Calls, &st.MeanMs, &st.TotalMs, &st.Rows)
-		return st, err
+	type row struct {
+		queryID *int64
+		st      api.AdminSystemStatement
+	}
+	got, err := pgx.CollectRows(rows, func(r pgx.CollectableRow) (row, error) {
+		var x row
+		var text *string
+		err := r.Scan(&x.queryID, &text, &x.st.Calls, &x.st.MeanMs, &x.st.TotalMs, &x.st.Rows)
+		if text != nil {
+			x.st.Query = *text
+		}
+		return x, err
 	})
 	if err != nil {
-		var pe *pgconn.PgError
-		if errors.As(err, &pe) && pe.Code == "55000" {
-			return api.AdminSystemStatementsStatusNotPreloaded, none
-		}
-		return api.AdminSystemStatementsStatusError, none
+		return statementsErr(err), none
 	}
-	return api.AdminSystemStatementsStatusOk, out
+	status, out := api.AdminSystemStatementsStatusOk, none
+	for _, x := range got {
+		if x.queryID == nil {
+			status = api.AdminSystemStatementsStatusNeedsPrivilege
+			continue
+		}
+		if x.st.Query = shownStatement(x.st.Query); x.st.Query != "" {
+			out = append(out, x.st)
+		}
+	}
+	return status, out
+}
+
+func statementsErr(err error) api.AdminSystemStatementsStatus {
+	var pe *pgconn.PgError
+	// 55000 object_not_in_prerequisite_state: not in shared_preload_libraries.
+	if errors.As(err, &pe) && pe.Code == "55000" {
+		return api.AdminSystemStatementsStatusNotPreloaded
+	}
+	return api.AdminSystemStatementsStatusError
+}
+
+// reSqlcName is sqlc's leading query name line, the one comment kept.
+var reSqlcName = regexp.MustCompile(`^-- name: [A-Za-z0-9_]+ :[a-z]+\n`)
+
+// shownStatement takes the comments out of a statement (pg_stat_statements
+// keeps them as written, and a tag such as /* user=… */ can carry a value),
+// except a leading sqlc `-- name:` line, and cuts it to maxStatementText.
+func shownStatement(q string) string {
+	q = strings.TrimLeft(q, " \t\r\n")
+	name := reSqlcName.FindString(q)
+	q = strings.TrimSpace(stripComments(q[len(name):]))
+	if q == "" {
+		return ""
+	}
+	q = name + q
+	if r := []rune(q); len(r) > maxStatementText {
+		q = string(r[:maxStatementText])
+	}
+	return q
+}
+
+// stripComments replaces each -- and /* */ comment (nested, as Postgres
+// allows) with a space. Quoted identifiers and strings are passed over. A
+// comment left open (the text was cut) runs to the end.
+func stripComments(q string) string {
+	var b strings.Builder
+	for i := 0; i < len(q); {
+		switch {
+		case q[i] == '\'' || q[i] == '"':
+			j := i + 1
+			for j < len(q) {
+				if q[j] == q[i] {
+					if j+1 < len(q) && q[j+1] == q[i] { // a doubled quote
+						j += 2
+						continue
+					}
+					break
+				}
+				j++
+			}
+			j = min(j+1, len(q))
+			b.WriteString(q[i:j])
+			i = j
+		case strings.HasPrefix(q[i:], "--"):
+			j := strings.IndexByte(q[i:], '\n')
+			if j < 0 {
+				return b.String()
+			}
+			b.WriteByte(' ')
+			i += j
+		case strings.HasPrefix(q[i:], "/*"):
+			depth, j := 1, i+2
+			for j < len(q) && depth > 0 {
+				switch {
+				case strings.HasPrefix(q[j:], "/*"):
+					depth, j = depth+1, j+2
+				case strings.HasPrefix(q[j:], "*/"):
+					depth, j = depth-1, j+2
+				default:
+					j++
+				}
+			}
+			if depth > 0 {
+				return b.String()
+			}
+			b.WriteByte(' ')
+			i = j
+		default:
+			b.WriteByte(q[i])
+			i++
+		}
+	}
+	return b.String()
 }
 
 func sprintfSchema(q, schema string) string {

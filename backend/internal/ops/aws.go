@@ -13,7 +13,9 @@ import (
 // implementation is NewAWS; tests use a fake. Every method is read-only.
 type AWS interface {
 	// Environments lists the Beanstalk environments with their last deploys
-	// and the load balancers they use (LoadBalancers feeds ALB).
+	// and the load balancers they use (LoadBalancers feeds ALB). An error is
+	// the list itself failing; one environment that cannot be read carries
+	// its own ErrorClass instead.
 	Environments(ctx context.Context) ([]Environment, error)
 	// ALB sums the given load balancers over [start, end).
 	ALB(ctx context.Context, loadBalancers []string, start, end time.Time) (ALBStats, error)
@@ -49,10 +51,14 @@ type awsSnapshot struct {
 
 // awsPanels returns the cached AWS panels, fetching when the cache is older
 // than AWSCacheTTL. One fetch runs at a time; callers meanwhile wait for it.
-func (s *Service) awsPanels(ctx context.Context, now time.Time) *awsSnapshot {
+func (s *Service) awsPanels(ctx context.Context) *awsSnapshot {
 	s.awsMu.Lock()
 	defer s.awsMu.Unlock()
-	if s.aws != nil && now.Sub(s.aws.at) < AWSCacheTTL && !now.Before(s.aws.at) {
+	// Read under the lock: a caller that waited for a fetch must see it as
+	// fresh, not as newer than a clock reading taken before it (which counts
+	// as stale and would refetch once per waiter).
+	now := s.d.Clock.Now()
+	if s.aws != nil && fresh(now, s.aws.at, AWSCacheTTL) {
 		return s.aws
 	}
 	switch {
@@ -68,6 +74,12 @@ func (s *Service) awsPanels(ctx context.Context, now time.Time) *awsSnapshot {
 		s.aws = notConfigured(now)
 	}
 	return s.aws
+}
+
+// fresh is at no older than ttl at now; a clock that went back counts as stale.
+func fresh(now, at time.Time, ttl time.Duration) bool {
+	age := now.Sub(at)
+	return age >= 0 && age < ttl
 }
 
 func emptyALB(now time.Time, status api.AdminSystemPanelStatus, err error) api.AdminSystemAlb {

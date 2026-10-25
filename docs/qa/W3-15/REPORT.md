@@ -96,6 +96,19 @@ In `docs/qa/W3-15/`, at desktop 1280×800, written by Playwright with `TZ_QA_DIR
 - `admin-a22-system.png`: A-22 locally.
 - `admin-a22-no-access-support.png`: support visiting `/system`.
 
+## Lead review fixes (after 0f1b43d)
+
+1. **Cache herd:** `awsPanels` and `dbPanels` read the clock only after taking their mutex. `fresh(now, at, ttl)` treats a fetch stamped later than `now` as fresh, never as stale. `System` reads `serverNow` after both panels, so no `fetchedAt` is ahead of it. Tests: `TestAWSCacheOneFetchWithARealClock` (`clock.Real{}`, 16 concurrent `System()` calls, a fake AWS that takes 50 ms, exactly one Beanstalk and one alarms fetch) and `TestDBCacheOneReadWithARealClock` (16 concurrent callers share one snapshot).
+2. **Alarm cap:** `Alarms` asks CloudWatch one state at a time, ALARM first, then INSUFFICIENT_DATA, then OK, and stops at 100. A firing alarm is never cut for a quiet one. Test: `TestAlarmsCapKeepsEveryFiringAlarm` (133 alarms, with the two ALARMs sorting last by name).
+3. **One Beanstalk environment failing:** it no longer fails the panel. The environment keeps what `DescribeEnvironments` said (name, health, status, version) and carries its own `errorClass` (the API error code only, never the message). Its instance count, load balancers and deploys are left empty. The other environments, the panel and the ALB stand. Contract: `AdminSystemEnvironment.errorClass` (required, nullable). The console shows "Instances, load balancers or deploys could not be read for this environment. (Class)". Test: `TestOneEnvironmentFailingDegradesAlone` (client and `System` level), plus the A-22 unit test.
+4. **Statements panel:**
+   - Comments are stripped from the shown text: `/* … */` (nested too), and `--` line comments, except a leading sqlc `-- name: X :one` line. Quoted strings and identifiers are passed over, and a comment cut off by the text limit drops the rest. Postgres reads up to 2,000 characters; the shown text is at most 500.
+   - Rows the role may not see (NULL queryid, `<insufficient privilege>`) are never shown, and the status becomes `needs_privilege`. The console says the role needs `pg_read_all_stats`, and still lists the statements it can see. Contract: `needs_privilege` added to `AdminSystemStatementsStatus`.
+   - Tests: `TestShownStatement` (unit), and `TestStatementsPrivilegeCommentsAndUtility` against Postgres. In that test, an owner's slow statement gives `needs_privilege` without its text. After `GRANT pg_read_all_stats` the status is ok, a `/* tenant=… */ -- phone …` statement is listed without its comments, and a `CREATE TABLE … DEFAULT '<value>'` and a `DO $$ … '<value>' $$` block are never listed.
+5. **Nil authorizer:** `TestNilAuthorizerFailsClosed`: `Register(r, NewFromConfig(…), nil)` answers 500 for super_admin, admin and support, never the panels. `NewFromConfig` takes no authorizer, so the test passes nil to `Register`, where the authorizer goes.
+
+No new D-numbers.
+
 ## Conservative readings (recorded, not asked)
 
 1. **Grafana in production:** a production build without `VITE_GRAFANA_URL` leaves the Grafana links out. It does not point them at a guess.
@@ -104,12 +117,15 @@ In `docs/qa/W3-15/`, at desktop 1280×800, written by Playwright with `TZ_QA_DIR
 4. **Deploy outcome:** read from Beanstalk's fixed event phrases ("Environment update completed successfully", "Failed to deploy application", …). Any other event is not counted as a deploy.
 5. **Multi-AZ on AWS:** shown only when RDS answered and there is exactly one instance. Otherwise the row is left out rather than guessed.
 6. **Job history panels:** visible to `AdminAuditView` (admin and super_admin), the roles that may act on a job. support, analyst and finance read A-21 without the history panels.
+7. **ALB with one environment unreadable:** the ALB figures cover the load balancers that could be read. The failing environment is marked on the Beanstalk panel.
+8. **`needs_privilege` still lists rows:** the statements the role can see are shown, with the note, rather than none.
+9. **Line comments stripped too:** the review named `/* … */`. `--` comments can carry values the same way, so they are stripped as well. The one exception is sqlc's leading `-- name:` line, which names the query and holds no value.
 
 ## Questions for the lead
 
 1. **`VITE_GRAFANA_URL` for prod:** what is the Grafana URL? Without it A-21 shows "Grafana links are off in this build." and A-22 has no dashboard links.
-2. **RDS role for top statements:** on RDS the API's database role needs `pg_read_all_stats` to see other roles' statements, and `pg_stat_statements` must be in the parameter group's `shared_preload_libraries`. Both are W1-10 or a migration owner's call. Without them the panel says why top statements are off.
-3. **`DescribeEnvironmentResources` permissions:** Beanstalk may also require read permissions on the resources underneath (Auto Scaling, CloudFormation, ELB describe calls). If prod shows the Beanstalk panel as `AccessDenied`, W1-10's policy needs those reads. Not verifiable without AWS.
+2. **RDS role for top statements:** on RDS the API's database role needs `pg_read_all_stats` to see other roles' statements, and `pg_stat_statements` must be in the parameter group's `shared_preload_libraries`. Both are W1-10 or a migration owner's call. Without the extension the panel says why top statements are off. Without the role it now says `needs_privilege` and lists only the API's own statements.
+3. **`DescribeEnvironmentResources` permissions:** Beanstalk may also require read permissions on the resources underneath (Auto Scaling, CloudFormation, ELB describe calls). If prod shows an environment marked `AccessDenied`, W1-10's policy needs those reads. Not verifiable without AWS.
 4. **Performance Insights is unused:** W1-10's policy grants `pi:GetResourceMetrics` and `pi:DescribeDimensionKeys`, but the top-10 panel reads `pg_stat_statements` instead. Should the policy keep the `pi:*` grant?
 5. **Test import across packages:** `internal/ops`'s DB test imports `internal/telemetry` to mount `/v1/test/slow-sql` (test code only). Is that acceptable, or should the slow-SQL helper move to `testkit`?
 6. **Job history for read-only roles:** should support, analyst and finance see the job and run audit panels? They are hidden for now (reading 6 above).

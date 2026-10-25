@@ -29,7 +29,7 @@ const ALARM: Readonly<Record<AdminSystemAlarmState, string>> = {
   alarm: 'system.alarm.alarm',
   insufficient_data: 'system.alarm.insufficient',
 };
-const STATEMENTS: Readonly<Record<Exclude<AdminSystemStatementsStatus, 'ok'>, string>> = {
+const STATEMENTS: Readonly<Record<Exclude<AdminSystemStatementsStatus, 'ok' | 'needs_privilege'>, string>> = {
   not_installed: 'system.db.notInstalled',
   not_preloaded: 'system.db.notPreloaded',
   error: 'system.db.statementsError',
@@ -115,6 +115,11 @@ function Panels({ d }: { d: AdminSystem }) {
                 <dt>{intl.formatMessage({ id: 'system.eb.updated' })}</dt>
                 <dd>{e.updatedAt ? when(e.updatedAt, now) : none}</dd>
               </dl>
+              {e.errorClass && (
+                <p className={css.muted}>
+                  {intl.formatMessage({ id: 'system.eb.detailError' })} <span className={own.mono}>({e.errorClass})</span>
+                </p>
+              )}
               {e.deploys.length > 0 && (
                 <div>
                   <h3 className="tz-field-label">{intl.formatMessage({ id: 'system.eb.deploys' })}</h3>
@@ -224,6 +229,11 @@ function Panels({ d }: { d: AdminSystem }) {
         </dl>
         {d.database.statementsStatus === 'ok' ? (
           <Statements rows={d.database.statements} />
+        ) : d.database.statementsStatus === 'needs_privilege' ? (
+          <>
+            <p className={css.muted}>{intl.formatMessage({ id: 'system.db.needsPrivilege' })}</p>
+            {d.database.statements.length > 0 && <Statements rows={d.database.statements} />}
+          </>
         ) : (
           <p className={css.muted}>{intl.formatMessage({ id: STATEMENTS[d.database.statementsStatus] })}</p>
         )}

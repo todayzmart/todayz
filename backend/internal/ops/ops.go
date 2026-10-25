@@ -71,9 +71,9 @@ func New(d Deps) *Service {
 
 // System returns every panel.
 func (s *Service) System(ctx context.Context) api.AdminSystem {
-	now := s.d.Clock.Now()
-	a := s.awsPanels(ctx, now)
-	db := s.dbPanels(ctx, now)
+	a := s.awsPanels(ctx)
+	db := s.dbPanels(ctx)
+	now := s.d.Clock.Now() // after the panels, so no fetchedAt is in the future
 	out := api.AdminSystem{
 		Env:           s.d.Env,
 		AwsConfigured: s.d.AWS != nil || s.d.AWSErr != nil,

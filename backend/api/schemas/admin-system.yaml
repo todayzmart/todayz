@@ -38,7 +38,7 @@ AdminSystemDeploy:
 AdminSystemEnvironment:
   type: object
   additionalProperties: false
-  required: [name, health, status, versionLabel, instanceCount, updatedAt, deploys]
+  required: [name, health, status, versionLabel, instanceCount, updatedAt, deploys, errorClass]
   properties:
     name: {type: string, maxLength: 100}
     health: {$ref: '#/AdminSystemHealth'}
@@ -57,6 +57,9 @@ AdminSystemEnvironment:
       oneOf:
         - {$ref: ./common.yaml#/Timestamp}
         - {type: 'null'}
+    # Why this environment's instances, load balancers or deploys could not be read; null when they
+    # were. The other environments and the panel stand.
+    errorClass: {$ref: '#/AdminSystemErrorClass'}
     deploys:
       type: array
       description: The last 10 environment updates, newest first.
@@ -181,9 +184,11 @@ AdminSystemStatement:
 AdminSystemStatementsStatus:
   type: string
   description: >-
-    `ok`; `not_installed` when the pg_stat_statements extension is absent; `not_preloaded` when it is
-    installed but not in shared_preload_libraries; `error` when the read failed.
-  enum: [ok, not_installed, not_preloaded, error]
+    `ok`; `needs_privilege` when statements the API's database role may not see (it lacks
+    pg_read_all_stats) rank in the top 10, so the list holds only the visible ones; `not_installed` when
+    the pg_stat_statements extension is absent; `not_preloaded` when it is installed but not in
+    shared_preload_libraries; `error` when the read failed.
+  enum: [ok, needs_privilege, not_installed, not_preloaded, error]
 AdminSystemDatabase:
   type: object
   additionalProperties: false

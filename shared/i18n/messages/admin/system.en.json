@@ -195,6 +195,10 @@
     "defaultMessage": "Database",
     "description": "A-22 System health: db"
   },
+  "system.eb.detailError": {
+    "defaultMessage": "Instances, load balancers or deploys could not be read for this environment.",
+    "description": "A-22 System health: eb detailError, followed by the error class"
+  },
   "system.db.connections": {
     "defaultMessage": "Connections in use / allowed",
     "description": "A-22 System health: db connections"
@@ -210,6 +214,10 @@
   "system.db.notPreloaded": {
     "defaultMessage": "Top statements are off: pg_stat_statements is not loaded when the database starts.",
     "description": "A-22 System health: db notPreloaded"
+  },
+  "system.db.needsPrivilege": {
+    "defaultMessage": "Some top statements are hidden: the API's database role needs pg_read_all_stats to see other roles' statements. Only the ones it can see are listed.",
+    "description": "A-22 System health: db needsPrivilege"
   },
   "system.db.statementsError": {
     "defaultMessage": "Could not load the top statements.",

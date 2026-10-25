@@ -135,3 +135,53 @@ func TestRiverPanelAndCache(t *testing.T) {
 	require.Equal(t, int64(2), again.River.Queues[1].Depth, "6 s later: the new job counts")
 	require.Equal(t, 96, again.River.Queues[0].OldestAgeSeconds)
 }
+
+// Lead review (W3-15): what the statements panel shows when the API's role
+// cannot see other roles' statements, and what it never shows.
+func TestStatementsPrivilegeCommentsAndUtility(t *testing.T) {
+	db := testkit.NewDB(t)
+	ctx := context.Background()
+	read := func() api.AdminSystemDatabase {
+		return New(Deps{Env: api.Local, DB: db.Pool, Clock: clock.Real{}}).System(ctx).Database
+	}
+
+	// The owner's slow statement is hidden from todayz_app: needs_privilege,
+	// with only the visible rows and never the placeholder text.
+	_, err := db.OwnerPool.Exec(ctx, `SELECT pg_sleep(0.3) AS owner_only`)
+	require.NoError(t, err)
+	_, err = db.Pool.Exec(ctx, `SELECT count(*) AS app_visible FROM users`)
+	require.NoError(t, err)
+	d := read()
+	require.Equal(t, api.AdminSystemPanelStatusOk, d.Status)
+	require.Equal(t, api.AdminSystemStatementsStatusNeedsPrivilege, d.StatementsStatus)
+	require.NotEmpty(t, d.Statements)
+	for _, s := range d.Statements {
+		require.NotContains(t, s.Query, "insufficient privilege")
+		require.NotContains(t, s.Query, "owner_only")
+	}
+
+	// With pg_read_all_stats the status is ok; comments are stripped from the
+	// text, and DDL or utility text (which keeps its values) is never listed.
+	require.NoError(t, db.AdminExec(ctx, `GRANT pg_read_all_stats TO todayz_app`))
+	t.Cleanup(func() { _ = db.AdminExec(context.Background(), `REVOKE pg_read_all_stats FROM todayz_app`) })
+	_, err = db.Pool.Exec(ctx, `SELECT pg_sleep(0.2) AS commented /* tenant=ops-secret-77 */ -- phone 9876543210`)
+	require.NoError(t, err)
+	_, err = db.OwnerPool.Exec(ctx, `CREATE TABLE ops_ddl_probe (v text DEFAULT 'ddl-secret-5150')`)
+	require.NoError(t, err)
+	_, err = db.OwnerPool.Exec(ctx, `DO $$BEGIN PERFORM pg_sleep(0.4); RAISE NOTICE 'ddl-secret-5150'; END$$`)
+	require.NoError(t, err)
+	d = read()
+	require.Equal(t, api.AdminSystemStatementsStatusOk, d.StatementsStatus)
+	var commented, owner bool
+	for _, s := range d.Statements {
+		require.NotContains(t, s.Query, "ops-secret-77")
+		require.NotContains(t, s.Query, "9876543210")
+		require.NotContains(t, s.Query, "/*")
+		require.NotContains(t, s.Query, "ddl-secret-5150")
+		require.NotContains(t, s.Query, "ops_ddl_probe")
+		commented = commented || strings.Contains(s.Query, "AS commented")
+		owner = owner || strings.Contains(s.Query, "owner_only")
+	}
+	require.True(t, commented, "the commented statement is listed, without its comments")
+	require.True(t, owner, "the owner's statement shows once the role may see it")
+}

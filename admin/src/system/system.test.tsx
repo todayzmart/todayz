@@ -86,7 +86,9 @@ describe('A-22 system health', () => {
                     { at, versionLabel: 'api-28d354c', outcome: 'succeeded' },
                     { at: '2026-10-24T06:00:00Z', versionLabel: 'api-eedc441', outcome: 'failed' },
                   ],
+                  errorClass: null,
                 },
+                { name: 'todayz-worker-prod', health: 'unknown', status: 'Ready', versionLabel: 'api-28d354c', instanceCount: null, updatedAt: at, deploys: [], errorClass: 'Throttling' },
               ],
             },
             alb: { status: 'ok', errorClass: null, fetchedAt: at, windowMinutes: 5, requestsPerMinute: 420, http5xxRateBp: 12, p95Ms: 180 },
@@ -108,6 +110,9 @@ describe('A-22 system health', () => {
     expect(within(eb).getByText('Healthy')).toBeInTheDocument();
     expect(within(eb).getAllByText('api-28d354c').length).toBeGreaterThan(0);
     expect(within(eb).getByText('Failed')).toBeInTheDocument();
+    // One environment that could not be read says so; the other still shows.
+    expect(within(eb).getByText('(Throttling)')).toBeInTheDocument();
+    expect(within(eb).getAllByText('Instances, load balancers or deploys could not be read for this environment.')).toHaveLength(1);
     const rds = await panel('RDS database server');
     expect(within(rds).getByText('Multi-AZ').nextElementSibling).toHaveTextContent('Off');
     expect(within(rds).getByText('40 GB / 50 GB')).toBeInTheDocument();
@@ -133,6 +138,17 @@ describe('A-22 system health', () => {
     expect(within(db).getByText('Top statements are off: the pg_stat_statements extension is not installed.')).toBeInTheDocument();
     // With RDS unreadable the API cannot say, so the row is left out.
     expect(within(db).queryByText('Multi-AZ')).not.toBeInTheDocument();
+  });
+
+  it('lists the visible top statements and says some are hidden when the role lacks pg_read_all_stats', async () => {
+    const base = local();
+    renderAt('/system', {
+      roles: ['admin'],
+      handlers: [api({ ...base, database: { ...base.database, statementsStatus: 'needs_privilege' } })],
+    });
+    const db = await panel('Database');
+    expect(within(db).getByText(/the API's database role needs pg_read_all_stats/)).toBeInTheDocument();
+    expect(within(db).getByText('SELECT * FROM orders WHERE store_id = $1')).toBeInTheDocument();
   });
 
   it('refreshes on Refresh', async () => {
