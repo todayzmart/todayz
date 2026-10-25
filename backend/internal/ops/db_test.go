@@ -2,14 +2,20 @@ package ops
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
 
 	api "github.com/todayz/backend/gen/api/admin-system"
 	"github.com/todayz/backend/internal/platform/clock"
+	"github.com/todayz/backend/internal/platform/config"
+	pdb "github.com/todayz/backend/internal/platform/db"
+	"github.com/todayz/backend/internal/telemetry"
 	"github.com/todayz/backend/internal/testkit"
 )
 
@@ -38,13 +44,21 @@ func TestLocalPanels(t *testing.T) {
 	require.NotNil(t, out.River.Queues)
 }
 
-// SC-OPS-02 (I): the top statements come from pg_stat_statements, normalised
-// (no literal reaches the page), this database only, slowest total first.
+// SC-OPS-02 (I): after a forced slow query through /v1/test/slow-sql?ms=500
+// (W1-07's route), the top statements list it with calls and mean time,
+// normalised (no literal reaches the page), this database only, slowest
+// total first.
 func TestTopStatements(t *testing.T) {
 	db := testkit.NewDB(t)
 	ctx := context.Background()
-	_, err := db.Pool.Exec(ctx, `SELECT pg_sleep(0.5)`)
+	r := chi.NewRouter()
+	_, gated, err := telemetry.Register(r, telemetry.Deps{DB: pdb.New(db.Pool), Clock: clock.Real{},
+		Env: config.EnvLocal, APIAddr: "127.0.0.1:8180", TestRoutes: true})
 	require.NoError(t, err)
+	require.True(t, gated)
+	rec := httptest.NewRecorder()
+	r.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/v1/test/slow-sql?ms=500", nil))
+	require.Equal(t, http.StatusOK, rec.Code, rec.Body.String())
 	_, err = db.Pool.Exec(ctx, `SELECT count(*) FROM users WHERE id::text = 'literal-9f3a2c'`)
 	require.NoError(t, err)
 	_, err = db.Pool.Exec(ctx, `SET application_name = 'utility-not-shown'`)
