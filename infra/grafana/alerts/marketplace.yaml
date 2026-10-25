@@ -1,0 +1,53 @@
+# Marketplace alerts (05 §5; owner W3-07). Grafana alerting file provisioning, same layout and datasource uids as jobs.yaml. Alert files
+# are not wired into the local stack yet; routing (05 §5) is W5's contact points. The firing test is
+# backend/internal/rollups/alerts_test.go.
+#
+#   Store not accepting  a store has ≥ 3 expired-unaccepted orders in 2 h. ops warning (support
+#                        queue, not paging; W5 routes severity=ops to it)
+#
+# orders has no expired_at, so the 2 h window is on placed_at: an unaccepted order expires
+# order_accept_window minutes after it is placed, well inside 2 h.
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: marketplace
+    folder: TodayZ
+    interval: 1m
+    rules:
+      # One series per store.
+      - uid: tz-store-not-accepting
+        title: 'Store not accepting'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 7200, to: 0}
+            datasourceUid: todayz-postgres
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              editorMode: code
+              rawSql: |-
+                SELECT store_id::text AS store_id, count(*) AS value FROM orders
+                WHERE status = 'expired' AND status_reason = 'not_accepted' AND placed_at > now() - interval '2 hours'
+                GROUP BY store_id HAVING count(*) >= 3
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [2]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          area: marketplace
+          severity: ops
+        annotations:
+          summary: 'A store let {{ $values.A.Value }} orders expire unaccepted in 2 h'
+          description: 'Store {{ $labels.store_id }} has not accepted {{ $values.A.Value }} orders in 2 h. Call the shop; it may be closed with the app open.'
+          runbook_url: docs/runbooks/marketplace-store-not-accepting.md
+          __dashboardUid__: todayz-08
+        isPaused: false

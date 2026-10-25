@@ -1,0 +1,185 @@
+# Auth alerts (05 §5; owner W3-07). Grafana alerting file provisioning, same layout and datasource uids as jobs.yaml. Alert files
+# are not wired into the local stack yet; routing (05 §5) is W5's contact points. The firing test is
+# backend/internal/rollups/alerts_test.go.
+#
+#   SMS failures         OTP SMS failure > 5 % for 10 min. critical
+#   OTP abuse (spike)    sends in 10 min > 5× the 7-day baseline per 10 min (and at least 20). warning
+#   OTP abuse (address)  one client address > 50 sends in an hour. warning
+#   Refresh token reuse  > 5 reuse revocations in 10 min. warning
+#
+# The OTP SMS goes through identity's own sender, not notify, so failures are its error log line
+# over the OTP requests made. ip_hash is per address: the /24 grouping needs a prefix hash
+# (TODO(lead)). Rules never carry a phone, an OTP or an address; the address key is the first 12
+# hex characters of its hash.
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: auth
+    folder: TodayZ
+    interval: 1m
+    rules:
+      # A: failed sends (identity logs each). B: OTP requests in the window. C = A / B.
+      - uid: tz-auth-sms-failures
+        title: 'SMS failures'
+        condition: D
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: loki
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                sum(count_over_time({service_name="todayz-api"} |= "identity: OTP SMS failed" [10m]))
+              queryType: instant
+          - refId: B
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: todayz-postgres
+            model:
+              refId: B
+              format: table
+              rawQuery: true
+              editorMode: code
+              rawSql: |-
+                SELECT greatest(count(*), 1) AS value FROM otp_requests WHERE created_at > now() - interval '10 minutes'
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: math
+              expression: '$A / $B'
+          - refId: D
+            datasourceUid: __expr__
+            model:
+              refId: D
+              type: threshold
+              expression: C
+              conditions:
+                - evaluator: {type: gt, params: [0.05]}
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        labels:
+          area: auth
+          severity: critical
+        annotations:
+          summary: 'OTP SMS are failing'
+          description: '{{ $values.C.Value | humanizePercentage }} of OTP SMS failed in 10 min: people cannot sign in.'
+          runbook_url: docs/runbooks/auth-sms-failures.md
+          __dashboardUid__: todayz-12
+        isPaused: false
+
+      # value = how many times the baseline the last 10 min are, 0 under the floor of 20 sends.
+      - uid: tz-auth-otp-spike
+        title: 'OTP abuse (spike)'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: todayz-postgres
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              editorMode: code
+              rawSql: |-
+                WITH cur AS (SELECT count(*)::float AS n FROM otp_requests WHERE created_at > now() - interval '10 minutes'),
+                base AS (SELECT count(*)::float / (7 * 24 * 6) AS n FROM otp_requests
+                         WHERE created_at > now() - interval '7 days' AND created_at <= now() - interval '10 minutes')
+                SELECT CASE WHEN cur.n >= 20 THEN cur.n / greatest(base.n, 0.1) ELSE 0 END AS value FROM cur, base
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [5]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          area: auth
+          severity: warning
+        annotations:
+          summary: 'OTP sends spiked'
+          description: 'OTP sends in the last 10 min are {{ $values.A.Value }}× the 7-day baseline.'
+          runbook_url: docs/runbooks/auth-otp-abuse.md
+          __dashboardUid__: todayz-12
+        isPaused: false
+
+      # Sends per hashed client address over the last hour.
+      - uid: tz-auth-otp-one-address
+        title: 'OTP abuse (one address)'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 3600, to: 0}
+            datasourceUid: todayz-postgres
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              editorMode: code
+              rawSql: |-
+                SELECT left(encode(ip_hash, 'hex'), 12) AS ip_key, count(*) AS value
+                FROM otp_requests WHERE ip_hash IS NOT NULL AND created_at > now() - interval '1 hour'
+                GROUP BY ip_hash HAVING count(*) > 50
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [50]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          area: auth
+          severity: warning
+        annotations:
+          summary: 'One client address asked for {{ $values.A.Value }} OTPs in an hour'
+          description: 'Address key {{ $labels.ip_key }} (a hash prefix) sent over 50 OTP requests in an hour.'
+          runbook_url: docs/runbooks/auth-otp-abuse.md
+          __dashboardUid__: todayz-12
+        isPaused: false
+
+      # Session families revoked because a rotated refresh token came back (theft or a client bug).
+      - uid: tz-auth-refresh-reuse
+        title: 'Refresh token reuse'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: todayz-postgres
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              editorMode: code
+              rawSql: |-
+                SELECT count(*) AS value FROM sessions WHERE revoked_reason = 'reuse' AND revoked_at > now() - interval '10 minutes'
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [5]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          area: auth
+          severity: warning
+        annotations:
+          summary: 'Refresh tokens are being reused'
+          description: '{{ $values.A.Value }} session families were revoked for refresh-token reuse in 10 min.'
+          runbook_url: docs/runbooks/auth-refresh-token-reuse.md
+          __dashboardUid__: todayz-12
+        isPaused: false

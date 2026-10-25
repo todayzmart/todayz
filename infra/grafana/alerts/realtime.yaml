@@ -1,0 +1,89 @@
+# Realtime alerts (05 §5; owner W3-07). Grafana alerting file provisioning, same layout and datasource uids as jobs.yaml. Alert files
+# are not wired into the local stack yet; routing (05 §5) is W5's contact points. The firing test is
+# backend/internal/rollups/alerts_test.go.
+#
+#   Order alerts slow  business-app SSE delivery lag p95 > 10 s for 10 min. critical
+#   SSE down           open business connections drop > 50 % in 5 min, in business hours. warning
+#
+# Business hours are read as 09:30–21:30 IST (04:00–16:00 UTC; TODO(lead): per-store hours), and
+# SSE down needs at least 10 connections 5 min ago so a quiet night stays quiet.
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: realtime
+    folder: TodayZ
+    interval: 1m
+    rules:
+      # Publish → business device, the order alert SLI (05 §6).
+      - uid: tz-order-alerts-slow
+        title: 'Order alerts slow'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                histogram_quantile(0.95, sum(rate(tz_sse_delivery_lag_seconds{app="business"}[10m]))) > 10
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        labels:
+          area: realtime
+          severity: critical
+        annotations:
+          summary: 'New-order alerts reach shops late'
+          description: 'p95 SSE delivery to the business app is {{ $values.A.Value | humanizeDuration }} (line 10 s): shops see new orders late and more expire unaccepted.'
+          runbook_url: docs/runbooks/realtime-order-alerts-slow.md
+          __dashboardUid__: todayz-04
+        isPaused: false
+
+      # Connections now under half of 5 min ago.
+      - uid: tz-sse-down
+        title: 'SSE down'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                sum(tz_sse_open_connections{app="business"}) < 0.5 * sum(tz_sse_open_connections{app="business"} offset 5m)
+                and on () sum(tz_sse_open_connections{app="business"} offset 5m) >= 10
+                and on () hour() >= 4 and on () hour() < 16
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 2m
+        labels:
+          area: realtime
+          severity: warning
+        annotations:
+          summary: 'Business-app live connections dropped by half'
+          description: '{{ $values.A.Value }} business SSE connections are open, under half of 5 min ago.'
+          runbook_url: docs/runbooks/realtime-sse-down.md
+          __dashboardUid__: todayz-04
+        isPaused: false

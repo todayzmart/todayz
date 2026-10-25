@@ -1,9 +1,271 @@
-# Schemas: domain "admin-pulse" (owner W3-07): admin Pulse (04 §2.7).
-#
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Schemas: domain "admin-pulse" (owner W3-07): admin Pulse, A-02 (04 §2.7, 05 §3).
+# Counts are whole numbers; rates and shares are basis points (`*Bp`, 10000 = 100%) and null when the
+# denominator is 0. Metric definitions are 05 §3 ("Metric definitions"): GMV is online (collected +
+# delivered orders) plus linked POS sales; a live store is active, has at least 50 listed items and stock
+# updated within `stock_stale_after_hours`, and so on.
+AdminPulseRange:
+  type: string
+  description: "`today`, or the last 7, 30 or 90 IST days including today."
+  enum: [today, 7d, 30d, 90d]
+  default: 7d
+AdminPulseDate:
+  type: string
+  format: date
+  description: An IST calendar day.
+  maxLength: 10
+AdminPulseRate:
+  type: [integer, 'null']
+  description: Basis points (10000 = 100%); null when nothing to divide by.
+  minimum: 0
+  maximum: 10000
+AdminPulseKpi:
+  type: object
+  additionalProperties: false
+  required: [value, previous]
+  properties:
+    value: {type: integer, minimum: 0}
+    previous:
+      type: [integer, 'null']
+      minimum: 0
+      description: The same figure for the period of the same length just before; null for none.
+AdminPulseRateKpi:
+  type: object
+  additionalProperties: false
+  required: [value, previous]
+  properties:
+    value: {$ref: '#/AdminPulseRate'}
+    previous: {$ref: '#/AdminPulseRate'}
+AdminPulseKpis:
+  type: object
+  additionalProperties: false
+  required: [gmvPaise, onlineGmvPaise, posGmvPaise, orders, completedOrders, successRateBp, activeCustomers,
+    transactingCustomers, liveStores, activeStores, newStores, searches, searchSuccessRateBp, d7RetentionBp]
+  properties:
+    gmvPaise:
+      $ref: '#/AdminPulseKpi'
+      description: Online plus linked POS GMV in paise.
+    onlineGmvPaise: {$ref: '#/AdminPulseKpi'}
+    posGmvPaise:
+      $ref: '#/AdminPulseKpi'
+      description: Linked POS sales only (bill QR or counter code); unlinked sales are shop sales recorded.
+    orders:
+      $ref: '#/AdminPulseKpi'
+      description: Orders placed in the period.
+    completedOrders:
+      $ref: '#/AdminPulseKpi'
+      description: Of those, collected or delivered.
+    successRateBp:
+      $ref: '#/AdminPulseRateKpi'
+      description: completedOrders ÷ orders.
+    activeCustomers:
+      $ref: '#/AdminPulseKpi'
+      description: Distinct customers who opened the app in the period.
+    transactingCustomers:
+      $ref: '#/AdminPulseKpi'
+      description: Distinct customers with a completed order or a linked POS sale in the period.
+    liveStores:
+      $ref: '#/AdminPulseKpi'
+      description: Live stores on the last day of the period.
+    activeStores:
+      $ref: '#/AdminPulseKpi'
+      description: Distinct stores active on at least one day of the period.
+    newStores:
+      $ref: '#/AdminPulseKpi'
+      description: Stores of verified businesses that went live in the period.
+    searches: {$ref: '#/AdminPulseKpi'}
+    searchSuccessRateBp:
+      $ref: '#/AdminPulseRateKpi'
+      description: Searches with at least one result ÷ searches.
+    d7RetentionBp:
+      $ref: '#/AdminPulseRateKpi'
+      description: Of customers first seen 7–13 days before the period ended, the share who opened the app 7 days later.
+AdminPulseDay:
+  type: object
+  additionalProperties: false
+  required: [date, gmvPaise, posGmvPaise, orders, completedOrders, activeCustomers, newCustomers, liveStores, searches,
+    zeroResultSearches]
+  properties:
+    date: {$ref: '#/AdminPulseDate'}
+    gmvPaise: {$ref: ./common.yaml#/Paise}
+    posGmvPaise: {$ref: ./common.yaml#/Paise}
+    orders: {type: integer, minimum: 0}
+    completedOrders: {type: integer, minimum: 0}
+    activeCustomers: {type: integer, minimum: 0}
+    newCustomers: {type: integer, minimum: 0}
+    liveStores: {type: integer, minimum: 0}
+    searches: {type: integer, minimum: 0}
+    zeroResultSearches: {type: integer, minimum: 0}
+AdminPulseFunnel:
+  type: object
+  additionalProperties: false
+  description: Searches → store views → orders placed → accepted → collected or delivered, in the period.
+  required: [searches, searchesWithResults, storeViews, ordersPlaced, ordersAccepted, ordersCompleted]
+  properties:
+    searches: {type: integer, minimum: 0}
+    searchesWithResults: {type: integer, minimum: 0}
+    storeViews: {type: integer, minimum: 0}
+    ordersPlaced: {type: integer, minimum: 0}
+    ordersAccepted: {type: integer, minimum: 0}
+    ordersCompleted: {type: integer, minimum: 0}
+AdminPulseLeak:
+  type: object
+  additionalProperties: false
+  description: Orders placed in the period that ended without being collected or delivered, by end state and reason.
+  required: [status, reason, count]
+  properties:
+    status:
+      type: string
+      enum: [rejected, expired, cancelled, delivery_failed]
+    reason:
+      type: [string, 'null']
+      maxLength: 40
+    count: {type: integer, minimum: 0}
+AdminPulseCohort:
+  type: object
+  additionalProperties: false
+  required: [cohortWeek, size, weeksBp]
+  properties:
+    cohortWeek:
+      $ref: '#/AdminPulseDate'
+      description: The Monday (IST) of the week the customers first completed an order or a linked POS sale.
+    size: {type: integer, minimum: 0}
+    weeksBp:
+      type: array
+      description: Transacting retention for week 0, 1, … (week 0 is 10000), up to week 12 or the current week.
+      maxItems: 13
+      items: {type: integer, minimum: 0, maximum: 10000}
+AdminPulseRetention:
+  type: object
+  additionalProperties: false
+  required: [d1Bp, d7Bp, d30Bp, cohorts]
+  properties:
+    d1Bp: {$ref: '#/AdminPulseRate'}
+    d7Bp: {$ref: '#/AdminPulseRate'}
+    d30Bp: {$ref: '#/AdminPulseRate'}
+    cohorts:
+      type: array
+      description: The last 12 customer cohorts, newest first.
+      maxItems: 12
+      items: {$ref: '#/AdminPulseCohort'}
+AdminPulseCredits:
+  type: object
+  additionalProperties: false
+  required: [issued, spent, expired]
+  properties:
+    issued: {$ref: ./common.yaml#/Credits}
+    spent: {$ref: ./common.yaml#/Credits}
+    expired: {$ref: ./common.yaml#/Credits}
+AdminPulseZeroResult:
+  type: object
+  additionalProperties: false
+  description: A normalised query that found nothing, with at least 10 searches in the period (k ≥ 10).
+  required: [queryNorm, searches]
+  properties:
+    queryNorm: {type: string, maxLength: 120}
+    searches: {type: integer, minimum: 0}
+AdminPulseAttention:
+  type: object
+  additionalProperties: false
+  required: [storeId, name, city, reason, expiredUnaccepted, strikes30d, acceptRateBp, stockUpdatedAt]
+  properties:
+    storeId: {$ref: ./common.yaml#/Ulid}
+    name: {type: string, maxLength: 120}
+    city: {type: string, maxLength: 60}
+    reason:
+      type: string
+      description: >-
+        The first that applies, in this order. `not_accepting`: 3 or more orders expired unaccepted in the
+        last 2 h (the "Store not accepting" alert, a fixed constant); `strikes`: at least
+        `store_strike_risk_threshold` store strikes in the last 30 days; `stale_stock`: a live store whose
+        stock was not updated within `stock_stale_after_hours`.
+      enum: [not_accepting, strikes, stale_stock]
+    expiredUnaccepted:
+      type: integer
+      minimum: 0
+      description: Orders that expired unaccepted in the period.
+    strikes30d: {type: integer, minimum: 0}
+    acceptRateBp: {$ref: '#/AdminPulseRate'}
+    stockUpdatedAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+AdminPulse:
+  type: object
+  additionalProperties: false
+  required: [range, from, to, asOf, kpis, trend, funnel, leaks, retention, credits, zeroResultSearches,
+    storesNeedingAttention, serverNow]
+  properties:
+    range: {$ref: '#/AdminPulseRange'}
+    from: {$ref: '#/AdminPulseDate'}
+    to: {$ref: '#/AdminPulseDate'}
+    asOf:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+      description: When the rollups behind today's figures last ran; null before the first run.
+    kpis: {$ref: '#/AdminPulseKpis'}
+    trend:
+      type: array
+      description: One row per IST day of the period, oldest first.
+      maxItems: 90
+      items: {$ref: '#/AdminPulseDay'}
+    funnel: {$ref: '#/AdminPulseFunnel'}
+    leaks:
+      type: array
+      maxItems: 40
+      items: {$ref: '#/AdminPulseLeak'}
+    retention: {$ref: '#/AdminPulseRetention'}
+    credits: {$ref: '#/AdminPulseCredits'}
+    zeroResultSearches:
+      type: array
+      maxItems: 20
+      items: {$ref: '#/AdminPulseZeroResult'}
+    storesNeedingAttention:
+      type: array
+      maxItems: 20
+      items: {$ref: '#/AdminPulseAttention'}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminPulseMapStore:
+  type: object
+  additionalProperties: false
+  required: [storeId, name, city, status, lat, lng, live]
+  properties:
+    storeId: {$ref: ./common.yaml#/Ulid}
+    name: {type: string, maxLength: 120}
+    city: {type: string, maxLength: 60}
+    status:
+      type: string
+      enum: [pending_review, live, paused, suspended]
+    lat: {type: number, minimum: -90, maximum: 90}
+    lng: {type: number, minimum: -180, maximum: 180}
+    live:
+      type: boolean
+      description: Meets the live-store definition today (05 §3), not only `status = live`.
+AdminPulseDemandCell:
+  type: object
+  additionalProperties: false
+  required: [cell, searches, zeroResultSearches]
+  properties:
+    cell:
+      type: string
+      description: H3 resolution-8 cell index, 15 lowercase hex digits.
+      pattern: ^[0-9a-f]{15}$
+    searches: {type: integer, minimum: 10}
+    zeroResultSearches: {type: integer, minimum: 0}
+AdminPulseMap:
+  type: object
+  additionalProperties: false
+  required: [range, from, to, stores, demand, serverNow]
+  properties:
+    range: {$ref: '#/AdminPulseRange'}
+    from: {$ref: '#/AdminPulseDate'}
+    to: {$ref: '#/AdminPulseDate'}
+    stores:
+      type: array
+      maxItems: 5000
+      items: {$ref: '#/AdminPulseMapStore'}
+    demand:
+      type: array
+      maxItems: 5000
+      items: {$ref: '#/AdminPulseDemandCell'}
+    serverNow: {$ref: ./common.yaml#/ServerNow}

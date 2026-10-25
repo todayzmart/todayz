@@ -1,0 +1,811 @@
+{
+  "uid": "todayz-09",
+  "title": "09 · Growth and retention",
+  "description": "New customers, referrals, cohorts, churn and the credits economy (05 §4 dashboard 09; owner W3-07).",
+  "tags": [
+    "todayz",
+    "w3-07",
+    "growth",
+    "retention"
+  ],
+  "timezone": "Asia/Kolkata",
+  "editable": false,
+  "graphTooltip": 1,
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5m",
+  "time": {
+    "from": "now-90d",
+    "to": "now"
+  },
+  "fiscalYearStartMonth": 0,
+  "liveNow": false,
+  "links": [
+    {
+      "title": "00 · What to fix today",
+      "type": "link",
+      "url": "/d/todayz-00",
+      "icon": "dashboard"
+    },
+    {
+      "title": "Alerts",
+      "type": "link",
+      "url": "/alerting/list",
+      "icon": "bolt",
+      "tooltip": "Every alert links its runbook in docs/runbooks/"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "type": "text",
+      "title": "How to read this",
+      "datasource": null,
+      "targets": [
+        {
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "mode": "markdown",
+        "content": "Cohorts are weekly (Monday, IST): customer cohort = week of the first completed order or linked POS sale; store cohort = week verified (05 §3). Each cell is the share of the cohort active N weeks later. Retention cells use `rollup_cohort_weekly`, recomputed daily."
+      },
+      "id": 1,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      }
+    },
+    {
+      "id": 2,
+      "type": "row",
+      "title": "Acquisition",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "New customers per day by source",
+      "description": "Customer accounts created per day, by referral source (organic when no referral).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT $__timeGroupAlias(u.created_at, '1d'), coalesce(r.source, 'organic') AS metric, count(*) AS value\nFROM users u LEFT JOIN referrals r ON r.referee_type = 'customer' AND r.referee_id = u.id\nWHERE $__timeFilter(u.created_at) AND u.id IN (SELECT user_id FROM customer_profiles) GROUP BY 1, 2 ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 3,
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Referral signups and qualification",
+      "description": "Referrals created and how many of them qualified.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT $__timeGroupAlias(created_at, '1d'), count(*) AS signups, count(*) FILTER (WHERE status IN ('qualified', 'rewarded')) AS qualified\nFROM referrals WHERE $__timeFilter(created_at) GROUP BY 1 ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 4,
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Referral reward cost per qualified customer",
+      "description": "Credits paid from platform_marketing per qualified referral (1 credit = ₹1).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT sum(referrer_credits + referee_credits)::float / nullif(count(*), 0) AS value\nFROM referrals WHERE status IN ('qualified', 'rewarded') AND $__timeFilter(qualified_at)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyINR"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 5,
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Qualification rate",
+      "description": "Qualified ÷ referrals created in range.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT avg((status IN ('qualified', 'rewarded'))::int) AS value FROM referrals WHERE $__timeFilter(created_at)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 6,
+      "gridPos": {
+        "x": 6,
+        "y": 12,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "table",
+      "title": "Referral rejections by reason",
+      "description": "Why referrals were rejected (including rejected_same_device, D-13).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT reject_reason, count(*) AS referrals FROM referrals WHERE status = 'rejected' AND $__timeFilter(created_at) GROUP BY 1 ORDER BY 2 DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 7,
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 12,
+        "h": 4
+      }
+    },
+    {
+      "id": 8,
+      "type": "row",
+      "title": "Cohorts",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "type": "table",
+      "title": "Customer transacting retention W0–W12",
+      "description": "Share (%) of each weekly customer cohort transacting N weeks later.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT cohort_week::text AS cohort, max(cohort_size) AS size,\nmax(CASE WHEN week_n = 0 THEN round(100.0 * ordering_count / nullif(cohort_size, 0)) END) AS w0, max(CASE WHEN week_n = 1 THEN round(100.0 * ordering_count / nullif(cohort_size, 0)) END) AS w1, max(CASE WHEN week_n = 2 THEN round(100.0 * ordering_count / nullif(cohort_size, 0)) END) AS w2, max(CASE WHEN week_n = 3 THEN round(100.0 * ordering_count / nullif(cohort_size, 0)) END) AS w3, max(CASE WHEN week_n = 4 THEN round(100.0 * ordering_count / nullif(cohort_size, 0)) END) AS w4, max(CASE WHEN week_n = 5 THEN round(100.0 * ordering_count / nullif(cohort_size, 0)) END) AS w5, max(CASE WHEN week_n = 6 THEN round(100.0 * ordering_count / nullif(cohort_size, 0)) END) AS w6, max(CASE WHEN week_n = 7 THEN round(100.0 * ordering_count / nullif(cohort_size, 0)) END) AS w7, max(CASE WHEN week_n = 8 THEN round(100.0 * ordering_count / nullif(cohort_size, 0)) END) AS w8, max(CASE WHEN week_n = 9 THEN round(100.0 * ordering_count / nullif(cohort_size, 0)) END) AS w9, max(CASE WHEN week_n = 10 THEN round(100.0 * ordering_count / nullif(cohort_size, 0)) END) AS w10, max(CASE WHEN week_n = 11 THEN round(100.0 * ordering_count / nullif(cohort_size, 0)) END) AS w11, max(CASE WHEN week_n = 12 THEN round(100.0 * ordering_count / nullif(cohort_size, 0)) END) AS w12\nFROM rollup_cohort_weekly WHERE kind = 'customer' GROUP BY cohort_week ORDER BY cohort_week DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "custom": {
+            "cellOptions": {
+              "type": "color-background"
+            }
+          },
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "min": 0,
+          "max": 100
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cohort"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "auto"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "size"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "auto"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 9,
+      "gridPos": {
+        "x": 0,
+        "y": 17,
+        "w": 24,
+        "h": 9
+      }
+    },
+    {
+      "type": "table",
+      "title": "Store active retention W0–W12",
+      "description": "Share (%) of each weekly store cohort active N weeks later.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT cohort_week::text AS cohort, max(cohort_size) AS size,\nmax(CASE WHEN week_n = 0 THEN round(100.0 * active_count / nullif(cohort_size, 0)) END) AS w0, max(CASE WHEN week_n = 1 THEN round(100.0 * active_count / nullif(cohort_size, 0)) END) AS w1, max(CASE WHEN week_n = 2 THEN round(100.0 * active_count / nullif(cohort_size, 0)) END) AS w2, max(CASE WHEN week_n = 3 THEN round(100.0 * active_count / nullif(cohort_size, 0)) END) AS w3, max(CASE WHEN week_n = 4 THEN round(100.0 * active_count / nullif(cohort_size, 0)) END) AS w4, max(CASE WHEN week_n = 5 THEN round(100.0 * active_count / nullif(cohort_size, 0)) END) AS w5, max(CASE WHEN week_n = 6 THEN round(100.0 * active_count / nullif(cohort_size, 0)) END) AS w6, max(CASE WHEN week_n = 7 THEN round(100.0 * active_count / nullif(cohort_size, 0)) END) AS w7, max(CASE WHEN week_n = 8 THEN round(100.0 * active_count / nullif(cohort_size, 0)) END) AS w8, max(CASE WHEN week_n = 9 THEN round(100.0 * active_count / nullif(cohort_size, 0)) END) AS w9, max(CASE WHEN week_n = 10 THEN round(100.0 * active_count / nullif(cohort_size, 0)) END) AS w10, max(CASE WHEN week_n = 11 THEN round(100.0 * active_count / nullif(cohort_size, 0)) END) AS w11, max(CASE WHEN week_n = 12 THEN round(100.0 * active_count / nullif(cohort_size, 0)) END) AS w12\nFROM rollup_cohort_weekly WHERE kind = 'store' GROUP BY cohort_week ORDER BY cohort_week DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "custom": {
+            "cellOptions": {
+              "type": "color-background"
+            }
+          },
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "min": 0,
+          "max": 100
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cohort"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "auto"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "size"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "auto"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 10,
+      "gridPos": {
+        "x": 0,
+        "y": 26,
+        "w": 24,
+        "h": 9
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "App retention D1 / D7 / D30",
+      "description": "Customers first seen N days earlier who opened the app on this day (05 §3).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT (date::timestamp AT TIME ZONE 'Asia/Kolkata') AS time, ret_d1_back::float / nullif(ret_d1_base, 0) AS d1, ret_d7_back::float / nullif(ret_d7_base, 0) AS d7,\n       ret_d30_back::float / nullif(ret_d30_base, 0) AS d30\nFROM rollup_daily_platform WHERE $__timeFilter(date) ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 11,
+      "gridPos": {
+        "x": 0,
+        "y": 35,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Churned (active 30–60 d ago, none since)",
+      "description": "Customers whose last app open was 30–60 days ago.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT count(*) AS value FROM (SELECT actor_id FROM v_metric_app_opens WHERE app = 'customer' GROUP BY actor_id\n  HAVING max(occurred_at) < now() - interval '30 days' AND max(occurred_at) >= now() - interval '60 days') x"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 12,
+      "gridPos": {
+        "x": 12,
+        "y": 35,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Resurrected (back this week after 30 d away)",
+      "description": "Customers who opened the app this week after more than 30 days away.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH o AS (SELECT actor_id, occurred_at, lag(occurred_at) OVER (PARTITION BY actor_id ORDER BY occurred_at) AS prev FROM v_metric_app_opens WHERE app = 'customer')\nSELECT count(DISTINCT actor_id) AS value FROM o WHERE occurred_at > now() - interval '7 days' AND prev < occurred_at - interval '30 days'"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 13,
+      "gridPos": {
+        "x": 18,
+        "y": 35,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "id": 14,
+      "type": "row",
+      "title": "Credits economy",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 43,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "Credits issued, spent, expired per day",
+      "description": "From the ledger (rollup_daily_platform).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT (date::timestamp AT TIME ZONE 'Asia/Kolkata') AS time, credits_issued AS issued, credits_spent AS spent, credits_expired AS expired\nFROM rollup_daily_platform WHERE $__timeFilter(date) ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 15,
+      "gridPos": {
+        "x": 0,
+        "y": 44,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "Credits issued by kind (range)",
+      "description": "Cashback, referral and adjustment credits into customer wallets.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT t.kind, sum(e.amount) AS credits FROM ledger_transactions t JOIN ledger_entries e ON e.transaction_id = t.id\nJOIN ledger_accounts a ON a.id = e.account_id AND a.kind = 'customer_wallet'\nWHERE e.amount > 0 AND t.kind IN ('cashback', 'referral_reward', 'admin_adjustment') AND $__timeFilter(t.created_at) GROUP BY 1 ORDER BY 2 DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 16,
+      "gridPos": {
+        "x": 12,
+        "y": 44,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Outstanding liability",
+      "description": "Σ customer wallets + held credits right now.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT coalesce(sum(balance), 0) AS value FROM account_balances WHERE kind IN ('customer_wallet', 'customer_held')"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 17,
+      "gridPos": {
+        "x": 18,
+        "y": 44,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Breakage rate (range)",
+      "description": "Expired ÷ issued in range.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT sum(credits_expired)::float / nullif(sum(credits_issued), 0) AS value FROM rollup_daily_platform WHERE $__timeFilter(date)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 18,
+      "gridPos": {
+        "x": 0,
+        "y": 52,
+        "w": 6,
+        "h": 4
+      }
+    }
+  ]
+}
