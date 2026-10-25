@@ -28,12 +28,14 @@ func TestDashboardsUseRegisteredMetrics(t *testing.T) {
 	// This package registers the platform metrics; the jobs platform (W1-11)
 	// registers tz_job_* in platform/jobs and tz_job_hard_cancelled_total in
 	// platform/queue, both as MetricPrefix + "…". The AI platform (W3-10)
-	// registers tz_ai_* in ai/client, ai/guard and ai/drafts (dashboard 14).
+	// registers tz_ai_* in ai/client, ai/guard and ai/drafts (dashboard 14), and voice
+	// (W3-04) registers tz_voice_* in internal/voice (dashboard 14's voice row).
 	known := map[string]bool{}
 	var srcs []string
 	ai := filepath.Join("..", "..", "ai")
 	for _, dir := range []string{".", filepath.Join("..", "jobs"), filepath.Join("..", "queue"),
-		filepath.Join(ai, "client"), filepath.Join(ai, "guard"), filepath.Join(ai, "drafts")} {
+		filepath.Join(ai, "client"), filepath.Join(ai, "guard"), filepath.Join(ai, "drafts"),
+		filepath.Join("..", "..", "voice")} {
 		fs, err := filepath.Glob(filepath.Join(dir, "*.go"))
 		if err != nil {
 			t.Fatal(err)
