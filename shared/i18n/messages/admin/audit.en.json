@@ -138,5 +138,25 @@
   "audit.action.settingsUpdate": {
     "defaultMessage": "Setting changed",
     "description": "Audit action: a platform setting changed"
+  },
+  "audit.action.reviewHide": {
+    "defaultMessage": "Review hidden",
+    "description": "Audit action name (A-12 review moderation)"
+  },
+  "audit.action.reviewRestore": {
+    "defaultMessage": "Review restored",
+    "description": "Audit action name (A-12 review moderation)"
+  },
+  "audit.action.replyHide": {
+    "defaultMessage": "Shop reply hidden",
+    "description": "Audit action name (A-12 review moderation)"
+  },
+  "audit.action.replyRestore": {
+    "defaultMessage": "Shop reply restored",
+    "description": "Audit action name (A-12 review moderation)"
+  },
+  "audit.action.reportResolve": {
+    "defaultMessage": "Review report resolved",
+    "description": "Audit action name (A-12 review moderation)"
   }
 }

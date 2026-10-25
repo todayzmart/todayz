@@ -1,0 +1,330 @@
+{
+  "reviews.sub": {
+    "defaultMessage": "Hide or restore reviews and shop replies with a reason, and close reports.",
+    "description": "A-12 Reviews: Page subtitle"
+  },
+  "reviews.tabs": {
+    "defaultMessage": "Reviews sections",
+    "description": "A-12 Reviews: Tab list label"
+  },
+  "reviews.tab.reviews": {
+    "defaultMessage": "Reviews",
+    "description": "A-12 Reviews: Tab"
+  },
+  "reviews.tab.reports": {
+    "defaultMessage": "Reports",
+    "description": "A-12 Reviews: Tab"
+  },
+  "reviews.table": {
+    "defaultMessage": "Reviews",
+    "description": "A-12 Reviews: Table label"
+  },
+  "reviews.empty": {
+    "defaultMessage": "No reviews match these filters.",
+    "description": "A-12 Reviews: Empty table"
+  },
+  "reviews.filters": {
+    "defaultMessage": "Review filters",
+    "description": "A-12 Reviews: Filter form label"
+  },
+  "reviews.filter.state": {
+    "defaultMessage": "Show",
+    "description": "A-12 Reviews: Filter label: review state"
+  },
+  "reviews.filter.reported": {
+    "defaultMessage": "Reported",
+    "description": "A-12 Reviews: Filter option: reviews with open reports"
+  },
+  "reviews.filter.visible": {
+    "defaultMessage": "Visible",
+    "description": "A-12 Reviews: Filter option"
+  },
+  "reviews.filter.hidden": {
+    "defaultMessage": "Hidden",
+    "description": "A-12 Reviews: Filter option"
+  },
+  "reviews.filter.store": {
+    "defaultMessage": "Store ID",
+    "description": "A-12 Reviews: Filter label"
+  },
+  "reviews.filter.apply": {
+    "defaultMessage": "Apply",
+    "description": "A-12 Reviews: Filter button"
+  },
+  "reviews.filter.clear": {
+    "defaultMessage": "Clear",
+    "description": "A-12 Reviews: Filter button"
+  },
+  "reviews.filter.reportStatus": {
+    "defaultMessage": "Report status",
+    "description": "A-12 Reviews: Segmented control label"
+  },
+  "reviews.col.review": {
+    "defaultMessage": "Review",
+    "description": "A-12 Reviews: Column"
+  },
+  "reviews.col.store": {
+    "defaultMessage": "Store",
+    "description": "A-12 Reviews: Column"
+  },
+  "reviews.col.stars": {
+    "defaultMessage": "Stars",
+    "description": "A-12 Reviews: Column and fact label"
+  },
+  "reviews.col.reports": {
+    "defaultMessage": "Open reports",
+    "description": "A-12 Reviews: Column and fact label"
+  },
+  "reviews.col.state": {
+    "defaultMessage": "State",
+    "description": "A-12 Reviews: Column and fact label"
+  },
+  "reviews.col.written": {
+    "defaultMessage": "Written",
+    "description": "A-12 Reviews: Column and fact label: when the review was written"
+  },
+  "reviews.col.reported": {
+    "defaultMessage": "Reported",
+    "description": "A-12 Reviews: Column: when the report was made"
+  },
+  "reviews.col.reporter": {
+    "defaultMessage": "From",
+    "description": "A-12 Reviews: Column: who reported"
+  },
+  "reviews.col.reason": {
+    "defaultMessage": "Reason",
+    "description": "A-12 Reviews: Column: report reason"
+  },
+  "reviews.col.status": {
+    "defaultMessage": "Status",
+    "description": "A-12 Reviews: Column"
+  },
+  "reviews.col.actions": {
+    "defaultMessage": "Actions",
+    "description": "A-12 Reviews: Column"
+  },
+  "reviews.noText": {
+    "defaultMessage": "(stars only)",
+    "description": "A-12 Reviews: A review with no text"
+  },
+  "reviews.stars": {
+    "defaultMessage": "{n, plural, one {# star} other {# stars}}",
+    "description": "A-12 Reviews: Star rating"
+  },
+  "reviews.state.hidden": {
+    "defaultMessage": "Hidden",
+    "description": "A-12 Reviews: Review state pill"
+  },
+  "reviews.state.reported": {
+    "defaultMessage": "Reported",
+    "description": "A-12 Reviews: Review state pill"
+  },
+  "reviews.state.visible": {
+    "defaultMessage": "Visible",
+    "description": "A-12 Reviews: Review state pill"
+  },
+  "reviews.reporter.store": {
+    "defaultMessage": "Shop",
+    "description": "A-12 Reviews: Reporter kind"
+  },
+  "reviews.reporter.customer": {
+    "defaultMessage": "Customer",
+    "description": "A-12 Reviews: Reporter kind"
+  },
+  "reviews.reports.open": {
+    "defaultMessage": "Open",
+    "description": "A-12 Reviews: Report status"
+  },
+  "reviews.reports.resolved": {
+    "defaultMessage": "Resolved",
+    "description": "A-12 Reviews: Report status filter"
+  },
+  "reviews.reports.table": {
+    "defaultMessage": "Review reports",
+    "description": "A-12 Reviews: Table label"
+  },
+  "reviews.reports.empty": {
+    "defaultMessage": "No resolved reports yet.",
+    "description": "A-12 Reviews: Empty table"
+  },
+  "reviews.reports.emptyOpen": {
+    "defaultMessage": "No open reports. Nothing to moderate.",
+    "description": "A-12 Reviews: Empty table"
+  },
+  "reviews.report.open": {
+    "defaultMessage": "Open review",
+    "description": "A-12 Reviews: Button: show the reported review"
+  },
+  "reviews.report.resolve": {
+    "defaultMessage": "Resolve",
+    "description": "A-12 Reviews: Button: close the report"
+  },
+  "reviews.resolution.dismissed": {
+    "defaultMessage": "Dismissed",
+    "description": "A-12 Reviews: Report resolution"
+  },
+  "reviews.resolution.upheld": {
+    "defaultMessage": "Upheld",
+    "description": "A-12 Reviews: Report resolution"
+  },
+  "reviews.resolve.title": {
+    "defaultMessage": "Resolve report",
+    "description": "A-12 Reviews: Dialog title"
+  },
+  "reviews.resolve.body": {
+    "defaultMessage": "Dismiss if the review is fair, uphold if the report is justified. Neither hides the review: hide it from the review panel with its own reason.",
+    "description": "A-12 Reviews: Dialog body"
+  },
+  "reviews.resolve.confirm": {
+    "defaultMessage": "Resolve report",
+    "description": "A-12 Reviews: Dialog confirm button"
+  },
+  "reviews.resolve.decision": {
+    "defaultMessage": "Decision",
+    "description": "A-12 Reviews: Segmented control label"
+  },
+  "reviews.resolve.decisionRequired": {
+    "defaultMessage": "Choose dismissed or upheld.",
+    "description": "A-12 Reviews: Validation"
+  },
+  "reviews.resolve.note": {
+    "defaultMessage": "Note (optional)",
+    "description": "A-12 Reviews: Field label"
+  },
+  "reviews.resolve.noteHelp": {
+    "defaultMessage": "Up to {max} characters. Kept on the report.",
+    "description": "A-12 Reviews: Field help"
+  },
+  "reviews.resolve.done": {
+    "defaultMessage": "Report resolved.",
+    "description": "A-12 Reviews: Toast"
+  },
+  "reviews.dialog.keep": {
+    "defaultMessage": "Go back",
+    "description": "A-12 Reviews: Dialog cancel button"
+  },
+  "reviews.dialog.reason": {
+    "defaultMessage": "Reason",
+    "description": "A-12 Reviews: Field label"
+  },
+  "reviews.dialog.reasonRequired": {
+    "defaultMessage": "Give a reason. It is kept on the review and in the audit log.",
+    "description": "A-12 Reviews: Validation"
+  },
+  "reviews.dialog.reasonHelp": {
+    "defaultMessage": "Up to {max} characters. Kept on the review and in the audit log.",
+    "description": "A-12 Reviews: Field help"
+  },
+  "reviews.pick": {
+    "defaultMessage": "Choose a review to see it, moderate it and read its history.",
+    "description": "A-12 Reviews: Side panel hint"
+  },
+  "reviews.pick.notListed": {
+    "defaultMessage": "That review is not in this list. Change the filters to find it.",
+    "description": "A-12 Reviews: Side panel hint when the chosen review is filtered out"
+  },
+  "reviews.none": {
+    "defaultMessage": "None",
+    "description": "A-12 Reviews: Empty fact value"
+  },
+  "reviews.detail.title": {
+    "defaultMessage": "Review of {store}",
+    "description": "A-12 Reviews: Card title"
+  },
+  "reviews.detail.text": {
+    "defaultMessage": "Text",
+    "description": "A-12 Reviews: Fact label"
+  },
+  "reviews.detail.tags": {
+    "defaultMessage": "Tags",
+    "description": "A-12 Reviews: Fact label"
+  },
+  "reviews.detail.from": {
+    "defaultMessage": "From",
+    "description": "A-12 Reviews: Fact label: what the review is about"
+  },
+  "reviews.detail.fromOrder": {
+    "defaultMessage": "An order",
+    "description": "A-12 Reviews: Fact value"
+  },
+  "reviews.detail.fromSale": {
+    "defaultMessage": "A counter sale",
+    "description": "A-12 Reviews: Fact value"
+  },
+  "reviews.detail.why": {
+    "defaultMessage": "Hidden because: {reason}",
+    "description": "A-12 Reviews: Hide reason"
+  },
+  "reviews.detail.reply": {
+    "defaultMessage": "Shop reply",
+    "description": "A-12 Reviews: Fact label"
+  },
+  "reviews.detail.replyHidden": {
+    "defaultMessage": "Hidden because: {reason}",
+    "description": "A-12 Reviews: Reply hide reason"
+  },
+  "reviews.move.hide": {
+    "defaultMessage": "Hide review",
+    "description": "A-12 Reviews: Button"
+  },
+  "reviews.move.restore": {
+    "defaultMessage": "Restore review",
+    "description": "A-12 Reviews: Button"
+  },
+  "reviews.move.replyHide": {
+    "defaultMessage": "Hide reply",
+    "description": "A-12 Reviews: Button"
+  },
+  "reviews.move.replyRestore": {
+    "defaultMessage": "Restore reply",
+    "description": "A-12 Reviews: Button"
+  },
+  "reviews.move.hideTitle": {
+    "defaultMessage": "Hide this review of {store}?",
+    "description": "A-12 Reviews: Dialog title"
+  },
+  "reviews.move.restoreTitle": {
+    "defaultMessage": "Restore this review of {store}?",
+    "description": "A-12 Reviews: Dialog title"
+  },
+  "reviews.move.replyHideTitle": {
+    "defaultMessage": "Hide the reply from {store}?",
+    "description": "A-12 Reviews: Dialog title"
+  },
+  "reviews.move.replyRestoreTitle": {
+    "defaultMessage": "Restore the reply from {store}?",
+    "description": "A-12 Reviews: Dialog title"
+  },
+  "reviews.move.hideBody": {
+    "defaultMessage": "Customers stop seeing it and it leaves the store rating. Its open reports are closed as upheld.",
+    "description": "A-12 Reviews: Dialog body"
+  },
+  "reviews.move.restoreBody": {
+    "defaultMessage": "Customers see it again and it counts in the store rating.",
+    "description": "A-12 Reviews: Dialog body"
+  },
+  "reviews.move.replyHideBody": {
+    "defaultMessage": "Customers stop seeing the shop reply. The review stays.",
+    "description": "A-12 Reviews: Dialog body"
+  },
+  "reviews.move.replyRestoreBody": {
+    "defaultMessage": "Customers see the shop reply again.",
+    "description": "A-12 Reviews: Dialog body"
+  },
+  "reviews.move.hideDone": {
+    "defaultMessage": "Review hidden.",
+    "description": "A-12 Reviews: Toast"
+  },
+  "reviews.move.restoreDone": {
+    "defaultMessage": "Review restored.",
+    "description": "A-12 Reviews: Toast"
+  },
+  "reviews.move.replyHideDone": {
+    "defaultMessage": "Reply hidden.",
+    "description": "A-12 Reviews: Toast"
+  },
+  "reviews.move.replyRestoreDone": {
+    "defaultMessage": "Reply restored.",
+    "description": "A-12 Reviews: Toast"
+  }
+}

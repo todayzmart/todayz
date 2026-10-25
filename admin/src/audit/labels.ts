@@ -24,6 +24,16 @@ export function useActionLabel() {
           return intl.formatMessage({ id: 'audit.action.sessionRevoke' });
         case 'order.admin_cancel':
           return intl.formatMessage({ id: 'audit.action.orderCancel' });
+        case 'review.hide':
+          return intl.formatMessage({ id: 'audit.action.reviewHide' });
+        case 'review.restore':
+          return intl.formatMessage({ id: 'audit.action.reviewRestore' });
+        case 'review.reply_hide':
+          return intl.formatMessage({ id: 'audit.action.replyHide' });
+        case 'review.reply_restore':
+          return intl.formatMessage({ id: 'audit.action.replyRestore' });
+        case 'review.report_resolve':
+          return intl.formatMessage({ id: 'audit.action.reportResolve' });
         case SETTINGS_UPDATE:
           return intl.formatMessage({ id: 'audit.action.settingsUpdate' });
         default:
