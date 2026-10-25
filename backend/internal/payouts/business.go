@@ -15,8 +15,8 @@ import (
 
 // B-10: the business's own statements. stores is the member's store limit
 // (nil: every store, D-125): a limited member sees only those stores' lines
-// and totals, and no payout, which is the whole business's. TODO(lead): is
-// hiding the payout from a store-limited manager right?
+// and totals, and no payout, which is the whole business's (conservative
+// reading, accepted by the lead 25 Oct).
 
 // BusinessStatements lists a business's statements, newest month first.
 func (s *Service) BusinessStatements(ctx context.Context, business ids.ID, stores []ids.ID, limit *int, cursor *string) (api.BusinessStatementList, error) {

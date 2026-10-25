@@ -338,9 +338,10 @@ func (a *Admin) CreateAdjustment(ctx context.Context, p authn.Principal, in Adju
 		if err != nil {
 			return problem.Wrap(genproblems.Internal, err)
 		}
-		// TODO(lead): 03 puts admin_adjustment_requests on the customer's wallet
-		// only; a store_credit adjustment (a shop's statement correction) is
-		// refused until the plan says who may make one and how it shows on B-10.
+		// 03 puts admin_adjustment_requests on the customer's wallet only; a
+		// store_credit adjustment (a shop's statement correction) is refused
+		// until the plan says who may make one and how it shows on B-10
+		// (conservative reading, accepted by the lead 25 Oct).
 		if acct.Kind != string(CustomerWallet) {
 			return adminFieldErr("body.accountId", "must be a customer's wallet")
 		}

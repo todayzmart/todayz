@@ -319,8 +319,8 @@ func (s *Service) computePayout(ctx context.Context, q *payoutsdb.Queries, now t
 	if hasOpen && open.Status == statusHeld {
 		// A close never lifts a hold (unhold is finance's, A-11): a manual
 		// hold keeps its note; an automatic one takes the cause open now, or
-		// keeps its own when none is. TODO(lead): lift an automatic hold
-		// whose cause has closed?
+		// keeps its own when none is. Conservative reading, accepted by the
+		// lead (25 Oct): a closed cause never lifts an automatic hold.
 		switch {
 		case *open.HoldReason == holdManual:
 			reason, note = holdManual, open.HoldNote
@@ -373,7 +373,8 @@ func (s *Service) computePayout(ctx context.Context, q *payoutsdb.Queries, now t
 // after midnight can only lower it), never below zero; the business is paid
 // at most its net closing, so one store's negative balance is carried
 // forward against the others (01 §9). The amount is taken from the stores
-// in id order. TODO(lead): conservative reading of "the payable balance".
+// in id order. Conservative reading of "the payable balance", accepted by
+// the lead (25 Oct).
 func payable(stores []storeStatement, balances []payoutsdb.StoreAccountsRow, closing int64) []Line {
 	now := map[ids.ID]int64{}
 	var current int64
