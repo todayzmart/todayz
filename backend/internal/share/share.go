@@ -91,6 +91,9 @@ type Deps struct {
 	AppURL string
 	// ImageURL is the public images origin (https://img.todayz.in).
 	ImageURL string
+	// PreviewKey is SHARE_PREVIEW_KEY as the Pages Function sends it (its
+	// standard base64). Empty: a forwarded preview IP is never believed.
+	PreviewKey string
 }
 
 // Service implements the share and admin-demand routes and the strip build.
@@ -106,7 +109,9 @@ type Service struct {
 	audit    *audit.Writer
 	appURL   string
 	imageURL string
-	ids      *ids.Generator
+	// previewKey is Deps.PreviewKey; never logged.
+	previewKey []byte
+	ids        *ids.Generator
 }
 
 var errUnavailable = errors.New("share: not configured")
@@ -123,6 +128,7 @@ func New(d Deps) (*Service, error) {
 		db: d.DB, clock: d.Clock, settings: d.Settings, events: d.Events, hash: d.Hash, images: d.Images, jobs: d.Jobs,
 		limit:  ratelimit.New(d.Clock, map[string]ratelimit.Rule{readGroup: readRule}),
 		appURL: d.AppURL, imageURL: d.ImageURL, ids: ids.NewGenerator(),
+		previewKey: []byte(d.PreviewKey),
 	}
 	if d.DB != nil {
 		s.audit = audit.New(d.DB, d.Clock, d.IPHashKey)

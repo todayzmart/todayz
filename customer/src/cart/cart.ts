@@ -23,6 +23,8 @@ export interface CartLine {
   askReplyId?: string;
   /** The asked quantity: the reply books at most this many. Above it the line drops the reply and is a plain line. */
   askQty?: number;
+  /** The reply has a price: checkout drops the reply once the quote stops pricing the line at it. */
+  askPriced?: true;
   qty: number;
 }
 
@@ -46,11 +48,20 @@ function emit(): void {
   listeners.forEach((l) => l());
 }
 
-/** A line past its ask's quantity no longer books from the reply, so checkout never sends a quantity the reply refuses. */
-function fitAsk(l: CartLine): CartLine {
-  if (l.askReplyId === undefined || l.askQty === undefined || l.qty <= l.askQty) return l;
-  const { askReplyId: _reply, askQty: _qty, ...plain } = l;
+function plainLine(l: CartLine): CartLine {
+  const { askReplyId: _reply, askQty: _qty, askPriced: _priced, ...plain } = l;
   return plain;
+}
+
+/**
+ * A line past its ask's quantity no longer books from the reply, so checkout never sends a quantity the
+ * reply refuses. A reply without a valid asked quantity (an older or damaged record) is dropped too.
+ */
+function fitAsk(l: CartLine): CartLine {
+  if (l.askReplyId === undefined && l.askQty === undefined && l.askPriced === undefined) return l;
+  const fits =
+    typeof l.askReplyId === 'string' && Number.isInteger(l.askQty) && (l.askQty ?? 0) > 0 && l.qty <= (l.askQty ?? 0);
+  return fits ? l : plainLine(l);
 }
 
 function set(next: CartState): void {
@@ -74,7 +85,7 @@ function clean(v: CartState): CartState {
       Number.isInteger(l.pricePaise) &&
       Number.isInteger(l.qty) &&
       l.qty > 0,
-  );
+  ).map(fitAsk);
   return v.store && lines.length > 0 ? { store: v.store, lines } : EMPTY;
 }
 
@@ -157,16 +168,13 @@ export function clearCart(): void {
   set(EMPTY);
 }
 
-/** The reply can no longer price its line (checkout's 409 `ask_price_expired`): the line stays, at the current price. */
+/**
+ * The reply can no longer price its line (checkout's 409 `ask_price_expired` or `ask_reply_used`, or a quote
+ * at another price): the line stays, at the current price.
+ */
 export function dropAskReply(): void {
   if (askReplyOf(state) === undefined) return;
-  set({
-    store: state.store,
-    lines: state.lines.map((l) => {
-      const { askReplyId: _reply, askQty: _qty, ...plain } = l;
-      return plain;
-    }),
-  });
+  set({ store: state.store, lines: state.lines.map(plainLine) });
 }
 
 /** The ask reply the cart books from, if a line came from one (one per order, 01 §11.2). */

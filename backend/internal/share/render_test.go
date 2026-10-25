@@ -34,6 +34,20 @@ func TestRenderCardLeavesOffIndicNames(t *testing.T) {
 	without, err := RenderCard(CardImage{Locality: "Indiranagar", PricePaise: 24500})
 	require.NoError(t, err)
 	require.Equal(t, without, indic)
+
+	// A local name in Indic script falls back to the master product's Latin name.
+	local, err := RenderCard(CardImage{Item: "आशीर्वाद आटा", Product: "Aashirvaad Atta 5 kg", Locality: "Indiranagar", PricePaise: 24500})
+	require.NoError(t, err)
+	latinName, err := RenderCard(CardImage{Item: "Aashirvaad Atta 5 kg", Locality: "Indiranagar", PricePaise: 24500})
+	require.NoError(t, err)
+	require.Equal(t, latinName, local)
+	require.NotEqual(t, without, local)
+	// A drawable local name wins over the product's.
+	own, err := RenderCard(CardImage{Item: "Chakki atta", Product: "Aashirvaad Atta 5 kg", PricePaise: 24500})
+	require.NoError(t, err)
+	plain, err := RenderCard(CardImage{Item: "Chakki atta", PricePaise: 24500})
+	require.NoError(t, err)
+	require.Equal(t, plain, own)
 }
 
 func TestRupees(t *testing.T) {

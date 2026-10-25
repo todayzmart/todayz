@@ -33,6 +33,7 @@ export function lineFor(ask: Ask, reply: AskReply, priceValid: boolean): Omit<Ca
     productName: ask.itemName,
     pricePaise: price,
     ...(keepsReply ? { askReplyId: reply.askReplyId, askQty: ask.quantity } : {}),
+    ...(keepsReply && reply.pricePaise !== null ? { askPriced: true as const } : {}),
   };
 }
 

@@ -3,6 +3,9 @@
 // returns a small page with the tags that then opens C-08 with `ref=share`. On any failure (410,
 // 404, the API down) it falls through to the app, whose `/x/$code` route shows the right state.
 // Without `API_URL` it logs and redirects instead (onRequestGet), so a missing setting is seen.
+// The API sees Cloudflare's IP, so the function forwards the visitor's `CF-Connecting-IP` in
+// `X-TZ-Preview-IP` with `SHARE_PREVIEW_KEY` in `X-TZ-Preview-Key`; the API counts that IP only when
+// the key matches. The key is never logged.
 // Locally the same `renderShare` runs as Vite dev middleware (vite.config.ts). Never a distance.
 
 export interface SharePreviewLike {
@@ -55,14 +58,34 @@ export function shareHtml(p: SharePreviewLike, origin: string, code: string): st
 </html>`;
 }
 
+/** The visitor's IP and the shared key, sent so the API counts the visitor and not Cloudflare. */
+export interface PreviewForward {
+  ip: string;
+  key: string;
+}
+
+export const PREVIEW_IP_HEADER = 'X-TZ-Preview-IP';
+export const PREVIEW_KEY_HEADER = 'X-TZ-Preview-Key';
+
 /**
  * The preview page for `code`, or null to fall through to the app. `apiBase` is the API origin
- * (no trailing slash).
+ * (no trailing slash). `forward` is sent only when both its values are set.
  */
-export async function renderShare(code: string, origin: string, apiBase: string, fetcher: typeof fetch = fetch): Promise<Response | null> {
+export async function renderShare(
+  code: string,
+  origin: string,
+  apiBase: string,
+  fetcher: typeof fetch = fetch,
+  forward?: PreviewForward,
+): Promise<Response | null> {
   if (!CODE.test(code) || !apiBase) return null;
+  const headers: Record<string, string> = { accept: 'application/json' };
+  if (forward?.ip && forward.key) {
+    headers[PREVIEW_IP_HEADER] = forward.ip;
+    headers[PREVIEW_KEY_HEADER] = forward.key;
+  }
   try {
-    const r = await fetcher(`${apiBase}/v1/public/share-cards/${code}`, { headers: { accept: 'application/json' } });
+    const r = await fetcher(`${apiBase}/v1/public/share-cards/${code}`, { headers });
     if (!r.ok) return null;
     const p = (await r.json()) as SharePreviewLike;
     if (!p.storeSlug || !p.storeItemId) return null;
@@ -77,7 +100,7 @@ export async function renderShare(code: string, origin: string, apiBase: string,
 interface PagesContext {
   request: Request;
   params: { code?: string | string[] };
-  env: { API_URL?: string };
+  env: { API_URL?: string; SHARE_PREVIEW_KEY?: string };
   next: () => Promise<Response>;
 }
 
@@ -88,7 +111,8 @@ export const APP_FLAG = 'app';
  * Without `API_URL` no link can have a preview, so the function says so: it logs an error and answers
  * a plain 302 to the same link with `?app=1`, which it lets through to the app's `/x/$code` route (that
  * still resolves the code). The 302 shows in the Pages logs and analytics, where a silent fall-through
- * would not. The lead sets `API_URL` (https://api.todayz.in) on the Pages project.
+ * would not. The lead sets `API_URL` (https://api.todayz.in) and `SHARE_PREVIEW_KEY` (the API's value) on
+ * the Pages project; without the key previews still work but share the Cloudflare IP's read limit.
  */
 export async function onRequestGet(ctx: PagesContext): Promise<Response> {
   const code = typeof ctx.params.code === 'string' ? ctx.params.code : '';
@@ -99,5 +123,8 @@ export async function onRequestGet(ctx: PagesContext): Promise<Response> {
     console.error('share link: API_URL is not set on the Pages project; no preview, sending the link to the app');
     return new Response(null, { status: 302, headers: { location: `/x/${code}?${APP_FLAG}=1`, 'cache-control': 'no-store' } });
   }
-  return (await renderShare(code, url.origin, apiBase)) ?? ctx.next();
+  const key = (ctx.env.SHARE_PREVIEW_KEY ?? '').trim();
+  if (!key) console.warn('share link: SHARE_PREVIEW_KEY is not set on the Pages project; previews are counted per Cloudflare IP');
+  const forward = { ip: ctx.request.headers.get('CF-Connecting-IP') ?? '', key };
+  return (await renderShare(code, url.origin, apiBase, fetch, forward)) ?? ctx.next();
 }

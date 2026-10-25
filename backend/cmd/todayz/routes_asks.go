@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/base64"
+
 	"github.com/go-chi/chi/v5"
 
 	"github.com/todayz/backend/internal/asks"
@@ -52,6 +54,9 @@ func newShare(d *deps) *share.Service {
 			}
 			sd.Hash = h
 			sd.IPHashKey = k.Bytes()
+		}
+		if k := c.Keys.SharePreviewKey; k.IsSet() {
+			sd.PreviewKey = base64.StdEncoding.EncodeToString(k.Bytes())
 		}
 		if st := share.NewS3Store(c.Storage, httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: c.NoEgress}), d.Clock); st != nil {
 			sd.Images = st

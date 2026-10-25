@@ -50,6 +50,10 @@
     description: >-
       Item, shop, price and the shop's locality; never a distance. Re-renders the image when the price
       changed. `410 share_card_unavailable` once the store is not `live` or its business not `verified`.
+      At most 60 reads a minute per IP (`429 rate_limited` with `Retry-After`), which also dedupes
+      `share_opened` per IP and IST day. The customer Pages Function reads this from Cloudflare, so it
+      sends the visitor's IP in `X-TZ-Preview-IP` with the shared `SHARE_PREVIEW_KEY` in
+      `X-TZ-Preview-Key`; the API counts that IP only when the key matches, and otherwise ignores both.
     security: []
     x-problems: [share_card_unavailable]
     parameters:

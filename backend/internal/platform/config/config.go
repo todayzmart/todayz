@@ -93,6 +93,11 @@ type AppKeys struct {
 	PIIHashKey         Secret
 	DeviceSecretEncKey Secret
 	TOTPEncKey         Secret
+	// SharePreviewKey is SHARE_PREVIEW_KEY, the secret the customer Pages
+	// Function sends with a link preview read so the API counts the visitor's
+	// IP, not Cloudflare's (W3-16). Optional: without it the forwarded IP is
+	// never trusted. make setup generates it like the D-18 keys.
+	SharePreviewKey Secret
 }
 
 // Providers holds provider endpoints and keys (D-17, D-19). Keys are optional
@@ -588,6 +593,7 @@ func (r *reader) appKeys() AppKeys {
 		PIIHashKey:         r.key32("PII_HASH_KEY"),
 		DeviceSecretEncKey: r.key32("DEVICE_SECRET_ENC_KEY"),
 		TOTPEncKey:         r.key32("TOTP_ENC_KEY"),
+		SharePreviewKey:    r.key32("SHARE_PREVIEW_KEY"),
 	}
 	k.JWTCurrentKID = r.raw("JWT_CURRENT_KID")
 	set := r.raw("JWT_SIGNING_KEYS")

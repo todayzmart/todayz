@@ -589,6 +589,10 @@ func TestStaleCardRenderIsAsync(t *testing.T) {
 	}())
 	require.NoError(t, w.svc.Render(context.Background(), cardID))
 	require.Equal(t, 3500, rendered())
+
+	// A worker without the image store fails the job rather than pass it.
+	w.svc.images = nil
+	require.Error(t, w.svc.Render(context.Background(), cardID))
 }
 
 func TestCardCreateNeedsHashKey(t *testing.T) {

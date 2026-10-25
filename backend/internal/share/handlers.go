@@ -29,7 +29,8 @@ var adminOps = map[string]string{
 // site-marquee) and A-23's admin routes. az may be nil only in a route-only
 // test, where every admin call is then refused.
 func Register(r chi.Router, svc *Service, az authz.Authorizer) {
-	shareapi.Register(r, shareHandlers{svc}, shareapi.StrictMiddlewareFunc(authz.Strict[shareapi.StrictHandlerFunc](az, shareOps)))
+	shareapi.Register(r, shareHandlers{svc},
+		shareapi.StrictMiddlewareFunc(authz.Strict[shareapi.StrictHandlerFunc](az, shareOps)), svc.previewIP)
 	admindemandapi.Register(r, adminHandlers{svc}, admindemandapi.StrictMiddlewareFunc(authz.Strict[admindemandapi.StrictHandlerFunc](az, adminOps)))
 }
 

@@ -26,7 +26,6 @@ import (
 	"github.com/todayz/backend/internal/platform/ids"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/ratelimit"
-	"github.com/todayz/backend/internal/platform/reqctx"
 	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
@@ -142,7 +141,7 @@ func (s *Service) create(ctx context.Context, body *shareapi.ShareCardCreate) (s
 func (s *Service) limitReads(ctx context.Context) ([]byte, error) {
 	var key []byte
 	if s.hash != nil {
-		key = s.hash.IPLimit(reqctx.ClientIP(ctx))
+		key = s.hash.IPLimit(visitorIP(ctx))
 	}
 	bucket := "-"
 	if key != nil {
@@ -313,11 +312,15 @@ func (s *Service) requestRender(ctx context.Context, cardID ids.ID, rendered *in
 
 // Render is share_card_render: it redraws the card's image when it shows
 // another price than the item's. A card that is gone, or whose item or store
-// is, needs nothing. A storage failure is returned, so the job retries with
-// River's backoff, and the card row is left as it was.
+// is, needs nothing. A storage failure, or a worker without the image store,
+// is returned, so the job retries with River's backoff (and shows as failed),
+// and the card row is left as it was.
 func (s *Service) Render(ctx context.Context, cardID ids.ID) error {
 	if err := s.ready(ctx); err != nil {
 		return err
+	}
+	if s.images == nil {
+		return fmt.Errorf("share: render card: %w (no image store)", errUnavailable)
 	}
 	card, err := s.q(ctx).CardByID(ctx, ids.UUID(cardID))
 	if errors.Is(err, pgx.ErrNoRows) {
@@ -346,7 +349,7 @@ func (s *Service) render(ctx context.Context, cardID ids.ID, code string, item a
 	if s.images == nil {
 		return nil
 	}
-	png, err := RenderCard(CardImage{Item: item.ItemName, Store: item.StoreName, Locality: deref(item.Locality), PricePaise: item.PricePaise})
+	png, err := RenderCard(CardImage{Item: item.ItemName, Product: item.ProductName, Store: item.StoreName, Locality: deref(item.Locality), PricePaise: item.PricePaise})
 	if err != nil {
 		return fmt.Errorf("share: render card: %w", err)
 	}

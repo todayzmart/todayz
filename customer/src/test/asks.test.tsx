@@ -10,7 +10,7 @@ import { lineFor } from '../asks/book';
 import { setAskStreamFetchForTests } from '../asks/api';
 import { setStreamFetchForTests } from '../orders/stream';
 import { isAndroid, whatsappHref } from '../share/links';
-import { itemPath, onRequestGet, renderShare, shareHtml } from '../../functions/x/[code]';
+import { PREVIEW_IP_HEADER, PREVIEW_KEY_HEADER, itemPath, onRequestGet, renderShare, shareHtml } from '../../functions/x/[code]';
 import { NOW, SHOP_A, item, page, pageOf } from './discover-fixtures';
 import { json, renderAt, type Call, type Handler } from './render';
 
@@ -196,7 +196,7 @@ describe('C-26 Ask progress and replies', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/checkout'));
     const cart = getCart();
     expect(cart.store?.id).toBe(STORE_ID);
-    expect(cart.lines).toEqual([expect.objectContaining({ storeItemId: ITEM_ID, qty: 2, pricePaise: 5800, askReplyId: '01KE0S1W6W8ZV7T1C3A6RPLY01' })]);
+    expect(cart.lines).toEqual([expect.objectContaining({ storeItemId: ITEM_ID, qty: 2, pricePaise: 5800, askReplyId: '01KE0S1W6W8ZV7T1C3A6RPLY01', askPriced: true })]);
   });
 
   it('once the replied price ends: "Price may have changed" and the current price', async () => {
@@ -218,6 +218,7 @@ describe('C-26 Ask progress and replies', () => {
   it('a Yes without a price keeps the reply and its cap; more than the ask drops the reply', () => {
     const line = lineFor(ask(), reply({ pricePaise: null, priceValidUntil: null }), false);
     expect(line).toMatchObject({ pricePaise: 6000, askReplyId: '01KE0S1W6W8ZV7T1C3A6RPLY01', askQty: 2 });
+    expect(line).not.toHaveProperty('askPriced');
     if (!line) throw new Error('no line');
     addToCart({ id: STORE_ID, slug: SHOP_A, name: 'Sri Lakshmi Stores' }, line, 2);
     expect(getCart().lines[0]?.askReplyId).toBe('01KE0S1W6W8ZV7T1C3A6RPLY01');
@@ -328,6 +329,46 @@ describe('Share link /x/{code}', () => {
     expect(await onRequestGet({ ...ctx('https://app.todayz.in/x/bad'), params: { code: 'bad' } })).toBe(app);
     expect(err).toHaveBeenCalledTimes(1);
     err.mockRestore();
+  });
+
+  it('the Pages Function forwards the visitor IP with SHARE_PREVIEW_KEY, and only with both', async () => {
+    const seen: Headers[] = [];
+    const fetcher = vi.fn((_: RequestInfo | URL, init?: RequestInit) => {
+      seen.push(new Headers(init?.headers));
+      return Promise.resolve(json(200, preview));
+    });
+    vi.stubGlobal('fetch', fetcher);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const next = vi.fn(() => Promise.resolve(new Response('app')));
+    const ctx = (env: { API_URL?: string; SHARE_PREVIEW_KEY?: string }, ip?: string) => ({
+      request: new Request(`https://app.todayz.in/x/${CODE}`, { headers: ip ? { 'CF-Connecting-IP': ip, [PREVIEW_KEY_HEADER]: 'from-visitor' } : {} }),
+      params: { code: CODE },
+      env,
+      next,
+    });
+    try {
+      const r = await onRequestGet(ctx({ API_URL: 'https://api.todayz.in/', SHARE_PREVIEW_KEY: ' k3y= ' }, '203.0.113.9'));
+      expect(r.status).toBe(200);
+      expect(fetcher).toHaveBeenCalledWith(`https://api.todayz.in/v1/public/share-cards/${CODE}`, expect.anything());
+      expect(seen[0]?.get(PREVIEW_IP_HEADER)).toBe('203.0.113.9');
+      expect(seen[0]?.get(PREVIEW_KEY_HEADER)).toBe('k3y=');
+      expect(warn).not.toHaveBeenCalled();
+
+      // Without the key: neither header (the visitor's own key header is never passed on), and a warning
+      // that names the setting, never a value.
+      await onRequestGet(ctx({ API_URL: 'https://api.todayz.in' }, '203.0.113.9'));
+      expect(seen[1]?.has(PREVIEW_IP_HEADER)).toBe(false);
+      expect(seen[1]?.has(PREVIEW_KEY_HEADER)).toBe(false);
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('SHARE_PREVIEW_KEY is not set'));
+
+      // Without a visitor IP: neither header either.
+      await onRequestGet(ctx({ API_URL: 'https://api.todayz.in', SHARE_PREVIEW_KEY: 'k3y=' }));
+      expect(seen[2]?.has(PREVIEW_IP_HEADER)).toBe(false);
+      expect(seen[2]?.has(PREVIEW_KEY_HEADER)).toBe(false);
+    } finally {
+      warn.mockRestore();
+      vi.unstubAllGlobals();
+    }
   });
 
   it('WhatsApp first only on Android, with the text and the link', () => {

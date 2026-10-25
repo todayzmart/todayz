@@ -200,3 +200,31 @@ func TestAskBookConcurrentOnOneReply(t *testing.T) {
 	require.Equal(t, 1, o.a.count(`SELECT count(*) FROM orders WHERE ask_reply_id = $1`, uuidOf(t, reply)))
 	require.Equal(t, 1, o.events("ask_booked", ""))
 }
+
+// ask_price_expired is written only when the refusal is the reply's own price
+// having ended for an item in the cart: an ended reply sent with a cart
+// without its item, or another customer's ended reply, is refused the same
+// way and writes nothing.
+func TestAskPriceExpiredOnlyForAnEndedPrice(t *testing.T) {
+	o := newOrderShop(t)
+	until := o.a.clk.Now().Add(20 * time.Minute)
+	reply := o.askYes(o.cust, 2, 27000, until)
+	o.set(until.Add(time.Minute))
+
+	c := o.cart([]line{{o.butter, 1}}, o.price[o.butter])
+	c["askReplyId"] = reply
+	r := o.a.call(o.cust, http.MethodPost, "/v1/me/orders", c, idem(o.a))
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, "ask_price_expired", problemCode(r))
+	require.Zero(t, o.events("ask_price_expired", ""), "the reply's item is not in the cart")
+
+	r = o.askPlace(o.cust2, reply, 2, 54000)
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, "ask_price_expired", problemCode(r))
+	require.Zero(t, o.events("ask_price_expired", ""), "another customer's reply")
+
+	r = o.askPlace(o.cust, reply, 2, 54000)
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+	require.Equal(t, 1, o.events("ask_price_expired", ""))
+	require.Zero(t, o.a.count(`SELECT count(*) FROM orders`))
+}

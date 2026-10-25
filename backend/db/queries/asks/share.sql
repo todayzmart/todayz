@@ -5,6 +5,7 @@
 -- the store is not live or its business not verified (D-40).
 SELECT si.id, si.price_paise, si.mrp_paise, si.product_id,
        coalesce(si.local_name, p.name || coalesce(' ' || p.variant, ''), '')::text AS item_name,
+       coalesce(p.name || coalesce(' ' || p.variant, ''), '')::text AS product_name,
        p.mrp_paise AS product_mrp_paise,
        s.name AS store_name, s.slug AS store_slug, s.locality,
        (s.status = 'live' AND b.status = 'verified')::bool AS available

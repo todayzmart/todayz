@@ -31,7 +31,10 @@ var (
 
 // CardImage is what a preview shows.
 type CardImage struct {
-	Item       string
+	Item string
+	// Product is the master product's name, drawn when Item (the shop's
+	// local name) has letters the font lacks.
+	Product    string
 	Store      string
 	Locality   string
 	PricePaise int64
@@ -39,7 +42,11 @@ type CardImage struct {
 
 // RenderCard draws the preview PNG.
 func RenderCard(c CardImage) ([]byte, error) {
-	c.Item, c.Store, c.Locality = latin(c.Item), latin(c.Store), latin(c.Locality)
+	item := latin(c.Item)
+	if item == "" {
+		item = latin(c.Product)
+	}
+	c.Item, c.Store, c.Locality = item, latin(c.Store), latin(c.Locality)
 	img := image.NewRGBA(image.Rect(0, 0, cardW, cardH))
 	fill(img, img.Bounds(), colWash)
 

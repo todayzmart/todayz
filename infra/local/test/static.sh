@@ -128,7 +128,7 @@ names() { grep -E '^[[:space:]]*(export[[:space:]]+)?[A-Z][A-Z0-9_]*=' "$1" | se
 example="$(names "$TZ_ROOT/.env.example")"
 missing="$(comm -23 <(names "$TZ_LOCAL_ENV") <(echo "$example"))"
 [[ -z "$missing" ]] || bad "local.env names not in .env.example: $(echo "$missing" | tr '\n' ' ')"
-d18=(JWT_SIGNING_KEYS JWT_CURRENT_KID ORDER_CODE_ENC_KEY ORDER_CODE_HMAC_KEY BILL_QR_SIGNING_KEY PII_ENC_KEY PII_HASH_KEY DEVICE_SECRET_ENC_KEY TOTP_ENC_KEY)
+d18=(JWT_SIGNING_KEYS JWT_CURRENT_KID ORDER_CODE_ENC_KEY ORDER_CODE_HMAC_KEY BILL_QR_SIGNING_KEY PII_ENC_KEY PII_HASH_KEY DEVICE_SECRET_ENC_KEY TOTP_ENC_KEY SHARE_PREVIEW_KEY)
 found=""
 for k in "${d18[@]}"; do grep -qE "^[[:space:]]*(export[[:space:]]+)?$k=" "$TZ_LOCAL_ENV" && found+="$k "; done
 [[ -z "$found" ]] || bad "local.env must not set D-18 app keys: $found"

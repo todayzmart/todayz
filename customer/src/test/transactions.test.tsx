@@ -366,6 +366,83 @@ describe('C-11 checkout', () => {
     expect(bodies[1]).not.toHaveProperty('askReplyId');
   });
 
+  it('a priced reply the quote does not price at is dropped at once, so the new total is accepted once', async () => {
+    resetCartForTests();
+    addToCart(STORE, { storeItemId: ITEM, productName: 'Toor dal', pricePaise: 2300, askReplyId: 'RPLY01', askQty: 2, askPriced: true }, 2);
+    const quotes: unknown[] = [];
+    const bodies: unknown[] = [];
+    renderAt('/checkout', {
+      returning: true,
+      handlers: [
+        signedIn,
+        on('POST', '/v1/me/checkout/quote', (c) => {
+          quotes.push(c.body);
+          return json(200, quote({}, 2500));
+        }),
+        on('POST', '/v1/me/orders', (c) => {
+          bodies.push(c.body);
+          return json(201, order());
+        }),
+        on('GET', `/v1/me/orders/${ORDER_ID}`, () => json(200, order())),
+      ],
+    });
+    await waitFor(() => expect(getCart().lines[0]?.askReplyId).toBeUndefined());
+    expect(getCart().lines[0]).toMatchObject({ qty: 2, pricePaise: 2300 });
+    expect(getCart().lines[0]).not.toHaveProperty('askPriced');
+    await waitFor(() => expect(quotes.at(-1)).not.toHaveProperty('askReplyId'));
+    expect(quotes[0]).toMatchObject({ askReplyId: 'RPLY01' });
+    fireEvent.click(await screen.findByRole('button', { name: `Accept new total · ${formatMoney(5000)}` }));
+    fireEvent.click(await screen.findByRole('button', { name: `Place order · ${formatMoney(5000)}` }));
+    await waitFor(() => expect(bodies).toHaveLength(1));
+    expect(bodies[0]).toMatchObject({ expectedTotalPaise: 5000 });
+    expect(bodies[0]).not.toHaveProperty('askReplyId');
+  });
+
+  it('a priced reply the quote prices at keeps it', async () => {
+    resetCartForTests();
+    addToCart(STORE, { storeItemId: ITEM, productName: 'Toor dal', pricePaise: 2300, askReplyId: 'RPLY01', askQty: 2, askPriced: true }, 2);
+    const atReply = quote({}, 2300);
+    const line = atReply.lines[0];
+    if (line) line.priceSource = 'ask_reply';
+    const bodies: unknown[] = [];
+    renderAt('/checkout', {
+      returning: true,
+      handlers: [
+        signedIn,
+        on('POST', '/v1/me/checkout/quote', () => json(200, atReply)),
+        on('POST', '/v1/me/orders', (c) => {
+          bodies.push(c.body);
+          return json(201, order());
+        }),
+        on('GET', `/v1/me/orders/${ORDER_ID}`, () => json(200, order())),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: `Place order · ${formatMoney(4600)}` }));
+    await waitFor(() => expect(bodies).toHaveLength(1));
+    expect(bodies[0]).toMatchObject({ askReplyId: 'RPLY01', expectedTotalPaise: 4600 });
+  });
+
+  it('a reply that already booked an open order (ask_reply_used) is dropped and the cart asked again', async () => {
+    resetCartForTests();
+    addToCart(STORE, { storeItemId: ITEM, productName: 'Toor dal', pricePaise: 2500, askReplyId: 'RPLY01', askQty: 2 }, 2);
+    const quotes: unknown[] = [];
+    renderAt('/checkout', {
+      returning: true,
+      handlers: [
+        signedIn,
+        on('POST', '/v1/me/checkout/quote', (c) => {
+          quotes.push(c.body);
+          return (c.body as { askReplyId?: string }).askReplyId
+            ? json(409, { type: 'about:blank#ask_reply_used', title: 'x', status: 409, code: 'ask_reply_used', extensions: { orderId: ORDER_ID } })
+            : json(200, quote());
+        }),
+      ],
+    });
+    await waitFor(() => expect(getCart().lines[0]?.askReplyId).toBeUndefined());
+    expect(await screen.findByRole('button', { name: `Place order · ${formatMoney(5000)}` })).toBeEnabled();
+    expect(quotes.at(-1)).not.toHaveProperty('askReplyId');
+  });
+
   it('names the line that has too little stock and keeps the cart', async () => {
     renderAt('/checkout', {
       returning: true,
