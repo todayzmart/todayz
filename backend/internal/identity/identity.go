@@ -33,6 +33,7 @@ import (
 	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/pii"
+	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/platform/testclock"
 )
 
@@ -65,6 +66,9 @@ type Deps struct {
 	Clock  clock.Clock
 	Log    *slog.Logger
 	Tokens *authn.Tokens
+	// Settings is platform_settings (the saved-address cap, D-222); nil in
+	// route-only tests, where saving an address answers 503.
+	Settings *settings.Cache
 	// SMS and Human override the providers built from Config (tests).
 	SMS   SMSSender
 	Human HumanVerifier
@@ -87,11 +91,13 @@ type Service struct {
 	clock  clock.Clock
 	log    *slog.Logger
 	tokens *authn.Tokens
-	sms    SMSSender
-	human  HumanVerifier
-	seal   *pii.Sealer
-	hash   *pii.Hasher
-	audit  *audit.Writer
+	// settings: see Deps.Settings.
+	settings *settings.Cache
+	sms      SMSSender
+	human    HumanVerifier
+	seal     *pii.Sealer
+	hash     *pii.Hasher
+	audit    *audit.Writer
 	// totpSeal seals admin TOTP secrets under TOTP_ENC_KEY (field
 	// "totp_secret"); nil when the key is unset (TOTP answers 503).
 	totpSeal *pii.Sealer
@@ -116,7 +122,7 @@ func New(d Deps) (*Service, error) {
 		return nil, errors.New("identity: config and clock are required")
 	}
 	s := &Service{
-		cfg: d.Config, db: d.DB, clock: d.Clock, log: d.Log, tokens: d.Tokens,
+		cfg: d.Config, db: d.DB, clock: d.Clock, log: d.Log, tokens: d.Tokens, settings: d.Settings,
 		sms: d.SMS, human: d.Human,
 		allowTestCode: d.Config.Env.AllowsTestRoutes() && d.TestRoutes && testclock.Loopback(d.Config.APIAddr),
 	}

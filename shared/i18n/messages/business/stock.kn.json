@@ -1,0 +1,982 @@
+{
+  "stock.title": {
+    "message": "ಸ್ಟಾಕ್",
+    "review": "reviewed",
+    "enHash": "bcecf456"
+  },
+  "stock.loading": {
+    "message": "ಸ್ಟಾಕ್ ಲೋಡ್ ಆಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "a1a29595"
+  },
+  "stock.noStore.title": {
+    "message": "ಮೊದಲು ಅಂಗಡಿ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "stock.noStore.body": {
+    "message": "ಸ್ಟಾಕ್ ಒಂದು ಅಂಗಡಿಗೆ ಸೇರಿರುತ್ತದೆ. ನೀವು ಕೆಲಸ ಮಾಡುತ್ತಿರುವ ಅಂಗಡಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "3ad8aef4"
+  },
+  "stock.noStore.action": {
+    "message": "ಅಂಗಡಿ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "stock.error.title": {
+    "message": "ಸ್ಟಾಕ್ ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "d98f90d7"
+  },
+  "stock.error.body": {
+    "message": "ನಿಮ್ಮ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "stock.error.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "stock.error.validation_failed": {
+    "message": "ಅದರಲ್ಲಿ ಕೆಲವು ಸ್ವೀಕಾರವಾಗಲಿಲ್ಲ. ಸಂಖ್ಯೆಗಳನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "a29c601a"
+  },
+  "stock.error.forbidden": {
+    "message": "ನಿಮ್ಮ ಪಾತ್ರದಿಂದ ಇದನ್ನು ಮಾಡಲು ಆಗುವುದಿಲ್ಲ. ಮ್ಯಾನೇಜರ್‌ರನ್ನು ಕೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "7c035098"
+  },
+  "stock.error.conflict": {
+    "message": "ನೀವು ಬದಲಿಸುತ್ತಿರುವಾಗ ಇದು ಬದಲಾಗಿದೆ. ಮತ್ತೆ ಲೋಡ್ ಮಾಡಿ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "d32da861"
+  },
+  "stock.error.not_found": {
+    "message": "ಈ ಐಟಂ ಇನ್ನು ನಿಮ್ಮ ಅಂಗಡಿಯಲ್ಲಿ ಇಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "bac42b30"
+  },
+  "stock.error.precondition_failed": {
+    "message": "ಬೇರೆ ಯಾರೋ ಈಗತಾನೆ ಈ ಐಟಂ ಬದಲಿಸಿದ್ದಾರೆ. ಅದನ್ನು ಮತ್ತೆ ಲೋಡ್ ಮಾಡಲಾಗಿದೆ; ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "16a84f1b"
+  },
+  "stock.error.precondition_required": {
+    "message": "ಈ ಐಟಂನ ಬದಲಾವಣೆಗಳನ್ನು ಪರಿಶೀಲಿಸಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಲೋಡ್ ಮಾಡಿ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "996ab7c1"
+  },
+  "stock.error.generic": {
+    "message": "ಅದು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "9ae914fa"
+  },
+  "stock.search.label": {
+    "message": "ಸ್ಟಾಕ್ ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "63960fa1"
+  },
+  "stock.search.placeholder": {
+    "message": "ಹೆಸರು ಅಥವಾ ಬಾರ್‌ಕೋಡ್‌ನಿಂದ ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "01f9e331"
+  },
+  "stock.search.clear": {
+    "message": "ಹುಡುಕಾಟ ತೆರವುಗೊಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "67300d0f"
+  },
+  "stock.filter.label": {
+    "message": "ಸ್ಟಾಕ್ ಫಿಲ್ಟರ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "5b642716"
+  },
+  "stock.filter.all": {
+    "message": "ಎಲ್ಲಾ",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "stock.filter.low": {
+    "message": "ಕಡಿಮೆ ಸ್ಟಾಕ್",
+    "review": "reviewed",
+    "enHash": "a6e1fef1"
+  },
+  "stock.filter.out": {
+    "message": "ಸ್ಟಾಕ್ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "stock.filter.stale": {
+    "message": "ಇತ್ತೀಚೆಗೆ ದೃಢೀಕರಿಸಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "09fece23"
+  },
+  "stock.filter.hidden": {
+    "message": "ಮರೆಮಾಡಿದವು",
+    "review": "reviewed",
+    "enHash": "d4c2792a"
+  },
+  "stock.category.label": {
+    "message": "ವರ್ಗ",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "stock.category.all": {
+    "message": "ಎಲ್ಲಾ ವರ್ಗಗಳು",
+    "review": "reviewed",
+    "enHash": "060be00f"
+  },
+  "stock.action.add": {
+    "message": "ಐಟಂ ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "5bcf4db4"
+  },
+  "stock.action.import": {
+    "message": "ಇಂಪೋರ್ಟ್",
+    "review": "reviewed",
+    "enHash": "d6fbc9d2"
+  },
+  "stock.action.count": {
+    "message": "ಸ್ಟಾಕ್ ಎಣಿಸಿ",
+    "review": "reviewed",
+    "enHash": "82d76c10"
+  },
+  "stock.action.countDone": {
+    "message": "ಎಣಿಕೆ ಮುಗಿಯಿತು",
+    "review": "reviewed",
+    "enHash": "152e7d90"
+  },
+  "stock.count.hint": {
+    "message": "ಪ್ರತಿ ಐಟಂಗೆ ಶೆಲ್ಫ್‌ನಲ್ಲಿ ಇರುವುದನ್ನು ಟೈಪ್ ಮಾಡಿ, ನಂತರ ದೃಢೀಕರಿಸಿ. ನೀವು ದೃಢೀಕರಿಸಿದ ಐಟಂಗಳು ಮಾತ್ರ ಬದಲಾಗುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "d36c7bbf"
+  },
+  "stock.table.label": {
+    "message": "ಸ್ಟಾಕ್ ಐಟಂಗಳು",
+    "review": "reviewed",
+    "enHash": "51ae889f"
+  },
+  "stock.col.item": {
+    "message": "ಐಟಂ",
+    "review": "reviewed",
+    "enHash": "ecdda59a"
+  },
+  "stock.col.stock": {
+    "message": "ಸ್ಟಾಕ್",
+    "review": "reviewed",
+    "enHash": "bcecf456"
+  },
+  "stock.col.onHand": {
+    "message": "ಕೈಯಲ್ಲಿರುವುದು",
+    "review": "reviewed",
+    "enHash": "d94c32d4"
+  },
+  "stock.col.counted": {
+    "message": "ಎಣಿಸಿದ್ದು",
+    "review": "reviewed",
+    "enHash": "319a2b6e"
+  },
+  "stock.col.price": {
+    "message": "ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "stock.empty.none": {
+    "message": "ಇನ್ನೂ ಐಟಂಗಳಿಲ್ಲ. ನಿಮ್ಮ ಮೊದಲ ಐಟಂ ಸೇರಿಸಿ ಅಥವಾ ಶೀಟ್ ಇಂಪೋರ್ಟ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "97b326b4"
+  },
+  "stock.empty.filtered": {
+    "message": "ಯಾವುದೇ ಐಟಂ ಹೊಂದಿಕೆಯಾಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "911453d6"
+  },
+  "stock.more": {
+    "message": "ಇನ್ನಷ್ಟು ತೋರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "25911d48"
+  },
+  "stock.level.in": {
+    "message": "ಸ್ಟಾಕ್‌ನಲ್ಲಿದೆ",
+    "review": "reviewed",
+    "enHash": "3f1356ad"
+  },
+  "stock.level.low": {
+    "message": "{available} ಮಾತ್ರ ಉಳಿದಿವೆ",
+    "review": "reviewed",
+    "enHash": "8a4dc0ee"
+  },
+  "stock.level.out": {
+    "message": "ಸ್ಟಾಕ್ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "stock.fresh.confirmed": {
+    "message": "ದೃಢೀಕರಿಸಿದ್ದು {time}",
+    "review": "reviewed",
+    "enHash": "7d1ac5a7"
+  },
+  "stock.fresh.stale": {
+    "message": "ಸ್ಟಾಕ್ ಇತ್ತೀಚೆಗೆ ದೃಢೀಕರಿಸಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "c8a47c2d"
+  },
+  "stock.inline.edit": {
+    "message": "{item} ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "0a705d55"
+  },
+  "stock.inline.save": {
+    "message": "{item} ಬೆಲೆ ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "2b9d7bee"
+  },
+  "stock.inline.confirm": {
+    "message": "{item} ಎಣಿಕೆ ದೃಢೀಕರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "0ffca104"
+  },
+  "stock.inline.price": {
+    "message": "{item} ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "f96e0600"
+  },
+  "stock.inline.count": {
+    "message": "{item} ಎಣಿಸಿದ ಪ್ರಮಾಣ",
+    "review": "reviewed",
+    "enHash": "3f1068a2"
+  },
+  "stock.item.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "stock.item.hidden": {
+    "message": "ಗ್ರಾಹಕರಿಂದ ಮರೆಮಾಡಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "f9800cca"
+  },
+  "stock.item.onHand": {
+    "message": "ಕೈಯಲ್ಲಿರುವುದು",
+    "review": "reviewed",
+    "enHash": "d94c32d4"
+  },
+  "stock.item.reserved": {
+    "message": "ಆರ್ಡರ್‌ಗಳಿಗೆ ಇಟ್ಟಿರುವುದು",
+    "review": "reviewed",
+    "enHash": "df36c2b4"
+  },
+  "stock.item.available": {
+    "message": "ಲಭ್ಯ",
+    "review": "reviewed",
+    "enHash": "7c62a142"
+  },
+  "stock.item.price": {
+    "message": "ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "stock.item.mrp": {
+    "message": "MRP",
+    "review": "reviewed",
+    "enHash": "cd74a166"
+  },
+  "stock.item.lowAt": {
+    "message": "ಕಡಿಮೆ ಸ್ಟಾಕ್ ಮಿತಿ",
+    "review": "reviewed",
+    "enHash": "7ba9fd9d"
+  },
+  "stock.item.notSet": {
+    "message": "ಹೊಂದಿಸಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "93039e60"
+  },
+  "stock.item.tabs": {
+    "message": "ಐಟಂ ವಿವರಗಳು",
+    "review": "reviewed",
+    "enHash": "12e853a0"
+  },
+  "stock.tab.batches": {
+    "message": "ಬ್ಯಾಚ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "30925eec"
+  },
+  "stock.tab.history": {
+    "message": "ಇತಿಹಾಸ",
+    "review": "reviewed",
+    "enHash": "90ccd649"
+  },
+  "stock.act.restock": {
+    "message": "ಮರು-ಸ್ಟಾಕ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "3ccf7127"
+  },
+  "stock.act.count": {
+    "message": "ಎಣಿಕೆ ಸರಿಪಡಿಸಿ",
+    "review": "reviewed",
+    "enHash": "afc22be8"
+  },
+  "stock.act.damage": {
+    "message": "ಹಾನಿಯಾಗಿದೆ ಎಂದು ಗುರುತಿಸಿ",
+    "review": "reviewed",
+    "enHash": "cb521b7a"
+  },
+  "stock.act.expired": {
+    "message": "ಅವಧಿ ಮುಗಿದಿದೆ ಎಂದು ಗುರುತಿಸಿ",
+    "review": "reviewed",
+    "enHash": "310c38b2"
+  },
+  "stock.act.price": {
+    "message": "ಬೆಲೆ ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "1eac205f"
+  },
+  "stock.act.threshold": {
+    "message": "ಕಡಿಮೆ ಸ್ಟಾಕ್ ಮಟ್ಟ",
+    "review": "reviewed",
+    "enHash": "50344aed"
+  },
+  "stock.act.hide": {
+    "message": "ಗ್ರಾಹಕರಿಂದ ಮರೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "2f8bd03c"
+  },
+  "stock.act.list": {
+    "message": "ಗ್ರಾಹಕರಿಗೆ ತೋರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "1f13846d"
+  },
+  "stock.batch.none": {
+    "message": "ಸ್ಟಾಕ್ ಉಳಿದಿರುವ ಯಾವುದೇ ಬ್ಯಾಚ್ ಇಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "3458ae7c"
+  },
+  "stock.batch.left": {
+    "message": "{quantity} ಉಳಿದಿವೆ",
+    "review": "reviewed",
+    "enHash": "62abbdae"
+  },
+  "stock.batch.expires": {
+    "message": "{date} ರಂದು ಅವಧಿ ಮುಗಿಯುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "dde25e8f"
+  },
+  "stock.batch.expiredOn": {
+    "message": "{date} ರಂದು ಅವಧಿ ಮುಗಿದಿದೆ",
+    "review": "reviewed",
+    "enHash": "7cd25a6a"
+  },
+  "stock.batch.noExpiry": {
+    "message": "ಅವಧಿ ದಿನಾಂಕ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "8fbd9bfa"
+  },
+  "stock.batch.cost": {
+    "message": "ವೆಚ್ಚ {cost}",
+    "review": "reviewed",
+    "enHash": "7703b083"
+  },
+  "stock.batch.edit": {
+    "message": "ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "5301648d"
+  },
+  "stock.history.none": {
+    "message": "ಇನ್ನೂ ಸ್ಟಾಕ್ ಬದಲಾವಣೆಗಳಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "1fdb9f2a"
+  },
+  "stock.source.opening": {
+    "message": "ಆರಂಭಿಕ ಸ್ಟಾಕ್",
+    "review": "reviewed",
+    "enHash": "38b7df56"
+  },
+  "stock.source.restock": {
+    "message": "ಮರು-ಸ್ಟಾಕ್ ಮಾಡಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "12d85280"
+  },
+  "stock.source.supplier_bill": {
+    "message": "ಸರಬರಾಜುದಾರರ ಬಿಲ್",
+    "review": "reviewed",
+    "enHash": "58997110"
+  },
+  "stock.source.import": {
+    "message": "ಇಂಪೋರ್ಟ್ ಮಾಡಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "434eb26f"
+  },
+  "stock.source.count_correction": {
+    "message": "ಎಣಿಕೆ ಸರಿಪಡಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "97f5f111"
+  },
+  "stock.source.damage": {
+    "message": "ಹಾನಿಯಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "052fc798"
+  },
+  "stock.source.expired": {
+    "message": "ಅವಧಿ ಮುಗಿದಿದೆ",
+    "review": "reviewed",
+    "enHash": "a689a999"
+  },
+  "stock.source.sale_pos": {
+    "message": "ಕೌಂಟರ್‌ನಲ್ಲಿ ಮಾರಾಟ",
+    "review": "reviewed",
+    "enHash": "ab1d9837"
+  },
+  "stock.source.sale_online": {
+    "message": "ಆನ್‌ಲೈನ್ ಮಾರಾಟ",
+    "review": "reviewed",
+    "enHash": "5320465a"
+  },
+  "stock.source.pos_reversal": {
+    "message": "ಕೌಂಟರ್ ಮಾರಾಟ ಹಿಂಪಡೆಯಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "da366a69"
+  },
+  "stock.source.other": {
+    "message": "ಸ್ಟಾಕ್ ಬದಲಾವಣೆ",
+    "review": "reviewed",
+    "enHash": "78a9fe7e"
+  },
+  "stock.form.title.restock": {
+    "message": "{item} ಮರು-ಸ್ಟಾಕ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "5b448a60"
+  },
+  "stock.form.title.damage": {
+    "message": "{item} ಹಾನಿಯಾಗಿದೆ ಎಂದು ಗುರುತಿಸಿ",
+    "review": "reviewed",
+    "enHash": "0e204bbc"
+  },
+  "stock.form.title.expired": {
+    "message": "{item} ಅವಧಿ ಮುಗಿದಿದೆ ಎಂದು ಗುರುತಿಸಿ",
+    "review": "reviewed",
+    "enHash": "3d31bd67"
+  },
+  "stock.form.title.count_correction": {
+    "message": "{item} ಎಣಿಕೆ ಸರಿಪಡಿಸಿ",
+    "review": "reviewed",
+    "enHash": "465989a3"
+  },
+  "stock.form.title.price": {
+    "message": "ಬೆಲೆ ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "1eac205f"
+  },
+  "stock.form.title.threshold": {
+    "message": "ಕಡಿಮೆ ಸ್ಟಾಕ್ ಮಟ್ಟ",
+    "review": "reviewed",
+    "enHash": "50344aed"
+  },
+  "stock.form.title.batch": {
+    "message": "ಬ್ಯಾಚ್ ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "6c57d40d"
+  },
+  "stock.form.save.restock": {
+    "message": "ಮರು-ಸ್ಟಾಕ್ ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "0e0572ab"
+  },
+  "stock.form.save.damage": {
+    "message": "ಹಾನಿ ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "d3f690ca"
+  },
+  "stock.form.save.expired": {
+    "message": "ಅವಧಿ ಮುಕ್ತಾಯ ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "f6053561"
+  },
+  "stock.form.save.count_correction": {
+    "message": "ಎಣಿಕೆ ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "b64c0a4d"
+  },
+  "stock.form.save.price": {
+    "message": "ಬೆಲೆ ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "6a897ddb"
+  },
+  "stock.form.save.threshold": {
+    "message": "ಮಟ್ಟ ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "fbddda1e"
+  },
+  "stock.form.save.batch": {
+    "message": "ಬ್ಯಾಚ್ ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "1de2c092"
+  },
+  "stock.form.cancel": {
+    "message": "ರದ್ದುಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "stock.form.back": {
+    "message": "ಹಿಂದೆ",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "stock.form.qty": {
+    "message": "ಪ್ರಮಾಣ",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "stock.form.qtyMax": {
+    "message": "{available} ವರೆಗೆ ಲಭ್ಯ.",
+    "review": "reviewed",
+    "enHash": "63f7abc0"
+  },
+  "stock.form.qtyInvalid": {
+    "message": "1 ಅಥವಾ ಹೆಚ್ಚಿನ, 10,00,000 ವರೆಗಿನ ಪೂರ್ಣ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "b0cf53e4"
+  },
+  "stock.form.qtyTooMany": {
+    "message": "{available} ಮಾತ್ರ ಲಭ್ಯವಿದೆ.",
+    "review": "reviewed",
+    "enHash": "f86ab2b0"
+  },
+  "stock.form.counted": {
+    "message": "ಶೆಲ್ಫ್‌ನಲ್ಲಿ ಎಣಿಸಿದ್ದು",
+    "review": "reviewed",
+    "enHash": "3757174e"
+  },
+  "stock.form.countedHelp": {
+    "message": "ಸಿಸ್ಟಂನಲ್ಲಿ {onHand} ಕೈಯಲ್ಲಿವೆ, ಅವುಗಳಲ್ಲಿ {reserved} ಆರ್ಡರ್‌ಗಳಿಗೆ ಇಡಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "71147153"
+  },
+  "stock.form.countInvalid": {
+    "message": "0 ರಿಂದ 10,00,000 ವರೆಗಿನ ಪೂರ್ಣ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "2d52188c"
+  },
+  "stock.form.batches": {
+    "message": "ಅವಧಿ ಮುಗಿದ ಬ್ಯಾಚ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "d2c336ef"
+  },
+  "stock.form.pickBatch": {
+    "message": "ಕನಿಷ್ಠ ಒಂದು ಬ್ಯಾಚ್ ಟಿಕ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "636d30b3"
+  },
+  "stock.form.writeOff": {
+    "message": "{quantity} ಅನ್ನು ಸ್ಟಾಕ್‌ನಿಂದ ತೆಗೆಯಲಾಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "25b017b9"
+  },
+  "stock.form.expiry": {
+    "message": "ಅವಧಿ ದಿನಾಂಕ",
+    "review": "reviewed",
+    "enHash": "6b440cd5"
+  },
+  "stock.form.expiryHelp": {
+    "message": "ಐಚ್ಛಿಕ. ಮೊದಲು ಅವಧಿ ಮುಗಿಯುವುದನ್ನು ಮೊದಲು ಮಾರಲಾಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "16368f0b"
+  },
+  "stock.form.cost": {
+    "message": "ಪ್ರತಿ ಯೂನಿಟ್ ವೆಚ್ಚ",
+    "review": "reviewed",
+    "enHash": "4f9ae67f"
+  },
+  "stock.form.costHelp": {
+    "message": "ಐಚ್ಛಿಕ. ಮಾರಾಟ ಬೆಲೆ {price}.",
+    "review": "reviewed",
+    "enHash": "f3898983"
+  },
+  "stock.form.costInvalid": {
+    "message": "ರೂಪಾಯಿಗಳಲ್ಲಿ ಮೊತ್ತ ನಮೂದಿಸಿ, ಉದಾ. 42 ಅಥವಾ 42.50.",
+    "review": "reviewed",
+    "enHash": "60cbee53"
+  },
+  "stock.form.note": {
+    "message": "ಟಿಪ್ಪಣಿ",
+    "review": "reviewed",
+    "enHash": "2c924e30"
+  },
+  "stock.form.price": {
+    "message": "ಮಾರಾಟ ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "7657ccd6"
+  },
+  "stock.form.priceMrp": {
+    "message": "MRP {mrp}. ಬೆಲೆ ಇದಕ್ಕಿಂತ ಹೆಚ್ಚಿರಬಾರದು.",
+    "review": "reviewed",
+    "enHash": "42107931"
+  },
+  "stock.form.priceInvalid": {
+    "message": "ರೂಪಾಯಿಗಳಲ್ಲಿ ಮೊತ್ತ ನಮೂದಿಸಿ, ಉದಾ. 58 ಅಥವಾ 58.50.",
+    "review": "reviewed",
+    "enHash": "1f25c621"
+  },
+  "stock.form.priceAboveMrp": {
+    "message": "ಬೆಲೆ {mrp} MRP ಗಿಂತ ಹೆಚ್ಚಿರಬಾರದು.",
+    "review": "reviewed",
+    "enHash": "7a0650ec"
+  },
+  "stock.form.priceRef": {
+    "message": "ಒಳನೋಟದಿಂದ ಉಲ್ಲೇಖ ಬೆಲೆ: {price}. ನೀವು ಉಳಿಸುವವರೆಗೆ ಏನೂ ಬದಲಾಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "188c481e"
+  },
+  "stock.form.threshold": {
+    "message": "ಕಡಿಮೆ ಸ್ಟಾಕ್ ಮಿತಿ",
+    "review": "reviewed",
+    "enHash": "7ba9fd9d"
+  },
+  "stock.form.thresholdHelp": {
+    "message": "ಲಭ್ಯ ಸ್ಟಾಕ್ ಈ ಸಂಖ್ಯೆ ತಲುಪಿದಾಗ ಎಚ್ಚರಿಸಿ. ಆಫ್ ಮಾಡಲು ಖಾಲಿ ಬಿಡಿ.",
+    "review": "reviewed",
+    "enHash": "5f13e007"
+  },
+  "stock.link.askManager": {
+    "message": "ಇದನ್ನು ಮಾಡಲು ಮ್ಯಾನೇಜರ್‌ರನ್ನು ಕೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "9c4dbb1f"
+  },
+  "stock.toast.restock": {
+    "message": "{item} ಮರು-ಸ್ಟಾಕ್ ಆಯಿತು",
+    "review": "reviewed",
+    "enHash": "d480fd84"
+  },
+  "stock.toast.damage": {
+    "message": "{item} ಹಾನಿಯಾಗಿದೆ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "371b429f"
+  },
+  "stock.toast.expired": {
+    "message": "{item} ಅವಧಿ ಮುಗಿದಿದೆ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "2680d0cd"
+  },
+  "stock.toast.count_correction": {
+    "message": "{item} ಎಣಿಕೆ ಉಳಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "4494f38a"
+  },
+  "stock.toast.price": {
+    "message": "{item} ಬೆಲೆ ಬದಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "b8e3449e"
+  },
+  "stock.toast.threshold": {
+    "message": "{item} ಕಡಿಮೆ ಸ್ಟಾಕ್ ಮಟ್ಟ ಉಳಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "fde3bc47"
+  },
+  "stock.toast.batch": {
+    "message": "ಬ್ಯಾಚ್ ಉಳಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "aa30e481"
+  },
+  "stock.toast.added": {
+    "message": "{item} ಸೇರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "29e20351"
+  },
+  "stock.add.title": {
+    "message": "ಐಟಂ ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "5bcf4db4"
+  },
+  "stock.add.search": {
+    "message": "ಉತ್ಪನ್ನ ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "1a413f0c"
+  },
+  "stock.add.searchHint": {
+    "message": "ಹೆಸರು ಅಥವಾ ಬಾರ್‌ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "d529b5fb"
+  },
+  "stock.add.hint": {
+    "message": "ಕನಿಷ್ಠ 2 ಅಕ್ಷರ ಟೈಪ್ ಮಾಡಿ, ಅಥವಾ ಬಾರ್‌ಕೋಡ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "405c2949"
+  },
+  "stock.add.noMatch": {
+    "message": "ಯಾವುದೇ ಉತ್ಪನ್ನ ಸಿಗಲಿಲ್ಲ. ನೀವು ಅದನ್ನು ರಚಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "b73e927b"
+  },
+  "stock.add.results": {
+    "message": "ಹೊಂದುವ ಉತ್ಪನ್ನಗಳು",
+    "review": "reviewed",
+    "enHash": "894ed0db"
+  },
+  "stock.add.pick": {
+    "message": "ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "stock.add.inStore": {
+    "message": "ಈಗಾಗಲೇ ನಿಮ್ಮ ಅಂಗಡಿಯಲ್ಲಿದೆ",
+    "review": "reviewed",
+    "enHash": "d008bf38"
+  },
+  "stock.add.pickAgain": {
+    "message": "ಸೇರಿಸಲು ಉತ್ಪನ್ನವನ್ನು ಹುಡುಕಿ.",
+    "review": "reviewed",
+    "enHash": "77422308"
+  },
+  "stock.add.create": {
+    "message": "ಹೊಸ ಉತ್ಪನ್ನ ರಚಿಸಿ",
+    "review": "reviewed",
+    "enHash": "48e2e613"
+  },
+  "stock.add.createTitle": {
+    "message": "ಹೊಸ ಉತ್ಪನ್ನ",
+    "review": "reviewed",
+    "enHash": "1bc965f3"
+  },
+  "stock.add.createNote": {
+    "message": "ನೀವು ಇದನ್ನು ತಕ್ಷಣ ಮಾರಬಹುದು. TodayZ ಹೊಸ ಉತ್ಪನ್ನಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತದೆ ಮತ್ತು ವಿವರಗಳನ್ನು ಸರಿಪಡಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "b17b44e7"
+  },
+  "stock.add.createSave": {
+    "message": "ರಚಿಸಿ ಮತ್ತು ಮುಂದುವರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "8fb3ba33"
+  },
+  "stock.add.name": {
+    "message": "ಉತ್ಪನ್ನದ ಹೆಸರು",
+    "review": "reviewed",
+    "enHash": "63c0fe8e"
+  },
+  "stock.add.brand": {
+    "message": "ಬ್ರ್ಯಾಂಡ್",
+    "review": "reviewed",
+    "enHash": "62b4aa57"
+  },
+  "stock.add.packSize": {
+    "message": "ಪ್ಯಾಕ್ ಗಾತ್ರ",
+    "review": "reviewed",
+    "enHash": "87dd2c97"
+  },
+  "stock.add.unit": {
+    "message": "ಯೂನಿಟ್",
+    "review": "reviewed",
+    "enHash": "f6b935ab"
+  },
+  "stock.add.category": {
+    "message": "ವರ್ಗ",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "stock.add.categoryPick": {
+    "message": "ವರ್ಗ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "b91bf5d4"
+  },
+  "stock.add.mrp": {
+    "message": "MRP",
+    "review": "reviewed",
+    "enHash": "cd74a166"
+  },
+  "stock.add.barcode": {
+    "message": "ಬಾರ್‌ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "8e54dc53"
+  },
+  "stock.add.nameInvalid": {
+    "message": "ಉತ್ಪನ್ನದ ಹೆಸರು ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "156b98ba"
+  },
+  "stock.add.packInvalid": {
+    "message": "0 ಗಿಂತ ಹೆಚ್ಚಿನ ಪ್ಯಾಕ್ ಗಾತ್ರ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "c518b9fb"
+  },
+  "stock.add.categoryInvalid": {
+    "message": "ವರ್ಗ ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "1ae9839f"
+  },
+  "stock.add.barcodeInvalid": {
+    "message": "ಬಾರ್‌ಕೋಡ್‌ನಲ್ಲಿ 8 ರಿಂದ 14 ಅಂಕಿಗಳಿರುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "6afd70c1"
+  },
+  "stock.add.priceTitle": {
+    "message": "ಬೆಲೆ ಮತ್ತು ಆರಂಭಿಕ ಸ್ಟಾಕ್",
+    "review": "reviewed",
+    "enHash": "ef3f7094"
+  },
+  "stock.add.opening": {
+    "message": "ಆರಂಭಿಕ ಸ್ಟಾಕ್",
+    "review": "reviewed",
+    "enHash": "38b7df56"
+  },
+  "stock.add.openingHelp": {
+    "message": "ಈಗ ನಿಮ್ಮ ಬಳಿ ಎಷ್ಟಿವೆ. ಸ್ಟಾಕ್ ಇಲ್ಲದೆ ಸೇರಿಸಲು ಖಾಲಿ ಬಿಡಿ.",
+    "review": "reviewed",
+    "enHash": "56e87302"
+  },
+  "stock.add.save": {
+    "message": "ನನ್ನ ಅಂಗಡಿಗೆ ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "6bcff51f"
+  },
+  "stock.import.title": {
+    "message": "ಐಟಂಗಳನ್ನು ಇಂಪೋರ್ಟ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "71475145"
+  },
+  "stock.import.body": {
+    "message": "ಪ್ರತಿ ಸಾಲಿನಲ್ಲಿ ಒಂದು ಐಟಂ ಇರುವ CSV ಅಥವಾ XLSX ಶೀಟ್ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ. ಏನಾದರೂ ಉಳಿಸುವ ಮೊದಲು ಪ್ರತಿ ಸಾಲಿನ ಪರಿಶೀಲನೆ ನಿಮಗೆ ಕಾಣಿಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "52306a4f"
+  },
+  "stock.import.choose": {
+    "message": "ಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "74b1d89d"
+  },
+  "stock.import.file": {
+    "message": "ಐಟಂಗಳ ಫೈಲ್",
+    "review": "reviewed",
+    "enHash": "2486c8be"
+  },
+  "stock.import.tooBig": {
+    "message": "ಆ ಫೈಲ್ 5 MB ಗಿಂತ ದೊಡ್ಡದು. ಅದನ್ನು ವಿಭಜಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "074bff0d"
+  },
+  "stock.import.okCount": {
+    "message": "{count, plural, one {# ಸಾಲು ಸಿದ್ಧ} other {# ಸಾಲುಗಳು ಸಿದ್ಧ}}",
+    "review": "reviewed",
+    "enHash": "454bd309"
+  },
+  "stock.import.errorCount": {
+    "message": "{count, plural, one {# ಸಾಲಿನಲ್ಲಿ ಸಮಸ್ಯೆ} other {# ಸಾಲುಗಳಲ್ಲಿ ಸಮಸ್ಯೆ}}",
+    "review": "reviewed",
+    "enHash": "6f89d2ee"
+  },
+  "stock.import.errorNote": {
+    "message": "ಸಮಸ್ಯೆ ಇರುವ ಸಾಲುಗಳನ್ನು ಬಿಡಲಾಗುತ್ತದೆ. ಅವುಗಳನ್ನು ನಿಮ್ಮ ಶೀಟ್‌ನಲ್ಲಿ ಸರಿಪಡಿಸಿ ಮತ್ತೆ ಇಂಪೋರ್ಟ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "8199a9f2"
+  },
+  "stock.import.rows": {
+    "message": "ಫೈಲ್‌ನ ಸಾಲುಗಳು",
+    "review": "reviewed",
+    "enHash": "ccfb8479"
+  },
+  "stock.import.rowNo": {
+    "message": "ಸಾಲು {row}",
+    "review": "reviewed",
+    "enHash": "b8e5d89e"
+  },
+  "stock.import.unnamed": {
+    "message": "ಹೆಸರಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "b78fd250"
+  },
+  "stock.import.rowError": {
+    "message": "{field}: {problem}",
+    "review": "reviewed",
+    "enHash": "c181bee1"
+  },
+  "stock.import.apply": {
+    "message": "{count, plural, one {# ಐಟಂ ಇಂಪೋರ್ಟ್ ಮಾಡಿ} other {# ಐಟಂಗಳನ್ನು ಇಂಪೋರ್ಟ್ ಮಾಡಿ}}",
+    "review": "reviewed",
+    "enHash": "f6fda5f5"
+  },
+  "stock.import.another": {
+    "message": "ಬೇರೆ ಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "62352371"
+  },
+  "stock.import.done": {
+    "message": "{applied, plural, one {# ಐಟಂ ಇಂಪೋರ್ಟ್ ಆಯಿತು} other {# ಐಟಂಗಳು ಇಂಪೋರ್ಟ್ ಆದವು}}. {skipped, plural, =0 {ಯಾವುದೇ ಸಾಲು ಬಿಡಲಾಗಿಲ್ಲ.} one {# ಸಾಲು ಬಿಡಲಾಗಿದೆ.} other {# ಸಾಲುಗಳನ್ನು ಬಿಡಲಾಗಿದೆ.}}",
+    "review": "reviewed",
+    "enHash": "87eae7f4"
+  },
+  "stock.import.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "stock.import.field.name": {
+    "message": "ಹೆಸರು",
+    "review": "reviewed",
+    "enHash": "709a2322"
+  },
+  "stock.import.field.barcode": {
+    "message": "ಬಾರ್‌ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "8e54dc53"
+  },
+  "stock.import.field.pricePaise": {
+    "message": "ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "stock.import.field.mrpPaise": {
+    "message": "MRP",
+    "review": "reviewed",
+    "enHash": "cd74a166"
+  },
+  "stock.import.field.quantity": {
+    "message": "ಪ್ರಮಾಣ",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "stock.import.field.expiresOn": {
+    "message": "ಅವಧಿ ದಿನಾಂಕ",
+    "review": "reviewed",
+    "enHash": "6b440cd5"
+  },
+  "stock.import.field.other": {
+    "message": "ಸಾಲು",
+    "review": "reviewed",
+    "enHash": "9bf7a8e8"
+  },
+  "stock.import.code.required": {
+    "message": "ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "cf6f06e2"
+  },
+  "stock.import.code.invalid": {
+    "message": "ಸರಿಯಾಗಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "e3fac096"
+  },
+  "stock.import.code.too_long": {
+    "message": "ತುಂಬಾ ಉದ್ದವಿದೆ",
+    "review": "reviewed",
+    "enHash": "306aee6f"
+  },
+  "stock.import.code.price_above_mrp": {
+    "message": "MRP ಗಿಂತ ಹೆಚ್ಚಿದೆ",
+    "review": "reviewed",
+    "enHash": "54e32832"
+  },
+  "stock.import.code.unknown_product": {
+    "message": "ಉತ್ಪನ್ನ ಪಟ್ಟಿಯಲ್ಲಿ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "dae05f63"
+  },
+  "stock.import.code.duplicate": {
+    "message": "ಎರಡು ಬಾರಿ ಇದೆ",
+    "review": "reviewed",
+    "enHash": "d5620f6c"
+  },
+  "stock.import.code.other": {
+    "message": "ಸಮಸ್ಯೆ ಇದೆ",
+    "review": "reviewed",
+    "enHash": "1547a58d"
+  }
+}

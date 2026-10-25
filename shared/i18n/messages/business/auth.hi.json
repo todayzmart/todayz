@@ -1,0 +1,217 @@
+{
+  "app.offline.title": {
+    "message": "आप ऑफ़लाइन हैं।",
+    "review": "reviewed",
+    "enHash": "4a2a6452"
+  },
+  "app.offline.body": {
+    "message": "सेव किए गए पेज अब भी खुलेंगे। ऑनलाइन होते ही सब अपडेट हो जाएगा।",
+    "review": "reviewed",
+    "enHash": "6019fada"
+  },
+  "app.update.message": {
+    "message": "TodayZ Business का नया वर्ज़न तैयार है।",
+    "review": "reviewed",
+    "enHash": "9744d22a"
+  },
+  "app.update.action": {
+    "message": "अपडेट करें",
+    "review": "reviewed",
+    "enHash": "fb91e24f"
+  },
+  "app.error.title": {
+    "message": "कुछ गड़बड़ हो गई",
+    "review": "reviewed",
+    "enHash": "8d886c0b"
+  },
+  "app.error.body": {
+    "message": "फिर से कोशिश करें। बार-बार हो तो पेज रीलोड करें।",
+    "review": "reviewed",
+    "enHash": "f081bc24"
+  },
+  "app.error.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "app.pending.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "app.loading": {
+    "message": "लोड हो रहा है",
+    "review": "reviewed",
+    "enHash": "8f26c652"
+  },
+  "auth.signIn.title": {
+    "message": "TodayZ Business में साइन इन करें",
+    "review": "reviewed",
+    "enHash": "4337b537"
+  },
+  "auth.signIn.sub": {
+    "message": "वही मोबाइल नंबर डालें जिससे आपकी दुकान रजिस्टर है। हम SMS से कोड भेजेंगे।",
+    "review": "reviewed",
+    "enHash": "f63d01a7"
+  },
+  "auth.phone.label": {
+    "message": "मोबाइल नंबर",
+    "review": "reviewed",
+    "enHash": "8e5c12de"
+  },
+  "auth.phone.help": {
+    "message": "इससे आप साइन इन करते हैं और ऑर्डर की सूचना पाते हैं।",
+    "review": "reviewed",
+    "enHash": "766d916b"
+  },
+  "auth.phone.invalid": {
+    "message": "6, 7, 8 या 9 से शुरू होने वाला 10 अंकों का मोबाइल नंबर डालें।",
+    "review": "reviewed",
+    "enHash": "6be55a3e"
+  },
+  "auth.code.send": {
+    "message": "कोड भेजें",
+    "review": "reviewed",
+    "enHash": "313503fa"
+  },
+  "auth.code.sending": {
+    "message": "कोड भेजा जा रहा है",
+    "review": "reviewed",
+    "enHash": "28de53b3"
+  },
+  "auth.code.label": {
+    "message": "6 अंकों का कोड डालें",
+    "review": "reviewed",
+    "enHash": "d148321a"
+  },
+  "auth.code.digit": {
+    "message": "अंक {position}",
+    "review": "reviewed",
+    "enHash": "1e73e888"
+  },
+  "auth.code.sentTo": {
+    "message": "हमने {phone} पर कोड भेजा है।",
+    "review": "reviewed",
+    "enHash": "c8aa6d25"
+  },
+  "auth.code.verifying": {
+    "message": "कोड जाँचा जा रहा है",
+    "review": "reviewed",
+    "enHash": "90adc49f"
+  },
+  "auth.code.resend": {
+    "message": "कोड फिर से भेजें",
+    "review": "reviewed",
+    "enHash": "1d3cb8a9"
+  },
+  "auth.code.resendIn": {
+    "message": "{seconds} s में फिर से भेजें",
+    "review": "reviewed",
+    "enHash": "f0589eca"
+  },
+  "auth.code.change": {
+    "message": "नंबर बदलें",
+    "review": "reviewed",
+    "enHash": "6c3b4080"
+  },
+  "auth.error.wrongCode": {
+    "message": "यह कोड सही नहीं है। जाँचें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "47948633"
+  },
+  "auth.error.expired": {
+    "message": "इस कोड का समय ख़त्म हो गया। नया कोड मँगाएँ।",
+    "review": "reviewed",
+    "enHash": "6a90a6f9"
+  },
+  "auth.error.locked": {
+    "message": "कई बार ग़लत कोड डाला गया। नया कोड मँगाएँ।",
+    "review": "reviewed",
+    "enHash": "371d1276"
+  },
+  "auth.error.rateLimited": {
+    "message": "बहुत ज़्यादा कोशिशें हो गईं। थोड़ा रुककर फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "c32bd496"
+  },
+  "auth.error.blocked": {
+    "message": "यह खाता अभी साइन इन नहीं कर सकता। सपोर्ट से संपर्क करें।",
+    "review": "reviewed",
+    "enHash": "10997ecd"
+  },
+  "auth.error.network": {
+    "message": "TodayZ तक नहीं पहुँच पा रहे। अपना इंटरनेट देखें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "470230be"
+  },
+  "auth.error.generic": {
+    "message": "कुछ गड़बड़ हो गई। कृपया फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "9a3ea059"
+  },
+  "auth.error.captcha": {
+    "message": "हम जाँच नहीं पाए कि आप इंसान हैं। पेज रीलोड करके फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "bc612d87"
+  },
+  "auth.signOut": {
+    "message": "साइन आउट",
+    "review": "reviewed",
+    "enHash": "dc1649a1"
+  },
+  "shop.pick.title": {
+    "message": "दुकान चुनें",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "shop.pick.sub": {
+    "message": "वह बिज़नेस और दुकान चुनें जिसमें आपको काम करना है। हम इसे इस डिवाइस पर याद रखेंगे।",
+    "review": "reviewed",
+    "enHash": "73012255"
+  },
+  "shop.pick.loading": {
+    "message": "आपकी दुकानें लोड हो रही हैं",
+    "review": "reviewed",
+    "enHash": "97200491"
+  },
+  "shop.pick.group": {
+    "message": "{business} की दुकानें",
+    "review": "reviewed",
+    "enHash": "f0b111f6"
+  },
+  "shop.pick.role.owner": {
+    "message": "मालिक",
+    "review": "reviewed",
+    "enHash": "89ff3122"
+  },
+  "shop.pick.role.manager": {
+    "message": "मैनेजर",
+    "review": "reviewed",
+    "enHash": "babe3050"
+  },
+  "shop.pick.role.cashier": {
+    "message": "कैशियर",
+    "review": "reviewed",
+    "enHash": "78c07270"
+  },
+  "shop.pick.empty": {
+    "message": "इस नंबर से अभी कोई दुकान नहीं जुड़ी है। अपने मालिक से आपको इनवाइट करने को कहें, या सपोर्ट से संपर्क करें।",
+    "review": "reviewed",
+    "enHash": "95e9e70b"
+  },
+  "shop.pick.unavailable": {
+    "message": "अभी आपकी दुकानें लोड नहीं हो पा रहीं। आप सारांश पर जा सकते हैं।",
+    "review": "reviewed",
+    "enHash": "8d7dd013"
+  },
+  "shop.pick.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "shop.pick.continue": {
+    "message": "सारांश पर जाएँ",
+    "review": "reviewed",
+    "enHash": "bc5e5ad7"
+  }
+}

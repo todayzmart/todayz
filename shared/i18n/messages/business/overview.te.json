@@ -1,0 +1,527 @@
+{
+  "overview.sample": {
+    "message": "నమూనా డేటా",
+    "review": "reviewed",
+    "enHash": "057f604c"
+  },
+  "overview.greet.morning": {
+    "message": "శుభోదయం, {name}",
+    "review": "reviewed",
+    "enHash": "a42e634a"
+  },
+  "overview.greet.afternoon": {
+    "message": "నమస్కారం, {name}",
+    "review": "reviewed",
+    "enHash": "91ed0e35"
+  },
+  "overview.greet.evening": {
+    "message": "శుభ సాయంత్రం, {name}",
+    "review": "reviewed",
+    "enHash": "5e6beb49"
+  },
+  "overview.greet.sub": {
+    "message": "{date} · {store} · {waiting, plural, =0 {ఏ ఆర్డరూ వేచి లేదు} one {# ఆర్డర్ వేచి ఉంది} other {# ఆర్డర్లు వేచి ఉన్నాయి}}",
+    "review": "reviewed",
+    "enHash": "1390632b"
+  },
+  "overview.period.label": {
+    "message": "వ్యవధి",
+    "review": "reviewed",
+    "enHash": "170a28a9"
+  },
+  "overview.period.today": {
+    "message": "ఈరోజు",
+    "review": "reviewed",
+    "enHash": "24345a14"
+  },
+  "overview.period.7d": {
+    "message": "7 రోజులు",
+    "review": "reviewed",
+    "enHash": "0a8dd6ad"
+  },
+  "overview.period.30d": {
+    "message": "30 రోజులు",
+    "review": "reviewed",
+    "enHash": "7d4278a8"
+  },
+  "overview.compare.today": {
+    "message": "<b>గత {weekday}</b> తో పోలిస్తే",
+    "review": "reviewed",
+    "enHash": "3dd23c80"
+  },
+  "overview.compare.7d": {
+    "message": "<b>గత 7 రోజులతో</b> పోలిస్తే",
+    "review": "reviewed",
+    "enHash": "3ab059e7"
+  },
+  "overview.compare.30d": {
+    "message": "<b>గత 30 రోజులతో</b> పోలిస్తే",
+    "review": "reviewed",
+    "enHash": "ef9f99f8"
+  },
+  "overview.compareShort.today": {
+    "message": "గత {weekday} తో పోలిస్తే",
+    "review": "reviewed",
+    "enHash": "3f4ddc2d"
+  },
+  "overview.compareShort.7d": {
+    "message": "గత 7 రోజులతో పోలిస్తే",
+    "review": "reviewed",
+    "enHash": "2fd3ac26"
+  },
+  "overview.compareShort.30d": {
+    "message": "గత 30 రోజులతో పోలిస్తే",
+    "review": "reviewed",
+    "enHash": "09cc972e"
+  },
+  "overview.synced": {
+    "message": "{time} కి సింక్ అయింది",
+    "review": "reviewed",
+    "enHash": "01d62c94"
+  },
+  "overview.newSale": {
+    "message": "కొత్త అమ్మకం",
+    "review": "reviewed",
+    "enHash": "4ab75642"
+  },
+  "overview.kpi.label": {
+    "message": "ఒక్క చూపులో",
+    "review": "reviewed",
+    "enHash": "fca77b7e"
+  },
+  "overview.kpi.sales.today": {
+    "message": "ఈరోజు అమ్మకాలు",
+    "review": "reviewed",
+    "enHash": "68a425b6"
+  },
+  "overview.kpi.sales.period": {
+    "message": "అమ్మకాలు",
+    "review": "reviewed",
+    "enHash": "d0edfb6e"
+  },
+  "overview.kpi.sales.note": {
+    "message": "{bills, plural, one {# బిల్లు} other {# బిల్లులు}} · {online, plural, one {# ఆన్‌లైన్ ఆర్డర్} other {# ఆన్‌లైన్ ఆర్డర్లు}}",
+    "review": "reviewed",
+    "enHash": "d3c6b2f9"
+  },
+  "overview.kpi.orders": {
+    "message": "ఆర్డర్లు",
+    "review": "reviewed",
+    "enHash": "cded0933"
+  },
+  "overview.kpi.orders.note": {
+    "message": "{waiting, plural, =0 {అంగీకరించాల్సినవి ఏవీ లేవు} other {# అంగీకరించాల్సి ఉంది}}",
+    "review": "reviewed",
+    "enHash": "b3ce1caa"
+  },
+  "overview.kpi.avgBill": {
+    "message": "సగటు బిల్లు",
+    "review": "reviewed",
+    "enHash": "1ade6d14"
+  },
+  "overview.kpi.avgBill.note": {
+    "message": "కౌంటర్, ఆన్‌లైన్ బిల్లులు",
+    "review": "reviewed",
+    "enHash": "21ea5022"
+  },
+  "overview.kpi.low": {
+    "message": "తక్కువ స్టాక్ ఐటమ్‌లు",
+    "review": "reviewed",
+    "enHash": "3f83eddd"
+  },
+  "overview.kpi.low.note": {
+    "message": "{soon, plural, =0 {రేపటికల్లా ఏదీ అయిపోదు} other {# రేపటికల్లా అయిపోతాయి}}",
+    "review": "reviewed",
+    "enHash": "273c84ec"
+  },
+  "overview.kpi.low.link": {
+    "message": "రీఆర్డర్ జాబితా",
+    "review": "reviewed",
+    "enHash": "58d98439"
+  },
+  "overview.delta.up": {
+    "message": "{value} పెరిగింది",
+    "review": "reviewed",
+    "enHash": "c5173160"
+  },
+  "overview.delta.down": {
+    "message": "{value} తగ్గింది",
+    "review": "reviewed",
+    "enHash": "17f9eb8b"
+  },
+  "overview.delta.flat": {
+    "message": "మార్పు లేదు",
+    "review": "reviewed",
+    "enHash": "95ec0529"
+  },
+  "overview.orders.title": {
+    "message": "కొత్త ఆర్డర్లు",
+    "review": "reviewed",
+    "enHash": "545afdee"
+  },
+  "overview.orders.waiting": {
+    "message": "{count, plural, one {# వేచి ఉంది} other {# వేచి ఉన్నాయి}}",
+    "review": "reviewed",
+    "enHash": "a49bdf6c"
+  },
+  "overview.orders.head": {
+    "message": "{code} · {customer}",
+    "review": "reviewed",
+    "enHash": "0c7a4282"
+  },
+  "overview.orders.timeLeft": {
+    "message": "అంగీకరించడానికి {time} మిగిలి ఉంది",
+    "review": "reviewed",
+    "enHash": "ff56fa39"
+  },
+  "overview.orders.expired": {
+    "message": "అంగీకరించే సమయం ముగిసింది",
+    "review": "reviewed",
+    "enHash": "27824c89"
+  },
+  "overview.orders.pickup": {
+    "message": "పికప్",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "overview.orders.delivery": {
+    "message": "డెలివరీ",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "overview.orders.accept": {
+    "message": "అంగీకరించండి",
+    "review": "reviewed",
+    "enHash": "bb54db51"
+  },
+  "overview.orders.reject": {
+    "message": "తిరస్కరించండి",
+    "review": "reviewed",
+    "enHash": "2b03b592"
+  },
+  "overview.orders.acceptA11y": {
+    "message": "ఆర్డర్ {code} అంగీకరించండి",
+    "review": "reviewed",
+    "enHash": "79428166"
+  },
+  "overview.orders.rejectA11y": {
+    "message": "ఆర్డర్ {code} తిరస్కరించండి",
+    "review": "reviewed",
+    "enHash": "65574cf4"
+  },
+  "overview.orders.sampleToast": {
+    "message": "నమూనా ఆర్డర్: ఏమీ మారలేదు",
+    "review": "reviewed",
+    "enHash": "71a14881"
+  },
+  "overview.orders.open": {
+    "message": "ఆర్డర్లు తెరవండి",
+    "review": "reviewed",
+    "enHash": "29706cca"
+  },
+  "overview.chart.title": {
+    "message": "గంటల వారీగా అమ్మకాలు",
+    "review": "reviewed",
+    "enHash": "162aeab3"
+  },
+  "overview.chart.today": {
+    "message": "ఈరోజు",
+    "review": "reviewed",
+    "enHash": "24345a14"
+  },
+  "overview.chart.prev": {
+    "message": "గత {weekday}",
+    "review": "reviewed",
+    "enHash": "c4b0c362"
+  },
+  "overview.chart.a11y": {
+    "message": "ఈరోజు గంటల వారీ అమ్మకాలు, గత {weekday} తో పోలిస్తే. {hour}, ఇప్పటివరకు: {now}; గత {weekday}: {prev}.",
+    "review": "reviewed",
+    "enHash": "745187c1"
+  },
+  "overview.chart.hourAm": {
+    "message": "{h}a",
+    "review": "reviewed",
+    "enHash": "eb07387b"
+  },
+  "overview.chart.hourPm": {
+    "message": "{h}p",
+    "review": "reviewed",
+    "enHash": "6dd1f7c7"
+  },
+  "overview.chart.axisK": {
+    "message": "₹{k}k",
+    "review": "reviewed",
+    "enHash": "bd0019a4"
+  },
+  "overview.chart.tipHour": {
+    "message": "{hour}, ఇప్పటివరకు",
+    "review": "reviewed",
+    "enHash": "9b524b96"
+  },
+  "overview.chart.tipPrev": {
+    "message": "గత {weekday} {amount}",
+    "review": "reviewed",
+    "enHash": "f1a37239"
+  },
+  "overview.chart.report": {
+    "message": "అమ్మకాల రిపోర్ట్ చూడండి",
+    "review": "reviewed",
+    "enHash": "4799c2be"
+  },
+  "overview.chart.updated": {
+    "message": "{time} కి అప్‌డేట్ అయింది",
+    "review": "reviewed",
+    "enHash": "c170aa32"
+  },
+  "overview.insights.title": {
+    "message": "డిమాండ్ సమాచారం",
+    "review": "reviewed",
+    "enHash": "750bb313"
+  },
+  "overview.insights.desc": {
+    "message": "ఏది అమ్ముడవుతోంది, ఏది నిలిచిపోయింది, ఏది పాడవబోతోంది, దగ్గర్లో జనం ఏమి కోరుకుంటున్నారు",
+    "review": "reviewed",
+    "enHash": "167ad93a"
+  },
+  "overview.insights.period": {
+    "message": "గత 7 రోజులు",
+    "review": "reviewed",
+    "enHash": "df833fe8"
+  },
+  "overview.insights.notUseful": {
+    "message": "ఉపయోగం లేదు",
+    "review": "reviewed",
+    "enHash": "33d21a37"
+  },
+  "overview.insights.hiddenToast": {
+    "message": "ఈసారికి దాచాం. నమూనా డేటా: ఏదీ సేవ్ కాదు.",
+    "review": "reviewed",
+    "enHash": "110e7b28"
+  },
+  "overview.insights.all": {
+    "message": "మొత్తం సమాచారం",
+    "review": "reviewed",
+    "enHash": "a971d032"
+  },
+  "overview.insights.foot": {
+    "message": "మీ అమ్మకాలు, స్టాక్, మీ దుకాణం దగ్గరి సెర్చ్‌ల నుంచి",
+    "review": "reviewed",
+    "enHash": "7096399e"
+  },
+  "overview.insights.empty": {
+    "message": "ప్రస్తుతం మీరు చూడాల్సింది ఏమీ లేదు",
+    "review": "reviewed",
+    "enHash": "42c17cdd"
+  },
+  "overview.insights.selling_fast.label": {
+    "message": "వేగంగా అమ్ముడవుతోంది",
+    "review": "reviewed",
+    "enHash": "5cbd2b13"
+  },
+  "overview.insights.selling_fast.sentence": {
+    "message": "<strong>{item}</strong> ఈ వారం {sold} అమ్ముడైంది. ఇదే వేగంతో {day} నాటికి అయిపోతుంది.",
+    "review": "reviewed",
+    "enHash": "4a5bb50c"
+  },
+  "overview.insights.selling_fast.action": {
+    "message": "స్టాక్ నింపండి",
+    "review": "reviewed",
+    "enHash": "3ccf7127"
+  },
+  "overview.insights.sitting_on_shelf.label": {
+    "message": "షెల్ఫ్‌లోనే ఉంది",
+    "review": "reviewed",
+    "enHash": "f955b9c0"
+  },
+  "overview.insights.sitting_on_shelf.sentence": {
+    "message": "<strong>{item}</strong>: {stock} స్టాక్‌లో ఉంది, {days} రోజులుగా అమ్మకం లేదు.",
+    "review": "reviewed",
+    "enHash": "bc06fec9"
+  },
+  "overview.insights.sitting_on_shelf.action": {
+    "message": "ఆఫర్ సృష్టించండి",
+    "review": "reviewed",
+    "enHash": "c6af210c"
+  },
+  "overview.insights.going_to_waste.label": {
+    "message": "పాడవబోతోంది",
+    "review": "reviewed",
+    "enHash": "847b43f5"
+  },
+  "overview.insights.going_to_waste.sentence": {
+    "message": "<strong>{count, plural, one {# ఐటమ్ {days} రోజుల్లో గడువు ముగుస్తుంది} other {# ఐటమ్‌లు {days} రోజుల్లో గడువు ముగుస్తాయి}}</strong>: {items}.",
+    "review": "reviewed",
+    "enHash": "9f4b5d8d"
+  },
+  "overview.insights.going_to_waste.action": {
+    "message": "ఫ్లాష్ ఆఫర్",
+    "review": "reviewed",
+    "enHash": "9b8c0a36"
+  },
+  "overview.insights.wanted_nearby.label": {
+    "message": "దగ్గర్లో డిమాండ్ ఉంది",
+    "review": "reviewed",
+    "enHash": "4e90f3e0"
+  },
+  "overview.insights.wanted_nearby.sentence": {
+    "message": "<strong>{item}</strong>: ఈ వారం {distance} లోపల {searches} సెర్చ్‌లు.",
+    "review": "reviewed",
+    "enHash": "ade7924a"
+  },
+  "overview.insights.wanted_nearby.sentenceNone": {
+    "message": "<strong>{item}</strong>: ఈ వారం {distance} లోపల {searches} సెర్చ్‌లు. దగ్గర్లో ఏ దుకాణంలోనూ ఇది లేదు.",
+    "review": "reviewed",
+    "enHash": "35287244"
+  },
+  "overview.insights.wanted_nearby.action": {
+    "message": "ఉత్పత్తి జోడించండి",
+    "review": "reviewed",
+    "enHash": "7c37958a"
+  },
+  "overview.insights.bought_together.label": {
+    "message": "కలిపి కొంటారు",
+    "review": "reviewed",
+    "enHash": "32ddb8f5"
+  },
+  "overview.insights.bought_together.sentence": {
+    "message": "<strong>{a}</strong>, <strong>{b}</strong> {pct}% బిల్లుల్లో కలిసి ఉన్నాయి.",
+    "review": "reviewed",
+    "enHash": "cdde8426"
+  },
+  "overview.insights.bought_together.action": {
+    "message": "ఆఫర్ సృష్టించండి",
+    "review": "reviewed",
+    "enHash": "c6af210c"
+  },
+  "overview.top.title": {
+    "message": "ఈరోజు టాప్ ఐటమ్‌లు",
+    "review": "reviewed",
+    "enHash": "1206eb05"
+  },
+  "overview.top.titlePeriod": {
+    "message": "టాప్ ఐటమ్‌లు",
+    "review": "reviewed",
+    "enHash": "79ec189d"
+  },
+  "overview.top.viewAll": {
+    "message": "అన్నీ చూడండి",
+    "review": "reviewed",
+    "enHash": "931e1a4b"
+  },
+  "overview.top.label": {
+    "message": "టాప్ ఐటమ్‌లు",
+    "review": "reviewed",
+    "enHash": "79ec189d"
+  },
+  "overview.top.item": {
+    "message": "ఐటమ్",
+    "review": "reviewed",
+    "enHash": "ecdda59a"
+  },
+  "overview.top.sold": {
+    "message": "అమ్ముడైనవి",
+    "review": "reviewed",
+    "enHash": "e6560d9c"
+  },
+  "overview.top.last7": {
+    "message": "7 రోజులు",
+    "review": "reviewed",
+    "enHash": "0a8dd6ad"
+  },
+  "overview.top.spark": {
+    "message": "గత 7 రోజుల్లో అమ్ముడైనవి: {values}",
+    "review": "reviewed",
+    "enHash": "6ce16968"
+  },
+  "overview.top.revenue": {
+    "message": "ఆదాయం",
+    "review": "reviewed",
+    "enHash": "35cf82f9"
+  },
+  "overview.top.stock": {
+    "message": "స్టాక్‌లో",
+    "review": "reviewed",
+    "enHash": "3f1356ad"
+  },
+  "overview.top.low": {
+    "message": "{count} (తక్కువ)",
+    "review": "reviewed",
+    "enHash": "f27710af"
+  },
+  "overview.top.updated": {
+    "message": "అప్‌డేట్",
+    "review": "reviewed",
+    "enHash": "f2f8570d"
+  },
+  "overview.top.source.pos": {
+    "message": "POS · {time}",
+    "review": "reviewed",
+    "enHash": "67a4e730"
+  },
+  "overview.top.source.online": {
+    "message": "ఆన్‌లైన్ · {time}",
+    "review": "reviewed",
+    "enHash": "ae1fc3b8"
+  },
+  "overview.top.source.voice": {
+    "message": "వాయిస్ · {time}",
+    "review": "reviewed",
+    "enHash": "4d92b893"
+  },
+  "overview.top.total": {
+    "message": "మొత్తం, {all} లో {shown} ఐటమ్‌లు",
+    "review": "reviewed",
+    "enHash": "a4884a09"
+  },
+  "overview.top.totals": {
+    "message": "{sold} అమ్ముడైనవి · {revenue}",
+    "review": "reviewed",
+    "enHash": "25077fd3"
+  },
+  "overview.top.empty": {
+    "message": "ఇంకా అమ్మకాలు లేవు",
+    "review": "reviewed",
+    "enHash": "f2a3f161"
+  },
+  "overview.loading": {
+    "message": "మీ దుకాణం గణాంకాలు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "5bba6f53"
+  },
+  "overview.error": {
+    "message": "సారాంశాన్ని లోడ్ చేయలేకపోయాం",
+    "review": "reviewed",
+    "enHash": "d5835bfb"
+  },
+  "overview.hour.am": {
+    "message": "{h} am",
+    "review": "reviewed",
+    "enHash": "fb73a259"
+  },
+  "overview.hour.pm": {
+    "message": "{h} pm",
+    "review": "reviewed",
+    "enHash": "020908c9"
+  },
+  "overview.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "overview.setup.title": {
+    "message": "దుకాణం సెటప్ {pct}%",
+    "review": "reviewed",
+    "enHash": "f5137798"
+  },
+  "overview.setup.next.openingHours": {
+    "message": "“ఇప్పుడు తెరిచి ఉంది” సెర్చ్‌లలో కనిపించడానికి తెరిచే సమయాలు జోడించండి.",
+    "review": "reviewed",
+    "enHash": "c6539f5e"
+  },
+  "overview.setup.finish": {
+    "message": "సెటప్ పూర్తి చేయండి",
+    "review": "reviewed",
+    "enHash": "c516d2df"
+  }
+}

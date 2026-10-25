@@ -1,0 +1,997 @@
+{
+  "orders.title": {
+    "message": "ఆర్డర్లు",
+    "review": "reviewed",
+    "enHash": "cded0933"
+  },
+  "orders.tabs.label": {
+    "message": "ఆర్డర్ స్థితి",
+    "review": "reviewed",
+    "enHash": "22edd6c1"
+  },
+  "orders.tab.new": {
+    "message": "కొత్తవి",
+    "review": "reviewed",
+    "enHash": "6403f2b7"
+  },
+  "orders.tab.accepted": {
+    "message": "అంగీకరించినవి",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "orders.tab.ready": {
+    "message": "సిద్ధం",
+    "review": "reviewed",
+    "enHash": "20c7c552"
+  },
+  "orders.tab.out_for_delivery": {
+    "message": "డెలివరీకి బయలుదేరినవి",
+    "review": "reviewed",
+    "enHash": "111fb997"
+  },
+  "orders.tab.returns": {
+    "message": "నిర్ధారించాల్సిన వాపసులు",
+    "review": "reviewed",
+    "enHash": "c27fa514"
+  },
+  "orders.tab.done": {
+    "message": "పూర్తయినవి",
+    "review": "reviewed",
+    "enHash": "e9b450d1"
+  },
+  "orders.tab.missed": {
+    "message": "తప్పిపోయినవి",
+    "review": "reviewed",
+    "enHash": "b564001a"
+  },
+  "orders.tab.asks": {
+    "message": "అభ్యర్థనలు",
+    "review": "reviewed",
+    "enHash": "2c5548cf"
+  },
+  "orders.asks.empty.title": {
+    "message": "ఇంకా అభ్యర్థనలు లేవు",
+    "review": "reviewed",
+    "enHash": "f9782d98"
+  },
+  "orders.asks.empty.body": {
+    "message": "దగ్గర్లోని కస్టమర్ ఏదైనా ఐటమ్ అడిగినప్పుడు, అది ఇక్కడ కనిపిస్తుంది.",
+    "review": "reviewed",
+    "enHash": "04ceb186"
+  },
+  "orders.empty.new.title": {
+    "message": "కొత్త ఆర్డర్లు లేవు",
+    "review": "reviewed",
+    "enHash": "74edcd15"
+  },
+  "orders.empty.new.body": {
+    "message": "కస్టమర్ బుక్ చేసిన వెంటనే కొత్త ఆర్డర్లు ఇక్కడ కనిపిస్తాయి. ఈ పేజీ దానంతట అదే అప్‌డేట్ అవుతుంది.",
+    "review": "reviewed",
+    "enHash": "22554196"
+  },
+  "orders.empty.accepted.title": {
+    "message": "ఏదీ అంగీకరించలేదు",
+    "review": "reviewed",
+    "enHash": "08e732c1"
+  },
+  "orders.empty.accepted.body": {
+    "message": "మీరు అంగీకరించిన ఆర్డర్లు కస్టమర్ వచ్చే వరకు ఇక్కడ ఉంటాయి.",
+    "review": "reviewed",
+    "enHash": "337b23d7"
+  },
+  "orders.empty.ready.title": {
+    "message": "ఏదీ సిద్ధంగా లేదు",
+    "review": "reviewed",
+    "enHash": "1a92d685"
+  },
+  "orders.empty.ready.body": {
+    "message": "మీరు సిద్ధం అని గుర్తించిన ఆర్డర్లు పికప్ వరకు ఇక్కడ ఉంటాయి.",
+    "review": "reviewed",
+    "enHash": "22ede753"
+  },
+  "orders.empty.out_for_delivery.title": {
+    "message": "దారిలో ఏదీ లేదు",
+    "review": "reviewed",
+    "enHash": "c26724bb"
+  },
+  "orders.empty.out_for_delivery.body": {
+    "message": "మీరు పంపిన డెలివరీ ఆర్డర్లు కస్టమర్ కోడ్ ఇచ్చే వరకు ఇక్కడ ఉంటాయి.",
+    "review": "reviewed",
+    "enHash": "2c77a998"
+  },
+  "orders.empty.returns.title": {
+    "message": "నిర్ధారించాల్సిన వాపసులు లేవు",
+    "review": "reviewed",
+    "enHash": "a5e30f69"
+  },
+  "orders.empty.returns.body": {
+    "message": "డెలివరీ విఫలమైనప్పుడు, సరుకు తిరిగి వచ్చిందో లేదో ఇక్కడ నిర్ధారించండి.",
+    "review": "reviewed",
+    "enHash": "2d4bf306"
+  },
+  "orders.empty.done.title": {
+    "message": "పూర్తయిన ఆర్డర్లు లేవు",
+    "review": "reviewed",
+    "enHash": "8d34898a"
+  },
+  "orders.empty.done.body": {
+    "message": "అప్పగించిన ఆర్డర్లు ఇక్కడ కనిపిస్తాయి.",
+    "review": "reviewed",
+    "enHash": "b382e9d8"
+  },
+  "orders.empty.missed.title": {
+    "message": "తప్పిపోయిన ఆర్డర్లు లేవు",
+    "review": "reviewed",
+    "enHash": "76145583"
+  },
+  "orders.empty.missed.body": {
+    "message": "తిరస్కరించిన, గడువు ముగిసిన, రద్దైన ఆర్డర్లు ఇక్కడ కనిపిస్తాయి.",
+    "review": "reviewed",
+    "enHash": "2102a5f8"
+  },
+  "orders.loading": {
+    "message": "ఆర్డర్లు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "58246f0e"
+  },
+  "orders.error.title": {
+    "message": "ఆర్డర్లు లోడ్ చేయలేకపోయాం",
+    "review": "reviewed",
+    "enHash": "c64fbfa9"
+  },
+  "orders.error.body": {
+    "message": "మీ కనెక్షన్ చూసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "orders.error.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "orders.noStore.title": {
+    "message": "ముందు ఒక దుకాణం ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "946fa8f4"
+  },
+  "orders.noStore.body": {
+    "message": "ఆర్డర్లు ఒక దుకాణానికి చెందుతాయి. మీరు పని చేస్తున్న దుకాణాన్ని ఎంచుకోండి.",
+    "review": "reviewed",
+    "enHash": "2d1b92a4"
+  },
+  "orders.noStore.action": {
+    "message": "దుకాణం ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "orders.live.polling": {
+    "message": "లైవ్ అప్‌డేట్‌లు ఆపివేయబడ్డాయి. ప్రతి 15 సెకన్లకు కొత్త ఆర్డర్ల కోసం చూస్తున్నాం.",
+    "review": "reviewed",
+    "enHash": "c8f8e69b"
+  },
+  "orders.sound.title": {
+    "message": "కొత్త ఆర్డర్లు వినండి.",
+    "review": "reviewed",
+    "enHash": "39f6bd17"
+  },
+  "orders.sound.body": {
+    "message": "అలర్ట్ శబ్దం ప్లే చేసే ముందు మీ బ్రౌజర్‌కు ఒక ట్యాప్ కావాలి.",
+    "review": "reviewed",
+    "enHash": "42e19ab9"
+  },
+  "orders.sound.allow": {
+    "message": "శబ్దం అనుమతించండి",
+    "review": "reviewed",
+    "enHash": "c0feb3a5"
+  },
+  "orders.sound.on": {
+    "message": "శబ్ద అలర్ట్ ఆన్‌లో ఉంది",
+    "review": "reviewed",
+    "enHash": "927c9a28"
+  },
+  "orders.sound.off": {
+    "message": "శబ్దం ఆఫ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "6a4e1b9b"
+  },
+  "orders.sound.muted": {
+    "message": "శబ్ద అలర్ట్ ఆఫ్‌లో ఉంది",
+    "review": "reviewed",
+    "enHash": "f04f5a47"
+  },
+  "orders.sound.unmute": {
+    "message": "శబ్దం ఆన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "92a0dbc1"
+  },
+  "orders.card.head": {
+    "message": "{number} · {customer}",
+    "review": "reviewed",
+    "enHash": "5993d96e"
+  },
+  "orders.card.noName": {
+    "message": "కస్టమర్",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "orders.card.items": {
+    "message": "{count, plural, one {# ఐటమ్} other {# ఐటమ్‌లు}}",
+    "review": "reviewed",
+    "enHash": "f34cfa9c"
+  },
+  "orders.card.pickup": {
+    "message": "పికప్",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "orders.card.delivery": {
+    "message": "డెలివరీ",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "orders.card.timeLeft": {
+    "message": "అంగీకరించడానికి {time} మిగిలి ఉంది",
+    "review": "reviewed",
+    "enHash": "ff56fa39"
+  },
+  "orders.card.expired": {
+    "message": "సమయం అయిపోయింది",
+    "review": "reviewed",
+    "enHash": "54b7f365"
+  },
+  "orders.card.holdLeft": {
+    "message": "{time} వరకు ఉంచాం",
+    "review": "reviewed",
+    "enHash": "deb0b1e1"
+  },
+  "orders.card.dispatchBy": {
+    "message": "{time} లోపు పంపండి",
+    "review": "reviewed",
+    "enHash": "6116684a"
+  },
+  "orders.card.open": {
+    "message": "ఆర్డర్ చూడండి",
+    "review": "reviewed",
+    "enHash": "0df27975"
+  },
+  "orders.card.openA11y": {
+    "message": "ఆర్డర్ {number} చూడండి",
+    "review": "reviewed",
+    "enHash": "40e56958"
+  },
+  "orders.card.accept": {
+    "message": "అంగీకరించండి",
+    "review": "reviewed",
+    "enHash": "bb54db51"
+  },
+  "orders.card.acceptA11y": {
+    "message": "ఆర్డర్ {number} అంగీకరించండి",
+    "review": "reviewed",
+    "enHash": "0a165e85"
+  },
+  "orders.card.reject": {
+    "message": "తిరస్కరించండి",
+    "review": "reviewed",
+    "enHash": "2b03b592"
+  },
+  "orders.card.rejectA11y": {
+    "message": "ఆర్డర్ {number} తిరస్కరించండి",
+    "review": "reviewed",
+    "enHash": "36ba391b"
+  },
+  "orders.line.stock": {
+    "message": "{available, plural, =0 {స్టాక్ లేదు} other {# స్టాక్‌లో ఉన్నాయి}}",
+    "review": "reviewed",
+    "enHash": "7855eb20"
+  },
+  "orders.line.short": {
+    "message": "సరిపడా స్టాక్ లేదు",
+    "review": "reviewed",
+    "enHash": "357cd443"
+  },
+  "orders.card.partHint": {
+    "message": "{count, plural, one {ఒక ఐటమ్‌కు} other {# ఐటమ్‌లకు}} సరిపడా స్టాక్ లేదు. కొంత భాగం అంగీకరించండి, ఆర్డర్ తిరస్కరించండి, లేదా స్టాక్ అప్‌డేట్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "5becf839"
+  },
+  "orders.card.acceptPart": {
+    "message": "కొంత భాగం అంగీకరించండి",
+    "review": "reviewed",
+    "enHash": "85461124"
+  },
+  "orders.card.acceptPartA11y": {
+    "message": "ఆర్డర్ {number} లో కొంత భాగం అంగీకరించండి",
+    "review": "reviewed",
+    "enHash": "d5ce1cd5"
+  },
+  "orders.part.title": {
+    "message": "{number} లో కొంత భాగం అంగీకరించండి",
+    "review": "reviewed",
+    "enHash": "e3ff275a"
+  },
+  "orders.part.body": {
+    "message": "మీరు ఎన్ని ఇవ్వగలరో సెట్ చేయండి. కస్టమర్ మార్చిన ఆర్డర్ తీసుకుంటారు లేదా రద్దు చేస్తారు. వారు తీసుకునే వరకు ఏదీ ఉంచబడదు.",
+    "review": "reviewed",
+    "enHash": "557cf769"
+  },
+  "orders.part.asked": {
+    "message": "అడిగినవి {wanted} · {available, plural, =0 {స్టాక్ లేదు} other {# స్టాక్‌లో ఉన్నాయి}}",
+    "review": "reviewed",
+    "enHash": "486e6d3e"
+  },
+  "orders.part.add": {
+    "message": "జోడించండి",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "orders.part.less": {
+    "message": "ఒకటి తక్కువ",
+    "review": "reviewed",
+    "enHash": "05892c7d"
+  },
+  "orders.part.more": {
+    "message": "ఒకటి ఎక్కువ",
+    "review": "reviewed",
+    "enHash": "8c87ebbd"
+  },
+  "orders.part.none": {
+    "message": "కనీసం ఒక ఐటమ్ ఉంచండి. ఏమీ ఇవ్వకపోతే, ఆర్డర్ తిరస్కరించండి.",
+    "review": "reviewed",
+    "enHash": "0a99dc18"
+  },
+  "orders.part.full": {
+    "message": "కొంత భాగం అంగీకరించడానికి ఒక పరిమాణం తగ్గించండి, లేదా మొత్తం ఆర్డర్ అంగీకరించండి.",
+    "review": "reviewed",
+    "enHash": "986cfc79"
+  },
+  "orders.part.confirm": {
+    "message": "కస్టమర్‌కు పంపండి",
+    "review": "reviewed",
+    "enHash": "37a27bbf"
+  },
+  "orders.part.waiting": {
+    "message": "{customer} మార్చిన ఆర్డర్ తీసుకోవడానికి లేదా రద్దు చేయడానికి ఎదురుచూస్తున్నాం.",
+    "review": "reviewed",
+    "enHash": "ef6bbe9e"
+  },
+  "orders.line.partQty": {
+    "message": "{name} × {got} (అడిగినవి {wanted})",
+    "review": "reviewed",
+    "enHash": "37ce8600"
+  },
+  "orders.action.partSent": {
+    "message": "నిర్ధారణ కోసం కస్టమర్‌కు పంపాం.",
+    "review": "reviewed",
+    "enHash": "071f5405"
+  },
+  "orders.card.shortHint": {
+    "message": "{count, plural, one {ఒక ఐటమ్‌కు} other {# ఐటమ్‌లకు}} సరిపడా స్టాక్ లేదు. ఆర్డర్ తిరస్కరించండి, లేదా స్టాక్ అప్‌డేట్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "d8d167db"
+  },
+  "orders.line.qty": {
+    "message": "{name} × {qty}",
+    "review": "reviewed",
+    "enHash": "8c65377b"
+  },
+  "orders.status.placed": {
+    "message": "కొత్తది",
+    "review": "reviewed",
+    "enHash": "6403f2b7"
+  },
+  "orders.status.awaiting_customer": {
+    "message": "కస్టమర్ కోసం ఎదురుచూపు",
+    "review": "reviewed",
+    "enHash": "43bce849"
+  },
+  "orders.status.accepted": {
+    "message": "అంగీకరించారు",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "orders.status.ready": {
+    "message": "పికప్‌కు సిద్ధం",
+    "review": "reviewed",
+    "enHash": "f1ebfd93"
+  },
+  "orders.status.out_for_delivery": {
+    "message": "డెలివరీకి బయలుదేరింది",
+    "review": "reviewed",
+    "enHash": "111fb997"
+  },
+  "orders.status.collected": {
+    "message": "తీసుకున్నారు",
+    "review": "reviewed",
+    "enHash": "5b0f7590"
+  },
+  "orders.status.delivered": {
+    "message": "డెలివరీ అయింది",
+    "review": "reviewed",
+    "enHash": "eea956cd"
+  },
+  "orders.status.rejected": {
+    "message": "తిరస్కరించబడింది",
+    "review": "reviewed",
+    "enHash": "27eeb7a2"
+  },
+  "orders.status.expired": {
+    "message": "గడువు ముగిసింది",
+    "review": "reviewed",
+    "enHash": "a689a999"
+  },
+  "orders.status.cancelled": {
+    "message": "రద్దైంది",
+    "review": "reviewed",
+    "enHash": "a1bf92ef"
+  },
+  "orders.status.delivery_failed": {
+    "message": "డెలివరీ విఫలమైంది",
+    "review": "reviewed",
+    "enHash": "5a954eb2"
+  },
+  "orders.reason.out_of_stock": {
+    "message": "స్టాక్ లేదు",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "orders.reason.closing_soon": {
+    "message": "త్వరలో మూసివేస్తున్నాం",
+    "review": "reviewed",
+    "enHash": "7ad45de1"
+  },
+  "orders.reason.too_busy": {
+    "message": "ఇప్పుడు చాలా బిజీ",
+    "review": "reviewed",
+    "enHash": "89ccd171"
+  },
+  "orders.reason.cannot_deliver_address": {
+    "message": "ఈ చిరునామాకు డెలివరీ చేయలేం",
+    "review": "reviewed",
+    "enHash": "b84133a5"
+  },
+  "orders.reason.price_changed": {
+    "message": "ధర మారింది",
+    "review": "reviewed",
+    "enHash": "13faa9f2"
+  },
+  "orders.reason.customer_unreachable": {
+    "message": "కస్టమర్ అందుబాటులో లేరు",
+    "review": "reviewed",
+    "enHash": "e8851107"
+  },
+  "orders.reason.other": {
+    "message": "వేరే కారణం",
+    "review": "reviewed",
+    "enHash": "98ed119c"
+  },
+  "orders.reason.changed_mind": {
+    "message": "కస్టమర్ మనసు మార్చుకున్నారు",
+    "review": "reviewed",
+    "enHash": "870c267b"
+  },
+  "orders.reason.declined_partial": {
+    "message": "కస్టమర్ మార్పులను ఒప్పుకోలేదు",
+    "review": "reviewed",
+    "enHash": "7a478210"
+  },
+  "orders.reason.too_slow": {
+    "message": "కస్టమర్‌కు జవాబు చాలా ఆలస్యంగా అనిపించింది",
+    "review": "reviewed",
+    "enHash": "e7314a3d"
+  },
+  "orders.reason.partial_timeout": {
+    "message": "కస్టమర్ సమయానికి జవాబు ఇవ్వలేదు",
+    "review": "reviewed",
+    "enHash": "de5941fb"
+  },
+  "orders.reason.not_accepted": {
+    "message": "సమయానికి అంగీకరించలేదు",
+    "review": "reviewed",
+    "enHash": "54be7649"
+  },
+  "orders.reason.no_show": {
+    "message": "సమయానికి తీసుకోలేదు",
+    "review": "reviewed",
+    "enHash": "40a35d5a"
+  },
+  "orders.reason.address_not_found": {
+    "message": "చిరునామా దొరకలేదు",
+    "review": "reviewed",
+    "enHash": "849594a1"
+  },
+  "orders.reason.customer_refused": {
+    "message": "కస్టమర్ ఆర్డర్‌ను నిరాకరించారు",
+    "review": "reviewed",
+    "enHash": "1b2f2106"
+  },
+  "orders.reason.dispatch_timeout": {
+    "message": "సమయానికి పంపలేదు",
+    "review": "reviewed",
+    "enHash": "a3af10da"
+  },
+  "orders.reason.label": {
+    "message": "కారణం: {reason}",
+    "review": "reviewed",
+    "enHash": "f147508d"
+  },
+  "orders.reject.title": {
+    "message": "ఆర్డర్ {number} తిరస్కరించండి",
+    "review": "reviewed",
+    "enHash": "36ba391b"
+  },
+  "orders.reject.body": {
+    "message": "కారణం ఎంచుకోండి. కస్టమర్‌కు తెలియజేస్తాం.",
+    "review": "reviewed",
+    "enHash": "9a803948"
+  },
+  "orders.reject.confirm": {
+    "message": "ఆర్డర్ తిరస్కరించండి",
+    "review": "reviewed",
+    "enHash": "3f825b9d"
+  },
+  "orders.cancel.title": {
+    "message": "ఆర్డర్ {number} రద్దు చేయండి",
+    "review": "reviewed",
+    "enHash": "225bf193"
+  },
+  "orders.cancel.body": {
+    "message": "ఉంచిన స్టాక్ విడుదల అవుతుంది, కస్టమర్‌కు తెలియజేస్తాం. కారణం ఎంచుకోండి.",
+    "review": "reviewed",
+    "enHash": "24d10967"
+  },
+  "orders.cancel.confirm": {
+    "message": "ఆర్డర్ రద్దు చేయండి",
+    "review": "reviewed",
+    "enHash": "5ae39c4a"
+  },
+  "orders.cancel.open": {
+    "message": "ఆర్డర్ రద్దు చేయండి",
+    "review": "reviewed",
+    "enHash": "5ae39c4a"
+  },
+  "orders.sheet.reason": {
+    "message": "కారణం",
+    "review": "reviewed",
+    "enHash": "f219cc06"
+  },
+  "orders.sheet.note": {
+    "message": "నోట్",
+    "review": "reviewed",
+    "enHash": "2c924e30"
+  },
+  "orders.sheet.noteHelp": {
+    "message": "ఏమైందో చెప్పండి. కస్టమర్ దీన్ని చూస్తారు.",
+    "review": "reviewed",
+    "enHash": "62165778"
+  },
+  "orders.sheet.back": {
+    "message": "ఆర్డర్ ఉంచండి",
+    "review": "reviewed",
+    "enHash": "3017312f"
+  },
+  "orders.sheet.close": {
+    "message": "మూసివేయండి",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "orders.detail.back": {
+    "message": "ఆర్డర్లకు వెనక్కి",
+    "review": "reviewed",
+    "enHash": "f02399a1"
+  },
+  "orders.detail.title": {
+    "message": "ఆర్డర్ {number}",
+    "review": "reviewed",
+    "enHash": "2daa0733"
+  },
+  "orders.detail.customer": {
+    "message": "కస్టమర్",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "orders.detail.phone": {
+    "message": "ఫోన్ {phone}",
+    "review": "reviewed",
+    "enHash": "f415f3a6"
+  },
+  "orders.detail.call": {
+    "message": "{phone} కి కాల్ చేయండి",
+    "review": "reviewed",
+    "enHash": "f9ea1a72"
+  },
+  "orders.detail.address": {
+    "message": "డెలివరీ చిరునామా",
+    "review": "reviewed",
+    "enHash": "beacd3ba"
+  },
+  "orders.detail.landmark": {
+    "message": "{landmark} దగ్గర",
+    "review": "reviewed",
+    "enHash": "a5d54d44"
+  },
+  "orders.detail.deliveryFee": {
+    "message": "డెలివరీ ఫీజు",
+    "review": "reviewed",
+    "enHash": "733b6148"
+  },
+  "orders.detail.deliveryFree": {
+    "message": "ఉచితం",
+    "review": "reviewed",
+    "enHash": "75f52718"
+  },
+  "orders.detail.payAtDoor": {
+    "message": "కస్టమర్ ఇంటి వద్ద చెల్లిస్తారు: నగదు లేదా UPI.",
+    "review": "reviewed",
+    "enHash": "fd0e5690"
+  },
+  "orders.detail.dispatch": {
+    "message": "పంపండి",
+    "review": "reviewed",
+    "enHash": "840e1b36"
+  },
+  "orders.detail.dispatchBy": {
+    "message": "{time} లోపు పంపండి, లేకపోతే ఆర్డర్ గడువు ముగుస్తుంది.",
+    "review": "reviewed",
+    "enHash": "f5c76435"
+  },
+  "orders.detail.items": {
+    "message": "ఐటమ్‌లు",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "orders.detail.total": {
+    "message": "మొత్తం",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "orders.detail.payAtShop": {
+    "message": "కస్టమర్ కౌంటర్ వద్ద చెల్లిస్తారు: నగదు లేదా UPI.",
+    "review": "reviewed",
+    "enHash": "45f597ab"
+  },
+  "orders.detail.paidWith": {
+    "message": "{method} ద్వారా చెల్లించారు",
+    "review": "reviewed",
+    "enHash": "b91f821a"
+  },
+  "orders.detail.progress": {
+    "message": "ఆర్డర్ పురోగతి",
+    "review": "reviewed",
+    "enHash": "fcbc4a3a"
+  },
+  "orders.detail.state.done": {
+    "message": "పూర్తయింది",
+    "review": "reviewed",
+    "enHash": "e5fd9cfe"
+  },
+  "orders.detail.state.upcoming": {
+    "message": "ఇంకా కాలేదు",
+    "review": "reviewed",
+    "enHash": "3a230353"
+  },
+  "orders.detail.state.failed": {
+    "message": "జరగలేదు",
+    "review": "reviewed",
+    "enHash": "aff78aa4"
+  },
+  "orders.detail.step.placed": {
+    "message": "ఆర్డర్ చేశారు",
+    "review": "reviewed",
+    "enHash": "bb5d68da"
+  },
+  "orders.detail.step.accepted": {
+    "message": "అంగీకరించారు",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "orders.detail.step.ready": {
+    "message": "పికప్‌కు సిద్ధం",
+    "review": "reviewed",
+    "enHash": "f1ebfd93"
+  },
+  "orders.detail.step.collected": {
+    "message": "అప్పగించాం",
+    "review": "reviewed",
+    "enHash": "435cd69c"
+  },
+  "orders.detail.step.out_for_delivery": {
+    "message": "డెలివరీకి బయలుదేరింది",
+    "review": "reviewed",
+    "enHash": "111fb997"
+  },
+  "orders.detail.step.delivered": {
+    "message": "డెలివరీ అయింది",
+    "review": "reviewed",
+    "enHash": "eea956cd"
+  },
+  "orders.detail.step.ended": {
+    "message": "{status}",
+    "review": "reviewed",
+    "enHash": "11e758b6"
+  },
+  "orders.detail.notFound": {
+    "message": "ఈ దుకాణానికి ఈ ఆర్డర్ దొరకలేదు.",
+    "review": "reviewed",
+    "enHash": "3bb68e08"
+  },
+  "orders.detail.ready": {
+    "message": "సిద్ధం అని గుర్తించండి",
+    "review": "reviewed",
+    "enHash": "e6c9229a"
+  },
+  "orders.detail.readyHelp": {
+    "message": "ఐచ్ఛికం. ప్యాక్ అయిందని కస్టమర్‌కు చెప్పండి.",
+    "review": "reviewed",
+    "enHash": "dbb77885"
+  },
+  "orders.detail.holdUntil": {
+    "message": "కస్టమర్ కోసం {time} వరకు ఉంచాం",
+    "review": "reviewed",
+    "enHash": "f1170404"
+  },
+  "orders.code.title": {
+    "message": "కస్టమర్ కోడ్‌తో అప్పగించండి",
+    "review": "reviewed",
+    "enHash": "220b2fb7"
+  },
+  "orders.code.label": {
+    "message": "కస్టమర్ 4 అంకెల కోడ్",
+    "review": "reviewed",
+    "enHash": "dafa146c"
+  },
+  "orders.code.digit": {
+    "message": "అంకె {n}",
+    "review": "reviewed",
+    "enHash": "095a7075"
+  },
+  "orders.code.help": {
+    "message": "కస్టమర్‌ను వారి ఫోన్‌లో కోడ్ చూపించమని అడగండి.",
+    "review": "reviewed",
+    "enHash": "711d2b81"
+  },
+  "orders.code.payment": {
+    "message": "వారు ఎలా చెల్లించారు?",
+    "review": "reviewed",
+    "enHash": "492418af"
+  },
+  "orders.code.pay.cash": {
+    "message": "నగదు",
+    "review": "reviewed",
+    "enHash": "758ec54e"
+  },
+  "orders.code.pay.upi": {
+    "message": "UPI",
+    "review": "reviewed",
+    "enHash": "f295b2cd"
+  },
+  "orders.code.pay.card": {
+    "message": "కార్డ్",
+    "review": "reviewed",
+    "enHash": "4d4ce73b"
+  },
+  "orders.code.pay.other": {
+    "message": "ఇతర",
+    "review": "reviewed",
+    "enHash": "6e6a6f20"
+  },
+  "orders.code.submit": {
+    "message": "ఆర్డర్ అప్పగించండి",
+    "review": "reviewed",
+    "enHash": "0f29d329"
+  },
+  "orders.code.submitting": {
+    "message": "కోడ్ తనిఖీ చేస్తున్నాం",
+    "review": "reviewed",
+    "enHash": "90adc49f"
+  },
+  "orders.code.invalid": {
+    "message": "ఆ కోడ్ సరైనది కాదు. {left, plural, =0 {ప్రయత్నాలు మిగల్లేదు.} one {# ప్రయత్నం మిగిలి ఉంది.} other {# ప్రయత్నాలు మిగిలి ఉన్నాయి.}}",
+    "review": "reviewed",
+    "enHash": "41870020"
+  },
+  "orders.code.locked.title": {
+    "message": "కోడ్ ఎంట్రీ లాక్ అయింది",
+    "review": "reviewed",
+    "enHash": "3208ad4c"
+  },
+  "orders.code.locked.body": {
+    "message": "చాలా తప్పు కోడ్‌లు. కస్టమర్ తమ యాప్‌లో కొత్త కోడ్ అడగవచ్చు, తర్వాత మీరు మళ్ళీ ప్రయత్నించవచ్చు.",
+    "review": "reviewed",
+    "enHash": "90ce4e8c"
+  },
+  "orders.code.attemptsLeft": {
+    "message": "{left, plural, one {# ప్రయత్నం మిగిలి ఉంది} other {# ప్రయత్నాలు మిగిలి ఉన్నాయి}}",
+    "review": "reviewed",
+    "enHash": "e128755c"
+  },
+  "orders.code.done": {
+    "message": "ఆర్డర్ అప్పగించాం.",
+    "review": "reviewed",
+    "enHash": "6bc4370b"
+  },
+  "orders.code.delivery.title": {
+    "message": "కస్టమర్ కోడ్‌తో డెలివరీ చేయండి",
+    "review": "reviewed",
+    "enHash": "1661f447"
+  },
+  "orders.code.delivery.submit": {
+    "message": "డెలివరీ అయిందని గుర్తించండి",
+    "review": "reviewed",
+    "enHash": "2a90783e"
+  },
+  "orders.code.delivery.done": {
+    "message": "ఆర్డర్ డెలివరీ అయింది.",
+    "review": "reviewed",
+    "enHash": "3e326553"
+  },
+  "orders.failed.open": {
+    "message": "డెలివరీ విఫలమైంది",
+    "review": "reviewed",
+    "enHash": "5a954eb2"
+  },
+  "orders.failed.title": {
+    "message": "{number} డెలివరీ విఫలమైందా?",
+    "review": "reviewed",
+    "enHash": "e7d49a1b"
+  },
+  "orders.failed.body": {
+    "message": "కస్టమర్‌కు కారణం చెప్పండి. తర్వాత సరుకు తిరిగి వచ్చిందో లేదో మీరు నిర్ధారిస్తారు.",
+    "review": "reviewed",
+    "enHash": "0b239d43"
+  },
+  "orders.failed.confirm": {
+    "message": "డెలివరీ విఫలమైందని గుర్తించండి",
+    "review": "reviewed",
+    "enHash": "1fe1e5fd"
+  },
+  "orders.return.title": {
+    "message": "వాపసు",
+    "review": "reviewed",
+    "enHash": "24f096b2"
+  },
+  "orders.return.question": {
+    "message": "సరుకు తిరిగి వచ్చిందా?",
+    "review": "reviewed",
+    "enHash": "1886718f"
+  },
+  "orders.return.failedAgo": {
+    "message": "{time} క్రితం విఫలమైంది",
+    "review": "reviewed",
+    "enHash": "77ee2377"
+  },
+  "orders.return.help": {
+    "message": "అవును అంటే స్టాక్ మళ్ళీ అమ్మకానికి వస్తుంది. కాదు అంటే పాడైనదిగా నమోదు అవుతుంది.",
+    "review": "reviewed",
+    "enHash": "a6ad9693"
+  },
+  "orders.return.yes": {
+    "message": "అవును, అన్నీ వచ్చాయి",
+    "review": "reviewed",
+    "enHash": "6619727c"
+  },
+  "orders.return.no": {
+    "message": "కాదు, పాడైంది",
+    "review": "reviewed",
+    "enHash": "04f22e97"
+  },
+  "orders.return.askManager": {
+    "message": "పాడైనది నమోదు చేయడానికి మేనేజర్‌ను అడగండి",
+    "review": "reviewed",
+    "enHash": "0bf657cb"
+  },
+  "orders.return.askManagerBody": {
+    "message": "సరుకు పూర్తిగా తిరిగి రాకపోతే, మేనేజర్ లేదా యజమాని మాత్రమే పాడైనది నమోదు చేయగలరు.",
+    "review": "reviewed",
+    "enHash": "4e4bbf79"
+  },
+  "orders.return.outcome.returned": {
+    "message": "సరుకు తిరిగి వచ్చింది. స్టాక్ మళ్ళీ అమ్మకానికి ఉంది.",
+    "review": "reviewed",
+    "enHash": "b39d86eb"
+  },
+  "orders.return.outcome.damaged": {
+    "message": "పాడైనదిగా నమోదు చేశాం.",
+    "review": "reviewed",
+    "enHash": "250593a6"
+  },
+  "orders.return.outcome.unconfirmed": {
+    "message": "72 h తర్వాత దానంతట అదే నిర్ధారించబడింది. ఎవరూ జవాబు ఇవ్వలేదు, అందుకే స్టాక్ మళ్ళీ అమ్మకానికి వచ్చింది.",
+    "review": "reviewed",
+    "enHash": "8db405ce"
+  },
+  "orders.return.short.returned": {
+    "message": "తిరిగి వచ్చింది",
+    "review": "reviewed",
+    "enHash": "870770a9"
+  },
+  "orders.return.short.damaged": {
+    "message": "పాడైంది",
+    "review": "reviewed",
+    "enHash": "052fc798"
+  },
+  "orders.return.short.unconfirmed": {
+    "message": "72 h తర్వాత దానంతట అదే నిర్ధారించబడింది",
+    "review": "reviewed",
+    "enHash": "1b5b5825"
+  },
+  "orders.since.hours": {
+    "message": "{h} h {m} min",
+    "review": "reviewed",
+    "enHash": "2a46291f"
+  },
+  "orders.since.minutes": {
+    "message": "{m} min",
+    "review": "reviewed",
+    "enHash": "a47d8efb"
+  },
+  "orders.action.accepted": {
+    "message": "ఆర్డర్ అంగీకరించాం.",
+    "review": "reviewed",
+    "enHash": "b987ceeb"
+  },
+  "orders.action.rejected": {
+    "message": "ఆర్డర్ తిరస్కరించాం.",
+    "review": "reviewed",
+    "enHash": "40985d86"
+  },
+  "orders.action.ready": {
+    "message": "సిద్ధం అని గుర్తించాం.",
+    "review": "reviewed",
+    "enHash": "d4bce752"
+  },
+  "orders.action.cancelled": {
+    "message": "ఆర్డర్ రద్దు చేశాం.",
+    "review": "reviewed",
+    "enHash": "c3ca8f89"
+  },
+  "orders.action.dispatched": {
+    "message": "ఆర్డర్ డెలివరీకి పంపాం.",
+    "review": "reviewed",
+    "enHash": "12e340d8"
+  },
+  "orders.action.failed": {
+    "message": "డెలివరీ విఫలమైందని గుర్తించాం.",
+    "review": "reviewed",
+    "enHash": "113e6ed7"
+  },
+  "orders.action.return.returned": {
+    "message": "స్టాక్ మళ్ళీ అమ్మకానికి ఉంది.",
+    "review": "reviewed",
+    "enHash": "44085f11"
+  },
+  "orders.action.return.damaged": {
+    "message": "పాడైనది నమోదు చేశాం.",
+    "review": "reviewed",
+    "enHash": "18ce297f"
+  },
+  "orders.error.generic": {
+    "message": "అది కుదరలేదు. దయచేసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "13555662"
+  },
+  "orders.error.insufficient_stock": {
+    "message": "ఒక ఐటమ్‌కు సరిపడా స్టాక్ లేదు. స్టాక్ చూసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "849a244f"
+  },
+  "orders.error.invalid_transition": {
+    "message": "ఈ ఆర్డర్ ఇప్పటికే మారింది. తాజాది చూపిస్తున్నాం.",
+    "review": "reviewed",
+    "enHash": "1e269238"
+  },
+  "orders.error.forbidden": {
+    "message": "అది చేయడానికి మీకు అనుమతి లేదు.",
+    "review": "reviewed",
+    "enHash": "c89b024b"
+  },
+  "orders.error.validation_failed": {
+    "message": "వివరాలు చూసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "7f48376a"
+  },
+  "orders.error.expired": {
+    "message": "ఈ ఆర్డర్‌ను అంగీకరించే సమయం అయిపోయింది.",
+    "review": "reviewed",
+    "enHash": "2ae054b1"
+  }
+}

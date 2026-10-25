@@ -1,0 +1,327 @@
+{
+  "credits.title": {
+    "message": "క్రెడిట్లు, రిఫరల్స్",
+    "review": "reviewed",
+    "enHash": "e9796059"
+  },
+  "credits.loading": {
+    "message": "క్రెడిట్లు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "1ff7a2d9"
+  },
+  "credits.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "credits.error.title": {
+    "message": "మీ దుకాణాలను లోడ్ చేయలేకపోయాం",
+    "review": "reviewed",
+    "enHash": "427c23ba"
+  },
+  "credits.error.body": {
+    "message": "మీ ఇంటర్నెట్ చూసుకుని మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "credits.noStore.title": {
+    "message": "ముందు దుకాణాన్ని ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "credits.noStore.body": {
+    "message": "క్రెడిట్లు ఒక దుకాణానికి చెందుతాయి. మీరు పనిచేస్తున్న దుకాణాన్ని ఎంచుకోండి.",
+    "review": "reviewed",
+    "enHash": "ffdf45d1"
+  },
+  "credits.noStore.action": {
+    "message": "దుకాణాన్ని ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "credits.manager.title": {
+    "message": "మేనేజర్‌ను అడగండి",
+    "review": "reviewed",
+    "enHash": "aa2dd365"
+  },
+  "credits.manager.body": {
+    "message": "క్రెడిట్లు, రిఫరల్స్, స్టాండీ యజమానులు, మేనేజర్ల కోసం.",
+    "review": "reviewed",
+    "enHash": "3a43a3e3"
+  },
+  "credits.account.title": {
+    "message": "క్రెడిట్ ఖాతా",
+    "review": "reviewed",
+    "enHash": "1a59b98e"
+  },
+  "credits.account.balance": {
+    "message": "బ్యాలెన్స్",
+    "review": "reviewed",
+    "enHash": "90eef613"
+  },
+  "credits.account.credits": {
+    "message": "{count, plural, one {# క్రెడిట్} other {# క్రెడిట్లు}}",
+    "review": "reviewed",
+    "enHash": "699b6117"
+  },
+  "credits.account.negative": {
+    "message": "మైనస్ బ్యాలెన్స్ ముందుకు కొనసాగుతుంది, పేఅవుట్ సమయంలో తీసివేయబడుతుంది.",
+    "review": "reviewed",
+    "enHash": "89430656"
+  },
+  "credits.account.error": {
+    "message": "మీ క్రెడిట్ ఖాతాను లోడ్ చేయలేకపోయాం.",
+    "review": "reviewed",
+    "enHash": "5c888d41"
+  },
+  "credits.lines.label": {
+    "message": "క్రెడిట్ ఖాతా ఎంట్రీలు",
+    "review": "reviewed",
+    "enHash": "0106aad6"
+  },
+  "credits.lines.empty.title": {
+    "message": "ఇంకా క్రెడిట్ లావాదేవీలు లేవు",
+    "review": "reviewed",
+    "enHash": "aa1820ee"
+  },
+  "credits.lines.empty.body": {
+    "message": "కస్టమర్లు మీ దుకాణంలో ఖర్చు చేసే క్రెడిట్లు, మీరు ఇచ్చే క్యాష్‌బ్యాక్ ఇక్కడ కనిపిస్తాయి.",
+    "review": "reviewed",
+    "enHash": "84011ab9"
+  },
+  "credits.lines.more": {
+    "message": "పాత ఎంట్రీలు చూపించండి",
+    "review": "reviewed",
+    "enHash": "d99d5681"
+  },
+  "credits.lines.loading": {
+    "message": "పాత ఎంట్రీలు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "fb0e4bcf"
+  },
+  "credits.lines.error": {
+    "message": "మరిన్ని ఎంట్రీలు లోడ్ చేయలేకపోయాం. మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "25d59ed3"
+  },
+  "credits.line.spent": {
+    "message": "మీ దుకాణంలో ఖర్చైన క్రెడిట్లు",
+    "review": "reviewed",
+    "enHash": "577a1d99"
+  },
+  "credits.line.cashback": {
+    "message": "మీరు ఇచ్చిన క్యాష్‌బ్యాక్",
+    "review": "reviewed",
+    "enHash": "b448f6f5"
+  },
+  "credits.line.referral_reward": {
+    "message": "రిఫరల్ బహుమతి",
+    "review": "reviewed",
+    "enHash": "6fc3bbab"
+  },
+  "credits.line.pos_reversal": {
+    "message": "అమ్మకం రివర్స్ అయింది",
+    "review": "reviewed",
+    "enHash": "e17f3704"
+  },
+  "credits.line.payout": {
+    "message": "పేఅవుట్",
+    "review": "reviewed",
+    "enHash": "9bb39694"
+  },
+  "credits.line.adjustment": {
+    "message": "సవరణ",
+    "review": "reviewed",
+    "enHash": "7f0496ac"
+  },
+  "credits.line.added": {
+    "message": "జోడించబడింది",
+    "review": "reviewed",
+    "enHash": "b68734c2"
+  },
+  "credits.line.taken": {
+    "message": "తీసివేయబడింది",
+    "review": "reviewed",
+    "enHash": "7ee5528e"
+  },
+  "credits.ref.order": {
+    "message": "ఆర్డర్ {ref}",
+    "review": "reviewed",
+    "enHash": "6b45f123"
+  },
+  "credits.ref.sale": {
+    "message": "అమ్మకం {ref}",
+    "review": "reviewed",
+    "enHash": "aae9dff8"
+  },
+  "credits.payouts.title": {
+    "message": "పేఅవుట్‌లు ఎలా పనిచేస్తాయి",
+    "review": "reviewed",
+    "enHash": "8bc68cc7"
+  },
+  "credits.payouts.in": {
+    "message": "కస్టమర్లు మీ దుకాణంలో క్రెడిట్లు ఖర్చు చేసినప్పుడు, మీ రిఫరల్స్‌కు బహుమతి వచ్చినప్పుడు క్రెడిట్లు వస్తాయి.",
+    "review": "reviewed",
+    "enHash": "e43f875a"
+  },
+  "credits.payouts.out": {
+    "message": "మీరు ఇచ్చే క్యాష్‌బ్యాక్, రివర్స్ అయిన అమ్మకాలు, పేఅవుట్‌లలో క్రెడిట్లు వెళ్తాయి.",
+    "review": "reviewed",
+    "enHash": "50227aac"
+  },
+  "credits.payouts.statement": {
+    "message": "స్టేట్‌మెంట్‌లు ప్రతి నెల 1వ తేదీన ముగుస్తాయి.",
+    "review": "reviewed",
+    "enHash": "b06786bc"
+  },
+  "credits.payouts.amount": {
+    "message": "మీ పేఅవుట్ అంటే మీ క్రెడిట్ బ్యాలెన్స్ నుంచి ఇంకా చెల్లించని పేఅవుట్ తీసివేయగా వచ్చేది.",
+    "review": "reviewed",
+    "enHash": "a7ae6425"
+  },
+  "credits.payouts.paid": {
+    "message": "TodayZ మీకు UPI ద్వారా చెల్లించి, రిఫరెన్స్ నమోదు చేసిన తర్వాతే పేఅవుట్ 'చెల్లించబడింది' అని కనిపిస్తుంది.",
+    "review": "reviewed",
+    "enHash": "eef9c25d"
+  },
+  "credits.payouts.holds": {
+    "message": "KYC అసంపూర్తిగా ఉన్నా, మోసం అనుమానం ఉన్నా, బిజినెస్ నిలిపివేయబడినా పేఅవుట్ ఆపబడుతుంది.",
+    "review": "reviewed",
+    "enHash": "78983e75"
+  },
+  "credits.statements.title": {
+    "message": "నెలవారీ స్టేట్‌మెంట్‌లు",
+    "review": "reviewed",
+    "enHash": "f4d5c628"
+  },
+  "credits.statements.soon": {
+    "message": "నెలవారీ స్టేట్‌మెంట్‌లు త్వరలో వస్తున్నాయి.",
+    "review": "reviewed",
+    "enHash": "8916c368"
+  },
+  "credits.standee.title": {
+    "message": "QR స్టాండీ",
+    "review": "reviewed",
+    "enHash": "db442fbd"
+  },
+  "credits.standee.body": {
+    "message": "{store} కోసం ప్రింట్ చేయగల A5 స్టాండీ. కస్టమర్లు దీన్ని స్కాన్ చేసి మీ దుకాణాన్ని తెరుస్తారు.",
+    "review": "reviewed",
+    "enHash": "662cecd3"
+  },
+  "credits.standee.shortCode": {
+    "message": "చిన్న కోడ్",
+    "review": "reviewed",
+    "enHash": "7545309d"
+  },
+  "credits.standee.preview": {
+    "message": "PDF ప్రివ్యూ",
+    "review": "reviewed",
+    "enHash": "37b66fde"
+  },
+  "credits.standee.download": {
+    "message": "A5 PDF డౌన్‌లోడ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "d5f56067"
+  },
+  "credits.standee.preparing": {
+    "message": "PDF సిద్ధమవుతోంది",
+    "review": "reviewed",
+    "enHash": "cc44de09"
+  },
+  "credits.standee.open": {
+    "message": "స్టాండీ ఆప్షన్లు",
+    "review": "reviewed",
+    "enHash": "62238373"
+  },
+  "credits.standee.error": {
+    "message": "స్టాండీని సిద్ధం చేయలేకపోయాం. మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "9f51d4bd"
+  },
+  "credits.referral.title": {
+    "message": "ఒక దుకాణాన్ని రిఫర్ చేయండి",
+    "review": "reviewed",
+    "enHash": "f3669d74"
+  },
+  "credits.referral.body": {
+    "message": "మీ కోడ్‌ను మరో దుకాణం యజమానితో షేర్ చేయండి. వారి దుకాణానికి మొదటి ఆర్డర్లు వచ్చినప్పుడు మీకు క్రెడిట్లు వస్తాయి.",
+    "review": "reviewed",
+    "enHash": "839b007c"
+  },
+  "credits.referral.codeLabel": {
+    "message": "మీ రిఫరల్ కోడ్",
+    "review": "reviewed",
+    "enHash": "4b8a4a39"
+  },
+  "credits.referral.copy": {
+    "message": "కోడ్ కాపీ చేయండి",
+    "review": "reviewed",
+    "enHash": "6c106927"
+  },
+  "credits.referral.copied": {
+    "message": "కోడ్ కాపీ అయింది",
+    "review": "reviewed",
+    "enHash": "1cca33a6"
+  },
+  "credits.referral.copyLink": {
+    "message": "లింక్ కాపీ చేయండి",
+    "review": "reviewed",
+    "enHash": "2f84eea5"
+  },
+  "credits.referral.linkCopied": {
+    "message": "లింక్ కాపీ అయింది",
+    "review": "reviewed",
+    "enHash": "c2e98476"
+  },
+  "credits.referral.copyFailed": {
+    "message": "కాపీ చేయలేకపోయాం. టెక్స్ట్‌ను ఎంచుకుని మీరే కాపీ చేయండి.",
+    "review": "reviewed",
+    "enHash": "2a15aec7"
+  },
+  "credits.referral.share": {
+    "message": "షేర్ చేయండి",
+    "review": "reviewed",
+    "enHash": "09ca55ca"
+  },
+  "credits.referral.shareTitle": {
+    "message": "TodayZ లో చేరండి",
+    "review": "reviewed",
+    "enHash": "84e86c58"
+  },
+  "credits.referral.pending": {
+    "message": "మొదటి ఆర్డర్ల కోసం వేచి ఉంది",
+    "review": "reviewed",
+    "enHash": "ec114479"
+  },
+  "credits.referral.rewarded": {
+    "message": "బహుమతి ఇవ్వబడింది",
+    "review": "reviewed",
+    "enHash": "8e773327"
+  },
+  "credits.referral.count": {
+    "message": "{count, plural, one {# దుకాణం} other {# దుకాణాలు}}",
+    "review": "reviewed",
+    "enHash": "ac03bc4f"
+  },
+  "credits.referral.where": {
+    "message": "బహుమతులు మీ ప్రధాన దుకాణం క్రెడిట్ ఖాతాలో జమ అవుతాయి.",
+    "review": "reviewed",
+    "enHash": "e023e087"
+  },
+  "credits.referral.error": {
+    "message": "మీ రిఫరల్ కోడ్‌ను లోడ్ చేయలేకపోయాం.",
+    "review": "reviewed",
+    "enHash": "8b449a2b"
+  },
+  "credits.referral.earned": {
+    "message": "సంపాదించిన క్రెడిట్లు",
+    "review": "reviewed",
+    "enHash": "89e38aea"
+  },
+  "credits.referral.earnedValue": {
+    "message": "{credits, plural, one {# క్రెడిట్} other {# క్రెడిట్లు}}",
+    "review": "reviewed",
+    "enHash": "4854c909"
+  }
+}

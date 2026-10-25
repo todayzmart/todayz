@@ -1,0 +1,992 @@
+{
+  "pos.title": {
+    "message": "விற்பனை",
+    "review": "reviewed",
+    "enHash": "fa3cf2ad"
+  },
+  "pos.loading": {
+    "message": "கவுண்டர் ஏற்றப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "f1beca55"
+  },
+  "pos.close": {
+    "message": "மூடவும்",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "pos.error.title": {
+    "message": "கவுண்டரைத் திறக்க முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "74b273cf"
+  },
+  "pos.error.body": {
+    "message": "உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும். இந்தச் சாதனத்தில் கவுண்டர் ஒருமுறை திறந்துவிட்டால், இணைப்பு இல்லாமலும் வேலை செய்யும்.",
+    "review": "reviewed",
+    "enHash": "09c4858a"
+  },
+  "pos.error.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "pos.noStore.title": {
+    "message": "முதலில் ஒரு கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "pos.noStore.body": {
+    "message": "கவுண்டர் ஒரு நேரத்தில் ஒரு கடையிலிருந்து மட்டுமே விற்கும்.",
+    "review": "reviewed",
+    "enHash": "3fb740a8"
+  },
+  "pos.noStore.action": {
+    "message": "கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "pos.browse.label": {
+    "message": "பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "pos.search.label": {
+    "message": "பொருளைத் தேடவும் அல்லது ஸ்கேன் செய்யவும்",
+    "review": "reviewed",
+    "enHash": "c002e92e"
+  },
+  "pos.search.placeholder": {
+    "message": "பொருளைத் தேடவும் அல்லது ஸ்கேன் செய்யவும்",
+    "review": "reviewed",
+    "enHash": "c002e92e"
+  },
+  "pos.search.clear": {
+    "message": "தேடலை அழிக்கவும்",
+    "review": "reviewed",
+    "enHash": "67300d0f"
+  },
+  "pos.search.none.title": {
+    "message": "\"{query}\" க்கு எதுவும் கிடைக்கவில்லை",
+    "review": "reviewed",
+    "enHash": "31fd2b2b"
+  },
+  "pos.search.none.body": {
+    "message": "இதை விலையுடன் இந்த பில்லில் ஒருமுறைப் பொருளாகச் சேர்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "84cd59bd"
+  },
+  "pos.tiles.title": {
+    "message": "விரைவுப் பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "9d4bbb51"
+  },
+  "pos.tile.inStock": {
+    "message": "ஸ்டாக்கில் {count}",
+    "review": "reviewed",
+    "enHash": "9ffca181"
+  },
+  "pos.tile.out": {
+    "message": "ஸ்டாக் இல்லை",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "pos.tile.countNeeded": {
+    "message": "எண்ணிக்கை தேவை",
+    "review": "reviewed",
+    "enHash": "a5bead5a"
+  },
+  "pos.catalogue.empty.title": {
+    "message": "இந்தச் சாதனத்தில் இன்னும் பொருட்கள் இல்லை",
+    "review": "reviewed",
+    "enHash": "c9c7b252"
+  },
+  "pos.catalogue.empty.body": {
+    "message": "உங்கள் பொருட்களை ஏற்ற ஒருமுறை இணையுங்கள், அல்லது பில்லில் ஒருமுறைப் பொருளைச் சேர்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "259cd91d"
+  },
+  "pos.sales.open": {
+    "message": "விற்பனைகள்",
+    "review": "reviewed",
+    "enHash": "d0edfb6e"
+  },
+  "pos.sales.openAttention": {
+    "message": "விற்பனைகள் · {count} சரிபார்க்க வேண்டும்",
+    "review": "reviewed",
+    "enHash": "3e248677"
+  },
+  "pos.banner.notDurable.title": {
+    "message": "இந்தச் சாதனத்தில் விற்பனைகள் சேமிக்கப்படவில்லை",
+    "review": "reviewed",
+    "enHash": "a00687ff"
+  },
+  "pos.banner.notDurable.body": {
+    "message": "இந்த உலாவி சேமிப்பகத்தைத் தடுக்கிறது. ஒவ்வொரு விற்பனையும் ஒத்திசைக்கப்படும் வரை இந்தப் பக்கத்தைத் திறந்து வைக்கவும்.",
+    "review": "reviewed",
+    "enHash": "cb5f1125"
+  },
+  "pos.banner.rejected.title": {
+    "message": "{count, plural, one {# விற்பனைக்கு உங்கள் கவனம் தேவை} other {# விற்பனைகளுக்கு உங்கள் கவனம் தேவை}}",
+    "review": "reviewed",
+    "enHash": "8841a4a7"
+  },
+  "pos.banner.rejected.action": {
+    "message": "பார்க்கவும்",
+    "review": "reviewed",
+    "enHash": "e29a79fe"
+  },
+  "pos.banner.offline.title": {
+    "message": "ஆஃப்லைன் · {count, plural, =0 {எந்த விற்பனையும் காத்திருக்கவில்லை} one {# விற்பனை ஒத்திசைவுக்குக் காத்திருக்கிறது} other {# விற்பனைகள் ஒத்திசைவுக்குக் காத்திருக்கின்றன}}",
+    "review": "reviewed",
+    "enHash": "3d9ecc43"
+  },
+  "pos.banner.offline.body": {
+    "message": "நீங்கள் தொடர்ந்து விற்கலாம். விற்பனைகள் இங்கே சேமிக்கப்பட்டு, மீண்டும் ஆன்லைனில் வந்ததும் ஒத்திசைக்கப்படும்.",
+    "review": "reviewed",
+    "enHash": "a3fbeb75"
+  },
+  "pos.banner.waiting.title": {
+    "message": "{count, plural, one {# விற்பனை ஒத்திசைவுக்குக் காத்திருக்கிறது} other {# விற்பனைகள் ஒத்திசைவுக்குக் காத்திருக்கின்றன}}",
+    "review": "reviewed",
+    "enHash": "fca44f24"
+  },
+  "pos.banner.waiting.body": {
+    "message": "அவை பின்னணியில் அனுப்பப்படும். நீங்கள் எதுவும் செய்ய வேண்டாம்.",
+    "review": "reviewed",
+    "enHash": "46a8c0dc"
+  },
+  "pos.banner.short.title": {
+    "message": "{count, plural, one {# பொருள்} other {# பொருட்கள்}} கையிருப்பு எண்ணிக்கையை விட அதிகம்",
+    "review": "reviewed",
+    "enHash": "96a4287f"
+  },
+  "pos.banner.short.body": {
+    "message": "இருந்தாலும் நீங்கள் விற்கலாம். ஸ்டாக் எண்ணிக்கை மறு எண்ணிக்கைக்குக் குறிக்கப்படும்.",
+    "review": "reviewed",
+    "enHash": "6f3c3731"
+  },
+  "pos.banner.linkDropped.title": {
+    "message": "வாடிக்கையாளர் இணைப்பு நீக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "9d6196d7"
+  },
+  "pos.banner.linkDropped.body": {
+    "message": "QR காட்டிய பிறகு பில் மாறியது. கிரெடிட் பயன்படுத்த வாடிக்கையாளரை மீண்டும் இணைக்கவும்.",
+    "review": "reviewed",
+    "enHash": "1d0ce2ea"
+  },
+  "pos.charge.failed.title": {
+    "message": "விற்பனையைச் சேமிக்க முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "e427f06a"
+  },
+  "pos.charge.failed.body": {
+    "message": "பில் இன்னும் இங்கே உள்ளது. மீண்டும் சார்ஜ் செய்யவும்.",
+    "review": "reviewed",
+    "enHash": "ce0f5f1e"
+  },
+  "pos.done.synced": {
+    "message": "{total} விற்பனை முடிந்தது",
+    "review": "reviewed",
+    "enHash": "02042f91"
+  },
+  "pos.done.waiting": {
+    "message": "{total} விற்பனை இந்தச் சாதனத்தில் சேமிக்கப்பட்டது. ஆன்லைனில் வந்ததும் ஒத்திசைக்கப்படும்.",
+    "review": "reviewed",
+    "enHash": "6fb0cfc5"
+  },
+  "pos.done.rejected": {
+    "message": "{total} விற்பனை நிராகரிக்கப்பட்டது. காரணத்தைப் பார்க்க விற்பனைப் பட்டியலைத் திறக்கவும்.",
+    "review": "reviewed",
+    "enHash": "1ad691cd"
+  },
+  "pos.done.receipt": {
+    "message": "ரசீது",
+    "review": "reviewed",
+    "enHash": "f6ce3b6f"
+  },
+  "pos.cart.label": {
+    "message": "தற்போதைய பில்",
+    "review": "reviewed",
+    "enHash": "a64c72ef"
+  },
+  "pos.cart.phone": {
+    "message": "வாடிக்கையாளர் தொலைபேசி",
+    "review": "reviewed",
+    "enHash": "7689682e"
+  },
+  "pos.cart.phonePlaceholder": {
+    "message": "வாடிக்கையாளர் தொலைபேசி (விருப்பத்தேர்வு)",
+    "review": "reviewed",
+    "enHash": "60d44f84"
+  },
+  "pos.cart.empty": {
+    "message": "பில்லைத் தொடங்க ஒரு பொருளை ஸ்கேன் செய்யவும் அல்லது தட்டவும்.",
+    "review": "reviewed",
+    "enHash": "8eba9230"
+  },
+  "pos.cart.add": {
+    "message": "சேர்",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "pos.cart.less": {
+    "message": "ஒன்றைக் குறைக்கவும்",
+    "review": "reviewed",
+    "enHash": "afbcf5f3"
+  },
+  "pos.cart.more": {
+    "message": "ஒன்றைச் சேர்க்கவும்",
+    "review": "reviewed",
+    "enHash": "bb49f016"
+  },
+  "pos.cart.lineDetailDiscount": {
+    "message": "ஒவ்வொன்றும் {price} · {discount} தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "7922a98a"
+  },
+  "pos.cart.summary": {
+    "message": "{count, plural, one {# பொருள்} other {# பொருட்கள்}}",
+    "review": "reviewed",
+    "enHash": "f34cfa9c"
+  },
+  "pos.cart.view": {
+    "message": "பில்லைப் பார்க்கவும்",
+    "review": "reviewed",
+    "enHash": "ee721f1b"
+  },
+  "pos.cart.charge": {
+    "message": "சார்ஜ் செய்",
+    "review": "reviewed",
+    "enHash": "d4e1aee4"
+  },
+  "pos.cart.charging": {
+    "message": "சார்ஜ் செய்யப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "5f99fe21"
+  },
+  "pos.cart.subtotal": {
+    "message": "துணைத்தொகை",
+    "review": "reviewed",
+    "enHash": "97f7359e"
+  },
+  "pos.cart.billDiscount": {
+    "message": "தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.cart.roundOff": {
+    "message": "முழுமையாக்கல்",
+    "review": "reviewed",
+    "enHash": "3aa7ebde"
+  },
+  "pos.cart.credits": {
+    "message": "கிரெடிட்",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "pos.cart.linkCustomer": {
+    "message": "வாடிக்கையாளரை இணைக்கவும்",
+    "review": "reviewed",
+    "enHash": "e051d869"
+  },
+  "pos.cart.unlink": {
+    "message": "நீக்கவும்",
+    "review": "reviewed",
+    "enHash": "e963907d"
+  },
+  "pos.cart.discount": {
+    "message": "தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.cart.clear": {
+    "message": "பில்லை அழிக்கவும்",
+    "review": "reviewed",
+    "enHash": "bbb4902a"
+  },
+  "pos.cart.link.billQr": {
+    "message": "பில் QR மூலம் இணைக்கப்பட்டது · {credits, plural, =0 {கிரெடிட் எதுவும் பயன்படுத்தவில்லை} one {# கிரெடிட் பயன்படுத்தப்பட்டது} other {# கிரெடிட் பயன்படுத்தப்பட்டன}}",
+    "review": "reviewed",
+    "enHash": "f26e079e"
+  },
+  "pos.cart.link.counterCode": {
+    "message": "குறியீடு மூலம் இணைக்கப்பட்டது · {phone}",
+    "review": "reviewed",
+    "enHash": "81e24f8e"
+  },
+  "pos.cart.link.unverified": {
+    "message": "தொலைபேசி குறிக்கப்பட்டது, சரிபார்க்கப்படவில்லை · {phone}",
+    "review": "reviewed",
+    "enHash": "28a8d23b"
+  },
+  "pos.pay.label": {
+    "message": "பணம் செலுத்தும் முறை",
+    "review": "reviewed",
+    "enHash": "0e55fb3b"
+  },
+  "pos.pay.cash": {
+    "message": "ரொக்கம்",
+    "review": "reviewed",
+    "enHash": "758ec54e"
+  },
+  "pos.pay.upi": {
+    "message": "UPI",
+    "review": "reviewed",
+    "enHash": "f295b2cd"
+  },
+  "pos.pay.card": {
+    "message": "கார்டு",
+    "review": "reviewed",
+    "enHash": "4d4ce73b"
+  },
+  "pos.add.open": {
+    "message": "தனிப் பொருள்",
+    "review": "reviewed",
+    "enHash": "b7757e4a"
+  },
+  "pos.add.customTitle": {
+    "message": "ஒருமுறைப் பொருளைச் சேர்க்கவும்",
+    "review": "reviewed",
+    "enHash": "8a3608cb"
+  },
+  "pos.add.unknownTitle": {
+    "message": "இந்த பார்கோடு எங்களுக்குத் தெரியாது",
+    "review": "reviewed",
+    "enHash": "2da821a4"
+  },
+  "pos.add.unknownBody": {
+    "message": "குறியீடு {code} உங்கள் பொருட்களில் இல்லை. பெயர் மற்றும் விலையுடன் இந்த பில்லில் சேர்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "7131a281"
+  },
+  "pos.add.name": {
+    "message": "பொருளின் பெயர்",
+    "review": "reviewed",
+    "enHash": "b56b71bb"
+  },
+  "pos.add.nameInvalid": {
+    "message": "பெயரை உள்ளிடவும்",
+    "review": "reviewed",
+    "enHash": "7e5fe97f"
+  },
+  "pos.add.price": {
+    "message": "விலை",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "pos.add.priceInvalid": {
+    "message": "பூஜ்ஜியத்தை விட அதிகமான விலையை உள்ளிடவும்",
+    "review": "reviewed",
+    "enHash": "8d0c1181"
+  },
+  "pos.add.submit": {
+    "message": "பில்லில் சேர்",
+    "review": "reviewed",
+    "enHash": "73cd5e5d"
+  },
+  "pos.add.inStock": {
+    "message": "இதை உங்கள் ஸ்டாக்கில் சேர்க்கவும்",
+    "review": "reviewed",
+    "enHash": "4792eee5"
+  },
+  "pos.discount.title": {
+    "message": "தள்ளுபடிகள்",
+    "review": "reviewed",
+    "enHash": "e5a40077"
+  },
+  "pos.discount.help": {
+    "message": "தொகைகளை ரூபாயில் உள்ளிடவும். பில் ₹1 அல்லது அதற்கு மேல் இருக்கும்.",
+    "review": "reviewed",
+    "enHash": "fe6d51ad"
+  },
+  "pos.discount.line": {
+    "message": "{name} · {price}",
+    "review": "reviewed",
+    "enHash": "6c125f94"
+  },
+  "pos.discount.bill": {
+    "message": "முழு பில் தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "74870af9"
+  },
+  "pos.discount.invalid": {
+    "message": "சரியான தொகையை உள்ளிடவும்",
+    "review": "reviewed",
+    "enHash": "a45acfd3"
+  },
+  "pos.discount.apply": {
+    "message": "பயன்படுத்து",
+    "review": "reviewed",
+    "enHash": "cfea419c"
+  },
+  "pos.scan.open": {
+    "message": "ஸ்கேன்",
+    "review": "reviewed",
+    "enHash": "28cba55d"
+  },
+  "pos.scan.title": {
+    "message": "பார்கோடை ஸ்கேன் செய்யவும்",
+    "review": "reviewed",
+    "enHash": "7276e973"
+  },
+  "pos.scan.unsupported": {
+    "message": "இந்த உலாவியால் கேமராவில் ஸ்கேன் செய்ய முடியாது. பார்கோடு ஸ்கேனரைப் பயன்படுத்தவும் அல்லது குறியீட்டைத் தட்டச்சு செய்யவும்.",
+    "review": "reviewed",
+    "enHash": "5c26f8e7"
+  },
+  "pos.scan.denied": {
+    "message": "கேமரா அணுகல் முடக்கப்பட்டுள்ளது. ஸ்கேன் செய்ய உலாவி அமைப்புகளில் அனுமதிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "253b57db"
+  },
+  "pos.scan.starting": {
+    "message": "கேமரா தொடங்குகிறது",
+    "review": "reviewed",
+    "enHash": "d6293a9d"
+  },
+  "pos.scan.hint": {
+    "message": "கேமராவை பார்கோடை நோக்கிக் காட்டவும்.",
+    "review": "reviewed",
+    "enHash": "9abc9dc4"
+  },
+  "pos.link.title": {
+    "message": "வாடிக்கையாளரை இணைக்கவும்",
+    "review": "reviewed",
+    "enHash": "f86c83df"
+  },
+  "pos.link.back": {
+    "message": "பின்செல்",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "pos.link.skip": {
+    "message": "இணைக்காமல் விற்கவும்",
+    "review": "reviewed",
+    "enHash": "a26d2e6c"
+  },
+  "pos.link.noCredits": {
+    "message": "இந்த பில் கிரெடிட் பயன்படுத்துவதற்கான குறைந்தபட்சத்தை விடக் குறைவு. வாடிக்கையாளர் இருந்தாலும் கிரெடிட் சம்பாதிக்கலாம்.",
+    "review": "reviewed",
+    "enHash": "4e4f339e"
+  },
+  "pos.link.qr": {
+    "message": "வாடிக்கையாளர் QR ஸ்கேன் செய்வார்",
+    "review": "reviewed",
+    "enHash": "fae4c5ca"
+  },
+  "pos.link.qrHelp": {
+    "message": "வாடிக்கையாளர் கிரெடிட் பயன்படுத்தவும் கேஷ்பேக் சம்பாதிக்கவும் முடியும்.",
+    "review": "reviewed",
+    "enHash": "da188dd6"
+  },
+  "pos.link.qrOffline": {
+    "message": "இணைப்பு தேவை.",
+    "review": "reviewed",
+    "enHash": "1e270e64"
+  },
+  "pos.link.code": {
+    "message": "வாடிக்கையாளர் குறியீட்டைச் சொல்வார்",
+    "review": "reviewed",
+    "enHash": "3f13bff1"
+  },
+  "pos.link.codeHelp": {
+    "message": "வாடிக்கையாளர் தங்கள் ஆப்பிலிருந்து 4 இலக்கக் குறியீட்டைக் காட்டுவார். அவர்கள் கிரெடிட் சம்பாதிப்பார்கள்.",
+    "review": "reviewed",
+    "enHash": "e9acea8e"
+  },
+  "pos.link.phone": {
+    "message": "தொலைபேசியை மட்டும் குறிக்கவும்",
+    "review": "reviewed",
+    "enHash": "504991bf"
+  },
+  "pos.link.phoneHelp": {
+    "message": "எண் விற்பனையில் சேமிக்கப்படும். சரிபார்க்கும் வரை கிரெடிட் இல்லை.",
+    "review": "reviewed",
+    "enHash": "5daaea7a"
+  },
+  "pos.link.phoneFieldHelp": {
+    "message": "10 இலக்க மொபைல் எண்",
+    "review": "reviewed",
+    "enHash": "3f114e30"
+  },
+  "pos.link.qrLabel": {
+    "message": "வாடிக்கையாளர் ஸ்கேன் செய்ய வேண்டிய QR குறியீடு",
+    "review": "reviewed",
+    "enHash": "1457d7c6"
+  },
+  "pos.link.qrPreparing": {
+    "message": "QR தயாராகிறது",
+    "review": "reviewed",
+    "enHash": "12ab2a36"
+  },
+  "pos.link.qrFailed": {
+    "message": "QR உருவாக்க முடியவில்லை.",
+    "review": "reviewed",
+    "enHash": "f41ca6be"
+  },
+  "pos.link.qrExpired": {
+    "message": "இந்த QR காலாவதியாகிவிட்டது.",
+    "review": "reviewed",
+    "enHash": "00efed4d"
+  },
+  "pos.link.newQr": {
+    "message": "புதிய QR",
+    "review": "reviewed",
+    "enHash": "16d87a7a"
+  },
+  "pos.link.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "pos.link.waiting": {
+    "message": "வாடிக்கையாளர் ஸ்கேன் செய்யக் காத்திருக்கிறது.",
+    "review": "reviewed",
+    "enHash": "a47155e3"
+  },
+  "pos.link.expiresIn": {
+    "message": "{seconds} s இல் காலாவதியாகும்",
+    "review": "reviewed",
+    "enHash": "d965684d"
+  },
+  "pos.link.phoneLabel": {
+    "message": "வாடிக்கையாளர் தொலைபேசி",
+    "review": "reviewed",
+    "enHash": "7689682e"
+  },
+  "pos.link.phoneInvalid": {
+    "message": "10 இலக்க மொபைல் எண்ணை உள்ளிடவும்",
+    "review": "reviewed",
+    "enHash": "63c5f1b7"
+  },
+  "pos.link.codeLabel": {
+    "message": "வாடிக்கையாளர் ஆப்பில் உள்ள குறியீடு",
+    "review": "reviewed",
+    "enHash": "dd3257a4"
+  },
+  "pos.link.codeHint": {
+    "message": "4 இலக்கங்கள்",
+    "review": "reviewed",
+    "enHash": "a970a484"
+  },
+  "pos.link.codeInvalid": {
+    "message": "4 இலக்கக் குறியீட்டை உள்ளிடவும்",
+    "review": "reviewed",
+    "enHash": "d99fedc4"
+  },
+  "pos.link.codeMismatch": {
+    "message": "அந்தக் குறியீடு பொருந்தவில்லை.",
+    "review": "reviewed",
+    "enHash": "d8ae7e1c"
+  },
+  "pos.link.codeMismatchTries": {
+    "message": "அந்தக் குறியீடு பொருந்தவில்லை. {count, plural, one {# முயற்சி மீதம்} other {# முயற்சிகள் மீதம்}}.",
+    "review": "reviewed",
+    "enHash": "21be7fcb"
+  },
+  "pos.link.codeLocked": {
+    "message": "மிக அதிகமான தவறான குறியீடுகள். பிறகு முயலவும் அல்லது தொலைபேசி மூலம் இணைக்கவும்.",
+    "review": "reviewed",
+    "enHash": "abbbdb33"
+  },
+  "pos.link.codeOffline": {
+    "message": "நீங்கள் ஆஃப்லைனில் உள்ளீர்கள். விற்பனை ஒத்திசைக்கப்படும்போது குறியீடு சரிபார்க்கப்படும்.",
+    "review": "reviewed",
+    "enHash": "df15f601"
+  },
+  "pos.link.codeSave": {
+    "message": "குறியீட்டுடன் இணைக்கவும்",
+    "review": "reviewed",
+    "enHash": "c9f2a2ec"
+  },
+  "pos.link.phoneSave": {
+    "message": "இந்தத் தொலைபேசியைக் குறிக்கவும்",
+    "review": "reviewed",
+    "enHash": "bca7b443"
+  },
+  "pos.history.title": {
+    "message": "இந்தச் சாதனத்தின் விற்பனைகள்",
+    "review": "reviewed",
+    "enHash": "ea829991"
+  },
+  "pos.history.empty.title": {
+    "message": "இன்னும் விற்பனைகள் இல்லை",
+    "review": "reviewed",
+    "enHash": "f2a3f161"
+  },
+  "pos.history.empty.body": {
+    "message": "நீங்கள் செய்யும் விற்பனைகள் பழையதாகும் வரை இங்கே தெரியும்.",
+    "review": "reviewed",
+    "enHash": "ef0aab5c"
+  },
+  "pos.history.units": {
+    "message": "{count, plural, one {# யூனிட்} other {# யூனிட்கள்}}",
+    "review": "reviewed",
+    "enHash": "55edb2e2"
+  },
+  "pos.history.receipt": {
+    "message": "ரசீது",
+    "review": "reviewed",
+    "enHash": "f6ce3b6f"
+  },
+  "pos.history.state.pending": {
+    "message": "ஒத்திசைவுக்குக் காத்திருக்கிறது",
+    "review": "reviewed",
+    "enHash": "e8f3a099"
+  },
+  "pos.history.state.sending": {
+    "message": "ஒத்திசைக்கப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "4ae6fa22"
+  },
+  "pos.history.state.synced": {
+    "message": "ஒத்திசைக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "b2ef6af6"
+  },
+  "pos.history.state.rejected": {
+    "message": "நிராகரிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "735ec50d"
+  },
+  "pos.history.state.reversed": {
+    "message": "திரும்பப் பெறப்பட்டது",
+    "review": "reviewed",
+    "enHash": "307404eb"
+  },
+  "pos.history.linkFailed": {
+    "message": "வாடிக்கையாளர் இணைப்பு தோல்வியடைந்தது",
+    "review": "reviewed",
+    "enHash": "b2a064c7"
+  },
+  "pos.history.countNeeded": {
+    "message": "எண்ணிக்கை தேவை",
+    "review": "reviewed",
+    "enHash": "a5bead5a"
+  },
+  "pos.history.countNeededItems": {
+    "message": "மறு எண்ணிக்கை: {names}",
+    "review": "reviewed",
+    "enHash": "7f5c83fa"
+  },
+  "pos.history.serverPrice": {
+    "message": "இங்கே {device} சார்ஜ் செய்யப்பட்டது; சர்வர் {server} இல் முடித்தது.",
+    "review": "reviewed",
+    "enHash": "237a255b"
+  },
+  "pos.history.refused": {
+    "message": "சர்வர் இந்த விற்பனையை நிராகரித்தது. மீண்டும் முயலவும், அல்லது வாடிக்கையாளரிடம் சரிபார்த்த பின் நிராகரிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "e61a6e2b"
+  },
+  "pos.sync.title": {
+    "message": "ஒத்திசைவு",
+    "review": "reviewed",
+    "enHash": "905f6309"
+  },
+  "pos.sync.status.idle": {
+    "message": "புதுப்பித்த நிலையில்",
+    "review": "reviewed",
+    "enHash": "82fb1d51"
+  },
+  "pos.sync.status.syncing": {
+    "message": "ஒத்திசைக்கப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "4ae6fa22"
+  },
+  "pos.sync.status.offline": {
+    "message": "ஆஃப்லைன்",
+    "review": "reviewed",
+    "enHash": "e01fa717"
+  },
+  "pos.sync.status.backoff": {
+    "message": "மீண்டும் முயலக் காத்திருக்கிறது",
+    "review": "reviewed",
+    "enHash": "ac710fd8"
+  },
+  "pos.sync.status.resync": {
+    "message": "பொருட்கள் புதுப்பிக்கப்படுகின்றன",
+    "review": "reviewed",
+    "enHash": "912875eb"
+  },
+  "pos.sync.now": {
+    "message": "இப்போது ஒத்திசை",
+    "review": "reviewed",
+    "enHash": "2b7d938e"
+  },
+  "pos.sync.counts": {
+    "message": "{pending, plural, one {# காத்திருக்கிறது} other {# காத்திருக்கின்றன}} · {rejected, plural, one {# நிராகரிக்கப்பட்டது} other {# நிராகரிக்கப்பட்டன}}",
+    "review": "reviewed",
+    "enHash": "4127fbe7"
+  },
+  "pos.sync.last": {
+    "message": "கடைசி ஒத்திசைவு {time}",
+    "review": "reviewed",
+    "enHash": "83c122a7"
+  },
+  "pos.sync.attention": {
+    "message": "{count, plural, one {# விற்பனையைச் சரிபார்க்க வேண்டும்} other {# விற்பனைகளைச் சரிபார்க்க வேண்டும்}}",
+    "review": "reviewed",
+    "enHash": "00315455"
+  },
+  "pos.sync.retry": {
+    "message": "மீண்டும் முயல்",
+    "review": "reviewed",
+    "enHash": "9f5cd8a2"
+  },
+  "pos.sync.dismiss": {
+    "message": "நிராகரி",
+    "review": "reviewed",
+    "enHash": "70afe9ef"
+  },
+  "pos.reverse.action": {
+    "message": "திரும்பப் பெறு",
+    "review": "reviewed",
+    "enHash": "57f99337"
+  },
+  "pos.reverse.title": {
+    "message": "இந்த விற்பனையைத் திரும்பப் பெறவா?",
+    "review": "reviewed",
+    "enHash": "31c561b0"
+  },
+  "pos.reverse.body": {
+    "message": "இதைச் செயல்தவிர்க்க முடியாது.",
+    "review": "reviewed",
+    "enHash": "fe63a123"
+  },
+  "pos.reverse.stock": {
+    "message": "{count, plural, one {# யூனிட் ஸ்டாக்கிற்குத் திரும்பும்} other {# யூனிட்கள் ஸ்டாக்கிற்குத் திரும்பும்}}",
+    "review": "reviewed",
+    "enHash": "fb6ecb00"
+  },
+  "pos.reverse.credits": {
+    "message": "{count, plural, =0 {திருப்பித் தர கிரெடிட் இல்லை} one {# கிரெடிட் வாடிக்கையாளருக்குத் திரும்பும்} other {# கிரெடிட் வாடிக்கையாளருக்குத் திரும்பும்}}",
+    "review": "reviewed",
+    "enHash": "7f6a019b"
+  },
+  "pos.reverse.cashback": {
+    "message": "{count, plural, =0 {திரும்பப் பெற கேஷ்பேக் இல்லை} one {# கேஷ்பேக் கிரெடிட் திரும்பப் பெறப்படும்} other {# கேஷ்பேக் கிரெடிட் திரும்பப் பெறப்படும்}}",
+    "review": "reviewed",
+    "enHash": "bd10f749"
+  },
+  "pos.reverse.reason": {
+    "message": "காரணம்",
+    "review": "reviewed",
+    "enHash": "f219cc06"
+  },
+  "pos.reverse.keep": {
+    "message": "விற்பனையை வைத்திரு",
+    "review": "reviewed",
+    "enHash": "0403484b"
+  },
+  "pos.reverse.confirm": {
+    "message": "விற்பனையைத் திரும்பப் பெறு",
+    "review": "reviewed",
+    "enHash": "a8309a05"
+  },
+  "pos.reverse.done": {
+    "message": "திரும்பப் பெறப்பட்டது. {units, plural, one {# யூனிட்} other {# யூனிட்கள்}} ஸ்டாக்கிற்குத் திரும்பின, {credits, plural, one {# கிரெடிட்} other {# கிரெடிட்}} திருப்பித் தரப்பட்டன, {cashback, plural, one {# கேஷ்பேக் கிரெடிட்} other {# கேஷ்பேக் கிரெடிட்}} திரும்பப் பெறப்பட்டன.",
+    "review": "reviewed",
+    "enHash": "6e36bd13"
+  },
+  "pos.reverse.offline": {
+    "message": "நீங்கள் ஆஃப்லைனில் உள்ளீர்கள். மீண்டும் ஆன்லைனில் வந்ததும் விற்பனையைத் திரும்பப் பெறவும்.",
+    "review": "reviewed",
+    "enHash": "92a58c40"
+  },
+  "pos.reverse.windowPassed": {
+    "message": "இந்த விற்பனையைத் திரும்பப் பெறும் நேரம் கடந்துவிட்டது.",
+    "review": "reviewed",
+    "enHash": "dd1ffab9"
+  },
+  "pos.reverse.failed": {
+    "message": "விற்பனையைத் திரும்பப் பெற முடியவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "f2e7f12b"
+  },
+  "pos.receipt.title": {
+    "message": "ரசீது",
+    "review": "reviewed",
+    "enHash": "f6ce3b6f"
+  },
+  "pos.receipt.lineDiscount": {
+    "message": "தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.receipt.subtotal": {
+    "message": "துணைத்தொகை",
+    "review": "reviewed",
+    "enHash": "97f7359e"
+  },
+  "pos.receipt.discount": {
+    "message": "தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.receipt.roundOff": {
+    "message": "முழுமையாக்கல்",
+    "review": "reviewed",
+    "enHash": "3aa7ebde"
+  },
+  "pos.receipt.credits": {
+    "message": "பயன்படுத்திய கிரெடிட்",
+    "review": "reviewed",
+    "enHash": "385686f7"
+  },
+  "pos.receipt.total": {
+    "message": "மொத்தம்",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "pos.receipt.paidBy": {
+    "message": "செலுத்திய முறை",
+    "review": "reviewed",
+    "enHash": "70c115d7"
+  },
+  "pos.receipt.thanks": {
+    "message": "எங்களிடம் வாங்கியதற்கு நன்றி.",
+    "review": "reviewed",
+    "enHash": "feb21b25"
+  },
+  "pos.receipt.whatsapp": {
+    "message": "WhatsApp இல் பகிரவும்",
+    "review": "reviewed",
+    "enHash": "7e03939f"
+  },
+  "pos.receipt.sms": {
+    "message": "SMS மூலம் அனுப்பவும்",
+    "review": "reviewed",
+    "enHash": "6c0b2af6"
+  },
+  "pos.receipt.print": {
+    "message": "அச்சிடு",
+    "review": "reviewed",
+    "enHash": "5b221e9c"
+  },
+  "pos.receipt.linkPending": {
+    "message": "இந்த விற்பனை ஒத்திசைக்கப்பட்ட பிறகு பகிர்வு இணைப்புகள் வேலை செய்யும்.",
+    "review": "reviewed",
+    "enHash": "29db9a75"
+  },
+  "pos.receipt.shareText": {
+    "message": "{shop} இலிருந்து உங்கள் ரசீது: {url}",
+    "review": "reviewed",
+    "enHash": "b72276cf"
+  },
+  "pos.pay.other": {
+    "message": "பிற",
+    "review": "reviewed",
+    "enHash": "6e6a6f20"
+  },
+  "pos.storeSales.open": {
+    "message": "கடையின் விற்பனைகள்",
+    "review": "reviewed",
+    "enHash": "26e31c8a"
+  },
+  "pos.storeSales.title": {
+    "message": "கடையின் விற்பனைகள்",
+    "review": "reviewed",
+    "enHash": "26e31c8a"
+  },
+  "pos.storeSales.sub": {
+    "message": "எல்லாச் சாதனங்களிலிருந்தும் இந்தக் கடையின் ஒவ்வொரு விற்பனையும், புதியவை முதலில்.",
+    "review": "reviewed",
+    "enHash": "bb528425"
+  },
+  "pos.storeSales.refresh": {
+    "message": "புதுப்பிக்கவும்",
+    "review": "reviewed",
+    "enHash": "56e3badc"
+  },
+  "pos.storeSales.more": {
+    "message": "மேலும் காட்டு",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "pos.storeSales.loading": {
+    "message": "விற்பனைகள் ஏற்றப்படுகின்றன",
+    "review": "reviewed",
+    "enHash": "2723eba7"
+  },
+  "pos.storeSales.offline": {
+    "message": "நீங்கள் ஆஃப்லைனில் உள்ளீர்கள். கடையின் விற்பனைகளைப் பார்க்க இணையத்துடன் இணையுங்கள்; இந்தச் சாதனத்தின் விற்பனைகள் “விற்பனைகள்” பகுதியில் உள்ளன.",
+    "review": "reviewed",
+    "enHash": "61c05b4d"
+  },
+  "pos.storeSales.failed": {
+    "message": "விற்பனைகளை ஏற்ற முடியவில்லை. “புதுப்பிக்கவும்” என்பதை முயலவும்.",
+    "review": "reviewed",
+    "enHash": "64c16cab"
+  },
+  "pos.storeSales.forbidden": {
+    "message": "இந்தக் கடையின் விற்பனைகளை நீங்கள் பார்க்க முடியாது.",
+    "review": "reviewed",
+    "enHash": "4d8a5236"
+  },
+  "pos.storeSales.empty.title": {
+    "message": "இன்னும் விற்பனைகள் இல்லை",
+    "review": "reviewed",
+    "enHash": "f2a3f161"
+  },
+  "pos.storeSales.empty.body": {
+    "message": "இந்தக் கடையில் நடந்த விற்பனைகள் சர்வரைச் சென்றடைந்ததும் இங்கே தோன்றும்.",
+    "review": "reviewed",
+    "enHash": "d6d582c5"
+  },
+  "pos.storeSales.offlineSale": {
+    "message": "ஆஃப்லைனில் விற்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "1080acf7"
+  },
+  "pos.storeSales.link.none": {
+    "message": "வாடிக்கையாளர் இல்லை",
+    "review": "reviewed",
+    "enHash": "871e3df8"
+  },
+  "pos.storeSales.link.linked": {
+    "message": "வாடிக்கையாளர் இணைக்கப்பட்டார்",
+    "review": "reviewed",
+    "enHash": "d731c875"
+  },
+  "pos.storeSales.link.linkedTo": {
+    "message": "{name} உடன் இணைக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "50f407f3"
+  },
+  "pos.storeSales.link.pending": {
+    "message": "இணைப்பு நிலுவையில் உள்ளது",
+    "review": "reviewed",
+    "enHash": "18990b4f"
+  },
+  "pos.storeSales.failure.code_used": {
+    "message": "கவுண்டர் குறியீடு ஏற்கனவே பயன்படுத்தப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "6ba38a1c"
+  },
+  "pos.storeSales.failure.code_wrong": {
+    "message": "கவுண்டர் குறியீடு பொருந்தவில்லை.",
+    "review": "reviewed",
+    "enHash": "3d77b8d3"
+  },
+  "pos.storeSales.failure.clock_off": {
+    "message": "சாதனத்தின் கடிகாரம் தவறாக இருந்தது.",
+    "review": "reviewed",
+    "enHash": "7f280bf4"
+  },
+  "pos.storeSales.failure.too_late": {
+    "message": "குறியீட்டைச் சரிபார்க்க முடியாத அளவுக்குத் தாமதமாக விற்பனை ஒத்திசைக்கப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "3e897c4c"
+  },
+  "pos.storeSales.failure.locked": {
+    "message": "பல தவறான குறியீடுகள்; சரிபார்ப்புகள் நிறுத்தப்பட்டுள்ளன.",
+    "review": "reviewed",
+    "enHash": "74daacba"
+  },
+  "pos.storeSales.failure.unverified": {
+    "message": "குறியீட்டைச் சரிபார்க்க முடியவில்லை.",
+    "review": "reviewed",
+    "enHash": "15c74c7c"
+  }
+}

@@ -1,0 +1,357 @@
+{
+  "onboarding.title": {
+    "message": "ಅಂಗಡಿ ಸೆಟಪ್",
+    "review": "reviewed",
+    "enHash": "0857f615"
+  },
+  "onboarding.loading": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಸೆಟಪ್ ಲೋಡ್ ಆಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "97135be6"
+  },
+  "onboarding.loadFailed.title": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "775cadd8"
+  },
+  "onboarding.loadFailed.body": {
+    "message": "ನಿಮ್ಮ ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "onboarding.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "onboarding.ownerOnly.title": {
+    "message": "ಅಂಗಡಿಯನ್ನು ಮಾಲೀಕರು ಮಾತ್ರ ಸೆಟ್ ಮಾಡಬಹುದು",
+    "review": "reviewed",
+    "enHash": "ce1ffa3e"
+  },
+  "onboarding.ownerOnly.body": {
+    "message": "ಸೆಟಪ್ ಮುಗಿಸಲು ನಿಮ್ಮ ಅಂಗಡಿ ಮಾಲೀಕರಿಗೆ ಹೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "ed6b1f38"
+  },
+  "onboarding.step": {
+    "message": "ಹಂತ {n}: {title}",
+    "review": "reviewed",
+    "enHash": "1133cf5c"
+  },
+  "onboarding.done": {
+    "message": "ಮುಗಿದಿದೆ",
+    "review": "reviewed",
+    "enHash": "e9b450d1"
+  },
+  "onboarding.saved": {
+    "message": "ಉಳಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "c0ae8f6e"
+  },
+  "onboarding.save": {
+    "message": "ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "onboarding.business.title": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿಯ ಬಗ್ಗೆ",
+    "review": "reviewed",
+    "enHash": "6291f190"
+  },
+  "onboarding.business.brandName": {
+    "message": "ಅಂಗಡಿಯ ಹೆಸರು",
+    "review": "reviewed",
+    "enHash": "6a5cc02e"
+  },
+  "onboarding.business.brandNameHelp": {
+    "message": "ಗ್ರಾಹಕರು ನೋಡುವ ಹೆಸರು.",
+    "review": "reviewed",
+    "enHash": "6680c228"
+  },
+  "onboarding.business.brandNameRequired": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿಯ ಹೆಸರು ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "00a41eb3"
+  },
+  "onboarding.business.legalName": {
+    "message": "ನೋಂದಾಯಿತ ಬಿಸಿನೆಸ್ ಹೆಸರು",
+    "review": "reviewed",
+    "enHash": "9deda141"
+  },
+  "onboarding.business.legalNameHelp": {
+    "message": "ನಿಮ್ಮ PAN ಅಥವಾ GST ಪ್ರಮಾಣಪತ್ರದಲ್ಲಿರುವಂತೆ. ಇದನ್ನು ನಂತರವೂ ಸೇರಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "fcbd36b3"
+  },
+  "onboarding.business.category": {
+    "message": "ನೀವು ಏನು ಮಾರುತ್ತೀರಿ",
+    "review": "reviewed",
+    "enHash": "99f2197d"
+  },
+  "onboarding.business.categoryNone": {
+    "message": "ವರ್ಗ ಆರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "b91bf5d4"
+  },
+  "onboarding.store.title": {
+    "message": "ನಿಮ್ಮ ಮೊದಲ ಅಂಗಡಿ",
+    "review": "reviewed",
+    "enHash": "c1b36766"
+  },
+  "onboarding.store.have": {
+    "message": "ಅಂಗಡಿ ಸೇರಿಸಲಾಗಿದೆ: {name}.",
+    "review": "reviewed",
+    "enHash": "ff206dca"
+  },
+  "onboarding.store.manage": {
+    "message": "ಅಂಗಡಿಗಳನ್ನು ನಿರ್ವಹಿಸಿ",
+    "review": "reviewed",
+    "enHash": "e0b3455b"
+  },
+  "onboarding.store.create": {
+    "message": "ಅಂಗಡಿ ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "a0df4ca0"
+  },
+  "onboarding.hours.title": {
+    "message": "ತೆರೆಯುವ ಸಮಯ",
+    "review": "reviewed",
+    "enHash": "6117e118"
+  },
+  "onboarding.payout.title": {
+    "message": "ಪಾವತಿ ವಿವರಗಳು",
+    "review": "reviewed",
+    "enHash": "ad5e1a85"
+  },
+  "onboarding.payout.body": {
+    "message": "ನಾವು ನಿಮಗೆ ಎಲ್ಲಿ ಹಣ ಕಳುಹಿಸಬೇಕು. ಇದನ್ನು ಈಗ ಅಥವಾ ನಂತರ ಸೇರಿಸಬಹುದು; ಅಂಗಡಿಯನ್ನು ಪರಿಶೀಲನೆಗೆ ಕಳುಹಿಸಲು ಇದು ಬೇಕಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "16c98dff"
+  },
+  "onboarding.docs.title": {
+    "message": "ದಾಖಲೆಗಳು",
+    "review": "reviewed",
+    "enHash": "687c8286"
+  },
+  "onboarding.docs.help": {
+    "message": "ಫೋಟೋಗಳು ಅಥವಾ PDF, ಪ್ರತಿಯೊಂದೂ 10 MB ವರೆಗೆ. ದಾಖಲೆಗಳನ್ನು ಖಾಸಗಿಯಾಗಿ ಇಡಲಾಗುತ್ತದೆ, ನಮ್ಮ ಪರಿಶೀಲನಾ ತಂಡ ಮಾತ್ರ ನೋಡುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "5285e84b"
+  },
+  "onboarding.docs.kind.pan": {
+    "message": "PAN ಕಾರ್ಡ್",
+    "review": "reviewed",
+    "enHash": "1a5fa132"
+  },
+  "onboarding.docs.kind.gst": {
+    "message": "GST ಪ್ರಮಾಣಪತ್ರ",
+    "review": "reviewed",
+    "enHash": "1d4b2467"
+  },
+  "onboarding.docs.kind.shop_photo": {
+    "message": "ಅಂಗಡಿಯ ಒಳಗಿನ ಫೋಟೋ",
+    "review": "reviewed",
+    "enHash": "043fa414"
+  },
+  "onboarding.docs.kind.storefront": {
+    "message": "ಅಂಗಡಿಯ ಮುಂಭಾಗದ ಫೋಟೋ",
+    "review": "reviewed",
+    "enHash": "2c113b69"
+  },
+  "onboarding.docs.kind.license": {
+    "message": "ಟ್ರೇಡ್ ಲೈಸೆನ್ಸ್",
+    "review": "reviewed",
+    "enHash": "42559b25"
+  },
+  "onboarding.docs.status.pending": {
+    "message": "ಅಪ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "de272409"
+  },
+  "onboarding.docs.status.uploaded": {
+    "message": "ಸಿಕ್ಕಿದೆ",
+    "review": "reviewed",
+    "enHash": "27548c4f"
+  },
+  "onboarding.docs.status.accepted": {
+    "message": "ಸ್ವೀಕರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "onboarding.docs.status.rejected": {
+    "message": "ತಿರಸ್ಕರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "27eeb7a2"
+  },
+  "onboarding.docs.add": {
+    "message": "{name} ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "3796d1b1"
+  },
+  "onboarding.docs.added": {
+    "message": "{name} ಸೇರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "dae4c24a"
+  },
+  "onboarding.docs.err.type": {
+    "message": "JPG, PNG ಅಥವಾ WebP ಫೋಟೋ, ಅಥವಾ PDF ಬಳಸಿ.",
+    "review": "reviewed",
+    "enHash": "78549188"
+  },
+  "onboarding.docs.err.size": {
+    "message": "ಈ ಫೈಲ್ 10 MB ಗಿಂತ ದೊಡ್ಡದಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "7be70506"
+  },
+  "onboarding.docs.err.empty": {
+    "message": "ಈ ಫೈಲ್ ಖಾಲಿಯಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "f9256174"
+  },
+  "onboarding.docs.uploadFailed": {
+    "message": "ಫೈಲ್ ಅಪ್‌ಲೋಡ್ ಆಗಲಿಲ್ಲ. ನಿಮ್ಮ ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಸೇರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "dd02b2ad"
+  },
+  "onboarding.submit.title": {
+    "message": "ಪರಿಶೀಲನೆಗೆ ಕಳುಹಿಸಿ",
+    "review": "reviewed",
+    "enHash": "ddc87345"
+  },
+  "onboarding.submit.body": {
+    "message": "ನಾವು ನಿಮ್ಮ ವಿವರಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತೇವೆ, ಏನಾದರೂ ಬೇಕಿದ್ದರೆ ಕರೆ ಮಾಡುತ್ತೇವೆ. ಪರಿಶೀಲನೆಯ ಸಮಯದಲ್ಲೂ ನೀವು ಆರ್ಡರ್‌ಗಳಿಗೆ TodayZ ಬಳಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "6dc86397"
+  },
+  "onboarding.submit.action": {
+    "message": "ಪರಿಶೀಲನೆಗೆ ಕಳುಹಿಸಿ",
+    "review": "reviewed",
+    "enHash": "ddc87345"
+  },
+  "onboarding.submit.sent": {
+    "message": "ಪರಿಶೀಲನೆಗೆ ಕಳುಹಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "ef78972f"
+  },
+  "onboarding.status.submitted.title": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಪರಿಶೀಲನೆಯಲ್ಲಿದೆ",
+    "review": "reviewed",
+    "enHash": "eaec7e93"
+  },
+  "onboarding.status.submitted.body": {
+    "message": "ಮುಗಿದಾಗ ನಾವು ನಿಮಗೆ ತಿಳಿಸುತ್ತೇವೆ.",
+    "review": "reviewed",
+    "enHash": "01dd0eb4"
+  },
+  "onboarding.status.needs_info.title": {
+    "message": "ನಮಗೆ ನಿಮ್ಮಿಂದ ಇನ್ನೂ ಸ್ವಲ್ಪ ಮಾಹಿತಿ ಬೇಕು",
+    "review": "reviewed",
+    "enHash": "4bc026eb"
+  },
+  "onboarding.status.needs_info.body": {
+    "message": "ದಯವಿಟ್ಟು ಇವುಗಳನ್ನು ಸರಿಪಡಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪರಿಶೀಲನೆಗೆ ಕಳುಹಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "f7322f3e"
+  },
+  "onboarding.status.verified.title": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಪರಿಶೀಲಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "f69ca01e"
+  },
+  "onboarding.status.verified.body": {
+    "message": "ಗ್ರಾಹಕರು ನಿಮ್ಮ ಲೈವ್ ಅಂಗಡಿಗಳನ್ನು ಹುಡುಕಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "ca169a4c"
+  },
+  "onboarding.status.rejected.title": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಅನುಮೋದನೆಯಾಗಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "75e8f563"
+  },
+  "onboarding.status.rejected.body": {
+    "message": "ಇದು ತಪ್ಪು ಎಂದು ನಿಮಗೆ ಅನಿಸಿದರೆ ಸಪೋರ್ಟ್ ಅನ್ನು ಸಂಪರ್ಕಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "9e413826"
+  },
+  "onboarding.status.suspended.title": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ತಡೆಹಿಡಿಯಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "655adb75"
+  },
+  "onboarding.status.suspended.body": {
+    "message": "ಕಾರಣ ತಿಳಿಯಲು ಸಪೋರ್ಟ್ ಅನ್ನು ಸಂಪರ್ಕಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "1943d6db"
+  },
+  "onboarding.field.categoryId": {
+    "message": "ನೀವು ಏನು ಮಾರುತ್ತೀರಿ",
+    "review": "reviewed",
+    "enHash": "32d50307"
+  },
+  "onboarding.field.stores": {
+    "message": "ಒಂದು ಅಂಗಡಿ",
+    "review": "reviewed",
+    "enHash": "73ea649e"
+  },
+  "onboarding.field.addressLine1": {
+    "message": "ಅಂಗಡಿ ವಿಳಾಸ",
+    "review": "reviewed",
+    "enHash": "93458909"
+  },
+  "onboarding.field.city": {
+    "message": "ನಗರ",
+    "review": "reviewed",
+    "enHash": "4271627f"
+  },
+  "onboarding.field.pincode": {
+    "message": "ಪಿನ್‌ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "f2c5ca7b"
+  },
+  "onboarding.field.location": {
+    "message": "ನಕ್ಷೆಯ ಸ್ಥಳ",
+    "review": "reviewed",
+    "enHash": "9a333493"
+  },
+  "onboarding.field.phone": {
+    "message": "ಅಂಗಡಿ ಫೋನ್",
+    "review": "reviewed",
+    "enHash": "5bd971a7"
+  },
+  "onboarding.field.hours": {
+    "message": "ತೆರೆಯುವ ಸಮಯ",
+    "review": "reviewed",
+    "enHash": "6117e118"
+  },
+  "onboarding.field.brandName": {
+    "message": "ಅಂಗಡಿಯ ಹೆಸರು",
+    "review": "reviewed",
+    "enHash": "6a5cc02e"
+  },
+  "onboarding.field.legalName": {
+    "message": "ನೋಂದಾಯಿತ ಬಿಸಿನೆಸ್ ಹೆಸರು",
+    "review": "reviewed",
+    "enHash": "9deda141"
+  },
+  "onboarding.field.pan": {
+    "message": "PAN",
+    "review": "reviewed",
+    "enHash": "ad2967ed"
+  },
+  "onboarding.field.gstin": {
+    "message": "GSTIN",
+    "review": "reviewed",
+    "enHash": "da7751f5"
+  },
+  "onboarding.field.documents": {
+    "message": "ದಾಖಲೆಗಳು",
+    "review": "reviewed",
+    "enHash": "687c8286"
+  },
+  "onboarding.field.other": {
+    "message": "ಬೇರೆ ಯಾವುದೋ ವಿವರ",
+    "review": "reviewed",
+    "enHash": "61052ba2"
+  }
+}

@@ -1,10 +1,9 @@
 import { ApiError } from '@todayz/api-client';
 import type { CheckoutQuote } from '@todayz/api-client/gen/model/checkoutQuote';
-import { getDiscoverStore } from '@todayz/api-client/gen/discover/discover';
 import { createOrder } from '@todayz/api-client/gen/orders/orders';
 import { SessionPending, useHoldUpdates, useSessionState } from '@todayz/auth';
 import { formatMoney } from '@todayz/i18n';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
 import { Banner, Button, EmptyState, Skeleton } from '@todayz/ui';
 import { Banknote, ShoppingBag } from 'lucide-react';
@@ -13,7 +12,11 @@ import { useIntl } from 'react-intl';
 import { useUpdateController } from '../app/update-context';
 import { clearCart, useCart } from '../cart/cart';
 import { CreditsControl } from '../cart/CreditsControl';
-import { FULFILMENT, quoteKey, todaysHours, useCartPricing } from '../cart/quote';
+import { DeliveryProblemBanner, FulfilmentSwitch } from '../cart/Delivery';
+import { deliveryProblemOf, type DeliveryProblem } from '../cart/deliveryRules';
+import { clearFulfilment, useFulfilment } from '../cart/fulfilment';
+import { quoteKey, todaysHours, useCartPricing } from '../cart/quote';
+import { AddressPicker } from '../address/AddressPicker';
 import styles from '../cart/tx.module.css';
 import { LimitBanner } from '../orders/LimitBanner';
 import { suspendedUntil, useSuspendedText } from '../orders/limit';
@@ -25,12 +28,15 @@ type PlaceProblem =
   | { kind: 'price_changed' }
   | { kind: 'insufficient_stock'; storeItemId?: string; available?: number }
   | { kind: 'store_closed' }
+  | { kind: 'delivery'; problem: DeliveryProblem }
   | { kind: 'until'; code: 'ordering_suspended'; until?: string }
   | { kind: 'code'; code: string }
   | { kind: 'network' };
 
 function problemOf(err: unknown): PlaceProblem {
   if (!(err instanceof ApiError)) return { kind: 'network' };
+  const delivery = deliveryProblemOf(err);
+  if (delivery) return { kind: 'delivery', problem: delivery };
   const ext = err.problem.extensions ?? {};
   switch (err.code) {
     case 'price_changed':
@@ -51,7 +57,7 @@ function problemOf(err: unknown): PlaceProblem {
   }
 }
 
-/** C-11 Checkout (pickup): review, the pay-at-the-shop note, total, Place order. */
+/** C-11 Checkout: review, pickup or delivery to a saved address, the payment note, total, Place order. */
 export function CheckoutPage() {
   const intl = useIntl();
   const suspendedText = useSuspendedText();
@@ -63,7 +69,8 @@ export function CheckoutPage() {
   // G9, D-98: the "new version" prompt waits while a checkout is open.
   useHoldUpdates(update, true);
 
-  const { quote, probe, choice, settling } = useCartPricing(cart, status === 'signedIn');
+  const ful = useFulfilment(cart, status === 'signedIn');
+  const { quote, probe, choice, settling } = useCartPricing(cart, status === 'signedIn', ful.quoted);
   const [accepted, setAccepted] = useState<number | null>(null);
   const [problem, setProblem] = useState<PlaceProblem | null>(null);
   const [placing, setPlacing] = useState(false);
@@ -82,12 +89,16 @@ export function CheckoutPage() {
   const agreed = accepted ?? (q && repriced.length === 0 ? q.totalPaise : null);
 
   const closed = problem?.kind === 'store_closed' || (quote.error instanceof ApiError && quote.error.code === 'store_closed');
-  const hours = useQuery({
-    queryKey: ['store-hours', cart.store?.slug ?? ''],
-    enabled: closed && cart.store !== null,
-    queryFn: () => getDiscoverStore(cart.store?.slug ?? ''),
-    staleTime: 60_000,
-  });
+  // The shop's page (hours, delivery terms) is already asked for by useFulfilment.
+  const hours = ful.store;
+  const quoteDelivery = quote.isError ? deliveryProblemOf(quote.error) : null;
+  const placeDelivery = problem?.kind === 'delivery' ? problem.problem : null;
+  // A delivery refusal from placing is shown instead of the quote's, never both.
+  const deliveryProblem = placeDelivery ?? quoteDelivery;
+  const toPickup = () => {
+    ful.choose('pickup');
+    setProblem(null);
+  };
 
   if (status === 'unknown') {
     return (
@@ -136,7 +147,7 @@ export function CheckoutPage() {
     const items = cart.lines.map((l) => ({ storeItemId: l.storeItemId, quantity: l.qty }));
     const body = {
       storeId: store.id,
-      fulfilment: FULFILMENT,
+      ...ful.quoted,
       items,
       creditsToUse: q.creditsUsed,
       expectedTotalPaise: q.totalPaise,
@@ -152,6 +163,7 @@ export function CheckoutPage() {
       attempt.current = null;
       router.history.push(`/orders/${order.id}?placed=1`);
       clearCart();
+      clearFulfilment();
       void client.invalidateQueries({ queryKey: ['orders'] });
     } catch (err) {
       const p = problemOf(err);
@@ -159,8 +171,8 @@ export function CheckoutPage() {
       if (p.kind === 'price_changed' && err instanceof ApiError) {
         // The 409 carries the fresh quote: show it and wait for a second tap.
         const fresh = err.problem.extensions?.['quote'] as CheckoutQuote | undefined;
-        if (fresh) client.setQueryData(quoteKey(cart, q?.creditsRequested ?? 0), fresh);
-        else void client.invalidateQueries({ queryKey: quoteKey(cart, q?.creditsRequested ?? 0) });
+        if (fresh) client.setQueryData(quoteKey(cart, q?.creditsRequested ?? 0, ful.quoted), fresh);
+        else void client.invalidateQueries({ queryKey: quoteKey(cart, q?.creditsRequested ?? 0, ful.quoted) });
       } else if (p.kind === 'insufficient_stock') {
         void client.invalidateQueries({ queryKey: ['quote'] });
       }
@@ -176,17 +188,34 @@ export function CheckoutPage() {
       <h1 className="tz-page-title">{intl.formatMessage({ id: 'checkout.title' })}</h1>
       <LimitBanner />
 
-      <section className="tz-card" aria-label={intl.formatMessage({ id: 'checkout.pickup.label' })}>
-        <h2 className="tz-card-title">{intl.formatMessage({ id: 'checkout.pickup.title' })}</h2>
+      <section className="tz-card" aria-label={intl.formatMessage({ id: 'checkout.fulfilment.label' })}>
+        <h2 className="tz-card-title">
+          {intl.formatMessage({ id: ful.mode === 'delivery' ? 'checkout.delivery.title' : 'checkout.pickup.title' })}
+        </h2>
         <p className={styles.meta}>{store.name}</p>
-        {/* TODO(W2-03): delivery and the address picker. Pickup only this weekend. */}
+        <FulfilmentSwitch store={ful.store} offered={ful.offered} mode={ful.mode} quote={q} onChange={(m) => { ful.choose(m); setProblem(null); }}>
+          {ful.store && (
+            <AddressPicker
+              store={ful.store}
+              addresses={ful.addresses}
+              loading={ful.addressesLoading}
+              chosen={ful.address?.addressId ?? null}
+              onChoose={(id) => {
+                ful.choose('delivery', id);
+                setProblem(null);
+              }}
+            />
+          )}
+        </FulfilmentSwitch>
       </section>
+
+      {deliveryProblem && <DeliveryProblemBanner problem={deliveryProblem} now={ful.store?.serverNow} onPickup={toPickup} />}
 
       {closed && (
         <Banner tone="warning" title={intl.formatMessage({ id: 'checkout.problem.store_closed' })}>
-          {hours.data
+          {hours
             ? (() => {
-                const today = todaysHours(hours.data.hours.weekly, hours.data.serverNow);
+                const today = todaysHours(hours.hours.weekly, hours.serverNow);
                 return today.length > 0
                   ? intl.formatMessage({ id: 'checkout.hoursToday' }, { hours: today.join(', ') })
                   : intl.formatMessage({ id: 'checkout.closedToday' });
@@ -194,7 +223,7 @@ export function CheckoutPage() {
             : intl.formatMessage({ id: 'checkout.cartKept' })}
         </Banner>
       )}
-      {quote.error instanceof ApiError && quote.error.code !== 'store_closed' && (
+      {quote.error instanceof ApiError && quote.error.code !== 'store_closed' && !quoteDelivery && (
         <Banner tone="warning" live="status">
           {quote.error.code === 'ordering_suspended'
             ? suspendedText(suspendedUntil(quote.error))
@@ -285,6 +314,12 @@ export function CheckoutPage() {
                 <dd>−{formatMoney(q.creditsUsed * 100)}</dd>
               </div>
             )}
+            {q.fulfilment === 'delivery' && (
+              <div className={styles.totalRow}>
+                <dt>{intl.formatMessage({ id: 'delivery.feeRow' })}</dt>
+                <dd>{q.deliveryFeePaise > 0 ? formatMoney(q.deliveryFeePaise) : intl.formatMessage({ id: 'delivery.free' })}</dd>
+              </div>
+            )}
             <div className={`${styles.totalRow} ${styles.grand}`}>
               <dt>{intl.formatMessage({ id: 'cart.total' })}</dt>
               <dd>{formatMoney(q.totalPaise)}</dd>
@@ -296,7 +331,7 @@ export function CheckoutPage() {
 
       <p className={styles.note}>
         <Icon icon={Banknote} />
-        <span>{intl.formatMessage({ id: 'checkout.payNote' })}</span>
+        <span>{intl.formatMessage({ id: q?.fulfilment === 'delivery' ? 'checkout.payNote.delivery' : 'checkout.payNote' })}</span>
       </p>
 
       <div className={styles.placeBar}>
@@ -306,7 +341,7 @@ export function CheckoutPage() {
           block
           loading={placing}
           loadingLabel={intl.formatMessage({ id: 'checkout.placing' })}
-          disabled={!q || blocked || closed || settling}
+          disabled={!q || blocked || closed || settling || (ful.mode === 'delivery' && ful.quoted.fulfilment !== 'delivery') || deliveryProblem !== null}
           onClick={() => void place()}
         >
           {needsAccept && q

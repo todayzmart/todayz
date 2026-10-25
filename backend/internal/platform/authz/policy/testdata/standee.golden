@@ -1,0 +1,5 @@
+# domain standee: one line per (role x action); regenerate with -update
+standee.manage kind=business step-up=false
+standee.manage owner allow
+standee.manage manager allow
+standee.manage cashier -

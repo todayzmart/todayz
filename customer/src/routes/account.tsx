@@ -9,6 +9,7 @@ import { useState, type FormEvent } from 'react';
 import { useIntl } from 'react-intl';
 import { patchMe } from '../app/me';
 import { usePlace } from '../app/place';
+import { SavedAddresses } from '../address/SavedAddresses';
 import styles from '../shell/shell.module.css';
 
 export const Route = createFileRoute('/account')({
@@ -173,6 +174,8 @@ function Profile({ me, note, setNote }: { me: Me; note: Note; setNote: (n: Note)
           </dd>
         </div>
       </dl>
+
+      <SavedAddresses />
 
       <Button variant="soft-danger" block onClick={() => void signOut()}>
         {intl.formatMessage({ id: 'account.signOut' })}

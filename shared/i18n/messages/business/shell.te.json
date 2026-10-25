@@ -1,0 +1,137 @@
+{
+  "shell.appName": {
+    "message": "TodayZ",
+    "review": "reviewed",
+    "enHash": "34b58f9d"
+  },
+  "shell.appTag": {
+    "message": "బిజినెస్",
+    "review": "reviewed",
+    "enHash": "d6663dda"
+  },
+  "shell.skipToContent": {
+    "message": "నేరుగా ముఖ్య భాగానికి వెళ్ళండి",
+    "review": "reviewed",
+    "enHash": "0a4470d6"
+  },
+  "shell.nav.label": {
+    "message": "బిజినెస్",
+    "review": "reviewed",
+    "enHash": "d6663dda"
+  },
+  "shell.nav.overview": {
+    "message": "సారాంశం",
+    "review": "reviewed",
+    "enHash": "0efc2e6b"
+  },
+  "shell.nav.orders": {
+    "message": "ఆర్డర్లు",
+    "review": "reviewed",
+    "enHash": "cded0933"
+  },
+  "shell.nav.sell": {
+    "message": "అమ్మకం",
+    "review": "reviewed",
+    "enHash": "fa3cf2ad"
+  },
+  "shell.nav.stock": {
+    "message": "స్టాక్",
+    "review": "reviewed",
+    "enHash": "bcecf456"
+  },
+  "shell.nav.more": {
+    "message": "మరిన్ని",
+    "review": "reviewed",
+    "enHash": "4bab2d8f"
+  },
+  "shell.nav.customers": {
+    "message": "కస్టమర్లు",
+    "review": "reviewed",
+    "enHash": "035eae60"
+  },
+  "shell.nav.groupGrow": {
+    "message": "పెంచుకోండి",
+    "review": "reviewed",
+    "enHash": "7e2299a8"
+  },
+  "shell.nav.offers": {
+    "message": "ఆఫర్లు",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "shell.nav.reviews": {
+    "message": "రివ్యూలు",
+    "review": "reviewed",
+    "enHash": "b83c4cda"
+  },
+  "shell.nav.analytics": {
+    "message": "గణాంకాలు",
+    "review": "reviewed",
+    "enHash": "25bc9629"
+  },
+  "shell.nav.groupShop": {
+    "message": "దుకాణం",
+    "review": "reviewed",
+    "enHash": "55de8870"
+  },
+  "shell.nav.credits": {
+    "message": "క్రెడిట్లు",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "shell.nav.settings": {
+    "message": "సెట్టింగ్‌లు",
+    "review": "reviewed",
+    "enHash": "c7f73bb5"
+  },
+  "shell.greet.title": {
+    "message": "TodayZ లో మీ దుకాణం",
+    "review": "reviewed",
+    "enHash": "ecd7ca85"
+  },
+  "shell.greet.sub": {
+    "message": "కౌంటర్, స్టాక్, ఆర్డర్లు, ఆఫర్లు అన్నీ ఒకే చోట నుంచి నడపండి.",
+    "review": "reviewed",
+    "enHash": "879ce392"
+  },
+  "shell.soon.tag": {
+    "message": "త్వరలో",
+    "review": "reviewed",
+    "enHash": "e4115be2"
+  },
+  "shell.soon.title": {
+    "message": "{section} త్వరలో వస్తోంది",
+    "review": "reviewed",
+    "enHash": "6c957e46"
+  },
+  "shell.soon.body": {
+    "message": "బిజినెస్ యాప్‌లో ఈ భాగాన్ని మేము తయారు చేస్తున్నాం. ఇది కౌంటర్ దగ్గర ఇంటర్నెట్ లేకపోయినా పనిచేస్తుంది.",
+    "review": "reviewed",
+    "enHash": "0aa81361"
+  },
+  "shell.notFound.title": {
+    "message": "పేజీ కనబడలేదు",
+    "review": "reviewed",
+    "enHash": "bc3023b3"
+  },
+  "shell.notFound.body": {
+    "message": "ఈ లింక్ ఇంకా ఎక్కడికీ వెళ్ళదు.",
+    "review": "reviewed",
+    "enHash": "8c0d72a2"
+  },
+  "shell.notFound.home": {
+    "message": "సారాంశానికి వెళ్ళండి",
+    "review": "reviewed",
+    "enHash": "711dbdf4"
+  },
+  "shell.nav.ordersCount": {
+    "message": "{count, plural, one {# ఆర్డర్ వేచి ఉంది} other {# ఆర్డర్లు వేచి ఉన్నాయి}}",
+    "review": "reviewed",
+    "enHash": "31dd266d"
+  },
+  "shell.nav.stockCount": {
+    "message": "{count, plural, one {# ఐటమ్ రేపటికల్లా అయిపోతుంది} other {# ఐటమ్‌లు రేపటికల్లా అయిపోతాయి}}",
+    "review": "reviewed",
+    "enHash": "a905b14b"
+  }
+}

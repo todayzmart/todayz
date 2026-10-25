@@ -1,0 +1,357 @@
+{
+  "onboarding.title": {
+    "message": "दुकान का सेटअप",
+    "review": "reviewed",
+    "enHash": "0857f615"
+  },
+  "onboarding.loading": {
+    "message": "आपकी दुकान का सेटअप लोड हो रहा है",
+    "review": "reviewed",
+    "enHash": "97135be6"
+  },
+  "onboarding.loadFailed.title": {
+    "message": "आपकी दुकान लोड नहीं हो सकी",
+    "review": "reviewed",
+    "enHash": "775cadd8"
+  },
+  "onboarding.loadFailed.body": {
+    "message": "अपना इंटरनेट देखें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "onboarding.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "onboarding.ownerOnly.title": {
+    "message": "दुकान का सेटअप सिर्फ़ मालिक कर सकते हैं",
+    "review": "reviewed",
+    "enHash": "ce1ffa3e"
+  },
+  "onboarding.ownerOnly.body": {
+    "message": "सेटअप पूरा करने के लिए अपनी दुकान के मालिक से कहें।",
+    "review": "reviewed",
+    "enHash": "ed6b1f38"
+  },
+  "onboarding.step": {
+    "message": "स्टेप {n}: {title}",
+    "review": "reviewed",
+    "enHash": "1133cf5c"
+  },
+  "onboarding.done": {
+    "message": "पूरा",
+    "review": "reviewed",
+    "enHash": "e9b450d1"
+  },
+  "onboarding.saved": {
+    "message": "सेव हो गया",
+    "review": "reviewed",
+    "enHash": "c0ae8f6e"
+  },
+  "onboarding.save": {
+    "message": "सेव करें",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "onboarding.business.title": {
+    "message": "आपकी दुकान के बारे में",
+    "review": "reviewed",
+    "enHash": "6291f190"
+  },
+  "onboarding.business.brandName": {
+    "message": "दुकान का नाम",
+    "review": "reviewed",
+    "enHash": "6a5cc02e"
+  },
+  "onboarding.business.brandNameHelp": {
+    "message": "वह नाम जो ग्राहक देखते हैं।",
+    "review": "reviewed",
+    "enHash": "6680c228"
+  },
+  "onboarding.business.brandNameRequired": {
+    "message": "अपनी दुकान का नाम डालें।",
+    "review": "reviewed",
+    "enHash": "00a41eb3"
+  },
+  "onboarding.business.legalName": {
+    "message": "रजिस्टर्ड बिज़नेस का नाम",
+    "review": "reviewed",
+    "enHash": "9deda141"
+  },
+  "onboarding.business.legalNameHelp": {
+    "message": "जैसा आपके PAN या GST सर्टिफ़िकेट पर है। आप इसे बाद में भी जोड़ सकते हैं।",
+    "review": "reviewed",
+    "enHash": "fcbd36b3"
+  },
+  "onboarding.business.category": {
+    "message": "आप क्या बेचते हैं",
+    "review": "reviewed",
+    "enHash": "99f2197d"
+  },
+  "onboarding.business.categoryNone": {
+    "message": "कैटेगरी चुनें",
+    "review": "reviewed",
+    "enHash": "b91bf5d4"
+  },
+  "onboarding.store.title": {
+    "message": "आपकी पहली दुकान",
+    "review": "reviewed",
+    "enHash": "c1b36766"
+  },
+  "onboarding.store.have": {
+    "message": "दुकान जुड़ गई: {name}।",
+    "review": "reviewed",
+    "enHash": "ff206dca"
+  },
+  "onboarding.store.manage": {
+    "message": "दुकानें संभालें",
+    "review": "reviewed",
+    "enHash": "e0b3455b"
+  },
+  "onboarding.store.create": {
+    "message": "दुकान जोड़ें",
+    "review": "reviewed",
+    "enHash": "a0df4ca0"
+  },
+  "onboarding.hours.title": {
+    "message": "खुलने का समय",
+    "review": "reviewed",
+    "enHash": "6117e118"
+  },
+  "onboarding.payout.title": {
+    "message": "पेमेंट की जानकारी",
+    "review": "reviewed",
+    "enHash": "ad5e1a85"
+  },
+  "onboarding.payout.body": {
+    "message": "हम आपको पैसे कहाँ भेजें। इसे अभी या बाद में जोड़ सकते हैं; दुकान को जाँच के लिए भेजने में इसकी ज़रूरत नहीं है।",
+    "review": "reviewed",
+    "enHash": "16c98dff"
+  },
+  "onboarding.docs.title": {
+    "message": "दस्तावेज़",
+    "review": "reviewed",
+    "enHash": "687c8286"
+  },
+  "onboarding.docs.help": {
+    "message": "फ़ोटो या PDF, हर एक 10 MB तक। दस्तावेज़ निजी रखे जाते हैं और सिर्फ़ हमारी जाँच टीम उन्हें देखती है।",
+    "review": "reviewed",
+    "enHash": "5285e84b"
+  },
+  "onboarding.docs.kind.pan": {
+    "message": "PAN कार्ड",
+    "review": "reviewed",
+    "enHash": "1a5fa132"
+  },
+  "onboarding.docs.kind.gst": {
+    "message": "GST सर्टिफ़िकेट",
+    "review": "reviewed",
+    "enHash": "1d4b2467"
+  },
+  "onboarding.docs.kind.shop_photo": {
+    "message": "दुकान के अंदर की फ़ोटो",
+    "review": "reviewed",
+    "enHash": "043fa414"
+  },
+  "onboarding.docs.kind.storefront": {
+    "message": "दुकान के सामने की फ़ोटो",
+    "review": "reviewed",
+    "enHash": "2c113b69"
+  },
+  "onboarding.docs.kind.license": {
+    "message": "ट्रेड लाइसेंस",
+    "review": "reviewed",
+    "enHash": "42559b25"
+  },
+  "onboarding.docs.status.pending": {
+    "message": "अपलोड हो रहा है",
+    "review": "reviewed",
+    "enHash": "de272409"
+  },
+  "onboarding.docs.status.uploaded": {
+    "message": "मिल गया",
+    "review": "reviewed",
+    "enHash": "27548c4f"
+  },
+  "onboarding.docs.status.accepted": {
+    "message": "मंज़ूर",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "onboarding.docs.status.rejected": {
+    "message": "नामंज़ूर",
+    "review": "reviewed",
+    "enHash": "27eeb7a2"
+  },
+  "onboarding.docs.add": {
+    "message": "{name} जोड़ें",
+    "review": "reviewed",
+    "enHash": "3796d1b1"
+  },
+  "onboarding.docs.added": {
+    "message": "{name} जुड़ गया",
+    "review": "reviewed",
+    "enHash": "dae4c24a"
+  },
+  "onboarding.docs.err.type": {
+    "message": "JPG, PNG या WebP फ़ोटो, या PDF इस्तेमाल करें।",
+    "review": "reviewed",
+    "enHash": "78549188"
+  },
+  "onboarding.docs.err.size": {
+    "message": "यह फ़ाइल 10 MB से बड़ी है।",
+    "review": "reviewed",
+    "enHash": "7be70506"
+  },
+  "onboarding.docs.err.empty": {
+    "message": "यह फ़ाइल ख़ाली है।",
+    "review": "reviewed",
+    "enHash": "f9256174"
+  },
+  "onboarding.docs.uploadFailed": {
+    "message": "फ़ाइल अपलोड नहीं हुई। अपना इंटरनेट देखें और फिर से जोड़ें।",
+    "review": "reviewed",
+    "enHash": "dd02b2ad"
+  },
+  "onboarding.submit.title": {
+    "message": "जाँच के लिए भेजें",
+    "review": "reviewed",
+    "enHash": "ddc87345"
+  },
+  "onboarding.submit.body": {
+    "message": "हम आपकी जानकारी जाँचते हैं और कुछ चाहिए हो तो फ़ोन करते हैं। जाँच के दौरान भी आप ऑर्डर के लिए TodayZ इस्तेमाल कर सकते हैं।",
+    "review": "reviewed",
+    "enHash": "6dc86397"
+  },
+  "onboarding.submit.action": {
+    "message": "जाँच के लिए भेजें",
+    "review": "reviewed",
+    "enHash": "ddc87345"
+  },
+  "onboarding.submit.sent": {
+    "message": "जाँच के लिए भेज दिया",
+    "review": "reviewed",
+    "enHash": "ef78972f"
+  },
+  "onboarding.status.submitted.title": {
+    "message": "आपकी दुकान की जाँच चल रही है",
+    "review": "reviewed",
+    "enHash": "eaec7e93"
+  },
+  "onboarding.status.submitted.body": {
+    "message": "जाँच पूरी होने पर हम आपको बताएँगे।",
+    "review": "reviewed",
+    "enHash": "01dd0eb4"
+  },
+  "onboarding.status.needs_info.title": {
+    "message": "हमें आपसे थोड़ी और जानकारी चाहिए",
+    "review": "reviewed",
+    "enHash": "4bc026eb"
+  },
+  "onboarding.status.needs_info.body": {
+    "message": "कृपया इन्हें ठीक करें और फिर से जाँच के लिए भेजें।",
+    "review": "reviewed",
+    "enHash": "f7322f3e"
+  },
+  "onboarding.status.verified.title": {
+    "message": "आपकी दुकान वेरिफ़ाई हो गई है",
+    "review": "reviewed",
+    "enHash": "f69ca01e"
+  },
+  "onboarding.status.verified.body": {
+    "message": "ग्राहक आपकी लाइव दुकानें ढूँढ सकते हैं।",
+    "review": "reviewed",
+    "enHash": "ca169a4c"
+  },
+  "onboarding.status.rejected.title": {
+    "message": "आपकी दुकान मंज़ूर नहीं हुई",
+    "review": "reviewed",
+    "enHash": "75e8f563"
+  },
+  "onboarding.status.rejected.body": {
+    "message": "अगर आपको लगता है कि यह ग़लती है तो सपोर्ट से संपर्क करें।",
+    "review": "reviewed",
+    "enHash": "9e413826"
+  },
+  "onboarding.status.suspended.title": {
+    "message": "आपकी दुकान रोक दी गई है",
+    "review": "reviewed",
+    "enHash": "655adb75"
+  },
+  "onboarding.status.suspended.body": {
+    "message": "वजह जानने के लिए सपोर्ट से संपर्क करें।",
+    "review": "reviewed",
+    "enHash": "1943d6db"
+  },
+  "onboarding.field.categoryId": {
+    "message": "आप क्या बेचते हैं",
+    "review": "reviewed",
+    "enHash": "32d50307"
+  },
+  "onboarding.field.stores": {
+    "message": "एक दुकान",
+    "review": "reviewed",
+    "enHash": "73ea649e"
+  },
+  "onboarding.field.addressLine1": {
+    "message": "दुकान का पता",
+    "review": "reviewed",
+    "enHash": "93458909"
+  },
+  "onboarding.field.city": {
+    "message": "शहर",
+    "review": "reviewed",
+    "enHash": "4271627f"
+  },
+  "onboarding.field.pincode": {
+    "message": "पिनकोड",
+    "review": "reviewed",
+    "enHash": "f2c5ca7b"
+  },
+  "onboarding.field.location": {
+    "message": "नक्शे पर जगह",
+    "review": "reviewed",
+    "enHash": "9a333493"
+  },
+  "onboarding.field.phone": {
+    "message": "दुकान का फ़ोन",
+    "review": "reviewed",
+    "enHash": "5bd971a7"
+  },
+  "onboarding.field.hours": {
+    "message": "खुलने का समय",
+    "review": "reviewed",
+    "enHash": "6117e118"
+  },
+  "onboarding.field.brandName": {
+    "message": "दुकान का नाम",
+    "review": "reviewed",
+    "enHash": "6a5cc02e"
+  },
+  "onboarding.field.legalName": {
+    "message": "रजिस्टर्ड बिज़नेस का नाम",
+    "review": "reviewed",
+    "enHash": "9deda141"
+  },
+  "onboarding.field.pan": {
+    "message": "PAN",
+    "review": "reviewed",
+    "enHash": "ad2967ed"
+  },
+  "onboarding.field.gstin": {
+    "message": "GSTIN",
+    "review": "reviewed",
+    "enHash": "da7751f5"
+  },
+  "onboarding.field.documents": {
+    "message": "दस्तावेज़",
+    "review": "reviewed",
+    "enHash": "687c8286"
+  },
+  "onboarding.field.other": {
+    "message": "कोई और जानकारी",
+    "review": "reviewed",
+    "enHash": "61052ba2"
+  }
+}

@@ -10,6 +10,9 @@ const (
 	MeView   = "me.view"
 	MeEdit   = "me.edit"
 	MeDelete = "me.delete"
+	// Saved addresses (W2-15): the customer's own only; another user's is 404.
+	MeAddressesView   = "me.addresses.view"
+	MeAddressesManage = "me.addresses.manage"
 )
 
 func init() {
@@ -17,5 +20,7 @@ func init() {
 		{Name: MeView, Kind: authz.KindAny, Doc: "GET /v1/me: own profile, any app"},
 		{Name: MeEdit, Kind: authz.KindAny, Doc: "PATCH /v1/me: own name and language, any app"},
 		{Name: MeDelete, Kind: authz.KindCustomer, Doc: "DELETE /v1/me: delete own account, customer app, with an SMS OTP (D-31)"},
+		{Name: MeAddressesView, Kind: authz.KindCustomer, Doc: "GET /v1/me/addresses: own saved addresses, customer app"},
+		{Name: MeAddressesManage, Kind: authz.KindCustomer, Doc: "POST/PATCH/DELETE /v1/me/addresses: add, change or delete own saved addresses, customer app"},
 	}})
 }

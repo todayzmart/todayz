@@ -11,6 +11,10 @@ import { cartCount, clearCart, setQty, useCart, type CartLine } from './cart';
 import { CreditsControl } from './CreditsControl';
 import { suspendedUntil, useSuspendedText } from '../orders/limit';
 import { useCartPricing } from './quote';
+import { DeliveryProblemBanner, FulfilmentSwitch } from './Delivery';
+import { deliveryProblemOf } from './deliveryRules';
+import { useFulfilment } from './fulfilment';
+import { addressLine } from '../address/line';
 import styles from './tx.module.css';
 
 /** Problem codes the quote can answer with that the cart explains in words. */
@@ -38,7 +42,8 @@ export function CartPage() {
   const cart = useCart();
   const router = useRouter();
   const { status } = useSessionState();
-  const { quote, probe, choice } = useCartPricing(cart, status === 'signedIn');
+  const ful = useFulfilment(cart, status === 'signedIn');
+  const { quote, probe, choice } = useCartPricing(cart, status === 'signedIn', ful.quoted);
   const problemText = useQuoteProblemText();
 
   if (!cart.store || cart.lines.length === 0) {
@@ -63,6 +68,7 @@ export function CartPage() {
   const blocked = (quote.data && !quote.data.orderable) === true;
   const localTotal = cart.lines.reduce((sum, l) => sum + l.pricePaise * l.qty, 0);
   const total = quote.data ? quote.data.totalPaise : localTotal;
+  const deliveryProblem = quote.isError ? deliveryProblemOf(quote.error) : null;
 
   return (
     <div className={`${styles.page} ${styles.withBar}`}>
@@ -71,11 +77,14 @@ export function CartPage() {
         <PathLink to={`/s/${cart.store.slug}`} className={styles.textLink}>{intl.formatMessage({ id: 'cart.from' }, { shop: cart.store.name })}</PathLink>
       </p>
 
-      {quote.isError && (
-        <Banner tone="warning" live="status">
-          {problemText(quote.error)}
-        </Banner>
-      )}
+      {quote.isError &&
+        (deliveryProblem ? (
+          <DeliveryProblemBanner problem={deliveryProblem} now={ful.store?.serverNow} onPickup={() => ful.choose('pickup')} />
+        ) : (
+          <Banner tone="warning" live="status">
+            {problemText(quote.error)}
+          </Banner>
+        ))}
       {blocked && (
         <Banner tone="warning" title={intl.formatMessage({ id: 'cart.unavailable.title' })}>
           {intl.formatMessage({ id: 'cart.unavailable.body' })}
@@ -115,14 +124,39 @@ export function CartPage() {
               <dd>−{formatMoney(quote.data.creditsUsed * 100)}</dd>
             </div>
           )}
+          {quote.data && quote.data.fulfilment === 'delivery' && (
+            <div className={styles.totalRow}>
+              <dt>{intl.formatMessage({ id: 'delivery.feeRow' })}</dt>
+              <dd>
+                {quote.data.deliveryFeePaise > 0 ? formatMoney(quote.data.deliveryFeePaise) : intl.formatMessage({ id: 'delivery.free' })}
+              </dd>
+            </div>
+          )}
           <div className={`${styles.totalRow} ${styles.grand}`}>
             <dt>{intl.formatMessage({ id: 'cart.total' })}</dt>
             <dd>{formatMoney(total)}</dd>
           </div>
         </dl>
         {status !== 'signedIn' && <p className={styles.meta}>{intl.formatMessage({ id: 'cart.priceNote' })}</p>}
-        <p className={styles.meta}>{intl.formatMessage({ id: 'cart.pickupOnly' })}</p>
-        {/* TODO(W2-03): the pickup/delivery switch appears here only when the quote says delivery is possible. */}
+        <FulfilmentSwitch store={ful.store} offered={ful.offered} mode={ful.mode} quote={quote.data} onChange={(m) => ful.choose(m)}>
+          {status !== 'signedIn' ? (
+            <p className={styles.meta}>{intl.formatMessage({ id: 'delivery.cart.signIn' })}</p>
+          ) : ful.address ? (
+            <p className={styles.meta}>
+              {intl.formatMessage({ id: 'delivery.cart.to' }, { label: ful.address.label, address: addressLine(ful.address) })}{' '}
+              <PathLink to="/checkout" className={styles.textLink}>
+                {intl.formatMessage({ id: 'delivery.cart.change' })}
+              </PathLink>
+            </p>
+          ) : ful.needsAddress ? (
+            <p className={styles.meta}>
+              {intl.formatMessage({ id: ful.addresses.length > 0 ? 'delivery.cart.noneInside' : 'delivery.cart.noAddress' })}{' '}
+              <PathLink to="/checkout" className={styles.textLink}>
+                {intl.formatMessage({ id: 'delivery.cart.add' })}
+              </PathLink>
+            </p>
+          ) : null}
+        </FulfilmentSwitch>
         {status === 'signedIn' && (
           <CreditsControl storeId={cart.store.id} probe={probe} quote={quote.data} on={choice.on} amount={choice.amount} />
         )}

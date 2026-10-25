@@ -1,0 +1,982 @@
+{
+  "stock.title": {
+    "message": "స్టాక్",
+    "review": "reviewed",
+    "enHash": "bcecf456"
+  },
+  "stock.loading": {
+    "message": "స్టాక్ లోడ్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "a1a29595"
+  },
+  "stock.noStore.title": {
+    "message": "ముందు ఒక దుకాణం ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "stock.noStore.body": {
+    "message": "స్టాక్ ఒక దుకాణానికి చెందుతుంది. మీరు పని చేస్తున్న దుకాణాన్ని ఎంచుకోండి.",
+    "review": "reviewed",
+    "enHash": "3ad8aef4"
+  },
+  "stock.noStore.action": {
+    "message": "దుకాణం ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "stock.error.title": {
+    "message": "స్టాక్ లోడ్ చేయలేకపోయాం",
+    "review": "reviewed",
+    "enHash": "d98f90d7"
+  },
+  "stock.error.body": {
+    "message": "మీ కనెక్షన్ చూసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "stock.error.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "stock.error.validation_failed": {
+    "message": "అందులో కొంత అంగీకరించబడలేదు. సంఖ్యలు చూసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "a29c601a"
+  },
+  "stock.error.forbidden": {
+    "message": "మీ పాత్రతో ఇది చేయలేరు. మేనేజర్‌ను అడగండి.",
+    "review": "reviewed",
+    "enHash": "7c035098"
+  },
+  "stock.error.conflict": {
+    "message": "మీరు మారుస్తుండగా ఇది మారింది. మళ్ళీ లోడ్ చేసి ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "d32da861"
+  },
+  "stock.error.not_found": {
+    "message": "ఈ ఐటమ్ ఇప్పుడు మీ దుకాణంలో లేదు.",
+    "review": "reviewed",
+    "enHash": "bac42b30"
+  },
+  "stock.error.precondition_failed": {
+    "message": "వేరొకరు ఇప్పుడే ఈ ఐటమ్‌ను మార్చారు. మళ్ళీ లోడ్ చేశాం; మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "16a84f1b"
+  },
+  "stock.error.precondition_required": {
+    "message": "ఈ ఐటమ్ మార్పులను తనిఖీ చేయలేకపోయాం. మళ్ళీ లోడ్ చేసి ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "996ab7c1"
+  },
+  "stock.error.generic": {
+    "message": "అది కుదరలేదు. మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "9ae914fa"
+  },
+  "stock.search.label": {
+    "message": "స్టాక్ వెతకండి",
+    "review": "reviewed",
+    "enHash": "63960fa1"
+  },
+  "stock.search.placeholder": {
+    "message": "పేరు లేదా బార్‌కోడ్‌తో వెతకండి",
+    "review": "reviewed",
+    "enHash": "01f9e331"
+  },
+  "stock.search.clear": {
+    "message": "వెతుకుడు తీసివేయండి",
+    "review": "reviewed",
+    "enHash": "67300d0f"
+  },
+  "stock.filter.label": {
+    "message": "స్టాక్ ఫిల్టర్ చేయండి",
+    "review": "reviewed",
+    "enHash": "5b642716"
+  },
+  "stock.filter.all": {
+    "message": "అన్నీ",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "stock.filter.low": {
+    "message": "తక్కువ స్టాక్",
+    "review": "reviewed",
+    "enHash": "a6e1fef1"
+  },
+  "stock.filter.out": {
+    "message": "స్టాక్ లేదు",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "stock.filter.stale": {
+    "message": "ఇటీవల నిర్ధారించలేదు",
+    "review": "reviewed",
+    "enHash": "09fece23"
+  },
+  "stock.filter.hidden": {
+    "message": "దాచినవి",
+    "review": "reviewed",
+    "enHash": "d4c2792a"
+  },
+  "stock.category.label": {
+    "message": "కేటగిరీ",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "stock.category.all": {
+    "message": "అన్ని కేటగిరీలు",
+    "review": "reviewed",
+    "enHash": "060be00f"
+  },
+  "stock.action.add": {
+    "message": "ఐటమ్ జోడించండి",
+    "review": "reviewed",
+    "enHash": "5bcf4db4"
+  },
+  "stock.action.import": {
+    "message": "ఇంపోర్ట్",
+    "review": "reviewed",
+    "enHash": "d6fbc9d2"
+  },
+  "stock.action.count": {
+    "message": "స్టాక్ లెక్కించండి",
+    "review": "reviewed",
+    "enHash": "82d76c10"
+  },
+  "stock.action.countDone": {
+    "message": "లెక్కింపు పూర్తయింది",
+    "review": "reviewed",
+    "enHash": "152e7d90"
+  },
+  "stock.count.hint": {
+    "message": "ప్రతి ఐటమ్‌కీ షెల్ఫ్‌లో ఉన్నది టైప్ చేసి, నిర్ధారించండి. మీరు నిర్ధారించిన ఐటమ్‌లే మారతాయి.",
+    "review": "reviewed",
+    "enHash": "d36c7bbf"
+  },
+  "stock.table.label": {
+    "message": "స్టాక్ ఐటమ్‌లు",
+    "review": "reviewed",
+    "enHash": "51ae889f"
+  },
+  "stock.col.item": {
+    "message": "ఐటమ్",
+    "review": "reviewed",
+    "enHash": "ecdda59a"
+  },
+  "stock.col.stock": {
+    "message": "స్టాక్",
+    "review": "reviewed",
+    "enHash": "bcecf456"
+  },
+  "stock.col.onHand": {
+    "message": "చేతిలో ఉన్నవి",
+    "review": "reviewed",
+    "enHash": "d94c32d4"
+  },
+  "stock.col.counted": {
+    "message": "లెక్కించినవి",
+    "review": "reviewed",
+    "enHash": "319a2b6e"
+  },
+  "stock.col.price": {
+    "message": "ధర",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "stock.empty.none": {
+    "message": "ఇంకా ఐటమ్‌లు లేవు. మీ మొదటి ఐటమ్ జోడించండి లేదా షీట్ ఇంపోర్ట్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "97b326b4"
+  },
+  "stock.empty.filtered": {
+    "message": "ఏ ఐటమ్ సరిపోలలేదు.",
+    "review": "reviewed",
+    "enHash": "911453d6"
+  },
+  "stock.more": {
+    "message": "మరిన్ని చూపండి",
+    "review": "reviewed",
+    "enHash": "25911d48"
+  },
+  "stock.level.in": {
+    "message": "స్టాక్‌లో ఉంది",
+    "review": "reviewed",
+    "enHash": "3f1356ad"
+  },
+  "stock.level.low": {
+    "message": "{available} మాత్రమే మిగిలాయి",
+    "review": "reviewed",
+    "enHash": "8a4dc0ee"
+  },
+  "stock.level.out": {
+    "message": "స్టాక్ లేదు",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "stock.fresh.confirmed": {
+    "message": "నిర్ధారించింది {time}",
+    "review": "reviewed",
+    "enHash": "7d1ac5a7"
+  },
+  "stock.fresh.stale": {
+    "message": "స్టాక్ ఇటీవల నిర్ధారించలేదు",
+    "review": "reviewed",
+    "enHash": "c8a47c2d"
+  },
+  "stock.inline.edit": {
+    "message": "{item} మార్చండి",
+    "review": "reviewed",
+    "enHash": "0a705d55"
+  },
+  "stock.inline.save": {
+    "message": "{item} ధర సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "2b9d7bee"
+  },
+  "stock.inline.confirm": {
+    "message": "{item} లెక్క నిర్ధారించండి",
+    "review": "reviewed",
+    "enHash": "0ffca104"
+  },
+  "stock.inline.price": {
+    "message": "{item} ధర",
+    "review": "reviewed",
+    "enHash": "f96e0600"
+  },
+  "stock.inline.count": {
+    "message": "{item} లెక్కించిన పరిమాణం",
+    "review": "reviewed",
+    "enHash": "3f1068a2"
+  },
+  "stock.item.close": {
+    "message": "మూసివేయండి",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "stock.item.hidden": {
+    "message": "కస్టమర్ల నుంచి దాచబడింది",
+    "review": "reviewed",
+    "enHash": "f9800cca"
+  },
+  "stock.item.onHand": {
+    "message": "చేతిలో ఉన్నవి",
+    "review": "reviewed",
+    "enHash": "d94c32d4"
+  },
+  "stock.item.reserved": {
+    "message": "ఆర్డర్ల కోసం ఉంచినవి",
+    "review": "reviewed",
+    "enHash": "df36c2b4"
+  },
+  "stock.item.available": {
+    "message": "అందుబాటులో ఉన్నవి",
+    "review": "reviewed",
+    "enHash": "7c62a142"
+  },
+  "stock.item.price": {
+    "message": "ధర",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "stock.item.mrp": {
+    "message": "MRP",
+    "review": "reviewed",
+    "enHash": "cd74a166"
+  },
+  "stock.item.lowAt": {
+    "message": "తక్కువ స్టాక్ పరిమితి",
+    "review": "reviewed",
+    "enHash": "7ba9fd9d"
+  },
+  "stock.item.notSet": {
+    "message": "సెట్ చేయలేదు",
+    "review": "reviewed",
+    "enHash": "93039e60"
+  },
+  "stock.item.tabs": {
+    "message": "ఐటమ్ వివరాలు",
+    "review": "reviewed",
+    "enHash": "12e853a0"
+  },
+  "stock.tab.batches": {
+    "message": "బ్యాచ్‌లు",
+    "review": "reviewed",
+    "enHash": "30925eec"
+  },
+  "stock.tab.history": {
+    "message": "చరిత్ర",
+    "review": "reviewed",
+    "enHash": "90ccd649"
+  },
+  "stock.act.restock": {
+    "message": "మళ్ళీ స్టాక్ చేయండి",
+    "review": "reviewed",
+    "enHash": "3ccf7127"
+  },
+  "stock.act.count": {
+    "message": "లెక్క సరిచేయండి",
+    "review": "reviewed",
+    "enHash": "afc22be8"
+  },
+  "stock.act.damage": {
+    "message": "పాడైనదిగా గుర్తించండి",
+    "review": "reviewed",
+    "enHash": "cb521b7a"
+  },
+  "stock.act.expired": {
+    "message": "గడువు ముగిసినదిగా గుర్తించండి",
+    "review": "reviewed",
+    "enHash": "310c38b2"
+  },
+  "stock.act.price": {
+    "message": "ధర మార్చండి",
+    "review": "reviewed",
+    "enHash": "1eac205f"
+  },
+  "stock.act.threshold": {
+    "message": "తక్కువ స్టాక్ స్థాయి",
+    "review": "reviewed",
+    "enHash": "50344aed"
+  },
+  "stock.act.hide": {
+    "message": "కస్టమర్ల నుంచి దాచండి",
+    "review": "reviewed",
+    "enHash": "2f8bd03c"
+  },
+  "stock.act.list": {
+    "message": "కస్టమర్లకు చూపండి",
+    "review": "reviewed",
+    "enHash": "1f13846d"
+  },
+  "stock.batch.none": {
+    "message": "స్టాక్ మిగిలిన బ్యాచ్‌లు లేవు.",
+    "review": "reviewed",
+    "enHash": "3458ae7c"
+  },
+  "stock.batch.left": {
+    "message": "{quantity} మిగిలాయి",
+    "review": "reviewed",
+    "enHash": "62abbdae"
+  },
+  "stock.batch.expires": {
+    "message": "{date} న గడువు ముగుస్తుంది",
+    "review": "reviewed",
+    "enHash": "dde25e8f"
+  },
+  "stock.batch.expiredOn": {
+    "message": "{date} న గడువు ముగిసింది",
+    "review": "reviewed",
+    "enHash": "7cd25a6a"
+  },
+  "stock.batch.noExpiry": {
+    "message": "గడువు తేదీ లేదు",
+    "review": "reviewed",
+    "enHash": "8fbd9bfa"
+  },
+  "stock.batch.cost": {
+    "message": "ఖర్చు {cost}",
+    "review": "reviewed",
+    "enHash": "7703b083"
+  },
+  "stock.batch.edit": {
+    "message": "మార్చండి",
+    "review": "reviewed",
+    "enHash": "5301648d"
+  },
+  "stock.history.none": {
+    "message": "ఇంకా స్టాక్ మార్పులు లేవు.",
+    "review": "reviewed",
+    "enHash": "1fdb9f2a"
+  },
+  "stock.source.opening": {
+    "message": "ప్రారంభ స్టాక్",
+    "review": "reviewed",
+    "enHash": "38b7df56"
+  },
+  "stock.source.restock": {
+    "message": "మళ్ళీ స్టాక్ చేశారు",
+    "review": "reviewed",
+    "enHash": "12d85280"
+  },
+  "stock.source.supplier_bill": {
+    "message": "సప్లయర్ బిల్లు",
+    "review": "reviewed",
+    "enHash": "58997110"
+  },
+  "stock.source.import": {
+    "message": "ఇంపోర్ట్ చేశారు",
+    "review": "reviewed",
+    "enHash": "434eb26f"
+  },
+  "stock.source.count_correction": {
+    "message": "లెక్క సరిచేశారు",
+    "review": "reviewed",
+    "enHash": "97f5f111"
+  },
+  "stock.source.damage": {
+    "message": "పాడైంది",
+    "review": "reviewed",
+    "enHash": "052fc798"
+  },
+  "stock.source.expired": {
+    "message": "గడువు ముగిసింది",
+    "review": "reviewed",
+    "enHash": "a689a999"
+  },
+  "stock.source.sale_pos": {
+    "message": "కౌంటర్‌లో అమ్మారు",
+    "review": "reviewed",
+    "enHash": "ab1d9837"
+  },
+  "stock.source.sale_online": {
+    "message": "ఆన్‌లైన్‌లో అమ్మారు",
+    "review": "reviewed",
+    "enHash": "5320465a"
+  },
+  "stock.source.pos_reversal": {
+    "message": "కౌంటర్ అమ్మకం వెనక్కి తీసుకున్నారు",
+    "review": "reviewed",
+    "enHash": "da366a69"
+  },
+  "stock.source.other": {
+    "message": "స్టాక్ మార్పు",
+    "review": "reviewed",
+    "enHash": "78a9fe7e"
+  },
+  "stock.form.title.restock": {
+    "message": "{item} మళ్ళీ స్టాక్ చేయండి",
+    "review": "reviewed",
+    "enHash": "5b448a60"
+  },
+  "stock.form.title.damage": {
+    "message": "{item} ని పాడైనదిగా గుర్తించండి",
+    "review": "reviewed",
+    "enHash": "0e204bbc"
+  },
+  "stock.form.title.expired": {
+    "message": "{item} ని గడువు ముగిసినదిగా గుర్తించండి",
+    "review": "reviewed",
+    "enHash": "3d31bd67"
+  },
+  "stock.form.title.count_correction": {
+    "message": "{item} లెక్క సరిచేయండి",
+    "review": "reviewed",
+    "enHash": "465989a3"
+  },
+  "stock.form.title.price": {
+    "message": "ధర మార్చండి",
+    "review": "reviewed",
+    "enHash": "1eac205f"
+  },
+  "stock.form.title.threshold": {
+    "message": "తక్కువ స్టాక్ స్థాయి",
+    "review": "reviewed",
+    "enHash": "50344aed"
+  },
+  "stock.form.title.batch": {
+    "message": "బ్యాచ్ మార్చండి",
+    "review": "reviewed",
+    "enHash": "6c57d40d"
+  },
+  "stock.form.save.restock": {
+    "message": "స్టాక్ సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "0e0572ab"
+  },
+  "stock.form.save.damage": {
+    "message": "పాడైనది సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "d3f690ca"
+  },
+  "stock.form.save.expired": {
+    "message": "గడువు సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "f6053561"
+  },
+  "stock.form.save.count_correction": {
+    "message": "లెక్క సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "b64c0a4d"
+  },
+  "stock.form.save.price": {
+    "message": "ధర సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "6a897ddb"
+  },
+  "stock.form.save.threshold": {
+    "message": "స్థాయి సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "fbddda1e"
+  },
+  "stock.form.save.batch": {
+    "message": "బ్యాచ్ సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "1de2c092"
+  },
+  "stock.form.cancel": {
+    "message": "రద్దు చేయండి",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "stock.form.back": {
+    "message": "వెనక్కి",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "stock.form.qty": {
+    "message": "పరిమాణం",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "stock.form.qtyMax": {
+    "message": "{available} వరకు అందుబాటులో ఉన్నాయి.",
+    "review": "reviewed",
+    "enHash": "63f7abc0"
+  },
+  "stock.form.qtyInvalid": {
+    "message": "1 లేదా అంతకంటే ఎక్కువ, 10,00,000 వరకు పూర్ణ సంఖ్య ఇవ్వండి.",
+    "review": "reviewed",
+    "enHash": "b0cf53e4"
+  },
+  "stock.form.qtyTooMany": {
+    "message": "{available} మాత్రమే అందుబాటులో ఉన్నాయి.",
+    "review": "reviewed",
+    "enHash": "f86ab2b0"
+  },
+  "stock.form.counted": {
+    "message": "షెల్ఫ్‌లో లెక్కించినవి",
+    "review": "reviewed",
+    "enHash": "3757174e"
+  },
+  "stock.form.countedHelp": {
+    "message": "సిస్టమ్‌లో {onHand} చేతిలో ఉన్నాయి, వాటిలో {reserved} ఆర్డర్ల కోసం ఉంచాం.",
+    "review": "reviewed",
+    "enHash": "71147153"
+  },
+  "stock.form.countInvalid": {
+    "message": "0 నుంచి 10,00,000 వరకు పూర్ణ సంఖ్య ఇవ్వండి.",
+    "review": "reviewed",
+    "enHash": "2d52188c"
+  },
+  "stock.form.batches": {
+    "message": "గడువు ముగిసిన బ్యాచ్‌లు",
+    "review": "reviewed",
+    "enHash": "d2c336ef"
+  },
+  "stock.form.pickBatch": {
+    "message": "కనీసం ఒక బ్యాచ్‌ను టిక్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "636d30b3"
+  },
+  "stock.form.writeOff": {
+    "message": "{quantity} స్టాక్ నుంచి తీసివేయబడతాయి.",
+    "review": "reviewed",
+    "enHash": "25b017b9"
+  },
+  "stock.form.expiry": {
+    "message": "గడువు తేదీ",
+    "review": "reviewed",
+    "enHash": "6b440cd5"
+  },
+  "stock.form.expiryHelp": {
+    "message": "ఐచ్ఛికం. ముందు గడువు ముగిసేది ముందు అమ్ముడవుతుంది.",
+    "review": "reviewed",
+    "enHash": "16368f0b"
+  },
+  "stock.form.cost": {
+    "message": "ఒక్కో యూనిట్ ఖర్చు",
+    "review": "reviewed",
+    "enHash": "4f9ae67f"
+  },
+  "stock.form.costHelp": {
+    "message": "ఐచ్ఛికం. అమ్మకం ధర {price}.",
+    "review": "reviewed",
+    "enHash": "f3898983"
+  },
+  "stock.form.costInvalid": {
+    "message": "రూపాయల్లో మొత్తం ఇవ్వండి, ఉదా. 42 లేదా 42.50.",
+    "review": "reviewed",
+    "enHash": "60cbee53"
+  },
+  "stock.form.note": {
+    "message": "నోట్",
+    "review": "reviewed",
+    "enHash": "2c924e30"
+  },
+  "stock.form.price": {
+    "message": "అమ్మకం ధర",
+    "review": "reviewed",
+    "enHash": "7657ccd6"
+  },
+  "stock.form.priceMrp": {
+    "message": "MRP {mrp}. ధర దీని కంటే ఎక్కువ ఉండకూడదు.",
+    "review": "reviewed",
+    "enHash": "42107931"
+  },
+  "stock.form.priceInvalid": {
+    "message": "రూపాయల్లో మొత్తం ఇవ్వండి, ఉదా. 58 లేదా 58.50.",
+    "review": "reviewed",
+    "enHash": "1f25c621"
+  },
+  "stock.form.priceAboveMrp": {
+    "message": "ధర {mrp} MRP కంటే ఎక్కువ ఉండకూడదు.",
+    "review": "reviewed",
+    "enHash": "7a0650ec"
+  },
+  "stock.form.priceRef": {
+    "message": "సూచన నుంచి రిఫరెన్స్ ధర: {price}. మీరు సేవ్ చేసే వరకు ఏమీ మారదు.",
+    "review": "reviewed",
+    "enHash": "188c481e"
+  },
+  "stock.form.threshold": {
+    "message": "తక్కువ స్టాక్ పరిమితి",
+    "review": "reviewed",
+    "enHash": "7ba9fd9d"
+  },
+  "stock.form.thresholdHelp": {
+    "message": "అందుబాటులో ఉన్న స్టాక్ ఈ సంఖ్యకు చేరినప్పుడు హెచ్చరించండి. ఆఫ్ చేయడానికి ఖాళీగా వదలండి.",
+    "review": "reviewed",
+    "enHash": "5f13e007"
+  },
+  "stock.link.askManager": {
+    "message": "దీని కోసం మేనేజర్‌ను అడగండి.",
+    "review": "reviewed",
+    "enHash": "9c4dbb1f"
+  },
+  "stock.toast.restock": {
+    "message": "{item} మళ్ళీ స్టాక్ అయింది",
+    "review": "reviewed",
+    "enHash": "d480fd84"
+  },
+  "stock.toast.damage": {
+    "message": "{item} ని పాడైనదిగా గుర్తించాం",
+    "review": "reviewed",
+    "enHash": "371b429f"
+  },
+  "stock.toast.expired": {
+    "message": "{item} ని గడువు ముగిసినదిగా గుర్తించాం",
+    "review": "reviewed",
+    "enHash": "2680d0cd"
+  },
+  "stock.toast.count_correction": {
+    "message": "{item} లెక్క సేవ్ అయింది",
+    "review": "reviewed",
+    "enHash": "4494f38a"
+  },
+  "stock.toast.price": {
+    "message": "{item} ధర మారింది",
+    "review": "reviewed",
+    "enHash": "b8e3449e"
+  },
+  "stock.toast.threshold": {
+    "message": "{item} తక్కువ స్టాక్ స్థాయి సేవ్ అయింది",
+    "review": "reviewed",
+    "enHash": "fde3bc47"
+  },
+  "stock.toast.batch": {
+    "message": "బ్యాచ్ సేవ్ అయింది",
+    "review": "reviewed",
+    "enHash": "aa30e481"
+  },
+  "stock.toast.added": {
+    "message": "{item} జోడించాం",
+    "review": "reviewed",
+    "enHash": "29e20351"
+  },
+  "stock.add.title": {
+    "message": "ఐటమ్ జోడించండి",
+    "review": "reviewed",
+    "enHash": "5bcf4db4"
+  },
+  "stock.add.search": {
+    "message": "ప్రోడక్ట్ వెతకండి",
+    "review": "reviewed",
+    "enHash": "1a413f0c"
+  },
+  "stock.add.searchHint": {
+    "message": "పేరు లేదా బార్‌కోడ్",
+    "review": "reviewed",
+    "enHash": "d529b5fb"
+  },
+  "stock.add.hint": {
+    "message": "కనీసం 2 అక్షరాలు టైప్ చేయండి, లేదా బార్‌కోడ్ స్కాన్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "405c2949"
+  },
+  "stock.add.noMatch": {
+    "message": "ప్రోడక్ట్ దొరకలేదు. మీరు దాన్ని సృష్టించవచ్చు.",
+    "review": "reviewed",
+    "enHash": "b73e927b"
+  },
+  "stock.add.results": {
+    "message": "సరిపోలిన ప్రోడక్ట్‌లు",
+    "review": "reviewed",
+    "enHash": "894ed0db"
+  },
+  "stock.add.pick": {
+    "message": "జోడించండి",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "stock.add.inStore": {
+    "message": "ఇప్పటికే మీ దుకాణంలో ఉంది",
+    "review": "reviewed",
+    "enHash": "d008bf38"
+  },
+  "stock.add.pickAgain": {
+    "message": "జోడించడానికి ప్రోడక్ట్‌ను వెతకండి.",
+    "review": "reviewed",
+    "enHash": "77422308"
+  },
+  "stock.add.create": {
+    "message": "కొత్త ప్రోడక్ట్ సృష్టించండి",
+    "review": "reviewed",
+    "enHash": "48e2e613"
+  },
+  "stock.add.createTitle": {
+    "message": "కొత్త ప్రోడక్ట్",
+    "review": "reviewed",
+    "enHash": "1bc965f3"
+  },
+  "stock.add.createNote": {
+    "message": "మీరు దీన్ని వెంటనే అమ్మవచ్చు. TodayZ కొత్త ప్రోడక్ట్‌లను తనిఖీ చేసి, వివరాలు సరిచేయవచ్చు.",
+    "review": "reviewed",
+    "enHash": "b17b44e7"
+  },
+  "stock.add.createSave": {
+    "message": "సృష్టించి కొనసాగండి",
+    "review": "reviewed",
+    "enHash": "8fb3ba33"
+  },
+  "stock.add.name": {
+    "message": "ప్రోడక్ట్ పేరు",
+    "review": "reviewed",
+    "enHash": "63c0fe8e"
+  },
+  "stock.add.brand": {
+    "message": "బ్రాండ్",
+    "review": "reviewed",
+    "enHash": "62b4aa57"
+  },
+  "stock.add.packSize": {
+    "message": "ప్యాక్ సైజ్",
+    "review": "reviewed",
+    "enHash": "87dd2c97"
+  },
+  "stock.add.unit": {
+    "message": "యూనిట్",
+    "review": "reviewed",
+    "enHash": "f6b935ab"
+  },
+  "stock.add.category": {
+    "message": "కేటగిరీ",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "stock.add.categoryPick": {
+    "message": "కేటగిరీ ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "b91bf5d4"
+  },
+  "stock.add.mrp": {
+    "message": "MRP",
+    "review": "reviewed",
+    "enHash": "cd74a166"
+  },
+  "stock.add.barcode": {
+    "message": "బార్‌కోడ్",
+    "review": "reviewed",
+    "enHash": "8e54dc53"
+  },
+  "stock.add.nameInvalid": {
+    "message": "ప్రోడక్ట్ పేరు ఇవ్వండి.",
+    "review": "reviewed",
+    "enHash": "156b98ba"
+  },
+  "stock.add.packInvalid": {
+    "message": "0 కంటే ఎక్కువ ప్యాక్ సైజ్ ఇవ్వండి.",
+    "review": "reviewed",
+    "enHash": "c518b9fb"
+  },
+  "stock.add.categoryInvalid": {
+    "message": "కేటగిరీ ఎంచుకోండి.",
+    "review": "reviewed",
+    "enHash": "1ae9839f"
+  },
+  "stock.add.barcodeInvalid": {
+    "message": "బార్‌కోడ్‌లో 8 నుంచి 14 అంకెలు ఉంటాయి.",
+    "review": "reviewed",
+    "enHash": "6afd70c1"
+  },
+  "stock.add.priceTitle": {
+    "message": "ధర, ప్రారంభ స్టాక్",
+    "review": "reviewed",
+    "enHash": "ef3f7094"
+  },
+  "stock.add.opening": {
+    "message": "ప్రారంభ స్టాక్",
+    "review": "reviewed",
+    "enHash": "38b7df56"
+  },
+  "stock.add.openingHelp": {
+    "message": "ఇప్పుడు మీ దగ్గర ఎన్ని ఉన్నాయి. స్టాక్ లేకుండా జోడించడానికి ఖాళీగా వదలండి.",
+    "review": "reviewed",
+    "enHash": "56e87302"
+  },
+  "stock.add.save": {
+    "message": "నా దుకాణంలో జోడించండి",
+    "review": "reviewed",
+    "enHash": "6bcff51f"
+  },
+  "stock.import.title": {
+    "message": "ఐటమ్‌లు ఇంపోర్ట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "71475145"
+  },
+  "stock.import.body": {
+    "message": "ఒక్కో వరుసలో ఒక ఐటమ్ ఉన్న CSV లేదా XLSX షీట్ అప్‌లోడ్ చేయండి. ఏదైనా సేవ్ అయ్యే ముందు ప్రతి వరుస తనిఖీ మీకు కనిపిస్తుంది.",
+    "review": "reviewed",
+    "enHash": "52306a4f"
+  },
+  "stock.import.choose": {
+    "message": "ఫైల్ ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "74b1d89d"
+  },
+  "stock.import.file": {
+    "message": "ఐటమ్‌ల ఫైల్",
+    "review": "reviewed",
+    "enHash": "2486c8be"
+  },
+  "stock.import.tooBig": {
+    "message": "ఆ ఫైల్ 5 MB కంటే పెద్దది. దాన్ని విభజించి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "074bff0d"
+  },
+  "stock.import.okCount": {
+    "message": "{count, plural, one {# వరుస సిద్ధం} other {# వరుసలు సిద్ధం}}",
+    "review": "reviewed",
+    "enHash": "454bd309"
+  },
+  "stock.import.errorCount": {
+    "message": "{count, plural, one {# వరుసలో సమస్య} other {# వరుసల్లో సమస్యలు}}",
+    "review": "reviewed",
+    "enHash": "6f89d2ee"
+  },
+  "stock.import.errorNote": {
+    "message": "సమస్యలు ఉన్న వరుసలను వదిలేస్తాం. వాటిని మీ షీట్‌లో సరిచేసి మళ్ళీ ఇంపోర్ట్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "8199a9f2"
+  },
+  "stock.import.rows": {
+    "message": "ఫైల్‌లోని వరుసలు",
+    "review": "reviewed",
+    "enHash": "ccfb8479"
+  },
+  "stock.import.rowNo": {
+    "message": "వరుస {row}",
+    "review": "reviewed",
+    "enHash": "b8e5d89e"
+  },
+  "stock.import.unnamed": {
+    "message": "పేరు లేదు",
+    "review": "reviewed",
+    "enHash": "b78fd250"
+  },
+  "stock.import.rowError": {
+    "message": "{field}: {problem}",
+    "review": "reviewed",
+    "enHash": "c181bee1"
+  },
+  "stock.import.apply": {
+    "message": "{count, plural, one {# ఐటమ్ ఇంపోర్ట్ చేయండి} other {# ఐటమ్‌లు ఇంపోర్ట్ చేయండి}}",
+    "review": "reviewed",
+    "enHash": "f6fda5f5"
+  },
+  "stock.import.another": {
+    "message": "వేరే ఫైల్ ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "62352371"
+  },
+  "stock.import.done": {
+    "message": "{applied, plural, one {# ఐటమ్ ఇంపోర్ట్ అయింది} other {# ఐటమ్‌లు ఇంపోర్ట్ అయ్యాయి}}. {skipped, plural, =0 {ఏ వరుసనూ వదల్లేదు.} one {# వరుసను వదిలేశాం.} other {# వరుసలను వదిలేశాం.}}",
+    "review": "reviewed",
+    "enHash": "87eae7f4"
+  },
+  "stock.import.close": {
+    "message": "మూసివేయండి",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "stock.import.field.name": {
+    "message": "పేరు",
+    "review": "reviewed",
+    "enHash": "709a2322"
+  },
+  "stock.import.field.barcode": {
+    "message": "బార్‌కోడ్",
+    "review": "reviewed",
+    "enHash": "8e54dc53"
+  },
+  "stock.import.field.pricePaise": {
+    "message": "ధర",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "stock.import.field.mrpPaise": {
+    "message": "MRP",
+    "review": "reviewed",
+    "enHash": "cd74a166"
+  },
+  "stock.import.field.quantity": {
+    "message": "పరిమాణం",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "stock.import.field.expiresOn": {
+    "message": "గడువు తేదీ",
+    "review": "reviewed",
+    "enHash": "6b440cd5"
+  },
+  "stock.import.field.other": {
+    "message": "వరుస",
+    "review": "reviewed",
+    "enHash": "9bf7a8e8"
+  },
+  "stock.import.code.required": {
+    "message": "లేదు",
+    "review": "reviewed",
+    "enHash": "cf6f06e2"
+  },
+  "stock.import.code.invalid": {
+    "message": "సరైనది కాదు",
+    "review": "reviewed",
+    "enHash": "e3fac096"
+  },
+  "stock.import.code.too_long": {
+    "message": "చాలా పొడవుగా ఉంది",
+    "review": "reviewed",
+    "enHash": "306aee6f"
+  },
+  "stock.import.code.price_above_mrp": {
+    "message": "MRP కంటే ఎక్కువ ఉంది",
+    "review": "reviewed",
+    "enHash": "54e32832"
+  },
+  "stock.import.code.unknown_product": {
+    "message": "ప్రోడక్ట్ జాబితాలో లేదు",
+    "review": "reviewed",
+    "enHash": "dae05f63"
+  },
+  "stock.import.code.duplicate": {
+    "message": "రెండుసార్లు ఉంది",
+    "review": "reviewed",
+    "enHash": "d5620f6c"
+  },
+  "stock.import.code.other": {
+    "message": "సమస్య ఉంది",
+    "review": "reviewed",
+    "enHash": "1547a58d"
+  }
+}

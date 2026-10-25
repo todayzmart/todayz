@@ -401,13 +401,16 @@ test.describe('SC-SITE-06 motion can be stopped (WCAG 2.2.2)', () => {
 
 test.describe('SC-SITE-04 languages', () => {
   for (const locale of LOCALISED) {
-    test(`/${locale}/ is a machine-draft translation with hreflang and a way back to English`, async ({ page }) => {
+    // The site translations were reviewed and approved (founder, 25 Oct; W4-05), so no locale is a
+    // machine draft any more: no draft meta or notice, and the switcher is the way back to English.
+    test(`/${locale}/ is a reviewed translation with hreflang and a way back to English`, async ({ page }) => {
       await page.goto(`/${locale}/`);
       await expect(page.locator('html')).toHaveAttribute('lang', new RegExp(`^${locale}-IN$`));
-      await expect(page.locator('meta[name="todayz:translation"]')).toHaveAttribute('content', 'machine-draft');
+      await expect(page.locator('meta[name="todayz:translation"]')).toHaveCount(0);
+      await expect(page.locator('.draft')).toHaveCount(0);
       await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(6);
       await expect(page.locator('link[rel="alternate"][hreflang="x-default"]')).toHaveAttribute('href', 'https://todayz.in/');
-      await expect(page.locator('.draft a')).toHaveAttribute('href', '/');
+      await expect(page.locator('header details.lang a[href="/"]')).toHaveCount(1);
       await expect(page.locator('h1')).not.toHaveText(/Everything nearby/);
       // Pages that exist only in English are marked as such where a localised page links to them.
       await expect(page.locator('footer a[href="/pricing/"]')).toHaveAttribute('hreflang', 'en');

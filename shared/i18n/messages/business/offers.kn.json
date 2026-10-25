@@ -1,0 +1,847 @@
+{
+  "offers.title": {
+    "message": "ಆಫರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "offers.loading": {
+    "message": "ಆಫರ್‌ಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ",
+    "review": "reviewed",
+    "enHash": "526c1854"
+  },
+  "offers.noStore.title": {
+    "message": "ಮೊದಲು ಅಂಗಡಿ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "offers.noStore.body": {
+    "message": "ಆಫರ್‌ಗಳು ಒಂದು ಅಂಗಡಿಗೆ ಸೇರಿರುತ್ತವೆ. ಅವುಗಳನ್ನು ನೋಡಲು ಒಂದನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "6be0bd92"
+  },
+  "offers.noStore.action": {
+    "message": "ಅಂಗಡಿ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "offers.askManager": {
+    "message": "ಆಫರ್‌ಗಳು ಮತ್ತು ಬ್ಯಾನರ್‌ಗಳು ಮಾಲೀಕರು ಮತ್ತು ಮ್ಯಾನೇಜರ್‌ಗಳಿಗೆ. ಮ್ಯಾನೇಜರ್‌ರನ್ನು ಕೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "87d93a07"
+  },
+  "offers.error.title": {
+    "message": "ಆಫರ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "70d93621"
+  },
+  "offers.error.body": {
+    "message": "ನಿಮ್ಮ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "offers.error.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "offers.error.generic": {
+    "message": "ಏನೋ ತಪ್ಪಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "4244e822"
+  },
+  "offers.error.validation_failed": {
+    "message": "ಕೆಲವು ವಿವರಗಳಿಗೆ ಅನುಮತಿ ಇಲ್ಲ. ಫಾರ್ಮ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "5ef5c8bb"
+  },
+  "offers.error.forbidden": {
+    "message": "ಇದನ್ನು ಮಾಡಲು ನಿಮಗೆ ಅನುಮತಿ ಇಲ್ಲ. ಮ್ಯಾನೇಜರ್‌ರನ್ನು ಕೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "f827c99e"
+  },
+  "offers.error.not_found": {
+    "message": "ಇದು ಸಿಗಲಿಲ್ಲ. ಇದನ್ನು ತೆಗೆದುಹಾಕಿರಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "db0134f3"
+  },
+  "offers.error.invalid_transition": {
+    "message": "ಇದನ್ನು ಇನ್ನು ಬದಲಿಸಲು ಆಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "2d020016"
+  },
+  "offers.error.banner_limit_reached": {
+    "message": "ನೀವು ಬ್ಯಾನರ್‌ಗಳ ಮಿತಿ ತಲುಪಿದ್ದೀರಿ. ಹೊಸದನ್ನು ಸೇರಿಸಲು ಒಂದನ್ನು ಮುಗಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "0fefea0d"
+  },
+  "offers.error.precondition_failed": {
+    "message": "ಇದು ಬೇರೆ ಸಾಧನದಲ್ಲಿ ಬದಲಾಗಿದೆ. ಪಟ್ಟಿ ಈಗ ಅಪ್‌ಡೇಟ್ ಆಗಿದೆ, ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "8e2fd84f"
+  },
+  "offers.error.precondition_required": {
+    "message": "ಇದನ್ನು ಉಳಿಸಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಲೋಡ್ ಮಾಡಿ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "2c6544e0"
+  },
+  "offers.error.conflict": {
+    "message": "ಈ ಆಫರ್ ಈಗಾಗಲೇ ಇದೆ. ಪಟ್ಟಿಯನ್ನು ನೋಡಿ.",
+    "review": "reviewed",
+    "enHash": "6dc784a9"
+  },
+  "offers.tabs.label": {
+    "message": "ಆಫರ್‌ಗಳು ಮತ್ತು ಬ್ಯಾನರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "70b265ae"
+  },
+  "offers.tabs.offers": {
+    "message": "ಆಫರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "offers.tabs.banners": {
+    "message": "ಬ್ಯಾನರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "b64085ed"
+  },
+  "offers.new": {
+    "message": "ಹೊಸ ಆಫರ್",
+    "review": "reviewed",
+    "enHash": "ad43a620"
+  },
+  "offers.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "offers.cancel": {
+    "message": "ರದ್ದುಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "offers.create": {
+    "message": "ಆಫರ್ ರಚಿಸಿ",
+    "review": "reviewed",
+    "enHash": "c6af210c"
+  },
+  "offers.created": {
+    "message": "{count, plural, one {ಆಫರ್ ರಚಿಸಲಾಗಿದೆ} other {# ಆಫರ್‌ಗಳನ್ನು ರಚಿಸಲಾಗಿದೆ}}",
+    "review": "reviewed",
+    "enHash": "70b3ffa7"
+  },
+  "offers.more": {
+    "message": "ಇನ್ನಷ್ಟು ತೋರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "25911d48"
+  },
+  "offers.empty.title": {
+    "message": "ಇನ್ನೂ ಆಫರ್‌ಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "0a61eeaf"
+  },
+  "offers.empty.body": {
+    "message": "ಆಫರ್ ರಚಿಸಿ, ಗ್ರಾಹಕರು ಅದನ್ನು ನಿಮ್ಮ ಅಂಗಡಿಯ ಪುಟದಲ್ಲಿ ಮತ್ತು ಕೌಂಟರ್‌ನಲ್ಲಿ ನೋಡುತ್ತಾರೆ.",
+    "review": "reviewed",
+    "enHash": "211bb98c"
+  },
+  "offers.empty.filtered": {
+    "message": "ಇಲ್ಲಿ ಯಾವುದೇ ಆಫರ್ ಇಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "3efa4da7"
+  },
+  "offers.filter.label": {
+    "message": "ಆಫರ್‌ಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "93688736"
+  },
+  "offers.filter.all": {
+    "message": "ಎಲ್ಲಾ",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "offers.filter.live": {
+    "message": "ಲೈವ್",
+    "review": "reviewed",
+    "enHash": "65c821a5"
+  },
+  "offers.filter.scheduled": {
+    "message": "ನಿಗದಿಯಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "1cd1bdad"
+  },
+  "offers.filter.paused": {
+    "message": "ವಿರಾಮದಲ್ಲಿ",
+    "review": "reviewed",
+    "enHash": "c7dfb6f1"
+  },
+  "offers.filter.ended": {
+    "message": "ಮುಗಿದಿದೆ",
+    "review": "reviewed",
+    "enHash": "90303d8d"
+  },
+  "offers.status.scheduled": {
+    "message": "ನಿಗದಿಯಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "1cd1bdad"
+  },
+  "offers.status.live": {
+    "message": "ಲೈವ್",
+    "review": "reviewed",
+    "enHash": "65c821a5"
+  },
+  "offers.status.paused": {
+    "message": "ವಿರಾಮದಲ್ಲಿ",
+    "review": "reviewed",
+    "enHash": "c7dfb6f1"
+  },
+  "offers.status.ended": {
+    "message": "ಮುಗಿದಿದೆ",
+    "review": "reviewed",
+    "enHash": "90303d8d"
+  },
+  "offers.list.label": {
+    "message": "ಆಫರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "offers.row.redemptions": {
+    "message": "{max, plural, =0 {{count} ಬಳಕೆ} other {{max} ರಲ್ಲಿ {count} ಬಳಕೆ}}",
+    "review": "reviewed",
+    "enHash": "c0e682c6"
+  },
+  "offers.row.until": {
+    "message": "{when} ವರೆಗೆ",
+    "review": "reviewed",
+    "enHash": "38e41287"
+  },
+  "offers.row.noEnd": {
+    "message": "ಕೊನೆಯ ದಿನಾಂಕ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "58fb5578"
+  },
+  "offers.pause": {
+    "message": "ವಿರಾಮ",
+    "review": "reviewed",
+    "enHash": "781961bc"
+  },
+  "offers.resume": {
+    "message": "ಮುಂದುವರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "b3bd0b5a"
+  },
+  "offers.end": {
+    "message": "ಮುಗಿಸಿ",
+    "review": "reviewed",
+    "enHash": "a2bb9d34"
+  },
+  "offers.end.confirm": {
+    "message": "ಇದನ್ನು ಶಾಶ್ವತವಾಗಿ ಮುಗಿಸಬೇಕೆ?",
+    "review": "reviewed",
+    "enHash": "bbd0c3d7"
+  },
+  "offers.end.keep": {
+    "message": "ಇರಲಿ",
+    "review": "reviewed",
+    "enHash": "d9f36924"
+  },
+  "offers.end.yes": {
+    "message": "ಮುಗಿಸಿ",
+    "review": "reviewed",
+    "enHash": "02deb283"
+  },
+  "offers.new.title": {
+    "message": "ಹೊಸ ಆಫರ್",
+    "review": "reviewed",
+    "enHash": "ad43a620"
+  },
+  "offers.kind.label": {
+    "message": "ಆಫರ್ ಪ್ರಕಾರ",
+    "review": "reviewed",
+    "enHash": "e1388365"
+  },
+  "offers.kind.percent": {
+    "message": "ಶೇಕಡಾ ರಿಯಾಯಿತಿ",
+    "review": "reviewed",
+    "enHash": "23f77d15"
+  },
+  "offers.kind.flat": {
+    "message": "ರೂಪಾಯಿ ರಿಯಾಯಿತಿ",
+    "review": "reviewed",
+    "enHash": "edfaf2b2"
+  },
+  "offers.kind.bxgy": {
+    "message": "ಖರೀದಿಸಿ, ಉಚಿತ ಪಡೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "9cceb7bb"
+  },
+  "offers.kind.bill_min": {
+    "message": "ಬಿಲ್ ರಿಯಾಯಿತಿ",
+    "review": "reviewed",
+    "enHash": "6555d928"
+  },
+  "offers.kind.flash": {
+    "message": "ಅವಧಿ ಮುಗಿಯುವ ಸ್ಟಾಕ್",
+    "review": "reviewed",
+    "enHash": "5a5f2759"
+  },
+  "offers.kind.summary": {
+    "message": "{kind, select, percent {{pct}% ರಿಯಾಯಿತಿ} flat {ಪ್ರತಿಯೊಂದಕ್ಕೆ {amount} ರಿಯಾಯಿತಿ} bxgy {{buy} ಖರೀದಿಸಿ {get} ಪಡೆಯಿರಿ} bill_min {{min} ಗಿಂತ ಹೆಚ್ಚಿನ ಬಿಲ್‌ಗೆ {amount} ರಿಯಾಯಿತಿ} other {ಆಫರ್}}",
+    "review": "reviewed",
+    "enHash": "61c65366"
+  },
+  "offers.scope.label": {
+    "message": "ಯಾವುದಕ್ಕೆ ಅನ್ವಯ",
+    "review": "reviewed",
+    "enHash": "0c9d314d"
+  },
+  "offers.scope.items": {
+    "message": "ಐಟಂಗಳು",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "offers.scope.category": {
+    "message": "ವರ್ಗ",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "offers.scope.store": {
+    "message": "ಇಡೀ ಅಂಗಡಿ",
+    "review": "reviewed",
+    "enHash": "ed76ecfe"
+  },
+  "offers.scope.storeNote": {
+    "message": "ಇಡೀ ಅಂಗಡಿಗೆ ಅನ್ವಯಿಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "437ea9db"
+  },
+  "offers.scope.summary": {
+    "message": "{scope, select, store {ಇಡೀ ಅಂಗಡಿ} category {ಒಂದು ವರ್ಗ} other {{count, plural, one {# ಐಟಂ} other {# ಐಟಂಗಳು}}}}",
+    "review": "reviewed",
+    "enHash": "f8213bd0"
+  },
+  "offers.items.one": {
+    "message": "ಐಟಂ",
+    "review": "reviewed",
+    "enHash": "ecdda59a"
+  },
+  "offers.items.many": {
+    "message": "ಐಟಂಗಳು",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "offers.category.label": {
+    "message": "ವರ್ಗ",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "offers.category.choose": {
+    "message": "ವರ್ಗ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "b91bf5d4"
+  },
+  "offers.picker.search": {
+    "message": "ಐಟಂಗಳನ್ನು ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "daeea688"
+  },
+  "offers.picker.searchHint": {
+    "message": "ನಿಮ್ಮ ಐಟಂಗಳನ್ನು ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "81e7c045"
+  },
+  "offers.picker.picked": {
+    "message": "ಆಯ್ಕೆ ಮಾಡಿದ ಐಟಂಗಳು",
+    "review": "reviewed",
+    "enHash": "35b59db9"
+  },
+  "offers.picker.results": {
+    "message": "ಸಿಕ್ಕ ಐಟಂಗಳು",
+    "review": "reviewed",
+    "enHash": "db1ba24e"
+  },
+  "offers.picker.none": {
+    "message": "ಯಾವುದೇ ಐಟಂ ಸಿಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "4b775dcf"
+  },
+  "offers.picker.add": {
+    "message": "ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "offers.picker.added": {
+    "message": "ಸೇರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "b68734c2"
+  },
+  "offers.picker.remove": {
+    "message": "{name} ತೆಗೆದುಹಾಕಿ",
+    "review": "reviewed",
+    "enHash": "df7193a5"
+  },
+  "offers.flash.batches": {
+    "message": "ಮಾರಾಟ ಮಾಡಬೇಕಾದ ಬ್ಯಾಚ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "ef42f5b5"
+  },
+  "offers.flash.none": {
+    "message": "ಅವಧಿ ದಿನಾಂಕವಿರುವ ಯಾವುದೇ ಬ್ಯಾಚ್ ಸ್ಟಾಕ್‌ನಲ್ಲಿ ಇಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "0c83fe51"
+  },
+  "offers.flash.batchMeta": {
+    "message": "{qty} ಉಳಿದಿವೆ, {date} ರಂದು ಅವಧಿ ಮುಗಿಯುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "1ef5226e"
+  },
+  "offers.flash.help": {
+    "message": "ಪ್ರತಿ ಬ್ಯಾಚ್‌ಗೆ ತನ್ನದೇ ಆಫರ್ ಸಿಗುತ್ತದೆ, ಅದು ಅದರ ಅವಧಿ ದಿನಾಂಕದಂದು ಮುಗಿಯುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "a7c5b28b"
+  },
+  "offers.value.percent": {
+    "message": "ಶೇಕಡಾ ರಿಯಾಯಿತಿ",
+    "review": "reviewed",
+    "enHash": "23f77d15"
+  },
+  "offers.value.percentHelp": {
+    "message": "1 ರಿಂದ {max} ವರೆಗಿನ ಪೂರ್ಣ ಸಂಖ್ಯೆ.",
+    "review": "reviewed",
+    "enHash": "06b3600d"
+  },
+  "offers.value.flatOff": {
+    "message": "ಪ್ರತಿಯೊಂದಕ್ಕೆ ರೂಪಾಯಿ ರಿಯಾಯಿತಿ",
+    "review": "reviewed",
+    "enHash": "54353916"
+  },
+  "offers.value.flatHelp": {
+    "message": "ಪ್ರತಿ ಯೂನಿಟ್‌ನಿಂದ ಕಡಿತವಾಗುತ್ತದೆ, ಆದ್ದರಿಂದ ಬೆಲೆಗಿಂತ ಕಡಿಮೆ ಇರಬೇಕು.",
+    "review": "reviewed",
+    "enHash": "978487d2"
+  },
+  "offers.value.billOff": {
+    "message": "ಬಿಲ್ ಮೇಲೆ ರೂಪಾಯಿ ರಿಯಾಯಿತಿ",
+    "review": "reviewed",
+    "enHash": "a421742a"
+  },
+  "offers.value.billHelp": {
+    "message": "ಬಿಲ್ ಕನಿಷ್ಠ ಮೊತ್ತ ತಲುಪಿದಾಗ ಇಡೀ ಬಿಲ್‌ನಿಂದ ಒಮ್ಮೆ ಕಡಿತವಾಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "37ca1ac1"
+  },
+  "offers.minBill.label": {
+    "message": "ಕನಿಷ್ಠ ಬಿಲ್",
+    "review": "reviewed",
+    "enHash": "6a0bea5b"
+  },
+  "offers.buy.label": {
+    "message": "ಖರೀದಿಸಿ",
+    "review": "reviewed",
+    "enHash": "7ceca51f"
+  },
+  "offers.get.label": {
+    "message": "ಉಚಿತ ಪಡೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "c8e927a1"
+  },
+  "offers.title.label": {
+    "message": "ಹೆಸರು (ಐಚ್ಛಿಕ)",
+    "review": "reviewed",
+    "enHash": "9c9f03a8"
+  },
+  "offers.title.help": {
+    "message": "ಗ್ರಾಹಕರಿಗೆ ಕಾಣಿಸುತ್ತದೆ. ಖಾಲಿ ಬಿಟ್ಟರೆ ನಾವೇ ಹೆಸರಿಡುತ್ತೇವೆ.",
+    "review": "reviewed",
+    "enHash": "d52d3b9a"
+  },
+  "offers.channels.label": {
+    "message": "ಎಲ್ಲಿ ಅನ್ವಯ",
+    "review": "reviewed",
+    "enHash": "f32914e5"
+  },
+  "offers.channels.both": {
+    "message": "ಆನ್‌ಲೈನ್ ಮತ್ತು ಕೌಂಟರ್",
+    "review": "reviewed",
+    "enHash": "f1974487"
+  },
+  "offers.channels.online": {
+    "message": "ಆನ್‌ಲೈನ್",
+    "review": "reviewed",
+    "enHash": "c3e839df"
+  },
+  "offers.channels.pos": {
+    "message": "ಕೌಂಟರ್",
+    "review": "reviewed",
+    "enHash": "f4018045"
+  },
+  "offers.once.label": {
+    "message": "ಪ್ರತಿ ಗ್ರಾಹಕರಿಗೆ ಒಮ್ಮೆ",
+    "review": "reviewed",
+    "enHash": "f5df284e"
+  },
+  "offers.max.label": {
+    "message": "ಮೊದಲ ಆರ್ಡರ್‌ಗಳಿಗೆ ಮಾತ್ರ (ಐಚ್ಛಿಕ)",
+    "review": "reviewed",
+    "enHash": "6a64b0e0"
+  },
+  "offers.max.help": {
+    "message": "ಇಷ್ಟು ಆರ್ಡರ್‌ಗಳ ನಂತರ ನಿಲ್ಲುತ್ತದೆ. ಮಿತಿ ಬೇಡವಾದರೆ ಖಾಲಿ ಬಿಡಿ.",
+    "review": "reviewed",
+    "enHash": "20603623"
+  },
+  "offers.starts.label": {
+    "message": "ಆರಂಭ",
+    "review": "reviewed",
+    "enHash": "fc612a2f"
+  },
+  "offers.starts.help": {
+    "message": "ಈಗಲೇ ಆರಂಭಿಸಲು ಖಾಲಿ ಬಿಡಿ.",
+    "review": "reviewed",
+    "enHash": "a515e52d"
+  },
+  "offers.ends.label": {
+    "message": "ಮುಕ್ತಾಯ",
+    "review": "reviewed",
+    "enHash": "91856dcb"
+  },
+  "offers.ends.help": {
+    "message": "ನೀವು ಮುಗಿಸುವವರೆಗೆ ನಡೆಸಲು ಖಾಲಿ ಬಿಡಿ.",
+    "review": "reviewed",
+    "enHash": "85330a45"
+  },
+  "offers.err.percent": {
+    "message": "{min} ರಿಂದ {max} ವರೆಗಿನ ಪೂರ್ಣ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "329d1c3b"
+  },
+  "offers.err.flatMin": {
+    "message": "ರೂಪಾಯಿಗಳಲ್ಲಿ ಮೊತ್ತ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "2b198b3b"
+  },
+  "offers.err.flatTooHigh": {
+    "message": "ಮೊತ್ತ ಐಟಂ ಬೆಲೆಗಿಂತ ಕಡಿಮೆ ಇರಬೇಕು.",
+    "review": "reviewed",
+    "enHash": "ddda7614"
+  },
+  "offers.err.buy": {
+    "message": "{min} ರಿಂದ {max} ವರೆಗಿನ ಪೂರ್ಣ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "329d1c3b"
+  },
+  "offers.err.get": {
+    "message": "{min} ರಿಂದ {max} ವರೆಗಿನ ಪೂರ್ಣ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "329d1c3b"
+  },
+  "offers.err.minBill": {
+    "message": "ಕನಿಷ್ಠ ಬಿಲ್ ಅನ್ನು ರೂಪಾಯಿಗಳಲ್ಲಿ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "09828023"
+  },
+  "offers.err.discountAboveBill": {
+    "message": "ರಿಯಾಯಿತಿ ಕನಿಷ್ಠ ಬಿಲ್‌ಗಿಂತ ಕಡಿಮೆ ಇರಬೇಕು.",
+    "review": "reviewed",
+    "enHash": "e19e4174"
+  },
+  "offers.err.itemsRequired": {
+    "message": "ಕನಿಷ್ಠ ಒಂದು ಐಟಂ ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "9df870a1"
+  },
+  "offers.err.oneItem": {
+    "message": "ಒಂದು ಐಟಂ ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "f2a32296"
+  },
+  "offers.err.tooManyItems": {
+    "message": "ಗರಿಷ್ಠ {max} ಐಟಂಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "83109741"
+  },
+  "offers.err.categoryRequired": {
+    "message": "ವರ್ಗ ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "1ae9839f"
+  },
+  "offers.err.batchesRequired": {
+    "message": "ಕನಿಷ್ಠ ಒಂದು ಬ್ಯಾಚ್ ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "43146d7c"
+  },
+  "offers.err.title": {
+    "message": "ಗರಿಷ್ಠ {max} ಅಕ್ಷರಗಳನ್ನು ಬಳಸಿ.",
+    "review": "reviewed",
+    "enHash": "67e6cbb4"
+  },
+  "offers.err.maxRedemptions": {
+    "message": "{max} ವರೆಗಿನ ಪೂರ್ಣ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ, ಅಥವಾ ಖಾಲಿ ಬಿಡಿ.",
+    "review": "reviewed",
+    "enHash": "69e7d68c"
+  },
+  "offers.err.dateInvalid": {
+    "message": "ಸರಿಯಾದ ದಿನಾಂಕ ಮತ್ತು ಸಮಯ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "808fd49b"
+  },
+  "offers.err.startPast": {
+    "message": "ಆರಂಭದ ಸಮಯ ಕಳೆದುಹೋಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "925c2101"
+  },
+  "offers.err.endBeforeStart": {
+    "message": "ಮುಕ್ತಾಯ ಆರಂಭದ ನಂತರ ಇರಬೇಕು.",
+    "review": "reviewed",
+    "enHash": "172f86fc"
+  },
+  "offers.preview.label": {
+    "message": "ಮುನ್ನೋಟ",
+    "review": "reviewed",
+    "enHash": "f1fbb2b4"
+  },
+  "offers.preview.title": {
+    "message": "ಚೆಕ್‌ಔಟ್‌ನಲ್ಲಿ ಹೇಗೆ ಕಾಣುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "5b885ef8"
+  },
+  "offers.preview.waiting": {
+    "message": "ಆಫರ್ ಭರ್ತಿ ಮಾಡಿ, ಅದರೊಂದಿಗೆ ಮಾದರಿ ಕಾರ್ಟ್‌ನ ಬೆಲೆ ಕಾಣಿಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "d28ce48f"
+  },
+  "offers.preview.failed": {
+    "message": "ಮುನ್ನೋಟ ಈಗ ಲಭ್ಯವಿಲ್ಲ. ಆದರೂ ನೀವು ಆಫರ್ ರಚಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "960080c9"
+  },
+  "offers.preview.item": {
+    "message": "ಐಟಂ",
+    "review": "reviewed",
+    "enHash": "ecdda59a"
+  },
+  "offers.preview.free": {
+    "message": "({count} ಉಚಿತ)",
+    "review": "reviewed",
+    "enHash": "ed65304a"
+  },
+  "offers.preview.without": {
+    "message": "ಆಫರ್ ಇಲ್ಲದೆ",
+    "review": "reviewed",
+    "enHash": "439e16ce"
+  },
+  "offers.preview.with": {
+    "message": "ಆಫರ್‌ನೊಂದಿಗೆ",
+    "review": "reviewed",
+    "enHash": "b8bd6327"
+  },
+  "offers.preview.noEffect": {
+    "message": "ಈ ಆಫರ್ ಈ ಮಾದರಿ ಕಾರ್ಟ್‌ಗೆ ಯಾವುದೇ ರಿಯಾಯಿತಿ ನೀಡುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "9b954cf6"
+  },
+  "offers.banner.new": {
+    "message": "ಹೊಸ ಬ್ಯಾನರ್",
+    "review": "reviewed",
+    "enHash": "b729b1ae"
+  },
+  "offers.banner.create": {
+    "message": "ಬ್ಯಾನರ್ ರಚಿಸಿ",
+    "review": "reviewed",
+    "enHash": "8d17d922"
+  },
+  "offers.banner.created": {
+    "message": "ಬ್ಯಾನರ್ ರಚಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "7605d111"
+  },
+  "offers.banner.list": {
+    "message": "ಬ್ಯಾನರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "b64085ed"
+  },
+  "offers.banner.empty.title": {
+    "message": "ಇನ್ನೂ ಬ್ಯಾನರ್‌ಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "278fb106"
+  },
+  "offers.banner.empty.body": {
+    "message": "ಬ್ಯಾನರ್ ನಿಮ್ಮ ಅಂಗಡಿಯ ಪುಟದ ಮೇಲ್ಭಾಗದಲ್ಲಿ ಒಂದು ಶೀರ್ಷಿಕೆ ತೋರಿಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "eae2ee77"
+  },
+  "offers.banner.headline": {
+    "message": "ಶೀರ್ಷಿಕೆ",
+    "review": "reviewed",
+    "enHash": "442250df"
+  },
+  "offers.banner.headlineHelp": {
+    "message": "ಗರಿಷ್ಠ {max} ಅಕ್ಷರಗಳು.",
+    "review": "reviewed",
+    "enHash": "5776685a"
+  },
+  "offers.banner.subline": {
+    "message": "ಉಪ-ಸಾಲು (ಐಚ್ಛಿಕ)",
+    "review": "reviewed",
+    "enHash": "f419d0bf"
+  },
+  "offers.banner.sampleHeadline": {
+    "message": "ನಿಮ್ಮ ಶೀರ್ಷಿಕೆ",
+    "review": "reviewed",
+    "enHash": "9f13632f"
+  },
+  "offers.banner.tint": {
+    "message": "ಬಣ್ಣ",
+    "review": "reviewed",
+    "enHash": "f28563a4"
+  },
+  "offers.banner.tint.green": {
+    "message": "ಹಸಿರು",
+    "review": "reviewed",
+    "enHash": "933bf21a"
+  },
+  "offers.banner.tint.amber": {
+    "message": "ಹಳದಿ",
+    "review": "reviewed",
+    "enHash": "27a01d47"
+  },
+  "offers.banner.tint.rose": {
+    "message": "ಗುಲಾಬಿ",
+    "review": "reviewed",
+    "enHash": "51ad0eae"
+  },
+  "offers.banner.tint.sky": {
+    "message": "ಆಕಾಶ ನೀಲಿ",
+    "review": "reviewed",
+    "enHash": "b3d97fd6"
+  },
+  "offers.banner.tint.lilac": {
+    "message": "ನೇರಳೆ",
+    "review": "reviewed",
+    "enHash": "a742758d"
+  },
+  "offers.banner.tint.peach": {
+    "message": "ಪೀಚ್",
+    "review": "reviewed",
+    "enHash": "9d572da1"
+  },
+  "offers.banner.target": {
+    "message": "ಏನು ತೆರೆಯುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "54c374d4"
+  },
+  "offers.banner.target.store": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿ",
+    "review": "reviewed",
+    "enHash": "8f808a7d"
+  },
+  "offers.banner.target.offer": {
+    "message": "ಒಂದು ಆಫರ್",
+    "review": "reviewed",
+    "enHash": "32321cab"
+  },
+  "offers.banner.target.category": {
+    "message": "ಒಂದು ವರ್ಗ",
+    "review": "reviewed",
+    "enHash": "d07bae3f"
+  },
+  "offers.banner.target.items": {
+    "message": "ಕೆಲವು ಐಟಂಗಳು",
+    "review": "reviewed",
+    "enHash": "03e595cf"
+  },
+  "offers.banner.pickOffer": {
+    "message": "ಆಫರ್",
+    "review": "reviewed",
+    "enHash": "3898b9aa"
+  },
+  "offers.banner.chooseOffer": {
+    "message": "ಆಫರ್ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "955b9baf"
+  },
+  "offers.banner.err.headlineRequired": {
+    "message": "ಶೀರ್ಷಿಕೆ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "4ae29c9b"
+  },
+  "offers.banner.err.headlineMax": {
+    "message": "ಗರಿಷ್ಠ {max} ಅಕ್ಷರಗಳನ್ನು ಬಳಸಿ.",
+    "review": "reviewed",
+    "enHash": "67e6cbb4"
+  },
+  "offers.banner.err.sublineMax": {
+    "message": "ಗರಿಷ್ಠ {max} ಅಕ್ಷರಗಳನ್ನು ಬಳಸಿ.",
+    "review": "reviewed",
+    "enHash": "67e6cbb4"
+  },
+  "offers.banner.err.offerRequired": {
+    "message": "ಆಫರ್ ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "87f686ca"
+  },
+  "offers.banner.err.categoryRequired": {
+    "message": "ವರ್ಗ ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "1ae9839f"
+  },
+  "offers.banner.err.itemsRequired": {
+    "message": "ಕನಿಷ್ಠ ಒಂದು ಐಟಂ ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "9df870a1"
+  },
+  "offers.banner.uploadLater": {
+    "message": "ಫೋಟೋ ಬ್ಯಾನರ್‌ಗಳು ಈ ಆವೃತ್ತಿಯಲ್ಲಿ ಲಭ್ಯವಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "803b2c52"
+  },
+  "offers.banner.status.pending_review": {
+    "message": "ಪರಿಶೀಲನೆಯಲ್ಲಿ",
+    "review": "reviewed",
+    "enHash": "97876b83"
+  },
+  "offers.banner.status.live": {
+    "message": "ಲೈವ್",
+    "review": "reviewed",
+    "enHash": "65c821a5"
+  },
+  "offers.banner.status.scheduled": {
+    "message": "ನಿಗದಿಯಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "1cd1bdad"
+  },
+  "offers.banner.status.paused": {
+    "message": "ವಿರಾಮದಲ್ಲಿ",
+    "review": "reviewed",
+    "enHash": "c7dfb6f1"
+  },
+  "offers.banner.status.ended": {
+    "message": "ಮುಗಿದಿದೆ",
+    "review": "reviewed",
+    "enHash": "90303d8d"
+  },
+  "offers.banner.status.removed": {
+    "message": "ತೆಗೆದುಹಾಕಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "b5e77c5c"
+  },
+  "offers.banner.checking": {
+    "message": "ಚಿತ್ರವನ್ನು ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ…",
+    "review": "reviewed",
+    "enHash": "e1134f27"
+  },
+  "offers.banner.removed": {
+    "message": "TodayZ ತೆಗೆದುಹಾಕಿದೆ.",
+    "review": "reviewed",
+    "enHash": "7f206588"
+  },
+  "offers.banner.removedWhy": {
+    "message": "TodayZ ತೆಗೆದುಹಾಕಿದೆ: {reason}",
+    "review": "reviewed",
+    "enHash": "cce1e45f"
+  },
+  "offers.banner.reach": {
+    "message": "{views, plural, one {# ವೀಕ್ಷಣೆ} other {# ವೀಕ್ಷಣೆಗಳು}} · {taps, plural, one {# ಟ್ಯಾಪ್} other {# ಟ್ಯಾಪ್‌ಗಳು}} · {orders, plural, one {# ಆರ್ಡರ್} other {# ಆರ್ಡರ್‌ಗಳು}}",
+    "review": "reviewed",
+    "enHash": "09e518c2"
+  }
+}

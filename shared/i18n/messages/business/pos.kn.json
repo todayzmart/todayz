@@ -1,0 +1,992 @@
+{
+  "pos.title": {
+    "message": "ಮಾರಾಟ",
+    "review": "reviewed",
+    "enHash": "fa3cf2ad"
+  },
+  "pos.loading": {
+    "message": "ಕೌಂಟರ್ ಲೋಡ್ ಆಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "f1beca55"
+  },
+  "pos.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "pos.error.title": {
+    "message": "ಕೌಂಟರ್ ತೆರೆಯಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "74b273cf"
+  },
+  "pos.error.body": {
+    "message": "ನಿಮ್ಮ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. ಈ ಸಾಧನದಲ್ಲಿ ಒಮ್ಮೆ ಕೌಂಟರ್ ತೆರೆದರೆ, ಅದು ಸಂಪರ್ಕವಿಲ್ಲದೆಯೂ ಕೆಲಸ ಮಾಡುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "09c4858a"
+  },
+  "pos.error.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "pos.noStore.title": {
+    "message": "ಮೊದಲು ಅಂಗಡಿ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "pos.noStore.body": {
+    "message": "ಕೌಂಟರ್ ಒಂದು ಬಾರಿಗೆ ಒಂದೇ ಅಂಗಡಿಯಿಂದ ಮಾರಾಟ ಮಾಡುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "3fb740a8"
+  },
+  "pos.noStore.action": {
+    "message": "ಅಂಗಡಿ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "pos.browse.label": {
+    "message": "ಐಟಂಗಳು",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "pos.search.label": {
+    "message": "ಐಟಂ ಹುಡುಕಿ ಅಥವಾ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "c002e92e"
+  },
+  "pos.search.placeholder": {
+    "message": "ಐಟಂ ಹುಡುಕಿ ಅಥವಾ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "c002e92e"
+  },
+  "pos.search.clear": {
+    "message": "ಹುಡುಕಾಟ ತೆರವುಗೊಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "67300d0f"
+  },
+  "pos.search.none.title": {
+    "message": "\"{query}\" ಗೆ ಏನೂ ಸಿಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "31fd2b2b"
+  },
+  "pos.search.none.body": {
+    "message": "ಇದನ್ನು ಬೆಲೆಯೊಂದಿಗೆ ಈ ಬಿಲ್‌ಗೆ ಒಂದು ಬಾರಿಯ ಐಟಂ ಆಗಿ ಸೇರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "84cd59bd"
+  },
+  "pos.tiles.title": {
+    "message": "ತ್ವರಿತ ಐಟಂಗಳು",
+    "review": "reviewed",
+    "enHash": "9d4bbb51"
+  },
+  "pos.tile.inStock": {
+    "message": "ಸ್ಟಾಕ್‌ನಲ್ಲಿ {count}",
+    "review": "reviewed",
+    "enHash": "9ffca181"
+  },
+  "pos.tile.out": {
+    "message": "ಸ್ಟಾಕ್ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "pos.tile.countNeeded": {
+    "message": "ಎಣಿಕೆ ಬೇಕು",
+    "review": "reviewed",
+    "enHash": "a5bead5a"
+  },
+  "pos.catalogue.empty.title": {
+    "message": "ಈ ಸಾಧನದಲ್ಲಿ ಇನ್ನೂ ಐಟಂಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "c9c7b252"
+  },
+  "pos.catalogue.empty.body": {
+    "message": "ನಿಮ್ಮ ಐಟಂಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಒಮ್ಮೆ ಸಂಪರ್ಕಿಸಿ, ಅಥವಾ ಬಿಲ್‌ಗೆ ಒಂದು ಬಾರಿಯ ಐಟಂ ಸೇರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "259cd91d"
+  },
+  "pos.sales.open": {
+    "message": "ಮಾರಾಟಗಳು",
+    "review": "reviewed",
+    "enHash": "d0edfb6e"
+  },
+  "pos.sales.openAttention": {
+    "message": "ಮಾರಾಟಗಳು · {count} ಪರಿಶೀಲಿಸಬೇಕು",
+    "review": "reviewed",
+    "enHash": "3e248677"
+  },
+  "pos.banner.notDurable.title": {
+    "message": "ಈ ಸಾಧನದಲ್ಲಿ ಮಾರಾಟಗಳು ಉಳಿಯುತ್ತಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "a00687ff"
+  },
+  "pos.banner.notDurable.body": {
+    "message": "ಈ ಬ್ರೌಸರ್ ಸಂಗ್ರಹಣೆಯನ್ನು ತಡೆಯುತ್ತದೆ. ಪ್ರತಿ ಮಾರಾಟ ಸಿಂಕ್ ಆಗುವವರೆಗೆ ಈ ಪುಟವನ್ನು ತೆರೆದಿಡಿ.",
+    "review": "reviewed",
+    "enHash": "cb5f1125"
+  },
+  "pos.banner.rejected.title": {
+    "message": "{count, plural, one {# ಮಾರಾಟಕ್ಕೆ ನಿಮ್ಮ ಗಮನ ಬೇಕು} other {# ಮಾರಾಟಗಳಿಗೆ ನಿಮ್ಮ ಗಮನ ಬೇಕು}}",
+    "review": "reviewed",
+    "enHash": "8841a4a7"
+  },
+  "pos.banner.rejected.action": {
+    "message": "ಪರಿಶೀಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "e29a79fe"
+  },
+  "pos.banner.offline.title": {
+    "message": "ಆಫ್‌ಲೈನ್ · {count, plural, =0 {ಯಾವುದೇ ಮಾರಾಟ ಕಾಯುತ್ತಿಲ್ಲ} one {# ಮಾರಾಟ ಸಿಂಕ್‌ಗೆ ಕಾಯುತ್ತಿದೆ} other {# ಮಾರಾಟಗಳು ಸಿಂಕ್‌ಗೆ ಕಾಯುತ್ತಿವೆ}}",
+    "review": "reviewed",
+    "enHash": "3d9ecc43"
+  },
+  "pos.banner.offline.body": {
+    "message": "ನೀವು ಮಾರಾಟ ಮುಂದುವರಿಸಬಹುದು. ಮಾರಾಟಗಳು ಇಲ್ಲಿ ಉಳಿಯುತ್ತವೆ ಮತ್ತು ಆನ್‌ಲೈನ್ ಬಂದಾಗ ಸಿಂಕ್ ಆಗುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "a3fbeb75"
+  },
+  "pos.banner.waiting.title": {
+    "message": "{count, plural, one {# ಮಾರಾಟ ಸಿಂಕ್‌ಗೆ ಕಾಯುತ್ತಿದೆ} other {# ಮಾರಾಟಗಳು ಸಿಂಕ್‌ಗೆ ಕಾಯುತ್ತಿವೆ}}",
+    "review": "reviewed",
+    "enHash": "fca44f24"
+  },
+  "pos.banner.waiting.body": {
+    "message": "ಅವು ಹಿನ್ನೆಲೆಯಲ್ಲಿ ಕಳುಹಿಸಲ್ಪಡುತ್ತವೆ. ನೀವು ಏನೂ ಮಾಡಬೇಕಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "46a8c0dc"
+  },
+  "pos.banner.short.title": {
+    "message": "{count, plural, one {# ಐಟಂ} other {# ಐಟಂಗಳು}} ಇರುವ ಎಣಿಕೆಗಿಂತ ಹೆಚ್ಚು",
+    "review": "reviewed",
+    "enHash": "96a4287f"
+  },
+  "pos.banner.short.body": {
+    "message": "ಆದರೂ ನೀವು ಮಾರಬಹುದು. ಸ್ಟಾಕ್ ಎಣಿಕೆಯನ್ನು ಮರು-ಎಣಿಕೆಗೆ ಗುರುತಿಸಲಾಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "6f3c3731"
+  },
+  "pos.banner.linkDropped.title": {
+    "message": "ಗ್ರಾಹಕರ ಲಿಂಕ್ ತೆಗೆದುಹಾಕಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "9d6196d7"
+  },
+  "pos.banner.linkDropped.body": {
+    "message": "QR ತೋರಿಸಿದ ನಂತರ ಬಿಲ್ ಬದಲಾಗಿದೆ. ಕ್ರೆಡಿಟ್ ಬಳಸಲು ಗ್ರಾಹಕರನ್ನು ಮತ್ತೆ ಲಿಂಕ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "1d0ce2ea"
+  },
+  "pos.charge.failed.title": {
+    "message": "ಮಾರಾಟ ಉಳಿಸಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "e427f06a"
+  },
+  "pos.charge.failed.body": {
+    "message": "ಬಿಲ್ ಇನ್ನೂ ಇಲ್ಲೇ ಇದೆ. ಮತ್ತೆ ಚಾರ್ಜ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "ce0f5f1e"
+  },
+  "pos.done.synced": {
+    "message": "{total} ಮಾರಾಟ ಆಯಿತು",
+    "review": "reviewed",
+    "enHash": "02042f91"
+  },
+  "pos.done.waiting": {
+    "message": "{total} ಮಾರಾಟ ಈ ಸಾಧನದಲ್ಲಿ ಉಳಿದಿದೆ. ಆನ್‌ಲೈನ್ ಆದಾಗ ಸಿಂಕ್ ಆಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "6fb0cfc5"
+  },
+  "pos.done.rejected": {
+    "message": "{total} ಮಾರಾಟ ತಿರಸ್ಕೃತವಾಯಿತು. ಕಾರಣ ನೋಡಲು ಮಾರಾಟ ಪಟ್ಟಿ ತೆರೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "1ad691cd"
+  },
+  "pos.done.receipt": {
+    "message": "ರಸೀದಿ",
+    "review": "reviewed",
+    "enHash": "f6ce3b6f"
+  },
+  "pos.cart.label": {
+    "message": "ಈಗಿನ ಬಿಲ್",
+    "review": "reviewed",
+    "enHash": "a64c72ef"
+  },
+  "pos.cart.phone": {
+    "message": "ಗ್ರಾಹಕರ ಫೋನ್",
+    "review": "reviewed",
+    "enHash": "7689682e"
+  },
+  "pos.cart.phonePlaceholder": {
+    "message": "ಗ್ರಾಹಕರ ಫೋನ್ (ಐಚ್ಛಿಕ)",
+    "review": "reviewed",
+    "enHash": "60d44f84"
+  },
+  "pos.cart.empty": {
+    "message": "ಬಿಲ್ ಆರಂಭಿಸಲು ಐಟಂ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ ಅಥವಾ ಟ್ಯಾಪ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "8eba9230"
+  },
+  "pos.cart.add": {
+    "message": "ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "pos.cart.less": {
+    "message": "ಒಂದು ಕಡಿಮೆ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "afbcf5f3"
+  },
+  "pos.cart.more": {
+    "message": "ಒಂದು ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "bb49f016"
+  },
+  "pos.cart.lineDetailDiscount": {
+    "message": "ಪ್ರತಿಯೊಂದಕ್ಕೆ {price} · {discount} ರಿಯಾಯಿತಿ",
+    "review": "reviewed",
+    "enHash": "7922a98a"
+  },
+  "pos.cart.summary": {
+    "message": "{count, plural, one {# ಐಟಂ} other {# ಐಟಂಗಳು}}",
+    "review": "reviewed",
+    "enHash": "f34cfa9c"
+  },
+  "pos.cart.view": {
+    "message": "ಬಿಲ್ ನೋಡಿ",
+    "review": "reviewed",
+    "enHash": "ee721f1b"
+  },
+  "pos.cart.charge": {
+    "message": "ಚಾರ್ಜ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "d4e1aee4"
+  },
+  "pos.cart.charging": {
+    "message": "ಚಾರ್ಜ್ ಆಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "5f99fe21"
+  },
+  "pos.cart.subtotal": {
+    "message": "ಉಪಮೊತ್ತ",
+    "review": "reviewed",
+    "enHash": "97f7359e"
+  },
+  "pos.cart.billDiscount": {
+    "message": "ರಿಯಾಯಿತಿ",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.cart.roundOff": {
+    "message": "ರೌಂಡ್ ಆಫ್",
+    "review": "reviewed",
+    "enHash": "3aa7ebde"
+  },
+  "pos.cart.credits": {
+    "message": "ಕ್ರೆಡಿಟ್",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "pos.cart.linkCustomer": {
+    "message": "ಗ್ರಾಹಕರನ್ನು ಲಿಂಕ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "e051d869"
+  },
+  "pos.cart.unlink": {
+    "message": "ತೆಗೆದುಹಾಕಿ",
+    "review": "reviewed",
+    "enHash": "e963907d"
+  },
+  "pos.cart.discount": {
+    "message": "ರಿಯಾಯಿತಿ",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.cart.clear": {
+    "message": "ಬಿಲ್ ತೆರವುಗೊಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "bbb4902a"
+  },
+  "pos.cart.link.billQr": {
+    "message": "ಬಿಲ್ QR ಮೂಲಕ ಲಿಂಕ್ · {credits, plural, =0 {ಯಾವುದೇ ಕ್ರೆಡಿಟ್ ಬಳಸಿಲ್ಲ} one {# ಕ್ರೆಡಿಟ್ ಬಳಸಲಾಗಿದೆ} other {# ಕ್ರೆಡಿಟ್ ಬಳಸಲಾಗಿದೆ}}",
+    "review": "reviewed",
+    "enHash": "f26e079e"
+  },
+  "pos.cart.link.counterCode": {
+    "message": "ಕೋಡ್ ಮೂಲಕ ಲಿಂಕ್ · {phone}",
+    "review": "reviewed",
+    "enHash": "81e24f8e"
+  },
+  "pos.cart.link.unverified": {
+    "message": "ಫೋನ್ ಗುರುತಿಸಲಾಗಿದೆ, ಪರಿಶೀಲಿಸಿಲ್ಲ · {phone}",
+    "review": "reviewed",
+    "enHash": "28a8d23b"
+  },
+  "pos.pay.label": {
+    "message": "ಪಾವತಿ ವಿಧಾನ",
+    "review": "reviewed",
+    "enHash": "0e55fb3b"
+  },
+  "pos.pay.cash": {
+    "message": "ನಗದು",
+    "review": "reviewed",
+    "enHash": "758ec54e"
+  },
+  "pos.pay.upi": {
+    "message": "UPI",
+    "review": "reviewed",
+    "enHash": "f295b2cd"
+  },
+  "pos.pay.card": {
+    "message": "ಕಾರ್ಡ್",
+    "review": "reviewed",
+    "enHash": "4d4ce73b"
+  },
+  "pos.add.open": {
+    "message": "ಬೇರೆ ಐಟಂ",
+    "review": "reviewed",
+    "enHash": "b7757e4a"
+  },
+  "pos.add.customTitle": {
+    "message": "ಒಂದು ಬಾರಿಯ ಐಟಂ ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "8a3608cb"
+  },
+  "pos.add.unknownTitle": {
+    "message": "ಈ ಬಾರ್‌ಕೋಡ್ ನಮಗೆ ಗೊತ್ತಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "2da821a4"
+  },
+  "pos.add.unknownBody": {
+    "message": "ಕೋಡ್ {code} ನಿಮ್ಮ ಐಟಂಗಳಲ್ಲಿ ಇಲ್ಲ. ಹೆಸರು ಮತ್ತು ಬೆಲೆಯೊಂದಿಗೆ ಈ ಬಿಲ್‌ಗೆ ಸೇರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "7131a281"
+  },
+  "pos.add.name": {
+    "message": "ಐಟಂ ಹೆಸರು",
+    "review": "reviewed",
+    "enHash": "b56b71bb"
+  },
+  "pos.add.nameInvalid": {
+    "message": "ಹೆಸರು ನಮೂದಿಸಿ",
+    "review": "reviewed",
+    "enHash": "7e5fe97f"
+  },
+  "pos.add.price": {
+    "message": "ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "pos.add.priceInvalid": {
+    "message": "ಸೊನ್ನೆಗಿಂತ ಹೆಚ್ಚಿನ ಬೆಲೆ ನಮೂದಿಸಿ",
+    "review": "reviewed",
+    "enHash": "8d0c1181"
+  },
+  "pos.add.submit": {
+    "message": "ಬಿಲ್‌ಗೆ ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "73cd5e5d"
+  },
+  "pos.add.inStock": {
+    "message": "ಇದನ್ನು ನಿಮ್ಮ ಸ್ಟಾಕ್‌ಗೆ ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "4792eee5"
+  },
+  "pos.discount.title": {
+    "message": "ರಿಯಾಯಿತಿಗಳು",
+    "review": "reviewed",
+    "enHash": "e5a40077"
+  },
+  "pos.discount.help": {
+    "message": "ಮೊತ್ತವನ್ನು ರೂಪಾಯಿಗಳಲ್ಲಿ ನಮೂದಿಸಿ. ಬಿಲ್ ₹1 ಅಥವಾ ಹೆಚ್ಚು ಇರುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "fe6d51ad"
+  },
+  "pos.discount.line": {
+    "message": "{name} · {price}",
+    "review": "reviewed",
+    "enHash": "6c125f94"
+  },
+  "pos.discount.bill": {
+    "message": "ಇಡೀ ಬಿಲ್ ರಿಯಾಯಿತಿ",
+    "review": "reviewed",
+    "enHash": "74870af9"
+  },
+  "pos.discount.invalid": {
+    "message": "ಸರಿಯಾದ ಮೊತ್ತ ನಮೂದಿಸಿ",
+    "review": "reviewed",
+    "enHash": "a45acfd3"
+  },
+  "pos.discount.apply": {
+    "message": "ಅನ್ವಯಿಸಿ",
+    "review": "reviewed",
+    "enHash": "cfea419c"
+  },
+  "pos.scan.open": {
+    "message": "ಸ್ಕ್ಯಾನ್",
+    "review": "reviewed",
+    "enHash": "28cba55d"
+  },
+  "pos.scan.title": {
+    "message": "ಬಾರ್‌ಕೋಡ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "7276e973"
+  },
+  "pos.scan.unsupported": {
+    "message": "ಈ ಬ್ರೌಸರ್ ಕ್ಯಾಮೆರಾದಿಂದ ಸ್ಕ್ಯಾನ್ ಮಾಡಲಾರದು. ಬಾರ್‌ಕೋಡ್ ಸ್ಕ್ಯಾನರ್ ಬಳಸಿ ಅಥವಾ ಕೋಡ್ ಟೈಪ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "5c26f8e7"
+  },
+  "pos.scan.denied": {
+    "message": "ಕ್ಯಾಮೆರಾ ಪ್ರವೇಶ ಆಫ್ ಆಗಿದೆ. ಸ್ಕ್ಯಾನ್ ಮಾಡಲು ಬ್ರೌಸರ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಅನುಮತಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "253b57db"
+  },
+  "pos.scan.starting": {
+    "message": "ಕ್ಯಾಮೆರಾ ಆರಂಭವಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "d6293a9d"
+  },
+  "pos.scan.hint": {
+    "message": "ಕ್ಯಾಮೆರಾವನ್ನು ಬಾರ್‌ಕೋಡ್ ಕಡೆಗೆ ಹಿಡಿಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "9abc9dc4"
+  },
+  "pos.link.title": {
+    "message": "ಗ್ರಾಹಕರನ್ನು ಲಿಂಕ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "f86c83df"
+  },
+  "pos.link.back": {
+    "message": "ಹಿಂದೆ",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "pos.link.skip": {
+    "message": "ಲಿಂಕ್ ಮಾಡದೆ ಮಾರಿ",
+    "review": "reviewed",
+    "enHash": "a26d2e6c"
+  },
+  "pos.link.noCredits": {
+    "message": "ಈ ಬಿಲ್ ಕ್ರೆಡಿಟ್ ಬಳಸುವ ಕನಿಷ್ಠ ಮೊತ್ತಕ್ಕಿಂತ ಕಡಿಮೆ ಇದೆ. ಗ್ರಾಹಕರು ಆದರೂ ಕ್ರೆಡಿಟ್ ಗಳಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "4e4f339e"
+  },
+  "pos.link.qr": {
+    "message": "ಗ್ರಾಹಕರು QR ಸ್ಕ್ಯಾನ್ ಮಾಡುತ್ತಾರೆ",
+    "review": "reviewed",
+    "enHash": "fae4c5ca"
+  },
+  "pos.link.qrHelp": {
+    "message": "ಗ್ರಾಹಕರು ಕ್ರೆಡಿಟ್ ಬಳಸಬಹುದು ಮತ್ತು ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್ ಗಳಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "da188dd6"
+  },
+  "pos.link.qrOffline": {
+    "message": "ಸಂಪರ್ಕ ಬೇಕು.",
+    "review": "reviewed",
+    "enHash": "1e270e64"
+  },
+  "pos.link.code": {
+    "message": "ಗ್ರಾಹಕರು ಕೋಡ್ ಹೇಳುತ್ತಾರೆ",
+    "review": "reviewed",
+    "enHash": "3f13bff1"
+  },
+  "pos.link.codeHelp": {
+    "message": "ಗ್ರಾಹಕರು ತಮ್ಮ ಆ್ಯಪ್‌ನಿಂದ 4 ಅಂಕಿಯ ಕೋಡ್ ತೋರಿಸುತ್ತಾರೆ. ಅವರು ಕ್ರೆಡಿಟ್ ಗಳಿಸುತ್ತಾರೆ.",
+    "review": "reviewed",
+    "enHash": "e9acea8e"
+  },
+  "pos.link.phone": {
+    "message": "ಫೋನ್ ಮಾತ್ರ ಗುರುತಿಸಿ",
+    "review": "reviewed",
+    "enHash": "504991bf"
+  },
+  "pos.link.phoneHelp": {
+    "message": "ಸಂಖ್ಯೆ ಮಾರಾಟದಲ್ಲಿ ಉಳಿಯುತ್ತದೆ. ಪರಿಶೀಲಿಸುವವರೆಗೆ ಕ್ರೆಡಿಟ್ ಇಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "5daaea7a"
+  },
+  "pos.link.phoneFieldHelp": {
+    "message": "10 ಅಂಕಿಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ",
+    "review": "reviewed",
+    "enHash": "3f114e30"
+  },
+  "pos.link.qrLabel": {
+    "message": "ಗ್ರಾಹಕರು ಸ್ಕ್ಯಾನ್ ಮಾಡಲು QR ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "1457d7c6"
+  },
+  "pos.link.qrPreparing": {
+    "message": "QR ಸಿದ್ಧವಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "12ab2a36"
+  },
+  "pos.link.qrFailed": {
+    "message": "QR ಮಾಡಲು ಆಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "f41ca6be"
+  },
+  "pos.link.qrExpired": {
+    "message": "ಈ QR ಅವಧಿ ಮುಗಿದಿದೆ.",
+    "review": "reviewed",
+    "enHash": "00efed4d"
+  },
+  "pos.link.newQr": {
+    "message": "ಹೊಸ QR",
+    "review": "reviewed",
+    "enHash": "16d87a7a"
+  },
+  "pos.link.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "pos.link.waiting": {
+    "message": "ಗ್ರಾಹಕರು ಸ್ಕ್ಯಾನ್ ಮಾಡುವುದನ್ನು ಕಾಯಲಾಗುತ್ತಿದೆ.",
+    "review": "reviewed",
+    "enHash": "a47155e3"
+  },
+  "pos.link.expiresIn": {
+    "message": "{seconds} s ನಲ್ಲಿ ಅವಧಿ ಮುಗಿಯುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "d965684d"
+  },
+  "pos.link.phoneLabel": {
+    "message": "ಗ್ರಾಹಕರ ಫೋನ್",
+    "review": "reviewed",
+    "enHash": "7689682e"
+  },
+  "pos.link.phoneInvalid": {
+    "message": "10 ಅಂಕಿಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ",
+    "review": "reviewed",
+    "enHash": "63c5f1b7"
+  },
+  "pos.link.codeLabel": {
+    "message": "ಗ್ರಾಹಕರ ಆ್ಯಪ್‌ನ ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "dd3257a4"
+  },
+  "pos.link.codeHint": {
+    "message": "4 ಅಂಕಿಗಳು",
+    "review": "reviewed",
+    "enHash": "a970a484"
+  },
+  "pos.link.codeInvalid": {
+    "message": "4 ಅಂಕಿಯ ಕೋಡ್ ನಮೂದಿಸಿ",
+    "review": "reviewed",
+    "enHash": "d99fedc4"
+  },
+  "pos.link.codeMismatch": {
+    "message": "ಆ ಕೋಡ್ ಹೊಂದಿಕೆಯಾಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "d8ae7e1c"
+  },
+  "pos.link.codeMismatchTries": {
+    "message": "ಆ ಕೋಡ್ ಹೊಂದಿಕೆಯಾಗಲಿಲ್ಲ. {count, plural, one {# ಪ್ರಯತ್ನ ಉಳಿದಿದೆ} other {# ಪ್ರಯತ್ನಗಳು ಉಳಿದಿವೆ}}.",
+    "review": "reviewed",
+    "enHash": "21be7fcb"
+  },
+  "pos.link.codeLocked": {
+    "message": "ತುಂಬಾ ತಪ್ಪು ಕೋಡ್‌ಗಳು. ನಂತರ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಫೋನ್ ಮೂಲಕ ಲಿಂಕ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "abbbdb33"
+  },
+  "pos.link.codeOffline": {
+    "message": "ನೀವು ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿದ್ದೀರಿ. ಮಾರಾಟ ಸಿಂಕ್ ಆದಾಗ ಕೋಡ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "df15f601"
+  },
+  "pos.link.codeSave": {
+    "message": "ಕೋಡ್ ಮೂಲಕ ಲಿಂಕ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "c9f2a2ec"
+  },
+  "pos.link.phoneSave": {
+    "message": "ಈ ಫೋನ್ ಗುರುತಿಸಿ",
+    "review": "reviewed",
+    "enHash": "bca7b443"
+  },
+  "pos.history.title": {
+    "message": "ಈ ಸಾಧನದ ಮಾರಾಟಗಳು",
+    "review": "reviewed",
+    "enHash": "ea829991"
+  },
+  "pos.history.empty.title": {
+    "message": "ಇನ್ನೂ ಮಾರಾಟಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "f2a3f161"
+  },
+  "pos.history.empty.body": {
+    "message": "ನೀವು ಮಾಡುವ ಮಾರಾಟಗಳು ಹಳೆಯದಾಗುವವರೆಗೆ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "ef0aab5c"
+  },
+  "pos.history.units": {
+    "message": "{count, plural, one {# ಯೂನಿಟ್} other {# ಯೂನಿಟ್‌ಗಳು}}",
+    "review": "reviewed",
+    "enHash": "55edb2e2"
+  },
+  "pos.history.receipt": {
+    "message": "ರಸೀದಿ",
+    "review": "reviewed",
+    "enHash": "f6ce3b6f"
+  },
+  "pos.history.state.pending": {
+    "message": "ಸಿಂಕ್‌ಗೆ ಕಾಯುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "e8f3a099"
+  },
+  "pos.history.state.sending": {
+    "message": "ಸಿಂಕ್ ಆಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "4ae6fa22"
+  },
+  "pos.history.state.synced": {
+    "message": "ಸಿಂಕ್ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "b2ef6af6"
+  },
+  "pos.history.state.rejected": {
+    "message": "ತಿರಸ್ಕೃತ",
+    "review": "reviewed",
+    "enHash": "735ec50d"
+  },
+  "pos.history.state.reversed": {
+    "message": "ಹಿಂಪಡೆಯಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "307404eb"
+  },
+  "pos.history.linkFailed": {
+    "message": "ಗ್ರಾಹಕರ ಲಿಂಕ್ ವಿಫಲವಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "b2a064c7"
+  },
+  "pos.history.countNeeded": {
+    "message": "ಎಣಿಕೆ ಬೇಕು",
+    "review": "reviewed",
+    "enHash": "a5bead5a"
+  },
+  "pos.history.countNeededItems": {
+    "message": "ಮರು-ಎಣಿಕೆ: {names}",
+    "review": "reviewed",
+    "enHash": "7f5c83fa"
+  },
+  "pos.history.serverPrice": {
+    "message": "ಇಲ್ಲಿ {device} ಚಾರ್ಜ್ ಆಯಿತು; ಸರ್ವರ್ {server} ಗೆ ಮುಗಿಸಿತು.",
+    "review": "reviewed",
+    "enHash": "237a255b"
+  },
+  "pos.history.refused": {
+    "message": "ಸರ್ವರ್ ಈ ಮಾರಾಟವನ್ನು ತಿರಸ್ಕರಿಸಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ, ಅಥವಾ ಗ್ರಾಹಕರೊಂದಿಗೆ ಪರಿಶೀಲಿಸಿ ವಜಾಗೊಳಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "e61a6e2b"
+  },
+  "pos.sync.title": {
+    "message": "ಸಿಂಕ್",
+    "review": "reviewed",
+    "enHash": "905f6309"
+  },
+  "pos.sync.status.idle": {
+    "message": "ಅಪ್‌ಡೇಟ್ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "82fb1d51"
+  },
+  "pos.sync.status.syncing": {
+    "message": "ಸಿಂಕ್ ಆಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "4ae6fa22"
+  },
+  "pos.sync.status.offline": {
+    "message": "ಆಫ್‌ಲೈನ್",
+    "review": "reviewed",
+    "enHash": "e01fa717"
+  },
+  "pos.sync.status.backoff": {
+    "message": "ಮರುಪ್ರಯತ್ನಕ್ಕೆ ಕಾಯುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "ac710fd8"
+  },
+  "pos.sync.status.resync": {
+    "message": "ಐಟಂಗಳನ್ನು ರಿಫ್ರೆಶ್ ಮಾಡಲಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "912875eb"
+  },
+  "pos.sync.now": {
+    "message": "ಈಗ ಸಿಂಕ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "2b7d938e"
+  },
+  "pos.sync.counts": {
+    "message": "{pending, plural, one {# ಕಾಯುತ್ತಿದೆ} other {# ಕಾಯುತ್ತಿವೆ}} · {rejected, plural, one {# ತಿರಸ್ಕೃತ} other {# ತಿರಸ್ಕೃತ}}",
+    "review": "reviewed",
+    "enHash": "4127fbe7"
+  },
+  "pos.sync.last": {
+    "message": "ಕೊನೆಯ ಸಿಂಕ್ {time}",
+    "review": "reviewed",
+    "enHash": "83c122a7"
+  },
+  "pos.sync.attention": {
+    "message": "{count, plural, one {# ಮಾರಾಟ ಪರಿಶೀಲಿಸಬೇಕು} other {# ಮಾರಾಟಗಳನ್ನು ಪರಿಶೀಲಿಸಬೇಕು}}",
+    "review": "reviewed",
+    "enHash": "00315455"
+  },
+  "pos.sync.retry": {
+    "message": "ಮರುಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "9f5cd8a2"
+  },
+  "pos.sync.dismiss": {
+    "message": "ವಜಾಗೊಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "70afe9ef"
+  },
+  "pos.reverse.action": {
+    "message": "ಹಿಂಪಡೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "57f99337"
+  },
+  "pos.reverse.title": {
+    "message": "ಈ ಮಾರಾಟವನ್ನು ಹಿಂಪಡೆಯಬೇಕೆ?",
+    "review": "reviewed",
+    "enHash": "31c561b0"
+  },
+  "pos.reverse.body": {
+    "message": "ಇದನ್ನು ರದ್ದುಗೊಳಿಸಲು ಆಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "fe63a123"
+  },
+  "pos.reverse.stock": {
+    "message": "{count, plural, one {# ಯೂನಿಟ್ ಸ್ಟಾಕ್‌ಗೆ ಮರಳುತ್ತದೆ} other {# ಯೂನಿಟ್‌ಗಳು ಸ್ಟಾಕ್‌ಗೆ ಮರಳುತ್ತವೆ}}",
+    "review": "reviewed",
+    "enHash": "fb6ecb00"
+  },
+  "pos.reverse.credits": {
+    "message": "{count, plural, =0 {ಹಿಂದಿರುಗಿಸಲು ಯಾವುದೇ ಕ್ರೆಡಿಟ್ ಇಲ್ಲ} one {# ಕ್ರೆಡಿಟ್ ಗ್ರಾಹಕರಿಗೆ ಮರಳುತ್ತದೆ} other {# ಕ್ರೆಡಿಟ್‌ಗಳು ಗ್ರಾಹಕರಿಗೆ ಮರಳುತ್ತವೆ}}",
+    "review": "reviewed",
+    "enHash": "7f6a019b"
+  },
+  "pos.reverse.cashback": {
+    "message": "{count, plural, =0 {ಹಿಂಪಡೆಯಲು ಯಾವುದೇ ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್ ಇಲ್ಲ} one {# ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್ ಕ್ರೆಡಿಟ್ ಹಿಂಪಡೆಯಲಾಗುತ್ತದೆ} other {# ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್ ಕ್ರೆಡಿಟ್‌ಗಳನ್ನು ಹಿಂಪಡೆಯಲಾಗುತ್ತದೆ}}",
+    "review": "reviewed",
+    "enHash": "bd10f749"
+  },
+  "pos.reverse.reason": {
+    "message": "ಕಾರಣ",
+    "review": "reviewed",
+    "enHash": "f219cc06"
+  },
+  "pos.reverse.keep": {
+    "message": "ಮಾರಾಟ ಇರಲಿ",
+    "review": "reviewed",
+    "enHash": "0403484b"
+  },
+  "pos.reverse.confirm": {
+    "message": "ಮಾರಾಟ ಹಿಂಪಡೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "a8309a05"
+  },
+  "pos.reverse.done": {
+    "message": "ಹಿಂಪಡೆಯಲಾಗಿದೆ. {units, plural, one {# ಯೂನಿಟ್} other {# ಯೂನಿಟ್‌ಗಳು}} ಸ್ಟಾಕ್‌ಗೆ ಮರಳಿದವು, {credits, plural, one {# ಕ್ರೆಡಿಟ್} other {# ಕ್ರೆಡಿಟ್‌ಗಳು}} ಹಿಂದಿರುಗಿಸಲಾಗಿದೆ, {cashback, plural, one {# ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್ ಕ್ರೆಡಿಟ್} other {# ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್ ಕ್ರೆಡಿಟ್‌ಗಳು}} ಹಿಂಪಡೆಯಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "6e36bd13"
+  },
+  "pos.reverse.offline": {
+    "message": "ನೀವು ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿದ್ದೀರಿ. ಆನ್‌ಲೈನ್ ಬಂದಾಗ ಮಾರಾಟ ಹಿಂಪಡೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "92a58c40"
+  },
+  "pos.reverse.windowPassed": {
+    "message": "ಈ ಮಾರಾಟವನ್ನು ಹಿಂಪಡೆಯುವ ಸಮಯ ಮುಗಿದಿದೆ.",
+    "review": "reviewed",
+    "enHash": "dd1ffab9"
+  },
+  "pos.reverse.failed": {
+    "message": "ಮಾರಾಟ ಹಿಂಪಡೆಯಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "f2e7f12b"
+  },
+  "pos.receipt.title": {
+    "message": "ರಸೀದಿ",
+    "review": "reviewed",
+    "enHash": "f6ce3b6f"
+  },
+  "pos.receipt.lineDiscount": {
+    "message": "ರಿಯಾಯಿತಿ",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.receipt.subtotal": {
+    "message": "ಉಪಮೊತ್ತ",
+    "review": "reviewed",
+    "enHash": "97f7359e"
+  },
+  "pos.receipt.discount": {
+    "message": "ರಿಯಾಯಿತಿ",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.receipt.roundOff": {
+    "message": "ರೌಂಡ್ ಆಫ್",
+    "review": "reviewed",
+    "enHash": "3aa7ebde"
+  },
+  "pos.receipt.credits": {
+    "message": "ಬಳಸಿದ ಕ್ರೆಡಿಟ್",
+    "review": "reviewed",
+    "enHash": "385686f7"
+  },
+  "pos.receipt.total": {
+    "message": "ಒಟ್ಟು",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "pos.receipt.paidBy": {
+    "message": "ಪಾವತಿ ವಿಧಾನ",
+    "review": "reviewed",
+    "enHash": "70c115d7"
+  },
+  "pos.receipt.thanks": {
+    "message": "ನಮ್ಮಲ್ಲಿ ಖರೀದಿಸಿದ್ದಕ್ಕೆ ಧನ್ಯವಾದಗಳು.",
+    "review": "reviewed",
+    "enHash": "feb21b25"
+  },
+  "pos.receipt.whatsapp": {
+    "message": "WhatsApp ನಲ್ಲಿ ಹಂಚಿಕೊಳ್ಳಿ",
+    "review": "reviewed",
+    "enHash": "7e03939f"
+  },
+  "pos.receipt.sms": {
+    "message": "SMS ಮೂಲಕ ಕಳುಹಿಸಿ",
+    "review": "reviewed",
+    "enHash": "6c0b2af6"
+  },
+  "pos.receipt.print": {
+    "message": "ಮುದ್ರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "5b221e9c"
+  },
+  "pos.receipt.linkPending": {
+    "message": "ಈ ಮಾರಾಟ ಸಿಂಕ್ ಆದ ನಂತರ ಹಂಚಿಕೆ ಲಿಂಕ್‌ಗಳು ಕೆಲಸ ಮಾಡುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "29db9a75"
+  },
+  "pos.receipt.shareText": {
+    "message": "{shop} ನಿಂದ ನಿಮ್ಮ ರಸೀದಿ: {url}",
+    "review": "reviewed",
+    "enHash": "b72276cf"
+  },
+  "pos.pay.other": {
+    "message": "ಇತರೆ",
+    "review": "reviewed",
+    "enHash": "6e6a6f20"
+  },
+  "pos.storeSales.open": {
+    "message": "ಅಂಗಡಿಯ ಮಾರಾಟಗಳು",
+    "review": "reviewed",
+    "enHash": "26e31c8a"
+  },
+  "pos.storeSales.title": {
+    "message": "ಅಂಗಡಿಯ ಮಾರಾಟಗಳು",
+    "review": "reviewed",
+    "enHash": "26e31c8a"
+  },
+  "pos.storeSales.sub": {
+    "message": "ಎಲ್ಲಾ ಸಾಧನಗಳಿಂದ ಈ ಅಂಗಡಿಯ ಪ್ರತಿ ಮಾರಾಟ, ಹೊಸದು ಮೊದಲು.",
+    "review": "reviewed",
+    "enHash": "bb528425"
+  },
+  "pos.storeSales.refresh": {
+    "message": "ರಿಫ್ರೆಶ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "56e3badc"
+  },
+  "pos.storeSales.more": {
+    "message": "ಇನ್ನಷ್ಟು ತೋರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "pos.storeSales.loading": {
+    "message": "ಮಾರಾಟಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ",
+    "review": "reviewed",
+    "enHash": "2723eba7"
+  },
+  "pos.storeSales.offline": {
+    "message": "ನೀವು ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿದ್ದೀರಿ. ಅಂಗಡಿಯ ಮಾರಾಟಗಳನ್ನು ನೋಡಲು ಸಂಪರ್ಕಿಸಿ; ಈ ಸಾಧನದ ಮಾರಾಟಗಳು “ಮಾರಾಟಗಳು” ಅಡಿಯಲ್ಲಿವೆ.",
+    "review": "reviewed",
+    "enHash": "61c05b4d"
+  },
+  "pos.storeSales.failed": {
+    "message": "ಮಾರಾಟಗಳು ಲೋಡ್ ಆಗಲಿಲ್ಲ. “ರಿಫ್ರೆಶ್ ಮಾಡಿ” ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "64c16cab"
+  },
+  "pos.storeSales.forbidden": {
+    "message": "ಈ ಅಂಗಡಿಯ ಮಾರಾಟಗಳನ್ನು ನೀವು ನೋಡಲು ಸಾಧ್ಯವಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "4d8a5236"
+  },
+  "pos.storeSales.empty.title": {
+    "message": "ಇನ್ನೂ ಮಾರಾಟಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "f2a3f161"
+  },
+  "pos.storeSales.empty.body": {
+    "message": "ಈ ಅಂಗಡಿಯಲ್ಲಿ ಮಾಡಿದ ಮಾರಾಟಗಳು ಸರ್ವರ್ ತಲುಪಿದ ನಂತರ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "d6d582c5"
+  },
+  "pos.storeSales.offlineSale": {
+    "message": "ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಮಾರಾಟ",
+    "review": "reviewed",
+    "enHash": "1080acf7"
+  },
+  "pos.storeSales.link.none": {
+    "message": "ಗ್ರಾಹಕರಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "871e3df8"
+  },
+  "pos.storeSales.link.linked": {
+    "message": "ಗ್ರಾಹಕರು ಲಿಂಕ್ ಆಗಿದ್ದಾರೆ",
+    "review": "reviewed",
+    "enHash": "d731c875"
+  },
+  "pos.storeSales.link.linkedTo": {
+    "message": "{name} ಅವರಿಗೆ ಲಿಂಕ್ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "50f407f3"
+  },
+  "pos.storeSales.link.pending": {
+    "message": "ಲಿಂಕ್ ಬಾಕಿ ಇದೆ",
+    "review": "reviewed",
+    "enHash": "18990b4f"
+  },
+  "pos.storeSales.failure.code_used": {
+    "message": "ಕೌಂಟರ್ ಕೋಡ್ ಈಗಾಗಲೇ ಬಳಕೆಯಾಗಿತ್ತು.",
+    "review": "reviewed",
+    "enHash": "6ba38a1c"
+  },
+  "pos.storeSales.failure.code_wrong": {
+    "message": "ಕೌಂಟರ್ ಕೋಡ್ ಹೊಂದಿಕೆಯಾಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "3d77b8d3"
+  },
+  "pos.storeSales.failure.clock_off": {
+    "message": "ಸಾಧನದ ಗಡಿಯಾರ ತಪ್ಪಾಗಿತ್ತು.",
+    "review": "reviewed",
+    "enHash": "7f280bf4"
+  },
+  "pos.storeSales.failure.too_late": {
+    "message": "ಕೋಡ್ ಪರಿಶೀಲಿಸಲು ಆಗದಷ್ಟು ತಡವಾಗಿ ಮಾರಾಟ ಸಿಂಕ್ ಆಯಿತು.",
+    "review": "reviewed",
+    "enHash": "3e897c4c"
+  },
+  "pos.storeSales.failure.locked": {
+    "message": "ಹಲವು ತಪ್ಪು ಕೋಡ್‌ಗಳು; ಪರಿಶೀಲನೆ ನಿಲ್ಲಿಸಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "74daacba"
+  },
+  "pos.storeSales.failure.unverified": {
+    "message": "ಕೋಡ್ ಪರಿಶೀಲಿಸಲು ಆಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "15c74c7c"
+  }
+}

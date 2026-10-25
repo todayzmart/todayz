@@ -728,11 +728,11 @@
     "description": "Accessible name of the loading placeholder"
   },
   "pos.storeSales.offline": {
-    "defaultMessage": "You are offline. Connect to see the store's sales; sales on this device are under Sales.",
+    "defaultMessage": "You are offline. Connect to see the store's sales; sales on this device are under “Sales”.",
     "description": "Banner when the store sales cannot load offline"
   },
   "pos.storeSales.failed": {
-    "defaultMessage": "Sales could not load. Try Refresh.",
+    "defaultMessage": "Sales could not load. Try “Refresh”.",
     "description": "Banner when the list fails"
   },
   "pos.storeSales.forbidden": {

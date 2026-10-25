@@ -1,0 +1,9 @@
+# Problem codes: domain "standee" (W2-10 PDF, W3-09 campaigns; 01 §8, D-26, D-223).
+#
+# Same shape as common.yaml.
+domain: standee
+problems:
+  - code: standee_limit_reached
+    status: 409
+    i18n: problems.standee_limit_reached
+    title: This shop already has as many standees as it can have

@@ -69,7 +69,7 @@ function order(over: Partial<Order> = {}): Order {
   return {
     id: ORDER_ID,
     number: 'R-1042',
-    store: { ...STORE, addressLine: '12 Main Road', locality: 'Indiranagar' },
+    store: { ...STORE, addressLine: '12 Main Road', locality: 'Indiranagar', phone: null },
     fulfilment: 'pickup',
     status: 'placed',
     statusReason: null,
@@ -594,7 +594,7 @@ describe('C-13 orders list', () => {
   const summary = (id: string, status: Order['status']) => ({
     id,
     number: `R-${id.slice(-2)}`,
-    store: { ...STORE, addressLine: '12 Main Road', locality: null },
+    store: { ...STORE, addressLine: '12 Main Road', locality: null, phone: null },
     fulfilment: 'pickup' as const,
     status,
     statusReason: null,

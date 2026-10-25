@@ -146,10 +146,16 @@ func (s *Service) Open(ctx context.Context, c Click) (Landing, error) {
 		click.Landing = "store"
 		loc := s.customerApp + "/s/" + url.PathEscape(r.Slug)
 		if hasStandee {
-			// TODO(lead): the standee id is not checked against qr_standees
-			// (W2-10); it only tracks which standee was scanned.
-			click.StandeeID = ids.UUID(standee)
-			loc += "?s=" + url.QueryEscape(standee.String())
+			// SC-ST-03: only a standee of this store is a scan. Another
+			// store's or an unknown id still lands on the store, unattributed.
+			mine, err := s.q(ctx).StoreStandee(ctx, referralsdb.StoreStandeeParams{ID: ids.UUID(standee), StoreID: ids.UUID(r.ID)})
+			if err != nil {
+				return Landing{}, err
+			}
+			if mine {
+				click.StandeeID = ids.UUID(standee)
+				loc += "?s=" + url.QueryEscape(standee.String())
+			}
 		}
 		out.Location = loc
 	case partyBusiness:

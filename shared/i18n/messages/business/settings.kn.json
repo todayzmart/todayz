@@ -1,0 +1,312 @@
+{
+  "settings.title": {
+    "message": "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "c7f73bb5"
+  },
+  "settings.loading": {
+    "message": "ಸೆಟ್ಟಿಂಗ್‌ಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ",
+    "review": "reviewed",
+    "enHash": "fa96b316"
+  },
+  "settings.loadFailed.title": {
+    "message": "ನಿಮ್ಮ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "ca73591b"
+  },
+  "settings.loadFailed.body": {
+    "message": "ನಿಮ್ಮ ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "settings.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "settings.none.title": {
+    "message": "ಇನ್ನೂ ಅಂಗಡಿ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "4830b3b7"
+  },
+  "settings.none.body": {
+    "message": "ಮೊದಲು ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ಸೆಟ್ ಮಾಡಿ, ನಂತರ ಇಲ್ಲಿಗೆ ಬನ್ನಿ.",
+    "review": "reviewed",
+    "enHash": "da1336b7"
+  },
+  "settings.none.action": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಸೆಟ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "f54cfff6"
+  },
+  "settings.noAccess.title": {
+    "message": "ಸೆಟ್ಟಿಂಗ್‌ಗಳು ಮಾಲೀಕರು ಮತ್ತು ಮ್ಯಾನೇಜರ್‌ಗಳಿಗೆ ಮಾತ್ರ",
+    "review": "reviewed",
+    "enHash": "207b45a2"
+  },
+  "settings.noAccess.body": {
+    "message": "ಏನಾದರೂ ಬದಲಾಯಿಸಬೇಕಿದ್ದರೆ ನಿಮ್ಮ ಅಂಗಡಿ ಮಾಲೀಕರಿಗೆ ಹೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "a4c81b6a"
+  },
+  "settings.links": {
+    "message": "ಸಂಬಂಧಿತ ಪುಟಗಳು",
+    "review": "reviewed",
+    "enHash": "99f548a9"
+  },
+  "settings.link.stores": {
+    "message": "ಅಂಗಡಿಗಳು ಮತ್ತು ಸಿಬ್ಬಂದಿ",
+    "review": "reviewed",
+    "enHash": "68c41031"
+  },
+  "settings.link.onboarding": {
+    "message": "ಅಂಗಡಿ ಸೆಟಪ್ ಮುಂದುವರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "221e0617"
+  },
+  "settings.noStore.title": {
+    "message": "ಸೆಟ್ ಮಾಡಲು ಇನ್ನೂ ಅಂಗಡಿ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "362a11a3"
+  },
+  "settings.noStore.body": {
+    "message": "“ಅಂಗಡಿಗಳು ಮತ್ತು ಸಿಬ್ಬಂದಿ” ಯಲ್ಲಿ ಒಂದು ಅಂಗಡಿ ಸೇರಿಸಿ. ಅದರ ಸೆಟ್ಟಿಂಗ್‌ಗಳು ಇಲ್ಲಿ ಕಾಣುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "e6841e2d"
+  },
+  "settings.forStore": {
+    "message": "{name} ಗಾಗಿ ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "5bb63b0b"
+  },
+  "settings.saved": {
+    "message": "ಉಳಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "c0ae8f6e"
+  },
+  "settings.save": {
+    "message": "ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "settings.profile.title": {
+    "message": "ಅಂಗಡಿ ಪ್ರೊಫೈಲ್",
+    "review": "reviewed",
+    "enHash": "ba2ce6e7"
+  },
+  "settings.profile.body": {
+    "message": "ಗ್ರಾಹಕರು ನೋಡುವ ಹೆಸರು, ವಿಳಾಸ, ನಕ್ಷೆಯ ಸ್ಥಳ ಮತ್ತು ಫೋನ್.",
+    "review": "reviewed",
+    "enHash": "81e5cbca"
+  },
+  "settings.hours.title": {
+    "message": "ತೆರೆಯುವ ಸಮಯ",
+    "review": "reviewed",
+    "enHash": "6117e118"
+  },
+  "settings.hours.body": {
+    "message": "ನೀವು ತೆರೆದಿರುವಾಗ ಮಾತ್ರ ಗ್ರಾಹಕರು ಬುಕ್ ಮಾಡಬಹುದು. ಅಂಗಡಿ ಮುಚ್ಚಿರುವ ರಜಾದಿನಗಳನ್ನು ಸೇರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "45190b6b"
+  },
+  "settings.delivery.title": {
+    "message": "ಪಿಕಪ್ ಮತ್ತು ಡೆಲಿವರಿ",
+    "review": "reviewed",
+    "enHash": "b2091838"
+  },
+  "settings.delivery.pickup": {
+    "message": "ಗ್ರಾಹಕರು ಅಂಗಡಿಯಿಂದ ಪಿಕಪ್ ಮಾಡಬಹುದು",
+    "review": "reviewed",
+    "enHash": "f5f43153"
+  },
+  "settings.delivery.delivery": {
+    "message": "ಗ್ರಾಹಕರಿಗೆ ಡೆಲಿವರಿ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "c4f865c6"
+  },
+  "settings.delivery.inStoreOnly.title": {
+    "message": "ಅಂಗಡಿಯಲ್ಲಿ ಮಾತ್ರ",
+    "review": "reviewed",
+    "enHash": "c72090ec"
+  },
+  "settings.delivery.inStoreOnly.body": {
+    "message": "ಪಿಕಪ್ ಮತ್ತು ಡೆಲಿವರಿ ಎರಡೂ ಆಫ್ ಆಗಿದ್ದರೆ, ಗ್ರಾಹಕರು ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ನೋಡಬಹುದು ಆದರೆ ಬುಕ್ ಮಾಡಲು ಆಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "e8067827"
+  },
+  "settings.delivery.radius": {
+    "message": "ಡೆಲಿವರಿ ದೂರ (km)",
+    "review": "reviewed",
+    "enHash": "3821a514"
+  },
+  "settings.delivery.radiusHelp": {
+    "message": "0.1 km ನಿಂದ 20 km ವರೆಗೆ.",
+    "review": "reviewed",
+    "enHash": "981b99be"
+  },
+  "settings.delivery.fee": {
+    "message": "ಡೆಲಿವರಿ ಶುಲ್ಕ",
+    "review": "reviewed",
+    "enHash": "733b6148"
+  },
+  "settings.delivery.freeAbove": {
+    "message": "ಇದಕ್ಕಿಂತ ಹೆಚ್ಚಿಗೆ ಉಚಿತ ಡೆಲಿವರಿ",
+    "review": "reviewed",
+    "enHash": "4b4964e0"
+  },
+  "settings.delivery.freeAboveHelp": {
+    "message": "ಯಾವಾಗಲೂ ಶುಲ್ಕ ತೆಗೆದುಕೊಳ್ಳಲು ಖಾಲಿ ಬಿಡಿ.",
+    "review": "reviewed",
+    "enHash": "0186f886"
+  },
+  "settings.delivery.minOrder": {
+    "message": "ಕನಿಷ್ಠ ಆರ್ಡರ್",
+    "review": "reviewed",
+    "enHash": "98d92586"
+  },
+  "settings.delivery.err.radius": {
+    "message": "0.1 ರಿಂದ 20 km ವರೆಗಿನ ದೂರ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "d8684a0d"
+  },
+  "settings.delivery.err.money": {
+    "message": "ರೂಪಾಯಿಯಲ್ಲಿ ಮೊತ್ತ ನಮೂದಿಸಿ, ದಶಮಾಂಶದ ನಂತರ ಗರಿಷ್ಠ ಎರಡು ಅಂಕಿಗಳು.",
+    "review": "reviewed",
+    "enHash": "2e283353"
+  },
+  "settings.rewards.title": {
+    "message": "ಬಹುಮಾನಗಳು ಮತ್ತು ಆರ್ಡರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "f180f64a"
+  },
+  "settings.rewards.cashback": {
+    "message": "ಬಿಲ್‌ಗಳ ಮೇಲೆ ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್",
+    "review": "reviewed",
+    "enHash": "e941ef9c"
+  },
+  "settings.rewards.example": {
+    "message": "{amount} ಬಿಲ್‌ಗೆ ಗ್ರಾಹಕರಿಗೆ {credits, plural, one {# ಕ್ರೆಡಿಟ್} other {# ಕ್ರೆಡಿಟ್‌ಗಳು}} ಸಿಗುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "a9c2e28b"
+  },
+  "settings.rewards.autoAccept": {
+    "message": "ಎಲ್ಲವೂ ಸ್ಟಾಕ್‌ನಲ್ಲಿದ್ದರೆ ಆರ್ಡರ್‌ಗಳನ್ನು ತಾನಾಗಿಯೇ ಸ್ವೀಕರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "24084d96"
+  },
+  "settings.rewards.asks": {
+    "message": "ಗ್ರಾಹಕರ ವಿಚಾರಣೆಗಳನ್ನು ಸ್ವೀಕರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "0f81555a"
+  },
+  "settings.payout.title": {
+    "message": "ಪಾವತಿ ಮತ್ತು ತೆರಿಗೆ ವಿವರಗಳು",
+    "review": "reviewed",
+    "enHash": "6e739b28"
+  },
+  "settings.payout.managerNote": {
+    "message": "ಇವುಗಳನ್ನು ಮಾಲೀಕರು ಮಾತ್ರ ಬದಲಾಯಿಸಬಹುದು. ನಿಮಗೆ ಕೊನೆಯ ಅಂಕಿಗಳು ಮಾತ್ರ ಕಾಣುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "d4c80359"
+  },
+  "settings.payout.legalName": {
+    "message": "ಕಾನೂನುಬದ್ಧ ಹೆಸರು",
+    "review": "reviewed",
+    "enHash": "15cd2be0"
+  },
+  "settings.payout.pan": {
+    "message": "PAN",
+    "review": "reviewed",
+    "enHash": "ad2967ed"
+  },
+  "settings.payout.gstin": {
+    "message": "GSTIN",
+    "review": "reviewed",
+    "enHash": "da7751f5"
+  },
+  "settings.payout.upi": {
+    "message": "UPI ID",
+    "review": "reviewed",
+    "enHash": "d06f3a68"
+  },
+  "settings.payout.bank": {
+    "message": "ಬ್ಯಾಂಕ್ ಖಾತೆ",
+    "review": "reviewed",
+    "enHash": "d2bd6b4c"
+  },
+  "settings.payout.bankAccount": {
+    "message": "ಬ್ಯಾಂಕ್ ಖಾತೆ ಸಂಖ್ಯೆ",
+    "review": "reviewed",
+    "enHash": "42045296"
+  },
+  "settings.payout.ifsc": {
+    "message": "IFSC",
+    "review": "reviewed",
+    "enHash": "e704f8ce"
+  },
+  "settings.payout.savedEnding": {
+    "message": "ಉಳಿಸಲಾಗಿದೆ, ಕೊನೆಯ ಅಂಕಿಗಳು {last4}",
+    "review": "reviewed",
+    "enHash": "ad71d96d"
+  },
+  "settings.payout.notSet": {
+    "message": "ಸೇರಿಸಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "a5651658"
+  },
+  "settings.payout.replaceHelp": {
+    "message": "ಸೇರಿಸಬೇಕಾದ ಅಥವಾ ಬದಲಾಯಿಸಬೇಕಾದುದನ್ನು ಮಾತ್ರ ತುಂಬಿ. ಖಾಲಿ ಬಿಟ್ಟ ಜಾಗಗಳಲ್ಲಿ ಉಳಿಸಿದ ವಿವರಗಳೇ ಇರುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "c59d12ea"
+  },
+  "settings.payout.err.format": {
+    "message": "ಇದು ಸರಿಯಾಗಿ ಕಾಣುತ್ತಿಲ್ಲ. ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "be9cb488"
+  },
+  "settings.payout.err.pair": {
+    "message": "ಈ ವಿವರಗಳು ಜೊತೆಯಾಗಿ ಬರುತ್ತವೆ. ಎರಡನ್ನೂ ಸೇರಿಸಿ, ಅಥವಾ GSTIN ನಲ್ಲಿ ನಿಮ್ಮ PAN ಇದೆಯೇ ಎಂದು ಪರಿಶೀಲಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "50154c2f"
+  },
+  "settings.language.title": {
+    "message": "ಭಾಷೆ",
+    "review": "reviewed",
+    "enHash": "89b86ab0"
+  },
+  "settings.language.body": {
+    "message": "ಈ ಸಾಧನದಲ್ಲಿ ಆ್ಯಪ್ ತಕ್ಷಣ ಬದಲಾಗುತ್ತದೆ. ಉತ್ಪನ್ನಗಳ ಹೆಸರು ಮತ್ತು ಬೆಲೆಗಳು ಹಾಗೆಯೇ ಇರುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "828a65d1"
+  },
+  "settings.language.group": {
+    "message": "ಆ್ಯಪ್ ಭಾಷೆ",
+    "review": "reviewed",
+    "enHash": "01e1787a"
+  },
+  "settings.language.name.en": {
+    "message": "ಇಂಗ್ಲಿಷ್",
+    "review": "reviewed",
+    "enHash": "649df08a"
+  },
+  "settings.language.name.hi": {
+    "message": "ಹಿಂದಿ",
+    "review": "reviewed",
+    "enHash": "c9e6b253"
+  },
+  "settings.language.name.kn": {
+    "message": "ಕನ್ನಡ",
+    "review": "reviewed",
+    "enHash": "c3ed6655"
+  },
+  "settings.language.name.te": {
+    "message": "ತೆಲುಗು",
+    "review": "reviewed",
+    "enHash": "ea6c0346"
+  },
+  "settings.language.name.ta": {
+    "message": "ತಮಿಳು",
+    "review": "reviewed",
+    "enHash": "86c2b627"
+  }
+}

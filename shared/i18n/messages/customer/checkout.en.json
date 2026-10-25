@@ -24,5 +24,8 @@
   "checkout.problem.ordering_suspended.until": { "defaultMessage": "You missed several pickups, so until {date} you can have only one open order. Finish or cancel it first.", "description": "Quote or place problem ordering_suspended with its end date (C-21)" },
   "checkout.problem.account_has_active_order": { "defaultMessage": "You already have an order in progress. Finish or cancel it first.", "description": "Quote problem" },
   "checkout.problem.other": { "defaultMessage": "We could not place the order. Please try again.", "description": "Quote problem fallback" },
-  "checkout.problem.network": { "defaultMessage": "No connection. Your cart is kept; try again when you are online.", "description": "Quote problem offline" }
+  "checkout.problem.network": { "defaultMessage": "No connection. Your cart is kept; try again when you are online.", "description": "Quote problem offline" },
+  "checkout.fulfilment.label": { "defaultMessage": "Pickup or delivery", "description": "C-11 accessible name of the fulfilment card" },
+  "checkout.delivery.title": { "defaultMessage": "Delivery from the shop", "description": "C-11 delivery card title" },
+  "checkout.payNote.delivery": { "defaultMessage": "You pay when it arrives: cash or UPI. Nothing is charged now.", "description": "C-11 and C-12 payment note for delivery" }
 }

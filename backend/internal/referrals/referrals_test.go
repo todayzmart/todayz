@@ -689,7 +689,7 @@ func TestOpen(t *testing.T) {
 		e.clk.Set(testNow)
 	})
 	t.Run("a standee lands on the store", func(t *testing.T) {
-		standee := ids.New(testNow)
+		standee := e.standee(store)
 		e.clk.Set(testNow.Add(-2 * time.Hour)) // the click comes before sign-up
 		l, err := e.svc.Open(e.ctx, Click{Code: storeCode, Standee: standee.String()})
 		e.clk.Set(testNow)
@@ -709,8 +709,41 @@ func TestOpen(t *testing.T) {
 		var source string
 		require.NoError(t, e.tdb.OwnerPool.QueryRow(e.ctx, `SELECT source FROM referrals WHERE id = $1`, ids.UUID(res.ReferralID)).Scan(&source))
 		assert.Equal(t, sourceStandee, source)
-		_ = store
 	})
+	// SC-ST-03: a standee of another store, or an id no standee has, lands on
+	// the store but is not a scan, so the sign-up is not attributed to it.
+	t.Run("another store's standee is not a scan", func(t *testing.T) {
+		_, other, _, _, _ := e.shopWithStore()
+		for name, standee := range map[string]ids.ID{"other store": e.standee(other), "unknown": ids.New(testNow)} {
+			e.clk.Set(testNow.Add(-2 * time.Hour))
+			l, err := e.svc.Open(e.ctx, Click{Code: storeCode, Standee: standee.String()})
+			e.clk.Set(testNow)
+			require.NoError(t, err, name)
+			assert.Equal(t, "https://app.todayz.localhost/s/"+slug, l.Location, name)
+			v := cookieValue(t, l.SetCookie)
+			var st *[16]byte
+			require.NoError(t, e.tdb.OwnerPool.QueryRow(e.ctx, `SELECT standee_id FROM referral_clicks WHERE id = $1`, ids.UUID(mustParse(t, v))).Scan(&st))
+			assert.Nil(t, st, name)
+			u, _ := e.newCustomer()
+			res, err := e.claim(u, ClaimInput{Cookie: v})
+			require.NoError(t, err, name)
+			var source string
+			var sid *[16]byte
+			require.NoError(t, e.tdb.OwnerPool.QueryRow(e.ctx, `SELECT source, standee_id FROM referrals WHERE id = $1`, ids.UUID(res.ReferralID)).Scan(&source, &sid))
+			assert.Equal(t, sourceLink, source, name)
+			assert.Nil(t, sid, name)
+		}
+	})
+}
+
+// standee is a printed standee of store (W3-09's qr_standees row).
+func (e *env) standee(store ids.ID) ids.ID {
+	e.t.Helper()
+	by, _ := e.newCustomer()
+	id := ids.New(testNow)
+	e.exec(`INSERT INTO qr_standees (id, store_id, campaign, created_by, created_at, updated_at) VALUES ($1, $2, 'Counter', $3, $4, $4)`,
+		ids.UUID(id), ids.UUID(store), ids.UUID(by), testNow)
+	return id
 }
 
 func mustID(t *testing.T, u pgtype.UUID) ids.ID {

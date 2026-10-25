@@ -47,6 +47,7 @@
   "orders.extend.done": { "defaultMessage": "Added 10 minutes.", "description": "C-12 extension confirmed" },
   "orders.extend.used": { "defaultMessage": "You already added time to this order.", "description": "C-12 extension used" },
   "orders.directions": { "defaultMessage": "Directions", "description": "C-12 link to maps" },
+  "orders.callShop": { "defaultMessage": "Call shop", "description": "C-12 tel: link to the shop's contact phone while the order is open (D-220)" },
   "orders.actionError": { "defaultMessage": "That did not go through. Please try again.", "description": "C-12 action error" },
   "orders.timeline.label": { "defaultMessage": "Order progress", "description": "C-12 timeline accessible name" },
   "orders.timeline.done": { "defaultMessage": "Done", "description": "Timeline step state" },
@@ -100,5 +101,13 @@
   "orders.cancel.keep": { "defaultMessage": "Keep order", "description": "Sheet button" },
   "orders.cancel.confirm": { "defaultMessage": "Cancel order", "description": "Sheet button" },
   "orders.cancel.error": { "defaultMessage": "We could not cancel the order. Please try again.", "description": "Sheet error" },
-  "orders.close": { "defaultMessage": "Close", "description": "Sheet close label" }
+  "orders.close": { "defaultMessage": "Close", "description": "Sheet close label" },
+  "orders.step.out_for_delivery": { "defaultMessage": "On the way", "description": "Timeline step (delivery)" },
+  "orders.step.delivered": { "defaultMessage": "Delivered", "description": "Timeline step (delivery)" },
+  "orders.code.deliveryLabel": { "defaultMessage": "Delivery code", "description": "C-12 code label for delivery" },
+  "orders.code.riderNote": { "defaultMessage": "Tell this code to the rider when your order arrives.", "description": "C-12 delivery code hint" },
+  "orders.delivery.accepted": { "defaultMessage": "{shop} accepted your order and will send it out by {time}.", "description": "C-12 accepted delivery note" },
+  "orders.delivery.acceptedNoTime": { "defaultMessage": "{shop} accepted your order and will send it out soon.", "description": "C-12 accepted delivery note without a time" },
+  "orders.delivery.onTheWay": { "defaultMessage": "Your order from {shop} is on the way.", "description": "C-12 out for delivery note" },
+  "orders.delivery.to": { "defaultMessage": "Delivering to {label}: {address}", "description": "C-12 delivery address" }
 }

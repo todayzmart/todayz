@@ -1,0 +1,352 @@
+{
+  "reviews.title": {
+    "message": "மதிப்புரைகள்",
+    "review": "reviewed",
+    "enHash": "b83c4cda"
+  },
+  "reviews.loading": {
+    "message": "மதிப்புரைகள் ஏற்றப்படுகின்றன",
+    "review": "reviewed",
+    "enHash": "61702287"
+  },
+  "reviews.noStore.title": {
+    "message": "முதலில் கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "reviews.noStore.body": {
+    "message": "மதிப்புரைகள் ஒரு கடைக்குச் சொந்தமானவை. நீங்கள் வேலை செய்யும் கடையைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "f9ec0e16"
+  },
+  "reviews.noStore.action": {
+    "message": "கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "reviews.askManager": {
+    "message": "மதிப்புரைகளைப் படித்துப் பதிலளிக்குமாறு மேலாளரிடமோ உரிமையாளரிடமோ கேளுங்கள்.",
+    "review": "reviewed",
+    "enHash": "2c2e609d"
+  },
+  "reviews.error.title": {
+    "message": "மதிப்புரைகளை ஏற்ற முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "de866185"
+  },
+  "reviews.error.body": {
+    "message": "உங்கள் இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "reviews.error.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "reviews.error.generic": {
+    "message": "ஏதோ தவறு நடந்துவிட்டது. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "4244e822"
+  },
+  "reviews.error.validation_failed": {
+    "message": "இந்த உரை சரியில்லை. சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "4adef4cf"
+  },
+  "reviews.error.forbidden": {
+    "message": "இதை உரிமையாளரும் மேலாளர்களும் மட்டுமே செய்ய முடியும்.",
+    "review": "reviewed",
+    "enHash": "6cfcc92b"
+  },
+  "reviews.error.not_found": {
+    "message": "இந்த மதிப்புரை இப்போது கிடைக்கவில்லை.",
+    "review": "reviewed",
+    "enHash": "272ac09f"
+  },
+  "reviews.stars": {
+    "message": "5 இல் {n} நட்சத்திரங்கள்",
+    "review": "reviewed",
+    "enHash": "9f1228f8"
+  },
+  "reviews.summary.label": {
+    "message": "மதிப்பீட்டுச் சுருக்கம்",
+    "review": "reviewed",
+    "enHash": "1beac453"
+  },
+  "reviews.summary.count": {
+    "message": "{count, plural, one {# மதிப்புரை} other {# மதிப்புரைகள்}}",
+    "review": "reviewed",
+    "enHash": "1686d1f3"
+  },
+  "reviews.filter.label": {
+    "message": "மதிப்புரைகளை வடிகட்டவும்",
+    "review": "reviewed",
+    "enHash": "5d0564c8"
+  },
+  "reviews.filter.all": {
+    "message": "அனைத்தும்",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "reviews.filter.needsReply": {
+    "message": "பதில் தேவை",
+    "review": "reviewed",
+    "enHash": "1876f7a3"
+  },
+  "reviews.filter.withText": {
+    "message": "உரையுடன்",
+    "review": "reviewed",
+    "enHash": "2edd6b89"
+  },
+  "reviews.filter.low": {
+    "message": "குறைந்த நட்சத்திரங்கள்",
+    "review": "reviewed",
+    "enHash": "e1711be2"
+  },
+  "reviews.list.label": {
+    "message": "மதிப்புரைகள்",
+    "review": "reviewed",
+    "enHash": "b83c4cda"
+  },
+  "reviews.card.label": {
+    "message": "{who} இன் மதிப்புரை, 5 இல் {n} நட்சத்திரங்கள்",
+    "review": "reviewed",
+    "enHash": "156b0978"
+  },
+  "reviews.customer": {
+    "message": "வாடிக்கையாளர்",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "reviews.tags.label": {
+    "message": "வாடிக்கையாளர் தேர்ந்தெடுத்தவை",
+    "review": "reviewed",
+    "enHash": "313df17b"
+  },
+  "reviews.tag.fresh_stock": {
+    "message": "புதிய ஸ்டாக்",
+    "review": "reviewed",
+    "enHash": "fc1a8787"
+  },
+  "reviews.tag.fair_price": {
+    "message": "நியாயமான விலை",
+    "review": "reviewed",
+    "enHash": "ec8540d9"
+  },
+  "reviews.tag.quick_service": {
+    "message": "விரைவான சேவை",
+    "review": "reviewed",
+    "enHash": "43b39cae"
+  },
+  "reviews.tag.friendly": {
+    "message": "நட்பான அணுகுமுறை",
+    "review": "reviewed",
+    "enHash": "bf567dc7"
+  },
+  "reviews.tag.stock_was_right": {
+    "message": "ஸ்டாக் சரியாக இருந்தது",
+    "review": "reviewed",
+    "enHash": "f8f0444f"
+  },
+  "reviews.tag.well_packed": {
+    "message": "நன்றாகப் பேக் செய்யப்பட்டது",
+    "review": "reviewed",
+    "enHash": "0e3f2961"
+  },
+  "reviews.tag.item_missing": {
+    "message": "பொருள் விடுபட்டது",
+    "review": "reviewed",
+    "enHash": "0855e85b"
+  },
+  "reviews.tag.slow": {
+    "message": "மெதுவான சேவை",
+    "review": "reviewed",
+    "enHash": "33dcec9c"
+  },
+  "reviews.tag.rude": {
+    "message": "முரட்டுத்தனம்",
+    "review": "reviewed",
+    "enHash": "ce184411"
+  },
+  "reviews.tag.wrong_item": {
+    "message": "தவறான பொருள்",
+    "review": "reviewed",
+    "enHash": "4acb91e2"
+  },
+  "reviews.tag.expired_item": {
+    "message": "காலாவதியான பொருள்",
+    "review": "reviewed",
+    "enHash": "4ae5e2f6"
+  },
+  "reviews.tag.overpriced": {
+    "message": "அதிக விலை",
+    "review": "reviewed",
+    "enHash": "41032e5c"
+  },
+  "reviews.reported.pill": {
+    "message": "புகாரளிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "73c20ded"
+  },
+  "reviews.reported.button": {
+    "message": "புகாரளிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "73c20ded"
+  },
+  "reviews.report.button": {
+    "message": "புகாரளிக்கவும்",
+    "review": "reviewed",
+    "enHash": "ee45c303"
+  },
+  "reviews.reply.yours": {
+    "message": "உங்கள் பதில்",
+    "review": "reviewed",
+    "enHash": "bf9a79bf"
+  },
+  "reviews.reply.start": {
+    "message": "பதிலளிக்கவும்",
+    "review": "reviewed",
+    "enHash": "6c2bb735"
+  },
+  "reviews.reply.edit": {
+    "message": "பதிலைத் திருத்தவும்",
+    "review": "reviewed",
+    "enHash": "a4bf4d45"
+  },
+  "reviews.reply.label": {
+    "message": "உங்கள் பதில்",
+    "review": "reviewed",
+    "enHash": "bf9a79bf"
+  },
+  "reviews.reply.editLabel": {
+    "message": "உங்கள் பதிலைத் திருத்தவும்",
+    "review": "reviewed",
+    "enHash": "97ac1ab6"
+  },
+  "reviews.reply.counter": {
+    "message": "{max} இல் {n}",
+    "review": "reviewed",
+    "enHash": "f0c3ff89"
+  },
+  "reviews.reply.empty": {
+    "message": "முதலில் பதிலை எழுதவும்.",
+    "review": "reviewed",
+    "enHash": "2fe86de8"
+  },
+  "reviews.reply.send": {
+    "message": "பதிலை அனுப்பவும்",
+    "review": "reviewed",
+    "enHash": "7f7e603a"
+  },
+  "reviews.reply.save": {
+    "message": "பதிலைச் சேமிக்கவும்",
+    "review": "reviewed",
+    "enHash": "c250061d"
+  },
+  "reviews.cancel": {
+    "message": "ரத்துசெய்",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "reviews.close": {
+    "message": "மூடு",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "reviews.toast.replySent": {
+    "message": "பதில் அனுப்பப்பட்டது",
+    "review": "reviewed",
+    "enHash": "94295a73"
+  },
+  "reviews.toast.replyUpdated": {
+    "message": "பதில் புதுப்பிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "19cf979f"
+  },
+  "reviews.toast.reported": {
+    "message": "மதிப்புரை TodayZ க்குப் புகாரளிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "00e2c963"
+  },
+  "reviews.report.title": {
+    "message": "இந்த மதிப்புரையைப் புகாரளிக்கவும்",
+    "review": "reviewed",
+    "enHash": "abad10bb"
+  },
+  "reviews.report.body": {
+    "message": "புகாரளிக்கப்பட்ட மதிப்புரைகளை TodayZ சரிபார்க்கும். அதுவரை மதிப்புரை தெரியும்.",
+    "review": "reviewed",
+    "enHash": "e386cb2f"
+  },
+  "reviews.report.reason": {
+    "message": "ஏன் புகாரளிக்கிறீர்கள்?",
+    "review": "reviewed",
+    "enHash": "2e7a55fa"
+  },
+  "reviews.report.reasons.abusive": {
+    "message": "தகாத அல்லது வெறுப்பான மொழி",
+    "review": "reviewed",
+    "enHash": "192ce604"
+  },
+  "reviews.report.reasons.spam": {
+    "message": "ஸ்பேம் அல்லது விளம்பரம்",
+    "review": "reviewed",
+    "enHash": "faaa5e25"
+  },
+  "reviews.report.reasons.fake": {
+    "message": "உண்மையான வாடிக்கையாளர் அல்ல",
+    "review": "reviewed",
+    "enHash": "97d094f4"
+  },
+  "reviews.report.reasons.not_about_shop": {
+    "message": "இந்தக் கடையைப் பற்றியது அல்ல",
+    "review": "reviewed",
+    "enHash": "b18e3075"
+  },
+  "reviews.report.reasons.other": {
+    "message": "வேறு ஏதோ",
+    "review": "reviewed",
+    "enHash": "48f88ac3"
+  },
+  "reviews.report.note": {
+    "message": "குறிப்பு (விருப்பத்தேர்வு)",
+    "review": "reviewed",
+    "enHash": "4e395670"
+  },
+  "reviews.report.submit": {
+    "message": "மதிப்புரையைப் புகாரளிக்கவும்",
+    "review": "reviewed",
+    "enHash": "f5cbfaf7"
+  },
+  "reviews.empty.title": {
+    "message": "இன்னும் மதிப்புரைகள் இல்லை",
+    "review": "reviewed",
+    "enHash": "e4d2123a"
+  },
+  "reviews.empty.body": {
+    "message": "வாடிக்கையாளர்கள் ஆர்டரைப் பெற்ற பிறகு அல்லது கவுண்டரில் வாங்கிய பிறகு கடைக்கு மதிப்புரை தரலாம். அவர்களின் மதிப்புரைகள் இங்கே தெரியும்.",
+    "review": "reviewed",
+    "enHash": "8b7325bb"
+  },
+  "reviews.empty.filtered": {
+    "message": "இந்த வடிகட்டிக்குப் பொருந்தும் மதிப்புரைகள் இல்லை.",
+    "review": "reviewed",
+    "enHash": "d4009a35"
+  },
+  "reviews.more": {
+    "message": "மேலும் காட்டவும்",
+    "review": "reviewed",
+    "enHash": "25911d48"
+  },
+  "reviews.error.review_reply_exists": {
+    "message": "இந்த மதிப்புரைக்கு ஏற்கனவே பதில் உள்ளது. அது மீண்டும் ஏற்றப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "26e93ce0"
+  },
+  "reviews.error.invalid_transition": {
+    "message": "இந்தப் பதிலை இனி திருத்த முடியாது.",
+    "review": "reviewed",
+    "enHash": "228ab362"
+  }
+}

@@ -5,31 +5,32 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import type { CartState } from './cart';
 import { CREDITS_PROBE, creditsState, useCreditsChoice } from './credits';
+import { fulfilmentKey, type Fulfilment } from './fulfilment';
 
-/** Pickup only this weekend. TODO(W2-03): delivery and the address picker. */
-export const FULFILMENT = 'pickup' as const;
+const PICKUP: Fulfilment = { fulfilment: 'pickup' };
 
-export function quoteKey(cart: CartState, credits = 0): readonly unknown[] {
-  return ['quote', cart.store?.id ?? '', cart.lines.map((l) => `${l.storeItemId}:${l.qty}`).join(','), credits];
+export function quoteKey(cart: CartState, credits = 0, f: Fulfilment = PICKUP): readonly unknown[] {
+  return ['quote', cart.store?.id ?? '', cart.lines.map((l) => `${l.storeItemId}:${l.qty}`).join(','), fulfilmentKey(f), credits];
 }
 
 /**
  * The priced cart (D-02): no side effects, so it is asked again whenever the cart changes. Signed
- * out there is nothing to ask (the route is a /me route). `credits` is what the person chose to use.
+ * out there is nothing to ask (the route is a /me route). `credits` is what the person chose to use;
+ * `f` is pickup or delivery to a saved address (cart/fulfilment.ts).
  */
-export function useCartQuote(cart: CartState, enabled: boolean, credits = 0) {
+export function useCartQuote(cart: CartState, enabled: boolean, credits = 0, f: Fulfilment = PICKUP) {
   return useQuery<CheckoutQuote, ApiError>({
-    queryKey: quoteKey(cart, credits),
+    queryKey: quoteKey(cart, credits, f),
     enabled: enabled && cart.store !== null && cart.lines.length > 0,
     retry: false,
     staleTime: 0,
     // Moving only the credits keeps the last price on screen (marked as a placeholder) instead of a blank.
     placeholderData: (prev, prevQuery) =>
-      prevQuery && prevQuery.queryKey.slice(0, 3).join('|') === quoteKey(cart).slice(0, 3).join('|') ? prev : undefined,
+      prevQuery && prevQuery.queryKey.slice(0, 4).join('|') === quoteKey(cart, 0, f).slice(0, 4).join('|') ? prev : undefined,
     queryFn: () =>
       quoteCheckout({
         storeId: cart.store?.id ?? '',
-        fulfilment: FULFILMENT,
+        ...f,
         items: cart.lines.map((l) => ({ storeItemId: l.storeItemId, quantity: l.qty })),
         creditsToUse: credits,
       }),
@@ -40,17 +41,17 @@ export function useCartQuote(cart: CartState, enabled: boolean, credits = 0) {
  * The same cart asked with more credits than anyone can use: `creditsAllowed` is then the most this
  * cart can take and `creditsLimit` says why it is not more. A failed probe just hides the control.
  */
-export function useCreditsProbe(cart: CartState, enabled: boolean) {
-  return useCartQuote(cart, enabled, CREDITS_PROBE);
+export function useCreditsProbe(cart: CartState, enabled: boolean, f: Fulfilment = PICKUP) {
+  return useCartQuote(cart, enabled, CREDITS_PROBE, f);
 }
 
 /**
  * The cart's price with the credits the person chose (01 §7). The chosen amount is clamped to what the
  * probe says the cart can take and waits a moment while the slider moves, so one drag is one quote.
  */
-export function useCartPricing(cart: CartState, enabled: boolean) {
+export function useCartPricing(cart: CartState, enabled: boolean, f: Fulfilment = PICKUP) {
   const choice = useCreditsChoice(cart.store?.id);
-  const probe = useCreditsProbe(cart, enabled);
+  const probe = useCreditsProbe(cart, enabled, f);
   const state = creditsState(probe.data);
   const wanted = choice.on && state.kind === 'available' ? Math.min(choice.amount, state.max) : 0;
   const [requested, setRequested] = useState(wanted);
@@ -58,7 +59,7 @@ export function useCartPricing(cart: CartState, enabled: boolean) {
     const t = setTimeout(() => setRequested(wanted), wanted === requested ? 0 : 250);
     return () => clearTimeout(t);
   }, [wanted, requested]);
-  const quote = useCartQuote(cart, enabled, requested);
+  const quote = useCartQuote(cart, enabled, requested, f);
   // The price shown is for `requested`; until it catches up with the slider the page must not place.
   return { quote, probe: probe.data, choice, settling: requested !== wanted || quote.isPlaceholderData };
 }

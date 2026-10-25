@@ -214,5 +214,37 @@
   "settings.payout.err.pair": {
     "defaultMessage": "These details go together. Add both, or check that the GSTIN carries your PAN.",
     "description": "Field error"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Language",
+    "description": "B-14 card title: the language the app is shown in"
+  },
+  "settings.language.body": {
+    "defaultMessage": "The app changes at once on this device. Product names and prices stay as they are.",
+    "description": "B-14 language card help"
+  },
+  "settings.language.group": {
+    "defaultMessage": "App language",
+    "description": "Accessible name of the group of language cards"
+  },
+  "settings.language.name.en": {
+    "defaultMessage": "English",
+    "description": "Name of English in the interface language, under its native name on the card"
+  },
+  "settings.language.name.hi": {
+    "defaultMessage": "Hindi",
+    "description": "Name of Hindi in the interface language, under its native name on the card"
+  },
+  "settings.language.name.kn": {
+    "defaultMessage": "Kannada",
+    "description": "Name of Kannada in the interface language, under its native name on the card"
+  },
+  "settings.language.name.te": {
+    "defaultMessage": "Telugu",
+    "description": "Name of Telugu in the interface language, under its native name on the card"
+  },
+  "settings.language.name.ta": {
+    "defaultMessage": "Tamil",
+    "description": "Name of Tamil in the interface language, under its native name on the card"
   }
 }
