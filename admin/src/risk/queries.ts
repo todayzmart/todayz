@@ -2,6 +2,7 @@ import { blockAdminCustomer } from '@todayz/api-client/gen/admin-customers/admin
 import { suspendAdminBusiness } from '@todayz/api-client/gen/admin-businesses/admin-businesses';
 import { clearRiskFlag, confirmRiskFlag, getRiskFlag, listRiskFlags } from '@todayz/api-client/gen/admin-risk/admin-risk';
 import type { RiskFlagStatus } from '@todayz/api-client/gen/model/riskFlagStatus';
+import type { RiskResolveRequestFrom } from '@todayz/api-client/gen/model/riskResolveRequestFrom';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { PAGE, refreshAudit } from '../audit/queries';
 
@@ -30,14 +31,16 @@ function refresh(qc: QueryClient, id: string) {
 export type Verdict = 'clear' | 'confirm';
 
 /**
- * Clear or confirm with a reason (D-225). Not idempotency-keyed: a resolved flag answers
- * `409 invalid_transition`, so a retry can never resolve it twice. Neither moves money or blocks.
+ * Clear (from open or confirmed) or confirm (from open) with a reason (D-225). `from` is the
+ * status the reviewer saw: a flag that moved since, or a retry, answers `409 invalid_transition`,
+ * so nothing resolves twice or over a verdict nobody saw. Neither blocks anyone; clearing a
+ * business or store flag can release its payout hold (01 §9).
  */
 export function useResolve(id: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ verdict, reason }: { verdict: Verdict; reason: string }) =>
-      verdict === 'clear' ? clearRiskFlag(id, { reason }) : confirmRiskFlag(id, { reason }),
+    mutationFn: ({ verdict, from, reason }: { verdict: Verdict; from: RiskResolveRequestFrom; reason: string }) =>
+      verdict === 'clear' ? clearRiskFlag(id, { from, reason }) : confirmRiskFlag(id, { from, reason }),
     onSettled: () => refresh(qc, id),
   });
 }

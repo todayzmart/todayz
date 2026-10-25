@@ -156,7 +156,7 @@ const (
 	RiskBillClaimStores      Key = "risk_bill_claim_stores"         // count, default 3
 	RiskBillClaimWindowMin   Key = "risk_bill_claim_window_minutes" // minutes, default 10
 	RiskReversalRatioPercent Key = "risk_reversal_ratio_percent"    // count, default 20
-	RiskReversalMinSales     Key = "risk_reversal_min_sales"        // count, default 10
+	RiskReversalMinSales     Key = "risk_reversal_min_sales"        // count, default 30
 	RiskReversalWindowDays   Key = "risk_reversal_window_days"      // days, default 7
 	RiskOTPPhonesPerIPHour   Key = "risk_otp_phones_per_ip_hour"    // count, default 10
 	RiskOTPFailedPerPhoneDay Key = "risk_otp_failed_per_phone_day"  // count, default 3

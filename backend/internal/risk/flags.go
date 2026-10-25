@@ -49,10 +49,25 @@ type subjectRef struct {
 	id  ids.ID
 }
 
+const (
+	partyReferee  = "referee"
+	partyReferrer = "referrer"
+)
+
+func sideOf(p *string) *riskapi.RiskReferralParty {
+	if p == nil {
+		return nil
+	}
+	v := riskapi.RiskReferralParty(*p)
+	return &v
+}
+
 // subjectInfo is what A-13 shows about a flag's subject.
 type subjectInfo struct {
 	label, status                   *string
 	storeID, businessID, customerID *string
+	// customerParty and businessParty: on a referral, which side each id is.
+	customerParty, businessParty *string
 }
 
 func flagOf(r flagRow, subj map[subjectRef]subjectInfo) riskapi.RiskFlag {
@@ -169,16 +184,16 @@ func (s *Service) subjects(ctx context.Context, rows []flagRow) (map[subjectRef]
 			info := subjectInfo{label: referralLabel(r.ReferrerLabel, r.RefereeLabel), status: ptr(r.Status)}
 			switch r.RefereeType {
 			case "customer":
-				info.customerID = ptr(mustID(r.RefereeID).String())
+				info.customerID, info.customerParty = ptr(mustID(r.RefereeID).String()), ptr(partyReferee)
 			case "business":
-				info.businessID = ptr(mustID(r.RefereeID).String())
+				info.businessID, info.businessParty = ptr(mustID(r.RefereeID).String()), ptr(partyReferee)
 			}
 			switch r.ReferrerType {
 			case "store":
 				info.storeID = ptr(mustID(r.ReferrerID).String())
 			case "business":
 				if info.businessID == nil {
-					info.businessID = ptr(mustID(r.ReferrerID).String())
+					info.businessID, info.businessParty = ptr(mustID(r.ReferrerID).String()), ptr(partyReferrer)
 				}
 			}
 			out[subjectRef{"referral", mustID(r.ID)}] = info
@@ -231,13 +246,14 @@ func (s *Service) getFlag(ctx context.Context, flagID ids.ID) (riskapi.RiskFlagD
 	}
 	info := subj[subjectRef{g.SubjectType, mustID(g.SubjectID)}]
 	if b := detail(g.Details, "businessId"); b != "" && ids.Valid(b) {
-		info.businessID = ptr(b) // referral.self_like: the business on the referrer's side
+		info.businessID, info.businessParty = ptr(b), ptr(partyReferrer) // referral.self_like: the referrer's business
 	}
 	out := riskapi.RiskFlagDetail{
 		Flag: flagOf(fr, subj),
 		Subject: riskapi.RiskSubject{
 			Type: g.SubjectType, Id: mustID(g.SubjectID).String(), Label: info.label, Status: info.status,
 			StoreId: info.storeID, BusinessId: info.businessID, CustomerId: info.customerID,
+			CustomerParty: sideOf(info.customerParty), BusinessParty: sideOf(info.businessParty),
 		},
 		Facts: []riskapi.RiskFact{}, History: make([]riskapi.RiskFlag, 0, len(hist)), ServerNow: s.now(),
 	}
@@ -512,6 +528,13 @@ func (s *Service) otpEvidence(ctx context.Context, g riskdb.GetFlagRow) ([]riska
 
 // --- clear and confirm -------------------------------------------------------------------
 
+// resolvable says whether a flag in status from may move to to: confirm only
+// from open, clear from open or confirmed (a confirmed finding can turn out
+// wrong later, and its payout hold must not be stuck).
+func resolvable(from, to string) bool {
+	return from == "open" || (from == "confirmed" && to == "cleared")
+}
+
 func cleanReason(r string, limit int) (string, error) {
 	r = strings.TrimSpace(r)
 	if r == "" || utf8.RuneCountInString(r) > limit {
@@ -520,9 +543,13 @@ func cleanReason(r string, limit int) (string, error) {
 	return r, nil
 }
 
-// resolve clears or confirms an open flag with a reason, audited in the same
-// transaction. It changes nothing else: no block, suspend or money.
-func (s *Service) resolve(ctx context.Context, actor, flagID ids.ID, to, reason string) (riskapi.RiskFlag, error) {
+// resolve confirms an open flag, or clears an open or confirmed one, with a
+// reason, audited in the same transaction. from is the status the reviewer
+// saw; a flag that has moved since is a 409, so two reviewers never stack a
+// clear on a confirm (or the reverse) unseen. It blocks or suspends no one; the
+// only money effect is the payout hold a business or store flag keeps while
+// it is open or confirmed (01 §256), which a clear releases.
+func (s *Service) resolve(ctx context.Context, actor, flagID ids.ID, from, to, reason string) (riskapi.RiskFlag, error) {
 	if err := s.auditReady(ctx); err != nil {
 		return riskapi.RiskFlag{}, err
 	}
@@ -541,7 +568,7 @@ func (s *Service) resolve(ctx context.Context, actor, flagID ids.ID, to, reason 
 		if err != nil {
 			return err
 		}
-		if l.Status != "open" {
+		if l.Status != from || !resolvable(from, to) {
 			return problem.New(genproblems.InvalidTransition, "")
 		}
 		now := s.now()
@@ -557,7 +584,7 @@ func (s *Service) resolve(ctx context.Context, actor, flagID ids.ID, to, reason 
 		if _, err := s.audit.Write(ctx, audit.Entry{
 			ActorKind: audit.ActorAdmin, ActorID: actor, Action: action,
 			SubjectType: "risk_flag", SubjectID: flagID.String(),
-			Before: map[string]any{"status": "open"},
+			Before: map[string]any{"status": l.Status},
 			After: map[string]any{"status": to, "reason": reason, "rule": g.Rule,
 				"subjectType": g.SubjectType, "subjectId": mustID(g.SubjectID).String()},
 		}); err != nil {

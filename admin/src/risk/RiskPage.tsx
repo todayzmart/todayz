@@ -2,6 +2,7 @@ import type { RiskEvidence } from '@todayz/api-client/gen/model/riskEvidence';
 import type { RiskFlag } from '@todayz/api-client/gen/model/riskFlag';
 import type { RiskFlagDetail } from '@todayz/api-client/gen/model/riskFlagDetail';
 import type { RiskFlagStatus } from '@todayz/api-client/gen/model/riskFlagStatus';
+import type { RiskResolveRequestFrom } from '@todayz/api-client/gen/model/riskResolveRequestFrom';
 import { Button, DataTable, Segmented, Skeleton, StatusPill, Tabs, useToast, type ColumnDef } from '@todayz/ui';
 import { useNavigate } from '@tanstack/react-router';
 import { Ban, Check, ShieldOff, UserX } from 'lucide-react';
@@ -27,8 +28,10 @@ type Go = (next: RiskSearch) => void;
 
 /**
  * A-13 Risk: the flags queue by rule, a flag's evidence, clear or confirm with a reason (D-225).
- * Nothing here moves money or blocks by itself: after a confirm the page offers the customer's
- * block and the business's suspend, their own audited actions. Support reads only (D-64).
+ * Nothing here blocks by itself: after a confirm the page offers the customer's block and the
+ * business's suspend, their own audited actions. The one money effect is 01 §9's payout hold:
+ * an open or confirmed flag on a business or store holds that business's payout, and only a
+ * clear (from open or confirmed) releases it. Support reads only (D-64).
  */
 export function RiskPage({ search }: { search: RiskSearch }) {
   const intl = useIntl();
@@ -182,6 +185,13 @@ function FlagCard({ d, onOpen }: { d: RiskFlagDetail; onOpen: (id: string) => vo
   const none = intl.formatMessage({ id: 'risk.none' });
   const rule = labels.rule(f.rule);
   const subject = labels.subject(f.subjectType, f.subjectLabel);
+  /** The status a clear or confirm starts from; a cleared flag takes neither. */
+  const from: RiskResolveRequestFrom | null = f.status === 'cleared' ? null : f.status;
+  const live = from !== null;
+  /** What this flag holds while it is open or confirmed (01 §9, D-225): the payout, a referral reward, or nothing. */
+  const hold = !live ? 'none' : f.subjectType === 'business' || f.subjectType === 'store' ? 'payout' : f.rule === REWARD_REFUSED ? 'reward' : 'none';
+  /** On a referral flag, which side the block or suspend falls on (referee or referrer). */
+  const party = next === 'suspend' ? s.businessParty : s.customerParty;
   const blockable = f.status === 'confirmed' && !!s.customerId && can(roles, 'customerBlock') && !(s.type === 'user' && s.status === 'blocked');
   const suspendable = f.status === 'confirmed' && !!s.businessId && can(roles, 'businessVerify') && !(s.type === 'business' && s.status === 'suspended');
 
@@ -204,6 +214,7 @@ function FlagCard({ d, onOpen }: { d: RiskFlagDetail; onOpen: (id: string) => vo
           <dt>{intl.formatMessage({ id: 'risk.col.status' })}</dt>
           <dd>
             <StatusPill tone={labels.tone(f.status)}>{labels.status(f.status)}</StatusPill>
+            {hold === 'payout' && <p className={css.muted}>{intl.formatMessage({ id: 'risk.holdsPayout' })}</p>}
             {f.reviewNote && (
               <p className={css.muted}>
                 {intl.formatMessage({ id: 'risk.detail.reviewed' }, { who: f.reviewedBy ?? none, reason: f.reviewNote })}
@@ -223,7 +234,7 @@ function FlagCard({ d, onOpen }: { d: RiskFlagDetail; onOpen: (id: string) => vo
             <FactRow key={x.key} k={x.key} v={x.value} />
           ))}
         </dl>
-        {may && f.status === 'open' && (
+        {may && live && (
           <div className={css.actions}>
             <Button
               icon={ShieldOff}
@@ -234,16 +245,18 @@ function FlagCard({ d, onOpen }: { d: RiskFlagDetail; onOpen: (id: string) => vo
             >
               {intl.formatMessage({ id: 'risk.clear' })}
             </Button>
-            <Button
-              variant="danger"
-              icon={Check}
-              onClick={() => {
-                resolve.reset();
-                setVerdict('confirm');
-              }}
-            >
-              {intl.formatMessage({ id: 'risk.confirm' })}
-            </Button>
+            {f.status === 'open' && (
+              <Button
+                variant="danger"
+                icon={Check}
+                onClick={() => {
+                  resolve.reset();
+                  setVerdict('confirm');
+                }}
+              >
+                {intl.formatMessage({ id: 'risk.confirm' })}
+              </Button>
+            )}
           </div>
         )}
         {(blockable || suspendable) && (
@@ -313,7 +326,7 @@ function FlagCard({ d, onOpen }: { d: RiskFlagDetail; onOpen: (id: string) => vo
       <ReasonDialog
         open={verdict !== null}
         title={intl.formatMessage({ id: verdict === 'confirm' ? 'risk.confirmTitle' : 'risk.clearTitle' }, { rule, subject })}
-        body={intl.formatMessage({ id: verdict === 'confirm' ? 'risk.confirmBody' : 'risk.clearBody' })}
+        body={intl.formatMessage({ id: verdict === 'confirm' ? 'risk.confirmBody' : 'risk.clearBody' }, { hold })}
         confirmLabel={intl.formatMessage({ id: verdict === 'confirm' ? 'risk.confirm' : 'risk.clear' })}
         max={MAX_REVIEW}
         danger={verdict === 'confirm'}
@@ -322,10 +335,10 @@ function FlagCard({ d, onOpen }: { d: RiskFlagDetail; onOpen: (id: string) => vo
         error={resolve.error ? problemText(resolve.error) : null}
         onClose={() => setVerdict(null)}
         onConfirm={(reason) => {
-          if (!verdict) return;
+          if (!verdict || !from) return;
           const done = intl.formatMessage({ id: verdict === 'confirm' ? 'risk.confirmDone' : 'risk.clearDone' });
           resolve.mutate(
-            { verdict, reason },
+            { verdict, from, reason },
             {
               onSuccess: () => {
                 setVerdict(null);
@@ -337,8 +350,8 @@ function FlagCard({ d, onOpen }: { d: RiskFlagDetail; onOpen: (id: string) => vo
       />
       <ReasonDialog
         open={next !== null}
-        title={intl.formatMessage({ id: next === 'suspend' ? 'risk.next.suspendTitle' : 'risk.next.blockTitle' })}
-        body={intl.formatMessage({ id: next === 'suspend' ? 'risk.next.suspendBody' : 'risk.next.blockBody' })}
+        title={intl.formatMessage({ id: next === 'suspend' ? 'risk.next.suspendTitle' : 'risk.next.blockTitle' }, { party: party ?? 'none' })}
+        body={intl.formatMessage({ id: next === 'suspend' ? 'risk.next.suspendBody' : 'risk.next.blockBody' }, { party: party ?? 'none' })}
         confirmLabel={intl.formatMessage({ id: next === 'suspend' ? 'risk.next.suspend' : 'risk.next.block' })}
         max={MAX_CHANGE}
         danger

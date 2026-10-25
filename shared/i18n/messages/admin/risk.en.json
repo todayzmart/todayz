@@ -1,6 +1,6 @@
 {
   "risk.sub": {
-    "defaultMessage": "Flags the rules raised, with what they counted. Clear or confirm each with a reason; nothing here moves money or blocks anyone by itself.",
+    "defaultMessage": "Flags the rules raised, with what they counted. Clear or confirm each with a reason. A flag blocks no one by itself; one on a business or store holds that business's payout until it is cleared.",
     "description": "A-13 Risk: Page subtitle"
   },
   "risk.filter.status": {
@@ -127,6 +127,10 @@
     "defaultMessage": "Return auto-confirmed after 72 hours",
     "description": "A-13 Risk: Rule name"
   },
+  "risk.rule.askReported": {
+    "defaultMessage": "Shop reported an ask",
+    "description": "A-13 Risk: Rule name"
+  },
   "risk.subject.store": {
     "defaultMessage": "Store",
     "description": "A-13 Risk: Subject type"
@@ -219,6 +223,10 @@
     "defaultMessage": "By {who}: {reason}",
     "description": "A-13 Risk: Who reviewed the flag and why"
   },
+  "risk.holdsPayout": {
+    "defaultMessage": "Holds payout: this business's payout stays held until the flag is cleared.",
+    "description": "A-13 Risk: Note on an open or confirmed business or store flag"
+  },
   "risk.detail.subjectStatus": {
     "defaultMessage": "Now: {status}",
     "description": "A-13 Risk: The subject's current status"
@@ -244,11 +252,11 @@
     "description": "A-13 Risk: Dialog title"
   },
   "risk.clearBody": {
-    "defaultMessage": "Clearing closes the flag. Your reason is kept on the flag and in the audit log.",
+    "defaultMessage": "Clearing closes the flag. Your reason is kept on the flag and in the audit log.{hold, select, payout { The business's payout is released once no other flag holds it.} other {}}",
     "description": "A-13 Risk: Dialog body"
   },
   "risk.confirmBody": {
-    "defaultMessage": "Confirming records that this was abuse. It does not block anyone or move money; do that next, as its own step.",
+    "defaultMessage": "Confirming records that this was abuse. It blocks no one; a block or suspension is its own step. {hold, select, payout {The business's payout stays held until someone clears this flag.} reward {The referral reward stays held until someone clears this flag.} other {The flag stays on the record until someone clears it.}}",
     "description": "A-13 Risk: Dialog body"
   },
   "risk.clearRewardWarning": {
@@ -276,19 +284,19 @@
     "description": "A-13 Risk: Button"
   },
   "risk.next.blockTitle": {
-    "defaultMessage": "Block this customer?",
+    "defaultMessage": "{party, select, referee {Block the referee?} referrer {Block the referrer?} other {Block this customer?}}",
     "description": "A-13 Risk: Dialog title"
   },
   "risk.next.suspendTitle": {
-    "defaultMessage": "Suspend this business?",
+    "defaultMessage": "{party, select, referee {Suspend the referee's business?} referrer {Suspend the referrer's business?} other {Suspend this business?}}",
     "description": "A-13 Risk: Dialog title"
   },
   "risk.next.blockBody": {
-    "defaultMessage": "They are signed out and cannot order until unblocked from Customers.",
+    "defaultMessage": "{party, select, referee {The referee} referrer {The referrer} other {This customer}} is signed out and cannot order until unblocked from Customers.",
     "description": "A-13 Risk: Dialog body"
   },
   "risk.next.suspendBody": {
-    "defaultMessage": "Its stores go offline until it is reinstated from Businesses.",
+    "defaultMessage": "{party, select, referee {The referee's business} referrer {The referrer's business} other {This business}}: its stores go offline until it is reinstated from Businesses.",
     "description": "A-13 Risk: Dialog body"
   },
   "risk.next.blockDone": {

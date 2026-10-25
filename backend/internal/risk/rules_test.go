@@ -140,7 +140,7 @@ func TestSelfLikeReferrals(t *testing.T) {
 	}
 }
 
-func TestOTPRulesHoldNoHashOrNumber(t *testing.T) {
+func TestOTPRulesHoldNoNumberOTPOrCode(t *testing.T) {
 	ip := make([]byte, 32)
 	ip[0] = 7
 	fs := OTPIPFanout([]IPFanout{{IPHash: ip, Phones: 12, Requests: 15}, {IPHash: ip, Phones: 3}}, 10, tNow)

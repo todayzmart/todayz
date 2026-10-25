@@ -68,7 +68,7 @@ test('A-13: an admin reads a flag, confirms it, then blocks the customer as a se
       };
     }
     if (url.pathname.endsWith('/confirm')) {
-      if (status !== 'open') return { status: 409, body: problem(409, 'invalid_transition') };
+      if (status !== 'open' || (body as { from: string }).from !== 'open') return { status: 409, body: problem(409, 'invalid_transition') };
       status = 'confirmed';
       note = (body as { reason: string }).reason;
       return { status: 200, body: flag() };
@@ -86,6 +86,8 @@ test('A-13: an admin reads a flag, confirms it, then blocks the customer as a se
           storeId: STORE_ID,
           businessId: null,
           customerId: blocked ? null : CUSTOMER_ID,
+          customerParty: blocked ? null : 'referee',
+          businessParty: null,
         },
         facts: [
           { key: 'minutes_to_first_order', value: '4' },
@@ -119,15 +121,17 @@ test('A-13: an admin reads a flag, confirms it, then blocks the customer as a se
   await dialog.getByRole('button', { name: 'Confirm' }).click();
   await expect(page.getByText('By Ravi: Owner referred their own second phone')).toBeVisible();
   expect(blocks).toEqual([]);
+  await expect(page.getByRole('button', { name: 'Clear' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Confirm' })).toBeHidden();
 
   await page.getByRole('button', { name: 'Block customer' }).click();
-  dialog = page.getByRole('dialog', { name: 'Block this customer?' });
+  dialog = page.getByRole('dialog', { name: 'Block the referee?' });
   await dialog.getByLabel('Reason').fill('Confirmed referral abuse');
   await dialog.getByRole('button', { name: 'Block customer' }).click();
   await expect(page.getByText('Customer blocked')).toBeVisible();
   await expect(dialog).toBeHidden();
   await expect(page.getByRole('button', { name: 'Block customer' })).toBeHidden();
-  expect(sent).toEqual([{ path: `/v1/admin/risk/flags/${FLAG_ID}/confirm`, body: { reason: 'Owner referred their own second phone' } }]);
+  expect(sent).toEqual([{ path: `/v1/admin/risk/flags/${FLAG_ID}/confirm`, body: { from: 'open', reason: 'Owner referred their own second phone' } }]);
   expect(blocks).toEqual([{ path: `/v1/admin/customers/${CUSTOMER_ID}/block`, body: { reason: 'Confirmed referral abuse' } }]);
 });
 

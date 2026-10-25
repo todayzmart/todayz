@@ -88,6 +88,8 @@
                 storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
                 businessId: 01JB0SBZ1A2B3C4D5E6F7G8H9J
                 customerId: null
+                customerParty: null
+                businessParty: null
               facts:
                 - key: lockouts
                   value: "11"
@@ -115,8 +117,10 @@
     tags: [admin-risk]
     summary: Clear a flag as a false positive (audited)
     description: >-
-      From `open`, with a reason. A cleared `referral.reward_refused` flag lets the reward sweep try that referral
-      again; a cleared flag no longer holds a payout. Any other status is `409 invalid_transition`.
+      From `open` or `confirmed`, with a reason (a confirmed finding that later turns out wrong is cleared too). A
+      cleared `referral.reward_refused` flag lets the reward sweep try that referral again; a cleared business or
+      store flag no longer holds the business's payout. A cleared flag, or one no longer in `from`, is
+      `409 invalid_transition`.
     x-idempotency: none
     x-problems: [invalid_transition]
     requestBody:
@@ -126,6 +130,7 @@
           schema:
             $ref: ../schemas/admin-risk.yaml#/RiskResolveRequest
           example:
+            from: open
             reason: Busy festival day; the customers tapped New code
     responses:
       "200":
@@ -149,8 +154,10 @@
     tags: [admin-risk]
     summary: Confirm a flag as fraud (audited)
     description: >-
-      From `open`, with a reason. It records the finding only; it does not block, suspend or move money. Any other
-      status is `409 invalid_transition`.
+      From `open`, with a reason. It records the finding and blocks or suspends no one. A confirmed business or store
+      flag keeps holding the business's payout (01 §256), and a confirmed `referral.reward_refused` flag keeps the
+      reward held, until someone clears the flag. A flag not open, or `from` other than `open`, is
+      `409 invalid_transition`.
     x-idempotency: none
     x-problems: [invalid_transition]
     requestBody:
@@ -160,6 +167,7 @@
           schema:
             $ref: ../schemas/admin-risk.yaml#/RiskResolveRequest
           example:
+            from: open
             reason: Staff guessed codes on other customers' orders
     responses:
       "200":

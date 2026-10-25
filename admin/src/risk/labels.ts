@@ -24,6 +24,7 @@ const RULES: Readonly<Record<string, string>> = {
   [rk('credits', 'customer_monthly_cap')]: 'risk.rule.customerMonthlyCap',
   store_strikes: 'risk.rule.storeStrikes',
   return_unconfirmed: 'risk.rule.returnUnconfirmed',
+  ask_reported: 'risk.rule.askReported', // raised by W3-16's "Report this ask" (01 §11)
 };
 
 const SUBJECTS: Readonly<Record<string, string>> = {

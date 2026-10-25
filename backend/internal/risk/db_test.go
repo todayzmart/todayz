@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"sync"
 	"testing"
 	"time"
 
@@ -216,6 +217,7 @@ func TestScanReversalRatio(t *testing.T) {
 	e := newEnv(t)
 	_, bad := e.shop("Bad")
 	_, ok := e.shop("Ok")
+	_, few := e.shop("Few")
 	cust := e.user("C")
 	sale := func(store ids.ID, reversed bool, method string) {
 		id := e.tdb.InsertPosSale(t, e.id(), store, e.admin)
@@ -226,9 +228,14 @@ func TestScanReversalRatio(t *testing.T) {
 				ids.UUID(id), tNow.Add(-23*time.Hour), ids.UUID(e.admin))
 		}
 	}
-	for i := range 10 {
-		sale(bad, i < 3, "bill_qr")
-		sale(ok, i < 1, "counter_code")
+	// The 30-sale default (risk_reversal_min_sales): Bad 9 of 30 reversed
+	// (30 %), Ok 3 of 30 (10 %), Few 15 of 29, under the minimum.
+	for i := range 30 {
+		sale(bad, i < 9, "bill_qr")
+		sale(ok, i < 3, "counter_code")
+		if i < 29 {
+			sale(few, i < 15, "bill_qr")
+		}
 	}
 	// Unlinked cash sales reversed at "ok" do not count (01 §7).
 	for range 5 {
@@ -242,7 +249,7 @@ func TestScanReversalRatio(t *testing.T) {
 	assert.Equal(t, bad.String(), fs[0].SubjectId)
 	d, err := e.svc.getFlag(e.ctx, mustParse(t, fs[0].Id))
 	require.NoError(t, err)
-	assert.Len(t, d.Evidence, 3)
+	assert.Len(t, d.Evidence, 9)
 	for _, ev := range d.Evidence {
 		assert.NotContains(t, ev.Label, "wrong item", "the reversal reason is free text and stays out")
 	}
@@ -319,7 +326,7 @@ func (e *env) otp(phone, ip string, attempts int, used bool, at time.Time) {
 		ids.UUID(e.id()), hash("phone:"+phone), hash(fmt.Sprintf("code:%d", e.n)), at.Add(5*time.Minute), attempts, consumed, ipHash, at)
 }
 
-// SC-RK-13, SC-RK-14: OTP abuse, never a number, hash or code in the flag.
+// SC-RK-13, SC-RK-14: OTP abuse, never a number, OTP or code in the flag.
 func TestScanOTPAbuse(t *testing.T) {
 	e := newEnv(t)
 	for i := range 10 {
@@ -366,7 +373,89 @@ func TestScanOTPAbuse(t *testing.T) {
 		assert.NotContains(t, string(b), "stuck")
 	}
 	sum = e.scan()
-	assert.EqualValues(t, 0, sum["identity_otp_ip_fanout"]+sum["identity_otp_failed_phone"], "one flag per subject per IST day")
+	assert.EqualValues(t, 0, sum["identity_otp_ip_fanout"]+sum["identity_otp_failed_phone"], "one flag per subject per window")
+}
+
+// The OTP rules dedupe on their rolling window, not the IST day: a flag
+// cleared at 23:50 is not raised again at 00:10 from the same requests.
+func TestOTPFlagsDoNotComeBackAtMidnight(t *testing.T) {
+	e := newEnv(t)
+	late := time.Date(2026, 10, 25, 23, 50, 0, 0, clock.IST)
+	e.clk.Set(late)
+	for i := range 10 {
+		e.otp(fmt.Sprintf("p%d", i), "bad-ip", 0, false, late.Add(-time.Duration(i+1)*time.Minute))
+	}
+	for _, h := range []time.Duration{20 * time.Minute, time.Hour, 2 * time.Hour} {
+		e.otp("stuck", "", otpMax, false, late.Add(-h))
+	}
+	sum := e.scan()
+	require.EqualValues(t, 1, sum["identity_otp_ip_fanout"])
+	require.EqualValues(t, 1, sum["identity_otp_failed_phone"])
+	for _, f := range append(e.flags(RuleOTPIPFanout), e.flags(RuleOTPFailedPhone)...) {
+		_, err := e.svc.resolve(e.ctx, e.admin, mustParse(t, f.Id), "open", "cleared", "load test from our office")
+		require.NoError(t, err)
+	}
+
+	e.clk.Set(late.Add(20 * time.Minute)) // 00:10 IST, the next day
+	sum = e.scan()
+	assert.EqualValues(t, 0, sum["identity_otp_ip_fanout"], "the same hour's requests, already cleared")
+	assert.EqualValues(t, 0, sum["identity_otp_failed_phone"], "the same 24 h, already cleared")
+
+	// A fresh burst once the last flag is older than the window is new facts.
+	e.clk.Set(late.Add(2 * time.Hour))
+	for i := range 10 {
+		e.otp(fmt.Sprintf("r%d", i), "bad-ip", 0, false, late.Add(2*time.Hour-time.Duration(i+1)*time.Minute))
+	}
+	assert.EqualValues(t, 1, e.scan()["identity_otp_ip_fanout"])
+}
+
+// Overlapping risk_scan runs: one holding the lock makes the other skip, and
+// two started together raise each flag once.
+func TestScanRunsOneAtATime(t *testing.T) {
+	e := newEnv(t)
+	for i := range 10 {
+		e.otp(fmt.Sprintf("p%d", i), "bad-ip", 0, false, tNow.Add(-time.Duration(i+1)*time.Minute))
+	}
+	tx, err := e.tdb.Pool.Begin(e.ctx)
+	require.NoError(t, err)
+	_, err = tx.Exec(e.ctx, `SELECT pg_advisory_xact_lock(hashtext('risk_scan'))`)
+	require.NoError(t, err)
+	assert.Equal(t, map[string]int64{"skipped": 1}, e.scan(), "the lock is held: skip")
+	assert.Empty(t, e.flags(RuleOTPIPFanout))
+	require.NoError(t, tx.Rollback(e.ctx))
+
+	sums := make([]map[string]int64, 4)
+	var wg sync.WaitGroup
+	for i := range sums {
+		wg.Go(func() {
+			var err error
+			sums[i], err = e.svc.Scan(e.ctx)
+			assert.NoError(t, err)
+		})
+	}
+	wg.Wait()
+	var raised int64
+	for _, s := range sums {
+		raised += s["identity_otp_ip_fanout"]
+	}
+	assert.EqualValues(t, 1, raised)
+	assert.Len(t, e.flags(RuleOTPIPFanout), 1)
+}
+
+// A rule that fails does not stop the others: they run and commit, the
+// error names the failed rule only.
+func TestScanKeepsGoingPastAFailedRule(t *testing.T) {
+	e := newEnv(t)
+	for i := range 10 {
+		e.otp(fmt.Sprintf("p%d", i), "bad-ip", 0, false, tNow.Add(-time.Duration(i+1)*time.Minute))
+	}
+	e.exec(`REVOKE SELECT ON order_code_lockouts FROM todayz_app`)
+	sum, err := e.svc.Scan(e.ctx)
+	require.Error(t, err)
+	assert.Equal(t, "risk_scan: rules failed: "+RuleCodeLockouts, err.Error())
+	assert.NotContains(t, sum, "orders_code_lockouts")
+	assert.EqualValues(t, 1, sum["identity_otp_ip_fanout"], "a later rule still ran")
+	assert.Len(t, e.flags(RuleOTPIPFanout), 1, "and its flag committed")
 }
 
 func (e *env) rawFlag(rule, subjectType string, subject ids.ID, details map[string]any) ids.ID {
@@ -424,38 +513,92 @@ func TestClearAndConfirm(t *testing.T) {
 	f1 := e.rawFlag(RuleCodeLockouts, "store", store, map[string]any{"lockouts": 11, "limit": 10, "day": "2026-10-25"})
 	f2 := e.rawFlag(RuleCodeLockouts, "store", store, map[string]any{"lockouts": 12, "limit": 10, "day": "2026-10-24"})
 
-	_, err := e.svc.resolve(e.ctx, e.admin, f1, "cleared", "   ")
+	_, err := e.svc.resolve(e.ctx, e.admin, f1, "open", "cleared", "   ")
 	assert.Equal(t, genproblems.ValidationFailed, problemCode(t, err))
 
-	got, err := e.svc.resolve(e.ctx, e.admin, f1, "cleared", "  Festival day  ")
+	got, err := e.svc.resolve(e.ctx, e.admin, f1, "open", "cleared", "  Festival day  ")
 	require.NoError(t, err)
 	assert.Equal(t, riskapi.RiskFlagStatus("cleared"), got.Status)
 	assert.Equal(t, "Festival day", *got.ReviewNote)
 	assert.Equal(t, "Asha", *got.ReviewedBy)
 	assert.Equal(t, tNow, got.ReviewedAt.UTC())
 
-	_, err = e.svc.resolve(e.ctx, e.admin, f1, "confirmed", "changed my mind")
+	_, err = e.svc.resolve(e.ctx, e.admin, f1, "open", "confirmed", "changed my mind")
 	assert.Equal(t, genproblems.InvalidTransition, problemCode(t, err), "only an open flag")
 
-	_, err = e.svc.resolve(e.ctx, e.admin, f2, "confirmed", "Staff guessed codes")
+	_, err = e.svc.resolve(e.ctx, e.admin, f2, "open", "confirmed", "Staff guessed codes")
 	require.NoError(t, err)
+	_, err = e.svc.resolve(e.ctx, e.admin, f2, "confirmed", "confirmed", "again")
+	assert.Equal(t, genproblems.InvalidTransition, problemCode(t, err), "confirm only from open")
+	var status string
+	require.NoError(t, e.tdb.OwnerPool.QueryRow(e.ctx, `SELECT status FROM stores WHERE id = $1`, ids.UUID(store)).Scan(&status))
+	assert.Equal(t, "live", status, "confirming never suspends")
 
-	_, err = e.svc.resolve(e.ctx, e.admin, e.id(), "cleared", "x")
+	// A confirmed finding that turns out wrong is cleared later (which
+	// releases its payout hold, 01 §256); the audit row says it was confirmed.
+	e.clk.Set(tNow.Add(time.Hour))
+	_, err = e.svc.resolve(e.ctx, e.admin, f2, "open", "cleared", "saw it open")
+	assert.Equal(t, genproblems.InvalidTransition, problemCode(t, err), "a clear never lands on a confirm it did not see")
+	got, err = e.svc.resolve(e.ctx, e.admin, f2, "confirmed", "cleared", "CCTV showed the customers")
+	require.NoError(t, err)
+	assert.Equal(t, riskapi.RiskFlagStatus("cleared"), got.Status)
+	assert.Equal(t, "CCTV showed the customers", *got.ReviewNote)
+	var before string
+	require.NoError(t, e.tdb.OwnerPool.QueryRow(e.ctx,
+		`SELECT before->>'status' FROM audit_log WHERE subject_id = $1 AND action = 'risk.flag_clear'`, f2.String()).Scan(&before))
+	assert.Equal(t, "confirmed", before)
+	_, err = e.svc.resolve(e.ctx, e.admin, f2, "confirmed", "cleared", "again")
+	assert.Equal(t, genproblems.InvalidTransition, problemCode(t, err), "a cleared flag stays cleared")
+
+	_, err = e.svc.resolve(e.ctx, e.admin, e.id(), "open", "cleared", "x")
 	assert.Equal(t, genproblems.NotFound, problemCode(t, err))
 
 	var n int
 	require.NoError(t, e.tdb.OwnerPool.QueryRow(e.ctx,
 		`SELECT count(*) FROM audit_log WHERE subject_type = 'risk_flag' AND action IN ('risk.flag_clear','risk.flag_confirm')`).Scan(&n))
-	assert.Equal(t, 2, n)
-	var status string
-	require.NoError(t, e.tdb.OwnerPool.QueryRow(e.ctx, `SELECT status FROM stores WHERE id = $1`, ids.UUID(store)).Scan(&status))
-	assert.Equal(t, "live", status, "confirming never suspends")
+	assert.Equal(t, 3, n)
 
 	l, err := e.svc.listFlags(e.ctx, riskapi.ListRiskFlagsParams{Status: ptr(riskapi.RiskFlagStatus("open"))})
 	require.NoError(t, err)
 	assert.Empty(t, l.Items)
 	for _, c := range l.OpenByRule {
 		assert.NotEqual(t, RuleCodeLockouts, c.Rule)
+	}
+}
+
+// Two reviewers on one open flag, one clearing and one confirming at once:
+// the row lock orders them and the second gets the 409, so exactly one
+// verdict and one audit row land.
+func TestConcurrentClearAndConfirm(t *testing.T) {
+	e := newEnv(t)
+	_, store := e.shop("S")
+	for i := range 5 {
+		f := e.rawFlag(RuleCodeLockouts, "store", store, map[string]any{"i": i})
+		verdicts := []string{"cleared", "confirmed"}
+		errs := make([]error, len(verdicts))
+		start := make(chan struct{})
+		var wg sync.WaitGroup
+		for j, to := range verdicts {
+			wg.Go(func() {
+				<-start
+				_, errs[j] = e.svc.resolve(e.ctx, e.admin, f, "open", to, "reviewer "+to)
+			})
+		}
+		close(start)
+		wg.Wait()
+		won := 0
+		for _, err := range errs {
+			if err == nil {
+				won++
+			} else {
+				assert.Equal(t, genproblems.InvalidTransition, problemCode(t, err))
+			}
+		}
+		assert.Equal(t, 1, won, "round %d", i)
+		var n int
+		require.NoError(t, e.tdb.OwnerPool.QueryRow(e.ctx,
+			`SELECT count(*) FROM audit_log WHERE subject_id = $1`, f.String()).Scan(&n))
+		assert.Equal(t, 1, n, "round %d", i)
 	}
 }
 
@@ -500,19 +643,19 @@ func TestRejectReferral(t *testing.T) {
 	  VALUES ($1, 'retailer_customer', 'store', $2, 'customer', $3, 'PAAAAA', 'code', 50, 50, $4, $4)`,
 		ids.UUID(pending), ids.UUID(store), ids.UUID(c2), tNow)
 
-	_, err := e.svc.rejectReferral(e.ctx, e.admin, qualified, "")
+	_, err := e.svc.RejectReferral(e.ctx, e.admin, qualified, "")
 	assert.Equal(t, genproblems.ValidationFailed, problemCode(t, err))
 
 	for _, id := range []ids.ID{qualified, pending} {
-		r, err := e.svc.rejectReferral(e.ctx, e.admin, id, "Staff self-referral")
+		r, err := e.svc.RejectReferral(e.ctx, e.admin, id, "Staff self-referral")
 		require.NoError(t, err)
 		assert.Equal(t, refapi.AdminReferralStatus("rejected"), r.Status)
 		assert.Equal(t, "admin_rejected", *r.RejectReason)
 		assert.Nil(t, r.QualifiedAt)
 	}
-	_, err = e.svc.rejectReferral(e.ctx, e.admin, paid, "too late")
+	_, err = e.svc.RejectReferral(e.ctx, e.admin, paid, "too late")
 	assert.Equal(t, genproblems.InvalidTransition, problemCode(t, err), "one side is paid")
-	_, err = e.svc.rejectReferral(e.ctx, e.admin, qualified, "again")
+	_, err = e.svc.RejectReferral(e.ctx, e.admin, qualified, "again")
 	assert.Equal(t, genproblems.InvalidTransition, problemCode(t, err))
 
 	var n int

@@ -117,6 +117,11 @@ GROUP BY o.phone_hash
 HAVING count(*) >= @lim::int
 ORDER BY o.phone_hash;
 
+-- name: TryScanLock :one
+-- One risk_scan at a time: a run that finds the lock held skips (the lock
+-- ends with the scan's transaction).
+SELECT pg_try_advisory_xact_lock(hashtext('risk_scan'))::boolean AS got;
+
 -- name: InsertFlagOnce :execrows
 -- Raises a flag unless the subject already has one for the rule created at or
 -- after @since (and, with @day, recorded for that IST day), whatever its
@@ -174,11 +179,12 @@ LIMIT 20;
 SELECT id, status FROM risk_flags WHERE id = @id FOR UPDATE;
 
 -- name: ResolveFlag :exec
--- Clear or confirm an open flag (the caller holds its row lock).
+-- Clear an open or confirmed flag, or confirm an open one (the caller holds
+-- its row lock and checks the transition).
 UPDATE risk_flags
 SET status = @status, reviewed_by = @reviewed_by, reviewed_at = @now, review_note = @note,
   updated_at = @now, version = version + 1
-WHERE id = @id AND status = 'open';
+WHERE id = @id AND status IN ('open', 'confirmed');
 
 -- --- A-13: subject labels ------------------------------------------------------------
 

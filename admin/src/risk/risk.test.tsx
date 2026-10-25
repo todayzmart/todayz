@@ -38,6 +38,8 @@ function detail(f: RiskFlag, over: Partial<RiskFlagDetail> = {}): RiskFlagDetail
       storeId: STORE_ID,
       businessId: null,
       customerId: CUSTOMER_ID,
+      customerParty: 'referee',
+      businessParty: null,
     },
     facts: [
       { key: 'minutes_to_first_order', value: '4' },
@@ -69,7 +71,9 @@ function api(start = flag(), opts: { assist?: boolean } = {}): Handler {
     if (c.path === `/v1/admin/risk/flags/${FLAG_ID}` && c.method === 'GET') return json(200, detail(current, { assistEnabled: !!opts.assist }));
     for (const verdict of ['clear', 'confirm'] as const) {
       if (c.path === `/v1/admin/risk/flags/${FLAG_ID}/${verdict}` && c.method === 'POST') {
-        if (current.status !== 'open') return problem(409, 'invalid_transition');
+        const { from } = c.body as { from: string };
+        const ok = from === current.status && (current.status === 'open' || (current.status === 'confirmed' && verdict === 'clear'));
+        if (!ok) return problem(409, 'invalid_transition');
         current = {
           ...current,
           status: verdict === 'clear' ? 'cleared' : 'confirmed',
@@ -138,7 +142,7 @@ describe('A-13 risk', () => {
     fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: '  same family, real customer  ' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Clear' }));
     await waitFor(() => expect(screen.getByText('Flag cleared')).toBeInTheDocument());
-    expect(calls.find((c) => c.path === `/v1/admin/risk/flags/${FLAG_ID}/clear`)?.body).toEqual({ reason: 'same family, real customer' });
+    expect(calls.find((c) => c.path === `/v1/admin/risk/flags/${FLAG_ID}/clear`)?.body).toEqual({ from: 'open', reason: 'same family, real customer' });
     expect(await screen.findByText('By Ravi: same family, real customer')).toBeInTheDocument();
   });
 
@@ -156,17 +160,61 @@ describe('A-13 risk', () => {
     fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'same device and address' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Confirm' }));
     await waitFor(() => expect(screen.getByText('Flag confirmed')).toBeInTheDocument());
-    expect(calls.find((c) => c.path === `/v1/admin/risk/flags/${FLAG_ID}/confirm`)?.body).toEqual({ reason: 'same device and address' });
+    expect(calls.find((c) => c.path === `/v1/admin/risk/flags/${FLAG_ID}/confirm`)?.body).toEqual({ from: 'open', reason: 'same device and address' });
     // The confirm alone blocked no one.
     expect(calls.some((c) => c.path.endsWith('/block'))).toBe(false);
     expect(screen.queryByRole('button', { name: 'Suspend business' })).not.toBeInTheDocument();
 
+    // Confirmed: still clearable, no longer confirmable.
+    expect(screen.getByRole('button', { name: 'Clear' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Confirm' })).not.toBeInTheDocument();
+
     fireEvent.click(await screen.findByRole('button', { name: 'Block customer' }));
-    dialog = await screen.findByRole('dialog', { name: 'Block this customer?' });
+    dialog = await screen.findByRole('dialog', { name: 'Block the referee?' });
+    expect(within(dialog).getByText(/^The referee is signed out/)).toBeInTheDocument();
     fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'confirmed referral abuse' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Block customer' }));
     await waitFor(() => expect(screen.getByText('Customer blocked')).toBeInTheDocument());
     expect(calls.find((c) => c.path === `/v1/admin/customers/${CUSTOMER_ID}/block`)?.body).toEqual({ reason: 'confirmed referral abuse' });
+  });
+
+  it('clears a confirmed flag from confirmed', async () => {
+    const { calls } = renderAt(`/risk?status=confirmed&flag=${FLAG_ID}`, {
+      roles: ['admin'],
+      handlers: [api(flag({ status: 'confirmed', reviewedBy: 'Ravi', reviewNote: 'abuse' }))],
+    });
+    expect(await screen.findByText('By Ravi: abuse')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Confirm' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
+    const dialog = await screen.findByRole('dialog', { name: /^Clear / });
+    fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'refund settled, real shop' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Clear' }));
+    await waitFor(() => expect(screen.getByText('Flag cleared')).toBeInTheDocument());
+    expect(calls.find((c) => c.path === `/v1/admin/risk/flags/${FLAG_ID}/clear`)?.body).toEqual({ from: 'confirmed', reason: 'refund settled, real shop' });
+  });
+
+  it('notes the payout hold on open and confirmed store and business flags only', async () => {
+    const store = flag({ rule: 'pos.reversal_ratio', subjectType: 'store', subjectId: STORE_ID, subjectLabel: 'Sri Lakshmi Stores' });
+    const { unmount } = renderAt(`/risk?flag=${FLAG_ID}`, { roles: ['support'], handlers: [api(store)] });
+    expect(await screen.findByText(/^Holds payout/)).toBeInTheDocument();
+    unmount();
+    const held = renderAt(`/risk?flag=${FLAG_ID}`, { roles: ['admin'], handlers: [api({ ...store, status: 'confirmed' })] });
+    expect(await screen.findByText(/^Holds payout/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
+    expect(within(await screen.findByRole('dialog')).getByText(/payout is released once no other flag holds it/)).toBeInTheDocument();
+    held.unmount();
+    renderAt(`/risk?status=cleared&flag=${FLAG_ID}`, { roles: ['admin'], handlers: [api({ ...store, status: 'cleared' })] });
+    expect(await screen.findByRole('heading', { name: /Sri Lakshmi Stores/ })).toBeInTheDocument();
+    expect(screen.queryByText(/^Holds payout/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument();
+  });
+
+  it('names a referral flag after the hold and shows no payout note', async () => {
+    renderAt(`/risk?flag=${FLAG_ID}`, { roles: ['admin'], handlers: [api()] });
+    await screen.findByRole('heading', { name: /Sri Lakshmi Stores → Asha/ });
+    expect(screen.queryByText(/^Holds payout/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    expect(within(await screen.findByRole('dialog')).getByText(/stays on the record until someone clears it/)).toBeInTheDocument();
   });
 
   it('shows the 409 when the flag was resolved elsewhere', async () => {

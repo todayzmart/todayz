@@ -90,7 +90,7 @@ func (h handlers) resolve(ctx context.Context, flagID string, body *riskapi.Risk
 	if body == nil {
 		return riskapi.RiskFlag{}, fieldErr("body", "required")
 	}
-	f, err := h.s.resolve(ctx, p.UserID, id, to, body.Reason)
+	f, err := h.s.resolve(ctx, p.UserID, id, string(body.From), to, body.Reason)
 	if err != nil {
 		return riskapi.RiskFlag{}, asProblem(err)
 	}
@@ -123,7 +123,7 @@ func (h refHandlers) RejectAdminReferral(ctx context.Context, req refapi.RejectA
 	if req.Body == nil {
 		return nil, fieldErr("body", "required")
 	}
-	r, err := h.s.rejectReferral(ctx, p.UserID, id, req.Body.Reason)
+	r, err := h.s.RejectReferral(ctx, p.UserID, id, req.Body.Reason)
 	if err != nil {
 		return nil, asProblem(err)
 	}

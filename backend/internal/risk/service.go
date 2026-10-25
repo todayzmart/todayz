@@ -5,22 +5,28 @@
 //
 // Rules this package keeps:
 //
-//   - A flag is a signal for a person. Nothing here moves money, blocks a
-//     customer or suspends a business: confirming records the finding, and
-//     A-13 then offers the customer's block or the business's suspend, their
-//     own audited actions (W3-05).
+//   - A flag is a signal for a person. Nothing here blocks a customer or
+//     suspends a business: confirming records the finding, and A-13 then
+//     offers the customer's block or the business's suspend, their own
+//     audited actions (W3-05). The one money effect is in payouts: a flag on
+//     a business or its store holds that business's payout while it is open
+//     or confirmed (01 §256), until someone clears it.
 //   - Other packages raise their own flags on risk_flags (referral device
 //     reuse, reward refused, offline counter-code links, the credits caps,
 //     store strikes, unconfirmed returns); risk_scan raises the six rules in
 //     rules.go. Every number comes from platform_settings.
-//   - A rule raises at most one flag per subject and window (or IST day),
-//     whatever the earlier flag's status, so a cleared false positive is not
-//     raised again from the same facts.
-//   - Clear, confirm and a referral reject need a reason, change only an open
-//     flag (or a referral whose reward has not posted), and write an audit_log
-//     row in the same transaction.
-//   - No phone number, OTP, order code or hash leaves this package: an ip or
-//     phone flag is known by the first 16 bytes of its keyed hash.
+//   - A rule raises at most one flag per subject and window (or IST day for
+//     lockouts and bill claims; the OTP rules use their rolling window, so a
+//     cleared flag does not come back at midnight), whatever the earlier
+//     flag's status, so a cleared false positive is not raised again from
+//     the same facts.
+//   - Clear, confirm and a referral reject need a reason and write an
+//     audit_log row in the same transaction. Confirm takes an open flag;
+//     clear takes an open or confirmed one; reject takes a referral whose
+//     reward has not posted.
+//   - No phone number, OTP or code leaves this package: an ip or phone flag
+//     is known by the first 16 bytes of its keyed hash, which A-13 never
+//     shows.
 package risk
 
 import (
@@ -125,6 +131,13 @@ func (s *Service) count(ctx context.Context, k settings.Key) (int, error) {
 
 // Scan runs the six rules once and raises what they find (the risk_scan job,
 // every 5 minutes). It returns how many flags each rule raised.
+//
+// The run holds a transaction-scoped advisory lock: a run that overlaps one
+// still going returns {"skipped": 1} and raises nothing, so two runs never
+// race on the same dedupe check. Each rule runs in its own savepoint; a rule
+// that fails is logged by name only (its error may quote row values), the
+// others still run and commit, and Scan returns an error naming the failed
+// rules so the job is retried.
 func (s *Service) Scan(ctx context.Context) (map[string]int64, error) {
 	if s.db == nil || s.settings == nil {
 		return nil, errUnavailable
@@ -143,16 +156,41 @@ func (s *Service) Scan(ctx context.Context) (map[string]int64, error) {
 		{RuleOTPFailedPhone, s.findOTPFailed},
 	}
 	sum := make(map[string]int64, len(rules))
-	for _, r := range rules {
-		fs, err := r.find(ctx, now)
+	var failed []string
+	err := s.db.InTx(ctx, func(ctx context.Context) error {
+		got, err := s.q(ctx).TryScanLock(ctx)
 		if err != nil {
-			return sum, err
+			return err
 		}
-		n, err := s.raise(ctx, fs, now)
-		if err != nil {
-			return sum, err
+		if !got {
+			telemetry.Logger(ctx).InfoContext(ctx, "risk_scan: another run holds the lock; skipped")
+			sum["skipped"] = 1
+			return nil
 		}
-		sum[strings.ReplaceAll(r.name, ".", "_")] = n
+		for _, r := range rules {
+			var n int64
+			err := s.db.InTx(ctx, func(ctx context.Context) error {
+				fs, err := r.find(ctx, now)
+				if err != nil {
+					return err
+				}
+				n, err = s.raise(ctx, fs, now)
+				return err
+			})
+			if err != nil {
+				telemetry.Logger(ctx).ErrorContext(ctx, "risk_scan: rule failed", "rule", r.name)
+				failed = append(failed, r.name)
+				continue
+			}
+			sum[strings.ReplaceAll(r.name, ".", "_")] = n
+		}
+		return nil
+	})
+	if err != nil {
+		return sum, err
+	}
+	if len(failed) > 0 {
+		return sum, errors.New("risk_scan: rules failed: " + strings.Join(failed, ", "))
 	}
 	return sum, nil
 }
@@ -266,7 +304,7 @@ func (s *Service) findOTPFanout(ctx context.Context, now time.Time) ([]Finding, 
 	if err != nil {
 		return nil, err
 	}
-	rows, err := s.q(ctx).OtpIPFanout(ctx, riskdb.OtpIPFanoutParams{Since: now.Add(-time.Hour), Lim: int32(limit)}) // #nosec G115 -- a setting bounded 2–100
+	rows, err := s.q(ctx).OtpIPFanout(ctx, riskdb.OtpIPFanoutParams{Since: now.Add(-otpFanoutWindow), Lim: int32(limit)}) // #nosec G115 -- a setting bounded 2–100
 	if err != nil {
 		return nil, err
 	}
@@ -286,7 +324,7 @@ func (s *Service) findOTPFailed(ctx context.Context, now time.Time) ([]Finding, 
 		return nil, err
 	}
 	rows, err := s.q(ctx).OtpFailedPhones(ctx, riskdb.OtpFailedPhonesParams{
-		Since: now.Add(-24 * time.Hour), MaxAttempts: int32(s.otpMax), Lim: int32(limit), // #nosec G115 -- small bounded values
+		Since: now.Add(-otpFailedWindow), MaxAttempts: int32(s.otpMax), Lim: int32(limit), // #nosec G115 -- small bounded values
 	})
 	if err != nil {
 		return nil, err

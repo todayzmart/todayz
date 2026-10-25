@@ -90,12 +90,12 @@ func (s *Service) listReferrals(ctx context.Context, p refapi.ListAdminReferrals
 	return out, nil
 }
 
-// rejectReferral stops a referral before any reward posts: from pending, or
+// RejectReferral stops a referral before any reward posts: from pending, or
 // from qualified while neither side has been paid. It runs under the referral's
 // row lock, the same lock the reward sweep takes, so a reward cannot post
 // half-way through. Once any side is paid it is 409; a reversal is a credits
 // action, not this one.
-func (s *Service) rejectReferral(ctx context.Context, actor, refID ids.ID, reason string) (refapi.AdminReferral, error) {
+func (s *Service) RejectReferral(ctx context.Context, actor, refID ids.ID, reason string) (refapi.AdminReferral, error) {
 	if err := s.auditReady(ctx); err != nil {
 		return refapi.AdminReferral{}, err
 	}

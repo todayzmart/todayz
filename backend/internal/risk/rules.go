@@ -264,12 +264,21 @@ type IPFanout struct {
 	Requests int
 }
 
+// The OTP rules' rolling windows, the "per hour" and "per day" in their
+// settings' names. Each is also the rule's dedupe window: no second flag for
+// a subject while its last one is younger than the window, so every flag
+// counts requests the previous one did not, and a cleared flag does not come
+// back just because the IST day turned.
+const (
+	otpFanoutWindow = time.Hour
+	otpFailedWindow = 24 * time.Hour //settings:ok the "per day" of risk_otp_failed_per_phone_day
+)
+
 // OTPIPFanout flags each IP that asked OTPs for limit or more different
 // phones in the hour before now (risk_otp_phones_per_ip_hour, 01 §2). One
-// flag per IP per IST day. The details hold counts only, never a hash.
+// flag per IP per rolling hour. The details hold counts only, never a hash.
 func OTPIPFanout(rows []IPFanout, limit int, now time.Time) []Finding {
 	var out []Finding
-	key := dayKey(now)
 	for _, r := range rows {
 		id, ok := HashID(r.IPHash)
 		if !ok || r.Phones < limit {
@@ -277,8 +286,8 @@ func OTPIPFanout(rows []IPFanout, limit int, now time.Time) []Finding {
 		}
 		out = append(out, Finding{
 			SubjectType: SubjectIP, SubjectID: id, Rule: RuleOTPIPFanout, Score: scoreOTPIPFanout,
-			Details: map[string]any{"phones": r.Phones, "requests": r.Requests, "limit": limit, "windowMinutes": 60, "day": key},
-			Day:     key, Since: clock.StartOfDayIST(now),
+			Details: map[string]any{"phones": r.Phones, "requests": r.Requests, "limit": limit, "windowMinutes": int(otpFanoutWindow / time.Minute)},
+			Since:   now.Add(-otpFanoutWindow),
 		})
 	}
 	return out
@@ -294,18 +303,17 @@ type FailedPhone struct {
 // OTPFailedPhone flags a phone with limit or more OTPs in 24 h that used every
 // attempt without a right code (risk_otp_failed_per_phone_day, 01 §2): on the
 // account when the phone has one, else on the phone's hash. One flag per
-// subject per IST day.
+// subject per rolling 24 h.
 func OTPFailedPhone(rows []FailedPhone, limit int, now time.Time) []Finding {
 	var out []Finding
-	key := dayKey(now)
 	for _, r := range rows {
 		if r.Failed < limit {
 			continue
 		}
 		f := Finding{
 			Rule: RuleOTPFailedPhone, Score: scoreOTPFailedPhone,
-			Details: map[string]any{"failedOtps": r.Failed, "limit": limit, "windowHours": 24, "day": key},
-			Day:     key, Since: clock.StartOfDayIST(now),
+			Details: map[string]any{"failedOtps": r.Failed, "limit": limit, "windowHours": int(otpFailedWindow / time.Hour)},
+			Since:   now.Add(-otpFailedWindow),
 		}
 		if r.UserID != ids.Zero {
 			f.SubjectType, f.SubjectID = "user", r.UserID

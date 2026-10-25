@@ -57,7 +57,7 @@ INSERT INTO platform_settings (key, value, unit, min, max, description) VALUES
   ('risk_bill_claim_stores', '3', 'count', 2, 20, 'Risk. 01 §6: different stores one customer claims bills at within risk_bill_claim_window_minutes that raise a risk flag'),
   ('risk_bill_claim_window_minutes', '10', 'minutes', 1, 240, 'Risk. 01 §6: the window for risk_bill_claim_stores'),
   ('risk_reversal_ratio_percent', '20', 'count', 1, 100, 'Risk. 01 §7: share of a store''s linked POS sales reversed in risk_reversal_window_days that raises a risk flag, in percent'),
-  ('risk_reversal_min_sales', '10', 'count', 1, 1000, 'Risk. 01 §7: linked POS sales a store needs in the window before the reversal ratio counts'),
+  ('risk_reversal_min_sales', '30', 'count', 1, 1000, 'Risk. 01 §7: linked POS sales a store needs in the window before the reversal ratio counts'),
   ('risk_reversal_window_days', '7', 'days', 1, 30, 'Risk. 01 §7: the window for risk_reversal_ratio_percent'),
   ('risk_otp_phones_per_ip_hour', '10', 'count', 2, 100, 'Risk. 01 §2: different phone numbers one IP asks OTPs for in an hour that raise a risk flag'),
   ('risk_otp_failed_per_phone_day', '3', 'count', 1, 50, 'Risk. 01 §2: OTPs for one phone that used every attempt without a right code in 24 h that raise a risk flag');

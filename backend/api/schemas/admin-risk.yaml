@@ -1,5 +1,6 @@
 # Schemas: domain "admin-risk" (owner W3-02): A-13 Risk, the risk flags queue (04 §2.7; 01 §13; D-78, D-225).
-# A flag is a signal for a person: it never moves money or blocks anyone by itself.
+# A flag is a signal for a person: it blocks no one by itself. Its one money effect is the payout hold (01 §9, D-225):
+# a flag on a business or one of its stores holds that business's payout while it is open or confirmed.
 RiskFlagStatus:
   type: string
   enum: [open, cleared, confirmed]
@@ -24,8 +25,15 @@ RiskReviewNote:
 RiskResolveRequest:
   type: object
   additionalProperties: false
-  required: [reason]
+  required: [from, reason]
   properties:
+    from:
+      type: string
+      description: >-
+        The flag's status as the reviewer saw it. If the flag has moved since (someone else cleared or confirmed it),
+        the change is `409 invalid_transition` and nothing is written, so a clear never lands on a confirm it did not
+        see.
+      enum: [open, confirmed]
     reason: {$ref: ./admin-risk.yaml#/RiskReviewNote}
 RiskFlag:
   type: object
@@ -91,10 +99,12 @@ RiskFact:
 RiskSubject:
   type: object
   additionalProperties: false
-  required: [type, id, label, status, storeId, businessId, customerId]
+  required: [type, id, label, status, storeId, businessId, customerId, customerParty, businessParty]
   description: >-
     The flag's subject, with the ids the A-13 actions need: `customerId` when blocking a customer is possible
-    (A-05's own block action), `businessId` when suspending a business is (A-03's own suspend action).
+    (A-05's own block action), `businessId` when suspending a business is (A-03's own suspend action). On a
+    referral, `customerParty` and `businessParty` say which side of it each id is, so A-13 can name the party it
+    blocks or suspends; they are null for any other subject.
   properties:
     type: {$ref: ./admin-risk.yaml#/RiskSubjectType}
     id:
@@ -116,6 +126,11 @@ RiskSubject:
     customerId:
       type: [string, 'null']
       pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    customerParty: {$ref: ./admin-risk.yaml#/RiskReferralParty}
+    businessParty: {$ref: ./admin-risk.yaml#/RiskReferralParty}
+RiskReferralParty:
+  type: [string, 'null']
+  enum: [referee, referrer, null]
 RiskEvidenceKind:
   type: string
   enum: [order, pos_sale, bill_claim, strike, code_lockout, referral, otp_request]

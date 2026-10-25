@@ -12,8 +12,9 @@ import (
 
 // KindRiskScan runs the rules internal/risk owns (code lockouts, bill-claim
 // spread, reversal ratio, self-like referrals, OTP abuse) and raises a flag on
-// risk_flags for each new finding (D-78, D-225). It never blocks a person or
-// moves money; an admin reviews the flag on A-13.
+// risk_flags for each new finding (D-78, D-225). It never blocks a person; a
+// flag on a business or store holds that business's payout until someone
+// clears it on A-13 (01 §9).
 const KindRiskScan = "risk_scan"
 
 // registerrisk declares the risk domain's job kinds.
