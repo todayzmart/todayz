@@ -27,6 +27,7 @@ locals {
   app_keys = [
     "JWT_SIGNING_KEYS", "JWT_CURRENT_KID", "ORDER_CODE_ENC_KEY", "ORDER_CODE_HMAC_KEY",
     "BILL_QR_SIGNING_KEY", "PII_ENC_KEY", "PII_HASH_KEY", "DEVICE_SECRET_ENC_KEY", "TOTP_ENC_KEY",
+    "SHARE_PREVIEW_KEY", # also set on the customer Pages project (W3-16)
   ]
   # Database URLs (built at the Wave 5 bootstrap, from the RDS-managed master secret) and
   # provider keys (02 §9, names from internal/platform/config).
