@@ -121,6 +121,13 @@ describe('A-13 risk', () => {
     expect(screen.queryByRole('button', { name: 'Confirm' })).not.toBeInTheDocument();
   });
 
+  it('shows support no follow-up on a confirmed flag', async () => {
+    renderAt(`/risk?status=confirmed&flag=${FLAG_ID}`, { roles: ['support'], handlers: [api(flag({ status: 'confirmed', reviewedBy: 'Ravi', reviewNote: 'abuse' }))] });
+    expect(await screen.findByText('By Ravi: abuse')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Block customer' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Suspend business' })).not.toBeInTheDocument();
+  });
+
   it('clears with a required, trimmed reason', async () => {
     const { calls } = renderAt(`/risk?flag=${FLAG_ID}`, { roles: ['admin'], handlers: [api()] });
     fireEvent.click(await screen.findByRole('button', { name: 'Clear' }));

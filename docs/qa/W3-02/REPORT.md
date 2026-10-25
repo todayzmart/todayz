@@ -89,7 +89,7 @@ The plan says "SC-RK-01…15" without listing them. The list below is how W3-02 
 | Contract lint and client (`make gen`, contract smoke) | pass (42) |
 | i18n `lint:messages` | 0 admin errors |
 | Admin typecheck, eslint `--max-warnings 0` | clean |
-| Admin vitest | 23 files, 194 tests pass (risk 8, referrals 5 new) |
+| Admin vitest | 23 files, 195 tests pass (risk 9, referrals 5 new) |
 | Admin `build:e2e` | ok; initial JS 161.07 KB of 250 KB, second budget 9.73 of 20 KB, precache and sourcemap checks pass |
 | Admin Playwright | 26 pass, including AD-02 `roles.spec.ts` (Risk and Referrals in each role's sidebar, READS entries) and the 3 new journeys in `risk.spec.ts` |
 
@@ -116,7 +116,7 @@ Notes:
 3. **No seeded flags.** ADMIN-M.23 says "Open each seeded flag kind", but the seed has no flags, and `TestSeedRaisesNoFlags` is the false-positive review. Seeding flag rows directly, outside the rules, would satisfy both. That is a seed change, so I left it to you.
 4. **Referral reject semantics.** Reject is allowed while pending, or while qualified with neither side paid; otherwise it is `409 invalid_transition`. Taking paid credits back stays an A-09 adjustment.
 5. **Payouts hold on any open flag.** The existing payouts code holds a payout on any open risk flag whose subject is the business or one of its stores. Referral, user, IP and phone flags do not hold it. A W3-02 flag (for example `pos.reversal_ratio` on a store) therefore now holds that business's payout until it is cleared. This is consistent with D-78, but it is a money effect of a flag. Please confirm.
-6. **Nav placement.** Risk sits ungrouped after Banner moderation, matching the support sidebar in 06 §3. Referrals sits under Growth after "Credits and referrals" and is admin-only. Finance has no A-10, per 06 §3.
+6. **Nav placement (lead confirmed 25 Oct, matches 06 §3).** No hi/kn/te/ta keys were added: the admin console is English-only (`messages/admin/` has only `*.en.json`, App formats en-IN with only a pseudo-locale), so there is no admin locale file to add them to. Risk sits ungrouped after Banner moderation, matching the support sidebar in 06 §3. Referrals sits under Growth after "Credits and referrals" and is admin-only. Finance has no A-10, per 06 §3.
 7. **Edits outside my area:**
    - files from W3-05: the admin-settings risk group, the audit subjects `risk_flag` and `referral` with their labels, the settings labels, `roles.spec.ts` (ALL, the support nav and READS) and `fake-api.ts` (an empty `/v1/admin/risk/flags` answer)
    - one comment in `orders/transitions.go` that names the lockout trigger
