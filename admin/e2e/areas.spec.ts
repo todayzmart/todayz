@@ -1,0 +1,202 @@
+import { VIEWPORTS, guardPage, shot, type PageGuard } from '@todayz/config/playwright';
+import { expect, test, type Page } from '@playwright/test';
+import { NOW, answerWith, problem, signIn, type Answer } from './fake-api';
+
+/**
+ * One journey per W3-05 area against the built console, with the API faked statefully: what the
+ * page sends is checked, and the answer is the next state. The unit tests cover the edge cases;
+ * this proves the built bundle wires the same flows, and leaves a screenshot of each.
+ */
+
+const BUSINESS_ID = '01JBUS1NESS0000000000000B1';
+const STORE_ID = '01JST0RE000000000000000S01';
+const REVIEW_ID = '01JREV1EW00000000000000V01';
+
+let guard: PageGuard;
+
+test.beforeEach(async ({ page }) => {
+  guard = await guardPage(page);
+  await page.setViewportSize(VIEWPORTS.desktop);
+});
+
+test.afterEach(() => {
+  expect(guard.external, 'requests to non-local hosts').toEqual([]);
+  expect(guard.errors, 'console and page errors').toEqual([]);
+});
+
+const page1 = (items: unknown[]) => ({ status: 200, body: { items, nextCursor: null, serverNow: NOW } });
+
+/** Records each write's path and body, so a test can check what the page sent. */
+async function fake(page: Page, path: string, reply: (method: string, url: URL, body: unknown) => Answer) {
+  const sent: { path: string; body: unknown }[] = [];
+  await answerWith(page, path, (req, url) => {
+    const raw = req.postData();
+    const body = raw ? (JSON.parse(raw) as unknown) : undefined;
+    if (req.method() !== 'GET') sent.push({ path: url.pathname, body });
+    return reply(req.method(), url, body);
+  });
+  return sent;
+}
+
+test('A-03: an admin verifies a submitted business from the queue', async ({ page }) => {
+  await signIn(page, ['admin']);
+  let status = 'submitted';
+  const detail = () => ({
+    id: BUSINESS_ID,
+    brandName: 'Sri Lakshmi Stores',
+    legalName: 'Sri Lakshmi Traders',
+    status,
+    needsInfoFields: [],
+    needsInfoNote: null,
+    submittedAt: '2026-10-24T05:00:00Z',
+    verifiedAt: status === 'verified' ? NOW : null,
+    createdAt: '2026-10-20T05:00:00Z',
+    kyc: { status: 'submitted', legalName: 'Sri Lakshmi Traders', panLast4: '234F', gstinLast4: '1Z5Q', upiLast4: null, bankLast4: '6789', bankIfsc: 'HDFC0001234', notes: null, verifiedAt: null },
+    stores: [{ id: STORE_ID, name: 'Lakshmi, Jayanagar', status: 'pending_review', locality: 'Jayanagar', city: 'Bengaluru', liveAt: null, createdAt: '2026-10-21T05:00:00Z' }],
+    staff: [{ id: '01JSTAFF000000000000000F01', name: 'Ravi', role: 'owner', status: 'active', phoneMasked: '98•••••321' }],
+    documents: [],
+    serverNow: NOW,
+  });
+  const sent = await fake(page, '/v1/admin/businesses**', (method, url) => {
+    if (url.pathname === '/v1/admin/businesses') {
+      const d = detail();
+      return page1([{ id: d.id, brandName: d.brandName, legalName: d.legalName, status, submittedAt: d.submittedAt, createdAt: d.createdAt, city: 'Bengaluru', storeCount: 1 }]);
+    }
+    if (url.pathname.endsWith('/verify')) {
+      status = 'verified';
+      return { status: 200, body: detail() };
+    }
+    return method === 'GET' ? { status: 200, body: detail() } : undefined;
+  });
+
+  await page.goto('/businesses');
+  const table = page.getByRole('table', { name: 'Businesses: Submitted' });
+  await shot(page, 'admin-a03-queue.png');
+  await table.getByRole('link', { name: 'Sri Lakshmi Stores' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Sri Lakshmi Stores' })).toBeVisible();
+  await expect(page.getByText('•••• 234F')).toBeVisible();
+  await page.getByRole('button', { name: 'Verify', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Verify Sri Lakshmi Stores?' });
+  await dialog.getByRole('button', { name: 'Verify', exact: true }).click();
+  await expect(page.getByText('Business verified')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Verify', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('complementary', { name: 'History' })).toBeVisible();
+  expect(sent).toEqual([{ path: `/v1/admin/businesses/${BUSINESS_ID}/verify`, body: {} }]);
+  await shot(page, 'admin-a03-verified.png', { fullPage: true });
+});
+
+test('A-05: an admin closes a live store until a time in IST', async ({ page }) => {
+  await signIn(page, ['admin']);
+  let closedUntil: string | null = null;
+  const detail = () => ({
+    id: STORE_ID,
+    name: 'Lakshmi, Jayanagar',
+    businessId: BUSINESS_ID,
+    businessName: 'Sri Lakshmi Stores',
+    businessStatus: 'verified',
+    status: 'live',
+    addressLine1: '12, 4th Block',
+    addressLine2: null,
+    landmark: null,
+    locality: 'Jayanagar',
+    city: 'Bengaluru',
+    pincode: '560011',
+    location: { lat: 12.925, lng: 77.593 },
+    hours: { weekly: { mon: [{ open: '09:00', close: '21:00' }] }, holidays: [] },
+    closedUntil,
+    reviewNote: null,
+    liveAt: '2026-10-21T05:00:00Z',
+    reviewedAt: '2026-10-21T05:00:00Z',
+    ratingAvg: 4.2,
+    ratingCount: 12,
+    acceptRate30d: 0.94,
+    unacceptedExpiryRate30d: 0.03,
+    reliabilityScore: 0.91,
+    reliabilityComputedAt: '2026-10-25T00:00:00Z',
+    activeStrikes: 0,
+    strikes: [],
+    createdAt: '2026-10-20T05:00:00Z',
+    serverNow: NOW,
+  });
+  const sent = await fake(page, '/v1/admin/stores**', (method, url, body) => {
+    if (url.pathname === '/v1/admin/stores') {
+      const d = detail();
+      const { id, name, businessId, businessName, businessStatus, status, locality, city, activeStrikes, reliabilityScore, createdAt } = d;
+      return page1([{ id, name, businessId, businessName, businessStatus, status, locality, city, closedUntil, activeStrikes, reliabilityScore, createdAt }]);
+    }
+    if (url.pathname.endsWith('/force-close')) {
+      closedUntil = (body as { until: string }).until;
+      return { status: 200, body: detail() };
+    }
+    return method === 'GET' ? { status: 200, body: detail() } : undefined;
+  });
+
+  await page.goto('/stores');
+  await shot(page, 'admin-a05-list.png');
+  await page.getByRole('table', { name: 'Stores' }).getByRole('link', { name: 'Lakshmi, Jayanagar' }).click();
+  await page.getByRole('button', { name: 'Close for a while' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Close Lakshmi, Jayanagar for a while?' });
+  await dialog.getByLabel('Reason').fill('Owner unwell');
+  await dialog.getByLabel('Closed until (IST)').fill('2026-10-26T09:00');
+  await shot(page, 'admin-a05-force-close.png');
+  await dialog.getByRole('button', { name: 'Close for a while' }).click();
+  await expect(page.getByText('Store closed')).toBeVisible();
+  // 09:00 IST is 03:30 UTC.
+  expect(sent).toEqual([{ path: `/v1/admin/stores/${STORE_ID}/force-close`, body: { reason: 'Owner unwell', until: '2026-10-26T03:30:00.000Z' } }]);
+});
+
+test('A-12: support hides a reported review and restores it, each with a reason', async ({ page }) => {
+  await signIn(page, ['support']);
+  let hidden = false;
+  let hideReason: string | null = null;
+  const review = () => ({
+    id: REVIEW_ID,
+    storeId: STORE_ID,
+    storeName: 'Sri Lakshmi Stores',
+    customerId: '01JCUST0000000000000000C01',
+    orderId: '01JORDER000000000000000R01',
+    posSaleId: null,
+    stars: 1,
+    text: 'Rude at the counter and the rice was stale.',
+    tags: ['service'],
+    createdAt: '2026-10-24T10:00:00Z',
+    hidden,
+    hiddenAt: hidden ? NOW : null,
+    hideReason,
+    openReports: hidden ? 0 : 1,
+    reply: null,
+  });
+  const sent = await fake(page, '/v1/admin/reviews**', (method, url, body) => {
+    if (url.pathname === '/v1/admin/reviews') return page1([review()]);
+    if (url.pathname.endsWith('/hide')) {
+      if (hidden) return { status: 409, body: problem(409, 'invalid_transition') };
+      hidden = true;
+      hideReason = (body as { reason: string }).reason;
+      return { status: 200, body: review() };
+    }
+    if (url.pathname.endsWith('/restore')) {
+      hidden = false;
+      hideReason = null;
+      return { status: 200, body: review() };
+    }
+    return method === 'GET' ? { status: 200, body: review() } : undefined;
+  });
+
+  await page.goto('/reviews');
+  await page.getByRole('button', { name: /Rude at the counter/ }).click();
+  await expect(page.getByRole('complementary', { name: 'History' }).getByText('No changes yet.')).toBeVisible();
+  await shot(page, 'admin-a12-detail.png');
+  await page.getByRole('button', { name: 'Hide review' }).click();
+  let dialog = page.getByRole('dialog', { name: 'Hide this review of Sri Lakshmi Stores?' });
+  await dialog.getByLabel('Reason').fill('Abusive language');
+  await dialog.getByRole('button', { name: 'Hide review' }).click();
+  await page.getByRole('button', { name: 'Restore review' }).click();
+  dialog = page.getByRole('dialog', { name: 'Restore this review of Sri Lakshmi Stores?' });
+  await dialog.getByLabel('Reason').fill('Owner and customer settled it');
+  await dialog.getByRole('button', { name: 'Restore review' }).click();
+  await expect(page.getByRole('button', { name: 'Hide review' })).toBeVisible();
+  expect(sent).toEqual([
+    { path: `/v1/admin/reviews/${REVIEW_ID}/hide`, body: { reason: 'Abusive language' } },
+    { path: `/v1/admin/reviews/${REVIEW_ID}/restore`, body: { reason: 'Owner and customer settled it' } },
+  ]);
+});
