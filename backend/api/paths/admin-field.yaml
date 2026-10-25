@@ -443,6 +443,7 @@
                   onHand: 20
                   isListed: true
                   productStatus: active
+                  editable: true
                   createdAt: "2026-10-25T05:15:00Z"
                   updatedAt: "2026-10-25T05:15:00Z"
               nextCursor: null

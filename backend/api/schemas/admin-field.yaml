@@ -317,9 +317,10 @@ FieldItem:
   type: object
   description: >-
     One item of the store. `productStatus` is `pending_review` for a product the agent added as
-    new: it waits in the A-08 review queue.
+    new: it waits in the A-08 review queue. `editable` is whether the caller may change this item
+    now: the list's `itemsEditable`, and for a field agent only an item they added (D-232).
   required: [id, storeId, productId, name, brand, variant, packSize, unit, pricePaise, mrpPaise, productMrpPaise,
-    onHand, isListed, productStatus, createdAt, updatedAt]
+    onHand, isListed, productStatus, editable, createdAt, updatedAt]
   properties:
     id: {$ref: ./common.yaml#/Ulid}
     storeId: {$ref: ./common.yaml#/Ulid}
@@ -343,6 +344,7 @@ FieldItem:
     productStatus:
       type: string
       enum: [active, pending_review, merged, retired]
+    editable: {type: boolean}
     createdAt: {$ref: ./common.yaml#/Timestamp}
     updatedAt: {$ref: ./common.yaml#/Timestamp}
 FieldItemList:

@@ -509,7 +509,9 @@ func (f *Field) ownerNumber(ctx context.Context, c fieldCall, phone string) (str
 
 // ownerAccountOpen refuses a number whose account is blocked (or deleted
 // but still holding the number): it gets no invite and no code. A number
-// with no account yet is fine; the right code makes one.
+// with no account yet is fine; the right code makes one. The refusal is the
+// same 422 as any other unusable owner number (errOwnerNumber), so it says
+// no more about the account than that.
 func (f *Field) ownerAccountOpen(ctx context.Context, e164 string) error {
 	status, err := f.s.q(ctx).AccountStatusByPhone(ctx, f.s.hash.Phone(e164))
 	if db.IsNoRows(err) {
@@ -519,9 +521,14 @@ func (f *Field) ownerAccountOpen(ctx context.Context, e164 string) error {
 		return fmt.Errorf("business: owner account status: %w", err)
 	}
 	if status != userActive {
-		return problem.New(genproblems.Forbidden, "this number's account cannot own a business")
+		return errOwnerNumber()
 	}
 	return nil
+}
+
+// errOwnerNumber is the refusal of a number that cannot own a business.
+func errOwnerNumber() error {
+	return problem.New(genproblems.ValidationFailed, "").WithField("body.ownerPhone", "this number cannot own a business")
 }
 
 // sealOwnerPhone seals the owner's number for their staff row.
@@ -838,9 +845,10 @@ func (f *Field) createPhoto(ctx context.Context, bidStr string, body *adminfield
 	}, nil
 }
 
-// pendingLife is how long a field photo may stay pending: the upload URL's
-// life and a few minutes for a PUT that started just before it ran out. After
-// it the photo no longer counts towards the cap and cannot be confirmed.
+// pendingLife is how long a field photo may stay pending (its confirm_by):
+// the upload URL's life and a few minutes for a PUT that started just before
+// it ran out. After it the photo no longer counts towards the cap, cannot be
+// confirmed, and the sweep rejects it.
 const pendingLife = uploadTTL + 5*time.Minute
 
 func fieldDocument(doc businessdb.BusinessDocument) adminfieldapi.FieldDocument {
@@ -894,7 +902,7 @@ func (f *Field) confirmPhoto(ctx context.Context, bidStr, docStr string) (adminf
 		return fieldDocument(doc), nil
 	}
 	now := f.s.clock.Now()
-	if now.Sub(doc.CreatedAt) > pendingLife {
+	if doc.ConfirmBy != nil && now.After(*doc.ConfirmBy) {
 		return adminfieldapi.FieldDocument{}, problem.New(genproblems.InvalidTransition, "the upload URL has expired; add the photo again")
 	}
 	// Outside the transaction: no row lock is held over the bucket call.

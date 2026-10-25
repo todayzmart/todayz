@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"io"
 	"net/http"
 	"net/url"
 	"sort"
@@ -111,6 +112,34 @@ func (p *presigner) head(ctx context.Context, key string, now time.Time) (object
 		return object{}, errors.New("business: storage HEAD answered " + res.Status)
 	}
 	return object{size: res.ContentLength, contentType: res.Header.Get("Content-Type")}, nil
+}
+
+// remove deletes the object (a signed DELETE); an object already gone is
+// fine.
+func (p *presigner) remove(ctx context.Context, key string, now time.Time) error {
+	if p.client == nil {
+		return errors.New("business: no storage client")
+	}
+	u := presignURL(presignInput{
+		Method: http.MethodDelete, Scheme: p.scheme, Host: p.host, Path: "/" + p.bucket + "/" + key,
+		Region: storageRegion, AccessKey: p.accessKey, SecretKey: p.secretKey,
+		Time: now, Expires: uploadTTL,
+	})
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u, nil)
+	if err != nil {
+		return err
+	}
+	res, err := p.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+	_, _ = io.Copy(io.Discard, io.LimitReader(res.Body, 4<<10))
+	switch res.StatusCode {
+	case http.StatusOK, http.StatusNoContent, http.StatusNotFound:
+		return nil
+	}
+	return errors.New("business: storage DELETE answered " + res.Status)
 }
 
 type presignInput struct {

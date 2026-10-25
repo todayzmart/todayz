@@ -101,15 +101,18 @@ RETURNING *;
 ------------------------------------------------------------------------------
 
 -- name: InsertDocument :one
-INSERT INTO business_documents (id, business_id, store_id, kind, object_key, content_type, size_bytes, created_at, updated_at)
-VALUES (@id, @business_id, sqlc.narg(store_id), @kind, @object_key, @content_type, @size_bytes, @now, @now)
+INSERT INTO business_documents (id, business_id, store_id, kind, object_key, content_type, size_bytes, confirm_by, created_at, updated_at)
+VALUES (@id, @business_id, sqlc.narg(store_id), @kind, @object_key, @content_type, @size_bytes, sqlc.narg(confirm_by), @now, @now)
 RETURNING *;
 
 -- name: CountDocumentsOfKind :one
--- The documents of one kind a business holds that are not rejected (pending
--- ones count, so unconfirmed upload URLs cannot pile up).
+-- The documents of one kind a business holds that are not rejected. Pending
+-- ones count (so unconfirmed upload URLs cannot pile up), except a field
+-- photo past its confirm_by: it can no longer be confirmed, and the sweep
+-- rejects it.
 SELECT count(*)::int FROM business_documents
-WHERE business_id = @business_id AND kind = @kind AND status <> 'rejected';
+WHERE business_id = @business_id AND kind = @kind AND status <> 'rejected'
+  AND NOT (status = 'pending' AND confirm_by IS NOT NULL AND confirm_by < @now::timestamptz);
 
 -- name: ListDocuments :many
 SELECT * FROM business_documents WHERE business_id = @business_id

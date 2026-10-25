@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 
@@ -127,8 +128,9 @@ func (s *Service) createDocument(ctx context.Context, bidStr string, body *busin
 // insertDocument records a pending document of the business (kind, content
 // type and size already checked) and returns it with its object key, audited
 // as the actor (kind, uid). check, when set, runs first in the transaction.
-// field (the field routes, which confirm their uploads) leaves out of the cap
-// the pending documents whose upload was never confirmed in time.
+// field (the field routes, which confirm their uploads) sets the row's
+// confirm_by. On every route the cap leaves out the pending rows past their
+// confirm_by: field photos whose upload was never confirmed in time.
 func (s *Service) insertDocument(ctx context.Context, actorKind string, uid, bid ids.ID, store pgtype.UUID, kind, contentType string, size int64, field bool, check func(context.Context) error) (businessdb.BusinessDocument, string, error) {
 	var doc businessdb.BusinessDocument
 	var key string
@@ -153,27 +155,24 @@ func (s *Service) insertDocument(ctx context.Context, actorKind string, uid, bid
 		if err := q.LockKey(ctx, "document:"+bid.String()+":"+kind); err != nil {
 			return err
 		}
-		var n int32
-		var err error
-		if field {
-			n, err = q.CountFieldDocumentsOfKind(ctx, businessdb.CountFieldDocumentsOfKindParams{
-				BusinessID: ids.UUID(bid), Kind: kind, StaleBefore: s.clock.Now().Add(-pendingLife),
-			})
-		} else {
-			n, err = q.CountDocumentsOfKind(ctx, businessdb.CountDocumentsOfKindParams{BusinessID: ids.UUID(bid), Kind: kind})
-		}
+		now := s.clock.Now()
+		n, err := q.CountDocumentsOfKind(ctx, businessdb.CountDocumentsOfKindParams{BusinessID: ids.UUID(bid), Kind: kind, Now: now})
 		if err != nil {
 			return err
 		}
 		if n >= maxDocumentsPerKind {
 			return problem.New(genproblems.Conflict, "this business already has the most documents of this kind")
 		}
-		now := s.clock.Now()
+		var confirmBy *time.Time
+		if field {
+			t := now.Add(pendingLife)
+			confirmBy = &t
+		}
 		id := ids.New(now)
 		key = "businesses/" + bid.String() + "/documents/" + id.String()
 		doc, err = q.InsertDocument(ctx, businessdb.InsertDocumentParams{
 			ID: ids.UUID(id), BusinessID: ids.UUID(bid), StoreID: store, Kind: kind,
-			ObjectKey: key, ContentType: contentType, SizeBytes: size, Now: now,
+			ObjectKey: key, ContentType: contentType, SizeBytes: size, ConfirmBy: confirmBy, Now: now,
 		})
 		if err != nil {
 			return err

@@ -114,19 +114,29 @@ func (f *Field) sendCode(ctx context.Context, bidStr string) (adminfieldapi.Fiel
 		if err != nil {
 			return err
 		}
-		mine, err := q.OwnerCodeSendsByAgent(ctx, businessdb.OwnerCodeSendsByAgentParams{SentBy: ids.UUID(c.p.UserID), Since: now.Add(-ownerCodeAgentWindow)})
+		since := now.Add(-ownerCodeAgentWindow)
+		mine, err := q.OwnerCodeSendsByAgent(ctx, businessdb.OwnerCodeSendsByAgentParams{SentBy: ids.UUID(c.p.UserID), Since: since})
 		if err != nil {
 			return err
 		}
-		if int64(mine.Sends) >= perAgent {
-			return rateLimited(mine.Oldest.Add(ownerCodeAgentWindow).Sub(now), ownerCodeAgentWindow)
+		if int64(mine) >= perAgent {
+			// The next send is allowed once the (sends − cap + 1)-th oldest
+			// leaves the window (a lowered cap can leave several over it).
+			at, err := q.OwnerCodeAgentSendAt(ctx, businessdb.OwnerCodeAgentSendAtParams{
+				SentBy: ids.UUID(c.p.UserID), Since: since, Skip: int32(int64(mine) - perAgent), //nolint:gosec // both are small counts
+			})
+			if err != nil {
+				return err
+			}
+			return rateLimited(at.Add(ownerCodeAgentWindow).Sub(now), ownerCodeAgentWindow)
 		}
 		hash := f.s.hash.Phone(e164)
 		if err := q.LockKey(ctx, "field-owner-code:"+hex.EncodeToString(hash)); err != nil {
 			return err
 		}
 		// Sign-in codes to the number count too (01 §2 is per number).
-		sends, err := q.OwnerCodeSendsByPhone(ctx, businessdb.OwnerCodeSendsByPhoneParams{PhoneHash: hash, Since: now.Add(-rules.Window)})
+		phoneSince := now.Add(-rules.Window)
+		sends, err := q.OwnerCodeSendsByPhone(ctx, businessdb.OwnerCodeSendsByPhoneParams{PhoneHash: hash, Since: phoneSince})
 		if err != nil {
 			return err
 		}
@@ -134,7 +144,13 @@ func (f *Field) sendCode(ctx context.Context, bidStr string) (adminfieldapi.Fiel
 			return rateLimited(sends.Latest.Add(rules.ResendGap).Sub(now), rules.ResendGap)
 		}
 		if int(sends.Sends) >= rules.PerPhone {
-			return rateLimited(sends.Oldest.Add(rules.Window).Sub(now), rules.Window)
+			at, err := q.OwnerCodePhoneSendAt(ctx, businessdb.OwnerCodePhoneSendAtParams{
+				PhoneHash: hash, Since: phoneSince, Skip: sends.Sends - int32(rules.PerPhone), //nolint:gosec // a small count
+			})
+			if err != nil {
+				return err
+			}
+			return rateLimited(at.Add(rules.Window).Sub(now), rules.Window)
 		}
 		code, err = randomString("0123456789", rules.Digits)
 		if err != nil {
@@ -209,16 +225,26 @@ func (f *Field) verifyCode(ctx context.Context, bidStr string, body *adminfielda
 		// A code sent to an earlier owner number does not confirm this one.
 		if !hmac.Equal(row.PhoneHash, f.s.hash.Phone(e164)) {
 			outcome = problem.New(genproblems.OtpExpired, "")
-			return nil
+			failure = ownerCodeExpired
+			return f.ownerCodeFailed(ctx, c, bid, ownerCodeExpired, 0)
 		}
 		if int(row.Attempts) >= rules.MaxAttempts {
 			outcome = problem.New(genproblems.OtpLocked, "")
 			failure = ownerCodeLocked
+			// The first try on a locked code is audited and marked (one more
+			// attempt); later ones are only counted.
+			if int(row.Attempts) > rules.MaxAttempts {
+				return nil
+			}
+			if _, err := q.RecordOwnerCodeAttempt(ctx, row.ID); err != nil {
+				return err
+			}
 			return f.ownerCodeFailed(ctx, c, bid, ownerCodeLocked, 0)
 		}
 		if !now.Before(row.ExpiresAt) {
 			outcome = problem.New(genproblems.OtpExpired, "")
-			return nil
+			failure = ownerCodeExpired
+			return f.ownerCodeFailed(ctx, c, bid, ownerCodeExpired, max(rules.MaxAttempts-int(row.Attempts), 0))
 		}
 		attempts, err := q.RecordOwnerCodeAttempt(ctx, row.ID)
 		if err != nil {
@@ -250,7 +276,7 @@ func (f *Field) verifyCode(ctx context.Context, bidStr string, body *adminfielda
 			return fmt.Errorf("business: owner account: %w", err)
 		}
 		if acct.Status != userActive {
-			return problem.New(genproblems.Forbidden, "this number's account cannot own a business")
+			return errOwnerNumber()
 		}
 		if acct.UserID == c.p.UserID {
 			return problem.New(genproblems.Conflict, "the owner's number is yours")

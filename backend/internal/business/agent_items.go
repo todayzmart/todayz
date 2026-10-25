@@ -9,6 +9,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/jackc/pgx/v5/pgtype"
+
 	adminfieldapi "github.com/todayz/backend/gen/api/admin-field"
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/gen/sqlc/businessdb"
@@ -18,9 +20,11 @@ import (
 	"github.com/todayz/backend/internal/platform/ids"
 )
 
-func toFieldItem(it CatalogueItem) adminfieldapi.FieldItem {
+// toFieldItem is an item as the field routes show it; editable is whether
+// the caller may change it now.
+func toFieldItem(it CatalogueItem, editable bool) adminfieldapi.FieldItem {
 	out := adminfieldapi.FieldItem{
-		Brand: it.Brand, CreatedAt: it.CreatedAt.UTC(), Id: it.ID.String(), IsListed: it.IsListed,
+		Brand: it.Brand, CreatedAt: it.CreatedAt.UTC(), Editable: editable, Id: it.ID.String(), IsListed: it.IsListed,
 		Name: it.Name, OnHand: int(it.OnHand), PackSize: float32(it.PackSize), PricePaise: int(it.PricePaise),
 		ProductId: it.ProductID.String(), ProductStatus: adminfieldapi.FieldItemProductStatus(it.ProductStatus),
 		StoreId: it.StoreID.String(), Unit: adminfieldapi.FieldUnit(it.Unit), UpdatedAt: it.UpdatedAt.UTC(),
@@ -96,8 +100,25 @@ func (f *Field) listItems(ctx context.Context, bidStr, sidStr string, params adm
 	if b.Status == businessVerified {
 		out.EditableUntil = until
 	}
+	// D-232: an agent may change only the items they added.
+	var mine map[ids.ID]bool
+	if ok && c.agent() && len(items) > 0 {
+		keys := make([]pgtype.UUID, len(items))
+		for i, it := range items {
+			keys[i] = ids.UUID(it.ID)
+		}
+		added, err := f.s.q(ctx).FieldItemsAddedByAgent(ctx, businessdb.FieldItemsAddedByAgentParams{StoreItemIds: keys, AgentID: ids.UUID(c.p.UserID)})
+		if err != nil {
+			return adminfieldapi.FieldItemList{}, fmt.Errorf("business: field items added: %w", err)
+		}
+		mine = make(map[ids.ID]bool, len(added))
+		for _, u := range added {
+			id, _ := ids.FromUUID(u)
+			mine[id] = true
+		}
+	}
 	for _, it := range items {
-		out.Items = append(out.Items, toFieldItem(it))
+		out.Items = append(out.Items, toFieldItem(it, ok && (!c.agent() || mine[it.ID])))
 	}
 	if more && len(items) > 0 {
 		out.NextCursor = fieldCursor(items[len(items)-1].ID)
@@ -208,7 +229,7 @@ func (f *Field) createItem(ctx context.Context, bidStr, sidStr string, body *adm
 	if err != nil {
 		return adminfieldapi.FieldItem{}, asProblem(err)
 	}
-	return toFieldItem(item), nil
+	return toFieldItem(item, true), nil
 }
 
 // updateItem changes an item's price, MRP or listing within the window.
@@ -274,5 +295,5 @@ func (f *Field) updateItem(ctx context.Context, bidStr, sidStr, itemStr string, 
 	if err != nil {
 		return adminfieldapi.FieldItem{}, asProblem(err)
 	}
-	return toFieldItem(item), nil
+	return toFieldItem(item, true), nil
 }
