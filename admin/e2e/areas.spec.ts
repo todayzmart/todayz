@@ -427,3 +427,107 @@ test('A-18: a super admin invites a desk member, then disables another after a f
   expect(stepUp).toBeGreaterThanOrEqual(0);
   guard.errors.splice(stepUp, 1);
 });
+
+test('A-02: an analyst reads Pulse, switches to 30 days and sees a store needing attention without a link', async ({ page }) => {
+  await signIn(page, ['analyst']);
+  const day = (date: string, i: number) => ({
+    date,
+    gmvPaise: (800 + i * 90) * 100,
+    posGmvPaise: (300 + i * 20) * 100,
+    orders: 8 + i,
+    completedOrders: 7 + i,
+    activeCustomers: 40 + i * 3,
+    newCustomers: 4,
+    liveStores: 12,
+    searches: 180 + i * 10,
+    zeroResultSearches: 18,
+  });
+  const ranges: string[] = [];
+  await answerWith(page, '/v1/admin/pulse?*', (_req, url) => {
+    const range = url.searchParams.get('range') ?? '7d';
+    ranges.push(range);
+    const days = range === '30d' ? 30 : 7;
+    return {
+      status: 200,
+      body: {
+        range,
+        from: range === '30d' ? '2026-09-26' : '2026-10-19',
+        to: '2026-10-25',
+        asOf: '2026-10-25T06:25:00Z',
+        kpis: {
+          gmvPaise: { value: 7_240_00, previous: 6_000_00 },
+          onlineGmvPaise: { value: 4_440_00, previous: 4_000_00 },
+          posGmvPaise: { value: 2_800_00, previous: 2_000_00 },
+          orders: { value: 70, previous: 80 },
+          completedOrders: { value: 58, previous: 60 },
+          successRateBp: { value: 8286, previous: 7500 },
+          activeCustomers: { value: 340, previous: 300 },
+          transactingCustomers: { value: 61, previous: 55 },
+          liveStores: { value: 12, previous: 11 },
+          activeStores: { value: 15, previous: 14 },
+          newStores: { value: 2, previous: 1 },
+          searches: { value: 1400, previous: 1200 },
+          searchSuccessRateBp: { value: 9000, previous: 8800 },
+          d7RetentionBp: { value: 2200, previous: 2500 },
+        },
+        trend: Array.from({ length: days }, (_, i) => {
+          const d = new Date(Date.UTC(2026, 9, 25 - (days - 1 - i)));
+          return day(d.toISOString().slice(0, 10), i % 9);
+        }),
+        funnel: { searches: 1400, searchesWithResults: 1260, storeViews: 600, ordersPlaced: 70, ordersAccepted: 63, ordersCompleted: 58 },
+        leaks: [
+          { status: 'expired', reason: 'not_accepted', count: 6 },
+          { status: 'rejected', reason: 'out_of_stock', count: 4 },
+          { status: 'cancelled', reason: 'changed_mind', count: 2 },
+        ],
+        retention: {
+          d1Bp: 4100,
+          d7Bp: 2200,
+          d30Bp: 1200,
+          cohorts: [
+            { cohortWeek: '2026-10-19', size: 30, weeksBp: [10000] },
+            { cohortWeek: '2026-10-12', size: 42, weeksBp: [10000, 3300] },
+            { cohortWeek: '2026-10-05', size: 38, weeksBp: [10000, 2900, 2100] },
+          ],
+        },
+        credits: { issued: 500, spent: 320, expired: 10 },
+        zeroResultSearches: [
+          { queryNorm: 'paneer', searches: 14 },
+          { queryNorm: 'ragi flour', searches: 11 },
+        ],
+        storesNeedingAttention: [
+          { storeId: STORE_ID, name: 'Lakshmi Stores', city: 'Bengaluru', reason: 'not_accepting', expiredUnaccepted: 4, strikes30d: 1, acceptRateBp: 6000, stockUpdatedAt: '2026-10-24T05:00:00Z' },
+        ],
+        serverNow: NOW,
+      },
+    };
+  });
+  await answerWith(page, '/v1/admin/pulse/map*', () => ({
+    status: 200,
+    body: {
+      range: '7d',
+      from: '2026-10-19',
+      to: '2026-10-25',
+      stores: [
+        { storeId: STORE_ID, name: 'Lakshmi Stores', city: 'Bengaluru', status: 'live', lat: 12.97, lng: 77.59, live: true },
+        { storeId: '01JST0RE000000000000000S02', name: 'Sri Ganesh', city: 'Mysuru', status: 'live', lat: 12.3, lng: 76.64, live: true },
+      ],
+      demand: [{ cell: '8860145b49fffff', searches: 40, zeroResultSearches: 6 }],
+      serverNow: NOW,
+    },
+  }));
+
+  await page.goto('/');
+  const main = page.getByRole('main');
+  await expect(main.getByText('₹7,240')).toBeVisible();
+  await expect(main.getByRole('img', { name: /GMV per day from 19 Oct to 25 Oct/ })).toBeVisible();
+  const attention = main.getByRole('table', { name: 'Stores needing attention' });
+  await expect(attention.getByText('Lakshmi Stores')).toBeVisible();
+  await expect(attention.getByRole('link')).toHaveCount(0);
+  await shot(page, 'admin-a02-pulse.png', { fullPage: true });
+
+  await main.getByRole('radio', { name: '30 days' }).click();
+  await expect(page).toHaveURL(/\?range=30d$/);
+  await expect(main.getByRole('img', { name: /from 26 Sept? to 25 Oct/ })).toBeVisible();
+  expect(ranges).toContain('30d');
+});
