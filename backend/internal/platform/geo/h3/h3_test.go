@@ -179,3 +179,54 @@ func TestPentagonDisk(t *testing.T) {
 		t.Fatalf("pentagon disk: %d cells, %v", len(d), err)
 	}
 }
+
+// The edge cases the golden files must keep: both poles and both sides of
+// the antimeridian (latlng_to_cell.tsv), and the 12 res-0 pentagons
+// (cell_to_latlng.tsv). Dropping one from a regenerated file fails here
+// rather than quietly shrinking the golden tests.
+func TestGoldenVectorsNameTheEdges(t *testing.T) {
+	points := map[[2]string]bool{}
+	for _, r := range readTSV(t, "latlng_to_cell.tsv") {
+		points[[2]string{r[0], r[1]}] = true
+	}
+	for name, p := range map[string][2]string{
+		"north pole":            {"89.9999", "0"},
+		"south pole":            {"-89.9999", "45"},
+		"antimeridian, east":    {"0", "179.9999"},
+		"antimeridian, west":    {"0", "-179.9999"},
+		"antimeridian, south":   {"-16.5", "-179.9999"},
+		"pentagon base cell 4":  {"58.15735", "8.34695"},
+		"pentagon base cell 58": {"2.300882", "-5.24539"},
+	} {
+		if !points[p] {
+			t.Errorf("latlng_to_cell.tsv has no %s (%s, %s)", name, p[0], p[1])
+		}
+	}
+
+	cells := map[string]bool{}
+	for _, r := range readTSV(t, "cell_to_latlng.tsv") {
+		cells[r[0]] = true
+	}
+	var pentagons []Cell
+	for bc := uint64(0); bc < 122; bc++ {
+		c := Cell(h3Init&^(modeMask|resMask) | uint64(cellMode)<<modeOffset | bc<<bcOffset)
+		if c.IsPentagon() {
+			pentagons = append(pentagons, c)
+		}
+	}
+	if len(pentagons) != 12 {
+		t.Fatalf("%d res-0 pentagons, want 12", len(pentagons))
+	}
+	for _, p := range pentagons {
+		if !cells[p.String()] {
+			t.Errorf("cell_to_latlng.tsv has no res-0 pentagon %v", p)
+		}
+		// grid_disk.tsv has reference disks for 3 of them; for all 12 the
+		// disk sizes are a pentagon's (one neighbour short per ring step).
+		for k, want := range []int{1, 6, 16} {
+			if d, err := GridDisk(p, k); err != nil || len(d) != want {
+				t.Errorf("GridDisk(%v, %d): %d cells, %v; want %d", p, k, len(d), err, want)
+			}
+		}
+	}
+}
