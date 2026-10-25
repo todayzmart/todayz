@@ -128,6 +128,7 @@
 /* Heat: the brand colour mixed over the surface by the cell's retention, at most half so the text stays readable. */
 .heat {
   --heat: 0%;
+
   background: color-mix(in srgb, var(--brand) calc(var(--heat) * 0.5), var(--surface));
   border-radius: var(--radius-xs);
 }
