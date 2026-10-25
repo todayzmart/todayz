@@ -1,997 +1,997 @@
 {
   "home.meta.title": {
     "message": "TodayZ: உங்கள் அருகிலுள்ள கடைகளில் தேடுங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cd0d038a"
   },
   "home.meta.description": {
     "message": "TodayZ அருகிலுள்ள கடைகளின் ஸ்டாக்கை ஆன்லைனுக்குக் கொண்டு வருகிறது, அருகில் இருப்பவர்கள் அதைத் தேடி, புக் செய்து, தாங்களே எடுத்துச் செல்லலாம் அல்லது வீட்டுக்கு வரவழைக்கலாம்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "db78764a"
   },
   "home.hero.kicker": {
     "message": "இந்தியா முழுவதும் அருகிலுள்ள கடைகளுக்காக",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "73d64763"
   },
   "home.hero.title": {
     "message": "உங்கள் தெருக்கடை, {em} தயார்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b83fa4d2"
   },
   "home.hero.title_em": {
     "message": "அதிக வாடிக்கையாளர்களுக்குத்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9194981c"
   },
   "home.hero.body": {
     "message": "உங்கள் ஸ்டாக்கை ஆன்லைனில் வையுங்கள், கவுண்டரை நடத்துங்கள், உங்கள் அலமாரியில் ஏற்கனவே இருப்பதை அருகில் இருப்பவர்கள் கண்டுபிடிக்கட்டும்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e1ce6218"
   },
   "home.hero.cta": {
     "message": "இலவசமாகத் தொடங்குங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a99da3b9"
   },
   "home.hero.cta_secondary": {
     "message": "எப்படி வேலை செய்கிறது பாருங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f7b38f07"
   },
   "home.hero.tick.1": {
     "message": "கடைகளுக்கு இலவசம்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a2839388"
   },
   "home.hero.tick.2": {
     "message": "இணையம் போனாலும் வேலை செய்யும்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "18aca7ee"
   },
   "home.hero.tick.3": {
     "message": "5 இந்திய மொழிகளில்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8cfef760"
   },
   "home.hero.tick.4": {
     "message": "பிக்அப் அல்லது டெலிவரி",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8a9547f9"
   },
   "home.hero.scene": {
     "message": "உதாரணம்: அருகில் இருக்கும் ஒருவர் Sharma General Store இல் பால் தேடுகிறார், கடைக்கு ஆர்டர் வருகிறது, அருகில் இருப்பவர்கள் வேறு என்ன தேடுகிறார்கள் என்பதும் தெரிகிறது.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9ee19e50"
   },
   "home.hero.note": {
     "message": "இந்தப் பக்கத்தில் உள்ள கடைகள், பொருட்கள், எண்கள் உதாரணங்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "673f32fb"
   },
   "home.mock.shops_have": {
     "message": "உங்கள் அருகிலுள்ள {count} கடைகளில் உள்ளது",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "97ce7209"
   },
   "home.mock.dist_pickup": {
     "message": "{distance} · பிக்அப்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "48cd9361"
   },
   "home.mock.dist_delivery": {
     "message": "{distance} · டெலிவரி",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e99aab7a"
   },
   "home.mock.fresh_min": {
     "message": "ஸ்டாக்கில் உள்ளது · {n} நிமிடம் முன் புதுப்பிப்பு",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bc9fe70a"
   },
   "home.mock.fresh_h": {
     "message": "ஸ்டாக்கில் உள்ளது · {n} மணி நேரம் முன் புதுப்பிப்பு",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "79117543"
   },
   "home.mock.stale": {
     "message": "ஸ்டாக் சமீபத்தில் உறுதி செய்யப்படவில்லை",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c8a47c2d"
   },
   "home.mock.book_pickup": {
     "message": "பிக்அப்புக்கு புக் செய்யுங்கள் · {amount}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1e5e5edf"
   },
   "home.mock.new_order": {
     "message": "புதிய ஆர்டர் {number}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "93fdc4bf"
   },
   "home.mock.pickup": {
     "message": "பிக்அப்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a51122c1"
   },
   "home.mock.delivery": {
     "message": "டெலிவரி",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9631af52"
   },
   "home.mock.accept": {
     "message": "ஏற்கவும்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bb54db51"
   },
   "home.mock.reject": {
     "message": "நிராகரிக்கவும்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2b03b592"
   },
   "home.mock.add": {
     "message": "சேர்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "61cc55aa"
   },
   "home.mock.todays_sales": {
     "message": "இன்றைய விற்பனை",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "23b9b8de"
   },
   "home.mock.wanted_line": {
     "message": "இந்த வாரம் {distance} க்குள் {count} தேடல்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9fff406b"
   },
   "home.problem.eyebrow": {
     "message": "சிக்கல்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8a940000"
   },
   "home.problem.title": {
     "message": "நல்ல கடைகள். பெரிய சவால்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fd3d5075"
   },
   "home.problem.intro": {
     "message": "இந்தியாவின் தெருக்கடைகளில் மக்களுக்குத் தேவையானது ஏற்கனவே இருக்கிறது. ஆனால் கவுண்டர், ஸ்டாக், வாடிக்கையாளர்களைக் கையால் பார்த்துக்கொள்ளும்போது வருமானம் அலமாரியிலேயே தங்கிவிடுகிறது.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c98749ea"
   },
   "home.problem.1.title": {
     "message": "ஸ்டாக் கணக்கை வைத்திருப்பது கடினம்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c972354e"
   },
   "home.problem.1.body": {
     "message": "பொருட்கள் விடுபடுகின்றன, எண்ணிக்கை தவறுகிறது, அதனால் என்ன விற்கிறது என்று தெரிவது கடினம்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f2a7e83c"
   },
   "home.problem.2.title": {
     "message": "உங்களிடம் இருப்பது அருகில் இருப்பவர்களுக்குத் தெரியாது",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "394c25ed"
   },
   "home.problem.2.body": {
     "message": "சில நிமிடம் தூரத்தில் உங்கள் அலமாரியில் இருக்கும் பொருள் யாருக்கோ தேவைப்படலாம், ஆனால் அவர்களுக்குத் தெரியவே தெரியாது.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cff44d11"
   },
   "home.problem.3.title": {
     "message": "ஸ்டாக் விற்காமல் தங்குகிறது",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7f0971df"
   },
   "home.problem.3.body": {
     "message": "தேவை தெரியாவிட்டால் தவறான பொருட்களை அதிகமாக வாங்கிவிடுவது எளிது.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "aea1fac2"
   },
   "home.problem.4.title": {
     "message": "மக்களுக்கு என்ன வேண்டும் என்று தெரிவதில்லை",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ca5cc745"
   },
   "home.problem.4.body": {
     "message": "சுற்றி இருப்பவர்கள் என்ன தேடுகிறார்கள் என்பது கடைகளுக்கு அரிதாகவே தெரியும்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8e04ffe9"
   },
   "home.problem.no_shops": {
     "message": "அருகில் கடைகள் இல்லை",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b75d7b5d"
   },
   "home.problem.shelf_weeks": {
     "message": "{n} வாரங்களாக அலமாரியில் உள்ளது",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b336c6e4"
   },
   "home.problem.ask.1": {
     "message": "உங்களிடம் {item} இருக்கிறதா?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "13192ad7"
   },
   "home.problem.ask.2": {
     "message": "சென்சிடிவ் டூத்பேஸ்ட் இருக்கா?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7c097792"
   },
   "home.problem.ask.3": {
     "message": "கசூரி மேத்தி?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e84eae02"
   },
   "home.insight.eyebrow": {
     "message": "யோசனை",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "43e19816"
   },
   "home.insight.title": {
     "message": "கடைகள் இருக்கின்றன. ஸ்டாக் இருக்கிறது. {em}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d7f0208d"
   },
   "home.insight.title_em": {
     "message": "தேடல் மட்டும் இல்லை.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1d313870"
   },
   "home.insight.body": {
     "message": "மக்களுக்குத் தேவையானதில் பெரும்பகுதி சில நிமிடம் தூரத்து அலமாரியில் ஏற்கனவே இருக்கிறது. ஆன்லைனில் கிடைக்காது, அவ்வளவுதான். TodayZ இரண்டையும் இணைக்கிறது.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7a11ad45"
   },
   "home.insight.flow.1.title": {
     "message": "அருகில் இருப்பவர்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a80df8f3"
   },
   "home.insight.flow.1.body": {
     "message": "தங்களுக்குத் தேவையானதைத் தேடுகிறார்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "81ccd64a"
   },
   "home.insight.flow.2.title": {
     "message": "அருகிலேயே கிடைக்கிறது",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b1923d37"
   },
   "home.insight.flow.2.body": {
     "message": "ஸ்டாக், விலை, தூரம், புத்தம்புதுமை",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "72f87ea4"
   },
   "home.insight.flow.3.title": {
     "message": "உள்ளூர் கடை அலமாரிகள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1b3fdc74"
   },
   "home.insight.flow.3.body": {
     "message": "ஆர்டர் பெற்று தேவையைப் பார்க்கின்றன",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a4c8429f"
   },
   "home.insight.loop.1": {
     "message": "தேடுங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bce06414"
   },
   "home.insight.loop.2": {
     "message": "கண்டுபிடியுங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "df251b06"
   },
   "home.insight.loop.3": {
     "message": "புக் செய்யுங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f69f2330"
   },
   "home.insight.loop.4": {
     "message": "எடுத்துச் செல்லுங்கள் அல்லது டெலிவரி",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b0214dcb"
   },
   "home.insight.loop.5": {
     "message": "என்ன விற்கிறது என்று அறியுங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7bb646b4"
   },
   "home.features.eyebrow": {
     "message": "கடைகளுக்கு",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "673d17e5"
   },
   "home.features.title": {
     "message": "கடையை வளர்க்க எளிய வழி",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5f2c440a"
   },
   "home.features.intro": {
     "message": "கவுண்டர், ஸ்டாக், வாடிக்கையாளர்களுக்கு ஒரே ஆப். அன்றாடக் கடை வேலைக்காக, உங்கள் மொழியில்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "259da520"
   },
   "home.features.1.title": {
     "message": "உங்கள் கவுண்டரை நடத்துங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3de6c082"
   },
   "home.features.1.body": {
     "message": "ஒரே ஆப்பில் கவுண்டரில் பில் போடுங்கள், ஸ்டாக்கைப் புதுப்பித்து வையுங்கள், வாடிக்கையாளர்களைப் பாருங்கள். இணையம் போனாலும் தொடர்ந்து வேலை செய்யும்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9a5e7d93"
   },
   "home.features.2.title": {
     "message": "அருகில் இருப்பவர்களிடமிருந்து ஆர்டர் பெறுங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "34ccd1e9"
   },
   "home.features.2.body": {
     "message": "வாடிக்கையாளர்கள் உங்கள் ஸ்டாக்கைத் தேடி, புக் செய்து, தாங்களே எடுத்துச் செல்கிறார்கள் அல்லது டெலிவரி கேட்கிறார்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "405258e5"
   },
   "home.features.3.title": {
     "message": "உண்மை சொல்லும் ஸ்டாக்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "65484a6d"
   },
   "home.features.3.body": {
     "message": "ஒவ்வொரு விற்பனையும் உங்கள் ஸ்டாக்கைப் புதுப்பிக்கிறது, வாடிக்கையாளர்கள் வருவதற்கு முன்பே அது எவ்வளவு புதியது என்று பார்க்கிறார்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ead82d37"
   },
   "home.features.4.title": {
     "message": "வாடிக்கையாளர்களை மீண்டும் வரவழையுங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "21e48b9d"
   },
   "home.features.4.body": {
     "message": "ஆஃபர்களும் கிரெடிட்களும் மக்களுக்கு உங்கள் கடைக்கு மீண்டும் வர ஒரு காரணம் தருகின்றன.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "192b570e"
   },
   "home.pos.search": {
     "message": "தேடுங்கள் அல்லது ஸ்கேன் செய்யுங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a7407992"
   },
   "home.pos.bill": {
     "message": "பில்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3d734614"
   },
   "home.pos.offline": {
     "message": "ஆஃப்லைன் · பின்னர் சிங்க் ஆகும்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4be5bc3e"
   },
   "home.pos.cash": {
     "message": "பணம்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "758ec54e"
   },
   "home.pos.upi": {
     "message": "UPI",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f295b2cd"
   },
   "home.pos.card": {
     "message": "கார்டு",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4d4ce73b"
   },
   "home.pos.total": {
     "message": "மொத்தம்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b25928c6"
   },
   "home.pos.charge": {
     "message": "வசூலிக்க",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d4e1aee4"
   },
   "home.orders.new": {
     "message": "புதியவை",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6403f2b7"
   },
   "home.orders.preparing": {
     "message": "தயாராகிறது",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "96a9b7cd"
   },
   "home.orders.ready": {
     "message": "தயார்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "20c7c552"
   },
   "home.orders.accept_within": {
     "message": "{time} க்குள் ஏற்கவும்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ec988822"
   },
   "home.orders.waiting": {
     "message": "பிக்அப்புக்குக் காத்திருக்கிறது",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1323a7f6"
   },
   "home.stock.updated_min": {
     "message": "{n} நிமிடம் முன் புதுப்பிப்பு",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bc8f82ef"
   },
   "home.stock.updated_h": {
     "message": "{n} மணி நேரம் முன் புதுப்பிப்பு",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b19204d8"
   },
   "home.stock.low": {
     "message": "குறைவாக உள்ளது · {n} மணி நேரம் முன் புதுப்பிப்பு",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8be3a9d0"
   },
   "home.offers.week": {
     "message": "இந்த வாரம்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7b72883e"
   },
   "home.offers.off": {
     "message": "{item} மீது {off} தள்ளுபடி",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "84319622"
   },
   "home.offers.regular": {
     "message": "வழக்கமான வாடிக்கையாளர் · இந்த மாதம் {n} முறை வந்தார்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7ebeb72a"
   },
   "home.offers.credits": {
     "message": "+{n} கிரெடிட்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5b03b4e6"
   },
   "home.showcase.eyebrow": {
     "message": "பிசினஸ் ஆப்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "66468763"
   },
   "home.showcase.title": {
     "message": "உங்கள் முழு கடையும், ஒரே பார்வையில்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e0eb3462"
   },
   "home.showcase.intro": {
     "message": "காலையில் ஆப்பைத் திறந்து, எதற்கு கவனம் தேவை என்று பாருங்கள்: ஏற்க வேண்டிய ஆர்டர்கள், குறைந்து வரும் பொருட்கள், அருகில் இருப்பவர்கள் கேட்பவை.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c24545a9"
   },
   "home.app.nav.1": {
     "message": "மேலோட்டம்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0efc2e6b"
   },
   "home.app.nav.2": {
     "message": "ஆர்டர்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cded0933"
   },
   "home.app.nav.3": {
     "message": "விற்பனை",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fa3cf2ad"
   },
   "home.app.nav.4": {
     "message": "ஸ்டாக்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bcecf456"
   },
   "home.app.nav.5": {
     "message": "ஆஃபர்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "43c94306"
   },
   "home.app.nav.6": {
     "message": "வாடிக்கையாளர்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "035eae60"
   },
   "home.app.nav.7": {
     "message": "இன்சைட்ஸ்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b4510362"
   },
   "home.app.date": {
     "message": "வியாழன், 23 அக்டோபர்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a377ff45"
   },
   "home.app.greet": {
     "message": "காலை வணக்கம், {shop}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ccd50e36"
   },
   "home.app.synced": {
     "message": "{time} க்கு சிங்க் ஆனது",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "01d62c94"
   },
   "home.app.sales_delta": {
     "message": "கடந்த வியாழனை விட {pct}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "adef0b35"
   },
   "home.app.orders": {
     "message": "ஆர்டர்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cded0933"
   },
   "home.app.waiting": {
     "message": "{n} காத்திருக்கின்றன",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e4536212"
   },
   "home.app.low": {
     "message": "குறைந்த பொருட்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3f83eddd"
   },
   "home.app.low_note": {
     "message": "விரைவில் வாங்குங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "384c0929"
   },
   "home.app.searches": {
     "message": "அருகிலுள்ள தேடல்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2c9b6552"
   },
   "home.app.searches_note": {
     "message": "நீங்கள் வைக்காத பொருட்களுக்கு",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d4521c69"
   },
   "home.app.act.orders": {
     "message": "{n} புதிய ஆர்டர்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "675b510a"
   },
   "home.app.act.orders_cta": {
     "message": "ஆர்டர்களை ஏற்கவும்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1fc40062"
   },
   "home.app.act.low": {
     "message": "{n} பொருட்கள் குறைவு",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "837e3fec"
   },
   "home.app.act.low_cta": {
     "message": "இப்போதே வாங்குங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bb595184"
   },
   "home.app.act.expiring": {
     "message": "{n} விரைவில் காலாவதியாகும்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5be326eb"
   },
   "home.app.act.expiring_cta": {
     "message": "ஆஃபர் உருவாக்குங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c6af210c"
   },
   "home.app.act.searches": {
     "message": "{n} தேடல்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "92a1e12c"
   },
   "home.app.act.searches_cta": {
     "message": "தேவையைப் பாருங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "44537575"
   },
   "home.app.chart": {
     "message": "மணிநேர விற்பனை",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "162aeab3"
   },
   "home.app.today": {
     "message": "இன்று",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "24345a14"
   },
   "home.app.top": {
     "message": "அதிகம் விற்றவை",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "79ec189d"
   },
   "home.insights.eyebrow": {
     "message": "தேவை நுண்ணறிவு",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "750bb313"
   },
   "home.insights.title": {
     "message": "அருகில் இருப்பவர்கள் என்ன தேடுகிறார்கள் என்று பாருங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9d1c4606"
   },
   "home.insights.intro": {
     "message": "அருகில் இருப்பவர்கள் எந்தப் பொருட்களைத் தேடி கிடைக்காமல் போகிறார்கள், எது தீரப்போகிறது, எந்த வழக்கமான வாடிக்கையாளர்கள் மீண்டும் வரவில்லை என்பதை தேவை நுண்ணறிவு கடைக்குச் சொல்கிறது.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8f9a9203"
   },
   "home.insights.kind.1.title": {
     "message": "அருகில் தேவைப்படுபவை",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4e90f3e0"
   },
   "home.insights.kind.1.body": {
     "message": "உங்கள் கடை அருகில் மக்கள் தேடும், நீங்கள் இன்னும் வைக்காத பொருட்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "18d9f53a"
   },
   "home.insights.kind.2.title": {
     "message": "தவறிய விற்பனை",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7e65c327"
   },
   "home.insights.kind.2.body": {
     "message": "அருகில் இருப்பவர்கள் தேடியபோது தீர்ந்துபோயிருந்த பொருட்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9cf19971"
   },
   "home.insights.kind.3.title": {
     "message": "வேகமாக விற்பவை",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5cbd2b13"
   },
   "home.insights.kind.3.body": {
     "message": "வழக்கத்தை விட வேகமாக விற்கும் பொருட்கள், சரியான நேரத்தில் வாங்கி வைக்கலாம்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a437058d"
   },
   "home.insights.kind.4.title": {
     "message": "விலகிப் போகும் வழக்கமான வாடிக்கையாளர்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "55ae88e6"
   },
   "home.insights.kind.4.body": {
     "message": "சிறிது காலமாக மீண்டும் வராத வழக்கமான வாடிக்கையாளர்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "09c1326e"
   },
   "home.insights.period": {
     "message": "கடந்த 7 நாட்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "df833fe8"
   },
   "home.insights.missed_line": {
     "message": "{days} நாட்களாக ஸ்டாக் இல்லை; அருகில் {count} தேடல்கள் இதற்குப் பொருந்தின.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1253e1c2"
   },
   "home.insights.add": {
     "message": "பொருளைச் சேர்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7c37958a"
   },
   "home.insights.restock": {
     "message": "மீண்டும் வாங்கு",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3ccf7127"
   },
   "home.shoppers.eyebrow": {
     "message": "வாடிக்கையாளர்களுக்கு",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b88dfd14"
   },
   "home.shoppers.title": {
     "message": "ஏதாவது வேண்டுமா? அருகிலேயே தேடுங்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d1036fc0"
   },
   "home.shoppers.intro": {
     "message": "உங்களைச் சுற்றி எந்தக் கடையில் இருக்கிறது, என்ன விலை, கடை ஸ்டாக்கை எவ்வளவு சமீபத்தில் புதுப்பித்தது என்று பாருங்கள். பிறகு வீட்டை விட்டுக் கிளம்பும் முன்பே புக் செய்யுங்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c2ee387e"
   },
   "home.shoppers.1": {
     "message": "உங்களுக்குத் தேவையானதைத் தேடுங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7d5bd0fc"
   },
   "home.shoppers.2": {
     "message": "அருகில் எந்தக் கடைகளில் இருக்கிறது என்று பாருங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5177cb50"
   },
   "home.shoppers.3": {
     "message": "புக் செய்யுங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b016aa80"
   },
   "home.shoppers.4": {
     "message": "எடுத்துச் செல்லுங்கள் அல்லது டெலிவரி பெறுங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "61974e58"
   },
   "home.shoppers.body.1": {
     "message": "மளிகை, மருந்து, ஸ்டேஷனரி, சார்ஜர், குழாய் வாஷர்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "15fa5ef8"
   },
   "home.shoppers.body.2": {
     "message": "விலை, தூரம், ஸ்டாக் எவ்வளவு புதியது.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b7f275ee"
   },
   "home.shoppers.body.3": {
     "message": "கடை உங்களுக்காகத் தனியே எடுத்து வைக்கும்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "19cd1f93"
   },
   "home.shoppers.body.4": {
     "message": "வழக்கம்போல கடைக்குப் பணம் கொடுங்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f5248dcf"
   },
   "home.shoppers.cta": {
     "message": "வாடிக்கையாளர் ஆப்பைத் திறக்கவும்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ebb9af61"
   },
   "home.shoppers.avail": {
     "message": "உங்கள் அருகிலுள்ள {count} கடைகளில் கிடைக்கும்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8a80f660"
   },
   "home.shoppers.book": {
     "message": "புக் செய்யுங்கள் · கடையில் செலுத்துங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e4fb86ee"
   },
   "home.shoppers.ready": {
     "message": "ஆர்டர் {number} தயார்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fd16fe5b"
   },
   "home.shoppers.code": {
     "message": "ஆர்டர் குறியீடு",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bc91748b"
   },
   "home.shoppers.show": {
     "message": "{shop} இல் இதைக் காட்டுங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "94d28e88"
   },
   "home.shoppers.tl.booked": {
     "message": "புக் ஆனது · {time}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "210c37a3"
   },
   "home.shoppers.tl.accepted": {
     "message": "ஏற்கப்பட்டது · {time}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "71950c1f"
   },
   "home.shoppers.tl.ready": {
     "message": "தயார் · {time}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "75e8b56e"
   },
   "home.shoppers.tl.collected": {
     "message": "எடுத்துக்கொண்டார்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "924a70ff"
   },
   "home.steps.eyebrow": {
     "message": "எப்படி வேலை செய்கிறது",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1dd6a17c"
   },
   "home.steps.title": {
     "message": "மூன்று படிகளில் தொடங்குங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a1af60ea"
   },
   "home.steps.1.title": {
     "message": "உங்கள் கடையை உருவாக்குங்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f5508ea0"
   },
   "home.steps.1.body": {
     "message": "போன் நம்பரால் பதிவு செய்து கடை விவரங்களைச் சேர்க்கவும்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "872900c2"
   },
   "home.steps.2.title": {
     "message": "உங்கள் ஸ்டாக்கைச் சேர்க்கவும்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "05a92e78"
   },
   "home.steps.2.body": {
     "message": "சில பொருட்களுடன் தொடங்குங்கள். மீதியை விற்கும்போது சேர்த்துக்கொள்ளுங்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fe0d0fdd"
   },
   "home.steps.3.title": {
     "message": "வாடிக்கையாளர்கள் வரத் தொடங்குவார்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6014332c"
   },
   "home.steps.3.body": {
     "message": "அருகில் இருப்பவர்கள் உங்கள் ஸ்டாக்கைத் தேடி புக் செய்கிறார்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "38f7c00b"
   },
   "home.steps.shop_name": {
     "message": "கடையின் பெயர்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6a5cc02e"
   },
   "home.steps.area": {
     "message": "பகுதி",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2745deba"
   },
   "home.steps.add_item": {
     "message": "பொருளைச் சேர்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5bcf4db4"
   },
   "home.steps.new_order": {
     "message": "அருகில் புதிய ஆர்டர்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0fd71c2f"
   },
   "home.types.eyebrow": {
     "message": "யாருக்காக",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0c5ba882"
   },
   "home.types.title": {
     "message": "எல்லா வகை கடைகளுக்கும்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "76a8ff39"
   },
   "home.types.intro": {
     "message": "மக்களின் வீடுகளுக்கு அருகிலுள்ள கடையிலிருந்து பொருட்கள் விற்றால், TodayZ உங்களுக்காகவே உருவாக்கப்பட்டது.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "38933281"
   },
   "home.types.strip": {
     "message": "எல்லா வகை கடைகளுக்கும் உருவாக்கப்பட்டது",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f8180338"
   },
   "home.types.1": {
     "message": "பொது மற்றும் மளிகை",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "37823308"
   },
   "home.types.2": {
     "message": "மருந்துக்கடை",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a9a24cd1"
   },
   "home.types.3": {
     "message": "அழகுசாதனம்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9555b604"
   },
   "home.types.4": {
     "message": "ஸ்டேஷனரி",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f6211e63"
   },
   "home.types.5": {
     "message": "எலக்ட்ரானிக்ஸ்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "89f1ebf5"
   },
   "home.types.6": {
     "message": "ஹார்டுவேர்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b76ab659"
   },
   "home.types.desc.1": {
     "message": "அன்றாடத் தேவைகள், மளிகைப் பொருட்கள், பாக்கெட் உணவு.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3a4cd0b8"
   },
   "home.types.desc.2": {
     "message": "மருந்து, ஆரோக்கியம், குழந்தை பராமரிப்பு.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b525a650"
   },
   "home.types.desc.3": {
     "message": "அழகு, சரும பராமரிப்பு, தனிப்பட்ட பராமரிப்பு.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b5574763"
   },
   "home.types.desc.4": {
     "message": "பள்ளி, அலுவலகம், ஓவியப் பொருட்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f4dce562"
   },
   "home.types.desc.5": {
     "message": "சார்ஜர், பல்பு, கேபிள், சிறிய சாதனங்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7a6e702f"
   },
   "home.types.desc.6": {
     "message": "கருவிகள், பொருத்திகள், பெயிண்ட், பிளம்பிங்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5e7cad99"
   },
   "home.testimonials.title": {
     "message": "கடை உரிமையாளர்கள் என்ன சொல்கிறார்கள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a9b676a9"
   },
   "home.faq.eyebrow": {
     "message": "கேள்விகள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "03688ba6"
   },
   "home.faq.title": {
     "message": "கடைக்காரர்கள் கேட்கும் கேள்விகள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "18e2d52e"
   },
   "home.faq.intro": {
     "message": "வேறு ஏதாவது தெரிய வேண்டுமா? கீழே உங்கள் விவரங்களை விடுங்கள், TodayZ குழு உங்களைத் தொடர்பு கொள்ளும்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a6c2f090"
   },
   "home.faq.1.q": {
     "message": "இதற்கு எவ்வளவு செலவு?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ed90bcad"
   },
   "home.faq.1.a": {
     "message": "தற்போது TodayZ கடைகளுக்கு இலவசம். சமீபத்திய தகவலுக்கு விலை பக்கத்தைப் பாருங்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9f35ab56"
   },
   "home.faq.2.q": {
     "message": "எனக்கு போன் நன்றாகப் பயன்படுத்தத் தெரிய வேண்டுமா?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "bb61bdaa"
   },
   "home.faq.2.a": {
     "message": "இல்லை. பிசினஸ் ஆப் அன்றாடக் கடை வேலைக்காக உருவாக்கப்பட்டது, சில பொருட்களுடன் தொடங்கலாம்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "90ac0fa2"
   },
   "home.faq.3.q": {
     "message": "வாடிக்கையாளர்களுக்குப் பொருட்கள் எப்படிக் கிடைக்கின்றன?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0c54ae3e"
   },
   "home.faq.3.a": {
     "message": "அவர்கள் TodayZ இல் பொருளை புக் செய்து, உங்கள் கடையிலிருந்து எடுத்துச் செல்கிறார்கள் அல்லது டெலிவரி கேட்கிறார்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b722f805"
   },
   "home.faq.4.q": {
     "message": "எந்தக் கடைகள் சேரலாம்?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c5b54c7f"
   },
   "home.faq.4.a": {
     "message": "மளிகை முதல் ஹார்டுவேர் வரை, பொருட்களை விற்கும் எந்தத் தெருக்கடையும்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "de090547"
   },
   "home.types.pause": {
     "message": "நகரும் பட்டியலை நிறுத்து",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "8cd44034"
   }
 }

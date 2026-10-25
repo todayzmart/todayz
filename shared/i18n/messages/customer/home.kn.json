@@ -1,0 +1,252 @@
+{
+  "home.search.label": {
+    "message": "ವಸ್ತುಗಳು ಅಥವಾ ಅಂಗಡಿಗಳನ್ನು ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "c21e85c0"
+  },
+  "home.search.placeholder": {
+    "message": "ಹಿಟ್ಟು, ಹಾಲು, ಅಂಗಡಿಯ ಹೆಸರು ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "bfbe9be2"
+  },
+  "home.noPlace.title": {
+    "message": "ನಿಮ್ಮ ಸ್ಥಳ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "bd10f419"
+  },
+  "home.noPlace.body": {
+    "message": "ನಿಮ್ಮ ಹತ್ತಿರದ ಅಂಗಡಿಗಳು ಮತ್ತು ವಸ್ತುಗಳನ್ನು ನೋಡಲು ನೀವು ಎಲ್ಲಿದ್ದೀರಿ ಎಂದು ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "e58104a8"
+  },
+  "home.placeError.title": {
+    "message": "ಆ PIN ಕೋಡ್ ನಮಗೆ ಸಿಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "479bb57f"
+  },
+  "home.placeError.body": {
+    "message": "ನಿಮ್ಮ ಕನೆಕ್ಷನ್ ಪರಿಶೀಲಿಸಿ ಅಥವಾ ನಿಮ್ಮ ಸ್ಥಳವನ್ನು ಮತ್ತೆ ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "41d12e91"
+  },
+  "home.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "home.stats.shops": {
+    "message": "ಹತ್ತಿರದ ಅಂಗಡಿಗಳು",
+    "review": "reviewed",
+    "enHash": "aaae98a5"
+  },
+  "home.stats.open": {
+    "message": "ಈಗ ತೆರೆದಿವೆ",
+    "review": "reviewed",
+    "enHash": "d7a05e65"
+  },
+  "home.stats.products": {
+    "message": "ವಸ್ತುಗಳು",
+    "review": "reviewed",
+    "enHash": "fe0a091f"
+  },
+  "home.radius.label": {
+    "message": "ಹುಡುಕುವ ದೂರ",
+    "review": "reviewed",
+    "enHash": "8df84e7a"
+  },
+  "home.radius.km": {
+    "message": "{km} km",
+    "review": "reviewed",
+    "enHash": "5d1ec3cd"
+  },
+  "home.categories.label": {
+    "message": "ವರ್ಗಗಳು",
+    "review": "reviewed",
+    "enHash": "6ccb6007"
+  },
+  "home.category.active": {
+    "message": "{name} ತೋರಿಸಲಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "12ce49c8"
+  },
+  "home.category.clear": {
+    "message": "ಎಲ್ಲವನ್ನೂ ತೋರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "50a279de"
+  },
+  "home.shops.title": {
+    "message": "ನಿಮ್ಮ ಹತ್ತಿರದ ಅಂಗಡಿಗಳು",
+    "review": "reviewed",
+    "enHash": "75865004"
+  },
+  "home.shops.error": {
+    "message": "ಅಂಗಡಿಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "643ecdaf"
+  },
+  "home.shops.more": {
+    "message": "ಇನ್ನಷ್ಟು ಅಂಗಡಿಗಳನ್ನು ತೋರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "c1c91491"
+  },
+  "home.empty.title": {
+    "message": "ಇಲ್ಲಿ ಇನ್ನೂ ಯಾವುದೇ ಅಂಗಡಿ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "75cb3ec4"
+  },
+  "home.empty.body": {
+    "message": "ಈ ದೂರದೊಳಗಿನ ಯಾವ ಅಂಗಡಿಯೂ ಇನ್ನೂ TodayZ ನಲ್ಲಿಲ್ಲ. ಹೆಚ್ಚು ದೂರದಲ್ಲಿ ಹುಡುಕಿ ನೋಡಿ.",
+    "review": "reviewed",
+    "enHash": "e6e65a38"
+  },
+  "home.empty.widen": {
+    "message": "{km} km ಒಳಗೆ ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "45f8f29c"
+  },
+  "home.map.label": {
+    "message": "ನಕ್ಷೆಯಲ್ಲಿ ಅಂಗಡಿಗಳು",
+    "review": "reviewed",
+    "enHash": "54173ebb"
+  },
+  "home.map.mapLabel": {
+    "message": "ನಕ್ಷೆ: {km} km ಒಳಗೆ {shops} ಅಂಗಡಿಗಳು, {open} ಈಗ ತೆರೆದಿವೆ",
+    "review": "reviewed",
+    "enHash": "81b48ba7"
+  },
+  "home.map.you": {
+    "message": "ನೀವು ಇಲ್ಲಿದ್ದೀರಿ",
+    "review": "reviewed",
+    "enHash": "b900c1e3"
+  },
+  "home.map.legend.open": {
+    "message": "ತೆರೆದಿದೆ",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "home.map.legend.closed": {
+    "message": "ಮುಚ್ಚಿದೆ",
+    "review": "reviewed",
+    "enHash": "88d86b77"
+  },
+  "home.map.legend.you": {
+    "message": "ನೀವು",
+    "review": "reviewed",
+    "enHash": "905cb326"
+  },
+  "home.map.live": {
+    "message": "ನಿಮ್ಮ ಹತ್ತಿರ, ಈಗ",
+    "review": "reviewed",
+    "enHash": "49cd82c5"
+  },
+  "home.map.expand": {
+    "message": "ಪೂರ್ತಿ ನಕ್ಷೆ ತೆರೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "a4b03af4"
+  },
+  "home.map.pinOpen": {
+    "message": "{name}, ತೆರೆದಿದೆ",
+    "review": "reviewed",
+    "enHash": "39821bc8"
+  },
+  "home.map.pinClosed": {
+    "message": "{name}, ಮುಚ್ಚಿದೆ",
+    "review": "reviewed",
+    "enHash": "ce238e4d"
+  },
+  "home.map.cluster": {
+    "message": "{count} ಅಂಗಡಿಗಳು, ಜೂಮ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "7a30704b"
+  },
+  "home.map.shopFallback": {
+    "message": "ಅಂಗಡಿ",
+    "review": "reviewed",
+    "enHash": "55de8870"
+  },
+  "map.title": {
+    "message": "ನಿಮ್ಮ ಹತ್ತಿರದ ಅಂಗಡಿಗಳು",
+    "review": "reviewed",
+    "enHash": "75865004"
+  },
+  "map.back": {
+    "message": "ಹಿಂದೆ",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "map.view.label": {
+    "message": "ನೋಟ",
+    "review": "reviewed",
+    "enHash": "69bd4ef9"
+  },
+  "map.view.map": {
+    "message": "ನಕ್ಷೆ",
+    "review": "reviewed",
+    "enHash": "ab478f3e"
+  },
+  "map.view.list": {
+    "message": "ಪಟ್ಟಿ",
+    "review": "reviewed",
+    "enHash": "a1fffaaa"
+  },
+  "map.truncated": {
+    "message": "ನಕ್ಷೆಯಲ್ಲಿ ಹತ್ತಿರದ {count} ಅಂಗಡಿಗಳು ಮಾತ್ರ ಕಾಣುತ್ತವೆ. ಎಲ್ಲವನ್ನೂ ನೋಡಲು ಪಟ್ಟಿ ಬಳಸಿ.",
+    "review": "reviewed",
+    "enHash": "c562dc9d"
+  },
+  "map.sheet.view": {
+    "message": "ಅಂಗಡಿ ನೋಡಿ",
+    "review": "reviewed",
+    "enHash": "c55061ee"
+  },
+  "map.sheet.directions": {
+    "message": "ದಾರಿ",
+    "review": "reviewed",
+    "enHash": "f814a9fb"
+  },
+  "map.sheet.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "map.sheet.error": {
+    "message": "ಈ ಅಂಗಡಿಯನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "8b316a74"
+  },
+  "category.notFound.title": {
+    "message": "ಆ ವರ್ಗ ನಮಗೆ ಸಿಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "822162f5"
+  },
+  "category.notFound.body": {
+    "message": "ಅದರ ಹೆಸರು ಬದಲಾಗಿರಬಹುದು. ಹೋಮ್ ಸ್ಕ್ರೀನ್‌ನಲ್ಲಿ ಒಂದು ವರ್ಗ ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "f8fc7661"
+  },
+  "category.shops": {
+    "message": "{name} ಅಂಗಡಿಗಳು",
+    "review": "reviewed",
+    "enHash": "0d95b2ba"
+  },
+  "category.empty.title": {
+    "message": "{km} km ಒಳಗೆ {name} ಅಂಗಡಿಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "cba642b6"
+  },
+  "category.empty.body": {
+    "message": "ಹೆಚ್ಚು ದೂರದಲ್ಲಿ ಹುಡುಕಿ ನೋಡಿ.",
+    "review": "reviewed",
+    "enHash": "42ec77ba"
+  },
+  "category.home": {
+    "message": "ಹೋಮ್‌ಗೆ ಹಿಂತಿರುಗಿ",
+    "review": "reviewed",
+    "enHash": "34ac37f5"
+  },
+  "home.category.page": {
+    "message": "ವರ್ಗ ತೆರೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "d189c7fd"
+  }
+}

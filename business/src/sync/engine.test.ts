@@ -101,6 +101,7 @@ function fakeServer(): Server {
     createBillClaim: () => Promise.reject(new Error('unused')),
     getBillClaim: () => Promise.reject(new Error('unused')),
     verifyCounterCode: () => Promise.reject(new Error('unused')),
+    listSales: () => Promise.reject(new Error('unused')),
   };
   return s;
 }

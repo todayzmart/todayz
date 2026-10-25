@@ -1,0 +1,112 @@
+{
+  "product.add": {
+    "message": "ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "product.remove": {
+    "message": "ಒಂದು ಕಡಿಮೆ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "afbcf5f3"
+  },
+  "product.addOne": {
+    "message": "ಒಂದು ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "bb49f016"
+  },
+  "product.max": {
+    "message": "{max} ಮಾತ್ರ ಸ್ಟಾಕ್‌ನಲ್ಲಿವೆ",
+    "review": "reviewed",
+    "enHash": "adffd51d"
+  },
+  "product.off": {
+    "message": "{pct}% ಕಡಿಮೆ",
+    "review": "reviewed",
+    "enHash": "76fb0776"
+  },
+  "product.unit.pc": {
+    "message": "{size} ಪೀಸ್",
+    "review": "reviewed",
+    "enHash": "ae6eb2b9"
+  },
+  "product.unit.pack": {
+    "message": "{size} ಪ್ಯಾಕ್",
+    "review": "reviewed",
+    "enHash": "8423135e"
+  },
+  "product.stock.in": {
+    "message": "ಸ್ಟಾಕ್‌ನಲ್ಲಿದೆ",
+    "review": "reviewed",
+    "enHash": "3f1356ad"
+  },
+  "product.stock.out": {
+    "message": "ಸ್ಟಾಕ್ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "product.confirmed": {
+    "message": "{time} ಖಚಿತಪಡಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "7d1ac5a7"
+  },
+  "product.confirmedNow": {
+    "message": "ಈಗಷ್ಟೇ ಖಚಿತಪಡಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "d966a28f"
+  },
+  "product.back": {
+    "message": "{shop} ಗೆ ಹಿಂತಿರುಗಿ",
+    "review": "reviewed",
+    "enHash": "841d2259"
+  },
+  "product.sold.by": {
+    "message": "ಮಾರಾಟಗಾರರು",
+    "review": "reviewed",
+    "enHash": "12c71f0a"
+  },
+  "product.addToCart": {
+    "message": "ಕಾರ್ಟ್‌ಗೆ ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "f8893b91"
+  },
+  "product.added": {
+    "message": "{name} ನಿಮ್ಮ ಕಾರ್ಟ್‌ಗೆ ಸೇರಿತು",
+    "review": "reviewed",
+    "enHash": "d89cc3a3"
+  },
+  "product.share": {
+    "message": "ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "2f84eea5"
+  },
+  "product.share.copied": {
+    "message": "ಲಿಂಕ್ ಕಾಪಿ ಆಯಿತು",
+    "review": "reviewed",
+    "enHash": "c2e98476"
+  },
+  "product.share.failed": {
+    "message": "ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "7a456d6f"
+  },
+  "product.others.title": {
+    "message": "ಹತ್ತಿರದ ಇತರ ಅಂಗಡಿಗಳು",
+    "review": "reviewed",
+    "enHash": "7f93304b"
+  },
+  "product.gone.title": {
+    "message": "ಈ ವಸ್ತು ನಮಗೆ ಸಿಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "88e0e3ac"
+  },
+  "product.gone.body": {
+    "message": "ಅಂಗಡಿ ಇದನ್ನು ತೆಗೆದಿರಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "65f93253"
+  },
+  "product.gone.action": {
+    "message": "ಅಂಗಡಿಗೆ ಹೋಗಿ",
+    "review": "reviewed",
+    "enHash": "349df3f4"
+  }
+}

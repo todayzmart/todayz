@@ -10,6 +10,18 @@ import (
 	"github.com/todayz/backend/internal/platform/ids"
 )
 
+func TestTypedText(t *testing.T) {
+	cases := map[string]string{
+		"amul \t butter\n":     "amul butter",
+		"ep\u008d\u0082\x00Φ;": "ep Φ;", // C0 and C1 controls (a NUL among them) are spaces
+		"ab\xffcd":             "ab cd", // invalid UTF-8 is a space
+		"\x00\t\x00":           "",
+	}
+	for in, want := range cases {
+		require.Equal(t, want, typedText(in), "%q", in)
+	}
+}
+
 func TestNormalize(t *testing.T) {
 	cases := map[string]string{
 		"  Amul   Butter 100gm ":   "amul butter 100 g",

@@ -1,0 +1,252 @@
+{
+  "home.search.label": {
+    "message": "వస్తువులు లేదా దుకాణాలు వెతకండి",
+    "review": "reviewed",
+    "enHash": "c21e85c0"
+  },
+  "home.search.placeholder": {
+    "message": "ఆటా, పాలు, దుకాణం పేరు వెతకండి",
+    "review": "reviewed",
+    "enHash": "bfbe9be2"
+  },
+  "home.noPlace.title": {
+    "message": "మీ లొకేషన్ సెట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "bd10f419"
+  },
+  "home.noPlace.body": {
+    "message": "మీ దగ్గరి దుకాణాలు, వస్తువులు చూడడానికి మీరు ఎక్కడ ఉన్నారో ఎంచుకోండి.",
+    "review": "reviewed",
+    "enHash": "e58104a8"
+  },
+  "home.placeError.title": {
+    "message": "ఆ PIN కోడ్ దొరకలేదు",
+    "review": "reviewed",
+    "enHash": "479bb57f"
+  },
+  "home.placeError.body": {
+    "message": "మీ కనెక్షన్ చెక్ చేయండి లేదా మీ లొకేషన్ మళ్లీ ఎంచుకోండి.",
+    "review": "reviewed",
+    "enHash": "41d12e91"
+  },
+  "home.retry": {
+    "message": "మళ్లీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "home.stats.shops": {
+    "message": "దగ్గరి దుకాణాలు",
+    "review": "reviewed",
+    "enHash": "aaae98a5"
+  },
+  "home.stats.open": {
+    "message": "ఇప్పుడు తెరిచి ఉన్నవి",
+    "review": "reviewed",
+    "enHash": "d7a05e65"
+  },
+  "home.stats.products": {
+    "message": "వస్తువులు",
+    "review": "reviewed",
+    "enHash": "fe0a091f"
+  },
+  "home.radius.label": {
+    "message": "వెతికే దూరం",
+    "review": "reviewed",
+    "enHash": "8df84e7a"
+  },
+  "home.radius.km": {
+    "message": "{km} km",
+    "review": "reviewed",
+    "enHash": "5d1ec3cd"
+  },
+  "home.categories.label": {
+    "message": "విభాగాలు",
+    "review": "reviewed",
+    "enHash": "6ccb6007"
+  },
+  "home.category.active": {
+    "message": "{name} చూపిస్తున్నాం",
+    "review": "reviewed",
+    "enHash": "12ce49c8"
+  },
+  "home.category.clear": {
+    "message": "అన్నీ చూపించండి",
+    "review": "reviewed",
+    "enHash": "50a279de"
+  },
+  "home.shops.title": {
+    "message": "మీ దగ్గరి దుకాణాలు",
+    "review": "reviewed",
+    "enHash": "75865004"
+  },
+  "home.shops.error": {
+    "message": "దుకాణాలు లోడ్ కాలేదు.",
+    "review": "reviewed",
+    "enHash": "643ecdaf"
+  },
+  "home.shops.more": {
+    "message": "ఇంకా దుకాణాలు చూపించండి",
+    "review": "reviewed",
+    "enHash": "c1c91491"
+  },
+  "home.empty.title": {
+    "message": "ఇక్కడ ఇంకా దుకాణాలు లేవు",
+    "review": "reviewed",
+    "enHash": "75cb3ec4"
+  },
+  "home.empty.body": {
+    "message": "ఈ దూరంలో ఏ దుకాణమూ ఇంకా TodayZ లో లేదు. ఎక్కువ దూరంలో వెతకండి.",
+    "review": "reviewed",
+    "enHash": "e6e65a38"
+  },
+  "home.empty.widen": {
+    "message": "{km} km లోపల వెతకండి",
+    "review": "reviewed",
+    "enHash": "45f8f29c"
+  },
+  "home.map.label": {
+    "message": "మ్యాప్‌లో దుకాణాలు",
+    "review": "reviewed",
+    "enHash": "54173ebb"
+  },
+  "home.map.mapLabel": {
+    "message": "మ్యాప్: {km} km లోపల {shops} దుకాణాలు, ఇప్పుడు {open} తెరిచి ఉన్నాయి",
+    "review": "reviewed",
+    "enHash": "81b48ba7"
+  },
+  "home.map.you": {
+    "message": "మీరు ఇక్కడ ఉన్నారు",
+    "review": "reviewed",
+    "enHash": "b900c1e3"
+  },
+  "home.map.legend.open": {
+    "message": "తెరిచి ఉంది",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "home.map.legend.closed": {
+    "message": "మూసి ఉంది",
+    "review": "reviewed",
+    "enHash": "88d86b77"
+  },
+  "home.map.legend.you": {
+    "message": "మీరు",
+    "review": "reviewed",
+    "enHash": "905cb326"
+  },
+  "home.map.live": {
+    "message": "మీ దగ్గర, ఇప్పుడు",
+    "review": "reviewed",
+    "enHash": "49cd82c5"
+  },
+  "home.map.expand": {
+    "message": "పూర్తి మ్యాప్ తెరవండి",
+    "review": "reviewed",
+    "enHash": "a4b03af4"
+  },
+  "home.map.pinOpen": {
+    "message": "{name}, తెరిచి ఉంది",
+    "review": "reviewed",
+    "enHash": "39821bc8"
+  },
+  "home.map.pinClosed": {
+    "message": "{name}, మూసి ఉంది",
+    "review": "reviewed",
+    "enHash": "ce238e4d"
+  },
+  "home.map.cluster": {
+    "message": "{count} దుకాణాలు, జూమ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "7a30704b"
+  },
+  "home.map.shopFallback": {
+    "message": "దుకాణం",
+    "review": "reviewed",
+    "enHash": "55de8870"
+  },
+  "map.title": {
+    "message": "మీ దగ్గరి దుకాణాలు",
+    "review": "reviewed",
+    "enHash": "75865004"
+  },
+  "map.back": {
+    "message": "వెనక్కి",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "map.view.label": {
+    "message": "చూపు",
+    "review": "reviewed",
+    "enHash": "69bd4ef9"
+  },
+  "map.view.map": {
+    "message": "మ్యాప్",
+    "review": "reviewed",
+    "enHash": "ab478f3e"
+  },
+  "map.view.list": {
+    "message": "జాబితా",
+    "review": "reviewed",
+    "enHash": "a1fffaaa"
+  },
+  "map.truncated": {
+    "message": "మ్యాప్ దగ్గరి {count} దుకాణాలు మాత్రమే చూపిస్తుంది. అన్నీ చూడడానికి జాబితా వాడండి.",
+    "review": "reviewed",
+    "enHash": "c562dc9d"
+  },
+  "map.sheet.view": {
+    "message": "దుకాణం చూడండి",
+    "review": "reviewed",
+    "enHash": "c55061ee"
+  },
+  "map.sheet.directions": {
+    "message": "దారి",
+    "review": "reviewed",
+    "enHash": "f814a9fb"
+  },
+  "map.sheet.close": {
+    "message": "మూసివేయండి",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "map.sheet.error": {
+    "message": "ఈ దుకాణం లోడ్ కాలేదు.",
+    "review": "reviewed",
+    "enHash": "8b316a74"
+  },
+  "category.notFound.title": {
+    "message": "ఆ విభాగం దొరకలేదు",
+    "review": "reviewed",
+    "enHash": "822162f5"
+  },
+  "category.notFound.body": {
+    "message": "దాని పేరు మారి ఉండవచ్చు. హోమ్ స్క్రీన్‌లో ఒక విభాగం ఎంచుకోండి.",
+    "review": "reviewed",
+    "enHash": "f8fc7661"
+  },
+  "category.shops": {
+    "message": "{name} లో దుకాణాలు",
+    "review": "reviewed",
+    "enHash": "0d95b2ba"
+  },
+  "category.empty.title": {
+    "message": "{km} km లోపల {name} లో దుకాణాలు లేవు",
+    "review": "reviewed",
+    "enHash": "cba642b6"
+  },
+  "category.empty.body": {
+    "message": "ఎక్కువ దూరం ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "42ec77ba"
+  },
+  "category.home": {
+    "message": "హోమ్‌కి వెనక్కి",
+    "review": "reviewed",
+    "enHash": "34ac37f5"
+  },
+  "home.category.page": {
+    "message": "విభాగం తెరవండి",
+    "review": "reviewed",
+    "enHash": "d189c7fd"
+  }
+}

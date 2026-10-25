@@ -18,9 +18,9 @@ import { isPreviewMode } from '../lib/env.ts';
 describe('site messages', () => {
   const en = englishMessages();
 
-  it('flags every non-English locale as a machine draft and English as reviewed', () => {
+  it('treats English and every approved locale as reviewed (W4-05: the founder approved hi, kn, te, ta)', () => {
     expect(isMachineDraft('en')).toBe(false);
-    for (const l of OTHER_LOCALES) expect(isMachineDraft(l)).toBe(true);
+    for (const l of OTHER_LOCALES) expect(isMachineDraft(l)).toBe(false);
   });
 
   /** The English keys of one file, by namespace (each English file is its namespace). */
@@ -87,9 +87,9 @@ describe('site messages', () => {
     expect(isPreviewMode('e2e')).toBe(true);
     for (const mode of ['production', 'staging', 'preview', '', undefined]) expect(isPreviewMode(mode)).toBe(false);
     expect(siteLocales('e2e')).toEqual(['en', 'hi', 'kn', 'te', 'ta']);
-    // Every translation is a machine draft today, so production ships English alone.
-    expect(siteLocales('production')).toEqual(['en']);
-    expect(siteLocales('staging')).toEqual(['en']);
+    // Every locale is reviewed since W4-05, so production ships them all.
+    expect(siteLocales('production')).toEqual(['en', 'hi', 'kn', 'te', 'ta']);
+    expect(siteLocales('staging')).toEqual(['en', 'hi', 'kn', 'te', 'ta']);
   });
 
   it('never uses emoji or raw hex colours in copy', () => {

@@ -1,0 +1,82 @@
+{
+  "shell.appName": {
+    "message": "TodayZ",
+    "review": "reviewed",
+    "enHash": "34b58f9d"
+  },
+  "shell.skipToContent": {
+    "message": "நேரடியாக முக்கியப் பகுதிக்குச் செல்",
+    "review": "reviewed",
+    "enHash": "0a4470d6"
+  },
+  "shell.nav.label": {
+    "message": "முதன்மை",
+    "review": "reviewed",
+    "enHash": "62bce942"
+  },
+  "shell.nav.home": {
+    "message": "முகப்பு",
+    "review": "reviewed",
+    "enHash": "70f8bb9a"
+  },
+  "shell.nav.search": {
+    "message": "தேடு",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "shell.nav.orders": {
+    "message": "ஆர்டர்கள்",
+    "review": "reviewed",
+    "enHash": "cded0933"
+  },
+  "shell.nav.wallet": {
+    "message": "வாலெட்",
+    "review": "reviewed",
+    "enHash": "b60862f4"
+  },
+  "shell.nav.account": {
+    "message": "கணக்கு",
+    "review": "reviewed",
+    "enHash": "85dfa32c"
+  },
+  "shell.hero.title": {
+    "message": "அருகில் எல்லாம், இன்றே.",
+    "review": "reviewed",
+    "enHash": "1aaf493f"
+  },
+  "shell.hero.sub": {
+    "message": "அருகில் உள்ள கடைகளில் ஸ்டாக்கில் என்ன இருக்கிறது என்று பாருங்கள், புக் செய்யுங்கள், பிக்அப் செய்யுங்கள் அல்லது டெலிவரி பெறுங்கள்.",
+    "review": "reviewed",
+    "enHash": "a5ee6a96"
+  },
+  "shell.soon.tag": {
+    "message": "விரைவில்",
+    "review": "reviewed",
+    "enHash": "e4115be2"
+  },
+  "shell.soon.title": {
+    "message": "{section} விரைவில் வருகிறது",
+    "review": "reviewed",
+    "enHash": "6c957e46"
+  },
+  "shell.soon.body": {
+    "message": "ஆப்பின் இந்தப் பகுதியை உருவாக்குகிறோம். உங்கள் அருகில் உள்ள கடைகள் இப்போது தங்கள் ஸ்டாக்கைச் சேர்க்கின்றன.",
+    "review": "reviewed",
+    "enHash": "b08be591"
+  },
+  "shell.notFound.title": {
+    "message": "பக்கம் கிடைக்கவில்லை",
+    "review": "reviewed",
+    "enHash": "bc3023b3"
+  },
+  "shell.notFound.body": {
+    "message": "இந்த லிங்க் இன்னும் எங்கும் போகவில்லை.",
+    "review": "reviewed",
+    "enHash": "8c0d72a2"
+  },
+  "shell.notFound.home": {
+    "message": "முகப்புக்குச் செல்",
+    "review": "reviewed",
+    "enHash": "f36ae945"
+  }
+}

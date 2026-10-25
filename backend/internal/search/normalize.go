@@ -43,6 +43,19 @@ var unitAliases = map[string]string{
 	"pack": "pack", "packs": "pack", "pkt": "pack", "packet": "pack",
 }
 
+// typedText is the customer's text as the database sees it: invalid UTF-8
+// and control characters (a NUL, which Postgres refuses in text, among them)
+// become spaces, and runs of space collapse to one.
+func typedText(s string) string {
+	s = strings.Map(func(r rune) rune {
+		if unicode.IsControl(r) {
+			return ' '
+		}
+		return r
+	}, strings.ToValidUTF8(s, " "))
+	return strings.Join(strings.Fields(s), " ")
+}
+
 // Normalize is the query normalisation shared by search, the search log and
 // D-99 matching (01 §11): Unicode NFKC, lower case, Indic digits as ASCII,
 // only letters, combining marks and digits kept (a '.' or ',' between two

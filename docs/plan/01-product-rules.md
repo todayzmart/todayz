@@ -490,6 +490,7 @@ WhatsApp, when enabled, carries the same events as the SMS column; SMS is the fa
 
 - Store the minimum: name (optional), phone, saved addresses, orders. Location is used for search, stored only as a saved address or as coarse search events (an H3 resolution-8 cell) for demand data.
 - Retailers see a customer's name and masked phone (`98•••••521`) for orders. The full phone number is shown to the shop only while the order is `out_for_delivery`.
+- A customer sees the store's contact phone on their own order while it is not in a terminal state (§5.2), never in search, store pages, baskets or asks, and never the owner's or a staff member's own phone (D-220).
 - Demand data shown to retailers or brands is aggregated and never names a person. k ≥ 10 always applies, including coach cards (e.g. "12 people near you searched…").
 - Every coach statement about other people needs k ≥ 10, including benchmarks against other shops (D-71). The B-12 "nearby shops" benchmark card is an analytics card, not a coach statement; it needs k ≥ 5 stores ([05-observability.md](05-observability.md) §4).
 - "Priced above nearby" insights compare a shop only with the median of at least 10 other live verified stores of distinct businesses, and "No shop nearby has it." shows only when at least 10 such stores are in the radius and none lists the product in stock. Neither names or counts a shop (D-71, D-99). Insight rows and their `facts` never contain a customer's phone number; the "Slipping away" list on B-09 shows phones masked as in R-16.2.

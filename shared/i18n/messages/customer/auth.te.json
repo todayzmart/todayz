@@ -1,0 +1,412 @@
+{
+  "app.offline.title": {
+    "message": "మీరు ఆఫ్‌లైన్‌లో ఉన్నారు.",
+    "review": "reviewed",
+    "enHash": "4a2a6452"
+  },
+  "app.offline.body": {
+    "message": "సేవ్ చేసిన పేజీలు ఇంకా తెరుచుకుంటాయి. మీరు మళ్లీ ఆన్‌లైన్‌కి రాగానే అన్నీ అప్‌డేట్ అవుతాయి.",
+    "review": "reviewed",
+    "enHash": "6019fada"
+  },
+  "app.pending.retry": {
+    "message": "మళ్లీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "app.update.message": {
+    "message": "TodayZ కొత్త వెర్షన్ సిద్ధంగా ఉంది.",
+    "review": "reviewed",
+    "enHash": "d7dccfc5"
+  },
+  "app.update.action": {
+    "message": "అప్‌డేట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "fb91e24f"
+  },
+  "app.error.title": {
+    "message": "ఏదో పొరపాటు జరిగింది",
+    "review": "reviewed",
+    "enHash": "8d886c0b"
+  },
+  "app.error.body": {
+    "message": "మళ్లీ ప్రయత్నించండి. ఇలాగే జరుగుతూ ఉంటే, పేజీని రీలోడ్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "f081bc24"
+  },
+  "app.error.retry": {
+    "message": "మళ్లీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "auth.signIn.title": {
+    "message": "సైన్ ఇన్",
+    "review": "reviewed",
+    "enHash": "ada2e9e9"
+  },
+  "auth.signIn.sub": {
+    "message": "మీ మొబైల్ నంబర్ ఇవ్వండి. మేము SMS ద్వారా కోడ్ పంపుతాం.",
+    "review": "reviewed",
+    "enHash": "64b55666"
+  },
+  "auth.phone.label": {
+    "message": "మొబైల్ నంబర్",
+    "review": "reviewed",
+    "enHash": "8e5c12de"
+  },
+  "auth.phone.help": {
+    "message": "మిమ్మల్ని సైన్ ఇన్ చేయడానికి, ఆర్డర్ అప్‌డేట్‌ల కోసం దీన్ని వాడతాం.",
+    "review": "reviewed",
+    "enHash": "c656d92e"
+  },
+  "auth.phone.invalid": {
+    "message": "6, 7, 8 లేదా 9 తో మొదలయ్యే 10 అంకెల మొబైల్ నంబర్ ఇవ్వండి.",
+    "review": "reviewed",
+    "enHash": "6be55a3e"
+  },
+  "auth.code.send": {
+    "message": "కోడ్ పంపండి",
+    "review": "reviewed",
+    "enHash": "313503fa"
+  },
+  "auth.code.sending": {
+    "message": "కోడ్ పంపుతున్నాం",
+    "review": "reviewed",
+    "enHash": "28de53b3"
+  },
+  "auth.code.label": {
+    "message": "6 అంకెల కోడ్ ఇవ్వండి",
+    "review": "reviewed",
+    "enHash": "d148321a"
+  },
+  "auth.code.digit": {
+    "message": "అంకె {position}",
+    "review": "reviewed",
+    "enHash": "1e73e888"
+  },
+  "auth.code.sentTo": {
+    "message": "{phone} కు కోడ్ పంపాం.",
+    "review": "reviewed",
+    "enHash": "c8aa6d25"
+  },
+  "auth.code.verifying": {
+    "message": "కోడ్ చెక్ చేస్తున్నాం",
+    "review": "reviewed",
+    "enHash": "90adc49f"
+  },
+  "auth.code.resend": {
+    "message": "కోడ్ మళ్లీ పంపండి",
+    "review": "reviewed",
+    "enHash": "1d3cb8a9"
+  },
+  "auth.code.resendIn": {
+    "message": "{seconds} s లో మళ్లీ పంపండి",
+    "review": "reviewed",
+    "enHash": "f0589eca"
+  },
+  "auth.code.change": {
+    "message": "నంబర్ మార్చండి",
+    "review": "reviewed",
+    "enHash": "6c3b4080"
+  },
+  "auth.error.wrongCode": {
+    "message": "ఆ కోడ్ సరైనది కాదు. చెక్ చేసి మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "47948633"
+  },
+  "auth.error.expired": {
+    "message": "ఆ కోడ్ గడువు ముగిసింది. కొత్త కోడ్ అడగండి.",
+    "review": "reviewed",
+    "enHash": "6a90a6f9"
+  },
+  "auth.error.locked": {
+    "message": "చాలా సార్లు తప్పు కోడ్ ఇచ్చారు. కొత్త కోడ్ అడగండి.",
+    "review": "reviewed",
+    "enHash": "371d1276"
+  },
+  "auth.error.rateLimited": {
+    "message": "చాలా ప్రయత్నాలు అయ్యాయి. కొంచెం ఆగి మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "c32bd496"
+  },
+  "auth.error.blocked": {
+    "message": "ఈ ఖాతా ఇప్పుడు సైన్ ఇన్ కాలేదు. సపోర్ట్‌ను సంప్రదించండి.",
+    "review": "reviewed",
+    "enHash": "10997ecd"
+  },
+  "auth.error.network": {
+    "message": "TodayZ కు కనెక్ట్ కాలేకపోతున్నాం. మీ కనెక్షన్ చెక్ చేసి మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "470230be"
+  },
+  "auth.error.generic": {
+    "message": "ఏదో పొరపాటు జరిగింది. దయచేసి మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "9a3ea059"
+  },
+  "auth.error.captcha": {
+    "message": "మీరు మనిషేనా అని చెక్ చేయలేకపోయాం. పేజీని రీలోడ్ చేసి మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "bc612d87"
+  },
+  "auth.welcome.title": {
+    "message": "TodayZ కు స్వాగతం",
+    "review": "reviewed",
+    "enHash": "941d65fc"
+  },
+  "auth.welcome.sub": {
+    "message": "దుకాణాలు మిమ్మల్ని ఏ పేరుతో పిలవాలో చెప్పండి. దీన్ని వదిలేయవచ్చు.",
+    "review": "reviewed",
+    "enHash": "9856b46a"
+  },
+  "auth.welcome.name": {
+    "message": "మీ పేరు (ఐచ్ఛికం)",
+    "review": "reviewed",
+    "enHash": "32861acd"
+  },
+  "auth.welcome.continue": {
+    "message": "కొనసాగించండి",
+    "review": "reviewed",
+    "enHash": "2e026239"
+  },
+  "auth.welcome.skip": {
+    "message": "ఇప్పటికి వదిలేయండి",
+    "review": "reviewed",
+    "enHash": "6fc09607"
+  },
+  "auth.welcome.error": {
+    "message": "మీ పేరు సేవ్ కాలేదు. తర్వాత “ఖాతా” లో చేర్చవచ్చు.",
+    "review": "reviewed",
+    "enHash": "b471ab4d"
+  },
+  "lang.title": {
+    "message": "మీ భాషను ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "1ee9cc37"
+  },
+  "lang.sub": {
+    "message": "“ఖాతా” లో ఎప్పుడైనా మార్చవచ్చు.",
+    "review": "reviewed",
+    "enHash": "47df9e8c"
+  },
+  "lang.group": {
+    "message": "భాష",
+    "review": "reviewed",
+    "enHash": "89b86ab0"
+  },
+  "lang.name.en": {
+    "message": "ఇంగ్లీష్",
+    "review": "reviewed",
+    "enHash": "649df08a"
+  },
+  "lang.name.hi": {
+    "message": "హిందీ",
+    "review": "reviewed",
+    "enHash": "c9e6b253"
+  },
+  "lang.name.kn": {
+    "message": "కన్నడ",
+    "review": "reviewed",
+    "enHash": "c3ed6655"
+  },
+  "lang.name.te": {
+    "message": "తెలుగు",
+    "review": "reviewed",
+    "enHash": "ea6c0346"
+  },
+  "lang.name.ta": {
+    "message": "తమిళం",
+    "review": "reviewed",
+    "enHash": "86c2b627"
+  },
+  "lang.continue": {
+    "message": "కొనసాగించండి",
+    "review": "reviewed",
+    "enHash": "2e026239"
+  },
+  "lang.skip": {
+    "message": "వదిలేయండి",
+    "review": "reviewed",
+    "enHash": "3da47453"
+  },
+  "location.title": {
+    "message": "ఎక్కడ వెతకాలి?",
+    "review": "reviewed",
+    "enHash": "78c38f9c"
+  },
+  "location.sub": {
+    "message": "ఈ ప్రదేశం దగ్గర ఉన్న దుకాణాలు, స్టాక్ చూపిస్తాం.",
+    "review": "reviewed",
+    "enHash": "7bd0799d"
+  },
+  "location.gps.title": {
+    "message": "నా ప్రస్తుత లొకేషన్ వాడండి",
+    "review": "reviewed",
+    "enHash": "9aee0641"
+  },
+  "location.gps.explain": {
+    "message": "మీ బ్రౌజర్ లొకేషన్ షేర్ చేయమని అడుగుతుంది. మీ దగ్గర ఉన్న దుకాణాలు కనుగొనడానికి మాత్రమే దాన్ని వాడతాం.",
+    "review": "reviewed",
+    "enHash": "aaf1690a"
+  },
+  "location.gps.button": {
+    "message": "నా లొకేషన్ షేర్ చేయండి",
+    "review": "reviewed",
+    "enHash": "fb3c7092"
+  },
+  "location.gps.locating": {
+    "message": "మీ లొకేషన్ కనుగొంటున్నాం",
+    "review": "reviewed",
+    "enHash": "4bd91431"
+  },
+  "location.gps.denied": {
+    "message": "TodayZ కు లొకేషన్ ఆఫ్‌లో ఉంది. బదులుగా మీ PIN కోడ్ ఇవ్వండి.",
+    "review": "reviewed",
+    "enHash": "f054ea82"
+  },
+  "location.gps.unavailable": {
+    "message": "మీ లొకేషన్ కనుగొనలేకపోయాం. బదులుగా మీ PIN కోడ్ ఇవ్వండి.",
+    "review": "reviewed",
+    "enHash": "1f4ba08f"
+  },
+  "location.gps.label": {
+    "message": "ప్రస్తుత లొకేషన్",
+    "review": "reviewed",
+    "enHash": "75ea6a18"
+  },
+  "location.pin.title": {
+    "message": "PIN కోడ్ ఇవ్వండి",
+    "review": "reviewed",
+    "enHash": "58808d4f"
+  },
+  "location.pin.label": {
+    "message": "PIN కోడ్",
+    "review": "reviewed",
+    "enHash": "3c52e572"
+  },
+  "location.pin.help": {
+    "message": "6 అంకెలు",
+    "review": "reviewed",
+    "enHash": "ab7fee7a"
+  },
+  "location.pin.invalid": {
+    "message": "6 అంకెల PIN కోడ్ ఇవ్వండి.",
+    "review": "reviewed",
+    "enHash": "b8ed22d9"
+  },
+  "location.pin.save": {
+    "message": "ఈ PIN కోడ్ వాడండి",
+    "review": "reviewed",
+    "enHash": "08e45709"
+  },
+  "location.pin.saved": {
+    "message": "PIN {pin}",
+    "review": "reviewed",
+    "enHash": "61d3ad30"
+  },
+  "location.search.title": {
+    "message": "మీ ప్రాంతాన్ని వెతకండి",
+    "review": "reviewed",
+    "enHash": "df3ba7c9"
+  },
+  "location.search.soon": {
+    "message": "ప్రాంతం వెతకడం త్వరలో వస్తుంది. ప్రస్తుతానికి మీ PIN కోడ్ వాడండి.",
+    "review": "reviewed",
+    "enHash": "06cde99d"
+  },
+  "location.current": {
+    "message": "{place} దగ్గర షాపింగ్",
+    "review": "reviewed",
+    "enHash": "ef0894d4"
+  },
+  "location.set": {
+    "message": "మీ లొకేషన్ సెట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "bd10f419"
+  },
+  "account.title": {
+    "message": "ఖాతా",
+    "review": "reviewed",
+    "enHash": "85dfa32c"
+  },
+  "account.signedOut.title": {
+    "message": "TodayZ లో సైన్ ఇన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "f9480b08"
+  },
+  "account.signedOut.body": {
+    "message": "వస్తువులు బుక్ చేయడానికి, మీ ఆర్డర్‌లు చూడడానికి, మీ వాలెట్ ఉంచుకోవడానికి సైన్ ఇన్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "2bd55cd8"
+  },
+  "account.signIn": {
+    "message": "సైన్ ఇన్",
+    "review": "reviewed",
+    "enHash": "ada2e9e9"
+  },
+  "account.loading": {
+    "message": "మీ ఖాతా లోడ్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "f6f58e00"
+  },
+  "account.loadError": {
+    "message": "మీ ఖాతా లోడ్ కాలేదు. మీ కనెక్షన్ చెక్ చేసి మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "93afdf48"
+  },
+  "account.retry": {
+    "message": "మళ్లీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "account.name.label": {
+    "message": "పేరు",
+    "review": "reviewed",
+    "enHash": "709a2322"
+  },
+  "account.name.save": {
+    "message": "సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "account.name.saved": {
+    "message": "సేవ్ అయింది",
+    "review": "reviewed",
+    "enHash": "c0ae8f6e"
+  },
+  "account.name.conflict": {
+    "message": "మీ వివరాలు వేరే పరికరంలో మారాయి. మళ్లీ లోడ్ చేశాం. మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "3e1db0b1"
+  },
+  "account.name.error": {
+    "message": "అది సేవ్ కాలేదు. మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "b1ecaf57"
+  },
+  "account.phone": {
+    "message": "మొబైల్ నంబర్",
+    "review": "reviewed",
+    "enHash": "8e5c12de"
+  },
+  "account.language": {
+    "message": "భాష",
+    "review": "reviewed",
+    "enHash": "89b86ab0"
+  },
+  "account.location": {
+    "message": "లొకేషన్",
+    "review": "reviewed",
+    "enHash": "d219c681"
+  },
+  "account.change": {
+    "message": "మార్చండి",
+    "review": "reviewed",
+    "enHash": "64fbd995"
+  },
+  "account.signOut": {
+    "message": "సైన్ అవుట్",
+    "review": "reviewed",
+    "enHash": "dc1649a1"
+  }
+}

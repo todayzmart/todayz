@@ -24,6 +24,7 @@ var Ops = map[string]string{
 	"GetBillClaim":      policy.PosLinkCustomer,
 	"VerifyCounterCode": policy.PosLinkCustomer,
 	"SyncStore":         policy.PosSync,
+	"ListPosSales":      policy.PosSales,
 
 	"PreviewBillClaim":   policy.MeBillClaim,
 	"ConfirmBillClaim":   policy.MeBillClaim,
@@ -74,6 +75,18 @@ func (h handlers) CreatePosSale(ctx context.Context, req posapi.CreatePosSaleReq
 		return nil, err
 	}
 	return posapi.CreatePosSale200JSONResponse(out), nil
+}
+
+func (h handlers) ListPosSales(ctx context.Context, req posapi.ListPosSalesRequestObject) (posapi.ListPosSalesResponseObject, error) {
+	sc, err := staffScope(ctx)
+	if err != nil {
+		return nil, err
+	}
+	out, err := h.s.Sales(ctx, sc, req.Params.Limit, req.Params.Cursor)
+	if err != nil {
+		return nil, err
+	}
+	return posapi.ListPosSales200JSONResponse(out), nil
 }
 
 func (h handlers) ReversePosSale(ctx context.Context, req posapi.ReversePosSaleRequestObject) (posapi.ReversePosSaleResponseObject, error) {

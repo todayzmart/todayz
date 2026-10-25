@@ -137,7 +137,7 @@ compose default), update this table, `make setup`.
 | `imresamu/postgis:16-3.4` (arm64, amd64) | `sha256:6da75969915039b7356058b4310d43fde88c275ada982c2dfee29da68445ff4d` | The same docker-postgis build, published multi-arch. `lib.sh` picks by `uname -m` (override with `TODAYZ_POSTGIS_IMAGE`, tag@digest). |
 | `pgsty/minio:RELEASE.2026-08-04T00-00-00Z` | `sha256:b6bfe7239bfc83fb90d31612d9704d86039dd714f7904b3f1ad68f211e602372` | MinIO stopped publishing images; pgsty builds the same AGPL source. |
 | `pgsty/mc:RELEASE.2026-09-16T00-00-00Z` | `sha256:cfc83108c3abb371f8fb84d99c1fdc88f8c237e022409b0081fb7c0a3be634dd` | As above. |
-| `grafana/otel-lgtm:0.35.0` | `sha256:2de1094c593c671cbfca878a28ffcd7e46ff5e32f2ce966c0cf33003f6cf4266` | Plugin preinstall disabled so it starts offline. |
+| `grafana/otel-lgtm:0.36.0` | `sha256:57c04cbd8e7022f32bb84c4ac005d79baf8b08e2c5be44facf11f5f1f9944ba2` | Plugin preinstall disabled so it starts offline. |
 | `prometheuscommunity/postgres-exporter:v0.20.1` | `sha256:ac5ec343104fae0e2d84a27bb8d69b38430a11910c5382cad85d478d2bab713e` | |
 
 ## Troubleshooting

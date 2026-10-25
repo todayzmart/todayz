@@ -1,0 +1,112 @@
+{
+  "product.add": {
+    "message": "சேர்",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "product.remove": {
+    "message": "ஒன்றை நீக்கு",
+    "review": "reviewed",
+    "enHash": "afbcf5f3"
+  },
+  "product.addOne": {
+    "message": "ஒன்று சேர்",
+    "review": "reviewed",
+    "enHash": "bb49f016"
+  },
+  "product.max": {
+    "message": "ஸ்டாக்கில் {max} மட்டுமே உள்ளன",
+    "review": "reviewed",
+    "enHash": "adffd51d"
+  },
+  "product.off": {
+    "message": "{pct}% தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "76fb0776"
+  },
+  "product.unit.pc": {
+    "message": "{size} பீஸ்",
+    "review": "reviewed",
+    "enHash": "ae6eb2b9"
+  },
+  "product.unit.pack": {
+    "message": "{size} பேக்",
+    "review": "reviewed",
+    "enHash": "8423135e"
+  },
+  "product.stock.in": {
+    "message": "ஸ்டாக்கில் உள்ளது",
+    "review": "reviewed",
+    "enHash": "3f1356ad"
+  },
+  "product.stock.out": {
+    "message": "ஸ்டாக்கில் இல்லை",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "product.confirmed": {
+    "message": "{time} உறுதிசெய்யப்பட்டது",
+    "review": "reviewed",
+    "enHash": "7d1ac5a7"
+  },
+  "product.confirmedNow": {
+    "message": "இப்போதுதான் உறுதிசெய்யப்பட்டது",
+    "review": "reviewed",
+    "enHash": "d966a28f"
+  },
+  "product.back": {
+    "message": "{shop} க்குத் திரும்பு",
+    "review": "reviewed",
+    "enHash": "841d2259"
+  },
+  "product.sold.by": {
+    "message": "விற்பவர்",
+    "review": "reviewed",
+    "enHash": "12c71f0a"
+  },
+  "product.addToCart": {
+    "message": "கார்ட்டில் சேர்",
+    "review": "reviewed",
+    "enHash": "f8893b91"
+  },
+  "product.added": {
+    "message": "{name} உங்கள் கார்ட்டில் சேர்ந்தது",
+    "review": "reviewed",
+    "enHash": "d89cc3a3"
+  },
+  "product.share": {
+    "message": "லிங்கை காப்பி செய்",
+    "review": "reviewed",
+    "enHash": "2f84eea5"
+  },
+  "product.share.copied": {
+    "message": "லிங்க் காப்பி ஆனது",
+    "review": "reviewed",
+    "enHash": "c2e98476"
+  },
+  "product.share.failed": {
+    "message": "லிங்கை காப்பி செய்ய முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "7a456d6f"
+  },
+  "product.others.title": {
+    "message": "அருகில் உள்ள பிற கடைகள்",
+    "review": "reviewed",
+    "enHash": "7f93304b"
+  },
+  "product.gone.title": {
+    "message": "இந்தப் பொருள் கிடைக்கவில்லை",
+    "review": "reviewed",
+    "enHash": "88e0e3ac"
+  },
+  "product.gone.body": {
+    "message": "கடை இதை நீக்கியிருக்கலாம்.",
+    "review": "reviewed",
+    "enHash": "65f93253"
+  },
+  "product.gone.action": {
+    "message": "கடைக்குச் செல்",
+    "review": "reviewed",
+    "enHash": "349df3f4"
+  }
+}

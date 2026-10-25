@@ -1,5 +1,5 @@
 # Prometheus config for the local grafana/otel-lgtm container (W0-02).
-# Top part: the image's own /otel-lgtm/prometheus.yaml from grafana/otel-lgtm:0.35.0,
+# Top part: the image's own /otel-lgtm/prometheus.yaml from grafana/otel-lgtm:0.36.0,
 # unchanged (re-copy it when the image tag changes). Bottom part: TodayZ scrape jobs.
 ---
 global:

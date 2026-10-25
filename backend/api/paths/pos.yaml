@@ -20,6 +20,50 @@
     required: true
     schema:
       $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listPosSales
+    tags:
+    - pos
+    summary: The store's sales history (B-05)
+    description: >-
+      Cashier and above (`pos.sales`). Every sale of the store, online and synced, newest first by the
+      device's sale time, with its link status; a failed offline counter code carries `link.failure`
+      ("Customer link failed", D-12). The customer is named only for `bill_qr` and `counter_code`; a phone
+      is never returned and no receipt token is.
+    parameters:
+    - $ref: ../common/parameters.yaml#/Limit
+    - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      '200':
+        description: The sales
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/pos.yaml#/PosSaleList
+            example:
+              items:
+              - id: 01JB0V2S4K3E5S6A7K8E9X0Y1Z
+                clientId: 01JB0V1S4K3C5K6N7T8D9X0Y1Z
+                soldAt: '2026-10-24T05:00:00Z'
+                receivedAt: '2026-10-24T07:00:00Z'
+                totalPaise: 30000
+                lineCount: 1
+                unitCount: 3
+                paymentMethod: cash
+                creditsUsed: 0
+                cashbackCredits: 0
+                status: completed
+                reversedAt: null
+                offline: true
+                link:
+                  method: counter_code
+                  status: failed
+                  customerName: null
+                  failure: code_used
+              nextCursor: null
+              serverNow: '2026-10-24T07:04:00Z'
+      default:
+        $ref: ../common/responses.yaml#/Problem
   post:
     operationId: createPosSale
     tags:

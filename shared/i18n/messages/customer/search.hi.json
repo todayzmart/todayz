@@ -1,0 +1,177 @@
+{
+  "search.title": {
+    "message": "खोजें",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "search.field.label": {
+    "message": "सामान खोजें",
+    "review": "reviewed",
+    "enHash": "4412bfe5"
+  },
+  "search.field.placeholder": {
+    "message": "आटा, दूध, दवाइयाँ खोजें",
+    "review": "reviewed",
+    "enHash": "5f25cc28"
+  },
+  "search.field.clear": {
+    "message": "खोज हटाएँ",
+    "review": "reviewed",
+    "enHash": "67300d0f"
+  },
+  "search.suggestions.label": {
+    "message": "सुझाव",
+    "review": "reviewed",
+    "enHash": "861edba0"
+  },
+  "search.suggestions.search": {
+    "message": "{query} खोजें",
+    "review": "reviewed",
+    "enHash": "64566b34"
+  },
+  "search.idle.hint": {
+    "message": "पास की दुकानों में खोजने के लिए कम से कम दो अक्षर लिखें।",
+    "review": "reviewed",
+    "enHash": "b84188f3"
+  },
+  "search.recent.title": {
+    "message": "हाल की खोजें",
+    "review": "reviewed",
+    "enHash": "a73d2913"
+  },
+  "search.recent.clear": {
+    "message": "हटाएँ",
+    "review": "reviewed",
+    "enHash": "719ea396"
+  },
+  "search.filter.label": {
+    "message": "फ़िल्टर",
+    "review": "reviewed",
+    "enHash": "96e57821"
+  },
+  "search.filter.open": {
+    "message": "अभी खुली",
+    "review": "reviewed",
+    "enHash": "d7a05e65"
+  },
+  "search.filter.pickup": {
+    "message": "पिकअप",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "search.filter.delivery": {
+    "message": "डिलीवरी",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "search.filter.offers": {
+    "message": "ऑफ़र",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "search.category.label": {
+    "message": "कैटेगरी",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "search.category.all": {
+    "message": "सभी",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "search.sort.label": {
+    "message": "क्रम से लगाएँ",
+    "review": "reviewed",
+    "enHash": "a2a5bdec"
+  },
+  "search.sort.relevance": {
+    "message": "सबसे सही",
+    "review": "reviewed",
+    "enHash": "86f686f8"
+  },
+  "search.sort.nearest": {
+    "message": "सबसे पास पहले",
+    "review": "reviewed",
+    "enHash": "f809e50f"
+  },
+  "search.sort.cheapest": {
+    "message": "सबसे कम दाम",
+    "review": "reviewed",
+    "enHash": "ead8b64d"
+  },
+  "search.refine.label": {
+    "message": "आपकी खोज के फ़िल्टर",
+    "review": "reviewed",
+    "enHash": "62174b9d"
+  },
+  "search.refine.remove": {
+    "message": "फ़िल्टर {chip} हटाएँ",
+    "review": "reviewed",
+    "enHash": "32664e04"
+  },
+  "search.summary": {
+    "message": "पास की {checked} दुकानें देखीं · {have} में है · {min} से",
+    "review": "reviewed",
+    "enHash": "8f73de69"
+  },
+  "search.error": {
+    "message": "अभी खोज नहीं हो सकी।",
+    "review": "reviewed",
+    "enHash": "b7a524b1"
+  },
+  "search.zero.title": {
+    "message": "पास की किसी दुकान में {query} स्टॉक में नहीं है",
+    "review": "reviewed",
+    "enHash": "353d873c"
+  },
+  "search.zero.body": {
+    "message": "हमने नोट कर लिया है कि आपके पास के लोग यह ढूँढ रहे हैं, ताकि दुकानें इसे रख सकें।",
+    "review": "reviewed",
+    "enHash": "7c3bed35"
+  },
+  "search.more": {
+    "message": "और दुकानें दिखाएँ",
+    "review": "reviewed",
+    "enHash": "c1c91491"
+  },
+  "search.badge.lowest": {
+    "message": "सबसे कम दाम",
+    "review": "reviewed",
+    "enHash": "ead8b64d"
+  },
+  "search.badge.closest": {
+    "message": "सबसे पास",
+    "review": "reviewed",
+    "enHash": "e596de54"
+  },
+  "search.deliveryFee": {
+    "message": "+{fee} डिलीवरी",
+    "review": "reviewed",
+    "enHash": "96e53339"
+  },
+  "search.noneConfirmed.title": {
+    "message": "अभी तक किसी दुकान ने पक्का नहीं किया है।",
+    "review": "reviewed",
+    "enHash": "d6934628"
+  },
+  "search.noneConfirmed.body": {
+    "message": "दुकानों की लिस्ट में यह है, पर हाल में किसी ने स्टॉक पक्का नहीं किया, इसलिए हो सकता है यह शेल्फ़ पर न हो।",
+    "review": "reviewed",
+    "enHash": "91bdc408"
+  },
+  "search.noneConfirmed.bodyWidest": {
+    "message": "दुकानों की लिस्ट में यह है, पर हाल में किसी ने स्टॉक पक्का नहीं किया। आप पहले से सबसे बड़े इलाके में खोज रहे हैं।",
+    "review": "reviewed",
+    "enHash": "f860d653"
+  },
+  "search.noneConfirmed.wider": {
+    "message": "{km} km तक खोजें",
+    "review": "reviewed",
+    "enHash": "45f8f29c"
+  },
+  "search.noneConfirmed.later": {
+    "message": "बाद में फिर से खोजें",
+    "review": "reviewed",
+    "enHash": "71ecbf77"
+  }
+}

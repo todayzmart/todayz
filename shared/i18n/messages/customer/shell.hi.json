@@ -1,0 +1,82 @@
+{
+  "shell.appName": {
+    "message": "TodayZ",
+    "review": "reviewed",
+    "enHash": "34b58f9d"
+  },
+  "shell.skipToContent": {
+    "message": "सीधे मुख्य हिस्से पर जाएँ",
+    "review": "reviewed",
+    "enHash": "0a4470d6"
+  },
+  "shell.nav.label": {
+    "message": "मुख्य",
+    "review": "reviewed",
+    "enHash": "62bce942"
+  },
+  "shell.nav.home": {
+    "message": "होम",
+    "review": "reviewed",
+    "enHash": "70f8bb9a"
+  },
+  "shell.nav.search": {
+    "message": "खोजें",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "shell.nav.orders": {
+    "message": "ऑर्डर",
+    "review": "reviewed",
+    "enHash": "cded0933"
+  },
+  "shell.nav.wallet": {
+    "message": "वॉलेट",
+    "review": "reviewed",
+    "enHash": "b60862f4"
+  },
+  "shell.nav.account": {
+    "message": "खाता",
+    "review": "reviewed",
+    "enHash": "85dfa32c"
+  },
+  "shell.hero.title": {
+    "message": "आस-पास का सब कुछ, आज ही।",
+    "review": "reviewed",
+    "enHash": "1aaf493f"
+  },
+  "shell.hero.sub": {
+    "message": "देखें कि पास की दुकानों में क्या स्टॉक में है, बुक करें, और दुकान से ले जाएँ या डिलीवरी मँगवाएँ।",
+    "review": "reviewed",
+    "enHash": "a5ee6a96"
+  },
+  "shell.soon.tag": {
+    "message": "जल्द आ रहा है",
+    "review": "reviewed",
+    "enHash": "e4115be2"
+  },
+  "shell.soon.title": {
+    "message": "{section} जल्द आ रहा है",
+    "review": "reviewed",
+    "enHash": "6c957e46"
+  },
+  "shell.soon.body": {
+    "message": "हम ऐप का यह हिस्सा बना रहे हैं। आपके पास की दुकानें अभी अपना स्टॉक जोड़ रही हैं।",
+    "review": "reviewed",
+    "enHash": "b08be591"
+  },
+  "shell.notFound.title": {
+    "message": "पेज नहीं मिला",
+    "review": "reviewed",
+    "enHash": "bc3023b3"
+  },
+  "shell.notFound.body": {
+    "message": "यह लिंक अभी कहीं नहीं जाता।",
+    "review": "reviewed",
+    "enHash": "8c0d72a2"
+  },
+  "shell.notFound.home": {
+    "message": "होम पर जाएँ",
+    "review": "reviewed",
+    "enHash": "f36ae945"
+  }
+}

@@ -1,0 +1,447 @@
+{
+  "basket.title": {
+    "message": "பாஸ்கெட்",
+    "review": "reviewed",
+    "enHash": "020b4183"
+  },
+  "basket.back": {
+    "message": "பாஸ்கெட்டுகள்",
+    "review": "reviewed",
+    "enHash": "d368818f"
+  },
+  "basket.loading": {
+    "message": "உங்கள் பாஸ்கெட்டுகள் லோட் ஆகின்றன",
+    "review": "reviewed",
+    "enHash": "077179d4"
+  },
+  "basket.error": {
+    "message": "உங்கள் பாஸ்கெட்டுகளை லோட் செய்ய முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "eff7d45d"
+  },
+  "basket.gone.title": {
+    "message": "இந்தப் பாஸ்கெட் இப்போது இல்லை",
+    "review": "reviewed",
+    "enHash": "8e3f494b"
+  },
+  "basket.defaultName": {
+    "message": "என் பாஸ்கெட்",
+    "review": "reviewed",
+    "enHash": "49c9899b"
+  },
+  "basket.signIn": {
+    "message": "சேமிக்க சைன் இன் செய்யவும்",
+    "review": "reviewed",
+    "enHash": "61198591"
+  },
+  "basket.device.title": {
+    "message": "இந்தச் சாதனத்தில் உள்ள பாஸ்கெட்",
+    "review": "reviewed",
+    "enHash": "5a9b9d21"
+  },
+  "basket.device.note": {
+    "message": "இந்தப் பாஸ்கெட் இந்தச் சாதனத்தில் மட்டுமே உள்ளது. உங்கள் கணக்கில் சேமிக்க சைன் இன் செய்யவும்.",
+    "review": "reviewed",
+    "enHash": "c06180e4"
+  },
+  "basket.device.clear": {
+    "message": "பாஸ்கெட்டைக் காலி செய்",
+    "review": "reviewed",
+    "enHash": "81f53e3e"
+  },
+  "basket.saving": {
+    "message": "சேமிக்கிறோம்",
+    "review": "reviewed",
+    "enHash": "369c534d"
+  },
+  "basket.saved": {
+    "message": "சேமிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "c0ae8f6e"
+  },
+  "basket.conflict": {
+    "message": "இந்தப் பாஸ்கெட் வேறு சாதனத்தில் மாறியது. சமீபத்தியதைக் காட்டுகிறோம்.",
+    "review": "reviewed",
+    "enHash": "fb4aceb3"
+  },
+  "basket.full": {
+    "message": "இந்தப் பாஸ்கெட் நிறைந்துவிட்டது. இன்னொன்றைச் சேர்க்க ஒரு பொருளை நீக்கவும்.",
+    "review": "reviewed",
+    "enHash": "52d00466"
+  },
+  "basket.limit": {
+    "message": "சேமிக்கக்கூடிய அதிகபட்ச பாஸ்கெட்டுகள் உங்களிடம் உள்ளன. புதியது செய்ய ஒன்றை டெலீட் செய்யவும்.",
+    "review": "reviewed",
+    "enHash": "907b9c23"
+  },
+  "basket.saveError": {
+    "message": "சேமிக்க முடியவில்லை. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "69f52210"
+  },
+  "basket.lastSplit": {
+    "message": "கடந்த முறை: {a}, {b}",
+    "review": "reviewed",
+    "enHash": "d062b8ed"
+  },
+  "basket.ask.label": {
+    "message": "ஒரு பொருளைச் சேர்",
+    "review": "reviewed",
+    "enHash": "fc1290c0"
+  },
+  "basket.ask.placeholder": {
+    "message": "ஆட்டா, பால், பிரெட் சேர்க்கவும்…",
+    "review": "reviewed",
+    "enHash": "7f9a11af"
+  },
+  "basket.ask.clear": {
+    "message": "அழி",
+    "review": "reviewed",
+    "enHash": "719ea396"
+  },
+  "basket.ask.try": {
+    "message": "முயலவும்: {example}",
+    "review": "reviewed",
+    "enHash": "f69e58c6"
+  },
+  "basket.ask.example1": {
+    "message": "Aashirvaad atta 5 kg",
+    "review": "reviewed",
+    "enHash": "43f36ca4"
+  },
+  "basket.ask.example2": {
+    "message": "Amul milk 500 ml",
+    "review": "reviewed",
+    "enHash": "c84bc4b6"
+  },
+  "basket.ask.example3": {
+    "message": "Dolo 650",
+    "review": "reviewed",
+    "enHash": "a8c97442"
+  },
+  "basket.ask.example4": {
+    "message": "Tata salt 1 kg",
+    "review": "reviewed",
+    "enHash": "59a93d2a"
+  },
+  "basket.ask.suggestions": {
+    "message": "பரிந்துரைகள்",
+    "review": "reviewed",
+    "enHash": "861edba0"
+  },
+  "basket.ask.addText": {
+    "message": "“{text}” ஐச் சேர்",
+    "review": "reviewed",
+    "enHash": "944e1cc0"
+  },
+  "basket.lines.empty": {
+    "message": "உங்கள் பாஸ்கெட் காலியாக உள்ளது. உங்களுக்குத் தேவையானதை மேலே சேர்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "42192d50"
+  },
+  "basket.lines.label": {
+    "message": "இந்தப் பாஸ்கெட்டில் உள்ள பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "01c3b088"
+  },
+  "basket.lines.anyBrand": {
+    "message": "எந்த பிராண்டும்",
+    "review": "reviewed",
+    "enHash": "b7e880d1"
+  },
+  "basket.lines.remove": {
+    "message": "{name} ஐ நீக்கு",
+    "review": "reviewed",
+    "enHash": "df7193a5"
+  },
+  "basket.name.label": {
+    "message": "பாஸ்கெட் பெயர்",
+    "review": "reviewed",
+    "enHash": "e14e97bc"
+  },
+  "basket.name.placeholder": {
+    "message": "வாராந்திர மளிகை",
+    "review": "reviewed",
+    "enHash": "a7fa990b"
+  },
+  "basket.results.title": {
+    "message": "எங்கே கிடைக்கும்",
+    "review": "reviewed",
+    "enHash": "e5a2bb5a"
+  },
+  "basket.search": {
+    "message": "கடைகளைத் தேடு",
+    "review": "reviewed",
+    "enHash": "fdb699b0"
+  },
+  "basket.search.again": {
+    "message": "மீண்டும் தேடு",
+    "review": "reviewed",
+    "enHash": "1178a4ff"
+  },
+  "basket.search.running": {
+    "message": "தேடுகிறோம்",
+    "review": "reviewed",
+    "enHash": "98cc363c"
+  },
+  "basket.search.checking": {
+    "message": "{n} கடைகளைப் பார்க்கிறோம்…",
+    "review": "reviewed",
+    "enHash": "24f87468"
+  },
+  "basket.search.checkingNearby": {
+    "message": "அருகில் உள்ள கடைகளைப் பார்க்கிறோம்…",
+    "review": "reviewed",
+    "enHash": "14a6970d"
+  },
+  "basket.search.error": {
+    "message": "இப்போது தேட முடியவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "cf8b0750"
+  },
+  "basket.search.stale": {
+    "message": "பாஸ்கெட் மாறியது. அதற்கான கடைகளைப் பார்க்க மீண்டும் தேடவும்.",
+    "review": "reviewed",
+    "enHash": "87db2770"
+  },
+  "basket.summary": {
+    "message": "அருகில் {checked} கடைகளைப் பார்த்தோம் · {all, plural, one {# கடையில் எல்லாம் உள்ளது} other {# கடைகளில் எல்லாம் உள்ளது}}",
+    "review": "reviewed",
+    "enHash": "a5faa10a"
+  },
+  "basket.zero.title": {
+    "message": "அருகில் எந்தக் கடையிலும் இந்தப் பொருட்கள் ஸ்டாக்கில் இல்லை",
+    "review": "reviewed",
+    "enHash": "039f6096"
+  },
+  "basket.zero.body": {
+    "message": "அதிக தூரத்தை முயலவும், அல்லது அருகில் உள்ள கடைகளிடம் கேட்கவும்.",
+    "review": "reviewed",
+    "enHash": "59090928"
+  },
+  "basket.noPlace.title": {
+    "message": "தேட உங்கள் இருப்பிடத்தை அமைக்கவும்",
+    "review": "reviewed",
+    "enHash": "4c765aeb"
+  },
+  "basket.noPlace.body": {
+    "message": "ஒவ்வொரு பொருளுக்கும் உங்கள் அருகில் உள்ள கடைகளைப் பார்ப்போம்.",
+    "review": "reviewed",
+    "enHash": "e397a455"
+  },
+  "basket.preview": {
+    "message": "இந்தத் தொகைகள் தோராயமானவை. இறுதி விலை செக்அவுட்டில் தெரியும்.",
+    "review": "reviewed",
+    "enHash": "4b932981"
+  },
+  "basket.badge.everything": {
+    "message": "எல்லாம் உள்ளது",
+    "review": "reviewed",
+    "enHash": "b5b23177"
+  },
+  "basket.badge.closest": {
+    "message": "மிக அருகில்",
+    "review": "reviewed",
+    "enHash": "e596de54"
+  },
+  "basket.badge.lowest": {
+    "message": "குறைந்த விலை",
+    "review": "reviewed",
+    "enHash": "ead8b64d"
+  },
+  "basket.card.meta": {
+    "message": "{m} இல் {n} · {distance} · {total}",
+    "review": "reviewed",
+    "enHash": "4d9c283a"
+  },
+  "basket.card.qty": {
+    "message": "× {qty} · {price}",
+    "review": "reviewed",
+    "enHash": "1db182ec"
+  },
+  "basket.card.missing": {
+    "message": "இல்லாதவை: {items}",
+    "review": "reviewed",
+    "enHash": "be599cea"
+  },
+  "basket.fill": {
+    "message": "கார்ட்டை நிரப்பு",
+    "review": "reviewed",
+    "enHash": "46e70f01"
+  },
+  "basket.split.title": {
+    "message": "இரண்டு கடைகளில் இருந்து எல்லாம் பெறுங்கள்",
+    "review": "reviewed",
+    "enHash": "1b03c4c5"
+  },
+  "basket.split.body": {
+    "message": "எந்த ஒரு கடையிலும் எல்லாம் இல்லை. இந்த இரண்டிலும் சேர்த்து உள்ளது.",
+    "review": "reviewed",
+    "enHash": "cbf2227f"
+  },
+  "basket.split.meta": {
+    "message": "{n} ஐட்டங்கள் · {distance}",
+    "review": "reviewed",
+    "enHash": "9c9d421e"
+  },
+  "basket.split.uncovered": {
+    "message": "அருகில் எந்தக் கடையிலும் இல்லாதவை: {items}",
+    "review": "reviewed",
+    "enHash": "3eb9d0e8"
+  },
+  "basket.split.fill": {
+    "message": "{shop} இல் இருந்து கார்ட்டை நிரப்பு",
+    "review": "reviewed",
+    "enHash": "2c6b30da"
+  },
+  "basket.split.inStore": {
+    "message": "இவற்றில் ஒரு கடை கடையில் மட்டுமே விற்கிறது. அந்தப் பொருட்களுக்கு அங்கே செல்லவும்.",
+    "review": "reviewed",
+    "enHash": "7722cded"
+  },
+  "basket.list.title": {
+    "message": "பாஸ்கெட்டுகள்",
+    "review": "reviewed",
+    "enHash": "d368818f"
+  },
+  "basket.list.sub": {
+    "message": "நீங்கள் அடிக்கடி வாங்குவதைச் சேமித்து, அவை எல்லாம் உள்ள கடையைக் கண்டுபிடியுங்கள்.",
+    "review": "reviewed",
+    "enHash": "d0bd4a33"
+  },
+  "basket.list.new": {
+    "message": "புதிய பாஸ்கெட்",
+    "review": "reviewed",
+    "enHash": "41876bb5"
+  },
+  "basket.list.count": {
+    "message": "{n, plural, one {# ஐட்டம்} other {# ஐட்டங்கள்}}",
+    "review": "reviewed",
+    "enHash": "5160c4b2"
+  },
+  "basket.list.updated": {
+    "message": "{time} அப்டேட் ஆனது",
+    "review": "reviewed",
+    "enHash": "d5a788b6"
+  },
+  "basket.list.open": {
+    "message": "திற",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "basket.list.searchAgain": {
+    "message": "மீண்டும் தேடு",
+    "review": "reviewed",
+    "enHash": "1178a4ff"
+  },
+  "basket.list.delete": {
+    "message": "{name} ஐ டெலீட் செய்",
+    "review": "reviewed",
+    "enHash": "1164a628"
+  },
+  "basket.list.empty.title": {
+    "message": "இன்னும் பாஸ்கெட்டுகள் இல்லை",
+    "review": "reviewed",
+    "enHash": "6de1a7b9"
+  },
+  "basket.list.empty.body": {
+    "message": "நீங்கள் அடிக்கடி வாங்குவதை வைத்து ஒரு பாஸ்கெட் செய்யுங்கள், பிறகு அவை எல்லாம் உள்ள கடையைத் தேடுங்கள்.",
+    "review": "reviewed",
+    "enHash": "ddad8049"
+  },
+  "basket.deleted": {
+    "message": "{name} டெலீட் ஆனது",
+    "review": "reviewed",
+    "enHash": "94f9867b"
+  },
+  "basket.undo": {
+    "message": "செயல்தவிர்",
+    "review": "reviewed",
+    "enHash": "39fc7212"
+  },
+  "basket.saveOffer.title": {
+    "message": "இந்தச் சாதனத்தில் உங்கள் பாஸ்கெட் உள்ளது",
+    "review": "reviewed",
+    "enHash": "1fd9dc0e"
+  },
+  "basket.saveOffer.body": {
+    "message": "அதன் {n} ஐட்டங்களை எங்கும் பயன்படுத்த உங்கள் கணக்கில் சேமிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "e1ee01a7"
+  },
+  "basket.saveOffer.save": {
+    "message": "சேமி",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "basket.saveOffer.notNow": {
+    "message": "இப்போது வேண்டாம்",
+    "review": "reviewed",
+    "enHash": "e4571490"
+  },
+  "basket.add": {
+    "message": "பாஸ்கெட்டில் சேர்",
+    "review": "reviewed",
+    "enHash": "1d978ebd"
+  },
+  "basket.add.labelFor": {
+    "message": "பாஸ்கெட்டில் சேர்: {name}",
+    "review": "reviewed",
+    "enHash": "fb174f2b"
+  },
+  "basket.add.title": {
+    "message": "எந்தப் பாஸ்கெட்டில் சேர்க்க வேண்டும்?",
+    "review": "reviewed",
+    "enHash": "5c27d993"
+  },
+  "basket.add.close": {
+    "message": "மூடு",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "basket.add.new": {
+    "message": "புதிய பாஸ்கெட்",
+    "review": "reviewed",
+    "enHash": "41876bb5"
+  },
+  "basket.add.done": {
+    "message": "{name} ஐ {basket} இல் சேர்த்தோம்",
+    "review": "reviewed",
+    "enHash": "69b59b15"
+  },
+  "basket.add.view": {
+    "message": "பார்",
+    "review": "reviewed",
+    "enHash": "69bd4ef9"
+  },
+  "basket.next.title": {
+    "message": "அடுத்து: மீதி {shop} இல் இருந்து",
+    "review": "reviewed",
+    "enHash": "a080388e"
+  },
+  "basket.next.body": {
+    "message": "உங்கள் பாஸ்கெட்டின் {n, plural, one {# ஐட்டம்} other {# ஐட்டங்கள்}} {shop} இல் காத்திருக்கின்றன.",
+    "review": "reviewed",
+    "enHash": "76b54dad"
+  },
+  "basket.next.fill": {
+    "message": "{shop} இல் இருந்து கார்ட்டை நிரப்பு",
+    "review": "reviewed",
+    "enHash": "2c6b30da"
+  },
+  "basket.next.dismiss": {
+    "message": "இப்போது வேண்டாம்",
+    "review": "reviewed",
+    "enHash": "e4571490"
+  },
+  "basket.entry": {
+    "message": "பாஸ்கெட்டுகள்",
+    "review": "reviewed",
+    "enHash": "d368818f"
+  },
+  "basket.entry.body": {
+    "message": "உங்கள் முழுப் பட்டியலுக்கும் ஒரே கடையைக் கண்டுபிடியுங்கள்",
+    "review": "reviewed",
+    "enHash": "f8cab370"
+  }
+}

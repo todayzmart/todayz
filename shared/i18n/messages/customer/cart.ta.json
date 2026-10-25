@@ -1,0 +1,172 @@
+{
+  "cart.title": {
+    "message": "கார்ட்",
+    "review": "reviewed",
+    "enHash": "44656820"
+  },
+  "cart.empty.title": {
+    "message": "உங்கள் கார்ட் காலியாக உள்ளது",
+    "review": "reviewed",
+    "enHash": "2303a3ae"
+  },
+  "cart.empty.body": {
+    "message": "அருகில் ஏதாவது கண்டுபிடித்து இங்கே சேர்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "2e9a3b5a"
+  },
+  "cart.empty.cta": {
+    "message": "அருகில் உள்ள கடைகளைக் கண்டுபிடி",
+    "review": "reviewed",
+    "enHash": "ae63ad8c"
+  },
+  "cart.from": {
+    "message": "{shop} இல் இருந்து",
+    "review": "reviewed",
+    "enHash": "bb11572a"
+  },
+  "cart.quoteError": {
+    "message": "இப்போது விலைகளைச் சரிபார்க்க முடியவில்லை. உங்கள் கார்ட் சேமிக்கப்பட்டுள்ளது.",
+    "review": "reviewed",
+    "enHash": "4fcfefc8"
+  },
+  "cart.unavailable.title": {
+    "message": "சில பொருட்களை மாற்ற வேண்டும்",
+    "review": "reviewed",
+    "enHash": "cc6e31b6"
+  },
+  "cart.unavailable.body": {
+    "message": "தொடர, கீழே குறிக்கப்பட்ட பொருட்களை நீக்கவும் அல்லது குறைக்கவும்.",
+    "review": "reviewed",
+    "enHash": "16235908"
+  },
+  "cart.lines.label": {
+    "message": "உங்கள் கார்ட்டில் உள்ள பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "cd350d25"
+  },
+  "cart.loading": {
+    "message": "விலைகளைச் சரிபார்க்கிறோம்",
+    "review": "reviewed",
+    "enHash": "59505f46"
+  },
+  "cart.subtotal": {
+    "message": "பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "cart.discount": {
+    "message": "ஆஃபர்கள்",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "cart.total": {
+    "message": "மொத்தம்",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "cart.priceNote": {
+    "message": "இறுதி விலையைப் பார்க்க செக்அவுட்டில் சைன் இன் செய்யவும்.",
+    "review": "reviewed",
+    "enHash": "6a1eed78"
+  },
+  "cart.pickupOnly": {
+    "message": "கடையில் பிக்அப் செய்து அங்கேயே பணம் செலுத்தவும்.",
+    "review": "reviewed",
+    "enHash": "51b5323d"
+  },
+  "cart.clear": {
+    "message": "கார்ட்டைக் காலி செய்",
+    "review": "reviewed",
+    "enHash": "40b6be92"
+  },
+  "cart.count": {
+    "message": "{count, plural, one {# ஐட்டம்} other {# ஐட்டங்கள்}}",
+    "review": "reviewed",
+    "enHash": "f34cfa9c"
+  },
+  "cart.checkout": {
+    "message": "செக்அவுட்",
+    "review": "reviewed",
+    "enHash": "3ac8e9e5"
+  },
+  "cart.stepper.add": {
+    "message": "சேர்",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "cart.stepper.remove": {
+    "message": "ஒன்றை நீக்கு",
+    "review": "reviewed",
+    "enHash": "afbcf5f3"
+  },
+  "cart.stepper.increment": {
+    "message": "இன்னொன்று சேர்",
+    "review": "reviewed",
+    "enHash": "87302651"
+  },
+  "cart.line.out": {
+    "message": "ஸ்டாக்கில் இல்லை",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "cart.line.short": {
+    "message": "{count} மட்டுமே உள்ளன",
+    "review": "reviewed",
+    "enHash": "b9d3d050"
+  },
+  "cart.line.reduce": {
+    "message": "{count} ஆகக் குறை",
+    "review": "reviewed",
+    "enHash": "7b7befbe"
+  },
+  "cart.line.remove": {
+    "message": "பொருளை நீக்கு",
+    "review": "reviewed",
+    "enHash": "76ecba1f"
+  },
+  "cart.creditsRow": {
+    "message": "கிரெடிட்",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "cart.credits.use": {
+    "message": "கிரெடிட் பயன்படுத்து",
+    "review": "reviewed",
+    "enHash": "9e984f02"
+  },
+  "cart.credits.hint": {
+    "message": "இந்த ஆர்டரில் அதிகபட்சம் {max, plural, one {# கிரெடிட்} other {# கிரெடிட்}} பயன்படுத்தலாம். ஒவ்வொரு கிரெடிட்டும் ₹1.",
+    "review": "reviewed",
+    "enHash": "8a4fab2f"
+  },
+  "cart.credits.amount": {
+    "message": "பயன்படுத்தும் கிரெடிட்",
+    "review": "reviewed",
+    "enHash": "24c50026"
+  },
+  "cart.credits.valueText": {
+    "message": "{count, plural, one {# கிரெடிட்} other {# கிரெடிட்}}, {off} தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "745e39cc"
+  },
+  "cart.credits.using": {
+    "message": "{count, plural, one {# கிரெடிட்} other {# கிரெடிட்}} பயன்படுத்தி {off} தள்ளுபடி. டெலிவரிக்கு கிரெடிட் பயன்படாது.",
+    "review": "reviewed",
+    "enHash": "e5dcec8b"
+  },
+  "cart.credits.blocked.store_credit_cap": {
+    "message": "இன்று இந்தக் கடையில் கிரெடிட் பயன்படுத்த முடியாது.",
+    "review": "reviewed",
+    "enHash": "3a7d2b32"
+  },
+  "cart.credits.blocked.credit_monthly_cap": {
+    "message": "இந்த மாதக் கிரெடிட் வரம்பைப் பயன்படுத்திவிட்டீர்கள்.",
+    "review": "reviewed",
+    "enHash": "c1461e19"
+  },
+  "cart.credits.blocked.below_credit_minimum": {
+    "message": "உங்கள் பொருட்களின் தொகை கடை கிரெடிட்டுக்கு வைத்துள்ள குறைந்தபட்சத் தொகையை எட்டினால் மட்டுமே கிரெடிட் பயன்படுத்தலாம். பயன்படுத்த மேலும் சேர்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "6a686b14"
+  }
+}

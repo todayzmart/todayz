@@ -64,13 +64,13 @@ WHERE id = @id AND counter_secret_enc IS NULL;
 -- caller then reads the first sale (idempotent by client id).
 INSERT INTO pos_sales (
   id, store_id, client_id, device_id, device_seq, cashier_user_id, customer_id,
-  link_method, link_status, offline_link_code, offline_link_at, device_clock_skew_ms,
+  link_method, link_status, link_fail_reason, offline_link_code, offline_link_at, device_clock_skew_ms,
   link_phone_hash, link_phone_enc, offline_offer_unmatched,
   item_subtotal_paise, bill_offer_discount_paise, subtotal_paise, discount_paise, round_off_paise,
   credits_used, cashback_credits, total_paise, payment_method, sold_at, received_at, created_at, updated_at
 ) VALUES (
   @id, @store_id, @client_id, @device_id, sqlc.narg(device_seq), @cashier_user_id, sqlc.narg(customer_id),
-  sqlc.narg(link_method), sqlc.narg(link_status), sqlc.narg(offline_link_code), sqlc.narg(offline_link_at),
+  sqlc.narg(link_method), sqlc.narg(link_status), sqlc.narg(link_fail_reason), sqlc.narg(offline_link_code), sqlc.narg(offline_link_at),
   sqlc.narg(device_clock_skew_ms), sqlc.narg(link_phone_hash), sqlc.narg(link_phone_enc), @offline_offer_unmatched,
   @item_subtotal_paise, @bill_offer_discount_paise, @subtotal_paise, @discount_paise, @round_off_paise,
   @credits_used, 0, @total_paise, @payment_method, @sold_at, @now, @now, @now
@@ -110,6 +110,24 @@ INSERT INTO pos_sale_lines (
   @id, @sale_id, @client_id, sqlc.narg(store_item_id), @name_snapshot, @unit_price_paise, @quantity,
   @offer_discount_paise, @manual_discount_paise, @line_total_paise, sqlc.narg(movement_id), @now
 );
+
+-- name: StoreSales :many
+-- The store's sales, newest first by device sale time, keyset on
+-- (sold_at, id) (B-05 sales history, W2-16). The customer is named only
+-- for a bill_qr or counter_code link; a phone is never read.
+SELECT ps.id, ps.client_id, ps.device_seq, ps.link_method, ps.link_status, ps.link_fail_reason,
+       ps.credits_used, ps.cashback_credits, ps.total_paise, ps.payment_method, ps.status,
+       ps.reversed_at, ps.sold_at, ps.received_at,
+       coalesce(CASE WHEN ps.link_method IN ('bill_qr','counter_code') THEN u.name END, '')::text AS customer_name,
+       (SELECT count(*) FROM pos_sale_lines l WHERE l.sale_id = ps.id)::int AS line_count,
+       (SELECT coalesce(sum(l.quantity), 0) FROM pos_sale_lines l WHERE l.sale_id = ps.id)::int AS unit_count
+FROM pos_sales ps
+LEFT JOIN users u ON u.id = ps.customer_id
+WHERE ps.store_id = @store_id
+  AND (sqlc.narg(before_at)::timestamptz IS NULL
+    OR (ps.sold_at, ps.id) < (sqlc.narg(before_at)::timestamptz, sqlc.narg(before_id)::uuid))
+ORDER BY ps.sold_at DESC, ps.id DESC
+LIMIT @lim;
 
 -- name: SaleLines :many
 SELECT * FROM pos_sale_lines WHERE sale_id = @sale_id ORDER BY created_at, id;

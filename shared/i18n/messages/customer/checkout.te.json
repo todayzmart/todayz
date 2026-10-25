@@ -1,0 +1,132 @@
+{
+  "checkout.title": {
+    "message": "చెక్‌అవుట్",
+    "review": "reviewed",
+    "enHash": "3ac8e9e5"
+  },
+  "checkout.loading": {
+    "message": "మీ చివరి ధర తెస్తున్నాం",
+    "review": "reviewed",
+    "enHash": "aa803be7"
+  },
+  "checkout.pickup.label": {
+    "message": "పికప్",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "checkout.pickup.title": {
+    "message": "దుకాణంలో పికప్ చేసుకోండి",
+    "review": "reviewed",
+    "enHash": "0932df77"
+  },
+  "checkout.review.label": {
+    "message": "ఆర్డర్ సారాంశం",
+    "review": "reviewed",
+    "enHash": "db14f498"
+  },
+  "checkout.review.title": {
+    "message": "మీ ఆర్డర్",
+    "review": "reviewed",
+    "enHash": "d2467b40"
+  },
+  "checkout.payNote": {
+    "message": "తీసుకునేటప్పుడు దుకాణంలో చెల్లించండి. ఇప్పుడు ఏమీ కట్ అవదు.",
+    "review": "reviewed",
+    "enHash": "926a2db6"
+  },
+  "checkout.placing": {
+    "message": "ఆర్డర్ చేస్తున్నాం",
+    "review": "reviewed",
+    "enHash": "690ad028"
+  },
+  "checkout.place": {
+    "message": "ఆర్డర్ చేయండి · {total}",
+    "review": "reviewed",
+    "enHash": "e92a92f1"
+  },
+  "checkout.accept": {
+    "message": "కొత్త మొత్తం అంగీకరించండి · {total}",
+    "review": "reviewed",
+    "enHash": "186c12fa"
+  },
+  "checkout.hoursToday": {
+    "message": "దుకాణం ఇప్పుడు మూసి ఉంది. ఈరోజు సమయం: {hours}. మీ కార్ట్ ఉంచాం.",
+    "review": "reviewed",
+    "enHash": "cfb7d4d9"
+  },
+  "checkout.closedToday": {
+    "message": "దుకాణం ఈరోజు మూసి ఉంది. మీ కార్ట్ ఉంచాం.",
+    "review": "reviewed",
+    "enHash": "f9683a6c"
+  },
+  "checkout.cartKept": {
+    "message": "మీ కార్ట్ ఉంచాం.",
+    "review": "reviewed",
+    "enHash": "8161928a"
+  },
+  "checkout.priceChanged.title": {
+    "message": "మొత్తం మారింది",
+    "review": "reviewed",
+    "enHash": "07a22be8"
+  },
+  "checkout.priceChanged.body": {
+    "message": "మీరు ఈ వస్తువులు చేర్చిన తర్వాత ధరలు లేదా స్టాక్ మారాయి. కొత్త మొత్తం చూసి మళ్లీ నొక్కండి.",
+    "review": "reviewed",
+    "enHash": "dff0fad1"
+  },
+  "checkout.stock.title": {
+    "message": "సరిపడా స్టాక్ లేదు",
+    "review": "reviewed",
+    "enHash": "357cd443"
+  },
+  "checkout.stock.body": {
+    "message": "{item}: {count, plural, =0 {ఏమీ మిగల్లేదు} other {# మాత్రమే ఉన్నాయి}}.",
+    "review": "reviewed",
+    "enHash": "1e731b21"
+  },
+  "checkout.stock.anItem": {
+    "message": "ఒక వస్తువు",
+    "review": "reviewed",
+    "enHash": "21906e27"
+  },
+  "checkout.stock.fix": {
+    "message": "కార్ట్‌లో మార్చండి",
+    "review": "reviewed",
+    "enHash": "dce1e662"
+  },
+  "checkout.problem.store_closed": {
+    "message": "దుకాణం ఇప్పుడు మూసి ఉంది. మీ కార్ట్ ఉంచాం.",
+    "review": "reviewed",
+    "enHash": "fbb7fa58"
+  },
+  "checkout.problem.store_not_bookable": {
+    "message": "ఈ దుకాణం ఇప్పుడు ఆర్డర్‌లు తీసుకోవడం లేదు. మీ కార్ట్ ఉంచాం.",
+    "review": "reviewed",
+    "enHash": "f36b1126"
+  },
+  "checkout.problem.ordering_suspended": {
+    "message": "ప్రస్తుతానికి ఆర్డర్ చేయడం ఆగింది. దయచేసి తర్వాత ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "e96f3604"
+  },
+  "checkout.problem.ordering_suspended.until": {
+    "message": "మీరు చాలాసార్లు పికప్ చేయలేదు, కాబట్టి {date} వరకు ఒక్క ఓపెన్ ఆర్డర్ మాత్రమే ఉండగలదు. ముందు దాన్ని పూర్తి చేయండి లేదా క్యాన్సిల్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "f69d5a61"
+  },
+  "checkout.problem.account_has_active_order": {
+    "message": "మీకు ఇప్పటికే ఒక ఆర్డర్ నడుస్తోంది. ముందు దాన్ని పూర్తి చేయండి లేదా క్యాన్సిల్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "42b3618c"
+  },
+  "checkout.problem.other": {
+    "message": "ఆర్డర్ చేయలేకపోయాం. దయచేసి మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "5f3ebf19"
+  },
+  "checkout.problem.network": {
+    "message": "కనెక్షన్ లేదు. మీ కార్ట్ ఉంచాం; ఆన్‌లైన్‌కి వచ్చాక మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "392cd811"
+  }
+}

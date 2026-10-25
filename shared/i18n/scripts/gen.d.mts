@@ -11,3 +11,5 @@ export declare function loadLocaleMessages(
   locale: string,
   opts?: { drafts?: boolean; dir?: string; onWarn?: (message: string) => void },
 ): Promise<Record<string, string>>;
+
+export declare function draftsFromEnv(env?: Record<string, string | undefined>): boolean;
