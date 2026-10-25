@@ -152,9 +152,27 @@ const (
 
 	// Added by the saved addresses (D-222; seeded by 21501_w2-15_saved_address_cap.sql)
 	CustomerMaxSavedAddresses Key = "customer_max_saved_addresses" // count, default 20
+
+	// Added by the risk rules (D-225; seeded by 30201_w3-02_risk.sql)
+	RiskBillClaimStores      Key = "risk_bill_claim_stores"         // count, default 3
+	RiskBillClaimWindowMin   Key = "risk_bill_claim_window_minutes" // minutes, default 10
+	RiskReversalRatioPercent Key = "risk_reversal_ratio_percent"    // count, default 20
+	RiskReversalMinSales     Key = "risk_reversal_min_sales"        // count, default 30
+	RiskReversalWindowDays   Key = "risk_reversal_window_days"      // days, default 7
+	RiskOTPPhonesPerIPHour   Key = "risk_otp_phones_per_ip_hour"    // count, default 10
+	RiskOTPFailedPerPhoneDay Key = "risk_otp_failed_per_phone_day"  // count, default 3
+
+	// Added by support tickets (D-226; seeded by 30801_w3-08_support.sql and 30802_w3-08_support_limits.sql)
+	SupportSlaUrgentMin   Key = "support_sla_urgent_min"   // minutes, default 60
+	SupportSlaHighMin     Key = "support_sla_high_min"     // minutes, default 240
+	SupportSlaNormalMin   Key = "support_sla_normal_min"   // minutes, default 1440
+	SupportOpenTicketsMax Key = "support_open_tickets_max" // count, default 5
+	SupportTicketsPerHour Key = "support_tickets_per_hour" // count, default 5
+	SupportUploadsPerHour Key = "support_uploads_per_hour" // count, default 30
+	SupportUploadTTLHours Key = "support_upload_ttl_hours" // hours, default 24
 )
 
-// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101, D-110, D-131, D-218, D-222).
+// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101, D-110, D-131, D-218, D-222, D-225, D-226).
 var AllKeys = []Key{
 	OrderAcceptTimeoutMin,
 	PickupHoldMin,
@@ -278,4 +296,18 @@ var AllKeys = []Key{
 	DeliveryReturnFirstReminderHours,
 	DeliveryReturnSecondReminderHours,
 	CustomerMaxSavedAddresses,
+	RiskBillClaimStores,
+	RiskBillClaimWindowMin,
+	RiskReversalRatioPercent,
+	RiskReversalMinSales,
+	RiskReversalWindowDays,
+	RiskOTPPhonesPerIPHour,
+	RiskOTPFailedPerPhoneDay,
+	SupportSlaUrgentMin,
+	SupportSlaHighMin,
+	SupportSlaNormalMin,
+	SupportOpenTicketsMax,
+	SupportTicketsPerHour,
+	SupportUploadsPerHour,
+	SupportUploadTTLHours,
 }

@@ -4,12 +4,14 @@ import {
   Bell,
   CalendarClock,
   Gift,
+  HeartHandshake,
   Image,
   LifeBuoy,
   MapPin,
   Package,
   ReceiptText,
   ScrollText,
+  ShieldAlert,
   Server,
   Settings,
   ShieldCheck,
@@ -42,7 +44,9 @@ export const NAV: readonly NavItem[] = [
   { section: 'support', label: 'shell.nav.support', icon: LifeBuoy, group: null },
   { section: 'reviews', label: 'shell.nav.reviews', icon: Star, group: null },
   { section: 'banners', label: 'shell.nav.banners', icon: Image, group: null },
+  { section: 'risk', label: 'shell.nav.risk', icon: ShieldAlert, group: null },
   { section: 'credits', label: 'shell.nav.credits', icon: Gift, group: 'shell.nav.groupGrowth' },
+  { section: 'referrals', label: 'shell.nav.referrals', icon: HeartHandshake, group: 'shell.nav.groupGrowth' },
   { section: 'catalogue', label: 'shell.nav.catalogue', icon: Package, group: 'shell.nav.groupGrowth' },
   { section: 'demand', label: 'shell.nav.demand', icon: TrendingUp, group: 'shell.nav.groupGrowth' },
   { section: 'payouts', label: 'shell.nav.payouts', icon: Banknote, group: 'shell.nav.groupGrowth' },
@@ -59,7 +63,7 @@ export const NAV: readonly NavItem[] = [
  * file (`src/routes/<area>/…`), which outranks `$section`; nothing here changes (src/app/routing.test.ts).
  */
 /** Sections with a real route (src/routes/<area>/); the rest show the placeholder. */
-export const BUILT_SECTIONS: readonly string[] = ['businesses', 'stores', 'customers', 'orders', 'reviews', 'banners', 'catalogue', 'admin-users', 'audit', 'settings', 'credits', 'payouts', 'notifications'];
+export const BUILT_SECTIONS: readonly string[] = ['businesses', 'stores', 'customers', 'orders', 'reviews', 'banners', 'catalogue', 'admin-users', 'audit', 'settings', 'credits', 'payouts', 'notifications', 'risk', 'referrals', 'support'];
 
 export const PLACEHOLDER_SECTIONS: readonly string[] = NAV.map((n) => n.section).filter((s) => s && !BUILT_SECTIONS.includes(s));
 

@@ -512,10 +512,10 @@ func (s *Service) verify(ctx context.Context, by, storeID, orderID ids.ID, b *or
 			}
 			wrong = true
 			if r.CodeLockedAt != nil {
-				// TODO(risk): the code-lockout risk flag (01 §6,
-				// risk_code_lockouts_store_per_day) is the risk WP's; it counts
-				// orders.code_locked_at per store per IST day. Nothing is
-				// flagged here.
+				// The code-lockout risk flag (01 §6,
+				// risk_code_lockouts_store_per_day) is internal/risk's: the
+				// trg_orders_code_lockout trigger (30201) records each lock in
+				// order_code_lockouts. Nothing is flagged here.
 				locked = true
 				return s.publish(ctx, o, r.Version)
 			}

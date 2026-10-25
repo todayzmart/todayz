@@ -67,6 +67,14 @@
     "defaultMessage": "Customers",
     "description": "Settings group heading: customers"
   },
+  "settings.group.risk": {
+    "defaultMessage": "Risk",
+    "description": "Settings group heading: risk"
+  },
+  "settings.group.support": {
+    "defaultMessage": "Support",
+    "description": "Settings group heading: support ticket SLA timers"
+  },
   "settings.group.features": {
     "defaultMessage": "Features",
     "description": "Settings group heading: features"

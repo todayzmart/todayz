@@ -1,0 +1,592 @@
+{
+  "help.title": {
+    "message": "ಸಹಾಯ",
+    "review": "reviewed",
+    "enHash": "c47ae153"
+  },
+  "help.loading": {
+    "message": "ಸಹಾಯ ಲೋಡ್ ಆಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "c72413f7"
+  },
+  "help.back": {
+    "message": "ಸಹಾಯಕ್ಕೆ ಹಿಂದೆ",
+    "review": "reviewed",
+    "enHash": "45dd3b17"
+  },
+  "help.noBusiness": {
+    "message": "ನಿಮ್ಮ ಬಿಸಿನೆಸ್ ಸೆಟ್ ಅಪ್ ಆದ ನಂತರ ಟಿಕೆಟ್ ಮೂಲಕ ಸಹಾಯ ಸಿಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "f5f5a982"
+  },
+  "help.askManager": {
+    "message": "ಟಿಕೆಟ್ ಅನ್ನು ಮಾಲೀಕರು ಅಥವಾ ಮ್ಯಾನೇಜರ್ ತೆರೆಯುತ್ತಾರೆ. ನಿಮ್ಮ ಪರವಾಗಿ ಸಪೋರ್ಟ್ ಅನ್ನು ಸಂಪರ್ಕಿಸಲು ಅವರಲ್ಲಿ ಒಬ್ಬರನ್ನು ಕೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "f7592e44"
+  },
+  "help.error.title": {
+    "message": "ನಿಮ್ಮ ಬಿಸಿನೆಸ್ ಲೋಡ್ ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "4bfa8553"
+  },
+  "help.error.body": {
+    "message": "ನಿಮ್ಮ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "help.error.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "help.sending": {
+    "message": "ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "ceafde86"
+  },
+  "help.tabs.label": {
+    "message": "ಸಹಾಯದ ವಿಭಾಗಗಳು",
+    "review": "reviewed",
+    "enHash": "1689f4a4"
+  },
+  "help.tabs.guide": {
+    "message": "ಮಾರ್ಗದರ್ಶಿ",
+    "review": "reviewed",
+    "enHash": "bf073fae"
+  },
+  "help.tabs.tickets": {
+    "message": "ಟಿಕೆಟ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "5c622a51"
+  },
+  "help.how.title": {
+    "message": "TodayZ ನಿಮ್ಮ ಅಂಗಡಿಗೆ ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "51eee93d"
+  },
+  "help.how.stock.title": {
+    "message": "ನಿಮ್ಮ ಸ್ಟಾಕ್ ಆನ್‌ಲೈನ್‌ಗೆ ಹಾಕಿ",
+    "review": "reviewed",
+    "enHash": "3da87e1e"
+  },
+  "help.how.stock.body": {
+    "message": "ಬೆಲೆ ಮತ್ತು ನಿಮ್ಮಲ್ಲಿ ಎಷ್ಟಿದೆ ಎಂಬುದರೊಂದಿಗೆ ಪ್ರಾಡಕ್ಟ್‌ಗಳನ್ನು ಸೇರಿಸಿ. ಹತ್ತಿರದ ಗ್ರಾಹಕರು ಸ್ಟಾಕ್‌ನಲ್ಲಿ ಏನಿದೆ ಎಂದು ನೋಡುತ್ತಾರೆ.",
+    "review": "reviewed",
+    "enHash": "92183b71"
+  },
+  "help.how.orders.title": {
+    "message": "ಆರ್ಡರ್‌ಗಳನ್ನು ಸಮಯಕ್ಕೆ ಸ್ವೀಕರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "fbf2a640"
+  },
+  "help.how.orders.body": {
+    "message": "ಹೊಸ ಆರ್ಡರ್ ಆರ್ಡರ್‌ಗಳ ಸ್ಕ್ರೀನ್‌ನಲ್ಲಿ ರಿಂಗ್ ಆಗುತ್ತದೆ. ಅದರ ಟೈಮರ್ ಮುಗಿಯುವ ಮೊದಲು ಅದನ್ನು ಸ್ವೀಕರಿಸಿ, ಅದರ ಒಂದು ಭಾಗ ತೆಗೆದುಕೊಳ್ಳಿ, ಅಥವಾ ಏಕೆ ಆಗುವುದಿಲ್ಲ ಎಂದು ತಿಳಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "d3742177"
+  },
+  "help.how.pickup.title": {
+    "message": "ಕೋಡ್‌ನೊಂದಿಗೆ ಹಸ್ತಾಂತರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "dae79fb9"
+  },
+  "help.how.pickup.body": {
+    "message": "ಪಿಕಪ್ ವೇಳೆ ಗ್ರಾಹಕರು ಒಂದು ಕೋಡ್ ತೋರಿಸುತ್ತಾರೆ. ಹಸ್ತಾಂತರ ಮುಗಿಸಲು ಅದನ್ನು ಆರ್ಡರ್‌ನಲ್ಲಿ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "fd9928c1"
+  },
+  "help.how.counter.title": {
+    "message": "ಕೌಂಟರ್‌ನಲ್ಲಿ ಮಾರಾಟ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "db51c22c"
+  },
+  "help.how.counter.body": {
+    "message": "ಅಂಗಡಿಗೆ ಬಂದ ಗ್ರಾಹಕರ ಮಾರಾಟವನ್ನು 'ಮಾರಾಟ'ದಲ್ಲಿ ದಾಖಲಿಸಿ, ಆಫ್‌ಲೈನ್‌ನಲ್ಲೂ. ಮಾರಿದಂತೆ ಸ್ಟಾಕ್ ಕಡಿಮೆಯಾಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "48604958"
+  },
+  "help.how.credits.title": {
+    "message": "ಕ್ರೆಡಿಟ್‌ಗಳು ಗ್ರಾಹಕರನ್ನು ಮತ್ತೆ ಕರೆತರುತ್ತವೆ",
+    "review": "reviewed",
+    "enHash": "fdbf56ad"
+  },
+  "help.how.credits.body": {
+    "message": "ಗ್ರಾಹಕರು TodayZ ಕ್ರೆಡಿಟ್ ಗಳಿಸುತ್ತಾರೆ ಮತ್ತು ಖರ್ಚು ಮಾಡುತ್ತಾರೆ. ನಿಮ್ಮ ಅಂಗಡಿಯಲ್ಲಿ ಅವರು ಖರ್ಚು ಮಾಡಿದ್ದು ನಿಮ್ಮ ಕ್ರೆಡಿಟ್ ಖಾತೆಗೆ ಸೇರುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "183c358e"
+  },
+  "help.how.payouts.title": {
+    "message": "ಹಣ ಪಡೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "d68abf9e"
+  },
+  "help.how.payouts.body": {
+    "message": "ಪ್ರತಿ ತಿಂಗಳು ಒಂದು ಸ್ಟೇಟ್‌ಮೆಂಟ್ ಮುಕ್ತಾಯವಾಗುತ್ತದೆ ಮತ್ತು ನಿಮಗೆ ಬರಬೇಕಾದ ಹಣವನ್ನು UPI ಮೂಲಕ ಕಳುಹಿಸಲಾಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "ddfb737e"
+  },
+  "help.faq.title": {
+    "message": "ಸಾಮಾನ್ಯ ಪ್ರಶ್ನೆಗಳು",
+    "review": "reviewed",
+    "enHash": "f07ac22a"
+  },
+  "help.faq.timer.q": {
+    "message": "ನಾನು ಆರ್ಡರ್ ಅನ್ನು ಸಮಯಕ್ಕೆ ಸ್ವೀಕರಿಸದಿದ್ದರೆ ಏನಾಗುತ್ತದೆ?",
+    "review": "reviewed",
+    "enHash": "a5eda5e3"
+  },
+  "help.faq.timer.a": {
+    "message": "ಆರ್ಡರ್‌ನ ಸಮಯ ಮುಗಿಯುತ್ತದೆ ಮತ್ತು ಗ್ರಾಹಕರಿಗೆ ತಿಳಿಸಲಾಗುತ್ತದೆ. ತಪ್ಪಿದ ಆರ್ಡರ್‌ಗಳಿಂದ ಹುಡುಕಾಟದಲ್ಲಿ ನಿಮ್ಮ ಅಂಗಡಿ ಕೆಳಗೆ ಕಾಣುತ್ತದೆ, ಆದ್ದರಿಂದ ಅಂಗಡಿ ತೆರೆದಿರುವಾಗ ಆರ್ಡರ್‌ಗಳ ಸ್ಕ್ರೀನ್ ತೆರೆದಿಡಿ.",
+    "review": "reviewed",
+    "enHash": "084873c7"
+  },
+  "help.faq.code.q": {
+    "message": "ಪಿಕಪ್ ಕೋಡ್ ಕೆಲಸ ಮಾಡುತ್ತಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "e7c8c075"
+  },
+  "help.faq.code.a": {
+    "message": "ಆರ್ಡರ್ ಸ್ವೀಕರಿಸಿದ ಅಥವಾ ಸಿದ್ಧವಾದಾಗ ಮಾತ್ರ ಕೋಡ್ ಕೆಲಸ ಮಾಡುತ್ತದೆ, ಅದೂ ಒಂದೇ ಬಾರಿ. ಹಲವು ತಪ್ಪು ಪ್ರಯತ್ನಗಳ ನಂತರ ಅದು ಲಾಕ್ ಆಗುತ್ತದೆ: ಗ್ರಾಹಕರ ಆ್ಯಪ್‌ನಲ್ಲಿ “ಹೊಸ ಕೋಡ್ ಪಡೆಯಿರಿ” ಒತ್ತಲು ಹೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "a5eb9cf2"
+  },
+  "help.faq.credits.q": {
+    "message": "ಗ್ರಾಹಕರು ಖರ್ಚು ಮಾಡುವ ಕ್ರೆಡಿಟ್‌ಗಳು ಎಲ್ಲಿಗೆ ಹೋಗುತ್ತವೆ?",
+    "review": "reviewed",
+    "enHash": "1f93d430"
+  },
+  "help.faq.credits.a": {
+    "message": "ಗ್ರಾಹಕರು ನಿಮ್ಮ ಅಂಗಡಿಯಲ್ಲಿ ಖರ್ಚು ಮಾಡುವ ಕ್ರೆಡಿಟ್‌ಗಳು ನಿಮ್ಮ ಕ್ರೆಡಿಟ್ ಖಾತೆಗೆ ಹೋಗುತ್ತವೆ ಮತ್ತು ನಿಮ್ಮ ಪೇಔಟ್ ಜೊತೆ ಪಾವತಿಯಾಗುತ್ತವೆ. ನೀವು ಕೊಡುವ ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್ ಕೂಡ ಇದೇ ಖಾತೆಯಿಂದ ಹೋಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "f50ee125"
+  },
+  "help.faq.payout.q": {
+    "message": "ನನಗೆ ಹಣ ಯಾವಾಗ ಸಿಗುತ್ತದೆ?",
+    "review": "reviewed",
+    "enHash": "dcac7e28"
+  },
+  "help.faq.payout.a": {
+    "message": "ಪ್ರತಿ ತಿಂಗಳ 1ನೇ ತಾರೀಖು ಸ್ಟೇಟ್‌ಮೆಂಟ್ ಮುಕ್ತಾಯವಾಗುತ್ತದೆ. ನಿಮಗೆ ಬರಬೇಕಾದ ಹಣವನ್ನು UPI ಮೂಲಕ ಕಳುಹಿಸಲಾಗುತ್ತದೆ, ಮತ್ತು ಕ್ರೆಡಿಟ್ ಸ್ಕ್ರೀನ್ ಅದನ್ನು UTR ಸಂಖ್ಯೆಯೊಂದಿಗೆ ಕಳುಹಿಸಲಾಗಿದೆ ಎಂದು ತೋರಿಸುತ್ತದೆ. ನಿಮ್ಮ ವೆರಿಫಿಕೇಶನ್ ಪೂರ್ಣಗೊಳ್ಳುವವರೆಗೆ ಪೇಔಟ್ ತಡೆಹಿಡಿಯಲಾಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "a7d7b298"
+  },
+  "help.faq.visible.q": {
+    "message": "ಗ್ರಾಹಕರಿಗೆ ನನ್ನ ಅಂಗಡಿ ಏಕೆ ಕಾಣುತ್ತಿಲ್ಲ?",
+    "review": "reviewed",
+    "enHash": "1b41376a"
+  },
+  "help.faq.visible.a": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಅನುಮೋದಿತ, ಲೈವ್ ಮತ್ತು ತೆರೆದಿದ್ದಾಗ ಮಾತ್ರ ಕಾಣುತ್ತದೆ, ಮತ್ತು ಹುಡುಕಾಟದಲ್ಲಿ ಸ್ಟಾಕ್ ಇರುವ ಪ್ರಾಡಕ್ಟ್‌ಗಳು ಮಾತ್ರ ಕಾಣುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "f4e2ecf1"
+  },
+  "help.faq.staff.q": {
+    "message": "ನನ್ನ ಸಿಬ್ಬಂದಿ ಏನು ಮಾಡಬಹುದು?",
+    "review": "reviewed",
+    "enHash": "b8db285c"
+  },
+  "help.faq.staff.a": {
+    "message": "ಕ್ಯಾಷಿಯರ್ ಮಾರಾಟ ಮಾಡುತ್ತಾರೆ ಮತ್ತು ಆರ್ಡರ್‌ಗಳನ್ನು ನೋಡಿಕೊಳ್ಳುತ್ತಾರೆ. ಮ್ಯಾನೇಜರ್ ಸ್ಟಾಕ್, ಆಫರ್ ಮತ್ತು ಕ್ಯಾಷಿಯರ್‌ಗಳನ್ನೂ ನಿರ್ವಹಿಸುತ್ತಾರೆ. ಮಾಲೀಕರು ಪೇಔಟ್ ಮತ್ತು ಮ್ಯಾನೇಜರ್‌ಗಳು ಸೇರಿದಂತೆ ಎಲ್ಲವನ್ನೂ ಮಾಡಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "3fa92516"
+  },
+  "help.faq.close.q": {
+    "message": "ನನ್ನ ಬಿಸಿನೆಸ್ ಅನ್ನು ಹೇಗೆ ಮುಚ್ಚುವುದು?",
+    "review": "reviewed",
+    "enHash": "9cbd77ce"
+  },
+  "help.faq.close.a": {
+    "message": "ಆ್ಯಪ್‌ನಲ್ಲಿ ಅಳಿಸುವ ಆಯ್ಕೆ ಇಲ್ಲ. ಸಪೋರ್ಟ್ ಅನ್ನು ಸಂಪರ್ಕಿಸಿ, ನಾವು ಸಹಾಯ ಮಾಡುತ್ತೇವೆ.",
+    "review": "reviewed",
+    "enHash": "c0c9b9a3"
+  },
+  "help.contact.title": {
+    "message": "ಸಪೋರ್ಟ್ ಸಂಪರ್ಕಿಸಿ",
+    "review": "reviewed",
+    "enHash": "2b658ffd"
+  },
+  "help.contact.body": {
+    "message": "ಟಿಕೆಟ್ ತೆರೆಯಿರಿ, ಸಪೋರ್ಟ್ ಇಲ್ಲೇ ಆ್ಯಪ್‌ನಲ್ಲಿ ಉತ್ತರಿಸುತ್ತದೆ. ಸಹಾಯವಾದರೆ ಆರ್ಡರ್ ಮತ್ತು ಫೋಟೋ ಸೇರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "6005ef8c"
+  },
+  "help.contact.bodyCashier": {
+    "message": "ಸಪೋರ್ಟ್‌ನೊಂದಿಗೆ ಟಿಕೆಟ್ ತೆರೆಯಲು ಮಾಲೀಕರು ಅಥವಾ ಮ್ಯಾನೇಜರ್ ಅನ್ನು ಕೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "dfa6938a"
+  },
+  "help.contact.call": {
+    "message": "{phone} ಗೆ ಕರೆ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "f9ea1a72"
+  },
+  "help.tickets.new": {
+    "message": "ಹೊಸ ಟಿಕೆಟ್",
+    "review": "reviewed",
+    "enHash": "b8bf9c88"
+  },
+  "help.tickets.loading": {
+    "message": "ಟಿಕೆಟ್‌ಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ",
+    "review": "reviewed",
+    "enHash": "b603c74a"
+  },
+  "help.tickets.list": {
+    "message": "ಟಿಕೆಟ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "5c622a51"
+  },
+  "help.tickets.more": {
+    "message": "ಇನ್ನಷ್ಟು ತೋರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "help.tickets.updated": {
+    "message": "{when} ಅಪ್‌ಡೇಟ್ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "f734128f"
+  },
+  "help.tickets.empty.title": {
+    "message": "ಇನ್ನೂ ಯಾವುದೇ ಟಿಕೆಟ್ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "16baa0a9"
+  },
+  "help.tickets.empty.body": {
+    "message": "ಆರ್ಡರ್, ಪೇಔಟ್ ಅಥವಾ ಆ್ಯಪ್‌ನಲ್ಲಿ ಏನಾದರೂ ತಪ್ಪಾದಾಗ, ಟಿಕೆಟ್ ತೆರೆಯಿರಿ, ಸಪೋರ್ಟ್ ಇಲ್ಲಿ ಉತ್ತರಿಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "87f97a5c"
+  },
+  "help.tickets.error.title": {
+    "message": "ಟಿಕೆಟ್‌ಗಳು ಲೋಡ್ ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "cf7d483b"
+  },
+  "help.status.open": {
+    "message": "ತೆರೆದಿದೆ",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "help.status.waiting": {
+    "message": "ಉತ್ತರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "7d688ab4"
+  },
+  "help.status.resolved": {
+    "message": "ಪರಿಹರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "e1d35505"
+  },
+  "help.status.closed": {
+    "message": "ಮುಚ್ಚಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "88d86b77"
+  },
+  "help.category.order": {
+    "message": "ಒಂದು ಆರ್ಡರ್",
+    "review": "reviewed",
+    "enHash": "40eb87b7"
+  },
+  "help.category.credits": {
+    "message": "ಕ್ರೆಡಿಟ್",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "help.category.payouts": {
+    "message": "ಪೇಔಟ್",
+    "review": "reviewed",
+    "enHash": "e0e7ea13"
+  },
+  "help.category.catalogue": {
+    "message": "ಪ್ರಾಡಕ್ಟ್ ಮತ್ತು ಸ್ಟಾಕ್",
+    "review": "reviewed",
+    "enHash": "5934f5ac"
+  },
+  "help.category.account": {
+    "message": "ನನ್ನ ಅಕೌಂಟ್ ಅಥವಾ ಸಿಬ್ಬಂದಿ",
+    "review": "reviewed",
+    "enHash": "caed2475"
+  },
+  "help.category.verification": {
+    "message": "ವೆರಿಫಿಕೇಶನ್",
+    "review": "reviewed",
+    "enHash": "03128bed"
+  },
+  "help.category.app": {
+    "message": "ಆ್ಯಪ್",
+    "review": "reviewed",
+    "enHash": "9445c325"
+  },
+  "help.category.other": {
+    "message": "ಬೇರೆ ಏನಾದರೂ",
+    "review": "reviewed",
+    "enHash": "48f88ac3"
+  },
+  "help.new.title": {
+    "message": "ಹೊಸ ಟಿಕೆಟ್",
+    "review": "reviewed",
+    "enHash": "b8bf9c88"
+  },
+  "help.new.intro": {
+    "message": "ಏನಾಯಿತು ಎಂದು ತಿಳಿಸಿ. ಸಪೋರ್ಟ್ ಟಿಕೆಟ್‌ನಲ್ಲಿ ಉತ್ತರಿಸುತ್ತದೆ, ನೀವು ಅಲ್ಲಿ ಇನ್ನಷ್ಟು ಸೇರಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "5b8aa383"
+  },
+  "help.new.category": {
+    "message": "ಇದು ಯಾವುದರ ಬಗ್ಗೆ?",
+    "review": "reviewed",
+    "enHash": "23a5beeb"
+  },
+  "help.new.category.pick": {
+    "message": "ಒಂದನ್ನು ಆರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "4238dc41"
+  },
+  "help.new.category.required": {
+    "message": "ಇದು ಯಾವುದರ ಬಗ್ಗೆ ಎಂದು ಆರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "079e2dcc"
+  },
+  "help.new.subject": {
+    "message": "ವಿಷಯ",
+    "review": "reviewed",
+    "enHash": "8d183dbd"
+  },
+  "help.new.subject.help": {
+    "message": "ಒಂದು ಚಿಕ್ಕ ಸಾಲು, ಉದಾಹರಣೆಗೆ “ಮಾರ್ಚ್ ಪೇಔಟ್ ಬಂದಿಲ್ಲ”.",
+    "review": "reviewed",
+    "enHash": "08192782"
+  },
+  "help.new.subject.required": {
+    "message": "{min} ರಿಂದ {max} ಅಕ್ಷರಗಳ ವಿಷಯ ಬರೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "2583925c"
+  },
+  "help.new.store": {
+    "message": "ಯಾವ ಅಂಗಡಿ?",
+    "review": "reviewed",
+    "enHash": "54f0dfee"
+  },
+  "help.new.store.none": {
+    "message": "ಒಂದು ಅಂಗಡಿಯ ಬಗ್ಗೆ ಅಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "98a3c63e"
+  },
+  "help.new.order": {
+    "message": "ಯಾವ ಆರ್ಡರ್?",
+    "review": "reviewed",
+    "enHash": "21813ae5"
+  },
+  "help.new.order.none": {
+    "message": "ಒಂದು ಆರ್ಡರ್ ಬಗ್ಗೆ ಅಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "f29403b4"
+  },
+  "help.new.order.help": {
+    "message": "ಈ ಅಂಗಡಿಯ ಇತ್ತೀಚಿನ ಆರ್ಡರ್‌ಗಳು.",
+    "review": "reviewed",
+    "enHash": "45dd645c"
+  },
+  "help.new.order.failed": {
+    "message": "ಆರ್ಡರ್‌ಗಳು ಲೋಡ್ ಆಗಲಿಲ್ಲ. ನೀವು ಆದರೂ ಟಿಕೆಟ್ ಕಳುಹಿಸಬಹುದು ಮತ್ತು ಮೆಸೇಜ್‌ನಲ್ಲಿ ಆರ್ಡರ್ ತಿಳಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "f7796d10"
+  },
+  "help.new.body": {
+    "message": "ಏನಾಯಿತು?",
+    "review": "reviewed",
+    "enHash": "e9ef659a"
+  },
+  "help.new.body.help": {
+    "message": "ಹೆಚ್ಚು ವಿವರ ಕೊಟ್ಟಷ್ಟು ನಾವು ಬೇಗ ಸಹಾಯ ಮಾಡಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "2f8737b5"
+  },
+  "help.new.body.required": {
+    "message": "ಒಂದು ಮೆಸೇಜ್ ಬರೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "c8e96b81"
+  },
+  "help.new.fieldRefused": {
+    "message": "ಇದನ್ನು ಸ್ವೀಕರಿಸಲಿಲ್ಲ. ಮತ್ತೆ ಆರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "f557af62"
+  },
+  "help.new.send": {
+    "message": "ಸಪೋರ್ಟ್‌ಗೆ ಕಳುಹಿಸಿ",
+    "review": "reviewed",
+    "enHash": "e0b3861b"
+  },
+  "help.new.sent": {
+    "message": "ಟಿಕೆಟ್ {number} ಕಳುಹಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "99303bb3"
+  },
+  "help.ticket.loading": {
+    "message": "ಟಿಕೆಟ್ ಲೋಡ್ ಆಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "ee58be8e"
+  },
+  "help.ticket.title": {
+    "message": "ಟಿಕೆಟ್ {number}",
+    "review": "reviewed",
+    "enHash": "fc0bae40"
+  },
+  "help.ticket.messages": {
+    "message": "ಮೆಸೇಜ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "f1702b46"
+  },
+  "help.ticket.fromSupport": {
+    "message": "TodayZ ಸಪೋರ್ಟ್",
+    "review": "reviewed",
+    "enHash": "f0829b0f"
+  },
+  "help.ticket.fromYou": {
+    "message": "ನಿಮ್ಮ ಬಿಸಿನೆಸ್",
+    "review": "reviewed",
+    "enHash": "d8f3e8b6"
+  },
+  "help.ticket.state.open": {
+    "message": "ಸಪೋರ್ಟ್ ಇಲ್ಲಿ ಉತ್ತರಿಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "fcb604cd"
+  },
+  "help.ticket.state.waiting": {
+    "message": "ಸಪೋರ್ಟ್ ಉತ್ತರಿಸಿದೆ. ಇನ್ನೂ ಸಹಾಯ ಬೇಕಿದ್ದರೆ ಕೆಳಗೆ ಉತ್ತರಿಸಿ, ಟಿಕೆಟ್ ಮತ್ತೆ ತೆರೆಯುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "e360387a"
+  },
+  "help.ticket.state.resolved": {
+    "message": "ಸಪೋರ್ಟ್ ಇದನ್ನು ಪರಿಹರಿಸಲಾಗಿದೆ ಎಂದು ಗುರುತಿಸಿದೆ. ಆಗಿಲ್ಲದಿದ್ದರೆ ಕೆಳಗೆ ಉತ್ತರಿಸಿ, ಟಿಕೆಟ್ ಮತ್ತೆ ತೆರೆಯುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "22fde542"
+  },
+  "help.ticket.state.closed": {
+    "message": "ಈ ಟಿಕೆಟ್ ಮುಚ್ಚಲಾಗಿದೆ, ಇದಕ್ಕೆ ಇನ್ನು ಮೆಸೇಜ್ ಕಳುಹಿಸಲಾಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "7e6e9eca"
+  },
+  "help.ticket.newInstead": {
+    "message": "ಹೊಸ ಟಿಕೆಟ್ ತೆರೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "c36c110e"
+  },
+  "help.ticket.notFound.title": {
+    "message": "ಟಿಕೆಟ್ ಸಿಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "fb25ca39"
+  },
+  "help.ticket.notFound.body": {
+    "message": "ಇದು ಬೇರೆ ಬಿಸಿನೆಸ್‌ನದ್ದಾಗಿರಬಹುದು, ಅಥವಾ ಲಿಂಕ್ ತಪ್ಪಾಗಿರಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "08e62202"
+  },
+  "help.ticket.notFound.action": {
+    "message": "ನಿಮ್ಮ ಟಿಕೆಟ್‌ಗಳನ್ನು ನೋಡಿ",
+    "review": "reviewed",
+    "enHash": "2a142fb0"
+  },
+  "help.ticket.error.title": {
+    "message": "ಟಿಕೆಟ್ ಲೋಡ್ ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "51a4c349"
+  },
+  "help.reply.title": {
+    "message": "ಉತ್ತರ",
+    "review": "reviewed",
+    "enHash": "6c2bb735"
+  },
+  "help.reply.label": {
+    "message": "ನಿಮ್ಮ ಮೆಸೇಜ್",
+    "review": "reviewed",
+    "enHash": "f190c98e"
+  },
+  "help.reply.help": {
+    "message": "ಸಪೋರ್ಟ್ ಇದನ್ನು ಈ ಟಿಕೆಟ್‌ನಲ್ಲಿ ನೋಡುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "0b3c7ee4"
+  },
+  "help.reply.reopens": {
+    "message": "ಉತ್ತರ ಕಳುಹಿಸಿದರೆ ಟಿಕೆಟ್ ಮತ್ತೆ ತೆರೆಯುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "afd6995f"
+  },
+  "help.reply.send": {
+    "message": "ಉತ್ತರ ಕಳುಹಿಸಿ",
+    "review": "reviewed",
+    "enHash": "7f7e603a"
+  },
+  "help.files.add": {
+    "message": "ಫೋಟೋ ಅಥವಾ PDF ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "ef72b016"
+  },
+  "help.files.uploading": {
+    "message": "ಅಪ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "de272409"
+  },
+  "help.files.help": {
+    "message": "JPEG, PNG, WebP ಅಥವಾ PDF, ಪ್ರತಿಯೊಂದೂ {mb} MB ವರೆಗೆ, ಗರಿಷ್ಠ {max} ಫೈಲ್‌ಗಳು.",
+    "review": "reviewed",
+    "enHash": "8a7ca2f9"
+  },
+  "help.files.list": {
+    "message": "ಫೈಲ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "6ce6c512"
+  },
+  "help.files.remove": {
+    "message": "{name} ತೆಗೆದುಹಾಕಿ",
+    "review": "reviewed",
+    "enHash": "df7193a5"
+  },
+  "help.files.type": {
+    "message": "{name} ಫೋಟೋ ಅಥವಾ PDF ಅಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "0299449c"
+  },
+  "help.files.size": {
+    "message": "{name} {mb} MB ಗಿಂತ ದೊಡ್ಡದಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "24ccdc18"
+  },
+  "help.files.tooMany": {
+    "message": "ಒಂದು ಮೆಸೇಜ್‌ಗೆ ಗರಿಷ್ಠ {max} ಫೈಲ್‌ಗಳು.",
+    "review": "reviewed",
+    "enHash": "d7a902ec"
+  },
+  "help.files.failed": {
+    "message": "{name} ಅಪ್‌ಲೋಡ್ ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "cd16e9c2"
+  },
+  "help.error.validation_failed": {
+    "message": "ಕೆಲವು ವಿವರಗಳನ್ನು ಸ್ವೀಕರಿಸಲಿಲ್ಲ. ಫಾರ್ಮ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "f1164913"
+  },
+  "help.error.forbidden": {
+    "message": "ಇದನ್ನು ಮಾಲೀಕರು ಅಥವಾ ಮ್ಯಾನೇಜರ್ ಮಾತ್ರ ಮಾಡಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "53dd9bab"
+  },
+  "help.error.not_found": {
+    "message": "ಈ ಟಿಕೆಟ್ ಈಗ ಲಭ್ಯವಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "9c3df5fd"
+  },
+  "help.error.invalid_transition": {
+    "message": "ಈ ಟಿಕೆಟ್ ಮುಚ್ಚಲಾಗಿದೆ, ಇದಕ್ಕೆ ಇನ್ನು ಮೆಸೇಜ್ ಕಳುಹಿಸಲಾಗುವುದಿಲ್ಲ. ಹೊಸ ಟಿಕೆಟ್ ತೆರೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "7bfa6828"
+  },
+  "help.error.generic": {
+    "message": "ಅದು ಆಗಲಿಲ್ಲ. ನಿಮ್ಮ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "462c8c1d"
+  },
+  "help.files.empty": {
+    "message": "{name} ಖಾಲಿಯಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "83f58457"
+  }
+}

@@ -22,7 +22,11 @@ export const SECTION_ROLES: Readonly<Record<string, readonly Role[]>> = {
   support: SUPPORT_UP,
   reviews: SUPPORT_UP,
   banners: SUPPORT_UP,
+  /** A-13: support reads the queue only (D-64). */
+  risk: SUPPORT_UP,
   credits: ['finance', ...ADMINS],
+  /** A-10 (admin.referrals.view, risk.golden). */
+  referrals: ADMINS,
   catalogue: ['catalogue', ...ADMINS],
   demand: ['field_agent', 'catalogue', 'analyst', ...ADMINS],
   payouts: ['finance', ...ADMINS],
@@ -54,6 +58,10 @@ export const ACTION_ROLES = {
   payoutManage: ['finance', 'super_admin'],
   /** A-09 adjustment request, approve and reject; the admin role cannot adjust credits (06 A-09). */
   creditAdjust: ['finance', 'super_admin'],
+  /** A-13 clear and confirm (admin.risk.resolve). */
+  riskResolve: ADMINS,
+  /** A-10 reject (admin.referral.reject). */
+  referralReject: ADMINS,
 } as const satisfies Record<string, readonly Role[]>;
 export type Action = keyof typeof ACTION_ROLES;
 

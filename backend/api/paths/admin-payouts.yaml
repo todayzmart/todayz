@@ -223,7 +223,7 @@
     summary: Release a held payout, with a reason (step-up)
     description: >-
       Only a held payout (else `409 invalid_transition`), and only once its automatic cause has cleared:
-      KYC verified, no open risk flag, business not suspended (else `409 payout_hold_cause_open`).
+      KYC verified, no open or confirmed risk flag on the business or its stores, business not suspended (else `409 payout_hold_cause_open`).
     x-idempotency: optional
     x-problems: [step_up_required, invalid_transition, payout_hold_cause_open]
     parameters:

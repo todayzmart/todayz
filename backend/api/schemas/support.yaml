@@ -1,0 +1,180 @@
+# Schemas: domain "support" (owner W3-08): the customer's own support tickets (01 §13, 04 §2.6, 06 C-19, D-226).
+#
+# Request objects carry `additionalProperties: false`. Internal notes never appear here.
+# The business side is biz-support.yaml; the two share rules, not schemas.
+MyTicketCategory:
+  type: string
+  description: The topics a customer can pick; the business-only ones (payouts, catalogue, verification) are not offered.
+  enum: [order, credits, account, app, other]
+MyTicketStatus:
+  type: string
+  description: "`open`: with support. `waiting`: support replied. `resolved`: done, a reply reopens it. `closed`: final; open a new ticket."
+  enum: [open, waiting, resolved, closed]
+MyTicket:
+  type: object
+  required: [id, number, subject, category, status, storeName, orderId, orderNumber, lastMessageAt, createdAt]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    number:
+      type: string
+    subject:
+      type: string
+    category:
+      $ref: "#/MyTicketCategory"
+    status:
+      $ref: "#/MyTicketStatus"
+    storeName:
+      type: [string, "null"]
+      description: The shop of the linked order, if any.
+    orderId:
+      type: [string, "null"]
+    orderNumber:
+      type: [string, "null"]
+    lastMessageAt:
+      $ref: ./common.yaml#/Timestamp
+    createdAt:
+      $ref: ./common.yaml#/Timestamp
+MyTicketList:
+  type: object
+  required: [items, nextCursor]
+  properties:
+    items:
+      type: array
+      items:
+        $ref: "#/MyTicket"
+    nextCursor:
+      $ref: ./common.yaml#/NextCursor
+MyTicketAttachmentContentType:
+  type: string
+  enum: [image/jpeg, image/png, image/webp, application/pdf]
+MyTicketAttachment:
+  type: object
+  required: [id, fileName, contentType, sizeBytes, url]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    fileName:
+      type: string
+    contentType:
+      $ref: "#/MyTicketAttachmentContentType"
+    sizeBytes:
+      type: integer
+    url:
+      type: [string, "null"]
+      description: A presigned GET, valid for 15 minutes; null while storage is not configured.
+MyTicketMessage:
+  type: object
+  required: [id, from, body, createdAt, attachments]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    from:
+      type: string
+      description: "`customer`: the caller. `support`: TodayZ support; no agent name is shown."
+      enum: [customer, support]
+    body:
+      type: string
+    createdAt:
+      $ref: ./common.yaml#/Timestamp
+    attachments:
+      type: array
+      items:
+        $ref: "#/MyTicketAttachment"
+MyTicketThread:
+  type: object
+  required: [ticket, messages, serverNow]
+  properties:
+    ticket:
+      $ref: "#/MyTicket"
+    messages:
+      type: array
+      description: Oldest first.
+      items:
+        $ref: "#/MyTicketMessage"
+    serverNow:
+      $ref: ./common.yaml#/ServerNow
+MyTicketCreate:
+  type: object
+  additionalProperties: false
+  required: [category, subject, body]
+  properties:
+    category:
+      $ref: "#/MyTicketCategory"
+    subject:
+      type: string
+      minLength: 3
+      maxLength: 120
+    body:
+      type: string
+      minLength: 1
+      maxLength: 4000
+    orderId:
+      $ref: ./common.yaml#/Ulid
+    attachmentIds:
+      type: array
+      maxItems: 5
+      items:
+        $ref: ./common.yaml#/Ulid
+MyTicketMessageCreate:
+  type: object
+  additionalProperties: false
+  required: [body]
+  properties:
+    body:
+      type: string
+      minLength: 1
+      maxLength: 4000
+    attachmentIds:
+      type: array
+      maxItems: 5
+      items:
+        $ref: ./common.yaml#/Ulid
+MyTicketAttachmentCreate:
+  type: object
+  additionalProperties: false
+  required: [fileName, contentType, sizeBytes]
+  properties:
+    fileName:
+      type: string
+      minLength: 1
+      maxLength: 120
+    contentType:
+      $ref: "#/MyTicketAttachmentContentType"
+    sizeBytes:
+      type: integer
+      format: int64
+      minimum: 1
+      maximum: 10485760
+      description: The file's exact size in bytes (at most 10 MB). The upload URL signs it.
+MyTicketUploadHeaders:
+  type: object
+  required: [Content-Type, Content-Length]
+  properties:
+    Content-Type:
+      $ref: "#/MyTicketAttachmentContentType"
+    Content-Length:
+      type: string
+      pattern: ^[1-9][0-9]*$
+MyTicketUploadTarget:
+  type: object
+  description: A presigned PUT into the private bucket. Send the file with exactly these headers before `expiresAt`.
+  required: [url, method, headers, expiresAt]
+  properties:
+    url:
+      type: string
+    method:
+      type: string
+      enum: [PUT]
+    headers:
+      $ref: "#/MyTicketUploadHeaders"
+    expiresAt:
+      $ref: ./common.yaml#/Timestamp
+MyTicketAttachmentUpload:
+  type: object
+  required: [attachment, upload]
+  properties:
+    attachment:
+      $ref: "#/MyTicketAttachment"
+    upload:
+      $ref: "#/MyTicketUploadTarget"

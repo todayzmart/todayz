@@ -253,11 +253,11 @@ Keys: `ref_<kind>_referrer_credits` and `ref_<kind>_referee_credits` for each ki
 - Each business has a credit account per store (statement is per business, broken down by store).
 - Credits in: customer credits spent at the store, referral rewards earned by the business. Credits out: cashback the store gave, payouts. Reversals (§7) and admin adjustments post here too.
 - **Monthly statement** (manual payout): statements close on the 1st of each month at 00:30 IST. The system closes the previous month's statement per business: opening balance + credits in − cashback ± reversals and adjustments − payouts paid = closing balance.
-- **Payout amount** = the business's store credit balance − its unpaid payouts. If the closing amount is above 0, a payout is created for finance. It is `pending` when KYC is verified, there is no open fraud flag and the business is not suspended. Otherwise it is `held` with `hold_reason` `kyc_incomplete`, `risk_flag` or `business_suspended`, and finance unholds it when the cause clears.
+- **Payout amount** = the business's store credit balance − its unpaid payouts. If the closing amount is above 0, a payout is created for finance. It is `pending` when KYC is verified, there is no open fraud flag (a risk flag on the business or one of its stores that nobody has cleared: `open` or `confirmed`, D-225) and the business is not suspended. Otherwise it is `held` with `hold_reason` `kyc_incomplete`, `risk_flag` or `business_suspended`, and finance unholds it when the cause clears.
   - A business has at most one open payout (`pending` or `held`).
   - If the open payout is still unpaid when the next statement closes, its amount is recomputed; no second payout is created.
 - Finance in the admin console reviews (fraud flags shown), pays by UPI outside TodayZ, then marks it paid with the UTR reference. Only then does the business app show "Paid". Negative balances carry forward.
-- Payout holds: unverified KYC, open fraud flag, suspended business.
+- Payout holds: unverified KYC, open or confirmed risk flag, suspended business.
 
 ## 10. Reviews
 
@@ -448,6 +448,14 @@ Admin roles (D-64; summary, the full permission matrix is in 02). There are 7 ro
 - Pulse: every admin role except `field_agent`.
 - Demand (A-23, D-101): demand gaps are read by `field_agent`, `catalogue`, `analyst`, `admin` and `super_admin`; the site search strip list is approved by `catalogue`, `admin` and `super_admin` (audited).
 - **Money settings** are `platform_settings` keys with unit `paise`, `bp` or `credits`. Only `super_admin` can change them.
+
+**Support tickets** (D-226). A business owner or manager opens a ticket from B-15 (cashiers cannot); a signed-in customer opens one from C-19, optionally on one of their own orders. Each ticket has a category, a status (`open`, `waiting`, `resolved`, `closed`) and a priority (`normal`, `high`, `urgent`); every new ticket starts at `normal`.
+- `support`, `admin` and `super_admin` work the inbox (A-14): assign (to themselves or another of these roles), reply, add internal notes, change the priority, resolve and close. Assign, priority, resolve and close are audited; resolve and close take a reason.
+- **SLA.** While a ticket is `open`, support owes a reply, due `support_sla_<priority>_min` minutes after the ticket was opened or reopened (the setting at that moment). A further message from the opener while it is still `open` keeps the due time, so writing again never pushes support's deadline back. An agent's reply moves it to `waiting` and stops the timer. Changing the priority of an `open` ticket moves its due time to when the timer started plus the new priority's minutes, so it can be overdue at once; on a `waiting` or `resolved` ticket it only sets the minutes the next timer uses; a `closed` ticket keeps its priority. Past the due time the inbox shows it as overdue; nothing escalates or changes on its own. The opener is never shown a reply time.
+- The opener's reply on a `waiting` or `resolved` ticket reopens it (`open`, a new due time). A `closed` ticket takes no more messages (`409 invalid_transition`); the opener opens a new one.
+- A customer sees only the tickets they opened as a customer, and support's messages without an agent's name; a business sees only its own tickets. Internal notes are never shown to the opener. Attachments (JPEG, PNG, WebP or PDF, at most 10 MB each, at most 5 per message) are private files, shown through short-lived links.
+- **Limits** (D-226). One person may have at most `support_open_tickets_max` tickets `open` or `waiting` at once (`422 support_ticket_limit_reached`), and may open at most `support_tickets_per_hour` tickets and ask for at most `support_uploads_per_hour` uploads in any rolling hour (`429 rate_limited`). An upload is claimed by one message: of its uploader, of the same business (none for a customer or an agent) and, for an agent's upload, on the ticket it was asked for. The file must be in the bucket with the declared size and type when the message is posted (`422` otherwise). An upload no message has claimed within `support_upload_ttl_hours` is refused, and the `support_uploads_sweep` job (`maintenance`) deletes it, row and file.
+- **Account deletion** (§2). Deleting a customer account closes their open customer tickets (reason `account_deleted`), replaces the subjects and the customer's own messages on their customer tickets with a neutral placeholder, and deletes the customer's attachments on them, rows and files. Support's replies and notes stay. A business ticket stays with the business.
 
 **Background jobs** (D-95). Every background job is a registered kind with a class: `timer` (order and hold expiries), `money` (ledger, payouts, credit expiry), `notify`, `marketing`, `ai`, `rollup` or `maintenance` (partitions, retention).
 - `timer` kinds can never be paused or run by hand: order correctness depends on them.
@@ -666,6 +674,30 @@ Every numeric key has a min and a max (the Rule column, or after the default). A
 |---|---|---|---|
 | `customer_max_saved_addresses` | count | 20 | §5.5: saved addresses one customer can keep (`422 validation_failed` on one more). Min 1, max 50. |
 
+**Risk** (A-13, D-225). Each raises a `risk_flags` row only; no one is blocked or suspended because of it. The one money effect is §9's payout hold: a flag on a business or one of its stores holds that business's payout while it is open or confirmed, until someone clears it.
+
+| Key | Unit | Default | Rule |
+|---|---|---|---|
+| `risk_bill_claim_stores` | count | 3 | §6: different stores one customer confirms bill QRs at within `risk_bill_claim_window_minutes` that raise a risk flag. Min 2, max 20. |
+| `risk_bill_claim_window_minutes` | minutes | 10 | §6: the window for `risk_bill_claim_stores`. Min 1, max 240. |
+| `risk_reversal_ratio_percent` | count | 20 | §7: share of a store's linked POS sales (bill QR or counter code) reversed within `risk_reversal_window_days` that raises a risk flag, in percent. Min 1, max 100. |
+| `risk_reversal_min_sales` | count | 30 | §7: linked sales a store needs in the window before the ratio counts. Min 1, max 1000. |
+| `risk_reversal_window_days` | days | 7 | §7: the window for the reversal ratio. Min 1, max 30. |
+| `risk_otp_phones_per_ip_hour` | count | 10 | §2: different phone numbers one IP asks OTPs for within an hour that raise a risk flag. Min 2, max 100. |
+| `risk_otp_failed_per_phone_day` | count | 3 | §2: OTPs for one phone that used every attempt without the right code within 24 h that raise a risk flag. Min 1, max 50. |
+
+**Support** (§13, D-226)
+
+| Key | Unit | Default | Rule |
+|---|---|---|---|
+| `support_sla_urgent_min` | minutes | 60 | §13: time to support's next reply on an urgent ticket. Min 15, max 10080. |
+| `support_sla_high_min` | minutes | 240 | §13: the same for a high-priority ticket. Min 15, max 10080. |
+| `support_sla_normal_min` | minutes | 1440 | §13: the same for a normal ticket. Min 15, max 10080. |
+| `support_open_tickets_max` | count | 5 | §13: tickets one person may have open or waiting at once. Min 1, max 50. |
+| `support_tickets_per_hour` | count | 5 | §13: tickets one person may open in a rolling hour. Min 1, max 60. |
+| `support_uploads_per_hour` | count | 30 | §13: attachment uploads one person may ask for in a rolling hour. Min 5, max 300. |
+| `support_upload_ttl_hours` | hours | 24 | §13: an upload no message has claimed is refused and deleted after this. Min 1, max 168. |
+
 **Feature flags** (turn a feature off without a deploy)
 
 | Key | Unit | Default |
@@ -725,6 +757,7 @@ Every numeric key has a min and a max (the Rule column, or after the default). A
 | "3 or more orders expired in 2 h" alert | 3 in 2 h | 05 §5 |
 | Failed-delivery auto-confirm | 72 h | §5.3, D-85 (the 2 h and 24 h reminders are settings, D-218) |
 | Store-strike window (risk flag and reliability) | 30 days | §5.4, D-85 |
+| Risk flag scores (0–100, shown in A-13) | fixed per rule in `internal/risk` | §13, D-225 |
 | Jobs watchdog interval | 5 min | §13, D-95 |
 | "Cron missed" threshold | no succeeded run within 2× the schedule interval (daily kinds: 15 min grace after the expected time) | §13, D-95 |
 | Job error text stored | scrubbed, at most 2 kB | §13, D-95 |

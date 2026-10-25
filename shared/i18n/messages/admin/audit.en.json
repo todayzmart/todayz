@@ -326,5 +326,17 @@
   "audit.action.payoutExport": {
     "defaultMessage": "Payout file exported",
     "description": "Audit action: an admin downloaded the bank and UPI payout file for a period (A-11)"
+  },
+  "audit.action.riskFlagClear": {
+    "defaultMessage": "Risk flag cleared",
+    "description": "Audit action: an admin cleared a risk flag as a false alarm, with a reason (A-13)"
+  },
+  "audit.action.riskFlagConfirm": {
+    "defaultMessage": "Risk flag confirmed",
+    "description": "Audit action: an admin confirmed a risk flag, with a reason (A-13)"
+  },
+  "audit.action.referralReject": {
+    "defaultMessage": "Referral rejected",
+    "description": "Audit action: an admin rejected a referral before its reward posted (A-10)"
   }
 }

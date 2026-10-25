@@ -21,7 +21,9 @@ const ALL = [
   'Support',
   'Reviews',
   'Banner moderation',
+  'Risk',
   'Credits and referrals',
+  'Referrals',
   'Master catalogue',
   'Demand',
   'Payouts',
@@ -38,7 +40,7 @@ const CASES: { roles: string[]; nav: string[]; hidden?: string }[] = [
   { roles: ['field_agent'], nav: ['Businesses', 'Demand'], hidden: '/orders' },
   {
     roles: ['support'],
-    nav: ['Pulse', 'Businesses', 'Stores', 'Customers', 'Orders', 'Support', 'Reviews', 'Banner moderation', 'Jobs'],
+    nav: ['Pulse', 'Businesses', 'Stores', 'Customers', 'Orders', 'Support', 'Reviews', 'Banner moderation', 'Risk', 'Jobs'],
     hidden: '/payouts',
   },
   { roles: ['catalogue'], nav: ['Pulse', 'Master catalogue', 'Demand'], hidden: '/orders' },
@@ -58,8 +60,13 @@ const SUPPORT_UP = ['support', 'admin', 'super_admin'];
 const READS: [RegExp, string[]][] = [
   [/^\/v1\/admin\/leads(\/|$)/, ['field_agent', ...SUPPORT_UP]],
   [/^\/v1\/admin\/(businesses|stores|customers|customer-search|orders|reviews|review-reports|banners)(\/|$)/, SUPPORT_UP],
+  // admin.support.tickets (support.golden): the A-14 inbox and ticket.
+  [/^\/v1\/admin\/tickets(\/|$)/, SUPPORT_UP],
   [/^\/v1\/admin\/audit-log\/subject$/, ['field_agent', 'support', 'catalogue', 'finance', 'admin', 'super_admin']],
   [/^\/v1\/admin\/(audit-log|settings)(\/|$)/, ['admin', 'super_admin']],
+  // admin.risk.view (support reads A-13 only) and admin.referrals.view (risk.golden).
+  [/^\/v1\/admin\/risk(\/|$)/, SUPPORT_UP],
+  [/^\/v1\/admin\/referrals(\/|$)/, ['admin', 'super_admin']],
   [/^\/v1\/admin\/(notification-templates|integrations)(\/|$)/, ['admin', 'super_admin']],
   // admin.ledger.view and admin.payout.view (credits.golden, payouts.golden).
   [/^\/v1\/admin\/(credits|credit-adjustments|payouts|statements)(\/|$)/, ['finance', 'admin', 'super_admin']],

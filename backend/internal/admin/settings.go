@@ -59,6 +59,8 @@ var groupPrefixes = []struct {
 	{"ask_", "asks"}, {"site_marquee", "asks"}, {"refine_ai", "asks"}, {"share_card", "asks"},
 	{"basket_", "baskets"},
 	{"customer_", "customers"},
+	{"risk_", "risk"},
+	{"support_", "support"},
 	{"feature_", "features"}, {"notify_", "features"},
 	{"ai_", "ai"},
 	{"min_client_version", "clients"},
@@ -67,7 +69,7 @@ var groupPrefixes = []struct {
 // groupOrder is the A-17 table's order of groups.
 var groupOrder = []api.AdminSettingGroup{
 	"orders", "stock", "credits", "reviews", "referrals", "pos", "search", "insights", "field", "jobs",
-	"asks", "baskets", "customers", "features", "ai", "clients", "other",
+	"asks", "baskets", "customers", "risk", "support", "features", "ai", "clients", "other",
 }
 
 func settingGroup(key string) api.AdminSettingGroup {

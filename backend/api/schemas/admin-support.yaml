@@ -1,9 +1,282 @@
-# Schemas: domain "admin-support" (owner W3-06): admin support (04 §2.7).
+# Schemas: domain "admin-support" (owner W3-08): the support ticket inbox (01 §13, 04 §2.7, 06 A-14, D-226).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Request objects carry `additionalProperties: false`. Ids are `Ulid`, times are `Timestamp`,
+# timed responses carry `serverNow` (the SLA chip counts down from it, never the device clock).
+TicketCategory:
+  type: string
+  enum: [order, credits, payouts, catalogue, account, verification, app, other]
+TicketStatus:
+  type: string
+  description: "`open`: support owes a reply (the SLA runs). `waiting`: support replied, the opener's turn. `resolved` and `closed` are done; the opener's reply reopens a resolved ticket, a closed one takes no more messages."
+  enum: [open, waiting, resolved, closed]
+TicketPriority:
+  type: string
+  enum: [normal, high, urgent]
+TicketOpenerType:
+  type: string
+  enum: [customer, business]
+TicketPerson:
+  type: object
+  required: [id, name]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    name:
+      type: [string, "null"]
+TicketSummary:
+  type: object
+  required: [id, number, subject, category, status, priority, openerType, opener, businessId, businessName, storeId, storeName,
+    orderId, orderNumber, assignee, slaDueAt, overdue, lastMessageAt, createdAt]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    number:
+      type: string
+      description: The display number, `SUP-001042`.
+    subject:
+      type: string
+    category:
+      $ref: "#/TicketCategory"
+    status:
+      $ref: "#/TicketStatus"
+    priority:
+      $ref: "#/TicketPriority"
+    openerType:
+      $ref: "#/TicketOpenerType"
+    opener:
+      $ref: "#/TicketPerson"
+    businessId:
+      type: [string, "null"]
+    businessName:
+      type: [string, "null"]
+    storeId:
+      type: [string, "null"]
+    storeName:
+      type: [string, "null"]
+    orderId:
+      type: [string, "null"]
+    orderNumber:
+      type: [string, "null"]
+    assignee:
+      oneOf:
+        - $ref: "#/TicketPerson"
+        - type: "null"
+    slaDueAt:
+      type: [string, "null"]
+      format: date-time
+      description: When support's reply is due; set only while the ticket is `open`.
+    overdue:
+      type: boolean
+      description: "`open` and past `slaDueAt` at `serverNow`."
+    lastMessageAt:
+      $ref: ./common.yaml#/Timestamp
+    createdAt:
+      $ref: ./common.yaml#/Timestamp
+TicketCounts:
+  type: object
+  description: Tickets per status under the same assignee and opener filters; `overdue` counts open tickets past their due time.
+  required: [open, waiting, resolved, closed, overdue]
+  properties:
+    open:
+      type: integer
+    waiting:
+      type: integer
+    resolved:
+      type: integer
+    closed:
+      type: integer
+    overdue:
+      type: integer
+TicketList:
+  type: object
+  required: [items, counts, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      items:
+        $ref: "#/TicketSummary"
+    counts:
+      $ref: "#/TicketCounts"
+    nextCursor:
+      $ref: ./common.yaml#/NextCursor
+    serverNow:
+      $ref: ./common.yaml#/ServerNow
+TicketAttachmentContentType:
+  type: string
+  enum: [image/jpeg, image/png, image/webp, application/pdf]
+TicketAttachment:
+  type: object
+  required: [id, fileName, contentType, sizeBytes, url]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    fileName:
+      type: string
+    contentType:
+      $ref: "#/TicketAttachmentContentType"
+    sizeBytes:
+      type: integer
+    url:
+      type: [string, "null"]
+      description: A presigned GET, valid for 15 minutes; null while storage is not configured.
+TicketMessage:
+  type: object
+  required: [id, kind, authorType, author, body, createdAt, attachments]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    kind:
+      type: string
+      enum: [reply, note]
+      description: "`note` is internal: the opener never sees it."
+    authorType:
+      type: string
+      enum: [customer, business, admin]
+    author:
+      $ref: "#/TicketPerson"
+    body:
+      type: string
+    createdAt:
+      $ref: ./common.yaml#/Timestamp
+    attachments:
+      type: array
+      items:
+        $ref: "#/TicketAttachment"
+TicketOrderLink:
+  type: object
+  required: [id, number, status]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    number:
+      type: string
+    status:
+      type: string
+TicketDetail:
+  type: object
+  required: [ticket, order, firstResponseAt, resolvedAt, closedAt, closeReason, messages, agents, assistEnabled, serverNow]
+  properties:
+    ticket:
+      $ref: "#/TicketSummary"
+    order:
+      oneOf:
+        - $ref: "#/TicketOrderLink"
+        - type: "null"
+    firstResponseAt:
+      type: [string, "null"]
+      format: date-time
+    resolvedAt:
+      type: [string, "null"]
+      format: date-time
+    closedAt:
+      type: [string, "null"]
+      format: date-time
+    closeReason:
+      type: [string, "null"]
+    messages:
+      type: array
+      description: Oldest first, notes included.
+      items:
+        $ref: "#/TicketMessage"
+    agents:
+      type: array
+      description: Who the ticket can be assigned to (active support, admin and super_admin users).
+      items:
+        $ref: "#/TicketPerson"
+    assistEnabled:
+      type: boolean
+      description: "`ai_triage_enabled` (AI-A2). The console mounts the triage assist only when it is true."
+    serverNow:
+      $ref: ./common.yaml#/ServerNow
+TicketAssignRequest:
+  type: object
+  additionalProperties: false
+  required: [assigneeId]
+  properties:
+    assigneeId:
+      type: [string, "null"]
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+      description: An active support, admin or super_admin user; null unassigns.
+TicketPriorityRequest:
+  type: object
+  additionalProperties: false
+  required: [priority]
+  properties:
+    priority:
+      $ref: "#/TicketPriority"
+TicketMessageRequest:
+  type: object
+  additionalProperties: false
+  required: [body]
+  properties:
+    body:
+      type: string
+      minLength: 1
+      maxLength: 4000
+    attachmentIds:
+      type: array
+      maxItems: 5
+      description: Uploads made by the caller that no message holds yet.
+      items:
+        $ref: ./common.yaml#/Ulid
+TicketCloseRequest:
+  type: object
+  additionalProperties: false
+  required: [outcome, reason]
+  properties:
+    outcome:
+      type: string
+      enum: [resolved, closed]
+      description: "`resolved`: the opener can still reply and reopen it. `closed`: final."
+    reason:
+      type: string
+      minLength: 1
+      maxLength: 500
+TicketAttachmentCreate:
+  type: object
+  additionalProperties: false
+  required: [fileName, contentType, sizeBytes]
+  properties:
+    fileName:
+      type: string
+      minLength: 1
+      maxLength: 120
+    contentType:
+      $ref: "#/TicketAttachmentContentType"
+    sizeBytes:
+      type: integer
+      format: int64
+      minimum: 1
+      maximum: 10485760
+      description: The file's exact size in bytes (at most 10 MB). The upload URL signs it.
+TicketUploadHeaders:
+  type: object
+  required: [Content-Type, Content-Length]
+  properties:
+    Content-Type:
+      $ref: "#/TicketAttachmentContentType"
+    Content-Length:
+      type: string
+      pattern: ^[1-9][0-9]*$
+TicketUploadTarget:
+  type: object
+  description: A presigned PUT into the private bucket. Send the file with exactly these headers before `expiresAt`.
+  required: [url, method, headers, expiresAt]
+  properties:
+    url:
+      type: string
+    method:
+      type: string
+      enum: [PUT]
+    headers:
+      $ref: "#/TicketUploadHeaders"
+    expiresAt:
+      $ref: ./common.yaml#/Timestamp
+TicketAttachmentUpload:
+  type: object
+  required: [attachment, upload]
+  properties:
+    attachment:
+      $ref: "#/TicketAttachment"
+    upload:
+      $ref: "#/TicketUploadTarget"

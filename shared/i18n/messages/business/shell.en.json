@@ -67,6 +67,10 @@
     "defaultMessage": "Settings",
     "description": "Navigation item"
   },
+  "shell.nav.help": {
+    "defaultMessage": "Help",
+    "description": "Navigation item: B-15 help guide and support tickets"
+  },
   "shell.greet.title": {
     "defaultMessage": "Your shop on TodayZ",
     "description": "Headline in the mint greeting band"

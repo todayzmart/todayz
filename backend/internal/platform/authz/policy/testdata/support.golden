@@ -1,0 +1,14 @@
+# domain support: one line per (role x action); regenerate with -update
+me.support.tickets kind=customer step-up=false
+support.tickets kind=business step-up=false
+support.tickets owner allow
+support.tickets manager allow
+support.tickets cashier -
+admin.support.tickets kind=admin step-up=false
+admin.support.tickets field_agent -
+admin.support.tickets support allow
+admin.support.tickets catalogue -
+admin.support.tickets analyst -
+admin.support.tickets finance -
+admin.support.tickets admin allow
+admin.support.tickets super_admin allow

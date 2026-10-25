@@ -26,6 +26,7 @@ import (
 	_ "github.com/todayz/backend/internal/ai/replydraft/replyeval"
 	_ "github.com/todayz/backend/internal/ai/shelfscan/shelfeval"
 	_ "github.com/todayz/backend/internal/coach/coacheval"
+	_ "github.com/todayz/backend/internal/voice/voiceeval"
 )
 
 // evalCallTimeout bounds one live model call in an eval.
