@@ -1,0 +1,152 @@
+{
+  "statements.loading": {
+    "message": "ஸ்டேட்மென்ட்கள் ஏற்றப்படுகின்றன",
+    "review": "machine",
+    "enHash": "e452acdf"
+  },
+  "statements.error": {
+    "message": "ஸ்டேட்மென்ட்களை ஏற்ற முடியவில்லை.",
+    "review": "machine",
+    "enHash": "59d08760"
+  },
+  "statements.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "machine",
+    "enHash": "042c862e"
+  },
+  "statements.empty": {
+    "message": "இன்னும் ஸ்டேட்மென்ட் இல்லை. ஒவ்வொரு மாதமும் 1 ஆம் தேதி முடிவடையும், அதன் ஸ்டேட்மென்ட் இங்கே காட்டப்படும்.",
+    "review": "machine",
+    "enHash": "efe33661"
+  },
+  "statements.list": {
+    "message": "மாதாந்திர ஸ்டேட்மென்ட்கள்",
+    "review": "machine",
+    "enHash": "f4d5c628"
+  },
+  "statements.closing": {
+    "message": "இறுதி இருப்பு {amount}",
+    "review": "machine",
+    "enHash": "730c0260"
+  },
+  "statements.status.processing": {
+    "message": "செயலாக்கத்தில்",
+    "review": "machine",
+    "enHash": "e63451d3"
+  },
+  "statements.status.needsKyc": {
+    "message": "நிறுத்திவைக்கப்பட்டது",
+    "review": "machine",
+    "enHash": "7725fc0e"
+  },
+  "statements.status.paid": {
+    "message": "வழங்கப்பட்டது",
+    "review": "machine",
+    "enHash": "dc9d4584"
+  },
+  "statements.payout.processing": {
+    "message": "{amount} பணம் வழங்கல் செயலாக்கத்தில் உள்ளது.",
+    "review": "machine",
+    "enHash": "48a73a31"
+  },
+  "statements.payout.needsKyc": {
+    "message": "உங்கள் பணம் வழங்கல் விவரங்கள் முழுமையாகும் வரை {amount} நிறுத்திவைக்கப்பட்டுள்ளது.",
+    "review": "machine",
+    "enHash": "c624cfec"
+  },
+  "statements.payout.paid": {
+    "message": "{date} அன்று {amount} வழங்கப்பட்டது.",
+    "review": "machine",
+    "enHash": "f72f3623"
+  },
+  "statements.payout.utr": {
+    "message": "UTR {utr}",
+    "review": "machine",
+    "enHash": "6103319e"
+  },
+  "statements.payout.none": {
+    "message": "இந்த மாதம் பணம் வழங்கல் இல்லை.",
+    "review": "machine",
+    "enHash": "6e206087"
+  },
+  "statements.negative": {
+    "message": "மைனஸ் இருப்பு அடுத்த மாதத்துக்குத் தொடரும்.",
+    "review": "machine",
+    "enHash": "7e8a47cf"
+  },
+  "statements.totals.title": {
+    "message": "விவரம்",
+    "review": "machine",
+    "enHash": "fd91b3cc"
+  },
+  "statements.totals.opening": {
+    "message": "தொடக்க இருப்பு",
+    "review": "machine",
+    "enHash": "7622a75d"
+  },
+  "statements.totals.creditsIn": {
+    "message": "உங்கள் கடையில் செலவான கிரெடிட்கள்",
+    "review": "machine",
+    "enHash": "577a1d99"
+  },
+  "statements.totals.referralIn": {
+    "message": "பரிந்துரை வெகுமதிகள்",
+    "review": "machine",
+    "enHash": "22d6a913"
+  },
+  "statements.totals.cashbackOut": {
+    "message": "நீங்கள் தந்த கேஷ்பேக்",
+    "review": "machine",
+    "enHash": "b448f6f5"
+  },
+  "statements.totals.reversals": {
+    "message": "திரும்பப் பெறப்பட்ட விற்பனைகள்",
+    "review": "machine",
+    "enHash": "955b6de8"
+  },
+  "statements.totals.adjustments": {
+    "message": "சரிசெய்தல்கள்",
+    "review": "machine",
+    "enHash": "ce5b2f72"
+  },
+  "statements.totals.payoutsOut": {
+    "message": "பணம் வழங்கல்கள்",
+    "review": "machine",
+    "enHash": "e0e7ea13"
+  },
+  "statements.totals.closing": {
+    "message": "இறுதி இருப்பு",
+    "review": "machine",
+    "enHash": "c171f510"
+  },
+  "statements.download": {
+    "message": "CSV பதிவிறக்கவும்",
+    "review": "machine",
+    "enHash": "eaa216ad"
+  },
+  "statements.downloadFor": {
+    "message": "{month} ஸ்டேட்மென்ட்டை CSV ஆகப் பதிவிறக்கவும்",
+    "review": "machine",
+    "enHash": "016b7082"
+  },
+  "statements.downloading": {
+    "message": "தயாராகிறது",
+    "review": "machine",
+    "enHash": "96a9b7cd"
+  },
+  "statements.downloadError": {
+    "message": "ஸ்டேட்மென்ட்டைப் பதிவிறக்க முடியவில்லை. மீண்டும் முயலவும்.",
+    "review": "machine",
+    "enHash": "d0897e54"
+  },
+  "statements.more": {
+    "message": "பழைய ஸ்டேட்மென்ட்களைக் காட்டவும்",
+    "review": "machine",
+    "enHash": "bcdafe62"
+  },
+  "statements.moreError": {
+    "message": "பழைய ஸ்டேட்மென்ட்களை ஏற்ற முடியவில்லை.",
+    "review": "machine",
+    "enHash": "d8e87af4"
+  }
+}

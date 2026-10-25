@@ -1,0 +1,152 @@
+{
+  "statements.loading": {
+    "message": "स्टेटमेंट लोड हो रहे हैं",
+    "review": "machine",
+    "enHash": "e452acdf"
+  },
+  "statements.error": {
+    "message": "स्टेटमेंट लोड नहीं हो सके।",
+    "review": "machine",
+    "enHash": "59d08760"
+  },
+  "statements.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "machine",
+    "enHash": "042c862e"
+  },
+  "statements.empty": {
+    "message": "अभी कोई स्टेटमेंट नहीं है। हर महीना 1 तारीख़ को बंद होता है और उसका स्टेटमेंट यहाँ दिखता है।",
+    "review": "machine",
+    "enHash": "efe33661"
+  },
+  "statements.list": {
+    "message": "मासिक स्टेटमेंट",
+    "review": "machine",
+    "enHash": "f4d5c628"
+  },
+  "statements.closing": {
+    "message": "अंतिम बैलेंस {amount}",
+    "review": "machine",
+    "enHash": "730c0260"
+  },
+  "statements.status.processing": {
+    "message": "प्रोसेस हो रहा है",
+    "review": "machine",
+    "enHash": "e63451d3"
+  },
+  "statements.status.needsKyc": {
+    "message": "रुका हुआ",
+    "review": "machine",
+    "enHash": "7725fc0e"
+  },
+  "statements.status.paid": {
+    "message": "चुकाया गया",
+    "review": "machine",
+    "enHash": "dc9d4584"
+  },
+  "statements.payout.processing": {
+    "message": "{amount} का पेआउट प्रोसेस हो रहा है।",
+    "review": "machine",
+    "enHash": "48a73a31"
+  },
+  "statements.payout.needsKyc": {
+    "message": "आपके पेआउट की जानकारी पूरी होने तक {amount} का पेआउट रुका हुआ है।",
+    "review": "machine",
+    "enHash": "c624cfec"
+  },
+  "statements.payout.paid": {
+    "message": "{date} को {amount} चुकाया गया।",
+    "review": "machine",
+    "enHash": "f72f3623"
+  },
+  "statements.payout.utr": {
+    "message": "UTR {utr}",
+    "review": "machine",
+    "enHash": "6103319e"
+  },
+  "statements.payout.none": {
+    "message": "इस महीने कोई पेआउट नहीं।",
+    "review": "machine",
+    "enHash": "6e206087"
+  },
+  "statements.negative": {
+    "message": "माइनस बैलेंस अगले महीने में जुड़ जाता है।",
+    "review": "machine",
+    "enHash": "7e8a47cf"
+  },
+  "statements.totals.title": {
+    "message": "पूरा हिसाब",
+    "review": "machine",
+    "enHash": "fd91b3cc"
+  },
+  "statements.totals.opening": {
+    "message": "शुरुआती बैलेंस",
+    "review": "machine",
+    "enHash": "7622a75d"
+  },
+  "statements.totals.creditsIn": {
+    "message": "आपकी दुकान पर खर्च हुए क्रेडिट",
+    "review": "machine",
+    "enHash": "577a1d99"
+  },
+  "statements.totals.referralIn": {
+    "message": "रेफ़रल इनाम",
+    "review": "machine",
+    "enHash": "22d6a913"
+  },
+  "statements.totals.cashbackOut": {
+    "message": "आपका दिया कैशबैक",
+    "review": "machine",
+    "enHash": "b448f6f5"
+  },
+  "statements.totals.reversals": {
+    "message": "वापस हुई बिक्री",
+    "review": "machine",
+    "enHash": "955b6de8"
+  },
+  "statements.totals.adjustments": {
+    "message": "सुधार",
+    "review": "machine",
+    "enHash": "ce5b2f72"
+  },
+  "statements.totals.payoutsOut": {
+    "message": "पेआउट",
+    "review": "machine",
+    "enHash": "e0e7ea13"
+  },
+  "statements.totals.closing": {
+    "message": "अंतिम बैलेंस",
+    "review": "machine",
+    "enHash": "c171f510"
+  },
+  "statements.download": {
+    "message": "CSV डाउनलोड करें",
+    "review": "machine",
+    "enHash": "eaa216ad"
+  },
+  "statements.downloadFor": {
+    "message": "{month} का स्टेटमेंट CSV में डाउनलोड करें",
+    "review": "machine",
+    "enHash": "016b7082"
+  },
+  "statements.downloading": {
+    "message": "तैयार हो रहा है",
+    "review": "machine",
+    "enHash": "96a9b7cd"
+  },
+  "statements.downloadError": {
+    "message": "स्टेटमेंट डाउनलोड नहीं हो सका। फिर से कोशिश करें।",
+    "review": "machine",
+    "enHash": "d0897e54"
+  },
+  "statements.more": {
+    "message": "पुराने स्टेटमेंट दिखाएँ",
+    "review": "machine",
+    "enHash": "bcdafe62"
+  },
+  "statements.moreError": {
+    "message": "पुराने स्टेटमेंट लोड नहीं हो सके।",
+    "review": "machine",
+    "enHash": "d8e87af4"
+  }
+}

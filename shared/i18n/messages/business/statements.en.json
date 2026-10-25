@@ -1,0 +1,122 @@
+{
+  "statements.loading": {
+    "defaultMessage": "Loading statements",
+    "description": "B-10 monthly statements"
+  },
+  "statements.error": {
+    "defaultMessage": "Statements could not be loaded.",
+    "description": "B-10 monthly statements"
+  },
+  "statements.retry": {
+    "defaultMessage": "Try again",
+    "description": "B-10 monthly statements"
+  },
+  "statements.empty": {
+    "defaultMessage": "No statements yet. Each month closes on the 1st and its statement shows here.",
+    "description": "B-10 monthly statements"
+  },
+  "statements.list": {
+    "defaultMessage": "Monthly statements",
+    "description": "B-10 monthly statements: list name for screen readers"
+  },
+  "statements.closing": {
+    "defaultMessage": "Closing {amount}",
+    "description": "B-10 monthly statements: the month's closing balance"
+  },
+  "statements.status.processing": {
+    "defaultMessage": "Processing",
+    "description": "B-10 monthly statements: payout status pill"
+  },
+  "statements.status.needsKyc": {
+    "defaultMessage": "On hold",
+    "description": "B-10 monthly statements: payout status pill, held until payout details are complete"
+  },
+  "statements.status.paid": {
+    "defaultMessage": "Paid",
+    "description": "B-10 monthly statements: payout status pill"
+  },
+  "statements.payout.processing": {
+    "defaultMessage": "Payout of {amount} is being processed.",
+    "description": "B-10 monthly statements"
+  },
+  "statements.payout.needsKyc": {
+    "defaultMessage": "Payout of {amount} is on hold until your payout details are complete.",
+    "description": "B-10 monthly statements"
+  },
+  "statements.payout.paid": {
+    "defaultMessage": "{amount} paid on {date}.",
+    "description": "B-10 monthly statements"
+  },
+  "statements.payout.utr": {
+    "defaultMessage": "UTR {utr}",
+    "description": "B-10 monthly statements: bank transfer reference"
+  },
+  "statements.payout.none": {
+    "defaultMessage": "No payout this month.",
+    "description": "B-10 monthly statements: the closing balance was zero or below"
+  },
+  "statements.negative": {
+    "defaultMessage": "A negative balance carries forward to next month.",
+    "description": "B-10 monthly statements"
+  },
+  "statements.totals.title": {
+    "defaultMessage": "Breakdown",
+    "description": "B-10 monthly statements: expands the month's totals"
+  },
+  "statements.totals.opening": {
+    "defaultMessage": "Opening balance",
+    "description": "B-10 monthly statements"
+  },
+  "statements.totals.creditsIn": {
+    "defaultMessage": "Credits spent at your shop",
+    "description": "B-10 monthly statements"
+  },
+  "statements.totals.referralIn": {
+    "defaultMessage": "Referral rewards",
+    "description": "B-10 monthly statements"
+  },
+  "statements.totals.cashbackOut": {
+    "defaultMessage": "Cashback you gave",
+    "description": "B-10 monthly statements"
+  },
+  "statements.totals.reversals": {
+    "defaultMessage": "Reversed sales",
+    "description": "B-10 monthly statements"
+  },
+  "statements.totals.adjustments": {
+    "defaultMessage": "Adjustments",
+    "description": "B-10 monthly statements"
+  },
+  "statements.totals.payoutsOut": {
+    "defaultMessage": "Payouts",
+    "description": "B-10 monthly statements"
+  },
+  "statements.totals.closing": {
+    "defaultMessage": "Closing balance",
+    "description": "B-10 monthly statements"
+  },
+  "statements.download": {
+    "defaultMessage": "Download CSV",
+    "description": "B-10 monthly statements"
+  },
+  "statements.downloadFor": {
+    "defaultMessage": "Download the {month} statement as CSV",
+    "description": "B-10 monthly statements: button name for screen readers"
+  },
+  "statements.downloading": {
+    "defaultMessage": "Preparing",
+    "description": "B-10 monthly statements"
+  },
+  "statements.downloadError": {
+    "defaultMessage": "The statement could not be downloaded. Try again.",
+    "description": "B-10 monthly statements"
+  },
+  "statements.more": {
+    "defaultMessage": "Load older statements",
+    "description": "B-10 monthly statements"
+  },
+  "statements.moreError": {
+    "defaultMessage": "Older statements could not be loaded.",
+    "description": "B-10 monthly statements"
+  }
+}

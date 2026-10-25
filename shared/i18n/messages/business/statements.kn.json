@@ -1,0 +1,152 @@
+{
+  "statements.loading": {
+    "message": "ಸ್ಟೇಟ್‌ಮೆಂಟ್‌ಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ",
+    "review": "machine",
+    "enHash": "e452acdf"
+  },
+  "statements.error": {
+    "message": "ಸ್ಟೇಟ್‌ಮೆಂಟ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ.",
+    "review": "machine",
+    "enHash": "59d08760"
+  },
+  "statements.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "machine",
+    "enHash": "042c862e"
+  },
+  "statements.empty": {
+    "message": "ಇನ್ನೂ ಯಾವುದೇ ಸ್ಟೇಟ್‌ಮೆಂಟ್ ಇಲ್ಲ. ಪ್ರತಿ ತಿಂಗಳು 1 ನೇ ತಾರೀಖು ಮುಚ್ಚುತ್ತದೆ ಮತ್ತು ಅದರ ಸ್ಟೇಟ್‌ಮೆಂಟ್ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ.",
+    "review": "machine",
+    "enHash": "efe33661"
+  },
+  "statements.list": {
+    "message": "ಮಾಸಿಕ ಸ್ಟೇಟ್‌ಮೆಂಟ್‌ಗಳು",
+    "review": "machine",
+    "enHash": "f4d5c628"
+  },
+  "statements.closing": {
+    "message": "ಮುಕ್ತಾಯ ಬ್ಯಾಲೆನ್ಸ್ {amount}",
+    "review": "machine",
+    "enHash": "730c0260"
+  },
+  "statements.status.processing": {
+    "message": "ಪ್ರಕ್ರಿಯೆಯಲ್ಲಿದೆ",
+    "review": "machine",
+    "enHash": "e63451d3"
+  },
+  "statements.status.needsKyc": {
+    "message": "ತಡೆಹಿಡಿಯಲಾಗಿದೆ",
+    "review": "machine",
+    "enHash": "7725fc0e"
+  },
+  "statements.status.paid": {
+    "message": "ಪಾವತಿಸಲಾಗಿದೆ",
+    "review": "machine",
+    "enHash": "dc9d4584"
+  },
+  "statements.payout.processing": {
+    "message": "{amount} ಪೇಔಟ್ ಪ್ರಕ್ರಿಯೆಯಲ್ಲಿದೆ.",
+    "review": "machine",
+    "enHash": "48a73a31"
+  },
+  "statements.payout.needsKyc": {
+    "message": "ನಿಮ್ಮ ಪೇಔಟ್ ವಿವರಗಳು ಪೂರ್ಣವಾಗುವವರೆಗೆ {amount} ಪೇಔಟ್ ತಡೆಹಿಡಿಯಲಾಗಿದೆ.",
+    "review": "machine",
+    "enHash": "c624cfec"
+  },
+  "statements.payout.paid": {
+    "message": "{date} ರಂದು {amount} ಪಾವತಿಸಲಾಗಿದೆ.",
+    "review": "machine",
+    "enHash": "f72f3623"
+  },
+  "statements.payout.utr": {
+    "message": "UTR {utr}",
+    "review": "machine",
+    "enHash": "6103319e"
+  },
+  "statements.payout.none": {
+    "message": "ಈ ತಿಂಗಳು ಯಾವುದೇ ಪೇಔಟ್ ಇಲ್ಲ.",
+    "review": "machine",
+    "enHash": "6e206087"
+  },
+  "statements.negative": {
+    "message": "ಮೈನಸ್ ಬ್ಯಾಲೆನ್ಸ್ ಮುಂದಿನ ತಿಂಗಳಿಗೆ ಮುಂದುವರಿಯುತ್ತದೆ.",
+    "review": "machine",
+    "enHash": "7e8a47cf"
+  },
+  "statements.totals.title": {
+    "message": "ವಿವರ",
+    "review": "machine",
+    "enHash": "fd91b3cc"
+  },
+  "statements.totals.opening": {
+    "message": "ಆರಂಭಿಕ ಬ್ಯಾಲೆನ್ಸ್",
+    "review": "machine",
+    "enHash": "7622a75d"
+  },
+  "statements.totals.creditsIn": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿಯಲ್ಲಿ ಖರ್ಚಾದ ಕ್ರೆಡಿಟ್‌ಗಳು",
+    "review": "machine",
+    "enHash": "577a1d99"
+  },
+  "statements.totals.referralIn": {
+    "message": "ರೆಫರಲ್ ಬಹುಮಾನಗಳು",
+    "review": "machine",
+    "enHash": "22d6a913"
+  },
+  "statements.totals.cashbackOut": {
+    "message": "ನೀವು ನೀಡಿದ ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್",
+    "review": "machine",
+    "enHash": "b448f6f5"
+  },
+  "statements.totals.reversals": {
+    "message": "ಹಿಂತಿರುಗಿಸಿದ ಮಾರಾಟಗಳು",
+    "review": "machine",
+    "enHash": "955b6de8"
+  },
+  "statements.totals.adjustments": {
+    "message": "ಹೊಂದಾಣಿಕೆಗಳು",
+    "review": "machine",
+    "enHash": "ce5b2f72"
+  },
+  "statements.totals.payoutsOut": {
+    "message": "ಪೇಔಟ್‌ಗಳು",
+    "review": "machine",
+    "enHash": "e0e7ea13"
+  },
+  "statements.totals.closing": {
+    "message": "ಮುಕ್ತಾಯ ಬ್ಯಾಲೆನ್ಸ್",
+    "review": "machine",
+    "enHash": "c171f510"
+  },
+  "statements.download": {
+    "message": "CSV ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ",
+    "review": "machine",
+    "enHash": "eaa216ad"
+  },
+  "statements.downloadFor": {
+    "message": "{month} ಸ್ಟೇಟ್‌ಮೆಂಟ್ ಅನ್ನು CSV ಆಗಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ",
+    "review": "machine",
+    "enHash": "016b7082"
+  },
+  "statements.downloading": {
+    "message": "ಸಿದ್ಧವಾಗುತ್ತಿದೆ",
+    "review": "machine",
+    "enHash": "96a9b7cd"
+  },
+  "statements.downloadError": {
+    "message": "ಸ್ಟೇಟ್‌ಮೆಂಟ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "machine",
+    "enHash": "d0897e54"
+  },
+  "statements.more": {
+    "message": "ಹಳೆಯ ಸ್ಟೇಟ್‌ಮೆಂಟ್‌ಗಳನ್ನು ತೋರಿಸಿ",
+    "review": "machine",
+    "enHash": "bcdafe62"
+  },
+  "statements.moreError": {
+    "message": "ಹಳೆಯ ಸ್ಟೇಟ್‌ಮೆಂಟ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ.",
+    "review": "machine",
+    "enHash": "d8e87af4"
+  }
+}

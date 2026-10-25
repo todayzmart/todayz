@@ -155,10 +155,6 @@
     "defaultMessage": "Monthly statements",
     "description": "B-10 card title"
   },
-  "credits.statements.soon": {
-    "defaultMessage": "Monthly statements are coming soon.",
-    "description": "B-10 placeholder until statements ship"
-  },
   "credits.standee.title": {
     "defaultMessage": "QR standee",
     "description": "B-10 card title"

@@ -1,0 +1,152 @@
+{
+  "statements.loading": {
+    "message": "స్టేట్‌మెంట్‌లు లోడ్ అవుతున్నాయి",
+    "review": "machine",
+    "enHash": "e452acdf"
+  },
+  "statements.error": {
+    "message": "స్టేట్‌మెంట్‌లను లోడ్ చేయలేకపోయాం.",
+    "review": "machine",
+    "enHash": "59d08760"
+  },
+  "statements.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "machine",
+    "enHash": "042c862e"
+  },
+  "statements.empty": {
+    "message": "ఇంకా స్టేట్‌మెంట్‌లు లేవు. ప్రతి నెల 1వ తేదీన ముగుస్తుంది, దాని స్టేట్‌మెంట్ ఇక్కడ కనిపిస్తుంది.",
+    "review": "machine",
+    "enHash": "efe33661"
+  },
+  "statements.list": {
+    "message": "నెలవారీ స్టేట్‌మెంట్‌లు",
+    "review": "machine",
+    "enHash": "f4d5c628"
+  },
+  "statements.closing": {
+    "message": "ముగింపు బ్యాలెన్స్ {amount}",
+    "review": "machine",
+    "enHash": "730c0260"
+  },
+  "statements.status.processing": {
+    "message": "ప్రాసెస్ అవుతోంది",
+    "review": "machine",
+    "enHash": "e63451d3"
+  },
+  "statements.status.needsKyc": {
+    "message": "నిలిపివేయబడింది",
+    "review": "machine",
+    "enHash": "7725fc0e"
+  },
+  "statements.status.paid": {
+    "message": "చెల్లించబడింది",
+    "review": "machine",
+    "enHash": "dc9d4584"
+  },
+  "statements.payout.processing": {
+    "message": "{amount} పేఅవుట్ ప్రాసెస్ అవుతోంది.",
+    "review": "machine",
+    "enHash": "48a73a31"
+  },
+  "statements.payout.needsKyc": {
+    "message": "మీ పేఅవుట్ వివరాలు పూర్తయ్యే వరకు {amount} పేఅవుట్ నిలిపివేయబడింది.",
+    "review": "machine",
+    "enHash": "c624cfec"
+  },
+  "statements.payout.paid": {
+    "message": "{date}న {amount} చెల్లించబడింది.",
+    "review": "machine",
+    "enHash": "f72f3623"
+  },
+  "statements.payout.utr": {
+    "message": "UTR {utr}",
+    "review": "machine",
+    "enHash": "6103319e"
+  },
+  "statements.payout.none": {
+    "message": "ఈ నెల పేఅవుట్ లేదు.",
+    "review": "machine",
+    "enHash": "6e206087"
+  },
+  "statements.negative": {
+    "message": "మైనస్ బ్యాలెన్స్ వచ్చే నెలకు కొనసాగుతుంది.",
+    "review": "machine",
+    "enHash": "7e8a47cf"
+  },
+  "statements.totals.title": {
+    "message": "వివరాలు",
+    "review": "machine",
+    "enHash": "fd91b3cc"
+  },
+  "statements.totals.opening": {
+    "message": "ప్రారంభ బ్యాలెన్స్",
+    "review": "machine",
+    "enHash": "7622a75d"
+  },
+  "statements.totals.creditsIn": {
+    "message": "మీ దుకాణంలో ఖర్చైన క్రెడిట్లు",
+    "review": "machine",
+    "enHash": "577a1d99"
+  },
+  "statements.totals.referralIn": {
+    "message": "రిఫరల్ బహుమతులు",
+    "review": "machine",
+    "enHash": "22d6a913"
+  },
+  "statements.totals.cashbackOut": {
+    "message": "మీరు ఇచ్చిన క్యాష్‌బ్యాక్",
+    "review": "machine",
+    "enHash": "b448f6f5"
+  },
+  "statements.totals.reversals": {
+    "message": "రివర్స్ అయిన అమ్మకాలు",
+    "review": "machine",
+    "enHash": "955b6de8"
+  },
+  "statements.totals.adjustments": {
+    "message": "సవరణలు",
+    "review": "machine",
+    "enHash": "ce5b2f72"
+  },
+  "statements.totals.payoutsOut": {
+    "message": "పేఅవుట్‌లు",
+    "review": "machine",
+    "enHash": "e0e7ea13"
+  },
+  "statements.totals.closing": {
+    "message": "ముగింపు బ్యాలెన్స్",
+    "review": "machine",
+    "enHash": "c171f510"
+  },
+  "statements.download": {
+    "message": "CSV డౌన్‌లోడ్ చేయండి",
+    "review": "machine",
+    "enHash": "eaa216ad"
+  },
+  "statements.downloadFor": {
+    "message": "{month} స్టేట్‌మెంట్‌ను CSVగా డౌన్‌లోడ్ చేయండి",
+    "review": "machine",
+    "enHash": "016b7082"
+  },
+  "statements.downloading": {
+    "message": "సిద్ధమవుతోంది",
+    "review": "machine",
+    "enHash": "96a9b7cd"
+  },
+  "statements.downloadError": {
+    "message": "స్టేట్‌మెంట్ డౌన్‌లోడ్ చేయలేకపోయాం. మళ్ళీ ప్రయత్నించండి.",
+    "review": "machine",
+    "enHash": "d0897e54"
+  },
+  "statements.more": {
+    "message": "పాత స్టేట్‌మెంట్‌లు చూపించండి",
+    "review": "machine",
+    "enHash": "bcdafe62"
+  },
+  "statements.moreError": {
+    "message": "పాత స్టేట్‌మెంట్‌లను లోడ్ చేయలేకపోయాం.",
+    "review": "machine",
+    "enHash": "d8e87af4"
+  }
+}
