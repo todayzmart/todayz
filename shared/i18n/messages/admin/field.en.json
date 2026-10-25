@@ -647,6 +647,10 @@
     "defaultMessage": "Agent",
     "description": "A-15 column"
   },
+  "field.stats.disabled": {
+    "defaultMessage": "Disabled",
+    "description": "A-15: beside an agent whose admin login is disabled; their numbers stay listed"
+  },
   "field.stats.col.trend": {
     "defaultMessage": "Trend",
     "description": "A-15 column"

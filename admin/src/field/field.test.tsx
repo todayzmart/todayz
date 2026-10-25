@@ -63,6 +63,7 @@ function stats(over: Partial<FieldAgentStats> = {}): FieldAgentStats {
     storesLive: 2,
     itemsAdded: 57,
     inWindow: 2,
+    disabled: false,
     firstOrderRate: 0.5,
     weekly: Array.from({ length: 8 }, (_, i) => ({
       weekStart: `2026-09-${String(7 + i * 7 > 30 ? 30 : 7 + i * 7).padStart(2, '0')}`,
@@ -247,17 +248,27 @@ describe('A-04 field onboarding', () => {
     expect(calls.some((c) => c.path.endsWith('/documents'))).toBe(false);
   });
 
-  it('uploads a photo to the presigned URL', async () => {
+  const DOC = '01JD0C000000000000000000D9';
+  // The photo is registered (pending), PUT, then confirmed with this status.
+  const docs =
+    (confirmed: number): Handler =>
+    (c) => {
+      if (c.path.endsWith(`/documents/${DOC}/confirm`))
+        return confirmed === 200
+          ? json(200, { id: DOC, kind: 'storefront', contentType: 'image/jpeg', storeId: STORE_ID, status: 'uploaded', createdAt: NOW })
+          : problem(confirmed, 'validation_failed');
+      if (c.path.endsWith('/documents'))
+        return json(201, {
+          document: { id: DOC, kind: 'storefront', contentType: 'image/jpeg', storeId: STORE_ID, status: 'pending', createdAt: NOW },
+          upload: { url: 'https://s3.test/put', method: 'PUT', headers: { 'Content-Type': 'image/jpeg' }, expiresAt: NOW },
+        });
+      return undefined;
+    };
+
+  it('uploads a photo to the presigned URL and confirms it', async () => {
     const put = vi.fn(async () => new Response(null, { status: 200 }));
     vi.stubGlobal('fetch', put);
-    const docs: Handler = (c) =>
-      c.path.endsWith('/documents')
-        ? json(201, {
-            document: { id: '01JD0C000000000000000000D9', kind: 'storefront', contentType: 'image/jpeg', storeId: STORE_ID, status: 'uploaded', createdAt: NOW },
-            upload: { url: 'https://s3.test/put', method: 'PUT', headers: { 'Content-Type': 'image/jpeg' }, expiresAt: NOW },
-          })
-        : undefined;
-    const { calls } = renderAt(`/field/${BID}`, { roles: ['field_agent'], handlers: [docs, api()] });
+    const { calls } = renderAt(`/field/${BID}`, { roles: ['field_agent'], handlers: [docs(200), api()] });
     fireEvent.click(await screen.findByRole('button', { name: /Photos/ }));
     fireEvent.change(await screen.findByTestId('field-photo-input'), {
       target: { files: [new File(['jpeg'], 'front.jpg', { type: 'image/jpeg' })] },
@@ -265,6 +276,17 @@ describe('A-04 field onboarding', () => {
     expect(await screen.findByText('Photo added')).toBeInTheDocument();
     expect(calls.find((c) => c.path.endsWith('/documents'))?.body).toMatchObject({ kind: 'storefront', contentType: 'image/jpeg', sizeBytes: 4, storeId: STORE_ID });
     expect(put).toHaveBeenCalledWith('https://s3.test/put', expect.objectContaining({ method: 'PUT' }));
+    expect(calls.some((c) => c.method === 'POST' && c.path.endsWith(`/documents/${DOC}/confirm`))).toBe(true);
+  });
+
+  it('says the upload failed when the API cannot find the stored photo', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(null, { status: 200 })));
+    renderAt(`/field/${BID}`, { roles: ['field_agent'], handlers: [docs(422), api()] });
+    fireEvent.click(await screen.findByRole('button', { name: /Photos/ }));
+    fireEvent.change(await screen.findByTestId('field-photo-input'), {
+      target: { files: [new File(['jpeg'], 'front.jpg', { type: 'image/jpeg' })] },
+    });
+    expect(await screen.findByText('The photo did not upload. Check the connection and try again.')).toBeInTheDocument();
   });
 });
 
@@ -279,14 +301,16 @@ describe('A-15 field agents', () => {
     expect(calls.some((c) => c.path === '/v1/admin/field-agents')).toBe(false);
   });
 
-  it('shows admins every agent and their trend', async () => {
+  it('shows admins every agent, disabled ones marked, and their trend', async () => {
     const all: Handler = (c) =>
       c.path === '/v1/admin/field-agents'
-        ? json(200, { items: [stats(), stats({ agentId: '01JAGENT00000000000000A002', name: 'Divya', firstOrderRate: null })], serverNow: NOW })
+        ? json(200, { items: [stats(), stats({ agentId: '01JAGENT00000000000000A002', name: 'Divya', firstOrderRate: null, disabled: true })], serverNow: NOW })
         : undefined;
     const { calls } = renderAt('/field-agents', { roles: ['admin'], handlers: [all] });
     const table = await screen.findByRole('table', { name: 'Field agents' });
     expect(await within(table).findByText('Divya')).toBeInTheDocument();
+    expect(within(table).getAllByText('Disabled')).toHaveLength(1);
+    expect(within(within(table).getByText('Divya').closest('tr')!).getByText('Disabled')).toBeInTheDocument();
     fireEvent.click(within(table).getByRole('button', { name: 'Show the weekly trend of Divya' }));
     expect(await screen.findByRole('heading', { name: 'Weekly trend: Divya' })).toBeInTheDocument();
     expect(calls.some((c) => c.path === '/v1/admin/field/me/stats')).toBe(false);

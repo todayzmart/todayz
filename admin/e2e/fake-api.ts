@@ -103,6 +103,7 @@ export const emptyAgentStats = {
   storesLive: 0,
   itemsAdded: 0,
   inWindow: 0,
+  disabled: false,
   firstOrderRate: null,
   weekly: [],
 };

@@ -133,12 +133,15 @@ async function fieldApi(page: Page) {
       stores = [{ id: SID, name: b['name'], status: 'draft', locality: b['locality'] }];
       return { status: 201, body: { ...stores[0], itemCount: 0 } };
     }
-    if (p === `${base}/documents`) {
+    if (p === `${base}/documents/01JD0C000000000000000000D9/confirm`) {
       photos += 1;
+      return { status: 200, body: { id: '01JD0C000000000000000000D9', kind: 'storefront', contentType: 'image/jpeg', storeId: SID, status: 'uploaded', createdAt: NOW } };
+    }
+    if (p === `${base}/documents`) {
       return {
         status: 201,
         body: {
-          document: { id: '01JD0C000000000000000000D9', kind: b['kind'], contentType: b['contentType'], storeId: SID, status: 'uploaded', createdAt: NOW },
+          document: { id: '01JD0C000000000000000000D9', kind: b['kind'], contentType: b['contentType'], storeId: SID, status: 'pending', createdAt: NOW },
           upload: { url: UPLOAD, method: 'PUT', headers: { 'Content-Type': b['contentType'] }, expiresAt: NOW },
         },
       };
@@ -304,6 +307,7 @@ const agent = (agentId: string, name: string, total: number) => ({
   storesLive: total - 3,
   itemsAdded: total * 14,
   inWindow: 2,
+  disabled: false,
   firstOrderRate: 0.4,
   weekly: Array.from({ length: 8 }, (_, i) => week(i)),
 });
@@ -330,7 +334,11 @@ test('A-15: an admin sees every agent and picks whose weekly trend to show', asy
   await page.setViewportSize(VIEWPORTS.desktop);
   await signIn(page, ['admin']);
   await answer(page, '/v1/admin/field-agents**', 200, {
-    items: [agent('01JAGENT00000000000000A001', 'Suresh', 18), agent('01JAGENT00000000000000A002', 'Lakshmi', 11)],
+    items: [
+      agent('01JAGENT00000000000000A001', 'Suresh', 18),
+      agent('01JAGENT00000000000000A002', 'Lakshmi', 11),
+      { ...agent('01JAGENT00000000000000A003', 'Imran', 4), disabled: true },
+    ],
     nextCursor: null,
     serverNow: NOW,
   });
@@ -338,7 +346,9 @@ test('A-15: an admin sees every agent and picks whose weekly trend to show', asy
   await page.goto('/field-agents');
   const main = page.getByRole('main');
   const table = main.getByRole('table', { name: 'Field agents' });
-  await expect(table.getByRole('row')).toHaveCount(3);
+  await expect(table.getByRole('row')).toHaveCount(4);
+  await expect(table.getByRole('row', { name: /Imran/ })).toContainText('Disabled');
+  await expect(table.getByRole('row', { name: /Suresh/ })).not.toContainText('Disabled');
   await expect(main.getByRole('heading', { name: 'Weekly trend: Suresh' })).toBeVisible();
   await table.getByRole('button', { name: 'Show the weekly trend of Lakshmi' }).click();
   await expect(main.getByRole('heading', { name: 'Weekly trend: Lakshmi' })).toBeVisible();

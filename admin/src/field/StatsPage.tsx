@@ -1,6 +1,6 @@
 import type { FieldAgentStats } from '@todayz/api-client/gen/model/fieldAgentStats';
 import type { FieldWeek } from '@todayz/api-client/gen/model/fieldWeek';
-import { Button, DataTable, EmptyState, Skeleton, type ColumnDef } from '@todayz/ui';
+import { Button, DataTable, EmptyState, Skeleton, StatusPill, type ColumnDef } from '@todayz/ui';
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { can, useRoles } from '../app/nav/access';
@@ -54,7 +54,18 @@ function AllAgents() {
   const [picked, setPicked] = useState<string | null>(null);
   const columns = useMemo<ColumnDef<FieldAgentStats, unknown>[]>(
     () => [
-      { id: 'name', header: intl.formatMessage({ id: 'field.stats.col.agent' }), accessorFn: (a) => a.name ?? '—' },
+      {
+        id: 'name',
+        header: intl.formatMessage({ id: 'field.stats.col.agent' }),
+        accessorFn: (a) => a.name ?? '—',
+        // A disabled agent stays listed (their shops are still theirs), marked.
+        cell: ({ row }) => (
+          <>
+            {row.original.name ?? '—'}{' '}
+            {row.original.disabled && <StatusPill tone="cancelled">{intl.formatMessage({ id: 'field.stats.disabled' })}</StatusPill>}
+          </>
+        ),
+      },
       { id: 'onboarded', header: intl.formatMessage({ id: 'field.stats.onboarded' }), accessorFn: (a) => a.businesses.total },
       { id: 'verified', header: intl.formatMessage({ id: 'field.stats.verified' }), accessorFn: (a) => a.businesses.verified },
       { id: 'live', header: intl.formatMessage({ id: 'field.stats.live' }), accessorFn: (a) => a.storesLive },

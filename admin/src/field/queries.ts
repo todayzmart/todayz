@@ -1,4 +1,5 @@
 import {
+  confirmFieldDocument,
   createFieldBusiness,
   createFieldDocument,
   createFieldItem,
@@ -23,6 +24,7 @@ import type { FieldItemCreate } from '@todayz/api-client/gen/model/fieldItemCrea
 import type { FieldItemUpdate } from '@todayz/api-client/gen/model/fieldItemUpdate';
 import type { FieldPhotoContentType } from '@todayz/api-client/gen/model/fieldPhotoContentType';
 import type { FieldStoreCreate } from '@todayz/api-client/gen/model/fieldStoreCreate';
+import { ApiError } from '@todayz/api-client';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useIdempotent } from '../app/idempotency';
 import { PAGE } from '../audit/queries';
@@ -92,7 +94,10 @@ export class UploadError extends Error {}
 
 export const PHOTO_TYPES: readonly FieldPhotoContentType[] = ['image/jpeg', 'image/png', 'image/webp'];
 
-/** Registers the photo, then PUTs the file to the presigned URL the API answered. */
+/**
+ * Registers the photo, PUTs the file to the presigned URL the API answered, then confirms it: the
+ * photo counts only once the API has seen the stored file.
+ */
 export function useAddPhoto(bid: string) {
   return useShopChange(bid, async ({ file, kind, storeId }: { file: File; kind: FieldDocumentKind; storeId?: string | undefined }) => {
     const made = await createFieldDocument(bid, {
@@ -107,7 +112,10 @@ export function useAddPhoto(bid: string) {
       body: file,
     });
     if (!res.ok) throw new UploadError();
-    return made.document;
+    return confirmFieldDocument(bid, made.document.id).catch((err: unknown) => {
+      // 422: the file is not in storage, or not what was registered; 409: the URL expired.
+      throw err instanceof ApiError && (err.status === 422 || err.status === 409) ? new UploadError() : err;
+    });
   });
 }
 
