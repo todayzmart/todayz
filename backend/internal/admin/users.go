@@ -30,7 +30,10 @@ import (
 // Guards: nobody changes or resets themselves, and no change leaves the
 // platform without an active super_admin. Every change takes one advisory
 // lock first, so two super_admins acting on each other at once are ordered
-// and the count stays true.
+// and the count stays true; under it the actor is read again (still an
+// active, enabled super_admin, or 403). A change that revokes sessions then
+// locks the target's users row before its admin_users row, the order every
+// revoke path in identity takes (users, admin_users, sessions).
 
 const (
 	superAdmin  = string(authz.SuperAdmin)
@@ -151,6 +154,9 @@ func (s *Service) inviteAdminUser(ctx context.Context, actor ids.ID, in api.Admi
 		if err := q.LockAdminUsers(ctx); err != nil {
 			return err
 		}
+		if err := actorStillSuper(ctx, q, actor); err != nil {
+			return err
+		}
 		now := s.now()
 		acct, err := s.accounts.FindOrCreateByPhone(ctx, phone, now)
 		if err != nil {
@@ -221,6 +227,13 @@ func (s *Service) updateAdminUser(ctx context.Context, actor, id ids.ID, in api.
 		if err := q.LockAdminUsers(ctx); err != nil {
 			return err
 		}
+		if err := actorStillSuper(ctx, q, actor); err != nil {
+			return err
+		}
+		status, err := lockTargetUser(ctx, q, id)
+		if err != nil {
+			return err
+		}
 		cur, err := q.LockAdminUser(ctx, ids.UUID(id))
 		if errors.Is(err, pgx.ErrNoRows) {
 			return notFound()
@@ -252,7 +265,7 @@ func (s *Service) updateAdminUser(ctx context.Context, actor, id ids.ID, in api.
 		}
 		before := map[string]any{"roles": cur.Roles, "disabled": wasDisabled}
 		after := map[string]any{"roles": next.Roles, "disabled": next.DisabledAt != nil, "reason": reason}
-		if err := s.keepSuperAdmin(ctx, q, cur.Roles, wasDisabled, next.Roles, next.DisabledAt != nil); err != nil {
+		if err := s.keepSuperAdmin(ctx, q, status == userActive, cur.Roles, wasDisabled, next.Roles, next.DisabledAt != nil); err != nil {
 			return err
 		}
 		if err := q.UpdateAdminUser(ctx, next); err != nil {
@@ -284,9 +297,12 @@ func (s *Service) updateAdminUser(ctx context.Context, actor, id ids.ID, in api.
 	return s.adminUser(ctx, id)
 }
 
-// keepSuperAdmin refuses a change that takes the last active super_admin away.
-func (s *Service) keepSuperAdmin(ctx context.Context, q *admindb.Queries, roles []string, disabled bool, nextRoles []string, nextDisabled bool) error {
-	wasSuper := !disabled && slices.Contains(roles, superAdmin)
+// keepSuperAdmin refuses a change that takes the last active super_admin
+// away. A target whose account is not active is not counted as one (nor is it
+// by CountActiveSuperAdmins), so taking the role from a blocked account is
+// never refused.
+func (s *Service) keepSuperAdmin(ctx context.Context, q *admindb.Queries, active bool, roles []string, disabled bool, nextRoles []string, nextDisabled bool) error {
+	wasSuper := active && !disabled && slices.Contains(roles, superAdmin)
 	staysSuper := !nextDisabled && slices.Contains(nextRoles, superAdmin)
 	if !wasSuper || staysSuper {
 		return nil
@@ -319,6 +335,12 @@ func (s *Service) resetAdminTOTP(ctx context.Context, actor, id ids.ID, in api.A
 		if err := q.LockAdminUsers(ctx); err != nil {
 			return err
 		}
+		if err := actorStillSuper(ctx, q, actor); err != nil {
+			return err
+		}
+		if _, err := lockTargetUser(ctx, q, id); err != nil {
+			return err
+		}
 		if _, err := q.LockAdminUser(ctx, ids.UUID(id)); errors.Is(err, pgx.ErrNoRows) {
 			return notFound()
 		} else if err != nil {
@@ -347,6 +369,35 @@ func (s *Service) resetAdminTOTP(ctx context.Context, actor, id ids.ID, in api.A
 		return api.AdminUser{}, err
 	}
 	return s.adminUser(ctx, id)
+}
+
+const userActive = "active"
+
+// actorStillSuper re-reads the actor under the advisory lock. authz checked
+// them when the request came in; a super_admin disabled, demoted or blocked by
+// a change that committed since then makes no further change.
+func actorStillSuper(ctx context.Context, q *admindb.Queries, actor ids.ID) error {
+	r, err := q.AdminActor(ctx, ids.UUID(actor))
+	if errors.Is(err, pgx.ErrNoRows) {
+		return problem.New(genproblems.Forbidden, "")
+	}
+	if err != nil {
+		return err
+	}
+	if r.DisabledAt != nil || !slices.Contains(r.Roles, superAdmin) || r.Status != userActive {
+		return problem.New(genproblems.Forbidden, "")
+	}
+	return nil
+}
+
+// lockTargetUser locks the target's users row (see LockAdminTargetUser) and
+// returns its status.
+func lockTargetUser(ctx context.Context, q *admindb.Queries, id ids.ID) (string, error) {
+	st, err := q.LockAdminTargetUser(ctx, ids.UUID(id))
+	if errors.Is(err, pgx.ErrNoRows) {
+		return "", notFound()
+	}
+	return st, err
 }
 
 func sortedCopy(in []string) []string {
