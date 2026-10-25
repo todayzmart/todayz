@@ -42,7 +42,7 @@ SELECT s.id AS sale_id,
        s.sold_at,
        (s.sold_at AT TIME ZONE 'Asia/Kolkata')::date AS sold_date,
        s.total_paise,
-       (s.link_method IN ('bill_qr', 'counter_code') AND s.link_status = 'linked') AS linked,
+       coalesce(s.link_method IN ('bill_qr', 'counter_code') AND s.link_status = 'linked', false) AS linked,
        s.device_seq IS NOT NULL AS offline
 FROM pos_sales s
 WHERE s.status = 'completed';

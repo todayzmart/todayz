@@ -29,6 +29,7 @@ commands:
   worker                    run the River worker
   migrate up|down|status    run schema migrations (DATABASE_MIGRATE_URL)
   seed dev|demo|test        load seed data (DATABASE_URL); local and test only
+  rollup --from D [--to D]  recompute the analytics rollups for IST days D (DATABASE_URL)
   version                   print build info
 `
 
@@ -79,6 +80,8 @@ func run(ctx context.Context, args []string, getenv config.Getenv, stdout, stder
 			return 2
 		}
 		err = runSeed(ctx, rest[0], getenv, stdout)
+	case "rollup":
+		err = runRollup(ctx, rest, getenv, stdout)
 	case "help", "-h", "--help":
 		_, _ = fmt.Fprint(stdout, usage)
 		return 0
