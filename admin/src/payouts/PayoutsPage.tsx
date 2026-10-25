@@ -15,8 +15,8 @@ import { ReasonDialog } from '../app/ReasonDialog';
 import { StepUpDialog } from '../app/StepUpDialog';
 import { MarkPaidDialog } from './MarkPaidDialog';
 import { statusTone, usePayoutLabels, usePayoutProblemText } from './labels';
-import { saveCsv, useExportPayouts, usePayout, usePayoutChange, usePayouts, useStatements, type PayoutChange } from './queries';
-import { PERIOD, STATUSES, lastClosedPeriod, type PayoutsSearch } from './search';
+import { saveCsv, useExportPayouts, usePayout, usePayoutChange, usePayouts, useServerPeriod, useStatements, type PayoutChange } from './queries';
+import { PERIOD, STATUSES, type PayoutsSearch } from './search';
 import css from '../app/page.module.css';
 
 const stepUp = (e: unknown) => e instanceof ApiError && e.code === 'step_up_required';
@@ -30,11 +30,33 @@ const DONE = { hold: 'payouts.done.hold', unhold: 'payouts.done.unhold', paid: '
  */
 export function PayoutsPage({ search }: { search: PayoutsSearch }) {
   const intl = useIntl();
+  const problemText = usePayoutProblemText();
+  const server = useServerPeriod(!search.period);
+  const period = search.period ?? server.data;
+  if (period) return <Month search={search} period={period} />;
+  return (
+    <div className={css.column}>
+      <h1 className="tz-page-title">{intl.formatMessage({ id: 'shell.nav.payouts' })}</h1>
+      {server.isError ? (
+        <p role="alert" className="tz-field-error">
+          {problemText(server.error)}{' '}
+          <Button size="sm" variant="ghost" onClick={() => void server.refetch()}>
+            {intl.formatMessage({ id: 'common.retry' })}
+          </Button>
+        </p>
+      ) : (
+        <Skeleton shape="block" height="320px" />
+      )}
+    </div>
+  );
+}
+
+function Month({ search, period }: { search: PayoutsSearch; period: string }) {
+  const intl = useIntl();
   const toast = useToast();
   const roles = useRoles();
   const navigate = useNavigate();
   const problemText = usePayoutProblemText();
-  const period = search.period ?? lastClosedPeriod(new Date());
   const manage = can(roles, 'payoutManage');
   const exporter = useExportPayouts();
   const [exportPending, setExportPending] = useState(false);
@@ -374,6 +396,7 @@ function PayoutDetail({ d, manage }: { d: AdminPayoutDetail; manage: boolean }) 
   const causes = [
     { key: 'suspended', open: d.causes.businessSuspended, label: intl.formatMessage({ id: 'payouts.cause.suspended' }) },
     { key: 'kyc', open: !d.causes.kycVerified, label: intl.formatMessage({ id: 'payouts.cause.kyc' }) },
+    { key: 'details', open: d.causes.payoutDetailsMissing, label: intl.formatMessage({ id: 'payouts.cause.details' }) },
     { key: 'risk', open: d.causes.openRiskFlag, label: intl.formatMessage({ id: 'payouts.cause.risk' }) },
   ];
 

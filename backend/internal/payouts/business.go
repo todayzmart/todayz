@@ -116,7 +116,7 @@ func (s *Service) businessStatement(ctx context.Context, q *payoutsdb.Queries, r
 		switch {
 		case *r.PayoutStatus == statusPaid:
 			ps.Status, ps.Utr, ps.PaidAt = api.BusinessPayoutStateStatusPaid, r.PayoutUtr, utc(r.PayoutPaidAt)
-		case r.PayoutHoldReason != nil && *r.PayoutHoldReason == holdKYC:
+		case r.PayoutHoldReason != nil && (*r.PayoutHoldReason == holdKYC || *r.PayoutHoldReason == holdDetails):
 			ps.Status = api.BusinessPayoutStateStatusNeedsKyc
 		}
 		out.Payout = ps

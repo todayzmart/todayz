@@ -175,6 +175,7 @@
               causes:
                 businessSuspended: false
                 kycVerified: true
+                payoutDetailsMissing: false
                 openRiskFlag: false
               payee:
                 kycStatus: verified

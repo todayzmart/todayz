@@ -31,6 +31,8 @@ export function usePayoutLabels() {
       switch (h) {
         case 'kyc_incomplete':
           return intl.formatMessage({ id: 'payouts.hold.kyc' });
+        case 'payout_details_missing':
+          return intl.formatMessage({ id: 'payouts.hold.details' });
         case 'risk_flag':
           return intl.formatMessage({ id: 'payouts.hold.risk' });
         case 'business_suspended':

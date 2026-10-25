@@ -195,6 +195,10 @@
     "defaultMessage": "KYC not verified",
     "description": "Hold cause"
   },
+  "payouts.cause.details": {
+    "defaultMessage": "No UPI or bank account",
+    "description": "Hold cause: the business has no payout destination"
+  },
   "payouts.cause.risk": {
     "defaultMessage": "Open risk flag",
     "description": "Hold cause"
@@ -252,12 +256,16 @@
     "description": "Unhold dialog title"
   },
   "payouts.unhold.body": {
-    "defaultMessage": "The payout goes back to pending. KYC, a risk flag or a suspension still blocks it until cleared.",
+    "defaultMessage": "The payout goes back to pending. KYC, missing payout details, a risk flag or a suspension still blocks it until cleared.",
     "description": "Unhold dialog body"
   },
   "payouts.hold.kyc": {
     "defaultMessage": "KYC incomplete",
     "description": "Hold reason"
+  },
+  "payouts.hold.details": {
+    "defaultMessage": "Payout details missing",
+    "description": "Hold reason: no UPI id or bank account"
   },
   "payouts.hold.risk": {
     "defaultMessage": "Risk flag",

@@ -80,7 +80,7 @@ CREATE TABLE payouts (
   version           int NOT NULL DEFAULT 1,
   CONSTRAINT ck_payouts_status CHECK (status IN ('pending','held','paid','cancelled')),
   CONSTRAINT ck_payouts_amount CHECK (amount > 0 OR status = 'cancelled'),
-  CONSTRAINT ck_payouts_hold_reason CHECK (hold_reason IS NULL OR hold_reason IN ('kyc_incomplete','risk_flag','business_suspended','manual')),
+  CONSTRAINT ck_payouts_hold_reason CHECK (hold_reason IS NULL OR hold_reason IN ('kyc_incomplete','payout_details_missing','risk_flag','business_suspended','manual')),
   CONSTRAINT ck_payouts_held CHECK ((status = 'held') = (hold_reason IS NOT NULL)),
   CONSTRAINT ck_payouts_hold_note CHECK (hold_note IS NULL OR (hold_reason = 'manual' AND char_length(hold_note) BETWEEN 1 AND 500)),
   CONSTRAINT ck_payouts_utr CHECK (utr IS NULL OR utr ~ '^[A-Z0-9]{12,22}$'),

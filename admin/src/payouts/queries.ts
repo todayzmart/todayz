@@ -12,6 +12,7 @@ import type { PayoutStatus } from '@todayz/api-client/gen/model/payoutStatus';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useIdempotent } from '../app/idempotency';
 import { PAGE } from '../audit/queries';
+import { lastClosedPeriod } from './search';
 
 export const statementsKey = (period: string) => ['admin', 'payouts', 'statements', period] as const;
 export const payoutsKey = (period: string, status?: PayoutStatus) => ['admin', 'payouts', 'list', { period, status }] as const;
@@ -34,6 +35,20 @@ export function usePayouts(period: string, status?: PayoutStatus) {
       listAdminPayouts({ period, ...(status ? { status } : {}), limit: PAGE, ...(pageParam ? { cursor: pageParam } : {}) }),
     initialPageParam: '',
     getNextPageParam: (last) => last.nextCursor ?? undefined,
+  });
+}
+
+/**
+ * The month A-11 opens on when the URL names none: the last closed IST month by the server's
+ * clock (`serverNow`), never the device's. One payout is enough to read it; skipped while the URL
+ * names a month.
+ */
+export function useServerPeriod(enabled: boolean) {
+  return useQuery({
+    queryKey: ['admin', 'payouts', 'serverPeriod'],
+    queryFn: async () => lastClosedPeriod(new Date((await listAdminPayouts({ limit: 1 })).serverNow)),
+    enabled,
+    staleTime: Infinity,
   });
 }
 

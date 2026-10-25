@@ -1,7 +1,7 @@
 import type { AdminPayout } from '@todayz/api-client/gen/model/adminPayout';
 import type { AdminPayoutDetail } from '@todayz/api-client/gen/model/adminPayoutDetail';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { NOW } from '../test/fixtures';
 import { json, problem, renderAt, type Handler } from '../test/render';
 import { lastClosedPeriod, validatePayoutsSearch } from './search';
@@ -49,7 +49,7 @@ function detail(p: AdminPayout): AdminPayoutDetail {
   return {
     payout: p,
     lines: [{ storeId: '01JB0ST1A2B3C4D5E6F7G8H9J0', storeName: 'Lakshmi Indiranagar', amountPaise: p.amountPaise }],
-    causes: { businessSuspended: false, kycVerified: true, openRiskFlag: false },
+    causes: { businessSuspended: false, kycVerified: true, payoutDetailsMissing: false, openRiskFlag: false },
     payee: { kycStatus: 'verified', upiIdLast4: '@okx', bankAccountLast4: '4321', ifsc: 'HDFC0001234' },
     serverNow: NOW,
   };
@@ -158,6 +158,19 @@ describe('A-11 payouts', () => {
     expect(new URLSearchParams(calls.find((c) => c.path === '/v1/admin/statements')?.search).get('period')).toBe('2026-09');
     expect(within(panel).getByRole('button', { name: 'Mark paid' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Export CSV' })).toBeInTheDocument();
+  });
+
+  it('opens on the last closed month by the server clock, not the device clock', async () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: new Date('2027-03-15T06:30:00Z') });
+    try {
+      const { calls } = renderAt('/payouts', { roles: ['finance'], handlers: [api().handler] });
+      expect(await screen.findByRole('heading', { name: 'Statements for 2026-09' })).toBeInTheDocument();
+      await waitFor(() => expect(calls.some((c) => c.path === '/v1/admin/statements')).toBe(true));
+      expect(new URLSearchParams(calls.find((c) => c.path === '/v1/admin/statements')?.search).get('period')).toBe('2026-09');
+      expect(screen.getByLabelText('Month')).toHaveValue('2026-09');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('lets the admin role read without any money action', async () => {

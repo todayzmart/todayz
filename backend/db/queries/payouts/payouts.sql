@@ -45,14 +45,18 @@ JOIN account_balances b ON b.account_id = a.id
 WHERE s.business_id = @business_id
 ORDER BY s.id;
 
--- HoldCauses reads the three automatic hold causes (01 §9): a suspended
--- business, KYC not verified, an open risk flag on the business or one of its
--- stores. TODO(lead): every open flag holds, not only fraud rules (W3-02 owns
+-- HoldCauses reads the automatic hold causes (01 §9): a suspended
+-- business, KYC not verified, no payout destination (neither a UPI id nor a
+-- bank account), an open risk flag on the business or one of its stores. TODO(lead): every open flag holds, not only fraud rules (W3-02 owns
 -- the rule list).
 -- name: HoldCauses :one
 SELECT
   (b.status = 'suspended')::boolean AS suspended,
   coalesce((SELECT k.status = 'verified' FROM business_kyc k WHERE k.business_id = b.id), false)::boolean AS kyc_verified,
+  (NOT EXISTS (
+    SELECT 1 FROM business_kyc k
+    WHERE k.business_id = b.id AND (k.upi_id_enc IS NOT NULL OR k.bank_account_enc IS NOT NULL)
+  ))::boolean AS details_missing,
   EXISTS (
     SELECT 1 FROM risk_flags f
     WHERE f.status = 'open' AND (

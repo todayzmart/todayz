@@ -143,3 +143,33 @@ func race(f func(i int) error) [2]error {
 	wg.Wait()
 	return out
 }
+
+// A verified business with neither a UPI id nor a bank account is held
+// (payout_details_missing): there is nowhere to pay it. B-10 shows needs_kyc.
+func TestPayoutDetailsMissingHoldsDB(t *testing.T) {
+	e := newEnv(t)
+	var bank []byte
+	require.NoError(t, e.tdb.OwnerPool.QueryRow(e.ctx, `SELECT bank_account_enc FROM business_kyc WHERE business_id = $1`, ids.UUID(e.biz)).Scan(&bank))
+	e.exec(`UPDATE business_kyc SET upi_id_enc = NULL, upi_id_last4 = NULL, bank_account_enc = NULL, bank_account_last4 = NULL
+	  WHERE business_id = $1`, ids.UUID(e.biz))
+	e.at(ist(2026, 6, 10, 12, 0))
+	e.storeReferral(e.s1, 100)
+	e.close(time.June, 2026)
+	p := e.openPayout()
+	require.Equal(t, api.PayoutStatus("held"), p.Payout.Status)
+	require.Equal(t, api.PayoutHoldCause("payout_details_missing"), *p.Payout.HoldReason)
+	require.True(t, p.Causes.PayoutDetailsMissing)
+	require.True(t, p.Causes.KycVerified)
+	st, err := e.svc.BusinessStatement(e.ctx, e.biz, nil, "2026-06")
+	require.NoError(t, err)
+	require.Equal(t, api.BusinessPayoutStateStatusNeedsKyc, st.Statement.Payout.Status)
+
+	// Unhold is refused while it is missing; a bank account clears it.
+	id, err := ids.Parse(p.Payout.Id)
+	require.NoError(t, err)
+	_, err = e.svc.Unhold(e.ctx, e.finance, id, "details checked")
+	require.Equal(t, "payout_hold_cause_open", code(err))
+	e.exec(`UPDATE business_kyc SET bank_account_enc = $2, bank_account_last4 = '7890' WHERE business_id = $1`, ids.UUID(e.biz), bank)
+	_, err = e.svc.Unhold(e.ctx, e.finance, id, "bank account added")
+	require.NoError(t, err)
+}

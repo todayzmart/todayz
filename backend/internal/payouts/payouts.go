@@ -44,6 +44,7 @@ const (
 
 	holdSuspended = "business_suspended"
 	holdKYC       = "kyc_incomplete"
+	holdDetails   = "payout_details_missing"
 	holdRisk      = "risk_flag"
 	holdManual    = "manual"
 )
@@ -142,21 +143,25 @@ func (s *Service) newID(now time.Time) ids.ID { return s.ids.New(now) }
 
 // --- small helpers ---------------------------------------------------------------
 
-// causes are the automatic hold causes now (01 §9).
+// causes are the automatic hold causes now (01 §9). DetailsMissing is a
+// business with neither a UPI id nor a bank account to pay to.
 type causes struct {
-	Suspended, KYCVerified, RiskFlag bool
+	Suspended, KYCVerified, DetailsMissing, RiskFlag bool
 }
 
-func (c causes) open() bool { return c.Suspended || !c.KYCVerified || c.RiskFlag }
+func (c causes) open() bool { return c.Suspended || !c.KYCVerified || c.DetailsMissing || c.RiskFlag }
 
 // reason is the hold reason the open causes give, in this order: a suspended
-// business, then KYC, then a risk flag; "" when none is open.
+// business, then KYC, then no payout details, then a risk flag; "" when none
+// is open.
 func (c causes) reason() string {
 	switch {
 	case c.Suspended:
 		return holdSuspended
 	case !c.KYCVerified:
 		return holdKYC
+	case c.DetailsMissing:
+		return holdDetails
 	case c.RiskFlag:
 		return holdRisk
 	}
@@ -168,7 +173,7 @@ func (s *Service) causes(ctx context.Context, q *payoutsdb.Queries, business ids
 	if err != nil {
 		return causes{}, fmt.Errorf("payouts: hold causes: %w", err)
 	}
-	return causes{Suspended: r.Suspended, KYCVerified: r.KycVerified, RiskFlag: r.RiskFlag}, nil
+	return causes{Suspended: r.Suspended, KYCVerified: r.KycVerified, DetailsMissing: r.DetailsMissing, RiskFlag: r.RiskFlag}, nil
 }
 
 func mustID(u pgtype.UUID) ids.ID {
