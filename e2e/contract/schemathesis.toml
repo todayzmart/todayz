@@ -1,5 +1,12 @@
 # Schemathesis settings for run.sh (W0-04). Loaded with --config-file.
 
+# Hypothesis' filter_too_much health check is about the generator, not the API: on
+# nested bodies with many ULID patterns (offer previews: an OfferCreate plus up to
+# 10 sample lines) the fuzzing phase sometimes discards too many drafts and the run
+# errors with no failed check (CI e2e on f033f31). Schemathesis 4 only takes this
+# globally; every check still runs on every example that is generated.
+suppress-health-check = ["filter_too_much"]
+
 # A list cursor is opaque: the coverage phase sends a schema-valid string the
 # server never issued, and 422 validation_failed (query.cursor) is the right
 # answer (W1-06, lead 2026-10-23). Lists behind auth answer 401 first, so only
