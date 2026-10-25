@@ -21,6 +21,21 @@ func TestRenderCard(t *testing.T) {
 	}
 }
 
+// A name the font cannot draw is left off, never drawn as blanks: the card is
+// the one without it. Typographic punctuation is folded to ASCII.
+func TestRenderCardLeavesOffIndicNames(t *testing.T) {
+	require.Equal(t, "Raju's Store - Main Rd", latin("Raju’s Store – Main Rd"))
+	require.Empty(t, latin("आशीर्वाद आटा 5 kg"))
+	require.Empty(t, latin("ಶ್ರೀ ಲಕ್ಷ್ಮಿ ಸ್ಟೋರ್ಸ್"))
+	require.Equal(t, "Indiranagar", latin("Indiranagar"))
+
+	indic, err := RenderCard(CardImage{Item: "आशीर्वाद आटा", Store: "ಶ್ರೀ ಲಕ್ಷ್ಮಿ ಸ್ಟೋರ್ಸ್", Locality: "Indiranagar", PricePaise: 24500})
+	require.NoError(t, err)
+	without, err := RenderCard(CardImage{Locality: "Indiranagar", PricePaise: 24500})
+	require.NoError(t, err)
+	require.Equal(t, without, indic)
+}
+
 func TestRupees(t *testing.T) {
 	require.Equal(t, "₹38", Rupees(3800))
 	require.Equal(t, "₹38.50", Rupees(3850))

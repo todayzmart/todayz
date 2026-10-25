@@ -3,11 +3,7 @@ package share
 // A 5×8 bitmap font for the preview image (printable ASCII and ₹). Rows 0–6
 // are the body, row 7 the descender. The standard library has no font
 // rasteriser and the module list is pinned (D-88), so the card is drawn from
-// this table. A rune outside it is drawn as a space.
-//
-// TODO(lead): Devanagari and other scripts render as spaces; a shop's own
-// item named in Hindi previews with a blank name until the image uses a real
-// font (golang.org/x/image needs the lead to pin it).
+// this table. latin decides what the card may draw from it.
 
 const (
 	glyphW = 5

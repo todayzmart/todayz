@@ -39,6 +39,7 @@ type CardImage struct {
 
 // RenderCard draws the preview PNG.
 func RenderCard(c CardImage) ([]byte, error) {
+	c.Item, c.Store, c.Locality = latin(c.Item), latin(c.Store), latin(c.Locality)
 	img := image.NewRGBA(image.Rect(0, 0, cardW, cardH))
 	fill(img, img.Bounds(), colWash)
 
@@ -80,6 +81,25 @@ func RenderCard(c CardImage) ([]byte, error) {
 		return nil, fmt.Errorf("share: png: %w", err)
 	}
 	return buf.Bytes(), nil
+}
+
+// folds maps typographic punctuation to the font's ASCII.
+var folds = strings.NewReplacer("‘", "'", "’", "'", "“", `"`, "”", `"`, "–", "-", "—", "-", "\u00a0", " ")
+
+// latin is s as the card draws it: typographic punctuation folded to ASCII,
+// or "" when a rune is still outside the font, so the field is left off the
+// image. The font is Latin only, and no Go rasteriser shapes Indic scripts
+// (x/image draws glyph by glyph: no conjuncts, no reordered vowel signs), so a
+// Devanagari, Kannada, Telugu or Tamil name would be drawn wrong. The link
+// preview's title and description carry the name in its own script.
+func latin(s string) string {
+	s = folds.Replace(s)
+	for _, r := range s {
+		if _, ok := glyphs[r]; !ok {
+			return ""
+		}
+	}
+	return s
 }
 
 // advance is one glyph's width plus its gap, in pixels at scale.
