@@ -4,6 +4,8 @@ import (
 	"context"
 	"strings"
 	"time"
+	"unicode"
+	"unicode/utf8"
 
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/gen/sqlc/identitydb"
@@ -11,6 +13,7 @@ import (
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/settings"
 )
 
 // Saved addresses (W2-15; 01 §5.5, C-11, C-18). An address is its owner's
@@ -18,11 +21,14 @@ import (
 // never logged, and errors never carry it. Orders keep their own snapshot
 // (orders.address_snapshot), so a change or a delete here never touches an
 // order already placed.
-
-// MaxAddresses is how many addresses one customer keeps. 01 has no rule for
-// it; the cap only bounds the list (a question for the lead in the W2-15
-// report).
-const MaxAddresses = 20
+//
+// How many addresses one customer keeps is customer_max_saved_addresses
+// (D-222, 01 §17).
+//
+// updated_at is the database's clock throughout: the touch trigger sets it
+// to now() on every UPDATE, and the INSERT takes the column default, so
+// "most recently changed" (the list order, the default promoted on delete)
+// never compares the injected clock with the database's.
 
 // Address is a saved address as the API shows it.
 type Address struct {
@@ -85,6 +91,21 @@ func (s *Service) CreateAddress(ctx context.Context, p authn.Principal, in Addre
 	if err != nil {
 		return Address{}, err
 	}
+	line2, err := optionalText("body.line2", in.Line2)
+	if err != nil {
+		return Address{}, err
+	}
+	landmark, err := optionalText("body.landmark", in.Landmark)
+	if err != nil {
+		return Address{}, err
+	}
+	if s.settings == nil {
+		return Address{}, unavailable(ctx, errUnavailable)
+	}
+	maxSaved, err := s.settings.Int(ctx, settings.CustomerMaxSavedAddresses)
+	if err != nil {
+		return Address{}, unavailable(ctx, err)
+	}
 	var out Address
 	err = s.db.InTx(ctx, func(ctx context.Context) error {
 		q := identitydb.New(s.db.Q(ctx))
@@ -95,21 +116,20 @@ func (s *Service) CreateAddress(ctx context.Context, p authn.Principal, in Addre
 		if err != nil {
 			return err
 		}
-		if n >= MaxAddresses {
+		if int64(n) >= maxSaved {
 			return fieldErr("body", "you already keep the most addresses allowed; delete one first")
 		}
-		now := s.clock.Now()
-		id := ids.New(now)
+		id := ids.New(s.clock.Now())
 		isDefault := in.IsDefault || n == 0
 		if isDefault {
-			if err := q.ClearOtherDefaults(ctx, identitydb.ClearOtherDefaultsParams{UserID: ids.UUID(p.UserID), ID: ids.UUID(id), Now: now}); err != nil {
+			if err := q.ClearOtherDefaults(ctx, identitydb.ClearOtherDefaultsParams{UserID: ids.UUID(p.UserID), ID: ids.UUID(id)}); err != nil {
 				return err
 			}
 		}
 		row, err := q.InsertAddress(ctx, identitydb.InsertAddressParams{
 			ID: ids.UUID(id), UserID: ids.UUID(p.UserID), Label: label, Line1: line1,
-			Line2: optionalText(in.Line2), Landmark: optionalText(in.Landmark), Pincode: in.Pincode,
-			Lat: in.Lat, Lng: in.Lng, IsDefault: isDefault, Now: now,
+			Line2: line2, Landmark: landmark, Pincode: in.Pincode,
+			Lat: in.Lat, Lng: in.Lng, IsDefault: isDefault,
 		})
 		if err != nil {
 			return err
@@ -130,25 +150,35 @@ func (s *Service) UpdateAddress(ctx context.Context, p authn.Principal, id ids.I
 	if err := s.ready(); err != nil {
 		return Address{}, unavailable(ctx, err)
 	}
-	if patch.Label != nil {
-		v := strings.TrimSpace(*patch.Label)
-		if v == "" {
-			return Address{}, fieldErr("body.label", "must not be blank")
+	for _, f := range []struct {
+		path string
+		v    **string
+	}{{"body.label", &patch.Label}, {"body.line1", &patch.Line1}} {
+		if *f.v == nil {
+			continue
 		}
-		patch.Label = &v
+		v, err := addressField(f.path, **f.v)
+		if err != nil {
+			return Address{}, err
+		}
+		if v == "" {
+			return Address{}, fieldErr(f.path, "must not be blank")
+		}
+		*f.v = &v
 	}
-	if patch.Line1 != nil {
-		v := strings.TrimSpace(*patch.Line1)
-		if v == "" {
-			return Address{}, fieldErr("body.line1", "must not be blank")
-		}
-		patch.Line1 = &v
+	line2, err := optionalText("body.line2", patch.Line2)
+	if err != nil {
+		return Address{}, err
+	}
+	landmark, err := optionalText("body.landmark", patch.Landmark)
+	if err != nil {
+		return Address{}, err
 	}
 	if (patch.Lat == nil) != (patch.Lng == nil) {
 		return Address{}, fieldErr("body.lat", "send lat and lng together")
 	}
 	var out Address
-	err := s.db.InTx(ctx, func(ctx context.Context) error {
+	err = s.db.InTx(ctx, func(ctx context.Context) error {
 		q := identitydb.New(s.db.Q(ctx))
 		if err := q.LockKey(ctx, addressLockKey(p.UserID)); err != nil {
 			return err
@@ -166,17 +196,16 @@ func (s *Service) UpdateAddress(ctx context.Context, p authn.Principal, id ids.I
 		if patch.IsDefault != nil && !*patch.IsDefault && cur.IsDefault {
 			return fieldErr("body.isDefault", "make another address the default instead")
 		}
-		now := s.clock.Now()
 		if patch.IsDefault != nil && *patch.IsDefault && !cur.IsDefault {
-			if err := q.ClearOtherDefaults(ctx, identitydb.ClearOtherDefaultsParams{UserID: ids.UUID(p.UserID), ID: ids.UUID(id), Now: now}); err != nil {
+			if err := q.ClearOtherDefaults(ctx, identitydb.ClearOtherDefaultsParams{UserID: ids.UUID(p.UserID), ID: ids.UUID(id)}); err != nil {
 				return err
 			}
 		}
 		params := identitydb.UpdateAddressParams{
 			Label: patch.Label, Line1: patch.Line1, Pincode: patch.Pincode, IsDefault: patch.IsDefault,
-			SetLine2: patch.SetLine2, Line2: optionalText(patch.Line2),
-			SetLandmark: patch.SetLandmark, Landmark: optionalText(patch.Landmark),
-			Now: now, ID: ids.UUID(id), UserID: ids.UUID(p.UserID),
+			SetLine2: patch.SetLine2, Line2: line2,
+			SetLandmark: patch.SetLandmark, Landmark: landmark,
+			ID: ids.UUID(id), UserID: ids.UUID(p.UserID),
 		}
 		if patch.Lat != nil {
 			params.SetLocation, params.Lat, params.Lng = true, *patch.Lat, *patch.Lng
@@ -213,7 +242,7 @@ func (s *Service) DeleteAddress(ctx context.Context, p authn.Principal, id ids.I
 			return err
 		}
 		if wasDefault {
-			return q.PromoteNewestAddress(ctx, identitydb.PromoteNewestAddressParams{UserID: ids.UUID(p.UserID), Now: s.clock.Now()})
+			return q.PromoteNewestAddress(ctx, ids.UUID(p.UserID))
 		}
 		return nil
 	})
@@ -228,7 +257,14 @@ func (s *Service) DeleteAddress(ctx context.Context, p authn.Principal, id ids.I
 func addressLockKey(user ids.ID) string { return "addresses:" + user.String() }
 
 func addressText(label, line1 string) (string, string, error) {
-	label, line1 = strings.TrimSpace(label), strings.TrimSpace(line1)
+	label, err := addressField("body.label", label)
+	if err != nil {
+		return "", "", err
+	}
+	line1, err = addressField("body.line1", line1)
+	if err != nil {
+		return "", "", err
+	}
 	if label == "" {
 		return "", "", fieldErr("body.label", "must not be blank")
 	}
@@ -238,16 +274,31 @@ func addressText(label, line1 string) (string, string, error) {
 	return label, line1, nil
 }
 
-// optionalText trims an optional line; blank is no value.
-func optionalText(s *string) *string {
+// optionalText checks and trims an optional line; blank is no value.
+func optionalText(path string, s *string) (*string, error) {
 	if s == nil {
-		return nil
+		return nil, nil
 	}
-	v := strings.TrimSpace(*s)
-	if v == "" {
-		return nil
+	v, err := addressField(path, *s)
+	if err != nil || v == "" {
+		return nil, err
 	}
-	return &v
+	return &v, nil
+}
+
+// addressField refuses invalid UTF-8 and control characters (Postgres
+// refuses a NUL, which would be a 500), as the catalogue's free text does,
+// and trims. The reason never repeats the value.
+func addressField(path, s string) (string, error) {
+	if !utf8.ValidString(s) {
+		return "", fieldErr(path, "must be valid text")
+	}
+	for _, r := range s {
+		if unicode.IsControl(r) {
+			return "", fieldErr(path, "must not contain control characters")
+		}
+	}
+	return strings.TrimSpace(s), nil
 }
 
 func toAddress(r identitydb.UpdateAddressRow) Address {

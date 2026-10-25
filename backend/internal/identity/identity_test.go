@@ -30,6 +30,7 @@ import (
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/reqctx"
+	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/platform/telemetry"
 	"github.com/todayz/backend/internal/testkit"
 )
@@ -161,6 +162,7 @@ func newFixtureWith(t *testing.T, appEnv config.Env, edit func(*config.Config, *
 	deps := Deps{
 		Config: cfg, DB: db.New(tdb.Pool), Clock: clk, Log: log,
 		Tokens: authn.NewTokens(ks, clk), SMS: f.sms, Human: f.human, TestRoutes: true,
+		Settings: settings.NewCache(settings.PGLoader(tdb.Pool), settings.Options{}),
 	}
 	if edit != nil {
 		edit(cfg, &deps)

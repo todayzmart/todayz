@@ -151,8 +151,9 @@
       Customer app only. The pin (`lat`, `lng`) is what the delivery radius is checked against
       (01 §5.5). The first address is the default; `isDefault: true` makes this one the default
       and clears the others. `422 validation_failed` on the field (`body.pincode` must be 6
-      digits not starting with 0) or on `body` when the caller already keeps the most addresses
-      allowed (20).
+      digits not starting with 0; `label`, `line1`, `line2` and `landmark` must be valid text
+      without control characters) or on `body` when the caller already keeps the configurable
+      maximum number of addresses.
     x-idempotency: optional
     parameters:
       - $ref: ../common/parameters.yaml#/IdempotencyKey
@@ -206,10 +207,12 @@
     summary: Change a saved address
     description: >-
       Customer app only. `If-Match` is required (428 without it, 412 when stale). Another user's
-      address is 404. `isDefault: true` makes it the default and clears the others;
-      `isDefault: false` is refused on the default address (`422 validation_failed` on
-      `body.isDefault`: make another one the default instead). Orders already placed keep the
-      address they were placed with.
+      address is 404. `isDefault: true` makes it the default and clears the others; clearing
+      the old default changes that address too, so its version goes up and an ETag the client
+      holds for it is stale (412) until it reads the list again. `isDefault: false` is refused
+      on the default address (`422 validation_failed` on `body.isDefault`: make another one the
+      default instead). Text fields refuse control characters as on create. Orders already
+      placed keep the address they were placed with.
     x-idempotency: none
     parameters:
       - $ref: ../common/parameters.yaml#/IfMatch

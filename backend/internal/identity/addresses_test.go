@@ -131,15 +131,59 @@ func TestAddressesAreTheOwnersOnly(t *testing.T) {
 
 func TestAddressCap(t *testing.T) {
 	f := newFixture(t, config.EnvTest)
+	// The cap is customer_max_saved_addresses (D-222): lowered here to prove
+	// it is read, not the default of 20.
+	_, err := f.db.Pool.Exec(context.Background(), `UPDATE platform_settings SET value = '3' WHERE key = 'customer_max_saved_addresses'`)
+	require.NoError(t, err)
 	p := f.customer("+919876543210")
 	ctx := f.ctx("10.0.0.1")
-	for i := range MaxAddresses {
+	for i := range 3 {
 		_, err := f.svc.CreateAddress(ctx, p, home(fmt.Sprintf("Place %d", i)))
 		require.NoError(t, err)
 	}
-	_, err := f.svc.CreateAddress(ctx, p, home("One more"))
+	_, err = f.svc.CreateAddress(ctx, p, home("One more"))
 	requireCode(t, err, genproblems.ValidationFailed, "over the cap")
 	require.Contains(t, problemOf(t, err).Fields, "body")
+}
+
+// TestAddressTextRefusesControlCharacters: Postgres refuses a NUL, which was
+// a 500. Every text field refuses control characters and invalid UTF-8 with a
+// 422 on its own path, on create and on patch (D-222).
+func TestAddressTextRefusesControlCharacters(t *testing.T) {
+	f := newFixture(t, config.EnvTest)
+	p := f.customer("+919876543210")
+	ctx := f.ctx("10.0.0.1")
+	a, err := f.svc.CreateAddress(ctx, p, home("Home"))
+	require.NoError(t, err)
+
+	bad := map[string]string{"NUL": "Home\x00", "newline": "Home\nOffice", "escape": "\x1b[31m", "DEL": "Ho\x7fme", "invalid UTF-8": "Ho\xffme"}
+	for name, v := range bad {
+		for _, field := range []string{"label", "line1", "line2", "landmark"} {
+			in := home("Office")
+			patch := AddressPatch{}
+			switch field {
+			case "label":
+				in.Label, patch.Label = v, &v
+			case "line1":
+				in.Line1, patch.Line1 = v, &v
+			case "line2":
+				in.Line2, patch.SetLine2, patch.Line2 = &v, true, &v
+			case "landmark":
+				in.Landmark, patch.SetLandmark, patch.Landmark = &v, true, &v
+			}
+			_, err := f.svc.CreateAddress(ctx, p, in)
+			requireCode(t, err, genproblems.ValidationFailed, name+" in "+field+" on create")
+			require.Contains(t, problemOf(t, err).Fields, "body."+field, name+" in "+field)
+			_, err = f.svc.UpdateAddress(ctx, p, a.ID, a.Version, patch)
+			requireCode(t, err, genproblems.ValidationFailed, name+" in "+field+" on patch")
+			require.Contains(t, problemOf(t, err).Fields, "body."+field, name+" in "+field)
+		}
+	}
+	// Nothing was saved, and the address did not change.
+	list, err := f.svc.ListAddresses(ctx, p)
+	require.NoError(t, err)
+	require.Len(t, list, 1)
+	require.Equal(t, a.Version, list[0].Version)
 }
 
 func TestAddressHandlers(t *testing.T) {

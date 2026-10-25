@@ -70,7 +70,7 @@ The fixed bottom nav shows mid-page in the full-page shots. That comes from how 
 ## Notes and choices
 
 - **Address privacy:** address text is stored as given and never logged, and journeys never print it. Whether it should be sealed like phones is the lead's call.
-- **Address cap:** the API caps saved addresses at 20 per person. 01 has no rule for this, so the lead should confirm the number or move it into `platform_settings`.
+- **Address cap:** now the setting `customer_max_saved_addresses` (default 20, D-222; see "Lead review fixes").
 - **The pin:** it comes from "Use my location" or the saved area and cannot be dragged on the map yet.
 - **Payment note:** the C-11 and C-12 wording is "You pay when it arrives: cash or UPI. Nothing is charged now." This is the conservative reading; no prepay is built.
 - **Journey shortcuts:**
@@ -85,6 +85,21 @@ The fixed bottom nav shows mid-page in the full-page shots. That comes from how 
 
 1. **Delivery code timing.** 01 says the delivery code is "valid only in `out_for_delivery`", but the backend returns it to the customer from accepted on (`codeShown`). The customer UI shows it only while out for delivery. Either 01 or the backend should change.
 2. **Business app after Dispatch.** The order detail keeps the dispatch response, which has no phone (an idempotent replay could store it). So "Call {customer}" appears only after the order is read again. The journey reloads the page. The business app should refetch the order after dispatch.
-3. **Address cap and sealing:** the two decisions under "Notes and choices".
+3. **Address sealing:** the decision under "Notes and choices" (the cap is settled by D-222).
 4. **Hindi review:** `orders.callShop` in `orders.hi.json` needs human review.
 5. **Docs:** this branch does not carry main's D-220 docs commit (3a11a74). No docs were touched here, so the merge should be clean.
+
+## Lead review fixes (25 Oct)
+
+| Fix | Where |
+|---|---|
+| A control character or invalid UTF-8 in `label`, `line1`, `line2` or `landmark` is `422` on `body.<field>` on create and patch (a NUL was a 500) | `internal/identity/addresses.go` (`addressField`); `TestAddressTextRefusesControlCharacters`, `TestAddressesHTTP` |
+| The cap is `customer_max_saved_addresses` (count, default 20, 1–50), read through `settings.Cache` (identity `Deps.Settings`); 01 §5.5 and §17, D-222 | migration `21501_w2-15_saved_address_cap.sql`, `settings/keys.go`; `TestAddressCap` lowers the setting to 3 |
+| `updated_at` is the database's clock on insert and update (the INSERT takes the default; no `@now` in any address query); ties fall back to the ULID | `db/queries/identity/addresses.sql` |
+| PATCH description: making a new default bumps the old default's version, so its ETag goes stale (412) | `api/paths/me.yaml` |
+| D-220 tests: phone shown in awaiting_customer, accepted after confirm-partial or extend, ready, out_for_delivery; null in rejected, expired, delivery_failed and in the confirm-partial and extend responses | `TestD220ShopPhoneByStatus`, `TestD220ShopPhoneOnDelivery` |
+| Router-level address test: another customer's PATCH and DELETE are 404, PATCH without If-Match is 428, a business token is 403 on GET, POST and DELETE | `cmd/todayz/addresses_http_test.go` |
+
+The staff `ready` response is the business view, which has no `store` object, so it has no phone to check.
+
+Checks: `make gen` ok; gofmt clean; `go vet ./...` ok; golangci-lint on `internal/identity`, `internal/platform/settings` and `cmd/todayz` reports 0 issues; settings lint ok; `go test` on `internal/identity`, `internal/platform/settings`, `internal/platform/migrate`, `internal/orders` and `cmd/todayz` (shared test PG): all ok (cmd/todayz 92 s). The journeys were not rerun, because nothing they use changed.

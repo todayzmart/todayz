@@ -31,7 +31,7 @@ func buildSecurity(d *deps) (mw.Authenticator, mw.Limiter, error) {
 		tokens = authn.NewTokens(ks, d.Clock)
 	}
 	svc, err := identity.New(identity.Deps{
-		Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Tokens: tokens,
+		Config: d.Config, DB: d.DB, Clock: d.Clock, Log: d.Log, Tokens: tokens, Settings: d.Settings,
 		TestRoutes: d.TestClock != nil, // the /v1/test/clock gate (D-80)
 	})
 	if err != nil {

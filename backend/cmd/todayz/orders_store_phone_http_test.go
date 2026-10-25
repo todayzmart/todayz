@@ -3,10 +3,12 @@ package main
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/todayz/backend/internal/business"
+	"github.com/todayz/backend/internal/orders"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/pii"
 )
@@ -84,4 +86,63 @@ func TestD220NoShopPhoneNoFallback(t *testing.T) {
 	o.a.exec(`UPDATE stores SET phone_enc = NULL WHERE id = $1`, uuidOf(t, o.sid))
 	id := o.order()
 	require.Nil(t, o.shopPhoneOf(id), "no shop phone: null, never the owner's")
+}
+
+// storePhone is store.phone in an order body (an action response).
+func storePhone(t *testing.T, r resp) any {
+	t.Helper()
+	require.Equal(t, http.StatusOK, r.code, "status %d", r.code)
+	st := r.body["store"].(map[string]any)
+	v, ok := st["phone"]
+	require.True(t, ok, "store.phone is always present")
+	return v
+}
+
+// The other open statuses show the phone; the other finished ones and the
+// confirm-partial and extend responses do not.
+func TestD220ShopPhoneByStatus(t *testing.T) {
+	o := newOrderShop(t)
+	o.setShopPhone(shopPhone)
+
+	id := o.orderOf(line{o.butter, 2}, line{o.salt, 1})
+	require.Equal(t, http.StatusOK, o.partial(id, 1, 1).code)
+	require.Equal(t, "awaiting_customer", o.status(id))
+	isShopPhone(t, o.shopPhoneOf(id), "awaiting_customer: the shop's phone")
+	r := o.me(o.cust, id, "confirm-partial", map[string]any{"accept": true})
+	require.Nil(t, storePhone(t, r), "the confirm-partial response has no phone")
+	isShopPhone(t, o.shopPhoneOf(id), "accepted after confirm-partial: the shop's phone")
+
+	r = o.staff(o.cashier, id, "ready", nil)
+	require.Equal(t, http.StatusOK, r.code, "status %d", r.code)
+	isShopPhone(t, o.shopPhoneOf(id), "ready: the shop's phone")
+
+	id = o.order()
+	r = o.staff(o.cashier, id, "reject", map[string]any{"reason": "out_of_stock"})
+	require.Equal(t, http.StatusOK, r.code, "status %d", r.code)
+	require.Nil(t, o.shopPhoneOf(id), "rejected: no phone")
+
+	id = o.order()
+	o.advance(10 * time.Minute)
+	expiredRun(t, o.timer(orders.KindAcceptTimeout, id, nil))
+	require.Equal(t, "expired", o.status(id))
+	require.Nil(t, o.shopPhoneOf(id), "expired: no phone")
+
+	id = o.accepted()
+	o.advance(25 * time.Minute)
+	r = o.me(o.cust, id, "extend", nil)
+	require.Nil(t, storePhone(t, r), "the extend response has no phone")
+	isShopPhone(t, o.shopPhoneOf(id), "accepted after extend: the shop's phone")
+}
+
+func TestD220ShopPhoneOnDelivery(t *testing.T) {
+	d := newDeliveryShop(t)
+	d.setShopPhone(shopPhone)
+
+	id := d.dispatched()
+	require.Equal(t, "out_for_delivery", d.status(id))
+	isShopPhone(t, d.shopPhoneOf(id), "out_for_delivery: the shop's phone")
+
+	id, _ = d.failed()
+	require.Equal(t, "delivery_failed", d.status(id))
+	require.Nil(t, d.shopPhoneOf(id), "delivery_failed: no phone")
 }
