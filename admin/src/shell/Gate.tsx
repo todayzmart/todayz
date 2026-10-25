@@ -22,6 +22,10 @@ export function Gate() {
   const factor = useSecondFactor();
   const { done } = useSecondFactorState();
   const location = useRouterState({ select: (s) => s.location });
+  // The page the Outlet holds. Right after a redirect to /sign-in, `location` is already /sign-in
+  // while the Outlet still holds the old match; the bare layout renders nothing until they agree, so
+  // a staff page never mounts signed out (and never fires its API calls).
+  const rendered = useRouterState({ select: (s) => s.matches[s.matches.length - 1]?.pathname });
 
   // A signed-out browser keeps nothing about the authenticator step.
   useEffect(() => {
@@ -35,14 +39,15 @@ export function Gate() {
       message={intl.formatMessage({ id: 'app.offline.body' })}
     />
   );
-  const bare = (
-    <>
-      {offline}
-      <main id="main" className={styles.signIn} tabIndex={-1}>
-        <Outlet />
-      </main>
-    </>
-  );
+  const bare =
+    rendered === location.pathname ? (
+      <>
+        {offline}
+        <main id="main" className={styles.signIn} tabIndex={-1}>
+          <Outlet />
+        </main>
+      </>
+    ) : null;
   const here = location.pathname + location.searchStr;
   const next = here === '/' || OPEN.includes(location.pathname) || location.pathname === SECOND_STEP ? {} : { next: here };
 

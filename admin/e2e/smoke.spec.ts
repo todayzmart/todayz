@@ -1,5 +1,6 @@
 import { VIEWPORTS, expectFontLoaded, guardPage, shot, type PageGuard } from '@todayz/config/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { answer, answerEmptyLists, answerMe, answerRefresh, problem } from './fake-api';
 
 /** The self-hosted Figtree file, as Vite names it (figtree-latin-wght-normal-<hash>.woff2). */
 const FIGTREE = /\/figtree-[^/]*\.woff2$/;
@@ -8,45 +9,14 @@ let guard: PageGuard;
 
 /**
  * The console is for signed-in staff who passed the authenticator step. The smoke run has no API, so
- * the session refresh is answered here: with a grant (signed in) or a 401 (signed out). The API is on
- * another origin, so the cookie-carrying call needs the preflight and an explicit origin in the answer.
+ * the calls are answered by ./fake-api: the session refresh with a grant (signed in) or a 401
+ * (signed out), `GET /v1/me` as a super admin, and every admin list as an empty page.
  */
-const cors = (origin: string) => ({
-  'access-control-allow-origin': origin,
-  'access-control-allow-credentials': 'true',
-  'access-control-allow-headers': 'authorization, content-type, x-tz-client, accept-language, accept',
-  'access-control-allow-methods': 'POST, OPTIONS',
-});
-
-async function answer(page: Page, path: string, status: number, body: unknown) {
-  await page.route(`**${path}`, (route) => {
-    const headers = cors(route.request().headers()['origin'] ?? '*');
-    if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
-    return route.fulfill({
-      status,
-      contentType: status === 200 ? 'application/json' : 'application/problem+json',
-      headers,
-      body: JSON.stringify(body),
-    });
-  });
-}
-
-const problem = (status: number, code: string) => ({ type: `about:blank#${code}`, title: code, status, code });
-
-async function answerRefresh(page: Page, signedIn: boolean) {
-  await (signedIn
-    ? answer(page, '/v1/auth/refresh', 200, {
-        accessToken: 'smoke-token',
-        expiresAt: new Date(Date.now() + 3_600_000).toISOString(),
-        tokenType: 'Bearer',
-        userId: '01J9ZAAAAAAAAAAAAAAAAAAAAA',
-      })
-    : answer(page, '/v1/auth/refresh', 401, problem(401, 'unauthorized')));
-}
-
 test.beforeEach(async ({ page }, info) => {
   guard = await guardPage(page);
+  await answerEmptyLists(page);
   await answerRefresh(page, true);
+  await answerMe(page, ['super_admin']);
   // Without the session hint a cold start skips the refresh and opens sign-in (shared/auth), as for a
   // visitor; the signed-out tests keep it off, so no 401 reaches the console.
   if (!info.title.startsWith('signed out')) {
@@ -107,6 +77,7 @@ test('is not indexable', async ({ page }) => {
 
 test('signed out: any page opens the sign-in screen (A-01)', async ({ page }) => {
   await answerRefresh(page, false);
+  await answer(page, '/v1/me', 401, problem(401, 'unauthorized'));
   await page.goto('/businesses');
   await expect(page).toHaveURL(/\/sign-in\?next=%2Fbusinesses$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Sign in to TodayZ Admin' })).toBeVisible();

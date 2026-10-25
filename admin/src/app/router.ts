@@ -2,6 +2,7 @@ import { ApiError } from '@todayz/api-client';
 import { QueryClient } from '@tanstack/react-query';
 import { createRouter, type RouterHistory } from '@tanstack/react-router';
 import { routeTree } from '../routeTree.gen';
+import { RouteError } from './CrashFallback';
 
 export interface RouterContext {
   queryClient: QueryClient;
@@ -21,6 +22,7 @@ export function makeRouter(queryClient: QueryClient, history?: RouterHistory) {
     routeTree,
     context: { queryClient },
     defaultPreload: 'intent',
+    defaultErrorComponent: RouteError,
     scrollRestoration: true,
     ...(history ? { history } : {}),
   });

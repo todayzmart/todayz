@@ -1,6 +1,6 @@
 import { useSession } from '@todayz/auth';
 import { useQueryClient } from '@tanstack/react-query';
-import { Link, Outlet, useRouterState } from '@tanstack/react-router';
+import { Link, Navigate, Outlet, useRouterState } from '@tanstack/react-router';
 import { Button, Skeleton } from '@todayz/ui';
 import { LogOut } from 'lucide-react';
 import { Fragment } from 'react';
@@ -64,7 +64,12 @@ function Content({ roles, loading, failed, retry }: { roles: readonly string[]; 
   if (!navItem(section) && section !== '') return <Outlet />;
   if (loading) return <Skeleton shape="block" height="160px" />;
   if (failed) return <AccessFailed retry={retry} />;
-  if (!canOpen(roles, section)) return <NoAccess roles={roles} />;
+  if (!canOpen(roles, section)) {
+    // Sign-in lands on `/`; a role without Pulse (a field agent) starts at its first screen instead.
+    const first = section === '' ? NAV.find((n) => n.section && canOpen(roles, n.section)) : undefined;
+    if (first) return <Navigate to="/$section" params={{ section: first.section }} replace />;
+    return <NoAccess roles={roles} />;
+  }
   return <Outlet />;
 }
 

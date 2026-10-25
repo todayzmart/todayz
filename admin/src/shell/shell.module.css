@@ -66,9 +66,11 @@
     overflow-x: hidden;
   }
 
-  /* 44px touch targets on the rail (the design's 32px rows are for a mouse). */
+  /* 44px touch targets on the rail (the design's 32px rows are for a mouse). They never shrink: a
+     super admin's full list is taller than a phone, and the rail scrolls instead. */
   .side.side a,
   .side.side button {
+    flex: none;
     justify-content: center;
     height: var(--control-lg);
     min-width: var(--control-lg);

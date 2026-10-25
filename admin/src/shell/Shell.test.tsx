@@ -1,8 +1,8 @@
 import xa from '@todayz/i18n/compiled/admin/en-XA.json';
 import { asMessages } from '@todayz/i18n';
 import { screen, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
-import { renderAt } from '../test/render';
+import { describe, expect, it, vi } from 'vitest';
+import { json, renderAt } from '../test/render';
 import { NAV, PLACEHOLDER_SECTIONS } from './nav';
 
 describe('admin shell', () => {
@@ -40,6 +40,16 @@ describe('admin shell', () => {
     renderAt('/no-such-page');
     expect(await screen.findByRole('heading', { name: 'Page not found' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Go to pulse' })).toHaveAttribute('href', '/');
+  });
+
+  it('keeps the sidebar when a page throws, and offers a retry', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    // A settings answer without `providers` makes A-17 throw while rendering.
+    renderAt('/settings', { roles: ['admin'], handlers: [(c) => (c.path === '/v1/admin/settings' ? json(200, { items: [] }) : undefined)] });
+    expect(await screen.findByRole('alert')).toHaveTextContent('Something went wrong');
+    expect(screen.getByRole('navigation', { name: 'Main' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
+    spy.mockRestore();
   });
 
   it('renders the pseudo-locale with every key present', async () => {
