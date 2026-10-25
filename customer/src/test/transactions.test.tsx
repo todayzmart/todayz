@@ -426,8 +426,11 @@ describe('C-21 order limit', () => {
 });
 
 describe('C-12 order tracking', () => {
-  const track = (o: Order, extra: Handler[] = []) =>
-    renderAt(`/orders/${ORDER_ID}`, { returning: true, handlers: [signedIn, on('GET', `/v1/me/orders/${ORDER_ID}`, () => json(200, o)), ...extra] });
+  const track = (o: Order | (() => Order), extra: Handler[] = []) =>
+    renderAt(`/orders/${ORDER_ID}`, {
+      returning: true,
+      handlers: [signedIn, on('GET', `/v1/me/orders/${ORDER_ID}`, () => json(200, typeof o === 'function' ? o() : o)), ...extra],
+    });
 
   it('counts down to the shop answer from the server time', async () => {
     track(order());
@@ -534,10 +537,13 @@ describe('C-12 order tracking', () => {
 
     it('takes the changed order once with an idempotency key', async () => {
       const calls: Call[] = [];
-      track(partial(), [
+      let current = partial();
+      track(() => current, [
         on('POST', `/v1/me/orders/${ORDER_ID}/confirm-partial`, (c) => {
           calls.push(c);
-          return json(200, accepted({ totalPaise: 2500, version: 3 }));
+          current = accepted({ totalPaise: 2500, version: 3 });
+          // Like the server: an action answer never carries the pickup code, only a GET does.
+          return json(200, { ...current, code: null });
         }),
       ]);
       fireEvent.click(await screen.findByRole('button', { name: `Take it · ${formatMoney(2500)}` }));
@@ -549,10 +555,12 @@ describe('C-12 order tracking', () => {
 
     it('cancels the order when the customer declines the change', async () => {
       const calls: Call[] = [];
-      track(partial(), [
+      let current = partial();
+      track(() => current, [
         on('POST', `/v1/me/orders/${ORDER_ID}/confirm-partial`, (c) => {
           calls.push(c);
-          return json(200, order({ status: 'cancelled', statusReason: 'declined_partial', acceptBy: null, version: 3 }));
+          current = order({ status: 'cancelled', statusReason: 'declined_partial', acceptBy: null, version: 3 });
+          return json(200, current);
         }),
       ]);
       fireEvent.click(await screen.findByRole('button', { name: 'Cancel order' }));

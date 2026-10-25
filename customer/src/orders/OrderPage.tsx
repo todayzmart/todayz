@@ -223,6 +223,9 @@ function OrderView({ order, showCheck }: { order: Order; showCheck: boolean }) {
           done={done}
           onNext={(next) => {
             apply(next);
+            // Action answers never carry the pickup code (the server reveals it only on GET): read the
+            // order again so an accepted change shows the code without waiting for a live update.
+            void client.invalidateQueries({ queryKey: ['order', order.id] });
             void client.invalidateQueries({ queryKey: ['orders'] });
           }}
         />
