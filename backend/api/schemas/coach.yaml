@@ -1,9 +1,78 @@
-# Schemas: domain "coach" (owner W3-10): the business coach (04 §2.6).
+# Schemas: domain "coach" (owner W3-11): the shop coach feed (04 §2.6, 11 §2.1, D-48).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# A card's `numbers` and its action `payload` stay open objects: the numbers are what the text
+# quotes (display-ready: "₹18,240", "Amul butter 100 g", 3), the payload is the prefill its
+# target screen reads.
+CoachCardFilter:
+  type: string
+  enum: [live, done, dismissed, all]
+  default: live
+CoachCardKind:
+  type: string
+  description: The card's type on B-19 (High, Low, Do this, Tip).
+  enum: [high, low, action, tip]
+CoachTopic:
+  type: string
+  enum: [sales, stock, orders, reliability, offers, reviews, demand, setup]
+CoachActionType:
+  type: string
+  description: >-
+    What the card's button opens, prefilled: the Demand insights actions (06 "Insight deep links"),
+    the review list (`reply_reviews`), the order settings (`turn_on_auto_accept`), stock (`update_stock`),
+    delivery settings (`enable_delivery`), or nothing (`none`, no button).
+  enum: [restock, create_offer, flash_offer, add_product, mark_expired, edit_price, check_cost, count_stock,
+    see_customers, reply_reviews, turn_on_auto_accept, update_stock, enable_delivery, none]
+CoachCardStatus:
+  type: string
+  enum: [new, seen, done, dismissed, expired]
+CoachAction:
+  type: object
+  required: [type, payload]
+  properties:
+    type: {$ref: ./coach.yaml#/CoachActionType}
+    payload:
+      type: object
+      x-open-object: true
+CoachCard:
+  type: object
+  required: [id, detector, subjectRef, kind, topic, title, body, numbers, action, status, generatedBy, lang,
+    createdAt, validUntil, actedAt, quietUntil]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    detector: {type: string, maxLength: 60, description: "The detector that wrote the card (dashboard 14)."}
+    subjectRef: {type: string, maxLength: 210, description: "What the card is about: an item, a batch, a pair or `store`."}
+    kind: {$ref: ./coach.yaml#/CoachCardKind}
+    topic: {$ref: ./coach.yaml#/CoachTopic}
+    title: {type: string, maxLength: 60}
+    body: {type: string, maxLength: 200}
+    numbers:
+      type: object
+      x-open-object: true
+      description: Every value the text quotes.
+    action: {$ref: ./coach.yaml#/CoachAction}
+    status: {$ref: ./coach.yaml#/CoachCardStatus}
+    generatedBy:
+      type: string
+      enum: [rule, ai]
+      description: ai when the model wrote the wording (AI-R5); rule for the template text.
+    lang: {type: string, enum: [en, hi, kn, te, ta]}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    validUntil: {$ref: ./common.yaml#/Timestamp}
+    actedAt:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: "null"}
+    quietUntil:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: "null"}
+CoachCardList:
+  type: object
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: ./coach.yaml#/CoachCard}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}

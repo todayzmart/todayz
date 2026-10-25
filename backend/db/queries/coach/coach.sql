@@ -227,3 +227,30 @@ VALUES (sqlc.arg(store_id), sqlc.arg(kind), sqlc.arg(subject_ref), sqlc.arg(lang
 ON CONFLICT (store_id, kind, subject_ref, lang) DO UPDATE
 SET facts_hash = EXCLUDED.facts_hash, text = EXCLUDED.text, prompt_version = EXCLUDED.prompt_version,
     model = EXCLUDED.model, created_at = EXCLUDED.created_at;
+
+-- Runs -----------------------------------------------------------------------
+
+-- name: Checkpoint :one
+-- Where a batched run of the period got to (no row: from the start).
+SELECT after, stores FROM coach_checkpoints WHERE job = sqlc.arg(job) AND period = sqlc.arg(period);
+
+-- name: PutCheckpoint :exec
+INSERT INTO coach_checkpoints (job, period, after, stores, updated_at)
+VALUES (sqlc.arg(job), sqlc.arg(period), sqlc.arg(after), sqlc.arg(stores), sqlc.arg(now))
+ON CONFLICT (job, period) DO UPDATE
+SET after = EXCLUDED.after, stores = EXCLUDED.stores, updated_at = EXCLUDED.updated_at;
+
+-- name: RealtimeStores :many
+-- The stores the realtime rules look at: live stores whose stored 30-day
+-- unaccepted-expiry rate is above the threshold, and those that still show a
+-- live card of one of the realtime detectors (so it can expire once it stops
+-- being true).
+SELECT s.id
+FROM stores s
+JOIN businesses b ON b.id = s.business_id
+WHERE s.status = 'live' AND b.status = 'verified'
+  AND (s.unaccepted_expiry_rate_30d > sqlc.arg(rate_above)::numeric
+       OR EXISTS (SELECT 1 FROM coach_suggestions c
+                  WHERE c.store_id = s.id AND c.status IN ('new', 'seen')
+                    AND c.detector = ANY(sqlc.arg(detectors)::text[])))
+ORDER BY s.id;

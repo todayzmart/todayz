@@ -23,6 +23,10 @@
 -- language, kept only while facts_hash still matches the row's facts, so a
 -- changed number never shows an old sentence.
 --
+-- coach_checkpoints: where a batched coach run (coach_daily, coach_weekly) got
+-- to in its period: the last store it finished, so a continuation after a
+-- yield or a retry goes on from there (D-98).
+--
 -- Timestamps are set from the injected clock by the queries (no touch trigger).
 
 -- +goose Up
@@ -113,7 +117,19 @@ CREATE TABLE insight_texts (
   CONSTRAINT ck_insight_texts_hash CHECK (facts_hash ~ '^[0-9a-f]{64}$')
 );
 
+CREATE TABLE coach_checkpoints (
+  job        text NOT NULL,
+  period     text NOT NULL,
+  after      uuid NOT NULL,
+  stores     int NOT NULL DEFAULT 0,
+  updated_at timestamptz NOT NULL,
+  PRIMARY KEY (job, period),
+  CONSTRAINT ck_coach_checkpoints_job CHECK (job IN ('coach_daily', 'coach_weekly')),
+  CONSTRAINT ck_coach_checkpoints_stores CHECK (stores >= 0)
+);
+
 -- +goose Down
+DROP TABLE IF EXISTS coach_checkpoints;
 DROP TABLE IF EXISTS insight_texts;
 DROP TABLE IF EXISTS coach_weights;
 DROP TABLE IF EXISTS coach_suggestions;
