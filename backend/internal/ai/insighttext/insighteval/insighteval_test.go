@@ -17,6 +17,9 @@ import (
 	"github.com/todayz/backend/internal/platform/settings"
 )
 
+// SC-AI-17: the recorded insight_text suite passes in full: every kept sentence uses only its
+// row's own numbers (0 ungrounded) in all five languages; an invented number drops the
+// sentence back to its template, and a schema break, no tool call or a refusal fails the call.
 func TestInsightTextRecorded(t *testing.T) {
 	s, ok := eval.Get(insighttext.Feature)
 	require.True(t, ok)

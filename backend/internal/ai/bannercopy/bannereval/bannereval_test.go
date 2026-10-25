@@ -17,6 +17,8 @@ import (
 	"github.com/todayz/backend/internal/platform/settings"
 )
 
+// SC-AI-21: the recorded banner_copy suite passes in full: an option with a price or a
+// discount the facts do not hold is dropped, and a draft with no grounded option fails.
 func TestBannerCopyRecorded(t *testing.T) {
 	s, ok := eval.Get(bannercopy.Feature)
 	require.True(t, ok)

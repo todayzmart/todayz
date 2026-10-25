@@ -17,6 +17,8 @@ import (
 	"github.com/todayz/backend/internal/platform/settings"
 )
 
+// SC-AI-19: the recorded review_reply suite passes in full: a reply in the review's language
+// with no number the review does not hold and no phone or link; the rest are rejected.
 func TestReviewReplyRecorded(t *testing.T) {
 	s, ok := eval.Get(replydraft.Feature)
 	require.True(t, ok)
