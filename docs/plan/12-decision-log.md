@@ -157,6 +157,7 @@ No method + path pair is defined twice. Business product endpoints become `/biz/
 | `PII_HASH_KEY` | HMAC for lookups |
 | `DEVICE_SECRET_ENC_KEY` | Counter-code device secrets |
 | `TOTP_ENC_KEY` | Admin TOTP secrets |
+| `SHARE_PREVIEW_KEY` | Shared with the customer Pages Function for share-link previews (W3-16) |
 
 - `make setup` generates any missing key into `.env.local` and prints only "generated: NAME".
 - In staging and prod, the keys live in Secrets Manager.
