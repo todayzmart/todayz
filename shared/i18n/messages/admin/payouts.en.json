@@ -1,0 +1,334 @@
+{
+  "payouts.sub": {
+    "defaultMessage": "Monthly statements per business, the payouts they open, and the money actions. Bank details stay masked.",
+    "description": "A-11 subtitle"
+  },
+  "payouts.period": {
+    "defaultMessage": "Month",
+    "description": "Label of the month picker and the payout's month"
+  },
+  "payouts.export": {
+    "defaultMessage": "Export CSV",
+    "description": "Button: download the bank/UPI batch file of the month's payable payouts"
+  },
+  "payouts.export.busy": {
+    "defaultMessage": "Exporting…",
+    "description": "Export button while the file is prepared"
+  },
+  "payouts.export.done": {
+    "defaultMessage": "Payout file for {period} saved. It holds bank details: keep it private.",
+    "description": "Toast after the export; period is YYYY-MM"
+  },
+  "payouts.panel": {
+    "defaultMessage": "Payout",
+    "description": "Accessible name of the payout side panel"
+  },
+  "payouts.panel.empty": {
+    "defaultMessage": "Choose a business to see its payout: the amount per store, hold causes and where it is paid.",
+    "description": "Side panel before a payout is chosen"
+  },
+  "payouts.col.business": {
+    "defaultMessage": "Business",
+    "description": "Column: business name"
+  },
+  "payouts.col.opening": {
+    "defaultMessage": "Opening",
+    "description": "Column: statement opening balance"
+  },
+  "payouts.col.in": {
+    "defaultMessage": "In",
+    "description": "Column: credits spent at the shop plus referral rewards in the month"
+  },
+  "payouts.col.cashback": {
+    "defaultMessage": "Cashback",
+    "description": "Column: cashback the shop funded in the month"
+  },
+  "payouts.col.closing": {
+    "defaultMessage": "Closing",
+    "description": "Column: statement closing balance"
+  },
+  "payouts.col.kyc": {
+    "defaultMessage": "KYC",
+    "description": "Column: the business's KYC state"
+  },
+  "payouts.col.flags": {
+    "defaultMessage": "Flags",
+    "description": "Column: suspension and open risk flags"
+  },
+  "payouts.col.payout": {
+    "defaultMessage": "Payout",
+    "description": "Column: the payout's status and amount"
+  },
+  "payouts.col.amount": {
+    "defaultMessage": "Amount",
+    "description": "Column and fact: payout amount"
+  },
+  "payouts.col.status": {
+    "defaultMessage": "Status",
+    "description": "Column and filter: payout status"
+  },
+  "payouts.col.hold": {
+    "defaultMessage": "Hold",
+    "description": "Column and fact: why a payout is held"
+  },
+  "payouts.col.paid": {
+    "defaultMessage": "Paid",
+    "description": "Column and fact: UTR and time the payout was paid"
+  },
+  "payouts.col.store": {
+    "defaultMessage": "Store",
+    "description": "Column: store name in the payout lines"
+  },
+  "payouts.flag.suspended": {
+    "defaultMessage": "Suspended",
+    "description": "Flag: the business is suspended"
+  },
+  "payouts.flag.risk": {
+    "defaultMessage": "Risk flag",
+    "description": "Flag: the business has an open risk flag"
+  },
+  "payouts.none": {
+    "defaultMessage": "None",
+    "description": "Placeholder for an empty value"
+  },
+  "payouts.noPayout": {
+    "defaultMessage": "Nothing to pay",
+    "description": "Statement row without a payout"
+  },
+  "payouts.pill": {
+    "defaultMessage": "{status} · {amount}",
+    "description": "Payout status pill with the amount, e.g. Pending · ₹2,670"
+  },
+  "payouts.statements": {
+    "defaultMessage": "Statements for {period}",
+    "description": "Card title; period is YYYY-MM"
+  },
+  "payouts.statements.table": {
+    "defaultMessage": "Statements",
+    "description": "Accessible name of the statements table"
+  },
+  "payouts.statements.none": {
+    "defaultMessage": "No statements for this month yet. The close runs on the 1st at 00:30 IST.",
+    "description": "Empty statements table"
+  },
+  "payouts.status.all": {
+    "defaultMessage": "All statuses",
+    "description": "Status filter: no filter"
+  },
+  "payouts.status.pending": {
+    "defaultMessage": "Pending",
+    "description": "Payout status"
+  },
+  "payouts.status.held": {
+    "defaultMessage": "Held",
+    "description": "Payout status"
+  },
+  "payouts.status.paid": {
+    "defaultMessage": "Paid",
+    "description": "Payout status"
+  },
+  "payouts.status.cancelled": {
+    "defaultMessage": "Cancelled",
+    "description": "Payout status"
+  },
+  "payouts.paidWith": {
+    "defaultMessage": "{utr}, {when}",
+    "description": "UTR and when it was paid"
+  },
+  "payouts.list": {
+    "defaultMessage": "Payouts",
+    "description": "Card title: the month's payouts"
+  },
+  "payouts.list.table": {
+    "defaultMessage": "Payouts",
+    "description": "Accessible name of the payouts table"
+  },
+  "payouts.list.none": {
+    "defaultMessage": "No payouts match.",
+    "description": "Empty payouts table"
+  },
+  "payouts.loadFailed": {
+    "defaultMessage": "We couldn't load this payout.",
+    "description": "Payout panel failed to load"
+  },
+  "payouts.done.hold": {
+    "defaultMessage": "Payout for {business} held",
+    "description": "Toast after a hold"
+  },
+  "payouts.done.unhold": {
+    "defaultMessage": "Payout for {business} released",
+    "description": "Toast after an unhold"
+  },
+  "payouts.done.paid": {
+    "defaultMessage": "Payout for {business} marked paid",
+    "description": "Toast after mark paid"
+  },
+  "payouts.holdWithNote": {
+    "defaultMessage": "{hold}: {note}",
+    "description": "Hold reason with the admin's note"
+  },
+  "payouts.computed": {
+    "defaultMessage": "Computed",
+    "description": "Fact: when the close last computed the payout"
+  },
+  "payouts.exported": {
+    "defaultMessage": "Exported",
+    "description": "Fact: when the payout was last in an export"
+  },
+  "payouts.lines": {
+    "defaultMessage": "Per store",
+    "description": "Accessible name of the payout lines table"
+  },
+  "payouts.lines.none": {
+    "defaultMessage": "No store lines.",
+    "description": "Empty payout lines"
+  },
+  "payouts.causes": {
+    "defaultMessage": "Hold causes",
+    "description": "Heading of the live hold causes"
+  },
+  "payouts.cause.suspended": {
+    "defaultMessage": "Business suspended",
+    "description": "Hold cause"
+  },
+  "payouts.cause.kyc": {
+    "defaultMessage": "KYC not verified",
+    "description": "Hold cause"
+  },
+  "payouts.cause.risk": {
+    "defaultMessage": "Open risk flag",
+    "description": "Hold cause"
+  },
+  "payouts.cause.open": {
+    "defaultMessage": "Open",
+    "description": "Pill: the hold cause applies now"
+  },
+  "payouts.cause.clear": {
+    "defaultMessage": "Clear",
+    "description": "Pill: the hold cause does not apply"
+  },
+  "payouts.payee": {
+    "defaultMessage": "Paid to",
+    "description": "Heading of the masked payee details"
+  },
+  "payouts.payee.upi": {
+    "defaultMessage": "UPI ID",
+    "description": "Fact: masked UPI ID"
+  },
+  "payouts.payee.bank": {
+    "defaultMessage": "Bank account",
+    "description": "Fact: masked bank account number"
+  },
+  "payouts.payee.ifsc": {
+    "defaultMessage": "IFSC",
+    "description": "Fact: bank branch code"
+  },
+  "payouts.masked": {
+    "defaultMessage": "•••• {last4}",
+    "description": "A masked value showing its last four characters"
+  },
+  "payouts.markPaid": {
+    "defaultMessage": "Mark paid",
+    "description": "Button: record the transfer's UTR"
+  },
+  "payouts.holdAction": {
+    "defaultMessage": "Hold",
+    "description": "Button: hold a pending payout"
+  },
+  "payouts.unholdAction": {
+    "defaultMessage": "Release hold",
+    "description": "Button: return a held payout to pending"
+  },
+  "payouts.hold.title": {
+    "defaultMessage": "Hold the payout for {business}?",
+    "description": "Hold dialog title"
+  },
+  "payouts.hold.body": {
+    "defaultMessage": "A held payout is left out of the export and cannot be marked paid until it is released.",
+    "description": "Hold dialog body"
+  },
+  "payouts.unhold.title": {
+    "defaultMessage": "Release the hold for {business}?",
+    "description": "Unhold dialog title"
+  },
+  "payouts.unhold.body": {
+    "defaultMessage": "The payout goes back to pending. KYC, a risk flag or a suspension still blocks it until cleared.",
+    "description": "Unhold dialog body"
+  },
+  "payouts.hold.kyc": {
+    "defaultMessage": "KYC incomplete",
+    "description": "Hold reason"
+  },
+  "payouts.hold.risk": {
+    "defaultMessage": "Risk flag",
+    "description": "Hold reason"
+  },
+  "payouts.hold.suspended": {
+    "defaultMessage": "Business suspended",
+    "description": "Hold reason"
+  },
+  "payouts.hold.manual": {
+    "defaultMessage": "Held by hand",
+    "description": "Hold reason: an admin held it"
+  },
+  "payouts.kyc.verified": {
+    "defaultMessage": "Verified",
+    "description": "KYC state"
+  },
+  "payouts.kyc.submitted": {
+    "defaultMessage": "Submitted",
+    "description": "KYC state"
+  },
+  "payouts.kyc.rejected": {
+    "defaultMessage": "Rejected",
+    "description": "KYC state"
+  },
+  "payouts.kyc.missing": {
+    "defaultMessage": "Missing",
+    "description": "KYC state"
+  },
+  "payouts.problem.notPayable": {
+    "defaultMessage": "Only a pending payout can be marked paid. Release the hold first.",
+    "description": "Error: payout_not_payable"
+  },
+  "payouts.problem.alreadyPaid": {
+    "defaultMessage": "This payout is already paid with another UTR.",
+    "description": "Error: payout_already_paid"
+  },
+  "payouts.problem.utrInUse": {
+    "defaultMessage": "That UTR already pays another payout. Check the reference.",
+    "description": "Error: utr_in_use"
+  },
+  "payouts.problem.causeOpen": {
+    "defaultMessage": "A hold cause is still open (KYC, a risk flag or a suspension). Clear it first.",
+    "description": "Error: payout_hold_cause_open"
+  },
+  "payouts.problem.amountChanged": {
+    "defaultMessage": "The amount changed since you opened this payout. Check the new amount and confirm again.",
+    "description": "Error: payout_amount_changed"
+  },
+  "payouts.paid.title": {
+    "defaultMessage": "Mark the payout for {business} paid?",
+    "description": "Mark paid dialog title"
+  },
+  "payouts.paid.body": {
+    "defaultMessage": "Make the transfer of {amount} first, then enter its UTR. This posts the payout to the ledger.",
+    "description": "Mark paid dialog body"
+  },
+  "payouts.paid.confirm": {
+    "defaultMessage": "Mark {amount} paid",
+    "description": "Mark paid confirm button"
+  },
+  "payouts.paid.utr": {
+    "defaultMessage": "UTR",
+    "description": "Label: the bank transfer reference"
+  },
+  "payouts.paid.utrHelp": {
+    "defaultMessage": "6 to 30 letters and digits, from the bank or UPI app.",
+    "description": "Help under the UTR"
+  },
+  "payouts.paid.utrInvalid": {
+    "defaultMessage": "Enter the UTR: 6 to 30 letters and digits.",
+    "description": "Error: UTR malformed"
+  }
+}
