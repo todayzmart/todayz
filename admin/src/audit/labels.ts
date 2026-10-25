@@ -8,12 +8,13 @@ import { useIntl } from 'react-intl';
  */
 const SETTINGS_UPDATE = ['settings', 'update'].join('.');
 
-/** The A-08, A-20, A-09, A-11 and A-13 actions, built the same way (`catalogue.…`, `banners.…`, `credits.…`, `payouts.…` and `risk.…` are message namespaces too). */
+/** The A-08, A-20, A-09, A-11, A-13 and A-21 actions, built the same way (`catalogue.…`, `banners.…`, `credits.…`, `payouts.…`, `risk.…` and `jobs.…` are message namespaces too). */
 const CATALOGUE = (...parts: string[]) => ['catalogue', ...parts].join('.');
 const BANNERS = (...parts: string[]) => ['banners', ...parts].join('.');
 const CREDITS = (...parts: string[]) => ['credits', ...parts].join('.');
 const PAYOUTS = (...parts: string[]) => ['payouts', ...parts].join('.');
 const RISK = (...parts: string[]) => ['risk', ...parts].join('.');
+const JOBS = (...parts: string[]) => ['jobs', ...parts].join('.');
 const BUILT_ACTIONS: Readonly<Record<string, string>> = {
   [CATALOGUE('product', 'create')]: 'audit.action.catalogueProductCreate',
   [CATALOGUE('product', 'update')]: 'audit.action.catalogueProductUpdate',
@@ -39,6 +40,10 @@ const BUILT_ACTIONS: Readonly<Record<string, string>> = {
   [RISK('flag_clear')]: 'audit.action.riskFlagClear',
   [RISK('flag_confirm')]: 'audit.action.riskFlagConfirm',
   ['referral.reject']: 'audit.action.referralReject',
+  [JOBS('run')]: 'audit.action.jobRun',
+  [JOBS('pause')]: 'audit.action.jobPause',
+  [JOBS('resume')]: 'audit.action.jobResume',
+  [JOBS('retry')]: 'audit.action.jobRetry',
 };
 
 /** Audit actions the console names; any other action shows as written (it is still audited). */

@@ -1,0 +1,422 @@
+{
+  "jobs.sub": {
+    "defaultMessage": "Every background job: when it runs (IST), how its last runs went, and whether it is paused. Open a job for its run history.",
+    "description": "A-21 Jobs: sub"
+  },
+  "jobs.table": {
+    "defaultMessage": "Jobs",
+    "description": "A-21 Jobs: table"
+  },
+  "jobs.empty": {
+    "defaultMessage": "No jobs are registered.",
+    "description": "A-21 Jobs: empty"
+  },
+  "jobs.emptyFiltered": {
+    "defaultMessage": "No jobs match these filters.",
+    "description": "A-21 Jobs: emptyFiltered"
+  },
+  "jobs.event": {
+    "defaultMessage": "On events",
+    "description": "A-21 Jobs: event"
+  },
+  "jobs.none": {
+    "defaultMessage": "—",
+    "description": "A-21 Jobs: none"
+  },
+  "jobs.ms": {
+    "defaultMessage": "{n} ms",
+    "description": "A-21 Jobs: ms"
+  },
+  "jobs.s": {
+    "defaultMessage": "{n} s",
+    "description": "A-21 Jobs: s"
+  },
+  "jobs.min": {
+    "defaultMessage": "{m} min {s} s",
+    "description": "A-21 Jobs: min"
+  },
+  "jobs.col.kind": {
+    "defaultMessage": "Job",
+    "description": "A-21 Jobs: col kind"
+  },
+  "jobs.col.class": {
+    "defaultMessage": "Class",
+    "description": "A-21 Jobs: col class"
+  },
+  "jobs.col.schedule": {
+    "defaultMessage": "Schedule (IST)",
+    "description": "A-21 Jobs: col schedule"
+  },
+  "jobs.col.next": {
+    "defaultMessage": "Next run",
+    "description": "A-21 Jobs: col next"
+  },
+  "jobs.col.last": {
+    "defaultMessage": "Last run",
+    "description": "A-21 Jobs: col last"
+  },
+  "jobs.col.rate": {
+    "defaultMessage": "7-day success",
+    "description": "A-21 Jobs: col rate"
+  },
+  "jobs.col.duration": {
+    "defaultMessage": "Average / longest",
+    "description": "A-21 Jobs: col duration"
+  },
+  "jobs.col.health": {
+    "defaultMessage": "Status",
+    "description": "A-21 Jobs: col health"
+  },
+  "jobs.filter.class": {
+    "defaultMessage": "Class",
+    "description": "A-21 Jobs: filter class"
+  },
+  "jobs.filter.anyClass": {
+    "defaultMessage": "Every class",
+    "description": "A-21 Jobs: filter anyClass"
+  },
+  "jobs.filter.health": {
+    "defaultMessage": "Status",
+    "description": "A-21 Jobs: filter health"
+  },
+  "jobs.filter.anyHealth": {
+    "defaultMessage": "All",
+    "description": "A-21 Jobs: filter anyHealth"
+  },
+  "jobs.filter.anyStatus": {
+    "defaultMessage": "Any status",
+    "description": "A-21 Jobs: filter anyStatus"
+  },
+  "jobs.filter.anyTrigger": {
+    "defaultMessage": "Any trigger",
+    "description": "A-21 Jobs: filter anyTrigger"
+  },
+  "jobs.filter.from": {
+    "defaultMessage": "From",
+    "description": "A-21 Jobs: filter from"
+  },
+  "jobs.filter.to": {
+    "defaultMessage": "To",
+    "description": "A-21 Jobs: filter to"
+  },
+  "jobs.filter.apply": {
+    "defaultMessage": "Apply",
+    "description": "A-21 Jobs: filter apply"
+  },
+  "jobs.filter.clear": {
+    "defaultMessage": "Clear filters",
+    "description": "A-21 Jobs: filter clear"
+  },
+  "jobs.class.timer": {
+    "defaultMessage": "Order timer",
+    "description": "A-21 Jobs: class timer"
+  },
+  "jobs.class.money": {
+    "defaultMessage": "Money",
+    "description": "A-21 Jobs: class money"
+  },
+  "jobs.class.notify": {
+    "defaultMessage": "Notifications",
+    "description": "A-21 Jobs: class notify"
+  },
+  "jobs.class.marketing": {
+    "defaultMessage": "Marketing",
+    "description": "A-21 Jobs: class marketing"
+  },
+  "jobs.class.ai": {
+    "defaultMessage": "AI",
+    "description": "A-21 Jobs: class ai"
+  },
+  "jobs.class.rollup": {
+    "defaultMessage": "Rollup",
+    "description": "A-21 Jobs: class rollup"
+  },
+  "jobs.class.maintenance": {
+    "defaultMessage": "Maintenance",
+    "description": "A-21 Jobs: class maintenance"
+  },
+  "jobs.health.ok": {
+    "defaultMessage": "OK",
+    "description": "A-21 Jobs: health ok"
+  },
+  "jobs.health.failing": {
+    "defaultMessage": "Failing",
+    "description": "A-21 Jobs: health failing"
+  },
+  "jobs.health.missed": {
+    "defaultMessage": "Missed",
+    "description": "A-21 Jobs: health missed"
+  },
+  "jobs.health.paused": {
+    "defaultMessage": "Paused",
+    "description": "A-21 Jobs: health paused"
+  },
+  "jobs.status.running": {
+    "defaultMessage": "Running",
+    "description": "A-21 Jobs: status running"
+  },
+  "jobs.status.succeeded": {
+    "defaultMessage": "Succeeded",
+    "description": "A-21 Jobs: status succeeded"
+  },
+  "jobs.status.failed": {
+    "defaultMessage": "Failed",
+    "description": "A-21 Jobs: status failed"
+  },
+  "jobs.status.cancelled": {
+    "defaultMessage": "Cancelled",
+    "description": "A-21 Jobs: status cancelled"
+  },
+  "jobs.status.skipped": {
+    "defaultMessage": "Skipped",
+    "description": "A-21 Jobs: status skipped"
+  },
+  "jobs.status.discarded": {
+    "defaultMessage": "Gave up",
+    "description": "A-21 Jobs: status discarded"
+  },
+  "jobs.status.missed": {
+    "defaultMessage": "Missed",
+    "description": "A-21 Jobs: status missed"
+  },
+  "jobs.status.yielded": {
+    "defaultMessage": "Continued",
+    "description": "A-21 Jobs: status yielded"
+  },
+  "jobs.trigger.schedule": {
+    "defaultMessage": "Schedule",
+    "description": "A-21 Jobs: trigger schedule"
+  },
+  "jobs.trigger.event": {
+    "defaultMessage": "Event",
+    "description": "A-21 Jobs: trigger event"
+  },
+  "jobs.trigger.manual": {
+    "defaultMessage": "Run by hand",
+    "description": "A-21 Jobs: trigger manual"
+  },
+  "jobs.trigger.retry": {
+    "defaultMessage": "Retry",
+    "description": "A-21 Jobs: trigger retry"
+  },
+  "jobs.trigger.backfill": {
+    "defaultMessage": "Backfill",
+    "description": "A-21 Jobs: trigger backfill"
+  },
+  "jobs.trigger.continuation": {
+    "defaultMessage": "Continuation",
+    "description": "A-21 Jobs: trigger continuation"
+  },
+  "jobs.back": {
+    "defaultMessage": "Back to “Jobs”",
+    "description": "A-21 Jobs: back"
+  },
+  "jobs.facts": {
+    "defaultMessage": "About this job",
+    "description": "A-21 Jobs: facts"
+  },
+  "jobs.fact.owner": {
+    "defaultMessage": "Owner",
+    "description": "A-21 Jobs: fact owner"
+  },
+  "jobs.fact.runs": {
+    "defaultMessage": "{n, plural, one {# run} other {# runs}} in 7 days",
+    "description": "A-21 Jobs: fact runs"
+  },
+  "jobs.fact.limits": {
+    "defaultMessage": "Limits",
+    "description": "A-21 Jobs: fact limits"
+  },
+  "jobs.fact.limitsValue": {
+    "defaultMessage": "{timeout} s timeout · {attempts} attempts · queue {queue} · {concurrency, plural, =0 {no cap} other {# at once}}",
+    "description": "A-21 Jobs: fact limitsValue"
+  },
+  "jobs.fact.runbook": {
+    "defaultMessage": "Runbook",
+    "description": "A-21 Jobs: fact runbook"
+  },
+  "jobs.fact.paused": {
+    "defaultMessage": "Paused",
+    "description": "A-21 Jobs: fact paused"
+  },
+  "jobs.timerNote": {
+    "defaultMessage": "Order timers can't be paused or run by hand.",
+    "description": "A-21 Jobs: timerNote"
+  },
+  "jobs.moneyNote": {
+    "defaultMessage": "Money jobs can be run, paused or retried by a super admin only, after a fresh authenticator code.",
+    "description": "A-21 Jobs: moneyNote"
+  },
+  "jobs.pick": {
+    "defaultMessage": "Pick a run to see its counts, error and attempts.",
+    "description": "A-21 Jobs: pick"
+  },
+  "jobs.runs": {
+    "defaultMessage": "Run history",
+    "description": "A-21 Jobs: runs"
+  },
+  "jobs.runsEmpty": {
+    "defaultMessage": "No runs match these filters.",
+    "description": "A-21 Jobs: runsEmpty"
+  },
+  "jobs.run.title": {
+    "defaultMessage": "Run",
+    "description": "A-21 Jobs: run title"
+  },
+  "jobs.run.id": {
+    "defaultMessage": "Run ID",
+    "description": "A-21 Jobs: run id"
+  },
+  "jobs.run.status": {
+    "defaultMessage": "Status",
+    "description": "A-21 Jobs: run status"
+  },
+  "jobs.run.trigger": {
+    "defaultMessage": "Trigger",
+    "description": "A-21 Jobs: run trigger"
+  },
+  "jobs.run.period": {
+    "defaultMessage": "Period",
+    "description": "A-21 Jobs: run period"
+  },
+  "jobs.run.started": {
+    "defaultMessage": "Started",
+    "description": "A-21 Jobs: run started"
+  },
+  "jobs.run.duration": {
+    "defaultMessage": "Duration",
+    "description": "A-21 Jobs: run duration"
+  },
+  "jobs.run.late": {
+    "defaultMessage": "Late by",
+    "description": "A-21 Jobs: run late"
+  },
+  "jobs.run.summary": {
+    "defaultMessage": "Counts",
+    "description": "A-21 Jobs: run summary"
+  },
+  "jobs.run.by": {
+    "defaultMessage": "Asked for by",
+    "description": "A-21 Jobs: run by"
+  },
+  "jobs.run.note": {
+    "defaultMessage": "Note",
+    "description": "A-21 Jobs: run note"
+  },
+  "jobs.run.error": {
+    "defaultMessage": "Error (personal data removed)",
+    "description": "A-21 Jobs: run error"
+  },
+  "jobs.run.attempts": {
+    "defaultMessage": "Attempts",
+    "description": "A-21 Jobs: run attempts"
+  },
+  "jobs.run.attempt": {
+    "defaultMessage": "Attempt {n}",
+    "description": "A-21 Jobs: run attempt"
+  },
+  "jobs.run.logs": {
+    "defaultMessage": "Grafana logs",
+    "description": "A-21 Jobs: run logs"
+  },
+  "jobs.run.trace": {
+    "defaultMessage": "Grafana trace",
+    "description": "A-21 Jobs: run trace"
+  },
+  "jobs.run.noGrafana": {
+    "defaultMessage": "Grafana links are off in this build.",
+    "description": "A-21 Jobs: run noGrafana"
+  },
+  "jobs.act.run": {
+    "defaultMessage": "Run now",
+    "description": "A-21 Jobs: act run"
+  },
+  "jobs.act.run.title": {
+    "defaultMessage": "Run {kind} now?",
+    "description": "A-21 Jobs: act run title"
+  },
+  "jobs.act.run.body": {
+    "defaultMessage": "The job runs once outside its schedule. A run for a period that already ran is refused.",
+    "description": "A-21 Jobs: act run body"
+  },
+  "jobs.act.pause": {
+    "defaultMessage": "Pause",
+    "description": "A-21 Jobs: act pause"
+  },
+  "jobs.act.pause.title": {
+    "defaultMessage": "Pause {kind}?",
+    "description": "A-21 Jobs: act pause title"
+  },
+  "jobs.act.pause.body": {
+    "defaultMessage": "Scheduled runs are skipped until someone resumes it. Runs already started finish.",
+    "description": "A-21 Jobs: act pause body"
+  },
+  "jobs.act.resume": {
+    "defaultMessage": "Resume",
+    "description": "A-21 Jobs: act resume"
+  },
+  "jobs.act.resume.title": {
+    "defaultMessage": "Resume {kind}?",
+    "description": "A-21 Jobs: act resume title"
+  },
+  "jobs.act.resume.body": {
+    "defaultMessage": "Scheduled runs start again from the next one. Skipped periods are not run.",
+    "description": "A-21 Jobs: act resume body"
+  },
+  "jobs.act.retry": {
+    "defaultMessage": "Retry",
+    "description": "A-21 Jobs: act retry"
+  },
+  "jobs.act.retry.title": {
+    "defaultMessage": "Retry this run?",
+    "description": "A-21 Jobs: act retry title"
+  },
+  "jobs.act.retry.body": {
+    "defaultMessage": "The same period runs again as a new run.",
+    "description": "A-21 Jobs: act retry body"
+  },
+  "jobs.act.period": {
+    "defaultMessage": "Period (optional)",
+    "description": "A-21 Jobs: act period"
+  },
+  "jobs.act.periodHelp": {
+    "defaultMessage": "Leave empty for the current period. Format: {example}.",
+    "description": "A-21 Jobs: act periodHelp"
+  },
+  "jobs.act.periodBad": {
+    "defaultMessage": "Use the format {example}.",
+    "description": "A-21 Jobs: act periodBad"
+  },
+  "jobs.done.run": {
+    "defaultMessage": "Run started.",
+    "description": "A-21 Jobs: done run"
+  },
+  "jobs.done.pause": {
+    "defaultMessage": "Job paused.",
+    "description": "A-21 Jobs: done pause"
+  },
+  "jobs.done.resume": {
+    "defaultMessage": "Job resumed.",
+    "description": "A-21 Jobs: done resume"
+  },
+  "jobs.done.retry": {
+    "defaultMessage": "Retry started.",
+    "description": "A-21 Jobs: done retry"
+  },
+  "jobs.error.notRunnable": {
+    "defaultMessage": "This job can't be run by hand.",
+    "description": "A-21 Jobs: error notRunnable"
+  },
+  "jobs.error.paused": {
+    "defaultMessage": "This job is paused. Resume it first.",
+    "description": "A-21 Jobs: error paused"
+  },
+  "jobs.error.running": {
+    "defaultMessage": "A run of this job is already going.",
+    "description": "A-21 Jobs: error running"
+  },
+  "jobs.error.stepUp": {
+    "defaultMessage": "Enter a fresh authenticator code to do this.",
+    "description": "A-21 Jobs: error stepUp"
+  }
+}

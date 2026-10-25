@@ -50,7 +50,7 @@ func TestCleanReason(t *testing.T) {
 func TestEverySubjectTypeHasAViewOrIsRefused(t *testing.T) {
 	// Every subject a panel can show has the action that views it; the A-03
 	// queue's view covers business.
-	for _, typ := range []api.AdminAuditSubjectType{"order", "user", "store", "business", "review", "banner", "lead", "platform_setting", "admin_user", "product", "category", "synonym", "notification_template", "payout", "payout_period", "credit_adjustment", "risk_flag", "referral"} {
+	for _, typ := range []api.AdminAuditSubjectType{"order", "user", "store", "business", "review", "banner", "lead", "platform_setting", "admin_user", "product", "category", "synonym", "notification_template", "payout", "payout_period", "credit_adjustment", "risk_flag", "referral", "job_kind", "job_run"} {
 		require.Contains(t, subjectView, typ)
 	}
 	require.Equal(t, policy.AdminBusinessView, subjectView["business"])
@@ -63,5 +63,8 @@ func TestEverySubjectTypeHasAViewOrIsRefused(t *testing.T) {
 	// W3-02: a flag's and a referral's history follow A-13 and A-10.
 	require.Equal(t, policy.AdminRiskView, subjectView["risk_flag"])
 	require.Equal(t, policy.AdminReferralsView, subjectView["referral"])
-	require.Len(t, subjectView, 18)
+	// W3-15: A-21's job history is for the roles that may act on a job.
+	require.Equal(t, policy.AdminAuditView, subjectView["job_kind"])
+	require.Equal(t, policy.AdminAuditView, subjectView["job_run"])
+	require.Len(t, subjectView, 20)
 }

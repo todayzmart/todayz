@@ -9,3 +9,11 @@ export const CLIENT_ID = 'admin/0.0.0';
  * object path under it. Empty means no image host is configured: banners show their headline only.
  */
 export const IMAGE_BASE_URL: string = (import.meta.env.VITE_IMG_URL ?? 'https://img.todayz.localhost').replace(/\/+$/, '');
+/**
+ * Grafana, for A-21's Explore links and A-22's dashboard links (grafana.todayz.localhost locally).
+ * A production build without `VITE_GRAFANA_URL` has no Grafana: the links are left out.
+ */
+export const GRAFANA_URL: string = (import.meta.env.VITE_GRAFANA_URL ?? (import.meta.env.MODE === 'production' ? '' : 'https://grafana.todayz.localhost')).replace(
+  /\/+$/,
+  '',
+);
