@@ -1,0 +1,19 @@
+[
+  {
+    "detector": "weekly_summary",
+    "subject": "2026-01-05",
+    "kind": "tip",
+    "topic": "sales",
+    "severity": 1,
+    "stake": 1750000,
+    "ageDays": 0,
+    "variant": "up",
+    "numbers": {
+      "bills": 70,
+      "pct": 25,
+      "sales": "₹17,500",
+      "weeks": 4
+    },
+    "action": "none"
+  }
+]

@@ -1,0 +1,19 @@
+[
+  {
+    "detector": "reviews_unanswered",
+    "subject": "store",
+    "kind": "action",
+    "topic": "reviews",
+    "severity": 2,
+    "stake": 2,
+    "ageDays": 0,
+    "numbers": {
+      "count": 2,
+      "days": 7
+    },
+    "action": "reply_reviews",
+    "payload": {
+      "filter": "unanswered"
+    }
+  }
+]

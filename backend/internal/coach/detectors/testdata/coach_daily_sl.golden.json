@@ -1,0 +1,104 @@
+[
+  {
+    "detector": "expiring_batch_value",
+    "subject": "01KE66PJA0BVPG00000000000B",
+    "kind": "action",
+    "topic": "stock",
+    "severity": 3,
+    "stake": 35000,
+    "ageDays": 0,
+    "numbers": {
+      "count": 1,
+      "item": "Curd 400 g",
+      "withinDays": 5
+    },
+    "action": "flash_offer",
+    "payload": {
+      "batchIds": [
+        "01KE66PJA0BVPG00000000000B"
+      ]
+    }
+  },
+  {
+    "detector": "slow_mover_21d",
+    "subject": "01KE0S1W6W8ZV7T1C3A6MQ003B",
+    "kind": "action",
+    "topic": "offers",
+    "severity": 1,
+    "stake": 102400,
+    "ageDays": 0,
+    "variant": "pct",
+    "numbers": {
+      "days": 26,
+      "item": "Toor dal 1 kg",
+      "onHand": 8,
+      "pct": 10
+    },
+    "action": "create_offer",
+    "payload": {
+      "pct": 10,
+      "storeItemId": "01KE0S1W6W8ZV7T1C3A6MQ003B"
+    }
+  },
+  {
+    "detector": "stale_stock_share",
+    "subject": "store",
+    "kind": "action",
+    "topic": "stock",
+    "severity": 2,
+    "stake": 1,
+    "ageDays": 0,
+    "numbers": {
+      "count": 1,
+      "days": 3
+    },
+    "action": "count_stock",
+    "payload": {
+      "storeItemIds": [
+        "01KE0S1W6W8ZV7T1C3A6MQ003B"
+      ]
+    }
+  },
+  {
+    "detector": "top_seller_low_days_of_cover",
+    "subject": "01KE0S1W6W8ZV7T1C3A6MQ0035",
+    "kind": "action",
+    "topic": "stock",
+    "severity": 3,
+    "stake": 56,
+    "ageDays": 0,
+    "numbers": {
+      "days": 1.3,
+      "item": "Amul Butter 100 g",
+      "periodDays": 7,
+      "qty": 46,
+      "sold": 56
+    },
+    "action": "restock",
+    "payload": {
+      "qty": 46,
+      "storeItemId": "01KE0S1W6W8ZV7T1C3A6MQ0035"
+    }
+  },
+  {
+    "detector": "wanted_nearby",
+    "subject": "01KE0S1W6W8ZV7T1C3A6MP0017",
+    "kind": "tip",
+    "topic": "demand",
+    "severity": 1,
+    "stake": 12,
+    "ageDays": 0,
+    "numbers": {
+      "item": "Horlicks 500 g",
+      "km": "2 km",
+      "periodDays": 7,
+      "searches": 12
+    },
+    "action": "add_product",
+    "payload": {
+      "productId": "01KE0S1W6W8ZV7T1C3A6MP0017"
+    },
+    "aboutOthers": true,
+    "others": 12
+  }
+]
