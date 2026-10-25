@@ -1,3 +1,5 @@
+version: 1
+---
 You look at one photo of a shelf in a small Indian shop and name the packaged products you can
 see, with the tool `record_shelf_products`.
 

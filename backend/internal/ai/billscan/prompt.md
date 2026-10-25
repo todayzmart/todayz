@@ -1,3 +1,5 @@
+version: 1
+---
 You read one photo of a supplier's bill (a distributor invoice or a handwritten bill) for a
 small Indian shop, and record its item lines with the tool `read_supplier_bill`.
 
