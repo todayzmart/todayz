@@ -1,0 +1,442 @@
+{
+  "stores.sub": {
+    "defaultMessage": "Every store with its status, strikes and reliability. Edit the pin and hours, close a store for a while, and review new stores.",
+    "description": "A-05 Stores: page subtitle"
+  },
+  "stores.tabs": {
+    "defaultMessage": "Store views",
+    "description": "Accessible name of the A-05 tab list"
+  },
+  "stores.tab.all": {
+    "defaultMessage": "All stores",
+    "description": "A-05 tab"
+  },
+  "stores.tab.review": {
+    "defaultMessage": "To review",
+    "description": "A-05 tab: stores waiting for review"
+  },
+  "stores.filters": {
+    "defaultMessage": "Store filters",
+    "description": "Accessible name of the filter form"
+  },
+  "stores.search": {
+    "defaultMessage": "Search",
+    "description": "Apply the store filters"
+  },
+  "stores.table": {
+    "defaultMessage": "Stores",
+    "description": "Accessible name of the store table"
+  },
+  "stores.empty": {
+    "defaultMessage": "No stores match.",
+    "description": "Empty store list"
+  },
+  "stores.review.empty": {
+    "defaultMessage": "No stores are waiting for review.",
+    "description": "Empty review queue"
+  },
+  "stores.col.name": {
+    "defaultMessage": "Store",
+    "description": "Column"
+  },
+  "stores.col.business": {
+    "defaultMessage": "Business",
+    "description": "Column"
+  },
+  "stores.col.place": {
+    "defaultMessage": "Area",
+    "description": "Column: locality and city"
+  },
+  "stores.col.city": {
+    "defaultMessage": "City",
+    "description": "Filter: city"
+  },
+  "stores.col.status": {
+    "defaultMessage": "Status",
+    "description": "Column and filter"
+  },
+  "stores.col.strikes": {
+    "defaultMessage": "Strikes",
+    "description": "Column: active strikes"
+  },
+  "stores.col.reliability": {
+    "defaultMessage": "Reliability",
+    "description": "Column and fact: reliability score"
+  },
+  "stores.col.created": {
+    "defaultMessage": "Created",
+    "description": "Column"
+  },
+  "stores.col.reason": {
+    "defaultMessage": "Reason",
+    "description": "Strike column"
+  },
+  "stores.col.order": {
+    "defaultMessage": "Order",
+    "description": "Strike column"
+  },
+  "stores.col.when": {
+    "defaultMessage": "When",
+    "description": "Strike column"
+  },
+  "stores.col.state": {
+    "defaultMessage": "State",
+    "description": "Strike column"
+  },
+  "stores.status.all": {
+    "defaultMessage": "All",
+    "description": "Status filter: every status"
+  },
+  "stores.status.draft": {
+    "defaultMessage": "Draft",
+    "description": "Store status"
+  },
+  "stores.status.pendingReview": {
+    "defaultMessage": "To review",
+    "description": "Store status"
+  },
+  "stores.status.live": {
+    "defaultMessage": "Live",
+    "description": "Store status"
+  },
+  "stores.status.paused": {
+    "defaultMessage": "Paused",
+    "description": "Store status"
+  },
+  "stores.status.suspended": {
+    "defaultMessage": "Suspended",
+    "description": "Store status"
+  },
+  "stores.closed": {
+    "defaultMessage": "Closed",
+    "description": "Pill: the store is force-closed now"
+  },
+  "stores.closedUntil": {
+    "defaultMessage": "Closed until {when}",
+    "description": "Pill: force-closed, with its end"
+  },
+  "stores.missing": {
+    "defaultMessage": "This store does not exist.",
+    "description": "Store detail: not found"
+  },
+  "stores.loadFailed": {
+    "defaultMessage": "The store could not be loaded.",
+    "description": "Store detail: load failed"
+  },
+  "stores.back": {
+    "defaultMessage": "Back to stores",
+    "description": "Link back to the A-05 list"
+  },
+  "stores.reviewNote": {
+    "defaultMessage": "Last review note: {note}",
+    "description": "The note from the last send back"
+  },
+  "stores.reliability": {
+    "defaultMessage": "Reliability",
+    "description": "Store detail card"
+  },
+  "stores.acceptRate": {
+    "defaultMessage": "Accepted in time (30 days)",
+    "description": "Fact"
+  },
+  "stores.expiryRate": {
+    "defaultMessage": "Expired unaccepted (30 days)",
+    "description": "Fact"
+  },
+  "stores.rating": {
+    "defaultMessage": "Rating",
+    "description": "Fact"
+  },
+  "stores.rating.value": {
+    "defaultMessage": "{avg} from {count, plural, one {# review} other {# reviews}}",
+    "description": "Rating value"
+  },
+  "stores.computedAt": {
+    "defaultMessage": "Last counted",
+    "description": "Fact: when reliability was last computed"
+  },
+  "stores.place": {
+    "defaultMessage": "Place",
+    "description": "Store detail card: address and pin"
+  },
+  "stores.address": {
+    "defaultMessage": "Address",
+    "description": "Fact"
+  },
+  "stores.pin": {
+    "defaultMessage": "Map pin",
+    "description": "Fact and edit fieldset"
+  },
+  "stores.pin.value": {
+    "defaultMessage": "{lat}, {lng}",
+    "description": "Pin as latitude, longitude"
+  },
+  "stores.pin.none": {
+    "defaultMessage": "Not set",
+    "description": "No pin"
+  },
+  "stores.pin.lat": {
+    "defaultMessage": "Latitude",
+    "description": "Pin field"
+  },
+  "stores.pin.lng": {
+    "defaultMessage": "Longitude",
+    "description": "Pin field"
+  },
+  "stores.pin.help": {
+    "defaultMessage": "Decimal degrees. Leave both empty to keep the pin as it is.",
+    "description": "Pin help"
+  },
+  "stores.pin.bad": {
+    "defaultMessage": "Enter both, as decimal degrees (latitude −90 to 90, longitude −180 to 180).",
+    "description": "Pin error"
+  },
+  "stores.liveAt": {
+    "defaultMessage": "Live since",
+    "description": "Fact"
+  },
+  "stores.hours": {
+    "defaultMessage": "Opening hours",
+    "description": "Store detail card and edit fieldset"
+  },
+  "stores.hours.closed": {
+    "defaultMessage": "Closed",
+    "description": "A day with no opening ranges"
+  },
+  "stores.hours.range": {
+    "defaultMessage": "{open}–{close}",
+    "description": "One opening range"
+  },
+  "stores.hours.help": {
+    "defaultMessage": "Up to {max} ranges a day. A range may run past midnight; ranges in a day must not overlap. Holidays stay as they are.",
+    "description": "Hours editor help"
+  },
+  "stores.hours.add": {
+    "defaultMessage": "Add",
+    "description": "Add an opening range"
+  },
+  "stores.hours.addOne": {
+    "defaultMessage": "Add a range on {day}",
+    "description": "Accessible name of the add button"
+  },
+  "stores.hours.opens": {
+    "defaultMessage": "{day} range {n} opens",
+    "description": "Accessible name of an opening time"
+  },
+  "stores.hours.closes": {
+    "defaultMessage": "{day} range {n} closes",
+    "description": "Accessible name of a closing time"
+  },
+  "stores.hours.remove": {
+    "defaultMessage": "Remove {day} range {n}",
+    "description": "Accessible name of the remove button"
+  },
+  "stores.hours.bad": {
+    "defaultMessage": "Check the {day} ranges: they overlap or a time is wrong.",
+    "description": "Server rejected one day's hours"
+  },
+  "stores.hours.fill": {
+    "defaultMessage": "Fill in every opening and closing time.",
+    "description": "Hours editor: a time is empty"
+  },
+  "stores.holidays": {
+    "defaultMessage": "{count, plural, one {# holiday set} other {# holidays set}}",
+    "description": "Hours card: holidays count"
+  },
+  "stores.strikes": {
+    "defaultMessage": "{count, plural, one {Strikes (# active)} other {Strikes (# active)}}",
+    "description": "Heading of the strikes card"
+  },
+  "stores.strikes.table": {
+    "defaultMessage": "Store strikes",
+    "description": "Accessible name of the strikes table"
+  },
+  "stores.strikes.none": {
+    "defaultMessage": "No strikes.",
+    "description": "No strikes"
+  },
+  "stores.strike.noShow": {
+    "defaultMessage": "Customer no-show",
+    "description": "Strike reason"
+  },
+  "stores.strike.dispatchTimeout": {
+    "defaultMessage": "Not dispatched in time",
+    "description": "Strike reason"
+  },
+  "stores.strike.adminCancel": {
+    "defaultMessage": "Cancelled by admin",
+    "description": "Strike reason"
+  },
+  "stores.strike.active": {
+    "defaultMessage": "Active",
+    "description": "Strike state"
+  },
+  "stores.strike.reset": {
+    "defaultMessage": "Reset {when}{reason, select, none {} other {: {reason}}}",
+    "description": "Strike state after a reset, with its reason"
+  },
+  "stores.openOrder": {
+    "defaultMessage": "Open order",
+    "description": "Link to the strike's order"
+  },
+  "stores.edit": {
+    "defaultMessage": "Edit pin and hours",
+    "description": "Action"
+  },
+  "stores.edit.title": {
+    "defaultMessage": "Edit {name}",
+    "description": "Edit dialog title"
+  },
+  "stores.edit.body": {
+    "defaultMessage": "Changes show to customers at once. The reason is kept in the audit log.",
+    "description": "Edit dialog body"
+  },
+  "stores.edit.save": {
+    "defaultMessage": "Save changes",
+    "description": "Edit dialog confirm"
+  },
+  "stores.forceClose": {
+    "defaultMessage": "Close for a while",
+    "description": "Action: force-close"
+  },
+  "stores.forceClose.title": {
+    "defaultMessage": "Close {name} for a while?",
+    "description": "Force-close dialog title"
+  },
+  "stores.forceClose.body": {
+    "defaultMessage": "Customers cannot order until the time you pick. The store keeps its status and opens again by itself.",
+    "description": "Force-close dialog body"
+  },
+  "stores.forceClose.until": {
+    "defaultMessage": "Closed until (IST)",
+    "description": "Force-close end time label"
+  },
+  "stores.forceClose.untilHelp": {
+    "defaultMessage": "Pick a time in the future.",
+    "description": "Force-close end time help"
+  },
+  "stores.forceClose.untilPast": {
+    "defaultMessage": "This time has passed. Pick a time in the future.",
+    "description": "Force-close end time error"
+  },
+  "stores.reopen": {
+    "defaultMessage": "Reopen now",
+    "description": "Action: end a force-close"
+  },
+  "stores.reopen.title": {
+    "defaultMessage": "Reopen {name} now?",
+    "description": "Reopen dialog title"
+  },
+  "stores.reopen.body": {
+    "defaultMessage": "Customers can order again at once.",
+    "description": "Reopen dialog body"
+  },
+  "stores.resetStrikes": {
+    "defaultMessage": "Reset strikes",
+    "description": "Action"
+  },
+  "stores.resetStrikes.title": {
+    "defaultMessage": "{count, plural, one {Reset # strike?} other {Reset # strikes?}}",
+    "description": "Strike reset dialog title"
+  },
+  "stores.resetStrikes.body": {
+    "defaultMessage": "The strikes stop counting. Reliability is recounted on its next run.",
+    "description": "Strike reset dialog body"
+  },
+  "stores.approve": {
+    "defaultMessage": "Approve",
+    "description": "Action: approve a store waiting for review"
+  },
+  "stores.approve.title": {
+    "defaultMessage": "Approve {name}?",
+    "description": "Approve dialog title"
+  },
+  "stores.approve.body": {
+    "defaultMessage": "The store goes live and shows to customers.",
+    "description": "Approve dialog body"
+  },
+  "stores.approve.needsBusiness": {
+    "defaultMessage": "The business must be verified before this store can go live.",
+    "description": "Approve is disabled: business not verified"
+  },
+  "stores.sendBack": {
+    "defaultMessage": "Send back",
+    "description": "Action: send a store back to the owner"
+  },
+  "stores.sendBack.title": {
+    "defaultMessage": "Send {name} back?",
+    "description": "Send back dialog title"
+  },
+  "stores.sendBack.body": {
+    "defaultMessage": "The store goes back to draft with your note for the owner.",
+    "description": "Send back dialog body"
+  },
+  "stores.sendBack.note": {
+    "defaultMessage": "Note to the owner",
+    "description": "Send back note label"
+  },
+  "stores.sendBack.noteHelp": {
+    "defaultMessage": "Say what to fix. It is also kept in the audit log.",
+    "description": "Send back note help"
+  },
+  "stores.note.label": {
+    "defaultMessage": "Note",
+    "description": "Optional note label"
+  },
+  "stores.note.optional": {
+    "defaultMessage": "Optional. Kept in the audit log.",
+    "description": "Optional note help"
+  },
+  "stores.done.edit": {
+    "defaultMessage": "Store updated",
+    "description": "Toast"
+  },
+  "stores.done.forceClose": {
+    "defaultMessage": "Store closed",
+    "description": "Toast"
+  },
+  "stores.done.reopen": {
+    "defaultMessage": "Store reopened",
+    "description": "Toast"
+  },
+  "stores.done.resetStrikes": {
+    "defaultMessage": "Strikes reset",
+    "description": "Toast"
+  },
+  "stores.done.approve": {
+    "defaultMessage": "Store approved",
+    "description": "Toast"
+  },
+  "stores.done.sendBack": {
+    "defaultMessage": "Sent back to the owner",
+    "description": "Toast"
+  },
+  "stores.day.mon": {
+    "defaultMessage": "Monday",
+    "description": "Weekday"
+  },
+  "stores.day.tue": {
+    "defaultMessage": "Tuesday",
+    "description": "Weekday"
+  },
+  "stores.day.wed": {
+    "defaultMessage": "Wednesday",
+    "description": "Weekday"
+  },
+  "stores.day.thu": {
+    "defaultMessage": "Thursday",
+    "description": "Weekday"
+  },
+  "stores.day.fri": {
+    "defaultMessage": "Friday",
+    "description": "Weekday"
+  },
+  "stores.day.sat": {
+    "defaultMessage": "Saturday",
+    "description": "Weekday"
+  },
+  "stores.day.sun": {
+    "defaultMessage": "Sunday",
+    "description": "Weekday"
+  }
+}

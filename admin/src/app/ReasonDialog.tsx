@@ -16,20 +16,30 @@ export interface ReasonDialogProps {
   error: string | null;
   onConfirm: (reason: string) => void;
   onClose: () => void;
+  /** The text box's label and help; the default is a reason. */
+  label?: string;
+  help?: string;
+  /** A note that may stay empty (then `onConfirm('')`). */
+  optional?: boolean;
+  /** Fields above the text box (request info's field list, force-close's end time). */
+  children?: ReactNode;
+  /** The extra fields are not ready yet: the confirm is refused, and they say why. */
+  blocked?: boolean;
 }
 
 /** A change that needs a written reason (block, unblock, strike reset). The reason is audited. */
-export function ReasonDialog({ open, title, description, confirmLabel, danger, pending, error, onConfirm, onClose }: ReasonDialogProps) {
+export function ReasonDialog(props: ReasonDialogProps) {
+  const { open, title, description, confirmLabel, danger, pending, error, onConfirm, onClose, label, help, optional, children, blocked } = props;
   const intl = useIntl();
   const id = useId();
   const [reason, setReason] = useState('');
   const [touched, setTouched] = useState(false);
   const clean = reason.trim();
-  const invalid = clean.length === 0 || clean.length > MAX_REASON;
+  const invalid = (!optional && clean.length === 0) || clean.length > MAX_REASON;
   const submit = (e: FormEvent) => {
     e.preventDefault();
     setTouched(true);
-    if (!invalid && !pending) onConfirm(clean);
+    if (!invalid && !blocked && !pending) onConfirm(clean);
   };
   const close = () => {
     setReason('');
@@ -55,9 +65,10 @@ export function ReasonDialog({ open, title, description, confirmLabel, danger, p
       }
     >
       <form id={id} onSubmit={submit} noValidate>
+        {children}
         <div className="tz-field">
           <label className="tz-field-label" htmlFor={`${id}-reason`}>
-            {intl.formatMessage({ id: 'common.reason.label' })}
+            {label ?? intl.formatMessage({ id: 'common.reason.label' })}
           </label>
           <textarea
             id={`${id}-reason`}
@@ -70,7 +81,7 @@ export function ReasonDialog({ open, title, description, confirmLabel, danger, p
             onChange={(e) => setReason(e.target.value)}
           />
           <p id={`${id}-help`} className={touched && invalid ? 'tz-field-error' : 'tz-field-help'}>
-            {touched && invalid ? intl.formatMessage({ id: 'common.reason.required' }) : intl.formatMessage({ id: 'common.reason.help' })}
+            {touched && invalid ? intl.formatMessage({ id: 'common.reason.required' }) : (help ?? intl.formatMessage({ id: 'common.reason.help' }))}
           </p>
         </div>
         {error && (

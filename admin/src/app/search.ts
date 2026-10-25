@@ -22,3 +22,10 @@ export const dayStart = (d: string) => new Date(`${d}T00:00:00+05:30`).toISOStri
 
 /** The next IST midnight: the API's `to` is exclusive, so a day runs up to it. */
 export const dayEnd = (d: string) => new Date(Date.parse(`${d}T00:00:00+05:30`) + 86_400_000).toISOString();
+
+/** A `datetime-local` value (YYYY-MM-DDTHH:mm) read as IST, as an instant; null if malformed. */
+export function istInstant(v: string): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(v)) return null;
+  const t = Date.parse(`${v}:00+05:30`);
+  return Number.isNaN(t) ? null : new Date(t).toISOString();
+}

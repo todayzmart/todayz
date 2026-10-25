@@ -158,5 +158,65 @@
   "audit.action.reportResolve": {
     "defaultMessage": "Review report resolved",
     "description": "Audit action name (A-12 review moderation)"
+  },
+  "audit.action.businessVerify": {
+    "defaultMessage": "Business verified",
+    "description": "Audit action name (A-03 businesses)"
+  },
+  "audit.action.businessRequestInfo": {
+    "defaultMessage": "Info requested",
+    "description": "Audit action name (A-03 businesses)"
+  },
+  "audit.action.businessReject": {
+    "defaultMessage": "Business rejected",
+    "description": "Audit action name (A-03 businesses)"
+  },
+  "audit.action.businessSuspend": {
+    "defaultMessage": "Business suspended",
+    "description": "Audit action name (A-03 businesses)"
+  },
+  "audit.action.businessReinstate": {
+    "defaultMessage": "Business reinstated",
+    "description": "Audit action name (A-03 businesses)"
+  },
+  "audit.action.kycReview": {
+    "defaultMessage": "KYC reviewed",
+    "description": "Audit action name (A-03 businesses)"
+  },
+  "audit.action.kycReveal": {
+    "defaultMessage": "KYC value shown",
+    "description": "Audit action name (A-03 businesses)"
+  },
+  "audit.action.documentReview": {
+    "defaultMessage": "Document reviewed",
+    "description": "Audit action name (A-03 businesses)"
+  },
+  "audit.action.storeUpdate": {
+    "defaultMessage": "Store edited",
+    "description": "Audit action name (A-05 stores)"
+  },
+  "audit.action.storeForceClose": {
+    "defaultMessage": "Store closed for a while",
+    "description": "Audit action name (A-05 stores)"
+  },
+  "audit.action.storeReopen": {
+    "defaultMessage": "Store reopened",
+    "description": "Audit action name (A-05 stores)"
+  },
+  "audit.action.storeApprove": {
+    "defaultMessage": "Store approved",
+    "description": "Audit action name (A-05 stores)"
+  },
+  "audit.action.storeSendBack": {
+    "defaultMessage": "Store sent back",
+    "description": "Audit action name (A-05 stores)"
+  },
+  "audit.action.storeStrikesReset": {
+    "defaultMessage": "Store strikes reset",
+    "description": "Audit action name (A-05 stores)"
+  },
+  "audit.action.leadStatus": {
+    "defaultMessage": "Lead status changed",
+    "description": "Audit action name (A-03 leads)"
   }
 }
