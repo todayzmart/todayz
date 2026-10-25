@@ -46,6 +46,7 @@ async function fakeApi(page: Page) {
       return ok(route, { segment, enough: true, total: CUSTOMERS.length, windowDays: 90, lapseDays: 30, items: CUSTOMERS, nextCursor: null, serverNow: SERVER_NOW });
     }
     if (url.pathname === `${STORE}/orders`) return ok(route, { items: [], nextCursor: null, serverNow: SERVER_NOW });
+    if (url.pathname === `${STORE}/coach/cards`) return ok(route, { items: [], nextCursor: null, serverNow: SERVER_NOW });
     return route.fulfill({ status: 404, contentType: 'application/problem+json', headers: cors(route), body: JSON.stringify({ type: 'about:blank#not_found', title: 'Not found', status: 404, code: 'not_found' }) });
   });
 }
