@@ -62,6 +62,12 @@ SELECT
 FROM businesses b
 WHERE b.id = @business_id;
 
+-- HasLaterStatement: a business closed for a later period keeps its payout
+-- as that close computed it; a backfilled older close only writes its report.
+-- name: HasLaterStatement :one
+SELECT EXISTS (
+  SELECT 1 FROM payout_statements WHERE business_id = @business_id AND period > @period)::boolean;
+
 -- name: InsertStatement :exec
 INSERT INTO payout_statements (id, business_id, period, opening, credits_in, cashback_out, referral_in,
   adjustments, reversals, payouts_out, closing, status, closed_at, payout_id, created_at)
