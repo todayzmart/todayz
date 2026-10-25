@@ -10,6 +10,7 @@ import (
 	"github.com/todayz/backend/internal/ai/client"
 	"github.com/todayz/backend/internal/ai/guard"
 	"github.com/todayz/backend/internal/ai/prompts"
+	"github.com/todayz/backend/internal/ai/retail"
 	"github.com/todayz/backend/internal/insights/facts"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/settings"
@@ -50,10 +51,14 @@ func (s *Service) Texts(ctx context.Context, storeID ids.ID, rows []facts.Row) [
 	for _, k := range kept {
 		byKey[k.Kind+"\x00"+k.SubjectRef] = k
 	}
-	misses, err := q.AiTextMisses(ctx, airetaildb.AiTextMissesParams{Feature: Feature, StoreID: store, Lang: lang})
-	if err != nil {
+	// Without the misses the kept texts are still served, but nothing is asked
+	// for: a failed read must not resend facts that already failed.
+	misses, err := q.AiTextMisses(ctx, airetaildb.AiTextMissesParams{
+		Feature: Feature, StoreID: store, Lang: lang, KeptAfter: s.d.Clock.Now().Add(-retail.MissTTL),
+	})
+	missesOK := err == nil
+	if !missesOK {
 		log.WarnContext(ctx, "insighttext: misses", slog.String("error", err.Error()))
-		return out
 	}
 	missed := map[string]string{}
 	for _, m := range misses {
@@ -75,7 +80,7 @@ func (s *Service) Texts(ctx context.Context, storeID ids.ID, rows []facts.Row) [
 		}
 		missing = append(missing, pending{row: r, hash: h})
 	}
-	if len(missing) > 0 && s.claim(storeID) {
+	if len(missing) > 0 && missesOK && s.claim(storeID) {
 		bg := context.WithoutCancel(ctx)
 		s.d.Go(func() { s.run(bg, storeID, lang, missing) })
 	}
@@ -86,7 +91,9 @@ func (s *Service) Texts(ctx context.Context, storeID ids.ID, rows []facts.Row) [
 func missRef(r facts.Row) string { return string(r.Kind) + "/" + r.SubjectRef }
 
 // missReason is the ai_text_misses reason for a whole-call reject, or false
-// for a transient one (an error or a timeout), which may ask again.
+// for a transient one (an error or a timeout), which may ask again. A
+// whole-call miss lasts retail.MissTTL; only an ungrounded row's holds until
+// its facts change.
 func missReason(reject string) (string, bool) {
 	switch reject {
 	case client.RejectSchema, client.OutcomeInvalid, client.OutcomeTruncated:
@@ -124,6 +131,12 @@ func (s *Service) run(ctx context.Context, storeID ids.ID, lang string, missing 
 	if len(missing) > MaxRows {
 		missing = missing[:MaxRows]
 	}
+	// The model is read first, so a failed read never holds a reservation.
+	model, err := s.d.Settings.String(ctx, settings.AiModelFast)
+	if err != nil {
+		log.WarnContext(ctx, "insighttext: model setting", slog.String("error", err.Error()))
+		return
+	}
 	// Background wording has its own budget (D-228); when it is spent the
 	// templates show.
 	if err := s.d.Guard.Reserve(ctx, Feature, guard.Subject{Store: storeID, Background: true}); err != nil {
@@ -131,11 +144,6 @@ func (s *Service) run(ctx context.Context, storeID ids.ID, lang string, missing 
 		if !errors.As(err, &ce) {
 			log.WarnContext(ctx, "insighttext: guard", slog.String("error", err.Error()))
 		}
-		return
-	}
-	model, err := s.d.Settings.String(ctx, settings.AiModelFast)
-	if err != nil {
-		log.WarnContext(ctx, "insighttext: model setting", slog.String("error", err.Error()))
 		return
 	}
 	in := make([]Row, len(missing))

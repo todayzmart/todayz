@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/todayz/backend/internal/ai/insighttext"
+	"github.com/todayz/backend/internal/ai/retail"
 	"github.com/todayz/backend/internal/ai/retail/retailtest"
 	"github.com/todayz/backend/internal/insights/facts"
 	"github.com/todayz/backend/internal/platform/ids"
@@ -74,12 +75,19 @@ func TestTextsNegativeCache(t *testing.T) {
 	next(e)
 	assert.Equal(t, []string{"Only 3 days of stock left after 12 sold.", "41 sold, 2 days left."}, texts(svc.Texts(e.Ctx, retailtest.Store, rows)))
 
+	// An ungrounded miss outlives retail.MissTTL; only new facts ask again.
+	e.Clock.Advance(retail.MissTTL + time.Minute)
+	rows[1] = row("b", 2, 40)
+	svc.Texts(e.Ctx, retailtest.Store, rows)
+	assert.Equal(t, 2, e.LLM.Calls(), "a grounding miss holds while its facts do")
+
 	// Background wording never takes from the calls the owner starts.
 	assert.Equal(t, 0, e.Count(t, `SELECT count(*) FROM ai_usage_daily WHERE scope = 'store'`))
 	assert.Equal(t, 2, e.Count(t, `SELECT coalesce(sum(calls), 0)::int FROM ai_usage_daily WHERE scope = 'store_background'`))
 }
 
-// A schema break is cached for every row of the call; a provider error is not.
+// A schema break is cached for every row of the call, but only for
+// retail.MissTTL (a later call may not repeat it); a provider error is not.
 func TestTextsMissOnReject(t *testing.T) {
 	e := retailtest.New(t)
 	e.Set(t, settings.AiInsighttextEnabled, "true")
@@ -93,6 +101,31 @@ func TestTextsMissOnReject(t *testing.T) {
 	next(e)
 	svc.Texts(e.Ctx, retailtest.Store, rows)
 	assert.Equal(t, 1, e.LLM.Calls())
+
+	e.Clock.Advance(retail.MissTTL)
+	e.LLM.Reply = insighttext.ToolOutput{Texts: []insighttext.ToolText{{Ref: "r1", Text: "3 days left."}}}
+	svc.Texts(e.Ctx, retailtest.Store, rows)
+	assert.Equal(t, 2, e.LLM.Calls(), "the same facts are asked again after MissTTL")
+	next(e)
+	assert.Equal(t, []string{"3 days left."}, texts(svc.Texts(e.Ctx, retailtest.Store, rows)))
+}
+
+// A failed read of the misses still serves the kept texts, and asks for nothing.
+func TestTextsMissesUnreadable(t *testing.T) {
+	e := retailtest.New(t)
+	e.Set(t, settings.AiInsighttextEnabled, "true")
+	svc := newService(e)
+	rows := []facts.Row{row("a", 3, 12)}
+	e.LLM.Reply = insighttext.ToolOutput{Texts: []insighttext.ToolText{{Ref: "r1", Text: "3 days left."}}}
+	svc.Texts(e.Ctx, retailtest.Store, rows)
+	require.Equal(t, 1, e.LLM.Calls())
+
+	_, err := e.TDB.OwnerPool.Exec(e.Ctx, `REVOKE SELECT ON ai_text_misses FROM todayz_app`)
+	require.NoError(t, err)
+	next(e)
+	rows = append(rows, row("b", 2, 40))
+	assert.Equal(t, []string{"3 days left.", ""}, texts(svc.Texts(e.Ctx, retailtest.Store, rows)))
+	assert.Equal(t, 1, e.LLM.Calls(), "no call without the misses")
 }
 
 func TestTextsOffAndBudget(t *testing.T) {

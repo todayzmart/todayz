@@ -51,6 +51,11 @@ const (
 	// together); a third start is 429 until one finishes or goes stale.
 	// A constant, not a setting: 01 does not mark it configurable (D-230).
 	MaxScansInFlight = 2
+	// MissTTL is how long a background wording miss that is not ungrounded text (a schema
+	// break, a refusal, a truncated or skipped answer, which a later call may not repeat)
+	// keeps the template before the same facts are asked again. An ungrounded miss holds
+	// until the facts change (D-228).
+	MissTTL = 24 * time.Hour //settings:ok a retry bound for background wording, not a product number
 )
 
 // ScanFeatures are the photo features MaxScansInFlight counts together.
@@ -208,6 +213,9 @@ func (k Kit) Start(ctx context.Context, n New, work func(ctx context.Context, id
 				return err
 			}
 			if busy >= MaxScansInFlight {
+				// ProcessTimeout, not StaleAfter: a running scan ends (read, failed or
+				// timed out) within ProcessTimeout of its start, which frees its slot.
+				// StaleAfter only frees one whose process died mid-call.
 				return problem.New(genproblems.RateLimited, "two scans are still being read").
 					WithHeader("Retry-After", strconv.Itoa(int(ProcessTimeout/time.Second)))
 			}

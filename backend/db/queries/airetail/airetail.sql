@@ -129,16 +129,21 @@ SET facts_hash = EXCLUDED.facts_hash, text = EXCLUDED.text, prompt_version = EXC
 
 -- name: AiTextMisses :many
 -- The negative cache of one background feature for a store in one language
--- (D-228): facts whose wording failed are not sent again while the hash holds.
+-- (D-228): facts whose wording was ungrounded are not sent again while the hash
+-- holds; any other miss (a schema break, a refusal, a skipped row) only until
+-- kept_after (retail.MissTTL).
 SELECT ref, facts_hash
 FROM ai_text_misses
-WHERE feature = @feature AND store_id = @store_id AND lang = @lang;
+WHERE feature = @feature AND store_id = @store_id AND lang = @lang
+  AND (reason = 'grounding' OR created_at > @kept_after);
 
 -- name: AiTextMissed :one
--- Whether these facts of one ref already failed (the coach asks per card).
+-- Whether these facts of one ref already failed (the coach asks per card), with
+-- the same rule as AiTextMisses.
 SELECT EXISTS (
   SELECT 1 FROM ai_text_misses
   WHERE feature = @feature AND store_id = @store_id AND ref = @ref AND lang = @lang AND facts_hash = @facts_hash
+    AND (reason = 'grounding' OR created_at > @kept_after)
 )::bool AS missed;
 
 -- name: UpsertAiTextMiss :exec

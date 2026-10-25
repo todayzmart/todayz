@@ -3,6 +3,8 @@ package coach
 import (
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"sync"
@@ -15,6 +17,8 @@ import (
 	"github.com/todayz/backend/gen/sqlc/coachdb"
 	"github.com/todayz/backend/internal/ai/client"
 	"github.com/todayz/backend/internal/ai/guard"
+	"github.com/todayz/backend/internal/ai/prompts"
+	"github.com/todayz/backend/internal/ai/retail"
 	"github.com/todayz/backend/internal/coach/detectors"
 	"github.com/todayz/backend/internal/insights/facts"
 	"github.com/todayz/backend/internal/platform/clock"
@@ -368,10 +372,63 @@ func TestAIWriterMissCache(t *testing.T) {
 	require.True(t, ok)
 	require.Equal(t, 2, e.llm.calls)
 
+	// An ungrounded miss holds past retail.MissTTL while its facts do.
+	e.clk.Advance(retail.MissTTL + time.Minute)
+	_, _, ok = s.writeAI(e.ctx, storeSL, f, "en", tpl, nums)
+	require.False(t, ok)
+	require.Equal(t, 2, e.llm.calls, "a grounding miss holds while its facts do")
+
 	e.setting(t, settings.AiDailyCallsStoreBackground, "0")
 	_, _, ok = s.writeAI(e.ctx, storeSL, f, "en", Text{Title: tpl.Title, Body: "1 day of stock left."}, []byte(`{"days":1}`))
 	require.False(t, ok, "a spent budget keeps the template")
 	require.Equal(t, 2, e.llm.calls)
+}
+
+// A schema break or a refusal (not the card's numbers) is a miss for
+// retail.MissTTL only; then the same facts are asked again.
+func TestAIWriterMissTTL(t *testing.T) {
+	e := newEnv(t)
+	e.setting(t, settings.AiCoachEnabled, "true")
+	e.llm.reply = func(Input) (Output, error) { return Output{Title: "", Body: "x"}, nil }
+	s := e.service(t, true)
+	f := detectors.Fact{Detector: "reviews_unanswered", Subject: "store", Kind: "action"}
+	tpl := Text{Title: "2 reviews need a reply", Body: "2 reviews have waited 7 days."}
+	nums := []byte(`{"count":2,"days":7}`)
+	_, _, ok := s.writeAI(e.ctx, storeSL, f, "en", tpl, nums)
+	require.False(t, ok)
+	_, _, ok = s.writeAI(e.ctx, storeSL, f, "en", tpl, nums)
+	require.False(t, ok)
+	require.Equal(t, 1, e.llm.calls, "a schema miss is kept")
+
+	e.clk.Advance(retail.MissTTL - time.Minute)
+	_, _, ok = s.writeAI(e.ctx, storeSL, f, "en", tpl, nums)
+	require.False(t, ok)
+	require.Equal(t, 1, e.llm.calls, "still inside MissTTL")
+
+	e.clk.Advance(2 * time.Minute)
+	e.llm.reply = func(in Input) (Output, error) { return Output{Title: in.Title, Body: in.Body}, nil }
+	_, _, ok = s.writeAI(e.ctx, storeSL, f, "en", tpl, nums)
+	require.True(t, ok)
+	require.Equal(t, 2, e.llm.calls, "asked again after MissTTL")
+}
+
+// A new prompt version is a new miss key: the same facts are asked again.
+func TestMissKeyHasPromptVersion(t *testing.T) {
+	f := detectors.Fact{Detector: "reviews_unanswered", Subject: "store"}
+	in := Input{Detector: f.Detector, Lang: "en", Title: "t", Body: "b", Numbers: []byte(`{"count":2}`)}
+	_, h1, err := missKey(f, in)
+	require.NoError(t, err)
+	b, err := json.Marshal(struct {
+		In     Input  `json:"i"`
+		Prompt string `json:"p"`
+	}{in, prompts.Version(Feature)})
+	require.NoError(t, err)
+	sum := sha256.Sum256(b)
+	require.Equal(t, hex.EncodeToString(sum[:]), h1)
+	plain, err := json.Marshal(in)
+	require.NoError(t, err)
+	old := sha256.Sum256(plain)
+	require.NotEqual(t, hex.EncodeToString(old[:]), h1, "the hash covers more than the input")
 }
 
 // A card closed because its condition resolved is neutral for the

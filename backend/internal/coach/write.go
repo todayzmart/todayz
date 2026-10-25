@@ -14,6 +14,7 @@ import (
 	"github.com/todayz/backend/internal/ai/client"
 	"github.com/todayz/backend/internal/ai/guard"
 	"github.com/todayz/backend/internal/ai/prompts"
+	"github.com/todayz/backend/internal/ai/retail"
 	"github.com/todayz/backend/internal/ai/schema"
 	"github.com/todayz/backend/internal/coach/detectors"
 	"github.com/todayz/backend/internal/platform/ids"
@@ -157,9 +158,18 @@ func (s *Service) writeAI(ctx context.Context, storeID ids.ID, f detectors.Fact,
 		return Text{}, generated{}, false
 	}
 	q := airetaildb.New(s.d.DB.Q(ctx))
-	key := airetaildb.AiTextMissedParams{Feature: Feature, StoreID: ids.UUID(storeID), Ref: ref, Lang: lang, FactsHash: hash}
+	key := airetaildb.AiTextMissedParams{
+		Feature: Feature, StoreID: ids.UUID(storeID), Ref: ref, Lang: lang, FactsHash: hash,
+		KeptAfter: s.d.Clock.Now().Add(-retail.MissTTL),
+	}
 	if missed, err := q.AiTextMissed(ctx, key); err != nil || missed {
 		return Text{}, generated{}, false // these facts failed before (D-228)
+	}
+	// The model is read first, so a failed read never holds a reservation.
+	model, err := s.d.Settings.String(ctx, settings.AiModelFast)
+	if err != nil {
+		log.WarnContext(ctx, "coach: model setting", slog.String("error", err.Error()))
+		return Text{}, generated{}, false
 	}
 	// Background wording has its own budget (D-228); when it is spent the
 	// template is used.
@@ -168,10 +178,6 @@ func (s *Service) writeAI(ctx context.Context, storeID ids.ID, f detectors.Fact,
 		if !errors.As(err, &ce) {
 			log.WarnContext(ctx, "coach: guard", slog.String("error", err.Error()))
 		}
-		return Text{}, generated{}, false
-	}
-	model, err := s.d.Settings.String(ctx, settings.AiModelFast)
-	if err != nil {
 		return Text{}, generated{}, false
 	}
 	out, resp, reject, err := Rewrite(ctx, s.d.LLM, model, storeID.String(), in)
@@ -200,9 +206,13 @@ func (s *Service) writeAI(ctx context.Context, storeID ids.ID, f detectors.Fact,
 }
 
 // missKey is a card's ref and facts hash in ai_text_misses: the detector and
-// subject, and a hash of everything the model saw.
+// subject, and a hash of everything the model saw and the prompt version (a
+// new prompt asks again).
 func missKey(f detectors.Fact, in Input) (ref, hash string, err error) {
-	b, err := json.Marshal(in)
+	b, err := json.Marshal(struct {
+		In     Input  `json:"i"`
+		Prompt string `json:"p"`
+	}{in, prompts.Version(Feature)})
 	if err != nil {
 		return "", "", err
 	}
@@ -211,7 +221,9 @@ func missKey(f detectors.Fact, in Input) (ref, hash string, err error) {
 }
 
 // missReason is the ai_text_misses reason of a reject, or false for a
-// transient one (an error or a timeout), which may ask again.
+// transient one (an error or a timeout), which may ask again. Only a
+// grounding miss holds until the facts change; the others last
+// retail.MissTTL, since a later call may not repeat them.
 func missReason(reject string) (string, bool) {
 	switch reject {
 	case client.RejectGrounding:
