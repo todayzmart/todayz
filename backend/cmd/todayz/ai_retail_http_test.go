@@ -67,6 +67,21 @@ func (f *retailLLM) count() int {
 type retailShop struct {
 	*orderShop
 	llm *retailLLM
+
+	mu   sync.Mutex
+	hold bool     // keep the background work for later: the draft stays processing
+	held []func() // the work kept while hold is set
+}
+
+// release runs the kept background work.
+func (o *retailShop) release() {
+	o.mu.Lock()
+	held := o.held
+	o.hold, o.held = false, nil
+	o.mu.Unlock()
+	for _, f := range held {
+		f()
+	}
 }
 
 var retailFlags = []string{"ai_billscan_enabled", "ai_shelfscan_enabled", "ai_replydraft_enabled", "ai_bannercopy_enabled"}
@@ -78,7 +93,16 @@ func newRetailShop(t *testing.T, on bool) *retailShop {
 		*llm = rs.llm
 		// The mock counts as a configured provider in test (D-17); the fake stands in for it.
 		kit.Guard = guard.New(d.DB, d.Settings, d.Clock, guard.Providers{LLM: true})
-		kit.Go = func(f func()) { f() }
+		kit.Go = func(f func()) {
+			rs.mu.Lock()
+			if rs.hold {
+				rs.held = append(rs.held, f)
+				rs.mu.Unlock()
+				return
+			}
+			rs.mu.Unlock()
+			f()
+		}
 	}
 	t.Cleanup(func() { aiRetailSeams = nil })
 	rs.orderShop = newOrderShop(t)
@@ -255,6 +279,56 @@ func TestAIRetailBillConcurrentConfirm(t *testing.T) {
 	assert.Equal(t, 2, o.a.count(`SELECT count(*) FROM stock_movements WHERE store_id = $1 AND source = 'supplier_bill'`, uuidOf(t, o.sid)))
 }
 
+// Scan starts racing on one store pass the in-flight check one at a time (the store's scan
+// lock): MaxScansInFlight are accepted, the rest are 429 with Retry-After and take nothing
+// from the daily cap; a read scan frees its slot.
+func TestAIRetailConcurrentScanStarts(t *testing.T) {
+	o := newRetailShop(t, true)
+	o.llm.reply("supplier_bill", billReply())
+	o.llm.reply("shelf_photo", shelfReply("Aashirvaad Atta"))
+	o.mu.Lock()
+	o.hold = true
+	o.mu.Unlock()
+	const n = 6
+	codes, retry := make([]int, n), make([]string, n)
+	var wg sync.WaitGroup
+	for i := range n {
+		path := billDrafts(o.S)
+		if i%2 == 1 {
+			path = shelfDrafts(o.S)
+		}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			r := o.photo(o.manager, path)
+			codes[i], retry[i] = r.code, r.hdr.Get("Retry-After")
+		}()
+	}
+	wg.Wait()
+	accepted := 0
+	for i, c := range codes {
+		switch c {
+		case http.StatusAccepted:
+			accepted++
+		case http.StatusTooManyRequests:
+			assert.Equal(t, "90", retry[i], "Retry-After is ProcessTimeout")
+		default:
+			t.Fatalf("start %d: %d", i, c)
+		}
+	}
+	assert.Equal(t, retail.MaxScansInFlight, accepted)
+	sid := uuidOf(t, o.sid)
+	assert.Equal(t, retail.MaxScansInFlight, o.a.count(`SELECT count(*) FROM ai_drafts WHERE store_id = $1`, sid))
+	assert.Equal(t, retail.MaxScansInFlight, o.a.count(
+		`SELECT coalesce(sum(calls), 0)::int FROM ai_usage_daily WHERE scope = 'store' AND subject = $1`, sid), "a refused start reserves nothing")
+	assert.Zero(t, o.llm.count())
+
+	o.release()
+	assert.Equal(t, retail.MaxScansInFlight, o.llm.count())
+	r := o.photo(o.manager, billDrafts(o.S))
+	assert.Equal(t, http.StatusAccepted, r.code, r.raw)
+}
+
 // A lost 202 retried with the same key and a rebuilt FormData (a new boundary) replays the
 // first answer: one draft, one model call, one use of the cap.
 func TestAIRetailScanRetryRebuiltForm(t *testing.T) {
@@ -387,6 +461,65 @@ func TestAIRetailShelfConfirmPerLine(t *testing.T) {
 	require.Equal(t, http.StatusOK, c.code, c.raw)
 	assert.Equal(t, "confirmed", c.body["status"])
 	assert.Equal(t, before+2, o.a.count(`SELECT count(*) FROM store_items`), "butter is not created twice")
+}
+
+// Two people confirming one shelf photo at once (different keys) create each item once.
+func TestAIRetailShelfConcurrentConfirm(t *testing.T) {
+	o := newRetailShop(t, true)
+	id, _ := o.scan(o.owner, shelfDrafts(o.S2), "shelf_photo", shelfReply("Aashirvaad Atta", "Amul Butter", "Qzxv Wjk Plorb"))
+	before := o.a.count(`SELECT count(*) FROM store_items`)
+	const n = 4
+	codes, statuses := make([]int, n), make([]string, n)
+	var wg sync.WaitGroup
+	for i := range n {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			r := o.confirm(o.owner, shelfDrafts(o.S2), id, accept("l1"), accept("l2"), discard("l3"))
+			codes[i] = r.code
+			statuses[i], _ = r.body["status"].(string)
+		}()
+	}
+	wg.Wait()
+	for i := range n {
+		assert.Equal(t, http.StatusOK, codes[i], i)
+		assert.Equal(t, "confirmed", statuses[i], i)
+	}
+	assert.Equal(t, before+2, o.a.count(`SELECT count(*) FROM store_items`))
+}
+
+// The same decisions sent again after a partial confirm (a new key: not a replay) write
+// nothing new: the settled line keeps its outcome, the refused lines are refused again.
+func TestAIRetailRepeatAfterPartialConfirm(t *testing.T) {
+	o := newRetailShop(t, true)
+	id, _ := o.scan(o.manager, billDrafts(o.S), "supplier_bill", billReply())
+	ds := []map[string]any{
+		edit("l1", map[string]any{"storeItemId": o.atta, "quantity": 6, "costPaise": 30001}), accept("l2"), accept("l3"),
+	}
+	first := o.confirm(o.manager, billDrafts(o.S), id, ds...)
+	require.Equal(t, http.StatusOK, first.code, first.raw)
+	require.Equal(t, 512, o.onHand(o.butter))
+
+	again := o.confirm(o.manager, billDrafts(o.S), id, ds...)
+	require.Equal(t, http.StatusOK, again.code, again.raw)
+	assert.Equal(t, "ready", again.body["status"])
+	assert.Equal(t, outcomesOf(first), outcomesOf(again))
+	assert.Equal(t, reasonsOf(first), reasonsOf(again))
+	assert.Equal(t, 500, o.onHand(o.atta))
+	assert.Equal(t, 512, o.onHand(o.butter), "the settled line is not written again")
+	assert.Equal(t, 1, o.a.count(`SELECT count(*) FROM stock_movements WHERE store_id = $1 AND source = 'supplier_bill'`, uuidOf(t, o.sid)))
+
+	// The shelf side: a partial confirm, then the same decisions, creates nothing more.
+	sid, _ := o.scan(o.owner, shelfDrafts(o.S2), "shelf_photo", shelfReply("Aashirvaad Atta", "Amul Butter", "Qzxv Wjk Plorb"))
+	before := o.a.count(`SELECT count(*) FROM store_items`)
+	sds := []map[string]any{accept("l2"), accept("l3")}
+	first = o.confirm(o.owner, shelfDrafts(o.S2), sid, sds...)
+	require.Equal(t, http.StatusOK, first.code, first.raw)
+	again = o.confirm(o.owner, shelfDrafts(o.S2), sid, sds...)
+	require.Equal(t, http.StatusOK, again.code, again.raw)
+	assert.Equal(t, "ready", again.body["status"])
+	assert.Equal(t, outcomesOf(first), outcomesOf(again))
+	assert.Equal(t, before+1, o.a.count(`SELECT count(*) FROM store_items`), "butter is created once")
 }
 
 // The catalogue's answers for a shelf line become that line's refusal; a missing permission
