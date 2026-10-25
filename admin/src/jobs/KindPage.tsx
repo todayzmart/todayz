@@ -226,7 +226,7 @@ function Kind({ d, search }: { d: JobKindDetail; search: KindSearch }) {
           ) : (
             <p className={`tz-card ${css.muted}`}>{intl.formatMessage({ id: 'jobs.pick' })}</p>
           )}
-          {can(roles, 'jobAct') && <AuditPanel type="job_kind" id={job.kind} />}
+          {can(roles, 'jobAct') && <AuditPanel type="job_kind" id={job.kind} title={intl.formatMessage({ id: 'jobs.audit.kind' })} />}
         </div>
       </div>
 
@@ -550,7 +550,7 @@ function RunCard({ d, kind, scheduled, may }: { d: JobRunDetail; kind: string; s
           {!logs && <p className={css.muted}>{intl.formatMessage({ id: 'jobs.run.noGrafana' })}</p>}
         </div>
       </section>
-      {may && <AuditPanel type="job_run" id={r.id} />}
+      {may && <AuditPanel type="job_run" id={r.id} title={intl.formatMessage({ id: 'jobs.audit.run' })} />}
       <ReasonDialog
         open={asking}
         title={intl.formatMessage({ id: 'jobs.act.retry.title' })}

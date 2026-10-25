@@ -10,8 +10,9 @@ import css from './audit.module.css';
 /**
  * The audit side panel every admin detail screen shows next to its changes: this subject's
  * history, newest first, with each row's before/after. The screen refreshes it after a change.
+ * A screen showing two subjects at once names each panel with `title`.
  */
-export function AuditPanel({ type, id }: { type: AdminAuditSubjectType; id: string }) {
+export function AuditPanel({ type, id, title }: { type: AdminAuditSubjectType; id: string; title?: string }) {
   const intl = useIntl();
   const when = useWhen();
   const action = useActionLabel();
@@ -22,7 +23,7 @@ export function AuditPanel({ type, id }: { type: AdminAuditSubjectType; id: stri
   return (
     <aside className={`tz-card ${css.panel}`} aria-labelledby={`audit-${id}`}>
       <h2 id={`audit-${id}`} className="tz-card-title">
-        {intl.formatMessage({ id: 'audit.panel.title' })}
+        {title ?? intl.formatMessage({ id: 'audit.panel.title' })}
       </h2>
       {q.isPending && <Skeleton shape="block" height="120px" />}
       {q.isError && (

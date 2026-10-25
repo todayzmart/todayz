@@ -418,5 +418,13 @@
   "jobs.error.stepUp": {
     "defaultMessage": "Enter a fresh authenticator code to do this.",
     "description": "A-21 Jobs: error stepUp"
+  },
+  "jobs.audit.kind": {
+    "defaultMessage": "Changes to this job",
+    "description": "A-21 Jobs: audit panel title for the job kind"
+  },
+  "jobs.audit.run": {
+    "defaultMessage": "Changes to this run",
+    "description": "A-21 Jobs: audit panel title for the selected run"
   }
 }

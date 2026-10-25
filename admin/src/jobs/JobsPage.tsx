@@ -47,6 +47,12 @@ export function JobsPage({ search }: { search: JobsSearch }) {
           </div>
         ),
       },
+      // Status sits next to the job so Missed, Failing and Paused are seen without scrolling.
+      {
+        id: 'health',
+        header: intl.formatMessage({ id: 'jobs.col.health' }),
+        cell: ({ row }) => <StatusPill tone={labels.healthTone(row.original.health)}>{labels.health(row.original.health)}</StatusPill>,
+      },
       { id: 'class', header: intl.formatMessage({ id: 'jobs.col.class' }), accessorFn: (j) => labels.cls(j.class) },
       {
         id: 'schedule',
@@ -83,11 +89,6 @@ export function JobsPage({ search }: { search: JobsSearch }) {
         header: intl.formatMessage({ id: 'jobs.col.duration' }),
         accessorFn: (j) => `${labels.duration(j.avgDurationMs7d)} / ${labels.duration(j.maxDurationMs7d)}`,
         meta: { numeric: true },
-      },
-      {
-        id: 'health',
-        header: intl.formatMessage({ id: 'jobs.col.health' }),
-        cell: ({ row }) => <StatusPill tone={labels.healthTone(row.original.health)}>{labels.health(row.original.health)}</StatusPill>,
       },
     ],
     [intl, labels, when, now, none],
