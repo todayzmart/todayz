@@ -1,0 +1,317 @@
+{
+  "asks.cta.nearby": {
+    "message": "దగ్గరి దుకాణాలను అడగండి",
+    "review": "reviewed",
+    "enHash": "2f82015e"
+  },
+  "asks.cta.shop": {
+    "message": "ఈ దుకాణాన్ని అడగండి",
+    "review": "reviewed",
+    "enHash": "5f3a8b07"
+  },
+  "asks.sheet.nearby": {
+    "message": "మీ దగ్గరి దుకాణాల్లో ఇది ఉందో లేదో మేము అడుగుతాం.",
+    "review": "reviewed",
+    "enHash": "6213db41"
+  },
+  "asks.sheet.shop": {
+    "message": "ఈ దుకాణంలో ఇది ఉందో లేదో మేము అడుగుతాం.",
+    "review": "reviewed",
+    "enHash": "654cbbe9"
+  },
+  "asks.sheet.close": {
+    "message": "మూసివేయండి",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "asks.sheet.item": {
+    "message": "మీకు ఏం కావాలి?",
+    "review": "reviewed",
+    "enHash": "2ef875b9"
+  },
+  "asks.sheet.quantity": {
+    "message": "పరిమాణం",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "asks.sheet.add": {
+    "message": "చేర్చండి",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "asks.sheet.less": {
+    "message": "ఒకటి తక్కువ",
+    "review": "reviewed",
+    "enHash": "05892c7d"
+  },
+  "asks.sheet.more": {
+    "message": "ఇంకొకటి",
+    "review": "reviewed",
+    "enHash": "8c87ebbd"
+  },
+  "asks.sheet.needBy": {
+    "message": "ఎప్పటికి కావాలి",
+    "review": "reviewed",
+    "enHash": "ebd461cf"
+  },
+  "asks.need.now": {
+    "message": "ఇప్పుడే",
+    "review": "reviewed",
+    "enHash": "e3b82040"
+  },
+  "asks.need.today": {
+    "message": "ఈ రోజు",
+    "review": "reviewed",
+    "enHash": "24345a14"
+  },
+  "asks.need.tomorrow": {
+    "message": "రేపు",
+    "review": "reviewed",
+    "enHash": "1948bf2d"
+  },
+  "asks.sheet.privacy": {
+    "message": "దుకాణాలు వస్తువు, పరిమాణం, మీరు సుమారు ఎంత దూరంలో ఉన్నారో మాత్రమే చూస్తాయి. మీ పేరు లేదా నంబర్ ఎప్పుడూ కాదు.",
+    "review": "reviewed",
+    "enHash": "976c532f"
+  },
+  "asks.sheet.noPlace": {
+    "message": "ఏ దుకాణాలను అడగాలో తెలియడానికి మీ లొకేషన్ సెట్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "9216eb6e"
+  },
+  "asks.sheet.setPlace": {
+    "message": "లొకేషన్ సెట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "f1a9152a"
+  },
+  "asks.sheet.placeError": {
+    "message": "మీ లొకేషన్ మాకు దొరకలేదు.",
+    "review": "reviewed",
+    "enHash": "3e3b5ee1"
+  },
+  "asks.sheet.send": {
+    "message": "పంపండి",
+    "review": "reviewed",
+    "enHash": "9bc2575c"
+  },
+  "asks.sheet.signIn": {
+    "message": "పంపడానికి సైన్ ఇన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "b9cb22a0"
+  },
+  "asks.error.limit": {
+    "message": "మీరు రోజుకు {n} అభ్యర్థనలు పంపవచ్చు. రేపు మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "ec90d6cb"
+  },
+  "asks.error.limitPlain": {
+    "message": "ఈ రోజు అభ్యర్థనలు పంపేశారు. రేపు మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "0e263750"
+  },
+  "asks.error.open": {
+    "message": "దీని కోసం మీ అభ్యర్థన ఒకటి ఇప్పటికే తెరిచి ఉంది.",
+    "review": "reviewed",
+    "enHash": "b3de419a"
+  },
+  "asks.error.openLink": {
+    "message": "చూడండి",
+    "review": "reviewed",
+    "enHash": "620c9c35"
+  },
+  "asks.error.noShops": {
+    "message": "ఇప్పుడు దగ్గరి ఏ దుకాణమూ అభ్యర్థన తీసుకోలేదు.",
+    "review": "reviewed",
+    "enHash": "a6c08e1c"
+  },
+  "asks.error.storeUnavailable": {
+    "message": "ఈ దుకాణం ఇప్పుడు అభ్యర్థనలు తీసుకోవడం లేదు.",
+    "review": "reviewed",
+    "enHash": "02e91de0"
+  },
+  "asks.error.invalid": {
+    "message": "వస్తువు, పరిమాణం చూసి, మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "ea124d37"
+  },
+  "asks.error.failed": {
+    "message": "మీ అభ్యర్థనను పంపలేకపోయాం. మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "a99b37d4"
+  },
+  "asks.ordersLink": {
+    "message": "మీ అభ్యర్థనలు",
+    "review": "reviewed",
+    "enHash": "77bf3817"
+  },
+  "asks.title": {
+    "message": "మీ అభ్యర్థనలు",
+    "review": "reviewed",
+    "enHash": "77bf3817"
+  },
+  "asks.back": {
+    "message": "మీ అభ్యర్థనలు",
+    "review": "reviewed",
+    "enHash": "77bf3817"
+  },
+  "asks.loading": {
+    "message": "మీ అభ్యర్థనలు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "9d8c3fab"
+  },
+  "asks.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "asks.gone": {
+    "message": "ఈ అభ్యర్థన దొరకలేదు",
+    "review": "reviewed",
+    "enHash": "f4d97a99"
+  },
+  "asks.error.load": {
+    "message": "మీ అభ్యర్థనలు లోడ్ కాలేదు",
+    "review": "reviewed",
+    "enHash": "b1c92572"
+  },
+  "asks.error.close": {
+    "message": "అభ్యర్థనను మూసివేయలేకపోయాం. మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "07d1cd69"
+  },
+  "asks.empty.title": {
+    "message": "ఇంకా అభ్యర్థనలు లేవు",
+    "review": "reviewed",
+    "enHash": "f9782d98"
+  },
+  "asks.empty.body": {
+    "message": "వెతికినప్పుడు ఏమీ దొరకకపోతే, దగ్గరి దుకాణాలను అడగండి; వాటి జవాబులు ఇక్కడ కనిపిస్తాయి.",
+    "review": "reviewed",
+    "enHash": "3d7ca49f"
+  },
+  "asks.empty.cta": {
+    "message": "వెతకండి",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "asks.list.yes": {
+    "message": "{n, plural, one {# దుకాణంలో ఉంది} other {# దుకాణాల్లో ఉంది}}",
+    "review": "reviewed",
+    "enHash": "8f4f8da5"
+  },
+  "asks.signedOut.title": {
+    "message": "మీ అభ్యర్థనలు చూడటానికి సైన్ ఇన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "ab68f44d"
+  },
+  "asks.signedOut.body": {
+    "message": "మీ అభ్యర్థనలు, దుకాణాల జవాబులు మీ అకౌంట్‌లోనే ఉంటాయి.",
+    "review": "reviewed",
+    "enHash": "7aa8a7a4"
+  },
+  "asks.signedOut.cta": {
+    "message": "సైన్ ఇన్",
+    "review": "reviewed",
+    "enHash": "ada2e9e9"
+  },
+  "asks.quantity": {
+    "message": "పరిమాణం {n}",
+    "review": "reviewed",
+    "enHash": "0c1713be"
+  },
+  "asks.status.open": {
+    "message": "తెరిచి ఉంది",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "asks.status.closed": {
+    "message": "మూసివేయబడింది",
+    "review": "reviewed",
+    "enHash": "88d86b77"
+  },
+  "asks.progress": {
+    "message": "{n, plural, one {# దుకాణాన్ని} other {# దుకాణాలను}} అడిగాం · {r} జవాబిచ్చాయి",
+    "review": "reviewed",
+    "enHash": "3bdf2da4"
+  },
+  "asks.progress.best": {
+    "message": "{n, plural, one {# దుకాణాన్ని} other {# దుకాణాలను}} అడిగాం · {r} జవాబిచ్చాయి · తక్కువ ధర {price}",
+    "review": "reviewed",
+    "enHash": "e4504424"
+  },
+  "asks.windowLeft": {
+    "message": "దుకాణాలు జవాబివ్వడానికి {time} మిగిలి ఉంది",
+    "review": "reviewed",
+    "enHash": "9a15b1e5"
+  },
+  "asks.replies": {
+    "message": "జవాబులు",
+    "review": "reviewed",
+    "enHash": "c8a103c7"
+  },
+  "asks.waiting": {
+    "message": "దుకాణాల కోసం ఎదురుచూస్తున్నాం. చాలావరకు {min} నిమిషాల్లో జవాబిస్తాయి.",
+    "review": "reviewed",
+    "enHash": "cd5f4968"
+  },
+  "asks.none": {
+    "message": "ఇప్పుడు ఏ దుకాణంలోనూ ఇది లేదు. ప్రజలకు ఇది కావాలని దగ్గరి దుకాణాలకు చెప్పాం.",
+    "review": "reviewed",
+    "enHash": "269931fa"
+  },
+  "asks.close": {
+    "message": "అభ్యర్థనను మూసివేయండి",
+    "review": "reviewed",
+    "enHash": "2385e8a9"
+  },
+  "asks.reply.soonest": {
+    "message": "అందరికంటే ముందు సిద్ధం",
+    "review": "reviewed",
+    "enHash": "c7f898b8"
+  },
+  "asks.reply.replied": {
+    "message": "{ago} జవాబిచ్చింది",
+    "review": "reviewed",
+    "enHash": "4029c5ac"
+  },
+  "asks.reply.noPrice": {
+    "message": "ధర దుకాణాన్ని అడగండి",
+    "review": "reviewed",
+    "enHash": "3b877b27"
+  },
+  "asks.reply.price": {
+    "message": "{price}",
+    "review": "reviewed",
+    "enHash": "a58a37f9"
+  },
+  "asks.reply.held": {
+    "message": "ధర ఇంకా {time} ఖచ్చితం",
+    "review": "reviewed",
+    "enHash": "48246caa"
+  },
+  "asks.reply.priceChanged": {
+    "message": "ధర మారి ఉండవచ్చు",
+    "review": "reviewed",
+    "enHash": "37ff7cbb"
+  },
+  "asks.reply.readyBy": {
+    "message": "{time} కల్లా సిద్ధం",
+    "review": "reviewed",
+    "enHash": "31d90ab7"
+  },
+  "asks.reply.book": {
+    "message": "బుక్ చేయండి",
+    "review": "reviewed",
+    "enHash": "f69f2330"
+  },
+  "asks.reply.viewOrder": {
+    "message": "ఆర్డర్ చూడండి",
+    "review": "reviewed",
+    "enHash": "0df27975"
+  },
+  "asks.reply.inStore": {
+    "message": "దుకాణంలో మాత్రమే: దుకాణానికి వెళ్లండి",
+    "review": "reviewed",
+    "enHash": "029cc8c9"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "share.button": {
+    "message": "शेयर करें",
+    "review": "reviewed",
+    "enHash": "09ca55ca"
+  },
+  "share.title": {
+    "message": "शेयर करें",
+    "review": "reviewed",
+    "enHash": "09ca55ca"
+  },
+  "share.close": {
+    "message": "बंद करें",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "share.whatsapp": {
+    "message": "WhatsApp",
+    "review": "reviewed",
+    "enHash": "b336fc55"
+  },
+  "share.more": {
+    "message": "और",
+    "review": "reviewed",
+    "enHash": "4bab2d8f"
+  },
+  "share.copy": {
+    "message": "लिंक कॉपी करें",
+    "review": "reviewed",
+    "enHash": "2f84eea5"
+  },
+  "share.gone": {
+    "message": "यह दुकान अभी TodayZ पर नहीं है",
+    "review": "reviewed",
+    "enHash": "5cf21b57"
+  },
+  "share.gone.body": {
+    "message": "यह सामान अपने पास की दुकानों में खोजें।",
+    "review": "reviewed",
+    "enHash": "3b1156d7"
+  },
+  "share.search": {
+    "message": "सामान खोजें",
+    "review": "reviewed",
+    "enHash": "d48fca59"
+  },
+  "share.searchGo": {
+    "message": "खोजें",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "share.notFound": {
+    "message": "हमें यह लिंक नहीं मिला",
+    "review": "reviewed",
+    "enHash": "304f6d46"
+  },
+  "share.error": {
+    "message": "हम यह लिंक नहीं खोल सके",
+    "review": "reviewed",
+    "enHash": "9fe7754e"
+  },
+  "share.home": {
+    "message": "होम पर जाएँ",
+    "review": "reviewed",
+    "enHash": "f36ae945"
+  }
+}

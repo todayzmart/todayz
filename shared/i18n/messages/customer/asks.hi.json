@@ -1,0 +1,317 @@
+{
+  "asks.cta.nearby": {
+    "message": "पास की दुकानों से पूछें",
+    "review": "reviewed",
+    "enHash": "2f82015e"
+  },
+  "asks.cta.shop": {
+    "message": "इस दुकान से पूछें",
+    "review": "reviewed",
+    "enHash": "5f3a8b07"
+  },
+  "asks.sheet.nearby": {
+    "message": "हम आपके पास की दुकानों से पूछेंगे कि उनके पास यह है या नहीं।",
+    "review": "reviewed",
+    "enHash": "6213db41"
+  },
+  "asks.sheet.shop": {
+    "message": "हम इस दुकान से पूछेंगे कि उसके पास यह है या नहीं।",
+    "review": "reviewed",
+    "enHash": "654cbbe9"
+  },
+  "asks.sheet.close": {
+    "message": "बंद करें",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "asks.sheet.item": {
+    "message": "आपको क्या चाहिए?",
+    "review": "reviewed",
+    "enHash": "2ef875b9"
+  },
+  "asks.sheet.quantity": {
+    "message": "मात्रा",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "asks.sheet.add": {
+    "message": "जोड़ें",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "asks.sheet.less": {
+    "message": "एक कम",
+    "review": "reviewed",
+    "enHash": "05892c7d"
+  },
+  "asks.sheet.more": {
+    "message": "एक और",
+    "review": "reviewed",
+    "enHash": "8c87ebbd"
+  },
+  "asks.sheet.needBy": {
+    "message": "कब तक चाहिए",
+    "review": "reviewed",
+    "enHash": "ebd461cf"
+  },
+  "asks.need.now": {
+    "message": "अभी",
+    "review": "reviewed",
+    "enHash": "e3b82040"
+  },
+  "asks.need.today": {
+    "message": "आज",
+    "review": "reviewed",
+    "enHash": "24345a14"
+  },
+  "asks.need.tomorrow": {
+    "message": "कल",
+    "review": "reviewed",
+    "enHash": "1948bf2d"
+  },
+  "asks.sheet.privacy": {
+    "message": "दुकानें सामान, मात्रा और आप लगभग कितनी दूर हैं, यही देखती हैं। आपका नाम या नंबर कभी नहीं।",
+    "review": "reviewed",
+    "enHash": "976c532f"
+  },
+  "asks.sheet.noPlace": {
+    "message": "अपनी लोकेशन चुनें, ताकि हमें पता चले कि किन दुकानों से पूछना है।",
+    "review": "reviewed",
+    "enHash": "9216eb6e"
+  },
+  "asks.sheet.setPlace": {
+    "message": "लोकेशन चुनें",
+    "review": "reviewed",
+    "enHash": "f1a9152a"
+  },
+  "asks.sheet.placeError": {
+    "message": "हमें आपकी लोकेशन नहीं मिल सकी।",
+    "review": "reviewed",
+    "enHash": "3e3b5ee1"
+  },
+  "asks.sheet.send": {
+    "message": "भेजें",
+    "review": "reviewed",
+    "enHash": "9bc2575c"
+  },
+  "asks.sheet.signIn": {
+    "message": "भेजने के लिए साइन इन करें",
+    "review": "reviewed",
+    "enHash": "b9cb22a0"
+  },
+  "asks.error.limit": {
+    "message": "आप एक दिन में {n} माँगें भेज सकते हैं। कल फिर कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "ec90d6cb"
+  },
+  "asks.error.limitPlain": {
+    "message": "आपने आज की माँगें भेज दी हैं। कल फिर कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "0e263750"
+  },
+  "asks.error.open": {
+    "message": "इसके लिए आपकी एक माँग पहले से खुली है।",
+    "review": "reviewed",
+    "enHash": "b3de419a"
+  },
+  "asks.error.openLink": {
+    "message": "देखें",
+    "review": "reviewed",
+    "enHash": "620c9c35"
+  },
+  "asks.error.noShops": {
+    "message": "अभी पास की कोई दुकान माँग नहीं ले सकती।",
+    "review": "reviewed",
+    "enHash": "a6c08e1c"
+  },
+  "asks.error.storeUnavailable": {
+    "message": "यह दुकान अभी माँगें नहीं ले रही है।",
+    "review": "reviewed",
+    "enHash": "02e91de0"
+  },
+  "asks.error.invalid": {
+    "message": "सामान और मात्रा जाँचें, फिर कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "ea124d37"
+  },
+  "asks.error.failed": {
+    "message": "हम आपकी माँग नहीं भेज सके। फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "a99b37d4"
+  },
+  "asks.ordersLink": {
+    "message": "आपकी माँगें",
+    "review": "reviewed",
+    "enHash": "77bf3817"
+  },
+  "asks.title": {
+    "message": "आपकी माँगें",
+    "review": "reviewed",
+    "enHash": "77bf3817"
+  },
+  "asks.back": {
+    "message": "आपकी माँगें",
+    "review": "reviewed",
+    "enHash": "77bf3817"
+  },
+  "asks.loading": {
+    "message": "आपकी माँगें लोड हो रही हैं",
+    "review": "reviewed",
+    "enHash": "9d8c3fab"
+  },
+  "asks.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "asks.gone": {
+    "message": "हमें यह माँग नहीं मिली",
+    "review": "reviewed",
+    "enHash": "f4d97a99"
+  },
+  "asks.error.load": {
+    "message": "हम आपकी माँगें लोड नहीं कर सके",
+    "review": "reviewed",
+    "enHash": "b1c92572"
+  },
+  "asks.error.close": {
+    "message": "हम माँग बंद नहीं कर सके। फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "07d1cd69"
+  },
+  "asks.empty.title": {
+    "message": "अभी कोई माँग नहीं",
+    "review": "reviewed",
+    "enHash": "f9782d98"
+  },
+  "asks.empty.body": {
+    "message": "जब खोज में कुछ न मिले, पास की दुकानों से पूछें; उनके जवाब यहाँ दिखेंगे।",
+    "review": "reviewed",
+    "enHash": "3d7ca49f"
+  },
+  "asks.empty.cta": {
+    "message": "खोजें",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "asks.list.yes": {
+    "message": "{n, plural, one {# दुकान के पास है} other {# दुकानों के पास है}}",
+    "review": "reviewed",
+    "enHash": "8f4f8da5"
+  },
+  "asks.signedOut.title": {
+    "message": "अपनी माँगें देखने के लिए साइन इन करें",
+    "review": "reviewed",
+    "enHash": "ab68f44d"
+  },
+  "asks.signedOut.body": {
+    "message": "आपकी माँगें और दुकानों के जवाब आपके अकाउंट में रहते हैं।",
+    "review": "reviewed",
+    "enHash": "7aa8a7a4"
+  },
+  "asks.signedOut.cta": {
+    "message": "साइन इन करें",
+    "review": "reviewed",
+    "enHash": "ada2e9e9"
+  },
+  "asks.quantity": {
+    "message": "मात्रा {n}",
+    "review": "reviewed",
+    "enHash": "0c1713be"
+  },
+  "asks.status.open": {
+    "message": "खुली",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "asks.status.closed": {
+    "message": "बंद",
+    "review": "reviewed",
+    "enHash": "88d86b77"
+  },
+  "asks.progress": {
+    "message": "{n, plural, one {# दुकान} other {# दुकानों}} से पूछा · {r} ने जवाब दिया",
+    "review": "reviewed",
+    "enHash": "3bdf2da4"
+  },
+  "asks.progress.best": {
+    "message": "{n, plural, one {# दुकान} other {# दुकानों}} से पूछा · {r} ने जवाब दिया · सबसे कम {price}",
+    "review": "reviewed",
+    "enHash": "e4504424"
+  },
+  "asks.windowLeft": {
+    "message": "दुकानों के जवाब के लिए {time} बाकी",
+    "review": "reviewed",
+    "enHash": "9a15b1e5"
+  },
+  "asks.replies": {
+    "message": "जवाब",
+    "review": "reviewed",
+    "enHash": "c8a103c7"
+  },
+  "asks.waiting": {
+    "message": "दुकानों के जवाब का इंतज़ार। ज़्यादातर {min} मिनट में जवाब देती हैं।",
+    "review": "reviewed",
+    "enHash": "cd5f4968"
+  },
+  "asks.none": {
+    "message": "अभी किसी दुकान के पास यह नहीं है। हमने पास की दुकानों को बता दिया है कि लोगों को यह चाहिए।",
+    "review": "reviewed",
+    "enHash": "269931fa"
+  },
+  "asks.close": {
+    "message": "माँग बंद करें",
+    "review": "reviewed",
+    "enHash": "2385e8a9"
+  },
+  "asks.reply.soonest": {
+    "message": "सबसे जल्दी तैयार",
+    "review": "reviewed",
+    "enHash": "c7f898b8"
+  },
+  "asks.reply.replied": {
+    "message": "{ago} जवाब दिया",
+    "review": "reviewed",
+    "enHash": "4029c5ac"
+  },
+  "asks.reply.noPrice": {
+    "message": "दाम दुकान से पूछें",
+    "review": "reviewed",
+    "enHash": "3b877b27"
+  },
+  "asks.reply.price": {
+    "message": "{price}",
+    "review": "reviewed",
+    "enHash": "a58a37f9"
+  },
+  "asks.reply.held": {
+    "message": "दाम {time} के लिए पक्का",
+    "review": "reviewed",
+    "enHash": "48246caa"
+  },
+  "asks.reply.priceChanged": {
+    "message": "दाम बदल गया हो सकता है",
+    "review": "reviewed",
+    "enHash": "37ff7cbb"
+  },
+  "asks.reply.readyBy": {
+    "message": "{time} तक तैयार",
+    "review": "reviewed",
+    "enHash": "31d90ab7"
+  },
+  "asks.reply.book": {
+    "message": "बुक करें",
+    "review": "reviewed",
+    "enHash": "f69f2330"
+  },
+  "asks.reply.viewOrder": {
+    "message": "ऑर्डर देखें",
+    "review": "reviewed",
+    "enHash": "0df27975"
+  },
+  "asks.reply.inStore": {
+    "message": "सिर्फ़ दुकान पर: दुकान पर जाएँ",
+    "review": "reviewed",
+    "enHash": "029cc8c9"
+  }
+}

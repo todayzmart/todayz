@@ -1,0 +1,67 @@
+{
+  "share.button": {
+    "message": "ಹಂಚಿಕೊಳ್ಳಿ",
+    "review": "reviewed",
+    "enHash": "09ca55ca"
+  },
+  "share.title": {
+    "message": "ಹಂಚಿಕೊಳ್ಳಿ",
+    "review": "reviewed",
+    "enHash": "09ca55ca"
+  },
+  "share.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "share.whatsapp": {
+    "message": "WhatsApp",
+    "review": "reviewed",
+    "enHash": "b336fc55"
+  },
+  "share.more": {
+    "message": "ಇನ್ನಷ್ಟು",
+    "review": "reviewed",
+    "enHash": "4bab2d8f"
+  },
+  "share.copy": {
+    "message": "ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "2f84eea5"
+  },
+  "share.gone": {
+    "message": "ಈ ಅಂಗಡಿ ಈಗ TodayZ ನಲ್ಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "5cf21b57"
+  },
+  "share.gone.body": {
+    "message": "ಈ ವಸ್ತುವನ್ನು ನಿಮ್ಮ ಹತ್ತಿರದ ಅಂಗಡಿಗಳಲ್ಲಿ ಹುಡುಕಿ.",
+    "review": "reviewed",
+    "enHash": "3b1156d7"
+  },
+  "share.search": {
+    "message": "ವಸ್ತುವನ್ನು ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "d48fca59"
+  },
+  "share.searchGo": {
+    "message": "ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "share.notFound": {
+    "message": "ಈ ಲಿಂಕ್ ಸಿಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "304f6d46"
+  },
+  "share.error": {
+    "message": "ಈ ಲಿಂಕ್ ತೆರೆಯಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "9fe7754e"
+  },
+  "share.home": {
+    "message": "ಹೋಮ್‌ಗೆ ಹೋಗಿ",
+    "review": "reviewed",
+    "enHash": "f36ae945"
+  }
+}

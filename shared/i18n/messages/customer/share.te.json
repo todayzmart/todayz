@@ -1,0 +1,67 @@
+{
+  "share.button": {
+    "message": "షేర్ చేయండి",
+    "review": "reviewed",
+    "enHash": "09ca55ca"
+  },
+  "share.title": {
+    "message": "షేర్ చేయండి",
+    "review": "reviewed",
+    "enHash": "09ca55ca"
+  },
+  "share.close": {
+    "message": "మూసివేయండి",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "share.whatsapp": {
+    "message": "WhatsApp",
+    "review": "reviewed",
+    "enHash": "b336fc55"
+  },
+  "share.more": {
+    "message": "ఇంకా",
+    "review": "reviewed",
+    "enHash": "4bab2d8f"
+  },
+  "share.copy": {
+    "message": "లింక్ కాపీ చేయండి",
+    "review": "reviewed",
+    "enHash": "2f84eea5"
+  },
+  "share.gone": {
+    "message": "ఈ దుకాణం ఇప్పుడు TodayZ లో లేదు",
+    "review": "reviewed",
+    "enHash": "5cf21b57"
+  },
+  "share.gone.body": {
+    "message": "ఈ వస్తువును మీ దగ్గరి దుకాణాల్లో వెతకండి.",
+    "review": "reviewed",
+    "enHash": "3b1156d7"
+  },
+  "share.search": {
+    "message": "వస్తువును వెతకండి",
+    "review": "reviewed",
+    "enHash": "d48fca59"
+  },
+  "share.searchGo": {
+    "message": "వెతకండి",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "share.notFound": {
+    "message": "ఈ లింక్ దొరకలేదు",
+    "review": "reviewed",
+    "enHash": "304f6d46"
+  },
+  "share.error": {
+    "message": "ఈ లింక్ తెరవలేకపోయాం",
+    "review": "reviewed",
+    "enHash": "9fe7754e"
+  },
+  "share.home": {
+    "message": "హోమ్‌కి వెళ్లండి",
+    "review": "reviewed",
+    "enHash": "f36ae945"
+  }
+}
