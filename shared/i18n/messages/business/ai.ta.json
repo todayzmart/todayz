@@ -1,0 +1,367 @@
+{
+  "ai.again": {
+    "message": "மீண்டும் முயற்சிக்கவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "ai.backToStock": {
+    "message": "ஸ்டாக்கிற்குச் செல்லவும்",
+    "review": "reviewed",
+    "enHash": "55742732"
+  },
+  "ai.closed": {
+    "message": "இந்த வரைவு முடிந்துவிட்டது. புதியதைத் தொடங்கவும்.",
+    "review": "reviewed",
+    "enHash": "a661d472"
+  },
+  "ai.discard": {
+    "message": "வரைவை நீக்கவும்",
+    "review": "reviewed",
+    "enHash": "3a09ce0d"
+  },
+  "ai.draftNote": {
+    "message": "AI பரிந்துரை. ஒவ்வொரு வரியையும் சரிபார்க்கவும்; நீங்கள் உறுதிசெய்யும் வரை எதுவும் மாறாது.",
+    "review": "reviewed",
+    "enHash": "df75a916"
+  },
+  "ai.insight.worded": {
+    "message": "AI எழுதியது",
+    "review": "reviewed",
+    "enHash": "e1ec3954"
+  },
+  "ai.photo.help": {
+    "message": "நல்ல வெளிச்சத்தில் தெளிவான புகைப்படம், {mb} MB வரை",
+    "review": "reviewed",
+    "enHash": "a821e356"
+  },
+  "ai.photo.type": {
+    "message": "இந்தக் கோப்பைப் படிக்க முடியாது. புகைப்படம் எடுக்கவும் அல்லது தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "845632a4"
+  },
+  "ai.photo.size": {
+    "message": "இந்தப் புகைப்படம் {mb} MB-க்கு மேல் உள்ளது. சிறியதைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "65d63829"
+  },
+  "ai.error.cap": {
+    "message": "இந்தக் கடைக்கான இன்றைய AI உதவி முடிந்துவிட்டது. பிறகு முயற்சிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "fb85c9e3"
+  },
+  "ai.error.capFor": {
+    "message": "இப்போதைக்கு AI உதவி முடிந்துவிட்டது. {mins, plural, one {# நிமிடம்} other {# நிமிடங்கள்}} கழித்து முயற்சிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "084d0337"
+  },
+  "ai.error.off": {
+    "message": "இந்த AI உதவி உங்கள் கடைக்கு இயக்கத்தில் இல்லை.",
+    "review": "reviewed",
+    "enHash": "68a74895"
+  },
+  "ai.error.changed": {
+    "message": "இந்த வரைவு மாறிவிட்டது. இப்போதைய தகவலைப் பார்க்க மீண்டும் தொடங்கவும்.",
+    "review": "reviewed",
+    "enHash": "6d898345"
+  },
+  "ai.error.photo": {
+    "message": "இந்தப் புகைப்படத்தை அனுப்ப முடியவில்லை. அதன் வகை மற்றும் அளவைச் சரிபார்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "60551ac4"
+  },
+  "ai.error.invalid": {
+    "message": "சில விவரங்களைச் சரிசெய்ய வேண்டும். கீழே குறித்த வரிகளைப் பார்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "28db3711"
+  },
+  "ai.error.offline": {
+    "message": "நீங்கள் ஆஃப்லைனில் இருப்பதாகத் தெரிகிறது. இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "81b7d772"
+  },
+  "ai.error.generic": {
+    "message": "ஏதோ தவறு நடந்தது. மீண்டும் முயற்சிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "4244e822"
+  },
+  "ai.err.range": {
+    "message": "இந்த எண்ணைச் சரிபார்க்கவும்",
+    "review": "reviewed",
+    "enHash": "239355d1"
+  },
+  "ai.err.above_mrp": {
+    "message": "MRP-ஐ விட அதிகம்",
+    "review": "reviewed",
+    "enHash": "8f3be78d"
+  },
+  "ai.err.past": {
+    "message": "இந்தத் தேதி கடந்துவிட்டது",
+    "review": "reviewed",
+    "enHash": "6792f0a7"
+  },
+  "ai.err.date": {
+    "message": "தேதியை உள்ளிடவும்",
+    "review": "reviewed",
+    "enHash": "64ceee5b"
+  },
+  "ai.err.required": {
+    "message": "தேவை",
+    "review": "reviewed",
+    "enHash": "27c0ee6e"
+  },
+  "ai.err.not_in_store": {
+    "message": "இது இந்தக் கடையின் பொருள் அல்ல",
+    "review": "reviewed",
+    "enHash": "59f405fb"
+  },
+  "ai.err.invalid": {
+    "message": "இந்த வரியைச் சரிபார்க்கவும்",
+    "review": "reviewed",
+    "enHash": "698e45b4"
+  },
+  "ai.err.no_product": {
+    "message": "பட்டியலில் இல்லை",
+    "review": "reviewed",
+    "enHash": "940e8a73"
+  },
+  "ai.err.duplicate": {
+    "message": "இந்தப் பட்டியலில் ஏற்கனவே உள்ளது",
+    "review": "reviewed",
+    "enHash": "15b6db98"
+  },
+  "ai.err.already_listed": {
+    "message": "உங்கள் ஸ்டாக்கில் ஏற்கனவே உள்ளது",
+    "review": "reviewed",
+    "enHash": "6762efb2"
+  },
+  "ai.err.quantity": {
+    "message": "முழு எண்ணை உள்ளிடவும்",
+    "review": "reviewed",
+    "enHash": "b394c9ca"
+  },
+  "ai.err.price": {
+    "message": "ரூபாயில் விலையை உள்ளிடவும்",
+    "review": "reviewed",
+    "enHash": "c223f02c"
+  },
+  "ai.bill.title": {
+    "message": "சப்ளையர் பில்லை ஸ்கேன் செய்யவும்",
+    "review": "reviewed",
+    "enHash": "4c70718c"
+  },
+  "ai.bill.desc": {
+    "message": "பில்லின் புகைப்படம் எடுக்கவும். அதன் வரிகளை உங்கள் பொருட்களுடன் பொருத்துகிறோம்; நீங்கள் சரிபார்த்து ஸ்டாக்கைச் சேர்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "c5ae78ac"
+  },
+  "ai.bill.pick": {
+    "message": "புகைப்படம் எடுக்கவும் அல்லது தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "097ac225"
+  },
+  "ai.bill.reading": {
+    "message": "பில் படிக்கப்படுகிறது…",
+    "review": "reviewed",
+    "enHash": "65179e5a"
+  },
+  "ai.bill.failed": {
+    "message": "இந்த பில்லைப் படிக்க முடியவில்லை. சமமாக வைத்து நல்ல வெளிச்சத்தில் தெளிவான புகைப்படம் எடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "d2ec5dac"
+  },
+  "ai.bill.off": {
+    "message": "பில் ஸ்கேன் உங்கள் கடைக்கு இயக்கத்தில் இல்லை",
+    "review": "reviewed",
+    "enHash": "d6fe4a22"
+  },
+  "ai.bill.from": {
+    "message": "{supplier} இடமிருந்து",
+    "review": "reviewed",
+    "enHash": "c70f3f37"
+  },
+  "ai.bill.lines": {
+    "message": "பில் வரிகள்",
+    "review": "reviewed",
+    "enHash": "cfd6514f"
+  },
+  "ai.bill.matched": {
+    "message": "பில்லில்: {bill} · இப்போது ஸ்டாக்கில் {n}",
+    "review": "reviewed",
+    "enHash": "d08ba258"
+  },
+  "ai.bill.unmatched": {
+    "message": "பில்லில்: {bill} · உங்கள் பொருள் அல்ல",
+    "review": "reviewed",
+    "enHash": "0a5ff5e2"
+  },
+  "ai.bill.unmatchedHelp": {
+    "message": "உங்கள் பொருட்கள் அல்லாத வரிகள் விடப்படும். முதலில் ஸ்டாக்கில் பொருளைச் சேர்த்து, பிறகு மீண்டும் ஸ்கேன் செய்யவும்.",
+    "review": "reviewed",
+    "enHash": "83d28323"
+  },
+  "ai.bill.mrp": {
+    "message": "MRP {mrp}",
+    "review": "reviewed",
+    "enHash": "5f2751fd"
+  },
+  "ai.bill.qty": {
+    "message": "அளவு",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "ai.bill.cost": {
+    "message": "வாங்கிய விலை",
+    "review": "reviewed",
+    "enHash": "b0e0a2d5"
+  },
+  "ai.bill.expiry": {
+    "message": "காலாவதி தேதி",
+    "review": "reviewed",
+    "enHash": "ba8f571e"
+  },
+  "ai.bill.confirm": {
+    "message": "{n, plural, =0 {சேர்க்க எதுவும் இல்லை} one {# பொருளுக்கு ஸ்டாக் சேர்க்கவும்} other {# பொருட்களுக்கு ஸ்டாக் சேர்க்கவும்}}",
+    "review": "reviewed",
+    "enHash": "14c7e60e"
+  },
+  "ai.bill.done": {
+    "message": "{n, plural, =0 {ஸ்டாக் எதுவும் சேர்க்கப்படவில்லை} one {# பொருளுக்கு ஸ்டாக் சேர்க்கப்பட்டது} other {# பொருட்களுக்கு ஸ்டாக் சேர்க்கப்பட்டது}}",
+    "review": "reviewed",
+    "enHash": "e1105ab3"
+  },
+  "ai.bill.discarded": {
+    "message": "வரைவு நீக்கப்பட்டது. எதுவும் சேர்க்கப்படவில்லை.",
+    "review": "reviewed",
+    "enHash": "581cb8d0"
+  },
+  "ai.bill.another": {
+    "message": "இன்னொரு பில்லை ஸ்கேன் செய்யவும்",
+    "review": "reviewed",
+    "enHash": "3bb2cbfa"
+  },
+  "ai.shelf.title": {
+    "message": "அலமாரி புகைப்படத்திலிருந்து ஸ்டாக் சேர்க்கவும்",
+    "review": "reviewed",
+    "enHash": "7499282c"
+  },
+  "ai.shelf.desc": {
+    "message": "அலமாரியின் புகைப்படம் எடுக்கவும். பட்டியலில் பொருட்களைக் கண்டுபிடிக்கிறோம்; எதை, என்ன விலைக்கு விற்பது என்று நீங்கள் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "66d96c07"
+  },
+  "ai.shelf.pick": {
+    "message": "புகைப்படம் எடுக்கவும் அல்லது தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "097ac225"
+  },
+  "ai.shelf.reading": {
+    "message": "அலமாரி பார்க்கப்படுகிறது…",
+    "review": "reviewed",
+    "enHash": "d0780c4f"
+  },
+  "ai.shelf.failed": {
+    "message": "இந்தப் புகைப்படத்தில் பொருட்கள் கிடைக்கவில்லை. அருகில் இருந்து தெளிவான புகைப்படம் எடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "1266f886"
+  },
+  "ai.shelf.off": {
+    "message": "அலமாரி புகைப்படம் உங்கள் கடைக்கு இயக்கத்தில் இல்லை",
+    "review": "reviewed",
+    "enHash": "cce50c9f"
+  },
+  "ai.shelf.lines": {
+    "message": "கிடைத்த பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "0e4425df"
+  },
+  "ai.shelf.unmatched": {
+    "message": "தெரிந்தது: {seen} · பட்டியலில் இல்லை",
+    "review": "reviewed",
+    "enHash": "a21072af"
+  },
+  "ai.shelf.listed": {
+    "message": "உங்கள் ஸ்டாக்கில் ஏற்கனவே உள்ளது",
+    "review": "reviewed",
+    "enHash": "6762efb2"
+  },
+  "ai.shelf.price": {
+    "message": "உங்கள் விலை",
+    "review": "reviewed",
+    "enHash": "16a067af"
+  },
+  "ai.shelf.opening": {
+    "message": "தொடக்க ஸ்டாக்",
+    "review": "reviewed",
+    "enHash": "38b7df56"
+  },
+  "ai.shelf.openingHelp": {
+    "message": "விருப்பம். பிறகு எண்ண காலியாக விடவும்.",
+    "review": "reviewed",
+    "enHash": "be82f640"
+  },
+  "ai.shelf.confirm": {
+    "message": "{n, plural, =0 {சேர்க்க எதுவும் இல்லை} one {# பொருளைச் சேர்க்கவும்} other {# பொருட்களைச் சேர்க்கவும்}}",
+    "review": "reviewed",
+    "enHash": "b40a6a21"
+  },
+  "ai.shelf.done": {
+    "message": "{n, plural, =0 {பொருள் எதுவும் சேர்க்கப்படவில்லை} one {# பொருள் உங்கள் ஸ்டாக்கில் சேர்க்கப்பட்டது} other {# பொருட்கள் உங்கள் ஸ்டாக்கில் சேர்க்கப்பட்டன}}",
+    "review": "reviewed",
+    "enHash": "1d716271"
+  },
+  "ai.shelf.discarded": {
+    "message": "வரைவு நீக்கப்பட்டது. எதுவும் சேர்க்கப்படவில்லை.",
+    "review": "reviewed",
+    "enHash": "581cb8d0"
+  },
+  "ai.shelf.another": {
+    "message": "இன்னொரு அலமாரியை ஸ்கேன் செய்யவும்",
+    "review": "reviewed",
+    "enHash": "3cbbbf0c"
+  },
+  "ai.reply.draft": {
+    "message": "பதில் வரைவை உருவாக்கவும்",
+    "review": "reviewed",
+    "enHash": "d7d6d9c7"
+  },
+  "ai.reply.note": {
+    "message": "AI வரைவு செய்தது. விரும்பியபடி மாற்றவும்; நீங்கள் அனுப்பும்போது மட்டுமே போகும்.",
+    "review": "reviewed",
+    "enHash": "f1f53f11"
+  },
+  "ai.reply.failed": {
+    "message": "இந்த முறை வரைவு வரவில்லை. உங்கள் பதிலை எழுதவும்.",
+    "review": "reviewed",
+    "enHash": "a4f32319"
+  },
+  "ai.banner.suggest": {
+    "message": "சொற்களைப் பரிந்துரைக்கவும்",
+    "review": "reviewed",
+    "enHash": "fa02e971"
+  },
+  "ai.banner.writing": {
+    "message": "விருப்பங்கள் எழுதப்படுகின்றன…",
+    "review": "reviewed",
+    "enHash": "7ce53a62"
+  },
+  "ai.banner.failed": {
+    "message": "இந்த முறை பரிந்துரைகள் வரவில்லை. நீங்களே எழுதவும்.",
+    "review": "reviewed",
+    "enHash": "a307457c"
+  },
+  "ai.banner.options": {
+    "message": "சொற்களைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "5890d694"
+  },
+  "ai.banner.use": {
+    "message": "இதைப் பயன்படுத்தவும்",
+    "review": "reviewed",
+    "enHash": "b80ded59"
+  },
+  "ai.banner.none": {
+    "message": "இவற்றில் எதுவும் வேண்டாம்",
+    "review": "reviewed",
+    "enHash": "175ed947"
+  }
+}

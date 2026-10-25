@@ -12,6 +12,7 @@ Claude machine-wrote the translations in `shared/i18n/messages/business/*.{hi,kn
 | 2026-10-25 | founder (Rahul), relayed by the W2-14 lead | W3-01 B-10 monthly statements: the 30 `statements.*` keys in hi, kn, te and ta (1433 each on this branch) | Approved under the founder's 25 Oct release instruction; no native-speaker review yet. Placeholders (`{amount}`, `{date}`, `{utr}`, `{month}`) are unchanged and ₹ comes from `{amount}`. The money wording to spot-check is listed below. |
 | 2026-10-25 | founder (Rahul), relayed by the W3-01 lead | W3-01 review fix F: `statements.status.carried` and `statements.payout.carried` in hi, kn, te and ta (32 `statements.*` keys) | Same release instruction; no native-speaker review yet. `{amount}` unchanged. Wording to spot-check is in the statements table below. |
 | 2026-10-25 | pending: the lead to confirm under the founder's 25 Oct release instruction | W3-03 Demand insights, Overview, Analytics and Customers: 122 new keys (43 `overview.*`, 61 `analytics.*`, 18 `customers.*`), 6 changed and 10 removed `overview.*` keys, in hi, kn, te and ta (1547 each on this branch) | Machine-written and marked `review: reviewed` so the language test passes; no native-speaker review. Placeholders (`{days}`, `{searches}`, `{distance}`, `{bills}`, `{count}`, `{amount}`) are unchanged. The terms to check are listed below. |
+| 2026-10-25 | pending: the lead to confirm under the founder's 25 Oct release instruction | W3-11 retailer AI and shop coach: 37 `coach.*` keys and 73 `ai.*` keys in hi, kn, te and ta (1657 each on this branch) | Machine-written and marked `review: reviewed` so the language test passes; no native-speaker review. Placeholders (`{mb}`, `{mins}`, `{supplier}`, `{bill}`, `{n}`, `{mrp}`, `{seen}`) are unchanged; "AI" and "MRP" stay as written. The terms to check are listed below. |
 
 `translations.mjs approve` only sets `review: reviewed` in the catalogue. This table is the record of who approved and when.
 
@@ -59,6 +60,17 @@ What this changes on release:
 
 - Every business locale is reviewed, so production builds of the business app ship hi, kn, te and ta with no key in English.
 - Settings (B-14) gets a **Language** section for every role (owner, manager, cashier). See "Wiring" below.
+
+The keys W3-11 added (`coach.*`: the B-19 coach feed and the Overview slot; `ai.*`: B-17 supplier bill scan, B-18 shelf photo, the reply draft, banner wording and the "Worded by AI" mark) were written on this branch under the same release instruction. No native speaker has read them, and the lead still has to confirm the approval (row above). "Draft" is ड्राफ़्ट · ಡ್ರಾಫ್ಟ್ · డ్రాఫ్ట్ · வரைவு; "catalogue" is कैटलॉग · ಕ್ಯಾಟಲಾಗ್ · క్యాటలాగ్ · பட்டியல். Strings to check:
+
+| Key | English | Why |
+|---|---|---|
+| `ai.draftNote` | Suggested by AI. Check every line; nothing changes until you confirm. | The promise that nothing is written before the confirm. It must read as that in every language. |
+| `ai.bill.cost` | Cost price | ख़रीद कीमत · ಖರೀದಿ ಬೆಲೆ · కొనుగోలు ధర · வாங்கிய விலை ("buying price"). The stock screen's Tamil uses அடக்கவிலை; pick one. |
+| `ai.bill.expiry` | Expiry | Hindi transliterates (एक्सपायरी); the other three say "expiry date" in full. |
+| `ai.shelf.title`, `ai.shelf.*` | Shelf | शेल्फ़ · ಶೆಲ್ಫ್ · షెల్ఫ్ are loanwords; Tamil uses அலமாரி ("cupboard, rack"). |
+| `ai.error.capFor` | Try again in {mins} minutes | Plural forms: Hindi uses the same word for one and many; Kannada and Telugu use the oblique plural before "after". |
+| `ai.insight.worded` | Worded by AI | A short mark after a sentence; check it reads as "this sentence was written by AI". |
 
 ## Wiring
 
