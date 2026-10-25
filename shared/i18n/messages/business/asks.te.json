@@ -1,0 +1,327 @@
+{
+  "asks.loading": {
+    "message": "అభ్యర్థనలు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "7d65f4f4"
+  },
+  "asks.error.load": {
+    "message": "అభ్యర్థనలను లోడ్ చేయలేకపోయాం",
+    "review": "reviewed",
+    "enHash": "5222921f"
+  },
+  "asks.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "asks.empty.title": {
+    "message": "ప్రస్తుతం అభ్యర్థనలు లేవు",
+    "review": "reviewed",
+    "enHash": "4a548cce"
+  },
+  "asks.empty.body": {
+    "message": "దగ్గర్లోని కస్టమర్లు మీ దగ్గర ఏదైనా ఉందా అని అడగవచ్చు.",
+    "review": "reviewed",
+    "enHash": "423b8f7d"
+  },
+  "asks.muted": {
+    "message": "ఈ షాప్‌కు అభ్యర్థనలు ఆఫ్‌లో ఉన్నాయి",
+    "review": "reviewed",
+    "enHash": "5f372058"
+  },
+  "asks.muted.settings": {
+    "message": "సెట్టింగ్‌లు తెరవండి",
+    "review": "reviewed",
+    "enHash": "fd7108f8"
+  },
+  "asks.open": {
+    "message": "మీ సమాధానం కోసం వేచి ఉన్నాయి",
+    "review": "reviewed",
+    "enHash": "8058b968"
+  },
+  "asks.done": {
+    "message": "ఈ రోజు పూర్తయినవి",
+    "review": "reviewed",
+    "enHash": "d4b4cebd"
+  },
+  "asks.earlier": {
+    "message": "ఇంతకు ముందువి",
+    "review": "reviewed",
+    "enHash": "13f7aee7"
+  },
+  "asks.earlier.show": {
+    "message": "ఇంతకు ముందు అభ్యర్థనలు చూపించండి",
+    "review": "reviewed",
+    "enHash": "1d874682"
+  },
+  "asks.more": {
+    "message": "మరిన్ని చూపించండి",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "asks.quantity": {
+    "message": "{n} కావాలి",
+    "review": "reviewed",
+    "enHash": "1d05ba25"
+  },
+  "asks.need.now": {
+    "message": "ఇప్పుడే కావాలి",
+    "review": "reviewed",
+    "enHash": "a0571b5c"
+  },
+  "asks.need.today": {
+    "message": "ఈ రోజు కావాలి",
+    "review": "reviewed",
+    "enHash": "d865550e"
+  },
+  "asks.need.tomorrow": {
+    "message": "రేపు కావాలి",
+    "review": "reviewed",
+    "enHash": "7d8e35fd"
+  },
+  "asks.band.lt_1km": {
+    "message": "1 km కంటే తక్కువ",
+    "review": "reviewed",
+    "enHash": "b6b4a253"
+  },
+  "asks.band.1_3km": {
+    "message": "1–3 km",
+    "review": "reviewed",
+    "enHash": "938ed989"
+  },
+  "asks.band.3_5km": {
+    "message": "3–5 km",
+    "review": "reviewed",
+    "enHash": "74974b4a"
+  },
+  "asks.band.gt_5km": {
+    "message": "5 km కంటే ఎక్కువ",
+    "review": "reviewed",
+    "enHash": "07378d0d"
+  },
+  "asks.card.timeLeft": {
+    "message": "సమాధానం ఇవ్వడానికి {time} మిగిలి ఉంది",
+    "review": "reviewed",
+    "enHash": "104ddb23"
+  },
+  "asks.card.over": {
+    "message": "సమాధానం ఇచ్చే సమయం ముగిసింది",
+    "review": "reviewed",
+    "enHash": "ff8dcbd5"
+  },
+  "asks.card.reply": {
+    "message": "సమాధానం ఇవ్వండి",
+    "review": "reviewed",
+    "enHash": "6c2bb735"
+  },
+  "asks.card.replyA11y": {
+    "message": "{item} అభ్యర్థనకు సమాధానం ఇవ్వండి",
+    "review": "reviewed",
+    "enHash": "d28b02ee"
+  },
+  "asks.card.report": {
+    "message": "రిపోర్ట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "ee45c303"
+  },
+  "asks.card.reportA11y": {
+    "message": "{item} అభ్యర్థనను రిపోర్ట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "5fcfbf10"
+  },
+  "asks.status.yes": {
+    "message": "మీరు అవును అన్నారు",
+    "review": "reviewed",
+    "enHash": "bcdd0bdd"
+  },
+  "asks.status.no": {
+    "message": "మీరు లేదు అన్నారు",
+    "review": "reviewed",
+    "enHash": "a3169474"
+  },
+  "asks.status.missed": {
+    "message": "మిస్ అయింది",
+    "review": "reviewed",
+    "enHash": "b564001a"
+  },
+  "asks.reported": {
+    "message": "రిపోర్ట్ చేశారు",
+    "review": "reviewed",
+    "enHash": "73c20ded"
+  },
+  "asks.sheet.close": {
+    "message": "మూసివేయండి",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "asks.sheet.back": {
+    "message": "వెనక్కి",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "asks.reply.wants": {
+    "message": "దగ్గర్లోని ఒక కస్టమర్‌కు {n} కావాలి. మీ దగ్గర ఉందా?",
+    "review": "reviewed",
+    "enHash": "9507eb52"
+  },
+  "asks.reply.yes": {
+    "message": "అవును, నా దగ్గర ఉంది",
+    "review": "reviewed",
+    "enHash": "34c4a3f2"
+  },
+  "asks.reply.no": {
+    "message": "లేదు",
+    "review": "reviewed",
+    "enHash": "816c52fd"
+  },
+  "asks.reply.price": {
+    "message": "ఒక్కదాని ధర",
+    "review": "reviewed",
+    "enHash": "f16bbf5e"
+  },
+  "asks.reply.mrp": {
+    "message": "MRP {mrp}. ధర దీని కంటే ఎక్కువ ఉండకూడదు.",
+    "review": "reviewed",
+    "enHash": "db85e294"
+  },
+  "asks.reply.priceOptional": {
+    "message": "ఐచ్ఛికం. ధర లేకపోతే కస్టమర్‌కు “ధర షాప్‌లో” అని కనిపిస్తుంది.",
+    "review": "reviewed",
+    "enHash": "2992f4f2"
+  },
+  "asks.reply.priceLocked": {
+    "message": "మీ లిస్ట్ ధర. మార్చాలంటే మేనేజర్‌ను అడగండి.",
+    "review": "reviewed",
+    "enHash": "0c9a85df"
+  },
+  "asks.reply.noPriceCashier": {
+    "message": "మీ షాప్ ఈ వస్తువును లిస్ట్ చేయలేదు, కాబట్టి సమాధానం ధర లేకుండా వెళ్తుంది. మేనేజర్ ధర జోడించవచ్చు.",
+    "review": "reviewed",
+    "enHash": "78838636"
+  },
+  "asks.reply.priceInvalid": {
+    "message": "ధరను రూపాయల్లో రాయండి, ఉదా. 58 లేదా 58.50",
+    "review": "reviewed",
+    "enHash": "da6953ad"
+  },
+  "asks.reply.aboveMrp": {
+    "message": "ధర MRP ({mrp}) కంటే ఎక్కువ ఉండకూడదు",
+    "review": "reviewed",
+    "enHash": "85a3a1d5"
+  },
+  "asks.reply.youHave": {
+    "message": "మీ దగ్గర {n} ఉన్నాయి",
+    "review": "reviewed",
+    "enHash": "8b357431"
+  },
+  "asks.reply.readyBy": {
+    "message": "ఎప్పటికి సిద్ధం (ఐచ్ఛికం)",
+    "review": "reviewed",
+    "enHash": "7481f57a"
+  },
+  "asks.reply.readyDay": {
+    "message": "రోజు",
+    "review": "reviewed",
+    "enHash": "987b9ced"
+  },
+  "asks.reply.day.today": {
+    "message": "ఈ రోజు",
+    "review": "reviewed",
+    "enHash": "24345a14"
+  },
+  "asks.reply.day.tomorrow": {
+    "message": "రేపు",
+    "review": "reviewed",
+    "enHash": "1948bf2d"
+  },
+  "asks.reply.readyTime": {
+    "message": "సమయం",
+    "review": "reviewed",
+    "enHash": "6c82e6dd"
+  },
+  "asks.reply.readyHelp": {
+    "message": "ఖచ్చితంగా తెలియకపోతే ఖాళీగా వదిలేయండి.",
+    "review": "reviewed",
+    "enHash": "cf80b488"
+  },
+  "asks.reply.readyPast": {
+    "message": "ఇంకా గడవని సమయాన్ని ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "c1731e4a"
+  },
+  "asks.reply.addStock": {
+    "message": "దీన్ని మీ స్టాక్‌కు జోడించండి",
+    "review": "reviewed",
+    "enHash": "4792eee5"
+  },
+  "asks.report.title": {
+    "message": "ఈ అభ్యర్థనను రిపోర్ట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "73f18a20"
+  },
+  "asks.report.body": {
+    "message": "ఈ కస్టమర్ నుండి మీ షాప్‌కు మళ్ళీ అభ్యర్థనలు రావు. వారికి తెలియజేయబడదు.",
+    "review": "reviewed",
+    "enHash": "a5bd5e0b"
+  },
+  "asks.report.reason": {
+    "message": "దీన్ని ఎందుకు రిపోర్ట్ చేస్తున్నారు?",
+    "review": "reviewed",
+    "enHash": "2e7a55fa"
+  },
+  "asks.report.reason.spam": {
+    "message": "స్పామ్",
+    "review": "reviewed",
+    "enHash": "d8628a52"
+  },
+  "asks.report.reason.abusive": {
+    "message": "అవమానకరం",
+    "review": "reviewed",
+    "enHash": "aa3921f5"
+  },
+  "asks.report.reason.not_a_real_ask": {
+    "message": "నిజమైన అభ్యర్థన కాదు",
+    "review": "reviewed",
+    "enHash": "d23bb509"
+  },
+  "asks.report.reason.other": {
+    "message": "వేరే ఏదో",
+    "review": "reviewed",
+    "enHash": "48f88ac3"
+  },
+  "asks.report.confirm": {
+    "message": "రిపోర్ట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "ee45c303"
+  },
+  "asks.error.price_above_mrp": {
+    "message": "ధర MRP కంటే ఎక్కువ ఉండకూడదు",
+    "review": "reviewed",
+    "enHash": "fb72842d"
+  },
+  "asks.error.ask_closed": {
+    "message": "ఈ అభ్యర్థన మూసివేయబడింది. కస్టమర్ ఇక వేచి లేరు.",
+    "review": "reviewed",
+    "enHash": "9de66d03"
+  },
+  "asks.error.invalid_transition": {
+    "message": "ఇప్పటికే అయిపోయింది. మీ షాప్‌లో వేరొకరు చేశారు.",
+    "review": "reviewed",
+    "enHash": "ba5025a4"
+  },
+  "asks.error.forbidden": {
+    "message": "మీ పాత్ర దీన్ని చేయలేదు. మేనేజర్‌ను అడగండి.",
+    "review": "reviewed",
+    "enHash": "a45042e2"
+  },
+  "asks.error.validation_failed": {
+    "message": "ధర మరియు సిద్ధ సమయాన్ని చెక్ చేయండి",
+    "review": "reviewed",
+    "enHash": "b4cca5f8"
+  },
+  "asks.error.generic": {
+    "message": "పంపలేకపోయాం. కనెక్షన్ చెక్ చేసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "36bda77c"
+  }
+}

@@ -1,0 +1,327 @@
+{
+  "asks.loading": {
+    "message": "माँगें लोड हो रही हैं",
+    "review": "reviewed",
+    "enHash": "7d65f4f4"
+  },
+  "asks.error.load": {
+    "message": "माँगें लोड नहीं हो सकीं",
+    "review": "reviewed",
+    "enHash": "5222921f"
+  },
+  "asks.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "asks.empty.title": {
+    "message": "अभी कोई माँग नहीं",
+    "review": "reviewed",
+    "enHash": "4a548cce"
+  },
+  "asks.empty.body": {
+    "message": "पास के ग्राहक पूछ सकते हैं कि आपके पास कोई चीज़ है या नहीं।",
+    "review": "reviewed",
+    "enHash": "423b8f7d"
+  },
+  "asks.muted": {
+    "message": "इस दुकान के लिए माँगें बंद हैं",
+    "review": "reviewed",
+    "enHash": "5f372058"
+  },
+  "asks.muted.settings": {
+    "message": "सेटिंग्स खोलें",
+    "review": "reviewed",
+    "enHash": "fd7108f8"
+  },
+  "asks.open": {
+    "message": "आपके जवाब का इंतज़ार",
+    "review": "reviewed",
+    "enHash": "8058b968"
+  },
+  "asks.done": {
+    "message": "आज पूरी हुईं",
+    "review": "reviewed",
+    "enHash": "d4b4cebd"
+  },
+  "asks.earlier": {
+    "message": "पहले की",
+    "review": "reviewed",
+    "enHash": "13f7aee7"
+  },
+  "asks.earlier.show": {
+    "message": "पहले की माँगें दिखाएँ",
+    "review": "reviewed",
+    "enHash": "1d874682"
+  },
+  "asks.more": {
+    "message": "और दिखाएँ",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "asks.quantity": {
+    "message": "{n} चाहिए",
+    "review": "reviewed",
+    "enHash": "1d05ba25"
+  },
+  "asks.need.now": {
+    "message": "अभी चाहिए",
+    "review": "reviewed",
+    "enHash": "a0571b5c"
+  },
+  "asks.need.today": {
+    "message": "आज चाहिए",
+    "review": "reviewed",
+    "enHash": "d865550e"
+  },
+  "asks.need.tomorrow": {
+    "message": "कल चाहिए",
+    "review": "reviewed",
+    "enHash": "7d8e35fd"
+  },
+  "asks.band.lt_1km": {
+    "message": "1 km से कम",
+    "review": "reviewed",
+    "enHash": "b6b4a253"
+  },
+  "asks.band.1_3km": {
+    "message": "1–3 km",
+    "review": "reviewed",
+    "enHash": "938ed989"
+  },
+  "asks.band.3_5km": {
+    "message": "3–5 km",
+    "review": "reviewed",
+    "enHash": "74974b4a"
+  },
+  "asks.band.gt_5km": {
+    "message": "5 km से ज़्यादा",
+    "review": "reviewed",
+    "enHash": "07378d0d"
+  },
+  "asks.card.timeLeft": {
+    "message": "जवाब देने के लिए {time} बाकी",
+    "review": "reviewed",
+    "enHash": "104ddb23"
+  },
+  "asks.card.over": {
+    "message": "जवाब देने का समय खत्म",
+    "review": "reviewed",
+    "enHash": "ff8dcbd5"
+  },
+  "asks.card.reply": {
+    "message": "जवाब दें",
+    "review": "reviewed",
+    "enHash": "6c2bb735"
+  },
+  "asks.card.replyA11y": {
+    "message": "{item} की माँग का जवाब दें",
+    "review": "reviewed",
+    "enHash": "d28b02ee"
+  },
+  "asks.card.report": {
+    "message": "रिपोर्ट करें",
+    "review": "reviewed",
+    "enHash": "ee45c303"
+  },
+  "asks.card.reportA11y": {
+    "message": "{item} की माँग रिपोर्ट करें",
+    "review": "reviewed",
+    "enHash": "5fcfbf10"
+  },
+  "asks.status.yes": {
+    "message": "आपने हाँ कहा",
+    "review": "reviewed",
+    "enHash": "bcdd0bdd"
+  },
+  "asks.status.no": {
+    "message": "आपने ना कहा",
+    "review": "reviewed",
+    "enHash": "a3169474"
+  },
+  "asks.status.missed": {
+    "message": "छूट गई",
+    "review": "reviewed",
+    "enHash": "b564001a"
+  },
+  "asks.reported": {
+    "message": "रिपोर्ट की गई",
+    "review": "reviewed",
+    "enHash": "73c20ded"
+  },
+  "asks.sheet.close": {
+    "message": "बंद करें",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "asks.sheet.back": {
+    "message": "वापस",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "asks.reply.wants": {
+    "message": "पास के एक ग्राहक को {n} चाहिए। क्या आपके पास है?",
+    "review": "reviewed",
+    "enHash": "9507eb52"
+  },
+  "asks.reply.yes": {
+    "message": "हाँ, मेरे पास है",
+    "review": "reviewed",
+    "enHash": "34c4a3f2"
+  },
+  "asks.reply.no": {
+    "message": "नहीं",
+    "review": "reviewed",
+    "enHash": "816c52fd"
+  },
+  "asks.reply.price": {
+    "message": "एक का दाम",
+    "review": "reviewed",
+    "enHash": "f16bbf5e"
+  },
+  "asks.reply.mrp": {
+    "message": "MRP {mrp}। दाम इससे ज़्यादा नहीं हो सकता।",
+    "review": "reviewed",
+    "enHash": "db85e294"
+  },
+  "asks.reply.priceOptional": {
+    "message": "ज़रूरी नहीं। दाम के बिना ग्राहक को “दाम दुकान पर” दिखेगा।",
+    "review": "reviewed",
+    "enHash": "2992f4f2"
+  },
+  "asks.reply.priceLocked": {
+    "message": "आपका लिस्ट किया दाम। बदलने के लिए मैनेजर से कहें।",
+    "review": "reviewed",
+    "enHash": "0c9a85df"
+  },
+  "asks.reply.noPriceCashier": {
+    "message": "आपकी दुकान यह चीज़ लिस्ट नहीं करती, इसलिए जवाब बिना दाम के जाएगा। मैनेजर दाम जोड़ सकते हैं।",
+    "review": "reviewed",
+    "enHash": "78838636"
+  },
+  "asks.reply.priceInvalid": {
+    "message": "दाम रुपये में लिखें, जैसे 58 या 58.50",
+    "review": "reviewed",
+    "enHash": "da6953ad"
+  },
+  "asks.reply.aboveMrp": {
+    "message": "दाम MRP ({mrp}) से ज़्यादा नहीं हो सकता",
+    "review": "reviewed",
+    "enHash": "85a3a1d5"
+  },
+  "asks.reply.youHave": {
+    "message": "आपके पास {n} हैं",
+    "review": "reviewed",
+    "enHash": "8b357431"
+  },
+  "asks.reply.readyBy": {
+    "message": "कब तक तैयार (ज़रूरी नहीं)",
+    "review": "reviewed",
+    "enHash": "7481f57a"
+  },
+  "asks.reply.readyDay": {
+    "message": "दिन",
+    "review": "reviewed",
+    "enHash": "987b9ced"
+  },
+  "asks.reply.day.today": {
+    "message": "आज",
+    "review": "reviewed",
+    "enHash": "24345a14"
+  },
+  "asks.reply.day.tomorrow": {
+    "message": "कल",
+    "review": "reviewed",
+    "enHash": "1948bf2d"
+  },
+  "asks.reply.readyTime": {
+    "message": "समय",
+    "review": "reviewed",
+    "enHash": "6c82e6dd"
+  },
+  "asks.reply.readyHelp": {
+    "message": "पक्का न हो तो खाली छोड़ दें।",
+    "review": "reviewed",
+    "enHash": "cf80b488"
+  },
+  "asks.reply.readyPast": {
+    "message": "ऐसा समय चुनें जो अभी बीता न हो",
+    "review": "reviewed",
+    "enHash": "c1731e4a"
+  },
+  "asks.reply.addStock": {
+    "message": "इसे अपने स्टॉक में जोड़ें",
+    "review": "reviewed",
+    "enHash": "4792eee5"
+  },
+  "asks.report.title": {
+    "message": "यह माँग रिपोर्ट करें",
+    "review": "reviewed",
+    "enHash": "73f18a20"
+  },
+  "asks.report.body": {
+    "message": "आपकी दुकान को इस ग्राहक से फिर माँगें नहीं मिलेंगी। उन्हें बताया नहीं जाता।",
+    "review": "reviewed",
+    "enHash": "a5bd5e0b"
+  },
+  "asks.report.reason": {
+    "message": "आप इसे क्यों रिपोर्ट कर रहे हैं?",
+    "review": "reviewed",
+    "enHash": "2e7a55fa"
+  },
+  "asks.report.reason.spam": {
+    "message": "स्पैम",
+    "review": "reviewed",
+    "enHash": "d8628a52"
+  },
+  "asks.report.reason.abusive": {
+    "message": "अपमानजनक",
+    "review": "reviewed",
+    "enHash": "aa3921f5"
+  },
+  "asks.report.reason.not_a_real_ask": {
+    "message": "असली माँग नहीं",
+    "review": "reviewed",
+    "enHash": "d23bb509"
+  },
+  "asks.report.reason.other": {
+    "message": "कुछ और",
+    "review": "reviewed",
+    "enHash": "48f88ac3"
+  },
+  "asks.report.confirm": {
+    "message": "रिपोर्ट करें",
+    "review": "reviewed",
+    "enHash": "ee45c303"
+  },
+  "asks.error.price_above_mrp": {
+    "message": "दाम MRP से ज़्यादा नहीं हो सकता",
+    "review": "reviewed",
+    "enHash": "fb72842d"
+  },
+  "asks.error.ask_closed": {
+    "message": "यह माँग बंद हो गई है। ग्राहक अब इंतज़ार नहीं कर रहे।",
+    "review": "reviewed",
+    "enHash": "9de66d03"
+  },
+  "asks.error.invalid_transition": {
+    "message": "पहले ही हो चुका है। आपकी दुकान में किसी और ने कर दिया।",
+    "review": "reviewed",
+    "enHash": "ba5025a4"
+  },
+  "asks.error.forbidden": {
+    "message": "आपकी भूमिका यह नहीं कर सकती। मैनेजर से कहें।",
+    "review": "reviewed",
+    "enHash": "a45042e2"
+  },
+  "asks.error.validation_failed": {
+    "message": "दाम और तैयार होने का समय जाँचें",
+    "review": "reviewed",
+    "enHash": "b4cca5f8"
+  },
+  "asks.error.generic": {
+    "message": "भेजा नहीं जा सका। कनेक्शन जाँचें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "36bda77c"
+  }
+}

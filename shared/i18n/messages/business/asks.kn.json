@@ -1,0 +1,327 @@
+{
+  "asks.loading": {
+    "message": "ಕೇಳಿಕೆಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "7d65f4f4"
+  },
+  "asks.error.load": {
+    "message": "ಕೇಳಿಕೆಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "5222921f"
+  },
+  "asks.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "asks.empty.title": {
+    "message": "ಈಗ ಯಾವುದೇ ಕೇಳಿಕೆ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "4a548cce"
+  },
+  "asks.empty.body": {
+    "message": "ಹತ್ತಿರದ ಗ್ರಾಹಕರು ನಿಮ್ಮಲ್ಲಿ ಏನಾದರೂ ಇದೆಯೇ ಎಂದು ಕೇಳಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "423b8f7d"
+  },
+  "asks.muted": {
+    "message": "ಈ ಅಂಗಡಿಗೆ ಕೇಳಿಕೆಗಳು ಆಫ್ ಆಗಿವೆ",
+    "review": "reviewed",
+    "enHash": "5f372058"
+  },
+  "asks.muted.settings": {
+    "message": "ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ತೆರೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "fd7108f8"
+  },
+  "asks.open": {
+    "message": "ನಿಮ್ಮ ಉತ್ತರಕ್ಕಾಗಿ ಕಾಯುತ್ತಿವೆ",
+    "review": "reviewed",
+    "enHash": "8058b968"
+  },
+  "asks.done": {
+    "message": "ಇಂದು ಮುಗಿದವು",
+    "review": "reviewed",
+    "enHash": "d4b4cebd"
+  },
+  "asks.earlier": {
+    "message": "ಹಿಂದಿನವು",
+    "review": "reviewed",
+    "enHash": "13f7aee7"
+  },
+  "asks.earlier.show": {
+    "message": "ಹಿಂದಿನ ಕೇಳಿಕೆಗಳನ್ನು ತೋರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "1d874682"
+  },
+  "asks.more": {
+    "message": "ಇನ್ನಷ್ಟು ತೋರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "asks.quantity": {
+    "message": "{n} ಬೇಕು",
+    "review": "reviewed",
+    "enHash": "1d05ba25"
+  },
+  "asks.need.now": {
+    "message": "ಈಗಲೇ ಬೇಕು",
+    "review": "reviewed",
+    "enHash": "a0571b5c"
+  },
+  "asks.need.today": {
+    "message": "ಇಂದು ಬೇಕು",
+    "review": "reviewed",
+    "enHash": "d865550e"
+  },
+  "asks.need.tomorrow": {
+    "message": "ನಾಳೆ ಬೇಕು",
+    "review": "reviewed",
+    "enHash": "7d8e35fd"
+  },
+  "asks.band.lt_1km": {
+    "message": "1 km ಗಿಂತ ಕಡಿಮೆ",
+    "review": "reviewed",
+    "enHash": "b6b4a253"
+  },
+  "asks.band.1_3km": {
+    "message": "1–3 km",
+    "review": "reviewed",
+    "enHash": "938ed989"
+  },
+  "asks.band.3_5km": {
+    "message": "3–5 km",
+    "review": "reviewed",
+    "enHash": "74974b4a"
+  },
+  "asks.band.gt_5km": {
+    "message": "5 km ಗಿಂತ ಹೆಚ್ಚು",
+    "review": "reviewed",
+    "enHash": "07378d0d"
+  },
+  "asks.card.timeLeft": {
+    "message": "ಉತ್ತರಿಸಲು {time} ಉಳಿದಿದೆ",
+    "review": "reviewed",
+    "enHash": "104ddb23"
+  },
+  "asks.card.over": {
+    "message": "ಉತ್ತರಿಸುವ ಸಮಯ ಮುಗಿದಿದೆ",
+    "review": "reviewed",
+    "enHash": "ff8dcbd5"
+  },
+  "asks.card.reply": {
+    "message": "ಉತ್ತರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "6c2bb735"
+  },
+  "asks.card.replyA11y": {
+    "message": "{item} ಕೇಳಿಕೆಗೆ ಉತ್ತರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "d28b02ee"
+  },
+  "asks.card.report": {
+    "message": "ವರದಿ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "ee45c303"
+  },
+  "asks.card.reportA11y": {
+    "message": "{item} ಕೇಳಿಕೆಯನ್ನು ವರದಿ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "5fcfbf10"
+  },
+  "asks.status.yes": {
+    "message": "ನೀವು ಹೌದು ಎಂದಿರಿ",
+    "review": "reviewed",
+    "enHash": "bcdd0bdd"
+  },
+  "asks.status.no": {
+    "message": "ನೀವು ಇಲ್ಲ ಎಂದಿರಿ",
+    "review": "reviewed",
+    "enHash": "a3169474"
+  },
+  "asks.status.missed": {
+    "message": "ತಪ್ಪಿಹೋಯಿತು",
+    "review": "reviewed",
+    "enHash": "b564001a"
+  },
+  "asks.reported": {
+    "message": "ವರದಿ ಮಾಡಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "73c20ded"
+  },
+  "asks.sheet.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "asks.sheet.back": {
+    "message": "ಹಿಂದೆ",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "asks.reply.wants": {
+    "message": "ಹತ್ತಿರದ ಒಬ್ಬ ಗ್ರಾಹಕರಿಗೆ {n} ಬೇಕು. ನಿಮ್ಮಲ್ಲಿ ಇದೆಯೇ?",
+    "review": "reviewed",
+    "enHash": "9507eb52"
+  },
+  "asks.reply.yes": {
+    "message": "ಹೌದು, ನನ್ನಲ್ಲಿ ಇದೆ",
+    "review": "reviewed",
+    "enHash": "34c4a3f2"
+  },
+  "asks.reply.no": {
+    "message": "ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "816c52fd"
+  },
+  "asks.reply.price": {
+    "message": "ಒಂದರ ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "f16bbf5e"
+  },
+  "asks.reply.mrp": {
+    "message": "MRP {mrp}. ಬೆಲೆ ಇದಕ್ಕಿಂತ ಹೆಚ್ಚಿರಬಾರದು.",
+    "review": "reviewed",
+    "enHash": "db85e294"
+  },
+  "asks.reply.priceOptional": {
+    "message": "ಐಚ್ಛಿಕ. ಬೆಲೆ ಇಲ್ಲದಿದ್ದರೆ ಗ್ರಾಹಕರಿಗೆ “ಬೆಲೆ ಅಂಗಡಿಯಲ್ಲಿ” ಎಂದು ಕಾಣುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "2992f4f2"
+  },
+  "asks.reply.priceLocked": {
+    "message": "ನಿಮ್ಮ ಪಟ್ಟಿ ಬೆಲೆ. ಬದಲಾಯಿಸಲು ಮ್ಯಾನೇಜರ್‌ಗೆ ಹೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "0c9a85df"
+  },
+  "asks.reply.noPriceCashier": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿ ಈ ವಸ್ತುವನ್ನು ಪಟ್ಟಿ ಮಾಡಿಲ್ಲ, ಆದ್ದರಿಂದ ಉತ್ತರ ಬೆಲೆ ಇಲ್ಲದೆ ಹೋಗುತ್ತದೆ. ಮ್ಯಾನೇಜರ್ ಬೆಲೆ ಸೇರಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "78838636"
+  },
+  "asks.reply.priceInvalid": {
+    "message": "ಬೆಲೆಯನ್ನು ರೂಪಾಯಿಯಲ್ಲಿ ಬರೆಯಿರಿ, ಉದಾ. 58 ಅಥವಾ 58.50",
+    "review": "reviewed",
+    "enHash": "da6953ad"
+  },
+  "asks.reply.aboveMrp": {
+    "message": "ಬೆಲೆ MRP ({mrp}) ಗಿಂತ ಹೆಚ್ಚಿರಬಾರದು",
+    "review": "reviewed",
+    "enHash": "85a3a1d5"
+  },
+  "asks.reply.youHave": {
+    "message": "ನಿಮ್ಮಲ್ಲಿ {n} ಇವೆ",
+    "review": "reviewed",
+    "enHash": "8b357431"
+  },
+  "asks.reply.readyBy": {
+    "message": "ಯಾವಾಗ ಸಿದ್ಧ (ಐಚ್ಛಿಕ)",
+    "review": "reviewed",
+    "enHash": "7481f57a"
+  },
+  "asks.reply.readyDay": {
+    "message": "ದಿನ",
+    "review": "reviewed",
+    "enHash": "987b9ced"
+  },
+  "asks.reply.day.today": {
+    "message": "ಇಂದು",
+    "review": "reviewed",
+    "enHash": "24345a14"
+  },
+  "asks.reply.day.tomorrow": {
+    "message": "ನಾಳೆ",
+    "review": "reviewed",
+    "enHash": "1948bf2d"
+  },
+  "asks.reply.readyTime": {
+    "message": "ಸಮಯ",
+    "review": "reviewed",
+    "enHash": "6c82e6dd"
+  },
+  "asks.reply.readyHelp": {
+    "message": "ಖಚಿತವಿಲ್ಲದಿದ್ದರೆ ಖಾಲಿ ಬಿಡಿ.",
+    "review": "reviewed",
+    "enHash": "cf80b488"
+  },
+  "asks.reply.readyPast": {
+    "message": "ಇನ್ನೂ ಕಳೆಯದ ಸಮಯವನ್ನು ಆರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "c1731e4a"
+  },
+  "asks.reply.addStock": {
+    "message": "ಇದನ್ನು ನಿಮ್ಮ ಸ್ಟಾಕ್‌ಗೆ ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "4792eee5"
+  },
+  "asks.report.title": {
+    "message": "ಈ ಕೇಳಿಕೆಯನ್ನು ವರದಿ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "73f18a20"
+  },
+  "asks.report.body": {
+    "message": "ಈ ಗ್ರಾಹಕರಿಂದ ನಿಮ್ಮ ಅಂಗಡಿಗೆ ಮತ್ತೆ ಕೇಳಿಕೆಗಳು ಬರುವುದಿಲ್ಲ. ಅವರಿಗೆ ತಿಳಿಸಲಾಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "a5bd5e0b"
+  },
+  "asks.report.reason": {
+    "message": "ಇದನ್ನು ಏಕೆ ವರದಿ ಮಾಡುತ್ತಿದ್ದೀರಿ?",
+    "review": "reviewed",
+    "enHash": "2e7a55fa"
+  },
+  "asks.report.reason.spam": {
+    "message": "ಸ್ಪ್ಯಾಮ್",
+    "review": "reviewed",
+    "enHash": "d8628a52"
+  },
+  "asks.report.reason.abusive": {
+    "message": "ಅವಮಾನಕರ",
+    "review": "reviewed",
+    "enHash": "aa3921f5"
+  },
+  "asks.report.reason.not_a_real_ask": {
+    "message": "ನಿಜವಾದ ಕೇಳಿಕೆ ಅಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "d23bb509"
+  },
+  "asks.report.reason.other": {
+    "message": "ಬೇರೆ ಏನೋ",
+    "review": "reviewed",
+    "enHash": "48f88ac3"
+  },
+  "asks.report.confirm": {
+    "message": "ವರದಿ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "ee45c303"
+  },
+  "asks.error.price_above_mrp": {
+    "message": "ಬೆಲೆ MRP ಗಿಂತ ಹೆಚ್ಚಿರಬಾರದು",
+    "review": "reviewed",
+    "enHash": "fb72842d"
+  },
+  "asks.error.ask_closed": {
+    "message": "ಈ ಕೇಳಿಕೆ ಮುಚ್ಚಿದೆ. ಗ್ರಾಹಕರು ಈಗ ಕಾಯುತ್ತಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "9de66d03"
+  },
+  "asks.error.invalid_transition": {
+    "message": "ಈಗಾಗಲೇ ಆಗಿದೆ. ನಿಮ್ಮ ಅಂಗಡಿಯ ಬೇರೊಬ್ಬರು ಮಾಡಿದ್ದಾರೆ.",
+    "review": "reviewed",
+    "enHash": "ba5025a4"
+  },
+  "asks.error.forbidden": {
+    "message": "ನಿಮ್ಮ ಪಾತ್ರ ಇದನ್ನು ಮಾಡಲಾಗದು. ಮ್ಯಾನೇಜರ್‌ಗೆ ಹೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "a45042e2"
+  },
+  "asks.error.validation_failed": {
+    "message": "ಬೆಲೆ ಮತ್ತು ಸಿದ್ಧ ಸಮಯವನ್ನು ಪರಿಶೀಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "b4cca5f8"
+  },
+  "asks.error.generic": {
+    "message": "ಕಳುಹಿಸಲಾಗಲಿಲ್ಲ. ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "36bda77c"
+  }
+}

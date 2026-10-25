@@ -1,0 +1,129 @@
+/* B-20 Asks inbox layout (W3-16). Cards come from bundle.css (tz-ocard, tz-card) and @todayz/ui;
+   this file only places them. Tokens only. */
+
+.inbox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sectionTitle {
+  margin: 0;
+  font: var(--type-title);
+  color: var(--ink);
+}
+
+.item {
+  font: var(--type-label);
+  color: var(--ink);
+}
+
+.facts {
+  margin: 0;
+  font: var(--type-body-sm);
+  color: var(--ink-2);
+}
+
+.short {
+  margin: 0;
+  font: var(--type-caption);
+  color: var(--warning);
+}
+
+.actions {
+  justify-content: flex-end;
+}
+
+.muted {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--ink-2);
+}
+
+.muted a {
+  margin-left: auto;
+  text-decoration: none;
+}
+
+.doneRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.doneTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.showEarlier {
+  align-self: flex-start;
+}
+
+.sheetBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sheetBody a {
+  align-self: flex-start;
+  text-decoration: none;
+}
+
+.label {
+  padding: 0;
+  font: var(--type-label);
+  color: var(--ink);
+}
+
+.locked {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.ready {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.reasons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  border: 0;
+}
+
+.reason {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--tap-min);
+}
