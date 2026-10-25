@@ -1,6 +1,6 @@
 # W3-11 Retailer AI and shop coach: QA report
 
-Branch `claude/w3-11-coach-1a5eea`, 26 Oct 2026. There are 35 commits from `fbe6a53` (`git log main..HEAD`), with current `main` merged in at `17bef82` and again at `6a2c248`; the last is this report's update. Nothing has been pushed or merged.
+Branch `claude/w3-11-coach-1a5eea`, 26 Oct 2026. There are 41 commits from `fbe6a53` (`git log main..HEAD`), with current `main` merged in at `17bef82` and again at `6a2c248`; the last is this report's update. Nothing has been pushed or merged.
 
 - **Work package:** W3-11, scenarios SC-AI-10…40 (`e2e/scenarios/AI.md`).
 - **Features:** AI-R2 supplier bill scan, AI-R3 shelf photo onboarding, AI-R4 insight sentences, AI-R5 review reply draft, AI-R6 shop coach wording, AI-R9 banner copy and AI-R10 banner image check, plus the coach (11 §2.1).
@@ -22,6 +22,21 @@ Every AI output is a draft that a person confirms. A bill, shelf photo, reply or
 | Grounding ignored units | `schema.UngroundedFacts` matches % to percent facts and ₹ to money facts; index and id fields ground nothing (D-230) | `8ffae21` |
 | Missing tests | Route tests (per line, double confirm, cashier, flag off, other store, injection) and coach done and dismiss on another store's card (404, nothing changes, `TestActOtherStore`) | `982b811`, `86009e0` |
 | Drafts left `processing` at shutdown | No change: the existing `StaleAfter` rule (3 min) closes such a draft as failed (timeout) when it is next read, and the in-flight cap counts only drafts made within `StaleAfter`, so a stuck one never holds a slot (noted in D-230) | — |
+
+## Re-review fixes (26 Oct)
+
+| Finding | Fix | Commit |
+|---|---|---|
+| A retry that rebuilt the FormData got 422 (new boundary, new hash) | For `multipart/form-data` the idempotency hash covers a canonical form: the parts sorted by field name, each with its name, file name, `Content-Type` and bytes, length-prefixed; the boundary and part order do not count. Size limits are unchanged; more than 64 parts or a body that does not parse is hashed raw. `TestRequestHashMultipart`, `TestMiddlewareMultipartRetry`, and on the route `TestAIRetailScanRetryRebuiltForm` (same key, new boundary: one draft, one model call; it fails with 422 without the fix) | `cb868dd` |
+| Grounding read `threshold` (a percent) as plain | `schema.Units` names a key's unit when its name does not say it; the coach has a unit map for every number each detector emits (`factUnits`, checked by `TestFactUnitsCoverEveryNumber`), and `Rewrite` grounds in it. `TestTemplatesAreGrounded` and the coacheval fixtures use each detector's real fact shapes with distinct values plus the detectors' golden facts. Audit: the insight keys read right by name (`pct`, `sharePct` percent; `*Paise` money as rupees); `radiusM`, `staleAfterHours` and `liftBp` stay plain, the conservative reading (`insighttext` `TestFactKeyUnits`) | `a52be04` |
+| A miss was kept for a whole call after a transient error | Misses get a TTL: a grounding miss (the row's own sentence had an invented number) holds until the facts change; a `schema`, `refused` or `skipped` miss expires after `retail.MissTTL` (24 h, a constant). `TestTextsMissOnReject`, `TestTextsNegativeCache`, `TestAIWriterMissCache`, `TestAIWriterMissTTL` | `629430c` |
+| `missKey` left out the prompt version | It now hashes the input and `prompts.Version(Feature)`, so a new prompt asks again (`TestMissKeyHasPromptVersion`) | `629430c` |
+| The model setting was read after `Reserve` | Coach and insighttext read `ai_model_fast` first, so a failed read takes nothing from the budget | `629430c` |
+| A failed misses read dropped the kept texts | It is logged; the kept texts are still served, and no call starts without the misses (`TestTextsMissesUnreadable`) | `629430c` |
+| `Retry-After` (90 s) differs from `StaleAfter` (3 min) | Kept at `ProcessTimeout`: a running scan ends (read, failed or timed out) within `ProcessTimeout` of its start, which frees its slot; `StaleAfter` only frees a scan whose process died mid-call. Said in a comment in `retail.Kit.Start` | `629430c` |
+| Missing tests | `TestAIRetailConcurrentScanStarts` (6 racing starts: 2 accepted, 4 are 429 with `Retry-After: 90`, 2 drafts, 2 calls reserved; it fails with 6 accepted when the scan lock is removed), `TestAIRetailShelfConcurrentConfirm` (each item created once), `TestAIRetailRepeatAfterPartialConfirm` (bill and shelf: the same decisions again write nothing new) | `2057a71` |
+
+`backend/CLAUDE.md` still says the hash is over the raw body bytes and a retry must resend the same bytes. For multipart that is now out of date; it is the lead's file, so it is not edited here.
 
 ## What was built
 
@@ -85,20 +100,20 @@ Every AI output is a draft that a person confirms. A bill, shelf photo, reply or
 |---|---|
 | Bill scan, recorded (SC-AI-10): 60 bills, en/hi/kn | Printed: 222 of 231 lines right (**96.1%**, bar 90%). Handwritten: 119 of 154 (**77.3%**, bar 75%). The CLI's per-bill pass rate is 0.68 against a placeholder of 0.60 |
 | Shelf photo, recorded (SC-AI-15): 40 photos | 197 of 220 products found (**89.5%**, placeholder bar 80%), 0 extra |
-| coach_card, insight_text, review_reply, banner_copy, image_check, recorded | Every case passes (14, 13, 9, 7 and 9 cases). **0 ungrounded numbers** kept in coach and insight text |
+| coach_card, insight_text, review_reply, banner_copy, image_check, recorded | Every case passes (16, 13, 9, 7 and 9 cases). **0 ungrounded numbers** kept in coach and insight text |
 | 0 writes without confirm | Each draft feature has a DB test that the draft writes nothing and the confirm writes only accepted and edited lines: `TestDraftWritesNothingUntilConfirm`, `TestShelfDraftCreatesNothingUntilConfirm`, `TestReplyPostsOnlyOnConfirm`, `TestBannerCopyWritesNoBanner`, `drafts.TestConfirmFlow` |
 | Refusals, feature off, store cap | `TestConfirmRefuses`, `TestShelfConfirmRefuses`, `TestReplyRefuses`, `TestBannerCopyRefuses`, `TestHiddenWhenOff`, `TestShelfHiddenWhenOff`, `TestStoreCap`, `TestFailedRead` |
-| Per-line confirm (1 bad line among good ones) | `drafts` `TestKeepOpen`, `TestNotPermitted`; route tests `TestAIRetailBillConfirmPerLine`, `TestAIRetailShelfConfirmPerLine`, `TestShelfRefusal`, `TestAIRetailBillConcurrentConfirm` (one double confirm wins, the other changes nothing) |
+| Per-line confirm (1 bad line among good ones) | `drafts` `TestKeepOpen`, `TestNotPermitted`; route tests `TestAIRetailBillConfirmPerLine`, `TestAIRetailShelfConfirmPerLine`, `TestShelfRefusal`, `TestAIRetailBillConcurrentConfirm` and `TestAIRetailShelfConcurrentConfirm` (one double confirm wins, the other changes nothing), `TestAIRetailRepeatAfterPartialConfirm` |
 | Route guards | `TestAIRetailCashierForbidden`, `TestAIRetailHiddenWhenOff`, `TestAIRetailOwnership`, `TestAIRetailBillInjection`, coach `TestActOtherStore` |
-| Hardening | `TestTiedMatchIsLeftUnmatched`, `TestScansInFlight`, `retail` `TestSniff`, `TestReadPhotoChecksTheBytes`, `schema` `TestUngroundedFacts` |
-| Background budget | `guard` `TestStoreBackgroundBudget`; `insighttext` `TestTextsNegativeCache`, `TestTextsMissOnReject`, `TestTextsOffAndBudget`; `coach` `TestAIWriter`, `TestAIWriterMissCache`, `TestResolvedIsNotIgnored` |
+| Hardening | `TestTiedMatchIsLeftUnmatched`, `TestScansInFlight`, `TestAIRetailConcurrentScanStarts`, `retail` `TestSniff`, `TestReadPhotoChecksTheBytes`, `schema` `TestUngroundedFacts`, `TestUngroundedFactsIn`, idempotency `TestRequestHashMultipart`, `TestMiddlewareMultipartRetry`, `TestAIRetailScanRetryRebuiltForm` |
+| Background budget | `guard` `TestStoreBackgroundBudget`; `insighttext` `TestTextsNegativeCache`, `TestTextsMissOnReject`, `TestTextsMissesUnreadable`, `TestTextsOffAndBudget`; `coach` `TestAIWriter`, `TestAIWriterMissCache`, `TestAIWriterMissTTL`, `TestMissKeyHasPromptVersion`, `TestResolvedIsNotIgnored` |
 | Coach | Card cap, push cap, dismiss quiet, k ≥ 10 floor, AI fallback, feed, batched checkpoint, realtime nudge, grounded templates: `internal/coach` and `detectors` golden tests on the dev seed and per-detector scenarios |
-| Go (26 Oct, after the main merge) | gofmt, `go vet`, golangci-lint (0 issues on `internal/ai`, `internal/coach`, `internal/catalogue`, `cmd/todayz`) and the settings lint are clean. `go test -race` passes for `internal/ai/...`, `internal/coach/...`, `internal/insights/...`, `internal/catalogue/...` and `internal/reviews/...` with the DB (shared test Postgres), and for `cmd/todayz` filtered to the AI, retail, catalogue and route-contract tests |
+| Go (26 Oct, after the re-review fixes; `main` is still `6a2c248`) | gofmt, `go vet ./...`, golangci-lint (`./...`, 0 issues after `dc4bf41`) and the settings lint are clean. `go test -race` passes with the DB (shared test Postgres) for `internal/ai/...`, `internal/coach/...`, `internal/insights/...`, `internal/catalogue/...`, `internal/reviews/...` and `internal/platform/idempotency`, and for `cmd/todayz` filtered to the AI, retail, voice, catalogue and route-contract tests. One exception, which comes from `main`: `guard` `TestDashboard14` fails on the voice row that `6a2c248` added to dashboard 14. Its panels query `tz_voice_*`, but the test only scans for `tz_ai_*` metrics in `client`, `drafts` and `guard`. W3-11 touches neither file, so it is left for the lead or W3-04 |
 | Business | Typecheck, ESLint and stylelint are clean. vitest: `src/ai-drafts/ai.test.tsx` 23 tests and `src/coach/coach.test.tsx` 7 tests pass. Full suite: **51 files, 486 tests pass** |
 | i18n | Message lint shows 0 business errors, and 1890 of 1890 keys are reviewed in each of hi, kn, te and ta; `src/settings/language.test.tsx` passes |
 | Contract (26 Oct) | `make gen check-contract` under `scripts/no-egress.sh` is green: redocly lint, apigen check, api-client gen (280 operations) and its 42 tests, the hooks check, and `TestContractSmoke` (68 problem codes registered) |
 
-Run: `scripts/no-egress.sh make gen check-contract`, `go test -race ./internal/ai/... ./internal/coach/... ./internal/insights/... ./internal/catalogue/... ./internal/reviews/...` with `TODAYZ_TEST_PG_URL_FILE`, and `pnpm --filter @todayz/business test|lint|typecheck`. The full `make check` was not run, as the work package says.
+Run: `scripts/no-egress.sh make gen check-contract`, `go test -race ./internal/ai/... ./internal/coach/... ./internal/insights/... ./internal/catalogue/... ./internal/reviews/... ./internal/platform/idempotency/...` with `TODAYZ_TEST_PG_URL_FILE`, and `pnpm --filter @todayz/business test|lint|typecheck`. The full `make check` was not run, as the work package says.
 
 ## Files outside W3-11's own paths
 
