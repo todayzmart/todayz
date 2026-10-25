@@ -1,0 +1,127 @@
+{
+  "name": "handwritten_hi_06",
+  "input": {
+    "image": "images/handwritten_hi_06.jpg",
+    "kind": "handwritten",
+    "lang": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "लक्स साबुन 100g",
+        "quantity": 10,
+        "costPaise": 3005,
+        "mrpPaise": 3800,
+        "expiresOn": null
+      },
+      {
+        "name": "बॉर्नविटा 500g",
+        "quantity": 6,
+        "costPaise": 20975,
+        "mrpPaise": 24900,
+        "expiresOn": "2027-07-28"
+      },
+      {
+        "name": "टाटा नमक 1kg",
+        "quantity": 10,
+        "costPaise": 2255,
+        "mrpPaise": 2800,
+        "expiresOn": "2027-08-15"
+      },
+      {
+        "name": "एमडीएच चना मसाला 100g",
+        "quantity": 12,
+        "costPaise": 6415,
+        "mrpPaise": 8200,
+        "expiresOn": null
+      },
+      {
+        "name": "आशीर्वाद आटा 5kg",
+        "quantity": 5,
+        "costPaise": 27050,
+        "mrpPaise": 29500,
+        "expiresOn": null
+      },
+      {
+        "name": "हॉर्लिक्स 500g",
+        "quantity": 5,
+        "costPaise": 22900,
+        "mrpPaise": 26000,
+        "expiresOn": null
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_handwritten_hi_06",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_handwritten_hi_06",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "राम वितरक",
+          "bill_date": "2026-10-08",
+          "lines": [
+            {
+              "name": "लक्स साबुन 100g",
+              "quantity": 10,
+              "cost_rupees": 30.05,
+              "mrp_rupees": 38.0,
+              "expires_on": null,
+              "confidence": 0.6
+            },
+            {
+              "name": "बॉर्नविटा 500g",
+              "quantity": 6,
+              "cost_rupees": 209.25,
+              "mrp_rupees": 249.0,
+              "expires_on": "2027-07-28",
+              "confidence": 0.82
+            },
+            {
+              "name": "टाटा नमक 1kg",
+              "quantity": 10,
+              "cost_rupees": 22.55,
+              "mrp_rupees": 28.0,
+              "expires_on": "2027-08-15",
+              "confidence": 0.75
+            },
+            {
+              "name": "एमडीएच चना मसाला 100g",
+              "quantity": 12,
+              "cost_rupees": 64.15,
+              "mrp_rupees": 82.0,
+              "expires_on": null,
+              "confidence": 0.62
+            },
+            {
+              "name": "आशीर्वाद आटा 5kg",
+              "quantity": 5,
+              "cost_rupees": 270.5,
+              "mrp_rupees": 295.0,
+              "expires_on": null,
+              "confidence": 0.55
+            },
+            {
+              "name": "हॉर्लिक्स 500g",
+              "quantity": 5,
+              "cost_rupees": 229.0,
+              "mrp_rupees": 260.0,
+              "expires_on": null,
+              "confidence": 0.73
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

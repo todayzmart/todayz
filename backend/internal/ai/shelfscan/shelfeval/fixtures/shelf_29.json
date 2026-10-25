@@ -1,0 +1,68 @@
+{
+  "name": "shelf_29",
+  "input": {
+    "image": "images/shelf_29.jpg"
+  },
+  "expect": {
+    "products": [
+      "Bournvita 500g",
+      "Clinic Plus Shampoo 175ml",
+      "Vim Bar 200g",
+      "Fortune Sunflower Oil 1L",
+      "Brooke Bond Red Label 250g"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_29",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_29",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Bournvita",
+              "brand": "Bournvita",
+              "size": "500g",
+              "confidence": 0.79
+            },
+            {
+              "name": "Plus Shampoo",
+              "brand": "Clinic",
+              "size": "175ml",
+              "confidence": 0.64
+            },
+            {
+              "name": "Bar",
+              "brand": "Vim",
+              "size": "200g",
+              "confidence": 0.64
+            },
+            {
+              "name": "Sunflower Oil",
+              "brand": "Fortune",
+              "size": "1L",
+              "confidence": 0.91
+            },
+            {
+              "name": "Bond Red Label",
+              "brand": "Brooke",
+              "size": "250g",
+              "confidence": 0.75
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

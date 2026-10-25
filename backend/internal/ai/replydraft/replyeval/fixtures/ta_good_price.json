@@ -1,0 +1,38 @@
+{
+  "name": "ta_good_price",
+  "input": {
+    "stars": 5,
+    "tags": [
+      "good_price"
+    ],
+    "text": null,
+    "language": "ta",
+    "shop": "Sri Lakshmi Stores"
+  },
+  "expect": {
+    "text": "உங்கள் அன்பான மதிப்பீட்டிற்கு நன்றி. மீண்டும் வாருங்கள்.",
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_rr_ta_good_price",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rr_ta_good_price",
+        "name": "draft_review_reply",
+        "input": {
+          "text": "உங்கள் அன்பான மதிப்பீட்டிற்கு நன்றி. மீண்டும் வாருங்கள்."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

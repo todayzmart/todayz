@@ -1,0 +1,76 @@
+{
+  "name": "shelf_19",
+  "input": {
+    "image": "images/shelf_19.jpg"
+  },
+  "expect": {
+    "products": [
+      "Aashirvaad Atta 5kg",
+      "Maggi Noodles 70g",
+      "Saffola Gold Oil 1L",
+      "Parle-G 250g",
+      "Real Mango Juice 1L",
+      "Good Knight Refill",
+      "Amul Taaza 500ml"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_19",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_19",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Atta",
+              "brand": "Aashirvaad",
+              "size": "5kg",
+              "confidence": 0.9
+            },
+            {
+              "name": "Noodles",
+              "brand": "Maggi",
+              "size": "70g",
+              "confidence": 0.64
+            },
+            {
+              "name": "Gold Oil",
+              "brand": "Saffola",
+              "size": "1L",
+              "confidence": 0.87
+            },
+            {
+              "name": "Parle-G",
+              "brand": "Parle-G",
+              "size": "250g",
+              "confidence": 0.89
+            },
+            {
+              "name": "Knight Refill",
+              "brand": "Good",
+              "size": null,
+              "confidence": 0.69
+            },
+            {
+              "name": "Taaza",
+              "brand": "Amul",
+              "size": "500ml",
+              "confidence": 0.75
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

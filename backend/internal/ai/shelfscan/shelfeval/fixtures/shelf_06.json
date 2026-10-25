@@ -1,0 +1,69 @@
+{
+  "name": "shelf_06",
+  "input": {
+    "image": "images/shelf_06.jpg"
+  },
+  "expect": {
+    "products": [
+      "Surf Excel 1kg",
+      "Fortune Sunflower Oil 1L",
+      "Brooke Bond Red Label 250g",
+      "Horlicks 500g",
+      "Aashirvaad Atta 5kg",
+      "Tata Salt 1kg"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_06",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_06",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Excel",
+              "brand": "Surf",
+              "size": "1kg",
+              "confidence": 0.85
+            },
+            {
+              "name": "Sunflower Oil",
+              "brand": "Fortune",
+              "size": "1L",
+              "confidence": 0.94
+            },
+            {
+              "name": "Horlicks",
+              "brand": "Horlicks",
+              "size": "500g",
+              "confidence": 0.95
+            },
+            {
+              "name": "Atta",
+              "brand": "Aashirvaad",
+              "size": "5kg",
+              "confidence": 0.76
+            },
+            {
+              "name": "Salt",
+              "brand": "Tata",
+              "size": "1kg",
+              "confidence": 0.89
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

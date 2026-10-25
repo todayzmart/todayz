@@ -1,0 +1,61 @@
+{
+  "name": "shelf_18",
+  "input": {
+    "image": "images/shelf_18.jpg"
+  },
+  "expect": {
+    "products": [
+      "Fortune Sunflower Oil 1L",
+      "Dettol Soap 125g",
+      "Kurkure Masala 90g",
+      "Nescafe Classic 50g"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_18",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_18",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Sunflower Oil",
+              "brand": "Fortune",
+              "size": "1L",
+              "confidence": 0.6
+            },
+            {
+              "name": "Soap",
+              "brand": "Dettol",
+              "size": "125g",
+              "confidence": 0.68
+            },
+            {
+              "name": "Masala",
+              "brand": "Kurkure",
+              "size": "90g",
+              "confidence": 0.77
+            },
+            {
+              "name": "Classic",
+              "brand": "Nescafe",
+              "size": "50g",
+              "confidence": 0.84
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

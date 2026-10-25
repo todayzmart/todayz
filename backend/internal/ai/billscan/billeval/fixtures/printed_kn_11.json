@@ -1,0 +1,97 @@
+{
+  "name": "printed_kn_11",
+  "input": {
+    "image": "images/printed_kn_11.jpg",
+    "kind": "printed",
+    "lang": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "ಕ್ಲಿನಿಕ್ ಪ್ಲಸ್ 175ml",
+        "quantity": 5,
+        "costPaise": 11545,
+        "mrpPaise": 13500,
+        "expiresOn": "2027-10-28"
+      },
+      {
+        "name": "ಫಾರ್ಚೂನ್ ಎಣ್ಣೆ 1L",
+        "quantity": 3,
+        "costPaise": 14640,
+        "mrpPaise": 18500,
+        "expiresOn": "2027-10-28"
+      },
+      {
+        "name": "ಸರ್ಫ್ ಎಕ್ಸೆಲ್ 1kg",
+        "quantity": 12,
+        "costPaise": 12080,
+        "mrpPaise": 14500,
+        "expiresOn": null
+      },
+      {
+        "name": "ವಿಮ್ ಬಾರ್ 200g",
+        "quantity": 6,
+        "costPaise": 1735,
+        "mrpPaise": 2000,
+        "expiresOn": null
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_kn_11",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_kn_11",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "ಓಂ ಸಾಯಿ ಎಂಟರ್‌ಪ್ರೈಸಸ್",
+          "bill_date": "2026-10-04",
+          "lines": [
+            {
+              "name": "ಕ್ಲಿನಿಕ್ ಪ್ಲಸ್ 175ml",
+              "quantity": 5,
+              "cost_rupees": 115.45,
+              "mrp_rupees": 135.0,
+              "expires_on": "2027-10-28",
+              "confidence": 0.88
+            },
+            {
+              "name": "ಫಾರ್ಚೂನ್ ಎಣ್ಣೆ 1L",
+              "quantity": 3,
+              "cost_rupees": 146.4,
+              "mrp_rupees": 185.0,
+              "expires_on": "2027-10-28",
+              "confidence": 0.83
+            },
+            {
+              "name": "ಸರ್ಫ್ ಎಕ್ಸೆಲ್ 1kg",
+              "quantity": 12,
+              "cost_rupees": 120.8,
+              "mrp_rupees": 145.0,
+              "expires_on": null,
+              "confidence": 0.87
+            },
+            {
+              "name": "ವಿಮ್ ಬಾರ್ 200g",
+              "quantity": 6,
+              "cost_rupees": 17.35,
+              "mrp_rupees": 20.0,
+              "expires_on": null,
+              "confidence": 0.91
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

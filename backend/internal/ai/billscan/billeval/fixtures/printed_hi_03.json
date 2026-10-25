@@ -1,0 +1,142 @@
+{
+  "name": "printed_hi_03",
+  "input": {
+    "image": "images/printed_hi_03.jpg",
+    "kind": "printed",
+    "lang": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "नेस्कैफे 50g",
+        "quantity": 6,
+        "costPaise": 15730,
+        "mrpPaise": 19000,
+        "expiresOn": "2027-01-28"
+      },
+      {
+        "name": "लक्स साबुन 100g",
+        "quantity": 12,
+        "costPaise": 3040,
+        "mrpPaise": 3800,
+        "expiresOn": null
+      },
+      {
+        "name": "फॉर्च्यून तेल 1L",
+        "quantity": 2,
+        "costPaise": 16485,
+        "mrpPaise": 18500,
+        "expiresOn": "2027-05-28"
+      },
+      {
+        "name": "कुरकुरे 90g",
+        "quantity": 4,
+        "costPaise": 1735,
+        "mrpPaise": 2000,
+        "expiresOn": "2027-02-15"
+      },
+      {
+        "name": "टाटा नमक 1kg",
+        "quantity": 6,
+        "costPaise": 2195,
+        "mrpPaise": 2800,
+        "expiresOn": null
+      },
+      {
+        "name": "कोलगेट 200g",
+        "quantity": 5,
+        "costPaise": 10840,
+        "mrpPaise": 12000,
+        "expiresOn": null
+      },
+      {
+        "name": "अमूल बटर 100g",
+        "quantity": 2,
+        "costPaise": 5275,
+        "mrpPaise": 6200,
+        "expiresOn": "2027-04-28"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_hi_03",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_hi_03",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "राम वितरक",
+          "bill_date": "2026-10-17",
+          "lines": [
+            {
+              "name": "नेस्कैफे 50g",
+              "quantity": 6,
+              "cost_rupees": 157.3,
+              "mrp_rupees": 190.0,
+              "expires_on": "2027-01-28",
+              "confidence": 0.93
+            },
+            {
+              "name": "लक्स साबुन 100g",
+              "quantity": 12,
+              "cost_rupees": 30.4,
+              "mrp_rupees": 38.0,
+              "expires_on": null,
+              "confidence": 0.86
+            },
+            {
+              "name": "फॉर्च्यून तेल 1L",
+              "quantity": 2,
+              "cost_rupees": 164.85,
+              "mrp_rupees": 185.0,
+              "expires_on": "2027-05-28",
+              "confidence": 0.93
+            },
+            {
+              "name": "कुरकुरे 90g",
+              "quantity": 4,
+              "cost_rupees": 17.35,
+              "mrp_rupees": 20.0,
+              "expires_on": "2027-02-15",
+              "confidence": 0.94
+            },
+            {
+              "name": "टाटा नमक 1kg",
+              "quantity": 6,
+              "cost_rupees": 21.95,
+              "mrp_rupees": 28.0,
+              "expires_on": null,
+              "confidence": 0.94
+            },
+            {
+              "name": "कोलगेट 200g",
+              "quantity": 5,
+              "cost_rupees": 108.4,
+              "mrp_rupees": 120.0,
+              "expires_on": null,
+              "confidence": 0.91
+            },
+            {
+              "name": "अमूल बटर 100g",
+              "quantity": 2,
+              "cost_rupees": 52.75,
+              "mrp_rupees": 62.0,
+              "expires_on": "2027-04-28",
+              "confidence": 0.9
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

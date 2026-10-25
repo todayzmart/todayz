@@ -1,0 +1,69 @@
+{
+  "name": "shelf_31",
+  "input": {
+    "image": "images/shelf_31.jpg"
+  },
+  "expect": {
+    "products": [
+      "Nescafe Classic 50g",
+      "Aashirvaad Atta 5kg",
+      "Vim Bar 200g",
+      "Dettol Soap 125g",
+      "Lux Soap 100g",
+      "Good Knight Refill"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_31",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_31",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Classic",
+              "brand": "Nescafe",
+              "size": "50g",
+              "confidence": 0.65
+            },
+            {
+              "name": "Atta",
+              "brand": "Aashirvaad",
+              "size": "5kg",
+              "confidence": 0.67
+            },
+            {
+              "name": "Bar",
+              "brand": "Vim",
+              "size": "200g",
+              "confidence": 0.78
+            },
+            {
+              "name": "Soap",
+              "brand": "Dettol",
+              "size": "125g",
+              "confidence": 0.62
+            },
+            {
+              "name": "Soap",
+              "brand": "Lux",
+              "size": "100g",
+              "confidence": 0.94
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

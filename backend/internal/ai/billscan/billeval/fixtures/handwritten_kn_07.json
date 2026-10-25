@@ -1,0 +1,127 @@
+{
+  "name": "handwritten_kn_07",
+  "input": {
+    "image": "images/handwritten_kn_07.jpg",
+    "kind": "handwritten",
+    "lang": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "ಹಾರ್ಲಿಕ್ಸ್ 500g",
+        "quantity": 3,
+        "costPaise": 22425,
+        "mrpPaise": 26000,
+        "expiresOn": null
+      },
+      {
+        "name": "ಹಲ್ದಿರಾಮ್ ಭುಜಿಯಾ 200g",
+        "quantity": 12,
+        "costPaise": 4705,
+        "mrpPaise": 5500,
+        "expiresOn": null
+      },
+      {
+        "name": "ರಿಯಲ್ ಮಾವು ಜ್ಯೂಸ್ 1L",
+        "quantity": 24,
+        "costPaise": 10180,
+        "mrpPaise": 12000,
+        "expiresOn": null
+      },
+      {
+        "name": "ಮ್ಯಾಗಿ ನೂಡಲ್ಸ್ 70g",
+        "quantity": 10,
+        "costPaise": 1100,
+        "mrpPaise": 1400,
+        "expiresOn": "2027-12-28"
+      },
+      {
+        "name": "ಗುಡ್ ನೈಟ್ ರಿಫಿಲ್",
+        "quantity": 6,
+        "costPaise": 6650,
+        "mrpPaise": 8500,
+        "expiresOn": null
+      },
+      {
+        "name": "ವಿಮ್ ಬಾರ್ 200g",
+        "quantity": 4,
+        "costPaise": 1740,
+        "mrpPaise": 2000,
+        "expiresOn": "2027-10-15"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_handwritten_kn_07",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_handwritten_kn_07",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "ಶ್ರೀ ಲಕ್ಷ್ಮಿ ಏಜೆನ್ಸೀಸ್",
+          "bill_date": "2026-10-18",
+          "lines": [
+            {
+              "name": "ಹಾರ್ಲಿಕ್ಸ್ 500g",
+              "quantity": 3,
+              "cost_rupees": 223.75,
+              "mrp_rupees": 260.0,
+              "expires_on": null,
+              "confidence": 0.58
+            },
+            {
+              "name": "ಹಲ್ದಿರಾಮ್ ಭುಜಿಯಾ 200g",
+              "quantity": 12,
+              "cost_rupees": 46.55,
+              "mrp_rupees": 55.0,
+              "expires_on": null,
+              "confidence": 0.62
+            },
+            {
+              "name": "ರಿಯಲ್ ಮಾವು ಜ್ಯೂಸ್ 1L",
+              "quantity": 24,
+              "cost_rupees": 101.8,
+              "mrp_rupees": 120.0,
+              "expires_on": null,
+              "confidence": 0.83
+            },
+            {
+              "name": "ಮ್ಯಾಗಿ ನೂಡಲ್ಸ್ 70g",
+              "quantity": 10,
+              "cost_rupees": 11.0,
+              "mrp_rupees": 14.0,
+              "expires_on": "2027-12-28",
+              "confidence": 0.86
+            },
+            {
+              "name": "ಗುಡ್ ನೈಟ್ ರಿಫಿಲ್",
+              "quantity": 6,
+              "cost_rupees": 66.5,
+              "mrp_rupees": 85.0,
+              "expires_on": "2028-01-31",
+              "confidence": 0.79
+            },
+            {
+              "name": "ವಿಮ್ ಬಾರ್ 200g",
+              "quantity": 4,
+              "cost_rupees": 17.4,
+              "mrp_rupees": 20.0,
+              "expires_on": "2027-10-15",
+              "confidence": 0.84
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

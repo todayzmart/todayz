@@ -1,0 +1,149 @@
+{
+  "name": "printed_kn_03",
+  "input": {
+    "image": "images/printed_kn_03.jpg",
+    "kind": "printed",
+    "lang": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "ಹಾರ್ಲಿಕ್ಸ್ 500g",
+        "quantity": 3,
+        "costPaise": 21545,
+        "mrpPaise": 26000,
+        "expiresOn": null
+      },
+      {
+        "name": "ಅಮುಲ್ ಬೆಣ್ಣೆ 100g",
+        "quantity": 24,
+        "costPaise": 5430,
+        "mrpPaise": 6200,
+        "expiresOn": null
+      },
+      {
+        "name": "ಎಂಡಿಎಚ್ ಚನಾ ಮಸಾಲ 100g",
+        "quantity": 10,
+        "costPaise": 6600,
+        "mrpPaise": 8200,
+        "expiresOn": null
+      },
+      {
+        "name": "ಟಾಟಾ ಉಪ್ಪು 1kg",
+        "quantity": 10,
+        "costPaise": 2370,
+        "mrpPaise": 2800,
+        "expiresOn": "2027-06-28"
+      },
+      {
+        "name": "ರಿಯಲ್ ಮಾವು ಜ್ಯೂಸ್ 1L",
+        "quantity": 12,
+        "costPaise": 10370,
+        "mrpPaise": 12000,
+        "expiresOn": null
+      },
+      {
+        "name": "ಸರ್ಫ್ ಎಕ್ಸೆಲ್ 1kg",
+        "quantity": 3,
+        "costPaise": 12695,
+        "mrpPaise": 14500,
+        "expiresOn": null
+      },
+      {
+        "name": "ಸಫೋಲಾ ಗೋಲ್ಡ್ 1L",
+        "quantity": 12,
+        "costPaise": 17690,
+        "mrpPaise": 21000,
+        "expiresOn": null
+      },
+      {
+        "name": "ಅಮುಲ್ ತಾಜಾ 500ml",
+        "quantity": 3,
+        "costPaise": 2510,
+        "mrpPaise": 2900,
+        "expiresOn": null
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_kn_03",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_kn_03",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "ಗಣೇಶ್ ಡಿಸ್ಟ್ರಿಬ್ಯೂಟರ್ಸ್",
+          "bill_date": "2026-10-23",
+          "lines": [
+            {
+              "name": "ಹಾರ್ಲಿಕ್ಸ್ 500g",
+              "quantity": 3,
+              "cost_rupees": 215.45,
+              "mrp_rupees": 260.0,
+              "expires_on": null,
+              "confidence": 0.88
+            },
+            {
+              "name": "ಎಂಡಿಎಚ್ ಚನಾ ಮಸಾಲ 100g",
+              "quantity": 10,
+              "cost_rupees": 66.0,
+              "mrp_rupees": 82.0,
+              "expires_on": null,
+              "confidence": 0.89
+            },
+            {
+              "name": "ಟಾಟಾ ಉಪ್ಪು 1kg",
+              "quantity": 10,
+              "cost_rupees": 23.7,
+              "mrp_rupees": 28.0,
+              "expires_on": "2027-06-28",
+              "confidence": 0.96
+            },
+            {
+              "name": "ರಿಯಲ್ ಮಾವು ಜ್ಯೂಸ್ 1L",
+              "quantity": 12,
+              "cost_rupees": 103.7,
+              "mrp_rupees": 120.0,
+              "expires_on": null,
+              "confidence": 0.91
+            },
+            {
+              "name": "ಸರ್ಫ್ ಎಕ್ಸೆಲ್ 1kg",
+              "quantity": 3,
+              "cost_rupees": 126.95,
+              "mrp_rupees": 145.0,
+              "expires_on": null,
+              "confidence": 0.98
+            },
+            {
+              "name": "ಸಫೋಲಾ ಗೋಲ್ಡ್ 1L",
+              "quantity": 12,
+              "cost_rupees": 176.9,
+              "mrp_rupees": 210.0,
+              "expires_on": null,
+              "confidence": 0.94
+            },
+            {
+              "name": "ಅಮುಲ್ ತಾಜಾ 500ml",
+              "quantity": 3,
+              "cost_rupees": 25.1,
+              "mrp_rupees": 29.0,
+              "expires_on": null,
+              "confidence": 0.9
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

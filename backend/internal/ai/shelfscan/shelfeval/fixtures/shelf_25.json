@@ -1,0 +1,61 @@
+{
+  "name": "shelf_25",
+  "input": {
+    "image": "images/shelf_25.jpg"
+  },
+  "expect": {
+    "products": [
+      "Tata Salt 1kg",
+      "Brooke Bond Red Label 250g",
+      "Vim Bar 200g",
+      "Dettol Soap 125g"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_25",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_25",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Salt",
+              "brand": "Tata",
+              "size": "1kg",
+              "confidence": 0.62
+            },
+            {
+              "name": "Bond Red Label",
+              "brand": "Brooke",
+              "size": "250g",
+              "confidence": 0.84
+            },
+            {
+              "name": "Bar",
+              "brand": "Vim",
+              "size": "200g",
+              "confidence": 0.63
+            },
+            {
+              "name": "Soap",
+              "brand": "Dettol",
+              "size": "125g",
+              "confidence": 0.88
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

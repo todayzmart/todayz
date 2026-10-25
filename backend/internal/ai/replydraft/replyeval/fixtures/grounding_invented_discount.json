@@ -1,0 +1,38 @@
+{
+  "name": "grounding_invented_discount",
+  "input": {
+    "stars": 3,
+    "tags": [
+      "expensive"
+    ],
+    "text": "Prices are a bit high.",
+    "language": "en",
+    "shop": "Sri Lakshmi Stores"
+  },
+  "expect": {
+    "text": "",
+    "reject": "grounding"
+  },
+  "reply": {
+    "id": "msg_rr_grounding_invented_discount",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rr_grounding_invented_discount",
+        "name": "draft_review_reply",
+        "input": {
+          "text": "Sorry about the prices. Show this reply for 10% off your next visit."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

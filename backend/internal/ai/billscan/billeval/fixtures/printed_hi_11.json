@@ -1,0 +1,142 @@
+{
+  "name": "printed_hi_11",
+  "input": {
+    "image": "images/printed_hi_11.jpg",
+    "kind": "printed",
+    "lang": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "रियल आम जूस 1L",
+        "quantity": 2,
+        "costPaise": 10920,
+        "mrpPaise": 12000,
+        "expiresOn": "2027-07-15"
+      },
+      {
+        "name": "अमूल बटर 100g",
+        "quantity": 24,
+        "costPaise": 4980,
+        "mrpPaise": 6200,
+        "expiresOn": "2027-10-28"
+      },
+      {
+        "name": "कोलगेट 200g",
+        "quantity": 2,
+        "costPaise": 9955,
+        "mrpPaise": 12000,
+        "expiresOn": "2027-02-28"
+      },
+      {
+        "name": "डेटॉल साबुन 125g",
+        "quantity": 4,
+        "costPaise": 4690,
+        "mrpPaise": 5500,
+        "expiresOn": "2027-06-28"
+      },
+      {
+        "name": "गुड नाइट रिफिल",
+        "quantity": 4,
+        "costPaise": 6875,
+        "mrpPaise": 8500,
+        "expiresOn": "2027-12-28"
+      },
+      {
+        "name": "नेस्कैफे 50g",
+        "quantity": 4,
+        "costPaise": 16220,
+        "mrpPaise": 19000,
+        "expiresOn": null
+      },
+      {
+        "name": "सर्फ एक्सेल 1kg",
+        "quantity": 6,
+        "costPaise": 13030,
+        "mrpPaise": 14500,
+        "expiresOn": "2027-02-28"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_hi_11",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_hi_11",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "श्री गणेश एजेंसी",
+          "bill_date": "2026-10-13",
+          "lines": [
+            {
+              "name": "रियल आम जूस 1L",
+              "quantity": 2,
+              "cost_rupees": 109.2,
+              "mrp_rupees": 120.0,
+              "expires_on": "2027-07-15",
+              "confidence": 0.91
+            },
+            {
+              "name": "अमूल बटर 100g",
+              "quantity": 24,
+              "cost_rupees": 49.8,
+              "mrp_rupees": 62.0,
+              "expires_on": "2027-10-28",
+              "confidence": 0.93
+            },
+            {
+              "name": "कोलगेट 200g",
+              "quantity": 2,
+              "cost_rupees": 99.55,
+              "mrp_rupees": 120.0,
+              "expires_on": "2027-02-28",
+              "confidence": 0.94
+            },
+            {
+              "name": "डेटॉल साबुन 125g",
+              "quantity": 4,
+              "cost_rupees": 46.9,
+              "mrp_rupees": 55.0,
+              "expires_on": "2027-06-28",
+              "confidence": 0.92
+            },
+            {
+              "name": "गुड नाइट रिफिल",
+              "quantity": 4,
+              "cost_rupees": 68.75,
+              "mrp_rupees": 85.0,
+              "expires_on": "2027-12-28",
+              "confidence": 0.94
+            },
+            {
+              "name": "नेस्कैफे 50g",
+              "quantity": 4,
+              "cost_rupees": 162.2,
+              "mrp_rupees": 190.0,
+              "expires_on": null,
+              "confidence": 0.97
+            },
+            {
+              "name": "सर्फ एक्सेल 1kg",
+              "quantity": 6,
+              "cost_rupees": 130.3,
+              "mrp_rupees": 145.0,
+              "expires_on": "2027-02-28",
+              "confidence": 0.98
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

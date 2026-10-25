@@ -1,0 +1,49 @@
+{
+  "name": "ta_wanted_nearby",
+  "input": {
+    "lang": "ta",
+    "rows": [
+      {
+        "ref": "r1",
+        "kind": "wanted_nearby",
+        "facts": {
+          "query": "oats",
+          "searches": 15
+        }
+      }
+    ]
+  },
+  "expect": {
+    "texts": {
+      "r1": "அருகில் oats 15 முறை தேடப்பட்டது; இதை உங்கள் கடையில் சேர்க்கவும்."
+    },
+    "dropped": 0
+  },
+  "reply": {
+    "id": "msg_it_ta_wanted_nearby",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_it_ta_wanted_nearby",
+        "name": "write_insight_texts",
+        "input": {
+          "texts": [
+            {
+              "ref": "r1",
+              "text": "அருகில் oats 15 முறை தேடப்பட்டது; இதை உங்கள் கடையில் சேர்க்கவும்."
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

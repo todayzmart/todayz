@@ -1,0 +1,97 @@
+{
+  "name": "printed_kn_08",
+  "input": {
+    "image": "images/printed_kn_08.jpg",
+    "kind": "printed",
+    "lang": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "ಪಾರ್ಲೆ-ಜಿ 250g",
+        "quantity": 12,
+        "costPaise": 2595,
+        "mrpPaise": 3000,
+        "expiresOn": "2027-02-28"
+      },
+      {
+        "name": "ಗುಡ್ ನೈಟ್ ರಿಫಿಲ್",
+        "quantity": 3,
+        "costPaise": 7700,
+        "mrpPaise": 8500,
+        "expiresOn": "2027-10-15"
+      },
+      {
+        "name": "ಸರ್ಫ್ ಎಕ್ಸೆಲ್ 1kg",
+        "quantity": 5,
+        "costPaise": 11985,
+        "mrpPaise": 14500,
+        "expiresOn": null
+      },
+      {
+        "name": "ಅಮುಲ್ ತಾಜಾ 500ml",
+        "quantity": 5,
+        "costPaise": 2555,
+        "mrpPaise": 2900,
+        "expiresOn": "2027-11-28"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_kn_08",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_kn_08",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "ಬಾಲಾಜಿ ಟ್ರೇಡರ್ಸ್",
+          "bill_date": "2026-10-18",
+          "lines": [
+            {
+              "name": "ಪಾರ್ಲೆ-ಜಿ 250g",
+              "quantity": 12,
+              "cost_rupees": 25.95,
+              "mrp_rupees": 30.0,
+              "expires_on": "2027-02-28",
+              "confidence": 0.86
+            },
+            {
+              "name": "ಗುಡ್ ನೈಟ್ ರಿಫಿಲ್",
+              "quantity": 3,
+              "cost_rupees": 77.0,
+              "mrp_rupees": 85.0,
+              "expires_on": "2027-10-15",
+              "confidence": 0.88
+            },
+            {
+              "name": "ಸರ್ಫ್ ಎಕ್ಸೆಲ್ 1kg",
+              "quantity": 5,
+              "cost_rupees": 119.85,
+              "mrp_rupees": 145.0,
+              "expires_on": null,
+              "confidence": 0.84
+            },
+            {
+              "name": "ಅಮುಲ್ ತಾಜಾ 500ml",
+              "quantity": 5,
+              "cost_rupees": 25.55,
+              "mrp_rupees": 29.0,
+              "expires_on": "2027-11-28",
+              "confidence": 0.83
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

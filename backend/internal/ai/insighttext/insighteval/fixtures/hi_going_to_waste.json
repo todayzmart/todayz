@@ -1,0 +1,51 @@
+{
+  "name": "hi_going_to_waste",
+  "input": {
+    "lang": "hi",
+    "rows": [
+      {
+        "ref": "r1",
+        "kind": "going_to_waste",
+        "facts": {
+          "itemName": "अमूल ताज़ा 500ml",
+          "units": 12,
+          "valueAtCost": "182.40",
+          "daysToExpiry": 3
+        }
+      }
+    ]
+  },
+  "expect": {
+    "texts": {
+      "r1": "अमूल ताज़ा 500ml के 12 पैकेट 3 दिन में एक्सपायर होंगे, लागत ₹182.40; फ़्लैश ऑफ़र से इन्हें निकालें।"
+    },
+    "dropped": 0
+  },
+  "reply": {
+    "id": "msg_it_hi_going_to_waste",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_it_hi_going_to_waste",
+        "name": "write_insight_texts",
+        "input": {
+          "texts": [
+            {
+              "ref": "r1",
+              "text": "अमूल ताज़ा 500ml के 12 पैकेट 3 दिन में एक्सपायर होंगे, लागत ₹182.40; फ़्लैश ऑफ़र से इन्हें निकालें।"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

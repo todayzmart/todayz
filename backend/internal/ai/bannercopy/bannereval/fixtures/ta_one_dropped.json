@@ -1,0 +1,65 @@
+{
+  "name": "ta_one_dropped",
+  "input": {
+    "shop": "Murugan Stores",
+    "language": "ta",
+    "offer": {
+      "kind": "percent",
+      "percentOff": 5,
+      "wholeShop": true
+    },
+    "items": []
+  },
+  "expect": {
+    "kept": 2,
+    "dropped": 1,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_bc_ta_one_dropped",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bc_ta_one_dropped",
+        "name": "draft_banner_copy",
+        "input": {
+          "options": [
+            {
+              "headline": "எல்லாவற்றிலும் 5% தள்ளுபடி",
+              "subline": "முழு கடைக்கும்",
+              "headline_en": "5% off everything",
+              "subline_en": "On the whole shop",
+              "tint": "green",
+              "item": null
+            },
+            {
+              "headline": "50% வரை தள்ளுபடி",
+              "subline": "இன்று மட்டும்",
+              "headline_en": "Up to 50% off",
+              "subline_en": "Today only",
+              "tint": "rose",
+              "item": null
+            },
+            {
+              "headline": "சேமிக்கும் நேரம்",
+              "subline": "5% குறைவு",
+              "headline_en": "Time to save",
+              "subline_en": "5% less",
+              "tint": "amber",
+              "item": null
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

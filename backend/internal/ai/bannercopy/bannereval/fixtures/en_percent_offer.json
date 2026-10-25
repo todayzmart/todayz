@@ -1,0 +1,72 @@
+{
+  "name": "en_percent_offer",
+  "input": {
+    "shop": "Sri Lakshmi Stores",
+    "language": "en",
+    "offer": {
+      "kind": "percent",
+      "percentOff": 10,
+      "wholeShop": true,
+      "endsOn": "31 Oct"
+    },
+    "items": [
+      {
+        "n": 1,
+        "name": "Haldiram Bhujia 200g",
+        "priceRupees": "55"
+      }
+    ]
+  },
+  "expect": {
+    "kept": 3,
+    "dropped": 0,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_bc_en_percent_offer",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bc_en_percent_offer",
+        "name": "draft_banner_copy",
+        "input": {
+          "options": [
+            {
+              "headline": "10% off everything",
+              "subline": "Till 31 Oct",
+              "headline_en": "10% off everything",
+              "subline_en": "Till 31 Oct",
+              "tint": "amber",
+              "item": 1
+            },
+            {
+              "headline": "Diwali savings are here",
+              "subline": "10% off the whole shop",
+              "headline_en": "Diwali savings are here",
+              "subline_en": "10% off the whole shop",
+              "tint": "rose",
+              "item": null
+            },
+            {
+              "headline": "Stock up for the festival",
+              "subline": "Offer ends 31 Oct",
+              "headline_en": "Stock up for the festival",
+              "subline_en": "Offer ends 31 Oct",
+              "tint": "green",
+              "item": null
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

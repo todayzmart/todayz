@@ -1,0 +1,72 @@
+{
+  "name": "te_bxgy",
+  "input": {
+    "shop": "Sai Ram Stores",
+    "language": "te",
+    "offer": {
+      "kind": "bxgy",
+      "buy": 2,
+      "get": 1,
+      "wholeShop": false
+    },
+    "items": [
+      {
+        "n": 1,
+        "name": "Lux Soap 100g",
+        "priceRupees": "38"
+      }
+    ]
+  },
+  "expect": {
+    "kept": 3,
+    "dropped": 0,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_bc_te_bxgy",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bc_te_bxgy",
+        "name": "draft_banner_copy",
+        "input": {
+          "options": [
+            {
+              "headline": "2 కొంటే 1 ఉచితం",
+              "subline": "Lux Soap 100g",
+              "headline_en": "Buy 2 get 1 free",
+              "subline_en": "Lux Soap 100g",
+              "tint": "rose",
+              "item": 1
+            },
+            {
+              "headline": "సబ్బులపై ఆఫర్",
+              "subline": "2 కొనండి, 1 ఉచితం",
+              "headline_en": "Soap offer",
+              "subline_en": "Buy 2, get 1 free",
+              "tint": "sky",
+              "item": 1
+            },
+            {
+              "headline": "ఈ వారం ప్రత్యేకం",
+              "subline": "2 + 1 ఉచితం",
+              "headline_en": "This week's special",
+              "subline_en": "2 + 1 free",
+              "tint": "peach",
+              "item": null
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

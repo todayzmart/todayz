@@ -1,0 +1,76 @@
+{
+  "name": "shelf_07",
+  "input": {
+    "image": "images/shelf_07.jpg"
+  },
+  "expect": {
+    "products": [
+      "Britannia Good Day 100g",
+      "Surf Excel 1kg",
+      "Kurkure Masala 90g",
+      "Amul Butter 100g",
+      "Brooke Bond Red Label 250g",
+      "Vim Bar 200g",
+      "Amul Taaza 500ml"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_07",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_07",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Good Day",
+              "brand": "Britannia",
+              "size": "100g",
+              "confidence": 0.6
+            },
+            {
+              "name": "Excel",
+              "brand": "Surf",
+              "size": "1kg",
+              "confidence": 0.73
+            },
+            {
+              "name": "Masala",
+              "brand": "Kurkure",
+              "size": "90g",
+              "confidence": 0.69
+            },
+            {
+              "name": "Butter",
+              "brand": "Amul",
+              "size": "100g",
+              "confidence": 0.86
+            },
+            {
+              "name": "Bond Red Label",
+              "brand": "Brooke",
+              "size": "250g",
+              "confidence": 0.87
+            },
+            {
+              "name": "Bar",
+              "brand": "Vim",
+              "size": "200g",
+              "confidence": 0.64
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

@@ -1,0 +1,142 @@
+{
+  "name": "printed_en_12",
+  "input": {
+    "image": "images/printed_en_12.jpg",
+    "kind": "printed",
+    "lang": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "Parle-G 250g",
+        "quantity": 3,
+        "costPaise": 2540,
+        "mrpPaise": 3000,
+        "expiresOn": null
+      },
+      {
+        "name": "Clinic Plus Shampoo 175ml",
+        "quantity": 12,
+        "costPaise": 11310,
+        "mrpPaise": 13500,
+        "expiresOn": null
+      },
+      {
+        "name": "Good Knight Refill",
+        "quantity": 12,
+        "costPaise": 7150,
+        "mrpPaise": 8500,
+        "expiresOn": null
+      },
+      {
+        "name": "Surf Excel 1kg",
+        "quantity": 24,
+        "costPaise": 11475,
+        "mrpPaise": 14500,
+        "expiresOn": "2027-02-28"
+      },
+      {
+        "name": "Dettol Soap 125g",
+        "quantity": 4,
+        "costPaise": 4930,
+        "mrpPaise": 5500,
+        "expiresOn": "2027-06-15"
+      },
+      {
+        "name": "Nescafe Classic 50g",
+        "quantity": 24,
+        "costPaise": 15060,
+        "mrpPaise": 19000,
+        "expiresOn": null
+      },
+      {
+        "name": "Fortune Sunflower Oil 1L",
+        "quantity": 4,
+        "costPaise": 16445,
+        "mrpPaise": 18500,
+        "expiresOn": "2027-03-28"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_en_12",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_en_12",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "Sri Lakshmi Agencies",
+          "bill_date": "2026-10-02",
+          "lines": [
+            {
+              "name": "Parle-G 250g",
+              "quantity": 3,
+              "cost_rupees": 25.4,
+              "mrp_rupees": 30.0,
+              "expires_on": null,
+              "confidence": 0.98
+            },
+            {
+              "name": "Clinic Plus Shampoo 175ml",
+              "quantity": 12,
+              "cost_rupees": 113.1,
+              "mrp_rupees": 135.0,
+              "expires_on": null,
+              "confidence": 0.97
+            },
+            {
+              "name": "Good Knight Refill",
+              "quantity": 12,
+              "cost_rupees": 71.0,
+              "mrp_rupees": 85.0,
+              "expires_on": null,
+              "confidence": 0.84
+            },
+            {
+              "name": "Surf Excel 1kg",
+              "quantity": 24,
+              "cost_rupees": 114.75,
+              "mrp_rupees": 145.0,
+              "expires_on": "2027-02-28",
+              "confidence": 0.91
+            },
+            {
+              "name": "Dettol Soap 125g",
+              "quantity": 4,
+              "cost_rupees": 49.3,
+              "mrp_rupees": 55.0,
+              "expires_on": "2027-06-15",
+              "confidence": 0.82
+            },
+            {
+              "name": "Nescafe Classic 50g",
+              "quantity": 24,
+              "cost_rupees": 150.6,
+              "mrp_rupees": 190.0,
+              "expires_on": null,
+              "confidence": 0.88
+            },
+            {
+              "name": "Fortune Sunflower Oil 1L",
+              "quantity": 4,
+              "cost_rupees": 164.45,
+              "mrp_rupees": 185.0,
+              "expires_on": "2027-03-28",
+              "confidence": 0.93
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}
