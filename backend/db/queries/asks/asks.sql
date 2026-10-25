@@ -147,6 +147,10 @@ SELECT id, customer_id, status FROM asks WHERE id = @id;
 -- name: AskYesCount :one
 SELECT count(*)::int FROM ask_recipients WHERE ask_id = @ask_id AND answer = 'yes';
 
+-- name: MarkFirstYesNotified :execrows
+-- Claims the ask's one first-Yes push: 1 for the first caller, 0 after.
+UPDATE asks SET first_yes_notified_at = @now WHERE id = @id AND first_yes_notified_at IS NULL;
+
 -- name: AskRecipientStores :many
 SELECT store_id FROM ask_recipients WHERE ask_id = @ask_id;
 
@@ -181,13 +185,15 @@ SELECT count(*)::int FROM ask_recipients r JOIN asks a ON a.id = r.ask_id
 WHERE r.store_id = @store_id AND r.answer IS NULL AND r.reply_by > @now AND a.status = 'open';
 
 -- name: LockRecipient :one
--- The store's row of one ask, locked for the reply or the report.
+-- The store's row of one ask, locked for the reply or the report. The ask row
+-- is locked too, so a customer's close (or the window job) and a reply never
+-- interleave: whichever comes second sees the other's result.
 SELECT r.id, r.ask_id, r.store_id, r.answer, r.reply_by, r.reported_at, r.store_item_id, r.sent_at,
        a.customer_id, a.product_id, a.query_norm, a.quantity, a.need_by, a.status AS ask_status, a.created_at AS ask_created_at,
        p.name AS product_name, p.mrp_paise AS product_mrp_paise
 FROM ask_recipients r JOIN asks a ON a.id = r.ask_id LEFT JOIN products p ON p.id = a.product_id
 WHERE r.ask_id = @ask_id AND r.store_id = @store_id
-FOR UPDATE OF r;
+FOR UPDATE OF r, a;
 
 -- name: StoreItemPrice :one
 SELECT si.id, si.price_paise, si.mrp_paise, si.is_listed, si.product_id
@@ -276,7 +282,8 @@ DELETE FROM ask_store_blocks WHERE customer_id = @customer_id;
 
 -- name: RollupAskDemand :execrows
 -- One IST day of closed asks per receiving store, product (or query) and
--- cell. An ask whose customer searched the same product (or query) in the
+-- cell. Only asks that ran their course count (window_ended, all_replied): a
+-- customer who closed an ask is not demand the shops missed. An ask whose customer searched the same product (or query) in the
 -- hour before counts in the search already (01 §11.1), so it is left out.
 INSERT INTO rollup_daily_ask_demand (date, geo_cell, store_id, product_id, query_norm, asks, asks_without_yes)
 SELECT @day::date, a.geo_cell, r.store_id, a.product_id, a.query_norm,
@@ -284,6 +291,7 @@ SELECT @day::date, a.geo_cell, r.store_id, a.product_id, a.query_norm,
        count(*) FILTER (WHERE NOT EXISTS (SELECT 1 FROM ask_recipients y WHERE y.ask_id = a.id AND y.answer = 'yes'))::int
 FROM asks a JOIN ask_recipients r ON r.ask_id = a.id
 WHERE a.created_at >= @from_at AND a.created_at < @to_at AND a.status = 'closed'
+  AND a.close_reason IN ('window_ended', 'all_replied')
   AND NOT EXISTS (
     SELECT 1 FROM search_log l
     WHERE l.user_id = a.customer_id AND l.created_at >= a.created_at - interval '1 hour' AND l.created_at <= a.created_at
@@ -317,7 +325,8 @@ ORDER BY 1, 2, 3;
 
 -- name: DemandGaps :many
 -- Products (or queries) that at least min_customers distinct customers of a
--- city asked for in the window with no Yes (01 §11.1, A-23 Gaps).
+-- city asked for in the window with no Yes (01 §11.1, A-23 Gaps). A
+-- customer_closed ask is not a gap.
 SELECT a.city_place_id, c.name AS city_name, a.product_id, p.name AS product_name, p.variant AS product_variant,
        (CASE WHEN a.product_id IS NULL THEN a.query_norm ELSE '' END)::text AS query_key,
        count(DISTINCT a.customer_id)::int AS customers, count(*)::int AS asks,
@@ -327,7 +336,7 @@ FROM asks a
 JOIN places c ON c.id = a.city_place_id
 LEFT JOIN products p ON p.id = a.product_id
 LEFT JOIN categories cat ON cat.id = p.category_id
-WHERE a.status = 'closed' AND a.created_at >= @since
+WHERE a.status = 'closed' AND a.close_reason IN ('window_ended', 'all_replied') AND a.created_at >= @since
   AND (sqlc.narg(city_place_id)::uuid IS NULL OR a.city_place_id = sqlc.narg(city_place_id)::uuid)
   AND NOT EXISTS (SELECT 1 FROM ask_recipients r WHERE r.ask_id = a.id AND r.answer = 'yes')
 GROUP BY 1, 2, 3, 4, 5, 6, cat.names

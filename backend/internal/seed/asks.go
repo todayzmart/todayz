@@ -114,31 +114,31 @@ func seedasks(ctx context.Context, d Deps, _ Profile) error {
 
 	asks := []seedAsk{
 		{Customer: "customer.asha", Product: "Toor dal 1 kg", Qty: 2, NeedBy: "today", Ago: 4 * time.Minute, Replies: []askReply{
-			{Store: "SL", DistanceM: 600, Item: "I7"}, {Store: "SL2", DistanceM: 1800},
-			{Store: "AP", DistanceM: 1200, Answer: "no", RepliedAt: 2 * time.Minute},
+			{Store: "SL", DistanceM: 500, Item: "I7"}, {Store: "SL2", DistanceM: 2000},
+			{Store: "AP", DistanceM: 1000, Answer: "no", RepliedAt: 2 * time.Minute},
 		}},
 		{Customer: "customer.ravi", Product: "Amul Butter 100 g", Qty: 1, NeedBy: "now", Ago: 10 * time.Minute, Replies: []askReply{
-			{Store: "SL", DistanceM: 600, Answer: "yes", Price: 5800, Item: "I1", ReadyIn: 20 * time.Minute, RepliedAt: 6 * time.Minute},
-			{Store: "SL2", DistanceM: 1800},
+			{Store: "SL", DistanceM: 500, Answer: "yes", Price: 5800, Item: "I1", ReadyIn: 20 * time.Minute, RepliedAt: 6 * time.Minute},
+			{Store: "SL2", DistanceM: 2000},
 		}},
 		{Customer: "customer.asha", Text: "brass diya", Qty: 1, Ago: 3 * time.Hour, Closed: "window_ended", Replies: []askReply{
-			{Store: "SL", DistanceM: 600}, {Store: "AP", DistanceM: 1200},
+			{Store: "SL", DistanceM: 500}, {Store: "AP", DistanceM: 1000},
 		}},
 	}
 	for i := range lowAfter {
 		asks = append(asks, seedAsk{Customer: "customer.new", Text: fmt.Sprintf("qa low yield %02d", i+1), Qty: 1,
 			Ago: time.Duration(i+1) * 6 * time.Hour, Closed: "window_ended",
-			Replies: []askReply{{Store: "SL2", DistanceM: 1800}}})
+			Replies: []askReply{{Store: "SL2", DistanceM: 2000}}})
 	}
 	for i := 1; i <= 10; i++ {
 		asks = append(asks, seedAsk{Shopper: i, Product: "Kodo millet 1 kg", Qty: 1, Ago: time.Duration(i) * 7 * time.Hour,
 			Closed: "window_ended", Replies: []askReply{
-				{Store: "SL", DistanceM: 600, Answer: "no", RepliedAt: time.Duration(i)*7*time.Hour - 5*time.Minute},
-				{Store: "SL2", DistanceM: 1800},
+				{Store: "SL", DistanceM: 500, Answer: "no", RepliedAt: time.Duration(i)*7*time.Hour - 5*time.Minute},
+				{Store: "SL2", DistanceM: 2000},
 			}})
 		if i <= 9 {
 			asks = append(asks, seedAsk{Shopper: i, Product: "Foxtail millet 500 g", Qty: 1, Ago: time.Duration(i)*7*time.Hour + time.Hour,
-				Closed: "window_ended", Replies: []askReply{{Store: "SL2", DistanceM: 1800}}})
+				Closed: "window_ended", Replies: []askReply{{Store: "SL2", DistanceM: 2000}}})
 		}
 	}
 

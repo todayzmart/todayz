@@ -5,8 +5,9 @@
 // Rules this package keeps:
 //
 //   - A shop never sees who asked: the shop side selects no customer column,
-//     and the only distance it sees is a band. The exact distance is in the
-//     customer's own replies only.
+//     and the only distance it sees is a band. The customer's own replies show
+//     a distance rounded to 500 m; the exact one is never stored, since exact
+//     distances to three shops would place the customer.
 //   - A store left out of an ask is never named: "Ask this shop" answers the
 //     same 409 ask_store_unavailable whatever the reason, and "nearby" answers
 //     409 ask_no_shops when none qualify.
@@ -156,7 +157,18 @@ const (
 	band1km = 1000 //settings:ok distance band edge, 01 §11.2
 	band3km = 3000 //settings:ok distance band edge, 01 §11.2
 	band5km = 5000 //settings:ok distance band edge, 01 §11.2
+
+	// distanceStepM is the rounding of the stored distance (privacy, not a
+	// product number): the nearest 500 m, never below 500.
+	distanceStepM = 500 //settings:ok privacy rounding of the stored distance
 )
+
+// RoundDistance is the distance kept on a recipient row: m to the nearest
+// distanceStepM, and never below it.
+func RoundDistance(m int32) int32 {
+	r := (m + distanceStepM/2) / distanceStepM * distanceStepM
+	return max(r, distanceStepM)
+}
 
 // Band names the distance band of m metres.
 func Band(m int32) string {

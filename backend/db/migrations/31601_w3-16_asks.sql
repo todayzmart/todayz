@@ -2,7 +2,8 @@
 -- 03 "Asks, share cards and the site search strip", D-101).
 --
 -- asks: the exact search point is never stored. It picks the recipients and
--- each recipient's distance, then only geo_cell (H3 res 8) and the city stay.
+-- each recipient's distance band and a distance rounded to 500 m, then only
+-- geo_cell (H3 res 8) and the city stay.
 -- No name or phone is copied; the shop sees the item, the quantity and a
 -- distance band.
 --
@@ -37,6 +38,8 @@ CREATE TABLE asks (
   version          int NOT NULL DEFAULT 1,
   created_at       timestamptz NOT NULL DEFAULT now(),
   closed_at        timestamptz,
+  -- set once, by the reply that sends the ask's one first-Yes push
+  first_yes_notified_at timestamptz,
   CONSTRAINT ck_asks_query_norm CHECK (char_length(query_norm) BETWEEN 1 AND 200),
   CONSTRAINT ck_asks_quantity CHECK (quantity BETWEEN 1 AND 99),
   CONSTRAINT ck_asks_need_by CHECK (need_by IS NULL OR need_by IN ('now','today','tomorrow')),
@@ -57,6 +60,8 @@ CREATE TABLE ask_recipients (
   ask_id            uuid NOT NULL REFERENCES asks (id) ON DELETE CASCADE,
   store_id          uuid NOT NULL REFERENCES stores (id),
   sent_at           timestamptz NOT NULL,
+  -- rounded to the nearest 500 m (never below 500): the customer's card shows
+  -- it, and exact distances to three shops would place the customer
   distance_m        int NOT NULL,
   distance_band     text NOT NULL,
   reply_by          timestamptz NOT NULL,
@@ -70,7 +75,7 @@ CREATE TABLE ask_recipients (
   reported_at       timestamptz,
   reported_by       uuid REFERENCES users (id),
   CONSTRAINT uq_ask_recipients_store UNIQUE (ask_id, store_id),
-  CONSTRAINT ck_ask_recipients_distance CHECK (distance_m >= 0),
+  CONSTRAINT ck_ask_recipients_distance CHECK (distance_m >= 500 AND distance_m % 500 = 0),
   CONSTRAINT ck_ask_recipients_band CHECK (distance_band IN ('lt_1km','1_3km','3_5km','gt_5km')),
   CONSTRAINT ck_ask_recipients_answer CHECK (answer IS NULL OR answer IN ('yes','no')),
   CONSTRAINT ck_ask_recipients_price CHECK ((answer = 'yes' OR price_paise IS NULL) AND (price_paise IS NULL OR price_paise > 0)),

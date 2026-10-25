@@ -268,11 +268,13 @@ func (s *Service) reply(ctx context.Context, sid, askID string, body *asksapi.As
 			return err
 		}
 		if yes && s.notices != nil {
-			n, err := q.AskYesCount(ctx, rec.AskID)
+			// The one push for an ask is at the first Yes (01 §11.2, §15): the
+			// conditional update claims it, so two Yeses at once send one.
+			n, err := q.MarkFirstYesNotified(ctx, asksdb.MarkFirstYesNotifiedParams{ID: rec.AskID, Now: &now})
 			if err != nil {
 				return err
 			}
-			if n == 1 { // the one push for an ask is at the first Yes (01 §11.2, §15)
+			if n == 1 {
 				st, err := q.StoreForAsk(ctx, ids.UUID(storeID))
 				if err != nil {
 					return err

@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
 
@@ -21,6 +22,7 @@ import (
 	"github.com/todayz/backend/internal/platform/eventcat"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/notice"
 	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/testkit"
 )
@@ -163,6 +165,12 @@ func code(t *testing.T, err error) string {
 	var p *problem.Error
 	require.ErrorAs(t, err, &p)
 	return p.Code
+}
+
+func TestRoundDistance(t *testing.T) {
+	for m, want := range map[int32]int32{0: 500, 249: 500, 600: 500, 749: 500, 750: 1000, 1234: 1000, 1250: 1500, 4999: 5000} {
+		require.Equal(t, want, RoundDistance(m), m)
+	}
 }
 
 func TestBand(t *testing.T) {
@@ -364,7 +372,7 @@ func TestReplyPricerAndNoStockMovement(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, det.Replies, 1)
 	rep := mustID(t, det.Replies[0].AskReplyId)
-	require.Equal(t, 400, det.Replies[0].DistanceM/100*100)
+	require.Equal(t, 500, det.Replies[0].DistanceM, "400 m is kept as 500 m")
 	require.Equal(t, st.String(), det.Replies[0].StoreId)
 	require.NotNil(t, det.Replies[0].ListedPricePaise, "the item's price now, for after the reply's price ends")
 	p, ok, err := w.svc.AskPrice(context.Background(), w.customer, st, rep, testNow)
@@ -486,4 +494,106 @@ func TestOneReplyUnderARace(t *testing.T) {
 	}
 	require.Equal(t, 1, ok)
 	require.Equal(t, 1, w.count(`SELECT count(*) FROM ask_recipients WHERE answer IS NOT NULL`))
+}
+
+// TestNoExactDistanceIsStored: a recipient row keeps the band and a distance
+// rounded to 500 m, never the exact one (three exact distances place the
+// customer), and the table refuses an exact value.
+func TestNoExactDistanceIsStored(t *testing.T) {
+	w := newWorld(t)
+	w.store("a", 320)
+	w.store("b", 1340)
+	w.store("c", 2710)
+	_, err := w.ask(ids.Zero, "")
+	require.NoError(t, err)
+	require.Equal(t, 3, w.count(`SELECT count(*) FROM ask_recipients`))
+	require.Zero(t, w.count(`SELECT count(*) FROM ask_recipients WHERE distance_m % 500 <> 0 OR distance_m < 500`))
+	require.Equal(t, 1, w.count(`SELECT count(*) FROM ask_recipients WHERE distance_m = 1500 AND distance_band = '1_3km'`))
+	_, err = w.tdb.OwnerPool.Exec(context.Background(), `UPDATE ask_recipients SET distance_m = 1340`)
+	require.ErrorContains(t, err, "ck_ask_recipients_distance")
+}
+
+// TestReplyWaitsForAClose: the reply locks the ask row, so a Yes cannot land
+// on an ask a customer is closing; it waits for the close and gets ask_closed.
+func TestReplyWaitsForAClose(t *testing.T) {
+	w := newWorld(t)
+	st := w.store("near", 300)
+	d, err := w.ask(ids.Zero, "")
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	closing, err := w.tdb.OwnerPool.Begin(ctx)
+	require.NoError(t, err)
+	defer func() { _ = closing.Rollback(ctx) }()
+	_, err = closing.Exec(ctx, `UPDATE asks SET status = 'closed', close_reason = 'customer_closed', closed_at = $2 WHERE id = $1`,
+		ids.UUID(mustID(t, d.Ask.AskId)), testNow)
+	require.NoError(t, err)
+
+	done := make(chan error, 1)
+	go func() {
+		_, err := w.svc.reply(w.asStaff(st, authz.Owner), st.String(), d.Ask.AskId, &asksapi.AskReplyCreate{Answer: asksapi.AskReplyCreateAnswerYes})
+		done <- err
+	}()
+	select {
+	case err := <-done:
+		t.Fatalf("the reply did not wait for the close: %v", err)
+	case <-time.After(300 * time.Millisecond):
+	}
+	require.NoError(t, closing.Commit(ctx))
+	require.Equal(t, string(genproblems.AskClosed), code(t, <-done))
+	require.Zero(t, w.count(`SELECT count(*) FROM ask_recipients WHERE answer IS NOT NULL`))
+}
+
+// countSender counts the notices by kind.
+type countSender struct {
+	mu sync.Mutex
+	n  map[string]int
+}
+
+func (c *countSender) Send(_ context.Context, _ pgx.Tx, n notice.Notification) (ids.ID, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.n[n.Kind]++
+	return ids.New(testNow), nil
+}
+
+// TestFirstYesPushOnceUnderARace: two shops saying Yes at once send the
+// customer one push.
+func TestFirstYesPushOnceUnderARace(t *testing.T) {
+	w := newWorld(t)
+	sender := &countSender{n: map[string]int{}}
+	w.svc.notices = sender
+	a, b := w.store("a", 300), w.store("b", 600)
+	w.store("c", 900)
+	d, err := w.ask(ids.Zero, "")
+	require.NoError(t, err)
+	var wg sync.WaitGroup
+	errs := make([]error, 2)
+	for i, st := range []ids.ID{a, b} {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			_, errs[i] = w.svc.reply(w.asStaff(st, authz.Owner), st.String(), d.Ask.AskId, &asksapi.AskReplyCreate{Answer: asksapi.AskReplyCreateAnswerYes})
+		}()
+	}
+	wg.Wait()
+	require.NoError(t, errs[0])
+	require.NoError(t, errs[1])
+	require.Equal(t, 1, sender.n[notice.KindAskReply])
+	require.Equal(t, 1, w.count(`SELECT count(*) FROM asks WHERE first_yes_notified_at IS NOT NULL`))
+}
+
+// TestCustomerClosedIsNotDemand: only asks that ran their course count in
+// the demand rollup.
+func TestCustomerClosedIsNotDemand(t *testing.T) {
+	w := newWorld(t)
+	w.store("near", 300)
+	d, err := w.ask(ids.Zero, "")
+	require.NoError(t, err)
+	_, err = w.svc.closeMine(w.asCustomer(), d.Ask.AskId)
+	require.NoError(t, err)
+	rows, err := w.svc.RollupDay(context.Background(), testNow)
+	require.NoError(t, err)
+	require.Zero(t, rows)
+	require.Zero(t, w.count(`SELECT count(*) FROM rollup_daily_ask_demand`))
 }

@@ -2,7 +2,7 @@
 #
 # The shop side never carries a customer name, phone, address or exact
 # distance: distanceBand is the only distance a shop sees. distanceM is in the
-# customer's own replies only.
+# customer's own replies only, rounded to 500 m (the exact one is never stored).
 AskNeedWhen:
   type: string
   enum: [now, today, tomorrow]
@@ -118,6 +118,7 @@ AskReply:
     distanceM:
       type: integer
       minimum: 0
+      description: Rounded to the nearest 500 m, never below 500.
     pricePaise:
       type:
         - integer

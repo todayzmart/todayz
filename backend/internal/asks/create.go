@@ -250,7 +250,7 @@ func (s *Service) create(ctx context.Context, body *asksapi.AskCreate) (asksapi.
 		for _, r := range recips {
 			if err := q.InsertRecipient(ctx, asksdb.InsertRecipientParams{
 				ID: ids.UUID(s.ids.New(now)), AskID: ids.UUID(askID), StoreID: ids.UUID(r.ID), Now: now,
-				DistanceM: r.DistanceM, DistanceBand: Band(r.DistanceM), ReplyBy: now.Add(lim.window),
+				DistanceM: RoundDistance(r.DistanceM), DistanceBand: Band(r.DistanceM), ReplyBy: now.Add(lim.window),
 			}); err != nil {
 				return err
 			}
