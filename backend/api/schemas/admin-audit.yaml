@@ -1,9 +1,45 @@
-# Schemas: domain "admin-audit" (owner W3-09): admin audit log (04 §2.7).
-#
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Schemas: domain "admin-audit" (owner W3-05): A-19 audit log and every screen's audit side panel (04 §2.7).
+# `before` and `after` are the values the change recorded; writers never put a phone, code, token or
+# address in them (internal/platform/audit).
+AdminAuditEntry:
+  type: object
+  additionalProperties: false
+  required: [id, actorKind, actorId, actorName, action, subjectType, subjectId, before, after, createdAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    actorKind:
+      type: string
+      enum: [user, staff, admin, system, device]
+    actorId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    actorName:
+      type: [string, 'null']
+      maxLength: 80
+    action: {type: string, maxLength: 80}
+    subjectType: {type: string, maxLength: 40}
+    subjectId:
+      type: [string, 'null']
+      maxLength: 120
+    before:
+      type: [object, 'null']
+      description: The recorded state before the change.
+    after:
+      type: [object, 'null']
+      description: The recorded state after the change.
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+AdminAuditList:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: '#/AdminAuditEntry'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminAuditSubjectType:
+  type: string
+  description: The subjects a screen's audit panel can show.
+  enum: [order, user, store, business, review, banner, lead, platform_setting, admin_user]

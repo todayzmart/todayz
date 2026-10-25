@@ -1,12 +1,97 @@
-# Paths: domain "admin-audit" (owner W3-09): admin audit log (04 §2.7).
-#
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-audit]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-audit.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Paths: domain "admin-audit" (owner W3-05): A-19 audit log and every screen's audit side panel (04 §2.7).
+# Roles are in internal/platform/authz/policy/admin.go: the full log is `admin` and `super_admin`; the
+# subject panel needs the caller to be allowed to view that subject.
+/v1/admin/audit-log:
+  get:
+    operationId: listAdminAuditLog
+    tags: [admin-audit]
+    summary: The audit log, newest first (A-19)
+    description: Every filter is optional and exact; `from` is inclusive and `to` exclusive.
+    parameters:
+      - name: actorId
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Ulid
+      - name: action
+        in: query
+        schema:
+          type: string
+          maxLength: 80
+          pattern: ^[a-z][a-z0-9_.]{0,79}$
+      - name: subjectType
+        in: query
+        schema:
+          type: string
+          maxLength: 40
+          pattern: ^[a-z][a-z0-9_]{0,39}$
+      - name: subjectId
+        in: query
+        schema:
+          type: string
+          maxLength: 120
+          pattern: ^[A-Za-z0-9_.:-]{1,120}$
+      - name: from
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Timestamp
+      - name: to
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Timestamp
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Audit entries
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-audit.yaml#/AdminAuditList
+            example: &list
+              items:
+                - id: 01JB0SAX1A2B3C4D5E6F7G8H9J
+                  actorKind: admin
+                  actorId: 01JB0SAD1A2B3C4D5E6F7G8H9J
+                  actorName: Asha (support)
+                  action: customer.block
+                  subjectType: user
+                  subjectId: 01JB0SCS1A2B3C4D5E6F7G8H9J
+                  before: {status: active}
+                  after: {status: blocked, reason: Repeated fake bookings}
+                  createdAt: "2026-10-24T11:00:00Z"
+              nextCursor: null
+              serverNow: "2026-10-24T11:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/audit-log/subject:
+  get:
+    operationId: listAdminSubjectAudit
+    tags: [admin-audit]
+    summary: One subject's audit history, for a screen's side panel
+    description: >-
+      Answers `403 forbidden` unless the caller may view that subject on its own screen (an order needs
+      `admin.order.view`, a customer `admin.customer.view`, and so on).
+    parameters:
+      - name: subjectType
+        in: query
+        required: true
+        schema:
+          $ref: ../schemas/admin-audit.yaml#/AdminAuditSubjectType
+      - name: subjectId
+        in: query
+        required: true
+        schema:
+          type: string
+          maxLength: 120
+          pattern: ^[A-Za-z0-9_.:-]{1,120}$
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Audit entries for the subject
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-audit.yaml#/AdminAuditList
+            example: *list
+      default: *problem
