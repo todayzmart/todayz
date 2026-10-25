@@ -18,7 +18,7 @@ This report covers the admin console work package so far. It lists the backend a
 | aa9ae2e | Journey E2E-12 through the admin API: the cap goes from 30 to 40 with step-up; checkout allows 40; history and audit are checked; the cap is restored to 30 |
 | 0bbb545 | Journey E2E-12 through the A-17 screen, with a screenshot; `Principal.totpCode` serves the dialog |
 | 6747cf9 | A-12 reviews: reported first, state and store filters in the URL, hide and restore (review and reply) with a required reason, the report queue (dismissed or upheld), the audit panel |
-| 4300035 | API for A-03 businesses, A-05 stores and the Leads tab; migration 30502 (lead status columns, `stores.review_note`); A-17 gets an addresses group |
+| 4300035 | API for A-03 businesses, A-05 stores and the Leads tab; migration 30502 (lead status columns, `stores.review_note`) |
 | db0cf55 | Screens A-03 (queues by status, verify, ask for info, reject, suspend, reinstate, KYC review and one-field reveal, documents) with the Leads tab, and A-05 (filters, review queue, pin and hours, force-close, reopen, strike reset) |
 | 9894128 | AD-02 role-matrix Playwright; the admin smoke fixed for the role-aware nav; shell fixes (below) |
 | 31f372b | Playwright journeys for A-03 verify, A-05 force-close and A-12 hide and restore |
@@ -104,7 +104,7 @@ Both forms (API and A-17 UI) are written and they typecheck. The journey needs r
     - Force-close works only on live or paused stores, until a future time entered in IST. Reopen works only while a closure is running.
     - A strike reset does not recount.
 13. **Leads:** the phone is masked for every role, and field agents see only the Leads tab.
-14. **A-17:** a new addresses group for `customer_max_saved_addresses` (W2-15).
+14. **A-17:** `customer_max_saved_addresses` (W2-15) is in the lead's "customers" group (915a8fb); my own addresses group was dropped in the merge.
 15. **Found and fixed in the shell (user-visible):**
     - The admin smoke had been broken on main by the role-aware nav (5 of 6 tests failed).
     - A field agent landed on "no access" at `/`. A role without Pulse now starts at its first screen (Businesses).

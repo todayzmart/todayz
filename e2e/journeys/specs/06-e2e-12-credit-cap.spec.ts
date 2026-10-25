@@ -121,6 +121,7 @@ test('E2E-12 super admin sets credit_max_per_order to 40 with step-up; checkout 
 
 test('E2E-12 through A-17: the super admin changes the cap on the settings screen; the history panel shows it', async ({ browser, who }, testInfo) => {
   const c = new Customer(await who('referee'));
+  test.skip((await c.wallet()).availableCredits < 40, 'the referee needs 40 credits for this check (E2E-02 and E2E-06 run first)');
   const admin = await who('superAdmin');
   const items = [{ storeItemId: SL_ITEMS.qa100.id, quantity: 5 }];
   const app = await openApp(browser, admin, URLS.admin);
