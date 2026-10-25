@@ -127,6 +127,7 @@ export function OwnerStep({ business: b, goTo }: { business: FieldBusiness; goTo
         <>
           <p>{t('field.owner.sent', { masked: sent.phoneMasked, until: intl.formatTime(sent.expiresAt, { timeStyle: 'short', timeZone: 'Asia/Kolkata' }) })}</p>
           <OtpInput
+            className={css.code}
             label={t('field.owner.code')}
             digitLabel={(i) => t('field.owner.digit', { i })}
             length={DIGITS}

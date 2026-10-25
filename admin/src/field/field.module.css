@@ -199,6 +199,27 @@
   white-space: nowrap;
 }
 
+/* Six 52px code boxes do not fit beside the icon rail on a 360px phone: let them share the row. */
+.code :global(.tz-otp) {
+  gap: var(--space-1);
+}
+
+.code :global(.tz-otp input) {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  max-width: 52px;
+  height: 52px;
+  font-size: 22px;
+}
+
+/* On a phone only every other week is named, so the dates do not run into each other. */
+@media (width < 720px) {
+  .week:nth-child(even) .barLabel {
+    visibility: hidden;
+  }
+}
+
 @media (width >= 720px) {
   .tiles {
     grid-template-columns: repeat(4, minmax(0, 1fr));

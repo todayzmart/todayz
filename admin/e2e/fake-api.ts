@@ -81,11 +81,25 @@ export async function answerEmptyLists(page: Page) {
   await answerWith(page, '/v1/admin/risk/flags**', (req, url) =>
     req.method() === 'GET' && url.pathname === '/v1/admin/risk/flags' ? { status: 200, body: { items: [], openByRule: [], nextCursor: null, serverNow: NOW } } : undefined,
   );
+  // A-15 for a field agent is their own row, not a list: an agent with no shops yet.
+  await answerWith(page, '/v1/admin/field/me/stats', (req) => (req.method() === 'GET' ? { status: 200, body: { stats: emptyAgentStats, serverNow: NOW } } : undefined));
   // A-02 Pulse is one summary, not a list: a platform with nothing in it yet.
   await answerWith(page, '/v1/admin/pulse**', (_req, url) => ({ status: 200, body: url.pathname.endsWith('/map') ? emptyPulseMap : emptyPulse }));
 }
 
 const count0 = { value: 0, previous: null };
+
+/** A-15 for an agent who has onboarded nothing yet. */
+export const emptyAgentStats = {
+  agentId: '01JADMIN0000000000000000AD',
+  name: 'Asha Rao',
+  businesses: { total: 0, draft: 0, submitted: 0, needsInfo: 0, verified: 0, rejected: 0, suspended: 0 },
+  storesLive: 0,
+  itemsAdded: 0,
+  inWindow: 0,
+  firstOrderRate: null,
+  weekly: [],
+};
 const rate0 = { value: null, previous: null };
 
 /** A-02 before any order, search or store. */

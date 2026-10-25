@@ -14,6 +14,7 @@ import { answerWith, problem, signIn } from './fake-api';
 /** 06-screens.md §3 "Admin roles and navigation", as sidebar labels in NAV order. */
 const ALL = [
   'Pulse',
+  'Add shops',
   'Businesses',
   'Stores',
   'Customers',
@@ -26,6 +27,7 @@ const ALL = [
   'Referrals',
   'Master catalogue',
   'Demand',
+  'Field agents',
   'Payouts',
   'Admin users',
   'Settings',
@@ -36,8 +38,8 @@ const ALL = [
 ];
 
 const CASES: { roles: string[]; nav: string[]; hidden?: string }[] = [
-  // A-03 Leads tab and A-23 Gaps; A-04 and A-15 are not in this sidebar yet (W3-06).
-  { roles: ['field_agent'], nav: ['Businesses', 'Demand'], hidden: '/orders' },
+  // A-04, the A-03 Leads tab, A-23 Gaps and their own A-15 row.
+  { roles: ['field_agent'], nav: ['Add shops', 'Businesses', 'Demand', 'Field agents'], hidden: '/orders' },
   {
     roles: ['support'],
     nav: ['Pulse', 'Businesses', 'Stores', 'Customers', 'Orders', 'Support', 'Reviews', 'Banner moderation', 'Risk', 'Jobs'],
@@ -59,6 +61,9 @@ const CASES: { roles: string[]; nav: string[]; hidden?: string }[] = [
 const SUPPORT_UP = ['support', 'admin', 'super_admin'];
 const READS: [RegExp, string[]][] = [
   [/^\/v1\/admin\/leads(\/|$)/, ['field_agent', ...SUPPORT_UP]],
+  // admin.field.* (field.golden): agents and admins; every agent's A-15 row is admins only.
+  [/^\/v1\/admin\/field(\/|$)/, ['field_agent', 'admin', 'super_admin']],
+  [/^\/v1\/admin\/field-agents$/, ['admin', 'super_admin']],
   [/^\/v1\/admin\/(businesses|stores|customers|customer-search|orders|reviews|review-reports|banners)(\/|$)/, SUPPORT_UP],
   [/^\/v1\/admin\/audit-log\/subject$/, ['field_agent', 'support', 'catalogue', 'finance', 'admin', 'super_admin']],
   [/^\/v1\/admin\/(audit-log|settings)(\/|$)/, ['admin', 'super_admin']],
