@@ -40,6 +40,20 @@ This report covers the admin console work package so far. It lists the backend a
 - **Backend:** `cmd/todayz` admin HTTP tests (`admin_shops_http_test.go`) and `internal/admin` pass. `make gen` is clean.
 - **Screenshots** (git-ignored, in `admin/test-results/screenshots/`): `admin-a03-queue.png`, `admin-a03-verified.png`, `admin-a05-list.png`, `admin-a05-force-close.png`, `admin-a12-detail.png`.
 
+### Review fixes (6b9658b, f3ef175)
+
+The lead's review items 1–5 and 7. Item 6 (30501 `CREATE INDEX CONCURRENTLY`) is skipped: 30501 is already on main, `db/migrations/README.md` forbids editing a migration on main, and prod's first apply runs it on an empty table, so a plain index build takes no real lock time.
+
+- **Backend:** `cmd/todayz` `TestAdmin*` and `TestRoutesAreInTheContract`, `internal/admin`, the settings package, `internal/platform/migrate` (`TestUpDownUp`), the settings lint, vet, gofmt and golangci-lint (0 issues) all pass.
+- **Contract:** lint, client and hooks checks pass; `make contract-smoke` passes (rc 0).
+- **Admin:** 120 unit tests and tsc pass; Playwright (smoke, AD-02 roles, area journeys) 17 pass. The journeys typecheck is clean.
+- **What the tests prove:**
+  - a setting outside its min/max is refused (422), never clamped, and a stale step-up on a money key is refused;
+  - the old GET search answers 404, and the new POST body never shows up in a path or query string;
+  - three phone-shaped reasons each get 422 on `body.reason`, and the reply never echoes the number;
+  - an admin account cannot be blocked, strike-reset or signed out (409), and its detail lists no sessions;
+  - a staff-only account (no customer profile) cannot be blocked (409).
+
 ### E2E-19 on a fresh stack (f73eca2)
 
 The run started from `make reset && make dev` (rc 0, all health checks pass). The journey ran on its own:
@@ -79,8 +93,10 @@ Both forms (API and A-17 UI) are written and they typecheck. The journey needs r
    - Each subject panel needs that subject's own view action (a business needs `admin.business.view`, a review `admin.review.moderate`, and so on); an unknown subject type is refused.
 2. **Blocks:**
    - a block is global, not per shop;
-   - blocking an admin is refused with 409.
-3. **Customer phone search:** the phone goes in the API query string but never in the UI URL.
+   - blocking an admin, or an account with no customer profile, is refused with 409;
+   - unblock stays open for any account, so one blocked before the fix can be recovered;
+   - phone-shaped text in any admin reason or note is refused (422), not redacted.
+3. **Customer phone search:** since f3ef175 it is `POST /v1/admin/customer-search` with the phone in the JSON body, so it is in no URL, UI or API. The path is not `/customers/search` because apigen refuses a literal segment beside `{customerId}`.
 4. **Where code lives:** admin order reads are in the orders package, not in `internal/admin`.
 5. **Nav role map:** inferred from 06-screens.md, because the plan has no explicit table.
 6. **Settings:**
