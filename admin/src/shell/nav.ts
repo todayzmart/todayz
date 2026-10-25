@@ -58,7 +58,10 @@ export const NAV: readonly NavItem[] = [
  * Sections `$section` renders a placeholder for. A WP builds its section by adding a static route
  * file (`src/routes/<area>/…`), which outranks `$section`; nothing here changes (src/app/routing.test.ts).
  */
-export const PLACEHOLDER_SECTIONS: readonly string[] = NAV.map((n) => n.section).filter(Boolean);
+/** Sections with a real route (src/routes/<area>/); the rest show the placeholder. */
+export const BUILT_SECTIONS: readonly string[] = ['customers', 'orders', 'audit'];
+
+export const PLACEHOLDER_SECTIONS: readonly string[] = NAV.map((n) => n.section).filter((s) => s && !BUILT_SECTIONS.includes(s));
 
 export function navItem(section: string): NavItem | undefined {
   return NAV.find((n) => n.section === section);

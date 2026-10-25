@@ -1,0 +1,274 @@
+{
+  "customers.sub": {
+    "defaultMessage": "Find a customer by their exact phone number.",
+    "description": "Subtitle of the customers screen (A-06)"
+  },
+  "customers.search.label": {
+    "defaultMessage": "Customer search",
+    "description": "Accessible name of the search form"
+  },
+  "customers.search.phone": {
+    "defaultMessage": "Phone number",
+    "description": "Label of the phone field"
+  },
+  "customers.search.help": {
+    "defaultMessage": "10-digit mobile number. It stays out of the address bar.",
+    "description": "Help under the phone field"
+  },
+  "customers.search.invalid": {
+    "defaultMessage": "Enter a 10-digit Indian mobile number.",
+    "description": "Error for a malformed phone"
+  },
+  "customers.search.submit": {
+    "defaultMessage": "Search",
+    "description": "Button: search by phone"
+  },
+  "customers.search.searching": {
+    "defaultMessage": "Searching…",
+    "description": "Search button while loading"
+  },
+  "customers.search.none": {
+    "defaultMessage": "No customer has this number.",
+    "description": "Search found nothing"
+  },
+  "customers.results": {
+    "defaultMessage": "Search results",
+    "description": "Accessible name of the results table"
+  },
+  "customers.noName": {
+    "defaultMessage": "No name yet",
+    "description": "A customer who has not set a name"
+  },
+  "customers.col.name": {
+    "defaultMessage": "Name",
+    "description": "Customers table column"
+  },
+  "customers.col.phone": {
+    "defaultMessage": "Phone",
+    "description": "Customers table column; always masked"
+  },
+  "customers.col.status": {
+    "defaultMessage": "Status",
+    "description": "Table column"
+  },
+  "customers.col.strikes": {
+    "defaultMessage": "Active strikes",
+    "description": "Customers table column"
+  },
+  "customers.col.joined": {
+    "defaultMessage": "Joined",
+    "description": "Customers table column"
+  },
+  "customers.col.reason": {
+    "defaultMessage": "Reason",
+    "description": "Strikes table column"
+  },
+  "customers.col.order": {
+    "defaultMessage": "Order",
+    "description": "Strikes table column"
+  },
+  "customers.col.when": {
+    "defaultMessage": "When",
+    "description": "Table column"
+  },
+  "customers.col.state": {
+    "defaultMessage": "State",
+    "description": "Strikes table column: active or reset"
+  },
+  "customers.col.app": {
+    "defaultMessage": "App",
+    "description": "Sessions table column"
+  },
+  "customers.col.device": {
+    "defaultMessage": "Device",
+    "description": "Sessions table column: the browser"
+  },
+  "customers.col.lastUsed": {
+    "defaultMessage": "Last used",
+    "description": "Sessions table column"
+  },
+  "customers.col.expires": {
+    "defaultMessage": "Expires",
+    "description": "Sessions table column"
+  },
+  "customers.col.actions": {
+    "defaultMessage": "Actions",
+    "description": "Table column with buttons"
+  },
+  "customers.col.number": {
+    "defaultMessage": "Order",
+    "description": "Orders table column: order number"
+  },
+  "customers.col.store": {
+    "defaultMessage": "Shop",
+    "description": "Orders table column"
+  },
+  "customers.col.total": {
+    "defaultMessage": "Total",
+    "description": "Orders table column"
+  },
+  "customers.col.placed": {
+    "defaultMessage": "Placed",
+    "description": "Orders table column"
+  },
+  "customers.status.active": {
+    "defaultMessage": "Active",
+    "description": "Customer status"
+  },
+  "customers.status.blocked": {
+    "defaultMessage": "Blocked",
+    "description": "Customer status"
+  },
+  "customers.status.deleted": {
+    "defaultMessage": "Deleted",
+    "description": "Customer status"
+  },
+  "customers.strike.noShow": {
+    "defaultMessage": "Didn't collect",
+    "description": "Strike reason: no-show on a pickup"
+  },
+  "customers.strike.dispatchTimeout": {
+    "defaultMessage": "Shop didn't dispatch",
+    "description": "Strike reason"
+  },
+  "customers.strike.adminCancel": {
+    "defaultMessage": "Cancelled by admin",
+    "description": "Strike reason"
+  },
+  "customers.strike.active": {
+    "defaultMessage": "Active",
+    "description": "Strike state"
+  },
+  "customers.strike.reset": {
+    "defaultMessage": "Reset {when}{reason, select, none {} other {: {reason}}}",
+    "description": "Strike state after a reset, with its reason"
+  },
+  "customers.app.customer": {
+    "defaultMessage": "Customer app",
+    "description": "Session app"
+  },
+  "customers.app.business": {
+    "defaultMessage": "Business app",
+    "description": "Session app"
+  },
+  "customers.app.admin": {
+    "defaultMessage": "Admin console",
+    "description": "Session app"
+  },
+  "customers.back": {
+    "defaultMessage": "Back to customers",
+    "description": "Link back to the search"
+  },
+  "customers.missing": {
+    "defaultMessage": "This customer doesn't exist",
+    "description": "Detail: not found"
+  },
+  "customers.loadFailed": {
+    "defaultMessage": "We couldn't load this customer",
+    "description": "Detail: load failure"
+  },
+  "customers.detail.sub": {
+    "defaultMessage": "{phone} · joined {joined} · {strikes, plural, one {# active strike} other {# active strikes}}",
+    "description": "Line under the customer's name"
+  },
+  "customers.strikes": {
+    "defaultMessage": "{count, plural, one {Strikes (# active)} other {Strikes (# active)}}",
+    "description": "Heading of the strikes card"
+  },
+  "customers.strikes.table": {
+    "defaultMessage": "Strikes",
+    "description": "Accessible name of the strikes table"
+  },
+  "customers.strikes.none": {
+    "defaultMessage": "No strikes.",
+    "description": "Empty strikes table"
+  },
+  "customers.openOrder": {
+    "defaultMessage": "Open order",
+    "description": "Link to the strike's order"
+  },
+  "customers.sessions": {
+    "defaultMessage": "Signed-in devices",
+    "description": "Heading of the sessions card"
+  },
+  "customers.sessions.none": {
+    "defaultMessage": "Not signed in anywhere.",
+    "description": "Empty sessions table"
+  },
+  "customers.orders": {
+    "defaultMessage": "Recent orders",
+    "description": "Heading of the recent orders card"
+  },
+  "customers.orders.none": {
+    "defaultMessage": "No orders yet.",
+    "description": "Empty orders table"
+  },
+  "customers.orders.all": {
+    "defaultMessage": "All of this customer's orders",
+    "description": "Link to the orders screen filtered to this customer"
+  },
+  "customers.block": {
+    "defaultMessage": "Block",
+    "description": "Button: block the customer everywhere"
+  },
+  "customers.block.title": {
+    "defaultMessage": "Block {name}?",
+    "description": "Block dialog title"
+  },
+  "customers.block.body": {
+    "defaultMessage": "They are signed out of every device and can't sign in or book until unblocked.",
+    "description": "Block dialog body"
+  },
+  "customers.unblock": {
+    "defaultMessage": "Unblock",
+    "description": "Button: unblock the customer"
+  },
+  "customers.unblock.title": {
+    "defaultMessage": "Unblock {name}?",
+    "description": "Unblock dialog title"
+  },
+  "customers.unblock.body": {
+    "defaultMessage": "They can sign in and book again.",
+    "description": "Unblock dialog body"
+  },
+  "customers.reset": {
+    "defaultMessage": "Reset strikes",
+    "description": "Button: clear every active strike"
+  },
+  "customers.reset.title": {
+    "defaultMessage": "{count, plural, one {Reset # strike?} other {Reset # strikes?}}",
+    "description": "Strike reset dialog title"
+  },
+  "customers.reset.body": {
+    "defaultMessage": "Their booking limit is worked out again straight away.",
+    "description": "Strike reset dialog body"
+  },
+  "customers.revoke": {
+    "defaultMessage": "Sign out",
+    "description": "Button: sign the customer out of one device"
+  },
+  "customers.revoke.title": {
+    "defaultMessage": "Sign out this device?",
+    "description": "Revoke dialog title"
+  },
+  "customers.revoke.body": {
+    "defaultMessage": "The customer is signed out of the {app} on this device.",
+    "description": "Revoke dialog body"
+  },
+  "customers.done.block": {
+    "defaultMessage": "Customer blocked",
+    "description": "Toast after blocking"
+  },
+  "customers.done.unblock": {
+    "defaultMessage": "Customer unblocked",
+    "description": "Toast after unblocking"
+  },
+  "customers.done.reset": {
+    "defaultMessage": "Strikes reset",
+    "description": "Toast after a strike reset"
+  },
+  "customers.done.revoke": {
+    "defaultMessage": "Device signed out",
+    "description": "Toast after revoking a session"
+  }
+}

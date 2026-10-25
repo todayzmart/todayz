@@ -3,7 +3,7 @@ import { asMessages } from '@todayz/i18n';
 import { screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { renderAt } from '../test/render';
-import { NAV } from './nav';
+import { NAV, PLACEHOLDER_SECTIONS } from './nav';
 
 describe('admin shell', () => {
   it('renders Pulse with the Admin-tagged sidebar', async () => {
@@ -28,7 +28,7 @@ describe('admin shell', () => {
     }
   });
 
-  it.each(NAV.filter((n) => n.section !== ''))('shows the placeholder for /$section', async ({ section }) => {
+  it.each(NAV.filter((n) => PLACEHOLDER_SECTIONS.includes(n.section)))('shows the placeholder for /$section', async ({ section }) => {
     renderAt(`/${section}`);
     const side = await screen.findByRole('navigation', { name: 'Main' });
     const active = (await within(side).findAllByRole('link')).find((l) => l.getAttribute('aria-current') === 'page');

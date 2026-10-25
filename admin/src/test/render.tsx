@@ -10,6 +10,8 @@ import { makeQueryClient, makeRouter } from '../app/router';
 export interface Call {
   method: string;
   path: string;
+  /** The query string, `?a=b` or empty. */
+  search: string;
   headers: Headers;
   body: unknown;
 }
@@ -62,6 +64,7 @@ export function renderAt(path: string, opts: RenderOptions = {}) {
     const call: Call = {
       method: (init?.method ?? 'GET').toUpperCase(),
       path: url.pathname,
+      search: url.search,
       headers: new Headers(init?.headers),
       body: raw ? (JSON.parse(raw) as unknown) : undefined,
     };
