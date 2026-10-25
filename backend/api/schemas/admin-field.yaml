@@ -96,8 +96,8 @@ FieldBusinessCreate:
     held for the owner OTP and an owner invite, never shown in full again.
   required: [brandName, ownerPhone]
   properties:
-    brandName: {$ref: "#/FieldText120"}
-    legalName: {$ref: "#/FieldText200"}
+    brandName: {$ref: "#/FieldText80"}
+    legalName: {$ref: "#/FieldText120"}
     categoryId: {$ref: ./common.yaml#/Ulid}
     ownerPhone: {$ref: "#/FieldPhone"}
 FieldBusinessUpdate:
@@ -108,11 +108,11 @@ FieldBusinessUpdate:
     only before the owner confirmed, and ends any code already sent.
   minProperties: 1
   properties:
-    brandName: {$ref: "#/FieldText120"}
+    brandName: {$ref: "#/FieldText80"}
     legalName:
       type: [string, "null"]
       minLength: 1
-      maxLength: 200
+      maxLength: 120
       pattern: ^\S(.*\S)?$
     categoryId:
       type: [string, "null"]
