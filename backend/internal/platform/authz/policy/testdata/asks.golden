@@ -1,0 +1,27 @@
+# domain asks: one line per (role x action); regenerate with -update
+me.asks.view kind=customer step-up=false
+me.asks.create kind=customer step-up=false
+asks.view kind=business step-up=false
+asks.view owner allow
+asks.view manager allow
+asks.view cashier allow
+asks.reply kind=business step-up=false
+asks.reply owner allow
+asks.reply manager allow
+asks.reply cashier allow
+admin.demand_gaps.view kind=admin step-up=false
+admin.demand_gaps.view field_agent allow
+admin.demand_gaps.view support -
+admin.demand_gaps.view catalogue allow
+admin.demand_gaps.view analyst allow
+admin.demand_gaps.view finance -
+admin.demand_gaps.view admin allow
+admin.demand_gaps.view super_admin allow
+admin.marquee.approve kind=admin step-up=false
+admin.marquee.approve field_agent -
+admin.marquee.approve support -
+admin.marquee.approve catalogue allow
+admin.marquee.approve analyst -
+admin.marquee.approve finance -
+admin.marquee.approve admin allow
+admin.marquee.approve super_admin allow

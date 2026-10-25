@@ -40,6 +40,8 @@ func mountOrders(r chi.Router, d *deps) {
 	// Offers price the quote and are counted in the order's transaction (W2-07).
 	pricing := offersForOrders{newOffers(d)}
 	od.Pricer, od.Redeemer = pricing, pricing
+	// A line booked from an ask reply takes the replied price (W3-16).
+	od.AskPricer = asksForOrders{newAsks(d)}
 	// A collected order may qualify a referral (W2-03).
 	od.Referrals = referralsForOrders{newReferrals(d)}
 	if d.Queue != nil {

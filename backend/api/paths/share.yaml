@@ -1,0 +1,114 @@
+# Paths: domain "share" (owner W3-16): share cards and the site's search strip (01 §11.1, §11.3; 04 §2.5; D-101).
+#
+# All public: no sign-in. `/x/{code}` itself is the customer app's Pages Function
+# (customer/functions/x/[code].ts), which reads the preview below.
+/v1/public/share-cards:
+  post:
+    operationId: createShareCard
+    tags: [share]
+    summary: Get or create the share card of a store item (C-08 "Share")
+    description: >-
+      One card per store item; the preview image is rendered when missing or when the price changed.
+      Only for a `live` store of a `verified` business, else `410 share_card_unavailable`. At most
+      `share_card_create_per_hour` new cards an hour per IP and per `anonId` (`429 rate_limited`);
+      returning an existing card does not count.
+    security: []
+    x-problems: [share_card_unavailable]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/share.yaml#/ShareCardCreate
+          example:
+            storeItemId: 01JB0SM1A2S3K4E5T6M7N8P9Q0
+            anonId: 3f0c2b8e-6a1d-4c5e-9b7a-2d4e6f8a0b1c
+    responses:
+      "200":
+        description: The card
+        headers:
+          Cache-Control:
+            description: Always `no-store`.
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/share.yaml#/ShareCard
+            example:
+              code: aB3dE5gH7j
+              url: https://app.todayz.in/x/aB3dE5gH7j
+              text: Amul Butter 500 g at Sharma Kirana, ₹38 · TodayZ
+              imageUrl: https://img.todayz.in/share/aB3dE5gH7j.png
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/public/share-cards/{code}:
+  get:
+    operationId: getShareCard
+    tags: [share]
+    summary: A share card's link preview
+    description: >-
+      Item, shop, price and the shop's locality; never a distance. Re-renders the image when the price
+      changed. `410 share_card_unavailable` once the store is not `live` or its business not `verified`.
+    security: []
+    x-problems: [share_card_unavailable]
+    parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          $ref: ../schemas/share.yaml#/ShareCode
+    responses:
+      "200":
+        description: The preview
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/share.yaml#/SharePreview
+            example:
+              storeItemId: 01JB0SM1A2S3K4E5T6M7N8P9Q0
+              productId: 01JB0SP1R2Q3D4V5C6T7A8B9C0
+              itemName: Amul Butter 500 g
+              storeName: Sharma Kirana
+              storeSlug: sharma-kirana-koramangala
+              locality: Koramangala
+              pricePaise: 3800
+              mrpPaise: 4000
+              imageUrl: https://img.todayz.in/share/aB3dE5gH7j.png
+      default: *problem
+/v1/public/site-marquee:
+  get:
+    operationId: getSiteMarquee
+    tags: [share]
+    summary: The site's "What people near you are searching for" strip (S-07)
+    description: >-
+      `city` is a city's slug (its name, lowercase, hyphens). The latest approved list, or
+      `fallback: true` when the city has none (or is unknown). Cached for an hour.
+    security: []
+    parameters:
+      - name: city
+        in: query
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-z0-9]+(-[a-z0-9]+)*$
+          minLength: 1
+          maxLength: 64
+    responses:
+      "200":
+        description: The strip
+        headers:
+          Cache-Control:
+            description: "`public, max-age=3600`"
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/share.yaml#/SiteMarquee
+            example:
+              fallback: false
+              items:
+                - productName: Amul Butter 500 g
+                - productName: Aashirvaad Atta 5 kg
+      default: *problem

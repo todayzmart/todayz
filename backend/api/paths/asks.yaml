@@ -1,0 +1,290 @@
+# Paths: domain "asks" (owner W3-16): Ask shops nearby (01 §11.1–§11.2, 04 §2.6, D-101).
+#
+# Every operation: `tags: [asks]`, an example per request and success response,
+# and the default problem response. The customer's asks are their own: another
+# customer's ask is 404. The shop side carries no customer field and only a
+# distance band. Roles per operation are in internal/platform/authz/policy/asks.go.
+# Progress and close also arrive as `ask.updated` on /v1/me/stream (and
+# `ask.created`, `ask.closed` on the store stream); GET is the polling fallback.
+/v1/me/asks:
+  get:
+    operationId: listMyAsks
+    tags: [asks]
+    summary: My asks (C-26 list)
+    description: Newest first. Asks older than `ask_retention_days` are gone.
+    parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: ../schemas/asks.yaml#/AskStatus
+      - $ref: ../common/parameters.yaml#/Cursor
+      - $ref: ../common/parameters.yaml#/Limit
+    responses:
+      "200":
+        description: The caller's asks
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/asks.yaml#/AskList
+            example:
+              asks:
+                - &ask
+                  askId: 01JB0SA1A2S3K4E5T6M7N8P9Q0
+                  itemName: Amul Butter 500 g
+                  productId: 01JB0SP1R2Q3D4V5C6T7A8B9C0
+                  quantity: 1
+                  needBy: today
+                  status: open
+                  closeReason: null
+                  progress: {asked: 8, replied: 3, bestPricePaise: 3800}
+                  yesCount: 2
+                  createdAt: "2026-10-25T09:30:00Z"
+                  closedAt: null
+                  windowEndsAt: "2026-10-25T09:45:00Z"
+                  version: 4
+              nextCursor: null
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: createAsk
+    tags: [asks]
+    summary: Ask shops nearby, or one shop (C-25)
+    description: >-
+      Sends the ask to up to `ask_max_stores` live stores within `ask_radius_m` (fewer for a
+      low-yield customer), stores that list the product first, then its category, then the rest,
+      nearest first; closed, muted, blocked and full stores are left out. With `storeSlug`, only
+      that store, inside or outside the radius, with the same exclusions. `429 ask_limit_reached`
+      (Retry-After: the next IST midnight), `409 ask_already_open` (extensions.askId),
+      `409 ask_no_shops`, `409 ask_store_unavailable` (the same answer whatever the reason).
+    x-idempotency: required
+    x-problems: [ask_limit_reached, ask_already_open, ask_no_shops, ask_store_unavailable]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/asks.yaml#/AskCreate
+          example:
+            productId: 01JB0SP1R2Q3D4V5C6T7A8B9C0
+            quantity: 1
+            needBy: today
+            lat: 12.9352
+            lng: 77.6245
+    responses:
+      "201":
+        description: The ask and its (empty) replies
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/asks.yaml#/AskDetail
+            example:
+              ask:
+                <<: *ask
+                progress: {asked: 8, replied: 0, bestPricePaise: null}
+                yesCount: 0
+                version: 1
+              replies: []
+              serverNow: "2026-10-25T09:30:00Z"
+      default: *problem
+/v1/me/asks/{askId}:
+  parameters:
+    - &askId
+      name: askId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getMyAsk
+    tags: [asks]
+    summary: One ask with its Yes replies (C-26)
+    responses:
+      "200":
+        description: The ask
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/asks.yaml#/AskDetail
+            example: &askDetail
+              ask: *ask
+              replies:
+                - askReplyId: 01JB0SR1A2S3K4E5T6M7N8P9Q0
+                  storeSlug: sharma-kirana-koramangala
+                  storeName: Sharma Kirana
+                  distanceM: 650
+                  pricePaise: 3800
+                  readyBy: "2026-10-25T11:00:00Z"
+                  repliedAt: "2026-10-25T09:34:00Z"
+                  priceValidUntil: "2026-10-25T10:34:00Z"
+                  storeItemId: 01JB0SM1A2S3K4E5T6M7N8P9Q0
+                  bookable: true
+                  inStoreOnly: false
+                  orderId: null
+              serverNow: "2026-10-25T09:36:00Z"
+      default: *problem
+/v1/me/asks/{askId}/close:
+  parameters:
+    - *askId
+  post:
+    operationId: closeMyAsk
+    tags: [asks]
+    summary: Close my ask ("Close ask")
+    description: Shops can no longer reply. `409 invalid_transition` when it is already closed.
+    x-idempotency: none
+    responses:
+      "200":
+        description: The closed ask
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/asks.yaml#/AskDetail
+            example: *askDetail
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/asks:
+  parameters: &store
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listStoreAsks
+    tags: [asks]
+    summary: The store's asks (B-20)
+    description: >-
+      `open` (default): not replied, window open. `replied`, `missed` (not replied in time) or
+      `all`. Newest first. No customer field and only a distance band.
+    parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum: [open, replied, missed, all]
+      - $ref: ../common/parameters.yaml#/Cursor
+      - $ref: ../common/parameters.yaml#/Limit
+    responses:
+      "200":
+        description: The asks
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/asks.yaml#/StoreAskList
+            example:
+              asks:
+                - &storeAsk
+                  askId: 01JB0SA1A2S3K4E5T6M7N8P9Q0
+                  itemName: Amul Butter 500 g
+                  productId: 01JB0SP1R2Q3D4V5C6T7A8B9C0
+                  storeItemId: 01JB0SM1A2S3K4E5T6M7N8P9Q0
+                  quantity: 1
+                  needBy: today
+                  distanceBand: lt_1km
+                  sentAt: "2026-10-25T09:30:00Z"
+                  replyBy: "2026-10-25T09:45:00Z"
+                  status: open
+                  answer: null
+                  pricePaise: null
+                  readyBy: null
+                  repliedAt: null
+                  reported: false
+                  available: 6
+                  listedPricePaise: 3800
+                  mrpPaise: 4000
+              openCount: 1
+              nextCursor: null
+              serverNow: "2026-10-25T09:31:00Z"
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/asks/{askId}/reply:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - *askId
+  post:
+    operationId: replyToAsk
+    tags: [asks]
+    summary: Answer an ask, Yes or No (B-20)
+    description: >-
+      Within `ask_reply_window_min`. A Yes may carry a per-unit price (never above the MRP,
+      `422 price_above_mrp`; only item.price.edit may change the listed price, and only owner or
+      manager may price an unlisted item) and `readyBy` (today, or by the end of tomorrow IST
+      when the ask is for tomorrow; else `422 validation_failed` on `body.readyBy`). A Yes on a
+      listed item confirms its stock with no stock movement. A second reply is
+      `409 invalid_transition`; a closed ask or an ended window is `409 ask_closed`.
+    x-idempotency: required
+    x-problems: [ask_closed, price_above_mrp]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/asks.yaml#/AskReplyCreate
+          example:
+            answer: "yes"
+            pricePaise: 3800
+            readyBy: "2026-10-25T11:00:00Z"
+    responses:
+      "200":
+        description: The ask as the shop now sees it
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/asks.yaml#/StoreAsk
+            example:
+              <<: *storeAsk
+              status: replied
+              answer: "yes"
+              pricePaise: 3800
+              readyBy: "2026-10-25T11:00:00Z"
+              repliedAt: "2026-10-25T09:34:00Z"
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/asks/{askId}/report:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - *askId
+  post:
+    operationId: reportAsk
+    tags: [asks]
+    summary: Report an ask ("Report this ask")
+    description: >-
+      The store gets no more asks from that customer, and a risk flag is raised for review. Once
+      per store per ask (`409 invalid_transition`); allowed while the ask is kept. The customer
+      is never told.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/asks.yaml#/AskReportCreate
+          example:
+            reason: spam
+    responses:
+      "204":
+        description: Reported
+      default: *problem

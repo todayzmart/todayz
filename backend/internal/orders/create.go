@@ -117,9 +117,9 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 			return err
 		}
 		if qq.askReplyID != nil && !qq.askUsable {
-			// TODO(lead): until W3-16 gives an AskPricer, every reply is
-			// refused here (ask_price_expired) and the customer books at the
-			// catalogue price shown in extensions.quote.
+			// A reply that cannot price its line (expired, not a Yes, not
+			// the customer's): the customer books at the catalogue price
+			// shown in extensions.quote.
 			return problem.New(genproblems.AskPriceExpired, "").WithExtension("quote", qq.view())
 		}
 		if i := qq.firstShort; i >= 0 {

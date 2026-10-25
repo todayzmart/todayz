@@ -1,0 +1,16 @@
+# Product events: share (05 §2.6). Owner W3-16.
+# One file per domain (D-50); an event name may be defined in only one file.
+# No PII and no store item price.
+domain: share
+owner: W3-16
+events:
+  share_created:
+    emitter: client
+    description: The customer shared an item from C-08 or a result card.
+    props:
+      surface: { type: enum, values: [result_card, product_page] }
+      channel: { type: enum, values: [whatsapp, system, copy] }
+  share_opened:
+    emitter: server
+    description: A share link's preview was read (GET /v1/public/share-cards/{code}, the /x/{code} page).
+    props: {}

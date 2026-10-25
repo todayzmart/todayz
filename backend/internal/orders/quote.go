@@ -164,7 +164,7 @@ func (s *Service) price(ctx context.Context, customerID ids.ID, st ordersdb.Stor
 			if err != nil {
 				return quoted{}, fmt.Errorf("orders: ask price: %w", err)
 			}
-			if ok && p.UnitPricePaise > 0 && now.Before(p.ValidUntil) && seen[p.StoreItemID] {
+			if ok && seen[p.StoreItemID] && (p.UnitPricePaise == 0 || now.Before(p.ValidUntil)) {
 				q.askUsable, q.askPrice = true, p
 			}
 		}
@@ -188,9 +188,14 @@ func (s *Service) price(ctx context.Context, customerID ids.ID, st ordersdb.Stor
 		l := quotedLine{row: r, id: id, productID: mustID(r.ProductID), qty: c.items[i].Quantity,
 			unitPrice: r.PricePaise, priceSource: sourceCatalogue}
 		if q.askUsable && q.askPrice.StoreItemID == id {
-			l.unitPrice, l.priceSource = q.askPrice.UnitPricePaise, sourceAskReply
-			vu := q.askPrice.ValidUntil
-			l.validUntil, q.validUntil = &vu, &vu
+			if q.askPrice.MaxQuantity > 0 && l.qty > q.askPrice.MaxQuantity {
+				return quoted{}, fieldErr(fmt.Sprintf("body.items[%d].quantity", i), "more than the ask")
+			}
+			if q.askPrice.UnitPricePaise > 0 {
+				l.unitPrice, l.priceSource = q.askPrice.UnitPricePaise, sourceAskReply
+				vu := q.askPrice.ValidUntil
+				l.validUntil, q.validUntil = &vu, &vu
+			}
 		}
 		l.available = int(r.OnHand - r.Reserved)
 		if !r.IsListed || (r.ProductStatus != "active" && r.ProductStatus != "pending_review") {

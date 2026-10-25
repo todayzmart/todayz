@@ -1,0 +1,96 @@
+# Schemas: domain "share" (owner W3-16): share cards and the site's search strip (01 §11.1, §11.3; D-101).
+#
+# Nothing here carries a distance (it depends on the viewer) or anything that could identify a
+# person: the strip is master product names only, after the k-floor and the category denylist.
+ShareCardCreate:
+  type: object
+  additionalProperties: false
+  required: [storeItemId]
+  properties:
+    storeItemId:
+      $ref: ../schemas/common.yaml#/Ulid
+    anonId:
+      type: string
+      format: uuid
+      maxLength: 36
+      description: The device's anonymous id (05 §2); with the IP, what `share_card_create_per_hour` counts.
+ShareCard:
+  type: object
+  additionalProperties: false
+  required: [code, url, text, imageUrl]
+  properties:
+    code:
+      $ref: ../schemas/share.yaml#/ShareCode
+    url:
+      type: string
+      format: uri
+      maxLength: 200
+      description: "`https://app.todayz.in/x/{code}`"
+    text:
+      type: string
+      maxLength: 300
+      description: "{item} at {shop}, ₹{price} · TodayZ"
+    imageUrl:
+      type: string
+      format: uri
+      maxLength: 300
+ShareCode:
+  type: string
+  pattern: ^[0-9A-Za-z]{10}$
+  minLength: 10
+  maxLength: 10
+SharePreview:
+  type: object
+  additionalProperties: false
+  description: The link preview. Never a distance.
+  required: [storeItemId, productId, itemName, storeName, storeSlug, locality, pricePaise, mrpPaise, imageUrl]
+  properties:
+    storeItemId:
+      $ref: ../schemas/common.yaml#/Ulid
+    productId:
+      type: [string, "null"]
+      maxLength: 26
+      description: The master product, for C-08; null for a shop's own item.
+    itemName:
+      type: string
+      maxLength: 200
+    storeName:
+      type: string
+      maxLength: 120
+    storeSlug:
+      $ref: ../schemas/common.yaml#/Slug
+    locality:
+      type: [string, "null"]
+      maxLength: 120
+    pricePaise:
+      $ref: ../schemas/common.yaml#/Paise
+    mrpPaise:
+      type: [integer, "null"]
+      minimum: 0
+    imageUrl:
+      type: string
+      format: uri
+      maxLength: 300
+SiteMarqueeItem:
+  type: object
+  additionalProperties: false
+  required: [productName]
+  properties:
+    productName:
+      type: string
+      maxLength: 200
+SiteMarquee:
+  type: object
+  additionalProperties: false
+  description: >-
+    The city's latest approved list, or `fallback: true` (no approved list): the site then shows its
+    curated hero list.
+  required: [fallback, items]
+  properties:
+    fallback:
+      type: boolean
+    items:
+      type: array
+      maxItems: 50
+      items:
+        $ref: ../schemas/share.yaml#/SiteMarqueeItem

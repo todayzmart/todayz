@@ -1,0 +1,158 @@
+# Schemas: domain "admin-demand" (owner W3-16): A-23 Demand, gaps and the site strip (01 §11.2–§11.3; D-101).
+#
+# Counts only, never a customer: a gap needs `ask_gap_min_customers` distinct customers and a strip
+# product `site_marquee_min_searchers` distinct signed-in searchers (both never below 10, 01 §16).
+DemandGap:
+  type: object
+  additionalProperties: false
+  required: [cityId, cityName, productId, itemName, category, customers, asks, shopsAsked, lastAskedAt]
+  properties:
+    cityId:
+      $ref: ../schemas/common.yaml#/Ulid
+    cityName:
+      type: string
+      maxLength: 120
+    productId:
+      type: [string, "null"]
+      maxLength: 26
+      description: Null for asked words that matched no product.
+    itemName:
+      type: string
+      maxLength: 200
+    category:
+      type: [string, "null"]
+      maxLength: 120
+    customers:
+      type: integer
+      minimum: 0
+    asks:
+      type: integer
+      minimum: 0
+    shopsAsked:
+      type: integer
+      minimum: 0
+    lastAskedAt:
+      $ref: ../schemas/common.yaml#/Timestamp
+DemandGapList:
+  type: object
+  additionalProperties: false
+  required: [items, days, minCustomers, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 500
+      items:
+        $ref: ../schemas/admin-demand.yaml#/DemandGap
+    days:
+      type: integer
+    minCustomers:
+      type: integer
+    serverNow:
+      $ref: ../schemas/common.yaml#/ServerNow
+MarqueeStatus:
+  type: string
+  enum: [proposed, approved, rejected]
+MarqueeItem:
+  type: object
+  additionalProperties: false
+  required: [productId, productName, category, searchers, searchesTotal, rank, status]
+  properties:
+    productId:
+      $ref: ../schemas/common.yaml#/Ulid
+    productName:
+      type: string
+      maxLength: 200
+    category:
+      type: [string, "null"]
+      maxLength: 120
+    searchers:
+      type: integer
+      minimum: 0
+      description: Distinct signed-in customers who searched it.
+    searchesTotal:
+      type: integer
+      minimum: 0
+      description: All searches of the window, anonymous ones included.
+    rank:
+      type: integer
+      minimum: 1
+    status:
+      $ref: ../schemas/admin-demand.yaml#/MarqueeStatus
+MarqueeBuild:
+  type: object
+  additionalProperties: false
+  required: [builtOn, status, decidedAt, items]
+  properties:
+    builtOn:
+      type: string
+      format: date
+      maxLength: 10
+    status:
+      $ref: ../schemas/admin-demand.yaml#/MarqueeStatus
+    decidedAt:
+      type: [string, "null"]
+      format: date-time
+      maxLength: 40
+    items:
+      type: array
+      maxItems: 50
+      items:
+        $ref: ../schemas/admin-demand.yaml#/MarqueeItem
+MarqueeCity:
+  type: object
+  additionalProperties: false
+  description: >-
+    `latest` is the newest build (proposed or decided); `approved` the list the site shows now, null
+    when none is approved ("Not approved yet: the site shows the curated list").
+  required: [cityId, cityName, citySlug, latest, approved]
+  properties:
+    cityId:
+      $ref: ../schemas/common.yaml#/Ulid
+    cityName:
+      type: string
+      maxLength: 120
+    citySlug:
+      $ref: ../schemas/common.yaml#/Slug
+    latest:
+      oneOf:
+        - type: "null"
+        - $ref: ../schemas/admin-demand.yaml#/MarqueeBuild
+    approved:
+      oneOf:
+        - type: "null"
+        - $ref: ../schemas/admin-demand.yaml#/MarqueeBuild
+MarqueeCityList:
+  type: object
+  additionalProperties: false
+  required: [cities, minSearchers, serverNow]
+  properties:
+    cities:
+      type: array
+      maxItems: 200
+      items:
+        $ref: ../schemas/admin-demand.yaml#/MarqueeCity
+    minSearchers:
+      type: integer
+    serverNow:
+      $ref: ../schemas/common.yaml#/ServerNow
+MarqueeDecision:
+  type: object
+  additionalProperties: false
+  description: >-
+    Approve the listed products of that build (a non-empty subset of its proposal; the rest are
+    rejected) or reject the whole build (`productIds` empty or left out).
+  required: [builtOn, decision]
+  properties:
+    builtOn:
+      type: string
+      format: date
+      maxLength: 10
+    decision:
+      type: string
+      enum: [approve, reject]
+    productIds:
+      type: array
+      maxItems: 50
+      uniqueItems: true
+      items:
+        $ref: ../schemas/common.yaml#/Ulid

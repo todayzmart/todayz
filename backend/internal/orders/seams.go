@@ -81,15 +81,19 @@ func (NoRedeem) Redeem(context.Context, ids.ID, ids.ID, []AppliedOffer) error { 
 // Release implements Redeemer.
 func (NoRedeem) Release(context.Context, ids.ID) error { return nil }
 
-// AskPrice is a shop's replied price for one item (D-101).
+// AskPrice is a shop's replied price for one item (D-101). UnitPricePaise 0
+// is a Yes with no price: the item books at its catalogue price and the
+// reply has no price expiry (01 §11.1). MaxQuantity is the asked quantity, the
+// most the reply books (a partial accept keeps the unit price).
 type AskPrice struct {
 	StoreItemID    ids.ID
 	UnitPricePaise int64
 	ValidUntil     time.Time
+	MaxQuantity    int
 }
 
 // AskPricer reads an ask reply's price (W3-16). ok is false when the reply
-// is not the customer's, not for the store, not a Yes, or past ValidUntil.
+// is not the customer's, not for the store, not a Yes, or has no item.
 type AskPricer interface {
 	AskPrice(ctx context.Context, customerID, storeID, askReplyID ids.ID, now time.Time) (p AskPrice, ok bool, err error)
 }
