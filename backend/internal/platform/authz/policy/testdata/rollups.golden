@@ -1,0 +1,9 @@
+# domain rollups: one line per (role x action); regenerate with -update
+admin.pulse.view kind=admin step-up=false
+admin.pulse.view field_agent -
+admin.pulse.view support allow
+admin.pulse.view catalogue allow
+admin.pulse.view analyst allow
+admin.pulse.view finance allow
+admin.pulse.view admin allow
+admin.pulse.view super_admin allow
