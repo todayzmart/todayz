@@ -6,7 +6,7 @@ import { json, renderAt, type Handler } from '../test/render';
 
 const OLD = '2026-10-25T06:29:15Z';
 
-/** What `GET /v1/admin/system` answers locally: no AWS, the database and River read for real. */
+/** What `GET /v1/admin/system` answers locally: no AWS, the database and River read for real, Multi-AZ off (one server). */
 function local(over: Partial<AdminSystem> = {}): AdminSystem {
   const off = { status: 'not_configured' as const, errorClass: null, fetchedAt: NOW };
   return {
@@ -23,7 +23,7 @@ function local(over: Partial<AdminSystem> = {}): AdminSystem {
       connections: 12,
       maxConnections: 100,
       sizeBytes: 3 * 1024 ** 3,
-      multiAz: null,
+      multiAz: false,
       statementsStatus: 'ok',
       statements: [{ query: 'SELECT * FROM orders WHERE store_id = $1', calls: 1200, meanMs: 2.4, totalMs: 2880, rows: 9600 }],
     },
@@ -48,7 +48,9 @@ describe('A-22 system health', () => {
     const db = await panel('Database');
     expect(within(db).getByText('45 s old')).toBeInTheDocument();
     expect(within(db).getByText('12 / 100')).toBeInTheDocument();
-    expect(within(db).queryByText('Multi-AZ')).not.toBeInTheDocument();
+    // SC-OPS-01: off is said as a fact, not a warning.
+    expect(within(db).getByText('Multi-AZ').nextElementSibling).toHaveTextContent('Off');
+    expect(within(db).queryByRole('alert')).not.toBeInTheDocument();
     const sql = within(db).getByRole('table', { name: 'Top 10 SQL statements by total time' });
     expect(within(sql).getByText('SELECT * FROM orders WHERE store_id = $1')).toBeInTheDocument();
     expect(within(sql).getByText('1,200')).toBeInTheDocument();
@@ -122,12 +124,15 @@ describe('A-22 system health', () => {
           ...base,
           awsConfigured: true,
           rds: { ...base.rds, status: 'error', errorClass: 'AccessDenied' },
-          database: { ...base.database, statementsStatus: 'not_installed', statements: [] },
+          database: { ...base.database, multiAz: null, statementsStatus: 'not_installed', statements: [] },
         }),
       ],
     });
     expect(within(within(await panel('RDS database server')).getByRole('alert')).getByText('(AccessDenied)')).toBeInTheDocument();
-    expect(within(await panel('Database')).getByText('Top statements are off: the pg_stat_statements extension is not installed.')).toBeInTheDocument();
+    const db = await panel('Database');
+    expect(within(db).getByText('Top statements are off: the pg_stat_statements extension is not installed.')).toBeInTheDocument();
+    // With RDS unreadable the API cannot say, so the row is left out.
+    expect(within(db).queryByText('Multi-AZ')).not.toBeInTheDocument();
   });
 
   it('refreshes on Refresh', async () => {

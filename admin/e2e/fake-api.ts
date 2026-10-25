@@ -138,7 +138,7 @@ export const localSystem = {
   alb: { ...offPanel, windowMinutes: 5, requestsPerMinute: null, http5xxRateBp: null, p95Ms: null },
   rds: { ...offPanel, instances: [] },
   alarms: { ...offPanel, items: [] },
-  database: { status: 'ok', errorClass: null, fetchedAt: NOW, connections: 4, maxConnections: 100, sizeBytes: 0, multiAz: null, statementsStatus: 'ok', statements: [] },
+  database: { status: 'ok', errorClass: null, fetchedAt: NOW, connections: 4, maxConnections: 100, sizeBytes: 0, multiAz: false, statementsStatus: 'ok', statements: [] },
   river: { status: 'ok', errorClass: null, fetchedAt: NOW, running: 0, queues: [] },
   serverNow: NOW,
 };

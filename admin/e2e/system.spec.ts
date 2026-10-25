@@ -31,6 +31,9 @@ for (const role of ['admin', 'super_admin']) {
       await expect(main.getByRole('region', { name }).getByText('Not configured (local)')).toBeVisible();
     }
     await expect(main.getByRole('region', { name: 'Database' }).getByText('4 / 100')).toBeVisible();
+    // Multi-AZ off is a fact locally (one server), not a warning.
+    await expect(main.getByRole('region', { name: 'Database' }).getByRole('definition').filter({ hasText: /^Off$/ })).toBeVisible();
+    await expect(main.getByRole('alert')).toHaveCount(0);
     await expect(main.getByRole('region', { name: 'Job queues' })).toBeVisible();
     await expect(main.getByRole('region', { name: 'Grafana dashboards' }).getByRole('link', { name: 'Jobs' })).toHaveAttribute('href', /^https:\/\/grafana\.todayz\.localhost\//);
     if (role === 'admin') await shot(page, 'admin-a22-system.png', { fullPage: true });
