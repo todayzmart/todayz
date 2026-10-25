@@ -1,0 +1,532 @@
+{
+  "voice.title": {
+    "message": "आवाज़ से अपडेट",
+    "review": "reviewed",
+    "enHash": "f1f256a4"
+  },
+  "voice.link": {
+    "message": "आवाज़ से अपडेट",
+    "review": "reviewed",
+    "enHash": "f1f256a4"
+  },
+  "voice.loading": {
+    "message": "आवाज़ से अपडेट लोड हो रहा है",
+    "review": "reviewed",
+    "enHash": "e5a59f91"
+  },
+  "voice.storeError.title": {
+    "message": "आवाज़ से अपडेट लोड नहीं हुआ",
+    "review": "reviewed",
+    "enHash": "8d27d556"
+  },
+  "voice.storeError.body": {
+    "message": "कनेक्शन देखें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "059c6344"
+  },
+  "voice.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "voice.noStore.title": {
+    "message": "पहले एक दुकान चुनें",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "voice.noStore.body": {
+    "message": "आवाज़ से अपडेट एक समय में एक दुकान पर काम करता है।",
+    "review": "reviewed",
+    "enHash": "3eddcdc5"
+  },
+  "voice.noStore.action": {
+    "message": "दुकान चुनें",
+    "review": "reviewed",
+    "enHash": "12cfd9dc"
+  },
+  "voice.off.title": {
+    "message": "आवाज़ से अपडेट बंद है",
+    "review": "reviewed",
+    "enHash": "6d34bae5"
+  },
+  "voice.off.body": {
+    "message": "इस दुकान के लिए अभी आवाज़ से अपडेट उपलब्ध नहीं है। आप स्टॉक पेज पर स्टॉक अपडेट कर सकते हैं।",
+    "review": "reviewed",
+    "enHash": "46616079"
+  },
+  "voice.openStock": {
+    "message": "स्टॉक खोलें",
+    "review": "reviewed",
+    "enHash": "1608a4fc"
+  },
+  "voice.intro": {
+    "message": "बोलें क्या बदला, जैसे “2 मैगी बिकी”, “10 अमूल दूध आया”, “पारले-जी खत्म है” या “सर्फ़ एक्सेल का दाम 58”। कुछ भी बदलने से पहले आप हर लाइन जाँचते हैं।",
+    "review": "reviewed",
+    "enHash": "2e7d6348"
+  },
+  "voice.privacy": {
+    "message": "रिकॉर्डिंग सिर्फ़ एक बार ड्राफ़्ट बनाने के लिए इस्तेमाल होती है और रखी नहीं जाती।",
+    "review": "reviewed",
+    "enHash": "54fff06c"
+  },
+  "voice.lang.title": {
+    "message": "आप कौन-सी भाषा बोलते हैं",
+    "review": "reviewed",
+    "enHash": "21711165"
+  },
+  "voice.lang.auto": {
+    "message": "पहचानें",
+    "review": "reviewed",
+    "enHash": "80628bd7"
+  },
+  "voice.lang.autoHint": {
+    "message": "भाषा हम खुद पहचान लेंगे। मिली-जुली बोली भी चलेगी।",
+    "review": "reviewed",
+    "enHash": "056ceb53"
+  },
+  "voice.talk.hold": {
+    "message": "बोलने के लिए दबाए रखें",
+    "review": "reviewed",
+    "enHash": "ae440774"
+  },
+  "voice.talk.release": {
+    "message": "भेजने के लिए छोड़ें",
+    "review": "reviewed",
+    "enHash": "445d26a2"
+  },
+  "voice.talk.timer": {
+    "message": "{now} / {max}",
+    "review": "reviewed",
+    "enHash": "c0c9212e"
+  },
+  "voice.talk.listening": {
+    "message": "सुन रहे हैं",
+    "review": "reviewed",
+    "enHash": "dc353487"
+  },
+  "voice.talk.error.unsupported": {
+    "message": "यह ब्राउज़र आवाज़ रिकॉर्ड नहीं कर सकता। अपने फ़ोन पर Chrome आज़माएँ।",
+    "review": "reviewed",
+    "enHash": "1def2eda"
+  },
+  "voice.talk.error.denied": {
+    "message": "इस साइट के लिए माइक्रोफ़ोन की अनुमति दें, फिर बटन दोबारा दबाए रखें।",
+    "review": "reviewed",
+    "enHash": "3ece20a9"
+  },
+  "voice.talk.error.short": {
+    "message": "बहुत छोटा। बोलते समय बटन दबाए रखें।",
+    "review": "reviewed",
+    "enHash": "c82d6ee5"
+  },
+  "voice.sending": {
+    "message": "रिकॉर्डिंग भेजी जा रही है",
+    "review": "reviewed",
+    "enHash": "e2f3a26a"
+  },
+  "voice.processing.title": {
+    "message": "आपकी बात समझ रहे हैं",
+    "review": "reviewed",
+    "enHash": "b609349f"
+  },
+  "voice.processing.body": {
+    "message": "इसमें कुछ सेकंड लगते हैं।",
+    "review": "reviewed",
+    "enHash": "6813189a"
+  },
+  "voice.failed.title": {
+    "message": "ड्राफ़्ट नहीं बन पाया",
+    "review": "reviewed",
+    "enHash": "2f9ae99f"
+  },
+  "voice.failed.empty": {
+    "message": "हमें कोई शब्द सुनाई नहीं दिया। बटन दबाए रखें और फिर से बोलें।",
+    "review": "reviewed",
+    "enHash": "386a46ed"
+  },
+  "voice.failed.busy": {
+    "message": "आवाज़ से अपडेट अभी व्यस्त है। एक मिनट बाद कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "5136b30e"
+  },
+  "voice.failed.generic": {
+    "message": "इस रिकॉर्डिंग में कुछ गड़बड़ हुई। फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "70222326"
+  },
+  "voice.again": {
+    "message": "फिर से बोलें",
+    "review": "reviewed",
+    "enHash": "567171d5"
+  },
+  "voice.error.too_large": {
+    "message": "रिकॉर्डिंग बहुत लंबी है। छोटी रिकॉर्डिंग आज़माएँ।",
+    "review": "reviewed",
+    "enHash": "3f2f0b12"
+  },
+  "voice.error.ai_daily_cap_reached": {
+    "message": "इस दुकान के लिए आज की आवाज़ से अपडेट की सीमा पूरी हो गई। आप स्टॉक पेज पर स्टॉक अपडेट कर सकते हैं।",
+    "review": "reviewed",
+    "enHash": "920c511b"
+  },
+  "voice.error.validation_failed": {
+    "message": "एक लाइन ठीक करनी है। हाइलाइट की गई लाइनें देखें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "1ebd1ff4"
+  },
+  "voice.error.invalid_transition": {
+    "message": "यह ड्राफ़्ट पहले ही कन्फ़र्म या रद्द हो चुका है।",
+    "review": "reviewed",
+    "enHash": "5e186a68"
+  },
+  "voice.error.not_found": {
+    "message": "यह ड्राफ़्ट अब उपलब्ध नहीं है। फिर से बोलें।",
+    "review": "reviewed",
+    "enHash": "3cc6920c"
+  },
+  "voice.error.forbidden": {
+    "message": "आप इस दुकान में यह नहीं कर सकते।",
+    "review": "reviewed",
+    "enHash": "0eeef5b3"
+  },
+  "voice.error.generic": {
+    "message": "कुछ गड़बड़ हुई। कनेक्शन देखें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "6a2667c6"
+  },
+  "voice.review.said": {
+    "message": "आपने कहा",
+    "review": "reviewed",
+    "enHash": "f105abd5"
+  },
+  "voice.review.hint": {
+    "message": "हर लाइन जाँचें। कन्फ़र्म करने तक कुछ नहीं बदलता।",
+    "review": "reviewed",
+    "enHash": "85b8c3ce"
+  },
+  "voice.review.blocked": {
+    "message": "कन्फ़र्म करने से पहले {n, plural, one {# लाइन में} other {# लाइनों में}} आइटम या संख्या चाहिए।",
+    "review": "reviewed",
+    "enHash": "e838c9b9"
+  },
+  "voice.review.manager": {
+    "message": "{n, plural, one {# लाइन के लिए मैनेजर चाहिए, यह लागू नहीं होगी।} other {# लाइनों के लिए मैनेजर चाहिए, ये लागू नहीं होंगी।}}",
+    "review": "reviewed",
+    "enHash": "ddc2967b"
+  },
+  "voice.review.lines": {
+    "message": "ड्राफ़्ट की लाइनें",
+    "review": "reviewed",
+    "enHash": "9ff61089"
+  },
+  "voice.review.discard": {
+    "message": "रद्द करें",
+    "review": "reviewed",
+    "enHash": "36fff63c"
+  },
+  "voice.review.confirm": {
+    "message": "{n, plural, =0 {कन्फ़र्म करें} one {# बदलाव कन्फ़र्म करें} other {# बदलाव कन्फ़र्म करें}}",
+    "review": "reviewed",
+    "enHash": "9b319135"
+  },
+  "voice.review.none.title": {
+    "message": "स्टॉक का कोई बदलाव सुनाई नहीं दिया",
+    "review": "reviewed",
+    "enHash": "cdefe4e8"
+  },
+  "voice.review.none.body": {
+    "message": "आइटम का नाम और उसके साथ क्या हुआ बोलें, जैसे “2 मैगी बिकी”।",
+    "review": "reviewed",
+    "enHash": "2bc3c1da"
+  },
+  "voice.kind.sale": {
+    "message": "बिक्री",
+    "review": "reviewed",
+    "enHash": "0028d743"
+  },
+  "voice.kind.restock": {
+    "message": "माल आया",
+    "review": "reviewed",
+    "enHash": "3ccf7127"
+  },
+  "voice.kind.count": {
+    "message": "गिनती",
+    "review": "reviewed",
+    "enHash": "66e12969"
+  },
+  "voice.kind.set_price": {
+    "message": "दाम",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "voice.change.sale": {
+    "message": "{n} बिके",
+    "review": "reviewed",
+    "enHash": "cada7134"
+  },
+  "voice.change.restock": {
+    "message": "{n} जोड़ें",
+    "review": "reviewed",
+    "enHash": "c44ec97c"
+  },
+  "voice.change.out": {
+    "message": "स्टॉक खत्म",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "voice.change.count": {
+    "message": "{n} गिने",
+    "review": "reviewed",
+    "enHash": "7df14703"
+  },
+  "voice.change.price": {
+    "message": "दाम {price}",
+    "review": "reviewed",
+    "enHash": "8bbcaf50"
+  },
+  "voice.change.priceFrom": {
+    "message": "दाम {price} (अभी {now})",
+    "review": "reviewed",
+    "enHash": "afc1e15d"
+  },
+  "voice.change.priceMissing": {
+    "message": "दाम सुनाई नहीं दिया",
+    "review": "reviewed",
+    "enHash": "9f2455d4"
+  },
+  "voice.line.askManager": {
+    "message": "मैनेजर से पूछें",
+    "review": "reviewed",
+    "enHash": "f4a0f296"
+  },
+  "voice.line.pickFlag": {
+    "message": "आइटम चुनें",
+    "review": "reviewed",
+    "enHash": "41825010"
+  },
+  "voice.line.edited": {
+    "message": "बदला गया",
+    "review": "reviewed",
+    "enHash": "978e8c33"
+  },
+  "voice.line.noItem": {
+    "message": "कोई आइटम नहीं मिला",
+    "review": "reviewed",
+    "enHash": "03219b45"
+  },
+  "voice.line.missingNumber": {
+    "message": "संख्या सुनाई नहीं दी",
+    "review": "reviewed",
+    "enHash": "7ca7271e"
+  },
+  "voice.line.onHand": {
+    "message": "{n} स्टॉक में",
+    "review": "reviewed",
+    "enHash": "01f97821"
+  },
+  "voice.line.heard": {
+    "message": "सुना: “{words}”",
+    "review": "reviewed",
+    "enHash": "d1009ed3"
+  },
+  "voice.line.sure": {
+    "message": "पक्का {pct}%",
+    "review": "reviewed",
+    "enHash": "7555951d"
+  },
+  "voice.line.unsure": {
+    "message": "इसे जाँचें ({pct}%)",
+    "review": "reviewed",
+    "enHash": "4a9667be"
+  },
+  "voice.line.managerNote": {
+    "message": "इसे सिर्फ़ मैनेजर या मालिक कन्फ़र्म कर सकते हैं। यह लागू नहीं होगा।",
+    "review": "reviewed",
+    "enHash": "b9ff8aa5"
+  },
+  "voice.line.restore": {
+    "message": "वापस लाएँ",
+    "review": "reviewed",
+    "enHash": "39fc7212"
+  },
+  "voice.line.pick": {
+    "message": "आइटम चुनें",
+    "review": "reviewed",
+    "enHash": "41825010"
+  },
+  "voice.line.edit": {
+    "message": "बदलें",
+    "review": "reviewed",
+    "enHash": "5301648d"
+  },
+  "voice.line.discard": {
+    "message": "हटाएँ",
+    "review": "reviewed",
+    "enHash": "e963907d"
+  },
+  "voice.edit.title": {
+    "message": "लाइन बदलें",
+    "review": "reviewed",
+    "enHash": "d440e5cb"
+  },
+  "voice.edit.pickTitle": {
+    "message": "आइटम चुनें",
+    "review": "reviewed",
+    "enHash": "14557eec"
+  },
+  "voice.edit.close": {
+    "message": "बंद करें",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "voice.edit.cancel": {
+    "message": "रहने दें",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "voice.edit.save": {
+    "message": "सेव करें",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "voice.edit.item": {
+    "message": "आइटम",
+    "review": "reviewed",
+    "enHash": "ecdda59a"
+  },
+  "voice.edit.changeItem": {
+    "message": "बदलें",
+    "review": "reviewed",
+    "enHash": "64fbd995"
+  },
+  "voice.edit.itemRequired": {
+    "message": "एक आइटम चुनें।",
+    "review": "reviewed",
+    "enHash": "a3046f35"
+  },
+  "voice.edit.kind": {
+    "message": "क्या हुआ",
+    "review": "reviewed",
+    "enHash": "7661e659"
+  },
+  "voice.edit.price": {
+    "message": "बिक्री का दाम",
+    "review": "reviewed",
+    "enHash": "7657ccd6"
+  },
+  "voice.edit.priceNow": {
+    "message": "अभी {price}",
+    "review": "reviewed",
+    "enHash": "9b7a7073"
+  },
+  "voice.edit.priceInvalid": {
+    "message": "₹0 से ज़्यादा दाम डालें।",
+    "review": "reviewed",
+    "enHash": "7af65ff1"
+  },
+  "voice.edit.aboveMrp": {
+    "message": "दाम MRP ({mrp}) से ज़्यादा नहीं हो सकता।",
+    "review": "reviewed",
+    "enHash": "7efee9c8"
+  },
+  "voice.edit.qty": {
+    "message": "मात्रा",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "voice.edit.qtyInvalid": {
+    "message": "1 से {max} तक की पूरी संख्या डालें।",
+    "review": "reviewed",
+    "enHash": "c4d982c3"
+  },
+  "voice.edit.counted": {
+    "message": "शेल्फ़ पर गिने",
+    "review": "reviewed",
+    "enHash": "3757174e"
+  },
+  "voice.edit.countHelp": {
+    "message": "0 का मतलब स्टॉक खत्म।",
+    "review": "reviewed",
+    "enHash": "1ef18a39"
+  },
+  "voice.edit.countInvalid": {
+    "message": "0 से {max} तक की पूरी संख्या डालें।",
+    "review": "reviewed",
+    "enHash": "9ea918c4"
+  },
+  "voice.edit.search": {
+    "message": "आइटम खोजें",
+    "review": "reviewed",
+    "enHash": "daeea688"
+  },
+  "voice.edit.searchHint": {
+    "message": "आइटम का नाम",
+    "review": "reviewed",
+    "enHash": "b56b71bb"
+  },
+  "voice.edit.noItems": {
+    "message": "कोई आइटम नहीं मिला। पहले स्टॉक पेज पर इसे जोड़ें।",
+    "review": "reviewed",
+    "enHash": "79cbb0fb"
+  },
+  "voice.edit.results": {
+    "message": "मिलते-जुलते आइटम",
+    "review": "reviewed",
+    "enHash": "defd0b26"
+  },
+  "voice.edit.pickShort": {
+    "message": "चुनें",
+    "review": "reviewed",
+    "enHash": "04d2414c"
+  },
+  "voice.edit.pickOne": {
+    "message": "{name} चुनें",
+    "review": "reviewed",
+    "enHash": "dbf74012"
+  },
+  "voice.done.title": {
+    "message": "ड्राफ़्ट कन्फ़र्म हो गया",
+    "review": "reviewed",
+    "enHash": "f796dd96"
+  },
+  "voice.done.discarded": {
+    "message": "ड्राफ़्ट रद्द हुआ। कुछ नहीं बदला।",
+    "review": "reviewed",
+    "enHash": "e8ec5fb7"
+  },
+  "voice.done.body": {
+    "message": "{applied, plural, one {# बदलाव लागू हुआ} other {# बदलाव लागू हुए}}{held, plural, =0 {।} other {, # मैनेजर के लिए बाकी।}}",
+    "review": "reviewed",
+    "enHash": "59b17c8b"
+  },
+  "voice.done.lines": {
+    "message": "हर लाइन का क्या हुआ",
+    "review": "reviewed",
+    "enHash": "60771315"
+  },
+  "voice.outcome.accepted": {
+    "message": "लागू हुआ",
+    "review": "reviewed",
+    "enHash": "a3e4a569"
+  },
+  "voice.outcome.edited": {
+    "message": "बदलाव के साथ लागू हुआ",
+    "review": "reviewed",
+    "enHash": "41f86f4d"
+  },
+  "voice.outcome.discarded": {
+    "message": "हटाया गया",
+    "review": "reviewed",
+    "enHash": "b5e77c5c"
+  },
+  "voice.outcome.not_permitted": {
+    "message": "मैनेजर चाहिए",
+    "review": "reviewed",
+    "enHash": "1bb456dd"
+  },
+  "voice.lang.fixedHint": {
+    "message": "सबसे सही मिलान के लिए इसी भाषा में बोलें।",
+    "review": "reviewed",
+    "enHash": "0adf1be4"
+  }
+}

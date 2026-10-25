@@ -1,0 +1,75 @@
+{
+  "name": "en_oil_price_change",
+  "input": {
+    "transcript": "change fortune oil price to 165",
+    "language": "en-IN",
+    "candidates": [
+      "Maggi 2-Minute Noodles 70 g",
+      "Amul Butter 100 g",
+      "Parle-G Biscuits 250 g",
+      "Tata Salt 1 kg",
+      "Aashirvaad Atta 5 kg",
+      "Fortune Sunflower Oil 1 l",
+      "Amul Taaza Milk 500 ml",
+      "Britannia Bread 400 g",
+      "Surf Excel 1 kg",
+      "Colgate Toothpaste 100 g",
+      "Lux Soap 100 g",
+      "Red Label Tea 250 g",
+      "Bru Coffee 50 g",
+      "Toor Dal 1 kg",
+      "Sona Masoori Rice 5 kg",
+      "Sugar 1 kg",
+      "Eggs 6 pack",
+      "Coca-Cola 750 ml",
+      "Lays Classic Salted 52 g",
+      "Dettol Soap 75 g",
+      "Good Day Cashew 200 g",
+      "MTR Rava Idli Mix 500 g",
+      "Aachi Sambar Powder 100 g",
+      "Nandini Milk 500 ml"
+    ]
+  },
+  "expect": {
+    "lines": [
+      {
+        "kind": "set_price",
+        "item": "c6",
+        "quantity": null,
+        "pricePaise": 16500
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_voice",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_voice",
+        "name": "record_voice_stock_lines",
+        "input": {
+          "lines": [
+            {
+              "kind": "set_price",
+              "item": "c6",
+              "unmatched": null,
+              "heard": "change fortune oil price to 165",
+              "quantity": null,
+              "price_rupees": 165.0,
+              "confidence": 0.92
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 900,
+      "output_tokens": 120
+    }
+  }
+}

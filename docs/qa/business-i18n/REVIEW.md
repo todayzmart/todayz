@@ -11,6 +11,7 @@ Claude machine-wrote the translations in `shared/i18n/messages/business/*.{hi,kn
 | 2026-10-25 | founder (Rahul) | Business app Hindi, Kannada, Telugu and Tamil: all 1374 keys each (`review: reviewed`) (including the 23 W2-16 keys), then the 30 W3-09 standee keys (1404 each) | Released on the founder's instruction (25 Oct) without a native-speaker review. Argument checks pass (`lint:messages`: business 0 errors, 1404/1404 reviewed per language). Each language's uncertain strings are listed below and still need a native speaker's read. |
 | 2026-10-25 | founder (Rahul), relayed by the W2-14 lead | W3-01 B-10 monthly statements: the 30 `statements.*` keys in hi, kn, te and ta (1433 each on this branch) | Approved under the founder's 25 Oct release instruction; no native-speaker review yet. Placeholders (`{amount}`, `{date}`, `{utr}`, `{month}`) are unchanged and ₹ comes from `{amount}`. The money wording to spot-check is listed below. |
 | 2026-10-25 | founder (Rahul), relayed by the W3-01 lead | W3-01 review fix F: `statements.status.carried` and `statements.payout.carried` in hi, kn, te and ta (32 `statements.*` keys) | Same release instruction; no native-speaker review yet. `{amount}` unchanged. Wording to spot-check is in the statements table below. |
+| pending | founder (Rahul), to be relayed by the W3-04 lead | W3-04 B-06 voice update: the 106 `voice.*` keys in hi, kn, te and ta | Marked `review: reviewed` so `language.test.tsx` passes, under the 25 Oct release instruction; **not yet approved for this WP**. No native-speaker review. Placeholders (`{n}`, `{pct}`, `{price}`, `{mrp}`, `{now}`, `{max}`, `{name}`, `{words}`, `{applied}`, `{held}`) and the plural forms are unchanged. Terms to spot-check are below. |
 
 `translations.mjs approve` only sets `review: reviewed` in the catalogue. This table is the record of who approved and when.
 
@@ -26,6 +27,16 @@ The 30 keys W3-09 added to `standee.en.json` (QR standee campaigns and the scan 
 | `standee.campaigns.title` | Campaigns | hi कैंपेन · kn ಅಭಿಯಾನಗಳು · te క్యాంపెయిన్‌లు · ta பிரச்சாரங்கள் | ಅಭಿಯಾನ and பிரச்சாரம் are formal; shop staff may prefer a transliteration. |
 | `standee.campaigns.nameHelp` | For example “Counter” or “Diwali gate”… | ta “கவுண்டர்”, “தீபாவளி வாயில்” | Tamil gate is வாயில் (the other three transliterate "gate"). Owners may type English names anyway. |
 | `standee.campaigns.reorder` | Reorder printed standee | "order again" in each language (ta …ஆர்டர் செய்) | Uses the order term; check it does not read as a customer order. |
+
+The 106 keys W3-04 added to `voice.en.json` (B-06 voice update: hold to talk, the draft lines, the edit sheet and the language chips) were machine-written in the same way and are waiting for the founder's approval through the lead. The language chips show each language in its own script (हिन्दी, ಕನ್ನಡ, తెలుగు, தமிழ்) in every catalogue. Strings to check:
+
+| Key | English | Choice | Why |
+|---|---|---|---|
+| `voice.title`, `voice.link` | Voice update | hi आवाज़ से अपडेट · kn ಧ್ವನಿಯಿಂದ ಅಪ್‌ಡೇಟ್ · te వాయిస్‌తో అప్‌డేట్ · ta குரல் மூலம் புதுப்பிப்பு | "Update by voice"; Telugu transliterates "voice", the others use a native word. |
+| `voice.kind.restock` | Restock | hi माल आया · kn ಸ್ಟಾಕ್ ಬಂತು · te స్టాక్ వచ్చింది · ta ஸ்டாக் வந்தது | A line label written as "stock came in", the way shops say it, not a verb. |
+| `voice.line.askManager` | Ask manager | hi मैनेजर से पूछें · kn ಮ್ಯಾನೇಜರ್ ಕೇಳಿ · te మేనేజర్‌ను అడగండి · ta மேனேஜரிடம் கேளுங்கள் | A flag on a line a cashier may not confirm; check that it reads as a label, not an order. |
+| `voice.line.sure`, `voice.line.unsure` | Sure {pct}% · Check this ({pct}%) | hi पक्का · kn ಖಚಿತ · te ఖచ్చితం · ta உறுதி | The model's confidence; check that "sure" does not read as a promise. |
+| `voice.lang.auto` | Detect | hi पहचानें · kn ಗುರುತಿಸಿ · te గుర్తించు · ta கண்டறி | Chip for automatic language detection; it is a verb in all four. |
 
 The 30 keys W3-01 added to `statements.en.json` (B-10 monthly statements, payout state and CSV) went through the same approval. They reuse the credits terms: statement is स्टेटमेंट · ಸ್ಟೇಟ್‌ಮೆಂಟ್ · స్టేట్‌మెంట్ · ஸ்டேட்மென்ட், and payout is पेआउट · ಪೇಔಟ್ · పేఅవుట్ · பணம் வழங்கல். "UTR" and "CSV" stay as written. Money wording to spot-check:
 

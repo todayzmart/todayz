@@ -1,0 +1,532 @@
+{
+  "voice.title": {
+    "message": "వాయిస్‌తో అప్‌డేట్",
+    "review": "reviewed",
+    "enHash": "f1f256a4"
+  },
+  "voice.link": {
+    "message": "వాయిస్‌తో అప్‌డేట్",
+    "review": "reviewed",
+    "enHash": "f1f256a4"
+  },
+  "voice.loading": {
+    "message": "వాయిస్‌తో అప్‌డేట్ లోడ్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "e5a59f91"
+  },
+  "voice.storeError.title": {
+    "message": "వాయిస్‌తో అప్‌డేట్ లోడ్ కాలేదు",
+    "review": "reviewed",
+    "enHash": "8d27d556"
+  },
+  "voice.storeError.body": {
+    "message": "కనెక్షన్ చూసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "059c6344"
+  },
+  "voice.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "voice.noStore.title": {
+    "message": "ముందుగా ఒక షాప్ ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "voice.noStore.body": {
+    "message": "వాయిస్‌తో అప్‌డేట్ ఒకసారి ఒక షాప్‌లో పనిచేస్తుంది.",
+    "review": "reviewed",
+    "enHash": "3eddcdc5"
+  },
+  "voice.noStore.action": {
+    "message": "షాప్ ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "12cfd9dc"
+  },
+  "voice.off.title": {
+    "message": "వాయిస్‌తో అప్‌డేట్ ఆఫ్‌లో ఉంది",
+    "review": "reviewed",
+    "enHash": "6d34bae5"
+  },
+  "voice.off.body": {
+    "message": "ఈ షాప్‌కు ఇప్పుడు వాయిస్‌తో అప్‌డేట్ అందుబాటులో లేదు. స్టాక్ పేజీలో స్టాక్ అప్‌డేట్ చేయవచ్చు.",
+    "review": "reviewed",
+    "enHash": "46616079"
+  },
+  "voice.openStock": {
+    "message": "స్టాక్ తెరవండి",
+    "review": "reviewed",
+    "enHash": "1608a4fc"
+  },
+  "voice.intro": {
+    "message": "ఏమి మారిందో చెప్పండి, ఉదా. “2 మ్యాగీ అమ్మాము”, “10 అమూల్ పాలు వచ్చాయి”, “పార్లే-జి అయిపోయింది” లేదా “సర్ఫ్ ఎక్సెల్ ధర 58”. ఏదైనా మారే ముందు మీరు ప్రతి లైన్‌ను చూస్తారు.",
+    "review": "reviewed",
+    "enHash": "2e7d6348"
+  },
+  "voice.privacy": {
+    "message": "రికార్డింగ్‌ను డ్రాఫ్ట్ చేయడానికి ఒక్కసారి మాత్రమే వాడతాం, దాచుకోము.",
+    "review": "reviewed",
+    "enHash": "54fff06c"
+  },
+  "voice.lang.title": {
+    "message": "మీరు మాట్లాడే భాష",
+    "review": "reviewed",
+    "enHash": "21711165"
+  },
+  "voice.lang.auto": {
+    "message": "గుర్తించు",
+    "review": "reviewed",
+    "enHash": "80628bd7"
+  },
+  "voice.lang.autoHint": {
+    "message": "భాష మేమే గుర్తిస్తాం. కలగలిపిన మాటలూ సరే.",
+    "review": "reviewed",
+    "enHash": "056ceb53"
+  },
+  "voice.talk.hold": {
+    "message": "మాట్లాడటానికి నొక్కి పట్టుకోండి",
+    "review": "reviewed",
+    "enHash": "ae440774"
+  },
+  "voice.talk.release": {
+    "message": "పంపడానికి వదలండి",
+    "review": "reviewed",
+    "enHash": "445d26a2"
+  },
+  "voice.talk.timer": {
+    "message": "{now} / {max}",
+    "review": "reviewed",
+    "enHash": "c0c9212e"
+  },
+  "voice.talk.listening": {
+    "message": "వింటోంది",
+    "review": "reviewed",
+    "enHash": "dc353487"
+  },
+  "voice.talk.error.unsupported": {
+    "message": "ఈ బ్రౌజర్ శబ్దాన్ని రికార్డ్ చేయలేదు. మీ ఫోన్‌లో Chrome ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "1def2eda"
+  },
+  "voice.talk.error.denied": {
+    "message": "ఈ సైట్‌కు మైక్రోఫోన్ అనుమతి ఇవ్వండి, తర్వాత బటన్‌ను మళ్ళీ నొక్కి పట్టుకోండి.",
+    "review": "reviewed",
+    "enHash": "3ece20a9"
+  },
+  "voice.talk.error.short": {
+    "message": "చాలా చిన్నది. మాట్లాడేటప్పుడు బటన్ నొక్కి పట్టుకోండి.",
+    "review": "reviewed",
+    "enHash": "c82d6ee5"
+  },
+  "voice.sending": {
+    "message": "రికార్డింగ్ పంపుతోంది",
+    "review": "reviewed",
+    "enHash": "e2f3a26a"
+  },
+  "voice.processing.title": {
+    "message": "మీరు చెప్పింది అర్థం చేసుకుంటున్నాం",
+    "review": "reviewed",
+    "enHash": "b609349f"
+  },
+  "voice.processing.body": {
+    "message": "దీనికి కొన్ని సెకన్లు పడుతుంది.",
+    "review": "reviewed",
+    "enHash": "6813189a"
+  },
+  "voice.failed.title": {
+    "message": "డ్రాఫ్ట్ చేయలేకపోయాం",
+    "review": "reviewed",
+    "enHash": "2f9ae99f"
+  },
+  "voice.failed.empty": {
+    "message": "మాకు ఏ పదమూ వినిపించలేదు. బటన్ నొక్కి పట్టుకుని మళ్ళీ మాట్లాడండి.",
+    "review": "reviewed",
+    "enHash": "386a46ed"
+  },
+  "voice.failed.busy": {
+    "message": "వాయిస్‌తో అప్‌డేట్ ఇప్పుడు బిజీగా ఉంది. ఒక నిమిషం తర్వాత ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "5136b30e"
+  },
+  "voice.failed.generic": {
+    "message": "ఈ రికార్డింగ్‌లో ఏదో తప్పు జరిగింది. మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "70222326"
+  },
+  "voice.again": {
+    "message": "మళ్ళీ మాట్లాడండి",
+    "review": "reviewed",
+    "enHash": "567171d5"
+  },
+  "voice.error.too_large": {
+    "message": "రికార్డింగ్ చాలా పొడవుగా ఉంది. చిన్నది ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "3f2f0b12"
+  },
+  "voice.error.ai_daily_cap_reached": {
+    "message": "ఈ షాప్‌కు ఈరోజు వాయిస్‌తో అప్‌డేట్ పరిమితి అయిపోయింది. స్టాక్ పేజీలో స్టాక్ అప్‌డేట్ చేయవచ్చు.",
+    "review": "reviewed",
+    "enHash": "920c511b"
+  },
+  "voice.error.validation_failed": {
+    "message": "ఒక లైన్ సరిచేయాలి. హైలైట్ చేసిన లైన్‌లు చూసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "1ebd1ff4"
+  },
+  "voice.error.invalid_transition": {
+    "message": "ఈ డ్రాఫ్ట్ ఇప్పటికే నిర్ధారించబడింది లేదా రద్దయింది.",
+    "review": "reviewed",
+    "enHash": "5e186a68"
+  },
+  "voice.error.not_found": {
+    "message": "ఈ డ్రాఫ్ట్ ఇక అందుబాటులో లేదు. మళ్ళీ మాట్లాడండి.",
+    "review": "reviewed",
+    "enHash": "3cc6920c"
+  },
+  "voice.error.forbidden": {
+    "message": "ఈ షాప్‌లో మీరు ఇది చేయలేరు.",
+    "review": "reviewed",
+    "enHash": "0eeef5b3"
+  },
+  "voice.error.generic": {
+    "message": "ఏదో తప్పు జరిగింది. కనెక్షన్ చూసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "6a2667c6"
+  },
+  "voice.review.said": {
+    "message": "మీరు చెప్పింది",
+    "review": "reviewed",
+    "enHash": "f105abd5"
+  },
+  "voice.review.hint": {
+    "message": "ప్రతి లైన్ చూడండి. మీరు నిర్ధారించే వరకు ఏదీ మారదు.",
+    "review": "reviewed",
+    "enHash": "85b8c3ce"
+  },
+  "voice.review.blocked": {
+    "message": "నిర్ధారించే ముందు {n, plural, one {# లైన్‌కు} other {# లైన్‌లకు}} ఐటమ్ లేదా సంఖ్య కావాలి.",
+    "review": "reviewed",
+    "enHash": "e838c9b9"
+  },
+  "voice.review.manager": {
+    "message": "{n, plural, one {# లైన్‌కు మేనేజర్ కావాలి, అది అమలు కాదు.} other {# లైన్‌లకు మేనేజర్ కావాలి, అవి అమలు కావు.}}",
+    "review": "reviewed",
+    "enHash": "ddc2967b"
+  },
+  "voice.review.lines": {
+    "message": "డ్రాఫ్ట్ లైన్‌లు",
+    "review": "reviewed",
+    "enHash": "9ff61089"
+  },
+  "voice.review.discard": {
+    "message": "రద్దు చేయండి",
+    "review": "reviewed",
+    "enHash": "36fff63c"
+  },
+  "voice.review.confirm": {
+    "message": "{n, plural, =0 {నిర్ధారించండి} one {# మార్పు నిర్ధారించండి} other {# మార్పులు నిర్ధారించండి}}",
+    "review": "reviewed",
+    "enHash": "9b319135"
+  },
+  "voice.review.none.title": {
+    "message": "స్టాక్ మార్పు ఏదీ వినిపించలేదు",
+    "review": "reviewed",
+    "enHash": "cdefe4e8"
+  },
+  "voice.review.none.body": {
+    "message": "ఐటమ్, దానికి ఏమైందో చెప్పండి, ఉదా. “2 మ్యాగీ అమ్మాము”.",
+    "review": "reviewed",
+    "enHash": "2bc3c1da"
+  },
+  "voice.kind.sale": {
+    "message": "అమ్మకం",
+    "review": "reviewed",
+    "enHash": "0028d743"
+  },
+  "voice.kind.restock": {
+    "message": "స్టాక్ వచ్చింది",
+    "review": "reviewed",
+    "enHash": "3ccf7127"
+  },
+  "voice.kind.count": {
+    "message": "లెక్క",
+    "review": "reviewed",
+    "enHash": "66e12969"
+  },
+  "voice.kind.set_price": {
+    "message": "ధర",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "voice.change.sale": {
+    "message": "{n} అమ్మారు",
+    "review": "reviewed",
+    "enHash": "cada7134"
+  },
+  "voice.change.restock": {
+    "message": "{n} జోడించు",
+    "review": "reviewed",
+    "enHash": "c44ec97c"
+  },
+  "voice.change.out": {
+    "message": "స్టాక్ అయిపోయింది",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "voice.change.count": {
+    "message": "{n} లెక్కించారు",
+    "review": "reviewed",
+    "enHash": "7df14703"
+  },
+  "voice.change.price": {
+    "message": "ధర {price}",
+    "review": "reviewed",
+    "enHash": "8bbcaf50"
+  },
+  "voice.change.priceFrom": {
+    "message": "ధర {price} (ఇప్పుడు {now})",
+    "review": "reviewed",
+    "enHash": "afc1e15d"
+  },
+  "voice.change.priceMissing": {
+    "message": "ధర వినిపించలేదు",
+    "review": "reviewed",
+    "enHash": "9f2455d4"
+  },
+  "voice.line.askManager": {
+    "message": "మేనేజర్‌ను అడగండి",
+    "review": "reviewed",
+    "enHash": "f4a0f296"
+  },
+  "voice.line.pickFlag": {
+    "message": "ఐటమ్ ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "41825010"
+  },
+  "voice.line.edited": {
+    "message": "మార్చారు",
+    "review": "reviewed",
+    "enHash": "978e8c33"
+  },
+  "voice.line.noItem": {
+    "message": "ఏ ఐటమ్ సరిపోలలేదు",
+    "review": "reviewed",
+    "enHash": "03219b45"
+  },
+  "voice.line.missingNumber": {
+    "message": "సంఖ్య వినిపించలేదు",
+    "review": "reviewed",
+    "enHash": "7ca7271e"
+  },
+  "voice.line.onHand": {
+    "message": "{n} స్టాక్‌లో ఉంది",
+    "review": "reviewed",
+    "enHash": "01f97821"
+  },
+  "voice.line.heard": {
+    "message": "విన్నది: “{words}”",
+    "review": "reviewed",
+    "enHash": "d1009ed3"
+  },
+  "voice.line.sure": {
+    "message": "ఖచ్చితం {pct}%",
+    "review": "reviewed",
+    "enHash": "7555951d"
+  },
+  "voice.line.unsure": {
+    "message": "దీన్ని చూడండి ({pct}%)",
+    "review": "reviewed",
+    "enHash": "4a9667be"
+  },
+  "voice.line.managerNote": {
+    "message": "మేనేజర్ లేదా యజమాని మాత్రమే దీన్ని నిర్ధారించగలరు. ఇది అమలు కాదు.",
+    "review": "reviewed",
+    "enHash": "b9ff8aa5"
+  },
+  "voice.line.restore": {
+    "message": "వెనక్కి తీసుకురండి",
+    "review": "reviewed",
+    "enHash": "39fc7212"
+  },
+  "voice.line.pick": {
+    "message": "ఐటమ్ ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "41825010"
+  },
+  "voice.line.edit": {
+    "message": "మార్చండి",
+    "review": "reviewed",
+    "enHash": "5301648d"
+  },
+  "voice.line.discard": {
+    "message": "తీసివేయండి",
+    "review": "reviewed",
+    "enHash": "e963907d"
+  },
+  "voice.edit.title": {
+    "message": "లైన్ మార్చండి",
+    "review": "reviewed",
+    "enHash": "d440e5cb"
+  },
+  "voice.edit.pickTitle": {
+    "message": "ఐటమ్ ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "14557eec"
+  },
+  "voice.edit.close": {
+    "message": "మూసివేయండి",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "voice.edit.cancel": {
+    "message": "వద్దు",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "voice.edit.save": {
+    "message": "సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "voice.edit.item": {
+    "message": "ఐటమ్",
+    "review": "reviewed",
+    "enHash": "ecdda59a"
+  },
+  "voice.edit.changeItem": {
+    "message": "మార్చండి",
+    "review": "reviewed",
+    "enHash": "64fbd995"
+  },
+  "voice.edit.itemRequired": {
+    "message": "ఒక ఐటమ్ ఎంచుకోండి.",
+    "review": "reviewed",
+    "enHash": "a3046f35"
+  },
+  "voice.edit.kind": {
+    "message": "ఏమైంది",
+    "review": "reviewed",
+    "enHash": "7661e659"
+  },
+  "voice.edit.price": {
+    "message": "అమ్మకం ధర",
+    "review": "reviewed",
+    "enHash": "7657ccd6"
+  },
+  "voice.edit.priceNow": {
+    "message": "ఇప్పుడు {price}",
+    "review": "reviewed",
+    "enHash": "9b7a7073"
+  },
+  "voice.edit.priceInvalid": {
+    "message": "₹0 కంటే ఎక్కువ ధర నమోదు చేయండి.",
+    "review": "reviewed",
+    "enHash": "7af65ff1"
+  },
+  "voice.edit.aboveMrp": {
+    "message": "ధర MRP ({mrp}) కంటే ఎక్కువ ఉండకూడదు.",
+    "review": "reviewed",
+    "enHash": "7efee9c8"
+  },
+  "voice.edit.qty": {
+    "message": "పరిమాణం",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "voice.edit.qtyInvalid": {
+    "message": "1 నుండి {max} వరకు పూర్ణ సంఖ్య నమోదు చేయండి.",
+    "review": "reviewed",
+    "enHash": "c4d982c3"
+  },
+  "voice.edit.counted": {
+    "message": "షెల్ఫ్‌లో లెక్కించినది",
+    "review": "reviewed",
+    "enHash": "3757174e"
+  },
+  "voice.edit.countHelp": {
+    "message": "0 అంటే స్టాక్ అయిపోయింది.",
+    "review": "reviewed",
+    "enHash": "1ef18a39"
+  },
+  "voice.edit.countInvalid": {
+    "message": "0 నుండి {max} వరకు పూర్ణ సంఖ్య నమోదు చేయండి.",
+    "review": "reviewed",
+    "enHash": "9ea918c4"
+  },
+  "voice.edit.search": {
+    "message": "ఐటమ్‌లు వెతకండి",
+    "review": "reviewed",
+    "enHash": "daeea688"
+  },
+  "voice.edit.searchHint": {
+    "message": "ఐటమ్ పేరు",
+    "review": "reviewed",
+    "enHash": "b56b71bb"
+  },
+  "voice.edit.noItems": {
+    "message": "ఏ ఐటమ్ దొరకలేదు. ముందుగా స్టాక్ పేజీలో జోడించండి.",
+    "review": "reviewed",
+    "enHash": "79cbb0fb"
+  },
+  "voice.edit.results": {
+    "message": "సరిపోయే ఐటమ్‌లు",
+    "review": "reviewed",
+    "enHash": "defd0b26"
+  },
+  "voice.edit.pickShort": {
+    "message": "ఎంచుకో",
+    "review": "reviewed",
+    "enHash": "04d2414c"
+  },
+  "voice.edit.pickOne": {
+    "message": "{name} ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "dbf74012"
+  },
+  "voice.done.title": {
+    "message": "డ్రాఫ్ట్ నిర్ధారించబడింది",
+    "review": "reviewed",
+    "enHash": "f796dd96"
+  },
+  "voice.done.discarded": {
+    "message": "డ్రాఫ్ట్ రద్దయింది. ఏదీ మారలేదు.",
+    "review": "reviewed",
+    "enHash": "e8ec5fb7"
+  },
+  "voice.done.body": {
+    "message": "{applied, plural, one {# మార్పు అమలైంది} other {# మార్పులు అమలయ్యాయి}}{held, plural, =0 {.} other {, # మేనేజర్ కోసం మిగిలాయి.}}",
+    "review": "reviewed",
+    "enHash": "59b17c8b"
+  },
+  "voice.done.lines": {
+    "message": "ప్రతి లైన్‌కు ఏమైంది",
+    "review": "reviewed",
+    "enHash": "60771315"
+  },
+  "voice.outcome.accepted": {
+    "message": "అమలైంది",
+    "review": "reviewed",
+    "enHash": "a3e4a569"
+  },
+  "voice.outcome.edited": {
+    "message": "మార్పులతో అమలైంది",
+    "review": "reviewed",
+    "enHash": "41f86f4d"
+  },
+  "voice.outcome.discarded": {
+    "message": "తీసివేశారు",
+    "review": "reviewed",
+    "enHash": "b5e77c5c"
+  },
+  "voice.outcome.not_permitted": {
+    "message": "మేనేజర్ కావాలి",
+    "review": "reviewed",
+    "enHash": "1bb456dd"
+  },
+  "voice.lang.fixedHint": {
+    "message": "సరైన మ్యాచ్ కోసం ఇదే భాషలో మాట్లాడండి.",
+    "review": "reviewed",
+    "enHash": "0adf1be4"
+  }
+}

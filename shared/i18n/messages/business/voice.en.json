@@ -1,0 +1,426 @@
+{
+  "voice.title": {
+    "defaultMessage": "Voice update",
+    "description": "B-06 page title"
+  },
+  "voice.link": {
+    "defaultMessage": "Voice update",
+    "description": "Stock page header link to B-06"
+  },
+  "voice.loading": {
+    "defaultMessage": "Loading voice update",
+    "description": "Accessible name of the loading state"
+  },
+  "voice.storeError.title": {
+    "defaultMessage": "Couldn't load voice update",
+    "description": "Shop or availability failed to load"
+  },
+  "voice.storeError.body": {
+    "defaultMessage": "Check the connection and try again.",
+    "description": "Body under voice.storeError.title"
+  },
+  "voice.retry": {
+    "defaultMessage": "Try again",
+    "description": "Retry after a load failure"
+  },
+  "voice.noStore.title": {
+    "defaultMessage": "Pick a shop first",
+    "description": "No current shop"
+  },
+  "voice.noStore.body": {
+    "defaultMessage": "Voice update works on one shop at a time.",
+    "description": "Body under voice.noStore.title"
+  },
+  "voice.noStore.action": {
+    "defaultMessage": "Choose shop",
+    "description": "Opens the shop picker"
+  },
+  "voice.off.title": {
+    "defaultMessage": "Voice update is off",
+    "description": "Voice integration is off for this shop"
+  },
+  "voice.off.body": {
+    "defaultMessage": "Voice update isn't available for this shop right now. You can still update stock on the Stock page.",
+    "description": "Body under voice.off.title"
+  },
+  "voice.openStock": {
+    "defaultMessage": "Open stock",
+    "description": "Link to B-07 Stock"
+  },
+  "voice.intro": {
+    "defaultMessage": "Say what changed, like “sold 2 Maggi”, “10 Amul milk came in”, “Parle-G is out of stock” or “Surf Excel price 58”. You check every line before anything changes.",
+    "description": "Explains how to speak a stock update; keep the quoted examples natural for a shop"
+  },
+  "voice.privacy": {
+    "defaultMessage": "The recording is used once to make the draft and is not kept.",
+    "description": "Privacy note under the talk button"
+  },
+  "voice.lang.title": {
+    "defaultMessage": "Language you speak",
+    "description": "Heading and group name of the speech language picker"
+  },
+  "voice.lang.auto": {
+    "defaultMessage": "Detect",
+    "description": "Picker card: let the speech service detect the language"
+  },
+  "voice.lang.autoHint": {
+    "defaultMessage": "We work out the language. Mixed speech works too.",
+    "description": "Note under the language chips while Detect is picked"
+  },
+  "voice.lang.fixedHint": {
+    "defaultMessage": "Speak in this language for the best match.",
+    "description": "Note under the language chips while one language is picked"
+  },
+  "voice.talk.hold": {
+    "defaultMessage": "Hold to talk",
+    "description": "Talk button, idle: press and hold while speaking"
+  },
+  "voice.talk.release": {
+    "defaultMessage": "Let go to send",
+    "description": "Talk button while recording"
+  },
+  "voice.talk.timer": {
+    "defaultMessage": "{now} of {max}",
+    "description": "Recording time, e.g. 0:04 of 0:15"
+  },
+  "voice.talk.listening": {
+    "defaultMessage": "Listening",
+    "description": "Screen reader status while recording"
+  },
+  "voice.talk.error.unsupported": {
+    "defaultMessage": "This browser can't record sound. Try Chrome on your phone.",
+    "description": "No MediaRecorder or microphone API"
+  },
+  "voice.talk.error.denied": {
+    "defaultMessage": "Allow the microphone for this site, then hold the button again.",
+    "description": "Microphone permission refused"
+  },
+  "voice.talk.error.short": {
+    "defaultMessage": "Too short. Hold the button while you speak.",
+    "description": "Released before half a second"
+  },
+  "voice.sending": {
+    "defaultMessage": "Sending the recording",
+    "description": "Status while uploading"
+  },
+  "voice.processing.title": {
+    "defaultMessage": "Working out what you said",
+    "description": "Draft is being made"
+  },
+  "voice.processing.body": {
+    "defaultMessage": "This takes a few seconds.",
+    "description": "Body under voice.processing.title"
+  },
+  "voice.failed.title": {
+    "defaultMessage": "Couldn't make a draft",
+    "description": "The draft failed"
+  },
+  "voice.failed.empty": {
+    "defaultMessage": "We didn't catch any words. Hold the button and speak again.",
+    "description": "Draft failed: no speech heard"
+  },
+  "voice.failed.busy": {
+    "defaultMessage": "Voice update is busy right now. Try again in a minute.",
+    "description": "Draft failed: provider timeout or rate limit"
+  },
+  "voice.failed.generic": {
+    "defaultMessage": "Something went wrong with this recording. Try again.",
+    "description": "Draft failed: any other reason"
+  },
+  "voice.again": {
+    "defaultMessage": "Speak again",
+    "description": "Start a new recording"
+  },
+  "voice.error.too_large": {
+    "defaultMessage": "That recording is too long. Try a shorter one.",
+    "description": "Upload over the size limit"
+  },
+  "voice.error.ai_daily_cap_reached": {
+    "defaultMessage": "Voice update has reached today's limit for this shop. You can still update stock on the Stock page.",
+    "description": "Daily AI cap reached"
+  },
+  "voice.error.validation_failed": {
+    "defaultMessage": "A line needs a fix. Check the highlighted lines and try again.",
+    "description": "Server refused a value"
+  },
+  "voice.error.invalid_transition": {
+    "defaultMessage": "This draft was already confirmed or discarded.",
+    "description": "Draft no longer open"
+  },
+  "voice.error.not_found": {
+    "defaultMessage": "This draft is no longer available. Speak again.",
+    "description": "Draft gone"
+  },
+  "voice.error.forbidden": {
+    "defaultMessage": "You can't do this in this shop.",
+    "description": "No permission"
+  },
+  "voice.error.generic": {
+    "defaultMessage": "Something went wrong. Check the connection and try again.",
+    "description": "Any other failure"
+  },
+  "voice.review.said": {
+    "defaultMessage": "You said",
+    "description": "Label over the transcript"
+  },
+  "voice.review.hint": {
+    "defaultMessage": "Check each line. Nothing changes until you confirm.",
+    "description": "Hint above the draft lines"
+  },
+  "voice.review.blocked": {
+    "defaultMessage": "{n, plural, one {# line needs} other {# lines need}} an item or a number before you can confirm.",
+    "description": "Banner: lines still need a pick or a fix"
+  },
+  "voice.review.manager": {
+    "defaultMessage": "{n, plural, one {# line needs a manager and won't be applied.} other {# lines need a manager and won't be applied.}}",
+    "description": "Banner for a cashier: lines they may not confirm"
+  },
+  "voice.review.lines": {
+    "defaultMessage": "Draft lines",
+    "description": "Accessible name of the line list"
+  },
+  "voice.review.discard": {
+    "defaultMessage": "Discard",
+    "description": "Discard the whole draft"
+  },
+  "voice.review.confirm": {
+    "defaultMessage": "{n, plural, =0 {Confirm} one {Confirm # change} other {Confirm # changes}}",
+    "description": "Confirm button; n is the lines that will be applied"
+  },
+  "voice.review.none.title": {
+    "defaultMessage": "No stock changes heard",
+    "description": "The draft has no lines"
+  },
+  "voice.review.none.body": {
+    "defaultMessage": "Say an item and what happened to it, like “sold 2 Maggi”.",
+    "description": "Body under voice.review.none.title"
+  },
+  "voice.kind.sale": {
+    "defaultMessage": "Sale",
+    "description": "Line kind: a counter sale"
+  },
+  "voice.kind.restock": {
+    "defaultMessage": "Restock",
+    "description": "Line kind: goods came in"
+  },
+  "voice.kind.count": {
+    "defaultMessage": "Count",
+    "description": "Line kind: counted on the shelf (0 is out of stock)"
+  },
+  "voice.kind.set_price": {
+    "defaultMessage": "Price",
+    "description": "Line kind: change the selling price"
+  },
+  "voice.change.sale": {
+    "defaultMessage": "Sold {n}",
+    "description": "Line change: units sold"
+  },
+  "voice.change.restock": {
+    "defaultMessage": "Add {n}",
+    "description": "Line change: units added"
+  },
+  "voice.change.out": {
+    "defaultMessage": "Out of stock",
+    "description": "Line change: count of 0"
+  },
+  "voice.change.count": {
+    "defaultMessage": "Counted {n}",
+    "description": "Line change: units counted"
+  },
+  "voice.change.price": {
+    "defaultMessage": "Price {price}",
+    "description": "Line change: new price"
+  },
+  "voice.change.priceFrom": {
+    "defaultMessage": "Price {price} (now {now})",
+    "description": "Line change: new price and the current one"
+  },
+  "voice.change.priceMissing": {
+    "defaultMessage": "Price not heard",
+    "description": "A price line with no price"
+  },
+  "voice.line.askManager": {
+    "defaultMessage": "Ask manager",
+    "description": "Flag: the caller may not confirm this kind"
+  },
+  "voice.line.pickFlag": {
+    "defaultMessage": "Pick item",
+    "description": "Flag: no item matched"
+  },
+  "voice.line.edited": {
+    "defaultMessage": "Edited",
+    "description": "Flag: the person changed the line"
+  },
+  "voice.line.noItem": {
+    "defaultMessage": "No item matched",
+    "description": "Stands in for the item name"
+  },
+  "voice.line.missingNumber": {
+    "defaultMessage": "Number not heard",
+    "description": "The quantity or price is missing or out of range"
+  },
+  "voice.line.onHand": {
+    "defaultMessage": "{n} on hand",
+    "description": "Current stock of the item"
+  },
+  "voice.line.heard": {
+    "defaultMessage": "Heard: “{words}”",
+    "description": "The words this line came from"
+  },
+  "voice.line.sure": {
+    "defaultMessage": "Sure {pct}%",
+    "description": "Model confidence"
+  },
+  "voice.line.unsure": {
+    "defaultMessage": "Check this ({pct}%)",
+    "description": "Low model confidence"
+  },
+  "voice.line.managerNote": {
+    "defaultMessage": "Only a manager or owner can confirm this. It won't be applied.",
+    "description": "Note on a line the caller may not confirm"
+  },
+  "voice.line.restore": {
+    "defaultMessage": "Undo",
+    "description": "Bring a removed line back"
+  },
+  "voice.line.pick": {
+    "defaultMessage": "Pick item",
+    "description": "Opens the item search for an unmatched line"
+  },
+  "voice.line.edit": {
+    "defaultMessage": "Edit",
+    "description": "Edit a line"
+  },
+  "voice.line.discard": {
+    "defaultMessage": "Remove",
+    "description": "Remove one line from the draft"
+  },
+  "voice.edit.title": {
+    "defaultMessage": "Edit line",
+    "description": "Edit sheet title"
+  },
+  "voice.edit.pickTitle": {
+    "defaultMessage": "Pick the item",
+    "description": "Edit sheet title for an unmatched line"
+  },
+  "voice.edit.close": {
+    "defaultMessage": "Close",
+    "description": "Close the edit sheet"
+  },
+  "voice.edit.cancel": {
+    "defaultMessage": "Cancel",
+    "description": "Leave the edit sheet without saving"
+  },
+  "voice.edit.save": {
+    "defaultMessage": "Save",
+    "description": "Save the line"
+  },
+  "voice.edit.item": {
+    "defaultMessage": "Item",
+    "description": "Field label"
+  },
+  "voice.edit.changeItem": {
+    "defaultMessage": "Change",
+    "description": "Pick a different item"
+  },
+  "voice.edit.itemRequired": {
+    "defaultMessage": "Pick an item.",
+    "description": "Error: no item chosen"
+  },
+  "voice.edit.kind": {
+    "defaultMessage": "What happened",
+    "description": "Label of the kind choice"
+  },
+  "voice.edit.price": {
+    "defaultMessage": "Selling price",
+    "description": "Price field label"
+  },
+  "voice.edit.priceNow": {
+    "defaultMessage": "Now {price}",
+    "description": "Help under the price field"
+  },
+  "voice.edit.priceInvalid": {
+    "defaultMessage": "Enter a price above ₹0.",
+    "description": "Error: bad price"
+  },
+  "voice.edit.aboveMrp": {
+    "defaultMessage": "The price can't be above the MRP ({mrp}).",
+    "description": "Error: price over MRP"
+  },
+  "voice.edit.qty": {
+    "defaultMessage": "Quantity",
+    "description": "Quantity field label"
+  },
+  "voice.edit.qtyInvalid": {
+    "defaultMessage": "Enter a whole number from 1 to {max}.",
+    "description": "Error: bad quantity"
+  },
+  "voice.edit.counted": {
+    "defaultMessage": "Counted on the shelf",
+    "description": "Count field label"
+  },
+  "voice.edit.countHelp": {
+    "defaultMessage": "0 means out of stock.",
+    "description": "Help under the count field"
+  },
+  "voice.edit.countInvalid": {
+    "defaultMessage": "Enter a whole number from 0 to {max}.",
+    "description": "Error: bad count"
+  },
+  "voice.edit.search": {
+    "defaultMessage": "Search items",
+    "description": "Accessible name of the item search"
+  },
+  "voice.edit.searchHint": {
+    "defaultMessage": "Item name",
+    "description": "Item search placeholder"
+  },
+  "voice.edit.noItems": {
+    "defaultMessage": "No items found. Add it on the Stock page first.",
+    "description": "Item search found nothing"
+  },
+  "voice.edit.results": {
+    "defaultMessage": "Matching items",
+    "description": "Accessible name of the search results"
+  },
+  "voice.edit.pickShort": {
+    "defaultMessage": "Pick",
+    "description": "Pick this item"
+  },
+  "voice.edit.pickOne": {
+    "defaultMessage": "Pick {name}",
+    "description": "Accessible name of the pick button"
+  },
+  "voice.done.title": {
+    "defaultMessage": "Draft confirmed",
+    "description": "Result heading"
+  },
+  "voice.done.discarded": {
+    "defaultMessage": "Draft discarded. Nothing changed.",
+    "description": "Result heading after Discard"
+  },
+  "voice.done.body": {
+    "defaultMessage": "{applied, plural, one {# change applied} other {# changes applied}}{held, plural, =0 {.} other {, # left for a manager.}}",
+    "description": "Result summary"
+  },
+  "voice.done.lines": {
+    "defaultMessage": "What happened to each line",
+    "description": "Accessible name of the result list"
+  },
+  "voice.outcome.accepted": {
+    "defaultMessage": "Applied",
+    "description": "Line result"
+  },
+  "voice.outcome.edited": {
+    "defaultMessage": "Applied with edits",
+    "description": "Line result"
+  },
+  "voice.outcome.discarded": {
+    "defaultMessage": "Removed",
+    "description": "Line result"
+  },
+  "voice.outcome.not_permitted": {
+    "defaultMessage": "Needs a manager",
+    "description": "Line result: not applied, the caller may not confirm it"
+  }
+}
