@@ -1,0 +1,307 @@
+{
+  "analytics.title": {
+    "message": "ವಿಶ್ಲೇಷಣೆ",
+    "review": "reviewed",
+    "enHash": "25bc9629"
+  },
+  "analytics.tabs": {
+    "message": "ವಿಶ್ಲೇಷಣೆ ವಿಭಾಗಗಳು",
+    "review": "reviewed",
+    "enHash": "c6f8a24c"
+  },
+  "analytics.tab.sales": {
+    "message": "ಮಾರಾಟ",
+    "review": "reviewed",
+    "enHash": "d0edfb6e"
+  },
+  "analytics.tab.insights": {
+    "message": "ಒಳನೋಟಗಳು",
+    "review": "reviewed",
+    "enHash": "b4510362"
+  },
+  "analytics.loading": {
+    "message": "ಲೋಡ್ ಆಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "8f26c652"
+  },
+  "analytics.more": {
+    "message": "ಇನ್ನಷ್ಟು ಲೋಡ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "analytics.error": {
+    "message": "ವಿಶ್ಲೇಷಣೆ ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "7e4a6d6f"
+  },
+  "analytics.range": {
+    "message": "ಅವಧಿ",
+    "review": "reviewed",
+    "enHash": "170a28a9"
+  },
+  "analytics.range.7d": {
+    "message": "7 ದಿನಗಳು",
+    "review": "reviewed",
+    "enHash": "0a8dd6ad"
+  },
+  "analytics.range.30d": {
+    "message": "30 ದಿನಗಳು",
+    "review": "reviewed",
+    "enHash": "7d4278a8"
+  },
+  "analytics.range.90d": {
+    "message": "90 ದಿನಗಳು",
+    "review": "reviewed",
+    "enHash": "170621ac"
+  },
+  "analytics.span": {
+    "message": "{from} ರಿಂದ {to}",
+    "review": "reviewed",
+    "enHash": "06f3df10"
+  },
+  "analytics.kpi.label": {
+    "message": "ಒಟ್ಟು",
+    "review": "reviewed",
+    "enHash": "65222d79"
+  },
+  "analytics.kpi.sales": {
+    "message": "ಮಾರಾಟ",
+    "review": "reviewed",
+    "enHash": "d0edfb6e"
+  },
+  "analytics.kpi.online": {
+    "message": "ಆನ್‌ಲೈನ್",
+    "review": "reviewed",
+    "enHash": "c3e839df"
+  },
+  "analytics.kpi.pos": {
+    "message": "ಕೌಂಟರ್",
+    "review": "reviewed",
+    "enHash": "f4018045"
+  },
+  "analytics.kpi.bills": {
+    "message": "ಬಿಲ್‌ಗಳು ಮತ್ತು ಆರ್ಡರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "89bf0748"
+  },
+  "analytics.daily.title": {
+    "message": "ದಿನವಾರು ಮಾರಾಟ",
+    "review": "reviewed",
+    "enHash": "5954e1c5"
+  },
+  "analytics.daily.empty": {
+    "message": "ಈ ಅವಧಿಯಲ್ಲಿ ಮಾರಾಟವಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "8e558855"
+  },
+  "analytics.hourly.title": {
+    "message": "ಗಂಟೆವಾರು ಮಾರಾಟ",
+    "review": "reviewed",
+    "enHash": "162aeab3"
+  },
+  "analytics.series.online": {
+    "message": "ಆನ್‌ಲೈನ್",
+    "review": "reviewed",
+    "enHash": "c3e839df"
+  },
+  "analytics.series.pos": {
+    "message": "ಕೌಂಟರ್",
+    "review": "reviewed",
+    "enHash": "f4018045"
+  },
+  "analytics.funnel.title": {
+    "message": "ಆನ್‌ಲೈನ್ ಆರ್ಡರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "1b62fbdb"
+  },
+  "analytics.funnel.empty": {
+    "message": "ಈ ಅವಧಿಯಲ್ಲಿ ಆನ್‌ಲೈನ್ ಆರ್ಡರ್‌ಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "f6b05168"
+  },
+  "analytics.funnel.received": {
+    "message": "ಸ್ವೀಕರಿಸಿದ",
+    "review": "reviewed",
+    "enHash": "27548c4f"
+  },
+  "analytics.funnel.accepted": {
+    "message": "ಒಪ್ಪಿಕೊಂಡ",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "analytics.funnel.completed": {
+    "message": "ಪೂರ್ಣಗೊಂಡ",
+    "review": "reviewed",
+    "enHash": "1798b3ba"
+  },
+  "analytics.funnel.missed": {
+    "message": "ತಪ್ಪಿದ ಆರ್ಡರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "45fbd640"
+  },
+  "analytics.funnel.rejected": {
+    "message": "ತಿರಸ್ಕರಿಸಿದ",
+    "review": "reviewed",
+    "enHash": "27eeb7a2"
+  },
+  "analytics.funnel.notAccepted": {
+    "message": "ಸಮಯಕ್ಕೆ ಒಪ್ಪಿಕೊಳ್ಳಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "54be7649"
+  },
+  "analytics.funnel.noShow": {
+    "message": "ತೆಗೆದುಕೊಂಡು ಹೋಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "2a5fc945"
+  },
+  "analytics.funnel.cancelled": {
+    "message": "ರದ್ದಾದ",
+    "review": "reviewed",
+    "enHash": "a1bf92ef"
+  },
+  "analytics.accept.p50": {
+    "message": "ನಿಮ್ಮ ಅರ್ಧ ಆರ್ಡರ್‌ಗಳು {time} ಒಳಗೆ ಒಪ್ಪಿಕೊಳ್ಳಲ್ಪಡುತ್ತವೆ",
+    "review": "reviewed",
+    "enHash": "a1cfe72b"
+  },
+  "analytics.accept.none": {
+    "message": "ಇನ್ನೂ ಒಪ್ಪಿಕೊಂಡ ಆರ್ಡರ್‌ಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "6c8b5d5a"
+  },
+  "analytics.accept.nearby": {
+    "message": "ಹತ್ತಿರದ ಅಂಗಡಿಗಳು: {time}",
+    "review": "reviewed",
+    "enHash": "0ad627e7"
+  },
+  "analytics.accept.nearbyNone": {
+    "message": "ಹೋಲಿಸಲು ಹತ್ತಿರದಲ್ಲಿ ಸಾಕಷ್ಟು ಅಂಗಡಿಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "5256a722"
+  },
+  "analytics.duration.seconds": {
+    "message": "{s} ಸೆ",
+    "review": "reviewed",
+    "enHash": "4a84fdfd"
+  },
+  "analytics.duration.minutes": {
+    "message": "{m} ನಿ {s} ಸೆ",
+    "review": "reviewed",
+    "enHash": "9b605337"
+  },
+  "analytics.top.title": {
+    "message": "ಟಾಪ್ ಐಟಂಗಳು",
+    "review": "reviewed",
+    "enHash": "79ec189d"
+  },
+  "analytics.mix.title": {
+    "message": "ವರ್ಗವಾರು ಮಾರಾಟ",
+    "review": "reviewed",
+    "enHash": "ae7554de"
+  },
+  "analytics.mix.value": {
+    "message": "{amount} · {share}",
+    "review": "reviewed",
+    "enHash": "5792f82a"
+  },
+  "analytics.repeat.title": {
+    "message": "ಮರಳಿ ಬರುವ ಗ್ರಾಹಕರು",
+    "review": "reviewed",
+    "enHash": "089baac2"
+  },
+  "analytics.repeat.note": {
+    "message": "{customers} ಲಿಂಕ್ ಮಾಡಿದ ಗ್ರಾಹಕರಲ್ಲಿ {repeat} ಮರಳಿ ಬಂದರು",
+    "review": "reviewed",
+    "enHash": "70451346"
+  },
+  "analytics.repeat.notEnough": {
+    "message": "ಇದನ್ನು ನೋಡಲು ಕೌಂಟರ್‌ನಲ್ಲಿ ಗ್ರಾಹಕರನ್ನು ಲಿಂಕ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "5d5ad767"
+  },
+  "analytics.ratings.title": {
+    "message": "ರೇಟಿಂಗ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "14021e13"
+  },
+  "analytics.ratings.empty": {
+    "message": "ಈ ಅವಧಿಯಲ್ಲಿ ವಿಮರ್ಶೆಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "97bfdfe9"
+  },
+  "analytics.ratings.week": {
+    "message": "{day} ರ ವಾರ",
+    "review": "reviewed",
+    "enHash": "ffa69e18"
+  },
+  "analytics.ratings.value": {
+    "message": "{stars} ★ · {count, plural, other {#}} ವಿಮರ್ಶೆಗಳು",
+    "review": "reviewed",
+    "enHash": "5969a6a3"
+  },
+  "analytics.insights.intro": {
+    "message": "ಕಳೆದ {days} ದಿನಗಳ ಎಲ್ಲ ಒಳನೋಟಗಳು, ಪ್ರಕಾರವಾರು",
+    "review": "reviewed",
+    "enHash": "7d3d6884"
+  },
+  "analytics.insights.filter": {
+    "message": "ಒಳನೋಟದ ಪ್ರಕಾರಗಳು",
+    "review": "reviewed",
+    "enHash": "010b6d1f"
+  },
+  "analytics.insights.allKinds": {
+    "message": "ಎಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "analytics.insights.none": {
+    "message": "ಈಗ ಯಾವುದಕ್ಕೂ ನಿಮ್ಮ ಗಮನ ಬೇಕಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "42c17cdd"
+  },
+  "analytics.insights.error": {
+    "message": "ಒಳನೋಟಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "b500a37b"
+  },
+  "analytics.insights.needs.selling_fast": {
+    "message": "ಒಂದು ಐಟಂ ಈ ಅವಧಿಯಲ್ಲಿ {units} ಅಥವಾ ಹೆಚ್ಚು ಮಾರಾಟವಾದಾಗ ಕಾಣಿಸುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "131de9f4"
+  },
+  "analytics.insights.needs.sitting_on_shelf": {
+    "message": "ಐಟಂಗಳು {days} ದಿನಗಳಿಂದ ಪಟ್ಟಿಯಲ್ಲಿದ್ದಾಗ ಕಾಣಿಸುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "4009257a"
+  },
+  "analytics.insights.needs.wanted_nearby": {
+    "message": "{distance} ಒಳಗೆ ನೀವು ಪಟ್ಟಿ ಮಾಡದ ವಸ್ತುವಿಗೆ {searches} ಅಥವಾ ಹೆಚ್ಚು ಹುಡುಕಾಟಗಳಾದಾಗ ಕಾಣಿಸುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "47bba6b7"
+  },
+  "analytics.insights.needs.missed_sales": {
+    "message": "ಒಂದು ಐಟಂ ಸ್ಟಾಕ್ ಇಲ್ಲದಾಗ ಹತ್ತಿರದ {searches} ಅಥವಾ ಹೆಚ್ಚು ಹುಡುಕಾಟಗಳು ಹೊಂದಿಕೆಯಾದಾಗ ಕಾಣಿಸುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "688cb24f"
+  },
+  "analytics.insights.needs.bought_together": {
+    "message": "{bills} ಅಥವಾ ಹೆಚ್ಚು ಬಿಲ್‌ಗಳಲ್ಲಿ ಒಂದೇ ಎರಡು ಐಟಂಗಳಿದ್ದಾಗ ಕಾಣಿಸುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "7558ca1e"
+  },
+  "analytics.insights.needs.regulars_slipping": {
+    "message": "ಇದನ್ನು ನೋಡಲು ಕೌಂಟರ್‌ನಲ್ಲಿ ಗ್ರಾಹಕರನ್ನು ಲಿಂಕ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "5d5ad767"
+  },
+  "analytics.insights.needs.priced_above_nearby": {
+    "message": "ಹತ್ತಿರದ {stores} ಅಥವಾ ಹೆಚ್ಚು ಅಂಗಡಿಗಳು ಅದೇ ಉತ್ಪನ್ನಗಳನ್ನು ಪಟ್ಟಿ ಮಾಡಿದಾಗ ಕಾಣಿಸುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "0bcfde71"
+  },
+  "analytics.insights.needs.other": {
+    "message": "ಇನ್ನೂ ಸಾಕಷ್ಟು ಡೇಟಾ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "0d14a861"
+  }
+}

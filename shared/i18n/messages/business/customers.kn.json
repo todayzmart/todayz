@@ -1,0 +1,92 @@
+{
+  "customers.title": {
+    "message": "ಗ್ರಾಹಕರು",
+    "review": "reviewed",
+    "enHash": "035eae60"
+  },
+  "customers.segments": {
+    "message": "ಗ್ರಾಹಕ ಗುಂಪುಗಳು",
+    "review": "reviewed",
+    "enHash": "236ddab4"
+  },
+  "customers.segment.all": {
+    "message": "ಎಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "customers.segment.top": {
+    "message": "ಹೆಚ್ಚು ಖರ್ಚು ಮಾಡುವವರು",
+    "review": "reviewed",
+    "enHash": "d577e755"
+  },
+  "customers.segment.slipping": {
+    "message": "ದೂರವಾಗುತ್ತಿರುವವರು",
+    "review": "reviewed",
+    "enHash": "72d72518"
+  },
+  "customers.col.customer": {
+    "message": "ಗ್ರಾಹಕ",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "customers.col.visits": {
+    "message": "ಭೇಟಿಗಳು",
+    "review": "reviewed",
+    "enHash": "6a4be2fa"
+  },
+  "customers.col.spend": {
+    "message": "ಖರ್ಚು",
+    "review": "reviewed",
+    "enHash": "14eeee8d"
+  },
+  "customers.col.last": {
+    "message": "ಕೊನೆಯ ಭೇಟಿ",
+    "review": "reviewed",
+    "enHash": "ed5ddeba"
+  },
+  "customers.unnamed": {
+    "message": "ಗ್ರಾಹಕ",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "customers.error": {
+    "message": "ಗ್ರಾಹಕರನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "fefeb39f"
+  },
+  "customers.more": {
+    "message": "ಇನ್ನಷ್ಟು ಲೋಡ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "customers.notEnough.title": {
+    "message": "ಇನ್ನೂ ಸಾಕಷ್ಟು ಲಿಂಕ್ ಮಾಡಿದ ಗ್ರಾಹಕರಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "bdd0f6d3"
+  },
+  "customers.notEnough.body": {
+    "message": "ಇದನ್ನು ನೋಡಲು ಕೌಂಟರ್‌ನಲ್ಲಿ ಗ್ರಾಹಕರನ್ನು ಲಿಂಕ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "5d5ad767"
+  },
+  "customers.about.window": {
+    "message": "ಕಳೆದ {days} ದಿನಗಳಲ್ಲಿ {total, plural, other {#}} ಗ್ರಾಹಕರು ಇಲ್ಲಿ ಖರೀದಿಸಿದ್ದಾರೆ",
+    "review": "reviewed",
+    "enHash": "8c69f589"
+  },
+  "customers.about.slipping": {
+    "message": "{total, plural, other {#}} ನಿಯಮಿತ ಗ್ರಾಹಕರು {days} ದಿನಗಳಿಂದ ಖರೀದಿಸಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "d1425e51"
+  },
+  "customers.empty": {
+    "message": "ಈ ಅವಧಿಯಲ್ಲಿ ಗ್ರಾಹಕರಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "adf13418"
+  },
+  "customers.empty.slipping": {
+    "message": "ಯಾವ ನಿಯಮಿತ ಗ್ರಾಹಕರೂ ದೂರವಾಗುತ್ತಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "1d64ad5d"
+  }
+}

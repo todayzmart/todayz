@@ -1,9 +1,354 @@
-# Schemas: domain "insights" (owner W3-07): business insights (04 §2.6).
+# Schemas: domain "insights" (owner W3-03): overview, Demand insights, analytics and customers
+# (04 §2.6, D-46, D-99).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Money is `*Paise`, ids are `Ulid`, times are `Timestamp`, IST days are `YYYY-MM-DD`. Insight
+# `facts` and action `payload` stay open objects: their fields per kind are listed in 04 §2.6 and
+# 06 "Insight deep links", and the client renders the sentence from them.
+OverviewRange:
+  type: string
+  enum: [today, 7d, 30d]
+  default: today
+AnalyticsRange:
+  type: string
+  enum: [7d, 30d, 90d]
+  default: 30d
+AnalyticsMetric:
+  type: string
+  enum: [sales, funnel, items, categories, repeat, ratings]
+CustomerSegment:
+  type: string
+  enum: [all, top, slipping]
+  default: all
+IstDay:
+  type: string
+  format: date
+  description: An IST calendar day.
+  examples:
+    - "2026-10-25"
+InsightKind:
+  type: string
+  description: The 11 kinds of D-99 (01 §12), in table order.
+  enum: [selling_fast, sitting_on_shelf, going_to_waste, wanted_nearby, missed_sales, expired_on_shelf,
+    selling_below_cost, stock_check_due, bought_together, regulars_slipping, priced_above_nearby]
+InsightSeverity:
+  type: string
+  enum: [high, medium, low]
+InsightActionType:
+  type: string
+  enum: [restock, create_offer, flash_offer, add_product, mark_expired, edit_price, check_cost, count_stock,
+    see_customers]
+OverviewKpis:
+  type: object
+  required: [salesPaise, salesPrevPaise, bills, onlineOrders, orders, ordersPrev, waitingOrders, avgBillPaise,
+    avgBillPrevPaise, lowItems, sellOutSoon]
+  properties:
+    salesPaise: {$ref: ./common.yaml#/Paise}
+    salesPrevPaise: {$ref: ./common.yaml#/Paise}
+    bills: {type: integer, minimum: 0}
+    onlineOrders: {type: integer, minimum: 0, description: "Online orders completed in the range."}
+    orders: {type: integer, minimum: 0, description: "Online orders placed in the range."}
+    ordersPrev: {type: integer, minimum: 0}
+    waitingOrders: {type: integer, minimum: 0, description: "Orders waiting to be accepted now."}
+    avgBillPaise: {$ref: ./common.yaml#/Paise}
+    avgBillPrevPaise: {$ref: ./common.yaml#/Paise}
+    lowItems: {type: integer, minimum: 0, description: "Listed items at or under their low-stock level."}
+    sellOutSoon: {type: integer, minimum: 0, description: "Of those, items that sell out by tomorrow at the 7-day pace."}
+OverviewOrder:
+  type: object
+  required: [id, code, customer, summary, totalPaise, fulfilment, acceptBy]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    code: {type: string, maxLength: 20, description: "The display number. Never the pickup code."}
+    customer: {type: string, maxLength: 80, description: "First name and initial."}
+    summary: {type: string, maxLength: 400}
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    fulfilment: {type: string, enum: [pickup, delivery]}
+    acceptBy:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: "null"}
+HourSales:
+  type: object
+  required: [hour, todayPaise, prevPaise]
+  properties:
+    hour: {type: integer, minimum: 0, maximum: 23}
+    todayPaise:
+      type: [integer, "null"]
+      minimum: 0
+      description: Null for an hour that has not started.
+    prevPaise: {$ref: ./common.yaml#/Paise}
+StockChange:
+  type: object
+  required: [source, at]
+  properties:
+    source: {type: string, maxLength: 40, description: "The stock movement source (sale_pos, sale_online, restock, …)."}
+    at: {$ref: ./common.yaml#/Timestamp}
+OverviewTopItem:
+  type: object
+  required: [storeItemId, name, size, sold, last7, revenuePaise, inStock, low, lastChange]
+  properties:
+    storeItemId: {$ref: ./common.yaml#/Ulid}
+    name: {type: string, maxLength: 200}
+    size: {type: string, maxLength: 40}
+    sold: {type: integer, minimum: 0}
+    last7:
+      type: array
+      description: Units sold on each of the last 7 IST days, oldest first, today last.
+      items: {type: integer, minimum: 0}
+      minItems: 7
+      maxItems: 7
+    revenuePaise: {$ref: ./common.yaml#/Paise}
+    inStock: {type: integer}
+    low: {type: boolean}
+    lastChange:
+      oneOf:
+        - {$ref: ./insights.yaml#/StockChange}
+        - {type: "null"}
+SetupSteps:
+  type: object
+  required: [kyc, products, staff, standee, openingHours]
+  properties:
+    kyc: {type: boolean, description: "The business is verified."}
+    products: {type: boolean, description: "At least 50 listed items."}
+    staff: {type: boolean, description: "At least one active staff member besides the owner."}
+    standee: {type: boolean, description: "A QR standee exists."}
+    openingHours: {type: boolean}
+SetupProgress:
+  type: object
+  required: [percent, next, steps]
+  properties:
+    percent: {type: integer, minimum: 0, maximum: 100}
+    next:
+      type: [string, "null"]
+      enum: [kyc, products, staff, standee, openingHours, null]
+    steps: {$ref: ./insights.yaml#/SetupSteps}
+StoreOverview:
+  type: object
+  required: [range, storeName, ownerName, kpis, newOrders, salesByHour, topItems, distinctItemsSold, listedItems,
+    setup, serverNow]
+  properties:
+    range: {$ref: ./insights.yaml#/OverviewRange}
+    storeName: {type: string, maxLength: 200}
+    ownerName: {type: string, maxLength: 80, description: "The caller's first name."}
+    kpis: {$ref: ./insights.yaml#/OverviewKpis}
+    newOrders:
+      type: array
+      items: {$ref: ./insights.yaml#/OverviewOrder}
+      maxItems: 5
+    salesByHour:
+      type: array
+      items: {$ref: ./insights.yaml#/HourSales}
+      maxItems: 24
+    topItems:
+      type: array
+      items: {$ref: ./insights.yaml#/OverviewTopItem}
+      maxItems: 10
+    distinctItemsSold: {type: integer, minimum: 0}
+    listedItems: {type: integer, minimum: 0}
+    setup: {$ref: ./insights.yaml#/SetupProgress}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+InsightNeeds:
+  type: object
+  required: [key, params]
+  properties:
+    key: {type: string, maxLength: 80, description: "Localisation key of the \"what data it needs\" line."}
+    params:
+      type: object
+      x-open-object: true
+InsightEvidence:
+  type: object
+  required: [state]
+  properties:
+    state: {type: string, enum: [ready, needs_data]}
+    needs: {$ref: ./insights.yaml#/InsightNeeds}
+InsightAction:
+  type: object
+  required: [type, payload]
+  properties:
+    type: {$ref: ./insights.yaml#/InsightActionType}
+    payload:
+      type: object
+      x-open-object: true
+      description: The prefill the target screen reads (06 "Insight deep links").
+Insight:
+  type: object
+  required: [kind, subjectRef, severity, evidence, facts, action, text]
+  properties:
+    kind: {$ref: ./insights.yaml#/InsightKind}
+    subjectRef:
+      type: [string, "null"]
+      maxLength: 210
+      description: What the row is about, for dismiss (04 §2.6). Null on a `needs_data` entry.
+    severity:
+      oneOf:
+        - {$ref: ./insights.yaml#/InsightSeverity}
+        - {type: "null"}
+    evidence: {$ref: ./insights.yaml#/InsightEvidence}
+    facts:
+      type: [object, "null"]
+      x-open-object: true
+      description: The numbers the sentence quotes. Null on a `needs_data` entry.
+    action:
+      oneOf:
+        - {$ref: ./insights.yaml#/InsightAction}
+        - {type: "null"}
+    text:
+      type: [string, "null"]
+      maxLength: 400
+      description: AI-R4 sentence (W3-11); null until then, and the client renders the template.
+InsightPeriod:
+  type: object
+  required: [days, label]
+  properties:
+    days: {type: integer, minimum: 1}
+    label: {type: string, maxLength: 40}
+InsightList:
+  type: object
+  required: [items, nextCursor, period, serverNow]
+  properties:
+    items:
+      type: array
+      items: {$ref: ./insights.yaml#/Insight}
+      maxItems: 100
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    period: {$ref: ./insights.yaml#/InsightPeriod}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+InsightDismiss:
+  type: object
+  additionalProperties: false
+  required: [kind, subjectRef]
+  properties:
+    kind: {$ref: ./insights.yaml#/InsightKind}
+    subjectRef: {type: string, minLength: 1, maxLength: 210}
+InsightDismissed:
+  type: object
+  required: [quietUntil]
+  properties:
+    quietUntil: {$ref: ./common.yaml#/Timestamp}
+DaySales:
+  type: object
+  required: [day, onlinePaise, posPaise, onlineBills, posBills]
+  properties:
+    day: {$ref: ./insights.yaml#/IstDay}
+    onlinePaise: {$ref: ./common.yaml#/Paise}
+    posPaise: {$ref: ./common.yaml#/Paise}
+    onlineBills: {type: integer, minimum: 0}
+    posBills: {type: integer, minimum: 0}
+HourTotal:
+  type: object
+  required: [hour, paise]
+  properties:
+    hour: {type: integer, minimum: 0, maximum: 23}
+    paise: {$ref: ./common.yaml#/Paise}
+OrderFunnel:
+  type: object
+  required: [received, accepted, completed, rejected, notAccepted, noShow, cancelled, p50AcceptSeconds,
+    nearbyMedianAcceptSeconds]
+  properties:
+    received: {type: integer, minimum: 0}
+    accepted: {type: integer, minimum: 0}
+    completed: {type: integer, minimum: 0}
+    rejected: {type: integer, minimum: 0}
+    notAccepted: {type: integer, minimum: 0}
+    noShow: {type: integer, minimum: 0}
+    cancelled: {type: integer, minimum: 0}
+    p50AcceptSeconds: {type: [integer, "null"], minimum: 0}
+    nearbyMedianAcceptSeconds:
+      type: [integer, "null"]
+      minimum: 0
+      description: Null below 5 other businesses in the radius (D-71).
+AnalyticsTopItem:
+  type: object
+  required: [storeItemId, name, size, sold, revenuePaise]
+  properties:
+    storeItemId: {$ref: ./common.yaml#/Ulid}
+    name: {type: string, maxLength: 200}
+    size: {type: string, maxLength: 40}
+    sold: {type: integer, minimum: 0}
+    revenuePaise: {$ref: ./common.yaml#/Paise}
+CategoryShare:
+  type: object
+  required: [category, paise]
+  properties:
+    category: {type: string, maxLength: 120}
+    paise: {$ref: ./common.yaml#/Paise}
+RepeatRate:
+  type: object
+  required: [customers, repeatCustomers, repeatPct]
+  properties:
+    customers: {type: integer, minimum: 0}
+    repeatCustomers: {type: integer, minimum: 0, description: "Customers with 2 or more visits."}
+    repeatPct:
+      type: [integer, "null"]
+      minimum: 0
+      maximum: 100
+      description: Null below `insight_min_events_for_percent` customers.
+WeekRating:
+  type: object
+  required: [week, reviews, avgStars]
+  properties:
+    week: {$ref: ./insights.yaml#/IstDay}
+    reviews: {type: integer, minimum: 0}
+    avgStars: {type: number, minimum: 0, maximum: 5}
+StoreAnalytics:
+  type: object
+  required: [range, from, to, serverNow]
+  properties:
+    range: {$ref: ./insights.yaml#/AnalyticsRange}
+    from: {$ref: ./insights.yaml#/IstDay}
+    to: {$ref: ./insights.yaml#/IstDay}
+    daily:
+      type: array
+      items: {$ref: ./insights.yaml#/DaySales}
+      maxItems: 90
+    byHour:
+      type: array
+      items: {$ref: ./insights.yaml#/HourTotal}
+      maxItems: 24
+    funnel: {$ref: ./insights.yaml#/OrderFunnel}
+    topItems:
+      type: array
+      items: {$ref: ./insights.yaml#/AnalyticsTopItem}
+      maxItems: 10
+    categoryMix:
+      type: array
+      items: {$ref: ./insights.yaml#/CategoryShare}
+      maxItems: 8
+    repeat: {$ref: ./insights.yaml#/RepeatRate}
+    ratings:
+      type: array
+      items: {$ref: ./insights.yaml#/WeekRating}
+      maxItems: 14
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+StoreCustomer:
+  type: object
+  required: [customerId, name, phoneMasked, visits, bills, spendPaise, lastVisitAt]
+  properties:
+    customerId:
+      oneOf:
+        - {$ref: ./common.yaml#/Ulid}
+        - {type: "null"}
+      description: Null for a phone-only POS link.
+    name: {type: [string, "null"], maxLength: 80, description: "First name and initial."}
+    phoneMasked: {type: [string, "null"], maxLength: 20, description: "Masked as R-16.2 shows it."}
+    visits: {type: integer, minimum: 0, description: "Distinct IST purchase days in the window."}
+    bills: {type: integer, minimum: 0}
+    spendPaise: {$ref: ./common.yaml#/Paise}
+    lastVisitAt: {$ref: ./common.yaml#/Timestamp}
+StoreCustomerList:
+  type: object
+  required: [segment, enough, total, windowDays, lapseDays, items, nextCursor, serverNow]
+  properties:
+    segment: {$ref: ./insights.yaml#/CustomerSegment}
+    enough:
+      type: boolean
+      description: False when the window has fewer linked customers than `insight_regular_min_linked_customers`.
+    total: {type: integer, minimum: 0}
+    windowDays: {type: integer, minimum: 1}
+    lapseDays: {type: integer, minimum: 1}
+    items:
+      type: array
+      items: {$ref: ./insights.yaml#/StoreCustomer}
+      maxItems: 100
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}

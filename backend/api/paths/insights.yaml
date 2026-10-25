@@ -1,12 +1,270 @@
-# Paths: domain "insights" (owner W3-07): business insights (04 §2.6).
+# Paths: domain "insights" (owner W3-03): business overview, Demand insights, analytics and
+# customers (04 §2.6, D-46, D-99).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [insights]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/insights.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Owner and manager only (`insights.view`, `customers.view`, 02 §3.3); staff below manager get 403.
+# Every number is computed at read time from the store's own sales, stock and searches, with the
+# `insight_*` settings (01 §12, §17). A nearby number needs k ≥ 10 distinct businesses or
+# searches (D-43, D-71). Actions are prefills the client opens; the API applies nothing.
+/v1/biz/businesses/{bid}/stores/{sid}/overview:
+  parameters: &store
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getStoreOverview
+    tags: [insights]
+    summary: The B-03 Overview of a store
+    description: >-
+      KPI strip for `range` against the same span one period back (today against the same weekday
+      last week), orders waiting to be accepted, today's sales by IST hour against the same weekday
+      last week, the top items of the range and the setup checklist. Demand insights come from
+      `GET {S}/insights` (the card is its default answer).
+    parameters:
+      - name: range
+        in: query
+        schema:
+          $ref: ../schemas/insights.yaml#/OverviewRange
+    responses:
+      "200":
+        description: The overview
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/insights.yaml#/StoreOverview
+            example:
+              range: today
+              storeName: Annapurna Kirana
+              ownerName: Ramesh
+              kpis:
+                salesPaise: 1845000
+                salesPrevPaise: 1620000
+                bills: 64
+                onlineOrders: 9
+                orders: 11
+                ordersPrev: 8
+                waitingOrders: 1
+                avgBillPaise: 28828
+                avgBillPrevPaise: 27000
+                lowItems: 4
+                sellOutSoon: 1
+              newOrders:
+                - id: 01JB0SDR1A2B3C4D5E6F7G8H9J
+                  code: TZ-24821
+                  customer: Ananya R.
+                  summary: Aashirvaad Atta 5 kg, Amul Taaza 500 ml ×2
+                  totalPaise: 41200
+                  fulfilment: pickup
+                  acceptBy: "2026-10-25T09:40:00Z"
+              salesByHour:
+                - {hour: 9, todayPaise: 152000, prevPaise: 98000}
+              topItems:
+                - storeItemId: 01JB0S5T1A2B3C4D5E6F7G8H9J
+                  name: Tata Tea Gold
+                  size: 250 g
+                  sold: 64
+                  last7: [8, 9, 10, 9, 8, 11, 9]
+                  revenuePaise: 960000
+                  inStock: 12
+                  low: false
+                  lastChange: {source: sale_pos, at: "2026-10-25T09:12:00Z"}
+              distinctItemsSold: 38
+              listedItems: 86
+              setup:
+                percent: 80
+                next: standee
+                steps: {kyc: true, products: true, staff: true, standee: false, openingHours: true}
+              serverNow: "2026-10-25T09:30:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/insights:
+  parameters: *store
+  get:
+    operationId: listStoreInsights
+    tags: [insights]
+    summary: Demand insights (B-03 card, B-12 Insights tab)
+    description: >-
+      Default: the B-03 card, the top 4 firing rows by severity, at most one per kind; kinds that do
+      not fire, including kinds below their minimum evidence, are not returned. `all=1`: every
+      firing row grouped by kind in the 01 §12 order, plus one `needs_data` entry for each kind that
+      has no row and is below its minimum evidence, paged with `limit` and `cursor`. `kind=` limits
+      to one kind. A subject dismissed as "Not useful" stays out until its `quietUntil`. Priced
+      above nearby is returned only while `insight_price_compare_enabled` is true.
+    parameters:
+      - name: all
+        in: query
+        description: 1 for every row (the B-12 Insights tab); 0 or absent for the card.
+        schema:
+          type: integer
+          enum: [0, 1]
+      - name: kind
+        in: query
+        schema:
+          $ref: ../schemas/insights.yaml#/InsightKind
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Insight rows, by severity (card) or grouped by kind (`all=1`)
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/insights.yaml#/InsightList
+            example:
+              items:
+                - kind: selling_fast
+                  subjectRef: 01JB0S5T1A2B3C4D5E6F7G8H9J
+                  severity: medium
+                  evidence: {state: ready}
+                  facts: {item: Tata Tea Gold, size: 250 g, soldQty: 64, periodDays: 7, available: 12, runOutOn: "2026-10-26"}
+                  action: {type: restock, payload: {storeItemId: 01JB0S5T1A2B3C4D5E6F7G8H9J, qty: 52}}
+                  text: null
+                - kind: regulars_slipping
+                  subjectRef: null
+                  severity: null
+                  evidence:
+                    state: needs_data
+                    needs: {key: insights.needs.regulars_slipping, params: {minLinked: 10}}
+                  facts: null
+                  action: null
+                  text: null
+              nextCursor: null
+              period: {days: 7, label: Last 7 days}
+              serverNow: "2026-10-25T09:30:00Z"
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/insights/dismiss:
+  parameters: *store
+  post:
+    operationId: dismissStoreInsight
+    tags: [insights]
+    summary: "\"Not useful\" on one insight row"
+    description: >-
+      Quiets that subject of that kind, not the whole kind, for `coach_dismiss_quiet_days` (D-99).
+      `subjectRef` is validated per kind: a wrong shape, an item, batch or pair that is not this
+      store's, or `store` on a kind that is not store-wide is `422 validation_failed`, and so is
+      `expired_on_shelf`, which cannot be dismissed. A going-to-waste row quiets every batch it
+      lists. A repeat call while the subject is still quiet keeps the existing `quietUntil`; the
+      call is a natural upsert and takes no Idempotency-Key.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/insights.yaml#/InsightDismiss
+          example:
+            kind: selling_fast
+            subjectRef: 01JB0S5T1A2B3C4D5E6F7G8H9J
+    responses:
+      "200":
+        description: The subject is quiet until `quietUntil`
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/insights.yaml#/InsightDismissed
+            example:
+              quietUntil: "2026-11-01T09:30:00Z"
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/analytics:
+  parameters: *store
+  get:
+    operationId: getStoreAnalytics
+    tags: [insights]
+    summary: The B-12 Sales tab
+    description: >-
+      Over the last `range` whole IST days before today: online and POS sales per day and per hour,
+      the orders funnel with missed reasons, seconds to accept against the nearby median (shown only
+      with at least 5 other businesses, D-71), top items, category mix, repeat rate and the ratings
+      trend. `metric` returns one section only; the others are left out.
+    parameters:
+      - name: range
+        in: query
+        schema:
+          $ref: ../schemas/insights.yaml#/AnalyticsRange
+      - name: metric
+        in: query
+        schema:
+          $ref: ../schemas/insights.yaml#/AnalyticsMetric
+    responses:
+      "200":
+        description: Analytics
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/insights.yaml#/StoreAnalytics
+            example:
+              range: 30d
+              from: "2026-09-25"
+              to: "2026-10-24"
+              daily:
+                - {day: "2026-10-24", onlinePaise: 210000, posPaise: 1450000, onlineBills: 7, posBills: 52}
+              byHour:
+                - {hour: 9, paise: 380000}
+              funnel:
+                received: 42
+                accepted: 38
+                completed: 35
+                rejected: 2
+                notAccepted: 2
+                noShow: 1
+                cancelled: 2
+                p50AcceptSeconds: 95
+                nearbyMedianAcceptSeconds: null
+              topItems:
+                - {storeItemId: 01JB0S5T1A2B3C4D5E6F7G8H9J, name: Tata Tea Gold, size: 250 g, sold: 240, revenuePaise: 3600000}
+              categoryMix:
+                - {category: Staples, paise: 5200000}
+              repeat: {customers: 120, repeatCustomers: 46, repeatPct: 38}
+              ratings:
+                - {week: "2026-10-19", reviews: 6, avgStars: 4.5}
+              serverNow: "2026-10-25T09:30:00Z"
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/customers:
+  parameters: *store
+  get:
+    operationId: listStoreCustomers
+    tags: [insights]
+    summary: Repeat customers (B-09)
+    description: >-
+      Customers who bought in the last `insight_regular_window_days`: a linked account, or the phone
+      of a phone-only POS link (D-07); walk-ins without a phone and reversed sales do not count.
+      Phones are masked (R-16.2). `segment=all` (default) is newest visit first; `top` is by spend;
+      `slipping` is the regulars behind the "Regulars slipping away" insight (D-99), by spend, and
+      is empty with `enough: false` below `insight_regular_min_linked_customers`.
+    parameters:
+      - name: segment
+        in: query
+        schema:
+          $ref: ../schemas/insights.yaml#/CustomerSegment
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Customers
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/insights.yaml#/StoreCustomerList
+            example:
+              segment: slipping
+              enough: true
+              total: 3
+              windowDays: 60
+              lapseDays: 21
+              items:
+                - customerId: 01JB0SC51A2B3C4D5E6F7G8H9J
+                  name: Ananya R.
+                  phoneMasked: 98•••••210
+                  visits: 5
+                  bills: 6
+                  spendPaise: 482000
+                  lastVisitAt: "2026-09-28T11:20:00Z"
+              nextCursor: null
+              serverNow: "2026-10-25T09:30:00Z"
+      default: *problem

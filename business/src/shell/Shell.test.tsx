@@ -3,11 +3,13 @@ import xa from '@todayz/i18n/compiled/business/en-XA.json';
 import { asMessages, type Messages } from '@todayz/i18n';
 import { fireEvent, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { overviewHandler, ownerApi } from '../test/insightsApi';
 import { json, renderAt as renderApp, type Call, type Handler } from '../test/render';
 import { MORE, NAV } from './nav';
 import { NARROW_QUERY } from './useNarrow';
 
-function renderAt(path: string, messages: Messages = asMessages(en), handlers: Handler[] = []) {
+/** Signed in as the owner of one shop with a live overview, unless the test says otherwise. */
+function renderAt(path: string, messages: Messages = asMessages(en), handlers: Handler[] = ownerApi()) {
   return renderApp(path, { messages, handlers });
 }
 
@@ -63,15 +65,16 @@ describe('business shell', () => {
   it('counts the live New orders on Orders in the sidebar only, read out in words', async () => {
     // The live stream uses the global fetch; it falls back to polling here.
     vi.stubGlobal('fetch', () => Promise.resolve(new Response(null, { status: 404 })));
-    renderAt('/orders', asMessages(en), [shops, newOrders(2)]);
+    renderAt('/orders', asMessages(en), [shops, newOrders(2), overviewHandler()]);
     const { side, tabs } = await navs();
     const orders = await within(side).findByRole('link', { name: /2 orders waiting$/ });
     expect(orders).toHaveAccessibleName(/^Orders\W+2 orders waiting$/);
     expect(orders.querySelector('.tz-count')).toHaveTextContent('2');
     expect(orders.querySelector('.tz-count')).toHaveAttribute('aria-hidden', 'true');
-    // Stock's number comes from the Overview, which still runs on sample data: no badge.
-    expect(within(side).getByRole('link', { name: 'Stock' }).querySelector('.tz-count')).toBeNull();
-    expect(side.querySelectorAll('.tz-count')).toHaveLength(1);
+    // Stock's number is today's "sell out soon" from GET /overview.
+    const stock = await within(side).findByRole('link', { name: /^Stock\b/ });
+    expect(stock.querySelector('.tz-count')).toHaveTextContent('3');
+    expect(side.querySelectorAll('.tz-count')).toHaveLength(2);
     expect(tabs.querySelectorAll('.tz-count')).toHaveLength(0);
   });
 
@@ -124,14 +127,18 @@ describe('business shell', () => {
     expect(within(side).getByText('Grow')).toHaveClass('tz-side-group');
     expect(within(side).getByText('Shop')).toHaveClass('tz-side-group');
     expect(within(side).queryByRole('link', { name: 'More' })).toBeNull();
-    // Nav items only: the setup card stays hidden while the Overview runs on sample data.
+    // The nav items, then the shop setup card at the foot (80% on the fake overview).
     await screen.findByRole('heading', { level: 1, name: /^Good / });
-    expect(side.querySelector('.tz-side-card')).toBeNull();
-    expect(within(side).getAllByRole('link')).toHaveLength(NAV.filter((n) => n.side).length);
+    const card = side.querySelector('.tz-side-card');
+    if (!(card instanceof HTMLElement)) throw new Error('no setup card');
+    expect(within(card).getByText('Shop setup 80%')).toBeInTheDocument();
+    const navLinks = within(side).getAllByRole('link').filter((l) => !card.contains(l));
+    expect(navLinks).toHaveLength(NAV.filter((n) => n.side).length);
   });
 
-  // Sections that have a real page (orders, settings: W2-10; stock, offers: W2-12; sell: W2-11) no longer show the placeholder.
-  const BUILT = new Set(['more', 'overview', 'orders', 'sell', 'stock', 'offers', 'reviews', 'credits', 'settings']);
+  // Sections that have a real page (orders, settings: W2-10; stock, offers: W2-12; sell: W2-11;
+  // customers, analytics: W3-03) no longer show the placeholder.
+  const BUILT = new Set(['more', 'overview', 'orders', 'sell', 'stock', 'offers', 'reviews', 'credits', 'settings', 'customers', 'analytics']);
   it.each(NAV.filter((n) => !BUILT.has(n.section)))('shows the placeholder for /$section', async ({ section }) => {
     renderAt(`/${section}`);
     const { side } = await navs();

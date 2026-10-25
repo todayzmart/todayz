@@ -182,7 +182,9 @@ describe('B-04 orders list', () => {
         orderHandler(() => full('o1')),
       ],
     });
-    fireEvent.click(await screen.findByRole('button', { name: 'Accept part of order TZ-o1' }));
+    const part = await screen.findByRole('button', { name: 'Accept part of order TZ-o1' });
+    await waitFor(() => expect(part).toBeEnabled());
+    fireEvent.click(part);
     const dialog = await screen.findByRole('dialog', { name: 'Accept part of TZ-o1' });
     expect(within(dialog).getByText('Asked 2 · 9 in stock')).toBeInTheDocument();
     expect(within(dialog).getByText('Asked 1 · out of stock')).toBeInTheDocument();
@@ -196,7 +198,9 @@ describe('B-04 orders list', () => {
 
   it('accept part needs a lowered quantity and refuses giving nothing', async () => {
     renderAt('/orders', { messages, handlers: [shops('cashier'), listHandler({ new: [summary('o1')] }), orderHandler(() => inStock('o1'))] });
-    fireEvent.click(await screen.findByRole('button', { name: 'Accept part of order TZ-o1' }));
+    const part = await screen.findByRole('button', { name: 'Accept part of order TZ-o1' });
+    await waitFor(() => expect(part).toBeEnabled());
+    fireEvent.click(part);
     const dialog = await screen.findByRole('dialog', { name: 'Accept part of TZ-o1' });
     const send = within(dialog).getByRole('button', { name: 'Send to customer' });
     expect(send).toBeDisabled();

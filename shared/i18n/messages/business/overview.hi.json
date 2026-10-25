@@ -1,9 +1,4 @@
 {
-  "overview.sample": {
-    "message": "सैंपल डेटा",
-    "review": "reviewed",
-    "enHash": "057f604c"
-  },
   "overview.greet.morning": {
     "message": "सुप्रभात, {name}",
     "review": "reviewed",
@@ -209,16 +204,6 @@
     "review": "reviewed",
     "enHash": "65574cf4"
   },
-  "overview.orders.sampleToast": {
-    "message": "सैंपल ऑर्डर: कुछ भी नहीं बदला गया",
-    "review": "reviewed",
-    "enHash": "71a14881"
-  },
-  "overview.orders.open": {
-    "message": "ऑर्डर खोलें",
-    "review": "reviewed",
-    "enHash": "29706cca"
-  },
   "overview.chart.title": {
     "message": "घंटे के हिसाब से बिक्री",
     "review": "reviewed",
@@ -285,19 +270,14 @@
     "enHash": "167ad93a"
   },
   "overview.insights.period": {
-    "message": "पिछले 7 दिन",
+    "message": "पिछले {days} दिन",
     "review": "reviewed",
-    "enHash": "df833fe8"
+    "enHash": "6253cd40"
   },
   "overview.insights.notUseful": {
     "message": "काम का नहीं",
     "review": "reviewed",
     "enHash": "33d21a37"
-  },
-  "overview.insights.hiddenToast": {
-    "message": "इस बार के लिए छिपा दिया। सैंपल डेटा: कुछ भी सेव नहीं होता।",
-    "review": "reviewed",
-    "enHash": "110e7b28"
   },
   "overview.insights.all": {
     "message": "सारी जानकारी",
@@ -320,14 +300,9 @@
     "enHash": "5cbd2b13"
   },
   "overview.insights.selling_fast.sentence": {
-    "message": "<strong>{item}</strong> इस हफ़्ते {sold} बिका। इसी रफ़्तार से {day} को ख़त्म हो जाएगा।",
+    "message": "<strong>{item}</strong> {period, plural, =7 {इस हफ़्ते} other {# दिनों में}} {sold} बिके। इसी रफ़्तार से यह {inDays, plural, =0 {आज} =1 {कल} other {{day} को}} ख़त्म हो जाएगा।",
     "review": "reviewed",
-    "enHash": "4a5bb50c"
-  },
-  "overview.insights.selling_fast.action": {
-    "message": "स्टॉक भरें",
-    "review": "reviewed",
-    "enHash": "3ccf7127"
+    "enHash": "42adf445"
   },
   "overview.insights.sitting_on_shelf.label": {
     "message": "शेल्फ़ पर पड़ा है",
@@ -339,25 +314,15 @@
     "review": "reviewed",
     "enHash": "bc06fec9"
   },
-  "overview.insights.sitting_on_shelf.action": {
-    "message": "ऑफ़र बनाएँ",
-    "review": "reviewed",
-    "enHash": "c6af210c"
-  },
   "overview.insights.going_to_waste.label": {
     "message": "ख़राब होने वाला है",
     "review": "reviewed",
     "enHash": "847b43f5"
   },
   "overview.insights.going_to_waste.sentence": {
-    "message": "<strong>{count, plural, one {# आइटम {days} दिन में एक्सपायर होगा} other {# आइटम {days} दिन में एक्सपायर होंगे}}</strong>: {items}।",
+    "message": "<strong>{count, plural, one {# आइटम} other {# आइटम}} {days} दिनों में एक्सपायर होंगे</strong>: {items}{more, plural, =0 {} other { + # और}}।",
     "review": "reviewed",
-    "enHash": "9f4b5d8d"
-  },
-  "overview.insights.going_to_waste.action": {
-    "message": "फ़्लैश ऑफ़र",
-    "review": "reviewed",
-    "enHash": "9b8c0a36"
+    "enHash": "4f3b8f9f"
   },
   "overview.insights.wanted_nearby.label": {
     "message": "आस-पास माँग है",
@@ -365,19 +330,14 @@
     "enHash": "4e90f3e0"
   },
   "overview.insights.wanted_nearby.sentence": {
-    "message": "<strong>{item}</strong>: इस हफ़्ते {distance} के अंदर {searches} बार खोजा गया।",
+    "message": "<strong>{item}</strong>: {period, plural, =7 {इस हफ़्ते} other {# दिनों में}} {distance} के अंदर {searches} खोजें।",
     "review": "reviewed",
-    "enHash": "ade7924a"
+    "enHash": "359d21f4"
   },
   "overview.insights.wanted_nearby.sentenceNone": {
-    "message": "<strong>{item}</strong>: इस हफ़्ते {distance} के अंदर {searches} बार खोजा गया। आस-पास किसी दुकान में नहीं है।",
+    "message": "<strong>{item}</strong>: {period, plural, =7 {इस हफ़्ते} other {# दिनों में}} {distance} के अंदर {searches} खोजें। आस-पास किसी दुकान में यह नहीं है।",
     "review": "reviewed",
-    "enHash": "35287244"
-  },
-  "overview.insights.wanted_nearby.action": {
-    "message": "प्रोडक्ट जोड़ें",
-    "review": "reviewed",
-    "enHash": "7c37958a"
+    "enHash": "8e701825"
   },
   "overview.insights.bought_together.label": {
     "message": "साथ में ख़रीदे जाते हैं",
@@ -385,14 +345,9 @@
     "enHash": "32ddb8f5"
   },
   "overview.insights.bought_together.sentence": {
-    "message": "<strong>{a}</strong> और <strong>{b}</strong> {pct}% बिलों में साथ हैं।",
+    "message": "<strong>{a}</strong> वाले हर {oneIn} बिलों में से 1 में <strong>{b}</strong> भी है।",
     "review": "reviewed",
-    "enHash": "cdde8426"
-  },
-  "overview.insights.bought_together.action": {
-    "message": "ऑफ़र बनाएँ",
-    "review": "reviewed",
-    "enHash": "c6af210c"
+    "enHash": "f540e5ba"
   },
   "overview.top.title": {
     "message": "आज के टॉप आइटम",
@@ -464,11 +419,6 @@
     "review": "reviewed",
     "enHash": "ae1fc3b8"
   },
-  "overview.top.source.voice": {
-    "message": "आवाज़ · {time}",
-    "review": "reviewed",
-    "enHash": "4d92b893"
-  },
   "overview.top.total": {
     "message": "कुल, {all} में से {shown} आइटम",
     "review": "reviewed",
@@ -523,5 +473,220 @@
     "message": "सेटअप पूरा करें",
     "review": "reviewed",
     "enHash": "c516d2df"
+  },
+  "overview.insights.sitting_on_shelf.sentenceCost": {
+    "message": "<strong>{item}</strong>: {stock} स्टॉक में (लागत पर {value}), {days} दिनों से कोई बिक्री नहीं।",
+    "review": "reviewed",
+    "enHash": "e54284ea"
+  },
+  "overview.insights.missed_sales.label": {
+    "message": "छूटी बिक्री",
+    "review": "reviewed",
+    "enHash": "7e65c327"
+  },
+  "overview.insights.missed_sales.sentence": {
+    "message": "<strong>{item}</strong> {days, plural, other {#}} दिन स्टॉक में नहीं था; आस-पास {searches} खोजें इससे मिलीं।",
+    "review": "reviewed",
+    "enHash": "e73039ef"
+  },
+  "overview.insights.expired_on_shelf.label": {
+    "message": "शेल्फ़ पर एक्सपायर",
+    "review": "reviewed",
+    "enHash": "d7f93e9d"
+  },
+  "overview.insights.expired_on_shelf.sentence": {
+    "message": "<strong>{item}</strong>: {qty} {ago, plural, =1 {कल} other {# दिन पहले}} एक्सपायर हो गए। इन्हें शेल्फ़ से हटा दें।",
+    "review": "reviewed",
+    "enHash": "3b679a22"
+  },
+  "overview.insights.selling_below_cost.label": {
+    "message": "लागत से कम पर बिक्री",
+    "review": "reviewed",
+    "enHash": "36024fc8"
+  },
+  "overview.insights.selling_below_cost.sentence": {
+    "message": "<strong>{item}</strong> {price} में बिकता है, पिछली लागत {cost}।",
+    "review": "reviewed",
+    "enHash": "6cb94ccf"
+  },
+  "overview.insights.selling_below_cost.sentenceCheck": {
+    "message": "<strong>{item}</strong> की लागत की एंट्री जाँचें।",
+    "review": "reviewed",
+    "enHash": "89e3a35b"
+  },
+  "overview.insights.stock_check_due.label": {
+    "message": "स्टॉक जाँच बाकी",
+    "review": "reviewed",
+    "enHash": "88eca95d"
+  },
+  "overview.insights.stock_check_due.sentence": {
+    "message": "<strong>{count, plural, other {#}} आइटम {unit, select, days {{span, plural, other {#}} दिन} other {{span, plural, other {#}} घंटे}} से कन्फ़र्म नहीं हुए</strong>। ग्राहक इन्हें “स्टॉक हाल में कन्फ़र्म नहीं” के रूप में देखते हैं।",
+    "review": "reviewed",
+    "enHash": "b9322572"
+  },
+  "overview.insights.regulars_slipping.label": {
+    "message": "नियमित ग्राहक दूर हो रहे हैं",
+    "review": "reviewed",
+    "enHash": "55ae88e6"
+  },
+  "overview.insights.regulars_slipping.sentence": {
+    "message": "<strong>{count, plural, other {#}} नियमित ग्राहकों</strong> ने {unit, select, weeks {{span, plural, other {#}} हफ़्ते} other {{span, plural, other {#}} दिन}} से ख़रीदारी नहीं की।",
+    "review": "reviewed",
+    "enHash": "2302efd8"
+  },
+  "overview.insights.priced_above_nearby.label": {
+    "message": "आस-पास से महँगा",
+    "review": "reviewed",
+    "enHash": "73f742b3"
+  },
+  "overview.insights.priced_above_nearby.sentence": {
+    "message": "<strong>{item}</strong>: यहाँ {price}, आस-पास आम तौर पर {typical}।",
+    "review": "reviewed",
+    "enHash": "6fd2e68c"
+  },
+  "overview.insights.action.restock": {
+    "message": "रीस्टॉक करें",
+    "review": "reviewed",
+    "enHash": "3ccf7127"
+  },
+  "overview.insights.action.create_offer": {
+    "message": "ऑफ़र बनाएँ",
+    "review": "reviewed",
+    "enHash": "c6af210c"
+  },
+  "overview.insights.action.flash_offer": {
+    "message": "फ़्लैश ऑफ़र",
+    "review": "reviewed",
+    "enHash": "9b8c0a36"
+  },
+  "overview.insights.action.add_product": {
+    "message": "प्रोडक्ट जोड़ें",
+    "review": "reviewed",
+    "enHash": "7c37958a"
+  },
+  "overview.insights.action.mark_expired": {
+    "message": "एक्सपायर मार्क करें",
+    "review": "reviewed",
+    "enHash": "310c38b2"
+  },
+  "overview.insights.action.edit_price": {
+    "message": "कीमत बदलें",
+    "review": "reviewed",
+    "enHash": "9a2ebfcc"
+  },
+  "overview.insights.action.check_cost": {
+    "message": "लागत जाँचें",
+    "review": "reviewed",
+    "enHash": "f2c0e8b3"
+  },
+  "overview.insights.action.count_stock": {
+    "message": "स्टॉक गिनें",
+    "review": "reviewed",
+    "enHash": "82d76c10"
+  },
+  "overview.insights.action.see_customers": {
+    "message": "ग्राहक देखें",
+    "review": "reviewed",
+    "enHash": "393ef412"
+  },
+  "overview.insights.hiddenUntil": {
+    "message": "{date} तक छिपा दिया",
+    "review": "reviewed",
+    "enHash": "41cd334f"
+  },
+  "overview.insights.dismissFailed": {
+    "message": "इसे छिपा नहीं सके। फिर कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "f31257d0"
+  },
+  "overview.insights.error": {
+    "message": "इनसाइट लोड नहीं हो सके",
+    "review": "reviewed",
+    "enHash": "b500a37b"
+  },
+  "overview.setup.next.kyc": {
+    "message": "लाइव होने के लिए अपना KYC पूरा करें।",
+    "review": "reviewed",
+    "enHash": "efa1d367"
+  },
+  "overview.setup.step.kyc": {
+    "message": "KYC",
+    "review": "reviewed",
+    "enHash": "9c2386e6"
+  },
+  "overview.setup.next.products": {
+    "message": "अपने प्रोडक्ट जोड़ें ताकि ग्राहक उन्हें ढूँढ सकें।",
+    "review": "reviewed",
+    "enHash": "b7a72097"
+  },
+  "overview.setup.step.products": {
+    "message": "प्रोडक्ट जोड़ें",
+    "review": "reviewed",
+    "enHash": "25a9fb7e"
+  },
+  "overview.setup.next.staff": {
+    "message": "अपने स्टाफ़ को बुलाएँ।",
+    "review": "reviewed",
+    "enHash": "7dc57fa5"
+  },
+  "overview.setup.step.staff": {
+    "message": "स्टाफ़ को बुलाएँ",
+    "review": "reviewed",
+    "enHash": "a7bbc7a7"
+  },
+  "overview.setup.next.standee": {
+    "message": "काउंटर के लिए अपना QR स्टैंडी प्रिंट करें।",
+    "review": "reviewed",
+    "enHash": "291ff8a7"
+  },
+  "overview.setup.step.standee": {
+    "message": "QR स्टैंडी प्रिंट करें",
+    "review": "reviewed",
+    "enHash": "a1bdcc81"
+  },
+  "overview.setup.step.openingHours": {
+    "message": "खुलने का समय जोड़ें",
+    "review": "reviewed",
+    "enHash": "3ac02ff5"
+  },
+  "overview.setup.left": {
+    "message": "बाकी सेटअप स्टेप",
+    "review": "reviewed",
+    "enHash": "aabef61c"
+  },
+  "overview.top.source.stock": {
+    "message": "स्टॉक · {time}",
+    "review": "reviewed",
+    "enHash": "9136b9c8"
+  },
+  "overview.top.source.none": {
+    "message": "अभी कोई बदलाव नहीं",
+    "review": "reviewed",
+    "enHash": "8efd778f"
+  },
+  "overview.gate.error": {
+    "message": "आपकी दुकान लोड नहीं हो सकी",
+    "review": "reviewed",
+    "enHash": "0980057d"
+  },
+  "overview.gate.noStore": {
+    "message": "इसे देखने के लिए दुकान चुनें",
+    "review": "reviewed",
+    "enHash": "57d8dc67"
+  },
+  "overview.gate.choose": {
+    "message": "दुकान चुनें",
+    "review": "reviewed",
+    "enHash": "12cfd9dc"
+  },
+  "overview.gate.cashier": {
+    "message": "यह स्क्रीन मालिकों और मैनेजरों के लिए है। आपके ऑर्डर और काउंटर यहाँ हैं।",
+    "review": "reviewed",
+    "enHash": "be4f2c6b"
+  },
+  "overview.gate.orders": {
+    "message": "ऑर्डर",
+    "review": "reviewed",
+    "enHash": "cded0933"
   }
 }

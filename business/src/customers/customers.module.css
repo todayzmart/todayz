@@ -1,0 +1,32 @@
+/* B-09 Customers layout. Component looks come from bundle.css (tz-*) and @todayz/ui. Tokens only. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.sub {
+  margin: 0;
+  color: var(--ink-2);
+  font: var(--type-body);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.note {
+  margin: 0 0 var(--space-3);
+  color: var(--ink-3);
+  font: var(--type-caption);
+}
+
+.more {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-3);
+}

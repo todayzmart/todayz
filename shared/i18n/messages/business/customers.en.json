@@ -1,0 +1,74 @@
+{
+  "customers.title": {
+    "defaultMessage": "Customers",
+    "description": "B-09 page title."
+  },
+  "customers.segments": {
+    "defaultMessage": "Customer groups",
+    "description": "Accessible name of the segment filter."
+  },
+  "customers.segment.all": {
+    "defaultMessage": "All",
+    "description": "Segment: every customer of the window, newest visit first."
+  },
+  "customers.segment.top": {
+    "defaultMessage": "Top spenders",
+    "description": "Segment: by spend."
+  },
+  "customers.segment.slipping": {
+    "defaultMessage": "Slipping away",
+    "description": "Segment: the regulars behind the Regulars slipping away insight."
+  },
+  "customers.col.customer": {
+    "defaultMessage": "Customer",
+    "description": "Column."
+  },
+  "customers.col.visits": {
+    "defaultMessage": "Visits",
+    "description": "Column: distinct purchase days."
+  },
+  "customers.col.spend": {
+    "defaultMessage": "Spend",
+    "description": "Column."
+  },
+  "customers.col.last": {
+    "defaultMessage": "Last visit",
+    "description": "Column."
+  },
+  "customers.unnamed": {
+    "defaultMessage": "Customer",
+    "description": "A customer with neither a name nor a phone."
+  },
+  "customers.error": {
+    "defaultMessage": "Could not load customers",
+    "description": "Request failed."
+  },
+  "customers.more": {
+    "defaultMessage": "Load more",
+    "description": "Button for the next page."
+  },
+  "customers.notEnough.title": {
+    "defaultMessage": "Not enough linked customers yet",
+    "description": "Below insight_regular_min_linked_customers."
+  },
+  "customers.notEnough.body": {
+    "defaultMessage": "Link customers at the counter to see this",
+    "description": "Below the minimum linked customers."
+  },
+  "customers.about.window": {
+    "defaultMessage": "{total, plural, one {# customer} other {# customers}} bought here in the last {days} days",
+    "description": "All and Top segments."
+  },
+  "customers.about.slipping": {
+    "defaultMessage": "{total, plural, one {# regular customer hasn't} other {# regular customers haven't}} bought in {days} days",
+    "description": "Slipping segment. {days} is insight_regular_lapse_days."
+  },
+  "customers.empty": {
+    "defaultMessage": "No customers in this period",
+    "description": "Empty list."
+  },
+  "customers.empty.slipping": {
+    "defaultMessage": "No regulars are slipping away",
+    "description": "Empty slipping segment."
+  }
+}

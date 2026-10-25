@@ -1,0 +1,307 @@
+{
+  "analytics.title": {
+    "message": "అనలిటిక్స్",
+    "review": "reviewed",
+    "enHash": "25bc9629"
+  },
+  "analytics.tabs": {
+    "message": "అనలిటిక్స్ విభాగాలు",
+    "review": "reviewed",
+    "enHash": "c6f8a24c"
+  },
+  "analytics.tab.sales": {
+    "message": "అమ్మకాలు",
+    "review": "reviewed",
+    "enHash": "d0edfb6e"
+  },
+  "analytics.tab.insights": {
+    "message": "ఇన్‌సైట్‌లు",
+    "review": "reviewed",
+    "enHash": "b4510362"
+  },
+  "analytics.loading": {
+    "message": "లోడ్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "8f26c652"
+  },
+  "analytics.more": {
+    "message": "మరిన్ని లోడ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "analytics.error": {
+    "message": "అనలిటిక్స్ లోడ్ కాలేదు",
+    "review": "reviewed",
+    "enHash": "7e4a6d6f"
+  },
+  "analytics.range": {
+    "message": "వ్యవధి",
+    "review": "reviewed",
+    "enHash": "170a28a9"
+  },
+  "analytics.range.7d": {
+    "message": "7 రోజులు",
+    "review": "reviewed",
+    "enHash": "0a8dd6ad"
+  },
+  "analytics.range.30d": {
+    "message": "30 రోజులు",
+    "review": "reviewed",
+    "enHash": "7d4278a8"
+  },
+  "analytics.range.90d": {
+    "message": "90 రోజులు",
+    "review": "reviewed",
+    "enHash": "170621ac"
+  },
+  "analytics.span": {
+    "message": "{from} నుంచి {to}",
+    "review": "reviewed",
+    "enHash": "06f3df10"
+  },
+  "analytics.kpi.label": {
+    "message": "మొత్తాలు",
+    "review": "reviewed",
+    "enHash": "65222d79"
+  },
+  "analytics.kpi.sales": {
+    "message": "అమ్మకాలు",
+    "review": "reviewed",
+    "enHash": "d0edfb6e"
+  },
+  "analytics.kpi.online": {
+    "message": "ఆన్‌లైన్",
+    "review": "reviewed",
+    "enHash": "c3e839df"
+  },
+  "analytics.kpi.pos": {
+    "message": "కౌంటర్",
+    "review": "reviewed",
+    "enHash": "f4018045"
+  },
+  "analytics.kpi.bills": {
+    "message": "బిల్లులు, ఆర్డర్‌లు",
+    "review": "reviewed",
+    "enHash": "89bf0748"
+  },
+  "analytics.daily.title": {
+    "message": "రోజువారీ అమ్మకాలు",
+    "review": "reviewed",
+    "enHash": "5954e1c5"
+  },
+  "analytics.daily.empty": {
+    "message": "ఈ వ్యవధిలో అమ్మకాలు లేవు",
+    "review": "reviewed",
+    "enHash": "8e558855"
+  },
+  "analytics.hourly.title": {
+    "message": "గంటవారీ అమ్మకాలు",
+    "review": "reviewed",
+    "enHash": "162aeab3"
+  },
+  "analytics.series.online": {
+    "message": "ఆన్‌లైన్",
+    "review": "reviewed",
+    "enHash": "c3e839df"
+  },
+  "analytics.series.pos": {
+    "message": "కౌంటర్",
+    "review": "reviewed",
+    "enHash": "f4018045"
+  },
+  "analytics.funnel.title": {
+    "message": "ఆన్‌లైన్ ఆర్డర్‌లు",
+    "review": "reviewed",
+    "enHash": "1b62fbdb"
+  },
+  "analytics.funnel.empty": {
+    "message": "ఈ వ్యవధిలో ఆన్‌లైన్ ఆర్డర్‌లు లేవు",
+    "review": "reviewed",
+    "enHash": "f6b05168"
+  },
+  "analytics.funnel.received": {
+    "message": "వచ్చినవి",
+    "review": "reviewed",
+    "enHash": "27548c4f"
+  },
+  "analytics.funnel.accepted": {
+    "message": "అంగీకరించినవి",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "analytics.funnel.completed": {
+    "message": "పూర్తయినవి",
+    "review": "reviewed",
+    "enHash": "1798b3ba"
+  },
+  "analytics.funnel.missed": {
+    "message": "తప్పిన ఆర్డర్‌లు",
+    "review": "reviewed",
+    "enHash": "45fbd640"
+  },
+  "analytics.funnel.rejected": {
+    "message": "తిరస్కరించినవి",
+    "review": "reviewed",
+    "enHash": "27eeb7a2"
+  },
+  "analytics.funnel.notAccepted": {
+    "message": "సమయానికి అంగీకరించలేదు",
+    "review": "reviewed",
+    "enHash": "54be7649"
+  },
+  "analytics.funnel.noShow": {
+    "message": "తీసుకెళ్లలేదు",
+    "review": "reviewed",
+    "enHash": "2a5fc945"
+  },
+  "analytics.funnel.cancelled": {
+    "message": "రద్దయినవి",
+    "review": "reviewed",
+    "enHash": "a1bf92ef"
+  },
+  "analytics.accept.p50": {
+    "message": "మీ ఆర్డర్‌లలో సగం {time}లోపు అంగీకరించబడతాయి",
+    "review": "reviewed",
+    "enHash": "a1cfe72b"
+  },
+  "analytics.accept.none": {
+    "message": "ఇంకా అంగీకరించిన ఆర్డర్‌లు లేవు",
+    "review": "reviewed",
+    "enHash": "6c8b5d5a"
+  },
+  "analytics.accept.nearby": {
+    "message": "దగ్గర్లోని దుకాణాలు: {time}",
+    "review": "reviewed",
+    "enHash": "0ad627e7"
+  },
+  "analytics.accept.nearbyNone": {
+    "message": "పోల్చడానికి దగ్గర్లో తగినన్ని దుకాణాలు లేవు",
+    "review": "reviewed",
+    "enHash": "5256a722"
+  },
+  "analytics.duration.seconds": {
+    "message": "{s} సె",
+    "review": "reviewed",
+    "enHash": "4a84fdfd"
+  },
+  "analytics.duration.minutes": {
+    "message": "{m} ని {s} సె",
+    "review": "reviewed",
+    "enHash": "9b605337"
+  },
+  "analytics.top.title": {
+    "message": "టాప్ ఐటమ్‌లు",
+    "review": "reviewed",
+    "enHash": "79ec189d"
+  },
+  "analytics.mix.title": {
+    "message": "వర్గం వారీ అమ్మకాలు",
+    "review": "reviewed",
+    "enHash": "ae7554de"
+  },
+  "analytics.mix.value": {
+    "message": "{amount} · {share}",
+    "review": "reviewed",
+    "enHash": "5792f82a"
+  },
+  "analytics.repeat.title": {
+    "message": "మళ్లీ వచ్చే కస్టమర్‌లు",
+    "review": "reviewed",
+    "enHash": "089baac2"
+  },
+  "analytics.repeat.note": {
+    "message": "{customers} లింక్ చేసిన కస్టమర్‌లలో {repeat} మళ్లీ వచ్చారు",
+    "review": "reviewed",
+    "enHash": "70451346"
+  },
+  "analytics.repeat.notEnough": {
+    "message": "దీన్ని చూడడానికి కౌంటర్‌లో కస్టమర్‌లను లింక్ చేయండి",
+    "review": "reviewed",
+    "enHash": "5d5ad767"
+  },
+  "analytics.ratings.title": {
+    "message": "రేటింగ్‌లు",
+    "review": "reviewed",
+    "enHash": "14021e13"
+  },
+  "analytics.ratings.empty": {
+    "message": "ఈ వ్యవధిలో రివ్యూలు లేవు",
+    "review": "reviewed",
+    "enHash": "97bfdfe9"
+  },
+  "analytics.ratings.week": {
+    "message": "{day} వారం",
+    "review": "reviewed",
+    "enHash": "ffa69e18"
+  },
+  "analytics.ratings.value": {
+    "message": "{stars} ★ · {count, plural, other {#}} రివ్యూలు",
+    "review": "reviewed",
+    "enHash": "5969a6a3"
+  },
+  "analytics.insights.intro": {
+    "message": "గత {days} రోజుల అన్ని ఇన్‌సైట్‌లు, రకం వారీగా",
+    "review": "reviewed",
+    "enHash": "7d3d6884"
+  },
+  "analytics.insights.filter": {
+    "message": "ఇన్‌సైట్ రకాలు",
+    "review": "reviewed",
+    "enHash": "010b6d1f"
+  },
+  "analytics.insights.allKinds": {
+    "message": "అన్నీ",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "analytics.insights.none": {
+    "message": "ప్రస్తుతం దేనికీ మీ అవసరం లేదు",
+    "review": "reviewed",
+    "enHash": "42c17cdd"
+  },
+  "analytics.insights.error": {
+    "message": "ఇన్‌సైట్‌లు లోడ్ కాలేదు",
+    "review": "reviewed",
+    "enHash": "b500a37b"
+  },
+  "analytics.insights.needs.selling_fast": {
+    "message": "ఏదైనా ఐటమ్ ఈ వ్యవధిలో {units} లేదా ఎక్కువ అమ్ముడైనప్పుడు కనిపిస్తుంది",
+    "review": "reviewed",
+    "enHash": "131de9f4"
+  },
+  "analytics.insights.needs.sitting_on_shelf": {
+    "message": "ఐటమ్‌లు {days} రోజులుగా లిస్ట్ అయ్యాక కనిపిస్తుంది",
+    "review": "reviewed",
+    "enHash": "4009257a"
+  },
+  "analytics.insights.needs.wanted_nearby": {
+    "message": "{distance} లోపు మీరు లిస్ట్ చేయని దాని కోసం {searches} లేదా ఎక్కువ శోధనలు వచ్చినప్పుడు కనిపిస్తుంది",
+    "review": "reviewed",
+    "enHash": "47bba6b7"
+  },
+  "analytics.insights.needs.missed_sales": {
+    "message": "ఏదైనా ఐటమ్ స్టాక్‌లో లేనప్పుడు దగ్గర్లో {searches} లేదా ఎక్కువ శోధనలు సరిపోయినప్పుడు కనిపిస్తుంది",
+    "review": "reviewed",
+    "enHash": "688cb24f"
+  },
+  "analytics.insights.needs.bought_together": {
+    "message": "{bills} లేదా ఎక్కువ బిల్లుల్లో అవే రెండు ఐటమ్‌లు ఉన్నప్పుడు కనిపిస్తుంది",
+    "review": "reviewed",
+    "enHash": "7558ca1e"
+  },
+  "analytics.insights.needs.regulars_slipping": {
+    "message": "దీన్ని చూడడానికి కౌంటర్‌లో కస్టమర్‌లను లింక్ చేయండి",
+    "review": "reviewed",
+    "enHash": "5d5ad767"
+  },
+  "analytics.insights.needs.priced_above_nearby": {
+    "message": "దగ్గర్లో {stores} లేదా ఎక్కువ దుకాణాలు అవే ప్రోడక్ట్‌లను లిస్ట్ చేసినప్పుడు కనిపిస్తుంది",
+    "review": "reviewed",
+    "enHash": "0bcfde71"
+  },
+  "analytics.insights.needs.other": {
+    "message": "ఇంకా తగినంత డేటా లేదు",
+    "review": "reviewed",
+    "enHash": "0d14a861"
+  }
+}

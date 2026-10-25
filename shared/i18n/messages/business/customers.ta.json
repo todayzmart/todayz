@@ -1,0 +1,92 @@
+{
+  "customers.title": {
+    "message": "வாடிக்கையாளர்கள்",
+    "review": "reviewed",
+    "enHash": "035eae60"
+  },
+  "customers.segments": {
+    "message": "வாடிக்கையாளர் குழுக்கள்",
+    "review": "reviewed",
+    "enHash": "236ddab4"
+  },
+  "customers.segment.all": {
+    "message": "அனைவரும்",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "customers.segment.top": {
+    "message": "அதிகம் செலவழிப்பவர்கள்",
+    "review": "reviewed",
+    "enHash": "d577e755"
+  },
+  "customers.segment.slipping": {
+    "message": "விலகுபவர்கள்",
+    "review": "reviewed",
+    "enHash": "72d72518"
+  },
+  "customers.col.customer": {
+    "message": "வாடிக்கையாளர்",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "customers.col.visits": {
+    "message": "வருகைகள்",
+    "review": "reviewed",
+    "enHash": "6a4be2fa"
+  },
+  "customers.col.spend": {
+    "message": "செலவு",
+    "review": "reviewed",
+    "enHash": "14eeee8d"
+  },
+  "customers.col.last": {
+    "message": "கடைசி வருகை",
+    "review": "reviewed",
+    "enHash": "ed5ddeba"
+  },
+  "customers.unnamed": {
+    "message": "வாடிக்கையாளர்",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "customers.error": {
+    "message": "வாடிக்கையாளர்களை ஏற்ற முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "fefeb39f"
+  },
+  "customers.more": {
+    "message": "மேலும் ஏற்றவும்",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "customers.notEnough.title": {
+    "message": "இன்னும் போதுமான இணைக்கப்பட்ட வாடிக்கையாளர்கள் இல்லை",
+    "review": "reviewed",
+    "enHash": "bdd0f6d3"
+  },
+  "customers.notEnough.body": {
+    "message": "இதைப் பார்க்க கவுண்டரில் வாடிக்கையாளர்களை இணைக்கவும்",
+    "review": "reviewed",
+    "enHash": "5d5ad767"
+  },
+  "customers.about.window": {
+    "message": "கடந்த {days} நாட்களில் {total, plural, other {#}} வாடிக்கையாளர்கள் இங்கே வாங்கினர்",
+    "review": "reviewed",
+    "enHash": "8c69f589"
+  },
+  "customers.about.slipping": {
+    "message": "{total, plural, other {#}} வழக்கமான வாடிக்கையாளர்கள் {days} நாட்களாக வாங்கவில்லை",
+    "review": "reviewed",
+    "enHash": "d1425e51"
+  },
+  "customers.empty": {
+    "message": "இந்தக் காலத்தில் வாடிக்கையாளர்கள் இல்லை",
+    "review": "reviewed",
+    "enHash": "adf13418"
+  },
+  "customers.empty.slipping": {
+    "message": "எந்த வழக்கமான வாடிக்கையாளரும் விலகவில்லை",
+    "review": "reviewed",
+    "enHash": "1d64ad5d"
+  }
+}
