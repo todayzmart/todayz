@@ -7,6 +7,16 @@ timers). A failed release does not fail the run, so it has its own alert:
 `tz-pos-claim-release-failed` (*Bill claim hold not released*, critical,
 `infra/grafana/alerts/pos.yaml`): `tz_pos_claim_release_failed_total` rose in 10 min, for 5 min.
 
+## What it means
+
+`tz-pos-claim-release-failed` fired: the claim-expiry sweep could not release a bill claim's credit hold. The customer's credits stay held after the bill QR expired. A failed sweep run is [Job failing](jobs-job-failing.md).
+
+## First five minutes
+
+1. Logs: "pos: claim hold not released" gives the claim id.
+2. Check [Ledger invariant](ledger-invariant.md) is not firing too.
+3. Tell the credits owner with the claim id. Never edit `bill_claims` or a hold by hand.
+
 ## What it does
 
 Every minute it expires every bill QR claim (`bill_claims`) that is `open` or `claimed`,
@@ -36,7 +46,7 @@ It is idempotent:
 - A claim whose `Release` fails is rolled back on its own, stays live and is retried next tick
   (counted in `failed` and in `tz_pos_claim_release_failed_total`).
 
-## First three checks
+## Diagnosis
 
 1. **A-21 Jobs**: open the kind, then the latest failed run: the error, the attempt and the
    summary (`expired`, `released`, `failed`).
@@ -45,7 +55,7 @@ It is idempotent:
 3. **Logs**: dashboard 15 *Job logs* with the run id; follow `trace_id`. Logs carry claim ids only,
    never a token.
 
-## Likely causes
+### Likely causes
 
 - **503 "pos: not configured"**: the worker started without the database or settings. Check the
   worker's boot log and `make env-check` names.
@@ -58,7 +68,7 @@ It is idempotent:
 - **Live claims pile up past `expires_at` with no failed runs**: the kind is not scheduled on the
   worker (check A-21 for recent runs and the [missed cron](jobs-cron-missed.md) alert).
 
-## Fix
+## Mitigation
 
 - Timer kinds are **never paused, run or retried by hand** (04 §2.7; A-21 refuses with
   `job_not_runnable`). Fix the cause; the next tick picks the claims up.
@@ -73,3 +83,16 @@ the batch, the whole batch is retried, up to 3 attempts (D-132). Each retry logs
 `pos: sync transaction retried` (store id, attempt) and counts in `tz_pos_sync_retried_total`.
 A few a day is expected; a steady rise means a new lock-order problem: read the warn logs'
 errors and D-132's lock order before anything else.
+
+## Escalation
+
+**Level:** Critical: SEV2, because customer credits are stuck. SEV1 if ledger drift shows too ([Severity levels](../ops/severity.md)).
+
+- The **W2-04** owner for the sweep and the **W2-01** owner for the credits ledger.
+- The **lead** for any SEV2.
+
+## Follow-up
+
+- A test with the claim state the ledger refused.
+- Confirm the hold was released (the claim's next tick) before closing.
+- SEV1 or SEV2: finish the [incident note](../ops/incident-template.md) and its review within two working days.

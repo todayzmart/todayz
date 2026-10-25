@@ -8,6 +8,16 @@ sweep's own alert is `tz-order-reconcile-failed` (`infra/grafana/alerts/orders.y
 `tz_order_reconcile_failed_total{kind}` kept rising for 5 minutes, since a run that fails on some
 orders still succeeds.
 
+## What it means
+
+`tz-order-reconcile-failed` fired: the `order_timer_reconcile` sweep failed to move some orders past their deadline for 5 minutes. Those orders stay `placed`, held or `awaiting_customer` after their time; customers and shops see them stuck. A timer kind failing outright is [Job failing](jobs-job-failing.md).
+
+## First five minutes
+
+1. Logs: the sweep's error line names the kind, the order and the error.
+2. Count the stuck orders: `SELECT count(*) FROM orders WHERE sweep_failed_at IS NOT NULL` (read-only).
+3. Open an [incident note](../ops/incident-template.md) and tell the owner and the lead. Do not edit `orders` by hand.
+
 ## What they do
 
 | Kind | Enqueued by | Runs at | Outcome |
@@ -45,7 +55,7 @@ Every expiry takes the order row lock first (`FOR UPDATE`), so a timer racing a 
 hand-over (BK-19, BK-20) serialises with it: whichever commits first wins and the other sees the
 new status.
 
-## First three checks
+## Diagnosis
 
 1. **A-21 Jobs**: open the kind, then the latest failed run: the error, the attempt and the
    summary (`expired`, `noop`).
@@ -54,7 +64,7 @@ new status.
 3. **Logs**: dashboard 15 *Job logs* with the run id; follow `trace_id`. Logs carry the order id
    only.
 
-## Likely causes
+### Likely causes
 
 - **"timer ran before its deadline" on every attempt**: the worker's clock and the database
   disagree, or (local/test only) the test clock was moved back. It clears once the deadline
@@ -67,7 +77,7 @@ new status.
 - **A trigger refused the move** (`trg_orders_guard`): the order is in a state the timer should
   have treated as a no-op. That is a bug; tell the owner with the order id.
 
-## Fix
+## Mitigation
 
 - Timer kinds are **never paused, run or retried by hand** (04 §2.7; A-21 refuses with
   `job_not_runnable`). Fix the cause; River's retries pick the run up.
@@ -81,8 +91,16 @@ new status.
   trigger and the reservations must move together).
 - Never edit `orders`, `order_events`, `stock_reservations`, `strikes` or `river_job` by hand.
 
-## Who to tell
+## Escalation
+
+**Level:** Critical: SEV2. SEV1 if many orders are stuck or stock stays reserved ([Severity levels](../ops/severity.md)).
 
 - **W2-02** (owner) and the **lead** at once: this is a critical timer.
 - The **support admin** if customers or shops saw an order stuck past its time, or a strike
   that should not be there.
+
+## Follow-up
+
+- A test with the order state that made the sweep fail.
+- Support contacts customers and shops whose orders were stuck.
+- SEV1 or SEV2: finish the [incident note](../ops/incident-template.md) and its review within two working days.

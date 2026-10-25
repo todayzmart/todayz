@@ -16,7 +16,13 @@ once that spend reaches `ai_daily_cost_cap_paise` (₹500 by default).
 
 A cap of 0 is the kill switch: it stops every call but fires neither alert, since it is a choice.
 
-## First three checks
+## First five minutes
+
+1. Open [14 · AI](https://grafana.todayz.localhost/d/todayz-14): which feature is spending, and is it rising?
+2. Check the spend is real use, not a loop: calls per minute by feature against the hour before.
+3. If one feature runs away, turn it off (`ai_<feature>_enabled`, A-17). Do not raise the cap to clear the alert.
+
+## Diagnosis
 
 1. [14 · AI quality and cost](https://grafana.todayz.localhost/d/todayz-14): *Spend by feature* and
    *Calls by feature and outcome*. One feature far above its usual share is the usual cause.
@@ -26,14 +32,14 @@ A cap of 0 is the kill switch: it stops every call but fires neither alert, sinc
    `SELECT scope, subject, calls FROM ai_usage_daily WHERE day = (now() AT TIME ZONE 'Asia/Kolkata')::date ORDER BY calls DESC LIMIT 10;`
    Subjects are store and user ids only; look them up in the admin console, never paste them into chat.
 
-## Likely causes
+### Likely causes
 
 - Real growth: more stores using a feature (look at the 7-day *Spend per day* trend).
 - A loop: a client or a job retrying one feature (many calls, one subject, many `invalid` or `timeout`).
 - A prompt or model change that made calls longer (tokens per call up on the same traffic).
 - A wrong price: `backend/internal/ai/client/price.go` is list price at ₹88/$ and may be out of date.
 
-## Fix
+## Mitigation
 
 All through the admin console's settings (A-17, step-up; the cap is a money setting, so super_admin only).
 Every change is audited (A-19):
@@ -46,7 +52,15 @@ Every change is audited (A-19):
 
 The cap resets at IST midnight on its own; nothing needs clearing.
 
-## Who to tell
+## Escalation
+
+**Level:** `tz-ai-cost-80` is a warning: SEV3. `tz-ai-cost-cap-reached` is critical but nothing breaks (AI features fall back to rules): SEV3, SEV2 only if the cap was hit before noon IST ([Severity levels](../ops/severity.md)).
 
 - The founder for any cap change (it is money, D-70).
 - The owner of the feature that spent it (W3-04, W3-11…W3-13).
+
+## Follow-up
+
+- If a loop or retry storm caused it, add a per-feature call limit or a test for it.
+- If real demand hit the cap, take the numbers to the founder for a cap decision (money, D-70).
+- SEV1 or SEV2: finish the [incident note](../ops/incident-template.md) and its review within two working days.
