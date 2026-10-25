@@ -1,0 +1,162 @@
+{
+  "statements.loading": {
+    "message": "స్టేట్‌మెంట్‌లు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "e452acdf"
+  },
+  "statements.error": {
+    "message": "స్టేట్‌మెంట్‌లను లోడ్ చేయలేకపోయాం.",
+    "review": "reviewed",
+    "enHash": "59d08760"
+  },
+  "statements.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "statements.empty": {
+    "message": "ఇంకా స్టేట్‌మెంట్‌లు లేవు. ప్రతి నెల 1వ తేదీన ముగుస్తుంది, దాని స్టేట్‌మెంట్ ఇక్కడ కనిపిస్తుంది.",
+    "review": "reviewed",
+    "enHash": "efe33661"
+  },
+  "statements.list": {
+    "message": "నెలవారీ స్టేట్‌మెంట్‌లు",
+    "review": "reviewed",
+    "enHash": "f4d5c628"
+  },
+  "statements.closing": {
+    "message": "ముగింపు బ్యాలెన్స్ {amount}",
+    "review": "reviewed",
+    "enHash": "730c0260"
+  },
+  "statements.status.processing": {
+    "message": "ప్రాసెస్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "e63451d3"
+  },
+  "statements.status.needsKyc": {
+    "message": "నిలిపివేయబడింది",
+    "review": "reviewed",
+    "enHash": "7725fc0e"
+  },
+  "statements.status.paid": {
+    "message": "చెల్లించబడింది",
+    "review": "reviewed",
+    "enHash": "dc9d4584"
+  },
+  "statements.payout.processing": {
+    "message": "{amount} పేఅవుట్ ప్రాసెస్ అవుతోంది.",
+    "review": "reviewed",
+    "enHash": "48a73a31"
+  },
+  "statements.payout.needsKyc": {
+    "message": "మీ పేఅవుట్ వివరాలు పూర్తయ్యే వరకు {amount} పేఅవుట్ నిలిపివేయబడింది.",
+    "review": "reviewed",
+    "enHash": "c624cfec"
+  },
+  "statements.payout.paid": {
+    "message": "{date}న {amount} చెల్లించబడింది.",
+    "review": "reviewed",
+    "enHash": "f72f3623"
+  },
+  "statements.payout.utr": {
+    "message": "UTR {utr}",
+    "review": "reviewed",
+    "enHash": "6103319e"
+  },
+  "statements.payout.none": {
+    "message": "ఈ నెల పేఅవుట్ లేదు.",
+    "review": "reviewed",
+    "enHash": "6e206087"
+  },
+  "statements.negative": {
+    "message": "మైనస్ బ్యాలెన్స్ వచ్చే నెలకు కొనసాగుతుంది.",
+    "review": "reviewed",
+    "enHash": "7e8a47cf"
+  },
+  "statements.totals.title": {
+    "message": "వివరాలు",
+    "review": "reviewed",
+    "enHash": "fd91b3cc"
+  },
+  "statements.totals.opening": {
+    "message": "ప్రారంభ బ్యాలెన్స్",
+    "review": "reviewed",
+    "enHash": "7622a75d"
+  },
+  "statements.totals.creditsIn": {
+    "message": "మీ దుకాణంలో ఖర్చైన క్రెడిట్లు",
+    "review": "reviewed",
+    "enHash": "577a1d99"
+  },
+  "statements.totals.referralIn": {
+    "message": "రిఫరల్ బహుమతులు",
+    "review": "reviewed",
+    "enHash": "22d6a913"
+  },
+  "statements.totals.cashbackOut": {
+    "message": "మీరు ఇచ్చిన క్యాష్‌బ్యాక్",
+    "review": "reviewed",
+    "enHash": "b448f6f5"
+  },
+  "statements.totals.reversals": {
+    "message": "రివర్స్ అయిన అమ్మకాలు",
+    "review": "reviewed",
+    "enHash": "955b6de8"
+  },
+  "statements.totals.adjustments": {
+    "message": "సవరణలు",
+    "review": "reviewed",
+    "enHash": "ce5b2f72"
+  },
+  "statements.totals.payoutsOut": {
+    "message": "పేఅవుట్‌లు",
+    "review": "reviewed",
+    "enHash": "e0e7ea13"
+  },
+  "statements.totals.closing": {
+    "message": "ముగింపు బ్యాలెన్స్",
+    "review": "reviewed",
+    "enHash": "c171f510"
+  },
+  "statements.download": {
+    "message": "CSV డౌన్‌లోడ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "eaa216ad"
+  },
+  "statements.downloadFor": {
+    "message": "{month} స్టేట్‌మెంట్‌ను CSVగా డౌన్‌లోడ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "016b7082"
+  },
+  "statements.downloading": {
+    "message": "సిద్ధమవుతోంది",
+    "review": "reviewed",
+    "enHash": "96a9b7cd"
+  },
+  "statements.downloadError": {
+    "message": "స్టేట్‌మెంట్ డౌన్‌లోడ్ చేయలేకపోయాం. మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "d0897e54"
+  },
+  "statements.more": {
+    "message": "పాత స్టేట్‌మెంట్‌లు చూపించండి",
+    "review": "reviewed",
+    "enHash": "bcdafe62"
+  },
+  "statements.moreError": {
+    "message": "పాత స్టేట్‌మెంట్‌లను లోడ్ చేయలేకపోయాం.",
+    "review": "reviewed",
+    "enHash": "d8e87af4"
+  },
+  "statements.status.carried": {
+    "message": "ముందుకు తీసుకెళ్లబడింది",
+    "review": "reviewed",
+    "enHash": "d65c9a05"
+  },
+  "statements.payout.carried": {
+    "message": "{amount} పేఅవుట్ తదుపరి స్టేట్‌మెంట్‌కు తీసుకెళ్లబడింది.",
+    "review": "reviewed",
+    "enHash": "17e54cde"
+  }
+}

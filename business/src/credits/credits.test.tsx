@@ -111,11 +111,10 @@ describe('B-10 credit account', () => {
     expect(await screen.findByTestId('credit-balance')).toHaveTextContent('7 credits');
   });
 
-  it('explains payouts and marks statements as coming soon', async () => {
+  it('explains payouts and shows the monthly statements card (W3-01, src/statements/)', async () => {
     renderAt('/credits', { messages, handlers: [shops('owner'), account([]), refs, store] });
     expect(await screen.findByRole('heading', { name: 'How payouts work' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Monthly statements' })).toBeInTheDocument();
-    expect(screen.getByText('Monthly statements are coming soon.')).toBeInTheDocument();
   });
 });
 

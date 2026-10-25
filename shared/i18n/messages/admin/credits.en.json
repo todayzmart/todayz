@@ -1,0 +1,358 @@
+{
+  "credits.sub": {
+    "defaultMessage": "Customer wallets and store and platform accounts: ledger lines, coming expiry, adjustments and their approvals.",
+    "description": "A-09 page subtitle"
+  },
+  "credits.tabs": {
+    "defaultMessage": "Credits views",
+    "description": "Accessible name of the A-09 tab list"
+  },
+  "credits.tab.ledger": {
+    "defaultMessage": "Ledger",
+    "description": "Tab: account search and ledger lines"
+  },
+  "credits.tab.approvals": {
+    "defaultMessage": "Pending approvals",
+    "description": "Tab and heading: adjustment requests waiting for a second person"
+  },
+  "credits.find": {
+    "defaultMessage": "Find an account",
+    "description": "Heading and name of the account search"
+  },
+  "credits.find.q": {
+    "defaultMessage": "Phone, store code or id",
+    "description": "Account search field label"
+  },
+  "credits.find.help": {
+    "defaultMessage": "A customer's full phone number, a store short code, a customer, store or account id, or platform.",
+    "description": "Account search help"
+  },
+  "credits.find.required": {
+    "defaultMessage": "Enter what to search for.",
+    "description": "Account search: empty field"
+  },
+  "credits.find.submit": {
+    "defaultMessage": "Find",
+    "description": "Account search button"
+  },
+  "credits.find.busy": {
+    "defaultMessage": "Searching",
+    "description": "Account search button while searching"
+  },
+  "credits.accounts": {
+    "defaultMessage": "Accounts",
+    "description": "Accessible name of the account results table"
+  },
+  "credits.accounts.none": {
+    "defaultMessage": "No account matches. Check the number or code.",
+    "description": "Account search: no results"
+  },
+  "credits.panel": {
+    "defaultMessage": "Account",
+    "description": "Accessible name of the empty account side panel"
+  },
+  "credits.panel.empty": {
+    "defaultMessage": "Choose an account to see its balance and ledger lines.",
+    "description": "Empty account side panel"
+  },
+  "credits.loadFailed": {
+    "defaultMessage": "This account could not be loaded",
+    "description": "Account side panel: load failed"
+  },
+  "credits.noName": {
+    "defaultMessage": "No name",
+    "description": "A customer or staff member without a name"
+  },
+  "credits.col.owner": {
+    "defaultMessage": "Owner",
+    "description": "Column: account owner"
+  },
+  "credits.col.kind": {
+    "defaultMessage": "Type",
+    "description": "Column and fact: account or entry type"
+  },
+  "credits.col.balance": {
+    "defaultMessage": "Balance",
+    "description": "Column and fact: account balance"
+  },
+  "credits.col.when": {
+    "defaultMessage": "When",
+    "description": "Column: when the entry posted"
+  },
+  "credits.col.memo": {
+    "defaultMessage": "Detail",
+    "description": "Column: entry memo or reference"
+  },
+  "credits.col.amount": {
+    "defaultMessage": "Amount",
+    "description": "Column: amount"
+  },
+  "credits.col.day": {
+    "defaultMessage": "Day",
+    "description": "Column: IST day the credits expire"
+  },
+  "credits.col.customers": {
+    "defaultMessage": "Customers",
+    "description": "Column: number of customers"
+  },
+  "credits.col.customer": {
+    "defaultMessage": "Customer",
+    "description": "Column: customer"
+  },
+  "credits.col.reason": {
+    "defaultMessage": "Reason",
+    "description": "Column: adjustment reason"
+  },
+  "credits.col.requested": {
+    "defaultMessage": "Requested",
+    "description": "Column: who asked and when"
+  },
+  "credits.col.status": {
+    "defaultMessage": "Status",
+    "description": "Column and filter: request status"
+  },
+  "credits.col.decision": {
+    "defaultMessage": "Decision",
+    "description": "Column: decision or the actions"
+  },
+  "credits.entries": {
+    "defaultMessage": "Ledger lines",
+    "description": "Accessible name of the ledger entries table"
+  },
+  "credits.entries.none": {
+    "defaultMessage": "No ledger lines on this account yet.",
+    "description": "Ledger entries: empty"
+  },
+  "credits.expiry": {
+    "defaultMessage": "Expiring soon",
+    "description": "Heading and table name of the expiry preview"
+  },
+  "credits.expiry.total": {
+    "defaultMessage": "Expiring soon: {amount}",
+    "description": "Expiry preview heading with the total"
+  },
+  "credits.expiry.none": {
+    "defaultMessage": "No credits expire in the coming days.",
+    "description": "Expiry preview: empty"
+  },
+  "credits.account.customer_wallet": {
+    "defaultMessage": "Customer wallet",
+    "description": "Ledger account type"
+  },
+  "credits.account.customer_held": {
+    "defaultMessage": "Held for an order",
+    "description": "Ledger account type"
+  },
+  "credits.account.store_credit": {
+    "defaultMessage": "Store credit",
+    "description": "Ledger account type"
+  },
+  "credits.account.platform_marketing": {
+    "defaultMessage": "Platform marketing",
+    "description": "Ledger account type"
+  },
+  "credits.account.platform_expired": {
+    "defaultMessage": "Platform expired",
+    "description": "Ledger account type"
+  },
+  "credits.account.platform_adjustments": {
+    "defaultMessage": "Platform adjustments",
+    "description": "Ledger account type"
+  },
+  "credits.account.platform_payouts_cash": {
+    "defaultMessage": "Platform payouts cash",
+    "description": "Ledger account type"
+  },
+  "credits.tx.spend_hold": {
+    "defaultMessage": "Held for an order",
+    "description": "Ledger entry type"
+  },
+  "credits.tx.spend_capture": {
+    "defaultMessage": "Spent on an order",
+    "description": "Ledger entry type"
+  },
+  "credits.tx.spend_release": {
+    "defaultMessage": "Released from an order",
+    "description": "Ledger entry type"
+  },
+  "credits.tx.cashback": {
+    "defaultMessage": "Cashback",
+    "description": "Ledger entry type"
+  },
+  "credits.tx.referral_reward": {
+    "defaultMessage": "Referral reward",
+    "description": "Ledger entry type"
+  },
+  "credits.tx.expiry": {
+    "defaultMessage": "Expired",
+    "description": "Ledger entry type"
+  },
+  "credits.tx.admin_adjustment": {
+    "defaultMessage": "Admin adjustment",
+    "description": "Ledger entry type"
+  },
+  "credits.tx.payout": {
+    "defaultMessage": "Payout",
+    "description": "Ledger entry type"
+  },
+  "credits.tx.reversal": {
+    "defaultMessage": "Reversal",
+    "description": "Ledger entry type"
+  },
+  "credits.tx.forfeit_deletion": {
+    "defaultMessage": "Forfeited on account deletion",
+    "description": "Ledger entry type"
+  },
+  "credits.status.pending": {
+    "defaultMessage": "Pending",
+    "description": "Adjustment request status"
+  },
+  "credits.status.approved": {
+    "defaultMessage": "Approved",
+    "description": "Adjustment request status"
+  },
+  "credits.status.rejected": {
+    "defaultMessage": "Rejected",
+    "description": "Adjustment request status"
+  },
+  "credits.status.cancelled": {
+    "defaultMessage": "Withdrawn",
+    "description": "Adjustment request status: the requester withdrew it"
+  },
+  "credits.status.all": {
+    "defaultMessage": "All statuses",
+    "description": "Approvals filter: every status"
+  },
+  "credits.adjust": {
+    "defaultMessage": "Adjust credits",
+    "description": "Button: open the adjustment form"
+  },
+  "credits.adjust.title": {
+    "defaultMessage": "Adjust credits for {name}",
+    "description": "Adjustment dialog title"
+  },
+  "credits.adjust.body": {
+    "defaultMessage": "Balance now: {balance}. Large adjustments wait for a second finance or super admin before they post.",
+    "description": "Adjustment dialog description"
+  },
+  "credits.adjust.direction": {
+    "defaultMessage": "Change",
+    "description": "Adjustment: add or take away"
+  },
+  "credits.adjust.add": {
+    "defaultMessage": "Add credits",
+    "description": "Adjustment direction"
+  },
+  "credits.adjust.remove": {
+    "defaultMessage": "Take credits away",
+    "description": "Adjustment direction"
+  },
+  "credits.adjust.credits": {
+    "defaultMessage": "Credits",
+    "description": "Adjustment: whole credits field"
+  },
+  "credits.adjust.creditsHelp": {
+    "defaultMessage": "Whole credits, 1 credit = ₹1.",
+    "description": "Adjustment credits help"
+  },
+  "credits.adjust.creditsInvalid": {
+    "defaultMessage": "Enter whole credits from 1 to 10,00,000.",
+    "description": "Adjustment credits error"
+  },
+  "credits.adjust.link": {
+    "defaultMessage": "Ticket or order (optional)",
+    "description": "Adjustment link field"
+  },
+  "credits.adjust.linkHelp": {
+    "defaultMessage": "A support ticket or order number, up to 200 characters.",
+    "description": "Adjustment link help"
+  },
+  "credits.adjust.confirm": {
+    "defaultMessage": "Adjust",
+    "description": "Adjustment dialog confirm button"
+  },
+  "credits.adjust.postedDone": {
+    "defaultMessage": "{amount} posted to {name}'s wallet",
+    "description": "Toast: adjustment posted at once"
+  },
+  "credits.adjust.pendingDone": {
+    "defaultMessage": "{amount} for {name} is waiting for a second person",
+    "description": "Toast: adjustment sent for approval"
+  },
+  "credits.requests": {
+    "defaultMessage": "Adjustment requests",
+    "description": "Accessible name of the requests table"
+  },
+  "credits.requests.none": {
+    "defaultMessage": "No requests here.",
+    "description": "Requests table: empty"
+  },
+  "credits.reasonWithLink": {
+    "defaultMessage": "{reason} ({link})",
+    "description": "Reason with its ticket or order reference"
+  },
+  "credits.requestedBy": {
+    "defaultMessage": "{name}, {when}",
+    "description": "Who asked for the adjustment and when"
+  },
+  "credits.decidedBy": {
+    "defaultMessage": "{name}: {note}",
+    "description": "Who decided and their note"
+  },
+  "credits.waiting": {
+    "defaultMessage": "Waiting for finance",
+    "description": "Pending request seen by a reader who cannot decide"
+  },
+  "credits.approve": {
+    "defaultMessage": "Approve",
+    "description": "Button: approve the adjustment"
+  },
+  "credits.reject": {
+    "defaultMessage": "Reject",
+    "description": "Button: reject the adjustment"
+  },
+  "credits.withdraw": {
+    "defaultMessage": "Withdraw",
+    "description": "Button: the requester withdraws their own request"
+  },
+  "credits.needsSecond": {
+    "defaultMessage": "Needs a second person",
+    "description": "Why the requester cannot approve their own request"
+  },
+  "credits.approve.title": {
+    "defaultMessage": "Approve {amount} for {name}?",
+    "description": "Approve dialog title"
+  },
+  "credits.reject.title": {
+    "defaultMessage": "Reject {amount} for {name}?",
+    "description": "Reject dialog title"
+  },
+  "credits.withdraw.title": {
+    "defaultMessage": "Withdraw your request of {amount} for {name}?",
+    "description": "Withdraw dialog title"
+  },
+  "credits.decide.body": {
+    "defaultMessage": "Their reason: {reason}. Your note is kept in the audit log.",
+    "description": "Decision dialog description"
+  },
+  "credits.approve.done": {
+    "defaultMessage": "{amount} for {name} approved and posted",
+    "description": "Toast: request approved"
+  },
+  "credits.reject.done": {
+    "defaultMessage": "{amount} for {name} rejected",
+    "description": "Toast: request rejected"
+  },
+  "credits.withdraw.done": {
+    "defaultMessage": "Your request of {amount} for {name} withdrawn",
+    "description": "Toast: request withdrawn"
+  },
+  "credits.problem.approverIsRequester": {
+    "defaultMessage": "You asked for this adjustment, so a second person has to approve it.",
+    "description": "Error: approver_is_requester"
+  },
+  "credits.problem.insufficient": {
+    "defaultMessage": "The wallet does not hold that many credits. Take away less.",
+    "description": "Error: adjustment_insufficient_balance"
+  }
+}

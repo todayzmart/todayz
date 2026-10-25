@@ -1,9 +1,296 @@
-# Schemas: domain "admin-payouts" (owner W3-09): admin payouts (04 §2.7).
+# Schemas: domain "admin-payouts" (owner W3-01): monthly statements, payouts,
+# hold, unhold, mark paid and the bank/UPI export (A-11), and the business's
+# own statements (B-10) (04 §2.6, §2.7; 01 §9; D-09, D-51, D-85, D-93).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Names are unique across every schemas/<domain>.yaml. Request objects carry
+# `additionalProperties: false`. Money is `*Paise`; the ledger counts credits
+# (1 credit = ₹1 = 100 paise), so amounts are multiples of 100. A statement
+# period is the IST calendar month, `YYYY-MM`.
+PayoutPeriod:
+  type: string
+  pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+  description: An IST calendar month.
+  examples:
+    - "2026-09"
+PayoutSignedPaise:
+  type: integer
+  description: A signed amount in integer paise; a store's balance may be negative (it carries forward).
+  minimum: -9007199254740900
+  maximum: 9007199254740900
+  examples:
+    - -2400
+PayoutStatus:
+  type: string
+  enum: [pending, held, paid, cancelled]
+PayoutHoldCause:
+  type: string
+  enum: [kyc_incomplete, payout_details_missing, risk_flag, business_suspended, manual]
+PayoutKycStatus:
+  type: string
+  enum: [missing, submitted, verified, rejected]
+StatementTotals:
+  type: object
+  required: [openingPaise, creditsInPaise, referralInPaise, cashbackOutPaise, reversalsPaise, adjustmentsPaise, payoutsOutPaise, closingPaise]
+  description: opening + credits in + referral in − cashback out ± reversals ± adjustments − payouts out = closing (01 §9).
+  properties:
+    openingPaise: {$ref: '#/PayoutSignedPaise'}
+    creditsInPaise: {$ref: '#/PayoutSignedPaise'}
+    referralInPaise: {$ref: '#/PayoutSignedPaise'}
+    cashbackOutPaise: {$ref: '#/PayoutSignedPaise'}
+    reversalsPaise: {$ref: '#/PayoutSignedPaise'}
+    adjustmentsPaise: {$ref: '#/PayoutSignedPaise'}
+    payoutsOutPaise: {$ref: '#/PayoutSignedPaise'}
+    closingPaise: {$ref: '#/PayoutSignedPaise'}
+StatementStore:
+  type: object
+  required: [storeId, storeName, totals, entries]
+  properties:
+    storeId: {$ref: ./common.yaml#/Ulid}
+    storeName:
+      type: string
+      maxLength: 200
+    totals: {$ref: '#/StatementTotals'}
+    entries:
+      type: integer
+      minimum: 0
+      description: Ledger entries in the period.
+AdminPayoutBrief:
+  type: object
+  required: [id, status, amountPaise, holdReason, utr, carried]
+  properties:
+    carried:
+      type: boolean
+      description: >-
+        A later close recomputed (or cancelled) this payout, so this statement's amount went on into it.
+        status, amountPaise and utr are then the payout's live state, not this statement's.
+    id: {$ref: ./common.yaml#/Ulid}
+    status: {$ref: '#/PayoutStatus'}
+    amountPaise: {$ref: ./common.yaml#/Paise}
+    holdReason:
+      oneOf:
+        - $ref: '#/PayoutHoldCause'
+        - type: "null"
+    utr:
+      type: [string, 'null']
+      maxLength: 30
+AdminStatement:
+  type: object
+  required: [id, businessId, businessName, businessStatus, period, totals, kycStatus, openRiskFlag, closedAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    businessId: {$ref: ./common.yaml#/Ulid}
+    businessName:
+      type: string
+      maxLength: 200
+    businessStatus:
+      type: string
+      maxLength: 40
+    period: {$ref: '#/PayoutPeriod'}
+    totals: {$ref: '#/StatementTotals'}
+    kycStatus: {$ref: '#/PayoutKycStatus'}
+    openRiskFlag:
+      type: boolean
+    closedAt: {$ref: ./common.yaml#/Timestamp}
+    payout:
+      $ref: '#/AdminPayoutBrief'
+      description: The payout this close created or recomputed; absent when it made none.
+AdminStatementList:
+  type: object
+  required: [period, items, nextCursor, serverNow]
+  properties:
+    period: {$ref: '#/PayoutPeriod'}
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: '#/AdminStatement'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminStatementDetail:
+  type: object
+  required: [statement, stores, serverNow]
+  properties:
+    statement: {$ref: '#/AdminStatement'}
+    stores:
+      type: array
+      maxItems: 500
+      items: {$ref: '#/StatementStore'}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminPayout:
+  type: object
+  required: [id, businessId, businessName, amountPaise, status, holdReason, holdNote, statementId, period, exportedAt, computedAt, utr, paidAt, paidBy, createdAt, version]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    businessId: {$ref: ./common.yaml#/Ulid}
+    businessName:
+      type: string
+      maxLength: 200
+    amountPaise: {$ref: ./common.yaml#/Paise}
+    status: {$ref: '#/PayoutStatus'}
+    holdReason:
+      oneOf:
+        - $ref: '#/PayoutHoldCause'
+        - type: "null"
+    holdNote:
+      type: [string, 'null']
+      maxLength: 500
+    statementId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    period:
+      type: [string, 'null']
+      pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+    exportedAt:
+      type: [string, 'null']
+      format: date-time
+    computedAt: {$ref: ./common.yaml#/Timestamp}
+    utr:
+      type: [string, 'null']
+      maxLength: 30
+    paidAt:
+      type: [string, 'null']
+      format: date-time
+    paidBy:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    version:
+      type: integer
+      minimum: 1
+AdminPayoutList:
+  type: object
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: '#/AdminPayout'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminPayoutLine:
+  type: object
+  required: [storeId, storeName, amountPaise]
+  properties:
+    storeId: {$ref: ./common.yaml#/Ulid}
+    storeName:
+      type: string
+      maxLength: 200
+    amountPaise: {$ref: ./common.yaml#/Paise}
+AdminPayoutCauses:
+  type: object
+  required: [businessSuspended, kycVerified, payoutDetailsMissing, openRiskFlag]
+  description: >-
+    The automatic hold causes as they are now (01 §9). payoutDetailsMissing is a business with neither a
+    UPI id nor a bank account to pay to.
+  properties:
+    businessSuspended: {type: boolean}
+    kycVerified: {type: boolean}
+    payoutDetailsMissing: {type: boolean}
+    openRiskFlag: {type: boolean}
+AdminPayoutPayee:
+  type: object
+  required: [kycStatus, upiIdLast4, bankAccountLast4, ifsc]
+  description: The payee's details, masked to the last 4 characters (D-64, D-85).
+  properties:
+    kycStatus: {$ref: '#/PayoutKycStatus'}
+    upiIdLast4:
+      type: [string, 'null']
+      maxLength: 4
+    bankAccountLast4:
+      type: [string, 'null']
+      maxLength: 4
+    ifsc:
+      type: [string, 'null']
+      maxLength: 11
+AdminPayoutDetail:
+  type: object
+  required: [payout, lines, causes, serverNow]
+  properties:
+    payout: {$ref: '#/AdminPayout'}
+    lines:
+      type: array
+      maxItems: 500
+      items: {$ref: '#/AdminPayoutLine'}
+    causes: {$ref: '#/AdminPayoutCauses'}
+    payee:
+      $ref: '#/AdminPayoutPayee'
+      description: Present with admin.payout.bank_view.
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminPayoutNote:
+  type: object
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason:
+      type: string
+      minLength: 1
+      maxLength: 500
+AdminPayoutMarkPaid:
+  type: object
+  additionalProperties: false
+  required: [utr, amountPaise, reason]
+  properties:
+    amountPaise:
+      allOf: [{$ref: ./common.yaml#/Paise}]
+      description: The amount transferred, as shown when the payout was loaded; a payout recomputed since is refused with payout_amount_changed.
+    utr:
+      type: string
+      pattern: ^[A-Za-z0-9]{12,22}$
+      description: The bank or UPI reference of the transfer; stored upper-case, and one UTR pays one payout.
+    reason:
+      type: string
+      minLength: 1
+      maxLength: 500
+BusinessPayoutState:
+  type: object
+  required: [status, amountPaise, utr, paidAt]
+  description: >-
+    The business sees `processing` until finance marks the payout paid, `needs_kyc` while it is held for
+    incomplete KYC or payout details, and `paid` with the UTR after (01 §9). An earlier statement whose
+    payout a later close recomputed (D-09: one open payout per business) is `carried`: its amount went on
+    into the next statement's payout, which shows the live state.
+  properties:
+    status:
+      type: string
+      enum: [processing, needs_kyc, paid, carried]
+    amountPaise:
+      $ref: ./common.yaml#/Paise
+      description: What this statement's close computed when `carried`; else the payout's amount.
+    utr:
+      type: [string, 'null']
+      maxLength: 30
+    paidAt:
+      type: [string, 'null']
+      format: date-time
+BusinessStatement:
+  type: object
+  required: [period, totals, closedAt]
+  properties:
+    period: {$ref: '#/PayoutPeriod'}
+    totals: {$ref: '#/StatementTotals'}
+    closedAt: {$ref: ./common.yaml#/Timestamp}
+    payout:
+      $ref: '#/BusinessPayoutState'
+      description: Absent when the close made no payout (closing at or under 0).
+BusinessStatementList:
+  type: object
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: '#/BusinessStatement'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+BusinessStatementDetail:
+  type: object
+  required: [statement, stores, serverNow]
+  properties:
+    statement: {$ref: '#/BusinessStatement'}
+    stores:
+      type: array
+      maxItems: 500
+      items: {$ref: '#/StatementStore'}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+StatementFormat:
+  type: string
+  enum: [json, csv]

@@ -1,9 +1,206 @@
-# Schemas: domain "admin-credits" (owner W3-06): admin credit adjustments (04 §2.7).
+# Schemas: domain "admin-credits" (owner W3-01): the A-09 ledger browser, expiry
+# preview and credit adjustments with two-person approval (04 §2.7, D-05, D-73).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Names are unique across every schemas/<domain>.yaml. Request objects carry
+# `additionalProperties: false`. Money is `*Paise`: the ledger counts credits
+# (1 credit = ₹1 = 100 paise), so every amount here is a multiple of 100.
+AdminSignedPaise:
+  type: integer
+  description: A signed amount in integer paise (credits × 100); negative is a debit.
+  minimum: -214748364700
+  maximum: 214748364700
+  examples:
+    - -2500
+AdminLedgerAccountKind:
+  type: string
+  enum: [customer_wallet, customer_held, store_credit, platform_marketing, platform_expired, platform_adjustments, platform_payouts_cash]
+AdminLedgerTransactionKind:
+  type: string
+  enum: [spend_hold, spend_capture, spend_release, cashback, referral_reward, expiry, admin_adjustment, payout, reversal, forfeit_deletion]
+AdminLedgerAccount:
+  type: object
+  required: [id, kind, ownerType, ownerId, ownerName, balancePaise]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    kind: {$ref: '#/AdminLedgerAccountKind'}
+    ownerType:
+      type: string
+      enum: [customer, store, platform]
+    ownerId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    ownerName:
+      type: [string, 'null']
+      maxLength: 200
+    balancePaise: {$ref: '#/AdminSignedPaise'}
+AdminLedgerAccountList:
+  type: object
+  required: [items, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: '#/AdminLedgerAccount'}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminLedgerEntry:
+  type: object
+  required: [id, transactionId, kind, refType, refId, memo, amountPaise, createdBy, createdAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    transactionId: {$ref: ./common.yaml#/Ulid}
+    kind: {$ref: '#/AdminLedgerTransactionKind'}
+    refType:
+      type: [string, 'null']
+      maxLength: 31
+    refId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    memo:
+      type: [string, 'null']
+      maxLength: 500
+    amountPaise: {$ref: '#/AdminSignedPaise'}
+    createdBy:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+AdminLedgerEntryPage:
+  type: object
+  required: [account, items, nextCursor, serverNow]
+  properties:
+    account: {$ref: '#/AdminLedgerAccount'}
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: '#/AdminLedgerEntry'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminExpiryDay:
+  type: object
+  required: [day, expiringPaise, lots, customers]
+  properties:
+    day:
+      type: string
+      format: date
+      description: The IST calendar day the credits expire on.
+    expiringPaise: {$ref: ./common.yaml#/Paise}
+    lots:
+      type: integer
+      minimum: 0
+    customers:
+      type: integer
+      minimum: 0
+AdminExpiryPreview:
+  type: object
+  required: [from, to, totalPaise, days, serverNow]
+  properties:
+    from: {$ref: ./common.yaml#/Timestamp}
+    to: {$ref: ./common.yaml#/Timestamp}
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    days:
+      type: array
+      maxItems: 100
+      items: {$ref: '#/AdminExpiryDay'}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+CreditAdjustmentStatus:
+  type: string
+  enum: [pending, approved, rejected, cancelled]
+CreditAdjustmentRequest:
+  type: object
+  required: [id, customerId, customerName, amountPaise, reason, link, status, requestedBy, requestedByName, requestedAt, mine, approvedBy, approvedByName, decidedAt, decisionNote, transactionId]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    customerId: {$ref: ./common.yaml#/Ulid}
+    customerName:
+      type: [string, 'null']
+      maxLength: 200
+    amountPaise: {$ref: '#/AdminSignedPaise'}
+    reason:
+      type: string
+      maxLength: 500
+    link:
+      type: [string, 'null']
+      maxLength: 200
+    status: {$ref: '#/CreditAdjustmentStatus'}
+    requestedBy: {$ref: ./common.yaml#/Ulid}
+    requestedByName:
+      type: [string, 'null']
+      maxLength: 200
+    requestedAt: {$ref: ./common.yaml#/Timestamp}
+    mine:
+      type: boolean
+      description: The caller made this request, so they cannot approve it (D-05).
+    approvedBy:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+      description: Who decided it (approved or rejected); null while pending.
+    approvedByName:
+      type: [string, 'null']
+      maxLength: 200
+    decidedAt:
+      type: [string, 'null']
+      format: date-time
+    decisionNote:
+      type: [string, 'null']
+      maxLength: 500
+    transactionId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+CreditAdjustmentList:
+  type: object
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: '#/CreditAdjustmentRequest'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+CreditAdjustmentCreate:
+  type: object
+  additionalProperties: false
+  required: [accountId, amountPaise, reason]
+  properties:
+    accountId:
+      $ref: ./common.yaml#/Ulid
+      description: The customer's wallet account (A-09 account search).
+    amountPaise:
+      type: integer
+      description: Credits × 100, never 0; negative takes credits away.
+      minimum: -100000000
+      maximum: 100000000
+      multipleOf: 100
+    reason:
+      type: string
+      minLength: 1
+      maxLength: 500
+    link:
+      type: string
+      minLength: 1
+      maxLength: 200
+      description: A ticket or order reference, optional.
+CreditAdjustmentDecision:
+  type: object
+  additionalProperties: false
+  required: [note]
+  properties:
+    note:
+      type: string
+      minLength: 1
+      maxLength: 500
+CreditAdjustmentResult:
+  type: object
+  required: [outcome, transactionId, serverNow]
+  properties:
+    outcome:
+      type: string
+      enum: [posted, pending, approved, rejected, cancelled]
+      description: >-
+        `posted`: at or under the threshold, posted at once with no request row. `pending`: above it,
+        waiting for a second person. `approved`, `rejected`, `cancelled`: a decision on a request.
+    request:
+      $ref: '#/CreditAdjustmentRequest'
+      description: The request row; absent when the adjustment posted at once.
+    transactionId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    serverNow: {$ref: ./common.yaml#/ServerNow}
