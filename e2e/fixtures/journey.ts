@@ -61,6 +61,18 @@ export interface Order {
   code: string | null;
   holdUntil: string | null;
   itemsAfterOffersPaise: number;
+  deliveryFeePaise: number;
+}
+
+/** An order as the shop reads it: the customer's full phone only while out for delivery (BK-27). Never print it. */
+export interface StoreOrder extends Order {
+  customer: { name: string | null; phoneMasked: string | null; phone: string | null };
+}
+
+export interface Address {
+  addressId: string;
+  label: string;
+  isDefault: boolean;
 }
 
 export interface Item {
@@ -127,7 +139,7 @@ export class Shop {
   }
 
   order(id: string) {
-    return this.api.ok<Order>('shop reads the order', 'GET', `${this.base}/orders/${id}`);
+    return this.api.ok<StoreOrder>('shop reads the order', 'GET', `${this.base}/orders/${id}`);
   }
 
   accept(id: string, lines?: { orderItemId: string; quantity: number }[]) {
@@ -136,6 +148,10 @@ export class Shop {
 
   ready(id: string) {
     return this.api.ok<Order>('shop marks ready', 'POST', `${this.base}/orders/${id}/ready`);
+  }
+
+  dispatch(id: string) {
+    return this.api.ok<StoreOrder>('shop sends the order out', 'POST', `${this.base}/orders/${id}/dispatch`);
   }
 
   /** Enters the customer's code at the counter (read from the customer's order, never shown). */
@@ -175,6 +191,20 @@ export class Customer {
 
   order(id: string) {
     return this.api.ok<Order>('customer reads the order', 'GET', `/v1/me/orders/${id}`);
+  }
+
+  /** The saved address with this label, added at `at` when there is none yet (reruns reuse it). */
+  async savedAddress(label: string, at: { lat: number; lng: number }): Promise<Address> {
+    const list = await this.api.ok<{ addresses: Address[] }>('customer lists addresses', 'GET', '/v1/me/addresses');
+    const found = list.addresses.find((a) => a.label === label);
+    if (found) return found;
+    return this.api.ok<Address>('customer saves an address', 'POST', '/v1/me/addresses', {
+      label,
+      line1: '3, 12th Main Road',
+      pincode: '560038',
+      lat: at.lat,
+      lng: at.lng,
+    });
   }
 
   /** The pickup code, as the customer's order page shows it. Never print it. */

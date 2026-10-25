@@ -34,6 +34,7 @@ export const PEOPLE = {
   walkIn: { key: 'walkIn', national: '9000000043', app: 'customer' },
   partial: { key: 'partial', national: '9000000044', app: 'customer' },
   baskets: { key: 'baskets', national: '9000000045', app: 'customer' },
+  delivery: { key: 'delivery', national: '9000000046', app: 'customer' },
 } as const satisfies Record<string, Person>;
 
 export const ASHA_REFERRAL_CODE = 'ASHA22';

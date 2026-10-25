@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -28,9 +29,9 @@ const (
 	maxLimit     = 100
 )
 
-// withCode says whether a customer view may carry the pickup code: only the
-// owner's GET of their order (never an action's response, which the
-// idempotency layer may store).
+// withCode says whether a customer view may carry the pickup code and the
+// shop's phone (D-220): only the owner's GET of their order (never an action's
+// response, which the idempotency layer may store).
 type withCode bool
 
 // --- one order ------------------------------------------------------------------
@@ -119,6 +120,9 @@ func (s *Service) customerView(ctx context.Context, d detail, st ordersdb.OrderS
 			out.Code = &c
 		}
 	}
+	if bool(code) && slices.Contains(openStatuses, o.Status) {
+		out.Store.Phone = s.storePhone(ctx, st)
+	}
 	return out
 }
 
@@ -205,6 +209,22 @@ func (s *Service) deliveryPhone(ctx context.Context, status string, enc []byte) 
 	plain, err := s.phones.Open("phone", enc)
 	if err != nil {
 		telemetry.Logger(ctx).WarnContext(ctx, "orders: customer phone does not open")
+		return nil
+	}
+	p := string(plain)
+	return &p
+}
+
+// storePhone is the shop's own contact phone (stores.phone_enc, sealed by
+// business under "phone:<store id>"), or null when it has none or it will not
+// open. Never the owner's or a staff login phone (D-220). Never logged.
+func (s *Service) storePhone(ctx context.Context, st ordersdb.OrderStoreRow) *string {
+	if s.phones == nil || len(st.PhoneEnc) == 0 {
+		return nil
+	}
+	plain, err := s.phones.Open("phone:"+mustID(st.ID).String(), st.PhoneEnc)
+	if err != nil {
+		telemetry.Logger(ctx).WarnContext(ctx, "orders: store phone does not open")
 		return nil
 	}
 	p := string(plain)

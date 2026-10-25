@@ -110,7 +110,7 @@ SELECT * FROM orders WHERE id = @id;
 SELECT * FROM orders WHERE id = @id FOR UPDATE;
 
 -- name: OrderStore :one
-SELECT id, business_id, slug, name, address_line1, address_line2, locality, cashback_bp
+SELECT id, business_id, slug, name, address_line1, address_line2, locality, cashback_bp, phone_enc
 FROM stores WHERE id = @id;
 
 -- name: OrderLines :many
