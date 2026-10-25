@@ -1146,7 +1146,7 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
   - `offer_redemptions.order_id` and `offer_redemptions.pos_sale_id`;
   - `referrals.referrer_transaction_id` and `referrals.referee_transaction_id`, each with a new partial index. 03 §13 called these a single `reward_transaction_id`; it is corrected;
   - `notify_order_escalations.order_id` (W2-05). It was missing from 03 §13 and is added there.
-- **Still deferred.** `referrals.standee_id` and `referral_clicks.standee_id` wait for a `qr_standees` table, and `support_tickets.order_id` waits for W2-09. Whichever package creates the table adds the FK in its own migration, the way a later-wave target does (D-35).
+- **Still deferred.** `support_tickets.order_id` waits for W2-09. (`referrals.standee_id` and `referral_clicks.standee_id` waited for a `qr_standees` table; W3-09 adds both in `30901_w3-09_qr_standees.sql`, D-222.) Whichever package creates the table adds the FK in its own migration, the way a later-wave target does (D-35).
 - All the constraints are plain `NO ACTION`, like the earlier FKs. No code deletes a parent row: orders, sales, claims and ledger transactions are never deleted, and users are anonymised, not removed.
 
 ## SMS on AWS End User Messaging (2026-10-24)
@@ -1236,3 +1236,20 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
 ## POS sales list (W2-16, 2026-10-25)
 
 **D-221 · The store sales list keeps why an offline link failed (W2-16, 25 Oct).** B-05 sales history needs "Customer link failed" with a reason (D-12). `GET {S}/pos/sales` (`listPosSales`, action `pos.sales`, cashier and above, as 06 B-05 shows the history to every staff member) lists every sale of the store from all devices, newest first by the device's sale time, keyset-paginated like `/v1/me/purchases`. Each item carries its link status and, for a failed offline counter code, `link.failure`: `code_used` (the code's time step was used before), `code_wrong`, `clock_off` (the device clock was more than 2 min off at its last check, or the typed time is in the future), `too_late` (synced after `pos_offline_link_max_hours`), `locked` or `unverified`. Migration `21601_w2-16_pos_link_fail_reason.sql` adds `pos_sales.link_fail_reason` with a check that it is set only on a failed link; sales that failed before it keep NULL and show the failure without a reason. The enum is named `PosLinkFailure` because apigen keeps names ending in `Reason` for `schemas/common.yaml`. The list returns no phone and no receipt token; the customer is named only for `bill_qr` and `counter_code`, as on the sale itself. Reading the list needs the server; the device's own outbox (sync, retry, reverse) stays in the "Sales on this device" sheet. Test: `TestW216SalesListLinkFailures`, E2E-07's last step.
+
+## QR standee campaigns (W3-09, 2026-10-25)
+
+**D-222 · Standee rows, their counts and reorders (W3-09, 25 Oct).** B-10 shows the shop one row per printed standee, each with its own QR and a scans → sign-ups → qualified funnel (01 §8, SC-ST-03…04).
+- **Table.** Migration `30901_w3-09_qr_standees.sql` creates `qr_standees` (id, store_id, campaign, created_by, printed_at, reorder_requested_at, reorder_requested_by, created_at, updated_at, version). `campaign` is the shop's own label, 1–40 characters, trimmed. A standee still has no code of its own (D-26). The migration also adds the two FKs D-211 deferred: `referrals.standee_id` and `referral_clicks.standee_id`.
+- **A scan is a click.** A standee's QR is `GET /v1/public/ref/{store short code}?s=<standee id>` (D-162). A scan is the `referral_clicks` row that link records with `standee_id` set; the discover page's `?s=` records nothing (04 §2.2 is corrected). SC-ST-03: `?s=` counts only when the standee belongs to the store the code names. Another store's standee, or an unknown id, still lands on the store page, but unattributed: no `standee_id` and no `?s=` in the redirect.
+- **Counts are computed, not stored.** `scans_count` (03) is dropped. `scans` counts the standee's clicks. `signUps` counts its referrals that were not rejected (`rejected`, `rejected_same_device`). `qualified` counts those in `qualified` or `rewarded`. With no counter to keep in step, a reprint carries its counts on.
+- **API.** The domain is `standee` (`paths/standee.yaml`, next to W2-10's PDF), not a new `standee-campaigns` file. The routes, all manager and above (`standee.manage`):
+  - `GET {S}/standees` (`listStandees`): newest first, with per-standee counts, `totals` and `limit`.
+  - `POST {S}/standees` (`createStandee`, `{campaign}`, optional Idempotency-Key): audited `standee.create`; `409 standee_limit_reached` at the cap.
+  - `POST {S}/standees/{standeeId}/reorder` (`requestStandeeReorder`): sets `reorder_requested_at/_by`, audited `standee.reorder_requested`. A request already waiting is answered unchanged, with no second audit row.
+- **Cap.** At most 20 standees per store, checked under a store row lock. 01 has no number for this, so 20 is a guard against runaway rows, not a product rule: `TODO(lead)` to move it to `platform_settings` if shops need more.
+- **Still open.**
+  - Admin fulfilment of a reorder (who prints it, and what clears `reorder_requested_at`) is not built (`TODO(lead)`).
+  - W2-10's `GET {S}/qr-standee.pdf` takes no standee id, so the printed PDF carries the store link without `?s=` and its scans are not counted per standee. 04 already lists `?standeeId=`; the PDF route needs that parameter (W2-10 or the lead).
+  - Nothing writes `printed_at` yet.
+- Tests: `internal/business/standee` (create, list, counts, cap under concurrent creates, reorder idempotency and audit, store isolation), `referrals` "another store's standee is not a scan", and `TestStandeeJourney` (SC-ST-04: create → scan → claim → first order → counts). The business app's tests are in `src/standee/campaigns/campaigns.test.tsx`.

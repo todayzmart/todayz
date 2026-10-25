@@ -1,8 +1,23 @@
 package main
 
-import "github.com/go-chi/chi/v5"
+import (
+	"github.com/go-chi/chi/v5"
 
-// mountStandee mounts the standee domain's routes. Only the work package that builds
-// internal/standee edits this file (D-50): build the domain's service from d and
-// call its Register, e.g. standee.Register(r, standee.Deps{DB: d.DB, Clock: d.Clock}).
-func mountStandee(r chi.Router, d *deps) {}
+	"github.com/todayz/backend/internal/business/standee"
+	"github.com/todayz/backend/internal/platform/authz"
+)
+
+// mountStandee mounts W3-09's standee routes under
+// /v1/biz/businesses/{bid}/stores/{sid}/standees: the store's standees with
+// their scan → sign-up → qualified counts, a new standee and a reorder.
+func mountStandee(r chi.Router, d *deps) {
+	svc, err := standee.New(standee.Deps{Config: d.Config, DB: d.DB, Clock: d.Clock})
+	if err != nil {
+		panic("standee: " + err.Error())
+	}
+	var az authz.Authorizer
+	if d.Authz != nil {
+		az = d.Authz
+	}
+	standee.Register(r, svc, az)
+}

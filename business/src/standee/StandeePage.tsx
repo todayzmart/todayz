@@ -7,11 +7,12 @@ import { getStandeePdf } from '../credits/api';
 import { canSeeCredits } from '../credits/permissions';
 import { useShortCode } from '../credits/queries';
 import { useCurrentStore, type CurrentStore } from '../orders/store';
+import { Campaigns } from './campaigns/Campaigns';
 import styles from './standee.module.css';
 
 /**
  * QR standee (06 B-02 step and B-10 link, D-51). W2-10 owns the PDF and the preview; campaigns,
- * reorders and scan analytics are W3-09. Manager and above; the API is the real gate.
+ * reorders and scan analytics are W3-09 (`campaigns/`, `analytics/`). Manager and above; the API is the real gate.
  */
 export function StandeePage() {
   const intl = useIntl();
@@ -122,6 +123,7 @@ function Standee({ store }: { store: CurrentStore }) {
           <p className={styles.sub}>{intl.formatMessage({ id: 'standee.printTip' })}</p>
         </div>
       </section>
+      <Campaigns store={store} />
     </>
   );
 }

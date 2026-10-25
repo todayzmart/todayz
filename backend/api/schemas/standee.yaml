@@ -1,9 +1,88 @@
-# Schemas: domain "standee" (owner W3-04): standees (04 §2.6).
+# Schemas: domain "standee" (W2-10 owns the PDF, D-51, D-206; W3-09 the standee rows and
+# their counts, D-222): QR standees (01 §8, 04 §2.6; D-26, D-162).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# A standee has no code of its own (D-26): its QR is the store's short-code link with
+# `s=<standee id>`. Request objects carry `additionalProperties: false`. Ids are `Ulid`,
+# times are `Timestamp`.
+StandeeCampaign:
+  type: string
+  minLength: 1
+  maxLength: 40
+  pattern: ^\S(.{0,38}\S)?$
+  description: The shop's own label for where the standee stands or what it is for.
+  examples:
+    - Billing counter
+StandeeCounts:
+  type: object
+  description: >-
+    The funnel of a standee's QR (D-222). `scans` are opens of its link; `signUps` are the
+    customer referrals those scans brought, except the rejected ones; `qualified` are the
+    sign-ups whose first qualifying purchase is done (qualified or rewarded).
+  required: [scans, signUps, qualified]
+  properties:
+    scans:
+      type: integer
+      minimum: 0
+    signUps:
+      type: integer
+      minimum: 0
+    qualified:
+      type: integer
+      minimum: 0
+Standee:
+  type: object
+  required: [id, storeId, campaign, link, counts, lastScanAt, printedAt, reorderRequestedAt, createdAt, version]
+  properties:
+    id:
+      $ref: ./common.yaml#/Ulid
+    storeId:
+      $ref: ./common.yaml#/Ulid
+    campaign:
+      $ref: '#/StandeeCampaign'
+    link:
+      type: string
+      format: uri
+      maxLength: 200
+      description: The URL the QR carries (`GET /v1/public/ref/{shortCode}?s={id}`, D-162).
+    counts:
+      $ref: '#/StandeeCounts'
+    lastScanAt:
+      oneOf:
+        - $ref: ./common.yaml#/Timestamp
+        - type: 'null'
+    printedAt:
+      oneOf:
+        - $ref: ./common.yaml#/Timestamp
+        - type: 'null'
+    reorderRequestedAt:
+      description: When a new printed standee was asked for; null when none is pending.
+      oneOf:
+        - $ref: ./common.yaml#/Timestamp
+        - type: 'null'
+    createdAt:
+      $ref: ./common.yaml#/Timestamp
+    version:
+      type: integer
+      minimum: 1
+StandeeList:
+  type: object
+  required: [items, totals, limit]
+  properties:
+    items:
+      type: array
+      description: Newest first.
+      items:
+        $ref: '#/Standee'
+    totals:
+      $ref: '#/StandeeCounts'
+    limit:
+      type: integer
+      minimum: 1
+      description: How many standees the store can have.
+StandeeCreate:
+  type: object
+  additionalProperties: false
+  required: [campaign]
+  properties:
+    campaign:
+      $ref: '#/StandeeCampaign'

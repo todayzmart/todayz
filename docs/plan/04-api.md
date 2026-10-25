@@ -173,7 +173,7 @@ How it works (W0-03, `platform/idempotency`):
 | GET | /v1/discover/summary?lat=&lng=&radius= | W1-06 | `{storesNearby, openNow, productsInRadius, pins:[{storeSlug, lat, lng, open, categoryTint}] or clusters}`: the StoreMap card. `productsInRadius` is the number of in-stock listings across live stores within the radius (not distinct catalogue products) |
 | GET | /v1/discover/categories | W1-05 | tree with tints and icons |
 | GET | /v1/discover/stores?lat=&lng=&radius=&category=&openNow=&delivery=&hasOffer= | W1-06 | shop list with distance, rating, cashbackPct, delivery flag, open state, `bookable` (false = "In-store only", D-41) |
-| GET | /v1/discover/stores/{slug} | W1-06 | shop page (hours, rating, offers, cashback, delivery terms); `?s={standeeId}` records a standee scan (D-26) |
+| GET | /v1/discover/stores/{slug} | W1-06 | shop page (hours, rating, offers, cashback, delivery terms); a standee scan is recorded by `/v1/public/ref/{code}?s=` before the redirect here, not by this route (D-162, D-222) |
 | GET | /v1/discover/stores/{slug}/items?q=&category=&cursor= | W1-06 | shop catalogue with stock + freshness (`confirmedAt`, D-101) |
 | GET | /v1/discover/stores/{slug}/reviews | W2-06 | |
 | GET | /v1/discover/search?q=&lat=&lng=&radius=&category=&openNow=&delivery=&pickup=&brand=&maxPricePaise=&hasOffer=&sort=&parse= | W1-06 | results grouped by store; filters first (in stock, `live`, in radius), then the D-42 score; `sort=relevance` (default) `|nearest|cheapest`; `hasOffer` is the C-05 chip; logs to `search_log`. D-101 adds: `summary {storesChecked, storesWithIt, minPricePaise}` (absent when `storesWithIt` is 0); per result `confirmedAt` (from `stock_updated_at`, null when stale), `badge` (`lowest_price|closest`, at most one, on the first page only) and `deliveryFeePaise`; `parse=true` (default) runs the refine-chip parser on `q` and returns `chips [{kind: maxPrice|openNow|pickup|delivery|offers|nearest|brand, value, text}]` (applied as filters; `offers` sets `hasOffer`) and `query` (the rest of the text); removing a chip re-runs with the remaining chips as parameters and `parse=false`. `refineHint: true` when the synonym table had no match or the parser found no chip in a query of at least `refine_ai_min_words` words; the app may then call `POST /v1/me/ai/search-assist` (§2.8) after the results render. Search itself never calls a model (01 §11.1) |
@@ -354,7 +354,9 @@ Priced above nearby is returned only while `insight_price_compare_enabled` is tr
 | GET | {B}/statements/{period} | manager | W3-01 | detail; `Accept: text/csv` for CSV |
 | GET | {B}/referrals | manager | W2-03 | business referral code (shop-to-shop), stats (D-26) |
 | GET | {S}/qr-standee.pdf?standeeId= | manager | W2-10 | printable A5 standee; URL carries the store short code and `?s={standeeId}` (D-26, D-52) |
-| GET/POST | {S}/standees | manager | W3-09 | standee rows (no code of their own) with scan and sign-up counts (D-51) |
+| GET | {S}/standees | manager | W3-09 | `listStandees`: standee rows (no code of their own), newest first, each with its link and `counts {scans, signUps, qualified}`, plus `totals` and `limit` (D-51, D-222) |
+| POST | {S}/standees | manager | W3-09 | `createStandee`, idempotent; `{campaign}` (1–40 chars); audited; `409 standee_limit_reached` at the cap (D-222) |
+| POST | {S}/standees/{standeeId}/reorder | manager | W3-09 | `requestStandeeReorder`, idempotent; asks for a reprint (`reorderRequestedAt`); a request already waiting is answered unchanged; audited (D-222) |
 
 ### 2.7 Admin (`/v1/admin`, `admin-*.yaml`)
 
