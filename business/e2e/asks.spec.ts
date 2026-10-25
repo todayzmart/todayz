@@ -107,7 +107,9 @@ test('desktop: the inbox, a Yes at the shop price, then Done (B-20)', async ({ p
   await page.goto('/orders?tab=asks');
   const tab = page.getByRole('tablist', { name: 'Order status' }).getByRole('tab', { name: /Asks/ });
   await expect(tab).toHaveAttribute('aria-selected', 'true');
-  await expect(page.getByText('2 wanted · Need it today · 1–3 km')).toBeVisible();
+  // Scoped to the open card: the missed Toor dal ask has the same facts and, at some IST hours,
+  // sits under "Done today" too.
+  await expect(page.getByRole('article', { name: 'Amul Butter 100 g' }).getByText('2 wanted · Need it today · 1–3 km')).toBeVisible();
   await expect(page.getByTestId('ask-countdown').first()).toHaveText(/\d{2}:\d{2}/);
   // No customer name, phone or exact distance anywhere on the card.
   await expect(page.getByRole('article', { name: 'Amul Butter 100 g' })).not.toContainText(/\+91|Meera| m\b/);

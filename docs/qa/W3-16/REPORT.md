@@ -87,7 +87,7 @@ Branch `claude/w3-16-asks-457dd8`, from merge base `1465e58`. Scenarios: [e2e/sc
 | Business | vitest | 468/468 (50 files) |
 | Admin | typecheck, vitest | pass, 220/220 (25 files) |
 | i18n | vitest; `lint:messages` | 198/198; customer 0 errors |
-| Playwright (fake API) | `customer/e2e/asks.shots.spec.ts` (7), `business/e2e/asks.spec.ts` (2, run before the review; no business change since), `admin/e2e/demand.spec.ts` and `roles.spec.ts` (10) | pass |
+| Playwright (fake API) | `customer/e2e/asks.shots.spec.ts` (7), `business/e2e/asks.spec.ts` (2; one assertion now scoped to the open card, since the missed fixture has the same facts line and shows under "Done today" at some IST hours), `admin/e2e/demand.spec.ts` and `roles.spec.ts` (10) | pass |
 
 I did not run the full `make check` or `make e2e`; the lead runs those after merge.
 
