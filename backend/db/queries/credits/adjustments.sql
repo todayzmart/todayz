@@ -10,7 +10,7 @@
 -- (store id), or the account with that id.
 -- name: AccountsByOwner :many
 SELECT a.id, a.kind, a.owner_type, a.owner_id, b.balance,
-  coalesce(u.name, s.name)::text AS owner_name
+  coalesce(u.name, s.name, '')::text AS owner_name
 FROM ledger_accounts a
 JOIN account_balances b ON b.account_id = a.id
 LEFT JOIN users u ON a.owner_type = 'customer' AND u.id = a.owner_id
