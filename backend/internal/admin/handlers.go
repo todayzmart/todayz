@@ -6,11 +6,15 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	auditapi "github.com/todayz/backend/gen/api/admin-audit"
+	bannersapi "github.com/todayz/backend/gen/api/admin-banners"
 	bizapi "github.com/todayz/backend/gen/api/admin-businesses"
+	catalogueapi "github.com/todayz/backend/gen/api/admin-catalogue"
 	customersapi "github.com/todayz/backend/gen/api/admin-customers"
 	leadsapi "github.com/todayz/backend/gen/api/admin-leads"
+	notifyapi "github.com/todayz/backend/gen/api/admin-notifications"
 	settingsapi "github.com/todayz/backend/gen/api/admin-settings"
 	storesapi "github.com/todayz/backend/gen/api/admin-stores"
+	usersapi "github.com/todayz/backend/gen/api/admin-users"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/authz/policy"
 	"github.com/todayz/backend/internal/platform/ids"
@@ -44,7 +48,8 @@ var SettingsOps = map[string]string{
 }
 
 // Register mounts the admin-customers, admin-businesses, admin-stores,
-// admin-leads, admin-settings and admin-audit routes behind slot 15.
+// admin-leads, admin-catalogue, admin-banners, admin-settings, admin-users,
+// admin-notifications and admin-audit routes behind slot 15.
 func Register(r chi.Router, s *Service, az authz.Authorizer) {
 	customersapi.Register(r, customerHandlers{s},
 		customersapi.StrictMiddlewareFunc(authz.Strict[customersapi.StrictHandlerFunc](az, CustomerOps)))
@@ -54,8 +59,16 @@ func Register(r chi.Router, s *Service, az authz.Authorizer) {
 		storesapi.StrictMiddlewareFunc(authz.Strict[storesapi.StrictHandlerFunc](az, StoreOps)))
 	leadsapi.Register(r, leadHandlers{s},
 		leadsapi.StrictMiddlewareFunc(authz.Strict[leadsapi.StrictHandlerFunc](az, LeadOps)))
+	catalogueapi.Register(r.With(bodyKeys), catalogueHandlers{s},
+		catalogueapi.StrictMiddlewareFunc(authz.Strict[catalogueapi.StrictHandlerFunc](az, CatalogueOps)))
+	bannersapi.Register(r, bannerHandlers{s},
+		bannersapi.StrictMiddlewareFunc(authz.Strict[bannersapi.StrictHandlerFunc](az, BannerOps)))
 	settingsapi.Register(r, settingHandlers{s},
 		settingsapi.StrictMiddlewareFunc(authz.Strict[settingsapi.StrictHandlerFunc](az, SettingsOps)))
+	usersapi.Register(r, userHandlers{s},
+		usersapi.StrictMiddlewareFunc(authz.Strict[usersapi.StrictHandlerFunc](az, UserOps)))
+	notifyapi.Register(r, notifyHandlers{s},
+		notifyapi.StrictMiddlewareFunc(authz.Strict[notifyapi.StrictHandlerFunc](az, NotifyOps)))
 	auditapi.Register(r, auditHandlers{s},
 		auditapi.StrictMiddlewareFunc(authz.Strict[auditapi.StrictHandlerFunc](az, AuditOps)))
 }

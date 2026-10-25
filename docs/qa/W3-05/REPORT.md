@@ -22,6 +22,18 @@ This report covers the admin console work package so far. It lists the backend a
 | db0cf55 | Screens A-03 (queues by status, verify, ask for info, reject, suspend, reinstate, KYC review and one-field reveal, documents) with the Leads tab, and A-05 (filters, review queue, pin and hours, force-close, reopen, strike reset) |
 | 9894128 | AD-02 role-matrix Playwright; the admin smoke fixed for the role-aware nav; shell fixes (below) |
 | 31f372b | Playwright journeys for A-03 verify, A-05 force-close and A-12 hide and restore |
+| ea7d5f0, 869fc6b | A-08 catalogue: API and screen. Products (filters in the URL, add, edit only the changed fields with a reason, retire), the review queue oldest first with duplicate suggestions (approve, merge into, reject), categories (two levels) and search words. The queue answers `assistEnabled` so the `<AssistSlot/>` for W3-13 mounts without the catalogue role reading settings |
+| 1609f3e, 05f65bb | A-20 banners: API and screen. Review, live and taken-down tabs with a store filter in the URL; clear a held banner with an optional note, take one down with a required reason; support and up |
+| 1c5517c | A-17 on a phone: below 720px each setting stacks (key and description, then value, range and last change as label and value lines, then the button) |
+| e9d3cb4, c698eb7 | A-18 admin users: API and screen. Active and Disabled tabs, invite by phone with roles, change roles, disable, enable, reset the authenticator; super_admin only, step-up, a reason, the version read, the audit panel. No self-change, and no change that leaves no active super_admin |
+| e12fb27, 3cc4b46, 3b0cc8b | Cherry-picked from W3-07 (the lead's call): the Pulse contract and the `admin.pulse.view` policy, so A-02 builds against them |
+| a97da6b | A-02 Pulse: range (today, 7, 30, 90 days) in the URL, two KPI strips with the change on the period before, trend chart with a metric switch, funnel, where orders leak (with a reason filter), retention with a cohort heat table, searches that found nothing, credits, stores needing attention (a link only for roles that can open stores), and stores by city |
+| 4fbf2fa | AD-01 as a Go test over the registered policy tables (`authz/policy/roles_test.go`) |
+| a966b8a | Re-review hardening: the phone check in reasons drops every non-digit (digits in any script count) and refuses a run of ten starting 6-9; unblock has the same guard as block (an admin account or one with no customer profile is 409); `LockCustomer` locks only the user row and the admin and customer flags are read after the lock |
+| 046b55c, 30e0781 | Main merged in (W3-01 payouts and admin money); admin copy names no product, for the i18n sentence-case test |
+| 84ee55d | A-18 invite goes through `identity.Accounts.FindOrCreateByPhone` (the same normalisation, hash, seal and per-number lock as OTP sign-in) instead of admin-written identity rows; the invite is audited with the phone masked; a disabled admin's token stops on the next request |
+| ba6fb02 | A-16 notifications, read-only (D-224): API, screen, journey. Details below |
+| 43685a3, (this commit) | Main (92d9055) merged in, keeping the lead's AD-02 reads and the expiry-preview fake. The audit subjects `payout`, `payout_period` and `credit_adjustment` added for W3-01, plus labels for its ten actions. Details below |
 
 ## Evidence
 
@@ -70,20 +82,30 @@ scripts/no-egress.sh pnpm --filter @todayz/e2e-journeys run journeys specs/12-e2
 - **No secrets in the output:** a grep of the run log and the reset log for the test phone prefix and `+91` found 0 matches.
 - **Stack:** `make stop` ran afterwards (rc 0; data volumes are kept).
 
+#### Area checks (on 4fbf2fa)
+
+- **Admin:** 159 unit tests pass, plus tsc and eslint. The admin message lint has 0 errors (5 warnings, the same as before).
+- **Admin Playwright (no API, the calls are faked):** 22 pass (smoke, AD-02 roles, area journeys). AD-02 now covers the A-08, A-20, A-18 and Pulse reads; new journeys cover A-08, A-20, A-18, A-17 at 375px and A-02.
+- **AD-01:** `TestAdminRoleMatrix` passes and checks these rules:
+  - catalogue reviews the queue and is denied every order, credit, payout, settings and risk action;
+  - analyst reads Pulse and is denied every admin action that is not a read;
+  - Pulse is open to every role except field_agent;
+  - KYC verify is admin and super_admin only;
+  - money settings are super_admin only, with step-up;
+  - any `admin.field.*` action is own-only for a field agent.
+
+  Payouts, credit adjust, risk and field stats have no actions registered yet. The test matches them by prefix, so they are checked from the day they land. The 403 on each route comes from the handler's `authz.Authorize` call, which the admin HTTP tests exercise.
+- **Backend:** `go test ./internal/platform/authz/...` passes, and so do the admin and banners packages.
+- **Screenshots** (git-ignored, in `admin/test-results/screenshots/`): `admin-a02-pulse.png`, plus the A-08, A-20, A-18 and A-17-phone shots.
+
 ### E2E-12: not run yet
 
 Both forms (API and A-17 UI) are written and they typecheck. The journey needs referee credits from E2E-02 and E2E-06 (specs 01- and 03-), so it has to run inside the full journey suite, not on its own. The A-17 screenshot (`a17-settings-1280.png`) is written to `$TZ_QA_DIR` on that run.
 
-## Still to build in W3-05
+## Left for later
 
-- **Screens:**
-  - A-02 Pulse: waits on the W3-07 Pulse API (`getAdminPulse`, `getAdminPulseMap`, `admin.pulse.view`), which is on the unmerged branch `claude/w3-07-rollups-15028a`;
-  - A-08 catalogue, with the `<AssistSlot/>`;
-  - A-16 notifications;
-  - A-18 admin users;
-  - A-20 banner moderation.
-- **Tests:** AD-01 as a Go integration test (every admin route against every role); Playwright for the screens above.
-- **Parts of the built screens left out:** document view links; the A-03 notes, credit and orders sections; the A-05 map and the stale and category filters; telling the owner when a store is sent back (the business app does not show the note yet).
+- **A-02 map (follow-up, the lead's call):** the page keeps the stores-by-city table and a count of demand areas; no h3-js or maplibre in admin. The map comes later as a map layer in `shared/ui`, reusing the customer app's tile setup.
+- **Parts of the built screens left out:** document view links; the A-03 notes, credit and orders sections; the A-05 map and the stale and category filters; telling the owner when a store is sent back (the business app does not show the note yet); A-08 bulk edit and import, and telling stores about a merge (nothing creates `pending_review` products yet).
 
 ## Notes and choices for the lead
 
@@ -94,7 +116,7 @@ Both forms (API and A-17 UI) are written and they typecheck. The journey needs r
 2. **Blocks:**
    - a block is global, not per shop;
    - blocking an admin, or an account with no customer profile, is refused with 409;
-   - unblock stays open for any account, so one blocked before the fix can be recovered;
+   - unblock has the same guard as block since a966b8a (an admin account, or one with no customer profile, is 409);
    - phone-shaped text in any admin reason or note is refused (422), not redacted.
 3. **Customer phone search:** since f3ef175 it is `POST /v1/admin/customer-search` with the phone in the JSON body, so it is in no URL, UI or API. The path is not `/customers/search` because apigen refuses a literal segment beside `{customerId}`.
 4. **Where code lives:** admin order reads are in the orders package, not in `internal/admin`.
@@ -131,3 +153,50 @@ Both forms (API and A-17 UI) are written and they typecheck. The journey needs r
 16. **Follow-ups for the lead:**
     - In-text links (store and business names) show the browser's default blue across admin. This needs a global link style in `shared/ui`.
     - The reviews table clips its last column ("Open reports") at 1280px.
+    - Banners (W2-07): `RemoveBanner` has no status guard, and the take-down audit row does not carry the reason.
+    - An A-18 invite creates the phone identity with `verified_at` set to the invite time.
+    - The last-super-admin guard is a backstop; the advisory lock serialises changes.
+    - DataTable shows sort arrows on lists that are paginated on the server.
+    - During a redirect, the shell can briefly mount the previous route's page. Pulse guards its queries with `enabled`; a general fix in the shell is a follow-up, because deciding from route matches looped in tests.
+
+## A-16 notifications (D-224)
+
+Read-only for v1, as the lead agreed.
+
+- **API** (`admin-notifications`, header owner now W3-05):
+  - `GET /v1/admin/notification-templates?app=` lists every kind × language, with variants, the `fallback` mark, params, channels and the SMS template names with `smsTemplateIdSet` only.
+  - `GET /v1/admin/integrations` gives the channel switch, `senderBuilt`, env var names as set/missing, and the last failed delivery.
+  - Both reads need `admin.notify.view` (admin, super_admin).
+  - `POST .../test-send` needs `admin.notify.manage` and is audited `notification.test_send`.
+  - There is no PATCH.
+- **Test send, conservative reading:**
+  - Only customer-app kinds can be tested.
+  - The notification goes to the caller's own customer inbox, with the params left as `{name}` placeholders.
+  - `Outside` is empty, so nothing goes by SMS, WhatsApp or push.
+  - A business kind answers 422: it goes to a store's inbox, not a person's.
+  - Push was in the lead's wording ("in-app/push"). It is left out: the push sender is not built yet, and leaving it out keeps the test to the inbox only.
+- **Screen** (`admin/src/notifications/`): channel cards, a Segmented app filter, the kinds table, and a card for the chosen kind. Language tabs, kind and app are in the URL. Texts show `{param}` as chips. Test send has a toast, and the audit panel is shown.
+- **Files outside the owned paths:**
+  - `backend/internal/notify/templates.go` and its test: one read-only `Templates()` accessor that returns deep copies. Nothing else in notify changed.
+  - Migration `30504_w3-05_failed_deliveries_index.sql`: a partial index on notify's `notification_deliveries` for the last-failure read.
+  - `backend/cmd/todayz/routes_admin.go`: wires the catalogue, the integrations list (from `config`, `awssms.Missing`) and the notify sender.
+- **Checks:**
+  - Go: `go build`, `go vet` and golangci-lint (0 issues) on `cmd/todayz`, `internal/admin` and `internal/notify`. Shared-PG tests for those, plus identity, authz and migrate. `TestAdminNotificationsHTTP` covers the list, the filter, integrations with a failed delivery, the in-app-only test send with its audit row, the 422s, and support getting 403. `make check-contract-lint` passes.
+  - Admin: typecheck, lint and 179 unit tests (6 new in `notifications.test.tsx`), `build:e2e`, and the full fake-API Playwright suite (23).
+  - i18n: `pnpm --filter @todayz/i18n test` (198) and `lint:messages` (0 errors).
+- **Screenshot:** `admin-a16-notifications.png`, from the A-16 journey in `e2e/areas.spec.ts`.
+- **AD-02 fix along the way:** `e2e/roles.spec.ts` READS had no entries for W3-01's A-09 and A-11 reads, so 4 role tests refused `/v1/admin/credits` and `/v1/admin/payouts` after the main merge. They now allow finance, admin and super_admin, as the policy does. The fake API also answers A-09's expiry preview with an empty summary, not a list (the page threw "paise must be an integer").
+
+## W3-01 audit subjects
+
+- `AdminAuditSubjectType` now has `payout`, `payout_period` and `credit_adjustment`. W3-01's TODO listed `payout_period` as well, for the payout file export, so it is added too.
+- The subject panel needs `admin.payout.view` for `payout` and `payout_period`, and `admin.ledger.view` for `credit_adjustment`. Those are the views of the screens they belong to: finance, admin and super_admin.
+- A-19 names the ten W3-01 actions: the wallet adjustment request, approve, reject, cancel and direct adjust; payout hold, release, mark paid and export; and the statement close. The subject filter picks the three new subjects up from the enum.
+- The A-09 and A-11 screens do not mount `<AuditPanel>` yet. Those are W3-01's files, so they are not changed here.
+- **Checks:** `TestEverySubjectTypeHasAViewOrIsRefused`, and `TestAdminCustomersHTTP` (support gets 403 on the three subjects, finance gets 200); golangci-lint (0 issues); contract lint; admin typecheck, lint and vitest (181); Playwright (23); i18n test (198) and `lint:messages` (admin 0 errors).
+
+## Open questions
+
+1. **D-224:** templates stay code-owned until DLT re-registration has a process. Who owns re-registration, and how does a new template id reach `SMS_NOTICE_TEMPLATE_IDS`? Editing in A-16 waits for that answer.
+2. **W2-06 (reviews):** `cleanModReason` in `internal/reviews/admin.go` writes moderation reasons to the audit log without the admin phone check (`noPhone`). That file is W2-06's, so it is not changed here.
+3. **A-09 and A-11 audit panels:** the money screens could show `<AuditPanel type="payout" | "credit_adjustment">` now that the subjects exist. That is W3-01's (or the lead's) call.

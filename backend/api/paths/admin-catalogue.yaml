@@ -1,12 +1,416 @@
-# Paths: domain "admin-catalogue" (owner W3-08): admin catalogue (04 §2.7).
+# Paths: domain "admin-catalogue" (owner W3-05): A-08 master catalogue (04 §2.7, D-64).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-catalogue]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-catalogue.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# `catalogue` reads products and works the review queue (approve, merge into, reject);
+# `admin` and `super_admin` also create and edit products, categories and synonyms. Every
+# change is audited. Roles per operation are in internal/platform/authz/policy/admin.go.
+/v1/admin/products:
+  get:
+    operationId: listAdminProducts
+    tags: [admin-catalogue]
+    summary: Master products, newest first
+    description: >-
+      `q` matches the name, variant or brand (a barcode of 8 to 14 digits matches exactly); `status`
+      narrows to one status (default every status); `categoryId` to one category.
+    parameters:
+      - name: q
+        in: query
+        schema: {type: string, minLength: 1, maxLength: 80}
+      - name: status
+        in: query
+        schema:
+          $ref: ../schemas/admin-catalogue.yaml#/AdminProductStatus
+      - name: categoryId
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Ulid
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Products
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminProductList
+            example:
+              items:
+                - &product
+                  id: 01JB0SPR1A2B3C4D5E6F7G8H9J
+                  name: Toor Dal
+                  brandName: Tata Sampann
+                  categoryId: 01JB0SCA1A2B3C4D5E6F7G8H9J
+                  categoryName: Staples
+                  variant: Unpolished
+                  packSize: 1
+                  unit: kg
+                  mrpPaise: 18900
+                  barcodes: ["8901725181234"]
+                  status: active
+                  mergedInto: null
+                  storeCount: 14
+                  createdAt: "2026-10-01T09:00:00Z"
+                  updatedAt: "2026-10-20T09:00:00Z"
+              nextCursor: null
+              serverNow: "2026-10-25T11:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: createAdminProduct
+    tags: [admin-catalogue]
+    summary: Add a master product (audited)
+    description: The product is `active` at once. A barcode another product already has is `409 conflict`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-catalogue.yaml#/AdminProductCreate
+          example:
+            name: Toor Dal
+            categoryId: 01JB0SCA1A2B3C4D5E6F7G8H9J
+            variant: Unpolished
+            packSize: 1
+            unit: kg
+            mrpPaise: 18900
+            barcodes: ["8901725181234"]
+    responses:
+      "201":
+        description: The new product
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminProduct
+            example: *product
+      default: *problem
+/v1/admin/products/{productId}:
+  parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getAdminProduct
+    tags: [admin-catalogue]
+    summary: One master product
+    responses:
+      "200":
+        description: The product
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminProduct
+            example: *product
+      default: *problem
+  patch:
+    operationId: updateAdminProduct
+    tags: [admin-catalogue]
+    summary: Edit a master product (audited)
+    description: >-
+      With a reason. A merged product is `409 invalid_transition`; a `pending_review` product is decided
+      in the review queue, so a status change on one is `409 invalid_transition` too. A barcode another
+      product already has is `409 conflict`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-catalogue.yaml#/AdminProductUpdate
+          example:
+            reason: The pack on the shelf says 1 kg
+            packSize: 1
+            unit: kg
+    responses:
+      "200":
+        description: The product after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminProduct
+            example: *product
+      default: *problem
+/v1/admin/pending-products:
+  get:
+    operationId: listAdminPendingProducts
+    tags: [admin-catalogue]
+    summary: The review queue, oldest first, with duplicate suggestions
+    parameters:
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Products waiting for review
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminPendingProductList
+            example:
+              items:
+                - product: &pending
+                    id: 01JB0SPP1A2B3C4D5E6F7G8H9J
+                    name: Toor dal unpolished
+                    brandName: null
+                    categoryId: 01JB0SCA1A2B3C4D5E6F7G8H9J
+                    categoryName: Staples
+                    variant: null
+                    packSize: 1
+                    unit: kg
+                    mrpPaise: null
+                    barcodes: []
+                    status: pending_review
+                    mergedInto: null
+                    storeCount: 0
+                    createdAt: "2026-10-24T09:00:00Z"
+                    updatedAt: "2026-10-24T09:00:00Z"
+                  createdByStoreId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  createdByStoreName: Annapurna Kirana
+                  suggestions:
+                    - product: *product
+                      similarity: 0.62
+              assistEnabled: false
+              nextCursor: null
+              serverNow: "2026-10-25T11:00:00Z"
+      default: *problem
+/v1/admin/pending-products/{pendingId}/approve:
+  parameters: &pendingParam
+    - name: pendingId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: approveAdminPendingProduct
+    tags: [admin-catalogue]
+    summary: Approve a pending product into the catalogue (audited)
+    description: From `pending_review` to `active`; any other status is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-catalogue.yaml#/AdminPendingApprove
+          example: {}
+    responses:
+      "200":
+        description: The product after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminProduct
+            example: *product
+      default: *problem
+/v1/admin/pending-products/{pendingId}/merge:
+  parameters: *pendingParam
+  post:
+    operationId: mergeAdminPendingProduct
+    tags: [admin-catalogue]
+    summary: Merge a pending product into an active one (audited)
+    description: >-
+      The pending product becomes `merged` and points at `intoProductId`, which must be `active`
+      (else `422` on `body.intoProductId`); its synonyms move with it. A pending product that a store
+      already lists is `409 invalid_transition`. Any status but `pending_review` is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-catalogue.yaml#/AdminPendingMerge
+          example:
+            intoProductId: 01JB0SPR1A2B3C4D5E6F7G8H9J
+    responses:
+      "200":
+        description: The pending product after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminProduct
+            example:
+              <<: *pending
+              status: merged
+              mergedInto: 01JB0SPR1A2B3C4D5E6F7G8H9J
+      default: *problem
+/v1/admin/pending-products/{pendingId}/reject:
+  parameters: *pendingParam
+  post:
+    operationId: rejectAdminPendingProduct
+    tags: [admin-catalogue]
+    summary: Reject a pending product (audited)
+    description: From `pending_review` to `retired`, with a reason; any other status is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-catalogue.yaml#/AdminPendingReject
+          example:
+            reason: Not a product we list (a service)
+    responses:
+      "200":
+        description: The product after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminProduct
+            example:
+              <<: *pending
+              status: retired
+      default: *problem
+/v1/admin/categories:
+  get:
+    operationId: listAdminCategories
+    tags: [admin-catalogue]
+    summary: Every category with its names per language
+    responses:
+      "200":
+        description: Categories
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminCategoryList
+            example:
+              items:
+                - &category
+                  id: 01JB0SCA1A2B3C4D5E6F7G8H9J
+                  parentId: null
+                  slug: staples
+                  names: {en: Staples, hi: राशन}
+                  tint: amber
+                  icon: wheat
+                  sort: 10
+                  productCount: 240
+                  updatedAt: "2026-10-01T09:00:00Z"
+      default: *problem
+  post:
+    operationId: createAdminCategory
+    tags: [admin-catalogue]
+    summary: Add a category (audited)
+    description: A slug in use is `409 conflict`; a parent that is itself a child is `422` on `body.parentId`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-catalogue.yaml#/AdminCategoryCreate
+          example:
+            slug: staples
+            names: {en: Staples, hi: राशन}
+            tint: amber
+            icon: wheat
+            sort: 10
+    responses:
+      "201":
+        description: The new category
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminCategory
+            example: *category
+      default: *problem
+/v1/admin/categories/{categoryId}:
+  parameters:
+    - name: categoryId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  patch:
+    operationId: updateAdminCategory
+    tags: [admin-catalogue]
+    summary: Rename, recolour or reorder a category (audited)
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-catalogue.yaml#/AdminCategoryUpdate
+          example:
+            reason: Hindi name reviewed
+            names: {en: Staples, hi: राशन}
+    responses:
+      "200":
+        description: The category after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminCategory
+            example: *category
+      default: *problem
+/v1/admin/synonyms:
+  get:
+    operationId: listAdminSynonyms
+    tags: [admin-catalogue]
+    summary: Search synonyms, by term
+    description: "`q` is a prefix of the term or the synonym."
+    parameters:
+      - name: q
+        in: query
+        schema: {type: string, minLength: 1, maxLength: 80}
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Synonyms
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminSynonymList
+            example:
+              items:
+                - &synonym
+                  id: 01JB0SSY1A2B3C4D5E6F7G8H9J
+                  term: curd
+                  synonym: dahi
+                  lang: hi
+                  productId: null
+                  productName: null
+                  createdAt: "2026-10-01T09:00:00Z"
+              nextCursor: null
+      default: *problem
+  post:
+    operationId: createAdminSynonym
+    tags: [admin-catalogue]
+    summary: Add a synonym (audited)
+    description: The same pair again is `409 conflict`; a `productId` that is not active is `422` on `body.productId`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-catalogue.yaml#/AdminSynonymCreate
+          example:
+            term: curd
+            synonym: dahi
+            lang: hi
+    responses:
+      "201":
+        description: The new synonym
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminSynonym
+            example: *synonym
+      default: *problem
+/v1/admin/synonyms/{synonymId}:
+  parameters:
+    - name: synonymId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  delete:
+    operationId: deleteAdminSynonym
+    tags: [admin-catalogue]
+    summary: Remove a synonym (audited)
+    x-idempotency: none
+    responses:
+      "204":
+        description: Removed
+      default: *problem

@@ -1,0 +1,346 @@
+{
+  "pulse.sub": {
+    "defaultMessage": "Platform-wide numbers from the same rollups as the monitoring dashboards. Read-only.",
+    "description": "A-02 Pulse: Page subtitle"
+  },
+  "pulse.asOf": {
+    "defaultMessage": "Updated {when}.",
+    "description": "A-02 Pulse: When the rollups last ran"
+  },
+  "pulse.asOf.never": {
+    "defaultMessage": "Not updated yet: the first rollup has not run.",
+    "description": "A-02 Pulse: Shown before the first rollup"
+  },
+  "pulse.range": {
+    "defaultMessage": "Period",
+    "description": "A-02 Pulse: Label of the period picker"
+  },
+  "pulse.range.today": {
+    "defaultMessage": "Today",
+    "description": "A-02 Pulse: Period option"
+  },
+  "pulse.range.7d": {
+    "defaultMessage": "7 days",
+    "description": "A-02 Pulse: Period option"
+  },
+  "pulse.range.30d": {
+    "defaultMessage": "30 days",
+    "description": "A-02 Pulse: Period option"
+  },
+  "pulse.range.90d": {
+    "defaultMessage": "90 days",
+    "description": "A-02 Pulse: Period option"
+  },
+  "pulse.vs.today": {
+    "defaultMessage": "vs yesterday",
+    "description": "A-02 Pulse: What a KPI change compares with"
+  },
+  "pulse.vs.7d": {
+    "defaultMessage": "vs the 7 days before",
+    "description": "A-02 Pulse: What a KPI change compares with"
+  },
+  "pulse.vs.30d": {
+    "defaultMessage": "vs the 30 days before",
+    "description": "A-02 Pulse: What a KPI change compares with"
+  },
+  "pulse.vs.90d": {
+    "defaultMessage": "vs the 90 days before",
+    "description": "A-02 Pulse: What a KPI change compares with"
+  },
+  "pulse.delta.up": {
+    "defaultMessage": "Up {change}",
+    "description": "A-02 Pulse: Screen-reader text for a rise"
+  },
+  "pulse.delta.down": {
+    "defaultMessage": "Down {change}",
+    "description": "A-02 Pulse: Screen-reader text for a fall"
+  },
+  "pulse.delta.flat": {
+    "defaultMessage": "No change",
+    "description": "A-02 Pulse: Screen-reader text when a figure did not move"
+  },
+  "pulse.points": {
+    "defaultMessage": "{n} pts",
+    "description": "A-02 Pulse: A change in percentage points"
+  },
+  "pulse.kpis.trade": {
+    "defaultMessage": "Orders and customers",
+    "description": "A-02 Pulse: KPI strip label"
+  },
+  "pulse.kpis.supply": {
+    "defaultMessage": "Stores and search",
+    "description": "A-02 Pulse: KPI strip label"
+  },
+  "pulse.kpi.gmv": {
+    "defaultMessage": "GMV",
+    "description": "A-02 Pulse: KPI: online orders plus linked counter sales"
+  },
+  "pulse.kpi.gmv.note": {
+    "defaultMessage": "{online} online · {pos} counter",
+    "description": "A-02 Pulse: KPI note: GMV split"
+  },
+  "pulse.kpi.orders": {
+    "defaultMessage": "Orders",
+    "description": "A-02 Pulse: KPI: orders placed"
+  },
+  "pulse.kpi.orders.note": {
+    "defaultMessage": "{n} collected or delivered",
+    "description": "A-02 Pulse: KPI note"
+  },
+  "pulse.kpi.success": {
+    "defaultMessage": "Order success",
+    "description": "A-02 Pulse: KPI: completed ÷ placed"
+  },
+  "pulse.kpi.customers": {
+    "defaultMessage": "Active customers",
+    "description": "A-02 Pulse: KPI: customers who opened the app"
+  },
+  "pulse.kpi.customers.note": {
+    "defaultMessage": "{n} bought something",
+    "description": "A-02 Pulse: KPI note: transacting customers"
+  },
+  "pulse.kpi.live": {
+    "defaultMessage": "Live stores",
+    "description": "A-02 Pulse: KPI: stores meeting the live definition"
+  },
+  "pulse.kpi.live.note": {
+    "defaultMessage": "{n} active in the period",
+    "description": "A-02 Pulse: KPI note"
+  },
+  "pulse.kpi.new": {
+    "defaultMessage": "New stores",
+    "description": "A-02 Pulse: KPI: stores that went live in the period"
+  },
+  "pulse.kpi.search": {
+    "defaultMessage": "Search success",
+    "description": "A-02 Pulse: KPI: searches with a result"
+  },
+  "pulse.kpi.search.note": {
+    "defaultMessage": "{n} searches",
+    "description": "A-02 Pulse: KPI note"
+  },
+  "pulse.kpi.d7": {
+    "defaultMessage": "D7 retention",
+    "description": "A-02 Pulse: KPI: customers back 7 days later"
+  },
+  "pulse.trend": {
+    "defaultMessage": "Trend",
+    "description": "A-02 Pulse: Card title: day-by-day chart"
+  },
+  "pulse.trend.metric": {
+    "defaultMessage": "Figure",
+    "description": "A-02 Pulse: Label of the trend figure picker"
+  },
+  "pulse.trend.gmvPaise": {
+    "defaultMessage": "GMV",
+    "description": "A-02 Pulse: Trend figure option"
+  },
+  "pulse.trend.orders": {
+    "defaultMessage": "Orders",
+    "description": "A-02 Pulse: Trend figure option"
+  },
+  "pulse.trend.activeCustomers": {
+    "defaultMessage": "Customers",
+    "description": "A-02 Pulse: Trend figure option"
+  },
+  "pulse.trend.searches": {
+    "defaultMessage": "Searches",
+    "description": "A-02 Pulse: Trend figure option"
+  },
+  "pulse.trend.label": {
+    "defaultMessage": "{metric} per day from {from} to {to}, highest {max}",
+    "description": "A-02 Pulse: Accessible name of the trend chart"
+  },
+  "pulse.trend.peak": {
+    "defaultMessage": "Highest day: {max}. The darker bar is the latest day.",
+    "description": "A-02 Pulse: Chart caption"
+  },
+  "pulse.funnel": {
+    "defaultMessage": "Funnel",
+    "description": "A-02 Pulse: Card title"
+  },
+  "pulse.funnel.searches": {
+    "defaultMessage": "Searches",
+    "description": "A-02 Pulse: Funnel step"
+  },
+  "pulse.funnel.searchesWithResults": {
+    "defaultMessage": "Found something",
+    "description": "A-02 Pulse: Funnel step: searches with a result"
+  },
+  "pulse.funnel.storeViews": {
+    "defaultMessage": "Store views",
+    "description": "A-02 Pulse: Funnel step"
+  },
+  "pulse.funnel.ordersPlaced": {
+    "defaultMessage": "Orders placed",
+    "description": "A-02 Pulse: Funnel step"
+  },
+  "pulse.funnel.ordersAccepted": {
+    "defaultMessage": "Accepted",
+    "description": "A-02 Pulse: Funnel step"
+  },
+  "pulse.funnel.ordersCompleted": {
+    "defaultMessage": "Collected or delivered",
+    "description": "A-02 Pulse: Funnel step"
+  },
+  "pulse.funnel.note": {
+    "defaultMessage": "Each percentage is of the step before.",
+    "description": "A-02 Pulse: Funnel footnote"
+  },
+  "pulse.leaks": {
+    "defaultMessage": "Where orders leak",
+    "description": "A-02 Pulse: Card title: orders that ended without a sale"
+  },
+  "pulse.leaks.none": {
+    "defaultMessage": "No lost orders in this period.",
+    "description": "A-02 Pulse: Empty state"
+  },
+  "pulse.reason": {
+    "defaultMessage": "{reason, select, out_of_stock {Out of stock} closing_soon {Closing soon} too_busy {Too busy} cannot_deliver_address {Cannot deliver there} price_changed {Price changed} not_accepted {Not accepted in time} no_show {Not collected} dispatch_timeout {Not sent out in time} changed_mind {Changed their mind} declined_partial {Declined a part order} too_slow {Too slow} customer_unreachable {Customer unreachable} partial_timeout {No answer on a part order} customer_request {Customer asked} store_request {Store asked} fraud_suspected {Suspected fraud} technical_issue {Technical issue} address_not_found {Address not found} customer_refused {Customer refused} none {No reason given} other {Other reason}}",
+    "description": "A-02 Pulse: Why an order ended without a sale"
+  },
+  "pulse.retention": {
+    "defaultMessage": "Retention",
+    "description": "A-02 Pulse: Card title"
+  },
+  "pulse.retention.d1Bp": {
+    "defaultMessage": "Day 1",
+    "description": "A-02 Pulse: Retention figure"
+  },
+  "pulse.retention.d7Bp": {
+    "defaultMessage": "Day 7",
+    "description": "A-02 Pulse: Retention figure"
+  },
+  "pulse.retention.d30Bp": {
+    "defaultMessage": "Day 30",
+    "description": "A-02 Pulse: Retention figure"
+  },
+  "pulse.retention.none": {
+    "defaultMessage": "No customer cohorts yet.",
+    "description": "A-02 Pulse: Empty state"
+  },
+  "pulse.retention.cohorts": {
+    "defaultMessage": "Share of each week's new buyers who bought again, by week.",
+    "description": "A-02 Pulse: Cohort table caption"
+  },
+  "pulse.retention.week": {
+    "defaultMessage": "First week",
+    "description": "A-02 Pulse: Cohort table column: week of first purchase"
+  },
+  "pulse.retention.size": {
+    "defaultMessage": "Buyers",
+    "description": "A-02 Pulse: Cohort table column"
+  },
+  "pulse.retention.w": {
+    "defaultMessage": "W{n}",
+    "description": "A-02 Pulse: Cohort table column: weeks after the first"
+  },
+  "pulse.zero": {
+    "defaultMessage": "Searches that found nothing",
+    "description": "A-02 Pulse: Card title"
+  },
+  "pulse.zero.none": {
+    "defaultMessage": "No query found nothing 10 times or more.",
+    "description": "A-02 Pulse: Empty state"
+  },
+  "pulse.zero.count": {
+    "defaultMessage": "{n} searches",
+    "description": "A-02 Pulse: Searches for one query"
+  },
+  "pulse.zero.note": {
+    "defaultMessage": "Only queries searched at least 10 times appear.",
+    "description": "A-02 Pulse: Card footnote"
+  },
+  "pulse.credits": {
+    "defaultMessage": "Credits",
+    "description": "A-02 Pulse: Card title: customer credits"
+  },
+  "pulse.credits.issued": {
+    "defaultMessage": "Issued",
+    "description": "A-02 Pulse: Credits figure"
+  },
+  "pulse.credits.spent": {
+    "defaultMessage": "Spent",
+    "description": "A-02 Pulse: Credits figure"
+  },
+  "pulse.credits.expired": {
+    "defaultMessage": "Expired",
+    "description": "A-02 Pulse: Credits figure"
+  },
+  "pulse.credits.note": {
+    "defaultMessage": "Credits issued, spent and expired in the period.",
+    "description": "A-02 Pulse: Card footnote"
+  },
+  "pulse.attention": {
+    "defaultMessage": "Stores needing attention",
+    "description": "A-02 Pulse: Section title"
+  },
+  "pulse.attention.store": {
+    "defaultMessage": "Store",
+    "description": "A-02 Pulse: Table column"
+  },
+  "pulse.attention.reason": {
+    "defaultMessage": "Why",
+    "description": "A-02 Pulse: Table column"
+  },
+  "pulse.attention.reason.not_accepting": {
+    "defaultMessage": "Not accepting",
+    "description": "A-02 Pulse: Attention reason: orders expiring unaccepted"
+  },
+  "pulse.attention.reason.strikes": {
+    "defaultMessage": "Strikes",
+    "description": "A-02 Pulse: Attention reason: many store strikes"
+  },
+  "pulse.attention.reason.stale_stock": {
+    "defaultMessage": "Stock out of date",
+    "description": "A-02 Pulse: Attention reason"
+  },
+  "pulse.attention.expired": {
+    "defaultMessage": "Expired orders",
+    "description": "A-02 Pulse: Table column: expired unaccepted"
+  },
+  "pulse.attention.strikes": {
+    "defaultMessage": "Strikes (30 days)",
+    "description": "A-02 Pulse: Table column"
+  },
+  "pulse.attention.accept": {
+    "defaultMessage": "Accept rate",
+    "description": "A-02 Pulse: Table column"
+  },
+  "pulse.attention.stock": {
+    "defaultMessage": "Stock updated",
+    "description": "A-02 Pulse: Table column"
+  },
+  "pulse.attention.stock.never": {
+    "defaultMessage": "Never",
+    "description": "A-02 Pulse: Stock never updated"
+  },
+  "pulse.attention.none": {
+    "defaultMessage": "No store needs attention.",
+    "description": "A-02 Pulse: Empty state"
+  },
+  "pulse.cities": {
+    "defaultMessage": "Stores by city",
+    "description": "A-02 Pulse: Section title"
+  },
+  "pulse.cities.city": {
+    "defaultMessage": "City",
+    "description": "A-02 Pulse: Table column"
+  },
+  "pulse.cities.stores": {
+    "defaultMessage": "Stores",
+    "description": "A-02 Pulse: Table column"
+  },
+  "pulse.cities.live": {
+    "defaultMessage": "Live",
+    "description": "A-02 Pulse: Table column"
+  },
+  "pulse.cities.none": {
+    "defaultMessage": "No stores yet.",
+    "description": "A-02 Pulse: Empty state"
+  },
+  "pulse.cities.demand": {
+    "defaultMessage": "{cells, plural, one {# area} other {# areas}} with 10 or more searches, {searches} searches in all.",
+    "description": "A-02 Pulse: Demand summary under the city table"
+  }
+}

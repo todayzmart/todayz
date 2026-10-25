@@ -17,6 +17,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/jackc/pgx/v5/pgtype"
 
@@ -29,6 +30,7 @@ import (
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/notice"
 	"github.com/todayz/backend/internal/platform/pii"
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
@@ -65,6 +67,32 @@ type Deps struct {
 	// Hours checks and normalises store hours for an A-05 edit
 	// (internal/business owns the rules). Without it an hours edit answers 503.
 	Hours HoursNormaliser
+	// Banners is internal/banners' takedown (A-20). Without it a takedown answers 503.
+	Banners BannerRemover
+	// Accounts finds or makes a phone number's account for an A-18 invite
+	// (internal/identity owns accounts). Without it an invite answers 503.
+	Accounts PhoneAccounts
+	// NotifyTemplates copies internal/notify's catalogue for A-16; without
+	// it the list is empty and a test send answers 503.
+	NotifyTemplates func() []NotifyTemplate
+	// Integrations are A-16's outside channels and the variables each needs.
+	Integrations []Integration
+	// Notices writes A-16's test send to the caller's own inbox. Without it
+	// a test send answers 503.
+	Notices notice.Sender
+}
+
+// PhoneAccounts finds or makes the account of an E.164 phone in the caller's
+// transaction, as a first sign-in would.
+type PhoneAccounts interface {
+	FindOrCreateByPhone(ctx context.Context, phone string, now time.Time) (PhoneAccount, error)
+}
+
+// PhoneAccount is the user behind a phone number.
+type PhoneAccount struct {
+	UserID  ids.ID
+	Status  string
+	Created bool
 }
 
 // HoursNormaliser validates store hours given in the stored JSON shape and
@@ -88,6 +116,12 @@ type Service struct {
 	strikes   StrikeRecounter
 	providers []ProviderKey
 	hours     HoursNormaliser
+	banners   BannerRemover
+	accounts  PhoneAccounts
+
+	notifyTemplates func() []NotifyTemplate
+	integrations    []Integration
+	notices         notice.Sender
 }
 
 // New builds the service.
@@ -95,7 +129,8 @@ func New(d Deps) (*Service, error) {
 	if d.Clock == nil {
 		return nil, errors.New("admin: a clock is required")
 	}
-	return &Service{db: d.DB, clock: d.Clock, audit: d.Audit, az: d.Authz, seal: d.Seal, hash: d.Hash, strikes: d.Strikes, providers: d.Providers, hours: d.Hours}, nil
+	return &Service{db: d.DB, clock: d.Clock, audit: d.Audit, az: d.Authz, seal: d.Seal, hash: d.Hash, strikes: d.Strikes, providers: d.Providers, hours: d.Hours, banners: d.Banners, accounts: d.Accounts,
+		notifyTemplates: d.NotifyTemplates, integrations: d.Integrations, notices: d.Notices}, nil
 }
 
 func (s *Service) ready(ctx context.Context) error {
@@ -165,18 +200,44 @@ func cleanReason(r string) (string, error) {
 	return r, noPhone("body.reason", r)
 }
 
-// rePhone is an Indian mobile number in free text, the same shape the log
-// redactor masks (telemetry's rePhone).
-var rePhone = regexp.MustCompile(`(^|[^0-9A-Za-z+])((?:\+91|91|0)?[\s-]?[6-9]\d{4}[\s-]?\d{5})($|[^0-9A-Za-z])`)
+// rePhone is an Indian mobile number once every non-digit is gone: 6-9 then
+// nine more digits anywhere in the run.
+var rePhone = regexp.MustCompile(`[6-9][0-9]{9}`)
 
 // noPhone refuses free text an admin typed (a reason or a note) that holds a
 // phone number: it is stored in the audit log and shown to other roles, and
 // writers never put a phone there (the subject already names the person).
+// It is strict on purpose: digits in any script count, and every other
+// character is dropped first, so spacing, dots, slashes, letters or a 0091
+// prefix do not hide a number. A reason that strings many numbers together
+// can be refused too; the writer rewords it.
 func noPhone(path, s string) error {
-	if rePhone.MatchString(s) {
+	if rePhone.MatchString(digitsOnly(s)) {
 		return fieldErr(path, "no phone numbers")
 	}
 	return nil
+}
+
+// digitsOnly keeps the decimal digits of s, in any script, as ASCII 0-9.
+func digitsOnly(s string) string {
+	var b strings.Builder
+	for _, r := range s {
+		if unicode.IsDigit(r) {
+			b.WriteRune('0' + digitValue(r))
+		}
+	}
+	return b.String()
+}
+
+// digitValue is the value of a Unicode decimal digit. Each script's digits are
+// one run of ten (some runs sit back to back), so the value is the distance
+// from the start of the run, mod 10.
+func digitValue(r rune) rune {
+	start := r
+	for unicode.IsDigit(start - 1) {
+		start--
+	}
+	return (r - start) % 10
 }
 
 func pageArgs(limit *int, cursor *string) (int, *time.Time, pgtype.UUID, error) {

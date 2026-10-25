@@ -48,7 +48,11 @@ func TestSettingValue(t *testing.T) {
 }
 
 func TestNoPhone(t *testing.T) {
-	for _, s := range []string{"9876543210", "call +91 98765 43210", "+919876543210.", "ph 098765-43210"} {
+	for _, s := range []string{
+		"9876543210", "call +91 98765 43210", "+919876543210.", "ph 098765-43210",
+		"0091 98765 43210", "ph9876543210", "98 76 54 32 10", "98765.43210", "98765/43210",
+		"९८७६५४३२१०", "９８７６５４３２１０", "call 98765 ४३२१०", "𝟗𝟖𝟕𝟔𝟓𝟒𝟑𝟐𝟏𝟎",
+	} {
 		require.Error(t, noPhone("body.reason", s), s)
 	}
 	// Order numbers, amounts, PIN codes and dates stay allowed.

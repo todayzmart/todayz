@@ -1,9 +1,288 @@
-# Schemas: domain "admin-catalogue" (owner W3-08): admin catalogue (04 §2.7).
+# Schemas: domain "admin-catalogue" (owner W3-05): A-08 master catalogue (04 §2.7, D-64).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Names are unique across every schemas/<domain>.yaml. Request objects carry
+# `additionalProperties: false`. Money is `*Paise`, ids are `Ulid`, times are `Timestamp`.
+AdminProductStatus:
+  type: string
+  description: "`pending_review` waits in the review queue; `merged` points at the product it became; `retired` is off the catalogue."
+  enum: [active, pending_review, merged, retired]
+AdminProductUnit:
+  type: string
+  enum: [g, kg, ml, l, pc, pack]
+AdminProduct:
+  type: object
+  additionalProperties: false
+  required: [id, name, brandName, categoryId, categoryName, variant, packSize, unit, mrpPaise, barcodes, status, mergedInto, storeCount, createdAt, updatedAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    name: {type: string, maxLength: 120}
+    brandName:
+      type: [string, 'null']
+      maxLength: 120
+    categoryId: {$ref: ./common.yaml#/Ulid}
+    categoryName:
+      type: string
+      description: The category's English name.
+      maxLength: 120
+    variant:
+      type: [string, 'null']
+      maxLength: 80
+    packSize: {type: number, format: double, exclusiveMinimum: 0}
+    unit: {$ref: '#/AdminProductUnit'}
+    mrpPaise:
+      type: [integer, 'null']
+      format: int64
+      minimum: 1
+    barcodes:
+      type: array
+      maxItems: 10
+      items: {type: string, maxLength: 32}
+    status: {$ref: '#/AdminProductStatus'}
+    mergedInto:
+      oneOf:
+        - {$ref: ./common.yaml#/Ulid}
+        - {type: 'null'}
+    storeCount:
+      type: integer
+      description: Stores that list the product.
+      minimum: 0
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    updatedAt: {$ref: ./common.yaml#/Timestamp}
+AdminProductList:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/AdminProduct'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminProductCreate:
+  type: object
+  additionalProperties: false
+  required: [name, categoryId, packSize, unit]
+  properties:
+    name: {type: string, minLength: 1, maxLength: 120}
+    categoryId: {$ref: ./common.yaml#/Ulid}
+    variant: {type: string, minLength: 1, maxLength: 80}
+    packSize: {type: number, format: double, exclusiveMinimum: 0, maximum: 1000000}
+    unit: {$ref: '#/AdminProductUnit'}
+    mrpPaise: {$ref: ./common.yaml#/Paise}
+    barcodes:
+      type: array
+      maxItems: 10
+      uniqueItems: true
+      items: {type: string, pattern: '^[0-9]{8,14}$', maxLength: 14}
+AdminProductUpdate:
+  type: object
+  description: >-
+    The fields to change, with a reason. A null `variant` or `mrpPaise` clears it. `status` may move an
+    active product to `retired` or back; the review queue decides `pending_review`, and `merged` is final.
+  additionalProperties: false
+  required: [reason]
+  minProperties: 2
+  properties:
+    reason: {type: string, minLength: 1, maxLength: 500}
+    name: {type: string, minLength: 1, maxLength: 120}
+    categoryId: {$ref: ./common.yaml#/Ulid}
+    variant:
+      type: [string, 'null']
+      minLength: 1
+      maxLength: 80
+    packSize: {type: number, format: double, exclusiveMinimum: 0, maximum: 1000000}
+    unit: {$ref: '#/AdminProductUnit'}
+    mrpPaise:
+      type: [integer, 'null']
+      format: int64
+      minimum: 1
+      maximum: 100000000000
+    barcodes:
+      type: array
+      maxItems: 10
+      uniqueItems: true
+      items: {type: string, pattern: '^[0-9]{8,14}$', maxLength: 14}
+    status:
+      type: string
+      enum: [active, retired]
+AdminPendingProduct:
+  type: object
+  additionalProperties: false
+  required: [product, createdByStoreId, createdByStoreName, suggestions]
+  properties:
+    product: {$ref: '#/AdminProduct'}
+    createdByStoreId:
+      oneOf:
+        - {$ref: ./common.yaml#/Ulid}
+        - {type: 'null'}
+    createdByStoreName:
+      type: [string, 'null']
+      maxLength: 80
+    suggestions:
+      type: array
+      description: Active products that look like duplicates, closest name first (at most 5).
+      maxItems: 5
+      items: {$ref: '#/AdminDuplicateSuggestion'}
+AdminDuplicateSuggestion:
+  type: object
+  additionalProperties: false
+  required: [product, similarity]
+  properties:
+    product: {$ref: '#/AdminProduct'}
+    similarity:
+      type: number
+      format: double
+      description: Trigram similarity of the names, 0 to 1.
+      minimum: 0
+      maximum: 1
+AdminPendingProductList:
+  type: object
+  additionalProperties: false
+  required: [items, assistEnabled, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/AdminPendingProduct'}
+    assistEnabled:
+      type: boolean
+      description: "`ai_catalogue_enabled`: whether the review detail shows the catalogue assistant (AI-A1, D-82)."
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminPendingApprove:
+  type: object
+  additionalProperties: false
+  properties:
+    reason: {type: string, minLength: 1, maxLength: 500}
+AdminPendingMerge:
+  type: object
+  additionalProperties: false
+  required: [intoProductId]
+  properties:
+    intoProductId: {$ref: ./common.yaml#/Ulid}
+    reason: {type: string, minLength: 1, maxLength: 500}
+AdminPendingReject:
+  type: object
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason: {type: string, minLength: 1, maxLength: 500}
+AdminCategoryNames:
+  type: object
+  description: Display name per language; `en` is required.
+  additionalProperties: false
+  required: [en]
+  properties:
+    en: {type: string, minLength: 1, maxLength: 60}
+    hi: {type: string, minLength: 1, maxLength: 60}
+    kn: {type: string, minLength: 1, maxLength: 60}
+    te: {type: string, minLength: 1, maxLength: 60}
+    ta: {type: string, minLength: 1, maxLength: 60}
+AdminCategoryTint:
+  type: string
+  enum: [green, amber, rose, sky, lilac, peach]
+AdminCategory:
+  type: object
+  additionalProperties: false
+  required: [id, parentId, slug, names, tint, icon, sort, productCount, updatedAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    parentId:
+      oneOf:
+        - {$ref: ./common.yaml#/Ulid}
+        - {type: 'null'}
+    slug: {type: string, maxLength: 64}
+    names: {$ref: '#/AdminCategoryNames'}
+    tint: {$ref: '#/AdminCategoryTint'}
+    icon:
+      type: string
+      description: A Lucide icon name.
+      maxLength: 40
+    sort: {type: integer}
+    productCount:
+      type: integer
+      description: Active products in the category.
+      minimum: 0
+    updatedAt: {$ref: ./common.yaml#/Timestamp}
+AdminCategoryList:
+  type: object
+  additionalProperties: false
+  required: [items]
+  properties:
+    items:
+      type: array
+      description: Top-level categories first, then children, each by sort.
+      items: {$ref: '#/AdminCategory'}
+AdminCategoryCreate:
+  type: object
+  additionalProperties: false
+  required: [slug, names, tint, icon]
+  properties:
+    parentId: {$ref: ./common.yaml#/Ulid}
+    slug:
+      type: string
+      pattern: ^[a-z0-9]+(-[a-z0-9]+)*$
+      minLength: 1
+      maxLength: 64
+    names: {$ref: '#/AdminCategoryNames'}
+    tint: {$ref: '#/AdminCategoryTint'}
+    icon:
+      type: string
+      pattern: ^[a-z0-9]+(-[a-z0-9]+)*$
+      minLength: 1
+      maxLength: 40
+    sort: {type: integer, minimum: 0, maximum: 10000}
+AdminCategoryUpdate:
+  type: object
+  description: The fields to change, with a reason. The slug and parent are fixed once made.
+  additionalProperties: false
+  required: [reason]
+  minProperties: 2
+  properties:
+    reason: {type: string, minLength: 1, maxLength: 500}
+    names: {$ref: '#/AdminCategoryNames'}
+    tint: {$ref: '#/AdminCategoryTint'}
+    icon:
+      type: string
+      pattern: ^[a-z0-9]+(-[a-z0-9]+)*$
+      minLength: 1
+      maxLength: 40
+    sort: {type: integer, minimum: 0, maximum: 10000}
+AdminSynonymLang:
+  type: string
+  enum: [en, hi, kn, te, ta]
+AdminSynonym:
+  type: object
+  additionalProperties: false
+  required: [id, term, synonym, lang, productId, productName, createdAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    term: {type: string, maxLength: 80}
+    synonym: {type: string, maxLength: 80}
+    lang: {$ref: '#/AdminSynonymLang'}
+    productId:
+      oneOf:
+        - {$ref: ./common.yaml#/Ulid}
+        - {type: 'null'}
+    productName:
+      type: [string, 'null']
+      maxLength: 120
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+AdminSynonymList:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/AdminSynonym'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+AdminSynonymCreate:
+  type: object
+  description: Search treats `synonym` as `term`. Both are trimmed and lower-cased, and must differ.
+  additionalProperties: false
+  required: [term, synonym, lang]
+  properties:
+    term: {type: string, minLength: 1, maxLength: 80}
+    synonym: {type: string, minLength: 1, maxLength: 80}
+    lang: {$ref: '#/AdminSynonymLang'}
+    productId: {$ref: ./common.yaml#/Ulid}

@@ -40,6 +40,7 @@ export const ACTION_ROLES = {
   strikesReset: SUPPORT_UP,
   orderCancel: SUPPORT_UP,
   reviewModerate: SUPPORT_UP,
+  bannerModerate: SUPPORT_UP,
   auditLog: ADMINS,
   businessView: SUPPORT_UP,
   businessVerify: ADMINS,
@@ -47,6 +48,8 @@ export const ACTION_ROLES = {
   storeReview: ADMINS,
   storeEdit: ADMINS,
   leads: ['field_agent', ...SUPPORT_UP],
+  catalogueReview: ['catalogue', ...ADMINS],
+  catalogueManage: ADMINS,
   /** A-11 hold, unhold, mark paid and export; the admin role reads only (06 A-11). */
   payoutManage: ['finance', 'super_admin'],
   /** A-09 adjustment request, approve and reject; the admin role cannot adjust credits (06 A-09). */

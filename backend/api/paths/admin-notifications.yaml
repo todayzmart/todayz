@@ -1,12 +1,121 @@
-# Paths: domain "admin-notifications" (owner W2-05): admin notifications (04 §2.7).
+# Paths: domain "admin-notifications" (owner W3-05): A-16 notifications (04 §2.7, D-224).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-notifications]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-notifications.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Read-only for v1 (D-224): the texts are code-owned (internal/notify's catalogue) until DLT
+# re-registration has a process, so there is no PATCH. Reads are admin.notify.view; the test send
+# is admin.notify.manage, writes only to the caller's own in-app inbox (never SMS or WhatsApp)
+# and is audited. Provider keys show as set or missing, never a value (D-19).
+/v1/admin/notification-templates:
+  get:
+    operationId: listAdminNotificationTemplates
+    tags: [admin-notifications]
+    summary: Every notification kind with its text per language
+    description: >-
+      The catalogue is a fixed list in code (about a dozen kinds), so it is filtered, not paged.
+      Texts are unrendered: `{store}` and the other placeholders are the kind's `params`. A language
+      without its own text shows the English one with `fallback: true`.
+    parameters:
+      - name: app
+        in: query
+        schema:
+          $ref: ../schemas/admin-notifications.yaml#/AdminNotificationApp
+    responses:
+      "200":
+        description: The templates, by kind
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-notifications.yaml#/AdminNotificationTemplateList
+            example:
+              items:
+                - kind: order_unseen
+                  app: business
+                  channels: [sms, whatsapp]
+                  params: [store, minutes]
+                  texts:
+                    - lang: en
+                      variant: null
+                      title: Order waiting
+                      body: A new order at {store} has not been opened for {minutes} minutes. Open the TodayZ business app to accept it.
+                      fallback: false
+                    - lang: kn
+                      variant: null
+                      title: Order waiting
+                      body: A new order at {store} has not been opened for {minutes} minutes. Open the TodayZ business app to accept it.
+                      fallback: true
+                  providerTemplates:
+                    - lang: en
+                      name: tz_order_unseen
+                      smsTemplateIdSet: true
+                  testable: false
+              serverNow: "2026-10-25T11:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/notification-templates/test-send:
+  post:
+    operationId: testSendAdminNotification
+    tags: [admin-notifications]
+    summary: Send a kind to your own in-app inbox (audited)
+    description: >-
+      Writes one notification of a customer-app kind to the caller's own customer inbox, with each
+      placeholder filled by its own name (`{store}`). Nothing goes out by SMS, WhatsApp or push. A
+      business-app kind has no personal inbox and is `422` on `body.kind`, as is an unknown kind or a
+      variant the kind does not have.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-notifications.yaml#/AdminNotificationTestSend
+          example:
+            kind: order_update
+            variant: ready
+    responses:
+      "201":
+        description: The notification written to your inbox
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-notifications.yaml#/AdminNotificationTestResult
+            example:
+              notificationId: 01JB0SAD1A2B3C4D5E6F7G8H9J
+              kind: order_update
+              variant: ready
+              sentAt: "2026-10-25T11:00:00Z"
+      default: *problem
+/v1/admin/integrations:
+  get:
+    operationId: listAdminIntegrations
+    tags: [admin-notifications]
+    summary: Notification channels with their switch, keys and last error
+    description: >-
+      One row per outside channel: whether its `notify_<channel>_enabled` setting is on, which of the
+      variables it needs are set (names only, D-19), whether this build has a sender for it, and the
+      latest failed delivery's time and error (already stripped of digit runs by the sender).
+    responses:
+      "200":
+        description: The channels
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-notifications.yaml#/AdminIntegrationList
+            example:
+              items:
+                - channel: sms
+                  enabled: true
+                  senderBuilt: true
+                  vars:
+                    - {name: SMS_SENDER_ID, set: true}
+                    - {name: SMS_DLT_ENTITY_ID, set: true}
+                    - {name: AWS_REGION, set: true}
+                  lastError:
+                    at: "2026-10-25T09:12:00Z"
+                    error: "throttled: retry later"
+                - channel: whatsapp
+                  enabled: false
+                  senderBuilt: false
+                  vars:
+                    - {name: WHATSAPP_API_KEY, set: false}
+                  lastError: null
+              serverNow: "2026-10-25T11:00:00Z"
+      default: *problem

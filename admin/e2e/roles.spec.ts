@@ -57,12 +57,16 @@ const CASES: { roles: string[]; nav: string[]; hidden?: string }[] = [
 const SUPPORT_UP = ['support', 'admin', 'super_admin'];
 const READS: [RegExp, string[]][] = [
   [/^\/v1\/admin\/leads(\/|$)/, ['field_agent', ...SUPPORT_UP]],
-  [/^\/v1\/admin\/(businesses|stores|customers|customer-search|orders|reviews|review-reports)(\/|$)/, SUPPORT_UP],
+  [/^\/v1\/admin\/(businesses|stores|customers|customer-search|orders|reviews|review-reports|banners)(\/|$)/, SUPPORT_UP],
   [/^\/v1\/admin\/audit-log\/subject$/, ['field_agent', 'support', 'catalogue', 'finance', 'admin', 'super_admin']],
   [/^\/v1\/admin\/(audit-log|settings)(\/|$)/, ['admin', 'super_admin']],
+  [/^\/v1\/admin\/(notification-templates|integrations)(\/|$)/, ['admin', 'super_admin']],
   // admin.ledger.view and admin.payout.view (credits.golden, payouts.golden).
   [/^\/v1\/admin\/(credits|credit-adjustments|payouts|statements)(\/|$)/, ['finance', 'admin', 'super_admin']],
   [/^\/v1\/admin\/(jobs|job-runs)(\/|$)/, ['support', 'analyst', 'finance', 'admin', 'super_admin']],
+  [/^\/v1\/admin\/(products|pending-products|categories|synonyms)(\/|$)/, ['catalogue', 'admin', 'super_admin']],
+  [/^\/v1\/admin\/users(\/|$)/, ['super_admin']],
+  [/^\/v1\/admin\/pulse(\/|$)/, ['support', 'catalogue', 'analyst', 'finance', 'admin', 'super_admin']],
 ];
 
 let guard: PageGuard;

@@ -218,5 +218,113 @@
   "audit.action.leadStatus": {
     "defaultMessage": "Lead status changed",
     "description": "Audit action name (A-03 leads)"
+  },
+  "audit.action.catalogueProductCreate": {
+    "defaultMessage": "Product added",
+    "description": "Audit action: a master product was added"
+  },
+  "audit.action.catalogueProductUpdate": {
+    "defaultMessage": "Product edited",
+    "description": "Audit action: a master product was edited"
+  },
+  "audit.action.catalogueApprove": {
+    "defaultMessage": "Product approved",
+    "description": "Audit action: a pending product was approved into the catalogue"
+  },
+  "audit.action.catalogueMerge": {
+    "defaultMessage": "Product merged",
+    "description": "Audit action: a pending product was merged into an active one"
+  },
+  "audit.action.catalogueReject": {
+    "defaultMessage": "Product rejected",
+    "description": "Audit action: a pending product was rejected"
+  },
+  "audit.action.catalogueCategoryCreate": {
+    "defaultMessage": "Category added",
+    "description": "Audit action: a category was added"
+  },
+  "audit.action.catalogueCategoryUpdate": {
+    "defaultMessage": "Category edited",
+    "description": "Audit action: a category was renamed, recoloured or reordered"
+  },
+  "audit.action.catalogueSynonymCreate": {
+    "defaultMessage": "Search word added",
+    "description": "Audit action: a search synonym was added"
+  },
+  "audit.action.catalogueSynonymDelete": {
+    "defaultMessage": "Search word removed",
+    "description": "Audit action: a search synonym was removed"
+  },
+  "audit.action.bannerApprove": {
+    "defaultMessage": "Banner cleared",
+    "description": "Audit action: an admin cleared a banner the automatic check held"
+  },
+  "audit.action.bannerRemove": {
+    "defaultMessage": "Banner taken down",
+    "description": "Audit action: an admin took a shop's banner down"
+  },
+  "audit.action.adminUserInvite": {
+    "defaultMessage": "Admin invited",
+    "description": "Audit action: an admin gave a phone number admin access"
+  },
+  "audit.action.adminUserUpdate": {
+    "defaultMessage": "Admin roles changed",
+    "description": "Audit action: an admin changed another admin's roles"
+  },
+  "audit.action.adminUserDisable": {
+    "defaultMessage": "Admin disabled",
+    "description": "Audit action: an admin disabled another admin"
+  },
+  "audit.action.adminUserEnable": {
+    "defaultMessage": "Admin enabled",
+    "description": "Audit action: an admin re-enabled another admin"
+  },
+  "audit.action.adminUserTotpReset": {
+    "defaultMessage": "Authenticator reset",
+    "description": "Audit action: an admin cleared another admin's authenticator"
+  },
+  "audit.action.notificationTestSend": {
+    "defaultMessage": "Test notification sent",
+    "description": "Audit action: an admin sent a notification of one kind to their own in-app inbox"
+  },
+  "audit.action.creditAdjust": {
+    "defaultMessage": "Wallet adjusted",
+    "description": "Audit action: an admin adjusted a customer's credit wallet within their own limit (A-09)"
+  },
+  "audit.action.creditAdjustmentRequest": {
+    "defaultMessage": "Wallet adjustment requested",
+    "description": "Audit action: an admin asked for a wallet adjustment that needs a second person (A-09)"
+  },
+  "audit.action.creditAdjustmentApprove": {
+    "defaultMessage": "Wallet adjustment approved",
+    "description": "Audit action: a second admin approved and posted a wallet adjustment (A-09)"
+  },
+  "audit.action.creditAdjustmentReject": {
+    "defaultMessage": "Wallet adjustment rejected",
+    "description": "Audit action: a second admin rejected a wallet adjustment request (A-09)"
+  },
+  "audit.action.creditAdjustmentCancel": {
+    "defaultMessage": "Wallet adjustment cancelled",
+    "description": "Audit action: the requester cancelled their wallet adjustment request (A-09)"
+  },
+  "audit.action.statementClose": {
+    "defaultMessage": "Statement closed",
+    "description": "Audit action: the monthly close made a store's statement and payout"
+  },
+  "audit.action.payoutHold": {
+    "defaultMessage": "Payout held",
+    "description": "Audit action: an admin put a payout on hold, with a reason (A-11)"
+  },
+  "audit.action.payoutUnhold": {
+    "defaultMessage": "Payout released",
+    "description": "Audit action: an admin took a payout off hold, with a reason (A-11)"
+  },
+  "audit.action.payoutMarkPaid": {
+    "defaultMessage": "Payout marked paid",
+    "description": "Audit action: an admin marked a payout paid with the bank's UTR (A-11)"
+  },
+  "audit.action.payoutExport": {
+    "defaultMessage": "Payout file exported",
+    "description": "Audit action: an admin downloaded the bank and UPI payout file for a period (A-11)"
   }
 }

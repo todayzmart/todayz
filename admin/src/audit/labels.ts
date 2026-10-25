@@ -8,6 +8,35 @@ import { useIntl } from 'react-intl';
  */
 const SETTINGS_UPDATE = ['settings', 'update'].join('.');
 
+/** The A-08, A-20, A-09 and A-11 actions, built the same way (`catalogue.…`, `banners.…`, `credits.…` and `payouts.…` are message namespaces too). */
+const CATALOGUE = (...parts: string[]) => ['catalogue', ...parts].join('.');
+const BANNERS = (...parts: string[]) => ['banners', ...parts].join('.');
+const CREDITS = (...parts: string[]) => ['credits', ...parts].join('.');
+const PAYOUTS = (...parts: string[]) => ['payouts', ...parts].join('.');
+const BUILT_ACTIONS: Readonly<Record<string, string>> = {
+  [CATALOGUE('product', 'create')]: 'audit.action.catalogueProductCreate',
+  [CATALOGUE('product', 'update')]: 'audit.action.catalogueProductUpdate',
+  [CATALOGUE('pending', 'approve')]: 'audit.action.catalogueApprove',
+  [CATALOGUE('pending', 'merge')]: 'audit.action.catalogueMerge',
+  [CATALOGUE('pending', 'reject')]: 'audit.action.catalogueReject',
+  [CATALOGUE('category', 'create')]: 'audit.action.catalogueCategoryCreate',
+  [CATALOGUE('category', 'update')]: 'audit.action.catalogueCategoryUpdate',
+  [CATALOGUE('synonym', 'create')]: 'audit.action.catalogueSynonymCreate',
+  [CATALOGUE('synonym', 'delete')]: 'audit.action.catalogueSynonymDelete',
+  [BANNERS('approve')]: 'audit.action.bannerApprove',
+  [BANNERS('remove')]: 'audit.action.bannerRemove',
+  [CREDITS('adjustment_request')]: 'audit.action.creditAdjustmentRequest',
+  [CREDITS('adjustment_approve')]: 'audit.action.creditAdjustmentApprove',
+  [CREDITS('adjustment_reject')]: 'audit.action.creditAdjustmentReject',
+  [CREDITS('adjustment_cancel')]: 'audit.action.creditAdjustmentCancel',
+  [CREDITS('adjust')]: 'audit.action.creditAdjust',
+  [PAYOUTS('statement_close')]: 'audit.action.statementClose',
+  [PAYOUTS('hold')]: 'audit.action.payoutHold',
+  [PAYOUTS('unhold')]: 'audit.action.payoutUnhold',
+  [PAYOUTS('mark_paid')]: 'audit.action.payoutMarkPaid',
+  [PAYOUTS('export')]: 'audit.action.payoutExport',
+};
+
 /** Audit actions the console names; any other action shows as written (it is still audited). */
 export function useActionLabel() {
   const intl = useIntl();
@@ -66,8 +95,22 @@ export function useActionLabel() {
           return intl.formatMessage({ id: 'audit.action.leadStatus' });
         case SETTINGS_UPDATE:
           return intl.formatMessage({ id: 'audit.action.settingsUpdate' });
-        default:
-          return action;
+        case 'admin_user.invite':
+          return intl.formatMessage({ id: 'audit.action.adminUserInvite' });
+        case 'admin_user.update':
+          return intl.formatMessage({ id: 'audit.action.adminUserUpdate' });
+        case 'admin_user.disable':
+          return intl.formatMessage({ id: 'audit.action.adminUserDisable' });
+        case 'admin_user.enable':
+          return intl.formatMessage({ id: 'audit.action.adminUserEnable' });
+        case 'admin_user.totp_reset':
+          return intl.formatMessage({ id: 'audit.action.adminUserTotpReset' });
+        case 'notification.test_send':
+          return intl.formatMessage({ id: 'audit.action.notificationTestSend' });
+        default: {
+          const id = BUILT_ACTIONS[action];
+          return id ? intl.formatMessage({ id }) : action;
+        }
       }
     },
     [intl],

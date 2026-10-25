@@ -73,11 +73,50 @@ export async function answerEmptyLists(page: Page) {
   );
   // A-17 lists every setting at once, with the provider keys beside them.
   await answerWith(page, '/v1/admin/settings', (req) => (req.method() === 'GET' ? { status: 200, body: { items: [], providers: [], serverNow: NOW } } : undefined));
-  // A-09 shows the coming week's expiry as a total and its days.
-  await answerWith(page, '/v1/admin/credits/expiry-preview', (req) =>
+  // A-09 shows the coming week's expiry as a total and its days (one summary, not a list).
+  await answerWith(page, '/v1/admin/credits/expiry-preview**', (req) =>
     req.method() === 'GET' ? { status: 200, body: { from: NOW, to: NOW, totalPaise: 0, days: [], serverNow: NOW } } : undefined,
   );
+  // A-02 Pulse is one summary, not a list: a platform with nothing in it yet.
+  await answerWith(page, '/v1/admin/pulse**', (_req, url) => ({ status: 200, body: url.pathname.endsWith('/map') ? emptyPulseMap : emptyPulse }));
 }
+
+const count0 = { value: 0, previous: null };
+const rate0 = { value: null, previous: null };
+
+/** A-02 before any order, search or store. */
+export const emptyPulse = {
+  range: '7d',
+  from: '2026-10-19',
+  to: '2026-10-25',
+  asOf: null,
+  kpis: {
+    gmvPaise: count0,
+    onlineGmvPaise: count0,
+    posGmvPaise: count0,
+    orders: count0,
+    completedOrders: count0,
+    successRateBp: rate0,
+    activeCustomers: count0,
+    transactingCustomers: count0,
+    liveStores: count0,
+    activeStores: count0,
+    newStores: count0,
+    searches: count0,
+    searchSuccessRateBp: rate0,
+    d7RetentionBp: rate0,
+  },
+  trend: [],
+  funnel: { searches: 0, searchesWithResults: 0, storeViews: 0, ordersPlaced: 0, ordersAccepted: 0, ordersCompleted: 0 },
+  leaks: [],
+  retention: { d1Bp: null, d7Bp: null, d30Bp: null, cohorts: [] },
+  credits: { issued: 0, spent: 0, expired: 0 },
+  zeroResultSearches: [],
+  storesNeedingAttention: [],
+  serverNow: NOW,
+};
+
+export const emptyPulseMap = { range: '7d', from: '2026-10-19', to: '2026-10-25', stores: [], demand: [], serverNow: NOW };
 
 /**
  * Signed in as staff with these roles and past the authenticator step. The session and 2FA flags are

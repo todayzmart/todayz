@@ -1,0 +1,222 @@
+{
+  "notifications.app": {
+    "defaultMessage": "App",
+    "description": "A-16 filter label: whose inbox a kind goes to"
+  },
+  "notifications.app.all": {
+    "defaultMessage": "All",
+    "description": "A-16 app filter: every kind"
+  },
+  "notifications.app.business": {
+    "defaultMessage": "Business",
+    "description": "A-16 app: the business app's inbox"
+  },
+  "notifications.app.customer": {
+    "defaultMessage": "Customer",
+    "description": "A-16 app: the customer app's inbox"
+  },
+  "notifications.channel.inApp": {
+    "defaultMessage": "In-app",
+    "description": "A-16 channel: the app's own inbox"
+  },
+  "notifications.channel.push": {
+    "defaultMessage": "Push",
+    "description": "A-16 channel: web push"
+  },
+  "notifications.channel.sms": {
+    "defaultMessage": "SMS",
+    "description": "A-16 channel: SMS"
+  },
+  "notifications.channel.whatsapp": {
+    "defaultMessage": "WhatsApp",
+    "description": "A-16 channel: WhatsApp"
+  },
+  "notifications.col.app": {
+    "defaultMessage": "App",
+    "description": "A-16 column and fact: whose inbox"
+  },
+  "notifications.col.channels": {
+    "defaultMessage": "Channels",
+    "description": "A-16 column and fact: where the kind is sent"
+  },
+  "notifications.col.kind": {
+    "defaultMessage": "Kind",
+    "description": "A-16 column: the notification kind"
+  },
+  "notifications.col.langs": {
+    "defaultMessage": "Languages",
+    "description": "A-16 column: how many languages have a text of their own"
+  },
+  "notifications.dlt.missing": {
+    "defaultMessage": "DLT id missing",
+    "description": "A-16 pill: the SMS template has no DLT template id configured"
+  },
+  "notifications.dlt.set": {
+    "defaultMessage": "DLT id set",
+    "description": "A-16 pill: the SMS template has a DLT template id configured"
+  },
+  "notifications.empty": {
+    "defaultMessage": "No kinds for this app",
+    "description": "A-16 table empty state"
+  },
+  "notifications.fallback": {
+    "defaultMessage": "Shows English",
+    "description": "A-16 pill: this language has no text of its own here"
+  },
+  "notifications.integrations": {
+    "defaultMessage": "Channels",
+    "description": "A-16 section title: outside channels (push, SMS, WhatsApp)"
+  },
+  "notifications.integrations.sub": {
+    "defaultMessage": "The in-app inbox is always written. Keys show as set or missing, never their value.",
+    "description": "A-16 channels section help"
+  },
+  "notifications.kind.ask_reply": {
+    "defaultMessage": "Ask reply",
+    "description": "Notification kind: a shop answered a customer's ask"
+  },
+  "notifications.kind.credits_earned": {
+    "defaultMessage": "Credits earned",
+    "description": "Notification kind: a customer earned credits"
+  },
+  "notifications.kind.credits_expiring": {
+    "defaultMessage": "Credits expiring",
+    "description": "Notification kind: a customer's credits expire soon"
+  },
+  "notifications.kind.delivery_return_pending": {
+    "defaultMessage": "Delivery return pending",
+    "description": "Notification kind: a delivery is coming back to the shop"
+  },
+  "notifications.kind.new_ask": {
+    "defaultMessage": "New ask",
+    "description": "Notification kind: a customer asked a shop for an item"
+  },
+  "notifications.kind.new_order": {
+    "defaultMessage": "New order",
+    "description": "Notification kind: a shop got a new order"
+  },
+  "notifications.kind.order_unseen": {
+    "defaultMessage": "Order not seen",
+    "description": "Notification kind: a shop has not opened a new order in time"
+  },
+  "notifications.kind.order_update": {
+    "defaultMessage": "Order update",
+    "description": "Notification kind: a customer's order changed status"
+  },
+  "notifications.kind.referral_unlocked": {
+    "defaultMessage": "Referral unlocked",
+    "description": "Notification kind: a customer's referral reward unlocked"
+  },
+  "notifications.kind.shop_referral_unlocked": {
+    "defaultMessage": "Shop referral unlocked",
+    "description": "Notification kind: a shop's referral reward unlocked"
+  },
+  "notifications.kinds": {
+    "defaultMessage": "Notification kinds",
+    "description": "A-16 table name"
+  },
+  "notifications.lang.en": {
+    "defaultMessage": "English",
+    "description": "Language name"
+  },
+  "notifications.lang.hi": {
+    "defaultMessage": "Hindi",
+    "description": "Language name"
+  },
+  "notifications.lang.kn": {
+    "defaultMessage": "Kannada",
+    "description": "Language name"
+  },
+  "notifications.lang.noOwn": {
+    "defaultMessage": "{lang} has no text of its own for this kind yet, so English is shown.",
+    "description": "A-16: the chosen language has no main text of its own for this kind"
+  },
+  "notifications.lang.ta": {
+    "defaultMessage": "Tamil",
+    "description": "Language name"
+  },
+  "notifications.lang.te": {
+    "defaultMessage": "Telugu",
+    "description": "Language name"
+  },
+  "notifications.langs": {
+    "defaultMessage": "Language",
+    "description": "A-16 tabs name: the language of the texts shown"
+  },
+  "notifications.langsOwn": {
+    "defaultMessage": "{own} of {all}",
+    "description": "A-16 column value: languages with their own text out of all languages"
+  },
+  "notifications.lastError": {
+    "defaultMessage": "Last failure {when}: {error}",
+    "description": "A-16 channel: the latest failed delivery; when is a relative time"
+  },
+  "notifications.noError": {
+    "defaultMessage": "No failed deliveries",
+    "description": "A-16 channel: no delivery on the channel has failed"
+  },
+  "notifications.notBuilt": {
+    "defaultMessage": "Sender not built yet",
+    "description": "A-16 channel pill: this build cannot send on the channel at all"
+  },
+  "notifications.params": {
+    "defaultMessage": "Values",
+    "description": "A-16 fact: the placeholders a text fills in"
+  },
+  "notifications.params.none": {
+    "defaultMessage": "None",
+    "description": "A-16 fact: the kind has no placeholders"
+  },
+  "notifications.pick": {
+    "defaultMessage": "Choose a kind to see its texts",
+    "description": "A-16 side panel before a kind is chosen"
+  },
+  "notifications.pick.notListed": {
+    "defaultMessage": "That kind is not in this list",
+    "description": "A-16 side panel: the kind in the URL is not in the filtered list"
+  },
+  "notifications.providerTemplates": {
+    "defaultMessage": "SMS templates",
+    "description": "A-16 fact: the DLT-registered SMS template each language uses"
+  },
+  "notifications.sub": {
+    "defaultMessage": "Every message the platform sends, in each language, and the keys each channel needs. Texts live in code until DLT re-registration has a process, so they are read-only here.",
+    "description": "A-16 page subtitle"
+  },
+  "notifications.switch.off": {
+    "defaultMessage": "Switched off",
+    "description": "A-16 channel pill: the channel's platform setting is off"
+  },
+  "notifications.switch.on": {
+    "defaultMessage": "Switched on",
+    "description": "A-16 channel pill: the channel's platform setting is on"
+  },
+  "notifications.test.business": {
+    "defaultMessage": "Business kinds go to a shop's inbox, so they cannot be sent as a test.",
+    "description": "A-16: why a business kind has no test send"
+  },
+  "notifications.test.done": {
+    "defaultMessage": "Test sent to your in-app inbox",
+    "description": "A-16 toast after a test send"
+  },
+  "notifications.test.help": {
+    "defaultMessage": "A test goes to your own in-app inbox in the customer app, with the values left as placeholders. Nothing goes by SMS, WhatsApp or push.",
+    "description": "A-16 test send help"
+  },
+  "notifications.test.send": {
+    "defaultMessage": "Send a test to me",
+    "description": "A-16 button: write this text to your own in-app inbox"
+  },
+  "notifications.var.missing": {
+    "defaultMessage": "Missing",
+    "description": "A-16 key pill: the environment variable has no value"
+  },
+  "notifications.var.set": {
+    "defaultMessage": "Set",
+    "description": "A-16 key pill: the environment variable has a value"
+  },
+  "notifications.variant.base": {
+    "defaultMessage": "Main text",
+    "description": "A-16: the kind's own text, not a variant"
+  }
+}

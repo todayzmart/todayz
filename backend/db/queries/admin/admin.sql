@@ -26,16 +26,15 @@ WHERE u.id = @id;
 
 -- name: LockCustomer :one
 -- Lock order is the users row before its sessions (identity's refresh does the same).
--- is_admin and is_customer are read under the same lock, so a guard on them holds
--- for the rest of the transaction.
-SELECT u.status,
-  (au.user_id IS NOT NULL AND au.disabled_at IS NULL)::bool AS is_admin,
-  (cp.user_id IS NOT NULL)::bool AS is_customer
-FROM users u
-  LEFT JOIN admin_users au ON au.user_id = u.id
-  LEFT JOIN customer_profiles cp ON cp.user_id = u.id
-WHERE u.id = @id
-FOR UPDATE OF u;
+SELECT status FROM users WHERE id = @id FOR UPDATE;
+
+-- name: CustomerRoles :one
+-- Read after LockCustomer, in a statement of its own: under read committed it
+-- takes a fresh snapshot, so an admin grant, re-enable or customer profile that
+-- committed while LockCustomer waited for the lock is seen.
+SELECT
+  EXISTS (SELECT 1 FROM admin_users au WHERE au.user_id = @id AND au.disabled_at IS NULL)::bool AS is_admin,
+  EXISTS (SELECT 1 FROM customer_profiles cp WHERE cp.user_id = @id)::bool AS is_customer;
 
 -- name: SetCustomerStatus :exec
 UPDATE users SET status = @status, updated_at = @now, version = version + 1 WHERE id = @id;
@@ -301,3 +300,294 @@ FROM leads WHERE id = @id FOR UPDATE;
 UPDATE leads SET status = @status, status_changed_at = @now, status_changed_by = @by, version = version + 1
 WHERE id = @id
 RETURNING id, name, phone_enc, shop_name, city, source, status, status_changed_at, created_at;
+
+------------------------------------------------------------------------------
+-- master catalogue (A-08)
+------------------------------------------------------------------------------
+
+-- name: ListProducts :many
+-- Newest first. q is matched as an escaped ILIKE pattern over the name,
+-- variant and brand; barcode is an exact match.
+SELECT p.id, p.name, b.name AS brand_name, p.category_id, (c.names ->> 'en')::text AS category_name,
+  p.variant, p.pack_size::float8 AS pack_size, p.unit, p.mrp_paise, p.barcodes, p.status, p.merged_into,
+  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at
+FROM products p JOIN categories c ON c.id = p.category_id LEFT JOIN brands b ON b.id = p.brand_id
+WHERE (sqlc.narg(status)::text IS NULL OR p.status = sqlc.narg(status)::text)
+  AND (sqlc.narg(category_id)::uuid IS NULL OR p.category_id = sqlc.narg(category_id)::uuid)
+  AND (sqlc.narg(barcode)::text IS NULL OR p.barcodes @> ARRAY[sqlc.narg(barcode)::text])
+  AND (sqlc.narg(pattern)::text IS NULL
+       OR p.name ILIKE sqlc.narg(pattern)::text
+       OR p.variant ILIKE sqlc.narg(pattern)::text
+       OR b.name ILIKE sqlc.narg(pattern)::text)
+  AND (sqlc.narg(before_at)::timestamptz IS NULL
+       OR (p.created_at, p.id) < (sqlc.narg(before_at)::timestamptz, sqlc.narg(before_id)::uuid))
+ORDER BY p.created_at DESC, p.id DESC
+LIMIT @lim;
+
+-- name: GetProduct :one
+SELECT p.id, p.name, b.name AS brand_name, p.category_id, (c.names ->> 'en')::text AS category_name,
+  p.variant, p.pack_size::float8 AS pack_size, p.unit, p.mrp_paise, p.barcodes, p.status, p.merged_into,
+  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at
+FROM products p JOIN categories c ON c.id = p.category_id LEFT JOIN brands b ON b.id = p.brand_id
+WHERE p.id = @id;
+
+-- name: LockProduct :one
+SELECT id, name, category_id, variant, pack_size::float8 AS pack_size, unit, mrp_paise, barcodes, status, merged_into
+FROM products WHERE id = @id FOR UPDATE;
+
+-- name: LockProductBarcodes :exec
+-- Serialises product writes that set barcodes, so the "barcode in use" check
+-- below cannot race (barcodes carry no unique index).
+SELECT pg_advisory_xact_lock(hashtext('admin.products.barcodes'));
+
+-- name: BarcodeTaken :one
+-- A barcode is taken by a product that is active or waiting for review.
+SELECT EXISTS (
+  SELECT 1 FROM products
+  WHERE barcodes && @barcodes::text[] AND id <> @id AND status IN ('active', 'pending_review')
+)::bool;
+
+-- name: CategoryParent :one
+SELECT parent_id FROM categories WHERE id = @id;
+
+-- name: InsertProduct :exec
+INSERT INTO products (id, name, category_id, variant, pack_size, unit, mrp_paise, barcodes, status, created_at, updated_at)
+VALUES (@id, @name, @category_id, sqlc.narg(variant), @pack_size::float8, @unit, sqlc.narg(mrp_paise), @barcodes::text[],
+  'active', @now, @now);
+
+-- name: UpdateProduct :exec
+UPDATE products SET name = @name, category_id = @category_id, variant = sqlc.narg(variant),
+  pack_size = @pack_size::float8, unit = @unit, mrp_paise = sqlc.narg(mrp_paise), barcodes = @barcodes::text[],
+  status = @status, updated_at = @now, version = version + 1
+WHERE id = @id;
+
+-- name: RefreshStoreItemSearch :exec
+-- store_items.search copies the product's words at insert (catalogue's
+-- InsertStoreItem); a master edit refreshes it the same way.
+UPDATE store_items si
+SET search = p.search || setweight(to_tsvector('simple'::regconfig, coalesce(b.name, '')), 'B')
+                      || setweight(to_tsvector('simple'::regconfig, coalesce(si.local_name, '')), 'A')
+FROM products p LEFT JOIN brands b ON b.id = p.brand_id
+WHERE p.id = @product_id AND si.product_id = p.id;
+
+-- name: ListPendingProducts :many
+-- The review queue, oldest first (keyset after_at/after_id).
+SELECT p.id, p.name, b.name AS brand_name, p.category_id, (c.names ->> 'en')::text AS category_name,
+  p.variant, p.pack_size::float8 AS pack_size, p.unit, p.mrp_paise, p.barcodes, p.status, p.merged_into,
+  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at,
+  p.created_by_store_id, s.name AS created_by_store_name
+FROM products p JOIN categories c ON c.id = p.category_id LEFT JOIN brands b ON b.id = p.brand_id
+LEFT JOIN stores s ON s.id = p.created_by_store_id
+WHERE p.status = 'pending_review'
+  AND (sqlc.narg(after_at)::timestamptz IS NULL
+       OR (p.created_at, p.id) > (sqlc.narg(after_at)::timestamptz, sqlc.narg(after_id)::uuid))
+ORDER BY p.created_at, p.id
+LIMIT @lim;
+
+-- name: ProductSuggestions :many
+-- Active products whose names look like name (pg_trgm), closest first.
+SELECT p.id, p.name, b.name AS brand_name, p.category_id, (c.names ->> 'en')::text AS category_name,
+  p.variant, p.pack_size::float8 AS pack_size, p.unit, p.mrp_paise, p.barcodes, p.status, p.merged_into,
+  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at,
+  similarity(p.name, @name::text)::float8 AS similarity
+FROM products p JOIN categories c ON c.id = p.category_id LEFT JOIN brands b ON b.id = p.brand_id
+WHERE p.status = 'active' AND p.id <> @id AND p.name % @name::text
+ORDER BY similarity(p.name, @name::text) DESC, p.id
+LIMIT 5;
+
+-- name: SetProductStatus :exec
+UPDATE products SET status = @status, merged_into = sqlc.narg(merged_into), updated_at = @now, version = version + 1
+WHERE id = @id;
+
+-- name: ProductListed :one
+SELECT EXISTS (SELECT 1 FROM store_items WHERE product_id = @product_id)::bool;
+
+-- name: DropDuplicateSynonyms :execrows
+-- Before a merge moves a product's synonyms, drop the ones the target
+-- already has (the pair index would refuse them).
+DELETE FROM product_synonyms f
+WHERE f.product_id = @from_id
+  AND EXISTS (SELECT 1 FROM product_synonyms t
+              WHERE t.product_id = @into_id AND t.term = f.term AND t.synonym = f.synonym);
+
+-- name: MoveSynonyms :execrows
+UPDATE product_synonyms SET product_id = @into_id WHERE product_id = @from_id;
+
+-- name: ListCategories :many
+-- Top-level categories first, then children, each by sort.
+SELECT c.id, c.parent_id, c.slug, c.names, c.tint, c.icon, c.sort, c.updated_at,
+  (SELECT count(*) FROM products p WHERE p.category_id = c.id AND p.status = 'active')::int AS product_count
+FROM categories c
+ORDER BY (c.parent_id IS NOT NULL), c.sort, c.slug;
+
+-- name: GetCategory :one
+SELECT c.id, c.parent_id, c.slug, c.names, c.tint, c.icon, c.sort, c.updated_at,
+  (SELECT count(*) FROM products p WHERE p.category_id = c.id AND p.status = 'active')::int AS product_count
+FROM categories c WHERE c.id = @id;
+
+-- name: LockCategory :one
+SELECT id, names, tint, icon, sort FROM categories WHERE id = @id FOR UPDATE;
+
+-- name: InsertCategory :exec
+INSERT INTO categories (id, parent_id, slug, names, tint, icon, sort, created_at, updated_at)
+VALUES (@id, sqlc.narg(parent_id), @slug, @names, @tint, @icon, @sort, @now, @now);
+
+-- name: UpdateCategory :exec
+UPDATE categories SET names = @names, tint = @tint, icon = @icon, sort = @sort, updated_at = @now
+WHERE id = @id;
+
+-- name: ListSynonyms :many
+-- Newest first; prefix matches the start of the term or the synonym.
+SELECT ps.id, ps.term, ps.synonym, ps.lang, ps.product_id, p.name AS product_name, ps.created_at
+FROM product_synonyms ps LEFT JOIN products p ON p.id = ps.product_id
+WHERE (sqlc.narg(prefix)::text IS NULL OR ps.term LIKE sqlc.narg(prefix)::text OR ps.synonym LIKE sqlc.narg(prefix)::text)
+  AND (sqlc.narg(before_at)::timestamptz IS NULL
+       OR (ps.created_at, ps.id) < (sqlc.narg(before_at)::timestamptz, sqlc.narg(before_id)::uuid))
+ORDER BY ps.created_at DESC, ps.id DESC
+LIMIT @lim;
+
+-- name: GetSynonym :one
+SELECT ps.id, ps.term, ps.synonym, ps.lang, ps.product_id, p.name AS product_name, ps.created_at
+FROM product_synonyms ps LEFT JOIN products p ON p.id = ps.product_id
+WHERE ps.id = @id;
+
+-- name: ProductStatus :one
+SELECT status FROM products WHERE id = @id;
+
+-- name: InsertSynonym :exec
+INSERT INTO product_synonyms (id, term, synonym, lang, product_id, created_at)
+VALUES (@id, @term, @synonym, @lang, sqlc.narg(product_id), @now);
+
+-- name: DeleteSynonym :one
+DELETE FROM product_synonyms WHERE id = @id
+RETURNING term, synonym, lang, product_id;
+
+-- A-20 banner moderation (W3-05). The takedown goes through the banners
+-- service (it owns the removal and the shop's event); the approve is here.
+
+-- name: ListAdminBanners :many
+-- review: waiting uploads, oldest first. live: cleared live, scheduled or paused,
+-- newest first. removed: taken down, newest first. Keyset on (created_at, id).
+SELECT sb.id, sb.store_id, s.name AS store_name, s.city AS store_city, sb.headline, sb.image_key, sb.template,
+  sb.target_type, cardinality(sb.target_item_ids)::int AS target_item_count,
+  COALESCE(CASE sb.target_type WHEN 'offer' THEN o.title WHEN 'category' THEN (c.names ->> 'en') END, '')::text AS target_label,
+  sb.starts_at, sb.ends_at, sb.status, sb.moderation, sb.remove_reason, sb.removed_at, sb.created_at, sb.updated_at
+FROM store_banners sb JOIN stores s ON s.id = sb.store_id
+LEFT JOIN offers o ON sb.target_type = 'offer' AND o.id = sb.target_id
+LEFT JOIN categories c ON sb.target_type = 'category' AND c.id = sb.target_id
+WHERE CASE @state::text
+    WHEN 'review' THEN sb.status = 'pending_review' AND sb.moderation = 'needs_review'
+    WHEN 'live' THEN sb.status IN ('live', 'scheduled', 'paused') AND sb.moderation = 'auto_ok'
+    ELSE sb.status = 'removed' END
+  AND (sqlc.narg(store_id)::uuid IS NULL OR sb.store_id = sqlc.narg(store_id)::uuid)
+  AND (sqlc.narg(after_at)::timestamptz IS NULL
+       OR (@state::text = 'review' AND (sb.created_at, sb.id) > (sqlc.narg(after_at)::timestamptz, sqlc.narg(after_id)::uuid))
+       OR (@state::text <> 'review' AND (sb.created_at, sb.id) < (sqlc.narg(after_at)::timestamptz, sqlc.narg(after_id)::uuid)))
+ORDER BY CASE WHEN @state::text = 'review' THEN sb.created_at END,
+  CASE WHEN @state::text = 'review' THEN sb.id END,
+  sb.created_at DESC, sb.id DESC
+LIMIT @lim;
+
+-- name: GetAdminBanner :one
+SELECT sb.id, sb.store_id, s.name AS store_name, s.city AS store_city, sb.headline, sb.image_key, sb.template,
+  sb.target_type, cardinality(sb.target_item_ids)::int AS target_item_count,
+  COALESCE(CASE sb.target_type WHEN 'offer' THEN o.title WHEN 'category' THEN (c.names ->> 'en') END, '')::text AS target_label,
+  sb.starts_at, sb.ends_at, sb.status, sb.moderation, sb.remove_reason, sb.removed_at, sb.created_at, sb.updated_at
+FROM store_banners sb JOIN stores s ON s.id = sb.store_id
+LEFT JOIN offers o ON sb.target_type = 'offer' AND o.id = sb.target_id
+LEFT JOIN categories c ON sb.target_type = 'category' AND c.id = sb.target_id
+WHERE sb.id = @id;
+
+-- name: LockBanner :one
+SELECT id, status, moderation, starts_at, ends_at FROM store_banners WHERE id = @id FOR UPDATE;
+
+-- name: ClearBanner :execrows
+-- A person cleared a held upload: it shows from now on, like an automatic pass.
+UPDATE store_banners SET moderation = 'auto_ok', status = @status, version = version + 1, updated_at = @now
+WHERE id = @id AND status = 'pending_review' AND moderation = 'needs_review';
+
+------------------------------------------------------------------------------
+-- admin users (A-18)
+------------------------------------------------------------------------------
+
+-- name: ListAdminUsers :many
+-- Newest first, keyset on (created_at, user_id). lastActiveAt is the latest
+-- use of any admin session.
+SELECT au.user_id, u.name, pi.phone_enc, au.roles, au.totp_enabled_at, au.created_by, cb.name AS created_by_name,
+  au.created_at, au.disabled_at, au.version,
+  (SELECT max(s.last_used_at) FROM sessions s WHERE s.user_id = au.user_id AND s.app = 'admin') AS last_active_at
+FROM admin_users au JOIN users u ON u.id = au.user_id
+LEFT JOIN phone_identities pi ON pi.user_id = au.user_id
+LEFT JOIN users cb ON cb.id = au.created_by
+WHERE (au.disabled_at IS NOT NULL) = @disabled::bool
+  AND (sqlc.narg(after_at)::timestamptz IS NULL
+       OR (au.created_at, au.user_id) < (sqlc.narg(after_at)::timestamptz, sqlc.narg(after_id)::uuid))
+ORDER BY au.created_at DESC, au.user_id DESC
+LIMIT @lim;
+
+-- name: GetAdminUser :one
+SELECT au.user_id, u.name, pi.phone_enc, au.roles, au.totp_enabled_at, au.created_by, cb.name AS created_by_name,
+  au.created_at, au.disabled_at, au.version,
+  (SELECT max(s.last_used_at) FROM sessions s WHERE s.user_id = au.user_id AND s.app = 'admin') AS last_active_at
+FROM admin_users au JOIN users u ON u.id = au.user_id
+LEFT JOIN phone_identities pi ON pi.user_id = au.user_id
+LEFT JOIN users cb ON cb.id = au.created_by
+WHERE au.user_id = @id;
+
+-- name: LockAdminUsers :exec
+-- Serialises every A-18 change, so two super_admins acting at once cannot
+-- together leave no active super_admin.
+SELECT pg_advisory_xact_lock(hashtextextended('admin:admin_users', 0));
+
+-- name: LockAdminUser :one
+SELECT roles, disabled_at, version FROM admin_users WHERE user_id = @id FOR UPDATE;
+
+-- name: CountActiveSuperAdmins :one
+SELECT count(*)::int FROM admin_users au JOIN users u ON u.id = au.user_id
+WHERE au.disabled_at IS NULL AND 'super_admin' = ANY (au.roles) AND u.status = 'active';
+
+-- name: AdminUserExists :one
+-- Any admin_users row, enabled or not: a disabled admin is re-enabled, not invited.
+SELECT EXISTS (SELECT 1 FROM admin_users WHERE user_id = @user_id)::bool;
+
+-- name: NameUserIfUnnamed :exec
+UPDATE users SET name = @name, version = version + 1 WHERE id = @id AND name IS NULL;
+
+-- name: InsertAdminUser :exec
+INSERT INTO admin_users (user_id, roles, created_by, created_at, updated_at)
+VALUES (@user_id, @roles::text[], @created_by, @now, @now);
+
+-- name: UpdateAdminUser :exec
+UPDATE admin_users SET roles = @roles::text[], disabled_at = sqlc.narg(disabled_at)::timestamptz,
+  version = version + 1, updated_at = @now
+WHERE user_id = @id;
+
+-- name: ResetAdminTOTP :exec
+UPDATE admin_users SET totp_secret_enc = NULL, totp_enabled_at = NULL, totp_last_step = NULL, totp_failures = 0,
+  version = version + 1, updated_at = @now
+WHERE user_id = @id;
+
+-- name: DeleteAdminRecoveryCodes :execrows
+DELETE FROM admin_recovery_codes WHERE admin_id = @admin_id;
+
+-- name: RevokeAdminSessions :execrows
+UPDATE sessions SET revoked_at = @now::timestamptz, revoked_reason = 'admin'
+WHERE user_id = @user_id AND app = 'admin' AND revoked_at IS NULL;
+
+------------------------------------------------------------------------------
+-- notifications (A-16)
+------------------------------------------------------------------------------
+
+-- name: NotifyChannelSwitches :many
+-- The notify_<channel>_enabled settings; a missing row reads as off.
+SELECT key, (value = 'true'::jsonb)::bool AS enabled
+FROM platform_settings
+WHERE key IN ('notify_push_enabled', 'notify_sms_enabled', 'notify_whatsapp_enabled');
+
+-- name: LastFailedDelivery :one
+-- The channel's latest failed delivery (ix_notification_deliveries_failed).
+SELECT updated_at, coalesce(error, '')::text AS error
+FROM notification_deliveries
+WHERE channel = @channel AND status = 'failed'
+ORDER BY updated_at DESC
+LIMIT 1;

@@ -23,6 +23,12 @@ describe('audit search', () => {
     expect(s).toEqual({ action: 'customer.block', subjectType: 'user', from: '2026-10-25' });
     expect(auditParams(s)).toEqual({ action: 'customer.block', subjectType: 'user', from: '2026-10-24T18:30:00.000Z' });
   });
+
+  it("keeps W3-01's money subjects", () => {
+    for (const subjectType of ['payout', 'payout_period', 'credit_adjustment'] as const) {
+      expect(validateAuditSearch({ subjectType })).toEqual({ subjectType });
+    }
+  });
 });
 
 describe('A-19 audit log', () => {
@@ -35,6 +41,23 @@ describe('A-19 audit log', () => {
     const sheet = await screen.findByRole('dialog', { name: 'Customer blocked' });
     expect(within(sheet).getByLabelText('was active')).toHaveTextContent('active');
     expect(within(sheet).getByText('fake orders')).toBeInTheDocument();
+  });
+
+  it('names the payout and wallet actions', async () => {
+    const money: Handler = (c) =>
+      c.path === '/v1/admin/audit-log'
+        ? json(200, {
+            ...emptyAudit,
+            items: [
+              auditEntry({ id: '01JAUDIT00000000000000A002', action: 'payouts.mark_paid', subjectType: 'payout', before: null, after: { status: 'paid' } }),
+              auditEntry({ id: '01JAUDIT00000000000000A003', action: 'credits.adjustment_request', subjectType: 'credit_adjustment', before: null, after: null }),
+            ],
+          })
+        : undefined;
+    renderAt('/audit', { roles: ['admin'], handlers: [money] });
+    const table = await screen.findByRole('table', { name: 'Audit log' });
+    expect(await within(table).findByRole('button', { name: 'Payout marked paid' })).toBeInTheDocument();
+    expect(within(table).getByRole('button', { name: 'Wallet adjustment requested' })).toBeInTheDocument();
   });
 
   it('puts the filters in the URL', async () => {

@@ -1,9 +1,141 @@
-# Schemas: domain "admin-notifications" (owner W2-05): admin notifications (04 §2.7).
+# Schemas: domain "admin-notifications" (owner W3-05): A-16 notifications (04 §2.7, D-224).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Names are unique across every schemas/<domain>.yaml. Request objects carry
+# `additionalProperties: false`. No key value ever appears here, only its name and set or missing.
+AdminNotificationApp:
+  type: string
+  description: Whose inbox a kind is written to.
+  enum: [customer, business]
+AdminNotificationChannel:
+  type: string
+  description: An outside channel; the in-app inbox is always written and has no switch.
+  enum: [push, sms, whatsapp]
+AdminNotificationLang:
+  type: string
+  enum: [en, hi, kn, te, ta]
+AdminNotificationText:
+  type: object
+  additionalProperties: false
+  required: [lang, variant, title, body, fallback]
+  properties:
+    lang: {$ref: '#/AdminNotificationLang'}
+    variant:
+      type: [string, 'null']
+      description: The variant (an order's new status) this text replaces the kind's text for; null for the kind's own.
+      maxLength: 32
+    title: {type: string, maxLength: 200}
+    body: {type: string, maxLength: 1000}
+    fallback:
+      type: boolean
+      description: True when this language has no text of its own and shows the English one.
+AdminNotificationProviderTemplate:
+  type: object
+  additionalProperties: false
+  required: [lang, name, smsTemplateIdSet]
+  properties:
+    lang: {$ref: '#/AdminNotificationLang'}
+    name: {type: string, maxLength: 64}
+    smsTemplateIdSet:
+      type: boolean
+      description: Whether SMS_NOTICE_TEMPLATE_IDS maps this name to a DLT template id.
+AdminNotificationTemplate:
+  type: object
+  additionalProperties: false
+  required: [kind, app, channels, params, texts, providerTemplates, testable]
+  properties:
+    kind: {type: string, maxLength: 32}
+    app: {$ref: '#/AdminNotificationApp'}
+    channels:
+      type: array
+      maxItems: 3
+      items: {$ref: '#/AdminNotificationChannel'}
+    params:
+      type: array
+      maxItems: 8
+      items: {type: string, maxLength: 32}
+    texts:
+      type: array
+      maxItems: 100
+      items: {$ref: '#/AdminNotificationText'}
+    providerTemplates:
+      type: array
+      maxItems: 5
+      items: {$ref: '#/AdminNotificationProviderTemplate'}
+    testable:
+      type: boolean
+      description: True for a customer-app kind, which a test send can write to your own inbox.
+AdminNotificationTemplateList:
+  type: object
+  additionalProperties: false
+  required: [items, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: '#/AdminNotificationTemplate'}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminNotificationTestSend:
+  type: object
+  additionalProperties: false
+  required: [kind]
+  properties:
+    kind: {type: string, minLength: 1, maxLength: 32}
+    variant:
+      type: [string, 'null']
+      maxLength: 32
+AdminNotificationTestResult:
+  type: object
+  additionalProperties: false
+  required: [notificationId, kind, variant, sentAt]
+  properties:
+    notificationId: {$ref: ./common.yaml#/Ulid}
+    kind: {type: string, maxLength: 32}
+    variant:
+      type: [string, 'null']
+      maxLength: 32
+    sentAt: {$ref: ./common.yaml#/Timestamp}
+AdminIntegrationVar:
+  type: object
+  additionalProperties: false
+  required: [name, set]
+  properties:
+    name: {type: string, maxLength: 64}
+    set: {type: boolean}
+AdminIntegrationError:
+  type: object
+  additionalProperties: false
+  required: [at, error]
+  properties:
+    at: {$ref: ./common.yaml#/Timestamp}
+    error: {type: string, maxLength: 200}
+AdminIntegration:
+  type: object
+  additionalProperties: false
+  required: [channel, enabled, senderBuilt, vars, lastError]
+  properties:
+    channel: {$ref: '#/AdminNotificationChannel'}
+    enabled:
+      type: boolean
+      description: The channel's notify_<channel>_enabled setting.
+    senderBuilt:
+      type: boolean
+      description: Whether this build can send on the channel at all; false while its sender is still to come.
+    vars:
+      type: array
+      maxItems: 10
+      items: {$ref: '#/AdminIntegrationVar'}
+    lastError:
+      description: The latest failed delivery on the channel; null when none failed.
+      oneOf:
+        - {$ref: '#/AdminIntegrationError'}
+        - {type: 'null'}
+AdminIntegrationList:
+  type: object
+  additionalProperties: false
+  required: [items, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 3
+      items: {$ref: '#/AdminIntegration'}
+    serverNow: {$ref: ./common.yaml#/ServerNow}

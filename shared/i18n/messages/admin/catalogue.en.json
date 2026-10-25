@@ -1,0 +1,622 @@
+{
+  "catalogue.sub": {
+    "defaultMessage": "The products every store picks from. Review what stores add, merge duplicates, and keep categories and search words tidy.",
+    "description": "A-08 Catalogue: page subtitle"
+  },
+  "catalogue.tabs": {
+    "defaultMessage": "Catalogue views",
+    "description": "Accessible name of the A-08 tab list"
+  },
+  "catalogue.tab.products": {
+    "defaultMessage": "Products",
+    "description": "A-08 tab: master products"
+  },
+  "catalogue.tab.review": {
+    "defaultMessage": "To review",
+    "description": "A-08 tab: products stores added that wait for review"
+  },
+  "catalogue.tab.categories": {
+    "defaultMessage": "Categories",
+    "description": "A-08 tab"
+  },
+  "catalogue.tab.synonyms": {
+    "defaultMessage": "Search words",
+    "description": "A-08 tab: search synonyms"
+  },
+  "catalogue.filters": {
+    "defaultMessage": "Product filters",
+    "description": "Accessible name of the product filter form"
+  },
+  "catalogue.filter.q": {
+    "defaultMessage": "Search",
+    "description": "Product filter: name, variant, brand or barcode"
+  },
+  "catalogue.filter.qHelp": {
+    "defaultMessage": "Name, variant, brand, or a full barcode",
+    "description": "Help under the product search field"
+  },
+  "catalogue.filter.status": {
+    "defaultMessage": "Status",
+    "description": "Product filter label"
+  },
+  "catalogue.filter.anyStatus": {
+    "defaultMessage": "Any status",
+    "description": "Product filter option: every status"
+  },
+  "catalogue.filter.category": {
+    "defaultMessage": "Category",
+    "description": "Product filter label"
+  },
+  "catalogue.filter.anyCategory": {
+    "defaultMessage": "Any category",
+    "description": "Product filter option: every category"
+  },
+  "catalogue.filter.apply": {
+    "defaultMessage": "Search",
+    "description": "Apply the filters"
+  },
+  "catalogue.filter.clear": {
+    "defaultMessage": "Clear",
+    "description": "Clear the filters"
+  },
+  "catalogue.filter.prefix": {
+    "defaultMessage": "Starts with",
+    "description": "Synonym search: a prefix of the word or the synonym"
+  },
+  "catalogue.products.table": {
+    "defaultMessage": "Products",
+    "description": "Accessible name of the product table"
+  },
+  "catalogue.products.empty": {
+    "defaultMessage": "No products match these filters.",
+    "description": "Empty product table"
+  },
+  "catalogue.review.table": {
+    "defaultMessage": "Products to review",
+    "description": "Accessible name of the review queue table"
+  },
+  "catalogue.review.empty": {
+    "defaultMessage": "Nothing to review. New products from stores show up here.",
+    "description": "Empty review queue"
+  },
+  "catalogue.categories.table": {
+    "defaultMessage": "Categories",
+    "description": "Accessible name of the category table"
+  },
+  "catalogue.categories.empty": {
+    "defaultMessage": "No categories yet.",
+    "description": "Empty category table"
+  },
+  "catalogue.synonyms.table": {
+    "defaultMessage": "Search words",
+    "description": "Accessible name of the synonym table"
+  },
+  "catalogue.synonyms.empty": {
+    "defaultMessage": "No search words match.",
+    "description": "Empty synonym table"
+  },
+  "catalogue.synonyms.search": {
+    "defaultMessage": "Search words",
+    "description": "Accessible name of the synonym search form"
+  },
+  "catalogue.col.product": {
+    "defaultMessage": "Product",
+    "description": "Column"
+  },
+  "catalogue.col.brand": {
+    "defaultMessage": "Brand",
+    "description": "Column / fact label"
+  },
+  "catalogue.col.category": {
+    "defaultMessage": "Category",
+    "description": "Column / fact label"
+  },
+  "catalogue.col.pack": {
+    "defaultMessage": "Pack",
+    "description": "Column: pack size and unit"
+  },
+  "catalogue.col.mrp": {
+    "defaultMessage": "MRP",
+    "description": "Column: maximum retail price"
+  },
+  "catalogue.col.stores": {
+    "defaultMessage": "Stores",
+    "description": "Column: stores that list the product"
+  },
+  "catalogue.col.status": {
+    "defaultMessage": "Status",
+    "description": "Column"
+  },
+  "catalogue.col.updated": {
+    "defaultMessage": "Changed",
+    "description": "Column: last change"
+  },
+  "catalogue.col.added": {
+    "defaultMessage": "Added",
+    "description": "Column: when it was created"
+  },
+  "catalogue.col.store": {
+    "defaultMessage": "Added by",
+    "description": "Column: the store that added a pending product"
+  },
+  "catalogue.col.matches": {
+    "defaultMessage": "Likely duplicates",
+    "description": "Column: number of similar active products"
+  },
+  "catalogue.col.slug": {
+    "defaultMessage": "Slug",
+    "description": "Column: category slug"
+  },
+  "catalogue.col.tint": {
+    "defaultMessage": "Colour",
+    "description": "Column: category tint"
+  },
+  "catalogue.col.icon": {
+    "defaultMessage": "Icon",
+    "description": "Column: Lucide icon name"
+  },
+  "catalogue.col.sort": {
+    "defaultMessage": "Order",
+    "description": "Column: sort position"
+  },
+  "catalogue.col.products": {
+    "defaultMessage": "Products",
+    "description": "Column: active products in the category"
+  },
+  "catalogue.col.term": {
+    "defaultMessage": "Word",
+    "description": "Column: the search term"
+  },
+  "catalogue.col.synonym": {
+    "defaultMessage": "Also matches",
+    "description": "Column: the synonym search reads as the word"
+  },
+  "catalogue.col.lang": {
+    "defaultMessage": "Language",
+    "description": "Column"
+  },
+  "catalogue.col.actions": {
+    "defaultMessage": "Actions",
+    "description": "Column"
+  },
+  "catalogue.status.active": {
+    "defaultMessage": "Active",
+    "description": "Product status"
+  },
+  "catalogue.status.pending": {
+    "defaultMessage": "To review",
+    "description": "Product status pending_review"
+  },
+  "catalogue.status.merged": {
+    "defaultMessage": "Merged",
+    "description": "Product status: merged into another product"
+  },
+  "catalogue.status.retired": {
+    "defaultMessage": "Retired",
+    "description": "Product status: off the catalogue"
+  },
+  "catalogue.lang.en": {
+    "defaultMessage": "English",
+    "description": "Language name"
+  },
+  "catalogue.lang.hi": {
+    "defaultMessage": "Hindi",
+    "description": "Language name"
+  },
+  "catalogue.lang.kn": {
+    "defaultMessage": "Kannada",
+    "description": "Language name"
+  },
+  "catalogue.lang.te": {
+    "defaultMessage": "Telugu",
+    "description": "Language name"
+  },
+  "catalogue.lang.ta": {
+    "defaultMessage": "Tamil",
+    "description": "Language name"
+  },
+  "catalogue.tint.green": {
+    "defaultMessage": "Green",
+    "description": "Category tint"
+  },
+  "catalogue.tint.amber": {
+    "defaultMessage": "Amber",
+    "description": "Category tint"
+  },
+  "catalogue.tint.rose": {
+    "defaultMessage": "Rose",
+    "description": "Category tint"
+  },
+  "catalogue.tint.sky": {
+    "defaultMessage": "Sky",
+    "description": "Category tint"
+  },
+  "catalogue.tint.lilac": {
+    "defaultMessage": "Lilac",
+    "description": "Category tint"
+  },
+  "catalogue.tint.peach": {
+    "defaultMessage": "Peach",
+    "description": "Category tint"
+  },
+  "catalogue.none": {
+    "defaultMessage": "None",
+    "description": "Shown for an empty value"
+  },
+  "catalogue.pick.product": {
+    "defaultMessage": "Pick a product to see its details and history.",
+    "description": "Side panel placeholder"
+  },
+  "catalogue.pick.missing": {
+    "defaultMessage": "That product could not be found.",
+    "description": "Side panel: the product in the link does not exist"
+  },
+  "catalogue.pick.pending": {
+    "defaultMessage": "Pick a product to review it.",
+    "description": "Side panel placeholder in the review queue"
+  },
+  "catalogue.pick.decided": {
+    "defaultMessage": "This product is no longer waiting for review. Its history is below.",
+    "description": "Review queue: the linked product was already decided"
+  },
+  "catalogue.pick.category": {
+    "defaultMessage": "Pick a category to see its names and history.",
+    "description": "Side panel placeholder"
+  },
+  "catalogue.pick.synonym": {
+    "defaultMessage": "Pick a word to see its history.",
+    "description": "Side panel placeholder"
+  },
+  "catalogue.product.add": {
+    "defaultMessage": "Add product",
+    "description": "Button: add a master product"
+  },
+  "catalogue.product.addTitle": {
+    "defaultMessage": "Add a product",
+    "description": "Dialog title"
+  },
+  "catalogue.product.addBody": {
+    "defaultMessage": "It is active at once and every store can pick it.",
+    "description": "Add product dialog body"
+  },
+  "catalogue.product.added": {
+    "defaultMessage": "Product added",
+    "description": "Toast"
+  },
+  "catalogue.product.edit": {
+    "defaultMessage": "Edit",
+    "description": "Button: edit the product"
+  },
+  "catalogue.product.editTitle": {
+    "defaultMessage": "Edit {name}",
+    "description": "Dialog title"
+  },
+  "catalogue.product.editBody": {
+    "defaultMessage": "Stores that list it see the change. Only what you change is saved.",
+    "description": "Edit product dialog body"
+  },
+  "catalogue.product.save": {
+    "defaultMessage": "Save",
+    "description": "Save the product"
+  },
+  "catalogue.product.saved": {
+    "defaultMessage": "Product saved",
+    "description": "Toast"
+  },
+  "catalogue.product.mergedInto": {
+    "defaultMessage": "Open the product it became",
+    "description": "Link from a merged product to its target"
+  },
+  "catalogue.product.inQueue": {
+    "defaultMessage": "A store added this product and it waits for review.",
+    "description": "Product detail note for a pending product"
+  },
+  "catalogue.product.openQueue": {
+    "defaultMessage": "Review it",
+    "description": "Link to the review queue"
+  },
+  "catalogue.field.name": {
+    "defaultMessage": "Name",
+    "description": "Product name field"
+  },
+  "catalogue.field.nameError": {
+    "defaultMessage": "Enter a name, up to 120 characters.",
+    "description": "Product or category name error"
+  },
+  "catalogue.field.category": {
+    "defaultMessage": "Category",
+    "description": "Field label"
+  },
+  "catalogue.field.categoryPick": {
+    "defaultMessage": "Choose a category",
+    "description": "Placeholder option"
+  },
+  "catalogue.field.categoryError": {
+    "defaultMessage": "Choose a category.",
+    "description": "Field error"
+  },
+  "catalogue.field.variant": {
+    "defaultMessage": "Variant",
+    "description": "Product variant field, e.g. Unpolished"
+  },
+  "catalogue.field.optional": {
+    "defaultMessage": "Optional",
+    "description": "Help under an optional field"
+  },
+  "catalogue.field.pack": {
+    "defaultMessage": "Pack size",
+    "description": "Field: number of units in the pack"
+  },
+  "catalogue.field.packError": {
+    "defaultMessage": "Enter a pack size above 0.",
+    "description": "Field error"
+  },
+  "catalogue.field.unit": {
+    "defaultMessage": "Unit",
+    "description": "Field: g, kg, ml, l, pc or pack"
+  },
+  "catalogue.field.mrp": {
+    "defaultMessage": "MRP",
+    "description": "Field: maximum retail price in rupees"
+  },
+  "catalogue.field.mrpError": {
+    "defaultMessage": "Enter the MRP in rupees, like 189 or 189.50.",
+    "description": "Field error"
+  },
+  "catalogue.field.barcodes": {
+    "defaultMessage": "Barcodes",
+    "description": "Field / fact label"
+  },
+  "catalogue.field.barcodesHelp": {
+    "defaultMessage": "8 to 14 digits each, separated by commas or spaces",
+    "description": "Help under the barcodes field"
+  },
+  "catalogue.field.barcodeError": {
+    "defaultMessage": "Each barcode is 8 to 14 digits.",
+    "description": "Field error"
+  },
+  "catalogue.field.barcodesMany": {
+    "defaultMessage": "At most 10 barcodes.",
+    "description": "Field error"
+  },
+  "catalogue.field.status": {
+    "defaultMessage": "Status",
+    "description": "Segmented: active or retired"
+  },
+  "catalogue.field.slug": {
+    "defaultMessage": "Slug",
+    "description": "Category slug field"
+  },
+  "catalogue.field.slugHelp": {
+    "defaultMessage": "Lower-case words joined by hyphens, like dry-fruits. It cannot change later.",
+    "description": "Help under the slug field"
+  },
+  "catalogue.field.slugError": {
+    "defaultMessage": "Use lower-case letters, digits and single hyphens.",
+    "description": "Field error"
+  },
+  "catalogue.field.parent": {
+    "defaultMessage": "Inside",
+    "description": "Category parent field"
+  },
+  "catalogue.field.parentNone": {
+    "defaultMessage": "Nothing (a top-level category)",
+    "description": "Parent option"
+  },
+  "catalogue.field.nameIn": {
+    "defaultMessage": "Name in {lang}",
+    "description": "Category name field per language"
+  },
+  "catalogue.field.iconHelp": {
+    "defaultMessage": "An icon name from the icon set, like wheat",
+    "description": "Help under the icon field"
+  },
+  "catalogue.field.iconError": {
+    "defaultMessage": "Use an icon name from the icon set: lower-case words joined by hyphens.",
+    "description": "Field error"
+  },
+  "catalogue.field.sortHelp": {
+    "defaultMessage": "Lower comes first, 0 to 10,000",
+    "description": "Help under the order field"
+  },
+  "catalogue.field.sortError": {
+    "defaultMessage": "Enter a whole number from 0 to 10,000.",
+    "description": "Field error"
+  },
+  "catalogue.field.termHelp": {
+    "defaultMessage": "What the product is called, like curd",
+    "description": "Help under the word field"
+  },
+  "catalogue.field.termError": {
+    "defaultMessage": "Enter a word, up to 80 characters.",
+    "description": "Field error"
+  },
+  "catalogue.field.synonymHelp": {
+    "defaultMessage": "What shoppers also type, like dahi",
+    "description": "Help under the synonym field"
+  },
+  "catalogue.field.productId": {
+    "defaultMessage": "Product ID",
+    "description": "Optional product id for a synonym"
+  },
+  "catalogue.field.productIdHelp": {
+    "defaultMessage": "Optional: tie the word to one active product",
+    "description": "Help under the product id field"
+  },
+  "catalogue.field.productIdError": {
+    "defaultMessage": "A product ID is 26 letters and digits.",
+    "description": "Field error"
+  },
+  "catalogue.error.unchanged": {
+    "defaultMessage": "Nothing has changed.",
+    "description": "A save with no change"
+  },
+  "catalogue.error.barcodeTaken": {
+    "defaultMessage": "Another product already has one of these barcodes.",
+    "description": "409 on product create or edit"
+  },
+  "catalogue.error.slugTaken": {
+    "defaultMessage": "Another category already uses this slug.",
+    "description": "409 on category create"
+  },
+  "catalogue.error.synonymTaken": {
+    "defaultMessage": "This pair is already there.",
+    "description": "409 on synonym create"
+  },
+  "catalogue.error.category": {
+    "defaultMessage": "That category no longer exists. Pick another.",
+    "description": "422 body.categoryId"
+  },
+  "catalogue.error.into": {
+    "defaultMessage": "Merge only into an active product, and not into itself.",
+    "description": "422 body.intoProductId"
+  },
+  "catalogue.error.product": {
+    "defaultMessage": "That product is not active.",
+    "description": "422 body.productId on a synonym"
+  },
+  "catalogue.error.parent": {
+    "defaultMessage": "A category can only sit inside a top-level category.",
+    "description": "422 body.parentId"
+  },
+  "catalogue.error.same": {
+    "defaultMessage": "Enter a different word, up to 80 characters.",
+    "description": "The synonym is empty or the same as the word"
+  },
+  "catalogue.review.matches": {
+    "defaultMessage": "Likely duplicates",
+    "description": "Card title: active products with similar names"
+  },
+  "catalogue.review.noMatches": {
+    "defaultMessage": "No similar active products.",
+    "description": "No duplicate suggestions"
+  },
+  "catalogue.review.match": {
+    "defaultMessage": "{pack} · {similarity} alike · {stores, plural, one {# store} other {# stores}}",
+    "description": "One duplicate suggestion line"
+  },
+  "catalogue.review.mergeInto": {
+    "defaultMessage": "Merge into this",
+    "description": "Button: merge the pending product into the suggestion"
+  },
+  "catalogue.review.merge": {
+    "defaultMessage": "Merge",
+    "description": "Confirm merge"
+  },
+  "catalogue.review.mergeTitle": {
+    "defaultMessage": "Merge {name} into {into}?",
+    "description": "Dialog title"
+  },
+  "catalogue.review.mergeBody": {
+    "defaultMessage": "The store's item points at the existing product, and its search words move with it. This cannot be undone.",
+    "description": "Merge dialog body"
+  },
+  "catalogue.review.merged": {
+    "defaultMessage": "Merged",
+    "description": "Toast"
+  },
+  "catalogue.review.approve": {
+    "defaultMessage": "Approve",
+    "description": "Button: add the product to the catalogue"
+  },
+  "catalogue.review.approveTitle": {
+    "defaultMessage": "Approve {name}?",
+    "description": "Dialog title"
+  },
+  "catalogue.review.approveBody": {
+    "defaultMessage": "It becomes an active product every store can pick.",
+    "description": "Approve dialog body"
+  },
+  "catalogue.review.approved": {
+    "defaultMessage": "Approved",
+    "description": "Toast"
+  },
+  "catalogue.review.reject": {
+    "defaultMessage": "Reject",
+    "description": "Button: refuse the product"
+  },
+  "catalogue.review.rejectTitle": {
+    "defaultMessage": "Reject {name}?",
+    "description": "Dialog title"
+  },
+  "catalogue.review.rejectBody": {
+    "defaultMessage": "It is retired and stays off the catalogue. The reason goes to the audit log.",
+    "description": "Reject dialog body"
+  },
+  "catalogue.review.rejected": {
+    "defaultMessage": "Rejected",
+    "description": "Toast"
+  },
+  "catalogue.review.note": {
+    "defaultMessage": "Note",
+    "description": "Optional note on approve or merge"
+  },
+  "catalogue.category.add": {
+    "defaultMessage": "Add category",
+    "description": "Button"
+  },
+  "catalogue.category.addTitle": {
+    "defaultMessage": "Add a category",
+    "description": "Dialog title"
+  },
+  "catalogue.category.addBody": {
+    "defaultMessage": "Stores and shoppers see the name in their language, English when it is missing.",
+    "description": "Add category dialog body"
+  },
+  "catalogue.category.added": {
+    "defaultMessage": "Category added",
+    "description": "Toast"
+  },
+  "catalogue.category.edit": {
+    "defaultMessage": "Edit",
+    "description": "Button: edit the category"
+  },
+  "catalogue.category.editTitle": {
+    "defaultMessage": "Edit {name}",
+    "description": "Dialog title"
+  },
+  "catalogue.category.editBody": {
+    "defaultMessage": "Rename, recolour or reorder. The slug and parent stay as they are.",
+    "description": "Edit category dialog body"
+  },
+  "catalogue.category.save": {
+    "defaultMessage": "Save",
+    "description": "Save the category"
+  },
+  "catalogue.category.saved": {
+    "defaultMessage": "Category saved",
+    "description": "Toast"
+  },
+  "catalogue.synonym.addTitle": {
+    "defaultMessage": "Add a search word",
+    "description": "Card title"
+  },
+  "catalogue.synonym.add": {
+    "defaultMessage": "Add",
+    "description": "Button: add the synonym"
+  },
+  "catalogue.synonym.added": {
+    "defaultMessage": "Search word added",
+    "description": "Toast"
+  },
+  "catalogue.synonym.remove": {
+    "defaultMessage": "Remove",
+    "description": "Button: remove the synonym"
+  },
+  "catalogue.synonym.removeOne": {
+    "defaultMessage": "Remove {term} → {synonym}",
+    "description": "Accessible name of a row's remove button"
+  },
+  "catalogue.synonym.removeTitle": {
+    "defaultMessage": "Remove this search word?",
+    "description": "Dialog title"
+  },
+  "catalogue.synonym.removeBody": {
+    "defaultMessage": "Search stops reading {synonym} as {term}.",
+    "description": "Remove synonym dialog body"
+  },
+  "catalogue.synonym.removed": {
+    "defaultMessage": "Search word removed",
+    "description": "Toast"
+  }
+}

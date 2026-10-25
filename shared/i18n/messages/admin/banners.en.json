@@ -1,0 +1,198 @@
+{
+  "banners.sub": {
+    "defaultMessage": "Clear shop banners the automatic check held, or take one down with a reason the shop sees.",
+    "description": "A-20 Banners: Page subtitle"
+  },
+  "banners.tabs": {
+    "defaultMessage": "Banner queues",
+    "description": "A-20 Banners: Tab list label"
+  },
+  "banners.tab.review": {
+    "defaultMessage": "Waiting for review",
+    "description": "A-20 Banners: Tab and table label: uploads held for a person"
+  },
+  "banners.tab.live": {
+    "defaultMessage": "Live and scheduled",
+    "description": "A-20 Banners: Tab and table label: cleared banners"
+  },
+  "banners.tab.removed": {
+    "defaultMessage": "Taken down",
+    "description": "A-20 Banners: Tab and table label: removed banners"
+  },
+  "banners.filters": {
+    "defaultMessage": "Banner filters",
+    "description": "A-20 Banners: Filter form label"
+  },
+  "banners.filter.store": {
+    "defaultMessage": "Store ID",
+    "description": "A-20 Banners: Filter field"
+  },
+  "banners.filter.apply": {
+    "defaultMessage": "Apply",
+    "description": "A-20 Banners: Filter button"
+  },
+  "banners.filter.clear": {
+    "defaultMessage": "Clear",
+    "description": "A-20 Banners: Filter button"
+  },
+  "banners.col.banner": {
+    "defaultMessage": "Banner",
+    "description": "A-20 Banners: Column: the banner's headline"
+  },
+  "banners.col.store": {
+    "defaultMessage": "Store",
+    "description": "A-20 Banners: Column"
+  },
+  "banners.col.target": {
+    "defaultMessage": "Opens",
+    "description": "A-20 Banners: Column: what a tap on the banner opens"
+  },
+  "banners.col.kind": {
+    "defaultMessage": "Made from",
+    "description": "A-20 Banners: Column: an uploaded photo or a template"
+  },
+  "banners.col.reason": {
+    "defaultMessage": "Reason",
+    "description": "A-20 Banners: Column: why it was taken down"
+  },
+  "banners.col.status": {
+    "defaultMessage": "Status",
+    "description": "A-20 Banners: Column"
+  },
+  "banners.col.uploaded": {
+    "defaultMessage": "Made",
+    "description": "A-20 Banners: Column: when the shop made the banner"
+  },
+  "banners.col.removed": {
+    "defaultMessage": "Taken down",
+    "description": "A-20 Banners: Column: when it was taken down"
+  },
+  "banners.empty.review": {
+    "defaultMessage": "No banners are waiting for review.",
+    "description": "A-20 Banners: Empty review queue"
+  },
+  "banners.empty": {
+    "defaultMessage": "No banners here.",
+    "description": "A-20 Banners: Empty list"
+  },
+  "banners.pick": {
+    "defaultMessage": "Pick a banner to see it and act on it.",
+    "description": "A-20 Banners: Side panel before a banner is chosen"
+  },
+  "banners.pick.notListed": {
+    "defaultMessage": "That banner is not in this list. It may have moved to another tab.",
+    "description": "A-20 Banners: Side panel when the banner in the link is not listed"
+  },
+  "banners.status.pending": {
+    "defaultMessage": "Waiting for review",
+    "description": "A-20 Banners: Banner status"
+  },
+  "banners.status.live": {
+    "defaultMessage": "Live",
+    "description": "A-20 Banners: Banner status"
+  },
+  "banners.status.scheduled": {
+    "defaultMessage": "Scheduled",
+    "description": "A-20 Banners: Banner status"
+  },
+  "banners.status.paused": {
+    "defaultMessage": "Paused by the shop",
+    "description": "A-20 Banners: Banner status"
+  },
+  "banners.status.ended": {
+    "defaultMessage": "Ended",
+    "description": "A-20 Banners: Banner status"
+  },
+  "banners.status.removed": {
+    "defaultMessage": "Taken down",
+    "description": "A-20 Banners: Banner status"
+  },
+  "banners.target.offer": {
+    "defaultMessage": "Offer: {name}",
+    "description": "A-20 Banners: What the banner opens"
+  },
+  "banners.target.category": {
+    "defaultMessage": "Category: {name}",
+    "description": "A-20 Banners: What the banner opens"
+  },
+  "banners.target.items": {
+    "defaultMessage": "{n, plural, one {# item} other {# items}}",
+    "description": "A-20 Banners: What the banner opens: a list of items"
+  },
+  "banners.target.store": {
+    "defaultMessage": "The store page",
+    "description": "A-20 Banners: What the banner opens"
+  },
+  "banners.kind.upload": {
+    "defaultMessage": "Uploaded photo",
+    "description": "A-20 Banners: How the banner was made"
+  },
+  "banners.kind.template": {
+    "defaultMessage": "Template",
+    "description": "A-20 Banners: How the banner was made"
+  },
+  "banners.detail.title": {
+    "defaultMessage": "Banner from {store}",
+    "description": "A-20 Banners: Side panel title"
+  },
+  "banners.detail.headline": {
+    "defaultMessage": "Headline",
+    "description": "A-20 Banners: Fact label"
+  },
+  "banners.detail.starts": {
+    "defaultMessage": "Starts",
+    "description": "A-20 Banners: Fact label"
+  },
+  "banners.detail.ends": {
+    "defaultMessage": "Ends",
+    "description": "A-20 Banners: Fact label"
+  },
+  "banners.detail.noEnd": {
+    "defaultMessage": "No end date",
+    "description": "A-20 Banners: Fact value"
+  },
+  "banners.detail.why": {
+    "defaultMessage": "Reason: {reason}",
+    "description": "A-20 Banners: Why it was taken down"
+  },
+  "banners.approve": {
+    "defaultMessage": "Clear banner",
+    "description": "A-20 Banners: Button and dialog confirm"
+  },
+  "banners.approveTitle": {
+    "defaultMessage": "Clear the banner from {store}?",
+    "description": "A-20 Banners: Dialog title"
+  },
+  "banners.approveBody": {
+    "defaultMessage": "It goes live at its start time, or now if that has passed.",
+    "description": "A-20 Banners: Dialog text"
+  },
+  "banners.note": {
+    "defaultMessage": "Note",
+    "description": "A-20 Banners: Dialog field: optional note"
+  },
+  "banners.noteHelp": {
+    "defaultMessage": "Optional. Kept in the audit log.",
+    "description": "A-20 Banners: Dialog field help"
+  },
+  "banners.approved": {
+    "defaultMessage": "Banner cleared",
+    "description": "A-20 Banners: Toast"
+  },
+  "banners.takedown": {
+    "defaultMessage": "Take down",
+    "description": "A-20 Banners: Button and dialog confirm"
+  },
+  "banners.takedownTitle": {
+    "defaultMessage": "Take down the banner from {store}?",
+    "description": "A-20 Banners: Dialog title"
+  },
+  "banners.takedownBody": {
+    "defaultMessage": "It stops showing at once and cannot be put back. The shop sees your reason and gets the slot back.",
+    "description": "A-20 Banners: Dialog text"
+  },
+  "banners.takenDown": {
+    "defaultMessage": "Banner taken down",
+    "description": "A-20 Banners: Toast"
+  }
+}

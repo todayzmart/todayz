@@ -2,7 +2,7 @@
 
 .providers {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
   gap: var(--space-2) var(--space-4);
   margin: 0;
   padding: 0;
@@ -16,3 +16,60 @@
   gap: var(--space-2);
 }
 
+/* Below 720px each setting row stacks into a card: the setting and its description on top, then
+ * value, range and last change as label–value lines, then the change button. The header row is
+ * hidden visually but stays for assistive tech, which keeps the table semantics. */
+.cellLabel {
+  display: none;
+}
+
+@media (width < 720px) {
+  .stack :global(.tz-table thead) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .stack :global(.tz-table tbody tr) {
+    display: block;
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--line);
+  }
+
+  .stack :global(.tz-table tbody tr:first-child) {
+    border-top: 0;
+  }
+
+  .stack :global(.tz-table tbody td) {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    height: auto;
+    padding: var(--space-1) 0;
+    border-top: 0;
+    white-space: normal;
+    text-align: right;
+  }
+
+  .stack :global(.tz-table tbody td:first-child) {
+    display: block;
+    text-align: left;
+    padding-bottom: var(--space-2);
+  }
+
+  .stack :global(.tz-table tbody td:last-child) {
+    justify-content: flex-start;
+    padding-top: var(--space-2);
+  }
+
+  .stack .cellLabel {
+    display: inline;
+    flex: none;
+    color: var(--ink-3);
+    white-space: nowrap;
+    text-align: left;
+  }
+}

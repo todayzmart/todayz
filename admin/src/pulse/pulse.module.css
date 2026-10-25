@@ -1,0 +1,133 @@
+/* A-02 Pulse. Tokens only. */
+
+.pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.chart {
+  margin: var(--space-3) 0 0;
+}
+
+.chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.axis {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.bar {
+  fill: var(--brand-soft);
+}
+
+.barNow {
+  fill: var(--brand);
+}
+
+.tick {
+  fill: var(--ink-3);
+  font: var(--type-caption);
+}
+
+.funnel,
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: var(--space-3) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.funnelRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.track {
+  height: var(--space-2);
+  margin-top: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--brand);
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-3) 0;
+}
+
+.figures dt {
+  color: var(--ink-3);
+  font: var(--type-body-sm);
+}
+
+.figures dd {
+  margin: 0;
+}
+
+.figure {
+  font: var(--type-kpi);
+  letter-spacing: var(--type-kpi-tracking);
+  font-variant-numeric: tabular-nums;
+}
+
+.scroll {
+  overflow-x: auto;
+}
+
+.cohorts {
+  border-collapse: collapse;
+  font: var(--type-body-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.cohorts caption {
+  text-align: start;
+  padding-bottom: var(--space-2);
+}
+
+.cohorts th,
+.cohorts td {
+  padding: var(--space-1) var(--space-2);
+  text-align: end;
+  white-space: nowrap;
+}
+
+.cohorts thead th,
+.cohorts tbody th {
+  color: var(--ink-3);
+  font-weight: normal;
+}
+
+.cohorts tbody th {
+  text-align: start;
+}
+
+/* Heat: the brand colour mixed over the surface by the cell's retention, at most half so the text stays readable. */
+.heat {
+  --heat: 0%;
+  background: color-mix(in srgb, var(--brand) calc(var(--heat) * 0.5), var(--surface));
+  border-radius: var(--radius-xs);
+}

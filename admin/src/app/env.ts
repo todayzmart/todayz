@@ -4,3 +4,8 @@ export const API_URL: string = import.meta.env.VITE_API_URL ?? 'https://api.toda
 export const TURNSTILE_SITE_KEY: string = import.meta.env.VITE_TURNSTILE_SITE_KEY ?? '1x00000000000000000000AA';
 /** Sent as X-TZ-Client with every auth call (AU-16). */
 export const CLIENT_ID = 'admin/0.0.0';
+/**
+ * Where uploaded images are served (img.todayz.localhost locally, W1-05's image bucket); an API `imageKey` is the
+ * object path under it. Empty means no image host is configured: banners show their headline only.
+ */
+export const IMAGE_BASE_URL: string = (import.meta.env.VITE_IMG_URL ?? 'https://img.todayz.localhost').replace(/\/+$/, '');

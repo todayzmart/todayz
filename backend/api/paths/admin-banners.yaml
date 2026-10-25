@@ -1,12 +1,119 @@
-# Paths: domain "admin-banners" (owner W3-02): admin banners (04 §2.7).
+# Paths: domain "admin-banners" (owner W3-05): A-20 banner moderation (04 §2.7, D-46, D-47).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-banners]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-banners.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# `support`, `admin` and `super_admin` (admin.banner.moderate). Every change is audited.
+/v1/admin/banners:
+  get:
+    operationId: listAdminBanners
+    tags: [admin-banners]
+    summary: Banners by moderation state
+    description: >-
+      `state` defaults to `review` (oldest first); `live` and `removed` are newest first. `storeId`
+      narrows to one shop.
+    parameters:
+      - name: state
+        in: query
+        schema:
+          $ref: ../schemas/admin-banners.yaml#/AdminBannerState
+      - name: storeId
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Ulid
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Banners
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-banners.yaml#/AdminBannerList
+            example:
+              items:
+                - &banner
+                  id: 01JB0SBN1A2B3C4D5E6F7G8H9J
+                  storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  storeName: Annapurna Kirana
+                  storeCity: Bengaluru
+                  headline: Diwali sweets are here
+                  imageKey: banners/01JB0SBN1A2B3C4D5E6F7G8H9J.webp
+                  template: null
+                  targetType: category
+                  targetLabel: Sweets
+                  targetItemCount: 0
+                  startsAt: "2026-10-25T04:30:00Z"
+                  endsAt: "2026-11-02T18:30:00Z"
+                  status: pending_review
+                  moderation: needs_review
+                  removeReason: null
+                  removedAt: null
+                  createdAt: "2026-10-25T04:00:00Z"
+                  updatedAt: "2026-10-25T04:00:00Z"
+              nextCursor: null
+              serverNow: "2026-10-25T11:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/banners/{bannerId}/approve:
+  parameters: &bannerParam
+    - name: bannerId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: approveAdminBanner
+    tags: [admin-banners]
+    summary: Clear a banner waiting for review (audited)
+    description: >-
+      From `pending_review` with `needs_review` to cleared: `live`, `scheduled` when it starts later,
+      or `ended` when its end has passed. Any other state is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-banners.yaml#/AdminBannerApprove
+          example: {}
+    responses:
+      "200":
+        description: The banner after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-banners.yaml#/AdminBanner
+            example:
+              <<: *banner
+              status: live
+              moderation: auto_ok
+      default: *problem
+/v1/admin/banners/{bannerId}/takedown:
+  parameters: *bannerParam
+  post:
+    operationId: takedownAdminBanner
+    tags: [admin-banners]
+    summary: Take a banner down, with a reason the shop sees (audited)
+    description: >-
+      Final: the banner is `removed` and frees the shop's slot. A banner already removed or ended is
+      `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-banners.yaml#/AdminBannerTakedown
+          example:
+            reason: The picture shows a medicine, which banners cannot advertise
+    responses:
+      "200":
+        description: The banner after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-banners.yaml#/AdminBanner
+            example:
+              <<: *banner
+              status: removed
+              removeReason: The picture shows a medicine, which banners cannot advertise
+              removedAt: "2026-10-25T11:00:00Z"
+      default: *problem

@@ -2,17 +2,23 @@ package main
 
 import (
 	"context"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 
 	"github.com/todayz/backend/internal/admin"
 	"github.com/todayz/backend/internal/business"
+	"github.com/todayz/backend/internal/identity"
 	"github.com/todayz/backend/internal/jobs"
+	"github.com/todayz/backend/internal/notify"
 	"github.com/todayz/backend/internal/orders"
 	"github.com/todayz/backend/internal/platform/audit"
 	"github.com/todayz/backend/internal/platform/authz"
+	"github.com/todayz/backend/internal/platform/awssms"
+	"github.com/todayz/backend/internal/platform/config"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/jobs/adminapi"
+	"github.com/todayz/backend/internal/platform/notice"
 	"github.com/todayz/backend/internal/platform/pii"
 )
 
@@ -29,9 +35,10 @@ func mountAdmin(r chi.Router, d *deps) {
 }
 
 // mountAdminConsole mounts W3-05's admin-customers, admin-businesses,
-// admin-stores, admin-leads, admin-settings and admin-audit routes.
-// The strike reset recounts through a minimal orders service (its strike
-// rules read only the database and settings).
+// admin-stores, admin-leads, admin-catalogue, admin-banners, admin-settings,
+// admin-users, admin-notifications and admin-audit routes. The strike reset recounts through a minimal orders
+// service (its strike rules read only the database and settings); a banner
+// takedown goes through the banners service (it owns the removal).
 func mountAdminConsole(r chi.Router, d *deps) {
 	ad := admin.Deps{DB: d.DB, Clock: d.Clock, Hours: storeHours}
 	if d.Authz != nil {
@@ -62,7 +69,9 @@ func mountAdminConsole(r chi.Router, d *deps) {
 			{Name: "ANTHROPIC_API_KEY", Set: pr.AnthropicAPIKey.IsSet()},
 			{Name: "GEOCODER_API_KEY", Set: pr.GeocoderAPIKey.IsSet()},
 		}
+		ad.Integrations = notifyIntegrations(d.Config)
 	}
+	ad.NotifyTemplates = func() []admin.NotifyTemplate { return notifyTemplates(d.Config) }
 	if d.DB != nil {
 		var hashKey []byte
 		if d.Config != nil {
@@ -74,6 +83,15 @@ func mountAdminConsole(r chi.Router, d *deps) {
 			panic("admin: " + err.Error())
 		}
 		ad.Strikes = ord
+		ad.Banners = newBanners(d)
+		if ad.Seal != nil && ad.Hash != nil {
+			acc, err := identity.NewAccounts(d.DB, ad.Seal, ad.Hash)
+			if err != nil {
+				panic("admin: " + err.Error())
+			}
+			ad.Accounts = phoneAccounts{acc}
+		}
+		ad.Notices = newNotifyService(d)
 	}
 	svc, err := admin.New(ad)
 	if err != nil {
@@ -150,4 +168,63 @@ func storeHours(raw []byte, prefix string) ([]byte, []admin.FieldError, error) {
 	}
 	stored, err := h.Marshal()
 	return stored, nil, err
+}
+
+// phoneAccounts gives A-18 identity's find-or-create by phone, so an invited
+// admin's account is made exactly as a first sign-in makes one.
+type phoneAccounts struct{ a *identity.Accounts }
+
+func (p phoneAccounts) FindOrCreateByPhone(ctx context.Context, phone string, now time.Time) (admin.PhoneAccount, error) {
+	acc, err := p.a.FindOrCreateByPhone(ctx, phone, now)
+	return admin.PhoneAccount{UserID: acc.UserID, Status: acc.Status, Created: acc.Created}, err
+}
+
+// notifyTemplates copies internal/notify's catalogue for A-16, marking which
+// provider templates have a DLT template id (names only, never the id).
+func notifyTemplates(cfg *config.Config) []admin.NotifyTemplate {
+	var ids map[string]string
+	if cfg != nil {
+		ids = cfg.Providers.SMSNoticeTemplateIDs
+	}
+	src := notify.Templates()
+	out := make([]admin.NotifyTemplate, 0, len(src))
+	for _, t := range src {
+		at := admin.NotifyTemplate{Kind: t.Kind, App: t.App, Params: t.Params}
+		for _, c := range t.Channels {
+			at.Channels = append(at.Channels, string(c))
+		}
+		for _, x := range t.Texts {
+			at.Texts = append(at.Texts, admin.NotifyText{Lang: x.Lang, Variant: x.Variant, Title: x.Title, Body: x.Body, Fallback: x.Fallback})
+		}
+		for _, p := range t.Providers {
+			at.Providers = append(at.Providers, admin.NotifyProviderTemplate{Lang: p.Lang, Name: p.Name, IDSet: ids[p.Name] != ""})
+		}
+		out = append(out, at)
+	}
+	return out
+}
+
+// notifyIntegrations lists A-16's channels with the variables each needs, set
+// or missing (D-19). internal/notify builds an SMS sender only (D-212); the
+// push and WhatsApp senders are still to come, so they show as not built.
+func notifyIntegrations(cfg *config.Config) []admin.Integration {
+	missing := map[string]bool{}
+	for _, m := range awssms.Missing(cfg) {
+		missing[m] = true
+	}
+	smsVars := []string{"SMS_API_URL"}
+	if cfg.Env.IsDeployed() {
+		smsVars = []string{"AWS_REGION"}
+	}
+	smsVars = append(smsVars, "SMS_SENDER_ID", "SMS_DLT_ENTITY_ID")
+	sms := admin.Integration{Channel: string(notice.SMS), SenderBuilt: true}
+	for _, v := range smsVars {
+		sms.Vars = append(sms.Vars, admin.ProviderKey{Name: v, Set: !missing[v]})
+	}
+	pr := cfg.Providers
+	return []admin.Integration{
+		{Channel: string(notice.Push), Vars: []admin.ProviderKey{{Name: "VAPID_PRIVATE_KEY", Set: pr.VAPIDPrivateKey.IsSet()}}},
+		sms,
+		{Channel: string(notice.WhatsApp), Vars: []admin.ProviderKey{{Name: "WHATSAPP_API_KEY", Set: pr.WhatsAppAPIKey.IsSet()}}},
+	}
 }

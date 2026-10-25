@@ -70,9 +70,15 @@ export function SettingsPage({ search }: { search: SettingsSearch }) {
         id: 'value',
         header: intl.formatMessage({ id: 'settings.col.value' }),
         accessorFn: (s) => labels.value(s.unit, s.value),
+        cell: ({ getValue }) => <Stacked label={intl.formatMessage({ id: 'settings.col.value' })}>{getValue<string>()}</Stacked>,
         meta: { numeric: true },
       },
-      { id: 'range', header: intl.formatMessage({ id: 'settings.col.range' }), accessorFn: (s) => labels.range(s.unit, s.min, s.max) },
+      {
+        id: 'range',
+        header: intl.formatMessage({ id: 'settings.col.range' }),
+        accessorFn: (s) => labels.range(s.unit, s.min, s.max),
+        cell: ({ getValue }) => <Stacked label={intl.formatMessage({ id: 'settings.col.range' })}>{getValue<string>()}</Stacked>,
+      },
       {
         id: 'updated',
         header: intl.formatMessage({ id: 'settings.col.updated' }),
@@ -80,6 +86,7 @@ export function SettingsPage({ search }: { search: SettingsSearch }) {
           s.updatedByName
             ? intl.formatMessage({ id: 'settings.updatedBy' }, { when: when(s.updatedAt, now ?? s.updatedAt), name: s.updatedByName })
             : when(s.updatedAt, now ?? s.updatedAt),
+        cell: ({ getValue }) => <Stacked label={intl.formatMessage({ id: 'settings.col.updated' })}>{getValue<string>()}</Stacked>,
       },
       {
         id: 'edit',
@@ -150,7 +157,14 @@ export function SettingsPage({ search }: { search: SettingsSearch }) {
               <h2 id={`group-${g}`} className="tz-card-title">
                 {labels.group(g)}
               </h2>
-              <DataTable label={labels.group(g)} columns={columns} data={items} getRowId={(s) => s.key} emptyLabel={intl.formatMessage({ id: 'settings.none' })} />
+              <DataTable
+                label={labels.group(g)}
+                className={styles.stack}
+                columns={columns}
+                data={items}
+                getRowId={(s) => s.key}
+                emptyLabel={intl.formatMessage({ id: 'settings.none' })}
+              />
             </section>
           ))}
           <Providers items={q.data.providers} />
@@ -184,6 +198,21 @@ export function SettingsPage({ search }: { search: SettingsSearch }) {
         }}
       />
     </div>
+  );
+}
+
+/**
+ * A cell's value with its column name in front. The name shows only when a narrow screen stacks
+ * each row into a card (settings.module.css); the column header still names the cell otherwise.
+ */
+function Stacked({ label, children }: { label: string; children: string }) {
+  return (
+    <>
+      <span className={styles.cellLabel} aria-hidden="true">
+        {label}
+      </span>
+      {children}
+    </>
   );
 }
 

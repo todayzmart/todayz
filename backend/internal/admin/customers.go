@@ -127,20 +127,11 @@ func (s *Service) setStatus(ctx context.Context, actor, id ids.ID, to, reason st
 		q := s.q(ctx)
 		u := ids.UUID(id)
 		// Lock the user before its sessions, as identity's refresh does.
-		l, err := q.LockCustomer(ctx, u)
-		if errors.Is(err, pgx.ErrNoRows) {
-			return notFound()
-		}
+		status, err := lockCustomer(ctx, q, u)
 		if err != nil {
 			return err
 		}
-		if to == "blocked" && l.IsAdmin {
-			return invalidTransition(adminAccount)
-		}
-		if to == "blocked" && !l.IsCustomer {
-			return invalidTransition("Only a customer account can be blocked here.")
-		}
-		if l.Status != from {
+		if status != from {
 			return invalidTransition("")
 		}
 		now := s.now()
@@ -248,17 +239,44 @@ const adminAccount = "An admin account is disabled from A-18, not changed here."
 
 // lockNonAdmin locks the user row and refuses an admin account under that lock.
 func lockNonAdmin(ctx context.Context, q *admindb.Queries, u pgtype.UUID) error {
-	l, err := q.LockCustomer(ctx, u)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return notFound()
-	}
+	_, roles, err := lockUser(ctx, q, u)
 	if err != nil {
 		return err
 	}
-	if l.IsAdmin {
+	if roles.IsAdmin {
 		return invalidTransition(adminAccount)
 	}
 	return nil
+}
+
+// lockCustomer is lockNonAdmin that also refuses an account with no customer
+// profile, for block and unblock; it returns the status read under the lock.
+func lockCustomer(ctx context.Context, q *admindb.Queries, u pgtype.UUID) (string, error) {
+	status, roles, err := lockUser(ctx, q, u)
+	if err != nil {
+		return "", err
+	}
+	if roles.IsAdmin {
+		return "", invalidTransition(adminAccount)
+	}
+	if !roles.IsCustomer {
+		return "", invalidTransition("Only a customer account can be blocked or unblocked here.")
+	}
+	return status, nil
+}
+
+// lockUser locks the users row, then reads the roles in a later statement so a
+// change that committed during the wait counts.
+func lockUser(ctx context.Context, q *admindb.Queries, u pgtype.UUID) (string, admindb.CustomerRolesRow, error) {
+	status, err := q.LockCustomer(ctx, u)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return "", admindb.CustomerRolesRow{}, notFound()
+	}
+	if err != nil {
+		return "", admindb.CustomerRolesRow{}, err
+	}
+	roles, err := q.CustomerRoles(ctx, u)
+	return status, roles, err
 }
 
 func uuidStrings(us []pgtype.UUID) []string {
