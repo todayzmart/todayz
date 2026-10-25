@@ -22,6 +22,13 @@ This report covers the admin console work package so far. It lists the backend a
 | db0cf55 | Screens A-03 (queues by status, verify, ask for info, reject, suspend, reinstate, KYC review and one-field reveal, documents) with the Leads tab, and A-05 (filters, review queue, pin and hours, force-close, reopen, strike reset) |
 | 9894128 | AD-02 role-matrix Playwright; the admin smoke fixed for the role-aware nav; shell fixes (below) |
 | 31f372b | Playwright journeys for A-03 verify, A-05 force-close and A-12 hide and restore |
+| ea7d5f0, 869fc6b | A-08 catalogue: API and screen. Products (filters in the URL, add, edit only the changed fields with a reason, retire), the review queue oldest first with duplicate suggestions (approve, merge into, reject), categories (two levels) and search words. The queue answers `assistEnabled` so the `<AssistSlot/>` for W3-13 mounts without the catalogue role reading settings |
+| 1609f3e, 05f65bb | A-20 banners: API and screen. Review, live and taken-down tabs with a store filter in the URL; clear a held banner with an optional note, take one down with a required reason; support and up |
+| 1c5517c | A-17 on a phone: below 720px each setting stacks (key and description, then value, range and last change as label and value lines, then the button) |
+| e9d3cb4, c698eb7 | A-18 admin users: API and screen. Active and Disabled tabs, invite by phone with roles, change roles, disable, enable, reset the authenticator; super_admin only, step-up, a reason, the version read, the audit panel. No self-change, and no change that leaves no active super_admin |
+| e12fb27, 3cc4b46, 3b0cc8b | Cherry-picked from W3-07 (the lead's call): the Pulse contract and the `admin.pulse.view` policy, so A-02 builds against them |
+| a97da6b | A-02 Pulse: range (today, 7, 30, 90 days) in the URL, two KPI strips with the change on the period before, trend chart with a metric switch, funnel, where orders leak (with a reason filter), retention with a cohort heat table, searches that found nothing, credits, stores needing attention (a link only for roles that can open stores), and stores by city |
+| 4fbf2fa | AD-01 as a Go test over the registered policy tables (`authz/policy/roles_test.go`) |
 
 ## Evidence
 
@@ -70,20 +77,31 @@ scripts/no-egress.sh pnpm --filter @todayz/e2e-journeys run journeys specs/12-e2
 - **No secrets in the output:** a grep of the run log and the reset log for the test phone prefix and `+91` found 0 matches.
 - **Stack:** `make stop` ran afterwards (rc 0; data volumes are kept).
 
+#### Area checks (on 4fbf2fa)
+
+- **Admin:** 159 unit tests pass, plus tsc and eslint. The admin message lint has 0 errors (5 warnings, the same as before).
+- **Admin Playwright (no API, the calls are faked):** 22 pass (smoke, AD-02 roles, area journeys). AD-02 now covers the A-08, A-20, A-18 and Pulse reads; new journeys cover A-08, A-20, A-18, A-17 at 375px and A-02.
+- **AD-01:** `TestAdminRoleMatrix` passes and checks these rules:
+  - catalogue reviews the queue and is denied every order, credit, payout, settings and risk action;
+  - analyst reads Pulse and is denied every admin action that is not a read;
+  - Pulse is open to every role except field_agent;
+  - KYC verify is admin and super_admin only;
+  - money settings are super_admin only, with step-up;
+  - any `admin.field.*` action is own-only for a field agent.
+
+  Payouts, credit adjust, risk and field stats have no actions registered yet. The test matches them by prefix, so they are checked from the day they land. The 403 on each route comes from the handler's `authz.Authorize` call, which the admin HTTP tests exercise.
+- **Backend:** `go test ./internal/platform/authz/...` passes, and so do the admin and banners packages.
+- **Screenshots** (git-ignored, in `admin/test-results/screenshots/`): `admin-a02-pulse.png`, plus the A-08, A-20, A-18 and A-17-phone shots.
+
 ### E2E-12: not run yet
 
 Both forms (API and A-17 UI) are written and they typecheck. The journey needs referee credits from E2E-02 and E2E-06 (specs 01- and 03-), so it has to run inside the full journey suite, not on its own. The A-17 screenshot (`a17-settings-1280.png`) is written to `$TZ_QA_DIR` on that run.
 
 ## Still to build in W3-05
 
-- **Screens:**
-  - A-02 Pulse: waits on the W3-07 Pulse API (`getAdminPulse`, `getAdminPulseMap`, `admin.pulse.view`), which is on the unmerged branch `claude/w3-07-rollups-15028a`;
-  - A-08 catalogue, with the `<AssistSlot/>`;
-  - A-16 notifications;
-  - A-18 admin users;
-  - A-20 banner moderation.
-- **Tests:** AD-01 as a Go integration test (every admin route against every role); Playwright for the screens above.
-- **Parts of the built screens left out:** document view links; the A-03 notes, credit and orders sections; the A-05 map and the stale and category filters; telling the owner when a store is sent back (the business app does not show the note yet).
+- **A-16 notifications:** waiting for the lead's answer on scope. The proposal is: templates read-only, integrations shown as set or missing, a test send only to the caller's own phone, and no PATCH.
+- **A-02 map:** the page shows stores by city and a count of demand areas. A real map with demand heat needs h3-js and maplibre in admin, or a map layer in `shared/ui`; that is the lead's call.
+- **Parts of the built screens left out:** document view links; the A-03 notes, credit and orders sections; the A-05 map and the stale and category filters; telling the owner when a store is sent back (the business app does not show the note yet); A-08 bulk edit and import, and telling stores about a merge (nothing creates `pending_review` products yet).
 
 ## Notes and choices for the lead
 
@@ -131,3 +149,8 @@ Both forms (API and A-17 UI) are written and they typecheck. The journey needs r
 16. **Follow-ups for the lead:**
     - In-text links (store and business names) show the browser's default blue across admin. This needs a global link style in `shared/ui`.
     - The reviews table clips its last column ("Open reports") at 1280px.
+    - Banners (W2-07): `RemoveBanner` has no status guard, and the take-down audit row does not carry the reason.
+    - An A-18 invite creates the phone identity with `verified_at` set to the invite time.
+    - The last-super-admin guard is a backstop; the advisory lock serialises changes.
+    - DataTable shows sort arrows on lists that are paginated on the server.
+    - During a redirect, the shell can briefly mount the previous route's page. Pulse guards its queries with `enabled`; a general fix in the shell is a follow-up, because deciding from route matches looped in tests.
