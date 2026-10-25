@@ -479,9 +479,9 @@
     "defaultMessage": "No products yet.",
     "description": "A-04 products: empty list"
   },
-  "field.items.shopItem": {
-    "defaultMessage": "Added by the shop",
-    "description": "A-04 products: shown instead of Edit on an item the shop added; a field agent changes only the items they added"
+  "field.items.notMine": {
+    "defaultMessage": "Added by someone else",
+    "description": "A-04 products: shown instead of Edit on an item the field agent did not add (the shop, another agent or an admin added it); an agent changes only the items they added"
   },
   "field.items.inReview": {
     "defaultMessage": "In review",

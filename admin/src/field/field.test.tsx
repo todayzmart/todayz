@@ -256,7 +256,7 @@ describe('A-04 field onboarding', () => {
     expect(await screen.findByText('Moong dal')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Edit the price of Toor dal' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Edit the price of Moong dal' })).not.toBeInTheDocument();
-    expect(screen.getByText('Added by the shop')).toBeInTheDocument();
+    expect(screen.getByText('Added by someone else')).toBeInTheDocument();
   });
 
   it('refuses a large photo before asking for an upload', async () => {
