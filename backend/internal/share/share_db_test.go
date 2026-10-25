@@ -291,6 +291,21 @@ func TestMarqueeFloorDenylistAndApproval(t *testing.T) {
 	require.False(t, m.Fallback)
 	require.Equal(t, []shareapi.SiteMarqueeItem{{ProductName: "Atta"}}, m.Items)
 
+	// The read checks again: a product moved into a denylisted category, or
+	// no longer active, since the approval drops out.
+	for _, change := range []string{
+		`UPDATE products SET category_id = '` + catMedicines + `' WHERE id = $1`,
+		`UPDATE products SET status = 'retired' WHERE id = $1`,
+	} {
+		w.exec(`UPDATE products SET category_id = '`+catStaples+`', status = 'active' WHERE id = $1`, ids.UUID(atta))
+		w.exec(change, ids.UUID(atta))
+		m, err = w.svc.siteMarquee(ctx, "bengaluru")
+		require.NoError(t, err)
+		require.True(t, m.Fallback, change)
+		require.Empty(t, m.Items, change)
+	}
+	w.exec(`UPDATE products SET category_id = '`+catStaples+`', status = 'active' WHERE id = $1`, ids.UUID(atta))
+
 	// A rerun of the same night keeps the decided list.
 	_, err = w.svc.Build(ctx, testNow)
 	require.NoError(t, err)

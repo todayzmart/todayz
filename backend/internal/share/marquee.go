@@ -121,7 +121,7 @@ func (s *Service) siteMarquee(ctx context.Context, city string) (shareapi.SiteMa
 	if err := s.ready(ctx); err != nil {
 		return shareapi.SiteMarquee{}, err
 	}
-	names, err := s.q(ctx).ApprovedMarquee(ctx, city)
+	names, err := s.q(ctx).ApprovedMarquee(ctx, asksdb.ApprovedMarqueeParams{CitySlug: city, Denylist: Denylist})
 	if err != nil {
 		return shareapi.SiteMarquee{}, fmt.Errorf("share: approved marquee: %w", err)
 	}

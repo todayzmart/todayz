@@ -87,7 +87,7 @@ WITH s AS (
   JOIN products pr ON pr.id = s.product_id
   LEFT JOIN categories c1 ON c1.id = pr.category_id
   LEFT JOIN categories c2 ON c2.id = c1.parent_id
-  WHERE s.city_place_id IS NOT NULL
+  WHERE s.city_place_id IS NOT NULL AND pr.status = 'active'
     AND NOT (coalesce(c1.slug, '') = ANY(@denylist::text[]) OR coalesce(c2.slug, '') = ANY(@denylist::text[]))
   GROUP BY 1, 2
   HAVING count(DISTINCT s.user_id) >= sqlc.arg(min_searchers)::int
@@ -115,7 +115,9 @@ VALUES (@id, @city_place_id, @product_id, @searchers, @searches_total, @rank, @b
 ON CONFLICT (city_place_id, built_on, product_id) DO NOTHING;
 
 -- name: ApprovedMarquee :many
--- The latest approved list of the city whose name slugifies to city_slug.
+-- The latest approved list of the city whose name slugifies to city_slug,
+-- checked again as it is read: a product no longer active, or moved into a
+-- denylisted category since the approval, drops out.
 WITH c AS (
   SELECT p.id FROM places p
   WHERE p.kind = 'city' AND trim(BOTH '-' FROM regexp_replace(lower(p.name), '[^a-z0-9]+', '-', 'g')) = @city_slug::text
@@ -129,7 +131,10 @@ FROM site_demand_marquee m
 JOIN c ON c.id = m.city_place_id
 JOIN b ON b.built_on = m.built_on
 JOIN products pr ON pr.id = m.product_id
-WHERE m.status = 'approved'
+LEFT JOIN categories c1 ON c1.id = pr.category_id
+LEFT JOIN categories c2 ON c2.id = c1.parent_id
+WHERE m.status = 'approved' AND pr.status = 'active'
+  AND NOT (coalesce(c1.slug, '') = ANY(@denylist::text[]) OR coalesce(c2.slug, '') = ANY(@denylist::text[]))
 ORDER BY m.rank
 LIMIT 50;
 
