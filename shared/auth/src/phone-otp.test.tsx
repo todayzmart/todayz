@@ -1,5 +1,5 @@
 import { configure } from '@todayz/api-client';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PhoneOtpFlow, type PhoneOtpLabels } from './phone-otp';
 import type { Session } from './session';
@@ -52,7 +52,8 @@ describe('PhoneOtpFlow WebOTP', () => {
     fireEvent.change(screen.getByLabelText('Mobile number'), { target: { value: '9000000011' } });
     fireEvent.click(screen.getByRole('button', { name: 'Send code' }));
     await screen.findByText(/Sent to/);
-    expect(get).toHaveBeenCalledTimes(1);
+    // The WebOTP request starts in an effect after the code screen shows; under load it lands a tick later.
+    await waitFor(() => expect(get).toHaveBeenCalledTimes(1));
     view.rerender(ui(() => undefined));
     view.rerender(ui(() => undefined));
     expect(get).toHaveBeenCalledTimes(1);
