@@ -13,14 +13,14 @@ describe('admin shell', () => {
     expect(within(side).getByText('Admin')).toHaveClass('tz-side-tag');
     expect(within(side).getByText('Growth')).toBeInTheDocument();
     expect(within(side).getByText('Access')).toBeInTheDocument();
-    expect(within(side).getAllByRole('link')).toHaveLength(NAV.length);
+    expect(await within(side).findAllByRole('link')).toHaveLength(NAV.length);
     expect(within(side).getByRole('link', { name: 'Pulse' })).toHaveAttribute('aria-current', 'page');
   });
 
   it('names every sidebar link and gives it a tooltip for the icon rail', async () => {
     renderAt('/');
     const side = await screen.findByRole('navigation', { name: 'Main' });
-    for (const link of within(side).getAllByRole('link')) {
+    for (const link of await within(side).findAllByRole('link')) {
       const name = link.textContent;
       expect(name).toBeTruthy();
       expect(link).toHaveAttribute('title', name);
@@ -31,9 +31,9 @@ describe('admin shell', () => {
   it.each(NAV.filter((n) => n.section !== ''))('shows the placeholder for /$section', async ({ section }) => {
     renderAt(`/${section}`);
     const side = await screen.findByRole('navigation', { name: 'Main' });
-    const active = within(side).getAllByRole('link').find((l) => l.getAttribute('aria-current') === 'page');
+    const active = (await within(side).findAllByRole('link')).find((l) => l.getAttribute('aria-current') === 'page');
     expect(active?.getAttribute('href')).toBe(`/${section}`);
-    expect(screen.getByText('Coming soon')).toBeInTheDocument();
+    expect(await screen.findByText('Coming soon')).toBeInTheDocument();
   });
 
   it('shows not found for unknown paths', async () => {

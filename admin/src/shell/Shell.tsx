@@ -1,12 +1,14 @@
 import { useSession } from '@todayz/auth';
 import { useQueryClient } from '@tanstack/react-query';
-import { Link, Outlet } from '@tanstack/react-router';
-import { Button } from '@todayz/ui';
+import { Link, Outlet, useRouterState } from '@tanstack/react-router';
+import { Button, Skeleton } from '@todayz/ui';
 import { LogOut } from 'lucide-react';
 import { Fragment } from 'react';
 import { useIntl } from 'react-intl';
+import { canOpen, useMe } from '../app/nav/access';
 import { Icon } from './Icon';
-import { NAV, type NavItem } from './nav';
+import { NoAccess, AccessFailed } from './NoAccess';
+import { NAV, navItem, type NavItem } from './nav';
 import styles from './shell.module.css';
 
 /**
@@ -54,11 +56,28 @@ function SignOut() {
 }
 
 /**
+ * The page for the current URL, or "no access" when it belongs to a sidebar section the caller's
+ * roles do not open. Paths outside the sidebar (unknown pages) fall through to the router.
+ */
+function Content({ roles, loading, failed, retry }: { roles: readonly string[]; loading: boolean; failed: boolean; retry: () => void }) {
+  const section = useRouterState({ select: (s) => s.location.pathname.split('/')[1] ?? '' });
+  if (!navItem(section) && section !== '') return <Outlet />;
+  if (loading) return <Skeleton shape="block" height="160px" />;
+  if (failed) return <AccessFailed retry={retry} />;
+  if (!canOpen(roles, section)) return <NoAccess roles={roles} />;
+  return <Outlet />;
+}
+
+/**
  * Admin frame: the business app's white sidebar plus the "Admin" tag, so staff always know which
  * app they are in. Below 1024px the sidebar collapses to icons (labels stay for screen readers).
+ * The sidebar lists only what the caller's roles open (D-64).
  */
 export function Shell() {
   const intl = useIntl();
+  const me = useMe();
+  const roles = me.data?.roles ?? [];
+  const items = NAV.filter((n) => canOpen(roles, n.section));
   return (
     <div className={styles.app}>
       <a className={styles.skip} href="#main">
@@ -72,8 +91,8 @@ export function Shell() {
           </span>
           <span className={`tz-side-tag ${styles.tag}`}>{intl.formatMessage({ id: 'shell.appTag' })}</span>
         </div>
-        {NAV.map((item, i) => {
-          const heading = item.group && item.group !== NAV[i - 1]?.group ? item.group : null;
+        {items.map((item, i) => {
+          const heading = item.group && item.group !== items[i - 1]?.group ? item.group : null;
           return (
             <Fragment key={item.section || 'pulse'}>
               {heading && (
@@ -88,7 +107,7 @@ export function Shell() {
         <SignOut />
       </nav>
       <main id="main" className={styles.main} tabIndex={-1}>
-        <Outlet />
+        <Content roles={roles} loading={me.isPending} failed={me.isError} retry={() => void me.refetch()} />
       </main>
     </div>
   );

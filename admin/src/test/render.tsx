@@ -35,6 +35,21 @@ export interface RenderOptions {
   secondFactor?: boolean;
   /** Answers per request; the first handler that returns a Response wins. */
   handlers?: Handler[];
+  /** Admin roles `GET /v1/me` answers with when no handler does (default super_admin). */
+  roles?: string[];
+}
+
+/** The `GET /v1/me` body for an admin with these roles. */
+export function adminMe(roles: string[]) {
+  return {
+    id: '01JADMIN0000000000000000AD',
+    name: 'Asha Rao',
+    preferredLang: 'en',
+    phoneMasked: '90•••••001',
+    app: 'admin',
+    roles,
+    createdAt: '2026-10-01T04:30:00Z',
+  };
 }
 
 /** Renders `<App>` at a path with a fake `fetch`. Signed in by default, so the shell and Overview tests stay simple. */
@@ -56,6 +71,7 @@ export function renderAt(path: string, opts: RenderOptions = {}) {
       if (r) return r;
     }
     if (call.path === '/v1/auth/refresh') return problem(401, 'unauthorized');
+    if (call.path === '/v1/me' && call.method === 'GET') return json(200, adminMe(opts.roles ?? ['super_admin']));
     return problem(404, 'not_found');
   }) as typeof fetch;
 
