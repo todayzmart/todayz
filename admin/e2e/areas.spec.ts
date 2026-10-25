@@ -313,3 +313,40 @@ test('A-20: support clears a held banner, then takes it down with a reason', asy
     { path: `/v1/admin/banners/${BANNER}/takedown`, body: { reason: 'Price on the banner is misleading' } },
   ]);
 });
+
+test('A-17: on a phone each setting reads as a card, with its value, range and change button in view', async ({ page }) => {
+  await signIn(page, ['admin']);
+  const setting = (key: string, group: string, unit: string, value: number, min: number, max: number, description: string, money = false) => ({
+    key,
+    group,
+    unit,
+    value,
+    min,
+    max,
+    description,
+    money,
+    editable: !money,
+    updatedBy: null,
+    updatedByName: null,
+    updatedAt: '2026-10-20T09:30:00Z',
+    version: 1,
+  });
+  await answerWith(page, '/v1/admin/settings', () => ({
+    status: 200,
+    body: {
+      items: [
+        setting('hold_minutes', 'stock', 'minutes', 30, 5, 240, 'How long a booked item is held for pickup. 01 §4'),
+        setting('ask_max_stores', 'asks', 'count', 5, 1, 20, 'Stores one ask goes to. 01 §15'),
+        setting('delivery_fee_paise', 'orders', 'paise', 2500, 0, 50_000, 'Delivery fee. 01 §5', true),
+      ],
+      providers: [{ name: 'SMS_API_KEY', set: true }],
+      serverNow: NOW,
+    },
+  }));
+  await page.setViewportSize(VIEWPORTS.phone);
+  await page.goto('/settings');
+  const row = page.getByRole('row', { name: /hold_minutes/ });
+  await expect(row.getByText('30 minutes')).toBeInViewport();
+  await expect(row.getByRole('button', { name: 'Change hold_minutes' })).toBeInViewport();
+  await shot(page, 'admin-a17-phone.png', { fullPage: true });
+});
