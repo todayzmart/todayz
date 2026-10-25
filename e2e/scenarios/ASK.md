@@ -9,21 +9,21 @@ Owner: W3-16 (`backend/internal/asks`, `backend/internal/share`, `customer/src/a
 | ASK-01 | `asks_db_test.go` TestCreateLimitsAndOneOpenAsk | the IST-midnight rollover with a test clock; paging with `limit=` |
 | ASK-02 | `asks_db_test.go` TestSelectRecipients (order, radius, `ask_max_stores`), TestCreateSendsNearestFirstAndSkipsExcluded | the seed-book run at the QA point (E2E-21) |
 | ASK-03 | TestCreateSendsNearestFirstAndSkipsExcluded, TestNoShopAnswersAreTheSame (same status, code, title, detail) | |
-| ASK-04 | TestBand (the four bands at their edges), TestReplyPricerAndNoStockMovement (no `customer`, `phone`, `address`, `distanceM`, `userId` in the biz JSON) | push payload and log-line scan |
-| ASK-05 | TestReadyByOK (need-by day rule), TestReplyPricerAndNoStockMovement (second reply → `409 invalid_transition`), TestOneReplyUnderARace | reply at `reply_by` with a test clock → `409 ask_closed` |
+| ASK-04 | TestBand (the four bands at their edges), TestRoundDistance and TestNoExactDistanceIsStored (only a distance rounded to 500 m is kept), TestReplyPricerAndNoStockMovement (no `customer`, `phone`, `address`, `distanceM`, `userId` in the biz JSON) | push payload and log-line scan |
+| ASK-05 | TestReadyByOK (need-by day rule), TestReplyPricerAndNoStockMovement (second reply → `409 invalid_transition`), TestOneReplyUnderARace, TestReplyWaitsForAClose (a Yes racing a close), TestFirstYesPushOnceUnderARace | reply at `reply_by` with a test clock → `409 ask_closed` |
 | ASK-06 | TestReplyPriceRule (cashier lock, MRP); `business/src/asks/asks.test.tsx` (cashier's Yes sends no price) | |
 | ASK-07 | TestReplyPricerAndNoStockMovement (`stock_updated_at` set, no `stock_movements` row); B-20 "You have {n}" in `asks.test.tsx` | |
-| ASK-08 | TestReplyPricerAndNoStockMovement (unit price, `validUntil`, max quantity); `customer/src/test/asks.test.tsx` ("Price may have changed · ₹60") | the full quote/order money matrix runs in W2-02's order tests behind the real pricer |
+| ASK-08 | TestReplyPricerAndNoStockMovement (unit price, `validUntil`, max quantity); `customer/src/test/asks.test.tsx` ("Price may have changed · ₹60"); `cmd/todayz/orders_ask_http_test.go` TestAskBookPricedReply (the reply's price, 422 above the asked quantity on quote and order, `ask_booked`) and TestAskBookExpiredReply (held until `price_valid_until`, exclusive; then the catalogue price and `409 ask_price_expired` with the fresh quote); `customer/e2e/asks.shots.spec.ts` (C-11 requotes without the reply) | |
 | ASK-13 | TestLowYield; TestCloseWindowRetentionAndDeletion (report → `ask_reported` risk flag, store block) | the order-lifts-the-cap path end to end |
 | ASK-14 | TestCreateSendsNearestFirstAndSkipsExcluded (a muted store gets nothing); B-20 muted note in `asks.test.tsx` | the toggle itself is B-14 settings (W2-10) |
-| ASK-17 | `share_db_test.go` TestCards; `render_test.go`; `customer/src/test/asks.test.tsx` (Pages Function HTML has no distance, escapes the name) | `share_opened` event row |
+| ASK-17 | `share_db_test.go` TestCards; `render_test.go`; `customer/src/test/asks.test.tsx` (Pages Function HTML has no distance, escapes the name, and without `API_URL` logs and redirects to the app); TestCardOpenedOncePerIPADay (`share_opened` once per card, IP and IST day); TestCardReadsAreRateLimitedPerIP; TestStaleCardRenderIsAsync (a read never writes the image; a storage failure leaves the card); TestRenderCardLeavesOffIndicNames | previews fetched by the Pages Function share Cloudflare's address (TODO(lead) in REPORT.md) |
 | ASK-18 | `share_db_test.go` TestGapsFloor; `admin/src/demand/demand.test.tsx` | |
-| ASK-19 | `share_db_test.go` TestMarqueeFloorDenylistAndApproval; `admin/e2e/demand.spec.ts` | |
-| ASK-20 | TestCloseWindowRetentionAndDeletion (`asks.Demand` counts the unanswered ask) | the search-then-ask "counts once" sum with the k ≥ 10 floor |
-| ASK-21 | TestOneReplyUnderARace (two replies at once from one store) | one booking per reply is W2-02's `ask_reply_used` |
+| ASK-19 | `share_db_test.go` TestMarqueeFloorDenylistAndApproval (with the read-time recheck of product status and the denylist); `admin/e2e/demand.spec.ts`; the `site_marquee` audit subject in `admin_test.go`, `admin_http_test.go` and `demand.test.tsx` | |
+| ASK-20 | TestCloseWindowRetentionAndDeletion (`asks.Demand` counts the unanswered ask), TestCustomerClosedIsNotDemand | the search-then-ask "counts once" sum with the k ≥ 10 floor |
+| ASK-21 | TestOneReplyUnderARace (two replies at once from one store); TestAskBookConcurrentOnOneReply (two placements from one reply: one order, the other `409 ask_reply_used`) | |
 | ASK-22 | TestCloseWindowRetentionAndDeletion | |
 | ASK-23 | `customer/src/test/asks.test.tsx` and `customer/e2e/asks.shots.spec.ts` (no Book on an in-store-only card) | the API `409 store_not_bookable` is W2-02's |
-| ASK-24 | TestYesWithNoPriceBooksAtCataloguePrice | |
+| ASK-24 | TestYesWithNoPriceBooksAtCataloguePrice; TestAskBookYesWithoutPrice (no expiry, catalogue price, still capped); TestAskBookAnotherCustomersReply (the same 409 as an expired price, not counted as one) | |
 | ASK-25 | TestCards (`410` for a paused store), TestCardCreateLimit, TestCardCreateNeedsHashKey; `/x` gone page in `asks.shots.spec.ts` | |
 | ASK-28 | TestCloseWindowRetentionAndDeletion (`OnAccountDelete`) | inside AU-18 |
 
