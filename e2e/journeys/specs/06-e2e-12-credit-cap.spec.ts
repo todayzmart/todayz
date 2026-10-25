@@ -1,9 +1,10 @@
-import { Customer, expect, test, waitForCredits, type Order } from '../../fixtures/journey';
+import { Customer, expect, openApp, test, URLS, waitForCredits, type Order } from '../../fixtures/journey';
 import { SL_ITEMS, STORES } from '../../fixtures/seed';
 
 // E2E-12: a super admin changes `credit_max_per_order` 30 → 40 with step-up → the next checkout allows
 // 40; the audit entry is visible. The first test is the "before" half (30 used, 40 refused); the second
-// changes the setting through the admin API (A-17, D-83) and puts it back.
+// changes the setting through the admin API (W2 gate, D-83), the third through the A-17 screen (W3
+// gate); each puts it back.
 //
 // More credits than `credit_max_per_order` is a 409 `credit_max_exceeded` (04-api, 08 CR-02; the
 // lead's answer to Q-1 in docs/qa/W2-13/REPORT.md; D-216, W2-02 finish).
@@ -116,4 +117,66 @@ test('E2E-12 super admin sets credit_max_per_order to 40 with step-up; checkout 
       .poll(async () => (await c.quote(STORES.SL, items, 40)).creditsAllowed, { message: 'checkout allows 30 again', timeout: 35_000, intervals: [500, 1_000, 2_000] })
       .toBe(30);
   });
+});
+
+test('E2E-12 through A-17: the super admin changes the cap on the settings screen; the history panel shows it', async ({ browser, who }, testInfo) => {
+  const c = new Customer(await who('referee'));
+  const admin = await who('superAdmin');
+  const items = [{ storeItemId: SL_ITEMS.qa100.id, quantity: 5 }];
+  const app = await openApp(browser, admin, URLS.admin);
+  // Routing hint only (the API checks the token's amr): this principal passed the authenticator step.
+  await app.context.addInitScript(() => sessionStorage.setItem('todayz.admin.2fa', String(Date.now())));
+  const { page } = app;
+
+  try {
+    await test.step('A-17 shows the cap as a money setting the super admin may change', async () => {
+      await page.goto('/settings?group=credits');
+      await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
+      const table = page.getByRole('table', { name: 'Credits and payouts' });
+      await expect(table.getByRole('row').filter({ hasText: KEY })).toContainText('30 credits');
+    });
+
+    await test.step('change it to 40 with a reason; a stale step-up asks for the authenticator code first', async () => {
+      await page.getByRole('button', { name: `Change ${KEY}` }).click();
+      const dialog = page.getByRole('dialog', { name: `Change ${KEY}` });
+      await expect(dialog.getByText('This is a money setting. It changes what customers pay or earn.')).toBeVisible();
+      await dialog.getByLabel('New value').fill('40');
+      await dialog.getByLabel('Reason').fill('E2E-12 festival week (A-17)');
+      await dialog.getByRole('button', { name: 'Save change' }).click();
+      // The API test's step-up may still be fresh (10 minutes): then the change saves at once.
+      const saved = page.getByText(`${KEY} saved. Every server picks it up within moments.`);
+      const step = page.getByRole('dialog', { name: 'Confirm it is you' });
+      await expect(saved.or(step)).toBeVisible();
+      if (await step.isVisible()) {
+        await step.getByRole('group', { name: 'Authenticator code' }).locator('input').first().click();
+        await page.keyboard.type(await admin.totpCode());
+      }
+      await expect(saved).toBeVisible();
+    });
+
+    await test.step('the row and the history panel show the change with who and why', async () => {
+      const table = page.getByRole('table', { name: 'Credits and payouts' });
+      await expect(table.getByRole('row').filter({ hasText: KEY })).toContainText('40 credits');
+      const panel = page.getByRole('complementary', { name: `Changes to ${KEY}` });
+      const entry = panel.getByRole('listitem').first();
+      await expect(entry).toContainText('30 credits → 40 credits');
+      await expect(entry).toContainText('E2E-12 festival week (A-17)');
+      testInfo.attach('a17-settings-1280', { body: await page.screenshot({ fullPage: true }), contentType: 'image/png' });
+      if (process.env['TZ_QA_DIR']) await page.screenshot({ path: `${process.env['TZ_QA_DIR']}/a17-settings-1280.png`, fullPage: true });
+    });
+
+    await test.step('the next checkout allows 40 credits', async () => {
+      await expect
+        .poll(async () => (await c.quote(STORES.SL, items, 40)).creditsAllowed, { message: 'checkout allows 40', timeout: 35_000, intervals: [500, 1_000, 2_000] })
+        .toBe(40);
+    });
+  } finally {
+    await app.close();
+    let r = await admin.api.call('PATCH', SETTING, { value: 30, reason: 'E2E-12 clean-up' });
+    if (r.code === 'step_up_required') {
+      await admin.stepUp();
+      r = await admin.api.call('PATCH', SETTING, { value: 30, reason: 'E2E-12 clean-up' });
+    }
+    expect(r.status, `restore answered ${r.status} ${r.code}`).toBe(200);
+  }
 });

@@ -183,31 +183,40 @@ export class Principal implements Bearer {
     await this.persist();
   }
 
-  private async totpVerify(purpose: 'login' | 'step_up'): Promise<void> {
-    if (!this.saved || !this.ctx) throw new Error(`${this.person.key} is not signed in`);
+  /**
+   * The admin's authenticator code for the next unused 30 s step, for a screen that asks for one
+   * (the step-up dialog). The step is recorded as used: the server takes each step once.
+   */
+  async totpCode(): Promise<string> {
+    if (!this.saved) throw new Error(`${this.person.key} is not signed in`);
     const secret = adminTotpSecret(this.person.admin ?? '');
-    const wait = (ms: number) => new Promise((done) => setTimeout(done, ms));
-    // Not in the last seconds of a 30 s step, so the code is still current when it arrives; and a
-    // step after the last one used, since the server refuses a step twice.
+    // Not in the last seconds of a step, so the code is still current when it arrives; and a step
+    // after the last one used.
     for (;;) {
       const now = Date.now();
       const left = 30_000 - (now % 30_000);
       const step = Math.floor(now / 30_000);
       if (left < 4_000 || (this.saved.totpStep !== undefined && step <= this.saved.totpStep)) {
-        await wait(left + 300);
+        await new Promise((done) => setTimeout(done, left + 300));
         continue;
       }
-      const t = await this.request().post(`${URLS.api}/v1/auth/totp/verify`, {
-        headers: { Authorization: `Bearer ${purpose === 'login' ? this.saved.token : await this.token()}` },
-        data: { code: totp(secret, now), purpose },
-      });
-      expect(t.status(), `TOTP ${purpose} for ${this.person.key}`).toBe(200);
-      const tb = (await t.json()) as { accessToken: string; expiresAt: string };
-      this.saved.token = tb.accessToken;
-      this.saved.expiresAt = Date.parse(tb.expiresAt);
       this.saved.totpStep = step;
-      return;
+      return totp(secret, now);
     }
+  }
+
+  private async totpVerify(purpose: 'login' | 'step_up'): Promise<void> {
+    if (!this.saved) throw new Error(`${this.person.key} is not signed in`);
+    const bearer = purpose === 'login' ? this.saved.token : await this.token();
+    const code = await this.totpCode();
+    const t = await this.request().post(`${URLS.api}/v1/auth/totp/verify`, {
+      headers: { Authorization: `Bearer ${bearer}` },
+      data: { code, purpose },
+    });
+    expect(t.status(), `TOTP ${purpose} for ${this.person.key}`).toBe(200);
+    const tb = (await t.json()) as { accessToken: string; expiresAt: string };
+    this.saved.token = tb.accessToken;
+    this.saved.expiresAt = Date.parse(tb.expiresAt);
   }
 
   async token(): Promise<string> {
