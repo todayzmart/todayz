@@ -32,7 +32,8 @@ This report covers the admin console work package so far. It lists the backend a
 | a966b8a | Re-review hardening: the phone check in reasons drops every non-digit (digits in any script count) and refuses a run of ten starting 6-9; unblock has the same guard as block (an admin account or one with no customer profile is 409); `LockCustomer` locks only the user row and the admin and customer flags are read after the lock |
 | 046b55c, 30e0781 | Main merged in (W3-01 payouts and admin money); admin copy names no product, for the i18n sentence-case test |
 | 84ee55d | A-18 invite goes through `identity.Accounts.FindOrCreateByPhone` (the same normalisation, hash, seal and per-number lock as OTP sign-in) instead of admin-written identity rows; the invite is audited with the phone masked; a disabled admin's token stops on the next request |
-| (this commit) | A-16 notifications, read-only (D-224): API, screen, journey. Details below |
+| ba6fb02 | A-16 notifications, read-only (D-224): API, screen, journey. Details below |
+| 43685a3, (this commit) | Main (92d9055) merged in, keeping the lead's AD-02 reads and the expiry-preview fake. The audit subjects `payout`, `payout_period` and `credit_adjustment` added for W3-01, plus labels for its ten actions. Details below |
 
 ## Evidence
 
@@ -186,7 +187,16 @@ Read-only for v1, as the lead agreed.
 - **Screenshot:** `admin-a16-notifications.png`, from the A-16 journey in `e2e/areas.spec.ts`.
 - **AD-02 fix along the way:** `e2e/roles.spec.ts` READS had no entries for W3-01's A-09 and A-11 reads, so 4 role tests refused `/v1/admin/credits` and `/v1/admin/payouts` after the main merge. They now allow finance, admin and super_admin, as the policy does. The fake API also answers A-09's expiry preview with an empty summary, not a list (the page threw "paise must be an integer").
 
+## W3-01 audit subjects
+
+- `AdminAuditSubjectType` now has `payout`, `payout_period` and `credit_adjustment`. W3-01's TODO listed `payout_period` as well, for the payout file export, so it is added too.
+- The subject panel needs `admin.payout.view` for `payout` and `payout_period`, and `admin.ledger.view` for `credit_adjustment`. Those are the views of the screens they belong to: finance, admin and super_admin.
+- A-19 names the ten W3-01 actions: the wallet adjustment request, approve, reject, cancel and direct adjust; payout hold, release, mark paid and export; and the statement close. The subject filter picks the three new subjects up from the enum.
+- The A-09 and A-11 screens do not mount `<AuditPanel>` yet. Those are W3-01's files, so they are not changed here.
+- **Checks:** `TestEverySubjectTypeHasAViewOrIsRefused`, and `TestAdminCustomersHTTP` (support gets 403 on the three subjects, finance gets 200); golangci-lint (0 issues); contract lint; admin typecheck, lint and vitest (181); Playwright (23); i18n test (198) and `lint:messages` (admin 0 errors).
+
 ## Open questions
 
 1. **D-224:** templates stay code-owned until DLT re-registration has a process. Who owns re-registration, and how does a new template id reach `SMS_NOTICE_TEMPLATE_IDS`? Editing in A-16 waits for that answer.
 2. **W2-06 (reviews):** `cleanModReason` in `internal/reviews/admin.go` writes moderation reasons to the audit log without the admin phone check (`noPhone`). That file is W2-06's, so it is not changed here.
+3. **A-09 and A-11 audit panels:** the money screens could show `<AuditPanel type="payout" | "credit_adjustment">` now that the subjects exist. That is W3-01's (or the lead's) call.

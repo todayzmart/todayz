@@ -8,9 +8,11 @@ import { useIntl } from 'react-intl';
  */
 const SETTINGS_UPDATE = ['settings', 'update'].join('.');
 
-/** The A-08 and A-20 actions, built the same way (`catalogue.…` and `banners.…` are message namespaces too). */
+/** The A-08, A-20, A-09 and A-11 actions, built the same way (`catalogue.…`, `banners.…`, `credits.…` and `payouts.…` are message namespaces too). */
 const CATALOGUE = (...parts: string[]) => ['catalogue', ...parts].join('.');
 const BANNERS = (...parts: string[]) => ['banners', ...parts].join('.');
+const CREDITS = (...parts: string[]) => ['credits', ...parts].join('.');
+const PAYOUTS = (...parts: string[]) => ['payouts', ...parts].join('.');
 const BUILT_ACTIONS: Readonly<Record<string, string>> = {
   [CATALOGUE('product', 'create')]: 'audit.action.catalogueProductCreate',
   [CATALOGUE('product', 'update')]: 'audit.action.catalogueProductUpdate',
@@ -23,6 +25,16 @@ const BUILT_ACTIONS: Readonly<Record<string, string>> = {
   [CATALOGUE('synonym', 'delete')]: 'audit.action.catalogueSynonymDelete',
   [BANNERS('approve')]: 'audit.action.bannerApprove',
   [BANNERS('remove')]: 'audit.action.bannerRemove',
+  [CREDITS('adjustment_request')]: 'audit.action.creditAdjustmentRequest',
+  [CREDITS('adjustment_approve')]: 'audit.action.creditAdjustmentApprove',
+  [CREDITS('adjustment_reject')]: 'audit.action.creditAdjustmentReject',
+  [CREDITS('adjustment_cancel')]: 'audit.action.creditAdjustmentCancel',
+  [CREDITS('adjust')]: 'audit.action.creditAdjust',
+  [PAYOUTS('statement_close')]: 'audit.action.statementClose',
+  [PAYOUTS('hold')]: 'audit.action.payoutHold',
+  [PAYOUTS('unhold')]: 'audit.action.payoutUnhold',
+  [PAYOUTS('mark_paid')]: 'audit.action.payoutMarkPaid',
+  [PAYOUTS('export')]: 'audit.action.payoutExport',
 };
 
 /** Audit actions the console names; any other action shows as written (it is still audited). */

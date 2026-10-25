@@ -203,9 +203,18 @@ func TestAdminCustomersHTTP(t *testing.T) {
 	require.Equal(t, http.StatusForbidden, r.code, r.raw)
 	r = get(tok, "/v1/admin/audit-log/subject?subjectType=platform_setting&subjectId=no_show_strikes")
 	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+	// W3-01's money subjects follow the payout and ledger views.
+	for _, typ := range []string{"payout", "payout_period", "credit_adjustment"} {
+		r = get(tok, "/v1/admin/audit-log/subject?subjectType="+typ+"&subjectId="+cid)
+		require.Equal(t, http.StatusForbidden, r.code, r.raw)
+	}
 	a.exec(`UPDATE admin_users SET roles = ARRAY['finance']`)
 	r = get(tok, "/v1/admin/audit-log/subject?subjectType=user&subjectId="+cid)
 	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+	for _, typ := range []string{"payout", "payout_period", "credit_adjustment"} {
+		r = get(tok, "/v1/admin/audit-log/subject?subjectType="+typ+"&subjectId="+cid)
+		require.Equal(t, http.StatusOK, r.code, r.raw)
+	}
 	r = get(tok, base)
 	require.Equal(t, http.StatusForbidden, r.code, r.raw)
 
