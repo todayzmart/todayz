@@ -1,0 +1,1080 @@
+{
+  "uid": "todayz-00",
+  "title": "00 · What to fix today",
+  "description": "One screen of ranked lists: what hurts customers and shops most right now (05 §4 dashboard 00; owner W3-07).",
+  "tags": [
+    "todayz",
+    "w3-07",
+    "pinpoint"
+  ],
+  "timezone": "Asia/Kolkata",
+  "editable": false,
+  "graphTooltip": 1,
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "1m",
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "fiscalYearStartMonth": 0,
+  "liveNow": false,
+  "links": [
+    {
+      "title": "00 · What to fix today",
+      "type": "link",
+      "url": "/d/todayz-00",
+      "icon": "dashboard"
+    },
+    {
+      "title": "Alerts",
+      "type": "link",
+      "url": "/alerting/list",
+      "icon": "bolt",
+      "tooltip": "Every alert links its runbook in docs/runbooks/"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "type": "text",
+      "title": "How to read this",
+      "datasource": null,
+      "targets": [
+        {
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "mode": "markdown",
+        "content": "Ranked lists only, worst first. Each list links to the dashboard that explains it. Budgets: API p95 200 ms reads / 400 ms writes (SLO, 05 §6); LCP p75 2.5 s, INP p75 200 ms. Runbooks: `docs/runbooks/` (every alert names its own)."
+      },
+      "id": 1,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      }
+    },
+    {
+      "type": "table",
+      "title": "1 · Slowest endpoints by impact",
+      "description": "Impact = RPS × max(0, p95 − budget) over the last hour; budget 200 ms for GET, 400 ms for writes. Row click opens 02 filtered to the route (exemplars there lead to Tempo).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sort_desc((sum by (route, method) (rate(tz_http_server_requests_total{method=\"GET\"}[1h])) * clamp_min(histogram_quantile(0.95, sum by (route, method) (rate(tz_http_server_duration_seconds{method=\"GET\"}[1h]))) - 0.2, 0)) or (sum by (route, method) (rate(tz_http_server_requests_total{method!=\"GET\"}[1h])) * clamp_min(histogram_quantile(0.95, sum by (route, method) (rate(tz_http_server_duration_seconds{method!=\"GET\"}[1h]))) - 0.4, 0)))",
+          "legendFormat": "impact",
+          "range": false,
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum by (route, method) (rate(tz_http_server_requests_total[1h]))",
+          "legendFormat": "rps",
+          "range": false,
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.5, sum by (route, method) (rate(tz_http_server_duration_seconds[1h])))",
+          "legendFormat": "p50",
+          "range": false,
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (route, method) (rate(tz_http_server_duration_seconds[1h])))",
+          "legendFormat": "p95",
+          "range": false,
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "refId": "E",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum by (route, method) (rate(tz_http_server_duration_seconds[1h])))",
+          "legendFormat": "p99",
+          "range": false,
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "refId": "F",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum by (route, method) (rate(tz_http_server_requests_total{status_class=\"5xx\"}[1h])) / sum by (route, method) (rate(tz_http_server_requests_total[1h]))",
+          "legendFormat": "error ratio",
+          "range": false,
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "links": [
+            {
+              "title": "02 · API endpoints for this route",
+              "url": "/d/todayz-02?var-route=${__data.fields.route}"
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "sortBy": [
+          {
+            "displayName": "Value #A",
+            "desc": true
+          }
+        ]
+      },
+      "id": 2,
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 24,
+        "h": 9
+      },
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "2 · Top 5xx by route and code (24 h)",
+      "description": "API 5xx counts by route and problem code. Users affected and the new-since-release flag come from Sentry in Wave 5 (TODO(lead): Sentry datasource is cloud only).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "topk(15, sum by (route, code) (increase(tz_http_server_requests_total{status_class=\"5xx\"}[24h])))",
+          "legendFormat": "__auto",
+          "range": false,
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 3,
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "2 · Top error log lines by fingerprint (24 h)",
+      "description": "Error log lines grouped by fingerprint (Loki). Open Explore with the fingerprint for the lines and their trace ids.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "editorMode": "code",
+          "expr": "topk(15, sum by (fingerprint) (count_over_time({service_name=~\"todayz-.*\"} | json | level=\"error\" [24h])))",
+          "legendFormat": "__auto",
+          "range": false,
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 4,
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "3 · Slowest SQL by total time",
+      "description": "Top 10 statements by calls × mean (pg_stat_statements, when the extension is enabled). The sqlc query name is in the comment at the start of each statement.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT left(query, 120) AS query, calls, round(mean_exec_time::numeric, 2) AS mean_ms,\n  round(total_exec_time::numeric, 0) AS total_ms, rows,\n  round(100.0 * shared_blks_hit / nullif(shared_blks_hit + shared_blks_read, 0), 1) AS cache_hit_pct\nFROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 10"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 5,
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 24,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "4 · Worst client screens (p75 LCP above 2.5 s)",
+      "description": "Route × app whose p75 LCP is over the 2.5 s budget, sorted by page views × excess. Page views stand in for sessions (RUM has no session counter).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sort_desc((histogram_quantile(0.75, sum by (app, route) (rate(tz_rum_lcp_seconds[24h]))) - 2.5 > 0) * histogram_count(sum by (app, route) (increase(tz_rum_lcp_seconds[24h]))))",
+          "legendFormat": "views × excess s",
+          "range": false,
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.75, sum by (app, route) (rate(tz_rum_lcp_seconds[24h])))",
+          "legendFormat": "p75 LCP",
+          "range": false,
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.75, sum by (app, route) (rate(tz_rum_inp_seconds[24h])))",
+          "legendFormat": "p75 INP",
+          "range": false,
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 6,
+      "gridPos": {
+        "x": 0,
+        "y": 28,
+        "w": 12,
+        "h": 8
+      },
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "5 · Biggest funnel leak today vs 7-day baseline",
+      "description": "Each leak's rate today against the previous 7 days (rollup_daily_platform; today is partial, recomputed every 5 min). Δ lost = (today − baseline) × today's base. Checkout quote failures need the checkout_quote_failed event (TODO(lead): not catalogued yet).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (SELECT * FROM rollup_daily_platform WHERE date = (now() AT TIME ZONE 'Asia/Kolkata')::date),\nb AS (SELECT sum(orders_placed) AS placed, sum(orders_rejected) AS rejected, sum(orders_expired_unaccepted) AS expired_unaccepted,\n             sum(orders_no_show) AS no_show, sum(orders_cancelled) AS cancelled, sum(orders_delivery_failed) AS delivery_failed,\n             sum(searches) AS searches, sum(searches_zero) AS searches_zero\n      FROM rollup_daily_platform WHERE date BETWEEN (now() AT TIME ZONE 'Asia/Kolkata')::date - 7 AND (now() AT TIME ZONE 'Asia/Kolkata')::date - 1),\nleaks AS (\n  SELECT 'Search zero-result' AS leak, t.searches_zero::numeric / nullif(t.searches, 0) AS today, b.searches_zero::numeric / nullif(b.searches, 0) AS baseline, t.searches AS base_today FROM t, b\n  UNION ALL SELECT 'Rejected', t.orders_rejected::numeric / nullif(t.orders_placed, 0), b.rejected::numeric / nullif(b.placed, 0), t.orders_placed FROM t, b\n  UNION ALL SELECT 'Expired unaccepted', t.orders_expired_unaccepted::numeric / nullif(t.orders_placed, 0), b.expired_unaccepted::numeric / nullif(b.placed, 0), t.orders_placed FROM t, b\n  UNION ALL SELECT 'No-show', t.orders_no_show::numeric / nullif(t.orders_placed, 0), b.no_show::numeric / nullif(b.placed, 0), t.orders_placed FROM t, b\n  UNION ALL SELECT 'Cancelled', t.orders_cancelled::numeric / nullif(t.orders_placed, 0), b.cancelled::numeric / nullif(b.placed, 0), t.orders_placed FROM t, b\n  UNION ALL SELECT 'Delivery failed', t.orders_delivery_failed::numeric / nullif(t.orders_placed, 0), b.delivery_failed::numeric / nullif(b.placed, 0), t.orders_placed FROM t, b)\nSELECT leak, round(100 * today, 1) AS today_pct, round(100 * baseline, 1) AS baseline_pct,\n       round((coalesce(today, 0) - coalesce(baseline, 0)) * base_today, 1) AS delta_lost\nFROM leaks ORDER BY delta_lost DESC NULLS LAST"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 7,
+      "gridPos": {
+        "x": 12,
+        "y": 28,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "6 · Stores hurting customers today",
+      "description": "Top 10 stores by expired-unaccepted orders plus rejections today, with their average time to accept. Row click opens the store in the admin console.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT s.name AS store, r.store_id, r.expired_unaccepted, r.rejected, r.orders,\n       r.avg_accept_seconds AS avg_accept_s\nFROM rollup_daily_store r JOIN stores s ON s.id = r.store_id\nWHERE r.date = (now() AT TIME ZONE 'Asia/Kolkata')::date AND r.expired_unaccepted + r.rejected > 0\nORDER BY r.expired_unaccepted + r.rejected DESC, r.orders DESC LIMIT 10"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "links": [
+            {
+              "title": "Open the store in admin",
+              "url": "https://admin.todayz.localhost/stores/${__data.fields.store_id}",
+              "targetBlank": true
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 8,
+      "gridPos": {
+        "x": 0,
+        "y": 36,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "7 · Zero-result searches nearby (today)",
+      "description": "Queries that found nothing in radius today, with at least 10 such searches (the k ≥ 10 floor, 01 §16). Searches carry an H3 cell, not a city, so this is platform-wide (TODO(lead): per-city split once cells map to cities).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT query_norm AS query, sum(zero_results) AS zero_results, count(DISTINCT geo_cell) AS cells\nFROM rollup_daily_search_demand WHERE date = (now() AT TIME ZONE 'Asia/Kolkata')::date\nGROUP BY query_norm HAVING sum(zero_results) >= 10\nORDER BY zero_results DESC LIMIT 15"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 9,
+      "gridPos": {
+        "x": 12,
+        "y": 36,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "8 · Jobs failing (24 h)",
+      "description": "Job kinds with failed, discarded or missed runs in the last 24 h. Row click opens 15 · Jobs filtered to the kind.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT kind, count(*) FILTER (WHERE status IN ('failed', 'discarded')) AS failed,\n       count(*) FILTER (WHERE status = 'missed') AS missed, max(created_at) AS last_run\nFROM job_runs WHERE created_at > now() - interval '24 hours'\nGROUP BY kind HAVING count(*) FILTER (WHERE status IN ('failed', 'discarded', 'missed')) > 0\nORDER BY failed DESC, missed DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "links": [
+            {
+              "title": "15 · Jobs for this kind",
+              "url": "/d/tz-jobs?var-kind=${__data.fields.kind}"
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 10,
+      "gridPos": {
+        "x": 0,
+        "y": 44,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "8 · Notification channels failing (> 2 %, 24 h)",
+      "description": "Channels and providers whose failure rate is over 2 % in the last 24 h (notification_deliveries).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT channel, provider, count(*) AS sent, count(*) FILTER (WHERE status = 'failed') AS failed,\n       round(100.0 * count(*) FILTER (WHERE status = 'failed') / count(*), 1) AS failed_pct\nFROM notification_deliveries WHERE created_at > now() - interval '24 hours'\nGROUP BY channel, provider HAVING count(*) FILTER (WHERE status = 'failed') * 50 > count(*)\nORDER BY failed_pct DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 11,
+      "gridPos": {
+        "x": 12,
+        "y": 44,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "stat",
+      "title": "9 · Availability budget left (30 d, 99.5 %)",
+      "description": "Share of the 30-day error budget still unspent: 1 − (5xx ratio ÷ 0.5 %). 429s are excluded (05 §6). Below 0 the SLO is broken.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "1 - (sum(increase(tz_http_server_requests_total{status_class=\"5xx\"}[30d])) / sum(increase(tz_http_server_requests_total{code!=\"429\"}[30d]))) / 0.005",
+          "legendFormat": "__auto",
+          "range": false,
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.25
+              },
+              {
+                "color": "green",
+                "value": 0.5
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 12,
+      "gridPos": {
+        "x": 0,
+        "y": 52,
+        "w": 6,
+        "h": 5
+      }
+    },
+    {
+      "type": "stat",
+      "title": "9 · Read latency budget left (95 % < 200 ms)",
+      "description": "Share of the 30-day budget left for GETs slower than 200 ms (target 95 % under).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "1 - (1 - histogram_fraction(0, 0.2, sum(increase(tz_http_server_duration_seconds{method=\"GET\"}[30d])))) / 0.05",
+          "legendFormat": "__auto",
+          "range": false,
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.25
+              },
+              {
+                "color": "green",
+                "value": 0.5
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 13,
+      "gridPos": {
+        "x": 6,
+        "y": 52,
+        "w": 6,
+        "h": 5
+      }
+    },
+    {
+      "type": "stat",
+      "title": "9 · Write latency budget left (95 % < 400 ms)",
+      "description": "Share of the 30-day budget left for writes slower than 400 ms (target 95 % under).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "1 - (1 - histogram_fraction(0, 0.4, sum(increase(tz_http_server_duration_seconds{method!=\"GET\"}[30d])))) / 0.05",
+          "legendFormat": "__auto",
+          "range": false,
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.25
+              },
+              {
+                "color": "green",
+                "value": 0.5
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 14,
+      "gridPos": {
+        "x": 12,
+        "y": 52,
+        "w": 6,
+        "h": 5
+      }
+    },
+    {
+      "type": "stat",
+      "title": "9 · Timer accuracy budget left (99.9 % within 30 s)",
+      "description": "Share of the 30-day budget left for timer expiries more than 30 s late (05 §6).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "1 - (1 - histogram_fraction(0, 30, sum(increase(tz_job_lateness_seconds{class=\"timer\"}[30d])))) / 0.001",
+          "legendFormat": "__auto",
+          "range": false,
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.25
+              },
+              {
+                "color": "green",
+                "value": 0.5
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 15,
+      "gridPos": {
+        "x": 18,
+        "y": 52,
+        "w": 6,
+        "h": 5
+      }
+    },
+    {
+      "type": "stat",
+      "title": "9 · Order alert budget left (99 % within 5 s)",
+      "description": "Business-app SSE delivery lag stands in for placed → device ack (05 §6).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "1 - (1 - histogram_fraction(0, 5, sum(increase(tz_sse_delivery_lag_seconds{app=\"business\"}[30d])))) / 0.01",
+          "legendFormat": "__auto",
+          "range": false,
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.25
+              },
+              {
+                "color": "green",
+                "value": 0.5
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 16,
+      "gridPos": {
+        "x": 0,
+        "y": 57,
+        "w": 6,
+        "h": 5
+      }
+    },
+    {
+      "type": "stat",
+      "title": "9 · Customer LCP p75 (30 d, target < 2.5 s)",
+      "description": "p75 LCP of the customer app over 30 days.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.75, sum(rate(tz_rum_lcp_seconds{app=\"customer\"}[30d])))",
+          "legendFormat": "__auto",
+          "range": false,
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 2.5
+              },
+              {
+                "color": "red",
+                "value": 3
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 17,
+      "gridPos": {
+        "x": 6,
+        "y": 57,
+        "w": 6,
+        "h": 5
+      }
+    },
+    {
+      "type": "stat",
+      "title": "9 · POS sync within 2 min (30 d, target 99 %)",
+      "description": "Offline POS sales received within 2 min of the sale (pos_sales.received_at − sold_at). It counts from the sale, not from coming online, so it under-reads (TODO(lead): online-at time per device).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT coalesce(avg((s.received_at - s.sold_at <= interval '2 minutes')::int), 1) AS value\nFROM pos_sales s WHERE s.device_seq IS NOT NULL AND s.received_at > now() - interval '30 days'"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.95
+              },
+              {
+                "color": "green",
+                "value": 0.99
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 18,
+      "gridPos": {
+        "x": 12,
+        "y": 57,
+        "w": 6,
+        "h": 5
+      }
+    }
+  ]
+}

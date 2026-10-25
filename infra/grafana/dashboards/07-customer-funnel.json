@@ -1,0 +1,959 @@
+{
+  "uid": "todayz-07",
+  "title": "07 · Customer funnel and usage",
+  "description": "From app open to a collected order; search; Asks; usage (05 §4 dashboard 07; owner W3-07). Same v_metric_* views as Pulse.",
+  "tags": [
+    "todayz",
+    "w3-07",
+    "funnel",
+    "customer"
+  ],
+  "timezone": "Asia/Kolkata",
+  "editable": false,
+  "graphTooltip": 1,
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5m",
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "fiscalYearStartMonth": 0,
+  "liveNow": false,
+  "links": [
+    {
+      "title": "00 · What to fix today",
+      "type": "link",
+      "url": "/d/todayz-00",
+      "icon": "dashboard"
+    },
+    {
+      "title": "Alerts",
+      "type": "link",
+      "url": "/alerting/list",
+      "icon": "bolt",
+      "tooltip": "Every alert links its runbook in docs/runbooks/"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "type": "text",
+      "title": "How to read this",
+      "datasource": null,
+      "targets": [
+        {
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "mode": "markdown",
+        "content": "Steps are distinct actors per step in the range (events and orders). A step that needs an event the catalogue does not have yet is left out and listed below. Numbers match Pulse because both read `rollup_daily_platform` and `v_metric_*`."
+      },
+      "id": 1,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      }
+    },
+    {
+      "id": 2,
+      "type": "row",
+      "title": "Funnel",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "type": "bargauge",
+      "title": "Funnel (distinct actors in range)",
+      "description": "Distinct customers (signed-in or anonymous) at each step. Location set, product viewed, cart and checkout steps wait for their events (TODO(lead): not catalogued).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT 'App opened' AS step, 1 AS n, count(DISTINCT actor_id) AS actors FROM v_metric_app_opens WHERE app = 'customer' AND $__timeFilter(occurred_at)\nUNION ALL SELECT 'Searched', 2, count(DISTINCT coalesce(user_id::text, anon_id::text)) FROM events WHERE name = 'search_performed' AND $__timeFilter(occurred_at)\nUNION ALL SELECT 'Store viewed', 3, count(DISTINCT coalesce(user_id::text, anon_id::text)) FROM events WHERE name = 'store_viewed' AND $__timeFilter(occurred_at)\nUNION ALL SELECT 'Order placed', 4, count(DISTINCT customer_id) FROM v_metric_orders WHERE $__timeFilter(placed_at)\nUNION ALL SELECT 'Order accepted', 5, count(DISTINCT customer_id) FROM v_metric_orders WHERE accepted AND $__timeFilter(placed_at)\nUNION ALL SELECT 'Collected / delivered', 6, count(DISTINCT customer_id) FROM v_metric_orders WHERE completed AND $__timeFilter(placed_at)\nORDER BY n"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true
+      },
+      "id": 3,
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 9
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Order success rate per day",
+      "description": "(collected + delivered) ÷ placed, per IST day (05 §3).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT (date::timestamp AT TIME ZONE 'Asia/Kolkata') AS time, orders_completed::float / nullif(orders_placed, 0) AS success\nFROM rollup_daily_platform WHERE $__timeFilter(date) ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 4,
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 9
+      }
+    },
+    {
+      "type": "table",
+      "title": "Conversion by step vs previous period",
+      "description": "This range against the same length just before it.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH cur AS (SELECT count(DISTINCT customer_id) FILTER (WHERE true) AS placed, count(DISTINCT customer_id) FILTER (WHERE completed) AS completed\n             FROM v_metric_orders WHERE $__timeFilter(placed_at)),\nprev AS (SELECT count(DISTINCT customer_id) AS placed, count(DISTINCT customer_id) FILTER (WHERE completed) AS completed\n         FROM v_metric_orders WHERE placed_at >= $__timeFrom()::timestamptz - ($__timeTo()::timestamptz - $__timeFrom()::timestamptz) AND placed_at < $__timeFrom()::timestamptz)\nSELECT 'Placed → completed' AS step, round(100.0 * cur.completed / nullif(cur.placed, 0), 1) AS this_period_pct,\n       round(100.0 * prev.completed / nullif(prev.placed, 0), 1) AS previous_pct FROM cur, prev"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 5,
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 12,
+        "h": 5
+      }
+    },
+    {
+      "type": "table",
+      "title": "New vs returning customers placing orders",
+      "description": "Customers who placed an order in range, split by whether their first ever order is in the range.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT CASE WHEN first_at >= $__timeFrom()::timestamptz THEN 'new' ELSE 'returning' END AS customers, count(*) AS n\nFROM (SELECT o.customer_id, min(f.placed_at) AS first_at FROM v_metric_orders o JOIN v_metric_orders f ON f.customer_id = o.customer_id\n      WHERE $__timeFilter(o.placed_at) GROUP BY o.customer_id) x GROUP BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 6,
+      "gridPos": {
+        "x": 12,
+        "y": 13,
+        "w": 12,
+        "h": 5
+      }
+    },
+    {
+      "type": "table",
+      "title": "Entry source (app opens)",
+      "description": "app_opened source: direct, push, qr (standee), referral, share.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT coalesce(props->>'source', 'unknown') AS source, count(*) AS opens, count(DISTINCT coalesce(user_id::text, anon_id::text)) AS actors\nFROM events WHERE name = 'app_opened' AND app = 'customer' AND $__timeFilter(occurred_at) GROUP BY 1 ORDER BY 2 DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 7,
+      "gridPos": {
+        "x": 0,
+        "y": 18,
+        "w": 12,
+        "h": 7
+      }
+    },
+    {
+      "type": "table",
+      "title": "Orders by category of the store",
+      "description": "Orders by the business category of the store.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT coalesce(c.names->>'en', 'none') AS category, count(*) AS placed, count(*) FILTER (WHERE o.completed) AS completed\nFROM v_metric_orders o JOIN stores s ON s.id = o.store_id JOIN businesses b ON b.id = s.business_id LEFT JOIN categories c ON c.id = b.category_id\nWHERE $__timeFilter(o.placed_at) GROUP BY 1 ORDER BY 2 DESC LIMIT 15"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 8,
+      "gridPos": {
+        "x": 12,
+        "y": 18,
+        "w": 12,
+        "h": 7
+      }
+    },
+    {
+      "id": 9,
+      "type": "row",
+      "title": "Search",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 25,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "Searches and zero-result rate",
+      "description": "Searches per hour and the share with no result in radius (alert at 40 % for an hour).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT $__timeGroupAlias(created_at, '1h'), count(*) AS searches, avg((NOT has_results)::int) AS zero_result_rate\nFROM v_metric_searches WHERE $__timeFilter(created_at) GROUP BY 1 ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "zero_result_rate"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 10,
+      "gridPos": {
+        "x": 0,
+        "y": 26,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "Top queries",
+      "description": "Most searched queries (k ≥ 10 floor).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT query_norm AS query, sum(searches) AS searches, sum(zero_results) AS zero_results\nFROM rollup_daily_search_demand WHERE $__timeFilter(date) GROUP BY 1 HAVING sum(searches) >= 10 ORDER BY 2 DESC LIMIT 20"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 11,
+      "gridPos": {
+        "x": 12,
+        "y": 26,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "Top zero-result queries",
+      "description": "Supply gaps: queries with no result in radius (k ≥ 10 floor).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT query_norm AS query, sum(zero_results) AS zero_results\nFROM rollup_daily_search_demand WHERE $__timeFilter(date) GROUP BY 1 HAVING sum(zero_results) >= 10 ORDER BY 2 DESC LIMIT 20"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 12,
+      "gridPos": {
+        "x": 18,
+        "y": 26,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "type": "bargauge",
+      "title": "Radius chosen",
+      "description": "Distribution of the radius customers searched with.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT (radius_m / 1000)::text || ' km' AS radius, count(*) AS searches FROM search_log\nWHERE $__timeFilter(created_at) GROUP BY radius_m ORDER BY radius_m"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal"
+      },
+      "id": 13,
+      "gridPos": {
+        "x": 0,
+        "y": 34,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "type": "bargauge",
+      "title": "Search source",
+      "description": "Typed vs voice (D-101).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT source, count(*) AS searches FROM search_log WHERE $__timeFilter(created_at) GROUP BY 1 ORDER BY 2 DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal"
+      },
+      "id": 14,
+      "gridPos": {
+        "x": 6,
+        "y": 34,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Search latency p95 (server)",
+      "description": "Server p95 of the search routes. Result click position needs search_result_clicked (TODO(lead): not catalogued).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum(rate(tz_http_server_duration_seconds{route=~\"/v1/search.*\"}[$__rate_interval])))",
+          "legendFormat": "p95",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 15,
+      "gridPos": {
+        "x": 12,
+        "y": 34,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "id": 16,
+      "type": "row",
+      "title": "Asks (D-101)",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 42,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "type": "text",
+      "title": "Asks panels — TODO(lead)",
+      "datasource": null,
+      "targets": [
+        {
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "mode": "markdown",
+        "content": "The ask funnel per city (created → at least one Yes → booked from a reply), reply rate, median time to reply, asks closed with no reply, asks per store per day against `ask_daily_limit_store`, shares, voice searches, search assist outcomes and refine chips removed come from W3-16's `shared/telemetry/events/asks.yaml` and its `asks` table, which do not exist yet. **TODO(lead):** add the panels when W3-16 lands; they read `events` and `asks`, never per customer."
+      },
+      "id": 17,
+      "gridPos": {
+        "x": 0,
+        "y": 43,
+        "w": 24,
+        "h": 4
+      }
+    },
+    {
+      "id": 18,
+      "type": "row",
+      "title": "Usage",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 47,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "DAU / WAU / MAU",
+      "description": "Distinct customers with app_opened that day / 7 d / 30 d (05 §3).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT (date::timestamp AT TIME ZONE 'Asia/Kolkata') AS time, dau, wau, mau FROM rollup_daily_platform WHERE $__timeFilter(date) ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 19,
+      "gridPos": {
+        "x": 0,
+        "y": 48,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Stickiness (DAU / MAU)",
+      "description": "DAU ÷ MAU.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT (date::timestamp AT TIME ZONE 'Asia/Kolkata') AS time, dau::float / nullif(mau, 0) AS stickiness FROM rollup_daily_platform WHERE $__timeFilter(date) ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "id": 20,
+      "gridPos": {
+        "x": 12,
+        "y": 48,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Sessions per user (range)",
+      "description": "session_started ÷ distinct actors. Session length needs a session_ended event (TODO(lead)).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT count(*)::float / nullif(count(DISTINCT coalesce(user_id::text, anon_id::text)), 0) AS value\nFROM events WHERE name = 'session_started' AND app = 'customer' AND $__timeFilter(occurred_at)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 21,
+      "gridPos": {
+        "x": 18,
+        "y": 48,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "type": "bargauge",
+      "title": "Language mix",
+      "description": "Languages chosen (lang_changed).",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT coalesce(props->>'lang', 'unknown') AS lang, count(*) AS changes FROM events\nWHERE name = 'lang_changed' AND $__timeFilter(occurred_at) GROUP BY 1 ORDER BY 2 DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal"
+      },
+      "id": 22,
+      "gridPos": {
+        "x": 0,
+        "y": 56,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "type": "stat",
+      "title": "PWA installs (range)",
+      "description": "pwa_installed events.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT count(*) AS value FROM events WHERE name = 'pwa_installed' AND $__timeFilter(occurred_at)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 23,
+      "gridPos": {
+        "x": 6,
+        "y": 56,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Push opt-in rate (range)",
+      "description": "Share of push permission prompts granted.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT avg((props->>'granted')::boolean::int) AS value FROM events WHERE name = 'push_permission' AND $__timeFilter(occurred_at) AND props ? 'granted'"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "id": 24,
+      "gridPos": {
+        "x": 12,
+        "y": 56,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "table",
+      "title": "Feature usage (events in range)",
+      "description": "Every catalogued customer event in range. Map, radius chips, bill QR scan, wallet, referrals and reviews show here as their events land.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "todayz-postgres"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "todayz-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT name AS event, count(*) AS events, count(DISTINCT coalesce(user_id::text, anon_id::text)) AS actors FROM events\nWHERE app = 'customer' AND $__timeFilter(occurred_at) GROUP BY 1 ORDER BY 2 DESC LIMIT 25"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 25,
+      "gridPos": {
+        "x": 0,
+        "y": 64,
+        "w": 12,
+        "h": 8
+      }
+    }
+  ]
+}
