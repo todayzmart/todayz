@@ -398,7 +398,7 @@ func (f *Field) view(ctx context.Context, c fieldCall, b businessdb.Business) (a
 func fieldPage(limit *int, cursor *string) (int32, ids.ID, error) {
 	lim := int32(20) //settings:ok the contract's default page size
 	if limit != nil {
-		lim = int32(*limit) //nolint:gosec // the validator bounds limit to 1..100
+		lim = int32(*limit) // #nosec G115 -- the validator bounds limit to 1..100
 	}
 	if cursor == nil {
 		return lim, ids.Zero, nil

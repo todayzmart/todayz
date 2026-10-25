@@ -170,7 +170,7 @@ func (f *Field) createItem(ctx context.Context, bidStr, sidStr string, body *adm
 		in.IsListed = *body.IsListed
 	}
 	if body.OpeningStock != nil {
-		in.OpeningStock = int32(*body.OpeningStock) //nolint:gosec // the validator bounds it to 0..1,000,000
+		in.OpeningStock = int32(*body.OpeningStock) // #nosec G115 -- the validator bounds it to 0..1,000,000
 	}
 	var v invalid
 	switch {

@@ -125,7 +125,7 @@ func (f *Field) sendCode(ctx context.Context, bidStr string) (adminfieldapi.Fiel
 			// The next send is allowed once the (sends − cap + 1)-th oldest
 			// leaves the window (a lowered cap can leave several over it).
 			at, err := q.OwnerCodeAgentSendAt(ctx, businessdb.OwnerCodeAgentSendAtParams{
-				SentBy: ids.UUID(c.p.UserID), Since: since, Skip: int32(int64(mine) - perAgent), //nolint:gosec // both are small counts
+				SentBy: ids.UUID(c.p.UserID), Since: since, Skip: int32(int64(mine) - perAgent), // #nosec G115 -- both are small counts
 			})
 			if err != nil {
 				return err
@@ -147,7 +147,7 @@ func (f *Field) sendCode(ctx context.Context, bidStr string) (adminfieldapi.Fiel
 		}
 		if int(sends.Sends) >= rules.PerPhone {
 			at, err := q.OwnerCodePhoneSendAt(ctx, businessdb.OwnerCodePhoneSendAtParams{
-				PhoneHash: hash, Since: phoneSince, Skip: sends.Sends - int32(rules.PerPhone), //nolint:gosec // a small count
+				PhoneHash: hash, Since: phoneSince, Skip: sends.Sends - int32(rules.PerPhone), // #nosec G115 -- a small count
 			})
 			if err != nil {
 				return err
