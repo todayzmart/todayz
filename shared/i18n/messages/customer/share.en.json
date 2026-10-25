@@ -1,0 +1,15 @@
+{
+  "share.button": { "defaultMessage": "Share", "description": "C-08 share button (opens the share sheet or the system sheet)" },
+  "share.title": { "defaultMessage": "Share", "description": "C-08 share sheet title" },
+  "share.close": { "defaultMessage": "Close", "description": "C-08 share sheet close label" },
+  "share.whatsapp": { "defaultMessage": "WhatsApp", "description": "C-08 share sheet first option on Android" },
+  "share.more": { "defaultMessage": "More", "description": "C-08 share sheet: the system share sheet" },
+  "share.copy": { "defaultMessage": "Copy link", "description": "C-08 share sheet: copy the /x link" },
+  "share.gone": { "defaultMessage": "This shop isn't on TodayZ right now", "description": "/x/{code} when the shop is no longer live (410)" },
+  "share.gone.body": { "defaultMessage": "Search for the item at shops near you.", "description": "/x/{code} 410 body above the search box" },
+  "share.search": { "defaultMessage": "Search for an item", "description": "/x/{code} 410 search box label" },
+  "share.searchGo": { "defaultMessage": "Search", "description": "/x/{code} 410 search button" },
+  "share.notFound": { "defaultMessage": "We couldn't find this link", "description": "/x/{code} unknown code (404)" },
+  "share.error": { "defaultMessage": "We couldn't open this link", "description": "/x/{code} any other failure" },
+  "share.home": { "defaultMessage": "Go to home", "description": "/x/{code} action back to C-03" }
+}

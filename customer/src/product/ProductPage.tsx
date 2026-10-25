@@ -4,7 +4,7 @@ import { getDiscoverStore, searchDiscover } from '@todayz/api-client/gen/discove
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, EmptyState, QuantityStepper, Skeleton, StockTag, useToast } from '@todayz/ui';
 import { formatDistance } from '@todayz/i18n';
-import { ChevronLeft, Link2, MapPin, Store as StoreIcon } from 'lucide-react';
+import { ChevronLeft, MapPin, Store as StoreIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useCoords } from '../home/coords';
@@ -14,6 +14,7 @@ import { RouterLink } from '../home/RouterLink';
 import { useRadiusKm } from '../home/radius';
 import { AddToBasket } from '../basket/AddToBasket';
 import { AskNearbySlot } from '../search/slots';
+import { ShareButton } from '../share/ShareButton';
 import { Icon } from '../shell/Icon';
 import { CartBarLink } from '../store/CartBarLink';
 import { itemHref, useStepperLabels } from '../store/itemUi';
@@ -106,15 +107,6 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
     toast.show({ message: intl.formatMessage({ id: 'product.added' }, { name: item.name }) });
   };
 
-  // Share: plain link only for now (share cards are W3-16).
-  const copyLink = () => {
-    const url = `${window.location.origin}${itemHref(slug, item.storeItemId)}`;
-    void navigator.clipboard
-      ?.writeText(url)
-      .then(() => toast.show({ message: intl.formatMessage({ id: 'product.share.copied' }) }))
-      .catch(() => toast.show({ message: intl.formatMessage({ id: 'product.share.failed' }) }));
-  };
-
   return (
     <div className={styles.page}>
       <RouterLink href={`/s/${encodeURIComponent(slug)}`} className={`tz-btn tz-btn-ghost tz-btn-sm ${styles.back}`}>
@@ -175,9 +167,7 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
 
       <div className={styles.actions}>
         <AddToBasket productId={item.productId} name={item.name} detail={packLine(item)} />
-        <Button variant="ghost" size="sm" icon={Link2} onClick={copyLink}>
-          {intl.formatMessage({ id: 'product.share' })}
-        </Button>
+        <ShareButton storeItemId={item.storeItemId} />
       </div>
 
       {others.data && others.data.length > 0 && (
@@ -203,7 +193,7 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
         </section>
       )}
 
-      <AskNearbySlot query={item.name} />
+      <AskNearbySlot query={item.name} productId={item.productId} />
       {sheet}
       <CartBarLink />
     </div>

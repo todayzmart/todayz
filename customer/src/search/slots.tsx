@@ -1,5 +1,6 @@
 // Empty slots for features that arrive later, so the screens keep their layout when they land.
-// They render nothing today (AI features stay empty in this slice; D-101).
+// They render nothing today (AI features stay empty in this slice; D-101). The ask flow is W3-16.
+import { AskNearby } from '../asks/AskNearby';
 
 /** AI-C2 search assist: suggestion chips under the summary line when the response says `refineHint`. */
 export function SearchAssistSlot(_props: { query: string; refineHint: boolean }) {
@@ -14,7 +15,6 @@ export function VoiceSearchSlot(_props: { onTranscript: (text: string) => void }
 }
 
 /** §11.2 "Ask shops nearby": zero results, and every product page. `shopSlug` limits it to one shop ("Ask this shop"). */
-export function AskNearbySlot(_props: { query: string; shopSlug?: string }) {
-  // TODO(W3): the ask flow (04 §2.x asks); needs the asks contract.
-  return null;
+export function AskNearbySlot(props: { query: string; productId?: string; shopSlug?: string }) {
+  return <AskNearby {...props} />;
 }

@@ -111,6 +111,7 @@
               ask: *ask
               replies:
                 - askReplyId: 01JB0SR1A2S3K4E5T6M7N8P9Q0
+                  storeId: 01JB0SS1A2S3K4E5T6M7N8P9Q0
                   storeSlug: sharma-kirana-koramangala
                   storeName: Sharma Kirana
                   distanceM: 650
@@ -119,6 +120,7 @@
                   repliedAt: "2026-10-25T09:34:00Z"
                   priceValidUntil: "2026-10-25T10:34:00Z"
                   storeItemId: 01JB0SM1A2S3K4E5T6M7N8P9Q0
+                  listedPricePaise: 4000
                   bookable: true
                   inStoreOnly: false
                   orderId: null

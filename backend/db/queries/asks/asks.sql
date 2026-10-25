@@ -119,10 +119,15 @@ WHERE a.id = @id AND a.customer_id = @customer_id;
 
 -- name: YesReplies :many
 -- The Yes replies of one ask, with the shop and the order already placed
--- from the reply (if any). distance_m is shown to the customer only.
-SELECT r.id, r.distance_m, r.price_paise, r.ready_by, r.replied_at, r.price_valid_until,
+-- from the reply (if any). distance_m is shown to the customer only;
+-- listed_price_paise is the item's price now (C-26 after the reply's price
+-- ends), 0 without an item (a store item's price is always above 0).
+SELECT r.id, r.store_id, r.distance_m, r.price_paise, r.ready_by, r.replied_at, r.price_valid_until,
        coalesce(r.store_item_id, (SELECT si.id FROM store_items si JOIN asks a ON a.id = r.ask_id
                                   WHERE si.store_id = r.store_id AND si.product_id = a.product_id))::uuid AS store_item_id,
+       coalesce((SELECT si.price_paise FROM store_items si JOIN asks a ON a.id = r.ask_id
+         WHERE si.id = r.store_item_id OR (r.store_item_id IS NULL AND si.store_id = r.store_id AND si.product_id = a.product_id)
+         LIMIT 1), 0)::bigint AS listed_price_paise,
        s.slug, s.name, s.accepts_pickup, s.accepts_delivery,
        (s.status = 'live' AND b.status = 'verified')::bool AS store_bookable,
        (SELECT o.id FROM orders o WHERE o.ask_reply_id = r.id

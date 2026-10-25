@@ -104,10 +104,12 @@ Ask:
       type: integer
 AskReply:
   type: object
-  required: [askReplyId, storeSlug, storeName, distanceM, pricePaise, readyBy, repliedAt, priceValidUntil,
-    storeItemId, bookable, inStoreOnly, orderId]
+  required: [askReplyId, storeId, storeSlug, storeName, distanceM, pricePaise, readyBy, repliedAt, priceValidUntil,
+    storeItemId, listedPricePaise, bookable, inStoreOnly, orderId]
   properties:
     askReplyId:
+      $ref: ../schemas/common.yaml#/Ulid
+    storeId:
       $ref: ../schemas/common.yaml#/Ulid
     storeSlug:
       $ref: ../schemas/common.yaml#/Slug
@@ -140,6 +142,12 @@ AskReply:
         - string
         - "null"
       description: The item to book; null when the shop does not list it.
+    listedPricePaise:
+      type:
+        - integer
+        - "null"
+      minimum: 0
+      description: The item's price now (shown once the reply's price ends); null without an item.
     bookable:
       type: boolean
       description: The shop takes online orders now and the reply has an item.

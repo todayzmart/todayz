@@ -10,7 +10,7 @@ import { Banknote, ShoppingBag } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useUpdateController } from '../app/update-context';
-import { clearCart, useCart } from '../cart/cart';
+import { askReplyOf, clearCart, useCart } from '../cart/cart';
 import { CreditsControl } from '../cart/CreditsControl';
 import { DeliveryProblemBanner, FulfilmentSwitch } from '../cart/Delivery';
 import { deliveryProblemOf, type DeliveryProblem } from '../cart/deliveryRules';
@@ -145,12 +145,14 @@ export function CheckoutPage() {
       return;
     }
     const items = cart.lines.map((l) => ({ storeItemId: l.storeItemId, quantity: l.qty }));
+    const askReplyId = askReplyOf(cart);
     const body = {
       storeId: store.id,
       ...ful.quoted,
       items,
       creditsToUse: q.creditsUsed,
       expectedTotalPaise: q.totalPaise,
+      ...(askReplyId ? { askReplyId } : {}),
     };
     // One key per attempt; a retry of the same order reuses it so the shop gets one order (BK-04).
     const sig = JSON.stringify(body);

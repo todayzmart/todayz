@@ -103,13 +103,16 @@ func (s *Service) detail(ctx context.Context, q *asksdb.Queries, askID, customer
 func toReply(r asksdb.YesRepliesRow) asksapi.AskReply {
 	inStore := !r.AcceptsPickup && !r.AcceptsDelivery
 	rep := asksapi.AskReply{
-		AskReplyId: idOf(r.ID).String(), StoreSlug: r.Slug, StoreName: r.Name, DistanceM: int(max(r.DistanceM, 0)),
+		AskReplyId: idOf(r.ID).String(), StoreId: idOf(r.StoreID).String(), StoreSlug: r.Slug, StoreName: r.Name, DistanceM: int(max(r.DistanceM, 0)),
 		PricePaise: intPtr(r.PricePaise), ReadyBy: utcPtr(r.ReadyBy), PriceValidUntil: utcPtr(r.PriceValidUntil),
 		StoreItemId: ulidPtr(r.StoreItemID), InStoreOnly: inStore, OrderId: ulidPtr(r.OrderID),
 		Bookable: r.StoreBookable && !inStore && r.StoreItemID.Valid,
 	}
 	if r.RepliedAt != nil {
 		rep.RepliedAt = r.RepliedAt.UTC()
+	}
+	if r.StoreItemID.Valid && r.ListedPricePaise > 0 {
+		rep.ListedPricePaise = ptr(int(r.ListedPricePaise))
 	}
 	return rep
 }

@@ -302,6 +302,9 @@ func TestCreateLimitsAndOneOpenAsk(t *testing.T) {
 	}
 	_, err = w.ask(ids.Zero, "")
 	require.Equal(t, string(genproblems.AskLimitReached), code(t, err))
+	var p *problem.Error
+	require.ErrorAs(t, err, &p)
+	require.EqualValues(t, limit, p.Extensions["limit"], "the setting, for the C-25 copy")
 }
 
 // TestNoShopAnswersAreTheSame: "Ask this shop" never says why a store is
@@ -362,6 +365,8 @@ func TestReplyPricerAndNoStockMovement(t *testing.T) {
 	require.Len(t, det.Replies, 1)
 	rep := mustID(t, det.Replies[0].AskReplyId)
 	require.Equal(t, 400, det.Replies[0].DistanceM/100*100)
+	require.Equal(t, st.String(), det.Replies[0].StoreId)
+	require.NotNil(t, det.Replies[0].ListedPricePaise, "the item's price now, for after the reply's price ends")
 	p, ok, err := w.svc.AskPrice(context.Background(), w.customer, st, rep, testNow)
 	require.NoError(t, err)
 	require.True(t, ok)
@@ -396,6 +401,7 @@ func TestYesWithNoPriceBooksAtCataloguePrice(t *testing.T) {
 	det, err := w.svc.getMine(w.asCustomer(), d.Ask.AskId)
 	require.NoError(t, err)
 	require.Nil(t, det.Replies[0].PricePaise)
+	require.Equal(t, 9000, *det.Replies[0].ListedPricePaise)
 	p, ok, err := w.svc.AskPrice(context.Background(), w.customer, st, mustID(t, det.Replies[0].AskReplyId), testNow)
 	require.NoError(t, err)
 	require.True(t, ok)

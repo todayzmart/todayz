@@ -149,7 +149,9 @@ func (s *Service) create(ctx context.Context, body *asksapi.AskCreate) (asksapi.
 		}
 		if int64(n) >= lim.daily {
 			wait := int64(nextISTMidnight(now).Sub(now).Seconds()) + 1
-			return problem.New(genproblems.AskLimitReached, "").WithHeader("Retry-After", strconv.FormatInt(wait, 10))
+			// extensions.limit is the setting, for "You can send {n} asks a day." (C-25).
+			return problem.New(genproblems.AskLimitReached, "").WithHeader("Retry-After", strconv.FormatInt(wait, 10)).
+				WithExtension("limit", lim.daily)
 		}
 
 		var categoryID pgtype.UUID

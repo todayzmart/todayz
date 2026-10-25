@@ -19,6 +19,8 @@ export interface CartLine {
   pricePaise: number;
   mrpPaise?: number;
   imageUrl?: string;
+  /** Booked from a shop's Yes on an ask (C-26, W3-16): quote and order price this line at the reply. */
+  askReplyId?: string;
   qty: number;
 }
 
@@ -144,6 +146,11 @@ export function setQty(storeItemId: string, qty: number): void {
 
 export function clearCart(): void {
   set(EMPTY);
+}
+
+/** The ask reply the cart books from, if a line came from one (one per order, 01 §11.2). */
+export function askReplyOf(c: CartState): string | undefined {
+  return c.lines.find((l) => typeof l.askReplyId === 'string')?.askReplyId;
 }
 
 export function cartCount(c: CartState): number {
