@@ -355,6 +355,9 @@ function OrderView({ order, showCheck }: { order: Order; showCheck: boolean }) {
           {intl.formatMessage({ id: 'orders.cancel' })}
         </Button>
       )}
+      <PathLink to={`/help/new?orderId=${order.id}`} className="tz-btn tz-btn-ghost">
+        {intl.formatMessage({ id: 'help.orderLink' })}
+      </PathLink>
       <CancelSheet
         order={order}
         open={cancelOpen}

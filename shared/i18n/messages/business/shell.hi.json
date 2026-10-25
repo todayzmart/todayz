@@ -133,5 +133,10 @@
     "message": "{count, plural, one {# आइटम कल तक ख़त्म हो जाएगा} other {# आइटम कल तक ख़त्म हो जाएँगे}}",
     "review": "reviewed",
     "enHash": "a905b14b"
+  },
+  "shell.nav.help": {
+    "message": "सहायता",
+    "review": "reviewed",
+    "enHash": "c47ae153"
   }
 }

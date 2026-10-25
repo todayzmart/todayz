@@ -1,0 +1,542 @@
+{
+  "voice.title": {
+    "message": "குரல் மூலம் புதுப்பிப்பு",
+    "review": "reviewed",
+    "enHash": "f1f256a4"
+  },
+  "voice.link": {
+    "message": "குரல் மூலம் புதுப்பிப்பு",
+    "review": "reviewed",
+    "enHash": "f1f256a4"
+  },
+  "voice.loading": {
+    "message": "குரல் மூலம் புதுப்பிப்பு ஏற்றப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "e5a59f91"
+  },
+  "voice.storeError.title": {
+    "message": "குரல் மூலம் புதுப்பிப்பை ஏற்ற முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "8d27d556"
+  },
+  "voice.storeError.body": {
+    "message": "இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "059c6344"
+  },
+  "voice.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "voice.noStore.title": {
+    "message": "முதலில் ஒரு கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "voice.noStore.body": {
+    "message": "குரல் மூலம் புதுப்பிப்பு ஒரு நேரத்தில் ஒரு கடையில் வேலை செய்யும்.",
+    "review": "reviewed",
+    "enHash": "3eddcdc5"
+  },
+  "voice.noStore.action": {
+    "message": "கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "12cfd9dc"
+  },
+  "voice.off.title": {
+    "message": "குரல் மூலம் புதுப்பிப்பு அணைக்கப்பட்டுள்ளது",
+    "review": "reviewed",
+    "enHash": "6d34bae5"
+  },
+  "voice.off.body": {
+    "message": "இந்தக் கடைக்கு இப்போது குரல் மூலம் புதுப்பிப்பு கிடைக்கவில்லை. ஸ்டாக் பக்கத்தில் ஸ்டாக்கைப் புதுப்பிக்கலாம்.",
+    "review": "reviewed",
+    "enHash": "4b6d60aa"
+  },
+  "voice.openStock": {
+    "message": "ஸ்டாக்கைத் திறக்கவும்",
+    "review": "reviewed",
+    "enHash": "1608a4fc"
+  },
+  "voice.intro": {
+    "message": "என்ன மாறியது என்று சொல்லுங்கள், எ.கா. “2 மேகி விற்றது”, “10 அமுல் பால் வந்தது”, “பார்லே-ஜி தீர்ந்தது” அல்லது “சர்ஃப் எக்செல் விலை 58”. எதுவும் மாறும் முன் ஒவ்வொரு வரியையும் நீங்கள் சரிபார்ப்பீர்கள்.",
+    "review": "reviewed",
+    "enHash": "2e7d6348"
+  },
+  "voice.privacy": {
+    "message": "பதிவு வரைவை உருவாக்க ஒருமுறை மட்டுமே பயன்படும், சேமிக்கப்படாது.",
+    "review": "reviewed",
+    "enHash": "54fff06c"
+  },
+  "voice.lang.title": {
+    "message": "நீங்கள் பேசும் மொழி",
+    "review": "reviewed",
+    "enHash": "21711165"
+  },
+  "voice.lang.auto": {
+    "message": "கண்டறி",
+    "review": "reviewed",
+    "enHash": "80628bd7"
+  },
+  "voice.lang.autoHint": {
+    "message": "மொழியை நாங்களே கண்டறிவோம். கலந்து பேசினாலும் சரி.",
+    "review": "reviewed",
+    "enHash": "056ceb53"
+  },
+  "voice.talk.hold": {
+    "message": "பேச அழுத்திப் பிடிக்கவும்",
+    "review": "reviewed",
+    "enHash": "ae440774"
+  },
+  "voice.talk.release": {
+    "message": "அனுப்ப விடவும்",
+    "review": "reviewed",
+    "enHash": "445d26a2"
+  },
+  "voice.talk.timer": {
+    "message": "{now} / {max}",
+    "review": "reviewed",
+    "enHash": "c0c9212e"
+  },
+  "voice.talk.listening": {
+    "message": "கேட்கிறது",
+    "review": "reviewed",
+    "enHash": "dc353487"
+  },
+  "voice.talk.error.unsupported": {
+    "message": "இந்த உலாவியால் ஒலியைப் பதிவு செய்ய முடியாது. உங்கள் ஃபோனில் Chrome முயலவும்.",
+    "review": "reviewed",
+    "enHash": "2a109179"
+  },
+  "voice.talk.error.denied": {
+    "message": "இந்தத் தளத்துக்கு மைக்ரோஃபோன் அனுமதி கொடுத்து, பொத்தானை மீண்டும் அழுத்திப் பிடிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "3ece20a9"
+  },
+  "voice.talk.error.short": {
+    "message": "மிகக் குறுகியது. பேசும்போது பொத்தானை அழுத்திப் பிடிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "c82d6ee5"
+  },
+  "voice.sending": {
+    "message": "பதிவு அனுப்பப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "e2f3a26a"
+  },
+  "voice.processing.title": {
+    "message": "நீங்கள் சொன்னதைப் புரிந்துகொள்கிறோம்",
+    "review": "reviewed",
+    "enHash": "b609349f"
+  },
+  "voice.processing.body": {
+    "message": "இதற்குச் சில வினாடிகள் ஆகும்.",
+    "review": "reviewed",
+    "enHash": "6813189a"
+  },
+  "voice.failed.title": {
+    "message": "வரைவை உருவாக்க முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "2f9ae99f"
+  },
+  "voice.failed.empty": {
+    "message": "எந்த வார்த்தையும் கேட்கவில்லை. பொத்தானை அழுத்திப் பிடித்து மீண்டும் பேசவும்.",
+    "review": "reviewed",
+    "enHash": "386a46ed"
+  },
+  "voice.failed.busy": {
+    "message": "குரல் மூலம் புதுப்பிப்பு இப்போது பிஸியாக உள்ளது. ஒரு நிமிடம் கழித்து முயலவும்.",
+    "review": "reviewed",
+    "enHash": "5136b30e"
+  },
+  "voice.failed.generic": {
+    "message": "இந்தப் பதிவில் ஏதோ தவறு நடந்தது. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "70222326"
+  },
+  "voice.again": {
+    "message": "மீண்டும் பேசவும்",
+    "review": "reviewed",
+    "enHash": "567171d5"
+  },
+  "voice.error.too_large": {
+    "message": "பதிவு மிக நீளமாக உள்ளது. சிறியதாக முயலவும்.",
+    "review": "reviewed",
+    "enHash": "3f2f0b12"
+  },
+  "voice.error.ai_daily_cap_reached": {
+    "message": "இந்தக் கடைக்கு இன்றைய குரல் மூலம் புதுப்பிப்பு வரம்பு முடிந்தது. ஸ்டாக் பக்கத்தில் ஸ்டாக்கைப் புதுப்பிக்கலாம்.",
+    "review": "reviewed",
+    "enHash": "f12504e6"
+  },
+  "voice.error.validation_failed": {
+    "message": "ஒரு வரியைச் சரிசெய்ய வேண்டும். குறிக்கப்பட்ட வரிகளைப் பார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "1ebd1ff4"
+  },
+  "voice.error.invalid_transition": {
+    "message": "இந்த வரைவு ஏற்கனவே உறுதிசெய்யப்பட்டது அல்லது நிராகரிக்கப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "5e186a68"
+  },
+  "voice.error.not_found": {
+    "message": "இந்த வரைவு இனி கிடைக்காது. மீண்டும் பேசவும்.",
+    "review": "reviewed",
+    "enHash": "3cc6920c"
+  },
+  "voice.error.forbidden": {
+    "message": "இந்தக் கடையில் இதை நீங்கள் செய்ய முடியாது.",
+    "review": "reviewed",
+    "enHash": "0eeef5b3"
+  },
+  "voice.error.generic": {
+    "message": "ஏதோ தவறு நடந்தது. இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "6a2667c6"
+  },
+  "voice.review.said": {
+    "message": "நீங்கள் சொன்னது",
+    "review": "reviewed",
+    "enHash": "f105abd5"
+  },
+  "voice.review.hint": {
+    "message": "ஒவ்வொரு வரியையும் சரிபார்க்கவும். உறுதிசெய்யும் வரை எதுவும் மாறாது.",
+    "review": "reviewed",
+    "enHash": "85b8c3ce"
+  },
+  "voice.review.blocked": {
+    "message": "உறுதிசெய்யும் முன் {n, plural, one {# வரிக்கு} other {# வரிகளுக்கு}} பொருள் அல்லது எண் தேவை.",
+    "review": "reviewed",
+    "enHash": "e838c9b9"
+  },
+  "voice.review.manager": {
+    "message": "{n, plural, one {# வரிக்கு மேனேஜர் தேவை. மேனேஜர் உறுதிசெய்யும் வரை அது இந்த வரைவிலேயே இருக்கும்.} other {# வரிகளுக்கு மேனேஜர் தேவை. மேனேஜர் உறுதிசெய்யும் வரை அவை இந்த வரைவிலேயே இருக்கும்.}}",
+    "review": "reviewed",
+    "enHash": "7c06ed60"
+  },
+  "voice.review.lines": {
+    "message": "வரைவு வரிகள்",
+    "review": "reviewed",
+    "enHash": "9ff61089"
+  },
+  "voice.review.discard": {
+    "message": "நிராகரி",
+    "review": "reviewed",
+    "enHash": "36fff63c"
+  },
+  "voice.review.confirm": {
+    "message": "{n, plural, =0 {உறுதிசெய்} one {# மாற்றத்தை உறுதிசெய்} other {# மாற்றங்களை உறுதிசெய்}}",
+    "review": "reviewed",
+    "enHash": "9b319135"
+  },
+  "voice.review.none.title": {
+    "message": "ஸ்டாக் மாற்றம் எதுவும் கேட்கவில்லை",
+    "review": "reviewed",
+    "enHash": "cdefe4e8"
+  },
+  "voice.review.none.body": {
+    "message": "பொருளையும் அதற்கு என்ன ஆனது என்பதையும் சொல்லுங்கள், எ.கா. “2 மேகி விற்றது”.",
+    "review": "reviewed",
+    "enHash": "2bc3c1da"
+  },
+  "voice.kind.sale": {
+    "message": "விற்பனை",
+    "review": "reviewed",
+    "enHash": "0028d743"
+  },
+  "voice.kind.restock": {
+    "message": "ஸ்டாக் வந்தது",
+    "review": "reviewed",
+    "enHash": "3ccf7127"
+  },
+  "voice.kind.count": {
+    "message": "எண்ணிக்கை",
+    "review": "reviewed",
+    "enHash": "66e12969"
+  },
+  "voice.kind.set_price": {
+    "message": "விலை",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "voice.change.sale": {
+    "message": "{n} விற்றது",
+    "review": "reviewed",
+    "enHash": "cada7134"
+  },
+  "voice.change.restock": {
+    "message": "{n} சேர்",
+    "review": "reviewed",
+    "enHash": "c44ec97c"
+  },
+  "voice.change.out": {
+    "message": "ஸ்டாக் தீர்ந்தது",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "voice.change.count": {
+    "message": "{n} எண்ணப்பட்டது",
+    "review": "reviewed",
+    "enHash": "7df14703"
+  },
+  "voice.change.price": {
+    "message": "விலை {price}",
+    "review": "reviewed",
+    "enHash": "8bbcaf50"
+  },
+  "voice.change.priceFrom": {
+    "message": "விலை {price} (இப்போது {now})",
+    "review": "reviewed",
+    "enHash": "afc1e15d"
+  },
+  "voice.change.priceMissing": {
+    "message": "விலை கேட்கவில்லை",
+    "review": "reviewed",
+    "enHash": "9f2455d4"
+  },
+  "voice.line.askManager": {
+    "message": "மேனேஜரிடம் கேளுங்கள்",
+    "review": "reviewed",
+    "enHash": "f4a0f296"
+  },
+  "voice.line.pickFlag": {
+    "message": "பொருளைத் தேர்ந்தெடு",
+    "review": "reviewed",
+    "enHash": "41825010"
+  },
+  "voice.line.edited": {
+    "message": "மாற்றப்பட்டது",
+    "review": "reviewed",
+    "enHash": "978e8c33"
+  },
+  "voice.line.noItem": {
+    "message": "பொருள் எதுவும் பொருந்தவில்லை",
+    "review": "reviewed",
+    "enHash": "03219b45"
+  },
+  "voice.line.missingNumber": {
+    "message": "எண் கேட்கவில்லை",
+    "review": "reviewed",
+    "enHash": "7ca7271e"
+  },
+  "voice.line.onHand": {
+    "message": "{n} கையிருப்பில்",
+    "review": "reviewed",
+    "enHash": "01f97821"
+  },
+  "voice.line.heard": {
+    "message": "கேட்டது: “{words}”",
+    "review": "reviewed",
+    "enHash": "d1009ed3"
+  },
+  "voice.line.sure": {
+    "message": "உறுதி {pct}%",
+    "review": "reviewed",
+    "enHash": "7555951d"
+  },
+  "voice.line.unsure": {
+    "message": "இதைச் சரிபார்க்கவும் ({pct}%)",
+    "review": "reviewed",
+    "enHash": "4a9667be"
+  },
+  "voice.line.managerNote": {
+    "message": "மேனேஜர் அல்லது உரிமையாளர் மட்டுமே இதை உறுதிசெய்ய முடியும். இது இந்த வரைவில் அவர்களுக்காகக் காத்திருக்கும்.",
+    "review": "reviewed",
+    "enHash": "b7af692b"
+  },
+  "voice.line.restore": {
+    "message": "திரும்பக் கொண்டுவா",
+    "review": "reviewed",
+    "enHash": "39fc7212"
+  },
+  "voice.line.pick": {
+    "message": "பொருளைத் தேர்ந்தெடு",
+    "review": "reviewed",
+    "enHash": "41825010"
+  },
+  "voice.line.edit": {
+    "message": "மாற்று",
+    "review": "reviewed",
+    "enHash": "5301648d"
+  },
+  "voice.line.discard": {
+    "message": "நீக்கு",
+    "review": "reviewed",
+    "enHash": "e963907d"
+  },
+  "voice.edit.title": {
+    "message": "வரியை மாற்று",
+    "review": "reviewed",
+    "enHash": "d440e5cb"
+  },
+  "voice.edit.pickTitle": {
+    "message": "பொருளைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "14557eec"
+  },
+  "voice.edit.close": {
+    "message": "மூடு",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "voice.edit.cancel": {
+    "message": "ரத்து",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "voice.edit.save": {
+    "message": "சேமி",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "voice.edit.item": {
+    "message": "பொருள்",
+    "review": "reviewed",
+    "enHash": "ecdda59a"
+  },
+  "voice.edit.changeItem": {
+    "message": "மாற்று",
+    "review": "reviewed",
+    "enHash": "64fbd995"
+  },
+  "voice.edit.itemRequired": {
+    "message": "ஒரு பொருளைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "a3046f35"
+  },
+  "voice.edit.kind": {
+    "message": "என்ன ஆனது",
+    "review": "reviewed",
+    "enHash": "7661e659"
+  },
+  "voice.edit.price": {
+    "message": "விற்பனை விலை",
+    "review": "reviewed",
+    "enHash": "7657ccd6"
+  },
+  "voice.edit.priceNow": {
+    "message": "இப்போது {price}",
+    "review": "reviewed",
+    "enHash": "9b7a7073"
+  },
+  "voice.edit.priceInvalid": {
+    "message": "₹0க்கு மேல் விலையை உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "7af65ff1"
+  },
+  "voice.edit.aboveMrp": {
+    "message": "விலை MRP ({mrp}) ஐ விட அதிகமாக இருக்கக்கூடாது.",
+    "review": "reviewed",
+    "enHash": "7efee9c8"
+  },
+  "voice.edit.qty": {
+    "message": "அளவு",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "voice.edit.qtyInvalid": {
+    "message": "1 முதல் {max} வரை முழு எண்ணை உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "c4d982c3"
+  },
+  "voice.edit.counted": {
+    "message": "அலமாரியில் எண்ணியது",
+    "review": "reviewed",
+    "enHash": "3757174e"
+  },
+  "voice.edit.countHelp": {
+    "message": "0 என்றால் ஸ்டாக் தீர்ந்தது.",
+    "review": "reviewed",
+    "enHash": "1ef18a39"
+  },
+  "voice.edit.countInvalid": {
+    "message": "0 முதல் {max} வரை முழு எண்ணை உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "9ea918c4"
+  },
+  "voice.edit.search": {
+    "message": "பொருட்களைத் தேடு",
+    "review": "reviewed",
+    "enHash": "daeea688"
+  },
+  "voice.edit.searchHint": {
+    "message": "பொருளின் பெயர்",
+    "review": "reviewed",
+    "enHash": "b56b71bb"
+  },
+  "voice.edit.noItems": {
+    "message": "பொருள் எதுவும் கிடைக்கவில்லை. முதலில் ஸ்டாக் பக்கத்தில் சேர்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "e1944bba"
+  },
+  "voice.edit.results": {
+    "message": "பொருந்தும் பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "defd0b26"
+  },
+  "voice.edit.pickShort": {
+    "message": "தேர்ந்தெடு",
+    "review": "reviewed",
+    "enHash": "04d2414c"
+  },
+  "voice.edit.pickOne": {
+    "message": "{name} தேர்ந்தெடு",
+    "review": "reviewed",
+    "enHash": "dbf74012"
+  },
+  "voice.done.title": {
+    "message": "வரைவு உறுதிசெய்யப்பட்டது",
+    "review": "reviewed",
+    "enHash": "f796dd96"
+  },
+  "voice.done.discarded": {
+    "message": "வரைவு நிராகரிக்கப்பட்டது. எதுவும் மாறவில்லை.",
+    "review": "reviewed",
+    "enHash": "e8ec5fb7"
+  },
+  "voice.done.body": {
+    "message": "{applied, plural, one {# மாற்றம் செயல்படுத்தப்பட்டது} other {# மாற்றங்கள் செயல்படுத்தப்பட்டன}}{held, plural, =0 {.} other {, # மேனேஜருக்காக மீதம்.}}",
+    "review": "reviewed",
+    "enHash": "59b17c8b"
+  },
+  "voice.done.lines": {
+    "message": "ஒவ்வொரு வரிக்கும் என்ன ஆனது",
+    "review": "reviewed",
+    "enHash": "60771315"
+  },
+  "voice.outcome.accepted": {
+    "message": "செயல்படுத்தப்பட்டது",
+    "review": "reviewed",
+    "enHash": "a3e4a569"
+  },
+  "voice.outcome.edited": {
+    "message": "மாற்றங்களுடன் செயல்படுத்தப்பட்டது",
+    "review": "reviewed",
+    "enHash": "41f86f4d"
+  },
+  "voice.outcome.discarded": {
+    "message": "நீக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "b5e77c5c"
+  },
+  "voice.outcome.not_permitted": {
+    "message": "மேனேஜர் தேவை",
+    "review": "reviewed",
+    "enHash": "1bb456dd"
+  },
+  "voice.lang.fixedHint": {
+    "message": "சரியான பொருத்தத்திற்கு இதே மொழியில் பேசுங்கள்.",
+    "review": "reviewed",
+    "enHash": "0adf1be4"
+  },
+  "voice.review.settled": {
+    "message": "ஏற்கெனவே முடிந்தது",
+    "review": "reviewed",
+    "enHash": "0022bedc"
+  },
+  "voice.done.partial": {
+    "message": "மீதியை உறுதிசெய்ய மேனேஜரிடம் சொல்லுங்கள்",
+    "review": "reviewed",
+    "enHash": "d6fd25cc"
+  }
+}

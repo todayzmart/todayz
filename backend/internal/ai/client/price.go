@@ -1,6 +1,9 @@
 package client
 
-import "math"
+import (
+	"math"
+	"time"
+)
 
 // Price is a model's list price in paise per million tokens.
 type Price struct {
@@ -47,4 +50,16 @@ func CostPaise(model string, u Usage) int64 {
 		return 0
 	}
 	return int64(math.Ceil(micro / 1e6))
+}
+
+// SpeechPaisePerHour is the speech-to-text list price (Sarvam, ₹30 an hour of audio). Like
+// Prices it is code, not a setting: 01 §17 does not list it.
+const SpeechPaisePerHour = 3000 //settings:ok provider list price (₹30 per hour)
+
+// SpeechCostPaise is what transcribing d of audio costs, rounded up to the next paisa.
+func SpeechCostPaise(d time.Duration) int64 {
+	if d <= 0 {
+		return 0
+	}
+	return int64(math.Ceil(float64(SpeechPaisePerHour) * d.Hours()))
 }

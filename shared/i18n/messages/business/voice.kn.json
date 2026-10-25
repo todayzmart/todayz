@@ -1,0 +1,542 @@
+{
+  "voice.title": {
+    "message": "ಧ್ವನಿಯಿಂದ ಅಪ್‌ಡೇಟ್",
+    "review": "reviewed",
+    "enHash": "f1f256a4"
+  },
+  "voice.link": {
+    "message": "ಧ್ವನಿಯಿಂದ ಅಪ್‌ಡೇಟ್",
+    "review": "reviewed",
+    "enHash": "f1f256a4"
+  },
+  "voice.loading": {
+    "message": "ಧ್ವನಿಯಿಂದ ಅಪ್‌ಡೇಟ್ ಲೋಡ್ ಆಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "e5a59f91"
+  },
+  "voice.storeError.title": {
+    "message": "ಧ್ವನಿಯಿಂದ ಅಪ್‌ಡೇಟ್ ಲೋಡ್ ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "8d27d556"
+  },
+  "voice.storeError.body": {
+    "message": "ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "059c6344"
+  },
+  "voice.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "voice.noStore.title": {
+    "message": "ಮೊದಲು ಒಂದು ಅಂಗಡಿ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "voice.noStore.body": {
+    "message": "ಧ್ವನಿಯಿಂದ ಅಪ್‌ಡೇಟ್ ಒಮ್ಮೆಗೆ ಒಂದು ಅಂಗಡಿಯಲ್ಲಿ ಕೆಲಸ ಮಾಡುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "3eddcdc5"
+  },
+  "voice.noStore.action": {
+    "message": "ಅಂಗಡಿ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "12cfd9dc"
+  },
+  "voice.off.title": {
+    "message": "ಧ್ವನಿಯಿಂದ ಅಪ್‌ಡೇಟ್ ಆಫ್ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "6d34bae5"
+  },
+  "voice.off.body": {
+    "message": "ಈ ಅಂಗಡಿಗೆ ಈಗ ಧ್ವನಿಯಿಂದ ಅಪ್‌ಡೇಟ್ ಲಭ್ಯವಿಲ್ಲ. ಸ್ಟಾಕ್ ಪುಟದಲ್ಲಿ ಸ್ಟಾಕ್ ಅಪ್‌ಡೇಟ್ ಮಾಡಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "4b6d60aa"
+  },
+  "voice.openStock": {
+    "message": "ಸ್ಟಾಕ್ ತೆರೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "1608a4fc"
+  },
+  "voice.intro": {
+    "message": "ಏನು ಬದಲಾಯಿತು ಎಂದು ಹೇಳಿ, ಉದಾ. “2 ಮ್ಯಾಗಿ ಮಾರಾಟವಾಯಿತು”, “10 ಅಮೂಲ್ ಹಾಲು ಬಂತು”, “ಪಾರ್ಲೆ-ಜಿ ಖಾಲಿ” ಅಥವಾ “ಸರ್ಫ್ ಎಕ್ಸೆಲ್ ಬೆಲೆ 58”. ಏನಾದರೂ ಬದಲಾಗುವ ಮೊದಲು ನೀವು ಪ್ರತಿ ಸಾಲನ್ನು ಪರಿಶೀಲಿಸುತ್ತೀರಿ.",
+    "review": "reviewed",
+    "enHash": "2e7d6348"
+  },
+  "voice.privacy": {
+    "message": "ರೆಕಾರ್ಡಿಂಗ್ ಅನ್ನು ಡ್ರಾಫ್ಟ್ ಮಾಡಲು ಒಮ್ಮೆ ಮಾತ್ರ ಬಳಸಲಾಗುತ್ತದೆ, ಇಟ್ಟುಕೊಳ್ಳುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "54fff06c"
+  },
+  "voice.lang.title": {
+    "message": "ನೀವು ಮಾತನಾಡುವ ಭಾಷೆ",
+    "review": "reviewed",
+    "enHash": "21711165"
+  },
+  "voice.lang.auto": {
+    "message": "ಗುರುತಿಸಿ",
+    "review": "reviewed",
+    "enHash": "80628bd7"
+  },
+  "voice.lang.autoHint": {
+    "message": "ಭಾಷೆಯನ್ನು ನಾವೇ ಗುರುತಿಸುತ್ತೇವೆ. ಬೆರೆತ ಮಾತೂ ಸರಿ.",
+    "review": "reviewed",
+    "enHash": "056ceb53"
+  },
+  "voice.talk.hold": {
+    "message": "ಮಾತನಾಡಲು ಒತ್ತಿ ಹಿಡಿಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "ae440774"
+  },
+  "voice.talk.release": {
+    "message": "ಕಳುಹಿಸಲು ಬಿಡಿ",
+    "review": "reviewed",
+    "enHash": "445d26a2"
+  },
+  "voice.talk.timer": {
+    "message": "{now} / {max}",
+    "review": "reviewed",
+    "enHash": "c0c9212e"
+  },
+  "voice.talk.listening": {
+    "message": "ಕೇಳುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "dc353487"
+  },
+  "voice.talk.error.unsupported": {
+    "message": "ಈ ಬ್ರೌಸರ್ ಧ್ವನಿ ರೆಕಾರ್ಡ್ ಮಾಡಲಾರದು. ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ Chrome ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "2a109179"
+  },
+  "voice.talk.error.denied": {
+    "message": "ಈ ಸೈಟ್‌ಗೆ ಮೈಕ್ರೋಫೋನ್ ಅನುಮತಿ ನೀಡಿ, ನಂತರ ಬಟನ್ ಮತ್ತೆ ಒತ್ತಿ ಹಿಡಿಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "3ece20a9"
+  },
+  "voice.talk.error.short": {
+    "message": "ತುಂಬಾ ಚಿಕ್ಕದು. ಮಾತನಾಡುವಾಗ ಬಟನ್ ಒತ್ತಿ ಹಿಡಿಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "c82d6ee5"
+  },
+  "voice.sending": {
+    "message": "ರೆಕಾರ್ಡಿಂಗ್ ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "e2f3a26a"
+  },
+  "voice.processing.title": {
+    "message": "ನೀವು ಹೇಳಿದ್ದನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುತ್ತಿದ್ದೇವೆ",
+    "review": "reviewed",
+    "enHash": "b609349f"
+  },
+  "voice.processing.body": {
+    "message": "ಇದಕ್ಕೆ ಕೆಲವು ಸೆಕೆಂಡುಗಳು ಬೇಕು.",
+    "review": "reviewed",
+    "enHash": "6813189a"
+  },
+  "voice.failed.title": {
+    "message": "ಡ್ರಾಫ್ಟ್ ಮಾಡಲಾಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "2f9ae99f"
+  },
+  "voice.failed.empty": {
+    "message": "ನಮಗೆ ಯಾವುದೇ ಪದ ಕೇಳಿಸಲಿಲ್ಲ. ಬಟನ್ ಒತ್ತಿ ಹಿಡಿದು ಮತ್ತೆ ಮಾತನಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "386a46ed"
+  },
+  "voice.failed.busy": {
+    "message": "ಧ್ವನಿಯಿಂದ ಅಪ್‌ಡೇಟ್ ಈಗ ಬ್ಯುಸಿ ಇದೆ. ಒಂದು ನಿಮಿಷದ ನಂತರ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "5136b30e"
+  },
+  "voice.failed.generic": {
+    "message": "ಈ ರೆಕಾರ್ಡಿಂಗ್‌ನಲ್ಲಿ ಏನೋ ತಪ್ಪಾಯಿತು. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "70222326"
+  },
+  "voice.again": {
+    "message": "ಮತ್ತೆ ಮಾತನಾಡಿ",
+    "review": "reviewed",
+    "enHash": "567171d5"
+  },
+  "voice.error.too_large": {
+    "message": "ರೆಕಾರ್ಡಿಂಗ್ ತುಂಬಾ ಉದ್ದವಾಗಿದೆ. ಚಿಕ್ಕದನ್ನು ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "3f2f0b12"
+  },
+  "voice.error.ai_daily_cap_reached": {
+    "message": "ಈ ಅಂಗಡಿಗೆ ಇಂದಿನ ಧ್ವನಿಯಿಂದ ಅಪ್‌ಡೇಟ್ ಮಿತಿ ಮುಗಿದಿದೆ. ಸ್ಟಾಕ್ ಪುಟದಲ್ಲಿ ಸ್ಟಾಕ್ ಅಪ್‌ಡೇಟ್ ಮಾಡಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "f12504e6"
+  },
+  "voice.error.validation_failed": {
+    "message": "ಒಂದು ಸಾಲನ್ನು ಸರಿಪಡಿಸಬೇಕು. ಹೈಲೈಟ್ ಮಾಡಿದ ಸಾಲುಗಳನ್ನು ನೋಡಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "1ebd1ff4"
+  },
+  "voice.error.invalid_transition": {
+    "message": "ಈ ಡ್ರಾಫ್ಟ್ ಈಗಾಗಲೇ ಖಚಿತಪಡಿಸಲಾಗಿದೆ ಅಥವಾ ರದ್ದಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "5e186a68"
+  },
+  "voice.error.not_found": {
+    "message": "ಈ ಡ್ರಾಫ್ಟ್ ಈಗ ಲಭ್ಯವಿಲ್ಲ. ಮತ್ತೆ ಮಾತನಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "3cc6920c"
+  },
+  "voice.error.forbidden": {
+    "message": "ಈ ಅಂಗಡಿಯಲ್ಲಿ ನೀವು ಇದನ್ನು ಮಾಡಲಾಗದು.",
+    "review": "reviewed",
+    "enHash": "0eeef5b3"
+  },
+  "voice.error.generic": {
+    "message": "ಏನೋ ತಪ್ಪಾಯಿತು. ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "6a2667c6"
+  },
+  "voice.review.said": {
+    "message": "ನೀವು ಹೇಳಿದ್ದು",
+    "review": "reviewed",
+    "enHash": "f105abd5"
+  },
+  "voice.review.hint": {
+    "message": "ಪ್ರತಿ ಸಾಲನ್ನು ಪರಿಶೀಲಿಸಿ. ಖಚಿತಪಡಿಸುವವರೆಗೆ ಏನೂ ಬದಲಾಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "85b8c3ce"
+  },
+  "voice.review.blocked": {
+    "message": "ಖಚಿತಪಡಿಸುವ ಮೊದಲು {n, plural, one {# ಸಾಲಿಗೆ} other {# ಸಾಲುಗಳಿಗೆ}} ಐಟಂ ಅಥವಾ ಸಂಖ್ಯೆ ಬೇಕು.",
+    "review": "reviewed",
+    "enHash": "e838c9b9"
+  },
+  "voice.review.manager": {
+    "message": "{n, plural, one {# ಸಾಲಿಗೆ ಮ್ಯಾನೇಜರ್ ಬೇಕು. ಮ್ಯಾನೇಜರ್ ಖಚಿತಪಡಿಸುವವರೆಗೆ ಅದು ಈ ಡ್ರಾಫ್ಟ್‌ನಲ್ಲೇ ಇರುತ್ತದೆ.} other {# ಸಾಲುಗಳಿಗೆ ಮ್ಯಾನೇಜರ್ ಬೇಕು. ಮ್ಯಾನೇಜರ್ ಖಚಿತಪಡಿಸುವವರೆಗೆ ಅವು ಈ ಡ್ರಾಫ್ಟ್‌ನಲ್ಲೇ ಇರುತ್ತವೆ.}}",
+    "review": "reviewed",
+    "enHash": "7c06ed60"
+  },
+  "voice.review.lines": {
+    "message": "ಡ್ರಾಫ್ಟ್ ಸಾಲುಗಳು",
+    "review": "reviewed",
+    "enHash": "9ff61089"
+  },
+  "voice.review.discard": {
+    "message": "ರದ್ದುಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "36fff63c"
+  },
+  "voice.review.confirm": {
+    "message": "{n, plural, =0 {ಖಚಿತಪಡಿಸಿ} one {# ಬದಲಾವಣೆ ಖಚಿತಪಡಿಸಿ} other {# ಬದಲಾವಣೆಗಳನ್ನು ಖಚಿತಪಡಿಸಿ}}",
+    "review": "reviewed",
+    "enHash": "9b319135"
+  },
+  "voice.review.none.title": {
+    "message": "ಯಾವುದೇ ಸ್ಟಾಕ್ ಬದಲಾವಣೆ ಕೇಳಿಸಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "cdefe4e8"
+  },
+  "voice.review.none.body": {
+    "message": "ಐಟಂ ಮತ್ತು ಅದಕ್ಕೆ ಏನಾಯಿತು ಎಂದು ಹೇಳಿ, ಉದಾ. “2 ಮ್ಯಾಗಿ ಮಾರಾಟವಾಯಿತು”.",
+    "review": "reviewed",
+    "enHash": "2bc3c1da"
+  },
+  "voice.kind.sale": {
+    "message": "ಮಾರಾಟ",
+    "review": "reviewed",
+    "enHash": "0028d743"
+  },
+  "voice.kind.restock": {
+    "message": "ಸ್ಟಾಕ್ ಬಂತು",
+    "review": "reviewed",
+    "enHash": "3ccf7127"
+  },
+  "voice.kind.count": {
+    "message": "ಎಣಿಕೆ",
+    "review": "reviewed",
+    "enHash": "66e12969"
+  },
+  "voice.kind.set_price": {
+    "message": "ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "voice.change.sale": {
+    "message": "{n} ಮಾರಾಟ",
+    "review": "reviewed",
+    "enHash": "cada7134"
+  },
+  "voice.change.restock": {
+    "message": "{n} ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "c44ec97c"
+  },
+  "voice.change.out": {
+    "message": "ಸ್ಟಾಕ್ ಖಾಲಿ",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "voice.change.count": {
+    "message": "{n} ಎಣಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "7df14703"
+  },
+  "voice.change.price": {
+    "message": "ಬೆಲೆ {price}",
+    "review": "reviewed",
+    "enHash": "8bbcaf50"
+  },
+  "voice.change.priceFrom": {
+    "message": "ಬೆಲೆ {price} (ಈಗ {now})",
+    "review": "reviewed",
+    "enHash": "afc1e15d"
+  },
+  "voice.change.priceMissing": {
+    "message": "ಬೆಲೆ ಕೇಳಿಸಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "9f2455d4"
+  },
+  "voice.line.askManager": {
+    "message": "ಮ್ಯಾನೇಜರ್ ಕೇಳಿ",
+    "review": "reviewed",
+    "enHash": "f4a0f296"
+  },
+  "voice.line.pickFlag": {
+    "message": "ಐಟಂ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "41825010"
+  },
+  "voice.line.edited": {
+    "message": "ಬದಲಾಯಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "978e8c33"
+  },
+  "voice.line.noItem": {
+    "message": "ಯಾವುದೇ ಐಟಂ ಹೊಂದಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "03219b45"
+  },
+  "voice.line.missingNumber": {
+    "message": "ಸಂಖ್ಯೆ ಕೇಳಿಸಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "7ca7271e"
+  },
+  "voice.line.onHand": {
+    "message": "{n} ಸ್ಟಾಕ್‌ನಲ್ಲಿದೆ",
+    "review": "reviewed",
+    "enHash": "01f97821"
+  },
+  "voice.line.heard": {
+    "message": "ಕೇಳಿದ್ದು: “{words}”",
+    "review": "reviewed",
+    "enHash": "d1009ed3"
+  },
+  "voice.line.sure": {
+    "message": "ಖಚಿತ {pct}%",
+    "review": "reviewed",
+    "enHash": "7555951d"
+  },
+  "voice.line.unsure": {
+    "message": "ಇದನ್ನು ಪರಿಶೀಲಿಸಿ ({pct}%)",
+    "review": "reviewed",
+    "enHash": "4a9667be"
+  },
+  "voice.line.managerNote": {
+    "message": "ಮ್ಯಾನೇಜರ್ ಅಥವಾ ಮಾಲೀಕರು ಮಾತ್ರ ಇದನ್ನು ಖಚಿತಪಡಿಸಬಹುದು. ಇದು ಈ ಡ್ರಾಫ್ಟ್‌ನಲ್ಲಿ ಅವರಿಗಾಗಿ ಕಾಯುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "b7af692b"
+  },
+  "voice.line.restore": {
+    "message": "ಹಿಂಪಡೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "39fc7212"
+  },
+  "voice.line.pick": {
+    "message": "ಐಟಂ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "41825010"
+  },
+  "voice.line.edit": {
+    "message": "ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "5301648d"
+  },
+  "voice.line.discard": {
+    "message": "ತೆಗೆದುಹಾಕಿ",
+    "review": "reviewed",
+    "enHash": "e963907d"
+  },
+  "voice.edit.title": {
+    "message": "ಸಾಲು ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "d440e5cb"
+  },
+  "voice.edit.pickTitle": {
+    "message": "ಐಟಂ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "14557eec"
+  },
+  "voice.edit.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "voice.edit.cancel": {
+    "message": "ರದ್ದು",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "voice.edit.save": {
+    "message": "ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "voice.edit.item": {
+    "message": "ಐಟಂ",
+    "review": "reviewed",
+    "enHash": "ecdda59a"
+  },
+  "voice.edit.changeItem": {
+    "message": "ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "64fbd995"
+  },
+  "voice.edit.itemRequired": {
+    "message": "ಒಂದು ಐಟಂ ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "a3046f35"
+  },
+  "voice.edit.kind": {
+    "message": "ಏನಾಯಿತು",
+    "review": "reviewed",
+    "enHash": "7661e659"
+  },
+  "voice.edit.price": {
+    "message": "ಮಾರಾಟ ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "7657ccd6"
+  },
+  "voice.edit.priceNow": {
+    "message": "ಈಗ {price}",
+    "review": "reviewed",
+    "enHash": "9b7a7073"
+  },
+  "voice.edit.priceInvalid": {
+    "message": "₹0 ಗಿಂತ ಹೆಚ್ಚಿನ ಬೆಲೆ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "7af65ff1"
+  },
+  "voice.edit.aboveMrp": {
+    "message": "ಬೆಲೆ MRP ({mrp}) ಗಿಂತ ಹೆಚ್ಚಿರಬಾರದು.",
+    "review": "reviewed",
+    "enHash": "7efee9c8"
+  },
+  "voice.edit.qty": {
+    "message": "ಪ್ರಮಾಣ",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "voice.edit.qtyInvalid": {
+    "message": "1 ರಿಂದ {max} ವರೆಗಿನ ಪೂರ್ಣ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "c4d982c3"
+  },
+  "voice.edit.counted": {
+    "message": "ಶೆಲ್ಫ್‌ನಲ್ಲಿ ಎಣಿಸಿದ್ದು",
+    "review": "reviewed",
+    "enHash": "3757174e"
+  },
+  "voice.edit.countHelp": {
+    "message": "0 ಎಂದರೆ ಸ್ಟಾಕ್ ಖಾಲಿ.",
+    "review": "reviewed",
+    "enHash": "1ef18a39"
+  },
+  "voice.edit.countInvalid": {
+    "message": "0 ರಿಂದ {max} ವರೆಗಿನ ಪೂರ್ಣ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "9ea918c4"
+  },
+  "voice.edit.search": {
+    "message": "ಐಟಂ ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "daeea688"
+  },
+  "voice.edit.searchHint": {
+    "message": "ಐಟಂ ಹೆಸರು",
+    "review": "reviewed",
+    "enHash": "b56b71bb"
+  },
+  "voice.edit.noItems": {
+    "message": "ಯಾವುದೇ ಐಟಂ ಸಿಗಲಿಲ್ಲ. ಮೊದಲು ಸ್ಟಾಕ್ ಪುಟದಲ್ಲಿ ಸೇರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "e1944bba"
+  },
+  "voice.edit.results": {
+    "message": "ಹೊಂದುವ ಐಟಂಗಳು",
+    "review": "reviewed",
+    "enHash": "defd0b26"
+  },
+  "voice.edit.pickShort": {
+    "message": "ಆಯ್ಕೆ",
+    "review": "reviewed",
+    "enHash": "04d2414c"
+  },
+  "voice.edit.pickOne": {
+    "message": "{name} ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "dbf74012"
+  },
+  "voice.done.title": {
+    "message": "ಡ್ರಾಫ್ಟ್ ಖಚಿತಪಡಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "f796dd96"
+  },
+  "voice.done.discarded": {
+    "message": "ಡ್ರಾಫ್ಟ್ ರದ್ದಾಯಿತು. ಏನೂ ಬದಲಾಗಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "e8ec5fb7"
+  },
+  "voice.done.body": {
+    "message": "{applied, plural, one {# ಬದಲಾವಣೆ ಅನ್ವಯವಾಯಿತು} other {# ಬದಲಾವಣೆಗಳು ಅನ್ವಯವಾದವು}}{held, plural, =0 {.} other {, # ಮ್ಯಾನೇಜರ್‌ಗಾಗಿ ಬಾಕಿ.}}",
+    "review": "reviewed",
+    "enHash": "59b17c8b"
+  },
+  "voice.done.lines": {
+    "message": "ಪ್ರತಿ ಸಾಲಿಗೆ ಏನಾಯಿತು",
+    "review": "reviewed",
+    "enHash": "60771315"
+  },
+  "voice.outcome.accepted": {
+    "message": "ಅನ್ವಯವಾಯಿತು",
+    "review": "reviewed",
+    "enHash": "a3e4a569"
+  },
+  "voice.outcome.edited": {
+    "message": "ಬದಲಾವಣೆಯೊಂದಿಗೆ ಅನ್ವಯವಾಯಿತು",
+    "review": "reviewed",
+    "enHash": "41f86f4d"
+  },
+  "voice.outcome.discarded": {
+    "message": "ತೆಗೆದುಹಾಕಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "b5e77c5c"
+  },
+  "voice.outcome.not_permitted": {
+    "message": "ಮ್ಯಾನೇಜರ್ ಬೇಕು",
+    "review": "reviewed",
+    "enHash": "1bb456dd"
+  },
+  "voice.lang.fixedHint": {
+    "message": "ಸರಿಯಾದ ಹೊಂದಾಣಿಕೆಗೆ ಇದೇ ಭಾಷೆಯಲ್ಲಿ ಮಾತನಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "0adf1be4"
+  },
+  "voice.review.settled": {
+    "message": "ಈಗಾಗಲೇ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "0022bedc"
+  },
+  "voice.done.partial": {
+    "message": "ಉಳಿದವನ್ನು ಖಚಿತಪಡಿಸಲು ಮ್ಯಾನೇಜರ್‌ಗೆ ಹೇಳಿ",
+    "review": "reviewed",
+    "enHash": "d6fd25cc"
+  }
+}

@@ -250,3 +250,98 @@ func TestOutputShapes(t *testing.T) {
 	_, err = e.s.Create(ctx, NewDraft{Feature: "voice_stock", PromptVersion: "1"})
 	assert.Error(t, err)
 }
+
+// byRole applies the lines whose name is in allowed and answers not_permitted for the rest,
+// recording every line it was asked to apply.
+type byRole struct {
+	allowed map[string]bool
+	seen    []string
+}
+
+func (a *byRole) apply(_ context.Context, d Draft, ds []Decision) ([]LineResult, error) {
+	var o out
+	if err := d.Decode(&o); err != nil {
+		return nil, err
+	}
+	names := map[string]string{}
+	for _, l := range o.Lines {
+		names[l.LineID] = l.Name
+	}
+	r := make([]LineResult, len(ds))
+	for i, dc := range ds {
+		a.seen = append(a.seen, dc.LineID)
+		r[i] = LineResult{LineID: dc.LineID, Outcome: dc.Outcome}
+		if !a.allowed[names[dc.LineID]] {
+			r[i].Outcome = NotPermitted
+		}
+	}
+	return r, nil
+}
+
+// KeepOpen: a confirm that leaves not_permitted lines keeps the draft ready with the applied
+// lines settled; a later confirm decides only the open lines (a settled line is never applied
+// again, whatever the request says), and the draft closes once nothing is open.
+func TestKeepOpen(t *testing.T) {
+	e := newEnv(t)
+	ctx := context.Background()
+	id := e.ready(threeLines)
+	all := []Decision{{LineID: "l1", Outcome: Accepted}, {LineID: "l2", Outcome: Accepted}, {LineID: "l3", Outcome: Discarded}}
+
+	cashier := &byRole{allowed: map[string]bool{"rice": true}}
+	c := Confirmation{Feature: "voice_stock", DraftID: id, By: e.actor, Apply: cashier.apply, Decisions: all, KeepOpen: true}
+	res, err := e.s.Confirm(ctx, c)
+	require.NoError(t, err)
+	assert.Equal(t, StatusReady, res.Status)
+	assert.Equal(t, []LineResult{{"l1", Accepted}, {"l2", NotPermitted}, {"l3", Discarded}}, res.Lines)
+	assert.Equal(t, []string{"l1", "l2"}, cashier.seen)
+	d, err := e.s.Get(ctx, "voice_stock", id)
+	require.NoError(t, err)
+	assert.Equal(t, StatusReady, d.Status)
+	assert.Equal(t, res.Lines, d.Lines)
+	assert.Nil(t, d.ConfirmedAt)
+
+	// The same request again: l1 is settled, l2 is still refused; nothing changes.
+	again, err := e.s.Confirm(ctx, c)
+	require.NoError(t, err)
+	assert.Equal(t, res, again)
+	assert.Equal(t, []string{"l1", "l2", "l2"}, cashier.seen, "the settled line is not applied again")
+
+	// Only settled lines in the request: answered as they stand, nothing applied.
+	c.Decisions = []Decision{{LineID: "l1", Outcome: Discarded}}
+	same, err := e.s.Confirm(ctx, c)
+	require.NoError(t, err)
+	assert.Equal(t, res, same)
+
+	// A manager sends every line again; only l2 is applied, and the draft closes.
+	manager := &byRole{allowed: map[string]bool{"rice": true, "dal": true, "oil": true}}
+	by := e.tdb.InsertUser(t, ids.Zero)
+	m := Confirmation{Feature: "voice_stock", DraftID: id, By: by, Apply: manager.apply, KeepOpen: true,
+		Decisions: []Decision{{LineID: "l1", Outcome: Accepted}, {LineID: "l2", Outcome: Edited, Value: json.RawMessage(`{"qty":4}`)}, {LineID: "l3", Outcome: Accepted}}}
+	done, err := e.s.Confirm(ctx, m)
+	require.NoError(t, err)
+	assert.Equal(t, StatusConfirmed, done.Status)
+	assert.Equal(t, []LineResult{{"l1", Accepted}, {"l2", Edited}, {"l3", Discarded}}, done.Lines)
+	assert.Equal(t, []string{"l2"}, manager.seen)
+	d, err = e.s.Get(ctx, "voice_stock", id)
+	require.NoError(t, err)
+	assert.Equal(t, StatusConfirmed, d.Status)
+	assert.Equal(t, by, d.ConfirmedBy)
+
+	// A replay after the close answers the closed result.
+	replay, err := e.s.Confirm(ctx, c)
+	require.NoError(t, err)
+	assert.Equal(t, done, replay)
+	assert.Equal(t, []string{"l2"}, manager.seen)
+
+	// Discarding the open lines also closes it; with nothing applied it is discarded.
+	id = e.ready(threeLines)
+	none := &byRole{}
+	_, err = e.s.Confirm(ctx, Confirmation{Feature: "voice_stock", DraftID: id, By: e.actor, Apply: none.apply, KeepOpen: true,
+		Decisions: []Decision{{LineID: "l1", Outcome: Accepted}}})
+	require.NoError(t, err)
+	closed, err := e.s.Confirm(ctx, Confirmation{Feature: "voice_stock", DraftID: id, By: e.actor, Apply: none.apply, KeepOpen: true,
+		Decisions: []Decision{{LineID: "l1", Outcome: Discarded}}})
+	require.NoError(t, err)
+	assert.Equal(t, StatusDiscarded, closed.Status)
+	assert.Equal(t, []LineResult{{"l1", Discarded}, {"l2", Discarded}, {"l3", Discarded}}, closed.Lines)
+}

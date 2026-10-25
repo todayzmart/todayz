@@ -133,5 +133,10 @@
     "message": "{count, plural, one {# ఐటమ్ రేపటికల్లా అయిపోతుంది} other {# ఐటమ్‌లు రేపటికల్లా అయిపోతాయి}}",
     "review": "reviewed",
     "enHash": "a905b14b"
+  },
+  "shell.nav.help": {
+    "message": "సహాయం",
+    "review": "reviewed",
+    "enHash": "c47ae153"
   }
 }

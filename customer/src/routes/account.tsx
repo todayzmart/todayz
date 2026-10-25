@@ -173,6 +173,12 @@ function Profile({ me, note, setNote }: { me: Me; note: Note; setNote: (n: Note)
             <Link to="/baskets">{intl.formatMessage({ id: 'basket.entry.body' })}</Link>
           </dd>
         </div>
+        <div>
+          <dt>{intl.formatMessage({ id: 'help.title' })}</dt>
+          <dd>
+            <Link to="/help">{intl.formatMessage({ id: 'help.entry' })}</Link>
+          </dd>
+        </div>
       </dl>
 
       <SavedAddresses />

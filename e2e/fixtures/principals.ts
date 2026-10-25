@@ -227,10 +227,19 @@ export class Principal implements Bearer {
   }
 
   async renew(): Promise<void> {
-    const r = await this.request().post(`${URLS.api}/v1/auth/refresh`, {
-      headers: { Origin: ORIGIN[this.person.app], 'X-TZ-Client': CLIENT },
-      data: { app: this.person.app },
-    });
+    const refresh = () =>
+      this.request().post(`${URLS.api}/v1/auth/refresh`, {
+        headers: { Origin: ORIGIN[this.person.app], 'X-TZ-Client': CLIENT },
+        data: { app: this.person.app },
+      });
+    let r = await refresh();
+    if (r.status() === 401 && this.lent) {
+      // The page refreshed with the same cookie at the same moment and won: the server refuses the
+      // loser inside RotationGrace and keeps the cookie, and the page's response puts the new one in
+      // the shared jar. Wait for it and retry once, as shared/auth's session does (graceWaitMs).
+      await new Promise((done) => setTimeout(done, 400));
+      r = await refresh();
+    }
     expect(r.status(), `session refresh for ${this.person.key}`).toBe(200);
     const b = (await r.json()) as { accessToken: string; expiresAt: string };
     if (!this.saved) throw new Error(`${this.person.key} is not signed in`);

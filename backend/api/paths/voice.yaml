@@ -1,0 +1,249 @@
+# Paths: domain "voice" (owner W3-04): voice stock update, AI-R1 (B-06, 04 §2.8, D-65).
+#
+# `/v1/biz/businesses/{bid}/stores/{sid}` is `{S}` in 04 §2.6. A recording becomes an
+# `ai_drafts` row (feature voice_stock) that a person reviews and confirms; nothing changes
+# stock, prices or sales before the confirm (11 §1 rule 1). Hidden (the common 404) while
+# `ai_voice_stock_enabled` or `feature_voice_enabled` is off or a provider key is missing
+# (11 §1 rule 2). Roles are in internal/platform/authz/policy/voice.go; each line's own
+# permission is checked again at confirm (D-06, D-65).
+/v1/biz/businesses/{bid}/stores/{sid}/ai/voice-stock:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getVoiceStockAvailability
+    tags:
+    - voice
+    summary: Whether voice update is on for this store (B-06)
+    description: >-
+      Cashier and above (`voice.draft`). 200 with the recording limits while voice update is on; the common
+      404 while `ai_voice_stock_enabled` or `feature_voice_enabled` is off or a provider key is missing, so
+      the app hides the screen (11 §1 rule 2). Counts nothing against the daily cap.
+    responses:
+      '200':
+        description: Voice update is on
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/voice.yaml#/VoiceStockAvailability
+            example:
+              maxSeconds: 15
+              maxBytes: 1048576
+              languages: [en-IN, hi-IN, kn-IN, te-IN, ta-IN]
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/ai/voice-stock/drafts:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: createVoiceStockDraft
+    tags:
+    - voice
+    summary: Send a voice stock update (B-06)
+    description: >-
+      Cashier and above (`voice.draft`). A multipart form with `audio` (one recording of at most 15 s:
+      audio/webm, audio/ogg, audio/wav, audio/mpeg or audio/mp4, at most 1 MB; past 15 s by the container's
+      length, or past that type's top bit rate for 15 s when it does not say, is `422 validation_failed`
+      `body.audio: too_long`) and an optional `language`
+      (VoiceStockLanguage; absent detects it). Answers 202 with the draft id at once; speech to text and the
+      model run in the background and the draft turns ready or failed (poll the draft). The recording is
+      not stored. Counts one call against the store's daily AI cap (`429 ai_daily_cap_reached`).
+    x-upload: true
+    x-idempotency: optional
+    x-problems:
+    - ai_daily_cap_reached
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            additionalProperties: false
+            required: [audio]
+            properties:
+              audio:
+                type: string
+                contentMediaType: application/octet-stream
+                maxLength: 1048576
+              language: {$ref: ../schemas/voice.yaml#/VoiceStockLanguage}
+          example:
+            audio: '<15 s of audio/webm>'
+            language: hi-IN
+    responses:
+      '202':
+        description: Accepted for processing
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/voice.yaml#/VoiceStockDraftCreated
+            example:
+              draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0D
+              status: processing
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/ai/voice-stock/drafts/{draftId}:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: draftId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getVoiceStockDraft
+    tags:
+    - voice
+    summary: A voice stock draft (B-06)
+    description: >-
+      The person who spoke it, and the store's owner and managers (`voice.draft.others`); anyone else gets
+      the common 404. Each line carries the matched item (or `matched: false` and "pick item"), its kind,
+      number, confidence and the item's price and stock now; a line the caller may not confirm comes back
+      `disabled: ask_manager` (D-06, D-65). A draft still processing after the provider timeout is closed
+      as failed.
+    responses:
+      '200':
+        description: The draft
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/voice.yaml#/VoiceStockDraft
+            example:
+              draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0D
+              feature: voice_stock
+              status: ready
+              promptVersion: voice_stock/prompt@1
+              createdAt: '2026-10-25T05:30:00Z'
+              language: hi-IN
+              transcript: teen maggi becha, amul butter ke barah packet aaye
+              lines:
+              - lineId: l1
+                kind: sale
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z0
+                itemName: Maggi 2-Minute Noodles 70 g
+                heard: teen maggi becha
+                quantity: 3
+                pricePaise: null
+                currentPricePaise: 1400
+                onHand: 42
+                confidence: 0.94
+                matched: true
+                disabled: null
+              - lineId: l2
+                kind: restock
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z1
+                itemName: Amul Butter 100 g
+                heard: amul butter ke barah packet aaye
+                quantity: 12
+                pricePaise: null
+                currentPricePaise: 5800
+                onHand: 4
+                confidence: 0.9
+                matched: true
+                disabled: ask_manager
+              outcomes: []
+              failure: null
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/ai/voice-stock/drafts/{draftId}/confirm:
+  parameters:
+  - name: bid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: sid
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  - name: draftId
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: confirmVoiceStockDraft
+    tags:
+    - voice
+    summary: Confirm a voice stock draft (B-06)
+    description: >-
+      The person who spoke it, or the store's owner and managers. One decision per line (`accepted`,
+      `edited` with its value, `discarded`); a line with no decision is discarded. Each line is checked
+      against the confirmer's permission (`pos.sell` for sale, `stock.count` for count, `stock.restock` for
+      restock, `item.price.edit` for set_price): a line they may not confirm is recorded `not_permitted` and
+      not applied. Accepted lines are applied in one transaction through their own domains: price edits
+      first (a sale is at the new price wherever it was spoken), then restock and count movements and
+      sales in the order spoken ("sold 3, only 5 left" leaves 5), each run of adjacent sale lines one POS
+      sale with no customer (cash, at the items' prices then). An accepted line that names no item, or a
+      number out of range, or a price above MRP, is `422 validation_failed` and nothing is applied; an
+      item changed under the confirm is `409 conflict`. When a line is `not_permitted` the others are
+      applied and the draft stays `ready` with that line open: a manager's confirm then applies only the
+      open lines (decisions for settled lines are ignored), and discarding them closes the draft.
+      Idempotent: a repeat answers the first result and applies nothing again. A draft not ready is
+      `409 invalid_transition`.
+    x-idempotency: required
+    x-money: true
+    parameters:
+    - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/voice.yaml#/VoiceStockConfirmRequest
+          example:
+            lines:
+            - lineId: l1
+              outcome: accepted
+            - lineId: l2
+              outcome: edited
+              value:
+                kind: restock
+                storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z1
+                quantity: 10
+                pricePaise: null
+    responses:
+      '200':
+        description: The outcomes
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/voice.yaml#/VoiceStockConfirmResult
+            example:
+              draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0D
+              status: ready
+              lines:
+              - lineId: l1
+                outcome: accepted
+              - lineId: l2
+                outcome: not_permitted
+      default:
+        $ref: ../common/responses.yaml#/Problem
