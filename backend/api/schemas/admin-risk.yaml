@@ -1,9 +1,171 @@
-# Schemas: domain "admin-risk" (owner W3-06): admin risk flags (04 §2.7).
-#
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# Schemas: domain "admin-risk" (owner W3-02): A-13 Risk, the risk flags queue (04 §2.7; 01 §13; D-78, D-225).
+# A flag is a signal for a person: it never moves money or blocks anyone by itself.
+RiskFlagStatus:
+  type: string
+  enum: [open, cleared, confirmed]
+RiskRule:
+  type: string
+  description: >-
+    The rule that raised the flag, for example `orders.code_lockouts`, `pos.bill_claim_spread`, `pos.reversal_ratio`,
+    `referral.self_like`, `identity.otp_ip_fanout`, `identity.otp_failed_phone`, `referral.device_accounts`,
+    `referral.reversed_after_reward`, `referral.reward_refused`, `pos.offline_links`,
+    `pos.offline_offer_without_discount_role`, `credits.store_daily_cap`, `credits.customer_monthly_cap`,
+    `store_strikes`, `return_unconfirmed`, `ask_reported`. Other packages may add rules.
+  pattern: ^[a-z][a-z0-9_.]{0,63}$
+RiskSubjectType:
+  type: string
+  description: What the flag is about, for example `store`, `user`, `referral`, `business`, `ip` or `phone`.
+  pattern: ^[a-z][a-z0-9_]{0,31}$
+RiskReviewNote:
+  type: string
+  description: Why, at most 500 characters. Kept on the flag and in the audit log.
+  minLength: 1
+  maxLength: 500
+RiskResolveRequest:
+  type: object
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason: {$ref: ./admin-risk.yaml#/RiskReviewNote}
+RiskFlag:
+  type: object
+  additionalProperties: false
+  required: [id, rule, subjectType, subjectId, subjectLabel, score, status, createdAt, reviewedAt, reviewedBy, reviewNote]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    rule: {$ref: ./admin-risk.yaml#/RiskRule}
+    subjectType: {$ref: ./admin-risk.yaml#/RiskSubjectType}
+    subjectId:
+      type: string
+      description: A ULID for a store, user, referral or business; for an `ip` or `phone` subject, an opaque id made from its keyed hash.
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    subjectLabel:
+      type: [string, 'null']
+      description: The store's, business's or customer's name, or a referral's "referrer → new person"; null for an `ip` or `phone`. Never a phone number.
+      maxLength: 200
+    score: {type: integer, minimum: 0, maximum: 100}
+    status: {$ref: ./admin-risk.yaml#/RiskFlagStatus}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    reviewedAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    reviewedBy:
+      type: [string, 'null']
+      description: The reviewer's name.
+      maxLength: 80
+    reviewNote:
+      type: [string, 'null']
+      maxLength: 500
+RiskRuleCount:
+  type: object
+  additionalProperties: false
+  required: [rule, open]
+  properties:
+    rule: {$ref: ./admin-risk.yaml#/RiskRule}
+    open: {type: integer, minimum: 0}
+RiskFlagList:
+  type: object
+  additionalProperties: false
+  required: [items, openByRule, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: ./admin-risk.yaml#/RiskFlag}
+    openByRule:
+      type: array
+      description: Open flags per rule, every rule with at least one, most first (the queue's tabs).
+      maxItems: 100
+      items: {$ref: ./admin-risk.yaml#/RiskRuleCount}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+RiskFact:
+  type: object
+  additionalProperties: false
+  required: [key, value]
+  description: One number or code the rule recorded when it raised the flag (`limit`, `count`, `stores`, `ratioPercent`, ...).
+  properties:
+    key: {type: string, pattern: '^[a-zA-Z][a-zA-Z0-9_]{0,40}$'}
+    value: {type: string, maxLength: 200}
+RiskSubject:
+  type: object
+  additionalProperties: false
+  required: [type, id, label, status, storeId, businessId, customerId]
+  description: >-
+    The flag's subject, with the ids the A-13 actions need: `customerId` when blocking a customer is possible
+    (A-05's own block action), `businessId` when suspending a business is (A-03's own suspend action).
+  properties:
+    type: {$ref: ./admin-risk.yaml#/RiskSubjectType}
+    id:
+      type: string
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    label:
+      type: [string, 'null']
+      maxLength: 200
+    status:
+      type: [string, 'null']
+      description: The subject's own status (`live`, `verified`, `active`, `blocked`, `pending`, ...).
+      maxLength: 40
+    storeId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    businessId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    customerId:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+RiskEvidenceKind:
+  type: string
+  enum: [order, pos_sale, bill_claim, strike, code_lockout, referral, otp_request]
+RiskEvidence:
+  type: object
+  additionalProperties: false
+  required: [kind, id, label, storeName, at, amountPaise, note]
+  description: One row the rule counted, newest first, at most 50.
+  properties:
+    kind: {$ref: ./admin-risk.yaml#/RiskEvidenceKind}
+    id:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+    label:
+      type: string
+      description: An order number, a referral's "referrer → new person", or the kind of row.
+      maxLength: 200
+    storeName:
+      type: [string, 'null']
+      maxLength: 200
+    at: {$ref: ./common.yaml#/Timestamp}
+    amountPaise:
+      oneOf:
+        - {$ref: ./common.yaml#/Paise}
+        - {type: 'null'}
+    note:
+      type: [string, 'null']
+      description: A status or reason code (`reversed`, `dispatch_timeout`, `rejected_same_device`, ...).
+      maxLength: 80
+RiskFlagDetail:
+  type: object
+  additionalProperties: false
+  required: [flag, subject, facts, evidence, history, assistEnabled, serverNow]
+  properties:
+    flag: {$ref: ./admin-risk.yaml#/RiskFlag}
+    subject: {$ref: ./admin-risk.yaml#/RiskSubject}
+    facts:
+      type: array
+      maxItems: 30
+      items: {$ref: ./admin-risk.yaml#/RiskFact}
+    evidence:
+      type: array
+      maxItems: 50
+      items: {$ref: ./admin-risk.yaml#/RiskEvidence}
+    history:
+      type: array
+      description: Other flags on the same subject, newest first, at most 20.
+      maxItems: 20
+      items: {$ref: ./admin-risk.yaml#/RiskFlag}
+    assistEnabled:
+      type: boolean
+      description: '`ai_riskexplain_enabled` (AI-A3, W3-13): the A-13 assistant mount shows only while it is on.'
+    serverNow: {$ref: ./common.yaml#/ServerNow}

@@ -1,12 +1,177 @@
-# Paths: domain "admin-risk" (owner W3-06): admin risk flags (04 §2.7).
+# Paths: domain "admin-risk" (owner W3-02): A-13 Risk, the risk flags queue (04 §2.7; 01 §13; D-78, D-225).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [admin-risk]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/admin-risk.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Any package raises a flag on the W0-03 `risk_flags` table; internal/risk owns the rules it runs itself
+# (the `risk_scan` job, every 5 minutes) and this queue. `support`, `admin` and `super_admin` read; only `admin` and
+# `super_admin` clear or confirm, always with a reason, audited (internal/platform/authz/policy/risk.go).
+# Confirming never blocks or suspends by itself: A-13 then offers the customer's block (A-05) or the
+# business's suspend (A-03), their own audited actions.
+/v1/admin/risk/flags:
+  get:
+    operationId: listRiskFlags
+    tags: [admin-risk]
+    summary: Risk flags, newest first (A-13)
+    description: >-
+      `status` defaults to every status; `rule` and `subjectType` narrow the list. `openByRule` counts the open
+      flags per rule whatever the filters.
+    parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: ../schemas/admin-risk.yaml#/RiskFlagStatus
+      - name: rule
+        in: query
+        schema:
+          $ref: ../schemas/admin-risk.yaml#/RiskRule
+      - name: subjectType
+        in: query
+        schema:
+          $ref: ../schemas/admin-risk.yaml#/RiskSubjectType
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: A page of flags
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-risk.yaml#/RiskFlagList
+            example:
+              items:
+                - &flag
+                  id: 01JB0RF1A2B3C4D5E6F7G8H9J0
+                  rule: orders.code_lockouts
+                  subjectType: store
+                  subjectId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                  subjectLabel: Annapurna Kirana
+                  score: 60
+                  status: open
+                  createdAt: "2026-10-25T09:00:00Z"
+                  reviewedAt: null
+                  reviewedBy: null
+                  reviewNote: null
+              openByRule:
+                - rule: orders.code_lockouts
+                  open: 1
+              nextCursor: null
+              serverNow: "2026-10-25T10:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/risk/flags/{flagId}:
+  parameters:
+    - &flagId
+      name: flagId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getRiskFlag
+    tags: [admin-risk]
+    summary: One flag with its evidence (A-13 detail)
+    description: >-
+      The rule's recorded numbers (`facts`), the rows it counted (`evidence`, read now, at most 50), the subject
+      with the ids its own actions need, and the subject's other flags. No phone number, OTP or code is ever in it.
+    responses:
+      "200":
+        description: The flag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-risk.yaml#/RiskFlagDetail
+            example:
+              flag: *flag
+              subject:
+                type: store
+                id: 01JB0SST1A2B3C4D5E6F7G8H9J
+                label: Annapurna Kirana
+                status: live
+                storeId: 01JB0SST1A2B3C4D5E6F7G8H9J
+                businessId: 01JB0SBZ1A2B3C4D5E6F7G8H9J
+                customerId: null
+              facts:
+                - key: lockouts
+                  value: "11"
+                - key: limit
+                  value: "10"
+                - key: day
+                  value: "2026-10-25"
+              evidence:
+                - kind: code_lockout
+                  id: 01JB0SDR1A2B3C4D5E6F7G8H9J
+                  label: TZ-024817
+                  storeName: Annapurna Kirana
+                  at: "2026-10-25T08:40:00Z"
+                  amountPaise: 48000
+                  note: accepted
+              history: []
+              assistEnabled: false
+              serverNow: "2026-10-25T10:00:00Z"
+      default: *problem
+/v1/admin/risk/flags/{flagId}/clear:
+  parameters:
+    - *flagId
+  post:
+    operationId: clearRiskFlag
+    tags: [admin-risk]
+    summary: Clear a flag as a false positive (audited)
+    description: >-
+      From `open`, with a reason. A cleared `referral.reward_refused` flag lets the reward sweep try that referral
+      again; a cleared flag no longer holds a payout. Any other status is `409 invalid_transition`.
+    x-idempotency: none
+    x-problems: [invalid_transition]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-risk.yaml#/RiskResolveRequest
+          example:
+            reason: Busy festival day; the customers tapped New code
+    responses:
+      "200":
+        description: The flag after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-risk.yaml#/RiskFlag
+            example:
+              <<: *flag
+              status: cleared
+              reviewedAt: "2026-10-25T10:00:00Z"
+              reviewedBy: Asha
+              reviewNote: Busy festival day; the customers tapped New code
+      default: *problem
+/v1/admin/risk/flags/{flagId}/confirm:
+  parameters:
+    - *flagId
+  post:
+    operationId: confirmRiskFlag
+    tags: [admin-risk]
+    summary: Confirm a flag as fraud (audited)
+    description: >-
+      From `open`, with a reason. It records the finding only; it does not block, suspend or move money. Any other
+      status is `409 invalid_transition`.
+    x-idempotency: none
+    x-problems: [invalid_transition]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-risk.yaml#/RiskResolveRequest
+          example:
+            reason: Staff guessed codes on other customers' orders
+    responses:
+      "200":
+        description: The flag after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-risk.yaml#/RiskFlag
+            example:
+              <<: *flag
+              status: confirmed
+              reviewedAt: "2026-10-25T10:00:00Z"
+              reviewedBy: Asha
+              reviewNote: Staff guessed codes on other customers' orders
+      default: *problem

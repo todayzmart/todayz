@@ -50,7 +50,7 @@ func TestCleanReason(t *testing.T) {
 func TestEverySubjectTypeHasAViewOrIsRefused(t *testing.T) {
 	// Every subject a panel can show has the action that views it; the A-03
 	// queue's view covers business.
-	for _, typ := range []api.AdminAuditSubjectType{"order", "user", "store", "business", "review", "banner", "lead", "platform_setting", "admin_user", "product", "category", "synonym", "notification_template", "payout", "payout_period", "credit_adjustment"} {
+	for _, typ := range []api.AdminAuditSubjectType{"order", "user", "store", "business", "review", "banner", "lead", "platform_setting", "admin_user", "product", "category", "synonym", "notification_template", "payout", "payout_period", "credit_adjustment", "risk_flag", "referral"} {
 		require.Contains(t, subjectView, typ)
 	}
 	require.Equal(t, policy.AdminBusinessView, subjectView["business"])
@@ -60,5 +60,8 @@ func TestEverySubjectTypeHasAViewOrIsRefused(t *testing.T) {
 	require.Equal(t, policy.AdminPayoutView, subjectView["payout"])
 	require.Equal(t, policy.AdminPayoutView, subjectView["payout_period"])
 	require.Equal(t, policy.AdminLedgerView, subjectView["credit_adjustment"])
-	require.Len(t, subjectView, 16)
+	// W3-02: a flag's and a referral's history follow A-13 and A-10.
+	require.Equal(t, policy.AdminRiskView, subjectView["risk_flag"])
+	require.Equal(t, policy.AdminReferralsView, subjectView["referral"])
+	require.Len(t, subjectView, 18)
 }

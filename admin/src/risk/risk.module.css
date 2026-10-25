@@ -1,0 +1,5 @@
+/* A-13: a rule's fact values are ids and counts; long ids wrap inside the card. */
+.value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

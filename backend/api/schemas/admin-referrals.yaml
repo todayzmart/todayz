@@ -1,9 +1,88 @@
-# Schemas: domain "admin-referrals" (owner W3-04): admin referrals (04 §2.7).
+# Schemas: domain "admin-referrals" (owner W3-02): A-10 Referrals (04 §2.7; 01 §8; D-78, D-225).
 #
-# Pre-created empty by W0-04 (D-50). Fill it as a map of schema name -> JSON
-# Schema; names are unique across every schemas/<domain>.yaml. Request objects
-# carry `additionalProperties: false` (an unknown field is 422 validation_failed);
-# an object that must stay open says `x-open-object: true`. Money is `*Paise`
-# (`../schemas/common.yaml#/Paise`), ids are `Ulid`, times are `Timestamp`,
-# timed responses carry `serverNow: {$ref: ./common.yaml#/ServerNow}`.
-{}
+# The admin view of W2-03's referrals: who referred whom, where the reward stands, and the open risk flags on
+# it. Phone numbers, device hashes and codes a person typed are never in it; the referral code shown is the
+# referrer's public code.
+AdminReferralStatus:
+  type: string
+  enum: [pending, qualified, rewarded, rejected, rejected_same_device]
+AdminReferralKind:
+  type: string
+  enum: [retailer_customer, customer_customer, any_shop]
+AdminReferralParty:
+  type: object
+  additionalProperties: false
+  required: [type, id, label]
+  properties:
+    type:
+      type: string
+      enum: [store, customer, business]
+    id: {$ref: ./common.yaml#/Ulid}
+    label:
+      type: [string, 'null']
+      description: The store's or business's name, or the customer's name; null when they have none. Never a phone number.
+      maxLength: 200
+AdminReferral:
+  type: object
+  additionalProperties: false
+  required: [id, kind, status, source, code, referrer, referee, referrerCredits, refereeCredits, rejectReason,
+    qualifiedAt, rewardedAt, createdAt, openFlags, flagRules]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    kind: {$ref: ./admin-referrals.yaml#/AdminReferralKind}
+    status: {$ref: ./admin-referrals.yaml#/AdminReferralStatus}
+    source:
+      type: string
+      enum: [qr_standee, link, code]
+    code:
+      type: string
+      description: The referrer's public referral code or store short code.
+      pattern: ^[A-HJKMNP-Z2-9]{6}$
+    referrer: {$ref: ./admin-referrals.yaml#/AdminReferralParty}
+    referee: {$ref: ./admin-referrals.yaml#/AdminReferralParty}
+    referrerCredits: {type: integer, minimum: 0, maximum: 100000}
+    refereeCredits: {type: integer, minimum: 0, maximum: 100000}
+    rejectReason:
+      type: [string, 'null']
+      description: The reason code (`same_device`, `admin_rejected`, ...).
+      pattern: ^[a-z][a-z0-9_]{0,40}$
+    qualifiedAt:
+      type: [string, 'null']
+      format: date-time
+      maxLength: 40
+    rewardedAt:
+      type: [string, 'null']
+      format: date-time
+      description: When the second side's reward posted.
+      maxLength: 40
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    openFlags:
+      type: integer
+      minimum: 0
+      description: Open risk flags on this referral (A-13).
+    flagRules:
+      type: array
+      description: The rules of the open flags.
+      maxItems: 20
+      items: {type: string, pattern: '^[a-z][a-z0-9_.]{0,63}$'}
+AdminReferralList:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      items: {$ref: ./admin-referrals.yaml#/AdminReferral}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminReferralRejectRequest:
+  type: object
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason:
+      type: string
+      description: Why, at most 300 characters. Kept in the audit log; the people in the referral never see it.
+      minLength: 1
+      maxLength: 300

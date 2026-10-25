@@ -8,11 +8,12 @@ import { useIntl } from 'react-intl';
  */
 const SETTINGS_UPDATE = ['settings', 'update'].join('.');
 
-/** The A-08, A-20, A-09 and A-11 actions, built the same way (`catalogue.…`, `banners.…`, `credits.…` and `payouts.…` are message namespaces too). */
+/** The A-08, A-20, A-09, A-11 and A-13 actions, built the same way (`catalogue.…`, `banners.…`, `credits.…`, `payouts.…` and `risk.…` are message namespaces too). */
 const CATALOGUE = (...parts: string[]) => ['catalogue', ...parts].join('.');
 const BANNERS = (...parts: string[]) => ['banners', ...parts].join('.');
 const CREDITS = (...parts: string[]) => ['credits', ...parts].join('.');
 const PAYOUTS = (...parts: string[]) => ['payouts', ...parts].join('.');
+const RISK = (...parts: string[]) => ['risk', ...parts].join('.');
 const BUILT_ACTIONS: Readonly<Record<string, string>> = {
   [CATALOGUE('product', 'create')]: 'audit.action.catalogueProductCreate',
   [CATALOGUE('product', 'update')]: 'audit.action.catalogueProductUpdate',
@@ -35,6 +36,9 @@ const BUILT_ACTIONS: Readonly<Record<string, string>> = {
   [PAYOUTS('unhold')]: 'audit.action.payoutUnhold',
   [PAYOUTS('mark_paid')]: 'audit.action.payoutMarkPaid',
   [PAYOUTS('export')]: 'audit.action.payoutExport',
+  [RISK('flag_clear')]: 'audit.action.riskFlagClear',
+  [RISK('flag_confirm')]: 'audit.action.riskFlagConfirm',
+  ['referral.reject']: 'audit.action.referralReject',
 };
 
 /** Audit actions the console names; any other action shows as written (it is still audited). */
