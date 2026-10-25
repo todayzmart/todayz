@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/jackc/pgx/v5/pgtype"
+
 	businessapi "github.com/todayz/backend/gen/api/business"
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/gen/sqlc/businessdb"
+	"github.com/todayz/backend/internal/platform/audit"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
@@ -103,45 +106,7 @@ func (s *Service) createDocument(ctx context.Context, bidStr string, body *busin
 	if err := v.err(); err != nil {
 		return businessapi.DocumentUpload{}, err
 	}
-
-	var doc businessdb.BusinessDocument
-	var key string
-	err = s.db.InTx(ctx, func(ctx context.Context) error {
-		q := s.q(ctx)
-		if store.Valid {
-			owner, err := q.StoreBusiness(ctx, store)
-			if db.IsNoRows(err) || (err == nil && owner != ids.UUID(bid)) {
-				return problem.New(genproblems.ValidationFailed, "").WithField("body.storeId", "must be a store of this business")
-			}
-			if err != nil {
-				return err
-			}
-		}
-		// One business and kind at a time, so two requests cannot both pass
-		// the cap.
-		if err := q.LockKey(ctx, "document:"+bid.String()+":"+string(body.Kind)); err != nil {
-			return err
-		}
-		n, err := q.CountDocumentsOfKind(ctx, businessdb.CountDocumentsOfKindParams{BusinessID: ids.UUID(bid), Kind: string(body.Kind)})
-		if err != nil {
-			return err
-		}
-		if n >= maxDocumentsPerKind {
-			return problem.New(genproblems.Conflict, "this business already has the most documents of this kind")
-		}
-		now := s.clock.Now()
-		id := ids.New(now)
-		key = "businesses/" + bid.String() + "/documents/" + id.String()
-		doc, err = q.InsertDocument(ctx, businessdb.InsertDocumentParams{
-			ID: ids.UUID(id), BusinessID: ids.UUID(bid), StoreID: store, Kind: string(body.Kind),
-			ObjectKey: key, ContentType: string(body.ContentType), SizeBytes: body.SizeBytes, Now: now,
-		})
-		if err != nil {
-			return err
-		}
-		return s.writeAudit(ctx, p.UserID, "document.create", "business_document", id.String(), nil,
-			map[string]any{"kind": doc.Kind, "contentType": doc.ContentType, "sizeBytes": doc.SizeBytes, "storeId": optIDString(doc.StoreID)})
-	})
+	doc, key, err := s.insertDocument(ctx, audit.ActorStaff, p.UserID, bid, store, string(body.Kind), string(body.ContentType), body.SizeBytes, nil)
 	if err != nil {
 		return businessapi.DocumentUpload{}, err
 	}
@@ -157,4 +122,54 @@ func (s *Service) createDocument(ctx context.Context, bidStr string, body *busin
 			Url:    s.presign.putURL(key, string(body.ContentType), doc.SizeBytes, now),
 		},
 	}, nil
+}
+
+// insertDocument records a pending document of the business (kind, content
+// type and size already checked) and returns it with its object key, audited
+// as the actor (kind, uid). check, when set, runs first in the transaction.
+func (s *Service) insertDocument(ctx context.Context, actorKind string, uid, bid ids.ID, store pgtype.UUID, kind, contentType string, size int64, check func(context.Context) error) (businessdb.BusinessDocument, string, error) {
+	var doc businessdb.BusinessDocument
+	var key string
+	err := s.db.InTx(ctx, func(ctx context.Context) error {
+		q := s.q(ctx)
+		if check != nil {
+			if err := check(ctx); err != nil {
+				return err
+			}
+		}
+		if store.Valid {
+			owner, err := q.StoreBusiness(ctx, store)
+			if db.IsNoRows(err) || (err == nil && owner != ids.UUID(bid)) {
+				return problem.New(genproblems.ValidationFailed, "").WithField("body.storeId", "must be a store of this business")
+			}
+			if err != nil {
+				return err
+			}
+		}
+		// One business and kind at a time, so two requests cannot both pass
+		// the cap.
+		if err := q.LockKey(ctx, "document:"+bid.String()+":"+kind); err != nil {
+			return err
+		}
+		n, err := q.CountDocumentsOfKind(ctx, businessdb.CountDocumentsOfKindParams{BusinessID: ids.UUID(bid), Kind: kind})
+		if err != nil {
+			return err
+		}
+		if n >= maxDocumentsPerKind {
+			return problem.New(genproblems.Conflict, "this business already has the most documents of this kind")
+		}
+		now := s.clock.Now()
+		id := ids.New(now)
+		key = "businesses/" + bid.String() + "/documents/" + id.String()
+		doc, err = q.InsertDocument(ctx, businessdb.InsertDocumentParams{
+			ID: ids.UUID(id), BusinessID: ids.UUID(bid), StoreID: store, Kind: kind,
+			ObjectKey: key, ContentType: contentType, SizeBytes: size, Now: now,
+		})
+		if err != nil {
+			return err
+		}
+		return s.writeAuditAs(ctx, actorKind, uid, "document.create", "business_document", id.String(), nil,
+			map[string]any{"kind": doc.Kind, "contentType": doc.ContentType, "sizeBytes": doc.SizeBytes, "storeId": optIDString(doc.StoreID)})
+	})
+	return doc, key, err
 }
