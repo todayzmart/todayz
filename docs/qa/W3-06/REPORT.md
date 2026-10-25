@@ -95,7 +95,7 @@ The owned paths are `admin/src/field`, `internal/business/agent*.go` and `backen
   - `backend/internal/catalogue/field.go`: item adds for agents, including a new product as pending.
   - `backend/internal/identity/field.go`: account lookup for the owner number and the SMS sender.
   - `backend/db/queries/{business/agent,catalogue/field}.sql`
-  - `backend/db/migrations/30601_w3-06_field.sql`, `30602_w3-06_field_limits.sql` (the per-agent cap setting) and `30603_w3-06_field_photo_confirm_by.sql` (`business_documents.confirm_by` and its partial index)
+  - `backend/db/migrations/30601_w3-06_field.sql`, `30602_w3-06_field_limits.sql` (the per-agent cap setting) `30603_w3-06_field_photo_confirm_by.sql` (`business_documents.confirm_by` and its partial index) and `30604_w3-06_owner_code_expired_audit.sql` (`field_owner_codes.expired_audited_at`)
   - `backend/db/queries/business/business.sql`: `InsertDocument` takes `confirm_by`; `CountDocumentsOfKind` takes `now` and skips stale field photos.
   - `backend/internal/jobs/business.go`: the `business_field_photos_sweep` job (the business domain's registry file).
   - `backend/internal/platform/settings/keys.go`: `FieldOwnerCodesPerAgentHour`.
@@ -108,7 +108,7 @@ The owned paths are `admin/src/field`, `internal/business/agent*.go` and `backen
   - `admin/e2e/{roles.spec,fake-api}.ts`, plus the new `admin/e2e/field.spec.ts`
   - `admin/CLAUDE.md`: the status line. The old "edit nothing in `nav.ts`" convention now says how W3-05 and W3-06 add a section.
 - **Shared and docs:**
-  - `shared/i18n/messages/admin/field.en.json` (new) and `shell.en.json`
+  - `shared/i18n/messages/admin/field.en.json` (new) and `shell.en.json`; `field.{hi,kn,te,ta}.json` (new: `field.items.notMine` only, machine drafts with `enHash`, not reviewed by a person)
   - `e2e/scenarios/FA.md` (new)
   - `docs/plan/01-product-rules.md` (§17: the per-agent cap; the agent edits only its own items) and `docs/plan/12-decision-log.md` (D-232)
 
@@ -130,7 +130,7 @@ The DLT template for the owner SMS stays with the lead.
 
 ## Lead re-review of 88e4624
 
-1. **Edit on owner-added items (medium).** `FieldItem` has a required `editable`: the list's `itemsEditable` and, for an agent, only the items `field_item_adds` records as theirs (D-232; one `FieldItemsAddedByAgent` query per page). It is true for admins while the list is open. The wizard shows Edit only when `editable` is true; on a shop's own item it shows "Added by the shop" instead. Create and update return `editable: true`. Tests: the wizard unit test, and the HTTP test checks the flag for the agent (own true, owner item false) and for an admin (all true).
+1. **Edit on owner-added items (medium).** `FieldItem` has a required `editable`: the list's `itemsEditable` and, for an agent, only the items `field_item_adds` records as theirs (D-232; one `FieldItemsAddedByAgent` query per page). It is true for admins while the list is open. The wizard shows Edit only when `editable` is true; on any item the agent did not add it shows "Added by someone else" instead. Create and update return `editable: true`. Tests: the wizard unit test, and the HTTP test checks the flag for the agent (own true, owner item false) and for an admin (all true).
 2. **Stale field photos and the owner's cap (medium).** Migration 30603 adds `business_documents.confirm_by`. Only field uploads set it (now + 20 minutes: the 15-minute URL plus 5). `CountDocumentsOfKind` serves both routes and skips `pending` rows past it, so the owner's upload on `/v1/biz/.../documents` is no longer blocked. The owner routes have no confirm step, so their rows keep `confirm_by` NULL and are never treated as stale.
    - *Sweep:* `business_field_photos_sweep`, class maintenance, hourly at :41 IST, one run per tick, one attempt, one minute. In batches of 200 it locks the stale field rows (`FOR UPDATE SKIP LOCKED`, so a confirm and the sweep cannot both take a row), deletes each object (a missing object is fine), and marks the deleted ones `rejected` with the reason "not uploaded in time". When a delete fails, the row is left `pending` for the next run and counted in the job summary as `failed`.
    - The REPORT line that said the skip was shared is corrected (see "Files changed outside the owned paths").
@@ -140,6 +140,13 @@ The DLT template for the owner SMS stays with the lead.
    - *Audit:* a try on a locked code writes its `locked` row once per code (the first such try bumps `attempts` past the maximum; later ones are only counted in the metric). An expired code, or one sent to an earlier owner number, is audited as `expired` with the tries left; the metric has the new `expired` outcome.
    - *A-15:* removing the `field_agent` role hides the agent from A-15 (`FieldAgents` lists only users who hold the role), and their shops drop out of the totals. A disabled agent who keeps the role stays, marked. This is noted in `e2e/scenarios/FA.md` (FA-15). The query is unchanged.
 4. **Tests added:** an owner-route upload succeeds after four stale field photos plus one confirmed one (the cap of 5); the sweep rejects only the stale field rows, deletes their objects (one stored, three not), and leaves the confirmed photo, the owner's pending upload and a fresh field photo alone; a second sweep finds nothing; another agent's confirm is 403; a stored file of another type, or larger than declared, is 422 and the photo stays pending; at cap − 1, two concurrent sends give one 200 and one 429 (the per-agent lock); Retry-After is checked against the oldest send at cap 2 and the second oldest after the cap drops to 1; a second try on a locked code writes no second row; two expired tries are audited.
+
+## Lead review of 9152967
+
+1. **Contract wording.** `admin-field.yaml` no longer says a blocked owner account is `403`: create, patch, send and verify describe the `422 validation_failed` on `body.ownerPhone` the code returns. The item-update description says an agent's `403` covers any item they did not add, not only the shop's. `make gen` ran.
+2. **Expired tries audited once per code.** Migration 30604 adds `field_owner_codes.expired_audited_at`. The first verify on a lapsed code, or on one sent to an earlier owner number, sets it (`MarkOwnerCodeExpiredAudited`, on the row already locked `FOR UPDATE`) and writes the `expired` audit row; later tries on that code still answer `401 otp_expired` and count in `tz_field_owner_code_failures_total{outcome="expired"}`, but write no row. A marker column rather than bumping `attempts` as the locked path does, because more attempts would turn a lapsed code into `otp_locked`. Test: `TestFieldOwnerCodeLimitsHTTP` tries each expired code three times and checks one row per code (1, then 2).
+3. **"Added by the shop".** `!editable` also covers items another agent or an admin added, and the list does not say who, so the wizard now shows the neutral "Added by someone else" (`field.items.notMine`, renamed from `field.items.shopItem`). Hindi, Kannada, Telugu and Tamil are imported as machine drafts with `enHash` (`translations.mjs import`); they need a person's review. The admin app has no other translations yet.
+4. Not done, logged by the lead as follow-ups: the sweep stalling under a persistent DELETE failure, and backfilling `confirm_by` for older pending rows.
 
 ## Open
 
