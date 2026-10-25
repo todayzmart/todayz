@@ -1,0 +1,407 @@
+{
+  "help.back": {
+    "message": "உதவிக்குத் திரும்பு",
+    "review": "machine",
+    "enHash": "45dd3b17"
+  },
+  "help.category.account": {
+    "message": "என் கணக்கு",
+    "review": "machine",
+    "enHash": "61909817"
+  },
+  "help.category.app": {
+    "message": "ஆப்",
+    "review": "machine",
+    "enHash": "9445c325"
+  },
+  "help.category.credits": {
+    "message": "கிரெடிட்",
+    "review": "machine",
+    "enHash": "bfac50d6"
+  },
+  "help.category.order": {
+    "message": "ஒரு ஆர்டர்",
+    "review": "machine",
+    "enHash": "40eb87b7"
+  },
+  "help.category.other": {
+    "message": "வேறு ஏதாவது",
+    "review": "machine",
+    "enHash": "48f88ac3"
+  },
+  "help.error.body": {
+    "message": "உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "machine",
+    "enHash": "563862b7"
+  },
+  "help.error.generic": {
+    "message": "அது நடக்கவில்லை. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "machine",
+    "enHash": "462c8c1d"
+  },
+  "help.error.invalid_transition": {
+    "message": "இந்த டிக்கெட் மூடப்பட்டது, இனி மெசேஜ்களை ஏற்காது. புதிய டிக்கெட் திறக்கவும்.",
+    "review": "machine",
+    "enHash": "7bfa6828"
+  },
+  "help.error.not_found": {
+    "message": "இந்த டிக்கெட் இப்போது கிடைக்கவில்லை.",
+    "review": "machine",
+    "enHash": "9c3df5fd"
+  },
+  "help.error.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "machine",
+    "enHash": "042c862e"
+  },
+  "help.error.validation_failed": {
+    "message": "சில விவரங்கள் ஏற்கப்படவில்லை. படிவத்தைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "machine",
+    "enHash": "f1164913"
+  },
+  "help.files.add": {
+    "message": "புகைப்படம் அல்லது PDF சேர்க்கவும்",
+    "review": "machine",
+    "enHash": "ef72b016"
+  },
+  "help.files.empty": {
+    "message": "{name} காலியாக உள்ளது.",
+    "review": "machine",
+    "enHash": "83f58457"
+  },
+  "help.files.failed": {
+    "message": "{name} பதிவேற்றப்படவில்லை. மீண்டும் முயலவும்.",
+    "review": "machine",
+    "enHash": "cd16e9c2"
+  },
+  "help.files.help": {
+    "message": "JPEG, PNG, WebP அல்லது PDF, ஒவ்வொன்றும் {mb} MB வரை, அதிகபட்சம் {max} கோப்புகள்.",
+    "review": "machine",
+    "enHash": "8a7ca2f9"
+  },
+  "help.files.list": {
+    "message": "கோப்புகள்",
+    "review": "machine",
+    "enHash": "6ce6c512"
+  },
+  "help.files.remove": {
+    "message": "{name} ஐ நீக்கவும்",
+    "review": "machine",
+    "enHash": "df7193a5"
+  },
+  "help.files.size": {
+    "message": "{name} {mb} MB-ஐ விடப் பெரியது.",
+    "review": "machine",
+    "enHash": "24ccdc18"
+  },
+  "help.files.tooMany": {
+    "message": "ஒரு மெசேஜுக்கு அதிகபட்சம் {max} கோப்புகள்.",
+    "review": "machine",
+    "enHash": "d7a902ec"
+  },
+  "help.files.type": {
+    "message": "{name} புகைப்படமோ PDF-ஓ அல்ல.",
+    "review": "machine",
+    "enHash": "0299449c"
+  },
+  "help.files.uploading": {
+    "message": "பதிவேற்றப்படுகிறது",
+    "review": "machine",
+    "enHash": "de272409"
+  },
+  "help.intro": {
+    "message": "ஆர்டர், உங்கள் கிரெடிட்கள் அல்லது ஆப்பில் ஏதேனும் சிக்கலா? டிக்கெட் திறங்கள், TodayZ உதவி இங்கேயே பதில் அளிக்கும்.",
+    "review": "machine",
+    "enHash": "c4fa2cf6"
+  },
+  "help.loading": {
+    "message": "உதவி ஏற்றப்படுகிறது",
+    "review": "machine",
+    "enHash": "c72413f7"
+  },
+  "help.new.body": {
+    "message": "என்ன நடந்தது?",
+    "review": "machine",
+    "enHash": "e9ef659a"
+  },
+  "help.new.body.help": {
+    "message": "எவ்வளவு விவரம் தருகிறீர்களோ, அவ்வளவு விரைவாக உதவ முடியும்.",
+    "review": "machine",
+    "enHash": "2f8737b5"
+  },
+  "help.new.body.required": {
+    "message": "ஒரு மெசேஜ் எழுதுங்கள்.",
+    "review": "machine",
+    "enHash": "c8e96b81"
+  },
+  "help.new.category": {
+    "message": "இது எதைப் பற்றியது?",
+    "review": "machine",
+    "enHash": "23a5beeb"
+  },
+  "help.new.category.pick": {
+    "message": "ஒன்றைத் தேர்ந்தெடுக்கவும்",
+    "review": "machine",
+    "enHash": "4238dc41"
+  },
+  "help.new.category.required": {
+    "message": "இது எதைப் பற்றியது என்று தேர்ந்தெடுக்கவும்.",
+    "review": "machine",
+    "enHash": "079e2dcc"
+  },
+  "help.new.intro": {
+    "message": "என்ன நடந்தது என்று சொல்லுங்கள். சப்போர்ட் டிக்கெட்டில் பதில் தரும், நீங்கள் அங்கே மேலும் சேர்க்கலாம்.",
+    "review": "machine",
+    "enHash": "5b8aa383"
+  },
+  "help.new.order": {
+    "message": "எந்த ஆர்டர்? (விருப்பம்)",
+    "review": "machine",
+    "enHash": "cb115a09"
+  },
+  "help.new.order.failed": {
+    "message": "ஆர்டர்களை ஏற்ற முடியவில்லை. இருந்தாலும் டிக்கெட்டை அனுப்பி, மெசேஜில் ஆர்டரைக் குறிப்பிடலாம்.",
+    "review": "machine",
+    "enHash": "f7796d10"
+  },
+  "help.new.order.help": {
+    "message": "உங்கள் சமீபத்திய ஆர்டர்கள்.",
+    "review": "machine",
+    "enHash": "ea27e86c"
+  },
+  "help.new.order.none": {
+    "message": "ஒரு ஆர்டரைப் பற்றியது அல்ல",
+    "review": "machine",
+    "enHash": "f29403b4"
+  },
+  "help.new.order.refused": {
+    "message": "இந்த ஆர்டர் ஏற்கப்படவில்லை. வேறொன்றைத் தேர்ந்தெடுங்கள் அல்லது எதுவும் வேண்டாம்.",
+    "review": "machine",
+    "enHash": "a47c2ce8"
+  },
+  "help.new.order.this": {
+    "message": "இந்த ஆர்டர்",
+    "review": "machine",
+    "enHash": "a25622f7"
+  },
+  "help.new.send": {
+    "message": "சப்போர்ட்டுக்கு அனுப்பவும்",
+    "review": "machine",
+    "enHash": "e0b3861b"
+  },
+  "help.new.sent": {
+    "message": "டிக்கெட் {number} அனுப்பப்பட்டது",
+    "review": "machine",
+    "enHash": "99303bb3"
+  },
+  "help.new.subject": {
+    "message": "தலைப்பு",
+    "review": "machine",
+    "enHash": "8d183dbd"
+  },
+  "help.new.subject.help": {
+    "message": "ஒரு சிறிய வரி, எ.கா. \"என் ஆர்டரில் ஆட்டா இல்லை\".",
+    "review": "machine",
+    "enHash": "29349dc3"
+  },
+  "help.new.subject.required": {
+    "message": "{min} முதல் {max} எழுத்துகள் வரை தலைப்பு எழுதுங்கள்.",
+    "review": "machine",
+    "enHash": "2583925c"
+  },
+  "help.new.title": {
+    "message": "புதிய டிக்கெட்",
+    "review": "machine",
+    "enHash": "b8bf9c88"
+  },
+  "help.reply.help": {
+    "message": "சப்போர்ட் இதை இந்த டிக்கெட்டில் பார்க்கும்.",
+    "review": "machine",
+    "enHash": "0b3c7ee4"
+  },
+  "help.reply.label": {
+    "message": "உங்கள் மெசேஜ்",
+    "review": "machine",
+    "enHash": "f190c98e"
+  },
+  "help.reply.reopens": {
+    "message": "பதில் அனுப்பினால் டிக்கெட் மீண்டும் திறக்கும்.",
+    "review": "machine",
+    "enHash": "afd6995f"
+  },
+  "help.reply.send": {
+    "message": "பதில் அனுப்பவும்",
+    "review": "machine",
+    "enHash": "7f7e603a"
+  },
+  "help.reply.title": {
+    "message": "பதில்",
+    "review": "machine",
+    "enHash": "6c2bb735"
+  },
+  "help.sending": {
+    "message": "அனுப்பப்படுகிறது",
+    "review": "machine",
+    "enHash": "ceafde86"
+  },
+  "help.signedOut.body": {
+    "message": "உங்கள் டிக்கெட்கள் உங்கள் கணக்கில் வைக்கப்படும், எனவே டிக்கெட் திறக்க அல்லது பதில்களைப் பார்க்க உள்நுழையுங்கள்.",
+    "review": "machine",
+    "enHash": "8f10756a"
+  },
+  "help.signedOut.cta": {
+    "message": "உள்நுழை",
+    "review": "machine",
+    "enHash": "ada2e9e9"
+  },
+  "help.signedOut.title": {
+    "message": "உதவிக்கு உள்நுழையுங்கள்",
+    "review": "machine",
+    "enHash": "e9c9d810"
+  },
+  "help.status.closed": {
+    "message": "மூடப்பட்டது",
+    "review": "machine",
+    "enHash": "88d86b77"
+  },
+  "help.status.open": {
+    "message": "திறந்துள்ளது",
+    "review": "machine",
+    "enHash": "cf9b7706"
+  },
+  "help.status.resolved": {
+    "message": "தீர்க்கப்பட்டது",
+    "review": "machine",
+    "enHash": "e1d35505"
+  },
+  "help.status.waiting": {
+    "message": "பதில் வந்தது",
+    "review": "machine",
+    "enHash": "7d688ab4"
+  },
+  "help.ticket.error.title": {
+    "message": "டிக்கெட்டை ஏற்ற முடியவில்லை",
+    "review": "machine",
+    "enHash": "51a4c349"
+  },
+  "help.ticket.fromSupport": {
+    "message": "TodayZ சப்போர்ட்",
+    "review": "machine",
+    "enHash": "f0829b0f"
+  },
+  "help.ticket.fromYou": {
+    "message": "நீங்கள்",
+    "review": "machine",
+    "enHash": "905cb326"
+  },
+  "help.ticket.loading": {
+    "message": "டிக்கெட் ஏற்றப்படுகிறது",
+    "review": "machine",
+    "enHash": "ee58be8e"
+  },
+  "help.ticket.messages": {
+    "message": "மெசேஜ்கள்",
+    "review": "machine",
+    "enHash": "f1702b46"
+  },
+  "help.ticket.newInstead": {
+    "message": "புதிய டிக்கெட் திறக்கவும்",
+    "review": "machine",
+    "enHash": "c36c110e"
+  },
+  "help.ticket.notFound.action": {
+    "message": "உங்கள் டிக்கெட்டுகளைப் பாருங்கள்",
+    "review": "machine",
+    "enHash": "2a142fb0"
+  },
+  "help.ticket.notFound.body": {
+    "message": "இணைப்பு தவறாக இருக்கலாம், அல்லது இந்த டிக்கெட் உங்களுடையது அல்ல.",
+    "review": "machine",
+    "enHash": "cb8501bc"
+  },
+  "help.ticket.notFound.title": {
+    "message": "டிக்கெட் கிடைக்கவில்லை",
+    "review": "machine",
+    "enHash": "fb25ca39"
+  },
+  "help.ticket.state.closed": {
+    "message": "இந்த டிக்கெட் மூடப்பட்டது, இனி மெசேஜ்களை ஏற்காது.",
+    "review": "machine",
+    "enHash": "7e6e9eca"
+  },
+  "help.ticket.state.open": {
+    "message": "சப்போர்ட் இங்கே பதில் தரும்.",
+    "review": "machine",
+    "enHash": "fcb604cd"
+  },
+  "help.ticket.state.resolved": {
+    "message": "சப்போர்ட் இதைத் தீர்க்கப்பட்டதாகக் குறித்துள்ளது. இல்லையென்றால் கீழே பதில் தாருங்கள், டிக்கெட் மீண்டும் திறக்கும்.",
+    "review": "machine",
+    "enHash": "22fde542"
+  },
+  "help.ticket.state.waiting": {
+    "message": "சப்போர்ட் பதில் தந்துள்ளது. இன்னும் உதவி தேவைப்பட்டால் கீழே பதில் தாருங்கள், டிக்கெட் மீண்டும் திறக்கும்.",
+    "review": "machine",
+    "enHash": "e360387a"
+  },
+  "help.ticket.title": {
+    "message": "டிக்கெட் {number}",
+    "review": "machine",
+    "enHash": "fc0bae40"
+  },
+  "help.tickets.empty.body": {
+    "message": "ஆர்டர், உங்கள் கிரெடிட்கள் அல்லது ஆப்பில் ஏதேனும் தவறானால், டிக்கெட் திறங்கள், உதவி இங்கேயே பதில் அளிக்கும்.",
+    "review": "machine",
+    "enHash": "f3dab2ec"
+  },
+  "help.tickets.empty.title": {
+    "message": "இன்னும் டிக்கெட்டுகள் இல்லை",
+    "review": "machine",
+    "enHash": "16baa0a9"
+  },
+  "help.tickets.error.title": {
+    "message": "டிக்கெட்டுகளை ஏற்ற முடியவில்லை",
+    "review": "machine",
+    "enHash": "cf7d483b"
+  },
+  "help.tickets.list": {
+    "message": "டிக்கெட்டுகள்",
+    "review": "machine",
+    "enHash": "5c622a51"
+  },
+  "help.tickets.loading": {
+    "message": "டிக்கெட்டுகள் ஏற்றப்படுகின்றன",
+    "review": "machine",
+    "enHash": "b603c74a"
+  },
+  "help.tickets.more": {
+    "message": "மேலும் காட்டு",
+    "review": "machine",
+    "enHash": "dfe60ca9"
+  },
+  "help.tickets.new": {
+    "message": "புதிய டிக்கெட்",
+    "review": "machine",
+    "enHash": "b8bf9c88"
+  },
+  "help.tickets.updated": {
+    "message": "{when} புதுப்பிக்கப்பட்டது",
+    "review": "machine",
+    "enHash": "f734128f"
+  },
+  "help.title": {
+    "message": "உதவி",
+    "review": "machine",
+    "enHash": "c47ae153"
+  },
+  "help.entry": {
+    "message": "உதவி பெறுங்கள் அல்லது உங்கள் டிக்கெட்களைப் பாருங்கள்",
+    "review": "machine",
+    "enHash": "059b3f04"
+  },
+  "help.orderLink": {
+    "message": "இந்த ஆர்டருக்கு உதவி பெறுங்கள்",
+    "review": "machine",
+    "enHash": "cf024239"
+  }
+}

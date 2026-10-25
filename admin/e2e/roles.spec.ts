@@ -58,6 +58,8 @@ const SUPPORT_UP = ['support', 'admin', 'super_admin'];
 const READS: [RegExp, string[]][] = [
   [/^\/v1\/admin\/leads(\/|$)/, ['field_agent', ...SUPPORT_UP]],
   [/^\/v1\/admin\/(businesses|stores|customers|customer-search|orders|reviews|review-reports|banners)(\/|$)/, SUPPORT_UP],
+  // admin.support.tickets (support.golden): the A-14 inbox and ticket.
+  [/^\/v1\/admin\/tickets(\/|$)/, SUPPORT_UP],
   [/^\/v1\/admin\/audit-log\/subject$/, ['field_agent', 'support', 'catalogue', 'finance', 'admin', 'super_admin']],
   [/^\/v1\/admin\/(audit-log|settings)(\/|$)/, ['admin', 'super_admin']],
   [/^\/v1\/admin\/(notification-templates|integrations)(\/|$)/, ['admin', 'super_admin']],

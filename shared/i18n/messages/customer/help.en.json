@@ -1,0 +1,326 @@
+{
+  "help.back": {
+    "defaultMessage": "Back to help",
+    "description": "C-19 back link to the ticket list"
+  },
+  "help.category.account": {
+    "defaultMessage": "My account",
+    "description": "Ticket category: account"
+  },
+  "help.category.app": {
+    "defaultMessage": "The app",
+    "description": "Ticket category: app"
+  },
+  "help.category.credits": {
+    "defaultMessage": "Credits",
+    "description": "Ticket category: credits"
+  },
+  "help.category.order": {
+    "defaultMessage": "An order",
+    "description": "Ticket category: order"
+  },
+  "help.category.other": {
+    "defaultMessage": "Something else",
+    "description": "Ticket category: other"
+  },
+  "help.entry": {
+    "defaultMessage": "Get help or see your tickets",
+    "description": "Profile row that opens C-19"
+  },
+  "help.error.body": {
+    "defaultMessage": "Check your connection and try again.",
+    "description": "C-19 error state body"
+  },
+  "help.error.generic": {
+    "defaultMessage": "That did not go through. Check your connection and try again.",
+    "description": "Any other send error"
+  },
+  "help.error.invalid_transition": {
+    "defaultMessage": "This ticket is closed and takes no more messages. Open a new ticket.",
+    "description": "Error after a 409 on a closed ticket"
+  },
+  "help.error.not_found": {
+    "defaultMessage": "This ticket is no longer available.",
+    "description": "Error after a 404"
+  },
+  "help.error.retry": {
+    "defaultMessage": "Try again",
+    "description": "C-19 error state button"
+  },
+  "help.error.validation_failed": {
+    "defaultMessage": "Some details were not accepted. Check the form and try again.",
+    "description": "Error after a 422"
+  },
+  "help.files.add": {
+    "defaultMessage": "Add photo or PDF",
+    "description": "Attachment picker button"
+  },
+  "help.files.empty": {
+    "defaultMessage": "{name} is empty.",
+    "description": "Attachment error: an empty file"
+  },
+  "help.files.failed": {
+    "defaultMessage": "{name} did not upload. Try again.",
+    "description": "Attachment error: upload failed"
+  },
+  "help.files.help": {
+    "defaultMessage": "JPEG, PNG, WebP or PDF, up to {mb} MB each, at most {max} files.",
+    "description": "Attachment rules"
+  },
+  "help.files.list": {
+    "defaultMessage": "Files",
+    "description": "Accessible name of the file list"
+  },
+  "help.files.remove": {
+    "defaultMessage": "Remove {name}",
+    "description": "Accessible name of the remove-file button"
+  },
+  "help.files.size": {
+    "defaultMessage": "{name} is larger than {mb} MB.",
+    "description": "Attachment error: too big"
+  },
+  "help.files.tooMany": {
+    "defaultMessage": "At most {max} files per message.",
+    "description": "Attachment error: too many"
+  },
+  "help.files.type": {
+    "defaultMessage": "{name} is not a photo or PDF.",
+    "description": "Attachment error: wrong type"
+  },
+  "help.files.uploading": {
+    "defaultMessage": "Uploading",
+    "description": "Attachment picker button while uploading"
+  },
+  "help.intro": {
+    "defaultMessage": "Something wrong with an order, your credits or the app? Open a ticket and TodayZ support replies here.",
+    "description": "C-19 intro above the ticket list"
+  },
+  "help.loading": {
+    "defaultMessage": "Loading help",
+    "description": "Accessible name of the loading state"
+  },
+  "help.new.body": {
+    "defaultMessage": "What happened?",
+    "description": "Message field label"
+  },
+  "help.new.body.help": {
+    "defaultMessage": "The more detail, the faster we can help.",
+    "description": "Message field help"
+  },
+  "help.new.body.required": {
+    "defaultMessage": "Write a message.",
+    "description": "Message validation error"
+  },
+  "help.new.category": {
+    "defaultMessage": "What is it about?",
+    "description": "Category picker label"
+  },
+  "help.new.category.pick": {
+    "defaultMessage": "Choose one",
+    "description": "Category picker placeholder option"
+  },
+  "help.new.category.required": {
+    "defaultMessage": "Choose what it is about.",
+    "description": "Category validation error"
+  },
+  "help.new.intro": {
+    "defaultMessage": "Tell us what happened. Support replies on the ticket, and you can add more there.",
+    "description": "New ticket intro"
+  },
+  "help.new.order": {
+    "defaultMessage": "Which order? (optional)",
+    "description": "Order picker label"
+  },
+  "help.new.order.failed": {
+    "defaultMessage": "Could not load orders. You can still send the ticket and name the order in the message.",
+    "description": "Order picker help when the orders failed to load"
+  },
+  "help.new.order.help": {
+    "defaultMessage": "Your recent orders.",
+    "description": "Order picker help"
+  },
+  "help.new.order.none": {
+    "defaultMessage": "Not about one order",
+    "description": "Order picker option for no order"
+  },
+  "help.new.order.refused": {
+    "defaultMessage": "This order was not accepted. Choose another or none.",
+    "description": "Error under the order picker after a 422"
+  },
+  "help.new.order.this": {
+    "defaultMessage": "This order",
+    "description": "Order picker option for the order the form was opened from, when it is not among the recent ones"
+  },
+  "help.new.send": {
+    "defaultMessage": "Send to support",
+    "description": "New ticket submit button"
+  },
+  "help.new.sent": {
+    "defaultMessage": "Ticket {number} sent",
+    "description": "Toast after a ticket is opened"
+  },
+  "help.new.subject": {
+    "defaultMessage": "Subject",
+    "description": "Subject field label"
+  },
+  "help.new.subject.help": {
+    "defaultMessage": "A short line, like \"Atta missing from my order\".",
+    "description": "Subject field help"
+  },
+  "help.new.subject.required": {
+    "defaultMessage": "Write a subject of {min} to {max} characters.",
+    "description": "Subject validation error"
+  },
+  "help.new.title": {
+    "defaultMessage": "New ticket",
+    "description": "C-19 new ticket page title"
+  },
+  "help.orderLink": {
+    "defaultMessage": "Get help with this order",
+    "description": "C-12 link that opens a C-19 ticket on this order"
+  },
+  "help.reply.help": {
+    "defaultMessage": "Support sees it on this ticket.",
+    "description": "Reply field help while open"
+  },
+  "help.reply.label": {
+    "defaultMessage": "Your message",
+    "description": "Reply field label"
+  },
+  "help.reply.reopens": {
+    "defaultMessage": "Sending a reply opens the ticket again.",
+    "description": "Reply field help while waiting or resolved"
+  },
+  "help.reply.send": {
+    "defaultMessage": "Send reply",
+    "description": "Reply submit button"
+  },
+  "help.reply.title": {
+    "defaultMessage": "Reply",
+    "description": "Reply card title"
+  },
+  "help.sending": {
+    "defaultMessage": "Sending",
+    "description": "Accessible label of a send button while it sends"
+  },
+  "help.signedOut.body": {
+    "defaultMessage": "Your tickets are kept with your account, so sign in to open one or see replies.",
+    "description": "C-19 when signed out"
+  },
+  "help.signedOut.cta": {
+    "defaultMessage": "Sign in",
+    "description": "C-19 sign-in button"
+  },
+  "help.signedOut.title": {
+    "defaultMessage": "Sign in to get help",
+    "description": "C-19 when signed out"
+  },
+  "help.status.closed": {
+    "defaultMessage": "Closed",
+    "description": "Ticket status pill: closed"
+  },
+  "help.status.open": {
+    "defaultMessage": "Open",
+    "description": "Ticket status pill: open"
+  },
+  "help.status.resolved": {
+    "defaultMessage": "Solved",
+    "description": "Ticket status pill: resolved"
+  },
+  "help.status.waiting": {
+    "defaultMessage": "Replied",
+    "description": "Ticket status pill: waiting"
+  },
+  "help.ticket.error.title": {
+    "defaultMessage": "Could not load the ticket",
+    "description": "Thread error state title"
+  },
+  "help.ticket.fromSupport": {
+    "defaultMessage": "TodayZ support",
+    "description": "Author shown on every support reply (no agent name)"
+  },
+  "help.ticket.fromYou": {
+    "defaultMessage": "You",
+    "description": "Author shown on the customer's own messages"
+  },
+  "help.ticket.loading": {
+    "defaultMessage": "Loading ticket",
+    "description": "Accessible name of the thread loading state"
+  },
+  "help.ticket.messages": {
+    "defaultMessage": "Messages",
+    "description": "Accessible name of the message list"
+  },
+  "help.ticket.newInstead": {
+    "defaultMessage": "Open a new ticket",
+    "description": "Link shown instead of the reply box on a closed ticket"
+  },
+  "help.ticket.notFound.action": {
+    "defaultMessage": "See your tickets",
+    "description": "Thread 404 button"
+  },
+  "help.ticket.notFound.body": {
+    "defaultMessage": "The link may be wrong, or the ticket is not yours.",
+    "description": "Thread 404 body"
+  },
+  "help.ticket.notFound.title": {
+    "defaultMessage": "Ticket not found",
+    "description": "Thread 404 title"
+  },
+  "help.ticket.state.closed": {
+    "defaultMessage": "This ticket is closed and takes no more messages.",
+    "description": "Thread note when closed"
+  },
+  "help.ticket.state.open": {
+    "defaultMessage": "Support will reply here.",
+    "description": "Thread note while the ticket is open"
+  },
+  "help.ticket.state.resolved": {
+    "defaultMessage": "Support marked this solved. If it is not, reply below and the ticket opens again.",
+    "description": "Thread note when resolved"
+  },
+  "help.ticket.state.waiting": {
+    "defaultMessage": "Support replied. If you still need help, reply below and the ticket opens again.",
+    "description": "Thread note while waiting on the customer"
+  },
+  "help.ticket.title": {
+    "defaultMessage": "Ticket {number}",
+    "description": "Thread page title"
+  },
+  "help.tickets.empty.body": {
+    "defaultMessage": "When something goes wrong with an order, your credits or the app, open a ticket and support will reply here.",
+    "description": "Ticket list empty state"
+  },
+  "help.tickets.empty.title": {
+    "defaultMessage": "No tickets yet",
+    "description": "Ticket list empty state title"
+  },
+  "help.tickets.error.title": {
+    "defaultMessage": "Could not load tickets",
+    "description": "Ticket list error state"
+  },
+  "help.tickets.list": {
+    "defaultMessage": "Tickets",
+    "description": "Accessible name of the ticket list"
+  },
+  "help.tickets.loading": {
+    "defaultMessage": "Loading tickets",
+    "description": "Accessible name of the ticket list loading state"
+  },
+  "help.tickets.more": {
+    "defaultMessage": "Load more",
+    "description": "Button that loads the next page of tickets"
+  },
+  "help.tickets.new": {
+    "defaultMessage": "New ticket",
+    "description": "Button that opens the new ticket form"
+  },
+  "help.tickets.updated": {
+    "defaultMessage": "updated {when}",
+    "description": "Ticket row: when the last message was written, e.g. \"updated 5 min ago\""
+  },
+  "help.title": {
+    "defaultMessage": "Help",
+    "description": "C-19 page title"
+  }
+}

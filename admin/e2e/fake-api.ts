@@ -77,6 +77,12 @@ export async function answerEmptyLists(page: Page) {
   await answerWith(page, '/v1/admin/credits/expiry-preview**', (req) =>
     req.method() === 'GET' ? { status: 200, body: { from: NOW, to: NOW, totalPaise: 0, days: [], serverNow: NOW } } : undefined,
   );
+  // A-14's list carries the count per status beside the page.
+  await answerWith(page, '/v1/admin/tickets**', (req, url) =>
+    req.method() === 'GET' && url.pathname === '/v1/admin/tickets'
+      ? { status: 200, body: { items: [], counts: { open: 0, waiting: 0, resolved: 0, closed: 0, overdue: 0 }, nextCursor: null, serverNow: NOW } }
+      : undefined,
+  );
   // A-02 Pulse is one summary, not a list: a platform with nothing in it yet.
   await answerWith(page, '/v1/admin/pulse**', (_req, url) => ({ status: 200, body: url.pathname.endsWith('/map') ? emptyPulseMap : emptyPulse }));
 }

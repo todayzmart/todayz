@@ -1,0 +1,592 @@
+{
+  "help.title": {
+    "message": "உதவி",
+    "review": "machine",
+    "enHash": "c47ae153"
+  },
+  "help.loading": {
+    "message": "உதவி ஏற்றப்படுகிறது",
+    "review": "machine",
+    "enHash": "c72413f7"
+  },
+  "help.back": {
+    "message": "உதவிக்குத் திரும்பு",
+    "review": "machine",
+    "enHash": "45dd3b17"
+  },
+  "help.noBusiness": {
+    "message": "உங்கள் பிசினஸ் அமைக்கப்பட்ட பிறகு டிக்கெட் மூலம் உதவி கிடைக்கும்.",
+    "review": "machine",
+    "enHash": "f5f5a982"
+  },
+  "help.askManager": {
+    "message": "டிக்கெட்டுகளை உரிமையாளர் அல்லது மேலாளர் திறப்பார்கள். உங்களுக்காக சப்போர்ட்டைத் தொடர்புகொள்ள அவர்களில் ஒருவரிடம் கேளுங்கள்.",
+    "review": "machine",
+    "enHash": "f7592e44"
+  },
+  "help.error.title": {
+    "message": "உங்கள் பிசினஸை ஏற்ற முடியவில்லை",
+    "review": "machine",
+    "enHash": "4bfa8553"
+  },
+  "help.error.body": {
+    "message": "உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "machine",
+    "enHash": "563862b7"
+  },
+  "help.error.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "machine",
+    "enHash": "042c862e"
+  },
+  "help.sending": {
+    "message": "அனுப்பப்படுகிறது",
+    "review": "machine",
+    "enHash": "ceafde86"
+  },
+  "help.tabs.label": {
+    "message": "உதவிப் பிரிவுகள்",
+    "review": "machine",
+    "enHash": "1689f4a4"
+  },
+  "help.tabs.guide": {
+    "message": "வழிகாட்டி",
+    "review": "machine",
+    "enHash": "bf073fae"
+  },
+  "help.tabs.tickets": {
+    "message": "டிக்கெட்டுகள்",
+    "review": "machine",
+    "enHash": "5c622a51"
+  },
+  "help.how.title": {
+    "message": "உங்கள் கடைக்கு TodayZ எப்படி வேலை செய்கிறது",
+    "review": "machine",
+    "enHash": "51eee93d"
+  },
+  "help.how.stock.title": {
+    "message": "உங்கள் ஸ்டாக்கை ஆன்லைனில் வையுங்கள்",
+    "review": "machine",
+    "enHash": "3da87e1e"
+  },
+  "help.how.stock.body": {
+    "message": "விலை மற்றும் உங்களிடம் எத்தனை உள்ளன என்பதுடன் பொருட்களைச் சேர்க்கவும். அருகிலுள்ள வாடிக்கையாளர்கள் ஸ்டாக்கில் என்ன உள்ளது என்று பார்ப்பார்கள்.",
+    "review": "machine",
+    "enHash": "92183b71"
+  },
+  "help.how.orders.title": {
+    "message": "ஆர்டர்களை நேரத்தில் ஏற்கவும்",
+    "review": "machine",
+    "enHash": "fbf2a640"
+  },
+  "help.how.orders.body": {
+    "message": "புதிய ஆர்டர் ஆர்டர்கள் திரையில் ஒலிக்கும். அதன் டைமர் முடியும் முன் அதை ஏற்கவும், அதில் ஒரு பகுதியை எடுக்கவும், அல்லது ஏன் முடியாது என்று சொல்லவும்.",
+    "review": "machine",
+    "enHash": "19618d44"
+  },
+  "help.how.pickup.title": {
+    "message": "குறியீட்டுடன் ஒப்படைக்கவும்",
+    "review": "machine",
+    "enHash": "dae79fb9"
+  },
+  "help.how.pickup.body": {
+    "message": "பிக்கப்பின் போது வாடிக்கையாளர் ஒரு குறியீட்டைக் காட்டுவார். ஒப்படைப்பை முடிக்க அதை ஆர்டரில் உள்ளிடவும்.",
+    "review": "machine",
+    "enHash": "fd9928c1"
+  },
+  "help.how.counter.title": {
+    "message": "கவுண்டரில் விற்கவும்",
+    "review": "machine",
+    "enHash": "db51c22c"
+  },
+  "help.how.counter.body": {
+    "message": "கடைக்கு வரும் வாடிக்கையாளர்களின் விற்பனையை 'விற்பனை'யில் பதிவு செய்யுங்கள், ஆஃப்லைனிலும். விற்கும்போதே ஸ்டாக் குறையும்.",
+    "review": "machine",
+    "enHash": "3b0c40dc"
+  },
+  "help.how.credits.title": {
+    "message": "கிரெடிட் வாடிக்கையாளர்களை மீண்டும் கொண்டுவரும்",
+    "review": "machine",
+    "enHash": "fdbf56ad"
+  },
+  "help.how.credits.body": {
+    "message": "வாடிக்கையாளர்கள் TodayZ கிரெடிட் சம்பாதித்து செலவழிக்கிறார்கள். உங்கள் கடையில் அவர்கள் செலவழிப்பது உங்கள் கிரெடிட் கணக்கில் சேரும்.",
+    "review": "machine",
+    "enHash": "183c358e"
+  },
+  "help.how.payouts.title": {
+    "message": "பணம் பெறுங்கள்",
+    "review": "machine",
+    "enHash": "d68abf9e"
+  },
+  "help.how.payouts.body": {
+    "message": "ஒவ்வொரு மாதமும் ஒரு ஸ்டேட்மென்ட் முடிகிறது, உங்களுக்கு வர வேண்டிய தொகை UPI மூலம் அனுப்பப்படும்.",
+    "review": "machine",
+    "enHash": "ddfb737e"
+  },
+  "help.faq.title": {
+    "message": "பொதுவான கேள்விகள்",
+    "review": "machine",
+    "enHash": "f07ac22a"
+  },
+  "help.faq.timer.q": {
+    "message": "ஆர்டரை நேரத்தில் ஏற்காவிட்டால் என்ன ஆகும்?",
+    "review": "machine",
+    "enHash": "a5eda5e3"
+  },
+  "help.faq.timer.a": {
+    "message": "ஆர்டரின் நேரம் முடிந்துவிடும், வாடிக்கையாளருக்குத் தெரிவிக்கப்படும். தவறவிட்ட ஆர்டர்களால் தேடலில் உங்கள் கடை கீழே காட்டப்படும், எனவே கடை திறந்திருக்கும் வரை ஆர்டர்கள் திரையைத் திறந்து வையுங்கள்.",
+    "review": "machine",
+    "enHash": "d7f43596"
+  },
+  "help.faq.code.q": {
+    "message": "பிக்கப் குறியீடு வேலை செய்யவில்லை",
+    "review": "machine",
+    "enHash": "e7c8c075"
+  },
+  "help.faq.code.a": {
+    "message": "ஆர்டர் ஏற்கப்பட்டு அல்லது தயாராக இருக்கும்போது மட்டுமே குறியீடு வேலை செய்யும், அதுவும் ஒரு முறை மட்டும். பல தவறான முயற்சிகளுக்குப் பிறகு அது பூட்டப்படும்: வாடிக்கையாளரிடம் அவர்களின் ஆப்பில் \"புதிய குறியீடு\" என்பதைத் தட்டச் சொல்லுங்கள்.",
+    "review": "machine",
+    "enHash": "b5440c50"
+  },
+  "help.faq.credits.q": {
+    "message": "வாடிக்கையாளர்கள் செலவழிக்கும் கிரெடிட் எங்கே போகும்?",
+    "review": "machine",
+    "enHash": "1f93d430"
+  },
+  "help.faq.credits.a": {
+    "message": "வாடிக்கையாளர் உங்கள் கடையில் செலவழிக்கும் கிரெடிட் உங்கள் கிரெடிட் கணக்குக்குச் சென்று, உங்கள் பணம் வழங்கலுடன் செலுத்தப்படும். நீங்கள் தரும் கேஷ்பேக்கும் இதே கணக்கிலிருந்து போகும்.",
+    "review": "machine",
+    "enHash": "f50ee125"
+  },
+  "help.faq.payout.q": {
+    "message": "எனக்கு எப்போது பணம் கிடைக்கும்?",
+    "review": "machine",
+    "enHash": "dcac7e28"
+  },
+  "help.faq.payout.a": {
+    "message": "ஒவ்வொரு மாதமும் 1ஆம் தேதி ஸ்டேட்மென்ட் முடிகிறது. உங்களுக்கு வர வேண்டிய தொகை UPI மூலம் அனுப்பப்படும், கிரெடிட் திரை அதை UTR எண்ணுடன் வழங்கப்பட்டதாகக் காட்டும். உங்கள் சரிபார்ப்பு முடியும் வரை பணம் வழங்கல் நிறுத்திவைக்கப்படும்.",
+    "review": "machine",
+    "enHash": "7854109f"
+  },
+  "help.faq.visible.q": {
+    "message": "வாடிக்கையாளர்களுக்கு என் கடை ஏன் தெரியவில்லை?",
+    "review": "machine",
+    "enHash": "1b41376a"
+  },
+  "help.faq.visible.a": {
+    "message": "உங்கள் கடை அங்கீகரிக்கப்பட்டு, லைவ்வாக, திறந்திருக்கும்போது மட்டுமே தெரியும், தேடலில் ஸ்டாக் உள்ள பொருட்கள் மட்டுமே தெரியும்.",
+    "review": "machine",
+    "enHash": "f4e2ecf1"
+  },
+  "help.faq.staff.q": {
+    "message": "என் ஊழியர்கள் என்ன செய்யலாம்?",
+    "review": "machine",
+    "enHash": "b8db285c"
+  },
+  "help.faq.staff.a": {
+    "message": "காசாளர் விற்பார், ஆர்டர்களைக் கவனிப்பார். மேலாளர் ஸ்டாக், ஆஃபர்கள், காசாளர்களையும் கவனிப்பார். உரிமையாளர் பணம் வழங்கல், மேலாளர்கள் உட்பட எல்லாவற்றையும் செய்யலாம்.",
+    "review": "machine",
+    "enHash": "3fa92516"
+  },
+  "help.faq.close.q": {
+    "message": "என் பிசினஸை எப்படி மூடுவது?",
+    "review": "machine",
+    "enHash": "9cbd77ce"
+  },
+  "help.faq.close.a": {
+    "message": "ஆப்பில் நீக்கும் வசதி இல்லை. சப்போர்ட்டைத் தொடர்புகொள்ளுங்கள், நாங்கள் உதவுவோம்.",
+    "review": "machine",
+    "enHash": "c0c9b9a3"
+  },
+  "help.contact.title": {
+    "message": "சப்போர்ட்டைத் தொடர்புகொள்ளுங்கள்",
+    "review": "machine",
+    "enHash": "2b658ffd"
+  },
+  "help.contact.body": {
+    "message": "டிக்கெட் திறங்கள், சப்போர்ட் இங்கேயே ஆப்பில் பதில் தரும். உதவும் என்றால் ஆர்டரையும் புகைப்படத்தையும் சேர்க்கவும்.",
+    "review": "machine",
+    "enHash": "6005ef8c"
+  },
+  "help.contact.bodyCashier": {
+    "message": "சப்போர்ட்டுடன் டிக்கெட் திறக்க உரிமையாளர் அல்லது மேலாளரிடம் கேளுங்கள்.",
+    "review": "machine",
+    "enHash": "dfa6938a"
+  },
+  "help.contact.call": {
+    "message": "{phone} ஐ அழைக்கவும்",
+    "review": "machine",
+    "enHash": "f9ea1a72"
+  },
+  "help.tickets.new": {
+    "message": "புதிய டிக்கெட்",
+    "review": "machine",
+    "enHash": "b8bf9c88"
+  },
+  "help.tickets.loading": {
+    "message": "டிக்கெட்டுகள் ஏற்றப்படுகின்றன",
+    "review": "machine",
+    "enHash": "b603c74a"
+  },
+  "help.tickets.list": {
+    "message": "டிக்கெட்டுகள்",
+    "review": "machine",
+    "enHash": "5c622a51"
+  },
+  "help.tickets.more": {
+    "message": "மேலும் காட்டு",
+    "review": "machine",
+    "enHash": "dfe60ca9"
+  },
+  "help.tickets.updated": {
+    "message": "{when} புதுப்பிக்கப்பட்டது",
+    "review": "machine",
+    "enHash": "f734128f"
+  },
+  "help.tickets.empty.title": {
+    "message": "இன்னும் டிக்கெட்டுகள் இல்லை",
+    "review": "machine",
+    "enHash": "16baa0a9"
+  },
+  "help.tickets.empty.body": {
+    "message": "ஆர்டர், பணம் வழங்கல் அல்லது ஆப்பில் ஏதாவது தவறு நடந்தால், டிக்கெட் திறங்கள், சப்போர்ட் இங்கே பதில் தரும்.",
+    "review": "machine",
+    "enHash": "87f97a5c"
+  },
+  "help.tickets.error.title": {
+    "message": "டிக்கெட்டுகளை ஏற்ற முடியவில்லை",
+    "review": "machine",
+    "enHash": "cf7d483b"
+  },
+  "help.status.open": {
+    "message": "திறந்துள்ளது",
+    "review": "machine",
+    "enHash": "cf9b7706"
+  },
+  "help.status.waiting": {
+    "message": "பதில் வந்தது",
+    "review": "machine",
+    "enHash": "7d688ab4"
+  },
+  "help.status.resolved": {
+    "message": "தீர்க்கப்பட்டது",
+    "review": "machine",
+    "enHash": "e1d35505"
+  },
+  "help.status.closed": {
+    "message": "மூடப்பட்டது",
+    "review": "machine",
+    "enHash": "88d86b77"
+  },
+  "help.category.order": {
+    "message": "ஒரு ஆர்டர்",
+    "review": "machine",
+    "enHash": "40eb87b7"
+  },
+  "help.category.credits": {
+    "message": "கிரெடிட்",
+    "review": "machine",
+    "enHash": "bfac50d6"
+  },
+  "help.category.payouts": {
+    "message": "பணம் வழங்கல்",
+    "review": "machine",
+    "enHash": "e0e7ea13"
+  },
+  "help.category.catalogue": {
+    "message": "பொருட்கள் மற்றும் ஸ்டாக்",
+    "review": "machine",
+    "enHash": "5934f5ac"
+  },
+  "help.category.account": {
+    "message": "என் கணக்கு அல்லது ஊழியர்கள்",
+    "review": "machine",
+    "enHash": "caed2475"
+  },
+  "help.category.verification": {
+    "message": "சரிபார்ப்பு",
+    "review": "machine",
+    "enHash": "03128bed"
+  },
+  "help.category.app": {
+    "message": "ஆப்",
+    "review": "machine",
+    "enHash": "9445c325"
+  },
+  "help.category.other": {
+    "message": "வேறு ஏதாவது",
+    "review": "machine",
+    "enHash": "48f88ac3"
+  },
+  "help.new.title": {
+    "message": "புதிய டிக்கெட்",
+    "review": "machine",
+    "enHash": "b8bf9c88"
+  },
+  "help.new.intro": {
+    "message": "என்ன நடந்தது என்று சொல்லுங்கள். சப்போர்ட் டிக்கெட்டில் பதில் தரும், நீங்கள் அங்கே மேலும் சேர்க்கலாம்.",
+    "review": "machine",
+    "enHash": "5b8aa383"
+  },
+  "help.new.category": {
+    "message": "இது எதைப் பற்றியது?",
+    "review": "machine",
+    "enHash": "23a5beeb"
+  },
+  "help.new.category.pick": {
+    "message": "ஒன்றைத் தேர்ந்தெடுக்கவும்",
+    "review": "machine",
+    "enHash": "4238dc41"
+  },
+  "help.new.category.required": {
+    "message": "இது எதைப் பற்றியது என்று தேர்ந்தெடுக்கவும்.",
+    "review": "machine",
+    "enHash": "079e2dcc"
+  },
+  "help.new.subject": {
+    "message": "தலைப்பு",
+    "review": "machine",
+    "enHash": "8d183dbd"
+  },
+  "help.new.subject.help": {
+    "message": "ஒரு சிறிய வரி, உதாரணமாக \"மார்ச் பணம் வழங்கல் வரவில்லை\".",
+    "review": "machine",
+    "enHash": "056a26d6"
+  },
+  "help.new.subject.required": {
+    "message": "{min} முதல் {max} எழுத்துகள் வரை தலைப்பு எழுதுங்கள்.",
+    "review": "machine",
+    "enHash": "2583925c"
+  },
+  "help.new.store": {
+    "message": "எந்தக் கடை?",
+    "review": "machine",
+    "enHash": "54f0dfee"
+  },
+  "help.new.store.none": {
+    "message": "ஒரு கடையைப் பற்றியது அல்ல",
+    "review": "machine",
+    "enHash": "98a3c63e"
+  },
+  "help.new.order": {
+    "message": "எந்த ஆர்டர்?",
+    "review": "machine",
+    "enHash": "21813ae5"
+  },
+  "help.new.order.none": {
+    "message": "ஒரு ஆர்டரைப் பற்றியது அல்ல",
+    "review": "machine",
+    "enHash": "f29403b4"
+  },
+  "help.new.order.help": {
+    "message": "இந்தக் கடையின் சமீபத்திய ஆர்டர்கள்.",
+    "review": "machine",
+    "enHash": "45dd645c"
+  },
+  "help.new.order.failed": {
+    "message": "ஆர்டர்களை ஏற்ற முடியவில்லை. இருந்தாலும் டிக்கெட்டை அனுப்பி, மெசேஜில் ஆர்டரைக் குறிப்பிடலாம்.",
+    "review": "machine",
+    "enHash": "f7796d10"
+  },
+  "help.new.body": {
+    "message": "என்ன நடந்தது?",
+    "review": "machine",
+    "enHash": "e9ef659a"
+  },
+  "help.new.body.help": {
+    "message": "எவ்வளவு விவரம் தருகிறீர்களோ, அவ்வளவு விரைவாக உதவ முடியும்.",
+    "review": "machine",
+    "enHash": "2f8737b5"
+  },
+  "help.new.body.required": {
+    "message": "ஒரு மெசேஜ் எழுதுங்கள்.",
+    "review": "machine",
+    "enHash": "c8e96b81"
+  },
+  "help.new.fieldRefused": {
+    "message": "இது ஏற்கப்படவில்லை. மீண்டும் தேர்ந்தெடுக்கவும்.",
+    "review": "machine",
+    "enHash": "f557af62"
+  },
+  "help.new.send": {
+    "message": "சப்போர்ட்டுக்கு அனுப்பவும்",
+    "review": "machine",
+    "enHash": "e0b3861b"
+  },
+  "help.new.sent": {
+    "message": "டிக்கெட் {number} அனுப்பப்பட்டது",
+    "review": "machine",
+    "enHash": "99303bb3"
+  },
+  "help.ticket.loading": {
+    "message": "டிக்கெட் ஏற்றப்படுகிறது",
+    "review": "machine",
+    "enHash": "ee58be8e"
+  },
+  "help.ticket.title": {
+    "message": "டிக்கெட் {number}",
+    "review": "machine",
+    "enHash": "fc0bae40"
+  },
+  "help.ticket.messages": {
+    "message": "மெசேஜ்கள்",
+    "review": "machine",
+    "enHash": "f1702b46"
+  },
+  "help.ticket.fromSupport": {
+    "message": "TodayZ சப்போர்ட்",
+    "review": "machine",
+    "enHash": "f0829b0f"
+  },
+  "help.ticket.fromYou": {
+    "message": "உங்கள் பிசினஸ்",
+    "review": "machine",
+    "enHash": "d8f3e8b6"
+  },
+  "help.ticket.state.open": {
+    "message": "சப்போர்ட் இங்கே பதில் தரும்.",
+    "review": "machine",
+    "enHash": "fcb604cd"
+  },
+  "help.ticket.state.waiting": {
+    "message": "சப்போர்ட் பதில் தந்துள்ளது. இன்னும் உதவி தேவைப்பட்டால் கீழே பதில் தாருங்கள், டிக்கெட் மீண்டும் திறக்கும்.",
+    "review": "machine",
+    "enHash": "e360387a"
+  },
+  "help.ticket.state.resolved": {
+    "message": "சப்போர்ட் இதைத் தீர்க்கப்பட்டதாகக் குறித்துள்ளது. இல்லையென்றால் கீழே பதில் தாருங்கள், டிக்கெட் மீண்டும் திறக்கும்.",
+    "review": "machine",
+    "enHash": "22fde542"
+  },
+  "help.ticket.state.closed": {
+    "message": "இந்த டிக்கெட் மூடப்பட்டது, இனி மெசேஜ்களை ஏற்காது.",
+    "review": "machine",
+    "enHash": "7e6e9eca"
+  },
+  "help.ticket.newInstead": {
+    "message": "புதிய டிக்கெட் திறக்கவும்",
+    "review": "machine",
+    "enHash": "c36c110e"
+  },
+  "help.ticket.notFound.title": {
+    "message": "டிக்கெட் கிடைக்கவில்லை",
+    "review": "machine",
+    "enHash": "fb25ca39"
+  },
+  "help.ticket.notFound.body": {
+    "message": "இது வேறு பிசினஸுடையதாக இருக்கலாம், அல்லது லிங்க் தவறாக இருக்கலாம்.",
+    "review": "machine",
+    "enHash": "08e62202"
+  },
+  "help.ticket.notFound.action": {
+    "message": "உங்கள் டிக்கெட்டுகளைப் பாருங்கள்",
+    "review": "machine",
+    "enHash": "2a142fb0"
+  },
+  "help.ticket.error.title": {
+    "message": "டிக்கெட்டை ஏற்ற முடியவில்லை",
+    "review": "machine",
+    "enHash": "51a4c349"
+  },
+  "help.reply.title": {
+    "message": "பதில்",
+    "review": "machine",
+    "enHash": "6c2bb735"
+  },
+  "help.reply.label": {
+    "message": "உங்கள் மெசேஜ்",
+    "review": "machine",
+    "enHash": "f190c98e"
+  },
+  "help.reply.help": {
+    "message": "சப்போர்ட் இதை இந்த டிக்கெட்டில் பார்க்கும்.",
+    "review": "machine",
+    "enHash": "0b3c7ee4"
+  },
+  "help.reply.reopens": {
+    "message": "பதில் அனுப்பினால் டிக்கெட் மீண்டும் திறக்கும்.",
+    "review": "machine",
+    "enHash": "afd6995f"
+  },
+  "help.reply.send": {
+    "message": "பதில் அனுப்பவும்",
+    "review": "machine",
+    "enHash": "7f7e603a"
+  },
+  "help.files.add": {
+    "message": "புகைப்படம் அல்லது PDF சேர்க்கவும்",
+    "review": "machine",
+    "enHash": "ef72b016"
+  },
+  "help.files.uploading": {
+    "message": "பதிவேற்றப்படுகிறது",
+    "review": "machine",
+    "enHash": "de272409"
+  },
+  "help.files.help": {
+    "message": "JPEG, PNG, WebP அல்லது PDF, ஒவ்வொன்றும் {mb} MB வரை, அதிகபட்சம் {max} கோப்புகள்.",
+    "review": "machine",
+    "enHash": "8a7ca2f9"
+  },
+  "help.files.list": {
+    "message": "கோப்புகள்",
+    "review": "machine",
+    "enHash": "6ce6c512"
+  },
+  "help.files.remove": {
+    "message": "{name} ஐ நீக்கவும்",
+    "review": "machine",
+    "enHash": "df7193a5"
+  },
+  "help.files.type": {
+    "message": "{name} புகைப்படமோ PDF-ஓ அல்ல.",
+    "review": "machine",
+    "enHash": "0299449c"
+  },
+  "help.files.size": {
+    "message": "{name} {mb} MB-ஐ விடப் பெரியது.",
+    "review": "machine",
+    "enHash": "24ccdc18"
+  },
+  "help.files.tooMany": {
+    "message": "ஒரு மெசேஜுக்கு அதிகபட்சம் {max} கோப்புகள்.",
+    "review": "machine",
+    "enHash": "d7a902ec"
+  },
+  "help.files.failed": {
+    "message": "{name} பதிவேற்றப்படவில்லை. மீண்டும் முயலவும்.",
+    "review": "machine",
+    "enHash": "cd16e9c2"
+  },
+  "help.error.validation_failed": {
+    "message": "சில விவரங்கள் ஏற்கப்படவில்லை. படிவத்தைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "machine",
+    "enHash": "f1164913"
+  },
+  "help.error.forbidden": {
+    "message": "இதை உரிமையாளர் அல்லது மேலாளர் மட்டுமே செய்ய முடியும்.",
+    "review": "machine",
+    "enHash": "53dd9bab"
+  },
+  "help.error.not_found": {
+    "message": "இந்த டிக்கெட் இப்போது கிடைக்கவில்லை.",
+    "review": "machine",
+    "enHash": "9c3df5fd"
+  },
+  "help.error.invalid_transition": {
+    "message": "இந்த டிக்கெட் மூடப்பட்டது, இனி மெசேஜ்களை ஏற்காது. புதிய டிக்கெட் திறக்கவும்.",
+    "review": "machine",
+    "enHash": "7bfa6828"
+  },
+  "help.error.generic": {
+    "message": "அது நடக்கவில்லை. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "machine",
+    "enHash": "462c8c1d"
+  },
+  "help.files.empty": {
+    "message": "{name} காலியாக உள்ளது.",
+    "review": "machine",
+    "enHash": "83f58457"
+  }
+}

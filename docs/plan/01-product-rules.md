@@ -449,6 +449,12 @@ Admin roles (D-64; summary, the full permission matrix is in 02). There are 7 ro
 - Demand (A-23, D-101): demand gaps are read by `field_agent`, `catalogue`, `analyst`, `admin` and `super_admin`; the site search strip list is approved by `catalogue`, `admin` and `super_admin` (audited).
 - **Money settings** are `platform_settings` keys with unit `paise`, `bp` or `credits`. Only `super_admin` can change them.
 
+**Support tickets** (D-226). A business owner or manager opens a ticket from B-15 (cashiers cannot); a signed-in customer opens one from C-19, optionally on one of their own orders. Each ticket has a category, a status (`open`, `waiting`, `resolved`, `closed`) and a priority (`normal`, `high`, `urgent`); every new ticket starts at `normal`.
+- `support`, `admin` and `super_admin` work the inbox (A-14): assign (to themselves or another of these roles), reply, add internal notes, change the priority, resolve and close. Assign, priority, resolve and close are audited; resolve and close take a reason.
+- **SLA.** While a ticket is `open`, support owes a reply, due `support_sla_<priority>_min` minutes after the ticket was opened or reopened (the setting at that moment). A further message from the opener while it is still `open` keeps the due time, so writing again never pushes support's deadline back. An agent's reply moves it to `waiting` and stops the timer. Changing the priority of an `open` ticket moves its due time to when the timer started plus the new priority's minutes, so it can be overdue at once; on a `waiting` or `resolved` ticket it only sets the minutes the next timer uses; a `closed` ticket keeps its priority. Past the due time the inbox shows it as overdue; nothing escalates or changes on its own. The opener is never shown a reply time.
+- The opener's reply on a `waiting` or `resolved` ticket reopens it (`open`, a new due time). A `closed` ticket takes no more messages (`409 invalid_transition`); the opener opens a new one.
+- A customer sees only the tickets they opened as a customer, and support's messages without an agent's name; a business sees only its own tickets. Internal notes are never shown to the opener. Attachments (JPEG, PNG, WebP or PDF, at most 10 MB each, at most 5 per message) are private files, shown through short-lived links.
+
 **Background jobs** (D-95). Every background job is a registered kind with a class: `timer` (order and hold expiries), `money` (ledger, payouts, credit expiry), `notify`, `marketing`, `ai`, `rollup` or `maintenance` (partitions, retention).
 - `timer` kinds can never be paused or run by hand: order correctness depends on them.
 - `money` kinds: `super_admin` only, with admin TOTP step-up (within 10 min) and a reason.
@@ -665,6 +671,14 @@ Every numeric key has a min and a max (the Rule column, or after the default). A
 | Key | Unit | Default | Rule |
 |---|---|---|---|
 | `customer_max_saved_addresses` | count | 20 | §5.5: saved addresses one customer can keep (`422 validation_failed` on one more). Min 1, max 50. |
+
+**Support** (§13, D-226)
+
+| Key | Unit | Default | Rule |
+|---|---|---|---|
+| `support_sla_urgent_min` | minutes | 60 | §13: time to support's next reply on an urgent ticket. Min 15, max 10080. |
+| `support_sla_high_min` | minutes | 240 | §13: the same for a high-priority ticket. Min 15, max 10080. |
+| `support_sla_normal_min` | minutes | 1440 | §13: the same for a normal ticket. Min 15, max 10080. |
 
 **Feature flags** (turn a feature off without a deploy)
 

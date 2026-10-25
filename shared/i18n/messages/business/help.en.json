@@ -1,0 +1,474 @@
+{
+  "help.title": {
+    "defaultMessage": "Help",
+    "description": "B-15 page title"
+  },
+  "help.loading": {
+    "defaultMessage": "Loading help",
+    "description": "Accessible name of the loading state"
+  },
+  "help.back": {
+    "defaultMessage": "Back to help",
+    "description": "B-15 back link to the tickets tab"
+  },
+  "help.noBusiness": {
+    "defaultMessage": "Help with tickets comes once your business is set up.",
+    "description": "B-15 banner when the user has no business yet"
+  },
+  "help.askManager": {
+    "defaultMessage": "Tickets are opened by the owner or a manager. Ask one of them to contact support for you.",
+    "description": "B-15 banner for a cashier"
+  },
+  "help.error.title": {
+    "defaultMessage": "Could not load your business",
+    "description": "B-15 error state title"
+  },
+  "help.error.body": {
+    "defaultMessage": "Check your connection and try again.",
+    "description": "B-15 error state body"
+  },
+  "help.error.retry": {
+    "defaultMessage": "Try again",
+    "description": "B-15 error state button"
+  },
+  "help.sending": {
+    "defaultMessage": "Sending",
+    "description": "Accessible label of a send button while it sends"
+  },
+  "help.tabs.label": {
+    "defaultMessage": "Help sections",
+    "description": "Accessible name of the B-15 tabs"
+  },
+  "help.tabs.guide": {
+    "defaultMessage": "Guide",
+    "description": "B-15 tab: how it works and FAQs"
+  },
+  "help.tabs.tickets": {
+    "defaultMessage": "Tickets",
+    "description": "B-15 tab: the business support tickets"
+  },
+  "help.how.title": {
+    "defaultMessage": "How TodayZ works for your shop",
+    "description": "B-15 guide card title"
+  },
+  "help.how.stock.title": {
+    "defaultMessage": "Put your stock online",
+    "description": "Guide step 1 title"
+  },
+  "help.how.stock.body": {
+    "defaultMessage": "Add products with a price and how many you have. Customers nearby see what is in stock.",
+    "description": "Guide step 1"
+  },
+  "help.how.orders.title": {
+    "defaultMessage": "Accept orders in time",
+    "description": "Guide step 2 title"
+  },
+  "help.how.orders.body": {
+    "defaultMessage": "A new order rings on the Orders screen. Accept it, take part of it, or say why you cannot before its timer runs out.",
+    "description": "Guide step 2"
+  },
+  "help.how.pickup.title": {
+    "defaultMessage": "Hand over with the code",
+    "description": "Guide step 3 title"
+  },
+  "help.how.pickup.body": {
+    "defaultMessage": "At pickup the customer shows a code. Enter it on the order to complete the handover.",
+    "description": "Guide step 3"
+  },
+  "help.how.counter.title": {
+    "defaultMessage": "Sell at the counter",
+    "description": "Guide step 4 title"
+  },
+  "help.how.counter.body": {
+    "defaultMessage": "Ring up walk-in sales on Sell, even offline. Stock goes down as you sell.",
+    "description": "Guide step 4"
+  },
+  "help.how.credits.title": {
+    "defaultMessage": "Credits bring customers back",
+    "description": "Guide step 5 title"
+  },
+  "help.how.credits.body": {
+    "defaultMessage": "Customers earn and spend TodayZ credits. What they spend at your shop is added to your credit account.",
+    "description": "Guide step 5"
+  },
+  "help.how.payouts.title": {
+    "defaultMessage": "Get paid",
+    "description": "Guide step 6 title"
+  },
+  "help.how.payouts.body": {
+    "defaultMessage": "Each month a statement closes and what you are owed is paid by UPI.",
+    "description": "Guide step 6"
+  },
+  "help.faq.title": {
+    "defaultMessage": "Common questions",
+    "description": "B-15 FAQ card title"
+  },
+  "help.faq.timer.q": {
+    "defaultMessage": "What happens if I do not accept an order in time?",
+    "description": "FAQ question"
+  },
+  "help.faq.timer.a": {
+    "defaultMessage": "The order lapses and the customer is told. Missed orders lower where your shop shows in search, so keep the Orders screen open while you are open.",
+    "description": "FAQ answer"
+  },
+  "help.faq.code.q": {
+    "defaultMessage": "The pickup code does not work",
+    "description": "FAQ question"
+  },
+  "help.faq.code.a": {
+    "defaultMessage": "A code works only while the order is accepted or ready, and only once. After too many wrong tries it locks: ask the customer to tap \"New code\" in their app.",
+    "description": "FAQ answer"
+  },
+  "help.faq.credits.q": {
+    "defaultMessage": "Where do the credits customers spend go?",
+    "description": "FAQ question"
+  },
+  "help.faq.credits.a": {
+    "defaultMessage": "Credits a customer spends at your shop go to your credit account and are paid out with your payout. Cashback you give comes out of the same account.",
+    "description": "FAQ answer"
+  },
+  "help.faq.payout.q": {
+    "defaultMessage": "When am I paid?",
+    "description": "FAQ question"
+  },
+  "help.faq.payout.a": {
+    "defaultMessage": "A statement closes on the 1st of each month. What you are owed is paid by UPI, and the Credits screen shows it as paid with the UTR reference. A payout waits while your verification is incomplete.",
+    "description": "FAQ answer"
+  },
+  "help.faq.visible.q": {
+    "defaultMessage": "Why can customers not see my shop?",
+    "description": "FAQ question"
+  },
+  "help.faq.visible.a": {
+    "defaultMessage": "Your shop shows once it is approved, live and open, and only products with stock show in search.",
+    "description": "FAQ answer"
+  },
+  "help.faq.staff.q": {
+    "defaultMessage": "What can my staff do?",
+    "description": "FAQ question"
+  },
+  "help.faq.staff.a": {
+    "defaultMessage": "A cashier sells and handles orders. A manager also runs stock, offers and cashiers. The owner can do everything, including payouts and managers.",
+    "description": "FAQ answer"
+  },
+  "help.faq.close.q": {
+    "defaultMessage": "How do I close my business?",
+    "description": "FAQ question"
+  },
+  "help.faq.close.a": {
+    "defaultMessage": "There is no delete in the app. Contact support and we will help you.",
+    "description": "FAQ answer"
+  },
+  "help.contact.title": {
+    "defaultMessage": "Contact support",
+    "description": "B-15 contact card title"
+  },
+  "help.contact.body": {
+    "defaultMessage": "Open a ticket and support replies here, in the app. Add the order and a photo if it helps.",
+    "description": "B-15 contact card for owner and manager"
+  },
+  "help.contact.bodyCashier": {
+    "defaultMessage": "Ask the owner or a manager to open a ticket with support.",
+    "description": "B-15 contact card for a cashier"
+  },
+  "help.contact.call": {
+    "defaultMessage": "Call {phone}",
+    "description": "Button that calls the support phone number"
+  },
+  "help.tickets.new": {
+    "defaultMessage": "New ticket",
+    "description": "Button that opens the new ticket form"
+  },
+  "help.tickets.loading": {
+    "defaultMessage": "Loading tickets",
+    "description": "Accessible name of the ticket list loading state"
+  },
+  "help.tickets.list": {
+    "defaultMessage": "Tickets",
+    "description": "Accessible name of the ticket list"
+  },
+  "help.tickets.more": {
+    "defaultMessage": "Load more",
+    "description": "Button that loads the next page of tickets"
+  },
+  "help.tickets.updated": {
+    "defaultMessage": "updated {when}",
+    "description": "Ticket row: when the last message was written, e.g. \"updated 5 min ago\""
+  },
+  "help.tickets.empty.title": {
+    "defaultMessage": "No tickets yet",
+    "description": "Ticket list empty state title"
+  },
+  "help.tickets.empty.body": {
+    "defaultMessage": "When something is wrong with an order, a payout or the app, open a ticket and support will reply here.",
+    "description": "Ticket list empty state"
+  },
+  "help.tickets.error.title": {
+    "defaultMessage": "Could not load tickets",
+    "description": "Ticket list error state"
+  },
+  "help.status.open": {
+    "defaultMessage": "Open",
+    "description": "Ticket status pill: open"
+  },
+  "help.status.waiting": {
+    "defaultMessage": "Replied",
+    "description": "Ticket status pill: waiting"
+  },
+  "help.status.resolved": {
+    "defaultMessage": "Solved",
+    "description": "Ticket status pill: resolved"
+  },
+  "help.status.closed": {
+    "defaultMessage": "Closed",
+    "description": "Ticket status pill: closed"
+  },
+  "help.category.order": {
+    "defaultMessage": "An order",
+    "description": "Ticket category: order"
+  },
+  "help.category.credits": {
+    "defaultMessage": "Credits",
+    "description": "Ticket category: credits"
+  },
+  "help.category.payouts": {
+    "defaultMessage": "Payouts",
+    "description": "Ticket category: payouts"
+  },
+  "help.category.catalogue": {
+    "defaultMessage": "Products and stock",
+    "description": "Ticket category: catalogue"
+  },
+  "help.category.account": {
+    "defaultMessage": "My account or staff",
+    "description": "Ticket category: account"
+  },
+  "help.category.verification": {
+    "defaultMessage": "Verification",
+    "description": "Ticket category: verification"
+  },
+  "help.category.app": {
+    "defaultMessage": "The app",
+    "description": "Ticket category: app"
+  },
+  "help.category.other": {
+    "defaultMessage": "Something else",
+    "description": "Ticket category: other"
+  },
+  "help.new.title": {
+    "defaultMessage": "New ticket",
+    "description": "B-15 new ticket page title"
+  },
+  "help.new.intro": {
+    "defaultMessage": "Tell us what happened. Support replies on the ticket, and you can add more there.",
+    "description": "New ticket intro"
+  },
+  "help.new.category": {
+    "defaultMessage": "What is it about?",
+    "description": "Category picker label"
+  },
+  "help.new.category.pick": {
+    "defaultMessage": "Choose one",
+    "description": "Category picker placeholder option"
+  },
+  "help.new.category.required": {
+    "defaultMessage": "Choose what it is about.",
+    "description": "Category validation error"
+  },
+  "help.new.subject": {
+    "defaultMessage": "Subject",
+    "description": "Subject field label"
+  },
+  "help.new.subject.help": {
+    "defaultMessage": "A short line, like \"Payout for March not received\".",
+    "description": "Subject field help"
+  },
+  "help.new.subject.required": {
+    "defaultMessage": "Write a subject of {min} to {max} characters.",
+    "description": "Subject validation error"
+  },
+  "help.new.store": {
+    "defaultMessage": "Which shop?",
+    "description": "Store picker label"
+  },
+  "help.new.store.none": {
+    "defaultMessage": "Not about one shop",
+    "description": "Store picker option for no store"
+  },
+  "help.new.order": {
+    "defaultMessage": "Which order?",
+    "description": "Order picker label"
+  },
+  "help.new.order.none": {
+    "defaultMessage": "Not about one order",
+    "description": "Order picker option for no order"
+  },
+  "help.new.order.help": {
+    "defaultMessage": "Recent orders of this shop.",
+    "description": "Order picker help"
+  },
+  "help.new.order.failed": {
+    "defaultMessage": "Could not load orders. You can still send the ticket and name the order in the message.",
+    "description": "Order picker help when the orders failed to load"
+  },
+  "help.new.body": {
+    "defaultMessage": "What happened?",
+    "description": "Message field label"
+  },
+  "help.new.body.help": {
+    "defaultMessage": "The more detail, the faster we can help.",
+    "description": "Message field help"
+  },
+  "help.new.body.required": {
+    "defaultMessage": "Write a message.",
+    "description": "Message validation error"
+  },
+  "help.new.fieldRefused": {
+    "defaultMessage": "This was not accepted. Choose again.",
+    "description": "Error under the store or order picker after a 422"
+  },
+  "help.new.send": {
+    "defaultMessage": "Send to support",
+    "description": "New ticket submit button"
+  },
+  "help.new.sent": {
+    "defaultMessage": "Ticket {number} sent",
+    "description": "Toast after a ticket is opened"
+  },
+  "help.ticket.loading": {
+    "defaultMessage": "Loading ticket",
+    "description": "Accessible name of the thread loading state"
+  },
+  "help.ticket.title": {
+    "defaultMessage": "Ticket {number}",
+    "description": "Thread page title"
+  },
+  "help.ticket.messages": {
+    "defaultMessage": "Messages",
+    "description": "Accessible name of the message list"
+  },
+  "help.ticket.fromSupport": {
+    "defaultMessage": "TodayZ support",
+    "description": "Author shown on every support reply (no agent name)"
+  },
+  "help.ticket.fromYou": {
+    "defaultMessage": "Your business",
+    "description": "Author shown on a business message with no name"
+  },
+  "help.ticket.state.open": {
+    "defaultMessage": "Support will reply here.",
+    "description": "Thread note while the ticket is open"
+  },
+  "help.ticket.state.waiting": {
+    "defaultMessage": "Support replied. If you still need help, reply below and the ticket opens again.",
+    "description": "Thread note while waiting on the business"
+  },
+  "help.ticket.state.resolved": {
+    "defaultMessage": "Support marked this solved. If it is not, reply below and the ticket opens again.",
+    "description": "Thread note when resolved"
+  },
+  "help.ticket.state.closed": {
+    "defaultMessage": "This ticket is closed and takes no more messages.",
+    "description": "Thread note when closed"
+  },
+  "help.ticket.newInstead": {
+    "defaultMessage": "Open a new ticket",
+    "description": "Link shown instead of the reply box on a closed ticket"
+  },
+  "help.ticket.notFound.title": {
+    "defaultMessage": "Ticket not found",
+    "description": "Thread 404 title"
+  },
+  "help.ticket.notFound.body": {
+    "defaultMessage": "It may belong to another business, or the link is wrong.",
+    "description": "Thread 404 body"
+  },
+  "help.ticket.notFound.action": {
+    "defaultMessage": "See your tickets",
+    "description": "Thread 404 button"
+  },
+  "help.ticket.error.title": {
+    "defaultMessage": "Could not load the ticket",
+    "description": "Thread error state title"
+  },
+  "help.reply.title": {
+    "defaultMessage": "Reply",
+    "description": "Reply card title"
+  },
+  "help.reply.label": {
+    "defaultMessage": "Your message",
+    "description": "Reply field label"
+  },
+  "help.reply.help": {
+    "defaultMessage": "Support sees it on this ticket.",
+    "description": "Reply field help while open"
+  },
+  "help.reply.reopens": {
+    "defaultMessage": "Sending a reply opens the ticket again.",
+    "description": "Reply field help while waiting or resolved"
+  },
+  "help.reply.send": {
+    "defaultMessage": "Send reply",
+    "description": "Reply submit button"
+  },
+  "help.files.add": {
+    "defaultMessage": "Add photo or PDF",
+    "description": "Attachment picker button"
+  },
+  "help.files.uploading": {
+    "defaultMessage": "Uploading",
+    "description": "Attachment picker button while uploading"
+  },
+  "help.files.help": {
+    "defaultMessage": "JPEG, PNG, WebP or PDF, up to {mb} MB each, at most {max} files.",
+    "description": "Attachment rules"
+  },
+  "help.files.list": {
+    "defaultMessage": "Files",
+    "description": "Accessible name of the file list"
+  },
+  "help.files.remove": {
+    "defaultMessage": "Remove {name}",
+    "description": "Accessible name of the remove-file button"
+  },
+  "help.files.type": {
+    "defaultMessage": "{name} is not a photo or PDF.",
+    "description": "Attachment error: wrong type"
+  },
+  "help.files.size": {
+    "defaultMessage": "{name} is larger than {mb} MB.",
+    "description": "Attachment error: too big"
+  },
+  "help.files.empty": {
+    "defaultMessage": "{name} is empty.",
+    "description": "Attachment error: an empty file"
+  },
+  "help.files.tooMany": {
+    "defaultMessage": "At most {max} files per message.",
+    "description": "Attachment error: too many"
+  },
+  "help.files.failed": {
+    "defaultMessage": "{name} did not upload. Try again.",
+    "description": "Attachment error: upload failed"
+  },
+  "help.error.validation_failed": {
+    "defaultMessage": "Some details were not accepted. Check the form and try again.",
+    "description": "Error after a 422"
+  },
+  "help.error.forbidden": {
+    "defaultMessage": "Only the owner or a manager can do this.",
+    "description": "Error after a 403"
+  },
+  "help.error.not_found": {
+    "defaultMessage": "This ticket is no longer available.",
+    "description": "Error after a 404"
+  },
+  "help.error.invalid_transition": {
+    "defaultMessage": "This ticket is closed and takes no more messages. Open a new ticket.",
+    "description": "Error after a 409 on a closed ticket"
+  },
+  "help.error.generic": {
+    "defaultMessage": "That did not go through. Check your connection and try again.",
+    "description": "Any other send error"
+  }
+}

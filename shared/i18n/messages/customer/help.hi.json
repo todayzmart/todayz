@@ -1,0 +1,407 @@
+{
+  "help.back": {
+    "message": "सहायता पर वापस",
+    "review": "machine",
+    "enHash": "45dd3b17"
+  },
+  "help.category.account": {
+    "message": "मेरा खाता",
+    "review": "machine",
+    "enHash": "61909817"
+  },
+  "help.category.app": {
+    "message": "ऐप",
+    "review": "machine",
+    "enHash": "9445c325"
+  },
+  "help.category.credits": {
+    "message": "क्रेडिट",
+    "review": "machine",
+    "enHash": "bfac50d6"
+  },
+  "help.category.order": {
+    "message": "कोई ऑर्डर",
+    "review": "machine",
+    "enHash": "40eb87b7"
+  },
+  "help.category.other": {
+    "message": "कुछ और",
+    "review": "machine",
+    "enHash": "48f88ac3"
+  },
+  "help.error.body": {
+    "message": "अपना कनेक्शन जाँचें और फिर से कोशिश करें।",
+    "review": "machine",
+    "enHash": "563862b7"
+  },
+  "help.error.generic": {
+    "message": "यह नहीं हो सका। अपना कनेक्शन जाँचें और फिर से कोशिश करें।",
+    "review": "machine",
+    "enHash": "462c8c1d"
+  },
+  "help.error.invalid_transition": {
+    "message": "यह टिकट बंद है और इसमें अब मैसेज नहीं जा सकते। नया टिकट खोलें।",
+    "review": "machine",
+    "enHash": "7bfa6828"
+  },
+  "help.error.not_found": {
+    "message": "यह टिकट अब उपलब्ध नहीं है।",
+    "review": "machine",
+    "enHash": "9c3df5fd"
+  },
+  "help.error.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "machine",
+    "enHash": "042c862e"
+  },
+  "help.error.validation_failed": {
+    "message": "कुछ जानकारी स्वीकार नहीं हुई। फ़ॉर्म जाँचें और फिर से कोशिश करें।",
+    "review": "machine",
+    "enHash": "f1164913"
+  },
+  "help.files.add": {
+    "message": "फ़ोटो या PDF जोड़ें",
+    "review": "machine",
+    "enHash": "ef72b016"
+  },
+  "help.files.empty": {
+    "message": "{name} खाली है।",
+    "review": "machine",
+    "enHash": "83f58457"
+  },
+  "help.files.failed": {
+    "message": "{name} अपलोड नहीं हुई। फिर से कोशिश करें।",
+    "review": "machine",
+    "enHash": "cd16e9c2"
+  },
+  "help.files.help": {
+    "message": "JPEG, PNG, WebP या PDF, हर एक {mb} MB तक, ज़्यादा से ज़्यादा {max} फ़ाइलें।",
+    "review": "machine",
+    "enHash": "8a7ca2f9"
+  },
+  "help.files.list": {
+    "message": "फ़ाइलें",
+    "review": "machine",
+    "enHash": "6ce6c512"
+  },
+  "help.files.remove": {
+    "message": "{name} हटाएँ",
+    "review": "machine",
+    "enHash": "df7193a5"
+  },
+  "help.files.size": {
+    "message": "{name} {mb} MB से बड़ी है।",
+    "review": "machine",
+    "enHash": "24ccdc18"
+  },
+  "help.files.tooMany": {
+    "message": "एक मैसेज में ज़्यादा से ज़्यादा {max} फ़ाइलें।",
+    "review": "machine",
+    "enHash": "d7a902ec"
+  },
+  "help.files.type": {
+    "message": "{name} फ़ोटो या PDF नहीं है।",
+    "review": "machine",
+    "enHash": "0299449c"
+  },
+  "help.files.uploading": {
+    "message": "अपलोड हो रहा है",
+    "review": "machine",
+    "enHash": "de272409"
+  },
+  "help.intro": {
+    "message": "किसी ऑर्डर, आपके क्रेडिट या ऐप में कोई दिक्कत है? टिकट खोलें, TodayZ सहायता यहीं जवाब देगी।",
+    "review": "machine",
+    "enHash": "c4fa2cf6"
+  },
+  "help.loading": {
+    "message": "सहायता लोड हो रही है",
+    "review": "machine",
+    "enHash": "c72413f7"
+  },
+  "help.new.body": {
+    "message": "क्या हुआ?",
+    "review": "machine",
+    "enHash": "e9ef659a"
+  },
+  "help.new.body.help": {
+    "message": "जितनी ज़्यादा जानकारी, उतनी जल्दी हम मदद कर पाएँगे।",
+    "review": "machine",
+    "enHash": "2f8737b5"
+  },
+  "help.new.body.required": {
+    "message": "एक मैसेज लिखें।",
+    "review": "machine",
+    "enHash": "c8e96b81"
+  },
+  "help.new.category": {
+    "message": "यह किस बारे में है?",
+    "review": "machine",
+    "enHash": "23a5beeb"
+  },
+  "help.new.category.pick": {
+    "message": "एक चुनें",
+    "review": "machine",
+    "enHash": "4238dc41"
+  },
+  "help.new.category.required": {
+    "message": "चुनें कि यह किस बारे में है।",
+    "review": "machine",
+    "enHash": "079e2dcc"
+  },
+  "help.new.intro": {
+    "message": "बताएँ क्या हुआ। सपोर्ट टिकट पर जवाब देगा, और आप वहाँ और जोड़ सकते हैं।",
+    "review": "machine",
+    "enHash": "5b8aa383"
+  },
+  "help.new.order": {
+    "message": "कौन सा ऑर्डर? (वैकल्पिक)",
+    "review": "machine",
+    "enHash": "cb115a09"
+  },
+  "help.new.order.failed": {
+    "message": "ऑर्डर लोड नहीं हो सके। आप फिर भी टिकट भेज सकते हैं और मैसेज में ऑर्डर बता सकते हैं।",
+    "review": "machine",
+    "enHash": "f7796d10"
+  },
+  "help.new.order.help": {
+    "message": "आपके हाल के ऑर्डर।",
+    "review": "machine",
+    "enHash": "ea27e86c"
+  },
+  "help.new.order.none": {
+    "message": "किसी एक ऑर्डर के बारे में नहीं",
+    "review": "machine",
+    "enHash": "f29403b4"
+  },
+  "help.new.order.refused": {
+    "message": "यह ऑर्डर स्वीकार नहीं हुआ। कोई दूसरा चुनें या कोई नहीं।",
+    "review": "machine",
+    "enHash": "a47c2ce8"
+  },
+  "help.new.order.this": {
+    "message": "यह ऑर्डर",
+    "review": "machine",
+    "enHash": "a25622f7"
+  },
+  "help.new.send": {
+    "message": "सपोर्ट को भेजें",
+    "review": "machine",
+    "enHash": "e0b3861b"
+  },
+  "help.new.sent": {
+    "message": "टिकट {number} भेजा गया",
+    "review": "machine",
+    "enHash": "99303bb3"
+  },
+  "help.new.subject": {
+    "message": "विषय",
+    "review": "machine",
+    "enHash": "8d183dbd"
+  },
+  "help.new.subject.help": {
+    "message": "एक छोटी लाइन, जैसे \"मेरे ऑर्डर से आटा गायब है\"।",
+    "review": "machine",
+    "enHash": "29349dc3"
+  },
+  "help.new.subject.required": {
+    "message": "{min} से {max} अक्षरों का विषय लिखें।",
+    "review": "machine",
+    "enHash": "2583925c"
+  },
+  "help.new.title": {
+    "message": "नया टिकट",
+    "review": "machine",
+    "enHash": "b8bf9c88"
+  },
+  "help.reply.help": {
+    "message": "सपोर्ट इसे इसी टिकट पर देखेगा।",
+    "review": "machine",
+    "enHash": "0b3c7ee4"
+  },
+  "help.reply.label": {
+    "message": "आपका मैसेज",
+    "review": "machine",
+    "enHash": "f190c98e"
+  },
+  "help.reply.reopens": {
+    "message": "जवाब भेजने से टिकट फिर से खुल जाएगा।",
+    "review": "machine",
+    "enHash": "afd6995f"
+  },
+  "help.reply.send": {
+    "message": "जवाब भेजें",
+    "review": "machine",
+    "enHash": "7f7e603a"
+  },
+  "help.reply.title": {
+    "message": "जवाब",
+    "review": "machine",
+    "enHash": "6c2bb735"
+  },
+  "help.sending": {
+    "message": "भेजा जा रहा है",
+    "review": "machine",
+    "enHash": "ceafde86"
+  },
+  "help.signedOut.body": {
+    "message": "आपके टिकट आपके खाते के साथ रखे जाते हैं, इसलिए टिकट खोलने या जवाब देखने के लिए साइन इन करें।",
+    "review": "machine",
+    "enHash": "8f10756a"
+  },
+  "help.signedOut.cta": {
+    "message": "साइन इन करें",
+    "review": "machine",
+    "enHash": "ada2e9e9"
+  },
+  "help.signedOut.title": {
+    "message": "सहायता के लिए साइन इन करें",
+    "review": "machine",
+    "enHash": "e9c9d810"
+  },
+  "help.status.closed": {
+    "message": "बंद",
+    "review": "machine",
+    "enHash": "88d86b77"
+  },
+  "help.status.open": {
+    "message": "खुला",
+    "review": "machine",
+    "enHash": "cf9b7706"
+  },
+  "help.status.resolved": {
+    "message": "हल हुआ",
+    "review": "machine",
+    "enHash": "e1d35505"
+  },
+  "help.status.waiting": {
+    "message": "जवाब मिला",
+    "review": "machine",
+    "enHash": "7d688ab4"
+  },
+  "help.ticket.error.title": {
+    "message": "टिकट लोड नहीं हो सका",
+    "review": "machine",
+    "enHash": "51a4c349"
+  },
+  "help.ticket.fromSupport": {
+    "message": "TodayZ सपोर्ट",
+    "review": "machine",
+    "enHash": "f0829b0f"
+  },
+  "help.ticket.fromYou": {
+    "message": "आप",
+    "review": "machine",
+    "enHash": "905cb326"
+  },
+  "help.ticket.loading": {
+    "message": "टिकट लोड हो रहा है",
+    "review": "machine",
+    "enHash": "ee58be8e"
+  },
+  "help.ticket.messages": {
+    "message": "मैसेज",
+    "review": "machine",
+    "enHash": "f1702b46"
+  },
+  "help.ticket.newInstead": {
+    "message": "नया टिकट खोलें",
+    "review": "machine",
+    "enHash": "c36c110e"
+  },
+  "help.ticket.notFound.action": {
+    "message": "अपने टिकट देखें",
+    "review": "machine",
+    "enHash": "2a142fb0"
+  },
+  "help.ticket.notFound.body": {
+    "message": "लिंक गलत हो सकता है, या यह टिकट आपका नहीं है।",
+    "review": "machine",
+    "enHash": "cb8501bc"
+  },
+  "help.ticket.notFound.title": {
+    "message": "टिकट नहीं मिला",
+    "review": "machine",
+    "enHash": "fb25ca39"
+  },
+  "help.ticket.state.closed": {
+    "message": "यह टिकट बंद है और इसमें अब मैसेज नहीं जा सकते।",
+    "review": "machine",
+    "enHash": "7e6e9eca"
+  },
+  "help.ticket.state.open": {
+    "message": "सपोर्ट यहाँ जवाब देगा।",
+    "review": "machine",
+    "enHash": "fcb604cd"
+  },
+  "help.ticket.state.resolved": {
+    "message": "सपोर्ट ने इसे हल मान लिया है। अगर नहीं हुआ, तो नीचे जवाब दें और टिकट फिर से खुल जाएगा।",
+    "review": "machine",
+    "enHash": "22fde542"
+  },
+  "help.ticket.state.waiting": {
+    "message": "सपोर्ट ने जवाब दिया। अगर अब भी मदद चाहिए, तो नीचे जवाब दें और टिकट फिर से खुल जाएगा।",
+    "review": "machine",
+    "enHash": "e360387a"
+  },
+  "help.ticket.title": {
+    "message": "टिकट {number}",
+    "review": "machine",
+    "enHash": "fc0bae40"
+  },
+  "help.tickets.empty.body": {
+    "message": "जब किसी ऑर्डर, आपके क्रेडिट या ऐप में कुछ गलत हो, तो टिकट खोलें और सहायता यहीं जवाब देगी।",
+    "review": "machine",
+    "enHash": "f3dab2ec"
+  },
+  "help.tickets.empty.title": {
+    "message": "अभी कोई टिकट नहीं",
+    "review": "machine",
+    "enHash": "16baa0a9"
+  },
+  "help.tickets.error.title": {
+    "message": "टिकट लोड नहीं हो सके",
+    "review": "machine",
+    "enHash": "cf7d483b"
+  },
+  "help.tickets.list": {
+    "message": "टिकट",
+    "review": "machine",
+    "enHash": "5c622a51"
+  },
+  "help.tickets.loading": {
+    "message": "टिकट लोड हो रहे हैं",
+    "review": "machine",
+    "enHash": "b603c74a"
+  },
+  "help.tickets.more": {
+    "message": "और दिखाएँ",
+    "review": "machine",
+    "enHash": "dfe60ca9"
+  },
+  "help.tickets.new": {
+    "message": "नया टिकट",
+    "review": "machine",
+    "enHash": "b8bf9c88"
+  },
+  "help.tickets.updated": {
+    "message": "{when} अपडेट हुआ",
+    "review": "machine",
+    "enHash": "f734128f"
+  },
+  "help.title": {
+    "message": "सहायता",
+    "review": "machine",
+    "enHash": "c47ae153"
+  },
+  "help.entry": {
+    "message": "सहायता लें या अपने टिकट देखें",
+    "review": "machine",
+    "enHash": "059b3f04"
+  },
+  "help.orderLink": {
+    "message": "इस ऑर्डर के लिए सहायता लें",
+    "review": "machine",
+    "enHash": "cf024239"
+  }
+}
