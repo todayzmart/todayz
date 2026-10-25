@@ -61,8 +61,8 @@ var (
 	personSQL   = regexp.MustCompile(`(?i)\b(phone|phone_enc|to_enc|address|otp_hash|code_hash|full_name|actor_user_id|confirmed_by)\b`)
 	nowCall     = regexp.MustCompile(`\bnow\(\)`)
 	timeFilter  = regexp.MustCompile(`\$__timeFilter\(([^()]*(?:\([^()]*\))?[^()]*)\)`)
-	promMetric  = regexp.MustCompile(`\btz_ai_[a-z0-9_]+`)
-	goMetricDef = regexp.MustCompile(`"(tz_ai_[a-z0-9_]+)"`)
+	promMetric  = regexp.MustCompile(`\btz_(?:ai|voice)_[a-z0-9_]+`)
+	goMetricDef = regexp.MustCompile(`"(tz_(?:ai|voice)_[a-z0-9_]+)"`)
 )
 
 // TestAIAlertsLint: two rules on Postgres with a threshold condition, the
@@ -142,7 +142,7 @@ func TestAIAlertsFire(t *testing.T) {
 }
 
 // TestDashboard14: the layout every TodayZ dashboard has, Prometheus panels
-// only on metrics the AI code registers, and Postgres panels that run on a
+// only on metrics the AI code (and B-06 voice, D-229) registers, and Postgres panels that run on a
 // migrated database, only read and select no person.
 func TestDashboard14(t *testing.T) {
 	b, err := os.ReadFile(filepath.Join(repoRoot(), "infra", "grafana", "dashboards", "14-ai-quality-cost.json"))
@@ -177,7 +177,7 @@ func TestDashboard14(t *testing.T) {
 	assert.Equal(t, "text", d.Panels[0].Type, "the first panel says how to read the dashboard")
 
 	known := map[string]bool{}
-	for _, dir := range []string{"../client", "../drafts", "."} {
+	for _, dir := range []string{"../client", "../drafts", "../../voice", "."} {
 		files, _ := filepath.Glob(filepath.Join(dir, "*.go"))
 		for _, f := range files {
 			if strings.HasSuffix(f, "_test.go") {

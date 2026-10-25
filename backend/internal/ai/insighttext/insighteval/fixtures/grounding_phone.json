@@ -1,0 +1,47 @@
+{
+  "name": "grounding_phone",
+  "input": {
+    "lang": "en",
+    "rows": [
+      {
+        "ref": "r1",
+        "kind": "regulars_slipping",
+        "facts": {
+          "customers": 11,
+          "days": 21
+        }
+      }
+    ]
+  },
+  "expect": {
+    "texts": {},
+    "dropped": 1
+  },
+  "reply": {
+    "id": "msg_it_grounding_phone",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_it_grounding_phone",
+        "name": "write_insight_texts",
+        "input": {
+          "texts": [
+            {
+              "ref": "r1",
+              "text": "11 regulars have not come in 21 days; call 98450 12345 to remind them."
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

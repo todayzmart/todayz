@@ -1,0 +1,397 @@
+{
+  "ai.again": {
+    "message": "फिर कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "ai.backToStock": {
+    "message": "स्टॉक पर जाएं",
+    "review": "reviewed",
+    "enHash": "55742732"
+  },
+  "ai.closed": {
+    "message": "यह ड्राफ़्ट बंद हो चुका है। नया शुरू करें।",
+    "review": "reviewed",
+    "enHash": "a661d472"
+  },
+  "ai.discard": {
+    "message": "ड्राफ़्ट हटाएं",
+    "review": "reviewed",
+    "enHash": "3a09ce0d"
+  },
+  "ai.draftNote": {
+    "message": "AI का सुझाव। हर लाइन जांच लें; आपके पक्का करने तक कुछ नहीं बदलेगा।",
+    "review": "reviewed",
+    "enHash": "df75a916"
+  },
+  "ai.insight.worded": {
+    "message": "AI ने लिखा",
+    "review": "reviewed",
+    "enHash": "e1ec3954"
+  },
+  "ai.photo.help": {
+    "message": "अच्छी रोशनी में साफ़ फ़ोटो, {mb} MB तक",
+    "review": "reviewed",
+    "enHash": "a821e356"
+  },
+  "ai.photo.type": {
+    "message": "यह फ़ाइल हम पढ़ नहीं सकते। फ़ोटो लें या चुनें।",
+    "review": "reviewed",
+    "enHash": "845632a4"
+  },
+  "ai.photo.size": {
+    "message": "यह फ़ोटो {mb} MB से बड़ी है। छोटी फ़ोटो चुनें।",
+    "review": "reviewed",
+    "enHash": "65d63829"
+  },
+  "ai.error.cap": {
+    "message": "इस दुकान के लिए आज की AI मदद पूरी हो गई। बाद में कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "fb85c9e3"
+  },
+  "ai.error.capFor": {
+    "message": "अभी के लिए AI मदद पूरी हो गई। {mins, plural, one {# मिनट} other {# मिनट}} बाद कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "084d0337"
+  },
+  "ai.error.off": {
+    "message": "यह AI मदद आपकी दुकान के लिए चालू नहीं है।",
+    "review": "reviewed",
+    "enHash": "68a74895"
+  },
+  "ai.error.changed": {
+    "message": "यह ड्राफ़्ट बदल गया है। अभी की जानकारी देखने के लिए फिर शुरू करें।",
+    "review": "reviewed",
+    "enHash": "6d898345"
+  },
+  "ai.error.photo": {
+    "message": "यह फ़ोटो भेजी नहीं जा सकी। उसका प्रकार और साइज़ जांचें।",
+    "review": "reviewed",
+    "enHash": "60551ac4"
+  },
+  "ai.error.invalid": {
+    "message": "कुछ जानकारी ठीक करनी है। नीचे चिह्नित लाइनें देखें।",
+    "review": "reviewed",
+    "enHash": "28db3711"
+  },
+  "ai.error.offline": {
+    "message": "लगता है आप ऑफ़लाइन हैं। कनेक्शन जांचकर फिर कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "81b7d772"
+  },
+  "ai.error.generic": {
+    "message": "कुछ गड़बड़ हो गई। फिर कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "4244e822"
+  },
+  "ai.err.range": {
+    "message": "यह संख्या जांचें",
+    "review": "reviewed",
+    "enHash": "239355d1"
+  },
+  "ai.err.above_mrp": {
+    "message": "MRP से ज़्यादा है",
+    "review": "reviewed",
+    "enHash": "8f3be78d"
+  },
+  "ai.err.past": {
+    "message": "यह तारीख निकल चुकी है",
+    "review": "reviewed",
+    "enHash": "6792f0a7"
+  },
+  "ai.err.date": {
+    "message": "तारीख डालें",
+    "review": "reviewed",
+    "enHash": "64ceee5b"
+  },
+  "ai.err.required": {
+    "message": "ज़रूरी है",
+    "review": "reviewed",
+    "enHash": "27c0ee6e"
+  },
+  "ai.err.not_in_store": {
+    "message": "यह इस दुकान का आइटम नहीं है",
+    "review": "reviewed",
+    "enHash": "59f405fb"
+  },
+  "ai.err.invalid": {
+    "message": "यह लाइन जांचें",
+    "review": "reviewed",
+    "enHash": "698e45b4"
+  },
+  "ai.err.no_product": {
+    "message": "कैटलॉग में नहीं है",
+    "review": "reviewed",
+    "enHash": "940e8a73"
+  },
+  "ai.err.duplicate": {
+    "message": "इस सूची में पहले से है",
+    "review": "reviewed",
+    "enHash": "15b6db98"
+  },
+  "ai.err.already_listed": {
+    "message": "आपके स्टॉक में पहले से है",
+    "review": "reviewed",
+    "enHash": "6762efb2"
+  },
+  "ai.err.quantity": {
+    "message": "पूरी संख्या डालें",
+    "review": "reviewed",
+    "enHash": "b394c9ca"
+  },
+  "ai.err.price": {
+    "message": "रुपये में कीमत डालें",
+    "review": "reviewed",
+    "enHash": "c223f02c"
+  },
+  "ai.bill.title": {
+    "message": "सप्लायर बिल स्कैन करें",
+    "review": "reviewed",
+    "enHash": "4c70718c"
+  },
+  "ai.bill.desc": {
+    "message": "बिल की फ़ोटो लें। हम उसकी लाइनें आपके आइटम से मिलाते हैं; आप जांचकर स्टॉक जोड़ें।",
+    "review": "reviewed",
+    "enHash": "c5ae78ac"
+  },
+  "ai.bill.pick": {
+    "message": "फ़ोटो लें या चुनें",
+    "review": "reviewed",
+    "enHash": "097ac225"
+  },
+  "ai.bill.reading": {
+    "message": "बिल पढ़ा जा रहा है…",
+    "review": "reviewed",
+    "enHash": "65179e5a"
+  },
+  "ai.bill.failed": {
+    "message": "यह बिल पढ़ा नहीं जा सका। सीधी रखकर अच्छी रोशनी में साफ़ फ़ोटो लें।",
+    "review": "reviewed",
+    "enHash": "d2ec5dac"
+  },
+  "ai.bill.off": {
+    "message": "बिल स्कैन आपकी दुकान के लिए चालू नहीं है",
+    "review": "reviewed",
+    "enHash": "d6fe4a22"
+  },
+  "ai.bill.from": {
+    "message": "{supplier} से",
+    "review": "reviewed",
+    "enHash": "c70f3f37"
+  },
+  "ai.bill.lines": {
+    "message": "बिल की लाइनें",
+    "review": "reviewed",
+    "enHash": "cfd6514f"
+  },
+  "ai.bill.matched": {
+    "message": "बिल पर: {bill} · अभी स्टॉक में {n}",
+    "review": "reviewed",
+    "enHash": "d08ba258"
+  },
+  "ai.bill.unmatched": {
+    "message": "बिल पर: {bill} · आपका आइटम नहीं",
+    "review": "reviewed",
+    "enHash": "0a5ff5e2"
+  },
+  "ai.bill.unmatchedHelp": {
+    "message": "जो लाइनें आपके आइटम नहीं हैं, वे छोड़ दी जाती हैं। पहले स्टॉक में आइटम जोड़ें, फिर दोबारा स्कैन करें।",
+    "review": "reviewed",
+    "enHash": "83d28323"
+  },
+  "ai.bill.mrp": {
+    "message": "MRP {mrp}",
+    "review": "reviewed",
+    "enHash": "5f2751fd"
+  },
+  "ai.bill.qty": {
+    "message": "मात्रा",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "ai.bill.cost": {
+    "message": "ख़रीद कीमत",
+    "review": "reviewed",
+    "enHash": "b0e0a2d5"
+  },
+  "ai.bill.expiry": {
+    "message": "एक्सपायरी",
+    "review": "reviewed",
+    "enHash": "ba8f571e"
+  },
+  "ai.bill.confirm": {
+    "message": "{n, plural, =0 {जोड़ने को कुछ नहीं} one {# आइटम का स्टॉक जोड़ें} other {# आइटम का स्टॉक जोड़ें}}",
+    "review": "reviewed",
+    "enHash": "14c7e60e"
+  },
+  "ai.bill.done": {
+    "message": "{n, plural, =0 {कोई स्टॉक नहीं जुड़ा} one {# आइटम का स्टॉक जुड़ गया} other {# आइटम का स्टॉक जुड़ गया}}",
+    "review": "reviewed",
+    "enHash": "e1105ab3"
+  },
+  "ai.bill.discarded": {
+    "message": "ड्राफ़्ट हटा दिया। कुछ नहीं जुड़ा।",
+    "review": "reviewed",
+    "enHash": "581cb8d0"
+  },
+  "ai.bill.another": {
+    "message": "दूसरा बिल स्कैन करें",
+    "review": "reviewed",
+    "enHash": "3bb2cbfa"
+  },
+  "ai.shelf.title": {
+    "message": "शेल्फ़ की फ़ोटो से स्टॉक जोड़ें",
+    "review": "reviewed",
+    "enHash": "7499282c"
+  },
+  "ai.shelf.desc": {
+    "message": "शेल्फ़ की फ़ोटो लें। हम कैटलॉग में प्रोडक्ट ढूंढते हैं; आप चुनें कि क्या और किस कीमत पर बेचना है।",
+    "review": "reviewed",
+    "enHash": "66d96c07"
+  },
+  "ai.shelf.pick": {
+    "message": "फ़ोटो लें या चुनें",
+    "review": "reviewed",
+    "enHash": "097ac225"
+  },
+  "ai.shelf.reading": {
+    "message": "शेल्फ़ देखी जा रही है…",
+    "review": "reviewed",
+    "enHash": "d0780c4f"
+  },
+  "ai.shelf.failed": {
+    "message": "इस फ़ोटो में प्रोडक्ट नहीं मिले। पास से साफ़ फ़ोटो लें।",
+    "review": "reviewed",
+    "enHash": "1266f886"
+  },
+  "ai.shelf.off": {
+    "message": "शेल्फ़ फ़ोटो आपकी दुकान के लिए चालू नहीं है",
+    "review": "reviewed",
+    "enHash": "cce50c9f"
+  },
+  "ai.shelf.lines": {
+    "message": "मिले प्रोडक्ट",
+    "review": "reviewed",
+    "enHash": "0e4425df"
+  },
+  "ai.shelf.unmatched": {
+    "message": "दिखा: {seen} · कैटलॉग में नहीं",
+    "review": "reviewed",
+    "enHash": "a21072af"
+  },
+  "ai.shelf.listed": {
+    "message": "आपके स्टॉक में पहले से है",
+    "review": "reviewed",
+    "enHash": "6762efb2"
+  },
+  "ai.shelf.price": {
+    "message": "आपकी कीमत",
+    "review": "reviewed",
+    "enHash": "16a067af"
+  },
+  "ai.shelf.opening": {
+    "message": "शुरुआती स्टॉक",
+    "review": "reviewed",
+    "enHash": "38b7df56"
+  },
+  "ai.shelf.openingHelp": {
+    "message": "ज़रूरी नहीं। बाद में गिनने के लिए ख़ाली छोड़ें।",
+    "review": "reviewed",
+    "enHash": "be82f640"
+  },
+  "ai.shelf.confirm": {
+    "message": "{n, plural, =0 {जोड़ने को कुछ नहीं} one {# प्रोडक्ट जोड़ें} other {# प्रोडक्ट जोड़ें}}",
+    "review": "reviewed",
+    "enHash": "b40a6a21"
+  },
+  "ai.shelf.done": {
+    "message": "{n, plural, =0 {कोई प्रोडक्ट नहीं जुड़ा} one {# प्रोडक्ट आपके स्टॉक में जुड़ गया} other {# प्रोडक्ट आपके स्टॉक में जुड़ गए}}",
+    "review": "reviewed",
+    "enHash": "1d716271"
+  },
+  "ai.shelf.discarded": {
+    "message": "ड्राफ़्ट हटा दिया। कुछ नहीं जुड़ा।",
+    "review": "reviewed",
+    "enHash": "581cb8d0"
+  },
+  "ai.shelf.another": {
+    "message": "दूसरी शेल्फ़ स्कैन करें",
+    "review": "reviewed",
+    "enHash": "3cbbbf0c"
+  },
+  "ai.reply.draft": {
+    "message": "जवाब का ड्राफ़्ट बनाएं",
+    "review": "reviewed",
+    "enHash": "d7d6d9c7"
+  },
+  "ai.reply.note": {
+    "message": "AI ने ड्राफ़्ट किया। जैसे चाहें बदलें; आपके भेजने पर ही जाएगा।",
+    "review": "reviewed",
+    "enHash": "f1f53f11"
+  },
+  "ai.reply.failed": {
+    "message": "इस बार ड्राफ़्ट नहीं बना। अपना जवाब लिखें।",
+    "review": "reviewed",
+    "enHash": "a4f32319"
+  },
+  "ai.banner.suggest": {
+    "message": "शब्द सुझाएं",
+    "review": "reviewed",
+    "enHash": "fa02e971"
+  },
+  "ai.banner.writing": {
+    "message": "विकल्प लिखे जा रहे हैं…",
+    "review": "reviewed",
+    "enHash": "7ce53a62"
+  },
+  "ai.banner.failed": {
+    "message": "इस बार सुझाव नहीं बने। अपने शब्द लिखें।",
+    "review": "reviewed",
+    "enHash": "a307457c"
+  },
+  "ai.banner.options": {
+    "message": "शब्द चुनें",
+    "review": "reviewed",
+    "enHash": "5890d694"
+  },
+  "ai.banner.use": {
+    "message": "यही इस्तेमाल करें",
+    "review": "reviewed",
+    "enHash": "b80ded59"
+  },
+  "ai.banner.none": {
+    "message": "इनमें से कोई नहीं",
+    "review": "reviewed",
+    "enHash": "175ed947"
+  },
+  "ai.error.busy": {
+    "message": "दूसरी फ़ोटो अभी पढ़ी जा रही हैं। एक-दो मिनट में फिर कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "cc92d5e7"
+  },
+  "ai.err.not_permitted": {
+    "message": "आपकी भूमिका यह लाइन नहीं जोड़ सकती। मालिक या मैनेजर से कहें।",
+    "review": "reviewed",
+    "enHash": "6d6a02fa"
+  },
+  "ai.partial": {
+    "message": "{n, plural, =0 {अभी कुछ नहीं जुड़ा।} one {# लाइन जुड़ गई।} other {# लाइनें जुड़ गईं।}} नीचे चिह्नित लाइनें ठीक करें और फिर से पक्का करें।",
+    "review": "reviewed",
+    "enHash": "5c64cef8"
+  },
+  "ai.line.added": {
+    "message": "जुड़ गया",
+    "review": "reviewed",
+    "enHash": "b68734c2"
+  },
+  "ai.line.left": {
+    "message": "छोड़ दिया",
+    "review": "reviewed",
+    "enHash": "e3b33f3c"
+  },
+  "ai.discardRest": {
+    "message": "बाकी हटाएं",
+    "review": "reviewed",
+    "enHash": "7f43c378"
+  }
+}

@@ -106,6 +106,30 @@ func TestStoreCapAndZero(t *testing.T) {
 	assert.Equal(t, 1, calls)
 }
 
+// D-228: background wording has its own per-store budget. Spending it leaves the owner's
+// calls untouched, and the owner's calls never spend it.
+func TestStoreBackgroundBudget(t *testing.T) {
+	e := newEnv(t, Providers{LLM: true})
+	e.set(settings.AiDailyCallsStoreBackground, "1")
+	e.set(settings.AiDailyCallsStore, "1")
+	ctx := context.Background()
+	store := ids.New(morning)
+	bg := Subject{Store: store, Background: true}
+
+	require.NoError(t, e.g.Reserve(ctx, "insight_text", bg))
+	assert.Equal(t, ScopeStoreBackground, capScope(t, e.g.Reserve(ctx, "coach_card", bg)))
+	require.NoError(t, e.g.Reserve(ctx, "supplier_bill", Subject{Store: store}))
+	assert.Equal(t, ScopeStore, capScope(t, e.g.Reserve(ctx, "supplier_bill", Subject{Store: store})))
+
+	count := func(scope string) (n int) {
+		require.NoError(t, e.tdb.OwnerPool.QueryRow(ctx, `SELECT coalesce(sum(calls), 0) FROM ai_usage_daily WHERE scope = $1`, scope).Scan(&n))
+		return n
+	}
+	assert.Equal(t, 1, count(ScopeStoreBackground))
+	assert.Equal(t, 1, count(ScopeStore))
+	assert.Equal(t, 2, count(ScopePlatform), "the platform row counts every call that ran")
+}
+
 // SC-AI-04: the cost cap stops calls at 100% and the warning fires at 80%, once a day.
 func TestCostCap(t *testing.T) {
 	e := newEnv(t, Providers{LLM: true})

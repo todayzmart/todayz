@@ -1,0 +1,35 @@
+{
+  "name": "schema_reject_without_reason",
+  "input": {
+    "image": "images/reject_phone.jpg"
+  },
+  "expect": {
+    "verdict": "unsure",
+    "reasons": [],
+    "reject": "schema"
+  },
+  "reply": {
+    "id": "msg_img_schema",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_img_schema",
+        "name": "check_banner_image",
+        "input": {
+          "verdict": "reject",
+          "reasons": [],
+          "confidence": 0.7
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 900,
+      "output_tokens": 30
+    }
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "name": "handwritten_en_01",
+  "input": {
+    "image": "images/handwritten_en_01.jpg",
+    "kind": "handwritten",
+    "lang": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "Good Knight Refill",
+        "quantity": 5,
+        "costPaise": 7620,
+        "mrpPaise": 8500,
+        "expiresOn": "2027-09-28"
+      },
+      {
+        "name": "Fortune Sunflower Oil 1L",
+        "quantity": 3,
+        "costPaise": 15780,
+        "mrpPaise": 18500,
+        "expiresOn": null
+      },
+      {
+        "name": "Vim Bar 200g",
+        "quantity": 2,
+        "costPaise": 1700,
+        "mrpPaise": 2000,
+        "expiresOn": null
+      },
+      {
+        "name": "Bournvita 500g",
+        "quantity": 10,
+        "costPaise": 21765,
+        "mrpPaise": 24900,
+        "expiresOn": null
+      },
+      {
+        "name": "Brooke Bond Red Label 250g",
+        "quantity": 6,
+        "costPaise": 12630,
+        "mrpPaise": 15500,
+        "expiresOn": null
+      },
+      {
+        "name": "Amul Butter 100g",
+        "quantity": 3,
+        "costPaise": 5600,
+        "mrpPaise": 6200,
+        "expiresOn": null
+      },
+      {
+        "name": "Saffola Gold Oil 1L",
+        "quantity": 12,
+        "costPaise": 16495,
+        "mrpPaise": 21000,
+        "expiresOn": "2027-08-28"
+      },
+      {
+        "name": "Surf Excel 1kg",
+        "quantity": 6,
+        "costPaise": 11405,
+        "mrpPaise": 14500,
+        "expiresOn": "2027-09-28"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_handwritten_en_01",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_handwritten_en_01",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "Ganesh Distributors",
+          "bill_date": "2026-10-10",
+          "lines": [
+            {
+              "name": "Good Knight Refill",
+              "quantity": 5,
+              "cost_rupees": 76.2,
+              "mrp_rupees": 85.0,
+              "expires_on": "2027-09-28",
+              "confidence": 0.73
+            },
+            {
+              "name": "Fortune Sunflower Oil 1L",
+              "quantity": 3,
+              "cost_rupees": 157.8,
+              "mrp_rupees": 185.0,
+              "expires_on": null,
+              "confidence": 0.76
+            },
+            {
+              "name": "Bournvita 500g",
+              "quantity": 10,
+              "cost_rupees": 217.65,
+              "mrp_rupees": 249.0,
+              "expires_on": null,
+              "confidence": 0.64
+            },
+            {
+              "name": "Brooke Bond Red Label 250g",
+              "quantity": 6,
+              "cost_rupees": 126.3,
+              "mrp_rupees": 155.0,
+              "expires_on": null,
+              "confidence": 0.72
+            },
+            {
+              "name": "Amul Butter 100g",
+              "quantity": 3,
+              "cost_rupees": 56.0,
+              "mrp_rupees": 62.0,
+              "expires_on": null,
+              "confidence": 0.77
+            },
+            {
+              "name": "Saffola Gold Oil 1L",
+              "quantity": 12,
+              "cost_rupees": 164.95,
+              "mrp_rupees": 210.0,
+              "expires_on": "2027-08-28",
+              "confidence": 0.69
+            },
+            {
+              "name": "Surf Excel 1kg",
+              "quantity": 6,
+              "cost_rupees": 114.05,
+              "mrp_rupees": 145.0,
+              "expires_on": "2027-09-28",
+              "confidence": 0.83
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

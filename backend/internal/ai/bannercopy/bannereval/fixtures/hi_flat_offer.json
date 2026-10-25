@@ -1,0 +1,66 @@
+{
+  "name": "hi_flat_offer",
+  "input": {
+    "shop": "बालाजी किराना",
+    "language": "hi",
+    "offer": {
+      "kind": "flat",
+      "rupeesOff": "50",
+      "minBillRupees": "500",
+      "wholeShop": true
+    },
+    "items": []
+  },
+  "expect": {
+    "kept": 3,
+    "dropped": 0,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_bc_hi_flat_offer",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bc_hi_flat_offer",
+        "name": "draft_banner_copy",
+        "input": {
+          "options": [
+            {
+              "headline": "₹500 की ख़रीद पर ₹50 की छूट",
+              "subline": "पूरी दुकान पर",
+              "headline_en": "₹50 off on ₹500",
+              "subline_en": "On the whole shop",
+              "tint": "green",
+              "item": null
+            },
+            {
+              "headline": "बचत का मौका",
+              "subline": "₹500 से ऊपर ₹50 कम",
+              "headline_en": "A chance to save",
+              "subline_en": "₹50 less above ₹500",
+              "tint": "sky",
+              "item": null
+            },
+            {
+              "headline": "आज ही ख़रीदें",
+              "subline": "₹50 की छूट",
+              "headline_en": "Shop today",
+              "subline_en": "₹50 off",
+              "tint": "peach",
+              "item": null
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

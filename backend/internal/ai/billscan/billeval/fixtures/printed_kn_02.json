@@ -1,0 +1,97 @@
+{
+  "name": "printed_kn_02",
+  "input": {
+    "image": "images/printed_kn_02.jpg",
+    "kind": "printed",
+    "lang": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "ಫಾರ್ಚೂನ್ ಎಣ್ಣೆ 1L",
+        "quantity": 24,
+        "costPaise": 16700,
+        "mrpPaise": 18500,
+        "expiresOn": "2027-12-28"
+      },
+      {
+        "name": "ವಿಮ್ ಬಾರ್ 200g",
+        "quantity": 2,
+        "costPaise": 1650,
+        "mrpPaise": 2000,
+        "expiresOn": "2027-10-15"
+      },
+      {
+        "name": "ಸರ್ಫ್ ಎಕ್ಸೆಲ್ 1kg",
+        "quantity": 12,
+        "costPaise": 12560,
+        "mrpPaise": 14500,
+        "expiresOn": null
+      },
+      {
+        "name": "ಡೆಟಾಲ್ ಸೋಪು 125g",
+        "quantity": 12,
+        "costPaise": 4355,
+        "mrpPaise": 5500,
+        "expiresOn": null
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_kn_02",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_kn_02",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "ಶ್ರೀ ಲಕ್ಷ್ಮಿ ಏಜೆನ್ಸೀಸ್",
+          "bill_date": "2026-10-12",
+          "lines": [
+            {
+              "name": "ಫಾರ್ಚೂನ್ ಎಣ್ಣೆ 1L",
+              "quantity": 24,
+              "cost_rupees": 167.0,
+              "mrp_rupees": 185.0,
+              "expires_on": "2027-12-28",
+              "confidence": 0.97
+            },
+            {
+              "name": "ವಿಮ್ ಬಾರ್ 200g",
+              "quantity": 2,
+              "cost_rupees": 16.5,
+              "mrp_rupees": 20.0,
+              "expires_on": "2027-10-15",
+              "confidence": 0.93
+            },
+            {
+              "name": "ಸರ್ಫ್ ಎಕ್ಸೆಲ್ 1kg",
+              "quantity": 12,
+              "cost_rupees": 125.6,
+              "mrp_rupees": 145.0,
+              "expires_on": null,
+              "confidence": 0.99
+            },
+            {
+              "name": "ಡೆಟಾಲ್ ಸೋಪು 125g",
+              "quantity": 12,
+              "cost_rupees": 43.55,
+              "mrp_rupees": 55.0,
+              "expires_on": null,
+              "confidence": 0.88
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

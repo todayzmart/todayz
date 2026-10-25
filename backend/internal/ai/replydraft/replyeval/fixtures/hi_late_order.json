@@ -1,0 +1,38 @@
+{
+  "name": "hi_late_order",
+  "input": {
+    "stars": 2,
+    "tags": [
+      "late"
+    ],
+    "text": "ऑर्डर 40 मिनट देर से तैयार हुआ।",
+    "language": "hi",
+    "shop": "Sri Lakshmi Stores"
+  },
+  "expect": {
+    "text": "आपको 40 मिनट इंतज़ार करना पड़ा, इसके लिए माफ़ी चाहते हैं। अगली बार हम आपका ऑर्डर समय पर तैयार रखेंगे।",
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_rr_hi_late_order",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rr_hi_late_order",
+        "name": "draft_review_reply",
+        "input": {
+          "text": "आपको 40 मिनट इंतज़ार करना पड़ा, इसके लिए माफ़ी चाहते हैं। अगली बार हम आपका ऑर्डर समय पर तैयार रखेंगे।"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

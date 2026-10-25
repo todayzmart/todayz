@@ -1,0 +1,58 @@
+{
+  "name": "grounding_all_invented",
+  "input": {
+    "shop": "Om Sai Kirana",
+    "language": "en",
+    "items": [
+      {
+        "n": 1,
+        "name": "Tata Salt 1kg",
+        "priceRupees": "28"
+      }
+    ]
+  },
+  "expect": {
+    "kept": 0,
+    "dropped": 2,
+    "reject": "grounding"
+  },
+  "reply": {
+    "id": "msg_bc_grounding_all_invented",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bc_grounding_all_invented",
+        "name": "draft_banner_copy",
+        "input": {
+          "options": [
+            {
+              "headline": "Tata Salt 1kg at ₹25",
+              "subline": "Save ₹3",
+              "headline_en": "Tata Salt 1kg at ₹25",
+              "subline_en": "Save ₹3",
+              "tint": "amber",
+              "item": 1
+            },
+            {
+              "headline": "Call 98450 12345",
+              "subline": "Home delivery",
+              "headline_en": "Call 98450 12345",
+              "subline_en": "Home delivery",
+              "tint": "sky",
+              "item": null
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

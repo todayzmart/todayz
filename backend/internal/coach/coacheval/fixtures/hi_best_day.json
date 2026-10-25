@@ -1,0 +1,44 @@
+{
+  "name": "hi_best_day",
+  "input": {
+    "detector": "best_day_record",
+    "lang": "hi",
+    "kind": "high",
+    "title": "6 हफ़्तों में सबसे अच्छा रविवार",
+    "body": "बिक्री ₹18,240 रही, आम रविवार से 55% ज़्यादा।",
+    "numbers": {
+      "weekday": "Sunday",
+      "weeks": 6,
+      "sales": "₹18,240",
+      "pct": 55,
+      "leaders": "Maggi · Amul milk"
+    }
+  },
+  "expect": {
+    "title": "6 हफ़्तों का सबसे अच्छा रविवार",
+    "body": "आज ₹18,240 की बिक्री हुई, आम रविवार से 55% ज़्यादा। Maggi और Amul milk सबसे आगे रहे।"
+  },
+  "reply": {
+    "id": "msg_coach",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_coach",
+        "name": "write_coach_card",
+        "input": {
+          "title": "6 हफ़्तों का सबसे अच्छा रविवार",
+          "body": "आज ₹18,240 की बिक्री हुई, आम रविवार से 55% ज़्यादा। Maggi और Amul milk सबसे आगे रहे।"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 90
+    }
+  }
+}

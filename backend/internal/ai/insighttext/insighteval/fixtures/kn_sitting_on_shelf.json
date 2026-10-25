@@ -1,0 +1,50 @@
+{
+  "name": "kn_sitting_on_shelf",
+  "input": {
+    "lang": "kn",
+    "rows": [
+      {
+        "ref": "r1",
+        "kind": "sitting_on_shelf",
+        "facts": {
+          "itemName": "ಡೆಟಾಲ್ ಸೋಪು 125g",
+          "daysWithoutSale": 21,
+          "units": 9
+        }
+      }
+    ]
+  },
+  "expect": {
+    "texts": {
+      "r1": "ಡೆಟಾಲ್ ಸೋಪು 125g 21 ದಿನಗಳಿಂದ ಮಾರಾಟವಾಗಿಲ್ಲ, 9 ಇವೆ; ಆಫರ್ ಅಥವಾ ಉತ್ತಮ ಜಾಗ ಪ್ರಯತ್ನಿಸಿ."
+    },
+    "dropped": 0
+  },
+  "reply": {
+    "id": "msg_it_kn_sitting_on_shelf",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_it_kn_sitting_on_shelf",
+        "name": "write_insight_texts",
+        "input": {
+          "texts": [
+            {
+              "ref": "r1",
+              "text": "ಡೆಟಾಲ್ ಸೋಪು 125g 21 ದಿನಗಳಿಂದ ಮಾರಾಟವಾಗಿಲ್ಲ, 9 ಇವೆ; ಆಫರ್ ಅಥವಾ ಉತ್ತಮ ಜಾಗ ಪ್ರಯತ್ನಿಸಿ."
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

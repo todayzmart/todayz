@@ -1,0 +1,187 @@
+{
+  "coach.title": {
+    "message": "షాప్ కోచ్",
+    "review": "reviewed",
+    "enHash": "33c8c0a8"
+  },
+  "coach.desc": {
+    "message": "మీ షాప్ అమ్మకాలు, స్టాక్, ఆర్డర్లు, రివ్యూల నుంచి సూచనలు",
+    "review": "reviewed",
+    "enHash": "35c78622"
+  },
+  "coach.foot": {
+    "message": "అయింది, ఉపయోగం లేదు నొక్కడం ద్వారా మీకు ఏది సహాయపడుతుందో కోచ్ నేర్చుకుంటుంది",
+    "review": "reviewed",
+    "enHash": "82dd9ef1"
+  },
+  "coach.all": {
+    "message": "అన్ని సూచనలు",
+    "review": "reviewed",
+    "enHash": "033ca611"
+  },
+  "coach.kind.high": {
+    "message": "మంచి వార్త",
+    "review": "reviewed",
+    "enHash": "b1a5954a"
+  },
+  "coach.kind.low": {
+    "message": "గమనించండి",
+    "review": "reviewed",
+    "enHash": "a124947c"
+  },
+  "coach.kind.action": {
+    "message": "ఇది చేయండి",
+    "review": "reviewed",
+    "enHash": "abd606c2"
+  },
+  "coach.kind.tip": {
+    "message": "సూచన",
+    "review": "reviewed",
+    "enHash": "d19ceca5"
+  },
+  "coach.action.reply_reviews": {
+    "message": "రివ్యూలకు జవాబు ఇవ్వండి",
+    "review": "reviewed",
+    "enHash": "7deef731"
+  },
+  "coach.action.turn_on_auto_accept": {
+    "message": "ఆటో-అంగీకారం ఆన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "d3830c7c"
+  },
+  "coach.action.update_stock": {
+    "message": "స్టాక్ అప్‌డేట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "1d3a00ca"
+  },
+  "coach.action.enable_delivery": {
+    "message": "డెలివరీ ఆన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "17a56f4b"
+  },
+  "coach.action.none": {
+    "message": "తెరవండి",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "coach.done": {
+    "message": "అయింది",
+    "review": "reviewed",
+    "enHash": "e9b450d1"
+  },
+  "coach.notUseful": {
+    "message": "ఉపయోగం లేదు",
+    "review": "reviewed",
+    "enHash": "33d21a37"
+  },
+  "coach.doneToast": {
+    "message": "అయింది అని గుర్తించాం",
+    "review": "reviewed",
+    "enHash": "43216298"
+  },
+  "coach.hiddenUntil": {
+    "message": "{date} వరకు దాచబడింది",
+    "review": "reviewed",
+    "enHash": "41cd334f"
+  },
+  "coach.hidden": {
+    "message": "దాచబడింది",
+    "review": "reviewed",
+    "enHash": "d4c2792a"
+  },
+  "coach.error.changed": {
+    "message": "ఈ సూచన మారింది. జాబితా ఇప్పుడు అప్‌డేట్ అయింది.",
+    "review": "reviewed",
+    "enHash": "da073162"
+  },
+  "coach.error.generic": {
+    "message": "సేవ్ చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "848e72d4"
+  },
+  "coach.error.load": {
+    "message": "కోచ్ లోడ్ కాలేదు",
+    "review": "reviewed",
+    "enHash": "644e4638"
+  },
+  "coach.retry": {
+    "message": "మళ్లీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "coach.loading": {
+    "message": "సూచనలు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "6f06eea1"
+  },
+  "coach.aiWording": {
+    "message": "మీ షాప్ సంఖ్యల నుంచి AI రాసింది",
+    "review": "reviewed",
+    "enHash": "b03a713b"
+  },
+  "coach.status.new": {
+    "message": "కొత్తది",
+    "review": "reviewed",
+    "enHash": "6403f2b7"
+  },
+  "coach.status.seen": {
+    "message": "చూశారు",
+    "review": "reviewed",
+    "enHash": "56564dcb"
+  },
+  "coach.status.done": {
+    "message": "{date} న అయింది",
+    "review": "reviewed",
+    "enHash": "0d22a262"
+  },
+  "coach.status.dismissed": {
+    "message": "{date} న ఉపయోగం లేదు అని గుర్తించారు",
+    "review": "reviewed",
+    "enHash": "30b18cc8"
+  },
+  "coach.status.expired": {
+    "message": "{date} న ముగిసింది",
+    "review": "reviewed",
+    "enHash": "3a6ae6bd"
+  },
+  "coach.tabs": {
+    "message": "కోచ్ కార్డులు",
+    "review": "reviewed",
+    "enHash": "9bc76ddd"
+  },
+  "coach.tab.live": {
+    "message": "మీ కోసం",
+    "review": "reviewed",
+    "enHash": "7e13d94a"
+  },
+  "coach.tab.done": {
+    "message": "అయింది",
+    "review": "reviewed",
+    "enHash": "e9b450d1"
+  },
+  "coach.tab.dismissed": {
+    "message": "ఉపయోగం లేదు",
+    "review": "reviewed",
+    "enHash": "33d21a37"
+  },
+  "coach.empty.live": {
+    "message": "ప్రస్తుతం కోచ్ నుంచి ఏమీ లేదు",
+    "review": "reviewed",
+    "enHash": "e3d22a87"
+  },
+  "coach.empty.done": {
+    "message": "ఇంకా ఏదీ అయింది అని గుర్తించలేదు",
+    "review": "reviewed",
+    "enHash": "93f38022"
+  },
+  "coach.empty.dismissed": {
+    "message": "ఏదీ ఉపయోగం లేదు అని గుర్తించలేదు",
+    "review": "reviewed",
+    "enHash": "c301e918"
+  },
+  "coach.more": {
+    "message": "మరిన్ని లోడ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  }
+}

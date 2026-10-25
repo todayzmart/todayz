@@ -1,0 +1,61 @@
+{
+  "name": "shelf_40",
+  "input": {
+    "image": "images/shelf_40.jpg"
+  },
+  "expect": {
+    "products": [
+      "Lux Soap 100g",
+      "Horlicks 500g",
+      "Tata Salt 1kg",
+      "Real Mango Juice 1L"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_40",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_40",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Soap",
+              "brand": "Lux",
+              "size": "100g",
+              "confidence": 0.84
+            },
+            {
+              "name": "Horlicks",
+              "brand": "Horlicks",
+              "size": "500g",
+              "confidence": 0.9
+            },
+            {
+              "name": "Salt",
+              "brand": "Tata",
+              "size": "1kg",
+              "confidence": 0.92
+            },
+            {
+              "name": "Mango Juice",
+              "brand": "Real",
+              "size": "1L",
+              "confidence": 0.77
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

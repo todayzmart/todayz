@@ -1,0 +1,38 @@
+{
+  "name": "reject_competitor",
+  "input": {
+    "image": "images/reject_competitor.jpg"
+  },
+  "expect": {
+    "verdict": "reject",
+    "reasons": [
+      "competitor_brand"
+    ]
+  },
+  "reply": {
+    "id": "msg_img_reject_competitor",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_img_reject_competitor",
+        "name": "check_banner_image",
+        "input": {
+          "verdict": "reject",
+          "reasons": [
+            "competitor_brand"
+          ],
+          "confidence": 0.9
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 900,
+      "output_tokens": 40
+    }
+  }
+}

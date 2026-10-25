@@ -1,0 +1,56 @@
+{
+  "name": "schema_bad_tint",
+  "input": {
+    "shop": "Sri Lakshmi Stores",
+    "language": "en",
+    "offer": {
+      "kind": "percent",
+      "percentOff": 10,
+      "wholeShop": true,
+      "endsOn": "31 Oct"
+    },
+    "items": [
+      {
+        "n": 1,
+        "name": "Haldiram Bhujia 200g",
+        "priceRupees": "55"
+      }
+    ]
+  },
+  "expect": {
+    "kept": 0,
+    "dropped": 0,
+    "reject": "schema"
+  },
+  "reply": {
+    "id": "msg_bc_tint",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bc_tint",
+        "name": "draft_banner_copy",
+        "input": {
+          "options": [
+            {
+              "headline": "Big sale",
+              "subline": "",
+              "headline_en": "Big sale",
+              "subline_en": "",
+              "tint": "neon",
+              "item": null
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

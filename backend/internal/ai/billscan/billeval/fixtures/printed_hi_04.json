@@ -1,0 +1,97 @@
+{
+  "name": "printed_hi_04",
+  "input": {
+    "image": "images/printed_hi_04.jpg",
+    "kind": "printed",
+    "lang": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "क्लिनिक प्लस 175ml",
+        "quantity": 5,
+        "costPaise": 11965,
+        "mrpPaise": 13500,
+        "expiresOn": "2027-05-15"
+      },
+      {
+        "name": "कोलगेट 200g",
+        "quantity": 5,
+        "costPaise": 9490,
+        "mrpPaise": 12000,
+        "expiresOn": "2027-07-15"
+      },
+      {
+        "name": "रेड लेबल चाय 250g",
+        "quantity": 12,
+        "costPaise": 12955,
+        "mrpPaise": 15500,
+        "expiresOn": null
+      },
+      {
+        "name": "नेस्कैफे 50g",
+        "quantity": 12,
+        "costPaise": 15285,
+        "mrpPaise": 19000,
+        "expiresOn": null
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_hi_04",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_hi_04",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "शिव एंटरप्राइज़",
+          "bill_date": "2026-10-23",
+          "lines": [
+            {
+              "name": "क्लिनिक प्लस 175ml",
+              "quantity": 5,
+              "cost_rupees": 119.65,
+              "mrp_rupees": 135.0,
+              "expires_on": "2027-05-15",
+              "confidence": 0.86
+            },
+            {
+              "name": "कोलगेट 200g",
+              "quantity": 5,
+              "cost_rupees": 94.9,
+              "mrp_rupees": 120.0,
+              "expires_on": "2027-07-15",
+              "confidence": 0.93
+            },
+            {
+              "name": "रेड लेबल चाय 250g",
+              "quantity": 12,
+              "cost_rupees": 129.55,
+              "mrp_rupees": 155.0,
+              "expires_on": null,
+              "confidence": 0.92
+            },
+            {
+              "name": "नेस्कैफे 50g",
+              "quantity": 12,
+              "cost_rupees": 152.85,
+              "mrp_rupees": 190.0,
+              "expires_on": null,
+              "confidence": 0.89
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

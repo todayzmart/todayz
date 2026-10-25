@@ -1,0 +1,71 @@
+{
+  "name": "shelf_10",
+  "input": {
+    "image": "images/shelf_10.jpg"
+  },
+  "expect": {
+    "products": [
+      "Nescafe Classic 50g",
+      "Maggi Noodles 70g",
+      "Amul Butter 100g",
+      "Colgate Strong Teeth 200g",
+      "Saffola Gold Oil 1L",
+      "MDH Chana Masala 100g",
+      "Aashirvaad Atta 5kg",
+      "Good Knight Refill"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_10",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_10",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Classic",
+              "brand": "Nescafe",
+              "size": "50g",
+              "confidence": 0.69
+            },
+            {
+              "name": "Butter",
+              "brand": "Amul",
+              "size": "100g",
+              "confidence": 0.68
+            },
+            {
+              "name": "Gold Oil",
+              "brand": "Saffola",
+              "size": "1L",
+              "confidence": 0.88
+            },
+            {
+              "name": "Atta",
+              "brand": "Aashirvaad",
+              "size": "5kg",
+              "confidence": 0.62
+            },
+            {
+              "name": "Knight Refill",
+              "brand": "Good",
+              "size": null,
+              "confidence": 0.75
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

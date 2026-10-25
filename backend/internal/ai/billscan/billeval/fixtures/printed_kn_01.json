@@ -1,0 +1,127 @@
+{
+  "name": "printed_kn_01",
+  "input": {
+    "image": "images/printed_kn_01.jpg",
+    "kind": "printed",
+    "lang": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "ಲಕ್ಸ್ ಸೋಪು 100g",
+        "quantity": 5,
+        "costPaise": 3460,
+        "mrpPaise": 3800,
+        "expiresOn": "2027-10-28"
+      },
+      {
+        "name": "ಕೋಲ್ಗೇಟ್ 200g",
+        "quantity": 3,
+        "costPaise": 10175,
+        "mrpPaise": 12000,
+        "expiresOn": "2027-09-28"
+      },
+      {
+        "name": "ಡೆಟಾಲ್ ಸೋಪು 125g",
+        "quantity": 24,
+        "costPaise": 4425,
+        "mrpPaise": 5500,
+        "expiresOn": "2027-02-28"
+      },
+      {
+        "name": "ರೆಡ್ ಲೇಬಲ್ ಟೀ 250g",
+        "quantity": 4,
+        "costPaise": 12295,
+        "mrpPaise": 15500,
+        "expiresOn": null
+      },
+      {
+        "name": "ಮ್ಯಾಗಿ ನೂಡಲ್ಸ್ 70g",
+        "quantity": 3,
+        "costPaise": 1170,
+        "mrpPaise": 1400,
+        "expiresOn": "2027-05-28"
+      },
+      {
+        "name": "ಕುರ್ಕುರೆ 90g",
+        "quantity": 4,
+        "costPaise": 1820,
+        "mrpPaise": 2000,
+        "expiresOn": null
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_kn_01",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_kn_01",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "ಬಾಲಾಜಿ ಟ್ರೇಡರ್ಸ್",
+          "bill_date": "2026-10-08",
+          "lines": [
+            {
+              "name": "ಲಕ್ಸ್ ಸೋಪು 100g",
+              "quantity": 5,
+              "cost_rupees": 34.6,
+              "mrp_rupees": 38.0,
+              "expires_on": "2027-10-28",
+              "confidence": 0.92
+            },
+            {
+              "name": "ಕೋಲ್ಗೇಟ್ 200g",
+              "quantity": 3,
+              "cost_rupees": 101.75,
+              "mrp_rupees": 120.0,
+              "expires_on": "2027-09-28",
+              "confidence": 0.83
+            },
+            {
+              "name": "ಡೆಟಾಲ್ ಸೋಪು 125g",
+              "quantity": 24,
+              "cost_rupees": 44.25,
+              "mrp_rupees": 55.0,
+              "expires_on": "2027-02-28",
+              "confidence": 0.93
+            },
+            {
+              "name": "ರೆಡ್ ಲೇಬಲ್ ಟೀ 250g",
+              "quantity": 4,
+              "cost_rupees": 122.95,
+              "mrp_rupees": 155.0,
+              "expires_on": null,
+              "confidence": 0.98
+            },
+            {
+              "name": "ಮ್ಯಾಗಿ ನೂಡಲ್ಸ್ 70g",
+              "quantity": 3,
+              "cost_rupees": 11.7,
+              "mrp_rupees": 14.0,
+              "expires_on": "2027-05-28",
+              "confidence": 0.88
+            },
+            {
+              "name": "ಕುರ್ಕುರೆ 90g",
+              "quantity": 4,
+              "cost_rupees": 18.2,
+              "mrp_rupees": 20.0,
+              "expires_on": null,
+              "confidence": 0.88
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

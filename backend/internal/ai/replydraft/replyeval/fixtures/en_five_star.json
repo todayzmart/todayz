@@ -1,0 +1,39 @@
+{
+  "name": "en_five_star",
+  "input": {
+    "stars": 5,
+    "tags": [
+      "fresh",
+      "quick_pickup"
+    ],
+    "text": "Fresh vegetables and my order was ready in 10 minutes.",
+    "language": "en",
+    "shop": "Sri Lakshmi Stores"
+  },
+  "expect": {
+    "text": "Thank you for the kind words. We are glad your order was ready in 10 minutes and hope to see you again soon.",
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_rr_en_five_star",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rr_en_five_star",
+        "name": "draft_review_reply",
+        "input": {
+          "text": "Thank you for the kind words. We are glad your order was ready in 10 minutes and hope to see you again soon."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

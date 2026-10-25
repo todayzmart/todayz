@@ -1,0 +1,36 @@
+{
+  "name": "schema_empty_text",
+  "input": {
+    "stars": 5,
+    "tags": [],
+    "text": null,
+    "language": "en",
+    "shop": "Sri Lakshmi Stores"
+  },
+  "expect": {
+    "text": "",
+    "reject": "schema"
+  },
+  "reply": {
+    "id": "msg_rr_empty",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rr_empty",
+        "name": "draft_review_reply",
+        "input": {
+          "text": "  "
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 700,
+      "output_tokens": 120
+    }
+  }
+}

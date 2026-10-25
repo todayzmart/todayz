@@ -1,0 +1,62 @@
+{
+  "name": "shelf_11",
+  "input": {
+    "image": "images/shelf_11.jpg"
+  },
+  "expect": {
+    "products": [
+      "Aashirvaad Atta 5kg",
+      "Clinic Plus Shampoo 175ml",
+      "Good Knight Refill",
+      "MDH Chana Masala 100g",
+      "Fortune Sunflower Oil 1L"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_11",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_11",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Atta",
+              "brand": "Aashirvaad",
+              "size": "5kg",
+              "confidence": 0.71
+            },
+            {
+              "name": "Knight Refill",
+              "brand": "Good",
+              "size": null,
+              "confidence": 0.86
+            },
+            {
+              "name": "Chana Masala",
+              "brand": "MDH",
+              "size": "100g",
+              "confidence": 0.73
+            },
+            {
+              "name": "Sunflower Oil",
+              "brand": "Fortune",
+              "size": "1L",
+              "confidence": 0.91
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

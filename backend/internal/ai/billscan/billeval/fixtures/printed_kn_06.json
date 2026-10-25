@@ -1,0 +1,97 @@
+{
+  "name": "printed_kn_06",
+  "input": {
+    "image": "images/printed_kn_06.jpg",
+    "kind": "printed",
+    "lang": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "ಬೋರ್ನ್‌ವಿಟಾ 500g",
+        "quantity": 12,
+        "costPaise": 22170,
+        "mrpPaise": 24900,
+        "expiresOn": null
+      },
+      {
+        "name": "ಎಂಡಿಎಚ್ ಚನಾ ಮಸಾಲ 100g",
+        "quantity": 3,
+        "costPaise": 6430,
+        "mrpPaise": 8200,
+        "expiresOn": "2027-05-15"
+      },
+      {
+        "name": "ರಿಯಲ್ ಮಾವು ಜ್ಯೂಸ್ 1L",
+        "quantity": 24,
+        "costPaise": 10135,
+        "mrpPaise": 12000,
+        "expiresOn": null
+      },
+      {
+        "name": "ಗುಡ್ ಡೇ 100g",
+        "quantity": 2,
+        "costPaise": 2725,
+        "mrpPaise": 3000,
+        "expiresOn": "2027-06-28"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_kn_06",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_kn_06",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "ಗಣೇಶ್ ಡಿಸ್ಟ್ರಿಬ್ಯೂಟರ್ಸ್",
+          "bill_date": "2026-10-22",
+          "lines": [
+            {
+              "name": "ಬೋರ್ನ್‌ವಿಟಾ 500g",
+              "quantity": 12,
+              "cost_rupees": 221.2,
+              "mrp_rupees": 249.0,
+              "expires_on": null,
+              "confidence": 0.87
+            },
+            {
+              "name": "ಎಂಡಿಎಚ್ ಚನಾ ಮಸಾಲ 100g",
+              "quantity": 3,
+              "cost_rupees": 64.3,
+              "mrp_rupees": 82.0,
+              "expires_on": "2027-05-15",
+              "confidence": 0.9
+            },
+            {
+              "name": "ರಿಯಲ್ ಮಾವು ಜ್ಯೂಸ್ 1L",
+              "quantity": 24,
+              "cost_rupees": 101.35,
+              "mrp_rupees": 120.0,
+              "expires_on": null,
+              "confidence": 0.83
+            },
+            {
+              "name": "ಗುಡ್ ಡೇ 100g",
+              "quantity": 2,
+              "cost_rupees": 27.25,
+              "mrp_rupees": 30.0,
+              "expires_on": "2027-06-28",
+              "confidence": 0.94
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

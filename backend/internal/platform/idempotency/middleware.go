@@ -4,10 +4,14 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"encoding/binary"
 	"errors"
 	"io"
 	"log/slog"
+	"mime"
+	"mime/multipart"
 	"net/http"
+	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -192,14 +196,70 @@ func principal(ctx context.Context) string {
 	return "ip:" + reqctx.ClientIP(ctx)
 }
 
-// requestHash covers the raw query string and the raw body bytes: "the same
-// request" is the same bytes (see the package doc).
+// requestHash covers the raw query string and the body: the raw bytes, or a
+// multipart/form-data body's canonical form (see the package doc).
 func requestHash(r *http.Request, body []byte) []byte {
 	h := sha256.New()
 	h.Write([]byte(r.URL.RawQuery))
 	h.Write([]byte{0})
+	if c, ok := canonicalMultipart(r.Header.Get("Content-Type"), body); ok {
+		h.Write([]byte("multipart\x00"))
+		h.Write(c)
+		return h.Sum(nil)
+	}
 	h.Write(body)
 	return h.Sum(nil)
+}
+
+// maxHashedParts bounds the parts a multipart body is canonicalised over; a
+// body with more is hashed as raw bytes.
+const maxHashedParts = 64
+
+// canonicalMultipart is a multipart/form-data body without its boundary: the
+// parts sorted by field name (stable, so repeated fields keep their order),
+// each as its name, file name, Content-Type and bytes, length-prefixed. A
+// browser picks a new boundary on every fetch, so a retry that rebuilds the
+// same FormData is the same request. false: not multipart, or a body that
+// does not parse (then the raw bytes are hashed). The body is already read
+// under the body limit, so this reads nothing new.
+func canonicalMultipart(contentType string, body []byte) ([]byte, bool) {
+	mt, params, err := mime.ParseMediaType(contentType)
+	if err != nil || mt != "multipart/form-data" || params["boundary"] == "" {
+		return nil, false
+	}
+	type part struct {
+		name, file, ctype string
+		data              []byte
+	}
+	var parts []part
+	mr := multipart.NewReader(bytes.NewReader(body), params["boundary"])
+	for {
+		p, err := mr.NextRawPart()
+		if err == io.EOF { //nolint:errorlint // only the bare EOF of a closing boundary; a wrapped one is a truncated body
+			break
+		}
+		if err != nil || len(parts) == maxHashedParts {
+			return nil, false
+		}
+		data, err := io.ReadAll(p)
+		if err != nil {
+			return nil, false
+		}
+		parts = append(parts, part{p.FormName(), p.FileName(), p.Header.Get("Content-Type"), data})
+	}
+	sort.SliceStable(parts, func(i, j int) bool { return parts[i].name < parts[j].name })
+	var out []byte
+	field := func(b []byte) {
+		out = binary.BigEndian.AppendUint64(out, uint64(len(b)))
+		out = append(out, b...)
+	}
+	for _, p := range parts {
+		field([]byte(p.name))
+		field([]byte(p.file))
+		field([]byte(p.ctype))
+		field(p.data)
+	}
+	return out, true
 }
 
 func replay(w http.ResponseWriter, resp *Response) {

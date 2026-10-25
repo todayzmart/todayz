@@ -1,0 +1,61 @@
+{
+  "name": "shelf_14",
+  "input": {
+    "image": "images/shelf_14.jpg"
+  },
+  "expect": {
+    "products": [
+      "Britannia Good Day 100g",
+      "Lux Soap 100g",
+      "Maggi Noodles 70g",
+      "Bournvita 500g"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_14",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_14",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Good Day",
+              "brand": "Britannia",
+              "size": "100g",
+              "confidence": 0.95
+            },
+            {
+              "name": "Soap",
+              "brand": "Lux",
+              "size": "100g",
+              "confidence": 0.75
+            },
+            {
+              "name": "Noodles",
+              "brand": "Maggi",
+              "size": "70g",
+              "confidence": 0.65
+            },
+            {
+              "name": "Bournvita",
+              "brand": "Bournvita",
+              "size": "500g",
+              "confidence": 0.73
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

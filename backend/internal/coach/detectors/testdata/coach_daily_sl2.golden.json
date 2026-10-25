@@ -1,0 +1,242 @@
+[
+  {
+    "detector": "expired_on_shelf",
+    "subject": "01KDHKGTA0BVPG00000000000W",
+    "kind": "low",
+    "topic": "stock",
+    "severity": 3,
+    "stake": 54000,
+    "ageDays": 0,
+    "numbers": {
+      "daysAgo": 1,
+      "item": "Paneer 200 g",
+      "qty": 6
+    },
+    "action": "mark_expired",
+    "payload": {
+      "batchIds": [
+        "01KDHKGTA0BVPG00000000000W"
+      ],
+      "batches": [
+        {
+          "batchId": "01KDHKGTA0BVPG00000000000W",
+          "qty": 6
+        }
+      ],
+      "storeItemId": "01KE0S1W6W8ZV7T1C3A6MQ006E"
+    }
+  },
+  {
+    "detector": "expiring_batch_value",
+    "subject": "01KE66PJA0BVPG00000000000M",
+    "kind": "action",
+    "topic": "stock",
+    "severity": 3,
+    "stake": 168000,
+    "ageDays": 0,
+    "variant": "many",
+    "numbers": {
+      "count": 4,
+      "item": "Curd 200 g",
+      "withinDays": 5
+    },
+    "action": "flash_offer",
+    "payload": {
+      "batchIds": [
+        "01KE66PJA0BVPG00000000000M",
+        "01KE66PJA0BVPG00000000000P",
+        "01KE66PJA0BVPG00000000000R",
+        "01KE66PJA0BVPG00000000000T"
+      ]
+    }
+  },
+  {
+    "detector": "missed_sales",
+    "subject": "01KE0S1W6W8ZV7T1C3A6MQ006K",
+    "kind": "low",
+    "topic": "demand",
+    "severity": 2,
+    "stake": 18,
+    "ageDays": 0,
+    "numbers": {
+      "item": "Idli rice 1 kg",
+      "searches": 18,
+      "zeroDays": 2
+    },
+    "action": "restock",
+    "payload": {
+      "qty": 4,
+      "storeItemId": "01KE0S1W6W8ZV7T1C3A6MQ006K"
+    },
+    "aboutOthers": true,
+    "others": 18
+  },
+  {
+    "detector": "selling_below_cost",
+    "subject": "01KE0S1W6W8ZV7T1C3A6MQ006F",
+    "kind": "low",
+    "topic": "sales",
+    "severity": 3,
+    "stake": 12000,
+    "ageDays": 0,
+    "numbers": {
+      "cost": "₹146",
+      "item": "Sunflower oil 1 L 1 l",
+      "price": "₹140"
+    },
+    "action": "edit_price",
+    "payload": {
+      "refPaise": 14600,
+      "storeItemId": "01KE0S1W6W8ZV7T1C3A6MQ006F"
+    }
+  },
+  {
+    "detector": "selling_below_cost",
+    "subject": "01KE0S1W6W8ZV7T1C3A6MQ006Y",
+    "kind": "low",
+    "topic": "sales",
+    "severity": 3,
+    "stake": 21600,
+    "ageDays": 0,
+    "variant": "check_cost",
+    "numbers": {
+      "cost": "₹240",
+      "item": "Salt 1 kg",
+      "price": "₹24"
+    },
+    "action": "check_cost",
+    "payload": {
+      "batchId": "01KE66PJA0BVPG00000000001K",
+      "storeItemId": "01KE0S1W6W8ZV7T1C3A6MQ006Y"
+    }
+  },
+  {
+    "detector": "slow_mover_21d",
+    "subject": "01KE0S1W6W8ZV7T1C3A6MQ006G",
+    "kind": "action",
+    "topic": "offers",
+    "severity": 1,
+    "stake": 48000,
+    "ageDays": 0,
+    "variant": "pct",
+    "numbers": {
+      "days": 23,
+      "item": "Mango pickle 500 g",
+      "onHand": 12,
+      "pct": 10
+    },
+    "action": "create_offer",
+    "payload": {
+      "pct": 10,
+      "storeItemId": "01KE0S1W6W8ZV7T1C3A6MQ006G"
+    }
+  },
+  {
+    "detector": "slow_mover_21d",
+    "subject": "01KE0S1W6W8ZV7T1C3A6MQ006H",
+    "kind": "action",
+    "topic": "offers",
+    "severity": 1,
+    "stake": 15000,
+    "ageDays": 0,
+    "variant": "pct",
+    "numbers": {
+      "days": 40,
+      "item": "Agarbatti pack 1 pack",
+      "onHand": 5,
+      "pct": 10
+    },
+    "action": "create_offer",
+    "payload": {
+      "pct": 10,
+      "storeItemId": "01KE0S1W6W8ZV7T1C3A6MQ006H"
+    }
+  },
+  {
+    "detector": "stale_stock_share",
+    "subject": "store",
+    "kind": "action",
+    "topic": "stock",
+    "severity": 2,
+    "stake": 6,
+    "ageDays": 0,
+    "numbers": {
+      "count": 6,
+      "days": 3
+    },
+    "action": "count_stock",
+    "payload": {
+      "storeItemIds": [
+        "01KE0S1W6W8ZV7T1C3A6MQ006M",
+        "01KE0S1W6W8ZV7T1C3A6MQ006N",
+        "01KE0S1W6W8ZV7T1C3A6MQ006P",
+        "01KE0S1W6W8ZV7T1C3A6MQ006Q",
+        "01KE0S1W6W8ZV7T1C3A6MQ006R",
+        "01KE0S1W6W8ZV7T1C3A6MQ006S"
+      ]
+    }
+  },
+  {
+    "detector": "top_seller_low_days_of_cover",
+    "subject": "01KE0S1W6W8ZV7T1C3A6MQ0069",
+    "kind": "action",
+    "topic": "stock",
+    "severity": 3,
+    "stake": 64,
+    "ageDays": 0,
+    "numbers": {
+      "days": 1.3,
+      "item": "Tata Tea Gold 250 g",
+      "periodDays": 7,
+      "qty": 52,
+      "sold": 64
+    },
+    "action": "restock",
+    "payload": {
+      "qty": 52,
+      "storeItemId": "01KE0S1W6W8ZV7T1C3A6MQ0069"
+    }
+  },
+  {
+    "detector": "wanted_nearby",
+    "subject": "01KE0S1W6W8ZV7T1C3A6MP0014",
+    "kind": "tip",
+    "topic": "demand",
+    "severity": 1,
+    "stake": 11,
+    "ageDays": 0,
+    "numbers": {
+      "item": "Boost 500 g",
+      "km": "2 km",
+      "periodDays": 7,
+      "searches": 11
+    },
+    "action": "add_product",
+    "payload": {
+      "productId": "01KE0S1W6W8ZV7T1C3A6MP0014"
+    },
+    "aboutOthers": true,
+    "others": 11
+  },
+  {
+    "detector": "wanted_nearby",
+    "subject": "01KE0S1W6W8ZV7T1C3A6MP0017",
+    "kind": "tip",
+    "topic": "demand",
+    "severity": 1,
+    "stake": 12,
+    "ageDays": 0,
+    "numbers": {
+      "item": "Horlicks 500 g",
+      "km": "2 km",
+      "periodDays": 7,
+      "searches": 12
+    },
+    "action": "add_product",
+    "payload": {
+      "productId": "01KE0S1W6W8ZV7T1C3A6MP0017"
+    },
+    "aboutOthers": true,
+    "others": 12
+  }
+]

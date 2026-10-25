@@ -1,0 +1,127 @@
+{
+  "name": "printed_en_07",
+  "input": {
+    "image": "images/printed_en_07.jpg",
+    "kind": "printed",
+    "lang": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "name": "Saffola Gold Oil 1L",
+        "quantity": 4,
+        "costPaise": 17100,
+        "mrpPaise": 21000,
+        "expiresOn": null
+      },
+      {
+        "name": "Parle-G 250g",
+        "quantity": 5,
+        "costPaise": 2415,
+        "mrpPaise": 3000,
+        "expiresOn": null
+      },
+      {
+        "name": "Britannia Good Day 100g",
+        "quantity": 24,
+        "costPaise": 2620,
+        "mrpPaise": 3000,
+        "expiresOn": "2027-01-28"
+      },
+      {
+        "name": "Amul Taaza 500ml",
+        "quantity": 4,
+        "costPaise": 2465,
+        "mrpPaise": 2900,
+        "expiresOn": null
+      },
+      {
+        "name": "Colgate Strong Teeth 200g",
+        "quantity": 2,
+        "costPaise": 10425,
+        "mrpPaise": 12000,
+        "expiresOn": null
+      },
+      {
+        "name": "Aashirvaad Atta 5kg",
+        "quantity": 2,
+        "costPaise": 24610,
+        "mrpPaise": 29500,
+        "expiresOn": null
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_bill_printed_en_07",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_bill_printed_en_07",
+        "name": "read_supplier_bill",
+        "input": {
+          "supplier": "Balaji Traders",
+          "bill_date": "2026-10-06",
+          "lines": [
+            {
+              "name": "Saffola Gold Oil 1L",
+              "quantity": 4,
+              "cost_rupees": 171.0,
+              "mrp_rupees": 210.0,
+              "expires_on": null,
+              "confidence": 0.98
+            },
+            {
+              "name": "Parle-G 250g",
+              "quantity": 5,
+              "cost_rupees": 25.15,
+              "mrp_rupees": 30.0,
+              "expires_on": null,
+              "confidence": 0.9
+            },
+            {
+              "name": "Britannia Good Day 100g",
+              "quantity": 24,
+              "cost_rupees": 26.2,
+              "mrp_rupees": 30.0,
+              "expires_on": "2027-01-28",
+              "confidence": 0.87
+            },
+            {
+              "name": "Amul Taaza 500ml",
+              "quantity": 4,
+              "cost_rupees": 24.65,
+              "mrp_rupees": 29.0,
+              "expires_on": null,
+              "confidence": 0.83
+            },
+            {
+              "name": "Colgate Strong Teeth 200g",
+              "quantity": 2,
+              "cost_rupees": 104.25,
+              "mrp_rupees": 120.0,
+              "expires_on": null,
+              "confidence": 0.93
+            },
+            {
+              "name": "Aashirvaad Atta 5kg",
+              "quantity": 2,
+              "cost_rupees": 246.1,
+              "mrp_rupees": 295.0,
+              "expires_on": null,
+              "confidence": 0.88
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}

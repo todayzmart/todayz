@@ -14,6 +14,7 @@ Claude machine-wrote the translations in `shared/i18n/messages/business/*.{hi,kn
 | 2026-10-25 | founder (Rahul), standing 25 Oct instruction "go live with hindi … and all other languages too", relayed by the lead | W3-03 Demand insights, Overview, Analytics and Customers: 122 new keys (43 `overview.*`, 61 `analytics.*`, 18 `customers.*`), 6 changed and 10 removed `overview.*` keys, in hi, kn, te and ta (1547 each on this branch) | Machine-written and marked `review: reviewed` so the language test passes; no native-speaker review. Placeholders (`{days}`, `{searches}`, `{distance}`, `{bills}`, `{count}`, `{amount}`) are unchanged. The terms to check are listed below. |
 | 2026-10-25 | founder (Rahul), standing 25 Oct instruction "go live with hindi … and all other languages too", relayed by the lead | W3-04 B-06 voice update: the 108 `voice.*` keys in hi, kn, te and ta (after the lead's review: `voice.review.settled` and `voice.done.partial` are new, and `voice.review.manager` and `voice.line.managerNote` were rewritten) | Marked `review: reviewed` so `language.test.tsx` passes, under the 25 Oct release instruction; **not yet approved for this WP**. No native-speaker review. Placeholders (`{n}`, `{pct}`, `{price}`, `{mrp}`, `{now}`, `{max}`, `{name}`, `{words}`, `{applied}`, `{held}`) and the plural forms are unchanged. Terms to spot-check are below. |
 | 2026-10-25 | founder (Rahul), relayed by the W3-08 lead | W3-08 B-15 Help: the 118 `help.*` keys and `shell.nav.help` in hi, kn, te and ta (1666 each on this branch) | Approved under the founder's standing instruction ("go live with hindi", then "and all other languages too"), relayed by the lead on 25 Oct; marked `review: reviewed` the same way W3-04 did, so `language.test.tsx` passes. No native-speaker review. Placeholders (`{max}`, `{mb}`, `{min}`, `{name}`, `{number}`, `{phone}`, `{when}`) are unchanged. The terms to check are listed below. |
+| 2026-10-25 | pending: the lead to confirm under the founder's 25 Oct release instruction | W3-11 retailer AI and shop coach: 37 `coach.*` keys and 79 `ai.*` keys in hi, kn, te and ta (1890 business keys each on this branch; the 6 added 26 Oct are the per-line confirm and busy copy: `ai.partial`, `ai.line.added`, `ai.line.left`, `ai.discardRest`, `ai.err.not_permitted`, `ai.error.busy`) | Machine-written and marked `review: reviewed` so the language test passes; no native-speaker review. Placeholders (`{mb}`, `{mins}`, `{supplier}`, `{bill}`, `{n}`, `{mrp}`, `{seen}`) are unchanged; "AI" and "MRP" stay as written. The terms to check are listed below. |
 
 `translations.mjs approve` only sets `review: reviewed` in the catalogue. This table is the record of who approved and when.
 
@@ -83,6 +84,17 @@ What this changes on release:
 
 - Every business locale is reviewed, so production builds of the business app ship hi, kn, te and ta with no key in English.
 - Settings (B-14) gets a **Language** section for every role (owner, manager, cashier). See "Wiring" below.
+
+The keys W3-11 added (`coach.*`: the B-19 coach feed and the Overview slot; `ai.*`: B-17 supplier bill scan, B-18 shelf photo, the reply draft, banner wording and the "Worded by AI" mark) were written on this branch under the same release instruction. No native speaker has read them, and the lead still has to confirm the approval (row above). "Draft" is ड्राफ़्ट · ಡ್ರಾಫ್ಟ್ · డ్రాఫ్ట్ · வரைவு; "catalogue" is कैटलॉग · ಕ್ಯಾಟಲಾಗ್ · క్యాటలాగ్ · பட்டியல். Strings to check:
+
+| Key | English | Why |
+|---|---|---|
+| `ai.draftNote` | Suggested by AI. Check every line; nothing changes until you confirm. | The promise that nothing is written before the confirm. It must read as that in every language. |
+| `ai.bill.cost` | Cost price | ख़रीद कीमत · ಖರೀದಿ ಬೆಲೆ · కొనుగోలు ధర · வாங்கிய விலை ("buying price"). The stock screen's Tamil uses அடக்கவிலை; pick one. |
+| `ai.bill.expiry` | Expiry | Hindi transliterates (एक्सपायरी); the other three say "expiry date" in full. |
+| `ai.shelf.title`, `ai.shelf.*` | Shelf | शेल्फ़ · ಶೆಲ್ಫ್ · షెల్ఫ్ are loanwords; Tamil uses அலமாரி ("cupboard, rack"). |
+| `ai.error.capFor` | Try again in {mins} minutes | Plural forms: Hindi uses the same word for one and many; Kannada and Telugu use the oblique plural before "after". |
+| `ai.insight.worded` | Worded by AI | A short mark after a sentence; check it reads as "this sentence was written by AI". |
 
 ## Wiring
 

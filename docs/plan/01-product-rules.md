@@ -735,6 +735,7 @@ Every numeric key has a min and a max (the Rule column, or after the default). A
 | `ai_model_fast` | text | `claude-haiku-5-5` (one of `claude-haiku-5-5`, `claude-sonnet-5-5`, `claude-opus-5-5`) |
 | `ai_model_smart` | text | `claude-sonnet-5-5` (one of `claude-haiku-5-5`, `claude-sonnet-5-5`, `claude-opus-5-5`) |
 | `ai_daily_calls_store` | count | 100 (min 0, max 1000) |
+| `ai_daily_calls_store_background` | count | 20 (background wording: AI-R4 insight sentences and AI-R5 coach cards, per store per IST day, separate from `ai_daily_calls_store`; when spent the template shows, never an error, D-228; min 0, max 1000) |
 | `ai_daily_calls_customer` | count | 30 (min 0, max 300) |
 | `ai_daily_cost_cap_paise` | paise | 50000 (₹500 a day; AI calls stop for the rest of the IST day when reached, alert at 80%, D-70; min 0, max 1000000) |
 

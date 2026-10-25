@@ -1,0 +1,57 @@
+/* B-19 coach layout. Rows reuse the Demand insights look from bundle.css (tz-insight, data-tint);
+   this file only places the extra parts. Tokens only. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.sub {
+  font: var(--type-caption);
+  color: var(--ink-3);
+}
+
+.preview {
+  margin-top: var(--space-4);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  align-items: start;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.kind {
+  font: var(--type-caption);
+  color: var(--t-ink);
+}
+
+.ai {
+  font: var(--type-caption);
+  color: var(--ink-3);
+}
+
+.acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.more {
+  display: flex;
+  justify-content: center;
+}

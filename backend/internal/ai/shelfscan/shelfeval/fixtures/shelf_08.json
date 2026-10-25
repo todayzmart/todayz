@@ -1,0 +1,57 @@
+{
+  "name": "shelf_08",
+  "input": {
+    "image": "images/shelf_08.jpg"
+  },
+  "expect": {
+    "products": [
+      "Colgate Strong Teeth 200g",
+      "Maggi Noodles 70g",
+      "Lux Soap 100g",
+      "Brooke Bond Red Label 250g",
+      "Amul Taaza 500ml",
+      "Clinic Plus Shampoo 175ml"
+    ]
+  },
+  "reply": {
+    "id": "msg_shelf_shelf_08",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_shelf_shelf_08",
+        "name": "record_shelf_products",
+        "input": {
+          "products": [
+            {
+              "name": "Noodles",
+              "brand": "Maggi",
+              "size": "70g",
+              "confidence": 0.93
+            },
+            {
+              "name": "Bond Red Label",
+              "brand": "Brooke",
+              "size": "250g",
+              "confidence": 0.65
+            },
+            {
+              "name": "Plus Shampoo",
+              "brand": "Clinic",
+              "size": "175ml",
+              "confidence": 0.66
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 400
+    }
+  }
+}
