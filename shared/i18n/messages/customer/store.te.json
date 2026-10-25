@@ -1,0 +1,172 @@
+{
+  "store.rating": {
+    "message": "{rating} ({count})",
+    "review": "reviewed",
+    "enHash": "21c8385b"
+  },
+  "store.open": {
+    "message": "తెరిచి ఉంది",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "store.closed": {
+    "message": "మూసి ఉంది",
+    "review": "reviewed",
+    "enHash": "88d86b77"
+  },
+  "store.cashback": {
+    "message": "{pct}% క్యాష్‌బ్యాక్",
+    "review": "reviewed",
+    "enHash": "73d039a2"
+  },
+  "store.delivery": {
+    "message": "డెలివరీ",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "store.pickup": {
+    "message": "పికప్",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "store.inStoreOnly": {
+    "message": "దుకాణంలో మాత్రమే",
+    "review": "reviewed",
+    "enHash": "c72090ec"
+  },
+  "store.directions": {
+    "message": "దారి చూడండి",
+    "review": "reviewed",
+    "enHash": "648d8058"
+  },
+  "store.viewShop": {
+    "message": "దుకాణం చూడండి",
+    "review": "reviewed",
+    "enHash": "c55061ee"
+  },
+  "store.hours.today": {
+    "message": "ఈరోజు {hours}",
+    "review": "reviewed",
+    "enHash": "4552054b"
+  },
+  "store.hours.range": {
+    "message": "{from} నుండి {to}",
+    "review": "reviewed",
+    "enHash": "06f3df10"
+  },
+  "store.hours.closedToday": {
+    "message": "ఈరోజు మూసి ఉంది",
+    "review": "reviewed",
+    "enHash": "57130ea5"
+  },
+  "store.deliveryNote": {
+    "message": "డెలివరీ {fee} · కనీస ఆర్డర్ {min}",
+    "review": "reviewed",
+    "enHash": "88de204f"
+  },
+  "store.deliveryFree": {
+    "message": "ఉచితం",
+    "review": "reviewed",
+    "enHash": "4ff88aad"
+  },
+  "store.inStoreOnly.banner": {
+    "message": "ఈ దుకాణం దుకాణంలోనే అమ్ముతుంది. దాని దగ్గర ఏముందో చూడవచ్చు, దారి తెలుసుకోవచ్చు.",
+    "review": "reviewed",
+    "enHash": "6a4677c2"
+  },
+  "store.search.label": {
+    "message": "ఈ దుకాణంలో వెతకండి",
+    "review": "reviewed",
+    "enHash": "1857f271"
+  },
+  "store.search.placeholder": {
+    "message": "ఈ దుకాణంలో వెతకండి",
+    "review": "reviewed",
+    "enHash": "98336b8e"
+  },
+  "store.items.error": {
+    "message": "వస్తువులు లోడ్ కాలేదు.",
+    "review": "reviewed",
+    "enHash": "1df81be5"
+  },
+  "store.items.more": {
+    "message": "ఇంకా వస్తువులు చూపించండి",
+    "review": "reviewed",
+    "enHash": "312e726c"
+  },
+  "store.items.none": {
+    "message": "ఇంకా వస్తువులు ఏవీ లేవు",
+    "review": "reviewed",
+    "enHash": "ba47f17e"
+  },
+  "store.items.noneBody": {
+    "message": "ఈ దుకాణం ఇంకా ఏమీ చేర్చలేదు.",
+    "review": "reviewed",
+    "enHash": "232b5f33"
+  },
+  "store.items.noMatch": {
+    "message": "సరిపోయే వస్తువులు లేవు",
+    "review": "reviewed",
+    "enHash": "22e14472"
+  },
+  "store.items.noMatchBody": {
+    "message": "వేరే పదం లేదా విభాగం ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "486ad6c8"
+  },
+  "store.gone.title": {
+    "message": "ఈ దుకాణం ఇప్పుడు TodayZ లో లేదు",
+    "review": "reviewed",
+    "enHash": "2e224436"
+  },
+  "store.gone.body": {
+    "message": "ప్రస్తుతానికి మూసి ఉండవచ్చు లేదా జాబితాలో లేకపోవచ్చు. మీకు కావాల్సింది దగ్గరలో వెతకండి.",
+    "review": "reviewed",
+    "enHash": "6d941326"
+  },
+  "store.gone.action": {
+    "message": "దగ్గరలో వెతకండి",
+    "review": "reviewed",
+    "enHash": "ad3bae31"
+  },
+  "store.replace.title": {
+    "message": "కొత్త కార్ట్ మొదలుపెట్టాలా?",
+    "review": "reviewed",
+    "enHash": "eb083d82"
+  },
+  "store.replace.body": {
+    "message": "మీ కార్ట్‌లో {current} వస్తువులు ఉన్నాయి. {next} నుండి చేరిస్తే అది మారిపోతుంది.",
+    "review": "reviewed",
+    "enHash": "4bd5cb81"
+  },
+  "store.replace.close": {
+    "message": "మూసివేయండి",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "store.replace.keep": {
+    "message": "నా కార్ట్ ఉంచండి",
+    "review": "reviewed",
+    "enHash": "66c34609"
+  },
+  "store.replace.confirm": {
+    "message": "కార్ట్ మార్చండి",
+    "review": "reviewed",
+    "enHash": "815bb0ba"
+  },
+  "store.cart.count": {
+    "message": "{count} ఐటమ్‌లు",
+    "review": "reviewed",
+    "enHash": "e3cc227e"
+  },
+  "store.cart.from": {
+    "message": "{shop} నుండి",
+    "review": "reviewed",
+    "enHash": "156e12b4"
+  },
+  "store.cart.open": {
+    "message": "కార్ట్ చూడండి",
+    "review": "reviewed",
+    "enHash": "e6d55733"
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "cart.title": {
+    "message": "कार्ट",
+    "review": "reviewed",
+    "enHash": "44656820"
+  },
+  "cart.empty.title": {
+    "message": "आपका कार्ट खाली है",
+    "review": "reviewed",
+    "enHash": "2303a3ae"
+  },
+  "cart.empty.body": {
+    "message": "पास में कुछ ढूँढें और यहाँ जोड़ें।",
+    "review": "reviewed",
+    "enHash": "2e9a3b5a"
+  },
+  "cart.empty.cta": {
+    "message": "पास की दुकानें ढूँढें",
+    "review": "reviewed",
+    "enHash": "ae63ad8c"
+  },
+  "cart.from": {
+    "message": "{shop} से",
+    "review": "reviewed",
+    "enHash": "bb11572a"
+  },
+  "cart.quoteError": {
+    "message": "अभी दाम चेक नहीं हो सके। आपका कार्ट सेव है।",
+    "review": "reviewed",
+    "enHash": "4fcfefc8"
+  },
+  "cart.unavailable.title": {
+    "message": "कुछ सामान में बदलाव चाहिए",
+    "review": "reviewed",
+    "enHash": "cc6e31b6"
+  },
+  "cart.unavailable.body": {
+    "message": "आगे बढ़ने के लिए नीचे निशान लगे सामान हटाएँ या कम करें।",
+    "review": "reviewed",
+    "enHash": "16235908"
+  },
+  "cart.lines.label": {
+    "message": "आपके कार्ट का सामान",
+    "review": "reviewed",
+    "enHash": "cd350d25"
+  },
+  "cart.loading": {
+    "message": "दाम चेक हो रहे हैं",
+    "review": "reviewed",
+    "enHash": "59505f46"
+  },
+  "cart.subtotal": {
+    "message": "सामान",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "cart.discount": {
+    "message": "ऑफ़र",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "cart.total": {
+    "message": "कुल",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "cart.priceNote": {
+    "message": "आख़िरी दाम देखने के लिए चेकआउट पर साइन इन करें।",
+    "review": "reviewed",
+    "enHash": "6a1eed78"
+  },
+  "cart.pickupOnly": {
+    "message": "दुकान से सामान लें और वहीं पैसे दें।",
+    "review": "reviewed",
+    "enHash": "51b5323d"
+  },
+  "cart.clear": {
+    "message": "कार्ट खाली करें",
+    "review": "reviewed",
+    "enHash": "40b6be92"
+  },
+  "cart.count": {
+    "message": "{count, plural, one {# आइटम} other {# आइटम}}",
+    "review": "reviewed",
+    "enHash": "f34cfa9c"
+  },
+  "cart.checkout": {
+    "message": "चेकआउट",
+    "review": "reviewed",
+    "enHash": "3ac8e9e5"
+  },
+  "cart.stepper.add": {
+    "message": "जोड़ें",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "cart.stepper.remove": {
+    "message": "एक कम करें",
+    "review": "reviewed",
+    "enHash": "afbcf5f3"
+  },
+  "cart.stepper.increment": {
+    "message": "एक और जोड़ें",
+    "review": "reviewed",
+    "enHash": "87302651"
+  },
+  "cart.line.out": {
+    "message": "स्टॉक में नहीं",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "cart.line.short": {
+    "message": "सिर्फ़ {count} बचे हैं",
+    "review": "reviewed",
+    "enHash": "b9d3d050"
+  },
+  "cart.line.reduce": {
+    "message": "{count} करें",
+    "review": "reviewed",
+    "enHash": "7b7befbe"
+  },
+  "cart.line.remove": {
+    "message": "सामान हटाएँ",
+    "review": "reviewed",
+    "enHash": "76ecba1f"
+  },
+  "cart.creditsRow": {
+    "message": "क्रेडिट",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "cart.credits.use": {
+    "message": "क्रेडिट इस्तेमाल करें",
+    "review": "reviewed",
+    "enHash": "9e984f02"
+  },
+  "cart.credits.hint": {
+    "message": "इस ऑर्डर पर आप {max, plural, one {# क्रेडिट} other {# क्रेडिट}} तक इस्तेमाल कर सकते हैं। हर क्रेडिट ₹1 का है।",
+    "review": "reviewed",
+    "enHash": "8a4fab2f"
+  },
+  "cart.credits.amount": {
+    "message": "कितने क्रेडिट इस्तेमाल करें",
+    "review": "reviewed",
+    "enHash": "24c50026"
+  },
+  "cart.credits.valueText": {
+    "message": "{count, plural, one {# क्रेडिट} other {# क्रेडिट}}, {off} की छूट",
+    "review": "reviewed",
+    "enHash": "745e39cc"
+  },
+  "cart.credits.using": {
+    "message": "{count, plural, one {# क्रेडिट} other {# क्रेडिट}} से {off} की छूट मिल रही है। क्रेडिट से डिलीवरी का पैसा नहीं दिया जा सकता।",
+    "review": "reviewed",
+    "enHash": "e5dcec8b"
+  },
+  "cart.credits.blocked.store_credit_cap": {
+    "message": "आज इस दुकान पर क्रेडिट इस्तेमाल नहीं हो सकते।",
+    "review": "reviewed",
+    "enHash": "3a7d2b32"
+  },
+  "cart.credits.blocked.credit_monthly_cap": {
+    "message": "आपने इस महीने की क्रेडिट लिमिट इस्तेमाल कर ली है।",
+    "review": "reviewed",
+    "enHash": "c1461e19"
+  },
+  "cart.credits.blocked.below_credit_minimum": {
+    "message": "क्रेडिट तभी इस्तेमाल होंगे जब आपका सामान दुकान की क्रेडिट वाली न्यूनतम रकम तक पहुँचे। इस्तेमाल करने के लिए और सामान जोड़ें।",
+    "review": "reviewed",
+    "enHash": "6a686b14"
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "cart.title": {
+    "message": "కార్ట్",
+    "review": "reviewed",
+    "enHash": "44656820"
+  },
+  "cart.empty.title": {
+    "message": "మీ కార్ట్ ఖాళీగా ఉంది",
+    "review": "reviewed",
+    "enHash": "2303a3ae"
+  },
+  "cart.empty.body": {
+    "message": "దగ్గరలో ఏదైనా కనుగొని ఇక్కడ చేర్చండి.",
+    "review": "reviewed",
+    "enHash": "2e9a3b5a"
+  },
+  "cart.empty.cta": {
+    "message": "దగ్గరి దుకాణాలు కనుగొనండి",
+    "review": "reviewed",
+    "enHash": "ae63ad8c"
+  },
+  "cart.from": {
+    "message": "{shop} నుండి",
+    "review": "reviewed",
+    "enHash": "bb11572a"
+  },
+  "cart.quoteError": {
+    "message": "ఇప్పుడు ధరలు చెక్ చేయలేకపోయాం. మీ కార్ట్ సేవ్ అయి ఉంది.",
+    "review": "reviewed",
+    "enHash": "4fcfefc8"
+  },
+  "cart.unavailable.title": {
+    "message": "కొన్ని వస్తువులు మార్చాలి",
+    "review": "reviewed",
+    "enHash": "cc6e31b6"
+  },
+  "cart.unavailable.body": {
+    "message": "కొనసాగడానికి కింద గుర్తించిన వస్తువులను తీసేయండి లేదా తగ్గించండి.",
+    "review": "reviewed",
+    "enHash": "16235908"
+  },
+  "cart.lines.label": {
+    "message": "మీ కార్ట్‌లోని వస్తువులు",
+    "review": "reviewed",
+    "enHash": "cd350d25"
+  },
+  "cart.loading": {
+    "message": "ధరలు చెక్ చేస్తున్నాం",
+    "review": "reviewed",
+    "enHash": "59505f46"
+  },
+  "cart.subtotal": {
+    "message": "వస్తువులు",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "cart.discount": {
+    "message": "ఆఫర్‌లు",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "cart.total": {
+    "message": "మొత్తం",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "cart.priceNote": {
+    "message": "చివరి ధర చూడడానికి చెక్‌అవుట్‌లో సైన్ ఇన్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "6a1eed78"
+  },
+  "cart.pickupOnly": {
+    "message": "దుకాణంలో పికప్ చేసుకుని అక్కడే చెల్లించండి.",
+    "review": "reviewed",
+    "enHash": "51b5323d"
+  },
+  "cart.clear": {
+    "message": "కార్ట్ ఖాళీ చేయండి",
+    "review": "reviewed",
+    "enHash": "40b6be92"
+  },
+  "cart.count": {
+    "message": "{count, plural, one {# ఐటమ్} other {# ఐటమ్‌లు}}",
+    "review": "reviewed",
+    "enHash": "f34cfa9c"
+  },
+  "cart.checkout": {
+    "message": "చెక్‌అవుట్",
+    "review": "reviewed",
+    "enHash": "3ac8e9e5"
+  },
+  "cart.stepper.add": {
+    "message": "చేర్చండి",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "cart.stepper.remove": {
+    "message": "ఒకటి తీసేయండి",
+    "review": "reviewed",
+    "enHash": "afbcf5f3"
+  },
+  "cart.stepper.increment": {
+    "message": "ఇంకొకటి చేర్చండి",
+    "review": "reviewed",
+    "enHash": "87302651"
+  },
+  "cart.line.out": {
+    "message": "స్టాక్‌లో లేదు",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "cart.line.short": {
+    "message": "{count} మాత్రమే ఉన్నాయి",
+    "review": "reviewed",
+    "enHash": "b9d3d050"
+  },
+  "cart.line.reduce": {
+    "message": "{count} కి తగ్గించండి",
+    "review": "reviewed",
+    "enHash": "7b7befbe"
+  },
+  "cart.line.remove": {
+    "message": "వస్తువు తీసేయండి",
+    "review": "reviewed",
+    "enHash": "76ecba1f"
+  },
+  "cart.creditsRow": {
+    "message": "క్రెడిట్‌లు",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "cart.credits.use": {
+    "message": "క్రెడిట్‌లు వాడండి",
+    "review": "reviewed",
+    "enHash": "9e984f02"
+  },
+  "cart.credits.hint": {
+    "message": "ఈ ఆర్డర్‌పై గరిష్టంగా {max, plural, one {# క్రెడిట్} other {# క్రెడిట్‌లు}} వాడవచ్చు. ఒక్కో క్రెడిట్ ₹1.",
+    "review": "reviewed",
+    "enHash": "8a4fab2f"
+  },
+  "cart.credits.amount": {
+    "message": "వాడే క్రెడిట్‌లు",
+    "review": "reviewed",
+    "enHash": "24c50026"
+  },
+  "cart.credits.valueText": {
+    "message": "{count, plural, one {# క్రెడిట్} other {# క్రెడిట్‌లు}}, {off} తగ్గింపు",
+    "review": "reviewed",
+    "enHash": "745e39cc"
+  },
+  "cart.credits.using": {
+    "message": "{count, plural, one {# క్రెడిట్} other {# క్రెడిట్‌లు}} వాడి {off} తగ్గింపు. డెలివరీకి క్రెడిట్‌లు వాడలేరు.",
+    "review": "reviewed",
+    "enHash": "e5dcec8b"
+  },
+  "cart.credits.blocked.store_credit_cap": {
+    "message": "ఈరోజు ఈ దుకాణంలో క్రెడిట్‌లు వాడలేరు.",
+    "review": "reviewed",
+    "enHash": "3a7d2b32"
+  },
+  "cart.credits.blocked.credit_monthly_cap": {
+    "message": "ఈ నెల క్రెడిట్ పరిమితి వాడేశారు.",
+    "review": "reviewed",
+    "enHash": "c1461e19"
+  },
+  "cart.credits.blocked.below_credit_minimum": {
+    "message": "మీ వస్తువుల మొత్తం దుకాణం క్రెడిట్‌లకు పెట్టిన కనీస మొత్తానికి చేరితేనే క్రెడిట్‌లు వాడవచ్చు. వాడడానికి ఇంకా చేర్చండి.",
+    "review": "reviewed",
+    "enHash": "6a686b14"
+  }
+}

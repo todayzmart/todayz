@@ -1,0 +1,412 @@
+{
+  "app.offline.title": {
+    "message": "आप ऑफ़लाइन हैं।",
+    "review": "reviewed",
+    "enHash": "4a2a6452"
+  },
+  "app.offline.body": {
+    "message": "सेव किए पेज अब भी खुलेंगे। ऑनलाइन होते ही सब अपडेट हो जाएगा।",
+    "review": "reviewed",
+    "enHash": "6019fada"
+  },
+  "app.pending.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "app.update.message": {
+    "message": "TodayZ का नया वर्ज़न तैयार है।",
+    "review": "reviewed",
+    "enHash": "d7dccfc5"
+  },
+  "app.update.action": {
+    "message": "अपडेट करें",
+    "review": "reviewed",
+    "enHash": "fb91e24f"
+  },
+  "app.error.title": {
+    "message": "कुछ गड़बड़ हो गई",
+    "review": "reviewed",
+    "enHash": "8d886c0b"
+  },
+  "app.error.body": {
+    "message": "फिर से कोशिश करें। अगर ऐसा बार-बार हो, तो पेज रीलोड करें।",
+    "review": "reviewed",
+    "enHash": "f081bc24"
+  },
+  "app.error.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "auth.signIn.title": {
+    "message": "साइन इन करें",
+    "review": "reviewed",
+    "enHash": "ada2e9e9"
+  },
+  "auth.signIn.sub": {
+    "message": "अपना मोबाइल नंबर डालें। हम SMS से एक कोड भेजेंगे।",
+    "review": "reviewed",
+    "enHash": "64b55666"
+  },
+  "auth.phone.label": {
+    "message": "मोबाइल नंबर",
+    "review": "reviewed",
+    "enHash": "8e5c12de"
+  },
+  "auth.phone.help": {
+    "message": "इससे आप साइन इन करेंगे और आपको ऑर्डर की जानकारी मिलेगी।",
+    "review": "reviewed",
+    "enHash": "c656d92e"
+  },
+  "auth.phone.invalid": {
+    "message": "10 अंकों का मोबाइल नंबर डालें जो 6, 7, 8 या 9 से शुरू हो।",
+    "review": "reviewed",
+    "enHash": "6be55a3e"
+  },
+  "auth.code.send": {
+    "message": "कोड भेजें",
+    "review": "reviewed",
+    "enHash": "313503fa"
+  },
+  "auth.code.sending": {
+    "message": "कोड भेज रहे हैं",
+    "review": "reviewed",
+    "enHash": "28de53b3"
+  },
+  "auth.code.label": {
+    "message": "6 अंकों का कोड डालें",
+    "review": "reviewed",
+    "enHash": "d148321a"
+  },
+  "auth.code.digit": {
+    "message": "अंक {position}",
+    "review": "reviewed",
+    "enHash": "1e73e888"
+  },
+  "auth.code.sentTo": {
+    "message": "हमने {phone} पर कोड भेजा है।",
+    "review": "reviewed",
+    "enHash": "c8aa6d25"
+  },
+  "auth.code.verifying": {
+    "message": "कोड चेक हो रहा है",
+    "review": "reviewed",
+    "enHash": "90adc49f"
+  },
+  "auth.code.resend": {
+    "message": "कोड फिर से भेजें",
+    "review": "reviewed",
+    "enHash": "1d3cb8a9"
+  },
+  "auth.code.resendIn": {
+    "message": "{seconds} s में फिर से भेजें",
+    "review": "reviewed",
+    "enHash": "f0589eca"
+  },
+  "auth.code.change": {
+    "message": "नंबर बदलें",
+    "review": "reviewed",
+    "enHash": "6c3b4080"
+  },
+  "auth.error.wrongCode": {
+    "message": "यह कोड सही नहीं है। देखकर फिर से डालें।",
+    "review": "reviewed",
+    "enHash": "47948633"
+  },
+  "auth.error.expired": {
+    "message": "इस कोड का समय ख़त्म हो गया। नया कोड मँगवाएँ।",
+    "review": "reviewed",
+    "enHash": "6a90a6f9"
+  },
+  "auth.error.locked": {
+    "message": "बहुत बार गलत कोड डाला गया। नया कोड मँगवाएँ।",
+    "review": "reviewed",
+    "enHash": "371d1276"
+  },
+  "auth.error.rateLimited": {
+    "message": "बहुत ज़्यादा कोशिशें हो गईं। थोड़ा रुककर फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "c32bd496"
+  },
+  "auth.error.blocked": {
+    "message": "यह खाता अभी साइन इन नहीं कर सकता। सपोर्ट से संपर्क करें।",
+    "review": "reviewed",
+    "enHash": "10997ecd"
+  },
+  "auth.error.network": {
+    "message": "TodayZ से कनेक्ट नहीं हो पा रहा। अपना कनेक्शन देखें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "470230be"
+  },
+  "auth.error.generic": {
+    "message": "कुछ गड़बड़ हो गई। कृपया फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "9a3ea059"
+  },
+  "auth.error.captcha": {
+    "message": "हम चेक नहीं कर सके कि आप इंसान हैं। पेज रीलोड करके फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "bc612d87"
+  },
+  "auth.welcome.title": {
+    "message": "TodayZ में आपका स्वागत है",
+    "review": "reviewed",
+    "enHash": "941d65fc"
+  },
+  "auth.welcome.sub": {
+    "message": "दुकानदार आपको किस नाम से बुलाएँ? आप इसे छोड़ भी सकते हैं।",
+    "review": "reviewed",
+    "enHash": "9856b46a"
+  },
+  "auth.welcome.name": {
+    "message": "आपका नाम (ज़रूरी नहीं)",
+    "review": "reviewed",
+    "enHash": "32861acd"
+  },
+  "auth.welcome.continue": {
+    "message": "आगे बढ़ें",
+    "review": "reviewed",
+    "enHash": "2e026239"
+  },
+  "auth.welcome.skip": {
+    "message": "अभी छोड़ें",
+    "review": "reviewed",
+    "enHash": "6fc09607"
+  },
+  "auth.welcome.error": {
+    "message": "आपका नाम सेव नहीं हो सका। आप इसे बाद में “खाता” में जोड़ सकते हैं।",
+    "review": "reviewed",
+    "enHash": "b471ab4d"
+  },
+  "lang.title": {
+    "message": "अपनी भाषा चुनें",
+    "review": "reviewed",
+    "enHash": "1ee9cc37"
+  },
+  "lang.sub": {
+    "message": "आप इसे कभी भी “खाता” में बदल सकते हैं।",
+    "review": "reviewed",
+    "enHash": "47df9e8c"
+  },
+  "lang.group": {
+    "message": "भाषा",
+    "review": "reviewed",
+    "enHash": "89b86ab0"
+  },
+  "lang.name.en": {
+    "message": "अंग्रेज़ी",
+    "review": "reviewed",
+    "enHash": "649df08a"
+  },
+  "lang.name.hi": {
+    "message": "हिन्दी",
+    "review": "reviewed",
+    "enHash": "c9e6b253"
+  },
+  "lang.name.kn": {
+    "message": "कन्नड़",
+    "review": "reviewed",
+    "enHash": "c3ed6655"
+  },
+  "lang.name.te": {
+    "message": "तेलुगु",
+    "review": "reviewed",
+    "enHash": "ea6c0346"
+  },
+  "lang.name.ta": {
+    "message": "तमिल",
+    "review": "reviewed",
+    "enHash": "86c2b627"
+  },
+  "lang.continue": {
+    "message": "आगे बढ़ें",
+    "review": "reviewed",
+    "enHash": "2e026239"
+  },
+  "lang.skip": {
+    "message": "छोड़ें",
+    "review": "reviewed",
+    "enHash": "3da47453"
+  },
+  "location.title": {
+    "message": "हम कहाँ ढूँढें?",
+    "review": "reviewed",
+    "enHash": "78c38f9c"
+  },
+  "location.sub": {
+    "message": "हम इस जगह के पास की दुकानें और स्टॉक दिखाते हैं।",
+    "review": "reviewed",
+    "enHash": "7bd0799d"
+  },
+  "location.gps.title": {
+    "message": "मेरी अभी की लोकेशन इस्तेमाल करें",
+    "review": "reviewed",
+    "enHash": "9aee0641"
+  },
+  "location.gps.explain": {
+    "message": "आपका ब्राउज़र लोकेशन शेयर करने की अनुमति माँगेगा। हम इसका इस्तेमाल सिर्फ़ आपके पास की दुकानें ढूँढने के लिए करते हैं।",
+    "review": "reviewed",
+    "enHash": "aaf1690a"
+  },
+  "location.gps.button": {
+    "message": "मेरी लोकेशन शेयर करें",
+    "review": "reviewed",
+    "enHash": "fb3c7092"
+  },
+  "location.gps.locating": {
+    "message": "आपकी लोकेशन ढूँढ रहे हैं",
+    "review": "reviewed",
+    "enHash": "4bd91431"
+  },
+  "location.gps.denied": {
+    "message": "TodayZ के लिए लोकेशन बंद है। इसकी जगह अपना PIN कोड डालें।",
+    "review": "reviewed",
+    "enHash": "f054ea82"
+  },
+  "location.gps.unavailable": {
+    "message": "आपकी लोकेशन नहीं मिल सकी। इसकी जगह अपना PIN कोड डालें।",
+    "review": "reviewed",
+    "enHash": "1f4ba08f"
+  },
+  "location.gps.label": {
+    "message": "अभी की लोकेशन",
+    "review": "reviewed",
+    "enHash": "75ea6a18"
+  },
+  "location.pin.title": {
+    "message": "PIN कोड डालें",
+    "review": "reviewed",
+    "enHash": "58808d4f"
+  },
+  "location.pin.label": {
+    "message": "PIN कोड",
+    "review": "reviewed",
+    "enHash": "3c52e572"
+  },
+  "location.pin.help": {
+    "message": "6 अंक",
+    "review": "reviewed",
+    "enHash": "ab7fee7a"
+  },
+  "location.pin.invalid": {
+    "message": "6 अंकों का PIN कोड डालें।",
+    "review": "reviewed",
+    "enHash": "b8ed22d9"
+  },
+  "location.pin.save": {
+    "message": "यह PIN कोड इस्तेमाल करें",
+    "review": "reviewed",
+    "enHash": "08e45709"
+  },
+  "location.pin.saved": {
+    "message": "PIN {pin}",
+    "review": "reviewed",
+    "enHash": "61d3ad30"
+  },
+  "location.search.title": {
+    "message": "अपना इलाका खोजें",
+    "review": "reviewed",
+    "enHash": "df3ba7c9"
+  },
+  "location.search.soon": {
+    "message": "इलाका खोजने की सुविधा जल्द आ रही है। अभी अपना PIN कोड इस्तेमाल करें।",
+    "review": "reviewed",
+    "enHash": "06cde99d"
+  },
+  "location.current": {
+    "message": "{place} के पास खरीदारी",
+    "review": "reviewed",
+    "enHash": "ef0894d4"
+  },
+  "location.set": {
+    "message": "अपनी लोकेशन चुनें",
+    "review": "reviewed",
+    "enHash": "bd10f419"
+  },
+  "account.title": {
+    "message": "खाता",
+    "review": "reviewed",
+    "enHash": "85dfa32c"
+  },
+  "account.signedOut.title": {
+    "message": "TodayZ में साइन इन करें",
+    "review": "reviewed",
+    "enHash": "f9480b08"
+  },
+  "account.signedOut.body": {
+    "message": "सामान बुक करने, अपने ऑर्डर देखने और वॉलेट रखने के लिए साइन इन करें।",
+    "review": "reviewed",
+    "enHash": "2bd55cd8"
+  },
+  "account.signIn": {
+    "message": "साइन इन करें",
+    "review": "reviewed",
+    "enHash": "ada2e9e9"
+  },
+  "account.loading": {
+    "message": "आपका खाता लोड हो रहा है",
+    "review": "reviewed",
+    "enHash": "f6f58e00"
+  },
+  "account.loadError": {
+    "message": "आपका खाता लोड नहीं हो सका। अपना कनेक्शन देखें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "93afdf48"
+  },
+  "account.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "account.name.label": {
+    "message": "नाम",
+    "review": "reviewed",
+    "enHash": "709a2322"
+  },
+  "account.name.save": {
+    "message": "सेव करें",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "account.name.saved": {
+    "message": "सेव हो गया",
+    "review": "reviewed",
+    "enHash": "c0ae8f6e"
+  },
+  "account.name.conflict": {
+    "message": "आपकी जानकारी दूसरे डिवाइस पर बदली गई थी। हमने उसे फिर से लोड किया है। फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "3e1db0b1"
+  },
+  "account.name.error": {
+    "message": "यह सेव नहीं हो सका। फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "b1ecaf57"
+  },
+  "account.phone": {
+    "message": "मोबाइल नंबर",
+    "review": "reviewed",
+    "enHash": "8e5c12de"
+  },
+  "account.language": {
+    "message": "भाषा",
+    "review": "reviewed",
+    "enHash": "89b86ab0"
+  },
+  "account.location": {
+    "message": "लोकेशन",
+    "review": "reviewed",
+    "enHash": "d219c681"
+  },
+  "account.change": {
+    "message": "बदलें",
+    "review": "reviewed",
+    "enHash": "64fbd995"
+  },
+  "account.signOut": {
+    "message": "साइन आउट करें",
+    "review": "reviewed",
+    "enHash": "dc1649a1"
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "product.add": {
+    "message": "जोड़ें",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "product.remove": {
+    "message": "एक कम करें",
+    "review": "reviewed",
+    "enHash": "afbcf5f3"
+  },
+  "product.addOne": {
+    "message": "एक जोड़ें",
+    "review": "reviewed",
+    "enHash": "bb49f016"
+  },
+  "product.max": {
+    "message": "स्टॉक में सिर्फ़ {max} हैं",
+    "review": "reviewed",
+    "enHash": "adffd51d"
+  },
+  "product.off": {
+    "message": "{pct}% छूट",
+    "review": "reviewed",
+    "enHash": "76fb0776"
+  },
+  "product.unit.pc": {
+    "message": "{size} पीस",
+    "review": "reviewed",
+    "enHash": "ae6eb2b9"
+  },
+  "product.unit.pack": {
+    "message": "{size} पैक",
+    "review": "reviewed",
+    "enHash": "8423135e"
+  },
+  "product.stock.in": {
+    "message": "स्टॉक में है",
+    "review": "reviewed",
+    "enHash": "3f1356ad"
+  },
+  "product.stock.out": {
+    "message": "स्टॉक में नहीं",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "product.confirmed": {
+    "message": "{time} पक्का किया",
+    "review": "reviewed",
+    "enHash": "7d1ac5a7"
+  },
+  "product.confirmedNow": {
+    "message": "अभी-अभी पक्का किया",
+    "review": "reviewed",
+    "enHash": "d966a28f"
+  },
+  "product.back": {
+    "message": "{shop} पर वापस",
+    "review": "reviewed",
+    "enHash": "841d2259"
+  },
+  "product.sold.by": {
+    "message": "बेचने वाली दुकान",
+    "review": "reviewed",
+    "enHash": "12c71f0a"
+  },
+  "product.addToCart": {
+    "message": "कार्ट में जोड़ें",
+    "review": "reviewed",
+    "enHash": "f8893b91"
+  },
+  "product.added": {
+    "message": "{name} आपके कार्ट में जुड़ गया",
+    "review": "reviewed",
+    "enHash": "d89cc3a3"
+  },
+  "product.share": {
+    "message": "लिंक कॉपी करें",
+    "review": "reviewed",
+    "enHash": "2f84eea5"
+  },
+  "product.share.copied": {
+    "message": "लिंक कॉपी हो गया",
+    "review": "reviewed",
+    "enHash": "c2e98476"
+  },
+  "product.share.failed": {
+    "message": "लिंक कॉपी नहीं हो सका",
+    "review": "reviewed",
+    "enHash": "7a456d6f"
+  },
+  "product.others.title": {
+    "message": "पास की दूसरी दुकानें",
+    "review": "reviewed",
+    "enHash": "7f93304b"
+  },
+  "product.gone.title": {
+    "message": "यह सामान नहीं मिला",
+    "review": "reviewed",
+    "enHash": "88e0e3ac"
+  },
+  "product.gone.body": {
+    "message": "हो सकता है दुकान ने इसे हटा दिया हो।",
+    "review": "reviewed",
+    "enHash": "65f93253"
+  },
+  "product.gone.action": {
+    "message": "दुकान पर जाएँ",
+    "review": "reviewed",
+    "enHash": "349df3f4"
+  }
+}

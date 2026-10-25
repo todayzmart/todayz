@@ -1,0 +1,82 @@
+{
+  "shell.appName": {
+    "message": "TodayZ",
+    "review": "reviewed",
+    "enHash": "34b58f9d"
+  },
+  "shell.skipToContent": {
+    "message": "నేరుగా ముఖ్య భాగానికి వెళ్లండి",
+    "review": "reviewed",
+    "enHash": "0a4470d6"
+  },
+  "shell.nav.label": {
+    "message": "ముఖ్య",
+    "review": "reviewed",
+    "enHash": "62bce942"
+  },
+  "shell.nav.home": {
+    "message": "హోమ్",
+    "review": "reviewed",
+    "enHash": "70f8bb9a"
+  },
+  "shell.nav.search": {
+    "message": "వెతకండి",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "shell.nav.orders": {
+    "message": "ఆర్డర్‌లు",
+    "review": "reviewed",
+    "enHash": "cded0933"
+  },
+  "shell.nav.wallet": {
+    "message": "వాలెట్",
+    "review": "reviewed",
+    "enHash": "b60862f4"
+  },
+  "shell.nav.account": {
+    "message": "ఖాతా",
+    "review": "reviewed",
+    "enHash": "85dfa32c"
+  },
+  "shell.hero.title": {
+    "message": "దగ్గరలో అన్నీ, ఈరోజే.",
+    "review": "reviewed",
+    "enHash": "1aaf493f"
+  },
+  "shell.hero.sub": {
+    "message": "దగ్గరి దుకాణాల్లో స్టాక్‌లో ఏముందో చూడండి, బుక్ చేయండి, పికప్ చేసుకోండి లేదా డెలివరీ తీసుకోండి.",
+    "review": "reviewed",
+    "enHash": "a5ee6a96"
+  },
+  "shell.soon.tag": {
+    "message": "త్వరలో వస్తుంది",
+    "review": "reviewed",
+    "enHash": "e4115be2"
+  },
+  "shell.soon.title": {
+    "message": "{section} త్వరలో వస్తోంది",
+    "review": "reviewed",
+    "enHash": "6c957e46"
+  },
+  "shell.soon.body": {
+    "message": "యాప్‌లో ఈ భాగాన్ని తయారు చేస్తున్నాం. మీ దగ్గరి దుకాణాలు ఇప్పుడు తమ స్టాక్ చేరుస్తున్నాయి.",
+    "review": "reviewed",
+    "enHash": "b08be591"
+  },
+  "shell.notFound.title": {
+    "message": "పేజీ దొరకలేదు",
+    "review": "reviewed",
+    "enHash": "bc3023b3"
+  },
+  "shell.notFound.body": {
+    "message": "ఈ లింక్ ఇంకా ఎక్కడికీ వెళ్లదు.",
+    "review": "reviewed",
+    "enHash": "8c0d72a2"
+  },
+  "shell.notFound.home": {
+    "message": "హోమ్‌కి వెళ్లండి",
+    "review": "reviewed",
+    "enHash": "f36ae945"
+  }
+}

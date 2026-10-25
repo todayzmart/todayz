@@ -1,0 +1,412 @@
+{
+  "app.offline.title": {
+    "message": "ನೀವು ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿದ್ದೀರಿ.",
+    "review": "reviewed",
+    "enHash": "4a2a6452"
+  },
+  "app.offline.body": {
+    "message": "ಸೇವ್ ಮಾಡಿದ ಪುಟಗಳು ಈಗಲೂ ತೆರೆಯುತ್ತವೆ. ನೀವು ಮತ್ತೆ ಆನ್‌ಲೈನ್ ಬಂದಾಗ ಎಲ್ಲವೂ ಅಪ್‌ಡೇಟ್ ಆಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "6019fada"
+  },
+  "app.pending.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "app.update.message": {
+    "message": "TodayZ ನ ಹೊಸ ಆವೃತ್ತಿ ಸಿದ್ಧವಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "d7dccfc5"
+  },
+  "app.update.action": {
+    "message": "ಅಪ್‌ಡೇಟ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "fb91e24f"
+  },
+  "app.error.title": {
+    "message": "ಏನೋ ತಪ್ಪಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "8d886c0b"
+  },
+  "app.error.body": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. ಹೀಗೆಯೇ ಆಗುತ್ತಿದ್ದರೆ, ಪುಟವನ್ನು ರಿಲೋಡ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "f081bc24"
+  },
+  "app.error.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "auth.signIn.title": {
+    "message": "ಸೈನ್ ಇನ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "ada2e9e9"
+  },
+  "auth.signIn.sub": {
+    "message": "ನಿಮ್ಮ ಮೊಬೈಲ್ ನಂಬರ್ ಬಳಸಿ. ನಾವು SMS ಮೂಲಕ ಕೋಡ್ ಕಳುಹಿಸುತ್ತೇವೆ.",
+    "review": "reviewed",
+    "enHash": "64b55666"
+  },
+  "auth.phone.label": {
+    "message": "ಮೊಬೈಲ್ ನಂಬರ್",
+    "review": "reviewed",
+    "enHash": "8e5c12de"
+  },
+  "auth.phone.help": {
+    "message": "ನಿಮ್ಮನ್ನು ಸೈನ್ ಇನ್ ಮಾಡಲು ಮತ್ತು ಆರ್ಡರ್ ಅಪ್‌ಡೇಟ್‌ಗಳಿಗೆ ನಾವು ಇದನ್ನು ಬಳಸುತ್ತೇವೆ.",
+    "review": "reviewed",
+    "enHash": "c656d92e"
+  },
+  "auth.phone.invalid": {
+    "message": "6, 7, 8 ಅಥವಾ 9 ರಿಂದ ಶುರುವಾಗುವ 10 ಅಂಕಿಯ ಮೊಬೈಲ್ ನಂಬರ್ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "6be55a3e"
+  },
+  "auth.code.send": {
+    "message": "ಕೋಡ್ ಕಳುಹಿಸಿ",
+    "review": "reviewed",
+    "enHash": "313503fa"
+  },
+  "auth.code.sending": {
+    "message": "ಕೋಡ್ ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "28de53b3"
+  },
+  "auth.code.label": {
+    "message": "6 ಅಂಕಿಯ ಕೋಡ್ ನಮೂದಿಸಿ",
+    "review": "reviewed",
+    "enHash": "d148321a"
+  },
+  "auth.code.digit": {
+    "message": "ಅಂಕಿ {position}",
+    "review": "reviewed",
+    "enHash": "1e73e888"
+  },
+  "auth.code.sentTo": {
+    "message": "ನಾವು {phone} ಗೆ ಕೋಡ್ ಕಳುಹಿಸಿದ್ದೇವೆ.",
+    "review": "reviewed",
+    "enHash": "c8aa6d25"
+  },
+  "auth.code.verifying": {
+    "message": "ಕೋಡ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "90adc49f"
+  },
+  "auth.code.resend": {
+    "message": "ಕೋಡ್ ಮತ್ತೆ ಕಳುಹಿಸಿ",
+    "review": "reviewed",
+    "enHash": "1d3cb8a9"
+  },
+  "auth.code.resendIn": {
+    "message": "{seconds} s ನಲ್ಲಿ ಮತ್ತೆ ಕಳುಹಿಸಿ",
+    "review": "reviewed",
+    "enHash": "f0589eca"
+  },
+  "auth.code.change": {
+    "message": "ನಂಬರ್ ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "6c3b4080"
+  },
+  "auth.error.wrongCode": {
+    "message": "ಆ ಕೋಡ್ ಸರಿಯಿಲ್ಲ. ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "47948633"
+  },
+  "auth.error.expired": {
+    "message": "ಆ ಕೋಡ್‌ನ ಅವಧಿ ಮುಗಿದಿದೆ. ಹೊಸ ಕೋಡ್ ಕೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "6a90a6f9"
+  },
+  "auth.error.locked": {
+    "message": "ತುಂಬಾ ಬಾರಿ ತಪ್ಪು ಕೋಡ್ ಹಾಕಲಾಗಿದೆ. ಹೊಸ ಕೋಡ್ ಕೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "371d1276"
+  },
+  "auth.error.rateLimited": {
+    "message": "ತುಂಬಾ ಪ್ರಯತ್ನಗಳು. ಸ್ವಲ್ಪ ಕಾದು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "c32bd496"
+  },
+  "auth.error.blocked": {
+    "message": "ಈ ಖಾತೆಗೆ ಈಗ ಸೈನ್ ಇನ್ ಆಗಲು ಸಾಧ್ಯವಿಲ್ಲ. ಸಪೋರ್ಟ್ ಅನ್ನು ಸಂಪರ್ಕಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "10997ecd"
+  },
+  "auth.error.network": {
+    "message": "TodayZ ಅನ್ನು ತಲುಪಲು ಆಗುತ್ತಿಲ್ಲ. ನಿಮ್ಮ ಕನೆಕ್ಷನ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "470230be"
+  },
+  "auth.error.generic": {
+    "message": "ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "9a3ea059"
+  },
+  "auth.error.captcha": {
+    "message": "ನೀವು ವ್ಯಕ್ತಿ ಎಂದು ನಮಗೆ ಪರಿಶೀಲಿಸಲು ಆಗಲಿಲ್ಲ. ಪುಟವನ್ನು ರಿಲೋಡ್ ಮಾಡಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "bc612d87"
+  },
+  "auth.welcome.title": {
+    "message": "TodayZ ಗೆ ಸ್ವಾಗತ",
+    "review": "reviewed",
+    "enHash": "941d65fc"
+  },
+  "auth.welcome.sub": {
+    "message": "ಅಂಗಡಿಗಳು ನಿಮ್ಮನ್ನು ಏನೆಂದು ಕರೆಯಬೇಕು ಎಂದು ತಿಳಿಸಿ. ಇದನ್ನು ಬಿಡಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "9856b46a"
+  },
+  "auth.welcome.name": {
+    "message": "ನಿಮ್ಮ ಹೆಸರು (ಐಚ್ಛಿಕ)",
+    "review": "reviewed",
+    "enHash": "32861acd"
+  },
+  "auth.welcome.continue": {
+    "message": "ಮುಂದುವರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "2e026239"
+  },
+  "auth.welcome.skip": {
+    "message": "ಈಗ ಬೇಡ",
+    "review": "reviewed",
+    "enHash": "6fc09607"
+  },
+  "auth.welcome.error": {
+    "message": "ನಿಮ್ಮ ಹೆಸರನ್ನು ಸೇವ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ. ನಂತರ “ಖಾತೆ” ಯಲ್ಲಿ ಸೇರಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "b471ab4d"
+  },
+  "lang.title": {
+    "message": "ನಿಮ್ಮ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "1ee9cc37"
+  },
+  "lang.sub": {
+    "message": "ಇದನ್ನು ಯಾವಾಗ ಬೇಕಾದರೂ “ಖಾತೆ” ಯಲ್ಲಿ ಬದಲಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "47df9e8c"
+  },
+  "lang.group": {
+    "message": "ಭಾಷೆ",
+    "review": "reviewed",
+    "enHash": "89b86ab0"
+  },
+  "lang.name.en": {
+    "message": "ಇಂಗ್ಲಿಷ್",
+    "review": "reviewed",
+    "enHash": "649df08a"
+  },
+  "lang.name.hi": {
+    "message": "ಹಿಂದಿ",
+    "review": "reviewed",
+    "enHash": "c9e6b253"
+  },
+  "lang.name.kn": {
+    "message": "ಕನ್ನಡ",
+    "review": "reviewed",
+    "enHash": "c3ed6655"
+  },
+  "lang.name.te": {
+    "message": "ತೆಲುಗು",
+    "review": "reviewed",
+    "enHash": "ea6c0346"
+  },
+  "lang.name.ta": {
+    "message": "ತಮಿಳು",
+    "review": "reviewed",
+    "enHash": "86c2b627"
+  },
+  "lang.continue": {
+    "message": "ಮುಂದುವರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "2e026239"
+  },
+  "lang.skip": {
+    "message": "ಬಿಟ್ಟುಬಿಡಿ",
+    "review": "reviewed",
+    "enHash": "3da47453"
+  },
+  "location.title": {
+    "message": "ನಾವು ಎಲ್ಲಿ ಹುಡುಕಬೇಕು?",
+    "review": "reviewed",
+    "enHash": "78c38f9c"
+  },
+  "location.sub": {
+    "message": "ಈ ಸ್ಥಳದ ಹತ್ತಿರದ ಅಂಗಡಿಗಳು ಮತ್ತು ಸ್ಟಾಕ್ ತೋರಿಸುತ್ತೇವೆ.",
+    "review": "reviewed",
+    "enHash": "7bd0799d"
+  },
+  "location.gps.title": {
+    "message": "ನನ್ನ ಈಗಿನ ಸ್ಥಳ ಬಳಸಿ",
+    "review": "reviewed",
+    "enHash": "9aee0641"
+  },
+  "location.gps.explain": {
+    "message": "ನಿಮ್ಮ ಬ್ರೌಸರ್ ನಿಮ್ಮ ಸ್ಥಳ ಹಂಚಿಕೊಳ್ಳಲು ಕೇಳುತ್ತದೆ. ನಿಮ್ಮ ಹತ್ತಿರದ ಅಂಗಡಿಗಳನ್ನು ಹುಡುಕಲು ಮಾತ್ರ ನಾವು ಇದನ್ನು ಬಳಸುತ್ತೇವೆ.",
+    "review": "reviewed",
+    "enHash": "aaf1690a"
+  },
+  "location.gps.button": {
+    "message": "ನನ್ನ ಸ್ಥಳ ಹಂಚಿಕೊಳ್ಳಿ",
+    "review": "reviewed",
+    "enHash": "fb3c7092"
+  },
+  "location.gps.locating": {
+    "message": "ನಿಮ್ಮ ಸ್ಥಳ ಹುಡುಕಲಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "4bd91431"
+  },
+  "location.gps.denied": {
+    "message": "TodayZ ಗೆ ಲೊಕೇಶನ್ ಆಫ್ ಆಗಿದೆ. ಬದಲಿಗೆ ನಿಮ್ಮ PIN ಕೋಡ್ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "f054ea82"
+  },
+  "location.gps.unavailable": {
+    "message": "ನಿಮ್ಮ ಸ್ಥಳ ಸಿಗಲಿಲ್ಲ. ಬದಲಿಗೆ ನಿಮ್ಮ PIN ಕೋಡ್ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "1f4ba08f"
+  },
+  "location.gps.label": {
+    "message": "ಈಗಿನ ಸ್ಥಳ",
+    "review": "reviewed",
+    "enHash": "75ea6a18"
+  },
+  "location.pin.title": {
+    "message": "PIN ಕೋಡ್ ನಮೂದಿಸಿ",
+    "review": "reviewed",
+    "enHash": "58808d4f"
+  },
+  "location.pin.label": {
+    "message": "PIN ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "3c52e572"
+  },
+  "location.pin.help": {
+    "message": "6 ಅಂಕಿಗಳು",
+    "review": "reviewed",
+    "enHash": "ab7fee7a"
+  },
+  "location.pin.invalid": {
+    "message": "6 ಅಂಕಿಯ PIN ಕೋಡ್ ನಮೂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "b8ed22d9"
+  },
+  "location.pin.save": {
+    "message": "ಈ PIN ಕೋಡ್ ಬಳಸಿ",
+    "review": "reviewed",
+    "enHash": "08e45709"
+  },
+  "location.pin.saved": {
+    "message": "PIN {pin}",
+    "review": "reviewed",
+    "enHash": "61d3ad30"
+  },
+  "location.search.title": {
+    "message": "ನಿಮ್ಮ ಏರಿಯಾ ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "df3ba7c9"
+  },
+  "location.search.soon": {
+    "message": "ಏರಿಯಾ ಹುಡುಕಾಟ ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ. ಸದ್ಯಕ್ಕೆ ನಿಮ್ಮ PIN ಕೋಡ್ ಬಳಸಿ.",
+    "review": "reviewed",
+    "enHash": "06cde99d"
+  },
+  "location.current": {
+    "message": "{place} ಹತ್ತಿರ ಶಾಪಿಂಗ್",
+    "review": "reviewed",
+    "enHash": "ef0894d4"
+  },
+  "location.set": {
+    "message": "ನಿಮ್ಮ ಸ್ಥಳ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "bd10f419"
+  },
+  "account.title": {
+    "message": "ಖಾತೆ",
+    "review": "reviewed",
+    "enHash": "85dfa32c"
+  },
+  "account.signedOut.title": {
+    "message": "TodayZ ಗೆ ಸೈನ್ ಇನ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "f9480b08"
+  },
+  "account.signedOut.body": {
+    "message": "ವಸ್ತುಗಳನ್ನು ಬುಕ್ ಮಾಡಲು, ನಿಮ್ಮ ಆರ್ಡರ್‌ಗಳನ್ನು ನೋಡಲು ಮತ್ತು ನಿಮ್ಮ ವಾಲೆಟ್ ಇಟ್ಟುಕೊಳ್ಳಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "2bd55cd8"
+  },
+  "account.signIn": {
+    "message": "ಸೈನ್ ಇನ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "ada2e9e9"
+  },
+  "account.loading": {
+    "message": "ನಿಮ್ಮ ಖಾತೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "f6f58e00"
+  },
+  "account.loadError": {
+    "message": "ನಿಮ್ಮ ಖಾತೆ ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ. ನಿಮ್ಮ ಕನೆಕ್ಷನ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "93afdf48"
+  },
+  "account.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "account.name.label": {
+    "message": "ಹೆಸರು",
+    "review": "reviewed",
+    "enHash": "709a2322"
+  },
+  "account.name.save": {
+    "message": "ಸೇವ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "account.name.saved": {
+    "message": "ಸೇವ್ ಆಯಿತು",
+    "review": "reviewed",
+    "enHash": "c0ae8f6e"
+  },
+  "account.name.conflict": {
+    "message": "ನಿಮ್ಮ ವಿವರಗಳು ಇನ್ನೊಂದು ಡಿವೈಸ್‌ನಲ್ಲಿ ಬದಲಾಗಿವೆ. ನಾವು ಅವುಗಳನ್ನು ಮತ್ತೆ ಲೋಡ್ ಮಾಡಿದ್ದೇವೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "3e1db0b1"
+  },
+  "account.name.error": {
+    "message": "ಅದನ್ನು ಸೇವ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "b1ecaf57"
+  },
+  "account.phone": {
+    "message": "ಮೊಬೈಲ್ ನಂಬರ್",
+    "review": "reviewed",
+    "enHash": "8e5c12de"
+  },
+  "account.language": {
+    "message": "ಭಾಷೆ",
+    "review": "reviewed",
+    "enHash": "89b86ab0"
+  },
+  "account.location": {
+    "message": "ಸ್ಥಳ",
+    "review": "reviewed",
+    "enHash": "d219c681"
+  },
+  "account.change": {
+    "message": "ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "64fbd995"
+  },
+  "account.signOut": {
+    "message": "ಸೈನ್ ಔಟ್",
+    "review": "reviewed",
+    "enHash": "dc1649a1"
+  }
+}

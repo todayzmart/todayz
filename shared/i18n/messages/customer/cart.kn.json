@@ -1,0 +1,172 @@
+{
+  "cart.title": {
+    "message": "ಕಾರ್ಟ್",
+    "review": "reviewed",
+    "enHash": "44656820"
+  },
+  "cart.empty.title": {
+    "message": "ನಿಮ್ಮ ಕಾರ್ಟ್ ಖಾಲಿಯಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "2303a3ae"
+  },
+  "cart.empty.body": {
+    "message": "ಹತ್ತಿರದಲ್ಲಿ ಏನನ್ನಾದರೂ ಹುಡುಕಿ ಇಲ್ಲಿ ಸೇರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "2e9a3b5a"
+  },
+  "cart.empty.cta": {
+    "message": "ಹತ್ತಿರದ ಅಂಗಡಿಗಳನ್ನು ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "ae63ad8c"
+  },
+  "cart.from": {
+    "message": "{shop} ನಿಂದ",
+    "review": "reviewed",
+    "enHash": "bb11572a"
+  },
+  "cart.quoteError": {
+    "message": "ಈಗ ಬೆಲೆಗಳನ್ನು ಪರಿಶೀಲಿಸಲು ಆಗಲಿಲ್ಲ. ನಿಮ್ಮ ಕಾರ್ಟ್ ಸೇವ್ ಆಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "4fcfefc8"
+  },
+  "cart.unavailable.title": {
+    "message": "ಕೆಲವು ವಸ್ತುಗಳನ್ನು ಬದಲಿಸಬೇಕು",
+    "review": "reviewed",
+    "enHash": "cc6e31b6"
+  },
+  "cart.unavailable.body": {
+    "message": "ಮುಂದುವರಿಯಲು ಕೆಳಗೆ ಗುರುತಿಸಿದ ವಸ್ತುಗಳನ್ನು ತೆಗೆಯಿರಿ ಅಥವಾ ಕಡಿಮೆ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "16235908"
+  },
+  "cart.lines.label": {
+    "message": "ನಿಮ್ಮ ಕಾರ್ಟ್‌ನ ವಸ್ತುಗಳು",
+    "review": "reviewed",
+    "enHash": "cd350d25"
+  },
+  "cart.loading": {
+    "message": "ಬೆಲೆಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತಿದ್ದೇವೆ",
+    "review": "reviewed",
+    "enHash": "59505f46"
+  },
+  "cart.subtotal": {
+    "message": "ವಸ್ತುಗಳು",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "cart.discount": {
+    "message": "ಆಫರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "cart.total": {
+    "message": "ಒಟ್ಟು",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "cart.priceNote": {
+    "message": "ಅಂತಿಮ ಬೆಲೆ ನೋಡಲು ಚೆಕ್‌ಔಟ್‌ನಲ್ಲಿ ಸೈನ್ ಇನ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "6a1eed78"
+  },
+  "cart.pickupOnly": {
+    "message": "ಅಂಗಡಿಯಿಂದ ತೆಗೆದುಕೊಳ್ಳಿ ಮತ್ತು ಅಲ್ಲೇ ಹಣ ಕೊಡಿ.",
+    "review": "reviewed",
+    "enHash": "51b5323d"
+  },
+  "cart.clear": {
+    "message": "ಕಾರ್ಟ್ ಖಾಲಿ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "40b6be92"
+  },
+  "cart.count": {
+    "message": "{count, plural, one {# ಐಟಂ} other {# ಐಟಂಗಳು}}",
+    "review": "reviewed",
+    "enHash": "f34cfa9c"
+  },
+  "cart.checkout": {
+    "message": "ಚೆಕ್‌ಔಟ್",
+    "review": "reviewed",
+    "enHash": "3ac8e9e5"
+  },
+  "cart.stepper.add": {
+    "message": "ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "cart.stepper.remove": {
+    "message": "ಒಂದು ಕಡಿಮೆ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "afbcf5f3"
+  },
+  "cart.stepper.increment": {
+    "message": "ಇನ್ನೊಂದು ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "87302651"
+  },
+  "cart.line.out": {
+    "message": "ಸ್ಟಾಕ್ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "cart.line.short": {
+    "message": "{count} ಮಾತ್ರ ಉಳಿದಿವೆ",
+    "review": "reviewed",
+    "enHash": "b9d3d050"
+  },
+  "cart.line.reduce": {
+    "message": "{count} ಕ್ಕೆ ಕಡಿಮೆ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "7b7befbe"
+  },
+  "cart.line.remove": {
+    "message": "ವಸ್ತು ತೆಗೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "76ecba1f"
+  },
+  "cart.creditsRow": {
+    "message": "ಕ್ರೆಡಿಟ್",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "cart.credits.use": {
+    "message": "ಕ್ರೆಡಿಟ್ ಬಳಸಿ",
+    "review": "reviewed",
+    "enHash": "9e984f02"
+  },
+  "cart.credits.hint": {
+    "message": "ಈ ಆರ್ಡರ್‌ನಲ್ಲಿ ನೀವು {max, plural, one {# ಕ್ರೆಡಿಟ್} other {# ಕ್ರೆಡಿಟ್}} ವರೆಗೆ ಬಳಸಬಹುದು. ಪ್ರತಿ ಕ್ರೆಡಿಟ್‌ನ ಬೆಲೆ ₹1.",
+    "review": "reviewed",
+    "enHash": "8a4fab2f"
+  },
+  "cart.credits.amount": {
+    "message": "ಬಳಸಬೇಕಾದ ಕ್ರೆಡಿಟ್",
+    "review": "reviewed",
+    "enHash": "24c50026"
+  },
+  "cart.credits.valueText": {
+    "message": "{count, plural, one {# ಕ್ರೆಡಿಟ್} other {# ಕ್ರೆಡಿಟ್}}, {off} ಕಡಿಮೆ",
+    "review": "reviewed",
+    "enHash": "745e39cc"
+  },
+  "cart.credits.using": {
+    "message": "{count, plural, one {# ಕ್ರೆಡಿಟ್} other {# ಕ್ರೆಡಿಟ್}} ಬಳಸಿ {off} ಕಡಿಮೆ. ಡೆಲಿವರಿಗೆ ಕ್ರೆಡಿಟ್ ಬಳಸಲು ಆಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "e5dcec8b"
+  },
+  "cart.credits.blocked.store_credit_cap": {
+    "message": "ಇಂದು ಈ ಅಂಗಡಿಯಲ್ಲಿ ಕ್ರೆಡಿಟ್ ಬಳಸಲು ಆಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "3a7d2b32"
+  },
+  "cart.credits.blocked.credit_monthly_cap": {
+    "message": "ಈ ತಿಂಗಳ ಕ್ರೆಡಿಟ್ ಮಿತಿಯನ್ನು ನೀವು ಬಳಸಿದ್ದೀರಿ.",
+    "review": "reviewed",
+    "enHash": "c1461e19"
+  },
+  "cart.credits.blocked.below_credit_minimum": {
+    "message": "ನಿಮ್ಮ ವಸ್ತುಗಳ ಮೊತ್ತ ಅಂಗಡಿಯ ಕ್ರೆಡಿಟ್ ಕನಿಷ್ಠ ಮೊತ್ತ ತಲುಪಿದಾಗ ಕ್ರೆಡಿಟ್ ಬಳಸಬಹುದು. ಬಳಸಲು ಇನ್ನಷ್ಟು ಸೇರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "6a686b14"
+  }
+}

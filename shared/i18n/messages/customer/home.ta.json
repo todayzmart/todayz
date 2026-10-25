@@ -1,0 +1,252 @@
+{
+  "home.search.label": {
+    "message": "பொருட்கள் அல்லது கடைகளைத் தேடவும்",
+    "review": "reviewed",
+    "enHash": "c21e85c0"
+  },
+  "home.search.placeholder": {
+    "message": "ஆட்டா, பால், கடையின் பெயர் தேடவும்",
+    "review": "reviewed",
+    "enHash": "bfbe9be2"
+  },
+  "home.noPlace.title": {
+    "message": "உங்கள் இருப்பிடத்தை அமைக்கவும்",
+    "review": "reviewed",
+    "enHash": "bd10f419"
+  },
+  "home.noPlace.body": {
+    "message": "உங்கள் அருகில் உள்ள கடைகளையும் பொருட்களையும் பார்க்க, நீங்கள் எங்கே இருக்கிறீர்கள் என்று தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "e58104a8"
+  },
+  "home.placeError.title": {
+    "message": "அந்த PIN கோடு கிடைக்கவில்லை",
+    "review": "reviewed",
+    "enHash": "479bb57f"
+  },
+  "home.placeError.body": {
+    "message": "உங்கள் இணைப்பைச் சரிபார்க்கவும் அல்லது இருப்பிடத்தை மீண்டும் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "41d12e91"
+  },
+  "home.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "home.stats.shops": {
+    "message": "அருகில் உள்ள கடைகள்",
+    "review": "reviewed",
+    "enHash": "aaae98a5"
+  },
+  "home.stats.open": {
+    "message": "இப்போது திறந்திருப்பவை",
+    "review": "reviewed",
+    "enHash": "d7a05e65"
+  },
+  "home.stats.products": {
+    "message": "பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "fe0a091f"
+  },
+  "home.radius.label": {
+    "message": "தேடும் தூரம்",
+    "review": "reviewed",
+    "enHash": "8df84e7a"
+  },
+  "home.radius.km": {
+    "message": "{km} km",
+    "review": "reviewed",
+    "enHash": "5d1ec3cd"
+  },
+  "home.categories.label": {
+    "message": "வகைகள்",
+    "review": "reviewed",
+    "enHash": "6ccb6007"
+  },
+  "home.category.active": {
+    "message": "{name} காட்டப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "12ce49c8"
+  },
+  "home.category.clear": {
+    "message": "எல்லாம் காட்டு",
+    "review": "reviewed",
+    "enHash": "50a279de"
+  },
+  "home.shops.title": {
+    "message": "உங்கள் அருகில் உள்ள கடைகள்",
+    "review": "reviewed",
+    "enHash": "75865004"
+  },
+  "home.shops.error": {
+    "message": "கடைகளை லோட் செய்ய முடியவில்லை.",
+    "review": "reviewed",
+    "enHash": "643ecdaf"
+  },
+  "home.shops.more": {
+    "message": "மேலும் கடைகளைக் காட்டு",
+    "review": "reviewed",
+    "enHash": "c1c91491"
+  },
+  "home.empty.title": {
+    "message": "இங்கே இன்னும் கடைகள் இல்லை",
+    "review": "reviewed",
+    "enHash": "75cb3ec4"
+  },
+  "home.empty.body": {
+    "message": "இந்தத் தூரத்தில் எந்தக் கடையும் இன்னும் TodayZ-இல் இல்லை. அதிக தூரத்தில் தேடவும்.",
+    "review": "reviewed",
+    "enHash": "e6e65a38"
+  },
+  "home.empty.widen": {
+    "message": "{km} km க்குள் தேடவும்",
+    "review": "reviewed",
+    "enHash": "45f8f29c"
+  },
+  "home.map.label": {
+    "message": "வரைபடத்தில் கடைகள்",
+    "review": "reviewed",
+    "enHash": "54173ebb"
+  },
+  "home.map.mapLabel": {
+    "message": "வரைபடம்: {km} km க்குள் {shops} கடைகள், இப்போது {open} திறந்துள்ளன",
+    "review": "reviewed",
+    "enHash": "81b48ba7"
+  },
+  "home.map.you": {
+    "message": "நீங்கள் இங்கே",
+    "review": "reviewed",
+    "enHash": "b900c1e3"
+  },
+  "home.map.legend.open": {
+    "message": "திறந்துள்ளது",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "home.map.legend.closed": {
+    "message": "மூடியுள்ளது",
+    "review": "reviewed",
+    "enHash": "88d86b77"
+  },
+  "home.map.legend.you": {
+    "message": "நீங்கள்",
+    "review": "reviewed",
+    "enHash": "905cb326"
+  },
+  "home.map.live": {
+    "message": "உங்கள் அருகில், இப்போது",
+    "review": "reviewed",
+    "enHash": "49cd82c5"
+  },
+  "home.map.expand": {
+    "message": "முழு வரைபடத்தைத் திற",
+    "review": "reviewed",
+    "enHash": "a4b03af4"
+  },
+  "home.map.pinOpen": {
+    "message": "{name}, திறந்துள்ளது",
+    "review": "reviewed",
+    "enHash": "39821bc8"
+  },
+  "home.map.pinClosed": {
+    "message": "{name}, மூடியுள்ளது",
+    "review": "reviewed",
+    "enHash": "ce238e4d"
+  },
+  "home.map.cluster": {
+    "message": "{count} கடைகள், ஜூம் செய்யவும்",
+    "review": "reviewed",
+    "enHash": "7a30704b"
+  },
+  "home.map.shopFallback": {
+    "message": "கடை",
+    "review": "reviewed",
+    "enHash": "55de8870"
+  },
+  "map.title": {
+    "message": "உங்கள் அருகில் உள்ள கடைகள்",
+    "review": "reviewed",
+    "enHash": "75865004"
+  },
+  "map.back": {
+    "message": "பின்செல்",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "map.view.label": {
+    "message": "காட்சி",
+    "review": "reviewed",
+    "enHash": "69bd4ef9"
+  },
+  "map.view.map": {
+    "message": "வரைபடம்",
+    "review": "reviewed",
+    "enHash": "ab478f3e"
+  },
+  "map.view.list": {
+    "message": "பட்டியல்",
+    "review": "reviewed",
+    "enHash": "a1fffaaa"
+  },
+  "map.truncated": {
+    "message": "வரைபடம் அருகில் உள்ள {count} கடைகளை மட்டுமே காட்டுகிறது. எல்லாவற்றையும் பார்க்க பட்டியலைப் பயன்படுத்தவும்.",
+    "review": "reviewed",
+    "enHash": "c562dc9d"
+  },
+  "map.sheet.view": {
+    "message": "கடையைப் பார்",
+    "review": "reviewed",
+    "enHash": "c55061ee"
+  },
+  "map.sheet.directions": {
+    "message": "வழி",
+    "review": "reviewed",
+    "enHash": "f814a9fb"
+  },
+  "map.sheet.close": {
+    "message": "மூடு",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "map.sheet.error": {
+    "message": "இந்தக் கடையை லோட் செய்ய முடியவில்லை.",
+    "review": "reviewed",
+    "enHash": "8b316a74"
+  },
+  "category.notFound.title": {
+    "message": "அந்த வகை கிடைக்கவில்லை",
+    "review": "reviewed",
+    "enHash": "822162f5"
+  },
+  "category.notFound.body": {
+    "message": "அதன் பெயர் மாறியிருக்கலாம். முகப்புத் திரையில் ஒரு வகையைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "f8fc7661"
+  },
+  "category.shops": {
+    "message": "{name} இல் கடைகள்",
+    "review": "reviewed",
+    "enHash": "0d95b2ba"
+  },
+  "category.empty.title": {
+    "message": "{km} km க்குள் {name} இல் கடைகள் இல்லை",
+    "review": "reviewed",
+    "enHash": "cba642b6"
+  },
+  "category.empty.body": {
+    "message": "அதிக தூரத்தை முயலவும்.",
+    "review": "reviewed",
+    "enHash": "42ec77ba"
+  },
+  "category.home": {
+    "message": "முகப்புக்குத் திரும்பு",
+    "review": "reviewed",
+    "enHash": "34ac37f5"
+  },
+  "home.category.page": {
+    "message": "வகையைத் திற",
+    "review": "reviewed",
+    "enHash": "d189c7fd"
+  }
+}
