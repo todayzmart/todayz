@@ -363,5 +363,35 @@
     "message": "இவற்றில் எதுவும் வேண்டாம்",
     "review": "reviewed",
     "enHash": "175ed947"
+  },
+  "ai.error.busy": {
+    "message": "மற்ற புகைப்படங்கள் இன்னும் படிக்கப்படுகின்றன. ஓரிரு நிமிடங்களில் மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "cc92d5e7"
+  },
+  "ai.err.not_permitted": {
+    "message": "உங்கள் பங்கால் இந்த வரியைச் சேர்க்க முடியாது. உரிமையாளர் அல்லது மேலாளரிடம் கேளுங்கள்.",
+    "review": "reviewed",
+    "enHash": "6d6a02fa"
+  },
+  "ai.partial": {
+    "message": "{n, plural, =0 {இன்னும் எதுவும் சேர்க்கப்படவில்லை.} one {# வரி சேர்க்கப்பட்டது.} other {# வரிகள் சேர்க்கப்பட்டன.}} கீழே குறிக்கப்பட்ட வரிகளைச் சரிசெய்து மீண்டும் உறுதிசெய்யவும்.",
+    "review": "reviewed",
+    "enHash": "5c64cef8"
+  },
+  "ai.line.added": {
+    "message": "சேர்க்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "b68734c2"
+  },
+  "ai.line.left": {
+    "message": "விடப்பட்டது",
+    "review": "reviewed",
+    "enHash": "e3b33f3c"
+  },
+  "ai.discardRest": {
+    "message": "மீதியை நீக்கவும்",
+    "review": "reviewed",
+    "enHash": "7f43c378"
   }
 }

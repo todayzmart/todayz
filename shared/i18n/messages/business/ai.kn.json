@@ -363,5 +363,35 @@
     "message": "ಇವುಗಳಲ್ಲಿ ಯಾವುದೂ ಬೇಡ",
     "review": "reviewed",
     "enHash": "175ed947"
+  },
+  "ai.error.busy": {
+    "message": "ಇತರ ಫೋಟೋಗಳನ್ನು ಇನ್ನೂ ಓದಲಾಗುತ್ತಿದೆ. ಒಂದೆರಡು ನಿಮಿಷದಲ್ಲಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "cc92d5e7"
+  },
+  "ai.err.not_permitted": {
+    "message": "ನಿಮ್ಮ ಪಾತ್ರಕ್ಕೆ ಈ ಸಾಲು ಸೇರಿಸಲು ಆಗುವುದಿಲ್ಲ. ಮಾಲೀಕರು ಅಥವಾ ಮ್ಯಾನೇಜರ್‌ಗೆ ಕೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "6d6a02fa"
+  },
+  "ai.partial": {
+    "message": "{n, plural, =0 {ಇನ್ನೂ ಏನೂ ಸೇರಿಸಿಲ್ಲ.} one {# ಸಾಲು ಸೇರಿಸಲಾಗಿದೆ.} other {# ಸಾಲುಗಳನ್ನು ಸೇರಿಸಲಾಗಿದೆ.}} ಕೆಳಗೆ ಗುರುತಿಸಿದ ಸಾಲುಗಳನ್ನು ಸರಿಪಡಿಸಿ ಮತ್ತೆ ದೃಢೀಕರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "5c64cef8"
+  },
+  "ai.line.added": {
+    "message": "ಸೇರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "b68734c2"
+  },
+  "ai.line.left": {
+    "message": "ಬಿಡಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "e3b33f3c"
+  },
+  "ai.discardRest": {
+    "message": "ಉಳಿದವನ್ನು ತೆಗೆದುಹಾಕಿ",
+    "review": "reviewed",
+    "enHash": "7f43c378"
   }
 }

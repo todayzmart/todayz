@@ -22,7 +22,7 @@ function features(over: Partial<typeof ON> = {}): Handler {
   return (c) => (c.method === 'GET' && c.path === `${AI}/retail` ? json(200, { ...ON, ...over }) : undefined);
 }
 
-const base = { promptVersion: 'v1', createdAt: '2026-10-24T08:00:00.000Z', outcomes: { accepted: 0, edited: 0, discarded: 0 }, failure: null };
+const base = { promptVersion: 'v1', createdAt: '2026-10-24T08:00:00.000Z', outcomes: [], failure: null };
 
 const billLines: SupplierBillLine[] = [
   { lineId: 'l1', name: 'AMUL BTR 100G', quantity: 6, costPaise: 5400, mrpPaise: 6000, expiresOn: null, confidence: 0.94, match: { storeItemId: 'si1', itemName: 'Amul Butter 100 g', onHand: 3 } },
@@ -82,6 +82,7 @@ describe('B-17 supplier bill scan', () => {
 
     const confirms = calls.filter((c) => c.path.endsWith('/confirm'));
     expect(confirms).toHaveLength(1);
+    expect(calls.find((c) => c.method === 'POST' && c.path.endsWith('/drafts'))?.headers.get('Idempotency-Key')).toBeTruthy();
     expect(confirms[0]?.headers.get('Idempotency-Key')).toBeTruthy();
     expect(confirms[0]?.body).toEqual({
       lines: [
@@ -114,6 +115,62 @@ describe('B-17 supplier bill scan', () => {
     fireEvent.change(within(butter).getByLabelText('Cost price'), { target: { value: '70' } });
     fireEvent.click(screen.getByRole('button', { name: 'Add stock for 2 items' }));
     expect(await within(butter).findByText('More than the MRP')).toBeInTheDocument();
+  });
+
+  it('applies the good lines, keeps the refused one open with its reason, and confirms it again (SC-AI-12)', async () => {
+    const calls: Call[] = [];
+    let n = 0;
+    const confirm = (c: Call) => {
+      const lines = (c.body as { lines: { lineId: string; outcome: string }[] }).lines;
+      // The first confirm refuses the butter line (cost above the MRP); the second takes it.
+      if (n++ === 0) return json(200, { draftId: 'd1', status: 'ready', lines: lines.map((l) => (l.lineId === 'l1' ? { lineId: 'l1', outcome: 'not_permitted', reason: 'invalid_cost_above_mrp' } : { lineId: l.lineId, outcome: l.outcome })) });
+      return json(200, { draftId: 'd1', status: 'confirmed', lines: [{ lineId: 'l1', outcome: 'edited' }, { lineId: 'l2', outcome: 'accepted' }, { lineId: 'l3', outcome: 'discarded' }] });
+    };
+    renderAt('/restock-scan', { messages, handlers: [shops('owner'), features(), bill(calls, { confirm })] });
+    await pick(photo());
+    const list = await screen.findByRole('list', { name: 'Bill lines' }, { timeout: 4000 });
+    fireEvent.click(screen.getByRole('button', { name: 'Add stock for 2 items' }));
+
+    expect(await screen.findByText(/1 line was added\. Fix the lines marked below/)).toBeInTheDocument();
+    const butter = within(list).getByRole('listitem', { name: 'Amul Butter 100 g' });
+    const salt = within(list).getByRole('listitem', { name: 'Tata Salt 1 kg' });
+    expect(within(butter).getByRole('alert')).toHaveTextContent('More than the MRP');
+    expect(within(salt).getByText('Added')).toBeInTheDocument();
+    expect(within(salt).getByRole('checkbox')).toBeDisabled();
+    expect(within(salt).queryByLabelText('Quantity')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Discard the rest' })).toBeInTheDocument();
+
+    // The person fixes the cost; only the open line goes again, under a new key.
+    fireEvent.change(within(butter).getByLabelText('Cost price'), { target: { value: '50' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add stock for 1 item' }));
+    expect(await screen.findByText('Stock added for 2 items')).toBeInTheDocument();
+    const confirms = calls.filter((c) => c.path.endsWith('/confirm'));
+    expect(confirms).toHaveLength(2);
+    // The salt and the unmatched line were settled by the first confirm and are not sent again.
+    expect(confirms[1]?.body).toEqual({ lines: [{ lineId: 'l1', outcome: 'edited', value: { storeItemId: 'si1', quantity: 6, costPaise: 5000, expiresOn: null } }] });
+    expect(confirms[1]?.headers.get('Idempotency-Key')).not.toEqual(confirms[0]?.headers.get('Idempotency-Key'));
+  });
+
+  it('says a refused line needs another role', async () => {
+    const confirm = (c: Call) => {
+      const lines = (c.body as { lines: { lineId: string; outcome: string }[] }).lines;
+      return json(200, { draftId: 'd1', status: 'ready', lines: lines.map((l) => (l.outcome === 'discarded' ? { lineId: l.lineId, outcome: 'discarded' } : { lineId: l.lineId, outcome: 'not_permitted', reason: 'not_permitted' })) });
+    };
+    renderAt('/restock-scan', { messages, handlers: [shops('manager'), features(), bill([], { confirm })] });
+    await pick(photo());
+    await screen.findByRole('list', { name: 'Bill lines' }, { timeout: 4000 });
+    fireEvent.click(screen.getByRole('button', { name: 'Add stock for 2 items' }));
+    expect(await screen.findAllByText('Your role cannot add this line. Ask the owner or a manager.')).toHaveLength(2);
+    expect(screen.getByText(/Nothing was added yet/)).toBeInTheDocument();
+  });
+
+  it('says when other photos are still being read (429)', async () => {
+    renderAt('/restock-scan', {
+      messages,
+      handlers: [shops('owner'), features(), (c) => (c.method === 'POST' && c.path.endsWith('/supplier-bill/drafts') ? json(429, { type: 'about:blank#rate_limited', title: 'x', status: 429, code: 'rate_limited' }, { 'retry-after': '90' }) : undefined)],
+    });
+    await pick(photo());
+    expect(await screen.findByText('Other photos are still being read. Try again in a minute or two.')).toBeInTheDocument();
   });
 
   it('discards the whole draft with every line discarded', async () => {
@@ -168,12 +225,13 @@ const shelfLines: ShelfPhotoLine[] = [
   { lineId: 'l3', name: 'Good Day', brand: null, size: null, confidence: 0.8, product: { productId: 'p3', name: 'Good Day 100 g', brand: 'Britannia', size: '100 g', mrpPaise: 2000 }, listed: true, pricePaise: 1900 },
 ];
 
-function shelf(calls: Call[]): Handler {
+function shelf(calls: Call[], confirm?: (c: Call) => Response): Handler {
   return (c) => {
     if (!c.path.startsWith(`${AI}/shelf-photo/drafts`)) return undefined;
     calls.push(c);
     if (c.method === 'POST' && c.path.endsWith('/drafts')) return json(202, { draftId: 'd2' });
     if (c.method === 'GET') return json(200, { ...base, draftId: 'd2', feature: 'shelf-photo', status: 'ready', lines: shelfLines });
+    if (confirm) return confirm(c);
     const lines = (c.body as { lines: { lineId: string; outcome: string }[] }).lines;
     return json(200, { draftId: 'd2', status: 'confirmed', lines });
   };
@@ -201,6 +259,26 @@ describe('B-18 shelf photo', () => {
         { lineId: 'l3', outcome: 'discarded' },
       ],
     });
+  });
+
+  it('adds the good products and keeps one listed meanwhile open with its reason (SC-AI-16)', async () => {
+    const calls: Call[] = [];
+    const confirm = (c: Call) => {
+      const lines = (c.body as { lines: { lineId: string; outcome: string }[] }).lines;
+      return json(200, { draftId: 'd2', status: 'ready', lines: lines.map((l) => (l.lineId === 'l2' ? { lineId: 'l2', outcome: 'not_permitted', reason: 'invalid_listed' } : { lineId: l.lineId, outcome: l.outcome })) });
+    };
+    renderAt('/onboarding/shelf', { messages, handlers: [shops('owner'), features(), shelf(calls, confirm)] });
+    await pick(photo());
+    const list = await screen.findByRole('list', { name: 'Products found' }, { timeout: 4000 });
+    fireEvent.click(screen.getByRole('button', { name: 'Add 2 products' }));
+    expect(await screen.findByText(/1 line was added/)).toBeInTheDocument();
+    const parle = within(list).getByRole('listitem', { name: 'Parle-G 250 g' });
+    expect(within(parle).getByRole('alert')).toHaveTextContent('Already in your stock');
+    expect(within(list).getByRole('listitem', { name: 'Maggi Masala Noodles 70 g' })).toHaveTextContent('Added');
+    // Leaving the rest out sends only the open line.
+    fireEvent.click(screen.getByRole('button', { name: 'Discard the rest' }));
+    await waitFor(() => expect(calls.filter((c) => c.path.endsWith('/confirm'))).toHaveLength(2));
+    expect(calls.filter((c) => c.path.endsWith('/confirm'))[1]?.body).toEqual({ lines: [{ lineId: 'l2', outcome: 'discarded' }] });
   });
 
   it('is an empty state when the feature is off (SC-AI-24)', async () => {
@@ -242,6 +320,7 @@ describe('B-11 reply draft (AI-R5)', () => {
     const box = screen.getByLabelText('Your reply');
     await waitFor(() => expect(box).toHaveValue('Thank you, Asha!'), { timeout: 4000 });
     expect(screen.getByText(/Drafted by AI/)).toBeInTheDocument();
+    expect(calls.find((c) => c.method === 'POST' && c.path.endsWith('/drafts'))?.headers.get('Idempotency-Key')).toBeTruthy();
     expect(calls.some((c) => c.path.endsWith('/confirm'))).toBe(false);
     fireEvent.change(box, { target: { value: 'Thank you, Asha! See you soon.' } });
     fireEvent.click(screen.getByRole('button', { name: 'Send reply' }));
@@ -307,7 +386,9 @@ describe('B-08 banner wording (AI-R9)', () => {
     const sheet = await openBannerSheet();
     fireEvent.click(await within(sheet).findByRole('button', { name: 'Suggest wording' }));
     const options = await within(sheet).findByRole('group', { name: 'Pick a wording' }, { timeout: 4000 });
-    expect(calls.find((c) => c.method === 'POST' && c.path.endsWith('/drafts'))?.body).toEqual({ offerId: 'o1' });
+    const create = calls.find((c) => c.method === 'POST' && c.path.endsWith('/drafts'));
+    expect(create?.body).toEqual({ offerId: 'o1' });
+    expect(create?.headers.get('Idempotency-Key')).toBeTruthy();
     fireEvent.click(within(options).getByRole('radio', { name: /Light up your Diwali/ }));
     fireEvent.click(within(sheet).getByRole('button', { name: 'Use this' }));
     await waitFor(() => expect(within(sheet).getByLabelText('Headline')).toHaveValue('Light up your Diwali'));

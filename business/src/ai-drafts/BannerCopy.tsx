@@ -24,8 +24,7 @@ export function BannerCopy({ store, request, onUse }: { store: CurrentStore; req
   const action = useAction();
   const name = useId();
   const [draftId, setDraftId] = useState<string | null>(null);
-  const [creating, setCreating] = useState(false);
-  const [failure, setFailure] = useState<unknown>(null);
+  const create = useAction();
   const [pick, setPick] = useState<string | null>(null);
   const draft = useDraft<BannerCopyDraft>(store, 'banner-copy', draftId, (id) => getBannerCopyDraft(store.bid, store.sid, id));
   if (!features.bannerCopy || request === null) return null;
@@ -36,15 +35,9 @@ export function BannerCopy({ store, request, onUse }: { store: CurrentStore; req
     setPick(null);
   };
   const start = async () => {
-    setCreating(true);
-    setFailure(null);
-    try {
-      setDraftId((await createBannerCopyDraft(store.bid, store.sid, request)).draftId);
-    } catch (err) {
-      setFailure(err);
-    } finally {
-      setCreating(false);
-    }
+    // Keyed per request: a retry after a dropped connection gets the same draft, not a second call.
+    const made = await create.run(`create:${JSON.stringify(request)}`, (key) => createBannerCopyDraft(store.bid, store.sid, request, withKey(key)));
+    if (made) setDraftId(made.draftId);
   };
   const decide = async (chosen: string | null) => {
     if (!d) return;
@@ -57,10 +50,10 @@ export function BannerCopy({ store, request, onUse }: { store: CurrentStore; req
   if (draftId === null || (d && d.status !== 'processing' && d.status !== 'ready' && d.status !== 'failed')) {
     return (
       <div className={styles.aiBox}>
-        <Button size="sm" icon={Sparkles} loading={creating} onClick={() => void start()}>
+        <Button size="sm" icon={Sparkles} loading={create.pending} onClick={() => void start()}>
           {intl.formatMessage({ id: 'ai.banner.suggest' })}
         </Button>
-        <AiError error={failure} />
+        <AiError error={create.error} />
       </div>
     );
   }

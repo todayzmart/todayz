@@ -363,5 +363,35 @@
     "message": "వీటిలో ఏదీ వద్దు",
     "review": "reviewed",
     "enHash": "175ed947"
+  },
+  "ai.error.busy": {
+    "message": "ఇతర ఫోటోలు ఇంకా చదువుతున్నాం. ఒకటి రెండు నిమిషాల్లో మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "cc92d5e7"
+  },
+  "ai.err.not_permitted": {
+    "message": "మీ పాత్రతో ఈ లైన్ జోడించలేరు. యజమాని లేదా మేనేజర్‌ని అడగండి.",
+    "review": "reviewed",
+    "enHash": "6d6a02fa"
+  },
+  "ai.partial": {
+    "message": "{n, plural, =0 {ఇంకా ఏదీ జోడించలేదు.} one {# లైన్ జోడించాం.} other {# లైన్‌లు జోడించాం.}} కింద గుర్తు పెట్టిన లైన్‌లు సరిచేసి మళ్లీ నిర్ధారించండి.",
+    "review": "reviewed",
+    "enHash": "5c64cef8"
+  },
+  "ai.line.added": {
+    "message": "జోడించాం",
+    "review": "reviewed",
+    "enHash": "b68734c2"
+  },
+  "ai.line.left": {
+    "message": "వదిలేశాం",
+    "review": "reviewed",
+    "enHash": "e3b33f3c"
+  },
+  "ai.discardRest": {
+    "message": "మిగతావి తీసేయండి",
+    "review": "reviewed",
+    "enHash": "7f43c378"
   }
 }

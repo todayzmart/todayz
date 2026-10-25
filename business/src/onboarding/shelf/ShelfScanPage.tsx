@@ -8,8 +8,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Camera } from 'lucide-react';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
-import { AiError, DraftNote } from '../../ai-drafts/AiError';
+import { AiError, DraftNote, LineOutcome, PartialNote } from '../../ai-drafts/AiError';
 import { lineReasonId, lineReasons } from '../../ai-drafts/errors';
+import { outcomesOf } from '../../ai-drafts/partial';
 import { useAiFeatures, withKey } from '../../ai-drafts/queries';
 import { ScanFlow } from '../../ai-drafts/ScanFlow';
 import type { CurrentStore } from '../../orders/store';
@@ -42,7 +43,7 @@ function ShelfDesk({ store }: { store: CurrentStore }) {
           features={features}
           text={{ desc: 'ai.shelf.desc', pick: 'ai.shelf.pick', reading: 'ai.shelf.reading', failed: 'ai.shelf.failed' }}
           feature="shelf-photo"
-          create={(photo) => createShelfPhotoDraft(store.bid, store.sid, { photo })}
+          create={(photo, key) => createShelfPhotoDraft(store.bid, store.sid, { photo }, withKey(key))}
           get={(id) => getShelfPhotoDraft(store.bid, store.sid, id)}
           ready={(d, done) => <Products store={store} draft={d} onDone={done} />}
           summary={(r, d, again) => <Summary result={r} draft={d} onAgain={again} />}
@@ -58,9 +59,14 @@ function Products({ store, draft, onDone }: { store: CurrentStore; draft: ShelfP
   const action = useAction();
   const [edits, setEdits] = useState<Record<string, ShelfEdit>>(() => Object.fromEntries(draft.lines.map((l) => [l.lineId, startShelf(l)])));
   const [problems, setProblems] = useState<Record<string, ShelfProblem>>({});
-  const plan = decideShelf(draft.lines, edits);
+  // A partial confirm (status ready) settles some lines; only the open ones are decided again.
+  const [partial, setPartial] = useState<AiConfirmResult | null>(null);
+  const done = outcomesOf(partial?.lines ?? draft.outcomes);
+  const open = draft.lines.filter((l) => !done.settled.has(l.lineId));
+  const plan = decideShelf(open, edits);
   const n = plan.decisions.filter((x) => x.outcome !== 'discarded').length;
   const server = lineReasons(action.error);
+  const sent = new Map(open.map((l, i) => [l.lineId, i]));
 
   const edit = (id: string, patch: Partial<ShelfEdit>) => {
     setEdits((all) => ({ ...all, [id]: { ...(all[id] as ShelfEdit), ...patch } }));
@@ -75,7 +81,8 @@ function Products({ store, draft, onDone }: { store: CurrentStore; draft: ShelfP
       // New store items: every stock list and the Overview read again.
       void qc.invalidateQueries({ queryKey: ['biz', store.bid, 'store', store.sid] });
       void qc.invalidateQueries({ queryKey: ['stock'] });
-      onDone(result);
+      if (result.status === 'ready') setPartial(result);
+      else onDone(result);
     }
   };
   const confirm = () => {
@@ -83,7 +90,7 @@ function Products({ store, draft, onDone }: { store: CurrentStore; draft: ShelfP
     if (Object.keys(plan.problems).length > 0) return;
     void send(plan.decisions, 'confirm');
   };
-  const discard = () => void send(draft.lines.map((l) => ({ lineId: l.lineId, outcome: 'discarded' as const })), 'discard');
+  const discard = () => void send(open.map((l) => ({ lineId: l.lineId, outcome: 'discarded' as const })), 'discard');
   const conflict = action.error instanceof ApiError && action.error.code === 'invalid_transition';
 
   return (
@@ -96,11 +103,14 @@ function Products({ store, draft, onDone }: { store: CurrentStore; draft: ShelfP
       }}
     >
       <DraftNote />
+      {done.refused.size > 0 && <PartialNote added={done.added} />}
       <ul className={styles.lines} aria-label={intl.formatMessage({ id: 'ai.shelf.lines' })}>
-        {draft.lines.map((l, i) => {
-          const e = edits[l.lineId] ?? startShelf(l);
+        {draft.lines.map((l) => {
+          const settled = done.settled.get(l.lineId);
+          const e = settled === undefined ? (edits[l.lineId] ?? startShelf(l)) : { ...startShelf(l), on: settled !== 'discarded' };
           const why = problems[l.lineId];
-          const fromServer = server[i] ?? {};
+          const i = sent.get(l.lineId);
+          const fromServer = (i === undefined ? undefined : server[i]) ?? {};
           const say = (field: 'pricePaise' | 'openingStock') => {
             const local = field === 'pricePaise' && why === 'price' ? 'price' : field === 'openingStock' && why === 'quantity' ? 'quantity' : undefined;
             const r = local ?? fromServer[field];
@@ -112,7 +122,7 @@ function Products({ store, draft, onDone }: { store: CurrentStore; draft: ShelfP
           return (
             <li key={l.lineId} className={styles.line} data-off={!e.on || undefined} aria-labelledby={rowId}>
               <div className={styles.lineHead}>
-                <input type="checkbox" id={`${rowId}-on`} checked={e.on} disabled={!addable(l)} onChange={(ev) => edit(l.lineId, { on: ev.target.checked })} />
+                <input type="checkbox" id={`${rowId}-on`} checked={e.on} disabled={!addable(l) || settled !== undefined} onChange={(ev) => edit(l.lineId, { on: ev.target.checked })} />
                 <label htmlFor={`${rowId}-on`}>
                   <b id={rowId}>{p ? p.name : l.name}</b>
                   <span className={styles.meta}>
@@ -125,7 +135,8 @@ function Products({ store, draft, onDone }: { store: CurrentStore; draft: ShelfP
                   {p && p.mrpPaise !== null && <span className={styles.meta}>{intl.formatMessage({ id: 'ai.bill.mrp' }, { mrp: formatMoney(p.mrpPaise) })}</span>}
                 </label>
               </div>
-              {addable(l) && e.on && (
+              <LineOutcome settled={settled} refused={done.refused.get(l.lineId)} isRefused={done.refused.has(l.lineId)} />
+              {addable(l) && e.on && settled === undefined && (
                 <div className={styles.fields}>
                   <TextField label={intl.formatMessage({ id: 'ai.shelf.price' })} prefix="₹" inputMode="decimal" value={e.price} error={say('pricePaise')} onChange={(ev) => edit(l.lineId, { price: ev.target.value })} />
                   <TextField
@@ -159,7 +170,7 @@ function Products({ store, draft, onDone }: { store: CurrentStore; draft: ShelfP
           {intl.formatMessage({ id: 'ai.shelf.confirm' }, { n })}
         </Button>
         <Button variant="ghost" onClick={discard} disabled={action.pending}>
-          {intl.formatMessage({ id: 'ai.discard' })}
+          {intl.formatMessage({ id: done.settled.size > 0 ? 'ai.discardRest' : 'ai.discard' })}
         </Button>
       </div>
     </form>

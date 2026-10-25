@@ -290,5 +290,29 @@
   "ai.banner.none": {
     "defaultMessage": "None of these",
     "description": "Button: discard every option"
+  },
+  "ai.error.busy": {
+    "defaultMessage": "Other photos are still being read. Try again in a minute or two.",
+    "description": "Too many AI requests in flight for the store (429); wait and try again"
+  },
+  "ai.err.not_permitted": {
+    "defaultMessage": "Your role cannot add this line. Ask the owner or a manager.",
+    "description": "Line refused: the person's role may not make this change"
+  },
+  "ai.partial": {
+    "defaultMessage": "{n, plural, =0 {Nothing was added yet.} one {# line was added.} other {# lines were added.}} Fix the lines marked below and confirm them again.",
+    "description": "After a partial confirm; n is the lines already added, the refused lines stay open"
+  },
+  "ai.line.added": {
+    "defaultMessage": "Added",
+    "description": "Note on a line a partial confirm already added"
+  },
+  "ai.line.left": {
+    "defaultMessage": "Left out",
+    "description": "Note on a line a partial confirm left out"
+  },
+  "ai.discardRest": {
+    "defaultMessage": "Discard the rest",
+    "description": "Button after a partial confirm: leave out the lines still open"
   }
 }

@@ -9,8 +9,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ScanLine } from 'lucide-react';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
-import { AiError, DraftNote } from '../ai-drafts/AiError';
+import { AiError, DraftNote, LineOutcome, PartialNote } from '../ai-drafts/AiError';
 import { lineReasonId, lineReasons } from '../ai-drafts/errors';
+import { outcomesOf } from '../ai-drafts/partial';
 import { ScanFlow } from '../ai-drafts/ScanFlow';
 import { useAiFeatures, withKey } from '../ai-drafts/queries';
 import type { CurrentStore } from '../orders/store';
@@ -43,7 +44,7 @@ function ScanDesk({ store }: { store: CurrentStore }) {
           features={features}
           text={{ desc: 'ai.bill.desc', pick: 'ai.bill.pick', reading: 'ai.bill.reading', failed: 'ai.bill.failed' }}
           feature="supplier-bill"
-          create={(photo) => createSupplierBillDraft(store.bid, store.sid, { photo })}
+          create={(photo, key) => createSupplierBillDraft(store.bid, store.sid, { photo }, withKey(key))}
           get={(id) => getSupplierBillDraft(store.bid, store.sid, id)}
           ready={(d, done) => <Lines store={store} draft={d} onDone={done} />}
           summary={(r, d, again) => <Summary result={r} lines={d.lines} onAgain={again} />}
@@ -59,9 +60,14 @@ function Lines({ store, draft, onDone }: { store: CurrentStore; draft: SupplierB
   const action = useAction();
   const [edits, setEdits] = useState<Record<string, LineEdit>>(() => Object.fromEntries(draft.lines.map((l) => [l.lineId, startEdit(l)])));
   const [problems, setProblems] = useState<Record<string, LineProblem>>({});
-  const plan = decide(draft.lines, edits);
+  // A partial confirm (status ready) settles some lines; only the open ones are decided again.
+  const [partial, setPartial] = useState<AiConfirmResult | null>(null);
+  const done = outcomesOf(partial?.lines ?? draft.outcomes);
+  const open = draft.lines.filter((l) => !done.settled.has(l.lineId));
+  const plan = decide(open, edits);
   const n = addCount(plan.decisions);
   const server = lineReasons(action.error);
+  const sent = new Map(open.map((l, i) => [l.lineId, i]));
 
   const edit = (id: string, patch: Partial<LineEdit>) => {
     setEdits((all) => ({ ...all, [id]: { ...(all[id] as LineEdit), ...patch } }));
@@ -76,7 +82,8 @@ function Lines({ store, draft, onDone }: { store: CurrentStore; draft: SupplierB
       // The restock changed stock counts: every stock list and the Overview read again.
       void qc.invalidateQueries({ queryKey: ['biz', store.bid, 'store', store.sid] });
       void qc.invalidateQueries({ queryKey: ['stock'] });
-      onDone(result);
+      if (result.status === 'ready') setPartial(result);
+      else onDone(result);
     }
   };
   const confirm = () => {
@@ -84,7 +91,7 @@ function Lines({ store, draft, onDone }: { store: CurrentStore; draft: SupplierB
     if (Object.keys(plan.problems).length > 0) return;
     void send(plan.decisions, 'confirm');
   };
-  const discard = () => void send(draft.lines.map((l) => ({ lineId: l.lineId, outcome: 'discarded' as const })), 'discard');
+  const discard = () => void send(open.map((l) => ({ lineId: l.lineId, outcome: 'discarded' as const })), 'discard');
   const conflict = action.error instanceof ApiError && action.error.code === 'invalid_transition';
 
   return (
@@ -98,11 +105,14 @@ function Lines({ store, draft, onDone }: { store: CurrentStore; draft: SupplierB
     >
       {draft.supplier && <p className={styles.sub}>{intl.formatMessage({ id: 'ai.bill.from' }, { supplier: draft.supplier })}</p>}
       <DraftNote />
+      {done.refused.size > 0 && <PartialNote added={done.added} />}
       <ul className={styles.lines} aria-label={intl.formatMessage({ id: 'ai.bill.lines' })}>
-        {draft.lines.map((l, i) => {
-          const e = edits[l.lineId] ?? startEdit(l);
+        {draft.lines.map((l) => {
+          const settled = done.settled.get(l.lineId);
+          const e = settled === undefined ? (edits[l.lineId] ?? startEdit(l)) : { ...startEdit(l), on: settled !== 'discarded' };
           const why = problems[l.lineId];
-          const fromServer = server[i] ?? {};
+          const i = sent.get(l.lineId);
+          const fromServer = (i === undefined ? undefined : server[i]) ?? {};
           const say = (field: string) => {
             const local = field === 'quantity' && why === 'quantity' ? 'quantity' : field === 'costPaise' && why === 'cost' ? 'price' : undefined;
             const r = local ?? fromServer[field];
@@ -112,7 +122,7 @@ function Lines({ store, draft, onDone }: { store: CurrentStore; draft: SupplierB
           return (
             <li key={l.lineId} className={styles.line} data-off={!e.on || undefined} aria-labelledby={rowId}>
               <div className={styles.lineHead}>
-                <input type="checkbox" id={`${rowId}-on`} checked={e.on} disabled={l.match === null} onChange={(ev) => edit(l.lineId, { on: ev.target.checked })} />
+                <input type="checkbox" id={`${rowId}-on`} checked={e.on} disabled={l.match === null || settled !== undefined} onChange={(ev) => edit(l.lineId, { on: ev.target.checked })} />
                 <label htmlFor={`${rowId}-on`}>
                   <b id={rowId}>{l.match ? l.match.itemName : l.name}</b>
                   <span className={styles.meta}>
@@ -123,7 +133,8 @@ function Lines({ store, draft, onDone }: { store: CurrentStore; draft: SupplierB
                   {l.mrpPaise !== null && <span className={styles.meta}>{intl.formatMessage({ id: 'ai.bill.mrp' }, { mrp: formatMoney(l.mrpPaise) })}</span>}
                 </label>
               </div>
-              {l.match !== null && e.on && (
+              <LineOutcome settled={settled} refused={done.refused.get(l.lineId)} isRefused={done.refused.has(l.lineId)} />
+              {l.match !== null && e.on && settled === undefined && (
                 <div className={styles.fields}>
                   <TextField label={intl.formatMessage({ id: 'ai.bill.qty' })} inputMode="numeric" value={e.qty} error={say('quantity')} onChange={(ev) => edit(l.lineId, { qty: ev.target.value })} />
                   <TextField label={intl.formatMessage({ id: 'ai.bill.cost' })} prefix="₹" inputMode="decimal" value={e.cost} error={say('costPaise')} onChange={(ev) => edit(l.lineId, { cost: ev.target.value })} />
@@ -147,7 +158,7 @@ function Lines({ store, draft, onDone }: { store: CurrentStore; draft: SupplierB
           {intl.formatMessage({ id: 'ai.bill.confirm' }, { n })}
         </Button>
         <Button variant="ghost" onClick={discard} disabled={action.pending}>
-          {intl.formatMessage({ id: 'ai.discard' })}
+          {intl.formatMessage({ id: done.settled.size > 0 ? 'ai.discardRest' : 'ai.discard' })}
         </Button>
       </div>
     </form>

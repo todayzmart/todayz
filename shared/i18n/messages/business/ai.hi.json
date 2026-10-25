@@ -363,5 +363,35 @@
     "message": "इनमें से कोई नहीं",
     "review": "reviewed",
     "enHash": "175ed947"
+  },
+  "ai.error.busy": {
+    "message": "दूसरी फ़ोटो अभी पढ़ी जा रही हैं। एक-दो मिनट में फिर कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "cc92d5e7"
+  },
+  "ai.err.not_permitted": {
+    "message": "आपकी भूमिका यह लाइन नहीं जोड़ सकती। मालिक या मैनेजर से कहें।",
+    "review": "reviewed",
+    "enHash": "6d6a02fa"
+  },
+  "ai.partial": {
+    "message": "{n, plural, =0 {अभी कुछ नहीं जुड़ा।} one {# लाइन जुड़ गई।} other {# लाइनें जुड़ गईं।}} नीचे चिह्नित लाइनें ठीक करें और फिर से पक्का करें।",
+    "review": "reviewed",
+    "enHash": "5c64cef8"
+  },
+  "ai.line.added": {
+    "message": "जुड़ गया",
+    "review": "reviewed",
+    "enHash": "b68734c2"
+  },
+  "ai.line.left": {
+    "message": "छोड़ दिया",
+    "review": "reviewed",
+    "enHash": "e3b33f3c"
+  },
+  "ai.discardRest": {
+    "message": "बाकी हटाएं",
+    "review": "reviewed",
+    "enHash": "7f43c378"
   }
 }

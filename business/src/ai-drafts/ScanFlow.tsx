@@ -5,6 +5,7 @@ import { Banner, Button, Skeleton } from '@todayz/ui';
 import { useState, type ReactNode } from 'react';
 import { useIntl } from 'react-intl';
 import type { CurrentStore } from '../orders/store';
+import { useAction } from '../stores/queries';
 import { AiError } from './AiError';
 import { PhotoPick } from './PhotoPick';
 import { useDraft } from './queries';
@@ -22,7 +23,8 @@ export interface ScanFlowProps<D extends Draft> {
   text: { desc: string; pick: string; reading: string; failed: string };
   /** Query key part for the draft. */
   feature: string;
-  create: (photo: File) => Promise<{ draftId: string }>;
+  /** Sends the photo with its Idempotency-Key (the same key for a retry of the same photo). */
+  create: (photo: File, key: string) => Promise<{ draftId: string }>;
   get: (id: string) => Promise<D>;
   /** The ready draft; `done` is called with the confirm's answer. */
   ready: (draft: D, done: (r: AiConfirmResult) => void, again: () => void) => ReactNode;
@@ -37,26 +39,19 @@ export interface ScanFlowProps<D extends Draft> {
 export function ScanFlow<D extends Draft>({ store, features, text, feature, create, get, ready, summary }: ScanFlowProps<D>) {
   const intl = useIntl();
   const [draftId, setDraftId] = useState<string | null>(null);
-  const [creating, setCreating] = useState(false);
-  const [failure, setFailure] = useState<unknown>(null);
+  const action = useAction();
   const [result, setResult] = useState<AiConfirmResult | null>(null);
   const draft = useDraft<D>(store, feature, draftId, get);
 
   const start = async (photo: File) => {
-    setCreating(true);
-    setFailure(null);
-    try {
-      setDraftId((await create(photo)).draftId);
-    } catch (err) {
-      setFailure(err);
-    } finally {
-      setCreating(false);
-    }
+    // One key per photo: a retry after a dropped connection reuses it, so it never makes a second draft.
+    const made = await action.run(`create:${photo.name}:${photo.size}:${photo.lastModified}`, (key) => create(photo, key));
+    if (made) setDraftId(made.draftId);
   };
   const again = () => {
     setDraftId(null);
     setResult(null);
-    setFailure(null);
+    action.clearError();
   };
   const tryAgain = (
     <div className={styles.actions}>
@@ -70,8 +65,8 @@ export function ScanFlow<D extends Draft>({ store, features, text, feature, crea
     return (
       <>
         <p className={styles.sub}>{intl.formatMessage({ id: text.desc })}</p>
-        <PhotoPick label={intl.formatMessage({ id: text.pick })} types={features.photoTypes} maxBytes={features.maxPhotoBytes} busy={creating} onPick={(f) => void start(f)} />
-        <AiError error={failure} />
+        <PhotoPick label={intl.formatMessage({ id: text.pick })} types={features.photoTypes} maxBytes={features.maxPhotoBytes} busy={action.pending} onPick={(f) => void start(f)} />
+        <AiError error={action.error} />
       </>
     );
   }

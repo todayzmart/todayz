@@ -24,8 +24,7 @@ export function useReplyDraft(store: CurrentStore, review: StoreReview, fill: (t
   const qc = useQueryClient();
   const action = useAction();
   const [draftId, setDraftId] = useState<string | null>(null);
-  const [creating, setCreating] = useState(false);
-  const [failure, setFailure] = useState<unknown>(null);
+  const create = useAction();
   const draft = useDraft<ReviewReplyDraft>(store, 'review-reply', draftId, (id) => getReviewReplyDraft(store.bid, store.sid, id));
   const d = draft.data;
   const line = d?.status === 'ready' ? (d.lines[0] ?? null) : null;
@@ -43,15 +42,9 @@ export function useReplyDraft(store: CurrentStore, review: StoreReview, fill: (t
   }, [d, line]);
 
   const start = async () => {
-    setCreating(true);
-    setFailure(null);
-    try {
-      setDraftId((await createReviewReplyDraft(store.bid, store.sid, { reviewId: review.id })).draftId);
-    } catch (err) {
-      setFailure(err);
-    } finally {
-      setCreating(false);
-    }
+    // Keyed per review: a retry after a dropped connection gets the same draft, not a second call.
+    const made = await create.run(`create:${review.id}`, (key) => createReviewReplyDraft(store.bid, store.sid, { reviewId: review.id }, withKey(key)));
+    if (made) setDraftId(made.draftId);
   };
 
   /** Sends the reply through the draft. False when it did not go (the error is in `sendError`). */
@@ -67,10 +60,10 @@ export function useReplyDraft(store: CurrentStore, review: StoreReview, fill: (t
   return {
     available: features.reviewReply && review.reply === null,
     start,
-    busy: creating || d?.status === 'processing',
+    busy: create.pending || d?.status === 'processing',
     drafted: line !== null,
     failed: d?.status === 'failed',
-    error: failure ?? (draft.isError ? draft.error : null),
+    error: create.error ?? (draft.isError ? draft.error : null),
     send,
     sending: action.pending,
     sendError: action.error,
