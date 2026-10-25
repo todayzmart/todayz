@@ -106,7 +106,7 @@ func (s *Service) createDocument(ctx context.Context, bidStr string, body *busin
 	if err := v.err(); err != nil {
 		return businessapi.DocumentUpload{}, err
 	}
-	doc, key, err := s.insertDocument(ctx, audit.ActorStaff, p.UserID, bid, store, string(body.Kind), string(body.ContentType), body.SizeBytes, nil)
+	doc, key, err := s.insertDocument(ctx, audit.ActorStaff, p.UserID, bid, store, string(body.Kind), string(body.ContentType), body.SizeBytes, false, nil)
 	if err != nil {
 		return businessapi.DocumentUpload{}, err
 	}
@@ -127,7 +127,9 @@ func (s *Service) createDocument(ctx context.Context, bidStr string, body *busin
 // insertDocument records a pending document of the business (kind, content
 // type and size already checked) and returns it with its object key, audited
 // as the actor (kind, uid). check, when set, runs first in the transaction.
-func (s *Service) insertDocument(ctx context.Context, actorKind string, uid, bid ids.ID, store pgtype.UUID, kind, contentType string, size int64, check func(context.Context) error) (businessdb.BusinessDocument, string, error) {
+// field (the field routes, which confirm their uploads) leaves out of the cap
+// the pending documents whose upload was never confirmed in time.
+func (s *Service) insertDocument(ctx context.Context, actorKind string, uid, bid ids.ID, store pgtype.UUID, kind, contentType string, size int64, field bool, check func(context.Context) error) (businessdb.BusinessDocument, string, error) {
 	var doc businessdb.BusinessDocument
 	var key string
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
@@ -151,7 +153,15 @@ func (s *Service) insertDocument(ctx context.Context, actorKind string, uid, bid
 		if err := q.LockKey(ctx, "document:"+bid.String()+":"+kind); err != nil {
 			return err
 		}
-		n, err := q.CountDocumentsOfKind(ctx, businessdb.CountDocumentsOfKindParams{BusinessID: ids.UUID(bid), Kind: kind})
+		var n int32
+		var err error
+		if field {
+			n, err = q.CountFieldDocumentsOfKind(ctx, businessdb.CountFieldDocumentsOfKindParams{
+				BusinessID: ids.UUID(bid), Kind: kind, StaleBefore: s.clock.Now().Add(-pendingLife),
+			})
+		} else {
+			n, err = q.CountDocumentsOfKind(ctx, businessdb.CountDocumentsOfKindParams{BusinessID: ids.UUID(bid), Kind: kind})
+		}
 		if err != nil {
 			return err
 		}

@@ -1,9 +1,12 @@
 package business
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
+	"net/http"
 	"net/url"
 	"sort"
 	"strconv"
@@ -35,6 +38,8 @@ type presigner struct {
 	bucket       string
 	accessKey    string
 	secretKey    string
+	// client makes the HEAD call (httpx.NewOutboundClient; set by New).
+	client *http.Client
 }
 
 // newPresigner returns nil unless the endpoint (or R2 account), both keys
@@ -68,6 +73,44 @@ func (p *presigner) putURL(key, contentType string, size int64, now time.Time) s
 			"content-type": contentType, "content-length": strconv.FormatInt(size, 10),
 		},
 	})
+}
+
+// errNoObject is HEAD's 404: nothing was uploaded under the key.
+var errNoObject = errors.New("business: no such object")
+
+// object is what HEAD says about an uploaded object.
+type object struct {
+	size        int64
+	contentType string
+}
+
+// head reads the object's size and type (a signed HEAD), as support's
+// claim step does (W3-08).
+func (p *presigner) head(ctx context.Context, key string, now time.Time) (object, error) {
+	if p.client == nil {
+		return object{}, errors.New("business: no storage client")
+	}
+	u := presignURL(presignInput{
+		Method: http.MethodHead, Scheme: p.scheme, Host: p.host, Path: "/" + p.bucket + "/" + key,
+		Region: storageRegion, AccessKey: p.accessKey, SecretKey: p.secretKey,
+		Time: now, Expires: uploadTTL,
+	})
+	req, err := http.NewRequestWithContext(ctx, http.MethodHead, u, nil)
+	if err != nil {
+		return object{}, err
+	}
+	res, err := p.client.Do(req)
+	if err != nil {
+		return object{}, err
+	}
+	defer res.Body.Close()
+	switch {
+	case res.StatusCode == http.StatusNotFound:
+		return object{}, errNoObject
+	case res.StatusCode != http.StatusOK:
+		return object{}, errors.New("business: storage HEAD answered " + res.Status)
+	}
+	return object{size: res.ContentLength, contentType: res.Header.Get("Content-Type")}, nil
 }
 
 type presignInput struct {

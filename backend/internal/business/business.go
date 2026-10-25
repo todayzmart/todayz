@@ -38,6 +38,7 @@ import (
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/db"
+	"github.com/todayz/backend/internal/platform/httpx"
 	"github.com/todayz/backend/internal/platform/httpx/ifmatch"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
@@ -112,6 +113,9 @@ func New(d Deps) (*Service, error) {
 		s.audit = audit.New(d.DB, d.Clock, ipKey)
 	}
 	s.presign = newPresigner(d.Config.Storage)
+	if s.presign != nil {
+		s.presign.client = httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: d.Config.NoEgress})
+	}
 	return s, nil
 }
 

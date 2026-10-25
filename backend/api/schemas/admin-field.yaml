@@ -448,10 +448,13 @@ FieldAgentStats:
     have at least one collected or delivered order; null when none is verified. `inWindow` counts
     their businesses whose items they may still edit. `weekly` is the last 8 IST weeks, oldest
     first.
-  required: [agentId, name, businesses, storesLive, itemsAdded, inWindow, firstOrderRate, weekly]
+  required: [agentId, name, disabled, businesses, storesLive, itemsAdded, inWindow, firstOrderRate, weekly]
   properties:
     agentId: {$ref: ./common.yaml#/Ulid}
     name: {type: [string, "null"]}
+    disabled:
+      type: boolean
+      description: The agent's admin login is disabled. Their shops and numbers stay listed.
     businesses: {$ref: "#/FieldStatusCounts"}
     storesLive: {type: integer, minimum: 0}
     itemsAdded: {type: integer, minimum: 0}
@@ -471,7 +474,7 @@ FieldMyStats:
     serverNow: {$ref: ./common.yaml#/ServerNow}
 FieldAgentStatsList:
   type: object
-  description: Every agent who onboarded a business or holds the field_agent role, most businesses first.
+  description: Every admin user who holds the field_agent role, disabled ones included and marked, by name.
   required: [items, serverNow]
   properties:
     items:

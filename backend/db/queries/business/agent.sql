@@ -32,10 +32,26 @@ WHERE s.business_id = ANY(@business_ids::uuid[])
 ORDER BY s.created_at, s.id;
 
 -- name: FieldPhotoCounts :many
--- Shop photos (A-04) that are not rejected, per business.
+-- Shop photos (A-04) that are stored and not rejected, per business: a photo
+-- whose upload was never confirmed is not counted.
 SELECT business_id, count(*)::int AS photos FROM business_documents
-WHERE business_id = ANY(@business_ids::uuid[]) AND kind IN ('shop_photo','storefront') AND status <> 'rejected'
+WHERE business_id = ANY(@business_ids::uuid[]) AND kind IN ('shop_photo','storefront') AND status IN ('uploaded','accepted')
 GROUP BY business_id;
+
+-- name: CountFieldDocumentsOfKind :one
+-- The cap on one kind (5) for the field routes: every row but the rejected
+-- ones and the pending ones whose upload URL has expired unconfirmed.
+SELECT count(*)::int FROM business_documents
+WHERE business_id = @business_id AND kind = @kind AND status <> 'rejected'
+  AND (status <> 'pending' OR created_at >= @stale_before);
+
+-- name: FieldDocumentForUpdate :one
+SELECT * FROM business_documents WHERE id = @id AND business_id = @business_id FOR UPDATE;
+
+-- name: MarkDocumentUploaded :one
+UPDATE business_documents SET status = 'uploaded', updated_at = @now::timestamptz
+WHERE id = @id AND status = 'pending'
+RETURNING *;
 
 -- name: FieldOwners :many
 -- The owner row of some businesses (invited until the owner confirms), with
@@ -70,11 +86,25 @@ INSERT INTO field_owner_codes (id, business_id, phone_hash, code_hash, expires_a
 VALUES (@id, @business_id, @phone_hash, @code_hash, @expires_at, @sent_by, @now);
 
 -- name: OwnerCodeSendsByPhone :one
--- The codes sent to one number since a time: how many, the oldest and the latest.
+-- The codes sent to one number since a time, owner codes and sign-in codes
+-- together (01 §2 limits sends per number): how many, the oldest and the latest.
 SELECT count(*)::int AS sends,
   COALESCE(min(created_at), 'epoch'::timestamptz)::timestamptz AS oldest,
   COALESCE(max(created_at), 'epoch'::timestamptz)::timestamptz AS latest
-FROM field_owner_codes WHERE phone_hash = @phone_hash AND created_at >= @since;
+FROM (
+  SELECT c.created_at FROM field_owner_codes c WHERE c.phone_hash = sqlc.arg(phone_hash)::bytea AND c.created_at >= sqlc.arg(since)::timestamptz
+  UNION ALL
+  SELECT o.created_at FROM otp_requests o WHERE o.phone_hash = sqlc.arg(phone_hash)::bytea AND o.created_at >= sqlc.arg(since)::timestamptz
+) sends;
+
+-- name: OwnerCodeSendsByAgent :one
+-- The owner codes one agent sent since a time: how many and the oldest.
+SELECT count(*)::int AS sends, COALESCE(min(created_at), 'epoch'::timestamptz)::timestamptz AS oldest
+FROM field_owner_codes WHERE sent_by = @sent_by AND created_at >= @since;
+
+-- name: AccountStatusByPhone :one
+-- users.status of the account that holds a number (none when the number is new).
+SELECT u.status FROM phone_identities p JOIN users u ON u.id = p.user_id WHERE p.phone_hash = @phone_hash;
 
 -- name: LatestOwnerCodeForUpdate :one
 SELECT * FROM field_owner_codes
@@ -96,6 +126,11 @@ WHERE business_id = @business_id AND consumed_at IS NULL;
 ------------------------------------------------------------------------------
 -- Items an agent adds
 ------------------------------------------------------------------------------
+
+-- name: FieldItemAddedBy :one
+-- The agent who added a store item from the field routes (none for an item
+-- the shop added itself).
+SELECT agent_id FROM field_item_adds WHERE store_item_id = @store_item_id;
 
 -- name: InsertFieldItemAdd :exec
 INSERT INTO field_item_adds (store_item_id, business_id, store_id, agent_id, created_at)

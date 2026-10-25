@@ -18,8 +18,8 @@ func init() {
 	window := map[authz.Role]authz.Grant{authz.FieldAgent: authz.OwnWindow, authz.Admin: authz.Allow, authz.SuperAdmin: authz.Allow}
 	admins := map[authz.Role]authz.Grant{authz.Admin: authz.Allow, authz.SuperAdmin: authz.Allow}
 	Register(authz.Table{Domain: "field", Actions: []authz.Action{
-		{Name: AdminBusinessOnboard, Kind: authz.KindAdmin, Grants: own, Doc: "GET/POST /v1/admin/field/businesses, GET/PATCH .../{bid}, POST .../owner-confirm(/verify), .../documents, .../stores, GET .../stores/{sid}/items, .../products: own businesses only"},
-		{Name: AdminFieldItemsEdit, Kind: authz.KindAdmin, Grants: window, Doc: "POST .../stores/{sid}/items, PATCH .../items/{itemId}: own, inside field_agent_edit_window_days (D-39)"},
+		{Name: AdminBusinessOnboard, Kind: authz.KindAdmin, Grants: own, Doc: "GET/POST /v1/admin/field/businesses, GET/PATCH .../{bid}, POST .../owner-confirm(/verify), .../documents(/{docId}/confirm), .../stores, GET .../stores/{sid}/items, .../products: own businesses only"},
+		{Name: AdminFieldItemsEdit, Kind: authz.KindAdmin, Grants: window, Doc: "POST .../stores/{sid}/items, PATCH .../items/{itemId}: own, inside field_agent_edit_window_days (D-39); an agent changes only items they added (D-232)"},
 		{Name: AdminFieldOwnStats, Kind: authz.KindAdmin, Grants: own, Doc: "GET /v1/admin/field/me/stats (A-15): the caller's own numbers"},
 		{Name: AdminFieldAgentsView, Kind: authz.KindAdmin, Grants: admins, Doc: "GET /v1/admin/field-agents (A-15): every agent's numbers"},
 	}})

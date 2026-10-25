@@ -13,6 +13,7 @@ import (
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/gen/sqlc/businessdb"
 	"github.com/todayz/backend/internal/platform/audit"
+	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
 )
@@ -246,6 +247,17 @@ func (f *Field) updateItem(ctx context.Context, bidStr, sidStr, itemStr string, 
 		cur, err := f.d.Catalogue.Item(ctx, sid, itemID)
 		if err != nil {
 			return err
+		}
+		// D-232: an agent changes only the items they added; the shop's own
+		// items are the shop's.
+		if c.agent() {
+			by, err := f.s.q(ctx).FieldItemAddedBy(ctx, ids.UUID(itemID))
+			if db.IsNoRows(err) || (err == nil && by != ids.UUID(c.p.UserID)) {
+				return problem.New(genproblems.Forbidden, "an agent changes only the items they added")
+			}
+			if err != nil {
+				return fmt.Errorf("business: field item added by: %w", err)
+			}
 		}
 		if in.SetPrice || in.SetMrp || in.SetListed {
 			if err := f.d.Catalogue.UpdateItem(ctx, in); err != nil {

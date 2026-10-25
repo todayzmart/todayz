@@ -21,6 +21,7 @@ import (
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/pii"
+	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
@@ -33,6 +34,10 @@ const ownerTestCode = "000000"
 
 // userActive is users.status of an account that may sign in.
 const userActive = "active"
+
+// ownerCodeAgentWindow is the rolling window of the per-agent send cap
+// (field_owner_codes_per_agent_hour).
+const ownerCodeAgentWindow = time.Hour
 
 // ownerCodeHash is the keyed hash of a code, bound to its row.
 func (s *Service) ownerCodeHash(id ids.ID, code string) []byte {
@@ -95,12 +100,32 @@ func (f *Field) sendCode(ctx context.Context, bidStr string) (adminfieldapi.Fiel
 		if err != nil {
 			return err
 		}
-		hash := f.s.hash.Phone(e164)
-		// One number at a time, so two sends cannot both pass the limits.
-		if err := q.LockKey(ctx, "field-owner-code:"+hex.EncodeToString(hash)); err != nil {
+		// The account may have been blocked since the invite.
+		if err := f.ownerAccountOpen(ctx, e164); err != nil {
+			return err
+		}
+		// One agent at a time, then one number at a time (always in this
+		// order), so two sends cannot both pass the limits.
+		if err := q.LockKey(ctx, "field-owner-code-agent:"+c.p.UserID.String()); err != nil {
 			return err
 		}
 		now := f.s.clock.Now().UTC()
+		perAgent, err := f.d.Settings.Int(ctx, settings.FieldOwnerCodesPerAgentHour)
+		if err != nil {
+			return err
+		}
+		mine, err := q.OwnerCodeSendsByAgent(ctx, businessdb.OwnerCodeSendsByAgentParams{SentBy: ids.UUID(c.p.UserID), Since: now.Add(-ownerCodeAgentWindow)})
+		if err != nil {
+			return err
+		}
+		if int64(mine.Sends) >= perAgent {
+			return rateLimited(mine.Oldest.Add(ownerCodeAgentWindow).Sub(now), ownerCodeAgentWindow)
+		}
+		hash := f.s.hash.Phone(e164)
+		if err := q.LockKey(ctx, "field-owner-code:"+hex.EncodeToString(hash)); err != nil {
+			return err
+		}
+		// Sign-in codes to the number count too (01 §2 is per number).
 		sends, err := q.OwnerCodeSendsByPhone(ctx, businessdb.OwnerCodeSendsByPhoneParams{PhoneHash: hash, Since: now.Add(-rules.Window)})
 		if err != nil {
 			return err
@@ -157,6 +182,7 @@ func (f *Field) verifyCode(ctx context.Context, bidStr string, body *adminfielda
 	}
 	rules := f.d.OTP
 	var outcome error
+	var failure string // the metric outcome, counted once the transaction commits
 	var b businessdb.Business
 	err = f.s.db.InTx(ctx, func(ctx context.Context) error {
 		q := f.s.q(ctx)
@@ -187,7 +213,8 @@ func (f *Field) verifyCode(ctx context.Context, bidStr string, body *adminfielda
 		}
 		if int(row.Attempts) >= rules.MaxAttempts {
 			outcome = problem.New(genproblems.OtpLocked, "")
-			return nil
+			failure = ownerCodeLocked
+			return f.ownerCodeFailed(ctx, c, bid, ownerCodeLocked, 0)
 		}
 		if !now.Before(row.ExpiresAt) {
 			outcome = problem.New(genproblems.OtpExpired, "")
@@ -205,7 +232,11 @@ func (f *Field) verifyCode(ctx context.Context, bidStr string, body *adminfielda
 		if !match {
 			left := max(rules.MaxAttempts-int(attempts), 0)
 			outcome = problem.New(genproblems.CodeInvalid, "").WithExtension("attemptsLeft", left)
-			return nil
+			failure = ownerCodeWrong
+			if left == 0 {
+				failure = ownerCodeLockedOut
+			}
+			return f.ownerCodeFailed(ctx, c, bid, failure, left)
 		}
 		// The business may have changed since the code went out.
 		if err := submitReady(ctx, q, cur); err != nil {
@@ -249,8 +280,19 @@ func (f *Field) verifyCode(ctx context.Context, bidStr string, body *adminfielda
 	if err != nil {
 		return adminfieldapi.FieldBusiness{}, asProblem(err)
 	}
+	if failure != "" {
+		countOwnerCodeFailure(ctx, failure)
+	}
 	if outcome != nil {
 		return adminfieldapi.FieldBusiness{}, outcome
 	}
 	return f.view(ctx, c, b)
+}
+
+// ownerCodeFailed audits a failed owner-code try (kept: the transaction
+// commits). The row carries what happened and the tries left, never the
+// number or a code.
+func (f *Field) ownerCodeFailed(ctx context.Context, c fieldCall, bid ids.ID, what string, left int) error {
+	return f.s.writeAuditAs(ctx, audit.ActorAdmin, c.p.UserID, "business.owner_code_fail", "business", bid.String(), nil,
+		map[string]any{"outcome": what, "attemptsLeft": left})
 }

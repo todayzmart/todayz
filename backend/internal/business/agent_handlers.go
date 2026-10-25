@@ -61,6 +61,14 @@ func (h fieldHandlers) CreateFieldDocument(ctx context.Context, req adminfieldap
 	}, nil
 }
 
+func (h fieldHandlers) ConfirmFieldDocument(ctx context.Context, req adminfieldapi.ConfirmFieldDocumentRequestObject) (adminfieldapi.ConfirmFieldDocumentResponseObject, error) {
+	out, err := h.f.confirmPhoto(ctx, req.Bid, req.DocId)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return adminfieldapi.ConfirmFieldDocument200JSONResponse(out), nil
+}
+
 func (h fieldHandlers) SendFieldOwnerCode(ctx context.Context, req adminfieldapi.SendFieldOwnerCodeRequestObject) (adminfieldapi.SendFieldOwnerCodeResponseObject, error) {
 	out, err := h.f.sendCode(ctx, req.Bid)
 	if err != nil {

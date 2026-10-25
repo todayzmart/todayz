@@ -65,8 +65,10 @@
     description: >-
       The caller becomes `onboardedBy`. The owner's number is held sealed for the owner code and as
       an owner invite, so the owner can also take over from the business app with that number.
-      The owner's number may not be the caller's own.
-    x-idempotency: optional
+      The owner's number may not be the caller's own (`422`), nor the number of a blocked account
+      (`403 forbidden`). A retry needs the same `Idempotency-Key`: it answers the first draft again
+      and makes no second business or invite.
+    x-idempotency: required
     parameters:
       - $ref: ../common/parameters.yaml#/IdempotencyKey
     requestBody:
@@ -107,6 +109,7 @@
               stats: &agentStats
                 agentId: 01JB0R9X1Y2Z3A4B5C6D7E8F9G
                 name: Asha
+                disabled: false
                 businesses: {total: 14, draft: 2, submitted: 3, needsInfo: 1, verified: 8, rejected: 0, suspended: 0}
                 storesLive: 7
                 itemsAdded: 412
@@ -143,8 +146,8 @@
     summary: Change the business while it is in draft or needs info
     description: >-
       Only before the business is submitted (draft) or while it needs info. `ownerPhone` changes
-      only before the owner confirmed; it ends any code already sent. Other states are
-      `409 invalid_transition`.
+      only before the owner confirmed; it ends any code already sent. A blocked account's number is
+      `403 forbidden`. Other states are `409 invalid_transition`.
     x-idempotency: none
     requestBody:
       required: true
@@ -173,8 +176,10 @@
     description: >-
       The business must be ready to submit (a category and one store with address, pin, phone and
       hours), else `409 submit_incomplete` with the missing fields. Sends a 6-digit code by SMS to
-      the owner's number; the same limits as the sign-in code apply (`429 rate_limited` with
-      `Retry-After`). The code is never returned or logged.
+      the owner's number; the same limits as the sign-in code apply, and the sends per number count
+      the sign-in codes sent to it too (`429 rate_limited` with `Retry-After`). One agent may send
+      at most `field_owner_codes_per_agent_hour` codes in a rolling hour (`429`). A number whose
+      account is blocked gets no code (`403 forbidden`). The code is never returned or logged.
     x-idempotency: none
     x-problems: [submit_incomplete]
     responses:
@@ -232,8 +237,10 @@
     summary: Add a shop photo and get its upload URL
     description: >-
       Shop photos only (`shop_photo`, `storefront`). Returns a presigned PUT into the private bucket
-      (D-46), valid for 15 minutes, signed for the declared type and size. A business holds at most
-      5 photos of one kind that are not rejected (`409 conflict` past that).
+      (D-46), valid for 15 minutes, signed for the declared type and size. The photo stays `pending`
+      until `.../documents/{docId}/confirm` finds the file stored. A business holds at most 5 photos
+      of one kind that are not rejected (`409 conflict` past that); a `pending` photo whose upload URL
+      expired unconfirmed does not count, so failed uploads can be retried.
     x-idempotency: none
     requestBody:
       required: true
@@ -272,6 +279,40 @@
                   Content-Type: image/jpeg
                   Content-Length: "482113"
                 expiresAt: "2026-10-25T05:25:00Z"
+      default: *problem
+/v1/admin/field/businesses/{bid}/documents/{docId}/confirm:
+  parameters:
+    - *bid
+    - name: docId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: confirmFieldDocument
+    tags: [admin-field]
+    summary: Confirm a shop photo after its upload
+    description: >-
+      Called after the PUT succeeds. The API reads the stored object (a signed HEAD); when it is there
+      with the declared type and no larger than the declared size, the photo becomes `uploaded`, counts
+      in `photos` and goes to A-03 review. A file that is missing, of another type or larger is `422
+      validation_failed` and the photo stays `pending`. Confirming an `uploaded` photo again answers it
+      unchanged. Same edit rules as adding the photo.
+    x-idempotency: none
+    responses:
+      "200":
+        description: The photo after the check
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-field.yaml#/FieldDocument
+            example:
+              id: 01JB0S5K6M7N8P9Q0R1S2T3V4W
+              kind: storefront
+              contentType: image/jpeg
+              storeId: null
+              status: uploaded
+              createdAt: "2026-10-25T05:10:00Z"
       default: *problem
 /v1/admin/field/businesses/{bid}/stores:
   parameters:
@@ -452,7 +493,10 @@
     operationId: updateFieldItem
     tags: [admin-field]
     summary: Change an item's price, MRP or listing
-    description: Only while the caller may edit the business's items (D-39), else `403 forbidden`.
+    description: >-
+      Only while the caller may edit the business's items (D-39), else `403 forbidden`. A field agent
+      changes only the items they added on these routes; an item the shop added is `403` (D-232).
+      Admins change any item.
     x-idempotency: none
     requestBody:
       required: true

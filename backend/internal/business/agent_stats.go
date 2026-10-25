@@ -163,7 +163,8 @@ func (f *Field) myStats(ctx context.Context) (adminfieldapi.FieldMyStats, error)
 	return adminfieldapi.FieldMyStats{ServerNow: f.s.clock.Now().UTC(), Stats: st[0]}, nil
 }
 
-// agents is every field agent's numbers (admins only, by the policy).
+// agents is every field agent's numbers (admins only, by the policy). stats
+// keeps the order it is given, so st[i] is rows[i].
 func (f *Field) agents(ctx context.Context) (adminfieldapi.FieldAgentStatsList, error) {
 	if _, err := f.call(ctx); err != nil {
 		return adminfieldapi.FieldAgentStatsList{}, err
@@ -181,6 +182,10 @@ func (f *Field) agents(ctx context.Context) (adminfieldapi.FieldAgentStatsList, 
 	st, err := f.stats(ctx, agents, names)
 	if err != nil {
 		return adminfieldapi.FieldAgentStatsList{}, err
+	}
+	// A disabled agent stays listed (their shops are still theirs), marked.
+	for i, r := range rows {
+		st[i].Disabled = r.DisabledAt != nil
 	}
 	return adminfieldapi.FieldAgentStatsList{Items: st, ServerNow: f.s.clock.Now().UTC()}, nil
 }

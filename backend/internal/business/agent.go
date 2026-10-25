@@ -169,6 +169,7 @@ var fieldOps = map[string]string{
 	"SendFieldOwnerCode":   policy.AdminBusinessOnboard,
 	"VerifyFieldOwnerCode": policy.AdminBusinessOnboard,
 	"CreateFieldDocument":  policy.AdminBusinessOnboard,
+	"ConfirmFieldDocument": policy.AdminBusinessOnboard,
 	"CreateFieldStore":     policy.AdminBusinessOnboard,
 	"ListFieldItems":       policy.AdminBusinessOnboard,
 	"SearchFieldProducts":  policy.AdminBusinessOnboard,
@@ -267,6 +268,9 @@ func (f *Field) mayEdit(ctx context.Context, c fieldCall, b businessdb.Business)
 		return err
 	}
 	if ok, _ := editable(b, c.agent(), w, f.s.clock.Now()); !ok {
+		if b.Status != businessVerified {
+			return problem.New(genproblems.Forbidden, "this business is rejected or suspended")
+		}
 		return problem.New(genproblems.Forbidden, "the edit window for this business has ended")
 	}
 	return nil
@@ -497,7 +501,27 @@ func (f *Field) ownerNumber(ctx context.Context, c fieldCall, phone string) (str
 	if len(mine) > 0 && string(mine) == string(f.s.hash.Phone(e164)) {
 		return "", problem.New(genproblems.ValidationFailed, "").WithField("body.ownerPhone", "must be the owner's number, not yours")
 	}
+	if err := f.ownerAccountOpen(ctx, e164); err != nil {
+		return "", err
+	}
 	return e164, nil
+}
+
+// ownerAccountOpen refuses a number whose account is blocked (or deleted
+// but still holding the number): it gets no invite and no code. A number
+// with no account yet is fine; the right code makes one.
+func (f *Field) ownerAccountOpen(ctx context.Context, e164 string) error {
+	status, err := f.s.q(ctx).AccountStatusByPhone(ctx, f.s.hash.Phone(e164))
+	if db.IsNoRows(err) {
+		return nil
+	}
+	if err != nil {
+		return fmt.Errorf("business: owner account status: %w", err)
+	}
+	if status != userActive {
+		return problem.New(genproblems.Forbidden, "this number's account cannot own a business")
+	}
+	return nil
 }
 
 // sealOwnerPhone seals the owner's number for their staff row.
@@ -733,10 +757,9 @@ func (f *Field) guard(c fieldCall, bid ids.ID) func(context.Context) error {
 		if err != nil {
 			return err
 		}
-		if c.agent() {
-			return f.mayEdit(ctx, c, b)
-		}
-		return nil
+		// Admins are not windowed, but a rejected or suspended business
+		// takes no new store or photo from anyone.
+		return f.mayEdit(ctx, c, b)
 	}
 }
 
@@ -797,17 +820,13 @@ func (f *Field) createPhoto(ctx context.Context, bidStr string, body *adminfield
 	if err := v.err(); err != nil {
 		return adminfieldapi.FieldDocumentUpload{}, err
 	}
-	doc, key, err := f.s.insertDocument(ctx, audit.ActorAdmin, c.p.UserID, bid, store, string(body.Kind), string(body.ContentType), size, f.guard(c, bid))
+	doc, key, err := f.s.insertDocument(ctx, audit.ActorAdmin, c.p.UserID, bid, store, string(body.Kind), string(body.ContentType), size, true, f.guard(c, bid))
 	if err != nil {
 		return adminfieldapi.FieldDocumentUpload{}, err
 	}
 	now := f.s.clock.Now()
 	return adminfieldapi.FieldDocumentUpload{
-		Document: adminfieldapi.FieldDocument{
-			ContentType: adminfieldapi.FieldPhotoContentType(doc.ContentType), CreatedAt: doc.CreatedAt.UTC(),
-			Id: idString(doc.ID), Kind: adminfieldapi.FieldDocumentKind(doc.Kind),
-			Status: adminfieldapi.FieldDocumentStatus(doc.Status), StoreId: optIDString(doc.StoreID),
-		},
+		Document: fieldDocument(doc),
 		Upload: adminfieldapi.FieldUploadTarget{
 			ExpiresAt: now.Add(uploadTTL).UTC(),
 			Headers: adminfieldapi.FieldUploadHeaders{
@@ -817,6 +836,98 @@ func (f *Field) createPhoto(ctx context.Context, bidStr string, body *adminfield
 			Url:    f.s.presign.putURL(key, string(body.ContentType), doc.SizeBytes, now),
 		},
 	}, nil
+}
+
+// pendingLife is how long a field photo may stay pending: the upload URL's
+// life and a few minutes for a PUT that started just before it ran out. After
+// it the photo no longer counts towards the cap and cannot be confirmed.
+const pendingLife = uploadTTL + 5*time.Minute
+
+func fieldDocument(doc businessdb.BusinessDocument) adminfieldapi.FieldDocument {
+	return adminfieldapi.FieldDocument{
+		ContentType: adminfieldapi.FieldPhotoContentType(doc.ContentType), CreatedAt: doc.CreatedAt.UTC(),
+		Id: idString(doc.ID), Kind: adminfieldapi.FieldDocumentKind(doc.Kind),
+		Status: adminfieldapi.FieldDocumentStatus(doc.Status), StoreId: optIDString(doc.StoreID),
+	}
+}
+
+// confirmPhoto marks a shop photo uploaded once the bucket holds it with the
+// declared type and at most the declared size (a signed HEAD, as support's
+// claim does). Until then it is pending: not in the counts, not reviewable.
+func (f *Field) confirmPhoto(ctx context.Context, bidStr, docStr string) (adminfieldapi.FieldDocument, error) {
+	c, err := f.call(ctx)
+	if err != nil {
+		return adminfieldapi.FieldDocument{}, err
+	}
+	if f.s.presign == nil {
+		return adminfieldapi.FieldDocument{}, problem.Wrap(genproblems.ServiceUnavailable, errNoStorage)
+	}
+	bid, err := pathID(bidStr)
+	if err != nil {
+		return adminfieldapi.FieldDocument{}, err
+	}
+	did, err := pathID(docStr)
+	if err != nil {
+		return adminfieldapi.FieldDocument{}, err
+	}
+	photo := func(ctx context.Context) (businessdb.BusinessDocument, error) {
+		if err := f.guard(c, bid)(ctx); err != nil {
+			return businessdb.BusinessDocument{}, err
+		}
+		doc, err := f.s.q(ctx).FieldDocumentForUpdate(ctx, businessdb.FieldDocumentForUpdateParams{ID: ids.UUID(did), BusinessID: ids.UUID(bid)})
+		if db.IsNoRows(err) || (err == nil && doc.Kind != string(adminfieldapi.ShopPhoto) && doc.Kind != string(adminfieldapi.Storefront)) {
+			return businessdb.BusinessDocument{}, problem.New(genproblems.NotFound, "")
+		}
+		if err != nil {
+			return businessdb.BusinessDocument{}, fmt.Errorf("business: field photo: %w", err)
+		}
+		return doc, nil
+	}
+	var doc businessdb.BusinessDocument
+	if err := f.s.db.InTx(ctx, func(ctx context.Context) error {
+		doc, err = photo(ctx)
+		return err
+	}); err != nil {
+		return adminfieldapi.FieldDocument{}, asProblem(err)
+	}
+	if doc.Status != "pending" {
+		return fieldDocument(doc), nil
+	}
+	now := f.s.clock.Now()
+	if now.Sub(doc.CreatedAt) > pendingLife {
+		return adminfieldapi.FieldDocument{}, problem.New(genproblems.InvalidTransition, "the upload URL has expired; add the photo again")
+	}
+	// Outside the transaction: no row lock is held over the bucket call.
+	obj, err := f.s.presign.head(ctx, doc.ObjectKey, now)
+	switch {
+	case errors.Is(err, errNoObject):
+		return adminfieldapi.FieldDocument{}, problem.New(genproblems.ValidationFailed, "").WithField("upload", "the photo is not in storage yet")
+	case err != nil:
+		return adminfieldapi.FieldDocument{}, problem.Wrap(genproblems.ServiceUnavailable, fmt.Errorf("business: head field photo: %w", err))
+	}
+	if obj.size < 1 || obj.size > doc.SizeBytes || obj.contentType != doc.ContentType {
+		return adminfieldapi.FieldDocument{}, problem.New(genproblems.ValidationFailed, "").WithField("upload", "the stored file is not the declared type and size")
+	}
+	err = f.s.db.InTx(ctx, func(ctx context.Context) error {
+		cur, err := photo(ctx)
+		if err != nil {
+			return err
+		}
+		if cur.Status != "pending" {
+			doc = cur
+			return nil
+		}
+		doc, err = f.s.q(ctx).MarkDocumentUploaded(ctx, businessdb.MarkDocumentUploadedParams{Now: f.s.clock.Now(), ID: cur.ID})
+		if err != nil {
+			return fmt.Errorf("business: confirm field photo: %w", err)
+		}
+		return f.s.writeAuditAs(ctx, audit.ActorAdmin, c.p.UserID, "document.uploaded", "business_document", did.String(),
+			map[string]any{"status": cur.Status}, map[string]any{"status": doc.Status, "sizeBytes": obj.size})
+	})
+	if err != nil {
+		return adminfieldapi.FieldDocument{}, asProblem(err)
+	}
+	return fieldDocument(doc), nil
 }
 
 // trimmedPtr is s without surrounding spaces, nil when that leaves nothing.
