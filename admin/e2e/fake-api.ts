@@ -81,6 +81,11 @@ export async function answerEmptyLists(page: Page) {
   await answerWith(page, '/v1/admin/risk/flags**', (req, url) =>
     req.method() === 'GET' && url.pathname === '/v1/admin/risk/flags' ? { status: 200, body: { items: [], openByRule: [], nextCursor: null, serverNow: NOW } } : undefined,
   );
+  // A-23 Demand: the gaps carry their rule from settings, the strip lists cities, not items.
+  await answerWith(page, '/v1/admin/demand-gaps**', (req) =>
+    req.method() === 'GET' ? { status: 200, body: { items: [], days: 7, minCustomers: 3, serverNow: NOW } } : undefined,
+  );
+  await answerWith(page, '/v1/admin/site-marquee', (req) => (req.method() === 'GET' ? { status: 200, body: { cities: [], minSearchers: 5, serverNow: NOW } } : undefined));
   // A-02 Pulse is one summary, not a list: a platform with nothing in it yet.
   await answerWith(page, '/v1/admin/pulse**', (_req, url) => ({ status: 200, body: url.pathname.endsWith('/map') ? emptyPulseMap : emptyPulse }));
 }

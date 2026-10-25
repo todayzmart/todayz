@@ -1,0 +1,118 @@
+{
+  "demand.sub": {
+    "defaultMessage": "What customers asked nearby shops for and nobody had, and the site's “What people near you are searching for” strip.",
+    "description": "A-23 Demand: Page subtitle"
+  },
+  "demand.tabs": {
+    "defaultMessage": "Demand views",
+    "description": "A-23 Demand: Tab list label"
+  },
+  "demand.tab.gaps": {
+    "defaultMessage": "Gaps",
+    "description": "A-23 Demand: Tab: asked-for items no shop had"
+  },
+  "demand.tab.strip": {
+    "defaultMessage": "Site strip",
+    "description": "A-23 Demand: Tab: the site's searching-for strip, approval"
+  },
+  "demand.filters": {
+    "defaultMessage": "Filter by city",
+    "description": "A-23 Demand: Filter form label"
+  },
+  "demand.city": {
+    "defaultMessage": "City",
+    "description": "A-23 Demand: City select label"
+  },
+  "demand.city.all": {
+    "defaultMessage": "All cities",
+    "description": "A-23 Demand: City select option for every city"
+  },
+  "demand.none": {
+    "defaultMessage": "None",
+    "description": "A-23 Demand: Shown when a value is missing, e.g. no category"
+  },
+  "demand.col.product": {
+    "defaultMessage": "Product",
+    "description": "A-23 Demand: Column header"
+  },
+  "demand.col.city": {
+    "defaultMessage": "City",
+    "description": "A-23 Demand: Column header"
+  },
+  "demand.col.category": {
+    "defaultMessage": "Category",
+    "description": "A-23 Demand: Column header"
+  },
+  "demand.col.customers": {
+    "defaultMessage": "Customers",
+    "description": "A-23 Demand: Column header: distinct customers who asked"
+  },
+  "demand.col.asks": {
+    "defaultMessage": "Asks",
+    "description": "A-23 Demand: Column header: number of asks"
+  },
+  "demand.col.last": {
+    "defaultMessage": "Last asked",
+    "description": "A-23 Demand: Column header: when it was last asked"
+  },
+  "demand.gaps.unmatched": {
+    "defaultMessage": "Not in the catalogue",
+    "description": "A-23 Demand: Pill on a gap whose item name matches no master product"
+  },
+  "demand.gaps.export": {
+    "defaultMessage": "Export CSV",
+    "description": "A-23 Demand: Button: download the shown gaps as a CSV file"
+  },
+  "demand.gaps.rule": {
+    "defaultMessage": "Items asked for by at least {min, plural, one {# customer} other {# customers}} in the last {days, plural, one {# day} other {# days}} that no shop said yes to. Customers are never named.",
+    "description": "A-23 Demand: Note above the gaps table; min and days come from settings"
+  },
+  "demand.gaps.table": {
+    "defaultMessage": "Demand gaps",
+    "description": "A-23 Demand: Table label"
+  },
+  "demand.gaps.empty": {
+    "defaultMessage": "No gaps right now",
+    "description": "A-23 Demand: Empty table"
+  },
+  "demand.strip.rule": {
+    "defaultMessage": "Each night the strip is proposed from master products that at least {min, plural, one {# signed-in customer} other {# signed-in customers}} searched for. Nothing shows on the site until it is approved.",
+    "description": "A-23 Demand: Note above the strip cards; min comes from settings"
+  },
+  "demand.strip.empty": {
+    "defaultMessage": "No cities to show",
+    "description": "A-23 Demand: Empty state when there are no cities"
+  },
+  "demand.strip.proposed": {
+    "defaultMessage": "Proposed on {day}",
+    "description": "A-23 Demand: Legend for the nightly proposal; day is YYYY-MM-DD"
+  },
+  "demand.strip.leaveOut": {
+    "defaultMessage": "Untick anything that should not be on the site.",
+    "description": "A-23 Demand: Hint above the proposal checkboxes"
+  },
+  "demand.strip.searchers": {
+    "defaultMessage": "{n, plural, one {# searcher} other {# searchers}}",
+    "description": "A-23 Demand: Distinct signed-in searchers for a product"
+  },
+  "demand.strip.approve": {
+    "defaultMessage": "Approve {n, plural, one {# product} other {# products}}",
+    "description": "A-23 Demand: Button: approve the ticked products"
+  },
+  "demand.strip.done": {
+    "defaultMessage": "Site strip for {city} approved with {n, plural, one {# product} other {# products}}",
+    "description": "A-23 Demand: Toast after approving"
+  },
+  "demand.strip.noProposal": {
+    "defaultMessage": "No new proposal waiting.",
+    "description": "A-23 Demand: Shown when the latest build is not waiting for a decision"
+  },
+  "demand.strip.approvedOn": {
+    "defaultMessage": "On the site: built {day}, approved {when}",
+    "description": "A-23 Demand: Heading of the approved list"
+  },
+  "demand.strip.notApproved": {
+    "defaultMessage": "Not approved yet: the site shows the curated list.",
+    "description": "A-23 Demand: Shown when a city has no approved strip"
+  }
+}
