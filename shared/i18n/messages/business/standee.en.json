@@ -74,5 +74,125 @@
   "standee.printTip": {
     "defaultMessage": "Print on A5 at 100% size, with no margins added by the printer, so the QR code stays sharp.",
     "description": "standee print tip"
+  },
+  "standee.campaigns.title": {
+    "defaultMessage": "Campaigns",
+    "description": "B-10 standee campaigns card title (W3-09)"
+  },
+  "standee.campaigns.body": {
+    "defaultMessage": "Each standee gets its own QR. Print one per spot or campaign to see which brings customers.",
+    "description": "B-10 campaigns card intro"
+  },
+  "standee.campaigns.loading": {
+    "defaultMessage": "Loading your standees",
+    "description": "campaigns loading status"
+  },
+  "standee.campaigns.loadError": {
+    "defaultMessage": "Could not load your standees.",
+    "description": "campaigns list failed"
+  },
+  "standee.campaigns.empty.title": {
+    "defaultMessage": "No standees yet",
+    "description": "campaigns empty state"
+  },
+  "standee.campaigns.empty.body": {
+    "defaultMessage": "Add one for your counter, gate or a festival campaign.",
+    "description": "campaigns empty state"
+  },
+  "standee.campaigns.name": {
+    "defaultMessage": "Campaign name",
+    "description": "new standee campaign field label"
+  },
+  "standee.campaigns.nameHelp": {
+    "defaultMessage": "For example Counter or Diwali gate. Up to {max} characters.",
+    "description": "new standee campaign field help"
+  },
+  "standee.campaigns.err.required": {
+    "defaultMessage": "Give the standee a campaign name",
+    "description": "campaign name missing"
+  },
+  "standee.campaigns.err.max": {
+    "defaultMessage": "Use {max} characters or fewer",
+    "description": "campaign name too long"
+  },
+  "standee.campaigns.add": {
+    "defaultMessage": "Add standee",
+    "description": "create standee button"
+  },
+  "standee.campaigns.adding": {
+    "defaultMessage": "Adding standee",
+    "description": "create standee loading label"
+  },
+  "standee.campaigns.created": {
+    "defaultMessage": "Standee added",
+    "description": "toast after a standee is created"
+  },
+  "standee.campaigns.full": {
+    "defaultMessage": "This shop has {limit} standees, the most it can have.",
+    "description": "standee limit reached notice"
+  },
+  "standee.campaigns.lastScan": {
+    "defaultMessage": "Last scan {date}",
+    "description": "when the standee was last scanned"
+  },
+  "standee.campaigns.noScans": {
+    "defaultMessage": "Not scanned yet",
+    "description": "standee with no scans"
+  },
+  "standee.campaigns.reorder": {
+    "defaultMessage": "Reorder printed standee",
+    "description": "ask for a reprint button"
+  },
+  "standee.campaigns.reordering": {
+    "defaultMessage": "Sending request",
+    "description": "reorder loading label"
+  },
+  "standee.campaigns.reorderPending": {
+    "defaultMessage": "Reorder requested",
+    "description": "pill on a standee waiting for a reprint"
+  },
+  "standee.campaigns.reorderSince": {
+    "defaultMessage": "Reprint requested on {date}. The QR stays the same, so its counts carry on.",
+    "description": "reorder pending note"
+  },
+  "standee.campaigns.error.validation_failed": {
+    "defaultMessage": "Check the campaign name and try again.",
+    "description": "standee validation_failed"
+  },
+  "standee.campaigns.error.forbidden": {
+    "defaultMessage": "Only owners and managers can change standees.",
+    "description": "standee forbidden"
+  },
+  "standee.campaigns.error.not_found": {
+    "defaultMessage": "This standee is no longer here. Reload the page.",
+    "description": "standee not_found"
+  },
+  "standee.campaigns.error.standee_limit_reached": {
+    "defaultMessage": "This shop already has as many standees as it can have.",
+    "description": "standee_limit_reached (D-223)"
+  },
+  "standee.campaigns.error.generic": {
+    "defaultMessage": "Something went wrong. Try again.",
+    "description": "standee generic error"
+  },
+  "standee.funnel.scans": {
+    "defaultMessage": "Scans",
+    "description": "funnel step: QR scans"
+  },
+  "standee.funnel.signUps": {
+    "defaultMessage": "Sign-ups",
+    "description": "funnel step: customers who joined from the QR"
+  },
+  "standee.funnel.qualified": {
+    "defaultMessage": "Qualified",
+    "description": "funnel step: sign-ups whose first qualifying purchase is done"
+  },
+  "standee.funnel.totals": {
+    "defaultMessage": "All standees",
+    "description": "accessible label of the totals funnel"
+  },
+  "standee.funnel.one": {
+    "defaultMessage": "{campaign} counts",
+    "description": "accessible label of a standee funnel"
   }
 }

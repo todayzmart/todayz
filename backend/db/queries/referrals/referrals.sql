@@ -29,6 +29,12 @@ SELECT referral_code FROM businesses WHERE id = @id;
 INSERT INTO referral_clicks (id, code, referrer_type, referrer_id, standee_id, landing, ip_hash, ua_hash, created_at)
 VALUES (@id, @code, @referrer_type, @referrer_id, sqlc.narg('standee_id'), @landing, sqlc.narg('ip_hash'), sqlc.narg('ua_hash'), @created_at);
 
+-- name: StoreStandee :one
+-- SC-ST-03: the scanned standee is one of the store's (W3-09, qr_standees).
+SELECT EXISTS (
+  SELECT 1 FROM qr_standees WHERE id = @id AND store_id = @store_id
+) AS mine;
+
 -- name: GetClick :one
 SELECT id, code, referrer_type, referrer_id, standee_id, created_at
 FROM referral_clicks WHERE id = @id;

@@ -16,6 +16,9 @@ function shops(role: string): Handler {
 const store: Handler = (c) => (c.method === 'GET' && c.path === `${B}/stores/s1` ? json(200, { id: 's1', shortCode: 'K7Q2X9' }) : undefined);
 const pdf: Handler = (c) => (c.path === `${B}/stores/s1/qr-standee.pdf` ? new Response(new Blob(['%PDF']), { status: 200, headers: { 'content-type': 'application/pdf' } }) : undefined);
 
+// The campaigns card (W3-09) asks for the standees too; an empty list keeps these tests on the PDF.
+const standees: Handler = (c) => (c.path === `${B}/stores/s1/standees` ? json(200, { items: [], totals: { scans: 0, signUps: 0, qualified: 0 }, limit: 20 }) : undefined);
+
 afterEach(() => vi.restoreAllMocks());
 
 describe('standee page', () => {
@@ -28,7 +31,7 @@ describe('standee page', () => {
   it('shows the short code and previews the PDF in a frame, fetched with the session token', async () => {
     Object.defineProperty(URL, 'createObjectURL', { value: vi.fn(() => 'blob:standee'), configurable: true });
     Object.defineProperty(URL, 'revokeObjectURL', { value: vi.fn(), configurable: true });
-    const { calls } = renderAt('/standee', { messages, handlers: [shops('manager'), store, pdf] });
+    const { calls } = renderAt('/standee', { messages, handlers: [shops('manager'), store, standees, pdf] });
     expect(await screen.findByText('K7Q2X9')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Preview' }));
     const frame = await screen.findByTitle('Standee preview');
@@ -40,7 +43,7 @@ describe('standee page', () => {
   });
 
   it('says so, with a retry, when the PDF cannot be made', async () => {
-    renderAt('/standee', { messages, handlers: [shops('owner'), store, (c) => (c.path.endsWith('.pdf') ? problem(503, 'service_unavailable') : undefined)] });
+    renderAt('/standee', { messages, handlers: [shops('owner'), store, standees, (c) => (c.path.endsWith('.pdf') ? problem(503, 'service_unavailable') : undefined)] });
     fireEvent.click(await screen.findByRole('button', { name: 'Download A5 PDF' }));
     expect(await screen.findByText('Could not prepare the standee. Try again.')).toBeInTheDocument();
     await waitFor(() => expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument());

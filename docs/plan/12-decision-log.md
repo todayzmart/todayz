@@ -1146,7 +1146,7 @@ Still open as work, not decisions: `has_offer` in search must agree with `offers
   - `offer_redemptions.order_id` and `offer_redemptions.pos_sale_id`;
   - `referrals.referrer_transaction_id` and `referrals.referee_transaction_id`, each with a new partial index. 03 §13 called these a single `reward_transaction_id`; it is corrected;
   - `notify_order_escalations.order_id` (W2-05). It was missing from 03 §13 and is added there.
-- **Still deferred.** `referrals.standee_id` and `referral_clicks.standee_id` wait for a `qr_standees` table, and `support_tickets.order_id` waits for W2-09. Whichever package creates the table adds the FK in its own migration, the way a later-wave target does (D-35).
+- **Still deferred.** `support_tickets.order_id` waits for W2-09. (`referrals.standee_id` and `referral_clicks.standee_id` waited for a `qr_standees` table; W3-09 adds both in `30901_w3-09_qr_standees.sql`, D-223.) Whichever package creates the table adds the FK in its own migration, the way a later-wave target does (D-35).
 - All the constraints are plain `NO ACTION`, like the earlier FKs. No code deletes a parent row: orders, sales, claims and ledger transactions are never deleted, and users are anonymised, not removed.
 
 ## SMS on AWS End User Messaging (2026-10-24)
@@ -1240,3 +1240,20 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
 ## Saved addresses (W2-15, 2026-10-25)
 
 **D-222 · Cap on saved addresses, default 20 (lead, 25 Oct).** 01 had no rule for how many addresses a customer keeps. The W2-15 API had a constant of 20 in Go. It is now the setting `customer_max_saved_addresses` (count, default 20, min 1, max 50; 01 §5.5, §17), seeded by `21501_w2-15_saved_address_cap.sql` and read through `settings.Cache`. `POST /v1/me/addresses` past the cap is `422 validation_failed` on `body`, checked in the write transaction under the per-user lock. The contract says only "a configurable maximum". The same review made address text refuse invalid UTF-8 and control characters (`422` per field; a NUL used to be a 500), and made `updated_at` the database's clock on both insert and update, so "most recently changed" never mixes two clocks. Tests: `TestAddressCap`, `TestAddressTextRefusesControlCharacters`, `TestAddressesHTTP`.
+
+## QR standee campaigns (W3-09, 2026-10-25)
+
+**D-223 · Standee rows, their counts and reorders (W3-09, 25 Oct).** B-10 shows the shop one row per printed standee, each with its own QR and a scans → sign-ups → qualified funnel (01 §8, SC-ST-03…04).
+- **Table.** Migration `30901_w3-09_qr_standees.sql` creates `qr_standees` (id, store_id, campaign, created_by, printed_at, reorder_requested_at, reorder_requested_by, created_at, updated_at, version). `campaign` is the shop's own label, 1–40 characters, trimmed. A standee still has no code of its own (D-26). The migration also adds the two FKs D-211 deferred: `referrals.standee_id` and `referral_clicks.standee_id`.
+- **A scan is a click.** A standee's QR is `GET /v1/public/ref/{store short code}?s=<standee id>` (D-162). A scan is the `referral_clicks` row that link records with `standee_id` set; the discover page's `?s=` records nothing (04 §2.2 is corrected). SC-ST-03: `?s=` counts only when the standee belongs to the store the code names. Another store's standee, or an unknown id, still lands on the store page, but unattributed: no `standee_id` and no `?s=` in the redirect.
+- **Counts are computed, not stored.** `scans_count` (03) is dropped. `scans` counts the standee's clicks. `signUps` counts its referrals that were not rejected (`rejected`, `rejected_same_device`). `qualified` counts those in `qualified` or `rewarded`. With no counter to keep in step, a reprint carries its counts on.
+- **API.** The domain is `standee` (`paths/standee.yaml`, next to W2-10's PDF), not a new `standee-campaigns` file. The routes, all manager and above (`standee.manage`):
+  - `GET {S}/standees` (`listStandees`): newest first, with per-standee counts, `totals` and `limit`.
+  - `POST {S}/standees` (`createStandee`, `{campaign}`, optional Idempotency-Key): audited `standee.create`; `409 standee_limit_reached` at the cap.
+  - `POST {S}/standees/{standeeId}/reorder` (`requestStandeeReorder`): sets `reorder_requested_at/_by`, audited `standee.reorder_requested`. A request already waiting is answered unchanged, with no second audit row.
+- **Cap.** At most 20 standees per store, checked under a store row lock. 01 has no number for this, so 20 is a guard against runaway rows, not a product rule: `TODO(lead)` to move it to `platform_settings` if shops need more.
+- **Still open.**
+  - Admin fulfilment of a reorder (who prints it, and what clears `reorder_requested_at`) is not built (`TODO(lead)`).
+  - W2-10's `GET {S}/qr-standee.pdf` takes no standee id, so the printed PDF carries the store link without `?s=` and its scans are not counted per standee. 04 already lists `?standeeId=`; the PDF route needs that parameter (W2-10 or the lead).
+  - Nothing writes `printed_at` yet.
+- Tests: `internal/business/standee` (create, list, counts, cap under concurrent creates, reorder idempotency and audit, store isolation), `referrals` "another store's standee is not a scan", and `TestStandeeJourney` (SC-ST-04: create → scan → claim → first order → counts). The business app's tests are in `src/standee/campaigns/campaigns.test.tsx`.

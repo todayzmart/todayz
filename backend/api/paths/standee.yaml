@@ -1,12 +1,146 @@
-# Paths: domain "standee" (owner W3-04): standees (04 §2.6).
+# Paths: domain "standee" (W2-10 owns the PDF, D-51, D-206; W3-09 the standee rows, their
+# counts and reorders, D-223): QR standees (01 §8, 04 §2.6; D-26, D-162).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [standee]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
-# this domain's schemas as `../schemas/standee.yaml#/Name` and the shared ones as
-# `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+# Manager and above (`standee.manage`, 02 §3.3). A standee has no code of its own: its QR is
+# the store's short-code link with `s=<standee id>`, and a scan is the referral click that
+# link records (D-162, D-223). Every operation: `tags: [standee]`, an example per request and
+# success response, and the default problem response.
+/v1/biz/businesses/{bid}/stores/{sid}/standees:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: listStandees
+    tags: [standee]
+    summary: The store's standees with their scans, sign-ups and qualified referrals (B-10)
+    description: >-
+      Manager and above. Newest first, every standee of the store (at most `limit`). `totals`
+      adds the counts of all of them.
+    responses:
+      "200":
+        description: The store's standees
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/standee.yaml#/StandeeList
+            example:
+              items:
+                - id: 01KE0S7A2B3C4D5E6F7G8H9J0K
+                  storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+                  campaign: Billing counter
+                  link: https://api.todayz.in/v1/public/ref/K7M2QX?s=01KE0S7A2B3C4D5E6F7G8H9J0K
+                  counts:
+                    scans: 42
+                    signUps: 9
+                    qualified: 4
+                  lastScanAt: "2026-10-25T06:10:00Z"
+                  printedAt: null
+                  reorderRequestedAt: null
+                  createdAt: "2026-10-20T05:00:00Z"
+                  version: 1
+              totals:
+                scans: 42
+                signUps: 9
+                qualified: 4
+              limit: 20
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: createStandee
+    tags: [standee]
+    summary: Add a standee for a campaign
+    description: >-
+      Manager and above. A new standee row with its own QR link; print it from the standee page.
+      `409 standee_limit_reached` when the store already has `limit` standees.
+    x-idempotency: optional
+    x-problems: [standee_limit_reached]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/standee.yaml#/StandeeCreate
+          example:
+            campaign: Diwali gate
+    responses:
+      "201":
+        description: The new standee
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/standee.yaml#/Standee
+            example:
+              id: 01KE0S7A2B3C4D5E6F7G8H9J0K
+              storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              campaign: Diwali gate
+              link: https://api.todayz.in/v1/public/ref/K7M2QX?s=01KE0S7A2B3C4D5E6F7G8H9J0K
+              counts:
+                scans: 0
+                signUps: 0
+                qualified: 0
+              lastScanAt: null
+              printedAt: null
+              reorderRequestedAt: null
+              createdAt: "2026-10-25T05:00:00Z"
+              version: 1
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/standees/{standeeId}/reorder:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: standeeId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: requestStandeeReorder
+    tags: [standee]
+    summary: Ask for a new printed standee
+    description: >-
+      Manager and above. Marks the standee as waiting for a reprint (`reorderRequestedAt`). A
+      request already waiting is answered unchanged. The QR link stays the same, so a reprint
+      keeps the standee's counts.
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    responses:
+      "200":
+        description: The standee
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/standee.yaml#/Standee
+            example:
+              id: 01KE0S7A2B3C4D5E6F7G8H9J0K
+              storeId: 01JB0S3M4N5P6Q7R8S9T0V1W2X
+              campaign: Billing counter
+              link: https://api.todayz.in/v1/public/ref/K7M2QX?s=01KE0S7A2B3C4D5E6F7G8H9J0K
+              counts:
+                scans: 42
+                signUps: 9
+                qualified: 4
+              lastScanAt: "2026-10-25T06:10:00Z"
+              printedAt: null
+              reorderRequestedAt: "2026-10-25T07:00:00Z"
+              createdAt: "2026-10-20T05:00:00Z"
+              version: 2
+      default: *problem
