@@ -1,0 +1,137 @@
+{
+  "shell.appName": {
+    "message": "TodayZ",
+    "review": "reviewed",
+    "enHash": "34b58f9d"
+  },
+  "shell.appTag": {
+    "message": "பிசினஸ்",
+    "review": "reviewed",
+    "enHash": "d6663dda"
+  },
+  "shell.skipToContent": {
+    "message": "நேரடியாக முக்கிய பகுதிக்குச் செல்லவும்",
+    "review": "reviewed",
+    "enHash": "0a4470d6"
+  },
+  "shell.nav.label": {
+    "message": "பிசினஸ்",
+    "review": "reviewed",
+    "enHash": "d6663dda"
+  },
+  "shell.nav.overview": {
+    "message": "சுருக்கம்",
+    "review": "reviewed",
+    "enHash": "0efc2e6b"
+  },
+  "shell.nav.orders": {
+    "message": "ஆர்டர்கள்",
+    "review": "reviewed",
+    "enHash": "cded0933"
+  },
+  "shell.nav.sell": {
+    "message": "விற்பனை",
+    "review": "reviewed",
+    "enHash": "fa3cf2ad"
+  },
+  "shell.nav.stock": {
+    "message": "ஸ்டாக்",
+    "review": "reviewed",
+    "enHash": "bcecf456"
+  },
+  "shell.nav.more": {
+    "message": "மேலும்",
+    "review": "reviewed",
+    "enHash": "4bab2d8f"
+  },
+  "shell.nav.customers": {
+    "message": "வாடிக்கையாளர்கள்",
+    "review": "reviewed",
+    "enHash": "035eae60"
+  },
+  "shell.nav.groupGrow": {
+    "message": "வளர்ச்சி",
+    "review": "reviewed",
+    "enHash": "7e2299a8"
+  },
+  "shell.nav.offers": {
+    "message": "ஆஃபர்கள்",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "shell.nav.reviews": {
+    "message": "மதிப்புரைகள்",
+    "review": "reviewed",
+    "enHash": "b83c4cda"
+  },
+  "shell.nav.analytics": {
+    "message": "புள்ளிவிவரங்கள்",
+    "review": "reviewed",
+    "enHash": "25bc9629"
+  },
+  "shell.nav.groupShop": {
+    "message": "கடை",
+    "review": "reviewed",
+    "enHash": "55de8870"
+  },
+  "shell.nav.credits": {
+    "message": "கிரெடிட்கள்",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "shell.nav.settings": {
+    "message": "அமைப்புகள்",
+    "review": "reviewed",
+    "enHash": "c7f73bb5"
+  },
+  "shell.greet.title": {
+    "message": "TodayZ இல் உங்கள் கடை",
+    "review": "reviewed",
+    "enHash": "ecd7ca85"
+  },
+  "shell.greet.sub": {
+    "message": "கவுண்டர், ஸ்டாக், ஆர்டர்கள், ஆஃபர்கள் எல்லாவற்றையும் ஒரே இடத்திலிருந்து நடத்துங்கள்.",
+    "review": "reviewed",
+    "enHash": "879ce392"
+  },
+  "shell.soon.tag": {
+    "message": "விரைவில்",
+    "review": "reviewed",
+    "enHash": "e4115be2"
+  },
+  "shell.soon.title": {
+    "message": "{section} விரைவில் வருகிறது",
+    "review": "reviewed",
+    "enHash": "6c957e46"
+  },
+  "shell.soon.body": {
+    "message": "பிசினஸ் ஆப்பின் இந்தப் பகுதியை நாங்கள் உருவாக்கி வருகிறோம். இது கவுண்டரில் இணையம் இல்லாமலும் வேலை செய்யும்.",
+    "review": "reviewed",
+    "enHash": "0aa81361"
+  },
+  "shell.notFound.title": {
+    "message": "பக்கம் கிடைக்கவில்லை",
+    "review": "reviewed",
+    "enHash": "bc3023b3"
+  },
+  "shell.notFound.body": {
+    "message": "இந்த இணைப்பு இன்னும் எங்கும் செல்லவில்லை.",
+    "review": "reviewed",
+    "enHash": "8c0d72a2"
+  },
+  "shell.notFound.home": {
+    "message": "சுருக்கத்துக்குச் செல்லவும்",
+    "review": "reviewed",
+    "enHash": "711dbdf4"
+  },
+  "shell.nav.ordersCount": {
+    "message": "{count, plural, one {# ஆர்டர் காத்திருக்கிறது} other {# ஆர்டர்கள் காத்திருக்கின்றன}}",
+    "review": "reviewed",
+    "enHash": "31dd266d"
+  },
+  "shell.nav.stockCount": {
+    "message": "{count, plural, one {# பொருள் நாளைக்குள் தீர்ந்துவிடும்} other {# பொருட்கள் நாளைக்குள் தீர்ந்துவிடும்}}",
+    "review": "reviewed",
+    "enHash": "a905b14b"
+  }
+}

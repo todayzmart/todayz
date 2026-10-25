@@ -1,11 +1,13 @@
 import { ErrorBoundary, SessionProvider, UpdateToastHost, type Session, type UpdateController } from '@todayz/auth';
-import { FORMAT_LOCALE, type Messages } from '@todayz/i18n';
+import { FORMAT_LOCALE, intlTag, type Locale, type MessageLocale, type Messages } from '@todayz/i18n';
 import { QueryClientProvider, type QueryClient } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';
 import { Button, ToastProvider } from '@todayz/ui';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { IntlProvider, useIntl } from 'react-intl';
+import { loadMessages } from './i18n';
 import { useUpdateLabels } from './labels';
+import { LocaleContext, rememberLocale, type LocaleApi } from './locale';
 import type { makeRouter } from './router';
 import { UpdateContext } from './update-context';
 
@@ -16,6 +18,7 @@ const onIntlError = (err: Error): void => {
 };
 
 interface AppProps {
+  locale?: MessageLocale;
   messages: Messages;
   router: ReturnType<typeof makeRouter>;
   queryClient: QueryClient;
@@ -41,10 +44,11 @@ function CrashFallback({ reset }: { reset: () => void }) {
 }
 
 /**
- * Formatting (numbers, dates, ₹) always uses en-IN; the pseudo-locale only swaps the messages,
- * so no extra Intl locale data is needed for it.
+ * English and the pseudo-locale format with en-IN; the other languages use `<lang>-IN-u-nu-latn`, so
+ * plurals and the words in times follow the language while digits stay Latin. ₹ amounts come
+ * from `formatMoney`, which uses English (India) rules in every language.
  */
-export function App({ messages, router, queryClient, session, update }: AppProps) {
+export function App({ locale: initial = 'en', messages: initialMessages, router, queryClient, session, update }: AppProps) {
   // Another tab signed in as someone else: nothing cached for the previous person may stay.
   useEffect(
     () =>
@@ -53,17 +57,32 @@ export function App({ messages, router, queryClient, session, update }: AppProps
       }),
     [session, queryClient],
   );
+  const [current, setCurrent] = useState<{ locale: MessageLocale; messages: Messages }>({
+    locale: initial,
+    messages: initialMessages,
+  });
+  const choose = useCallback(async (next: Locale) => {
+    rememberLocale(next);
+    const messages = await loadMessages(next);
+    setCurrent({ locale: next, messages });
+  }, []);
+  const api = useMemo<LocaleApi>(() => ({ locale: current.locale, choose }), [current.locale, choose]);
+
+  const tag = current.locale === 'en' || current.locale === 'en-XA' ? FORMAT_LOCALE : intlTag(current.locale);
+
   return (
-    <IntlProvider locale={FORMAT_LOCALE} defaultLocale={FORMAT_LOCALE} messages={messages} onError={onIntlError}>
+    <IntlProvider locale={tag} defaultLocale={FORMAT_LOCALE} messages={current.messages} timeZone="Asia/Kolkata" onError={onIntlError}>
       <ErrorBoundary fallback={(reset) => <CrashFallback reset={reset} />}>
         <SessionProvider session={session}>
           <UpdateContext.Provider value={update}>
-            <ToastProvider>
-              <QueryClientProvider client={queryClient}>
-                <RouterProvider router={router} />
-                <UpdateToast update={update} />
-              </QueryClientProvider>
-            </ToastProvider>
+            <LocaleContext.Provider value={api}>
+              <ToastProvider>
+                <QueryClientProvider client={queryClient}>
+                  <RouterProvider router={router} />
+                  <UpdateToast update={update} />
+                </QueryClientProvider>
+              </ToastProvider>
+            </LocaleContext.Provider>
           </UpdateContext.Provider>
         </SessionProvider>
       </ErrorBoundary>

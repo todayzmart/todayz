@@ -1,0 +1,217 @@
+{
+  "app.offline.title": {
+    "message": "మీరు ఆఫ్‌లైన్‌లో ఉన్నారు.",
+    "review": "reviewed",
+    "enHash": "4a2a6452"
+  },
+  "app.offline.body": {
+    "message": "సేవ్ చేసిన పేజీలు ఇప్పటికీ తెరుచుకుంటాయి. మీరు ఆన్‌లైన్‌కు రాగానే అన్నీ అప్‌డేట్ అవుతాయి.",
+    "review": "reviewed",
+    "enHash": "6019fada"
+  },
+  "app.update.message": {
+    "message": "TodayZ Business కొత్త వెర్షన్ సిద్ధంగా ఉంది.",
+    "review": "reviewed",
+    "enHash": "9744d22a"
+  },
+  "app.update.action": {
+    "message": "అప్‌డేట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "fb91e24f"
+  },
+  "app.error.title": {
+    "message": "ఏదో తప్పు జరిగింది",
+    "review": "reviewed",
+    "enHash": "8d886c0b"
+  },
+  "app.error.body": {
+    "message": "మళ్ళీ ప్రయత్నించండి. అలాగే జరుగుతూ ఉంటే పేజీని రీలోడ్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "f081bc24"
+  },
+  "app.error.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "app.pending.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "app.loading": {
+    "message": "లోడ్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "8f26c652"
+  },
+  "auth.signIn.title": {
+    "message": "TodayZ Business లో సైన్ ఇన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "4337b537"
+  },
+  "auth.signIn.sub": {
+    "message": "మీ దుకాణం నమోదైన మొబైల్ నంబర్ వాడండి. మేము SMS ద్వారా కోడ్ పంపుతాం.",
+    "review": "reviewed",
+    "enHash": "f63d01a7"
+  },
+  "auth.phone.label": {
+    "message": "మొబైల్ నంబర్",
+    "review": "reviewed",
+    "enHash": "8e5c12de"
+  },
+  "auth.phone.help": {
+    "message": "సైన్ ఇన్ చేయడానికి, ఆర్డర్ అలర్ట్‌ల కోసం దీన్ని వాడతాం.",
+    "review": "reviewed",
+    "enHash": "766d916b"
+  },
+  "auth.phone.invalid": {
+    "message": "6, 7, 8 లేదా 9 తో మొదలయ్యే 10 అంకెల మొబైల్ నంబర్ ఇవ్వండి.",
+    "review": "reviewed",
+    "enHash": "6be55a3e"
+  },
+  "auth.code.send": {
+    "message": "కోడ్ పంపండి",
+    "review": "reviewed",
+    "enHash": "313503fa"
+  },
+  "auth.code.sending": {
+    "message": "కోడ్ పంపుతున్నాం",
+    "review": "reviewed",
+    "enHash": "28de53b3"
+  },
+  "auth.code.label": {
+    "message": "6 అంకెల కోడ్ ఇవ్వండి",
+    "review": "reviewed",
+    "enHash": "d148321a"
+  },
+  "auth.code.digit": {
+    "message": "అంకె {position}",
+    "review": "reviewed",
+    "enHash": "1e73e888"
+  },
+  "auth.code.sentTo": {
+    "message": "మేము {phone} కి కోడ్ పంపాం.",
+    "review": "reviewed",
+    "enHash": "c8aa6d25"
+  },
+  "auth.code.verifying": {
+    "message": "కోడ్ చెక్ చేస్తున్నాం",
+    "review": "reviewed",
+    "enHash": "90adc49f"
+  },
+  "auth.code.resend": {
+    "message": "కోడ్ మళ్ళీ పంపండి",
+    "review": "reviewed",
+    "enHash": "1d3cb8a9"
+  },
+  "auth.code.resendIn": {
+    "message": "{seconds} s లో మళ్ళీ పంపండి",
+    "review": "reviewed",
+    "enHash": "f0589eca"
+  },
+  "auth.code.change": {
+    "message": "నంబర్ మార్చండి",
+    "review": "reviewed",
+    "enHash": "6c3b4080"
+  },
+  "auth.error.wrongCode": {
+    "message": "ఈ కోడ్ సరైనది కాదు. చూసుకుని మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "47948633"
+  },
+  "auth.error.expired": {
+    "message": "ఈ కోడ్ గడువు ముగిసింది. కొత్త కోడ్ అడగండి.",
+    "review": "reviewed",
+    "enHash": "6a90a6f9"
+  },
+  "auth.error.locked": {
+    "message": "చాలాసార్లు తప్పు కోడ్ ఇచ్చారు. కొత్త కోడ్ అడగండి.",
+    "review": "reviewed",
+    "enHash": "371d1276"
+  },
+  "auth.error.rateLimited": {
+    "message": "చాలా ప్రయత్నాలు అయ్యాయి. కాసేపు ఆగి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "c32bd496"
+  },
+  "auth.error.blocked": {
+    "message": "ఈ ఖాతాతో ఇప్పుడు సైన్ ఇన్ చేయలేరు. సపోర్ట్‌ను సంప్రదించండి.",
+    "review": "reviewed",
+    "enHash": "10997ecd"
+  },
+  "auth.error.network": {
+    "message": "TodayZ ను చేరుకోలేకపోతున్నాం. మీ ఇంటర్నెట్ చూసుకుని మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "470230be"
+  },
+  "auth.error.generic": {
+    "message": "ఏదో తప్పు జరిగింది. దయచేసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "9a3ea059"
+  },
+  "auth.error.captcha": {
+    "message": "మీరు మనిషేనని చెక్ చేయలేకపోయాం. పేజీని రీలోడ్ చేసి మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "bc612d87"
+  },
+  "auth.signOut": {
+    "message": "సైన్ అవుట్",
+    "review": "reviewed",
+    "enHash": "dc1649a1"
+  },
+  "shop.pick.title": {
+    "message": "దుకాణాన్ని ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "shop.pick.sub": {
+    "message": "మీరు పనిచేయాల్సిన బిజినెస్, దుకాణాన్ని ఎంచుకోండి. దీన్ని ఈ పరికరంలో గుర్తుంచుకుంటాం.",
+    "review": "reviewed",
+    "enHash": "73012255"
+  },
+  "shop.pick.loading": {
+    "message": "మీ దుకాణాలు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "97200491"
+  },
+  "shop.pick.group": {
+    "message": "{business} దుకాణాలు",
+    "review": "reviewed",
+    "enHash": "f0b111f6"
+  },
+  "shop.pick.role.owner": {
+    "message": "యజమాని",
+    "review": "reviewed",
+    "enHash": "89ff3122"
+  },
+  "shop.pick.role.manager": {
+    "message": "మేనేజర్",
+    "review": "reviewed",
+    "enHash": "babe3050"
+  },
+  "shop.pick.role.cashier": {
+    "message": "క్యాషియర్",
+    "review": "reviewed",
+    "enHash": "78c07270"
+  },
+  "shop.pick.empty": {
+    "message": "ఈ నంబర్‌కు ఇంకా ఏ దుకాణమూ లింక్ కాలేదు. మిమ్మల్ని ఆహ్వానించమని మీ యజమానిని అడగండి, లేదా సపోర్ట్‌ను సంప్రదించండి.",
+    "review": "reviewed",
+    "enHash": "95e9e70b"
+  },
+  "shop.pick.unavailable": {
+    "message": "మీ దుకాణాలను ఇంకా లోడ్ చేయలేకపోతున్నాం. మీరు సారాంశానికి కొనసాగవచ్చు.",
+    "review": "reviewed",
+    "enHash": "8d7dd013"
+  },
+  "shop.pick.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "shop.pick.continue": {
+    "message": "సారాంశానికి కొనసాగండి",
+    "review": "reviewed",
+    "enHash": "bc5e5ad7"
+  }
+}

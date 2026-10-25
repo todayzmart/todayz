@@ -1,0 +1,357 @@
+{
+  "onboarding.title": {
+    "message": "கடை அமைப்பு",
+    "review": "reviewed",
+    "enHash": "0857f615"
+  },
+  "onboarding.loading": {
+    "message": "உங்கள் கடை அமைப்பு ஏற்றப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "97135be6"
+  },
+  "onboarding.loadFailed.title": {
+    "message": "உங்கள் கடையை ஏற்ற முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "775cadd8"
+  },
+  "onboarding.loadFailed.body": {
+    "message": "உங்கள் இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "onboarding.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "onboarding.ownerOnly.title": {
+    "message": "கடையை உரிமையாளர் மட்டுமே அமைக்க முடியும்",
+    "review": "reviewed",
+    "enHash": "ce1ffa3e"
+  },
+  "onboarding.ownerOnly.body": {
+    "message": "அமைப்பை முடிக்குமாறு உங்கள் கடை உரிமையாளரிடம் கேளுங்கள்.",
+    "review": "reviewed",
+    "enHash": "ed6b1f38"
+  },
+  "onboarding.step": {
+    "message": "படி {n}: {title}",
+    "review": "reviewed",
+    "enHash": "1133cf5c"
+  },
+  "onboarding.done": {
+    "message": "முடிந்தது",
+    "review": "reviewed",
+    "enHash": "e9b450d1"
+  },
+  "onboarding.saved": {
+    "message": "சேமிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "c0ae8f6e"
+  },
+  "onboarding.save": {
+    "message": "சேமிக்கவும்",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "onboarding.business.title": {
+    "message": "உங்கள் கடையைப் பற்றி",
+    "review": "reviewed",
+    "enHash": "6291f190"
+  },
+  "onboarding.business.brandName": {
+    "message": "கடையின் பெயர்",
+    "review": "reviewed",
+    "enHash": "6a5cc02e"
+  },
+  "onboarding.business.brandNameHelp": {
+    "message": "வாடிக்கையாளர்கள் பார்க்கும் பெயர்.",
+    "review": "reviewed",
+    "enHash": "6680c228"
+  },
+  "onboarding.business.brandNameRequired": {
+    "message": "உங்கள் கடையின் பெயரை உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "00a41eb3"
+  },
+  "onboarding.business.legalName": {
+    "message": "பதிவுசெய்யப்பட்ட பிசினஸ் பெயர்",
+    "review": "reviewed",
+    "enHash": "9deda141"
+  },
+  "onboarding.business.legalNameHelp": {
+    "message": "உங்கள் PAN அல்லது GST சான்றிதழில் உள்ளபடி. இதைப் பிறகும் சேர்க்கலாம்.",
+    "review": "reviewed",
+    "enHash": "fcbd36b3"
+  },
+  "onboarding.business.category": {
+    "message": "நீங்கள் என்ன விற்கிறீர்கள்",
+    "review": "reviewed",
+    "enHash": "99f2197d"
+  },
+  "onboarding.business.categoryNone": {
+    "message": "வகையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "b91bf5d4"
+  },
+  "onboarding.store.title": {
+    "message": "உங்கள் முதல் கடை",
+    "review": "reviewed",
+    "enHash": "c1b36766"
+  },
+  "onboarding.store.have": {
+    "message": "கடை சேர்க்கப்பட்டது: {name}.",
+    "review": "reviewed",
+    "enHash": "ff206dca"
+  },
+  "onboarding.store.manage": {
+    "message": "கடைகளை நிர்வகிக்கவும்",
+    "review": "reviewed",
+    "enHash": "e0b3455b"
+  },
+  "onboarding.store.create": {
+    "message": "கடையைச் சேர்க்கவும்",
+    "review": "reviewed",
+    "enHash": "a0df4ca0"
+  },
+  "onboarding.hours.title": {
+    "message": "திறந்திருக்கும் நேரம்",
+    "review": "reviewed",
+    "enHash": "6117e118"
+  },
+  "onboarding.payout.title": {
+    "message": "பணம் பெறும் விவரங்கள்",
+    "review": "reviewed",
+    "enHash": "ad5e1a85"
+  },
+  "onboarding.payout.body": {
+    "message": "நாங்கள் உங்களுக்கு எங்கே பணம் அனுப்ப வேண்டும். இதை இப்போதோ பிறகோ சேர்க்கலாம்; கடையை மதிப்பாய்வுக்கு அனுப்ப இது தேவையில்லை.",
+    "review": "reviewed",
+    "enHash": "16c98dff"
+  },
+  "onboarding.docs.title": {
+    "message": "ஆவணங்கள்",
+    "review": "reviewed",
+    "enHash": "687c8286"
+  },
+  "onboarding.docs.help": {
+    "message": "புகைப்படங்கள் அல்லது PDF, ஒவ்வொன்றும் 10 MB வரை. ஆவணங்கள் தனிப்பட்டவையாக வைக்கப்படும், எங்கள் மதிப்பாய்வுக் குழு மட்டுமே பார்க்கும்.",
+    "review": "reviewed",
+    "enHash": "5285e84b"
+  },
+  "onboarding.docs.kind.pan": {
+    "message": "PAN கார்டு",
+    "review": "reviewed",
+    "enHash": "1a5fa132"
+  },
+  "onboarding.docs.kind.gst": {
+    "message": "GST சான்றிதழ்",
+    "review": "reviewed",
+    "enHash": "1d4b2467"
+  },
+  "onboarding.docs.kind.shop_photo": {
+    "message": "கடையின் உள்ளே எடுத்த புகைப்படம்",
+    "review": "reviewed",
+    "enHash": "043fa414"
+  },
+  "onboarding.docs.kind.storefront": {
+    "message": "கடையின் முன்பக்கப் புகைப்படம்",
+    "review": "reviewed",
+    "enHash": "2c113b69"
+  },
+  "onboarding.docs.kind.license": {
+    "message": "வர்த்தக உரிமம்",
+    "review": "reviewed",
+    "enHash": "42559b25"
+  },
+  "onboarding.docs.status.pending": {
+    "message": "பதிவேற்றப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "de272409"
+  },
+  "onboarding.docs.status.uploaded": {
+    "message": "கிடைத்தது",
+    "review": "reviewed",
+    "enHash": "27548c4f"
+  },
+  "onboarding.docs.status.accepted": {
+    "message": "ஏற்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "onboarding.docs.status.rejected": {
+    "message": "நிராகரிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "27eeb7a2"
+  },
+  "onboarding.docs.add": {
+    "message": "{name} சேர்க்கவும்",
+    "review": "reviewed",
+    "enHash": "3796d1b1"
+  },
+  "onboarding.docs.added": {
+    "message": "{name} சேர்க்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "dae4c24a"
+  },
+  "onboarding.docs.err.type": {
+    "message": "JPG, PNG அல்லது WebP புகைப்படம், அல்லது PDF பயன்படுத்தவும்.",
+    "review": "reviewed",
+    "enHash": "78549188"
+  },
+  "onboarding.docs.err.size": {
+    "message": "இந்தக் கோப்பு 10 MB ஐ விடப் பெரியது.",
+    "review": "reviewed",
+    "enHash": "7be70506"
+  },
+  "onboarding.docs.err.empty": {
+    "message": "இந்தக் கோப்பு காலியாக உள்ளது.",
+    "review": "reviewed",
+    "enHash": "f9256174"
+  },
+  "onboarding.docs.uploadFailed": {
+    "message": "கோப்பு பதிவேறவில்லை. உங்கள் இணைய இணைப்பைச் சரிபார்த்து மீண்டும் சேர்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "dd02b2ad"
+  },
+  "onboarding.submit.title": {
+    "message": "மதிப்பாய்வுக்கு அனுப்பவும்",
+    "review": "reviewed",
+    "enHash": "ddc87345"
+  },
+  "onboarding.submit.body": {
+    "message": "உங்கள் விவரங்களைச் சரிபார்ப்போம், ஏதாவது தேவைப்பட்டால் அழைப்போம். மதிப்பாய்வு நடக்கும்போதும் ஆர்டர்களுக்கு TodayZ ஐப் பயன்படுத்தலாம்.",
+    "review": "reviewed",
+    "enHash": "6dc86397"
+  },
+  "onboarding.submit.action": {
+    "message": "மதிப்பாய்வுக்கு அனுப்பவும்",
+    "review": "reviewed",
+    "enHash": "ddc87345"
+  },
+  "onboarding.submit.sent": {
+    "message": "மதிப்பாய்வுக்கு அனுப்பப்பட்டது",
+    "review": "reviewed",
+    "enHash": "ef78972f"
+  },
+  "onboarding.status.submitted.title": {
+    "message": "உங்கள் கடை மதிப்பாய்வில் உள்ளது",
+    "review": "reviewed",
+    "enHash": "eaec7e93"
+  },
+  "onboarding.status.submitted.body": {
+    "message": "முடிந்ததும் உங்களுக்குத் தெரிவிப்போம்.",
+    "review": "reviewed",
+    "enHash": "01dd0eb4"
+  },
+  "onboarding.status.needs_info.title": {
+    "message": "உங்களிடமிருந்து இன்னும் கொஞ்சம் தகவல் தேவை",
+    "review": "reviewed",
+    "enHash": "4bc026eb"
+  },
+  "onboarding.status.needs_info.body": {
+    "message": "இவற்றைச் சரிசெய்து மீண்டும் மதிப்பாய்வுக்கு அனுப்பவும்.",
+    "review": "reviewed",
+    "enHash": "f7322f3e"
+  },
+  "onboarding.status.verified.title": {
+    "message": "உங்கள் கடை சரிபார்க்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "f69ca01e"
+  },
+  "onboarding.status.verified.body": {
+    "message": "வாடிக்கையாளர்கள் உங்கள் நேரலைக் கடைகளைக் கண்டறியலாம்.",
+    "review": "reviewed",
+    "enHash": "ca169a4c"
+  },
+  "onboarding.status.rejected.title": {
+    "message": "உங்கள் கடை அங்கீகரிக்கப்படவில்லை",
+    "review": "reviewed",
+    "enHash": "75e8f563"
+  },
+  "onboarding.status.rejected.body": {
+    "message": "இது தவறு என்று நினைத்தால் ஆதரவுக் குழுவைத் தொடர்புகொள்ளவும்.",
+    "review": "reviewed",
+    "enHash": "9e413826"
+  },
+  "onboarding.status.suspended.title": {
+    "message": "உங்கள் கடை இடைநிறுத்தப்பட்டுள்ளது",
+    "review": "reviewed",
+    "enHash": "655adb75"
+  },
+  "onboarding.status.suspended.body": {
+    "message": "காரணம் அறிய ஆதரவுக் குழுவைத் தொடர்புகொள்ளவும்.",
+    "review": "reviewed",
+    "enHash": "1943d6db"
+  },
+  "onboarding.field.categoryId": {
+    "message": "நீங்கள் என்ன விற்கிறீர்கள்",
+    "review": "reviewed",
+    "enHash": "32d50307"
+  },
+  "onboarding.field.stores": {
+    "message": "ஒரு கடை",
+    "review": "reviewed",
+    "enHash": "73ea649e"
+  },
+  "onboarding.field.addressLine1": {
+    "message": "கடை முகவரி",
+    "review": "reviewed",
+    "enHash": "93458909"
+  },
+  "onboarding.field.city": {
+    "message": "நகரம்",
+    "review": "reviewed",
+    "enHash": "4271627f"
+  },
+  "onboarding.field.pincode": {
+    "message": "பின்கோடு",
+    "review": "reviewed",
+    "enHash": "f2c5ca7b"
+  },
+  "onboarding.field.location": {
+    "message": "வரைபட இடம்",
+    "review": "reviewed",
+    "enHash": "9a333493"
+  },
+  "onboarding.field.phone": {
+    "message": "கடைத் தொலைபேசி",
+    "review": "reviewed",
+    "enHash": "5bd971a7"
+  },
+  "onboarding.field.hours": {
+    "message": "திறந்திருக்கும் நேரம்",
+    "review": "reviewed",
+    "enHash": "6117e118"
+  },
+  "onboarding.field.brandName": {
+    "message": "கடையின் பெயர்",
+    "review": "reviewed",
+    "enHash": "6a5cc02e"
+  },
+  "onboarding.field.legalName": {
+    "message": "பதிவுசெய்யப்பட்ட பிசினஸ் பெயர்",
+    "review": "reviewed",
+    "enHash": "9deda141"
+  },
+  "onboarding.field.pan": {
+    "message": "PAN",
+    "review": "reviewed",
+    "enHash": "ad2967ed"
+  },
+  "onboarding.field.gstin": {
+    "message": "GSTIN",
+    "review": "reviewed",
+    "enHash": "da7751f5"
+  },
+  "onboarding.field.documents": {
+    "message": "ஆவணங்கள்",
+    "review": "reviewed",
+    "enHash": "687c8286"
+  },
+  "onboarding.field.other": {
+    "message": "வேறு ஏதோ விவரம்",
+    "review": "reviewed",
+    "enHash": "61052ba2"
+  }
+}

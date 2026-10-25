@@ -7,9 +7,13 @@ import { BizError } from '../stores/BizError';
 import { canEditPayout, canManageStores, canMuteAsks, canOnboard, canSeePayout } from '../stores/perm';
 import { useCurrentBusiness, useStore, useStoreSettings } from '../stores/queries';
 import styles from '../stores/stores.module.css';
+import { LanguageSection } from './LanguageSection';
 import { DeliverySection, HoursSection, PayoutSection, ProfileSection, RewardsSection } from './sections';
 
-/** B-14 Settings: profile, hours, pickup and delivery, rewards and payout, for the store this device works in. */
+/**
+ * B-14 Settings: profile, hours, pickup and delivery, rewards and payout, for the store this device works in.
+ * The language card is for every role, so it sits outside the manager gate.
+ */
 export function SettingsPage() {
   const intl = useIntl();
   const cur = useCurrentBusiness();
@@ -51,6 +55,7 @@ export function SettingsPage() {
             description={intl.formatMessage({ id: 'settings.noAccess.body' })}
           />
         ))}
+      <LanguageSection />
     </div>
   );
 }

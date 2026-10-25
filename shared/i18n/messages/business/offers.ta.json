@@ -1,0 +1,847 @@
+{
+  "offers.title": {
+    "message": "ஆஃபர்கள்",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "offers.loading": {
+    "message": "ஆஃபர்கள் ஏற்றப்படுகின்றன",
+    "review": "reviewed",
+    "enHash": "526c1854"
+  },
+  "offers.noStore.title": {
+    "message": "முதலில் ஒரு கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "offers.noStore.body": {
+    "message": "ஆஃபர்கள் ஒரு கடைக்குச் சொந்தமானவை. அவற்றைப் பார்க்க ஒன்றைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "6be0bd92"
+  },
+  "offers.noStore.action": {
+    "message": "கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "offers.askManager": {
+    "message": "ஆஃபர்களும் பேனர்களும் உரிமையாளர் மற்றும் மேலாளர்களுக்கானவை. ஒரு மேலாளரிடம் கேளுங்கள்.",
+    "review": "reviewed",
+    "enHash": "87d93a07"
+  },
+  "offers.error.title": {
+    "message": "ஆஃபர்களை ஏற்ற முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "70d93621"
+  },
+  "offers.error.body": {
+    "message": "உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "offers.error.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "offers.error.generic": {
+    "message": "ஏதோ தவறு நடந்தது. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "4244e822"
+  },
+  "offers.error.validation_failed": {
+    "message": "சில விவரங்களுக்கு அனுமதி இல்லை. படிவத்தைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "5ef5c8bb"
+  },
+  "offers.error.forbidden": {
+    "message": "இதைச் செய்ய உங்களுக்கு அனுமதி இல்லை. ஒரு மேலாளரிடம் கேளுங்கள்.",
+    "review": "reviewed",
+    "enHash": "f827c99e"
+  },
+  "offers.error.not_found": {
+    "message": "இது கிடைக்கவில்லை. இது நீக்கப்பட்டிருக்கலாம்.",
+    "review": "reviewed",
+    "enHash": "db0134f3"
+  },
+  "offers.error.invalid_transition": {
+    "message": "இதை இனி மாற்ற முடியாது.",
+    "review": "reviewed",
+    "enHash": "2d020016"
+  },
+  "offers.error.banner_limit_reached": {
+    "message": "பேனர்களின் வரம்பை அடைந்துவிட்டீர்கள். புதியதைச் சேர்க்க ஒன்றை முடிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "0fefea0d"
+  },
+  "offers.error.precondition_failed": {
+    "message": "இது வேறொரு சாதனத்தில் மாறியது. பட்டியல் இப்போது புதுப்பிக்கப்பட்டுள்ளது, மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "8e2fd84f"
+  },
+  "offers.error.precondition_required": {
+    "message": "இதைச் சேமிக்க முடியவில்லை. மீண்டும் ஏற்றி முயலவும்.",
+    "review": "reviewed",
+    "enHash": "2c6544e0"
+  },
+  "offers.error.conflict": {
+    "message": "இந்த ஆஃபர் ஏற்கெனவே உள்ளது. பட்டியலைப் பார்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "6dc784a9"
+  },
+  "offers.tabs.label": {
+    "message": "ஆஃபர்கள் மற்றும் பேனர்கள்",
+    "review": "reviewed",
+    "enHash": "70b265ae"
+  },
+  "offers.tabs.offers": {
+    "message": "ஆஃபர்கள்",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "offers.tabs.banners": {
+    "message": "பேனர்கள்",
+    "review": "reviewed",
+    "enHash": "b64085ed"
+  },
+  "offers.new": {
+    "message": "புதிய ஆஃபர்",
+    "review": "reviewed",
+    "enHash": "ad43a620"
+  },
+  "offers.close": {
+    "message": "மூடவும்",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "offers.cancel": {
+    "message": "ரத்துசெய்",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "offers.create": {
+    "message": "ஆஃபர் உருவாக்கவும்",
+    "review": "reviewed",
+    "enHash": "c6af210c"
+  },
+  "offers.created": {
+    "message": "{count, plural, one {ஆஃபர் உருவாக்கப்பட்டது} other {# ஆஃபர்கள் உருவாக்கப்பட்டன}}",
+    "review": "reviewed",
+    "enHash": "70b3ffa7"
+  },
+  "offers.more": {
+    "message": "மேலும் காட்டு",
+    "review": "reviewed",
+    "enHash": "25911d48"
+  },
+  "offers.empty.title": {
+    "message": "இன்னும் ஆஃபர்கள் இல்லை",
+    "review": "reviewed",
+    "enHash": "0a61eeaf"
+  },
+  "offers.empty.body": {
+    "message": "ஒரு ஆஃபர் உருவாக்குங்கள், வாடிக்கையாளர்கள் அதை உங்கள் கடைப் பக்கத்திலும் கவுண்டரிலும் பார்ப்பார்கள்.",
+    "review": "reviewed",
+    "enHash": "211bb98c"
+  },
+  "offers.empty.filtered": {
+    "message": "இங்கே ஆஃபர்கள் இல்லை.",
+    "review": "reviewed",
+    "enHash": "3efa4da7"
+  },
+  "offers.filter.label": {
+    "message": "ஆஃபர்களை வடிகட்டவும்",
+    "review": "reviewed",
+    "enHash": "93688736"
+  },
+  "offers.filter.all": {
+    "message": "அனைத்தும்",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "offers.filter.live": {
+    "message": "நேரலையில்",
+    "review": "reviewed",
+    "enHash": "65c821a5"
+  },
+  "offers.filter.scheduled": {
+    "message": "திட்டமிடப்பட்டவை",
+    "review": "reviewed",
+    "enHash": "1cd1bdad"
+  },
+  "offers.filter.paused": {
+    "message": "இடைநிறுத்தப்பட்டவை",
+    "review": "reviewed",
+    "enHash": "c7dfb6f1"
+  },
+  "offers.filter.ended": {
+    "message": "முடிந்தவை",
+    "review": "reviewed",
+    "enHash": "90303d8d"
+  },
+  "offers.status.scheduled": {
+    "message": "திட்டமிடப்பட்டது",
+    "review": "reviewed",
+    "enHash": "1cd1bdad"
+  },
+  "offers.status.live": {
+    "message": "நேரலையில்",
+    "review": "reviewed",
+    "enHash": "65c821a5"
+  },
+  "offers.status.paused": {
+    "message": "இடைநிறுத்தப்பட்டது",
+    "review": "reviewed",
+    "enHash": "c7dfb6f1"
+  },
+  "offers.status.ended": {
+    "message": "முடிந்தது",
+    "review": "reviewed",
+    "enHash": "90303d8d"
+  },
+  "offers.list.label": {
+    "message": "ஆஃபர்கள்",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "offers.row.redemptions": {
+    "message": "{max, plural, =0 {{count} முறை பயன்படுத்தப்பட்டது} other {{max} இல் {count} பயன்படுத்தப்பட்டது}}",
+    "review": "reviewed",
+    "enHash": "c0e682c6"
+  },
+  "offers.row.until": {
+    "message": "{when} வரை",
+    "review": "reviewed",
+    "enHash": "38e41287"
+  },
+  "offers.row.noEnd": {
+    "message": "முடிவுத் தேதி இல்லை",
+    "review": "reviewed",
+    "enHash": "58fb5578"
+  },
+  "offers.pause": {
+    "message": "இடைநிறுத்து",
+    "review": "reviewed",
+    "enHash": "781961bc"
+  },
+  "offers.resume": {
+    "message": "மீண்டும் தொடங்கு",
+    "review": "reviewed",
+    "enHash": "b3bd0b5a"
+  },
+  "offers.end": {
+    "message": "முடி",
+    "review": "reviewed",
+    "enHash": "a2bb9d34"
+  },
+  "offers.end.confirm": {
+    "message": "இதை நிரந்தரமாக முடிக்கவா?",
+    "review": "reviewed",
+    "enHash": "bbd0c3d7"
+  },
+  "offers.end.keep": {
+    "message": "வைத்திரு",
+    "review": "reviewed",
+    "enHash": "d9f36924"
+  },
+  "offers.end.yes": {
+    "message": "முடி",
+    "review": "reviewed",
+    "enHash": "02deb283"
+  },
+  "offers.new.title": {
+    "message": "புதிய ஆஃபர்",
+    "review": "reviewed",
+    "enHash": "ad43a620"
+  },
+  "offers.kind.label": {
+    "message": "ஆஃபர் வகை",
+    "review": "reviewed",
+    "enHash": "e1388365"
+  },
+  "offers.kind.percent": {
+    "message": "சதவீதத் தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "23f77d15"
+  },
+  "offers.kind.flat": {
+    "message": "ரூபாய்த் தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "edfaf2b2"
+  },
+  "offers.kind.bxgy": {
+    "message": "வாங்கினால் இலவசம்",
+    "review": "reviewed",
+    "enHash": "9cceb7bb"
+  },
+  "offers.kind.bill_min": {
+    "message": "பில் தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "6555d928"
+  },
+  "offers.kind.flash": {
+    "message": "காலாவதியாகும் ஸ்டாக்",
+    "review": "reviewed",
+    "enHash": "5a5f2759"
+  },
+  "offers.kind.summary": {
+    "message": "{kind, select, percent {{pct}% தள்ளுபடி} flat {ஒவ்வொன்றுக்கும் {amount} தள்ளுபடி} bxgy {{buy} வாங்கினால் {get} இலவசம்} bill_min {{min} க்கு மேலான பில்களுக்கு {amount} தள்ளுபடி} other {ஆஃபர்}}",
+    "review": "reviewed",
+    "enHash": "61c65366"
+  },
+  "offers.scope.label": {
+    "message": "எதற்குப் பொருந்தும்",
+    "review": "reviewed",
+    "enHash": "0c9d314d"
+  },
+  "offers.scope.items": {
+    "message": "பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "offers.scope.category": {
+    "message": "வகை",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "offers.scope.store": {
+    "message": "முழுக் கடை",
+    "review": "reviewed",
+    "enHash": "ed76ecfe"
+  },
+  "offers.scope.storeNote": {
+    "message": "முழுக் கடைக்கும் பொருந்தும்.",
+    "review": "reviewed",
+    "enHash": "437ea9db"
+  },
+  "offers.scope.summary": {
+    "message": "{scope, select, store {முழுக் கடை} category {ஒரு வகை} other {{count, plural, one {# பொருள்} other {# பொருட்கள்}}}}",
+    "review": "reviewed",
+    "enHash": "f8213bd0"
+  },
+  "offers.items.one": {
+    "message": "பொருள்",
+    "review": "reviewed",
+    "enHash": "ecdda59a"
+  },
+  "offers.items.many": {
+    "message": "பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "offers.category.label": {
+    "message": "வகை",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "offers.category.choose": {
+    "message": "வகையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "b91bf5d4"
+  },
+  "offers.picker.search": {
+    "message": "பொருட்களைத் தேடவும்",
+    "review": "reviewed",
+    "enHash": "daeea688"
+  },
+  "offers.picker.searchHint": {
+    "message": "உங்கள் பொருட்களைத் தேடவும்",
+    "review": "reviewed",
+    "enHash": "81e7c045"
+  },
+  "offers.picker.picked": {
+    "message": "தேர்ந்தெடுத்த பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "35b59db9"
+  },
+  "offers.picker.results": {
+    "message": "கிடைத்த பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "db1ba24e"
+  },
+  "offers.picker.none": {
+    "message": "பொருட்கள் எதுவும் கிடைக்கவில்லை.",
+    "review": "reviewed",
+    "enHash": "4b775dcf"
+  },
+  "offers.picker.add": {
+    "message": "சேர்",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "offers.picker.added": {
+    "message": "சேர்க்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "b68734c2"
+  },
+  "offers.picker.remove": {
+    "message": "{name} ஐ நீக்கவும்",
+    "review": "reviewed",
+    "enHash": "df7193a5"
+  },
+  "offers.flash.batches": {
+    "message": "விற்றுத் தீர்க்க வேண்டிய பேட்ச்கள்",
+    "review": "reviewed",
+    "enHash": "ef42f5b5"
+  },
+  "offers.flash.none": {
+    "message": "காலாவதித் தேதி உள்ள பேட்ச் எதுவும் ஸ்டாக்கில் இல்லை.",
+    "review": "reviewed",
+    "enHash": "0c83fe51"
+  },
+  "offers.flash.batchMeta": {
+    "message": "{qty} மீதம், {date} அன்று காலாவதி",
+    "review": "reviewed",
+    "enHash": "1ef5226e"
+  },
+  "offers.flash.help": {
+    "message": "ஒவ்வொரு பேட்ச்சுக்கும் தனி ஆஃபர் கிடைக்கும், அது அதன் காலாவதித் தேதியில் முடியும்.",
+    "review": "reviewed",
+    "enHash": "a7c5b28b"
+  },
+  "offers.value.percent": {
+    "message": "சதவீதத் தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "23f77d15"
+  },
+  "offers.value.percentHelp": {
+    "message": "1 முதல் {max} வரையிலான முழு எண்.",
+    "review": "reviewed",
+    "enHash": "06b3600d"
+  },
+  "offers.value.flatOff": {
+    "message": "ஒவ்வொன்றுக்கும் ரூபாய்த் தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "54353916"
+  },
+  "offers.value.flatHelp": {
+    "message": "ஒவ்வொரு யூனிட்டிலிருந்தும் கழிக்கப்படும், எனவே விலையை விடக் குறைவாக இருக்க வேண்டும்.",
+    "review": "reviewed",
+    "enHash": "978487d2"
+  },
+  "offers.value.billOff": {
+    "message": "பில்லில் ரூபாய்த் தள்ளுபடி",
+    "review": "reviewed",
+    "enHash": "a421742a"
+  },
+  "offers.value.billHelp": {
+    "message": "பில் குறைந்தபட்சத் தொகையை அடைந்ததும் முழு பில்லிலிருந்தும் ஒருமுறை கழிக்கப்படும்.",
+    "review": "reviewed",
+    "enHash": "37ca1ac1"
+  },
+  "offers.minBill.label": {
+    "message": "குறைந்தபட்ச பில்",
+    "review": "reviewed",
+    "enHash": "6a0bea5b"
+  },
+  "offers.buy.label": {
+    "message": "வாங்கவும்",
+    "review": "reviewed",
+    "enHash": "7ceca51f"
+  },
+  "offers.get.label": {
+    "message": "இலவசமாகப் பெறவும்",
+    "review": "reviewed",
+    "enHash": "c8e927a1"
+  },
+  "offers.title.label": {
+    "message": "பெயர் (விருப்பத்தேர்வு)",
+    "review": "reviewed",
+    "enHash": "9c9f03a8"
+  },
+  "offers.title.help": {
+    "message": "வாடிக்கையாளர்களுக்குத் தெரியும். காலியாக விட்டால் நாங்களே பெயர் வைப்போம்.",
+    "review": "reviewed",
+    "enHash": "d52d3b9a"
+  },
+  "offers.channels.label": {
+    "message": "எங்கே பொருந்தும்",
+    "review": "reviewed",
+    "enHash": "f32914e5"
+  },
+  "offers.channels.both": {
+    "message": "ஆன்லைன் மற்றும் கவுண்டர்",
+    "review": "reviewed",
+    "enHash": "f1974487"
+  },
+  "offers.channels.online": {
+    "message": "ஆன்லைன்",
+    "review": "reviewed",
+    "enHash": "c3e839df"
+  },
+  "offers.channels.pos": {
+    "message": "கவுண்டர்",
+    "review": "reviewed",
+    "enHash": "f4018045"
+  },
+  "offers.once.label": {
+    "message": "ஒரு வாடிக்கையாளருக்கு ஒருமுறை",
+    "review": "reviewed",
+    "enHash": "f5df284e"
+  },
+  "offers.max.label": {
+    "message": "முதல் ஆர்டர்களுக்கு மட்டும் (விருப்பத்தேர்வு)",
+    "review": "reviewed",
+    "enHash": "6a64b0e0"
+  },
+  "offers.max.help": {
+    "message": "இத்தனை ஆர்டர்களுக்குப் பிறகு நின்றுவிடும். வரம்பு வேண்டாமெனில் காலியாக விடவும்.",
+    "review": "reviewed",
+    "enHash": "20603623"
+  },
+  "offers.starts.label": {
+    "message": "தொடக்கம்",
+    "review": "reviewed",
+    "enHash": "fc612a2f"
+  },
+  "offers.starts.help": {
+    "message": "இப்போதே தொடங்க காலியாக விடவும்.",
+    "review": "reviewed",
+    "enHash": "a515e52d"
+  },
+  "offers.ends.label": {
+    "message": "முடிவு",
+    "review": "reviewed",
+    "enHash": "91856dcb"
+  },
+  "offers.ends.help": {
+    "message": "நீங்கள் முடிக்கும் வரை இயங்க காலியாக விடவும்.",
+    "review": "reviewed",
+    "enHash": "85330a45"
+  },
+  "offers.err.percent": {
+    "message": "{min} முதல் {max} வரையிலான முழு எண்ணை உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "329d1c3b"
+  },
+  "offers.err.flatMin": {
+    "message": "ரூபாயில் தொகையை உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "2b198b3b"
+  },
+  "offers.err.flatTooHigh": {
+    "message": "தொகை பொருளின் விலையை விடக் குறைவாக இருக்க வேண்டும்.",
+    "review": "reviewed",
+    "enHash": "ddda7614"
+  },
+  "offers.err.buy": {
+    "message": "{min} முதல் {max} வரையிலான முழு எண்ணை உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "329d1c3b"
+  },
+  "offers.err.get": {
+    "message": "{min} முதல் {max} வரையிலான முழு எண்ணை உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "329d1c3b"
+  },
+  "offers.err.minBill": {
+    "message": "குறைந்தபட்ச பில்லை ரூபாயில் உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "09828023"
+  },
+  "offers.err.discountAboveBill": {
+    "message": "தள்ளுபடி குறைந்தபட்ச பில்லை விடக் குறைவாக இருக்க வேண்டும்.",
+    "review": "reviewed",
+    "enHash": "e19e4174"
+  },
+  "offers.err.itemsRequired": {
+    "message": "குறைந்தது ஒரு பொருளைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "9df870a1"
+  },
+  "offers.err.oneItem": {
+    "message": "ஒரு பொருளைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "f2a32296"
+  },
+  "offers.err.tooManyItems": {
+    "message": "அதிகபட்சம் {max} பொருட்களைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "83109741"
+  },
+  "offers.err.categoryRequired": {
+    "message": "வகையைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "1ae9839f"
+  },
+  "offers.err.batchesRequired": {
+    "message": "குறைந்தது ஒரு பேட்ச்சைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "43146d7c"
+  },
+  "offers.err.title": {
+    "message": "அதிகபட்சம் {max} எழுத்துகளைப் பயன்படுத்தவும்.",
+    "review": "reviewed",
+    "enHash": "67e6cbb4"
+  },
+  "offers.err.maxRedemptions": {
+    "message": "{max} வரையிலான முழு எண்ணை உள்ளிடவும், அல்லது காலியாக விடவும்.",
+    "review": "reviewed",
+    "enHash": "69e7d68c"
+  },
+  "offers.err.dateInvalid": {
+    "message": "சரியான தேதியையும் நேரத்தையும் உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "808fd49b"
+  },
+  "offers.err.startPast": {
+    "message": "தொடக்க நேரம் கடந்துவிட்டது.",
+    "review": "reviewed",
+    "enHash": "925c2101"
+  },
+  "offers.err.endBeforeStart": {
+    "message": "முடிவு தொடக்கத்துக்குப் பிறகு இருக்க வேண்டும்.",
+    "review": "reviewed",
+    "enHash": "172f86fc"
+  },
+  "offers.preview.label": {
+    "message": "முன்னோட்டம்",
+    "review": "reviewed",
+    "enHash": "f1fbb2b4"
+  },
+  "offers.preview.title": {
+    "message": "செக்அவுட்டில் எப்படித் தெரியும்",
+    "review": "reviewed",
+    "enHash": "5b885ef8"
+  },
+  "offers.preview.waiting": {
+    "message": "ஆஃபரை நிரப்புங்கள், அதனுடன் ஒரு மாதிரி கார்ட்டின் விலை தெரியும்.",
+    "review": "reviewed",
+    "enHash": "d28ce48f"
+  },
+  "offers.preview.failed": {
+    "message": "முன்னோட்டம் இப்போது கிடைக்கவில்லை. இருந்தாலும் ஆஃபரை உருவாக்கலாம்.",
+    "review": "reviewed",
+    "enHash": "960080c9"
+  },
+  "offers.preview.item": {
+    "message": "பொருள்",
+    "review": "reviewed",
+    "enHash": "ecdda59a"
+  },
+  "offers.preview.free": {
+    "message": "({count} இலவசம்)",
+    "review": "reviewed",
+    "enHash": "ed65304a"
+  },
+  "offers.preview.without": {
+    "message": "ஆஃபர் இல்லாமல்",
+    "review": "reviewed",
+    "enHash": "439e16ce"
+  },
+  "offers.preview.with": {
+    "message": "ஆஃபருடன்",
+    "review": "reviewed",
+    "enHash": "b8bd6327"
+  },
+  "offers.preview.noEffect": {
+    "message": "இந்த ஆஃபர் இந்த மாதிரி கார்ட்டில் எதையும் குறைக்கவில்லை.",
+    "review": "reviewed",
+    "enHash": "9b954cf6"
+  },
+  "offers.banner.new": {
+    "message": "புதிய பேனர்",
+    "review": "reviewed",
+    "enHash": "b729b1ae"
+  },
+  "offers.banner.create": {
+    "message": "பேனர் உருவாக்கவும்",
+    "review": "reviewed",
+    "enHash": "8d17d922"
+  },
+  "offers.banner.created": {
+    "message": "பேனர் உருவாக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "7605d111"
+  },
+  "offers.banner.list": {
+    "message": "பேனர்கள்",
+    "review": "reviewed",
+    "enHash": "b64085ed"
+  },
+  "offers.banner.empty.title": {
+    "message": "இன்னும் பேனர்கள் இல்லை",
+    "review": "reviewed",
+    "enHash": "278fb106"
+  },
+  "offers.banner.empty.body": {
+    "message": "பேனர் உங்கள் கடைப் பக்கத்தின் மேலே ஒரு தலைப்பைக் காட்டும்.",
+    "review": "reviewed",
+    "enHash": "eae2ee77"
+  },
+  "offers.banner.headline": {
+    "message": "தலைப்பு",
+    "review": "reviewed",
+    "enHash": "442250df"
+  },
+  "offers.banner.headlineHelp": {
+    "message": "அதிகபட்சம் {max} எழுத்துகள்.",
+    "review": "reviewed",
+    "enHash": "5776685a"
+  },
+  "offers.banner.subline": {
+    "message": "துணை வரி (விருப்பத்தேர்வு)",
+    "review": "reviewed",
+    "enHash": "f419d0bf"
+  },
+  "offers.banner.sampleHeadline": {
+    "message": "உங்கள் தலைப்பு",
+    "review": "reviewed",
+    "enHash": "9f13632f"
+  },
+  "offers.banner.tint": {
+    "message": "நிறம்",
+    "review": "reviewed",
+    "enHash": "f28563a4"
+  },
+  "offers.banner.tint.green": {
+    "message": "பச்சை",
+    "review": "reviewed",
+    "enHash": "933bf21a"
+  },
+  "offers.banner.tint.amber": {
+    "message": "மஞ்சள்",
+    "review": "reviewed",
+    "enHash": "27a01d47"
+  },
+  "offers.banner.tint.rose": {
+    "message": "ரோஜா",
+    "review": "reviewed",
+    "enHash": "51ad0eae"
+  },
+  "offers.banner.tint.sky": {
+    "message": "வான நீலம்",
+    "review": "reviewed",
+    "enHash": "b3d97fd6"
+  },
+  "offers.banner.tint.lilac": {
+    "message": "இளஞ்சிவப்பு ஊதா",
+    "review": "reviewed",
+    "enHash": "a742758d"
+  },
+  "offers.banner.tint.peach": {
+    "message": "பீச்",
+    "review": "reviewed",
+    "enHash": "9d572da1"
+  },
+  "offers.banner.target": {
+    "message": "எது திறக்கும்",
+    "review": "reviewed",
+    "enHash": "54c374d4"
+  },
+  "offers.banner.target.store": {
+    "message": "உங்கள் கடை",
+    "review": "reviewed",
+    "enHash": "8f808a7d"
+  },
+  "offers.banner.target.offer": {
+    "message": "ஒரு ஆஃபர்",
+    "review": "reviewed",
+    "enHash": "32321cab"
+  },
+  "offers.banner.target.category": {
+    "message": "ஒரு வகை",
+    "review": "reviewed",
+    "enHash": "d07bae3f"
+  },
+  "offers.banner.target.items": {
+    "message": "சில பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "03e595cf"
+  },
+  "offers.banner.pickOffer": {
+    "message": "ஆஃபர்",
+    "review": "reviewed",
+    "enHash": "3898b9aa"
+  },
+  "offers.banner.chooseOffer": {
+    "message": "ஆஃபரைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "955b9baf"
+  },
+  "offers.banner.err.headlineRequired": {
+    "message": "தலைப்பை உள்ளிடவும்.",
+    "review": "reviewed",
+    "enHash": "4ae29c9b"
+  },
+  "offers.banner.err.headlineMax": {
+    "message": "அதிகபட்சம் {max} எழுத்துகளைப் பயன்படுத்தவும்.",
+    "review": "reviewed",
+    "enHash": "67e6cbb4"
+  },
+  "offers.banner.err.sublineMax": {
+    "message": "அதிகபட்சம் {max} எழுத்துகளைப் பயன்படுத்தவும்.",
+    "review": "reviewed",
+    "enHash": "67e6cbb4"
+  },
+  "offers.banner.err.offerRequired": {
+    "message": "ஆஃபரைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "87f686ca"
+  },
+  "offers.banner.err.categoryRequired": {
+    "message": "வகையைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "1ae9839f"
+  },
+  "offers.banner.err.itemsRequired": {
+    "message": "குறைந்தது ஒரு பொருளைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "9df870a1"
+  },
+  "offers.banner.uploadLater": {
+    "message": "புகைப்படப் பேனர்கள் இந்தப் பதிப்பில் கிடைக்கவில்லை.",
+    "review": "reviewed",
+    "enHash": "803b2c52"
+  },
+  "offers.banner.status.pending_review": {
+    "message": "சரிபார்க்கப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "97876b83"
+  },
+  "offers.banner.status.live": {
+    "message": "நேரலையில்",
+    "review": "reviewed",
+    "enHash": "65c821a5"
+  },
+  "offers.banner.status.scheduled": {
+    "message": "திட்டமிடப்பட்டது",
+    "review": "reviewed",
+    "enHash": "1cd1bdad"
+  },
+  "offers.banner.status.paused": {
+    "message": "இடைநிறுத்தப்பட்டது",
+    "review": "reviewed",
+    "enHash": "c7dfb6f1"
+  },
+  "offers.banner.status.ended": {
+    "message": "முடிந்தது",
+    "review": "reviewed",
+    "enHash": "90303d8d"
+  },
+  "offers.banner.status.removed": {
+    "message": "நீக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "b5e77c5c"
+  },
+  "offers.banner.checking": {
+    "message": "படம் சரிபார்க்கப்படுகிறது…",
+    "review": "reviewed",
+    "enHash": "e1134f27"
+  },
+  "offers.banner.removed": {
+    "message": "TodayZ நீக்கியது.",
+    "review": "reviewed",
+    "enHash": "7f206588"
+  },
+  "offers.banner.removedWhy": {
+    "message": "TodayZ நீக்கியது: {reason}",
+    "review": "reviewed",
+    "enHash": "cce1e45f"
+  },
+  "offers.banner.reach": {
+    "message": "{views, plural, one {# பார்வை} other {# பார்வைகள்}} · {taps, plural, one {# தட்டல்} other {# தட்டல்கள்}} · {orders, plural, one {# ஆர்டர்} other {# ஆர்டர்கள்}}",
+    "review": "reviewed",
+    "enHash": "09e518c2"
+  }
+}

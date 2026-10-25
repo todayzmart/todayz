@@ -1,0 +1,137 @@
+{
+  "shell.appName": {
+    "message": "TodayZ",
+    "review": "reviewed",
+    "enHash": "34b58f9d"
+  },
+  "shell.appTag": {
+    "message": "ಬಿಸಿನೆಸ್",
+    "review": "reviewed",
+    "enHash": "d6663dda"
+  },
+  "shell.skipToContent": {
+    "message": "ನೇರವಾಗಿ ಮುಖ್ಯ ಭಾಗಕ್ಕೆ ಹೋಗಿ",
+    "review": "reviewed",
+    "enHash": "0a4470d6"
+  },
+  "shell.nav.label": {
+    "message": "ಬಿಸಿನೆಸ್",
+    "review": "reviewed",
+    "enHash": "d6663dda"
+  },
+  "shell.nav.overview": {
+    "message": "ಸಾರಾಂಶ",
+    "review": "reviewed",
+    "enHash": "0efc2e6b"
+  },
+  "shell.nav.orders": {
+    "message": "ಆರ್ಡರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "cded0933"
+  },
+  "shell.nav.sell": {
+    "message": "ಮಾರಾಟ",
+    "review": "reviewed",
+    "enHash": "fa3cf2ad"
+  },
+  "shell.nav.stock": {
+    "message": "ಸ್ಟಾಕ್",
+    "review": "reviewed",
+    "enHash": "bcecf456"
+  },
+  "shell.nav.more": {
+    "message": "ಇನ್ನಷ್ಟು",
+    "review": "reviewed",
+    "enHash": "4bab2d8f"
+  },
+  "shell.nav.customers": {
+    "message": "ಗ್ರಾಹಕರು",
+    "review": "reviewed",
+    "enHash": "035eae60"
+  },
+  "shell.nav.groupGrow": {
+    "message": "ಬೆಳೆಸಿ",
+    "review": "reviewed",
+    "enHash": "7e2299a8"
+  },
+  "shell.nav.offers": {
+    "message": "ಆಫರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "shell.nav.reviews": {
+    "message": "ರಿವ್ಯೂಗಳು",
+    "review": "reviewed",
+    "enHash": "b83c4cda"
+  },
+  "shell.nav.analytics": {
+    "message": "ಅಂಕಿಅಂಶಗಳು",
+    "review": "reviewed",
+    "enHash": "25bc9629"
+  },
+  "shell.nav.groupShop": {
+    "message": "ಅಂಗಡಿ",
+    "review": "reviewed",
+    "enHash": "55de8870"
+  },
+  "shell.nav.credits": {
+    "message": "ಕ್ರೆಡಿಟ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "shell.nav.settings": {
+    "message": "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "c7f73bb5"
+  },
+  "shell.greet.title": {
+    "message": "TodayZ ನಲ್ಲಿ ನಿಮ್ಮ ಅಂಗಡಿ",
+    "review": "reviewed",
+    "enHash": "ecd7ca85"
+  },
+  "shell.greet.sub": {
+    "message": "ಕೌಂಟರ್, ಸ್ಟಾಕ್, ಆರ್ಡರ್‌ಗಳು ಮತ್ತು ಆಫರ್‌ಗಳನ್ನು ಒಂದೇ ಕಡೆಯಿಂದ ನಡೆಸಿ.",
+    "review": "reviewed",
+    "enHash": "879ce392"
+  },
+  "shell.soon.tag": {
+    "message": "ಶೀಘ್ರದಲ್ಲೇ",
+    "review": "reviewed",
+    "enHash": "e4115be2"
+  },
+  "shell.soon.title": {
+    "message": "{section} ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ",
+    "review": "reviewed",
+    "enHash": "6c957e46"
+  },
+  "shell.soon.body": {
+    "message": "ಬಿಸಿನೆಸ್ ಆ್ಯಪ್‌ನ ಈ ಭಾಗವನ್ನು ನಾವು ತಯಾರಿಸುತ್ತಿದ್ದೇವೆ. ಇದು ಕೌಂಟರ್‌ನಲ್ಲಿ ಇಂಟರ್ನೆಟ್ ಇಲ್ಲದೆಯೂ ಕೆಲಸ ಮಾಡುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "0aa81361"
+  },
+  "shell.notFound.title": {
+    "message": "ಪುಟ ಸಿಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "bc3023b3"
+  },
+  "shell.notFound.body": {
+    "message": "ಈ ಲಿಂಕ್ ಇನ್ನೂ ಎಲ್ಲಿಗೂ ಹೋಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "8c0d72a2"
+  },
+  "shell.notFound.home": {
+    "message": "ಸಾರಾಂಶಕ್ಕೆ ಹೋಗಿ",
+    "review": "reviewed",
+    "enHash": "711dbdf4"
+  },
+  "shell.nav.ordersCount": {
+    "message": "{count, plural, one {# ಆರ್ಡರ್ ಕಾಯುತ್ತಿದೆ} other {# ಆರ್ಡರ್‌ಗಳು ಕಾಯುತ್ತಿವೆ}}",
+    "review": "reviewed",
+    "enHash": "31dd266d"
+  },
+  "shell.nav.stockCount": {
+    "message": "{count, plural, one {# ಐಟಂ ನಾಳೆಯೊಳಗೆ ಖಾಲಿಯಾಗುತ್ತದೆ} other {# ಐಟಂಗಳು ನಾಳೆಯೊಳಗೆ ಖಾಲಿಯಾಗುತ್ತವೆ}}",
+    "review": "reviewed",
+    "enHash": "a905b14b"
+  }
+}

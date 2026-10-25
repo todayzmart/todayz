@@ -1,0 +1,982 @@
+{
+  "stock.title": {
+    "message": "स्टॉक",
+    "review": "reviewed",
+    "enHash": "bcecf456"
+  },
+  "stock.loading": {
+    "message": "स्टॉक लोड हो रहा है",
+    "review": "reviewed",
+    "enHash": "a1a29595"
+  },
+  "stock.noStore.title": {
+    "message": "पहले एक दुकान चुनें",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "stock.noStore.body": {
+    "message": "स्टॉक किसी एक दुकान का होता है। जिस दुकान में आप काम कर रहे हैं, उसे चुनें।",
+    "review": "reviewed",
+    "enHash": "3ad8aef4"
+  },
+  "stock.noStore.action": {
+    "message": "दुकान चुनें",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "stock.error.title": {
+    "message": "स्टॉक लोड नहीं हो सका",
+    "review": "reviewed",
+    "enHash": "d98f90d7"
+  },
+  "stock.error.body": {
+    "message": "अपना कनेक्शन जाँचें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "stock.error.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "stock.error.validation_failed": {
+    "message": "इसमें से कुछ स्वीकार नहीं हुआ। संख्याएँ जाँचें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "a29c601a"
+  },
+  "stock.error.forbidden": {
+    "message": "आपकी भूमिका यह नहीं कर सकती। किसी मैनेजर से कहें।",
+    "review": "reviewed",
+    "enHash": "7c035098"
+  },
+  "stock.error.conflict": {
+    "message": "आपके बदलते समय यह बदल गया। फिर से लोड करें और दोबारा कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "d32da861"
+  },
+  "stock.error.not_found": {
+    "message": "यह आइटम अब आपकी दुकान में नहीं है।",
+    "review": "reviewed",
+    "enHash": "bac42b30"
+  },
+  "stock.error.precondition_failed": {
+    "message": "किसी और ने अभी यह आइटम बदला है। इसे फिर से लोड किया गया है; दोबारा कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "16a84f1b"
+  },
+  "stock.error.precondition_required": {
+    "message": "इस आइटम के बदलाव जाँचे नहीं जा सके। फिर से लोड करें और दोबारा कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "996ab7c1"
+  },
+  "stock.error.generic": {
+    "message": "यह नहीं हुआ। फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "9ae914fa"
+  },
+  "stock.search.label": {
+    "message": "स्टॉक खोजें",
+    "review": "reviewed",
+    "enHash": "63960fa1"
+  },
+  "stock.search.placeholder": {
+    "message": "नाम या बारकोड से खोजें",
+    "review": "reviewed",
+    "enHash": "01f9e331"
+  },
+  "stock.search.clear": {
+    "message": "खोज साफ़ करें",
+    "review": "reviewed",
+    "enHash": "67300d0f"
+  },
+  "stock.filter.label": {
+    "message": "स्टॉक फ़िल्टर करें",
+    "review": "reviewed",
+    "enHash": "5b642716"
+  },
+  "stock.filter.all": {
+    "message": "सभी",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "stock.filter.low": {
+    "message": "कम स्टॉक",
+    "review": "reviewed",
+    "enHash": "a6e1fef1"
+  },
+  "stock.filter.out": {
+    "message": "स्टॉक ख़त्म",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "stock.filter.stale": {
+    "message": "हाल में पक्का नहीं किया",
+    "review": "reviewed",
+    "enHash": "09fece23"
+  },
+  "stock.filter.hidden": {
+    "message": "छिपे हुए",
+    "review": "reviewed",
+    "enHash": "d4c2792a"
+  },
+  "stock.category.label": {
+    "message": "कैटेगरी",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "stock.category.all": {
+    "message": "सभी कैटेगरी",
+    "review": "reviewed",
+    "enHash": "060be00f"
+  },
+  "stock.action.add": {
+    "message": "आइटम जोड़ें",
+    "review": "reviewed",
+    "enHash": "5bcf4db4"
+  },
+  "stock.action.import": {
+    "message": "इंपोर्ट",
+    "review": "reviewed",
+    "enHash": "d6fbc9d2"
+  },
+  "stock.action.count": {
+    "message": "स्टॉक गिनें",
+    "review": "reviewed",
+    "enHash": "82d76c10"
+  },
+  "stock.action.countDone": {
+    "message": "गिनती पूरी",
+    "review": "reviewed",
+    "enHash": "152e7d90"
+  },
+  "stock.count.hint": {
+    "message": "हर आइटम के लिए शेल्फ़ पर जितना है वह लिखें, फिर पक्का करें। सिर्फ़ पक्के किए गए आइटम बदलते हैं।",
+    "review": "reviewed",
+    "enHash": "d36c7bbf"
+  },
+  "stock.table.label": {
+    "message": "स्टॉक आइटम",
+    "review": "reviewed",
+    "enHash": "51ae889f"
+  },
+  "stock.col.item": {
+    "message": "आइटम",
+    "review": "reviewed",
+    "enHash": "ecdda59a"
+  },
+  "stock.col.stock": {
+    "message": "स्टॉक",
+    "review": "reviewed",
+    "enHash": "bcecf456"
+  },
+  "stock.col.onHand": {
+    "message": "मौजूद",
+    "review": "reviewed",
+    "enHash": "d94c32d4"
+  },
+  "stock.col.counted": {
+    "message": "गिना गया",
+    "review": "reviewed",
+    "enHash": "319a2b6e"
+  },
+  "stock.col.price": {
+    "message": "क़ीमत",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "stock.empty.none": {
+    "message": "अभी कोई आइटम नहीं। अपना पहला आइटम जोड़ें या शीट इंपोर्ट करें।",
+    "review": "reviewed",
+    "enHash": "97b326b4"
+  },
+  "stock.empty.filtered": {
+    "message": "कोई आइटम मेल नहीं खाता।",
+    "review": "reviewed",
+    "enHash": "911453d6"
+  },
+  "stock.more": {
+    "message": "और दिखाएँ",
+    "review": "reviewed",
+    "enHash": "25911d48"
+  },
+  "stock.level.in": {
+    "message": "स्टॉक में",
+    "review": "reviewed",
+    "enHash": "3f1356ad"
+  },
+  "stock.level.low": {
+    "message": "सिर्फ़ {available} बचे",
+    "review": "reviewed",
+    "enHash": "8a4dc0ee"
+  },
+  "stock.level.out": {
+    "message": "स्टॉक ख़त्म",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "stock.fresh.confirmed": {
+    "message": "पक्का किया {time}",
+    "review": "reviewed",
+    "enHash": "7d1ac5a7"
+  },
+  "stock.fresh.stale": {
+    "message": "स्टॉक हाल में पक्का नहीं किया",
+    "review": "reviewed",
+    "enHash": "c8a47c2d"
+  },
+  "stock.inline.edit": {
+    "message": "{item} बदलें",
+    "review": "reviewed",
+    "enHash": "0a705d55"
+  },
+  "stock.inline.save": {
+    "message": "{item} की क़ीमत सेव करें",
+    "review": "reviewed",
+    "enHash": "2b9d7bee"
+  },
+  "stock.inline.confirm": {
+    "message": "{item} की गिनती पक्की करें",
+    "review": "reviewed",
+    "enHash": "0ffca104"
+  },
+  "stock.inline.price": {
+    "message": "{item} की क़ीमत",
+    "review": "reviewed",
+    "enHash": "f96e0600"
+  },
+  "stock.inline.count": {
+    "message": "{item} की गिनी गई मात्रा",
+    "review": "reviewed",
+    "enHash": "3f1068a2"
+  },
+  "stock.item.close": {
+    "message": "बंद करें",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "stock.item.hidden": {
+    "message": "ग्राहकों से छिपा है",
+    "review": "reviewed",
+    "enHash": "f9800cca"
+  },
+  "stock.item.onHand": {
+    "message": "मौजूद",
+    "review": "reviewed",
+    "enHash": "d94c32d4"
+  },
+  "stock.item.reserved": {
+    "message": "ऑर्डर के लिए रखा",
+    "review": "reviewed",
+    "enHash": "df36c2b4"
+  },
+  "stock.item.available": {
+    "message": "उपलब्ध",
+    "review": "reviewed",
+    "enHash": "7c62a142"
+  },
+  "stock.item.price": {
+    "message": "क़ीमत",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "stock.item.mrp": {
+    "message": "MRP",
+    "review": "reviewed",
+    "enHash": "cd74a166"
+  },
+  "stock.item.lowAt": {
+    "message": "कम स्टॉक की सीमा",
+    "review": "reviewed",
+    "enHash": "7ba9fd9d"
+  },
+  "stock.item.notSet": {
+    "message": "सेट नहीं",
+    "review": "reviewed",
+    "enHash": "93039e60"
+  },
+  "stock.item.tabs": {
+    "message": "आइटम की जानकारी",
+    "review": "reviewed",
+    "enHash": "12e853a0"
+  },
+  "stock.tab.batches": {
+    "message": "बैच",
+    "review": "reviewed",
+    "enHash": "30925eec"
+  },
+  "stock.tab.history": {
+    "message": "इतिहास",
+    "review": "reviewed",
+    "enHash": "90ccd649"
+  },
+  "stock.act.restock": {
+    "message": "फिर से स्टॉक करें",
+    "review": "reviewed",
+    "enHash": "3ccf7127"
+  },
+  "stock.act.count": {
+    "message": "गिनती सुधारें",
+    "review": "reviewed",
+    "enHash": "afc22be8"
+  },
+  "stock.act.damage": {
+    "message": "ख़राब बताएँ",
+    "review": "reviewed",
+    "enHash": "cb521b7a"
+  },
+  "stock.act.expired": {
+    "message": "एक्सपायर बताएँ",
+    "review": "reviewed",
+    "enHash": "310c38b2"
+  },
+  "stock.act.price": {
+    "message": "क़ीमत बदलें",
+    "review": "reviewed",
+    "enHash": "1eac205f"
+  },
+  "stock.act.threshold": {
+    "message": "कम स्टॉक का स्तर",
+    "review": "reviewed",
+    "enHash": "50344aed"
+  },
+  "stock.act.hide": {
+    "message": "ग्राहकों से छिपाएँ",
+    "review": "reviewed",
+    "enHash": "2f8bd03c"
+  },
+  "stock.act.list": {
+    "message": "ग्राहकों को दिखाएँ",
+    "review": "reviewed",
+    "enHash": "1f13846d"
+  },
+  "stock.batch.none": {
+    "message": "स्टॉक वाला कोई बैच नहीं बचा।",
+    "review": "reviewed",
+    "enHash": "3458ae7c"
+  },
+  "stock.batch.left": {
+    "message": "{quantity} बचे",
+    "review": "reviewed",
+    "enHash": "62abbdae"
+  },
+  "stock.batch.expires": {
+    "message": "{date} को एक्सपायर",
+    "review": "reviewed",
+    "enHash": "dde25e8f"
+  },
+  "stock.batch.expiredOn": {
+    "message": "{date} को एक्सपायर हुआ",
+    "review": "reviewed",
+    "enHash": "7cd25a6a"
+  },
+  "stock.batch.noExpiry": {
+    "message": "कोई एक्सपायरी तारीख़ नहीं",
+    "review": "reviewed",
+    "enHash": "8fbd9bfa"
+  },
+  "stock.batch.cost": {
+    "message": "लागत {cost}",
+    "review": "reviewed",
+    "enHash": "7703b083"
+  },
+  "stock.batch.edit": {
+    "message": "बदलें",
+    "review": "reviewed",
+    "enHash": "5301648d"
+  },
+  "stock.history.none": {
+    "message": "अभी स्टॉक में कोई बदलाव नहीं।",
+    "review": "reviewed",
+    "enHash": "1fdb9f2a"
+  },
+  "stock.source.opening": {
+    "message": "शुरुआती स्टॉक",
+    "review": "reviewed",
+    "enHash": "38b7df56"
+  },
+  "stock.source.restock": {
+    "message": "फिर से स्टॉक किया",
+    "review": "reviewed",
+    "enHash": "12d85280"
+  },
+  "stock.source.supplier_bill": {
+    "message": "सप्लायर बिल",
+    "review": "reviewed",
+    "enHash": "58997110"
+  },
+  "stock.source.import": {
+    "message": "इंपोर्ट किया",
+    "review": "reviewed",
+    "enHash": "434eb26f"
+  },
+  "stock.source.count_correction": {
+    "message": "गिनती सुधारी",
+    "review": "reviewed",
+    "enHash": "97f5f111"
+  },
+  "stock.source.damage": {
+    "message": "ख़राब",
+    "review": "reviewed",
+    "enHash": "052fc798"
+  },
+  "stock.source.expired": {
+    "message": "एक्सपायर",
+    "review": "reviewed",
+    "enHash": "a689a999"
+  },
+  "stock.source.sale_pos": {
+    "message": "काउंटर पर बिका",
+    "review": "reviewed",
+    "enHash": "ab1d9837"
+  },
+  "stock.source.sale_online": {
+    "message": "ऑनलाइन बिका",
+    "review": "reviewed",
+    "enHash": "5320465a"
+  },
+  "stock.source.pos_reversal": {
+    "message": "काउंटर बिक्री वापस हुई",
+    "review": "reviewed",
+    "enHash": "da366a69"
+  },
+  "stock.source.other": {
+    "message": "स्टॉक बदलाव",
+    "review": "reviewed",
+    "enHash": "78a9fe7e"
+  },
+  "stock.form.title.restock": {
+    "message": "{item} फिर से स्टॉक करें",
+    "review": "reviewed",
+    "enHash": "5b448a60"
+  },
+  "stock.form.title.damage": {
+    "message": "{item} को ख़राब बताएँ",
+    "review": "reviewed",
+    "enHash": "0e204bbc"
+  },
+  "stock.form.title.expired": {
+    "message": "{item} को एक्सपायर बताएँ",
+    "review": "reviewed",
+    "enHash": "3d31bd67"
+  },
+  "stock.form.title.count_correction": {
+    "message": "{item} की गिनती सुधारें",
+    "review": "reviewed",
+    "enHash": "465989a3"
+  },
+  "stock.form.title.price": {
+    "message": "क़ीमत बदलें",
+    "review": "reviewed",
+    "enHash": "1eac205f"
+  },
+  "stock.form.title.threshold": {
+    "message": "कम स्टॉक का स्तर",
+    "review": "reviewed",
+    "enHash": "50344aed"
+  },
+  "stock.form.title.batch": {
+    "message": "बैच बदलें",
+    "review": "reviewed",
+    "enHash": "6c57d40d"
+  },
+  "stock.form.save.restock": {
+    "message": "स्टॉक सेव करें",
+    "review": "reviewed",
+    "enHash": "0e0572ab"
+  },
+  "stock.form.save.damage": {
+    "message": "ख़राबी सेव करें",
+    "review": "reviewed",
+    "enHash": "d3f690ca"
+  },
+  "stock.form.save.expired": {
+    "message": "एक्सपायरी सेव करें",
+    "review": "reviewed",
+    "enHash": "f6053561"
+  },
+  "stock.form.save.count_correction": {
+    "message": "गिनती सेव करें",
+    "review": "reviewed",
+    "enHash": "b64c0a4d"
+  },
+  "stock.form.save.price": {
+    "message": "क़ीमत सेव करें",
+    "review": "reviewed",
+    "enHash": "6a897ddb"
+  },
+  "stock.form.save.threshold": {
+    "message": "स्तर सेव करें",
+    "review": "reviewed",
+    "enHash": "fbddda1e"
+  },
+  "stock.form.save.batch": {
+    "message": "बैच सेव करें",
+    "review": "reviewed",
+    "enHash": "1de2c092"
+  },
+  "stock.form.cancel": {
+    "message": "रद्द करें",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "stock.form.back": {
+    "message": "वापस",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "stock.form.qty": {
+    "message": "मात्रा",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "stock.form.qtyMax": {
+    "message": "{available} तक उपलब्ध।",
+    "review": "reviewed",
+    "enHash": "63f7abc0"
+  },
+  "stock.form.qtyInvalid": {
+    "message": "1 या उससे ज़्यादा, 10,00,000 तक की पूरी संख्या डालें।",
+    "review": "reviewed",
+    "enHash": "b0cf53e4"
+  },
+  "stock.form.qtyTooMany": {
+    "message": "सिर्फ़ {available} उपलब्ध हैं।",
+    "review": "reviewed",
+    "enHash": "f86ab2b0"
+  },
+  "stock.form.counted": {
+    "message": "शेल्फ़ पर गिना गया",
+    "review": "reviewed",
+    "enHash": "3757174e"
+  },
+  "stock.form.countedHelp": {
+    "message": "सिस्टम में {onHand} मौजूद हैं, जिनमें से {reserved} ऑर्डर के लिए रखे हैं।",
+    "review": "reviewed",
+    "enHash": "71147153"
+  },
+  "stock.form.countInvalid": {
+    "message": "0 से 10,00,000 तक की पूरी संख्या डालें।",
+    "review": "reviewed",
+    "enHash": "2d52188c"
+  },
+  "stock.form.batches": {
+    "message": "एक्सपायर हुए बैच",
+    "review": "reviewed",
+    "enHash": "d2c336ef"
+  },
+  "stock.form.pickBatch": {
+    "message": "कम से कम एक बैच पर टिक करें।",
+    "review": "reviewed",
+    "enHash": "636d30b3"
+  },
+  "stock.form.writeOff": {
+    "message": "{quantity} बट्टे खाते में जाएँगे।",
+    "review": "reviewed",
+    "enHash": "25b017b9"
+  },
+  "stock.form.expiry": {
+    "message": "एक्सपायरी तारीख़",
+    "review": "reviewed",
+    "enHash": "6b440cd5"
+  },
+  "stock.form.expiryHelp": {
+    "message": "ज़रूरी नहीं। सबसे पहले एक्सपायर होने वाला पहले बिकता है।",
+    "review": "reviewed",
+    "enHash": "16368f0b"
+  },
+  "stock.form.cost": {
+    "message": "प्रति यूनिट लागत",
+    "review": "reviewed",
+    "enHash": "4f9ae67f"
+  },
+  "stock.form.costHelp": {
+    "message": "ज़रूरी नहीं। बिक्री क़ीमत {price} है।",
+    "review": "reviewed",
+    "enHash": "f3898983"
+  },
+  "stock.form.costInvalid": {
+    "message": "रुपये में रकम डालें, जैसे 42 या 42.50।",
+    "review": "reviewed",
+    "enHash": "60cbee53"
+  },
+  "stock.form.note": {
+    "message": "नोट",
+    "review": "reviewed",
+    "enHash": "2c924e30"
+  },
+  "stock.form.price": {
+    "message": "बिक्री क़ीमत",
+    "review": "reviewed",
+    "enHash": "7657ccd6"
+  },
+  "stock.form.priceMrp": {
+    "message": "MRP {mrp} है। क़ीमत इससे ज़्यादा नहीं हो सकती।",
+    "review": "reviewed",
+    "enHash": "42107931"
+  },
+  "stock.form.priceInvalid": {
+    "message": "रुपये में रकम डालें, जैसे 58 या 58.50।",
+    "review": "reviewed",
+    "enHash": "1f25c621"
+  },
+  "stock.form.priceAboveMrp": {
+    "message": "क़ीमत {mrp} के MRP से ज़्यादा नहीं हो सकती।",
+    "review": "reviewed",
+    "enHash": "7a0650ec"
+  },
+  "stock.form.priceRef": {
+    "message": "सुझाव से संदर्भ क़ीमत: {price}। सेव करने तक कुछ नहीं बदलता।",
+    "review": "reviewed",
+    "enHash": "188c481e"
+  },
+  "stock.form.threshold": {
+    "message": "कम स्टॉक की सीमा",
+    "review": "reviewed",
+    "enHash": "7ba9fd9d"
+  },
+  "stock.form.thresholdHelp": {
+    "message": "उपलब्ध स्टॉक इस संख्या तक पहुँचने पर चेतावनी दें। बंद करने के लिए ख़ाली छोड़ें।",
+    "review": "reviewed",
+    "enHash": "5f13e007"
+  },
+  "stock.link.askManager": {
+    "message": "यह करने के लिए किसी मैनेजर से कहें।",
+    "review": "reviewed",
+    "enHash": "9c4dbb1f"
+  },
+  "stock.toast.restock": {
+    "message": "{item} फिर से स्टॉक हुआ",
+    "review": "reviewed",
+    "enHash": "d480fd84"
+  },
+  "stock.toast.damage": {
+    "message": "{item} को ख़राब बताया",
+    "review": "reviewed",
+    "enHash": "371b429f"
+  },
+  "stock.toast.expired": {
+    "message": "{item} को एक्सपायर बताया",
+    "review": "reviewed",
+    "enHash": "2680d0cd"
+  },
+  "stock.toast.count_correction": {
+    "message": "{item} की गिनती सेव हुई",
+    "review": "reviewed",
+    "enHash": "4494f38a"
+  },
+  "stock.toast.price": {
+    "message": "{item} की क़ीमत बदली",
+    "review": "reviewed",
+    "enHash": "b8e3449e"
+  },
+  "stock.toast.threshold": {
+    "message": "{item} का कम स्टॉक स्तर सेव हुआ",
+    "review": "reviewed",
+    "enHash": "fde3bc47"
+  },
+  "stock.toast.batch": {
+    "message": "बैच सेव हुआ",
+    "review": "reviewed",
+    "enHash": "aa30e481"
+  },
+  "stock.toast.added": {
+    "message": "{item} जोड़ा गया",
+    "review": "reviewed",
+    "enHash": "29e20351"
+  },
+  "stock.add.title": {
+    "message": "आइटम जोड़ें",
+    "review": "reviewed",
+    "enHash": "5bcf4db4"
+  },
+  "stock.add.search": {
+    "message": "प्रोडक्ट खोजें",
+    "review": "reviewed",
+    "enHash": "1a413f0c"
+  },
+  "stock.add.searchHint": {
+    "message": "नाम या बारकोड",
+    "review": "reviewed",
+    "enHash": "d529b5fb"
+  },
+  "stock.add.hint": {
+    "message": "कम से कम 2 अक्षर लिखें, या बारकोड स्कैन करें।",
+    "review": "reviewed",
+    "enHash": "405c2949"
+  },
+  "stock.add.noMatch": {
+    "message": "कोई प्रोडक्ट नहीं मिला। आप इसे बना सकते हैं।",
+    "review": "reviewed",
+    "enHash": "b73e927b"
+  },
+  "stock.add.results": {
+    "message": "मिलते-जुलते प्रोडक्ट",
+    "review": "reviewed",
+    "enHash": "894ed0db"
+  },
+  "stock.add.pick": {
+    "message": "जोड़ें",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "stock.add.inStore": {
+    "message": "पहले से आपकी दुकान में",
+    "review": "reviewed",
+    "enHash": "d008bf38"
+  },
+  "stock.add.pickAgain": {
+    "message": "जोड़ने के लिए प्रोडक्ट खोजें।",
+    "review": "reviewed",
+    "enHash": "77422308"
+  },
+  "stock.add.create": {
+    "message": "नया प्रोडक्ट बनाएँ",
+    "review": "reviewed",
+    "enHash": "48e2e613"
+  },
+  "stock.add.createTitle": {
+    "message": "नया प्रोडक्ट",
+    "review": "reviewed",
+    "enHash": "1bc965f3"
+  },
+  "stock.add.createNote": {
+    "message": "आप इसे तुरंत बेच सकते हैं। TodayZ नए प्रोडक्ट जाँचता है और जानकारी सुधार सकता है।",
+    "review": "reviewed",
+    "enHash": "b17b44e7"
+  },
+  "stock.add.createSave": {
+    "message": "बनाएँ और आगे बढ़ें",
+    "review": "reviewed",
+    "enHash": "8fb3ba33"
+  },
+  "stock.add.name": {
+    "message": "प्रोडक्ट का नाम",
+    "review": "reviewed",
+    "enHash": "63c0fe8e"
+  },
+  "stock.add.brand": {
+    "message": "ब्रांड",
+    "review": "reviewed",
+    "enHash": "62b4aa57"
+  },
+  "stock.add.packSize": {
+    "message": "पैक साइज़",
+    "review": "reviewed",
+    "enHash": "87dd2c97"
+  },
+  "stock.add.unit": {
+    "message": "यूनिट",
+    "review": "reviewed",
+    "enHash": "f6b935ab"
+  },
+  "stock.add.category": {
+    "message": "कैटेगरी",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "stock.add.categoryPick": {
+    "message": "कैटेगरी चुनें",
+    "review": "reviewed",
+    "enHash": "b91bf5d4"
+  },
+  "stock.add.mrp": {
+    "message": "MRP",
+    "review": "reviewed",
+    "enHash": "cd74a166"
+  },
+  "stock.add.barcode": {
+    "message": "बारकोड",
+    "review": "reviewed",
+    "enHash": "8e54dc53"
+  },
+  "stock.add.nameInvalid": {
+    "message": "प्रोडक्ट का नाम डालें।",
+    "review": "reviewed",
+    "enHash": "156b98ba"
+  },
+  "stock.add.packInvalid": {
+    "message": "0 से ज़्यादा पैक साइज़ डालें।",
+    "review": "reviewed",
+    "enHash": "c518b9fb"
+  },
+  "stock.add.categoryInvalid": {
+    "message": "कैटेगरी चुनें।",
+    "review": "reviewed",
+    "enHash": "1ae9839f"
+  },
+  "stock.add.barcodeInvalid": {
+    "message": "बारकोड में 8 से 14 अंक होते हैं।",
+    "review": "reviewed",
+    "enHash": "6afd70c1"
+  },
+  "stock.add.priceTitle": {
+    "message": "क़ीमत और शुरुआती स्टॉक",
+    "review": "reviewed",
+    "enHash": "ef3f7094"
+  },
+  "stock.add.opening": {
+    "message": "शुरुआती स्टॉक",
+    "review": "reviewed",
+    "enHash": "38b7df56"
+  },
+  "stock.add.openingHelp": {
+    "message": "अभी आपके पास कितने हैं। बिना स्टॉक के जोड़ने के लिए ख़ाली छोड़ें।",
+    "review": "reviewed",
+    "enHash": "56e87302"
+  },
+  "stock.add.save": {
+    "message": "मेरी दुकान में जोड़ें",
+    "review": "reviewed",
+    "enHash": "6bcff51f"
+  },
+  "stock.import.title": {
+    "message": "आइटम इंपोर्ट करें",
+    "review": "reviewed",
+    "enHash": "71475145"
+  },
+  "stock.import.body": {
+    "message": "हर पंक्ति में एक आइटम वाली CSV या XLSX शीट अपलोड करें। कुछ भी सेव होने से पहले आप हर पंक्ति की जाँच देखेंगे।",
+    "review": "reviewed",
+    "enHash": "52306a4f"
+  },
+  "stock.import.choose": {
+    "message": "फ़ाइल चुनें",
+    "review": "reviewed",
+    "enHash": "74b1d89d"
+  },
+  "stock.import.file": {
+    "message": "आइटम फ़ाइल",
+    "review": "reviewed",
+    "enHash": "2486c8be"
+  },
+  "stock.import.tooBig": {
+    "message": "यह फ़ाइल 5 MB से बड़ी है। इसे बाँटें और फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "074bff0d"
+  },
+  "stock.import.okCount": {
+    "message": "{count, plural, one {# पंक्ति तैयार} other {# पंक्तियाँ तैयार}}",
+    "review": "reviewed",
+    "enHash": "454bd309"
+  },
+  "stock.import.errorCount": {
+    "message": "{count, plural, one {# पंक्ति में समस्या} other {# पंक्तियों में समस्या}}",
+    "review": "reviewed",
+    "enHash": "6f89d2ee"
+  },
+  "stock.import.errorNote": {
+    "message": "समस्या वाली पंक्तियाँ छोड़ दी जाती हैं। उन्हें अपनी शीट में ठीक करें और फिर से इंपोर्ट करें।",
+    "review": "reviewed",
+    "enHash": "8199a9f2"
+  },
+  "stock.import.rows": {
+    "message": "फ़ाइल की पंक्तियाँ",
+    "review": "reviewed",
+    "enHash": "ccfb8479"
+  },
+  "stock.import.rowNo": {
+    "message": "पंक्ति {row}",
+    "review": "reviewed",
+    "enHash": "b8e5d89e"
+  },
+  "stock.import.unnamed": {
+    "message": "कोई नाम नहीं",
+    "review": "reviewed",
+    "enHash": "b78fd250"
+  },
+  "stock.import.rowError": {
+    "message": "{field}: {problem}",
+    "review": "reviewed",
+    "enHash": "c181bee1"
+  },
+  "stock.import.apply": {
+    "message": "{count, plural, one {# आइटम इंपोर्ट करें} other {# आइटम इंपोर्ट करें}}",
+    "review": "reviewed",
+    "enHash": "f6fda5f5"
+  },
+  "stock.import.another": {
+    "message": "दूसरी फ़ाइल चुनें",
+    "review": "reviewed",
+    "enHash": "62352371"
+  },
+  "stock.import.done": {
+    "message": "{applied, plural, one {# आइटम इंपोर्ट हुआ} other {# आइटम इंपोर्ट हुए}}। {skipped, plural, =0 {कोई पंक्ति नहीं छोड़ी गई।} one {# पंक्ति छोड़ी गई।} other {# पंक्तियाँ छोड़ी गईं।}}",
+    "review": "reviewed",
+    "enHash": "87eae7f4"
+  },
+  "stock.import.close": {
+    "message": "बंद करें",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "stock.import.field.name": {
+    "message": "नाम",
+    "review": "reviewed",
+    "enHash": "709a2322"
+  },
+  "stock.import.field.barcode": {
+    "message": "बारकोड",
+    "review": "reviewed",
+    "enHash": "8e54dc53"
+  },
+  "stock.import.field.pricePaise": {
+    "message": "क़ीमत",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "stock.import.field.mrpPaise": {
+    "message": "MRP",
+    "review": "reviewed",
+    "enHash": "cd74a166"
+  },
+  "stock.import.field.quantity": {
+    "message": "मात्रा",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "stock.import.field.expiresOn": {
+    "message": "एक्सपायरी तारीख़",
+    "review": "reviewed",
+    "enHash": "6b440cd5"
+  },
+  "stock.import.field.other": {
+    "message": "पंक्ति",
+    "review": "reviewed",
+    "enHash": "9bf7a8e8"
+  },
+  "stock.import.code.required": {
+    "message": "नहीं है",
+    "review": "reviewed",
+    "enHash": "cf6f06e2"
+  },
+  "stock.import.code.invalid": {
+    "message": "सही नहीं है",
+    "review": "reviewed",
+    "enHash": "e3fac096"
+  },
+  "stock.import.code.too_long": {
+    "message": "बहुत लंबा है",
+    "review": "reviewed",
+    "enHash": "306aee6f"
+  },
+  "stock.import.code.price_above_mrp": {
+    "message": "MRP से ज़्यादा है",
+    "review": "reviewed",
+    "enHash": "54e32832"
+  },
+  "stock.import.code.unknown_product": {
+    "message": "प्रोडक्ट सूची में नहीं है",
+    "review": "reviewed",
+    "enHash": "dae05f63"
+  },
+  "stock.import.code.duplicate": {
+    "message": "दो बार है",
+    "review": "reviewed",
+    "enHash": "d5620f6c"
+  },
+  "stock.import.code.other": {
+    "message": "में समस्या है",
+    "review": "reviewed",
+    "enHash": "1547a58d"
+  }
+}

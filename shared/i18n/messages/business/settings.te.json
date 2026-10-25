@@ -1,0 +1,312 @@
+{
+  "settings.title": {
+    "message": "సెట్టింగ్‌లు",
+    "review": "reviewed",
+    "enHash": "c7f73bb5"
+  },
+  "settings.loading": {
+    "message": "సెట్టింగ్‌లు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "fa96b316"
+  },
+  "settings.loadFailed.title": {
+    "message": "మీ సెట్టింగ్‌లను లోడ్ చేయలేకపోయాం",
+    "review": "reviewed",
+    "enHash": "ca73591b"
+  },
+  "settings.loadFailed.body": {
+    "message": "మీ ఇంటర్నెట్ చూసుకుని మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "settings.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "settings.none.title": {
+    "message": "ఇంకా దుకాణం లేదు",
+    "review": "reviewed",
+    "enHash": "4830b3b7"
+  },
+  "settings.none.body": {
+    "message": "ముందు మీ దుకాణాన్ని సెటప్ చేసి, తర్వాత ఇక్కడికి రండి.",
+    "review": "reviewed",
+    "enHash": "da1336b7"
+  },
+  "settings.none.action": {
+    "message": "మీ దుకాణాన్ని సెటప్ చేయండి",
+    "review": "reviewed",
+    "enHash": "f54cfff6"
+  },
+  "settings.noAccess.title": {
+    "message": "సెట్టింగ్‌లు యజమానులు, మేనేజర్ల కోసం",
+    "review": "reviewed",
+    "enHash": "207b45a2"
+  },
+  "settings.noAccess.body": {
+    "message": "ఏదైనా మార్చాలంటే మీ దుకాణం యజమానిని అడగండి.",
+    "review": "reviewed",
+    "enHash": "a4c81b6a"
+  },
+  "settings.links": {
+    "message": "సంబంధిత పేజీలు",
+    "review": "reviewed",
+    "enHash": "99f548a9"
+  },
+  "settings.link.stores": {
+    "message": "దుకాణాలు, సిబ్బంది",
+    "review": "reviewed",
+    "enHash": "68c41031"
+  },
+  "settings.link.onboarding": {
+    "message": "దుకాణం సెటప్ కొనసాగించండి",
+    "review": "reviewed",
+    "enHash": "221e0617"
+  },
+  "settings.noStore.title": {
+    "message": "సెటప్ చేయడానికి ఇంకా దుకాణం లేదు",
+    "review": "reviewed",
+    "enHash": "362a11a3"
+  },
+  "settings.noStore.body": {
+    "message": "“దుకాణాలు, సిబ్బంది” లో ఒక దుకాణాన్ని జోడించండి. దాని సెట్టింగ్‌లు ఇక్కడ కనిపిస్తాయి.",
+    "review": "reviewed",
+    "enHash": "e6841e2d"
+  },
+  "settings.forStore": {
+    "message": "{name} సెట్టింగ్‌లు",
+    "review": "reviewed",
+    "enHash": "5bb63b0b"
+  },
+  "settings.saved": {
+    "message": "సేవ్ అయింది",
+    "review": "reviewed",
+    "enHash": "c0ae8f6e"
+  },
+  "settings.save": {
+    "message": "సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "settings.profile.title": {
+    "message": "దుకాణం ప్రొఫైల్",
+    "review": "reviewed",
+    "enHash": "ba2ce6e7"
+  },
+  "settings.profile.body": {
+    "message": "కస్టమర్లు చూసే పేరు, చిరునామా, మ్యాప్‌లో స్థలం, ఫోన్.",
+    "review": "reviewed",
+    "enHash": "81e5cbca"
+  },
+  "settings.hours.title": {
+    "message": "తెరిచే సమయాలు",
+    "review": "reviewed",
+    "enHash": "6117e118"
+  },
+  "settings.hours.body": {
+    "message": "మీరు తెరిచి ఉన్నప్పుడు మాత్రమే కస్టమర్లు బుక్ చేయగలరు. దుకాణం మూసి ఉండే సెలవు రోజులను జోడించండి.",
+    "review": "reviewed",
+    "enHash": "45190b6b"
+  },
+  "settings.delivery.title": {
+    "message": "పికప్, డెలివరీ",
+    "review": "reviewed",
+    "enHash": "b2091838"
+  },
+  "settings.delivery.pickup": {
+    "message": "కస్టమర్లు దుకాణం నుంచి పికప్ చేసుకోవచ్చు",
+    "review": "reviewed",
+    "enHash": "f5f43153"
+  },
+  "settings.delivery.delivery": {
+    "message": "కస్టమర్లకు డెలివరీ చేయండి",
+    "review": "reviewed",
+    "enHash": "c4f865c6"
+  },
+  "settings.delivery.inStoreOnly.title": {
+    "message": "దుకాణంలో మాత్రమే",
+    "review": "reviewed",
+    "enHash": "c72090ec"
+  },
+  "settings.delivery.inStoreOnly.body": {
+    "message": "పికప్, డెలివరీ రెండూ ఆఫ్‌లో ఉంటే, కస్టమర్లు మీ దుకాణాన్ని చూడగలరు కానీ బుక్ చేయలేరు.",
+    "review": "reviewed",
+    "enHash": "e8067827"
+  },
+  "settings.delivery.radius": {
+    "message": "డెలివరీ దూరం (km)",
+    "review": "reviewed",
+    "enHash": "3821a514"
+  },
+  "settings.delivery.radiusHelp": {
+    "message": "0.1 km నుంచి 20 km వరకు.",
+    "review": "reviewed",
+    "enHash": "981b99be"
+  },
+  "settings.delivery.fee": {
+    "message": "డెలివరీ ఛార్జీ",
+    "review": "reviewed",
+    "enHash": "733b6148"
+  },
+  "settings.delivery.freeAbove": {
+    "message": "దీనికి మించితే ఉచిత డెలివరీ",
+    "review": "reviewed",
+    "enHash": "4b4964e0"
+  },
+  "settings.delivery.freeAboveHelp": {
+    "message": "ఎప్పుడూ ఛార్జీ తీసుకోవాలంటే ఖాళీగా వదిలేయండి.",
+    "review": "reviewed",
+    "enHash": "0186f886"
+  },
+  "settings.delivery.minOrder": {
+    "message": "కనీస ఆర్డర్",
+    "review": "reviewed",
+    "enHash": "98d92586"
+  },
+  "settings.delivery.err.radius": {
+    "message": "0.1 నుంచి 20 km మధ్య దూరం ఇవ్వండి.",
+    "review": "reviewed",
+    "enHash": "d8684a0d"
+  },
+  "settings.delivery.err.money": {
+    "message": "రూపాయల్లో మొత్తం ఇవ్వండి, దశాంశం తర్వాత గరిష్ఠంగా రెండు అంకెలు.",
+    "review": "reviewed",
+    "enHash": "2e283353"
+  },
+  "settings.rewards.title": {
+    "message": "రివార్డులు, ఆర్డర్లు",
+    "review": "reviewed",
+    "enHash": "f180f64a"
+  },
+  "settings.rewards.cashback": {
+    "message": "బిల్లులపై క్యాష్‌బ్యాక్",
+    "review": "reviewed",
+    "enHash": "e941ef9c"
+  },
+  "settings.rewards.example": {
+    "message": "{amount} బిల్లుపై కస్టమర్‌కు {credits, plural, one {# క్రెడిట్} other {# క్రెడిట్లు}} వస్తాయి.",
+    "review": "reviewed",
+    "enHash": "a9c2e28b"
+  },
+  "settings.rewards.autoAccept": {
+    "message": "అన్నీ స్టాక్‌లో ఉంటే ఆర్డర్లను ఆటోమేటిక్‌గా అంగీకరించండి",
+    "review": "reviewed",
+    "enHash": "24084d96"
+  },
+  "settings.rewards.asks": {
+    "message": "కస్టమర్ల ప్రశ్నలు తీసుకోండి",
+    "review": "reviewed",
+    "enHash": "0f81555a"
+  },
+  "settings.payout.title": {
+    "message": "చెల్లింపు, పన్ను వివరాలు",
+    "review": "reviewed",
+    "enHash": "6e739b28"
+  },
+  "settings.payout.managerNote": {
+    "message": "వీటిని యజమాని మాత్రమే మార్చగలరు. మీకు చివరి అంకెలు మాత్రమే కనిపిస్తాయి.",
+    "review": "reviewed",
+    "enHash": "d4c80359"
+  },
+  "settings.payout.legalName": {
+    "message": "చట్టపరమైన పేరు",
+    "review": "reviewed",
+    "enHash": "15cd2be0"
+  },
+  "settings.payout.pan": {
+    "message": "PAN",
+    "review": "reviewed",
+    "enHash": "ad2967ed"
+  },
+  "settings.payout.gstin": {
+    "message": "GSTIN",
+    "review": "reviewed",
+    "enHash": "da7751f5"
+  },
+  "settings.payout.upi": {
+    "message": "UPI ID",
+    "review": "reviewed",
+    "enHash": "d06f3a68"
+  },
+  "settings.payout.bank": {
+    "message": "బ్యాంక్ ఖాతా",
+    "review": "reviewed",
+    "enHash": "d2bd6b4c"
+  },
+  "settings.payout.bankAccount": {
+    "message": "బ్యాంక్ ఖాతా నంబర్",
+    "review": "reviewed",
+    "enHash": "42045296"
+  },
+  "settings.payout.ifsc": {
+    "message": "IFSC",
+    "review": "reviewed",
+    "enHash": "e704f8ce"
+  },
+  "settings.payout.savedEnding": {
+    "message": "సేవ్ అయింది, చివరి అంకెలు {last4}",
+    "review": "reviewed",
+    "enHash": "ad71d96d"
+  },
+  "settings.payout.notSet": {
+    "message": "జోడించలేదు",
+    "review": "reviewed",
+    "enHash": "a5651658"
+  },
+  "settings.payout.replaceHelp": {
+    "message": "జోడించాల్సినవి లేదా మార్చాల్సినవి మాత్రమే నింపండి. ఖాళీగా వదిలిన చోట్ల సేవ్ చేసినవే ఉంటాయి.",
+    "review": "reviewed",
+    "enHash": "c59d12ea"
+  },
+  "settings.payout.err.format": {
+    "message": "ఇది సరిగ్గా లేనట్లుంది. చూసుకుని మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "be9cb488"
+  },
+  "settings.payout.err.pair": {
+    "message": "ఈ వివరాలు కలిసి ఉంటాయి. రెండూ జోడించండి, లేదా GSTIN లో మీ PAN ఉందో లేదో చూడండి.",
+    "review": "reviewed",
+    "enHash": "50154c2f"
+  },
+  "settings.language.title": {
+    "message": "భాష",
+    "review": "reviewed",
+    "enHash": "89b86ab0"
+  },
+  "settings.language.body": {
+    "message": "ఈ పరికరంలో యాప్ వెంటనే మారుతుంది. ఉత్పత్తుల పేర్లు, ధరలు అలాగే ఉంటాయి.",
+    "review": "reviewed",
+    "enHash": "828a65d1"
+  },
+  "settings.language.group": {
+    "message": "యాప్ భాష",
+    "review": "reviewed",
+    "enHash": "01e1787a"
+  },
+  "settings.language.name.en": {
+    "message": "ఇంగ్లీష్",
+    "review": "reviewed",
+    "enHash": "649df08a"
+  },
+  "settings.language.name.hi": {
+    "message": "హిందీ",
+    "review": "reviewed",
+    "enHash": "c9e6b253"
+  },
+  "settings.language.name.kn": {
+    "message": "కన్నడ",
+    "review": "reviewed",
+    "enHash": "c3ed6655"
+  },
+  "settings.language.name.te": {
+    "message": "తెలుగు",
+    "review": "reviewed",
+    "enHash": "ea6c0346"
+  },
+  "settings.language.name.ta": {
+    "message": "తమిళం",
+    "review": "reviewed",
+    "enHash": "86c2b627"
+  }
+}

@@ -1,16 +1,40 @@
 import en from '@todayz/i18n/compiled/business/en.json';
-import { asMessages, pseudoAllowed, resolveLocale, type MessageLocale, type Messages } from '@todayz/i18n';
+import {
+  asMessages,
+  browserStore,
+  detectLocale,
+  pseudoAllowed,
+  type MessageLocale,
+  type Messages,
+} from '@todayz/i18n';
 
-/** English ships in the entry chunk; the pseudo-locale loads only when asked for. */
+/** English ships in the entry chunk; every other catalogue loads only when it is chosen. */
 export async function loadMessages(locale: MessageLocale): Promise<Messages> {
-  if (locale === 'en-XA') {
-    const mod = await import('@todayz/i18n/compiled/business/en-XA.json');
-    return asMessages(mod.default);
+  switch (locale) {
+    case 'en-XA':
+      return asMessages((await import('@todayz/i18n/compiled/business/en-XA.json')).default);
+    case 'hi':
+      return asMessages((await import('@todayz/i18n/compiled/business/hi.json')).default);
+    case 'kn':
+      return asMessages((await import('@todayz/i18n/compiled/business/kn.json')).default);
+    case 'te':
+      return asMessages((await import('@todayz/i18n/compiled/business/te.json')).default);
+    case 'ta':
+      return asMessages((await import('@todayz/i18n/compiled/business/ta.json')).default);
+    default:
+      return asMessages(en);
   }
-  return asMessages(en);
 }
 
-/** `?locale=pseudo` works in every build mode except production (the e2e build uses mode `e2e`). */
+/**
+ * The language to start in: the stored choice, then `?locale=` (`?locale=pseudo` in every build
+ * mode except production), then the browser's languages, then English.
+ */
 export function initialLocale(search = window.location.search, mode: string = import.meta.env.MODE): MessageLocale {
-  return resolveLocale(search, { allowPseudo: pseudoAllowed(mode) });
+  return detectLocale({
+    store: browserStore(),
+    search,
+    languages: typeof navigator === 'undefined' ? [] : navigator.languages,
+    allowPseudo: pseudoAllowed(mode),
+  });
 }

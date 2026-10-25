@@ -1,0 +1,997 @@
+{
+  "orders.title": {
+    "message": "ஆர்டர்கள்",
+    "review": "reviewed",
+    "enHash": "cded0933"
+  },
+  "orders.tabs.label": {
+    "message": "ஆர்டர் நிலை",
+    "review": "reviewed",
+    "enHash": "22edd6c1"
+  },
+  "orders.tab.new": {
+    "message": "புதியவை",
+    "review": "reviewed",
+    "enHash": "6403f2b7"
+  },
+  "orders.tab.accepted": {
+    "message": "ஏற்றவை",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "orders.tab.ready": {
+    "message": "தயார்",
+    "review": "reviewed",
+    "enHash": "20c7c552"
+  },
+  "orders.tab.out_for_delivery": {
+    "message": "டெலிவரிக்குச் சென்றவை",
+    "review": "reviewed",
+    "enHash": "111fb997"
+  },
+  "orders.tab.returns": {
+    "message": "உறுதிசெய்ய வேண்டிய திரும்புதல்கள்",
+    "review": "reviewed",
+    "enHash": "c27fa514"
+  },
+  "orders.tab.done": {
+    "message": "முடிந்தவை",
+    "review": "reviewed",
+    "enHash": "e9b450d1"
+  },
+  "orders.tab.missed": {
+    "message": "தவறியவை",
+    "review": "reviewed",
+    "enHash": "b564001a"
+  },
+  "orders.tab.asks": {
+    "message": "கோரிக்கைகள்",
+    "review": "reviewed",
+    "enHash": "2c5548cf"
+  },
+  "orders.asks.empty.title": {
+    "message": "இன்னும் கோரிக்கைகள் இல்லை",
+    "review": "reviewed",
+    "enHash": "f9782d98"
+  },
+  "orders.asks.empty.body": {
+    "message": "அருகிலுள்ள வாடிக்கையாளர் ஒரு பொருளைக் கேட்கும்போது, அது இங்கே தோன்றும்.",
+    "review": "reviewed",
+    "enHash": "04ceb186"
+  },
+  "orders.empty.new.title": {
+    "message": "புதிய ஆர்டர்கள் இல்லை",
+    "review": "reviewed",
+    "enHash": "74edcd15"
+  },
+  "orders.empty.new.body": {
+    "message": "வாடிக்கையாளர் புக் செய்தவுடன் புதிய ஆர்டர்கள் இங்கே தோன்றும். இந்தப் பக்கம் தானாகவே புதுப்பிக்கப்படும்.",
+    "review": "reviewed",
+    "enHash": "22554196"
+  },
+  "orders.empty.accepted.title": {
+    "message": "எதுவும் ஏற்கப்படவில்லை",
+    "review": "reviewed",
+    "enHash": "08e732c1"
+  },
+  "orders.empty.accepted.body": {
+    "message": "நீங்கள் ஏற்ற ஆர்டர்கள் வாடிக்கையாளர் வரும் வரை இங்கே இருக்கும்.",
+    "review": "reviewed",
+    "enHash": "337b23d7"
+  },
+  "orders.empty.ready.title": {
+    "message": "எதுவும் தயாராக இல்லை",
+    "review": "reviewed",
+    "enHash": "1a92d685"
+  },
+  "orders.empty.ready.body": {
+    "message": "நீங்கள் தயார் எனக் குறித்த ஆர்டர்கள் பிக்அப் வரை இங்கே இருக்கும்.",
+    "review": "reviewed",
+    "enHash": "22ede753"
+  },
+  "orders.empty.out_for_delivery.title": {
+    "message": "வழியில் எதுவும் இல்லை",
+    "review": "reviewed",
+    "enHash": "c26724bb"
+  },
+  "orders.empty.out_for_delivery.body": {
+    "message": "நீங்கள் அனுப்பிய டெலிவரி ஆர்டர்கள் வாடிக்கையாளர் குறியீட்டைத் தரும் வரை இங்கே இருக்கும்.",
+    "review": "reviewed",
+    "enHash": "2c77a998"
+  },
+  "orders.empty.returns.title": {
+    "message": "உறுதிசெய்ய திரும்புதல்கள் இல்லை",
+    "review": "reviewed",
+    "enHash": "a5e30f69"
+  },
+  "orders.empty.returns.body": {
+    "message": "டெலிவரி தோல்வியடைந்தால், பொருட்கள் திரும்பி வந்தனவா என்பதை இங்கே உறுதிசெய்யவும்.",
+    "review": "reviewed",
+    "enHash": "2d4bf306"
+  },
+  "orders.empty.done.title": {
+    "message": "முடிந்த ஆர்டர்கள் இல்லை",
+    "review": "reviewed",
+    "enHash": "8d34898a"
+  },
+  "orders.empty.done.body": {
+    "message": "ஒப்படைக்கப்பட்ட ஆர்டர்கள் இங்கே பட்டியலிடப்படும்.",
+    "review": "reviewed",
+    "enHash": "b382e9d8"
+  },
+  "orders.empty.missed.title": {
+    "message": "தவறிய ஆர்டர்கள் இல்லை",
+    "review": "reviewed",
+    "enHash": "76145583"
+  },
+  "orders.empty.missed.body": {
+    "message": "நிராகரிக்கப்பட்ட, காலாவதியான மற்றும் ரத்துசெய்யப்பட்ட ஆர்டர்கள் இங்கே பட்டியலிடப்படும்.",
+    "review": "reviewed",
+    "enHash": "2102a5f8"
+  },
+  "orders.loading": {
+    "message": "ஆர்டர்கள் ஏற்றப்படுகின்றன",
+    "review": "reviewed",
+    "enHash": "58246f0e"
+  },
+  "orders.error.title": {
+    "message": "ஆர்டர்களை ஏற்ற முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "c64fbfa9"
+  },
+  "orders.error.body": {
+    "message": "உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "orders.error.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "orders.noStore.title": {
+    "message": "முதலில் ஒரு கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "946fa8f4"
+  },
+  "orders.noStore.body": {
+    "message": "ஆர்டர்கள் ஒரு கடைக்குச் சொந்தமானவை. நீங்கள் வேலை செய்யும் கடையைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "2d1b92a4"
+  },
+  "orders.noStore.action": {
+    "message": "கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "orders.live.polling": {
+    "message": "நேரலைப் புதுப்பிப்புகள் இடைநிறுத்தப்பட்டுள்ளன. ஒவ்வொரு 15 விநாடிக்கும் புதிய ஆர்டர்கள் சரிபார்க்கப்படுகின்றன.",
+    "review": "reviewed",
+    "enHash": "c8f8e69b"
+  },
+  "orders.sound.title": {
+    "message": "புதிய ஆர்டர்களைக் கேளுங்கள்.",
+    "review": "reviewed",
+    "enHash": "39f6bd17"
+  },
+  "orders.sound.body": {
+    "message": "எச்சரிக்கை ஒலியை இயக்கும் முன் உங்கள் உலாவிக்கு ஒரு தட்டல் தேவை.",
+    "review": "reviewed",
+    "enHash": "42e19ab9"
+  },
+  "orders.sound.allow": {
+    "message": "ஒலியை அனுமதி",
+    "review": "reviewed",
+    "enHash": "c0feb3a5"
+  },
+  "orders.sound.on": {
+    "message": "ஒலி எச்சரிக்கை இயக்கத்தில் உள்ளது",
+    "review": "reviewed",
+    "enHash": "927c9a28"
+  },
+  "orders.sound.off": {
+    "message": "ஒலியை அணை",
+    "review": "reviewed",
+    "enHash": "6a4e1b9b"
+  },
+  "orders.sound.muted": {
+    "message": "ஒலி எச்சரிக்கை அணைக்கப்பட்டுள்ளது",
+    "review": "reviewed",
+    "enHash": "f04f5a47"
+  },
+  "orders.sound.unmute": {
+    "message": "ஒலியை இயக்கு",
+    "review": "reviewed",
+    "enHash": "92a0dbc1"
+  },
+  "orders.card.head": {
+    "message": "{number} · {customer}",
+    "review": "reviewed",
+    "enHash": "5993d96e"
+  },
+  "orders.card.noName": {
+    "message": "வாடிக்கையாளர்",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "orders.card.items": {
+    "message": "{count, plural, one {# பொருள்} other {# பொருட்கள்}}",
+    "review": "reviewed",
+    "enHash": "f34cfa9c"
+  },
+  "orders.card.pickup": {
+    "message": "பிக்அப்",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "orders.card.delivery": {
+    "message": "டெலிவரி",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "orders.card.timeLeft": {
+    "message": "ஏற்க {time} மீதம்",
+    "review": "reviewed",
+    "enHash": "ff56fa39"
+  },
+  "orders.card.expired": {
+    "message": "நேரம் முடிந்தது",
+    "review": "reviewed",
+    "enHash": "54b7f365"
+  },
+  "orders.card.holdLeft": {
+    "message": "{time} வரை வைக்கப்பட்டுள்ளது",
+    "review": "reviewed",
+    "enHash": "deb0b1e1"
+  },
+  "orders.card.dispatchBy": {
+    "message": "{time} க்குள் அனுப்பவும்",
+    "review": "reviewed",
+    "enHash": "6116684a"
+  },
+  "orders.card.open": {
+    "message": "ஆர்டரைப் பார்",
+    "review": "reviewed",
+    "enHash": "0df27975"
+  },
+  "orders.card.openA11y": {
+    "message": "ஆர்டர் {number} ஐப் பார்",
+    "review": "reviewed",
+    "enHash": "40e56958"
+  },
+  "orders.card.accept": {
+    "message": "ஏற்கவும்",
+    "review": "reviewed",
+    "enHash": "bb54db51"
+  },
+  "orders.card.acceptA11y": {
+    "message": "ஆர்டர் {number} ஐ ஏற்கவும்",
+    "review": "reviewed",
+    "enHash": "0a165e85"
+  },
+  "orders.card.reject": {
+    "message": "நிராகரி",
+    "review": "reviewed",
+    "enHash": "2b03b592"
+  },
+  "orders.card.rejectA11y": {
+    "message": "ஆர்டர் {number} ஐ நிராகரி",
+    "review": "reviewed",
+    "enHash": "36ba391b"
+  },
+  "orders.line.stock": {
+    "message": "{available, plural, =0 {ஸ்டாக் இல்லை} other {# ஸ்டாக்கில் உள்ளன}}",
+    "review": "reviewed",
+    "enHash": "7855eb20"
+  },
+  "orders.line.short": {
+    "message": "போதுமான ஸ்டாக் இல்லை",
+    "review": "reviewed",
+    "enHash": "357cd443"
+  },
+  "orders.card.partHint": {
+    "message": "{count, plural, one {ஒரு பொருளுக்கு} other {# பொருட்களுக்கு}} போதுமான ஸ்டாக் இல்லை. ஒரு பகுதியை ஏற்கவும், ஆர்டரை நிராகரிக்கவும், அல்லது ஸ்டாக்கைப் புதுப்பிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "5becf839"
+  },
+  "orders.card.acceptPart": {
+    "message": "ஒரு பகுதியை ஏற்கவும்",
+    "review": "reviewed",
+    "enHash": "85461124"
+  },
+  "orders.card.acceptPartA11y": {
+    "message": "ஆர்டர் {number} இன் ஒரு பகுதியை ஏற்கவும்",
+    "review": "reviewed",
+    "enHash": "d5ce1cd5"
+  },
+  "orders.part.title": {
+    "message": "{number} இன் ஒரு பகுதியை ஏற்கவும்",
+    "review": "reviewed",
+    "enHash": "e3ff275a"
+  },
+  "orders.part.body": {
+    "message": "நீங்கள் எத்தனை தர முடியும் என்பதை அமைக்கவும். வாடிக்கையாளர் மாற்றிய ஆர்டரை ஏற்பார் அல்லது ரத்துசெய்வார். அவர் ஏற்கும் வரை எதுவும் வைக்கப்படாது.",
+    "review": "reviewed",
+    "enHash": "557cf769"
+  },
+  "orders.part.asked": {
+    "message": "கேட்டது {wanted} · {available, plural, =0 {ஸ்டாக் இல்லை} other {# ஸ்டாக்கில் உள்ளன}}",
+    "review": "reviewed",
+    "enHash": "486e6d3e"
+  },
+  "orders.part.add": {
+    "message": "சேர்",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "orders.part.less": {
+    "message": "ஒன்று குறைவு",
+    "review": "reviewed",
+    "enHash": "05892c7d"
+  },
+  "orders.part.more": {
+    "message": "ஒன்று கூடுதல்",
+    "review": "reviewed",
+    "enHash": "8c87ebbd"
+  },
+  "orders.part.none": {
+    "message": "குறைந்தது ஒரு பொருளை வைக்கவும். எதுவும் தராவிட்டால், ஆர்டரை நிராகரிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "0a99dc18"
+  },
+  "orders.part.full": {
+    "message": "ஒரு பகுதியை ஏற்க ஓர் அளவைக் குறைக்கவும், அல்லது முழு ஆர்டரையும் ஏற்கவும்.",
+    "review": "reviewed",
+    "enHash": "986cfc79"
+  },
+  "orders.part.confirm": {
+    "message": "வாடிக்கையாளருக்கு அனுப்பு",
+    "review": "reviewed",
+    "enHash": "37a27bbf"
+  },
+  "orders.part.waiting": {
+    "message": "{customer} மாற்றிய ஆர்டரை ஏற்கவோ ரத்துசெய்யவோ காத்திருக்கிறோம்.",
+    "review": "reviewed",
+    "enHash": "ef6bbe9e"
+  },
+  "orders.line.partQty": {
+    "message": "{name} × {got} (கேட்டது {wanted})",
+    "review": "reviewed",
+    "enHash": "37ce8600"
+  },
+  "orders.action.partSent": {
+    "message": "உறுதிசெய்ய வாடிக்கையாளருக்கு அனுப்பப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "071f5405"
+  },
+  "orders.card.shortHint": {
+    "message": "{count, plural, one {ஒரு பொருளுக்கு} other {# பொருட்களுக்கு}} போதுமான ஸ்டாக் இல்லை. ஆர்டரை நிராகரிக்கவும், அல்லது ஸ்டாக்கைப் புதுப்பிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "d8d167db"
+  },
+  "orders.line.qty": {
+    "message": "{name} × {qty}",
+    "review": "reviewed",
+    "enHash": "8c65377b"
+  },
+  "orders.status.placed": {
+    "message": "புதியது",
+    "review": "reviewed",
+    "enHash": "6403f2b7"
+  },
+  "orders.status.awaiting_customer": {
+    "message": "வாடிக்கையாளருக்காகக் காத்திருக்கிறது",
+    "review": "reviewed",
+    "enHash": "43bce849"
+  },
+  "orders.status.accepted": {
+    "message": "ஏற்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "orders.status.ready": {
+    "message": "பிக்அப்புக்குத் தயார்",
+    "review": "reviewed",
+    "enHash": "f1ebfd93"
+  },
+  "orders.status.out_for_delivery": {
+    "message": "டெலிவரிக்குச் சென்றுள்ளது",
+    "review": "reviewed",
+    "enHash": "111fb997"
+  },
+  "orders.status.collected": {
+    "message": "பெற்றுக்கொண்டார்",
+    "review": "reviewed",
+    "enHash": "5b0f7590"
+  },
+  "orders.status.delivered": {
+    "message": "டெலிவரி செய்யப்பட்டது",
+    "review": "reviewed",
+    "enHash": "eea956cd"
+  },
+  "orders.status.rejected": {
+    "message": "நிராகரிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "27eeb7a2"
+  },
+  "orders.status.expired": {
+    "message": "காலாவதியானது",
+    "review": "reviewed",
+    "enHash": "a689a999"
+  },
+  "orders.status.cancelled": {
+    "message": "ரத்துசெய்யப்பட்டது",
+    "review": "reviewed",
+    "enHash": "a1bf92ef"
+  },
+  "orders.status.delivery_failed": {
+    "message": "டெலிவரி தோல்வி",
+    "review": "reviewed",
+    "enHash": "5a954eb2"
+  },
+  "orders.reason.out_of_stock": {
+    "message": "ஸ்டாக் இல்லை",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "orders.reason.closing_soon": {
+    "message": "விரைவில் மூடுகிறோம்",
+    "review": "reviewed",
+    "enHash": "7ad45de1"
+  },
+  "orders.reason.too_busy": {
+    "message": "இப்போது மிகவும் பிஸி",
+    "review": "reviewed",
+    "enHash": "89ccd171"
+  },
+  "orders.reason.cannot_deliver_address": {
+    "message": "இந்த முகவரிக்கு டெலிவரி செய்ய முடியாது",
+    "review": "reviewed",
+    "enHash": "b84133a5"
+  },
+  "orders.reason.price_changed": {
+    "message": "விலை மாறிவிட்டது",
+    "review": "reviewed",
+    "enHash": "13faa9f2"
+  },
+  "orders.reason.customer_unreachable": {
+    "message": "வாடிக்கையாளரைத் தொடர்புகொள்ள முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "e8851107"
+  },
+  "orders.reason.other": {
+    "message": "வேறு காரணம்",
+    "review": "reviewed",
+    "enHash": "98ed119c"
+  },
+  "orders.reason.changed_mind": {
+    "message": "வாடிக்கையாளர் மனம் மாறினார்",
+    "review": "reviewed",
+    "enHash": "870c267b"
+  },
+  "orders.reason.declined_partial": {
+    "message": "வாடிக்கையாளர் மாற்றங்களை ஏற்கவில்லை",
+    "review": "reviewed",
+    "enHash": "7a478210"
+  },
+  "orders.reason.too_slow": {
+    "message": "பதில் மிகவும் தாமதம் என வாடிக்கையாளர் கருதினார்",
+    "review": "reviewed",
+    "enHash": "e7314a3d"
+  },
+  "orders.reason.partial_timeout": {
+    "message": "வாடிக்கையாளர் நேரத்தில் பதிலளிக்கவில்லை",
+    "review": "reviewed",
+    "enHash": "de5941fb"
+  },
+  "orders.reason.not_accepted": {
+    "message": "நேரத்தில் ஏற்கப்படவில்லை",
+    "review": "reviewed",
+    "enHash": "54be7649"
+  },
+  "orders.reason.no_show": {
+    "message": "நேரத்தில் பெற்றுக்கொள்ளப்படவில்லை",
+    "review": "reviewed",
+    "enHash": "40a35d5a"
+  },
+  "orders.reason.address_not_found": {
+    "message": "முகவரி கிடைக்கவில்லை",
+    "review": "reviewed",
+    "enHash": "849594a1"
+  },
+  "orders.reason.customer_refused": {
+    "message": "வாடிக்கையாளர் ஆர்டரை மறுத்தார்",
+    "review": "reviewed",
+    "enHash": "1b2f2106"
+  },
+  "orders.reason.dispatch_timeout": {
+    "message": "நேரத்தில் அனுப்பப்படவில்லை",
+    "review": "reviewed",
+    "enHash": "a3af10da"
+  },
+  "orders.reason.label": {
+    "message": "காரணம்: {reason}",
+    "review": "reviewed",
+    "enHash": "f147508d"
+  },
+  "orders.reject.title": {
+    "message": "ஆர்டர் {number} ஐ நிராகரி",
+    "review": "reviewed",
+    "enHash": "36ba391b"
+  },
+  "orders.reject.body": {
+    "message": "காரணத்தைத் தேர்ந்தெடுக்கவும். வாடிக்கையாளருக்குத் தெரிவிக்கப்படும்.",
+    "review": "reviewed",
+    "enHash": "9a803948"
+  },
+  "orders.reject.confirm": {
+    "message": "ஆர்டரை நிராகரி",
+    "review": "reviewed",
+    "enHash": "3f825b9d"
+  },
+  "orders.cancel.title": {
+    "message": "ஆர்டர் {number} ஐ ரத்துசெய்",
+    "review": "reviewed",
+    "enHash": "225bf193"
+  },
+  "orders.cancel.body": {
+    "message": "வைக்கப்பட்ட ஸ்டாக் விடுவிக்கப்படும், வாடிக்கையாளருக்குத் தெரிவிக்கப்படும். காரணத்தைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "24d10967"
+  },
+  "orders.cancel.confirm": {
+    "message": "ஆர்டரை ரத்துசெய்",
+    "review": "reviewed",
+    "enHash": "5ae39c4a"
+  },
+  "orders.cancel.open": {
+    "message": "ஆர்டரை ரத்துசெய்",
+    "review": "reviewed",
+    "enHash": "5ae39c4a"
+  },
+  "orders.sheet.reason": {
+    "message": "காரணம்",
+    "review": "reviewed",
+    "enHash": "f219cc06"
+  },
+  "orders.sheet.note": {
+    "message": "குறிப்பு",
+    "review": "reviewed",
+    "enHash": "2c924e30"
+  },
+  "orders.sheet.noteHelp": {
+    "message": "என்ன நடந்தது என்று சொல்லுங்கள். வாடிக்கையாளர் இதைப் பார்ப்பார்.",
+    "review": "reviewed",
+    "enHash": "62165778"
+  },
+  "orders.sheet.back": {
+    "message": "ஆர்டரை வைத்திரு",
+    "review": "reviewed",
+    "enHash": "3017312f"
+  },
+  "orders.sheet.close": {
+    "message": "மூடவும்",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "orders.detail.back": {
+    "message": "ஆர்டர்களுக்குத் திரும்பு",
+    "review": "reviewed",
+    "enHash": "f02399a1"
+  },
+  "orders.detail.title": {
+    "message": "ஆர்டர் {number}",
+    "review": "reviewed",
+    "enHash": "2daa0733"
+  },
+  "orders.detail.customer": {
+    "message": "வாடிக்கையாளர்",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "orders.detail.phone": {
+    "message": "தொலைபேசி {phone}",
+    "review": "reviewed",
+    "enHash": "f415f3a6"
+  },
+  "orders.detail.call": {
+    "message": "{phone} ஐ அழைக்கவும்",
+    "review": "reviewed",
+    "enHash": "f9ea1a72"
+  },
+  "orders.detail.address": {
+    "message": "டெலிவரி முகவரி",
+    "review": "reviewed",
+    "enHash": "beacd3ba"
+  },
+  "orders.detail.landmark": {
+    "message": "{landmark} அருகில்",
+    "review": "reviewed",
+    "enHash": "a5d54d44"
+  },
+  "orders.detail.deliveryFee": {
+    "message": "டெலிவரி கட்டணம்",
+    "review": "reviewed",
+    "enHash": "733b6148"
+  },
+  "orders.detail.deliveryFree": {
+    "message": "இலவசம்",
+    "review": "reviewed",
+    "enHash": "75f52718"
+  },
+  "orders.detail.payAtDoor": {
+    "message": "வாடிக்கையாளர் வாசலில் பணம் செலுத்துவார்: ரொக்கம் அல்லது UPI.",
+    "review": "reviewed",
+    "enHash": "fd0e5690"
+  },
+  "orders.detail.dispatch": {
+    "message": "அனுப்பு",
+    "review": "reviewed",
+    "enHash": "840e1b36"
+  },
+  "orders.detail.dispatchBy": {
+    "message": "{time} க்குள் அனுப்பவும், இல்லையெனில் ஆர்டர் காலாவதியாகும்.",
+    "review": "reviewed",
+    "enHash": "f5c76435"
+  },
+  "orders.detail.items": {
+    "message": "பொருட்கள்",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "orders.detail.total": {
+    "message": "மொத்தம்",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "orders.detail.payAtShop": {
+    "message": "வாடிக்கையாளர் கவுண்டரில் பணம் செலுத்துவார்: ரொக்கம் அல்லது UPI.",
+    "review": "reviewed",
+    "enHash": "45f597ab"
+  },
+  "orders.detail.paidWith": {
+    "message": "{method} மூலம் செலுத்தப்பட்டது",
+    "review": "reviewed",
+    "enHash": "b91f821a"
+  },
+  "orders.detail.progress": {
+    "message": "ஆர்டர் முன்னேற்றம்",
+    "review": "reviewed",
+    "enHash": "fcbc4a3a"
+  },
+  "orders.detail.state.done": {
+    "message": "முடிந்தது",
+    "review": "reviewed",
+    "enHash": "e5fd9cfe"
+  },
+  "orders.detail.state.upcoming": {
+    "message": "இன்னும் இல்லை",
+    "review": "reviewed",
+    "enHash": "3a230353"
+  },
+  "orders.detail.state.failed": {
+    "message": "நடக்கவில்லை",
+    "review": "reviewed",
+    "enHash": "aff78aa4"
+  },
+  "orders.detail.step.placed": {
+    "message": "ஆர்டர் செய்யப்பட்டது",
+    "review": "reviewed",
+    "enHash": "bb5d68da"
+  },
+  "orders.detail.step.accepted": {
+    "message": "ஏற்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "orders.detail.step.ready": {
+    "message": "பிக்அப்புக்குத் தயார்",
+    "review": "reviewed",
+    "enHash": "f1ebfd93"
+  },
+  "orders.detail.step.collected": {
+    "message": "ஒப்படைக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "435cd69c"
+  },
+  "orders.detail.step.out_for_delivery": {
+    "message": "டெலிவரிக்குச் சென்றுள்ளது",
+    "review": "reviewed",
+    "enHash": "111fb997"
+  },
+  "orders.detail.step.delivered": {
+    "message": "டெலிவரி செய்யப்பட்டது",
+    "review": "reviewed",
+    "enHash": "eea956cd"
+  },
+  "orders.detail.step.ended": {
+    "message": "{status}",
+    "review": "reviewed",
+    "enHash": "11e758b6"
+  },
+  "orders.detail.notFound": {
+    "message": "இந்தக் கடைக்கு இந்த ஆர்டர் கிடைக்கவில்லை.",
+    "review": "reviewed",
+    "enHash": "3bb68e08"
+  },
+  "orders.detail.ready": {
+    "message": "தயார் எனக் குறி",
+    "review": "reviewed",
+    "enHash": "e6c9229a"
+  },
+  "orders.detail.readyHelp": {
+    "message": "விருப்பத்தேர்வு. பேக் செய்யப்பட்டது என வாடிக்கையாளரிடம் தெரிவிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "dbb77885"
+  },
+  "orders.detail.holdUntil": {
+    "message": "வாடிக்கையாளருக்காக {time} வரை வைக்கப்பட்டுள்ளது",
+    "review": "reviewed",
+    "enHash": "f1170404"
+  },
+  "orders.code.title": {
+    "message": "வாடிக்கையாளரின் குறியீட்டுடன் ஒப்படைக்கவும்",
+    "review": "reviewed",
+    "enHash": "220b2fb7"
+  },
+  "orders.code.label": {
+    "message": "வாடிக்கையாளரின் 4 இலக்கக் குறியீடு",
+    "review": "reviewed",
+    "enHash": "dafa146c"
+  },
+  "orders.code.digit": {
+    "message": "இலக்கம் {n}",
+    "review": "reviewed",
+    "enHash": "095a7075"
+  },
+  "orders.code.help": {
+    "message": "வாடிக்கையாளரிடம் அவரது தொலைபேசியில் குறியீட்டைக் காட்டச் சொல்லுங்கள்.",
+    "review": "reviewed",
+    "enHash": "711d2b81"
+  },
+  "orders.code.payment": {
+    "message": "அவர் எப்படிப் பணம் செலுத்தினார்?",
+    "review": "reviewed",
+    "enHash": "492418af"
+  },
+  "orders.code.pay.cash": {
+    "message": "ரொக்கம்",
+    "review": "reviewed",
+    "enHash": "758ec54e"
+  },
+  "orders.code.pay.upi": {
+    "message": "UPI",
+    "review": "reviewed",
+    "enHash": "f295b2cd"
+  },
+  "orders.code.pay.card": {
+    "message": "கார்டு",
+    "review": "reviewed",
+    "enHash": "4d4ce73b"
+  },
+  "orders.code.pay.other": {
+    "message": "மற்றவை",
+    "review": "reviewed",
+    "enHash": "6e6a6f20"
+  },
+  "orders.code.submit": {
+    "message": "ஆர்டரை ஒப்படை",
+    "review": "reviewed",
+    "enHash": "0f29d329"
+  },
+  "orders.code.submitting": {
+    "message": "குறியீடு சரிபார்க்கப்படுகிறது",
+    "review": "reviewed",
+    "enHash": "90adc49f"
+  },
+  "orders.code.invalid": {
+    "message": "அந்தக் குறியீடு சரியில்லை. {left, plural, =0 {முயற்சிகள் எதுவும் மீதமில்லை.} one {# முயற்சி மீதம்.} other {# முயற்சிகள் மீதம்.}}",
+    "review": "reviewed",
+    "enHash": "41870020"
+  },
+  "orders.code.locked.title": {
+    "message": "குறியீடு உள்ளிடுதல் பூட்டப்பட்டது",
+    "review": "reviewed",
+    "enHash": "3208ad4c"
+  },
+  "orders.code.locked.body": {
+    "message": "அதிகமான தவறான குறியீடுகள். வாடிக்கையாளர் தனது ஆப்பில் புதிய குறியீட்டைக் கேட்கலாம், பிறகு நீங்கள் மீண்டும் முயலலாம்.",
+    "review": "reviewed",
+    "enHash": "90ce4e8c"
+  },
+  "orders.code.attemptsLeft": {
+    "message": "{left, plural, one {# முயற்சி மீதம்} other {# முயற்சிகள் மீதம்}}",
+    "review": "reviewed",
+    "enHash": "e128755c"
+  },
+  "orders.code.done": {
+    "message": "ஆர்டர் ஒப்படைக்கப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "6bc4370b"
+  },
+  "orders.code.delivery.title": {
+    "message": "வாடிக்கையாளரின் குறியீட்டுடன் டெலிவரி செய்யவும்",
+    "review": "reviewed",
+    "enHash": "1661f447"
+  },
+  "orders.code.delivery.submit": {
+    "message": "டெலிவரி செய்யப்பட்டது எனக் குறி",
+    "review": "reviewed",
+    "enHash": "2a90783e"
+  },
+  "orders.code.delivery.done": {
+    "message": "ஆர்டர் டெலிவரி செய்யப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "3e326553"
+  },
+  "orders.failed.open": {
+    "message": "டெலிவரி தோல்வி",
+    "review": "reviewed",
+    "enHash": "5a954eb2"
+  },
+  "orders.failed.title": {
+    "message": "{number} இன் டெலிவரி தோல்வியடைந்ததா?",
+    "review": "reviewed",
+    "enHash": "e7d49a1b"
+  },
+  "orders.failed.body": {
+    "message": "வாடிக்கையாளரிடம் காரணத்தைச் சொல்லுங்கள். பிறகு பொருட்கள் திரும்பி வந்தனவா என்பதை நீங்கள் உறுதிசெய்வீர்கள்.",
+    "review": "reviewed",
+    "enHash": "0b239d43"
+  },
+  "orders.failed.confirm": {
+    "message": "டெலிவரி தோல்வி எனக் குறி",
+    "review": "reviewed",
+    "enHash": "1fe1e5fd"
+  },
+  "orders.return.title": {
+    "message": "திரும்புதல்",
+    "review": "reviewed",
+    "enHash": "24f096b2"
+  },
+  "orders.return.question": {
+    "message": "பொருட்கள் திரும்பி வந்தனவா?",
+    "review": "reviewed",
+    "enHash": "1886718f"
+  },
+  "orders.return.failedAgo": {
+    "message": "{time} முன்பு தோல்வியடைந்தது",
+    "review": "reviewed",
+    "enHash": "77ee2377"
+  },
+  "orders.return.help": {
+    "message": "ஆம் என்றால் ஸ்டாக் மீண்டும் விற்பனைக்கு வரும். இல்லை என்றால் சேதம் எனப் பதிவாகும்.",
+    "review": "reviewed",
+    "enHash": "a6ad9693"
+  },
+  "orders.return.yes": {
+    "message": "ஆம், அனைத்தும் வந்தன",
+    "review": "reviewed",
+    "enHash": "6619727c"
+  },
+  "orders.return.no": {
+    "message": "இல்லை, சேதமடைந்தது",
+    "review": "reviewed",
+    "enHash": "04f22e97"
+  },
+  "orders.return.askManager": {
+    "message": "சேதத்தைப் பதிவுசெய்ய ஒரு மேலாளரிடம் கேளுங்கள்",
+    "review": "reviewed",
+    "enHash": "0bf657cb"
+  },
+  "orders.return.askManagerBody": {
+    "message": "பொருட்கள் முழுமையாகத் திரும்பி வரவில்லை என்றால், மேலாளர் அல்லது உரிமையாளர் மட்டுமே சேதத்தைப் பதிவுசெய்ய முடியும்.",
+    "review": "reviewed",
+    "enHash": "4e4bbf79"
+  },
+  "orders.return.outcome.returned": {
+    "message": "பொருட்கள் திரும்பி வந்தன. ஸ்டாக் மீண்டும் விற்பனையில் உள்ளது.",
+    "review": "reviewed",
+    "enHash": "b39d86eb"
+  },
+  "orders.return.outcome.damaged": {
+    "message": "சேதம் எனப் பதிவுசெய்யப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "250593a6"
+  },
+  "orders.return.outcome.unconfirmed": {
+    "message": "72 h க்குப் பிறகு தானாக உறுதிசெய்யப்பட்டது. யாரும் பதிலளிக்கவில்லை, எனவே ஸ்டாக் மீண்டும் விற்பனைக்கு வந்தது.",
+    "review": "reviewed",
+    "enHash": "8db405ce"
+  },
+  "orders.return.short.returned": {
+    "message": "திரும்பி வந்தது",
+    "review": "reviewed",
+    "enHash": "870770a9"
+  },
+  "orders.return.short.damaged": {
+    "message": "சேதமடைந்தது",
+    "review": "reviewed",
+    "enHash": "052fc798"
+  },
+  "orders.return.short.unconfirmed": {
+    "message": "72 h க்குப் பிறகு தானாக உறுதிசெய்யப்பட்டது",
+    "review": "reviewed",
+    "enHash": "1b5b5825"
+  },
+  "orders.since.hours": {
+    "message": "{h} h {m} min",
+    "review": "reviewed",
+    "enHash": "2a46291f"
+  },
+  "orders.since.minutes": {
+    "message": "{m} min",
+    "review": "reviewed",
+    "enHash": "a47d8efb"
+  },
+  "orders.action.accepted": {
+    "message": "ஆர்டர் ஏற்கப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "b987ceeb"
+  },
+  "orders.action.rejected": {
+    "message": "ஆர்டர் நிராகரிக்கப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "40985d86"
+  },
+  "orders.action.ready": {
+    "message": "தயார் எனக் குறிக்கப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "d4bce752"
+  },
+  "orders.action.cancelled": {
+    "message": "ஆர்டர் ரத்துசெய்யப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "c3ca8f89"
+  },
+  "orders.action.dispatched": {
+    "message": "ஆர்டர் டெலிவரிக்கு அனுப்பப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "12e340d8"
+  },
+  "orders.action.failed": {
+    "message": "டெலிவரி தோல்வி எனக் குறிக்கப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "113e6ed7"
+  },
+  "orders.action.return.returned": {
+    "message": "ஸ்டாக் மீண்டும் விற்பனையில் உள்ளது.",
+    "review": "reviewed",
+    "enHash": "44085f11"
+  },
+  "orders.action.return.damaged": {
+    "message": "சேதம் பதிவுசெய்யப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "18ce297f"
+  },
+  "orders.error.generic": {
+    "message": "அது நடக்கவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "13555662"
+  },
+  "orders.error.insufficient_stock": {
+    "message": "ஒரு பொருளுக்குப் போதுமான ஸ்டாக் இல்லை. ஸ்டாக்கைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "849a244f"
+  },
+  "orders.error.invalid_transition": {
+    "message": "இந்த ஆர்டர் ஏற்கெனவே மாறிவிட்டது. சமீபத்தியது காட்டப்படுகிறது.",
+    "review": "reviewed",
+    "enHash": "1e269238"
+  },
+  "orders.error.forbidden": {
+    "message": "அதைச் செய்ய உங்களுக்கு அனுமதி இல்லை.",
+    "review": "reviewed",
+    "enHash": "c89b024b"
+  },
+  "orders.error.validation_failed": {
+    "message": "விவரங்களைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "7f48376a"
+  },
+  "orders.error.expired": {
+    "message": "இந்த ஆர்டரை ஏற்கும் நேரம் முடிந்துவிட்டது.",
+    "review": "reviewed",
+    "enHash": "2ae054b1"
+  }
+}

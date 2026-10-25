@@ -1,0 +1,137 @@
+{
+  "shell.appName": {
+    "message": "TodayZ",
+    "review": "reviewed",
+    "enHash": "34b58f9d"
+  },
+  "shell.appTag": {
+    "message": "बिज़नेस",
+    "review": "reviewed",
+    "enHash": "d6663dda"
+  },
+  "shell.skipToContent": {
+    "message": "सीधे मुख्य हिस्से पर जाएँ",
+    "review": "reviewed",
+    "enHash": "0a4470d6"
+  },
+  "shell.nav.label": {
+    "message": "बिज़नेस",
+    "review": "reviewed",
+    "enHash": "d6663dda"
+  },
+  "shell.nav.overview": {
+    "message": "सारांश",
+    "review": "reviewed",
+    "enHash": "0efc2e6b"
+  },
+  "shell.nav.orders": {
+    "message": "ऑर्डर",
+    "review": "reviewed",
+    "enHash": "cded0933"
+  },
+  "shell.nav.sell": {
+    "message": "बेचें",
+    "review": "reviewed",
+    "enHash": "fa3cf2ad"
+  },
+  "shell.nav.stock": {
+    "message": "स्टॉक",
+    "review": "reviewed",
+    "enHash": "bcecf456"
+  },
+  "shell.nav.more": {
+    "message": "और",
+    "review": "reviewed",
+    "enHash": "4bab2d8f"
+  },
+  "shell.nav.customers": {
+    "message": "ग्राहक",
+    "review": "reviewed",
+    "enHash": "035eae60"
+  },
+  "shell.nav.groupGrow": {
+    "message": "बढ़ाएँ",
+    "review": "reviewed",
+    "enHash": "7e2299a8"
+  },
+  "shell.nav.offers": {
+    "message": "ऑफ़र",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "shell.nav.reviews": {
+    "message": "रिव्यू",
+    "review": "reviewed",
+    "enHash": "b83c4cda"
+  },
+  "shell.nav.analytics": {
+    "message": "आँकड़े",
+    "review": "reviewed",
+    "enHash": "25bc9629"
+  },
+  "shell.nav.groupShop": {
+    "message": "दुकान",
+    "review": "reviewed",
+    "enHash": "55de8870"
+  },
+  "shell.nav.credits": {
+    "message": "क्रेडिट",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "shell.nav.settings": {
+    "message": "सेटिंग्स",
+    "review": "reviewed",
+    "enHash": "c7f73bb5"
+  },
+  "shell.greet.title": {
+    "message": "TodayZ पर आपकी दुकान",
+    "review": "reviewed",
+    "enHash": "ecd7ca85"
+  },
+  "shell.greet.sub": {
+    "message": "काउंटर, स्टॉक, ऑर्डर और ऑफ़र, सब एक ही जगह से चलाएँ।",
+    "review": "reviewed",
+    "enHash": "879ce392"
+  },
+  "shell.soon.tag": {
+    "message": "जल्द आ रहा है",
+    "review": "reviewed",
+    "enHash": "e4115be2"
+  },
+  "shell.soon.title": {
+    "message": "{section} जल्द आ रहा है",
+    "review": "reviewed",
+    "enHash": "6c957e46"
+  },
+  "shell.soon.body": {
+    "message": "बिज़नेस ऐप का यह हिस्सा अभी बन रहा है। यह काउंटर पर बिना इंटरनेट के भी चलेगा।",
+    "review": "reviewed",
+    "enHash": "0aa81361"
+  },
+  "shell.notFound.title": {
+    "message": "पेज नहीं मिला",
+    "review": "reviewed",
+    "enHash": "bc3023b3"
+  },
+  "shell.notFound.body": {
+    "message": "यह लिंक अभी कहीं नहीं जाता।",
+    "review": "reviewed",
+    "enHash": "8c0d72a2"
+  },
+  "shell.notFound.home": {
+    "message": "सारांश पर जाएँ",
+    "review": "reviewed",
+    "enHash": "711dbdf4"
+  },
+  "shell.nav.ordersCount": {
+    "message": "{count, plural, one {# ऑर्डर इंतज़ार में} other {# ऑर्डर इंतज़ार में}}",
+    "review": "reviewed",
+    "enHash": "31dd266d"
+  },
+  "shell.nav.stockCount": {
+    "message": "{count, plural, one {# आइटम कल तक ख़त्म हो जाएगा} other {# आइटम कल तक ख़त्म हो जाएँगे}}",
+    "review": "reviewed",
+    "enHash": "a905b14b"
+  }
+}

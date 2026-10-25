@@ -1,0 +1,997 @@
+{
+  "orders.title": {
+    "message": "ಆರ್ಡರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "cded0933"
+  },
+  "orders.tabs.label": {
+    "message": "ಆರ್ಡರ್ ಸ್ಥಿತಿ",
+    "review": "reviewed",
+    "enHash": "22edd6c1"
+  },
+  "orders.tab.new": {
+    "message": "ಹೊಸವು",
+    "review": "reviewed",
+    "enHash": "6403f2b7"
+  },
+  "orders.tab.accepted": {
+    "message": "ಸ್ವೀಕರಿಸಿದವು",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "orders.tab.ready": {
+    "message": "ಸಿದ್ಧ",
+    "review": "reviewed",
+    "enHash": "20c7c552"
+  },
+  "orders.tab.out_for_delivery": {
+    "message": "ಡೆಲಿವರಿಗೆ ಹೊರಟಿವೆ",
+    "review": "reviewed",
+    "enHash": "111fb997"
+  },
+  "orders.tab.returns": {
+    "message": "ದೃಢೀಕರಿಸಬೇಕಾದ ವಾಪಸಿಗಳು",
+    "review": "reviewed",
+    "enHash": "c27fa514"
+  },
+  "orders.tab.done": {
+    "message": "ಮುಗಿದವು",
+    "review": "reviewed",
+    "enHash": "e9b450d1"
+  },
+  "orders.tab.missed": {
+    "message": "ತಪ್ಪಿದವು",
+    "review": "reviewed",
+    "enHash": "b564001a"
+  },
+  "orders.tab.asks": {
+    "message": "ಕೇಳಿಕೆಗಳು",
+    "review": "reviewed",
+    "enHash": "2c5548cf"
+  },
+  "orders.asks.empty.title": {
+    "message": "ಇನ್ನೂ ಕೇಳಿಕೆಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "f9782d98"
+  },
+  "orders.asks.empty.body": {
+    "message": "ಹತ್ತಿರದ ಗ್ರಾಹಕರು ಐಟಂ ಕೇಳಿದಾಗ, ಅದು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "04ceb186"
+  },
+  "orders.empty.new.title": {
+    "message": "ಹೊಸ ಆರ್ಡರ್‌ಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "74edcd15"
+  },
+  "orders.empty.new.body": {
+    "message": "ಗ್ರಾಹಕರು ಬುಕ್ ಮಾಡಿದ ತಕ್ಷಣ ಹೊಸ ಆರ್ಡರ್‌ಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ. ಈ ಪುಟ ತಾನಾಗಿಯೇ ಅಪ್‌ಡೇಟ್ ಆಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "22554196"
+  },
+  "orders.empty.accepted.title": {
+    "message": "ಏನೂ ಸ್ವೀಕರಿಸಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "08e732c1"
+  },
+  "orders.empty.accepted.body": {
+    "message": "ನೀವು ಸ್ವೀಕರಿಸಿದ ಆರ್ಡರ್‌ಗಳು ಗ್ರಾಹಕರು ಬರುವವರೆಗೆ ಇಲ್ಲಿರುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "337b23d7"
+  },
+  "orders.empty.ready.title": {
+    "message": "ಏನೂ ಸಿದ್ಧವಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "1a92d685"
+  },
+  "orders.empty.ready.body": {
+    "message": "ನೀವು ಸಿದ್ಧ ಎಂದು ಗುರುತಿಸಿದ ಆರ್ಡರ್‌ಗಳು ಪಿಕಪ್‌ವರೆಗೆ ಇಲ್ಲಿರುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "22ede753"
+  },
+  "orders.empty.out_for_delivery.title": {
+    "message": "ದಾರಿಯಲ್ಲಿ ಏನೂ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "c26724bb"
+  },
+  "orders.empty.out_for_delivery.body": {
+    "message": "ನೀವು ಕಳುಹಿಸಿದ ಡೆಲಿವರಿ ಆರ್ಡರ್‌ಗಳು ಗ್ರಾಹಕರು ಕೋಡ್ ಕೊಡುವವರೆಗೆ ಇಲ್ಲಿರುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "2c77a998"
+  },
+  "orders.empty.returns.title": {
+    "message": "ದೃಢೀಕರಿಸಲು ವಾಪಸಿಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "a5e30f69"
+  },
+  "orders.empty.returns.body": {
+    "message": "ಡೆಲಿವರಿ ವಿಫಲವಾದಾಗ, ಸಾಮಾನು ವಾಪಸ್ ಬಂತೇ ಎಂದು ಇಲ್ಲಿ ದೃಢೀಕರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "2d4bf306"
+  },
+  "orders.empty.done.title": {
+    "message": "ಮುಗಿದ ಆರ್ಡರ್‌ಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "8d34898a"
+  },
+  "orders.empty.done.body": {
+    "message": "ಹಸ್ತಾಂತರಿಸಿದ ಆರ್ಡರ್‌ಗಳು ಇಲ್ಲಿ ಪಟ್ಟಿಯಾಗಿವೆ.",
+    "review": "reviewed",
+    "enHash": "b382e9d8"
+  },
+  "orders.empty.missed.title": {
+    "message": "ತಪ್ಪಿದ ಆರ್ಡರ್‌ಗಳಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "76145583"
+  },
+  "orders.empty.missed.body": {
+    "message": "ತಿರಸ್ಕೃತ, ಅವಧಿ ಮುಗಿದ ಮತ್ತು ರದ್ದಾದ ಆರ್ಡರ್‌ಗಳು ಇಲ್ಲಿ ಪಟ್ಟಿಯಾಗಿವೆ.",
+    "review": "reviewed",
+    "enHash": "2102a5f8"
+  },
+  "orders.loading": {
+    "message": "ಆರ್ಡರ್‌ಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ",
+    "review": "reviewed",
+    "enHash": "58246f0e"
+  },
+  "orders.error.title": {
+    "message": "ಆರ್ಡರ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "c64fbfa9"
+  },
+  "orders.error.body": {
+    "message": "ನಿಮ್ಮ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "orders.error.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "orders.noStore.title": {
+    "message": "ಮೊದಲು ಅಂಗಡಿ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "946fa8f4"
+  },
+  "orders.noStore.body": {
+    "message": "ಆರ್ಡರ್‌ಗಳು ಒಂದು ಅಂಗಡಿಗೆ ಸೇರಿರುತ್ತವೆ. ನೀವು ಕೆಲಸ ಮಾಡುತ್ತಿರುವ ಅಂಗಡಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "2d1b92a4"
+  },
+  "orders.noStore.action": {
+    "message": "ಅಂಗಡಿ ಆಯ್ಕೆಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "orders.live.polling": {
+    "message": "ಲೈವ್ ಅಪ್‌ಡೇಟ್‌ಗಳು ವಿರಾಮದಲ್ಲಿವೆ. ಪ್ರತಿ 15 ಸೆಕೆಂಡಿಗೆ ಹೊಸ ಆರ್ಡರ್‌ಗಳನ್ನು ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ.",
+    "review": "reviewed",
+    "enHash": "c8f8e69b"
+  },
+  "orders.sound.title": {
+    "message": "ಹೊಸ ಆರ್ಡರ್‌ಗಳನ್ನು ಕೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "39f6bd17"
+  },
+  "orders.sound.body": {
+    "message": "ಎಚ್ಚರಿಕೆ ಧ್ವನಿ ಪ್ಲೇ ಮಾಡುವ ಮೊದಲು ನಿಮ್ಮ ಬ್ರೌಸರ್‌ಗೆ ಒಂದು ಟ್ಯಾಪ್ ಬೇಕು.",
+    "review": "reviewed",
+    "enHash": "42e19ab9"
+  },
+  "orders.sound.allow": {
+    "message": "ಧ್ವನಿ ಅನುಮತಿಸಿ",
+    "review": "reviewed",
+    "enHash": "c0feb3a5"
+  },
+  "orders.sound.on": {
+    "message": "ಧ್ವನಿ ಎಚ್ಚರಿಕೆ ಆನ್ ಇದೆ",
+    "review": "reviewed",
+    "enHash": "927c9a28"
+  },
+  "orders.sound.off": {
+    "message": "ಧ್ವನಿ ಆಫ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "6a4e1b9b"
+  },
+  "orders.sound.muted": {
+    "message": "ಧ್ವನಿ ಎಚ್ಚರಿಕೆ ಆಫ್ ಇದೆ",
+    "review": "reviewed",
+    "enHash": "f04f5a47"
+  },
+  "orders.sound.unmute": {
+    "message": "ಧ್ವನಿ ಆನ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "92a0dbc1"
+  },
+  "orders.card.head": {
+    "message": "{number} · {customer}",
+    "review": "reviewed",
+    "enHash": "5993d96e"
+  },
+  "orders.card.noName": {
+    "message": "ಗ್ರಾಹಕರು",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "orders.card.items": {
+    "message": "{count, plural, one {# ಐಟಂ} other {# ಐಟಂಗಳು}}",
+    "review": "reviewed",
+    "enHash": "f34cfa9c"
+  },
+  "orders.card.pickup": {
+    "message": "ಪಿಕಪ್",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "orders.card.delivery": {
+    "message": "ಡೆಲಿವರಿ",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "orders.card.timeLeft": {
+    "message": "ಸ್ವೀಕರಿಸಲು {time} ಉಳಿದಿದೆ",
+    "review": "reviewed",
+    "enHash": "ff56fa39"
+  },
+  "orders.card.expired": {
+    "message": "ಸಮಯ ಮುಗಿಯಿತು",
+    "review": "reviewed",
+    "enHash": "54b7f365"
+  },
+  "orders.card.holdLeft": {
+    "message": "{time} ವರೆಗೆ ಇಡಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "deb0b1e1"
+  },
+  "orders.card.dispatchBy": {
+    "message": "{time} ಒಳಗೆ ಕಳುಹಿಸಿ",
+    "review": "reviewed",
+    "enHash": "6116684a"
+  },
+  "orders.card.open": {
+    "message": "ಆರ್ಡರ್ ನೋಡಿ",
+    "review": "reviewed",
+    "enHash": "0df27975"
+  },
+  "orders.card.openA11y": {
+    "message": "ಆರ್ಡರ್ {number} ನೋಡಿ",
+    "review": "reviewed",
+    "enHash": "40e56958"
+  },
+  "orders.card.accept": {
+    "message": "ಸ್ವೀಕರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "bb54db51"
+  },
+  "orders.card.acceptA11y": {
+    "message": "ಆರ್ಡರ್ {number} ಸ್ವೀಕರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "0a165e85"
+  },
+  "orders.card.reject": {
+    "message": "ತಿರಸ್ಕರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "2b03b592"
+  },
+  "orders.card.rejectA11y": {
+    "message": "ಆರ್ಡರ್ {number} ತಿರಸ್ಕರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "36ba391b"
+  },
+  "orders.line.stock": {
+    "message": "{available, plural, =0 {ಸ್ಟಾಕ್ ಇಲ್ಲ} other {# ಸ್ಟಾಕ್‌ನಲ್ಲಿವೆ}}",
+    "review": "reviewed",
+    "enHash": "7855eb20"
+  },
+  "orders.line.short": {
+    "message": "ಸಾಕಷ್ಟು ಸ್ಟಾಕ್ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "357cd443"
+  },
+  "orders.card.partHint": {
+    "message": "{count, plural, one {ಒಂದು ಐಟಂಗೆ} other {# ಐಟಂಗಳಿಗೆ}} ಸಾಕಷ್ಟು ಸ್ಟಾಕ್ ಇಲ್ಲ. ಭಾಗಶಃ ಸ್ವೀಕರಿಸಿ, ಆರ್ಡರ್ ತಿರಸ್ಕರಿಸಿ, ಅಥವಾ ಸ್ಟಾಕ್ ಅಪ್‌ಡೇಟ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "5becf839"
+  },
+  "orders.card.acceptPart": {
+    "message": "ಭಾಗಶಃ ಸ್ವೀಕರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "85461124"
+  },
+  "orders.card.acceptPartA11y": {
+    "message": "ಆರ್ಡರ್ {number} ಭಾಗಶಃ ಸ್ವೀಕರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "d5ce1cd5"
+  },
+  "orders.part.title": {
+    "message": "{number} ಭಾಗಶಃ ಸ್ವೀಕರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "e3ff275a"
+  },
+  "orders.part.body": {
+    "message": "ನೀವು ಎಷ್ಟು ಕೊಡಬಹುದು ಎಂದು ಹೊಂದಿಸಿ. ಗ್ರಾಹಕರು ಬದಲಾದ ಆರ್ಡರ್ ತೆಗೆದುಕೊಳ್ಳುತ್ತಾರೆ ಅಥವಾ ರದ್ದುಮಾಡುತ್ತಾರೆ. ಅವರು ತೆಗೆದುಕೊಳ್ಳುವವರೆಗೆ ಏನನ್ನೂ ಇಡಲಾಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "557cf769"
+  },
+  "orders.part.asked": {
+    "message": "ಕೇಳಿದ್ದು {wanted} · {available, plural, =0 {ಸ್ಟಾಕ್ ಇಲ್ಲ} other {# ಸ್ಟಾಕ್‌ನಲ್ಲಿವೆ}}",
+    "review": "reviewed",
+    "enHash": "486e6d3e"
+  },
+  "orders.part.add": {
+    "message": "ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "orders.part.less": {
+    "message": "ಒಂದು ಕಡಿಮೆ",
+    "review": "reviewed",
+    "enHash": "05892c7d"
+  },
+  "orders.part.more": {
+    "message": "ಒಂದು ಹೆಚ್ಚು",
+    "review": "reviewed",
+    "enHash": "8c87ebbd"
+  },
+  "orders.part.none": {
+    "message": "ಕನಿಷ್ಠ ಒಂದು ಐಟಂ ಇಡಿ. ಏನೂ ಕೊಡದಿದ್ದರೆ, ಆರ್ಡರ್ ತಿರಸ್ಕರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "0a99dc18"
+  },
+  "orders.part.full": {
+    "message": "ಭಾಗಶಃ ಸ್ವೀಕರಿಸಲು ಒಂದು ಪ್ರಮಾಣ ಕಡಿಮೆ ಮಾಡಿ, ಅಥವಾ ಪೂರ್ತಿ ಆರ್ಡರ್ ಸ್ವೀಕರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "986cfc79"
+  },
+  "orders.part.confirm": {
+    "message": "ಗ್ರಾಹಕರಿಗೆ ಕಳುಹಿಸಿ",
+    "review": "reviewed",
+    "enHash": "37a27bbf"
+  },
+  "orders.part.waiting": {
+    "message": "{customer} ಬದಲಾದ ಆರ್ಡರ್ ತೆಗೆದುಕೊಳ್ಳುವುದಕ್ಕೋ ರದ್ದುಮಾಡುವುದಕ್ಕೋ ಕಾಯಲಾಗುತ್ತಿದೆ.",
+    "review": "reviewed",
+    "enHash": "ef6bbe9e"
+  },
+  "orders.line.partQty": {
+    "message": "{name} × {got} (ಕೇಳಿದ್ದು {wanted})",
+    "review": "reviewed",
+    "enHash": "37ce8600"
+  },
+  "orders.action.partSent": {
+    "message": "ದೃಢೀಕರಿಸಲು ಗ್ರಾಹಕರಿಗೆ ಕಳುಹಿಸಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "071f5405"
+  },
+  "orders.card.shortHint": {
+    "message": "{count, plural, one {ಒಂದು ಐಟಂಗೆ} other {# ಐಟಂಗಳಿಗೆ}} ಸಾಕಷ್ಟು ಸ್ಟಾಕ್ ಇಲ್ಲ. ಆರ್ಡರ್ ತಿರಸ್ಕರಿಸಿ, ಅಥವಾ ಸ್ಟಾಕ್ ಅಪ್‌ಡೇಟ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "d8d167db"
+  },
+  "orders.line.qty": {
+    "message": "{name} × {qty}",
+    "review": "reviewed",
+    "enHash": "8c65377b"
+  },
+  "orders.status.placed": {
+    "message": "ಹೊಸದು",
+    "review": "reviewed",
+    "enHash": "6403f2b7"
+  },
+  "orders.status.awaiting_customer": {
+    "message": "ಗ್ರಾಹಕರಿಗಾಗಿ ಕಾಯುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "43bce849"
+  },
+  "orders.status.accepted": {
+    "message": "ಸ್ವೀಕರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "orders.status.ready": {
+    "message": "ಪಿಕಪ್‌ಗೆ ಸಿದ್ಧ",
+    "review": "reviewed",
+    "enHash": "f1ebfd93"
+  },
+  "orders.status.out_for_delivery": {
+    "message": "ಡೆಲಿವರಿಗೆ ಹೊರಟಿದೆ",
+    "review": "reviewed",
+    "enHash": "111fb997"
+  },
+  "orders.status.collected": {
+    "message": "ಪಡೆದುಕೊಂಡಿದ್ದಾರೆ",
+    "review": "reviewed",
+    "enHash": "5b0f7590"
+  },
+  "orders.status.delivered": {
+    "message": "ಡೆಲಿವರಿ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "eea956cd"
+  },
+  "orders.status.rejected": {
+    "message": "ತಿರಸ್ಕೃತ",
+    "review": "reviewed",
+    "enHash": "27eeb7a2"
+  },
+  "orders.status.expired": {
+    "message": "ಅವಧಿ ಮುಗಿದಿದೆ",
+    "review": "reviewed",
+    "enHash": "a689a999"
+  },
+  "orders.status.cancelled": {
+    "message": "ರದ್ದಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "a1bf92ef"
+  },
+  "orders.status.delivery_failed": {
+    "message": "ಡೆಲಿವರಿ ವಿಫಲ",
+    "review": "reviewed",
+    "enHash": "5a954eb2"
+  },
+  "orders.reason.out_of_stock": {
+    "message": "ಸ್ಟಾಕ್ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "orders.reason.closing_soon": {
+    "message": "ಬೇಗ ಮುಚ್ಚುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "7ad45de1"
+  },
+  "orders.reason.too_busy": {
+    "message": "ಈಗ ತುಂಬಾ ಬ್ಯುಸಿ",
+    "review": "reviewed",
+    "enHash": "89ccd171"
+  },
+  "orders.reason.cannot_deliver_address": {
+    "message": "ಈ ವಿಳಾಸಕ್ಕೆ ಡೆಲಿವರಿ ಮಾಡಲು ಆಗುವುದಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "b84133a5"
+  },
+  "orders.reason.price_changed": {
+    "message": "ಬೆಲೆ ಬದಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "13faa9f2"
+  },
+  "orders.reason.customer_unreachable": {
+    "message": "ಗ್ರಾಹಕರು ಸಂಪರ್ಕಕ್ಕೆ ಸಿಗುತ್ತಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "e8851107"
+  },
+  "orders.reason.other": {
+    "message": "ಬೇರೆ ಕಾರಣ",
+    "review": "reviewed",
+    "enHash": "98ed119c"
+  },
+  "orders.reason.changed_mind": {
+    "message": "ಗ್ರಾಹಕರು ಮನಸ್ಸು ಬದಲಿಸಿದರು",
+    "review": "reviewed",
+    "enHash": "870c267b"
+  },
+  "orders.reason.declined_partial": {
+    "message": "ಗ್ರಾಹಕರು ಬದಲಾವಣೆಗಳನ್ನು ಒಪ್ಪಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "7a478210"
+  },
+  "orders.reason.too_slow": {
+    "message": "ಗ್ರಾಹಕರಿಗೆ ಉತ್ತರ ತುಂಬಾ ತಡವಾಯಿತು",
+    "review": "reviewed",
+    "enHash": "e7314a3d"
+  },
+  "orders.reason.partial_timeout": {
+    "message": "ಗ್ರಾಹಕರು ಸಮಯಕ್ಕೆ ಉತ್ತರಿಸಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "de5941fb"
+  },
+  "orders.reason.not_accepted": {
+    "message": "ಸಮಯಕ್ಕೆ ಸ್ವೀಕರಿಸಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "54be7649"
+  },
+  "orders.reason.no_show": {
+    "message": "ಸಮಯಕ್ಕೆ ಪಡೆದುಕೊಳ್ಳಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "40a35d5a"
+  },
+  "orders.reason.address_not_found": {
+    "message": "ವಿಳಾಸ ಸಿಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "849594a1"
+  },
+  "orders.reason.customer_refused": {
+    "message": "ಗ್ರಾಹಕರು ಆರ್ಡರ್ ನಿರಾಕರಿಸಿದರು",
+    "review": "reviewed",
+    "enHash": "1b2f2106"
+  },
+  "orders.reason.dispatch_timeout": {
+    "message": "ಸಮಯಕ್ಕೆ ಕಳುಹಿಸಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "a3af10da"
+  },
+  "orders.reason.label": {
+    "message": "ಕಾರಣ: {reason}",
+    "review": "reviewed",
+    "enHash": "f147508d"
+  },
+  "orders.reject.title": {
+    "message": "ಆರ್ಡರ್ {number} ತಿರಸ್ಕರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "36ba391b"
+  },
+  "orders.reject.body": {
+    "message": "ಕಾರಣ ಆಯ್ಕೆಮಾಡಿ. ಗ್ರಾಹಕರಿಗೆ ತಿಳಿಸಲಾಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "9a803948"
+  },
+  "orders.reject.confirm": {
+    "message": "ಆರ್ಡರ್ ತಿರಸ್ಕರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "3f825b9d"
+  },
+  "orders.cancel.title": {
+    "message": "ಆರ್ಡರ್ {number} ರದ್ದುಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "225bf193"
+  },
+  "orders.cancel.body": {
+    "message": "ಇಟ್ಟಿದ್ದ ಸ್ಟಾಕ್ ಬಿಡುಗಡೆಯಾಗುತ್ತದೆ ಮತ್ತು ಗ್ರಾಹಕರಿಗೆ ತಿಳಿಸಲಾಗುತ್ತದೆ. ಕಾರಣ ಆಯ್ಕೆಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "24d10967"
+  },
+  "orders.cancel.confirm": {
+    "message": "ಆರ್ಡರ್ ರದ್ದುಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "5ae39c4a"
+  },
+  "orders.cancel.open": {
+    "message": "ಆರ್ಡರ್ ರದ್ದುಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "5ae39c4a"
+  },
+  "orders.sheet.reason": {
+    "message": "ಕಾರಣ",
+    "review": "reviewed",
+    "enHash": "f219cc06"
+  },
+  "orders.sheet.note": {
+    "message": "ಟಿಪ್ಪಣಿ",
+    "review": "reviewed",
+    "enHash": "2c924e30"
+  },
+  "orders.sheet.noteHelp": {
+    "message": "ಏನಾಯಿತು ಎಂದು ಹೇಳಿ. ಗ್ರಾಹಕರು ಇದನ್ನು ನೋಡುತ್ತಾರೆ.",
+    "review": "reviewed",
+    "enHash": "62165778"
+  },
+  "orders.sheet.back": {
+    "message": "ಆರ್ಡರ್ ಇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "3017312f"
+  },
+  "orders.sheet.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "orders.detail.back": {
+    "message": "ಆರ್ಡರ್‌ಗಳಿಗೆ ಹಿಂತಿರುಗಿ",
+    "review": "reviewed",
+    "enHash": "f02399a1"
+  },
+  "orders.detail.title": {
+    "message": "ಆರ್ಡರ್ {number}",
+    "review": "reviewed",
+    "enHash": "2daa0733"
+  },
+  "orders.detail.customer": {
+    "message": "ಗ್ರಾಹಕರು",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "orders.detail.phone": {
+    "message": "ಫೋನ್ {phone}",
+    "review": "reviewed",
+    "enHash": "f415f3a6"
+  },
+  "orders.detail.call": {
+    "message": "{phone} ಗೆ ಕರೆ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "f9ea1a72"
+  },
+  "orders.detail.address": {
+    "message": "ಡೆಲಿವರಿ ವಿಳಾಸ",
+    "review": "reviewed",
+    "enHash": "beacd3ba"
+  },
+  "orders.detail.landmark": {
+    "message": "{landmark} ಹತ್ತಿರ",
+    "review": "reviewed",
+    "enHash": "a5d54d44"
+  },
+  "orders.detail.deliveryFee": {
+    "message": "ಡೆಲಿವರಿ ಶುಲ್ಕ",
+    "review": "reviewed",
+    "enHash": "733b6148"
+  },
+  "orders.detail.deliveryFree": {
+    "message": "ಉಚಿತ",
+    "review": "reviewed",
+    "enHash": "75f52718"
+  },
+  "orders.detail.payAtDoor": {
+    "message": "ಗ್ರಾಹಕರು ಬಾಗಿಲಲ್ಲಿ ಪಾವತಿಸುತ್ತಾರೆ: ನಗದು ಅಥವಾ UPI.",
+    "review": "reviewed",
+    "enHash": "fd0e5690"
+  },
+  "orders.detail.dispatch": {
+    "message": "ಕಳುಹಿಸಿ",
+    "review": "reviewed",
+    "enHash": "840e1b36"
+  },
+  "orders.detail.dispatchBy": {
+    "message": "{time} ಒಳಗೆ ಕಳುಹಿಸಿ, ಇಲ್ಲದಿದ್ದರೆ ಆರ್ಡರ್ ಅವಧಿ ಮುಗಿಯುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "f5c76435"
+  },
+  "orders.detail.items": {
+    "message": "ಐಟಂಗಳು",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "orders.detail.total": {
+    "message": "ಒಟ್ಟು",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "orders.detail.payAtShop": {
+    "message": "ಗ್ರಾಹಕರು ಕೌಂಟರ್‌ನಲ್ಲಿ ಪಾವತಿಸುತ್ತಾರೆ: ನಗದು ಅಥವಾ UPI.",
+    "review": "reviewed",
+    "enHash": "45f597ab"
+  },
+  "orders.detail.paidWith": {
+    "message": "{method} ಮೂಲಕ ಪಾವತಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "b91f821a"
+  },
+  "orders.detail.progress": {
+    "message": "ಆರ್ಡರ್ ಪ್ರಗತಿ",
+    "review": "reviewed",
+    "enHash": "fcbc4a3a"
+  },
+  "orders.detail.state.done": {
+    "message": "ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "e5fd9cfe"
+  },
+  "orders.detail.state.upcoming": {
+    "message": "ಇನ್ನೂ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "3a230353"
+  },
+  "orders.detail.state.failed": {
+    "message": "ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "aff78aa4"
+  },
+  "orders.detail.step.placed": {
+    "message": "ಆರ್ಡರ್ ಮಾಡಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "bb5d68da"
+  },
+  "orders.detail.step.accepted": {
+    "message": "ಸ್ವೀಕರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "orders.detail.step.ready": {
+    "message": "ಪಿಕಪ್‌ಗೆ ಸಿದ್ಧ",
+    "review": "reviewed",
+    "enHash": "f1ebfd93"
+  },
+  "orders.detail.step.collected": {
+    "message": "ಹಸ್ತಾಂತರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "435cd69c"
+  },
+  "orders.detail.step.out_for_delivery": {
+    "message": "ಡೆಲಿವರಿಗೆ ಹೊರಟಿದೆ",
+    "review": "reviewed",
+    "enHash": "111fb997"
+  },
+  "orders.detail.step.delivered": {
+    "message": "ಡೆಲಿವರಿ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "eea956cd"
+  },
+  "orders.detail.step.ended": {
+    "message": "{status}",
+    "review": "reviewed",
+    "enHash": "11e758b6"
+  },
+  "orders.detail.notFound": {
+    "message": "ಈ ಅಂಗಡಿಗೆ ಈ ಆರ್ಡರ್ ಸಿಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "3bb68e08"
+  },
+  "orders.detail.ready": {
+    "message": "ಸಿದ್ಧ ಎಂದು ಗುರುತಿಸಿ",
+    "review": "reviewed",
+    "enHash": "e6c9229a"
+  },
+  "orders.detail.readyHelp": {
+    "message": "ಐಚ್ಛಿಕ. ಪ್ಯಾಕ್ ಆಗಿದೆ ಎಂದು ಗ್ರಾಹಕರಿಗೆ ತಿಳಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "dbb77885"
+  },
+  "orders.detail.holdUntil": {
+    "message": "ಗ್ರಾಹಕರಿಗಾಗಿ {time} ವರೆಗೆ ಇಡಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "f1170404"
+  },
+  "orders.code.title": {
+    "message": "ಗ್ರಾಹಕರ ಕೋಡ್‌ನಿಂದ ಹಸ್ತಾಂತರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "220b2fb7"
+  },
+  "orders.code.label": {
+    "message": "ಗ್ರಾಹಕರ 4 ಅಂಕಿಯ ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "dafa146c"
+  },
+  "orders.code.digit": {
+    "message": "ಅಂಕಿ {n}",
+    "review": "reviewed",
+    "enHash": "095a7075"
+  },
+  "orders.code.help": {
+    "message": "ಗ್ರಾಹಕರಿಗೆ ಅವರ ಫೋನ್‌ನಲ್ಲಿ ಕೋಡ್ ತೋರಿಸಲು ಹೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "711d2b81"
+  },
+  "orders.code.payment": {
+    "message": "ಅವರು ಹೇಗೆ ಪಾವತಿಸಿದರು?",
+    "review": "reviewed",
+    "enHash": "492418af"
+  },
+  "orders.code.pay.cash": {
+    "message": "ನಗದು",
+    "review": "reviewed",
+    "enHash": "758ec54e"
+  },
+  "orders.code.pay.upi": {
+    "message": "UPI",
+    "review": "reviewed",
+    "enHash": "f295b2cd"
+  },
+  "orders.code.pay.card": {
+    "message": "ಕಾರ್ಡ್",
+    "review": "reviewed",
+    "enHash": "4d4ce73b"
+  },
+  "orders.code.pay.other": {
+    "message": "ಬೇರೆ",
+    "review": "reviewed",
+    "enHash": "6e6a6f20"
+  },
+  "orders.code.submit": {
+    "message": "ಆರ್ಡರ್ ಹಸ್ತಾಂತರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "0f29d329"
+  },
+  "orders.code.submitting": {
+    "message": "ಕೋಡ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "90adc49f"
+  },
+  "orders.code.invalid": {
+    "message": "ಆ ಕೋಡ್ ಸರಿಯಲ್ಲ. {left, plural, =0 {ಯಾವುದೇ ಪ್ರಯತ್ನ ಉಳಿದಿಲ್ಲ.} one {# ಪ್ರಯತ್ನ ಉಳಿದಿದೆ.} other {# ಪ್ರಯತ್ನಗಳು ಉಳಿದಿವೆ.}}",
+    "review": "reviewed",
+    "enHash": "41870020"
+  },
+  "orders.code.locked.title": {
+    "message": "ಕೋಡ್ ನಮೂದು ಲಾಕ್ ಆಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "3208ad4c"
+  },
+  "orders.code.locked.body": {
+    "message": "ತುಂಬಾ ತಪ್ಪು ಕೋಡ್‌ಗಳು. ಗ್ರಾಹಕರು ತಮ್ಮ ಆ್ಯಪ್‌ನಲ್ಲಿ ಹೊಸ ಕೋಡ್ ಕೇಳಬಹುದು, ನಂತರ ನೀವು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "90ce4e8c"
+  },
+  "orders.code.attemptsLeft": {
+    "message": "{left, plural, one {# ಪ್ರಯತ್ನ ಉಳಿದಿದೆ} other {# ಪ್ರಯತ್ನಗಳು ಉಳಿದಿವೆ}}",
+    "review": "reviewed",
+    "enHash": "e128755c"
+  },
+  "orders.code.done": {
+    "message": "ಆರ್ಡರ್ ಹಸ್ತಾಂತರಿಸಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "6bc4370b"
+  },
+  "orders.code.delivery.title": {
+    "message": "ಗ್ರಾಹಕರ ಕೋಡ್‌ನಿಂದ ಡೆಲಿವರಿ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "1661f447"
+  },
+  "orders.code.delivery.submit": {
+    "message": "ಡೆಲಿವರಿ ಆಗಿದೆ ಎಂದು ಗುರುತಿಸಿ",
+    "review": "reviewed",
+    "enHash": "2a90783e"
+  },
+  "orders.code.delivery.done": {
+    "message": "ಆರ್ಡರ್ ಡೆಲಿವರಿ ಆಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "3e326553"
+  },
+  "orders.failed.open": {
+    "message": "ಡೆಲಿವರಿ ವಿಫಲ",
+    "review": "reviewed",
+    "enHash": "5a954eb2"
+  },
+  "orders.failed.title": {
+    "message": "{number} ಡೆಲಿವರಿ ವಿಫಲವಾಯಿತೇ?",
+    "review": "reviewed",
+    "enHash": "e7d49a1b"
+  },
+  "orders.failed.body": {
+    "message": "ಗ್ರಾಹಕರಿಗೆ ಕಾರಣ ತಿಳಿಸಿ. ನಂತರ ಸಾಮಾನು ವಾಪಸ್ ಬಂತೇ ಎಂದು ನೀವು ದೃಢೀಕರಿಸುತ್ತೀರಿ.",
+    "review": "reviewed",
+    "enHash": "0b239d43"
+  },
+  "orders.failed.confirm": {
+    "message": "ಡೆಲಿವರಿ ವಿಫಲ ಎಂದು ಗುರುತಿಸಿ",
+    "review": "reviewed",
+    "enHash": "1fe1e5fd"
+  },
+  "orders.return.title": {
+    "message": "ವಾಪಸಿ",
+    "review": "reviewed",
+    "enHash": "24f096b2"
+  },
+  "orders.return.question": {
+    "message": "ಸಾಮಾನು ವಾಪಸ್ ಬಂತೇ?",
+    "review": "reviewed",
+    "enHash": "1886718f"
+  },
+  "orders.return.failedAgo": {
+    "message": "{time} ಹಿಂದೆ ವಿಫಲವಾಯಿತು",
+    "review": "reviewed",
+    "enHash": "77ee2377"
+  },
+  "orders.return.help": {
+    "message": "ಹೌದು ಎಂದರೆ ಸ್ಟಾಕ್ ಮತ್ತೆ ಮಾರಾಟಕ್ಕೆ ಬರುತ್ತದೆ. ಇಲ್ಲ ಎಂದರೆ ಹಾನಿ ಎಂದು ದಾಖಲಾಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "a6ad9693"
+  },
+  "orders.return.yes": {
+    "message": "ಹೌದು, ಎಲ್ಲಾ ವಾಪಸ್ ಬಂದಿದೆ",
+    "review": "reviewed",
+    "enHash": "6619727c"
+  },
+  "orders.return.no": {
+    "message": "ಇಲ್ಲ, ಹಾನಿಯಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "04f22e97"
+  },
+  "orders.return.askManager": {
+    "message": "ಹಾನಿ ದಾಖಲಿಸಲು ಮ್ಯಾನೇಜರ್‌ರನ್ನು ಕೇಳಿ",
+    "review": "reviewed",
+    "enHash": "0bf657cb"
+  },
+  "orders.return.askManagerBody": {
+    "message": "ಸಾಮಾನು ಪೂರ್ತಿಯಾಗಿ ವಾಪಸ್ ಬರದಿದ್ದರೆ, ಮ್ಯಾನೇಜರ್ ಅಥವಾ ಮಾಲೀಕ ಮಾತ್ರ ಹಾನಿ ದಾಖಲಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "4e4bbf79"
+  },
+  "orders.return.outcome.returned": {
+    "message": "ಸಾಮಾನು ವಾಪಸ್ ಬಂದಿದೆ. ಸ್ಟಾಕ್ ಮತ್ತೆ ಮಾರಾಟಕ್ಕಿದೆ.",
+    "review": "reviewed",
+    "enHash": "b39d86eb"
+  },
+  "orders.return.outcome.damaged": {
+    "message": "ಹಾನಿ ಎಂದು ದಾಖಲಿಸಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "250593a6"
+  },
+  "orders.return.outcome.unconfirmed": {
+    "message": "72 h ನಂತರ ತಾನಾಗಿಯೇ ದೃಢೀಕರಿಸಲಾಗಿದೆ. ಯಾರೂ ಉತ್ತರಿಸಲಿಲ್ಲ, ಹಾಗಾಗಿ ಸ್ಟಾಕ್ ಮತ್ತೆ ಮಾರಾಟಕ್ಕೆ ಬಂದಿದೆ.",
+    "review": "reviewed",
+    "enHash": "8db405ce"
+  },
+  "orders.return.short.returned": {
+    "message": "ವಾಪಸ್ ಬಂದಿದೆ",
+    "review": "reviewed",
+    "enHash": "870770a9"
+  },
+  "orders.return.short.damaged": {
+    "message": "ಹಾನಿಯಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "052fc798"
+  },
+  "orders.return.short.unconfirmed": {
+    "message": "72 h ನಂತರ ತಾನಾಗಿಯೇ ದೃಢೀಕರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "1b5b5825"
+  },
+  "orders.since.hours": {
+    "message": "{h} h {m} min",
+    "review": "reviewed",
+    "enHash": "2a46291f"
+  },
+  "orders.since.minutes": {
+    "message": "{m} min",
+    "review": "reviewed",
+    "enHash": "a47d8efb"
+  },
+  "orders.action.accepted": {
+    "message": "ಆರ್ಡರ್ ಸ್ವೀಕರಿಸಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "b987ceeb"
+  },
+  "orders.action.rejected": {
+    "message": "ಆರ್ಡರ್ ತಿರಸ್ಕರಿಸಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "40985d86"
+  },
+  "orders.action.ready": {
+    "message": "ಸಿದ್ಧ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "d4bce752"
+  },
+  "orders.action.cancelled": {
+    "message": "ಆರ್ಡರ್ ರದ್ದಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "c3ca8f89"
+  },
+  "orders.action.dispatched": {
+    "message": "ಆರ್ಡರ್ ಡೆಲಿವರಿಗೆ ಕಳುಹಿಸಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "12e340d8"
+  },
+  "orders.action.failed": {
+    "message": "ಡೆಲಿವರಿ ವಿಫಲ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "113e6ed7"
+  },
+  "orders.action.return.returned": {
+    "message": "ಸ್ಟಾಕ್ ಮತ್ತೆ ಮಾರಾಟಕ್ಕಿದೆ.",
+    "review": "reviewed",
+    "enHash": "44085f11"
+  },
+  "orders.action.return.damaged": {
+    "message": "ಹಾನಿ ದಾಖಲಿಸಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "18ce297f"
+  },
+  "orders.error.generic": {
+    "message": "ಅದು ಆಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "13555662"
+  },
+  "orders.error.insufficient_stock": {
+    "message": "ಒಂದು ಐಟಂಗೆ ಸಾಕಷ್ಟು ಸ್ಟಾಕ್ ಇಲ್ಲ. ಸ್ಟಾಕ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "849a244f"
+  },
+  "orders.error.invalid_transition": {
+    "message": "ಈ ಆರ್ಡರ್ ಈಗಾಗಲೇ ಬದಲಾಗಿದೆ. ಇತ್ತೀಚಿನದನ್ನು ತೋರಿಸಲಾಗಿದೆ.",
+    "review": "reviewed",
+    "enHash": "1e269238"
+  },
+  "orders.error.forbidden": {
+    "message": "ಅದನ್ನು ಮಾಡಲು ನಿಮಗೆ ಅನುಮತಿ ಇಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "c89b024b"
+  },
+  "orders.error.validation_failed": {
+    "message": "ವಿವರಗಳನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "7f48376a"
+  },
+  "orders.error.expired": {
+    "message": "ಈ ಆರ್ಡರ್ ಸ್ವೀಕರಿಸುವ ಸಮಯ ಮುಗಿದಿದೆ.",
+    "review": "reviewed",
+    "enHash": "2ae054b1"
+  }
+}

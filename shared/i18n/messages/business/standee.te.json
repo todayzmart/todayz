@@ -1,0 +1,97 @@
+{
+  "standee.title": {
+    "message": "QR స్టాండీ",
+    "review": "reviewed",
+    "enHash": "db442fbd"
+  },
+  "standee.loading": {
+    "message": "మీ దుకాణం లోడ్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "accd3e95"
+  },
+  "standee.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "standee.error.title": {
+    "message": "మీ దుకాణాన్ని లోడ్ చేయలేకపోయాం",
+    "review": "reviewed",
+    "enHash": "0980057d"
+  },
+  "standee.error.body": {
+    "message": "మీ ఇంటర్నెట్ చూసుకుని మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "standee.noStore.title": {
+    "message": "ముందు ఒక దుకాణాన్ని ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "standee.noStore.body": {
+    "message": "స్టాండీ ఒకసారికి ఒక దుకాణానికి మాత్రమే ప్రింట్ అవుతుంది.",
+    "review": "reviewed",
+    "enHash": "0949921e"
+  },
+  "standee.noStore.action": {
+    "message": "దుకాణాన్ని ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "standee.manager.title": {
+    "message": "స్టాండీ యజమానులు, మేనేజర్ల కోసం",
+    "review": "reviewed",
+    "enHash": "7bdf789c"
+  },
+  "standee.manager.body": {
+    "message": "దీన్ని ప్రింట్ చేయమని మీ యజమానిని లేదా మేనేజర్‌ని అడగండి.",
+    "review": "reviewed",
+    "enHash": "1ee19220"
+  },
+  "standee.card.title": {
+    "message": "మీ స్టాండీని ప్రింట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "455a10fb"
+  },
+  "standee.card.body": {
+    "message": "మీ దుకాణం QR కోడ్ ఉన్న A5 షీట్. కస్టమర్లు దీన్ని స్కాన్ చేసి మీ దుకాణాన్ని తెరుస్తారు, క్యాష్‌బ్యాక్ పొందుతారు.",
+    "review": "reviewed",
+    "enHash": "4dc14021"
+  },
+  "standee.shortCode": {
+    "message": "చిన్న కోడ్",
+    "review": "reviewed",
+    "enHash": "7545309d"
+  },
+  "standee.preview": {
+    "message": "ప్రివ్యూ",
+    "review": "reviewed",
+    "enHash": "f1fbb2b4"
+  },
+  "standee.download": {
+    "message": "A5 PDF డౌన్‌లోడ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "d5f56067"
+  },
+  "standee.preparing": {
+    "message": "PDF సిద్ధమవుతోంది",
+    "review": "reviewed",
+    "enHash": "cc44de09"
+  },
+  "standee.pdfError": {
+    "message": "స్టాండీని సిద్ధం చేయలేకపోయాం. మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "9f51d4bd"
+  },
+  "standee.frameTitle": {
+    "message": "స్టాండీ ప్రివ్యూ",
+    "review": "reviewed",
+    "enHash": "d22dd779"
+  },
+  "standee.printTip": {
+    "message": "QR కోడ్ స్పష్టంగా ఉండేలా A5 మీద 100% సైజులో, ప్రింటర్ మార్జిన్లు జోడించకుండా ప్రింట్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "079abaf2"
+  }
+}

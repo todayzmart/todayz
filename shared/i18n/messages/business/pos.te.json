@@ -1,0 +1,877 @@
+{
+  "pos.title": {
+    "message": "అమ్మండి",
+    "review": "reviewed",
+    "enHash": "fa3cf2ad"
+  },
+  "pos.loading": {
+    "message": "కౌంటర్ లోడ్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "f1beca55"
+  },
+  "pos.close": {
+    "message": "మూసివేయండి",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "pos.error.title": {
+    "message": "కౌంటర్ తెరవలేకపోయాం",
+    "review": "reviewed",
+    "enHash": "74b273cf"
+  },
+  "pos.error.body": {
+    "message": "మీ కనెక్షన్ చూసి మళ్ళీ ప్రయత్నించండి. ఈ పరికరంలో ఒకసారి కౌంటర్ తెరుచుకున్నాక, అది కనెక్షన్ లేకుండా కూడా పని చేస్తుంది.",
+    "review": "reviewed",
+    "enHash": "09c4858a"
+  },
+  "pos.error.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "pos.noStore.title": {
+    "message": "ముందు ఒక దుకాణం ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "pos.noStore.body": {
+    "message": "కౌంటర్ ఒకసారి ఒక దుకాణం నుంచే అమ్ముతుంది.",
+    "review": "reviewed",
+    "enHash": "3fb740a8"
+  },
+  "pos.noStore.action": {
+    "message": "దుకాణం ఎంచుకోండి",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "pos.browse.label": {
+    "message": "ఐటమ్‌లు",
+    "review": "reviewed",
+    "enHash": "44d25b5d"
+  },
+  "pos.search.label": {
+    "message": "ఐటమ్ వెతకండి లేదా స్కాన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "c002e92e"
+  },
+  "pos.search.placeholder": {
+    "message": "ఐటమ్ వెతకండి లేదా స్కాన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "c002e92e"
+  },
+  "pos.search.clear": {
+    "message": "వెతుకుడు తీసివేయండి",
+    "review": "reviewed",
+    "enHash": "67300d0f"
+  },
+  "pos.search.none.title": {
+    "message": "\"{query}\" కోసం ఏమీ దొరకలేదు",
+    "review": "reviewed",
+    "enHash": "31fd2b2b"
+  },
+  "pos.search.none.body": {
+    "message": "దీన్ని ధరతో ఈ బిల్లులో ఒకసారి ఐటమ్‌గా జోడించండి.",
+    "review": "reviewed",
+    "enHash": "84cd59bd"
+  },
+  "pos.tiles.title": {
+    "message": "త్వరిత ఐటమ్‌లు",
+    "review": "reviewed",
+    "enHash": "9d4bbb51"
+  },
+  "pos.tile.inStock": {
+    "message": "స్టాక్‌లో {count}",
+    "review": "reviewed",
+    "enHash": "9ffca181"
+  },
+  "pos.tile.out": {
+    "message": "స్టాక్ లేదు",
+    "review": "reviewed",
+    "enHash": "8b78c7ae"
+  },
+  "pos.tile.countNeeded": {
+    "message": "లెక్కింపు అవసరం",
+    "review": "reviewed",
+    "enHash": "a5bead5a"
+  },
+  "pos.catalogue.empty.title": {
+    "message": "ఈ పరికరంలో ఇంకా ఐటమ్‌లు లేవు",
+    "review": "reviewed",
+    "enHash": "c9c7b252"
+  },
+  "pos.catalogue.empty.body": {
+    "message": "మీ ఐటమ్‌లు లోడ్ చేయడానికి ఒకసారి కనెక్ట్ అవ్వండి, లేదా బిల్లులో ఒకసారి ఐటమ్ జోడించండి.",
+    "review": "reviewed",
+    "enHash": "259cd91d"
+  },
+  "pos.sales.open": {
+    "message": "అమ్మకాలు",
+    "review": "reviewed",
+    "enHash": "d0edfb6e"
+  },
+  "pos.sales.openAttention": {
+    "message": "అమ్మకాలు · {count} చూడాలి",
+    "review": "reviewed",
+    "enHash": "3e248677"
+  },
+  "pos.banner.notDurable.title": {
+    "message": "ఈ పరికరంలో అమ్మకాలు సేవ్ కావడం లేదు",
+    "review": "reviewed",
+    "enHash": "a00687ff"
+  },
+  "pos.banner.notDurable.body": {
+    "message": "ఈ బ్రౌజర్ స్టోరేజ్‌ను అడ్డుకుంటోంది. ప్రతి అమ్మకం సింక్ అయ్యే వరకు ఈ పేజీ తెరిచి ఉంచండి.",
+    "review": "reviewed",
+    "enHash": "cb5f1125"
+  },
+  "pos.banner.rejected.title": {
+    "message": "{count, plural, one {# అమ్మకంపై మీ దృష్టి అవసరం} other {# అమ్మకాలపై మీ దృష్టి అవసరం}}",
+    "review": "reviewed",
+    "enHash": "8841a4a7"
+  },
+  "pos.banner.rejected.action": {
+    "message": "చూడండి",
+    "review": "reviewed",
+    "enHash": "e29a79fe"
+  },
+  "pos.banner.offline.title": {
+    "message": "ఆఫ్‌లైన్ · {count, plural, =0 {ఏ అమ్మకమూ వేచి లేదు} one {# అమ్మకం సింక్ కోసం వేచి ఉంది} other {# అమ్మకాలు సింక్ కోసం వేచి ఉన్నాయి}}",
+    "review": "reviewed",
+    "enHash": "3d9ecc43"
+  },
+  "pos.banner.offline.body": {
+    "message": "మీరు అమ్మడం కొనసాగించవచ్చు. అమ్మకాలు ఇక్కడ సేవ్ అవుతాయి, మీరు ఆన్‌లైన్‌కి వచ్చాక సింక్ అవుతాయి.",
+    "review": "reviewed",
+    "enHash": "a3fbeb75"
+  },
+  "pos.banner.waiting.title": {
+    "message": "{count, plural, one {# అమ్మకం సింక్ కోసం వేచి ఉంది} other {# అమ్మకాలు సింక్ కోసం వేచి ఉన్నాయి}}",
+    "review": "reviewed",
+    "enHash": "fca44f24"
+  },
+  "pos.banner.waiting.body": {
+    "message": "అవి బ్యాక్‌గ్రౌండ్‌లో వెళ్తాయి. మీరు ఏమీ చేయనక్కర్లేదు.",
+    "review": "reviewed",
+    "enHash": "46a8c0dc"
+  },
+  "pos.banner.short.title": {
+    "message": "{count, plural, one {# ఐటమ్} other {# ఐటమ్‌లు}} ఉన్న లెక్క కంటే ఎక్కువ",
+    "review": "reviewed",
+    "enHash": "96a4287f"
+  },
+  "pos.banner.short.body": {
+    "message": "అయినా మీరు అమ్మవచ్చు. స్టాక్ లెక్కను మళ్ళీ లెక్కించడానికి గుర్తు పెడతాం.",
+    "review": "reviewed",
+    "enHash": "6f3c3731"
+  },
+  "pos.banner.linkDropped.title": {
+    "message": "కస్టమర్ లింక్ తీసివేయబడింది",
+    "review": "reviewed",
+    "enHash": "9d6196d7"
+  },
+  "pos.banner.linkDropped.body": {
+    "message": "QR చూపించిన తర్వాత బిల్లు మారింది. క్రెడిట్‌లు వాడటానికి కస్టమర్‌ను మళ్ళీ లింక్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "1d0ce2ea"
+  },
+  "pos.charge.failed.title": {
+    "message": "అమ్మకం సేవ్ కాలేదు",
+    "review": "reviewed",
+    "enHash": "e427f06a"
+  },
+  "pos.charge.failed.body": {
+    "message": "బిల్లు ఇంకా ఇక్కడే ఉంది. మళ్ళీ ఛార్జ్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "ce0f5f1e"
+  },
+  "pos.done.synced": {
+    "message": "{total} అమ్మకం పూర్తయింది",
+    "review": "reviewed",
+    "enHash": "02042f91"
+  },
+  "pos.done.waiting": {
+    "message": "{total} అమ్మకం ఈ పరికరంలో సేవ్ అయింది. మీరు ఆన్‌లైన్‌కి వచ్చాక సింక్ అవుతుంది.",
+    "review": "reviewed",
+    "enHash": "6fb0cfc5"
+  },
+  "pos.done.rejected": {
+    "message": "{total} అమ్మకం తిరస్కరించబడింది. కారణం చూడటానికి అమ్మకాల జాబితా తెరవండి.",
+    "review": "reviewed",
+    "enHash": "1ad691cd"
+  },
+  "pos.done.receipt": {
+    "message": "రసీదు",
+    "review": "reviewed",
+    "enHash": "f6ce3b6f"
+  },
+  "pos.cart.label": {
+    "message": "ప్రస్తుత బిల్లు",
+    "review": "reviewed",
+    "enHash": "a64c72ef"
+  },
+  "pos.cart.phone": {
+    "message": "కస్టమర్ ఫోన్",
+    "review": "reviewed",
+    "enHash": "7689682e"
+  },
+  "pos.cart.phonePlaceholder": {
+    "message": "కస్టమర్ ఫోన్ (ఐచ్ఛికం)",
+    "review": "reviewed",
+    "enHash": "60d44f84"
+  },
+  "pos.cart.empty": {
+    "message": "బిల్లు మొదలుపెట్టడానికి ఐటమ్‌ను స్కాన్ చేయండి లేదా ట్యాప్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "8eba9230"
+  },
+  "pos.cart.add": {
+    "message": "జోడించండి",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "pos.cart.less": {
+    "message": "ఒకటి తగ్గించండి",
+    "review": "reviewed",
+    "enHash": "afbcf5f3"
+  },
+  "pos.cart.more": {
+    "message": "ఒకటి జోడించండి",
+    "review": "reviewed",
+    "enHash": "bb49f016"
+  },
+  "pos.cart.lineDetailDiscount": {
+    "message": "ఒక్కోటి {price} · {discount} తగ్గింపు",
+    "review": "reviewed",
+    "enHash": "7922a98a"
+  },
+  "pos.cart.summary": {
+    "message": "{count, plural, one {# ఐటమ్} other {# ఐటమ్‌లు}}",
+    "review": "reviewed",
+    "enHash": "f34cfa9c"
+  },
+  "pos.cart.view": {
+    "message": "బిల్లు చూడండి",
+    "review": "reviewed",
+    "enHash": "ee721f1b"
+  },
+  "pos.cart.charge": {
+    "message": "ఛార్జ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "d4e1aee4"
+  },
+  "pos.cart.charging": {
+    "message": "ఛార్జ్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "5f99fe21"
+  },
+  "pos.cart.subtotal": {
+    "message": "ఉప మొత్తం",
+    "review": "reviewed",
+    "enHash": "97f7359e"
+  },
+  "pos.cart.billDiscount": {
+    "message": "తగ్గింపు",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.cart.roundOff": {
+    "message": "రౌండ్ ఆఫ్",
+    "review": "reviewed",
+    "enHash": "3aa7ebde"
+  },
+  "pos.cart.credits": {
+    "message": "క్రెడిట్‌లు",
+    "review": "reviewed",
+    "enHash": "bfac50d6"
+  },
+  "pos.cart.linkCustomer": {
+    "message": "కస్టమర్‌ను లింక్ చేయండి",
+    "review": "reviewed",
+    "enHash": "e051d869"
+  },
+  "pos.cart.unlink": {
+    "message": "తీసివేయండి",
+    "review": "reviewed",
+    "enHash": "e963907d"
+  },
+  "pos.cart.discount": {
+    "message": "తగ్గింపు",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.cart.clear": {
+    "message": "బిల్లు క్లియర్ చేయండి",
+    "review": "reviewed",
+    "enHash": "bbb4902a"
+  },
+  "pos.cart.link.billQr": {
+    "message": "బిల్లు QR ద్వారా లింక్ · {credits, plural, =0 {క్రెడిట్‌లు వాడలేదు} one {# క్రెడిట్ వాడారు} other {# క్రెడిట్‌లు వాడారు}}",
+    "review": "reviewed",
+    "enHash": "f26e079e"
+  },
+  "pos.cart.link.counterCode": {
+    "message": "కోడ్ ద్వారా లింక్ · {phone}",
+    "review": "reviewed",
+    "enHash": "81e24f8e"
+  },
+  "pos.cart.link.unverified": {
+    "message": "ఫోన్ నోట్ చేశాం, ధృవీకరించలేదు · {phone}",
+    "review": "reviewed",
+    "enHash": "28a8d23b"
+  },
+  "pos.pay.label": {
+    "message": "చెల్లింపు విధానం",
+    "review": "reviewed",
+    "enHash": "0e55fb3b"
+  },
+  "pos.pay.cash": {
+    "message": "నగదు",
+    "review": "reviewed",
+    "enHash": "758ec54e"
+  },
+  "pos.pay.upi": {
+    "message": "UPI",
+    "review": "reviewed",
+    "enHash": "f295b2cd"
+  },
+  "pos.pay.card": {
+    "message": "కార్డ్",
+    "review": "reviewed",
+    "enHash": "4d4ce73b"
+  },
+  "pos.add.open": {
+    "message": "వేరే ఐటమ్",
+    "review": "reviewed",
+    "enHash": "b7757e4a"
+  },
+  "pos.add.customTitle": {
+    "message": "ఒకసారి ఐటమ్ జోడించండి",
+    "review": "reviewed",
+    "enHash": "8a3608cb"
+  },
+  "pos.add.unknownTitle": {
+    "message": "ఈ బార్‌కోడ్ మాకు తెలియదు",
+    "review": "reviewed",
+    "enHash": "2da821a4"
+  },
+  "pos.add.unknownBody": {
+    "message": "కోడ్ {code} మీ ఐటమ్‌లలో లేదు. పేరు, ధరతో ఈ బిల్లులో జోడించండి.",
+    "review": "reviewed",
+    "enHash": "7131a281"
+  },
+  "pos.add.name": {
+    "message": "ఐటమ్ పేరు",
+    "review": "reviewed",
+    "enHash": "b56b71bb"
+  },
+  "pos.add.nameInvalid": {
+    "message": "పేరు ఇవ్వండి",
+    "review": "reviewed",
+    "enHash": "7e5fe97f"
+  },
+  "pos.add.price": {
+    "message": "ధర",
+    "review": "reviewed",
+    "enHash": "3e8248e3"
+  },
+  "pos.add.priceInvalid": {
+    "message": "సున్నా కంటే ఎక్కువ ధర ఇవ్వండి",
+    "review": "reviewed",
+    "enHash": "8d0c1181"
+  },
+  "pos.add.submit": {
+    "message": "బిల్లులో జోడించండి",
+    "review": "reviewed",
+    "enHash": "73cd5e5d"
+  },
+  "pos.add.inStock": {
+    "message": "దీన్ని మీ స్టాక్‌లో జోడించండి",
+    "review": "reviewed",
+    "enHash": "4792eee5"
+  },
+  "pos.discount.title": {
+    "message": "తగ్గింపులు",
+    "review": "reviewed",
+    "enHash": "e5a40077"
+  },
+  "pos.discount.help": {
+    "message": "మొత్తాలను రూపాయల్లో ఇవ్వండి. బిల్లు ₹1 లేదా అంతకంటే ఎక్కువ ఉంటుంది.",
+    "review": "reviewed",
+    "enHash": "fe6d51ad"
+  },
+  "pos.discount.line": {
+    "message": "{name} · {price}",
+    "review": "reviewed",
+    "enHash": "6c125f94"
+  },
+  "pos.discount.bill": {
+    "message": "మొత్తం బిల్లుపై తగ్గింపు",
+    "review": "reviewed",
+    "enHash": "74870af9"
+  },
+  "pos.discount.invalid": {
+    "message": "సరైన మొత్తం ఇవ్వండి",
+    "review": "reviewed",
+    "enHash": "a45acfd3"
+  },
+  "pos.discount.apply": {
+    "message": "వర్తింపజేయండి",
+    "review": "reviewed",
+    "enHash": "cfea419c"
+  },
+  "pos.scan.open": {
+    "message": "స్కాన్",
+    "review": "reviewed",
+    "enHash": "28cba55d"
+  },
+  "pos.scan.title": {
+    "message": "బార్‌కోడ్ స్కాన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "7276e973"
+  },
+  "pos.scan.unsupported": {
+    "message": "ఈ బ్రౌజర్ కెమెరాతో స్కాన్ చేయలేదు. బార్‌కోడ్ స్కానర్ వాడండి లేదా కోడ్ టైప్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "5c26f8e7"
+  },
+  "pos.scan.denied": {
+    "message": "కెమెరా యాక్సెస్ ఆఫ్‌లో ఉంది. స్కాన్ చేయడానికి బ్రౌజర్ సెట్టింగ్‌లలో అనుమతించండి.",
+    "review": "reviewed",
+    "enHash": "253b57db"
+  },
+  "pos.scan.starting": {
+    "message": "కెమెరా మొదలవుతోంది",
+    "review": "reviewed",
+    "enHash": "d6293a9d"
+  },
+  "pos.scan.hint": {
+    "message": "కెమెరాను బార్‌కోడ్ వైపు పెట్టండి.",
+    "review": "reviewed",
+    "enHash": "9abc9dc4"
+  },
+  "pos.link.title": {
+    "message": "కస్టమర్‌ను లింక్ చేయండి",
+    "review": "reviewed",
+    "enHash": "f86c83df"
+  },
+  "pos.link.back": {
+    "message": "వెనక్కి",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "pos.link.skip": {
+    "message": "లింక్ చేయకుండా అమ్మండి",
+    "review": "reviewed",
+    "enHash": "a26d2e6c"
+  },
+  "pos.link.noCredits": {
+    "message": "ఈ బిల్లు క్రెడిట్‌లు వాడే కనీస మొత్తం కంటే తక్కువ. కస్టమర్ అయినా క్రెడిట్‌లు సంపాదించవచ్చు.",
+    "review": "reviewed",
+    "enHash": "4e4f339e"
+  },
+  "pos.link.qr": {
+    "message": "కస్టమర్ QR స్కాన్ చేస్తారు",
+    "review": "reviewed",
+    "enHash": "fae4c5ca"
+  },
+  "pos.link.qrHelp": {
+    "message": "కస్టమర్ క్రెడిట్‌లు వాడవచ్చు, క్యాష్‌బ్యాక్ సంపాదించవచ్చు.",
+    "review": "reviewed",
+    "enHash": "da188dd6"
+  },
+  "pos.link.qrOffline": {
+    "message": "కనెక్షన్ అవసరం.",
+    "review": "reviewed",
+    "enHash": "1e270e64"
+  },
+  "pos.link.code": {
+    "message": "కస్టమర్ కోడ్ చెబుతారు",
+    "review": "reviewed",
+    "enHash": "3f13bff1"
+  },
+  "pos.link.codeHelp": {
+    "message": "కస్టమర్ తమ యాప్ నుంచి 4 అంకెల కోడ్ చూపిస్తారు. వారు క్రెడిట్‌లు సంపాదిస్తారు.",
+    "review": "reviewed",
+    "enHash": "e9acea8e"
+  },
+  "pos.link.phone": {
+    "message": "ఫోన్ మాత్రమే నోట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "504991bf"
+  },
+  "pos.link.phoneHelp": {
+    "message": "నంబర్ అమ్మకంలో సేవ్ అవుతుంది. ధృవీకరించే వరకు క్రెడిట్‌లు ఉండవు.",
+    "review": "reviewed",
+    "enHash": "5daaea7a"
+  },
+  "pos.link.phoneFieldHelp": {
+    "message": "10 అంకెల మొబైల్ నంబర్",
+    "review": "reviewed",
+    "enHash": "3f114e30"
+  },
+  "pos.link.qrLabel": {
+    "message": "కస్టమర్ స్కాన్ చేయడానికి QR కోడ్",
+    "review": "reviewed",
+    "enHash": "1457d7c6"
+  },
+  "pos.link.qrPreparing": {
+    "message": "QR సిద్ధమవుతోంది",
+    "review": "reviewed",
+    "enHash": "12ab2a36"
+  },
+  "pos.link.qrFailed": {
+    "message": "QR తయారు చేయలేకపోయాం.",
+    "review": "reviewed",
+    "enHash": "f41ca6be"
+  },
+  "pos.link.qrExpired": {
+    "message": "ఈ QR గడువు ముగిసింది.",
+    "review": "reviewed",
+    "enHash": "00efed4d"
+  },
+  "pos.link.newQr": {
+    "message": "కొత్త QR",
+    "review": "reviewed",
+    "enHash": "16d87a7a"
+  },
+  "pos.link.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "pos.link.waiting": {
+    "message": "కస్టమర్ స్కాన్ చేయడం కోసం వేచి ఉన్నాం.",
+    "review": "reviewed",
+    "enHash": "a47155e3"
+  },
+  "pos.link.expiresIn": {
+    "message": "{seconds} s లో గడువు ముగుస్తుంది",
+    "review": "reviewed",
+    "enHash": "d965684d"
+  },
+  "pos.link.phoneLabel": {
+    "message": "కస్టమర్ ఫోన్",
+    "review": "reviewed",
+    "enHash": "7689682e"
+  },
+  "pos.link.phoneInvalid": {
+    "message": "10 అంకెల మొబైల్ నంబర్ ఇవ్వండి",
+    "review": "reviewed",
+    "enHash": "63c5f1b7"
+  },
+  "pos.link.codeLabel": {
+    "message": "కస్టమర్ యాప్‌లోని కోడ్",
+    "review": "reviewed",
+    "enHash": "dd3257a4"
+  },
+  "pos.link.codeHint": {
+    "message": "4 అంకెలు",
+    "review": "reviewed",
+    "enHash": "a970a484"
+  },
+  "pos.link.codeInvalid": {
+    "message": "4 అంకెల కోడ్ ఇవ్వండి",
+    "review": "reviewed",
+    "enHash": "d99fedc4"
+  },
+  "pos.link.codeMismatch": {
+    "message": "ఆ కోడ్ సరిపోలలేదు.",
+    "review": "reviewed",
+    "enHash": "d8ae7e1c"
+  },
+  "pos.link.codeMismatchTries": {
+    "message": "ఆ కోడ్ సరిపోలలేదు. {count, plural, one {# ప్రయత్నం మిగిలి ఉంది} other {# ప్రయత్నాలు మిగిలి ఉన్నాయి}}.",
+    "review": "reviewed",
+    "enHash": "21be7fcb"
+  },
+  "pos.link.codeLocked": {
+    "message": "చాలా తప్పు కోడ్‌లు. తర్వాత ప్రయత్నించండి లేదా ఫోన్ ద్వారా లింక్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "abbbdb33"
+  },
+  "pos.link.codeOffline": {
+    "message": "మీరు ఆఫ్‌లైన్‌లో ఉన్నారు. అమ్మకం సింక్ అయినప్పుడు కోడ్ తనిఖీ అవుతుంది.",
+    "review": "reviewed",
+    "enHash": "df15f601"
+  },
+  "pos.link.codeSave": {
+    "message": "కోడ్‌తో లింక్ చేయండి",
+    "review": "reviewed",
+    "enHash": "c9f2a2ec"
+  },
+  "pos.link.phoneSave": {
+    "message": "ఈ ఫోన్ నోట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "bca7b443"
+  },
+  "pos.history.title": {
+    "message": "ఈ పరికరంలోని అమ్మకాలు",
+    "review": "reviewed",
+    "enHash": "ea829991"
+  },
+  "pos.history.empty.title": {
+    "message": "ఇంకా అమ్మకాలు లేవు",
+    "review": "reviewed",
+    "enHash": "f2a3f161"
+  },
+  "pos.history.empty.body": {
+    "message": "మీరు చేసే అమ్మకాలు పాతవి అయ్యే వరకు ఇక్కడ కనిపిస్తాయి.",
+    "review": "reviewed",
+    "enHash": "ef0aab5c"
+  },
+  "pos.history.units": {
+    "message": "{count, plural, one {# యూనిట్} other {# యూనిట్‌లు}}",
+    "review": "reviewed",
+    "enHash": "55edb2e2"
+  },
+  "pos.history.receipt": {
+    "message": "రసీదు",
+    "review": "reviewed",
+    "enHash": "f6ce3b6f"
+  },
+  "pos.history.state.pending": {
+    "message": "సింక్ కోసం వేచి ఉంది",
+    "review": "reviewed",
+    "enHash": "e8f3a099"
+  },
+  "pos.history.state.sending": {
+    "message": "సింక్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "4ae6fa22"
+  },
+  "pos.history.state.synced": {
+    "message": "సింక్ అయింది",
+    "review": "reviewed",
+    "enHash": "b2ef6af6"
+  },
+  "pos.history.state.rejected": {
+    "message": "తిరస్కరించబడింది",
+    "review": "reviewed",
+    "enHash": "735ec50d"
+  },
+  "pos.history.state.reversed": {
+    "message": "వెనక్కి తీసుకున్నారు",
+    "review": "reviewed",
+    "enHash": "307404eb"
+  },
+  "pos.history.linkFailed": {
+    "message": "కస్టమర్ లింక్ విఫలమైంది",
+    "review": "reviewed",
+    "enHash": "b2a064c7"
+  },
+  "pos.history.countNeeded": {
+    "message": "లెక్కింపు అవసరం",
+    "review": "reviewed",
+    "enHash": "a5bead5a"
+  },
+  "pos.history.countNeededItems": {
+    "message": "మళ్ళీ లెక్కించండి: {names}",
+    "review": "reviewed",
+    "enHash": "7f5c83fa"
+  },
+  "pos.history.serverPrice": {
+    "message": "ఇక్కడ {device} ఛార్జ్ చేశారు; సర్వర్ {server} వద్ద పూర్తి చేసింది.",
+    "review": "reviewed",
+    "enHash": "237a255b"
+  },
+  "pos.history.refused": {
+    "message": "సర్వర్ ఈ అమ్మకాన్ని తిరస్కరించింది. మళ్ళీ ప్రయత్నించండి, లేదా కస్టమర్‌తో మాట్లాడి తీసివేయండి.",
+    "review": "reviewed",
+    "enHash": "e61a6e2b"
+  },
+  "pos.sync.title": {
+    "message": "సింక్",
+    "review": "reviewed",
+    "enHash": "905f6309"
+  },
+  "pos.sync.status.idle": {
+    "message": "అప్‌డేట్‌గా ఉంది",
+    "review": "reviewed",
+    "enHash": "82fb1d51"
+  },
+  "pos.sync.status.syncing": {
+    "message": "సింక్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "4ae6fa22"
+  },
+  "pos.sync.status.offline": {
+    "message": "ఆఫ్‌లైన్",
+    "review": "reviewed",
+    "enHash": "e01fa717"
+  },
+  "pos.sync.status.backoff": {
+    "message": "మళ్ళీ ప్రయత్నం కోసం వేచి ఉంది",
+    "review": "reviewed",
+    "enHash": "ac710fd8"
+  },
+  "pos.sync.status.resync": {
+    "message": "ఐటమ్‌లు రిఫ్రెష్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "912875eb"
+  },
+  "pos.sync.now": {
+    "message": "ఇప్పుడే సింక్ చేయండి",
+    "review": "reviewed",
+    "enHash": "2b7d938e"
+  },
+  "pos.sync.counts": {
+    "message": "{pending, plural, one {# వేచి ఉంది} other {# వేచి ఉన్నాయి}} · {rejected, plural, one {# తిరస్కరించబడింది} other {# తిరస్కరించబడ్డాయి}}",
+    "review": "reviewed",
+    "enHash": "4127fbe7"
+  },
+  "pos.sync.last": {
+    "message": "చివరి సింక్ {time}",
+    "review": "reviewed",
+    "enHash": "83c122a7"
+  },
+  "pos.sync.attention": {
+    "message": "{count, plural, one {# అమ్మకాన్ని చూడాలి} other {# అమ్మకాలను చూడాలి}}",
+    "review": "reviewed",
+    "enHash": "00315455"
+  },
+  "pos.sync.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "9f5cd8a2"
+  },
+  "pos.sync.dismiss": {
+    "message": "తీసివేయండి",
+    "review": "reviewed",
+    "enHash": "70afe9ef"
+  },
+  "pos.reverse.action": {
+    "message": "వెనక్కి తీసుకోండి",
+    "review": "reviewed",
+    "enHash": "57f99337"
+  },
+  "pos.reverse.title": {
+    "message": "ఈ అమ్మకాన్ని వెనక్కి తీసుకోవాలా?",
+    "review": "reviewed",
+    "enHash": "31c561b0"
+  },
+  "pos.reverse.body": {
+    "message": "దీన్ని మళ్ళీ మార్చలేరు.",
+    "review": "reviewed",
+    "enHash": "fe63a123"
+  },
+  "pos.reverse.stock": {
+    "message": "{count, plural, one {# యూనిట్ స్టాక్‌కి తిరిగి వెళ్తుంది} other {# యూనిట్‌లు స్టాక్‌కి తిరిగి వెళ్తాయి}}",
+    "review": "reviewed",
+    "enHash": "fb6ecb00"
+  },
+  "pos.reverse.credits": {
+    "message": "{count, plural, =0 {తిరిగి ఇవ్వడానికి క్రెడిట్‌లు లేవు} one {# క్రెడిట్ కస్టమర్‌కి తిరిగి వెళ్తుంది} other {# క్రెడిట్‌లు కస్టమర్‌కి తిరిగి వెళ్తాయి}}",
+    "review": "reviewed",
+    "enHash": "7f6a019b"
+  },
+  "pos.reverse.cashback": {
+    "message": "{count, plural, =0 {వెనక్కి తీసుకోవడానికి క్యాష్‌బ్యాక్ లేదు} one {# క్యాష్‌బ్యాక్ క్రెడిట్ వెనక్కి తీసుకుంటాం} other {# క్యాష్‌బ్యాక్ క్రెడిట్‌లు వెనక్కి తీసుకుంటాం}}",
+    "review": "reviewed",
+    "enHash": "bd10f749"
+  },
+  "pos.reverse.reason": {
+    "message": "కారణం",
+    "review": "reviewed",
+    "enHash": "f219cc06"
+  },
+  "pos.reverse.keep": {
+    "message": "అమ్మకం ఉంచండి",
+    "review": "reviewed",
+    "enHash": "0403484b"
+  },
+  "pos.reverse.confirm": {
+    "message": "అమ్మకం వెనక్కి తీసుకోండి",
+    "review": "reviewed",
+    "enHash": "a8309a05"
+  },
+  "pos.reverse.done": {
+    "message": "వెనక్కి తీసుకున్నాం. {units, plural, one {# యూనిట్} other {# యూనిట్‌లు}} స్టాక్‌కి తిరిగి, {credits, plural, one {# క్రెడిట్} other {# క్రెడిట్‌లు}} తిరిగి ఇచ్చాం, {cashback, plural, one {# క్యాష్‌బ్యాక్ క్రెడిట్} other {# క్యాష్‌బ్యాక్ క్రెడిట్‌లు}} వెనక్కి తీసుకున్నాం.",
+    "review": "reviewed",
+    "enHash": "6e36bd13"
+  },
+  "pos.reverse.offline": {
+    "message": "మీరు ఆఫ్‌లైన్‌లో ఉన్నారు. ఆన్‌లైన్‌కి వచ్చాక అమ్మకాన్ని వెనక్కి తీసుకోండి.",
+    "review": "reviewed",
+    "enHash": "92a58c40"
+  },
+  "pos.reverse.windowPassed": {
+    "message": "ఈ అమ్మకాన్ని వెనక్కి తీసుకునే సమయం దాటిపోయింది.",
+    "review": "reviewed",
+    "enHash": "dd1ffab9"
+  },
+  "pos.reverse.failed": {
+    "message": "అమ్మకాన్ని వెనక్కి తీసుకోలేకపోయాం. మళ్ళీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "f2e7f12b"
+  },
+  "pos.receipt.title": {
+    "message": "రసీదు",
+    "review": "reviewed",
+    "enHash": "f6ce3b6f"
+  },
+  "pos.receipt.lineDiscount": {
+    "message": "తగ్గింపు",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.receipt.subtotal": {
+    "message": "ఉప మొత్తం",
+    "review": "reviewed",
+    "enHash": "97f7359e"
+  },
+  "pos.receipt.discount": {
+    "message": "తగ్గింపు",
+    "review": "reviewed",
+    "enHash": "b524936d"
+  },
+  "pos.receipt.roundOff": {
+    "message": "రౌండ్ ఆఫ్",
+    "review": "reviewed",
+    "enHash": "3aa7ebde"
+  },
+  "pos.receipt.credits": {
+    "message": "వాడిన క్రెడిట్‌లు",
+    "review": "reviewed",
+    "enHash": "385686f7"
+  },
+  "pos.receipt.total": {
+    "message": "మొత్తం",
+    "review": "reviewed",
+    "enHash": "b25928c6"
+  },
+  "pos.receipt.paidBy": {
+    "message": "చెల్లింపు",
+    "review": "reviewed",
+    "enHash": "70c115d7"
+  },
+  "pos.receipt.thanks": {
+    "message": "మా దగ్గర కొన్నందుకు ధన్యవాదాలు.",
+    "review": "reviewed",
+    "enHash": "feb21b25"
+  },
+  "pos.receipt.whatsapp": {
+    "message": "WhatsApp లో షేర్ చేయండి",
+    "review": "reviewed",
+    "enHash": "7e03939f"
+  },
+  "pos.receipt.sms": {
+    "message": "SMS ద్వారా పంపండి",
+    "review": "reviewed",
+    "enHash": "6c0b2af6"
+  },
+  "pos.receipt.print": {
+    "message": "ప్రింట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "5b221e9c"
+  },
+  "pos.receipt.linkPending": {
+    "message": "ఈ అమ్మకం సింక్ అయ్యాక షేర్ లింక్‌లు పని చేస్తాయి.",
+    "review": "reviewed",
+    "enHash": "29db9a75"
+  },
+  "pos.receipt.shareText": {
+    "message": "{shop} నుంచి మీ రసీదు: {url}",
+    "review": "reviewed",
+    "enHash": "b72276cf"
+  }
+}

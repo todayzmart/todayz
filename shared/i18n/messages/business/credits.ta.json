@@ -1,0 +1,327 @@
+{
+  "credits.title": {
+    "message": "கிரெடிட்களும் பரிந்துரைகளும்",
+    "review": "reviewed",
+    "enHash": "e9796059"
+  },
+  "credits.loading": {
+    "message": "கிரெடிட்கள் ஏற்றப்படுகின்றன",
+    "review": "reviewed",
+    "enHash": "1ff7a2d9"
+  },
+  "credits.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "credits.error.title": {
+    "message": "உங்கள் கடைகளை ஏற்ற முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "427c23ba"
+  },
+  "credits.error.body": {
+    "message": "உங்கள் இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "563862b7"
+  },
+  "credits.noStore.title": {
+    "message": "முதலில் கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "ef8327cf"
+  },
+  "credits.noStore.body": {
+    "message": "கிரெடிட்கள் ஒரு கடைக்குச் சொந்தமானவை. நீங்கள் வேலை செய்யும் கடையைத் தேர்ந்தெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "ffdf45d1"
+  },
+  "credits.noStore.action": {
+    "message": "கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "89d93c1f"
+  },
+  "credits.manager.title": {
+    "message": "மேலாளரிடம் கேளுங்கள்",
+    "review": "reviewed",
+    "enHash": "aa2dd365"
+  },
+  "credits.manager.body": {
+    "message": "கிரெடிட்கள், பரிந்துரைகள், ஸ்டாண்டி ஆகியவை உரிமையாளர்களுக்கும் மேலாளர்களுக்கும் மட்டும்.",
+    "review": "reviewed",
+    "enHash": "3a43a3e3"
+  },
+  "credits.account.title": {
+    "message": "கிரெடிட் கணக்கு",
+    "review": "reviewed",
+    "enHash": "1a59b98e"
+  },
+  "credits.account.balance": {
+    "message": "இருப்பு",
+    "review": "reviewed",
+    "enHash": "90eef613"
+  },
+  "credits.account.credits": {
+    "message": "{count, plural, one {# கிரெடிட்} other {# கிரெடிட்கள்}}",
+    "review": "reviewed",
+    "enHash": "699b6117"
+  },
+  "credits.account.negative": {
+    "message": "மைனஸ் இருப்பு அடுத்த காலத்துக்குத் தொடரும், பணம் வழங்கும்போது கழிக்கப்படும்.",
+    "review": "reviewed",
+    "enHash": "89430656"
+  },
+  "credits.account.error": {
+    "message": "உங்கள் கிரெடிட் கணக்கை ஏற்ற முடியவில்லை.",
+    "review": "reviewed",
+    "enHash": "5c888d41"
+  },
+  "credits.lines.label": {
+    "message": "கிரெடிட் கணக்குப் பதிவுகள்",
+    "review": "reviewed",
+    "enHash": "0106aad6"
+  },
+  "credits.lines.empty.title": {
+    "message": "இன்னும் கிரெடிட் செயல்பாடு இல்லை",
+    "review": "reviewed",
+    "enHash": "aa1820ee"
+  },
+  "credits.lines.empty.body": {
+    "message": "வாடிக்கையாளர்கள் உங்கள் கடையில் செலவிடும் கிரெடிட்களும் நீங்கள் தரும் கேஷ்பேக்கும் இங்கே தெரியும்.",
+    "review": "reviewed",
+    "enHash": "84011ab9"
+  },
+  "credits.lines.more": {
+    "message": "பழைய பதிவுகளைக் காட்டவும்",
+    "review": "reviewed",
+    "enHash": "d99d5681"
+  },
+  "credits.lines.loading": {
+    "message": "பழைய பதிவுகள் ஏற்றப்படுகின்றன",
+    "review": "reviewed",
+    "enHash": "fb0e4bcf"
+  },
+  "credits.lines.error": {
+    "message": "மேலும் பதிவுகளை ஏற்ற முடியவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "25d59ed3"
+  },
+  "credits.line.spent": {
+    "message": "உங்கள் கடையில் செலவான கிரெடிட்கள்",
+    "review": "reviewed",
+    "enHash": "577a1d99"
+  },
+  "credits.line.cashback": {
+    "message": "நீங்கள் தந்த கேஷ்பேக்",
+    "review": "reviewed",
+    "enHash": "b448f6f5"
+  },
+  "credits.line.referral_reward": {
+    "message": "பரிந்துரை வெகுமதி",
+    "review": "reviewed",
+    "enHash": "6fc3bbab"
+  },
+  "credits.line.pos_reversal": {
+    "message": "விற்பனை திரும்பப் பெறப்பட்டது",
+    "review": "reviewed",
+    "enHash": "e17f3704"
+  },
+  "credits.line.payout": {
+    "message": "பணம் வழங்கல்",
+    "review": "reviewed",
+    "enHash": "9bb39694"
+  },
+  "credits.line.adjustment": {
+    "message": "சரிசெய்தல்",
+    "review": "reviewed",
+    "enHash": "7f0496ac"
+  },
+  "credits.line.added": {
+    "message": "சேர்க்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "b68734c2"
+  },
+  "credits.line.taken": {
+    "message": "கழிக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "7ee5528e"
+  },
+  "credits.ref.order": {
+    "message": "ஆர்டர் {ref}",
+    "review": "reviewed",
+    "enHash": "6b45f123"
+  },
+  "credits.ref.sale": {
+    "message": "விற்பனை {ref}",
+    "review": "reviewed",
+    "enHash": "aae9dff8"
+  },
+  "credits.payouts.title": {
+    "message": "பணம் வழங்கல் எப்படி நடக்கிறது",
+    "review": "reviewed",
+    "enHash": "8bc68cc7"
+  },
+  "credits.payouts.in": {
+    "message": "வாடிக்கையாளர்கள் உங்கள் கடையில் கிரெடிட்களைச் செலவிடும்போதும் உங்கள் பரிந்துரைகளுக்கு வெகுமதி கிடைக்கும்போதும் கிரெடிட்கள் வரும்.",
+    "review": "reviewed",
+    "enHash": "e43f875a"
+  },
+  "credits.payouts.out": {
+    "message": "நீங்கள் தரும் கேஷ்பேக், திரும்பப் பெற்ற விற்பனைகள், பணம் வழங்கல் ஆகியவற்றில் கிரெடிட்கள் செல்லும்.",
+    "review": "reviewed",
+    "enHash": "50227aac"
+  },
+  "credits.payouts.statement": {
+    "message": "ஸ்டேட்மென்ட்கள் ஒவ்வொரு மாதமும் 1 ஆம் தேதி முடிவடையும்.",
+    "review": "reviewed",
+    "enHash": "b06786bc"
+  },
+  "credits.payouts.amount": {
+    "message": "உங்கள் கிரெடிட் இருப்பிலிருந்து இன்னும் வழங்கப்படாத தொகையைக் கழித்ததே உங்களுக்கு வழங்கப்படும் தொகை.",
+    "review": "reviewed",
+    "enHash": "a7ae6425"
+  },
+  "credits.payouts.paid": {
+    "message": "TodayZ உங்களுக்கு UPI மூலம் பணம் அனுப்பி அதன் குறிப்பு எண்ணைப் பதிவுசெய்த பிறகே பணம் 'வழங்கப்பட்டது' எனக் காட்டும்.",
+    "review": "reviewed",
+    "enHash": "eef9c25d"
+  },
+  "credits.payouts.holds": {
+    "message": "KYC முழுமையடையாவிட்டால், மோசடி சந்தேகம் இருந்தால் அல்லது பிசினஸ் இடைநிறுத்தப்பட்டிருந்தால் பணம் வழங்கல் நிறுத்திவைக்கப்படும்.",
+    "review": "reviewed",
+    "enHash": "78983e75"
+  },
+  "credits.statements.title": {
+    "message": "மாதாந்திர ஸ்டேட்மென்ட்கள்",
+    "review": "reviewed",
+    "enHash": "f4d5c628"
+  },
+  "credits.statements.soon": {
+    "message": "மாதாந்திர ஸ்டேட்மென்ட்கள் விரைவில் வரும்.",
+    "review": "reviewed",
+    "enHash": "8916c368"
+  },
+  "credits.standee.title": {
+    "message": "QR ஸ்டாண்டி",
+    "review": "reviewed",
+    "enHash": "db442fbd"
+  },
+  "credits.standee.body": {
+    "message": "{store} க்கான அச்சிடக்கூடிய A5 ஸ்டாண்டி. வாடிக்கையாளர்கள் இதை ஸ்கேன் செய்து உங்கள் கடையைத் திறப்பார்கள்.",
+    "review": "reviewed",
+    "enHash": "662cecd3"
+  },
+  "credits.standee.shortCode": {
+    "message": "சுருக்கக் குறியீடு",
+    "review": "reviewed",
+    "enHash": "7545309d"
+  },
+  "credits.standee.preview": {
+    "message": "PDF முன்னோட்டம்",
+    "review": "reviewed",
+    "enHash": "37b66fde"
+  },
+  "credits.standee.download": {
+    "message": "A5 PDF பதிவிறக்கவும்",
+    "review": "reviewed",
+    "enHash": "d5f56067"
+  },
+  "credits.standee.preparing": {
+    "message": "PDF தயாராகிறது",
+    "review": "reviewed",
+    "enHash": "cc44de09"
+  },
+  "credits.standee.open": {
+    "message": "ஸ்டாண்டி விருப்பங்கள்",
+    "review": "reviewed",
+    "enHash": "62238373"
+  },
+  "credits.standee.error": {
+    "message": "ஸ்டாண்டியைத் தயாரிக்க முடியவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "9f51d4bd"
+  },
+  "credits.referral.title": {
+    "message": "ஒரு கடையைப் பரிந்துரைக்கவும்",
+    "review": "reviewed",
+    "enHash": "f3669d74"
+  },
+  "credits.referral.body": {
+    "message": "உங்கள் குறியீட்டை மற்றொரு கடை உரிமையாளருடன் பகிருங்கள். அவர்களின் கடைக்கு முதல் ஆர்டர்கள் வரும்போது உங்களுக்குக் கிரெடிட்கள் கிடைக்கும்.",
+    "review": "reviewed",
+    "enHash": "839b007c"
+  },
+  "credits.referral.codeLabel": {
+    "message": "உங்கள் பரிந்துரைக் குறியீடு",
+    "review": "reviewed",
+    "enHash": "4b8a4a39"
+  },
+  "credits.referral.copy": {
+    "message": "குறியீட்டை நகலெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "6c106927"
+  },
+  "credits.referral.copied": {
+    "message": "குறியீடு நகலெடுக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "1cca33a6"
+  },
+  "credits.referral.copyLink": {
+    "message": "இணைப்பை நகலெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "2f84eea5"
+  },
+  "credits.referral.linkCopied": {
+    "message": "இணைப்பு நகலெடுக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "c2e98476"
+  },
+  "credits.referral.copyFailed": {
+    "message": "நகலெடுக்க முடியவில்லை. உரையைத் தேர்ந்தெடுத்து நீங்களே நகலெடுக்கவும்.",
+    "review": "reviewed",
+    "enHash": "2a15aec7"
+  },
+  "credits.referral.share": {
+    "message": "பகிரவும்",
+    "review": "reviewed",
+    "enHash": "09ca55ca"
+  },
+  "credits.referral.shareTitle": {
+    "message": "TodayZ இல் சேருங்கள்",
+    "review": "reviewed",
+    "enHash": "84e86c58"
+  },
+  "credits.referral.pending": {
+    "message": "முதல் ஆர்டர்களுக்குக் காத்திருக்கிறது",
+    "review": "reviewed",
+    "enHash": "ec114479"
+  },
+  "credits.referral.rewarded": {
+    "message": "வெகுமதி வழங்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "8e773327"
+  },
+  "credits.referral.count": {
+    "message": "{count, plural, one {# கடை} other {# கடைகள்}}",
+    "review": "reviewed",
+    "enHash": "ac03bc4f"
+  },
+  "credits.referral.where": {
+    "message": "வெகுமதிகள் உங்கள் முதன்மைக் கடையின் கிரெடிட் கணக்கில் சேர்க்கப்படும்.",
+    "review": "reviewed",
+    "enHash": "e023e087"
+  },
+  "credits.referral.error": {
+    "message": "உங்கள் பரிந்துரைக் குறியீட்டை ஏற்ற முடியவில்லை.",
+    "review": "reviewed",
+    "enHash": "8b449a2b"
+  },
+  "credits.referral.earned": {
+    "message": "ஈட்டிய கிரெடிட்கள்",
+    "review": "reviewed",
+    "enHash": "89e38aea"
+  },
+  "credits.referral.earnedValue": {
+    "message": "{credits, plural, one {# கிரெடிட்} other {# கிரெடிட்கள்}}",
+    "review": "reviewed",
+    "enHash": "4854c909"
+  }
+}
