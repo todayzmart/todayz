@@ -1,0 +1,9 @@
+# domain insights: one line per (role x action); regenerate with -update
+insights.view kind=business step-up=false
+insights.view owner allow
+insights.view manager allow
+insights.view cashier -
+customers.view kind=business step-up=false
+customers.view owner allow
+customers.view manager allow
+customers.view cashier -

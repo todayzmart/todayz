@@ -213,11 +213,12 @@ func TestCatalogueSeed(t *testing.T) {
 	}, j6)
 	require.EqualValues(t, 10, item("J6").OnHand)
 
-	// J11 has never had stock; J12–J17 were last stocked nine days ago; J20
-	// is the same product as I3.
+	// J11 (Idli rice) is sold out: W3-03's seed stocks 4 and sells them for
+	// missed sales (08 §2); J12–J17 were last stocked nine days ago; J20 is
+	// the same product as I3.
 	j11 := item("J11")
 	require.Zero(t, j11.OnHand)
-	require.Nil(t, j11.Updated)
+	require.NotNil(t, j11.Updated)
 	for i := 12; i <= 17; i++ {
 		r := item("J" + strconv.Itoa(i))
 		require.True(t, r.Updated.Equal(Epoch.Add(-9*day)), "J%d", i)
