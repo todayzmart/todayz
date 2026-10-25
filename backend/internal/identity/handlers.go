@@ -22,12 +22,13 @@ import (
 	"github.com/todayz/backend/internal/platform/authz/policy"
 	"github.com/todayz/backend/internal/platform/httpx/ifmatch"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
+	"github.com/todayz/backend/internal/platform/ids"
 )
 
 // noStore is the Cache-Control of every answer that carries a token.
 const noStore = "no-store"
 
-// maxPatchBody bounds the copy namePresence reads; the validator (slot 13)
+// maxPatchBody bounds the copy patchKeys reads; the validator (slot 13)
 // already refused anything larger than the 1 MB body limit.
 const maxPatchBody = 1 << 20
 
@@ -52,6 +53,11 @@ var (
 		"GetMe":    policy.MeView,
 		"UpdateMe": policy.MeEdit,
 		"DeleteMe": policy.MeDelete,
+
+		"ListMyAddresses": policy.MeAddressesView,
+		"CreateAddress":   policy.MeAddressesManage,
+		"UpdateAddress":   policy.MeAddressesManage,
+		"DeleteAddress":   policy.MeAddressesManage,
 	}
 )
 
@@ -62,7 +68,7 @@ func Register(r chi.Router, svc *Service, az authz.Authorizer) {
 		authapi.StrictMiddlewareFunc(authz.Strict[authapi.StrictHandlerFunc](az, authOps)),
 		stashRequest[authapi.StrictHandlerFunc],
 	)
-	meapi.Register(r.With(namePresence), meHandlers{svc},
+	meapi.Register(r.With(patchKeys), meHandlers{svc},
 		meapi.StrictMiddlewareFunc(authz.Strict[meapi.StrictHandlerFunc](az, meOps)),
 	)
 }
@@ -87,12 +93,13 @@ func requestFrom(ctx context.Context) *http.Request {
 	return r
 }
 
-type namePresentKey struct{}
+type patchKeysKey struct{}
 
-// namePresence records whether a PATCH body has a "name" key, so that
+// patchKeys records which top-level keys a PATCH body has, so that
 // `"name": null` (clear it) differs from no name at all; the generated
-// MePatch reads both as nil. The body is restored for the strict server.
-func namePresence(next http.Handler) http.Handler {
+// MePatch and AddressPatch read both as nil. The body is restored for the
+// strict server.
+func patchKeys(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch || r.Body == nil {
 			next.ServeHTTP(w, r)
@@ -106,9 +113,17 @@ func namePresence(next http.Handler) http.Handler {
 			return
 		}
 		var keys map[string]json.RawMessage
-		present := json.Unmarshal(body, &keys) == nil && keys["name"] != nil
-		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), namePresentKey{}, present)))
+		if json.Unmarshal(body, &keys) != nil {
+			keys = nil
+		}
+		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), patchKeysKey{}, keys)))
 	})
+}
+
+// bodyHas reports whether the PATCH body had the key, null included.
+func bodyHas(ctx context.Context, key string) bool {
+	keys, _ := ctx.Value(patchKeysKey{}).(map[string]json.RawMessage)
+	return keys[key] != nil
 }
 
 // --- cookies ----------------------------------------------------------------
@@ -472,8 +487,7 @@ func (h meHandlers) UpdateMe(ctx context.Context, req meapi.UpdateMeRequestObjec
 	if req.Body == nil {
 		return nil, problem.New(genproblems.BadRequest, "")
 	}
-	present, _ := ctx.Value(namePresentKey{}).(bool)
-	patch := MePatch{SetName: present || req.Body.Name != nil}
+	patch := MePatch{SetName: bodyHas(ctx, "name") || req.Body.Name != nil}
 	if req.Body.Name != nil {
 		name := strings.TrimSpace(*req.Body.Name)
 		if name == "" {
@@ -507,4 +521,105 @@ func (h meHandlers) DeleteMe(ctx context.Context, req meapi.DeleteMeRequestObjec
 	}
 	// Every session is revoked; the cookie goes too.
 	return meapi.DeleteMe204Response{Headers: meapi.DeleteMe204ResponseHeaders{SetCookie: ptr(clearCookie(authn.AppCustomer))}}, nil
+}
+
+// --- /v1/me/addresses (W2-15) ------------------------------------------------
+
+func toAPIAddress(a Address) meapi.Address {
+	return meapi.Address{
+		AddressId: a.ID.String(), Label: a.Label, Line1: a.Line1, Line2: a.Line2, Landmark: a.Landmark,
+		Pincode: a.Pincode, Lat: a.Lat, Lng: a.Lng, IsDefault: a.IsDefault, UpdatedAt: a.UpdatedAt, Version: a.Version,
+	}
+}
+
+// addressID parses the path id; a malformed one is 404 like a foreign one.
+func addressID(s string) (ids.ID, error) {
+	id, err := ids.Parse(s)
+	if err != nil {
+		return ids.Zero, notFound()
+	}
+	return id, nil
+}
+
+func (h meHandlers) ListMyAddresses(ctx context.Context, _ meapi.ListMyAddressesRequestObject) (meapi.ListMyAddressesResponseObject, error) {
+	p, err := principal(ctx)
+	if err != nil {
+		return nil, err
+	}
+	list, err := h.s.ListAddresses(ctx, p)
+	if err != nil {
+		return nil, err
+	}
+	out := meapi.AddressList{Addresses: make([]meapi.Address, 0, len(list))}
+	for _, a := range list {
+		out.Addresses = append(out.Addresses, toAPIAddress(a))
+	}
+	return meapi.ListMyAddresses200JSONResponse(out), nil
+}
+
+func (h meHandlers) CreateAddress(ctx context.Context, req meapi.CreateAddressRequestObject) (meapi.CreateAddressResponseObject, error) {
+	p, err := principal(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if req.Body == nil {
+		return nil, problem.New(genproblems.BadRequest, "")
+	}
+	b := req.Body
+	a, err := h.s.CreateAddress(ctx, p, AddressInput{
+		Label: b.Label, Line1: b.Line1, Line2: b.Line2, Landmark: b.Landmark, Pincode: b.Pincode,
+		Lat: b.Lat, Lng: b.Lng, IsDefault: b.IsDefault != nil && *b.IsDefault,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return meapi.CreateAddress201JSONResponse{Body: toAPIAddress(a), Headers: meapi.CreateAddress201ResponseHeaders{ETag: ptr(etag(a.Version))}}, nil
+}
+
+func (h meHandlers) UpdateAddress(ctx context.Context, req meapi.UpdateAddressRequestObject) (meapi.UpdateAddressResponseObject, error) {
+	p, err := principal(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := addressID(req.AddressId)
+	if err != nil {
+		return nil, err
+	}
+	// If-Match is optional in the contract so that a missing one answers 428.
+	if req.Params.IfMatch == nil || strings.TrimSpace(*req.Params.IfMatch) == "" {
+		return nil, problem.New(genproblems.PreconditionRequired, "")
+	}
+	version, ok := parseETag(*req.Params.IfMatch)
+	if !ok {
+		return nil, preconditionFailed()
+	}
+	if req.Body == nil {
+		return nil, problem.New(genproblems.BadRequest, "")
+	}
+	b := req.Body
+	a, err := h.s.UpdateAddress(ctx, p, id, version, AddressPatch{
+		Label: b.Label, Line1: b.Line1, Pincode: b.Pincode, IsDefault: b.IsDefault,
+		SetLine2: bodyHas(ctx, "line2") || b.Line2 != nil, Line2: b.Line2,
+		SetLandmark: bodyHas(ctx, "landmark") || b.Landmark != nil, Landmark: b.Landmark,
+		Lat: b.Lat, Lng: b.Lng,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return meapi.UpdateAddress200JSONResponse{Body: toAPIAddress(a), Headers: meapi.UpdateAddress200ResponseHeaders{ETag: ptr(etag(a.Version))}}, nil
+}
+
+func (h meHandlers) DeleteAddress(ctx context.Context, req meapi.DeleteAddressRequestObject) (meapi.DeleteAddressResponseObject, error) {
+	p, err := principal(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := addressID(req.AddressId)
+	if err != nil {
+		return nil, err
+	}
+	if err := h.s.DeleteAddress(ctx, p, id); err != nil {
+		return nil, err
+	}
+	return meapi.DeleteAddress204Response{}, nil
 }

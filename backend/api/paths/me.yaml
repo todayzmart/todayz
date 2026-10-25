@@ -115,3 +115,147 @@
               type: string
       default:
         $ref: ../common/responses.yaml#/Problem
+/v1/me/addresses:
+  get:
+    operationId: listMyAddresses
+    tags: [me]
+    summary: My saved addresses (C-18, C-11)
+    description: Customer app only. The default address first, then the newest change first. Another user's addresses never appear.
+    responses:
+      "200":
+        description: The caller's saved addresses
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/me.yaml#/AddressList
+            example:
+              addresses:
+                - addressId: 01JB0SA1D2D3R4E5S6S7H8Q9M0
+                  label: Home
+                  line1: 12, 4th Cross, Indiranagar
+                  line2: null
+                  landmark: Near the park
+                  pincode: "560038"
+                  lat: 12.9719
+                  lng: 77.6412
+                  isDefault: true
+                  updatedAt: "2026-10-24T09:30:00Z"
+                  version: 1
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  post:
+    operationId: createAddress
+    tags: [me]
+    summary: Save a new address
+    description: >-
+      Customer app only. The pin (`lat`, `lng`) is what the delivery radius is checked against
+      (01 §5.5). The first address is the default; `isDefault: true` makes this one the default
+      and clears the others. `422 validation_failed` on the field (`body.pincode` must be 6
+      digits not starting with 0) or on `body` when the caller already keeps the most addresses
+      allowed (20).
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/me.yaml#/AddressCreate
+          example:
+            label: Home
+            line1: 12, 4th Cross, Indiranagar
+            landmark: Near the park
+            pincode: "560038"
+            lat: 12.9719
+            lng: 77.6412
+    responses:
+      "201":
+        description: The address
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/me.yaml#/Address
+            example:
+              addressId: 01JB0SA1D2D3R4E5S6S7H8Q9M0
+              label: Home
+              line1: 12, 4th Cross, Indiranagar
+              line2: null
+              landmark: Near the park
+              pincode: "560038"
+              lat: 12.9719
+              lng: 77.6412
+              isDefault: true
+              updatedAt: "2026-10-24T09:30:00Z"
+              version: 1
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/me/addresses/{addressId}:
+  parameters:
+    - name: addressId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  patch:
+    operationId: updateAddress
+    tags: [me]
+    summary: Change a saved address
+    description: >-
+      Customer app only. `If-Match` is required (428 without it, 412 when stale). Another user's
+      address is 404. `isDefault: true` makes it the default and clears the others;
+      `isDefault: false` is refused on the default address (`422 validation_failed` on
+      `body.isDefault`: make another one the default instead). Orders already placed keep the
+      address they were placed with.
+    x-idempotency: none
+    parameters:
+      - $ref: ../common/parameters.yaml#/IfMatch
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/me.yaml#/AddressPatch
+          example:
+            landmark: Opposite the temple
+    responses:
+      "200":
+        description: The address after the change
+        headers:
+          ETag:
+            $ref: ../common/headers.yaml#/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/me.yaml#/Address
+            example:
+              addressId: 01JB0SA1D2D3R4E5S6S7H8Q9M0
+              label: Home
+              line1: 12, 4th Cross, Indiranagar
+              line2: null
+              landmark: Opposite the temple
+              pincode: "560038"
+              lat: 12.9719
+              lng: 77.6412
+              isDefault: true
+              updatedAt: "2026-10-24T10:00:00Z"
+              version: 2
+      default:
+        $ref: ../common/responses.yaml#/Problem
+  delete:
+    operationId: deleteAddress
+    tags: [me]
+    summary: Delete a saved address
+    description: >-
+      Customer app only. Another user's address is 404. Deleting the default makes the most
+      recently changed remaining address the default. Orders already placed keep their own copy
+      of the address.
+    x-idempotency: none
+    responses:
+      "204":
+        description: Deleted
+      default:
+        $ref: ../common/responses.yaml#/Problem
