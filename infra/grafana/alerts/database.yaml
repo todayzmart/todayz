@@ -1,0 +1,137 @@
+# Database alerts (05 §5; owner W3-07). Grafana alerting file provisioning, same layout and datasource uids as jobs.yaml. Alert files
+# are not wired into the local stack yet; routing (05 §5) is W5's contact points. The firing test is
+# backend/internal/rollups/alerts_test.go.
+#
+#   DB connections     app pool: mean acquire wait > 50 ms or connections > 80 % of max, for 5 min;
+#                      server: connections > 80 % of max_connections (postgres_exporter). warning
+#   Missing partition  a partitioned table has no partition covering now + 7 days. warning
+#
+# The pool exports a wait total, not a histogram, so "pool wait p95 > 50 ms" is read as the mean wait
+# per acquire over 5 min (TODO(lead): a wait histogram in platform/db would give the p95).
+# DB CPU > 80 % for 15 min and free storage < 20 % are RDS CloudWatch metrics: cloud only, no
+# CloudWatch datasource yet (TODO(lead): Wave 5).
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: database
+    folder: TodayZ
+    interval: 1m
+    rules:
+      # Mean wait per acquire, or the pool's connections against its max, per service.
+      - uid: tz-db-pool-saturated
+        title: 'DB connections (app pool)'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 300, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                max(
+                  (sum by (service) (rate(tz_db_pool_acquire_wait_seconds_total[5m])) / sum by (service) (rate(tz_db_pool_acquire_total[5m])) > 0.05)
+                  or (sum by (service) (tz_db_pool_total_connections) / sum by (service) (tz_db_pool_max_connections) > 0.8)
+                )
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        labels:
+          area: database
+          severity: warning
+        annotations:
+          summary: 'The app''s database pool is saturated'
+          description: 'Pool wait or use is past the line (mean wait 50 ms, 80 % of max connections). Check 03 · Database.'
+          runbook_url: docs/runbooks/database-connections.md
+          __dashboardUid__: todayz-03
+        isPaused: false
+
+      # postgres_exporter: backends across every client against max_connections.
+      - uid: tz-db-server-connections
+        title: 'DB connections (server)'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 300, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                sum(pg_stat_activity_count) / max(pg_settings_max_connections) > 0.8
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        labels:
+          area: database
+          severity: warning
+        annotations:
+          summary: 'Postgres is near max_connections'
+          description: '{{ $values.A.Value | humanizePercentage }} of max_connections are in use.'
+          runbook_url: docs/runbooks/database-connections.md
+          __dashboardUid__: todayz-03
+        isPaused: false
+
+      # Every parent in partition_policies needs a partition holding now + 7 days, so next month's
+      # partition exists a week before the month starts (and a daily table is 7 days ahead). The bound
+      # is read from pg_get_expr; a parent with no partition at all counts as missing too.
+      - uid: tz-db-missing-partition
+        title: 'Missing partition'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: todayz-postgres
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              editorMode: code
+              rawSql: |-
+                SELECT p.parent, CASE WHEN EXISTS (
+                    SELECT 1 FROM pg_inherits i JOIN pg_class c ON c.oid = i.inhrelid
+                    WHERE i.inhparent = to_regclass('public.' || p.parent)
+                      AND substring(pg_get_expr(c.relpartbound, c.oid) FROM $$FROM \('([^']+)'\)$$)::timestamptz <= now() + interval '7 days'
+                      AND substring(pg_get_expr(c.relpartbound, c.oid) FROM $$TO \('([^']+)'\)$$)::timestamptz > now() + interval '7 days'
+                  ) THEN 0 ELSE 1 END AS missing
+                FROM partition_policies p
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          area: database
+          severity: warning
+        annotations:
+          summary: '{{ $labels.parent }} has no partition 7 days ahead'
+          description: 'No partition of {{ $labels.parent }} covers now + 7 days. ensure_partitions (the partition_maintenance job) should have made it.'
+          runbook_url: docs/runbooks/database-missing-partition.md
+          __dashboardUid__: todayz-03
+        isPaused: false

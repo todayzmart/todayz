@@ -1,0 +1,128 @@
+# Client alerts (05 §5; owner W3-07). Grafana alerting file provisioning, same layout and datasource uids as jobs.yaml. Alert files
+# are not wired into the local stack yet; routing (05 §5) is W5's contact points. The firing test is
+# backend/internal/rollups/alerts_test.go.
+#
+#   Client errors          JS errors per page view > 2 % for 30 min. warning
+#   Client release errors  an app version's error rate over 30 min is 2× its app's rate over the
+#                          day before. warning
+#   RUM regression         p75 LCP on customer / or /search > 3 s for 1 h. warning
+#
+# RUM has no session counter, so "error sessions" is read as errors per page view (one LCP sample
+# per page load), with a floor of 100 page views (TODO(lead): a session id in the RUM beacon).
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: client
+    folder: TodayZ
+    interval: 1m
+    rules:
+      # Errors per page view by app.
+      - uid: tz-client-errors
+        title: 'Client errors'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 1800, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                (sum by (app) (rate(tz_rum_errors_total[30m])) / histogram_count(sum by (app) (rate(tz_rum_lcp_seconds[30m])))) > 0.02
+                and on (app) histogram_count(sum by (app) (increase(tz_rum_lcp_seconds[30m]))) >= 100
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 30m
+        labels:
+          area: client
+          severity: warning
+        annotations:
+          summary: '{{ $labels.app }}: JS errors on {{ $values.A.Value | humanizePercentage }} of page views'
+          description: 'Client errors (chunk-load failures included) per page view on {{ $labels.app }} are over 2 %.'
+          runbook_url: docs/runbooks/client-errors.md
+          __dashboardUid__: todayz-05
+        isPaused: false
+
+      # Each version against its app's previous day.
+      - uid: tz-client-release-errors
+        title: 'Client release errors'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 86400, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                (sum by (app, app_version) (rate(tz_rum_errors_total[30m])) / histogram_count(sum by (app, app_version) (rate(tz_rum_lcp_seconds[30m]))))
+                > on (app) group_left () 2 * (sum by (app) (rate(tz_rum_errors_total[1d] offset 30m)) / histogram_count(sum by (app) (rate(tz_rum_lcp_seconds[1d] offset 30m))))
+                and on (app, app_version) histogram_count(sum by (app, app_version) (increase(tz_rum_lcp_seconds[30m]))) >= 100
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 15m
+        labels:
+          area: client
+          severity: warning
+        annotations:
+          summary: '{{ $labels.app }} {{ $labels.app_version }} errors at twice the usual rate'
+          description: 'Version {{ $labels.app_version }} of {{ $labels.app }} has {{ $values.A.Value | humanizePercentage }} errors per page view, twice the previous day.'
+          runbook_url: docs/runbooks/client-errors.md
+          __dashboardUid__: todayz-05
+        isPaused: false
+
+      # p75 LCP per route over 1 h.
+      - uid: tz-client-rum-regression
+        title: 'RUM regression'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 3600, to: 0}
+            datasourceUid: prometheus
+            model:
+              refId: A
+              editorMode: code
+              instant: true
+              range: false
+              expr: |-
+                histogram_quantile(0.75, sum by (route) (rate(tz_rum_lcp_seconds{app="customer", route=~"/|/search"}[1h]))) > 3
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 1h
+        labels:
+          area: client
+          severity: warning
+        annotations:
+          summary: 'Customer {{ $labels.route }} p75 LCP over 3 s'
+          description: 'p75 LCP on {{ $labels.route }} is {{ $values.A.Value | humanizeDuration }} over the last hour (budget 2.5 s).'
+          runbook_url: docs/runbooks/client-rum-regression.md
+          __dashboardUid__: todayz-05
+        isPaused: false
