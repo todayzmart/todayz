@@ -1,8 +1,8 @@
 # W3-11 Retailer AI and shop coach: QA report
 
-Branch `claude/w3-11-coach-1a5eea`, 26 Oct 2026. There are 34 commits from `fbe6a53` (`git log main..HEAD`), with current `main` merged in at `17bef82` and again at `6a2c248`; the last is this report's update. Nothing has been pushed or merged.
+Branch `claude/w3-11-coach-1a5eea`, 26 Oct 2026. There are 35 commits from `fbe6a53` (`git log main..HEAD`), with current `main` merged in at `17bef82` and again at `6a2c248`; the last is this report's update. Nothing has been pushed or merged.
 
-- **Work package:** W3-11, scenarios SC-AI-10…42 (`e2e/scenarios/AI.md`).
+- **Work package:** W3-11, scenarios SC-AI-10…40 (`e2e/scenarios/AI.md`).
 - **Features:** AI-R2 supplier bill scan, AI-R3 shelf photo onboarding, AI-R4 insight sentences, AI-R5 review reply draft, AI-R6 shop coach wording, AI-R9 banner copy and AI-R10 banner image check, plus the coach (11 §2.1).
 - **Screens:** B-17 bill scan, B-18 shelf photo, B-19 coach, and the AI pieces in B-03, B-08 and B-11.
 
