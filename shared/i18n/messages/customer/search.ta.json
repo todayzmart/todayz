@@ -173,5 +173,75 @@
     "message": "பிறகு மீண்டும் தேடவும்",
     "review": "reviewed",
     "enHash": "71ecbf77"
+  },
+  "search.voice.start": {
+    "message": "பேசித் தேடுங்கள்",
+    "review": "reviewed",
+    "enHash": "5d977e06"
+  },
+  "search.voice.stop": {
+    "message": "நிறுத்தி, நான் சொன்னதைப் பயன்படுத்துங்கள்",
+    "review": "reviewed",
+    "enHash": "bf2d0f65"
+  },
+  "search.voice.listening": {
+    "message": "கேட்கிறோம்… {seconds} விநாடி மீதம். முடிந்ததும் நிறுத்து என்பதைத் தட்டுங்கள்.",
+    "review": "reviewed",
+    "enHash": "e9cc16f6"
+  },
+  "search.voice.working": {
+    "message": "நீங்கள் சொன்னதைப் படிக்கிறோம்…",
+    "review": "reviewed",
+    "enHash": "21fb1074"
+  },
+  "search.voice.heard": {
+    "message": "சொற்களைச் சரிபார்த்து, பிறகு தேடுங்கள்.",
+    "review": "reviewed",
+    "enHash": "d513ca1a"
+  },
+  "search.voice.capped": {
+    "message": "இன்றைக்கான பேசித் தேடல் முடிந்தது. தட்டச்சு செய்து தேடுங்கள்.",
+    "review": "reviewed",
+    "enHash": "73f669ed"
+  },
+  "search.voice.failed": {
+    "message": "பேசித் தேடல் இப்போது வேலை செய்யவில்லை. தட்டச்சு செய்து தேடுங்கள்.",
+    "review": "reviewed",
+    "enHash": "5a6a4c17"
+  },
+  "search.voice.denied": {
+    "message": "பேசித் தேட மைக்ரோஃபோனை அனுமதியுங்கள், அல்லது தட்டச்சு செய்யுங்கள்.",
+    "review": "reviewed",
+    "enHash": "9fa9a9df"
+  },
+  "search.voice.short": {
+    "message": "எங்களுக்குப் புரியவில்லை. மீண்டும் முயலுங்கள் அல்லது தட்டச்சு செய்யுங்கள்.",
+    "review": "reviewed",
+    "enHash": "acc0656d"
+  },
+  "search.assist.label": {
+    "message": "இந்தத் தேடலுக்கான பரிந்துரைகள்",
+    "review": "reviewed",
+    "enHash": "39d287b1"
+  },
+  "search.assist.query": {
+    "message": "“{query}” தேடுங்கள்",
+    "review": "reviewed",
+    "enHash": "705a8155"
+  },
+  "search.assist.maxPrice": {
+    "message": "{price}க்குள்",
+    "review": "reviewed",
+    "enHash": "8344ca3d"
+  },
+  "search.assist.brand": {
+    "message": "பிராண்ட்: {brand}",
+    "review": "reviewed",
+    "enHash": "0a347d6d"
+  },
+  "search.assist.applied": {
+    "message": "சேர்த்த வடிகட்டிகள்",
+    "review": "reviewed",
+    "enHash": "8111377d"
   }
 }

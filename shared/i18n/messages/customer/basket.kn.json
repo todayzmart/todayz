@@ -443,5 +443,110 @@
     "message": "ನಿಮ್ಮ ಪೂರ್ತಿ ಪಟ್ಟಿಗೆ ಒಂದೇ ಅಂಗಡಿ ಹುಡುಕಿ",
     "review": "reviewed",
     "enHash": "f8cab370"
+  },
+  "basket.paste.open": {
+    "message": "ಪಟ್ಟಿಯನ್ನು ಅಂಟಿಸಿ",
+    "review": "reviewed",
+    "enHash": "b4e62165"
+  },
+  "basket.paste.title": {
+    "message": "ಪೂರ್ತಿ ಪಟ್ಟಿಯನ್ನು ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "735ed34d"
+  },
+  "basket.paste.label": {
+    "message": "ನಿಮ್ಮ ಪಟ್ಟಿ",
+    "review": "reviewed",
+    "enHash": "07bcbd85"
+  },
+  "basket.paste.placeholder": {
+    "message": "1 ಕೆಜಿ ಆಟಾ, 2 ಪ್ಯಾಕೆಟ್ ಹಾಲು, 1 ಸೋಪು",
+    "review": "reviewed",
+    "enHash": "39602a59"
+  },
+  "basket.paste.help": {
+    "message": "ಅಲ್ಪವಿರಾಮದಿಂದ ಅಥವಾ ಸಾಲಿಗೊಂದು ವಸ್ತು, ಯಾವುದೇ ಭಾಷೆಯಲ್ಲಿ. ನೀವು ಪರಿಶೀಲಿಸುವವರೆಗೆ ಏನೂ ಸೇರುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "1fac4c44"
+  },
+  "basket.paste.read": {
+    "message": "ನನ್ನ ಪಟ್ಟಿ ಓದಿ",
+    "review": "reviewed",
+    "enHash": "b0122bd0"
+  },
+  "basket.paste.cancel": {
+    "message": "ರದ್ದುಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "basket.paste.reading": {
+    "message": "ನಿಮ್ಮ ಪಟ್ಟಿ ಓದುತ್ತಿದ್ದೇವೆ…",
+    "review": "reviewed",
+    "enHash": "91e1bb36"
+  },
+  "basket.paste.sendFailed": {
+    "message": "ನಿಮ್ಮ ಪಟ್ಟಿಯನ್ನು ಕಳುಹಿಸಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "7614ac2d"
+  },
+  "basket.paste.failed": {
+    "message": "ಆ ಪಟ್ಟಿಯನ್ನು ಓದಲಾಗಲಿಲ್ಲ. ವಸ್ತುಗಳನ್ನು ಒಂದೊಂದಾಗಿ ಸೇರಿಸಿ, ಅಥವಾ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "da5a4e5d"
+  },
+  "basket.paste.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "basket.paste.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "basket.paste.capped": {
+    "message": "ಇಂದಿನ ಪಟ್ಟಿ ಓದುವಿಕೆ ಮುಗಿದಿದೆ. ವಸ್ತುಗಳನ್ನು ಒಂದೊಂದಾಗಿ ಸೇರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "c568e746"
+  },
+  "basket.paste.review.title": {
+    "message": "ನಿಮ್ಮ ಪಟ್ಟಿಯನ್ನು ಪರಿಶೀಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "2a0475c3"
+  },
+  "basket.paste.review.help": {
+    "message": "ತಪ್ಪಾಗಿರುವುದನ್ನು ಬದಲಿಸಿ ಅಥವಾ ತೆಗೆದುಹಾಕಿ. ನೀವು ಉಳಿಸಿಕೊಂಡದ್ದು ಮಾತ್ರ ಬಾಸ್ಕೆಟ್‌ಗೆ ಸೇರುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "5db412e3"
+  },
+  "basket.paste.review.item": {
+    "message": "ವಸ್ತು {n}",
+    "review": "reviewed",
+    "enHash": "6f8c7dbc"
+  },
+  "basket.paste.review.remove": {
+    "message": "{name} ತೆಗೆದುಹಾಕಿ",
+    "review": "reviewed",
+    "enHash": "df7193a5"
+  },
+  "basket.paste.review.keep": {
+    "message": "ಉಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "466fc492"
+  },
+  "basket.paste.review.add": {
+    "message": "{count, plural, one {# ವಸ್ತುವನ್ನು ಬಾಸ್ಕೆಟ್‌ಗೆ ಸೇರಿಸಿ} other {# ವಸ್ತುಗಳನ್ನು ಬಾಸ್ಕೆಟ್‌ಗೆ ಸೇರಿಸಿ}}",
+    "review": "reviewed",
+    "enHash": "76bd7b4b"
+  },
+  "basket.paste.review.discard": {
+    "message": "ಪಟ್ಟಿಯನ್ನು ಬಿಡಿ",
+    "review": "reviewed",
+    "enHash": "4f59bf89"
+  },
+  "basket.paste.confirmFailed": {
+    "message": "ಆ ಸಾಲುಗಳನ್ನು ಸೇರಿಸಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "9d032a51"
   }
 }

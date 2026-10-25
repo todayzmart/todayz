@@ -354,5 +354,89 @@
   "basket.entry.body": {
     "defaultMessage": "Find one shop for your whole list",
     "description": "Home entry detail"
+  },
+  "basket.paste.open": {
+    "defaultMessage": "Paste a list",
+    "description": "C-22 opens the list box (AI-C1)"
+  },
+  "basket.paste.title": {
+    "defaultMessage": "Add a whole list",
+    "description": "C-22 accessible name of the list box"
+  },
+  "basket.paste.label": {
+    "defaultMessage": "Your list",
+    "description": "C-22 label of the list text box"
+  },
+  "basket.paste.placeholder": {
+    "defaultMessage": "1 kg atta, 2 packets of milk, 1 bar of soap",
+    "description": "C-22 example list"
+  },
+  "basket.paste.help": {
+    "defaultMessage": "Commas or one item per line, in any language. Nothing is added until you check it.",
+    "description": "C-22 help under the list box"
+  },
+  "basket.paste.read": {
+    "defaultMessage": "Read my list",
+    "description": "C-22 sends the list to be read"
+  },
+  "basket.paste.cancel": {
+    "defaultMessage": "Cancel",
+    "description": "C-22 closes the list box"
+  },
+  "basket.paste.reading": {
+    "defaultMessage": "Reading your list…",
+    "description": "C-22 while the draft is processing"
+  },
+  "basket.paste.sendFailed": {
+    "defaultMessage": "Your list couldn't be sent. Try again.",
+    "description": "C-22 when the list could not be sent"
+  },
+  "basket.paste.failed": {
+    "defaultMessage": "We couldn't read that list. Add the items one by one, or try again.",
+    "description": "C-22 when the draft failed or found nothing"
+  },
+  "basket.paste.retry": {
+    "defaultMessage": "Try again",
+    "description": "C-22 back to the list box"
+  },
+  "basket.paste.close": {
+    "defaultMessage": "Close",
+    "description": "C-22 closes the list notice"
+  },
+  "basket.paste.capped": {
+    "defaultMessage": "Reading lists is used up for today. Add the items one by one.",
+    "description": "C-22 at the daily cap"
+  },
+  "basket.paste.review.title": {
+    "defaultMessage": "Check your list",
+    "description": "C-22 heading of the draft lines"
+  },
+  "basket.paste.review.help": {
+    "defaultMessage": "Change or remove anything that's wrong. Only what you keep joins the basket.",
+    "description": "C-22 help above the draft lines"
+  },
+  "basket.paste.review.item": {
+    "defaultMessage": "Item {n}",
+    "description": "C-22 accessible name of a draft line text box"
+  },
+  "basket.paste.review.remove": {
+    "defaultMessage": "Remove {name}",
+    "description": "C-22 removes one draft line"
+  },
+  "basket.paste.review.keep": {
+    "defaultMessage": "Keep",
+    "description": "C-22 brings a removed draft line back"
+  },
+  "basket.paste.review.add": {
+    "defaultMessage": "{count, plural, one {Add # item to basket} other {Add # items to basket}}",
+    "description": "C-22 adds the kept lines to the basket editor"
+  },
+  "basket.paste.review.discard": {
+    "defaultMessage": "Discard list",
+    "description": "C-22 drops every draft line"
+  },
+  "basket.paste.confirmFailed": {
+    "defaultMessage": "Those lines couldn't be added. Try again.",
+    "description": "C-22 when the confirm failed"
   }
 }
