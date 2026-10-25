@@ -527,7 +527,7 @@ func formBody(t *testing.T, boundary string, fields [][3]string) (string, string
 
 func TestRequestHashMultipart(t *testing.T) {
 	hash := func(body, ct string) []byte {
-		r := httptest.NewRequest("POST", "/v1/x?a=1", strings.NewReader(body))
+		r := httptest.NewRequest(http.MethodPost, "/v1/x?a=1", strings.NewReader(body))
 		r.Header.Set("Content-Type", ct)
 		return requestHash(r, []byte(body))
 	}
@@ -555,7 +555,7 @@ func TestMiddlewareMultipartRetry(t *testing.T) {
 	key := ids.New(t0).String()
 	send := func(boundary string) *httptest.ResponseRecorder {
 		body, ct := formBody(t, boundary, [][3]string{{"photo", "\xff\xd8jpeg", "image/jpeg"}})
-		r := httptest.NewRequest("POST", "/v1/me/orders", strings.NewReader(body))
+		r := httptest.NewRequest(http.MethodPost, "/v1/me/orders", strings.NewReader(body))
 		r.Header.Set(HeaderKey, key)
 		r.Header.Set("Content-Type", ct)
 		w := httptest.NewRecorder()
