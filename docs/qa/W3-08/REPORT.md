@@ -116,6 +116,53 @@ W3-08 adds support tickets: the backend in `backend/internal/support`, the admin
   - The A-17 settings test from main requires every key to have a 01 §17 group, so `support_sla_*` now has a `support` group: the `AdminSettingGroup` enum in `backend/api/schemas/admin-settings.yaml`, `groupPrefixes` and `groupOrder` in `internal/admin/settings.go`, the A-17 label in `admin/src/settings/labels.ts` and `settings.group.support`.
   - The owner shell now reads `GET {S}/overview` (W3-03), so `business/e2e/help.spec.ts` answers it, as `sell.spec.ts` does.
 
+## Lead review of b45d936 (25 Oct)
+
+There were no conflict markers left after the merge. 01 had no support retention rule, so account deletion follows the lead's spec. All of this is recorded in D-226 and 01 §13 and §17.
+
+| # | Fix | Where | Tests |
+|---|---|---|---|
+| 1 | Account deletion: the identity deletion hook closes the customer's open customer tickets (`account_deleted`, audited), sets their subjects and the customer's messages to "Removed: the account was deleted.", and deletes their attachments, files first, then rows. If a file cannot be deleted, `503` rolls the whole deletion back. | `internal/support/retention.go`, `routes_support.go` | `TestAccountDeletion`, `TestAccountDeletionStorageDown`, `TestSupportHTTPAccountDeletion` (through `DELETE /v1/me`) |
+| 2 | Limits from settings: `support_open_tickets_max` 5 (`422 support_ticket_limit_reached`), `support_tickets_per_hour` 5 and `support_uploads_per_hour` 30 (`429 rate_limited`), under a per-person advisory lock. The `support_uploads_sweep` job (maintenance, hourly at :17) deletes uploads still unclaimed after `support_upload_ttl_hours` (24), files then rows; a file it fails to delete is kept for the next run. | migration 30802, `keys.go`, `support.go`, `internal/jobs/support.go`, contract descriptions | `TestOpenLimits`, `TestUploadLimit`, `TestSweepUploads`; the HTTP race test also hits the hourly limit at its default |
+| 3 | `Idempotency-Key` required on create, reply and note (customer, business, admin). The apps already send one (`useSend.ts`, `queries.ts`, `useIdempotent`). | `api/paths/*support.yaml` | `TestSupportHTTPIdempotency`: missing key 400 on all six routes; the same key and body replays the stored answer with one ticket or message; the same key with another body is 422 `idempotency_mismatch` |
+| 4 | An agent's reply on a `resolved` ticket clears `close_reason` and is audited `support.ticket_reopen` (resolved → waiting). | `support.sql`, `admin.go` | `TestReplyReopensResolved` |
+| 5 | An agent's upload records its ticket and is claimable only there. | migration 30802, `support.go` | `TestUploadSidesAndTickets`, `TestSupportHTTPAttachmentSides` |
+| 6 | `CountTickets` uses the partial index `ix_support_tickets_counts`. | migration 30802, `support.sql` | `TestCountTickets` (EXPLAIN shows the index) |
+| 7 | At claim, a HEAD request checks that the file exists with the declared size and type, else `422`. | `presign.go`, `support.go` | `TestClaimChecksTheObject` |
+
+New HTTP tests in `cmd/todayz/support_http_test.go`, against a fake private bucket:
+- **Authz.**
+  - Anonymous callers get 401 on the business, customer and admin routes.
+  - A cashier gets 403 listing, uploading and opening a ticket.
+  - The owner of A gets 403 on B's `{bid}`, and B's owner gets 403 on A's ticket. A's ticket under B's path is 404.
+  - A customer gets 404 on a business ticket and 403 on the inbox.
+  - Finance and analyst get 403 on `/v1/admin/tickets` and on reply; support gets 200.
+- **Concurrency.**
+  - An opener reply racing a resolve, five times: both land, and the timer always agrees with the status.
+  - Two claims of one upload: one 201 and one 422, and one message holds the file.
+  - Two opener replies on a waiting ticket: both 201 and one timer, due = first reply + `support_sla_normal_min`.
+- **Settings, then priority.** `support_sla_high_min` changed to 90, then the priority raised to high: due = start + 90 min, audited.
+- **Attachments across sides.** Six cross-side and cross-ticket claims are each refused with 422, including the same person as owner and as customer. The agent's own upload works on its ticket.
+
+The new HTTP test also caught a real bug: the sweep was declared with a 10-minute timeout, which D-98 refuses for a non-batched kind. It is now 1 minute; each batch checks the context, and the next hour's run picks up whatever is left.
+
+### Checks for the review fixes
+
+Run on 25 Oct, offline, against testcontainers Postgres and a fake private bucket (no MinIO, no cloud).
+
+| Area | Command | Result |
+|---|---|---|
+| Contract | `make gen`, `make check-contract-lint check-contract-client` | ok; api-client 42/42 |
+| Backend | `gofmt -l`, `go vet ./...`, settings lint, `golangci-lint run` on support, jobs, cmd/todayz | clean |
+| Backend | `go test -race` on internal/support, jobs, platform/settings, platform/authz, admin, identity, seed | all ok |
+| Backend | `go test -race ./cmd/todayz/...` | ok (119 s). The first run failed `TestBusinessAccountDeletion` and `TestIdentityHTTPDeleteMe` because the hook needed a settings cache it never reads; fixed, then rerun |
+| Backend | `go test -race -count=3 -run TestSupportHTTP ./cmd/todayz/` | ok 3/3, so the race tests are not flaky |
+| Customer | `tsc --noEmit`, `eslint src/help`, `vitest run` | clean; 142/142 |
+| Business | `tsc --noEmit`, `eslint src/help`, `vitest run` | clean; 424/424 |
+| i18n | `pnpm run gen`, `pnpm run lint:messages`, `vitest run` | 0 errors (warnings only, for ids built at run time); 198/198 |
+
+Not run: Playwright (no UI change beyond which error message is chosen), the full `make check` and `make e2e`.
+
 ## Checks run (area checks only)
 
 Run on 25 Oct after the merge, offline, against testcontainers Postgres and faked APIs. The e2e builds were rebuilt first (`build:e2e` in admin, business and customer).
@@ -158,3 +205,8 @@ Items 1–3 of the first report (translations, the nav entry, the support phone)
 2. **Reply time.** B-15 and C-19 say "Support will reply here." and show no reply time: the SLA is an internal target (01 §13 now says so). If the founder wants a promise shown, it is a copy change reading the same settings.
 3. **Notify.** Telling the opener about a reply is `internal/notify`'s (D-226 Open); W3-08 sends none.
 4. **Presigner.** `internal/support/presign.go` is a copy of `internal/business`'s until it moves to `platform/storage` (`TODO(lead)`).
+5. **Limit copy (needs the founder's yes, then translation).**
+   - B-15 and C-19 show `429 rate_limited` with the existing, already-translated "Too many tries. Wait a moment and try again." (`auth.error.rateLimited`), both for tickets and for uploads.
+   - `422 support_ticket_limit_reached` still shows the generic "That did not go through…". Proposed English: "You already have {max} open tickets. Reply in one of them, or wait for support to answer." I added no new strings, so nothing is translated without review.
+6. **Limit defaults.** 5 open, 5 per hour, 30 uploads per hour and a 24 h TTL are conservative guesses. Support can change them in A-17 without a deploy.
+7. **HEAD, DELETE and the test clock.** HEAD and DELETE are signed at the injected clock's time. Locally, if the test clock is moved far from real time, MinIO may reject the signature, which shows as `503` at claim or deletion. Uploads are presigned the same way already, so this is not new.

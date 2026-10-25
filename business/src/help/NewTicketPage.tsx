@@ -16,7 +16,7 @@ import { AttachmentPicker } from './Attachments';
 import { useAttachments } from './useAttachments';
 import { BODY_MAX, CATEGORIES, SUBJECT_MAX, SUBJECT_MIN } from './limits';
 import { canTickets } from './permissions';
-import { helpErrorKey, openTicket, useRecentOrders } from './queries';
+import { helpErrorId, openTicket, useRecentOrders } from './queries';
 import styles from './help.module.css';
 
 /** B-15 new ticket: for the owner and manager; a cashier is told to ask one of them. */
@@ -218,7 +218,7 @@ function TicketForm({ business }: { business: BusinessSummary }) {
       <AttachmentPicker id={`${id}-files`} att={att} />
       {action.error !== null && (
         <p role="alert" className="tz-field-error">
-          {intl.formatMessage({ id: `help.error.${helpErrorKey(action.error)}` })}
+          {intl.formatMessage({ id: helpErrorId(action.error) })}
         </p>
       )}
       <div className={styles.actions}>

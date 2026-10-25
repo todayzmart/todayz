@@ -1,3 +1,4 @@
+import { ApiError } from '@todayz/api-client';
 import type { MyTicketAttachment } from '@todayz/api-client/gen/model/myTicketAttachment';
 import { useCallback, useState, type ChangeEvent } from 'react';
 import { useIntl } from 'react-intl';
@@ -52,7 +53,11 @@ export function useAttachments(): Attachments {
             const a = await uploadFile(f);
             count += 1;
             setFiles((list) => [...list, a]);
-          } catch {
+          } catch (err) {
+            if (err instanceof ApiError && err.code === 'rate_limited') {
+              setError(intl.formatMessage({ id: 'auth.error.rateLimited' }));
+              return;
+            }
             setError(intl.formatMessage({ id: 'help.files.failed' }, { name: f.name }));
           }
         }

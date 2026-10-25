@@ -163,6 +163,9 @@ func (s *Service) openBiz(ctx context.Context, user, bid ids.ID, body bizapi.Biz
 			store = o.StoreID
 		}
 		now := s.now()
+		if err := s.openLimit(ctx, user, now); err != nil {
+			return err
+		}
 		due, err := s.slaDue(ctx, "normal", now)
 		if err != nil {
 			return err
@@ -181,7 +184,7 @@ func (s *Service) openBiz(ctx context.Context, user, bid ids.ID, body bizapi.Biz
 		}); err != nil {
 			return err
 		}
-		if err := s.claim(ctx, ids.UUID(ticket), msg, uploads, user, business); err != nil {
+		if err := s.claim(ctx, ids.UUID(ticket), msg, uploads, user, business, pgtype.UUID{}); err != nil {
 			return err
 		}
 		out, err = s.thread(ctx, bid, ticket)
@@ -225,7 +228,7 @@ func (s *Service) replyBiz(ctx context.Context, user, bid, ticket ids.ID, body b
 		}); err != nil {
 			return err
 		}
-		if err := s.claim(ctx, t.ID, msg, uploads, user, business); err != nil {
+		if err := s.claim(ctx, t.ID, msg, uploads, user, business, pgtype.UUID{}); err != nil {
 			return err
 		}
 		start, due, err := s.openerTimer(ctx, t, now)
@@ -250,7 +253,12 @@ func (s *Service) bizUpload(ctx context.Context, user, bid ids.ID, body bizapi.B
 	if err := s.storageReady(); err != nil {
 		return bizapi.BizAttachmentUpload{}, err
 	}
-	u, err := s.newUpload(ctx, user, ids.UUID(bid), "", body.FileName, string(body.ContentType), body.SizeBytes)
+	var u upload
+	err := s.db.InTx(ctx, func(ctx context.Context) error {
+		var err error
+		u, err = s.newUpload(ctx, user, ids.UUID(bid), pgtype.UUID{}, "", body.FileName, string(body.ContentType), body.SizeBytes)
+		return err
+	})
 	if err != nil {
 		return bizapi.BizAttachmentUpload{}, err
 	}

@@ -207,7 +207,7 @@
       The opener sees it. The ticket moves to `waiting` and its SLA stops; the first reply sets
       `firstResponseAt`. An unassigned ticket is assigned to the caller. `attachmentIds` are the caller's
       own uploads that no message holds yet. A closed ticket is `409 invalid_transition`.
-    x-idempotency: optional
+    x-idempotency: required
     parameters:
       - $ref: ../common/parameters.yaml#/IdempotencyKey
     requestBody:
@@ -242,7 +242,7 @@
     description: >-
       Support only: the opener never sees it. Status and SLA do not change. A closed ticket still takes
       notes.
-    x-idempotency: optional
+    x-idempotency: required
     parameters:
       - $ref: ../common/parameters.yaml#/IdempotencyKey
     requestBody:
@@ -310,9 +310,12 @@
     description: >-
       Records the attachment and returns a presigned PUT into the private bucket, valid for 15 minutes.
       The URL signs the Content-Type and the size, so the PUT sends exactly the returned headers. Send its
-      id in the next reply or note. JPEG, PNG, WebP or PDF, at most 10 MB. `503 service_unavailable` while
-      storage is not configured.
+      id in the next reply or note on this ticket. JPEG, PNG, WebP or PDF, at most 10 MB. At most
+      `support_uploads_per_hour` uploads per person in a rolling hour (`429 rate_limited`); on claim the
+      object must exist with the declared size and type (`422 validation_failed` otherwise).
+      `503 service_unavailable` while storage is not configured.
     x-idempotency: none
+    x-problems: [rate_limited]
     requestBody:
       required: true
       content:

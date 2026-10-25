@@ -44,6 +44,7 @@ type env struct {
 	biz   ids.ID
 	store ids.ID
 	other ids.ID // another business
+	s3    *fakeS3
 }
 
 func newEnv(t *testing.T) *env {
@@ -56,12 +57,13 @@ func newEnv(t *testing.T) *env {
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
 	st := settings.NewCache(settings.PGLoader(tdb.Pool), settings.Options{TTL: time.Hour, Log: log})
 	d := db.New(tdb.Pool)
+	s3 := newFakeS3(t)
 	svc, err := New(Deps{DB: d, Clock: clk, Settings: st, Audit: audit.New(d, clk, nil), Storage: config.Storage{
-		Endpoint: "http://127.0.0.1:9100", AccessKeyID: config.NewSecret([]byte("minio")),
+		Endpoint: s3.srv.URL, AccessKeyID: config.NewSecret([]byte("minio")),
 		SecretAccessKey: config.NewSecret([]byte("minio-secret")), BucketPrivate: "todayz-private",
 	}})
 	require.NoError(t, err)
-	e := &env{t: t, ctx: context.Background(), tdb: tdb, clk: clk, st: st, svc: svc, gen: ids.NewGenerator()}
+	e := &env{t: t, ctx: context.Background(), tdb: tdb, clk: clk, st: st, svc: svc, gen: ids.NewGenerator(), s3: s3}
 	e.owner = e.user("Lakshmi")
 	e.agent = e.user("Priya")
 	e.exec(`INSERT INTO admin_users (user_id, roles) VALUES ($1, '{support}')`, ids.UUID(e.agent))
@@ -358,7 +360,7 @@ func TestAttachments(t *testing.T) {
 	require.Equal(t, "2048", u.Upload.Headers.ContentLength)
 	put, err := url.Parse(u.Upload.Url)
 	require.NoError(t, err)
-	require.Equal(t, "127.0.0.1:9100", put.Host, "MinIO locally")
+	require.Equal(t, strings.TrimPrefix(e.s3.srv.URL, "http://"), put.Host, "the configured endpoint (MinIO locally)")
 	require.True(t, strings.HasPrefix(put.Path, "/todayz-private/support/businesses/"+e.biz.String()+"/"), put.Path)
 	require.Contains(t, put.Query().Get("X-Amz-SignedHeaders"), "content-length")
 
@@ -367,6 +369,7 @@ func TestAttachments(t *testing.T) {
 	_, err = e.svc.bizUpload(e.ctx, e.owner, e.biz, bizapi.BizAttachmentCreate{FileName: "x.exe", ContentType: "application/x-msdownload", SizeBytes: 10})
 	require.Equal(t, []string{"body.contentType"}, field(t, err))
 
+	e.s3.put(t, u.Upload.Url, "application/pdf", 2048)
 	th, err := e.svc.openBiz(e.ctx, e.owner, e.biz, bizapi.BizTicketCreate{Subject: "Statement", Body: "Attached.", Category: "payouts",
 		AttachmentIds: &[]string{u.Attachment.Id}})
 	require.NoError(t, err)
@@ -383,12 +386,14 @@ func TestAttachments(t *testing.T) {
 	manager := e.user("Suresh")
 	m, err := e.svc.bizUpload(e.ctx, manager, e.biz, bizapi.BizAttachmentCreate{FileName: "a.png", ContentType: "image/png", SizeBytes: 10})
 	require.NoError(t, err)
+	e.s3.put(t, m.Upload.Url, "image/png", 10)
 	_, err = e.svc.replyBiz(e.ctx, e.owner, e.biz, tid, bizapi.BizTicketMessageCreate{Body: "Theirs", AttachmentIds: &[]string{m.Attachment.Id}})
 	require.Equal(t, []string{"body.attachmentIds"}, field(t, err))
 	// An agent's upload goes on a reply or a note.
 	a, err := e.svc.adminUpload(e.ctx, e.agent, tid, adminapi.TicketAttachmentCreate{FileName: "utr.jpg", ContentType: "image/jpeg", SizeBytes: 500})
 	require.NoError(t, err)
 	require.Contains(t, a.Upload.Url, "/todayz-private/support/admin/")
+	e.s3.put(t, a.Upload.Url, "image/jpeg", 500)
 	d, err := e.svc.adminMessage(e.ctx, e.agent, tid, "reply", adminapi.TicketMessageRequest{Body: "Here is the UTR.", AttachmentIds: &[]string{a.Attachment.Id}})
 	require.NoError(t, err)
 	require.Len(t, d.Messages[1].Attachments, 1)

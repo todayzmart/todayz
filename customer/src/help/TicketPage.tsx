@@ -11,7 +11,7 @@ import { useFmt } from '../home/format';
 import { AttachmentLinks, AttachmentPicker } from './Attachments';
 import { STATUS_TONE } from './labels';
 import { BODY_MAX } from './limits';
-import { helpErrorKey, sendMessage, useThread } from './queries';
+import { helpErrorId, sendMessage, useThread } from './queries';
 import { SignedInOnly } from './SignedInOnly';
 import { useAttachments } from './useAttachments';
 import { useSend } from './useSend';
@@ -166,7 +166,7 @@ function ReplyBox({ thread }: { thread: MyTicketThread }) {
       <AttachmentPicker id={`${id}-files`} att={att} />
       {send.error !== null && (
         <p role="alert" className="tz-field-error">
-          {intl.formatMessage({ id: `help.error.${helpErrorKey(send.error)}` })}
+          {intl.formatMessage({ id: helpErrorId(send.error) })}
         </p>
       )}
       <div className={styles.actions}>

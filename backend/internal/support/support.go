@@ -49,6 +49,7 @@ import (
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/config"
 	"github.com/todayz/backend/internal/platform/db"
+	"github.com/todayz/backend/internal/platform/httpx"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/settings"
@@ -79,6 +80,8 @@ type Deps struct {
 	Settings *settings.Cache
 	Audit    *audit.Writer
 	Storage  config.Storage
+	// NoEgress is config.Config.NoEgress: the storage calls then reach loopback only.
+	NoEgress bool
 }
 
 // Service implements the business and admin support routes.
@@ -101,9 +104,13 @@ func New(d Deps) (*Service, error) {
 	if d.Clock == nil {
 		return nil, errors.New("support: a clock is required")
 	}
+	p := newPresigner(d.Storage)
+	if p != nil {
+		p.client = httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: d.NoEgress})
+	}
 	return &Service{
 		db: d.DB, clock: d.Clock, settings: d.Settings, audit: d.Audit,
-		presign: newPresigner(d.Storage), ids: ids.NewGenerator(),
+		presign: p, ids: ids.NewGenerator(),
 	}, nil
 }
 
@@ -190,9 +197,11 @@ const (
 )
 
 // newUpload validates the file, records the upload as the uploader's (and
-// the business's, when business is set) and signs the PUT. prefix is
-// prefixAdmin or prefixCustomers; a business upload goes under the business.
-func (s *Service) newUpload(ctx context.Context, uploader ids.ID, business pgtype.UUID, prefix, fileName, contentType string, size int64) (upload, error) {
+// the business's, when business is set; the ticket's, when ticket is set:
+// an agent's upload) and signs the PUT. prefix is prefixAdmin or
+// prefixCustomers; a business upload goes under the business. It runs in a
+// transaction: past support_uploads_per_hour in the last hour it is 429.
+func (s *Service) newUpload(ctx context.Context, uploader ids.ID, business, ticket pgtype.UUID, prefix, fileName, contentType string, size int64) (upload, error) {
 	fileName = strings.TrimSpace(fileName)
 	if fileName == "" || utf8.RuneCountInString(fileName) > 120 { //settings:ok contract bound (fileName ≤ 120)
 		return upload{}, fieldErr("body.fileName", "1 to 120 characters")
@@ -204,13 +213,16 @@ func (s *Service) newUpload(ctx context.Context, uploader ids.ID, business pgtyp
 		return upload{}, fieldErr("body.sizeBytes", "must be between 1 byte and 10 MB")
 	}
 	now := s.now()
+	if err := s.uploadLimit(ctx, uploader, now); err != nil {
+		return upload{}, err
+	}
 	id := s.ids.New(now)
 	if business.Valid {
 		prefix = "support/businesses/" + idString(business) + "/"
 	}
 	key := prefix + id.String()
 	if err := s.q(ctx).InsertAttachment(ctx, supportdb.InsertAttachmentParams{
-		ID: ids.UUID(id), UploadedBy: ids.UUID(uploader), BusinessID: business, ObjectKey: key,
+		ID: ids.UUID(id), UploadedBy: ids.UUID(uploader), BusinessID: business, TicketID: ticket, ObjectKey: key,
 		ContentType: contentType, SizeBytes: int32(size), FileName: fileName, Now: now, //nolint:gosec // size ≤ 10 MB, checked above
 	}); err != nil {
 		return upload{}, err
@@ -248,20 +260,103 @@ func attachmentIDs(in *[]string) ([]pgtype.UUID, error) {
 }
 
 // claim links the uploads to the message. Every id must be an upload of the
-// caller, of the same business (none when business is not set), that no
-// message holds yet.
-func (s *Service) claim(ctx context.Context, ticket, message pgtype.UUID, uploads []pgtype.UUID, uploader ids.ID, business pgtype.UUID) error {
+// caller, of the same business (none when business is not set), asked for on
+// this ticket when uploadTicket is set (an agent's) or on none, younger than
+// support_upload_ttl_hours, that no message holds yet; and its object must be
+// in the bucket with the declared size and type (a HEAD each, while the rows
+// are locked). Anything else is 422 on body.attachmentIds; storage that does
+// not answer is 503.
+func (s *Service) claim(ctx context.Context, ticket, message pgtype.UUID, uploads []pgtype.UUID, uploader ids.ID, business, uploadTicket pgtype.UUID) error {
 	if len(uploads) == 0 {
 		return nil
 	}
-	n, err := s.q(ctx).ClaimAttachments(ctx, supportdb.ClaimAttachmentsParams{
+	if err := s.storageReady(); err != nil {
+		return err
+	}
+	ttl, err := s.settings.Duration(ctx, settings.SupportUploadTTLHours)
+	if err != nil {
+		return err
+	}
+	now := s.now()
+	rows, err := s.q(ctx).ClaimAttachments(ctx, supportdb.ClaimAttachmentsParams{
 		TicketID: ticket, MessageID: message, Ids: uploads, UploadedBy: ids.UUID(uploader), BusinessID: business,
+		UploadTicket: uploadTicket, NotBefore: now.Add(-ttl),
 	})
 	if err != nil {
 		return err
 	}
-	if n != int64(len(uploads)) {
-		return fieldErr("body.attachmentIds", "must be your own uploads that no message holds yet")
+	if len(rows) != len(uploads) {
+		return fieldErr("body.attachmentIds", "must be your own recent uploads that no message holds yet")
+	}
+	for _, r := range rows {
+		obj, err := s.presign.head(ctx, r.ObjectKey, now)
+		if errors.Is(err, errNoObject) {
+			return fieldErr("body.attachmentIds", "every file must be uploaded first")
+		}
+		if err != nil {
+			telemetry.Logger(ctx).ErrorContext(ctx, "support: storage HEAD failed", "error", err)
+			return problem.Wrap(genproblems.ServiceUnavailable, err)
+		}
+		if obj.size != int64(r.SizeBytes) || obj.contentType != r.ContentType {
+			return fieldErr("body.attachmentIds", "every file must match its declared size and type")
+		}
+	}
+	return nil
+}
+
+// --- limits (01 §13, D-226) ----------------------------------------------------------
+
+// lockUser serialises one person's ticket openings and uploads until the
+// transaction ends, so two requests cannot both pass a limit.
+func (s *Service) lockUser(ctx context.Context, user ids.ID) error {
+	return s.q(ctx).LockSupportUser(ctx, "support:"+user.String())
+}
+
+// openLimit refuses a new ticket while the person has
+// support_open_tickets_max tickets open or waiting (422
+// support_ticket_limit_reached), or opened support_tickets_per_hour in the
+// last hour (429 rate_limited). Call it inside the opening's transaction.
+func (s *Service) openLimit(ctx context.Context, user ids.ID, now time.Time) error {
+	if err := s.lockUser(ctx, user); err != nil {
+		return err
+	}
+	maxOpen, err := s.settings.Int(ctx, settings.SupportOpenTicketsMax)
+	if err != nil {
+		return err
+	}
+	perHour, err := s.settings.Int(ctx, settings.SupportTicketsPerHour)
+	if err != nil {
+		return err
+	}
+	load, err := s.q(ctx).OpenerLoad(ctx, supportdb.OpenerLoadParams{UserID: ids.UUID(user), Since: now.Add(-time.Hour)})
+	if err != nil {
+		return err
+	}
+	if int64(load.Active) >= maxOpen {
+		return problem.New(genproblems.SupportTicketLimitReached, "")
+	}
+	if int64(load.Recent) >= perHour {
+		return problem.New(genproblems.RateLimited, "")
+	}
+	return nil
+}
+
+// uploadLimit refuses an upload past support_uploads_per_hour in the last
+// hour (429 rate_limited). Call it inside the upload's transaction.
+func (s *Service) uploadLimit(ctx context.Context, user ids.ID, now time.Time) error {
+	if err := s.lockUser(ctx, user); err != nil {
+		return err
+	}
+	perHour, err := s.settings.Int(ctx, settings.SupportUploadsPerHour)
+	if err != nil {
+		return err
+	}
+	n, err := s.q(ctx).CountRecentUploads(ctx, supportdb.CountRecentUploadsParams{UploadedBy: ids.UUID(user), Since: now.Add(-time.Hour)})
+	if err != nil {
+		return err
+	}
+	if int64(n) >= perHour {
+		return problem.New(genproblems.RateLimited, "")
 	}
 	return nil
 }

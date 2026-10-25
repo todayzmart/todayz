@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/go-chi/chi/v5"
 
+	"github.com/todayz/backend/internal/identity"
 	"github.com/todayz/backend/internal/platform/audit"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/support"
@@ -16,7 +17,7 @@ import (
 func mountSupport(r chi.Router, d *deps) {
 	sd := support.Deps{DB: d.DB, Clock: d.Clock, Settings: d.Settings}
 	if d.Config != nil {
-		sd.Storage = d.Config.Storage
+		sd.Storage, sd.NoEgress = d.Config.Storage, d.Config.NoEgress
 	}
 	if d.DB != nil {
 		var hashKey []byte
@@ -34,4 +35,7 @@ func mountSupport(r chi.Router, d *deps) {
 		az = d.Authz
 	}
 	support.Register(r, svc, az)
+	if d.Identity != nil {
+		d.Identity.AddDeletionHook(identity.OnDeleteFunc(svc.OnAccountDelete))
+	}
 }

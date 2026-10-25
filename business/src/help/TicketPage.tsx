@@ -14,7 +14,7 @@ import { useAttachments } from './useAttachments';
 import { STATUS_TONE } from './labels';
 import { BODY_MAX } from './limits';
 import { canTickets } from './permissions';
-import { helpErrorKey, sendMessage, useThread } from './queries';
+import { helpErrorId, sendMessage, useThread } from './queries';
 import styles from './help.module.css';
 
 /** B-15 ticket: the thread with support and the reply box. */
@@ -184,7 +184,7 @@ function ReplyBox({ bid, thread }: { bid: string; thread: BizTicketThread }) {
       <AttachmentPicker id={`${id}-files`} att={att} />
       {action.error !== null && (
         <p role="alert" className="tz-field-error">
-          {intl.formatMessage({ id: `help.error.${helpErrorKey(action.error)}` })}
+          {intl.formatMessage({ id: helpErrorId(action.error) })}
         </p>
       )}
       <div className={styles.actions}>

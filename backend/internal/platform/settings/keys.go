@@ -162,10 +162,14 @@ const (
 	RiskOTPPhonesPerIPHour   Key = "risk_otp_phones_per_ip_hour"    // count, default 10
 	RiskOTPFailedPerPhoneDay Key = "risk_otp_failed_per_phone_day"  // count, default 3
 
-	// Added by support tickets (D-226; seeded by 30801_w3-08_support.sql)
-	SupportSlaUrgentMin Key = "support_sla_urgent_min" // minutes, default 60
-	SupportSlaHighMin   Key = "support_sla_high_min"   // minutes, default 240
-	SupportSlaNormalMin Key = "support_sla_normal_min" // minutes, default 1440
+	// Added by support tickets (D-226; seeded by 30801_w3-08_support.sql and 30802_w3-08_support_limits.sql)
+	SupportSlaUrgentMin   Key = "support_sla_urgent_min"   // minutes, default 60
+	SupportSlaHighMin     Key = "support_sla_high_min"     // minutes, default 240
+	SupportSlaNormalMin   Key = "support_sla_normal_min"   // minutes, default 1440
+	SupportOpenTicketsMax Key = "support_open_tickets_max" // count, default 5
+	SupportTicketsPerHour Key = "support_tickets_per_hour" // count, default 5
+	SupportUploadsPerHour Key = "support_uploads_per_hour" // count, default 30
+	SupportUploadTTLHours Key = "support_upload_ttl_hours" // hours, default 24
 )
 
 // AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101, D-110, D-131, D-218, D-222, D-225, D-226).
@@ -302,4 +306,8 @@ var AllKeys = []Key{
 	SupportSlaUrgentMin,
 	SupportSlaHighMin,
 	SupportSlaNormalMin,
+	SupportOpenTicketsMax,
+	SupportTicketsPerHour,
+	SupportUploadsPerHour,
+	SupportUploadTTLHours,
 }

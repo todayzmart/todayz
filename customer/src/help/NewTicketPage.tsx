@@ -10,7 +10,7 @@ import { useId, useState, type FormEvent } from 'react';
 import { useIntl } from 'react-intl';
 import { AttachmentPicker } from './Attachments';
 import { BODY_MAX, CATEGORIES, SUBJECT_MAX, SUBJECT_MIN } from './limits';
-import { helpErrorKey, openTicket, useRecentOrders } from './queries';
+import { helpErrorId, openTicket, useRecentOrders } from './queries';
 import { SignedInOnly } from './SignedInOnly';
 import { useAttachments } from './useAttachments';
 import { useSend } from './useSend';
@@ -165,7 +165,7 @@ function TicketForm({ orderId: preset }: { orderId?: string | undefined }) {
       <AttachmentPicker id={`${id}-files`} att={att} />
       {send.error !== null && (
         <p role="alert" className="tz-field-error">
-          {intl.formatMessage({ id: `help.error.${helpErrorKey(send.error)}` })}
+          {intl.formatMessage({ id: helpErrorId(send.error) })}
         </p>
       )}
       <div className={styles.actions}>

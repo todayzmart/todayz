@@ -1,9 +1,13 @@
 package support
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
+	"io"
+	"net/http"
 	"net/url"
 	"sort"
 	"strconv"
@@ -15,7 +19,8 @@ import (
 
 // Presigned uploads and downloads in the private bucket (R2 deployed, MinIO
 // locally): AWS Signature Version 4 query signing, which both speak. No SDK
-// (D-97).
+// (D-97). The server's own HEAD (at claim time) and DELETE (account deletion,
+// the unclaimed-upload sweep) use the same signed URLs.
 //
 // TODO(lead): a copy of internal/business/presign.go plus getURL (domains do
 // not import each other's internals). It belongs in a platform/storage
@@ -34,6 +39,8 @@ type presigner struct {
 	bucket       string
 	accessKey    string
 	secretKey    string
+	// client makes the HEAD and DELETE calls (httpx.NewOutboundClient; set by New).
+	client *http.Client
 }
 
 // newPresigner returns nil unless the endpoint (or R2 account), both keys
@@ -76,6 +83,63 @@ func (p *presigner) getURL(key string, now time.Time) string {
 		Region: storageRegion, AccessKey: p.accessKey, SecretKey: p.secretKey,
 		Time: now, Expires: uploadTTL,
 	})
+}
+
+// errNoObject is HEAD's 404: nothing was uploaded under the key.
+var errNoObject = errors.New("support: no such object")
+
+// object is what HEAD says about an uploaded object.
+type object struct {
+	size        int64
+	contentType string
+}
+
+// head reads the object's size and type (a signed HEAD).
+func (p *presigner) head(ctx context.Context, key string, now time.Time) (object, error) {
+	res, err := p.do(ctx, http.MethodHead, key, now)
+	if err != nil {
+		return object{}, err
+	}
+	defer res.Body.Close()
+	switch {
+	case res.StatusCode == http.StatusNotFound:
+		return object{}, errNoObject
+	case res.StatusCode != http.StatusOK:
+		return object{}, errors.New("support: storage HEAD answered " + res.Status)
+	}
+	return object{size: res.ContentLength, contentType: res.Header.Get("Content-Type")}, nil
+}
+
+// remove deletes the object (a signed DELETE). An object that is not there
+// counts as removed, so a retry after a partial run is fine.
+func (p *presigner) remove(ctx context.Context, key string, now time.Time) error {
+	res, err := p.do(ctx, http.MethodDelete, key, now)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+	_, _ = io.Copy(io.Discard, io.LimitReader(res.Body, 4<<10))
+	switch res.StatusCode {
+	case http.StatusOK, http.StatusNoContent, http.StatusNotFound:
+		return nil
+	}
+	return errors.New("support: storage DELETE answered " + res.Status)
+}
+
+func (p *presigner) do(ctx context.Context, method, key string, now time.Time) (*http.Response, error) {
+	if p.client == nil {
+		return nil, errNoStorage
+	}
+	u := presignURL(presignInput{
+		Method: method, Scheme: p.scheme, Host: p.host, Path: "/" + p.bucket + "/" + key,
+		Region: storageRegion, AccessKey: p.accessKey, SecretKey: p.secretKey,
+		Time: now, Expires: uploadTTL,
+	})
+	req, err := http.NewRequestWithContext(ctx, method, u, nil)
+	if err != nil {
+		return nil, err
+	}
+	return p.client.Do(req)
 }
 
 type presignInput struct {

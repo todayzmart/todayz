@@ -280,7 +280,11 @@ func (s *Service) setPriority(ctx context.Context, actor, ticket ids.ID, priorit
 // waiting (the SLA stops) and assigns an unassigned ticket to the agent; a
 // note changes nothing else and is the one thing a closed ticket still takes.
 func (s *Service) adminMessage(ctx context.Context, actor, ticket ids.ID, kind string, body adminapi.TicketMessageRequest) (adminapi.TicketDetail, error) {
-	if err := s.ready(ctx); err != nil {
+	ready := s.ready
+	if kind == "reply" {
+		ready = s.auditReady // a reply on a resolved ticket reopens it, audited
+	}
+	if err := ready(ctx); err != nil {
 		return adminapi.TicketDetail{}, err
 	}
 	text, err := cleanBody(body.Body)
@@ -302,13 +306,26 @@ func (s *Service) adminMessage(ctx context.Context, actor, ticket ids.ID, kind s
 		}); err != nil {
 			return err
 		}
-		if err := s.claim(ctx, t.ID, msg, uploads, actor, pgtype.UUID{}); err != nil {
+		if err := s.claim(ctx, t.ID, msg, uploads, actor, pgtype.UUID{}, t.ID); err != nil {
 			return err
 		}
 		if kind == "note" {
 			return q.TouchTicket(ctx, t.ID)
 		}
-		return q.TicketAfterAgentReply(ctx, supportdb.TicketAfterAgentReplyParams{Now: now, AssigneeID: ids.UUID(actor), ID: t.ID})
+		if err := q.TicketAfterAgentReply(ctx, supportdb.TicketAfterAgentReplyParams{Now: now, AssigneeID: ids.UUID(actor), ID: t.ID}); err != nil {
+			return err
+		}
+		if t.Status != "resolved" {
+			return nil
+		}
+		// A reply on a resolved ticket reopens it for the opener: waiting, the
+		// resolve reason cleared.
+		_, err := s.audit.Write(ctx, audit.Entry{
+			ActorKind: audit.ActorAdmin, ActorID: actor, Action: "support.ticket_reopen",
+			SubjectType: "support_ticket", SubjectID: ticket.String(),
+			Before: map[string]any{"status": "resolved"}, After: map[string]any{"status": "waiting"},
+		})
+		return err
 	})
 }
 
@@ -361,13 +378,13 @@ func (s *Service) adminUpload(ctx context.Context, actor, ticket ids.ID, body ad
 	}
 	var u upload
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
-		if _, err := s.q(ctx).LockTicket(ctx, ids.UUID(ticket)); db.IsNoRows(err) {
+		t, err := s.q(ctx).LockTicket(ctx, ids.UUID(ticket))
+		if db.IsNoRows(err) {
 			return notFound()
 		} else if err != nil {
 			return err
 		}
-		var err error
-		u, err = s.newUpload(ctx, actor, pgtype.UUID{}, prefixAdmin, body.FileName, string(body.ContentType), body.SizeBytes)
+		u, err = s.newUpload(ctx, actor, pgtype.UUID{}, t.ID, prefixAdmin, body.FileName, string(body.ContentType), body.SizeBytes)
 		return err
 	})
 	if err != nil {

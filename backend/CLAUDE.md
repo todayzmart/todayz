@@ -203,4 +203,9 @@ The SLA due time reads `support_sla_<priority>_min` at the moment it is set, fro
 a priority change (`POST /v1/admin/tickets/{ticketId}/priority`) moves it to `sla_started_at` plus
 the new minutes; notes never leave the admin side; assign, priority, resolve and close write
 `audit_log` rows; attachments go through `presign.go` into the
-private bucket (MinIO locally), claimed once by their uploader's message.
+private bucket (MinIO locally), claimed once by their uploader's message. After the lead's review (D-226):
+per-person limits from settings (`support_open_tickets_max`, `support_tickets_per_hour`,
+`support_uploads_per_hour`) under a per-person advisory lock, a HEAD check of the object at claim, an agent's
+upload tied to its ticket, the `support_uploads_sweep` maintenance job (`support_upload_ttl_hours`),
+and the identity deletion hook (`retention.go`) that closes, blanks and deletes a deleted customer's
+support data.

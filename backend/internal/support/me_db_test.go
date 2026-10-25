@@ -143,6 +143,8 @@ func TestCustomerAttachments(t *testing.T) {
 
 	b, err := e.svc.bizUpload(e.ctx, e.owner, e.biz, bizapi.BizAttachmentCreate{FileName: "stmt.pdf", ContentType: "application/pdf", SizeBytes: 100})
 	require.NoError(t, err)
+	e.s3.put(t, u.Upload.Url, "image/jpeg", 900)
+	e.s3.put(t, b.Upload.Url, "application/pdf", 100)
 	_, err = e.svc.openMe(e.ctx, e.owner, meapi.MyTicketCreate{Category: "other", Subject: "Mixed", Body: "x", AttachmentIds: &[]string{b.Attachment.Id}})
 	require.Equal(t, []string{"body.attachmentIds"}, field(t, err), "a business upload is not a customer's")
 	_, err = e.svc.openBiz(e.ctx, e.owner, e.biz, bizapi.BizTicketCreate{Subject: "Mixed", Body: "x", Category: "other", AttachmentIds: &[]string{u.Attachment.Id}})

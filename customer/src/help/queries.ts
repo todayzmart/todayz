@@ -84,15 +84,17 @@ export async function uploadFile(file: File): Promise<MyTicketAttachment> {
   return made.attachment;
 }
 
-/** The i18n key suffix (`help.error.<suffix>`) for a failed call; unknown codes are `generic`. */
-export function helpErrorKey(err: unknown): string {
+/** The message id for a failed call; unknown codes are `help.error.generic`. */
+export function helpErrorId(err: unknown): string {
   if (err instanceof ApiError) {
     switch (err.code) {
       case 'validation_failed':
       case 'not_found':
       case 'invalid_transition':
-        return err.code;
+        return `help.error.${err.code}`;
+      case 'rate_limited':
+        return 'auth.error.rateLimited';
     }
   }
-  return 'generic';
+  return 'help.error.generic';
 }

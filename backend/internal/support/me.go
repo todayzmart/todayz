@@ -146,6 +146,9 @@ func (s *Service) openMe(ctx context.Context, user ids.ID, body meapi.MyTicketCr
 			store = o.StoreID
 		}
 		now := s.now()
+		if err := s.openLimit(ctx, user, now); err != nil {
+			return err
+		}
 		due, err := s.slaDue(ctx, "normal", now)
 		if err != nil {
 			return err
@@ -164,7 +167,7 @@ func (s *Service) openMe(ctx context.Context, user ids.ID, body meapi.MyTicketCr
 		}); err != nil {
 			return err
 		}
-		if err := s.claim(ctx, ids.UUID(ticket), msg, uploads, user, pgtype.UUID{}); err != nil {
+		if err := s.claim(ctx, ids.UUID(ticket), msg, uploads, user, pgtype.UUID{}, pgtype.UUID{}); err != nil {
 			return err
 		}
 		out, err = s.meThread(ctx, user, ticket)
@@ -207,7 +210,7 @@ func (s *Service) replyMe(ctx context.Context, user, ticket ids.ID, body meapi.M
 		}); err != nil {
 			return err
 		}
-		if err := s.claim(ctx, t.ID, msg, uploads, user, pgtype.UUID{}); err != nil {
+		if err := s.claim(ctx, t.ID, msg, uploads, user, pgtype.UUID{}, pgtype.UUID{}); err != nil {
 			return err
 		}
 		start, due, err := s.openerTimer(ctx, t, now)
@@ -232,7 +235,12 @@ func (s *Service) meUpload(ctx context.Context, user ids.ID, body meapi.MyTicket
 	if err := s.storageReady(); err != nil {
 		return meapi.MyTicketAttachmentUpload{}, err
 	}
-	u, err := s.newUpload(ctx, user, pgtype.UUID{}, prefixCustomers, body.FileName, string(body.ContentType), body.SizeBytes)
+	var u upload
+	err := s.db.InTx(ctx, func(ctx context.Context) error {
+		var err error
+		u, err = s.newUpload(ctx, user, pgtype.UUID{}, pgtype.UUID{}, prefixCustomers, body.FileName, string(body.ContentType), body.SizeBytes)
+		return err
+	})
 	if err != nil {
 		return meapi.MyTicketAttachmentUpload{}, err
 	}

@@ -14,19 +14,80 @@ RETURNING id;
 INSERT INTO support_messages (id, ticket_id, author_type, author_user_id, kind, body, created_at)
 VALUES (@id, @ticket_id, @author_type, @author_user_id, @kind, @body, @now);
 
--- name: ClaimAttachments :execrows
--- Links the caller's own unclaimed uploads to a message. The caller checks the row count
--- against the ids it sent; fewer means one was not theirs or was already used. The
--- business must match exactly: a business's upload never goes on a customer's or an
--- agent's message, nor theirs on a business's.
+-- name: ClaimAttachments :many
+-- Links the caller's own unclaimed uploads to a message and returns them, so the caller
+-- can check the count against the ids it sent (fewer means one was not theirs, was
+-- already used or is past support_upload_ttl_hours) and then the objects in the bucket.
+-- The business must match exactly: a business's upload never goes on a customer's or an
+-- agent's message, nor theirs on a business's. An agent's upload records the ticket it
+-- was asked for and goes on a message of that ticket only; a customer's or business's
+-- has none until now (upload_ticket is NULL for them).
 UPDATE support_attachments
 SET ticket_id = @ticket_id, message_id = @message_id
 WHERE id = ANY(@ids::uuid[]) AND uploaded_by = @uploaded_by AND message_id IS NULL
-  AND business_id IS NOT DISTINCT FROM sqlc.narg('business_id')::uuid;
+  AND business_id IS NOT DISTINCT FROM sqlc.narg('business_id')::uuid
+  AND ticket_id IS NOT DISTINCT FROM sqlc.narg('upload_ticket')::uuid
+  AND created_at > @not_before::timestamptz
+RETURNING id, object_key, content_type, size_bytes;
 
 -- name: InsertAttachment :exec
-INSERT INTO support_attachments (id, uploaded_by, business_id, object_key, content_type, size_bytes, file_name, created_at)
-VALUES (@id, @uploaded_by, sqlc.narg('business_id'), @object_key, @content_type, @size_bytes, @file_name, @now);
+INSERT INTO support_attachments (id, uploaded_by, business_id, ticket_id, object_key, content_type, size_bytes, file_name, created_at)
+VALUES (@id, @uploaded_by, sqlc.narg('business_id'), sqlc.narg('ticket_id'), @object_key, @content_type, @size_bytes, @file_name, @now);
+
+-- name: LockSupportUser :exec
+-- Serialises one person's ticket openings and uploads (the limits below read, then
+-- write) for the rest of the transaction. lock_key is 'support:' and the user id.
+SELECT pg_advisory_xact_lock(hashtextextended(@lock_key::text, 0));
+
+-- name: OpenerLoad :one
+-- The person's tickets open or waiting now, and those they opened since @since.
+SELECT (SELECT count(*) FROM support_tickets a WHERE a.opener_user_id = @user_id AND a.status IN ('open','waiting'))::int AS active,
+       (SELECT count(*) FROM support_tickets r WHERE r.opener_user_id = @user_id AND r.created_at > @since::timestamptz)::int AS recent;
+
+-- name: CountRecentUploads :one
+SELECT count(*)::int FROM support_attachments WHERE uploaded_by = @uploaded_by AND created_at > @since::timestamptz;
+
+-- name: StaleUploads :many
+-- Uploads no message claimed before @before, oldest first, locked for the sweep. A row
+-- a message is claiming right now is skipped (that claim refuses it anyway).
+SELECT id, object_key FROM support_attachments
+WHERE message_id IS NULL AND created_at < @before::timestamptz
+ORDER BY created_at, id
+LIMIT @lim
+FOR UPDATE SKIP LOCKED;
+
+-- name: DeleteAttachments :execrows
+DELETE FROM support_attachments WHERE id = ANY(@ids::uuid[]);
+
+-- name: CustomerTicketsToClose :many
+-- Account deletion: the customer's own tickets not closed yet, locked.
+SELECT id, status FROM support_tickets
+WHERE opener_type = 'customer' AND opener_user_id = @user_id AND status <> 'closed'
+ORDER BY id
+FOR UPDATE;
+
+-- name: ScrubCustomerTickets :exec
+-- Account deletion: the subjects of the customer's own tickets become @placeholder.
+UPDATE support_tickets SET subject = @placeholder, version = version + 1
+WHERE opener_type = 'customer' AND opener_user_id = @user_id AND subject <> @placeholder;
+
+-- name: ScrubCustomerMessages :exec
+-- Account deletion: the customer's own messages on their tickets become @placeholder.
+-- Support's replies and notes stay.
+UPDATE support_messages m SET body = @placeholder
+FROM support_tickets t
+WHERE m.ticket_id = t.id AND t.opener_type = 'customer' AND t.opener_user_id = @user_id
+  AND m.author_type = 'customer' AND m.author_user_id = @user_id AND m.body <> @placeholder;
+
+-- name: CustomerAttachments :many
+-- Account deletion: the customer's own uploads (business uploads stay with the business),
+-- claimed on their tickets or not claimed yet, locked.
+SELECT a.id, a.object_key FROM support_attachments a
+WHERE a.uploaded_by = @user_id AND a.business_id IS NULL
+  AND (a.ticket_id IS NULL OR a.ticket_id IN (
+        SELECT t.id FROM support_tickets t WHERE t.opener_type = 'customer' AND t.opener_user_id = @user_id))
+ORDER BY a.id
+FOR UPDATE OF a;
 
 -- name: LockTicket :one
 SELECT id, opener_type, opener_user_id, business_id, status, priority, assignee_id, sla_started_at, sla_due_at, first_response_at
@@ -37,7 +98,7 @@ FOR UPDATE;
 -- name: TicketAfterAgentReply :exec
 -- Support answered: the opener's turn, the SLA stops.
 UPDATE support_tickets
-SET status = 'waiting', sla_started_at = NULL, sla_due_at = NULL, resolved_at = NULL,
+SET status = 'waiting', sla_started_at = NULL, sla_due_at = NULL, resolved_at = NULL, close_reason = NULL,
     first_response_at = COALESCE(first_response_at, @now),
     assignee_id = COALESCE(assignee_id, sqlc.narg('assignee_id')::uuid),
     last_message_at = @now, version = version + 1
@@ -142,16 +203,34 @@ ORDER BY t.last_message_at DESC, t.id DESC
 LIMIT @lim;
 
 -- name: CountTickets :one
-SELECT count(*) FILTER (WHERE t.status = 'open')::int AS open,
-       count(*) FILTER (WHERE t.status = 'waiting')::int AS waiting,
-       count(*) FILTER (WHERE t.status = 'resolved')::int AS resolved,
-       count(*) FILTER (WHERE t.status = 'closed')::int AS closed,
-       count(*) FILTER (WHERE t.status = 'open' AND t.sla_due_at < @now::timestamptz)::int AS overdue
-FROM support_tickets t
-WHERE (@assignee_mode::text = ''
-       OR (@assignee_mode::text = 'me' AND t.assignee_id = sqlc.narg('me')::uuid)
-       OR (@assignee_mode::text = 'unassigned' AND t.assignee_id IS NULL))
-  AND (@opener_type::text = '' OR t.opener_type = @opener_type::text);
+-- One count per status, each inside its own range of ix_support_tickets_counts (status,
+-- opener_type, assignee_id INCLUDE sla_due_at), so no count reads another status's rows
+-- or the table.
+SELECT (SELECT count(*) FROM support_tickets o
+        WHERE o.status = 'open'
+          AND (@assignee_mode::text = '' OR (@assignee_mode::text = 'me' AND o.assignee_id = sqlc.narg('me')::uuid)
+               OR (@assignee_mode::text = 'unassigned' AND o.assignee_id IS NULL))
+          AND (@opener_type::text = '' OR o.opener_type = @opener_type::text))::int AS open,
+       (SELECT count(*) FROM support_tickets w
+        WHERE w.status = 'waiting'
+          AND (@assignee_mode::text = '' OR (@assignee_mode::text = 'me' AND w.assignee_id = sqlc.narg('me')::uuid)
+               OR (@assignee_mode::text = 'unassigned' AND w.assignee_id IS NULL))
+          AND (@opener_type::text = '' OR w.opener_type = @opener_type::text))::int AS waiting,
+       (SELECT count(*) FROM support_tickets r
+        WHERE r.status = 'resolved'
+          AND (@assignee_mode::text = '' OR (@assignee_mode::text = 'me' AND r.assignee_id = sqlc.narg('me')::uuid)
+               OR (@assignee_mode::text = 'unassigned' AND r.assignee_id IS NULL))
+          AND (@opener_type::text = '' OR r.opener_type = @opener_type::text))::int AS resolved,
+       (SELECT count(*) FROM support_tickets c
+        WHERE c.status = 'closed'
+          AND (@assignee_mode::text = '' OR (@assignee_mode::text = 'me' AND c.assignee_id = sqlc.narg('me')::uuid)
+               OR (@assignee_mode::text = 'unassigned' AND c.assignee_id IS NULL))
+          AND (@opener_type::text = '' OR c.opener_type = @opener_type::text))::int AS closed,
+       (SELECT count(*) FROM support_tickets d
+        WHERE d.status = 'open' AND d.sla_due_at < @now::timestamptz
+          AND (@assignee_mode::text = '' OR (@assignee_mode::text = 'me' AND d.assignee_id = sqlc.narg('me')::uuid)
+               OR (@assignee_mode::text = 'unassigned' AND d.assignee_id IS NULL))
+          AND (@opener_type::text = '' OR d.opener_type = @opener_type::text))::int AS overdue;
 
 -- name: GetTicket :one
 SELECT t.id, t.display_number, t.subject, t.category, t.status, t.priority, t.opener_type, t.opener_user_id,
@@ -177,7 +256,7 @@ ORDER BY m.created_at, m.id;
 -- name: ListTicketAttachments :many
 SELECT a.id, a.message_id, a.object_key, a.content_type, a.size_bytes, a.file_name
 FROM support_attachments a
-WHERE a.ticket_id = @ticket_id
+WHERE a.ticket_id = @ticket_id AND a.message_id IS NOT NULL
 ORDER BY a.created_at, a.id;
 
 -- name: ListBusinessTickets :many
