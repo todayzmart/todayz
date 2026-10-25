@@ -131,6 +131,11 @@ describe('A-23 site strip', () => {
     expect(within(card).getByText(/12 searchers · Dairy/)).toBeInTheDocument();
     expect(within(card).getByText('Not approved yet: the site shows the curated list.')).toBeInTheDocument();
     expect(screen.getByText(/at least 5 signed-in customers/)).toBeInTheDocument();
+    // The city's decisions, audited as `site_marquee` and keyed by the city, show beside the strip.
+    expect(await within(card).findByRole('complementary', { name: 'History' })).toBeInTheDocument();
+    const audits = () => calls.filter((c) => c.path === '/v1/admin/audit-log/subject' && c.search.includes('subjectType=site_marquee')).length;
+    await waitFor(() => expect(audits()).toBe(1));
+    expect(calls.find((c) => c.path === '/v1/admin/audit-log/subject')?.search).toContain(`subjectId=${BLR}`);
 
     fireEvent.click(within(card).getByRole('checkbox', { name: /Maggi 70 g/ }));
     fireEvent.click(within(card).getByRole('button', { name: 'Approve 1 product' }));
@@ -144,6 +149,7 @@ describe('A-23 site strip', () => {
     expect(await within(after).findByText(/On the site: built 2026-10-25/)).toBeInTheDocument();
     expect(within(after).getByText('No new proposal waiting.')).toBeInTheDocument();
     expect(within(after).getAllByRole('listitem').map((li) => li.textContent)).toEqual(['Amul taaza 1 L']);
+    await waitFor(() => expect(audits()).toBeGreaterThan(1));
   });
 
   it('will not approve an empty strip', async () => {

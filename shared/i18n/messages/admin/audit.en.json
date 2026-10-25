@@ -338,5 +338,9 @@
   "audit.action.referralReject": {
     "defaultMessage": "Referral rejected",
     "description": "Audit action: an admin rejected a referral before its reward posted (A-10)"
+  },
+  "audit.action.marqueeDecide": {
+    "defaultMessage": "Site strip decided",
+    "description": "Audit action: an admin approved part of a city's proposed site strip and left out the rest (A-23)"
   }
 }

@@ -8,6 +8,7 @@ import { useIntl } from 'react-intl';
 import { useWhen } from '../app/format';
 import { useRoles } from '../app/nav/access';
 import { useProblemText } from '../app/problems';
+import { AuditPanel } from '../audit/AuditPanel';
 import { saveCsv } from '../payouts/queries';
 import { gapsCsv } from './csv';
 import { canApproveStrip } from './perm';
@@ -179,9 +180,7 @@ function Strip({ search, go }: { search: DemandSearch; go: Go }) {
   );
 }
 
-// TODO(lead): approvals are audited as subject type `site_marquee`, which the admin-audit contract's
-// AdminAuditSubjectType does not list yet, so the shared AuditPanel cannot show them here. The card
-// shows the approved list and its date instead; A-19 lists the `marquee.decide` entries.
+// A city's strip, with its decisions (audited as subject type `site_marquee`, keyed by the city) beside it.
 function CityStrip({ city, now }: { city: MarqueeCity; now: string }) {
   const intl = useIntl();
   const when = useWhen();
@@ -268,6 +267,7 @@ function CityStrip({ city, now }: { city: MarqueeCity; now: string }) {
       ) : (
         <p className={css.muted}>{intl.formatMessage({ id: 'demand.strip.notApproved' })}</p>
       )}
+      <AuditPanel type="site_marquee" id={city.cityId} />
     </section>
   );
 }

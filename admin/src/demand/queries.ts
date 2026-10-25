@@ -2,6 +2,7 @@ import { decideSiteMarquee, listDemandGaps, listSiteMarquee } from '@todayz/api-
 import type { MarqueeDecision } from '@todayz/api-client/gen/model/marqueeDecision';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useIdempotent } from '../app/idempotency';
+import { refreshAudit } from '../audit/queries';
 
 export const gapsKey = ['admin', 'demand', 'gaps'] as const;
 export const marqueeKey = ['admin', 'demand', 'marquee'] as const;
@@ -20,6 +21,9 @@ export function useDecide(cityId: string) {
   const once = useIdempotent();
   return useMutation({
     mutationFn: (body: MarqueeDecision) => once((headers) => decideSiteMarquee(cityId, body, { headers })),
-    onSettled: () => void qc.invalidateQueries({ queryKey: marqueeKey }),
+    onSettled: () => {
+      void qc.invalidateQueries({ queryKey: marqueeKey });
+      refreshAudit(qc, 'site_marquee', cityId);
+    },
   });
 }

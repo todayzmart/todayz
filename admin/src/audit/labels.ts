@@ -39,6 +39,7 @@ const BUILT_ACTIONS: Readonly<Record<string, string>> = {
   [RISK('flag_clear')]: 'audit.action.riskFlagClear',
   [RISK('flag_confirm')]: 'audit.action.riskFlagConfirm',
   ['referral.reject']: 'audit.action.referralReject',
+  ['marquee.decide']: 'audit.action.marqueeDecide',
 };
 
 /** Audit actions the console names; any other action shows as written (it is still audited). */
