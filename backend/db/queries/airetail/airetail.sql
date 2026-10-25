@@ -102,3 +102,23 @@ VALUES (@store_id, @kind, @subject_ref, @lang, @facts_hash, @text, @prompt_versi
 ON CONFLICT (store_id, kind, subject_ref, lang) DO UPDATE
 SET facts_hash = EXCLUDED.facts_hash, text = EXCLUDED.text, prompt_version = EXCLUDED.prompt_version,
     model = EXCLUDED.model, created_at = EXCLUDED.created_at;
+
+-- name: AiTextMisses :many
+-- The negative cache of one background feature for a store in one language
+-- (D-228): facts whose wording failed are not sent again while the hash holds.
+SELECT ref, facts_hash
+FROM ai_text_misses
+WHERE feature = @feature AND store_id = @store_id AND lang = @lang;
+
+-- name: AiTextMissed :one
+-- Whether these facts of one ref already failed (the coach asks per card).
+SELECT EXISTS (
+  SELECT 1 FROM ai_text_misses
+  WHERE feature = @feature AND store_id = @store_id AND ref = @ref AND lang = @lang AND facts_hash = @facts_hash
+)::bool AS missed;
+
+-- name: UpsertAiTextMiss :exec
+INSERT INTO ai_text_misses (feature, store_id, ref, lang, facts_hash, reason, created_at)
+VALUES (@feature, @store_id, @ref, @lang, @facts_hash, @reason, @now)
+ON CONFLICT (feature, store_id, ref, lang) DO UPDATE
+SET facts_hash = EXCLUDED.facts_hash, reason = EXCLUDED.reason, created_at = EXCLUDED.created_at;

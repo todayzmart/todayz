@@ -165,8 +165,10 @@ type Written struct {
 	Texts map[string]string
 	// Dropped counts the sentences that were ungrounded, unclean or empty.
 	Dropped int
-	Resp    client.Response
-	Reject  string
+	// Ungrounded holds the refs of the dropped sentences.
+	Ungrounded map[string]bool
+	Resp       client.Response
+	Reject     string
 }
 
 // Write words rows in one call. ref is the store id (a case name in the
@@ -192,7 +194,7 @@ func Write(ctx context.Context, llm client.LLM, model, ref, lang string, rows []
 	for _, r := range rows {
 		byRef[r.Ref] = r
 	}
-	w := Written{Texts: map[string]string{}, Resp: resp}
+	w := Written{Texts: map[string]string{}, Ungrounded: map[string]bool{}, Resp: resp}
 	for _, t := range out.Texts {
 		row, ok := byRef[t.Ref]
 		if !ok {
@@ -203,6 +205,7 @@ func Write(ctx context.Context, llm client.LLM, model, ref, lang string, rows []
 		}
 		if !Grounded(t.Text, row) {
 			w.Dropped++
+			w.Ungrounded[t.Ref] = true
 			client.RecordRejected(ctx, Feature, client.RejectGrounding)
 			continue
 		}

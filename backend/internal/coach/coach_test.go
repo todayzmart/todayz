@@ -300,14 +300,15 @@ func TestAIWriter(t *testing.T) {
 		reply func(Input) (Output, error)
 		want  string
 		calls bool
+		miss  string // the ai_text_misses reason kept per card, "" for none
 	}{
-		{"off", false, grounded, "rule", false},
-		{"grounded", true, grounded, "ai", true},
+		{"off", false, grounded, "rule", false, ""},
+		{"grounded", true, grounded, "ai", true, ""},
 		{"ungrounded", true, func(in Input) (Output, error) {
 			return Output{Title: in.Title, Body: in.Body + " Sales up 99,999%."}, nil
-		}, "rule", true},
-		{"schema", true, func(Input) (Output, error) { return Output{Title: "", Body: "x"}, nil }, "rule", true},
-		{"provider_down", true, func(Input) (Output, error) { return Output{}, errors.New("connection refused") }, "rule", true},
+		}, "rule", true, "grounding"},
+		{"schema", true, func(Input) (Output, error) { return Output{Title: "", Body: "x"}, nil }, "rule", true, "schema"},
+		{"provider_down", true, func(Input) (Output, error) { return Output{}, errors.New("connection refused") }, "rule", true, ""},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -318,6 +319,15 @@ func TestAIWriter(t *testing.T) {
 			require.NoError(t, err)
 			require.Positive(t, sum.Created)
 			require.Equal(t, c.calls, e.llm.calls > 0)
+			var misses int
+			require.NoError(t, e.tdb.OwnerPool.QueryRow(e.ctx, `SELECT count(*) FROM ai_text_misses WHERE feature = 'coach_card' AND reason = $1`, c.miss).Scan(&misses))
+			if c.miss != "" {
+				require.Equal(t, e.llm.calls, misses, "every failed card is kept as a miss")
+			}
+			var bg, owner int
+			require.NoError(t, e.tdb.OwnerPool.QueryRow(e.ctx, `SELECT coalesce(sum(calls) FILTER (WHERE scope = 'store_background'), 0)::int, coalesce(sum(calls) FILTER (WHERE scope = 'store'), 0)::int FROM ai_usage_daily`).Scan(&bg, &owner))
+			require.Equal(t, e.llm.calls, bg, "coach wording counts against the background budget (D-228)")
+			require.Zero(t, owner)
 			for _, x := range e.cards(t, storeSL) {
 				require.Equal(t, c.want, x.GeneratedBy, x.Detector)
 				if c.want == "ai" {
@@ -331,6 +341,37 @@ func TestAIWriter(t *testing.T) {
 			}
 		})
 	}
+}
+
+// D-228: a card whose wording failed is not sent again while its facts hold;
+// changed numbers ask once more. A spent background budget keeps the template.
+func TestAIWriterMissCache(t *testing.T) {
+	e := newEnv(t)
+	e.setting(t, settings.AiCoachEnabled, "true")
+	e.llm.reply = func(in Input) (Output, error) {
+		return Output{Title: in.Title, Body: in.Body + " Up 99,999%."}, nil
+	}
+	s := e.service(t, true)
+	f := detectors.Fact{Detector: "selling_fast", Subject: "item-1", Kind: "restock"}
+	tpl := Text{Title: "Restock Amul Butter", Body: "3 days of stock left."}
+	nums := []byte(`{"days":3}`)
+	_, _, ok := s.writeAI(e.ctx, storeSL, f, "en", tpl, nums)
+	require.False(t, ok)
+	require.Equal(t, 1, e.llm.calls)
+	_, _, ok = s.writeAI(e.ctx, storeSL, f, "en", tpl, nums)
+	require.False(t, ok)
+	require.Equal(t, 1, e.llm.calls, "a cached miss is not asked again")
+
+	e.llm.reply = func(in Input) (Output, error) { return Output{Title: in.Title, Body: in.Body}, nil }
+	tpl2 := Text{Title: tpl.Title, Body: "2 days of stock left."}
+	_, _, ok = s.writeAI(e.ctx, storeSL, f, "en", tpl2, []byte(`{"days":2}`))
+	require.True(t, ok)
+	require.Equal(t, 2, e.llm.calls)
+
+	e.setting(t, settings.AiDailyCallsStoreBackground, "0")
+	_, _, ok = s.writeAI(e.ctx, storeSL, f, "en", Text{Title: tpl.Title, Body: "1 day of stock left."}, []byte(`{"days":1}`))
+	require.False(t, ok, "a spent budget keeps the template")
+	require.Equal(t, 2, e.llm.calls)
 }
 
 // TestFeed: List marks new cards seen; Done and Dismiss are one-way, repeat

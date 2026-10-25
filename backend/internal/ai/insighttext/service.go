@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/todayz/backend/gen/sqlc/airetaildb"
+	"github.com/todayz/backend/internal/ai/client"
 	"github.com/todayz/backend/internal/ai/guard"
 	"github.com/todayz/backend/internal/ai/prompts"
 	"github.com/todayz/backend/internal/insights/facts"
@@ -49,6 +50,15 @@ func (s *Service) Texts(ctx context.Context, storeID ids.ID, rows []facts.Row) [
 	for _, k := range kept {
 		byKey[k.Kind+"\x00"+k.SubjectRef] = k
 	}
+	misses, err := q.AiTextMisses(ctx, airetaildb.AiTextMissesParams{Feature: Feature, StoreID: store, Lang: lang})
+	if err != nil {
+		log.WarnContext(ctx, "insighttext: misses", slog.String("error", err.Error()))
+		return out
+	}
+	missed := map[string]string{}
+	for _, m := range misses {
+		missed[m.Ref] = m.FactsHash
+	}
 	var missing []pending
 	for i, r := range rows {
 		h, err := Hash(r, lang)
@@ -60,6 +70,9 @@ func (s *Service) Texts(ctx context.Context, storeID ids.ID, rows []facts.Row) [
 			out[i] = &t
 			continue
 		}
+		if missed[missRef(r)] == h {
+			continue // these facts failed before; the template shows until they change
+		}
 		missing = append(missing, pending{row: r, hash: h})
 	}
 	if len(missing) > 0 && s.claim(storeID) {
@@ -67,6 +80,21 @@ func (s *Service) Texts(ctx context.Context, storeID ids.ID, rows []facts.Row) [
 		s.d.Go(func() { s.run(bg, storeID, lang, missing) })
 	}
 	return out
+}
+
+// missRef is a row's ref in ai_text_misses.
+func missRef(r facts.Row) string { return string(r.Kind) + "/" + r.SubjectRef }
+
+// missReason is the ai_text_misses reason for a whole-call reject, or false
+// for a transient one (an error or a timeout), which may ask again.
+func missReason(reject string) (string, bool) {
+	switch reject {
+	case client.RejectSchema, client.OutcomeInvalid, client.OutcomeTruncated:
+		return "schema", true
+	case client.OutcomeRefused:
+		return "refused", true
+	}
+	return "", false
 }
 
 // claim reports whether this store may start a run now (one per retryAfter).
@@ -96,9 +124,9 @@ func (s *Service) run(ctx context.Context, storeID ids.ID, lang string, missing 
 	if len(missing) > MaxRows {
 		missing = missing[:MaxRows]
 	}
-	// TODO(lead): a background run counts against the store's daily AI calls
-	// cap like a call the owner started (conservative, as the coach does).
-	if err := s.d.Guard.Reserve(ctx, Feature, guard.Subject{Store: storeID}); err != nil {
+	// Background wording has its own budget (D-228); when it is spent the
+	// templates show.
+	if err := s.d.Guard.Reserve(ctx, Feature, guard.Subject{Store: storeID, Background: true}); err != nil {
 		var ce *guard.CapError
 		if !errors.As(err, &ce) {
 			log.WarnContext(ctx, "insighttext: guard", slog.String("error", err.Error()))
@@ -118,9 +146,29 @@ func (s *Service) run(ctx context.Context, storeID ids.ID, lang string, missing 
 	if serr := s.d.Guard.Settle(ctx, w.Resp.CostPaise); serr != nil {
 		log.WarnContext(ctx, "insighttext: settle", slog.String("error", serr.Error()))
 	}
-	if err != nil || w.Reject != "" {
-		if err != nil {
-			log.WarnContext(ctx, "insighttext: model call", slog.String("error", err.Error()))
+	if err != nil {
+		log.WarnContext(ctx, "insighttext: model call", slog.String("error", err.Error()))
+		return
+	}
+	q := airetaildb.New(s.d.DB.Q(ctx))
+	now := s.d.Clock.Now().UTC()
+	miss := func(p pending, reason string) bool {
+		if err := q.UpsertAiTextMiss(ctx, airetaildb.UpsertAiTextMissParams{
+			Feature: Feature, StoreID: ids.UUID(storeID), Ref: missRef(p.row), Lang: lang,
+			FactsHash: p.hash, Reason: reason, Now: now,
+		}); err != nil {
+			log.WarnContext(ctx, "insighttext: keep miss", slog.String("error", err.Error()))
+			return false
+		}
+		return true
+	}
+	if w.Reject != "" {
+		if reason, ok := missReason(w.Reject); ok {
+			for _, p := range missing {
+				if !miss(p, reason) {
+					return
+				}
+			}
 		}
 		return
 	}
@@ -128,11 +176,16 @@ func (s *Service) run(ctx context.Context, storeID ids.ID, lang string, missing 
 	if m == "" {
 		m = model
 	}
-	q := airetaildb.New(s.d.DB.Q(ctx))
-	now := s.d.Clock.Now().UTC()
 	for i, p := range missing {
 		t, ok := w.Texts[in[i].Ref]
 		if !ok {
+			reason := "skipped"
+			if w.Ungrounded[in[i].Ref] {
+				reason = "grounding"
+			}
+			if !miss(p, reason) {
+				return
+			}
 			continue
 		}
 		if err := q.UpsertInsightText(ctx, airetaildb.UpsertInsightTextParams{

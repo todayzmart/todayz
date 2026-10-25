@@ -2,12 +2,15 @@ package coach
 
 import (
 	"context"
+	"crypto/sha256"
 	"embed"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"strings"
 
+	"github.com/todayz/backend/gen/sqlc/airetaildb"
 	"github.com/todayz/backend/internal/ai/client"
 	"github.com/todayz/backend/internal/ai/guard"
 	"github.com/todayz/backend/internal/ai/prompts"
@@ -119,10 +122,19 @@ func (s *Service) writeAI(ctx context.Context, storeID ids.ID, f detectors.Fact,
 	if err != nil || !on {
 		return Text{}, generated{}, false
 	}
-	// TODO(lead): a background card counts against the store's daily AI calls
-	// cap (ai_daily_calls_store) like a call the owner started; conservative
-	// reading, so a busy coach day cannot exceed it.
-	if err := s.d.Guard.Reserve(ctx, Feature, guard.Subject{Store: storeID}); err != nil {
+	in := Input{Lang: lang, Kind: string(f.Kind), Title: tpl.Title, Body: tpl.Body, Numbers: nums}
+	ref, hash, err := missKey(f, in)
+	if err != nil {
+		return Text{}, generated{}, false
+	}
+	q := airetaildb.New(s.d.DB.Q(ctx))
+	key := airetaildb.AiTextMissedParams{Feature: Feature, StoreID: ids.UUID(storeID), Ref: ref, Lang: lang, FactsHash: hash}
+	if missed, err := q.AiTextMissed(ctx, key); err != nil || missed {
+		return Text{}, generated{}, false // these facts failed before (D-228)
+	}
+	// Background wording has its own budget (D-228); when it is spent the
+	// template is used.
+	if err := s.d.Guard.Reserve(ctx, Feature, guard.Subject{Store: storeID, Background: true}); err != nil {
 		var ce *guard.CapError
 		if !errors.As(err, &ce) {
 			log.WarnContext(ctx, "coach: guard", slog.String("error", err.Error()))
@@ -133,15 +145,20 @@ func (s *Service) writeAI(ctx context.Context, storeID ids.ID, f detectors.Fact,
 	if err != nil {
 		return Text{}, generated{}, false
 	}
-	out, resp, reject, err := Rewrite(ctx, s.d.LLM, model, storeID.String(), Input{
-		Lang: lang, Kind: string(f.Kind), Title: tpl.Title, Body: tpl.Body, Numbers: nums,
-	})
+	out, resp, reject, err := Rewrite(ctx, s.d.LLM, model, storeID.String(), in)
 	if serr := s.d.Guard.Settle(ctx, resp.CostPaise); serr != nil {
 		log.WarnContext(ctx, "coach: settle", slog.String("error", serr.Error()))
 	}
 	if err != nil || reject != "" {
 		if err != nil {
 			log.WarnContext(ctx, "coach: model call", slog.String("error", err.Error()))
+		}
+		if reason, ok := missReason(reject); ok {
+			if err := q.UpsertAiTextMiss(ctx, airetaildb.UpsertAiTextMissParams{
+				Feature: Feature, StoreID: key.StoreID, Ref: ref, Lang: lang, FactsHash: hash, Reason: reason, Now: s.d.Clock.Now().UTC(),
+			}); err != nil {
+				log.WarnContext(ctx, "coach: keep miss", slog.String("error", err.Error()))
+			}
 		}
 		return Text{}, generated{}, false
 	}
@@ -151,4 +168,29 @@ func (s *Service) writeAI(ctx context.Context, storeID ids.ID, f detectors.Fact,
 		m = model
 	}
 	return Text(out), generated{By: "ai", PromptVersion: &v, Model: &m}, true
+}
+
+// missKey is a card's ref and facts hash in ai_text_misses: the detector and
+// subject, and a hash of everything the model saw.
+func missKey(f detectors.Fact, in Input) (ref, hash string, err error) {
+	b, err := json.Marshal(in)
+	if err != nil {
+		return "", "", err
+	}
+	sum := sha256.Sum256(b)
+	return f.Detector + "/" + f.Subject, hex.EncodeToString(sum[:]), nil
+}
+
+// missReason is the ai_text_misses reason of a reject, or false for a
+// transient one (an error or a timeout), which may ask again.
+func missReason(reject string) (string, bool) {
+	switch reject {
+	case client.RejectGrounding:
+		return "grounding", true
+	case client.RejectSchema, client.OutcomeInvalid, client.OutcomeTruncated:
+		return "schema", true
+	case client.OutcomeRefused:
+		return "refused", true
+	}
+	return "", false
 }
