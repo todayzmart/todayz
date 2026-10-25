@@ -169,7 +169,7 @@ func TestPayoutsHTTP(t *testing.T) {
 	require.NotContains(t, r.raw, "001234567890", "the payee block is masked")
 
 	note := map[string]any{"reason": "checking the October statement"}
-	paid := map[string]any{"utr": "AXIS123456", "amountPaise": 300000, "reason": "October payout sent"}
+	paid := map[string]any{"utr": "AXIS12345678", "amountPaise": 300000, "reason": "October payout sent"}
 	money := map[string]func() resp{
 		"hold":      func() resp { return post(base+"/hold", note, nil) },
 		"unhold":    func() resp { return post(base+"/unhold", note, nil) },
@@ -239,14 +239,14 @@ func TestPayoutsHTTP(t *testing.T) {
 	r = post(base+"/mark-paid", paid, nil)
 	require.Equal(t, http.StatusBadRequest, r.code, r.raw)
 	require.Equal(t, "idempotency_key_required", problemCode(r))
-	r = post(base+"/mark-paid", map[string]any{"utr": "AXIS123456", "amountPaise": 299900, "reason": "October payout sent"}, idem(a))
+	r = post(base+"/mark-paid", map[string]any{"utr": "AXIS12345678", "amountPaise": 299900, "reason": "October payout sent"}, idem(a))
 	require.Equal(t, http.StatusConflict, r.code, r.raw)
 	require.Equal(t, "payout_amount_changed", problemCode(r))
 	key := idem(a)
 	r = post(base+"/mark-paid", paid, key)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.Equal(t, "paid", r.body["payout"].(map[string]any)["status"])
-	require.Equal(t, "AXIS123456", r.body["payout"].(map[string]any)["utr"])
+	require.Equal(t, "AXIS12345678", r.body["payout"].(map[string]any)["utr"])
 	// A retry with the same key replays; nothing posts twice.
 	r = post(base+"/mark-paid", paid, key)
 	require.Equal(t, http.StatusOK, r.code, r.raw)

@@ -152,6 +152,18 @@ FROM payout_lines pl JOIN stores s ON s.id = pl.store_id
 WHERE pl.payout_id = @payout_id
 ORDER BY pl.store_id;
 
+-- LockPayoutBalances locks the balances a payout's posting touches (its
+-- stores' store_credit and platform_payouts_cash) in account id order, the
+-- credits Poster's one lock order, and reads them. Mark paid checks each
+-- store still holds its line: a store's balance can fall after the close
+-- (cashback), and a payout never takes a store below zero.
+-- name: LockPayoutBalances :many
+SELECT a.id AS account_id, a.kind, a.owner_id AS store_id, b.balance
+FROM ledger_accounts a JOIN account_balances b ON b.account_id = a.id
+WHERE (a.kind = 'store_credit' AND a.owner_id = ANY(@store_ids::uuid[])) OR a.kind = 'platform_payouts_cash'
+ORDER BY a.id
+FOR UPDATE OF b;
+
 -- PayoutRows lists payouts newest first, with their business and statement
 -- period; period and status filter when given.
 -- name: PayoutRows :many

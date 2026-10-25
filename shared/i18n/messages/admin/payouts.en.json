@@ -324,11 +324,11 @@
     "description": "Label: the bank transfer reference"
   },
   "payouts.paid.utrHelp": {
-    "defaultMessage": "6 to 30 letters and digits, from the bank or UPI app.",
+    "defaultMessage": "12 to 22 letters and digits, from the bank or UPI app.",
     "description": "Help under the UTR"
   },
   "payouts.paid.utrInvalid": {
-    "defaultMessage": "Enter the UTR: 6 to 30 letters and digits.",
+    "defaultMessage": "Enter the UTR: 12 to 22 letters and digits.",
     "description": "Error: UTR malformed"
   }
 }

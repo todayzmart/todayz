@@ -6,7 +6,7 @@ import { money } from '../app/format';
 import { MAX_REASON } from '../app/ReasonDialog';
 
 /** The bank's transfer reference (payouts.utrPattern on the server). */
-export const UTR = /^[A-Z0-9]{6,30}$/;
+export const UTR = /^[A-Z0-9]{12,22}$/;
 
 export interface MarkPaidDialogProps {
   payout: AdminPayout;

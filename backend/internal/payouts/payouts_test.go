@@ -144,10 +144,11 @@ func TestCleanReason(t *testing.T) {
 }
 
 func TestUTRPattern(t *testing.T) {
-	for _, ok := range []string{"AXIS12", "HDFC765432", "123456789012", strings.Repeat("A", 30)} {
+	// UPI RRN 12, NEFT UTR 16, RTGS UTR 22.
+	for _, ok := range []string{"123456789012", "HDFCN52026102500", "HDFCR52026102512345678"} {
 		require.True(t, utrPattern.MatchString(ok), ok)
 	}
-	for _, bad := range []string{"", "AB12", "axis123456", "AXIS-12345", "AXIS 12345", strings.Repeat("A", 31)} {
+	for _, bad := range []string{"", "AXIS123456", "12345678901", "axis12345678", "AXIS-1234567", "AXIS 1234567", strings.Repeat("A", 23)} {
 		require.False(t, utrPattern.MatchString(bad), bad)
 	}
 }

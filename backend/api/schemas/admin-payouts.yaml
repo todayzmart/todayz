@@ -226,7 +226,7 @@ AdminPayoutMarkPaid:
       description: The amount transferred, as shown when the payout was loaded; a payout recomputed since is refused with payout_amount_changed.
     utr:
       type: string
-      pattern: ^[A-Za-z0-9]{6,30}$
+      pattern: ^[A-Za-z0-9]{12,22}$
       description: The bank or UPI reference of the transfer; stored upper-case, and one UTR pays one payout.
     reason:
       type: string

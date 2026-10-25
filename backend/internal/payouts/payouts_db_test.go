@@ -397,26 +397,26 @@ func TestOnePayoutPerBusinessDB(t *testing.T) {
 	pid, err := ids.Parse(again.Payout.Id)
 	require.NoError(t, err)
 	e.at(ist(2026, 8, 3, 11, 0))
-	_, err = e.svc.MarkPaid(e.ctx, e.finance, pid, "AXIS123456", 6900, "July payout")
+	_, err = e.svc.MarkPaid(e.ctx, e.finance, pid, "AXIS12345678", 6900, "July payout")
 	require.Equal(t, "payout_amount_changed", code(err))
 	_, err = e.svc.MarkPaid(e.ctx, e.finance, pid, "no", 9900, "July payout")
 	require.Equal(t, "validation_failed", code(err))
-	paid, err := e.svc.MarkPaid(e.ctx, e.finance, pid, " axis123456 ", 9900, "July payout")
+	paid, err := e.svc.MarkPaid(e.ctx, e.finance, pid, " axis12345678 ", 9900, "July payout")
 	require.NoError(t, err)
 	require.Equal(t, api.PayoutStatus("paid"), paid.Payout.Status)
-	require.Equal(t, "AXIS123456", *paid.Payout.Utr)
+	require.Equal(t, "AXIS12345678", *paid.Payout.Utr)
 	require.Zero(t, e.storeCredit(e.s1))
 	require.Zero(t, e.storeCredit(e.s2))
 	require.Equal(t, 1, e.count(`SELECT count(*) FROM ledger_transactions WHERE kind = 'payout' AND idempotency_key = $1`, "payout:"+pid.String()))
 
 	// A rerun never pays twice: the same UTR returns the paid payout, another is refused.
-	same, err := e.svc.MarkPaid(e.ctx, e.finance, pid, "AXIS123456", 9900, "July payout")
+	same, err := e.svc.MarkPaid(e.ctx, e.finance, pid, "AXIS12345678", 9900, "July payout")
 	require.NoError(t, err)
 	require.Equal(t, paid.Payout.PaidAt, same.Payout.PaidAt)
-	_, err = e.svc.MarkPaid(e.ctx, e.finance, pid, "AXIS999999", 9900, "July payout")
+	_, err = e.svc.MarkPaid(e.ctx, e.finance, pid, "AXIS99999999", 9900, "July payout")
 	require.Equal(t, "payout_already_paid", code(err))
 	require.Equal(t, 1, e.count(`SELECT count(*) FROM ledger_transactions WHERE kind = 'payout'`))
-	require.Equal(t, 1, e.count(`SELECT count(*) FROM audit_log WHERE action = 'payouts.mark_paid' AND after->>'utr' = 'AXIS123456'`))
+	require.Equal(t, 1, e.count(`SELECT count(*) FROM audit_log WHERE action = 'payouts.mark_paid' AND after->>'utr' = 'AXIS12345678'`))
 
 	// PO-02: after P1 is paid the next close creates a new payout; KYC
 	// missing holds it, and a held payout is still the open one.
@@ -449,7 +449,7 @@ func TestOnePayoutPerBusinessDB(t *testing.T) {
 	// Held: not payable; unhold refused while the cause is open.
 	id2, err := ids.Parse(p2.Payout.Id)
 	require.NoError(t, err)
-	_, err = e.svc.MarkPaid(e.ctx, e.finance, id2, "AXIS222222", 5000, "September payout")
+	_, err = e.svc.MarkPaid(e.ctx, e.finance, id2, "AXIS22222222", 5000, "September payout")
 	require.Equal(t, "payout_not_payable", code(err))
 	_, err = e.svc.Unhold(e.ctx, e.finance, id2, "KYC checked")
 	require.Equal(t, "payout_hold_cause_open", code(err))
@@ -473,14 +473,14 @@ func TestOnePayoutPerBusinessDB(t *testing.T) {
 	// A risk flag opened after the close blocks mark paid live.
 	flag := e.id()
 	e.exec(`INSERT INTO risk_flags (id, subject_type, subject_id, rule) VALUES ($1, 'store', $2, 'test.rule')`, ids.UUID(flag), ids.UUID(e.s2))
-	_, err = e.svc.MarkPaid(e.ctx, e.finance, id2, "AXIS222222", 5000, "September payout")
+	_, err = e.svc.MarkPaid(e.ctx, e.finance, id2, "AXIS22222222", 5000, "September payout")
 	require.Equal(t, "payout_hold_cause_open", code(err))
 	e.exec(`UPDATE risk_flags SET status = 'cleared', reviewed_at = now() WHERE id = $1`, ids.UUID(flag))
 
 	// Another payout's UTR is refused.
-	_, err = e.svc.MarkPaid(e.ctx, e.finance, id2, "AXIS123456", 5000, "September payout")
+	_, err = e.svc.MarkPaid(e.ctx, e.finance, id2, "AXIS12345678", 5000, "September payout")
 	require.Equal(t, "utr_in_use", code(err))
-	_, err = e.svc.MarkPaid(e.ctx, e.finance, id2, "AXIS222222", 5000, "September payout")
+	_, err = e.svc.MarkPaid(e.ctx, e.finance, id2, "AXIS22222222", 5000, "September payout")
 	require.NoError(t, err)
 
 	for _, a := range []string{"payouts.hold", "payouts.unhold", "payouts.mark_paid"} {
@@ -562,7 +562,7 @@ func TestExportDB(t *testing.T) {
 	pd := e.payoutWhere(`business_id = $1`, ids.UUID(paidBiz))
 	pid, err := ids.Parse(pd.Payout.Id)
 	require.NoError(t, err)
-	_, err = e.svc.MarkPaid(e.ctx, e.finance, pid, "HDFC765432", 1000, "paid by hand")
+	_, err = e.svc.MarkPaid(e.ctx, e.finance, pid, "HDFC76543210", 1000, "paid by hand")
 	require.NoError(t, err)
 
 	b, err := e.svc.Export(e.ctx, e.finance, "2026-06")

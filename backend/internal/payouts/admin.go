@@ -30,10 +30,9 @@ const (
 	maxReason    = 500 //settings:ok contract bound (AdminPayoutNote.reason ≤ 500)
 )
 
-// utrPattern is a bank's UTR or UPI reference as ck_payouts_utr stores it.
-// TODO(lead): NEFT/RTGS UTRs are 16–22 letters and digits, UPI RRNs 12
-// digits; 6–30 upper-case letters and digits takes both.
-var utrPattern = regexp.MustCompile(`^[A-Z0-9]{6,30}$`)
+// utrPattern is a bank's UTR or UPI reference as ck_payouts_utr stores it:
+// a UPI RRN is 12, a NEFT UTR 16 and an RTGS UTR 22 letters and digits.
+var utrPattern = regexp.MustCompile(`^[A-Z0-9]{12,22}$`)
 
 // --- statements ------------------------------------------------------------------
 
@@ -297,7 +296,7 @@ func (s *Service) MarkPaid(ctx context.Context, by authn.Principal, id ids.ID, u
 	}
 	utr = strings.ToUpper(strings.TrimSpace(utr))
 	if !utrPattern.MatchString(utr) {
-		return api.AdminPayoutDetail{}, fieldErr("body.utr", "6 to 30 letters and digits")
+		return api.AdminPayoutDetail{}, fieldErr("body.utr", "12 to 22 letters and digits")
 	}
 	if s.ledger == nil {
 		telemetry.Logger(ctx).ErrorContext(ctx, "payouts: the ledger is not configured")
@@ -340,6 +339,9 @@ func (s *Service) MarkPaid(ctx context.Context, by authn.Principal, id ids.ID, u
 		if total != p.Amount || len(pay.Lines) == 0 {
 			return internal("mark paid", errors.New("payout lines do not add up to the payout"))
 		}
+		if err := lockStoresCover(ctx, q, rows); err != nil {
+			return err
+		}
 		tx, err := s.ledger.Pay(ctx, pay)
 		if err != nil {
 			return internal("posting", err)
@@ -355,6 +357,33 @@ func (s *Service) MarkPaid(ctx context.Context, by authn.Principal, id ids.ID, u
 			"status": statusPaid, "utr": utr, "amount_credits": p.Amount, "transaction_id": tx.String(), "reason": reason,
 		})
 	})
+}
+
+// lockStoresCover locks the balances the payout's posting touches and
+// refuses with payout_amount_changed when a store's live store_credit is
+// below its line: the balance fell after the close (cashback), so finance
+// recomputes. A payout never takes a store negative.
+func lockStoresCover(ctx context.Context, q *payoutsdb.Queries, lines []payoutsdb.PayoutLinesRow) error {
+	stores := make([]pgtype.UUID, 0, len(lines))
+	for _, l := range lines {
+		stores = append(stores, l.StoreID)
+	}
+	bal, err := q.LockPayoutBalances(ctx, stores)
+	if err != nil {
+		return internal("lock balances", err)
+	}
+	live := make(map[pgtype.UUID]int64, len(bal))
+	for _, b := range bal {
+		if b.Kind == "store_credit" {
+			live[b.StoreID] = b.Balance
+		}
+	}
+	for _, l := range lines {
+		if b, ok := live[l.StoreID]; !ok || b < l.Amount {
+			return problem.New(genproblems.PayoutAmountChanged, "")
+		}
+	}
+	return nil
 }
 
 // errAlreadyDone ends a change that an earlier identical request made.

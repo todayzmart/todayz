@@ -178,10 +178,10 @@ describe('A-11 payouts', () => {
     const confirm = () => fireEvent.click(within(dialog).getByRole('button', { name: 'Mark ₹2,670 paid' }));
     fireEvent.change(within(dialog).getByLabelText('UTR'), { target: { value: 'ax 1' } });
     confirm();
-    expect(await within(dialog).findByText('Enter the UTR: 6 to 30 letters and digits.')).toBeInTheDocument();
+    expect(await within(dialog).findByText('Enter the UTR: 12 to 22 letters and digits.')).toBeInTheDocument();
     expect(within(dialog).getByText('Write a reason, up to 500 characters.')).toBeInTheDocument();
     expect(calls.some((c) => c.path === `${base}/mark-paid`)).toBe(false);
-    fireEvent.change(within(dialog).getByLabelText('UTR'), { target: { value: 'axis123456' } });
+    fireEvent.change(within(dialog).getByLabelText('UTR'), { target: { value: 'axis12345678' } });
     fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'September payout, HDFC batch' } });
     confirm();
 
@@ -190,9 +190,9 @@ describe('A-11 payouts', () => {
     await toastSays('Payout for Sri Lakshmi Stores marked paid');
     const posts = calls.filter((c) => c.path === `${base}/mark-paid`);
     expect(posts).toHaveLength(2);
-    expect(posts[1]?.body).toEqual({ utr: 'AXIS123456', amountPaise: 267000, reason: 'September payout, HDFC batch' });
+    expect(posts[1]?.body).toEqual({ utr: 'AXIS12345678', amountPaise: 267000, reason: 'September payout, HDFC batch' });
     expect(posts[1]?.headers.get('Idempotency-Key')).toMatch(KEY);
-    expect(await within(screen.getByRole('complementary', { name: 'Sri Lakshmi Stores' })).findByText(/AXIS123456/)).toBeInTheDocument();
+    expect(await within(screen.getByRole('complementary', { name: 'Sri Lakshmi Stores' })).findByText(/AXIS12345678/)).toBeInTheDocument();
   });
 
   it('refuses a recomputed amount and shows the new one', async () => {
@@ -201,7 +201,7 @@ describe('A-11 payouts', () => {
     const panel = await screen.findByRole('complementary', { name: 'Sri Lakshmi Stores' });
     fireEvent.click(within(panel).getByRole('button', { name: 'Mark paid' }));
     const dialog = await screen.findByRole('dialog', { name: 'Mark the payout for Sri Lakshmi Stores paid?' });
-    fireEvent.change(within(dialog).getByLabelText('UTR'), { target: { value: 'AXIS123456' } });
+    fireEvent.change(within(dialog).getByLabelText('UTR'), { target: { value: 'AXIS12345678' } });
     fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'September payout' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Mark ₹2,670 paid' }));
     expect(await within(dialog).findByText('The amount changed since you opened this payout. Check the new amount and confirm again.')).toBeInTheDocument();
