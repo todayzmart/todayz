@@ -116,6 +116,27 @@ func TestUnitAndKeyErrors(t *testing.T) {
 	require.ErrorIs(t, err, ErrBadValue)
 }
 
+// A minutes value past what time.Duration holds would wrap; a negative one would put every
+// deadline in the past (W3-05 review).
+func TestDurationOutOfRange(t *testing.T) {
+	ctx := context.Background()
+	calls := 0
+	c := NewCache(fakeLoader(map[Key]Value{
+		"huge_min":  row("huge_min", UnitMinutes, "200000000"),
+		"neg_min":   row("neg_min", UnitMinutes, "-1"),
+		"huge_days": row("huge_days", UnitDays, "200000"),
+		"edge_min":  row("edge_min", UnitMinutes, "153722867"),
+	}, &calls, nil), Options{})
+
+	for _, k := range []Key{"huge_min", "neg_min", "huge_days"} {
+		_, err := c.Duration(ctx, k)
+		require.ErrorIs(t, err, ErrBadValue, k)
+	}
+	d, err := c.Duration(ctx, "edge_min")
+	require.NoError(t, err, "the largest whole minute time.Duration holds")
+	require.Positive(t, d)
+}
+
 func TestTTLAndInvalidate(t *testing.T) {
 	ctx := context.Background()
 	now := time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)

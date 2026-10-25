@@ -305,6 +305,29 @@ func TestAdminSettingsHTTP(t *testing.T) {
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.EqualValues(t, 40, r.body["setting"].(map[string]any)["value"])
 
+	// Every number has a real range (30503), and values outside it, or past what the unit can
+	// carry, are refused even for a super_admin (W3-05 review).
+	require.Zero(t, a.count(`SELECT count(*) FROM platform_settings WHERE unit NOT IN ('bool','text') AND (min IS NULL OR max IS NULL)`),
+		"every numeric key has a min and a max")
+	require.Zero(t, a.count(`SELECT count(*) FROM platform_settings WHERE unit IN ('minutes','hours','days') AND min < 1`),
+		"no timer can be 0")
+	for key, bad := range map[string][]any{
+		"admin_adjust_dual_approval_above_paise": {float64(1 << 53), 500001, -1},
+		"ref_customer_customer_referee_credits":  {9e15, 1001},
+		"order_accept_timeout_min":               {0, 61, 200000000},
+		"ai_daily_cost_cap_paise":                {float64(1<<31) + 1},
+		"ai_model_fast":                          {"claude-haiku-5", "gpt-5"},
+	} {
+		for _, v := range bad {
+			r = patch(key, change(v))
+			require.Equal(t, http.StatusUnprocessableEntity, r.code, "%s=%v: %s", key, v, r.raw)
+			require.Contains(t, r.raw, "body.value")
+		}
+	}
+	r = patch("ai_model_fast", change("claude-sonnet-5-5"))
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.EqualValues(t, 0, a.count(`SELECT count(*) FROM audit_log WHERE subject_id = 'order_accept_timeout_min'`), "a refused change is not audited")
+
 	require.Equal(t, 1, a.count(`SELECT count(*) FROM audit_log WHERE action = 'settings.update' AND subject_type = 'platform_setting'
 	  AND subject_id = 'credit_max_per_order' AND before->>'value' = '30' AND after->>'value' = '40' AND after->>'reason' = 'W3-05 test'`))
 	require.Equal(t, 2, a.count(`SELECT count(*) FROM audit_log WHERE action = 'settings.update' AND subject_id = 'ask_max_stores'`))
@@ -330,4 +353,13 @@ func TestAdminSettingsHTTP(t *testing.T) {
 	r = get("/v1/admin/audit-log/subject?subjectType=platform_setting&subjectId=ask_max_stores")
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.Len(t, r.body["items"], 2)
+
+	// A stale step-up is asked again for a money key too, even of a super_admin (a fresh sign-in,
+	// so the access token outlives the step-up window).
+	tok = desk.token()
+	a.clk.Advance(authn.StepUpWindow + time.Second)
+	r = patch("credit_max_per_order", change(41))
+	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+	require.Equal(t, "step_up_required", problemCode(r))
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM platform_settings WHERE key = 'credit_max_per_order' AND value = '40'`))
 }
