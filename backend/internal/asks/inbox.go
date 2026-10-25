@@ -229,7 +229,7 @@ func (s *Service) reply(ctx context.Context, sid, askID string, body *asksapi.As
 				}
 				params.StoreItemID = item.ID
 			}
-			if body.PricePaise != nil && !(listed && int64(*body.PricePaise) == rule.ListedPaise) {
+			if body.PricePaise != nil && (!listed || int64(*body.PricePaise) != rule.ListedPaise) {
 				rule.CanEdit = s.canEditPrice(ctx, p, dec.Scope)
 			}
 			if params.PricePaise, err = rule.Decide(body.PricePaise); err != nil {
