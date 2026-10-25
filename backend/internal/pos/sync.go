@@ -519,7 +519,11 @@ func (s *Service) offlineLink(ctx context.Context, run *syncRun, in *syncapi.Syn
 	default:
 		return link{}, reject(syncapi.Invalid)
 	}
-	failed := link{method: methodCounterCode, status: linkFailed}
+	failed := link{method: methodCounterCode, status: linkFailed, failReason: failUnverified}
+	fail := func(reason string) (link, error) {
+		failed.failReason = reason
+		return failed, nil
+	}
 	if in.Code == nil || in.ClockOffsetMs == nil || s.devices == nil || s.hasher == nil {
 		return failed, nil
 	}
@@ -534,8 +538,11 @@ func (s *Service) offlineLink(ctx context.Context, run *syncRun, in *syncapi.Syn
 	if err != nil {
 		return link{}, err
 	}
-	if offset > maxClockOffset || offset < -maxClockOffset || run.now.Sub(typed) > maxAge || typed.After(run.now.Add(totpPeriod)) {
-		return failed, nil
+	if offset > maxClockOffset || offset < -maxClockOffset || typed.After(run.now.Add(totpPeriod)) {
+		return fail(failClockOff)
+	}
+	if run.now.Sub(typed) > maxAge {
+		return fail(failTooLate)
 	}
 	// Wrong codes count into the online locks at the sync's time, and a
 	// locked phone or cashier fails the sync's remaining links (D-131).
@@ -545,19 +552,20 @@ func (s *Service) offlineLink(ctx context.Context, run *syncRun, in *syncapi.Syn
 		return link{}, err
 	}
 	if locks.locked() {
-		return failed, nil
+		return fail(failLocked)
 	}
 	m, ok, err := s.matchCode(ctx, in.Phone, *in.Code, typed)
 	if err != nil {
 		return link{}, err
 	}
+	reason := failCodeWrong
 	if ok {
 		_, err = s.q(ctx).InsertCodeUse(ctx, posdb.InsertCodeUseParams{
 			CustomerDeviceID: ids.UUID(m.deviceID), TimeStep: m.step, StoreID: ids.UUID(run.sc.StoreID), Now: run.now,
 		})
 		switch {
 		case isNoRows(err):
-			ok = false // the code was used before: as wrong as a guess
+			ok, reason = false, failCodeUsed // the code was used before: as wrong as a guess
 		case err != nil:
 			return link{}, fmt.Errorf("pos: code use: %w", err)
 		}
@@ -566,7 +574,7 @@ func (s *Service) offlineLink(ctx context.Context, run *syncRun, in *syncapi.Syn
 		if _, err := s.codeFailed(ctx, g, locks, "sync", run.now); err != nil {
 			return link{}, err
 		}
-		return failed, nil
+		return fail(reason)
 	}
 	return link{
 		method: methodCounterCode, status: linkLinked, customerID: m.customerID,
