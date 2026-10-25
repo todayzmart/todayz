@@ -29,8 +29,18 @@ const (
 	AdminLeadView   = "admin.lead.view"
 	AdminLeadManage = "admin.lead.manage"
 
+	// master catalogue (A-08); `catalogue` reviews pending products and reads
+	// products to pick a merge target, admins also edit (D-64)
+	AdminCatalogueView   = "admin.catalogue.view"
+	AdminCatalogueReview = "admin.catalogue.review"
+	AdminCatalogueManage = "admin.catalogue.manage"
+
 	// banners (A-20)
 	AdminBannerModerate = "admin.banner.moderate"
+
+	// notifications (A-16)
+	AdminNotifyView   = "admin.notify.view"
+	AdminNotifyManage = "admin.notify.manage"
 
 	// settings (A-17); money settings are the keys with unit paise, bp or credits
 	AdminSettingsView      = "admin.settings.view"
@@ -56,11 +66,12 @@ func init() {
 	}
 	support := grant(authz.Support, authz.Admin, authz.SuperAdmin)
 	admins := grant(authz.Admin, authz.SuperAdmin)
+	catalogue := grant(authz.Catalogue, authz.Admin, authz.SuperAdmin)
 	leads := grant(authz.FieldAgent, authz.Support, authz.Admin, authz.SuperAdmin)
 	// Analyst reads Pulse, dashboards and jobs only (D-64), so it has no audit panel.
 	panel := grant(authz.FieldAgent, authz.Support, authz.Catalogue, authz.Finance, authz.Admin, authz.SuperAdmin)
 	Register(authz.Table{Domain: "admin", Actions: []authz.Action{
-		{Name: AdminCustomerView, Kind: authz.KindAdmin, Grants: support, Doc: "GET /v1/admin/customers?phone=, /v1/admin/customers/{customerId} (A-06)"},
+		{Name: AdminCustomerView, Kind: authz.KindAdmin, Grants: support, Doc: "POST /v1/admin/customer-search, GET /v1/admin/customers/{customerId} (A-06)"},
 		{Name: AdminCustomerBlock, Kind: authz.KindAdmin, Grants: admins, Doc: "POST .../customers/{customerId}/block, /unblock; DELETE .../sessions/{sessionId}: audited"},
 		{Name: AdminStrikesReset, Kind: authz.KindAdmin, Grants: support, Doc: "POST .../customers/{customerId}/strikes/reset, .../stores/{sid}/strikes/reset: with a reason, audited (D-41)"},
 
@@ -77,7 +88,14 @@ func init() {
 		{Name: AdminLeadView, Kind: authz.KindAdmin, Grants: leads, Doc: "GET /v1/admin/leads (Leads tab on A-03)"},
 		{Name: AdminLeadManage, Kind: authz.KindAdmin, Grants: leads, Doc: "POST /v1/admin/leads/{leadId}/status: audited"},
 
+		{Name: AdminCatalogueView, Kind: authz.KindAdmin, Grants: catalogue, Doc: "GET /v1/admin/products, .../{productId}, /v1/admin/pending-products, /v1/admin/categories, /v1/admin/synonyms (A-08)"},
+		{Name: AdminCatalogueReview, Kind: authz.KindAdmin, Grants: catalogue, Doc: "POST /v1/admin/pending-products/{pendingId}/approve, /merge, /reject: audited"},
+		{Name: AdminCatalogueManage, Kind: authz.KindAdmin, Grants: admins, Doc: "POST/PATCH /v1/admin/products, POST/PATCH /v1/admin/categories, POST/DELETE /v1/admin/synonyms (A-08): audited"},
+
 		{Name: AdminBannerModerate, Kind: authz.KindAdmin, Grants: support, Doc: "GET /v1/admin/banners, POST .../approve, .../takedown (A-20): audited"},
+
+		{Name: AdminNotifyView, Kind: authz.KindAdmin, Grants: admins, Doc: "GET /v1/admin/notification-templates, /v1/admin/integrations (A-16): keys set or missing only (D-19)"},
+		{Name: AdminNotifyManage, Kind: authz.KindAdmin, Grants: admins, Doc: "PATCH /v1/admin/notification-templates/{templateId}, POST .../test-send (to the caller's own phone): audited"},
 
 		{Name: AdminSettingsView, Kind: authz.KindAdmin, Grants: admins, Doc: "GET /v1/admin/settings, .../{key}/history (A-17)"},
 		{Name: AdminSettingsEdit, Kind: authz.KindAdmin, Grants: admins, StepUp: true, Doc: "PATCH /v1/admin/settings/{key}: keys that are not money settings; audited"},

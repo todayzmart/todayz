@@ -34,6 +34,9 @@ var subjectView = map[api.AdminAuditSubjectType]string{
 	api.AdminAuditSubjectTypeLead:            policy.AdminLeadView,
 	api.AdminAuditSubjectTypePlatformSetting: policy.AdminSettingsView,
 	api.AdminAuditSubjectTypeAdminUser:       policy.AdminUsersView,
+	api.AdminAuditSubjectTypeProduct:         policy.AdminCatalogueView,
+	api.AdminAuditSubjectTypeCategory:        policy.AdminCatalogueView,
+	api.AdminAuditSubjectTypeSynonym:         policy.AdminCatalogueView,
 }
 
 type auditFilter struct {

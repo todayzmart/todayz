@@ -301,3 +301,164 @@ FROM leads WHERE id = @id FOR UPDATE;
 UPDATE leads SET status = @status, status_changed_at = @now, status_changed_by = @by, version = version + 1
 WHERE id = @id
 RETURNING id, name, phone_enc, shop_name, city, source, status, status_changed_at, created_at;
+
+------------------------------------------------------------------------------
+-- master catalogue (A-08)
+------------------------------------------------------------------------------
+
+-- name: ListProducts :many
+-- Newest first. q is matched as an escaped ILIKE pattern over the name,
+-- variant and brand; barcode is an exact match.
+SELECT p.id, p.name, b.name AS brand_name, p.category_id, (c.names ->> 'en')::text AS category_name,
+  p.variant, p.pack_size::float8 AS pack_size, p.unit, p.mrp_paise, p.barcodes, p.status, p.merged_into,
+  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at
+FROM products p JOIN categories c ON c.id = p.category_id LEFT JOIN brands b ON b.id = p.brand_id
+WHERE (sqlc.narg(status)::text IS NULL OR p.status = sqlc.narg(status)::text)
+  AND (sqlc.narg(category_id)::uuid IS NULL OR p.category_id = sqlc.narg(category_id)::uuid)
+  AND (sqlc.narg(barcode)::text IS NULL OR p.barcodes @> ARRAY[sqlc.narg(barcode)::text])
+  AND (sqlc.narg(pattern)::text IS NULL
+       OR p.name ILIKE sqlc.narg(pattern)::text
+       OR p.variant ILIKE sqlc.narg(pattern)::text
+       OR b.name ILIKE sqlc.narg(pattern)::text)
+  AND (sqlc.narg(before_at)::timestamptz IS NULL
+       OR (p.created_at, p.id) < (sqlc.narg(before_at)::timestamptz, sqlc.narg(before_id)::uuid))
+ORDER BY p.created_at DESC, p.id DESC
+LIMIT @lim;
+
+-- name: GetProduct :one
+SELECT p.id, p.name, b.name AS brand_name, p.category_id, (c.names ->> 'en')::text AS category_name,
+  p.variant, p.pack_size::float8 AS pack_size, p.unit, p.mrp_paise, p.barcodes, p.status, p.merged_into,
+  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at
+FROM products p JOIN categories c ON c.id = p.category_id LEFT JOIN brands b ON b.id = p.brand_id
+WHERE p.id = @id;
+
+-- name: LockProduct :one
+SELECT id, name, category_id, variant, pack_size::float8 AS pack_size, unit, mrp_paise, barcodes, status, merged_into
+FROM products WHERE id = @id FOR UPDATE;
+
+-- name: LockProductBarcodes :exec
+-- Serialises product writes that set barcodes, so the "barcode in use" check
+-- below cannot race (barcodes carry no unique index).
+SELECT pg_advisory_xact_lock(hashtext('admin.products.barcodes'));
+
+-- name: BarcodeTaken :one
+-- A barcode is taken by a product that is active or waiting for review.
+SELECT EXISTS (
+  SELECT 1 FROM products
+  WHERE barcodes && @barcodes::text[] AND id <> @id AND status IN ('active', 'pending_review')
+)::bool;
+
+-- name: CategoryParent :one
+SELECT parent_id FROM categories WHERE id = @id;
+
+-- name: InsertProduct :exec
+INSERT INTO products (id, name, category_id, variant, pack_size, unit, mrp_paise, barcodes, status, created_at, updated_at)
+VALUES (@id, @name, @category_id, sqlc.narg(variant), @pack_size::float8, @unit, sqlc.narg(mrp_paise), @barcodes::text[],
+  'active', @now, @now);
+
+-- name: UpdateProduct :exec
+UPDATE products SET name = @name, category_id = @category_id, variant = sqlc.narg(variant),
+  pack_size = @pack_size::float8, unit = @unit, mrp_paise = sqlc.narg(mrp_paise), barcodes = @barcodes::text[],
+  status = @status, updated_at = @now, version = version + 1
+WHERE id = @id;
+
+-- name: RefreshStoreItemSearch :exec
+-- store_items.search copies the product's words at insert (catalogue's
+-- InsertStoreItem); a master edit refreshes it the same way.
+UPDATE store_items si
+SET search = p.search || setweight(to_tsvector('simple'::regconfig, coalesce(b.name, '')), 'B')
+                      || setweight(to_tsvector('simple'::regconfig, coalesce(si.local_name, '')), 'A')
+FROM products p LEFT JOIN brands b ON b.id = p.brand_id
+WHERE p.id = @product_id AND si.product_id = p.id;
+
+-- name: ListPendingProducts :many
+-- The review queue, oldest first (keyset after_at/after_id).
+SELECT p.id, p.name, b.name AS brand_name, p.category_id, (c.names ->> 'en')::text AS category_name,
+  p.variant, p.pack_size::float8 AS pack_size, p.unit, p.mrp_paise, p.barcodes, p.status, p.merged_into,
+  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at,
+  p.created_by_store_id, s.name AS created_by_store_name
+FROM products p JOIN categories c ON c.id = p.category_id LEFT JOIN brands b ON b.id = p.brand_id
+LEFT JOIN stores s ON s.id = p.created_by_store_id
+WHERE p.status = 'pending_review'
+  AND (sqlc.narg(after_at)::timestamptz IS NULL
+       OR (p.created_at, p.id) > (sqlc.narg(after_at)::timestamptz, sqlc.narg(after_id)::uuid))
+ORDER BY p.created_at, p.id
+LIMIT @lim;
+
+-- name: ProductSuggestions :many
+-- Active products whose names look like name (pg_trgm), closest first.
+SELECT p.id, p.name, b.name AS brand_name, p.category_id, (c.names ->> 'en')::text AS category_name,
+  p.variant, p.pack_size::float8 AS pack_size, p.unit, p.mrp_paise, p.barcodes, p.status, p.merged_into,
+  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at,
+  similarity(p.name, @name::text)::float8 AS similarity
+FROM products p JOIN categories c ON c.id = p.category_id LEFT JOIN brands b ON b.id = p.brand_id
+WHERE p.status = 'active' AND p.id <> @id AND p.name % @name::text
+ORDER BY similarity(p.name, @name::text) DESC, p.id
+LIMIT 5;
+
+-- name: SetProductStatus :exec
+UPDATE products SET status = @status, merged_into = sqlc.narg(merged_into), updated_at = @now, version = version + 1
+WHERE id = @id;
+
+-- name: ProductListed :one
+SELECT EXISTS (SELECT 1 FROM store_items WHERE product_id = @product_id)::bool;
+
+-- name: DropDuplicateSynonyms :execrows
+-- Before a merge moves a product's synonyms, drop the ones the target
+-- already has (the pair index would refuse them).
+DELETE FROM product_synonyms f
+WHERE f.product_id = @from_id
+  AND EXISTS (SELECT 1 FROM product_synonyms t
+              WHERE t.product_id = @into_id AND t.term = f.term AND t.synonym = f.synonym);
+
+-- name: MoveSynonyms :execrows
+UPDATE product_synonyms SET product_id = @into_id WHERE product_id = @from_id;
+
+-- name: ListCategories :many
+-- Top-level categories first, then children, each by sort.
+SELECT c.id, c.parent_id, c.slug, c.names, c.tint, c.icon, c.sort, c.updated_at,
+  (SELECT count(*) FROM products p WHERE p.category_id = c.id AND p.status = 'active')::int AS product_count
+FROM categories c
+ORDER BY (c.parent_id IS NOT NULL), c.sort, c.slug;
+
+-- name: GetCategory :one
+SELECT c.id, c.parent_id, c.slug, c.names, c.tint, c.icon, c.sort, c.updated_at,
+  (SELECT count(*) FROM products p WHERE p.category_id = c.id AND p.status = 'active')::int AS product_count
+FROM categories c WHERE c.id = @id;
+
+-- name: LockCategory :one
+SELECT id, names, tint, icon, sort FROM categories WHERE id = @id FOR UPDATE;
+
+-- name: InsertCategory :exec
+INSERT INTO categories (id, parent_id, slug, names, tint, icon, sort, created_at, updated_at)
+VALUES (@id, sqlc.narg(parent_id), @slug, @names, @tint, @icon, @sort, @now, @now);
+
+-- name: UpdateCategory :exec
+UPDATE categories SET names = @names, tint = @tint, icon = @icon, sort = @sort, updated_at = @now
+WHERE id = @id;
+
+-- name: ListSynonyms :many
+-- Newest first; prefix matches the start of the term or the synonym.
+SELECT ps.id, ps.term, ps.synonym, ps.lang, ps.product_id, p.name AS product_name, ps.created_at
+FROM product_synonyms ps LEFT JOIN products p ON p.id = ps.product_id
+WHERE (sqlc.narg(prefix)::text IS NULL OR ps.term LIKE sqlc.narg(prefix)::text OR ps.synonym LIKE sqlc.narg(prefix)::text)
+  AND (sqlc.narg(before_at)::timestamptz IS NULL
+       OR (ps.created_at, ps.id) < (sqlc.narg(before_at)::timestamptz, sqlc.narg(before_id)::uuid))
+ORDER BY ps.created_at DESC, ps.id DESC
+LIMIT @lim;
+
+-- name: GetSynonym :one
+SELECT ps.id, ps.term, ps.synonym, ps.lang, ps.product_id, p.name AS product_name, ps.created_at
+FROM product_synonyms ps LEFT JOIN products p ON p.id = ps.product_id
+WHERE ps.id = @id;
+
+-- name: ProductStatus :one
+SELECT status FROM products WHERE id = @id;
+
+-- name: InsertSynonym :exec
+INSERT INTO product_synonyms (id, term, synonym, lang, product_id, created_at)
+VALUES (@id, @term, @synonym, @lang, sqlc.narg(product_id), @now);
+
+-- name: DeleteSynonym :one
+DELETE FROM product_synonyms WHERE id = @id
+RETURNING term, synonym, lang, product_id;
