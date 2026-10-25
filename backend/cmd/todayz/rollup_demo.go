@@ -158,10 +158,10 @@ func (c demoConfig) check() error {
 
 func newDemoRun(cfg demoConfig, hc demoDoer, clk clock.Clock, otp demoOTP, out io.Writer) *demoRun {
 	cfg.API = strings.TrimSuffix(cfg.API, "/")
-	seed := uint64(clk.Now().UnixNano()) //nolint:gosec // a demo's random seed
+	seed := uint64(clk.Now().UnixNano()) // #nosec G115 -- a demo's random seed
 	return &demoRun{
 		cfg: cfg, hc: hc, clk: clk, otp: otp, out: out,
-		rnd:    rand.New(rand.NewPCG(seed, seed>>1)), //nolint:gosec // synthetic traffic, not security
+		rnd:    rand.New(rand.NewPCG(seed, seed>>1)), // #nosec G404 -- synthetic traffic, not security
 		counts: map[string]int{},
 	}
 }

@@ -193,9 +193,9 @@ func (s *Service) ComputeItemPairs(ctx context.Context, d Day) (int64, error) {
 		}
 		var err error
 		n, err = q.InsertItemPairs(ctx, rollupsdb.InsertItemPairsParams{
-			ComputedAt: s.clock.Now(), WindowDays: int32(days), //nolint:gosec // a settings value in days
+			ComputedAt: s.clock.Now(), WindowDays: int32(days), // #nosec G115 -- a settings value in days
 			WindowStart: d.Add(-int(days)).Start(), WindowEnd: d.Start(),
-			MinBills: int32(minBills), //nolint:gosec // a settings count
+			MinBills: int32(minBills), // #nosec G115 -- a settings count
 		})
 		return err
 	})

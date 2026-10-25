@@ -285,7 +285,7 @@ func (s *Service) attention(ctx context.Context, q *rollupsdb.Queries, p period,
 	}
 	rows, err := q.StoresNeedingAttention(ctx, rollupsdb.StoresNeedingAttentionParams{
 		RecentFrom: now.Add(-notAcceptingWindow), StartAt: p.from.Start(), EndAt: p.to.End(),
-		StrikesFrom: now.Add(-strikeWindow), StrikeThreshold: int32(threshold), //nolint:gosec // a settings count
+		StrikesFrom: now.Add(-strikeWindow), StrikeThreshold: int32(threshold), // #nosec G115 -- a settings count
 		StaleBefore: now.Add(-stale),
 	})
 	if err != nil {
@@ -343,7 +343,7 @@ func (s *Service) Map(ctx context.Context, r *api.AdminPulseRange) (api.AdminPul
 	}
 	for _, c := range cells {
 		out.Demand = append(out.Demand, api.AdminPulseDemandCell{
-			Cell: fmt.Sprintf("%015x", uint64(c.GeoCell)), Searches: int(c.Searches), ZeroResultSearches: int(c.ZeroResults), //nolint:gosec // an H3 index is a uint64 held in a bigint
+			Cell: fmt.Sprintf("%015x", uint64(c.GeoCell)), Searches: int(c.Searches), ZeroResultSearches: int(c.ZeroResults), // #nosec G115 -- an H3 index is a uint64 held in a bigint
 		})
 	}
 	return out, nil
