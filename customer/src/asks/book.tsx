@@ -1,6 +1,8 @@
 // "Book" on a Yes card (01 §11.2): the replied store item goes into the cart with the asked quantity and
-// the reply's id, and checkout (C-11) prices it at the reply while that is valid. One shop per cart: when
-// the cart holds another shop's items, the same "replace cart" sheet as the shop page asks first.
+// the reply's id, and checkout (C-11) prices it at the reply while that is valid. A reply whose price has
+// expired books at the current price: the line carries no reply id, and checkout's "price changed" second
+// tap shows the new price. One shop per cart: when the cart holds another shop's items, the same "replace
+// cart" sheet as the shop page asks first.
 import type { Ask } from '@todayz/api-client/gen/model/ask';
 import type { AskReply } from '@todayz/api-client/gen/model/askReply';
 import { useRouter } from '@tanstack/react-router';
@@ -16,12 +18,22 @@ interface Pending {
   current: CartStore;
 }
 
-/** The cart line for a reply. The price is for show; the quote decides what is charged. */
+/**
+ * The cart line for a reply. The price is what the person saw on the reply; the quote decides what is
+ * charged. A Yes without a price has no expiry and keeps the reply (catalogue price, the asked quantity
+ * at most); an expired price drops it.
+ */
 export function lineFor(ask: Ask, reply: AskReply, priceValid: boolean): Omit<CartLine, 'qty'> | null {
   if (!reply.storeItemId) return null;
-  const price = (priceValid ? reply.pricePaise : null) ?? reply.listedPricePaise ?? reply.pricePaise;
+  const price = reply.pricePaise ?? reply.listedPricePaise;
   if (price === null) return null;
-  return { storeItemId: reply.storeItemId, productName: ask.itemName, pricePaise: price, askReplyId: reply.askReplyId };
+  const keepsReply = priceValid || reply.pricePaise === null;
+  return {
+    storeItemId: reply.storeItemId,
+    productName: ask.itemName,
+    pricePaise: price,
+    ...(keepsReply ? { askReplyId: reply.askReplyId, askQty: ask.quantity } : {}),
+  };
 }
 
 export function useBookReply(): { book: (ask: Ask, reply: AskReply, priceValid: boolean) => void; sheet: ReactNode } {

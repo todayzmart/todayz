@@ -21,6 +21,8 @@ export interface CartLine {
   imageUrl?: string;
   /** Booked from a shop's Yes on an ask (C-26, W3-16): quote and order price this line at the reply. */
   askReplyId?: string;
+  /** The asked quantity: the reply books at most this many. Above it the line drops the reply and is a plain line. */
+  askQty?: number;
   qty: number;
 }
 
@@ -44,8 +46,15 @@ function emit(): void {
   listeners.forEach((l) => l());
 }
 
+/** A line past its ask's quantity no longer books from the reply, so checkout never sends a quantity the reply refuses. */
+function fitAsk(l: CartLine): CartLine {
+  if (l.askReplyId === undefined || l.askQty === undefined || l.qty <= l.askQty) return l;
+  const { askReplyId: _reply, askQty: _qty, ...plain } = l;
+  return plain;
+}
+
 function set(next: CartState): void {
-  state = next.lines.length === 0 ? EMPTY : next;
+  state = next.lines.length === 0 ? EMPTY : { store: next.store, lines: next.lines.map(fitAsk) };
   touched = true;
   emit();
   const s = storage;
@@ -146,6 +155,18 @@ export function setQty(storeItemId: string, qty: number): void {
 
 export function clearCart(): void {
   set(EMPTY);
+}
+
+/** The reply can no longer price its line (checkout's 409 `ask_price_expired`): the line stays, at the current price. */
+export function dropAskReply(): void {
+  if (askReplyOf(state) === undefined) return;
+  set({
+    store: state.store,
+    lines: state.lines.map((l) => {
+      const { askReplyId: _reply, askQty: _qty, ...plain } = l;
+      return plain;
+    }),
+  });
 }
 
 /** The ask reply the cart books from, if a line came from one (one per order, 01 §11.2). */

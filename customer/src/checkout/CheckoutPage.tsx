@@ -10,7 +10,7 @@ import { Banknote, ShoppingBag } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useUpdateController } from '../app/update-context';
-import { askReplyOf, clearCart, useCart } from '../cart/cart';
+import { askReplyOf, clearCart, dropAskReply, useCart } from '../cart/cart';
 import { CreditsControl } from '../cart/CreditsControl';
 import { DeliveryProblemBanner, FulfilmentSwitch } from '../cart/Delivery';
 import { deliveryProblemOf, type DeliveryProblem } from '../cart/deliveryRules';
@@ -170,7 +170,13 @@ export function CheckoutPage() {
     } catch (err) {
       const p = problemOf(err);
       setProblem(p);
-      if (p.kind === 'price_changed' && err instanceof ApiError) {
+      if (err instanceof ApiError && err.code === 'ask_price_expired') {
+        // The reply's price ran out: the line stays at the current price, asked again without the
+        // reply, and the new total waits for a second tap.
+        dropAskReply();
+        setAccepted(null);
+        void client.invalidateQueries({ queryKey: ['quote'] });
+      } else if (p.kind === 'price_changed' && err instanceof ApiError) {
         // The 409 carries the fresh quote: show it and wait for a second tap.
         const fresh = err.problem.extensions?.['quote'] as CheckoutQuote | undefined;
         if (fresh) client.setQueryData(quoteKey(cart, q?.creditsRequested ?? 0, ful.quoted), fresh);

@@ -328,6 +328,44 @@ describe('C-11 checkout', () => {
     expect(bodies[1]).toMatchObject({ expectedTotalPaise: 5400 });
   });
 
+  it('an expired ask price drops the reply, asks again at the current price and needs a second tap', async () => {
+    resetCartForTests();
+    addToCart(STORE, { storeItemId: ITEM, productName: 'Toor dal', pricePaise: 2300, askReplyId: 'RPLY01', askQty: 2 }, 2);
+    const quotes: unknown[] = [];
+    const bodies: unknown[] = [];
+    renderAt('/checkout', {
+      returning: true,
+      handlers: [
+        signedIn,
+        on('POST', '/v1/me/checkout/quote', (c) => {
+          quotes.push(c.body);
+          return json(200, (c.body as { askReplyId?: string }).askReplyId ? quote({}, 2300) : quote());
+        }),
+        on('POST', '/v1/me/orders', (c) => {
+          bodies.push(c.body);
+          if (bodies.length === 1) {
+            return json(409, { type: 'about:blank#ask_price_expired', title: 'x', status: 409, code: 'ask_price_expired', extensions: { quote: quote() } });
+          }
+          return json(201, order());
+        }),
+        on('GET', `/v1/me/orders/${ORDER_ID}`, () => json(200, order())),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: `Place order · ${formatMoney(4600)}` }));
+    await waitFor(() => expect(bodies).toHaveLength(1));
+    expect(bodies[0]).toMatchObject({ askReplyId: 'RPLY01' });
+    await waitFor(() => expect(getCart().lines[0]?.askReplyId).toBeUndefined());
+    expect(getCart().lines[0]).toMatchObject({ qty: 2 });
+    expect(await screen.findByText('The total changed')).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole('button', { name: `Accept new total · ${formatMoney(5000)}` }));
+    expect(bodies).toHaveLength(1);
+    expect(quotes.at(-1)).not.toHaveProperty('askReplyId');
+    fireEvent.click(await screen.findByRole('button', { name: `Place order · ${formatMoney(5000)}` }));
+    await waitFor(() => expect(bodies).toHaveLength(2));
+    expect(bodies[1]).toMatchObject({ expectedTotalPaise: 5000 });
+    expect(bodies[1]).not.toHaveProperty('askReplyId');
+  });
+
   it('names the line that has too little stock and keeps the cart', async () => {
     renderAt('/checkout', {
       returning: true,

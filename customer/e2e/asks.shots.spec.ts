@@ -118,6 +118,48 @@ const preview = {
   imageUrl: null,
 };
 
+// The quote at the catalogue price (26000 × 2): the line no longer carries the reply.
+const unit = 26000;
+const catalogueQuote = {
+  storeId: STORE_ID,
+  fulfilment: 'pickup',
+  lines: [
+    {
+      storeItemId: ITEM_ID,
+      productId: PRODUCT_ID,
+      name: 'Aashirvaad Atta',
+      variant: null,
+      packSize: 5,
+      unit: 'kg',
+      imageKey: null,
+      quantity: 2,
+      availableQuantity: 20,
+      availability: 'in_stock',
+      unitPricePaise: unit,
+      mrpPaise: 29500,
+      lineSubtotalPaise: unit * 2,
+      discountPaise: 0,
+      lineTotalPaise: unit * 2,
+      priceSource: 'catalog',
+      validUntil: null,
+    },
+  ],
+  subtotalPaise: unit * 2,
+  discountPaise: 0,
+  itemSubtotalPaise: unit * 2,
+  itemsAfterOffersPaise: unit * 2,
+  deliveryFeePaise: 0,
+  creditsRequested: 0,
+  creditsAllowed: 0,
+  creditsUsed: 0,
+  creditsLimit: null,
+  totalPaise: unit * 2,
+  offersApplied: [],
+  orderable: true,
+  validUntil: null,
+  serverNow: NOW,
+};
+
 type Seen = { method: string; path: string; body: unknown; key: string | undefined };
 type Answers = { detail?: () => unknown; share?: 'ok' | 'gone' };
 
@@ -150,6 +192,7 @@ async function api(page: Page, answers: Answers = {}): Promise<Seen[]> {
     if (p === `/v1/discover/stores/${SHOP}/items/${ITEM_ID}`) return send(200, { item, serverNow: NOW });
     if (p === '/v1/me/asks' && req.method() === 'POST') return send(201, { ask: ask(), replies: [], serverNow: NOW });
     if (p === `/v1/me/asks/${ASK_ID}`) return send(200, answers.detail?.() ?? { ask: ask(), replies: [], serverNow: NOW });
+    if (p === '/v1/me/checkout/quote') return send(200, catalogueQuote);
     if (p === `/v1/public/share-cards/${CODE}`)
       return answers.share === 'gone' ? send(410, { type: 'about:blank', title: 'Gone', status: 410, code: 'share_card_unavailable' }) : send(200, preview);
     if (p === '/v1/public/share-cards' && req.method() === 'POST')
@@ -222,6 +265,23 @@ test('C-26 replies: soonest badge, prices, in-store only, and Book opens checkou
 
   await cards.nth(0).getByRole('button', { name: 'Book' }).click();
   await expect(page).toHaveURL(/\/checkout$/);
+});
+
+test('C-26 Book on an expired price: checkout asks at the current price and shows the new total', async ({ page }) => {
+  const seen = await api(page, {
+    detail: () => ({ ask: ask({ progress: { asked: 5, replied: 1, bestPricePaise: 25500 }, yesCount: 1 }), replies: [reply({ priceValidUntil: at(-1) })], serverNow: NOW }),
+  });
+  await page.goto(`/asks/${ASK_ID}`);
+  await expect(page.getByText(/Price may have changed · ₹260/)).toBeVisible();
+  await page.getByRole('article').first().getByRole('button', { name: 'Book' }).click();
+  await expect(page).toHaveURL(/\/checkout$/);
+  await expect(page.getByText('The total changed')).toBeVisible();
+  await expect(page.getByRole('button', { name: /Accept new total · ₹520/ })).toBeVisible();
+  const quotes = seen.filter((s) => s.method === 'POST' && s.path === '/v1/me/checkout/quote');
+  expect(quotes.length).toBeGreaterThan(0);
+  for (const q of quotes) expect(q.body).not.toHaveProperty('askReplyId');
+  expect(quotes.at(-1)?.body).toMatchObject({ items: [{ storeItemId: ITEM_ID, quantity: 2 }] });
+  await shot(page, 'customer-c11-ask-expired.png');
 });
 
 test('C-26 closed with no Yes', async ({ page }) => {

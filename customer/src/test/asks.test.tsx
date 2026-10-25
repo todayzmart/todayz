@@ -5,7 +5,8 @@ import type { AskReply } from '@todayz/api-client/gen/model/askReply';
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { setPlace } from '../app/place';
-import { getCart, resetCartForTests } from '../cart/cart';
+import { addToCart, getCart, resetCartForTests, setQty } from '../cart/cart';
+import { lineFor } from '../asks/book';
 import { setAskStreamFetchForTests } from '../asks/api';
 import { setStreamFetchForTests } from '../orders/stream';
 import { isAndroid, whatsappHref } from '../share/links';
@@ -202,6 +203,28 @@ describe('C-26 Ask progress and replies', () => {
     const expired = detail(ask({ progress: { asked: 5, replied: 1, bestPricePaise: 5800 } }), [reply({ priceValidUntil: at(-1) })]);
     renderAt(`/asks/${ASK_ID}`, { returning: true, handlers: [signedIn, on('GET', `/v1/me/asks/${ASK_ID}`, () => json(200, expired))] });
     expect(await screen.findByText(/Price may have changed · ₹60/)).toBeInTheDocument();
+  });
+
+  it('Book on an expired price books at the current price: no reply id, the asked quantity', async () => {
+    const expired = detail(ask({ progress: { asked: 5, replied: 1, bestPricePaise: 5800 }, yesCount: 1 }), [reply({ priceValidUntil: at(-1) })]);
+    const { router } = renderAt(`/asks/${ASK_ID}`, { returning: true, handlers: [signedIn, on('GET', `/v1/me/asks/${ASK_ID}`, () => json(200, expired))] });
+    fireEvent.click(await screen.findByRole('button', { name: 'Book' }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/checkout'));
+    const [line] = getCart().lines;
+    expect(line).toMatchObject({ storeItemId: ITEM_ID, qty: 2, pricePaise: 5800 });
+    expect(line?.askReplyId).toBeUndefined();
+  });
+
+  it('a Yes without a price keeps the reply and its cap; more than the ask drops the reply', () => {
+    const line = lineFor(ask(), reply({ pricePaise: null, priceValidUntil: null }), false);
+    expect(line).toMatchObject({ pricePaise: 6000, askReplyId: '01KE0S1W6W8ZV7T1C3A6RPLY01', askQty: 2 });
+    if (!line) throw new Error('no line');
+    addToCart({ id: STORE_ID, slug: SHOP_A, name: 'Sri Lakshmi Stores' }, line, 2);
+    expect(getCart().lines[0]?.askReplyId).toBe('01KE0S1W6W8ZV7T1C3A6RPLY01');
+    setQty(ITEM_ID, 3);
+    expect(getCart().lines[0]).toMatchObject({ qty: 3 });
+    expect(getCart().lines[0]?.askReplyId).toBeUndefined();
+    expect(getCart().lines[0]?.askQty).toBeUndefined();
   });
 
   it('closed with no Yes says so; signed out asks to sign in', async () => {
