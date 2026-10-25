@@ -408,11 +408,11 @@
     "description": "Category name field per language"
   },
   "catalogue.field.iconHelp": {
-    "defaultMessage": "A Lucide icon name, like wheat",
+    "defaultMessage": "An icon name from the icon set, like wheat",
     "description": "Help under the icon field"
   },
   "catalogue.field.iconError": {
-    "defaultMessage": "Use a Lucide icon name: lower-case words joined by hyphens.",
+    "defaultMessage": "Use an icon name from the icon set: lower-case words joined by hyphens.",
     "description": "Field error"
   },
   "catalogue.field.sortHelp": {

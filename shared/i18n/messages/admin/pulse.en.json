@@ -1,6 +1,6 @@
 {
   "pulse.sub": {
-    "defaultMessage": "Platform-wide numbers from the same rollups as the Grafana dashboards. Read-only.",
+    "defaultMessage": "Platform-wide numbers from the same rollups as the monitoring dashboards. Read-only.",
     "description": "A-02 Pulse: Page subtitle"
   },
   "pulse.asOf": {
