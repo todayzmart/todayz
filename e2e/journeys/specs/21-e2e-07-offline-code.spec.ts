@@ -119,8 +119,9 @@ test('E2E-07 the shop sees "Customer link failed" on the sale in the business ap
     await expect(sales.getByText('The counter code was already used.')).toBeVisible();
     await expect(sales.getByText('The device clock was off.')).toBeVisible();
     await expect(sales.getByText('The sale synced too late to check the code.')).toBeVisible();
-    // The linked sale names the customer; no phone is shown anywhere on the list.
-    await expect(sales.getByText(/^Linked to /).first()).toBeVisible();
+    // The linked sale shows as linked: "Linked to {name}" when the customer has set a name, else
+    // "Customer linked" (a freshly signed-in walk-in has none). No phone is shown anywhere on the list.
+    await expect(sales.getByText(/^(Linked to .+|Customer linked)$/).first()).toBeVisible();
     expect(await sheet.innerText()).not.toContain(PEOPLE.walkIn.national);
   } finally {
     await app.close();
