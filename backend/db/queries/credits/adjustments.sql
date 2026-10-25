@@ -79,9 +79,21 @@ ORDER BY day;
 -- Adjustment requests (D-05)
 ------------------------------------------------------------------------------
 
--- name: InsertAdjustmentRequest :exec
-INSERT INTO admin_adjustment_requests (id, customer_id, amount, reason, link, requested_by, requested_at, status)
-VALUES (@id, @customer_id, @amount, @reason, sqlc.narg(link), @requested_by, @now, 'pending');
+-- InsertAdjustmentRequest writes nothing (0 rows) when the requester's
+-- Idempotency-Key already made a request; AdjustmentRequestByKey reads it.
+-- name: InsertAdjustmentRequest :execrows
+INSERT INTO admin_adjustment_requests (id, customer_id, amount, reason, link, requested_by, requested_at, status, idempotency_key)
+VALUES (@id, @customer_id, @amount, @reason, sqlc.narg(link), @requested_by, @now, 'pending', sqlc.narg(idempotency_key))
+ON CONFLICT (requested_by, idempotency_key) WHERE idempotency_key IS NOT NULL DO NOTHING;
+
+-- name: AdjustmentRequestByKey :one
+SELECT * FROM admin_adjustment_requests WHERE requested_by = @requested_by AND idempotency_key = @idempotency_key;
+
+-- AdjustmentRefByKey is the request id (ref) of the at-once adjustment this
+-- key posted, so an identical replay posts with the same ref and gets the
+-- first transaction back.
+-- name: AdjustmentRefByKey :one
+SELECT ref_id FROM ledger_transactions WHERE idempotency_key = @idempotency_key AND kind = 'admin_adjustment';
 
 -- name: LockAdjustmentRequest :one
 SELECT * FROM admin_adjustment_requests WHERE id = @id FOR UPDATE;

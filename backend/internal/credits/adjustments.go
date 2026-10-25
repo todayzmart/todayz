@@ -352,21 +352,38 @@ func (a *Admin) CreateAdjustment(ctx context.Context, p authn.Principal, in Adju
 		if !live {
 			return adminFieldErr("body.accountId", "the customer's account is deleted")
 		}
-		if credits < 0 && acct.Balance < -credits {
-			return problem.New(genproblems.AdjustmentInsufficientBalance, "")
-		}
 		after := map[string]any{
 			"customerId": customer.String(), "amountPaise": in.AmountPaise, "reason": reason, "link": link,
 			"thresholdPaise": int64(threshold),
 		}
 		if pending {
-			if err := cq.InsertAdjustmentRequest(ctx, creditsdb.InsertAdjustmentRequestParams{
+			// At once, Post checks the balance itself (after the key, so a replay
+			// of a debit still answers its first result).
+			if credits < 0 && acct.Balance < -credits {
+				return problem.New(genproblems.AdjustmentInsufficientBalance, "")
+			}
+			var key *string
+			if in.IdempotencyKey != "" {
+				key = &in.IdempotencyKey
+			}
+			n, err := cq.InsertAdjustmentRequest(ctx, creditsdb.InsertAdjustmentRequestParams{
 				ID: ids.UUID(id), CustomerID: acct.OwnerID, Amount: int32(credits), // #nosec G115 -- |credits| ≤ 1,000,000 (contract bound)
-				Reason: reason, Link: link, RequestedBy: ids.UUID(p.UserID), Now: now,
-			}); err != nil {
+				Reason: reason, Link: link, RequestedBy: ids.UUID(p.UserID), Now: now, IdempotencyKey: key,
+			})
+			if err != nil {
 				return problem.Wrap(genproblems.Internal, err)
 			}
-			if _, err := a.audit.Write(ctx, audit.Entry{
+			if n == 0 {
+				// A replay of this requester's key: the first request, never a second.
+				first, err := cq.AdjustmentRequestByKey(ctx, creditsdb.AdjustmentRequestByKeyParams{RequestedBy: ids.UUID(p.UserID), IdempotencyKey: key})
+				if err != nil {
+					return problem.Wrap(genproblems.Internal, err)
+				}
+				if first.CustomerID != acct.OwnerID || int64(first.Amount) != credits || first.Reason != reason || deref(first.Link) != deref(link) {
+					return problem.New(genproblems.Conflict, "this idempotency key made another adjustment request")
+				}
+				id = mustID(first.ID)
+			} else if _, err := a.audit.Write(ctx, audit.Entry{
 				ActorKind: audit.ActorAdmin, ActorID: p.UserID, Action: "credits.adjustment_request",
 				SubjectType: "credit_adjustment", SubjectID: id.String(), After: after,
 			}); err != nil {
@@ -383,19 +400,30 @@ func (a *Admin) CreateAdjustment(ctx context.Context, p authn.Principal, in Adju
 		key := id.String()
 		if in.IdempotencyKey != "" {
 			key = p.UserID.String() + ":" + in.IdempotencyKey
+			// An identical replay posts with the first ref, so Post returns the
+			// first transaction; a different body under the key is still 409.
+			ref, err := cq.AdjustmentRefByKey(ctx, KeyPrefix[TxAdminAdjustment]+key)
+			switch {
+			case err == nil:
+				id = mustID(ref)
+			case !db.IsNoRows(err):
+				return problem.Wrap(genproblems.Internal, err)
+			}
 		}
 		posted, err := a.post(ctx, p.UserID, customer, credits, id, key, reason)
 		if err != nil {
 			return err
 		}
-		after["transactionId"] = posted.String()
-		if _, err := a.audit.Write(ctx, audit.Entry{
-			ActorKind: audit.ActorAdmin, ActorID: p.UserID, Action: "credits.adjust",
-			SubjectType: "credit_adjustment", SubjectID: id.String(), After: after,
-		}); err != nil {
-			return err
+		if !posted.Duplicate {
+			after["transactionId"] = posted.TransactionID.String()
+			if _, err := a.audit.Write(ctx, audit.Entry{
+				ActorKind: audit.ActorAdmin, ActorID: p.UserID, Action: "credits.adjust",
+				SubjectType: "credit_adjustment", SubjectID: id.String(), After: after,
+			}); err != nil {
+				return err
+			}
 		}
-		t := posted.String()
+		t := posted.TransactionID.String()
 		out = api.CreditAdjustmentResult{Outcome: "posted", TransactionId: &t}
 		return nil
 	})
@@ -409,7 +437,7 @@ func (a *Admin) CreateAdjustment(ctx context.Context, p authn.Principal, in Adju
 // post is the admin_adjustment posting: the wallet by credits, the platform's
 // adjustments account the other way. Its key is "adjust:" + key: the request
 // id for an approval, the caller and their Idempotency-Key for an at-once one.
-func (a *Admin) post(ctx context.Context, by, customer ids.ID, credits int64, ref ids.ID, key, memo string) (ids.ID, error) {
+func (a *Admin) post(ctx context.Context, by, customer ids.ID, credits int64, ref ids.ID, key, memo string) (Posted, error) {
 	res, err := a.s.Post(ctx, Posting{
 		Kind: TxAdminAdjustment, RefType: refAdjustment, RefID: ref,
 		IdempotencyKey: KeyPrefix[TxAdminAdjustment] + key, CreatedBy: by, Memo: memo,
@@ -420,13 +448,13 @@ func (a *Admin) post(ctx context.Context, by, customer ids.ID, credits int64, re
 	})
 	switch {
 	case errors.Is(err, ErrInsufficient):
-		return ids.Zero, problem.New(genproblems.AdjustmentInsufficientBalance, "")
+		return Posted{}, problem.New(genproblems.AdjustmentInsufficientBalance, "")
 	case errors.Is(err, ErrKeyReused):
-		return ids.Zero, problem.New(genproblems.Conflict, "this idempotency key posted another adjustment")
+		return Posted{}, problem.New(genproblems.Conflict, "this idempotency key posted another adjustment")
 	case err != nil:
-		return ids.Zero, asProblem(err)
+		return Posted{}, asProblem(err)
 	}
-	return res.TransactionID, nil
+	return res, nil
 }
 
 // ApproveAdjustment posts a pending request; the approver is never the
@@ -459,10 +487,19 @@ func (a *Admin) ApproveAdjustment(ctx context.Context, p authn.Principal, reques
 		if r.Status != "pending" {
 			return problem.New(genproblems.InvalidTransition, "the request is "+r.Status)
 		}
-		posted, err := a.post(ctx, p.UserID, mustID(r.CustomerID), int64(r.Amount), requestID, requestID.String(), r.Reason)
+		// The customer may have deleted their account since the request.
+		live, err := cq.CustomerExists(ctx, r.CustomerID)
+		if err != nil {
+			return problem.Wrap(genproblems.Internal, err)
+		}
+		if !live {
+			return problem.New(genproblems.InvalidTransition, "the customer's account is deleted")
+		}
+		res, err := a.post(ctx, p.UserID, mustID(r.CustomerID), int64(r.Amount), requestID, requestID.String(), r.Reason)
 		if err != nil {
 			return err
 		}
+		posted := res.TransactionID
 		now := a.s.now()
 		if err := cq.ApproveAdjustmentRequest(ctx, creditsdb.ApproveAdjustmentRequestParams{
 			ID: r.ID, ApprovedBy: ids.UUID(p.UserID), Now: &now, DecisionNote: cleaned, TransactionID: ids.UUID(posted),

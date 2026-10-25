@@ -37,6 +37,10 @@ CREATE TABLE admin_adjustment_requests (
   decision_note  text,
   transaction_id uuid REFERENCES ledger_transactions (id),
   version        int NOT NULL DEFAULT 1,
+  -- The request's Idempotency-Key: a replay past the HTTP layer returns the
+  -- first request instead of making a second one two approvers could post.
+  idempotency_key text,
+  CONSTRAINT ck_admin_adjustment_requests_idempotency_key CHECK (idempotency_key IS NULL OR char_length(idempotency_key) BETWEEN 1 AND 255),
   CONSTRAINT ck_admin_adjustment_requests_status CHECK (status IN ('pending','approved','rejected','cancelled')),
   CONSTRAINT ck_admin_adjustment_requests_amount CHECK (amount <> 0),
   CONSTRAINT ck_admin_adjustment_requests_reason CHECK (char_length(reason) BETWEEN 1 AND 500),
@@ -54,6 +58,7 @@ CREATE INDEX ix_admin_adjustment_requests_requested ON admin_adjustment_requests
 CREATE INDEX ix_admin_adjustment_requests_customer ON admin_adjustment_requests (customer_id);
 CREATE INDEX ix_admin_adjustment_requests_requested_by ON admin_adjustment_requests (requested_by);
 CREATE INDEX ix_admin_adjustment_requests_approved_by ON admin_adjustment_requests (approved_by) WHERE approved_by IS NOT NULL;
+CREATE UNIQUE INDEX ux_admin_adjustment_requests_idempotency ON admin_adjustment_requests (requested_by, idempotency_key) WHERE idempotency_key IS NOT NULL;
 CREATE UNIQUE INDEX ux_admin_adjustment_requests_transaction ON admin_adjustment_requests (transaction_id) WHERE transaction_id IS NOT NULL;
 
 CREATE TABLE payouts (

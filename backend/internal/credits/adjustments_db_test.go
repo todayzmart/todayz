@@ -176,20 +176,34 @@ func TestAdjustmentInsufficientBalanceDB(t *testing.T) {
 }
 
 // The at-once posting is keyed by the caller's Idempotency-Key, so a replay
-// that gets past the HTTP idempotency layer never posts twice. TODO(lead): the
-// replay answers conflict (each call has its own request id as the ref)
-// rather than the first result; the HTTP layer replays the stored response
-// before it gets here.
+// that gets past the HTTP idempotency layer never posts twice: an identical
+// one answers the first result, a different body under the key 409.
 func TestAdjustmentIdempotencyKeyDB(t *testing.T) {
 	a := newAdjustEnv(t)
 	in := AdjustmentInput{AccountID: a.account, AmountPaise: 10000, Reason: "refund for a missing item", IdempotencyKey: "k-1"}
 	r1, err := a.adm.CreateAdjustment(a.ctx, a.finance, in)
 	require.NoError(t, err)
 	require.NotNil(t, r1.TransactionId)
-	_, err = a.adm.CreateAdjustment(a.ctx, a.finance, in)
-	require.Equal(t, "conflict", problem.CodeOf(err))
+	again, err := a.adm.CreateAdjustment(a.ctx, a.finance, in)
+	require.NoError(t, err)
+	require.Equal(t, "posted", string(again.Outcome))
+	require.Equal(t, *r1.TransactionId, *again.TransactionId)
 	require.EqualValues(t, 1100, a.wallet())
 	require.Equal(t, 1, a.count(`SELECT count(*) FROM ledger_transactions WHERE kind = 'admin_adjustment'`))
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM audit_log WHERE action = 'credits.adjust'`))
+
+	// A debit replayed after it emptied the wallet still answers its first result.
+	a.setting(settings.AdminAdjustDualApprovalAbovePaise, "200000")
+	debit := AdjustmentInput{AccountID: a.account, AmountPaise: -110000, Reason: "duplicate grant", IdempotencyKey: "k-debit"}
+	d1, err := a.adm.CreateAdjustment(a.ctx, a.finance, debit)
+	require.NoError(t, err)
+	require.Zero(t, a.wallet())
+	d2, err := a.adm.CreateAdjustment(a.ctx, a.finance, debit)
+	require.NoError(t, err)
+	require.Equal(t, *d1.TransactionId, *d2.TransactionId)
+	_, err = a.adm.CreateAdjustment(a.ctx, a.finance, AdjustmentInput{AccountID: a.account, AmountPaise: 110000, Reason: "restore", IdempotencyKey: "k-restore"})
+	require.NoError(t, err)
+	a.setting(settings.AdminAdjustDualApprovalAbovePaise, "50000")
 	// Another admin's same key is their own.
 	_, err = a.adm.CreateAdjustment(a.ctx, a.finance2, in)
 	require.NoError(t, err)
@@ -206,6 +220,53 @@ func TestAdjustmentIdempotencyKeyDB(t *testing.T) {
 	require.Equal(t, "validation_failed", problem.CodeOf(err))
 	_, err = a.adm.CreateAdjustment(a.ctx, a.finance, AdjustmentInput{AccountID: a.account, AmountPaise: 100, Reason: "  "})
 	require.Equal(t, "validation_failed", problem.CodeOf(err))
+}
+
+// A pending request is keyed by its requester's Idempotency-Key: a replay
+// returns the first request, so two approvers can never post it twice.
+func TestAdjustmentRequestIdempotencyKeyDB(t *testing.T) {
+	a := newAdjustEnv(t)
+	in := AdjustmentInput{AccountID: a.account, AmountPaise: 60000, Reason: "goodwill for a late pickup", IdempotencyKey: "req-1"}
+	r1, err := a.adm.CreateAdjustment(a.ctx, a.finance, in)
+	require.NoError(t, err)
+	require.Equal(t, "pending", string(r1.Outcome))
+	r2, err := a.adm.CreateAdjustment(a.ctx, a.finance, in)
+	require.NoError(t, err)
+	require.Equal(t, "pending", string(r2.Outcome))
+	require.Equal(t, r1.Request.Id, r2.Request.Id)
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM admin_adjustment_requests`))
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM audit_log WHERE action = 'credits.adjustment_request'`))
+
+	// The same key with another body is a conflict, not a second request.
+	in.AmountPaise = 70000
+	_, err = a.adm.CreateAdjustment(a.ctx, a.finance, in)
+	require.Equal(t, "conflict", problem.CodeOf(err))
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM admin_adjustment_requests`))
+
+	// Approved once; the replay's request is the same row, already approved.
+	rid, _ := ids.Parse(r1.Request.Id)
+	_, err = a.adm.ApproveAdjustment(a.ctx, a.finance2, rid, nil)
+	require.NoError(t, err)
+	rid2, _ := ids.Parse(r2.Request.Id)
+	_, err = a.adm.ApproveAdjustment(a.ctx, a.finance2, rid2, nil)
+	require.Equal(t, "invalid_transition", problem.CodeOf(err))
+	require.EqualValues(t, 1600, a.wallet())
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM ledger_transactions WHERE kind = 'admin_adjustment'`))
+}
+
+// Approval re-checks the customer inside its transaction: a request for an
+// account deleted since is refused and posts nothing.
+func TestAdjustmentApproveDeletedCustomerDB(t *testing.T) {
+	a := newAdjustEnv(t)
+	_, req, err := a.adjust(a.finance, 60000)
+	require.NoError(t, err)
+	a.exec(`UPDATE users SET status = 'deleted', deleted_at = now() WHERE id = $1`, ids.UUID(a.customer))
+	rid, _ := ids.Parse(req)
+	_, err = a.adm.ApproveAdjustment(a.ctx, a.finance2, rid, nil)
+	require.Equal(t, "invalid_transition", problem.CodeOf(err))
+	require.EqualValues(t, 1000, a.wallet())
+	require.Zero(t, a.count(`SELECT count(*) FROM ledger_transactions WHERE kind = 'admin_adjustment'`))
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM admin_adjustment_requests WHERE status = 'pending'`))
 }
 
 func uuidOf(t *testing.T, s string) pgtype.UUID {
