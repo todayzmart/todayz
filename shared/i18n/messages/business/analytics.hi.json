@@ -1,0 +1,307 @@
+{
+  "analytics.title": {
+    "message": "एनालिटिक्स",
+    "review": "reviewed",
+    "enHash": "25bc9629"
+  },
+  "analytics.tabs": {
+    "message": "एनालिटिक्स सेक्शन",
+    "review": "reviewed",
+    "enHash": "c6f8a24c"
+  },
+  "analytics.tab.sales": {
+    "message": "बिक्री",
+    "review": "reviewed",
+    "enHash": "d0edfb6e"
+  },
+  "analytics.tab.insights": {
+    "message": "इनसाइट",
+    "review": "reviewed",
+    "enHash": "b4510362"
+  },
+  "analytics.loading": {
+    "message": "लोड हो रहा है",
+    "review": "reviewed",
+    "enHash": "8f26c652"
+  },
+  "analytics.more": {
+    "message": "और लोड करें",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "analytics.error": {
+    "message": "एनालिटिक्स लोड नहीं हो सका",
+    "review": "reviewed",
+    "enHash": "7e4a6d6f"
+  },
+  "analytics.range": {
+    "message": "अवधि",
+    "review": "reviewed",
+    "enHash": "170a28a9"
+  },
+  "analytics.range.7d": {
+    "message": "7 दिन",
+    "review": "reviewed",
+    "enHash": "0a8dd6ad"
+  },
+  "analytics.range.30d": {
+    "message": "30 दिन",
+    "review": "reviewed",
+    "enHash": "7d4278a8"
+  },
+  "analytics.range.90d": {
+    "message": "90 दिन",
+    "review": "reviewed",
+    "enHash": "170621ac"
+  },
+  "analytics.span": {
+    "message": "{from} से {to}",
+    "review": "reviewed",
+    "enHash": "06f3df10"
+  },
+  "analytics.kpi.label": {
+    "message": "कुल",
+    "review": "reviewed",
+    "enHash": "65222d79"
+  },
+  "analytics.kpi.sales": {
+    "message": "बिक्री",
+    "review": "reviewed",
+    "enHash": "d0edfb6e"
+  },
+  "analytics.kpi.online": {
+    "message": "ऑनलाइन",
+    "review": "reviewed",
+    "enHash": "c3e839df"
+  },
+  "analytics.kpi.pos": {
+    "message": "काउंटर",
+    "review": "reviewed",
+    "enHash": "f4018045"
+  },
+  "analytics.kpi.bills": {
+    "message": "बिल और ऑर्डर",
+    "review": "reviewed",
+    "enHash": "89bf0748"
+  },
+  "analytics.daily.title": {
+    "message": "दिन के हिसाब से बिक्री",
+    "review": "reviewed",
+    "enHash": "5954e1c5"
+  },
+  "analytics.daily.empty": {
+    "message": "इस अवधि में कोई बिक्री नहीं",
+    "review": "reviewed",
+    "enHash": "8e558855"
+  },
+  "analytics.hourly.title": {
+    "message": "घंटे के हिसाब से बिक्री",
+    "review": "reviewed",
+    "enHash": "162aeab3"
+  },
+  "analytics.series.online": {
+    "message": "ऑनलाइन",
+    "review": "reviewed",
+    "enHash": "c3e839df"
+  },
+  "analytics.series.pos": {
+    "message": "काउंटर",
+    "review": "reviewed",
+    "enHash": "f4018045"
+  },
+  "analytics.funnel.title": {
+    "message": "ऑनलाइन ऑर्डर",
+    "review": "reviewed",
+    "enHash": "1b62fbdb"
+  },
+  "analytics.funnel.empty": {
+    "message": "इस अवधि में कोई ऑनलाइन ऑर्डर नहीं",
+    "review": "reviewed",
+    "enHash": "f6b05168"
+  },
+  "analytics.funnel.received": {
+    "message": "मिले",
+    "review": "reviewed",
+    "enHash": "27548c4f"
+  },
+  "analytics.funnel.accepted": {
+    "message": "स्वीकार किए",
+    "review": "reviewed",
+    "enHash": "61a0572c"
+  },
+  "analytics.funnel.completed": {
+    "message": "पूरे हुए",
+    "review": "reviewed",
+    "enHash": "1798b3ba"
+  },
+  "analytics.funnel.missed": {
+    "message": "छूटे ऑर्डर",
+    "review": "reviewed",
+    "enHash": "45fbd640"
+  },
+  "analytics.funnel.rejected": {
+    "message": "अस्वीकार किए",
+    "review": "reviewed",
+    "enHash": "27eeb7a2"
+  },
+  "analytics.funnel.notAccepted": {
+    "message": "समय पर स्वीकार नहीं हुए",
+    "review": "reviewed",
+    "enHash": "54be7649"
+  },
+  "analytics.funnel.noShow": {
+    "message": "लिए नहीं गए",
+    "review": "reviewed",
+    "enHash": "2a5fc945"
+  },
+  "analytics.funnel.cancelled": {
+    "message": "रद्द",
+    "review": "reviewed",
+    "enHash": "a1bf92ef"
+  },
+  "analytics.accept.p50": {
+    "message": "आपके आधे ऑर्डर {time} में स्वीकार होते हैं",
+    "review": "reviewed",
+    "enHash": "a1cfe72b"
+  },
+  "analytics.accept.none": {
+    "message": "अभी कोई स्वीकार किया ऑर्डर नहीं",
+    "review": "reviewed",
+    "enHash": "6c8b5d5a"
+  },
+  "analytics.accept.nearby": {
+    "message": "आस-पास की दुकानें: {time}",
+    "review": "reviewed",
+    "enHash": "0ad627e7"
+  },
+  "analytics.accept.nearbyNone": {
+    "message": "तुलना के लिए आस-पास काफ़ी दुकानें नहीं हैं",
+    "review": "reviewed",
+    "enHash": "5256a722"
+  },
+  "analytics.duration.seconds": {
+    "message": "{s} सेकंड",
+    "review": "reviewed",
+    "enHash": "4a84fdfd"
+  },
+  "analytics.duration.minutes": {
+    "message": "{m} मिनट {s} सेकंड",
+    "review": "reviewed",
+    "enHash": "9b605337"
+  },
+  "analytics.top.title": {
+    "message": "टॉप आइटम",
+    "review": "reviewed",
+    "enHash": "79ec189d"
+  },
+  "analytics.mix.title": {
+    "message": "कैटेगरी के हिसाब से बिक्री",
+    "review": "reviewed",
+    "enHash": "ae7554de"
+  },
+  "analytics.mix.value": {
+    "message": "{amount} · {share}",
+    "review": "reviewed",
+    "enHash": "5792f82a"
+  },
+  "analytics.repeat.title": {
+    "message": "दोबारा आने वाले ग्राहक",
+    "review": "reviewed",
+    "enHash": "089baac2"
+  },
+  "analytics.repeat.note": {
+    "message": "{customers} जुड़े ग्राहकों में से {repeat} दोबारा आए",
+    "review": "reviewed",
+    "enHash": "70451346"
+  },
+  "analytics.repeat.notEnough": {
+    "message": "इसे देखने के लिए काउंटर पर ग्राहकों को जोड़ें",
+    "review": "reviewed",
+    "enHash": "5d5ad767"
+  },
+  "analytics.ratings.title": {
+    "message": "रेटिंग",
+    "review": "reviewed",
+    "enHash": "14021e13"
+  },
+  "analytics.ratings.empty": {
+    "message": "इस अवधि में कोई रिव्यू नहीं",
+    "review": "reviewed",
+    "enHash": "97bfdfe9"
+  },
+  "analytics.ratings.week": {
+    "message": "{day} वाला हफ़्ता",
+    "review": "reviewed",
+    "enHash": "ffa69e18"
+  },
+  "analytics.ratings.value": {
+    "message": "{stars} ★ · {count, plural, other {#}} रिव्यू",
+    "review": "reviewed",
+    "enHash": "5969a6a3"
+  },
+  "analytics.insights.intro": {
+    "message": "पिछले {days} दिनों की हर इनसाइट, प्रकार के हिसाब से",
+    "review": "reviewed",
+    "enHash": "7d3d6884"
+  },
+  "analytics.insights.filter": {
+    "message": "इनसाइट के प्रकार",
+    "review": "reviewed",
+    "enHash": "010b6d1f"
+  },
+  "analytics.insights.allKinds": {
+    "message": "सभी",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "analytics.insights.none": {
+    "message": "अभी किसी चीज़ पर ध्यान देने की ज़रूरत नहीं",
+    "review": "reviewed",
+    "enHash": "42c17cdd"
+  },
+  "analytics.insights.error": {
+    "message": "इनसाइट लोड नहीं हो सके",
+    "review": "reviewed",
+    "enHash": "b500a37b"
+  },
+  "analytics.insights.needs.selling_fast": {
+    "message": "जब कोई आइटम इस अवधि में {units} या ज़्यादा बिकेगा तब दिखेगा",
+    "review": "reviewed",
+    "enHash": "131de9f4"
+  },
+  "analytics.insights.needs.sitting_on_shelf": {
+    "message": "जब आइटम {days} दिनों से लिस्ट होंगे तब दिखेगा",
+    "review": "reviewed",
+    "enHash": "4009257a"
+  },
+  "analytics.insights.needs.wanted_nearby": {
+    "message": "जब {distance} के अंदर आपकी लिस्ट से बाहर की किसी चीज़ की {searches} या ज़्यादा खोजें होंगी तब दिखेगा",
+    "review": "reviewed",
+    "enHash": "47bba6b7"
+  },
+  "analytics.insights.needs.missed_sales": {
+    "message": "जब किसी आइटम के स्टॉक में न होने पर आस-पास {searches} या ज़्यादा खोजें उससे मिलेंगी तब दिखेगा",
+    "review": "reviewed",
+    "enHash": "688cb24f"
+  },
+  "analytics.insights.needs.bought_together": {
+    "message": "जब {bills} या ज़्यादा बिलों में वही दो आइटम होंगे तब दिखेगा",
+    "review": "reviewed",
+    "enHash": "7558ca1e"
+  },
+  "analytics.insights.needs.regulars_slipping": {
+    "message": "इसे देखने के लिए काउंटर पर ग्राहकों को जोड़ें",
+    "review": "reviewed",
+    "enHash": "5d5ad767"
+  },
+  "analytics.insights.needs.priced_above_nearby": {
+    "message": "जब आस-पास {stores} या ज़्यादा दुकानें वही प्रोडक्ट लिस्ट करेंगी तब दिखेगा",
+    "review": "reviewed",
+    "enHash": "0bcfde71"
+  },
+  "analytics.insights.needs.other": {
+    "message": "अभी काफ़ी डेटा नहीं है",
+    "review": "reviewed",
+    "enHash": "0d14a861"
+  }
+}

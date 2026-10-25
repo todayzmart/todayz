@@ -1,8 +1,9 @@
+import type { Insight } from '@todayz/api-client/gen/model/insight';
 import type { InsightKind } from '@todayz/ui';
 
 /**
- * What the B-03 Overview screen reads. W3-03 maps the real API onto this shape and swaps the
- * query function in `queries.ts`; the components never see where the data came from.
+ * What the B-03 Overview screen reads: `queries.ts` maps `GET {S}/overview` and `GET {S}/insights`
+ * onto this shape, so the components never see the wire format.
  * Money is integer paise; times are ISO 8601 strings with an offset (read in IST).
  */
 
@@ -40,8 +41,8 @@ export interface NewOrder {
   summary: string;
   totalPaise: number;
   fulfilment: Fulfilment;
-  /** Seconds left to accept when the data was read. */
-  secondsToAccept: number;
+  /** Seconds left to accept when the data was read (server clock); null when there is no deadline. */
+  secondsToAccept: number | null;
 }
 
 export interface HourPoint {
@@ -53,15 +54,20 @@ export interface HourPoint {
   prevPaise: number;
 }
 
-/** One Demand insights row (D-99). The sentence values are formatted by the card. */
-export type InsightData =
-  | { id: string; kind: 'selling_fast'; item: string; sold: number; runOutDay: string; restockQty: number; storeItemId: string }
-  | { id: string; kind: 'going_to_waste'; count: number; days: number; items: readonly string[]; batchIds: readonly string[] }
-  | { id: string; kind: 'sitting_on_shelf'; item: string; inStock: number; daysSinceSale: number; storeItemId: string; pct: number }
-  | { id: string; kind: 'wanted_nearby'; item: string; searches: number; radiusMetres: number; noShopNearby: boolean; masterProductId: string }
-  | { id: string; kind: 'bought_together'; itemA: string; itemB: string; sharePct: number; storeItemIds: readonly [string, string] };
+/**
+ * One Demand insights row (D-99) as `GET {S}/insights` sends it, with a stable id (kind and
+ * subject). `facts` holds the numbers the sentence quotes; `insightRows.tsx` writes the sentence.
+ */
+export interface InsightData extends Insight {
+  id: string;
+}
 
-export type StockSource = 'pos' | 'online' | 'voice';
+export function insightId(i: Pick<Insight, 'kind' | 'subjectRef'>): string {
+  return `${i.kind}:${i.subjectRef ?? ''}`;
+}
+
+/** Where the last stock change came from: a counter sale, an online order, or any other stock entry. */
+export type StockSource = 'pos' | 'online' | 'stock';
 
 export interface TopItem {
   id: string;
@@ -74,12 +80,14 @@ export interface TopItem {
   revenuePaise: number;
   inStock: number;
   low: boolean;
-  /** Source and time of the last stock change. */
-  lastChange: { source: StockSource; at: string };
+  /** Source and time of the last stock change; null when the stock never moved. */
+  lastChange: { source: StockSource; at: string } | null;
 }
 
-/** The next thing a shop needs to finish setting up; each has its own hint line on the setup card. */
-export type SetupStep = 'openingHours';
+/** The setup checklist steps (B-03: KYC, 50 products, staff, QR standee, plus opening hours). */
+export type SetupStep = 'kyc' | 'products' | 'staff' | 'standee' | 'openingHours';
+
+export const SETUP_STEPS: readonly SetupStep[] = ['kyc', 'products', 'staff', 'standee', 'openingHours'];
 
 /** Shop setup checklist progress (B-03: the setup card shows until it is complete). */
 export interface SetupProgress {
@@ -87,11 +95,11 @@ export interface SetupProgress {
   percent: number;
   /** The first unfinished step, or null when only optional steps are left. */
   next: SetupStep | null;
+  /** Each step, done or not. */
+  steps: Readonly<Record<SetupStep, boolean>>;
 }
 
 export interface OverviewData {
-  /** True when the screen shows built-in sample data, never a real shop. Drives the "Sample data" pill. */
-  isSample: boolean;
   period: Period;
   ownerName: string;
   storeName: string;
@@ -101,8 +109,6 @@ export interface OverviewData {
   kpis: Kpis;
   newOrders: readonly NewOrder[];
   salesByHour: readonly HourPoint[];
-  /** Ordered by severity, as the API returns them (D-99). The card keeps one per kind, at most 4. */
-  insights: readonly InsightData[];
   topItems: readonly TopItem[];
   /** Different items sold in the period ("3 of 86 items"). */
   distinctItemsSold: number;

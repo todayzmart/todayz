@@ -20,8 +20,10 @@ export function SalesByHour({ data }: { data: OverviewData }) {
   const nowText = cur ? formatMoney(cur.paise, 'dashboard') : '';
   const prevText = m.currentPrevPaise === undefined ? '' : formatMoney(m.currentPrevPaise, 'dashboard');
   const hourText = hourLabel(intl, currentHour);
-  // The tooltip box sits left of the bar centre, as on the design card.
-  const tipLeft = cur ? Math.max(0, ((cur.x + CHART.bar / 2) / CHART.width) * 100 - 14) : 0;
+  // The tooltip box sits left of the bar centre, as on the design card; past the middle it hangs
+  // from its right edge instead, so a late hour never pushes it off a phone screen.
+  const centre = cur ? ((cur.x + CHART.bar / 2) / CHART.width) * 100 : 0;
+  const tipStyle = centre > 50 ? { right: `${Math.max(0, 100 - centre - 14).toFixed(1)}%` } : { left: `${Math.max(0, centre - 14).toFixed(1)}%` };
   return (
     <section className={`tz-card ${styles.chart}`} aria-labelledby="ov-chart-title">
       <div className="tz-card-head">
@@ -77,7 +79,7 @@ export function SalesByHour({ data }: { data: OverviewData }) {
           <path className="line-prev" d={m.prevPath} />
         </svg>
         {cur && (
-          <div className={`tz-tip ${styles.tip}`} style={{ left: `${tipLeft.toFixed(1)}%` }} aria-hidden="true">
+          <div className={`tz-tip ${styles.tip}`} style={tipStyle} aria-hidden="true">
             {intl.formatMessage({ id: 'overview.chart.tipHour' }, { hour: hourText })}
             <b>{nowText}</b>
             {intl.formatMessage({ id: 'overview.chart.tipPrev' }, { weekday: weekday(intl, data.now, 'short'), amount: prevText })}

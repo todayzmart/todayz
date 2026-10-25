@@ -1,5 +1,6 @@
 import { VIEWPORTS, guardPage, shot, type PageGuard } from '@todayz/config/playwright';
 import { expect, test, type Page, type Route } from '@playwright/test';
+import { overview } from '../src/test/insightsData';
 
 // B-05 Sell on the production-shaped build with a faked API (no stack): the counter, the offline queue
 // and the receipt. `TZ_QA_DIR=docs/qa/W2-11 pnpm exec playwright test sell.spec.ts` refreshes the committed shots.
@@ -153,6 +154,8 @@ async function fakeApi(page: Page) {
       });
     }
     if (url.pathname === `${base}/orders`) return ok(route, { items: [], nextCursor: null, serverNow: NOW() });
+    // The owner's sidebar reads today's overview for the Stock badge and the setup card (W3-03).
+    if (url.pathname === `${base}/overview`) return ok(route, overview({ newOrders: [] }));
     if (url.pathname === `${base}/items`) return ok(route, { items: ITEMS, nextCursor: null });
     if (url.pathname === `${base}/pos/sales` && req.method() === 'GET') return ok(route, { items: STORE_SALES, nextCursor: null, serverNow: NOW() });
     if (url.pathname === `${base}/pos/sales`) return ok(route, posSale(req.postDataJSON() as Parameters<typeof posSale>[0]), 201);

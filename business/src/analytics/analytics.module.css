@@ -1,0 +1,253 @@
+/* B-12 Analytics layout. Component looks come from bundle.css (tz-*) and @todayz/ui; this file
+   places them and draws the plain CSS bars. Tokens only. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.sub {
+  margin: 0;
+  color: var(--ink-2);
+  font: var(--type-body);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.note {
+  margin: 0;
+  color: var(--ink-3);
+  font: var(--type-caption);
+}
+
+.more {
+  display: flex;
+  justify-content: center;
+}
+
+/* Sales tab: one column on phones, two from 1024px; wide cards span both. */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+@media (width >= 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wide {
+    grid-column: 1 / -1;
+  }
+}
+
+.big {
+  margin: 0;
+  font: var(--type-heading);
+  font-variant-numeric: tabular-nums;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font: var(--type-body);
+}
+
+/* Bars: columns scaled to the largest; online on top of the counter when stacked. */
+.legend {
+  display: flex;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+  color: var(--ink-2);
+  font: var(--type-caption);
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.swatchOnline,
+.swatchPos {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-sm);
+}
+
+.swatchOnline,
+.segOnline {
+  background: var(--brand);
+}
+
+.swatchPos,
+.segPos {
+  background: color-mix(in srgb, var(--ink) 18%, transparent);
+}
+
+.bars {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  height: 160px;
+}
+
+.col {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.stackBar {
+  display: flex;
+  flex: 1;
+  flex-direction: column-reverse;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  overflow: hidden;
+}
+
+.stackBar i {
+  display: block;
+  flex: none;
+}
+
+.colLabel {
+  overflow: hidden;
+  color: var(--ink-3);
+  font: var(--type-caption);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Funnel and category mix: a label, a number and a thin bar underneath. */
+.funnel,
+.mix {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.funnel li,
+.mix li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-1) var(--space-3);
+  font: var(--type-body);
+}
+
+.funnel b {
+  font-variant-numeric: tabular-nums;
+}
+
+.funnel i,
+.mix i {
+  display: block;
+  grid-column: 1 / -1;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--brand);
+}
+
+/* Insights tab. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.group :global(.tz-card-title) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.kindIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: var(--t-bg);
+  color: var(--t-ink);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row,
+.needs {
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--line);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+}
+
+.sentence {
+  flex: 1 1 240px;
+  min-width: 0;
+  font: var(--type-body);
+}
+
+.rowActions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+}
+
+/* The action reads like the Overview card's (.tz-insight a): ink, no underline until hover. */
+.rowActions a {
+  color: var(--ink);
+  font: 500 13px/18px var(--font-sans);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.rowActions a:hover {
+  text-decoration: underline;
+}
+
+.needs {
+  color: var(--ink-3);
+  font: var(--type-body);
+}
+
+.row:first-child,
+.needs:first-child {
+  border-top: 0;
+}

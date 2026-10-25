@@ -1,0 +1,92 @@
+{
+  "customers.title": {
+    "message": "కస్టమర్‌లు",
+    "review": "reviewed",
+    "enHash": "035eae60"
+  },
+  "customers.segments": {
+    "message": "కస్టమర్ గ్రూపులు",
+    "review": "reviewed",
+    "enHash": "236ddab4"
+  },
+  "customers.segment.all": {
+    "message": "అందరూ",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "customers.segment.top": {
+    "message": "ఎక్కువ ఖర్చు చేసేవారు",
+    "review": "reviewed",
+    "enHash": "d577e755"
+  },
+  "customers.segment.slipping": {
+    "message": "దూరమవుతున్నవారు",
+    "review": "reviewed",
+    "enHash": "72d72518"
+  },
+  "customers.col.customer": {
+    "message": "కస్టమర్",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "customers.col.visits": {
+    "message": "సందర్శనలు",
+    "review": "reviewed",
+    "enHash": "6a4be2fa"
+  },
+  "customers.col.spend": {
+    "message": "ఖర్చు",
+    "review": "reviewed",
+    "enHash": "14eeee8d"
+  },
+  "customers.col.last": {
+    "message": "చివరి సందర్శన",
+    "review": "reviewed",
+    "enHash": "ed5ddeba"
+  },
+  "customers.unnamed": {
+    "message": "కస్టమర్",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "customers.error": {
+    "message": "కస్టమర్‌లు లోడ్ కాలేదు",
+    "review": "reviewed",
+    "enHash": "fefeb39f"
+  },
+  "customers.more": {
+    "message": "మరిన్ని లోడ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "customers.notEnough.title": {
+    "message": "ఇంకా తగినంత లింక్ చేసిన కస్టమర్‌లు లేరు",
+    "review": "reviewed",
+    "enHash": "bdd0f6d3"
+  },
+  "customers.notEnough.body": {
+    "message": "దీన్ని చూడడానికి కౌంటర్‌లో కస్టమర్‌లను లింక్ చేయండి",
+    "review": "reviewed",
+    "enHash": "5d5ad767"
+  },
+  "customers.about.window": {
+    "message": "గత {days} రోజుల్లో {total, plural, other {#}} కస్టమర్‌లు ఇక్కడ కొన్నారు",
+    "review": "reviewed",
+    "enHash": "8c69f589"
+  },
+  "customers.about.slipping": {
+    "message": "{total, plural, other {#}} రెగ్యులర్ కస్టమర్‌లు {days} రోజులుగా కొనలేదు",
+    "review": "reviewed",
+    "enHash": "d1425e51"
+  },
+  "customers.empty": {
+    "message": "ఈ వ్యవధిలో కస్టమర్‌లు లేరు",
+    "review": "reviewed",
+    "enHash": "adf13418"
+  },
+  "customers.empty.slipping": {
+    "message": "ఏ రెగ్యులర్ కస్టమర్ దూరం కావడం లేదు",
+    "review": "reviewed",
+    "enHash": "1d64ad5d"
+  }
+}

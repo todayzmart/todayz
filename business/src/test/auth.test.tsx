@@ -1,5 +1,6 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { insights, overviewHandler } from './insightsApi';
 import { json, problem, renderAt, type Handler } from './render';
 
 const PHONE = '9000000012';
@@ -64,9 +65,10 @@ describe('B-01 sign in', () => {
   it('sends the code without a bearer and verifies it for the business app', async () => {
     const { calls, session } = renderAt('/sign-in', {
       signedIn: false,
-      handlers: authHandlers([shops([{ id: 'b1', status: 'verified', brandName: 'Sri Lakshmi', role: 'owner', stores: [{ id: 's1', name: 'Indiranagar' }] }])]),
+      handlers: authHandlers([shops([{ id: 'b1', status: 'verified', brandName: 'Sri Lakshmi', role: 'owner', stores: [{ id: 's1', name: 'Indiranagar' }] }]), overviewHandler(), insights()]),
     });
     await enterPhoneAndCode();
+    // Lands on the Overview, which now reads GET /overview.
     expect(await screen.findByRole('heading', { level: 1, name: /^Good / })).toBeInTheDocument();
     const send = calls.find((c) => c.path === '/v1/auth/otp/send');
     expect(send?.body).toMatchObject({ phone: `+91${PHONE}`, purpose: 'login', app: 'business', turnstileToken: 'XXXX.DUMMY.TOKEN.XXXX' });

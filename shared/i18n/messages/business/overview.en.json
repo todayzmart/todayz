@@ -1,8 +1,4 @@
 {
-  "overview.sample": {
-    "defaultMessage": "Sample data",
-    "description": "Neutral pill in the greeting band while the Overview shows built-in sample numbers, not the shop's own"
-  },
   "overview.greet.morning": {
     "defaultMessage": "Good morning, {name}",
     "description": "Greeting before noon. {name} is the owner's first name."
@@ -167,14 +163,6 @@
     "defaultMessage": "Reject order {code}",
     "description": "Accessible name of the Reject button"
   },
-  "overview.orders.sampleToast": {
-    "defaultMessage": "Sample order: nothing was changed",
-    "description": "Toast after Accept or Reject on a sample order. Nothing is sent or saved."
-  },
-  "overview.orders.open": {
-    "defaultMessage": "Open orders",
-    "description": "Toast action that opens the Orders section"
-  },
   "overview.chart.title": {
     "defaultMessage": "Sales by hour",
     "description": "Card title"
@@ -228,16 +216,12 @@
     "description": "Card line under the title (D-99)"
   },
   "overview.insights.period": {
-    "defaultMessage": "Last 7 days",
-    "description": "Card tag: the insight period"
+    "defaultMessage": "Last {days} days",
+    "description": "Demand insights tag: the period of the numbers (insight_period_days)."
   },
   "overview.insights.notUseful": {
     "defaultMessage": "Not useful",
     "description": "Quiet button on an insight row; hides that row's item"
-  },
-  "overview.insights.hiddenToast": {
-    "defaultMessage": "Hidden for this visit. Sample data: nothing is saved.",
-    "description": "Toast after Not useful on a sample insight"
   },
   "overview.insights.all": {
     "defaultMessage": "All insights",
@@ -256,12 +240,8 @@
     "description": "Insight row label"
   },
   "overview.insights.selling_fast.sentence": {
-    "defaultMessage": "<strong>{item}</strong> sold {sold} this week. At this pace you run out on {day}.",
-    "description": "Insight sentence. {day} is a weekday like 'Saturday'."
-  },
-  "overview.insights.selling_fast.action": {
-    "defaultMessage": "Restock",
-    "description": "Insight action; opens the restock form prefilled"
+    "defaultMessage": "<strong>{item}</strong> sold {sold} {period, plural, =7 {this week} other {in # days}}. At this pace you run out {inDays, plural, =0 {today} =1 {tomorrow} other {on {day}}}.",
+    "description": "Selling fast. {item} bold; {period} days of the window; {day} a weekday or a date such as 3 Nov."
   },
   "overview.insights.sitting_on_shelf.label": {
     "defaultMessage": "Sitting on the shelf",
@@ -271,49 +251,33 @@
     "defaultMessage": "<strong>{item}</strong>: {stock} in stock, no sale in {days} days.",
     "description": "Insight sentence"
   },
-  "overview.insights.sitting_on_shelf.action": {
-    "defaultMessage": "Create offer",
-    "description": "Insight action; opens the offer form prefilled"
-  },
   "overview.insights.going_to_waste.label": {
     "defaultMessage": "Going to waste",
     "description": "Insight row label"
   },
   "overview.insights.going_to_waste.sentence": {
-    "defaultMessage": "<strong>{count, plural, one {# item expires} other {# items expire}} within {days} days</strong>: {items}.",
-    "description": "Insight sentence. {items} is a comma-separated list of item names."
-  },
-  "overview.insights.going_to_waste.action": {
-    "defaultMessage": "Flash offer",
-    "description": "Insight action; opens the flash offer form prefilled"
+    "defaultMessage": "<strong>{count, plural, one {# item expires} other {# items expire}} within {days} days</strong>: {items}{more, plural, =0 {} other { + # more}}.",
+    "description": "Going to waste. {items} up to 3 names; {more} the number of further items."
   },
   "overview.insights.wanted_nearby.label": {
     "defaultMessage": "Wanted nearby",
     "description": "Insight row label"
   },
   "overview.insights.wanted_nearby.sentence": {
-    "defaultMessage": "<strong>{item}</strong>: {searches} searches within {distance} this week.",
-    "description": "Insight sentence. {distance} is like '2.0 km'."
+    "defaultMessage": "<strong>{item}</strong>: {searches} searches within {distance} {period, plural, =7 {this week} other {in # days}}.",
+    "description": "Wanted nearby. {distance} such as 2 km."
   },
   "overview.insights.wanted_nearby.sentenceNone": {
-    "defaultMessage": "<strong>{item}</strong>: {searches} searches within {distance} this week. No shop nearby has it.",
-    "description": "Insight sentence when no shop nearby lists the product (D-99)"
-  },
-  "overview.insights.wanted_nearby.action": {
-    "defaultMessage": "Add product",
-    "description": "Insight action; opens add item prefilled"
+    "defaultMessage": "<strong>{item}</strong>: {searches} searches within {distance} {period, plural, =7 {this week} other {in # days}}. No shop nearby has it.",
+    "description": "Wanted nearby when no shop nearby lists it in stock."
   },
   "overview.insights.bought_together.label": {
     "defaultMessage": "Bought together",
     "description": "Insight row label"
   },
   "overview.insights.bought_together.sentence": {
-    "defaultMessage": "<strong>{a}</strong> and <strong>{b}</strong> are in {pct}% of bills together.",
-    "description": "Insight sentence"
-  },
-  "overview.insights.bought_together.action": {
-    "defaultMessage": "Create offer",
-    "description": "Insight action; opens the offer form with the two items"
+    "defaultMessage": "1 of {oneIn} bills with <strong>{a}</strong> also have <strong>{b}</strong>.",
+    "description": "Bought together. {a} and {b} are items; {oneIn} is the whole number N in \"1 of N\"."
   },
   "overview.top.title": {
     "defaultMessage": "Top items today",
@@ -371,10 +335,6 @@
     "defaultMessage": "Online · {time}",
     "description": "Last stock change came from an online order"
   },
-  "overview.top.source.voice": {
-    "defaultMessage": "Voice · {time}",
-    "description": "Last stock change came from a voice entry"
-  },
   "overview.top.total": {
     "defaultMessage": "Total, {shown} of {all} items",
     "description": "Table footer"
@@ -418,5 +378,177 @@
   "overview.setup.finish": {
     "defaultMessage": "Finish setup",
     "description": "Link on the setup card; opens Settings"
+  },
+  "overview.insights.sitting_on_shelf.sentenceCost": {
+    "defaultMessage": "<strong>{item}</strong>: {stock} in stock ({value} at cost), no sale in {days} days.",
+    "description": "Sitting on the shelf, when the cost is known. {value} is the stock value at cost."
+  },
+  "overview.insights.missed_sales.label": {
+    "defaultMessage": "Missed sales",
+    "description": "Insight kind label."
+  },
+  "overview.insights.missed_sales.sentence": {
+    "defaultMessage": "<strong>{item}</strong> was out of stock {days, plural, one {# day} other {# days}}; {searches} searches nearby matched it.",
+    "description": "Missed sales. {days} days at 0; {searches} nearby searches on those days."
+  },
+  "overview.insights.expired_on_shelf.label": {
+    "defaultMessage": "Expired on shelf",
+    "description": "Insight kind label."
+  },
+  "overview.insights.expired_on_shelf.sentence": {
+    "defaultMessage": "<strong>{item}</strong>: {qty} expired {ago, plural, =1 {yesterday} other {# days ago}}. Remove them from the shelf.",
+    "description": "Expired on shelf. {qty} is the batch remaining; {ago} days since expiry (1 or more)."
+  },
+  "overview.insights.selling_below_cost.label": {
+    "defaultMessage": "Selling below cost",
+    "description": "Insight kind label."
+  },
+  "overview.insights.selling_below_cost.sentence": {
+    "defaultMessage": "<strong>{item}</strong> sells at {price}, last cost {cost}.",
+    "description": "Selling below cost. {price} and {cost} are money."
+  },
+  "overview.insights.selling_below_cost.sentenceCheck": {
+    "defaultMessage": "Check the cost entry for <strong>{item}</strong>.",
+    "description": "Selling below cost when the cost is at or above the MRP."
+  },
+  "overview.insights.stock_check_due.label": {
+    "defaultMessage": "Stock check due",
+    "description": "Insight kind label."
+  },
+  "overview.insights.stock_check_due.sentence": {
+    "defaultMessage": "<strong>{count, plural, one {# item} other {# items}} not confirmed in {unit, select, days {{span, plural, one {# day} other {# days}}} other {{span, plural, one {# hour} other {# hours}}}}</strong>. Customers see {count, plural, one {it} other {them}} as “Stock not confirmed recently”.",
+    "description": "Stock check due. {unit} is days or hours; {span} the number of them."
+  },
+  "overview.insights.regulars_slipping.label": {
+    "defaultMessage": "Regulars slipping away",
+    "description": "Insight kind label."
+  },
+  "overview.insights.regulars_slipping.sentence": {
+    "defaultMessage": "<strong>{count, plural, one {# regular customer hasn't} other {# regular customers haven't}}</strong> bought in {unit, select, weeks {{span, plural, one {# week} other {# weeks}}} other {{span, plural, one {# day} other {# days}}}}.",
+    "description": "Regulars slipping away. {unit} is weeks or days; {span} the number of them."
+  },
+  "overview.insights.priced_above_nearby.label": {
+    "defaultMessage": "Priced above nearby",
+    "description": "Insight kind label."
+  },
+  "overview.insights.priced_above_nearby.sentence": {
+    "defaultMessage": "<strong>{item}</strong>: {price} here, {typical} typical nearby.",
+    "description": "Priced above nearby. {typical} is the median nearby price."
+  },
+  "overview.insights.action.restock": {
+    "defaultMessage": "Restock",
+    "description": "Insight action link (restock); opens its screen prefilled, applies nothing."
+  },
+  "overview.insights.action.create_offer": {
+    "defaultMessage": "Create offer",
+    "description": "Insight action link (create_offer); opens its screen prefilled, applies nothing."
+  },
+  "overview.insights.action.flash_offer": {
+    "defaultMessage": "Flash offer",
+    "description": "Insight action link (flash_offer); opens its screen prefilled, applies nothing."
+  },
+  "overview.insights.action.add_product": {
+    "defaultMessage": "Add product",
+    "description": "Insight action link (add_product); opens its screen prefilled, applies nothing."
+  },
+  "overview.insights.action.mark_expired": {
+    "defaultMessage": "Mark expired",
+    "description": "Insight action link (mark_expired); opens its screen prefilled, applies nothing."
+  },
+  "overview.insights.action.edit_price": {
+    "defaultMessage": "Edit price",
+    "description": "Insight action link (edit_price); opens its screen prefilled, applies nothing."
+  },
+  "overview.insights.action.check_cost": {
+    "defaultMessage": "Check cost",
+    "description": "Insight action link (check_cost); opens its screen prefilled, applies nothing."
+  },
+  "overview.insights.action.count_stock": {
+    "defaultMessage": "Count stock",
+    "description": "Insight action link (count_stock); opens its screen prefilled, applies nothing."
+  },
+  "overview.insights.action.see_customers": {
+    "defaultMessage": "See customers",
+    "description": "Insight action link (see_customers); opens its screen prefilled, applies nothing."
+  },
+  "overview.insights.hiddenUntil": {
+    "defaultMessage": "Hidden until {date}",
+    "description": "Toast after Not useful. {date} such as 1 Nov."
+  },
+  "overview.insights.dismissFailed": {
+    "defaultMessage": "Could not hide it. Try again.",
+    "description": "Toast when Not useful fails."
+  },
+  "overview.insights.error": {
+    "defaultMessage": "Could not load insights",
+    "description": "Demand insights card when the request fails."
+  },
+  "overview.setup.next.kyc": {
+    "defaultMessage": "Finish your KYC to go live.",
+    "description": "Shop setup card: the next step (kyc)."
+  },
+  "overview.setup.step.kyc": {
+    "defaultMessage": "KYC",
+    "description": "Setup checklist link (kyc)."
+  },
+  "overview.setup.next.products": {
+    "defaultMessage": "Add your products so customers can find them.",
+    "description": "Shop setup card: the next step (products)."
+  },
+  "overview.setup.step.products": {
+    "defaultMessage": "Add products",
+    "description": "Setup checklist link (products)."
+  },
+  "overview.setup.next.staff": {
+    "defaultMessage": "Invite your staff.",
+    "description": "Shop setup card: the next step (staff)."
+  },
+  "overview.setup.step.staff": {
+    "defaultMessage": "Invite staff",
+    "description": "Setup checklist link (staff)."
+  },
+  "overview.setup.next.standee": {
+    "defaultMessage": "Print your QR standee for the counter.",
+    "description": "Shop setup card: the next step (standee)."
+  },
+  "overview.setup.step.standee": {
+    "defaultMessage": "Print the QR standee",
+    "description": "Setup checklist link (standee)."
+  },
+  "overview.setup.step.openingHours": {
+    "defaultMessage": "Add opening hours",
+    "description": "Setup checklist link (opening hours)."
+  },
+  "overview.setup.left": {
+    "defaultMessage": "Setup steps left",
+    "description": "Accessible name of the setup checklist on the empty insights card."
+  },
+  "overview.top.source.stock": {
+    "defaultMessage": "Stock · {time}",
+    "description": "Top items: last change was a stock edit at {time}."
+  },
+  "overview.top.source.none": {
+    "defaultMessage": "No change yet",
+    "description": "Top items: the item has no stock change yet."
+  },
+  "overview.gate.error": {
+    "defaultMessage": "Could not load your shop",
+    "description": "Owner screens when the shop list fails."
+  },
+  "overview.gate.noStore": {
+    "defaultMessage": "Choose a shop to see this",
+    "description": "Owner screens when no shop is chosen."
+  },
+  "overview.gate.choose": {
+    "defaultMessage": "Choose shop",
+    "description": "Button to the shop picker."
+  },
+  "overview.gate.cashier": {
+    "defaultMessage": "This screen is for owners and managers. Your orders and the counter are here.",
+    "description": "Shown to a cashier on the Overview, Analytics and Customers screens."
+  },
+  "overview.gate.orders": {
+    "defaultMessage": "Orders",
+    "description": "Cashier note link to Orders."
   }
 }

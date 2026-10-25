@@ -1,0 +1,92 @@
+{
+  "customers.title": {
+    "message": "ग्राहक",
+    "review": "reviewed",
+    "enHash": "035eae60"
+  },
+  "customers.segments": {
+    "message": "ग्राहक समूह",
+    "review": "reviewed",
+    "enHash": "236ddab4"
+  },
+  "customers.segment.all": {
+    "message": "सभी",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "customers.segment.top": {
+    "message": "सबसे ज़्यादा ख़र्च करने वाले",
+    "review": "reviewed",
+    "enHash": "d577e755"
+  },
+  "customers.segment.slipping": {
+    "message": "दूर हो रहे",
+    "review": "reviewed",
+    "enHash": "72d72518"
+  },
+  "customers.col.customer": {
+    "message": "ग्राहक",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "customers.col.visits": {
+    "message": "विज़िट",
+    "review": "reviewed",
+    "enHash": "6a4be2fa"
+  },
+  "customers.col.spend": {
+    "message": "ख़र्च",
+    "review": "reviewed",
+    "enHash": "14eeee8d"
+  },
+  "customers.col.last": {
+    "message": "पिछली विज़िट",
+    "review": "reviewed",
+    "enHash": "ed5ddeba"
+  },
+  "customers.unnamed": {
+    "message": "ग्राहक",
+    "review": "reviewed",
+    "enHash": "0e85749a"
+  },
+  "customers.error": {
+    "message": "ग्राहक लोड नहीं हो सके",
+    "review": "reviewed",
+    "enHash": "fefeb39f"
+  },
+  "customers.more": {
+    "message": "और लोड करें",
+    "review": "reviewed",
+    "enHash": "dfe60ca9"
+  },
+  "customers.notEnough.title": {
+    "message": "अभी काफ़ी जुड़े ग्राहक नहीं हैं",
+    "review": "reviewed",
+    "enHash": "bdd0f6d3"
+  },
+  "customers.notEnough.body": {
+    "message": "इसे देखने के लिए काउंटर पर ग्राहकों को जोड़ें",
+    "review": "reviewed",
+    "enHash": "5d5ad767"
+  },
+  "customers.about.window": {
+    "message": "पिछले {days} दिनों में {total, plural, other {#}} ग्राहकों ने यहाँ ख़रीदा",
+    "review": "reviewed",
+    "enHash": "8c69f589"
+  },
+  "customers.about.slipping": {
+    "message": "{total, plural, other {#}} नियमित ग्राहकों ने {days} दिनों से ख़रीदारी नहीं की",
+    "review": "reviewed",
+    "enHash": "d1425e51"
+  },
+  "customers.empty": {
+    "message": "इस अवधि में कोई ग्राहक नहीं",
+    "review": "reviewed",
+    "enHash": "adf13418"
+  },
+  "customers.empty.slipping": {
+    "message": "कोई नियमित ग्राहक दूर नहीं हो रहा",
+    "review": "reviewed",
+    "enHash": "1d64ad5d"
+  }
+}

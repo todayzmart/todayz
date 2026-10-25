@@ -1,5 +1,5 @@
-import { Banner, Button, Skeleton, ToastProvider, useToast, VisuallyHidden, type InsightRow } from '@todayz/ui';
-import { useCallback, useState } from 'react';
+import { Banner, Button, Skeleton, ToastProvider, VisuallyHidden } from '@todayz/ui';
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { CoachSlot } from './CoachSlot';
 import { GreetBand } from './GreetBand';
@@ -13,21 +13,23 @@ import { TopItems } from './TopItems';
 import { Topbar } from './Topbar';
 import styles from './overview.module.css';
 import type { OverviewData, Period } from './types';
+import type { CurrentStore } from '../orders/store';
 import { useNarrow } from '../shell/useNarrow';
+import { StoreGate } from './StoreGate';
 
-/** B-03 Overview, the business landing page (`/`). */
+/** B-03 Overview, the business landing page (`/`): owners and managers. */
 export function OverviewPage() {
   return (
     <ToastProvider>
-      <OverviewContent />
+      <StoreGate next="/">{(store) => <OverviewContent store={store} />}</StoreGate>
     </ToastProvider>
   );
 }
 
-function OverviewContent() {
+function OverviewContent({ store }: { store: CurrentStore }) {
   const intl = useIntl();
   const [period, setPeriod] = useState<Period>('today');
-  const query = useOverview(period);
+  const query = useOverview(store, period);
 
   if (query.isPending) {
     return (
@@ -54,29 +56,19 @@ function OverviewContent() {
       </div>
     );
   }
-  return <Dashboard data={query.data} period={period} onPeriod={setPeriod} />;
+  return <Dashboard store={store} data={query.data} period={period} onPeriod={setPeriod} />;
 }
 
 interface DashboardProps {
+  store: CurrentStore;
   data: OverviewData;
   period: Period;
   onPeriod: (p: Period) => void;
 }
 
-function Dashboard({ data, period, onPeriod }: DashboardProps) {
-  const intl = useIntl();
-  const toast = useToast();
+function Dashboard({ store, data, period, onPeriod }: DashboardProps) {
   // The sidebar has the setup card from 1024px; below that it sits under the KPIs (Shell.tsx).
   const narrow = useNarrow();
-  // "Not useful" hides the row for this visit; the next row of another kind moves up (D-99).
-  const [hidden, setHidden] = useState<ReadonlySet<string>>(() => new Set());
-  const onNotUseful = useCallback(
-    (row: InsightRow) => {
-      setHidden((h) => new Set(h).add(row.id));
-      toast.show({ message: intl.formatMessage({ id: 'overview.insights.hiddenToast' }) });
-    },
-    [intl, toast],
-  );
   return (
     <div className={styles.page}>
       <Topbar syncedAt={data.syncedAt} storeName={data.storeName} />
@@ -94,10 +86,10 @@ function Dashboard({ data, period, onPeriod }: DashboardProps) {
           <SalesByHour data={data} />
         </div>
         <div className={styles.areaOrders}>
-          <NewOrders orders={data.newOrders} />
+          <NewOrders store={store} orders={data.newOrders} />
         </div>
         <div className={styles.areaInsights}>
-          <Insights insights={data.insights.filter((i) => !hidden.has(i.id))} onNotUseful={onNotUseful} />
+          <Insights store={store} setup={data.setup} />
         </div>
         <div className={styles.areaTop}>
           <TopItems data={data} />
