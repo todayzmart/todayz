@@ -14,7 +14,7 @@ import { createFormatters, detectLocale, saveLocale, applyLocale, formatMoney } 
 
 - English source: `messages/<app>/<area>.en.json`, `{ "key": { "defaultMessage": "...", "description": "..." } }`, ICU MessageFormat, sentence case, no exclamation marks.
 - Translations: `messages/<app>/<area>.<hi|kn|te|ta>.json`, `{ "key": { "message": "...", "review": "machine"|"reviewed", "enHash": "ab12cd34" } }`. See [docs/translation-workflow.md](docs/translation-workflow.md).
-- `make gen` (`pnpm --filter @todayz/i18n gen`) writes `compiled/<app>/{en,en-XA,hi,kn,te,ta}.json` as ICU ASTs (git-ignored). A language file has the reviewed translation where there is one and English everywhere else. Machine drafts and stale translations never ship; `node scripts/gen.mjs --drafts` includes drafts for a local look.
+- `make gen` (`pnpm --filter @todayz/i18n gen`) writes `compiled/<app>/{en,en-XA,hi,kn,te,ta}.json` as ICU ASTs (git-ignored). A language file has the reviewed translation where there is one and English everywhere else. Machine drafts and stale translations never ship to prod; with `TODAYZ_I18N_DRAFTS=1` (set by `make dev` and `make e2e`, never by the Pages build) gen also ships drafts. See [docs/translation-workflow.md](docs/translation-workflow.md).
 - Load a catalogue per app with `import('@todayz/i18n/compiled/customer/hi.json')` and `asMessages()`; hand it to react-intl:
 
   ```tsx

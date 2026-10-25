@@ -1,0 +1,177 @@
+{
+  "search.title": {
+    "message": "தேடு",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "search.field.label": {
+    "message": "பொருட்களைத் தேடவும்",
+    "review": "reviewed",
+    "enHash": "4412bfe5"
+  },
+  "search.field.placeholder": {
+    "message": "ஆட்டா, பால், மருந்துகள் தேடவும்",
+    "review": "reviewed",
+    "enHash": "5f25cc28"
+  },
+  "search.field.clear": {
+    "message": "தேடலை அழி",
+    "review": "reviewed",
+    "enHash": "67300d0f"
+  },
+  "search.suggestions.label": {
+    "message": "பரிந்துரைகள்",
+    "review": "reviewed",
+    "enHash": "861edba0"
+  },
+  "search.suggestions.search": {
+    "message": "{query} ஐத் தேடு",
+    "review": "reviewed",
+    "enHash": "64566b34"
+  },
+  "search.idle.hint": {
+    "message": "உங்கள் அருகில் உள்ள கடைகளில் தேட குறைந்தது இரண்டு எழுத்துகள் டைப் செய்யவும்.",
+    "review": "reviewed",
+    "enHash": "b84188f3"
+  },
+  "search.recent.title": {
+    "message": "சமீபத்திய தேடல்கள்",
+    "review": "reviewed",
+    "enHash": "a73d2913"
+  },
+  "search.recent.clear": {
+    "message": "அழி",
+    "review": "reviewed",
+    "enHash": "719ea396"
+  },
+  "search.filter.label": {
+    "message": "ஃபில்டர்கள்",
+    "review": "reviewed",
+    "enHash": "96e57821"
+  },
+  "search.filter.open": {
+    "message": "இப்போது திறந்திருப்பவை",
+    "review": "reviewed",
+    "enHash": "d7a05e65"
+  },
+  "search.filter.pickup": {
+    "message": "பிக்அப்",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "search.filter.delivery": {
+    "message": "டெலிவரி",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "search.filter.offers": {
+    "message": "ஆஃபர்கள்",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "search.category.label": {
+    "message": "வகை",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "search.category.all": {
+    "message": "எல்லாம்",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "search.sort.label": {
+    "message": "வரிசை",
+    "review": "reviewed",
+    "enHash": "a2a5bdec"
+  },
+  "search.sort.relevance": {
+    "message": "மிகப் பொருத்தமானவை",
+    "review": "reviewed",
+    "enHash": "86f686f8"
+  },
+  "search.sort.nearest": {
+    "message": "அருகில் உள்ளவை முதலில்",
+    "review": "reviewed",
+    "enHash": "f809e50f"
+  },
+  "search.sort.cheapest": {
+    "message": "குறைந்த விலை",
+    "review": "reviewed",
+    "enHash": "ead8b64d"
+  },
+  "search.refine.label": {
+    "message": "உங்கள் தேடலில் இருந்து ஃபில்டர்கள்",
+    "review": "reviewed",
+    "enHash": "62174b9d"
+  },
+  "search.refine.remove": {
+    "message": "ஃபில்டர் {chip} ஐ நீக்கு",
+    "review": "reviewed",
+    "enHash": "32664e04"
+  },
+  "search.summary": {
+    "message": "அருகில் {checked} கடைகளைப் பார்த்தோம் · {have} இல் உள்ளது · {min} முதல்",
+    "review": "reviewed",
+    "enHash": "8f73de69"
+  },
+  "search.error": {
+    "message": "இப்போது தேட முடியவில்லை.",
+    "review": "reviewed",
+    "enHash": "b7a524b1"
+  },
+  "search.zero.title": {
+    "message": "அருகில் எந்தக் கடையிலும் {query} ஸ்டாக்கில் இல்லை",
+    "review": "reviewed",
+    "enHash": "353d873c"
+  },
+  "search.zero.body": {
+    "message": "உங்கள் அருகில் உள்ளவர்கள் இதைத் தேடுகிறார்கள் என்று குறித்துக்கொண்டோம், கடைகள் இதை வைக்கலாம்.",
+    "review": "reviewed",
+    "enHash": "7c3bed35"
+  },
+  "search.more": {
+    "message": "மேலும் கடைகளைக் காட்டு",
+    "review": "reviewed",
+    "enHash": "c1c91491"
+  },
+  "search.badge.lowest": {
+    "message": "குறைந்த விலை",
+    "review": "reviewed",
+    "enHash": "ead8b64d"
+  },
+  "search.badge.closest": {
+    "message": "மிக அருகில்",
+    "review": "reviewed",
+    "enHash": "e596de54"
+  },
+  "search.deliveryFee": {
+    "message": "+{fee} டெலிவரி",
+    "review": "reviewed",
+    "enHash": "96e53339"
+  },
+  "search.noneConfirmed.title": {
+    "message": "இன்னும் எந்தக் கடையும் உறுதிசெய்யவில்லை.",
+    "review": "reviewed",
+    "enHash": "d6934628"
+  },
+  "search.noneConfirmed.body": {
+    "message": "அவர்கள் பட்டியலில் உள்ளது, ஆனால் சமீபத்தில் யாரும் ஸ்டாக்கை உறுதிசெய்யவில்லை, எனவே அலமாரியில் இல்லாமல் இருக்கலாம்.",
+    "review": "reviewed",
+    "enHash": "91bdc408"
+  },
+  "search.noneConfirmed.bodyWidest": {
+    "message": "அவர்கள் பட்டியலில் உள்ளது, ஆனால் சமீபத்தில் யாரும் ஸ்டாக்கை உறுதிசெய்யவில்லை. நீங்கள் ஏற்கனவே அதிகபட்ச தூரத்தில் தேடுகிறீர்கள்.",
+    "review": "reviewed",
+    "enHash": "f860d653"
+  },
+  "search.noneConfirmed.wider": {
+    "message": "{km} km க்குள் தேடவும்",
+    "review": "reviewed",
+    "enHash": "45f8f29c"
+  },
+  "search.noneConfirmed.later": {
+    "message": "பிறகு மீண்டும் தேடவும்",
+    "review": "reviewed",
+    "enHash": "71ecbf77"
+  }
+}

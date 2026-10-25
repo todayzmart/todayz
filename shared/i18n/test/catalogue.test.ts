@@ -6,7 +6,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { enHash, extractMessageIds, extractMessageRefs, lintApp } from '../scripts/catalogue.mjs';
-import { compile, loadApp, loadLocaleMessages } from '../scripts/gen.mjs';
+import { compile, draftsFromEnv, loadApp, loadLocaleMessages } from '../scripts/gen.mjs';
 import { approve, importDrafts, todo } from '../scripts/translations.mjs';
 import { PSEUDO_GROWTH, pseudoAst } from '../src/pseudo.mjs';
 
@@ -290,6 +290,21 @@ describe('SC-I18N-05 what ships: reviewed translations only, English for the res
     });
     expect(await loadLocaleMessages('shop', 'kn', { dir: messagesDir })).toEqual({ 'shop.a': 'ಎ', 'shop.b': 'B', 'shop.c': 'C' });
     expect(await loadLocaleMessages('shop', 'kn', { dir: messagesDir, drafts: true })).toEqual({ 'shop.a': 'ಎ', 'shop.b': 'ಬಿ', 'shop.c': 'C' });
+  });
+
+  it('leaves a draft out unless TODAYZ_I18N_DRAFTS is exactly 1 (W4-05: nothing unreviewed reaches prod)', async () => {
+    const messagesDir = fixture({
+      'a.en.json': en({ 'shop.a': 'A', 'shop.b': 'B' }),
+      'a.hi.json': tr({ 'shop.a': ['ए', 'reviewed', 'A'], 'shop.b': ['बी', 'machine', 'B'] }),
+    });
+    for (const value of [undefined, '', '0', 'true', 'yes', ' 1', '1 ']) {
+      const drafts = draftsFromEnv(value === undefined ? {} : { TODAYZ_I18N_DRAFTS: value });
+      expect(drafts, `TODAYZ_I18N_DRAFTS=${JSON.stringify(value)}`).toBe(false);
+      expect(await loadLocaleMessages('shop', 'hi', { dir: messagesDir, drafts })).toEqual({ 'shop.a': 'ए', 'shop.b': 'B' });
+    }
+    const drafts = draftsFromEnv({ TODAYZ_I18N_DRAFTS: '1' });
+    expect(drafts).toBe(true);
+    expect(await loadLocaleMessages('shop', 'hi', { dir: messagesDir, drafts })).toEqual({ 'shop.a': 'ए', 'shop.b': 'बी' });
   });
 });
 

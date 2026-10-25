@@ -5,8 +5,9 @@
 //   compiled/<app>/en.json     every area of the app merged, as ASTs (no runtime parser needed)
 //   compiled/<app>/en-XA.json  accented, bracketed and 40% longer
 //   compiled/<app>/<lc>.json   hi, kn, te, ta: translated messages; English wherever a key is not
-//                              translated, not reviewed or stale. `--drafts` also ships machine
-//                              drafts (for local checks); release builds never do.
+//                              translated, not reviewed or stale. TODAYZ_I18N_DRAFTS=1 also ships
+//                              machine drafts (`make dev` and `make e2e` set it); any other value,
+//                              or unset, ships reviewed translations only. Release builds never set it.
 //
 // Output is git-ignored and produced by `make gen`.
 import { parse } from '@formatjs/icu-messageformat-parser';
@@ -43,6 +44,11 @@ export async function loadLocaleMessages(app, locale, { drafts = false, dir = me
   return out;
 }
 
+/** Machine drafts ship only when TODAYZ_I18N_DRAFTS is exactly "1" (local stack and e2e gate). */
+export function draftsFromEnv(env = process.env) {
+  return env.TODAYZ_I18N_DRAFTS === '1';
+}
+
 export function compile(messages, { pseudo = false } = {}) {
   const outMsgs = {};
   for (const [key, msg] of Object.entries(messages)) {
@@ -53,7 +59,7 @@ export function compile(messages, { pseudo = false } = {}) {
 }
 
 async function main() {
-  const drafts = process.argv.includes('--drafts');
+  const drafts = draftsFromEnv();
   await rm(out, { recursive: true, force: true });
   const apps = (await readdir(messagesDir, { withFileTypes: true })).filter((d) => d.isDirectory()).map((d) => d.name);
   let keys = 0;
@@ -67,7 +73,7 @@ async function main() {
       await writeFile(join(out, app, `${lc}.json`), JSON.stringify(compile(await loadLocaleMessages(app, lc, { drafts }))));
     }
   }
-  console.log(`i18n: ${apps.length} apps, ${keys} keys, locales en, ${TRANSLATED_LOCALES.join(', ')} + ${PSEUDO_LOCALE} -> shared/i18n/compiled`);
+  console.log(`i18n: ${apps.length} apps, ${keys} keys, locales en, ${TRANSLATED_LOCALES.join(', ')} + ${PSEUDO_LOCALE}${drafts ? ' (with machine drafts)' : ''} -> shared/i18n/compiled`);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

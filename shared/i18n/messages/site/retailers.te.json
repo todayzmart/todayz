@@ -1,62 +1,62 @@
 {
   "retailers.meta.title": {
     "message": "షాపుల కోసం | TodayZ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "84e84db2"
   },
   "retailers.meta.description": {
     "message": "మీ కౌంటర్ నడపండి, స్టాక్‌ను ఆన్‌లైన్‌లో పెట్టండి, దగ్గర ఉన్నవారు ఏం వెతుకుతారో చూడండి. ప్రస్తుతం ఉచితం.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5ebd1f7f"
   },
   "retailers.hero.title": {
     "message": "మీ కౌంటర్ నడపండి. {em}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "731f7a9c"
   },
   "retailers.hero.title_em": {
     "message": "మీ వీధిని చేరుకోండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "66e0f09b"
   },
   "retailers.hero.body": {
     "message": "TodayZ మీ షాపుకు పాయింట్-ఆఫ్-సేల్, ఆన్‌లైన్ ఆర్డర్లు, డిమాండ్ సమాచారం, కస్టమర్లను మళ్లీ రప్పించే క్రెడిట్‌లు ఇస్తుంది. ప్రస్తుతం ఉచితం.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6459059b"
   },
   "retailers.faq.title": {
     "message": "సాధారణ ప్రశ్నలు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f07ac22a"
   },
   "retailers.faq.1.q": {
     "message": "చేరడానికి ఫీజు ఉందా?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "02642550"
   },
   "retailers.faq.1.a": {
     "message": "లేదు. ప్రస్తుతం TodayZ షాపులకు ఉచితం.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6036c302"
   },
   "retailers.faq.2.q": {
     "message": "ఇప్పుడు నడుపుతున్నట్టే నా షాపును నడపవచ్చా?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2cc787ac"
   },
   "retailers.faq.2.a": {
     "message": "అవును. TodayZ మీరు ఇప్పుడు పని చేసే పద్ధతికి కలుస్తుంది; మీ కౌంటర్‌ను మార్చదు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ee8e9935"
   },
   "retailers.faq.3.q": {
     "message": "నా దగ్గర ఉన్నవారు ఏం వెతుకుతారో చూడవచ్చా?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "75c50e26"
   },
   "retailers.faq.3.a": {
     "message": "అవును. డిమాండ్ సమాచారం మీ షాపు దగ్గర, మీరు ఉంచని ఐటెమ్‌ల కోసం జరిగిన వెతుకులాటలను చూపిస్తుంది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "312beb90"
   }
 }

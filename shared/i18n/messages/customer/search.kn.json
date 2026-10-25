@@ -1,0 +1,177 @@
+{
+  "search.title": {
+    "message": "ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "search.field.label": {
+    "message": "ವಸ್ತುಗಳನ್ನು ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "4412bfe5"
+  },
+  "search.field.placeholder": {
+    "message": "ಹಿಟ್ಟು, ಹಾಲು, ಔಷಧಿ ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "5f25cc28"
+  },
+  "search.field.clear": {
+    "message": "ಹುಡುಕಾಟ ತೆರವುಗೊಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "67300d0f"
+  },
+  "search.suggestions.label": {
+    "message": "ಸಲಹೆಗಳು",
+    "review": "reviewed",
+    "enHash": "861edba0"
+  },
+  "search.suggestions.search": {
+    "message": "{query} ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "64566b34"
+  },
+  "search.idle.hint": {
+    "message": "ಹತ್ತಿರದ ಅಂಗಡಿಗಳಲ್ಲಿ ಹುಡುಕಲು ಕನಿಷ್ಠ ಎರಡು ಅಕ್ಷರ ಟೈಪ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "b84188f3"
+  },
+  "search.recent.title": {
+    "message": "ಇತ್ತೀಚಿನ ಹುಡುಕಾಟಗಳು",
+    "review": "reviewed",
+    "enHash": "a73d2913"
+  },
+  "search.recent.clear": {
+    "message": "ತೆರವುಗೊಳಿಸಿ",
+    "review": "reviewed",
+    "enHash": "719ea396"
+  },
+  "search.filter.label": {
+    "message": "ಫಿಲ್ಟರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "96e57821"
+  },
+  "search.filter.open": {
+    "message": "ಈಗ ತೆರೆದಿವೆ",
+    "review": "reviewed",
+    "enHash": "d7a05e65"
+  },
+  "search.filter.pickup": {
+    "message": "ಪಿಕಪ್",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "search.filter.delivery": {
+    "message": "ಡೆಲಿವರಿ",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "search.filter.offers": {
+    "message": "ಆಫರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "search.category.label": {
+    "message": "ವರ್ಗ",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "search.category.all": {
+    "message": "ಎಲ್ಲಾ",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "search.sort.label": {
+    "message": "ಈ ಕ್ರಮದಲ್ಲಿ",
+    "review": "reviewed",
+    "enHash": "a2a5bdec"
+  },
+  "search.sort.relevance": {
+    "message": "ಹೆಚ್ಚು ಹೊಂದುವವು",
+    "review": "reviewed",
+    "enHash": "86f686f8"
+  },
+  "search.sort.nearest": {
+    "message": "ಹತ್ತಿರದವು ಮೊದಲು",
+    "review": "reviewed",
+    "enHash": "f809e50f"
+  },
+  "search.sort.cheapest": {
+    "message": "ಕಡಿಮೆ ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "ead8b64d"
+  },
+  "search.refine.label": {
+    "message": "ನಿಮ್ಮ ಹುಡುಕಾಟದ ಫಿಲ್ಟರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "62174b9d"
+  },
+  "search.refine.remove": {
+    "message": "ಫಿಲ್ಟರ್ {chip} ತೆಗೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "32664e04"
+  },
+  "search.summary": {
+    "message": "ಹತ್ತಿರದ {checked} ಅಂಗಡಿಗಳನ್ನು ನೋಡಿದೆವು · {have} ಅಂಗಡಿಗಳಲ್ಲಿ ಇದೆ · {min} ರಿಂದ",
+    "review": "reviewed",
+    "enHash": "8f73de69"
+  },
+  "search.error": {
+    "message": "ಈಗ ಹುಡುಕಲು ಆಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "b7a524b1"
+  },
+  "search.zero.title": {
+    "message": "ಹತ್ತಿರದ ಯಾವ ಅಂಗಡಿಯಲ್ಲೂ {query} ಸ್ಟಾಕ್‌ನಲ್ಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "353d873c"
+  },
+  "search.zero.body": {
+    "message": "ನಿಮ್ಮ ಹತ್ತಿರದ ಜನರು ಇದನ್ನು ಹುಡುಕುತ್ತಿದ್ದಾರೆ ಎಂದು ನಾವು ಗಮನಿಸಿದ್ದೇವೆ, ಇದರಿಂದ ಅಂಗಡಿಗಳು ಇದನ್ನು ತರಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "7c3bed35"
+  },
+  "search.more": {
+    "message": "ಇನ್ನಷ್ಟು ಅಂಗಡಿಗಳನ್ನು ತೋರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "c1c91491"
+  },
+  "search.badge.lowest": {
+    "message": "ಕಡಿಮೆ ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "ead8b64d"
+  },
+  "search.badge.closest": {
+    "message": "ಅತಿ ಹತ್ತಿರ",
+    "review": "reviewed",
+    "enHash": "e596de54"
+  },
+  "search.deliveryFee": {
+    "message": "+{fee} ಡೆಲಿವರಿ",
+    "review": "reviewed",
+    "enHash": "96e53339"
+  },
+  "search.noneConfirmed.title": {
+    "message": "ಇನ್ನೂ ಯಾವ ಅಂಗಡಿಯೂ ಖಚಿತಪಡಿಸಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "d6934628"
+  },
+  "search.noneConfirmed.body": {
+    "message": "ಅಂಗಡಿಗಳ ಪಟ್ಟಿಯಲ್ಲಿ ಇದು ಇದೆ, ಆದರೆ ಇತ್ತೀಚೆಗೆ ಯಾರೂ ಸ್ಟಾಕ್ ಖಚಿತಪಡಿಸಿಲ್ಲ, ಹಾಗಾಗಿ ಇದು ಶೆಲ್ಫ್‌ನಲ್ಲಿ ಇಲ್ಲದಿರಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "91bdc408"
+  },
+  "search.noneConfirmed.bodyWidest": {
+    "message": "ಅಂಗಡಿಗಳ ಪಟ್ಟಿಯಲ್ಲಿ ಇದು ಇದೆ, ಆದರೆ ಇತ್ತೀಚೆಗೆ ಯಾರೂ ಸ್ಟಾಕ್ ಖಚಿತಪಡಿಸಿಲ್ಲ. ನೀವು ಈಗಾಗಲೇ ಅತಿ ದೊಡ್ಡ ಪ್ರದೇಶದಲ್ಲಿ ಹುಡುಕುತ್ತಿದ್ದೀರಿ.",
+    "review": "reviewed",
+    "enHash": "f860d653"
+  },
+  "search.noneConfirmed.wider": {
+    "message": "{km} km ಒಳಗೆ ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "45f8f29c"
+  },
+  "search.noneConfirmed.later": {
+    "message": "ನಂತರ ಮತ್ತೆ ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "71ecbf77"
+  }
+}

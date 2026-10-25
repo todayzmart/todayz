@@ -7,7 +7,7 @@ English is the source. Hindi, Kannada, Telugu and Tamil follow in two steps: a m
 | State | In the file | What people see |
 |---|---|---|
 | Not translated | no entry | English |
-| Machine draft | `"review": "machine"` | English (drafts do not ship) |
+| Machine draft | `"review": "machine"` | English (drafts do not ship); the translation only in the local stack and the e2e gate (`TODAYZ_I18N_DRAFTS=1`) |
 | Reviewed | `"review": "reviewed"` | the translation |
 | Stale | `enHash` differs from the current English | English, until re-translated and re-reviewed |
 
@@ -18,8 +18,12 @@ English is the source. Hindi, Kannada, Telugu and Tamil follow in two steps: a m
 1. A WP adds English in `messages/<app>/<area>.en.json` (`defaultMessage` plus a `description` saying where it appears and any constraint). Sentence case, no exclamation marks, product names untouched. Plurals use ICU (`{n, plural, one {# item} other {# items}}`); Hindi, Kannada, Telugu and Tamil need the `one` and `other` options (other categories only if the language needs them).
 2. List what needs work: `node shared/i18n/scripts/translations.mjs todo <app> <lc>` prints JSON `[{ key, area, en, description, was? }]`.
 3. Machine draft: give that list to the translation model or service with the glossary below, get `{ "key": "translated message" }` back, and import it: `... import <app> <area> <lc> drafts.json`. The import checks that the draft takes the same arguments as English and stores it as `machine`. A model output is a draft that a person confirms; it never ships on its own.
-4. Human review: a fluent reviewer reads the drafts in context (use `?locale=<lc>` with `--drafts` output, or the draft file), edits the `message`, and approves: `... approve <app> <area> <lc> key1 key2`. Approve refuses a key whose English changed since the draft.
+4. Human review: a fluent reviewer reads the drafts in context (pick the language in `make dev`, which compiles drafts, or read the draft file), edits the `message`, and approves: `... approve <app> <area> <lc> key1 key2`. Approve refuses a key whose English changed since the draft.
 5. `pnpm --filter @todayz/i18n lint:messages` (and the `check-i18n-messages` step of `make check`) must pass. It reports reviewed, machine, missing and stale counts per language. A stale translation (English changed) only warns; the other checks (parse, same arguments and tags, no number/date/time arguments) are skipped for it because it will be translated again. `make gen` ships a reviewed translation only if it is not stale, parses and takes the same arguments and tags as English; otherwise English ships and gen warns.
+
+## Drafts in local builds (`TODAYZ_I18N_DRAFTS`)
+
+`make gen` ships machine drafts only when `TODAYZ_I18N_DRAFTS` is exactly `1`; any other value, or unset, ships reviewed translations only. `make dev` and `make e2e` set it (`mk/40-frontend.mk`): `make dev` recompiles the catalogues with drafts before the dev servers start, and `make e2e` compiles them for its builds and journeys. Plain `make gen` and `make check` do not set it, and `scripts/deploy/pages.sh` unsets it before the prod build. This is how a journey can read a draft language while nothing unreviewed reaches prod. Running `make gen` or `make check` after `make dev` puts the dev servers back on reviewed-only catalogues until the next `make dev`. For a one-off look: `TODAYZ_I18N_DRAFTS=1 pnpm --filter @todayz/i18n gen`.
 
 ## Glossary and style
 

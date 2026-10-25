@@ -5,12 +5,13 @@
 // The contract has no catalogue snapshot route (04 lists one, the W1-05 contract does not carry it),
 // so the snapshot is the store's item list plus the cursor a sync from 0 ends on. See the report.
 import { newUlid } from '@todayz/auth';
-import { createBillClaim, createPosSale, getBillClaim, reversePosSale, verifyCounterCode } from '@todayz/api-client/gen/pos/pos';
+import { createBillClaim, createPosSale, getBillClaim, listPosSales, reversePosSale, verifyCounterCode } from '@todayz/api-client/gen/pos/pos';
 import { listStoreItems, getStoreItem } from '@todayz/api-client/gen/catalogue/catalogue';
 import { syncStore } from '@todayz/api-client/gen/sync/sync';
 import type { PosSale } from '@todayz/api-client/gen/model/posSale';
 import type { PosSaleCreateRequest } from '@todayz/api-client/gen/model/posSaleCreateRequest';
 import type { PosSaleLinkInput } from '@todayz/api-client/gen/model/posSaleLinkInput';
+import type { PosSaleSummary } from '@todayz/api-client/gen/model/posSaleSummary';
 import type { StoreItem } from '@todayz/api-client/gen/model/storeItem';
 import type { SyncChange } from '@todayz/api-client/gen/model/syncChange';
 import type { SyncEntry } from '@todayz/api-client/gen/model/syncEntry';
@@ -113,6 +114,28 @@ export interface ReverseAck {
   cashbackClawedBack: number;
 }
 
+/** Why an offline counter code did not link at sync (D-12), as the server recorded it. */
+export type LinkFailure = 'code_used' | 'code_wrong' | 'clock_off' | 'too_late' | 'locked' | 'unverified';
+
+/** One sale of the store as the server holds it (`GET pos/sales`): any device, online or synced. */
+export interface StoreSale {
+  id: string;
+  soldAt: string;
+  totalPaise: number;
+  unitCount: number;
+  paymentMethod: 'cash' | 'upi' | 'card' | 'other';
+  reversed: boolean;
+  /** Rung up offline and synced later. */
+  offline: boolean;
+  /** No phone ever: the customer is named only for a bill QR or counter code link. */
+  link: { status: LinkStatus; customerName: string | null; failure: LinkFailure | null } | null;
+}
+
+export interface StoreSalesPage {
+  items: StoreSale[];
+  nextCursor: string | null;
+}
+
 export interface PosApi {
   /** The whole catalogue and the cursor it is current to. */
   getSnapshot(): Promise<CatalogueSnapshot>;
@@ -126,6 +149,8 @@ export interface PosApi {
   createBillClaim(draft: BillClaimDraft, idempotencyKey: string): Promise<BillClaim>;
   getBillClaim(claimId: string): Promise<BillClaimStatus>;
   verifyCounterCode(body: { phone: string; code: string; saleClientId: string }, idempotencyKey: string): Promise<CounterCodeResult>;
+  /** The store's sales, newest first (B-05 sales history); pass `nextCursor` for the next page. */
+  listSales(cursor: string | null): Promise<StoreSalesPage>;
 }
 
 /** No number reaches the POS from `platform_settings` yet, so none is assumed: the server enforces them. */
@@ -264,6 +289,19 @@ export function toAck(s: PosSale): SaleAck {
   };
 }
 
+export function toStoreSale(s: PosSaleSummary): StoreSale {
+  return {
+    id: s.id,
+    soldAt: s.soldAt,
+    totalPaise: s.totalPaise,
+    unitCount: s.unitCount,
+    paymentMethod: s.paymentMethod,
+    reversed: s.status === 'reversed',
+    offline: s.offline,
+    link: s.link ? { status: s.link.status, customerName: s.link.customerName ?? null, failure: s.link.failure ?? null } : null,
+  };
+}
+
 export function toReverseAck(s: PosSale): ReverseAck {
   return {
     stockReturned: s.lines.flatMap((l) => (l.storeItemId ? [{ storeItemId: l.storeItemId, quantity: l.quantity }] : [])),
@@ -362,6 +400,10 @@ export function httpPosApi(bid: string, sid: string): PosApi {
     async verifyCounterCode(body, key) {
       const r = await verifyCounterCode(bid, sid, { phone: e164(body.phone), code: body.code, saleClientId: body.saleClientId }, { idempotencyKey: key });
       return { linked: true, customerName: r.customerName, serverNow: r.serverNow };
+    },
+    async listSales(cursor) {
+      const r = await listPosSales(bid, sid, { limit: 20, ...(cursor ? { cursor } : {}) });
+      return { items: r.items.map(toStoreSale), nextCursor: r.nextCursor ?? null };
     },
   };
 }

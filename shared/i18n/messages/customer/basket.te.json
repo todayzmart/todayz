@@ -1,0 +1,447 @@
+{
+  "basket.title": {
+    "message": "బాస్కెట్",
+    "review": "reviewed",
+    "enHash": "020b4183"
+  },
+  "basket.back": {
+    "message": "బాస్కెట్‌లు",
+    "review": "reviewed",
+    "enHash": "d368818f"
+  },
+  "basket.loading": {
+    "message": "మీ బాస్కెట్‌లు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "077179d4"
+  },
+  "basket.error": {
+    "message": "మీ బాస్కెట్‌లు లోడ్ కాలేదు",
+    "review": "reviewed",
+    "enHash": "eff7d45d"
+  },
+  "basket.gone.title": {
+    "message": "ఈ బాస్కెట్ ఇప్పుడు లేదు",
+    "review": "reviewed",
+    "enHash": "8e3f494b"
+  },
+  "basket.defaultName": {
+    "message": "నా బాస్కెట్",
+    "review": "reviewed",
+    "enHash": "49c9899b"
+  },
+  "basket.signIn": {
+    "message": "సేవ్ చేయడానికి సైన్ ఇన్ చేయండి",
+    "review": "reviewed",
+    "enHash": "61198591"
+  },
+  "basket.device.title": {
+    "message": "ఈ పరికరంలో బాస్కెట్",
+    "review": "reviewed",
+    "enHash": "5a9b9d21"
+  },
+  "basket.device.note": {
+    "message": "ఈ బాస్కెట్ ఈ పరికరంలో మాత్రమే ఉంది. మీ ఖాతాలో సేవ్ చేయడానికి సైన్ ఇన్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "c06180e4"
+  },
+  "basket.device.clear": {
+    "message": "బాస్కెట్ ఖాళీ చేయండి",
+    "review": "reviewed",
+    "enHash": "81f53e3e"
+  },
+  "basket.saving": {
+    "message": "సేవ్ అవుతోంది",
+    "review": "reviewed",
+    "enHash": "369c534d"
+  },
+  "basket.saved": {
+    "message": "సేవ్ అయింది",
+    "review": "reviewed",
+    "enHash": "c0ae8f6e"
+  },
+  "basket.conflict": {
+    "message": "ఈ బాస్కెట్ వేరే పరికరంలో మారింది. తాజాది చూపిస్తున్నాం.",
+    "review": "reviewed",
+    "enHash": "fb4aceb3"
+  },
+  "basket.full": {
+    "message": "ఈ బాస్కెట్ నిండిపోయింది. ఇంకొకటి చేర్చడానికి ఒక వస్తువు తీసేయండి.",
+    "review": "reviewed",
+    "enHash": "52d00466"
+  },
+  "basket.limit": {
+    "message": "మీరు సేవ్ చేయగలిగినన్ని బాస్కెట్‌లు ఉన్నాయి. కొత్తది చేయడానికి ఒకటి డిలీట్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "907b9c23"
+  },
+  "basket.saveError": {
+    "message": "సేవ్ కాలేదు. మీ కనెక్షన్ చెక్ చేసి మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "69f52210"
+  },
+  "basket.lastSplit": {
+    "message": "గతసారి: {a}, {b}",
+    "review": "reviewed",
+    "enHash": "d062b8ed"
+  },
+  "basket.ask.label": {
+    "message": "ఒక వస్తువు చేర్చండి",
+    "review": "reviewed",
+    "enHash": "fc1290c0"
+  },
+  "basket.ask.placeholder": {
+    "message": "ఆటా, పాలు, బ్రెడ్ చేర్చండి…",
+    "review": "reviewed",
+    "enHash": "7f9a11af"
+  },
+  "basket.ask.clear": {
+    "message": "తీసేయండి",
+    "review": "reviewed",
+    "enHash": "719ea396"
+  },
+  "basket.ask.try": {
+    "message": "ప్రయత్నించండి: {example}",
+    "review": "reviewed",
+    "enHash": "f69e58c6"
+  },
+  "basket.ask.example1": {
+    "message": "Aashirvaad atta 5 kg",
+    "review": "reviewed",
+    "enHash": "43f36ca4"
+  },
+  "basket.ask.example2": {
+    "message": "Amul milk 500 ml",
+    "review": "reviewed",
+    "enHash": "c84bc4b6"
+  },
+  "basket.ask.example3": {
+    "message": "Dolo 650",
+    "review": "reviewed",
+    "enHash": "a8c97442"
+  },
+  "basket.ask.example4": {
+    "message": "Tata salt 1 kg",
+    "review": "reviewed",
+    "enHash": "59a93d2a"
+  },
+  "basket.ask.suggestions": {
+    "message": "సూచనలు",
+    "review": "reviewed",
+    "enHash": "861edba0"
+  },
+  "basket.ask.addText": {
+    "message": "“{text}” చేర్చండి",
+    "review": "reviewed",
+    "enHash": "944e1cc0"
+  },
+  "basket.lines.empty": {
+    "message": "మీ బాస్కెట్ ఖాళీగా ఉంది. మీకు కావాల్సినవి పైన చేర్చండి.",
+    "review": "reviewed",
+    "enHash": "42192d50"
+  },
+  "basket.lines.label": {
+    "message": "ఈ బాస్కెట్‌లోని వస్తువులు",
+    "review": "reviewed",
+    "enHash": "01c3b088"
+  },
+  "basket.lines.anyBrand": {
+    "message": "ఏ బ్రాండ్ అయినా",
+    "review": "reviewed",
+    "enHash": "b7e880d1"
+  },
+  "basket.lines.remove": {
+    "message": "{name} తీసేయండి",
+    "review": "reviewed",
+    "enHash": "df7193a5"
+  },
+  "basket.name.label": {
+    "message": "బాస్కెట్ పేరు",
+    "review": "reviewed",
+    "enHash": "e14e97bc"
+  },
+  "basket.name.placeholder": {
+    "message": "వారపు సరుకులు",
+    "review": "reviewed",
+    "enHash": "a7fa990b"
+  },
+  "basket.results.title": {
+    "message": "ఎక్కడ దొరుకుతుంది",
+    "review": "reviewed",
+    "enHash": "e5a2bb5a"
+  },
+  "basket.search": {
+    "message": "దుకాణాలు వెతకండి",
+    "review": "reviewed",
+    "enHash": "fdb699b0"
+  },
+  "basket.search.again": {
+    "message": "మళ్లీ వెతకండి",
+    "review": "reviewed",
+    "enHash": "1178a4ff"
+  },
+  "basket.search.running": {
+    "message": "వెతుకుతున్నాం",
+    "review": "reviewed",
+    "enHash": "98cc363c"
+  },
+  "basket.search.checking": {
+    "message": "{n} దుకాణాలు చూస్తున్నాం…",
+    "review": "reviewed",
+    "enHash": "24f87468"
+  },
+  "basket.search.checkingNearby": {
+    "message": "దగ్గరి దుకాణాలు చూస్తున్నాం…",
+    "review": "reviewed",
+    "enHash": "14a6970d"
+  },
+  "basket.search.error": {
+    "message": "ఇప్పుడు వెతకలేకపోయాం. మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "cf8b0750"
+  },
+  "basket.search.stale": {
+    "message": "బాస్కెట్ మారింది. దానికి దుకాణాలు చూడడానికి మళ్లీ వెతకండి.",
+    "review": "reviewed",
+    "enHash": "87db2770"
+  },
+  "basket.summary": {
+    "message": "దగ్గరి {checked} దుకాణాలు చూశాం · {all, plural, one {# దుకాణంలో అన్నీ ఉన్నాయి} other {# దుకాణాల్లో అన్నీ ఉన్నాయి}}",
+    "review": "reviewed",
+    "enHash": "a5faa10a"
+  },
+  "basket.zero.title": {
+    "message": "దగ్గరి ఏ దుకాణంలోనూ ఈ వస్తువులు స్టాక్‌లో లేవు",
+    "review": "reviewed",
+    "enHash": "039f6096"
+  },
+  "basket.zero.body": {
+    "message": "ఎక్కువ దూరం ప్రయత్నించండి, లేదా దగ్గరి దుకాణాలను అడగండి.",
+    "review": "reviewed",
+    "enHash": "59090928"
+  },
+  "basket.noPlace.title": {
+    "message": "వెతకడానికి మీ లొకేషన్ సెట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "4c765aeb"
+  },
+  "basket.noPlace.body": {
+    "message": "ప్రతి వస్తువు కోసం మీ దగ్గరి దుకాణాలు చూస్తాం.",
+    "review": "reviewed",
+    "enHash": "e397a455"
+  },
+  "basket.preview": {
+    "message": "ఈ మొత్తాలు అంచనా మాత్రమే. చివరి ధర చెక్‌అవుట్‌లో కనిపిస్తుంది.",
+    "review": "reviewed",
+    "enHash": "4b932981"
+  },
+  "basket.badge.everything": {
+    "message": "అన్నీ ఉన్నాయి",
+    "review": "reviewed",
+    "enHash": "b5b23177"
+  },
+  "basket.badge.closest": {
+    "message": "అతి దగ్గర",
+    "review": "reviewed",
+    "enHash": "e596de54"
+  },
+  "basket.badge.lowest": {
+    "message": "తక్కువ ధర",
+    "review": "reviewed",
+    "enHash": "ead8b64d"
+  },
+  "basket.card.meta": {
+    "message": "{m} లో {n} · {distance} · {total}",
+    "review": "reviewed",
+    "enHash": "4d9c283a"
+  },
+  "basket.card.qty": {
+    "message": "× {qty} · {price}",
+    "review": "reviewed",
+    "enHash": "1db182ec"
+  },
+  "basket.card.missing": {
+    "message": "లేనివి: {items}",
+    "review": "reviewed",
+    "enHash": "be599cea"
+  },
+  "basket.fill": {
+    "message": "కార్ట్ నింపండి",
+    "review": "reviewed",
+    "enHash": "46e70f01"
+  },
+  "basket.split.title": {
+    "message": "రెండు దుకాణాల నుండి అన్నీ తీసుకోండి",
+    "review": "reviewed",
+    "enHash": "1b03c4c5"
+  },
+  "basket.split.body": {
+    "message": "ఒకే దుకాణంలో అన్నీ లేవు. ఈ రెండింటిలో కలిపి ఉన్నాయి.",
+    "review": "reviewed",
+    "enHash": "cbf2227f"
+  },
+  "basket.split.meta": {
+    "message": "{n} ఐటమ్‌లు · {distance}",
+    "review": "reviewed",
+    "enHash": "9c9d421e"
+  },
+  "basket.split.uncovered": {
+    "message": "దగ్గరి ఏ దుకాణంలోనూ లేనివి: {items}",
+    "review": "reviewed",
+    "enHash": "3eb9d0e8"
+  },
+  "basket.split.fill": {
+    "message": "{shop} నుండి కార్ట్ నింపండి",
+    "review": "reviewed",
+    "enHash": "2c6b30da"
+  },
+  "basket.split.inStore": {
+    "message": "వీటిలో ఒక దుకాణం దుకాణంలో మాత్రమే అమ్ముతుంది. ఆ వస్తువుల కోసం అక్కడికి వెళ్లండి.",
+    "review": "reviewed",
+    "enHash": "7722cded"
+  },
+  "basket.list.title": {
+    "message": "బాస్కెట్‌లు",
+    "review": "reviewed",
+    "enHash": "d368818f"
+  },
+  "basket.list.sub": {
+    "message": "మీరు తరచుగా కొనేవి సేవ్ చేయండి, అవన్నీ ఉన్న దుకాణం కనుగొనండి.",
+    "review": "reviewed",
+    "enHash": "d0bd4a33"
+  },
+  "basket.list.new": {
+    "message": "కొత్త బాస్కెట్",
+    "review": "reviewed",
+    "enHash": "41876bb5"
+  },
+  "basket.list.count": {
+    "message": "{n, plural, one {# ఐటమ్} other {# ఐటమ్‌లు}}",
+    "review": "reviewed",
+    "enHash": "5160c4b2"
+  },
+  "basket.list.updated": {
+    "message": "{time} అప్‌డేట్ అయింది",
+    "review": "reviewed",
+    "enHash": "d5a788b6"
+  },
+  "basket.list.open": {
+    "message": "తెరవండి",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "basket.list.searchAgain": {
+    "message": "మళ్లీ వెతకండి",
+    "review": "reviewed",
+    "enHash": "1178a4ff"
+  },
+  "basket.list.delete": {
+    "message": "{name} డిలీట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "1164a628"
+  },
+  "basket.list.empty.title": {
+    "message": "ఇంకా బాస్కెట్‌లు లేవు",
+    "review": "reviewed",
+    "enHash": "6de1a7b9"
+  },
+  "basket.list.empty.body": {
+    "message": "మీరు తరచుగా కొనేవాటితో ఒక బాస్కెట్ చేయండి, తర్వాత అవన్నీ ఉన్న దుకాణం వెతకండి.",
+    "review": "reviewed",
+    "enHash": "ddad8049"
+  },
+  "basket.deleted": {
+    "message": "{name} డిలీట్ అయింది",
+    "review": "reviewed",
+    "enHash": "94f9867b"
+  },
+  "basket.undo": {
+    "message": "రద్దు చేయండి",
+    "review": "reviewed",
+    "enHash": "39fc7212"
+  },
+  "basket.saveOffer.title": {
+    "message": "ఈ పరికరంలో మీ బాస్కెట్ ఉంది",
+    "review": "reviewed",
+    "enHash": "1fd9dc0e"
+  },
+  "basket.saveOffer.body": {
+    "message": "దాని {n} ఐటమ్‌లను ఎక్కడైనా వాడడానికి మీ ఖాతాలో సేవ్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "e1ee01a7"
+  },
+  "basket.saveOffer.save": {
+    "message": "సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "efc007a3"
+  },
+  "basket.saveOffer.notNow": {
+    "message": "ఇప్పుడు కాదు",
+    "review": "reviewed",
+    "enHash": "e4571490"
+  },
+  "basket.add": {
+    "message": "బాస్కెట్‌లో చేర్చండి",
+    "review": "reviewed",
+    "enHash": "1d978ebd"
+  },
+  "basket.add.labelFor": {
+    "message": "బాస్కెట్‌లో చేర్చండి: {name}",
+    "review": "reviewed",
+    "enHash": "fb174f2b"
+  },
+  "basket.add.title": {
+    "message": "ఏ బాస్కెట్‌లో చేర్చాలి?",
+    "review": "reviewed",
+    "enHash": "5c27d993"
+  },
+  "basket.add.close": {
+    "message": "మూసివేయండి",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "basket.add.new": {
+    "message": "కొత్త బాస్కెట్",
+    "review": "reviewed",
+    "enHash": "41876bb5"
+  },
+  "basket.add.done": {
+    "message": "{name} ను {basket} లో చేర్చాం",
+    "review": "reviewed",
+    "enHash": "69b59b15"
+  },
+  "basket.add.view": {
+    "message": "చూడండి",
+    "review": "reviewed",
+    "enHash": "69bd4ef9"
+  },
+  "basket.next.title": {
+    "message": "తర్వాత: మిగిలినవి {shop} నుండి",
+    "review": "reviewed",
+    "enHash": "a080388e"
+  },
+  "basket.next.body": {
+    "message": "మీ బాస్కెట్‌లోని {n, plural, one {# ఐటమ్} other {# ఐటమ్‌లు}} {shop} లో ఎదురుచూస్తున్నాయి.",
+    "review": "reviewed",
+    "enHash": "76b54dad"
+  },
+  "basket.next.fill": {
+    "message": "{shop} నుండి కార్ట్ నింపండి",
+    "review": "reviewed",
+    "enHash": "2c6b30da"
+  },
+  "basket.next.dismiss": {
+    "message": "ఇప్పుడు కాదు",
+    "review": "reviewed",
+    "enHash": "e4571490"
+  },
+  "basket.entry": {
+    "message": "బాస్కెట్‌లు",
+    "review": "reviewed",
+    "enHash": "d368818f"
+  },
+  "basket.entry.body": {
+    "message": "మీ పూర్తి జాబితాకు ఒకే దుకాణం కనుగొనండి",
+    "review": "reviewed",
+    "enHash": "f8cab370"
+  }
+}

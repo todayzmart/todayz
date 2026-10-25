@@ -28,6 +28,15 @@ PosLinkStatus:
     `linked`; `pending_verification` never comes back from the server (it is the device's state before
     sync); `failed` is an offline counter code the server refused at sync ("Customer link failed", D-12).
   enum: [linked, pending_verification, failed]
+PosLinkFailure:
+  type: string
+  description: >-
+    Why the server refused an offline counter code at sync (D-12, W2-16): `code_used` the code was used
+    before; `code_wrong` it did not match; `clock_off` the device clock was more than 2 min off at its last
+    online check (or the sale time is in the future); `too_late` it synced after `pos_offline_link_max_hours`;
+    `locked` too many wrong codes for this phone or cashier; `unverified` the sale carried no code or clock
+    offset. Null for a sale that failed before the reason was kept.
+  enum: [code_used, code_wrong, clock_off, too_late, locked, unverified]
 PosPaymentMethod:
   type: string
   description: How the customer paid at the counter.
@@ -120,6 +129,11 @@ PosSaleLink:
     method: {$ref: "#/PosLinkMethod"}
     status: {$ref: "#/PosLinkStatus"}
     customerName: {type: [string, "null"]}
+    failure:
+      description: Set only when `status` is `failed`.
+      oneOf:
+        - {$ref: "#/PosLinkFailure"}
+        - {type: "null"}
 PosSale:
   type: object
   required: [id, clientId, lines, itemSubtotalPaise, billOfferDiscountPaise, subtotalPaise, discountPaise,
@@ -158,6 +172,43 @@ PosSale:
         The receipt link's token (`/r/{token}`, D-45), 22 base64url characters. Only in the response that
         rang the sale; the server keeps only its hash.
     version: {type: integer}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+PosSaleSummary:
+  type: object
+  description: >-
+    A sale in the store's sales history (B-05, W2-16): what the list row shows. `lineCount` is the number
+    of lines, `unitCount` the units across them. `offline` is a sale that came through `{S}/sync`.
+  required: [id, clientId, soldAt, receivedAt, totalPaise, lineCount, unitCount, paymentMethod, creditsUsed,
+    cashbackCredits, status, reversedAt, offline, link]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    clientId: {$ref: ./common.yaml#/Ulid}
+    soldAt: {$ref: ./common.yaml#/Timestamp}
+    receivedAt: {$ref: ./common.yaml#/Timestamp}
+    totalPaise: {$ref: ./common.yaml#/Paise}
+    lineCount: {type: integer, minimum: 0}
+    unitCount: {type: integer, minimum: 0}
+    paymentMethod: {$ref: "#/PosPaymentMethod"}
+    creditsUsed: {$ref: ./common.yaml#/Credits}
+    cashbackCredits: {$ref: ./common.yaml#/Credits}
+    status: {$ref: "#/PosSaleStatus"}
+    reversedAt:
+      oneOf:
+        - {$ref: ./common.yaml#/Timestamp}
+        - {type: "null"}
+    offline: {type: boolean}
+    link:
+      oneOf:
+        - {$ref: "#/PosSaleLink"}
+        - {type: "null"}
+PosSaleList:
+  type: object
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      items: {$ref: "#/PosSaleSummary"}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
     serverNow: {$ref: ./common.yaml#/ServerNow}
 BillClaimCreateRequest:
   type: object

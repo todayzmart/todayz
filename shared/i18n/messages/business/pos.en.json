@@ -698,5 +698,97 @@
   "pos.receipt.shareText": {
     "defaultMessage": "Your receipt from {shop}: {url}",
     "description": "Text of the share message"
+  },
+  "pos.pay.other": {
+    "defaultMessage": "Other",
+    "description": "Payment method name"
+  },
+  "pos.storeSales.open": {
+    "defaultMessage": "Store sales",
+    "description": "Button on the Sell screen that opens every sale of the store from the server (B-05 sales history)"
+  },
+  "pos.storeSales.title": {
+    "defaultMessage": "Store sales",
+    "description": "Sheet title: the store's sales from the server, every device"
+  },
+  "pos.storeSales.sub": {
+    "defaultMessage": "Every sale at this store from all devices, newest first.",
+    "description": "Line under the store sales title"
+  },
+  "pos.storeSales.refresh": {
+    "defaultMessage": "Refresh",
+    "description": "Button that reloads the store's sales"
+  },
+  "pos.storeSales.more": {
+    "defaultMessage": "Load more",
+    "description": "Button that loads older sales"
+  },
+  "pos.storeSales.loading": {
+    "defaultMessage": "Loading sales",
+    "description": "Accessible name of the loading placeholder"
+  },
+  "pos.storeSales.offline": {
+    "defaultMessage": "You are offline. Connect to see the store's sales; sales on this device are under “Sales”.",
+    "description": "Banner when the store sales cannot load offline"
+  },
+  "pos.storeSales.failed": {
+    "defaultMessage": "Sales could not load. Try “Refresh”.",
+    "description": "Banner when the list fails"
+  },
+  "pos.storeSales.forbidden": {
+    "defaultMessage": "You cannot see this store's sales.",
+    "description": "Banner when the server refuses the list"
+  },
+  "pos.storeSales.empty.title": {
+    "defaultMessage": "No sales yet",
+    "description": "Empty state"
+  },
+  "pos.storeSales.empty.body": {
+    "defaultMessage": "Sales rung up at this store appear here once they reach the server.",
+    "description": "Empty state body"
+  },
+  "pos.storeSales.offlineSale": {
+    "defaultMessage": "Rung up offline",
+    "description": "Tag on a sale that was recorded offline and synced later"
+  },
+  "pos.storeSales.link.none": {
+    "defaultMessage": "No customer",
+    "description": "Tag on a sale with no customer linked"
+  },
+  "pos.storeSales.link.linked": {
+    "defaultMessage": "Customer linked",
+    "description": "Tag on a sale linked to a customer whose name is not shown (phone only)"
+  },
+  "pos.storeSales.link.linkedTo": {
+    "defaultMessage": "Linked to {name}",
+    "description": "Tag on a sale linked to a customer; {name} is the customer's display name"
+  },
+  "pos.storeSales.link.pending": {
+    "defaultMessage": "Link pending",
+    "description": "Tag on a sale whose customer link is waiting to be checked"
+  },
+  "pos.storeSales.failure.code_used": {
+    "defaultMessage": "The counter code was already used.",
+    "description": "Why an offline customer link failed (D-12)"
+  },
+  "pos.storeSales.failure.code_wrong": {
+    "defaultMessage": "The counter code did not match.",
+    "description": "Why an offline customer link failed (D-12)"
+  },
+  "pos.storeSales.failure.clock_off": {
+    "defaultMessage": "The device clock was off.",
+    "description": "Why an offline customer link failed (D-12)"
+  },
+  "pos.storeSales.failure.too_late": {
+    "defaultMessage": "The sale synced too late to check the code.",
+    "description": "Why an offline customer link failed (D-12)"
+  },
+  "pos.storeSales.failure.locked": {
+    "defaultMessage": "Too many wrong codes; checks are paused.",
+    "description": "Why an offline customer link failed (D-12)"
+  },
+  "pos.storeSales.failure.unverified": {
+    "defaultMessage": "The code could not be checked.",
+    "description": "Why an offline customer link failed (D-12)"
   }
 }

@@ -521,5 +521,11 @@ func TestSuggest(t *testing.T) {
 		}
 	}
 	assert.Contains(t, cats, "dairy-eggs")
+
+	// The contract fuzzer's query: a NUL, which Postgres refuses in text, was a 500.
+	out, err = f.svc.Suggest(f.ctx, discoverapi.SearchSuggestParams{Q: "amu\x00\u008d;\xff"})
+	require.NoError(t, err)
+	require.NotEmpty(t, out.Items)
+	assert.Equal(t, "Amul", out.Items[0].Text)
 	assert.Empty(t, f.logRows(), "a suggestion is not a search")
 }

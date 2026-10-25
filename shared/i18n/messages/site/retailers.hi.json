@@ -1,62 +1,62 @@
 {
   "retailers.meta.title": {
     "message": "दुकानदारों के लिए | TodayZ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "84e84db2"
   },
   "retailers.meta.description": {
     "message": "अपना काउंटर चलाएँ, स्टॉक ऑनलाइन लाएँ और देखें कि आसपास के लोग क्या खोजते हैं। अभी मुफ़्त।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5ebd1f7f"
   },
   "retailers.hero.title": {
     "message": "अपना काउंटर चलाएँ। {em}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "731f7a9c"
   },
   "retailers.hero.title_em": {
     "message": "अपने मोहल्ले तक पहुँचें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "66e0f09b"
   },
   "retailers.hero.body": {
     "message": "TodayZ आपकी दुकान को पॉइंट-ऑफ़-सेल, ऑनलाइन ऑर्डर, माँग की जानकारी और ग्राहकों को वापस लाने वाले क्रेडिट देता है। अभी मुफ़्त।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6459059b"
   },
   "retailers.faq.title": {
     "message": "आम सवाल",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f07ac22a"
   },
   "retailers.faq.1.q": {
     "message": "क्या जुड़ने की कोई फ़ीस है?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "02642550"
   },
   "retailers.faq.1.a": {
     "message": "नहीं। अभी TodayZ दुकानों के लिए मुफ़्त है।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6036c302"
   },
   "retailers.faq.2.q": {
     "message": "क्या मैं अपनी दुकान वैसे ही चला सकता हूँ जैसे अभी चलाता हूँ?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2cc787ac"
   },
   "retailers.faq.2.a": {
     "message": "हाँ। TodayZ आपके आज के तरीके में कुछ जोड़ता है; आपके काउंटर की जगह नहीं लेता।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ee8e9935"
   },
   "retailers.faq.3.q": {
     "message": "क्या मैं देख सकता हूँ कि मेरे पास के लोग क्या खोजते हैं?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "75c50e26"
   },
   "retailers.faq.3.a": {
     "message": "हाँ। माँग की जानकारी आपकी दुकान के पास उन आइटम की खोजें दिखाती है जो आप नहीं रखते।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "312beb90"
   }
 }

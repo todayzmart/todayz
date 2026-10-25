@@ -112,6 +112,22 @@ function posSale(body: { clientId: string; lines: WireLine[]; billDiscountPaise?
   };
 }
 
+// The store's sales from the server (W2-16): one of each link state, three offline-code failures.
+const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString();
+function storeSale(n: number, min: number, totalPaise: number, units: number, paymentMethod: string, offline: boolean, link: unknown, status = 'completed') {
+  const id = `01J9ZQQQQQQQQQQQQQQQQQQQ${String(n).padStart(2, '0')}`;
+  return { id, clientId: id, soldAt: ago(min), receivedAt: ago(min), totalPaise, lineCount: units, unitCount: units, paymentMethod, creditsUsed: 0, cashbackCredits: 0, status, reversedAt: status === 'reversed' ? ago(min - 1) : null, offline, link };
+}
+const failed = (failure: string) => ({ method: 'counter_code', status: 'failed', customerName: null, failure });
+const STORE_SALES = [
+  storeSale(1, 4, 38200, 4, 'upi', false, { method: 'bill_qr', status: 'linked', customerName: 'Ananya', failure: null }),
+  storeSale(2, 18, 9600, 2, 'cash', true, failed('code_used')),
+  storeSale(3, 35, 16500, 1, 'cash', true, failed('clock_off')),
+  storeSale(4, 52, 26000, 1, 'card', true, failed('too_late')),
+  storeSale(5, 70, 4800, 1, 'cash', true, { method: 'counter_code', status: 'pending_verification', customerName: null, failure: null }),
+  storeSale(6, 95, 1000, 1, 'cash', false, null, 'reversed'),
+];
+
 async function fakeApi(page: Page) {
   await page.route('**/v1/**', (route) => {
     const req = route.request();
@@ -138,6 +154,7 @@ async function fakeApi(page: Page) {
     }
     if (url.pathname === `${base}/orders`) return ok(route, { items: [], nextCursor: null, serverNow: NOW() });
     if (url.pathname === `${base}/items`) return ok(route, { items: ITEMS, nextCursor: null });
+    if (url.pathname === `${base}/pos/sales` && req.method() === 'GET') return ok(route, { items: STORE_SALES, nextCursor: null, serverNow: NOW() });
     if (url.pathname === `${base}/pos/sales`) return ok(route, posSale(req.postDataJSON() as Parameters<typeof posSale>[0]), 201);
     return route.fulfill({ status: 404, contentType: 'application/problem+json', headers: cors(route), body: JSON.stringify({ type: 'about:blank#not_found', title: 'Not found', status: 404, code: 'not_found' }) });
   });
@@ -207,4 +224,21 @@ test('phone: counter with the bill bar and the bill sheet (B-05)', async ({ page
   await page.getByRole('button', { name: /View bill/ }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await shot(page, 'sell-bill-sheet-phone.png');
+});
+
+test('phone 360: store sales with each link status and why a link failed (B-05, W2-16)', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto('/sell');
+  await page.getByRole('button', { name: 'Store sales', exact: true }).click();
+  const sheet = page.getByRole('dialog', { name: 'Store sales' });
+  const list = sheet.getByRole('list', { name: 'Store sales' });
+  await expect(list.getByText('Customer link failed')).toHaveCount(3);
+  await expect(list.getByText('The counter code was already used.')).toBeVisible();
+  await expect(list.getByText('The device clock was off.')).toBeVisible();
+  await expect(list.getByText('The sale synced too late to check the code.')).toBeVisible();
+  await expect(list.getByText('Linked to Ananya')).toBeVisible();
+  await expect(list.getByText('Link pending')).toBeVisible();
+  await expect(sheet.getByRole('button', { name: 'Refresh' })).toHaveCSS('min-height', '44px');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+  await shot(page, 'store-sales-360.png');
 });

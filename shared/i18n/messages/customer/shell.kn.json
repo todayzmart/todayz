@@ -1,0 +1,82 @@
+{
+  "shell.appName": {
+    "message": "TodayZ",
+    "review": "reviewed",
+    "enHash": "34b58f9d"
+  },
+  "shell.skipToContent": {
+    "message": "ಮುಖ್ಯ ಭಾಗಕ್ಕೆ ನೇರವಾಗಿ ಹೋಗಿ",
+    "review": "reviewed",
+    "enHash": "0a4470d6"
+  },
+  "shell.nav.label": {
+    "message": "ಮುಖ್ಯ",
+    "review": "reviewed",
+    "enHash": "62bce942"
+  },
+  "shell.nav.home": {
+    "message": "ಹೋಮ್",
+    "review": "reviewed",
+    "enHash": "70f8bb9a"
+  },
+  "shell.nav.search": {
+    "message": "ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "shell.nav.orders": {
+    "message": "ಆರ್ಡರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "cded0933"
+  },
+  "shell.nav.wallet": {
+    "message": "ವಾಲೆಟ್",
+    "review": "reviewed",
+    "enHash": "b60862f4"
+  },
+  "shell.nav.account": {
+    "message": "ಖಾತೆ",
+    "review": "reviewed",
+    "enHash": "85dfa32c"
+  },
+  "shell.hero.title": {
+    "message": "ಹತ್ತಿರದ ಎಲ್ಲವೂ, ಇಂದೇ.",
+    "review": "reviewed",
+    "enHash": "1aaf493f"
+  },
+  "shell.hero.sub": {
+    "message": "ಸ್ಥಳೀಯ ಅಂಗಡಿಗಳಲ್ಲಿ ಏನು ಸ್ಟಾಕ್ ಇದೆ ಎಂದು ನೋಡಿ, ಬುಕ್ ಮಾಡಿ, ಮತ್ತು ಅಂಗಡಿಯಿಂದ ತೆಗೆದುಕೊಳ್ಳಿ ಅಥವಾ ಡೆಲಿವರಿ ಪಡೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "a5ee6a96"
+  },
+  "shell.soon.tag": {
+    "message": "ಶೀಘ್ರದಲ್ಲೇ",
+    "review": "reviewed",
+    "enHash": "e4115be2"
+  },
+  "shell.soon.title": {
+    "message": "{section} ಬರುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "6c957e46"
+  },
+  "shell.soon.body": {
+    "message": "ನಾವು ಆ್ಯಪ್‌ನ ಈ ಭಾಗವನ್ನು ತಯಾರಿಸುತ್ತಿದ್ದೇವೆ. ನಿಮ್ಮ ಹತ್ತಿರದ ಅಂಗಡಿಗಳು ಈಗ ತಮ್ಮ ಸ್ಟಾಕ್ ಸೇರಿಸುತ್ತಿವೆ.",
+    "review": "reviewed",
+    "enHash": "b08be591"
+  },
+  "shell.notFound.title": {
+    "message": "ಪುಟ ಸಿಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "bc3023b3"
+  },
+  "shell.notFound.body": {
+    "message": "ಈ ಲಿಂಕ್ ಇನ್ನೂ ಎಲ್ಲಿಗೂ ಹೋಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "8c0d72a2"
+  },
+  "shell.notFound.home": {
+    "message": "ಹೋಮ್‌ಗೆ ಹೋಗಿ",
+    "review": "reviewed",
+    "enHash": "f36ae945"
+  }
+}

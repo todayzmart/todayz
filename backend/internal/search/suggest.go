@@ -23,7 +23,7 @@ func (s *Service) Suggest(ctx context.Context, p discoverapi.SearchSuggestParams
 		return out, err
 	}
 	limit := pageLimit(p.Limit, defaultSuggestLimit)
-	text := strings.Join(strings.Fields(p.Q), " ")
+	text := typedText(p.Q)
 	norm := Normalize(text)
 	if norm == "" {
 		return out, nil

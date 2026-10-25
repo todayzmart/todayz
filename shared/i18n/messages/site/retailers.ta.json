@@ -1,62 +1,62 @@
 {
   "retailers.meta.title": {
     "message": "கடைகளுக்கு | TodayZ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "84e84db2"
   },
   "retailers.meta.description": {
     "message": "உங்கள் கவுண்டரை நடத்துங்கள், ஸ்டாக்கை ஆன்லைனில் வையுங்கள், அருகில் இருப்பவர்கள் என்ன தேடுகிறார்கள் என்று பாருங்கள். தற்போது இலவசம்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5ebd1f7f"
   },
   "retailers.hero.title": {
     "message": "உங்கள் கவுண்டரை நடத்துங்கள். {em}",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "731f7a9c"
   },
   "retailers.hero.title_em": {
     "message": "உங்கள் தெருவை அடையுங்கள்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "66e0f09b"
   },
   "retailers.hero.body": {
     "message": "TodayZ உங்கள் கடைக்கு பாயின்ட்-ஆஃப்-சேல், ஆன்லைன் ஆர்டர்கள், தேவை நுண்ணறிவு, வாடிக்கையாளர்களை மீண்டும் வரவழைக்கும் கிரெடிட்களைத் தருகிறது. தற்போது இலவசம்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6459059b"
   },
   "retailers.faq.title": {
     "message": "பொதுவான கேள்விகள்",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f07ac22a"
   },
   "retailers.faq.1.q": {
     "message": "சேர கட்டணம் உண்டா?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "02642550"
   },
   "retailers.faq.1.a": {
     "message": "இல்லை. தற்போது TodayZ கடைகளுக்கு இலவசம்.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6036c302"
   },
   "retailers.faq.2.q": {
     "message": "இப்போது நடத்துவது போலவே என் கடையை நடத்தலாமா?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "2cc787ac"
   },
   "retailers.faq.2.a": {
     "message": "ஆம். TodayZ நீங்கள் இப்போது வேலை செய்யும் முறையுடன் சேர்கிறது; உங்கள் கவுண்டரை மாற்றாது.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ee8e9935"
   },
   "retailers.faq.3.q": {
     "message": "என் அருகில் இருப்பவர்கள் என்ன தேடுகிறார்கள் என்று பார்க்கலாமா?",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "75c50e26"
   },
   "retailers.faq.3.a": {
     "message": "ஆம். தேவை நுண்ணறிவு உங்கள் கடை அருகில், நீங்கள் வைக்காத பொருட்களுக்கான தேடல்களைக் காட்டுகிறது.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "312beb90"
   }
 }

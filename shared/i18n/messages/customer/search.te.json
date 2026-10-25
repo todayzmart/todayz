@@ -1,0 +1,177 @@
+{
+  "search.title": {
+    "message": "వెతకండి",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "search.field.label": {
+    "message": "వస్తువులు వెతకండి",
+    "review": "reviewed",
+    "enHash": "4412bfe5"
+  },
+  "search.field.placeholder": {
+    "message": "ఆటా, పాలు, మందులు వెతకండి",
+    "review": "reviewed",
+    "enHash": "5f25cc28"
+  },
+  "search.field.clear": {
+    "message": "వెతుకులాట తీసేయండి",
+    "review": "reviewed",
+    "enHash": "67300d0f"
+  },
+  "search.suggestions.label": {
+    "message": "సూచనలు",
+    "review": "reviewed",
+    "enHash": "861edba0"
+  },
+  "search.suggestions.search": {
+    "message": "{query} కోసం వెతకండి",
+    "review": "reviewed",
+    "enHash": "64566b34"
+  },
+  "search.idle.hint": {
+    "message": "మీ దగ్గరి దుకాణాల్లో వెతకడానికి కనీసం రెండు అక్షరాలు టైప్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "b84188f3"
+  },
+  "search.recent.title": {
+    "message": "ఇటీవలి వెతుకులాటలు",
+    "review": "reviewed",
+    "enHash": "a73d2913"
+  },
+  "search.recent.clear": {
+    "message": "తీసేయండి",
+    "review": "reviewed",
+    "enHash": "719ea396"
+  },
+  "search.filter.label": {
+    "message": "ఫిల్టర్‌లు",
+    "review": "reviewed",
+    "enHash": "96e57821"
+  },
+  "search.filter.open": {
+    "message": "ఇప్పుడు తెరిచి ఉన్నవి",
+    "review": "reviewed",
+    "enHash": "d7a05e65"
+  },
+  "search.filter.pickup": {
+    "message": "పికప్",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "search.filter.delivery": {
+    "message": "డెలివరీ",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "search.filter.offers": {
+    "message": "ఆఫర్‌లు",
+    "review": "reviewed",
+    "enHash": "43c94306"
+  },
+  "search.category.label": {
+    "message": "విభాగం",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "search.category.all": {
+    "message": "అన్నీ",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "search.sort.label": {
+    "message": "క్రమం",
+    "review": "reviewed",
+    "enHash": "a2a5bdec"
+  },
+  "search.sort.relevance": {
+    "message": "సరిగ్గా సరిపోయేవి",
+    "review": "reviewed",
+    "enHash": "86f686f8"
+  },
+  "search.sort.nearest": {
+    "message": "దగ్గరివి ముందు",
+    "review": "reviewed",
+    "enHash": "f809e50f"
+  },
+  "search.sort.cheapest": {
+    "message": "తక్కువ ధర",
+    "review": "reviewed",
+    "enHash": "ead8b64d"
+  },
+  "search.refine.label": {
+    "message": "మీ వెతుకులాట నుండి ఫిల్టర్‌లు",
+    "review": "reviewed",
+    "enHash": "62174b9d"
+  },
+  "search.refine.remove": {
+    "message": "ఫిల్టర్ {chip} తీసేయండి",
+    "review": "reviewed",
+    "enHash": "32664e04"
+  },
+  "search.summary": {
+    "message": "దగ్గరి {checked} దుకాణాలు చూశాం · {have} లో ఉంది · {min} నుండి",
+    "review": "reviewed",
+    "enHash": "8f73de69"
+  },
+  "search.error": {
+    "message": "ఇప్పుడు వెతకలేకపోయాం.",
+    "review": "reviewed",
+    "enHash": "b7a524b1"
+  },
+  "search.zero.title": {
+    "message": "దగ్గరి ఏ దుకాణంలోనూ {query} స్టాక్‌లో లేదు",
+    "review": "reviewed",
+    "enHash": "353d873c"
+  },
+  "search.zero.body": {
+    "message": "మీ దగ్గర ఉన్నవాళ్లు దీని కోసం వెతుకుతున్నారని నోట్ చేశాం, దుకాణాలు దీన్ని తెచ్చుకోవచ్చు.",
+    "review": "reviewed",
+    "enHash": "7c3bed35"
+  },
+  "search.more": {
+    "message": "ఇంకా దుకాణాలు చూపించండి",
+    "review": "reviewed",
+    "enHash": "c1c91491"
+  },
+  "search.badge.lowest": {
+    "message": "తక్కువ ధర",
+    "review": "reviewed",
+    "enHash": "ead8b64d"
+  },
+  "search.badge.closest": {
+    "message": "అతి దగ్గర",
+    "review": "reviewed",
+    "enHash": "e596de54"
+  },
+  "search.deliveryFee": {
+    "message": "+{fee} డెలివరీ",
+    "review": "reviewed",
+    "enHash": "96e53339"
+  },
+  "search.noneConfirmed.title": {
+    "message": "ఇంకా ఏ దుకాణమూ నిర్ధారించలేదు.",
+    "review": "reviewed",
+    "enHash": "d6934628"
+  },
+  "search.noneConfirmed.body": {
+    "message": "వాళ్ల జాబితాలో ఉంది, కానీ ఇటీవల ఎవరూ స్టాక్ నిర్ధారించలేదు, కాబట్టి షెల్ఫ్‌పై లేకపోవచ్చు.",
+    "review": "reviewed",
+    "enHash": "91bdc408"
+  },
+  "search.noneConfirmed.bodyWidest": {
+    "message": "వాళ్ల జాబితాలో ఉంది, కానీ ఇటీవల ఎవరూ స్టాక్ నిర్ధారించలేదు. మీరు ఇప్పటికే అతి ఎక్కువ దూరంలో వెతుకుతున్నారు.",
+    "review": "reviewed",
+    "enHash": "f860d653"
+  },
+  "search.noneConfirmed.wider": {
+    "message": "{km} km లోపల వెతకండి",
+    "review": "reviewed",
+    "enHash": "45f8f29c"
+  },
+  "search.noneConfirmed.later": {
+    "message": "తర్వాత మళ్లీ వెతకండి",
+    "review": "reviewed",
+    "enHash": "71ecbf77"
+  }
+}

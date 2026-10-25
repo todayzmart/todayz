@@ -1,4 +1,4 @@
-import { counterCode, Customer, expect, moveClock, serverNow, Shop, test, ulid, waitForCredits } from '../../fixtures/journey';
+import { counterCode, Customer, expect, moveClock, openApp, serverNow, Shop, test, ulid, URLS, waitForCredits } from '../../fixtures/journey';
 import { PEOPLE, SL_ITEMS, STORES } from '../../fixtures/seed';
 
 // E2E-07 (D-12): the POS goes offline after an online clock check; the customer reads the counter code;
@@ -100,6 +100,29 @@ test('E2E-07 variant: synced after 12 h → link failed, no credits', async ({ w
   expect((await c.wallet()).availableCredits).toBe(credits);
 });
 
-test.fixme('E2E-07 the shop sees "Customer link failed" on the sale in the business app', async () => {
-  // Deferred: the POS sales list with the link status is not in the business app at this gate.
+test('E2E-07 the shop sees "Customer link failed" on the sale in the business app', async ({ browser, who }) => {
+  test.skip(!linkedCode, 'the linked sale did not run');
+  // B-05 store sales (W2-16): the cashier at Sri Lakshmi opens the sales list from the Sell screen.
+  // The sales the variants above synced are the newest at the store, each with why its link failed.
+  const app = await openApp(browser, await who('cashier'), URLS.business);
+  try {
+    const { page } = app;
+    // A cashier of one store skips the picker (B-01) and lands on the store's overview.
+    await page.goto('/choose-shop');
+    await expect(page).not.toHaveURL(/\/choose-shop/);
+    await page.goto('/sell');
+    await page.getByRole('button', { name: 'Store sales', exact: true }).click();
+    const sheet = page.getByRole('dialog', { name: 'Store sales' });
+    await expect(sheet).toBeVisible();
+    const sales = sheet.getByRole('list', { name: 'Store sales' });
+    await expect(sales.getByText('Customer link failed').first()).toBeVisible();
+    await expect(sales.getByText('The counter code was already used.')).toBeVisible();
+    await expect(sales.getByText('The device clock was off.')).toBeVisible();
+    await expect(sales.getByText('The sale synced too late to check the code.')).toBeVisible();
+    // The linked sale names the customer; no phone is shown anywhere on the list.
+    await expect(sales.getByText(/^Linked to /).first()).toBeVisible();
+    expect(await sheet.innerText()).not.toContain(PEOPLE.walkIn.national);
+  } finally {
+    await app.close();
+  }
 });

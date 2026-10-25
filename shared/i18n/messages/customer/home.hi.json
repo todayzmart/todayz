@@ -1,0 +1,252 @@
+{
+  "home.search.label": {
+    "message": "सामान या दुकान खोजें",
+    "review": "reviewed",
+    "enHash": "c21e85c0"
+  },
+  "home.search.placeholder": {
+    "message": "आटा, दूध, दुकान का नाम खोजें",
+    "review": "reviewed",
+    "enHash": "bfbe9be2"
+  },
+  "home.noPlace.title": {
+    "message": "अपनी लोकेशन चुनें",
+    "review": "reviewed",
+    "enHash": "bd10f419"
+  },
+  "home.noPlace.body": {
+    "message": "आप कहाँ हैं, यह चुनें, ताकि आपके पास की दुकानें और सामान दिख सकें।",
+    "review": "reviewed",
+    "enHash": "e58104a8"
+  },
+  "home.placeError.title": {
+    "message": "यह PIN कोड नहीं मिला",
+    "review": "reviewed",
+    "enHash": "479bb57f"
+  },
+  "home.placeError.body": {
+    "message": "अपना कनेक्शन देखें या लोकेशन फिर से चुनें।",
+    "review": "reviewed",
+    "enHash": "41d12e91"
+  },
+  "home.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "home.stats.shops": {
+    "message": "पास की दुकानें",
+    "review": "reviewed",
+    "enHash": "aaae98a5"
+  },
+  "home.stats.open": {
+    "message": "अभी खुली",
+    "review": "reviewed",
+    "enHash": "d7a05e65"
+  },
+  "home.stats.products": {
+    "message": "सामान",
+    "review": "reviewed",
+    "enHash": "fe0a091f"
+  },
+  "home.radius.label": {
+    "message": "खोज की दूरी",
+    "review": "reviewed",
+    "enHash": "8df84e7a"
+  },
+  "home.radius.km": {
+    "message": "{km} km",
+    "review": "reviewed",
+    "enHash": "5d1ec3cd"
+  },
+  "home.categories.label": {
+    "message": "कैटेगरी",
+    "review": "reviewed",
+    "enHash": "6ccb6007"
+  },
+  "home.category.active": {
+    "message": "{name} दिखा रहे हैं",
+    "review": "reviewed",
+    "enHash": "12ce49c8"
+  },
+  "home.category.clear": {
+    "message": "सब दिखाएँ",
+    "review": "reviewed",
+    "enHash": "50a279de"
+  },
+  "home.shops.title": {
+    "message": "आपके पास की दुकानें",
+    "review": "reviewed",
+    "enHash": "75865004"
+  },
+  "home.shops.error": {
+    "message": "दुकानें लोड नहीं हो सकीं।",
+    "review": "reviewed",
+    "enHash": "643ecdaf"
+  },
+  "home.shops.more": {
+    "message": "और दुकानें दिखाएँ",
+    "review": "reviewed",
+    "enHash": "c1c91491"
+  },
+  "home.empty.title": {
+    "message": "यहाँ अभी कोई दुकान नहीं है",
+    "review": "reviewed",
+    "enHash": "75cb3ec4"
+  },
+  "home.empty.body": {
+    "message": "इतनी दूरी में अभी कोई दुकान TodayZ पर नहीं है। खोज की दूरी बढ़ाकर देखें।",
+    "review": "reviewed",
+    "enHash": "e6e65a38"
+  },
+  "home.empty.widen": {
+    "message": "{km} km तक खोजें",
+    "review": "reviewed",
+    "enHash": "45f8f29c"
+  },
+  "home.map.label": {
+    "message": "नक्शे पर दुकानें",
+    "review": "reviewed",
+    "enHash": "54173ebb"
+  },
+  "home.map.mapLabel": {
+    "message": "नक्शा: {km} km के अंदर {shops} दुकानें, {open} अभी खुली",
+    "review": "reviewed",
+    "enHash": "81b48ba7"
+  },
+  "home.map.you": {
+    "message": "आप यहाँ हैं",
+    "review": "reviewed",
+    "enHash": "b900c1e3"
+  },
+  "home.map.legend.open": {
+    "message": "खुली",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "home.map.legend.closed": {
+    "message": "बंद",
+    "review": "reviewed",
+    "enHash": "88d86b77"
+  },
+  "home.map.legend.you": {
+    "message": "आप",
+    "review": "reviewed",
+    "enHash": "905cb326"
+  },
+  "home.map.live": {
+    "message": "आपके पास, अभी",
+    "review": "reviewed",
+    "enHash": "49cd82c5"
+  },
+  "home.map.expand": {
+    "message": "पूरा नक्शा खोलें",
+    "review": "reviewed",
+    "enHash": "a4b03af4"
+  },
+  "home.map.pinOpen": {
+    "message": "{name}, खुली",
+    "review": "reviewed",
+    "enHash": "39821bc8"
+  },
+  "home.map.pinClosed": {
+    "message": "{name}, बंद",
+    "review": "reviewed",
+    "enHash": "ce238e4d"
+  },
+  "home.map.cluster": {
+    "message": "{count} दुकानें, ज़ूम करें",
+    "review": "reviewed",
+    "enHash": "7a30704b"
+  },
+  "home.map.shopFallback": {
+    "message": "दुकान",
+    "review": "reviewed",
+    "enHash": "55de8870"
+  },
+  "map.title": {
+    "message": "आपके पास की दुकानें",
+    "review": "reviewed",
+    "enHash": "75865004"
+  },
+  "map.back": {
+    "message": "वापस",
+    "review": "reviewed",
+    "enHash": "b52b36b7"
+  },
+  "map.view.label": {
+    "message": "देखें",
+    "review": "reviewed",
+    "enHash": "69bd4ef9"
+  },
+  "map.view.map": {
+    "message": "नक्शा",
+    "review": "reviewed",
+    "enHash": "ab478f3e"
+  },
+  "map.view.list": {
+    "message": "सूची",
+    "review": "reviewed",
+    "enHash": "a1fffaaa"
+  },
+  "map.truncated": {
+    "message": "नक्शे पर सबसे पास की {count} दुकानें दिख रही हैं। सभी देखने के लिए सूची खोलें।",
+    "review": "reviewed",
+    "enHash": "c562dc9d"
+  },
+  "map.sheet.view": {
+    "message": "दुकान देखें",
+    "review": "reviewed",
+    "enHash": "c55061ee"
+  },
+  "map.sheet.directions": {
+    "message": "रास्ता देखें",
+    "review": "reviewed",
+    "enHash": "f814a9fb"
+  },
+  "map.sheet.close": {
+    "message": "बंद करें",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "map.sheet.error": {
+    "message": "यह दुकान लोड नहीं हो सकी।",
+    "review": "reviewed",
+    "enHash": "8b316a74"
+  },
+  "category.notFound.title": {
+    "message": "यह कैटेगरी नहीं मिली",
+    "review": "reviewed",
+    "enHash": "822162f5"
+  },
+  "category.notFound.body": {
+    "message": "हो सकता है इसका नाम बदल गया हो। होम पर कोई कैटेगरी चुनें।",
+    "review": "reviewed",
+    "enHash": "f8fc7661"
+  },
+  "category.shops": {
+    "message": "{name} की दुकानें",
+    "review": "reviewed",
+    "enHash": "0d95b2ba"
+  },
+  "category.empty.title": {
+    "message": "{km} km के अंदर {name} की कोई दुकान नहीं है",
+    "review": "reviewed",
+    "enHash": "cba642b6"
+  },
+  "category.empty.body": {
+    "message": "दूरी बढ़ाकर देखें।",
+    "review": "reviewed",
+    "enHash": "42ec77ba"
+  },
+  "category.home": {
+    "message": "होम पर वापस",
+    "review": "reviewed",
+    "enHash": "34ac37f5"
+  },
+  "home.category.page": {
+    "message": "कैटेगरी खोलें",
+    "review": "reviewed",
+    "enHash": "d189c7fd"
+  }
+}

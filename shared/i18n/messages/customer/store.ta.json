@@ -1,0 +1,172 @@
+{
+  "store.rating": {
+    "message": "{rating} ({count})",
+    "review": "reviewed",
+    "enHash": "21c8385b"
+  },
+  "store.open": {
+    "message": "திறந்துள்ளது",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "store.closed": {
+    "message": "மூடியுள்ளது",
+    "review": "reviewed",
+    "enHash": "88d86b77"
+  },
+  "store.cashback": {
+    "message": "{pct}% கேஷ்பேக்",
+    "review": "reviewed",
+    "enHash": "73d039a2"
+  },
+  "store.delivery": {
+    "message": "டெலிவரி",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "store.pickup": {
+    "message": "பிக்அப்",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "store.inStoreOnly": {
+    "message": "கடையில் மட்டும்",
+    "review": "reviewed",
+    "enHash": "c72090ec"
+  },
+  "store.directions": {
+    "message": "வழி காட்டு",
+    "review": "reviewed",
+    "enHash": "648d8058"
+  },
+  "store.viewShop": {
+    "message": "கடையைப் பார்",
+    "review": "reviewed",
+    "enHash": "c55061ee"
+  },
+  "store.hours.today": {
+    "message": "இன்று {hours}",
+    "review": "reviewed",
+    "enHash": "4552054b"
+  },
+  "store.hours.range": {
+    "message": "{from} முதல் {to} வரை",
+    "review": "reviewed",
+    "enHash": "06f3df10"
+  },
+  "store.hours.closedToday": {
+    "message": "இன்று மூடியுள்ளது",
+    "review": "reviewed",
+    "enHash": "57130ea5"
+  },
+  "store.deliveryNote": {
+    "message": "டெலிவரி {fee} · குறைந்தபட்ச ஆர்டர் {min}",
+    "review": "reviewed",
+    "enHash": "88de204f"
+  },
+  "store.deliveryFree": {
+    "message": "இலவசம்",
+    "review": "reviewed",
+    "enHash": "4ff88aad"
+  },
+  "store.inStoreOnly.banner": {
+    "message": "இந்தக் கடை கடையில் மட்டுமே விற்கிறது. அதில் என்ன உள்ளது என்று பார்க்கலாம், வழியும் பெறலாம்.",
+    "review": "reviewed",
+    "enHash": "6a4677c2"
+  },
+  "store.search.label": {
+    "message": "இந்தக் கடையில் தேடவும்",
+    "review": "reviewed",
+    "enHash": "1857f271"
+  },
+  "store.search.placeholder": {
+    "message": "இந்தக் கடையில் தேடவும்",
+    "review": "reviewed",
+    "enHash": "98336b8e"
+  },
+  "store.items.error": {
+    "message": "பொருட்களை லோட் செய்ய முடியவில்லை.",
+    "review": "reviewed",
+    "enHash": "1df81be5"
+  },
+  "store.items.more": {
+    "message": "மேலும் பொருட்களைக் காட்டு",
+    "review": "reviewed",
+    "enHash": "312e726c"
+  },
+  "store.items.none": {
+    "message": "இன்னும் பொருட்கள் இல்லை",
+    "review": "reviewed",
+    "enHash": "ba47f17e"
+  },
+  "store.items.noneBody": {
+    "message": "இந்தக் கடை இன்னும் எதையும் சேர்க்கவில்லை.",
+    "review": "reviewed",
+    "enHash": "232b5f33"
+  },
+  "store.items.noMatch": {
+    "message": "பொருந்தும் பொருட்கள் இல்லை",
+    "review": "reviewed",
+    "enHash": "22e14472"
+  },
+  "store.items.noMatchBody": {
+    "message": "வேறு சொல் அல்லது வகையை முயலவும்.",
+    "review": "reviewed",
+    "enHash": "486ad6c8"
+  },
+  "store.gone.title": {
+    "message": "இந்தக் கடை இப்போது TodayZ-இல் இல்லை",
+    "review": "reviewed",
+    "enHash": "2e224436"
+  },
+  "store.gone.body": {
+    "message": "தற்போது மூடியிருக்கலாம் அல்லது பட்டியலில் இல்லாமல் இருக்கலாம். உங்களுக்குத் தேவையானதை அருகில் தேடவும்.",
+    "review": "reviewed",
+    "enHash": "6d941326"
+  },
+  "store.gone.action": {
+    "message": "அருகில் தேடவும்",
+    "review": "reviewed",
+    "enHash": "ad3bae31"
+  },
+  "store.replace.title": {
+    "message": "புதிய கார்ட் தொடங்கவா?",
+    "review": "reviewed",
+    "enHash": "eb083d82"
+  },
+  "store.replace.body": {
+    "message": "உங்கள் கார்ட்டில் {current} பொருட்கள் உள்ளன. {next} இல் இருந்து சேர்த்தால் அது மாற்றப்படும்.",
+    "review": "reviewed",
+    "enHash": "4bd5cb81"
+  },
+  "store.replace.close": {
+    "message": "மூடு",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "store.replace.keep": {
+    "message": "என் கார்ட்டை வைத்திரு",
+    "review": "reviewed",
+    "enHash": "66c34609"
+  },
+  "store.replace.confirm": {
+    "message": "கார்ட்டை மாற்று",
+    "review": "reviewed",
+    "enHash": "815bb0ba"
+  },
+  "store.cart.count": {
+    "message": "{count} ஐட்டங்கள்",
+    "review": "reviewed",
+    "enHash": "e3cc227e"
+  },
+  "store.cart.from": {
+    "message": "{shop} இல் இருந்து",
+    "review": "reviewed",
+    "enHash": "156e12b4"
+  },
+  "store.cart.open": {
+    "message": "கார்ட்டைப் பார்",
+    "review": "reviewed",
+    "enHash": "e6d55733"
+  }
+}
