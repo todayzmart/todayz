@@ -26,11 +26,11 @@ describe('role-aware sidebar (D-64)', () => {
     expect(screen.getByText(/Your roles: Support, Finance\./)).toBeInTheDocument();
   });
 
-  it('a field agent starts at Businesses (Pulse is not theirs) and sees no access on a hidden screen', async () => {
+  it('a field agent starts at A-04 Add shops (Pulse is not theirs) and sees no access on a hidden screen', async () => {
     const { router, unmount } = renderAt('/', { roles: ['field_agent'] });
-    await waitFor(() => expect(router.state.location.pathname).toBe('/businesses'));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/field'));
     const side = await sidebar();
-    expect(side.getAllByRole('link').map((l) => l.textContent)).toEqual(['Businesses', 'Demand']);
+    expect(side.getAllByRole('link').map((l) => l.textContent)).toEqual(['Add shops', 'Businesses', 'Demand', 'Field agents']);
     unmount();
 
     renderAt('/orders', { roles: ['field_agent'] });

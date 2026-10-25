@@ -3,6 +3,8 @@ import {
   Banknote,
   Bell,
   CalendarClock,
+  ChartNoAxesColumn,
+  ClipboardPlus,
   Gift,
   HeartHandshake,
   Image,
@@ -37,6 +39,8 @@ export interface NavItem {
  */
 export const NAV: readonly NavItem[] = [
   { section: '', label: 'shell.nav.pulse', icon: Activity, group: null },
+  /** A-04 sits right after Pulse, so a field agent (no Pulse) lands on it. */
+  { section: 'field', label: 'shell.nav.field', icon: ClipboardPlus, group: null },
   { section: 'businesses', label: 'shell.nav.businesses', icon: Store, group: null },
   { section: 'stores', label: 'shell.nav.stores', icon: MapPin, group: null },
   { section: 'customers', label: 'shell.nav.customers', icon: UsersRound, group: null },
@@ -49,6 +53,7 @@ export const NAV: readonly NavItem[] = [
   { section: 'referrals', label: 'shell.nav.referrals', icon: HeartHandshake, group: 'shell.nav.groupGrowth' },
   { section: 'catalogue', label: 'shell.nav.catalogue', icon: Package, group: 'shell.nav.groupGrowth' },
   { section: 'demand', label: 'shell.nav.demand', icon: TrendingUp, group: 'shell.nav.groupGrowth' },
+  { section: 'field-agents', label: 'shell.nav.fieldAgents', icon: ChartNoAxesColumn, group: 'shell.nav.groupGrowth' },
   { section: 'payouts', label: 'shell.nav.payouts', icon: Banknote, group: 'shell.nav.groupGrowth' },
   { section: 'admin-users', label: 'shell.nav.adminUsers', icon: ShieldCheck, group: 'shell.nav.groupAccess' },
   { section: 'settings', label: 'shell.nav.settings', icon: Settings, group: 'shell.nav.groupAccess' },
@@ -63,7 +68,7 @@ export const NAV: readonly NavItem[] = [
  * file (`src/routes/<area>/…`), which outranks `$section`; nothing here changes (src/app/routing.test.ts).
  */
 /** Sections with a real route (src/routes/<area>/); the rest show the placeholder. */
-export const BUILT_SECTIONS: readonly string[] = ['businesses', 'stores', 'customers', 'orders', 'reviews', 'banners', 'catalogue', 'admin-users', 'audit', 'settings', 'credits', 'payouts', 'notifications', 'risk', 'referrals'];
+export const BUILT_SECTIONS: readonly string[] = ['businesses', 'stores', 'customers', 'orders', 'reviews', 'banners', 'catalogue', 'admin-users', 'audit', 'settings', 'credits', 'payouts', 'notifications', 'risk', 'referrals', 'field', 'field-agents'];
 
 export const PLACEHOLDER_SECTIONS: readonly string[] = NAV.map((n) => n.section).filter((s) => s && !BUILT_SECTIONS.includes(s));
 
