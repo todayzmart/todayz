@@ -1,12 +1,495 @@
 # Paths: domain "ai" (owner W3-10 and each feature's WP): AI draft envelope and feature drafts (04 §2.8, D-46).
 #
-# Pre-created empty by W0-04 so parallel work packages never edit the same file
-# (D-50). Fill it as a map of path -> path item. Every operation: `tags: [ai]`,
-# an operationId unique across the API, an example per request and success
-# response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
+# Every operation: `tags: [ai]`, an operationId unique across the API, an example per request
+# and success response, and `default: {$ref: ../common/responses.yaml#/Problem}`. Reference
 # this domain's schemas as `../schemas/ai.yaml#/Name` and the shared ones as
 # `../schemas/common.yaml#/Name`; parameters and headers from `../common/`.
-# Mark idempotent operations `x-idempotency: required|optional` and uploads
-# `x-upload: true` (04 §1.6; the server reads the route policy from the spec).
-# List the domain problem codes an operation can return under `x-problems`.
-{}
+#
+# W3-11 (retailer AI, AI-R2, R3, R6, R9): `{S}` is `/v1/biz/businesses/{bid}/stores/{sid}`.
+# Each feature has its three draft endpoints (create → 202, read, confirm) under its prefix,
+# owner and manager only. A draft is reviewed and confirmed by a person; nothing changes stock,
+# items, reviews or banners before the confirm, and the confirm applies only what the person
+# sent, re-checked as if typed by hand (11 §1 rule 1). A feature is the common 404 while its
+# flag is off or the model key is missing (11 §1 rule 2). AI-R4 insight text comes back inside
+# `{S}/insights`, AI-R5 inside `{S}/coach/cards`, and AI-R10 has no endpoint (04 §2.8).
+/v1/biz/businesses/{bid}/stores/{sid}/ai/retail:
+  parameters: &store
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getStoreAiRetailFeatures
+    tags: [ai]
+    summary: Which retailer AI helpers are on for this store
+    description: >-
+      Owner and manager. One flag per W3-11 draft feature (on only while its switch is on and the
+      model key is set), so the app shows or hides each entry point, and the photo limits. Counts
+      nothing against the daily cap.
+    responses:
+      "200":
+        description: The features
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiRetailFeatures
+            example:
+              supplierBill: true
+              shelfPhoto: true
+              reviewReply: true
+              bannerCopy: false
+              maxPhotoBytes: 4194304
+              photoTypes: [image/jpeg, image/png, image/webp]
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/ai/supplier-bill/drafts:
+  parameters: *store
+  post:
+    operationId: createSupplierBillDraft
+    tags: [ai]
+    summary: Scan a supplier bill to restock (AI-R2)
+    description: >-
+      Owner and manager. A multipart form with `photo` (one photo of a distributor bill: image/jpeg,
+      image/png or image/webp, at most 4 MB). Answers 202 at once; the model reads the lines in the
+      background and the draft turns ready (lines matched to the store's items) or failed. The photo
+      is not stored. One call against the store's daily AI cap (`429 ai_daily_cap_reached`).
+    x-upload: true
+    x-idempotency: optional
+    x-problems: [ai_daily_cap_reached]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            $ref: ../schemas/ai.yaml#/AiPhotoUpload
+          example:
+            photo: '<a photo of the bill, image/jpeg>'
+    responses:
+      "202":
+        description: Accepted for processing
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiDraftCreated
+            example: {draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0D, status: processing}
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/ai/supplier-bill/drafts/{draftId}:
+  parameters: &draft
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: draftId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getSupplierBillDraft
+    tags: [ai]
+    summary: A supplier bill draft
+    description: >-
+      The store's owner and managers. Each line is what the bill says (name, quantity, cost per
+      unit, MRP, expiry when printed) and the store item it matched, or `match: null` (pick an item
+      or create the product). A draft still processing after the provider timeout is closed as
+      failed.
+    responses:
+      "200":
+        description: The draft
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/SupplierBillDraft
+            example:
+              draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0D
+              feature: supplier_bill
+              status: ready
+              promptVersion: supplier_bill/prompt@1
+              createdAt: "2026-10-25T05:30:00Z"
+              supplier: Sri Lakshmi Agencies
+              billDate: "2026-10-24"
+              lines:
+                - lineId: l1
+                  name: AMUL BUTTER 100G
+                  quantity: 12
+                  costPaise: 5200
+                  mrpPaise: 6000
+                  expiresOn: "2026-12-20"
+                  confidence: 0.95
+                  match: {storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z1, itemName: Amul Butter 100 g, onHand: 4}
+                - lineId: l2
+                  name: GOOD DAY CASHEW 75G
+                  quantity: 24
+                  costPaise: 1800
+                  mrpPaise: 2000
+                  expiresOn: null
+                  confidence: 0.7
+                  match: null
+              outcomes: []
+              failure: null
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/ai/supplier-bill/drafts/{draftId}/confirm:
+  parameters: *draft
+  post:
+    operationId: confirmSupplierBillDraft
+    tags: [ai]
+    summary: Confirm a supplier bill draft
+    description: >-
+      The store's owner and managers. One decision per line; a line with no decision is discarded.
+      Accepted and edited lines become `supplier_bill` stock movements with a batch (quantity, cost
+      per unit, expiry), in one transaction. A line still without a store item, a quantity out of
+      range, a cost above the MRP or an expiry in the past is `422 validation_failed` and nothing is
+      applied. Idempotent: a repeat answers the first result and applies nothing again. A draft not
+      ready is `409 invalid_transition`.
+    x-idempotency: required
+    x-money: true
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/ai.yaml#/SupplierBillConfirmRequest
+          example:
+            lines:
+              - {lineId: l1, outcome: accepted}
+              - lineId: l2
+                outcome: edited
+                value: {storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z2, quantity: 24, costPaise: 1800, expiresOn: null}
+    responses:
+      "200":
+        description: The outcomes
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiConfirmResult
+            example:
+              draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0D
+              status: confirmed
+              lines:
+                - {lineId: l1, outcome: accepted}
+                - {lineId: l2, outcome: edited}
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/ai/shelf-photo/drafts:
+  parameters: *store
+  post:
+    operationId: createShelfPhotoDraft
+    tags: [ai]
+    summary: Shelf photo to catalogue (AI-R3)
+    description: >-
+      Owner and manager. A multipart form with `photo` (one shelf photo: image/jpeg, image/png or
+      image/webp, at most 4 MB). Answers 202 at once; the model names the products it sees and the
+      server matches them to the master catalogue in the background. The photo is not stored. One
+      call against the store's daily AI cap (`429 ai_daily_cap_reached`).
+    x-upload: true
+    x-idempotency: optional
+    x-problems: [ai_daily_cap_reached]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            $ref: ../schemas/ai.yaml#/AiPhotoUpload
+          example:
+            photo: '<a shelf photo, image/jpeg>'
+    responses:
+      "202":
+        description: Accepted for processing
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiDraftCreated
+            example: {draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0E, status: processing}
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/ai/shelf-photo/drafts/{draftId}:
+  parameters: *draft
+  get:
+    operationId: getShelfPhotoDraft
+    tags: [ai]
+    summary: A shelf photo draft
+    description: >-
+      The store's owner and managers. Each line is a product the model saw and the master product it
+      matched (`product: null` when none did), with `listed: true` when the store already sells it.
+      The price to add at defaults to the product's MRP.
+    responses:
+      "200":
+        description: The draft
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/ShelfPhotoDraft
+            example:
+              draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0E
+              feature: shelf_photo
+              status: ready
+              promptVersion: shelf_photo/prompt@1
+              createdAt: "2026-10-25T05:30:00Z"
+              lines:
+                - lineId: l1
+                  name: Maggi Masala Noodles
+                  brand: Nestle
+                  size: 70 g
+                  confidence: 0.9
+                  product: {productId: 01JB0P1R2Q3D4V5C6T7M8A9G0H, name: Maggi 2-Minute Masala Noodles, brand: Maggi, size: 70 g, mrpPaise: 1400}
+                  listed: false
+                  pricePaise: 1400
+              outcomes: []
+              failure: null
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/ai/shelf-photo/drafts/{draftId}/confirm:
+  parameters: *draft
+  post:
+    operationId: confirmShelfPhotoDraft
+    tags: [ai]
+    summary: Confirm a shelf photo draft
+    description: >-
+      The store's owner and managers. Accepted and edited lines become store items of their master
+      product at the line's price (the MRP unless edited; never above it) with the opening stock
+      sent (0 when absent), through the same checks as adding an item by hand, in one transaction.
+      A line without a product, or for a product the store already sells, is `422
+      validation_failed` and nothing is applied. Idempotent. A draft not ready is `409
+      invalid_transition`.
+    x-idempotency: required
+    x-money: true
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/ai.yaml#/ShelfPhotoConfirmRequest
+          example:
+            lines:
+              - lineId: l1
+                outcome: edited
+                value: {productId: 01JB0P1R2Q3D4V5C6T7M8A9G0H, pricePaise: 1300, openingStock: 20}
+    responses:
+      "200":
+        description: The outcomes
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiConfirmResult
+            example:
+              draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0E
+              status: confirmed
+              lines:
+                - {lineId: l1, outcome: edited}
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/ai/review-reply/drafts:
+  parameters: *store
+  post:
+    operationId: createReviewReplyDraft
+    tags: [ai]
+    summary: Draft a reply to a review (AI-R6)
+    description: >-
+      Owner and manager. `{reviewId}` of a review of this store without a reply. Answers 202; the
+      model drafts one polite reply in the review's language in the background. One call against
+      the store's daily AI cap (`429 ai_daily_cap_reached`).
+    x-idempotency: optional
+    x-problems: [ai_daily_cap_reached]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/ai.yaml#/ReviewReplyDraftRequest
+          example: {reviewId: 01JB2R0E1V2K3E4W5R6E7V8M9E}
+    responses:
+      "202":
+        description: Accepted for processing
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiDraftCreated
+            example: {draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0F, status: processing}
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/ai/review-reply/drafts/{draftId}:
+  parameters: *draft
+  get:
+    operationId: getReviewReplyDraft
+    tags: [ai]
+    summary: A review reply draft
+    description: The store's owner and managers. One line, the reply text to edit.
+    responses:
+      "200":
+        description: The draft
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/ReviewReplyDraft
+            example:
+              draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0F
+              feature: review_reply
+              status: ready
+              promptVersion: review_reply/prompt@1
+              createdAt: "2026-10-25T05:30:00Z"
+              reviewId: 01JB2R0E1V2K3E4W5R6E7V8M9E
+              lines:
+                - {lineId: l1, text: Thank you for shopping with us! We are glad the milk was fresh., language: en}
+              outcomes: []
+              failure: null
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/ai/review-reply/drafts/{draftId}/confirm:
+  parameters: *draft
+  post:
+    operationId: confirmReviewReplyDraft
+    tags: [ai]
+    summary: Post the reply
+    description: >-
+      The store's owner and managers. `accepted` or `edited` (with the text) posts the reply to the
+      review exactly as a typed reply (`409 review_reply_exists` when it already has one);
+      `discarded` posts nothing. Idempotent. A draft not ready is `409 invalid_transition`.
+    x-idempotency: required
+    x-money: true
+    x-problems: [review_reply_exists]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/ai.yaml#/ReviewReplyConfirmRequest
+          example:
+            lines:
+              - lineId: l1
+                outcome: edited
+                value: {text: Thank you! See you again soon.}
+    responses:
+      "200":
+        description: The outcome
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiConfirmResult
+            example:
+              draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0F
+              status: confirmed
+              lines:
+                - {lineId: l1, outcome: edited}
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/ai/banner-copy/drafts:
+  parameters: *store
+  post:
+    operationId: createBannerCopyDraft
+    tags: [ai]
+    summary: Draft banner copy (AI-R9)
+    description: >-
+      Owner and manager. Exactly one of `offerId` (an offer of this store) and `itemIds` (1 to 10
+      of its items). Answers 202; the model drafts three headline and sub-line options in the
+      shop's language and in English, each with a tint and one of the items for the photo. One
+      call against the store's daily AI cap (`429 ai_daily_cap_reached`).
+    x-idempotency: optional
+    x-problems: [ai_daily_cap_reached]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/ai.yaml#/BannerCopyDraftRequest
+          example: {offerId: 01JB2F1F2F3E4R5Q6F7F8E9R0A}
+    responses:
+      "202":
+        description: Accepted for processing
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiDraftCreated
+            example: {draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0G, status: processing}
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/ai/banner-copy/drafts/{draftId}:
+  parameters: *draft
+  get:
+    operationId: getBannerCopyDraft
+    tags: [ai]
+    summary: A banner copy draft
+    description: The store's owner and managers. Three options; the person picks one and edits it.
+    responses:
+      "200":
+        description: The draft
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/BannerCopyDraft
+            example:
+              draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0G
+              feature: banner_copy
+              status: ready
+              promptVersion: banner_copy/prompt@1
+              createdAt: "2026-10-25T05:30:00Z"
+              language: kn
+              lines:
+                - lineId: l1
+                  headline: ಹಾಲು ಮತ್ತು ಬೆಣ್ಣೆ ಮೇಲೆ 10% ರಿಯಾಯಿತಿ
+                  subline: ಈ ವಾರ ಮಾತ್ರ
+                  headlineEn: 10% off milk and butter
+                  sublineEn: This week only
+                  tint: green
+                  storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z1
+              outcomes: []
+              failure: null
+      default: *problem
+/v1/biz/businesses/{bid}/stores/{sid}/ai/banner-copy/drafts/{draftId}/confirm:
+  parameters: *draft
+  post:
+    operationId: confirmBannerCopyDraft
+    tags: [ai]
+    summary: Pick one banner option
+    description: >-
+      The store's owner and managers. At most one line `accepted` or `edited` (with the copy); the
+      others discarded. Answers the picked copy for the banner editor (`POST {S}/banners`); it
+      publishes nothing. Idempotent. A draft not ready is `409 invalid_transition`.
+    x-idempotency: required
+    x-money: true
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/ai.yaml#/BannerCopyConfirmRequest
+          example:
+            lines:
+              - {lineId: l1, outcome: accepted}
+              - {lineId: l2, outcome: discarded}
+              - {lineId: l3, outcome: discarded}
+    responses:
+      "200":
+        description: The outcomes and the picked copy
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/BannerCopyConfirmResult
+            example:
+              draftId: 01JB2Q7Z8M3V6Y4K2T9W5R1C0G
+              status: confirmed
+              lines:
+                - {lineId: l1, outcome: accepted}
+                - {lineId: l2, outcome: discarded}
+                - {lineId: l3, outcome: discarded}
+              copy: {headline: ಹಾಲು ಮತ್ತು ಬೆಣ್ಣೆ ಮೇಲೆ 10% ರಿಯಾಯಿತಿ, subline: ಈ ವಾರ ಮಾತ್ರ, tint: green, storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z1}
+      default: *problem
