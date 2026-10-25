@@ -35,6 +35,8 @@ export function useSettingLabels() {
           return intl.formatMessage({ id: 'settings.group.asks' });
         case 'baskets':
           return intl.formatMessage({ id: 'settings.group.baskets' });
+        case 'customers':
+          return intl.formatMessage({ id: 'settings.group.customers' });
         case 'features':
           return intl.formatMessage({ id: 'settings.group.features' });
         case 'ai':

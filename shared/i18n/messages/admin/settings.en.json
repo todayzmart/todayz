@@ -63,6 +63,10 @@
     "defaultMessage": "Baskets",
     "description": "Settings group heading: baskets"
   },
+  "settings.group.customers": {
+    "defaultMessage": "Customers",
+    "description": "Settings group heading: customers"
+  },
   "settings.group.features": {
     "defaultMessage": "Features",
     "description": "Settings group heading: features"
