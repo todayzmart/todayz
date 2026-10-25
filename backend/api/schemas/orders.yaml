@@ -294,13 +294,21 @@ CheckoutQuote:
 # --- orders: shared parts ---------------------------------------------------------
 OrderStore:
   type: object
-  required: [id, slug, name, addressLine, locality]
+  required: [id, slug, name, addressLine, locality, phone]
   properties:
     id: {$ref: ./common.yaml#/Ulid}
     slug: {type: string}
     name: {type: string}
     addressLine: {type: string}
     locality: {type: [string, "null"]}
+    phone:
+      type: [string, "null"]
+      description: >-
+        The shop's contact phone (D-220), in full, only on the customer's own
+        GET /v1/me/orders/{orderId} while the order is open (placed,
+        awaiting_customer, accepted, ready, out_for_delivery). Null once the
+        order is finished, when the shop has no contact phone, in lists and in
+        action responses. Never the owner's or a staff member's login phone.
 OrderLine:
   type: object
   description: >-

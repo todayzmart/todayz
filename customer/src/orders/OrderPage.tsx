@@ -18,7 +18,7 @@ import {
   orderStatusTone,
   type TimelineStep,
 } from '@todayz/ui';
-import { Check, Clock, MapPin } from 'lucide-react';
+import { Check, Clock, MapPin, Phone } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useIntl, type IntlShape } from 'react-intl';
 import styles from '../cart/tx.module.css';
@@ -27,10 +27,12 @@ import { PartialConfirm } from './PartialConfirm';
 import { Icon } from '../shell/Icon';
 import { formatMmSs, useServerCountdown } from './clock';
 import { PathLink } from './ShopLink';
+import { addressLine } from '../address/line';
 import { useMyOrderStream } from './stream';
 import { newUlid } from './ulid';
 
-const SUCCESS_PATH = ['placed', 'accepted', 'ready', 'collected'] as const;
+const PICKUP_PATH = ['placed', 'accepted', 'ready', 'collected'] as const;
+const DELIVERY_PATH = ['placed', 'accepted', 'out_for_delivery', 'delivered'] as const;
 const FAILED = new Set(['rejected', 'expired', 'cancelled', 'delivery_failed']);
 const CANCELLABLE = new Set(['placed', 'accepted', 'ready']);
 
@@ -63,8 +65,10 @@ function orderSteps(order: Order, intl: IntlShape): TimelineStep[] {
     return [done('placed', intl.formatMessage({ id: 'orders.step.placed' }), 'done'), failed];
   }
   const now = stepIndex(order.status);
-  return SUCCESS_PATH.map((key, i) =>
-    done(key, intl.formatMessage({ id: `orders.step.${key}` }), i < now ? 'done' : i === now ? (key === 'collected' ? 'done' : 'now') : 'upcoming'),
+  const path = order.fulfilment === 'delivery' ? DELIVERY_PATH : PICKUP_PATH;
+  const last = path.length - 1;
+  return path.map((key, i) =>
+    done(key, intl.formatMessage({ id: `orders.step.${key}` }), i < now ? 'done' : i === now ? (i === last ? 'done' : 'now') : 'upcoming'),
   );
 }
 
@@ -110,7 +114,8 @@ function OrderView({ order, showCheck }: { order: Order; showCheck: boolean }) {
   const client = useQueryClient();
   const status = order.status;
   const shop = order.store.name;
-  const open = status === 'accepted' || status === 'ready';
+  const delivery = order.fulfilment === 'delivery';
+  const open = status === 'accepted' || status === 'ready' || status === 'out_for_delivery';
 
   // acceptBy is the shop's answer deadline; holdUntil is how long an accepted order is kept.
   const acceptLeft = useServerCountdown(status === 'placed' ? order.acceptBy : null, order.serverNow);
@@ -130,7 +135,7 @@ function OrderView({ order, showCheck }: { order: Order; showCheck: boolean }) {
 
   const store = useQuery({
     queryKey: ['store-page', order.store.slug],
-    enabled: open,
+    enabled: open && !delivery,
     queryFn: () => getDiscoverStore(order.store.slug),
     staleTime: 5 * 60_000,
     retry: false,
@@ -176,8 +181,9 @@ function OrderView({ order, showCheck }: { order: Order; showCheck: boolean }) {
   });
 
   const lines = order.lines;
-  const showCode = open && order.code !== null && !order.codeLocked;
-  const where = store.data ? `https://www.google.com/maps/dir/?api=1&destination=${store.data.lat},${store.data.lng}` : null;
+  // Delivery: the code is for the rider, so it shows once the order is on its way (01 §5.5).
+  const showCode = open && order.code !== null && !order.codeLocked && (!delivery || status === 'out_for_delivery');
+  const where = !delivery && store.data ? `https://www.google.com/maps/dir/?api=1&destination=${store.data.lat},${store.data.lng}` : null;
 
   return (
     <div className={styles.page}>
@@ -205,6 +211,7 @@ function OrderView({ order, showCheck }: { order: Order; showCheck: boolean }) {
               : intl.formatMessage({ id: 'orders.waitingLong' }, { shop })}
           </p>
           <p className={styles.meta}>{intl.formatMessage({ id: 'orders.waiting.note' })}</p>
+          <CallShop order={order} />
         </section>
       )}
 
@@ -220,19 +227,20 @@ function OrderView({ order, showCheck }: { order: Order; showCheck: boolean }) {
           }}
         />
       )}
+      {status === 'awaiting_customer' && <CallShop order={order} card />}
 
       {open && (
         <section className={`tz-card ${styles.stack}`}>
           {showCode && order.code ? (
             <PickupCode
-              label={intl.formatMessage({ id: 'orders.code.label' })}
+              label={intl.formatMessage({ id: delivery ? 'orders.code.deliveryLabel' : 'orders.code.label' })}
               code={order.code}
-              note={intl.formatMessage({ id: 'orders.code.note' }, { shop })}
+              note={delivery ? intl.formatMessage({ id: 'orders.code.riderNote' }) : intl.formatMessage({ id: 'orders.code.note' }, { shop })}
             >
               {/* TODO(lead): a QR of the code needs a QR library; none is in the workspace. Digits only. */}
               <span className="tz-ui-code-note">{intl.formatMessage({ id: 'orders.code.brightness' })}</span>
             </PickupCode>
-          ) : order.codeLocked ? (
+          ) : order.codeLocked && (!delivery || status === 'out_for_delivery') ? (
             <div className={styles.stack}>
               <Banner tone="warning" title={intl.formatMessage({ id: 'orders.code.locked.title' })}>
                 {intl.formatMessage({ id: 'orders.code.locked.body' })}
@@ -242,7 +250,15 @@ function OrderView({ order, showCheck }: { order: Order; showCheck: boolean }) {
               </Button>
             </div>
           ) : null}
-          {status === 'accepted' && <p className={styles.meta}>{intl.formatMessage({ id: 'orders.accepted.note' }, { shop })}</p>}
+          {status === 'accepted' && !delivery && <p className={styles.meta}>{intl.formatMessage({ id: 'orders.accepted.note' }, { shop })}</p>}
+          {status === 'accepted' && delivery && (
+            <p className={styles.meta}>
+              {order.dispatchBy
+                ? intl.formatMessage({ id: 'orders.delivery.accepted' }, { shop, time: formatClock(order.dispatchBy) })
+                : intl.formatMessage({ id: 'orders.delivery.acceptedNoTime' }, { shop })}
+            </p>
+          )}
+          {status === 'out_for_delivery' && <p className={styles.meta}>{intl.formatMessage({ id: 'orders.delivery.onTheWay' }, { shop })}</p>}
           {status === 'ready' && <p className={styles.meta}>{intl.formatMessage({ id: 'orders.ready.note' }, { shop })}</p>}
           {holdLeft !== null && (
             <p className={styles.countdown} aria-live="off">
@@ -266,7 +282,7 @@ function OrderView({ order, showCheck }: { order: Order; showCheck: boolean }) {
                 <Icon icon={MapPin} /> {intl.formatMessage({ id: 'orders.directions' })}
               </a>
             )}
-            {/* TODO(lead): "Call shop" needs the shop's phone, which no customer-facing response carries yet. */}
+            <CallShop order={order} bare />
           </div>
         </section>
       )}
@@ -309,12 +325,26 @@ function OrderView({ order, showCheck }: { order: Order; showCheck: boolean }) {
           ))}
         </ul>
         <dl className={styles.totals}>
+          {delivery && (
+            <div className={styles.totalRow}>
+              <dt>{intl.formatMessage({ id: 'delivery.feeRow' })}</dt>
+              <dd>{order.deliveryFeePaise > 0 ? formatMoney(order.deliveryFeePaise) : intl.formatMessage({ id: 'delivery.free' })}</dd>
+            </div>
+          )}
           <div className={`${styles.totalRow} ${styles.grand}`}>
             <dt>{intl.formatMessage({ id: 'cart.total' })}</dt>
             <dd>{formatMoney(order.totalPaise)}</dd>
           </div>
         </dl>
-        <p className={styles.meta}>{intl.formatMessage({ id: 'checkout.payNote' })}</p>
+        {order.deliveryAddress && (
+          <p className={styles.meta}>
+            {intl.formatMessage(
+              { id: 'orders.delivery.to' },
+              { label: order.deliveryAddress.label, address: addressLine(order.deliveryAddress) },
+            )}
+          </p>
+        )}
+        <p className={styles.meta}>{intl.formatMessage({ id: delivery ? 'checkout.payNote.delivery' : 'checkout.payNote' })}</p>
       </section>
 
       {CANCELLABLE.has(status) && (
@@ -426,4 +456,19 @@ function CancelSheet({
       {error && <p role="alert">{intl.formatMessage({ id: 'orders.cancel.error' })}</p>}
     </Sheet>
   );
+}
+
+/** "Call shop" (D-220): the server sends the shop's phone only on the customer's GET of an open order. */
+function CallShop({ order, bare, card }: { order: Order; bare?: boolean; card?: boolean }) {
+  const intl = useIntl();
+  const phone = order.store.phone;
+  if (!phone) return null;
+  const link = (
+    <a className="tz-btn tz-btn-soft" href={`tel:${phone}`}>
+      <Icon icon={Phone} /> {intl.formatMessage({ id: 'orders.callShop' })}
+    </a>
+  );
+  if (bare) return link;
+  if (card) return <section className={`tz-card ${styles.actions}`}>{link}</section>;
+  return <div className={styles.actions}>{link}</div>;
 }

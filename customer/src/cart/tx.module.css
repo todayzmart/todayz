@@ -245,3 +245,25 @@
   width: 100%;
   accent-color: var(--brand);
 }
+
+/* Delivery address choice (C-11, C-18; W2-15). */
+.addressRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: var(--tap-min);
+  padding: var(--space-2) 0;
+  font: var(--type-body);
+}
+
+.addressRow input {
+  margin-top: var(--space-1);
+}
+
+.addressText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

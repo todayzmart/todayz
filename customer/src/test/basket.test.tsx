@@ -102,7 +102,7 @@ function order(over: Partial<Order> = {}): Order {
   return {
     id: ORDER_ID,
     number: 'R-1042',
-    store: { id: STORE_A_ID, slug: SHOP_A, name: 'Sri Lakshmi Stores', addressLine: '12 Main Road', locality: 'Indiranagar' },
+    store: { id: STORE_A_ID, slug: SHOP_A, name: 'Sri Lakshmi Stores', addressLine: '12 Main Road', locality: 'Indiranagar', phone: null },
     fulfilment: 'pickup',
     status: 'placed',
     statusReason: null,

@@ -149,9 +149,12 @@ const (
 	// Added by the delivery returns (D-218; seeded by 20204_w2-02_return_reminder_settings.sql)
 	DeliveryReturnFirstReminderHours  Key = "delivery_return_first_reminder_hours"  // hours, default 2
 	DeliveryReturnSecondReminderHours Key = "delivery_return_second_reminder_hours" // hours, default 24
+
+	// Added by the saved addresses (D-222; seeded by 21501_w2-15_saved_address_cap.sql)
+	CustomerMaxSavedAddresses Key = "customer_max_saved_addresses" // count, default 20
 )
 
-// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101, D-110, D-131, D-218).
+// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101, D-110, D-131, D-218, D-222).
 var AllKeys = []Key{
 	OrderAcceptTimeoutMin,
 	PickupHoldMin,
@@ -274,4 +277,5 @@ var AllKeys = []Key{
 	PosCodePhoneFailuresPerHour,
 	DeliveryReturnFirstReminderHours,
 	DeliveryReturnSecondReminderHours,
+	CustomerMaxSavedAddresses,
 }

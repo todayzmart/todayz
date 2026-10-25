@@ -166,6 +166,7 @@ Any non-terminal state
 - Ordering delivery outside delivery hours returns `409 delivery_closed` (with `nextDeliveryWindow` in `extensions`); pickup is still offered, and checkout (C-11) offers "Switch to pickup".
 - The shop's own staff delivers. The customer's delivery code is told to the rider, who enters it in the business app (rider = staff member with cashier role or a "delivery" flag).
 - Customer app shows "Delivery" on shops that offer it and only offers it if the address is inside the radius.
+- A customer keeps up to `customer_max_saved_addresses` saved addresses (C-11, C-18; `422 validation_failed` on one more, D-222). One of them is the default.
 - `delivery_failed`: held credits are released and no cashback is issued. The goods follow §5.3.
 
 ### 5.6 Reason lists
@@ -656,6 +657,12 @@ Keys with unit `paise`, `bp` or `credits` are money settings: only `super_admin`
 | `basket_max_items` | count | 30 | §11.4: lines in one basket. Min 5, max 100. |
 | `basket_split_max_shops` | count | 2 | §11.4: stores in a suggested split; 1 turns splits off. Min 1, max 2. |
 | `basket_results_max` | count | 10 | §11.4: stores shown in basket search results. Min 3, max 30. |
+
+**Saved addresses** (§5.5, D-222)
+
+| Key | Unit | Default | Rule |
+|---|---|---|---|
+| `customer_max_saved_addresses` | count | 20 | §5.5: saved addresses one customer can keep (`422 validation_failed` on one more). Min 1, max 50. |
 
 **Feature flags** (turn a feature off without a deploy)
 
