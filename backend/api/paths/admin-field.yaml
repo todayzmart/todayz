@@ -65,8 +65,10 @@
     description: >-
       The caller becomes `onboardedBy`. The owner's number is held sealed for the owner code and as
       an owner invite, so the owner can also take over from the business app with that number.
-      The owner's number may not be the caller's own (`422`), nor the number of a blocked account
-      (`403 forbidden`). A retry needs the same `Idempotency-Key`: it answers the first draft again
+      The owner's number may not be the caller's own, nor the number of a blocked account: both are
+      `422 validation_failed` on `body.ownerPhone` (a blocked account gets the reason any unusable
+      number gets, so the answer does not say the account is blocked). A retry needs the same
+      `Idempotency-Key`: it answers the first draft again
       and makes no second business or invite.
     x-idempotency: required
     parameters:
@@ -146,8 +148,9 @@
     summary: Change the business while it is in draft or needs info
     description: >-
       Only before the business is submitted (draft) or while it needs info. `ownerPhone` changes
-      only before the owner confirmed; it ends any code already sent. A blocked account's number is
-      `403 forbidden`. Other states are `409 invalid_transition`.
+      only before the owner confirmed; it ends any code already sent. The caller's own number or a
+      blocked account's is `422 validation_failed` on `body.ownerPhone`. Other states are
+      `409 invalid_transition`.
     x-idempotency: none
     requestBody:
       required: true
@@ -179,7 +182,8 @@
       the owner's number; the same limits as the sign-in code apply, and the sends per number count
       the sign-in codes sent to it too (`429 rate_limited` with `Retry-After`). One agent may send
       at most `field_owner_codes_per_agent_hour` codes in a rolling hour (`429`). A number whose
-      account is blocked gets no code (`403 forbidden`). The code is never returned or logged.
+      account is blocked gets no code (`422 validation_failed` on `body.ownerPhone`). The code is
+      never returned or logged.
     x-idempotency: none
     x-problems: [submit_incomplete]
     responses:
@@ -205,7 +209,8 @@
       On the right code the owner becomes the business's owner (their account is made from the
       number if they have none) and the business is submitted for verification. A wrong code is
       `422 code_invalid` with `attemptsLeft`; after 5 wrong codes `429 otp_locked`; a lapsed or
-      replaced code `401 otp_expired` (the registered sign-in codes).
+      replaced code `401 otp_expired` (the registered sign-in codes). A blocked account's number
+      is `422 validation_failed` on `body.ownerPhone`.
     x-idempotency: none
     x-problems: [code_invalid, otp_locked, otp_expired, submit_incomplete]
     requestBody:
@@ -496,7 +501,8 @@
     summary: Change an item's price, MRP or listing
     description: >-
       Only while the caller may edit the business's items (D-39), else `403 forbidden`. A field agent
-      changes only the items they added on these routes; an item the shop added is `403` (D-232).
+      changes only the items they added on these routes; an item they did not add (the shop's,
+      another agent's or an admin's) is `403` (D-232).
       Admins change any item.
     x-idempotency: none
     requestBody:
