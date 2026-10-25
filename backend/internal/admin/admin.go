@@ -68,6 +68,22 @@ type Deps struct {
 	Hours HoursNormaliser
 	// Banners is internal/banners' takedown (A-20). Without it a takedown answers 503.
 	Banners BannerRemover
+	// Accounts finds or makes a phone number's account for an A-18 invite
+	// (internal/identity owns accounts). Without it an invite answers 503.
+	Accounts PhoneAccounts
+}
+
+// PhoneAccounts finds or makes the account of an E.164 phone in the caller's
+// transaction, as a first sign-in would.
+type PhoneAccounts interface {
+	FindOrCreateByPhone(ctx context.Context, phone string, now time.Time) (PhoneAccount, error)
+}
+
+// PhoneAccount is the user behind a phone number.
+type PhoneAccount struct {
+	UserID  ids.ID
+	Status  string
+	Created bool
 }
 
 // HoursNormaliser validates store hours given in the stored JSON shape and
@@ -92,6 +108,7 @@ type Service struct {
 	providers []ProviderKey
 	hours     HoursNormaliser
 	banners   BannerRemover
+	accounts  PhoneAccounts
 }
 
 // New builds the service.
@@ -99,7 +116,7 @@ func New(d Deps) (*Service, error) {
 	if d.Clock == nil {
 		return nil, errors.New("admin: a clock is required")
 	}
-	return &Service{db: d.DB, clock: d.Clock, audit: d.Audit, az: d.Authz, seal: d.Seal, hash: d.Hash, strikes: d.Strikes, providers: d.Providers, hours: d.Hours, banners: d.Banners}, nil
+	return &Service{db: d.DB, clock: d.Clock, audit: d.Audit, az: d.Authz, seal: d.Seal, hash: d.Hash, strikes: d.Strikes, providers: d.Providers, hours: d.Hours, banners: d.Banners, accounts: d.Accounts}, nil
 }
 
 func (s *Service) ready(ctx context.Context) error {

@@ -162,3 +162,63 @@ func TestAdminUsersHTTP(t *testing.T) {
 	r = get("/v1/admin/users")
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 }
+
+// A disabled admin's access token stops working on its next request, not when
+// it expires; re-enabling does not bring the old session back.
+func TestAdminUsersDisabledTokenHTTP(t *testing.T) {
+	o := newOrderShop(t)
+	desk := newAdminDesk(o, "super_admin")
+	tok := desk.token()
+	a := o.a
+
+	r := a.call(tok, http.MethodPost, "/v1/admin/users", map[string]any{"phone": "9000000041", "name": "Asha", "roles": []string{"support"}, "reason": "joins support"}, nil)
+	require.Equal(t, http.StatusCreated, r.code, r.raw)
+	asha := r.body["id"].(string)
+	// The invite is audited with the number masked, never in full.
+	require.Equal(t, 1, a.count(`SELECT count(*) FROM audit_log WHERE action = 'admin_user.invite' AND subject_id = $1 AND after ->> 'phone' = '90•••••041' AND (after ->> 'newAccount')::bool`, asha))
+	require.Equal(t, 0, a.count(`SELECT count(*) FROM audit_log WHERE after::text LIKE '%9000000041%' OR before::text LIKE '%9000000041%'`))
+
+	// Asha signs in with both steps and can read orders.
+	w := a.call("", http.MethodPost, "/v1/auth/otp/send", map[string]string{
+		"phone": "+919000000041", "app": "admin", "purpose": "login", "turnstileToken": "XXXX.DUMMY.TOKEN.XXXX",
+	}, nil)
+	require.Equal(t, http.StatusOK, w.code, w.raw)
+	w = a.call("", http.MethodPost, "/v1/auth/otp/verify", map[string]string{
+		"app": "admin", "requestId": w.body["requestId"].(string), "code": testOTP, "deviceId": ids.New(a.clk.Now()).String(),
+	}, nil)
+	require.Equal(t, http.StatusOK, w.code, w.raw)
+	first := w.body["accessToken"].(string)
+	e := a.call(first, http.MethodPost, "/v1/auth/totp/enrol", nil, nil)
+	require.Equal(t, http.StatusOK, e.code, e.raw)
+	secret, err := identity.DecodeTOTPSecret(e.body["secret"].(string))
+	require.NoError(t, err)
+	a.clk.Advance(31 * time.Second)
+	v := a.call(first, http.MethodPost, "/v1/auth/totp/verify", map[string]string{"code": identity.TOTPCode(secret, a.clk.Now()), "purpose": "login"}, nil)
+	require.Equal(t, http.StatusOK, v.code, v.raw)
+	ashaTok := v.body["accessToken"].(string)
+	r = a.call(ashaTok, http.MethodGet, "/v1/admin/orders", nil, nil)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+
+	// The super admin disables her; her very next request is refused.
+	tok = desk.token() // a fresh step-up after the clock moved
+	r = a.call(tok, http.MethodGet, "/v1/admin/users?status=active", nil, nil)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	var version any
+	for _, it := range r.body["items"].([]any) {
+		if m := it.(map[string]any); m["id"] == asha {
+			version = m["version"]
+		}
+	}
+	require.NotNil(t, version)
+	r = a.call(tok, http.MethodPatch, "/v1/admin/users/"+asha, map[string]any{"status": "disabled", "version": version, "reason": "left the team"}, nil)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	version = r.body["version"]
+	r = a.call(ashaTok, http.MethodGet, "/v1/admin/orders", nil, nil)
+	require.Equal(t, http.StatusUnauthorized, r.code, r.raw)
+
+	// Re-enabled, she has to sign in again: the old token stays dead.
+	r = a.call(tok, http.MethodPatch, "/v1/admin/users/"+asha, map[string]any{"status": "active", "version": version, "reason": "back"}, nil)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	r = a.call(ashaTok, http.MethodGet, "/v1/admin/orders", nil, nil)
+	require.Equal(t, http.StatusUnauthorized, r.code, r.raw)
+}

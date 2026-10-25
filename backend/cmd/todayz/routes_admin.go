@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 
 	"github.com/todayz/backend/internal/admin"
 	"github.com/todayz/backend/internal/business"
+	"github.com/todayz/backend/internal/identity"
 	"github.com/todayz/backend/internal/jobs"
 	"github.com/todayz/backend/internal/orders"
 	"github.com/todayz/backend/internal/platform/audit"
@@ -76,6 +78,13 @@ func mountAdminConsole(r chi.Router, d *deps) {
 		}
 		ad.Strikes = ord
 		ad.Banners = newBanners(d)
+		if ad.Seal != nil && ad.Hash != nil {
+			acc, err := identity.NewAccounts(d.DB, ad.Seal, ad.Hash)
+			if err != nil {
+				panic("admin: " + err.Error())
+			}
+			ad.Accounts = phoneAccounts{acc}
+		}
 	}
 	svc, err := admin.New(ad)
 	if err != nil {
@@ -152,4 +161,13 @@ func storeHours(raw []byte, prefix string) ([]byte, []admin.FieldError, error) {
 	}
 	stored, err := h.Marshal()
 	return stored, nil, err
+}
+
+// phoneAccounts gives A-18 identity's find-or-create by phone, so an invited
+// admin's account is made exactly as a first sign-in makes one.
+type phoneAccounts struct{ a *identity.Accounts }
+
+func (p phoneAccounts) FindOrCreateByPhone(ctx context.Context, phone string, now time.Time) (admin.PhoneAccount, error) {
+	acc, err := p.a.FindOrCreateByPhone(ctx, phone, now)
+	return admin.PhoneAccount{UserID: acc.UserID, Status: acc.Status, Created: acc.Created}, err
 }

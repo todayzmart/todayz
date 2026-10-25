@@ -13,9 +13,9 @@ import (
 	"github.com/todayz/backend/gen/sqlc/admindb"
 	"github.com/todayz/backend/internal/platform/audit"
 	"github.com/todayz/backend/internal/platform/authz"
-	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/pii"
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
@@ -122,8 +122,8 @@ func (s *Service) inviteAdminUser(ctx context.Context, actor ids.ID, in api.Admi
 	if err := s.writeReady(ctx); err != nil {
 		return api.AdminUser{}, err
 	}
-	if s.hash == nil || s.seal == nil {
-		telemetry.Logger(ctx).ErrorContext(ctx, "admin: an invite needs PII_ENC_KEY and PII_HASH_KEY")
+	if s.accounts == nil {
+		telemetry.Logger(ctx).ErrorContext(ctx, "admin: an invite needs the identity accounts (PII_ENC_KEY and PII_HASH_KEY)")
 		return api.AdminUser{}, unavailable()
 	}
 	phone, ok := e164(in.Phone)
@@ -152,41 +152,25 @@ func (s *Service) inviteAdminUser(ctx context.Context, actor ids.ID, in api.Admi
 			return err
 		}
 		now := s.now()
-		hash := s.hash.Phone(phone)
-		u, err := q.UserByPhoneHash(ctx, hash)
-		isNew := errors.Is(err, pgx.ErrNoRows)
-		switch {
-		case isNew:
-			id = ids.New(now)
-			enc, err := s.seal.Seal("phone", []byte(phone))
+		acct, err := s.accounts.FindOrCreateByPhone(ctx, phone, now)
+		if err != nil {
+			return err
+		}
+		id = acct.UserID
+		if !acct.Created {
+			exists, err := q.AdminUserExists(ctx, ids.UUID(id))
 			if err != nil {
 				return err
 			}
-			if err := q.InsertInvitedUser(ctx, admindb.InsertInvitedUserParams{ID: ids.UUID(id), Name: &name, Now: now}); err != nil {
-				return err
-			}
-			if err := q.InsertInvitedPhone(ctx, admindb.InsertInvitedPhoneParams{
-				ID: ids.UUID(ids.New(now)), UserID: ids.UUID(id), PhoneEnc: enc, PhoneHash: hash, Now: now,
-			}); err != nil {
-				if db.IsUniqueViolation(err, "") {
-					// The number signed in for the first time while this ran.
-					return problem.New(genproblems.Conflict, "This number just signed up. Try again.")
-				}
-				return err
-			}
-		case err != nil:
-			return err
-		default:
-			if u.IsAdmin {
+			if exists {
 				return problem.New(genproblems.Conflict, "This number already has admin access.")
 			}
-			if u.Status != "active" {
+			if acct.Status != "active" {
 				return invalidTransition("This account is blocked, so it cannot be given admin access.")
 			}
-			id, _ = ids.FromUUID(u.ID)
-			if err := q.NameUserIfUnnamed(ctx, admindb.NameUserIfUnnamedParams{Name: &name, ID: u.ID}); err != nil {
-				return err
-			}
+		}
+		if err := q.NameUserIfUnnamed(ctx, admindb.NameUserIfUnnamedParams{Name: &name, ID: ids.UUID(id)}); err != nil {
+			return err
 		}
 		if err := q.InsertAdminUser(ctx, admindb.InsertAdminUserParams{
 			UserID: ids.UUID(id), Roles: roles, CreatedBy: ids.UUID(actor), Now: now,
@@ -196,7 +180,7 @@ func (s *Service) inviteAdminUser(ctx context.Context, actor ids.ID, in api.Admi
 		_, err = s.audit.Write(ctx, audit.Entry{
 			ActorKind: audit.ActorAdmin, ActorID: actor, Action: "admin_user.invite",
 			SubjectType: "admin_user", SubjectID: id.String(),
-			After: map[string]any{"roles": roles, "newAccount": isNew, "reason": reason},
+			After: map[string]any{"phone": pii.MaskPhone(phone), "roles": roles, "newAccount": acct.Created, "reason": reason},
 		})
 		return err
 	})

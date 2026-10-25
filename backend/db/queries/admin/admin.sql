@@ -546,21 +546,9 @@ SELECT roles, disabled_at, version FROM admin_users WHERE user_id = @id FOR UPDA
 SELECT count(*)::int FROM admin_users au JOIN users u ON u.id = au.user_id
 WHERE au.disabled_at IS NULL AND 'super_admin' = ANY (au.roles) AND u.status = 'active';
 
--- name: UserByPhoneHash :one
-SELECT u.id, u.status, u.name, (au.user_id IS NOT NULL)::bool AS is_admin
-FROM phone_identities pi JOIN users u ON u.id = pi.user_id
-LEFT JOIN admin_users au ON au.user_id = u.id
-WHERE pi.phone_hash = @phone_hash
-FOR UPDATE OF u;
-
--- name: InsertInvitedUser :exec
--- A number that has never signed in: the account is made here (identity makes
--- one at a first customer or shop sign-in; an admin is never made by signing in).
-INSERT INTO users (id, name, created_at, updated_at) VALUES (@id, @name, @now, @now);
-
--- name: InsertInvitedPhone :exec
-INSERT INTO phone_identities (id, user_id, phone_enc, phone_hash, verified_at, created_at)
-VALUES (@id, @user_id, @phone_enc, @phone_hash, @now, @now);
+-- name: AdminUserExists :one
+-- Any admin_users row, enabled or not: a disabled admin is re-enabled, not invited.
+SELECT EXISTS (SELECT 1 FROM admin_users WHERE user_id = @user_id)::bool;
 
 -- name: NameUserIfUnnamed :exec
 UPDATE users SET name = @name, version = version + 1 WHERE id = @id AND name IS NULL;
