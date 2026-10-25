@@ -1,0 +1,37 @@
+{
+  "name": "grounding_invented_qty",
+  "input": {
+    "note": "Some atta came in today"
+  },
+  "expect": {
+    "reject": "grounding"
+  },
+  "reply": {
+    "id": "msg_selftest",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_selftest",
+        "name": "record_stock_lines",
+        "input": {
+          "lines": [
+            {
+              "name": "atta",
+              "qty": 5,
+              "unit": "kg"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 400,
+      "output_tokens": 60
+    }
+  }
+}

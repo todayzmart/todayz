@@ -1,0 +1,31 @@
+{
+  "name": "truncated",
+  "input": {
+    "note": "a very long note"
+  },
+  "expect": {
+    "reject": "truncated"
+  },
+  "reply": {
+    "id": "msg_selftest",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_selftest",
+        "name": "record_stock_lines",
+        "input": {
+          "lines": []
+        }
+      }
+    ],
+    "stop_reason": "max_tokens",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 400,
+      "output_tokens": 60
+    }
+  }
+}

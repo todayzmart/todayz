@@ -19,8 +19,8 @@ import (
 )
 
 // W3-07's alert files (05 §5). jobs.yaml is W1-11's, orders.yaml and pos.yaml
-// are W2's and have their own checks.
-var otherAlertFiles = map[string]bool{"jobs.yaml": true, "orders.yaml": true, "pos.yaml": true}
+// are W2's and have their own checks; ai.yaml is W3-10's (internal/ai/guard/alerts_test.go).
+var otherAlertFiles = map[string]bool{"ai.yaml": true, "jobs.yaml": true, "orders.yaml": true, "pos.yaml": true}
 
 type alertFile struct {
 	file   string
