@@ -59,7 +59,7 @@ export const NAV: readonly NavItem[] = [
  * file (`src/routes/<area>/…`), which outranks `$section`; nothing here changes (src/app/routing.test.ts).
  */
 /** Sections with a real route (src/routes/<area>/); the rest show the placeholder. */
-export const BUILT_SECTIONS: readonly string[] = ['businesses', 'stores', 'customers', 'orders', 'reviews', 'audit', 'settings'];
+export const BUILT_SECTIONS: readonly string[] = ['businesses', 'stores', 'customers', 'orders', 'reviews', 'catalogue', 'audit', 'settings'];
 
 export const PLACEHOLDER_SECTIONS: readonly string[] = NAV.map((n) => n.section).filter((s) => s && !BUILT_SECTIONS.includes(s));
 

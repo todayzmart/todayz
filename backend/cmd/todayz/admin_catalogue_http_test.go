@@ -112,6 +112,7 @@ func TestAdminCatalogueHTTP(t *testing.T) {
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	items := r.body["items"].([]any)
 	require.Len(t, items, 3)
+	require.Equal(t, false, r.body["assistEnabled"], "ai_catalogue_enabled is off by default")
 	first := items[0].(map[string]any)
 	require.Equal(t, p1, first["product"].(map[string]any)["id"])
 	require.NotEmpty(t, first["createdByStoreName"])
@@ -159,6 +160,11 @@ func TestAdminCatalogueHTTP(t *testing.T) {
 	r = get("/v1/admin/pending-products")
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	require.Empty(t, r.body["items"])
+	a.exec(`UPDATE platform_settings SET value = 'true' WHERE key = 'ai_catalogue_enabled'`)
+	o.settings.Invalidate()
+	r = get("/v1/admin/pending-products")
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	require.Equal(t, true, r.body["assistEnabled"])
 	require.Equal(t, 1, a.count(`SELECT count(*) FROM audit_log WHERE action = 'catalogue.pending.merge' AND subject_id = $1`, p2))
 
 	// Categories: catalogue reads; admin creates (slug unique, two levels) and edits.

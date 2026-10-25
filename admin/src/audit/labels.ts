@@ -8,6 +8,20 @@ import { useIntl } from 'react-intl';
  */
 const SETTINGS_UPDATE = ['settings', 'update'].join('.');
 
+/** The A-08 actions, built the same way (`catalogue.…` is a message namespace too). */
+const CATALOGUE = (...parts: string[]) => ['catalogue', ...parts].join('.');
+const CATALOGUE_ACTIONS: Readonly<Record<string, string>> = {
+  [CATALOGUE('product', 'create')]: 'audit.action.catalogueProductCreate',
+  [CATALOGUE('product', 'update')]: 'audit.action.catalogueProductUpdate',
+  [CATALOGUE('pending', 'approve')]: 'audit.action.catalogueApprove',
+  [CATALOGUE('pending', 'merge')]: 'audit.action.catalogueMerge',
+  [CATALOGUE('pending', 'reject')]: 'audit.action.catalogueReject',
+  [CATALOGUE('category', 'create')]: 'audit.action.catalogueCategoryCreate',
+  [CATALOGUE('category', 'update')]: 'audit.action.catalogueCategoryUpdate',
+  [CATALOGUE('synonym', 'create')]: 'audit.action.catalogueSynonymCreate',
+  [CATALOGUE('synonym', 'delete')]: 'audit.action.catalogueSynonymDelete',
+};
+
 /** Audit actions the console names; any other action shows as written (it is still audited). */
 export function useActionLabel() {
   const intl = useIntl();
@@ -66,8 +80,10 @@ export function useActionLabel() {
           return intl.formatMessage({ id: 'audit.action.leadStatus' });
         case SETTINGS_UPDATE:
           return intl.formatMessage({ id: 'audit.action.settingsUpdate' });
-        default:
-          return action;
+        default: {
+          const id = CATALOGUE_ACTIONS[action];
+          return id ? intl.formatMessage({ id }) : action;
+        }
       }
     },
     [intl],

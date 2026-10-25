@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -17,6 +18,7 @@ import (
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
@@ -343,6 +345,9 @@ func (s *Service) listPending(ctx context.Context, limit *int, cursor *string) (
 		return api.AdminPendingProductList{}, err
 	}
 	out := api.AdminPendingProductList{Items: []api.AdminPendingProduct{}, ServerNow: s.now()}
+	if out.AssistEnabled, err = s.flag(ctx, settings.AiCatalogueEnabled); err != nil {
+		return api.AdminPendingProductList{}, err
+	}
 	for i, r := range rows {
 		if i == lim {
 			last := rows[lim-1]
@@ -377,6 +382,22 @@ func (s *Service) listPending(ctx context.Context, limit *int, cursor *string) (
 		out.Items = append(out.Items, m)
 	}
 	return out, nil
+}
+
+// flag reads a bool setting; a missing one is off.
+func (s *Service) flag(ctx context.Context, key settings.Key) (bool, error) {
+	r, err := s.q(ctx).GetSetting(ctx, string(key))
+	if errors.Is(err, pgx.ErrNoRows) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	var on bool
+	if err := json.Unmarshal(r.Value, &on); err != nil {
+		return false, fmt.Errorf("admin: setting %s is not a bool: %w", key, err)
+	}
+	return on, nil
 }
 
 // optReason cleans an optional reason.

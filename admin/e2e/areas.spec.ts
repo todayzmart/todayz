@@ -200,3 +200,54 @@ test('A-12: support hides a reported review and restores it, each with a reason'
     { path: `/v1/admin/reviews/${REVIEW_ID}/restore`, body: { reason: 'Owner and customer settled it' } },
   ]);
 });
+
+test('A-08: the catalogue desk merges a store-made duplicate into the master product', async ({ page }) => {
+  await signIn(page, ['catalogue']);
+  const TOOR = '01JPR0DXCT00000000000000T1';
+  const PENDING = '01JPR0DXCT00000000000000P1';
+  const CATEGORY = '01JCATEG0RY0000000000000S1';
+  const product = {
+    id: TOOR,
+    name: 'Toor Dal',
+    brandName: 'Tata Sampann',
+    categoryId: CATEGORY,
+    categoryName: 'Staples',
+    variant: 'Unpolished',
+    packSize: 1,
+    unit: 'kg',
+    mrpPaise: 18900,
+    barcodes: ['8901725181234'],
+    status: 'active',
+    mergedInto: null,
+    storeCount: 14,
+    createdAt: '2026-10-01T09:00:00Z',
+    updatedAt: '2026-10-20T09:00:00Z',
+  };
+  const pending = { ...product, id: PENDING, name: 'Toor dal unpolished', brandName: null, variant: null, mrpPaise: null, barcodes: [], status: 'pending_review', storeCount: 0 };
+  let waiting = true;
+  await answerWith(page, '/v1/admin/categories', () => ({
+    status: 200,
+    body: { items: [{ id: CATEGORY, parentId: null, slug: 'staples', names: { en: 'Staples' }, tint: 'amber', icon: 'wheat', sort: 10, productCount: 240, updatedAt: NOW }] },
+  }));
+  const sent = await fake(page, '/v1/admin/pending-products**', (method, url) => {
+    if (method === 'GET') {
+      const items = waiting ? [{ product: pending, createdByStoreId: STORE_ID, createdByStoreName: 'Annapurna Kirana', suggestions: [{ product, similarity: 0.62 }] }] : [];
+      return { status: 200, body: { items, assistEnabled: false, nextCursor: null, serverNow: NOW } };
+    }
+    if (url.pathname.endsWith('/merge')) {
+      waiting = false;
+      return { status: 200, body: { ...pending, status: 'merged', mergedInto: TOOR } };
+    }
+    return undefined;
+  });
+
+  await page.goto('/catalogue?tab=review');
+  await page.getByRole('table', { name: 'Products to review' }).getByRole('button', { name: 'Toor dal unpolished' }).click();
+  await expect(page.getByText('1 kg · 62% alike · 14 stores')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Add product' })).toHaveCount(0);
+  await shot(page, 'admin-a08-review.png');
+  await page.getByRole('button', { name: 'Merge into this' }).click();
+  await page.getByRole('dialog', { name: 'Merge Toor dal unpolished into Toor Dal · Unpolished?' }).getByRole('button', { name: 'Merge' }).click();
+  await expect(page.getByText('This product is no longer waiting for review. Its history is below.')).toBeVisible();
+  expect(sent).toEqual([{ path: `/v1/admin/pending-products/${PENDING}/merge`, body: { intoProductId: TOOR } }]);
+});

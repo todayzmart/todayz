@@ -138,11 +138,14 @@ AdminDuplicateSuggestion:
 AdminPendingProductList:
   type: object
   additionalProperties: false
-  required: [items, nextCursor, serverNow]
+  required: [items, assistEnabled, nextCursor, serverNow]
   properties:
     items:
       type: array
       items: {$ref: '#/AdminPendingProduct'}
+    assistEnabled:
+      type: boolean
+      description: "`ai_catalogue_enabled`: whether the review detail shows the catalogue assistant (AI-A1, D-82)."
     nextCursor: {$ref: ./common.yaml#/NextCursor}
     serverNow: {$ref: ./common.yaml#/ServerNow}
 AdminPendingApprove:

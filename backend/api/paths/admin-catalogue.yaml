@@ -169,6 +169,7 @@
                   suggestions:
                     - product: *product
                       similarity: 0.62
+              assistEnabled: false
               nextCursor: null
               serverNow: "2026-10-25T11:00:00Z"
       default: *problem

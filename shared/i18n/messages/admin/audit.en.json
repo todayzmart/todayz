@@ -218,5 +218,41 @@
   "audit.action.leadStatus": {
     "defaultMessage": "Lead status changed",
     "description": "Audit action name (A-03 leads)"
+  },
+  "audit.action.catalogueProductCreate": {
+    "defaultMessage": "Product added",
+    "description": "Audit action: a master product was added"
+  },
+  "audit.action.catalogueProductUpdate": {
+    "defaultMessage": "Product edited",
+    "description": "Audit action: a master product was edited"
+  },
+  "audit.action.catalogueApprove": {
+    "defaultMessage": "Product approved",
+    "description": "Audit action: a pending product was approved into the catalogue"
+  },
+  "audit.action.catalogueMerge": {
+    "defaultMessage": "Product merged",
+    "description": "Audit action: a pending product was merged into an active one"
+  },
+  "audit.action.catalogueReject": {
+    "defaultMessage": "Product rejected",
+    "description": "Audit action: a pending product was rejected"
+  },
+  "audit.action.catalogueCategoryCreate": {
+    "defaultMessage": "Category added",
+    "description": "Audit action: a category was added"
+  },
+  "audit.action.catalogueCategoryUpdate": {
+    "defaultMessage": "Category edited",
+    "description": "Audit action: a category was renamed, recoloured or reordered"
+  },
+  "audit.action.catalogueSynonymCreate": {
+    "defaultMessage": "Search word added",
+    "description": "Audit action: a search synonym was added"
+  },
+  "audit.action.catalogueSynonymDelete": {
+    "defaultMessage": "Search word removed",
+    "description": "Audit action: a search synonym was removed"
   }
 }

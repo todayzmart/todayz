@@ -47,6 +47,8 @@ export const ACTION_ROLES = {
   storeReview: ADMINS,
   storeEdit: ADMINS,
   leads: ['field_agent', ...SUPPORT_UP],
+  catalogueReview: ['catalogue', ...ADMINS],
+  catalogueManage: ADMINS,
 } as const satisfies Record<string, readonly Role[]>;
 export type Action = keyof typeof ACTION_ROLES;
 
