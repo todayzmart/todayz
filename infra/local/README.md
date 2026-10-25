@@ -9,7 +9,7 @@ on `*.todayz.localhost`. Apps (API, PWAs, site, mocks) run on the host through
 ## Run it
 
 ```
-colima start            # once per boot; Docker runs in Colima
+colima start            # once per boot; Docker runs in Colima (sized once: colima start --cpu 4 --memory 6)
 make setup              # pulls images, installs pmtiles, downloads city map tiles
 caddy trust             # once, by you: adds Caddy's local CA to the keychain (asks for your password)
 make dev                # containers, buckets, tiles, Caddy, apps, then the health check
