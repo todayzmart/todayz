@@ -1,0 +1,317 @@
+{
+  "asks.cta.nearby": {
+    "message": "ಹತ್ತಿರದ ಅಂಗಡಿಗಳನ್ನು ಕೇಳಿ",
+    "review": "reviewed",
+    "enHash": "2f82015e"
+  },
+  "asks.cta.shop": {
+    "message": "ಈ ಅಂಗಡಿಯನ್ನು ಕೇಳಿ",
+    "review": "reviewed",
+    "enHash": "5f3a8b07"
+  },
+  "asks.sheet.nearby": {
+    "message": "ನಿಮ್ಮ ಹತ್ತಿರದ ಅಂಗಡಿಗಳಲ್ಲಿ ಇದು ಇದೆಯೇ ಎಂದು ನಾವು ಕೇಳುತ್ತೇವೆ.",
+    "review": "reviewed",
+    "enHash": "6213db41"
+  },
+  "asks.sheet.shop": {
+    "message": "ಈ ಅಂಗಡಿಯಲ್ಲಿ ಇದು ಇದೆಯೇ ಎಂದು ನಾವು ಕೇಳುತ್ತೇವೆ.",
+    "review": "reviewed",
+    "enHash": "654cbbe9"
+  },
+  "asks.sheet.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "asks.sheet.item": {
+    "message": "ನಿಮಗೆ ಏನು ಬೇಕು?",
+    "review": "reviewed",
+    "enHash": "2ef875b9"
+  },
+  "asks.sheet.quantity": {
+    "message": "ಪ್ರಮಾಣ",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "asks.sheet.add": {
+    "message": "ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "asks.sheet.less": {
+    "message": "ಒಂದು ಕಡಿಮೆ",
+    "review": "reviewed",
+    "enHash": "05892c7d"
+  },
+  "asks.sheet.more": {
+    "message": "ಇನ್ನೊಂದು",
+    "review": "reviewed",
+    "enHash": "8c87ebbd"
+  },
+  "asks.sheet.needBy": {
+    "message": "ಯಾವಾಗ ಬೇಕು",
+    "review": "reviewed",
+    "enHash": "ebd461cf"
+  },
+  "asks.need.now": {
+    "message": "ಈಗ",
+    "review": "reviewed",
+    "enHash": "e3b82040"
+  },
+  "asks.need.today": {
+    "message": "ಇಂದು",
+    "review": "reviewed",
+    "enHash": "24345a14"
+  },
+  "asks.need.tomorrow": {
+    "message": "ನಾಳೆ",
+    "review": "reviewed",
+    "enHash": "1948bf2d"
+  },
+  "asks.sheet.privacy": {
+    "message": "ಅಂಗಡಿಗಳು ವಸ್ತು, ಪ್ರಮಾಣ ಮತ್ತು ನೀವು ಸುಮಾರು ಎಷ್ಟು ದೂರದಲ್ಲಿದ್ದೀರಿ ಎಂಬುದನ್ನು ಮಾತ್ರ ನೋಡುತ್ತವೆ. ನಿಮ್ಮ ಹೆಸರು ಅಥವಾ ನಂಬರ್ ಎಂದಿಗೂ ಇಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "976c532f"
+  },
+  "asks.sheet.noPlace": {
+    "message": "ಯಾವ ಅಂಗಡಿಗಳನ್ನು ಕೇಳಬೇಕು ಎಂದು ತಿಳಿಯಲು ನಿಮ್ಮ ಸ್ಥಳವನ್ನು ಹೊಂದಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "9216eb6e"
+  },
+  "asks.sheet.setPlace": {
+    "message": "ಸ್ಥಳ ಹೊಂದಿಸಿ",
+    "review": "reviewed",
+    "enHash": "f1a9152a"
+  },
+  "asks.sheet.placeError": {
+    "message": "ನಿಮ್ಮ ಸ್ಥಳ ನಮಗೆ ಸಿಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "3e3b5ee1"
+  },
+  "asks.sheet.send": {
+    "message": "ಕಳುಹಿಸಿ",
+    "review": "reviewed",
+    "enHash": "9bc2575c"
+  },
+  "asks.sheet.signIn": {
+    "message": "ಕಳುಹಿಸಲು ಸೈನ್ ಇನ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "b9cb22a0"
+  },
+  "asks.error.limit": {
+    "message": "ನೀವು ದಿನಕ್ಕೆ {n} ಕೇಳಿಕೆಗಳನ್ನು ಕಳುಹಿಸಬಹುದು. ನಾಳೆ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "ec90d6cb"
+  },
+  "asks.error.limitPlain": {
+    "message": "ಇಂದಿನ ಕೇಳಿಕೆಗಳನ್ನು ನೀವು ಕಳುಹಿಸಿದ್ದೀರಿ. ನಾಳೆ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "0e263750"
+  },
+  "asks.error.open": {
+    "message": "ಇದಕ್ಕೆ ನಿಮ್ಮ ಒಂದು ಕೇಳಿಕೆ ಈಗಾಗಲೇ ತೆರೆದಿದೆ.",
+    "review": "reviewed",
+    "enHash": "b3de419a"
+  },
+  "asks.error.openLink": {
+    "message": "ನೋಡಿ",
+    "review": "reviewed",
+    "enHash": "620c9c35"
+  },
+  "asks.error.noShops": {
+    "message": "ಈಗ ಹತ್ತಿರದ ಯಾವ ಅಂಗಡಿಯೂ ಕೇಳಿಕೆ ತೆಗೆದುಕೊಳ್ಳಲು ಆಗುವುದಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "a6c08e1c"
+  },
+  "asks.error.storeUnavailable": {
+    "message": "ಈ ಅಂಗಡಿ ಈಗ ಕೇಳಿಕೆಗಳನ್ನು ತೆಗೆದುಕೊಳ್ಳುತ್ತಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "02e91de0"
+  },
+  "asks.error.invalid": {
+    "message": "ವಸ್ತು ಮತ್ತು ಪ್ರಮಾಣವನ್ನು ಪರಿಶೀಲಿಸಿ, ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "ea124d37"
+  },
+  "asks.error.failed": {
+    "message": "ನಿಮ್ಮ ಕೇಳಿಕೆಯನ್ನು ಕಳುಹಿಸಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "a99b37d4"
+  },
+  "asks.ordersLink": {
+    "message": "ನಿಮ್ಮ ಕೇಳಿಕೆಗಳು",
+    "review": "reviewed",
+    "enHash": "77bf3817"
+  },
+  "asks.title": {
+    "message": "ನಿಮ್ಮ ಕೇಳಿಕೆಗಳು",
+    "review": "reviewed",
+    "enHash": "77bf3817"
+  },
+  "asks.back": {
+    "message": "ನಿಮ್ಮ ಕೇಳಿಕೆಗಳು",
+    "review": "reviewed",
+    "enHash": "77bf3817"
+  },
+  "asks.loading": {
+    "message": "ನಿಮ್ಮ ಕೇಳಿಕೆಗಳನ್ನು ಲೋಡ್ ಮಾಡುತ್ತಿದ್ದೇವೆ",
+    "review": "reviewed",
+    "enHash": "9d8c3fab"
+  },
+  "asks.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "asks.gone": {
+    "message": "ಈ ಕೇಳಿಕೆ ಸಿಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "f4d97a99"
+  },
+  "asks.error.load": {
+    "message": "ನಿಮ್ಮ ಕೇಳಿಕೆಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "b1c92572"
+  },
+  "asks.error.close": {
+    "message": "ಕೇಳಿಕೆಯನ್ನು ಮುಚ್ಚಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "07d1cd69"
+  },
+  "asks.empty.title": {
+    "message": "ಇನ್ನೂ ಯಾವುದೇ ಕೇಳಿಕೆ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "f9782d98"
+  },
+  "asks.empty.body": {
+    "message": "ಹುಡುಕಾಟದಲ್ಲಿ ಏನೂ ಸಿಗದಿದ್ದಾಗ, ಹತ್ತಿರದ ಅಂಗಡಿಗಳನ್ನು ಕೇಳಿ; ಅವುಗಳ ಉತ್ತರಗಳು ಇಲ್ಲಿ ಕಾಣುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "3d7ca49f"
+  },
+  "asks.empty.cta": {
+    "message": "ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "asks.list.yes": {
+    "message": "{n, plural, one {# ಅಂಗಡಿಯಲ್ಲಿ ಇದೆ} other {# ಅಂಗಡಿಗಳಲ್ಲಿ ಇದೆ}}",
+    "review": "reviewed",
+    "enHash": "8f4f8da5"
+  },
+  "asks.signedOut.title": {
+    "message": "ನಿಮ್ಮ ಕೇಳಿಕೆಗಳನ್ನು ನೋಡಲು ಸೈನ್ ಇನ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "ab68f44d"
+  },
+  "asks.signedOut.body": {
+    "message": "ನಿಮ್ಮ ಕೇಳಿಕೆಗಳು ಮತ್ತು ಅಂಗಡಿಗಳ ಉತ್ತರಗಳು ನಿಮ್ಮ ಖಾತೆಯಲ್ಲಿ ಇರುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "7aa8a7a4"
+  },
+  "asks.signedOut.cta": {
+    "message": "ಸೈನ್ ಇನ್",
+    "review": "reviewed",
+    "enHash": "ada2e9e9"
+  },
+  "asks.quantity": {
+    "message": "ಪ್ರಮಾಣ {n}",
+    "review": "reviewed",
+    "enHash": "0c1713be"
+  },
+  "asks.status.open": {
+    "message": "ತೆರೆದಿದೆ",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "asks.status.closed": {
+    "message": "ಮುಚ್ಚಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "88d86b77"
+  },
+  "asks.progress": {
+    "message": "{n, plural, one {# ಅಂಗಡಿಯನ್ನು} other {# ಅಂಗಡಿಗಳನ್ನು}} ಕೇಳಲಾಗಿದೆ · {r} ಉತ್ತರಿಸಿವೆ",
+    "review": "reviewed",
+    "enHash": "3bdf2da4"
+  },
+  "asks.progress.best": {
+    "message": "{n, plural, one {# ಅಂಗಡಿಯನ್ನು} other {# ಅಂಗಡಿಗಳನ್ನು}} ಕೇಳಲಾಗಿದೆ · {r} ಉತ್ತರಿಸಿವೆ · ಕಡಿಮೆ ಬೆಲೆ {price}",
+    "review": "reviewed",
+    "enHash": "e4504424"
+  },
+  "asks.windowLeft": {
+    "message": "ಅಂಗಡಿಗಳು ಉತ್ತರಿಸಲು {time} ಉಳಿದಿದೆ",
+    "review": "reviewed",
+    "enHash": "9a15b1e5"
+  },
+  "asks.replies": {
+    "message": "ಉತ್ತರಗಳು",
+    "review": "reviewed",
+    "enHash": "c8a103c7"
+  },
+  "asks.waiting": {
+    "message": "ಅಂಗಡಿಗಳಿಗಾಗಿ ಕಾಯುತ್ತಿದ್ದೇವೆ. ಹೆಚ್ಚಿನವು {min} ನಿಮಿಷದಲ್ಲಿ ಉತ್ತರಿಸುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "cd5f4968"
+  },
+  "asks.none": {
+    "message": "ಈಗ ಯಾವ ಅಂಗಡಿಯಲ್ಲೂ ಇದು ಇಲ್ಲ. ಜನರಿಗೆ ಇದು ಬೇಕು ಎಂದು ಹತ್ತಿರದ ಅಂಗಡಿಗಳಿಗೆ ತಿಳಿಸಿದ್ದೇವೆ.",
+    "review": "reviewed",
+    "enHash": "269931fa"
+  },
+  "asks.close": {
+    "message": "ಕೇಳಿಕೆ ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "2385e8a9"
+  },
+  "asks.reply.soonest": {
+    "message": "ಬೇಗ ಸಿದ್ಧ",
+    "review": "reviewed",
+    "enHash": "c7f898b8"
+  },
+  "asks.reply.replied": {
+    "message": "{ago} ಉತ್ತರಿಸಿದೆ",
+    "review": "reviewed",
+    "enHash": "4029c5ac"
+  },
+  "asks.reply.noPrice": {
+    "message": "ಬೆಲೆಯನ್ನು ಅಂಗಡಿಯಲ್ಲಿ ಕೇಳಿ",
+    "review": "reviewed",
+    "enHash": "3b877b27"
+  },
+  "asks.reply.price": {
+    "message": "{price}",
+    "review": "reviewed",
+    "enHash": "a58a37f9"
+  },
+  "asks.reply.held": {
+    "message": "ಬೆಲೆ ಇನ್ನೂ {time} ಖಚಿತ",
+    "review": "reviewed",
+    "enHash": "48246caa"
+  },
+  "asks.reply.priceChanged": {
+    "message": "ಬೆಲೆ ಬದಲಾಗಿರಬಹುದು",
+    "review": "reviewed",
+    "enHash": "37ff7cbb"
+  },
+  "asks.reply.readyBy": {
+    "message": "{time} ಒಳಗೆ ಸಿದ್ಧ",
+    "review": "reviewed",
+    "enHash": "31d90ab7"
+  },
+  "asks.reply.book": {
+    "message": "ಬುಕ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "f69f2330"
+  },
+  "asks.reply.viewOrder": {
+    "message": "ಆರ್ಡರ್ ನೋಡಿ",
+    "review": "reviewed",
+    "enHash": "0df27975"
+  },
+  "asks.reply.inStore": {
+    "message": "ಅಂಗಡಿಯಲ್ಲಿ ಮಾತ್ರ: ಅಂಗಡಿಗೆ ಹೋಗಿ",
+    "review": "reviewed",
+    "enHash": "029cc8c9"
+  }
+}

@@ -43,6 +43,7 @@ var subjectView = map[api.AdminAuditSubjectType]string{
 	api.AdminAuditSubjectTypeCreditAdjustment:     policy.AdminLedgerView,
 	api.AdminAuditSubjectTypeRiskFlag:             policy.AdminRiskView,
 	api.AdminAuditSubjectTypeReferral:             policy.AdminReferralsView,
+	api.AdminAuditSubjectTypeSiteMarquee:          policy.AdminMarqueeApprove,
 	// A-21's run now, pause, resume and retry (W1-11's jobs.* actions): the
 	// roles that may act on a job (W3-15); A-21's read-only roles see no panel.
 	api.AdminAuditSubjectTypeJobKind: policy.AdminAuditView,

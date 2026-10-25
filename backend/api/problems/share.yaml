@@ -1,0 +1,10 @@
+# Problem codes: domain "share" (owner W3-16; 01 §11.3, 04 §2.6, D-101).
+#
+# Same shape as common.yaml. Too many creates from one IP or anon id in an
+# hour is the common rate_limited.
+domain: share
+problems:
+  - code: share_card_unavailable
+    status: 410
+    i18n: problems.share_card_unavailable
+    title: The shared item or its shop is not on TodayZ right now

@@ -93,6 +93,13 @@ type AppKeys struct {
 	PIIHashKey         Secret
 	DeviceSecretEncKey Secret
 	TOTPEncKey         Secret
+	// SharePreviewKey is SHARE_PREVIEW_KEY, the secret the customer Pages
+	// Function sends with a link preview read so the API counts the visitor's
+	// IP, not Cloudflare's (W3-16). make setup generates it locally like the
+	// D-18 keys, but it is not in AppKeyNames: the API starts without it and
+	// then never trusts the forwarded IP (previews count by Cloudflare IP).
+	// Prod sets the same value on the Pages project and the API.
+	SharePreviewKey Secret
 }
 
 // Providers holds provider endpoints and keys (D-17, D-19). Keys are optional
@@ -376,6 +383,27 @@ func (c *Config) PublicCORSOrigins() []string {
 	}
 }
 
+// CustomerAppOrigin is the customer app's origin, which share links point at
+// (W3-16). It is the first of CORSOrigins.
+func (c *Config) CustomerAppOrigin() string {
+	return c.CORSOrigins()[0]
+}
+
+// ImagesOrigin is the public images origin (the R2 images bucket behind
+// Cloudflare; MinIO through Caddy locally) that share card images are served
+// from (W3-16).
+func (c *Config) ImagesOrigin() string {
+	switch c.Env {
+	case EnvProd:
+		return "https://img.todayz.in"
+	case EnvStaging:
+		// Placeholder host name, like CORSOrigins, until Wave 5 fixes the staging domains.
+		return "https://img.staging.todayz.in"
+	default:
+		return "https://img.todayz.localhost"
+	}
+}
+
 // ---------------------------------------------------------------- reader
 
 type reader struct {
@@ -567,6 +595,7 @@ func (r *reader) appKeys() AppKeys {
 		PIIHashKey:         r.key32("PII_HASH_KEY"),
 		DeviceSecretEncKey: r.key32("DEVICE_SECRET_ENC_KEY"),
 		TOTPEncKey:         r.key32("TOTP_ENC_KEY"),
+		SharePreviewKey:    r.key32("SHARE_PREVIEW_KEY"),
 	}
 	k.JWTCurrentKID = r.raw("JWT_CURRENT_KID")
 	set := r.raw("JWT_SIGNING_KEYS")

@@ -1,0 +1,317 @@
+{
+  "asks.cta.nearby": {
+    "message": "அருகில் உள்ள கடைகளிடம் கேளுங்கள்",
+    "review": "reviewed",
+    "enHash": "2f82015e"
+  },
+  "asks.cta.shop": {
+    "message": "இந்தக் கடையிடம் கேளுங்கள்",
+    "review": "reviewed",
+    "enHash": "5f3a8b07"
+  },
+  "asks.sheet.nearby": {
+    "message": "உங்கள் அருகில் உள்ள கடைகளில் இது இருக்கிறதா என்று நாங்கள் கேட்போம்.",
+    "review": "reviewed",
+    "enHash": "6213db41"
+  },
+  "asks.sheet.shop": {
+    "message": "இந்தக் கடையில் இது இருக்கிறதா என்று நாங்கள் கேட்போம்.",
+    "review": "reviewed",
+    "enHash": "654cbbe9"
+  },
+  "asks.sheet.close": {
+    "message": "மூடு",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "asks.sheet.item": {
+    "message": "உங்களுக்கு என்ன வேண்டும்?",
+    "review": "reviewed",
+    "enHash": "2ef875b9"
+  },
+  "asks.sheet.quantity": {
+    "message": "அளவு",
+    "review": "reviewed",
+    "enHash": "44f6af69"
+  },
+  "asks.sheet.add": {
+    "message": "சேர்",
+    "review": "reviewed",
+    "enHash": "61cc55aa"
+  },
+  "asks.sheet.less": {
+    "message": "ஒன்று குறைவு",
+    "review": "reviewed",
+    "enHash": "05892c7d"
+  },
+  "asks.sheet.more": {
+    "message": "இன்னும் ஒன்று",
+    "review": "reviewed",
+    "enHash": "8c87ebbd"
+  },
+  "asks.sheet.needBy": {
+    "message": "எப்போது வேண்டும்",
+    "review": "reviewed",
+    "enHash": "ebd461cf"
+  },
+  "asks.need.now": {
+    "message": "இப்போது",
+    "review": "reviewed",
+    "enHash": "e3b82040"
+  },
+  "asks.need.today": {
+    "message": "இன்று",
+    "review": "reviewed",
+    "enHash": "24345a14"
+  },
+  "asks.need.tomorrow": {
+    "message": "நாளை",
+    "review": "reviewed",
+    "enHash": "1948bf2d"
+  },
+  "asks.sheet.privacy": {
+    "message": "கடைகள் பொருள், அளவு, நீங்கள் தோராயமாக எவ்வளவு தூரத்தில் இருக்கிறீர்கள் என்பதை மட்டுமே பார்க்கும். உங்கள் பெயரோ எண்ணோ ஒருபோதும் இல்லை.",
+    "review": "reviewed",
+    "enHash": "976c532f"
+  },
+  "asks.sheet.noPlace": {
+    "message": "எந்தக் கடைகளிடம் கேட்பது என்று தெரிய உங்கள் இருப்பிடத்தை அமைக்கவும்.",
+    "review": "reviewed",
+    "enHash": "9216eb6e"
+  },
+  "asks.sheet.setPlace": {
+    "message": "இருப்பிடத்தை அமை",
+    "review": "reviewed",
+    "enHash": "f1a9152a"
+  },
+  "asks.sheet.placeError": {
+    "message": "உங்கள் இருப்பிடத்தைப் பெற முடியவில்லை.",
+    "review": "reviewed",
+    "enHash": "3e3b5ee1"
+  },
+  "asks.sheet.send": {
+    "message": "அனுப்பு",
+    "review": "reviewed",
+    "enHash": "9bc2575c"
+  },
+  "asks.sheet.signIn": {
+    "message": "அனுப்ப உள்நுழையவும்",
+    "review": "reviewed",
+    "enHash": "b9cb22a0"
+  },
+  "asks.error.limit": {
+    "message": "நீங்கள் ஒரு நாளில் {n} கோரிக்கைகள் அனுப்பலாம். நாளை மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "ec90d6cb"
+  },
+  "asks.error.limitPlain": {
+    "message": "இன்றைய கோரிக்கைகளை அனுப்பிவிட்டீர்கள். நாளை மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "0e263750"
+  },
+  "asks.error.open": {
+    "message": "இதற்கு உங்கள் கோரிக்கை ஒன்று ஏற்கனவே திறந்துள்ளது.",
+    "review": "reviewed",
+    "enHash": "b3de419a"
+  },
+  "asks.error.openLink": {
+    "message": "பார்",
+    "review": "reviewed",
+    "enHash": "620c9c35"
+  },
+  "asks.error.noShops": {
+    "message": "இப்போது அருகில் எந்தக் கடையும் கோரிக்கையை ஏற்க முடியாது.",
+    "review": "reviewed",
+    "enHash": "a6c08e1c"
+  },
+  "asks.error.storeUnavailable": {
+    "message": "இந்தக் கடை இப்போது கோரிக்கைகளை ஏற்கவில்லை.",
+    "review": "reviewed",
+    "enHash": "02e91de0"
+  },
+  "asks.error.invalid": {
+    "message": "பொருளையும் அளவையும் சரிபார்த்து, மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "ea124d37"
+  },
+  "asks.error.failed": {
+    "message": "உங்கள் கோரிக்கையை அனுப்ப முடியவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "a99b37d4"
+  },
+  "asks.ordersLink": {
+    "message": "உங்கள் கோரிக்கைகள்",
+    "review": "reviewed",
+    "enHash": "77bf3817"
+  },
+  "asks.title": {
+    "message": "உங்கள் கோரிக்கைகள்",
+    "review": "reviewed",
+    "enHash": "77bf3817"
+  },
+  "asks.back": {
+    "message": "உங்கள் கோரிக்கைகள்",
+    "review": "reviewed",
+    "enHash": "77bf3817"
+  },
+  "asks.loading": {
+    "message": "உங்கள் கோரிக்கைகள் லோட் ஆகின்றன",
+    "review": "reviewed",
+    "enHash": "9d8c3fab"
+  },
+  "asks.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "asks.gone": {
+    "message": "இந்தக் கோரிக்கையைக் கண்டுபிடிக்க முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "f4d97a99"
+  },
+  "asks.error.load": {
+    "message": "உங்கள் கோரிக்கைகளை லோட் செய்ய முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "b1c92572"
+  },
+  "asks.error.close": {
+    "message": "கோரிக்கையை மூட முடியவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "07d1cd69"
+  },
+  "asks.empty.title": {
+    "message": "இன்னும் கோரிக்கைகள் இல்லை",
+    "review": "reviewed",
+    "enHash": "f9782d98"
+  },
+  "asks.empty.body": {
+    "message": "தேடலில் எதுவும் கிடைக்காதபோது, அருகில் உள்ள கடைகளிடம் கேளுங்கள்; அவற்றின் பதில்கள் இங்கே தெரியும்.",
+    "review": "reviewed",
+    "enHash": "3d7ca49f"
+  },
+  "asks.empty.cta": {
+    "message": "தேடு",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "asks.list.yes": {
+    "message": "{n, plural, one {# கடையில் உள்ளது} other {# கடைகளில் உள்ளது}}",
+    "review": "reviewed",
+    "enHash": "8f4f8da5"
+  },
+  "asks.signedOut.title": {
+    "message": "உங்கள் கோரிக்கைகளைப் பார்க்க உள்நுழையவும்",
+    "review": "reviewed",
+    "enHash": "ab68f44d"
+  },
+  "asks.signedOut.body": {
+    "message": "உங்கள் கோரிக்கைகளும் கடைகளின் பதில்களும் உங்கள் கணக்கில் இருக்கும்.",
+    "review": "reviewed",
+    "enHash": "7aa8a7a4"
+  },
+  "asks.signedOut.cta": {
+    "message": "உள்நுழை",
+    "review": "reviewed",
+    "enHash": "ada2e9e9"
+  },
+  "asks.quantity": {
+    "message": "அளவு {n}",
+    "review": "reviewed",
+    "enHash": "0c1713be"
+  },
+  "asks.status.open": {
+    "message": "திறந்துள்ளது",
+    "review": "reviewed",
+    "enHash": "cf9b7706"
+  },
+  "asks.status.closed": {
+    "message": "மூடப்பட்டது",
+    "review": "reviewed",
+    "enHash": "88d86b77"
+  },
+  "asks.progress": {
+    "message": "{n, plural, one {# கடையிடம்} other {# கடைகளிடம்}} கேட்டோம் · {r} பதில் அளித்தன",
+    "review": "reviewed",
+    "enHash": "3bdf2da4"
+  },
+  "asks.progress.best": {
+    "message": "{n, plural, one {# கடையிடம்} other {# கடைகளிடம்}} கேட்டோம் · {r} பதில் அளித்தன · குறைந்த விலை {price}",
+    "review": "reviewed",
+    "enHash": "e4504424"
+  },
+  "asks.windowLeft": {
+    "message": "கடைகள் பதில் சொல்ல {time} உள்ளது",
+    "review": "reviewed",
+    "enHash": "9a15b1e5"
+  },
+  "asks.replies": {
+    "message": "பதில்கள்",
+    "review": "reviewed",
+    "enHash": "c8a103c7"
+  },
+  "asks.waiting": {
+    "message": "கடைகளுக்காகக் காத்திருக்கிறோம். பெரும்பாலானவை {min} நிமிடத்தில் பதில் சொல்லும்.",
+    "review": "reviewed",
+    "enHash": "cd5f4968"
+  },
+  "asks.none": {
+    "message": "இப்போது எந்தக் கடையிலும் இது இல்லை. மக்களுக்கு இது வேண்டும் என்று அருகில் உள்ள கடைகளிடம் சொல்லியிருக்கிறோம்.",
+    "review": "reviewed",
+    "enHash": "269931fa"
+  },
+  "asks.close": {
+    "message": "கோரிக்கையை மூடு",
+    "review": "reviewed",
+    "enHash": "2385e8a9"
+  },
+  "asks.reply.soonest": {
+    "message": "முதலில் தயார்",
+    "review": "reviewed",
+    "enHash": "c7f898b8"
+  },
+  "asks.reply.replied": {
+    "message": "{ago} பதில் அளித்தது",
+    "review": "reviewed",
+    "enHash": "4029c5ac"
+  },
+  "asks.reply.noPrice": {
+    "message": "விலையைக் கடையிடம் கேளுங்கள்",
+    "review": "reviewed",
+    "enHash": "3b877b27"
+  },
+  "asks.reply.price": {
+    "message": "{price}",
+    "review": "reviewed",
+    "enHash": "a58a37f9"
+  },
+  "asks.reply.held": {
+    "message": "விலை இன்னும் {time} உறுதி",
+    "review": "reviewed",
+    "enHash": "48246caa"
+  },
+  "asks.reply.priceChanged": {
+    "message": "விலை மாறியிருக்கலாம்",
+    "review": "reviewed",
+    "enHash": "37ff7cbb"
+  },
+  "asks.reply.readyBy": {
+    "message": "{time} க்குள் தயார்",
+    "review": "reviewed",
+    "enHash": "31d90ab7"
+  },
+  "asks.reply.book": {
+    "message": "புக் செய்",
+    "review": "reviewed",
+    "enHash": "f69f2330"
+  },
+  "asks.reply.viewOrder": {
+    "message": "ஆர்டரைப் பார்",
+    "review": "reviewed",
+    "enHash": "0df27975"
+  },
+  "asks.reply.inStore": {
+    "message": "கடையில் மட்டும்: கடைக்குச் செல்லுங்கள்",
+    "review": "reviewed",
+    "enHash": "029cc8c9"
+  }
+}

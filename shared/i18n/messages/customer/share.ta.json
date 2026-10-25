@@ -1,0 +1,67 @@
+{
+  "share.button": {
+    "message": "பகிர்",
+    "review": "reviewed",
+    "enHash": "09ca55ca"
+  },
+  "share.title": {
+    "message": "பகிர்",
+    "review": "reviewed",
+    "enHash": "09ca55ca"
+  },
+  "share.close": {
+    "message": "மூடு",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "share.whatsapp": {
+    "message": "WhatsApp",
+    "review": "reviewed",
+    "enHash": "b336fc55"
+  },
+  "share.more": {
+    "message": "மேலும்",
+    "review": "reviewed",
+    "enHash": "4bab2d8f"
+  },
+  "share.copy": {
+    "message": "லிங்கை காப்பி செய்",
+    "review": "reviewed",
+    "enHash": "2f84eea5"
+  },
+  "share.gone": {
+    "message": "இந்தக் கடை இப்போது TodayZ-இல் இல்லை",
+    "review": "reviewed",
+    "enHash": "5cf21b57"
+  },
+  "share.gone.body": {
+    "message": "இந்தப் பொருளை உங்கள் அருகில் உள்ள கடைகளில் தேடுங்கள்.",
+    "review": "reviewed",
+    "enHash": "3b1156d7"
+  },
+  "share.search": {
+    "message": "பொருளைத் தேடு",
+    "review": "reviewed",
+    "enHash": "d48fca59"
+  },
+  "share.searchGo": {
+    "message": "தேடு",
+    "review": "reviewed",
+    "enHash": "bce06414"
+  },
+  "share.notFound": {
+    "message": "இந்த லிங்கைக் கண்டுபிடிக்க முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "304f6d46"
+  },
+  "share.error": {
+    "message": "இந்த லிங்கைத் திறக்க முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "9fe7754e"
+  },
+  "share.home": {
+    "message": "முகப்புக்குச் செல்",
+    "review": "reviewed",
+    "enHash": "f36ae945"
+  }
+}

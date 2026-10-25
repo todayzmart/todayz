@@ -25,10 +25,11 @@ const (
 	posDeviceIDPrefix   = "01KE0S1W6W8ZV7T1C3A6MZ"
 )
 
-// Search cells (D-81). The backend has no H3 library yet (migration 30301's
-// TODO(lead)), so these are fixed placeholder cell numbers with the centre
-// the book gives each: W 1.2 km from both SL and SL2, S2 0.2 km from SL2 and
-// 2.6 km from SL, M 0.5 km from the Chennai shop.
+// Search cells (D-81). These stay fixed placeholder cell numbers (not H3)
+// with the centre the book gives each, so its distances hold exactly: W 1.2 km
+// from both SL and SL2, S2 0.2 km from SL2 and 2.6 km from SL, M 0.5 km from
+// the Chennai shop. Real searches log a real H3 cell (platform/geo/h3) and
+// rollup_demand gives insight_geo_cells its centre.
 var insightCells = []struct {
 	Cell int64
 	At   LatLng

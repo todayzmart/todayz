@@ -215,6 +215,13 @@ func TestAdminCustomersHTTP(t *testing.T) {
 		r = get(tok, "/v1/admin/audit-log/subject?subjectType="+typ+"&subjectId="+cid)
 		require.Equal(t, http.StatusOK, r.code, r.raw)
 	}
+	// W3-16: a city's strip history follows A-23's strip action (catalogue, not finance).
+	r = get(tok, "/v1/admin/audit-log/subject?subjectType=site_marquee&subjectId="+cid)
+	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+	a.exec(`UPDATE admin_users SET roles = ARRAY['catalogue']`)
+	r = get(tok, "/v1/admin/audit-log/subject?subjectType=site_marquee&subjectId="+cid)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	a.exec(`UPDATE admin_users SET roles = ARRAY['finance']`)
 	r = get(tok, base)
 	require.Equal(t, http.StatusForbidden, r.code, r.raw)
 

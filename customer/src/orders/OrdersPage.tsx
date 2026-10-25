@@ -51,6 +51,10 @@ export function OrdersPage() {
   return (
     <div className={styles.page}>
       <h1 className="tz-page-title">{intl.formatMessage({ id: 'orders.title' })}</h1>
+      {/* C-26: the asks list is also reached from Orders (W3-16). */}
+      <PathLink to="/asks" className="tz-btn tz-btn-soft tz-btn-sm">
+        {intl.formatMessage({ id: 'asks.ordersLink' })}
+      </PathLink>
       <Tabs
         label={intl.formatMessage({ id: 'orders.tabs.label' })}
         value={tab}

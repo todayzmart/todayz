@@ -1,0 +1,32 @@
+# Problem codes: domain "asks" (owner W3-16; 01 §11.1–§11.2, 04 §2.6, D-101).
+#
+# Same shape as common.yaml. A second reply or a second report of the same
+# ask by one store is the common invalid_transition; another customer's ask
+# is not_found. ask_reply_used and ask_price_expired are orders' codes
+# (booking from a reply goes through POST /v1/me/orders).
+domain: asks
+problems:
+  - code: ask_limit_reached
+    status: 429
+    i18n: problems.ask_limit_reached
+    title: The customer has sent the most asks for today; Retry-After is the next IST midnight
+  - code: ask_already_open
+    status: 409
+    i18n: problems.ask_already_open
+    title: An ask for this item is already open; extensions.askId is that ask
+  - code: ask_no_shops
+    status: 409
+    i18n: problems.ask_no_shops
+    title: No shop nearby can take an ask right now
+  - code: ask_store_unavailable
+    status: 409
+    i18n: problems.ask_store_unavailable
+    title: This shop is not taking asks right now
+  - code: ask_closed
+    status: 409
+    i18n: problems.ask_closed
+    title: The ask is closed
+  - code: price_above_mrp
+    status: 422
+    i18n: problems.price_above_mrp
+    title: The price is above the MRP

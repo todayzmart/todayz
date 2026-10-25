@@ -80,6 +80,9 @@ const READS: [RegExp, string[]][] = [
   [/^\/v1\/admin\/system$/, ['admin', 'super_admin']],
   [/^\/v1\/admin\/(products|pending-products|categories|synonyms)(\/|$)/, ['catalogue', 'admin', 'super_admin']],
   [/^\/v1\/admin\/users(\/|$)/, ['super_admin']],
+  // admin.demand_gaps.view and admin.marquee.approve (asks.golden, A-23).
+  [/^\/v1\/admin\/demand-gaps$/, ['field_agent', 'catalogue', 'analyst', 'admin', 'super_admin']],
+  [/^\/v1\/admin\/site-marquee(\/|$)/, ['catalogue', 'admin', 'super_admin']],
   [/^\/v1\/admin\/pulse(\/|$)/, ['support', 'catalogue', 'analyst', 'finance', 'admin', 'super_admin']],
 ];
 

@@ -81,17 +81,30 @@ func (NoRedeem) Redeem(context.Context, ids.ID, ids.ID, []AppliedOffer) error { 
 // Release implements Redeemer.
 func (NoRedeem) Release(context.Context, ids.ID) error { return nil }
 
-// AskPrice is a shop's replied price for one item (D-101).
+// AskPrice is a shop's replied price for one item (D-101). UnitPricePaise 0
+// is a Yes with no price: the item books at its catalogue price and the
+// reply has no price expiry (01 §11.1). MaxQuantity is the asked quantity, the
+// most the reply books (a partial accept keeps the unit price).
 type AskPrice struct {
 	StoreItemID    ids.ID
 	UnitPricePaise int64
 	ValidUntil     time.Time
+	MaxQuantity    int
 }
 
 // AskPricer reads an ask reply's price (W3-16). ok is false when the reply
-// is not the customer's, not for the store, not a Yes, or past ValidUntil.
+// is not the customer's, not for the store, not a Yes, or has no item.
 type AskPricer interface {
 	AskPrice(ctx context.Context, customerID, storeID, askReplyID ids.ID, now time.Time) (p AskPrice, ok bool, err error)
+}
+
+// AskEvents is told, after the fact, what became of a booking from an ask
+// reply: an order placed from it, or a placement refused with
+// ask_price_expired. An AskPricer may implement it; it never fails the
+// request.
+type AskEvents interface {
+	AskBooked(ctx context.Context, customerID, storeID, askReplyID ids.ID, now time.Time)
+	AskPriceExpired(ctx context.Context, customerID, storeID, askReplyID ids.ID, now time.Time)
 }
 
 // CreditsAllowance is how many credits a checkout may use. Limit names why

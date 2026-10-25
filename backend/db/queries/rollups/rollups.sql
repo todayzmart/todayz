@@ -330,6 +330,19 @@ GROUP BY geo_cell, query_norm, product_id
 ON CONFLICT ON CONSTRAINT ux_rollup_daily_search_demand DO UPDATE SET
   searches = excluded.searches, zero_results = excluded.zero_results, stores_with_stock = excluded.stores_with_stock;
 
+-- name: MissingGeoCells :many
+-- Cells day d's demand uses that insight_geo_cells has no centre for yet.
+SELECT DISTINCT d.geo_cell::bigint AS geo_cell
+FROM rollup_daily_search_demand d
+LEFT JOIN insight_geo_cells c ON c.geo_cell = d.geo_cell
+WHERE d.date = @on_date::date AND d.geo_cell IS NOT NULL AND c.geo_cell IS NULL;
+
+-- name: InsertGeoCell :exec
+-- The centre of an H3 res-8 cell, computed in Go (platform/geo/h3).
+INSERT INTO insight_geo_cells (geo_cell, centre)
+VALUES (@geo_cell, ST_SetSRID(ST_MakePoint(@lng::float8, @lat::float8), 4326)::geography)
+ON CONFLICT (geo_cell) DO NOTHING;
+
 ------------------------------------------------------------------------------
 -- rollup_item_pairs
 ------------------------------------------------------------------------------

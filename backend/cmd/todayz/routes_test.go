@@ -39,5 +39,5 @@ func TestOneMountPerDomain(t *testing.T) {
 	for _, f := range files {
 		require.True(t, want[f], "%s is not a domain's routes file", f)
 	}
-	require.Len(t, jobs.Domains, 24)
+	require.Len(t, jobs.Domains, 25)
 }

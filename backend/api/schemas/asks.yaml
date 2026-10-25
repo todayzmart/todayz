@@ -1,0 +1,296 @@
+# Schemas: domain "asks" (owner W3-16; 01 §11.1–§11.2, 04 §2.6, D-101).
+#
+# The shop side never carries a customer name, phone, address or exact
+# distance: distanceBand is the only distance a shop sees. distanceM is in the
+# customer's own replies only, rounded to 500 m (the exact one is never stored).
+AskNeedWhen:
+  type: string
+  enum: [now, today, tomorrow]
+AskStatus:
+  type: string
+  enum: [open, closed]
+AskCreate:
+  type: object
+  additionalProperties: false
+  description: >-
+    Exactly one of `productId` (a catalogue product) and `query` (the typed words, when search
+    matched no product). `storeSlug` is "Ask this shop": that one store only, inside or outside
+    the radius.
+  required: [quantity, lat, lng]
+  properties:
+    productId:
+      $ref: ../schemas/common.yaml#/Ulid
+    query:
+      type: string
+      minLength: 1
+      maxLength: 200
+    quantity:
+      type: integer
+      minimum: 1
+      maximum: 99
+    needBy:
+      $ref: ../schemas/asks.yaml#/AskNeedWhen
+    lat:
+      type: number
+      minimum: 6
+      maximum: 38
+    lng:
+      type: number
+      minimum: 68
+      maximum: 98
+    storeSlug:
+      $ref: ../schemas/common.yaml#/Slug
+AskProgress:
+  type: object
+  required: [asked, replied, bestPricePaise]
+  properties:
+    asked:
+      type: integer
+      minimum: 0
+    replied:
+      type: integer
+      minimum: 0
+    bestPricePaise:
+      type:
+        - integer
+        - "null"
+      minimum: 1
+Ask:
+  type: object
+  required: [askId, itemName, productId, quantity, needBy, status, closeReason, progress, yesCount,
+    createdAt, closedAt, windowEndsAt, version]
+  properties:
+    askId:
+      $ref: ../schemas/common.yaml#/Ulid
+    itemName:
+      type: string
+      description: The product's name (and variant), or the asked words.
+    productId:
+      type:
+        - string
+        - "null"
+    quantity:
+      type: integer
+    needBy:
+      type:
+        - string
+        - "null"
+      enum: [now, today, tomorrow, null]
+    status:
+      $ref: ../schemas/asks.yaml#/AskStatus
+    closeReason:
+      type:
+        - string
+        - "null"
+      enum: [all_replied, window_ended, customer_closed, null]
+    progress:
+      $ref: ../schemas/asks.yaml#/AskProgress
+    yesCount:
+      type: integer
+    createdAt:
+      $ref: ../schemas/common.yaml#/Timestamp
+    closedAt:
+      type:
+        - string
+        - "null"
+      format: date-time
+    windowEndsAt:
+      type:
+        - string
+        - "null"
+      format: date-time
+      description: When the last shop's reply window ends.
+    version:
+      type: integer
+AskReply:
+  type: object
+  required: [askReplyId, storeId, storeSlug, storeName, distanceM, pricePaise, readyBy, repliedAt, priceValidUntil,
+    storeItemId, listedPricePaise, bookable, inStoreOnly, orderId]
+  properties:
+    askReplyId:
+      $ref: ../schemas/common.yaml#/Ulid
+    storeId:
+      $ref: ../schemas/common.yaml#/Ulid
+    storeSlug:
+      $ref: ../schemas/common.yaml#/Slug
+    storeName:
+      type: string
+    distanceM:
+      type: integer
+      minimum: 0
+      description: Rounded to the nearest 500 m, never below 500.
+    pricePaise:
+      type:
+        - integer
+        - "null"
+      minimum: 1
+      description: Per unit; null is a Yes with no price ("Ask the shop for the price").
+    readyBy:
+      type:
+        - string
+        - "null"
+      format: date-time
+    repliedAt:
+      $ref: ../schemas/common.yaml#/Timestamp
+    priceValidUntil:
+      type:
+        - string
+        - "null"
+      format: date-time
+      description: Null when the reply has no price.
+    storeItemId:
+      type:
+        - string
+        - "null"
+      description: The item to book; null when the shop does not list it.
+    listedPricePaise:
+      type:
+        - integer
+        - "null"
+      minimum: 0
+      description: The item's price now (shown once the reply's price ends); null without an item.
+    bookable:
+      type: boolean
+      description: The shop takes online orders now and the reply has an item.
+    inStoreOnly:
+      type: boolean
+    orderId:
+      type:
+        - string
+        - "null"
+      description: The active order already placed from this reply ("View order").
+AskDetail:
+  type: object
+  required: [ask, replies, serverNow]
+  properties:
+    ask:
+      $ref: ../schemas/asks.yaml#/Ask
+    replies:
+      type: array
+      description: The Yes replies, first reply first.
+      items:
+        $ref: ../schemas/asks.yaml#/AskReply
+    serverNow:
+      $ref: ../schemas/common.yaml#/ServerNow
+AskList:
+  type: object
+  required: [asks, nextCursor]
+  properties:
+    asks:
+      type: array
+      items:
+        $ref: ../schemas/asks.yaml#/Ask
+    nextCursor:
+      $ref: ../schemas/common.yaml#/NextCursor
+DistanceBand:
+  type: string
+  enum: [lt_1km, 1_3km, 3_5km, gt_5km]
+StoreAsk:
+  type: object
+  description: One ask as the shop sees it (B-20). No customer field, no exact distance.
+  required: [askId, itemName, productId, storeItemId, quantity, needBy, distanceBand, sentAt, replyBy,
+    status, answer, pricePaise, readyBy, repliedAt, reported, available, listedPricePaise, mrpPaise]
+  properties:
+    askId:
+      $ref: ../schemas/common.yaml#/Ulid
+    itemName:
+      type: string
+    productId:
+      type:
+        - string
+        - "null"
+    storeItemId:
+      type:
+        - string
+        - "null"
+      description: The shop's own item for the product, when it lists it.
+    quantity:
+      type: integer
+    needBy:
+      type:
+        - string
+        - "null"
+      enum: [now, today, tomorrow, null]
+    distanceBand:
+      $ref: ../schemas/asks.yaml#/DistanceBand
+    sentAt:
+      $ref: ../schemas/common.yaml#/Timestamp
+    replyBy:
+      $ref: ../schemas/common.yaml#/Timestamp
+    status:
+      type: string
+      enum: [open, replied, missed]
+    answer:
+      type:
+        - string
+        - "null"
+      enum: [yes, no, null]
+    pricePaise:
+      type:
+        - integer
+        - "null"
+    readyBy:
+      type:
+        - string
+        - "null"
+      format: date-time
+    repliedAt:
+      type:
+        - string
+        - "null"
+      format: date-time
+    reported:
+      type: boolean
+    available:
+      type:
+        - integer
+        - "null"
+      description: On hand less reserved ("You have {n}"); null when the shop does not list it.
+    listedPricePaise:
+      type:
+        - integer
+        - "null"
+    mrpPaise:
+      type:
+        - integer
+        - "null"
+      description: The item's MRP, else the master product's.
+StoreAskList:
+  type: object
+  required: [asks, openCount, nextCursor, serverNow]
+  properties:
+    asks:
+      type: array
+      items:
+        $ref: ../schemas/asks.yaml#/StoreAsk
+    openCount:
+      type: integer
+    nextCursor:
+      $ref: ../schemas/common.yaml#/NextCursor
+    serverNow:
+      $ref: ../schemas/common.yaml#/ServerNow
+AskReplyCreate:
+  type: object
+  additionalProperties: false
+  required: [answer]
+  properties:
+    answer:
+      type: string
+      enum: [yes, no]
+    pricePaise:
+      type: integer
+      minimum: 1
+      maximum: 10000000
+      description: >-
+        Per unit, with a Yes only. Prefilled from the listed price; only a role with
+        item.price.edit may change it (a cashier sends the listed price). Never above the MRP.
+    readyBy:
+      $ref: ../schemas/common.yaml#/Timestamp
+AskReportCreate:
+  type: object
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason:
+      type: string
+      enum: [spam, abusive, not_a_real_ask, other]

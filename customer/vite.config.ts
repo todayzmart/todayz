@@ -5,6 +5,9 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import type * as ShareFn from './functions/x/[code]';
+
+type ShareModule = typeof ShareFn;
 
 // MapLibre's worker is copied into dist as an asset (`?url` import in @todayz/ui/map) with its own
 // sourceMappingURL comment; shipped files must not point at maps (dist-check), so the comment is dropped.
@@ -23,6 +26,33 @@ function stripAssetSourceMapComments(): Plugin {
   };
 }
 
+// `/x/{code}` share links (W3-16): in dev the Pages Function's renderShare runs as middleware, so link
+// previews behave as in production. Anything it cannot render falls through to the app's `/x/$code` route.
+function shareLinks(apiBase: string): Plugin {
+  return {
+    name: 'tz-share-links',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const m = /^\/x\/([0-9A-Za-z]{10})(?:\?|$)/.exec(req.url ?? '');
+        if (req.method !== 'GET' || !m?.[1]) return next();
+        const code = m[1];
+        const origin = `https://${req.headers.host ?? 'app.todayz.localhost'}`;
+        server
+          .ssrLoadModule('/functions/x/[code].ts')
+          .then((mod) => (mod as ShareModule).renderShare(code, origin, apiBase.replace(/\/$/, '')))
+          .then(async (r) => {
+            if (!r) return next();
+            res.statusCode = r.status;
+            r.headers.forEach((v, k) => res.setHeader(k, v));
+            res.end(await r.text());
+          })
+          .catch(() => next());
+      });
+    },
+  };
+}
+
 // Customer PWA: app.todayz.in, locally https://app.todayz.localhost (Caddy) -> 127.0.0.1:5301.
 // A production build needs a real VITE_TURNSTILE_SITE_KEY and an https VITE_API_URL (authDefines throws
 // without them); development, test and the e2e build fall back to the local API and Cloudflare's test key.
@@ -35,6 +65,7 @@ export default defineConfig(({ mode }) => ({
     react(),
     todayzIcons(),
     stripAssetSourceMapComments(),
+    shareLinks(loadEnv(mode, process.cwd(), 'VITE_')['VITE_API_URL'] ?? ''),
     VitePWA({
       registerType: 'prompt',
       injectRegister: false,

@@ -140,10 +140,10 @@ func TestBasketLogsAndValidationBSK14(t *testing.T) {
 	logs := f.logRows()
 	require.Len(t, logs, 3)
 	prod := f.butter100
-	assert.Equal(t, logRow{query: "amul butter", results: 1, store: 1, product: &prod, source: "basket"}, logs[0])
+	assert.Equal(t, logRow{query: "amul butter", results: 1, store: 1, product: &prod, source: "basket", cell: qaCell()}, logs[0])
 	assert.Equal(t, "amull buttr", logs[1].query)
 	assert.Equal(t, "basket", logs[1].source)
-	assert.Equal(t, logRow{query: "paneer", source: "basket"}, logs[2])
+	assert.Equal(t, logRow{query: "paneer", source: "basket", cell: qaCell()}, logs[2])
 	var n int
 	require.NoError(t, f.tdb.OwnerPool.QueryRow(context.Background(),
 		`SELECT (SELECT count(*) FROM stock_reservations) + (SELECT count(*) FROM orders)`).Scan(&n))

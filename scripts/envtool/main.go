@@ -29,7 +29,8 @@ import (
 	"time"
 )
 
-// AppKeys is the D-18 table, in the order make setup generates them.
+// AppKeys is the D-18 table, in the order make setup generates them, then
+// SHARE_PREVIEW_KEY (W3-16: the share-preview Pages Function's secret).
 var AppKeys = []string{
 	"JWT_SIGNING_KEYS",
 	"JWT_CURRENT_KID",
@@ -40,6 +41,7 @@ var AppKeys = []string{
 	"PII_HASH_KEY",
 	"DEVICE_SECRET_ENC_KEY",
 	"TOTP_ENC_KEY",
+	"SHARE_PREVIEW_KEY",
 }
 
 func main() {

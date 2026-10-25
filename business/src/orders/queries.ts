@@ -24,6 +24,7 @@ import { useRealtimeInvalidation, type RealtimeStatus } from '@todayz/realtime';
 import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { API_URL } from '../app/env';
+import { asksKey } from '../asks/api';
 import type { CurrentStore } from './store';
 
 /**
@@ -70,12 +71,15 @@ export function useOrdersStream(store: CurrentStore): RealtimeStatus {
       getToken: () => session.getToken(),
       refresh: () => session.refresh(),
       queryClient,
-      resetKeys: [ordersKey(store.sid)],
+      resetKeys: [ordersKey(store.sid), asksKey(store.sid)],
       onStatus: setStatus,
     },
     {
       'order.created': () => [ordersKey(store.sid)],
       'order.updated': () => [ordersKey(store.sid)],
+      // B-20 (W3-16): a new ask, or one the customer closed.
+      'ask.created': () => [asksKey(store.sid)],
+      'ask.closed': () => [asksKey(store.sid)],
     },
   );
   return status;

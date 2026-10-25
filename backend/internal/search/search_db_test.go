@@ -46,6 +46,13 @@ func card(t *testing.T, r discoverapi.DiscoverSearchResult, slug string) discove
 	return discoverapi.DiscoverSearchStore{}
 }
 
+// qaCell is the H3 res-8 cell of the QA point (D-59), the only location a
+// search_log row keeps.
+func qaCell() *int64 {
+	v := int64(0x8861892ecbfffff)
+	return &v
+}
+
 // logRow is the latest search_log row.
 type logRow struct {
 	query          string
@@ -53,18 +60,19 @@ type logRow struct {
 	product        *string
 	user           *string
 	source         string
+	cell           *int64
 }
 
 func (w *world) logRows() []logRow {
 	w.t.Helper()
-	rows, err := w.tdb.OwnerPool.Query(w.ctx, `SELECT query_norm, results_count, store_count, product_id::text, user_id::text, source
+	rows, err := w.tdb.OwnerPool.Query(w.ctx, `SELECT query_norm, results_count, store_count, product_id::text, user_id::text, source, geo_cell
 	  FROM search_log ORDER BY created_at, id`)
 	require.NoError(w.t, err)
 	defer rows.Close()
 	var out []logRow
 	for rows.Next() {
 		var r logRow
-		require.NoError(w.t, rows.Scan(&r.query, &r.results, &r.store, &r.product, &r.user, &r.source))
+		require.NoError(w.t, rows.Scan(&r.query, &r.results, &r.store, &r.product, &r.user, &r.source, &r.cell))
 		out = append(out, r)
 	}
 	require.NoError(w.t, rows.Err())
@@ -119,7 +127,7 @@ func TestSearchSummaryASK09(t *testing.T) {
 	assert.False(t, r.RefineHint)
 	logs := f.logRows()
 	require.Len(t, logs, 3)
-	assert.Equal(t, logRow{query: "paneer", source: "typed"}, logs[2])
+	assert.Equal(t, logRow{query: "paneer", source: "typed", cell: qaCell()}, logs[2])
 	zero := f.eventsNamed("search_zero_results")
 	require.Len(t, zero, 1)
 	assert.NotContains(t, zero[0], "query")

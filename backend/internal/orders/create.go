@@ -62,8 +62,16 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 	var orderID ids.ID
 	var stale bool
 	var quoteStore ordersdb.StoreForBookingRow
+	// The ask reply the order booked from, or the one whose price had ended,
+	// told to AskEvents once the transaction is over, at the time it was
+	// priced.
+	var askBooked, askRefused *ids.ID
+	var askStore ids.ID
+	var askAt time.Time
 	err = s.db.InTx(ctx, func(ctx context.Context) error {
+		askBooked, askRefused = nil, nil
 		now := s.now()
+		askAt = now
 		q := s.q(ctx)
 		st, storeID, err := s.bookableStore(ctx, c)
 		if err != nil {
@@ -117,9 +125,13 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 			return err
 		}
 		if qq.askReplyID != nil && !qq.askUsable {
-			// TODO(lead): until W3-16 gives an AskPricer, every reply is
-			// refused here (ask_price_expired) and the customer books at the
-			// catalogue price shown in extensions.quote.
+			// A reply that cannot price its line (expired, not a Yes, not
+			// the customer's): the customer books at the catalogue price
+			// shown in extensions.quote. Only an ended price is told as
+			// ask_price_expired.
+			if qq.askExpired {
+				askRefused, askStore = qq.askReplyID, storeID
+			}
 			return problem.New(genproblems.AskPriceExpired, "").WithExtension("quote", qq.view())
 		}
 		if i := qq.firstShort; i >= 0 {
@@ -214,8 +226,12 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		}); err != nil {
 			return fmt.Errorf("orders: new order notice: %w", err)
 		}
+		if qq.askUsable {
+			askBooked, askStore = qq.askReplyID, storeID
+		}
 		return nil
 	})
+	s.tellAsk(ctx, p.UserID, askStore, askBooked, askRefused, askAt, err)
 	if stale {
 		// An offer ran out between the quote and the order: the transaction
 		// is rolled back, so price again and show the customer the new total.
@@ -229,6 +245,23 @@ func (s *Service) create(ctx context.Context, c cart, expectedTotal int) (ids.ID
 		return ids.Zero, asProblem(err)
 	}
 	return orderID, nil
+}
+
+// tellAsk tells AskEvents what became of the ask reply once the order's
+// transaction is over: booked when it committed, refused when it ended in
+// ask_price_expired because the reply's price had ended. now is the time the
+// cart was priced at, so the event agrees with the refusal.
+func (s *Service) tellAsk(ctx context.Context, customerID, storeID ids.ID, booked, refused *ids.ID, now time.Time, err error) {
+	ae, ok := s.askPricer.(AskEvents)
+	if !ok {
+		return
+	}
+	switch {
+	case err == nil && booked != nil:
+		ae.AskBooked(ctx, customerID, storeID, *booked, now)
+	case err != nil && refused != nil:
+		ae.AskPriceExpired(ctx, customerID, storeID, *refused, now)
+	}
 }
 
 // lockCartItems locks the cart's items in id order (LockItems). An id that

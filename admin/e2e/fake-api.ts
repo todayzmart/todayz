@@ -91,6 +91,11 @@ export async function answerEmptyLists(page: Page) {
   await answerWith(page, '/v1/admin/system', (req) => (req.method() === 'GET' ? { status: 200, body: localSystem } : undefined));
   // A-15 for a field agent is their own row, not a list: an agent with no shops yet.
   await answerWith(page, '/v1/admin/field/me/stats', (req) => (req.method() === 'GET' ? { status: 200, body: { stats: emptyAgentStats, serverNow: NOW } } : undefined));
+  // A-23 Demand: the gaps carry their rule from settings, the strip lists cities, not items.
+  await answerWith(page, '/v1/admin/demand-gaps**', (req) =>
+    req.method() === 'GET' ? { status: 200, body: { items: [], days: 7, minCustomers: 3, serverNow: NOW } } : undefined,
+  );
+  await answerWith(page, '/v1/admin/site-marquee', (req) => (req.method() === 'GET' ? { status: 200, body: { cities: [], minSearchers: 5, serverNow: NOW } } : undefined));
   // A-02 Pulse is one summary, not a list: a platform with nothing in it yet.
   await answerWith(page, '/v1/admin/pulse**', (_req, url) => ({ status: 200, body: url.pathname.endsWith('/map') ? emptyPulseMap : emptyPulse }));
 }

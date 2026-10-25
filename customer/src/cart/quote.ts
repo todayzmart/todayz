@@ -3,14 +3,14 @@ import { quoteCheckout } from '@todayz/api-client/gen/orders/orders';
 import type { CheckoutQuote } from '@todayz/api-client/gen/model/checkoutQuote';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import type { CartState } from './cart';
+import { askReplyOf, type CartState } from './cart';
 import { CREDITS_PROBE, creditsState, useCreditsChoice } from './credits';
 import { fulfilmentKey, type Fulfilment } from './fulfilment';
 
 const PICKUP: Fulfilment = { fulfilment: 'pickup' };
 
 export function quoteKey(cart: CartState, credits = 0, f: Fulfilment = PICKUP): readonly unknown[] {
-  return ['quote', cart.store?.id ?? '', cart.lines.map((l) => `${l.storeItemId}:${l.qty}`).join(','), fulfilmentKey(f), credits];
+  return ['quote', cart.store?.id ?? '', cart.lines.map((l) => `${l.storeItemId}:${l.qty}`).join(','), fulfilmentKey(f), credits, askReplyOf(cart) ?? ''];
 }
 
 /**
@@ -27,13 +27,16 @@ export function useCartQuote(cart: CartState, enabled: boolean, credits = 0, f: 
     // Moving only the credits keeps the last price on screen (marked as a placeholder) instead of a blank.
     placeholderData: (prev, prevQuery) =>
       prevQuery && prevQuery.queryKey.slice(0, 4).join('|') === quoteKey(cart, 0, f).slice(0, 4).join('|') ? prev : undefined,
-    queryFn: () =>
-      quoteCheckout({
+    queryFn: () => {
+      const askReplyId = askReplyOf(cart);
+      return quoteCheckout({
         storeId: cart.store?.id ?? '',
         ...f,
         items: cart.lines.map((l) => ({ storeItemId: l.storeItemId, quantity: l.qty })),
         creditsToUse: credits,
-      }),
+        ...(askReplyId ? { askReplyId } : {}),
+      });
+    },
   });
 }
 

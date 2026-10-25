@@ -9,6 +9,7 @@ import (
 	"github.com/todayz/backend/gen/sqlc/rollupsdb"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/db"
+	"github.com/todayz/backend/internal/platform/geo/h3"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/settings"
 	"github.com/todayz/backend/internal/testkit"
@@ -287,6 +288,17 @@ func TestRollupsMatchRawCountsForASeededDay(t *testing.T) {
 	}
 	if n := e.count(`SELECT zero_results FROM rollup_daily_search_demand WHERE date = $1 AND query_norm = 'kokum syrup'`, seedDay.pg()); n != 3 {
 		t.Errorf("kokum syrup zero results = %d, want 3", n)
+	}
+	// Each demand cell gets its centre (D-81), placed where H3 puts it.
+	for _, v := range []int64{0x8861892653fffff, 0x8861892655fffff} {
+		lat, lng, err := h3.CellToLatLng(h3.FromInt64(v))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if n := e.count(`SELECT count(*) FROM insight_geo_cells WHERE geo_cell = $1
+			AND ST_DWithin(centre, ST_SetSRID(ST_MakePoint($2::float8, $3::float8), 4326)::geography, 1)`, v, lng, lat); n != 1 {
+			t.Errorf("insight_geo_cells centre of %x: %d rows, want 1", v, n)
+		}
 	}
 }
 

@@ -10,7 +10,7 @@ import { Banknote, ShoppingBag } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useUpdateController } from '../app/update-context';
-import { clearCart, useCart } from '../cart/cart';
+import { askReplyOf, clearCart, dropAskReply, useCart } from '../cart/cart';
 import { CreditsControl } from '../cart/CreditsControl';
 import { DeliveryProblemBanner, FulfilmentSwitch } from '../cart/Delivery';
 import { deliveryProblemOf, type DeliveryProblem } from '../cart/deliveryRules';
@@ -41,6 +41,7 @@ function problemOf(err: unknown): PlaceProblem {
   switch (err.code) {
     case 'price_changed':
     case 'ask_price_expired':
+    case 'ask_reply_used':
       return { kind: 'price_changed' };
     case 'insufficient_stock':
       return {
@@ -86,6 +87,21 @@ export function CheckoutPage() {
   // else by the first tap on the button.
   const q = quote.data;
   const repriced = q ? priceMoves(cart.lines, q) : [];
+
+  // A priced reply the quote no longer prices at (its price ended, or it is not this person's): drop
+  // it now, so the cart is asked again without it and the new total is accepted once, not again after
+  // placing answers ask_price_expired. A Yes without a price is quoted at the catalogue and keeps it.
+  // A reply that already booked an open order (`ask_reply_used`) is dropped the same way.
+  const askLine = cart.lines.find((l) => l.askPriced && typeof l.askReplyId === 'string');
+  const offReply =
+    (askLine !== undefined &&
+      q !== undefined &&
+      !quote.isPlaceholderData &&
+      q.lines.some((l) => l.storeItemId === askLine.storeItemId && l.priceSource !== 'ask_reply')) ||
+    (askReplyOf(cart) !== undefined && quote.error instanceof ApiError && quote.error.code === 'ask_reply_used');
+  useEffect(() => {
+    if (offReply) dropAskReply();
+  }, [offReply]);
   const agreed = accepted ?? (q && repriced.length === 0 ? q.totalPaise : null);
 
   const closed = problem?.kind === 'store_closed' || (quote.error instanceof ApiError && quote.error.code === 'store_closed');
@@ -145,12 +161,14 @@ export function CheckoutPage() {
       return;
     }
     const items = cart.lines.map((l) => ({ storeItemId: l.storeItemId, quantity: l.qty }));
+    const askReplyId = askReplyOf(cart);
     const body = {
       storeId: store.id,
       ...ful.quoted,
       items,
       creditsToUse: q.creditsUsed,
       expectedTotalPaise: q.totalPaise,
+      ...(askReplyId ? { askReplyId } : {}),
     };
     // One key per attempt; a retry of the same order reuses it so the shop gets one order (BK-04).
     const sig = JSON.stringify(body);
@@ -168,7 +186,13 @@ export function CheckoutPage() {
     } catch (err) {
       const p = problemOf(err);
       setProblem(p);
-      if (p.kind === 'price_changed' && err instanceof ApiError) {
+      if (err instanceof ApiError && (err.code === 'ask_price_expired' || err.code === 'ask_reply_used')) {
+        // The reply's price ran out, or the reply already booked an open order: the line stays at the
+        // current price, asked again without the reply, and the new total waits for a second tap.
+        dropAskReply();
+        setAccepted(null);
+        void client.invalidateQueries({ queryKey: ['quote'] });
+      } else if (p.kind === 'price_changed' && err instanceof ApiError) {
         // The 409 carries the fresh quote: show it and wait for a second tap.
         const fresh = err.problem.extensions?.['quote'] as CheckoutQuote | undefined;
         if (fresh) client.setQueryData(quoteKey(cart, q?.creditsRequested ?? 0, ful.quoted), fresh);

@@ -1,0 +1,140 @@
+# Paths: domain "admin-demand" (owner W3-16): A-23 Demand (04 §2.7; 01 §11.2–§11.3; D-101).
+#
+# Gaps (`admin.demand_gaps.view`: field_agent, catalogue, analyst, admin, super_admin) are read-only
+# counts, never a customer. The site strip (`admin.marquee.approve`: catalogue, admin, super_admin)
+# shows only what an admin approved; every decision is audited
+# (internal/platform/authz/policy/asks.go).
+/v1/admin/demand-gaps:
+  get:
+    operationId: listDemandGaps
+    tags: [admin-demand]
+    summary: Products asked for with no Yes (A-23 Gaps)
+    description: >-
+      Per city, products (or asked words) asked by at least `ask_gap_min_customers` distinct customers
+      in the last `days` days (default `ask_gap_window_days`) with no Yes from any shop; most customers
+      first. `city` narrows to one city.
+    parameters:
+      - name: city
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Ulid
+      - name: days
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 30
+    responses:
+      "200":
+        description: The gaps
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-demand.yaml#/DemandGapList
+            example:
+              items:
+                - cityId: 01JB0PC1A2B3C4D5E6F7G8H9J0
+                  cityName: Bengaluru
+                  productId: 01JB0SP1R2Q3D4V5C6T7A8B9C0
+                  itemName: Amul Butter 500 g
+                  category: Dairy
+                  customers: 12
+                  asks: 15
+                  shopsAsked: 40
+                  lastAskedAt: "2026-10-25T09:30:00Z"
+              days: 7
+              minCustomers: 10
+              serverNow: "2026-10-25T10:00:00Z"
+      default: &problem
+        $ref: ../common/responses.yaml#/Problem
+/v1/admin/site-marquee:
+  get:
+    operationId: listSiteMarquee
+    tags: [admin-demand]
+    summary: The site strip per city, proposed and approved (A-23 Site strip)
+    description: Every city with a build, or only `city`.
+    parameters:
+      - name: city
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Ulid
+    responses:
+      "200":
+        description: The cities
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-demand.yaml#/MarqueeCityList
+            example:
+              cities:
+                - &city
+                  cityId: 01JB0PC1A2B3C4D5E6F7G8H9J0
+                  cityName: Bengaluru
+                  citySlug: bengaluru
+                  latest:
+                    builtOn: "2026-10-25"
+                    status: proposed
+                    decidedAt: null
+                    items:
+                      - productId: 01JB0SP1R2Q3D4V5C6T7A8B9C0
+                        productName: Amul Butter 500 g
+                        category: Dairy
+                        searchers: 14
+                        searchesTotal: 52
+                        rank: 1
+                        status: proposed
+                  approved: null
+              minSearchers: 10
+              serverNow: "2026-10-25T10:00:00Z"
+      default: *problem
+/v1/admin/site-marquee/{cityId}:
+  parameters:
+    - name: cityId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  put:
+    operationId: decideSiteMarquee
+    tags: [admin-demand]
+    summary: Approve or reject a city's proposed strip (audited)
+    description: >-
+      Only the city's latest build, while it is `proposed`; else `409 invalid_transition`. Approving
+      takes a non-empty subset of the proposal (`422 validation_failed` on `body.productIds`
+      otherwise); the products left out are rejected.
+    x-idempotency: optional
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-demand.yaml#/MarqueeDecision
+          example:
+            builtOn: "2026-10-25"
+            decision: approve
+            productIds: [01JB0SP1R2Q3D4V5C6T7A8B9C0]
+    responses:
+      "200":
+        description: The city after the decision
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-demand.yaml#/MarqueeCity
+            example:
+              <<: *city
+              latest: &decided
+                builtOn: "2026-10-25"
+                status: approved
+                decidedAt: "2026-10-25T10:05:00Z"
+                items:
+                  - productId: 01JB0SP1R2Q3D4V5C6T7A8B9C0
+                    productName: Amul Butter 500 g
+                    category: Dairy
+                    searchers: 14
+                    searchesTotal: 52
+                    rank: 1
+                    status: approved
+              approved: *decided
+      default: *problem

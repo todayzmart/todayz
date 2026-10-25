@@ -19,7 +19,7 @@ var domains = []string{
 	"credits", "orders", "referrals", "pos", "notify",
 	"reviews", "offers", "banners", "support", "payouts",
 	"risk", "insights", "voice", "admin", "rollups",
-	"ai", "coach", "standee", "baskets",
+	"ai", "coach", "standee", "baskets", "asks",
 }
 
 func TestOneLineAndOneFilePerDomain(t *testing.T) {

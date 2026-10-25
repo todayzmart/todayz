@@ -44,6 +44,7 @@ const BUILT_ACTIONS: Readonly<Record<string, string>> = {
   [JOBS('pause')]: 'audit.action.jobPause',
   [JOBS('resume')]: 'audit.action.jobResume',
   [JOBS('retry')]: 'audit.action.jobRetry',
+  ['marquee.decide']: 'audit.action.marqueeDecide',
 };
 
 /** Audit actions the console names; any other action shows as written (it is still audited). */

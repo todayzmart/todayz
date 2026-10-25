@@ -1,0 +1,57 @@
+# Product events: asks (05 §2.6). Owner W3-16. Emitted by the API (app 'api').
+# One file per domain (D-50); an event name may be defined in only one file.
+# Never a customer id, name, phone or address in props: the place is the H3
+# resolution-8 cell (its hex string) and the city only.
+domain: asks
+owner: W3-16
+events:
+  ask_created:
+    emitter: server
+    description: A customer's ask went out to shops (POST /v1/me/asks, C-25).
+    props:
+      target: { type: enum, values: [nearby, one_shop] }
+      has_product: { type: bool }
+      quantity: { type: int, min: 1, max: 99 }
+      need_by: { type: enum, values: [now, today, tomorrow, unset] }
+      recipients: { type: int, min: 1 }
+      low_yield: { type: bool }
+      geo_cell: { type: token, optional: true }
+      city_id: { type: ulid, optional: true }
+  ask_replied:
+    emitter: server
+    description: A shop answered an ask Yes or No (B-20). by_role is the replying staff's role.
+    props:
+      answer: { type: enum, values: ["yes", "no"] }
+      seconds_to_reply: { type: int, min: 0 }
+      priced: { type: bool }
+      listed: { type: bool }
+      by_role: { type: enum, values: [owner, manager, cashier] }
+  ask_closed:
+    emitter: server
+    description: An ask closed, by every shop replying, every reply window ending, or the customer.
+    props:
+      reason: { type: enum, values: [all_replied, window_ended, customer_closed] }
+      yes_count: { type: int, min: 0 }
+      recipients: { type: int, min: 0 }
+  ask_booked:
+    emitter: server
+    description: >-
+      An order was placed from the customer's Yes reply (orders tells asks through
+      orders.AskEvents once the order has committed). price_source is ask_reply for a
+      priced Yes and catalogue for a Yes without a price.
+    props:
+      minutes_since_reply: { type: int, min: 0 }
+      price_source: { type: enum, values: [ask_reply, catalogue] }
+  ask_price_expired:
+    emitter: server
+    description: >-
+      Placing an order from the customer's priced Yes was refused (409
+      ask_price_expired) because the replied price had ended. Quotes never emit it;
+      a refusal for another reason (another customer's reply, the item not in the
+      cart) is not counted.
+    props: {}
+  ask_reported:
+    emitter: server
+    description: A shop reported an ask (B-20 "Report this ask"); the customer is never told.
+    props:
+      reason: { type: enum, values: [spam, abusive, not_a_real_ask, other] }

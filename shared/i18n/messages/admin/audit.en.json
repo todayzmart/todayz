@@ -354,5 +354,9 @@
   "audit.action.jobRetry": {
     "defaultMessage": "Job run retried",
     "description": "Audit action: an admin retried a failed, discarded or missed job run, with a reason (A-21)"
+  },
+  "audit.action.marqueeDecide": {
+    "defaultMessage": "Site strip decided",
+    "description": "Audit action: an admin approved part of a city's proposed site strip and left out the rest (A-23)"
   }
 }

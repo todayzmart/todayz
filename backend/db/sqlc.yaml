@@ -213,3 +213,10 @@ sql:
         <<: *go
         package: basketsdb
         out: ../gen/sqlc/basketsdb
+  - <<: *pkg
+    queries: queries/asks
+    gen:
+      go:
+        <<: *go
+        package: asksdb
+        out: ../gen/sqlc/asksdb

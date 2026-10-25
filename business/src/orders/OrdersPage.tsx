@@ -3,6 +3,8 @@ import { Link } from '@tanstack/react-router';
 import { BellRing, Inbox, Store as StoreIcon, Volume2, VolumeX } from 'lucide-react';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
+import { AsksInbox } from '../asks/AsksInbox';
+import { useOpenAsks } from '../asks/api';
 import { useAlertingOrders } from './alerts';
 import { NewOrderCard, OrderRow } from './OrderCards';
 import { TABS, useOrderList, useOrdersStream, type OrderTab } from './queries';
@@ -13,7 +15,7 @@ import styles from './orders.module.css';
 type TabValue = OrderTab | 'asks';
 
 /** B-04 Orders: the business app's order desk. */
-export function OrdersPage() {
+export function OrdersPage({ initialTab }: { initialTab?: 'asks' | undefined } = {}) {
   const intl = useIntl();
   const current = useCurrentStore();
   return (
@@ -44,26 +46,27 @@ export function OrdersPage() {
           }
         />
       )}
-      {current.status === 'ready' && <OrdersDesk store={current.store} />}
+      {current.status === 'ready' && <OrdersDesk store={current.store} initialTab={initialTab} />}
     </div>
   );
 }
 
-function OrdersDesk({ store }: { store: CurrentStore }) {
+function OrdersDesk({ store, initialTab }: { store: CurrentStore; initialTab: 'asks' | undefined }) {
   const intl = useIntl();
-  const [tab, setTab] = useState<TabValue>('new');
+  const [tab, setTab] = useState<TabValue>(initialTab ?? 'new');
   const stream = useOrdersStream(store);
   const newList = useOrderList(store, 'new');
   const active = useOrderList(store, tab === 'asks' ? 'new' : tab);
   const alerting = useAlertingOrders(store.sid, newList.data?.items);
   const sound = useSoundAlert(alerting.length > 0);
   const newItems = newList.data?.items.length ?? 0;
+  const asks = useOpenAsks(store);
 
   const tabs: TabItem<TabValue>[] = [
     { value: 'new', label: intl.formatMessage({ id: 'orders.tab.new' }), count: newItems },
     ...TABS.filter((t) => t !== 'new').map((t) => ({ value: t, label: intl.formatMessage({ id: `orders.tab.${t}` }) })),
-    // TODO(W3-16): the Asks tab mounts B-20, the asks inbox. Empty slot until then.
-    { value: 'asks', label: intl.formatMessage({ id: 'orders.tab.asks' }) },
+    // B-20 (W3-16): the count is the asks waiting for a reply.
+    { value: 'asks', label: intl.formatMessage({ id: 'orders.tab.asks' }), count: asks.data?.openCount ?? 0 },
   ];
 
   return (
@@ -93,11 +96,7 @@ function OrdersDesk({ store }: { store: CurrentStore }) {
       ) : null}
       <Tabs label={intl.formatMessage({ id: 'orders.tabs.label' })} tabs={tabs} value={tab} onChange={setTab} />
       {tab === 'asks' ? (
-        <EmptyState
-          icon={Inbox}
-          title={intl.formatMessage({ id: 'orders.asks.empty.title' })}
-          description={intl.formatMessage({ id: 'orders.asks.empty.body' })}
-        />
+        <AsksInbox store={store} />
       ) : (
         <TabBody store={store} tab={tab} query={active} />
       )}

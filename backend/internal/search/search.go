@@ -22,9 +22,9 @@
 //     platform_settings through settings.Cache; nothing here hard-codes one.
 //   - Search never calls a model (01 §11.1). The refine-chip parser is not
 //     built yet: `parse` is accepted and `chips` is always empty.
-//   - The customer's coordinates are never stored or logged; search_log and
-//     the search events carry no location (geo_cell stays NULL until the H3
-//     cell is computed) and no query text in events.
+//   - The customer's coordinates are never stored or logged; search_log keeps
+//     only the H3 res-8 cell (D-59), the search events carry no location and
+//     no query text.
 //   - Logging a search never fails the search.
 package search
 
