@@ -1349,3 +1349,84 @@ func TestPOSSaleReview(t *testing.T) {
 	require.Equal(t, http.StatusOK, p.reverse(p.manager, reversed).code)
 	require.Equal(t, "review_not_eligible", problemCode(review(reversed)))
 }
+
+// W2-16: GET {S}/pos/sales lists the store's sales newest first, paged, with
+// each link's status and, for a failed offline counter code, why: used
+// before, wrong, clock off, synced too late. No phone, code or receipt token
+// comes back, and another store's cashier is refused.
+func TestW216SalesListLinkFailures(t *testing.T) {
+	p := newPosShop(t)
+	secret := p.seed(p.cust)
+	now := p.a.clk.Now()
+	codeLink := func(code string, offset time.Duration) map[string]any {
+		return map[string]any{"method": "counter_code", "phone": custPhone, "code": code, "clockOffsetMs": offset.Milliseconds()}
+	}
+	at := func(back time.Duration) time.Time { return now.Add(-back) }
+	t1, t2, t3, t4 := at(5*time.Hour), at(4*time.Hour), at(3*time.Hour), at(12*time.Hour+time.Minute)
+	es := []any{
+		p.saleEntry(1, t4, codeLink(testTOTP(secret, t4), 0), line{p.salt, 1}),                                // too late
+		p.saleEntry(2, t1, codeLink(testTOTP(secret, t1), 0), line{p.salt, 2}),                                // linked
+		p.saleEntry(3, t1, codeLink(testTOTP(secret, t1), 0), line{p.salt, 1}),                                // the same code again
+		p.saleEntry(4, t2.Add(3*time.Minute), codeLink(testTOTP(secret, t2), 3*time.Minute), line{p.salt, 1}), // clock 3 min ahead
+		p.saleEntry(5, t3, codeLink(testTOTP(secret, t3.Add(-time.Hour)), 0), line{p.salt, 1}),                // an hour-old code
+	}
+	r := p.sync(p.cashier, es...)
+	require.Equal(t, http.StatusOK, r.code, "sync: status %d", r.code)
+	require.Equal(t, []any{"failed", "linked", "failed", "failed", "failed"}, linkStatuses(r))
+	online := p.sell(p.cashier, p.saleBody(p.newID(), line{p.butter, 1}))
+	require.Equal(t, http.StatusOK, online.code, online.raw)
+
+	var got []map[string]any
+	cursor := ""
+	for range 5 {
+		path := p.S + "/pos/sales?limit=2"
+		if cursor != "" {
+			path += "&cursor=" + cursor
+		}
+		lr := p.a.call(p.cashier, http.MethodGet, path, nil, nil)
+		require.Equal(t, http.StatusOK, lr.code, lr.raw)
+		require.NotContains(t, lr.raw, custPhone)
+		require.NotContains(t, lr.raw, "receiptToken")
+		for _, it := range lr.body["items"].([]any) {
+			got = append(got, it.(map[string]any))
+		}
+		next, _ := lr.body["nextCursor"].(string)
+		if next == "" {
+			break
+		}
+		cursor = next
+	}
+	require.Len(t, got, 6)
+	for i := 1; i < len(got); i++ {
+		a, _ := time.Parse(time.RFC3339Nano, got[i-1]["soldAt"].(string))
+		b, _ := time.Parse(time.RFC3339Nano, got[i]["soldAt"].(string))
+		require.False(t, a.Before(b), "newest first")
+	}
+	byID := map[string]map[string]any{}
+	for _, it := range got {
+		byID[it["id"].(string)] = it
+	}
+	sale := func(i int) map[string]any { return byID[results(r)[i]["saleId"].(string)] }
+	failure := func(i int) any { return sale(i)["link"].(map[string]any)["failure"] }
+	require.Equal(t, "too_late", failure(0))
+	require.Nil(t, failure(1))
+	require.Equal(t, "linked", sale(1)["link"].(map[string]any)["status"])
+	require.EqualValues(t, 2, sale(1)["unitCount"])
+	require.EqualValues(t, 1, sale(1)["lineCount"])
+	require.Equal(t, true, sale(1)["offline"])
+	require.Equal(t, "code_used", failure(2))
+	require.Equal(t, "clock_off", failure(3))
+	require.Equal(t, "code_wrong", failure(4))
+	for _, i := range []int{0, 2, 3, 4} {
+		require.Nil(t, sale(i)["link"].(map[string]any)["customerName"], "a failed link names no customer")
+	}
+	on := byID[online.body["id"].(string)]
+	require.Nil(t, on["link"])
+	require.Equal(t, false, on["offline"])
+
+	lr := p.a.call(p.cashierS2, http.MethodGet, p.S+"/pos/sales", nil, nil)
+	require.Equal(t, http.StatusForbidden, lr.code, lr.raw)
+	lr = p.a.call(p.cashier, http.MethodGet, p.S+"/pos/sales?cursor=nope", nil, nil)
+	require.Equal(t, http.StatusUnprocessableEntity, lr.code, lr.raw)
+	p.noSecrets(custPhone, testTOTP(secret, t1))
+}

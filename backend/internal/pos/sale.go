@@ -61,6 +61,16 @@ const (
 	linkFailed  = "failed"
 )
 
+// Why an offline counter code failed (pos_sales.link_fail_reason, W2-16).
+const (
+	failCodeUsed   = "code_used"
+	failCodeWrong  = "code_wrong"
+	failClockOff   = "clock_off"
+	failTooLate    = "too_late"
+	failLocked     = "locked"
+	failUnverified = "unverified"
+)
+
 // receiptTTL is how long a receipt link works (D-45: 30 days; there is no
 // setting for it).
 const receiptTTL = 30 * 24 * time.Hour //settings:ok D-45 fixes the receipt link at 30 days
@@ -76,6 +86,7 @@ var payments = []string{"cash", "upi", "card", "other"}
 // link is a sale's customer link as it will be written.
 type link struct {
 	method, status string // "" when the sale has no link
+	failReason     string // a failed offline counter code: why (W2-16)
 	customerID     ids.ID
 	phoneHash      []byte
 	phoneEnc       []byte
@@ -152,7 +163,7 @@ func (s *Service) writeSale(ctx context.Context, st posdb.StoreInfoRow, in saleW
 		ID: ids.UUID(saleID), StoreID: ids.UUID(in.StoreID), ClientID: ids.UUID(in.ClientID),
 		DeviceID: ids.UUID(in.Device), DeviceSeq: in.DeviceSeq, CashierUserID: ids.UUID(in.Cashier),
 		CustomerID: nullID(l.customerID), LinkMethod: optString(l.method), LinkStatus: optString(l.status),
-		OfflineLinkAt: l.offlineAt, DeviceClockSkewMs: l.skewMs,
+		LinkFailReason: optString(l.failReason), OfflineLinkAt: l.offlineAt, DeviceClockSkewMs: l.skewMs,
 		LinkPhoneHash: l.phoneHash, LinkPhoneEnc: l.phoneEnc, OfflineOfferUnmatched: in.OfferUnmatched,
 		ItemSubtotalPaise: b.ItemSubtotal, BillOfferDiscountPaise: b.BillOffer, SubtotalPaise: b.Subtotal,
 		DiscountPaise: b.Discount, RoundOffPaise: b.RoundOff, CreditsUsed: i32(int64(b.Credits)),
@@ -749,7 +760,7 @@ func (s *Service) saleView(ctx context.Context, row posdb.PosSale, lines []posdb
 		}
 	}
 	if row.LinkMethod != nil {
-		lk := &posapi.PosSaleLink{Method: posapi.PosLinkMethod(*row.LinkMethod), Status: posapi.PosLinkStatus(deref(row.LinkStatus))}
+		lk := &posapi.PosSaleLink{Method: posapi.PosLinkMethod(*row.LinkMethod), Status: posapi.PosLinkStatus(deref(row.LinkStatus)), Failure: linkFailure(row.LinkFailReason)}
 		if row.CustomerID.Valid && *row.LinkMethod != methodPhone {
 			name, err := s.q(ctx).UserName(ctx, row.CustomerID)
 			if err != nil && !isNoRows(err) {
@@ -762,6 +773,16 @@ func (s *Service) saleView(ctx context.Context, row posdb.PosSale, lines []posdb
 		v.Link = lk
 	}
 	return v, nil
+}
+
+// linkFailure is a failed link's reason as the contract names it; nil for
+// none (a sale that failed before W2-16 kept the reason).
+func linkFailure(r *string) *posapi.PosLinkFailure {
+	if r == nil {
+		return nil
+	}
+	f := posapi.PosLinkFailure(*r)
+	return &f
 }
 
 // --- small helpers ---------------------------------------------------------

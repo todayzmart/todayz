@@ -295,6 +295,7 @@ Cashier rights are D-06 as amended by D-65: cashiers run orders day to day (acce
 | Method | Path | Role | Pkg | Notes |
 |---|---|---|---|---|
 | POST | {S}/sync | cashier | W2-04 | offline outbox (sales, movements) in device seq order; returns server deltas. An offline counter-code link carries the typed code, device time and the clock offset at the last online check; verified per D-12, else the sale stays unlinked ("Customer link failed") |
+| GET | {S}/pos/sales | cashier | W2-16 | the store's sales from all devices, newest first by sale time, `limit`/`cursor` keyset; each with `link.status` and, for a failed offline counter code, `link.failure` (`code_used|code_wrong|clock_off|too_late|locked|unverified`, D-12, D-221); no phone, no receipt token. Backs B-05 "Store sales" |
 | POST | {S}/pos/sales | cashier | W2-04 | online sale; `link.method: bill_qr|counter_code|phone_unverified` (D-07); manual line or bill discounts need manager+ (D-06); round-off to the nearest ₹1 is automatic, half rounds up (₹100.50 becomes ₹101, `round_off_paise` −49…+50; D-94), and allowed for cashiers (D-65); response has `receiptToken` (D-45) |
 | POST | {S}/pos/sales/{saleId}/reverse | manager | W2-04 | within `pos_reversal_window_hours` else `409 reversal_window_passed`; `pos_reversal` movement + `reversal` ledger entry (D-08) |
 | POST | {S}/bill-claims | cashier | W2-04 | create bill QR token for a sale/draft |

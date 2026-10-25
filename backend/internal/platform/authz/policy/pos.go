@@ -18,6 +18,7 @@ const (
 	PosDiscount     = "pos.discount"
 	PosReverse      = "pos.reverse"
 	PosSync         = "pos.sync"
+	PosSales        = "pos.sales"
 )
 
 func init() {
@@ -33,5 +34,6 @@ func init() {
 		{Name: PosDiscount, Kind: authz.KindBusiness, Grants: ownerManager, Doc: "a manual line or bill discount on a sale, online or at sync (D-06)"},
 		{Name: PosReverse, Kind: authz.KindBusiness, Grants: ownerManager, Doc: "POST {S}/pos/sales/{saleId}/reverse within pos_reversal_window_hours (D-74)"},
 		{Name: PosSync, Kind: authz.KindBusiness, Grants: staff, Doc: "POST {S}/sync (B-03, B-05); each entry is checked as its own action"},
+		{Name: PosSales, Kind: authz.KindBusiness, Grants: staff, Doc: "GET {S}/pos/sales (B-05 sales history, W2-16): the store's sales with their link status"},
 	}})
 }

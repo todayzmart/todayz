@@ -22,3 +22,7 @@ pos.sync kind=business step-up=false
 pos.sync owner allow
 pos.sync manager allow
 pos.sync cashier allow
+pos.sales kind=business step-up=false
+pos.sales owner allow
+pos.sales manager allow
+pos.sales cashier allow
