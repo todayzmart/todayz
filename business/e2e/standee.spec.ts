@@ -1,5 +1,6 @@
 import { VIEWPORTS, guardPage, shot, type PageGuard } from '@todayz/config/playwright';
 import { expect, test, type Page, type Route } from '@playwright/test';
+import { overview } from '../src/test/insightsData';
 
 // B-10 standee campaigns (W3-09) on the production-shaped build with a faked API (no stack): the
 // funnel per standee and in total, adding a standee and asking for a reprint.
@@ -71,6 +72,8 @@ async function fakeApi(page: Page) {
       return ok(route, items.find((s) => s.id === reorder[1]));
     }
     if (url.pathname === `${base}/orders`) return ok(route, { items: [], nextCursor: null, serverNow: new Date().toISOString() });
+    // The owner's sidebar reads today's overview for the Stock badge and the setup card (W3-03).
+    if (url.pathname === `${base}/overview`) return ok(route, overview({ newOrders: [] }));
     return route.fulfill({ status: 404, contentType: 'application/problem+json', headers: cors(route), body: JSON.stringify({ type: 'about:blank#not_found', title: 'Not found', status: 404, code: 'not_found' }) });
   });
 }

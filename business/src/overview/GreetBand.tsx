@@ -1,4 +1,4 @@
-import { Segmented, StatusPill } from '@todayz/ui';
+import { Segmented } from '@todayz/ui';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { dayPart, longDate, weekday } from './format';
 import styles from './overview.module.css';
@@ -28,7 +28,6 @@ export function GreetBand({ data, period, onPeriod }: GreetBandProps) {
       <div className={styles.greetText}>
         <div className={styles.greetTitle}>
           <h1 className="tz-page-title">{title}</h1>
-          {data.isSample && <StatusPill>{intl.formatMessage({ id: 'overview.sample' })}</StatusPill>}
         </div>
         <p className="tz-page-sub">
           {intl.formatMessage(

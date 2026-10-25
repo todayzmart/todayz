@@ -1,0 +1,246 @@
+{
+  "analytics.title": {
+    "defaultMessage": "Analytics",
+    "description": "B-12 page title."
+  },
+  "analytics.tabs": {
+    "defaultMessage": "Analytics sections",
+    "description": "Accessible name of the B-12 tabs."
+  },
+  "analytics.tab.sales": {
+    "defaultMessage": "Sales",
+    "description": "B-12 tab."
+  },
+  "analytics.tab.insights": {
+    "defaultMessage": "Insights",
+    "description": "B-12 tab."
+  },
+  "analytics.loading": {
+    "defaultMessage": "Loading",
+    "description": "Accessible name of a loading placeholder."
+  },
+  "analytics.more": {
+    "defaultMessage": "Load more",
+    "description": "Button for the next page."
+  },
+  "analytics.error": {
+    "defaultMessage": "Could not load analytics",
+    "description": "Sales tab when the request fails."
+  },
+  "analytics.range": {
+    "defaultMessage": "Period",
+    "description": "Accessible name of the period switch."
+  },
+  "analytics.range.7d": {
+    "defaultMessage": "7 days",
+    "description": "Period option."
+  },
+  "analytics.range.30d": {
+    "defaultMessage": "30 days",
+    "description": "Period option."
+  },
+  "analytics.range.90d": {
+    "defaultMessage": "90 days",
+    "description": "Period option."
+  },
+  "analytics.span": {
+    "defaultMessage": "{from} to {to}",
+    "description": "The days covered, such as 29 Dec to 4 Jan."
+  },
+  "analytics.kpi.label": {
+    "defaultMessage": "Totals",
+    "description": "Accessible name of the totals strip."
+  },
+  "analytics.kpi.sales": {
+    "defaultMessage": "Sales",
+    "description": "Total sales tile."
+  },
+  "analytics.kpi.online": {
+    "defaultMessage": "Online",
+    "description": "Online sales tile."
+  },
+  "analytics.kpi.pos": {
+    "defaultMessage": "Counter",
+    "description": "Counter (POS) sales tile."
+  },
+  "analytics.kpi.bills": {
+    "defaultMessage": "Bills and orders",
+    "description": "Number of POS bills plus completed online orders."
+  },
+  "analytics.daily.title": {
+    "defaultMessage": "Sales by day",
+    "description": "Card title."
+  },
+  "analytics.daily.empty": {
+    "defaultMessage": "No sales in this period",
+    "description": "Empty chart."
+  },
+  "analytics.hourly.title": {
+    "defaultMessage": "Sales by hour",
+    "description": "Card title."
+  },
+  "analytics.series.online": {
+    "defaultMessage": "Online",
+    "description": "Chart legend."
+  },
+  "analytics.series.pos": {
+    "defaultMessage": "Counter",
+    "description": "Chart legend."
+  },
+  "analytics.funnel.title": {
+    "defaultMessage": "Online orders",
+    "description": "Card title of the order funnel."
+  },
+  "analytics.funnel.empty": {
+    "defaultMessage": "No online orders in this period",
+    "description": "Empty funnel."
+  },
+  "analytics.funnel.received": {
+    "defaultMessage": "Received",
+    "description": "Funnel step."
+  },
+  "analytics.funnel.accepted": {
+    "defaultMessage": "Accepted",
+    "description": "Funnel step."
+  },
+  "analytics.funnel.completed": {
+    "defaultMessage": "Completed",
+    "description": "Funnel step: collected or delivered."
+  },
+  "analytics.funnel.missed": {
+    "defaultMessage": "Missed orders",
+    "description": "Accessible name of the missed reasons list."
+  },
+  "analytics.funnel.rejected": {
+    "defaultMessage": "Rejected",
+    "description": "Missed reason."
+  },
+  "analytics.funnel.notAccepted": {
+    "defaultMessage": "Not accepted in time",
+    "description": "Missed reason."
+  },
+  "analytics.funnel.noShow": {
+    "defaultMessage": "Not collected",
+    "description": "Missed reason: the customer did not come."
+  },
+  "analytics.funnel.cancelled": {
+    "defaultMessage": "Cancelled",
+    "description": "Missed reason."
+  },
+  "analytics.accept.p50": {
+    "defaultMessage": "Half your orders are accepted within {time}",
+    "description": "{time} is the median time to accept, such as 1 min 20 s."
+  },
+  "analytics.accept.none": {
+    "defaultMessage": "No accepted orders yet",
+    "description": "No median time to accept."
+  },
+  "analytics.accept.nearby": {
+    "defaultMessage": "Shops nearby: {time}",
+    "description": "Median time to accept of nearby shops."
+  },
+  "analytics.accept.nearbyNone": {
+    "defaultMessage": "Not enough shops nearby to compare",
+    "description": "Fewer than the minimum nearby businesses (D-71)."
+  },
+  "analytics.duration.seconds": {
+    "defaultMessage": "{s} s",
+    "description": "A duration under a minute."
+  },
+  "analytics.duration.minutes": {
+    "defaultMessage": "{m} min {s} s",
+    "description": "A duration of a minute or more."
+  },
+  "analytics.top.title": {
+    "defaultMessage": "Top items",
+    "description": "Card title."
+  },
+  "analytics.mix.title": {
+    "defaultMessage": "Sales by category",
+    "description": "Card title."
+  },
+  "analytics.mix.value": {
+    "defaultMessage": "{amount} · {share}",
+    "description": "Category amount and share, such as ₹4,200 · 32%."
+  },
+  "analytics.repeat.title": {
+    "defaultMessage": "Repeat customers",
+    "description": "Card title."
+  },
+  "analytics.repeat.note": {
+    "defaultMessage": "{repeat} of {customers} linked customers came back",
+    "description": "Repeat rate detail."
+  },
+  "analytics.repeat.notEnough": {
+    "defaultMessage": "Link customers at the counter to see this",
+    "description": "Below the minimum linked customers."
+  },
+  "analytics.ratings.title": {
+    "defaultMessage": "Ratings",
+    "description": "Card title."
+  },
+  "analytics.ratings.empty": {
+    "defaultMessage": "No reviews in this period",
+    "description": "Empty ratings."
+  },
+  "analytics.ratings.week": {
+    "defaultMessage": "Week of {day}",
+    "description": "Ratings row: the week starting {day}."
+  },
+  "analytics.ratings.value": {
+    "defaultMessage": "{stars} ★ · {count, plural, one {# review} other {# reviews}}",
+    "description": "Average stars and number of reviews."
+  },
+  "analytics.insights.intro": {
+    "defaultMessage": "Every insight from the last {days} days, grouped by kind",
+    "description": "Insights tab intro."
+  },
+  "analytics.insights.filter": {
+    "defaultMessage": "Insight kinds",
+    "description": "Accessible name of the kind filter."
+  },
+  "analytics.insights.allKinds": {
+    "defaultMessage": "All",
+    "description": "Kind filter: every kind."
+  },
+  "analytics.insights.none": {
+    "defaultMessage": "Nothing needs you right now",
+    "description": "Insights tab with no rows."
+  },
+  "analytics.insights.error": {
+    "defaultMessage": "Could not load insights",
+    "description": "Insights tab when the request fails."
+  },
+  "analytics.insights.needs.selling_fast": {
+    "defaultMessage": "Shows once an item sells {units} or more in the period",
+    "description": "Needs line: minimum units sold."
+  },
+  "analytics.insights.needs.sitting_on_shelf": {
+    "defaultMessage": "Shows once items have been listed for {days} days",
+    "description": "Needs line: minimum days listed."
+  },
+  "analytics.insights.needs.wanted_nearby": {
+    "defaultMessage": "Shows once there are {searches} or more searches within {distance} for something you do not list",
+    "description": "Needs line: minimum nearby searches."
+  },
+  "analytics.insights.needs.missed_sales": {
+    "defaultMessage": "Shows once {searches} or more nearby searches match an item while it is out of stock",
+    "description": "Needs line: minimum searches on days at 0."
+  },
+  "analytics.insights.needs.bought_together": {
+    "defaultMessage": "Shows once {bills} or more bills have the same two items",
+    "description": "Needs line: minimum bills with a pair."
+  },
+  "analytics.insights.needs.regulars_slipping": {
+    "defaultMessage": "Link customers at the counter to see this",
+    "description": "Needs line: below the minimum linked customers (01 §12)."
+  },
+  "analytics.insights.needs.priced_above_nearby": {
+    "defaultMessage": "Shows once {stores} or more shops nearby list the same products",
+    "description": "Needs line: minimum nearby shops (D-71)."
+  },
+  "analytics.insights.needs.other": {
+    "defaultMessage": "Not enough data yet",
+    "description": "Needs line for any other kind."
+  }
+}

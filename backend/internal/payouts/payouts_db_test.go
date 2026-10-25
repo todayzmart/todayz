@@ -534,6 +534,36 @@ func TestHoldCausesAndCarryForwardDB(t *testing.T) {
 	require.Zero(t, e.count(`SELECT count(*) FROM payout_statements WHERE business_id = $1`, ids.UUID(quiet)))
 }
 
+// 01 §256 (D-225): a confirmed store flag is fraud nobody has cleared, so it
+// keeps the payout held; only clearing the flag releases it.
+func TestConfirmedRiskFlagKeepsTheHoldDB(t *testing.T) {
+	e := newEnv(t)
+	e.at(ist(2026, 7, 5, 12, 0))
+	e.storeReferral(e.s2, 30)
+	flag := e.id()
+	e.exec(`INSERT INTO risk_flags (id, subject_type, subject_id, rule) VALUES ($1, 'store', $2, 'test.rule')`, ids.UUID(flag), ids.UUID(e.s2))
+	e.close(time.July, 2026)
+	p := e.openPayout()
+	require.Equal(t, api.PayoutStatus("held"), p.Payout.Status)
+	require.Equal(t, api.PayoutHoldCause("risk_flag"), *p.Payout.HoldReason)
+	id, err := ids.Parse(p.Payout.Id)
+	require.NoError(t, err)
+
+	e.exec(`UPDATE risk_flags SET status = 'confirmed', reviewed_at = now() WHERE id = $1`, ids.UUID(flag))
+	_, err = e.svc.Unhold(e.ctx, e.finance, id, "flag reviewed")
+	require.Equal(t, "payout_hold_cause_open", code(err), "a confirmed flag still holds")
+	e.at(ist(2026, 8, 3, 12, 0))
+	e.close(time.August, 2026)
+	require.Equal(t, api.PayoutStatus("held"), e.openPayout().Payout.Status, "a close keeps it held")
+
+	e.exec(`UPDATE risk_flags SET status = 'cleared', reviewed_at = now() WHERE id = $1`, ids.UUID(flag))
+	u, err := e.svc.Unhold(e.ctx, e.finance, id, "flag cleared")
+	require.NoError(t, err)
+	require.Equal(t, api.PayoutStatus("pending"), u.Payout.Status)
+	_, err = e.svc.MarkPaid(e.ctx, e.finance, id, "AXIS12345678", u.Payout.AmountPaise, "July payout")
+	require.NoError(t, err)
+}
+
 func mustUUID(t *testing.T, s string) any {
 	t.Helper()
 	id, err := ids.Parse(s)

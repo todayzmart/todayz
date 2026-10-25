@@ -41,6 +41,8 @@ var subjectView = map[api.AdminAuditSubjectType]string{
 	api.AdminAuditSubjectTypePayout:               policy.AdminPayoutView,
 	api.AdminAuditSubjectTypePayoutPeriod:         policy.AdminPayoutView,
 	api.AdminAuditSubjectTypeCreditAdjustment:     policy.AdminLedgerView,
+	api.AdminAuditSubjectTypeRiskFlag:             policy.AdminRiskView,
+	api.AdminAuditSubjectTypeReferral:             policy.AdminReferralsView,
 }
 
 type auditFilter struct {

@@ -265,6 +265,7 @@
 /* Kit gap: .tz-table-wrap scrolls sideways on phones but cannot take focus (axe
    scrollable-region-focusable), so this focusable region does the scrolling instead. */
 .tableScroll {
+  position: relative; /* keeps the absolutely placed screen-reader text inside the scroll box */
   overflow-x: auto;
 }
 
@@ -287,4 +288,25 @@
   color: var(--ink);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+/* The setup steps left, inside the empty Demand insights card. */
+.checklist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checklist a {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.gateLinks {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }

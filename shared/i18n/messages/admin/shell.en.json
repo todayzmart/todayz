@@ -47,6 +47,10 @@
     "defaultMessage": "Credits and referrals",
     "description": "Navigation item"
   },
+  "shell.nav.referrals": {
+    "defaultMessage": "Referrals",
+    "description": "Admin sidebar: A-10 referrals list"
+  },
   "shell.nav.catalogue": {
     "defaultMessage": "Master catalogue",
     "description": "Navigation item"
@@ -74,6 +78,10 @@
   "shell.nav.banners": {
     "defaultMessage": "Banner moderation",
     "description": "Navigation item (A-20)"
+  },
+  "shell.nav.risk": {
+    "defaultMessage": "Risk",
+    "description": "Admin sidebar: A-13 risk flags queue"
   },
   "shell.nav.demand": {
     "defaultMessage": "Demand",

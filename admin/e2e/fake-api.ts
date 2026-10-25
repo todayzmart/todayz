@@ -83,6 +83,10 @@ export async function answerEmptyLists(page: Page) {
       ? { status: 200, body: { items: [], counts: { open: 0, waiting: 0, resolved: 0, closed: 0, overdue: 0 }, nextCursor: null, serverNow: NOW } }
       : undefined,
   );
+  // A-13 lists flags with the open count per rule beside them.
+  await answerWith(page, '/v1/admin/risk/flags**', (req, url) =>
+    req.method() === 'GET' && url.pathname === '/v1/admin/risk/flags' ? { status: 200, body: { items: [], openByRule: [], nextCursor: null, serverNow: NOW } } : undefined,
+  );
   // A-02 Pulse is one summary, not a list: a platform with nothing in it yet.
   await answerWith(page, '/v1/admin/pulse**', (_req, url) => ({ status: 200, body: url.pathname.endsWith('/map') ? emptyPulseMap : emptyPulse }));
 }

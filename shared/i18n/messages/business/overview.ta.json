@@ -1,9 +1,4 @@
 {
-  "overview.sample": {
-    "message": "மாதிரித் தரவு",
-    "review": "reviewed",
-    "enHash": "057f604c"
-  },
   "overview.greet.morning": {
     "message": "காலை வணக்கம், {name}",
     "review": "reviewed",
@@ -209,16 +204,6 @@
     "review": "reviewed",
     "enHash": "65574cf4"
   },
-  "overview.orders.sampleToast": {
-    "message": "மாதிரி ஆர்டர்: எதுவும் மாற்றப்படவில்லை",
-    "review": "reviewed",
-    "enHash": "71a14881"
-  },
-  "overview.orders.open": {
-    "message": "ஆர்டர்களைத் திறக்கவும்",
-    "review": "reviewed",
-    "enHash": "29706cca"
-  },
   "overview.chart.title": {
     "message": "மணிநேர விற்பனை",
     "review": "reviewed",
@@ -285,19 +270,14 @@
     "enHash": "167ad93a"
   },
   "overview.insights.period": {
-    "message": "கடந்த 7 நாட்கள்",
+    "message": "கடந்த {days} நாட்கள்",
     "review": "reviewed",
-    "enHash": "df833fe8"
+    "enHash": "6253cd40"
   },
   "overview.insights.notUseful": {
     "message": "பயனில்லை",
     "review": "reviewed",
     "enHash": "33d21a37"
-  },
-  "overview.insights.hiddenToast": {
-    "message": "இந்த முறைக்கு மறைக்கப்பட்டது. மாதிரித் தரவு: எதுவும் சேமிக்கப்படாது.",
-    "review": "reviewed",
-    "enHash": "110e7b28"
   },
   "overview.insights.all": {
     "message": "அனைத்துத் தகவல்களும்",
@@ -320,14 +300,9 @@
     "enHash": "5cbd2b13"
   },
   "overview.insights.selling_fast.sentence": {
-    "message": "<strong>{item}</strong> இந்த வாரம் {sold} விற்றது. இதே வேகத்தில் {day} அன்று தீர்ந்துவிடும்.",
+    "message": "<strong>{item}</strong> {period, plural, =7 {இந்த வாரம்} other {# நாட்களில்}} {sold} விற்றது. இதே வேகத்தில் {inDays, plural, =0 {இன்று} =1 {நாளை} other {{day} அன்று}} தீர்ந்துவிடும்.",
     "review": "reviewed",
-    "enHash": "4a5bb50c"
-  },
-  "overview.insights.selling_fast.action": {
-    "message": "ஸ்டாக் நிரப்பவும்",
-    "review": "reviewed",
-    "enHash": "3ccf7127"
+    "enHash": "42adf445"
   },
   "overview.insights.sitting_on_shelf.label": {
     "message": "அலமாரியில் தேங்கியுள்ளது",
@@ -339,25 +314,15 @@
     "review": "reviewed",
     "enHash": "bc06fec9"
   },
-  "overview.insights.sitting_on_shelf.action": {
-    "message": "ஆஃபர் உருவாக்கவும்",
-    "review": "reviewed",
-    "enHash": "c6af210c"
-  },
   "overview.insights.going_to_waste.label": {
     "message": "வீணாகப் போகிறது",
     "review": "reviewed",
     "enHash": "847b43f5"
   },
   "overview.insights.going_to_waste.sentence": {
-    "message": "<strong>{count, plural, one {# பொருள் {days} நாட்களுக்குள் காலாவதியாகும்} other {# பொருட்கள் {days} நாட்களுக்குள் காலாவதியாகும்}}</strong>: {items}.",
+    "message": "<strong>{count, plural, one {# பொருள்} other {# பொருட்கள்}} {days} நாட்களில் காலாவதியாகும்</strong>: {items}{more, plural, =0 {} other { + மேலும் #}}.",
     "review": "reviewed",
-    "enHash": "9f4b5d8d"
-  },
-  "overview.insights.going_to_waste.action": {
-    "message": "ஃபிளாஷ் ஆஃபர்",
-    "review": "reviewed",
-    "enHash": "9b8c0a36"
+    "enHash": "4f3b8f9f"
   },
   "overview.insights.wanted_nearby.label": {
     "message": "அருகில் தேவை உள்ளது",
@@ -365,19 +330,14 @@
     "enHash": "4e90f3e0"
   },
   "overview.insights.wanted_nearby.sentence": {
-    "message": "<strong>{item}</strong>: இந்த வாரம் {distance} க்குள் {searches} தேடல்கள்.",
+    "message": "<strong>{item}</strong>: {period, plural, =7 {இந்த வாரம்} other {# நாட்களில்}} {distance} சுற்றளவில் {searches} தேடல்கள்.",
     "review": "reviewed",
-    "enHash": "ade7924a"
+    "enHash": "359d21f4"
   },
   "overview.insights.wanted_nearby.sentenceNone": {
-    "message": "<strong>{item}</strong>: இந்த வாரம் {distance} க்குள் {searches} தேடல்கள். அருகிலுள்ள எந்தக் கடையிலும் இது இல்லை.",
+    "message": "<strong>{item}</strong>: {period, plural, =7 {இந்த வாரம்} other {# நாட்களில்}} {distance} சுற்றளவில் {searches} தேடல்கள். அருகில் எந்தக் கடையிலும் இது இல்லை.",
     "review": "reviewed",
-    "enHash": "35287244"
-  },
-  "overview.insights.wanted_nearby.action": {
-    "message": "பொருளைச் சேர்க்கவும்",
-    "review": "reviewed",
-    "enHash": "7c37958a"
+    "enHash": "8e701825"
   },
   "overview.insights.bought_together.label": {
     "message": "சேர்த்து வாங்கப்படுபவை",
@@ -385,14 +345,9 @@
     "enHash": "32ddb8f5"
   },
   "overview.insights.bought_together.sentence": {
-    "message": "<strong>{a}</strong>, <strong>{b}</strong> இரண்டும் {pct}% பில்களில் சேர்ந்து உள்ளன.",
+    "message": "<strong>{a}</strong> உள்ள ஒவ்வொரு {oneIn} பில்களில் 1 இல் <strong>{b}</strong> உம் உள்ளது.",
     "review": "reviewed",
-    "enHash": "cdde8426"
-  },
-  "overview.insights.bought_together.action": {
-    "message": "ஆஃபர் உருவாக்கவும்",
-    "review": "reviewed",
-    "enHash": "c6af210c"
+    "enHash": "f540e5ba"
   },
   "overview.top.title": {
     "message": "இன்றைய முன்னணிப் பொருட்கள்",
@@ -464,11 +419,6 @@
     "review": "reviewed",
     "enHash": "ae1fc3b8"
   },
-  "overview.top.source.voice": {
-    "message": "குரல் · {time}",
-    "review": "reviewed",
-    "enHash": "4d92b893"
-  },
   "overview.top.total": {
     "message": "மொத்தம், {all} இல் {shown} பொருட்கள்",
     "review": "reviewed",
@@ -523,5 +473,220 @@
     "message": "அமைப்பை முடிக்கவும்",
     "review": "reviewed",
     "enHash": "c516d2df"
+  },
+  "overview.insights.sitting_on_shelf.sentenceCost": {
+    "message": "<strong>{item}</strong>: {stock} கையிருப்பில் (அடக்க விலையில் {value}), {days} நாட்களாக விற்பனை இல்லை.",
+    "review": "reviewed",
+    "enHash": "e54284ea"
+  },
+  "overview.insights.missed_sales.label": {
+    "message": "தவறிய விற்பனை",
+    "review": "reviewed",
+    "enHash": "7e65c327"
+  },
+  "overview.insights.missed_sales.sentence": {
+    "message": "<strong>{item}</strong> {days, plural, other {#}} நாட்கள் கையிருப்பில் இல்லை; அருகில் {searches} தேடல்கள் இதனுடன் பொருந்தின.",
+    "review": "reviewed",
+    "enHash": "e73039ef"
+  },
+  "overview.insights.expired_on_shelf.label": {
+    "message": "அலமாரியில் காலாவதியானவை",
+    "review": "reviewed",
+    "enHash": "d7f93e9d"
+  },
+  "overview.insights.expired_on_shelf.sentence": {
+    "message": "<strong>{item}</strong>: {qty} {ago, plural, =1 {நேற்று} other {# நாட்களுக்கு முன்}} காலாவதியானது. அவற்றை அலமாரியிலிருந்து அகற்றுங்கள்.",
+    "review": "reviewed",
+    "enHash": "3b679a22"
+  },
+  "overview.insights.selling_below_cost.label": {
+    "message": "அடக்க விலைக்குக் கீழே விற்பனை",
+    "review": "reviewed",
+    "enHash": "36024fc8"
+  },
+  "overview.insights.selling_below_cost.sentence": {
+    "message": "<strong>{item}</strong> {price} க்கு விற்கிறது, கடைசி அடக்க விலை {cost}.",
+    "review": "reviewed",
+    "enHash": "6cb94ccf"
+  },
+  "overview.insights.selling_below_cost.sentenceCheck": {
+    "message": "<strong>{item}</strong> இன் அடக்க விலைப் பதிவைச் சரிபார்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "89e3a35b"
+  },
+  "overview.insights.stock_check_due.label": {
+    "message": "கையிருப்புச் சரிபார்ப்பு நிலுவை",
+    "review": "reviewed",
+    "enHash": "88eca95d"
+  },
+  "overview.insights.stock_check_due.sentence": {
+    "message": "<strong>{count, plural, other {#}} பொருட்கள் {unit, select, days {{span, plural, other {#}} நாட்களாக} other {{span, plural, other {#}} மணி நேரமாக}} உறுதிசெய்யப்படவில்லை</strong>. வாடிக்கையாளர்கள் அவற்றை “கையிருப்பு சமீபத்தில் உறுதிசெய்யப்படவில்லை” என்று பார்க்கிறார்கள்.",
+    "review": "reviewed",
+    "enHash": "b9322572"
+  },
+  "overview.insights.regulars_slipping.label": {
+    "message": "வழக்கமான வாடிக்கையாளர்கள் விலகுகிறார்கள்",
+    "review": "reviewed",
+    "enHash": "55ae88e6"
+  },
+  "overview.insights.regulars_slipping.sentence": {
+    "message": "<strong>{count, plural, other {#}} வழக்கமான வாடிக்கையாளர்கள்</strong> {unit, select, weeks {{span, plural, other {#}} வாரங்களாக} other {{span, plural, other {#}} நாட்களாக}} வாங்கவில்லை.",
+    "review": "reviewed",
+    "enHash": "2302efd8"
+  },
+  "overview.insights.priced_above_nearby.label": {
+    "message": "அருகிலுள்ளதை விட அதிக விலை",
+    "review": "reviewed",
+    "enHash": "73f742b3"
+  },
+  "overview.insights.priced_above_nearby.sentence": {
+    "message": "<strong>{item}</strong>: இங்கே {price}, அருகில் வழக்கமாக {typical}.",
+    "review": "reviewed",
+    "enHash": "6fd2e68c"
+  },
+  "overview.insights.action.restock": {
+    "message": "மீண்டும் சேர்க்கவும்",
+    "review": "reviewed",
+    "enHash": "3ccf7127"
+  },
+  "overview.insights.action.create_offer": {
+    "message": "சலுகையை உருவாக்கவும்",
+    "review": "reviewed",
+    "enHash": "c6af210c"
+  },
+  "overview.insights.action.flash_offer": {
+    "message": "ஃபிளாஷ் சலுகை",
+    "review": "reviewed",
+    "enHash": "9b8c0a36"
+  },
+  "overview.insights.action.add_product": {
+    "message": "பொருளைச் சேர்க்கவும்",
+    "review": "reviewed",
+    "enHash": "7c37958a"
+  },
+  "overview.insights.action.mark_expired": {
+    "message": "காலாவதி எனக் குறிக்கவும்",
+    "review": "reviewed",
+    "enHash": "310c38b2"
+  },
+  "overview.insights.action.edit_price": {
+    "message": "விலையைத் திருத்தவும்",
+    "review": "reviewed",
+    "enHash": "9a2ebfcc"
+  },
+  "overview.insights.action.check_cost": {
+    "message": "அடக்க விலையைச் சரிபார்க்கவும்",
+    "review": "reviewed",
+    "enHash": "f2c0e8b3"
+  },
+  "overview.insights.action.count_stock": {
+    "message": "கையிருப்பை எண்ணவும்",
+    "review": "reviewed",
+    "enHash": "82d76c10"
+  },
+  "overview.insights.action.see_customers": {
+    "message": "வாடிக்கையாளர்களைப் பார்க்கவும்",
+    "review": "reviewed",
+    "enHash": "393ef412"
+  },
+  "overview.insights.hiddenUntil": {
+    "message": "{date} வரை மறைக்கப்பட்டது",
+    "review": "reviewed",
+    "enHash": "41cd334f"
+  },
+  "overview.insights.dismissFailed": {
+    "message": "மறைக்க முடியவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "f31257d0"
+  },
+  "overview.insights.error": {
+    "message": "நுண்ணறிவுகளை ஏற்ற முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "b500a37b"
+  },
+  "overview.setup.next.kyc": {
+    "message": "நேரலைக்கு வர உங்கள் KYC ஐ முடிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "efa1d367"
+  },
+  "overview.setup.step.kyc": {
+    "message": "KYC",
+    "review": "reviewed",
+    "enHash": "9c2386e6"
+  },
+  "overview.setup.next.products": {
+    "message": "வாடிக்கையாளர்கள் கண்டுபிடிக்க உங்கள் பொருட்களைச் சேர்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "b7a72097"
+  },
+  "overview.setup.step.products": {
+    "message": "பொருட்களைச் சேர்க்கவும்",
+    "review": "reviewed",
+    "enHash": "25a9fb7e"
+  },
+  "overview.setup.next.staff": {
+    "message": "உங்கள் ஊழியர்களை அழைக்கவும்.",
+    "review": "reviewed",
+    "enHash": "7dc57fa5"
+  },
+  "overview.setup.step.staff": {
+    "message": "ஊழியர்களை அழைக்கவும்",
+    "review": "reviewed",
+    "enHash": "a7bbc7a7"
+  },
+  "overview.setup.next.standee": {
+    "message": "கவுண்டருக்கு உங்கள் QR ஸ்டாண்டியை அச்சிடவும்.",
+    "review": "reviewed",
+    "enHash": "291ff8a7"
+  },
+  "overview.setup.step.standee": {
+    "message": "QR ஸ்டாண்டியை அச்சிடவும்",
+    "review": "reviewed",
+    "enHash": "a1bdcc81"
+  },
+  "overview.setup.step.openingHours": {
+    "message": "திறக்கும் நேரத்தைச் சேர்க்கவும்",
+    "review": "reviewed",
+    "enHash": "3ac02ff5"
+  },
+  "overview.setup.left": {
+    "message": "மீதமுள்ள அமைப்புப் படிகள்",
+    "review": "reviewed",
+    "enHash": "aabef61c"
+  },
+  "overview.top.source.stock": {
+    "message": "கையிருப்பு · {time}",
+    "review": "reviewed",
+    "enHash": "9136b9c8"
+  },
+  "overview.top.source.none": {
+    "message": "இன்னும் மாற்றம் இல்லை",
+    "review": "reviewed",
+    "enHash": "8efd778f"
+  },
+  "overview.gate.error": {
+    "message": "உங்கள் கடையை ஏற்ற முடியவில்லை",
+    "review": "reviewed",
+    "enHash": "0980057d"
+  },
+  "overview.gate.noStore": {
+    "message": "இதைப் பார்க்க கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "57d8dc67"
+  },
+  "overview.gate.choose": {
+    "message": "கடையைத் தேர்ந்தெடுக்கவும்",
+    "review": "reviewed",
+    "enHash": "12cfd9dc"
+  },
+  "overview.gate.cashier": {
+    "message": "இந்தத் திரை உரிமையாளர்கள் மற்றும் மேலாளர்களுக்கானது. உங்கள் ஆர்டர்களும் கவுண்டரும் இங்கே.",
+    "review": "reviewed",
+    "enHash": "be4f2c6b"
+  },
+  "overview.gate.orders": {
+    "message": "ஆர்டர்கள்",
+    "review": "reviewed",
+    "enHash": "cded0933"
   }
 }

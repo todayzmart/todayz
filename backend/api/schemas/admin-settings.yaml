@@ -13,7 +13,7 @@ AdminSettingUnit:
 AdminSettingGroup:
   type: string
   description: The 01 §17 section a key belongs to; `other` for a key no section claims yet.
-  enum: [orders, stock, credits, reviews, referrals, pos, search, insights, field, jobs, asks, baskets, customers, features, ai, clients, other]
+  enum: [orders, stock, credits, reviews, referrals, pos, search, insights, field, jobs, asks, baskets, customers, risk, features, ai, clients, other]
 AdminSettingValue:
   description: >-
     A whole number, a boolean or text (at most 200 characters), as the unit says. Untyped here because one

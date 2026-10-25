@@ -6,13 +6,14 @@ import { RouterLink } from './RouterLink';
 import styles from './overview.module.css';
 import type { OverviewData, StockSource, TopItem } from './types';
 
-function sourceText(intl: IntlShape, source: StockSource, at: string): string {
-  const time = formatClock(at);
-  return source === 'pos'
+function sourceText(intl: IntlShape, change: { source: StockSource; at: string } | null): string {
+  if (!change) return intl.formatMessage({ id: 'overview.top.source.none' });
+  const time = formatClock(change.at);
+  return change.source === 'pos'
     ? intl.formatMessage({ id: 'overview.top.source.pos' }, { time })
-    : source === 'online'
+    : change.source === 'online'
       ? intl.formatMessage({ id: 'overview.top.source.online' }, { time })
-      : intl.formatMessage({ id: 'overview.top.source.voice' }, { time });
+      : intl.formatMessage({ id: 'overview.top.source.stock' }, { time });
 }
 
 function Spark({ values, label }: { values: readonly number[]; label: string }) {
@@ -86,7 +87,7 @@ export function TopItems({ data }: { data: OverviewData }) {
         id: 'updated',
         header: intl.formatMessage({ id: 'overview.top.updated' }),
         enableSorting: false,
-        cell: ({ row }) => sourceText(intl, row.original.lastChange.source, row.original.lastChange.at),
+        cell: ({ row }) => sourceText(intl, row.original.lastChange),
       },
     ],
     [intl],
