@@ -1,0 +1,43 @@
+{
+  "name": "hi_native_digits",
+  "input": {
+    "lang": "hi",
+    "kind": "high",
+    "title": "6 हफ़्तों में सबसे अच्छा रविवार",
+    "body": "बिक्री ₹18,240 रही, आम रविवार से 55% ज़्यादा।",
+    "numbers": {
+      "amount": "₹18,240",
+      "pct": "55%",
+      "weekday": "Sunday",
+      "weeks": 6,
+      "leaders": "Maggi and Amul milk"
+    }
+  },
+  "expect": {
+    "title": "६ हफ़्तों का सबसे अच्छा रविवार",
+    "body": "आज ₹१८,२४० की बिक्री हुई, आम रविवार से ५५% ज़्यादा।"
+  },
+  "reply": {
+    "id": "msg_coach",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_coach",
+        "name": "write_coach_card",
+        "input": {
+          "title": "६ हफ़्तों का सबसे अच्छा रविवार",
+          "body": "आज ₹१८,२४० की बिक्री हुई, आम रविवार से ५५% ज़्यादा।"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 90
+    }
+  }
+}

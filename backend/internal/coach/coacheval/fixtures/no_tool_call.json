@@ -1,0 +1,35 @@
+{
+  "name": "no_tool_call",
+  "input": {
+    "lang": "en",
+    "kind": "tip",
+    "title": "₹17,500 this week",
+    "body": "Up 25% on the last 4 weeks.",
+    "numbers": {
+      "amount": "₹17,500",
+      "pct": "25%",
+      "weeks": 4
+    }
+  },
+  "expect": {
+    "reject": "invalid"
+  },
+  "reply": {
+    "id": "msg_coach",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "text",
+        "text": "Here is your card: ₹17,500 this week."
+      }
+    ],
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 90
+    }
+  }
+}

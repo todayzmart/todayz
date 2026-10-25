@@ -19,6 +19,7 @@ import (
 
 	// Eval suites register themselves; a feature package adds its import here.
 	_ "github.com/todayz/backend/internal/ai/eval/selftest"
+	_ "github.com/todayz/backend/internal/coach/coacheval"
 )
 
 // evalCallTimeout bounds one live model call in an eval.

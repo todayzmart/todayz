@@ -1,0 +1,41 @@
+{
+  "name": "ta_missed",
+  "input": {
+    "lang": "ta",
+    "kind": "low",
+    "title": "3 ஆர்டர்கள் தவறின",
+    "body": "7–9 pm இடையே 3 ஆர்டர்கள் 10 நிமிடத்தில் ஏற்கப்படவில்லை.",
+    "numbers": {
+      "count": 3,
+      "hours": "7–9 pm",
+      "minutes": 10
+    }
+  },
+  "expect": {
+    "title": "மாலை 3 ஆர்டர்கள் தவறின",
+    "body": "7–9 pm நேரத்தில் 3 ஆர்டர்கள் 10 நிமிடத்துக்குள் ஏற்கப்படவில்லை. அந்த நேரத்தில் போனை அருகில் வையுங்கள்."
+  },
+  "reply": {
+    "id": "msg_coach",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_coach",
+        "name": "write_coach_card",
+        "input": {
+          "title": "மாலை 3 ஆர்டர்கள் தவறின",
+          "body": "7–9 pm நேரத்தில் 3 ஆர்டர்கள் 10 நிமிடத்துக்குள் ஏற்கப்படவில்லை. அந்த நேரத்தில் போனை அருகில் வையுங்கள்."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 90
+    }
+  }
+}

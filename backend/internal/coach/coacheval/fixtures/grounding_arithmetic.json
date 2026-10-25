@@ -1,0 +1,41 @@
+{
+  "name": "grounding_arithmetic",
+  "input": {
+    "lang": "en",
+    "kind": "tip",
+    "title": "₹17,500 this week",
+    "body": "Up 25% on the last 4 weeks, 70 bills.",
+    "numbers": {
+      "amount": "₹17,500",
+      "pct": "25%",
+      "weeks": 4,
+      "bills": 70
+    }
+  },
+  "expect": {
+    "reject": "grounding"
+  },
+  "reply": {
+    "id": "msg_coach",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_coach",
+        "name": "write_coach_card",
+        "input": {
+          "title": "₹17,500 this week",
+          "body": "Up 25% on the last 4 weeks: about ₹250 a bill across 70 bills."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 90
+    }
+  }
+}

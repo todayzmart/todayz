@@ -1,0 +1,40 @@
+{
+  "name": "kn_reviews",
+  "input": {
+    "lang": "kn",
+    "kind": "action",
+    "title": "2 ವಿಮರ್ಶೆಗಳಿಗೆ ಉತ್ತರ ಬಾಕಿ",
+    "body": "7 ದಿನಗಳಿಂದ 2 ವಿಮರ್ಶೆಗಳಿಗೆ ಉತ್ತರ ಇಲ್ಲ.",
+    "numbers": {
+      "count": 2,
+      "days": 7
+    }
+  },
+  "expect": {
+    "title": "2 ವಿಮರ್ಶೆಗಳು ಉತ್ತರಕ್ಕೆ ಕಾಯುತ್ತಿವೆ",
+    "body": "7 ದಿನಗಳಿಂದ 2 ಗ್ರಾಹಕರ ವಿಮರ್ಶೆಗೆ ಉತ್ತರ ಹೋಗಿಲ್ಲ. ಇಂದು ಒಂದು ಸಣ್ಣ ಉತ್ತರ ಬರೆಯಿರಿ."
+  },
+  "reply": {
+    "id": "msg_coach",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_coach",
+        "name": "write_coach_card",
+        "input": {
+          "title": "2 ವಿಮರ್ಶೆಗಳು ಉತ್ತರಕ್ಕೆ ಕಾಯುತ್ತಿವೆ",
+          "body": "7 ದಿನಗಳಿಂದ 2 ಗ್ರಾಹಕರ ವಿಮರ್ಶೆಗೆ ಉತ್ತರ ಹೋಗಿಲ್ಲ. ಇಂದು ಒಂದು ಸಣ್ಣ ಉತ್ತರ ಬರೆಯಿರಿ."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 90
+    }
+  }
+}

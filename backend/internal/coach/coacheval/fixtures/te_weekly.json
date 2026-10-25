@@ -1,0 +1,42 @@
+{
+  "name": "te_weekly",
+  "input": {
+    "lang": "te",
+    "kind": "tip",
+    "title": "ఈ వారం ₹17,500 అమ్మకాలు",
+    "body": "గత 4 వారాల కంటే 25% ఎక్కువ, 70 బిల్లులు.",
+    "numbers": {
+      "amount": "₹17,500",
+      "pct": "25%",
+      "weeks": 4,
+      "bills": 70
+    }
+  },
+  "expect": {
+    "title": "ఈ వారం ₹17,500 అమ్మకాలు",
+    "body": "గత 4 వారాల సగటు కంటే 25% ఎక్కువ. మొత్తం 70 బిల్లులు."
+  },
+  "reply": {
+    "id": "msg_coach",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_coach",
+        "name": "write_coach_card",
+        "input": {
+          "title": "ఈ వారం ₹17,500 అమ్మకాలు",
+          "body": "గత 4 వారాల సగటు కంటే 25% ఎక్కువ. మొత్తం 70 బిల్లులు."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 90
+    }
+  }
+}
