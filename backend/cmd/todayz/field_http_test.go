@@ -5,6 +5,8 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"net/url"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -12,6 +14,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
 
+	"github.com/todayz/backend/internal/business"
 	"github.com/todayz/backend/internal/identity"
 	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/config"
@@ -38,6 +41,7 @@ const (
 
 type fieldAPI struct {
 	*bizAPI
+	cfg      *config.Config
 	settings *settings.Cache
 	bucket   *supportBucket // the private bucket the confirm step HEADs
 	category string         // a top-level business category
@@ -69,7 +73,7 @@ func newFieldAPI(t *testing.T) *fieldAPI {
 	}
 	h, err := buildRouter(d, idempotency.NewMemoryStore(), contractValidator(t))
 	require.NoError(t, err)
-	f := &fieldAPI{bizAPI: &bizAPI{t: t, h: h, clk: clk, tdb: tdb}, settings: st, bucket: bucket}
+	f := &fieldAPI{bizAPI: &bizAPI{t: t, h: h, clk: clk, tdb: tdb}, cfg: cfg, settings: st, bucket: bucket}
 	var category pgtype.UUID
 	require.NoError(t, tdb.OwnerPool.QueryRow(context.Background(), `SELECT id FROM categories WHERE parent_id IS NULL ORDER BY sort, slug LIMIT 1`).Scan(&category))
 	cid, _ := ids.FromUUID(category)
@@ -283,8 +287,27 @@ func TestFieldOnboardingHTTP(t *testing.T) {
 	r = f.call(tok, http.MethodPatch, S+"/items/"+item, map[string]any{"pricePaise": 1000}, nil)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 	admin := f.user(fieldAdminPhone, "admin")
-	r = f.call(admin.token(), http.MethodPatch, S+"/items/"+shopItem, map[string]any{"pricePaise": 3900}, nil)
+	atok := admin.token()
+	r = f.call(atok, http.MethodPatch, S+"/items/"+shopItem, map[string]any{"pricePaise": 3900}, nil)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
+	// The list says which items each caller may change (editable).
+	editable := func(tok string) map[string]any {
+		r := f.call(tok, http.MethodGet, S+"/items", nil, nil)
+		require.Equal(t, http.StatusOK, r.code, r.raw)
+		out := map[string]any{}
+		for _, it := range r.body["items"].([]any) {
+			m := it.(map[string]any)
+			out[m["id"].(string)] = m["editable"]
+		}
+		return out
+	}
+	mine, all := editable(tok), editable(atok)
+	require.Equal(t, true, mine[item])
+	require.Equal(t, false, mine[shopItem])
+	for id, e := range all {
+		require.Equal(t, true, e, "admin: %s", id)
+	}
+	require.Len(t, all, len(mine))
 
 	// Audit: by the agent as an admin actor, never the number or a code.
 	require.Positive(t, f.count(`SELECT count(*) FROM audit_log WHERE action = 'business.submit' AND subject_id = $1 AND actor_kind = 'admin'`, bid))
@@ -311,11 +334,13 @@ func TestFieldOwnerCodeLimitsHTTP(t *testing.T) {
 		require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
 		require.EqualValues(t, 4-i, ext(r, "attemptsLeft"))
 	}
-	r = f.call(tok, http.MethodPost, B+"/owner-confirm/verify", map[string]any{"code": "000000"}, nil)
-	require.Equal(t, http.StatusTooManyRequests, r.code, r.raw)
-	require.Equal(t, "otp_locked", problemCode(r))
+	for range 2 {
+		r = f.call(tok, http.MethodPost, B+"/owner-confirm/verify", map[string]any{"code": "000000"}, nil)
+		require.Equal(t, http.StatusTooManyRequests, r.code, r.raw)
+		require.Equal(t, "otp_locked", problemCode(r))
+	}
 
-	// Every failed try is audited (what happened, never the number or a code).
+	// Every failed try is audited (a locked code once) (what happened, never the number or a code).
 	fails := func(outcome string) int {
 		return f.count(`SELECT count(*) FROM audit_log WHERE action = 'business.owner_code_fail' AND subject_id = $1
 		  AND actor_kind = 'admin' AND after->>'outcome' = $2`, bid, outcome)
@@ -345,6 +370,8 @@ func TestFieldOwnerCodeLimitsHTTP(t *testing.T) {
 	r = f.call(tok, http.MethodPost, B+"/owner-confirm/verify", map[string]any{"code": "000000"}, nil)
 	require.Equal(t, http.StatusUnauthorized, r.code, r.raw)
 	require.Equal(t, "otp_expired", problemCode(r))
+	// The lapsed code and the one for the old number are audited as expired.
+	require.Equal(t, 2, fails("expired"))
 }
 
 // SC-FA-07, D-39: another agent's business is 403; items change only within
@@ -567,6 +594,98 @@ func TestFieldPhotosHTTP(t *testing.T) {
 	}
 }
 
+// Lead re-review of 88e4624: only the business's agent confirms a photo, and
+// only the declared type and size; field photos never confirmed neither block
+// the owner's uploads nor stay: the sweep rejects them and deletes their
+// objects, leaving the owner's own pending uploads and live URLs alone.
+func TestFieldPhotoSweepHTTP(t *testing.T) {
+	f := newFieldAPI(t)
+	agent := f.user(agentPhone, "field_agent")
+	other := f.user(agent2Phone, "field_agent")
+	tok, otok := agent.token(), other.token()
+	bid, sid := f.onboard(tok, "Kodagu Stores", shopOwnerPhone)
+	B := "/v1/admin/field/businesses/" + bid
+	photo := map[string]any{"kind": "storefront", "contentType": "image/jpeg", "sizeBytes": 2048, "storeId": sid}
+	upload := func() resp {
+		r := f.call(tok, http.MethodPost, B+"/documents", photo, nil)
+		require.Equal(t, http.StatusCreated, r.code, r.raw)
+		return r
+	}
+	docID := func(up resp) string { return up.body["document"].(map[string]any)["id"].(string) }
+	confirm := func(tok string, up resp) resp {
+		return f.call(tok, http.MethodPost, B+"/documents/"+docID(up)+"/confirm", nil, nil)
+	}
+	status := func(up resp) string {
+		var st string
+		require.NoError(t, f.tdb.OwnerPool.QueryRow(context.Background(), `SELECT status FROM business_documents WHERE id = $1`, uuidOf(t, docID(up))).Scan(&st))
+		return st
+	}
+	stored := func(up resp, contentType, size string) {
+		u, err := url.Parse(up.body["upload"].(map[string]any)["url"].(string))
+		require.NoError(t, err)
+		f.bucket.mu.Lock()
+		defer f.bucket.mu.Unlock()
+		f.bucket.objects[u.Path] = [2]string{contentType, size}
+	}
+
+	// Another agent cannot confirm it; a file of another type or larger than
+	// declared is refused and the photo stays pending.
+	up := upload()
+	f.bucket.put(t, up)
+	r := confirm(otok, up)
+	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+	for _, o := range [][2]string{{"image/png", "2048"}, {"image/jpeg", "4096"}} {
+		stored(up, o[0], o[1])
+		r = confirm(tok, up)
+		require.Equal(t, http.StatusUnprocessableEntity, r.code, "%v: %s", o, r.raw)
+		require.Equal(t, "pending", status(up))
+	}
+	f.bucket.put(t, up)
+	r = confirm(tok, up)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+
+	// Four never confirmed (one of them stored): with the first, the cap of 5.
+	stale := make([]resp, 4)
+	for i := range stale {
+		stale[i] = upload()
+	}
+	f.bucket.put(t, stale[0])
+	r = f.call(tok, http.MethodPost, B+"/documents", photo, nil)
+	require.Equal(t, http.StatusConflict, r.code, r.raw)
+
+	// The owner confirms; once the field URLs have expired, the owner's own
+	// upload on the business app is not blocked by them.
+	r = f.call(tok, http.MethodPost, B+"/owner-confirm", nil, nil)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	r = f.call(tok, http.MethodPost, B+"/owner-confirm/verify", map[string]any{"code": "000000"}, nil)
+	require.Equal(t, http.StatusOK, r.code, r.raw)
+	f.clk.Advance(20*time.Minute + time.Second)
+	owner := f.signIn(shopOwnerPhone, "business")
+	mine := f.call(owner, http.MethodPost, "/v1/biz/businesses/"+bid+"/documents", photo, nil)
+	require.Equal(t, http.StatusCreated, mine.code, mine.raw)
+	tok = agent.token()
+	fresh := upload()
+
+	// The sweep (business_field_photos_sweep) takes only the expired field photos.
+	svc, err := business.New(business.Deps{Config: f.cfg, DB: db.New(f.tdb.Pool), Clock: f.clk, Log: slog.New(slog.NewTextHandler(io.Discard, nil))})
+	require.NoError(t, err)
+	res, err := svc.SweepFieldPhotos(context.Background())
+	require.NoError(t, err)
+	require.Equal(t, business.SweepResult{Rejected: 4}, res)
+	for _, s := range stale {
+		require.Equal(t, "rejected", status(s))
+		require.False(t, f.bucket.has(t, s))
+	}
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM business_documents WHERE id = $1 AND reject_reason = 'not uploaded in time'`, uuidOf(t, docID(stale[0]))))
+	require.Equal(t, "uploaded", status(up))
+	require.True(t, f.bucket.has(t, up))
+	require.Equal(t, "pending", status(mine))
+	require.Equal(t, "pending", status(fresh))
+	res, err = svc.SweepFieldPhotos(context.Background())
+	require.NoError(t, err)
+	require.Zero(t, res.Rejected, "a second sweep finds nothing")
+}
+
 // Lead review of b42d9ee: who may send and check the owner code, the caps
 // (per agent; per number with sign-in codes), blocked accounts, and a correct
 // code that cannot finish staying unused.
@@ -599,24 +718,27 @@ func TestFieldOwnerCodeGuardsHTTP(t *testing.T) {
 	r = f.call(tok, http.MethodPatch, B, map[string]any{"categoryId": f.category}, nil)
 	require.Equal(t, http.StatusOK, r.code, r.raw)
 
-	// The owner's account is blocked after the send: a correct code is 403 and
+	// The owner's account is blocked after the send: a correct code is 422 on
+	// the owner number (as any refused number, so it tells nothing more) and
 	// stays unused; no new invite or code goes to a blocked number.
 	cust := f.signIn(shopOwnerPhone, "customer")
 	me := f.call(cust, http.MethodGet, "/v1/me", nil, nil)
 	require.Equal(t, http.StatusOK, me.code, me.raw)
 	ownerID := uuidOf(t, me.body["id"].(string))
 	f.exec(`UPDATE users SET status = 'blocked' WHERE id = $1`, ownerID)
-	r = f.call(tok, http.MethodPost, B+"/owner-confirm/verify", map[string]any{"code": "000000"}, nil)
-	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+	refused := func(r resp) {
+		t.Helper()
+		require.Equal(t, http.StatusUnprocessableEntity, r.code, r.raw)
+		require.Equal(t, "validation_failed", problemCode(r))
+		require.Contains(t, r.raw, "body.ownerPhone")
+	}
+	refused(f.call(tok, http.MethodPost, B+"/owner-confirm/verify", map[string]any{"code": "000000"}, nil))
 	require.Equal(t, 1, unused())
-	r = f.call(tok, http.MethodPost, F, map[string]any{"brandName": "Blocked", "ownerPhone": shopOwnerPhone}, idem(f.bizAPI))
-	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+	refused(f.call(tok, http.MethodPost, F, map[string]any{"brandName": "Blocked", "ownerPhone": shopOwnerPhone}, idem(f.bizAPI)))
 	other2, _ := f.onboard(tok, "Kaveri Stores", shop2OwnerPhone)
-	r = f.call(tok, http.MethodPatch, F+"/"+other2, map[string]any{"ownerPhone": shopOwnerPhone}, nil)
-	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+	refused(f.call(tok, http.MethodPatch, F+"/"+other2, map[string]any{"ownerPhone": shopOwnerPhone}, nil))
 	f.clk.Advance(31 * time.Second)
-	r = f.call(tok, http.MethodPost, B+"/owner-confirm", nil, nil)
-	require.Equal(t, http.StatusForbidden, r.code, r.raw)
+	refused(f.call(tok, http.MethodPost, B+"/owner-confirm", nil, nil))
 	require.Equal(t, 1, f.count(`SELECT count(*) FROM field_owner_codes WHERE business_id = $1`, uuidOf(t, bid)))
 
 	// Unblocked, the same code confirms, once: two at the same time give one 200.
@@ -642,7 +764,39 @@ func TestFieldOwnerCodeGuardsHTTP(t *testing.T) {
 	r = f.call(tok, http.MethodPost, F+"/"+third+"/owner-confirm", nil, nil)
 	require.Equal(t, http.StatusTooManyRequests, r.code, r.raw)
 	require.Equal(t, "rate_limited", problemCode(r))
-	require.NotEmpty(t, r.hdr.Get("Retry-After"))
+	// Retry-After is when the (sends − cap + 1)-th oldest send leaves the hour.
+	sentAt := func(place int) time.Time {
+		var at time.Time
+		require.NoError(t, f.tdb.OwnerPool.QueryRow(context.Background(), `SELECT created_at FROM field_owner_codes
+		  WHERE sent_by = $1 ORDER BY created_at OFFSET $2 LIMIT 1`, uuidOf(t, agent.id), place).Scan(&at))
+		return at
+	}
+	retryAfter := func(at time.Time) string {
+		wait := at.Add(time.Hour).Sub(f.clk.Now())
+		return strconv.Itoa(int((wait + time.Second - 1) / time.Second))
+	}
+	require.Equal(t, retryAfter(sentAt(0)), r.hdr.Get("Retry-After"))
+	f.exec(`UPDATE platform_settings SET value = '1' WHERE key = 'field_owner_codes_per_agent_hour'`)
+	f.settings.Invalidate()
+	r = f.call(tok, http.MethodPost, F+"/"+third+"/owner-confirm", nil, nil)
+	require.Equal(t, http.StatusTooManyRequests, r.code, r.raw)
+	require.Equal(t, retryAfter(sentAt(1)), r.hdr.Get("Retry-After"))
+	require.NotEqual(t, sentAt(0), sentAt(1))
+
+	// At cap − 1, two sends at the same time: exactly one goes out.
+	f.exec(`UPDATE platform_settings SET value = '3' WHERE key = 'field_owner_codes_per_agent_hour'`)
+	f.settings.Invalidate()
+	fourth, _ := f.onboard(tok, "Hemavathi Stores", "+919000000070")
+	sends := make([]int, 2)
+	var swg sync.WaitGroup
+	for i, b := range []string{third, fourth} {
+		swg.Go(func() {
+			sends[i] = f.call(tok, http.MethodPost, F+"/"+b+"/owner-confirm", nil, nil).code
+		})
+	}
+	swg.Wait()
+	require.ElementsMatch(t, []int{http.StatusOK, http.StatusTooManyRequests}, sends)
+	require.Equal(t, 3, f.count(`SELECT count(*) FROM field_owner_codes WHERE sent_by = $1`, uuidOf(t, agent.id)))
 	// Another agent has their own count.
 	theirs, _ := f.onboard(otok, "Netra Stores", "+919000000068")
 	r = f.call(otok, http.MethodPost, F+"/"+theirs+"/owner-confirm", nil, nil)
