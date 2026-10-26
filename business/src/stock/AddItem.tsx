@@ -114,7 +114,6 @@ function PriceStep({ store, product, onBack, onDone }: { store: CurrentStore; pr
     const paise = parseRupees(price);
     const errors: { price?: string; opening?: string } = {};
     if (paise === null) errors.price = 'stock.form.priceInvalid';
-    else if (product.mrpPaise !== null && paise > product.mrpPaise) errors.price = 'stock.form.priceAboveMrp';
     const stock = opening.trim() === '' ? 0 : parseQuantity(opening);
     if (stock === null) errors.opening = 'stock.form.countInvalid';
     setInvalid(errors);
@@ -202,6 +201,7 @@ function NewProductForm({
     setInvalid(errors);
     if (Object.keys(errors).length > 0) return;
     const body = {
+      storeId: store.sid,
       name: name.trim(),
       ...(brand.trim() ? { brand: brand.trim() } : {}),
       packSize: pack,

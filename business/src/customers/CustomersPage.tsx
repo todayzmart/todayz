@@ -89,7 +89,7 @@ function Customers({ store, segment }: { store: CurrentStore; segment: CustomerS
         <EmptyState
           icon={Inbox}
           title={intl.formatMessage({ id: 'customers.error' })}
-          action={<Button onClick={() => void q.refetch()}>{intl.formatMessage({ id: 'overview.retry' })}</Button>}
+          action={<Button loading={q.isFetching} onClick={() => void q.refetch()}>{intl.formatMessage({ id: 'overview.retry' })}</Button>}
         />
       ) : first && !first.enough ? (
         <EmptyState

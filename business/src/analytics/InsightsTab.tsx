@@ -65,7 +65,7 @@ export function InsightsTab({ store, kind }: { store: CurrentStore; kind: Insigh
       <EmptyState
         icon={Inbox}
         title={intl.formatMessage({ id: 'analytics.insights.error' })}
-        action={<Button onClick={() => void list.refetch()}>{intl.formatMessage({ id: 'overview.retry' })}</Button>}
+        action={<Button loading={list.isFetching} onClick={() => void list.refetch()}>{intl.formatMessage({ id: 'overview.retry' })}</Button>}
       />
     );
   }

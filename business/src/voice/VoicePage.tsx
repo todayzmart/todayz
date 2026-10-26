@@ -40,7 +40,7 @@ export function VoicePage({ draft }: { draft?: string | undefined }) {
           icon={Inbox}
           title={intl.formatMessage({ id: 'voice.storeError.title' })}
           description={intl.formatMessage({ id: 'voice.storeError.body' })}
-          action={<Button onClick={current.retry}>{intl.formatMessage({ id: 'voice.retry' })}</Button>}
+          action={<Button loading={current.retrying} onClick={current.retry}>{intl.formatMessage({ id: 'voice.retry' })}</Button>}
         />
       )}
       {current.status === 'none' && (
@@ -76,7 +76,7 @@ function VoiceDesk({ store, draft }: { store: CurrentStore; draft: string | unde
         icon={Inbox}
         title={intl.formatMessage({ id: 'voice.storeError.title' })}
         description={intl.formatMessage({ id: 'voice.storeError.body' })}
-        action={<Button onClick={() => void avail.refetch()}>{intl.formatMessage({ id: 'voice.retry' })}</Button>}
+        action={<Button loading={avail.isFetching} onClick={() => void avail.refetch()}>{intl.formatMessage({ id: 'voice.retry' })}</Button>}
       />
     );
   }
@@ -253,6 +253,8 @@ function Review({
     return l?.itemName ?? l?.heard ?? intl.formatMessage({ id: 'voice.line.noItem' });
   };
 
+  // Which button sent the call, so only that one shows the spinner.
+  const [discarding, setDiscarding] = useState(false);
   const send = async (lines: ReturnType<typeof discardAll>) => {
     const out = await action.run(JSON.stringify(lines), (key) => confirmDraft(qc, store, draft, lines, key));
     if (out) onDone(out);
@@ -334,14 +336,25 @@ function Review({
           </Button>
         ) : (
           <>
-          <Button variant="ghost" disabled={action.pending} onClick={() => void send(discardAll(open))}>
+          <Button
+            variant="ghost"
+            loading={action.pending && discarding}
+            disabled={action.pending && !discarding}
+            onClick={() => {
+              setDiscarding(true);
+              void send(discardAll(open));
+            }}
+          >
             {intl.formatMessage({ id: 'voice.review.discard' })}
           </Button>
           <Button
             variant="primary"
-            loading={action.pending}
-            disabled={sum.blocked > 0 || sum.ready + sum.manager === 0}
-            onClick={() => void send(decisions(open, choices, store.role))}
+            loading={action.pending && !discarding}
+            disabled={sum.blocked > 0 || sum.ready + sum.manager === 0 || (action.pending && discarding)}
+            onClick={() => {
+              setDiscarding(false);
+              void send(decisions(open, choices, store.role));
+            }}
           >
             {intl.formatMessage({ id: 'voice.review.confirm' }, { n: sum.ready })}
           </Button>

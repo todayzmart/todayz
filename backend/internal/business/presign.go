@@ -1,6 +1,7 @@
 package business
 
 import (
+	"bytes"
 	"context"
 	"crypto/hmac"
 	"crypto/sha256"
@@ -37,8 +38,11 @@ const storageRegion = "us-east-1"
 type presigner struct {
 	scheme, host string
 	bucket       string
-	accessKey    string
-	secretKey    string
+	// images is the public images bucket the store photos are copied into
+	// (D-246); empty when it is not configured.
+	images    string
+	accessKey string
+	secretKey string
 	// client makes the HEAD call (httpx.NewOutboundClient; set by New).
 	client *http.Client
 }
@@ -58,7 +62,7 @@ func newPresigner(c config.Storage) *presigner {
 		return nil
 	}
 	return &presigner{
-		scheme: u.Scheme, host: u.Host, bucket: c.BucketPrivate,
+		scheme: u.Scheme, host: u.Host, bucket: c.BucketPrivate, images: c.BucketImages,
 		accessKey: c.AccessKeyID.Reveal(), secretKey: c.SecretAccessKey.Reveal(),
 	}
 }
@@ -117,11 +121,23 @@ func (p *presigner) head(ctx context.Context, key string, now time.Time) (object
 // remove deletes the object (a signed DELETE); an object already gone is
 // fine.
 func (p *presigner) remove(ctx context.Context, key string, now time.Time) error {
+	return p.removeFrom(ctx, p.bucket, key, now)
+}
+
+// removeImage deletes an object from the images bucket, as remove does.
+func (p *presigner) removeImage(ctx context.Context, key string, now time.Time) error {
+	if p.images == "" {
+		return errNoImages
+	}
+	return p.removeFrom(ctx, p.images, key, now)
+}
+
+func (p *presigner) removeFrom(ctx context.Context, bucket, key string, now time.Time) error {
 	if p.client == nil {
 		return errors.New("business: no storage client")
 	}
 	u := presignURL(presignInput{
-		Method: http.MethodDelete, Scheme: p.scheme, Host: p.host, Path: "/" + p.bucket + "/" + key,
+		Method: http.MethodDelete, Scheme: p.scheme, Host: p.host, Path: "/" + bucket + "/" + key,
 		Region: storageRegion, AccessKey: p.accessKey, SecretKey: p.secretKey,
 		Time: now, Expires: uploadTTL,
 	})
@@ -140,6 +156,67 @@ func (p *presigner) remove(ctx context.Context, key string, now time.Time) error
 		return nil
 	}
 	return errors.New("business: storage DELETE answered " + res.Status)
+}
+
+// errNoImages: the images bucket is not configured.
+var errNoImages = errors.New("business: no images bucket")
+
+// copyToImages copies a private object into the public images bucket under
+// dst (a signed GET, then a signed PUT of the same bytes with contentType).
+// The object is at most maxDocumentBytes, so it is read into memory.
+func (p *presigner) copyToImages(ctx context.Context, src, dst, contentType string, now time.Time) error {
+	if p.client == nil {
+		return errors.New("business: no storage client")
+	}
+	if p.images == "" {
+		return errNoImages
+	}
+	get := presignURL(presignInput{
+		Method: http.MethodGet, Scheme: p.scheme, Host: p.host, Path: "/" + p.bucket + "/" + src,
+		Region: storageRegion, AccessKey: p.accessKey, SecretKey: p.secretKey,
+		Time: now, Expires: uploadTTL,
+	})
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, get, nil)
+	if err != nil {
+		return err
+	}
+	res, err := p.client.Do(req)
+	if err != nil {
+		return err
+	}
+	body, err := io.ReadAll(io.LimitReader(res.Body, maxDocumentBytes+1))
+	_ = res.Body.Close()
+	switch {
+	case err != nil:
+		return err
+	case res.StatusCode == http.StatusNotFound:
+		return errNoObject
+	case res.StatusCode != http.StatusOK:
+		return errors.New("business: storage GET answered " + res.Status)
+	case len(body) > maxDocumentBytes:
+		return errors.New("business: the object is larger than a document may be")
+	}
+	put := presignURL(presignInput{
+		Method: http.MethodPut, Scheme: p.scheme, Host: p.host, Path: "/" + p.images + "/" + dst,
+		Region: storageRegion, AccessKey: p.accessKey, SecretKey: p.secretKey,
+		Time: now, Expires: uploadTTL, Headers: map[string]string{"content-type": contentType},
+	})
+	req, err = http.NewRequestWithContext(ctx, http.MethodPut, put, bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", contentType)
+	req.ContentLength = int64(len(body))
+	res, err = p.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+	_, _ = io.Copy(io.Discard, io.LimitReader(res.Body, 4<<10))
+	if res.StatusCode/100 != 2 {
+		return errors.New("business: storage PUT answered " + res.Status)
+	}
+	return nil
 }
 
 type presignInput struct {

@@ -55,9 +55,6 @@ export function ReplySheet({ store, ask, offsetMs, onClose }: ReplySheetProps) {
     if (editable && price.trim() !== '') {
       const paise = parseRupees(price);
       if (paise === null) return setFieldError(intl.formatMessage({ id: 'asks.reply.priceInvalid' }));
-      if (ask.mrpPaise !== null && paise > ask.mrpPaise) {
-        return setFieldError(intl.formatMessage({ id: 'asks.reply.aboveMrp' }, { mrp: formatMoney(ask.mrpPaise) }));
-      }
       if (!listed || paise !== ask.listedPricePaise) body.pricePaise = paise;
     }
     if (time !== '') {

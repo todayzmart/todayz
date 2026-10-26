@@ -121,18 +121,14 @@ describe('B-20 asks inbox', () => {
     expect(post?.headers.get('Idempotency-Key')).toMatch(/^[0-9A-HJKMNP-TV-Z]{26}$/);
   });
 
-  it('a manager can change the price, but never above the MRP', async () => {
+  it('a manager can change the price, above the MRP too (D-245)', async () => {
     const view = renderAt('/orders?tab=asks', { messages, handlers: [shops('manager'), settings(false), asksHandler({ open: [ask('a1')] }), replyHandler(replied)] });
     const sheet = await openReply();
     const price = within(sheet).getByRole('textbox', { name: /Price for one/ });
     expect(price).toHaveValue('58');
     fireEvent.change(price, { target: { value: '65' } });
     fireEvent.click(within(sheet).getByRole('button', { name: 'Yes, I have it' }));
-    expect(await within(sheet).findByRole('alert')).toHaveTextContent(/MRP \(₹60\)/);
-    expect(view.calls.some((c) => c.method === 'POST')).toBe(false);
-    fireEvent.change(price, { target: { value: '55' } });
-    fireEvent.click(within(sheet).getByRole('button', { name: 'Yes, I have it' }));
-    await waitFor(() => expect(view.calls.find((c) => c.method === 'POST')?.body).toEqual({ answer: 'yes', pricePaise: 5500 }));
+    await waitFor(() => expect(view.calls.find((c) => c.method === 'POST')?.body).toEqual({ answer: 'yes', pricePaise: 6500 }));
   });
 
   it('sends a ready-by time on today in IST', async () => {

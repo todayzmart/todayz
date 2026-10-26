@@ -126,7 +126,7 @@ func (s *Service) listStore(ctx context.Context, sid string, params asksapi.List
 
 // ReplyPriceRule is what decides a Yes's price (01 §11.2): the listed price
 // is the default; only a role with item.price.edit changes it or prices an
-// unlisted item; never above the MRP (the item's, else the master's).
+// unlisted item. It may be above the MRP (D-245).
 type ReplyPriceRule struct {
 	Listed      bool
 	ListedPaise int64
@@ -148,9 +148,6 @@ func (r ReplyPriceRule) Decide(sent *int) (*int64, error) {
 		return nil, problem.New(genproblems.Forbidden, "").WithField("body.pricePaise", "your role cannot change the price")
 	default:
 		price = ptr(int64(*sent))
-	}
-	if r.MrpPaise != nil && *price > *r.MrpPaise {
-		return nil, problem.New(genproblems.PriceAboveMrp, "").WithField("body.pricePaise", "above the MRP")
 	}
 	return price, nil
 }

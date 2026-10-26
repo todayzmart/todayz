@@ -8,6 +8,7 @@ import { decideShelf, startShelf } from '../onboarding/shelf/lines';
 import { decide, startEdit } from '../restock-scan/lines';
 import { INSIGHTS, ownerApi, shops, STORE } from '../test/insightsApi';
 import { json, renderAt, type Call, type Handler } from '../test/render';
+import { holding } from '../test/held';
 import { bannerDecisions } from './bannerDecisions';
 import { checkPhoto } from './photo';
 import { replyDecision } from './replyDraft';
@@ -451,5 +452,34 @@ describe('the decisions the client sends', () => {
     expect(checkPhoto(photo('image/gif'), ON.photoTypes, MB)).toBe('type');
     expect(checkPhoto(photo('image/png', 2 * MB), ON.photoTypes, MB)).toBe('size');
     expect(checkPhoto(photo(), ON.photoTypes, MB)).toBeNull();
+  });
+});
+
+describe('AI draft loading states', () => {
+  it('Discard draft shows its spinner, and Add stock waits, while the call runs', async () => {
+    const calls: Call[] = [];
+    renderAt('/restock-scan', { messages, handlers: [shops('owner'), features(), holding((c) => c.method === 'POST' && c.path.endsWith('/confirm')), bill(calls)] });
+    await pick(photo());
+    await screen.findByRole('list', { name: 'Bill lines' }, { timeout: 4000 });
+    const discard = screen.getByRole('button', { name: 'Discard draft' });
+    fireEvent.click(discard);
+    await waitFor(() => expect(discard).toHaveAttribute('aria-busy', 'true'));
+    const add = screen.getByRole('button', { name: /^Add stock/ });
+    expect(add).not.toHaveAttribute('aria-busy');
+    expect(add).toBeDisabled();
+  });
+
+  it('banner wording: None of these shows its spinner, and Use this waits, while the call runs', async () => {
+    const calls: Call[] = [];
+    renderAt('/offers', { messages, handlers: [shops('manager'), features(), offersApi, holding((c) => c.method === 'POST' && c.path.endsWith('/confirm')), copyApi(calls)] });
+    const sheet = await openBannerSheet();
+    fireEvent.click(await within(sheet).findByRole('button', { name: 'Suggest wording' }));
+    await within(sheet).findByRole('group', { name: 'Pick a wording' }, { timeout: 4000 });
+    const none = within(sheet).getByRole('button', { name: 'None of these' });
+    fireEvent.click(none);
+    await waitFor(() => expect(none).toHaveAttribute('aria-busy', 'true'));
+    const use = within(sheet).getByRole('button', { name: 'Use this' });
+    expect(use).not.toHaveAttribute('aria-busy');
+    expect(use).toBeDisabled();
   });
 });

@@ -32,6 +32,7 @@ export function card(over: Partial<DiscoverStoreCard> = {}): DiscoverStoreCard {
     ratingCount: 120,
     cashbackPct: 0,
     categoryTint: 'green',
+    photoKey: null,
     ...over,
   };
 }
@@ -80,6 +81,7 @@ export function page(over: Partial<DiscoverStorePage> = {}): DiscoverStorePage {
     ratingCount: 120,
     cashbackPct: 0,
     categoryTint: 'green',
+    photoKey: null,
     categorySlug: 'grocery',
     categoryName: 'Grocery',
     deliveryFeePaise: 2000,

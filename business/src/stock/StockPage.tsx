@@ -10,7 +10,7 @@ import { useIntl } from 'react-intl';
 import { useCurrentStore, type CurrentStore } from '../orders/store';
 import { AddItem } from './AddItem';
 import type { StockSearch } from './deeplink';
-import { effectiveMrp, itemTitle, parseQuantity, parseRupees, rupeesText, stockLevel } from './format';
+import { itemTitle, parseQuantity, parseRupees, rupeesText, stockLevel } from './format';
 import { ImportSheet } from './ImportSheet';
 import { InlineEdit } from './InlineEdit';
 import { ItemSheet, type SheetMode } from './ItemSheet';
@@ -39,7 +39,7 @@ export function StockPage({ search }: { search: StockSearch }) {
           icon={Inbox}
           title={intl.formatMessage({ id: 'stock.error.title' })}
           description={intl.formatMessage({ id: 'stock.error.body' })}
-          action={<Button onClick={current.retry}>{intl.formatMessage({ id: 'stock.error.retry' })}</Button>}
+          action={<Button loading={current.retrying} onClick={current.retry}>{intl.formatMessage({ id: 'stock.error.retry' })}</Button>}
         />
       )}
       {current.status === 'none' && (
@@ -197,7 +197,7 @@ function StockDesk({ store, search }: { store: CurrentStore; search: StockSearch
           icon={Inbox}
           title={intl.formatMessage({ id: 'stock.error.title' })}
           description={intl.formatMessage({ id: 'stock.error.body' })}
-          action={<Button onClick={() => void list.refetch()}>{intl.formatMessage({ id: 'stock.error.retry' })}</Button>}
+          action={<Button loading={list.isFetching} onClick={() => void list.refetch()}>{intl.formatMessage({ id: 'stock.error.retry' })}</Button>}
         />
       ) : (
         <ItemTable
@@ -335,23 +335,16 @@ function ItemTable({
         cell: ({ row }) => {
           const i = row.original;
           const name = itemTitle(i);
-          const mrp = effectiveMrp(i);
           return (
             <InlineEdit
               key={`${i.id}-${String(i.pricePaise)}`}
               label={intl.formatMessage({ id: 'stock.inline.price' }, { item: name })}
               initial={rupeesText(i.pricePaise)}
               prefix="₹"
-              parse={(t) => {
-                const p = parseRupees(t);
-                return p !== null && (mrp === null || p <= mrp) ? p : null;
-              }}
+              parse={parseRupees}
               editable={!counting && canStock(store.role, 'price')}
               display={formatMoney(i.pricePaise, 'product')}
-              invalidText={intl.formatMessage(
-                { id: mrp === null ? 'stock.form.priceInvalid' : 'stock.form.priceAboveMrp' },
-                { mrp: mrp === null ? '' : formatMoney(mrp, 'product') },
-              )}
+              invalidText={intl.formatMessage({ id: 'stock.form.priceInvalid' })}
               failedText={intl.formatMessage({ id: 'stock.error.generic' })}
               saveLabel={intl.formatMessage({ id: 'stock.inline.save' }, { item: name })}
               cancelLabel={intl.formatMessage({ id: 'stock.form.cancel' })}

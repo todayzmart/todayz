@@ -3,6 +3,7 @@ import { asMessages } from '@todayz/i18n';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { json, problem, renderAt, type Call, type Handler } from '../test/render';
+import { failThenHold, holding } from '../test/held';
 
 const messages = asMessages(en);
 const B = '/v1/biz/businesses/b1';
@@ -209,5 +210,24 @@ describe('B-10 standee and referrals', () => {
   it('shows an error with retry when referrals fail', async () => {
     renderAt('/credits', { messages, handlers: [shops('owner'), account([]), (c) => (c.path === `${B}/referrals` ? problem(500, 'internal') : undefined), store] });
     expect(await screen.findByText('Could not load your referral code.')).toBeInTheDocument();
+  });
+});
+
+describe('B-10 loading states', () => {
+  it('shows a skeleton for the short code while the store loads', async () => {
+    renderAt('/credits', { messages, handlers: [shops('owner'), account([]), refs, holding((c) => c.method === 'GET' && c.path === `${B}/stores/s1`)] });
+    await waitFor(() => expect(document.getElementById('cr-standee-title')).not.toBeNull());
+    const card = document.getElementById('cr-standee-title')?.closest('section') as HTMLElement;
+    expect(card.querySelector('.tz-ui-skeleton')).not.toBeNull();
+  });
+
+  it('referral "Try again" shows the loading state while the retry runs', async () => {
+    const r = failThenHold((c) => c.path === `${B}/referrals`);
+    renderAt('/credits', { messages, handlers: [shops('owner'), account([]), r, store] });
+    expect(await screen.findByText('Could not load your referral code.')).toBeInTheDocument();
+    const card = document.getElementById('cr-ref-title')?.closest('section') as HTMLElement;
+    fireEvent.click(within(card).getByRole('button', { name: 'Try again' }));
+    await waitFor(() => expect(r.calls()).toBe(2));
+    await waitFor(() => expect(card.querySelector('.tz-ui-skeleton, [aria-busy="true"]')).not.toBeNull());
   });
 });

@@ -93,8 +93,8 @@ export function NewOrders({ store, orders }: { store: CurrentStore; orders: read
                   setLastId(o.id);
                   void accept(o.id);
                 }}
-                disabled={acting !== null}
-                aria-busy={acting === o.id || undefined}
+                loading={acting === o.id}
+                disabled={acting !== null && acting !== o.id}
                 aria-label={intl.formatMessage({ id: 'overview.orders.acceptA11y' }, { code: o.code })}
               >
                 {intl.formatMessage({ id: 'overview.orders.accept' })}

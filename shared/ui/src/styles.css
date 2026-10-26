@@ -104,6 +104,26 @@ html.tz-ui-scroll-lock {
   color: var(--ink-2);
 }
 
+/* A native select draws its arrow flush against the right edge. Draw a chevron inset by the
+   field's own padding instead: two token-coloured strokes make the "v". */
+select.tz-input {
+  appearance: none;
+  padding-right: calc(var(--space-3) * 2 + 12px);
+  background-image:
+    linear-gradient(45deg, transparent calc(50% - 0.75px), var(--ink-2) calc(50% - 0.75px), var(--ink-2) calc(50% + 0.75px), transparent calc(50% + 0.75px)),
+    linear-gradient(-45deg, transparent calc(50% - 0.75px), var(--ink-2) calc(50% - 0.75px), var(--ink-2) calc(50% + 0.75px), transparent calc(50% + 0.75px));
+  background-position:
+    right calc(var(--space-3) + 6px) center,
+    right var(--space-3) center;
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+select.tz-input:disabled {
+  cursor: not-allowed;
+}
+
 .tz-ui-affix .tz-input {
   min-height: calc(var(--control-md) - 2px);
   padding-left: var(--space-2);
@@ -242,6 +262,11 @@ html.tz-ui-scroll-lock {
   height: 100%;
   object-fit: cover;
   border-radius: inherit;
+}
+
+/* A shop photo in the avatar's place: the picture fills it, corners clipped. */
+.tz-ui-avatar-photo {
+  overflow: hidden;
 }
 
 .tz-ui-mrp-spacer {

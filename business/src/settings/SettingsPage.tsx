@@ -30,7 +30,7 @@ export function SettingsPage() {
           icon={Inbox}
           title={intl.formatMessage({ id: 'settings.loadFailed.title' })}
           description={intl.formatMessage({ id: 'settings.loadFailed.body' })}
-          action={<Button onClick={cur.retry}>{intl.formatMessage({ id: 'settings.retry' })}</Button>}
+          action={<Button loading={cur.retrying} onClick={cur.retry}>{intl.formatMessage({ id: 'settings.retry' })}</Button>}
         />
       )}
       {cur.status === 'none' && (

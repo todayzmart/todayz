@@ -221,8 +221,8 @@
     tags: [asks]
     summary: Answer an ask, Yes or No (B-20)
     description: >-
-      Within `ask_reply_window_min`. A Yes may carry a per-unit price (never above the MRP,
-      `422 price_above_mrp`; only item.price.edit may change the listed price, and only owner or
+      Within `ask_reply_window_min`. A Yes may carry a per-unit price (any price, above the
+      MRP too, D-245; `price_above_mrp` is no longer returned; only item.price.edit may change the listed price, and only owner or
       manager may price an unlisted item) and `readyBy` (today, or by the end of tomorrow IST
       when the ask is for tomorrow; else `422 validation_failed` on `body.readyBy`). A Yes on a
       listed item confirms its stock with no stock movement. A second reply is

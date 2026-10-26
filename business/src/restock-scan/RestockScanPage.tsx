@@ -76,7 +76,10 @@ function Lines({ store, draft, onDone }: { store: CurrentStore; draft: SupplierB
       return rest;
     });
   };
+  // Which button sent the call, so only that one shows the spinner.
+  const [sending, setSending] = useState('');
   const send = async (decisions: typeof plan.decisions, name: string) => {
+    setSending(name);
     const result = await action.run(name, (key) => confirmSupplierBillDraft(store.bid, store.sid, draft.draftId, { lines: decisions }, withKey(key)));
     if (result) {
       // The restock changed stock counts: every stock list and the Overview read again.
@@ -154,10 +157,10 @@ function Lines({ store, draft, onDone }: { store: CurrentStore; draft: SupplierB
       {draft.lines.some((l) => l.match === null) && <p className="tz-field-help">{intl.formatMessage({ id: 'ai.bill.unmatchedHelp' })}</p>}
       {conflict ? <Banner tone="warning"><span role="alert">{intl.formatMessage({ id: 'ai.error.changed' })}</span></Banner> : action.error !== null && Object.keys(server).length === 0 && <AiError error={action.error} />}
       <div className={styles.actions}>
-        <Button variant="primary" type="submit" loading={action.pending} disabled={n === 0}>
+        <Button variant="primary" type="submit" loading={action.pending && sending === 'confirm'} disabled={n === 0 || (action.pending && sending !== 'confirm')}>
           {intl.formatMessage({ id: 'ai.bill.confirm' }, { n })}
         </Button>
-        <Button variant="ghost" onClick={discard} disabled={action.pending}>
+        <Button variant="ghost" onClick={discard} loading={action.pending && sending === 'discard'} disabled={action.pending && sending !== 'discard'}>
           {intl.formatMessage({ id: done.settled.size > 0 ? 'ai.discardRest' : 'ai.discard' })}
         </Button>
       </div>

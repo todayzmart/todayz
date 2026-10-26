@@ -132,8 +132,7 @@ func TestShelfDraftCreatesNothingUntilConfirm(t *testing.T) {
 	}, adds)
 }
 
-// TestShelfConfirmRefuses (SC-AI-16): a product the store already sells, a price above MRP,
-// an unmatched accepted line and a line the catalogue refuses for want of a permission
+// TestShelfConfirmRefuses (SC-AI-16): a product the store already sells, an unmatched accepted line and a line the catalogue refuses for want of a permission
 // (item.price.edit, W3-11 review) are refused alone with their reason; the good line among
 // them is created, the draft stays ready, and the next confirm creates only the fixed line.
 func TestShelfConfirmRefuses(t *testing.T) {
@@ -155,7 +154,6 @@ func TestShelfConfirmRefuses(t *testing.T) {
 		refuse bool
 	}{
 		{"already listed", edit(listed[0], listed[0].MrpPaise), "invalid_listed", false},
-		{"above mrp", edit(ps[0], ps[0].MrpPaise+1), "invalid_price_above_mrp", false},
 		{"no price edit permission", accept("l1"), "not_permitted", true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {

@@ -92,7 +92,7 @@ Shorthand in 2.6: `{B}` = `/v1/biz/businesses/{bid}`, `{S}` = `{B}/stores/{sid}`
   | `ask_no_shops` | 409 | `asks.yaml` | no store qualifies (radius, open now, not muted, under its daily limit) |
   | `ask_store_unavailable` | 409 | `asks.yaml` | "Ask this shop": that store is closed, muted, at its daily limit or blocked this customer. The body, `detail` and copy are the same for every reason; the reason is never sent (01 §11.2) |
   | `ask_closed` | 409 | `asks.yaml` | a reply after the store's reply window, or on a closed ask |
-  | `price_above_mrp` | 422 | `asks.yaml` | a Yes price above the item's MRP (the master product's MRP for an unlisted item) |
+  | `price_above_mrp` | 422 | `asks.yaml` | unused since D-245 (a price may be above the MRP); kept so clients do not change |
   | `ask_reply_used` | 409 | `orders.yaml` | an order from an ask reply that already has an active order (any state but `cancelled`, `expired`, `rejected`); the unique index `ux_orders_ask_reply_active` (03) decides a race; `extensions.orderId` is the customer's own active order |
   | `ask_price_expired` | 409 | `orders.yaml` | the replied price ended between the quote and the order; the fresh quote at the current price is in `extensions`; never re-priced silently |
   | `share_card_unavailable` | 410 | `share.yaml` | share card create for an item whose store is not `live` or whose business is not `verified`, or a read of a card whose store is no longer `live` (D-40) |
@@ -260,7 +260,7 @@ Cashier rights are D-06 as amended by D-65: cashiers run orders day to day (acce
 
 | Method | Path | Role | Pkg | Notes |
 |---|---|---|---|---|
-| POST | {B}/products | manager | W1-05 | create a missing master product (pending review) (D-37) |
+| POST | {B}/products | manager | W1-05 | create a missing master product (pending review) for the body's `storeId`, which can list it at once (D-37) |
 | GET | {B}/products/search?q=&barcode= | cashier | W1-05 | master catalogue (D-37) |
 | GET | {S}/items | cashier | W1-05 | |
 | POST | {S}/items | manager | W1-05 | list a product with price; opening stock writes an `opening` movement |
@@ -343,7 +343,7 @@ Priced above nearby is returned only while `insight_price_compare_enabled` is tr
 | Method | Path | Role | Pkg | Notes |
 |---|---|---|---|---|
 | GET | {S}/asks?status=&cursor=&limit= | cashier | W3-16 | `asks.view`; the Asks inbox (B-20), paginated (§1): open asks first, by `replyBy`. Each: `{askId, itemName, productId?, storeItemId?, quantity, needBy?, distanceBand, replyBy, available?, listedPricePaise?, mrpPaise?}`; never a name, phone, address or exact distance |
-| POST | {S}/asks/{askId}/reply | cashier | W3-16 | idempotent; `asks.reply`; `{answer: yes|no, pricePaise?, readyBy?}`. `readyBy` is today (IST), or up to the end of tomorrow when the ask's `needBy` is `tomorrow`; later is `422 validation_failed`. A price other than the listed price needs `item.price.edit` (`403` otherwise); on an unlisted item only `item.price.edit` may send a price. `422 price_above_mrp`, `409 ask_closed`, `409 invalid_transition` (already answered). A Yes on a listed item moves `stock_updated_at` with no movement |
+| POST | {S}/asks/{askId}/reply | cashier | W3-16 | idempotent; `asks.reply`; `{answer: yes|no, pricePaise?, readyBy?}`. `readyBy` is today (IST), or up to the end of tomorrow when the ask's `needBy` is `tomorrow`; later is `422 validation_failed`. A price other than the listed price needs `item.price.edit` (`403` otherwise); on an unlisted item only `item.price.edit` may send a price. `409 ask_closed`, `409 invalid_transition` (already answered). A Yes on a listed item moves `stock_updated_at` with no movement |
 | POST | {S}/asks/{askId}/report | cashier | W3-16 | `asks.reply`; `{reason}`; raises a `risk_flags` row (rule `ask_reported`) for the customer and stops asks from that customer to this store; allowed while the ask is kept (`ask_retention_days`), open or closed; `409 invalid_transition` when this store already reported it |
 
 **Credits, statements, referrals, standees (`business-credits.yaml`, `referrals.yaml`, `standee.yaml`)**

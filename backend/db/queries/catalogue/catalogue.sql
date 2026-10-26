@@ -33,7 +33,8 @@ VALUES (@id, @name, sqlc.narg(brand_id), @category_id, sqlc.narg(variant), @pack
 
 -- name: GetProduct :one
 SELECT p.id, p.name, p.brand_id, b.name AS brand_name, p.category_id, p.variant,
-  p.pack_size::float8 AS pack_size, p.unit, p.mrp_paise, p.image_key, p.barcodes, p.status
+  p.pack_size::float8 AS pack_size, p.unit, p.mrp_paise, p.image_key, p.barcodes, p.status,
+  p.created_by_store_id
 FROM products p LEFT JOIN brands b ON b.id = p.brand_id
 WHERE p.id = @id;
 

@@ -49,7 +49,7 @@ export function StoresPage() {
           icon={Inbox}
           title={intl.formatMessage({ id: 'stores.loadFailed.title' })}
           description={intl.formatMessage({ id: 'stores.loadFailed.body' })}
-          action={<Button onClick={cur.retry}>{intl.formatMessage({ id: 'stores.retry' })}</Button>}
+          action={<Button loading={cur.retrying} onClick={cur.retry}>{intl.formatMessage({ id: 'stores.retry' })}</Button>}
         />
       )}
       {cur.status === 'none' && (

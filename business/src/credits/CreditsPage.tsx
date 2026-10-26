@@ -30,7 +30,7 @@ export function CreditsPage() {
           icon={Inbox}
           title={intl.formatMessage({ id: 'credits.error.title' })}
           description={intl.formatMessage({ id: 'credits.error.body' })}
-          action={<Button onClick={current.retry}>{intl.formatMessage({ id: 'credits.retry' })}</Button>}
+          action={<Button loading={current.retrying} onClick={current.retry}>{intl.formatMessage({ id: 'credits.retry' })}</Button>}
         />
       )}
       {current.status === 'none' && (
@@ -81,7 +81,7 @@ function Desk({ store }: { store: CurrentStore }) {
           </div>
         )}
         {account.isError && !account.data && (
-          <Banner tone="warning" action={<Button onClick={() => void account.refetch()}>{intl.formatMessage({ id: 'credits.retry' })}</Button>}>
+          <Banner tone="warning" action={<Button loading={account.isFetching} onClick={() => void account.refetch()}>{intl.formatMessage({ id: 'credits.retry' })}</Button>}>
             {intl.formatMessage({ id: 'credits.account.error' })}
           </Banner>
         )}
@@ -116,6 +116,7 @@ function Desk({ store }: { store: CurrentStore }) {
         loading={referrals.isPending}
         failed={referrals.isError}
         retry={() => void referrals.refetch()}
+        retrying={referrals.isFetching}
       />
     </>
   );

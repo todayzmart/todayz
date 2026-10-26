@@ -36,7 +36,7 @@ export function AsksInbox({ store }: { store: CurrentStore }) {
       <EmptyState
         icon={MessageCircleQuestion}
         title={intl.formatMessage({ id: 'asks.error.load' })}
-        action={<Button onClick={() => void open.refetch()}>{intl.formatMessage({ id: 'asks.retry' })}</Button>}
+        action={<Button loading={open.isFetching} onClick={() => void open.refetch()}>{intl.formatMessage({ id: 'asks.retry' })}</Button>}
       />
     );
   }

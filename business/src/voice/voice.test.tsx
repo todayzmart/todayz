@@ -3,6 +3,7 @@ import { asMessages } from '@todayz/i18n';
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { json, problem, renderAt, type Call, type Handler } from '../test/render';
+import { holding } from '../test/held';
 
 const messages = asMessages(en);
 const BASE = '/v1/biz/businesses/b1/stores/s1';
@@ -492,5 +493,19 @@ describe('SC-VO-08/09/10 refusals and failures', () => {
     });
     await speak();
     expect(await screen.findByText('Applied', {}, { timeout: 3000 })).toBeInTheDocument();
+  });
+});
+
+describe('voice review loading states', () => {
+  it('Discard shows its spinner, and Confirm waits, while the call runs', async () => {
+    renderAt('/voice', { messages, handlers: [shops('owner'), holding((c) => c.method === 'POST' && c.path.endsWith('/confirm')), ...voiceHandlers(draft('ready', [line('a'), line('b')]))] });
+    await speak();
+    await screen.findByRole('list', { name: 'Draft lines' }, { timeout: 3000 });
+    const discard = screen.getByRole('button', { name: 'Discard' });
+    fireEvent.click(discard);
+    await waitFor(() => expect(discard).toHaveAttribute('aria-busy', 'true'));
+    const confirm = screen.getByRole('button', { name: /^Confirm/ });
+    expect(confirm).not.toHaveAttribute('aria-busy');
+    expect(confirm).toBeDisabled();
   });
 });

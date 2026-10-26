@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -165,6 +166,121 @@ func (s *Service) searchProducts(ctx context.Context, bid string, p catalogueapi
 	return out, nil
 }
 
+// --- missing products -------------------------------------------------------------
+
+// createProduct creates a product the master catalogue does not have
+// (D-37): pending_review, with the body's store as its creator, so that
+// store can list it at once and the A-08 queue sees it. The engine checked
+// product.create in the business; the store needs it too.
+func (s *Service) createProduct(ctx context.Context, bid string, b *catalogueapi.ProductCreate) (catalogueapi.CreatedProduct, error) {
+	if err := s.ready(ctx); err != nil {
+		return catalogueapi.CreatedProduct{}, err
+	}
+	sc, err := scope(bid, "")
+	if err != nil {
+		return catalogueapi.CreatedProduct{}, err
+	}
+	if b == nil {
+		return catalogueapi.CreatedProduct{}, problem.New(genproblems.BadRequest, "")
+	}
+	if sc.StoreID, err = ids.Parse(b.StoreId); err != nil {
+		return catalogueapi.CreatedProduct{}, fieldErr("body.storeId", "not a store id")
+	}
+	if err := s.also(ctx, policy.ProductCreate, sc); err != nil {
+		return catalogueapi.CreatedProduct{}, err
+	}
+	categoryID, err := ids.Parse(b.CategoryId)
+	if err != nil {
+		return catalogueapi.CreatedProduct{}, fieldErr("body.categoryId", "not a category id")
+	}
+	cq := s.q(ctx)
+	var v invalid
+	name := strings.TrimSpace(b.Name)
+	v.text("body.name", &name)
+	variant, brand := trimmed(b.Variant), trimmed(b.Brand)
+	v.text("body.variant", variant)
+	v.text("body.brand", brand)
+	barcodes := []string{}
+	if b.Barcodes != nil {
+		for i, bc := range *b.Barcodes {
+			if slices.Contains(barcodes, bc) {
+				continue
+			}
+			taken, err := cq.BarcodeTaken(ctx, bc)
+			if err != nil {
+				return catalogueapi.CreatedProduct{}, fmt.Errorf("catalogue: barcode: %w", err)
+			}
+			if taken {
+				v.add(fmt.Sprintf("body.barcodes[%d]", i), "a product with this barcode exists; search for it")
+			}
+			barcodes = append(barcodes, bc)
+		}
+	}
+	if err := v.err(); err != nil {
+		return catalogueapi.CreatedProduct{}, err
+	}
+	now := s.clock.Now()
+	productID := s.ids.New(now)
+	err = s.db.InTx(ctx, func(ctx context.Context) error {
+		q := cataloguedb.New(s.db.Q(ctx))
+		var brandID pgtype.UUID
+		// A brand whose name has no ASCII letter or digit has no slug; the
+		// product is saved without it and review can add it.
+		if brand != nil {
+			if slug := brandSlug(*brand); slug != "" {
+				if brandID, err = q.InsertBrand(ctx, cataloguedb.InsertBrandParams{
+					ID: ids.UUID(s.ids.New(now)), Name: *brand, Slug: slug, Now: now,
+				}); err != nil {
+					return fmt.Errorf("catalogue: brand: %w", err)
+				}
+			}
+		}
+		if err := q.InsertProduct(ctx, cataloguedb.InsertProductParams{
+			ID: ids.UUID(productID), Name: name, BrandID: brandID, CategoryID: ids.UUID(categoryID), Variant: variant,
+			PackSize: float64(b.PackSize), Unit: string(b.Unit), MrpPaise: int64p(b.MrpPaise), Barcodes: barcodes,
+			Status: "pending_review", CreatedByStoreID: ids.UUID(sc.StoreID), Now: now,
+		}); err != nil {
+			if db.IsForeignKeyViolation(err, "fk_products_category_id") {
+				return fieldErr("body.categoryId", "unknown category")
+			}
+			return fmt.Errorf("catalogue: new product: %w", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return catalogueapi.CreatedProduct{}, err
+	}
+	r, err := s.q(ctx).GetProduct(ctx, ids.UUID(productID))
+	if err != nil {
+		return catalogueapi.CreatedProduct{}, fmt.Errorf("catalogue: product: %w", err)
+	}
+	return catalogueapi.CreatedProduct{
+		Id: ulidOf(r.ID), Name: r.Name, Brand: r.BrandName, Variant: r.Variant, PackSize: float32(r.PackSize),
+		Unit: catalogueapi.Unit(r.Unit), MrpPaise: intp(r.MrpPaise), CategoryId: ulidOf(r.CategoryID),
+		Barcodes: nonNil(r.Barcodes), Status: catalogueapi.PendingReview,
+	}, nil
+}
+
+// brandSlug is a brand's slug: ASCII lower-case letters and digits joined by
+// single hyphens; empty when the name has none.
+func brandSlug(name string) string {
+	var b strings.Builder
+	hyphen := false
+	for _, r := range strings.ToLower(name) {
+		switch {
+		case (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9'):
+			if hyphen && b.Len() > 0 {
+				b.WriteByte('-')
+			}
+			hyphen = false
+			b.WriteRune(r)
+		default:
+			hyphen = true
+		}
+	}
+	return b.String()
+}
+
 // --- store items ----------------------------------------------------------------
 
 func (s *Service) toItem(r cataloguedb.GetStoreItemRow, v view) catalogueapi.StoreItem {
@@ -281,15 +397,6 @@ func (s *Service) listItems(ctx context.Context, bid, sid string, p catalogueapi
 	return out, nil
 }
 
-// effectiveMRP is the MRP the price may not exceed: the store's, else the
-// product's; nil when neither has one.
-func effectiveMRP(store, product *int64) *int64 {
-	if store != nil {
-		return store
-	}
-	return product
-}
-
 // istDate turns an API date into the IST calendar date as midnight UTC.
 func istDate(d *openapi_types.Date) *time.Time {
 	if d == nil {
@@ -342,8 +449,11 @@ func (s *Service) createItem(ctx context.Context, bid, sid string, b *cataloguea
 	if err := v.err(); err != nil {
 		return catalogueapi.StoreItem{}, 0, err
 	}
+	// A product waiting for review is usable at once in the store that
+	// created it (01 §5, D-37).
 	prod, err := s.q(ctx).GetProduct(ctx, ids.UUID(productID))
-	if db.IsNoRows(err) || (err == nil && prod.Status != "active") {
+	if db.IsNoRows(err) || (err == nil && prod.Status != "active" &&
+		(prod.Status != "pending_review" || prod.CreatedByStoreID != ids.UUID(sc.StoreID))) {
 		return catalogueapi.StoreItem{}, 0, fieldErr("body.productId", "no such product")
 	}
 	if err != nil {
@@ -351,9 +461,6 @@ func (s *Service) createItem(ctx context.Context, bid, sid string, b *cataloguea
 	}
 	price := int64(b.PricePaise)
 	mrp := int64p(b.MrpPaise)
-	if m := effectiveMRP(mrp, prod.MrpPaise); m != nil && price > *m {
-		return catalogueapi.StoreItem{}, 0, fieldErr("body.pricePaise", "must not be above the MRP")
-	}
 	listed := true
 	if b.IsListed != nil {
 		listed = *b.IsListed
@@ -462,22 +569,6 @@ func (s *Service) updateItem(ctx context.Context, bid, sid, itemID string, h *st
 		}
 		if cur.Version != version {
 			return problem.New(genproblems.PreconditionFailed, "")
-		}
-		// The price may not pass the MRP that applies after the change
-		// (clearing the store MRP falls back to the product's).
-		price, mrp := cur.PricePaise, cur.MrpPaise
-		if setPrice {
-			price = arg.PricePaise
-		}
-		if setMrp {
-			mrp = arg.MrpPaise
-		}
-		if m := effectiveMRP(mrp, cur.ProductMrpPaise); m != nil && price > *m {
-			field := "body.pricePaise"
-			if !setPrice {
-				field = "body.mrpPaise"
-			}
-			return fieldErr(field, "the price must not be above the MRP")
 		}
 		if _, err := q.UpdateStoreItem(ctx, arg); err != nil {
 			if db.IsNoRows(err) {

@@ -11,7 +11,7 @@ export interface CurrentStore {
 
 export type CurrentStoreState =
   | { status: 'loading' }
-  | { status: 'error'; retry: () => void }
+  | { status: 'error'; retry: () => void; /** The retry is in flight: the retry button shows a spinner. */ retrying: boolean }
   | { status: 'none' }
   | { status: 'ready'; store: CurrentStore };
 
@@ -34,7 +34,7 @@ export function canRecordDamage(role: ShopRole): boolean {
 export function useCurrentStore(): CurrentStoreState {
   const { status } = useSessionState();
   const q = useQuery({ queryKey: ['businesses'], queryFn: () => listBusinesses(), enabled: status === 'signedIn', retry: false });
-  if (q.isError) return { status: 'error', retry: () => void q.refetch() };
+  if (q.isError) return { status: 'error', retry: () => void q.refetch(), retrying: q.isFetching };
   if (!q.data) return { status: 'loading' };
   const remembered = rememberedStore();
   const all = q.data.items.flatMap((b) => b.stores.map((s) => ({ b, s })));

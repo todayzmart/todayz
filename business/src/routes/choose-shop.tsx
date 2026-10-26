@@ -59,7 +59,7 @@ function ChooseShop() {
           <Button variant="primary" onClick={go}>
             {intl.formatMessage({ id: 'shop.pick.continue' })}
           </Button>
-          <Button variant="ghost" onClick={() => void query.refetch()}>
+          <Button variant="ghost" loading={query.isFetching} onClick={() => void query.refetch()}>
             {intl.formatMessage({ id: 'shop.pick.retry' })}
           </Button>
         </div>

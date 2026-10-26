@@ -35,6 +35,15 @@ describe('C-03 Home', () => {
     expect(screen.getByText('In-store only')).toBeInTheDocument();
   });
 
+  it('shows a shop\'s accepted storefront photo in place of its initials (D-246)', async () => {
+    const { container } = renderDiscover('/', routes([card({ photoKey: 'stores/s1/d1.jpg' })]));
+    atBengaluru();
+    expect(await screen.findByText('Sri Lakshmi Stores')).toBeInTheDocument();
+    const img = container.querySelector('.tz-scard img');
+    expect(img?.getAttribute('src')).toMatch(/\/stores\/s1\/d1\.jpg$/);
+    expect(screen.queryByText('SS')).toBeNull();
+  });
+
   it('a wider radius asks the API again and is remembered', async () => {
     const { calls } = renderDiscover('/', routes());
     atBengaluru();

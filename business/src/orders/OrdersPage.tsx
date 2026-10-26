@@ -31,7 +31,7 @@ export function OrdersPage({ initialTab }: { initialTab?: 'asks' | undefined } =
           icon={Inbox}
           title={intl.formatMessage({ id: 'orders.error.title' })}
           description={intl.formatMessage({ id: 'orders.error.body' })}
-          action={<Button onClick={current.retry}>{intl.formatMessage({ id: 'orders.error.retry' })}</Button>}
+          action={<Button loading={current.retrying} onClick={current.retry}>{intl.formatMessage({ id: 'orders.error.retry' })}</Button>}
         />
       )}
       {current.status === 'none' && (
@@ -112,7 +112,7 @@ function TabBody({ store, tab, query }: { store: CurrentStore; tab: OrderTab; qu
         icon={Inbox}
         title={intl.formatMessage({ id: 'orders.error.title' })}
         description={intl.formatMessage({ id: 'orders.error.body' })}
-        action={<Button onClick={() => void query.refetch()}>{intl.formatMessage({ id: 'orders.error.retry' })}</Button>}
+        action={<Button loading={query.isFetching} onClick={() => void query.refetch()}>{intl.formatMessage({ id: 'orders.error.retry' })}</Button>}
       />
     );
   }

@@ -244,8 +244,9 @@ func TestReplyPriceRule(t *testing.T) {
 	p, err = edit.Decide(ptr(4500))
 	require.NoError(t, err)
 	require.Equal(t, int64(4500), *p)
-	_, err = edit.Decide(ptr(6001))
-	require.Equal(t, string(genproblems.PriceAboveMrp), code(t, err), "never above MRP")
+	p, err = edit.Decide(ptr(6001))
+	require.NoError(t, err)
+	require.Equal(t, int64(6001), *p, "above the MRP is allowed (D-245)")
 	p, err = (ReplyPriceRule{}).Decide(nil)
 	require.NoError(t, err)
 	require.Nil(t, p, "an unlisted Yes with no price")
@@ -350,11 +351,9 @@ func TestReplyPricerAndNoStockMovement(t *testing.T) {
 	}
 	require.Equal(t, "lt_1km", string(l.Asks[0].DistanceBand))
 
-	// A cashier cannot change the price; above MRP is refused.
+	// A cashier cannot change the price.
 	_, err = w.svc.reply(w.asStaff(st, authz.Cashier), st.String(), aid, &asksapi.AskReplyCreate{Answer: asksapi.AskReplyCreateAnswerYes, PricePaise: ptr(75000)})
 	require.Equal(t, string(genproblems.Forbidden), code(t, err))
-	_, err = w.svc.reply(w.asStaff(st, authz.Owner), st.String(), aid, &asksapi.AskReplyCreate{Answer: asksapi.AskReplyCreateAnswerYes, PricePaise: ptr(90001)})
-	require.Equal(t, string(genproblems.PriceAboveMrp), code(t, err))
 
 	moves := w.count(`SELECT count(*) FROM stock_movements`)
 	got, err := w.svc.reply(w.asStaff(st, authz.Owner), st.String(), aid, &asksapi.AskReplyCreate{Answer: asksapi.AskReplyCreateAnswerYes, PricePaise: ptr(76000)})

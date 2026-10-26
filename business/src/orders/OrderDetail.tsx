@@ -78,7 +78,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
           icon={Inbox}
           title={intl.formatMessage({ id: 'orders.error.title' })}
           description={intl.formatMessage({ id: 'orders.error.body' })}
-          action={<Button onClick={current.retry}>{intl.formatMessage({ id: 'orders.error.retry' })}</Button>}
+          action={<Button loading={current.retrying} onClick={current.retry}>{intl.formatMessage({ id: 'orders.error.retry' })}</Button>}
         />
       )}
       {current.status === 'none' && (
@@ -104,7 +104,7 @@ function DetailBody({ store, orderId }: { store: CurrentStore; orderId: string }
         icon={Inbox}
         title={intl.formatMessage({ id: missing ? 'orders.detail.notFound' : 'orders.error.title' })}
         description={missing ? undefined : intl.formatMessage({ id: 'orders.error.body' })}
-        action={missing ? undefined : <Button onClick={() => void query.refetch()}>{intl.formatMessage({ id: 'orders.error.retry' })}</Button>}
+        action={missing ? undefined : <Button loading={query.isFetching} onClick={() => void query.refetch()}>{intl.formatMessage({ id: 'orders.error.retry' })}</Button>}
       />
     );
   }

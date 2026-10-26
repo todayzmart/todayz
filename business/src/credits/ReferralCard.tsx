@@ -22,10 +22,11 @@ interface Props {
   loading: boolean;
   failed: boolean;
   retry: () => void;
+  retrying: boolean;
 }
 
 /** The business referral code (shop-to-shop only, D-26), a share link and the stats. */
-export function ReferralCard({ referrals, loading, failed, retry }: Props) {
+export function ReferralCard({ referrals, loading, failed, retry, retrying }: Props) {
   const intl = useIntl();
   const toast = useToast();
   const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
@@ -51,7 +52,7 @@ export function ReferralCard({ referrals, loading, failed, retry }: Props) {
       </div>
       {loading && <Skeleton height="5rem" />}
       {failed && (
-        <Banner tone="warning" action={<Button onClick={retry}>{intl.formatMessage({ id: 'credits.retry' })}</Button>}>
+        <Banner tone="warning" action={<Button loading={retrying} onClick={retry}>{intl.formatMessage({ id: 'credits.retry' })}</Button>}>
           {intl.formatMessage({ id: 'credits.referral.error' })}
         </Banner>
       )}

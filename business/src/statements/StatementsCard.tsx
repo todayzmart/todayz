@@ -43,7 +43,7 @@ export function StatementsCard({ bid }: { bid: string }) {
         </div>
       )}
       {statements.isError && !statements.data && (
-        <Banner tone="warning" action={<Button onClick={() => void statements.refetch()}>{intl.formatMessage({ id: 'statements.retry' })}</Button>}>
+        <Banner tone="warning" action={<Button loading={statements.isFetching} onClick={() => void statements.refetch()}>{intl.formatMessage({ id: 'statements.retry' })}</Button>}>
           {intl.formatMessage({ id: 'statements.error' })}
         </Banner>
       )}

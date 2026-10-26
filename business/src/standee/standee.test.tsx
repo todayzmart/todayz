@@ -3,6 +3,7 @@ import { asMessages } from '@todayz/i18n';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { json, problem, renderAt, type Call, type Handler } from '../test/render';
+import { failThenHold, holding } from '../test/held';
 
 const messages = asMessages(en);
 const B = '/v1/biz/businesses/b1';
@@ -47,5 +48,22 @@ describe('standee page', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Download A5 PDF' }));
     expect(await screen.findByText('Could not prepare the standee. Try again.')).toBeInTheDocument();
     await waitFor(() => expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument());
+  });
+});
+
+describe('standee loading states', () => {
+  it('shows a skeleton for the short code while the store loads', async () => {
+    renderAt('/standee', { messages, handlers: [shops('owner'), standees, holding((c) => c.method === 'GET' && c.path === `${B}/stores/s1`)] });
+    await screen.findByRole('button', { name: 'Download A5 PDF' });
+    expect(document.querySelector('.tz-ui-skeleton[style*="10ch"]')).not.toBeNull();
+  });
+
+  it('"Try again" after a failed PDF shows a spinner while it runs', async () => {
+    const p = failThenHold((c) => c.path.endsWith('.pdf'));
+    renderAt('/standee', { messages, handlers: [shops('owner'), store, standees, p] });
+    fireEvent.click(await screen.findByRole('button', { name: 'Download A5 PDF' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Try again' }));
+    await waitFor(() => expect(p.calls()).toBe(2));
+    await waitFor(() => expect(screen.getAllByRole('button').some((b) => b.getAttribute('aria-busy') === 'true')).toBe(true));
   });
 });

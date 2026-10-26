@@ -1426,6 +1426,19 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
 - **Not changed.** Enrolment, verify, recovery and reset still work when called. Nothing is audited per sign-in about the waiver.
 - Tests: `internal/identity` `TestAdminTOTPOff`, `internal/platform/config` `TestAdminTOTPOff`, admin `auth.test.tsx` (no second step goes straight to Pulse).
 
+**D-245 · A shop may sell at any price, above the MRP too (founder, 26 Oct: "retailer can keep any price … no limit").**
+- **Why.** A shop adding Sugar 1 kg at ₹100 was refused ("The price cannot be above the MRP of ₹65"). The founder wants no limit on the selling price.
+- **What changed.** Nothing refuses a selling price above the MRP any more: add item, price edit (PATCH and the inline editor), voice set price, the field agent's item add and edit, shelf photo lines and an ask's Yes price. Migration `49804` drops `ck_store_items_price_mrp`. The MRP is still stored and shown; customer screens show a saving only when the MRP is above the price, as before.
+- **Not changed.** A supplier bill line whose cost is above the MRP is still refused (`invalid_cost_above_mrp`): it is a data-entry check on the cost, not a price limit. The insight's suggested price stays at or below the MRP. The problem code `price_above_mrp` and the refusal `invalid_price_above_mrp` stay in the contract, unused, so clients do not change.
+- **Note for the founder.** Under the Legal Metrology (Packaged Commodities) Rules, selling a pre-packaged item above its printed MRP is an offence. The app now allows it; the shop is responsible.
+- Tests: `cmd/todayz` catalogue (create above MRP) and voice (set price above MRP), `internal/asks` `TestReplyPriceRule`, shelf scan refusals, business `stock.test.tsx`.
+
+**D-246 · The shop's storefront photo shows on the customer shop cards and the shop page (founder, 26 Oct: "go with your suggestion").**
+- **Why.** Sai' Store had an accepted storefront photo, but the customer home showed only its initials: documents live in the private bucket and discover sent no photo.
+- **What changed.** Migration `49805` adds `stores.photo_key` and `stores.photo_document_id`. The `store_photos_publish` maintenance job (every 5 minutes, W4-98) copies each store's newest accepted storefront photo (by `reviewed_at`) from the private bucket to the public images bucket at `stores/<storeId>/<documentId>.<ext>` and sets the key; a newer accepted photo replaces it and the old file is deleted; when no accepted storefront photo is left (all rejected later), the photo is cleared. `DiscoverStoreCard` and `DiscoverStorePage` carry `photoKey` (null shows the initials). `@todayz/ui` StoreCard takes an optional `imageUrl` in the avatar's place, with the initials again if the image fails to load (lead-owned component, D-84, changed at the founder's request); the C-07 header does the same.
+- **Not changed.** Only an admin-accepted storefront photo is ever public; shop interior photos (`shop_photo`), KYC documents and pending uploads stay private. A store shows its photo up to 5 minutes after the acceptance.
+- Tests: `internal/business` `TestPublishStorePhotosDB`, `shared/ui` StoreCard, customer `home.test.tsx` and `store.test.tsx`.
+
 **D-247 · The site's cream-and-navy look is tried as a standalone page first (founder, 26 Oct: "i want to test first … site / cream / navy / bag logo / keep all the things mentioned").**
 - **What.** A local-only trial of the founder's landing page (`design/trials/site-home/index.html`), rebuilt on our fonts (Anek, Figtree), tokens and Lucide icons. It keeps every section and its copy, and uses:
   - a cream page background with the dot grid (D-101);

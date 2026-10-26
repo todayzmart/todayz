@@ -1,6 +1,7 @@
 import type { StoreOrder } from '@todayz/api-client/gen/model/storeOrder';
 import { Banner, Button, useToast } from '@todayz/ui';
 import { PackageX } from 'lucide-react';
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { ActionError } from './ActionError';
 import { clock, since } from './labels';
@@ -17,6 +18,8 @@ export function ReturnPanel({ store, order }: { store: CurrentStore; order: Stor
   const intl = useIntl();
   const toast = useToast();
   const action = useOrderAction(store);
+  // Which answer was sent, so only that button shows the spinner.
+  const [sent, setSent] = useState<'returned' | 'damaged'>('returned');
   const now = useNow();
   if (order.returnOutcome) {
     return (
@@ -29,10 +32,12 @@ export function ReturnPanel({ store, order }: { store: CurrentStore; order: Stor
       </section>
     );
   }
-  const run = (outcome: 'returned' | 'damaged') =>
+  const run = (outcome: 'returned' | 'damaged') => {
+    setSent(outcome);
     void action.run('confirmReturn', confirmReturnCall(store, order.id, outcome)).then((o) => {
       if (o) toast.show({ message: intl.formatMessage({ id: `orders.action.return.${outcome}` }) });
     });
+  };
   return (
     <section className={`tz-card ${styles.codeBox}`} aria-labelledby="return-title">
       <h2 id="return-title" className="tz-card-title">
@@ -46,11 +51,11 @@ export function ReturnPanel({ store, order }: { store: CurrentStore; order: Stor
       <p className={styles.muted}>{intl.formatMessage({ id: 'orders.return.help' })}</p>
       <ActionError error={action.error} />
       <div className={styles.actions}>
-        <Button variant="primary" loading={action.pending === 'confirmReturn'} disabled={action.pending !== null} onClick={() => run('returned')}>
+        <Button variant="primary" loading={action.pending === 'confirmReturn' && sent === 'returned'} disabled={action.pending !== null} onClick={() => run('returned')}>
           {intl.formatMessage({ id: 'orders.return.yes' })}
         </Button>
         {canRecordDamage(store.role) && (
-          <Button variant="danger" disabled={action.pending !== null} onClick={() => run('damaged')}>
+          <Button variant="danger" loading={action.pending === 'confirmReturn' && sent === 'damaged'} disabled={action.pending !== null} onClick={() => run('damaged')}>
             {intl.formatMessage({ id: 'orders.return.no' })}
           </Button>
         )}

@@ -3,6 +3,7 @@ import { asMessages } from '@todayz/i18n';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { json, renderAt, type Call, type Handler } from '../test/render';
+import { holding } from '../test/held';
 
 const messages = asMessages(en);
 const BIZ = '/v1/biz/businesses/b1';
@@ -62,7 +63,7 @@ function data(over: Record<string, unknown> = {}): Handler {
     if (c.method !== 'GET') return undefined;
     if (c.path === `${BIZ}/stores/s1`) return json(200, STORE, { etag: '"v2"' });
     if (c.path === SETTINGS) return json(200, settings(over), { etag: '"v5"' });
-    if (c.path === `${BIZ}/kyc`) return json(200, KYC);
+    if (c.path === `${BIZ}/kyc`) return json(200, KYC, { etag: '"v3"' });
     return undefined;
   };
 }
@@ -112,6 +113,7 @@ describe('B-14 settings by role', () => {
     fireEvent.click(within(section).getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(calls.some((c) => c.method === 'PUT')).toBe(true));
     expect(calls.find((c) => c.method === 'PUT')?.body).toEqual({ pan: 'ABCDE1234F' });
+    expect(calls.find((c) => c.method === 'PUT')?.headers.get('if-match')).toBe('"v3"');
   });
 
   it('owner: a malformed PAN is refused before anything is sent', async () => {
@@ -180,5 +182,14 @@ describe('B-14 settings saves', () => {
     fireEvent.click(within(section).getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(calls.some((c) => c.method === 'PATCH')).toBe(true));
     expect(calls.find((c) => c.method === 'PATCH')?.body).toEqual({ cashbackBp: 750, asksMuted: true });
+  });
+});
+
+describe('B-14 loading states', () => {
+  it('shows a skeleton in the payout section while the payout details load, never a blank card', async () => {
+    renderAt('/settings', { messages, handlers: [shops('owner'), holding((c) => c.path === `${BIZ}/kyc`), data()] });
+    await waitFor(() => expect(document.getElementById('set-payout')).not.toBeNull());
+    const section = document.getElementById('set-payout')?.closest('section') as HTMLElement;
+    expect(section.querySelector('.tz-ui-skeleton')).not.toBeNull();
   });
 });

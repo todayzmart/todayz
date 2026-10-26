@@ -1,5 +1,5 @@
 import type { Banner } from '@todayz/api-client/gen/model/banner';
-import { Button, EmptyState, StatusPill } from '@todayz/ui';
+import { Button, EmptyState, Skeleton, StatusPill } from '@todayz/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { Image } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -22,11 +22,17 @@ export function BannersPanel({ store, onNew }: { store: CurrentStore; onNew: () 
         icon={Image}
         title={intl.formatMessage({ id: 'offers.error.title' })}
         description={intl.formatMessage({ id: 'offers.error.body' })}
-        action={<Button onClick={() => void list.refetch()}>{intl.formatMessage({ id: 'offers.error.retry' })}</Button>}
+        action={<Button loading={list.isFetching} onClick={() => void list.refetch()}>{intl.formatMessage({ id: 'offers.error.retry' })}</Button>}
       />
     );
   }
-  if (list.isPending) return <p className={styles.note}>{intl.formatMessage({ id: 'offers.loading' })}</p>;
+  if (list.isPending) {
+    return (
+      <div role="status" aria-busy="true" aria-label={intl.formatMessage({ id: 'offers.loading' })}>
+        <Skeleton shape="block" height="160px" />
+      </div>
+    );
+  }
   if (all.length === 0) {
     return (
       <EmptyState

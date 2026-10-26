@@ -39,7 +39,7 @@ export function SellPage() {
           icon={Inbox}
           title={intl.formatMessage({ id: 'pos.error.title' })}
           description={intl.formatMessage({ id: 'pos.error.body' })}
-          action={<Button onClick={current.retry}>{intl.formatMessage({ id: 'pos.error.retry' })}</Button>}
+          action={<Button loading={current.retrying} onClick={current.retry}>{intl.formatMessage({ id: 'pos.error.retry' })}</Button>}
         />
       )}
       {current.status === 'none' && (

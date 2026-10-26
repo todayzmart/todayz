@@ -3,6 +3,7 @@ import { asMessages } from '@todayz/i18n';
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { json, renderAt, type Call, type Handler } from '../test/render';
+import { holding } from '../test/held';
 import { resetAlerts } from './alerts';
 
 const messages = asMessages(en);
@@ -493,6 +494,16 @@ describe('B-04 delivery (BK-24–27)', () => {
     await waitFor(() => expect(calls.some((c) => c.path.endsWith('/confirm-return'))).toBe(true));
     expect(calls.find((c) => c.path.endsWith('/confirm-return'))?.body).toEqual({ outcome: 'damaged' });
     expect(screen.queryByText('Ask a manager to record damage')).not.toBeInTheDocument();
+  });
+
+  it('shows the spinner on the answer sent, and holds the other, while the return call runs', async () => {
+    renderAt('/orders/o1', { messages, handlers: [shops('manager'), holding((c) => c.method === 'POST' && c.path.endsWith('/confirm-return')), orderHandler(() => failed())] });
+    const damaged = await screen.findByRole('button', { name: 'No, damaged' });
+    fireEvent.click(damaged);
+    await waitFor(() => expect(damaged).toHaveAttribute('aria-busy', 'true'));
+    const yes = screen.getByRole('button', { name: /^Yes/ });
+    expect(yes).not.toHaveAttribute('aria-busy');
+    expect(yes).toBeDisabled();
   });
 
   it('says an unanswered return was auto-confirmed after 72 h', async () => {

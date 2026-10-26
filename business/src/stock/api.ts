@@ -11,6 +11,8 @@ import { request } from '@todayz/api-client';
 import type { Unit } from '@todayz/api-client/gen/model/unit';
 
 export interface NewProduct {
+  /** The store that creates it; only that store can list it before review. */
+  storeId: string;
   name: string;
   brand?: string;
   variant?: string;

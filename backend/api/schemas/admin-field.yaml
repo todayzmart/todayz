@@ -387,7 +387,7 @@ FieldItemCreate:
   additionalProperties: false
   description: >-
     List one product in the store: send `productId` (from the master catalogue) or `newProduct`,
-    not both. The price may not be above the MRP. `openingStock` above 0 writes an `opening`
+    not both. The price may be above the MRP (D-245). `openingStock` above 0 writes an `opening`
     movement.
   required: [pricePaise]
   properties:

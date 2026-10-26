@@ -26,6 +26,8 @@ export function BannerCopy({ store, request, onUse }: { store: CurrentStore; req
   const [draftId, setDraftId] = useState<string | null>(null);
   const create = useAction();
   const [pick, setPick] = useState<string | null>(null);
+  // Which button sent the call, so only that one shows the spinner.
+  const [using, setUsing] = useState(true);
   const draft = useDraft<BannerCopyDraft>(store, 'banner-copy', draftId, (id) => getBannerCopyDraft(store.bid, store.sid, id));
   if (!features.bannerCopy || request === null) return null;
 
@@ -41,6 +43,7 @@ export function BannerCopy({ store, request, onUse }: { store: CurrentStore; req
   };
   const decide = async (chosen: string | null) => {
     if (!d) return;
+    setUsing(chosen !== null);
     const res = await action.run(chosen ? 'use' : 'discard', (key) => confirmBannerCopyDraft(store.bid, store.sid, d.draftId, { lines: bannerDecisions(d, chosen) }, withKey(key)));
     if (!res) return;
     if (res.copy) onUse(res.copy);
@@ -98,10 +101,10 @@ export function BannerCopy({ store, request, onUse }: { store: CurrentStore; req
       </div>
       <AiError error={action.error} />
       <div className={styles.actions}>
-        <Button size="sm" variant="primary" disabled={pick === null} loading={action.pending} onClick={() => void decide(pick)}>
+        <Button size="sm" variant="primary" disabled={pick === null || (action.pending && !using)} loading={action.pending && using} onClick={() => void decide(pick)}>
           {intl.formatMessage({ id: 'ai.banner.use' })}
         </Button>
-        <Button size="sm" variant="ghost" disabled={action.pending} onClick={() => void decide(null)}>
+        <Button size="sm" variant="ghost" loading={action.pending && !using} disabled={action.pending && using} onClick={() => void decide(null)}>
           {intl.formatMessage({ id: 'ai.banner.none' })}
         </Button>
       </div>

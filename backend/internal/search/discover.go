@@ -125,7 +125,7 @@ func (s *Service) ListStores(ctx context.Context, p discoverapi.ListDiscoverStor
 			continue
 		}
 		cards = append(cards, storeCard(&candStore{
-			ID: sid, Slug: r.Slug, Name: r.Name, Locality: r.Locality, Tint: r.CategoryTint,
+			ID: sid, Slug: r.Slug, Name: r.Name, Locality: r.Locality, Tint: r.CategoryTint, PhotoKey: r.PhotoKey,
 			DistanceM: r.DistanceM, Open: open, Pickup: r.AcceptsPickup, Delivery: delivers,
 			CashbackBP: r.CashbackBp, Rating: ratingPtr(r.HasRating, r.RatingAvg), RatingCount: r.RatingCount,
 		}))

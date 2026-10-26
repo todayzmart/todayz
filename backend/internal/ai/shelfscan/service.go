@@ -271,9 +271,6 @@ func (s *Service) write(ctx context.Context, sc authz.Scope, c change, ps map[st
 		}
 		price = p.mrp
 	}
-	if p.mrp != nil && *price > *p.mrp {
-		return retail.RefusePriceAboveMRP
-	}
 	pid, _ := ids.Parse(c.product)
 	return s.d.DB.InTx(ctx, func(ctx context.Context) error {
 		return s.d.Items.Add(ctx, sc, NewItem{ProductID: pid, PricePaise: *price, OpeningStock: c.opening})

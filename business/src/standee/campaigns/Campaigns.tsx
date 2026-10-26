@@ -37,7 +37,7 @@ export function Campaigns({ store }: { store: CurrentStore }) {
           </div>
         )}
         {list.isError && (
-          <Banner tone="warning" action={<Button onClick={() => void list.refetch()}>{intl.formatMessage({ id: 'standee.retry' })}</Button>}>
+          <Banner tone="warning" action={<Button loading={list.isFetching} onClick={() => void list.refetch()}>{intl.formatMessage({ id: 'standee.retry' })}</Button>}>
             {intl.formatMessage({ id: 'standee.campaigns.loadError' })}
           </Banner>
         )}

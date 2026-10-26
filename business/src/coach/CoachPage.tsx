@@ -51,7 +51,7 @@ function Feed({ store, status }: { store: CurrentStore; status: Tab }) {
         tone="warning"
         title={intl.formatMessage({ id: 'coach.error.load' })}
         action={
-          <Button size="sm" onClick={() => void feed.refetch()}>
+          <Button size="sm" loading={feed.isFetching} onClick={() => void feed.refetch()}>
             {intl.formatMessage({ id: 'coach.retry' })}
           </Button>
         }

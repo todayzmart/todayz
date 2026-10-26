@@ -3,6 +3,7 @@ import { asMessages } from '@todayz/i18n';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { json, problem, renderAt, type Call, type Handler } from '../test/render';
+import { holding } from '../test/held';
 import { sampleLines } from './preview';
 
 const messages = asMessages(en);
@@ -270,5 +271,22 @@ describe('sample cart', () => {
   it('adds units for buy X get Y and reaches a minimum bill', () => {
     expect(sampleLines({ kind: 'bxgy', scope: 'items', storeItemIds: ['i1'], buyQty: 2, getQty: 1 }, [], pool)[0]?.quantity).toBe(3);
     expect(sampleLines({ kind: 'bill_min', scope: 'store', minBillPaise: 10000 }, [], pool)[0]?.quantity).toBe(Math.ceil((10000 - 1000) / 4000));
+  });
+});
+
+// The page's own store gate is a status with the same name; the list's one is busy and holds a skeleton.
+const listBusy = () =>
+  screen.queryAllByRole('status', { name: 'Loading offers' }).some((el) => el.getAttribute('aria-busy') === 'true' && el.querySelector('.tz-ui-skeleton') !== null);
+
+describe('B-08 loading states', () => {
+  it('shows a skeleton while the offers load', async () => {
+    renderAt('/offers', { messages, handlers: [shops('owner'), holding((c) => c.path === `${BASE}/offers`)] });
+    await waitFor(() => expect(listBusy()).toBe(true));
+  });
+
+  it('shows a skeleton while the banners load', async () => {
+    renderAt('/offers', { messages, handlers: [shops('owner'), offers([]), holding((c) => c.path === `${BASE}/banners`)] });
+    fireEvent.click(await screen.findByRole('tab', { name: 'Banners' }));
+    await waitFor(() => expect(listBusy()).toBe(true));
   });
 });

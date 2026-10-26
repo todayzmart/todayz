@@ -283,7 +283,7 @@ AskReplyCreate:
       maximum: 10000000
       description: >-
         Per unit, with a Yes only. Prefilled from the listed price; only a role with
-        item.price.edit may change it (a cashier sends the listed price). Never above the MRP.
+        item.price.edit may change it (a cashier sends the listed price). It may be above the MRP (D-245).
     readyBy:
       $ref: ../schemas/common.yaml#/Timestamp
 AskReportCreate:
