@@ -149,6 +149,15 @@ describe('StoreMap (static fallback)', () => {
     expect(p.onRadiusChange).toHaveBeenCalledWith(5);
   });
 
+  it('draws a shop at the customer\'s own spot above the customer dot', () => {
+    const here = { id: 'here', name: 'Corner shop', lat: mapCenter.lat + 0.0005, lng: mapCenter.lng, open: true };
+    render(<StoreMap {...props({ shops: [here], radiusKm: 20 })} />);
+    const you = screen.getByRole('img', { name: 'You are here' });
+    const pin = screen.getByRole('button', { name: 'Corner shop, open' });
+    // Same stacking context: the later sibling paints on top.
+    expect(you.compareDocumentPosition(pin) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('skips pins for unknown shops and an empty list', () => {
     render(<StoreMap {...props({ shops: [] })} />);
     expect(pins()).toHaveLength(0);

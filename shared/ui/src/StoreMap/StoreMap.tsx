@@ -370,6 +370,8 @@ export function StoreMap({
         {ring}
         {projector && (
           <div className="tz-ui-map-overlay">
+            {/* First, so a shop at the customer's own spot draws its pin on top of the dot. */}
+            <span className="tz-ui-map-you" style={place(projector.project(center))} role="img" aria-label={youLabel} />
             {clusters.map((f) => {
               const [lng, lat] = f.geometry.coordinates as [number, number];
               const xy = projector.project({ lng, lat });
@@ -404,7 +406,6 @@ export function StoreMap({
                 />
               );
             })}
-            <span className="tz-ui-map-you" style={place(projector.project(center))} role="img" aria-label={youLabel} />
           </div>
         )}
         {liveLabel !== undefined && <span className="tz-map-live">{liveLabel}</span>}
