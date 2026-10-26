@@ -1,0 +1,87 @@
+# Deploy the API and the worker to Elastic Beanstalk on a push to main that touches the backend
+# (D-210, D-254). Off until the repository variable BACKEND_DEPLOY_ENABLED is "true", which the
+# lead sets after the first release went out by hand (docs/qa/deploy-prep/RUNBOOK.md).
+#
+# Two jobs, like deploy.yml: `build` (no AWS access) generates the code and builds the arm64
+# image; `deploy` checks out only the script, downloads that image and runs
+# scripts/deploy/beanstalk.sh ci-deploy. That job alone holds `id-token: write`: the script
+# trades the job's OIDC token for the role todayz-prod-github-deploy, whose trust policy accepts
+# only repo:todayzmart/todayz:environment:production. No stored AWS key, no third-party action.
+# Order inside the job: push to ECR, migrate, application versions, worker, then api.
+name: deploy-backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "scripts/deploy/beanstalk.sh"
+      - ".github/workflows/deploy-backend.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One release at a time; a newer push waits rather than cancelling one mid-deploy.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: build backend image
+    if: vars.BACKEND_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go, Node, pnpm and CI tools
+        uses: ./.github/actions/setup-toolchain
+
+      - name: Generate and build the image
+        run: scripts/deploy/beanstalk.sh build
+
+      - name: Upload the image
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: backend-image
+          path: |
+            .cache/backend/image.tar
+            .cache/backend/tag
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    name: release to Beanstalk
+    needs: build
+    if: vars.BACKEND_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download the image
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: backend-image
+          path: .cache/backend
+
+      - name: Push, migrate and deploy
+        run: scripts/deploy/beanstalk.sh ci-deploy

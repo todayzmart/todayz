@@ -59,3 +59,13 @@ output "secret_arn_prefix_pattern" {
   description = "IAM resource pattern covering every secret of this environment."
   value       = "arn:aws:secretsmanager:*:*:secret:todayz/${var.environment}/*"
 }
+
+output "app_key_names" {
+  description = "The app keys (09 §2.1): every process needs them, so they are always injected."
+  value       = local.app_keys
+}
+
+output "provider_secret_names" {
+  description = "Provider keys: injected only once they have a value (stack variable provider_secret_names, D-256)."
+  value       = [for n in local.other : n if !startswith(n, "DATABASE_")]
+}

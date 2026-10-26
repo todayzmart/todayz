@@ -1528,6 +1528,43 @@ The questions are in `docs/qa/go-live-gaps/LIST.md`. The founder delegated them;
 - **Business.** Add item shows product thumbnails in the master-list results and shows the brand once (a name that already starts with its brand is not prefixed again). A shop may now send a photo for any active master-list product it stocks, not only one it created; it still waits for an admin. The only refusal left is another store's product that is still in review.
 - Tests: `internal/search` `credit_test.go` (kind credit), `internal/imageimport`, `internal/admin`, `internal/platform/migrate`, admin `catalogue/typePhotos.test.tsx`, business `stock` tests.
 
+**D-254 · Prod's first deploy is two applies; every release after it goes through `scripts/deploy/beanstalk.sh` (lead, 26 Oct; prod deploy prep).**
+- **Why two applies.** A Beanstalk environment needs an application version when it is created, the image must exist in ECR first, and the ACM certificate validates only once Cloudflare has the validation records. So apply #1 runs with `app_environments_enabled = false`: network, RDS, secrets (empty), ECR access, ALB groundwork, ops tasks, alarms that do not read the environments. The certificate is requested but not waited on. Apply #2 (`true`) creates the api and worker environments on the first release (`<tag>-api`, `<tag>-worker`), plus the scaling policies and environment alarms.
+- **The release bundle.** One image (`todayz-backend:<g + 12-char sha>`, immutable tag, linux/arm64) runs api, worker and `migrate up`. The Beanstalk bundle is a `docker-compose.yml` that `beanstalk.sh release` writes. It uses `network_mode: host`, `env_file: .env` (Beanstalk writes the properties and secrets there), `stop_grace_period` from `CONTAINER_STOP_TIMEOUT_SECONDS` (timings.tf, SC-GS-10), and an ECR login prebuild hook. `ProxyServer = none`: the ALB reaches the app port 8080 directly. Host networking also lets the SMS signer reach IMDS with the default hop limit (09 §6, D-213).
+- **Ops tasks instead of a bastion.** The database bootstrap (`modules/stack/ops/db-bootstrap.sh`, the deployed twin of `infra/local/postgres/init.sql`: roles `todayz_owner` and `todayz_app`, `REVOKE TEMPORARY`, extensions, default privileges) and `todayz migrate up` run as ECS Fargate tasks in the private subnets with the app security group. The cluster costs nothing between runs. The run settings are in SSM `/todayz/prod/ops/run-task`. Each release registers a migrate revision on its own image.
+- **Order of a release:** push to ECR → migrate → application versions → worker → api. The worker goes first, so the api never runs ahead of the jobs. Migrations stay expand/contract (09 §3.2).
+- **CI.** `.github/workflows/deploy-backend.yml` runs on a push to main that touches `backend/**`. It is off until the repository variable `BACKEND_DEPLOY_ENABLED` is `true`. A `build` job without cloud access hands the image to a `deploy` job in the `production` environment. That job alone holds `id-token: write` and assumes `todayz-prod-github-deploy`: its trust is `repo:todayzmart/todayz:environment:production`, and it gets Beanstalk deploy, ECR push to one repository, run of the two ops task families, and the app-versions bucket. No stored AWS key, no third-party action. The GitHub OIDC provider is in `envs/account`.
+- **Rollback** is `beanstalk.sh deploy <older tag>`. The schema stays forward (09 §7).
+
+**D-255 · Terraform state: one S3 bucket with the native lockfile, and every root is pinned to the TodayZ account (lead, 26 Oct).**
+- `todayz-tfstate-061292478202` (ap-south-1) is created by `scripts/deploy/state-bucket.sh`, the one AWS resource made outside Terraform. It is private, versioned (90-day non-current history), SSE-S3 and TLS-only.
+- `envs/account`, `envs/prod` and `infra/cloudflare` use `backend "s3" {}` with `-backend-config` at init: keys `account/`, `prod/`, `cloudflare/terraform.tfstate`, `use_lockfile=true`, no DynamoDB table.
+- Every AWS provider has `allowed_account_ids = [061292478202]`, so credentials for any other account (the old 212412893706 included) fail before a change.
+- The Cloudflare state holds the Turnstile secret, which is one more reason the bucket is private and versioned.
+
+**D-256 · Secrets are created empty, filled by a script, and reach an environment only once they have a value (lead, 26 Oct).**
+- Terraform creates the 22 Secrets Manager containers under `todayz/prod/` without values (unchanged). `scripts/deploy/secrets.sh` fills them:
+  - `app-keys` generates the 10 app keys with envtool;
+  - `database` writes `DATABASE_URL` (`todayz_app`) and `DATABASE_MIGRATE_URL` (`todayz_owner`) with random hex passwords;
+  - `put NAME` takes a provider key from stdin;
+  - `status` prints set or missing.
+  It never replaces a value that is set (the app keys encrypt stored data); rotation is its own runbook. `put` is the one deliberate exception.
+- Beanstalk fails a deploy on an environment secret with no value. So the environments get the app keys and `DATABASE_URL` always, plus the provider keys listed in `provider_secret_names` once they are set. `DATABASE_MIGRATE_URL` goes only to the migrate task, never to the api or worker.
+- Non-secret config the app reads in prod is set as properties from `envs/prod` variables, empty ones left out: R2 account, endpoint and buckets, the Turnstile site key, the VAPID public key, the OTLP endpoint.
+
+**D-257 · Cloudflare adopts the hand-made resources by import blocks, and `api.` waits for the origin (lead, 26 Oct; follows D-214).**
+- Import blocks behind variables: the four Pages projects, their custom domains, the Pages DNS records (`import_dns_record_ids`), the `todayz-prod` Turnstile widget and the three R2 buckets. The first plan must show them as imports, not creates.
+- `www.todayz.in` is now in the module, on the site project, prod only.
+- The `api` record has `count` on `api_origin_hostname`. The first Cloudflare apply adds only the ACM validation records, and the second (after prod apply #2) points `api.todayz.in` at the ALB.
+- If the apex is an A record today, the plan replaces it with the Pages CNAME (flattened). That is expected.
+
+**D-258 · Prod runs the full paid shape, estimated at about $270–300 a month before GST; the budget alarm stays ₹30k (lead, 26 Oct).**
+- The shape is unchanged from D-96: api 2 × t4g.small, worker 1 × t4g.small, RDS db.t4g.medium Single-AZ (100 GB gp3, PITR 14 days, weekly copy to ap-southeast-1), one NAT, the ALB, interface endpoints for ECR (api, dkr) and Secrets Manager in 2 AZs, 22 secrets and CloudWatch.
+- The bottom-up estimate is in `docs/qa/deploy-prep/RUNBOOK.md` §6. It replaces 09 §3.8's ₹13–17k, which left out the interface endpoints, public IPv4 charges, Secrets Manager, logs and the DR copy.
+- It is above the $220–250 the brief expected. The biggest optional line is the six endpoint ENIs (about $48). Removing them sends ECR and Secrets Manager traffic through the NAT (a few dollars of data), but it changes 09 §3.5, so that is the founder's call and not made here.
+- An AWS India (AISPL) account adds 18% GST.
+- The budget stays ₹30,000 (09 §6) when the account bills in INR, and about 350 when it bills in USD. `budget_limit_unit` only accepts INR or USD.
+
 **D-259 · A customer can add, change and remove a profile photo; it shows at once and only to them (lead brief and founder answers, 26 Oct).**
 - **Why.** Account showed only a letter. A photo makes the app feel like the customer's own, and the brief asked for it end to end.
 - **Founder answers.** Moderation: "Show right away", so there is no review queue. Visibility: "Only the customer", so shops, staff and other customers never see it.

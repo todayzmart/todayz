@@ -17,8 +17,8 @@ resource "aws_sns_topic_subscription" "email" {
 
 locals {
   alarm_actions = [aws_sns_topic.alarms.arn]
-  lb_suffix     = data.aws_lb.api.arn_suffix
-  tg_suffix     = data.aws_lb_target_group.api.arn_suffix
+  lb_suffix     = one(data.aws_lb.api[*].arn_suffix)
+  tg_suffix     = one(data.aws_lb_target_group.api[*].arn_suffix)
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
@@ -69,6 +69,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_burst_balance" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "alb_5xx" {
+  count               = local.envs
   alarm_name          = "${local.name}-alb-target-5xx"
   alarm_description   = "More than 10 target 5xx responses a minute for 5 minutes. Runbook: docs/runbooks/api-5xx.md."
   namespace           = "AWS/ApplicationELB"
@@ -85,6 +86,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_5xx" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_hosts" {
+  count               = local.envs
   alarm_name          = "${local.name}-alb-unhealthy-hosts"
   alarm_description   = "At least one api target failing /readyz for 3 minutes. Runbook: docs/runbooks/api-unhealthy.md."
   namespace           = "AWS/ApplicationELB"
@@ -101,6 +103,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_hosts" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "alb_latency_p95" {
+  count               = local.envs
   alarm_name          = "${local.name}-alb-latency-p95-high"
   alarm_description   = "p95 target response time above 1.5 s for 10 minutes. Runbook: docs/runbooks/api-latency.md."
   namespace           = "AWS/ApplicationELB"
@@ -116,11 +119,12 @@ resource "aws_cloudwatch_metric_alarm" "alb_latency_p95" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "eb_api_health" {
+  count               = local.envs
   alarm_name          = "${local.name}-api-environment-health"
   alarm_description   = "Beanstalk api environment health worse than Ok (EnvironmentHealth above 15). Runbook: docs/runbooks/api-unhealthy.md."
   namespace           = "AWS/ElasticBeanstalk"
   metric_name         = "EnvironmentHealth"
-  dimensions          = { EnvironmentName = module.api.environment_name }
+  dimensions          = { EnvironmentName = module.api[0].environment_name }
   statistic           = "Maximum"
   period              = 60
   evaluation_periods  = 5
@@ -132,11 +136,12 @@ resource "aws_cloudwatch_metric_alarm" "eb_api_health" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "eb_worker_health" {
+  count               = local.envs
   alarm_name          = "${local.name}-worker-environment-health"
   alarm_description   = "Beanstalk worker environment health worse than Ok. Runbook: docs/runbooks/worker-unhealthy.md."
   namespace           = "AWS/ElasticBeanstalk"
   metric_name         = "EnvironmentHealth"
-  dimensions          = { EnvironmentName = module.worker.environment_name }
+  dimensions          = { EnvironmentName = module.worker[0].environment_name }
   statistic           = "Maximum"
   period              = 60
   evaluation_periods  = 5

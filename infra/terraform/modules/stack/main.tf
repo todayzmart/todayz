@@ -17,6 +17,9 @@ data "aws_caller_identity" "current" {}
 
 locals {
   name = "todayz-${var.environment}"
+  # Two-phase first apply (D-254): the Beanstalk environments, and everything that reads them,
+  # wait until the certificate is validated, the secrets have values and a release exists.
+  envs = var.app_environments_enabled ? 1 : 0
 }
 
 module "network" {
@@ -103,6 +106,8 @@ module "edge" {
   vpc_id       = module.network.vpc_id
   vpc_cidr     = module.network.vpc_cidr
   api_hostname = var.api_hostname
+
+  wait_for_validation = var.app_environments_enabled
 }
 
 # ---- IAM -----------------------------------------------------------------------------
@@ -161,7 +166,7 @@ data "aws_iam_policy_document" "instance_common" {
   statement {
     sid       = "ReadEnvironmentSecrets"
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = values(module.secrets.secret_arns)
+    resources = values(local.injected_secret_arns)
   }
 }
 
@@ -258,6 +263,13 @@ resource "aws_elastic_beanstalk_application" "this" {
 }
 
 locals {
+  # Only secrets that have a value are injected: Beanstalk fails a deploy on a secret with no
+  # version. The app keys and DATABASE_URL always; a provider key once it is set (D-256).
+  # DATABASE_MIGRATE_URL goes only to the ops migrate task (ops.tf).
+  injected_secret_arns = {
+    for n in concat(module.secrets.app_key_names, ["DATABASE_URL"], var.provider_secret_names) :
+    n => module.secrets.secret_arns[n]
+  }
   sms_send_policy = templatefile("${path.module}/policies/sms-send.json", {
     region     = data.aws_region.current.region
     account_id = data.aws_caller_identity.current.account_id
@@ -274,7 +286,10 @@ locals {
     SMS_NOTICE_TEMPLATE_IDS = var.sms_notice_template_ids
   } : k => v if v != "" }
   # Non-secret configuration both processes share (names from backend/CLAUDE.md).
-  common_properties = merge(local.sms_properties, {
+  # Non-secret settings set per environment (R2, Turnstile site key, VAPID public key, OTLP
+  # endpoint); an empty value is left out.
+  extra_properties = { for k, v in var.extra_properties : k => v if v != "" }
+  common_properties = merge(local.sms_properties, local.extra_properties, {
     APP_ENV                    = var.environment
     API_PUBLIC_URL             = "https://${var.api_hostname}"
     LOG_LEVEL                  = "info"
@@ -294,6 +309,7 @@ locals {
 
 module "api" {
   source = "../beanstalk_env"
+  count  = local.envs
 
   name                        = "${local.name}-api"
   role                        = "api"
@@ -310,6 +326,7 @@ module "api" {
   instance_security_group_ids = [aws_security_group.app.id]
   alb_security_group_id       = module.edge.alb_security_group_id
   certificate_arn             = module.edge.certificate_arn
+  version_label               = var.initial_image_tag == "" ? null : "${var.initial_image_tag}-api"
   access_logs_bucket          = module.edge.access_logs_bucket
   app_port                    = 8080
   deployment_policy           = var.api_deployment_policy
@@ -321,11 +338,12 @@ module "api" {
   deregistration_delay_seconds  = local.deregistration_delay_seconds
 
   environment_properties = local.api_properties
-  secret_arns            = module.secrets.secret_arns
+  secret_arns            = local.injected_secret_arns
 }
 
 module "worker" {
   source = "../beanstalk_env"
+  count  = local.envs
 
   name                        = "${local.name}-worker"
   role                        = "worker"
@@ -340,10 +358,11 @@ module "worker" {
   instance_profile_name       = aws_iam_instance_profile.worker.name
   instance_security_group_ids = [aws_security_group.app.id]
   app_port                    = 8081
+  version_label               = var.initial_image_tag == "" ? null : "${var.initial_image_tag}-worker"
   deployment_policy           = var.worker_deployment_policy
 
   environment_properties = local.worker_properties
-  secret_arns            = module.secrets.secret_arns
+  secret_arns            = local.injected_secret_arns
 }
 
 # ---- Scaling -------------------------------------------------------------------------
@@ -351,33 +370,37 @@ module "worker" {
 # elasticbeanstalk:environment-name (the lookup below relies on it).
 
 data "aws_lb" "api" {
-  arn = module.api.load_balancer_arn
+  count = local.envs
+  arn   = module.api[0].load_balancer_arn
 }
 
 data "aws_lb_target_group" "api" {
+  count = local.envs
   tags = {
-    "elasticbeanstalk:environment-name" = module.api.environment_name
+    "elasticbeanstalk:environment-name" = module.api[0].environment_name
   }
   depends_on = [module.api]
 }
 
 resource "aws_autoscaling_policy" "api_requests" {
+  count                  = local.envs
   name                   = "${local.name}-api-requests-per-target"
-  autoscaling_group_name = module.api.autoscaling_group_name
+  autoscaling_group_name = module.api[0].autoscaling_group_name
   policy_type            = "TargetTrackingScaling"
 
   target_tracking_configuration {
     target_value = var.requests_per_target_per_minute
     predefined_metric_specification {
       predefined_metric_type = "ALBRequestCountPerTarget"
-      resource_label         = "${data.aws_lb.api.arn_suffix}/${data.aws_lb_target_group.api.arn_suffix}"
+      resource_label         = "${data.aws_lb.api[0].arn_suffix}/${data.aws_lb_target_group.api[0].arn_suffix}"
     }
   }
 }
 
 resource "aws_autoscaling_policy" "api_cpu" {
+  count                  = local.envs
   name                   = "${local.name}-api-cpu"
-  autoscaling_group_name = module.api.autoscaling_group_name
+  autoscaling_group_name = module.api[0].autoscaling_group_name
   policy_type            = "TargetTrackingScaling"
 
   target_tracking_configuration {
@@ -390,8 +413,9 @@ resource "aws_autoscaling_policy" "api_cpu" {
 
 # Worker: step scaling on the age of the oldest available River job (TodayZ/Worker).
 resource "aws_autoscaling_policy" "worker_out" {
+  count                  = local.envs
   name                   = "${local.name}-worker-scale-out"
-  autoscaling_group_name = module.worker.autoscaling_group_name
+  autoscaling_group_name = module.worker[0].autoscaling_group_name
   policy_type            = "StepScaling"
   adjustment_type        = "ChangeInCapacity"
 
@@ -407,8 +431,9 @@ resource "aws_autoscaling_policy" "worker_out" {
 }
 
 resource "aws_autoscaling_policy" "worker_in" {
+  count                  = local.envs
   name                   = "${local.name}-worker-scale-in"
-  autoscaling_group_name = module.worker.autoscaling_group_name
+  autoscaling_group_name = module.worker[0].autoscaling_group_name
   policy_type            = "StepScaling"
   adjustment_type        = "ChangeInCapacity"
 
@@ -419,6 +444,7 @@ resource "aws_autoscaling_policy" "worker_in" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "worker_queue_age_high" {
+  count               = local.envs
   alarm_name          = "${local.name}-worker-oldest-job-age-high"
   alarm_description   = "Oldest available River job older than ${var.worker_scale_out_age_seconds}s for 3 minutes: scale the worker out. Runbook: docs/runbooks/job-queue-backlog.md."
   namespace           = "TodayZ/Worker"
@@ -429,10 +455,11 @@ resource "aws_cloudwatch_metric_alarm" "worker_queue_age_high" {
   threshold           = var.worker_scale_out_age_seconds
   comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "notBreaching"
-  alarm_actions       = [aws_autoscaling_policy.worker_out.arn, aws_sns_topic.alarms.arn]
+  alarm_actions       = [aws_autoscaling_policy.worker_out[0].arn, aws_sns_topic.alarms.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "worker_queue_age_low" {
+  count               = local.envs
   alarm_name          = "${local.name}-worker-oldest-job-age-low"
   alarm_description   = "Queue age back under 10s for 15 minutes: scale the worker in."
   namespace           = "TodayZ/Worker"
@@ -443,5 +470,5 @@ resource "aws_cloudwatch_metric_alarm" "worker_queue_age_low" {
   threshold           = 10
   comparison_operator = "LessThanThreshold"
   treat_missing_data  = "notBreaching"
-  alarm_actions       = [aws_autoscaling_policy.worker_in.arn]
+  alarm_actions       = [aws_autoscaling_policy.worker_in[0].arn]
 }
