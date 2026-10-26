@@ -32,9 +32,9 @@ type identityUser struct {
 	Referral string // customers only: the referral code
 }
 
-// identityUsers are the same in every profile: three customers and the three
-// staff of the seeded business (W1-04's seed links them as owner, manager and
-// cashier through identityUserID). Admins come from SEED_ADMINS_FILE
+// identityUsers are the same in every profile: three customers, the three
+// staff of Lakshmi Traders (W1-04's seed links them as owner, manager and
+// cashier through identityUserID) and the owners of Annapurna and Nandi. Admins come from SEED_ADMINS_FILE
 // (seedAdmins below), never from here.
 var identityUsers = []identityUser{
 	{Key: "customer.asha", ID: "01KE0S1W6W8ZV7T1C3A6M9N001", Phone: "+919000000001", Name: "Asha", Lang: "en", Referral: "ASHA22"},
@@ -43,6 +43,9 @@ var identityUsers = []identityUser{
 	{Key: "staff.owner", ID: "01KE0S1W6W8ZV7T1C3A6M9N011", Phone: "+919000000011", Name: "Lakshmi", Lang: "en"},
 	{Key: "staff.manager", ID: "01KE0S1W6W8ZV7T1C3A6M9N012", Phone: "+919000000012", Name: "Suresh", Lang: "ta"},
 	{Key: "staff.cashier", ID: "01KE0S1W6W8ZV7T1C3A6M9N013", Phone: "+919000000013", Name: "Meena", Lang: "te"},
+	// The owners of Annapurna Provisions and Nandi Hardware (W4-01: E2E-21 signs in as AP's owner).
+	{Key: "staff.ap_owner", ID: "01KE0S1W6W8ZV7T1C3A6M9N061", Phone: "+919000000061", Name: "Prakash", Lang: "kn"},
+	{Key: "staff.nh_owner", ID: "01KE0S1W6W8ZV7T1C3A6M9N062", Phone: "+919000000062", Name: "Imran", Lang: "en"},
 }
 
 // identityUserID returns the fixed id of a seeded user by its Key. It panics

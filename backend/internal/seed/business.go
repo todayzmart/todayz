@@ -25,8 +25,9 @@ import (
 // TODO(lead): the book's people (O20 owner, M21, K22, R23, M24, X25, O26–O29)
 // are not the identity seed's (+91 90000 00011–13, which the book lists as
 // customers C11–C13). This seed links the identity seed's three staff users
-// to Lakshmi Traders as owner, manager and cashier (Sri Lakshmi only); the
-// other businesses have no staff until identity seeds their owners.
+// to Lakshmi Traders as owner, manager and cashier (Sri Lakshmi only), and
+// Annapurna's and Nandi's owners (W4-01, E2E-21); the other businesses have
+// no staff until identity seeds their owners.
 
 // QAPoint is the manual book's "location QA point" (Indiranagar, 560038).
 var QAPoint = LatLng{Lat: 12.9719, Lng: 77.6412}
@@ -185,7 +186,7 @@ func init() {
 	}
 }
 
-// seedStaff links the identity seed's staff users to Lakshmi Traders.
+// seedStaff links the identity seed's staff users to their businesses.
 var seedStaff = []struct {
 	ID, Business, User, Role string
 	Stores                   []string // store keys; nil: every store
@@ -193,6 +194,8 @@ var seedStaff = []struct {
 	{ID: "01KE0S1W6W8ZV7T1C3A6MT0001", Business: "lakshmi", User: "staff.owner", Role: "owner"},
 	{ID: "01KE0S1W6W8ZV7T1C3A6MT0002", Business: "lakshmi", User: "staff.manager", Role: "manager"},
 	{ID: "01KE0S1W6W8ZV7T1C3A6MT0003", Business: "lakshmi", User: "staff.cashier", Role: "cashier", Stores: []string{"SL"}},
+	{ID: "01KE0S1W6W8ZV7T1C3A6MT0004", Business: "annapurna", User: "staff.ap_owner", Role: "owner"},
+	{ID: "01KE0S1W6W8ZV7T1C3A6MT0005", Business: "nandi", User: "staff.nh_owner", Role: "owner"},
 }
 
 // businessSeedID returns a seeded business's fixed id by its key; it panics on
