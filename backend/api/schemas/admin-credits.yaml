@@ -21,7 +21,13 @@ AdminLedgerAccount:
   type: object
   required: [id, kind, ownerType, ownerId, ownerName, balancePaise]
   properties:
-    id: {$ref: ./common.yaml#/Ulid}
+    id:
+      type: [string, 'null']
+      pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
+      description: >-
+        The account. Null for a customer who has never had a ledger posting
+        (kind customer_wallet, balance 0): the wallet opens with the first
+        adjustment, which names the customer instead (CreditAdjustmentCreate.customerId, D-240).
     kind: {$ref: '#/AdminLedgerAccountKind'}
     ownerType:
       type: string
@@ -158,11 +164,18 @@ CreditAdjustmentList:
 CreditAdjustmentCreate:
   type: object
   additionalProperties: false
-  required: [accountId, amountPaise, reason]
+  required: [amountPaise, reason]
+  description: >-
+    Exactly one of accountId and customerId (422 otherwise). customerId is for
+    a customer whose wallet is not open yet (an account search row with a null
+    id); the posting opens it in the same transaction (D-240).
   properties:
     accountId:
       $ref: ./common.yaml#/Ulid
       description: The customer's wallet account (A-09 account search).
+    customerId:
+      $ref: ./common.yaml#/Ulid
+      description: The customer (user id), whether or not their wallet is open yet.
     amountPaise:
       type: integer
       description: Credits × 100, never 0; negative takes credits away.

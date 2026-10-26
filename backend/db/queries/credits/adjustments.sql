@@ -35,6 +35,27 @@ JOIN account_balances b ON b.account_id = a.id
 WHERE p.phone_hash = @phone_hash
 ORDER BY a.kind, a.id;
 
+-- CustomerWithoutWalletByID and CustomerWithoutWalletByPhoneHash find a
+-- customer (a user not deleted with a customer profile, that is one who has
+-- signed in to the customer app) who has no wallet account yet: accounts open
+-- at the first posting, so the A-09 search lists such a customer with no
+-- account id, and an adjustment opens the wallet (D-240).
+-- name: CustomerWithoutWalletByID :many
+SELECT u.id, coalesce(u.name, '')::text AS owner_name
+FROM users u
+JOIN customer_profiles cp ON cp.user_id = u.id
+WHERE u.id = @id AND u.status <> 'deleted'
+  AND NOT EXISTS (SELECT 1 FROM ledger_accounts a WHERE a.kind = 'customer_wallet' AND a.owner_id = u.id);
+
+-- name: CustomerWithoutWalletByPhoneHash :many
+SELECT u.id, coalesce(u.name, '')::text AS owner_name
+FROM phone_identities p
+JOIN users u ON u.id = p.user_id
+JOIN customer_profiles cp ON cp.user_id = u.id
+WHERE p.phone_hash = @phone_hash AND u.status <> 'deleted'
+  AND NOT EXISTS (SELECT 1 FROM ledger_accounts a WHERE a.kind = 'customer_wallet' AND a.owner_id = u.id)
+ORDER BY u.id;
+
 -- name: PlatformAccounts :many
 SELECT a.id, a.kind, a.owner_type, a.owner_id, b.balance, ''::text AS owner_name
 FROM ledger_accounts a
@@ -136,6 +157,15 @@ LIMIT @lim;
 
 -- name: CustomerExists :one
 SELECT EXISTS (SELECT 1 FROM users WHERE id = @id AND status <> 'deleted')::boolean;
+
+-- IsCustomer is CustomerExists for a user with no wallet yet (D-240): only a
+-- user with a customer profile may have one opened by an adjustment, so an
+-- admin or a shop owner who never used the customer app gets none.
+-- name: IsCustomer :one
+SELECT EXISTS (
+  SELECT 1 FROM users u JOIN customer_profiles cp ON cp.user_id = u.id
+  WHERE u.id = @id AND u.status <> 'deleted'
+)::boolean;
 
 ------------------------------------------------------------------------------
 -- The day's sum for the two-person rule (D-237)

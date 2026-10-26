@@ -421,10 +421,10 @@ Priced above nearby is returned only while `insight_price_compare_enabled` is tr
 | Reviews | POST | /v1/admin/reviews/{reviewId}/reply/hide, .../reply/restore | support, admin | W2-06 (console: W3-05) | `{reason}`; audited (D-140) |
 | Reviews | GET | /v1/admin/review-reports | support, admin | W2-06 (console: W3-05) | |
 | Reviews | POST | /v1/admin/review-reports/{reportId}/resolve | support, admin | W2-06 (console: W3-05) | |
-| Credits | GET | /v1/admin/ledger/accounts?q= | finance, admin | W3-01 | |
+| Credits | GET | /v1/admin/ledger/accounts?q= | finance, admin | W3-01 | by id or phone also lists a customer with no wallet yet as a `customer_wallet` row with `id: null` and a zero balance (D-240) |
 | Credits | GET | /v1/admin/ledger/accounts/{accountId}/entries | finance, admin | W3-01 | |
 | Credits | GET | /v1/admin/credits/expiry-preview | finance, admin | W3-01 | |
-| Credits | GET/POST | /v1/admin/credit-adjustments | finance | W3-01 | POST = request, step-up, idempotent: while the admin's IST-day total for the customer (D-237) stays at or under `admin_adjust_dual_approval_above_paise` it posts at once; above it creates a pending `admin_adjustment_requests` row, for super_admin too (D-05). `admin` cannot adjust |
+| Credits | GET/POST | /v1/admin/credit-adjustments | finance | W3-01 | POST = request, step-up, idempotent; names the wallet by `accountId` or, for a customer with no wallet yet, `customerId` (exactly one; the posting opens the wallet in its transaction, a pending request opens nothing until approved, D-240); while the admin's IST-day total for the customer (D-237) stays at or under `admin_adjust_dual_approval_above_paise` it posts at once; above it creates a pending `admin_adjustment_requests` row, for super_admin too (D-05). `admin` cannot adjust |
 | Credits | POST | /v1/admin/credit-adjustments/{requestId}/approve | finance | W3-01 | step-up, idempotent; approver ≠ requester else `403 approver_is_requester` |
 | Credits | POST | /v1/admin/credit-adjustments/{requestId}/reject | finance | W3-01 | approver ≠ requester |
 | Payouts | GET | /v1/admin/statements?period= | finance, admin | W3-01 | |

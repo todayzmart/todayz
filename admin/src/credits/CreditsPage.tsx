@@ -74,12 +74,20 @@ function Ledger({ account, manage, onOpen }: { account?: string | undefined; man
   const find = useAccountSearch();
   const [q, setQ] = useState('');
   const [invalid, setInvalid] = useState(false);
+  /** A customer with no wallet account yet (D-240): shown here, not in the URL, since it has no account id. */
+  const [unopened, setUnopened] = useState<AdminLedgerAccount | null>(null);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
     const clean = q.trim();
     setInvalid(clean.length === 0);
+    setUnopened(null);
     if (clean) find.mutate(clean);
+  };
+  /** After the first adjustment the wallet has an account: search again so the row carries its id. */
+  const again = () => {
+    setUnopened(null);
+    if (find.variables) find.mutate(find.variables);
   };
 
   const columns = useMemo<ColumnDef<AdminLedgerAccount, unknown>[]>(
@@ -87,16 +95,32 @@ function Ledger({ account, manage, onOpen }: { account?: string | undefined; man
       {
         id: 'owner',
         header: intl.formatMessage({ id: 'credits.col.owner' }),
-        cell: ({ row }) => (
-          <Button size="sm" variant="ghost" aria-pressed={account === row.original.id} onClick={() => onOpen(row.original.id)}>
-            {row.original.ownerName ?? labels.account(row.original.kind)}
-          </Button>
-        ),
+        cell: ({ row }) => {
+          const a = row.original;
+          const id = a.id;
+          return id ? (
+            <Button
+              size="sm"
+              variant="ghost"
+              aria-pressed={!unopened && account === id}
+              onClick={() => {
+                setUnopened(null);
+                onOpen(id);
+              }}
+            >
+              {a.ownerName ?? labels.account(a.kind)}
+            </Button>
+          ) : (
+            <Button size="sm" variant="ghost" aria-pressed={unopened?.ownerId === a.ownerId} onClick={() => setUnopened(a)}>
+              {a.ownerName ?? labels.account(a.kind)}
+            </Button>
+          );
+        },
       },
       { id: 'kind', header: intl.formatMessage({ id: 'credits.col.kind' }), accessorFn: (a) => labels.account(a.kind) },
       { id: 'balance', header: intl.formatMessage({ id: 'credits.col.balance' }), accessorFn: (a) => money(a.balancePaise), meta: { numeric: true } },
     ],
-    [intl, labels, account, onOpen],
+    [intl, labels, account, onOpen, unopened],
   );
 
   return (
@@ -130,14 +154,16 @@ function Ledger({ account, manage, onOpen }: { account?: string | undefined; man
               label={intl.formatMessage({ id: 'credits.accounts' })}
               columns={columns}
               data={find.data.items}
-              getRowId={(a) => a.id}
+              getRowId={(a) => a.id ?? `customer-${a.ownerId ?? ''}`}
               emptyLabel={intl.formatMessage({ id: 'credits.accounts.none' })}
             />
           )}
         </section>
         <Expiry />
       </div>
-      {account ? (
+      {unopened ? (
+        <UnopenedPanel key={unopened.ownerId} account={unopened} manage={manage} onDone={again} />
+      ) : account ? (
         <AccountPanel key={account} id={account} manage={manage} />
       ) : (
         <aside className="tz-card" aria-label={intl.formatMessage({ id: 'credits.panel' })}>
@@ -145,6 +171,39 @@ function Ledger({ account, manage, onOpen }: { account?: string | undefined; man
         </aside>
       )}
     </div>
+  );
+}
+
+/** A customer who has never had a ledger posting: no lines, a zero balance, and Adjust opens the wallet (D-240). */
+function UnopenedPanel({ account: a, manage, onDone }: { account: AdminLedgerAccount; manage: boolean; onDone: () => void }) {
+  const intl = useIntl();
+  const labels = useCreditLabels();
+  const [adjusting, setAdjusting] = useState(false);
+  const name = a.ownerName ?? labels.account(a.kind);
+  const headingId = `customer-${a.ownerId ?? ''}`;
+  return (
+    <aside className={`tz-card ${css.stack}`} aria-labelledby={headingId}>
+      <div className={css.title}>
+        <h2 id={headingId} className="tz-card-title">
+          {name}
+        </h2>
+      </div>
+      <dl className={css.facts}>
+        <dt>{intl.formatMessage({ id: 'credits.col.kind' })}</dt>
+        <dd>{labels.account(a.kind)}</dd>
+        <dt>{intl.formatMessage({ id: 'credits.col.balance' })}</dt>
+        <dd className={css.mono}>{money(a.balancePaise)}</dd>
+      </dl>
+      <p className={css.muted}>{intl.formatMessage({ id: 'credits.panel.unopened' })}</p>
+      {manage && a.kind === 'customer_wallet' && (
+        <div className={css.actions}>
+          <Button variant="primary" icon={SlidersHorizontal} onClick={() => setAdjusting(true)}>
+            {intl.formatMessage({ id: 'credits.adjust' })}
+          </Button>
+        </div>
+      )}
+      {adjusting && <AdjustDialog account={a} onDone={onDone} onClose={() => setAdjusting(false)} />}
+    </aside>
   );
 }
 
