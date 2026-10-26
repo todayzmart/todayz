@@ -307,10 +307,6 @@
     "defaultMessage": "We couldn't save that. Try again.",
     "description": "Saving the name failed"
   },
-  "account.phone": {
-    "defaultMessage": "Mobile number",
-    "description": "Row label for the signed-in number (masked)"
-  },
   "account.language": {
     "defaultMessage": "Language",
     "description": "Row label for the language"
@@ -318,10 +314,6 @@
   "account.location": {
     "defaultMessage": "Location",
     "description": "Row label for the saved location"
-  },
-  "account.change": {
-    "defaultMessage": "Change",
-    "description": "Link to change the language or location"
   },
   "account.signOut": {
     "defaultMessage": "Sign out",

@@ -8,23 +8,27 @@ import { Link } from '@tanstack/react-router';
 import {
   Banner,
   Button,
+  CategoryRow,
   Chip,
   ChipGroup,
   EmptyState,
-  RadiusChips,
   SearchField,
-  Segmented,
   Skeleton,
   StoreCard,
   type StoreCardProps,
 } from '@todayz/ui';
-import { MapPin, SearchX, X } from 'lucide-react';
+import { ArrowUpDown, ArrowUpLeft, BadgePercent, Bike, Clock, History, MapPin, Search as SearchIcon, SearchX, ShoppingBag, Store as StoreIcon, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { categoryIcon } from '../home/categories';
 import { useCoords, type Coords } from '../home/coords';
+import { categoryPhoto } from '../home/photos';
+import { RouterLink } from '../home/RouterLink';
 import { useFmt, usePackLine } from '../home/format';
-import { radiusM, useStoreCardProps } from '../home/present';
+import { asTint, radiusM, useStoreCardProps } from '../home/present';
 import { RADIUS_OPTIONS_KM, setRadiusKm, useRadiusKm } from '../home/radius';
+import { ChipSelect } from '../shell/ChipSelect';
+import { Icon } from '../shell/Icon';
 import { CartBarLink } from '../store/CartBarLink';
 import { ItemCard } from '../store/ItemCard';
 import { seedItems } from '../store/itemCache';
@@ -58,6 +62,7 @@ export interface SearchState {
 
 type FilterKey = 'open' | 'pickup' | 'delivery' | 'offers';
 const FILTERS: readonly FilterKey[] = ['open', 'pickup', 'delivery', 'offers'];
+const FILTER_ICONS = { open: Clock, pickup: ShoppingBag, delivery: Bike, offers: BadgePercent } as const;
 
 function clean(s: SearchState): SearchState {
   const out: SearchState = {};
@@ -146,8 +151,8 @@ export function SearchPage({ state, onChange }: { state: SearchState; onChange: 
 
   return (
     <div className={styles.page}>
-      <header className={`tz-hero-wash ${styles.head}`}>
-        <h1 className={styles.title}>{intl.formatMessage({ id: 'search.title' })}</h1>
+      <header className={styles.head}>
+        <h1 className="tz-ui-sr-only">{intl.formatMessage({ id: 'search.title' })}</h1>
         <form
           role="search"
           onSubmit={(e) => {
@@ -189,7 +194,9 @@ export function SearchPage({ state, onChange }: { state: SearchState; onChange: 
                 {suggest.data.items.map((s, i) => (
                   <li key={`${s.kind}-${s.text}-${i}`}>
                     <button type="button" className={styles.suggestion} onClick={() => commit(s.text)}>
-                      {s.text}
+                      <Icon icon={SearchIcon} />
+                      <span className={styles.suggestionText}>{s.text}</span>
+                      <Icon icon={ArrowUpLeft} />
                     </button>
                   </li>
                 ))}
@@ -215,29 +222,60 @@ export function SearchPage({ state, onChange }: { state: SearchState; onChange: 
 
 function Idle({ recent, onPick, onClear }: { recent: string[]; onPick: (q: string) => void; onClear: () => void }) {
   const intl = useIntl();
-  if (recent.length === 0) {
-    return (
-      <p className={styles.hint}>{intl.formatMessage({ id: 'search.idle.hint' })}</p>
-    );
-  }
+  const categories = useQuery({
+    queryKey: ['catalogue', 'categories'],
+    staleTime: 60 * 60_000,
+    queryFn: () => listCategories(),
+  });
+  const cats = categories.data?.items ?? [];
   return (
-    <section aria-labelledby="search-recent">
-      <div className={styles.recentHead}>
-        <h2 id="search-recent" className={styles.sectionTitle}>
-          {intl.formatMessage({ id: 'search.recent.title' })}
-        </h2>
-        <Button variant="ghost" size="sm" onClick={onClear}>
-          {intl.formatMessage({ id: 'search.recent.clear' })}
-        </Button>
-      </div>
-      <div className="tz-chips">
-        {recent.map((r) => (
-          <Chip key={r} pressed={false} onPressedChange={() => onPick(r)}>
-            {r}
-          </Chip>
-        ))}
-      </div>
-    </section>
+    <>
+      {recent.length === 0 ? (
+        <p className={styles.hint}>{intl.formatMessage({ id: 'search.idle.hint' })}</p>
+      ) : (
+        <section aria-labelledby="search-recent">
+          <div className={styles.recentHead}>
+            <h2 id="search-recent" className="tz-label-rule">
+              {intl.formatMessage({ id: 'search.recent.title' })}
+            </h2>
+            <Button variant="ghost" size="sm" onClick={onClear}>
+              {intl.formatMessage({ id: 'search.recent.clear' })}
+            </Button>
+          </div>
+          <ul className={styles.suggestions}>
+            {recent.map((r) => (
+              <li key={r}>
+                <button type="button" className={styles.suggestion} onClick={() => onPick(r)}>
+                  <Icon icon={History} />
+                  <span className={styles.suggestionText}>{r}</span>
+                  <Icon icon={ArrowUpLeft} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {cats.length > 0 && (
+        <section className={styles.cats} aria-labelledby="search-cats">
+          <h2 id="search-cats" className="tz-label-rule">
+            {intl.formatMessage({ id: 'search.categories.title' })}
+          </h2>
+          <CategoryRow
+            label={intl.formatMessage({ id: 'search.categories.title' })}
+            layout="grid"
+            LinkComponent={RouterLink}
+            categories={cats.map((c) => ({
+              key: c.slug,
+              label: c.name,
+              icon: categoryIcon(c.icon),
+              tint: asTint(c.tint) ?? 'green',
+              imageUrl: categoryPhoto(c.slug),
+              href: `/c/${encodeURIComponent(c.slug)}`,
+            }))}
+          />
+        </section>
+      )}
+    </>
   );
 }
 
@@ -314,7 +352,6 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
     for (const p of pages) for (const r of p.results) seedItems(qc, r.store.storeSlug, r.items, p.serverNow);
   }, [pages, qc]);
 
-  const filterValue = FILTERS.filter((f) => state[f]);
   const filterLabels: Record<FilterKey, string> = {
     open: intl.formatMessage({ id: 'search.filter.open' }),
     pickup: intl.formatMessage({ id: 'search.filter.pickup' }),
@@ -325,43 +362,38 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
 
   return (
     <>
-      <div className={styles.filters}>
-        <RadiusChips
+      <div className={styles.filterRow} role="group" aria-label={intl.formatMessage({ id: 'search.filter.label' })}>
+        <ChipSelect
           label={intl.formatMessage({ id: 'home.radius.label' })}
-          options={RADIUS_OPTIONS_KM.map((k) => ({ km: k, label: intl.formatMessage({ id: 'home.radius.km' }, { km: String(k) }) }))}
           value={km}
+          options={RADIUS_OPTIONS_KM.map((k) => ({ value: k, label: intl.formatMessage({ id: 'home.radius.within' }, { km: String(k) }) }))}
           onChange={setRadiusKm}
         />
-        <ChipGroup
-          multiple
-          label={intl.formatMessage({ id: 'search.filter.label' })}
-          options={FILTERS.map((f) => ({ value: f, label: filterLabels[f] }))}
-          value={filterValue}
-          onChange={(next) => {
-            const s: SearchState = { ...state };
-            for (const f of FILTERS) s[f] = next.includes(f) ? true : undefined;
-            onChange(s);
-          }}
-        />
-        {cats.length > 0 && (
-          <ChipGroup
-            label={intl.formatMessage({ id: 'search.category.label' })}
-            options={[{ value: '', label: intl.formatMessage({ id: 'search.category.all' }) }, ...cats.map((c) => ({ value: c.slug, label: c.name }))]}
-            value={state.category ?? ''}
-            onChange={(v) => onChange({ ...state, category: v || undefined })}
-          />
-        )}
-        <Segmented
+        <ChipSelect
           label={intl.formatMessage({ id: 'search.sort.label' })}
+          icon={ArrowUpDown}
+          value={sort}
           options={[
             { value: 'relevance', label: intl.formatMessage({ id: 'search.sort.relevance' }) },
             { value: 'nearest', label: intl.formatMessage({ id: 'search.sort.nearest' }) },
             { value: 'cheapest', label: intl.formatMessage({ id: 'search.sort.cheapest' }) },
           ]}
-          value={sort}
-          onChange={(v) => onChange({ ...state, sort: v })}
+          onChange={(v: SortKey) => onChange({ ...state, sort: v })}
         />
+        {FILTERS.map((f) => (
+          <Chip key={f} icon={FILTER_ICONS[f]} pressed={state[f] === true} onPressedChange={(on) => onChange({ ...state, [f]: on ? true : undefined })}>
+            {filterLabels[f]}
+          </Chip>
+        ))}
       </div>
+      {cats.length > 0 && (
+        <ChipGroup
+          label={intl.formatMessage({ id: 'search.category.label' })}
+          options={[{ value: '', label: intl.formatMessage({ id: 'search.category.all' }) }, ...cats.map((c) => ({ value: c.slug, label: c.name }))]}
+          value={state.category ?? ''}
+          onChange={(v) => onChange({ ...state, category: v || undefined })}
+        />
+      )}
 
       {(state.maxPricePaise || state.brand) && (
         <div className="tz-chips" role="group" aria-label={intl.formatMessage({ id: 'search.assist.applied' })}>
@@ -398,6 +430,7 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
 
       {first?.summary && first.summary.storesWithIt > 0 && (
         <p className={styles.summary} role="status">
+          <Icon icon={StoreIcon} />
           {intl.formatMessage(
             { id: 'search.summary' },
             {

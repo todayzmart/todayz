@@ -1,0 +1,23 @@
+/* Account: the profile header (bright skin, D-249). Values come from tokens only. */
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--t-bg);
+  color: var(--t-ink);
+  font: 800 22px/1 var(--font-display);
+}
+
+.whoText {
+  min-width: 0;
+}

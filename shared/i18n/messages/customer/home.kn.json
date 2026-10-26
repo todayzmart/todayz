@@ -248,5 +248,160 @@
     "message": "ವರ್ಗ ತೆರೆಯಿರಿ",
     "review": "reviewed",
     "enHash": "d189c7fd"
+  },
+  "home.wallet.label": {
+    "message": "ವಾಲೆಟ್, {count, plural, one {# ಕ್ರೆಡಿಟ್} other {# ಕ್ರೆಡಿಟ್}}",
+    "review": "machine",
+    "enHash": "d1c7ec10"
+  },
+  "home.account.label": {
+    "message": "ಖಾತೆ",
+    "review": "machine",
+    "enHash": "85dfa32c"
+  },
+  "home.filters.label": {
+    "message": "ಅಂಗಡಿಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ",
+    "review": "machine",
+    "enHash": "2a5b401c"
+  },
+  "home.radius.within": {
+    "message": "{km} km ಒಳಗೆ",
+    "review": "machine",
+    "enHash": "e7ce5cbc"
+  },
+  "home.filter.openNow": {
+    "message": "ಈಗ ತೆರೆದಿವೆ",
+    "review": "machine",
+    "enHash": "d7a05e65"
+  },
+  "home.filter.pickup": {
+    "message": "ಪಿಕಪ್",
+    "review": "machine",
+    "enHash": "a51122c1"
+  },
+  "home.filter.delivery": {
+    "message": "ಡೆಲಿವರಿ",
+    "review": "machine",
+    "enHash": "9631af52"
+  },
+  "home.filter.offers": {
+    "message": "ಆಫರ್",
+    "review": "machine",
+    "enHash": "43c94306"
+  },
+  "home.filters.clear": {
+    "message": "ಫಿಲ್ಟರ್ ತೆಗೆದುಹಾಕಿ",
+    "review": "machine",
+    "enHash": "41222671"
+  },
+  "home.empty.filtered.title": {
+    "message": "ಈ ಫಿಲ್ಟರ್‌ಗಳಿಗೆ ಯಾವ ಅಂಗಡಿಯೂ ಸಿಗಲಿಲ್ಲ",
+    "review": "machine",
+    "enHash": "423f30a9"
+  },
+  "home.empty.filtered.body": {
+    "message": "ಕಡಿಮೆ ಫಿಲ್ಟರ್ ಆಯ್ಕೆಮಾಡಿ ಅಥವಾ ಹೆಚ್ಚು ದೂರದವರೆಗೆ ಹುಡುಕಿ.",
+    "review": "machine",
+    "enHash": "d7669f3a"
+  },
+  "home.offers.title": {
+    "message": "ನಿಮ್ಮ ಹತ್ತಿರದ ಆಫರ್‌ಗಳು",
+    "review": "machine",
+    "enHash": "13f6c37f"
+  },
+  "home.offers.viewShop": {
+    "message": "ಅಂಗಡಿ ನೋಡಿ",
+    "review": "machine",
+    "enHash": "c55061ee"
+  },
+  "home.offers.how.eyebrow": {
+    "message": "TodayZ ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ",
+    "review": "machine",
+    "enHash": "eab4e74e"
+  },
+  "home.offers.how.title": {
+    "message": "ಬುಕ್ ಮಾಡಿ. ನಡೆದು ಹೋಗಿ ತನ್ನಿ.",
+    "review": "machine",
+    "enHash": "4242d4c6"
+  },
+  "home.offers.how.sub": {
+    "message": "ಹತ್ತಿರದ ಅಂಗಡಿಗಳ ಶೆಲ್ಫ್‌ನಲ್ಲಿ ಇರುವುದನ್ನು ಬುಕ್ ಮಾಡಿ, ಇಂದೇ ಪಿಕಪ್ ಮಾಡಿ.",
+    "review": "machine",
+    "enHash": "ae797517"
+  },
+  "home.offers.how.cta": {
+    "message": "ಹತ್ತಿರ ಹುಡುಕಿ",
+    "review": "machine",
+    "enHash": "ad3bae31"
+  },
+  "home.offers.credits.eyebrow": {
+    "message": "ಕ್ಯಾಶ್ ಬ್ಯಾಕ್",
+    "review": "machine",
+    "enHash": "90685d65"
+  },
+  "home.offers.credits.title": {
+    "message": "ಖರೀದಿಸುತ್ತಾ ಕ್ರೆಡಿಟ್ ಗಳಿಸಿ",
+    "review": "machine",
+    "enHash": "5d61d4dd"
+  },
+  "home.offers.credits.sub": {
+    "message": "ಕ್ಯಾಶ್ ಬ್ಯಾಕ್ ಇರುವ ಅಂಗಡಿಗಳು ಕ್ರೆಡಿಟ್ ಮರಳಿ ನೀಡುತ್ತವೆ. ಪ್ರತಿ ಕ್ರೆಡಿಟ್ ಮುಂದಿನ ಆರ್ಡರ್‌ನಲ್ಲಿ ₹1 ಕಡಿತ.",
+    "review": "machine",
+    "enHash": "087fcf9b"
+  },
+  "home.offers.credits.cta": {
+    "message": "ವಾಲೆಟ್ ತೆರೆಯಿರಿ",
+    "review": "machine",
+    "enHash": "57fba6b3"
+  },
+  "home.offers.baskets.eyebrow": {
+    "message": "ಬಾಸ್ಕೆಟ್",
+    "review": "machine",
+    "enHash": "d368818f"
+  },
+  "home.offers.baskets.cta": {
+    "message": "ಬಾಸ್ಕೆಟ್ ತೆರೆಯಿರಿ",
+    "review": "machine",
+    "enHash": "f22b5481"
+  },
+  "home.categories.title": {
+    "message": "ನೀವು ಏನನ್ನು ಹುಡುಕುತ್ತಿದ್ದೀರಿ?",
+    "review": "machine",
+    "enHash": "ffca59bc"
+  },
+  "home.card.cashback": {
+    "message": "{pct}% ಕ್ಯಾಶ್ ಬ್ಯಾಕ್",
+    "review": "machine",
+    "enHash": "73d039a2"
+  },
+  "home.card.asCredits": {
+    "message": "ಕ್ರೆಡಿಟ್ ರೂಪದಲ್ಲಿ",
+    "review": "machine",
+    "enHash": "0414ab76"
+  },
+  "home.card.rating": {
+    "message": "5 ರಲ್ಲಿ {rating} ರೇಟಿಂಗ್, {count, plural, one {# ರೇಟಿಂಗ್} other {# ರೇಟಿಂಗ್‌ಗಳು}}",
+    "review": "machine",
+    "enHash": "df99ab0c"
+  },
+  "home.card.footer.cashback": {
+    "message": "ಪ್ರತಿ ಆರ್ಡರ್‌ಗೆ {pct}% ಕ್ರೆಡಿಟ್ ಮರಳಿ",
+    "review": "machine",
+    "enHash": "f1fad6f5"
+  },
+  "home.card.footer.none": {
+    "message": "ಈ ಅಂಗಡಿಯಲ್ಲಿ ಕ್ಯಾಶ್ ಬ್ಯಾಕ್ ಇಲ್ಲ",
+    "review": "machine",
+    "enHash": "45bf03b9"
+  },
+  "home.place.current": {
+    "message": "ನಿಮ್ಮ ಸ್ಥಳ:",
+    "review": "machine",
+    "enHash": "9cf8c08f"
+  },
+  "home.place.change": {
+    "message": "ಸ್ಥಳ ಬದಲಿಸಿ",
+    "review": "machine",
+    "enHash": "04410a88"
   }
 }

@@ -264,6 +264,12 @@ select.tz-input:disabled {
   border-radius: inherit;
 }
 
+/* A product photo fills the square thumb whatever its own shape (a tall photo must not stretch the card). */
+.tz-thumb > .tz-ui-thumb-img {
+  position: absolute;
+  inset: 0;
+}
+
 /* A shop photo in the avatar's place: the picture fills it, corners clipped. */
 .tz-ui-avatar-photo {
   overflow: hidden;

@@ -384,11 +384,6 @@
     "review": "reviewed",
     "enHash": "b1ecaf57"
   },
-  "account.phone": {
-    "message": "मोबाइल नंबर",
-    "review": "reviewed",
-    "enHash": "8e5c12de"
-  },
   "account.language": {
     "message": "भाषा",
     "review": "reviewed",
@@ -398,11 +393,6 @@
     "message": "लोकेशन",
     "review": "reviewed",
     "enHash": "d219c681"
-  },
-  "account.change": {
-    "message": "बदलें",
-    "review": "reviewed",
-    "enHash": "64fbd995"
   },
   "account.signOut": {
     "message": "साइन आउट करें",

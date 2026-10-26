@@ -35,6 +35,10 @@
     "defaultMessage": "Clear",
     "description": "Clears the recent searches"
   },
+  "search.categories.title": {
+    "defaultMessage": "Shop by category",
+    "description": "Heading over the category photo grid on Search before anything is typed"
+  },
   "search.filter.label": {
     "defaultMessage": "Filters",
     "description": "Accessible name of the filter chips"

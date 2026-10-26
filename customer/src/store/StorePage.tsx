@@ -1,17 +1,19 @@
-// C-07 Shop page: header (name, distance, open state with today's hours, rating, directions), in-shop
-// search, category tabs, and the items with stock, freshness and Add to cart.
+// C-07 Shop page (D-249 bright): the shop's photo as a cover (its category's stock photo without one), a
+// white card over it (name, rating, distance, open state with today's hours, pickup or delivery, directions,
+// cashback), a sticky in-shop search with category chips, and the items with stock, freshness and Add.
 import { listCategories } from '@todayz/api-client/gen/catalogue/catalogue';
 import { getDiscoverStore, listDiscoverStoreItems } from '@todayz/api-client/gen/discover/discover';
 import type { DiscoverHours } from '@todayz/api-client/gen/model/discoverHours';
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Banner, Button, EmptyState, SearchField, Skeleton, Tabs } from '@todayz/ui';
+import { Banner, Button, ChipGroup, EmptyState, SearchField, Skeleton } from '@todayz/ui';
 import { formatDistance } from '@todayz/i18n';
-import { MapPin, Star, Store as StoreIcon } from 'lucide-react';
+import { BadgePercent, Bike, Clock, MapPin, Navigation, ShoppingBag, Star, Store as StoreIcon, Wallet } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useIntl, type IntlShape } from 'react-intl';
 import { useCoords } from '../home/coords';
 import { useFmt, usePackLine } from '../home/format';
 import { asTint, directionsUrl, imageUrl, initials } from '../home/present';
+import { tintPhoto } from '../home/photos';
 import { RouterLink } from '../home/RouterLink';
 import { AskNearbySlot } from '../search/slots';
 import { Icon } from '../shell/Icon';
@@ -134,75 +136,106 @@ export function StorePage({ slug, state, onChange }: { slug: string; state: Stor
     </div>
   );
 
+
   const cats = categories.data?.items ?? [];
-  const tabValue = state.cat ?? 'all';
-  const tabs = [
-    { value: 'all', label: intl.formatMessage({ id: 'search.category.all' }), panel: tabValue === 'all' ? list : undefined },
-    ...cats.map((c) => ({ value: c.slug, label: c.name, panel: tabValue === c.slug ? list : undefined })),
-  ];
 
   return (
     <div className={styles.page}>
-      <header className={`tz-hero-wash ${styles.head}`}>
-        {s ? (
-          <>
-            <div className={styles.titleRow}>
-              <StoreAvatar name={s.name} tint={s.categoryTint} photoKey={s.photoKey} />
-              <div className="tz-ui-minw0">
-                <h1 className={styles.name}>{s.name}</h1>
-                <div className="tz-meta">
-                  {s.distanceM !== null && <span>{formatDistance(s.distanceM)}</span>}
-                  {s.categoryName && <span>{s.categoryName}</span>}
-                  {s.locality && <span>{s.locality}</span>}
-                  {s.rating !== null && (
-                    <span className={styles.rating}>
-                      <Icon icon={Star} />
-                      {intl.formatMessage({ id: 'store.rating' }, { rating: s.rating.toFixed(1), count: String(s.ratingCount) })}
-                    </span>
-                  )}
+      <header className={styles.head}>
+        <div className={styles.cover} aria-hidden="true">
+          {s && <img src={imageUrl(s.photoKey) ?? tintPhoto(asTint(s.categoryTint))} alt="" decoding="async" />}
+        </div>
+        <div className={styles.card}>
+          {s ? (
+            <>
+              <div className={styles.titleRow}>
+                <StoreAvatar name={s.name} tint={s.categoryTint} photoKey={s.photoKey} />
+                <div className={styles.titleText}>
+                  <h1 className={styles.name}>{s.name}</h1>
+                  <div className={`tz-meta ${styles.meta}`}>
+                    {s.distanceM !== null && (
+                      <span>
+                        <Icon icon={MapPin} />
+                        {formatDistance(s.distanceM)}
+                      </span>
+                    )}
+                    {s.categoryName && (
+                      <span>
+                        <Icon icon={StoreIcon} />
+                        {s.categoryName}
+                      </span>
+                    )}
+                    {s.locality && <span>{s.locality}</span>}
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="tz-meta tz-ui-meta-tags">
-              <span className={s.open ? 'tz-tag tz-tag-open' : 'tz-tag'}>
-                {intl.formatMessage({ id: s.open ? 'store.open' : 'store.closed' })}
-              </span>
-              <span className="tz-tag">{hoursText(intl, s.hours, s.serverNow)}</span>
-              {s.pickup && <span className="tz-tag">{intl.formatMessage({ id: 'store.pickup' })}</span>}
-              {s.delivery && <span className="tz-tag">{intl.formatMessage({ id: 'store.delivery' })}</span>}
-              {s.cashbackPct > 0 && (
-                <span className="tz-tag tz-tag-offer">{intl.formatMessage({ id: 'store.cashback' }, { pct: String(s.cashbackPct) })}</span>
-              )}
-            </div>
-            {s.delivery && (
-              <p className={styles.note}>
-                {intl.formatMessage(
-                  { id: 'store.deliveryNote' },
-                  {
-                    fee: s.deliveryFeePaise === 0 ? intl.formatMessage({ id: 'store.deliveryFree' }) : money(s.deliveryFeePaise),
-                    min: money(s.deliveryMinOrderPaise),
-                  },
+                {s.rating !== null && (
+                  <span
+                    className={styles.rate}
+                    role="img"
+                    aria-label={intl.formatMessage({ id: 'home.card.rating' }, { rating: s.rating.toFixed(1), count: s.ratingCount })}
+                  >
+                    <Icon icon={Star} />
+                    {s.rating.toFixed(1)}
+                  </span>
                 )}
-              </p>
-            )}
-            {/* TODO(lead): no phone in the shop page contract, so there is no Call button yet. */}
-            <div className={styles.actions}>
-              <a className="tz-btn tz-btn-soft tz-btn-sm" href={directionsUrl(s.lat, s.lng)} target="_blank" rel="noopener noreferrer">
-                <Icon icon={MapPin} />
-                {intl.formatMessage({ id: 'store.directions' })}
-              </a>
-            </div>
-          </>
-        ) : (
-          <>
-            <Skeleton width="60%" height="28px" />
-            <Skeleton width="40%" />
-          </>
-        )}
+              </div>
+
+              <ul className={styles.facts}>
+                <li>
+                  <Icon icon={Clock} />
+                  <span className={s.open ? styles.open : styles.closed}>{intl.formatMessage({ id: s.open ? 'store.open' : 'store.closed' })}</span>
+                  <span>{hoursText(intl, s.hours, s.serverNow)}</span>
+                </li>
+                {(s.pickup || s.delivery) && (
+                  <li>
+                    <Icon icon={s.delivery ? Bike : ShoppingBag} />
+                    <span>
+                      {[s.pickup && intl.formatMessage({ id: 'store.pickup' }), s.delivery && intl.formatMessage({ id: 'store.delivery' })]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </span>
+                  </li>
+                )}
+                {s.delivery && (
+                  <li className={styles.note}>
+                    <Icon icon={Wallet} />
+                    <span>
+                      {intl.formatMessage(
+                        { id: 'store.deliveryNote' },
+                        {
+                          fee: s.deliveryFeePaise === 0 ? intl.formatMessage({ id: 'store.deliveryFree' }) : money(s.deliveryFeePaise),
+                          min: money(s.deliveryMinOrderPaise),
+                        },
+                      )}
+                    </span>
+                  </li>
+                )}
+              </ul>
+
+              {/* TODO(lead): no phone in the shop page contract, so there is no Call button yet. */}
+              <div className={styles.actions}>
+                <a className="tz-btn tz-btn-soft tz-btn-sm" href={directionsUrl(s.lat, s.lng)} target="_blank" rel="noopener noreferrer">
+                  <Icon icon={Navigation} />
+                  {intl.formatMessage({ id: 'store.directions' })}
+                </a>
+              </div>
+            </>
+          ) : (
+            <>
+              <Skeleton width="60%" height="28px" />
+              <Skeleton width="40%" />
+            </>
+          )}
+          {s && s.cashbackPct > 0 && (
+            <p className={styles.offer}>
+              <Icon icon={BadgePercent} />
+              {intl.formatMessage({ id: 'home.card.footer.cashback' }, { pct: String(s.cashbackPct) })}
+            </p>
+          )}
+        </div>
       </header>
 
-      <div className={styles.body}>
-        {!bookable && <Banner tone="info">{intl.formatMessage({ id: 'store.inStoreOnly.banner' })}</Banner>}
+      <div className={styles.band}>
         <form role="search" onSubmit={(e) => e.preventDefault()}>
           <SearchField
             label={intl.formatMessage({ id: 'store.search.label' })}
@@ -213,12 +246,19 @@ export function StorePage({ slug, state, onChange }: { slug: string; state: Stor
             enterKeyHint="search"
           />
         </form>
-        <Tabs
-          label={intl.formatMessage({ id: 'search.category.label' })}
-          tabs={tabs}
-          value={tabValue}
-          onChange={(v) => onChange({ ...state, cat: v === 'all' ? undefined : v })}
-        />
+        {cats.length > 0 && (
+          <ChipGroup
+            label={intl.formatMessage({ id: 'search.category.label' })}
+            options={[{ value: '', label: intl.formatMessage({ id: 'search.category.all' }) }, ...cats.map((c) => ({ value: c.slug, label: c.name }))]}
+            value={state.cat ?? ''}
+            onChange={(v) => onChange({ ...state, cat: v || undefined })}
+          />
+        )}
+      </div>
+
+      <div className={styles.body}>
+        {!bookable && <Banner tone="info">{intl.formatMessage({ id: 'store.inStoreOnly.banner' })}</Banner>}
+        {list}
         <AskNearbySlot query={state.q ?? ''} shopSlug={slug} />
       </div>
       {sheet}

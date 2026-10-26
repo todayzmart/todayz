@@ -42,6 +42,19 @@ export const LongName: Story = {
   args: { ...lakshmi, name: 'Sri Venkateshwara Medical and General Stores', initials: 'SV', tint: 'rose' },
 };
 
+export const Feature: Story = {
+  args: {
+    ...lakshmi,
+    layout: 'feature',
+    tint: 'green',
+    tags: [],
+    photoTag: { label: 'Open now', kind: 'open' },
+    highlight: { title: '5% cashback', sub: 'as credits' },
+    rating: { value: '4.6', label: 'Rated 4.6 of 5' },
+    footer: { label: '5% back as credits on every order', kind: 'offer' },
+  },
+};
+
 export const DesignReference: Story = {
   ...designRef('StoreCard', 196),
   render: () => (

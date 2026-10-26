@@ -9,7 +9,7 @@ import styles from './shell.module.css';
 export function Shell() {
   const intl = useIntl();
   return (
-    <div className={styles.app} data-density="touch">
+    <div className={styles.app} data-density="touch" data-skin="bright">
       <a className={styles.skip} href="#main">
         {intl.formatMessage({ id: 'shell.skipToContent' })}
       </a>

@@ -248,5 +248,160 @@
     "message": "வகையைத் திற",
     "review": "reviewed",
     "enHash": "d189c7fd"
+  },
+  "home.wallet.label": {
+    "message": "வாலெட், {count, plural, one {# கிரெடிட்} other {# கிரெடிட்}}",
+    "review": "machine",
+    "enHash": "d1c7ec10"
+  },
+  "home.account.label": {
+    "message": "கணக்கு",
+    "review": "machine",
+    "enHash": "85dfa32c"
+  },
+  "home.filters.label": {
+    "message": "கடைகளை வடிகட்டவும்",
+    "review": "machine",
+    "enHash": "2a5b401c"
+  },
+  "home.radius.within": {
+    "message": "{km} km க்குள்",
+    "review": "machine",
+    "enHash": "e7ce5cbc"
+  },
+  "home.filter.openNow": {
+    "message": "இப்போது திறந்தவை",
+    "review": "machine",
+    "enHash": "d7a05e65"
+  },
+  "home.filter.pickup": {
+    "message": "பிக்அப்",
+    "review": "machine",
+    "enHash": "a51122c1"
+  },
+  "home.filter.delivery": {
+    "message": "டெலிவரி",
+    "review": "machine",
+    "enHash": "9631af52"
+  },
+  "home.filter.offers": {
+    "message": "ஆஃபர்",
+    "review": "machine",
+    "enHash": "43c94306"
+  },
+  "home.filters.clear": {
+    "message": "வடிகட்டிகளை நீக்கவும்",
+    "review": "machine",
+    "enHash": "41222671"
+  },
+  "home.empty.filtered.title": {
+    "message": "இந்த வடிகட்டிகளுக்கு எந்தக் கடையும் இல்லை",
+    "review": "machine",
+    "enHash": "423f30a9"
+  },
+  "home.empty.filtered.body": {
+    "message": "குறைவான வடிகட்டிகளை முயலவும் அல்லது அதிக தூரம் தேடவும்.",
+    "review": "machine",
+    "enHash": "d7669f3a"
+  },
+  "home.offers.title": {
+    "message": "உங்கள் அருகிலுள்ள ஆஃபர்கள்",
+    "review": "machine",
+    "enHash": "13f6c37f"
+  },
+  "home.offers.viewShop": {
+    "message": "கடையைப் பார்க்கவும்",
+    "review": "machine",
+    "enHash": "c55061ee"
+  },
+  "home.offers.how.eyebrow": {
+    "message": "TodayZ எப்படி வேலை செய்கிறது",
+    "review": "machine",
+    "enHash": "eab4e74e"
+  },
+  "home.offers.how.title": {
+    "message": "முன்பதிவு செய்யுங்கள். நடந்து சென்று வாங்குங்கள்.",
+    "review": "machine",
+    "enHash": "4242d4c6"
+  },
+  "home.offers.how.sub": {
+    "message": "அருகிலுள்ள கடைகளின் அலமாரியில் இருப்பதை முன்பதிவு செய்து இன்றே பிக்அப் செய்யுங்கள்.",
+    "review": "machine",
+    "enHash": "ae797517"
+  },
+  "home.offers.how.cta": {
+    "message": "அருகில் தேடவும்",
+    "review": "machine",
+    "enHash": "ad3bae31"
+  },
+  "home.offers.credits.eyebrow": {
+    "message": "கேஷ்பேக்",
+    "review": "machine",
+    "enHash": "90685d65"
+  },
+  "home.offers.credits.title": {
+    "message": "வாங்கும்போது கிரெடிட் பெறுங்கள்",
+    "review": "machine",
+    "enHash": "5d61d4dd"
+  },
+  "home.offers.credits.sub": {
+    "message": "கேஷ்பேக் உள்ள கடைகள் கிரெடிட்டாகத் திருப்பித் தரும். ஒவ்வொரு கிரெடிட்டும் அடுத்த ஆர்டரில் ₹1 தள்ளுபடி.",
+    "review": "machine",
+    "enHash": "087fcf9b"
+  },
+  "home.offers.credits.cta": {
+    "message": "வாலெட்டைத் திறக்கவும்",
+    "review": "machine",
+    "enHash": "57fba6b3"
+  },
+  "home.offers.baskets.eyebrow": {
+    "message": "பாஸ்கெட்",
+    "review": "machine",
+    "enHash": "d368818f"
+  },
+  "home.offers.baskets.cta": {
+    "message": "பாஸ்கெட்டுகளைத் திறக்கவும்",
+    "review": "machine",
+    "enHash": "f22b5481"
+  },
+  "home.categories.title": {
+    "message": "நீங்கள் எதைத் தேடுகிறீர்கள்?",
+    "review": "machine",
+    "enHash": "ffca59bc"
+  },
+  "home.card.cashback": {
+    "message": "{pct}% கேஷ்பேக்",
+    "review": "machine",
+    "enHash": "73d039a2"
+  },
+  "home.card.asCredits": {
+    "message": "கிரெடிட்டாக",
+    "review": "machine",
+    "enHash": "0414ab76"
+  },
+  "home.card.rating": {
+    "message": "5 இல் {rating} மதிப்பீடு, {count, plural, one {# மதிப்பீடு} other {# மதிப்பீடுகள்}}",
+    "review": "machine",
+    "enHash": "df99ab0c"
+  },
+  "home.card.footer.cashback": {
+    "message": "ஒவ்வொரு ஆர்டருக்கும் {pct}% கிரெடிட்டாகத் திரும்ப",
+    "review": "machine",
+    "enHash": "f1fad6f5"
+  },
+  "home.card.footer.none": {
+    "message": "இந்தக் கடையில் கேஷ்பேக் இல்லை",
+    "review": "machine",
+    "enHash": "45bf03b9"
+  },
+  "home.place.current": {
+    "message": "உங்கள் இருப்பிடம்:",
+    "review": "machine",
+    "enHash": "9cf8c08f"
+  },
+  "home.place.change": {
+    "message": "இருப்பிடத்தை மாற்றவும்",
+    "review": "machine",
+    "enHash": "04410a88"
   }
 }

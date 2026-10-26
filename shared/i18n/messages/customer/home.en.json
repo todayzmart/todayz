@@ -198,5 +198,129 @@
   "home.category.page": {
     "defaultMessage": "Open category",
     "description": "Link from the Home category filter to the category page (C-06)"
+  },
+  "home.place.current": {
+    "defaultMessage": "Your location:",
+    "description": "Screen-reader text before the place name in the Home header link"
+  },
+  "home.place.change": {
+    "defaultMessage": "Change location",
+    "description": "Screen-reader text after the place in the Home header link, which opens the location screen"
+  },
+  "home.wallet.label": {
+    "defaultMessage": "Wallet, {count, plural, one {# credit} other {# credits}}",
+    "description": "Accessible name of the credits chip in the Home header"
+  },
+  "home.account.label": {
+    "defaultMessage": "Account",
+    "description": "Accessible name of the avatar button in the Home header"
+  },
+  "home.filters.label": {
+    "defaultMessage": "Filter shops",
+    "description": "Accessible name of the row with the radius and the filter chips on Home"
+  },
+  "home.radius.within": {
+    "defaultMessage": "Within {km} km",
+    "description": "Option of the radius picker on Home; km is a number written as text"
+  },
+  "home.filter.openNow": {
+    "defaultMessage": "Open now",
+    "description": "Home filter chip: only shops open now"
+  },
+  "home.filter.pickup": {
+    "defaultMessage": "Pickup",
+    "description": "Home filter chip: only shops that take pickup orders"
+  },
+  "home.filter.delivery": {
+    "defaultMessage": "Delivery",
+    "description": "Home filter chip: only shops that deliver"
+  },
+  "home.filter.offers": {
+    "defaultMessage": "Offers",
+    "description": "Home filter chip: only shops with an offer running"
+  },
+  "home.filters.clear": {
+    "defaultMessage": "Clear filters",
+    "description": "Button that turns off every Home filter chip"
+  },
+  "home.empty.filtered.title": {
+    "defaultMessage": "No shops match these filters",
+    "description": "Home empty state when the filter chips leave no shop"
+  },
+  "home.empty.filtered.body": {
+    "defaultMessage": "Try fewer filters or a wider search radius.",
+    "description": "Body of the filtered empty state on Home"
+  },
+  "home.offers.title": {
+    "defaultMessage": "Offers near you",
+    "description": "Heading of the banner row on Home (read by screen readers)"
+  },
+  "home.offers.viewShop": {
+    "defaultMessage": "View shop",
+    "description": "Button text on a shop's offer banner on Home"
+  },
+  "home.offers.how.eyebrow": {
+    "defaultMessage": "How TodayZ works",
+    "description": "Small capitals above the first Home banner"
+  },
+  "home.offers.how.title": {
+    "defaultMessage": "Reserve it. Walk over.",
+    "description": "Title of the first Home banner"
+  },
+  "home.offers.how.sub": {
+    "defaultMessage": "Book what shops near you have on the shelf and pick it up today.",
+    "description": "Body of the first Home banner"
+  },
+  "home.offers.how.cta": {
+    "defaultMessage": "Search nearby",
+    "description": "Button text on the first Home banner; opens search"
+  },
+  "home.offers.credits.eyebrow": {
+    "defaultMessage": "Cashback",
+    "description": "Small capitals above the credits banner on Home"
+  },
+  "home.offers.credits.title": {
+    "defaultMessage": "Earn credits as you shop",
+    "description": "Title of the credits banner on Home"
+  },
+  "home.offers.credits.sub": {
+    "defaultMessage": "Shops with cashback pay you back in credits. Each credit is ₹1 off a later order.",
+    "description": "Body of the credits banner on Home"
+  },
+  "home.offers.credits.cta": {
+    "defaultMessage": "Open wallet",
+    "description": "Button text on the credits banner; opens the wallet"
+  },
+  "home.offers.baskets.eyebrow": {
+    "defaultMessage": "Baskets",
+    "description": "Small capitals above the baskets banner on Home"
+  },
+  "home.offers.baskets.cta": {
+    "defaultMessage": "Open baskets",
+    "description": "Button text on the baskets banner; opens saved baskets"
+  },
+  "home.categories.title": {
+    "defaultMessage": "What are you looking for?",
+    "description": "Heading above the category photos on Home"
+  },
+  "home.card.cashback": {
+    "defaultMessage": "{pct}% cashback",
+    "description": "Big line on a shop photo; pct is a number written as text"
+  },
+  "home.card.asCredits": {
+    "defaultMessage": "as credits",
+    "description": "Small line under the cashback on a shop photo"
+  },
+  "home.card.rating": {
+    "defaultMessage": "Rated {rating} of 5, {count, plural, one {# rating} other {# ratings}}",
+    "description": "What a screen reader hears for the rating badge on a Home shop card; rating is text"
+  },
+  "home.card.footer.cashback": {
+    "defaultMessage": "{pct}% back as credits on every order",
+    "description": "Footer of a Home shop card with cashback; pct is a number written as text"
+  },
+  "home.card.footer.none": {
+    "defaultMessage": "No cashback at this shop",
+    "description": "Footer of a Home shop card without cashback"
   }
 }
