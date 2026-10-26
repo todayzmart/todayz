@@ -1,6 +1,6 @@
 import type { StoreHours } from '@todayz/api-client/gen/model/storeHours';
 import type { StoreSettings } from '@todayz/api-client/gen/model/storeSettings';
-import { getStore, putKyc, updateStore } from '@todayz/api-client/gen/business/business';
+import { getKyc, getStore, putKyc, updateStore } from '@todayz/api-client/gen/business/business';
 import type { Store } from '@todayz/api-client/gen/model/store';
 import { Banner, Button, TextField, useToast } from '@todayz/ui';
 import { useQueryClient } from '@tanstack/react-query';
@@ -10,7 +10,7 @@ import { EMPTY_KYC, kycPayload, validateKyc, type KycValues } from '../onboardin
 import { BizError } from '../stores/BizError';
 import { HoursEditor } from '../stores/HoursEditor';
 import { hoursPayload, hoursValid, sameHours, validateHours } from '../stores/hours';
-import { bizKey, kycKey, storePath, storesKey, useAction, useIfMatch, useKyc } from '../stores/queries';
+import { bizKey, kycKey, kycPath, storePath, storesKey, useAction, useIfMatch, useKyc } from '../stores/queries';
 import { StoreForm } from '../stores/StoreForm';
 import { updatePayload, type StoreValues } from '../stores/storeValues';
 import styles from '../stores/stores.module.css';
@@ -229,6 +229,7 @@ export function PayoutSection({ bid, canEdit }: { bid: string; canEdit: boolean 
   const toast = useToast();
   const kyc = useKyc(bid);
   const action = useAction();
+  const ifMatch = useIfMatch();
   const [v, setV] = useState<KycValues>(EMPTY_KYC);
   const [shown, setShown] = useState(false);
   const have = { bank: Boolean(kyc.data?.bankAccountLast4) };
@@ -241,7 +242,10 @@ export function PayoutSection({ bid, canEdit }: { bid: string; canEdit: boolean 
     setShown(true);
     const body = kycPayload(v);
     if (Object.keys(errors).length > 0 || Object.keys(body).length === 0) return;
-    const out = await action.run('kyc', async () => putKyc(bid, body));
+    const out = await action.run('kyc', async () => {
+      const tag = await ifMatch(kycPath(bid), () => getKyc(bid));
+      return putKyc(bid, body, tag ? { ifMatch: tag } : {});
+    });
     if (!out) return;
     setV(EMPTY_KYC);
     setShown(false);

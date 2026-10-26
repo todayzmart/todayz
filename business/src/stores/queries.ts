@@ -2,6 +2,7 @@ import { ApiError } from '@todayz/api-client';
 import {
   getBusiness,
   getGetBusinessUrl,
+  getGetKycUrl,
   getGetStoreSettingsUrl,
   getGetStoreUrl,
   getKyc,
@@ -88,6 +89,7 @@ export function useIfMatch() {
 export const businessPath = (bid: string) => getGetBusinessUrl(bid);
 export const storePath = (bid: string, sid: string) => getGetStoreUrl(bid, sid);
 export const settingsPath = (bid: string, sid: string) => getGetStoreSettingsUrl(bid, sid);
+export const kycPath = (bid: string) => getGetKycUrl(bid);
 
 /** The i18n key suffix (`stores.error.<key>`) for a failure; unknown codes fall back to `generic`. */
 export function bizErrorKey(err: unknown): string {
