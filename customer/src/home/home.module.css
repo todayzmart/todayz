@@ -15,6 +15,24 @@
   gap: var(--space-3);
 }
 
+/* The place chip shrinks and truncates with an ellipsis: a long label (Tamil, Telugu) must not run past the edge of a 360 px phone. */
+.placeChip {
+  min-width: 0;
+  max-width: 100%;
+  flex: 0 1 auto;
+}
+
+.placeChip :global(svg) {
+  flex: none;
+}
+
+.placeText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .brandRow :global(.tz-side-brand) {
   margin: 0;
   padding: 0;

@@ -17,6 +17,8 @@
 
 .title {
   flex: 1;
+  min-width: 0; /* a long title (Tamil) wraps instead of pushing the Map/List switch off a 360 px phone */
+  overflow-wrap: break-word;
   margin: 0;
   font: var(--type-headline);
   letter-spacing: var(--type-headline-tracking);

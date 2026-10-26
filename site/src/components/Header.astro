@@ -230,5 +230,20 @@ const start = page.leadForm ? { href: '#join', hreflang: undefined } : { ...link
     .start :global(.tz-ico) {
       display: none;
     }
+
+    /* Longer scripts (Tamil, Kannada) must still fit a 360 px phone: no sideways scroll. */
+    .head-row {
+      gap: 8px;
+      padding-inline: 12px;
+    }
+
+    .head-cta {
+      gap: 6px;
+    }
+
+    .start {
+      padding: 0 8px;
+      font-size: 13px;
+    }
   }
 </style>

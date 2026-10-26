@@ -30,6 +30,14 @@ fixtures/     @todayz/e2e-fixtures (W2-13): seed.ts (seed ids, slugs, prices, te
 journeys/     @todayz/e2e-journeys (W2-13): Playwright multi-context journeys, specs/NN-e2e-XX-*.
               globalSetup opens SL and SL2 all day and globalTeardown restores their hours and
               resets the test clock. Specs that move the clock run last (20-*, 21-*).
+a11y/         @todayz/e2e-a11y (W4-04): routes.ts (every route of the four apps), harness.ts (context per
+              person, English or hi/kn/te/ta, the seed's place and shop), a11y.spec.ts (axe WCAG 2.2 AA
+              at 360, 390 and 1280 px, no sideways scroll, the phone again in hi/kn/te/ta),
+              lighthouse.mjs (the three app shells; the site has `site/scripts/lighthouse.mjs`).
+              out/ (findings, Lighthouse reports) is git-ignored.
+visual/       @todayz/e2e-visual (W4-04): visual.spec.ts and baselines/ (key screens in en and the
+              en-XA pseudo-locale). Refresh on purpose with `TZ_VISUAL_APP=<app> ... --update-snapshots`
+              and say which baselines changed in the WP report. `make e2e-a11y e2e-visual` run both.
 ```
 
 ## Conventions
