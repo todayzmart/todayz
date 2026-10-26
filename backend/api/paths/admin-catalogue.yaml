@@ -654,3 +654,130 @@
               status: approved
               imageKey: products/01JB0SPR1A2B3C4D5E6F7G8H9J/01JB0SMG1A2B3C4D5E6F7G8H9J.jpg
       default: *problem
+/v1/admin/type-photos:
+  get:
+    operationId: listAdminTypePhotos
+    tags: [admin-catalogue]
+    summary: Kinds of item with their photos (D-253), by name
+    description: >-
+      `todayz images types` finds up to three free-licence photos for each kind of item (the product name
+      without brand and pack size, in its category) and they wait here as `pending`. `status=pending`
+      (the default) lists kinds with candidates to review; `status=approved` lists kinds that have their
+      photo. `previewUrl` is a signed link to the stored copy, valid for 15 minutes.
+    parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum: [pending, approved]
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Kinds of item
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminTypeKindList
+            example:
+              items:
+                - categoryId: 01JB0SCA1A2B3C4D5E6F7G8H9J
+                  categoryName: Dals & pulses
+                  typeKey: toor dal
+                  productCount: 14
+                  showing: 0
+                  samples: [Tata Sampann Toor dal 1 kg, Toor dal 500 g]
+                  photos:
+                    - &typePhoto
+                      id: 01JB0STP1A2B3C4D5E6F7G8H9J
+                      categoryId: 01JB0SCA1A2B3C4D5E6F7G8H9J
+                      typeKey: toor dal
+                      status: pending
+                      rank: 1
+                      contentType: image/jpeg
+                      sizeBytes: 61022
+                      previewUrl: https://s3.todayz.localhost/todayz-private/type-photos/01JB0STP1A2B3C4D5E6F7G8H9J.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256
+                      imageKey: null
+                      sourceRef: File:Toor dal.jpg
+                      sourceUrl: https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Toor_dal.jpg/800px-Toor_dal.jpg
+                      pageUrl: https://commons.wikimedia.org/wiki/File:Toor_dal.jpg
+                      licence: CC BY-SA 4.0
+                      attribution: A. Photographer
+                      rejectReason: null
+                      decidedAt: null
+                      createdAt: "2026-10-26T09:00:00Z"
+              nextCursor: null
+              serverNow: "2026-10-26T11:00:00Z"
+      default: *problem
+/v1/admin/type-photos/{typePhotoId}/approve:
+  parameters: &typePhotoParam
+    - name: typePhotoId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: approveAdminTypePhoto
+    tags: [admin-catalogue]
+    summary: Pick a candidate as the photo of its kind (audited)
+    description: >-
+      Copies the candidate into the public images bucket once, turns the kind's other candidates down, and
+      gives every product of the kind without an image of its own a `type` image pointing at that copy.
+      Only a `pending` candidate of a kind without an approved photo may be picked, else
+      `409 invalid_transition`. Storage not configured is `503`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-catalogue.yaml#/AdminProductImageApprove
+          example: {}
+    responses:
+      "200":
+        description: The photo and how many products gained it
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminTypePhotoDecision
+            example:
+              photo:
+                <<: *typePhoto
+                status: approved
+                imageKey: types/01JB0STP1A2B3C4D5E6F7G8H9J.jpg
+              products: 14
+      default: *problem
+/v1/admin/type-photos/{typePhotoId}/reject:
+  parameters: *typePhotoParam
+  post:
+    operationId: rejectAdminTypePhoto
+    tags: [admin-catalogue]
+    summary: Turn down a candidate, or take down the photo of a kind (audited)
+    description: >-
+      A `pending` candidate becomes `rejected`. The `approved` photo becomes `rejected` too: every product
+      showing it goes back to the placeholder and the public copy is removed. Anything else is
+      `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-catalogue.yaml#/AdminProductImageReject
+          example:
+            reason: Shows the plant, not the dal
+    responses:
+      "200":
+        description: The photo and how many products lost it
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminTypePhotoDecision
+            example:
+              photo:
+                <<: *typePhoto
+                status: rejected
+                rejectReason: Shows the plant, not the dal
+                decidedAt: "2026-10-26T11:00:00Z"
+              products: 0
+      default: *problem

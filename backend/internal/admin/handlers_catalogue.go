@@ -35,6 +35,9 @@ var CatalogueOps = map[string]string{
 	"RejectAdminProductImage":    policy.AdminCatalogueReview,
 	"CreateAdminProductImage":    policy.AdminCatalogueManage,
 	"ConfirmAdminProductImage":   policy.AdminCatalogueManage,
+	"ListAdminTypePhotos":        policy.AdminCatalogueView,
+	"ApproveAdminTypePhoto":      policy.AdminCatalogueReview,
+	"RejectAdminTypePhoto":       policy.AdminCatalogueReview,
 }
 
 // maxBody is the request body limit (the platform's 1 MB).
@@ -332,4 +335,39 @@ func (h catalogueHandlers) ConfirmAdminProductImage(ctx context.Context, req cat
 		return nil, asProblem(err)
 	}
 	return catalogueapi.ConfirmAdminProductImage200JSONResponse(out), nil
+}
+
+// ListAdminTypePhotos implements GET /v1/admin/type-photos.
+func (h catalogueHandlers) ListAdminTypePhotos(ctx context.Context, req catalogueapi.ListAdminTypePhotosRequestObject) (catalogueapi.ListAdminTypePhotosResponseObject, error) {
+	out, err := h.s.listTypeKinds(ctx, req.Params)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return catalogueapi.ListAdminTypePhotos200JSONResponse(out), nil
+}
+
+// ApproveAdminTypePhoto implements POST /v1/admin/type-photos/{typePhotoId}/approve.
+func (h catalogueHandlers) ApproveAdminTypePhoto(ctx context.Context, req catalogueapi.ApproveAdminTypePhotoRequestObject) (catalogueapi.ApproveAdminTypePhotoResponseObject, error) {
+	actor, id, err := adminCall(ctx, req.TypePhotoId, req.Body != nil)
+	if err != nil {
+		return nil, err
+	}
+	out, err := h.s.approveTypePhoto(ctx, actor, id, *req.Body)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return catalogueapi.ApproveAdminTypePhoto200JSONResponse(out), nil
+}
+
+// RejectAdminTypePhoto implements POST /v1/admin/type-photos/{typePhotoId}/reject.
+func (h catalogueHandlers) RejectAdminTypePhoto(ctx context.Context, req catalogueapi.RejectAdminTypePhotoRequestObject) (catalogueapi.RejectAdminTypePhotoResponseObject, error) {
+	actor, id, err := adminCall(ctx, req.TypePhotoId, req.Body != nil)
+	if err != nil {
+		return nil, err
+	}
+	out, err := h.s.rejectTypePhoto(ctx, actor, id, *req.Body)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return catalogueapi.RejectAdminTypePhoto200JSONResponse(out), nil
 }
