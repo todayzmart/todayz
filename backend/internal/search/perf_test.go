@@ -7,7 +7,10 @@ import (
 	"log/slog"
 	"math"
 	"os"
+	"os/exec"
+	"runtime"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -246,7 +249,8 @@ func TestSearchAtScale(t *testing.T) {
 }
 
 // checkLatency times 14 queries at two radii twice, plus the summary and the
-// store list, and asserts p95 < 300 ms (latencyBudget).
+// store list, and asserts p95 < 300 ms (latencyBudget). A miss while the
+// machine is saturated (busyLoadPerCPU) is logged and skipped, not failed.
 func checkLatency(t *testing.T, f *qa) {
 	ctx := f.ctx
 	queries := []string{"curd", "amul butter 100 g", "rice", "atta 5 kg", "milk", "ghee", "dahi", "biscuits",
@@ -311,11 +315,52 @@ func checkLatency(t *testing.T, f *qa) {
 		}
 	}
 	rec.mu.Unlock()
-	if !assert.Less(t, p95, latencyBudget(t)) {
-		for _, w := range worst {
-			t.Logf("EXPLAIN (ANALYZE, BUFFERS) of the slowest call\n%s\n%s", w.sql, f.analyze(w))
+	budget := latencyBudget(t)
+	if p95 < budget {
+		return
+	}
+	for _, w := range worst {
+		t.Logf("EXPLAIN (ANALYZE, BUFFERS) of the slowest call\n%s\n%s", w.sql, f.analyze(w))
+	}
+	if load, ok := loadPerCPU(); ok && load >= busyLoadPerCPU {
+		t.Skipf("p95 %v is over the %v budget, but the 1-minute load is %.2f per CPU: the queries waited for a core, "+
+			"so this run cannot judge the budget (the index checks still gate); rerun on a quiet machine", p95, budget, load)
+	}
+	assert.Less(t, p95, budget)
+}
+
+// busyLoadPerCPU is the 1-minute load per CPU at or above which a missed
+// latency budget is not counted: every core already had a runnable thread, so
+// the time measured is mostly the wait for one. Two or three worktrees running
+// their checks at once on one laptop get there; a single `make check` that
+// misses the budget on a quieter machine still fails.
+const busyLoadPerCPU = 1.0
+
+// The load reading works on the machines the tests run on (macOS and Linux).
+func TestLoadPerCPU(t *testing.T) {
+	load, ok := loadPerCPU()
+	require.True(t, ok)
+	require.GreaterOrEqual(t, load, 0.0)
+}
+
+// loadPerCPU is the 1-minute load average divided by the CPU count, from
+// /proc/loadavg on Linux or `sysctl vm.loadavg` on macOS; ok is false when
+// neither can be read.
+func loadPerCPU() (float64, bool) {
+	var field string
+	if b, err := os.ReadFile("/proc/loadavg"); err == nil {
+		field, _, _ = strings.Cut(string(b), " ")
+	} else if out, err := exec.Command("sysctl", "-n", "vm.loadavg").Output(); err == nil {
+		// "{ 3.21 2.90 2.70 }"
+		if fs := strings.Fields(strings.Trim(strings.TrimSpace(string(out)), "{}")); len(fs) > 0 {
+			field = fs[0]
 		}
 	}
+	load, err := strconv.ParseFloat(field, 64)
+	if err != nil {
+		return 0, false
+	}
+	return load / float64(runtime.NumCPU()), true
 }
 
 // latencyBudget is the p95 the latency subtest gates on: 300 ms, the W1-06
