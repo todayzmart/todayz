@@ -1,0 +1,142 @@
+{
+  "info.how.meta.title": {
+    "message": "TodayZ எப்படி வேலை செய்கிறது",
+    "review": "reviewed",
+    "enHash": "eab4e74e"
+  },
+  "info.how.meta.description": {
+    "message": "கடைகள் தங்கள் ஸ்டாக்கை TodayZ இல் எப்படி வைக்கின்றன, அருகிலுள்ளவர்கள் அதை எப்படித் தேடி, புக் செய்து, பிக்அப் அல்லது டெலிவரியில் பெறுகிறார்கள்.",
+    "review": "reviewed",
+    "enHash": "443cd6cb"
+  },
+  "info.how.title": {
+    "message": "TodayZ எப்படி வேலை செய்கிறது",
+    "review": "reviewed",
+    "enHash": "eab4e74e"
+  },
+  "info.how.intro": {
+    "message": "TodayZ கடையின் அலமாரியில் உள்ள ஸ்டாக்கை அருகில் வசிப்பவர்களுடன் இணைக்கிறது.",
+    "review": "reviewed",
+    "enHash": "10acfac6"
+  },
+  "info.how.shops.title": {
+    "message": "கடைகளுக்கு",
+    "review": "reviewed",
+    "enHash": "673d17e5"
+  },
+  "info.how.shoppers.title": {
+    "message": "வாங்குபவர்களுக்கு",
+    "review": "reviewed",
+    "enHash": "b88dfd14"
+  },
+  "info.pricing.meta.title": {
+    "message": "விலை",
+    "review": "reviewed",
+    "enHash": "a0d9bbad"
+  },
+  "info.pricing.meta.description": {
+    "message": "இப்போதைக்கு கடைகளுக்கு TodayZ இலவசம். இந்தப் பக்கம் எப்போதும் தற்போதைய விலையைக் காட்டும், அதனால் சேருவதற்கு முன் பார்க்கலாம்.",
+    "review": "reviewed",
+    "enHash": "d35642a1"
+  },
+  "info.pricing.title": {
+    "message": "இப்போதைக்கு இலவசம்",
+    "review": "reviewed",
+    "enHash": "a73052fa"
+  },
+  "info.pricing.intro": {
+    "message": "தொடக்க காலத்தில் கடைகளுக்கு TodayZ இலவசம். இந்தப் பக்கம் எப்போதும் தற்போதைய விலையைக் காட்டும்.",
+    "review": "reviewed",
+    "enHash": "52e5a9d4"
+  },
+  "info.pricing.point.1": {
+    "message": "சேர எந்தக் கட்டணமும் இல்லை.",
+    "review": "reviewed",
+    "enHash": "40587f97"
+  },
+  "info.pricing.point.2": {
+    "message": "POS (கவுண்டர் பில்லிங்), ஆன்லைன் ஆர்டர்கள் மற்றும் தேவைப் பார்வைகள் சேர்க்கப்பட்டுள்ளன.",
+    "review": "reviewed",
+    "enHash": "5229ae66"
+  },
+  "info.pricing.point.3": {
+    "message": "கிரெடிட் மற்றும் ரீஃபண்ட் எப்படி வேலை செய்கின்றன என்பதை அறிய ரீஃபண்ட் மற்றும் கிரெடிட் பக்கத்தைப் படிக்கவும்.",
+    "review": "reviewed",
+    "enHash": "8b40934f"
+  },
+  "info.about.meta.title": {
+    "message": "TodayZ பற்றி",
+    "review": "reviewed",
+    "enHash": "13372525"
+  },
+  "info.about.meta.description": {
+    "message": "அருகிலுள்ள கடைகளில் என்ன ஸ்டாக்கில் உள்ளது என்று தேடும் வழியை TodayZ உருவாக்குகிறது.",
+    "review": "reviewed",
+    "enHash": "0aecc2e2"
+  },
+  "info.about.title": {
+    "message": "TodayZ பற்றி",
+    "review": "reviewed",
+    "enHash": "13372525"
+  },
+  "info.about.1": {
+    "message": "அருகிலுள்ள கடைகளில் என்ன ஸ்டாக்கில் உள்ளது என்று தேடும் வழியை TodayZ உருவாக்குகிறது.",
+    "review": "reviewed",
+    "enHash": "0aecc2e2"
+  },
+  "info.about.2": {
+    "message": "கடைகளுக்கு தங்கள் கவுண்டர் மற்றும் ஸ்டாக்கை நடத்த கருவிகள் கிடைக்கின்றன. வாங்குபவர்களுக்கு அருகில் தேவையானதைத் தேடிப் பெற எளிய வழி கிடைக்கிறது.",
+    "review": "reviewed",
+    "enHash": "915d2131"
+  },
+  "info.about.3": {
+    "message": "தயாரிப்பு புதியது, இணையும் கடைகளுடன் சேர்ந்து நாங்கள் இதை உருவாக்குகிறோம்.",
+    "review": "reviewed",
+    "enHash": "6fd82bec"
+  },
+  "info.contact.meta.title": {
+    "message": "தொடர்புக்கு",
+    "review": "reviewed",
+    "enHash": "b37456c4"
+  },
+  "info.contact.meta.description": {
+    "message": "TodayZ குழுவைத் தொடர்புகொள்ளவும், அல்லது உங்கள் கடை விவரங்களை விட்டுச் செல்லவும், நாங்கள் உங்களைத் தொடர்புகொள்வோம்.",
+    "review": "reviewed",
+    "enHash": "b744c7df"
+  },
+  "info.contact.title": {
+    "message": "தொடர்புக்கு",
+    "review": "reviewed",
+    "enHash": "b37456c4"
+  },
+  "info.contact.intro": {
+    "message": "எங்களை அடைய விரைவான வழி கீழே உங்கள் விவரங்களை விட்டுச் செல்வது.",
+    "review": "reviewed",
+    "enHash": "270aeb1d"
+  },
+  "info.contact.email": {
+    "message": "மின்னஞ்சல்",
+    "review": "reviewed",
+    "enHash": "84add5b2"
+  },
+  "info.404.meta.title": {
+    "message": "பக்கம் கிடைக்கவில்லை",
+    "review": "reviewed",
+    "enHash": "bc3023b3"
+  },
+  "info.404.title": {
+    "message": "அந்தப் பக்கம் எங்களுக்குக் கிடைக்கவில்லை",
+    "review": "reviewed",
+    "enHash": "2f03df8a"
+  },
+  "info.404.body": {
+    "message": "இணைப்பு பழையதாக இருக்கலாம் அல்லது தவறாக தட்டச்சு செய்யப்பட்டிருக்கலாம்.",
+    "review": "reviewed",
+    "enHash": "d69f363a"
+  },
+  "info.404.cta": {
+    "message": "முகப்புப் பக்கத்திற்குத் திரும்பு",
+    "review": "reviewed",
+    "enHash": "bc5fe132"
+  }
+}

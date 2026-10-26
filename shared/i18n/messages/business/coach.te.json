@@ -1,11 +1,11 @@
 {
   "coach.title": {
-    "message": "షాప్ కోచ్",
+    "message": "దుకాణం కోచ్",
     "review": "reviewed",
     "enHash": "33c8c0a8"
   },
   "coach.desc": {
-    "message": "మీ షాప్ అమ్మకాలు, స్టాక్, ఆర్డర్లు, రివ్యూల నుంచి సూచనలు",
+    "message": "మీ దుకాణం అమ్మకాలు, స్టాక్, ఆర్డర్లు, రివ్యూల నుంచి సూచనలు",
     "review": "reviewed",
     "enHash": "35c78622"
   },
@@ -115,7 +115,7 @@
     "enHash": "6f06eea1"
   },
   "coach.aiWording": {
-    "message": "మీ షాప్ సంఖ్యల నుంచి AI రాసింది",
+    "message": "మీ దుకాణం సంఖ్యల నుంచి AI రాసింది",
     "review": "reviewed",
     "enHash": "b03a713b"
   },

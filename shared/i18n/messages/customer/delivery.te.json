@@ -1,0 +1,147 @@
+{
+  "delivery.mode.label": {
+    "message": "మీరు దీన్ని ఎలా తీసుకుంటారు",
+    "review": "reviewed",
+    "enHash": "f110690b"
+  },
+  "delivery.mode.pickup": {
+    "message": "పికప్",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "delivery.mode.delivery": {
+    "message": "డెలివరీ",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "delivery.terms.fee": {
+    "message": "{amount} డెలివరీ",
+    "review": "reviewed",
+    "enHash": "f9040a0b"
+  },
+  "delivery.terms.noFee": {
+    "message": "ఉచిత డెలివరీ",
+    "review": "reviewed",
+    "enHash": "98aa5831"
+  },
+  "delivery.terms.minimum": {
+    "message": "కనీసం {amount}",
+    "review": "reviewed",
+    "enHash": "c0e9a0f0"
+  },
+  "delivery.terms.freeAbove": {
+    "message": "{amount}+ పైన ఉచిత డెలివరీ",
+    "review": "reviewed",
+    "enHash": "1e2ec5e1"
+  },
+  "delivery.terms.radius": {
+    "message": "{distance} లోపల డెలివరీ",
+    "review": "reviewed",
+    "enHash": "e1ea5144"
+  },
+  "delivery.freeGap": {
+    "message": "ఉచిత డెలివరీ కోసం ఇంకా {amount} జోడించండి",
+    "review": "reviewed",
+    "enHash": "f0a48c32"
+  },
+  "delivery.feeRow": {
+    "message": "డెలివరీ",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "delivery.free": {
+    "message": "ఉచితం",
+    "review": "reviewed",
+    "enHash": "75f52718"
+  },
+  "delivery.switchToPickup": {
+    "message": "పికప్‌కు మార్చండి",
+    "review": "reviewed",
+    "enHash": "ea865bdf"
+  },
+  "delivery.closed.title": {
+    "message": "డెలివరీ ఇప్పుడు మూసి ఉంది",
+    "review": "reviewed",
+    "enHash": "3ca0294b"
+  },
+  "delivery.closed.next": {
+    "message": "తదుపరి డెలివరీ: {window}. మీ కార్ట్ అలాగే ఉంటుంది.",
+    "review": "reviewed",
+    "enHash": "15488068"
+  },
+  "delivery.closed.none": {
+    "message": "దుకాణానికి రాబోయే డెలివరీ సమయాలు లేవు. మీ కార్ట్ అలాగే ఉంటుంది.",
+    "review": "reviewed",
+    "enHash": "24816ea3"
+  },
+  "delivery.window.today": {
+    "message": "ఈ రోజు {time}",
+    "review": "reviewed",
+    "enHash": "7f3aa7f4"
+  },
+  "delivery.window.tomorrow": {
+    "message": "రేపు {time}",
+    "review": "reviewed",
+    "enHash": "e32ff926"
+  },
+  "delivery.window.day": {
+    "message": "{day} {time}",
+    "review": "reviewed",
+    "enHash": "6b4b9e45"
+  },
+  "delivery.minimum.title": {
+    "message": "డెలివరీకి కనీసం {amount} కావాలి",
+    "review": "reviewed",
+    "enHash": "13bf9b3c"
+  },
+  "delivery.minimum.addMore": {
+    "message": "డెలివరీ కోసం ఇంకా {amount} జోడించండి, లేదా మీరే తీసుకోండి.",
+    "review": "reviewed",
+    "enHash": "bbf459a5"
+  },
+  "delivery.minimum.body": {
+    "message": "డెలివరీ కోసం ఇంకా వస్తువులు జోడించండి, లేదా మీరే తీసుకోండి.",
+    "review": "reviewed",
+    "enHash": "d1656b99"
+  },
+  "delivery.outside.title": {
+    "message": "ఈ చిరునామా డెలివరీ ప్రాంతం బయట ఉంది",
+    "review": "reviewed",
+    "enHash": "5d959cef"
+  },
+  "delivery.outside.body": {
+    "message": "మరో చిరునామా ఎంచుకోండి లేదా దుకాణం నుండి మీరే తీసుకోండి.",
+    "review": "reviewed",
+    "enHash": "d82b3936"
+  },
+  "delivery.cart.signIn": {
+    "message": "డెలివరీ చిరునామా ఎంచుకోవడానికి చెక్‌అవుట్‌లో సైన్ ఇన్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "6b7dcc29"
+  },
+  "delivery.cart.to": {
+    "message": "{label} కు డెలివరీ: {address}",
+    "review": "reviewed",
+    "enHash": "2b76e932"
+  },
+  "delivery.cart.change": {
+    "message": "మార్చండి",
+    "review": "reviewed",
+    "enHash": "64fbd995"
+  },
+  "delivery.cart.noAddress": {
+    "message": "డెలివరీ ధర చూడటానికి చిరునామా జోడించండి.",
+    "review": "reviewed",
+    "enHash": "560b0973"
+  },
+  "delivery.cart.noneInside": {
+    "message": "మీ చిరునామాలు ఏవీ డెలివరీ ప్రాంతం లోపల లేవు.",
+    "review": "reviewed",
+    "enHash": "8d41bf45"
+  },
+  "delivery.cart.add": {
+    "message": "చిరునామా జోడించండి",
+    "review": "reviewed",
+    "enHash": "d46fa3ca"
+  }
+}

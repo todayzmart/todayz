@@ -1,0 +1,142 @@
+{
+  "info.how.meta.title": {
+    "message": "TodayZ ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "eab4e74e"
+  },
+  "info.how.meta.description": {
+    "message": "ಅಂಗಡಿಗಳು ತಮ್ಮ ಸ್ಟಾಕ್ ಅನ್ನು TodayZ ನಲ್ಲಿ ಹೇಗೆ ಹಾಕುತ್ತವೆ, ಮತ್ತು ಹತ್ತಿರದ ಜನರು ಅದನ್ನು ಹೇಗೆ ಹುಡುಕಿ, ಬುಕ್ ಮಾಡಿ, ಪಿಕಪ್ ಅಥವಾ ಡೆಲಿವರಿಯಲ್ಲಿ ಪಡೆಯುತ್ತಾರೆ.",
+    "review": "reviewed",
+    "enHash": "443cd6cb"
+  },
+  "info.how.title": {
+    "message": "TodayZ ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "eab4e74e"
+  },
+  "info.how.intro": {
+    "message": "TodayZ ಅಂಗಡಿಯ ಶೆಲ್ಫ್‌ನಲ್ಲಿರುವ ಸ್ಟಾಕ್ ಅನ್ನು ಹತ್ತಿರದಲ್ಲಿ ವಾಸಿಸುವ ಜನರಿಗೆ ಜೋಡಿಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "10acfac6"
+  },
+  "info.how.shops.title": {
+    "message": "ಅಂಗಡಿಗಳಿಗಾಗಿ",
+    "review": "reviewed",
+    "enHash": "673d17e5"
+  },
+  "info.how.shoppers.title": {
+    "message": "ಖರೀದಿದಾರರಿಗಾಗಿ",
+    "review": "reviewed",
+    "enHash": "b88dfd14"
+  },
+  "info.pricing.meta.title": {
+    "message": "ಬೆಲೆ",
+    "review": "reviewed",
+    "enHash": "a0d9bbad"
+  },
+  "info.pricing.meta.description": {
+    "message": "ಸದ್ಯಕ್ಕೆ ಅಂಗಡಿಗಳಿಗೆ TodayZ ಉಚಿತ. ಈ ಪುಟ ಯಾವಾಗಲೂ ಪ್ರಸ್ತುತ ಬೆಲೆಯನ್ನು ತೋರಿಸುತ್ತದೆ, ಹಾಗಾಗಿ ಸೇರುವ ಮೊದಲು ನೀವು ನೋಡಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "d35642a1"
+  },
+  "info.pricing.title": {
+    "message": "ಸದ್ಯಕ್ಕೆ ಉಚಿತ",
+    "review": "reviewed",
+    "enHash": "a73052fa"
+  },
+  "info.pricing.intro": {
+    "message": "ಆರಂಭದ ಸಮಯದಲ್ಲಿ ಅಂಗಡಿಗಳಿಗೆ TodayZ ಉಚಿತ. ಈ ಪುಟ ಯಾವಾಗಲೂ ಪ್ರಸ್ತುತ ಬೆಲೆಯನ್ನು ತೋರಿಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "52e5a9d4"
+  },
+  "info.pricing.point.1": {
+    "message": "ಸೇರಲು ಯಾವುದೇ ಶುಲ್ಕವಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "40587f97"
+  },
+  "info.pricing.point.2": {
+    "message": "POS (ಕೌಂಟರ್ ಬಿಲ್ಲಿಂಗ್), ಆನ್‌ಲೈನ್ ಆರ್ಡರ್‌ಗಳು ಮತ್ತು ಬೇಡಿಕೆಯ ಒಳನೋಟಗಳು ಸೇರಿವೆ.",
+    "review": "reviewed",
+    "enHash": "5229ae66"
+  },
+  "info.pricing.point.3": {
+    "message": "ಕ್ರೆಡಿಟ್ ಮತ್ತು ರಿಫಂಡ್ ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತವೆ ಎಂದು ತಿಳಿಯಲು ರಿಫಂಡ್ ಮತ್ತು ಕ್ರೆಡಿಟ್ ಪುಟವನ್ನು ಓದಿ.",
+    "review": "reviewed",
+    "enHash": "8b40934f"
+  },
+  "info.about.meta.title": {
+    "message": "TodayZ ಬಗ್ಗೆ",
+    "review": "reviewed",
+    "enHash": "13372525"
+  },
+  "info.about.meta.description": {
+    "message": "ಹತ್ತಿರದ ಅಂಗಡಿಗಳಲ್ಲಿ ಏನು ಸ್ಟಾಕ್‌ನಲ್ಲಿದೆ ಎಂದು ಹುಡುಕುವ ದಾರಿಯನ್ನು TodayZ ಕಟ್ಟುತ್ತಿದೆ.",
+    "review": "reviewed",
+    "enHash": "0aecc2e2"
+  },
+  "info.about.title": {
+    "message": "TodayZ ಬಗ್ಗೆ",
+    "review": "reviewed",
+    "enHash": "13372525"
+  },
+  "info.about.1": {
+    "message": "ಹತ್ತಿರದ ಅಂಗಡಿಗಳಲ್ಲಿ ಏನು ಸ್ಟಾಕ್‌ನಲ್ಲಿದೆ ಎಂದು ಹುಡುಕುವ ದಾರಿಯನ್ನು TodayZ ಕಟ್ಟುತ್ತಿದೆ.",
+    "review": "reviewed",
+    "enHash": "0aecc2e2"
+  },
+  "info.about.2": {
+    "message": "ಅಂಗಡಿಗಳಿಗೆ ತಮ್ಮ ಕೌಂಟರ್ ಮತ್ತು ಸ್ಟಾಕ್ ನಡೆಸಲು ಸಾಧನಗಳು ಸಿಗುತ್ತವೆ. ಖರೀದಿದಾರರಿಗೆ ಹತ್ತಿರದಲ್ಲಿ ಬೇಕಾದದ್ದನ್ನು ಹುಡುಕಿ ಪಡೆಯಲು ಸುಲಭ ದಾರಿ ಸಿಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "915d2131"
+  },
+  "info.about.3": {
+    "message": "ಉತ್ಪನ್ನ ಹೊಸದು, ಮತ್ತು ಸೇರುವ ಅಂಗಡಿಗಳ ಜೊತೆ ಸೇರಿ ನಾವು ಇದನ್ನು ಕಟ್ಟುತ್ತಿದ್ದೇವೆ.",
+    "review": "reviewed",
+    "enHash": "6fd82bec"
+  },
+  "info.contact.meta.title": {
+    "message": "ಸಂಪರ್ಕಿಸಿ",
+    "review": "reviewed",
+    "enHash": "b37456c4"
+  },
+  "info.contact.meta.description": {
+    "message": "TodayZ ತಂಡವನ್ನು ಸಂಪರ್ಕಿಸಿ, ಅಥವಾ ನಿಮ್ಮ ಅಂಗಡಿಯ ವಿವರ ಬಿಡಿ, ನಾವು ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸುತ್ತೇವೆ.",
+    "review": "reviewed",
+    "enHash": "b744c7df"
+  },
+  "info.contact.title": {
+    "message": "ಸಂಪರ್ಕಿಸಿ",
+    "review": "reviewed",
+    "enHash": "b37456c4"
+  },
+  "info.contact.intro": {
+    "message": "ನಮ್ಮನ್ನು ತಲುಪಲು ಅತಿ ವೇಗದ ದಾರಿ ಕೆಳಗೆ ನಿಮ್ಮ ವಿವರ ಬಿಡುವುದು.",
+    "review": "reviewed",
+    "enHash": "270aeb1d"
+  },
+  "info.contact.email": {
+    "message": "ಇಮೇಲ್",
+    "review": "reviewed",
+    "enHash": "84add5b2"
+  },
+  "info.404.meta.title": {
+    "message": "ಪುಟ ಸಿಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "bc3023b3"
+  },
+  "info.404.title": {
+    "message": "ನಮಗೆ ಆ ಪುಟ ಸಿಗಲಿಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "2f03df8a"
+  },
+  "info.404.body": {
+    "message": "ಲಿಂಕ್ ಹಳೆಯದಾಗಿರಬಹುದು ಅಥವಾ ತಪ್ಪಾಗಿ ಬರೆದಿರಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "d69f363a"
+  },
+  "info.404.cta": {
+    "message": "ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ",
+    "review": "reviewed",
+    "enHash": "bc5fe132"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "site.title": {
+    "message": "TodayZ: அருகில் எல்லாமே, இன்றே",
+    "review": "reviewed",
+    "enHash": "e514d77d"
+  },
+  "site.description": {
+    "message": "உங்களுக்கு அருகிலுள்ள கடைகளில் என்ன ஸ்டாக்கில் உள்ளது என்று பாருங்கள், புக் செய்யுங்கள், பிக்அப் அல்லது டெலிவரியில் பெறுங்கள்.",
+    "review": "reviewed",
+    "enHash": "7e3e5251"
+  },
+  "site.skipToContent": {
+    "message": "நேரடியாக முக்கியப் பகுதிக்குச் செல்லவும்",
+    "review": "reviewed",
+    "enHash": "0a4470d6"
+  },
+  "site.logoAlt": {
+    "message": "TodayZ",
+    "review": "reviewed",
+    "enHash": "34b58f9d"
+  },
+  "site.hero.title": {
+    "message": "அருகில் எல்லாமே, இன்றே.",
+    "review": "reviewed",
+    "enHash": "1aaf493f"
+  },
+  "site.hero.sub": {
+    "message": "உள்ளூர் கடைகள் தங்கள் ஸ்டாக்கை ஆன்லைனில் வைக்கின்றன. உங்களுக்கு அருகில் என்ன ஸ்டாக்கில் உள்ளது என்று பார்த்து, புக் செய்து, பிக்அப் அல்லது டெலிவரியில் பெறுங்கள்.",
+    "review": "reviewed",
+    "enHash": "ecee0988"
+  },
+  "site.soon.tag": {
+    "message": "விரைவில் வருகிறது",
+    "review": "reviewed",
+    "enHash": "e4115be2"
+  },
+  "site.soon.title": {
+    "message": "நாங்கள் தொடங்கத் தயாராகிறோம்",
+    "review": "reviewed",
+    "enHash": "6c48ef38"
+  },
+  "site.soon.body": {
+    "message": "TodayZ ஐ உருவாக்கும் வரை இந்தத் தளம் ஒரு தற்காலிகப் பக்கம். கடை உரிமையாளர்கள் விரைவில் இங்கே பதிவு செய்ய முடியும்.",
+    "review": "reviewed",
+    "enHash": "dc1f1b4f"
+  },
+  "site.footer": {
+    "message": "© {year} TodayZ",
+    "review": "reviewed",
+    "enHash": "04b1a988"
+  }
+}

@@ -1,0 +1,217 @@
+{
+  "address.loading": {
+    "message": "చిరునామాలు లోడ్ అవుతున్నాయి",
+    "review": "reviewed",
+    "enHash": "4edf9c73"
+  },
+  "address.pick": {
+    "message": "ఇక్కడికి పంపండి",
+    "review": "reviewed",
+    "enHash": "c229c05a"
+  },
+  "address.none": {
+    "message": "మీకు ఇంకా సేవ్ చేసిన చిరునామా లేదు.",
+    "review": "reviewed",
+    "enHash": "550f2dc7"
+  },
+  "address.outside": {
+    "message": "డెలివరీ ప్రాంతం బయట ({distance})",
+    "review": "reviewed",
+    "enHash": "d3042935"
+  },
+  "address.add": {
+    "message": "కొత్త చిరునామా జోడించండి",
+    "review": "reviewed",
+    "enHash": "c3cb8829"
+  },
+  "address.form.title": {
+    "message": "కొత్త చిరునామా",
+    "review": "reviewed",
+    "enHash": "262e89de"
+  },
+  "address.form.labelDefault": {
+    "message": "ఇల్లు",
+    "review": "reviewed",
+    "enHash": "70f8bb9a"
+  },
+  "address.form.label": {
+    "message": "పేరు",
+    "review": "reviewed",
+    "enHash": "709a2322"
+  },
+  "address.form.line1": {
+    "message": "ఇల్లు మరియు వీధి",
+    "review": "reviewed",
+    "enHash": "61c82324"
+  },
+  "address.form.line1Help": {
+    "message": "ఫ్లాట్ లేదా ఇంటి నంబర్, భవనం, వీధి",
+    "review": "reviewed",
+    "enHash": "dbc52ba6"
+  },
+  "address.form.line2": {
+    "message": "ప్రాంతం (ఐచ్ఛికం)",
+    "review": "reviewed",
+    "enHash": "9701514b"
+  },
+  "address.form.landmark": {
+    "message": "ల్యాండ్‌మార్క్ (ఐచ్ఛికం)",
+    "review": "reviewed",
+    "enHash": "7f3d6f2e"
+  },
+  "address.form.pincode": {
+    "message": "పిన్ కోడ్",
+    "review": "reviewed",
+    "enHash": "3c52e572"
+  },
+  "address.form.required": {
+    "message": "దీన్ని నింపండి",
+    "review": "reviewed",
+    "enHash": "3dfbc7c1"
+  },
+  "address.form.pincodeError": {
+    "message": "6 అంకెల పిన్ కోడ్ నమోదు చేయండి",
+    "review": "reviewed",
+    "enHash": "cab7855b"
+  },
+  "address.form.pinError": {
+    "message": "ముందు పిన్ పెట్టండి",
+    "review": "reviewed",
+    "enHash": "e6b78edd"
+  },
+  "address.form.invalid": {
+    "message": "దీన్ని తనిఖీ చేయండి",
+    "review": "reviewed",
+    "enHash": "a606b403"
+  },
+  "address.form.failed": {
+    "message": "చిరునామా సేవ్ చేయలేకపోయాం. దయచేసి మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "b95c0890"
+  },
+  "address.form.pinTitle": {
+    "message": "మ్యాప్‌లో పిన్",
+    "review": "reviewed",
+    "enHash": "8dd1eed8"
+  },
+  "address.form.pinDevice": {
+    "message": "పిన్ ఇప్పుడు మీ ఫోన్ ఉన్న చోట ఉంది.",
+    "review": "reviewed",
+    "enHash": "04a3b444"
+  },
+  "address.form.pinArea": {
+    "message": "పిన్ మీరు ఎంచుకున్న ప్రాంతంలో ఉంది. ఖచ్చితమైన చోటు కోసం మీ లొకేషన్ వాడండి.",
+    "review": "reviewed",
+    "enHash": "4b00790b"
+  },
+  "address.form.pinNone": {
+    "message": "ఇంకా పిన్ లేదు. సెట్ చేయడానికి మీ లొకేషన్ వాడండి.",
+    "review": "reviewed",
+    "enHash": "0477ec69"
+  },
+  "address.form.inside": {
+    "message": "దుకాణం డెలివరీ ప్రాంతం లోపల ({distance}).",
+    "review": "reviewed",
+    "enHash": "42b57f7f"
+  },
+  "address.form.outside": {
+    "message": "దుకాణం డెలివరీ ప్రాంతం బయట ({distance}).",
+    "review": "reviewed",
+    "enHash": "eb07fb3d"
+  },
+  "address.form.locate": {
+    "message": "నా లొకేషన్ వాడండి",
+    "review": "reviewed",
+    "enHash": "0132375d"
+  },
+  "address.form.locateFailed": {
+    "message": "మీ లొకేషన్ దొరకలేదు. అనుమతిని తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "8c9881b6"
+  },
+  "address.form.save": {
+    "message": "చిరునామా సేవ్ చేయండి",
+    "review": "reviewed",
+    "enHash": "c08b67b2"
+  },
+  "address.form.cancel": {
+    "message": "క్యాన్సిల్",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "address.map.label": {
+    "message": "చిరునామా పిన్ మరియు డెలివరీ ప్రాంతం",
+    "review": "reviewed",
+    "enHash": "c0de6d5e"
+  },
+  "address.map.mapLabel": {
+    "message": "మ్యాప్: మీ పిన్ మరియు {shop}, ఇది {distance} లోపల డెలివరీ చేస్తుంది",
+    "review": "reviewed",
+    "enHash": "61c53df5"
+  },
+  "address.map.radius": {
+    "message": "డెలివరీ ప్రాంతం",
+    "review": "reviewed",
+    "enHash": "1dbe7804"
+  },
+  "address.map.cluster": {
+    "message": "{count} ప్రదేశాలు",
+    "review": "reviewed",
+    "enHash": "88d52f88"
+  },
+  "address.map.pin": {
+    "message": "మీ పిన్",
+    "review": "reviewed",
+    "enHash": "c84462cb"
+  },
+  "address.map.legend.shop": {
+    "message": "దుకాణం",
+    "review": "reviewed",
+    "enHash": "55de8870"
+  },
+  "address.saved.title": {
+    "message": "చిరునామాలు",
+    "review": "reviewed",
+    "enHash": "4ca7b966"
+  },
+  "address.saved.empty": {
+    "message": "సేవ్ చేసిన చిరునామాలు లేవు. ఇక్కడ లేదా చెక్‌అవుట్‌లో జోడించండి.",
+    "review": "reviewed",
+    "enHash": "6d9b5c5c"
+  },
+  "address.saved.default": {
+    "message": "డిఫాల్ట్",
+    "review": "reviewed",
+    "enHash": "808d7dca"
+  },
+  "address.saved.makeDefault": {
+    "message": "డిఫాల్ట్ చేయండి",
+    "review": "reviewed",
+    "enHash": "7b2628d1"
+  },
+  "address.saved.delete": {
+    "message": "తొలగించండి",
+    "review": "reviewed",
+    "enHash": "f6fdbe48"
+  },
+  "address.saved.deleteLabel": {
+    "message": "{label} తొలగించండి",
+    "review": "reviewed",
+    "enHash": "214d4859"
+  },
+  "address.saved.loadError": {
+    "message": "మీ చిరునామాలను లోడ్ చేయలేకపోయాం.",
+    "review": "reviewed",
+    "enHash": "3608b559"
+  },
+  "address.saved.retry": {
+    "message": "మళ్లీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "address.saved.actionError": {
+    "message": "అది జరగలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "13555662"
+  }
+}

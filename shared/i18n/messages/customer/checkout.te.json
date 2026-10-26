@@ -100,7 +100,7 @@
     "enHash": "fbb7fa58"
   },
   "checkout.problem.store_not_bookable": {
-    "message": "ఈ దుకాణం ఇప్పుడు ఆర్డర్‌లు తీసుకోవడం లేదు. మీ కార్ట్ ఉంచాం.",
+    "message": "ఈ దుకాణం ఇప్పుడు ఆర్డర్లు తీసుకోవడం లేదు. మీ కార్ట్ ఉంచాం.",
     "review": "reviewed",
     "enHash": "f36b1126"
   },
@@ -128,5 +128,20 @@
     "message": "కనెక్షన్ లేదు. మీ కార్ట్ ఉంచాం; ఆన్‌లైన్‌కి వచ్చాక మళ్లీ ప్రయత్నించండి.",
     "review": "reviewed",
     "enHash": "392cd811"
+  },
+  "checkout.fulfilment.label": {
+    "message": "పికప్ లేదా డెలివరీ",
+    "review": "reviewed",
+    "enHash": "8a9547f9"
+  },
+  "checkout.delivery.title": {
+    "message": "దుకాణం నుండి డెలివరీ",
+    "review": "reviewed",
+    "enHash": "e3a8b49c"
+  },
+  "checkout.payNote.delivery": {
+    "message": "వచ్చినప్పుడు చెల్లించండి: నగదు లేదా UPI. ఇప్పుడు ఏమీ కట్ అవదు.",
+    "review": "reviewed",
+    "enHash": "156b35cb"
   }
 }

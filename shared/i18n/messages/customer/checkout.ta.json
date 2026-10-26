@@ -128,5 +128,20 @@
     "message": "இணைப்பு இல்லை. உங்கள் கார்ட் வைக்கப்பட்டுள்ளது; ஆன்லைனுக்கு வந்ததும் மீண்டும் முயலவும்.",
     "review": "reviewed",
     "enHash": "392cd811"
+  },
+  "checkout.fulfilment.label": {
+    "message": "பிக்அப் அல்லது டெலிவரி",
+    "review": "reviewed",
+    "enHash": "8a9547f9"
+  },
+  "checkout.delivery.title": {
+    "message": "கடையிலிருந்து டெலிவரி",
+    "review": "reviewed",
+    "enHash": "e3a8b49c"
+  },
+  "checkout.payNote.delivery": {
+    "message": "வந்ததும் பணம் செலுத்துங்கள்: பணம் அல்லது UPI. இப்போது எதுவும் வசூலிக்கப்படாது.",
+    "review": "reviewed",
+    "enHash": "156b35cb"
   }
 }

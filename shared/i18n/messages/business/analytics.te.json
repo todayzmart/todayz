@@ -80,7 +80,7 @@
     "enHash": "f4018045"
   },
   "analytics.kpi.bills": {
-    "message": "బిల్లులు, ఆర్డర్‌లు",
+    "message": "బిల్లులు, ఆర్డర్లు",
     "review": "reviewed",
     "enHash": "89bf0748"
   },
@@ -110,12 +110,12 @@
     "enHash": "f4018045"
   },
   "analytics.funnel.title": {
-    "message": "ఆన్‌లైన్ ఆర్డర్‌లు",
+    "message": "ఆన్‌లైన్ ఆర్డర్లు",
     "review": "reviewed",
     "enHash": "1b62fbdb"
   },
   "analytics.funnel.empty": {
-    "message": "ఈ వ్యవధిలో ఆన్‌లైన్ ఆర్డర్‌లు లేవు",
+    "message": "ఈ వ్యవధిలో ఆన్‌లైన్ ఆర్డర్లు లేవు",
     "review": "reviewed",
     "enHash": "f6b05168"
   },
@@ -135,7 +135,7 @@
     "enHash": "1798b3ba"
   },
   "analytics.funnel.missed": {
-    "message": "తప్పిన ఆర్డర్‌లు",
+    "message": "తప్పిన ఆర్డర్లు",
     "review": "reviewed",
     "enHash": "45fbd640"
   },
@@ -160,12 +160,12 @@
     "enHash": "a1bf92ef"
   },
   "analytics.accept.p50": {
-    "message": "మీ ఆర్డర్‌లలో సగం {time}లోపు అంగీకరించబడతాయి",
+    "message": "మీ ఆర్డర్లలో సగం {time}లోపు అంగీకరించబడతాయి",
     "review": "reviewed",
     "enHash": "a1cfe72b"
   },
   "analytics.accept.none": {
-    "message": "ఇంకా అంగీకరించిన ఆర్డర్‌లు లేవు",
+    "message": "ఇంకా అంగీకరించిన ఆర్డర్లు లేవు",
     "review": "reviewed",
     "enHash": "6c8b5d5a"
   },
@@ -205,17 +205,17 @@
     "enHash": "5792f82a"
   },
   "analytics.repeat.title": {
-    "message": "మళ్లీ వచ్చే కస్టమర్‌లు",
+    "message": "మళ్లీ వచ్చే కస్టమర్లు",
     "review": "reviewed",
     "enHash": "089baac2"
   },
   "analytics.repeat.note": {
-    "message": "{customers} లింక్ చేసిన కస్టమర్‌లలో {repeat} మళ్లీ వచ్చారు",
+    "message": "{customers} లింక్ చేసిన కస్టమర్లలో {repeat} మళ్లీ వచ్చారు",
     "review": "reviewed",
     "enHash": "70451346"
   },
   "analytics.repeat.notEnough": {
-    "message": "దీన్ని చూడడానికి కౌంటర్‌లో కస్టమర్‌లను లింక్ చేయండి",
+    "message": "దీన్ని చూడడానికి కౌంటర్‌లో కస్టమర్లను లింక్ చేయండి",
     "review": "reviewed",
     "enHash": "5d5ad767"
   },
@@ -290,7 +290,7 @@
     "enHash": "7558ca1e"
   },
   "analytics.insights.needs.regulars_slipping": {
-    "message": "దీన్ని చూడడానికి కౌంటర్‌లో కస్టమర్‌లను లింక్ చేయండి",
+    "message": "దీన్ని చూడడానికి కౌంటర్‌లో కస్టమర్లను లింక్ చేయండి",
     "review": "reviewed",
     "enHash": "5d5ad767"
   },

@@ -508,5 +508,50 @@
     "message": "மூடு",
     "review": "reviewed",
     "enHash": "bbfa773e"
+  },
+  "orders.callShop": {
+    "message": "கடைக்கு அழைக்கவும்",
+    "review": "reviewed",
+    "enHash": "b605f7d5"
+  },
+  "orders.step.out_for_delivery": {
+    "message": "வழியில் உள்ளது",
+    "review": "reviewed",
+    "enHash": "7884d39a"
+  },
+  "orders.step.delivered": {
+    "message": "டெலிவரி ஆனது",
+    "review": "reviewed",
+    "enHash": "eea956cd"
+  },
+  "orders.code.deliveryLabel": {
+    "message": "டெலிவரி கோடு",
+    "review": "reviewed",
+    "enHash": "ff5c3ad0"
+  },
+  "orders.code.riderNote": {
+    "message": "ஆர்டர் வந்ததும் இந்த கோடை டெலிவரி செய்பவரிடம் சொல்லுங்கள்.",
+    "review": "reviewed",
+    "enHash": "400b0567"
+  },
+  "orders.delivery.accepted": {
+    "message": "{shop} உங்கள் ஆர்டரை ஏற்றுக்கொண்டது, {time} க்குள் அனுப்பும்.",
+    "review": "reviewed",
+    "enHash": "f1b3c175"
+  },
+  "orders.delivery.acceptedNoTime": {
+    "message": "{shop} உங்கள் ஆர்டரை ஏற்றுக்கொண்டது, விரைவில் அனுப்பும்.",
+    "review": "reviewed",
+    "enHash": "b8f95b32"
+  },
+  "orders.delivery.onTheWay": {
+    "message": "{shop} இலிருந்து உங்கள் ஆர்டர் வழியில் உள்ளது.",
+    "review": "reviewed",
+    "enHash": "5c7cbe84"
+  },
+  "orders.delivery.to": {
+    "message": "{label} க்கு டெலிவரி: {address}",
+    "review": "reviewed",
+    "enHash": "f4a4eb85"
   }
 }

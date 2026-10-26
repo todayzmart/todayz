@@ -160,12 +160,12 @@
     "enHash": "cb115a09"
   },
   "help.new.order.failed": {
-    "message": "ఆర్డర్‌లు లోడ్ కాలేదు. అయినా మీరు టికెట్ పంపి, మెసేజ్‌లో ఆర్డర్ చెప్పవచ్చు.",
+    "message": "ఆర్డర్లు లోడ్ కాలేదు. అయినా మీరు టికెట్ పంపి, మెసేజ్‌లో ఆర్డర్ చెప్పవచ్చు.",
     "review": "reviewed",
     "enHash": "f7796d10"
   },
   "help.new.order.help": {
-    "message": "మీ ఇటీవలి ఆర్డర్‌లు.",
+    "message": "మీ ఇటీవలి ఆర్డర్లు.",
     "review": "reviewed",
     "enHash": "ea27e86c"
   },
@@ -200,7 +200,7 @@
     "enHash": "8d183dbd"
   },
   "help.new.subject.help": {
-    "message": "ఒక చిన్న లైన్, ఉదా. “నా ఆర్డర్‌లో ఆటా లేదు”.",
+    "message": "ఒక చిన్న లైన్, ఉదా. “నా ఆర్డర్లో ఆటా లేదు”.",
     "review": "reviewed",
     "enHash": "2db268e5"
   },

@@ -1,6 +1,6 @@
 {
   "nav.retailers": {
-    "message": "షాపుల కోసం",
+    "message": "దుకాణాల కోసం",
     "review": "reviewed",
     "enHash": "673d17e5"
   },
@@ -30,7 +30,7 @@
     "enHash": "b37456c4"
   },
   "nav.cta": {
-    "message": "మీ షాపును TodayZ లో చేర్చండి",
+    "message": "మీ దుకాణాన్ని TodayZ లో చేర్చండి",
     "review": "reviewed",
     "enHash": "c24d8be6"
   },
@@ -90,7 +90,7 @@
     "enHash": "1ed20291"
   },
   "footer.terms_shops": {
-    "message": "షాపులకు నిబంధనలు",
+    "message": "దుకాణాలకు నిబంధనలు",
     "review": "reviewed",
     "enHash": "43b1e64b"
   },
@@ -105,7 +105,7 @@
     "enHash": "04b1a988"
   },
   "lead.title": {
-    "message": "మీ షాపు గురించి చెప్పండి",
+    "message": "మీ దుకాణం గురించి చెప్పండి",
     "review": "reviewed",
     "enHash": "709fb0ad"
   },
@@ -120,7 +120,7 @@
     "enHash": "ab42293e"
   },
   "lead.shop": {
-    "message": "షాపు పేరు",
+    "message": "దుకాణం పేరు",
     "review": "reviewed",
     "enHash": "6a5cc02e"
   },
@@ -160,7 +160,7 @@
     "enHash": "dacddcd9"
   },
   "lead.err_shop": {
-    "message": "షాపు పేరు నమోదు చేయండి.",
+    "message": "దుకాణం పేరు నమోదు చేయండి.",
     "review": "reviewed",
     "enHash": "00a41eb3"
   },
@@ -205,17 +205,17 @@
     "enHash": "90e40d50"
   },
   "cta.title": {
-    "message": "మీ షాపును ఈ రోజే ఆన్‌లైన్‌లోకి తీసుకురండి.",
+    "message": "మీ దుకాణాన్ని ఈ రోజే ఆన్‌లైన్‌లోకి తీసుకురండి.",
     "review": "reviewed",
     "enHash": "4aab645b"
   },
   "cta.body": {
-    "message": "మీ వివరాలు ఇవ్వండి, షాపు సెటప్ కోసం TodayZ బృందం మిమ్మల్ని సంప్రదిస్తుంది.",
+    "message": "మీ వివరాలు ఇవ్వండి, దుకాణం సెటప్ కోసం TodayZ బృందం మిమ్మల్ని సంప్రదిస్తుంది.",
     "review": "reviewed",
     "enHash": "4931e9ff"
   },
   "cta.tick.1": {
-    "message": "షాపులకు ఉచితం",
+    "message": "దుకాణాలకు ఉచితం",
     "review": "reviewed",
     "enHash": "a2839388"
   },

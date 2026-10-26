@@ -1,0 +1,147 @@
+{
+  "delivery.mode.label": {
+    "message": "ನೀವು ಇದನ್ನು ಹೇಗೆ ಪಡೆಯುತ್ತೀರಿ",
+    "review": "reviewed",
+    "enHash": "f110690b"
+  },
+  "delivery.mode.pickup": {
+    "message": "ಪಿಕಪ್",
+    "review": "reviewed",
+    "enHash": "a51122c1"
+  },
+  "delivery.mode.delivery": {
+    "message": "ಡೆಲಿವರಿ",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "delivery.terms.fee": {
+    "message": "{amount} ಡೆಲಿವರಿ",
+    "review": "reviewed",
+    "enHash": "f9040a0b"
+  },
+  "delivery.terms.noFee": {
+    "message": "ಉಚಿತ ಡೆಲಿವರಿ",
+    "review": "reviewed",
+    "enHash": "98aa5831"
+  },
+  "delivery.terms.minimum": {
+    "message": "ಕನಿಷ್ಠ {amount}",
+    "review": "reviewed",
+    "enHash": "c0e9a0f0"
+  },
+  "delivery.terms.freeAbove": {
+    "message": "{amount}+ ಮೇಲೆ ಉಚಿತ ಡೆಲಿವರಿ",
+    "review": "reviewed",
+    "enHash": "1e2ec5e1"
+  },
+  "delivery.terms.radius": {
+    "message": "{distance} ಒಳಗೆ ಡೆಲಿವರಿ",
+    "review": "reviewed",
+    "enHash": "e1ea5144"
+  },
+  "delivery.freeGap": {
+    "message": "ಉಚಿತ ಡೆಲಿವರಿಗಾಗಿ ಇನ್ನೂ {amount} ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "f0a48c32"
+  },
+  "delivery.feeRow": {
+    "message": "ಡೆಲಿವರಿ",
+    "review": "reviewed",
+    "enHash": "9631af52"
+  },
+  "delivery.free": {
+    "message": "ಉಚಿತ",
+    "review": "reviewed",
+    "enHash": "75f52718"
+  },
+  "delivery.switchToPickup": {
+    "message": "ಪಿಕಪ್‌ಗೆ ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "ea865bdf"
+  },
+  "delivery.closed.title": {
+    "message": "ಡೆಲಿವರಿ ಈಗ ಮುಚ್ಚಿದೆ",
+    "review": "reviewed",
+    "enHash": "3ca0294b"
+  },
+  "delivery.closed.next": {
+    "message": "ಮುಂದಿನ ಡೆಲಿವರಿ: {window}. ನಿಮ್ಮ ಕಾರ್ಟ್ ಹಾಗೇ ಇರುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "15488068"
+  },
+  "delivery.closed.none": {
+    "message": "ಅಂಗಡಿಗೆ ಮುಂದೆ ಡೆಲಿವರಿ ಸಮಯವಿಲ್ಲ. ನಿಮ್ಮ ಕಾರ್ಟ್ ಹಾಗೇ ಇರುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "24816ea3"
+  },
+  "delivery.window.today": {
+    "message": "ಇಂದು {time}",
+    "review": "reviewed",
+    "enHash": "7f3aa7f4"
+  },
+  "delivery.window.tomorrow": {
+    "message": "ನಾಳೆ {time}",
+    "review": "reviewed",
+    "enHash": "e32ff926"
+  },
+  "delivery.window.day": {
+    "message": "{day} {time}",
+    "review": "reviewed",
+    "enHash": "6b4b9e45"
+  },
+  "delivery.minimum.title": {
+    "message": "ಡೆಲಿವರಿಗೆ ಕನಿಷ್ಠ {amount} ಬೇಕು",
+    "review": "reviewed",
+    "enHash": "13bf9b3c"
+  },
+  "delivery.minimum.addMore": {
+    "message": "ಡೆಲಿವರಿ ಪಡೆಯಲು ಇನ್ನೂ {amount} ಸೇರಿಸಿ, ಅಥವಾ ನೀವೇ ತೆಗೆದುಕೊಳ್ಳಿ.",
+    "review": "reviewed",
+    "enHash": "bbf459a5"
+  },
+  "delivery.minimum.body": {
+    "message": "ಡೆಲಿವರಿ ಪಡೆಯಲು ಇನ್ನಷ್ಟು ವಸ್ತುಗಳನ್ನು ಸೇರಿಸಿ, ಅಥವಾ ನೀವೇ ತೆಗೆದುಕೊಳ್ಳಿ.",
+    "review": "reviewed",
+    "enHash": "d1656b99"
+  },
+  "delivery.outside.title": {
+    "message": "ಈ ವಿಳಾಸ ಡೆಲಿವರಿ ಪ್ರದೇಶದ ಹೊರಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "5d959cef"
+  },
+  "delivery.outside.body": {
+    "message": "ಬೇರೆ ವಿಳಾಸ ಆರಿಸಿ ಅಥವಾ ಅಂಗಡಿಯಿಂದ ನೀವೇ ತೆಗೆದುಕೊಳ್ಳಿ.",
+    "review": "reviewed",
+    "enHash": "d82b3936"
+  },
+  "delivery.cart.signIn": {
+    "message": "ಡೆಲಿವರಿ ವಿಳಾಸ ಆರಿಸಲು ಚೆಕ್‌ಔಟ್‌ನಲ್ಲಿ ಸೈನ್ ಇನ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "6b7dcc29"
+  },
+  "delivery.cart.to": {
+    "message": "{label} ಗೆ ಡೆಲಿವರಿ: {address}",
+    "review": "reviewed",
+    "enHash": "2b76e932"
+  },
+  "delivery.cart.change": {
+    "message": "ಬದಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "64fbd995"
+  },
+  "delivery.cart.noAddress": {
+    "message": "ಡೆಲಿವರಿ ಬೆಲೆ ನೋಡಲು ವಿಳಾಸ ಸೇರಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "560b0973"
+  },
+  "delivery.cart.noneInside": {
+    "message": "ನಿಮ್ಮ ಯಾವ ವಿಳಾಸವೂ ಡೆಲಿವರಿ ಪ್ರದೇಶದ ಒಳಗಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "8d41bf45"
+  },
+  "delivery.cart.add": {
+    "message": "ವಿಳಾಸ ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "d46fa3ca"
+  }
+}
