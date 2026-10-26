@@ -31,7 +31,7 @@ export function CoachPreview({ store }: { store: CurrentStore }) {
           <CoachCardRow key={c.id} store={store} card={c} onGone={(id) => setGone((g) => new Set(g).add(id))} />
         ))}
       </ul>
-      <div className="tz-card-foot">
+      <div className={`tz-card-foot ${styles.foot}`}>
         <RouterLink href="/coach">{intl.formatMessage({ id: 'coach.all' })}</RouterLink>
         <span>{intl.formatMessage({ id: 'coach.foot' })}</span>
       </div>

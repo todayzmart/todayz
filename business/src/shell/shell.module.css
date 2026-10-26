@@ -3,7 +3,9 @@
 .app {
   min-height: 100dvh;
   display: flex;
-  background: var(--bg);
+
+  /* Bright skin (D-261): grey page, white cards. */
+  background: var(--page);
   color: var(--ink);
 }
 
@@ -51,8 +53,7 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Active tab: ink label and icon with a 2px stroke, from bundle.css (.tz-bnav a[aria-current]).
-   Brand is only for the active sidebar icon. */
+/* Active tab and sidebar item: brand, from the bright skin in bundle.css. */
 
 /* Desktop: sticky sidebar, wider content padding, no bottom tabs (Sidebar README: collapses below 1024px). */
 @media (width >= 1024px) {

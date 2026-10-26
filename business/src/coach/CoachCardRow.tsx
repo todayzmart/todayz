@@ -16,8 +16,9 @@ const day = { day: 'numeric', month: 'short', timeZone: 'Asia/Kolkata' } as cons
 
 /**
  * One coach card in the Demand insights row look (D-99, no metric chip): tinted icon, the type and
- * title, the sentence with its numbers, one text action that opens a prefilled screen, and Done /
- * Not useful while the card is live. The action changes nothing by itself.
+ * title, the sentence with its numbers, then one text action that opens a prefilled screen, and Done /
+ * Not useful while the card is live. The action sits under the sentence, not beside it, so the text
+ * keeps the full width on a phone (D-261). The action changes nothing by itself.
  */
 export function CoachCardRow({ store, card, onGone }: { store: CurrentStore; card: CoachCard; onGone?: (id: string) => void }) {
   const intl = useIntl();
@@ -63,6 +64,12 @@ export function CoachCardRow({ store, card, onGone }: { store: CurrentStore; car
         <b id={titleId}>{card.title}</b>
         <small id={bodyId}>{card.body}</small>
         {card.generatedBy === 'ai' && <span className={styles.ai}>{intl.formatMessage({ id: 'coach.aiWording' })}</span>}
+        {live && href && (
+          <RouterLink href={href} className={styles.action} aria-describedby={bodyId}>
+            {coachActionLabel(intl, card.action)}
+            <span aria-hidden="true"> →</span>
+          </RouterLink>
+        )}
         {live ? (
           <span className={styles.acts}>
             <Button size="sm" variant="soft" icon={Check} loading={busy === 'done'} disabled={busy === 'dismiss'} aria-describedby={titleId} onClick={() => void act('done')}>
@@ -78,12 +85,6 @@ export function CoachCardRow({ store, card, onGone }: { store: CurrentStore; car
           </span>
         )}
       </div>
-      {live && href && (
-        <RouterLink href={href} aria-describedby={bodyId}>
-          {coachActionLabel(intl, card.action)}
-          <span aria-hidden="true"> →</span>
-        </RouterLink>
-      )}
     </li>
   );
 }

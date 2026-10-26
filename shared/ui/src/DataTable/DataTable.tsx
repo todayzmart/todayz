@@ -51,7 +51,8 @@ export interface DataTableProps<T> {
 
 /**
  * Dense data table (tz-table) on TanStack Table: sortable headers are buttons with aria-sort on the
- * header cell; numeric columns align right. Rows are 44px, headers 36px.
+ * header cell; numeric columns align right. Rows are 44px, headers 36px. The wrap scrolls sideways on
+ * a narrow screen, so it is a focusable, named group: keyboard users can scroll it (WCAG 2.1.1).
  */
 export function DataTable<T>({
   label,
@@ -85,7 +86,8 @@ export function DataTable<T>({
   const rows = table.getRowModel().rows;
 
   return (
-    <div className={cx('tz-table-wrap', className)}>
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scroll container must take focus so a keyboard can scroll it (axe scrollable-region-focusable)
+    <div className={cx('tz-table-wrap', className)} role="group" aria-label={label} tabIndex={0}>
       <table className="tz-table" aria-label={label} aria-busy={loading || undefined}>
         <thead>
           {table.getHeaderGroups().map((hg) => (

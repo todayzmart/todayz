@@ -1,7 +1,8 @@
 import en from '@todayz/i18n/compiled/business/en.json';
 import { asMessages } from '@todayz/i18n';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { PHONE_QUERY } from '../shell/useNarrow';
 import { json, problem, renderAt, type Call, type Handler } from '../test/render';
 
 const messages = asMessages(en);
@@ -140,6 +141,43 @@ describe('B-07 item sheet and movements', () => {
     await waitFor(() => expect(patch).toBeDefined());
     expect(patch?.body).toEqual({ pricePaise: 7000 });
     expect(patch?.headers.get('if-match')).toBe('"v3"');
+  });
+});
+
+describe('B-07 stock list on a phone (D-261)', () => {
+  it('is a list of item rows, not a table: stock tag, on hand and price on their own line, price edited in place', async () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: query === PHONE_QUERY,
+      media: query,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+    }));
+    let patch: Call | undefined;
+    renderAt('/stock', {
+      messages,
+      handlers: [
+        shops('manager'),
+        (c) => {
+          if (c.method !== 'PATCH' || c.path !== `${BASE}/items/i1`) return undefined;
+          patch = c;
+          return json(200, item('i1', { pricePaise: 7000 }), { ETag: '"v4"' });
+        },
+        ...stockHandlers([item('i1'), item('i2', { available: 0, onHand: 0, reserved: 0 })]),
+      ],
+    });
+    const list = await screen.findByRole('list', { name: 'Stock items' });
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    const rows = within(list).getAllByRole('listitem');
+    expect(rows).toHaveLength(2);
+    const first = rows[0] as HTMLElement;
+    expect(within(first).getByRole('button', { name: 'Item i1 · 1 kg' })).toBeInTheDocument();
+    expect(within(first).getByText('On hand')).toBeInTheDocument();
+    expect(within(first).getByText('Price')).toBeInTheDocument();
+    fireEvent.click(within(first).getByRole('button', { name: 'Edit Item i1 · 1 kg' }));
+    fireEvent.change(within(first).getByLabelText('Price of Item i1 · 1 kg'), { target: { value: '70' } });
+    fireEvent.keyDown(within(first).getByLabelText('Price of Item i1 · 1 kg'), { key: 'Enter' });
+    await waitFor(() => expect(patch).toBeDefined());
+    expect(patch?.body).toEqual({ pricePaise: 7000 });
   });
 });
 

@@ -4,7 +4,7 @@ import { formatMoney } from '@todayz/i18n';
 import { Banner, Button, Chip, DataTable, EmptyState, SearchField, Skeleton, StockTag, useToast, type ColumnDef } from '@todayz/ui';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
-import { ClipboardCheck, Inbox, Plus, Store as StoreIcon, Upload } from 'lucide-react';
+import { ChevronRight, ClipboardCheck, Inbox, Plus, Store as StoreIcon, Upload } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useCurrentStore, type CurrentStore } from '../orders/store';
@@ -15,6 +15,8 @@ import { ImportSheet } from './ImportSheet';
 import { InlineEdit } from './InlineEdit';
 import { ItemSheet, type SheetMode } from './ItemSheet';
 import { freshnessProps, levelLabel } from './labels';
+import { usePhone } from '../shell/useNarrow';
+import { Icon } from '../shell/Icon';
 import { VoiceLink } from '../voice/VoiceLink';
 import { canStock } from './permissions';
 import { Thumb } from './Thumb';
@@ -135,7 +137,7 @@ function StockDesk({ store, search }: { store: CurrentStore; search: StockSearch
   return (
     <>
       <div className={styles.head}>
-        <p className={styles.sub}>{store.name}</p>
+        <p className="tz-page-sub">{store.name}</p>
         <div className={styles.headActions}>
           <VoiceLink store={store} />
           <Button icon={ClipboardCheck} variant={counting ? 'primary' : 'default'} onClick={() => setCounting((c) => !c)} aria-pressed={counting}>
@@ -246,25 +248,144 @@ function StockDesk({ store, search }: { store: CurrentStore; search: StockSearch
   );
 }
 
-function ItemTable({
-  store,
-  rows,
-  loading,
-  counting,
-  empty,
-  onOpen,
-}: {
+type ItemListProps = {
   store: CurrentStore;
   rows: readonly StoreItem[];
   loading: boolean;
   counting: boolean;
   empty: boolean;
   onOpen: (i: StoreItem) => void;
-}) {
+};
+
+/** The on-hand count, edited in place while counting (manager, owner or cashier). */
+function OnHandEdit({ store, item, counting }: { store: CurrentStore; item: StoreItem; counting: boolean }) {
+  const intl = useIntl();
+  const qc = useQueryClient();
+  const toast = useToast();
+  const name = itemTitle(item);
+  return (
+    <InlineEdit
+      key={`${item.id}-${String(item.onHand)}`}
+      label={intl.formatMessage({ id: 'stock.inline.count' }, { item: name })}
+      initial={String(item.onHand)}
+      parse={parseQuantity}
+      editable={counting && canStock(store.role, 'count')}
+      always={counting}
+      display={String(item.onHand)}
+      invalidText={intl.formatMessage({ id: 'stock.form.countInvalid' })}
+      failedText={intl.formatMessage({ id: 'stock.error.generic' })}
+      saveLabel={intl.formatMessage({ id: 'stock.inline.confirm' }, { item: name })}
+      cancelLabel={intl.formatMessage({ id: 'stock.form.cancel' })}
+      editLabel={intl.formatMessage({ id: 'stock.inline.edit' }, { item: name })}
+      onSave={async (n) => {
+        try {
+          await sendMovement(qc, store, item.id, { kind: 'count_correction', quantity: n }, newUlid());
+          toast.show({ message: intl.formatMessage({ id: 'stock.toast.count_correction' }, { item: name }) });
+          return true;
+        } catch {
+          return false;
+        }
+      }}
+    />
+  );
+}
+
+/** The selling price, edited in place outside counting by whoever may set prices. */
+function PriceEdit({ store, item, counting }: { store: CurrentStore; item: StoreItem; counting: boolean }) {
   const intl = useIntl();
   const qc = useQueryClient();
   const session = useSession();
   const toast = useToast();
+  const name = itemTitle(item);
+  return (
+    <InlineEdit
+      key={`${item.id}-${String(item.pricePaise)}`}
+      label={intl.formatMessage({ id: 'stock.inline.price' }, { item: name })}
+      initial={rupeesText(item.pricePaise)}
+      prefix="₹"
+      parse={parseRupees}
+      editable={!counting && canStock(store.role, 'price')}
+      display={formatMoney(item.pricePaise, 'product')}
+      invalidText={intl.formatMessage({ id: 'stock.form.priceInvalid' })}
+      failedText={intl.formatMessage({ id: 'stock.error.generic' })}
+      saveLabel={intl.formatMessage({ id: 'stock.inline.save' }, { item: name })}
+      cancelLabel={intl.formatMessage({ id: 'stock.form.cancel' })}
+      editLabel={intl.formatMessage({ id: 'stock.inline.edit' }, { item: name })}
+      onSave={async (p) => {
+        try {
+          await patchItem(qc, session, store, item.id, { pricePaise: p });
+          toast.show({ message: intl.formatMessage({ id: 'stock.toast.price' }, { item: name }) });
+          return true;
+        } catch {
+          return false;
+        }
+      }}
+    />
+  );
+}
+
+/** A table on wider screens; on a phone, a list with one card row per item (D-261). */
+function ItemTable(props: ItemListProps) {
+  return usePhone() ? <ItemList {...props} /> : <ItemGrid {...props} />;
+}
+
+/**
+ * Phone stock list: the page keeps its width and nothing scrolls sideways. Each row has the photo,
+ * the name (opens the item sheet), the stock tag, then on-hand and price on their own line, each
+ * edited in place as in the table.
+ */
+function ItemList({ store, rows, loading, counting, empty, onOpen }: ItemListProps) {
+  const intl = useIntl();
+  const label = intl.formatMessage({ id: 'stock.table.label' });
+  if (loading) {
+    return (
+      <div role="status" aria-label={label} className={styles.list}>
+        {[0, 1, 2, 3].map((n) => (
+          <div key={n} className={styles.listRow}>
+            <Skeleton height="4rem" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (rows.length === 0) {
+    return <p className={`${styles.list} ${styles.listEmpty}`}>{intl.formatMessage({ id: empty ? 'stock.empty.none' : 'stock.empty.filtered' })}</p>;
+  }
+  return (
+    <ul className={styles.list} aria-label={label}>
+      {rows.map((i) => (
+        <li key={i.id} className={styles.listRow}>
+          <Thumb item={i} />
+          <div className={styles.listMain}>
+            <button type="button" className={`${styles.nameButton} ${styles.listName}`} onClick={() => onOpen(i)}>
+              <span className={styles.name}>{itemTitle(i)}</span>
+              <Icon icon={ChevronRight} />
+            </button>
+            {!i.isListed && <span className={styles.sub}>{intl.formatMessage({ id: 'stock.item.hidden' })}</span>}
+            <StockTag level={stockLevel(i)} label={levelLabel(intl, stockLevel(i), i.available)} {...freshnessProps(intl, i)} />
+            <dl className={styles.listFacts}>
+              <div>
+                <dt>{intl.formatMessage({ id: counting ? 'stock.col.counted' : 'stock.col.onHand' })}</dt>
+                <dd>
+                  <OnHandEdit store={store} item={i} counting={counting} />
+                </dd>
+              </div>
+              <div>
+                <dt>{intl.formatMessage({ id: 'stock.col.price' })}</dt>
+                <dd>
+                  <PriceEdit store={store} item={i} counting={counting} />
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function ItemGrid({ store, rows, loading, counting, empty, onOpen }: ItemListProps) {
+  const intl = useIntl();
 
   const columns = useMemo<ColumnDef<StoreItem, unknown>[]>(
     () => [
@@ -301,73 +422,17 @@ function ItemTable({
         header: intl.formatMessage({ id: counting ? 'stock.col.counted' : 'stock.col.onHand' }),
         accessorFn: (i) => i.onHand,
         meta: { numeric: true },
-        cell: ({ row }) => {
-          const i = row.original;
-          const name = itemTitle(i);
-          return (
-            <InlineEdit
-              key={`${i.id}-${String(i.onHand)}`}
-              label={intl.formatMessage({ id: 'stock.inline.count' }, { item: name })}
-              initial={String(i.onHand)}
-              parse={parseQuantity}
-              editable={counting && canStock(store.role, 'count')}
-              always={counting}
-              display={String(i.onHand)}
-              invalidText={intl.formatMessage({ id: 'stock.form.countInvalid' })}
-              failedText={intl.formatMessage({ id: 'stock.error.generic' })}
-              saveLabel={intl.formatMessage({ id: 'stock.inline.confirm' }, { item: name })}
-              cancelLabel={intl.formatMessage({ id: 'stock.form.cancel' })}
-              editLabel={intl.formatMessage({ id: 'stock.inline.edit' }, { item: name })}
-              onSave={async (n) => {
-                try {
-                  await sendMovement(qc, store, i.id, { kind: 'count_correction', quantity: n }, newUlid());
-                  toast.show({ message: intl.formatMessage({ id: 'stock.toast.count_correction' }, { item: name }) });
-                  return true;
-                } catch {
-                  return false;
-                }
-              }}
-            />
-          );
-        },
+        cell: ({ row }) => <OnHandEdit store={store} item={row.original} counting={counting} />,
       },
       {
         id: 'price',
         header: intl.formatMessage({ id: 'stock.col.price' }),
         accessorFn: (i) => i.pricePaise,
         meta: { numeric: true },
-        cell: ({ row }) => {
-          const i = row.original;
-          const name = itemTitle(i);
-          return (
-            <InlineEdit
-              key={`${i.id}-${String(i.pricePaise)}`}
-              label={intl.formatMessage({ id: 'stock.inline.price' }, { item: name })}
-              initial={rupeesText(i.pricePaise)}
-              prefix="₹"
-              parse={parseRupees}
-              editable={!counting && canStock(store.role, 'price')}
-              display={formatMoney(i.pricePaise, 'product')}
-              invalidText={intl.formatMessage({ id: 'stock.form.priceInvalid' })}
-              failedText={intl.formatMessage({ id: 'stock.error.generic' })}
-              saveLabel={intl.formatMessage({ id: 'stock.inline.save' }, { item: name })}
-              cancelLabel={intl.formatMessage({ id: 'stock.form.cancel' })}
-              editLabel={intl.formatMessage({ id: 'stock.inline.edit' }, { item: name })}
-              onSave={async (p) => {
-                try {
-                  await patchItem(qc, session, store, i.id, { pricePaise: p });
-                  toast.show({ message: intl.formatMessage({ id: 'stock.toast.price' }, { item: name }) });
-                  return true;
-                } catch {
-                  return false;
-                }
-              }}
-            />
-          );
-        },
+        cell: ({ row }) => <PriceEdit store={store} item={row.original} counting={counting} />,
       },
     ],
-    [intl, counting, onOpen, qc, session, store, toast],
+    [intl, counting, onOpen, store],
   );
 
   return (

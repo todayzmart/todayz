@@ -38,9 +38,9 @@ White first, black and grey for structure, a pale mint and soft pastels for warm
 - **Light only.** TodayZ ships one theme: white. There is no dark mode at launch; every app stays light whatever the phone or computer is set to.
 - **Focus** is a 2px solid `focus` ring offset 2px, on every interactive element.
 
-### Bright skin (customer app, D-249)
+### Bright skin (customer app D-249, business app D-261)
 
-The customer app sets `data-skin="bright"` on its root, and the skin in `components/bundle.css` changes these rules for that app only. Business, admin and the design cards keep the rules above.
+The customer and business apps set `data-skin="bright"` on their root, and the skin in `components/bundle.css` changes these rules for those apps only. Admin and the design cards keep the rules above. In the business app, KPI tiles, tables, POS tiles and the greeting card also lift off the page with `shadow-card`, and the sidebar's active item is `brand-soft` with `brand-strong` text, like the active tab. Tabs and the segmented control keep their look in both apps.
 
 - **The page is light grey `page` (#F4F5F7).** Cards stay white and lift off it with `shadow-card` instead of a `line` border. Only `ink` and `ink-2` text sits directly on the grey; `ink-3` would fall to 4.3:1.
 - **Primary buttons are `brand` green, not `inverse`.** Brand stays the one loud colour; secondary buttons stay white and outlined.

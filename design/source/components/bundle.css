@@ -464,3 +464,12 @@ body { margin: 0; font-family: var(--font-sans); font-size: 14px; line-height: 2
 .tz-cat:hover i { transform: translateY(-2px); }
 .tz-cat i { transition: transform 150ms cubic-bezier(0.2, 0, 0, 1); }
 @media (prefers-reduced-motion: reduce) { .tz-cat i { transition: none; } .tz-cat:hover i { transform: none; } }
+
+/* Bright skin in the business app (D-261): the business shell sets data-skin="bright" too, so the rules above apply there, and these cover the pieces only business uses. KPIs, tables, POS tiles and the greeting card lift off the grey page with the card shadow; a table inside a card keeps its hairline. The sidebar's active item is brand, like the active tab. POS tiles keep their size and density. */
+[data-skin="bright"] :is(.tz-kpi, .tz-kpi-strip, .tz-table-wrap, .tz-pos-tile, .tz-greet) { border-color: transparent; box-shadow: var(--shadow-card); }
+[data-skin="bright"] :is(.tz-card, .tz-ocard, .tz-kpi-strip) .tz-table-wrap { border-color: var(--line); box-shadow: none; }
+[data-skin="bright"] .tz-pos-tile:active { box-shadow: var(--shadow-xs); }
+[data-skin="bright"] .tz-side a { font-weight: 500; }
+[data-skin="bright"] .tz-side a[aria-current="page"] { background: var(--brand-soft); color: var(--brand-strong); font-weight: 600; }
+[data-skin="bright"] .tz-side a[aria-current="page"] .tz-ico { color: var(--brand); }
+[data-skin="bright"] .tz-side a[aria-current="page"] .tz-count { border-color: var(--brand); color: var(--brand-strong); }
