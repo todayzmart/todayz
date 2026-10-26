@@ -21,12 +21,13 @@ const (
 	LowStockDefault      Key = "low_stock_default"       // count, default 5
 	StoreBannersMax      Key = "store_banners_max"       // count, default 3
 	// Credits and payouts
-	CreditMaxPerOrder                 Key = "credit_max_per_order"                   // credits, default 30
-	CreditMinOrderValuePaise          Key = "credit_min_order_value_paise"           // paise, default 10000
-	CreditExpiryDays                  Key = "credit_expiry_days"                     // days, default 365
-	CreditOrdersPerMonth              Key = "credit_orders_per_month"                // count, default 10
-	StoreCreditRedemptionsPerDay      Key = "store_credit_redemptions_per_day"       // count, default 200
-	AdminAdjustDualApprovalAbovePaise Key = "admin_adjust_dual_approval_above_paise" // paise, default 50000
+	CreditMaxPerOrder                    Key = "credit_max_per_order"                       // credits, default 30
+	CreditMinOrderValuePaise             Key = "credit_min_order_value_paise"               // paise, default 10000
+	CreditExpiryDays                     Key = "credit_expiry_days"                         // days, default 365
+	CreditOrdersPerMonth                 Key = "credit_orders_per_month"                    // count, default 10
+	StoreCreditRedemptionsPerDay         Key = "store_credit_redemptions_per_day"           // count, default 200
+	AdminAdjustDualApprovalAbovePaise    Key = "admin_adjust_dual_approval_above_paise"     // paise, default 50000
+	AdminAdjustDailyTotalAlertAbovePaise Key = "admin_adjust_daily_total_alert_above_paise" // paise, default 500000
 	// Referrals
 	RefRetailerCustomerReferrerCredits Key = "ref_retailer_customer_referrer_credits" // credits, default 30
 	RefRetailerCustomerRefereeCredits  Key = "ref_retailer_customer_referee_credits"  // credits, default 100
@@ -198,6 +199,7 @@ var AllKeys = []Key{
 	CreditOrdersPerMonth,
 	StoreCreditRedemptionsPerDay,
 	AdminAdjustDualApprovalAbovePaise,
+	AdminAdjustDailyTotalAlertAbovePaise,
 	RefRetailerCustomerReferrerCredits,
 	RefRetailerCustomerRefereeCredits,
 	RefCustomerCustomerReferrerCredits,

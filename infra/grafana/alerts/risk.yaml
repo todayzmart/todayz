@@ -6,8 +6,11 @@
 #                        strikes in 30 days; no automatic pause, D-67). ops warning (risk queue)
 #   Unconfirmed returns  a return_unconfirmed risk flag was raised (a delivery-failed return auto-
 #                        confirmed after 72 h, D-69). ops info
+#   Admin adjust day     one admin's wallet adjustments in the IST day, across all customers, passed
+#                        admin_adjust_daily_total_alert_above_paise (D-246 B9). ops warning
 #
-# Both read the flags their WPs raise, so the threshold lives in one place (platform_settings).
+# The first two read the flags their WPs raise and the third reads the setting itself, so each
+# threshold lives in one place (platform_settings).
 apiVersion: 1
 groups:
   - orgId: 1
@@ -88,4 +91,57 @@ groups:
           description: 'Returns nobody confirmed within 72 h were auto-confirmed as unconfirmed and flagged (D-69).'
           runbook_url: docs/runbooks/risk-unconfirmed-returns.md
           __dashboardUid__: todayz-08
+        isPaused: false
+
+      # One admin's wallet adjustments today (IST), across all customers (D-246 B9), counted as the
+      # two-person rule counts them per customer (D-237): posted at-once adjustments plus that
+      # admin's pending and approved requests. The value is paise.
+      - uid: tz-risk-admin-adjust-day
+        title: 'Admin adjustments in a day'
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange: {from: 86400, to: 0}
+            datasourceUid: todayz-postgres
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              editorMode: code
+              rawSql: |-
+                WITH day AS (SELECT date_trunc('day', now() AT TIME ZONE 'Asia/Kolkata') AT TIME ZONE 'Asia/Kolkata' AS since),
+                moves AS (
+                  SELECT t.created_by AS admin_id, sum(abs(e.amount)) / 2 AS credits
+                  FROM ledger_transactions t JOIN ledger_entries e ON e.transaction_id = t.id, day
+                  WHERE t.kind = 'admin_adjustment' AND t.created_at >= day.since AND e.created_at >= day.since
+                    AND NOT EXISTS (SELECT 1 FROM admin_adjustment_requests r WHERE r.id = t.ref_id)
+                  GROUP BY t.created_by
+                  UNION ALL
+                  SELECT r.requested_by, sum(abs(r.amount)) FROM admin_adjustment_requests r, day
+                  WHERE r.requested_at >= day.since AND r.status IN ('pending', 'approved')
+                  GROUP BY r.requested_by
+                )
+                SELECT admin_id::text AS admin_id, sum(credits) * 100 AS value FROM moves
+                GROUP BY admin_id
+                HAVING sum(credits) * 100 > (SELECT (value #>> '{}')::bigint FROM platform_settings
+                  WHERE key = 'admin_adjust_daily_total_alert_above_paise')
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          area: risk
+          severity: ops
+        annotations:
+          summary: 'One admin adjusted wallets by more than the daily alert line today'
+          description: 'Admin {{ $labels.admin_id }} has adjusted customer wallets by {{ $values.A.Value }} paise today (IST), across all customers; the line is admin_adjust_daily_total_alert_above_paise. Nothing is blocked.'
+          runbook_url: docs/runbooks/risk-admin-adjust-day.md
+          __dashboardUid__: todayz-11
         isPaused: false
