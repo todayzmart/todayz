@@ -10,7 +10,7 @@ RiskRule:
     The rule that raised the flag, for example `orders.code_lockouts`, `pos.bill_claim_spread`, `pos.reversal_ratio`,
     `referral.self_like`, `identity.otp_ip_fanout`, `identity.otp_failed_phone`, `referral.device_accounts`,
     `referral.reversed_after_reward`, `referral.reward_refused`, `pos.offline_links`,
-    `pos.offline_offer_without_discount_role`, `credits.store_daily_cap`, `credits.customer_monthly_cap`,
+    `pos.offline_offer_without_discount_role`, `pos.offline_sold_at_odd`, `credits.store_daily_cap`, `credits.customer_monthly_cap`,
     `store_strikes`, `return_unconfirmed`, `ask_reported`. Other packages may add rules.
   pattern: ^[a-z][a-z0-9_.]{0,63}$
 RiskSubjectType:

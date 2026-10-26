@@ -196,7 +196,7 @@ Any non-terminal state
   - the device clock was within 2 minutes of the server's at the device's last online check (the device records it);
   - the code has not been used before.
 
-  If verification fails, the sale stays unlinked and the shop sees "Customer link failed". More than `pos_offline_links_risk_per_day` (20) offline links at one store in a day raises a risk flag. More than `risk_code_lockouts_store_per_day` (10) order-code lockouts at one store in an IST day also raises a risk flag.
+  If verification fails, the sale stays unlinked and the shop sees "Customer link failed". More than `pos_offline_links_risk_per_day` (20) offline links at one store in a day raises a risk flag. More than `risk_code_lockouts_store_per_day` (10) order-code lockouts at one store in an IST day also raises a risk flag. An offline sale is never refused for its time: an odd device time (ahead of the server, past the 72 h clamp, or well before the device's previous sync) is kept as sold, with `sold_at` clamped as before, and raises a `pos.offline_sold_at_odd` risk flag once a day per store (D-243).
 
 ## 7. Credits
 
@@ -760,6 +760,7 @@ Every numeric key has a min and a max (the Rule column, or after the default). A
 | Device clock tolerance for offline links | 2 min | §6, D-12 |
 | Voice recording length | 15 s | §12; also customer voice search, §11.1, D-101 |
 | `sold_at` clamp for offline sales | 72 h | 02 §4.3 |
+| Odd offline sale time (kept, flagged once a day per store) | device clock more than 5 min ahead, past the 72 h clamp, or more than 30 min before the device's previous sync | §6, D-243 |
 | Order SSE poll interval | 15 s | 02 |
 | "3 or more orders expired in 2 h" alert | 3 in 2 h | 05 §5 |
 | Failed-delivery auto-confirm | 72 h | §5.3, D-85 (the 2 h and 24 h reminders are settings, D-218) |

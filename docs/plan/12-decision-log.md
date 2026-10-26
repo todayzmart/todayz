@@ -1404,3 +1404,13 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
 - They are in code, not `platform_settings`. They are not a product rule, and a bad value in a settings row must not be able to lock everyone out.
 - They are per instance and in memory, so N instances allow N times the rate. That is accepted. Abuse limits that must hold globally are the Postgres-backed OTP caps (01 §2), and in W5 Cloudflare rate-limiting rules sit in front of `api.todayz.in`.
 - The limiter stays off locally and in tests (contract fuzzing and the journeys would trip it). `internal/platform/ratelimit` tests cover it.
+
+**D-243 · An offline sale with an odd time is kept and flagged, never refused (founder, 26 Oct; W4-03 F6).**
+- **The gap.** `clampSoldAt` already keeps a recorded `sold_at` between received_at minus 72 h and received_at (01 §17, D-131). Within that window, a device could still back-date a sale into an earlier day, after the shop had read that day's numbers, and nobody was told.
+- **Rule (founder: "keep the sale and flag it").** Refusing would lose a real cash sale. So the sync applies the sale as ever and counts it as odd when the device time is:
+  - more than 5 min ahead of the server;
+  - older than the 72 h clamp;
+  - more than 30 min before this device's previous successful sync. The device was online then and should have sent it; the 30 min covers a sale rung while a sync was in flight, and ordinary clock drift.
+- **The flag.** One `pos.offline_sold_at_odd` risk flag per store per IST day, score 50 as for the other POS flags, with details of the cashier and the count. The admin risk queue (A-13) names it "Offline sale with an odd time".
+- **Fixed values in code** (01 §17), not settings: they are device-clock tolerances, not product levers. A device's first sync has no previous sync, so only the ahead and clamp tests apply to it.
+- Tests: `cmd/todayz` `TestPOSOfflineSoldAtOdd`, plus the existing POS sync tests unchanged.

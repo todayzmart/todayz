@@ -87,6 +87,10 @@
     "defaultMessage": "Offline offer without the discount role",
     "description": "A-13 Risk: Rule name"
   },
+  "risk.rule.offlineSoldAtOdd": {
+    "defaultMessage": "Offline sale with an odd time",
+    "description": "A-13 Risk: Rule name (D-243: device time ahead of the server, past the 72 h clamp, or before the device's previous sync)"
+  },
   "risk.rule.selfLike": {
     "defaultMessage": "Referral looks like self-referral",
     "description": "A-13 Risk: Rule name"

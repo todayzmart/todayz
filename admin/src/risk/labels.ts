@@ -14,6 +14,7 @@ const RULES: Readonly<Record<string, string>> = {
   [rk('pos', 'reversal_ratio')]: 'risk.rule.reversalRatio',
   [rk('pos', 'offline_links')]: 'risk.rule.offlineLinks',
   [rk('pos', 'offline_offer_without_discount_role')]: 'risk.rule.offlineOffer',
+  [rk('pos', 'offline_sold_at_odd')]: 'risk.rule.offlineSoldAtOdd',
   [rk('referral', 'self_like')]: 'risk.rule.selfLike',
   [rk('referral', 'device_accounts')]: 'risk.rule.deviceAccounts',
   [rk('referral', 'reversed_after_reward')]: 'risk.rule.reversedAfterReward',

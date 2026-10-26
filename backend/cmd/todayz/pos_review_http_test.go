@@ -205,6 +205,34 @@ func TestPOSOfflineOfferDiscount(t *testing.T) {
 	require.Equal(t, 1, flags("pos.offline_offer_without_discount_role"), "once a day")
 }
 
+// D-243: an offline sale with an odd device time is kept as sold and flags
+// the store once a day: ahead of the server, older than the 72 h clamp, or
+// well before the device's previous sync. Ordinary offline times do not.
+func TestPOSOfflineSoldAtOdd(t *testing.T) {
+	p := newPosShop(t)
+	flags := func() int {
+		return p.a.count(`SELECT count(*) FROM risk_flags WHERE subject_type = 'store' AND subject_id = $1 AND rule = 'pos.offline_sold_at_odd'`, uuidOf(t, p.sid))
+	}
+	now := p.a.clk.Now()
+	// First sync: no previous sync, so a sale 2 h old (offline all morning) is ordinary.
+	r := p.sync(p.cashier, p.saleEntry(1, now.Add(-2*time.Hour), nil, line{p.salt, 1}), p.saleEntry(2, now.Add(2*time.Minute), nil, line{p.salt, 1}))
+	require.Equal(t, []string{"applied", "applied"}, statuses(r), r.raw)
+	require.Zero(t, flags(), "2 h offline and a 2 min fast clock are ordinary")
+
+	p.advance(time.Hour)
+	// After that sync, a sale claiming 40 min before it is back-dated: kept, flagged.
+	r = p.sync(p.cashier, p.saleEntry(3, now.Add(-40*time.Minute), nil, line{p.salt, 1}))
+	require.Equal(t, []string{"applied"}, statuses(r), r.raw)
+	require.Equal(t, 1, flags())
+	require.Equal(t, 3, p.a.count(`SELECT count(*) FROM pos_sales WHERE store_id = $1`, uuidOf(t, p.sid)), "the sale is kept")
+
+	// A clock an hour fast and a time older than the clamp: still once a day.
+	r = p.sync(p.cashier, p.saleEntry(4, p.a.clk.Now().Add(time.Hour), nil, line{p.salt, 1}), p.saleEntry(5, now.Add(-100*time.Hour), nil, line{p.salt, 1}))
+	require.Equal(t, []string{"applied", "applied"}, statuses(r), r.raw)
+	require.Equal(t, 1, flags(), "once a day")
+	require.Equal(t, 5, p.a.count(`SELECT count(*) FROM pos_sales WHERE store_id = $1`, uuidOf(t, p.sid)))
+}
+
 // A retry of a bill-QR sale with the same clientId under a new
 // Idempotency-Key, at the same time, is the same sale; the hold is captured
 // once.

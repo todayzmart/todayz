@@ -57,6 +57,35 @@ type syncRun struct {
 	// engine would not give at sold_at; noRole those of them rung by a user
 	// without pos.discount (D-131).
 	offers, noRole int
+	// lastSync is when this device last synced this store (zero for its
+	// first sync); oddTime counts this sync's sales whose device time the
+	// manager should look at (oddSoldAt, D-243).
+	lastSync time.Time
+	oddTime  int
+}
+
+// A device time more than soldAtAhead past the server's, or more than
+// soldAtBeforeSync before the device's previous sync (a sale it should have
+// sent then), is kept but flagged (D-243). Older than soldAtMaxAge is
+// clamped and flagged too.
+const (
+	soldAtAhead      = 5 * time.Minute  //settings:ok D-243 fixed tolerance for device clocks, not a product number
+	soldAtBeforeSync = 30 * time.Minute //settings:ok D-243 fixed slack for a sale rung while a sync was in flight
+)
+
+// oddSoldAt reports whether an offline sale's device time is one the
+// manager should look at: ahead of the server, older than the clamp, or
+// well before this device's previous sync.
+func oddSoldAt(at time.Time, run *syncRun) bool {
+	switch {
+	case at.After(run.now.Add(soldAtAhead)):
+		return true
+	case at.Before(run.now.Add(-soldAtMaxAge)):
+		return true
+	case !run.lastSync.IsZero() && at.Before(run.lastSync.Add(-soldAtBeforeSync)):
+		return true
+	}
+	return false
 }
 
 // Sync applies a device's outbox in deviceSeq order and returns the
@@ -116,6 +145,11 @@ func (s *Service) Sync(ctx context.Context, sc authz.Scope, body syncapi.SyncReq
 		}
 		if run.noRole > 0 {
 			if err := s.offerRoleRisk(ctx, run); err != nil {
+				return err
+			}
+		}
+		if run.oddTime > 0 {
+			if err := s.soldAtRisk(ctx, run); err != nil {
 				return err
 			}
 		}
@@ -234,7 +268,9 @@ func (s *Service) checkCursor(ctx context.Context, run *syncRun, cursor int64) e
 	switch {
 	case err == nil && run.now.Sub(c.LastSyncedAt) > changesKept:
 		return resync
-	case err != nil && !isNoRows(err):
+	case err == nil:
+		run.lastSync = c.LastSyncedAt
+	case !isNoRows(err):
 		return fmt.Errorf("pos: get sync cursor: %w", err)
 	}
 	if cursor == seq {
@@ -416,6 +452,10 @@ func (s *Service) syncSale(ctx context.Context, run *syncRun, clientID ids.ID, e
 	}
 	if l.method == methodCounterCode && l.status == linkLinked {
 		run.offline++
+	}
+	if oddSoldAt(e.At, run) {
+		// Kept as sold (sold_at clamped as ever); the manager looks at it.
+		run.oddTime++
 	}
 	if unmatched {
 		// The device's offer discount is kept as sold (no offer id reaches
@@ -627,6 +667,24 @@ func (s *Service) offerRoleRisk(ctx context.Context, run *syncRun) error {
 	err := s.q(ctx).InsertRiskFlagOnce(ctx, posdb.InsertRiskFlagOnceParams{
 		ID: ids.UUID(s.ids.New(run.now)), StoreID: ids.UUID(run.sc.StoreID), Rule: "pos.offline_offer_without_discount_role",
 		// TODO(lead): no score in the plan; 50 as for pos.offline_links.
+		Score: 50, Details: details, Now: run.now, Since: since,
+	})
+	if err != nil {
+		return fmt.Errorf("pos: risk flag: %w", err)
+	}
+	return nil
+}
+
+// soldAtRisk flags the store once a day when a sync carried sales whose
+// device time is odd (oddSoldAt, D-243): back-dated past the device's
+// previous sync, older than the clamp, or ahead of the server. The sales are
+// kept as sold; the manager looks at them.
+func (s *Service) soldAtRisk(ctx context.Context, run *syncRun) error {
+	since := istDay(run.now)
+	details, _ := json.Marshal(map[string]any{"cashierUserId": run.p.UserID.String(), "sales": run.oddTime})
+	err := s.q(ctx).InsertRiskFlagOnce(ctx, posdb.InsertRiskFlagOnceParams{
+		ID: ids.UUID(s.ids.New(run.now)), StoreID: ids.UUID(run.sc.StoreID), Rule: "pos.offline_sold_at_odd",
+		// No score in the plan; 50 as for the other POS flags.
 		Score: 50, Details: details, Now: run.now, Since: since,
 	})
 	if err != nil {
