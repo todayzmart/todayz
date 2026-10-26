@@ -5,12 +5,12 @@ import { getDiscoverSummary, listDiscoverStores } from '@todayz/api-client/gen/d
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import { Button, CategoryRow, Chip, EmptyState, SearchField, Skeleton, StoreCard } from '@todayz/ui';
-import { BadgePercent, Bike, ChevronDown, Clock, MapPin, ShoppingBag, Store as StoreIcon } from 'lucide-react';
+import { BadgePercent, Bike, Clock, MapPin, ShoppingBag, Store as StoreIcon } from 'lucide-react';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { LimitBanner } from '../orders/LimitBanner';
 import { VoiceSearchSlot } from '../search/slots';
-import { Icon } from '../shell/Icon';
+import { ChipSelect } from '../shell/ChipSelect';
 import { CartBarLink } from '../store/CartBarLink';
 import { useVoiceOutcome } from '../voice-search/session';
 import { categoryIcon } from './categories';
@@ -173,17 +173,12 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
   return (
     <>
       <div className={styles.filters} role="group" aria-label={intl.formatMessage({ id: 'home.filters.label' })}>
-        <label className={`tz-chip ${styles.radius}`}>
-          <span className="tz-ui-sr-only">{intl.formatMessage({ id: 'home.radius.label' })}</span>
-          <select value={km} onChange={(e) => setRadiusKm(Number(e.target.value))}>
-            {RADIUS_OPTIONS_KM.map((k) => (
-              <option key={k} value={k}>
-                {intl.formatMessage({ id: 'home.radius.within' }, { km: String(k) })}
-              </option>
-            ))}
-          </select>
-          <Icon icon={ChevronDown} />
-        </label>
+        <ChipSelect
+          label={intl.formatMessage({ id: 'home.radius.label' })}
+          value={km}
+          options={RADIUS_OPTIONS_KM.map((k) => ({ value: k, label: intl.formatMessage({ id: 'home.radius.within' }, { km: String(k) }) }))}
+          onChange={setRadiusKm}
+        />
         {FILTERS.map((f) => (
           <Chip
             key={f.key}

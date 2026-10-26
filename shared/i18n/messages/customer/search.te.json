@@ -243,5 +243,10 @@
     "message": "జోడించిన ఫిల్టర్లు",
     "review": "reviewed",
     "enHash": "8111377d"
+  },
+  "search.categories.title": {
+    "message": "వర్గం వారీగా కొనండి",
+    "review": "machine",
+    "enHash": "09ac8bca"
   }
 }

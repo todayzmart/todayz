@@ -189,38 +189,6 @@
   flex: none;
 }
 
-/* The native select keeps the platform picker; the chip around it draws the look. */
-.radius {
-  position: relative;
-  padding: 0;
-}
-
-.radius select {
-  height: 100%;
-  padding: 0 calc(var(--space-3) + 18px) 0 var(--space-3);
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  appearance: none;
-  cursor: pointer;
-}
-
-.radius > :global(svg) {
-  position: absolute;
-  right: var(--space-2);
-  pointer-events: none;
-}
-
-.radius:focus-within {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
-}
-
-.radius select:focus-visible {
-  outline: none;
-}
-
 /* Offers near you: photo banners that snap, the next one peeking in. */
 .offers {
   display: flex;

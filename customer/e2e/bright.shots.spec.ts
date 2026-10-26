@@ -87,6 +87,56 @@ const DISCOVER: Record<string, unknown> = {
   },
 };
 
+const item = (id: string, name: string, over: Record<string, unknown> = {}) => ({
+  storeItemId: `01KE0S1W6W8ZV7T1C3A6ITEM${id}`,
+  productId: `01KE0S1W6W8ZV7T1C3A6PROD${id}`,
+  name,
+  variant: null,
+  brand: null,
+  packSize: 500,
+  unit: 'ml',
+  pricePaise: 3000,
+  mrpPaise: 3000,
+  hasOffer: false,
+  inStock: true,
+  confirmedAt: new Date(Date.now() - 12 * 60_000).toISOString(),
+  imageKey: null,
+  ...over,
+});
+
+DISCOVER['/v1/discover/search'] = {
+  query: 'milk',
+  summary: { storesChecked: 12, storesWithIt: 3, minPricePaise: 2800 },
+  results: [
+    {
+      store: shop('sri-lakshmi-stores', 'Sri Lakshmi Provision Stores', { photoKey: 'shop-grocery.jpg', cashbackPct: 5 }),
+      items: [
+        item('01', 'Nandini Toned Milk', { brand: 'Nandini', pricePaise: 2800, imageKey: 'p-milk.jpg' }),
+        item('02', 'Milk Bread', { brand: 'Modern', packSize: 400, unit: 'g', pricePaise: 4500, mrpPaise: 5000, hasOffer: true, imageKey: 'p-bread.jpg' }),
+      ],
+      badge: 'lowest_price',
+      deliveryFeePaise: 2000,
+    },
+    {
+      store: shop('apollo-pharmacy', 'Jeevan Medicals', { photoKey: 'shop-pharmacy.jpg', categoryTint: 'rose', distanceM: 800, locality: 'HAL 2nd Stage' }),
+      items: [item('03', 'Dairy Milk Silk', { brand: 'Cadbury', packSize: 60, unit: 'g', pricePaise: 8000, imageKey: 'p-choc.jpg' })],
+      badge: 'closest',
+      deliveryFeePaise: 0,
+    },
+    {
+      store: shop('annapurna-kirana', 'Annapurna Kirana', { distanceM: 1200, rating: null, ratingCount: 0, categoryTint: 'amber' }),
+      items: [item('04', 'Amul Gold Milk', { brand: 'Amul', pricePaise: 3300, confirmedAt: null })],
+      badge: null,
+      deliveryFeePaise: 0,
+    },
+  ],
+  chips: [],
+  refineHint: null,
+  nextCursor: null,
+  serverNow: NOW,
+};
+DISCOVER['/v1/discover/search/suggest'] = { items: [] };
+
 /** With TZ_AXE (a path to axe.min.js), the screen must have no WCAG 2.2 AA violations. */
 async function axe(page: Page) {
   const path = process.env['TZ_AXE'];
@@ -149,4 +199,28 @@ test('home', async ({ page }) => {
   await axe(page);
   await shot(page, 'home.png');
   await shot(page, 'home-full.png', { fullPage: true });
+});
+
+test('search', async ({ page }) => {
+  await page.setViewportSize(PHONE);
+  await page.addInitScript(() => localStorage.setItem('todayz.recentSearches', JSON.stringify(['atta 5 kg', 'paracetamol', 'notebook'])));
+  await signedIn(page);
+  await page.goto('/search');
+  await page.getByText('paracetamol').first().waitFor();
+  await page.evaluate(() => document.fonts.ready);
+  await page.waitForFunction(() => [...document.images].every((i) => i.complete));
+  await axe(page);
+  await shot(page, 'search.png');
+});
+
+test('search results', async ({ page }) => {
+  await page.setViewportSize(PHONE);
+  await signedIn(page);
+  await page.goto('/search?q=milk');
+  await page.getByText('Amul Gold Milk').waitFor();
+  await page.evaluate(() => document.fonts.ready);
+  await page.waitForFunction(() => [...document.images].every((i) => i.complete));
+  await axe(page);
+  await shot(page, 'search-results.png');
+  await shot(page, 'search-results-full.png', { fullPage: true });
 });
