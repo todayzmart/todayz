@@ -1,5 +1,6 @@
 {
   "1000000000000000101": "{#var#} is your TodayZ login code. Do not share it with anyone.",
   "1000000000000000201": "A new order at {#var#} has not been opened for {#var#} minutes. Open the TodayZ business app to accept it.",
-  "1000000000000000202": "{#var#} पर एक नया ऑर्डर {#var#} मिनट से खोला नहीं गया है। स्वीकार करने के लिए TodayZ बिज़नेस ऐप खोलें।"
+  "1000000000000000202": "{#var#} पर एक नया ऑर्डर {#var#} मिनट से खोला नहीं गया है। स्वीकार करने के लिए TodayZ बिज़नेस ऐप खोलें।",
+  "1000000000000000203": "{#var#} is your TodayZ code to confirm your shop with our field agent. Share it only with that agent."
 }
