@@ -6,7 +6,7 @@ Put each value in `.env.cloud.local` as `NAME=value`, and never paste a value in
 
 ## A. Lift the block on the TodayZ AWS account (required)
 
-> **26 Oct: TodayZ now uses a new account, `061292478202`** (Terraform refuses any other, D-248). Part A was written for the old account `212412893706`. Do it again only if the new account is also in an AWS Organization whose service control policy blocks RDS, EC2, S3, ECR, Secrets Manager or SMS; a standalone account needs nothing here. The first deploy is `docs/qa/deploy-prep/RUNBOOK.md`.
+> **26 Oct: TodayZ now uses a new account, `061292478202`** (Terraform refuses any other, D-255). Part A was written for the old account `212412893706`. Do it again only if the new account is also in an AWS Organization whose service control policy blocks RDS, EC2, S3, ECR, Secrets Manager or SMS; a standalone account needs nothing here. The first deploy is `docs/qa/deploy-prep/RUNBOOK.md`.
 
 The TodayZ account `212412893706` is a member of an AWS Organization whose management account is `882034444063`. That organization's service control policy `p-4dtreasp` denies RDS, EC2, S3, ECR, Secrets Manager and SMS in every region, so Terraform cannot create anything.
 

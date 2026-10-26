@@ -66,6 +66,6 @@ output "app_key_names" {
 }
 
 output "provider_secret_names" {
-  description = "Provider keys: injected only once they have a value (stack variable provider_secret_names, D-249)."
+  description = "Provider keys: injected only once they have a value (stack variable provider_secret_names, D-256)."
   value       = [for n in local.other : n if !startswith(n, "DATABASE_")]
 }

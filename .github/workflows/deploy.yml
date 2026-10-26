@@ -1,6 +1,6 @@
 # Deploy the four Cloudflare Pages sites on every push to main (D-210, D-214): todayz.in,
 # app., business. and admin.todayz.in. The API and worker deploy to Beanstalk from their own
-# workflow, deploy-backend.yml (D-247).
+# workflow, deploy-backend.yml (D-254).
 #
 # Two jobs so the secret never shares a job with third-party install code: `build` (no
 # secrets) installs, generates and runs the production builds and uploads the output;

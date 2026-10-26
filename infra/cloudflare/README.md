@@ -8,7 +8,7 @@ Pages projects (site, customer, business, admin; direct upload from CI).
 **Not applied yet.** The provider reads `CLOUDFLARE_API_TOKEN` from the environment; account and zone ids
 are variables (`CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID`). CI runs only `fmt -check`, `validate`,
 tflint and checkov (`make check-infra`). State is in the S3 bucket with key
-`cloudflare/terraform.tfstate` (D-248); the lead's two applies are steps 5 and 11 of
+`cloudflare/terraform.tfstate` (D-255); the lead's two applies are steps 5 and 11 of
 `docs/qa/deploy-prep/RUNBOOK.md`.
 
 - Staging hosts use a hyphen (`app-staging.todayz.in`): Universal SSL covers one wildcard level, so
@@ -21,7 +21,7 @@ tflint and checkov (`make check-infra`). State is in the S3 bucket with key
 **Live parts made by hand (D-214).** The four Pages projects, their custom domains (including
 `www.todayz.in` on the site project, now in this module for prod), the Pages DNS records
 and the `todayz-prod` Turnstile widget were created through the API on 2026-10-24. The import blocks
-in `main.tf` adopt them, and the R2 buckets, on the first apply (D-250): set `import_existing_pages`,
+in `main.tf` adopt them, and the R2 buckets, on the first apply (D-257): set `import_existing_pages`,
 `import_r2_buckets`, `import_turnstile_sitekey` and `import_dns_record_ids` for that apply only. The
 `api` record waits for `api_origin_hostname` (after prod's second apply). `scripts/deploy/pages.sh` and `.github/workflows/deploy.yml` deploy the
 sites; `pages.env` holds the public build settings.

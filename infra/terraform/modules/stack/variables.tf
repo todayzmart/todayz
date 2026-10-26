@@ -188,7 +188,7 @@ variable "sms_notice_template_ids" {
   description = "name=id pairs for the notice SMS templates, e.g. tz_order_unseen=<id>,tz_order_unseen_hi=<id>."
 }
 
-# ---- First deploy and releases (D-247) -----------------------------------------------
+# ---- First deploy and releases (D-254) -----------------------------------------------
 
 variable "app_environments_enabled" {
   type        = bool

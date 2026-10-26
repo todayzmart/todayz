@@ -17,7 +17,7 @@ data "aws_caller_identity" "current" {}
 
 locals {
   name = "todayz-${var.environment}"
-  # Two-phase first apply (D-247): the Beanstalk environments, and everything that reads them,
+  # Two-phase first apply (D-254): the Beanstalk environments, and everything that reads them,
   # wait until the certificate is validated, the secrets have values and a release exists.
   envs = var.app_environments_enabled ? 1 : 0
 }
@@ -264,7 +264,7 @@ resource "aws_elastic_beanstalk_application" "this" {
 
 locals {
   # Only secrets that have a value are injected: Beanstalk fails a deploy on a secret with no
-  # version. The app keys and DATABASE_URL always; a provider key once it is set (D-249).
+  # version. The app keys and DATABASE_URL always; a provider key once it is set (D-256).
   # DATABASE_MIGRATE_URL goes only to the ops migrate task (ops.tf).
   injected_secret_arns = {
     for n in concat(module.secrets.app_key_names, ["DATABASE_URL"], var.provider_secret_names) :

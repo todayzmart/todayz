@@ -196,7 +196,7 @@ resource "aws_s3_bucket_policy" "alb_logs" {
 # DNS validation. The validation CNAME lives in Cloudflare (infra/cloudflare): the first prod
 # apply creates the certificate with wait_for_validation = false, infra/cloudflare creates the
 # record from the certificate_validation_records output, and the second apply waits for it
-# (docs/qa/deploy-prep/RUNBOOK.md, D-247).
+# (docs/qa/deploy-prep/RUNBOOK.md, D-254).
 
 resource "aws_acm_certificate" "api" {
   domain_name       = var.api_hostname

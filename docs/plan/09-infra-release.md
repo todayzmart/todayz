@@ -87,7 +87,7 @@ Observability: OTel → Grafana Cloud (metrics/logs/traces) · Sentry · CloudWa
 - The founder provides IAM access keys for Wave 5 only. They go in `.env.cloud.local` (D-210) as `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_REGION`, and are never printed (`make env-check` shows names only).
 - Only Terraform and the lead's shell see them. The running app never does: it uses instance profiles. `infra/local/proc.sh` strips every `AWS_*` variable from app processes (W0-03b), and `internal/ops` builds an AWS client only when `APP_ENV` is `staging` or `prod`, with an explicit EC2 instance-role (IMDS) credential provider and never the SDK's default chain (§3.6, 02 §10).
 - The first Terraform resource is an AWS Budgets alarm (§6).
-- CI deploys use GitHub OIDC: `deploy-backend.yml`'s deploy job assumes `todayz-prod-github-deploy`, whose trust is `repo:todayzmart/todayz:environment:production` (D-247, the W0-06 checklist in §4). The account is 061292478202, and every provider refuses any other (D-248).
+- CI deploys use GitHub OIDC: `deploy-backend.yml`'s deploy job assumes `todayz-prod-github-deploy`, whose trust is `repo:todayzmart/todayz:environment:production` (D-254, the W0-06 checklist in §4). The account is 061292478202, and every provider refuses any other (D-255).
 
 ### 3.2 Compute (Elastic Beanstalk, Docker on Amazon Linux 2023, Graviton)
 
@@ -99,9 +99,9 @@ Observability: OTel → Grafana Cloud (metrics/logs/traces) · Sentry · CloudWa
 | Health check | `/readyz` on the app port | `/readyz` on the internal port 8181 (Wave 5 decides how the environment's health check reaches it) |
 
 - Enhanced health reporting, an instance profile with least privilege, logs to CloudWatch, plus the OTel exporter.
-- Migrations run as a separate step (`todayz migrate up`, an ECS Fargate ops task connecting as `todayz_owner`, D-247) before the new version deploys. They must be backward compatible with the previous app version: expand, migrate, contract.
+- Migrations run as a separate step (`todayz migrate up`, an ECS Fargate ops task connecting as `todayz_owner`, D-254) before the new version deploys. They must be backward compatible with the previous app version: expand, migrate, contract.
 - The worker serves `/healthz`, `/readyz` and `/version` on its internal port 8181.
-- **Release mechanics (D-247).** One image runs api, worker and migrate. The Beanstalk bundle is a compose file with host networking and no nginx (`ProxyServer none`). `scripts/deploy/beanstalk.sh` builds, pushes, migrates, creates the application versions and deploys the worker, then the api. Terraform creates the environments once (two applies on the first deploy) and ignores the version label afterwards.
+- **Release mechanics (D-254).** One image runs api, worker and migrate. The Beanstalk bundle is a compose file with host networking and no nginx (`ProxyServer none`). `scripts/deploy/beanstalk.sh` builds, pushes, migrates, creates the application versions and deploys the worker, then the api. Terraform creates the environments once (two applies on the first deploy) and ignores the version label afterwards.
 
 ### 3.3 Load balancer
 
@@ -156,7 +156,7 @@ Target group health check (`/readyz`): interval 5 s, timeout 4 s, unhealthy thre
 - A Terraform or `infra` check asserts the deregistration delay, both stop timeouts and the target group health check of §3.3 (SC-GS-10).
 - The worker's stop timeout has to hold on the host too: W5-04 checks the stop timeout of the Docker unit on the worker instance. If it is under 180 s, set it, or add an Auto Scaling termination lifecycle hook that keeps a scaling-in instance alive until the drain ends.
 
-### 3.8 Estimated monthly cost (D-251; to be re-checked with the AWS Pricing Calculator and the first bill)
+### 3.8 Estimated monthly cost (D-258; to be re-checked with the AWS Pricing Calculator and the first bill)
 
 Bottom-up from ap-south-1 list prices; the per-resource table is in `docs/qa/deploy-prep/RUNBOOK.md` §6. It replaces the earlier ₹13–17k, which left out the interface endpoints, public IPv4, Secrets Manager, logs and the DR copy.
 
@@ -235,7 +235,7 @@ GitHub Actions workflows are written in Wave 0 (W0-06) to mirror these. They wil
 12. smoke test;
 13. CI on.
 
-The founder's yes on the prod plan summary comes before step 4 (D-247).
+The founder's yes on the prod plan summary comes before step 4 (D-254).
 
 1. The user adds credentials to env (names listed in `.env.example` under "Cloud"). The lead runs `make env-check` and confirms only `set`/`missing`.
 2. The first Terraform resource is the AWS Budgets alarm (§6). Then the first `terraform plan` ever run, for staging; the user reviews the plan summary (resources and estimated cost) and says yes.
@@ -268,7 +268,7 @@ The founder's yes on the prod plan summary comes before step 4 (D-247).
 
 ## 7. Rollback
 
-- App: `scripts/deploy/beanstalk.sh deploy <older tag>` moves the worker, then the api, back to that release's application versions (D-247). Pages rolls back to the previous deployment.
+- App: `scripts/deploy/beanstalk.sh deploy <older tag>` moves the worker, then the api, back to that release's application versions (D-254). Pages rolls back to the previous deployment.
 - DB: forward-only migrations designed expand/contract, so the previous app version works against the new schema. Destructive changes need a separate later migration. Data repair uses PITR to a side instance and copies back only the affected rows.
 - Feature flags in `platform_settings` turn off risky features without a deploy (D-25):
   - `feature_delivery_enabled`, `feature_bill_qr_enabled`, `feature_voice_enabled`, `feature_offers_enabled`, `feature_banners_enabled`

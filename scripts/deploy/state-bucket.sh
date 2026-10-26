@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Create the Terraform state bucket (D-248): the one AWS resource made outside Terraform, because
+# Create the Terraform state bucket (D-255): the one AWS resource made outside Terraform, because
 # every root keeps its state in it. Idempotent; the lead runs it once with .env.cloud.local
 # loaded, before the first `terraform init`. All three roots (envs/account, envs/prod,
 # infra/cloudflare) use it with the S3 native lockfile, so there is no DynamoDB table.

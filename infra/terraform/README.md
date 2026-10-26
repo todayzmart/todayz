@@ -1,7 +1,7 @@
 # infra/terraform
 
 AWS for TodayZ, the D-96 shape (09 section 3), account **061292478202** (every provider has
-`allowed_account_ids`, D-248). **Nothing here has been planned or applied yet.** CI and worker sessions
+`allowed_account_ids`, D-255). **Nothing here has been planned or applied yet.** CI and worker sessions
 run only `terraform fmt -check`, `terraform validate` (after `init -backend=false`), tflint and checkov
 (`make check`, `make security`), plus the offline policy checks in `checks/`. Plan and apply are the
 lead's, through `TODAYZ_WAVE5=1 scripts/ci/terraform.sh`, following
@@ -43,7 +43,7 @@ checks/        offline checks and their tests (python3, standard library)
 
 ## State
 
-One S3 bucket, `todayz-tfstate-061292478202`, made by `scripts/deploy/state-bucket.sh` (D-248). The
+One S3 bucket, `todayz-tfstate-061292478202`, made by `scripts/deploy/state-bucket.sh` (D-255). The
 roots declare `backend "s3" {}` and take bucket, key (`account/`, `prod/`,
 `cloudflare/terraform.tfstate`), region and `use_lockfile=true` through `-backend-config` at init
 (the S3 native lockfile, no DynamoDB). `init -backend=false` for the static checks is unchanged.
@@ -51,7 +51,7 @@ roots declare `backend "s3" {}` and take bucket, key (`account/`, `prod/`,
 ## First deploy (for the lead)
 
 `docs/qa/deploy-prep/RUNBOOK.md` has every step, every variable and where its value comes from, the
-founder's inputs, the cost and rollback. In short (D-247):
+founder's inputs, the cost and rollback. In short (D-254):
 
 1. state bucket;
 2. `envs/account`;

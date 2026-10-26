@@ -1,5 +1,5 @@
 # Deploy the API and the worker to Elastic Beanstalk on a push to main that touches the backend
-# (D-210, D-247). Off until the repository variable BACKEND_DEPLOY_ENABLED is "true", which the
+# (D-210, D-254). Off until the repository variable BACKEND_DEPLOY_ENABLED is "true", which the
 # lead sets after the first release went out by hand (docs/qa/deploy-prep/RUNBOOK.md).
 #
 # Two jobs, like deploy.yml: `build` (no AWS access) generates the code and builds the arm64

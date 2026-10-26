@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build and release the backend to Elastic Beanstalk (D-247). One image, `todayz`, runs the api,
+# Build and release the backend to Elastic Beanstalk (D-254). One image, `todayz`, runs the api,
 # the worker and the migrate task. A release is: the image in ECR (immutable tag), a migrate
 # task on that image, and two application versions <tag>-api and <tag>-worker whose bundle is a
 # small docker-compose file. Terraform creates the environments once; every release after that

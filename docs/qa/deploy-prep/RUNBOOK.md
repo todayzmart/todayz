@@ -8,7 +8,7 @@ Nothing in this branch has been planned or applied. It was checked offline only:
 - wflint;
 - shellcheck.
 
-Decisions: D-247 (two applies, the release pipeline), D-248 (state, account pin), D-249 (secrets), D-250 (Cloudflare imports), D-251 (cost).
+Decisions: D-254 (two applies, the release pipeline), D-255 (state, account pin), D-256 (secrets), D-257 (Cloudflare imports), D-258 (cost).
 
 | | |
 |---|---|
@@ -49,7 +49,7 @@ Values go into `.env.cloud.local` by name and are never pasted in chat. Items ma
 
 | # | What | Where it goes | Blocking? |
 |---|---|---|---|
-| F1 | **Billing currency.** INR if the account is AWS India (AISPL, Indian card); USD otherwise | `TF_VAR_budget_limit_unit` = `INR` with amount `30000`, or `USD` with `350` (09 §6, D-251) | yes |
+| F1 | **Billing currency.** INR if the account is AWS India (AISPL, Indian card); USD otherwise | `TF_VAR_budget_limit_unit` = `INR` with amount `30000`, or `USD` with `350` (09 §6, D-258) | yes |
 | F2 | **Budget and alarm emails**, then click "Confirm subscription" in both AWS mails (Budgets, and SNS `todayz-prod-alarms`) | `BUDGET_ALERT_EMAIL`; alarms use the same address unless `ALARM_EMAIL` is added | yes |
 | F3 | **Yes on the prod plan summary** (resources, the cost in §6, the domain cut-over) | chat | yes |
 | F4 | **GitHub `production` environment** with the founder as required reviewer. The lead can create it with `GH_TOKEN`; the founder picks the reviewers | GitHub settings | before step 13 |
@@ -71,10 +71,10 @@ Values go into `.env.cloud.local` by name and are never pasted in chat. Items ma
 | prod | `ecr_repository_arn`, `ecr_repository_url` | `envs/account` outputs (step 2) |
 | prod | `github_oidc_provider_arn` | `envs/account` output `github_oidc_provider_arn` |
 | prod | `initial_image_tag` | `cat .cache/backend/tag` (step 3) |
-| prod | `app_environments_enabled` | `false` on apply #1, `true` from apply #2 on (D-247) |
+| prod | `app_environments_enabled` | `false` on apply #1, `true` from apply #2 on (D-254) |
 | prod | `alarm_email` | `$BUDGET_ALERT_EMAIL` or `$ALARM_EMAIL` (F2) |
 | prod | `sms_sender_id`, `sms_dlt_entity_id`, `sms_otp_template_id`, `sms_notice_template_ids` | `SMS_*` (F5). They can be empty at first: the app starts, and only SMS sends fail |
-| prod | `provider_secret_names` | JSON list of the provider secrets `secrets.sh status` shows as set, e.g. `'["TURNSTILE_SECRET_KEY","SENTRY_DSN"]'` (D-249) |
+| prod | `provider_secret_names` | JSON list of the provider secrets `secrets.sh status` shows as set, e.g. `'["TURNSTILE_SECRET_KEY","SENTRY_DSN"]'` (D-256) |
 | prod | `r2_account_id` | `$CLOUDFLARE_ACCOUNT_ID` (R2 lives in the same account) |
 | prod | `otel_exporter_otlp_endpoint` | `$OTEL_EXPORTER_OTLP_ENDPOINT` (F9) |
 | prod | `turnstile_site_key` | default `0x4AAAAAAFj6Q6j9e1vnXIkj` (the hand-made `todayz-prod` widget, D-214) |
@@ -120,9 +120,9 @@ Each `plan` is reviewed before its `apply`. For prod, the summary goes to the fo
    $TF -chdir=infra/cloudflare apply ../../.cache/deploy/cf-1.plan
    ```
    - The plan must show **imports** for the Pages projects, domains, records, R2 buckets and Turnstile, not creates or replaces.
-   - The one expected replacement is the apex A record, which becomes the flattened Pages CNAME (D-250).
+   - The one expected replacement is the apex A record, which becomes the flattened Pages CNAME (D-257).
    - Unset the `import_*` variables afterwards; the import blocks are no-ops once the resources are in state.
-6. **Secrets** (D-249). The scripts print names only.
+6. **Secrets** (D-256). The scripts print names only.
    ```bash
    scripts/deploy/secrets.sh app-keys
    scripts/deploy/secrets.sh database
@@ -171,7 +171,7 @@ Later releases are CI, or by hand: `build`, `push`, `migrate`, `release`, then `
   - before step 10, nothing serves traffic; fix the cause and re-run that step;
   - if apply #2 fails on an environment, read its events (`aws elasticbeanstalk describe-events`), fix it, and apply again; the release is not rebuilt.
 
-## 6. Monthly cost, prod (D-251)
+## 6. Monthly cost, prod (D-258)
 
 Estimated from the ap-south-1 list prices at 730 hours a month, in USD, before GST. Re-check with the AWS Pricing Calculator; the first month's bill is the real number.
 
@@ -197,7 +197,7 @@ Usage-billed and not in the total:
 - Anthropic and Sarvam;
 - Cloudflare (Free or Pro), Grafana Cloud and Sentry (free tiers at first).
 
-The brief expected $220–250. The gap is mostly the interface endpoints ($48), which 09 §3.5 chose. Dropping them saves about $45 net, but whether to do so is the founder's call (D-251). Staging is not deployed (D-210).
+The brief expected $220–250. The gap is mostly the interface endpoints ($48), which 09 §3.5 chose. Dropping them saves about $45 net, but whether to do so is the founder's call (D-258). Staging is not deployed (D-210).
 
 ## 7. Known gaps (not blocking the first deploy)
 

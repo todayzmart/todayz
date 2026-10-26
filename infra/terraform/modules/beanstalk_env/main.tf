@@ -185,7 +185,7 @@ locals {
     { ns = "aws:elasticbeanstalk:cloudwatch:logs", name = "RetentionInDays", value = tostring(var.log_retention_days) },
     { ns = "aws:elasticbeanstalk:application:environment", name = "PORT", value = tostring(var.app_port) },
     # No nginx: the container runs with network_mode host and the ALB reaches app_port directly
-    # (D-247; the compose bundle is written by scripts/deploy/beanstalk.sh release).
+    # (D-254; the compose bundle is written by scripts/deploy/beanstalk.sh release).
     { ns = "aws:elasticbeanstalk:environment:proxy", name = "ProxyServer", value = "none" },
   ]
 
@@ -273,7 +273,7 @@ resource "aws_elastic_beanstalk_environment" "this" {
 
   tags = { Role = var.role }
 
-  # Every deploy after the first is scripts/deploy/beanstalk.sh deploy (D-247).
+  # Every deploy after the first is scripts/deploy/beanstalk.sh deploy (D-254).
   lifecycle {
     ignore_changes = [version_label]
   }

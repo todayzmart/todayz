@@ -1,5 +1,5 @@
 #!/bin/sh
-# Prod database bootstrap (D-247): the deployed twin of infra/local/postgres/init.sql. Runs once
+# Prod database bootstrap (D-254): the deployed twin of infra/local/postgres/init.sql. Runs once
 # (and again harmlessly) as the RDS master user in the ops db-bootstrap task, which ECS starts
 # with these variables from Secrets Manager: PGUSER and PGPASSWORD (the RDS-managed master
 # secret), DATABASE_URL (todayz_app) and DATABASE_MIGRATE_URL (todayz_owner). The role

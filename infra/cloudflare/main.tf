@@ -9,7 +9,7 @@
 # encrypted (scripts/deploy/state-bucket.sh).
 #
 # The Pages projects, their domains, DNS records and the Turnstile widget were made by hand at
-# go-live (D-214); the import blocks below adopt them on the first apply (D-250, RUNBOOK).
+# go-live (D-214); the import blocks below adopt them on the first apply (D-257, RUNBOOK).
 
 terraform {
   required_version = ">= 1.9"
@@ -58,7 +58,7 @@ variable "api_origin_hostname" {
   description = "ALB / Beanstalk endpoint from the AWS stack output api_origin_hostname. Empty (the first apply, before the api environment exists): no api. record."
 }
 
-# ---- Adopting the hand-made resources (D-214, D-250) ------------------------------------
+# ---- Adopting the hand-made resources (D-214, D-257) ------------------------------------
 # Set these for the first apply only; once the state has the resources the import blocks are
 # no-ops and the variables can go back to their defaults.
 

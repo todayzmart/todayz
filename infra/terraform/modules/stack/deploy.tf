@@ -1,4 +1,4 @@
-# Releases (D-247): the S3 bucket that holds the Beanstalk source bundles, and the role the
+# Releases (D-254): the S3 bucket that holds the Beanstalk source bundles, and the role the
 # GitHub deploy workflow assumes through OIDC. A release is an image in ECR plus a small
 # docker-compose bundle here; scripts/deploy/beanstalk.sh writes both.
 

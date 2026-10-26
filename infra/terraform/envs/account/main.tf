@@ -1,4 +1,4 @@
-# Account-level resources, applied first (09 §5, D-248): the AWS Budgets alarm, the shared ECR
+# Account-level resources, applied first (09 §5, D-255): the AWS Budgets alarm, the shared ECR
 # repository and the GitHub OIDC provider (one per account). Only the lead applies, with the
 # credentials in .env.cloud.local; the first apply waits for the founder's yes (D-210).
 #
@@ -37,7 +37,7 @@ variable "region" {
 variable "aws_account_id" {
   type        = string
   default     = "061292478202"
-  description = "The TodayZ AWS account (D-248). The provider refuses credentials for any other account."
+  description = "The TodayZ AWS account (D-255). The provider refuses credentials for any other account."
 }
 
 variable "budget_alert_emails" {
@@ -98,7 +98,7 @@ output "ecr_repository_arn" {
   value = module.ecr.repository_arn
 }
 
-# GitHub Actions OIDC (D-247): lets the deploy workflow assume envs/prod's deploy role without a
+# GitHub Actions OIDC (D-254): lets the deploy workflow assume envs/prod's deploy role without a
 # stored AWS key. One provider per account; the role's trust policy narrows it to the repository
 # and its production environment.
 resource "aws_iam_openid_connect_provider" "github" {

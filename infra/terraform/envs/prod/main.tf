@@ -1,6 +1,6 @@
 # Production: the D-96 shape, the only cloud environment (D-210: merges to main deploy here).
 # Only the lead plans and applies, with .env.cloud.local; the first apply waits for the
-# founder's yes on the plan summary. The first deploy is two applies (D-247):
+# founder's yes on the plan summary. The first deploy is two applies (D-254):
 # app_environments_enabled=false, then true once the certificate, secrets, database and first
 # release exist. Steps: docs/qa/deploy-prep/RUNBOOK.md.
 #
@@ -53,7 +53,7 @@ variable "dr_region" {
 variable "aws_account_id" {
   type        = string
   default     = "061292478202"
-  description = "The TodayZ AWS account (D-248). The providers refuse credentials for any other account."
+  description = "The TodayZ AWS account (D-255). The providers refuse credentials for any other account."
 }
 
 variable "api_hostname" {
@@ -97,7 +97,7 @@ variable "sms_notice_template_ids" {
   default = ""
 }
 
-# ---- First deploy and releases (D-247) ----------------------------------------------
+# ---- First deploy and releases (D-254) ----------------------------------------------
 
 variable "app_environments_enabled" {
   type        = bool

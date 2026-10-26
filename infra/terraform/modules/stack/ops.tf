@@ -1,4 +1,4 @@
-# One-off ops tasks on ECS Fargate (D-247): the database bootstrap and `todayz migrate up`. They
+# One-off ops tasks on ECS Fargate (D-254): the database bootstrap and `todayz migrate up`. They
 # run inside the VPC with the app security group (the database lets it in), so nobody needs a
 # bastion or a public database. scripts/deploy/beanstalk.sh starts them and waits for the exit
 # code; the cluster costs nothing while no task runs.
