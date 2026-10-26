@@ -398,5 +398,15 @@
     "message": "ಸೈನ್ ಔಟ್",
     "review": "reviewed",
     "enHash": "dc1649a1"
+  },
+  "account.name.edit": {
+    "message": "ಹೆಸರು ಬದಲಿಸಿ",
+    "review": "machine",
+    "enHash": "d3aafd85"
+  },
+  "account.name.cancel": {
+    "message": "ರದ್ದುಮಾಡಿ",
+    "review": "machine",
+    "enHash": "77dfd213"
   }
 }

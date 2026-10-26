@@ -398,5 +398,15 @@
     "message": "సైన్ అవుట్",
     "review": "reviewed",
     "enHash": "dc1649a1"
+  },
+  "account.name.edit": {
+    "message": "పేరు మార్చండి",
+    "review": "machine",
+    "enHash": "d3aafd85"
+  },
+  "account.name.cancel": {
+    "message": "రద్దు చేయండి",
+    "review": "machine",
+    "enHash": "77dfd213"
   }
 }

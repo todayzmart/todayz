@@ -398,5 +398,15 @@
     "message": "சைன் அவுட்",
     "review": "reviewed",
     "enHash": "dc1649a1"
+  },
+  "account.name.edit": {
+    "message": "பெயரைத் திருத்து",
+    "review": "machine",
+    "enHash": "d3aafd85"
+  },
+  "account.name.cancel": {
+    "message": "ரத்துசெய்",
+    "review": "machine",
+    "enHash": "77dfd213"
   }
 }

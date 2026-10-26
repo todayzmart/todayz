@@ -78,5 +78,10 @@
     "message": "హోమ్‌కి వెళ్లండి",
     "review": "reviewed",
     "enHash": "f36ae945"
+  },
+  "shell.nav.baskets": {
+    "message": "బాస్కెట్‌లు",
+    "review": "machine",
+    "enHash": "d368818f"
   }
 }

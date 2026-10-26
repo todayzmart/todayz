@@ -134,7 +134,7 @@ describe('Account', () => {
     expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/sign-in?next=%2Faccount');
   });
 
-  it('shows the profile, saves a name with If-Match, and reloads on a 412', async () => {
+  it('edits the name behind the pencil, saves with If-Match, and reloads on a 412', async () => {
     let conflict = true;
     const { calls } = renderAt('/account', {
       returning: true,
@@ -151,6 +151,9 @@ describe('Account', () => {
       ],
     });
     expect(await screen.findByText('90•••••011')).toBeInTheDocument();
+    // D-250: the name field shows only after the pencil.
+    expect(screen.queryByLabelText('Name')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Edit name' }));
     const name = screen.getByLabelText('Name');
     fireEvent.change(name, { target: { value: 'Asha' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
@@ -158,6 +161,7 @@ describe('Account', () => {
     fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Asha' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
     expect(await screen.findByText('Saved')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Name')).not.toBeInTheDocument();
     expect(calls.filter((c) => c.method === 'PATCH')).toHaveLength(2);
   });
 

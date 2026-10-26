@@ -16,12 +16,12 @@ describe('customer shell', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Everything nearby, today.' })).toBeInTheDocument();
     const nav = screen.getByRole('navigation', { name: 'Main' });
     const links = within(nav).getAllByRole('link');
-    expect(links.map((l) => l.textContent)).toEqual(['Home', 'Search', 'Orders', 'Wallet', 'Account']);
+    expect(links.map((l) => l.textContent)).toEqual(['Home', 'Search', 'Orders', 'Wallet', 'Baskets']);
     expect(within(nav).getByRole('link', { name: 'Home' })).toHaveAttribute('aria-current', 'page');
     expect(within(nav).getByRole('link', { name: 'Search' })).not.toHaveAttribute('aria-current');
   });
 
-  it.each(NAV.filter((n) => n.section !== '' && n.section !== 'account' && n.section !== 'search' && n.section !== 'orders'))('shows the placeholder for /$section', async ({ section }) => {
+  it.each(NAV.filter((n) => n.section !== '' && n.section !== 'baskets' && n.section !== 'search' && n.section !== 'orders'))('shows the placeholder for /$section', async ({ section }) => {
     renderAt(`/${section}`);
     const nav = await screen.findByRole('navigation', { name: 'Main' });
     const active = within(nav).getAllByRole('link').find((l) => l.getAttribute('aria-current') === 'page');

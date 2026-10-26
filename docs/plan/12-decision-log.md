@@ -1482,3 +1482,8 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
   The unused keys `account.phone` and `account.change` are removed.
 - **Next.** The other customer screens follow one at a time. Screenshots come from `customer/e2e/bright.shots.spec.ts`.
 - **Baselines.** The customer visual baselines in `e2e/visual/` will differ. They are refreshed only after the founder's yes.
+
+**D-250 · Baskets takes the last bottom-nav tab, and the name on Account is edited behind a pencil (founder, 26 Oct, on the live `/account`: "keep baskets in last tab, as on click on home screen profile icon and remove save button (instead keep edit icon and then this current UI)").**
+- **Nav.** The tabs are Home, Search, Orders, Wallet, Baskets. Account opens from the avatar in the Home header, so the Baskets row on Account goes.
+- **Name.** Account shows the name and phone with a pencil ("Edit name"). The pencil opens the name field with Cancel and Save. A saved name closes the field and shows "Saved". A 412 keeps the field open with the reloaded name and the conflict message.
+- **Profile photo.** Asked for in the same message; built in its own session.

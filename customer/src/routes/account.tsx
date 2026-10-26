@@ -4,8 +4,8 @@ import { SessionPending, useSession, useSessionState } from '@todayz/auth';
 import { NATIVE_NAMES, isLocale } from '@todayz/i18n';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, createFileRoute } from '@tanstack/react-router';
-import { Button, Skeleton, TextField } from '@todayz/ui';
-import { ChevronRight, Languages, LifeBuoy, LogOut, MapPin, ShoppingBasket, UserRound, type LucideIcon } from 'lucide-react';
+import { Button, IconButton, Skeleton, TextField } from '@todayz/ui';
+import { ChevronRight, Languages, LifeBuoy, LogOut, MapPin, Pencil, UserRound, type LucideIcon } from 'lucide-react';
 import { useState, type FormEvent, type ReactNode } from 'react';
 import { useIntl } from 'react-intl';
 import { patchMe } from '../app/me';
@@ -60,6 +60,7 @@ function SignedIn() {
   const intl = useIntl();
   // Kept here, not in Profile: a 412 reloads the account, which remounts Profile with the fresh name.
   const [note, setNote] = useState<Note>(null);
+  const [editing, setEditing] = useState(false);
   const query = useQuery({ queryKey: ['me'], queryFn: () => getMe() });
 
   return (
@@ -76,14 +77,23 @@ function SignedIn() {
           <Button onClick={() => void query.refetch()}>{intl.formatMessage({ id: 'account.retry' })}</Button>
         </div>
       )}
-      {query.data && <Profile key={query.dataUpdatedAt} me={query.data} note={note} setNote={setNote} />}
+      {query.data && <Profile key={query.dataUpdatedAt} me={query.data} note={note} setNote={setNote} editing={editing} setEditing={setEditing} />}
     </div>
   );
 }
 
 type Me = Awaited<ReturnType<typeof getMe>>;
 
-function Profile({ me, note, setNote }: { me: Me; note: Note; setNote: (n: Note) => void }) {
+interface ProfileProps {
+  me: Me;
+  note: Note;
+  setNote: (n: Note) => void;
+  /** The name field shows only after the pencil (D-250). */
+  editing: boolean;
+  setEditing: (on: boolean) => void;
+}
+
+function Profile({ me, note, setNote, editing, setEditing }: ProfileProps) {
   const intl = useIntl();
   const session = useSession();
   const client = useQueryClient();
@@ -99,6 +109,7 @@ function Profile({ me, note, setNote }: { me: Me; note: Note; setNote: (n: Note)
     try {
       const next = await patchMe(session, { name: trimmed === '' ? null : trimmed });
       client.setQueryData(['me'], next);
+      setEditing(false);
       setNote('saved');
     } catch (err) {
       // 412: the account changed elsewhere. Reload it (which also refreshes the ETag) and ask again.
@@ -142,30 +153,59 @@ function Profile({ me, note, setNote }: { me: Me; note: Note; setNote: (n: Note)
             </h2>
             {me.name && <p className="tz-card-desc">{me.phoneMasked}</p>}
           </div>
+          {!editing && (
+            <IconButton
+              icon={Pencil}
+              label={intl.formatMessage({ id: 'account.name.edit' })}
+              onClick={() => {
+                setNote(null);
+                setEditing(true);
+              }}
+            />
+          )}
         </div>
-        <form className={styles.stack} onSubmit={(e) => void save(e)}>
-          <TextField
-            label={intl.formatMessage({ id: 'account.name.label' })}
-            value={name}
-            maxLength={80}
-            autoComplete="name"
-            onChange={(e) => {
-              setName(e.target.value);
-              setNote(null);
-            }}
-            error={
-              note === 'conflict'
-                ? intl.formatMessage({ id: 'account.name.conflict' })
-                : note === 'error'
-                  ? intl.formatMessage({ id: 'account.name.error' })
-                  : undefined
-            }
-          />
-          <Button type="submit" variant="primary" loading={saving}>
-            {intl.formatMessage({ id: 'account.name.save' })}
-          </Button>
-          {note === 'saved' && <p role="status">{intl.formatMessage({ id: 'account.name.saved' })}</p>}
-        </form>
+        {editing ? (
+          <form className={`${styles.stack} ${a.edit}`} onSubmit={(e) => void save(e)}>
+            <TextField
+              label={intl.formatMessage({ id: 'account.name.label' })}
+              value={name}
+              maxLength={80}
+              autoComplete="name"
+              onChange={(e) => {
+                setName(e.target.value);
+                setNote(null);
+              }}
+              error={
+                note === 'conflict'
+                  ? intl.formatMessage({ id: 'account.name.conflict' })
+                  : note === 'error'
+                    ? intl.formatMessage({ id: 'account.name.error' })
+                    : undefined
+              }
+            />
+            <div className={a.editActions}>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setName(me.name ?? '');
+                  setNote(null);
+                  setEditing(false);
+                }}
+              >
+                {intl.formatMessage({ id: 'account.name.cancel' })}
+              </Button>
+              <Button type="submit" variant="primary" loading={saving}>
+                {intl.formatMessage({ id: 'account.name.save' })}
+              </Button>
+            </div>
+          </form>
+        ) : (
+          note === 'saved' && (
+            <p role="status" className={a.saved}>
+              {intl.formatMessage({ id: 'account.name.saved' })}
+            </p>
+          )
+        )}
       </section>
 
       <ul className="tz-list">
@@ -184,17 +224,6 @@ function Profile({ me, note, setNote }: { me: Me; note: Note; setNote: (n: Note)
       </ul>
 
       <ul className="tz-list">
-        <li>
-          <Link to="/baskets" className="tz-list-row">
-            <RowText
-              icon={ShoppingBasket}
-              tint="peach"
-              label={intl.formatMessage({ id: 'basket.entry' })}
-              value={intl.formatMessage({ id: 'basket.entry.body' })}
-            />
-            <Icon icon={ChevronRight} />
-          </Link>
-        </li>
         <li>
           <Link to="/help" className="tz-list-row">
             <RowText

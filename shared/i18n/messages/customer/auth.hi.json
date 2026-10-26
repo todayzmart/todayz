@@ -398,5 +398,15 @@
     "message": "साइन आउट करें",
     "review": "reviewed",
     "enHash": "dc1649a1"
+  },
+  "account.name.edit": {
+    "message": "नाम बदलें",
+    "review": "machine",
+    "enHash": "d3aafd85"
+  },
+  "account.name.cancel": {
+    "message": "रद्द करें",
+    "review": "machine",
+    "enHash": "77dfd213"
   }
 }

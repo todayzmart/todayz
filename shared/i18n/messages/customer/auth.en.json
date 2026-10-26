@@ -291,6 +291,14 @@
     "defaultMessage": "Name",
     "description": "Label of the name field"
   },
+  "account.name.edit": {
+    "defaultMessage": "Edit name",
+    "description": "Account: pencil button next to the name; opens the name field"
+  },
+  "account.name.cancel": {
+    "defaultMessage": "Cancel",
+    "description": "Account: closes the name field without saving"
+  },
   "account.name.save": {
     "defaultMessage": "Save",
     "description": "Saves the name"
