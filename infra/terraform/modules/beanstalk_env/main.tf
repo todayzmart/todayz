@@ -152,6 +152,12 @@ variable "secret_arns" {
   description = "Env var name to Secrets Manager ARN, injected by Beanstalk at deploy."
 }
 
+variable "version_label" {
+  type        = string
+  default     = null
+  description = "Application version the environment is created with (scripts/deploy/beanstalk.sh release). Later deploys change it outside Terraform, so changes are ignored."
+}
+
 variable "log_retention_days" {
   type    = number
   default = 30
@@ -178,6 +184,9 @@ locals {
     { ns = "aws:elasticbeanstalk:cloudwatch:logs", name = "DeleteOnTerminate", value = "false" },
     { ns = "aws:elasticbeanstalk:cloudwatch:logs", name = "RetentionInDays", value = tostring(var.log_retention_days) },
     { ns = "aws:elasticbeanstalk:application:environment", name = "PORT", value = tostring(var.app_port) },
+    # No nginx: the container runs with network_mode host and the ALB reaches app_port directly
+    # (D-247; the compose bundle is written by scripts/deploy/beanstalk.sh release).
+    { ns = "aws:elasticbeanstalk:environment:proxy", name = "ProxyServer", value = "none" },
   ]
 
   api_only = [
@@ -224,6 +233,7 @@ resource "aws_elastic_beanstalk_environment" "this" {
   application         = var.application_name
   solution_stack_name = var.solution_stack_name
   tier                = local.is_api ? "WebServer" : "Worker"
+  version_label       = var.version_label
 
   # Written as static blocks (not through the dynamic list below) so static analysis sees them.
   setting {
@@ -262,6 +272,11 @@ resource "aws_elastic_beanstalk_environment" "this" {
   }
 
   tags = { Role = var.role }
+
+  # Every deploy after the first is scripts/deploy/beanstalk.sh deploy (D-247).
+  lifecycle {
+    ignore_changes = [version_label]
+  }
 }
 
 output "environment_name" {

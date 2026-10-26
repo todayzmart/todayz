@@ -187,3 +187,55 @@ variable "sms_notice_template_ids" {
   default     = ""
   description = "name=id pairs for the notice SMS templates, e.g. tz_order_unseen=<id>,tz_order_unseen_hi=<id>."
 }
+
+# ---- First deploy and releases (D-247) -----------------------------------------------
+
+variable "app_environments_enabled" {
+  type        = bool
+  default     = true
+  description = "false on the first apply only: everything but the Beanstalk environments (and the scaling, alarms and certificate wait that read them). See docs/qa/deploy-prep/RUNBOOK.md."
+}
+
+variable "initial_image_tag" {
+  type        = string
+  default     = ""
+  description = "Image tag of the first release; the environments are created on application versions <tag>-api and <tag>-worker (scripts/deploy/beanstalk.sh release). Later deploys go through the script, not Terraform."
+}
+
+variable "provider_secret_names" {
+  type        = list(string)
+  default     = []
+  description = "Provider keys that have a value in Secrets Manager and are injected into both environments. Add a name only after `scripts/deploy/secrets.sh put NAME`."
+
+  validation {
+    condition = alltrue([for n in var.provider_secret_names : contains([
+      "ANTHROPIC_API_KEY", "SARVAM_API_KEY", "TURNSTILE_SECRET_KEY", "R2_ACCESS_KEY_ID",
+      "R2_SECRET_ACCESS_KEY", "SENTRY_DSN", "VAPID_PRIVATE_KEY", "WHATSAPP_API_KEY",
+      "OTEL_EXPORTER_OTLP_HEADERS", "GEOCODER_API_KEY",
+    ], n)])
+    error_message = "provider_secret_names holds only provider key names from modules/secrets (not the app keys or the database URLs)."
+  }
+}
+
+variable "extra_properties" {
+  type        = map(string)
+  default     = {}
+  description = "Non-secret environment properties for both processes (R2_*, TURNSTILE_SITE_KEY, VAPID_PUBLIC_KEY, OTEL_EXPORTER_OTLP_ENDPOINT, ...). Empty values are left out."
+}
+
+variable "github_oidc_provider_arn" {
+  type        = string
+  default     = ""
+  description = "envs/account output github_oidc_provider_arn. Empty: no GitHub deploy role."
+}
+
+variable "github_repository" {
+  type        = string
+  default     = "todayzmart/todayz"
+  description = "owner/name of the repository whose production environment may assume the deploy role."
+}
+
+variable "ops_log_retention_days" {
+  type    = number
+  default = 30
+}

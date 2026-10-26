@@ -33,6 +33,12 @@ variable "api_hostname" {
   description = "Public API host, for example api.todayz.in."
 }
 
+variable "wait_for_validation" {
+  type        = bool
+  default     = true
+  description = "Wait for the certificate's DNS validation (false on the first apply, before Cloudflare has the record)."
+}
+
 variable "log_retention_days" {
   type    = number
   default = 90
@@ -187,9 +193,10 @@ resource "aws_s3_bucket_policy" "alb_logs" {
 }
 
 # ---- Certificate ---------------------------------------------------------------------
-# DNS validation. The validation CNAME lives in Cloudflare (infra/cloudflare), so Wave 5
-# applies this resource first (-target), creates the record there, then applies the rest;
-# see infra/terraform/README.md.
+# DNS validation. The validation CNAME lives in Cloudflare (infra/cloudflare): the first prod
+# apply creates the certificate with wait_for_validation = false, infra/cloudflare creates the
+# record from the certificate_validation_records output, and the second apply waits for it
+# (docs/qa/deploy-prep/RUNBOOK.md, D-247).
 
 resource "aws_acm_certificate" "api" {
   domain_name       = var.api_hostname
@@ -201,6 +208,7 @@ resource "aws_acm_certificate" "api" {
 }
 
 resource "aws_acm_certificate_validation" "api" {
+  count           = var.wait_for_validation ? 1 : 0
   certificate_arn = aws_acm_certificate.api.arn
 }
 
@@ -213,7 +221,8 @@ output "access_logs_bucket" {
 }
 
 output "certificate_arn" {
-  value = aws_acm_certificate_validation.api.certificate_arn
+  description = "The validated certificate; empty until wait_for_validation is true."
+  value       = one(aws_acm_certificate_validation.api[*].certificate_arn)
 }
 
 output "certificate_validation_records" {

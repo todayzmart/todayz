@@ -1,9 +1,15 @@
-# Cloudflare for one environment (prod or staging): DNS, TLS settings, WAF, rate limits, R2,
-# Turnstile, cache rules, Pages projects. Nothing here has been planned or applied (Wave 5).
+# Cloudflare for one environment (prod; staging is unused since D-210): DNS, TLS settings, WAF,
+# rate limits, R2, Turnstile, cache rules, Pages projects. Only the lead plans and applies.
 #
 # Credentials: CLOUDFLARE_API_TOKEN in the environment (read by the provider; never written
 # here). The account and zone ids are variables.
-# State: the backend block is a placeholder, filled in Wave 5.
+# State: S3 with the native lockfile, in the same bucket as the AWS roots (key
+# cloudflare/terraform.tfstate), passed at init with -backend-config; the S3 backend reads the
+# lead's AWS credentials. The state holds the Turnstile secret, so the bucket is private and
+# encrypted (scripts/deploy/state-bucket.sh).
+#
+# The Pages projects, their domains, DNS records and the Turnstile widget were made by hand at
+# go-live (D-214); the import blocks below adopt them on the first apply (D-250, RUNBOOK).
 
 terraform {
   required_version = ">= 1.9"
@@ -15,7 +21,7 @@ terraform {
     }
   }
 
-  # backend "s3" {}   # Wave 5: bucket, key, region via -backend-config; never committed.
+  backend "s3" {}
 }
 
 provider "cloudflare" {}
@@ -48,7 +54,36 @@ variable "zone_name" {
 
 variable "api_origin_hostname" {
   type        = string
-  description = "ALB / Beanstalk endpoint from the AWS stack output api_origin_hostname."
+  default     = ""
+  description = "ALB / Beanstalk endpoint from the AWS stack output api_origin_hostname. Empty (the first apply, before the api environment exists): no api. record."
+}
+
+# ---- Adopting the hand-made resources (D-214, D-250) ------------------------------------
+# Set these for the first apply only; once the state has the resources the import blocks are
+# no-ops and the variables can go back to their defaults.
+
+variable "import_existing_pages" {
+  type        = bool
+  default     = false
+  description = "Import the four Pages projects and their custom domains (www too, in prod)."
+}
+
+variable "import_dns_record_ids" {
+  type        = map(string)
+  default     = {}
+  description = "Existing DNS record ids by Pages domain key (site, customer, business, admin, www), from the dashboard or the DNS records API."
+}
+
+variable "import_turnstile_sitekey" {
+  type        = string
+  default     = ""
+  description = "Site key of the existing todayz-prod Turnstile widget; empty: create a new one."
+}
+
+variable "import_r2_buckets" {
+  type        = bool
+  default     = false
+  description = "Import the three R2 buckets if they were made by hand."
 }
 
 variable "acm_validation_records" {
@@ -111,6 +146,12 @@ locals {
     admin    = "todayz-admin${local.suffix}"
   }
 
+  # Every Pages custom domain: the app hosts, and www (prod) on the site project.
+  pages_domains = merge(
+    { for k, p in local.pages_projects : k => { project = k, host = local.host[k] } },
+    var.environment == "prod" ? { www = { project = "site", host = "www.${var.zone_name}" } } : {},
+  )
+
   buckets = {
     images  = "todayz-images${local.suffix}"
     tiles   = "todayz-tiles${local.suffix}"
@@ -142,6 +183,7 @@ resource "cloudflare_zone_setting" "always_https" {
 
 # api.: proxied to the ALB (which accepts Cloudflare ranges only).
 resource "cloudflare_dns_record" "api" {
+  count   = var.api_origin_hostname == "" ? 0 : 1
   zone_id = var.zone_id
   name    = local.host.api
   type    = "CNAME"
@@ -165,11 +207,11 @@ resource "cloudflare_dns_record" "acm_validation" {
 
 # Pages custom domains (the CNAME to <project>.pages.dev is what makes the domain resolve).
 resource "cloudflare_dns_record" "pages" {
-  for_each = local.pages_projects
+  for_each = local.pages_domains
   zone_id  = var.zone_id
-  name     = local.host[each.key]
+  name     = each.value.host
   type     = "CNAME"
-  content  = "${each.value}.pages.dev"
+  content  = "${local.pages_projects[each.value.project]}.pages.dev"
   proxied  = true
   ttl      = 1
   comment  = "Cloudflare Pages: ${each.key}"
@@ -185,10 +227,30 @@ resource "cloudflare_pages_project" "app" {
 }
 
 resource "cloudflare_pages_domain" "app" {
-  for_each     = local.pages_projects
+  for_each     = local.pages_domains
   account_id   = var.account_id
-  project_name = cloudflare_pages_project.app[each.key].name
-  name         = local.host[each.key]
+  project_name = cloudflare_pages_project.app[each.value.project].name
+  name         = each.value.host
+}
+
+import {
+  for_each = var.import_existing_pages ? local.pages_projects : {}
+  to       = cloudflare_pages_project.app[each.key]
+  id       = "${var.account_id}/${each.value}"
+}
+
+import {
+  for_each = var.import_existing_pages ? local.pages_domains : {}
+  to       = cloudflare_pages_domain.app[each.key]
+  id       = "${var.account_id}/${local.pages_projects[each.value.project]}/${each.value.host}"
+}
+
+# The apex was an A record at go-live (D-214); if the plan shows it replaced by the CNAME,
+# that is expected (Cloudflare flattens a CNAME at the apex).
+import {
+  for_each = var.import_dns_record_ids
+  to       = cloudflare_dns_record.pages[each.key]
+  id       = "${var.zone_id}/${each.value}"
 }
 
 # ---- R2 ---------------------------------------------------------------------------------
@@ -198,6 +260,12 @@ resource "cloudflare_r2_bucket" "this" {
   account_id = var.account_id
   name       = each.value
   location   = var.r2_location
+}
+
+import {
+  for_each = var.import_r2_buckets ? local.buckets : {}
+  to       = cloudflare_r2_bucket.this[each.key]
+  id       = "${var.account_id}/${each.value}/default"
 }
 
 # Public buckets get custom domains (cached by Cloudflare); `private` has none.
@@ -227,6 +295,12 @@ resource "cloudflare_turnstile_widget" "this" {
   domains    = [local.host.customer, local.host.business, local.host.site, local.host.api]
   mode       = "managed"
   region     = "world"
+}
+
+import {
+  for_each = var.import_turnstile_sitekey == "" ? toset([]) : toset([var.import_turnstile_sitekey])
+  to       = cloudflare_turnstile_widget.this
+  id       = "${var.account_id}/${each.value}"
 }
 
 # ---- WAF: managed rules and custom rules ----------------------------------------------------

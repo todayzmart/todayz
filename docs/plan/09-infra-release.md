@@ -84,10 +84,10 @@ Observability: OTel → Grafana Cloud (metrics/logs/traces) · Sentry · CloudWa
 
 ### 3.1 Access
 
-- The founder provides IAM access keys for Wave 5 only. They go in `.env.local` as `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_REGION`, and are never printed (`make env-check` shows names only).
+- The founder provides IAM access keys for Wave 5 only. They go in `.env.cloud.local` (D-210) as `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_REGION`, and are never printed (`make env-check` shows names only).
 - Only Terraform and the lead's shell see them. The running app never does: it uses instance profiles. `infra/local/proc.sh` strips every `AWS_*` variable from app processes (W0-03b), and `internal/ops` builds an AWS client only when `APP_ENV` is `staging` or `prod`, with an explicit EC2 instance-role (IMDS) credential provider and never the SDK's default chain (§3.6, 02 §10).
 - The first Terraform resource is an AWS Budgets alarm (§6).
-- CI deploys later use GitHub OIDC roles (the W0-06 checklist, §4).
+- CI deploys use GitHub OIDC: `deploy-backend.yml`'s deploy job assumes `todayz-prod-github-deploy`, whose trust is `repo:todayzmart/todayz:environment:production` (D-247, the W0-06 checklist in §4). The account is 061292478202, and every provider refuses any other (D-248).
 
 ### 3.2 Compute (Elastic Beanstalk, Docker on Amazon Linux 2023, Graviton)
 
@@ -99,8 +99,9 @@ Observability: OTel → Grafana Cloud (metrics/logs/traces) · Sentry · CloudWa
 | Health check | `/readyz` on the app port | `/readyz` on the internal port 8181 (Wave 5 decides how the environment's health check reaches it) |
 
 - Enhanced health reporting, an instance profile with least privilege, logs to CloudWatch, plus the OTel exporter.
-- Migrations run as a separate step (`todayz migrate up`, a one-off task with the migration role) before the new version deploys. They must be backward compatible with the previous app version: expand, migrate, contract.
+- Migrations run as a separate step (`todayz migrate up`, an ECS Fargate ops task connecting as `todayz_owner`, D-247) before the new version deploys. They must be backward compatible with the previous app version: expand, migrate, contract.
 - The worker serves `/healthz`, `/readyz` and `/version` on its internal port 8181.
+- **Release mechanics (D-247).** One image runs api, worker and migrate. The Beanstalk bundle is a compose file with host networking and no nginx (`ProxyServer none`). `scripts/deploy/beanstalk.sh` builds, pushes, migrates, creates the application versions and deploys the worker, then the api. Terraform creates the environments once (two applies on the first deploy) and ignores the version label afterwards.
 
 ### 3.3 Load balancer
 
@@ -155,18 +156,20 @@ Target group health check (`/readyz`): interval 5 s, timeout 4 s, unhealthy thre
 - A Terraform or `infra` check asserts the deregistration delay, both stop timeouts and the target group health check of §3.3 (SC-GS-10).
 - The worker's stop timeout has to hold on the host too: W5-04 checks the stop timeout of the Docker unit on the worker instance. If it is under 180 s, set it, or add an Auto Scaling termination lifecycle hook that keeps a scaling-in instance alive until the drain ends.
 
-### 3.8 Estimated monthly cost (to be re-checked with the AWS Pricing Calculator in Wave 5)
+### 3.8 Estimated monthly cost (D-251; to be re-checked with the AWS Pricing Calculator and the first bill)
 
-| Item | About |
+Bottom-up from ap-south-1 list prices; the per-resource table is in `docs/qa/deploy-prep/RUNBOOK.md` §6. It replaces the earlier ₹13–17k, which left out the interface endpoints, public IPv4, Secrets Manager, logs and the DR copy.
+
+| Item | About ($/month) |
 |---|---|
-| RDS db.t4g.medium Single-AZ | ₹4.5k |
-| RDS storage (100 GB gp3) and backups | ₹2.5k |
-| 3 × t4g.small (api 2, worker 1) | ₹3k |
-| ALB | ₹2k |
-| NAT gateway | ₹3k |
-| CloudWatch (logs, metrics, Database Insights) | ₹1-2k |
-| **Prod total** | **about ₹13-17k a month** |
-| **Staging** | **about ₹4-6k a month**, less if stopped off-hours |
+| RDS db.t4g.medium Single-AZ, 100 GB gp3, backups, monitoring | 72 |
+| 3 × t4g.small (api 2, worker 1) with root volumes | 40 |
+| ALB | 24 |
+| NAT gateway | 44 |
+| Interface endpoints (ECR api/dkr, Secrets Manager, 2 AZs) | 48 |
+| Public IPv4, Secrets Manager (23), CloudWatch, DR copy, ECR/S3 | 49 |
+| **Prod total** | **about $270–300 a month before GST (≈ ₹27–30k with 18% GST on an AISPL account)** |
+| **Staging** | not deployed (D-210) |
 
 Cloudflare free or pro plan, Grafana Cloud and Sentry free tiers at first.
 
@@ -217,6 +220,23 @@ GitHub Actions workflows are written in Wave 0 (W0-06) to mirror these. They wil
 
 ## 5. Wave 5 steps (after credentials)
 
+**Since D-210 there is no staging**, so steps 2–4 below are history. The prod first deploy is the 13 steps of `docs/qa/deploy-prep/RUNBOOK.md` §4:
+1. state bucket;
+2. account root;
+3. first image;
+4. prod apply #1;
+5. Cloudflare apply #1;
+6. secrets;
+7. database bootstrap;
+8. migrate;
+9. application versions;
+10. prod apply #2;
+11. Cloudflare apply #2;
+12. smoke test;
+13. CI on.
+
+The founder's yes on the prod plan summary comes before step 4 (D-247).
+
 1. The user adds credentials to env (names listed in `.env.example` under "Cloud"). The lead runs `make env-check` and confirms only `set`/`missing`.
 2. The first Terraform resource is the AWS Budgets alarm (§6). Then the first `terraform plan` ever run, for staging; the user reviews the plan summary (resources and estimated cost) and says yes.
 3. Apply staging; run migrations; seed demo; deploy apps; point `staging.*` DNS.
@@ -248,7 +268,7 @@ GitHub Actions workflows are written in Wave 0 (W0-06) to mirror these. They wil
 
 ## 7. Rollback
 
-- App: Beanstalk redeploys the previous application version (one click/command); Pages rolls back to the previous deployment.
+- App: `scripts/deploy/beanstalk.sh deploy <older tag>` moves the worker, then the api, back to that release's application versions (D-247). Pages rolls back to the previous deployment.
 - DB: forward-only migrations designed expand/contract, so the previous app version works against the new schema. Destructive changes need a separate later migration. Data repair uses PITR to a side instance and copies back only the affected rows.
 - Feature flags in `platform_settings` turn off risky features without a deploy (D-25):
   - `feature_delivery_enabled`, `feature_bill_qr_enabled`, `feature_voice_enabled`, `feature_offers_enabled`, `feature_banners_enabled`

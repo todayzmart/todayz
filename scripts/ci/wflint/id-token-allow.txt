@@ -5,3 +5,4 @@
 # `make setup` (no third-party code before the OIDC token exists), and the cloud
 # role's trust policy scopes `sub` to repo:<org>/<repo>:environment:production.
 # The workflow level stays read/none; wflint allows the write only on jobs.
+.github/workflows/deploy-backend.yml
