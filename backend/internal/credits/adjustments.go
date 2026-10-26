@@ -122,7 +122,14 @@ func (a *Admin) LedgerAccounts(ctx context.Context, q string) (api.AdminLedgerAc
 		}
 	case isULID(q):
 		id, _ := ids.Parse(q)
-		rows, err = cq.AccountsByOwner(ctx, ids.UUID(id))
+		if rows, err = cq.AccountsByOwner(ctx, ids.UUID(id)); err == nil {
+			var rs []creditsdb.CustomerWithoutWalletByIDRow
+			if rs, err = cq.CustomerWithoutWalletByID(ctx, ids.UUID(id)); err == nil {
+				for _, r := range rs {
+					rows = append(rows, unopenedWallet(r.ID, r.OwnerName))
+				}
+			}
+		}
 	case looksLikePhone(q):
 		p, ok := phoneE164(q)
 		if !ok {
@@ -133,9 +140,16 @@ func (a *Admin) LedgerAccounts(ctx context.Context, q string) (api.AdminLedgerAc
 			return api.AdminLedgerAccountList{}, problem.Wrap(genproblems.ServiceUnavailable, ErrUnavailable)
 		}
 		var rs []creditsdb.AccountsByPhoneHashRow
-		if rs, err = cq.AccountsByPhoneHash(ctx, a.hash.Phone(p)); err == nil {
+		h := a.hash.Phone(p)
+		if rs, err = cq.AccountsByPhoneHash(ctx, h); err == nil {
 			for _, r := range rs {
 				rows = append(rows, creditsdb.AccountsByOwnerRow(r))
+			}
+			var us []creditsdb.CustomerWithoutWalletByPhoneHashRow
+			if us, err = cq.CustomerWithoutWalletByPhoneHash(ctx, h); err == nil {
+				for _, u := range us {
+					rows = append(rows, unopenedWallet(u.ID, u.OwnerName))
+				}
 			}
 		}
 	default:
@@ -159,13 +173,23 @@ func (a *Admin) LedgerAccounts(ctx context.Context, q string) (api.AdminLedgerAc
 	return api.AdminLedgerAccountList{Items: items, ServerNow: a.s.now()}, nil
 }
 
+// unopenedWallet is the search row of a customer who has never had a ledger
+// posting (D-240): a customer_wallet with no account id and a zero balance.
+// Accounts open at the first posting (Service.accountID), so an adjustment
+// names the customer instead and opens the wallet in its own transaction.
+func unopenedWallet(customer pgtype.UUID, name string) creditsdb.AccountsByOwnerRow {
+	return creditsdb.AccountsByOwnerRow{
+		Kind: string(CustomerWallet), OwnerType: ownerType(CustomerWallet), OwnerID: customer, OwnerName: name,
+	}
+}
+
 func ledgerAccount(r creditsdb.AccountsByOwnerRow) api.AdminLedgerAccount {
 	var name *string
 	if r.OwnerName != "" {
 		name = &r.OwnerName
 	}
 	return api.AdminLedgerAccount{
-		Id: uuidString(r.ID), Kind: api.AdminLedgerAccountKind(r.Kind),
+		Id: optUUID(r.ID), Kind: api.AdminLedgerAccountKind(r.Kind),
 		OwnerType: api.AdminLedgerAccountOwnerType(r.OwnerType), OwnerId: optUUID(r.OwnerID), OwnerName: name,
 		BalancePaise: int(r.Balance * paisePerCredit),
 	}
@@ -284,7 +308,10 @@ func adjustmentView(r creditsdb.AdjustmentRequestRow, caller ids.ID) api.CreditA
 
 // AdjustmentInput is a create request, as the route received it.
 type AdjustmentInput struct {
+	// AccountID is the customer's wallet; CustomerID the customer, for one
+	// whose wallet is not open yet (D-240). Exactly one is set.
 	AccountID   string
+	CustomerID  string
 	AmountPaise int
 	Reason      string
 	Link        *string
@@ -315,9 +342,20 @@ func (a *Admin) CreateAdjustment(ctx context.Context, p authn.Principal, in Adju
 		return api.CreditAdjustmentResult{}, adminFieldErr("body.amountPaise", "whole credits (a multiple of 100), never 0")
 	}
 	credits := int64(in.AmountPaise / paisePerCredit)
-	accountID, err := ids.Parse(in.AccountID)
-	if err != nil {
-		return api.CreditAdjustmentResult{}, adminFieldErr("body.accountId", "not an account")
+	var accountID, customerID ids.ID
+	field := "body.accountId"
+	switch {
+	case in.AccountID != "" && in.CustomerID != "":
+		return api.CreditAdjustmentResult{}, adminFieldErr("body.customerId", "name the account or the customer, not both")
+	case in.CustomerID != "":
+		field = "body.customerId"
+		if customerID, err = ids.Parse(in.CustomerID); err != nil {
+			return api.CreditAdjustmentResult{}, adminFieldErr(field, "not a customer")
+		}
+	default:
+		if accountID, err = ids.Parse(in.AccountID); err != nil {
+			return api.CreditAdjustmentResult{}, adminFieldErr(field, "not an account")
+		}
 	}
 	threshold, err := a.s.settings.Paise(ctx, settings.AdminAdjustDualApprovalAbovePaise)
 	if err != nil {
@@ -333,19 +371,16 @@ func (a *Admin) CreateAdjustment(ctx context.Context, p authn.Principal, in Adju
 	var out api.CreditAdjustmentResult
 	err = a.s.db.InTx(ctx, func(ctx context.Context) error {
 		cq := a.s.q(ctx)
-		acct, err := cq.AccountByID(ctx, ids.UUID(accountID))
-		if db.IsNoRows(err) {
-			return adminFieldErr("body.accountId", "not an account")
-		}
+		acct, err := a.adjustWallet(ctx, p.UserID, accountID, customerID)
 		if err != nil {
-			return problem.Wrap(genproblems.Internal, err)
+			return err
 		}
 		// 03 puts admin_adjustment_requests on the customer's wallet only; a
 		// store_credit adjustment (a shop's statement correction) is refused
 		// until the plan says who may make one and how it shows on B-10
 		// (conservative reading, accepted by the lead 25 Oct).
 		if acct.Kind != string(CustomerWallet) {
-			return adminFieldErr("body.accountId", "must be a customer's wallet")
+			return adminFieldErr(field, "must be a customer's wallet")
 		}
 		customer := mustID(acct.OwnerID)
 		live, err := cq.CustomerExists(ctx, acct.OwnerID)
@@ -353,7 +388,7 @@ func (a *Admin) CreateAdjustment(ctx context.Context, p authn.Principal, in Adju
 			return problem.Wrap(genproblems.Internal, err)
 		}
 		if !live {
-			return adminFieldErr("body.accountId", "the customer's account is deleted")
+			return adminFieldErr(field, "the customer's account is deleted")
 		}
 		dayPaise, pending, err := a.needsSecond(ctx, p.UserID, acct, abs, int64(threshold), in.IdempotencyKey, now)
 		if err != nil {
@@ -441,6 +476,54 @@ func (a *Admin) CreateAdjustment(ctx context.Context, p authn.Principal, in Adju
 	return out, nil
 }
 
+// adjustWallet is the wallet an adjustment names: by account id, or by
+// customer id (D-240). A customer (a user with a customer profile) whose
+// wallet is not open yet (accounts open at the first posting) gets a row with
+// no id and a zero balance: the
+// at-once posting opens the wallet in this transaction through the same path
+// as every first posting (Service.accountID), and a pending request opens
+// nothing until it is approved. On the customer path the D-237 lock on admin
+// and customer is taken before the wallet is looked up, so a concurrent
+// adjustment by the same admin that opened the wallet is seen (needsSecond
+// takes the same lock again; a transaction lock is re-entrant), and its
+// posting counts in the day's sum.
+func (a *Admin) adjustWallet(ctx context.Context, admin, accountID, customerID ids.ID) (creditsdb.AccountByIDRow, error) {
+	cq := a.s.q(ctx)
+	field := "body.accountId"
+	if !customerID.IsZero() {
+		field = "body.customerId"
+		if err := cq.LockAdminCustomerAdjust(ctx, admin.String()+":"+customerID.String()); err != nil {
+			return creditsdb.AccountByIDRow{}, problem.Wrap(genproblems.Internal, err)
+		}
+		id, err := cq.AccountID(ctx, creditsdb.AccountIDParams{Kind: string(CustomerWallet), OwnerID: ids.UUID(customerID)})
+		switch {
+		case err == nil:
+			accountID = mustID(id)
+		case db.IsNoRows(err):
+			live, err := cq.IsCustomer(ctx, ids.UUID(customerID))
+			if err != nil {
+				return creditsdb.AccountByIDRow{}, problem.Wrap(genproblems.Internal, err)
+			}
+			if !live {
+				return creditsdb.AccountByIDRow{}, adminFieldErr(field, "not a customer")
+			}
+			return creditsdb.AccountByIDRow{
+				Kind: string(CustomerWallet), OwnerType: ownerType(CustomerWallet), OwnerID: ids.UUID(customerID),
+			}, nil
+		default:
+			return creditsdb.AccountByIDRow{}, problem.Wrap(genproblems.Internal, err)
+		}
+	}
+	acct, err := cq.AccountByID(ctx, ids.UUID(accountID))
+	if db.IsNoRows(err) {
+		return creditsdb.AccountByIDRow{}, adminFieldErr(field, "not an account")
+	}
+	if err != nil {
+		return creditsdb.AccountByIDRow{}, problem.Wrap(genproblems.Internal, err)
+	}
+	return acct, nil
+}
+
 // needsSecond decides whether an adjustment waits for a second approver
 // (D-237): it does when this admin's adjustments to this customer in the
 // current IST day, absolute values, pending and posted, plus this one, come
@@ -448,6 +531,8 @@ func (a *Admin) CreateAdjustment(ctx context.Context, p authn.Principal, in Adju
 // customer first, so two concurrent requests cannot both pass under it. A
 // replay of an Idempotency-Key keeps the path its first request took (its
 // first request is already in the sum). dayPaise is the sum, this one included.
+// A wallet not open yet (acct.ID null, D-240) has no entries, so only the
+// admin's requests for the customer count.
 func (a *Admin) needsSecond(ctx context.Context, admin ids.ID, acct creditsdb.AccountByIDRow, abs, threshold int64, idemKey string, now time.Time) (dayPaise int64, pending bool, err error) {
 	cq := a.s.q(ctx)
 	if err := cq.LockAdminCustomerAdjust(ctx, admin.String()+":"+mustID(acct.OwnerID).String()); err != nil {

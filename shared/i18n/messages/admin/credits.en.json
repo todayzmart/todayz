@@ -55,6 +55,10 @@
     "defaultMessage": "Choose an account to see its balance and ledger lines.",
     "description": "Empty account side panel"
   },
+  "credits.panel.unopened": {
+    "defaultMessage": "No ledger lines yet. The wallet opens with the first adjustment.",
+    "description": "Account side panel for a customer who has never had a credits posting, so has no wallet account yet"
+  },
   "credits.loadFailed": {
     "defaultMessage": "This account could not be loaded",
     "description": "Account side panel: load failed"

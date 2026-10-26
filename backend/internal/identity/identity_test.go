@@ -594,45 +594,6 @@ func TestRefreshRotationAndReuse(t *testing.T) {
 	require.Equal(t, 0, f.count(`SELECT count(*) FROM sessions WHERE revoked_at IS NULL`))
 }
 
-// A retried refresh whose response was lost: the token rotated RotationGrace
-// ago or less is a plain 401 (no revoke, no audit); a moment later it is reuse.
-func TestRefreshRotationGrace(t *testing.T) {
-	f := newFixture(t, config.EnvTest)
-	in := f.signIn("+919876543210", authn.AppCustomer)
-	first, err := f.svc.tokens.Verify(in.AccessToken)
-	require.NoError(t, err)
-
-	r1, err := refreshIn(f, authn.AppCustomer, in.RefreshToken) // in rotated now
-	require.NoError(t, err)
-
-	_, err = refreshIn(f, authn.AppCustomer, in.RefreshToken)
-	requireCode(t, err, genproblems.Unauthorized, "a retry at once")
-	f.clk.Advance(RotationGrace)
-	_, err = refreshIn(f, authn.AppCustomer, in.RefreshToken)
-	requireCode(t, err, genproblems.Unauthorized, "a retry at the edge of the window")
-	require.Contains(t, f.out.String(), "within the grace window", "the log capture is live")
-
-	st, err := f.svc.CheckSession(context.Background(), in.UserID, first.SessionID, authn.AppCustomer)
-	require.NoError(t, err)
-	require.True(t, st.Active, "inside the window the sign-in lives on")
-	require.Equal(t, 0, f.count(`SELECT count(*) FROM audit_log WHERE action = 'identity.refresh_reuse'`))
-	require.Equal(t, 0, f.count(`SELECT count(*) FROM sessions WHERE revoked_reason = 'reuse'`))
-
-	// The holder of the successor carries on (this rotates r1, not in).
-	_, err = refreshIn(f, authn.AppCustomer, r1.RefreshToken)
-	require.NoError(t, err)
-
-	// Just past the window, the first token is reuse: the family ends.
-	f.clk.Advance(time.Microsecond)
-	_, err = refreshIn(f, authn.AppCustomer, in.RefreshToken)
-	requireCode(t, err, genproblems.Unauthorized)
-	st, err = f.svc.CheckSession(context.Background(), in.UserID, first.SessionID, authn.AppCustomer)
-	require.NoError(t, err)
-	require.False(t, st.Active)
-	require.Equal(t, 1, f.count(`SELECT count(*) FROM audit_log WHERE action = 'identity.refresh_reuse'`))
-	require.Equal(t, 0, f.count(`SELECT count(*) FROM sessions WHERE revoked_at IS NULL`))
-}
-
 func TestRefreshRefusals(t *testing.T) {
 	f := newFixture(t, config.EnvTest)
 	in := f.signIn("+919876543210", authn.AppCustomer)

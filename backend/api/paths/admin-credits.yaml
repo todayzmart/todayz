@@ -13,6 +13,9 @@
     description: >-
       `q` is a customer's phone (exact, matched by its keyed hash), a store short code, or a customer,
       store or account id. `platform` lists the platform accounts. Balances are in paise (credits × 100).
+      A customer found by phone or id who has never had a ledger posting is listed as a
+      `customer_wallet` row with a null `id` and a zero balance: their wallet opens at the first
+      adjustment, which names `customerId` (D-240).
     parameters:
       - name: q
         in: query
@@ -164,7 +167,10 @@
       or under `admin_adjust_dual_approval_above_paise` it posts at once (`outcome: posted`, no request
       row); above it a pending request waits for a second person (`outcome: pending`), for super_admin
       too (D-05, D-73). A debit larger than the wallet's balance is `409 adjustment_insufficient_balance`.
-      The amount is a whole number of credits in paise (a multiple of 100), never 0.
+      The amount is a whole number of credits in paise (a multiple of 100), never 0. The body names
+      the wallet (`accountId`) or the customer (`customerId`), exactly one; a customer whose wallet is
+      not open yet gets it in the same transaction as the posting, and a pending request opens nothing
+      until it is approved (D-240).
     x-idempotency: required
     x-money: true
     x-problems: [step_up_required, adjustment_insufficient_balance]

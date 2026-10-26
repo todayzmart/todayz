@@ -271,7 +271,7 @@ Every background job is a registered kind, declared with `jobs.Define(jobs.Kind{
 ### 3.1 Tokens and sessions
 
 - OTP verify returns an **access token** (JWT, EdDSA, 15 min, header `kid`, claims: `sub` user id, `aud` app (`customer|business|admin`), `sid` session id, `roles` for admin, `amr` (`otp`, `otp+totp`)). Keys come from `JWT_SIGNING_KEYS` (JSON set of Ed25519 keys with `kid`); new tokens are signed with `JWT_CURRENT_KID`, and older keys stay in the set until their tokens expire.
-- It also sets a **refresh token** cookie: opaque 256-bit random, stored hashed (SHA-256) in `sessions`, rotated on each use. Lifetime 30 days (customer, business), 12 h (admin). Reuse of an old refresh token revokes the whole session family (theft detection).
+- It also sets a **refresh token** cookie: opaque 256-bit, stored hashed (SHA-256) in `sessions`, rotated on each use. Lifetime 30 days (customer, business), 12 h (admin). Reuse of an old refresh token revokes the whole session family (theft detection). A rotation's new token is derived (HMAC under `PII_HASH_KEY`) from the presented token and a salt stored on the rotated row, so a retry whose response was lost, within `RotationGrace` (30 s) and before the new token is used, gets the same new token back; once it is used, the retry is a 401 that keeps the cookie, and after the window it is reuse (D-105, D-239).
 - **Refresh cookies (D-14):** one per app, so signing out of one app never touches another.
 
   | App | Cookie |

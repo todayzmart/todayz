@@ -107,7 +107,13 @@ func (h adminHandlers) CreateCreditAdjustment(ctx context.Context, req api.Creat
 	if req.Body == nil {
 		return nil, problem.New(genproblems.BadRequest, "")
 	}
-	in := AdjustmentInput{AccountID: req.Body.AccountId, AmountPaise: req.Body.AmountPaise, Reason: req.Body.Reason, Link: req.Body.Link}
+	in := AdjustmentInput{AmountPaise: req.Body.AmountPaise, Reason: req.Body.Reason, Link: req.Body.Link}
+	if req.Body.AccountId != nil {
+		in.AccountID = *req.Body.AccountId
+	}
+	if req.Body.CustomerId != nil {
+		in.CustomerID = *req.Body.CustomerId
+	}
 	if req.Params.IdempotencyKey != nil {
 		in.IdempotencyKey = *req.Params.IdempotencyKey
 	}

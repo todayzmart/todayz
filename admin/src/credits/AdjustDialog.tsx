@@ -16,14 +16,18 @@ const MAX_LINK = 200;
 export interface AdjustDialogProps {
   account: AdminLedgerAccount;
   onClose: () => void;
+  /** Called once the server has posted the adjustment or made its request, before onClose. */
+  onDone?: () => void;
 }
 
 /**
  * Adjust a customer's wallet: whole credits added or taken away, a reason and an optional ticket or
  * order link. The server posts it at once or, above the dual-approval threshold, makes a pending
- * request for a second person (D-05); the toast says which.
+ * request for a second person (D-05); the toast says which. A customer who has never had a posting
+ * has no wallet account yet (no id): the adjustment names the customer and the server opens the wallet
+ * with the posting (D-240).
  */
-export function AdjustDialog({ account, onClose }: AdjustDialogProps) {
+export function AdjustDialog({ account, onClose, onDone }: AdjustDialogProps) {
   const intl = useIntl();
   const toast = useToast();
   const id = useId();
@@ -56,6 +60,7 @@ export function AdjustDialog({ account, onClose }: AdjustDialogProps) {
               ? intl.formatMessage({ id: 'credits.adjust.pendingDone' }, { amount, name })
               : intl.formatMessage({ id: 'credits.adjust.postedDone' }, { amount, name }),
         });
+        onDone?.();
         onClose();
       },
       onError: (e) => {
@@ -68,9 +73,11 @@ export function AdjustDialog({ account, onClose }: AdjustDialogProps) {
     e.preventDefault();
     setTouched(true);
     if (badCredits || badReason || adjust.isPending) return;
+    const target = account.id ? { accountId: account.id } : account.ownerId ? { customerId: account.ownerId } : null;
+    if (!target) return;
     const paise = Number(cleanCredits) * 100;
     send({
-      accountId: account.id,
+      ...target,
       amountPaise: direction === 'add' ? paise : -paise,
       reason: cleanReason,
       ...(cleanLink ? { link: cleanLink } : {}),

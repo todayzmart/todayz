@@ -183,6 +183,40 @@ describe('A-09 credits', () => {
     expect(posts[1]?.headers.get('Idempotency-Key')).toMatch(KEY);
   });
 
+  it('finds a customer with no wallet yet, adjusts by customer id and searches again (D-240)', async () => {
+    const CUST = '01JB0CN1A2B3C4D5E6F7G8H9J0';
+    const fresh: AdminLedgerAccount = { id: null, kind: 'customer_wallet', ownerType: 'customer', ownerId: CUST, ownerName: 'Meena', balancePaise: 0 };
+    let opened = false;
+    const noWallet: Handler = (c) => {
+      if (c.path === '/v1/admin/ledger/accounts' && c.method === 'GET') {
+        return json(200, { items: [opened ? { ...fresh, id: ACC, balancePaise: 20000 } : fresh], serverNow: NOW });
+      }
+      if (c.path === '/v1/admin/credit-adjustments' && c.method === 'POST') opened = true;
+      return undefined;
+    };
+    const { calls, history } = renderAt('/credits', { roles: ['finance'], handlers: [noWallet, api().handler] });
+    fireEvent.change(await screen.findByLabelText('Phone, store code or id'), { target: { value: CUST } });
+    fireEvent.click(screen.getByRole('button', { name: 'Find' }));
+    const results = await screen.findByRole('table', { name: 'Accounts' });
+    fireEvent.click(within(results).getByRole('button', { name: 'Meena' }));
+    const panel = await screen.findByRole('complementary', { name: 'Meena' });
+    expect(within(panel).getByText('No ledger lines yet. The wallet opens with the first adjustment.')).toBeInTheDocument();
+    expect(within(panel).getByText('₹0')).toBeInTheDocument();
+    expect(calls.some((c) => c.path.includes('/entries'))).toBe(false);
+    expect(history.location.search).not.toContain('account=');
+
+    fireEvent.click(within(panel).getByRole('button', { name: 'Adjust credits' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Adjust credits for Meena' });
+    fireEvent.change(within(dialog).getByLabelText('Credits'), { target: { value: '200' } });
+    fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'Goodwill' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Adjust' }));
+    await toastSays("₹200 posted to Meena's wallet");
+    const post = calls.find((c) => c.method === 'POST' && c.path === '/v1/admin/credit-adjustments');
+    expect(post?.body).toEqual({ customerId: CUST, amountPaise: 20000, reason: 'Goodwill' });
+    await waitFor(() => expect(calls.filter((c) => c.path === '/v1/admin/ledger/accounts')).toHaveLength(2));
+    expect(await within(await screen.findByRole('table', { name: 'Accounts' })).findByText('₹200')).toBeInTheDocument();
+  });
+
   it('says when an adjustment above the threshold waits for a second person', async () => {
     renderAt(`/credits?account=${ACC}`, { roles: ['super_admin'], handlers: [api({ outcome: 'pending' }).handler] });
     const panel = await screen.findByRole('complementary', { name: 'Priya' });
