@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/subtle"
 	"encoding/base64"
 	"fmt"
 	"strings"
@@ -30,17 +31,34 @@ const (
 	reasonAdmin   = "admin"
 )
 
-// RotationGrace is how long after its rotation a refresh token is answered
-// with a plain 401 instead of reuse detection. A refresh whose response was
-// lost (a dropped connection, a tab closed mid-request) leaves the client
-// holding the token the server just rotated; its retry must not end the
-// sign-in everywhere and raise a theft alarm. Past the window, presenting a
-// rotated token is reuse: the family is revoked and audited.
+// RotationGrace is how long after its rotation a refresh token still gets
+// the lost-response treatment instead of reuse detection. A refresh whose
+// response was lost (a reload or navigation mid-request, a dropped mobile
+// connection) leaves the client holding the token the server just rotated.
 //
-// The cost: a thief who rotates a stolen token first and is followed by the
-// owner within this window is not detected (the owner gets 401). The window
-// is kept short for that reason. A security constant, not a product rule
-// (01 §17 does not cover it), so it is code and not a platform setting.
+// Within the window (measured from that rotation, never extended), the retry
+// is answered with the very response it lost (D-239): the rotation recorded
+// its successor's row and a salt, the successor's token is derived from the
+// presented token (successorToken), and if that successor has never been
+// presented it is returned again, with a fresh access token, and nothing is
+// written or audited. Every retry gets the same token, so two tabs or two
+// concurrent retries all converge on one cookie. When the successor has been
+// used (or revoked, or the row predates D-239 or was rotated by the TOTP
+// flows, which record no successor), the retry is a plain 401 that keeps the
+// cookie (graceRetry), as before.
+//
+// Past the window, presenting a rotated token is reuse: the family is
+// revoked and audited ("identity.refresh_reuse").
+//
+// The costs: a thief who rotates a stolen token first and is followed by the
+// owner within this window is not detected at once (the owner gets the
+// thief's successor, or a 401 once the thief has used it). And a thief
+// holding a copy who presents it within this window of the owner's rotation,
+// before the owner's client uses the successor, receives the successor too.
+// Detection is delayed, not lost: the next time either party presents a
+// token the other has rotated, past the window, the family is revoked. The
+// window is kept short for that reason. A security constant, not a product
+// rule (01 §17 does not cover it), so it is code and not a platform setting.
 const RotationGrace = 30 * time.Second
 
 // graceRetry is the 401 for a token rotated RotationGrace ago or less. The
@@ -67,6 +85,22 @@ func newRefreshToken() (token string, hash []byte, err error) {
 	}
 	token = base64.RawURLEncoding.EncodeToString(b)
 	return token, hashRefresh(token), nil
+}
+
+// successorSaltLen is sessions.successor_salt's length (ck_sessions_successor_salt).
+const successorSaltLen = 32
+
+// successorToken derives the refresh token that a rotation of parent issues:
+// HMAC-SHA256 under PII_HASH_KEY of the parent token and a salt the rotation
+// draws and stores (D-239). Only someone who presents parent can recompute
+// it, which is what lets a lost refresh response be replayed without storing
+// any token: the database keeps the salt and, as for every token, only the
+// successor's SHA-256. The output is 32 bytes, so the token has the shape of
+// a random one (validRefreshToken). A parent is fixed-length base64url (no
+// ':'), so the input is unambiguous.
+func (s *Service) successorToken(parent string, salt []byte) string {
+	return base64.RawURLEncoding.EncodeToString(
+		s.hash.Sum("refresh-successor:v1:" + parent + ":" + base64.RawURLEncoding.EncodeToString(salt)))
 }
 
 func hashRefresh(token string) []byte {
@@ -116,9 +150,12 @@ type RefreshInput struct {
 }
 
 // Refresh rotates a refresh token (AU-07): the presented row is revoked as
-// rotated and a new row joins the same family. Presenting a token that was
-// already rotated revokes the whole family (reuse detection) and answers 401,
-// unless it was rotated RotationGrace ago or less: then it is only a 401.
+// rotated, recording the row that replaces it and the salt that row's token
+// was derived with (successorToken), and the new row joins the same family.
+// Presenting a token that was already rotated revokes the whole family (reuse
+// detection) and answers 401, unless it was rotated RotationGrace ago or
+// less: then the lost response is replayed if its successor is still unused
+// (replaySuccessor), and otherwise it is only a 401 (graceRetry).
 //
 // Customer and business sessions slide (each refresh lasts the full TTL
 // again); an admin session keeps its first expiry (12 h absolute).
@@ -127,15 +164,18 @@ type RefreshInput struct {
 // reading for the privileged app).
 //
 // Locks: the users row FOR NO KEY UPDATE first (lockSessionUser), then the
-// session row. Every path that revokes sessions in bulk (logout, logout-all,
-// this function's reuse branch, the TOTP lockout, deletion) and every path
-// that rotates (refresh, TOTP elevation) holds that lock, so a rotation
-// either commits before a revocation starts (and its new row is revoked with
-// the rest) or runs after it (and finds its token revoked). Without that, a
-// revocation's UPDATE, whose snapshot predates the rotation's insert, would
-// miss the new row. Refreshes of one user therefore run one at a time; the
-// lock is held only for a few indexed statements and the audit insert (the
-// access token is signed after commit).
+// session row, then (replay only) its successor's row. Every path that
+// revokes sessions in bulk (logout, logout-all, this function's reuse branch,
+// the TOTP lockout, deletion) and every path that rotates (refresh, TOTP
+// elevation) holds that lock, so a rotation either commits before a
+// revocation starts (and its new row is revoked with the rest) or runs after
+// it (and finds its token revoked). Without that, a revocation's UPDATE,
+// whose snapshot predates the rotation's insert, would miss the new row. The
+// same lock serialises a replay against a refresh of the successor: the
+// replay sees the successor either live (and returns it) or rotated (and
+// answers graceRetry), never half-rotated. Refreshes of one user therefore
+// run one at a time; the lock is held only for a few indexed statements and
+// the audit insert (the access token is signed after commit).
 func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) {
 	if err := s.readyTokens(); err != nil {
 		return SignIn{}, unavailable(ctx, err)
@@ -173,15 +213,29 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 			outcome = problem.New(genproblems.Unauthorized, "")
 			return nil
 		}
-		if row.RevokedAt != nil {
-			rotated := row.RevokedReason != nil && *row.RevokedReason == reasonRotated
-			if rotated && now.Sub(*row.RevokedAt) <= RotationGrace {
-				// A retry of a refresh that already succeeded: refuse it, end
-				// nothing (RotationGrace).
+		// The live row the checks below apply to: the presented one or, on a
+		// replay, its successor.
+		var (
+			replay         *replayed
+			expiresAt      = row.ExpiresAt
+			totpVerifiedAt = row.TotpVerifiedAt
+		)
+		rotated := row.RevokedAt != nil && row.RevokedReason != nil && *row.RevokedReason == reasonRotated
+		if rotated && now.Sub(*row.RevokedAt) <= RotationGrace {
+			r, err := s.replaySuccessor(ctx, q, row, in.Token)
+			if err != nil {
+				return err
+			}
+			if r == nil {
+				// A retry of a refresh whose successor is already in use
+				// (another tab's refresh set the newer cookie): refuse it,
+				// end nothing (RotationGrace).
 				telemetry.Logger(ctx).InfoContext(ctx, "identity: rotated refresh token presented within the grace window", "app", row.App)
 				outcome = graceRetry{problem.New(genproblems.Unauthorized, "")}
 				return nil
 			}
+			replay, expiresAt, totpVerifiedAt = r, r.expiresAt, r.totpVerifiedAt
+		} else if row.RevokedAt != nil {
 			if rotated {
 				// Reuse: someone holds an old token. End the sign-in everywhere.
 				n, err := q.RevokeFamily(ctx, identitydb.RevokeFamilyParams{Now: now, Reason: reasonReuse, FamilyID: row.FamilyID})
@@ -200,7 +254,7 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 			outcome = problem.New(genproblems.Unauthorized, "")
 			return nil
 		}
-		if !now.Before(row.ExpiresAt) {
+		if !now.Before(expiresAt) {
 			outcome = problem.New(genproblems.Unauthorized, "")
 			return nil
 		}
@@ -221,31 +275,46 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 				return err
 			}
 			roles = a.Roles
-			if totpCurrent(a.TotpEnabledAt, row.TotpVerifiedAt) {
+			if totpCurrent(a.TotpEnabledAt, totpVerifiedAt) {
 				amr = authn.AMROTPTOTP
 			}
 		}
-		if err := q.RevokeSession(ctx, identitydb.RevokeSessionParams{Now: now, Reason: reasonRotated, ID: row.ID}); err != nil {
-			return err
+		family = fam
+		if replay != nil {
+			// The lost response again: the same refresh token and expiry, a
+			// new access token. Nothing is written, so any number of retries
+			// inside the window converge on this one token.
+			telemetry.Logger(ctx).InfoContext(ctx, "identity: lost refresh response replayed within the grace window", "app", row.App)
+			out = SignIn{UserID: userID, RefreshToken: replay.token, RefreshExpiresAt: expiresAt.UTC()}
+			return nil
 		}
-		refresh, refreshHash, err := newRefreshToken()
+		salt := make([]byte, successorSaltLen)
+		if _, err := rand.Read(salt); err != nil {
+			return fmt.Errorf("identity: refresh salt: %w", err)
+		}
+		next := ids.UUID(ids.New(now))
+		n, err := q.RotateSession(ctx, identitydb.RotateSessionParams{Now: now, SuccessorID: next, SuccessorSalt: salt, ID: row.ID})
 		if err != nil {
 			return err
 		}
+		if n != 1 {
+			// The row is locked and was live, so this cannot happen.
+			return fmt.Errorf("identity: rotate session: %d rows", n)
+		}
+		refresh := s.successorToken(in.Token, salt)
 		exp := now.Add(in.App.RefreshTTL())
 		if in.App == authn.AppAdmin {
 			exp = row.ExpiresAt.UTC() // absolute: the family's first expiry
 		}
 		if err := q.InsertSession(ctx, identitydb.InsertSessionParams{
-			ID: ids.UUID(ids.New(now)), UserID: row.UserID, App: row.App, FamilyID: row.FamilyID,
-			RefreshHash: refreshHash, ExpiresAt: exp, DeviceID: row.DeviceID,
+			ID: next, UserID: row.UserID, App: row.App, FamilyID: row.FamilyID,
+			RefreshHash: hashRefresh(refresh), ExpiresAt: exp, DeviceID: row.DeviceID,
 			UserAgent: cleanUserAgent(in.UserAgent), IpHash: s.hash.IP(reqctx.ClientIP(ctx)), Now: now,
 			TotpVerifiedAt: row.TotpVerifiedAt,
 		}); err != nil {
 			return err
 		}
 		out = SignIn{UserID: userID, RefreshToken: refresh, RefreshExpiresAt: exp}
-		family = fam
 		return nil
 	})
 	if err != nil {
@@ -260,6 +329,41 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (SignIn, error) 
 	}
 	out.AccessToken, out.ExpiresAt = tok, exp
 	return out, nil
+}
+
+// replayed is a rotated token's still-unused successor (replaySuccessor).
+type replayed struct {
+	token          string
+	expiresAt      time.Time
+	totpVerifiedAt *time.Time
+}
+
+// replaySuccessor returns the successor of the rotated row presented with
+// token when the lost response can be replayed (D-239): the rotation
+// recorded a successor, that row still exists and is live (never presented,
+// never revoked), it belongs to the same family, user and app, and its hash
+// matches the token derived from the presented one. Otherwise it returns nil
+// and the caller answers graceRetry. It locks the successor's row (after the
+// users row and the presented row) and writes nothing.
+func (s *Service) replaySuccessor(ctx context.Context, q *identitydb.Queries, row identitydb.GetSessionByRefreshHashForUpdateRow, token string) (*replayed, error) {
+	if !row.SuccessorID.Valid || len(row.SuccessorSalt) != successorSaltLen {
+		return nil, nil // rotated before D-239, or by the TOTP flows
+	}
+	succ, err := q.GetSessionForUpdate(ctx, row.SuccessorID)
+	switch {
+	case db.IsNoRows(err):
+		return nil, nil // purged
+	case err != nil:
+		return nil, err
+	}
+	if succ.RevokedAt != nil || succ.FamilyID != row.FamilyID || succ.UserID != row.UserID || succ.App != row.App {
+		return nil, nil
+	}
+	derived := s.successorToken(token, row.SuccessorSalt)
+	if subtle.ConstantTimeCompare(hashRefresh(derived), succ.RefreshHash) != 1 {
+		return nil, nil // PII_HASH_KEY changed since the rotation
+	}
+	return &replayed{token: derived, expiresAt: succ.ExpiresAt, totpVerifiedAt: succ.TotpVerifiedAt}, nil
 }
 
 // lockSessionUser locks the users row of a refresh token's session (LockUser,

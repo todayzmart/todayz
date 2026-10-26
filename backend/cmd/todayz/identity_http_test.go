@@ -168,15 +168,23 @@ func TestIdentityHTTPRefresh(t *testing.T) {
 	rotated := refreshCookieOf(t, w)
 	require.NotEqual(t, c.Value, rotated.Value)
 
-	// Replaying the first cookie at once (the response was lost, or a second
-	// tab raced the first): 401, the cookie left alone (it may already hold
-	// the rotated token), and the family lives on.
+	// Replaying the first cookie at once, before the rotated one was used
+	// (the response was lost): the lost response again, the same cookie
+	// (D-239), and nothing rotates.
 	w = a.do(http.MethodPost, "/v1/auth/refresh", body, refreshHeaders(c, appOrigin))
-	require.Equal(t, http.StatusUnauthorized, w.Code)
-	require.Empty(t, w.Header().Values("Set-Cookie"), "a grace retry keeps the cookie")
+	require.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	require.NotEmpty(t, decode(t, w)["accessToken"])
+	require.Equal(t, rotated.Value, refreshCookieOf(t, w).Value, "a lost response is replayed")
 	w = a.do(http.MethodPost, "/v1/auth/refresh", body, refreshHeaders(rotated, appOrigin))
 	require.Equal(t, http.StatusOK, w.Code, "a replay inside the grace window revokes nothing")
 	latest := refreshCookieOf(t, w)
+
+	// Once the rotated cookie is in use, the first one inside the window is
+	// a 401 that leaves the cookie alone (it may already hold the newer
+	// token), and the family lives on.
+	w = a.do(http.MethodPost, "/v1/auth/refresh", body, refreshHeaders(c, appOrigin))
+	require.Equal(t, http.StatusUnauthorized, w.Code)
+	require.Empty(t, w.Header().Values("Set-Cookie"), "a grace retry keeps the cookie")
 
 	// Past the window a replay is reuse: the family is revoked.
 	a.clk.Advance(identity.RotationGrace + time.Second)

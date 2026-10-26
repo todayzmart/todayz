@@ -115,14 +115,25 @@ SELECT user_id FROM sessions WHERE refresh_hash = @refresh_hash;
 
 -- name: GetSessionByRefreshHashForUpdate :one
 SELECT s.id, s.user_id, s.app, s.family_id, s.expires_at, s.revoked_at, s.revoked_reason,
-  s.device_id, s.totp_verified_at, u.status AS user_status
+  s.device_id, s.totp_verified_at, s.successor_id, s.successor_salt, u.status AS user_status
 FROM sessions s JOIN users u ON u.id = s.user_id
 WHERE s.refresh_hash = @refresh_hash
 FOR UPDATE OF s;
 
--- name: RevokeSession :exec
-UPDATE sessions SET revoked_at = @now::timestamptz, revoked_reason = @reason::text
+-- name: RotateSession :execrows
+-- A refresh revokes the presented row as rotated and records the row it
+-- inserts and the salt its token was derived with (D-239), so a retry of the
+-- presented token inside RotationGrace can be answered with the same token.
+UPDATE sessions SET revoked_at = @now::timestamptz, revoked_reason = 'rotated',
+  successor_id = @successor_id, successor_salt = @successor_salt
 WHERE id = @id AND revoked_at IS NULL;
+
+-- name: GetSessionForUpdate :one
+-- A rotated row's successor, for the lost-response replay (D-239). Taken
+-- after the users row and the rotated row (lock order: users, sessions).
+SELECT id, user_id, app, family_id, refresh_hash, expires_at, revoked_at, totp_verified_at
+FROM sessions WHERE id = @id
+FOR UPDATE;
 
 -- name: RevokeFamily :execrows
 UPDATE sessions SET revoked_at = @now::timestamptz, revoked_reason = @reason::text

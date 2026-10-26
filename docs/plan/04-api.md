@@ -145,7 +145,7 @@ How it works (W0-03, `platform/idempotency`):
 | POST | /v1/auth/totp/enrol | adm | first admin login: secret QR + 10 recovery codes shown once |
 | POST | /v1/auth/totp/verify | adm | `{code, purpose: login|step_up}`; second factor after OTP and step-up |
 | POST | /v1/auth/totp/recover | adm | `{recoveryCode}`; single use (`admin_recovery_codes`) |
-| POST | /v1/auth/refresh | cookie | `{app}`; rotates; reuse of an old token revokes the family |
+| POST | /v1/auth/refresh | cookie | `{app}`; rotates; a retry of a lost response within 30 s, before the new token is used, gets the same new token (D-239); reuse of an old token revokes the family |
 | POST | /v1/auth/logout | cookie | current session of this app |
 | POST | /v1/auth/logout-all | cookie | all sessions of this app |
 
