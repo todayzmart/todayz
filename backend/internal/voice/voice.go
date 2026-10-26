@@ -84,7 +84,6 @@ const (
 
 // Errors a Stock adapter returns for the confirm to answer 422.
 var (
-	ErrAboveMRP = errors.New("voice: the price is above the item's MRP")
 	ErrItemGone = errors.New("voice: the item is not in the store")
 	ErrQuantity = errors.New("voice: quantity out of range")
 	ErrStale    = errors.New("voice: the item changed under the confirm")

@@ -261,7 +261,7 @@
     summary: Confirm a shelf photo draft
     description: >-
       The store's owner and managers. Accepted and edited lines become store items of their master
-      product at the line's price (the MRP unless edited; never above it) with the opening stock
+      product at the line's price (the MRP unless edited; above it is allowed, D-245) with the opening stock
       sent (0 when absent), through the same checks as adding an item by hand, in one transaction.
       A line without a product, or for a product the store already sells, is `422
       validation_failed` and nothing is applied. Idempotent. A draft not ready is `409

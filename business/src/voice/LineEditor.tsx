@@ -42,9 +42,7 @@ export function LineEditor({ store, line, choice, onSave, onClose }: LineEditorP
   const quantity = /^\d{1,4}$/.test(qty.trim()) ? Number(qty.trim()) : null;
   const pricePaise = parseRupees(price);
   const value = { kind, quantity: kind === 'set_price' ? null : quantity, pricePaise: kind === 'set_price' ? pricePaise : null };
-  const mrp = item?.mrpPaise ?? null;
-  const aboveMrp = kind === 'set_price' && mrp !== null && pricePaise !== null && pricePaise > mrp;
-  const ok = item !== null && numberOk(value) && !aboveMrp;
+  const ok = item !== null && numberOk(value);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
@@ -57,7 +55,6 @@ export function LineEditor({ store, line, choice, onSave, onClose }: LineEditorP
     if (!tried) return undefined;
     if (kind === 'set_price') {
       if (pricePaise === null) return intl.formatMessage({ id: 'voice.edit.priceInvalid' });
-      if (aboveMrp && mrp !== null) return intl.formatMessage({ id: 'voice.edit.aboveMrp' }, { mrp: formatMoney(mrp) });
       return undefined;
     }
     return numberOk(value) ? undefined : intl.formatMessage({ id: kind === 'count' ? 'voice.edit.countInvalid' : 'voice.edit.qtyInvalid' }, { max: MAX_QUANTITY });

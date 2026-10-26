@@ -439,7 +439,8 @@ func TestAIRetailBillInjection(t *testing.T) {
 }
 
 // SC-AI-16 on the route: a shelf confirm in S2 (where nothing is listed) creates the good
-// line and refuses the others with their reasons; the next confirm creates the fixed one.
+// lines (a price above the MRP is one, D-245) and refuses the other with its reason; the next
+// confirm settles it and creates nothing twice.
 func TestAIRetailShelfConfirmPerLine(t *testing.T) {
 	o := newRetailShop(t, true)
 	id, g := o.scan(o.owner, shelfDrafts(o.S2), "shelf_photo", shelfReply("Aashirvaad Atta", "Amul Butter", "Qzxv Wjk Plorb"))
@@ -453,14 +454,14 @@ func TestAIRetailShelfConfirmPerLine(t *testing.T) {
 		edit("l1", map[string]any{"productId": atta, "pricePaise": 30001}), accept("l2"), accept("l3"))
 	require.Equal(t, http.StatusOK, c.code, c.raw)
 	assert.Equal(t, "ready", c.body["status"])
-	assert.Equal(t, map[string]string{"l1": "invalid_price_above_mrp", "l3": "invalid_product"}, reasonsOf(c))
-	assert.Equal(t, before+1, o.a.count(`SELECT count(*) FROM store_items`))
+	assert.Equal(t, map[string]string{"l3": "invalid_product"}, reasonsOf(c))
+	assert.Equal(t, before+2, o.a.count(`SELECT count(*) FROM store_items`))
 
 	c = o.confirm(o.owner, shelfDrafts(o.S2), id,
 		edit("l1", map[string]any{"productId": atta, "pricePaise": 29500}), accept("l2"), discard("l3"))
 	require.Equal(t, http.StatusOK, c.code, c.raw)
 	assert.Equal(t, "confirmed", c.body["status"])
-	assert.Equal(t, before+2, o.a.count(`SELECT count(*) FROM store_items`), "butter is not created twice")
+	assert.Equal(t, before+2, o.a.count(`SELECT count(*) FROM store_items`), "atta and butter are not created twice")
 }
 
 // Two people confirming one shelf photo at once (different keys) create each item once.

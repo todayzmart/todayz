@@ -125,11 +125,17 @@ function BillQr({
   };
   // Device clock minus server clock when the claim was made, so the countdown follows the server's expiry.
   const skewRef = useRef(0);
+  // One Idempotency-Key (a ULID, 04 §1.6) per bill, amount and "Try again", so a repeated request
+  // replays the same claim.
+  const keys = useRef(new Map<string, string>());
 
   useEffect(() => {
     let cancelled = false;
+    const sig = `${saleClientId}-${amountPaise}-${round}`;
+    const key = keys.current.get(sig) ?? newUlid();
+    keys.current.set(sig, key);
     api
-      .createBillClaim({ saleClientId, amountPaise }, `claim-${saleClientId}-${amountPaise}-${round}`)
+      .createBillClaim({ saleClientId, amountPaise }, key)
       .then((c) => {
         if (cancelled) return;
         skewRef.current = now() - Date.parse(c.serverNow);

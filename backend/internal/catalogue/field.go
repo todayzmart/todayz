@@ -197,7 +197,6 @@ func (s *Service) FieldCreateItem(ctx context.Context, in FieldItemCreate) (ids.
 	q := s.db.Q(ctx)
 	cq := cataloguedb.New(q)
 	var productID ids.ID
-	var productMRP *int64
 	switch {
 	case in.ProductID != nil && in.NewProduct != nil:
 		return ids.Zero, fieldErr("body.newProduct", "send productId or newProduct, not both")
@@ -209,7 +208,7 @@ func (s *Service) FieldCreateItem(ctx context.Context, in FieldItemCreate) (ids.
 		if err != nil {
 			return ids.Zero, fmt.Errorf("catalogue: product: %w", err)
 		}
-		productID, productMRP = *in.ProductID, prod.MrpPaise
+		productID = *in.ProductID
 	case in.NewProduct != nil:
 		np := in.NewProduct
 		var v invalid
@@ -245,12 +244,8 @@ func (s *Service) FieldCreateItem(ctx context.Context, in FieldItemCreate) (ids.
 			}
 			return ids.Zero, fmt.Errorf("catalogue: new product: %w", err)
 		}
-		productMRP = np.MrpPaise
 	default:
 		return ids.Zero, fieldErr("body.productId", "send productId or newProduct")
-	}
-	if m := effectiveMRP(in.MrpPaise, productMRP); m != nil && in.PricePaise > *m {
-		return ids.Zero, fieldErr("body.pricePaise", "must not be above the MRP")
 	}
 	itemID := s.ids.New(now)
 	if _, err := cq.InsertStoreItem(ctx, cataloguedb.InsertStoreItemParams{
@@ -295,20 +290,6 @@ func (s *Service) FieldUpdateItem(ctx context.Context, in FieldItemUpdate) error
 	}
 	if err != nil {
 		return fmt.Errorf("catalogue: item: %w", err)
-	}
-	price, mrp := cur.PricePaise, cur.MrpPaise
-	if in.SetPrice {
-		price = in.PricePaise
-	}
-	if in.SetMrp {
-		mrp = in.MrpPaise
-	}
-	if m := effectiveMRP(mrp, cur.ProductMrpPaise); m != nil && price > *m {
-		field := "body.pricePaise"
-		if !in.SetPrice {
-			field = "body.mrpPaise"
-		}
-		return fieldErr(field, "the price must not be above the MRP")
 	}
 	if _, err := cq.UpdateStoreItem(ctx, cataloguedb.UpdateStoreItemParams{
 		SetPrice: in.SetPrice, PricePaise: in.PricePaise, SetMrp: in.SetMrp, MrpPaise: in.MrpPaise,

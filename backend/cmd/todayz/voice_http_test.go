@@ -509,8 +509,8 @@ func TestVoiceStockConcurrentConfirm(t *testing.T) {
 // SC-VO-05: an item the model could not match (no candidate, or a ref the list does not
 // have) is a line with no item, the spoken name and confidence 0; accepting it is refused
 // with "pick_item", and editing in an item applies it.
-// SC-VO-06: edited lines follow the per-kind ranges, a price above MRP is refused, and an
-// item not in this store is not found; a refused confirm writes nothing and keeps the draft.
+// SC-VO-06: edited lines follow the per-kind ranges, and an item not in this store is not
+// found (a price above MRP is allowed, D-245); a refused confirm writes nothing and keeps the draft.
 func TestVoiceStockPickAndEdit(t *testing.T) {
 	v := newVoiceShop(t)
 	before := v.writes()
@@ -541,8 +541,6 @@ func TestVoiceStockPickAndEdit(t *testing.T) {
 		{"a restock of 0", []map[string]any{edit("l1", map[string]any{"kind": "restock", "storeItemId": v.salt, "quantity": 0}), discard("l2"), discard("l3")}, "body.lines[0].value.quantity", "range"},
 		{"a sale with no quantity", []map[string]any{discard("l1"), edit("l2", map[string]any{"kind": "sale", "storeItemId": v.salt}), discard("l3")}, "body.lines[1].value.quantity", "required"},
 		{"a price on a count", []map[string]any{edit("l1", map[string]any{"kind": "count", "storeItemId": v.salt, "quantity": 3, "pricePaise": 100}), discard("l2"), discard("l3")}, "body.lines[0].value.pricePaise", "set_price_only"},
-		{"a price above MRP", []map[string]any{discard("l1"), discard("l2"), accept("l3")}, "body.lines[2].outcome", "above_mrp"},
-		{"an edited price above MRP", []map[string]any{discard("l1"), discard("l2"), edit("l3", map[string]any{"kind": "set_price", "storeItemId": v.butter, "pricePaise": 6001})}, "body.lines[2].value.pricePaise", "above_mrp"},
 		{"an item of no store", []map[string]any{edit("l1", map[string]any{"kind": "restock", "storeItemId": ids.New(v.a.clk.Now()).String(), "quantity": 6}), discard("l2"), discard("l3")}, "body.lines[0].value.storeItemId", "not_found"},
 	}
 	for _, b := range bad {
@@ -556,11 +554,11 @@ func TestVoiceStockPickAndEdit(t *testing.T) {
 	c := v.confirm(v.owner, id,
 		edit("l1", map[string]any{"kind": "restock", "storeItemId": v.salt, "quantity": 6}),
 		discard("l2"),
-		edit("l3", map[string]any{"kind": "set_price", "storeItemId": v.butter, "pricePaise": 5900}))
+		edit("l3", map[string]any{"kind": "set_price", "storeItemId": v.butter, "pricePaise": 6100}))
 	require.Equal(t, http.StatusOK, c.code, c.raw)
 	assert.Equal(t, map[string]string{"l1": "edited", "l2": "discarded", "l3": "edited"}, outcomesOf(c))
 	assert.Equal(t, 506, v.onHand(v.salt))
-	assert.Equal(t, 5900, v.priceOf(v.butter))
+	assert.Equal(t, 6100, v.priceOf(v.butter), "above the MRP of ₹60 (D-245)")
 	assert.Equal(t, 0, v.a.count(`SELECT count(*) FROM pos_sales WHERE store_id = $1`, uuidOf(t, v.sid)), "the discarded sale is not written")
 }
 
@@ -835,7 +833,6 @@ func TestVoiceStockErrMapping(t *testing.T) {
 	assert.NoError(t, voiceStockErr(nil))
 	assert.ErrorIs(t, voiceStockErr(catalogue.ErrStale), voice.ErrStale)
 	assert.ErrorIs(t, voiceStockErr(fmt.Errorf("set price: %w", catalogue.ErrStale)), voice.ErrStale)
-	assert.ErrorIs(t, voiceStockErr(catalogue.ErrAboveMRP), voice.ErrAboveMRP)
 	assert.ErrorIs(t, voiceStockErr(catalogue.ErrItemNotFound), voice.ErrItemGone)
 	assert.ErrorIs(t, voiceStockErr(catalogue.ErrQuantity), voice.ErrQuantity)
 	other := errors.New("boom")

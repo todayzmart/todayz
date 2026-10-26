@@ -19,7 +19,7 @@ interface FormBase {
   onCancel: () => void;
 }
 
-/** The selling price, checked against the MRP here and by the server (a price above MRP is a 422). */
+/** The selling price; any price, above the MRP too (D-245). */
 export function PriceForm({ store, item, reference, onDone, onCancel }: FormBase & { item: StoreItem; reference?: number | undefined }) {
   const intl = useIntl();
   const qc = useQueryClient();
@@ -34,7 +34,6 @@ export function PriceForm({ store, item, reference, onDone, onCancel }: FormBase
     e.preventDefault();
     const paise = parseRupees(price);
     if (paise === null) return setInvalid('stock.form.priceInvalid');
-    if (mrp !== null && paise > mrp) return setInvalid('stock.form.priceAboveMrp');
     setInvalid(null);
     const out = await action.run(`price:${paise}`, () => patchItem(qc, session, store, item.id, { pricePaise: paise }));
     if (out) {

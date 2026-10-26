@@ -24,6 +24,7 @@ const maxBody = 1 << 20
 var ops = map[string]string{
 	"ListCategories":      authz.Public,
 	"SearchProducts":      policy.ItemView,
+	"CreateProduct":       policy.ProductCreate,
 	"ListStoreItems":      policy.ItemView,
 	"GetStoreItem":        policy.ItemView,
 	"GetStoreItemHistory": policy.ItemView,
@@ -101,6 +102,14 @@ func (h handlers) SearchProducts(ctx context.Context, req catalogueapi.SearchPro
 		return nil, asProblem(err)
 	}
 	return catalogueapi.SearchProducts200JSONResponse(l), nil
+}
+
+func (h handlers) CreateProduct(ctx context.Context, req catalogueapi.CreateProductRequestObject) (catalogueapi.CreateProductResponseObject, error) {
+	p, err := h.s.createProduct(ctx, req.Bid, req.Body)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return catalogueapi.CreateProduct201JSONResponse(p), nil
 }
 
 func (h handlers) ListStoreItems(ctx context.Context, req catalogueapi.ListStoreItemsRequestObject) (catalogueapi.ListStoreItemsResponseObject, error) {
