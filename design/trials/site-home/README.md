@@ -1,4 +1,4 @@
-# Site home trial: cream and navy (D-246)
+# Site home trial: cream and navy (D-247)
 
 A standalone, local-only try-out of the founder's landing page (`TodayZ — The Physical World, Searchable`) in our own design system. Nothing here is built, deployed or imported: tokens, `shared/ui`, the apps and the live `site/` are unchanged.
 

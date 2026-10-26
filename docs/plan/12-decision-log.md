@@ -1426,7 +1426,7 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
 - **Not changed.** Enrolment, verify, recovery and reset still work when called. Nothing is audited per sign-in about the waiver.
 - Tests: `internal/identity` `TestAdminTOTPOff`, `internal/platform/config` `TestAdminTOTPOff`, admin `auth.test.tsx` (no second step goes straight to Pulse).
 
-**D-246 · The site's cream-and-navy look is tried as a standalone page first (founder, 26 Oct: "i want to test first … site / cream / navy / bag logo / keep all the things mentioned").**
+**D-247 · The site's cream-and-navy look is tried as a standalone page first (founder, 26 Oct: "i want to test first … site / cream / navy / bag logo / keep all the things mentioned").**
 - **What.** A local-only trial of the founder's landing page (`design/trials/site-home/index.html`), rebuilt on our fonts (Anek, Figtree), tokens and Lucide icons. It keeps every section and its copy, and uses:
   - a cream page background with the dot grid (D-101);
   - navy blocks for the top bar, radar, savings calculator, store owners panel and footer;
@@ -1434,3 +1434,16 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
 - **Scope.** Site only, and only as a trial. Tokens, `shared/ui`, the four apps and the live Astro site are unchanged, and no visual baselines move.
 - **Trial-only colours.** Cream `#faf9f5` / `#f3f0e9`, navy `#0b101d`, and mint and category colours used only on navy. They are CSS variables in the trial page. Text and buttons on cream stay on our brand green, because the source page's emerald fails contrast on cream.
 - **If the founder keeps it.** The colours become tokens in `design/source/tokens.json`, the page is ported into `site/` with message keys, and the copy conflicts listed in the trial README are settled first.
+
+**D-248 · A bright, Zomato/Swiggy-style look is tried on the customer app home and the site (founder, 26 Oct: "white theme but exellent color combinations, styles, css, ui/ux etc / can we do like that"; answers: both surfaces, free stock photos, light grey background).**
+- **What.** Two local-only trial pages:
+  - `design/trials/app-home/index.html` is the customer home at phone width;
+  - `design/trials/site-home-bright/index.html` is the D-247 site page re-skinned, with the same content.
+- **The look.**
+  - A light grey page (`#f4f5f7`) with white cards and soft shadows.
+  - Brand green is the one loud colour; colour comes from photos and from full-strength promo or section blocks (green, plum, blue).
+  - Anek headings at weight 800, letter-spaced centred section labels between hairlines, and round category photos.
+  - Big photo shop cards with the cashback on the photo, a product rail with `ADD`, a sticky search with a mic, filter chips, a floating cart bar and the five-tab bottom bar.
+- **What is not copied.** Their logos, illustrations, exact colours or layouts. Text stays on our green, because their orange and red fail contrast for small text.
+- **Photos.** These are Openverse CC BY 2.0 photos in `design/trials/photos/`, credited in `CREDITS.md`, for the trials only.
+- **Scope.** Trials only. Tokens, `shared/ui`, the apps and the live site are unchanged, and no visual baselines move. If the founder keeps the look, the trial-only values become tokens first, and the screens follow.
