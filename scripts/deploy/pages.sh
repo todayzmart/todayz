@@ -75,9 +75,14 @@ deploy() {
     dirty=true
   fi
   echo "==> pages: deploy $app"
-  npx --yes "wrangler@$WRANGLER_VERSION" pages deploy "$OUT/$app" \
-    --project-name "todayz-$app" --branch main \
-    --commit-hash "$commit" --commit-dirty="$dirty"
+  # wrangler takes Pages Functions from ./functions in its working directory, so run it from
+  # the app folder (customer/functions serves the /x/<code> share previews, W3-16).
+  (
+    cd "$ROOT/$app"
+    npx --yes "wrangler@$WRANGLER_VERSION" pages deploy "$OUT/$app" \
+      --project-name "todayz-$app" --branch main \
+      --commit-hash "$commit" --commit-dirty="$dirty"
+  )
 }
 
 [[ $# -ge 1 ]] || usage
