@@ -380,5 +380,5 @@ Each column below is created as a plain `uuid` with an index. The constraint is 
 | `bill_claims` (W2-04, 2) | `credit_holds.bill_claim_id` (W2-01) | Wave 2 constraints migration |
 | `ledger_transactions` (W2-01, 2) | `referrals.referrer_transaction_id`, `referrals.referee_transaction_id` (W2-03) | Wave 2 constraints migration |
 | `qr_standees` (W3-09, 3) | `referrals.standee_id`, `referral_clicks.standee_id` (W2-03) | W3-09, `30901_w3-09_qr_standees.sql` (D-211, D-223) |
-| `ai_drafts` (W3-10, 3) | `coach_suggestions.ai_draft_id` (W3-11) | Wave 3 constraints migration |
+| `ai_drafts` (W3-10, 3) | `coach_suggestions.ai_draft_id` (W3-11) | Wave 3 constraints migration (`39901`, `on delete set null`) |
 | `ask_recipients` (W3-16, 3) | `orders.ask_reply_id` (W2-02), `on delete set null` (D-101) | W3-16 |
