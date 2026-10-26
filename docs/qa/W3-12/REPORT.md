@@ -156,6 +156,7 @@ Static checks:
 - golangci-lint is clean on the changed packages.
 - `make gen`, `scripts/no-egress.sh make gen check-contract` and `scripts/no-egress.sh make contract-smoke` are green.
 - Rerun on 26 Oct after the lead's answers: the Go tests for search, ai, voice, platform/settings, admin, migrate, db and cmd/todayz pass, except one run of W2-04's `TestPOSOfflineOfferMatchesEngine` (`pos_round2_http_test.go:328`, entry 4 "failed" instead of "linked"). It passes 3/3 alone; it signs TOTP codes at minute offsets, so it looks like a time-window flake, not W3-12. gosec, settingslint, golangci, check-contract, contract-smoke, the customer checks and the mocked Playwright specs (`ai`, `smoke`: 11/11) pass again.
+- Then `main` at `5c371423` (W3-13 admin AI, W4-07, the zod bump) was merged in. The conflicts were in `sqlc.yaml`, `ai.yaml` (paths and schemas), `cmd/todayz/ai.go`, `routes_ai.go`, backend `CLAUDE.md` and the decision log; each side only added, so both sides were kept. After the merge everything passes again: `make gen`, the Go tests above plus `internal/support`, golangci, gosec, settingslint, check-contract, contract-smoke, customer lint, tsc, vitest 195/195, `build:e2e`, size 143.84 kB, every mocked Playwright spec 28/28, and `shared/i18n` 198/198.
 
 ### Recorded evals
 
