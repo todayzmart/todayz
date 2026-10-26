@@ -358,6 +358,91 @@
               nextCursor: null
               serverNow: '2026-10-24T05:30:00Z'
       default: *id001
+/v1/discover/stores/{slug}/substitutes:
+  parameters:
+  - name: slug
+    in: path
+    required: true
+    schema:
+      $ref: ../schemas/common.yaml#/Slug
+  get:
+    operationId: listDiscoverSubstitutes
+    tags:
+    - discover
+    summary: Alternatives to a shop's item
+    description: 'AI-C3 substitutes, rule-based (11 §AI-C3, D-233; no model, no flag): what to buy
+      instead of `itemId` when it is out of stock. `sameShop`: in-stock items of this shop in the same
+      category, of a pack size within 25% of it in the same kind of unit, same brand first, then the
+      closest pack, then price. `nearby`: the same master product in stock at other live shops of
+      verified businesses inside the radius, nearest first. A store that is not live, or an item it
+      does not list, is 404 `not_found`. Read-only and not logged as a search.'
+    security: []
+    parameters:
+    - name: itemId
+      in: query
+      required: true
+      description: The shop's item (`DiscoverSearchItem.storeItemId`).
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+      example: 01JB0S5A6B7C8D9E0F1G2H3J4K
+    - *id002
+    - *id003
+    - *id004
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/discover.yaml#/DiscoverSubstitutes
+            example:
+              sameShop:
+              - storeItemId: 01JB0S5A6B7C8D9E0F1G2H3J5M
+                productId: 01JB0S4A5B6C7D8E9F0G1H2J5M
+                name: Nandini Butter
+                variant: null
+                brand: Nandini
+                packSize: 100
+                unit: g
+                pricePaise: 5400
+                mrpPaise: 5600
+                hasOffer: false
+                inStock: true
+                confirmedAt: '2026-10-24T05:18:00Z'
+                imageKey: null
+              nearby:
+              - store:
+                  storeId: 01JB0S3A4B5C6D7E8F9G0H1J2K
+                  storeSlug: sri-lakshmi-stores
+                  name: Sri Lakshmi Stores
+                  locality: Indiranagar
+                  categoryTint: green
+                  distanceM: 650
+                  open: true
+                  pickup: true
+                  delivery: false
+                  bookable: true
+                  rating: 4.6
+                  ratingCount: 38
+                  cashbackPct: 0
+                items:
+                - storeItemId: 01JB0S5A6B7C8D9E0F1G2H3J6N
+                  productId: 01JB0S4A5B6C7D8E9F0G1H2J3K
+                  name: Amul Butter
+                  variant: Pasteurised
+                  brand: Amul
+                  packSize: 100
+                  unit: g
+                  pricePaise: 5800
+                  mrpPaise: 6000
+                  hasOffer: false
+                  inStock: true
+                  confirmedAt: '2026-10-24T05:18:00Z'
+                  imageKey: null
+                badge: null
+                deliveryFeePaise: null
+              serverNow: '2026-10-24T05:30:00Z'
+      default: *id001
 /v1/discover/search:
   get:
     operationId: searchDiscover

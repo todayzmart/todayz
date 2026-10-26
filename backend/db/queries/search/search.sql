@@ -292,3 +292,49 @@ LIMIT @lim;
 -- name: BasketProductNames :many
 -- The names of a basket's product lines, for the search log (any status).
 SELECT id, name FROM products WHERE id = ANY(@ids::uuid[]);
+
+------------------------------------------------------------------------------
+-- Substitutes (W3-12, AI-C3 rule-based, D-233)
+------------------------------------------------------------------------------
+
+-- name: SubstituteSource :one
+-- The item substitutes are found for: a listed item of the store whose product
+-- is not retired or merged, else no row (404).
+SELECT si.product_id, p.category_id, p.brand_id, p.pack_size::float8 AS pack_size, p.unit
+FROM store_items si
+JOIN products p ON p.id = si.product_id
+WHERE si.id = @store_item_id AND si.store_id = @store_id AND si.is_listed
+  AND p.status IN ('active', 'pending_review');
+
+-- name: SubstituteShopItems :many
+-- The same shop's in-stock items of other products in the category, in one of
+-- units, whose pack size in base units (g, ml, pc, pack; kg and l × 1000) is
+-- between min_base and max_base. The columns are SearchItems's, in its order,
+-- so Go reads them the same way. The store is the caller's live store.
+SELECT si.id AS store_item_id, si.product_id, si.local_name, si.price_paise, si.mrp_paise,
+  (si.on_hand - si.reserved)::int AS available, si.stock_updated_at,
+  p.name AS product_name, p.variant, p.pack_size::float8 AS pack_size, p.unit, p.image_key,
+  p.category_id, p.brand_id, br.name AS brand_name,
+  true AS fts,
+  1::float8 AS sim,
+  s.id AS store_id, s.slug AS store_slug, s.name AS store_name, s.locality AS store_locality,
+  s.hours, s.closed_until, s.accepts_pickup, s.accepts_delivery,
+  s.delivery_fee_paise, s.delivery_free_above_paise, s.cashback_bp,
+  (s.rating_avg IS NOT NULL)::bool AS has_rating, COALESCE(s.rating_avg, 0)::float8 AS rating_avg, s.rating_count,
+  c.tint AS category_tint,
+  (s.reliability_score IS NOT NULL)::bool AS has_reliability, COALESCE(s.reliability_score, 0)::float8 AS reliability,
+  ST_Distance(s.location, ST_SetSRID(ST_MakePoint(@lng::float8, @lat::float8), 4326)::geography)::float8 AS distance_m
+FROM stores s
+JOIN businesses b ON b.id = s.business_id
+JOIN store_items si ON si.store_id = s.id
+JOIN products p ON p.id = si.product_id
+LEFT JOIN brands br ON br.id = p.brand_id
+LEFT JOIN categories c ON c.id = b.category_id
+WHERE s.id = @store_id AND s.status = 'live' AND b.status = 'verified'
+  AND si.is_listed AND si.on_hand - si.reserved > 0
+  AND p.status IN ('active', 'pending_review')
+  AND p.category_id = @category_id AND p.id <> @product_id
+  AND p.unit = ANY(@units::text[])
+  AND (p.pack_size * CASE WHEN p.unit IN ('kg', 'l') THEN 1000 ELSE 1 END)::float8
+      BETWEEN @min_base::float8 AND @max_base::float8
+LIMIT @lim;
