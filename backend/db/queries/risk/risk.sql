@@ -30,8 +30,10 @@ GROUP BY store_id
 ORDER BY store_id;
 
 -- name: SelfLikeCandidates :many
--- Referrals that qualified since @since and were never flagged
--- referral.self_like, with the self-like signals (D-225):
+-- Referrals that qualified since @since (or, with @referral_id, that one
+-- referral whenever it qualified: the reward pass checks it before it posts,
+-- D-237) and were never flagged referral.self_like, with the self-like
+-- signals (D-225):
 --   * own_shop: the qualifying order or sale was at a store of a business on
 --     the referrer's side (the referring store's business; for a customer
 --     referrer, a business they work at);
@@ -48,7 +50,9 @@ WITH c AS (
   FROM referrals r
   LEFT JOIN orders o ON r.qualifying_ref_type = 'order' AND o.id = r.qualifying_ref_id
   LEFT JOIN pos_sales ps ON r.qualifying_ref_type = 'pos_sale' AND ps.id = r.qualifying_ref_id
-  WHERE r.qualified_at >= @since AND r.status IN ('qualified', 'rewarded')
+  WHERE (sqlc.narg(referral_id)::uuid IS NULL OR r.id = sqlc.narg(referral_id)::uuid)
+    AND (sqlc.narg(since)::timestamptz IS NULL OR r.qualified_at >= sqlc.narg(since)::timestamptz)
+    AND r.status IN ('qualified', 'rewarded')
     AND NOT EXISTS (SELECT 1 FROM risk_flags f
       WHERE f.subject_type = 'referral' AND f.subject_id = r.id AND f.rule = 'referral.self_like')
 ), side AS (

@@ -29,9 +29,12 @@ import (
 // A-09 Credits (W3-01; 01 §7; D-05, D-73): the ledger browser, the expiry
 // preview and admin adjustments of a customer's wallet.
 //
-// An adjustment whose |amount| is at or under
-// admin_adjust_dual_approval_above_paise posts at once (admin_adjustment,
-// against platform_adjustments). Above it, it waits in
+// An adjustment posts at once (admin_adjustment, against
+// platform_adjustments) while the same admin's adjustments to the same
+// customer in the current IST day, |amount| summed with this one's, stay at
+// or under admin_adjust_dual_approval_above_paise (D-73, D-237: so splitting
+// one large adjustment into small ones does not skip the second person).
+// Above it, it waits in
 // admin_adjustment_requests for a second finance or super_admin; the
 // requester can only cancel it (D-05; the table's CHECK keeps it too). Every
 // step is one audit row in the posting's transaction, and every posting goes
@@ -324,7 +327,6 @@ func (a *Admin) CreateAdjustment(ctx context.Context, p authn.Principal, in Adju
 	if abs < 0 {
 		abs = -abs
 	}
-	pending := abs > int64(threshold)
 
 	now := a.s.now()
 	id := a.ids.New(now)
@@ -353,9 +355,13 @@ func (a *Admin) CreateAdjustment(ctx context.Context, p authn.Principal, in Adju
 		if !live {
 			return adminFieldErr("body.accountId", "the customer's account is deleted")
 		}
+		dayPaise, pending, err := a.needsSecond(ctx, p.UserID, acct, abs, int64(threshold), in.IdempotencyKey, now)
+		if err != nil {
+			return err
+		}
 		after := map[string]any{
 			"customerId": customer.String(), "amountPaise": in.AmountPaise, "reason": reason, "link": link,
-			"thresholdPaise": int64(threshold),
+			"thresholdPaise": int64(threshold), "dayTotalPaise": dayPaise,
 		}
 		if pending {
 			// At once, Post checks the balance itself (after the key, so a replay
@@ -433,6 +439,44 @@ func (a *Admin) CreateAdjustment(ctx context.Context, p authn.Principal, in Adju
 	}
 	out.ServerNow = a.s.now()
 	return out, nil
+}
+
+// needsSecond decides whether an adjustment waits for a second approver
+// (D-237): it does when this admin's adjustments to this customer in the
+// current IST day, absolute values, pending and posted, plus this one, come
+// to more than the threshold. It takes a transaction lock on the admin and
+// customer first, so two concurrent requests cannot both pass under it. A
+// replay of an Idempotency-Key keeps the path its first request took (its
+// first request is already in the sum). dayPaise is the sum, this one included.
+func (a *Admin) needsSecond(ctx context.Context, admin ids.ID, acct creditsdb.AccountByIDRow, abs, threshold int64, idemKey string, now time.Time) (dayPaise int64, pending bool, err error) {
+	cq := a.s.q(ctx)
+	if err := cq.LockAdminCustomerAdjust(ctx, admin.String()+":"+mustID(acct.OwnerID).String()); err != nil {
+		return 0, false, problem.Wrap(genproblems.Internal, err)
+	}
+	if idemKey != "" {
+		_, err := cq.AdjustmentRefByKey(ctx, KeyPrefix[TxAdminAdjustment]+admin.String()+":"+idemKey)
+		switch {
+		case err == nil:
+			return 0, false, nil
+		case !db.IsNoRows(err):
+			return 0, false, problem.Wrap(genproblems.Internal, err)
+		}
+		_, err = cq.AdjustmentRequestByKey(ctx, creditsdb.AdjustmentRequestByKeyParams{RequestedBy: ids.UUID(admin), IdempotencyKey: &idemKey})
+		switch {
+		case err == nil:
+			return 0, true, nil
+		case !db.IsNoRows(err):
+			return 0, false, problem.Wrap(genproblems.Internal, err)
+		}
+	}
+	done, err := cq.AdminAdjustedSince(ctx, creditsdb.AdminAdjustedSinceParams{
+		WalletID: acct.ID, Since: clock.StartOfDayIST(now), AdminID: ids.UUID(admin), CustomerID: acct.OwnerID,
+	})
+	if err != nil {
+		return 0, false, problem.Wrap(genproblems.Internal, err)
+	}
+	dayPaise = done*paisePerCredit + abs
+	return dayPaise, dayPaise > threshold, nil
 }
 
 // post is the admin_adjustment posting: the wallet by credits, the platform's

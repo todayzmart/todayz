@@ -835,3 +835,16 @@ func TestConcurrentWritesKeepTheRatingExact(t *testing.T) {
 	require.True(t, ok)
 	e.requireRating(e.store, want, count)
 }
+
+// A moderation reason goes into the audit log: never a phone number.
+func TestCleanModReason(t *testing.T) {
+	r, err := cleanModReason("  abusive language  ")
+	require.NoError(t, err)
+	assert.Equal(t, "abusive language", r)
+	for _, s := range []string{"", "   ", strings.Repeat("x", 501), "customer said call 98765 43210", "ph +91 ९८७६५४३२१०"} {
+		_, err := cleanModReason(s)
+		requireProblem(t, err, genproblems.ValidationFailed, "body.reason")
+	}
+	_, err = cleanModReason("order TZ-48213 was hidden twice")
+	require.NoError(t, err)
+}

@@ -312,6 +312,34 @@ func TestScanSelfLikeReferral(t *testing.T) {
 	assert.Equal(t, 1, l.Items[0].OpenFlags)
 }
 
+// D-237: the reward pass checks one referral before it posts; the scan
+// never raises a second flag for it, and a referral that is not self-like
+// raises nothing.
+func TestCheckReferralSelfLike(t *testing.T) {
+	e := newEnv(t)
+	biz, store := e.shop("Own Shop")
+	cashier := e.user("Cashier")
+	e.staff(biz, cashier)
+	selfLike := e.referral("retailer_customer", "store", store, "customer", cashier, "order", e.tdb.InsertOrder(t, e.id(), cashier, store))
+	real := e.user("Real")
+	normal := e.referral("retailer_customer", "store", store, "customer", real, "order", e.tdb.InsertOrder(t, e.id(), real, store))
+
+	raised, err := e.svc.CheckReferralSelfLike(e.ctx, normal)
+	require.NoError(t, err)
+	assert.False(t, raised)
+	raised, err = e.svc.CheckReferralSelfLike(e.ctx, selfLike)
+	require.NoError(t, err)
+	assert.True(t, raised)
+	raised, err = e.svc.CheckReferralSelfLike(e.ctx, selfLike)
+	require.NoError(t, err)
+	assert.False(t, raised, "one flag per referral, ever")
+
+	fs := e.flags(RuleSelfLike)
+	require.Len(t, fs, 1)
+	assert.Equal(t, selfLike.String(), fs[0].SubjectId)
+	assert.EqualValues(t, 0, e.scan()["referral_self_like"], "the scan does not raise it again")
+}
+
 func (e *env) otp(phone, ip string, attempts int, used bool, at time.Time) {
 	var consumed *time.Time
 	if used {

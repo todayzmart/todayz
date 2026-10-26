@@ -38,13 +38,29 @@ SELECT business_id, count(*)::int AS photos FROM business_documents
 WHERE business_id = ANY(@business_ids::uuid[]) AND kind IN ('shop_photo','storefront') AND status IN ('uploaded','accepted')
 GROUP BY business_id;
 
--- name: StaleFieldDocuments :many
--- Field photos never confirmed by their confirm_by, oldest first, for the
--- sweep; locked so two sweeps do not take the same rows.
-SELECT id, object_key FROM business_documents
-WHERE status = 'pending' AND confirm_by < @now::timestamptz
-ORDER BY confirm_by, id LIMIT @lim
-FOR UPDATE SKIP LOCKED;
+-- name: ClaimStaleFieldDocuments :many
+-- Field photos never confirmed by their confirm_by and not waiting on a
+-- retry, for the sweep: never-failed rows first, then oldest confirm_by. The
+-- claim sets sweep_retry_at to the lease's end and commits, so the sweep
+-- deletes the objects outside any row lock and a second sweep does not take
+-- the same rows. Past confirm_by a photo can no longer be confirmed, so
+-- nothing else changes a claimed row.
+UPDATE business_documents d SET sweep_retry_at = @lease_until::timestamptz
+FROM (
+  SELECT id FROM business_documents
+  WHERE status = 'pending' AND confirm_by < @now::timestamptz
+    AND (sweep_retry_at IS NULL OR sweep_retry_at <= @now::timestamptz)
+  ORDER BY sweep_attempts, confirm_by, id LIMIT @lim
+  FOR UPDATE SKIP LOCKED
+) c
+WHERE d.id = c.id
+RETURNING d.id, d.object_key, d.sweep_attempts;
+
+-- name: FailStaleDocumentSweep :exec
+-- The sweep could not delete the photo's object: it is tried again after
+-- retry_at and counts one more failed attempt.
+UPDATE business_documents SET sweep_attempts = sweep_attempts + 1, sweep_retry_at = @retry_at::timestamptz
+WHERE id = @id AND status = 'pending';
 
 -- name: RejectStaleDocuments :execrows
 UPDATE business_documents SET status = 'rejected', reject_reason = 'not uploaded in time',

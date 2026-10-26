@@ -72,10 +72,11 @@ const (
 	failError   = "error"        // any other error in the side's transaction; retried with the backoff
 	failWaiting = "waiting"      // the beneficiary is not payable yet (no live store); retried with the backoff
 	failBlocked = "blocked"      // a blocked customer referrer (D-168); retried once unblocked
+	failHeld    = "held"         // held as self-like (D-237); posted once a person clears the flag
 )
 
 func init() {
-	telemetry.RegisterLabelValues("reason", failLedger, failRefused, failError, failWaiting, failBlocked)
+	telemetry.RegisterLabelValues("reason", failLedger, failRefused, failError, failWaiting, failBlocked, failHeld)
 }
 
 var (
@@ -314,7 +315,9 @@ type RewardResult struct {
 // inside a caller's transaction). A side left unposted records an attempt:
 // a ledger error or a beneficiary not payable yet backs off, a refusal
 // raises referral.reward_refused (the sweep skips the referral until a
-// person clears it). The error is a database error recording the outcome.
+// person clears it). Before any side, the self-like check runs (D-237): a
+// referral held as self-like posts nothing until a person clears the flag.
+// The error is a database error recording the outcome, or the check's.
 func (s *Service) PostRewards(ctx context.Context, referralID ids.ID) (RewardResult, error) {
 	var res RewardResult
 	if s.db == nil {
@@ -325,6 +328,16 @@ func (s *Service) PostRewards(ctx context.Context, referralID ids.ID) (RewardRes
 	}
 	id := ids.UUID(referralID)
 	log := telemetry.Logger(ctx)
+	held, err := s.heldSelfLike(ctx, id)
+	if err != nil {
+		return res, err
+	}
+	if held {
+		countFailed(ctx, failHeld)
+		log.InfoContext(ctx, "referrals: reward held as self-like until a person clears the flag", "referral", referralID.String())
+		res.Waiting = true
+		return res, nil
+	}
 	backoff, unposted := false, false
 	for _, name := range []string{SideReferrer, SideReferee} {
 		out, err := s.postSide(ctx, id, name)
@@ -371,6 +384,41 @@ func (s *Service) PostRewards(ctx context.Context, referralID ids.ID) (RewardRes
 	}
 	res.Waiting = true
 	return res, s.recordAttempt(ctx, row, backoff)
+}
+
+// heldSelfLike runs the self-like check on a qualified referral before any
+// side posts (D-237) and reports whether its reward is held: an open or
+// confirmed referral.self_like flag, raised now or earlier (by risk_scan,
+// the backstop). A held referral posts nothing and the sweep skips it until
+// a person clears the flag; a cleared flag is never raised again, so the next
+// pass posts. A referral no longer qualified is left to postSide.
+func (s *Service) heldSelfLike(ctx context.Context, id pgtype.UUID) (bool, error) {
+	held := false
+	err := s.db.InTx(ctx, func(ctx context.Context) error {
+		q := s.q(ctx)
+		row, err := q.GetReferral(ctx, id)
+		if db.IsNoRows(err) {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		if row.Status != statusQualified {
+			return nil
+		}
+		if s.selfLike != nil {
+			raised, err := s.selfLike.CheckReferralSelfLike(ctx, idOf(id))
+			if err != nil {
+				return fmt.Errorf("referrals: self-like check: %w", err)
+			}
+			if raised {
+				telemetry.Logger(ctx).WarnContext(ctx, "referrals: referral flagged self-like before its reward", "referral", idOf(id).String())
+			}
+		}
+		held, err = q.SelfLikeHeld(ctx, id)
+		return err
+	})
+	return held, err
 }
 
 // recordAttempt records a pass that left a qualified referral with a side

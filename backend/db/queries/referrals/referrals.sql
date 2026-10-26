@@ -125,6 +125,13 @@ SELECT count(*)::int AS n FROM (
   SELECT r.referee_id FROM referrals r WHERE r.device_hash = @device_hash
 ) a;
 
+-- name: SelfLikeHeld :one
+-- A referral with an open or confirmed referral.self_like flag: its reward is
+-- held until a person clears the flag (D-237).
+SELECT EXISTS (SELECT 1 FROM risk_flags
+  WHERE subject_type = 'referral' AND subject_id = @subject_id AND rule = 'referral.self_like'
+    AND status IN ('open', 'confirmed'))::boolean;
+
 -- name: LockOpenRiskFlag :one
 -- A referral's open or confirmed flag for a rule, to add to it rather than
 -- raise a second one (D-169). The caller holds the referral's row lock.
@@ -232,13 +239,14 @@ WHERE id = @id AND status = 'qualified';
 -- fill every batch; it comes back once the referrer is unblocked. A referral
 -- whose reward the ledger refused for good (an open or confirmed
 -- referral.reward_refused flag) is skipped too, until a person clears the
--- flag (D-169).
+-- flag (D-169). A referral held as self-like (an open or confirmed
+-- referral.self_like flag, D-237) is skipped the same way.
 SELECT r.id FROM referrals r
 WHERE r.status = 'qualified'
   AND NOT (r.referee_rewarded_at IS NOT NULL AND r.referrer_type = 'customer'
     AND EXISTS (SELECT 1 FROM users u WHERE u.id = r.referrer_id AND u.status = 'blocked'))
   AND NOT EXISTS (SELECT 1 FROM risk_flags f WHERE f.subject_type = 'referral' AND f.subject_id = r.id
-    AND f.rule = 'referral.reward_refused' AND f.status IN ('open', 'confirmed'))
+    AND f.rule IN ('referral.reward_refused', 'referral.self_like') AND f.status IN ('open', 'confirmed'))
   AND r.next_attempt_at <= @now::timestamptz
 ORDER BY r.next_attempt_at, r.id LIMIT @lim;
 

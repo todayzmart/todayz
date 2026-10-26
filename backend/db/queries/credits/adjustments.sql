@@ -136,3 +136,30 @@ LIMIT @lim;
 
 -- name: CustomerExists :one
 SELECT EXISTS (SELECT 1 FROM users WHERE id = @id AND status <> 'deleted')::boolean;
+
+------------------------------------------------------------------------------
+-- The day's sum for the two-person rule (D-237)
+------------------------------------------------------------------------------
+
+-- LockAdminCustomerAdjust serialises one admin's adjustments to one customer
+-- (pair_key: admin id, a colon, customer id) for the rest of the transaction, so two concurrent requests cannot both
+-- read the day's sum before either is written.
+-- name: LockAdminCustomerAdjust :exec
+SELECT pg_advisory_xact_lock(hashtextextended('credits.adjust:' || sqlc.arg(pair_key)::text, 0));
+
+-- AdminAdjustedSince is the credits (absolute values) one admin has adjusted
+-- on one customer's wallet since a moment: their at-once postings plus their
+-- requests still pending or approved. A request's own posting (made by its
+-- approver) is counted once, as the request; rejected and cancelled requests
+-- moved nothing and do not count.
+-- name: AdminAdjustedSince :one
+SELECT (
+  coalesce((SELECT sum(abs(e.amount)) FROM ledger_entries e
+    JOIN ledger_transactions t ON t.id = e.transaction_id
+    WHERE e.account_id = @wallet_id AND e.created_at >= @since
+      AND t.kind = 'admin_adjustment' AND t.created_by = @admin_id
+      AND NOT EXISTS (SELECT 1 FROM admin_adjustment_requests r WHERE r.id = t.ref_id)), 0)
+  + coalesce((SELECT sum(abs(r.amount)) FROM admin_adjustment_requests r
+    WHERE r.requested_by = @admin_id AND r.customer_id = @customer_id AND r.requested_at >= @since
+      AND r.status IN ('pending', 'approved')), 0)
+)::bigint AS credits;
