@@ -457,7 +457,9 @@
       the deterministic refine-chip parser (no model) reads price caps, open now, pickup, delivery, offers,
       near me and brands out of `q`; each chip it applies is a filter, is listed in `chips`, and `query` is
       what is left to search for. A chip whose filter the request sets itself is not applied. `refineHint`
-      is true when parsing was on, no chip was read and `q` has at least `refine_ai_min_words` words. Every search
+      is true when parsing was on and either no chip was read and `q` has at least `refine_ai_min_words` words, or
+      the synonym table matched none of the words left and no listing or master product recognises them
+      either (not a barcode, not one `productId`; D-238). Every search
       is logged to `search_log`, zero results too. Search never calls a model.'
     security: []
     parameters:

@@ -208,7 +208,7 @@ func (s *Service) basketCandidates(ctx context.Context, q *searchdb.Queries, req
 			r := req
 			r.Q = l.norm
 			var err error
-			if found, _, err = s.find(ctx, q, r, l.norm, rs, now); err != nil {
+			if found, _, _, err = s.find(ctx, q, r, l.norm, rs, now); err != nil {
 				return nil, nil, err
 			}
 			e.norm = l.norm

@@ -163,7 +163,7 @@ func (s *Service) ListStoreItems(ctx context.Context, slug string, p discoverapi
 	params := searchdb.StoreItemsPageParams{StoreID: st.ID, Off: i32(offset), Lim: i32(limit + 1)}
 	if p.Q != nil {
 		if words := parse(Normalize(*p.Q)).words; len(words) > 0 {
-			slots, err := expand(ctx, q, words)
+			slots, _, err := expand(ctx, q, words)
 			if err != nil {
 				return out, internal(err)
 			}

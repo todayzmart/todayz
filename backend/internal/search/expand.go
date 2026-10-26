@@ -15,10 +15,11 @@ import (
 // returns the query's slots. A phrase of one to three words that is a term or
 // a synonym stands for its canonical terms and every synonym of those terms
 // (the second hop: "dahi" → curd → "thayir", "ಮೊಸರು"). The table is the only
-// source of synonyms; no model is asked (01 §11.1).
-func expand(ctx context.Context, q *searchdb.Queries, words []string) ([]slot, error) {
+// source of synonyms; no model is asked (01 §11.1). hit says whether any phrase of the
+// query was a term or a synonym in the table (the search's synonym miss is !hit, D-238).
+func expand(ctx context.Context, q *searchdb.Queries, words []string) (slots []slot, hit bool, err error) {
 	if len(words) == 0 {
-		return nil, nil
+		return nil, false, nil
 	}
 	phrases := ngrams(words)
 	inQuery := make(map[string]bool, len(phrases))
@@ -27,7 +28,7 @@ func expand(ctx context.Context, q *searchdb.Queries, words []string) ([]slot, e
 	}
 	rows, err := q.SynonymsFor(ctx, phrases)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	canon := map[string]map[string]bool{} // phrase -> its canonical terms
 	add := func(phrase, term string) {
@@ -54,7 +55,7 @@ func expand(ctx context.Context, q *searchdb.Queries, words []string) ([]slot, e
 	if len(terms) > 0 {
 		second, err := q.SynonymsOfTerms(ctx, terms)
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
 		synOf := map[string][]string{}
 		for _, r := range second {
@@ -81,7 +82,7 @@ func expand(ctx context.Context, q *searchdb.Queries, words []string) ([]slot, e
 			alts[phrase] = list
 		}
 	}
-	return buildSlots(words, alts), nil
+	return buildSlots(words, alts), len(canon) > 0, nil
 }
 
 // catIndex is the category tree for matching and filtering.

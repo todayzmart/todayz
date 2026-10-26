@@ -26,8 +26,11 @@ type ChipReader interface {
 // removing a chip or tapping a search assist suggestion), applies them as filters and leaves
 // req.Q as the words that were not chips. A chip whose filter the request already sets
 // explicitly is not applied and not shown. Reading never fails a search: on an error the
-// query is searched as typed. hint is refineHint: parsing was on, no chip was read and the
-// query has at least refine_ai_min_words words (the conservative half of 01 §11.1, D-231).
+// query is searched as typed. hint is the parser half of refineHint (01 §11.1, D-231):
+// parsing was on, no chip was read and the query has at least refine_ai_min_words words.
+// The other half, the synonym miss (D-238), is known only after the search has run: Search
+// sets it from find's result, unless req.skipMiss says there was nothing to search for
+// (chips read, no words left).
 func (s *Service) refine(ctx context.Context, req *searchReq) (chips []discoverapi.DiscoverChip, hint bool, err error) {
 	chips = []discoverapi.DiscoverChip{}
 	if !req.Parse {
@@ -35,9 +38,12 @@ func (s *Service) refine(ctx context.Context, req *searchReq) (chips []discovera
 	}
 	if s.chips != nil {
 		rest, read, rerr := s.chips.ReadChips(ctx, req.Q)
-		if rerr != nil {
+		switch {
+		case rerr != nil:
 			telemetry.Logger(ctx).WarnContext(ctx, "search: refine chips", "err", rerr)
-		} else if len(read) > 0 && Normalize(rest) != "" {
+		case len(read) > 0 && Normalize(rest) == "":
+			req.skipMiss = true // only chips: searched as typed, never offered to the model
+		case len(read) > 0:
 			req.Q = rest
 			for _, c := range read {
 				if applyChip(req, c) {
