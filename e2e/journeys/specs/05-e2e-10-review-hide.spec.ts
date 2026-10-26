@@ -73,3 +73,46 @@ test('E2E-10 the customer shop page (C-07) shows the rating', async ({ who, brow
     await app.close();
   }
 });
+
+// The W3 gate: the same journey with the admin steps on A-12 Reviews (D-83), support signed in
+// to the admin console in a browser context.
+test('E2E-10 through A-12: support hides and restores a review on the Reviews screen; the public rating follows', async ({ who, browser }) => {
+  const asha = new Customer(await who('asha'));
+  const support = await who('support');
+  const shop = new Shop(await who('owner'), STORES.SL);
+
+  const start = await rating();
+  const order = await placeAndCollect(asha, shop, [{ storeItemId: SL_ITEMS.qa100.id, quantity: 1 }]);
+  const review = await asha.api.ok<{ id: string }>('customer reviews the order', 'POST', '/v1/me/reviews', { orderId: order.id, stars: 2, text: 'E2E-10 A-12 journey review' });
+  await expect.poll(async () => (await rating()).count).toBe(start.count + 1);
+
+  const app = await openApp(browser, support, URLS.admin);
+  const { page } = app;
+  try {
+    await test.step('A-12 lists the review of the shop; support opens it', async () => {
+      await page.goto(`/reviews?state=visible&storeId=${STORES.SL.id}&review=${review.id}`);
+      await expect(page.getByRole('button', { name: 'Hide review' })).toBeVisible();
+    });
+
+    await test.step('support hides it with a reason; the public rating drops', async () => {
+      await page.getByRole('button', { name: 'Hide review' }).click();
+      const dialog = page.getByRole('dialog', { name: `Hide this review of ${STORES.SL.name}?` });
+      await dialog.getByLabel('Reason').fill('E2E-10 A-12: hide check');
+      await dialog.getByRole('button', { name: 'Hide review' }).click();
+      await expect(page.getByText('Review hidden.')).toBeVisible();
+      await expect.poll(async () => (await rating()).count).toBe(start.count);
+    });
+
+    await test.step('the hidden filter shows it; support restores it with a reason; the rating counts it again', async () => {
+      await page.goto(`/reviews?state=hidden&storeId=${STORES.SL.id}&review=${review.id}`);
+      await page.getByRole('button', { name: 'Restore review' }).click();
+      const dialog = page.getByRole('dialog', { name: `Restore this review of ${STORES.SL.name}?` });
+      await dialog.getByLabel('Reason').fill('E2E-10 A-12: restore check');
+      await dialog.getByRole('button', { name: 'Restore review' }).click();
+      await expect(page.getByText('Review restored.')).toBeVisible();
+      await expect.poll(async () => (await rating()).count).toBe(start.count + 1);
+    });
+  } finally {
+    await app.close();
+  }
+});
