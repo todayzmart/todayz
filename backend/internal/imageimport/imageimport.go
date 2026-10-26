@@ -50,6 +50,7 @@ var ErrRateLimited = errors.New("imageimport: rate limited, run again later")
 // Store keeps the copied image in the private bucket (*storage.Client).
 type Store interface {
 	Put(ctx context.Context, key, contentType string, body []byte, now time.Time) error
+	Remove(ctx context.Context, key string, now time.Time) error
 }
 
 // Deps are what an import needs. Store may be nil on a dry run.

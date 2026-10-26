@@ -59,8 +59,12 @@ func (r TypeReport) WriteMarkdown(w io.Writer) error {
 	if r.DryRun {
 		run = "Dry run (nothing stored)"
 	}
-	if _, err := fmt.Fprintf(w, "# Item-type photos\n\n%s: %d products given their kind's approved photo; %d kinds searched; %d with candidates, %d with none, %d medicines skipped, %d failed.\n",
-		run, r.Filled, r.Searched, len(r.Found), len(r.Missed), len(r.Medicines), len(r.Failed)); err != nil {
+	cleared := ""
+	if r.Cleared > 0 {
+		cleared = fmt.Sprintf("%d waiting candidates dropped to search again; ", r.Cleared)
+	}
+	if _, err := fmt.Fprintf(w, "# Item-type photos\n\n%s: %d products given their kind's approved photo; %s%d kinds searched; %d with candidates, %d with none, %d medicines skipped, %d failed.\n",
+		run, r.Filled, cleared, r.Searched, len(r.Found), len(r.Missed), len(r.Medicines), len(r.Failed)); err != nil {
 		return err
 	}
 	sections := []struct {

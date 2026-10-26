@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"unicode"
 	"unicode/utf8"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -24,9 +25,11 @@ import (
 // name without the brand and the trailing pack size. For each kind with a
 // product still on the placeholder, the importer stores up to TypeCandidates
 // Commons files as pending candidates in the private bucket; an admin picks
-// one in A-08 (or turns them all down). A kind with a stored candidate is not
-// searched again, so a turned-down file does not come back. The run also
-// gives an approved kind's photo to products added since it was approved.
+// one in A-08 (or turns them all down). A kind with a waiting or picked photo
+// is not searched again; a kind whose candidates were all turned down is, and
+// its turned-down files are skipped. --again first drops the waiting
+// candidates so those kinds are searched afresh. The run also gives an
+// approved kind's photo to products added since it was approved.
 
 // CommonsAPI is the Wikimedia Commons API.
 const CommonsAPI = "https://commons.wikimedia.org/w/api.php"
@@ -60,6 +63,7 @@ type TypeOptions struct {
 	UserAgent string // required
 	Limit     int    // kinds to search; at least 1
 	DryRun    bool   // search only; copy and store nothing
+	Again     bool   // first drop waiting candidates, so their kinds are searched again
 	APIURL    string // default CommonsAPI (tests)
 	FileHosts []string
 }
@@ -76,6 +80,7 @@ type TypeLine struct {
 // TypeReport is what a run did.
 type TypeReport struct {
 	Filled    int // products given an approved kind's photo
+	Cleared   int // waiting candidates dropped by --again
 	Searched  int
 	Found     []TypeLine
 	Missed    []TypeLine
@@ -135,6 +140,11 @@ func (t *TypeImporter) Run(ctx context.Context) (TypeReport, error) {
 		if err != nil {
 			return rep, err
 		}
+		if t.o.Again {
+			if rep.Cleared, err = t.clear(ctx); err != nil {
+				return rep, err
+			}
+		}
 	}
 	kinds, err := imageimportdb.New(t.d.DB.Q(ctx)).TypeKinds(ctx, int32(t.o.Limit)) // #nosec G115 -- the CLI bounds the limit
 	if err != nil {
@@ -145,6 +155,11 @@ func (t *TypeImporter) Run(ctx context.Context) (TypeReport, error) {
 		line := TypeLine{Category: k.CategorySlug, TypeKey: k.TypeKey, Products: int(k.Products)}
 		if skipped(k.CategorySlug, k.ParentSlug) {
 			rep.Medicines = append(rep.Medicines, line)
+			continue
+		}
+		if _, ok := kindWords(k.TypeKey); !ok {
+			line.Reason = "only a pack size or code, not a kind of item"
+			rep.Missed = append(rep.Missed, line)
 			continue
 		}
 		files, err := t.kind(ctx, k)
@@ -204,6 +219,21 @@ func (t *TypeImporter) fill(ctx context.Context) (int, error) {
 	return total, nil
 }
 
+// clear drops the waiting candidates of kinds with no picked photo, and their
+// copies in the private bucket.
+func (t *TypeImporter) clear(ctx context.Context) (int, error) {
+	keys, err := imageimportdb.New(t.d.DB.Q(ctx)).ClearPendingTypePhotos(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("imageimport: clear candidates: %w", err)
+	}
+	for _, k := range keys {
+		if err := t.d.Store.Remove(ctx, k, t.d.Clock.Now()); err != nil {
+			t.d.Log.WarnContext(ctx, "type photo copy not removed", slog.String("key", k), slog.String("error", err.Error()))
+		}
+	}
+	return len(keys), nil
+}
+
 // commonsFile is one search result.
 type commonsFile struct {
 	Title    string
@@ -216,45 +246,248 @@ type commonsFile struct {
 	Restrict string
 }
 
-// queries are the Commons searches for a kind, best first: every word in the
-// file's title ("toor dal" finds "Toor dal.jpg", not pigeon-pea fields), then
-// the last two words for a longer kind ("classic salted chips" → "salted
-// chips"), then a plain search.
-func queries(typeKey string) []string {
-	words := strings.Fields(typeKey)
+// typeQuery is one Commons search and the words a file's title must carry.
+type typeQuery struct {
+	search string
+	words  []string
+}
+
+// packWords are sizes and counts left in a kind ("garbage bags medium",
+// "diaper pants l", "matchbox pack of"); they are not searched for.
+var packWords = map[string]bool{
+	"xs": true, "s": true, "m": true, "l": true, "xl": true, "xxl": true, "small": true, "medium": true, "large": true,
+	"pack": true, "of": true, "pcs": true, "pc": true, "g": true, "kg": true, "ml": true, "ltr": true, "litre": true,
+}
+
+// kindWords are a kind's words without pack sizes; false when what is left is
+// no kind of item ("500 g", "qa pack ₹120").
+func kindWords(typeKey string) ([]string, bool) {
+	var out []string
+	letters := 0
+	for _, w := range strings.Fields(strings.ToLower(strings.ReplaceAll(typeKey, `"`, ""))) {
+		n := 0
+		for _, r := range w {
+			if unicode.IsLetter(r) {
+				n++
+			}
+		}
+		if n == 0 || packWords[w] {
+			continue
+		}
+		out = append(out, w)
+		letters += n
+	}
+	return out, letters >= 3
+}
+
+// typeAliases name a kind the way Commons titles its photos: Indian shop
+// names to the English for the thing itself ("besan" → "gram flour"), and
+// retail names to what the photo shows. Searched before the kind's own words.
+var typeAliases = map[string]string{
+	"sugar": "granulated sugar", "salt": "table salt", "iodised salt": "table salt",
+	"besan": "gram flour", "sooji": "semolina", "rava": "semolina", "idli rava": "semolina",
+	"maida": "maida flour", "atta": "wheat flour", "wheat atta": "wheat flour", "whole wheat atta": "wheat flour",
+	"jowar flour": "sorghum flour", "ragi flour": "finger millet flour", "rajma": "kidney beans",
+	"kabuli chana": "chickpeas", "chana dal": "split chickpeas", "toor dal": "pigeon peas", "moong dal": "mung beans",
+	"masoor dal": "red lentils", "urad dal": "black gram", "poha": "flattened rice", "sabudana": "tapioca pearls",
+	"idli rice": "parboiled rice", "ghee": "clarified butter", "curd": "yogurt", "probiotic curd": "yogurt",
+	"kasuri methi": "fenugreek leaves", "dust tea": "tea leaves", "leaf tea": "tea leaves",
+	"filter coffee powder": "ground coffee", "classic salted chips": "potato chips", "2-minute noodles": "instant noodles",
+	"apple shimla": "apples", "beans": "green beans", "kajal": "kohl", "face wash": "facial cleanser",
+	"hand wash": "liquid soap", "garbage bags": "garbage bag", "diaper pants": "diaper", "dry iron": "clothes iron",
+	"spike guard": "surge protector", "extension board": "power strip", "mcb": "circuit breaker",
+	"bib tap": "water tap", "solvent cement": "pvc cement", "ball pens blue": "ballpoint pen",
+	"long notebook": "notebook", "wired earphones": "earphones", "interior emulsion": "emulsion paint",
+	"enamel paint white": "enamel paint", "primer": "paint primer", "pav": "pav bread",
+}
+
+// categoryHints are words one of which a file must also carry (in its title,
+// description or categories) for a kind in that category, so "conditioner"
+// in hair care finds hair conditioner, not air conditioners. Keyed by the
+// category's slug, else its parent's.
+var categoryHints = map[string]string{
+	"staples":            "grain OR grains OR flour OR lentil OR lentils OR pulses OR rice OR raw OR india",
+	"spices-oils":        "spice OR spices OR oil OR powder OR seeds OR india",
+	"snacks":             "snack OR snacks OR food",
+	"bakery":             "bread OR bakery OR baked",
+	"beverages":          "drink OR beverage OR tea OR coffee OR juice OR bottle",
+	"dairy-eggs":         "milk OR dairy OR food",
+	"fruits-vegetables":  "vegetable OR vegetables OR fruit OR fruits OR market",
+	"household":          "cleaning OR cleaner OR household OR laundry OR kitchen",
+	"personal-care":      "hygiene OR cosmetic OR cosmetics OR toiletries OR bathroom",
+	"hair-care":          "hair",
+	"skin-care":          "skin OR cosmetic OR cosmetics OR cream OR lotion",
+	"makeup":             "makeup OR cosmetic OR cosmetics",
+	"baby-care":          "baby",
+	"health-wellness":    "health OR ayurveda OR ayurvedic OR herbal",
+	"electrical":         "electrical OR electric OR wiring OR circuit",
+	"plumbing":           "plumbing OR pipe OR water OR tap",
+	"paints":             "paint OR wall",
+	"tools":              "tool OR tools",
+	"school-supplies":    "stationery OR school OR pen OR pencil",
+	"office-supplies":    "stationery OR office OR paper",
+	"mobile-accessories": "phone OR mobile OR smartphone OR usb",
+	"small-appliances":   "appliance OR kitchen OR electric",
+	"batteries-lighting": "battery OR batteries OR light OR lamp",
+	"grocery":            "food",
+	"beauty":             "cosmetic OR cosmetics",
+}
+
+// queries are the Commons searches for a kind, best first. For the kind's
+// alias, then its own words: every word in the file's title with the
+// category's hint; the last two words with the hint for a longer kind; then
+// for two words or more the title words alone. A single word is never
+// searched without the hint ("ginger" alone finds Ginger Rogers).
+func queries(typeKey, category, parent string) []typeQuery {
+	words, ok := kindWords(typeKey)
+	if !ok {
+		return nil
+	}
+	hint := categoryHints[category]
+	if hint == "" {
+		hint = categoryHints[parent]
+	}
 	intitle := func(ws []string) string {
 		q := make([]string, len(ws))
 		for i, w := range ws {
-			q[i] = "intitle:" + strings.ReplaceAll(w, `"`, "")
+			q[i] = "intitle:" + w
 		}
 		return strings.Join(q, " ")
 	}
-	out := []string{intitle(words)}
-	if len(words) > 2 {
-		out = append(out, intitle(words[len(words)-2:]))
+	var out []typeQuery
+	add := func(ws []string) {
+		if hint != "" {
+			out = append(out, typeQuery{search: intitle(ws) + " " + hint, words: ws})
+			if len(ws) > 2 {
+				out = append(out, typeQuery{search: intitle(ws[len(ws)-2:]) + " " + hint, words: ws[len(ws)-2:]})
+			}
+		}
+		if len(ws) > 1 {
+			out = append(out, typeQuery{search: intitle(ws), words: ws})
+		}
 	}
-	return append(out, typeKey)
+	if alias, ok := typeAliases[strings.Join(words, " ")]; ok {
+		add(strings.Fields(alias))
+	}
+	add(words)
+	return out
 }
 
-var digits = regexp.MustCompile(`[0-9()_\-.,]+`)
+// titleWords are a title's lower-case words.
+func titleWords(s string) []string {
+	return strings.FieldsFunc(strings.ToLower(s), func(r rune) bool { return !unicode.IsLetter(r) && !unicode.IsDigit(r) })
+}
 
-// sameShot reduces a file name to its words, so a series ("Toothbrush (2021)
-// 02.jpg", "… 03.jpg") offers one candidate, not three.
+// sameWord matches a word and its plural or a longer form ("biscuits" and
+// "biscuit", "salt" and "salted"); words under four letters match exactly.
+func sameWord(a, b string) bool {
+	if a == b {
+		return true
+	}
+	if len(a) < 4 || len(b) < 4 {
+		return false
+	}
+	n := min(5, len(a), len(b))
+	return a[:n] == b[:n]
+}
+
+// offTopic are title words that mark a photo of something else: places,
+// paintings, signs, plants in a field, and cooked dishes (a kind is the
+// packet, not what is made with it). A word the kind itself uses is fine
+// ("biryani masala", "fruit cake").
+var offTopic = map[string]bool{
+	"geograph": true, "falls": true, "factory": true, "map": true, "painting": true, "portrait": true,
+	"poster": true, "logo": true, "sign": true, "street": true, "road": true, "station": true, "church": true,
+	"temple": true, "museum": true, "met": true, "county": true, "river": true, "lake": true, "beach": true,
+	"village": true, "advertisement": true, "eb1911": true, "britannica": true, "plant": true, "farm": true,
+	"farming": true, "field": true, "harvest": true, "manufacturing": true, "industries": true,
+	"conference": true, "stamp": true, "stampsheet": true, "symbol": true, "diagram": true, "infographic": true,
+	"micrograph": true, "bhl": true, "page": true, "mural": true, "statue": true, "cottage": true,
+	"curry": true, "rasam": true, "tadka": true, "pakoda": true, "pakodas": true, "pakora": true,
+	"paratha": true, "parantha": true, "kachori": true, "halwa": true, "burfi": true, "vada": true,
+	"laddu": true, "ladoo": true, "laddo": true, "thali": true, "kebab": true, "korma": true, "chawal": true,
+	"roti": true, "bhakri": true, "bhaji": true, "cheela": true, "chilla": true, "recipe": true, "dish": true,
+	"pizza": true, "omelette": true, "soup": true, "sandwich": true, "toast": true, "salad": true,
+	"biryani": true, "dosa": true, "idli": true, "sambar": true, "sambhar": true, "chaat": true, "fried": true,
+	"cooked": true, "served": true, "meal": true, "breakfast": true, "lunch": true, "dinner": true,
+	"platter": true, "pasta": true, "wings": true, "tikki": true, "porridge": true, "dumplings": true,
+	"doughnut": true, "pudding": true, "stuffed": true, "stuffing": true, "kosambari": true,
+	"cake": true, "fish": true, "chicken": true, "egg": true, "steak": true, "kimchi": true,
+}
+
+// onTopic is a title that carries every word searched for and nothing that
+// marks it as a photo of something else.
+func onTopic(title string, q typeQuery, own []string) bool {
+	ts := titleWords(title)
+	has := func(w string) bool {
+		for _, t := range ts {
+			if sameWord(t, w) {
+				return true
+			}
+		}
+		return false
+	}
+	for _, w := range q.words {
+		for _, part := range titleWords(w) {
+			if !has(part) {
+				return false
+			}
+		}
+	}
+	for _, t := range ts {
+		if !offTopic[t] {
+			continue
+		}
+		mine := false
+		for _, w := range own {
+			if sameWord(t, w) {
+				mine = true
+			}
+		}
+		if !mine {
+			return false
+		}
+	}
+	return true
+}
+
+// sameShot reduces a file name to its first words, so a series ("Toothbrush
+// (2021) 02.jpg", "… 03.jpg", "Brown Bread from a Colonial Oven-Baughan (1912)
+// - 1", "… - 2") offers one candidate, not three.
 func sameShot(title string) string {
-	return strings.Join(strings.Fields(digits.ReplaceAllString(strings.ToLower(title), " ")), " ")
+	ws := titleWords(digits.ReplaceAllString(title, " "))
+	if len(ws) > 0 && (ws[len(ws)-1] == "jpg" || ws[len(ws)-1] == "jpeg" || ws[len(ws)-1] == "png" || ws[len(ws)-1] == "webp") {
+		ws = ws[:len(ws)-1]
+	}
+	return strings.Join(ws[:min(4, len(ws))], " ")
 }
 
-// kind searches Commons for a kind and stores up to TypeCandidates files.
+var digits = regexp.MustCompile(`[0-9]+`)
+
+// kind searches Commons for a kind and stores up to TypeCandidates files it
+// has not had before.
 func (t *TypeImporter) kind(ctx context.Context, k imageimportdb.TypeKindsRow) ([]string, error) {
-	var found []commonsFile
+	known, err := imageimportdb.New(t.d.DB.Q(ctx)).TypeKindSources(ctx, imageimportdb.TypeKindSourcesParams{CategoryID: k.CategoryID, TypeKey: k.TypeKey})
+	if err != nil {
+		return nil, fmt.Errorf("imageimport: kind sources: %w", err)
+	}
 	seen := map[string]bool{}
-	for _, q := range queries(k.TypeKey) {
-		files, err := t.search(ctx, q)
+	for _, title := range known {
+		seen[sameShot(title)] = true
+	}
+	own, _ := kindWords(k.TypeKey)
+	qs := queries(k.TypeKey, k.CategorySlug, k.ParentSlug)
+	for _, q := range qs {
+		own = append(own, q.words...)
+	}
+	var found []commonsFile
+	for _, q := range qs {
+		files, err := t.search(ctx, q.search)
 		if err != nil {
 			return nil, err
 		}
 		for _, f := range files {
-			if key := sameShot(f.Title); !seen[key] {
+			if key := sameShot(f.Title); !seen[key] && onTopic(f.Title, q, own) {
 				seen[key] = true
 				found = append(found, f)
 			}
@@ -296,7 +529,7 @@ func (t *TypeImporter) search(ctx context.Context, query string) ([]commonsFile,
 	v.Set("formatversion", "2")
 	v.Set("generator", "search")
 	v.Set("gsrnamespace", "6")
-	v.Set("gsrlimit", "12")
+	v.Set("gsrlimit", "20")
 	v.Set("gsrsearch", query+" filetype:bitmap")
 	v.Set("prop", "imageinfo")
 	v.Set("iiprop", "url|mime|size|extmetadata")
