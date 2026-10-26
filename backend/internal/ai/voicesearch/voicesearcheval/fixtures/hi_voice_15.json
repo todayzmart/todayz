@@ -1,0 +1,64 @@
+{
+  "name": "hi_voice_15",
+  "input": {
+    "language": "",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "ताज़ा पनीर पिकअप के लिए",
+    "language": "hi",
+    "chips": [
+      {
+        "kind": "pickup",
+        "value": "",
+        "text": "पिकअप"
+      }
+    ]
+  },
+  "reply": {
+    "request_id": "rec_vs_hi_voice_15",
+    "transcript": "ताज़ा पनीर पिकअप के लिए",
+    "language_code": "hi-IN"
+  }
+}

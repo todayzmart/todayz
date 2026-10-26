@@ -1,0 +1,59 @@
+{
+  "name": "mx_list_11",
+  "input": {
+    "text": "బంగాళాదుంపలు 2 కిలోలు, 1 kg atta, two Lux soap",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "బంగాళాదుంపలు 2 కిలోలు",
+        "quantity": 1
+      },
+      {
+        "text": "1 kg atta",
+        "quantity": 1
+      },
+      {
+        "text": "Lux soap",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_mx_list_11",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_mx_list_11",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "బంగాళాదుంపలు 2 కిలోలు",
+              "quantity": 1
+            },
+            {
+              "text": "1 kg atta",
+              "quantity": 1
+            },
+            {
+              "text": "Lux soap",
+              "quantity": 2
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 461,
+      "output_tokens": 130
+    }
+  }
+}

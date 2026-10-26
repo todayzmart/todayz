@@ -16,6 +16,7 @@ import { AddToBasket } from '../basket/AddToBasket';
 import { AskNearbySlot } from '../search/slots';
 import { ShareButton } from '../share/ShareButton';
 import { Icon } from '../shell/Icon';
+import { Substitutes } from '../substitutes/Substitutes';
 import { CartBarLink } from '../store/CartBarLink';
 import { itemHref, useStepperLabels } from '../store/itemUi';
 import { findItem, itemKey, seedItems, type CachedItem } from '../store/itemCache';
@@ -164,6 +165,7 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
           {intl.formatMessage({ id: 'store.directions' })}
         </a>
       ) : null}
+      {!item.inStock && <Substitutes shopSlug={slug} storeItemId={item.storeItemId} name={item.name} size="md" />}
 
       <div className={styles.actions}>
         <AddToBasket productId={item.productId} name={item.name} detail={packLine(item)} />

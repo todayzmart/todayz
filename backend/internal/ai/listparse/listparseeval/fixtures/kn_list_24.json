@@ -1,0 +1,67 @@
+{
+  "name": "kn_list_24",
+  "input": {
+    "text": "1 kg ಅಕ್ಕಿ, ಬಾಳೆಹಣ್ಣು ಒಂದು ಡಜನ್, ಸಕ್ಕರೆ ಅರ್ಧ ಕೆಜಿ, ಟೀ ಪುಡಿ 250 ಗ್ರಾಂ",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "1 kg ಅಕ್ಕಿ",
+        "quantity": 1
+      },
+      {
+        "text": "ಬಾಳೆಹಣ್ಣು",
+        "quantity": 12
+      },
+      {
+        "text": "ಸಕ್ಕರೆ ಅರ್ಧ ಕೆಜಿ",
+        "quantity": 1
+      },
+      {
+        "text": "ಟೀ ಪುಡಿ 250 ಗ್ರಾಂ",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_24",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_24",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "1 kg ಅಕ್ಕಿ",
+              "quantity": 1
+            },
+            {
+              "text": "ಬಾಳೆಹಣ್ಣು",
+              "quantity": 12
+            },
+            {
+              "text": "ಸಕ್ಕರೆ ಅರ್ಧ ಕೆಜಿ",
+              "quantity": 1
+            },
+            {
+              "text": "ಟೀ ಪುಡಿ 250 ಗ್ರಾಂ",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 476,
+      "output_tokens": 160
+    }
+  }
+}

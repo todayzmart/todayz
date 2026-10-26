@@ -1,0 +1,75 @@
+{
+  "name": "te_list_07",
+  "input": {
+    "text": "- ఐదు పార్లే-జి\n- రెండు పాలు\n- paalu rendu\n- కందిపప్పు 1 కిలో\n- గుడ్లు 6",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "పార్లే-జి",
+        "quantity": 5
+      },
+      {
+        "text": "పాలు",
+        "quantity": 2
+      },
+      {
+        "text": "paalu",
+        "quantity": 2
+      },
+      {
+        "text": "కందిపప్పు 1 కిలో",
+        "quantity": 1
+      },
+      {
+        "text": "గుడ్లు",
+        "quantity": 6
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_te_list_07",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_te_list_07",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "పార్లే-జి",
+              "quantity": 5
+            },
+            {
+              "text": "పాలు",
+              "quantity": 2
+            },
+            {
+              "text": "paalu",
+              "quantity": 2
+            },
+            {
+              "text": "కందిపప్పు 1 కిలో",
+              "quantity": 1
+            },
+            {
+              "text": "గుడ్లు",
+              "quantity": 6
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 481,
+      "output_tokens": 190
+    }
+  }
+}

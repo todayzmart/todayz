@@ -1,0 +1,69 @@
+{
+  "name": "kn_assist_02",
+  "input": {
+    "q": "ಆಫರ್ ಮನೆಗೆ ಡೆಲಿವರಿ ತಲೆನೋವಿನ ಮಾತ್ರೆ ಇರುವ ಅಂಗಡಿ",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "ತಲೆನೋವಿನ ಮಾತ್ರೆ",
+    "chips": [
+      {
+        "kind": "delivery",
+        "value": "",
+        "text": "ಮನೆಗೆ ಡೆಲಿವರಿ"
+      },
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "ಆಫರ್"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_kn_assist_02",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_kn_assist_02",
+        "name": "suggest_search",
+        "input": {
+          "query": "ತಲೆನೋವಿನ ಮಾತ್ರೆ",
+          "chips": [
+            {
+              "kind": "delivery",
+              "value": null,
+              "text": "ಮನೆಗೆ ಡೆಲಿವರಿ"
+            },
+            {
+              "kind": "offers",
+              "value": null,
+              "text": "ಆಫರ್"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

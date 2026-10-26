@@ -698,3 +698,148 @@ RiskSummaryConfirmRequest:
       minItems: 1
       maxItems: 1
       items: {$ref: ./ai.yaml#/RiskSummaryDecision}
+# W3-12 consumer AI (AI-C1, C2, C5; D-101, D-110, D-231).
+AiCustomerFeatures:
+  type: object
+  additionalProperties: false
+  required: [listParse, voiceSearch, searchAssist, maxAudioSeconds, maxAudioBytes, audioTypes]
+  properties:
+    listParse: {type: boolean, description: 'AI-C1: ai_listparse_enabled and the model key'}
+    voiceSearch: {type: boolean, description: 'AI-C5: ai_voicesearch_enabled and the speech key'}
+    searchAssist: {type: boolean, description: 'AI-C2: ai_querynorm_enabled and the model key'}
+    maxAudioSeconds: {type: integer, minimum: 1, maximum: 60}
+    maxAudioBytes: {type: integer, minimum: 1}
+    audioTypes:
+      type: array
+      maxItems: 10
+      items: {type: string, maxLength: 40}
+ListParseDraftRequest:
+  type: object
+  additionalProperties: false
+  required: [text]
+  properties:
+    text: {type: string, minLength: 1, maxLength: 2000, description: 'The list as typed, pasted or spoken (the transcript, edited).'}
+ListParseLine:
+  type: object
+  additionalProperties: false
+  description: One basket line as the customer wrote it (a free-text basket line, baskets.yaml BasketLineInput).
+  required: [lineId, text, quantity]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    text: {type: string, minLength: 1, maxLength: 120}
+    quantity: {type: integer, minimum: 1, maximum: 99}
+ListParseDraft:
+  type: object
+  additionalProperties: false
+  required: [draftId, feature, status, promptVersion, createdAt, lines, outcomes, failure]
+  properties:
+    draftId: {$ref: ./common.yaml#/Ulid}
+    feature: {type: string, enum: [list_parse]}
+    status: {$ref: ./ai.yaml#/AiDraftStatus}
+    promptVersion: {type: string, maxLength: 80}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    lines:
+      type: array
+      maxItems: 100
+      items: {$ref: ./ai.yaml#/ListParseLine}
+    outcomes: {$ref: ./ai.yaml#/AiOutcomes}
+    failure: {$ref: ./ai.yaml#/AiDraftFailure}
+ListParseLineValue:
+  type: object
+  additionalProperties: false
+  required: [text, quantity]
+  properties:
+    text: {type: string, minLength: 1, maxLength: 120}
+    quantity: {type: integer, minimum: 1, maximum: 99}
+ListParseDecision:
+  type: object
+  additionalProperties: false
+  required: [lineId, outcome]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    outcome: {$ref: ./ai.yaml#/AiConfirmOutcome}
+    value: {$ref: ./ai.yaml#/ListParseLineValue}
+ListParseConfirmRequest:
+  type: object
+  additionalProperties: false
+  required: [lines]
+  properties:
+    lines:
+      type: array
+      minItems: 1
+      maxItems: 100
+      items: {$ref: ./ai.yaml#/ListParseDecision}
+ListParseConfirmResult:
+  type: object
+  description: AiConfirmResult plus the accepted and edited lines for the basket editor.
+  additionalProperties: false
+  required: [draftId, status, lines, basketLines]
+  properties:
+    draftId: {$ref: ./common.yaml#/Ulid}
+    status:
+      type: string
+      enum: [confirmed, discarded]
+    lines:
+      type: array
+      maxItems: 100
+      items: {$ref: ./ai.yaml#/AiLineResult}
+    basketLines:
+      type: array
+      maxItems: 100
+      items: {$ref: ./ai.yaml#/ListParseLine}
+AiSearchChipKind:
+  type: string
+  description: The refine chip kinds (discover.yaml DiscoverChipKind); nothing else is ever suggested.
+  enum: [maxPrice, openNow, pickup, delivery, offers, nearest, brand]
+AiSearchChip:
+  type: object
+  additionalProperties: false
+  description: A refine chip (discover.yaml DiscoverChip); applying it sets that search filter.
+  required: [kind, value, text]
+  properties:
+    kind: {$ref: ./ai.yaml#/AiSearchChipKind}
+    value:
+      type: [string, "null"]
+      maxLength: 80
+      description: Paise for maxPrice, the brand slug for brand, null for the others.
+    text: {type: string, maxLength: 80, description: The words the chip came from.}
+VoiceSearchUpload:
+  type: object
+  additionalProperties: false
+  required: [audio]
+  properties:
+    audio:
+      type: string
+      contentMediaType: application/octet-stream
+      maxLength: 1048576
+    language:
+      type: string
+      description: The language spoken; absent detects it.
+      enum: [en-IN, hi-IN, kn-IN, te-IN, ta-IN]
+VoiceSearchResult:
+  type: object
+  additionalProperties: false
+  required: [transcript, language, chips]
+  properties:
+    transcript: {type: string, maxLength: 200}
+    language: {$ref: ./ai.yaml#/AiLanguage}
+    chips:
+      type: array
+      maxItems: 8
+      items: {$ref: ./ai.yaml#/AiSearchChip}
+SearchAssistRequest:
+  type: object
+  additionalProperties: false
+  required: [q]
+  properties:
+    q: {type: string, minLength: 1, maxLength: 200}
+SearchAssistResult:
+  type: object
+  additionalProperties: false
+  required: [chips]
+  properties:
+    query: {type: string, maxLength: 200, description: 'The cleaned query ("Search for {query}"), absent when the same as q.'}
+    chips:
+      type: array
+      maxItems: 6
+      items: {$ref: ./ai.yaml#/AiSearchChip}

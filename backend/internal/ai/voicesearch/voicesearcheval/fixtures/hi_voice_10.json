@@ -1,0 +1,58 @@
+{
+  "name": "hi_voice_10",
+  "input": {
+    "language": "hi-IN",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "सिर दर्द की गोली",
+    "language": "hi",
+    "chips": []
+  },
+  "reply": {
+    "request_id": "rec_vs_hi_voice_10",
+    "transcript": "सिर दर्द की गोली",
+    "language_code": "hi-IN"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "name": "mx_list_05",
+  "input": {
+    "text": "1 किलो आटा, ಬೆಣ್ಣೆ 100 ಗ್ರಾಂ, Dolo 650 ek patta",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "1 किलो आटा",
+        "quantity": 1
+      },
+      {
+        "text": "ಬೆಣ್ಣೆ 100 ಗ್ರಾಂ",
+        "quantity": 1
+      },
+      {
+        "text": "Dolo 650 ek patta",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_mx_list_05",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_mx_list_05",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "1 किलो आटा",
+              "quantity": 1
+            },
+            {
+              "text": "ಬೆಣ್ಣೆ 100 ಗ್ರಾಂ",
+              "quantity": 1
+            },
+            {
+              "text": "Dolo 650 ek patta",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 463,
+      "output_tokens": 130
+    }
+  }
+}

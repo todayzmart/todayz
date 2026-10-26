@@ -30,6 +30,9 @@ import { ItemCard } from '../store/ItemCard';
 import { seedItems } from '../store/itemCache';
 import { useCartActions } from '../store/useCartActions';
 import { addRecent, clearRecent, getRecent } from './recent';
+import type { AiSearchChip } from '@todayz/api-client/gen/model/aiSearchChip';
+import type { AssistPick } from '../search-assist/SearchAssist';
+import { useVoiceOutcome } from '../voice-search/session';
 import { AskNearbySlot, SearchAssistSlot, VoiceSearchSlot } from './slots';
 import styles from './search.module.css';
 
@@ -45,6 +48,12 @@ export interface SearchState {
   category?: string | undefined;
   /** false: the customer removed a refine chip, so the words are not parsed into filters again. */
   parse?: false | undefined;
+  /** A top price a search assist chip set (AI-C2). */
+  maxPricePaise?: number | undefined;
+  /** A brand slug a search assist chip set (AI-C2). */
+  brand?: string | undefined;
+  /** The query came from voice search (C-23); recorded by the search, dropped on the next change. */
+  source?: 'voice' | undefined;
 }
 
 type FilterKey = 'open' | 'pickup' | 'delivery' | 'offers';
@@ -57,7 +66,46 @@ function clean(s: SearchState): SearchState {
   for (const f of FILTERS) if (s[f]) out[f] = true;
   if (s.category) out.category = s.category;
   if (s.parse === false) out.parse = false;
+  if (s.maxPricePaise && s.maxPricePaise > 0) out.maxPricePaise = s.maxPricePaise;
+  if (s.brand) out.brand = s.brand;
+  if (s.source === 'voice') out.source = 'voice';
   return out;
+}
+
+/** A search assist tap: the cleaned words, or one more filter. The words are not parsed again. */
+function applyPick(state: SearchState, pick: AssistPick): SearchState {
+  const next: SearchState = { ...state, parse: false, source: undefined };
+  if (pick.kind === 'query') return { ...next, q: pick.query.slice(0, 120) };
+  const { kind, value } = pick.chip;
+  switch (kind) {
+    case 'openNow':
+      return { ...next, open: true };
+    case 'pickup':
+      return { ...next, pickup: true };
+    case 'delivery':
+      return { ...next, delivery: true };
+    case 'offers':
+      return { ...next, offers: true };
+    case 'nearest':
+      return { ...next, sort: 'nearest' };
+    case 'maxPrice': {
+      const paise = Number(value);
+      return Number.isInteger(paise) && paise > 0 ? { ...next, maxPricePaise: paise } : state;
+    }
+    case 'brand':
+      return value && BRAND_SLUG.test(value) ? { ...next, brand: value } : state;
+  }
+}
+
+const BRAND_SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+/** True when tapping the chip would change no filter (already applied, or not usable). */
+function chipChangesNothing(state: SearchState, chip: AiSearchChip): boolean {
+  const next = applyPick(state, { kind: 'chip', chip });
+  const keys = new Set([...Object.keys(state), ...Object.keys(next)] as (keyof SearchState)[]);
+  keys.delete('parse');
+  keys.delete('source');
+  return [...keys].every((k) => next[k] === state[k]);
 }
 
 export function SearchPage({ state, onChange }: { state: SearchState; onChange: (next: SearchState) => void }) {
@@ -67,6 +115,8 @@ export function SearchPage({ state, onChange }: { state: SearchState; onChange: 
   const [draft, setDraft] = useState(q);
   const [typed, setTyped] = useState(q);
   const [recent, setRecent] = useState<string[]>(getRecent);
+  const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
+  const voice = useVoiceOutcome();
 
   // The URL is the source of truth (back button, shared links): follow it when it changes under us.
   const [seenQ, setSeenQ] = useState(q);
@@ -81,7 +131,9 @@ export function SearchPage({ state, onChange }: { state: SearchState; onChange: 
     setDraft(t);
     setTyped(t);
     if (t.length >= 2) setRecent(addRecent(t));
-    onChange(clean({ ...state, q: t || undefined, parse: undefined }));
+    setVoiceNotice(null);
+    const source = t ? voice.searched(t) : undefined;
+    onChange(clean({ ...state, q: t || undefined, parse: undefined, source }));
   };
 
   const suggest = useQuery({
@@ -111,8 +163,21 @@ export function SearchPage({ state, onChange }: { state: SearchState; onChange: 
             onChange={setDraft}
             onSearch={setTyped}
             enterKeyHint="search"
-            trailing={<VoiceSearchSlot onTranscript={setDraft} />}
+            trailing={
+              <VoiceSearchSlot
+                onNotice={setVoiceNotice}
+                onTranscript={(heard) => {
+                  voice.heard(heard);
+                  setDraft(heard.transcript);
+                }}
+              />
+            }
           />
+          {voiceNotice && (
+            <p className={styles.voiceNotice} role="status">
+              {voiceNotice}
+            </p>
+          )}
         </form>
       </header>
 
@@ -138,7 +203,7 @@ export function SearchPage({ state, onChange }: { state: SearchState; onChange: 
         ) : q.length < 2 ? (
           <Idle recent={recent} onPick={commit} onClear={() => { clearRecent(); setRecent([]); }} />
         ) : coords.status === 'ready' ? (
-          <Results coords={coords.coords} state={state} onChange={(s) => onChange(clean(s))} />
+          <Results coords={coords.coords} state={state} onChange={(s) => onChange(clean({ ...s, source: undefined }))} />
         ) : (
           <NoPlace status={coords.status} retry={coords.status === 'error' ? coords.retry : undefined} />
         )}
@@ -212,7 +277,7 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
     queryFn: () => listCategories(),
   });
   const search = useInfiniteQuery({
-    queryKey: ['discover', 'search', q, lat, lng, km, sort, state.open, state.pickup, state.delivery, state.offers, state.category, state.parse],
+    queryKey: ['discover', 'search', q, lat, lng, km, sort, state.open, state.pickup, state.delivery, state.offers, state.category, state.parse, state.maxPricePaise, state.brand, state.source],
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
     queryFn: ({ pageParam }: { pageParam: string | undefined }) =>
@@ -228,6 +293,9 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
         ...(state.offers ? { hasOffer: true } : {}),
         ...(state.category ? { category: state.category } : {}),
         ...(state.parse === false ? { parse: false } : {}),
+        ...(state.maxPricePaise ? { maxPricePaise: state.maxPricePaise } : {}),
+        ...(state.brand ? { brand: state.brand } : {}),
+        ...(state.source ? { source: state.source } : {}),
         limit: 20,
         ...(pageParam ? { cursor: pageParam } : {}),
       }),
@@ -294,6 +362,21 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
         />
       </div>
 
+      {(state.maxPricePaise || state.brand) && (
+        <div className="tz-chips" role="group" aria-label={intl.formatMessage({ id: 'search.assist.applied' })}>
+          {state.maxPricePaise ? (
+            <Chip pressed icon={X} onPressedChange={() => onChange({ ...state, maxPricePaise: undefined })}>
+              {intl.formatMessage({ id: 'search.assist.maxPrice' }, { price: money(state.maxPricePaise) })}
+            </Chip>
+          ) : null}
+          {state.brand ? (
+            <Chip pressed icon={X} onPressedChange={() => onChange({ ...state, brand: undefined })}>
+              {intl.formatMessage({ id: 'search.assist.brand' }, { brand: state.brand })}
+            </Chip>
+          ) : null}
+        </div>
+      )}
+
       {first && first.chips.length > 0 && (
         <div className="tz-chips" role="group" aria-label={intl.formatMessage({ id: 'search.refine.label' })}>
           {first.chips.map((c, i) => (
@@ -324,7 +407,14 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
           )}
         </p>
       )}
-      {first && <SearchAssistSlot query={q} refineHint={first.refineHint} />}
+      {first && (
+        <SearchAssistSlot
+          query={q}
+          refineHint={first.refineHint}
+          hide={(c) => chipChangesNothing(state, c)}
+          onPick={(p) => onChange(applyPick(state, p))}
+        />
+      )}
 
       {search.isPending && (
         <div aria-busy="true" className={styles.groups}>

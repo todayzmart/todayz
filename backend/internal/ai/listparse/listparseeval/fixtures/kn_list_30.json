@@ -1,0 +1,51 @@
+{
+  "name": "kn_list_30",
+  "input": {
+    "text": "ಎರಡು ಹಾಲು, akki 5 kg",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಹಾಲು",
+        "quantity": 2
+      },
+      {
+        "text": "akki 5 kg",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_30",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_30",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಹಾಲು",
+              "quantity": 2
+            },
+            {
+              "text": "akki 5 kg",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 443,
+      "output_tokens": 100
+    }
+  }
+}

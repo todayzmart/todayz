@@ -1,0 +1,69 @@
+{
+  "name": "kn_assist_13",
+  "input": {
+    "q": "ಪಿಕಪ್ ನಂದಿನಿ ತುಪ್ಪ ಇರುವ ಅಂಗಡಿ",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "ನಂದಿನಿ ತುಪ್ಪ",
+    "chips": [
+      {
+        "kind": "pickup",
+        "value": "",
+        "text": "ಪಿಕಪ್"
+      },
+      {
+        "kind": "brand",
+        "value": "nandini",
+        "text": "ನಂದಿನಿ"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_kn_assist_13",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_kn_assist_13",
+        "name": "suggest_search",
+        "input": {
+          "query": "ನಂದಿನಿ ತುಪ್ಪ",
+          "chips": [
+            {
+              "kind": "pickup",
+              "value": null,
+              "text": "ಪಿಕಪ್"
+            },
+            {
+              "kind": "brand",
+              "value": "nandini",
+              "text": "ನಂದಿನಿ"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

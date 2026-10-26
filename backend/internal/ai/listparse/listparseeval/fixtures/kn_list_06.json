@@ -1,0 +1,59 @@
+{
+  "name": "kn_list_06",
+  "input": {
+    "text": "1 kg ಅಕ್ಕಿ, ಐದು ಪಾರ್ಲೆ-ಜಿ, ಎರಡು ಹಾಲು",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "1 kg ಅಕ್ಕಿ",
+        "quantity": 1
+      },
+      {
+        "text": "ಪಾರ್ಲೆ-ಜಿ",
+        "quantity": 5
+      },
+      {
+        "text": "ಹಾಲು",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_06",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_06",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "1 kg ಅಕ್ಕಿ",
+              "quantity": 1
+            },
+            {
+              "text": "ಪಾರ್ಲೆ-ಜಿ",
+              "quantity": 5
+            },
+            {
+              "text": "ಹಾಲು",
+              "quantity": 2
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 456,
+      "output_tokens": 130
+    }
+  }
+}

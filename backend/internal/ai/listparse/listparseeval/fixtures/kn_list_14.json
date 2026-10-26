@@ -1,0 +1,67 @@
+{
+  "name": "kn_list_14",
+  "input": {
+    "text": "ಮೊಟ್ಟೆ 6, ಬೆಣ್ಣೆ 100 ಗ್ರಾಂ, ಎಣ್ಣೆ 1 ಲೀಟರ್, ರಾಗಿ ಹಿಟ್ಟು 1 ಕೆಜಿ",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಮೊಟ್ಟೆ",
+        "quantity": 6
+      },
+      {
+        "text": "ಬೆಣ್ಣೆ 100 ಗ್ರಾಂ",
+        "quantity": 1
+      },
+      {
+        "text": "ಎಣ್ಣೆ 1 ಲೀಟರ್",
+        "quantity": 1
+      },
+      {
+        "text": "ರಾಗಿ ಹಿಟ್ಟು 1 ಕೆಜಿ",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_14",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_14",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಮೊಟ್ಟೆ",
+              "quantity": 6
+            },
+            {
+              "text": "ಬೆಣ್ಣೆ 100 ಗ್ರಾಂ",
+              "quantity": 1
+            },
+            {
+              "text": "ಎಣ್ಣೆ 1 ಲೀಟರ್",
+              "quantity": 1
+            },
+            {
+              "text": "ರಾಗಿ ಹಿಟ್ಟು 1 ಕೆಜಿ",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 476,
+      "output_tokens": 160
+    }
+  }
+}

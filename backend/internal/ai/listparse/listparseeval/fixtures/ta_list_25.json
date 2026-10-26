@@ -1,0 +1,67 @@
+{
+  "name": "ta_list_25",
+  "input": {
+    "text": "வெங்காயம் 2 கிலோ\nமூன்று மேகி\n1 kg அரிசி\nவெண்ணெய் 100 கிராம்",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "வெங்காயம் 2 கிலோ",
+        "quantity": 1
+      },
+      {
+        "text": "மேகி",
+        "quantity": 3
+      },
+      {
+        "text": "1 kg அரிசி",
+        "quantity": 1
+      },
+      {
+        "text": "வெண்ணெய் 100 கிராம்",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_list_25",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_list_25",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "வெங்காயம் 2 கிலோ",
+              "quantity": 1
+            },
+            {
+              "text": "மேகி",
+              "quantity": 3
+            },
+            {
+              "text": "1 kg அரிசி",
+              "quantity": 1
+            },
+            {
+              "text": "வெண்ணெய் 100 கிராம்",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 475,
+      "output_tokens": 160
+    }
+  }
+}

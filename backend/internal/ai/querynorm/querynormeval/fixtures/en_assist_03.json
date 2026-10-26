@@ -1,0 +1,79 @@
+{
+  "name": "en_assist_03",
+  "input": {
+    "q": "looking for toor dal open now under 250 rupees with home delivery",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "toor dal",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "25000",
+        "text": "under 250 rupees"
+      },
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "open now"
+      },
+      {
+        "kind": "delivery",
+        "value": "",
+        "text": "with home delivery"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_en_assist_03",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_en_assist_03",
+        "name": "suggest_search",
+        "input": {
+          "query": "toor dal",
+          "chips": [
+            {
+              "kind": "maxPrice",
+              "value": "25000",
+              "text": "under 250 rupees"
+            },
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "open now"
+            },
+            {
+              "kind": "delivery",
+              "value": null,
+              "text": "with home delivery"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 135
+    }
+  }
+}

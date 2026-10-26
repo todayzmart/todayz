@@ -1,0 +1,51 @@
+{
+  "name": "kn_list_04",
+  "input": {
+    "text": "ಮೊಸರು 500 ಗ್ರಾಂ\nakki 5 kg",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಮೊಸರು 500 ಗ್ರಾಂ",
+        "quantity": 1
+      },
+      {
+        "text": "akki 5 kg",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_04",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_04",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಮೊಸರು 500 ಗ್ರಾಂ",
+              "quantity": 1
+            },
+            {
+              "text": "akki 5 kg",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 447,
+      "output_tokens": 100
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "name": "ta_list_06",
+  "input": {
+    "text": "சர்க்கரை அரை கிலோ; எண்ணெய் 1 லிட்டர்; நான்கு எலுமிச்சை; பிரெட்; மூன்று மேகி",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "சர்க்கரை அரை கிலோ",
+        "quantity": 1
+      },
+      {
+        "text": "எண்ணெய் 1 லிட்டர்",
+        "quantity": 1
+      },
+      {
+        "text": "எலுமிச்சை",
+        "quantity": 4
+      },
+      {
+        "text": "பிரெட்",
+        "quantity": 1
+      },
+      {
+        "text": "மேகி",
+        "quantity": 3
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_list_06",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_list_06",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "சர்க்கரை அரை கிலோ",
+              "quantity": 1
+            },
+            {
+              "text": "எண்ணெய் 1 லிட்டர்",
+              "quantity": 1
+            },
+            {
+              "text": "எலுமிச்சை",
+              "quantity": 4
+            },
+            {
+              "text": "பிரெட்",
+              "quantity": 1
+            },
+            {
+              "text": "மேகி",
+              "quantity": 3
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 486,
+      "output_tokens": 190
+    }
+  }
+}

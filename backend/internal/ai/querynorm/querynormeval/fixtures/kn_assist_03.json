@@ -1,0 +1,59 @@
+{
+  "name": "kn_assist_03",
+  "input": {
+    "q": "ತೊಗರಿ ಬೇಳೆ ಎಲ್ಲಿ ಸಿಗುತ್ತೆ 60 ರೂಪಾಯಿ ಒಳಗೆ",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "ತೊಗರಿ ಬೇಳೆ",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "6000",
+        "text": "60 ರೂಪಾಯಿ ಒಳಗೆ"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_kn_assist_03",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_kn_assist_03",
+        "name": "suggest_search",
+        "input": {
+          "query": "ತೊಗರಿ ಬೇಳೆ",
+          "chips": [
+            {
+              "kind": "maxPrice",
+              "value": "6000",
+              "text": "60 ರೂಪಾಯಿ ಒಳಗೆ"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 85
+    }
+  }
+}

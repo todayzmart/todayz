@@ -1,0 +1,64 @@
+{
+  "name": "mx_pack_and_price",
+  "input": {
+    "language": "",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "atta 5 kg under 300 rupees",
+    "language": "en",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "30000",
+        "text": "under 300 rupees"
+      }
+    ]
+  },
+  "reply": {
+    "request_id": "rec_vs_mx_pack_and_price",
+    "transcript": "atta 5 kg under 300 rupees",
+    "language_code": "en-IN"
+  }
+}

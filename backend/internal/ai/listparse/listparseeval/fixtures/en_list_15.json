@@ -1,0 +1,67 @@
+{
+  "name": "en_list_15",
+  "input": {
+    "text": "bread, curd 500 g, coriander, 6 eggs",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "bread",
+        "quantity": 1
+      },
+      {
+        "text": "curd 500 g",
+        "quantity": 1
+      },
+      {
+        "text": "coriander",
+        "quantity": 1
+      },
+      {
+        "text": "eggs",
+        "quantity": 6
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_15",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_15",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "bread",
+              "quantity": 1
+            },
+            {
+              "text": "curd 500 g",
+              "quantity": 1
+            },
+            {
+              "text": "coriander",
+              "quantity": 1
+            },
+            {
+              "text": "eggs",
+              "quantity": 6
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 468,
+      "output_tokens": 160
+    }
+  }
+}

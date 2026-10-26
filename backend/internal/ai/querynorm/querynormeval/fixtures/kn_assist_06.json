@@ -1,0 +1,69 @@
+{
+  "name": "kn_assist_06",
+  "input": {
+    "q": "ಮನೆಗೆ ಡೆಲಿವರಿ ಹತ್ತಿರ ರಾಗಿ ಹಿಟ್ಟು ಇರುವ ಅಂಗಡಿ",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "ರಾಗಿ ಹಿಟ್ಟು",
+    "chips": [
+      {
+        "kind": "delivery",
+        "value": "",
+        "text": "ಮನೆಗೆ ಡೆಲಿವರಿ"
+      },
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "ಹತ್ತಿರ"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_kn_assist_06",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_kn_assist_06",
+        "name": "suggest_search",
+        "input": {
+          "query": "ರಾಗಿ ಹಿಟ್ಟು",
+          "chips": [
+            {
+              "kind": "delivery",
+              "value": null,
+              "text": "ಮನೆಗೆ ಡೆಲಿವರಿ"
+            },
+            {
+              "kind": "nearest",
+              "value": null,
+              "text": "ಹತ್ತಿರ"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "name": "en_list_06",
+  "input": {
+    "text": "2 Parle-G, tomato 1 kg, 3 Maggi, 4 lemons",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "Parle-G",
+        "quantity": 2
+      },
+      {
+        "text": "tomato 1 kg",
+        "quantity": 1
+      },
+      {
+        "text": "Maggi",
+        "quantity": 3
+      },
+      {
+        "text": "lemons",
+        "quantity": 4
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_06",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_06",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "Parle-G",
+              "quantity": 2
+            },
+            {
+              "text": "tomato 1 kg",
+              "quantity": 1
+            },
+            {
+              "text": "Maggi",
+              "quantity": 3
+            },
+            {
+              "text": "lemons",
+              "quantity": 4
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 468,
+      "output_tokens": 160
+    }
+  }
+}

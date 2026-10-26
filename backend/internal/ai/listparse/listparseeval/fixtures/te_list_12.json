@@ -1,0 +1,51 @@
+{
+  "name": "te_list_12",
+  "input": {
+    "text": "కందిపప్పు 1 కిలో; పెరుగు 500 గ్రాములు",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "కందిపప్పు 1 కిలో",
+        "quantity": 1
+      },
+      {
+        "text": "పెరుగు 500 గ్రాములు",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_te_list_12",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_te_list_12",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "కందిపప్పు 1 కిలో",
+              "quantity": 1
+            },
+            {
+              "text": "పెరుగు 500 గ్రాములు",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 451,
+      "output_tokens": 100
+    }
+  }
+}

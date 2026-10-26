@@ -1,0 +1,67 @@
+{
+  "name": "hi_list_28",
+  "input": {
+    "text": "धनिया\nDolo 650 ek patta\nचीनी आधा किलो\npaanch Parle-G",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "धनिया",
+        "quantity": 1
+      },
+      {
+        "text": "Dolo 650 ek patta",
+        "quantity": 1
+      },
+      {
+        "text": "चीनी आधा किलो",
+        "quantity": 1
+      },
+      {
+        "text": "Parle-G",
+        "quantity": 5
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_28",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_28",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "धनिया",
+              "quantity": 1
+            },
+            {
+              "text": "Dolo 650 ek patta",
+              "quantity": 1
+            },
+            {
+              "text": "चीनी आधा किलो",
+              "quantity": 1
+            },
+            {
+              "text": "Parle-G",
+              "quantity": 5
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 472,
+      "output_tokens": 160
+    }
+  }
+}

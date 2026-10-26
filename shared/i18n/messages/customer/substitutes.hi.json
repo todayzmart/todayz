@@ -1,0 +1,47 @@
+{
+  "substitutes.open": {
+    "message": "मिलते-जुलते सामान देखें",
+    "review": "reviewed",
+    "enHash": "0fb1f77d"
+  },
+  "substitutes.title": {
+    "message": "{name} की जगह",
+    "review": "reviewed",
+    "enHash": "b873aba1"
+  },
+  "substitutes.description": {
+    "message": "अभी स्टॉक में है। कार्ट में जोड़ने के लिए कोई एक खोलें।",
+    "review": "reviewed",
+    "enHash": "306d85b7"
+  },
+  "substitutes.sameShop": {
+    "message": "इसी दुकान में",
+    "review": "reviewed",
+    "enHash": "0f94e4c5"
+  },
+  "substitutes.nearby": {
+    "message": "दूसरी दुकानों में यही सामान",
+    "review": "reviewed",
+    "enHash": "54b5bcb2"
+  },
+  "substitutes.none": {
+    "message": "पास में कुछ मिलता-जुलता स्टॉक में नहीं है।",
+    "review": "reviewed",
+    "enHash": "fb970cd7"
+  },
+  "substitutes.error": {
+    "message": "मिलते-जुलते सामान लोड नहीं हो पाए।",
+    "review": "reviewed",
+    "enHash": "6c4c70bc"
+  },
+  "substitutes.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "substitutes.close": {
+    "message": "बंद करें",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  }
+}

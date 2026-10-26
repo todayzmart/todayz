@@ -1,0 +1,67 @@
+{
+  "name": "kn_list_26",
+  "input": {
+    "text": "ಮೂರು ಮ್ಯಾಗಿ; ಮೊಸರು 500 ಗ್ರಾಂ; ಟೀ ಪುಡಿ 250 ಗ್ರಾಂ; ಟೊಮೆಟೊ 1 ಕೆಜಿ",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಮ್ಯಾಗಿ",
+        "quantity": 3
+      },
+      {
+        "text": "ಮೊಸರು 500 ಗ್ರಾಂ",
+        "quantity": 1
+      },
+      {
+        "text": "ಟೀ ಪುಡಿ 250 ಗ್ರಾಂ",
+        "quantity": 1
+      },
+      {
+        "text": "ಟೊಮೆಟೊ 1 ಕೆಜಿ",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_26",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_26",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಮ್ಯಾಗಿ",
+              "quantity": 3
+            },
+            {
+              "text": "ಮೊಸರು 500 ಗ್ರಾಂ",
+              "quantity": 1
+            },
+            {
+              "text": "ಟೀ ಪುಡಿ 250 ಗ್ರಾಂ",
+              "quantity": 1
+            },
+            {
+              "text": "ಟೊಮೆಟೊ 1 ಕೆಜಿ",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 475,
+      "output_tokens": 160
+    }
+  }
+}

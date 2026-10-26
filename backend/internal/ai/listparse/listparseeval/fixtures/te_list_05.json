@@ -1,0 +1,59 @@
+{
+  "name": "te_list_05",
+  "input": {
+    "text": "ఉల్లిపాయలు ౨ కిలోలు, టమాటా 1 కిలో, paalu rendu",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ఉల్లిపాయలు ౨ కిలోలు",
+        "quantity": 1
+      },
+      {
+        "text": "టమాటా 1 కిలో",
+        "quantity": 1
+      },
+      {
+        "text": "paalu",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_te_list_05",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_te_list_05",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ఉల్లిపాయలు ౨ కిలోలు",
+              "quantity": 1
+            },
+            {
+              "text": "టమాటా 1 కిలో",
+              "quantity": 1
+            },
+            {
+              "text": "paalu",
+              "quantity": 2
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 461,
+      "output_tokens": 130
+    }
+  }
+}

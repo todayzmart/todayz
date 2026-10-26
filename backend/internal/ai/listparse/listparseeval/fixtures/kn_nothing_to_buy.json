@@ -1,0 +1,33 @@
+{
+  "name": "kn_nothing_to_buy",
+  "input": {
+    "text": "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [],
+    "reject": "empty"
+  },
+  "reply": {
+    "id": "msg_lp_kn_nothing_to_buy",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_nothing_to_buy",
+        "name": "record_list_items",
+        "input": {
+          "lines": []
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 420,
+      "output_tokens": 40
+    }
+  }
+}

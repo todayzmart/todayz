@@ -1,0 +1,79 @@
+{
+  "name": "hi_assist_15",
+  "input": {
+    "q": "ऑफ़र 60 रुपये से कम हल्दीराम नमकीन वाली दुकान",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "हल्दीराम नमकीन",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "6000",
+        "text": "60 रुपये से कम"
+      },
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "ऑफ़र"
+      },
+      {
+        "kind": "brand",
+        "value": "haldirams",
+        "text": "हल्दीराम"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_hi_assist_15",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_hi_assist_15",
+        "name": "suggest_search",
+        "input": {
+          "query": "हल्दीराम नमकीन",
+          "chips": [
+            {
+              "kind": "maxPrice",
+              "value": "6000",
+              "text": "60 रुपये से कम"
+            },
+            {
+              "kind": "offers",
+              "value": null,
+              "text": "ऑफ़र"
+            },
+            {
+              "kind": "brand",
+              "value": "haldirams",
+              "text": "हल्दीराम"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 135
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "name": "kn_list_01",
+  "input": {
+    "text": "- ಕೊತ್ತಂಬರಿ\n- ಡೋಲೋ 650\n- 1 kg ಅಕ್ಕಿ\n- ತೊಗರಿ ಬೇಳೆ 1 ಕೆಜಿ\n- haalu eradu",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಕೊತ್ತಂಬರಿ",
+        "quantity": 1
+      },
+      {
+        "text": "ಡೋಲೋ 650",
+        "quantity": 1
+      },
+      {
+        "text": "1 kg ಅಕ್ಕಿ",
+        "quantity": 1
+      },
+      {
+        "text": "ತೊಗರಿ ಬೇಳೆ 1 ಕೆಜಿ",
+        "quantity": 1
+      },
+      {
+        "text": "haalu",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_01",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_01",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಕೊತ್ತಂಬರಿ",
+              "quantity": 1
+            },
+            {
+              "text": "ಡೋಲೋ 650",
+              "quantity": 1
+            },
+            {
+              "text": "1 kg ಅಕ್ಕಿ",
+              "quantity": 1
+            },
+            {
+              "text": "ತೊಗರಿ ಬೇಳೆ 1 ಕೆಜಿ",
+              "quantity": 1
+            },
+            {
+              "text": "haalu",
+              "quantity": 2
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 484,
+      "output_tokens": 190
+    }
+  }
+}

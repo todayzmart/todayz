@@ -1,0 +1,75 @@
+{
+  "name": "te_list_29",
+  "input": {
+    "text": "biyyam 5 kg, గుడ్లు 6, సబ్బు ౩, బ్రెడ్, ఐదు పార్లే-జి",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "biyyam 5 kg",
+        "quantity": 1
+      },
+      {
+        "text": "గుడ్లు",
+        "quantity": 6
+      },
+      {
+        "text": "సబ్బు",
+        "quantity": 3
+      },
+      {
+        "text": "బ్రెడ్",
+        "quantity": 1
+      },
+      {
+        "text": "పార్లే-జి",
+        "quantity": 5
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_te_list_29",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_te_list_29",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "biyyam 5 kg",
+              "quantity": 1
+            },
+            {
+              "text": "గుడ్లు",
+              "quantity": 6
+            },
+            {
+              "text": "సబ్బు",
+              "quantity": 3
+            },
+            {
+              "text": "బ్రెడ్",
+              "quantity": 1
+            },
+            {
+              "text": "పార్లే-జి",
+              "quantity": 5
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 480,
+      "output_tokens": 190
+    }
+  }
+}

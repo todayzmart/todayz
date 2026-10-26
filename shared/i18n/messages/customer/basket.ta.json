@@ -443,5 +443,110 @@
     "message": "உங்கள் முழுப் பட்டியலுக்கும் ஒரே கடையைக் கண்டுபிடியுங்கள்",
     "review": "reviewed",
     "enHash": "f8cab370"
+  },
+  "basket.paste.open": {
+    "message": "பட்டியலை ஒட்டுங்கள்",
+    "review": "reviewed",
+    "enHash": "b4e62165"
+  },
+  "basket.paste.title": {
+    "message": "முழுப் பட்டியலையும் சேருங்கள்",
+    "review": "reviewed",
+    "enHash": "735ed34d"
+  },
+  "basket.paste.label": {
+    "message": "உங்கள் பட்டியல்",
+    "review": "reviewed",
+    "enHash": "07bcbd85"
+  },
+  "basket.paste.placeholder": {
+    "message": "1 கிலோ ஆட்டா, 2 பாக்கெட் பால், 1 சோப்பு",
+    "review": "reviewed",
+    "enHash": "39602a59"
+  },
+  "basket.paste.help": {
+    "message": "காற்புள்ளியுடன் அல்லது வரிக்கு ஒரு பொருள், எந்த மொழியிலும். நீங்கள் சரிபார்க்கும் வரை எதுவும் சேராது.",
+    "review": "reviewed",
+    "enHash": "1fac4c44"
+  },
+  "basket.paste.read": {
+    "message": "என் பட்டியலைப் படியுங்கள்",
+    "review": "reviewed",
+    "enHash": "b0122bd0"
+  },
+  "basket.paste.cancel": {
+    "message": "ரத்துசெய்",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "basket.paste.reading": {
+    "message": "உங்கள் பட்டியலைப் படிக்கிறோம்…",
+    "review": "reviewed",
+    "enHash": "91e1bb36"
+  },
+  "basket.paste.sendFailed": {
+    "message": "உங்கள் பட்டியலை அனுப்ப முடியவில்லை. மீண்டும் முயலுங்கள்.",
+    "review": "reviewed",
+    "enHash": "7614ac2d"
+  },
+  "basket.paste.failed": {
+    "message": "அந்தப் பட்டியலைப் படிக்க முடியவில்லை. பொருட்களை ஒவ்வொன்றாகச் சேருங்கள், அல்லது மீண்டும் முயலுங்கள்.",
+    "review": "reviewed",
+    "enHash": "da5a4e5d"
+  },
+  "basket.paste.retry": {
+    "message": "மீண்டும் முயலுங்கள்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "basket.paste.close": {
+    "message": "மூடு",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "basket.paste.capped": {
+    "message": "இன்றைக்கான பட்டியல் படிப்பு முடிந்தது. பொருட்களை ஒவ்வொன்றாகச் சேருங்கள்.",
+    "review": "reviewed",
+    "enHash": "c568e746"
+  },
+  "basket.paste.review.title": {
+    "message": "உங்கள் பட்டியலைச் சரிபாருங்கள்",
+    "review": "reviewed",
+    "enHash": "2a0475c3"
+  },
+  "basket.paste.review.help": {
+    "message": "தவறானதை மாற்றுங்கள் அல்லது நீக்குங்கள். நீங்கள் வைத்திருப்பவை மட்டுமே பாஸ்கெட்டில் சேரும்.",
+    "review": "reviewed",
+    "enHash": "5db412e3"
+  },
+  "basket.paste.review.item": {
+    "message": "பொருள் {n}",
+    "review": "reviewed",
+    "enHash": "6f8c7dbc"
+  },
+  "basket.paste.review.remove": {
+    "message": "{name} நீக்கு",
+    "review": "reviewed",
+    "enHash": "df7193a5"
+  },
+  "basket.paste.review.keep": {
+    "message": "வை",
+    "review": "reviewed",
+    "enHash": "466fc492"
+  },
+  "basket.paste.review.add": {
+    "message": "{count, plural, one {# பொருளை பாஸ்கெட்டில் சேர்} other {# பொருட்களை பாஸ்கெட்டில் சேர்}}",
+    "review": "reviewed",
+    "enHash": "76bd7b4b"
+  },
+  "basket.paste.review.discard": {
+    "message": "பட்டியலைக் கைவிடு",
+    "review": "reviewed",
+    "enHash": "4f59bf89"
+  },
+  "basket.paste.confirmFailed": {
+    "message": "அந்த வரிகளைச் சேர்க்க முடியவில்லை. மீண்டும் முயலுங்கள்.",
+    "review": "reviewed",
+    "enHash": "9d032a51"
   }
 }

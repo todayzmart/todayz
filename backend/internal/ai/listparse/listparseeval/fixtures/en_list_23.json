@@ -1,0 +1,59 @@
+{
+  "name": "en_list_23",
+  "input": {
+    "text": "Red Label tea 250 g\nbread\n3 Maggi",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "Red Label tea 250 g",
+        "quantity": 1
+      },
+      {
+        "text": "bread",
+        "quantity": 1
+      },
+      {
+        "text": "Maggi",
+        "quantity": 3
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_23",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_23",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "Red Label tea 250 g",
+              "quantity": 1
+            },
+            {
+              "text": "bread",
+              "quantity": 1
+            },
+            {
+              "text": "Maggi",
+              "quantity": 3
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 458,
+      "output_tokens": 130
+    }
+  }
+}

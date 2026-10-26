@@ -1,0 +1,67 @@
+{
+  "name": "hi_list_22",
+  "input": {
+    "text": "- धनिया\n- paanch Parle-G\n- २ साबुन\n- ब्रेड",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "धनिया",
+        "quantity": 1
+      },
+      {
+        "text": "Parle-G",
+        "quantity": 5
+      },
+      {
+        "text": "साबुन",
+        "quantity": 2
+      },
+      {
+        "text": "ब्रेड",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_22",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_22",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "धनिया",
+              "quantity": 1
+            },
+            {
+              "text": "Parle-G",
+              "quantity": 5
+            },
+            {
+              "text": "साबुन",
+              "quantity": 2
+            },
+            {
+              "text": "ब्रेड",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 466,
+      "output_tokens": 160
+    }
+  }
+}

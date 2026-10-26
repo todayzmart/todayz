@@ -1,0 +1,79 @@
+{
+  "name": "hi_assist_02",
+  "input": {
+    "q": "कोई दुकान जहाँ सिर दर्द की दवा मिले अभी खुली मेरे पास पिकअप",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "सिर दर्द की दवा",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "अभी खुली"
+      },
+      {
+        "kind": "pickup",
+        "value": "",
+        "text": "पिकअप"
+      },
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "मेरे पास"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_hi_assist_02",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_hi_assist_02",
+        "name": "suggest_search",
+        "input": {
+          "query": "सिर दर्द की दवा",
+          "chips": [
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "अभी खुली"
+            },
+            {
+              "kind": "pickup",
+              "value": null,
+              "text": "पिकअप"
+            },
+            {
+              "kind": "nearest",
+              "value": null,
+              "text": "मेरे पास"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 135
+    }
+  }
+}

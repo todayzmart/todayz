@@ -1,0 +1,47 @@
+{
+  "substitutes.open": {
+    "message": "இதுபோன்ற பொருட்களைப் பாருங்கள்",
+    "review": "reviewed",
+    "enHash": "0fb1f77d"
+  },
+  "substitutes.title": {
+    "message": "{name} க்குப் பதிலாக",
+    "review": "reviewed",
+    "enHash": "b873aba1"
+  },
+  "substitutes.description": {
+    "message": "இப்போது கையிருப்பில் உள்ளது. கார்ட்டில் சேர்க்க ஒன்றைத் திறங்கள்.",
+    "review": "reviewed",
+    "enHash": "306d85b7"
+  },
+  "substitutes.sameShop": {
+    "message": "இதே கடையில்",
+    "review": "reviewed",
+    "enHash": "0f94e4c5"
+  },
+  "substitutes.nearby": {
+    "message": "மற்ற கடைகளில் இதே பொருள்",
+    "review": "reviewed",
+    "enHash": "54b5bcb2"
+  },
+  "substitutes.none": {
+    "message": "அருகில் இதுபோன்றது எதுவும் கையிருப்பில் இல்லை.",
+    "review": "reviewed",
+    "enHash": "fb970cd7"
+  },
+  "substitutes.error": {
+    "message": "இதுபோன்ற பொருட்கள் ஏற்றப்படவில்லை.",
+    "review": "reviewed",
+    "enHash": "6c4c70bc"
+  },
+  "substitutes.retry": {
+    "message": "மீண்டும் முயலுங்கள்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "substitutes.close": {
+    "message": "மூடு",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  }
+}

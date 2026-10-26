@@ -1,0 +1,79 @@
+{
+  "name": "hi_assist_10",
+  "input": {
+    "q": "मुझे बच्चों का डायपर चाहिए 120 रुपये से कम पिकअप मेरे पास",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "बच्चों का डायपर",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "12000",
+        "text": "120 रुपये से कम"
+      },
+      {
+        "kind": "pickup",
+        "value": "",
+        "text": "पिकअप"
+      },
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "मेरे पास"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_hi_assist_10",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_hi_assist_10",
+        "name": "suggest_search",
+        "input": {
+          "query": "बच्चों का डायपर",
+          "chips": [
+            {
+              "kind": "maxPrice",
+              "value": "12000",
+              "text": "120 रुपये से कम"
+            },
+            {
+              "kind": "pickup",
+              "value": null,
+              "text": "पिकअप"
+            },
+            {
+              "kind": "nearest",
+              "value": null,
+              "text": "मेरे पास"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 135
+    }
+  }
+}

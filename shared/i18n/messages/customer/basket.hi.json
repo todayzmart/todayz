@@ -443,5 +443,110 @@
     "message": "अपनी पूरी लिस्ट के लिए एक दुकान ढूँढें",
     "review": "reviewed",
     "enHash": "f8cab370"
+  },
+  "basket.paste.open": {
+    "message": "सूची चिपकाएँ",
+    "review": "reviewed",
+    "enHash": "b4e62165"
+  },
+  "basket.paste.title": {
+    "message": "पूरी सूची जोड़ें",
+    "review": "reviewed",
+    "enHash": "735ed34d"
+  },
+  "basket.paste.label": {
+    "message": "आपकी सूची",
+    "review": "reviewed",
+    "enHash": "07bcbd85"
+  },
+  "basket.paste.placeholder": {
+    "message": "1 किलो आटा, 2 पैकेट दूध, 1 साबुन",
+    "review": "reviewed",
+    "enHash": "39602a59"
+  },
+  "basket.paste.help": {
+    "message": "अल्पविराम से या हर लाइन में एक सामान, किसी भी भाषा में। आपके जाँचने तक कुछ नहीं जुड़ता।",
+    "review": "reviewed",
+    "enHash": "1fac4c44"
+  },
+  "basket.paste.read": {
+    "message": "मेरी सूची पढ़ें",
+    "review": "reviewed",
+    "enHash": "b0122bd0"
+  },
+  "basket.paste.cancel": {
+    "message": "रद्द करें",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "basket.paste.reading": {
+    "message": "आपकी सूची पढ़ रहे हैं…",
+    "review": "reviewed",
+    "enHash": "91e1bb36"
+  },
+  "basket.paste.sendFailed": {
+    "message": "आपकी सूची भेजी नहीं जा सकी। फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "7614ac2d"
+  },
+  "basket.paste.failed": {
+    "message": "हम वह सूची पढ़ नहीं पाए। सामान एक-एक करके जोड़ें, या फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "da5a4e5d"
+  },
+  "basket.paste.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "basket.paste.close": {
+    "message": "बंद करें",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "basket.paste.capped": {
+    "message": "आज के लिए सूची पढ़ना खत्म हो गया। सामान एक-एक करके जोड़ें।",
+    "review": "reviewed",
+    "enHash": "c568e746"
+  },
+  "basket.paste.review.title": {
+    "message": "अपनी सूची जाँचें",
+    "review": "reviewed",
+    "enHash": "2a0475c3"
+  },
+  "basket.paste.review.help": {
+    "message": "जो गलत हो उसे बदलें या हटाएँ। सिर्फ़ जो आप रखेंगे वही बास्केट में जुड़ेगा।",
+    "review": "reviewed",
+    "enHash": "5db412e3"
+  },
+  "basket.paste.review.item": {
+    "message": "सामान {n}",
+    "review": "reviewed",
+    "enHash": "6f8c7dbc"
+  },
+  "basket.paste.review.remove": {
+    "message": "{name} हटाएँ",
+    "review": "reviewed",
+    "enHash": "df7193a5"
+  },
+  "basket.paste.review.keep": {
+    "message": "रखें",
+    "review": "reviewed",
+    "enHash": "466fc492"
+  },
+  "basket.paste.review.add": {
+    "message": "{count, plural, one {# सामान बास्केट में जोड़ें} other {# सामान बास्केट में जोड़ें}}",
+    "review": "reviewed",
+    "enHash": "76bd7b4b"
+  },
+  "basket.paste.review.discard": {
+    "message": "सूची हटाएँ",
+    "review": "reviewed",
+    "enHash": "4f59bf89"
+  },
+  "basket.paste.confirmFailed": {
+    "message": "वे लाइनें जोड़ी नहीं जा सकीं। फिर से कोशिश करें।",
+    "review": "reviewed",
+    "enHash": "9d032a51"
   }
 }

@@ -1,0 +1,67 @@
+{
+  "name": "en_list_08",
+  "input": {
+    "text": "Red Label tea 250 g\n1 kg atta\n3 Dairy Milk\nsunflower oil 1 litre",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "Red Label tea 250 g",
+        "quantity": 1
+      },
+      {
+        "text": "1 kg atta",
+        "quantity": 1
+      },
+      {
+        "text": "Dairy Milk",
+        "quantity": 3
+      },
+      {
+        "text": "sunflower oil 1 litre",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_08",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_08",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "Red Label tea 250 g",
+              "quantity": 1
+            },
+            {
+              "text": "1 kg atta",
+              "quantity": 1
+            },
+            {
+              "text": "Dairy Milk",
+              "quantity": 3
+            },
+            {
+              "text": "sunflower oil 1 litre",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 478,
+      "output_tokens": 160
+    }
+  }
+}

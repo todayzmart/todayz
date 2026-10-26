@@ -1,0 +1,75 @@
+{
+  "name": "hi_list_30",
+  "input": {
+    "text": "दही 500 ग्राम, चार नींबू, आलू ३ किलो, तीन अमूल बटर, २ साबुन",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "दही 500 ग्राम",
+        "quantity": 1
+      },
+      {
+        "text": "नींबू",
+        "quantity": 4
+      },
+      {
+        "text": "आलू ३ किलो",
+        "quantity": 1
+      },
+      {
+        "text": "अमूल बटर",
+        "quantity": 3
+      },
+      {
+        "text": "साबुन",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_30",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_30",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "दही 500 ग्राम",
+              "quantity": 1
+            },
+            {
+              "text": "नींबू",
+              "quantity": 4
+            },
+            {
+              "text": "आलू ३ किलो",
+              "quantity": 1
+            },
+            {
+              "text": "अमूल बटर",
+              "quantity": 3
+            },
+            {
+              "text": "साबुन",
+              "quantity": 2
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 482,
+      "output_tokens": 190
+    }
+  }
+}

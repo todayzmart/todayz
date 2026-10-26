@@ -443,5 +443,110 @@
     "message": "మీ పూర్తి జాబితాకు ఒకే దుకాణం కనుగొనండి",
     "review": "reviewed",
     "enHash": "f8cab370"
+  },
+  "basket.paste.open": {
+    "message": "జాబితా అతికించండి",
+    "review": "reviewed",
+    "enHash": "b4e62165"
+  },
+  "basket.paste.title": {
+    "message": "మొత్తం జాబితా జోడించండి",
+    "review": "reviewed",
+    "enHash": "735ed34d"
+  },
+  "basket.paste.label": {
+    "message": "మీ జాబితా",
+    "review": "reviewed",
+    "enHash": "07bcbd85"
+  },
+  "basket.paste.placeholder": {
+    "message": "1 కిలో ఆటా, 2 ప్యాకెట్ల పాలు, 1 సబ్బు",
+    "review": "reviewed",
+    "enHash": "39602a59"
+  },
+  "basket.paste.help": {
+    "message": "కామాలతో లేదా లైనుకు ఒక వస్తువు, ఏ భాషలోనైనా. మీరు సరిచూసే వరకు ఏదీ జోడించబడదు.",
+    "review": "reviewed",
+    "enHash": "1fac4c44"
+  },
+  "basket.paste.read": {
+    "message": "నా జాబితా చదవండి",
+    "review": "reviewed",
+    "enHash": "b0122bd0"
+  },
+  "basket.paste.cancel": {
+    "message": "రద్దు చేయండి",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "basket.paste.reading": {
+    "message": "మీ జాబితా చదువుతున్నాం…",
+    "review": "reviewed",
+    "enHash": "91e1bb36"
+  },
+  "basket.paste.sendFailed": {
+    "message": "మీ జాబితా పంపలేకపోయాం. మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "7614ac2d"
+  },
+  "basket.paste.failed": {
+    "message": "ఆ జాబితా చదవలేకపోయాం. వస్తువులను ఒక్కొక్కటిగా జోడించండి, లేదా మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "da5a4e5d"
+  },
+  "basket.paste.retry": {
+    "message": "మళ్లీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "basket.paste.close": {
+    "message": "మూసివేయండి",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  },
+  "basket.paste.capped": {
+    "message": "ఈ రోజుకు జాబితాలు చదవడం అయిపోయింది. వస్తువులను ఒక్కొక్కటిగా జోడించండి.",
+    "review": "reviewed",
+    "enHash": "c568e746"
+  },
+  "basket.paste.review.title": {
+    "message": "మీ జాబితా సరిచూసుకోండి",
+    "review": "reviewed",
+    "enHash": "2a0475c3"
+  },
+  "basket.paste.review.help": {
+    "message": "తప్పుగా ఉన్నదాన్ని మార్చండి లేదా తీసేయండి. మీరు ఉంచినవి మాత్రమే బాస్కెట్‌లో చేరుతాయి.",
+    "review": "reviewed",
+    "enHash": "5db412e3"
+  },
+  "basket.paste.review.item": {
+    "message": "వస్తువు {n}",
+    "review": "reviewed",
+    "enHash": "6f8c7dbc"
+  },
+  "basket.paste.review.remove": {
+    "message": "{name} తీసేయండి",
+    "review": "reviewed",
+    "enHash": "df7193a5"
+  },
+  "basket.paste.review.keep": {
+    "message": "ఉంచండి",
+    "review": "reviewed",
+    "enHash": "466fc492"
+  },
+  "basket.paste.review.add": {
+    "message": "{count, plural, one {# వస్తువును బాస్కెట్‌కు జోడించండి} other {# వస్తువులను బాస్కెట్‌కు జోడించండి}}",
+    "review": "reviewed",
+    "enHash": "76bd7b4b"
+  },
+  "basket.paste.review.discard": {
+    "message": "జాబితా వదిలేయండి",
+    "review": "reviewed",
+    "enHash": "4f59bf89"
+  },
+  "basket.paste.confirmFailed": {
+    "message": "ఆ లైన్లు జోడించలేకపోయాం. మళ్లీ ప్రయత్నించండి.",
+    "review": "reviewed",
+    "enHash": "9d032a51"
   }
 }

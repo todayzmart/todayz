@@ -1,0 +1,74 @@
+{
+  "name": "en_voice_16",
+  "input": {
+    "language": "en-IN",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "Dolo 650 on offer for pickup",
+    "language": "en",
+    "chips": [
+      {
+        "kind": "pickup",
+        "value": "",
+        "text": "pickup"
+      },
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "on offer"
+      },
+      {
+        "kind": "brand",
+        "value": "dolo",
+        "text": "Dolo"
+      }
+    ]
+  },
+  "reply": {
+    "request_id": "rec_vs_en_voice_16",
+    "transcript": "Dolo 650 on offer for pickup",
+    "language_code": "en-IN"
+  }
+}

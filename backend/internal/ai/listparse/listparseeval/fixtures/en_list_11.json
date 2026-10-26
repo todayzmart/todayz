@@ -1,0 +1,75 @@
+{
+  "name": "en_list_11",
+  "input": {
+    "text": "5 kg rice\n6 eggs\nRed Label tea 250 g\ncurd 500 g\na dozen bananas",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "5 kg rice",
+        "quantity": 1
+      },
+      {
+        "text": "eggs",
+        "quantity": 6
+      },
+      {
+        "text": "Red Label tea 250 g",
+        "quantity": 1
+      },
+      {
+        "text": "curd 500 g",
+        "quantity": 1
+      },
+      {
+        "text": "bananas",
+        "quantity": 12
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_11",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_11",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "5 kg rice",
+              "quantity": 1
+            },
+            {
+              "text": "eggs",
+              "quantity": 6
+            },
+            {
+              "text": "Red Label tea 250 g",
+              "quantity": 1
+            },
+            {
+              "text": "curd 500 g",
+              "quantity": 1
+            },
+            {
+              "text": "bananas",
+              "quantity": 12
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 485,
+      "output_tokens": 190
+    }
+  }
+}

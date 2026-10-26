@@ -1,0 +1,67 @@
+{
+  "name": "te_list_19",
+  "input": {
+    "text": "పంచదార అర కిలో\nడోలో 650\nమూడు మ్యాగీ\nగోధుమ పిండి 1 కిలో",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "పంచదార అర కిలో",
+        "quantity": 1
+      },
+      {
+        "text": "డోలో 650",
+        "quantity": 1
+      },
+      {
+        "text": "మ్యాగీ",
+        "quantity": 3
+      },
+      {
+        "text": "గోధుమ పిండి 1 కిలో",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_te_list_19",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_te_list_19",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "పంచదార అర కిలో",
+              "quantity": 1
+            },
+            {
+              "text": "డోలో 650",
+              "quantity": 1
+            },
+            {
+              "text": "మ్యాగీ",
+              "quantity": 3
+            },
+            {
+              "text": "గోధుమ పిండి 1 కిలో",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 474,
+      "output_tokens": 160
+    }
+  }
+}

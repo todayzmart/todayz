@@ -1,0 +1,64 @@
+{
+  "name": "kn_invented_price",
+  "input": {
+    "q": "ಈಗ ತೆರೆದಿರುವ ತಲೆನೋವಿನ ಮಾತ್ರೆ ಇರುವ ಅಂಗಡಿ",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "ತಲೆನೋವಿನ ಮಾತ್ರೆ",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "ಈಗ ತೆರೆದಿರುವ"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_kn_invented_price",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_kn_invented_price",
+        "name": "suggest_search",
+        "input": {
+          "query": "ತಲೆನೋವಿನ ಮಾತ್ರೆ",
+          "chips": [
+            {
+              "kind": "maxPrice",
+              "value": "5000",
+              "text": "ತಲೆನೋವಿನ ಮಾತ್ರೆ"
+            },
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "ಈಗ ತೆರೆದಿರುವ"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

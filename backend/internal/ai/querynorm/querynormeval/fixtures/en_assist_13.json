@@ -1,0 +1,79 @@
+{
+  "name": "en_assist_13",
+  "input": {
+    "q": "where can I get toor dal near me for pickup on offer",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "toor dal",
+    "chips": [
+      {
+        "kind": "pickup",
+        "value": "",
+        "text": "for pickup"
+      },
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "on offer"
+      },
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "near me"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_en_assist_13",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_en_assist_13",
+        "name": "suggest_search",
+        "input": {
+          "query": "toor dal",
+          "chips": [
+            {
+              "kind": "pickup",
+              "value": null,
+              "text": "for pickup"
+            },
+            {
+              "kind": "offers",
+              "value": null,
+              "text": "on offer"
+            },
+            {
+              "kind": "nearest",
+              "value": null,
+              "text": "near me"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 135
+    }
+  }
+}

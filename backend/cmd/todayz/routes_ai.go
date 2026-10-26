@@ -19,11 +19,14 @@ import (
 	"github.com/todayz/backend/internal/ai/client"
 	"github.com/todayz/backend/internal/ai/drafts"
 	"github.com/todayz/backend/internal/ai/guard"
+	"github.com/todayz/backend/internal/ai/listparse"
+	"github.com/todayz/backend/internal/ai/querynorm"
 	"github.com/todayz/backend/internal/ai/replydraft"
 	"github.com/todayz/backend/internal/ai/retail"
 	"github.com/todayz/backend/internal/ai/riskexplain"
 	"github.com/todayz/backend/internal/ai/shelfscan"
 	"github.com/todayz/backend/internal/ai/triage"
+	"github.com/todayz/backend/internal/ai/voicesearch"
 	"github.com/todayz/backend/internal/catalogue"
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/authz/policy"
@@ -31,17 +34,25 @@ import (
 	"github.com/todayz/backend/internal/platform/httpx"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/reviews"
+	"github.com/todayz/backend/internal/voice"
 )
 
 // aiRetailSeams lets a test swap the retail AI kit and model (a fake model, a
 // guard that counts the providers as configured, an inline runner).
 var aiRetailSeams func(d *deps, kit *retail.Kit, llm *client.LLM)
 
+// aiConsumerSeams lets a test swap voice search's speech client (W3-12); the
+// model and guard come from aiRetailSeams.
+var aiConsumerSeams func(d *deps, stt *client.STT)
+
 // mountAI mounts the ai domain's routes. Only the work packages that build
 // internal/ai edit this file (D-50). W3-10 serves no route of its own; W3-11
 // mounts the retailer helpers under {S}/ai (04 §2.8): supplier bill (AI-R2),
 // shelf photo (AI-R3), review reply (AI-R6) and banner copy (AI-R9) drafts,
 // each confirmed by a person before anything is written (11 §1 rule 1).
+// W3-12 mounts the customer's own helpers under /v1/me/ai (D-101): list parse
+// (AI-C1, a draft the customer confirms line by line), search assist (AI-C2)
+// and voice search (AI-C5), which keep nothing.
 // Without a database or config (a route-only test) every call is 503.
 func mountAI(r chi.Router, d *deps) {
 	var az authz.Authorizer
@@ -91,11 +102,30 @@ func mountAI(r chi.Router, d *deps) {
 	if err != nil {
 		panic("ai: bannercopy: " + err.Error())
 	}
+	list, err := listparse.New(listparse.Deps{Clock: d.Clock, Settings: d.Settings, LLM: llm, Guard: kit.Guard, Drafts: kit.Drafts, Go: kit.Go})
+	if err != nil {
+		panic("ai: listparse: " + err.Error())
+	}
+	assist, err := querynorm.New(querynorm.Deps{DB: d.DB, Settings: d.Settings, LLM: llm, Guard: kit.Guard})
+	if err != nil {
+		panic("ai: querynorm: " + err.Error())
+	}
+	stt := k.STT(voicesearch.Feature)
+	if aiConsumerSeams != nil {
+		aiConsumerSeams(d, &stt)
+	}
+	speech, err := voicesearch.New(voicesearch.Deps{DB: d.DB, Guard: kit.Guard, STT: stt})
+	if err != nil {
+		panic("ai: voicesearch: " + err.Error())
+	}
 	aiapi.Register(r, aiServer{
 		Handlers: billscan.Handlers{S: bill},
 		shelf:    shelfscan.Handlers{S: shelf},
 		reply:    replydraft.Handlers{S: reply},
 		banner:   bannercopy.Handlers{S: banner},
+		list:     listparse.Handlers{S: list},
+		assist:   querynorm.Handlers{S: assist},
+		speech:   voicesearch.Handlers{S: speech},
 		admin:    newAIAdmin(d, kit, llm),
 		guard:    kit.Guard,
 	}, mws...)
@@ -103,8 +133,11 @@ func mountAI(r chi.Router, d *deps) {
 
 // aiRetailOps is every ai operation's route check.
 func aiRetailOps() map[string]string {
-	ops := map[string]string{"GetStoreAiRetailFeatures": policy.InsightsView}
-	for _, m := range []map[string]string{billscan.Ops, shelfscan.Ops, replydraft.Ops, bannercopy.Ops, aicatalogue.Ops, triage.Ops, riskexplain.Ops} {
+	ops := map[string]string{"GetStoreAiRetailFeatures": policy.InsightsView, "GetMyAiFeatures": policy.MeAiUse}
+	for _, m := range []map[string]string{
+		billscan.Ops, shelfscan.Ops, replydraft.Ops, bannercopy.Ops, listparse.Ops, querynorm.Ops, voicesearch.Ops,
+		aicatalogue.Ops, triage.Ops, riskexplain.Ops,
+	} {
 		maps.Copy(ops, m)
 	}
 	return ops
@@ -117,6 +150,9 @@ type aiServer struct {
 	shelf  shelfscan.Handlers
 	reply  replydraft.Handlers
 	banner bannercopy.Handlers
+	list   listparse.Handlers
+	assist querynorm.Handlers
+	speech voicesearch.Handlers
 	admin  aiAdmin // W3-13: the admin assistants (ai_admin.go)
 	guard  *guard.Guard
 }
@@ -140,6 +176,48 @@ func (s aiServer) GetStoreAiRetailFeatures(ctx context.Context, _ aiapi.GetStore
 		*f.to = v
 	}
 	return aiapi.GetStoreAiRetailFeatures200JSONResponse(out), nil
+}
+
+// GetMyAiFeatures is which customer helpers are on (D-231) and the recording
+// limits; it counts nothing against the cap.
+func (s aiServer) GetMyAiFeatures(ctx context.Context, _ aiapi.GetMyAiFeaturesRequestObject) (aiapi.GetMyAiFeaturesResponseObject, error) {
+	if _, err := querynorm.Customer(ctx); err != nil {
+		return nil, err
+	}
+	out := aiapi.AiCustomerFeatures{MaxAudioSeconds: voice.MaxSeconds, MaxAudioBytes: voice.MaxAudioBytes, AudioTypes: voice.MediaTypes}
+	for _, f := range []struct {
+		name string
+		to   *bool
+	}{
+		{listparse.Feature, &out.ListParse}, {voicesearch.Feature, &out.VoiceSearch}, {querynorm.Feature, &out.SearchAssist},
+	} {
+		v, err := s.guard.Available(ctx, f.name)
+		if err != nil {
+			return nil, err
+		}
+		*f.to = v
+	}
+	return aiapi.GetMyAiFeatures200JSONResponse(out), nil
+}
+
+func (s aiServer) CreateListParseDraft(ctx context.Context, req aiapi.CreateListParseDraftRequestObject) (aiapi.CreateListParseDraftResponseObject, error) {
+	return s.list.CreateListParseDraft(ctx, req)
+}
+
+func (s aiServer) GetListParseDraft(ctx context.Context, req aiapi.GetListParseDraftRequestObject) (aiapi.GetListParseDraftResponseObject, error) {
+	return s.list.GetListParseDraft(ctx, req)
+}
+
+func (s aiServer) ConfirmListParseDraft(ctx context.Context, req aiapi.ConfirmListParseDraftRequestObject) (aiapi.ConfirmListParseDraftResponseObject, error) {
+	return s.list.ConfirmListParseDraft(ctx, req)
+}
+
+func (s aiServer) SearchAssist(ctx context.Context, req aiapi.SearchAssistRequestObject) (aiapi.SearchAssistResponseObject, error) {
+	return s.assist.SearchAssist(ctx, req)
+}
+
+func (s aiServer) VoiceSearch(ctx context.Context, req aiapi.VoiceSearchRequestObject) (aiapi.VoiceSearchResponseObject, error) {
+	return s.speech.VoiceSearch(ctx, req)
 }
 
 func (s aiServer) CreateShelfPhotoDraft(ctx context.Context, req aiapi.CreateShelfPhotoDraftRequestObject) (aiapi.CreateShelfPhotoDraftResponseObject, error) {

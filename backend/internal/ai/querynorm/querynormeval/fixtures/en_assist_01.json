@@ -1,0 +1,89 @@
+{
+  "name": "en_assist_01",
+  "input": {
+    "q": "where can I get amul butter near me under 99 rupees for pickup",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "amul butter",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "9900",
+        "text": "under 99 rupees"
+      },
+      {
+        "kind": "pickup",
+        "value": "",
+        "text": "for pickup"
+      },
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "near me"
+      },
+      {
+        "kind": "brand",
+        "value": "amul",
+        "text": "amul"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_en_assist_01",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_en_assist_01",
+        "name": "suggest_search",
+        "input": {
+          "query": "amul butter",
+          "chips": [
+            {
+              "kind": "maxPrice",
+              "value": "9900",
+              "text": "under 99 rupees"
+            },
+            {
+              "kind": "pickup",
+              "value": null,
+              "text": "for pickup"
+            },
+            {
+              "kind": "nearest",
+              "value": null,
+              "text": "near me"
+            },
+            {
+              "kind": "brand",
+              "value": "amul",
+              "text": "amul"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 160
+    }
+  }
+}

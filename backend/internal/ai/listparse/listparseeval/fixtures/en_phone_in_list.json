@@ -1,0 +1,55 @@
+{
+  "name": "en_phone_in_list",
+  "input": {
+    "text": "onions 2 kg, Surf Excel 1 kg, call 9845012345",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "onions 2 kg",
+        "quantity": 1
+      },
+      {
+        "text": "Surf Excel 1 kg",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_phone_in_list",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_phone_in_list",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "onions 2 kg",
+              "quantity": 1
+            },
+            {
+              "text": "Surf Excel 1 kg",
+              "quantity": 1
+            },
+            {
+              "text": "call 9845012345",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 462,
+      "output_tokens": 130
+    }
+  }
+}

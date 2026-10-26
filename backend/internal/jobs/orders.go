@@ -22,7 +22,7 @@ import (
 // The orders timers run up to this many attempts. An attempt that runs
 // before its deadline (queue and clock skew) fails and is retried, and a
 // timer kind is never retried by hand (D-95), so the cap is generous.
-const ordersTimerAttempts = 25
+const ordersTimerAttempts = 25 //settings:ok a River attempt cap, not a product rule
 
 // registerorders declares the orders timers (W2-02): the accept timeout
 // (BK-06), the pickup no-show (BK-14) and the partial-confirm timeout

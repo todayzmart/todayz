@@ -13,15 +13,16 @@ import (
 // places, browse shops and search; a signed-in caller is only recorded on
 // the search log). Slot 15 lets a Public operation through without a check.
 var discoverOps = map[string]string{
-	"ReversePlace":           authz.Public,
-	"SearchPlaces":           authz.Public,
-	"SearchDiscover":         authz.Public,
-	"SearchSuggest":          authz.Public,
-	"ListDiscoverStores":     authz.Public,
-	"GetDiscoverStore":       authz.Public,
-	"ListDiscoverStoreItems": authz.Public,
-	"GetDiscoverSummary":     authz.Public,
-	"SearchBasket":           authz.Public,
+	"ReversePlace":            authz.Public,
+	"SearchPlaces":            authz.Public,
+	"SearchDiscover":          authz.Public,
+	"SearchSuggest":           authz.Public,
+	"ListDiscoverStores":      authz.Public,
+	"GetDiscoverStore":        authz.Public,
+	"ListDiscoverStoreItems":  authz.Public,
+	"GetDiscoverSummary":      authz.Public,
+	"SearchBasket":            authz.Public,
+	"ListDiscoverSubstitutes": authz.Public,
 }
 
 // Register mounts /v1/places/* and /v1/discover/* on r. az may be nil: every
@@ -109,4 +110,12 @@ func (h handlers) SearchBasket(ctx context.Context, req discoverapi.SearchBasket
 		return nil, err
 	}
 	return discoverapi.SearchBasket200JSONResponse(out), nil
+}
+
+func (h handlers) ListDiscoverSubstitutes(ctx context.Context, req discoverapi.ListDiscoverSubstitutesRequestObject) (discoverapi.ListDiscoverSubstitutesResponseObject, error) {
+	out, err := h.s.Substitutes(ctx, req.Slug, req.Params)
+	if err != nil {
+		return nil, err
+	}
+	return discoverapi.ListDiscoverSubstitutes200JSONResponse(out), nil
 }

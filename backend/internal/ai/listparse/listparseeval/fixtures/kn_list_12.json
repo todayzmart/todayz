@@ -1,0 +1,59 @@
+{
+  "name": "kn_list_12",
+  "input": {
+    "text": "ಉಪ್ಪು, ನಂದಿನಿ ತುಪ್ಪ 2, ನಾಲ್ಕು ನಿಂಬೆಹಣ್ಣು",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಉಪ್ಪು",
+        "quantity": 1
+      },
+      {
+        "text": "ನಂದಿನಿ ತುಪ್ಪ",
+        "quantity": 2
+      },
+      {
+        "text": "ನಿಂಬೆಹಣ್ಣು",
+        "quantity": 4
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_12",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_12",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಉಪ್ಪು",
+              "quantity": 1
+            },
+            {
+              "text": "ನಂದಿನಿ ತುಪ್ಪ",
+              "quantity": 2
+            },
+            {
+              "text": "ನಿಂಬೆಹಣ್ಣು",
+              "quantity": 4
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 458,
+      "output_tokens": 130
+    }
+  }
+}

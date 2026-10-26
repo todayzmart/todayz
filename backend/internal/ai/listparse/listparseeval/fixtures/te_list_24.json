@@ -1,0 +1,51 @@
+{
+  "name": "te_list_24",
+  "input": {
+    "text": "బ్రెడ్, నూనె 1 లీటరు",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "బ్రెడ్",
+        "quantity": 1
+      },
+      {
+        "text": "నూనె 1 లీటరు",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_te_list_24",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_te_list_24",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "బ్రెడ్",
+              "quantity": 1
+            },
+            {
+              "text": "నూనె 1 లీటరు",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 445,
+      "output_tokens": 100
+    }
+  }
+}

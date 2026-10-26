@@ -1,0 +1,67 @@
+{
+  "name": "hi_list_06",
+  "input": {
+    "text": "- दो दूध\n- प्याज़ २ किलो\n- ब्रेड\n- paanch Parle-G",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "दूध",
+        "quantity": 2
+      },
+      {
+        "text": "प्याज़ २ किलो",
+        "quantity": 1
+      },
+      {
+        "text": "ब्रेड",
+        "quantity": 1
+      },
+      {
+        "text": "Parle-G",
+        "quantity": 5
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_06",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_06",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "दूध",
+              "quantity": 2
+            },
+            {
+              "text": "प्याज़ २ किलो",
+              "quantity": 1
+            },
+            {
+              "text": "ब्रेड",
+              "quantity": 1
+            },
+            {
+              "text": "Parle-G",
+              "quantity": 5
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 468,
+      "output_tokens": 160
+    }
+  }
+}

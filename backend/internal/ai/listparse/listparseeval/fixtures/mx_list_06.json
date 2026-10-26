@@ -1,0 +1,59 @@
+{
+  "name": "mx_list_06",
+  "input": {
+    "text": "ಟೊಮೆಟೊ 1 ಕೆಜಿ, ಮೊಟ್ಟೆ 6, డజన్ అరటిపండ్లు",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಟೊಮೆಟೊ 1 ಕೆಜಿ",
+        "quantity": 1
+      },
+      {
+        "text": "ಮೊಟ್ಟೆ",
+        "quantity": 6
+      },
+      {
+        "text": "అరటిపండ్లు",
+        "quantity": 12
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_mx_list_06",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_mx_list_06",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಟೊಮೆಟೊ 1 ಕೆಜಿ",
+              "quantity": 1
+            },
+            {
+              "text": "ಮೊಟ್ಟೆ",
+              "quantity": 6
+            },
+            {
+              "text": "అరటిపండ్లు",
+              "quantity": 12
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 459,
+      "output_tokens": 130
+    }
+  }
+}

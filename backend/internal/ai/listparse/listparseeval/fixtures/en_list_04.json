@@ -1,0 +1,59 @@
+{
+  "name": "en_list_04",
+  "input": {
+    "text": "two Lux soap; toor dal 1 kg; Good Day biscuits 2 packets",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "Lux soap",
+        "quantity": 2
+      },
+      {
+        "text": "toor dal 1 kg",
+        "quantity": 1
+      },
+      {
+        "text": "Good Day biscuits",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_list_04",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_list_04",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "Lux soap",
+              "quantity": 2
+            },
+            {
+              "text": "toor dal 1 kg",
+              "quantity": 1
+            },
+            {
+              "text": "Good Day biscuits",
+              "quantity": 2
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 461,
+      "output_tokens": 130
+    }
+  }
+}

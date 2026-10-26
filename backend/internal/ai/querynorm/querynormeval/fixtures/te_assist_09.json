@@ -1,0 +1,69 @@
+{
+  "name": "te_assist_09",
+  "input": {
+    "q": "నాకు అమూల్ వెన్న కావాలి ఆఫర్",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "అమూల్ వెన్న",
+    "chips": [
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "ఆఫర్"
+      },
+      {
+        "kind": "brand",
+        "value": "amul",
+        "text": "అమూల్"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_te_assist_09",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_te_assist_09",
+        "name": "suggest_search",
+        "input": {
+          "query": "అమూల్ వెన్న",
+          "chips": [
+            {
+              "kind": "offers",
+              "value": null,
+              "text": "ఆఫర్"
+            },
+            {
+              "kind": "brand",
+              "value": "amul",
+              "text": "అమూల్"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

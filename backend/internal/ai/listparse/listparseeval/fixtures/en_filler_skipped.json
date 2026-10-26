@@ -1,0 +1,51 @@
+{
+  "name": "en_filler_skipped",
+  "input": {
+    "text": "Hi bhaiya, please keep ready: a dozen bananas, Good Day biscuits 2 packets",
+    "language": "en"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "bananas",
+        "quantity": 12
+      },
+      {
+        "text": "Good Day biscuits",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_en_filler_skipped",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_en_filler_skipped",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "bananas",
+              "quantity": 12
+            },
+            {
+              "text": "Good Day biscuits",
+              "quantity": 2
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 447,
+      "output_tokens": 100
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "name": "en_voice_07",
+  "input": {
+    "language": "en-IN",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "Dolo 650",
+    "language": "en",
+    "chips": [
+      {
+        "kind": "brand",
+        "value": "dolo",
+        "text": "Dolo"
+      }
+    ]
+  },
+  "reply": {
+    "request_id": "rec_vs_en_voice_07",
+    "transcript": "Dolo 650",
+    "language_code": "en-IN"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "name": "kn_voice_06",
+  "input": {
+    "language": "",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "ಬೆಣ್ಣೆ ಹತ್ತಿರದ",
+    "language": "kn",
+    "chips": [
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "ಹತ್ತಿರದ"
+      }
+    ]
+  },
+  "reply": {
+    "request_id": "rec_vs_kn_voice_06",
+    "transcript": "ಬೆಣ್ಣೆ ಹತ್ತಿರದ",
+    "language_code": "kn-IN"
+  }
+}

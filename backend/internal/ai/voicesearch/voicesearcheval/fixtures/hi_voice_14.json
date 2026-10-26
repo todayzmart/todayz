@@ -1,0 +1,64 @@
+{
+  "name": "hi_voice_14",
+  "input": {
+    "language": "",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "Dabur शहद",
+    "language": "hi",
+    "chips": [
+      {
+        "kind": "brand",
+        "value": "dabur",
+        "text": "Dabur"
+      }
+    ]
+  },
+  "reply": {
+    "request_id": "rec_vs_hi_voice_14",
+    "transcript": "Dabur शहद",
+    "language_code": "hi-IN"
+  }
+}

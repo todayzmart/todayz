@@ -1,0 +1,69 @@
+{
+  "name": "hi_assist_09",
+  "input": {
+    "q": "मेरे पास टाटा नमक वाली दुकान",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "टाटा नमक",
+    "chips": [
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "मेरे पास"
+      },
+      {
+        "kind": "brand",
+        "value": "tata",
+        "text": "टाटा"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_hi_assist_09",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_hi_assist_09",
+        "name": "suggest_search",
+        "input": {
+          "query": "टाटा नमक",
+          "chips": [
+            {
+              "kind": "nearest",
+              "value": null,
+              "text": "मेरे पास"
+            },
+            {
+              "kind": "brand",
+              "value": "tata",
+              "text": "टाटा"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

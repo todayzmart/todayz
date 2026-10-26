@@ -1,0 +1,51 @@
+{
+  "name": "ta_list_16",
+  "input": {
+    "text": "எண்ணெய் 1 லிட்டர்; முட்டை 6",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "எண்ணெய் 1 லிட்டர்",
+        "quantity": 1
+      },
+      {
+        "text": "முட்டை",
+        "quantity": 6
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_list_16",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_list_16",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "எண்ணெய் 1 லிட்டர்",
+              "quantity": 1
+            },
+            {
+              "text": "முட்டை",
+              "quantity": 6
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 447,
+      "output_tokens": 100
+    }
+  }
+}

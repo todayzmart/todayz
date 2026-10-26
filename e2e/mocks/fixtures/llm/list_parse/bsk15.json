@@ -1,0 +1,19 @@
+{
+  "description": "The BSK-15 list (\"1 kg atta, 2 Nandini milk, Dolo 650\"): three basket lines as written.",
+  "match": {"contains": ["atta", "nandini milk", "dolo 650"], "tool": "record_list_items"},
+  "response": {
+    "content": [
+      {
+        "type": "tool_use",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {"text": "atta 1 kg", "quantity": 1},
+            {"text": "Nandini milk", "quantity": 2},
+            {"text": "Dolo 650", "quantity": 1}
+          ]
+        }
+      }
+    ]
+  }
+}

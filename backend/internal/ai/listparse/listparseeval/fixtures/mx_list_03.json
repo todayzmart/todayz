@@ -1,0 +1,59 @@
+{
+  "name": "mx_list_03",
+  "input": {
+    "text": "3 Dairy Milk, Colgate 100 g, biyyam 5 kg",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "Dairy Milk",
+        "quantity": 3
+      },
+      {
+        "text": "Colgate 100 g",
+        "quantity": 1
+      },
+      {
+        "text": "biyyam 5 kg",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_mx_list_03",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_mx_list_03",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "Dairy Milk",
+              "quantity": 3
+            },
+            {
+              "text": "Colgate 100 g",
+              "quantity": 1
+            },
+            {
+              "text": "biyyam 5 kg",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 460,
+      "output_tokens": 130
+    }
+  }
+}

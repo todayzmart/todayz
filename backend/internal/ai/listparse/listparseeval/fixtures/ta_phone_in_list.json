@@ -1,0 +1,55 @@
+{
+  "name": "ta_phone_in_list",
+  "input": {
+    "text": "டோலோ 650, சர்க்கரை அரை கிலோ, call 9845012345",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "டோலோ 650",
+        "quantity": 1
+      },
+      {
+        "text": "சர்க்கரை அரை கிலோ",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_phone_in_list",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_phone_in_list",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "டோலோ 650",
+              "quantity": 1
+            },
+            {
+              "text": "சர்க்கரை அரை கிலோ",
+              "quantity": 1
+            },
+            {
+              "text": "call 9845012345",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 462,
+      "output_tokens": 130
+    }
+  }
+}

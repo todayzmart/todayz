@@ -1,0 +1,63 @@
+{
+  "name": "kn_invented_item",
+  "input": {
+    "text": "ನಂದಿನಿ ತುಪ್ಪ 2, ಬೆಣ್ಣೆ 100 ಗ್ರಾಂ, haalu eradu",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ನಂದಿನಿ ತುಪ್ಪ",
+        "quantity": 2
+      },
+      {
+        "text": "ಬೆಣ್ಣೆ 100 ಗ್ರಾಂ",
+        "quantity": 1
+      },
+      {
+        "text": "haalu",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_invented_item",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_invented_item",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ನಂದಿನಿ ತುಪ್ಪ",
+              "quantity": 2
+            },
+            {
+              "text": "ಬೆಣ್ಣೆ 100 ಗ್ರಾಂ",
+              "quantity": 1
+            },
+            {
+              "text": "haalu",
+              "quantity": 2
+            },
+            {
+              "text": "Maggi 70 g",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 473,
+      "output_tokens": 160
+    }
+  }
+}

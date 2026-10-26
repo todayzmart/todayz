@@ -1,0 +1,67 @@
+{
+  "name": "mx_list_17",
+  "input": {
+    "text": "अरहर दाल 1 किलो, paanch Parle-G, Red Label tea 250 g, two Lux soap",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "अरहर दाल 1 किलो",
+        "quantity": 1
+      },
+      {
+        "text": "Parle-G",
+        "quantity": 5
+      },
+      {
+        "text": "Red Label tea 250 g",
+        "quantity": 1
+      },
+      {
+        "text": "Lux soap",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_mx_list_17",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_mx_list_17",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "अरहर दाल 1 किलो",
+              "quantity": 1
+            },
+            {
+              "text": "Parle-G",
+              "quantity": 5
+            },
+            {
+              "text": "Red Label tea 250 g",
+              "quantity": 1
+            },
+            {
+              "text": "Lux soap",
+              "quantity": 2
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 475,
+      "output_tokens": 160
+    }
+  }
+}

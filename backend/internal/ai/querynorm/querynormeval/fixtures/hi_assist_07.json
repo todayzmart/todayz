@@ -1,0 +1,79 @@
+{
+  "name": "hi_assist_07",
+  "input": {
+    "q": "कोई दुकान जहाँ डाबर शहद मिले मेरे पास 99 रुपये से कम",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "डाबर शहद",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "9900",
+        "text": "99 रुपये से कम"
+      },
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "मेरे पास"
+      },
+      {
+        "kind": "brand",
+        "value": "dabur",
+        "text": "डाबर"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_hi_assist_07",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_hi_assist_07",
+        "name": "suggest_search",
+        "input": {
+          "query": "डाबर शहद",
+          "chips": [
+            {
+              "kind": "maxPrice",
+              "value": "9900",
+              "text": "99 रुपये से कम"
+            },
+            {
+              "kind": "nearest",
+              "value": null,
+              "text": "मेरे पास"
+            },
+            {
+              "kind": "brand",
+              "value": "dabur",
+              "text": "डाबर"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 135
+    }
+  }
+}

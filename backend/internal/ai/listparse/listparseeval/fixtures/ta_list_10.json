@@ -1,0 +1,67 @@
+{
+  "name": "ta_list_10",
+  "input": {
+    "text": "தயிர் 500 கிராம்; கோதுமை மாவு 1 கிலோ; paal rendu; மூன்று மேகி",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "தயிர் 500 கிராம்",
+        "quantity": 1
+      },
+      {
+        "text": "கோதுமை மாவு 1 கிலோ",
+        "quantity": 1
+      },
+      {
+        "text": "paal",
+        "quantity": 2
+      },
+      {
+        "text": "மேகி",
+        "quantity": 3
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_list_10",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_list_10",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "தயிர் 500 கிராம்",
+              "quantity": 1
+            },
+            {
+              "text": "கோதுமை மாவு 1 கிலோ",
+              "quantity": 1
+            },
+            {
+              "text": "paal",
+              "quantity": 2
+            },
+            {
+              "text": "மேகி",
+              "quantity": 3
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 472,
+      "output_tokens": 160
+    }
+  }
+}

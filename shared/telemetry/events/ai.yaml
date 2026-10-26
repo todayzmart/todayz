@@ -1,0 +1,34 @@
+# Product events: customer AI helpers (05 §2.6, D-101). Owner W3-12. Emitted by the customer app.
+# One file per domain (D-50); an event name may be defined in only one file.
+# Never audio, a transcript, the query or a suggestion's text: an abandoned voice search
+# leaves no text anywhere (ASK-26). The search itself is search_performed (source: voice).
+domain: ai
+owner: W3-12
+events:
+  voice_search_used:
+    emitter: client
+    description: >-
+      The customer finished with one voice search (C-23): searched the transcript as heard,
+      edited it and then searched, left it (abandoned), hit the daily cap, or the speech call
+      failed. seconds is the recording's length.
+    props:
+      lang: { type: enum, values: [en, hi, kn, te, ta] }
+      seconds: { type: int, min: 0, max: 15 }
+      outcome: { type: enum, values: [searched, edited_then_searched, abandoned, cap_reached, failed] }
+  search_assist_used:
+    emitter: client
+    description: >-
+      One search assist call after a search with refineHint (C-05): suggestions shown, one
+      tapped, nothing to suggest (204), the 3 s timeout, a failure, or the daily cap.
+      latency_ms is the call's time as the app saw it.
+    props:
+      outcome: { type: enum, values: [shown, tapped, empty, timeout, failed, cap_reached] }
+      latency_ms: { type: int, min: 0, max: 10000 }
+  list_parse_used:
+    emitter: client
+    description: >-
+      One "just ask" list in the basket editor (C-22): lines confirmed into the basket, the
+      draft discarded or failed, or the daily cap. lines is how many lines went to the basket.
+    props:
+      outcome: { type: enum, values: [confirmed, discarded, failed, cap_reached] }
+      lines: { type: int, min: 0, max: 100 }

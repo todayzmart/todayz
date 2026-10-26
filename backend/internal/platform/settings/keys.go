@@ -119,24 +119,25 @@ const (
 	InsightPriceCompareEnabled       Key = "insight_price_compare_enabled"        // bool, default false
 
 	// Added by Ask shops nearby and search proof (D-101; seeded by 00012_w0-03_settings_d101.sql)
-	AskDailyLimitCustomer   Key = "ask_daily_limit_customer"   // count, default 5
-	AskRadiusM              Key = "ask_radius_m"               // meters, default 3000
-	AskMaxStores            Key = "ask_max_stores"             // count, default 8
-	AskDailyLimitStore      Key = "ask_daily_limit_store"      // count, default 40
-	AskReplyWindowMin       Key = "ask_reply_window_min"       // minutes, default 15
-	AskPriceValidMin        Key = "ask_price_valid_min"        // minutes, default 60
-	AskLowYieldAfterCount   Key = "ask_low_yield_after_count"  // count, default 20
-	AskLowYieldMaxStores    Key = "ask_low_yield_max_stores"   // count, default 3
-	AskRetentionDays        Key = "ask_retention_days"         // days, default 90
-	AskWhatsappEnabled      Key = "ask_whatsapp_enabled"       // bool, default false
-	AskGapMinCustomers      Key = "ask_gap_min_customers"      // count, default 10
-	AskGapWindowDays        Key = "ask_gap_window_days"        // days, default 7
-	SiteMarqueeMinSearchers Key = "site_marquee_min_searchers" // count, default 10
-	SiteMarqueeWindowDays   Key = "site_marquee_window_days"   // days, default 7
-	SiteMarqueeMaxItems     Key = "site_marquee_max_items"     // count, default 20
-	RefineAiMinWords        Key = "refine_ai_min_words"        // count, default 4
-	AiVoicesearchEnabled    Key = "ai_voicesearch_enabled"     // bool, default false
-	ShareCardCreatePerHour  Key = "share_card_create_per_hour" // count, default 30
+	AskDailyLimitCustomer      Key = "ask_daily_limit_customer"      // count, default 5
+	AskRadiusM                 Key = "ask_radius_m"                  // meters, default 3000
+	AskMaxStores               Key = "ask_max_stores"                // count, default 8
+	AskDailyLimitStore         Key = "ask_daily_limit_store"         // count, default 40
+	AskReplyWindowMin          Key = "ask_reply_window_min"          // minutes, default 15
+	AskPriceValidMin           Key = "ask_price_valid_min"           // minutes, default 60
+	AskLowYieldAfterCount      Key = "ask_low_yield_after_count"     // count, default 20
+	AskLowYieldMaxStores       Key = "ask_low_yield_max_stores"      // count, default 3
+	AskRetentionDays           Key = "ask_retention_days"            // days, default 90
+	AskWhatsappEnabled         Key = "ask_whatsapp_enabled"          // bool, default false
+	AskGapMinCustomers         Key = "ask_gap_min_customers"         // count, default 10
+	AskGapWindowDays           Key = "ask_gap_window_days"           // days, default 7
+	SiteMarqueeMinSearchers    Key = "site_marquee_min_searchers"    // count, default 10
+	SiteMarqueeWindowDays      Key = "site_marquee_window_days"      // days, default 7
+	SiteMarqueeMaxItems        Key = "site_marquee_max_items"        // count, default 20
+	RefineAiMinWords           Key = "refine_ai_min_words"           // count, default 4
+	SubstitutePackTolerancePct Key = "substitute_pack_tolerance_pct" // count, default 25
+	AiVoicesearchEnabled       Key = "ai_voicesearch_enabled"        // bool, default false
+	ShareCardCreatePerHour     Key = "share_card_create_per_hour"    // count, default 30
 
 	// Added by saved baskets (D-110; seeded by 21401_w2-14_baskets.sql)
 	BasketMaxSaved      Key = "basket_max_saved"       // count, default 10
@@ -291,6 +292,7 @@ var AllKeys = []Key{
 	SiteMarqueeWindowDays,
 	SiteMarqueeMaxItems,
 	RefineAiMinWords,
+	SubstitutePackTolerancePct,
 	AiVoicesearchEnabled,
 	ShareCardCreatePerHour,
 	BasketMaxSaved,

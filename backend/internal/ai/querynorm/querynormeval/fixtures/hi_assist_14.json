@@ -1,0 +1,69 @@
+{
+  "name": "hi_assist_14",
+  "input": {
+    "q": "मुझे पारले बिस्किट चाहिए मेरे पास",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "पारले बिस्किट",
+    "chips": [
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "मेरे पास"
+      },
+      {
+        "kind": "brand",
+        "value": "parle",
+        "text": "पारले"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_hi_assist_14",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_hi_assist_14",
+        "name": "suggest_search",
+        "input": {
+          "query": "पारले बिस्किट",
+          "chips": [
+            {
+              "kind": "nearest",
+              "value": null,
+              "text": "मेरे पास"
+            },
+            {
+              "kind": "brand",
+              "value": "parle",
+              "text": "पारले"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

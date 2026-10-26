@@ -5,6 +5,7 @@ import { applyLocale } from '@todayz/i18n';
 import { configFromEnv, initTelemetry } from '@todayz/telemetry';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { setAiEventSink } from './ai/events';
 import { App } from './app/App';
 import { initialLocale, loadMessages } from './app/i18n';
 import { makeQueryClient, makeRouter } from './app/router';
@@ -26,7 +27,8 @@ const update = createUpdateController();
 
 // Off unless VITE_RUM_ENDPOINT is set for a staging or production build (05-observability §2.5).
 // RUM labels use the matched route id (`/r/$token`), never the raw path.
-initTelemetry({ ...configFromEnv('customer', import.meta.env), routeId: () => router.state.matches.at(-1)?.routeId });
+const telemetry = initTelemetry({ ...configFromEnv('customer', import.meta.env), routeId: () => router.state.matches.at(-1)?.routeId });
+setAiEventSink((name, props) => telemetry.emit(name, props));
 
 const root = document.getElementById('root');
 if (!root) throw new Error('#root is missing from index.html');

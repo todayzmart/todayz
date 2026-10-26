@@ -1,0 +1,75 @@
+{
+  "name": "hi_list_02",
+  "input": {
+    "text": "२ साबुन, चीनी आधा किलो, प्याज़ २ किलो, Dolo 650 ek patta, 1 किलो आटा",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "साबुन",
+        "quantity": 2
+      },
+      {
+        "text": "चीनी आधा किलो",
+        "quantity": 1
+      },
+      {
+        "text": "प्याज़ २ किलो",
+        "quantity": 1
+      },
+      {
+        "text": "Dolo 650 ek patta",
+        "quantity": 1
+      },
+      {
+        "text": "1 किलो आटा",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_02",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_02",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "साबुन",
+              "quantity": 2
+            },
+            {
+              "text": "चीनी आधा किलो",
+              "quantity": 1
+            },
+            {
+              "text": "प्याज़ २ किलो",
+              "quantity": 1
+            },
+            {
+              "text": "Dolo 650 ek patta",
+              "quantity": 1
+            },
+            {
+              "text": "1 किलो आटा",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 487,
+      "output_tokens": 190
+    }
+  }
+}

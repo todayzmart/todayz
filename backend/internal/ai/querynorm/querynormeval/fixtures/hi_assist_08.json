@@ -1,0 +1,59 @@
+{
+  "name": "hi_assist_08",
+  "input": {
+    "q": "मूंग दाल कहाँ मिलेगा 150 रुपये से कम",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "मूंग दाल",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "15000",
+        "text": "150 रुपये से कम"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_hi_assist_08",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_hi_assist_08",
+        "name": "suggest_search",
+        "input": {
+          "query": "मूंग दाल",
+          "chips": [
+            {
+              "kind": "maxPrice",
+              "value": "15000",
+              "text": "150 रुपये से कम"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 85
+    }
+  }
+}

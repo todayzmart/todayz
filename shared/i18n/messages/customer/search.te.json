@@ -173,5 +173,75 @@
     "message": "తర్వాత మళ్లీ వెతకండి",
     "review": "reviewed",
     "enHash": "71ecbf77"
+  },
+  "search.voice.start": {
+    "message": "మాట్లాడి వెతకండి",
+    "review": "reviewed",
+    "enHash": "5d977e06"
+  },
+  "search.voice.stop": {
+    "message": "ఆపి, నేను చెప్పినది వాడండి",
+    "review": "reviewed",
+    "enHash": "bf2d0f65"
+  },
+  "search.voice.listening": {
+    "message": "వింటున్నాం… {seconds} సెకన్లు మిగిలాయి. పూర్తయ్యాక ఆపు నొక్కండి.",
+    "review": "reviewed",
+    "enHash": "e9cc16f6"
+  },
+  "search.voice.working": {
+    "message": "మీరు చెప్పినది చదువుతున్నాం…",
+    "review": "reviewed",
+    "enHash": "21fb1074"
+  },
+  "search.voice.heard": {
+    "message": "పదాలు సరిచూసుకుని, తర్వాత వెతకండి.",
+    "review": "reviewed",
+    "enHash": "d513ca1a"
+  },
+  "search.voice.capped": {
+    "message": "ఈ రోజుకు మాట్లాడి వెతకడం అయిపోయింది. టైప్ చేసి వెతకండి.",
+    "review": "reviewed",
+    "enHash": "73f669ed"
+  },
+  "search.voice.failed": {
+    "message": "మాట్లాడి వెతకడం ఇప్పుడు పనిచేయడం లేదు. టైప్ చేసి వెతకండి.",
+    "review": "reviewed",
+    "enHash": "5a6a4c17"
+  },
+  "search.voice.denied": {
+    "message": "మాట్లాడి వెతకడానికి మైక్రోఫోన్‌కు అనుమతి ఇవ్వండి, లేదా టైప్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "9fa9a9df"
+  },
+  "search.voice.short": {
+    "message": "మాకు అది వినిపించలేదు. మళ్లీ ప్రయత్నించండి లేదా టైప్ చేయండి.",
+    "review": "reviewed",
+    "enHash": "acc0656d"
+  },
+  "search.assist.label": {
+    "message": "ఈ వెతుకులాటకు సూచనలు",
+    "review": "reviewed",
+    "enHash": "39d287b1"
+  },
+  "search.assist.query": {
+    "message": "“{query}” కోసం వెతకండి",
+    "review": "reviewed",
+    "enHash": "705a8155"
+  },
+  "search.assist.maxPrice": {
+    "message": "{price} లోపు",
+    "review": "reviewed",
+    "enHash": "8344ca3d"
+  },
+  "search.assist.brand": {
+    "message": "బ్రాండ్: {brand}",
+    "review": "reviewed",
+    "enHash": "0a347d6d"
+  },
+  "search.assist.applied": {
+    "message": "జోడించిన ఫిల్టర్లు",
+    "review": "reviewed",
+    "enHash": "8111377d"
   }
 }

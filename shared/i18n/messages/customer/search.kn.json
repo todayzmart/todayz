@@ -173,5 +173,75 @@
     "message": "ನಂತರ ಮತ್ತೆ ಹುಡುಕಿ",
     "review": "reviewed",
     "enHash": "71ecbf77"
+  },
+  "search.voice.start": {
+    "message": "ಮಾತಿನ ಮೂಲಕ ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "5d977e06"
+  },
+  "search.voice.stop": {
+    "message": "ನಿಲ್ಲಿಸಿ, ನಾನು ಹೇಳಿದ್ದನ್ನು ಬಳಸಿ",
+    "review": "reviewed",
+    "enHash": "bf2d0f65"
+  },
+  "search.voice.listening": {
+    "message": "ಕೇಳುತ್ತಿದ್ದೇವೆ… {seconds} ಸೆಕೆಂಡು ಉಳಿದಿದೆ. ಮುಗಿದ ಮೇಲೆ ನಿಲ್ಲಿಸಿ ಒತ್ತಿ.",
+    "review": "reviewed",
+    "enHash": "e9cc16f6"
+  },
+  "search.voice.working": {
+    "message": "ನೀವು ಹೇಳಿದ್ದನ್ನು ಓದುತ್ತಿದ್ದೇವೆ…",
+    "review": "reviewed",
+    "enHash": "21fb1074"
+  },
+  "search.voice.heard": {
+    "message": "ಪದಗಳನ್ನು ಪರಿಶೀಲಿಸಿ, ನಂತರ ಹುಡುಕಿ.",
+    "review": "reviewed",
+    "enHash": "d513ca1a"
+  },
+  "search.voice.capped": {
+    "message": "ಇಂದಿನ ಮಾತಿನ ಹುಡುಕಾಟ ಮುಗಿದಿದೆ. ಟೈಪ್ ಮಾಡಿ ಹುಡುಕಿ.",
+    "review": "reviewed",
+    "enHash": "73f669ed"
+  },
+  "search.voice.failed": {
+    "message": "ಮಾತಿನ ಹುಡುಕಾಟ ಈಗ ಕೆಲಸ ಮಾಡುತ್ತಿಲ್ಲ. ಟೈಪ್ ಮಾಡಿ ಹುಡುಕಿ.",
+    "review": "reviewed",
+    "enHash": "5a6a4c17"
+  },
+  "search.voice.denied": {
+    "message": "ಮಾತಿನ ಮೂಲಕ ಹುಡುಕಲು ಮೈಕ್ರೊಫೋನ್‌ಗೆ ಅನುಮತಿ ನೀಡಿ, ಇಲ್ಲವೇ ಟೈಪ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "9fa9a9df"
+  },
+  "search.voice.short": {
+    "message": "ನಮಗೆ ಅದು ಕೇಳಿಸಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಟೈಪ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "acc0656d"
+  },
+  "search.assist.label": {
+    "message": "ಈ ಹುಡುಕಾಟಕ್ಕೆ ಸಲಹೆಗಳು",
+    "review": "reviewed",
+    "enHash": "39d287b1"
+  },
+  "search.assist.query": {
+    "message": "“{query}” ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "705a8155"
+  },
+  "search.assist.maxPrice": {
+    "message": "{price} ಒಳಗೆ",
+    "review": "reviewed",
+    "enHash": "8344ca3d"
+  },
+  "search.assist.brand": {
+    "message": "ಬ್ರ್ಯಾಂಡ್: {brand}",
+    "review": "reviewed",
+    "enHash": "0a347d6d"
+  },
+  "search.assist.applied": {
+    "message": "ಸೇರಿಸಿದ ಫಿಲ್ಟರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "8111377d"
   }
 }

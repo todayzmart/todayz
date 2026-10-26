@@ -1,0 +1,67 @@
+{
+  "name": "mx_list_04",
+  "input": {
+    "text": "sunflower oil 1 litre, சோப்பு 3, கோதுமை மாவு 1 கிலோ, 3 Dairy Milk",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "sunflower oil 1 litre",
+        "quantity": 1
+      },
+      {
+        "text": "சோப்பு",
+        "quantity": 3
+      },
+      {
+        "text": "கோதுமை மாவு 1 கிலோ",
+        "quantity": 1
+      },
+      {
+        "text": "Dairy Milk",
+        "quantity": 3
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_mx_list_04",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_mx_list_04",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "sunflower oil 1 litre",
+              "quantity": 1
+            },
+            {
+              "text": "சோப்பு",
+              "quantity": 3
+            },
+            {
+              "text": "கோதுமை மாவு 1 கிலோ",
+              "quantity": 1
+            },
+            {
+              "text": "Dairy Milk",
+              "quantity": 3
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 477,
+      "output_tokens": 160
+    }
+  }
+}

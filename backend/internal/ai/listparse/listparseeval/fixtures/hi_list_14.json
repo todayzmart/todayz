@@ -1,0 +1,75 @@
+{
+  "name": "hi_list_14",
+  "input": {
+    "text": "- doodh 2 packet\n- सरसों का तेल 1 लीटर\n- दही 500 ग्राम\n- हल्दी पाउडर 100 ग्राम\n- ब्रेड",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "doodh",
+        "quantity": 2
+      },
+      {
+        "text": "सरसों का तेल 1 लीटर",
+        "quantity": 1
+      },
+      {
+        "text": "दही 500 ग्राम",
+        "quantity": 1
+      },
+      {
+        "text": "हल्दी पाउडर 100 ग्राम",
+        "quantity": 1
+      },
+      {
+        "text": "ब्रेड",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_14",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_14",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "doodh",
+              "quantity": 2
+            },
+            {
+              "text": "सरसों का तेल 1 लीटर",
+              "quantity": 1
+            },
+            {
+              "text": "दही 500 ग्राम",
+              "quantity": 1
+            },
+            {
+              "text": "हल्दी पाउडर 100 ग्राम",
+              "quantity": 1
+            },
+            {
+              "text": "ब्रेड",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 489,
+      "output_tokens": 190
+    }
+  }
+}

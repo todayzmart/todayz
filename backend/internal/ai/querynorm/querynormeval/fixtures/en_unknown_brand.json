@@ -1,0 +1,64 @@
+{
+  "name": "en_unknown_brand",
+  "input": {
+    "q": "toor dal open now please",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "toor dal",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "open now"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_en_unknown_brand",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_en_unknown_brand",
+        "name": "suggest_search",
+        "input": {
+          "query": "toor dal",
+          "chips": [
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "open now"
+            },
+            {
+              "kind": "brand",
+              "value": "loreal",
+              "text": "toor dal"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

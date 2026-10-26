@@ -1,0 +1,59 @@
+{
+  "name": "te_list_03",
+  "input": {
+    "text": "paalu rendu, నూనె 1 లీటరు, గుడ్లు 6",
+    "language": "te"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "paalu",
+        "quantity": 2
+      },
+      {
+        "text": "నూనె 1 లీటరు",
+        "quantity": 1
+      },
+      {
+        "text": "గుడ్లు",
+        "quantity": 6
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_te_list_03",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_te_list_03",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "paalu",
+              "quantity": 2
+            },
+            {
+              "text": "నూనె 1 లీటరు",
+              "quantity": 1
+            },
+            {
+              "text": "గుడ్లు",
+              "quantity": 6
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 456,
+      "output_tokens": 130
+    }
+  }
+}

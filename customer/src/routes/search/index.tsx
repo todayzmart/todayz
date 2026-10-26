@@ -15,6 +15,10 @@ export const Route = createFileRoute('/search/')({
     }
     if (typeof s['category'] === 'string' && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(s['category'])) out.category = s['category'];
     if (s['parse'] === false || s['parse'] === 'false') out.parse = false;
+    const max = Number(s['maxPricePaise']);
+    if (Number.isInteger(max) && max >= 1 && max <= 100_000_000) out.maxPricePaise = max;
+    if (typeof s['brand'] === 'string' && s['brand'].length <= 64 && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(s['brand'])) out.brand = s['brand'];
+    if (s['source'] === 'voice') out.source = 'voice';
     return out;
   },
   component: SearchRoute,

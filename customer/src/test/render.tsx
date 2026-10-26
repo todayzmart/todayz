@@ -56,7 +56,8 @@ export function renderAt(path: string, opts: RenderOptions = {}) {
       query: url.searchParams,
       search: url.search,
       headers: new Headers(init?.headers),
-      body: raw ? (JSON.parse(raw) as unknown) : undefined,
+      // JSON bodies parsed; a multipart upload (C-23 voice search) as its FormData.
+      body: raw ? (JSON.parse(raw) as unknown) : init?.body instanceof FormData ? init.body : undefined,
     };
     calls.push(call);
     for (const h of handlers) {

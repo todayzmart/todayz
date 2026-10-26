@@ -1,0 +1,67 @@
+{
+  "name": "hi_list_07",
+  "input": {
+    "text": "आलू ३ किलो; हल्दी पाउडर 100 ग्राम; 1 किलो आटा; चीनी आधा किलो",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "आलू ३ किलो",
+        "quantity": 1
+      },
+      {
+        "text": "हल्दी पाउडर 100 ग्राम",
+        "quantity": 1
+      },
+      {
+        "text": "1 किलो आटा",
+        "quantity": 1
+      },
+      {
+        "text": "चीनी आधा किलो",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_07",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_07",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "आलू ३ किलो",
+              "quantity": 1
+            },
+            {
+              "text": "हल्दी पाउडर 100 ग्राम",
+              "quantity": 1
+            },
+            {
+              "text": "1 किलो आटा",
+              "quantity": 1
+            },
+            {
+              "text": "चीनी आधा किलो",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 476,
+      "output_tokens": 160
+    }
+  }
+}

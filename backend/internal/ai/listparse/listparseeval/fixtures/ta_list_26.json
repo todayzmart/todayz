@@ -1,0 +1,51 @@
+{
+  "name": "ta_list_26",
+  "input": {
+    "text": "சர்க்கரை அரை கிலோ; paal rendu",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "சர்க்கரை அரை கிலோ",
+        "quantity": 1
+      },
+      {
+        "text": "paal",
+        "quantity": 2
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_list_26",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_list_26",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "சர்க்கரை அரை கிலோ",
+              "quantity": 1
+            },
+            {
+              "text": "paal",
+              "quantity": 2
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 446,
+      "output_tokens": 100
+    }
+  }
+}

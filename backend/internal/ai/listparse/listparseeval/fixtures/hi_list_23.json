@@ -1,0 +1,59 @@
+{
+  "name": "hi_list_23",
+  "input": {
+    "text": "दही 500 ग्राम\n3 मैगी\nचावल 5 किलो",
+    "language": "hi"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "दही 500 ग्राम",
+        "quantity": 1
+      },
+      {
+        "text": "मैगी",
+        "quantity": 3
+      },
+      {
+        "text": "चावल 5 किलो",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_hi_list_23",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_hi_list_23",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "दही 500 ग्राम",
+              "quantity": 1
+            },
+            {
+              "text": "मैगी",
+              "quantity": 3
+            },
+            {
+              "text": "चावल 5 किलो",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 458,
+      "output_tokens": 130
+    }
+  }
+}

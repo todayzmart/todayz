@@ -1,0 +1,51 @@
+{
+  "name": "ta_list_29",
+  "input": {
+    "text": "arisi 5 kg; எண்ணெய் 1 லிட்டர்",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "arisi 5 kg",
+        "quantity": 1
+      },
+      {
+        "text": "எண்ணெய் 1 லிட்டர்",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_list_29",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_list_29",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "arisi 5 kg",
+              "quantity": 1
+            },
+            {
+              "text": "எண்ணெய் 1 லிட்டர்",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 448,
+      "output_tokens": 100
+    }
+  }
+}

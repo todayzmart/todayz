@@ -1,0 +1,9 @@
+{
+  "description": "Any other list_parse call: nothing to buy, so the draft fails and the editor keeps the typed text.",
+  "match": {},
+  "response": {
+    "content": [
+      {"type": "tool_use", "name": "record_list_items", "input": {"lines": []}}
+    ]
+  }
+}

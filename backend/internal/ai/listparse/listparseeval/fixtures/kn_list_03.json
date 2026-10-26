@@ -1,0 +1,75 @@
+{
+  "name": "kn_list_03",
+  "input": {
+    "text": "ಕೊತ್ತಂಬರಿ, ಉಪ್ಪು, ಎಣ್ಣೆ 1 ಲೀಟರ್, akki 5 kg, ಸೋಪು ೩",
+    "language": "kn"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "ಕೊತ್ತಂಬರಿ",
+        "quantity": 1
+      },
+      {
+        "text": "ಉಪ್ಪು",
+        "quantity": 1
+      },
+      {
+        "text": "ಎಣ್ಣೆ 1 ಲೀಟರ್",
+        "quantity": 1
+      },
+      {
+        "text": "akki 5 kg",
+        "quantity": 1
+      },
+      {
+        "text": "ಸೋಪು",
+        "quantity": 3
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_kn_list_03",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_kn_list_03",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "ಕೊತ್ತಂಬರಿ",
+              "quantity": 1
+            },
+            {
+              "text": "ಉಪ್ಪು",
+              "quantity": 1
+            },
+            {
+              "text": "ಎಣ್ಣೆ 1 ಲೀಟರ್",
+              "quantity": 1
+            },
+            {
+              "text": "akki 5 kg",
+              "quantity": 1
+            },
+            {
+              "text": "ಸೋಪು",
+              "quantity": 3
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 481,
+      "output_tokens": 190
+    }
+  }
+}

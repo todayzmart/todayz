@@ -1,0 +1,79 @@
+{
+  "name": "ta_assist_07",
+  "input": {
+    "q": "எனக்கு டாடா உப்பு வேண்டும் வீட்டுக்கு டெலிவரி 150 ரூபாய்க்குள்",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "டாடா உப்பு",
+    "chips": [
+      {
+        "kind": "maxPrice",
+        "value": "15000",
+        "text": "150 ரூபாய்க்குள்"
+      },
+      {
+        "kind": "delivery",
+        "value": "",
+        "text": "வீட்டுக்கு டெலிவரி"
+      },
+      {
+        "kind": "brand",
+        "value": "tata",
+        "text": "டாடா"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_ta_assist_07",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_ta_assist_07",
+        "name": "suggest_search",
+        "input": {
+          "query": "டாடா உப்பு",
+          "chips": [
+            {
+              "kind": "maxPrice",
+              "value": "15000",
+              "text": "150 ரூபாய்க்குள்"
+            },
+            {
+              "kind": "delivery",
+              "value": null,
+              "text": "வீட்டுக்கு டெலிவரி"
+            },
+            {
+              "kind": "brand",
+              "value": "tata",
+              "text": "டாடா"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 135
+    }
+  }
+}

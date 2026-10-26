@@ -1,0 +1,69 @@
+{
+  "name": "kn_voice_14",
+  "input": {
+    "language": "",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "ತಾಜಾ ತರಕಾರಿ ಪಿಕಪ್ ಆಫರ್ ಇರುವ",
+    "language": "kn",
+    "chips": [
+      {
+        "kind": "pickup",
+        "value": "",
+        "text": "ಪಿಕಪ್"
+      },
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "ಆಫರ್"
+      }
+    ]
+  },
+  "reply": {
+    "request_id": "rec_vs_kn_voice_14",
+    "transcript": "ತಾಜಾ ತರಕಾರಿ ಪಿಕಪ್ ಆಫರ್ ಇರುವ",
+    "language_code": "kn-IN"
+  }
+}

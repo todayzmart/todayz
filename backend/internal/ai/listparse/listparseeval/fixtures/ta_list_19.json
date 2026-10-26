@@ -1,0 +1,59 @@
+{
+  "name": "ta_list_19",
+  "input": {
+    "text": "- டீ தூள் 250 கிராம்\n- உப்பு\n- வெண்ணெய் 100 கிராம்",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "டீ தூள் 250 கிராம்",
+        "quantity": 1
+      },
+      {
+        "text": "உப்பு",
+        "quantity": 1
+      },
+      {
+        "text": "வெண்ணெய் 100 கிராம்",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_list_19",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_list_19",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "டீ தூள் 250 கிராம்",
+              "quantity": 1
+            },
+            {
+              "text": "உப்பு",
+              "quantity": 1
+            },
+            {
+              "text": "வெண்ணெய் 100 கிராம்",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 463,
+      "output_tokens": 130
+    }
+  }
+}

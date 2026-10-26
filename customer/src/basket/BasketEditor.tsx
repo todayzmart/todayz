@@ -1,5 +1,6 @@
 // C-22 editor: the "just ask" box (a product from the suggestions, or the words as typed), the lines with a
-// stepper and remove, and the name. The same editor serves a saved basket and the device basket.
+// stepper and remove, and the name. The same editor serves a saved basket and the device basket. A
+// signed-in customer with list parse on can also paste a whole list (AI-C1, W3-12).
 import { searchSuggest } from '@todayz/api-client/gen/discover/discover';
 import type { DiscoverSuggestion } from '@todayz/api-client/gen/model/discoverSuggestion';
 import { useQuery } from '@tanstack/react-query';
@@ -7,6 +8,7 @@ import { Button, QuantityStepper, SearchField, TextField } from '@todayz/ui';
 import { Package, Trash2, Type } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { ListParse } from '../list-parse/ListParse';
 import { Icon } from '../shell/Icon';
 import { useStepperLabels } from '../store/itemUi';
 import { addLine, NAME_MAX, QTY_MAX, QTY_MIN, type EditLine } from './model';
@@ -125,6 +127,16 @@ export function BasketEditor({ name, lines, onName, onLines, status }: BasketEdi
           </ul>
         )}
       </form>
+      <ListParse
+        onLines={(found) =>
+          onLines(
+            found.reduce<EditLine[]>(
+              (acc, l) => addLine(acc, { productId: null, text: l.text, label: l.text, detail: '', quantity: l.quantity }),
+              [...lines],
+            ),
+          )
+        }
+      />
 
       {lines.length === 0 ? (
         <p className={styles.hint}>{intl.formatMessage({ id: 'basket.lines.empty' })}</p>

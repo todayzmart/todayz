@@ -173,5 +173,75 @@
     "message": "बाद में फिर से खोजें",
     "review": "reviewed",
     "enHash": "71ecbf77"
+  },
+  "search.voice.start": {
+    "message": "बोलकर खोजें",
+    "review": "reviewed",
+    "enHash": "5d977e06"
+  },
+  "search.voice.stop": {
+    "message": "रोकें और मेरी बात इस्तेमाल करें",
+    "review": "reviewed",
+    "enHash": "bf2d0f65"
+  },
+  "search.voice.listening": {
+    "message": "सुन रहे हैं… {seconds} सेकंड बाकी। बोल लें तो रोकें दबाएँ।",
+    "review": "reviewed",
+    "enHash": "e9cc16f6"
+  },
+  "search.voice.working": {
+    "message": "आपकी बात समझ रहे हैं…",
+    "review": "reviewed",
+    "enHash": "21fb1074"
+  },
+  "search.voice.heard": {
+    "message": "शब्द जाँच लें, फिर खोजें।",
+    "review": "reviewed",
+    "enHash": "d513ca1a"
+  },
+  "search.voice.capped": {
+    "message": "आज के लिए बोलकर खोज खत्म हो गई। टाइप करके खोजें।",
+    "review": "reviewed",
+    "enHash": "73f669ed"
+  },
+  "search.voice.failed": {
+    "message": "बोलकर खोज अभी काम नहीं कर रही। टाइप करके खोजें।",
+    "review": "reviewed",
+    "enHash": "5a6a4c17"
+  },
+  "search.voice.denied": {
+    "message": "बोलकर खोजने के लिए माइक्रोफ़ोन की अनुमति दें, या टाइप करें।",
+    "review": "reviewed",
+    "enHash": "9fa9a9df"
+  },
+  "search.voice.short": {
+    "message": "हम समझ नहीं पाए। फिर से बोलें या टाइप करें।",
+    "review": "reviewed",
+    "enHash": "acc0656d"
+  },
+  "search.assist.label": {
+    "message": "इस खोज के लिए सुझाव",
+    "review": "reviewed",
+    "enHash": "39d287b1"
+  },
+  "search.assist.query": {
+    "message": "“{query}” खोजें",
+    "review": "reviewed",
+    "enHash": "705a8155"
+  },
+  "search.assist.maxPrice": {
+    "message": "{price} से कम",
+    "review": "reviewed",
+    "enHash": "8344ca3d"
+  },
+  "search.assist.brand": {
+    "message": "ब्रांड: {brand}",
+    "review": "reviewed",
+    "enHash": "0a347d6d"
+  },
+  "search.assist.applied": {
+    "message": "जोड़े गए फ़िल्टर",
+    "review": "reviewed",
+    "enHash": "8111377d"
   }
 }

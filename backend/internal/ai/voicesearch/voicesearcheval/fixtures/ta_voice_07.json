@@ -1,0 +1,58 @@
+{
+  "name": "ta_voice_07",
+  "input": {
+    "language": "ta-IN",
+    "brands": [
+      {
+        "name": "Amul",
+        "slug": "amul"
+      },
+      {
+        "name": "Nandini",
+        "slug": "nandini"
+      },
+      {
+        "name": "MTR",
+        "slug": "mtr"
+      },
+      {
+        "name": "Aashirvaad",
+        "slug": "aashirvaad"
+      },
+      {
+        "name": "Tata",
+        "slug": "tata"
+      },
+      {
+        "name": "Britannia",
+        "slug": "britannia"
+      },
+      {
+        "name": "Parle",
+        "slug": "parle"
+      },
+      {
+        "name": "Dolo",
+        "slug": "dolo"
+      },
+      {
+        "name": "Maggi",
+        "slug": "maggi"
+      },
+      {
+        "name": "Dabur",
+        "slug": "dabur"
+      }
+    ]
+  },
+  "expect": {
+    "transcript": "இட்லி மாவு",
+    "language": "ta",
+    "chips": []
+  },
+  "reply": {
+    "request_id": "rec_vs_ta_voice_07",
+    "transcript": "இட்லி மாவு",
+    "language_code": "ta-IN"
+  }
+}

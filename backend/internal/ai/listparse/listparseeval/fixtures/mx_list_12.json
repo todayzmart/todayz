@@ -1,0 +1,59 @@
+{
+  "name": "mx_list_12",
+  "input": {
+    "text": "உருளைக்கிழங்கு 2 கிலோ, 3 Maggi, Colgate 100 g",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "உருளைக்கிழங்கு 2 கிலோ",
+        "quantity": 1
+      },
+      {
+        "text": "Maggi",
+        "quantity": 3
+      },
+      {
+        "text": "Colgate 100 g",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_mx_list_12",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_mx_list_12",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "உருளைக்கிழங்கு 2 கிலோ",
+              "quantity": 1
+            },
+            {
+              "text": "Maggi",
+              "quantity": 3
+            },
+            {
+              "text": "Colgate 100 g",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 462,
+      "output_tokens": 130
+    }
+  }
+}

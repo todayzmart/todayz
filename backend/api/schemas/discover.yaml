@@ -423,6 +423,26 @@ DiscoverStoreItemList:
       $ref: ./common.yaml#/NextCursor
     serverNow:
       $ref: ./common.yaml#/ServerNow
+# --- W3-12 substitutes (AI-C3, rule-based, D-235) ---
+DiscoverSubstitutes:
+  type: object
+  description: What to buy instead of an out-of-stock item, at most 6 rows (D-235).
+  required: [sameShop, nearby, serverNow]
+  properties:
+    sameShop:
+      type: array
+      maxItems: 3
+      description: Similar in-stock items of the same shop (same category, pack within substitute_pack_tolerance_pct), best first.
+      items:
+        $ref: "#/DiscoverSearchItem"
+    nearby:
+      type: array
+      maxItems: 3
+      description: The same product at other shops nearby, nearest first, one item each.
+      items:
+        $ref: "#/DiscoverSearchStore"
+    serverNow:
+      $ref: ./common.yaml#/ServerNow
 # --- W2-14 basket search (01 §11.4, D-110, D-111) ---
 BasketSearchLine:
   type: object

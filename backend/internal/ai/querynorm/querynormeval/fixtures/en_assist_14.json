@@ -1,0 +1,59 @@
+{
+  "name": "en_assist_14",
+  "input": {
+    "q": "where can I get headache tablets on offer",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "headache tablets",
+    "chips": [
+      {
+        "kind": "offers",
+        "value": "",
+        "text": "on offer"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_en_assist_14",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_en_assist_14",
+        "name": "suggest_search",
+        "input": {
+          "query": "headache tablets",
+          "chips": [
+            {
+              "kind": "offers",
+              "value": null,
+              "text": "on offer"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 85
+    }
+  }
+}

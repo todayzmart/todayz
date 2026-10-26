@@ -1,0 +1,69 @@
+{
+  "name": "te_assist_14",
+  "input": {
+    "q": "తాజా పెరుగు ఎక్కడ దొరుకుతుంది ఇప్పుడు తెరిచి ఉన్న ఇంటికి డెలివరీ",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "తాజా పెరుగు",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "ఇప్పుడు తెరిచి ఉన్న"
+      },
+      {
+        "kind": "delivery",
+        "value": "",
+        "text": "ఇంటికి డెలివరీ"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_te_assist_14",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_te_assist_14",
+        "name": "suggest_search",
+        "input": {
+          "query": "తాజా పెరుగు",
+          "chips": [
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "ఇప్పుడు తెరిచి ఉన్న"
+            },
+            {
+              "kind": "delivery",
+              "value": null,
+              "text": "ఇంటికి డెలివరీ"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

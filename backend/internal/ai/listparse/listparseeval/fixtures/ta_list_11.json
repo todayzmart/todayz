@@ -1,0 +1,75 @@
+{
+  "name": "ta_list_11",
+  "input": {
+    "text": "- வெங்காயம் 2 கிலோ\n- கொத்தமல்லி\n- டீ தூள் 250 கிராம்\n- பிரெட்\n- 1 kg அரிசி",
+    "language": "ta"
+  },
+  "expect": {
+    "lines": [
+      {
+        "text": "வெங்காயம் 2 கிலோ",
+        "quantity": 1
+      },
+      {
+        "text": "கொத்தமல்லி",
+        "quantity": 1
+      },
+      {
+        "text": "டீ தூள் 250 கிராம்",
+        "quantity": 1
+      },
+      {
+        "text": "பிரெட்",
+        "quantity": 1
+      },
+      {
+        "text": "1 kg அரிசி",
+        "quantity": 1
+      }
+    ],
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_lp_ta_list_11",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_lp_ta_list_11",
+        "name": "record_list_items",
+        "input": {
+          "lines": [
+            {
+              "text": "வெங்காயம் 2 கிலோ",
+              "quantity": 1
+            },
+            {
+              "text": "கொத்தமல்லி",
+              "quantity": 1
+            },
+            {
+              "text": "டீ தூள் 250 கிராம்",
+              "quantity": 1
+            },
+            {
+              "text": "பிரெட்",
+              "quantity": 1
+            },
+            {
+              "text": "1 kg அரிசி",
+              "quantity": 1
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 488,
+      "output_tokens": 190
+    }
+  }
+}

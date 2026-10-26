@@ -1,0 +1,69 @@
+{
+  "name": "en_assist_04",
+  "input": {
+    "q": "I need headache tablets near me open now",
+    "brands": [
+      "amul",
+      "nandini",
+      "mtr",
+      "aashirvaad",
+      "tata",
+      "britannia",
+      "parle",
+      "haldirams",
+      "dabur",
+      "patanjali",
+      "dolo",
+      "maggi"
+    ]
+  },
+  "expect": {
+    "query": "headache tablets",
+    "chips": [
+      {
+        "kind": "openNow",
+        "value": "",
+        "text": "open now"
+      },
+      {
+        "kind": "nearest",
+        "value": "",
+        "text": "near me"
+      }
+    ]
+  },
+  "reply": {
+    "id": "msg_sa_en_assist_04",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_sa_en_assist_04",
+        "name": "suggest_search",
+        "input": {
+          "query": "headache tablets",
+          "chips": [
+            {
+              "kind": "openNow",
+              "value": null,
+              "text": "open now"
+            },
+            {
+              "kind": "nearest",
+              "value": null,
+              "text": "near me"
+            }
+          ]
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 520,
+      "output_tokens": 110
+    }
+  }
+}

@@ -138,5 +138,61 @@
   "search.noneConfirmed.later": {
     "defaultMessage": "Search again later",
     "description": "C-05 at the widest radius: run the search again"
+  },
+  "search.voice.start": {
+    "defaultMessage": "Search by voice",
+    "description": "C-23 mic button in the search box"
+  },
+  "search.voice.stop": {
+    "defaultMessage": "Stop and use what I said",
+    "description": "C-23 mic button while recording"
+  },
+  "search.voice.listening": {
+    "defaultMessage": "Listening… {seconds} s left. Tap stop when you're done.",
+    "description": "C-23 while recording; seconds left of the limit"
+  },
+  "search.voice.working": {
+    "defaultMessage": "Reading what you said…",
+    "description": "C-23 while the recording is sent"
+  },
+  "search.voice.heard": {
+    "defaultMessage": "Check the words, then search.",
+    "description": "C-23 after the transcript fills the box; it never searches by itself"
+  },
+  "search.voice.capped": {
+    "defaultMessage": "Voice search is used up for today. Type instead.",
+    "description": "C-23 at the daily cap (also the disabled mic label)"
+  },
+  "search.voice.failed": {
+    "defaultMessage": "Voice search isn't working right now. Type instead.",
+    "description": "C-23 on a failure; the mic hides for the session"
+  },
+  "search.voice.denied": {
+    "defaultMessage": "Allow the microphone to search by voice, or type instead.",
+    "description": "C-23 when the browser refuses the microphone"
+  },
+  "search.voice.short": {
+    "defaultMessage": "We didn't catch that. Try again or type instead.",
+    "description": "C-23 when the recording was too short or had no words"
+  },
+  "search.assist.label": {
+    "defaultMessage": "Suggestions for this search",
+    "description": "C-05 accessible name of the search assist chips"
+  },
+  "search.assist.query": {
+    "defaultMessage": "Search for “{query}”",
+    "description": "C-05 search assist: run the cleaned words"
+  },
+  "search.assist.maxPrice": {
+    "defaultMessage": "Under {price}",
+    "description": "C-05 price filter chip; price is formatted money"
+  },
+  "search.assist.brand": {
+    "defaultMessage": "Brand: {brand}",
+    "description": "C-05 applied brand filter chip"
+  },
+  "search.assist.applied": {
+    "defaultMessage": "Added filters",
+    "description": "C-05 accessible name of the price and brand filters the customer added"
   }
 }
