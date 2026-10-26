@@ -41,10 +41,10 @@ test('first run: language, location, sign in, stay signed in across a reload, si
   await expect(page.getByRole('heading', { level: 1, name: 'Where should we look?' })).toBeVisible();
   await page.getByRole('textbox', { name: 'PIN code' }).fill('560001');
   await page.getByRole('button', { name: 'Use this PIN code' }).click();
-  await expect(page.getByRole('link', { name: /Shopping near 560001/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Your location: 560001/ })).toBeVisible();
 
-  // C-10: Account asks to sign in; the code comes from the mocks.
-  await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Account' }).click();
+  // C-10: Account (the Home header's avatar, D-250) asks to sign in; the code comes from the mocks.
+  await page.getByRole('link', { name: 'Account', exact: true }).click();
   await page.getByRole('link', { name: 'Sign in' }).click();
   await signIn(page, request, phone);
 

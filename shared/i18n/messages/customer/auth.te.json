@@ -448,5 +448,15 @@
     "message": "మీ ఫోటోను అప్‌డేట్ చేయలేకపోయాము. మళ్లీ ప్రయత్నించండి.",
     "review": "machine",
     "enHash": "257399f9"
+  },
+  "account.name.edit": {
+    "message": "పేరు మార్చండి",
+    "review": "machine",
+    "enHash": "d3aafd85"
+  },
+  "account.name.cancel": {
+    "message": "రద్దు చేయండి",
+    "review": "machine",
+    "enHash": "77dfd213"
   }
 }

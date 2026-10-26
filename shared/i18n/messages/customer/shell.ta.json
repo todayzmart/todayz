@@ -78,5 +78,10 @@
     "message": "முகப்புக்குச் செல்",
     "review": "reviewed",
     "enHash": "f36ae945"
+  },
+  "shell.nav.baskets": {
+    "message": "பாஸ்கெட்டுகள்",
+    "review": "machine",
+    "enHash": "d368818f"
   }
 }

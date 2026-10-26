@@ -448,5 +448,15 @@
     "message": "हम आपकी फ़ोटो अपडेट नहीं कर पाए। फिर से कोशिश करें।",
     "review": "machine",
     "enHash": "257399f9"
+  },
+  "account.name.edit": {
+    "message": "नाम बदलें",
+    "review": "machine",
+    "enHash": "d3aafd85"
+  },
+  "account.name.cancel": {
+    "message": "रद्द करें",
+    "review": "machine",
+    "enHash": "77dfd213"
   }
 }

@@ -204,6 +204,11 @@ test('account', async ({ page }) => {
   await axe(page);
   await shot(page, 'account.png');
   await shot(page, 'account-full.png', { fullPage: true });
+  // D-250: the pencil opens the name field.
+  await page.getByRole('button', { name: 'Edit name' }).click();
+  await page.getByLabel('Name').waitFor();
+  await axe(page);
+  await shot(page, 'account-edit.png');
 });
 
 test('home', async ({ page }) => {

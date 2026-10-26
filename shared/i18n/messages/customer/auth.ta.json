@@ -448,5 +448,15 @@
     "message": "உங்கள் படத்தைப் புதுப்பிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.",
     "review": "machine",
     "enHash": "257399f9"
+  },
+  "account.name.edit": {
+    "message": "பெயரைத் திருத்து",
+    "review": "machine",
+    "enHash": "d3aafd85"
+  },
+  "account.name.cancel": {
+    "message": "ரத்துசெய்",
+    "review": "machine",
+    "enHash": "77dfd213"
   }
 }

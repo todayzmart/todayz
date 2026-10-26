@@ -1,4 +1,4 @@
-import { House, ReceiptText, Search, UserRound, Wallet, type LucideIcon } from 'lucide-react';
+import { House, ReceiptText, Search, ShoppingBasket, Wallet, type LucideIcon } from 'lucide-react';
 
 export interface NavItem {
   /** URL segment; '' is the home route. */
@@ -8,13 +8,16 @@ export interface NavItem {
   icon: LucideIcon;
 }
 
-/** Bottom nav, in the order of 06-screens.md "Customer app global". Five items at most. */
+/**
+ * Bottom nav, in the order of 06-screens.md "Customer app global". Five items at most. Baskets is the
+ * last tab and Account opens from the Home header's avatar (D-250).
+ */
 export const NAV: readonly NavItem[] = [
   { section: '', label: 'shell.nav.home', icon: House },
   { section: 'search', label: 'shell.nav.search', icon: Search },
   { section: 'orders', label: 'shell.nav.orders', icon: ReceiptText },
   { section: 'wallet', label: 'shell.nav.wallet', icon: Wallet },
-  { section: 'account', label: 'shell.nav.account', icon: UserRound },
+  { section: 'baskets', label: 'shell.nav.baskets', icon: ShoppingBasket },
 ];
 
 /**

@@ -1483,6 +1483,11 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
 - **Next.** The other customer screens follow one at a time. Screenshots come from `customer/e2e/bright.shots.spec.ts`.
 - **Baselines.** The customer visual baselines in `e2e/visual/` will differ. They are refreshed only after the founder's yes.
 
+**D-250 · Baskets takes the last bottom-nav tab, and the name on Account is edited behind a pencil (founder, 26 Oct, on the live `/account`: "keep baskets in last tab, as on click on home screen profile icon and remove save button (instead keep edit icon and then this current UI)").**
+- **Nav.** The tabs are Home, Search, Orders, Wallet, Baskets. Account opens from the avatar in the Home header, so the Baskets row on Account goes.
+- **Name.** Account shows the name and phone with a pencil ("Edit name"). The pencil opens the name field with Cancel and Save. A saved name closes the field and shows "Saved". A 412 keeps the field open with the reloaded name and the conflict message.
+- **Profile photo.** Asked for in the same message; built in its own session.
+
 **D-252 · Products get photos: a shop's photo, an admin upload, or a stock photo from the Open Food/Beauty/Products Facts databases, each approved by an admin (lead brief, 26 Oct).**
 - **Why.** Every product showed only its initials. Shops can photograph what they add, and many packaged goods already have free photos under CC BY-SA in the Open Food Facts family of databases. Scraping retailers is not allowed.
 - **One table.** Migration `49601` adds `product_images` (source `retailer | admin | off | obf | opf`, status `uploading | pending | approved | rejected | replaced`) and `products.image_id` / `products.image_key`. A draft lives in the private bucket and no customer sees it. Approval copies it into the public images bucket and makes it the product's image; the image it replaces becomes `replaced`.

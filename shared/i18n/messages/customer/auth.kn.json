@@ -448,5 +448,15 @@
     "message": "ನಿಮ್ಮ ಫೋಟೋವನ್ನು ಅಪ್‌ಡೇಟ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
     "review": "machine",
     "enHash": "257399f9"
+  },
+  "account.name.edit": {
+    "message": "ಹೆಸರು ಬದಲಿಸಿ",
+    "review": "machine",
+    "enHash": "d3aafd85"
+  },
+  "account.name.cancel": {
+    "message": "ರದ್ದುಮಾಡಿ",
+    "review": "machine",
+    "enHash": "77dfd213"
   }
 }

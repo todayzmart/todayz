@@ -27,6 +27,10 @@
     "defaultMessage": "Wallet",
     "description": "Bottom nav tab"
   },
+  "shell.nav.baskets": {
+    "defaultMessage": "Baskets",
+    "description": "Bottom nav tab: saved shopping lists (C-22)"
+  },
   "shell.nav.account": {
     "defaultMessage": "Account",
     "description": "Bottom nav tab"

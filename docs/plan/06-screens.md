@@ -48,7 +48,7 @@ Screen owners are listed in [07-work-packages.md](07-work-packages.md). Where a 
 
 AI screens (see [11-ai-features.md](11-ai-features.md)): **C-22 Baskets** (D-110, in the table above; the AI part is only filling a basket draft from typed, pasted or spoken text), **C-23 Voice search** (AI-C5, D-101: mic in the search field, shown only when `ai_voicesearch_enabled` is on, the key is set, the customer is signed in and online; up to 15 s; the transcript fills the search box for editing and never searches by itself; at the daily cap the mic is disabled with "Voice search is used up for today. Type instead."; a provider failure shows "Voice search isn't working right now. Type instead." and hides the mic for the session; no audio and no transcript kept, and an abandoned voice search leaves no text anywhere), substitutes sheet on out-of-stock items in C-07/C-09.
 
-Customer app global: bottom nav (Home, Search, Orders, Wallet, Account), install prompt shown once, on C-12, right after the customer's second order is placed (not before it, and not on completion), offline banner with cached shops/results marked "may be out of date", update toast when a new version is ready.
+Customer app global: bottom nav (Home, Search, Orders, Wallet, Baskets; Account opens from the avatar in the Home header, D-250), install prompt shown once, on C-12, right after the customer's second order is placed (not before it, and not on completion), offline banner with cached shops/results marked "may be out of date", update toast when a new version is ready.
 
 ## 2. Business app (`business/`)
 
