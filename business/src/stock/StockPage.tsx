@@ -135,7 +135,7 @@ function StockDesk({ store, search }: { store: CurrentStore; search: StockSearch
   return (
     <>
       <div className={styles.head}>
-        <p className={styles.sub}>{store.name}</p>
+        <p className="tz-page-sub">{store.name}</p>
         <div className={styles.headActions}>
           <VoiceLink store={store} />
           <Button icon={ClipboardCheck} variant={counting ? 'primary' : 'default'} onClick={() => setCounting((c) => !c)} aria-pressed={counting}>

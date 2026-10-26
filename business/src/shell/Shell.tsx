@@ -37,8 +37,9 @@ function SignOut() {
 }
 
 /**
- * Business frame: white sidebar with the mint active item from 1024px (Sidebar in the design
- * system), phone bottom tabs below it (BottomNav). Only one of the two is rendered visible.
+ * Business frame in the bright skin (D-260): grey page, white sidebar with the brand active item
+ * from 1024px (Sidebar in the design system), phone bottom tabs below it (BottomNav). Only one of
+ * the two is rendered visible.
  * The sidebar carries the counts (`useNavCounts`: Orders from the live New list) and, until setup
  * is complete, the shop setup card at its foot (B-03; owners and managers). Below 1024px the
  * Overview shows that card under its KPIs instead, so it is rendered in one place only.
@@ -50,7 +51,7 @@ export function Shell() {
   const counts = useNavCounts();
   const { data } = useTodayOverview();
   return (
-    <div className={styles.app}>
+    <div className={styles.app} data-skin="bright">
       <a className={styles.skip} href="#main">
         {intl.formatMessage({ id: 'shell.skipToContent' })}
       </a>

@@ -77,7 +77,7 @@ function Customers({ store, segment }: { store: CurrentStore; segment: CustomerS
   return (
     <div className={styles.page}>
       <h1 className="tz-page-title">{intl.formatMessage({ id: 'customers.title' })}</h1>
-      <p className={styles.sub}>{store.name}</p>
+      <p className="tz-page-sub">{store.name}</p>
       <div className={styles.chips} role="group" aria-label={intl.formatMessage({ id: 'customers.segments' })}>
         {SEGMENTS.map((s) => (
           <Chip key={s} pressed={segment === s} onPressedChange={() => pick(s)}>

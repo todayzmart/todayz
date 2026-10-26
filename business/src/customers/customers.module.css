@@ -7,12 +7,6 @@
   min-width: 0;
 }
 
-.sub {
-  margin: 0;
-  color: var(--ink-2);
-  font: var(--type-body);
-}
-
 .chips {
   display: flex;
   flex-wrap: wrap;

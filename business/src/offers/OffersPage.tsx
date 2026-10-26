@@ -69,7 +69,7 @@ function OffersDesk({ store, search }: { store: CurrentStore; search: OffersSear
 
   return (
     <>
-      <p className={styles.sub}>{store.name}</p>
+      <p className="tz-page-sub">{store.name}</p>
       <div className={styles.bar}>
         <Tabs
           label={intl.formatMessage({ id: 'offers.tabs.label' })}
