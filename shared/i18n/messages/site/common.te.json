@@ -248,5 +248,40 @@
     "message": "భద్రతా తనిఖీ లోడ్ కాలేదు. పేజీని మళ్లీ లోడ్ చేసి మళ్లీ ప్రయత్నించండి.",
     "review": "reviewed",
     "enHash": "15c3e9e7"
+  },
+  "bar.label": {
+    "message": "ప్రకటన",
+    "review": "reviewed",
+    "enHash": "cf84a98d"
+  },
+  "bar.live": {
+    "message": "ఇప్పుడు దుకాణాలను చేర్చుకుంటున్నాం",
+    "review": "reviewed",
+    "enHash": "cc641213"
+  },
+  "bar.reward": {
+    "message": "దుకాణంలో పికప్ చేసుకోండి: ఎలాంటి ఫీజు లేదు, దుకాణం ఇస్తే క్యాష్ బ్యాక్",
+    "review": "reviewed",
+    "enHash": "0f32d83b"
+  },
+  "bar.list": {
+    "message": "మీ దుకాణాన్ని చేర్చండి",
+    "review": "reviewed",
+    "enHash": "b94ec5f9"
+  },
+  "bar.how": {
+    "message": "ఎలా పని చేస్తుందో చూడండి",
+    "review": "reviewed",
+    "enHash": "f7b38f07"
+  },
+  "brand.tagline": {
+    "message": "ఫిజికల్ సెర్చ్ ఇంజిన్",
+    "review": "reviewed",
+    "enHash": "5c918698"
+  },
+  "nav.search": {
+    "message": "మీ దగ్గరి దుకాణాలను వెతకండి",
+    "review": "reviewed",
+    "enHash": "e27265ba"
   }
 }

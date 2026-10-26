@@ -1,5 +1,6 @@
 ---
-// Sticky glass header: wordmark, page links, log in, language, and the "Get started" button.
+// Sticky glass header: logo mark and wordmark with the tagline, page links, search (the customer app),
+// log in, language, and the "Get started" button.
 // "Get started" goes to the lead form on the page (#join) when the page holds one (page.leadForm), and
 // to the form on the for-retailers page in the current language otherwise. It keys on the flag, not
 // the page id, because the 404 page reuses the home page definition without the form.
@@ -7,6 +8,7 @@ import { createT, type Locale } from '../i18n/index.ts';
 import { links } from '../lib/company.ts';
 import { pageById, pageLocales, pagePath, type PageDef, type PageId } from '../lib/pages.ts';
 import { SITE_LOCALES } from '../lib/site-locales.ts';
+import mark from '../assets/landing/todayz-mark-96.png';
 import Icon from './Icon.astro';
 import LangSwitch from './LangSwitch.astro';
 
@@ -36,7 +38,13 @@ const start = page.leadForm ? { href: '#join', hreflang: undefined } : { ...link
 
 <header class="site-head">
   <div class="head-row">
-    <a class="brand" href={home.href} aria-label={t('a11y.home')}>Today<b>Z</b></a>
+    <a class="brand" href={home.href} aria-label={t('a11y.home')}>
+      <img src={mark.src} width="36" height="36" alt="" />
+      <span class="brand-text">
+        <span class="brand-word">Today<b>Z</b></span>
+        <small>{t('brand.tagline')}</small>
+      </span>
+    </a>
 
     <nav class="nav" aria-label={t('nav.label')}>
       {
@@ -49,6 +57,7 @@ const start = page.leadForm ? { href: '#join', hreflang: undefined } : { ...link
     </nav>
 
     <div class="head-cta">
+      <a class="search" href={`${links.customerApp}/search`} aria-label={t('nav.search')}><Icon name="search" size={20} /></a>
       <a class="login" href={links.businessApp}>{t('nav.login')}</a>
       <LangSwitch page={page} locale={locale} />
       <a class="tz-btn tz-btn-brand start" href={start.href} hreflang={start.hreflang}>
@@ -94,10 +103,48 @@ const start = page.leadForm ? { href: '#join', hreflang: undefined } : { ...link
   }
 
   .brand {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 10px;
     color: var(--ink);
     text-decoration: none;
+  }
+
+  .brand img {
+    display: block;
+    border-radius: 10px;
+  }
+
+  .brand-text {
+    display: grid;
+    gap: 3px;
+  }
+
+  .brand-word {
     font: 700 24px/1 var(--font-display);
     letter-spacing: -0.02em;
+  }
+
+  .brand small {
+    color: var(--ink-2);
+    font: 600 10px/1 var(--font-sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .search {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: var(--ink);
+  }
+
+  .search:hover {
+    background: var(--brand-soft);
+    color: var(--brand-strong);
   }
 
   .brand b {
@@ -217,8 +264,14 @@ const start = page.leadForm ? { href: '#join', hreflang: undefined } : { ...link
       gap: 8px;
     }
 
-    .login {
+    .login,
+    .brand small {
       display: none;
+    }
+
+    .brand img {
+      width: 30px;
+      height: 30px;
     }
 
     .start {
@@ -227,7 +280,8 @@ const start = page.leadForm ? { href: '#join', hreflang: undefined } : { ...link
   }
 
   @media (width <= 400px) {
-    .start :global(.tz-ico) {
+    .start :global(.tz-ico),
+    .search {
       display: none;
     }
 

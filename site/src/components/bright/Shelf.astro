@@ -1,0 +1,64 @@
+---
+// Shelf inspector: example items with photo, shop, freshness, walk and price; "Find it" opens that
+// search in the customer app. The category buttons are revealed and wired by bright.ts; without
+// JavaScript every item shows.
+import Icon from '../Icon.astro';
+import type { Translate } from '../../i18n/index.ts';
+import { EM, splitEm } from '../home/data.ts';
+import { CATEGORIES, SHELF, formatDistance, walkMinutes, type Category } from './data.ts';
+
+interface Props {
+  t: Translate;
+  appUrl: string;
+}
+
+const { t, appUrl } = Astro.props;
+const [before, after] = splitEm(t('home.shelf.title', EM));
+const catLabel: Record<Category, string> = {
+  grocery: t('home.shelf.cat.grocery'),
+  pharmacy: t('home.shelf.cat.pharmacy'),
+  electronics: t('home.shelf.cat.electronics'),
+};
+const items = SHELF.map((s) => ({
+  ...s,
+  walk: t('home.shelf.walk', { distance: formatDistance(s.distance), minutes: walkMinutes(s.distance) }),
+  href: `${appUrl}/search?q=${encodeURIComponent(s.query)}`,
+}));
+---
+
+<section class="b-sec" id="shelf">
+  <div class="b-w">
+    <div class="b-shelf-head rv">
+      <div>
+        <p class="b-eyebrow">{t('home.shelf.eyebrow')}</p>
+        <h2>{before}<span class="b-acc">{t('home.shelf.title_em')}</span>{after}</h2>
+      </div>
+      <div class="b-tabs" role="group" aria-label={t('home.shelf.tabs')} data-shelf-tabs hidden>
+        <button type="button" aria-pressed="true" data-cat="all">{t('home.shelf.all')}</button>
+        {CATEGORIES.map((c) => <button type="button" aria-pressed="false" data-cat={c}>{catLabel[c]}</button>)}
+      </div>
+    </div>
+    <ul class="b-shelf" data-shelf>
+      {
+        items.map((s) => (
+          <li class="b-item b-card" data-cat={s.category}>
+            <div class="b-thumb">
+              <img src={s.photo.src} width={s.photo.width} height={s.photo.height} alt="" loading="lazy" decoding="async" />
+              <em>{catLabel[s.category]}</em>
+            </div>
+            <small class="b-shop"><Icon name="pin" size={14} />{s.shop}</small>
+            <h3>{s.name}</h3>
+            <small class="b-fresh"><i aria-hidden="true" />{t('home.shelf.stock', { minutes: s.confirmed })}</small>
+            <small><Icon name="footprints" size={14} />{s.walk}</small>
+            <div class="b-item-foot">
+              <b>₹{s.price}</b>
+              <a href={s.href} aria-label={t('home.shelf.find_label', { item: s.name })}>
+                {t('home.shelf.find')}<Icon name="search" size={14} />
+              </a>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

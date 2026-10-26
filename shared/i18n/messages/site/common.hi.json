@@ -248,5 +248,40 @@
     "message": "सुरक्षा जाँच लोड नहीं हो सकी। पेज दोबारा लोड करके फिर कोशिश करें।",
     "review": "reviewed",
     "enHash": "15c3e9e7"
+  },
+  "bar.label": {
+    "message": "घोषणा",
+    "review": "reviewed",
+    "enHash": "cf84a98d"
+  },
+  "bar.live": {
+    "message": "अभी दुकानें जोड़ी जा रही हैं",
+    "review": "reviewed",
+    "enHash": "cc641213"
+  },
+  "bar.reward": {
+    "message": "दुकान से पिकअप करें: कोई फ़ीस नहीं, और जहाँ दुकान दे वहाँ कैशबैक",
+    "review": "reviewed",
+    "enHash": "0f32d83b"
+  },
+  "bar.list": {
+    "message": "अपनी दुकान जोड़ें",
+    "review": "reviewed",
+    "enHash": "b94ec5f9"
+  },
+  "bar.how": {
+    "message": "देखें कैसे काम करता है",
+    "review": "reviewed",
+    "enHash": "f7b38f07"
+  },
+  "brand.tagline": {
+    "message": "फ़िज़िकल सर्च इंजन",
+    "review": "reviewed",
+    "enHash": "5c918698"
+  },
+  "nav.search": {
+    "message": "अपने पास की दुकानें खोजें",
+    "review": "reviewed",
+    "enHash": "e27265ba"
   }
 }

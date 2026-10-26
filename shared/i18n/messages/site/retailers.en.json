@@ -35,5 +35,8 @@
   },
   "retailers.faq.3.a": {
     "defaultMessage": "Yes. Demand insights show searches near your shop for items you do not stock."
+  },
+  "retailers.hero.photo": {
+    "defaultMessage": "A smiling shop owner in his packed general store in Kochi."
   }
 }

@@ -993,5 +993,710 @@
     "message": "ಚಲಿಸುವ ಪಟ್ಟಿಯನ್ನು ನಿಲ್ಲಿಸಿ",
     "review": "reviewed",
     "enHash": "8cd44034"
+  },
+  "home.lede.badge": {
+    "message": "ನಿಮ್ಮ ಬಡಾವಣೆ, ಸ್ಟಾಕ್ ಸಹಿತ",
+    "review": "reviewed",
+    "enHash": "5b48065b"
+  },
+  "home.lede.title": {
+    "message": "ನಿಜ ಜಗತ್ತನ್ನು {em}",
+    "review": "reviewed",
+    "enHash": "8131f698"
+  },
+  "home.lede.title_em": {
+    "message": "ಹುಡುಕಬಹುದಾದಂತೆ ಮಾಡುವುದು.",
+    "review": "reviewed",
+    "enHash": "12976092"
+  },
+  "home.lede.body": {
+    "message": "ಹತ್ತಿರದ ಅಂಗಡಿಯಲ್ಲಿ ಹುಡುಕಿ, ಆ್ಯಪ್‌ನಲ್ಲಿ ಬುಕ್ ಮಾಡಿ, ನಡೆದುಕೊಂಡು ಹೋಗಿ ತೆಗೆದುಕೊಳ್ಳಿ. ಪಿಕಪ್‌ಗೆ ಶುಲ್ಕವಿಲ್ಲ, ದಿನಗಟ್ಟಲೆ ಕಾಯಬೇಕಿಲ್ಲ, ಸ್ವಲ್ಪ ದೂರ ನಡೆದರೆ ಸಾಕು.",
+    "review": "reviewed",
+    "enHash": "4c7e4434"
+  },
+  "home.lede.search_label": {
+    "message": "ನಿಮ್ಮ ಹತ್ತಿರದ ಅಂಗಡಿಗಳನ್ನು ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "e27265ba"
+  },
+  "home.lede.search_placeholder": {
+    "message": "ಹಾಲು, ಫೋನ್ ಚಾರ್ಜರ್, ಪ್ಯಾರಾಸಿಟಮಾಲ್ ಹುಡುಕಿ…",
+    "review": "reviewed",
+    "enHash": "a54ff435"
+  },
+  "home.lede.search_go": {
+    "message": "ಹತ್ತಿರದಲ್ಲಿ ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "ad3bae31"
+  },
+  "home.lede.stat.1.value": {
+    "message": "₹0",
+    "review": "reviewed",
+    "enHash": "c51874cd"
+  },
+  "home.lede.stat.1.label": {
+    "message": "ಪಿಕಪ್ ಶುಲ್ಕ",
+    "review": "reviewed",
+    "enHash": "cd505f16"
+  },
+  "home.lede.stat.2.value": {
+    "message": "0–20%",
+    "review": "reviewed",
+    "enHash": "b9b8fb42"
+  },
+  "home.lede.stat.2.label": {
+    "message": "ಕ್ಯಾಶ್ ಬ್ಯಾಕ್, ಪ್ರತಿ ಅಂಗಡಿ ನಿರ್ಧರಿಸುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "b7f6ad15"
+  },
+  "home.lede.stat.3.value": {
+    "message": "2 km",
+    "review": "reviewed",
+    "enHash": "8067ebaa"
+  },
+  "home.lede.stat.3.label": {
+    "message": "ಆರಂಭದಲ್ಲಿ ಹುಡುಕಾಟದ ವ್ಯಾಪ್ತಿ, 20 km ವರೆಗೆ ಹೆಚ್ಚಿಸಬಹುದು",
+    "review": "reviewed",
+    "enHash": "d3b1faf2"
+  },
+  "home.strip.title": {
+    "message": "ಇವನ್ನೆಲ್ಲ ಹುಡುಕಬಹುದು",
+    "review": "reviewed",
+    "enHash": "0443693b"
+  },
+  "home.strip.pause": {
+    "message": "ಚಲಿಸುವ ಪಟ್ಟಿಯನ್ನು ನಿಲ್ಲಿಸಿ",
+    "review": "reviewed",
+    "enHash": "8cd44034"
+  },
+  "home.strip.1": {
+    "message": "ಹಾಲು 1 L",
+    "review": "reviewed",
+    "enHash": "9b24bbce"
+  },
+  "home.strip.2": {
+    "message": "ಫೋನ್ ಚಾರ್ಜರ್",
+    "review": "reviewed",
+    "enHash": "3dc867cb"
+  },
+  "home.strip.3": {
+    "message": "ಪ್ಯಾರಾಸಿಟಮಾಲ್ 650",
+    "review": "reviewed",
+    "enHash": "fcd766a5"
+  },
+  "home.strip.4": {
+    "message": "ನೋಟ್‌ಬುಕ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "251ce0b0"
+  },
+  "home.strip.5": {
+    "message": "ಬ್ರೌನ್ ಬ್ರೆಡ್",
+    "review": "reviewed",
+    "enHash": "b68f6446"
+  },
+  "home.strip.6": {
+    "message": "LED ಬಲ್ಬ್",
+    "review": "reviewed",
+    "enHash": "b9cf6971"
+  },
+  "home.strip.7": {
+    "message": "ಫೇಸ್ ವಾಶ್",
+    "review": "reviewed",
+    "enHash": "4f44dc39"
+  },
+  "home.strip.8": {
+    "message": "ಇಯರ್‌ಫೋನ್",
+    "review": "reviewed",
+    "enHash": "efa2d377"
+  },
+  "home.strip.9": {
+    "message": "ಇನ್‌ಸ್ಟಂಟ್ ನೂಡಲ್ಸ್",
+    "review": "reviewed",
+    "enHash": "9e701e5f"
+  },
+  "home.strip.10": {
+    "message": "ಬ್ಯಾಟರಿಗಳು",
+    "review": "reviewed",
+    "enHash": "0970f9df"
+  },
+  "home.cost.eyebrow": {
+    "message": "ಸಮಸ್ಯೆ",
+    "review": "reviewed",
+    "enHash": "8a940000"
+  },
+  "home.cost.title": {
+    "message": "ಖರೀದಿಸುವ ಪ್ರತಿ ದಾರಿ {em}",
+    "review": "reviewed",
+    "enHash": "5022a201"
+  },
+  "home.cost.title_em": {
+    "message": "ನಿಮ್ಮಿಂದ ಏನಾದರೂ ವಸೂಲು ಮಾಡುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "2bb9b83a"
+  },
+  "home.cost.sub": {
+    "message": "ಸಮಯ, ತಾಳ್ಮೆ ಅಥವಾ ಹಣ. ಇಂದು ನೀವು ಈ ಮೂರರಲ್ಲಿ ಕನಿಷ್ಠ ಒಂದನ್ನು ತೆರುತ್ತೀರಿ, ಹೆಚ್ಚಾಗಿ ಮೂರನ್ನೂ.",
+    "review": "reviewed",
+    "enHash": "5a37b8b5"
+  },
+  "home.cost.1.title": {
+    "message": "ಸುತ್ತಾಡಿ, ಕೊನೆಗೆ ಬಿಟ್ಟುಬಿಡಿ",
+    "review": "reviewed",
+    "enHash": "97f4e09a"
+  },
+  "home.cost.1.body": {
+    "message": "ನೀವು ಅಂಗಡಿಯಿಂದ ಅಂಗಡಿಗೆ ಕೇಳುತ್ತಾ, ಕಾಯುತ್ತಾ ಹೋಗುತ್ತೀರಿ, ಆದರೂ ಖಾಲಿ ಕೈಯಲ್ಲಿ ಮನೆಗೆ ಮರಳುತ್ತೀರಿ.",
+    "review": "reviewed",
+    "enHash": "b8a9828e"
+  },
+  "home.cost.2.title": {
+    "message": "ಆನ್‌ಲೈನ್ ಆರ್ಡರ್ ಮಾಡಿ, ದಿನಗಟ್ಟಲೆ ಕಾಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "05596e51"
+  },
+  "home.cost.2.body": {
+    "message": "ಸ್ಕ್ರೀನ್‌ನಲ್ಲಿ ಕ್ಷಣಗಳಲ್ಲಿ ಕಾಣುತ್ತದೆ, ಬಾಗಿಲಿಗೆ ಬರಲು ದಿನಗಳೇ ಬೇಕು, ಹತ್ತಿರದ ಅಂಗಡಿಯಲ್ಲಿ ಈಗಾಗಲೇ ಇದ್ದ ವಸ್ತುವಿಗಾಗಿ.",
+    "review": "reviewed",
+    "enHash": "43759e2f"
+  },
+  "home.cost.3.title": {
+    "message": "ತ್ವರಿತ ಡೆಲಿವರಿ, ಆದರೆ ಶುಲ್ಕ ಕೊಡಿ",
+    "review": "reviewed",
+    "enHash": "5702bcb5"
+  },
+  "home.cost.3.body": {
+    "message": "ವೇಗವಾಗಿದೆ, ಆದರೆ ಡೆಲಿವರಿ, ಹ್ಯಾಂಡ್ಲಿಂಗ್ ಮತ್ತು ಸಣ್ಣ ಬಾಸ್ಕೆಟ್ ಶುಲ್ಕಗಳು ಪ್ರತಿ ಆರ್ಡರ್‌ನಲ್ಲಿ ಸದ್ದಿಲ್ಲದೆ ಸೇರಿಕೊಳ್ಳುತ್ತವೆ.",
+    "review": "reviewed",
+    "enHash": "064c6675"
+  },
+  "home.cost.way.eyebrow": {
+    "message": "TodayZ ನ ದಾರಿ",
+    "review": "reviewed",
+    "enHash": "a7f0b759"
+  },
+  "home.cost.way.title": {
+    "message": "ಒಮ್ಮೆ ಹುಡುಕಿ. ಬುಕ್ ಮಾಡಿ. ನಡೆದು ಹೋಗಿ. ಅಂಗಡಿಗೆ ಹಣ ಕೊಡಿ.",
+    "review": "reviewed",
+    "enHash": "2e141c06"
+  },
+  "home.cost.way.cta": {
+    "message": "ಹೇಗಿರುತ್ತದೆ ನೋಡಿ",
+    "review": "reviewed",
+    "enHash": "196a6a56"
+  },
+  "home.walk.eyebrow": {
+    "message": "ಪ್ರಯಾಣ",
+    "review": "reviewed",
+    "enHash": "7fe9eb42"
+  },
+  "home.walk.title": {
+    "message": "ಒಮ್ಮೆ ಹುಡುಕಿ. {em} ಪಿಕಪ್ ಮಾಡಿ.",
+    "review": "reviewed",
+    "enHash": "c13692dc"
+  },
+  "home.walk.title_em": {
+    "message": "ನಡೆದು ಹೋಗಿ.",
+    "review": "reviewed",
+    "enHash": "4128f8a3"
+  },
+  "home.walk.sub": {
+    "message": "ಹುಡುಕಿ, ಬುಕ್ ಮಾಡಿ, ಹತ್ತಿರದ ಅಂಗಡಿಯಿಂದ ತೆಗೆದುಕೊಳ್ಳಿ. ಒಂದು ಚಿಕ್ಕ ನಡಿಗೆ ಹೇಗಿರುತ್ತದೆ ನೋಡಿ.",
+    "review": "reviewed",
+    "enHash": "0a238688"
+  },
+  "home.walk.map": {
+    "message": "ನಿಮ್ಮಿಂದ 600 m ದೂರದ ಶರ್ಮಾ ಜನರಲ್ ಸ್ಟೋರ್‌ಗೆ ನಡಿಗೆಯ ಮಾರ್ಗ.",
+    "review": "reviewed",
+    "enHash": "44043abc"
+  },
+  "home.walk.scroll": {
+    "message": "ನಡಿಗೆ ಮಾರ್ಗದ ನಕ್ಷೆ, ಚಿಕ್ಕ ಪರದೆಯಲ್ಲಿ ಪಕ್ಕಕ್ಕೆ ಸ್ಕ್ರಾಲ್ ಆಗುತ್ತದೆ",
+    "review": "reviewed",
+    "enHash": "d5ec4c27"
+  },
+  "home.walk.you": {
+    "message": "ನೀವು",
+    "review": "reviewed",
+    "enHash": "905cb326"
+  },
+  "home.walk.tag": {
+    "message": "ಬುಕ್ ಆಯಿತು · 600 m · 8 ನಿಮಿಷ ನಡಿಗೆ",
+    "review": "reviewed",
+    "enHash": "203e6ddd"
+  },
+  "home.walk.replay": {
+    "message": "ನಡಿಗೆಯನ್ನು ಮತ್ತೆ ಪ್ಲೇ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "fc90235d"
+  },
+  "home.walk.hud.1": {
+    "message": "ನಡೆದ ಮೀಟರ್",
+    "review": "reviewed",
+    "enHash": "e394a90c"
+  },
+  "home.walk.hud.2": {
+    "message": "ನಡೆದ ನಿಮಿಷಗಳು",
+    "review": "reviewed",
+    "enHash": "8037005b"
+  },
+  "home.walk.hud.3": {
+    "message": "ಪಿಕಪ್ ಶುಲ್ಕ",
+    "review": "reviewed",
+    "enHash": "d93f487e"
+  },
+  "home.walk.hud.4": {
+    "message": "ಸ್ಟಾಕ್ ದೃಢೀಕರಣ",
+    "review": "reviewed",
+    "enHash": "06198737"
+  },
+  "home.walk.hud.4.value": {
+    "message": "12 ನಿಮಿಷ ಹಿಂದೆ",
+    "review": "reviewed",
+    "enHash": "6c786da7"
+  },
+  "home.walk.step.1.title": {
+    "message": "01 · ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "e42236a3"
+  },
+  "home.walk.step.1.body": {
+    "message": "ನಿಮಗೆ ಬೇಕಾದುದನ್ನು ಟೈಪ್ ಮಾಡಿ. ಅದು ಸ್ಟಾಕ್‌ನಲ್ಲಿರುವ ಹತ್ತಿರದ ಅಂಗಡಿಗಳನ್ನು ನೋಡಿ.",
+    "review": "reviewed",
+    "enHash": "29f36790"
+  },
+  "home.walk.step.2.title": {
+    "message": "02 · ಬುಕ್ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "0ca4552a"
+  },
+  "home.walk.step.2.body": {
+    "message": "ಅಂಗಡಿಯ ಬೆಲೆಗೆ ಬುಕ್ ಮಾಡಿ, ಅಂಗಡಿಯವರು ಅದನ್ನು ಸಿದ್ಧವಾಗಿಡುತ್ತಾರೆ.",
+    "review": "reviewed",
+    "enHash": "329ddbbb"
+  },
+  "home.walk.step.3.title": {
+    "message": "03 · ನಡೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "3167c564"
+  },
+  "home.walk.step.3.body": {
+    "message": "ಅಂಗಡಿ ಎಷ್ಟು ದೂರ ಎಂದು ಆ್ಯಪ್ ತೋರಿಸುತ್ತದೆ. ಅನುಕೂಲವಾದಾಗ ನಡೆದು ಹೋಗಿ.",
+    "review": "reviewed",
+    "enHash": "66066c48"
+  },
+  "home.walk.step.4.title": {
+    "message": "04 · ತೆಗೆದುಕೊಳ್ಳಿ",
+    "review": "reviewed",
+    "enHash": "dc111fbf"
+  },
+  "home.walk.step.4.body": {
+    "message": "ನಿಮ್ಮ ಪಿಕಪ್ ಕೋಡ್ ತೋರಿಸಿ, ಅಂಗಡಿಗೆ ಹಣ ಕೊಡಿ, ಅಂಗಡಿ ಕ್ಯಾಶ್ ಬ್ಯಾಕ್ ನೀಡಿದರೆ ಅದನ್ನು ಪಡೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "81d7c45d"
+  },
+  "home.walk.note": {
+    "message": "ಉದಾಹರಣೆ. ನಡಿಗೆಯ ಸಮಯ ಗಂಟೆಗೆ ಸುಮಾರು 5 km ವೇಗದಲ್ಲಿ ಲೆಕ್ಕ ಹಾಕಿದ್ದು.",
+    "review": "reviewed",
+    "enHash": "c7baab0f"
+  },
+  "home.week.eyebrow": {
+    "message": "ಸಣ್ಣ ಕೆಲಸಗಳು, ಹೊಸ ರೀತಿಯಲ್ಲಿ",
+    "review": "reviewed",
+    "enHash": "19f6df43"
+  },
+  "home.week.title": {
+    "message": "ಅತ್ಯುತ್ತಮ ಅಂಗಡಿ ಎಂದರೆ {em}",
+    "review": "reviewed",
+    "enHash": "edbe6a99"
+  },
+  "home.week.title_em": {
+    "message": "ನೀವು ನಡೆದು ಹೋಗುವ ಅಂಗಡಿ.",
+    "review": "reviewed",
+    "enHash": "01a3af05"
+  },
+  "home.week.sub": {
+    "message": "ಪ್ರತಿ ಪಿಕಪ್ ಒಂದು ಕೆಲಸವನ್ನು ಚಿಕ್ಕ ನಡಿಗೆಯಾಗಿ ಬದಲಿಸುತ್ತದೆ. ಡೆಲಿವರಿ ಶುಲ್ಕವಿಲ್ಲ, ಒಂದು ಬಿಸ್ಕತ್ ಪ್ಯಾಕೆಟ್‌ಗಾಗಿ ರಸ್ತೆಯಲ್ಲಿ ರೈಡರ್ ಇಲ್ಲ, ನೀವು ವಾಸಿಸುವ ಬಡಾವಣೆಯನ್ನು ಇನ್ನಷ್ಟು ನೋಡುತ್ತೀರಿ.",
+    "review": "reviewed",
+    "enHash": "32946fc6"
+  },
+  "home.week.perk.1.title": {
+    "message": "ಪ್ರತಿ ಅಂಗಡಿಗೆ ದೂರ",
+    "review": "reviewed",
+    "enHash": "f89db939"
+  },
+  "home.week.perk.1.body": {
+    "message": "ಹುಡುಕಾಟದಲ್ಲಿ ಪ್ರತಿ ಅಂಗಡಿ ಎಷ್ಟು ದೂರ ಎಂದು ತೋರಿಸುತ್ತದೆ, ಹೀಗಾಗಿ ಹತ್ತಿರದ ನಡಿಗೆಯನ್ನು ಆರಿಸಬಹುದು.",
+    "review": "reviewed",
+    "enHash": "208d8d77"
+  },
+  "home.week.perk.2.title": {
+    "message": "ಅಂಗಡಿ ನೀಡುವಲ್ಲಿ ಕ್ಯಾಶ್ ಬ್ಯಾಕ್",
+    "review": "reviewed",
+    "enHash": "a08e581a"
+  },
+  "home.week.perk.2.body": {
+    "message": "ಪ್ರತಿ ಅಂಗಡಿ ತನ್ನದೇ ಕ್ಯಾಶ್ ಬ್ಯಾಕ್ ನಿಗದಿಪಡಿಸುತ್ತದೆ, 0 ರಿಂದ 20% ವರೆಗೆ, ಅದು ನಿಮಗೆ ಕ್ರೆಡಿಟ್‌ನಲ್ಲಿ ಸಿಗುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "070368c8"
+  },
+  "home.week.perk.3.title": {
+    "message": "ಶುಲ್ಕವಿಲ್ಲ, ಕಡಿಮೆ ಪ್ಯಾಕೇಜಿಂಗ್",
+    "review": "reviewed",
+    "enHash": "bf8271a2"
+  },
+  "home.week.perk.3.body": {
+    "message": "ಪಿಕಪ್‌ಗೆ ಹೆಚ್ಚುವರಿ ಏನೂ ಕೊಡಬೇಕಿಲ್ಲ, ಒಂದೇ ವಸ್ತುವಿಗೆ ಡೆಲಿವರಿ ಬ್ಯಾಗ್ ಕೂಡ ಬೇಡ.",
+    "review": "reviewed",
+    "enHash": "0b09e279"
+  },
+  "home.week.card.title": {
+    "message": "ಪಿಕಪ್‌ಗಳ ಒಂದು ವಾರ",
+    "review": "reviewed",
+    "enHash": "3fcfcbbb"
+  },
+  "home.week.card.tag": {
+    "message": "ಉದಾಹರಣೆ",
+    "review": "reviewed",
+    "enHash": "0f01ed56"
+  },
+  "home.week.rings": {
+    "message": "ಉದಾಹರಣೆ ವಾರ: 4.9 km ನಡಿಗೆ, 58 ನಿಮಿಷ ನಡೆದದ್ದು, 6 ಪಿಕಪ್.",
+    "review": "reviewed",
+    "enHash": "d8d2e6f1"
+  },
+  "home.week.km": {
+    "message": "km ನಡಿಗೆ",
+    "review": "reviewed",
+    "enHash": "eaccc501"
+  },
+  "home.week.min": {
+    "message": "ನಿಮಿಷ ನಡಿಗೆ",
+    "review": "reviewed",
+    "enHash": "5c1d740b"
+  },
+  "home.week.pickups": {
+    "message": "ಪಿಕಪ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "cf8af551"
+  },
+  "home.week.bars": {
+    "message": "ಉದಾಹರಣೆ ವಾರದ ಪ್ರತಿ ದಿನ ನಡೆದ ದೂರ, ಶನಿವಾರ ಅತಿ ಹೆಚ್ಚು.",
+    "review": "reviewed",
+    "enHash": "e03d16b2"
+  },
+  "home.week.days": {
+    "message": "ಸೋ ಮಂ ಬು ಗು ಶು ಶ ಭಾ",
+    "review": "reviewed",
+    "enHash": "a0862b3a"
+  },
+  "home.week.row.1.title": {
+    "message": "ಪಿಕಪ್ ಶುಲ್ಕದಲ್ಲಿ ₹0",
+    "review": "reviewed",
+    "enHash": "cd61f110"
+  },
+  "home.week.row.1.body": {
+    "message": "ಪಿಕಪ್‌ಗೆ ಎಂದಿಗೂ ಶುಲ್ಕ ಇಲ್ಲ",
+    "review": "reviewed",
+    "enHash": "e19693c5"
+  },
+  "home.week.row.2.title": {
+    "message": "86 ಕ್ರೆಡಿಟ್ ಗಳಿಸಿದ್ದು",
+    "review": "reviewed",
+    "enHash": "320d9afa"
+  },
+  "home.week.row.2.body": {
+    "message": "6 ಪಿಕಪ್‌ಗಳ ಕ್ಯಾಶ್ ಬ್ಯಾಕ್, 1 ಕ್ರೆಡಿಟ್ = ₹1",
+    "review": "reviewed",
+    "enHash": "b24af8d3"
+  },
+  "home.orbit.eyebrow": {
+    "message": "ನಿಮ್ಮ 2 km",
+    "review": "reviewed",
+    "enHash": "cd03ef8f"
+  },
+  "home.orbit.title": {
+    "message": "ನಿಮ್ಮ ಸುತ್ತಲಿನ {em} ಅನ್ನು ಅನ್ವೇಷಿಸಿ",
+    "review": "reviewed",
+    "enHash": "2fe44f83"
+  },
+  "home.orbit.title_em": {
+    "message": "2 km",
+    "review": "reviewed",
+    "enHash": "8067ebaa"
+  },
+  "home.orbit.sub": {
+    "message": "ಹುಡುಕಾಟ 2 km ಒಳಗಿನ ಅಂಗಡಿಗಳಿಂದ ಆರಂಭವಾಗುತ್ತದೆ, ಅದನ್ನು 20 km ವರೆಗೆ ಹೆಚ್ಚಿಸಬಹುದು. ಅಂಗಡಿಯನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ, ಅಲ್ಲಿ ಏನಿದೆ ಮತ್ತು ಎಷ್ಟು ನಡೆಯಬೇಕು ನೋಡಿ.",
+    "review": "reviewed",
+    "enHash": "5a5d16cf"
+  },
+  "home.orbit.label": {
+    "message": "2 km ಒಳಗಿನ ಉದಾಹರಣೆ ಅಂಗಡಿಗಳು",
+    "review": "reviewed",
+    "enHash": "d40f9fe7"
+  },
+  "home.orbit.you": {
+    "message": "ನೀವು",
+    "review": "reviewed",
+    "enHash": "905cb326"
+  },
+  "home.orbit.away": {
+    "message": "{distance} ದೂರ · ಸುಮಾರು {minutes} ನಿಮಿಷ ನಡಿಗೆ",
+    "review": "reviewed",
+    "enHash": "0c2dbb1c"
+  },
+  "home.orbit.item": {
+    "message": "ಉದಾಹರಣೆ ಐಟಂ",
+    "review": "reviewed",
+    "enHash": "735134c0"
+  },
+  "home.orbit.confirmed": {
+    "message": "ಸ್ಟಾಕ್ ದೃಢೀಕರಣ",
+    "review": "reviewed",
+    "enHash": "06198737"
+  },
+  "home.orbit.confirmed_value": {
+    "message": "{minutes} ನಿಮಿಷ ಹಿಂದೆ",
+    "review": "reviewed",
+    "enHash": "61da5f60"
+  },
+  "home.orbit.walk": {
+    "message": "ನಡಿಗೆ, ಒಂದು ಕಡೆ",
+    "review": "reviewed",
+    "enHash": "0246767d"
+  },
+  "home.orbit.walk_value": {
+    "message": "{minutes} ನಿಮಿಷ",
+    "review": "reviewed",
+    "enHash": "09a22c22"
+  },
+  "home.orbit.cashback": {
+    "message": "ಈ ಅಂಗಡಿಯ ಕ್ಯಾಶ್ ಬ್ಯಾಕ್",
+    "review": "reviewed",
+    "enHash": "3469fd2c"
+  },
+  "home.orbit.shop": {
+    "message": "{shop}, {distance} ದೂರ",
+    "review": "reviewed",
+    "enHash": "6992686b"
+  },
+  "home.shelf.eyebrow": {
+    "message": "ಶೆಲ್ಫ್ ಪರಿಶೀಲನೆ",
+    "review": "reviewed",
+    "enHash": "09e8887e"
+  },
+  "home.shelf.title": {
+    "message": "ಹತ್ತಿರದಲ್ಲಿ ಲಭ್ಯ, {em}",
+    "review": "reviewed",
+    "enHash": "53b95304"
+  },
+  "home.shelf.title_em": {
+    "message": "ಈಗಲೇ.",
+    "review": "reviewed",
+    "enHash": "3254a76f"
+  },
+  "home.shelf.tabs": {
+    "message": "ವರ್ಗ",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "home.shelf.all": {
+    "message": "ಎಲ್ಲಾ",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "home.shelf.cat.grocery": {
+    "message": "ದಿನಸಿ",
+    "review": "reviewed",
+    "enHash": "9c998ada"
+  },
+  "home.shelf.cat.pharmacy": {
+    "message": "ಔಷಧಿ",
+    "review": "reviewed",
+    "enHash": "2f6c536b"
+  },
+  "home.shelf.cat.electronics": {
+    "message": "ಎಲೆಕ್ಟ್ರಾನಿಕ್ಸ್",
+    "review": "reviewed",
+    "enHash": "89f1ebf5"
+  },
+  "home.shelf.stock": {
+    "message": "ಸ್ಟಾಕ್‌ನಲ್ಲಿದೆ · {minutes} ನಿಮಿಷ ಹಿಂದೆ ದೃಢೀಕರಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "fa8811bd"
+  },
+  "home.shelf.walk": {
+    "message": "{distance} · {minutes} ನಿಮಿಷ ನಡಿಗೆ",
+    "review": "reviewed",
+    "enHash": "23b64712"
+  },
+  "home.shelf.find": {
+    "message": "ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "65080933"
+  },
+  "home.shelf.find_label": {
+    "message": "ನಿಮ್ಮ ಹತ್ತಿರ {item} ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "38b02c29"
+  },
+  "home.save.eyebrow": {
+    "message": "ನಿಮ್ಮ ಉಳಿತಾಯ",
+    "review": "reviewed",
+    "enHash": "09f03557"
+  },
+  "home.save.title": {
+    "message": "ಒಂದು {em} ದ ಮೌಲ್ಯ ಎಷ್ಟು ನೋಡಿ",
+    "review": "reviewed",
+    "enHash": "9d38b897"
+  },
+  "home.save.title_em": {
+    "message": "ನಡಿಗೆ",
+    "review": "reviewed",
+    "enHash": "df06b147"
+  },
+  "home.save.sub": {
+    "message": "ತಿಂಗಳ ಕೆಲವು ಆರ್ಡರ್‌ಗಳನ್ನು ಡೆಲಿವರಿಯಿಂದ ಹತ್ತಿರದ ಅಂಗಡಿಗೆ ಬದಲಿಸಿ.",
+    "review": "reviewed",
+    "enHash": "410f68bb"
+  },
+  "home.save.orders": {
+    "message": "ತಿಂಗಳಿಗೆ ಆರ್ಡರ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "e7e0d70d"
+  },
+  "home.save.fee": {
+    "message": "ಡೆಲಿವರಿ ಆದ ಪ್ರತಿ ಆರ್ಡರ್‌ಗೆ ನೀವು ಕೊಡುವ ಶುಲ್ಕ",
+    "review": "reviewed",
+    "enHash": "1b092045"
+  },
+  "home.save.basket": {
+    "message": "ನಿಮ್ಮ ಸಾಮಾನ್ಯ ಬಾಸ್ಕೆಟ್",
+    "review": "reviewed",
+    "enHash": "e3640cf2"
+  },
+  "home.save.cashback": {
+    "message": "ಅಂಗಡಿಯ ಕ್ಯಾಶ್ ಬ್ಯಾಕ್",
+    "review": "reviewed",
+    "enHash": "27f9118a"
+  },
+  "home.save.walk": {
+    "message": "ಅಂಗಡಿಗೆ ಹೋಗಿ ಬರುವ ನಡಿಗೆ",
+    "review": "reviewed",
+    "enHash": "2fc9bd58"
+  },
+  "home.save.keep": {
+    "message": "ಪ್ರತಿ ವರ್ಷ ನಿಮ್ಮಲ್ಲಿ ಉಳಿಯುವುದು",
+    "review": "reviewed",
+    "enHash": "102629ba"
+  },
+  "home.save.fees": {
+    "message": "ತಪ್ಪಿದ ಶುಲ್ಕ",
+    "review": "reviewed",
+    "enHash": "e948a0e4"
+  },
+  "home.save.credits": {
+    "message": "ಕ್ಯಾಶ್ ಬ್ಯಾಕ್, ಕ್ರೆಡಿಟ್‌ನಲ್ಲಿ",
+    "review": "reviewed",
+    "enHash": "51ff9a15"
+  },
+  "home.save.km": {
+    "message": "ನಡೆದ ದೂರ",
+    "review": "reviewed",
+    "enHash": "3aba6f93"
+  },
+  "home.save.hours": {
+    "message": "ನಡೆಯಲು ಕಳೆದ ಸಮಯ",
+    "review": "reviewed",
+    "enHash": "88b31039"
+  },
+  "home.save.cta": {
+    "message": "TodayZ ಆ್ಯಪ್ ತೆರೆಯಿರಿ",
+    "review": "reviewed",
+    "enHash": "785b7c7d"
+  },
+  "home.save.note": {
+    "message": "ಉದಾಹರಣೆಗಾಗಿ ಮಾತ್ರ. ಪ್ರತಿ ಅಂಗಡಿ ತನ್ನದೇ ಕ್ಯಾಶ್ ಬ್ಯಾಕ್ ನಿಗದಿಪಡಿಸುತ್ತದೆ, 0 ರಿಂದ 20% ವರೆಗೆ, ಹಲವು ಅಂಗಡಿಗಳು ಏನೂ ನೀಡುವುದಿಲ್ಲ. ನಡಿಗೆಯ ಸಮಯ ಗಂಟೆಗೆ ಸುಮಾರು 5 km ವೇಗದಲ್ಲಿ ಲೆಕ್ಕ ಹಾಕಿದ್ದು.",
+    "review": "reviewed",
+    "enHash": "b0158fc9"
+  },
+  "home.owners.eyebrow": {
+    "message": "ಅಂಗಡಿಯವರಿಗಾಗಿ",
+    "review": "reviewed",
+    "enHash": "fa54f1ea"
+  },
+  "home.owners.title": {
+    "message": "ನಿಮ್ಮ ಶೆಲ್ಫ್‌ನಲ್ಲಿ {em}",
+    "review": "reviewed",
+    "enHash": "1958bd36"
+  },
+  "home.owners.title_em": {
+    "message": "ಜನ ಹುಡುಕುತ್ತಿರುವುದೇ ಇದೆ.",
+    "review": "reviewed",
+    "enHash": "317f3f2e"
+  },
+  "home.owners.body": {
+    "message": "ಹತ್ತಿರದ ಗ್ರಾಹಕರಿಗೆ ನಿಮ್ಮ ಅಂಗಡಿ ಕಾಣಿಸಲಿ, TodayZ ಗೆ ಕರೆತರುವ ಪ್ರತಿ ಗ್ರಾಹಕರಿಗೆ 30 ಕ್ರೆಡಿಟ್ ಗಳಿಸಿ, ಮುಗಿಯುವ ಮೊದಲೇ ಏನನ್ನು ತರಿಸಬೇಕೆಂದು ತಿಳಿಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "bd883c32"
+  },
+  "home.owners.cta": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "b94ec5f9"
+  },
+  "home.owners.1.title": {
+    "message": "ಹತ್ತಿರದಲ್ಲಿ ಕಾಣಿಸಿ",
+    "review": "reviewed",
+    "enHash": "f5672a1d"
+  },
+  "home.owners.1.body": {
+    "message": "ತಮ್ಮ ಹುಡುಕಾಟದ ವ್ಯಾಪ್ತಿಯಲ್ಲಿರುವ ಗ್ರಾಹಕರು ಹುಡುಕಿದಾಗ ನಿಮ್ಮ ಸ್ಟಾಕ್ ನೋಡುತ್ತಾರೆ.",
+    "review": "reviewed",
+    "enHash": "cc6b20f6"
+  },
+  "home.owners.2.title": {
+    "message": "ಪ್ರತಿ ಗ್ರಾಹಕರಿಗೆ 30 ಕ್ರೆಡಿಟ್",
+    "review": "reviewed",
+    "enHash": "2c192c45"
+  },
+  "home.owners.2.body": {
+    "message": "ನೀವು ಕರೆತಂದ ವ್ಯಕ್ತಿ ₹100 ಅಥವಾ ಹೆಚ್ಚಿನ ಮೊದಲ ಆರ್ಡರ್ ಪೂರ್ಣಗೊಳಿಸಿದಾಗ. 1 ಕ್ರೆಡಿಟ್ = ₹1, ಪ್ರತಿ ತಿಂಗಳು ಪಾವತಿ.",
+    "review": "reviewed",
+    "enHash": "a8144148"
+  },
+  "home.owners.3.title": {
+    "message": "ಹೆಚ್ಚು ಮಾರಿ, ಕಡಿಮೆ ವ್ಯರ್ಥ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "104616d1"
+  },
+  "home.owners.3.body": {
+    "message": "ಏನನ್ನು ತರಿಸಬೇಕು, ಯಾವುದಕ್ಕೆ ಆಫರ್ ಇಡಬೇಕು ಎಂಬ ದೈನಂದಿನ ಸಲಹೆಗಳು.",
+    "review": "reviewed",
+    "enHash": "d1ab7cc3"
+  },
+  "home.credits.title": {
+    "message": "ಫೋಟೋ ಕ್ರೆಡಿಟ್‌ಗಳು",
+    "review": "reviewed",
+    "enHash": "f9ce2574"
+  },
+  "home.credits.licence": {
+    "message": "ಫೋಟೋಗಳನ್ನು CC BY 2.0 ಪರವಾನಗಿಯಡಿ ಬಳಸಲಾಗಿದೆ. ಶೀರ್ಷಿಕೆ, ಲೇಖಕ ಮತ್ತು ಮೂಲ:",
+    "review": "reviewed",
+    "enHash": "a643642b"
+  },
+  "home.save.km_value": {
+    "message": "{km} ಕಿಮೀ",
+    "review": "reviewed",
+    "enHash": "5d1ec3cd"
+  },
+  "home.save.hours_value": {
+    "message": "{hours} ಗಂಟೆಗಳು",
+    "review": "reviewed",
+    "enHash": "83996d17"
+  },
+  "home.lede.photo": {
+    "message": "ಸಾಮಾನುಗಳಿಂದ ತುಂಬಿದ ಕಪಾಟುಗಳಿರುವ ಸಣ್ಣ ಜನರಲ್ ಸ್ಟೋರ್‌ನ ಕೌಂಟರ್‌ನಲ್ಲಿ ಅಂಗಡಿಯವರು.",
+    "review": "reviewed",
+    "enHash": "380ce24b"
   }
 }

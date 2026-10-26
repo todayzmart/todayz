@@ -248,5 +248,40 @@
     "message": "ಭದ್ರತಾ ಪರಿಶೀಲನೆ ಲೋಡ್ ಆಗಲಿಲ್ಲ. ಪುಟವನ್ನು ಮರುಲೋಡ್ ಮಾಡಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
     "review": "reviewed",
     "enHash": "15c3e9e7"
+  },
+  "bar.label": {
+    "message": "ಪ್ರಕಟಣೆ",
+    "review": "reviewed",
+    "enHash": "cf84a98d"
+  },
+  "bar.live": {
+    "message": "ಈಗ ಅಂಗಡಿಗಳನ್ನು ಸೇರಿಸಿಕೊಳ್ಳಲಾಗುತ್ತಿದೆ",
+    "review": "reviewed",
+    "enHash": "cc641213"
+  },
+  "bar.reward": {
+    "message": "ಅಂಗಡಿಯಲ್ಲಿ ಪಿಕಪ್ ಮಾಡಿ: ಯಾವುದೇ ಶುಲ್ಕವಿಲ್ಲ, ಅಂಗಡಿ ನೀಡುವಲ್ಲಿ ಕ್ಯಾಶ್ ಬ್ಯಾಕ್",
+    "review": "reviewed",
+    "enHash": "0f32d83b"
+  },
+  "bar.list": {
+    "message": "ನಿಮ್ಮ ಅಂಗಡಿಯನ್ನು ಸೇರಿಸಿ",
+    "review": "reviewed",
+    "enHash": "b94ec5f9"
+  },
+  "bar.how": {
+    "message": "ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ ನೋಡಿ",
+    "review": "reviewed",
+    "enHash": "f7b38f07"
+  },
+  "brand.tagline": {
+    "message": "ಫಿಸಿಕಲ್ ಸರ್ಚ್ ಇಂಜಿನ್",
+    "review": "reviewed",
+    "enHash": "5c918698"
+  },
+  "nav.search": {
+    "message": "ನಿಮ್ಮ ಹತ್ತಿರದ ಅಂಗಡಿಗಳನ್ನು ಹುಡುಕಿ",
+    "review": "reviewed",
+    "enHash": "e27265ba"
   }
 }

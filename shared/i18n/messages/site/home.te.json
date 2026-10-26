@@ -993,5 +993,710 @@
     "message": "కదిలే జాబితాను ఆపండి",
     "review": "reviewed",
     "enHash": "8cd44034"
+  },
+  "home.lede.badge": {
+    "message": "మీ వీధి, స్టాక్‌తో సహా",
+    "review": "reviewed",
+    "enHash": "5b48065b"
+  },
+  "home.lede.title": {
+    "message": "నిజమైన ప్రపంచాన్ని {em}",
+    "review": "reviewed",
+    "enHash": "8131f698"
+  },
+  "home.lede.title_em": {
+    "message": "వెతకగలిగేలా చేయడం.",
+    "review": "reviewed",
+    "enHash": "12976092"
+  },
+  "home.lede.body": {
+    "message": "దగ్గరి దుకాణంలో వెతకండి, యాప్‌లో బుక్ చేయండి, నడిచి వెళ్లి తీసుకోండి. పికప్‌కు ఫీజు లేదు, రోజుల తరబడి ఎదురుచూపు లేదు, కొద్ది దూరం నడిస్తే చాలు.",
+    "review": "reviewed",
+    "enHash": "4c7e4434"
+  },
+  "home.lede.search_label": {
+    "message": "మీ దగ్గరి దుకాణాలను వెతకండి",
+    "review": "reviewed",
+    "enHash": "e27265ba"
+  },
+  "home.lede.search_placeholder": {
+    "message": "పాలు, ఫోన్ చార్జర్, పారాసిటమాల్ వెతకండి…",
+    "review": "reviewed",
+    "enHash": "a54ff435"
+  },
+  "home.lede.search_go": {
+    "message": "దగ్గరలో వెతకండి",
+    "review": "reviewed",
+    "enHash": "ad3bae31"
+  },
+  "home.lede.stat.1.value": {
+    "message": "₹0",
+    "review": "reviewed",
+    "enHash": "c51874cd"
+  },
+  "home.lede.stat.1.label": {
+    "message": "పికప్ ఫీజు",
+    "review": "reviewed",
+    "enHash": "cd505f16"
+  },
+  "home.lede.stat.2.value": {
+    "message": "0–20%",
+    "review": "reviewed",
+    "enHash": "b9b8fb42"
+  },
+  "home.lede.stat.2.label": {
+    "message": "క్యాష్ బ్యాక్, ప్రతి దుకాణం నిర్ణయిస్తుంది",
+    "review": "reviewed",
+    "enHash": "b7f6ad15"
+  },
+  "home.lede.stat.3.value": {
+    "message": "2 km",
+    "review": "reviewed",
+    "enHash": "8067ebaa"
+  },
+  "home.lede.stat.3.label": {
+    "message": "మొదట వెతికే పరిధి, 20 km వరకు పెంచుకోవచ్చు",
+    "review": "reviewed",
+    "enHash": "d3b1faf2"
+  },
+  "home.strip.title": {
+    "message": "వీటన్నింటినీ వెతకవచ్చు",
+    "review": "reviewed",
+    "enHash": "0443693b"
+  },
+  "home.strip.pause": {
+    "message": "కదిలే జాబితాను ఆపండి",
+    "review": "reviewed",
+    "enHash": "8cd44034"
+  },
+  "home.strip.1": {
+    "message": "పాలు 1 L",
+    "review": "reviewed",
+    "enHash": "9b24bbce"
+  },
+  "home.strip.2": {
+    "message": "ఫోన్ చార్జర్",
+    "review": "reviewed",
+    "enHash": "3dc867cb"
+  },
+  "home.strip.3": {
+    "message": "పారాసిటమాల్ 650",
+    "review": "reviewed",
+    "enHash": "fcd766a5"
+  },
+  "home.strip.4": {
+    "message": "నోట్‌బుక్‌లు",
+    "review": "reviewed",
+    "enHash": "251ce0b0"
+  },
+  "home.strip.5": {
+    "message": "బ్రౌన్ బ్రెడ్",
+    "review": "reviewed",
+    "enHash": "b68f6446"
+  },
+  "home.strip.6": {
+    "message": "LED బల్బు",
+    "review": "reviewed",
+    "enHash": "b9cf6971"
+  },
+  "home.strip.7": {
+    "message": "ఫేస్ వాష్",
+    "review": "reviewed",
+    "enHash": "4f44dc39"
+  },
+  "home.strip.8": {
+    "message": "ఇయర్‌ఫోన్లు",
+    "review": "reviewed",
+    "enHash": "efa2d377"
+  },
+  "home.strip.9": {
+    "message": "ఇన్‌స్టంట్ నూడుల్స్",
+    "review": "reviewed",
+    "enHash": "9e701e5f"
+  },
+  "home.strip.10": {
+    "message": "బ్యాటరీలు",
+    "review": "reviewed",
+    "enHash": "0970f9df"
+  },
+  "home.cost.eyebrow": {
+    "message": "సమస్య",
+    "review": "reviewed",
+    "enHash": "8a940000"
+  },
+  "home.cost.title": {
+    "message": "కొనడానికి ప్రతి మార్గం {em}",
+    "review": "reviewed",
+    "enHash": "5022a201"
+  },
+  "home.cost.title_em": {
+    "message": "మీ నుంచి ఏదో ఒకటి తీసుకుంటుంది.",
+    "review": "reviewed",
+    "enHash": "2bb9b83a"
+  },
+  "home.cost.sub": {
+    "message": "సమయం, ఓపిక లేదా డబ్బు. ఈరోజు మీరు ఈ మూడింటిలో కనీసం ఒకటి చెల్లిస్తున్నారు, తరచూ మూడూ.",
+    "review": "reviewed",
+    "enHash": "5a37b8b5"
+  },
+  "home.cost.1.title": {
+    "message": "తిరిగి తిరిగి, చివరకు వదిలేయండి",
+    "review": "reviewed",
+    "enHash": "97f4e09a"
+  },
+  "home.cost.1.body": {
+    "message": "మీరు దుకాణం దుకాణం తిరుగుతూ అడుగుతారు, ఎదురుచూస్తారు, అయినా ఖాళీ చేతులతో ఇంటికి వస్తారు.",
+    "review": "reviewed",
+    "enHash": "b8a9828e"
+  },
+  "home.cost.2.title": {
+    "message": "ఆన్‌లైన్‌లో ఆర్డర్ చేయండి, రోజులు ఎదురుచూడండి",
+    "review": "reviewed",
+    "enHash": "05596e51"
+  },
+  "home.cost.2.body": {
+    "message": "స్క్రీన్‌పై క్షణాల్లో కనిపిస్తుంది, ఇంటికి రావడానికి రోజులు పడుతుంది, పక్క దుకాణంలో ఇప్పటికే ఉన్న వస్తువుకే.",
+    "review": "reviewed",
+    "enHash": "43759e2f"
+  },
+  "home.cost.3.title": {
+    "message": "త్వరిత డెలివరీ, కానీ ఫీజులు కట్టండి",
+    "review": "reviewed",
+    "enHash": "5702bcb5"
+  },
+  "home.cost.3.body": {
+    "message": "వేగంగా వస్తుంది, కానీ డెలివరీ, హ్యాండ్లింగ్, చిన్న బాస్కెట్ ఛార్జీలు ప్రతి ఆర్డర్‌పై నెమ్మదిగా పెరిగిపోతాయి.",
+    "review": "reviewed",
+    "enHash": "064c6675"
+  },
+  "home.cost.way.eyebrow": {
+    "message": "TodayZ మార్గం",
+    "review": "reviewed",
+    "enHash": "a7f0b759"
+  },
+  "home.cost.way.title": {
+    "message": "ఒకసారి వెతకండి. బుక్ చేయండి. నడిచి వెళ్లండి. దుకాణానికి చెల్లించండి.",
+    "review": "reviewed",
+    "enHash": "2e141c06"
+  },
+  "home.cost.way.cta": {
+    "message": "ఎలా ఉంటుందో చూడండి",
+    "review": "reviewed",
+    "enHash": "196a6a56"
+  },
+  "home.walk.eyebrow": {
+    "message": "ప్రయాణం",
+    "review": "reviewed",
+    "enHash": "7fe9eb42"
+  },
+  "home.walk.title": {
+    "message": "ఒకసారి వెతకండి. {em} పికప్ చేసుకోండి.",
+    "review": "reviewed",
+    "enHash": "c13692dc"
+  },
+  "home.walk.title_em": {
+    "message": "నడిచి వెళ్లండి.",
+    "review": "reviewed",
+    "enHash": "4128f8a3"
+  },
+  "home.walk.sub": {
+    "message": "వెతకండి, బుక్ చేయండి, పక్క దుకాణం నుంచి తీసుకోండి. ఒక చిన్న నడక ఎలా సాగుతుందో చూడండి.",
+    "review": "reviewed",
+    "enHash": "0a238688"
+  },
+  "home.walk.map": {
+    "message": "మీ నుంచి 600 m దూరంలోని శర్మ జనరల్ స్టోర్‌కు నడక మార్గం.",
+    "review": "reviewed",
+    "enHash": "44043abc"
+  },
+  "home.walk.scroll": {
+    "message": "నడక మార్గం మ్యాప్, చిన్న స్క్రీన్‌లపై పక్కకు స్క్రోల్ అవుతుంది",
+    "review": "reviewed",
+    "enHash": "d5ec4c27"
+  },
+  "home.walk.you": {
+    "message": "మీరు",
+    "review": "reviewed",
+    "enHash": "905cb326"
+  },
+  "home.walk.tag": {
+    "message": "బుక్ అయింది · 600 m · 8 నిమిషాల నడక",
+    "review": "reviewed",
+    "enHash": "203e6ddd"
+  },
+  "home.walk.replay": {
+    "message": "నడకను మళ్లీ ప్లే చేయండి",
+    "review": "reviewed",
+    "enHash": "fc90235d"
+  },
+  "home.walk.hud.1": {
+    "message": "నడిచిన మీటర్లు",
+    "review": "reviewed",
+    "enHash": "e394a90c"
+  },
+  "home.walk.hud.2": {
+    "message": "నడిచిన నిమిషాలు",
+    "review": "reviewed",
+    "enHash": "8037005b"
+  },
+  "home.walk.hud.3": {
+    "message": "పికప్ ఫీజు",
+    "review": "reviewed",
+    "enHash": "d93f487e"
+  },
+  "home.walk.hud.4": {
+    "message": "స్టాక్ నిర్ధారణ",
+    "review": "reviewed",
+    "enHash": "06198737"
+  },
+  "home.walk.hud.4.value": {
+    "message": "12 నిమిషాల క్రితం",
+    "review": "reviewed",
+    "enHash": "6c786da7"
+  },
+  "home.walk.step.1.title": {
+    "message": "01 · వెతకండి",
+    "review": "reviewed",
+    "enHash": "e42236a3"
+  },
+  "home.walk.step.1.body": {
+    "message": "మీకు కావాల్సింది టైప్ చేయండి. అది స్టాక్‌లో ఉన్న దగ్గరి దుకాణాలను చూడండి.",
+    "review": "reviewed",
+    "enHash": "29f36790"
+  },
+  "home.walk.step.2.title": {
+    "message": "02 · బుక్ చేయండి",
+    "review": "reviewed",
+    "enHash": "0ca4552a"
+  },
+  "home.walk.step.2.body": {
+    "message": "దుకాణం ధరకే బుక్ చేయండి, దుకాణం దాన్ని సిద్ధంగా ఉంచుతుంది.",
+    "review": "reviewed",
+    "enHash": "329ddbbb"
+  },
+  "home.walk.step.3.title": {
+    "message": "03 · నడవండి",
+    "review": "reviewed",
+    "enHash": "3167c564"
+  },
+  "home.walk.step.3.body": {
+    "message": "దుకాణం ఎంత దూరమో యాప్ చూపిస్తుంది. మీకు వీలైనప్పుడు నడిచి వెళ్లండి.",
+    "review": "reviewed",
+    "enHash": "66066c48"
+  },
+  "home.walk.step.4.title": {
+    "message": "04 · తీసుకోండి",
+    "review": "reviewed",
+    "enHash": "dc111fbf"
+  },
+  "home.walk.step.4.body": {
+    "message": "మీ పికప్ కోడ్ చూపించండి, దుకాణానికి చెల్లించండి, దుకాణం క్యాష్ బ్యాక్ ఇస్తే అది పొందండి.",
+    "review": "reviewed",
+    "enHash": "81d7c45d"
+  },
+  "home.walk.note": {
+    "message": "ఉదాహరణ. నడక సమయం గంటకు సుమారు 5 km వేగంతో లెక్కించినది.",
+    "review": "reviewed",
+    "enHash": "c7baab0f"
+  },
+  "home.week.eyebrow": {
+    "message": "చిన్న పనులు, కొత్త తీరులో",
+    "review": "reviewed",
+    "enHash": "19f6df43"
+  },
+  "home.week.title": {
+    "message": "ఉత్తమ దుకాణం అంటే {em}",
+    "review": "reviewed",
+    "enHash": "edbe6a99"
+  },
+  "home.week.title_em": {
+    "message": "మీరు నడిచి వెళ్లే దుకాణమే.",
+    "review": "reviewed",
+    "enHash": "01a3af05"
+  },
+  "home.week.sub": {
+    "message": "ప్రతి పికప్ ఒక పనిని చిన్న నడకగా మారుస్తుంది. డెలివరీ ఛార్జీ లేదు, ఒక బిస్కెట్ ప్యాకెట్ కోసం రోడ్డుపై రైడర్ అవసరం లేదు, మీరు ఉండే వీధిని ఇంకా దగ్గరగా చూస్తారు.",
+    "review": "reviewed",
+    "enHash": "32946fc6"
+  },
+  "home.week.perk.1.title": {
+    "message": "ప్రతి దుకాణానికి దూరం",
+    "review": "reviewed",
+    "enHash": "f89db939"
+  },
+  "home.week.perk.1.body": {
+    "message": "వెతికినప్పుడు ప్రతి దుకాణం ఎంత దూరమో కనిపిస్తుంది, కాబట్టి దగ్గరి నడకను ఎంచుకోవచ్చు.",
+    "review": "reviewed",
+    "enHash": "208d8d77"
+  },
+  "home.week.perk.2.title": {
+    "message": "దుకాణం ఇచ్చే చోట క్యాష్ బ్యాక్",
+    "review": "reviewed",
+    "enHash": "a08e581a"
+  },
+  "home.week.perk.2.body": {
+    "message": "ప్రతి దుకాణం తన క్యాష్ బ్యాక్‌ను తానే నిర్ణయిస్తుంది, 0 నుంచి 20% వరకు, అది మీకు క్రెడిట్‌లలో వస్తుంది.",
+    "review": "reviewed",
+    "enHash": "070368c8"
+  },
+  "home.week.perk.3.title": {
+    "message": "ఫీజు లేదు, తక్కువ ప్యాకేజింగ్",
+    "review": "reviewed",
+    "enHash": "bf8271a2"
+  },
+  "home.week.perk.3.body": {
+    "message": "పికప్‌కు అదనంగా ఏమీ చెల్లించక్కర్లేదు, ఒక్క వస్తువుకు డెలివరీ బ్యాగ్ కూడా అక్కర్లేదు.",
+    "review": "reviewed",
+    "enHash": "0b09e279"
+  },
+  "home.week.card.title": {
+    "message": "పికప్‌ల ఒక వారం",
+    "review": "reviewed",
+    "enHash": "3fcfcbbb"
+  },
+  "home.week.card.tag": {
+    "message": "ఉదాహరణ",
+    "review": "reviewed",
+    "enHash": "0f01ed56"
+  },
+  "home.week.rings": {
+    "message": "ఉదాహరణ వారం: 4.9 km నడక, 58 నిమిషాలు నడిచారు, 6 పికప్‌లు.",
+    "review": "reviewed",
+    "enHash": "d8d2e6f1"
+  },
+  "home.week.km": {
+    "message": "km నడక",
+    "review": "reviewed",
+    "enHash": "eaccc501"
+  },
+  "home.week.min": {
+    "message": "నిమిషాల నడక",
+    "review": "reviewed",
+    "enHash": "5c1d740b"
+  },
+  "home.week.pickups": {
+    "message": "పికప్‌లు",
+    "review": "reviewed",
+    "enHash": "cf8af551"
+  },
+  "home.week.bars": {
+    "message": "ఉదాహరణ వారంలో ప్రతిరోజు నడిచిన దూరం, శనివారం ఎక్కువ.",
+    "review": "reviewed",
+    "enHash": "e03d16b2"
+  },
+  "home.week.days": {
+    "message": "సో మం బు గు శు శ ఆ",
+    "review": "reviewed",
+    "enHash": "a0862b3a"
+  },
+  "home.week.row.1.title": {
+    "message": "పికప్ ఫీజులో ₹0",
+    "review": "reviewed",
+    "enHash": "cd61f110"
+  },
+  "home.week.row.1.body": {
+    "message": "పికప్‌కు ఎప్పుడూ ఫీజు ఉండదు",
+    "review": "reviewed",
+    "enHash": "e19693c5"
+  },
+  "home.week.row.2.title": {
+    "message": "86 క్రెడిట్‌లు వచ్చాయి",
+    "review": "reviewed",
+    "enHash": "320d9afa"
+  },
+  "home.week.row.2.body": {
+    "message": "6 పికప్‌ల క్యాష్ బ్యాక్, 1 క్రెడిట్ = ₹1",
+    "review": "reviewed",
+    "enHash": "b24af8d3"
+  },
+  "home.orbit.eyebrow": {
+    "message": "మీ 2 km",
+    "review": "reviewed",
+    "enHash": "cd03ef8f"
+  },
+  "home.orbit.title": {
+    "message": "మీ చుట్టూ ఉన్న {em} ని చూడండి",
+    "review": "reviewed",
+    "enHash": "2fe44f83"
+  },
+  "home.orbit.title_em": {
+    "message": "2 km",
+    "review": "reviewed",
+    "enHash": "8067ebaa"
+  },
+  "home.orbit.sub": {
+    "message": "వెతుకులాట 2 km లోపు దుకాణాలతో మొదలవుతుంది, దాన్ని 20 km వరకు పెంచుకోవచ్చు. దుకాణంపై ట్యాప్ చేసి, అక్కడ ఏముందో, ఎంత నడవాలో చూడండి.",
+    "review": "reviewed",
+    "enHash": "5a5d16cf"
+  },
+  "home.orbit.label": {
+    "message": "2 km లోపు ఉదాహరణ దుకాణాలు",
+    "review": "reviewed",
+    "enHash": "d40f9fe7"
+  },
+  "home.orbit.you": {
+    "message": "మీరు",
+    "review": "reviewed",
+    "enHash": "905cb326"
+  },
+  "home.orbit.away": {
+    "message": "{distance} దూరం · సుమారు {minutes} నిమిషాల నడక",
+    "review": "reviewed",
+    "enHash": "0c2dbb1c"
+  },
+  "home.orbit.item": {
+    "message": "ఉదాహరణ ఐటమ్",
+    "review": "reviewed",
+    "enHash": "735134c0"
+  },
+  "home.orbit.confirmed": {
+    "message": "స్టాక్ నిర్ధారణ",
+    "review": "reviewed",
+    "enHash": "06198737"
+  },
+  "home.orbit.confirmed_value": {
+    "message": "{minutes} నిమిషాల క్రితం",
+    "review": "reviewed",
+    "enHash": "61da5f60"
+  },
+  "home.orbit.walk": {
+    "message": "నడక, ఒక వైపు",
+    "review": "reviewed",
+    "enHash": "0246767d"
+  },
+  "home.orbit.walk_value": {
+    "message": "{minutes} నిమిషాలు",
+    "review": "reviewed",
+    "enHash": "09a22c22"
+  },
+  "home.orbit.cashback": {
+    "message": "ఈ దుకాణం క్యాష్ బ్యాక్",
+    "review": "reviewed",
+    "enHash": "3469fd2c"
+  },
+  "home.orbit.shop": {
+    "message": "{shop}, {distance} దూరం",
+    "review": "reviewed",
+    "enHash": "6992686b"
+  },
+  "home.shelf.eyebrow": {
+    "message": "షెల్ఫ్ తనిఖీ",
+    "review": "reviewed",
+    "enHash": "09e8887e"
+  },
+  "home.shelf.title": {
+    "message": "దగ్గరలో దొరుకుతుంది, {em}",
+    "review": "reviewed",
+    "enHash": "53b95304"
+  },
+  "home.shelf.title_em": {
+    "message": "ఇప్పుడే.",
+    "review": "reviewed",
+    "enHash": "3254a76f"
+  },
+  "home.shelf.tabs": {
+    "message": "వర్గం",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "home.shelf.all": {
+    "message": "అన్నీ",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "home.shelf.cat.grocery": {
+    "message": "కిరాణా",
+    "review": "reviewed",
+    "enHash": "9c998ada"
+  },
+  "home.shelf.cat.pharmacy": {
+    "message": "మందులు",
+    "review": "reviewed",
+    "enHash": "2f6c536b"
+  },
+  "home.shelf.cat.electronics": {
+    "message": "ఎలక్ట్రానిక్స్",
+    "review": "reviewed",
+    "enHash": "89f1ebf5"
+  },
+  "home.shelf.stock": {
+    "message": "స్టాక్‌లో ఉంది · {minutes} నిమిషాల క్రితం నిర్ధారించారు",
+    "review": "reviewed",
+    "enHash": "fa8811bd"
+  },
+  "home.shelf.walk": {
+    "message": "{distance} · {minutes} నిమిషాల నడక",
+    "review": "reviewed",
+    "enHash": "23b64712"
+  },
+  "home.shelf.find": {
+    "message": "వెతకండి",
+    "review": "reviewed",
+    "enHash": "65080933"
+  },
+  "home.shelf.find_label": {
+    "message": "మీ దగ్గర {item} వెతకండి",
+    "review": "reviewed",
+    "enHash": "38b02c29"
+  },
+  "home.save.eyebrow": {
+    "message": "మీ పొదుపు",
+    "review": "reviewed",
+    "enHash": "09f03557"
+  },
+  "home.save.title": {
+    "message": "ఒక {em} విలువ ఎంతో చూడండి",
+    "review": "reviewed",
+    "enHash": "9d38b897"
+  },
+  "home.save.title_em": {
+    "message": "నడక",
+    "review": "reviewed",
+    "enHash": "df06b147"
+  },
+  "home.save.sub": {
+    "message": "నెలలోని కొన్ని ఆర్డర్లను డెలివరీ నుంచి పక్క దుకాణానికి మార్చండి.",
+    "review": "reviewed",
+    "enHash": "410f68bb"
+  },
+  "home.save.orders": {
+    "message": "నెలకు ఆర్డర్లు",
+    "review": "reviewed",
+    "enHash": "e7e0d70d"
+  },
+  "home.save.fee": {
+    "message": "డెలివరీ అయిన ప్రతి ఆర్డర్‌కు మీరు చెల్లించే ఫీజు",
+    "review": "reviewed",
+    "enHash": "1b092045"
+  },
+  "home.save.basket": {
+    "message": "మీ మామూలు బాస్కెట్",
+    "review": "reviewed",
+    "enHash": "e3640cf2"
+  },
+  "home.save.cashback": {
+    "message": "దుకాణం క్యాష్ బ్యాక్",
+    "review": "reviewed",
+    "enHash": "27f9118a"
+  },
+  "home.save.walk": {
+    "message": "దుకాణానికి వెళ్లి రావడానికి నడక",
+    "review": "reviewed",
+    "enHash": "2fc9bd58"
+  },
+  "home.save.keep": {
+    "message": "ప్రతి సంవత్సరం మీకు మిగిలేది",
+    "review": "reviewed",
+    "enHash": "102629ba"
+  },
+  "home.save.fees": {
+    "message": "తప్పిన ఫీజులు",
+    "review": "reviewed",
+    "enHash": "e948a0e4"
+  },
+  "home.save.credits": {
+    "message": "క్యాష్ బ్యాక్, క్రెడిట్‌లలో",
+    "review": "reviewed",
+    "enHash": "51ff9a15"
+  },
+  "home.save.km": {
+    "message": "నడిచిన దూరం",
+    "review": "reviewed",
+    "enHash": "3aba6f93"
+  },
+  "home.save.hours": {
+    "message": "నడకకు గడిపిన సమయం",
+    "review": "reviewed",
+    "enHash": "88b31039"
+  },
+  "home.save.cta": {
+    "message": "TodayZ యాప్ తెరవండి",
+    "review": "reviewed",
+    "enHash": "785b7c7d"
+  },
+  "home.save.note": {
+    "message": "ఉదాహరణ కోసం మాత్రమే. ప్రతి దుకాణం తన క్యాష్ బ్యాక్‌ను తానే నిర్ణయిస్తుంది, 0 నుంచి 20% వరకు, చాలా దుకాణాలు ఏమీ ఇవ్వవు. నడక సమయం గంటకు సుమారు 5 km వేగంతో లెక్కించినది.",
+    "review": "reviewed",
+    "enHash": "b0158fc9"
+  },
+  "home.owners.eyebrow": {
+    "message": "దుకాణదారుల కోసం",
+    "review": "reviewed",
+    "enHash": "fa54f1ea"
+  },
+  "home.owners.title": {
+    "message": "మీ షెల్ఫ్‌లో {em}",
+    "review": "reviewed",
+    "enHash": "1958bd36"
+  },
+  "home.owners.title_em": {
+    "message": "జనం వెతుకుతున్నదే ఉంది.",
+    "review": "reviewed",
+    "enHash": "317f3f2e"
+  },
+  "home.owners.body": {
+    "message": "దగ్గరి వినియోగదారులకు మీ దుకాణం కనిపించనివ్వండి, TodayZ కు తీసుకొచ్చే ప్రతి కస్టమర్‌కు 30 క్రెడిట్‌లు సంపాదించండి, అయిపోకముందే ఏం తెప్పించాలో తెలుసుకోండి.",
+    "review": "reviewed",
+    "enHash": "bd883c32"
+  },
+  "home.owners.cta": {
+    "message": "మీ దుకాణాన్ని చేర్చండి",
+    "review": "reviewed",
+    "enHash": "b94ec5f9"
+  },
+  "home.owners.1.title": {
+    "message": "దగ్గరలో కనిపించండి",
+    "review": "reviewed",
+    "enHash": "f5672a1d"
+  },
+  "home.owners.1.body": {
+    "message": "తమ వెతుకులాట పరిధిలో ఉన్నవారు వెతికినప్పుడు మీ స్టాక్ చూస్తారు.",
+    "review": "reviewed",
+    "enHash": "cc6b20f6"
+  },
+  "home.owners.2.title": {
+    "message": "ప్రతి కస్టమర్‌కు 30 క్రెడిట్‌లు",
+    "review": "reviewed",
+    "enHash": "2c192c45"
+  },
+  "home.owners.2.body": {
+    "message": "మీరు తీసుకొచ్చిన వ్యక్తి ₹100 లేదా అంతకంటే ఎక్కువ మొదటి ఆర్డర్ పూర్తి చేసినప్పుడు. 1 క్రెడిట్ = ₹1, ప్రతి నెలా చెల్లింపు.",
+    "review": "reviewed",
+    "enHash": "a8144148"
+  },
+  "home.owners.3.title": {
+    "message": "ఎక్కువ అమ్మండి, తక్కువ వృథా చేయండి",
+    "review": "reviewed",
+    "enHash": "104616d1"
+  },
+  "home.owners.3.body": {
+    "message": "ఏం తెప్పించాలో, ఏ వాటిపై ఆఫర్ పెట్టాలో రోజువారీ సూచనలు.",
+    "review": "reviewed",
+    "enHash": "d1ab7cc3"
+  },
+  "home.credits.title": {
+    "message": "ఫోటో క్రెడిట్‌లు",
+    "review": "reviewed",
+    "enHash": "f9ce2574"
+  },
+  "home.credits.licence": {
+    "message": "ఫోటోలు CC BY 2.0 లైసెన్స్ కింద ఉపయోగించాం. శీర్షిక, రచయిత, మూలం:",
+    "review": "reviewed",
+    "enHash": "a643642b"
+  },
+  "home.save.km_value": {
+    "message": "{km} కి.మీ",
+    "review": "reviewed",
+    "enHash": "5d1ec3cd"
+  },
+  "home.save.hours_value": {
+    "message": "{hours} గంటలు",
+    "review": "reviewed",
+    "enHash": "83996d17"
+  },
+  "home.lede.photo": {
+    "message": "సరుకులతో నిండిన అరలున్న చిన్న జనరల్ స్టోర్ కౌంటర్ వద్ద దుకాణదారు.",
+    "review": "reviewed",
+    "enHash": "380ce24b"
   }
 }

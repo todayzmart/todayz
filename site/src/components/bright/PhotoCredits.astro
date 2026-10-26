@@ -1,0 +1,30 @@
+---
+// Credits for the CC BY 2.0 photos (title, author, source, licence). Plain text: the site links to no
+// remote host (verify-dist), and the source paths are on flickr.com.
+import type { Translate } from '../../i18n/index.ts';
+import { PHOTO_CREDITS } from './data.ts';
+
+interface Props {
+  t: Translate;
+}
+
+const { t } = Astro.props;
+---
+
+<section class="b-credits" aria-labelledby="credits-title">
+  <div class="b-w">
+    <details>
+      <summary id="credits-title">{t('home.credits.title')}</summary>
+      <p>{t('home.credits.licence')}</p>
+      <ul>
+        {
+          PHOTO_CREDITS.map((c) => (
+            <li lang="en">
+              “{c.title}”, {c.creator}, {c.source}
+            </li>
+          ))
+        }
+      </ul>
+    </details>
+  </div>
+</section>

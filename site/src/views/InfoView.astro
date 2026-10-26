@@ -1,5 +1,6 @@
 ---
-// S-03 How it works, Pricing, About and Contact (English only).
+// S-03 How it works, Pricing, About and Contact (English only), under the bright page head (D-262).
+import PageHead from '../components/bright/PageHead.astro';
 import Icon from '../components/Icon.astro';
 import LeadForm from '../components/LeadForm.astro';
 import Section from '../components/Section.astro';
@@ -9,6 +10,7 @@ import { createT, type Locale, type MessageKey } from '../i18n/index.ts';
 import { company, links } from '../lib/company.ts';
 import { softwareApplicationJsonLd } from '../lib/jsonld.ts';
 import { pageById, pagePath, type PageDef } from '../lib/pages.ts';
+import '../styles/bright.css';
 
 interface Props {
   page: PageDef;
@@ -30,11 +32,8 @@ const jsonLd = kind === 'pricing' ? [softwareApplicationJsonLd(locale, t('info.p
 ---
 
 <Base page={page} locale={locale} jsonLd={jsonLd}>
-  <div class="tz-hero-wash head">
-    <div class="inner">
-      <h1>{t(key(`${ns}.title`))}</h1>
-      {kind !== 'about' && <p class="lead">{t(key(`${ns}.intro`))}</p>}
-    </div>
+  <div class="bp">
+    <PageHead title={t(key(`${ns}.title`))} body={kind !== 'about' ? t(key(`${ns}.intro`)) : undefined} />
   </div>
 
   {
@@ -90,33 +89,6 @@ const jsonLd = kind === 'pricing' ? [softwareApplicationJsonLd(locale, t('info.p
 </Base>
 
 <style>
-  .head {
-    padding-block: var(--space-10) var(--space-8);
-  }
-
-  .inner {
-    display: grid;
-    gap: var(--space-3);
-    max-width: 1120px;
-    margin: 0 auto;
-    padding-inline: var(--space-4);
-  }
-
-  h1 {
-    margin: 0;
-    font: var(--type-display-xl);
-    font-weight: 800;
-    letter-spacing: var(--type-display-xl-tracking);
-    color: var(--ink);
-  }
-
-  .lead {
-    margin: 0;
-    max-width: 60ch;
-    font: var(--type-body-lg);
-    color: var(--ink-2);
-  }
-
   .points {
     display: grid;
     gap: var(--space-4);

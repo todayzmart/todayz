@@ -1,0 +1,42 @@
+---
+// Bright hero (D-262): a photo of a neighbourhood shop under a dark scrim (Unsplash licence,
+// assets/landing/CREDITS.md; an 800px copy for phones), the badge, the big two-part title and the lead. The page passes its own
+// actions and stats in the default slot.
+import type { ImageMetadata } from 'astro';
+import { splitEm } from '../home/data.ts';
+
+interface Props {
+  photo: ImageMetadata;
+  /** The same photo 800px wide, so a phone does not download the full one. */
+  small: ImageMetadata;
+  alt: string;
+  badge: string;
+  /** Title formatted with the EM argument (home/data.ts), and the emphasised part. */
+  title: string;
+  titleEm: string;
+  body: string;
+}
+
+const { photo, small, alt, badge, title, titleEm, body } = Astro.props;
+const [before, after] = splitEm(title);
+---
+
+<section class="b-hero">
+  <img
+    class="b-hero-photo"
+    src={photo.src}
+    srcset={`${small.src} ${small.width}w, ${photo.src} ${photo.width}w`}
+    sizes="100vw"
+    width={photo.width}
+    height={photo.height}
+    alt={alt}
+    fetchpriority="high"
+    decoding="async"
+  />
+  <div class="b-w b-hero-in">
+    <p class="b-badge"><i class="b-dot" aria-hidden="true"></i>{badge}</p>
+    <h1>{before}<span class="b-acc">{titleEm}</span>{after}</h1>
+    <p class="b-lead">{body}</p>
+    <slot />
+  </div>
+</section>

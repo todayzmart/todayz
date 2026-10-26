@@ -1,25 +1,29 @@
 ---
-// S-01 Home, in any language: the landing page (components/home, styles/landing.css).
-import Bento from '../components/home/Bento.astro';
+// S-01 Home, in any language: the bright landing (D-262, components/bright, styles/bright.css), ported
+// from design/trials/site-home-bright. The FAQ and the lead form (#join) keep the landing styles (.lp).
+import Cost from '../components/bright/Cost.astro';
+import Hero from '../components/bright/Hero.astro';
+import Journey from '../components/bright/Journey.astro';
+import Orbit from '../components/bright/Orbit.astro';
+import Owners from '../components/bright/Owners.astro';
+import PhotoCredits from '../components/bright/PhotoCredits.astro';
+import Savings from '../components/bright/Savings.astro';
+import SearchStrip from '../components/bright/SearchStrip.astro';
+import Shelf from '../components/bright/Shelf.astro';
+import Week from '../components/bright/Week.astro';
+import Icon from '../components/Icon.astro';
 import Cta from '../components/home/Cta.astro';
-import DemandInsights from '../components/home/DemandInsights.astro';
 import FaqSection from '../components/home/FaqSection.astro';
-import HeroScene from '../components/home/HeroScene.astro';
-import IdeaBand from '../components/home/IdeaBand.astro';
-import Marquee from '../components/home/Marquee.astro';
-import Problems from '../components/home/Problems.astro';
-import Shoppers from '../components/home/Shoppers.astro';
-import ShopTypes from '../components/home/ShopTypes.astro';
-import Showcase from '../components/home/Showcase.astro';
-import Testimonials from '../components/home/Testimonials.astro';
-import ThreeSteps from '../components/home/ThreeSteps.astro';
 import { EM } from '../components/home/data.ts';
 import { createT, type Locale, type MessageKey } from '../i18n/index.ts';
 import { company, links } from '../lib/company.ts';
 import { faqJsonLd, organizationJsonLd, websiteJsonLd } from '../lib/jsonld.ts';
 import { pageById } from '../lib/pages.ts';
 import Base from '../layouts/Base.astro';
+import kirana from '../assets/landing/hero-kirana.webp';
+import kiranaSmall from '../assets/landing/hero-kirana-800.webp';
 import '../styles/landing.css';
+import '../styles/bright.css';
 
 interface Props {
   locale: Locale;
@@ -29,30 +33,55 @@ const { locale } = Astro.props;
 const page = pageById('home');
 const t = createT(locale);
 const faq = [1, 2, 3, 4].map((i) => ({ q: t(`home.faq.${i}.q` as MessageKey), a: t(`home.faq.${i}.a` as MessageKey) }));
+const stats = [1, 2, 3].map((i) => ({ value: t(`home.lede.stat.${i}.value` as MessageKey), label: t(`home.lede.stat.${i}.label` as MessageKey) }));
 ---
 
 <Base page={page} locale={locale} jsonLd={[organizationJsonLd(company), websiteJsonLd(locale), faqJsonLd(faq)]}>
+  <div class="bp">
+    <Hero
+      photo={kirana}
+      small={kiranaSmall}
+      alt={t('home.lede.photo')}
+      badge={t('home.lede.badge')}
+      title={t('home.lede.title', EM)}
+      titleEm={t('home.lede.title_em')}
+      body={t('home.lede.body')}
+    >
+      <a class="b-trig" href={`${links.customerApp}/search`} aria-label={t('home.lede.search_label')}>
+        <span class="i"><Icon name="search" size={20} /></span>
+        <span class="t">{t('home.lede.search_placeholder')}</span>
+        <span class="go">{t('home.lede.search_go')}</span>
+      </a>
+      <ul class="b-stats">
+        {
+          stats.map((s) => (
+            <li>
+              <b>{s.value}</b>
+              <span>{s.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="b-hero-note">{t('home.hero.note')}</p>
+    </Hero>
+    <SearchStrip t={t} appUrl={links.customerApp} />
+    <Cost t={t} />
+    <Journey t={t} />
+    <Week t={t} />
+    <Orbit t={t} />
+    <Shelf t={t} appUrl={links.customerApp} />
+    <Savings t={t} appUrl={links.customerApp} />
+    <Owners t={t} href="#join" />
+  </div>
   <div class="lp">
-    <HeroScene
-      t={t}
-      kicker={t('home.hero.kicker')}
-      title={t('home.hero.title', EM)}
-      titleEm={t('home.hero.title_em')}
-      body={t('home.hero.body')}
-      primaryHref="#join"
-      secondaryHref="#how"
-    />
-    <Marquee t={t} />
-    <Problems t={t} />
-    <IdeaBand t={t} />
-    <Bento t={t} />
-    <Showcase t={t} />
-    <DemandInsights t={t} />
-    <Shoppers t={t} appUrl={links.customerApp} />
-    <ThreeSteps t={t} />
-    <ShopTypes t={t} />
-    <Testimonials t={t} />
     <FaqSection t={t} title={t('home.faq.title')} items={faq} />
     <Cta t={t} locale={locale} source="home" />
   </div>
+  <div class="bp">
+    <PhotoCredits t={t} />
+  </div>
 </Base>
+
+<script>
+  import '../components/bright/bright.ts';
+</script>
