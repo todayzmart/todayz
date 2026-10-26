@@ -99,6 +99,23 @@ Test: `business` `TestConfirmByBackfillDB` runs the Up SQL against real rows: fi
 1. **"Reaches" is read as "goes above".** An adjustment that brings the day's total to exactly ₹500 still posts at once. This keeps D-73's "at or under posts immediately". If you meant `>=`, the change is one character in `needsSecond`, plus the test edges.
 2. **The approver's own day.** Approving someone else's request does not add to the approver's day total. Only the requester's total counts it.
 3. **The window in 49802 is a code constant.** The task said to read it from the setting the code uses, but the code uses a constant: `pendingLife` = `uploadTTL` (15 min) + 5 min. No `platform_settings` key exists for it, so 49802 writes 20 minutes and says why. For these rows it makes no difference, since all of them are long past it.
-4. **A small flag race.** If the reward job and the risk scan check the same referral at the same instant, both could insert a `referral.self_like` flag, because `InsertFlagOnce` is not backed by a unique index. The effect is a duplicate flag only: the reward is still held. A unique partial index would close it.
+4. **A small flag race.** Fixed after review (see below).
 5. **No alert rule yet.** `tz_field_photo_sweep_failed_total` is exposed, but I did not add a Grafana rule: `check-runbooks` (D-236) needs a runbook for each rule, and alerting is outside this task. A follow-up could add `tz-field-photo-sweep-failed` with a runbook.
 6. **DB outage during the work.** Colima's disk threw I/O errors, and `todayz-testpg` was down for a while. It was back up when the tests ran; I did not restart Colima.
+
+## After the lead's review of fcfaeb20
+
+1. **Confirm against the lock-free sweep (MEDIUM).** `MarkDocumentUploaded` now also requires `confirm_by IS NULL OR confirm_by >= now`. A confirm that read the row before `confirm_by`, and whose bucket HEAD ran while the sweep claimed the row, now answers 409 `invalid_transition` ("the upload URL has expired"). The photo stays pending, nothing is audited, and the sweep rejects it. Test: `cmd/todayz` `TestFieldPhotoConfirmRacesSweepHTTP` claims the row during the HEAD; the fake bucket gained an `onHead` hook.
+2. **Duplicate self_like flags (LOW).** `heldSelfLike` now takes the referral's row lock (`LockReferral`) around the check and the insert. `risk.Service.raise` takes the same row lock before it inserts a `referral.self_like` flag, so risk_scan and the reward pass are serialised on the referral.
+   - Lock order: the scan takes findings in referral id order, as a reversal does.
+   - The reward pass holds no ledger lock in that transaction, which commits before any side posts.
+3. **Real wiring (LOW).** Test: `jobs` `TestReferralSelfLikeHeldThroughRiskDB` runs `ReferralsService`, then risk's `CheckReferralSelfLike`, then `SelfLikeHeld`, with no fake. A shop's own cashier claims the shop's code and buys there:
+   - the job raises one flag and posts nothing;
+   - the sweep skips the referral;
+   - after the flag is cleared, both sides post and no second flag is raised.
+4. **NIT.** The stale `rePhone` comment in `admin/admin.go` is removed.
+
+Checks:
+- `make gen`, `go build ./...`, `go vet`;
+- `go test -p 2` (testpg) on business, risk, referrals, jobs, admin and credits, plus `cmd/todayz -run 'TestField|TestSupport'`;
+- golangci-lint on the touched packages: 0 issues.

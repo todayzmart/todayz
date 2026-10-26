@@ -214,10 +214,22 @@ func failCause(err error) string {
 }
 
 // raise inserts each finding unless its subject already has one (InsertFlagOnce).
+// A referral.self_like finding first locks its referral row, as the reward
+// pass does around the same check (D-237): risk_scan and the reward pass then
+// never both insert a flag for one referral. Findings come in referral id
+// order, the order a reversal locks referrals in.
 func (s *Service) raise(ctx context.Context, fs []Finding, now time.Time) (int64, error) {
 	var n int64
 	q := s.q(ctx)
 	for _, f := range fs {
+		if f.Rule == RuleSelfLike && f.SubjectType == "referral" {
+			if _, err := q.LockReferral(ctx, ids.UUID(f.SubjectID)); err != nil {
+				if db.IsNoRows(err) {
+					continue
+				}
+				return n, err
+			}
+		}
 		var day *string
 		if f.Day != "" {
 			day = &f.Day

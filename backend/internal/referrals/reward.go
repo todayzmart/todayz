@@ -392,11 +392,16 @@ func (s *Service) PostRewards(ctx context.Context, referralID ids.ID) (RewardRes
 // the backstop). A held referral posts nothing and the sweep skips it until
 // a person clears the flag; a cleared flag is never raised again, so the next
 // pass posts. A referral no longer qualified is left to postSide.
+//
+// The check and the flag insert run under the referral's row lock, which
+// risk_scan takes before it inserts the same flag, so the two never raise two
+// flags for one referral (clearing one would leave the reward held). No
+// ledger lock is held here: this transaction commits before any side posts.
 func (s *Service) heldSelfLike(ctx context.Context, id pgtype.UUID) (bool, error) {
 	held := false
 	err := s.db.InTx(ctx, func(ctx context.Context) error {
 		q := s.q(ctx)
-		row, err := q.GetReferral(ctx, id)
+		row, err := q.LockReferral(ctx, id)
 		if db.IsNoRows(err) {
 			return nil
 		}

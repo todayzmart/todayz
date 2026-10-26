@@ -198,8 +198,6 @@ func cleanReason(r string) (string, error) {
 	return r, noPhone("body.reason", r)
 }
 
-// rePhone is an Indian mobile number once every non-digit is gone: 6-9 then
-// nine more digits anywhere in the run.
 // noPhone refuses free text an admin typed (a reason or a note) that holds a
 // phone number: it is stored in the audit log and shown to other roles, and
 // writers never put a phone there (the subject already names the person).
