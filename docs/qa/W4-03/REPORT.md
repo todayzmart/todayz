@@ -74,7 +74,7 @@ Run with `TODAYZ_TEST_PG_URL_FILE=… go test -p 2 -count=1 -run TestAbuse ./cmd
 - the OTP resend gap (429 with Retry-After);
 - the OTP lock after five wrong codes.
 
-Written but not yet run, because the stack was busy with E2E.
+The lead ran it on 26 Oct with `make dev` up from a fresh `make reset`: **10 of 10 pass**.
 
 ## Static scans
 
@@ -86,9 +86,26 @@ Written but not yet run, because the stack was busy with E2E.
 | Trivy fs | exit 0, all targets clean |
 | gitleaks, full history (via stdin, because the worktree guard refuses `gitleaks git`) | 20 hits, all go.sum hashes (false positives); no real secret. The lead reruns `security-gitleaks` from the main checkout |
 
+## ZAP (lead, 26 Oct)
+
+Image `zaproxy/zap-stable:20261008` (pinned digest in `scripts/ci/versions.env`), run against the local stack through Caddy.
+
+| Scan | Result |
+|---|---|
+| Baseline, all four apps and the API (`scan.sh zap`) | no FAIL |
+| Full scan (spider and active, 3 min), customer app | 0 FAIL, 8 WARN, 135 PASS |
+| API scan from the OpenAPI bundle (active) | did not finish: ZAP died during the active scan, twice, even with `-Xmx3g` (2617 URLs). Not a finding. The API is covered by Schemathesis full fuzzing in `make e2e`, the Go abuse tests and the stack abuse suite |
+
+The 8 warnings are all about the local Vite dev server and Caddy, not the deployed build:
+- Missing headers: anti-clickjacking, nosniff, HSTS, Permissions-Policy and CSP. Production sets all but CSP in `_headers` from `scripts/deploy/pages.sh`. `curl -I https://app.todayz.in/` confirms X-Frame-Options DENY, nosniff, HSTS, Permissions-Policy and Referrer-Policy. CSP is F1.
+- CORS `*` and missing Cross-Origin-Resource-Policy: these are static, public, uncredentialed assets. Pages sends `*` too. The API's CORS allow-list is checked by the abuse suite.
+- Proxy disclosure: this is local Caddy.
+
+The deeper scans of business, admin and the site were not run, for time. Their baselines are clean, and they share the same headers.
+
 ## Remaining
 
-1. ZAP full scan of all apps, plus `scripts/ci/scan.sh abuse`, with `make dev` up (after E2E frees the stack).
+1. ZAP: a full scan of business, admin and the site, and an API active scan on a bigger machine or in CI.
 2. Lead: F1 (CSP, report-only first), F4, F8 (product), D1 after 29 Oct.
 3. Referrals owner: F3, F7. POS owner: F6.
 4. W5: F5, TLS config, RDS TLS, subdomain takeover.
