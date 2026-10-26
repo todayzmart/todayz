@@ -265,6 +265,9 @@ func TestFieldOnboardingHTTP(t *testing.T) {
 	require.Equal(t, true, r.body["ownerConfirmed"])
 	require.Equal(t, 1, f.count(`SELECT count(*) FROM staff s JOIN phone_identities p ON p.user_id = s.user_id
 	  WHERE s.business_id = $1 AND s.role = 'owner' AND s.status = 'active'`, uuidOf(t, bid)))
+	// D-241: the confirm also sends the agent's complete store for review.
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM stores WHERE id = $1 AND status = 'pending_review'`, uuidOf(t, sid)))
+	require.Equal(t, 1, f.count(`SELECT count(*) FROM audit_log WHERE action = 'store.submit' AND subject_type = 'store' AND subject_id = $1`, sid))
 	r = f.call(tok, http.MethodPost, B+"/owner-confirm/verify", map[string]any{"code": "000000"}, nil)
 	require.Equal(t, http.StatusConflict, r.code, r.raw, "submitted: no second confirm")
 	r = f.call(tok, http.MethodPatch, B, map[string]any{"ownerPhone": shop2OwnerPhone}, nil)

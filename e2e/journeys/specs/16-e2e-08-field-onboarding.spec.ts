@@ -86,10 +86,11 @@ test('E2E-08 field agent onboards a shop → owner confirms → admin verifies �
   // The owner signs in only after the confirm: a sign-in code to the number inside the resend gap
   // would make the agent's owner-confirm send 429 (01 §2 counts codes per number).
   const owner = await who('newOwner');
-  await test.step('the owner sends the new store for review', async () => {
-    // Only an owner or manager moves a store from draft to pending_review (submitStore); a field
-    // agent has no submit.
-    await owner.api.ok('owner submits the store', 'POST', `/v1/biz/businesses/${bid}/stores/${sid}/submit`, {});
+  await test.step('the confirm sent the new store for review', async () => {
+    // D-241: the owner's code submits the business and its complete draft stores, so the owner
+    // need not open the app to submit.
+    const store = await owner.api.ok<{ status: string }>('owner reads the store', 'GET', `/v1/biz/businesses/${bid}/stores/${sid}`);
+    expect(store.status).toBe('pending_review');
   });
 
   await test.step('an admin verifies the business; the store goes live', async () => {
