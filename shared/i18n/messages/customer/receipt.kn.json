@@ -1,0 +1,82 @@
+{
+  "receipt.title": {
+    "message": "ರಸೀದಿ",
+    "review": "machine",
+    "enHash": "f6ce3b6f"
+  },
+  "receipt.items": {
+    "message": "ವಸ್ತುಗಳು",
+    "review": "machine",
+    "enHash": "44d25b5d"
+  },
+  "receipt.qty": {
+    "message": "{count} × {price}",
+    "review": "machine",
+    "enHash": "790f5a82"
+  },
+  "receipt.lineDiscount": {
+    "message": "{amount} ರಿಯಾಯಿತಿ",
+    "review": "machine",
+    "enHash": "d13b0949"
+  },
+  "receipt.subtotal": {
+    "message": "ವಸ್ತುಗಳು",
+    "review": "machine",
+    "enHash": "44d25b5d"
+  },
+  "receipt.discount": {
+    "message": "ರಿಯಾಯಿತಿ",
+    "review": "machine",
+    "enHash": "b524936d"
+  },
+  "receipt.credits": {
+    "message": "ಕ್ರೆಡಿಟ್",
+    "review": "machine",
+    "enHash": "bfac50d6"
+  },
+  "receipt.roundOff": {
+    "message": "ರೌಂಡ್ ಆಫ್",
+    "review": "machine",
+    "enHash": "3aa7ebde"
+  },
+  "receipt.total": {
+    "message": "ಒಟ್ಟು",
+    "review": "machine",
+    "enHash": "b25928c6"
+  },
+  "receipt.paidBy": {
+    "message": "{method, select, cash {ನಗದು ಮೂಲಕ ಪಾವತಿ} upi {UPI ಮೂಲಕ ಪಾವತಿ} card {ಕಾರ್ಡ್ ಮೂಲಕ ಪಾವತಿ} other {ಪಾವತಿಸಲಾಗಿದೆ}}",
+    "review": "machine",
+    "enHash": "482746d6"
+  },
+  "receipt.reversed": {
+    "message": "ಅಂಗಡಿಯವರು ಈ ಮಾರಾಟವನ್ನು ರದ್ದುಪಡಿಸಿದ್ದಾರೆ.",
+    "review": "machine",
+    "enHash": "edf15251"
+  },
+  "receipt.expired": {
+    "message": "ಈ ರಸೀದಿ ಲಿಂಕ್ ಅವಧಿ ಮುಗಿದಿದೆ",
+    "review": "machine",
+    "enHash": "ac5c9049"
+  },
+  "receipt.expired.body": {
+    "message": "ರಸೀದಿ ಲಿಂಕ್‌ಗಳು 30 ದಿನ ಕೆಲಸ ಮಾಡುತ್ತವೆ.",
+    "review": "machine",
+    "enHash": "0a7a6a9a"
+  },
+  "receipt.error": {
+    "message": "ಈ ರಸೀದಿ ತೆರೆಯಲು ಆಗಲಿಲ್ಲ",
+    "review": "machine",
+    "enHash": "666547ba"
+  },
+  "receipt.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "machine",
+    "enHash": "042c862e"
+  },
+  "receipt.home": {
+    "message": "ಮುಖಪುಟಕ್ಕೆ ಹೋಗಿ",
+    "review": "machine",
+    "enHash": "f36ae945"
+  }
+}

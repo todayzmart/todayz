@@ -1,0 +1,82 @@
+{
+  "receipt.title": {
+    "message": "रसीद",
+    "review": "machine",
+    "enHash": "f6ce3b6f"
+  },
+  "receipt.items": {
+    "message": "सामान",
+    "review": "machine",
+    "enHash": "44d25b5d"
+  },
+  "receipt.qty": {
+    "message": "{count} × {price}",
+    "review": "machine",
+    "enHash": "790f5a82"
+  },
+  "receipt.lineDiscount": {
+    "message": "{amount} की छूट",
+    "review": "machine",
+    "enHash": "d13b0949"
+  },
+  "receipt.subtotal": {
+    "message": "सामान",
+    "review": "machine",
+    "enHash": "44d25b5d"
+  },
+  "receipt.discount": {
+    "message": "छूट",
+    "review": "machine",
+    "enHash": "b524936d"
+  },
+  "receipt.credits": {
+    "message": "क्रेडिट",
+    "review": "machine",
+    "enHash": "bfac50d6"
+  },
+  "receipt.roundOff": {
+    "message": "राउंड ऑफ",
+    "review": "machine",
+    "enHash": "3aa7ebde"
+  },
+  "receipt.total": {
+    "message": "कुल",
+    "review": "machine",
+    "enHash": "b25928c6"
+  },
+  "receipt.paidBy": {
+    "message": "{method, select, cash {नकद में भुगतान} upi {UPI से भुगतान} card {कार्ड से भुगतान} other {भुगतान हो गया}}",
+    "review": "machine",
+    "enHash": "482746d6"
+  },
+  "receipt.reversed": {
+    "message": "दुकान ने यह बिक्री रद्द कर दी।",
+    "review": "machine",
+    "enHash": "edf15251"
+  },
+  "receipt.expired": {
+    "message": "इस रसीद लिंक का समय खत्म हो गया",
+    "review": "machine",
+    "enHash": "ac5c9049"
+  },
+  "receipt.expired.body": {
+    "message": "रसीद लिंक 30 दिन तक चलते हैं।",
+    "review": "machine",
+    "enHash": "0a7a6a9a"
+  },
+  "receipt.error": {
+    "message": "हम यह रसीद नहीं खोल पाए",
+    "review": "machine",
+    "enHash": "666547ba"
+  },
+  "receipt.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "machine",
+    "enHash": "042c862e"
+  },
+  "receipt.home": {
+    "message": "होम पर जाएँ",
+    "review": "machine",
+    "enHash": "f36ae945"
+  }
+}

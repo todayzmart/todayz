@@ -1,0 +1,127 @@
+{
+  "scan.title": {
+    "message": "यह बिल जोड़ें",
+    "review": "machine",
+    "enHash": "c5594fed"
+  },
+  "scan.at": {
+    "message": "{shop} पर {amount}",
+    "review": "machine",
+    "enHash": "b96eb7e3"
+  },
+  "scan.help": {
+    "message": "रसीद रखने और क्रेडिट कमाने के लिए यह बिल अपने खाते से जोड़ें।",
+    "review": "machine",
+    "enHash": "2a7d7b89"
+  },
+  "scan.expiresIn": {
+    "message": "QR अभी {left} और चलेगा",
+    "review": "machine",
+    "enHash": "c6da7f13"
+  },
+  "scan.credits.use": {
+    "message": "क्रेडिट इस्तेमाल करें",
+    "review": "machine",
+    "enHash": "9e984f02"
+  },
+  "scan.credits.hint": {
+    "message": "इस बिल पर आप ज़्यादा से ज़्यादा {max, plural, one {# क्रेडिट} other {# क्रेडिट}} इस्तेमाल कर सकते हैं। हर क्रेडिट ₹1 का है।",
+    "review": "machine",
+    "enHash": "eac4480f"
+  },
+  "scan.credits.amount": {
+    "message": "कितने क्रेडिट इस्तेमाल करें",
+    "review": "machine",
+    "enHash": "24c50026"
+  },
+  "scan.credits.valueText": {
+    "message": "{count, plural, one {# क्रेडिट} other {# क्रेडिट}}, {off} की छूट",
+    "review": "machine",
+    "enHash": "745e39cc"
+  },
+  "scan.credits.using": {
+    "message": "{count, plural, one {# क्रेडिट} other {# क्रेडिट}} से {off} की छूट।",
+    "review": "machine",
+    "enHash": "16670b1a"
+  },
+  "scan.credits.blocked.store_credit_cap": {
+    "message": "आज इस दुकान पर क्रेडिट इस्तेमाल नहीं हो सकते।",
+    "review": "machine",
+    "enHash": "3a7d2b32"
+  },
+  "scan.credits.blocked.credit_monthly_cap": {
+    "message": "आपने इस महीने की क्रेडिट लिमिट इस्तेमाल कर ली है।",
+    "review": "machine",
+    "enHash": "c1461e19"
+  },
+  "scan.credits.blocked.below_credit_minimum": {
+    "message": "यह बिल क्रेडिट इस्तेमाल करने के लिए दुकान की न्यूनतम राशि से कम है।",
+    "review": "machine",
+    "enHash": "bb50276d"
+  },
+  "scan.confirm": {
+    "message": "पक्का करें",
+    "review": "machine",
+    "enHash": "04a21221"
+  },
+  "scan.confirming": {
+    "message": "जोड़ रहे हैं",
+    "review": "machine",
+    "enHash": "a5f54e0f"
+  },
+  "scan.done.title": {
+    "message": "बिल जुड़ गया",
+    "review": "machine",
+    "enHash": "1b1670c0"
+  },
+  "scan.done.pay": {
+    "message": "काउंटर पर {amount} दें।",
+    "review": "machine",
+    "enHash": "22241ca7"
+  },
+  "scan.done.credits": {
+    "message": "{count, plural, one {# क्रेडिट} other {# क्रेडिट}} इस्तेमाल हुए।",
+    "review": "machine",
+    "enHash": "4e646924"
+  },
+  "scan.done.orders": {
+    "message": "मेरी खरीदारी देखें",
+    "review": "machine",
+    "enHash": "a254b220"
+  },
+  "scan.expired": {
+    "message": "इस QR का समय खत्म हो गया",
+    "review": "machine",
+    "enHash": "034626e8"
+  },
+  "scan.expired.body": {
+    "message": "दुकान से नया QR दिखाने को कहें, फिर से स्कैन करें।",
+    "review": "machine",
+    "enHash": "f9460a8a"
+  },
+  "scan.used": {
+    "message": "यह बिल पहले ही जुड़ चुका है",
+    "review": "machine",
+    "enHash": "bca8c427"
+  },
+  "scan.notFound": {
+    "message": "हम यह QR नहीं पढ़ पाए",
+    "review": "machine",
+    "enHash": "c83ae315"
+  },
+  "scan.error": {
+    "message": "हम यह बिल नहीं खोल पाए",
+    "review": "machine",
+    "enHash": "8ab3dcf2"
+  },
+  "scan.retry": {
+    "message": "फिर से कोशिश करें",
+    "review": "machine",
+    "enHash": "042c862e"
+  },
+  "scan.home": {
+    "message": "होम पर जाएँ",
+    "review": "machine",
+    "enHash": "f36ae945"
+  }
+}

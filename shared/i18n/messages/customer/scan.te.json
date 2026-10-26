@@ -1,0 +1,127 @@
+{
+  "scan.title": {
+    "message": "ఈ బిల్‌ను జోడించండి",
+    "review": "machine",
+    "enHash": "c5594fed"
+  },
+  "scan.at": {
+    "message": "{shop} లో {amount}",
+    "review": "machine",
+    "enHash": "b96eb7e3"
+  },
+  "scan.help": {
+    "message": "రసీదు ఉంచుకోవడానికి, క్రెడిట్‌లు పొందడానికి ఈ బిల్‌ను మీ ఖాతాకు జోడించండి.",
+    "review": "machine",
+    "enHash": "2a7d7b89"
+  },
+  "scan.expiresIn": {
+    "message": "QR ఇంకా {left} పని చేస్తుంది",
+    "review": "machine",
+    "enHash": "c6da7f13"
+  },
+  "scan.credits.use": {
+    "message": "క్రెడిట్‌లు వాడండి",
+    "review": "machine",
+    "enHash": "9e984f02"
+  },
+  "scan.credits.hint": {
+    "message": "ఈ బిల్‌పై మీరు గరిష్టంగా {max, plural, one {# క్రెడిట్} other {# క్రెడిట్‌లు}} వాడవచ్చు. ఒక్కో క్రెడిట్ విలువ ₹1.",
+    "review": "machine",
+    "enHash": "eac4480f"
+  },
+  "scan.credits.amount": {
+    "message": "వాడే క్రెడిట్‌లు",
+    "review": "machine",
+    "enHash": "24c50026"
+  },
+  "scan.credits.valueText": {
+    "message": "{count, plural, one {# క్రెడిట్} other {# క్రెడిట్‌లు}}, {off} తగ్గింపు",
+    "review": "machine",
+    "enHash": "745e39cc"
+  },
+  "scan.credits.using": {
+    "message": "{count, plural, one {# క్రెడిట్} other {# క్రెడిట్‌లు}} వాడి {off} తగ్గింపు.",
+    "review": "machine",
+    "enHash": "16670b1a"
+  },
+  "scan.credits.blocked.store_credit_cap": {
+    "message": "ఈరోజు ఈ దుకాణంలో క్రెడిట్‌లు వాడలేరు.",
+    "review": "machine",
+    "enHash": "3a7d2b32"
+  },
+  "scan.credits.blocked.credit_monthly_cap": {
+    "message": "ఈ నెల క్రెడిట్ పరిమితి వాడేశారు.",
+    "review": "machine",
+    "enHash": "c1461e19"
+  },
+  "scan.credits.blocked.below_credit_minimum": {
+    "message": "క్రెడిట్‌లు వాడటానికి దుకాణం కనీస మొత్తం కంటే ఈ బిల్ తక్కువగా ఉంది.",
+    "review": "machine",
+    "enHash": "bb50276d"
+  },
+  "scan.confirm": {
+    "message": "నిర్ధారించండి",
+    "review": "machine",
+    "enHash": "04a21221"
+  },
+  "scan.confirming": {
+    "message": "జోడిస్తోంది",
+    "review": "machine",
+    "enHash": "a5f54e0f"
+  },
+  "scan.done.title": {
+    "message": "బిల్ జోడించబడింది",
+    "review": "machine",
+    "enHash": "1b1670c0"
+  },
+  "scan.done.pay": {
+    "message": "కౌంటర్ వద్ద {amount} చెల్లించండి.",
+    "review": "machine",
+    "enHash": "22241ca7"
+  },
+  "scan.done.credits": {
+    "message": "{count, plural, one {# క్రెడిట్ వాడారు} other {# క్రెడిట్‌లు వాడారు}}.",
+    "review": "machine",
+    "enHash": "4e646924"
+  },
+  "scan.done.orders": {
+    "message": "నా కొనుగోళ్లు చూడండి",
+    "review": "machine",
+    "enHash": "a254b220"
+  },
+  "scan.expired": {
+    "message": "ఈ QR గడువు ముగిసింది",
+    "review": "machine",
+    "enHash": "034626e8"
+  },
+  "scan.expired.body": {
+    "message": "కొత్త QR చూపమని దుకాణాన్ని అడగండి, మళ్లీ స్కాన్ చేయండి.",
+    "review": "machine",
+    "enHash": "f9460a8a"
+  },
+  "scan.used": {
+    "message": "ఈ బిల్ ఇప్పటికే జోడించబడింది",
+    "review": "machine",
+    "enHash": "bca8c427"
+  },
+  "scan.notFound": {
+    "message": "ఈ QR చదవలేకపోయాం",
+    "review": "machine",
+    "enHash": "c83ae315"
+  },
+  "scan.error": {
+    "message": "ఈ బిల్‌ను తెరవలేకపోయాం",
+    "review": "machine",
+    "enHash": "8ab3dcf2"
+  },
+  "scan.retry": {
+    "message": "మళ్లీ ప్రయత్నించండి",
+    "review": "machine",
+    "enHash": "042c862e"
+  },
+  "scan.home": {
+    "message": "హోమ్‌కు వెళ్లండి",
+    "review": "machine",
+    "enHash": "f36ae945"
+  }
+}

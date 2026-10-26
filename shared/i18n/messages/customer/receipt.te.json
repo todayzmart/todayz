@@ -1,0 +1,82 @@
+{
+  "receipt.title": {
+    "message": "రసీదు",
+    "review": "machine",
+    "enHash": "f6ce3b6f"
+  },
+  "receipt.items": {
+    "message": "వస్తువులు",
+    "review": "machine",
+    "enHash": "44d25b5d"
+  },
+  "receipt.qty": {
+    "message": "{count} × {price}",
+    "review": "machine",
+    "enHash": "790f5a82"
+  },
+  "receipt.lineDiscount": {
+    "message": "{amount} తగ్గింపు",
+    "review": "machine",
+    "enHash": "d13b0949"
+  },
+  "receipt.subtotal": {
+    "message": "వస్తువులు",
+    "review": "machine",
+    "enHash": "44d25b5d"
+  },
+  "receipt.discount": {
+    "message": "తగ్గింపు",
+    "review": "machine",
+    "enHash": "b524936d"
+  },
+  "receipt.credits": {
+    "message": "క్రెడిట్‌లు",
+    "review": "machine",
+    "enHash": "bfac50d6"
+  },
+  "receipt.roundOff": {
+    "message": "రౌండ్ ఆఫ్",
+    "review": "machine",
+    "enHash": "3aa7ebde"
+  },
+  "receipt.total": {
+    "message": "మొత్తం",
+    "review": "machine",
+    "enHash": "b25928c6"
+  },
+  "receipt.paidBy": {
+    "message": "{method, select, cash {నగదుగా చెల్లించారు} upi {UPI ద్వారా చెల్లించారు} card {కార్డ్ ద్వారా చెల్లించారు} other {చెల్లించారు}}",
+    "review": "machine",
+    "enHash": "482746d6"
+  },
+  "receipt.reversed": {
+    "message": "ఈ అమ్మకాన్ని దుకాణం రద్దు చేసింది.",
+    "review": "machine",
+    "enHash": "edf15251"
+  },
+  "receipt.expired": {
+    "message": "ఈ రసీదు లింక్ గడువు ముగిసింది",
+    "review": "machine",
+    "enHash": "ac5c9049"
+  },
+  "receipt.expired.body": {
+    "message": "రసీదు లింక్‌లు 30 రోజులు పని చేస్తాయి.",
+    "review": "machine",
+    "enHash": "0a7a6a9a"
+  },
+  "receipt.error": {
+    "message": "ఈ రసీదును తెరవలేకపోయాం",
+    "review": "machine",
+    "enHash": "666547ba"
+  },
+  "receipt.retry": {
+    "message": "మళ్లీ ప్రయత్నించండి",
+    "review": "machine",
+    "enHash": "042c862e"
+  },
+  "receipt.home": {
+    "message": "హోమ్‌కు వెళ్లండి",
+    "review": "machine",
+    "enHash": "f36ae945"
+  }
+}

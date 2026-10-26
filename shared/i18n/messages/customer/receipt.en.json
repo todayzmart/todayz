@@ -1,0 +1,18 @@
+{
+  "receipt.title": { "defaultMessage": "Receipt", "description": "C-24 page title" },
+  "receipt.items": { "defaultMessage": "Items", "description": "C-24 accessible name of the item list" },
+  "receipt.qty": { "defaultMessage": "{count} × {price}", "description": "C-24 line quantity and unit price (pre-formatted)" },
+  "receipt.lineDiscount": { "defaultMessage": "{amount} off", "description": "C-24 a line's discount (pre-formatted)" },
+  "receipt.subtotal": { "defaultMessage": "Items", "description": "C-24 totals: item subtotal" },
+  "receipt.discount": { "defaultMessage": "Discount", "description": "C-24 totals: bill discount" },
+  "receipt.credits": { "defaultMessage": "Credits", "description": "C-24 totals: credits used" },
+  "receipt.roundOff": { "defaultMessage": "Round off", "description": "C-24 totals: round-off to the rupee" },
+  "receipt.total": { "defaultMessage": "Total", "description": "C-24 totals: grand total" },
+  "receipt.paidBy": { "defaultMessage": "{method, select, cash {Paid in cash} upi {Paid by UPI} card {Paid by card} other {Paid}}", "description": "C-24 payment method" },
+  "receipt.reversed": { "defaultMessage": "This sale was reversed by the shop.", "description": "C-24 banner on a reversed sale" },
+  "receipt.expired": { "defaultMessage": "This receipt link has expired", "description": "C-24 unknown or expired (30 days) token" },
+  "receipt.expired.body": { "defaultMessage": "Receipt links work for 30 days.", "description": "C-24 expired body" },
+  "receipt.error": { "defaultMessage": "We couldn't open this receipt", "description": "C-24 any other failure" },
+  "receipt.retry": { "defaultMessage": "Try again", "description": "C-24 retry after a failure" },
+  "receipt.home": { "defaultMessage": "Go to home", "description": "C-24 action back to C-03" }
+}

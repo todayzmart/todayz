@@ -1,0 +1,82 @@
+{
+  "receipt.title": {
+    "message": "ரசீது",
+    "review": "machine",
+    "enHash": "f6ce3b6f"
+  },
+  "receipt.items": {
+    "message": "பொருட்கள்",
+    "review": "machine",
+    "enHash": "44d25b5d"
+  },
+  "receipt.qty": {
+    "message": "{count} × {price}",
+    "review": "machine",
+    "enHash": "790f5a82"
+  },
+  "receipt.lineDiscount": {
+    "message": "{amount} தள்ளுபடி",
+    "review": "machine",
+    "enHash": "d13b0949"
+  },
+  "receipt.subtotal": {
+    "message": "பொருட்கள்",
+    "review": "machine",
+    "enHash": "44d25b5d"
+  },
+  "receipt.discount": {
+    "message": "தள்ளுபடி",
+    "review": "machine",
+    "enHash": "b524936d"
+  },
+  "receipt.credits": {
+    "message": "கிரெடிட்",
+    "review": "machine",
+    "enHash": "bfac50d6"
+  },
+  "receipt.roundOff": {
+    "message": "ரவுண்ட் ஆஃப்",
+    "review": "machine",
+    "enHash": "3aa7ebde"
+  },
+  "receipt.total": {
+    "message": "மொத்தம்",
+    "review": "machine",
+    "enHash": "b25928c6"
+  },
+  "receipt.paidBy": {
+    "message": "{method, select, cash {ரொக்கமாகச் செலுத்தப்பட்டது} upi {UPI மூலம் செலுத்தப்பட்டது} card {கார்டு மூலம் செலுத்தப்பட்டது} other {செலுத்தப்பட்டது}}",
+    "review": "machine",
+    "enHash": "482746d6"
+  },
+  "receipt.reversed": {
+    "message": "கடை இந்த விற்பனையை ரத்து செய்தது.",
+    "review": "machine",
+    "enHash": "edf15251"
+  },
+  "receipt.expired": {
+    "message": "இந்த ரசீது இணைப்பு காலாவதியானது",
+    "review": "machine",
+    "enHash": "ac5c9049"
+  },
+  "receipt.expired.body": {
+    "message": "ரசீது இணைப்புகள் 30 நாட்கள் வேலை செய்யும்.",
+    "review": "machine",
+    "enHash": "0a7a6a9a"
+  },
+  "receipt.error": {
+    "message": "இந்த ரசீதைத் திறக்க முடியவில்லை",
+    "review": "machine",
+    "enHash": "666547ba"
+  },
+  "receipt.retry": {
+    "message": "மீண்டும் முயற்சிக்கவும்",
+    "review": "machine",
+    "enHash": "042c862e"
+  },
+  "receipt.home": {
+    "message": "முகப்புக்குச் செல்",
+    "review": "machine",
+    "enHash": "f36ae945"
+  }
+}

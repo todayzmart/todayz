@@ -1,0 +1,127 @@
+{
+  "scan.title": {
+    "message": "இந்த பில்லை இணைக்கவும்",
+    "review": "machine",
+    "enHash": "c5594fed"
+  },
+  "scan.at": {
+    "message": "{shop} இல் {amount}",
+    "review": "machine",
+    "enHash": "b96eb7e3"
+  },
+  "scan.help": {
+    "message": "ரசீதை வைத்துக்கொள்ளவும் கிரெடிட் பெறவும் இந்த பில்லை உங்கள் கணக்கில் இணைக்கவும்.",
+    "review": "machine",
+    "enHash": "2a7d7b89"
+  },
+  "scan.expiresIn": {
+    "message": "QR இன்னும் {left} வேலை செய்யும்",
+    "review": "machine",
+    "enHash": "c6da7f13"
+  },
+  "scan.credits.use": {
+    "message": "கிரெடிட் பயன்படுத்து",
+    "review": "machine",
+    "enHash": "9e984f02"
+  },
+  "scan.credits.hint": {
+    "message": "இந்த பில்லில் அதிகபட்சம் {max, plural, one {# கிரெடிட்} other {# கிரெடிட்}} பயன்படுத்தலாம். ஒவ்வொரு கிரெடிட்டும் ₹1 மதிப்பு.",
+    "review": "machine",
+    "enHash": "eac4480f"
+  },
+  "scan.credits.amount": {
+    "message": "பயன்படுத்த வேண்டிய கிரெடிட்",
+    "review": "machine",
+    "enHash": "24c50026"
+  },
+  "scan.credits.valueText": {
+    "message": "{count, plural, one {# கிரெடிட்} other {# கிரெடிட்}}, {off} தள்ளுபடி",
+    "review": "machine",
+    "enHash": "745e39cc"
+  },
+  "scan.credits.using": {
+    "message": "{count, plural, one {# கிரெடிட்} other {# கிரெடிட்}} பயன்படுத்தி {off} தள்ளுபடி.",
+    "review": "machine",
+    "enHash": "16670b1a"
+  },
+  "scan.credits.blocked.store_credit_cap": {
+    "message": "இன்று இந்தக் கடையில் கிரெடிட் பயன்படுத்த முடியாது.",
+    "review": "machine",
+    "enHash": "3a7d2b32"
+  },
+  "scan.credits.blocked.credit_monthly_cap": {
+    "message": "இந்த மாதக் கிரெடிட் வரம்பைப் பயன்படுத்திவிட்டீர்கள்.",
+    "review": "machine",
+    "enHash": "c1461e19"
+  },
+  "scan.credits.blocked.below_credit_minimum": {
+    "message": "கிரெடிட் பயன்படுத்த கடையின் குறைந்தபட்சத் தொகையை விட இந்த பில் குறைவு.",
+    "review": "machine",
+    "enHash": "bb50276d"
+  },
+  "scan.confirm": {
+    "message": "உறுதிசெய்",
+    "review": "machine",
+    "enHash": "04a21221"
+  },
+  "scan.confirming": {
+    "message": "இணைக்கிறது",
+    "review": "machine",
+    "enHash": "a5f54e0f"
+  },
+  "scan.done.title": {
+    "message": "பில் இணைக்கப்பட்டது",
+    "review": "machine",
+    "enHash": "1b1670c0"
+  },
+  "scan.done.pay": {
+    "message": "கவுண்டரில் {amount} செலுத்துங்கள்.",
+    "review": "machine",
+    "enHash": "22241ca7"
+  },
+  "scan.done.credits": {
+    "message": "{count, plural, one {# கிரெடிட்} other {# கிரெடிட்}} பயன்படுத்தப்பட்டது.",
+    "review": "machine",
+    "enHash": "4e646924"
+  },
+  "scan.done.orders": {
+    "message": "என் வாங்குதல்களைப் பார்",
+    "review": "machine",
+    "enHash": "a254b220"
+  },
+  "scan.expired": {
+    "message": "இந்த QR காலாவதியானது",
+    "review": "machine",
+    "enHash": "034626e8"
+  },
+  "scan.expired.body": {
+    "message": "புதிய QR காட்டும்படி கடையிடம் கேளுங்கள், பிறகு மீண்டும் ஸ்கேன் செய்யுங்கள்.",
+    "review": "machine",
+    "enHash": "f9460a8a"
+  },
+  "scan.used": {
+    "message": "இந்த பில் ஏற்கனவே இணைக்கப்பட்டது",
+    "review": "machine",
+    "enHash": "bca8c427"
+  },
+  "scan.notFound": {
+    "message": "இந்த QR-ஐப் படிக்க முடியவில்லை",
+    "review": "machine",
+    "enHash": "c83ae315"
+  },
+  "scan.error": {
+    "message": "இந்த பில்லைத் திறக்க முடியவில்லை",
+    "review": "machine",
+    "enHash": "8ab3dcf2"
+  },
+  "scan.retry": {
+    "message": "மீண்டும் முயற்சிக்கவும்",
+    "review": "machine",
+    "enHash": "042c862e"
+  },
+  "scan.home": {
+    "message": "முகப்புக்குச் செல்",
+    "review": "machine",
+    "enHash": "f36ae945"
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "scan.title": {
+    "message": "ಈ ಬಿಲ್ ಸೇರಿಸಿ",
+    "review": "machine",
+    "enHash": "c5594fed"
+  },
+  "scan.at": {
+    "message": "{shop} ನಲ್ಲಿ {amount}",
+    "review": "machine",
+    "enHash": "b96eb7e3"
+  },
+  "scan.help": {
+    "message": "ರಸೀದಿ ಇಟ್ಟುಕೊಳ್ಳಲು ಮತ್ತು ಕ್ರೆಡಿಟ್ ಗಳಿಸಲು ಈ ಬಿಲ್ ಅನ್ನು ನಿಮ್ಮ ಖಾತೆಗೆ ಸೇರಿಸಿ.",
+    "review": "machine",
+    "enHash": "2a7d7b89"
+  },
+  "scan.expiresIn": {
+    "message": "QR ಇನ್ನೂ {left} ಕೆಲಸ ಮಾಡುತ್ತದೆ",
+    "review": "machine",
+    "enHash": "c6da7f13"
+  },
+  "scan.credits.use": {
+    "message": "ಕ್ರೆಡಿಟ್ ಬಳಸಿ",
+    "review": "machine",
+    "enHash": "9e984f02"
+  },
+  "scan.credits.hint": {
+    "message": "ಈ ಬಿಲ್‌ನಲ್ಲಿ ನೀವು ಗರಿಷ್ಠ {max, plural, one {# ಕ್ರೆಡಿಟ್} other {# ಕ್ರೆಡಿಟ್}} ಬಳಸಬಹುದು. ಪ್ರತಿ ಕ್ರೆಡಿಟ್ ₹1 ಮೌಲ್ಯದ್ದು.",
+    "review": "machine",
+    "enHash": "eac4480f"
+  },
+  "scan.credits.amount": {
+    "message": "ಬಳಸುವ ಕ್ರೆಡಿಟ್",
+    "review": "machine",
+    "enHash": "24c50026"
+  },
+  "scan.credits.valueText": {
+    "message": "{count, plural, one {# ಕ್ರೆಡಿಟ್} other {# ಕ್ರೆಡಿಟ್}}, {off} ರಿಯಾಯಿತಿ",
+    "review": "machine",
+    "enHash": "745e39cc"
+  },
+  "scan.credits.using": {
+    "message": "{count, plural, one {# ಕ್ರೆಡಿಟ್} other {# ಕ್ರೆಡಿಟ್}} ಬಳಸಿ {off} ರಿಯಾಯಿತಿ.",
+    "review": "machine",
+    "enHash": "16670b1a"
+  },
+  "scan.credits.blocked.store_credit_cap": {
+    "message": "ಇಂದು ಈ ಅಂಗಡಿಯಲ್ಲಿ ಕ್ರೆಡಿಟ್ ಬಳಸಲು ಆಗುವುದಿಲ್ಲ.",
+    "review": "machine",
+    "enHash": "3a7d2b32"
+  },
+  "scan.credits.blocked.credit_monthly_cap": {
+    "message": "ಈ ತಿಂಗಳ ಕ್ರೆಡಿಟ್ ಮಿತಿಯನ್ನು ನೀವು ಬಳಸಿದ್ದೀರಿ.",
+    "review": "machine",
+    "enHash": "c1461e19"
+  },
+  "scan.credits.blocked.below_credit_minimum": {
+    "message": "ಕ್ರೆಡಿಟ್ ಬಳಸಲು ಅಂಗಡಿಯ ಕನಿಷ್ಠ ಮೊತ್ತಕ್ಕಿಂತ ಈ ಬಿಲ್ ಕಡಿಮೆ ಇದೆ.",
+    "review": "machine",
+    "enHash": "bb50276d"
+  },
+  "scan.confirm": {
+    "message": "ಖಚಿತಪಡಿಸಿ",
+    "review": "machine",
+    "enHash": "04a21221"
+  },
+  "scan.confirming": {
+    "message": "ಸೇರಿಸಲಾಗುತ್ತಿದೆ",
+    "review": "machine",
+    "enHash": "a5f54e0f"
+  },
+  "scan.done.title": {
+    "message": "ಬಿಲ್ ಸೇರಿಸಲಾಗಿದೆ",
+    "review": "machine",
+    "enHash": "1b1670c0"
+  },
+  "scan.done.pay": {
+    "message": "ಕೌಂಟರ್‌ನಲ್ಲಿ {amount} ಪಾವತಿಸಿ.",
+    "review": "machine",
+    "enHash": "22241ca7"
+  },
+  "scan.done.credits": {
+    "message": "{count, plural, one {# ಕ್ರೆಡಿಟ್} other {# ಕ್ರೆಡಿಟ್}} ಬಳಸಲಾಗಿದೆ.",
+    "review": "machine",
+    "enHash": "4e646924"
+  },
+  "scan.done.orders": {
+    "message": "ನನ್ನ ಖರೀದಿಗಳನ್ನು ನೋಡಿ",
+    "review": "machine",
+    "enHash": "a254b220"
+  },
+  "scan.expired": {
+    "message": "ಈ QR ಅವಧಿ ಮುಗಿದಿದೆ",
+    "review": "machine",
+    "enHash": "034626e8"
+  },
+  "scan.expired.body": {
+    "message": "ಹೊಸ QR ತೋರಿಸಲು ಅಂಗಡಿಯವರಿಗೆ ಹೇಳಿ, ನಂತರ ಮತ್ತೆ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ.",
+    "review": "machine",
+    "enHash": "f9460a8a"
+  },
+  "scan.used": {
+    "message": "ಈ ಬಿಲ್ ಈಗಾಗಲೇ ಸೇರಿಸಲಾಗಿದೆ",
+    "review": "machine",
+    "enHash": "bca8c427"
+  },
+  "scan.notFound": {
+    "message": "ಈ QR ಓದಲು ಆಗಲಿಲ್ಲ",
+    "review": "machine",
+    "enHash": "c83ae315"
+  },
+  "scan.error": {
+    "message": "ಈ ಬಿಲ್ ತೆರೆಯಲು ಆಗಲಿಲ್ಲ",
+    "review": "machine",
+    "enHash": "8ab3dcf2"
+  },
+  "scan.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "machine",
+    "enHash": "042c862e"
+  },
+  "scan.home": {
+    "message": "ಮುಖಪುಟಕ್ಕೆ ಹೋಗಿ",
+    "review": "machine",
+    "enHash": "f36ae945"
+  }
+}
