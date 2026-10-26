@@ -3,7 +3,7 @@ import { asMessages } from '@todayz/i18n';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { json, problem, renderAt, type Call, type Handler } from '../test/render';
-import { holding } from '../test/held';
+import { failThenHold, holding } from '../test/held';
 import { sampleLines } from './preview';
 
 const messages = asMessages(en);
@@ -288,5 +288,50 @@ describe('B-08 loading states', () => {
     renderAt('/offers', { messages, handlers: [shops('owner'), offers([]), holding((c) => c.path === `${BASE}/banners`)] });
     fireEvent.click(await screen.findByRole('tab', { name: 'Banners' }));
     await waitFor(() => expect(listBusy()).toBe(true));
+  });
+});
+
+describe('B-08 sheet choices while their options load', () => {
+  const cats = (c: Call) => c.method === 'GET' && c.path === '/v1/discover/categories';
+  const busyIn = (el: HTMLElement) =>
+    within(el).queryAllByRole('status', { name: 'Loading' }).some((s) => s.getAttribute('aria-busy') === 'true' && s.querySelector('.tz-ui-skeleton') !== null);
+  async function offerSheet(handlers: Handler[]) {
+    renderAt('/offers', { messages, handlers: [shops('owner'), offers([]), ...handlers] });
+    fireEvent.click((await screen.findAllByRole('button', { name: 'New offer' }))[0] as HTMLElement);
+    return screen.findByRole('dialog');
+  }
+
+  it('offer sheet: the category choice is a skeleton while categories load, never an empty list', async () => {
+    const sheet = await offerSheet([holding(cats)]);
+    fireEvent.click(within(sheet).getByRole('radio', { name: 'Category' }));
+    await waitFor(() => expect(busyIn(sheet)).toBe(true));
+    expect(within(sheet).queryByRole('combobox', { name: 'Category' })).toBeNull();
+  });
+
+  it('offer sheet: a failed category list says so, and Try again shows the loading state', async () => {
+    // The categories query retries once by itself, so two failures reach the error.
+    const list = failThenHold(cats, 2);
+    const sheet = await offerSheet([list]);
+    fireEvent.click(within(sheet).getByRole('radio', { name: 'Category' }));
+    expect(await within(sheet).findByText('Check your connection and try again.', {}, { timeout: 4000 })).toBeInTheDocument();
+    fireEvent.click(within(sheet).getByRole('button', { name: 'Try again' }));
+    await waitFor(() => expect(list.calls()).toBe(3));
+    await waitFor(() => expect(busyIn(sheet) || within(sheet).queryByRole('button', { name: 'Try again' })?.getAttribute('aria-busy') === 'true').toBe(true));
+  });
+
+  it('offer sheet: the expiring batches show a skeleton while they load', async () => {
+    const sheet = await offerSheet([holding((c) => c.method === 'GET' && c.path === `${BASE}/batches`)]);
+    fireEvent.click(within(sheet).getByRole('button', { name: 'Expiring stock' }));
+    await waitFor(() => expect(busyIn(sheet)).toBe(true));
+  });
+
+  it('banner sheet: the category choice is a skeleton while categories load', async () => {
+    renderAt('/offers', { messages, handlers: [shops('owner'), offers([]), banners([]), holding(cats)] });
+    fireEvent.click(await screen.findByRole('tab', { name: 'Banners' }));
+    fireEvent.click((await screen.findAllByRole('button', { name: 'New banner' }))[0] as HTMLElement);
+    const sheet = await screen.findByRole('dialog');
+    fireEvent.click(within(sheet).getByRole('radio', { name: 'A category' }));
+    await waitFor(() => expect(busyIn(sheet)).toBe(true));
+    expect(within(sheet).queryByRole('combobox', { name: 'Category' })).toBeNull();
   });
 });

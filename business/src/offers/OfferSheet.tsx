@@ -9,6 +9,7 @@ import { dateText } from '../stock/labels';
 import { useCategories, useItems } from '../stock/queries';
 import { emptyDraft, scopeOf, validateDraft, type FieldError, type FieldKey, type OfferChoice, type OfferDraft, type PickedItem } from './form';
 import { ItemPicker } from './ItemPicker';
+import { OptionsGate } from './OptionsGate';
 import { OFFER_LIMITS } from './limits';
 import { OfferPreview } from './OfferPreview';
 import { sampleLines } from './preview';
@@ -128,25 +129,25 @@ export function OfferSheet({ store, initial, onClose }: OfferSheetProps) {
         {d.choice === 'flash' ? (
           <fieldset className={styles.group}>
             <legend className="tz-field-label">{intl.formatMessage({ id: 'offers.flash.batches' })}</legend>
-            {batches.isPending ? (
-              <p className={styles.note}>{intl.formatMessage({ id: 'offers.loading' })}</p>
-            ) : (batches.data ?? []).length === 0 ? (
-              <p className={styles.note}>{intl.formatMessage({ id: 'offers.flash.none' })}</p>
-            ) : (
-              (batches.data ?? []).map((b) => (
-                <label key={b.id} className={styles.check}>
-                  <input
-                    type="checkbox"
-                    checked={d.batchIds.includes(b.id)}
-                    onChange={(e) => set('batchIds', e.target.checked ? [...d.batchIds, b.id] : d.batchIds.filter((x) => x !== b.id))}
-                  />
-                  <span className={styles.grow}>{b.itemName}</span>
-                  <span className={styles.meta}>
-                    {intl.formatMessage({ id: 'offers.flash.batchMeta' }, { qty: b.quantity, date: b.expiresOn ? dateText(intl, b.expiresOn) : '' })}
-                  </span>
-                </label>
-              ))
-            )}
+            <OptionsGate query={batches} loadingId="app.loading" failedId="offers.error.body" height="5rem">
+              {(batches.data ?? []).length === 0 ? (
+                <p className={styles.note}>{intl.formatMessage({ id: 'offers.flash.none' })}</p>
+              ) : (
+                (batches.data ?? []).map((b) => (
+                  <label key={b.id} className={styles.check}>
+                    <input
+                      type="checkbox"
+                      checked={d.batchIds.includes(b.id)}
+                      onChange={(e) => set('batchIds', e.target.checked ? [...d.batchIds, b.id] : d.batchIds.filter((x) => x !== b.id))}
+                    />
+                    <span className={styles.grow}>{b.itemName}</span>
+                    <span className={styles.meta}>
+                      {intl.formatMessage({ id: 'offers.flash.batchMeta' }, { qty: b.quantity, date: b.expiresOn ? dateText(intl, b.expiresOn) : '' })}
+                    </span>
+                  </label>
+                ))
+              )}
+            </OptionsGate>
             {err('batches') && <p className="tz-field-error">{err('batches')}</p>}
             <p className={styles.note}>{intl.formatMessage({ id: 'offers.flash.help' })}</p>
           </fieldset>
@@ -161,14 +162,16 @@ export function OfferSheet({ store, initial, onClose }: OfferSheetProps) {
             <label className="tz-field-label" htmlFor="offer-category">
               {intl.formatMessage({ id: 'offers.category.label' })}
             </label>
-            <select id="offer-category" className="tz-input" value={d.categoryId} onChange={(e) => set('categoryId', e.target.value)}>
-              <option value="">{intl.formatMessage({ id: 'offers.category.choose' })}</option>
-              {flat.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+            <OptionsGate query={categories} loadingId="app.loading" failedId="offers.error.body">
+              <select id="offer-category" className="tz-input" value={d.categoryId} onChange={(e) => set('categoryId', e.target.value)}>
+                <option value="">{intl.formatMessage({ id: 'offers.category.choose' })}</option>
+                {flat.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </OptionsGate>
             {err('category') && <p className="tz-field-error">{err('category')}</p>}
           </div>
         ) : (
