@@ -17,7 +17,7 @@ const grant = (token: string, extra: Record<string, unknown> = {}) => ({
   ...extra,
 });
 
-function otpHandlers(nextStep: 'totp_enrol' | 'totp_verify', extra: Handler[] = []): Handler[] {
+function otpHandlers(nextStep: 'totp_enrol' | 'totp_verify' | undefined, extra: Handler[] = []): Handler[] {
   return [
     (c) => (c.path === '/v1/auth/otp/send' ? json(200, { requestId: 'req-1', resendAfter: 30 }) : undefined),
     (c) =>
@@ -94,6 +94,16 @@ describe('A-01 phone step', () => {
     await screen.findByText(/We sent a code to/);
     await typeCode('Enter the 6-digit code', '000000');
     expect(await screen.findByText('That code is not right. Check it and try again.')).toBeInTheDocument();
+  });
+});
+
+describe('A-01 without the authenticator step (D-244, local only)', () => {
+  it('goes straight to Pulse when the sign-in names no second step', async () => {
+    const { calls, history } = renderAt('/sign-in', { signedIn: false, handlers: otpHandlers(undefined) });
+    await phoneStep();
+    await waitFor(() => expect(history.location.pathname).toBe('/'));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Pulse' })).toBeInTheDocument();
+    expect(calls.some((c) => c.path.startsWith('/v1/auth/totp/'))).toBe(false);
   });
 });
 

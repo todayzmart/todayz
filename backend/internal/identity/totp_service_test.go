@@ -451,3 +451,34 @@ func TestTOTPSealBoundToAdmin(t *testing.T) {
 	// The owner's own row still opens.
 	f.totp(a.totp, a.secret, TOTPPurposeStepUp)
 }
+
+// D-244: with ADMIN_TOTP_OFF locally the SMS code alone signs an admin in,
+// with no authenticator step, and † actions pass without a step-up code. A
+// deployed environment never honours the switch, even if config let it by.
+func TestAdminTOTPOff(t *testing.T) {
+	f := newFixtureWith(t, config.EnvLocal, func(c *config.Config, _ *Deps) { c.AdminTOTPOff = true })
+	in, p := newAdmin(f)
+	require.Empty(t, in.NextStep, "no authenticator step")
+
+	st, err := f.svc.CheckSession(context.Background(), p.UserID, p.SessionID, authn.AppAdmin)
+	require.NoError(t, err)
+	require.True(t, st.Active)
+	require.True(t, st.TOTPWaived)
+	require.Equal(t, f.clk.Now().UTC(), st.StepUpAt.UTC())
+
+	f.clk.Advance(authn.StepUpWindow + time.Minute)
+	auth := authn.NewAuthenticator(f.svc.tokens, f.svc)
+	ap, err := auth.Authenticate(context.Background(), in.AccessToken)
+	require.NoError(t, err)
+	require.Equal(t, authn.AMROTPTOTP, ap.AMR)
+	gate := authz.NewAdminGate(f.clk)
+	_, err = gate.Require(authn.WithPrincipal(context.Background(), ap), []authz.Role{authz.Finance}, true)
+	require.NoError(t, err, "a † action needs no step-up code")
+
+	for _, e := range []config.Env{config.EnvStaging, config.EnvProd} {
+		g := newFixtureWith(t, e, func(c *config.Config, _ *Deps) { c.AdminTOTPOff = true })
+		require.False(t, g.svc.totpOff, e)
+	}
+	g := newFixtureWith(t, config.EnvLocal, func(c *config.Config, _ *Deps) { c.AdminTOTPOff, c.APIAddr = true, "0.0.0.0:8180" })
+	require.False(t, g.svc.totpOff, "only an API on loopback")
+}

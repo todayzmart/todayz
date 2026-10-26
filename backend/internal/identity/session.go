@@ -485,7 +485,12 @@ func (s *Service) CheckSession(ctx context.Context, userID, sessionID ids.ID, ap
 			return authn.SessionState{}, fmt.Errorf("identity: admin check: %w", err)
 		}
 		out.Roles = a.Roles
-		if st.HasTotp && totpCurrent(a.TotpEnabledAt, &st.TotpVerifiedAt) {
+		switch {
+		case s.totpOff:
+			// D-244 (local and test only): every request counts as a fresh
+			// TOTP verification, so sign-in and † actions need no code.
+			out.StepUpAt, out.TOTPWaived = now, true
+		case st.HasTotp && totpCurrent(a.TotpEnabledAt, &st.TotpVerifiedAt):
 			out.StepUpAt = st.TotpVerifiedAt
 		}
 	}

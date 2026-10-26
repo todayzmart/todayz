@@ -179,6 +179,11 @@ type Config struct {
 	// may reach only loopback addresses (SC-PL-04).
 	NoEgress bool
 
+	// AdminTOTPOff skips the admin authenticator step (enrol, verify and
+	// step-up) when ADMIN_TOTP_OFF=1: the SMS code alone signs an admin in.
+	// Local and test only (D-244); staging and prod refuse to start with it.
+	AdminTOTPOff bool
+
 	// Shutdown holds the API drain timings from the environment (02 §2.8,
 	// D-98). Zero means unset: lifecycle.APITimings applies the defaults and
 	// checks them against WriteTimeout and the container stop timeout.
@@ -315,6 +320,10 @@ func Load(getenv Getenv, log *slog.Logger) (*Config, error) {
 		r.bad("SMS_API_URL", "must be unset in staging and prod")
 	}
 	c.NoEgress = r.boolDefault("TODAYZ_NO_EGRESS", false) || env == EnvTest
+	c.AdminTOTPOff = r.boolDefault("ADMIN_TOTP_OFF", false)
+	if env.IsDeployed() && c.AdminTOTPOff {
+		r.bad("ADMIN_TOTP_OFF", "must be unset in staging and prod")
+	}
 	c.Shutdown = Shutdown{PreStop: r.duration("SHUTDOWN_PRESTOP"), Drain: r.duration("SHUTDOWN_DRAIN")}
 
 	sort.Strings(r.missing)

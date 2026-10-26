@@ -1414,3 +1414,14 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
 - **The flag.** One `pos.offline_sold_at_odd` risk flag per store per IST day, score 50 as for the other POS flags, with details of the cashier and the count. The admin risk queue (A-13) names it "Offline sale with an odd time".
 - **Fixed values in code** (01 §17), not settings: they are device-clock tolerances, not product levers. A device's first sync has no previous sync, so only the ahead and clamp tests apply to it.
 - Tests: `cmd/todayz` `TestPOSOfflineSoldAtOdd`, plus the existing POS sync tests unchanged.
+
+**D-244 · A local-only switch turns off the admin authenticator step (founder, 26 Oct: "remove TOTP for now … in admin").**
+- **Why.** The founder signs in to the local admin console with their own number and has no authenticator set up yet. The TOTP rule for admins (D-60, step-up for † actions) is unchanged for staging and prod.
+- **The switch.** `ADMIN_TOTP_OFF=1` (in `.env.local`, never in `local.env` or Terraform). With it, the API:
+  - answers the admin OTP verify with no `nextStep`;
+  - treats every admin request as TOTP-verified now (`CheckSession` sets `StepUpAt` to now and `TOTPWaived`; the authenticator then counts the session as `otp+totp`), so † actions need no step-up code;
+  - logs one warning at start naming the variable.
+- **Where it can work.** Only when `APP_ENV` is local or test and the API listens on loopback, the same gate as the reserved-number test code. `config.Load` refuses to start staging or prod with it set.
+- **Admin app.** The Vite dev server passes the same variable to the app (`VITE_ADMIN_TOTP_OFF`; a build never gets it), and the gate then skips `/two-step`, after a reload or in a new tab too. A sign-in whose answer names no second step also goes straight in.
+- **Not changed.** Enrolment, verify, recovery and reset still work when called. Nothing is audited per sign-in about the waiver.
+- Tests: `internal/identity` `TestAdminTOTPOff`, `internal/platform/config` `TestAdminTOTPOff`, admin `auth.test.tsx` (no second step goes straight to Pulse).

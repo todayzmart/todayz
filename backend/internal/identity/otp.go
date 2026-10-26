@@ -325,9 +325,13 @@ func (s *Service) signIn(ctx context.Context, q *identitydb.Queries, now time.Ti
 			return signInResult{}, nil, err
 		}
 		roles = a.Roles
-		nextStep = NextStepTOTPVerify
-		if a.TotpEnabledAt == nil {
+		switch {
+		case s.totpOff:
+			// D-244: no authenticator step locally; CheckSession waives it.
+		case a.TotpEnabledAt == nil:
 			nextStep = NextStepTOTPEnrol
+		default:
+			nextStep = NextStepTOTPVerify
 		}
 	case authn.AppCustomer:
 		if err := s.ensureCustomerProfile(ctx, q, userID, now); err != nil {

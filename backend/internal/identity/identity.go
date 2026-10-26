@@ -107,6 +107,8 @@ type Service struct {
 	hooks   Hooks
 	// allowTestCode accepts 000000 for the reserved test numbers (Deps.TestRoutes).
 	allowTestCode bool
+	// totpOff waives the admin authenticator step (config.AdminTOTPOff, D-244).
+	totpOff bool
 }
 
 // errUnavailable is why a service cannot serve (no database, no keys); the
@@ -125,6 +127,10 @@ func New(d Deps) (*Service, error) {
 		cfg: d.Config, db: d.DB, clock: d.Clock, log: d.Log, tokens: d.Tokens, settings: d.Settings,
 		sms: d.SMS, human: d.Human,
 		allowTestCode: d.Config.Env.AllowsTestRoutes() && d.TestRoutes && testclock.Loopback(d.Config.APIAddr),
+		totpOff:       d.Config.AdminTOTPOff && d.Config.Env.AllowsTestRoutes() && testclock.Loopback(d.Config.APIAddr),
+	}
+	if s.totpOff && d.Log != nil {
+		d.Log.Warn("identity: ADMIN_TOTP_OFF is set: admins sign in without the authenticator step (D-244)")
 	}
 	if s.sms == nil || s.human == nil {
 		sms, human := providers(d.Config)

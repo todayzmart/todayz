@@ -41,7 +41,11 @@ function SignIn() {
         session={session}
         siteKey={TURNSTILE_SITE_KEY}
         labels={labels}
-        onSignedIn={({ nextStep }) => factor.setNextStep(nextStep)}
+        onSignedIn={({ nextStep }) => {
+          // No second step from the server (the authenticator is off locally, D-244): straight in.
+          if (nextStep) factor.setNextStep(nextStep);
+          else factor.markDone();
+        }}
       />
     </>
   );

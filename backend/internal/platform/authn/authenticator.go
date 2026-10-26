@@ -27,6 +27,9 @@ type SessionState struct {
 	Roles []string
 	// StepUpAt is the session's last TOTP verification (admin app; zero if none).
 	StepUpAt time.Time
+	// TOTPWaived is true when the admin authenticator step is switched off
+	// (local and test only, D-244): the session counts as otp+totp.
+	TOTPWaived bool
 }
 
 // SessionChecker looks a session up by primary key. internal/identity
@@ -78,7 +81,10 @@ func (a *Authenticator) Authenticate(ctx context.Context, raw string) (Principal
 		// The token's amr is a claim; the session row is the truth. An
 		// otp+totp token whose sign-in holds no TOTP verification (it was
 		// reset) is only an OTP session.
-		if p.AMR == AMROTPTOTP && st.StepUpAt.IsZero() {
+		switch {
+		case st.TOTPWaived:
+			p.AMR = AMROTPTOTP
+		case p.AMR == AMROTPTOTP && st.StepUpAt.IsZero():
 			p.AMR = AMROTP
 		}
 	}

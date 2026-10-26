@@ -2,6 +2,7 @@ import { OfflineBanner, SessionPending, useSessionState } from '@todayz/auth';
 import { Navigate, Outlet, useRouterState } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
+import { ADMIN_TOTP_OFF } from '../app/env';
 import { useSecondFactor, useSecondFactorState } from '../app/second-factor';
 import { Shell } from './Shell';
 import styles from './shell.module.css';
@@ -20,7 +21,7 @@ export function Gate() {
   const intl = useIntl();
   const { status } = useSessionState();
   const factor = useSecondFactor();
-  const { done } = useSecondFactorState();
+  const done = useSecondFactorState().done || ADMIN_TOTP_OFF;
   const location = useRouterState({ select: (s) => s.location });
   // The page the Outlet holds. Right after a redirect to /sign-in, `location` is already /sign-in
   // while the Outlet still holds the old match; the bare layout renders nothing until they agree, so
