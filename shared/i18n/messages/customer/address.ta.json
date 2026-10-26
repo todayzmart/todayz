@@ -1,0 +1,217 @@
+{
+  "address.loading": {
+    "message": "முகவரிகள் ஏற்றப்படுகின்றன",
+    "review": "reviewed",
+    "enHash": "4edf9c73"
+  },
+  "address.pick": {
+    "message": "இங்கே அனுப்பவும்",
+    "review": "reviewed",
+    "enHash": "c229c05a"
+  },
+  "address.none": {
+    "message": "சேமித்த முகவரி எதுவும் இன்னும் இல்லை.",
+    "review": "reviewed",
+    "enHash": "550f2dc7"
+  },
+  "address.outside": {
+    "message": "டெலிவரி பகுதிக்கு வெளியே ({distance})",
+    "review": "reviewed",
+    "enHash": "d3042935"
+  },
+  "address.add": {
+    "message": "புதிய முகவரியைச் சேர்க்கவும்",
+    "review": "reviewed",
+    "enHash": "c3cb8829"
+  },
+  "address.form.title": {
+    "message": "புதிய முகவரி",
+    "review": "reviewed",
+    "enHash": "262e89de"
+  },
+  "address.form.labelDefault": {
+    "message": "வீடு",
+    "review": "reviewed",
+    "enHash": "70f8bb9a"
+  },
+  "address.form.label": {
+    "message": "பெயர்",
+    "review": "reviewed",
+    "enHash": "709a2322"
+  },
+  "address.form.line1": {
+    "message": "வீடு மற்றும் தெரு",
+    "review": "reviewed",
+    "enHash": "61c82324"
+  },
+  "address.form.line1Help": {
+    "message": "ஃபிளாட் அல்லது வீட்டு எண், கட்டடம், தெரு",
+    "review": "reviewed",
+    "enHash": "dbc52ba6"
+  },
+  "address.form.line2": {
+    "message": "பகுதி (விருப்பம்)",
+    "review": "reviewed",
+    "enHash": "9701514b"
+  },
+  "address.form.landmark": {
+    "message": "அடையாள இடம் (விருப்பம்)",
+    "review": "reviewed",
+    "enHash": "7f3d6f2e"
+  },
+  "address.form.pincode": {
+    "message": "பின் கோடு",
+    "review": "reviewed",
+    "enHash": "3c52e572"
+  },
+  "address.form.required": {
+    "message": "இதை நிரப்பவும்",
+    "review": "reviewed",
+    "enHash": "3dfbc7c1"
+  },
+  "address.form.pincodeError": {
+    "message": "6 இலக்க பின் கோடை உள்ளிடவும்",
+    "review": "reviewed",
+    "enHash": "cab7855b"
+  },
+  "address.form.pinError": {
+    "message": "முதலில் பின் வைக்கவும்",
+    "review": "reviewed",
+    "enHash": "e6b78edd"
+  },
+  "address.form.invalid": {
+    "message": "இதைச் சரிபார்க்கவும்",
+    "review": "reviewed",
+    "enHash": "a606b403"
+  },
+  "address.form.failed": {
+    "message": "முகவரியைச் சேமிக்க முடியவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "b95c0890"
+  },
+  "address.form.pinTitle": {
+    "message": "வரைபடத்தில் பின்",
+    "review": "reviewed",
+    "enHash": "8dd1eed8"
+  },
+  "address.form.pinDevice": {
+    "message": "பின் இப்போது உங்கள் போன் இருக்கும் இடத்தில் உள்ளது.",
+    "review": "reviewed",
+    "enHash": "04a3b444"
+  },
+  "address.form.pinArea": {
+    "message": "பின் நீங்கள் தேர்ந்தெடுத்த பகுதியில் உள்ளது. சரியான இடத்திற்கு உங்கள் இருப்பிடத்தைப் பயன்படுத்தவும்.",
+    "review": "reviewed",
+    "enHash": "4b00790b"
+  },
+  "address.form.pinNone": {
+    "message": "இன்னும் பின் இல்லை. அமைக்க உங்கள் இருப்பிடத்தைப் பயன்படுத்தவும்.",
+    "review": "reviewed",
+    "enHash": "0477ec69"
+  },
+  "address.form.inside": {
+    "message": "கடையின் டெலிவரி பகுதிக்குள் ({distance}).",
+    "review": "reviewed",
+    "enHash": "42b57f7f"
+  },
+  "address.form.outside": {
+    "message": "கடையின் டெலிவரி பகுதிக்கு வெளியே ({distance}).",
+    "review": "reviewed",
+    "enHash": "eb07fb3d"
+  },
+  "address.form.locate": {
+    "message": "என் இருப்பிடத்தைப் பயன்படுத்து",
+    "review": "reviewed",
+    "enHash": "0132375d"
+  },
+  "address.form.locateFailed": {
+    "message": "உங்கள் இருப்பிடம் கிடைக்கவில்லை. அனுமதியைச் சரிபார்த்து மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "8c9881b6"
+  },
+  "address.form.save": {
+    "message": "முகவரியைச் சேமி",
+    "review": "reviewed",
+    "enHash": "c08b67b2"
+  },
+  "address.form.cancel": {
+    "message": "ரத்து",
+    "review": "reviewed",
+    "enHash": "77dfd213"
+  },
+  "address.map.label": {
+    "message": "முகவரி பின் மற்றும் டெலிவரி பகுதி",
+    "review": "reviewed",
+    "enHash": "c0de6d5e"
+  },
+  "address.map.mapLabel": {
+    "message": "வரைபடம்: உங்கள் பின் மற்றும் {shop}, இது {distance} தூரத்திற்குள் டெலிவரி செய்கிறது",
+    "review": "reviewed",
+    "enHash": "61c53df5"
+  },
+  "address.map.radius": {
+    "message": "டெலிவரி பகுதி",
+    "review": "reviewed",
+    "enHash": "1dbe7804"
+  },
+  "address.map.cluster": {
+    "message": "{count} இடங்கள்",
+    "review": "reviewed",
+    "enHash": "88d52f88"
+  },
+  "address.map.pin": {
+    "message": "உங்கள் பின்",
+    "review": "reviewed",
+    "enHash": "c84462cb"
+  },
+  "address.map.legend.shop": {
+    "message": "கடை",
+    "review": "reviewed",
+    "enHash": "55de8870"
+  },
+  "address.saved.title": {
+    "message": "முகவரிகள்",
+    "review": "reviewed",
+    "enHash": "4ca7b966"
+  },
+  "address.saved.empty": {
+    "message": "சேமித்த முகவரிகள் இல்லை. இங்கே அல்லது செக்அவுட்டில் சேர்க்கவும்.",
+    "review": "reviewed",
+    "enHash": "6d9b5c5c"
+  },
+  "address.saved.default": {
+    "message": "இயல்புநிலை",
+    "review": "reviewed",
+    "enHash": "808d7dca"
+  },
+  "address.saved.makeDefault": {
+    "message": "இயல்புநிலையாக்கு",
+    "review": "reviewed",
+    "enHash": "7b2628d1"
+  },
+  "address.saved.delete": {
+    "message": "நீக்கு",
+    "review": "reviewed",
+    "enHash": "f6fdbe48"
+  },
+  "address.saved.deleteLabel": {
+    "message": "{label} நீக்கு",
+    "review": "reviewed",
+    "enHash": "214d4859"
+  },
+  "address.saved.loadError": {
+    "message": "உங்கள் முகவரிகளை ஏற்ற முடியவில்லை.",
+    "review": "reviewed",
+    "enHash": "3608b559"
+  },
+  "address.saved.retry": {
+    "message": "மீண்டும் முயலவும்",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "address.saved.actionError": {
+    "message": "அது நடக்கவில்லை. மீண்டும் முயலவும்.",
+    "review": "reviewed",
+    "enHash": "13555662"
+  }
+}

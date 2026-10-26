@@ -60,6 +60,16 @@ type Ledger interface {
 	PostReward(ctx context.Context, r Reward) (txID ids.ID, posted bool, err error)
 }
 
+// SelfLikeCheck is risk's referral.self_like rule run on one referral
+// (D-225, D-237): it raises the flag when the referral looks like the
+// referrer referring themself, and never raises a second one for a referral
+// already flagged in any status. The reward pass calls it, in a transaction
+// of its own, before it posts; an open or confirmed flag then holds the
+// reward. W3-02's risk.Service is it (jobs.ReferralsService).
+type SelfLikeCheck interface {
+	CheckReferralSelfLike(ctx context.Context, referralID ids.ID) (raised bool, err error)
+}
+
 // ErrRewardRefused marks a posting the ledger will never accept as it is
 // (an idempotency key reused for other legs, an invalid posting): retrying
 // cannot help, so the side waits for a person (D-169).

@@ -145,12 +145,12 @@
     "enHash": "c223f02c"
   },
   "ai.bill.title": {
-    "message": "సప్లయర్ బిల్ స్కాన్ చేయండి",
+    "message": "సప్లయర్ బిల్లు స్కాన్ చేయండి",
     "review": "reviewed",
     "enHash": "4c70718c"
   },
   "ai.bill.desc": {
-    "message": "బిల్ ఫోటో తీయండి. దాని లైన్లను మీ ఐటమ్‌లతో సరిపోలుస్తాం; మీరు చూసి స్టాక్ జోడించండి.",
+    "message": "బిల్లు ఫోటో తీయండి. దాని లైన్లను మీ ఐటమ్‌లతో సరిపోలుస్తాం; మీరు చూసి స్టాక్ జోడించండి.",
     "review": "reviewed",
     "enHash": "c5ae78ac"
   },
@@ -160,17 +160,17 @@
     "enHash": "097ac225"
   },
   "ai.bill.reading": {
-    "message": "బిల్ చదువుతున్నాం…",
+    "message": "బిల్లు చదువుతున్నాం…",
     "review": "reviewed",
     "enHash": "65179e5a"
   },
   "ai.bill.failed": {
-    "message": "ఈ బిల్ చదవలేకపోయాం. చదునుగా పెట్టి మంచి వెలుతురులో స్పష్టమైన ఫోటో తీయండి.",
+    "message": "ఈ బిల్లు చదవలేకపోయాం. చదునుగా పెట్టి మంచి వెలుతురులో స్పష్టమైన ఫోటో తీయండి.",
     "review": "reviewed",
     "enHash": "d2ec5dac"
   },
   "ai.bill.off": {
-    "message": "బిల్ స్కాన్ మీ దుకాణానికి ఆన్‌లో లేదు",
+    "message": "బిల్లు స్కాన్ మీ దుకాణానికి ఆన్‌లో లేదు",
     "review": "reviewed",
     "enHash": "d6fe4a22"
   },
@@ -180,17 +180,17 @@
     "enHash": "c70f3f37"
   },
   "ai.bill.lines": {
-    "message": "బిల్ లైన్లు",
+    "message": "బిల్లు లైన్లు",
     "review": "reviewed",
     "enHash": "cfd6514f"
   },
   "ai.bill.matched": {
-    "message": "బిల్‌లో: {bill} · ఇప్పుడు స్టాక్‌లో {n}",
+    "message": "బిల్లులో: {bill} · ఇప్పుడు స్టాక్‌లో {n}",
     "review": "reviewed",
     "enHash": "d08ba258"
   },
   "ai.bill.unmatched": {
-    "message": "బిల్‌లో: {bill} · మీ ఐటమ్ కాదు",
+    "message": "బిల్లులో: {bill} · మీ ఐటమ్ కాదు",
     "review": "reviewed",
     "enHash": "0a5ff5e2"
   },
@@ -235,7 +235,7 @@
     "enHash": "581cb8d0"
   },
   "ai.bill.another": {
-    "message": "ఇంకో బిల్ స్కాన్ చేయండి",
+    "message": "ఇంకో బిల్లు స్కాన్ చేయండి",
     "review": "reviewed",
     "enHash": "3bb2cbfa"
   },

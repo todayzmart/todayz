@@ -1,13 +1,16 @@
 package credits
 
 import (
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
 
 	"github.com/todayz/backend/internal/platform/audit"
 	"github.com/todayz/backend/internal/platform/authn"
+	"github.com/todayz/backend/internal/platform/clock"
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
@@ -56,6 +59,11 @@ func (a *aenv) adjust(p authn.Principal, paise int) (string, string, error) {
 	return string(r.Outcome), id, nil
 }
 
+// admin is a fresh finance user.
+func (a *aenv) admin() authn.Principal {
+	return authn.Principal{UserID: a.user(), App: authn.AppAdmin, Roles: []string{"finance"}}
+}
+
 func (a *aenv) wallet() int64 { return a.balance(wallet(a.customer)) }
 
 // SC-CR-15: whole credits; |amount| above the threshold (exclusive) waits
@@ -67,8 +75,9 @@ func TestAdjustmentThresholdDB(t *testing.T) {
 	require.EqualValues(t, 50000, threshold, "01 §17 default")
 
 	start := a.wallet()
+	// A different admin each time, so the day's sum (D-237) is this one alone.
 	for _, paise := range []int{20000, -20000, 50000, -50000} {
-		out, id, err := a.adjust(a.finance, paise)
+		out, id, err := a.adjust(a.admin(), paise)
 		require.NoError(t, err, paise)
 		require.Equal(t, "posted", out, paise)
 		require.Empty(t, id)
@@ -76,7 +85,7 @@ func TestAdjustmentThresholdDB(t *testing.T) {
 	require.Equal(t, start, a.wallet(), "±₹200 and ±₹500 net to zero")
 	require.Zero(t, a.count(`SELECT count(*) FROM admin_adjustment_requests`), "no request row at or under the threshold")
 	require.Equal(t, 4, a.count(`SELECT count(*) FROM ledger_transactions WHERE kind = 'admin_adjustment'`))
-	require.Equal(t, 4, a.count(`SELECT count(*) FROM audit_log WHERE action = 'credits.adjust' AND actor_id = $1`, ids.UUID(a.finance.UserID)))
+	require.Equal(t, 4, a.count(`SELECT count(*) FROM audit_log WHERE action = 'credits.adjust'`))
 
 	for _, paise := range []int{50100, -50100, 60000, -60000} {
 		out, id, err := a.adjust(a.finance, paise)
@@ -166,7 +175,7 @@ func TestAdjustmentInsufficientBalanceDB(t *testing.T) {
 	// Approved later, after the balance fell.
 	_, req, err := a.adjust(a.finance, -80000) // 800 of 1000
 	require.NoError(t, err)
-	_, _, err = a.adjust(a.finance, -50000) // at once: 500 → 500 left
+	_, _, err = a.adjust(a.finance2, -50000) // at once: 500 → 500 left
 	require.NoError(t, err)
 	rid, _ := ids.Parse(req)
 	_, err = a.adm.ApproveAdjustment(a.ctx, a.finance2, rid, nil)
@@ -201,6 +210,7 @@ func TestAdjustmentIdempotencyKeyDB(t *testing.T) {
 	d2, err := a.adm.CreateAdjustment(a.ctx, a.finance, debit)
 	require.NoError(t, err)
 	require.Equal(t, *d1.TransactionId, *d2.TransactionId)
+	a.setting(settings.AdminAdjustDualApprovalAbovePaise, "400000") // the day's sum is ₹2,300 with the restore (D-237)
 	_, err = a.adm.CreateAdjustment(a.ctx, a.finance, AdjustmentInput{AccountID: a.account, AmountPaise: 110000, Reason: "restore", IdempotencyKey: "k-restore"})
 	require.NoError(t, err)
 	a.setting(settings.AdminAdjustDualApprovalAbovePaise, "50000")
@@ -252,6 +262,115 @@ func TestAdjustmentRequestIdempotencyKeyDB(t *testing.T) {
 	require.Equal(t, "invalid_transition", problem.CodeOf(err))
 	require.EqualValues(t, 1600, a.wallet())
 	require.Equal(t, 1, a.count(`SELECT count(*) FROM ledger_transactions WHERE kind = 'admin_adjustment'`))
+}
+
+// D-237: the threshold applies to the day's sum of one admin's adjustments to
+// one customer (absolute values, pending and posted, this one included), so
+// splitting a large adjustment into small ones still needs a second person.
+func TestAdjustmentDaySumDB(t *testing.T) {
+	a := newAdjustEnv(t) // threshold ₹500
+	start := a.wallet()
+	for _, paise := range []int{20000, -10000, 20000} { // 200 + 100 + 200 = 500: at the threshold
+		out, _, err := a.adjust(a.finance, paise)
+		require.NoError(t, err, paise)
+		require.Equal(t, "posted", out, paise)
+	}
+	require.Equal(t, start+300, a.wallet())
+	// ₹1 more today, either sign, is above it.
+	for _, paise := range []int{100, -100} {
+		out, id, err := a.adjust(a.finance, paise)
+		require.NoError(t, err, paise)
+		require.Equal(t, "pending", out, paise)
+		require.NotEmpty(t, id)
+	}
+	require.Equal(t, start+300, a.wallet())
+	var total int64
+	require.NoError(t, a.tdb.OwnerPool.QueryRow(a.ctx,
+		`SELECT max((after->>'dayTotalPaise')::bigint) FROM audit_log WHERE action = 'credits.adjustment_request'`).Scan(&total))
+	require.EqualValues(t, 50200, total, "pending requests count too")
+
+	// Another admin, or another customer, has a sum of its own.
+	out, _, err := a.adjust(a.finance2, 50000)
+	require.NoError(t, err)
+	require.Equal(t, "posted", out)
+	other := a.user()
+	a.grant(other, 100)
+	var u pgtype.UUID
+	require.NoError(t, a.tdb.OwnerPool.QueryRow(a.ctx,
+		`SELECT id FROM ledger_accounts WHERE kind = 'customer_wallet' AND owner_id = $1`, ids.UUID(other)).Scan(&u))
+	oid, _ := ids.FromUUID(u)
+	r, err := a.adm.CreateAdjustment(a.ctx, a.finance, AdjustmentInput{AccountID: oid.String(), AmountPaise: 50000, Reason: "goodwill"})
+	require.NoError(t, err)
+	require.Equal(t, "posted", string(r.Outcome))
+
+	// Rejected and cancelled requests moved nothing and stop counting; an
+	// approved one still counts, once (its posting is the approver's).
+	reqs := a.count(`SELECT count(*) FROM admin_adjustment_requests WHERE requested_by = $1`, ids.UUID(a.finance.UserID))
+	require.Equal(t, 2, reqs)
+	var pending []pgtype.UUID
+	rows, err := a.tdb.OwnerPool.Query(a.ctx, `SELECT id FROM admin_adjustment_requests WHERE requested_by = $1 ORDER BY amount`, ids.UUID(a.finance.UserID))
+	require.NoError(t, err)
+	for rows.Next() {
+		var id pgtype.UUID
+		require.NoError(t, rows.Scan(&id))
+		pending = append(pending, id)
+	}
+	require.NoError(t, rows.Err())
+	debitReq, _ := ids.FromUUID(pending[0])
+	creditReq, _ := ids.FromUUID(pending[1])
+	_, err = a.adm.RejectAdjustment(a.ctx, a.finance, debitReq, "split by mistake")
+	require.NoError(t, err)
+	approver := a.admin()
+	_, err = a.adm.ApproveAdjustment(a.ctx, approver, creditReq, nil)
+	require.NoError(t, err)
+	out, _, err = a.adjust(a.finance, -100) // 500 + 1 approved + 1 = 502
+	require.NoError(t, err)
+	require.Equal(t, "pending", out)
+
+	// The approval's posting is the requester's adjustment, not the
+	// approver's: the approver still has ₹500 of their own today.
+	out, _, err = a.adjust(approver, 50000)
+	require.NoError(t, err)
+	require.Equal(t, "posted", out)
+
+	// The next IST day starts a new sum.
+	a.clk.Set(clock.StartOfDayIST(a.clk.Now()).Add(24 * time.Hour))
+	out, _, err = a.adjust(a.finance, 50000)
+	require.NoError(t, err)
+	require.Equal(t, "posted", out)
+}
+
+// D-237 under concurrency: several at-once-sized adjustments by one admin to
+// one customer at the same moment never post more than the threshold in all.
+func TestAdjustmentDaySumConcurrentDB(t *testing.T) {
+	a := newAdjustEnv(t) // threshold ₹500
+	const n = 6
+	outs := make(chan string, n)
+	var wg sync.WaitGroup
+	for range n {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			out, _, err := a.adjust(a.finance, 20000)
+			if err != nil {
+				outs <- "error: " + problem.CodeOf(err)
+				return
+			}
+			outs <- out
+		}()
+	}
+	wg.Wait()
+	close(outs)
+	posted := 0
+	for out := range outs {
+		require.Contains(t, []string{"posted", "pending"}, out)
+		if out == "posted" {
+			posted++
+		}
+	}
+	require.Equal(t, 2, posted, "₹200 + ₹200 fit under ₹500; a third would not")
+	require.EqualValues(t, 1400, a.wallet())
+	require.Equal(t, n-2, a.count(`SELECT count(*) FROM admin_adjustment_requests WHERE status = 'pending'`))
 }
 
 // Approval re-checks the customer inside its transaction: a request for an

@@ -1,0 +1,52 @@
+{
+  "site.title": {
+    "message": "TodayZ: आसपास सब कुछ, आज ही",
+    "review": "reviewed",
+    "enHash": "e514d77d"
+  },
+  "site.description": {
+    "message": "देखें कि आपके पास की दुकानों में क्या स्टॉक में है, उसे बुक करें, और पिकअप या डिलीवरी से लें।",
+    "review": "reviewed",
+    "enHash": "7e3e5251"
+  },
+  "site.skipToContent": {
+    "message": "सीधे मुख्य हिस्से पर जाएँ",
+    "review": "reviewed",
+    "enHash": "0a4470d6"
+  },
+  "site.logoAlt": {
+    "message": "TodayZ",
+    "review": "reviewed",
+    "enHash": "34b58f9d"
+  },
+  "site.hero.title": {
+    "message": "आसपास सब कुछ, आज ही।",
+    "review": "reviewed",
+    "enHash": "1aaf493f"
+  },
+  "site.hero.sub": {
+    "message": "पास की दुकानें अपना स्टॉक ऑनलाइन डालती हैं। आप देखते हैं कि आपके पास क्या स्टॉक में है, उसे बुक करते हैं, और पिकअप या डिलीवरी से लेते हैं।",
+    "review": "reviewed",
+    "enHash": "ecee0988"
+  },
+  "site.soon.tag": {
+    "message": "जल्द आ रहा है",
+    "review": "reviewed",
+    "enHash": "e4115be2"
+  },
+  "site.soon.title": {
+    "message": "हम शुरू होने की तैयारी में हैं",
+    "review": "reviewed",
+    "enHash": "6c48ef38"
+  },
+  "site.soon.body": {
+    "message": "TodayZ बनाते समय यह साइट एक अस्थायी पेज है। दुकान मालिक जल्द ही यहाँ साइन अप कर सकेंगे।",
+    "review": "reviewed",
+    "enHash": "dc1f1b4f"
+  },
+  "site.footer": {
+    "message": "© {year} TodayZ",
+    "review": "reviewed",
+    "enHash": "04b1a988"
+  }
+}

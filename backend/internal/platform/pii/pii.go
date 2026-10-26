@@ -17,6 +17,7 @@ import (
 	"net/netip"
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 // KeySize is the size of PII_ENC_KEY and PII_HASH_KEY.
@@ -155,6 +156,37 @@ func MaskPhone(e164 string) string {
 	}
 	n := e164[3:]
 	return n[:2] + strings.Repeat("•", 5) + n[7:]
+}
+
+var reMobileDigits = regexp.MustCompile(`[6-9][0-9]{9}`)
+
+// ContainsPhone reports whether free text a person typed (a reason or a
+// note) holds an Indian mobile number. It is strict on purpose: digits in any
+// script count, and every other character is dropped first, so spacing,
+// dots, slashes, letters or a 0091 prefix do not hide a number. Text that
+// strings many numbers together can match too; the writer rewords it.
+func ContainsPhone(s string) bool { return reMobileDigits.MatchString(digitsOnly(s)) }
+
+// digitsOnly keeps the decimal digits of s, in any script, as ASCII 0-9.
+func digitsOnly(s string) string {
+	var b strings.Builder
+	for _, r := range s {
+		if unicode.IsDigit(r) {
+			b.WriteRune('0' + digitValue(r))
+		}
+	}
+	return b.String()
+}
+
+// digitValue is the value of a Unicode decimal digit. Each script's digits are
+// one run of ten (some runs sit back to back), so the value is the distance
+// from the start of the run, mod 10.
+func digitValue(r rune) rune {
+	start := r
+	for unicode.IsDigit(start - 1) {
+		start--
+	}
+	return (r - start) % 10
 }
 
 // reservedPrefix is the reserved test range +91 90000 000xx (01 §2): in local

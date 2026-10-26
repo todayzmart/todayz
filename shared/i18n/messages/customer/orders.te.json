@@ -1,6 +1,6 @@
 {
   "orders.title": {
-    "message": "ఆర్డర్‌లు",
+    "message": "ఆర్డర్లు",
     "review": "reviewed",
     "enHash": "cded0933"
   },
@@ -30,12 +30,12 @@
     "enHash": "087de36b"
   },
   "orders.signedOut.title": {
-    "message": "మీ ఆర్డర్‌లు చూడడానికి సైన్ ఇన్ చేయండి",
+    "message": "మీ ఆర్డర్లు చూడడానికి సైన్ ఇన్ చేయండి",
     "review": "reviewed",
     "enHash": "360bead5"
   },
   "orders.signedOut.body": {
-    "message": "మీ ఆర్డర్‌లు, పికప్ కోడ్‌లు మీ ఖాతాలో ఉంటాయి.",
+    "message": "మీ ఆర్డర్లు, పికప్ కోడ్‌లు మీ ఖాతాలో ఉంటాయి.",
     "review": "reviewed",
     "enHash": "db1c00fe"
   },
@@ -45,7 +45,7 @@
     "enHash": "ada2e9e9"
   },
   "orders.empty.title": {
-    "message": "ఇంకా ఆర్డర్‌లు లేవు",
+    "message": "ఇంకా ఆర్డర్లు లేవు",
     "review": "reviewed",
     "enHash": "9f61f6df"
   },
@@ -75,12 +75,12 @@
     "enHash": "595ea451"
   },
   "orders.loading": {
-    "message": "ఆర్డర్‌లు లోడ్ అవుతున్నాయి",
+    "message": "ఆర్డర్లు లోడ్ అవుతున్నాయి",
     "review": "reviewed",
     "enHash": "58246f0e"
   },
   "orders.loadError": {
-    "message": "మీ ఆర్డర్‌లు లోడ్ కాలేదు.",
+    "message": "మీ ఆర్డర్లు లోడ్ కాలేదు.",
     "review": "reviewed",
     "enHash": "bd6d09a0"
   },
@@ -285,7 +285,7 @@
     "enHash": "5b0f7590"
   },
   "orders.items.label": {
-    "message": "ఈ ఆర్డర్‌లోని వస్తువులు",
+    "message": "ఈ ఆర్డర్లోని వస్తువులు",
     "review": "reviewed",
     "enHash": "a8022691"
   },
@@ -325,12 +325,12 @@
     "enHash": "fb3b71a2"
   },
   "orders.limit.title": {
-    "message": "ప్రస్తుతానికి ఆర్డర్‌లపై పరిమితి ఉంది",
+    "message": "ప్రస్తుతానికి ఆర్డర్లపై పరిమితి ఉంది",
     "review": "reviewed",
     "enHash": "b2afda5a"
   },
   "orders.limit.body": {
-    "message": "మీరు చాలాసార్లు పికప్ చేయలేదు, కాబట్టి {date} వరకు ఒకేసారి {max, plural, one {ఒక్క ఓపెన్ ఆర్డర్ మాత్రమే} other {# ఓపెన్ ఆర్డర్‌లు}} ఉండగలవు.",
+    "message": "మీరు చాలాసార్లు పికప్ చేయలేదు, కాబట్టి {date} వరకు ఒకేసారి {max, plural, one {ఒక్క ఓపెన్ ఆర్డర్ మాత్రమే} other {# ఓపెన్ ఆర్డర్లు}} ఉండగలవు.",
     "review": "reviewed",
     "enHash": "8d1ad358"
   },
@@ -508,5 +508,50 @@
     "message": "మూసివేయండి",
     "review": "reviewed",
     "enHash": "bbfa773e"
+  },
+  "orders.callShop": {
+    "message": "దుకాణానికి కాల్ చేయండి",
+    "review": "reviewed",
+    "enHash": "b605f7d5"
+  },
+  "orders.step.out_for_delivery": {
+    "message": "దారిలో ఉంది",
+    "review": "reviewed",
+    "enHash": "7884d39a"
+  },
+  "orders.step.delivered": {
+    "message": "డెలివరీ అయింది",
+    "review": "reviewed",
+    "enHash": "eea956cd"
+  },
+  "orders.code.deliveryLabel": {
+    "message": "డెలివరీ కోడ్",
+    "review": "reviewed",
+    "enHash": "ff5c3ad0"
+  },
+  "orders.code.riderNote": {
+    "message": "ఆర్డర్ వచ్చినప్పుడు ఈ కోడ్‌ను డెలివరీ చేసే వారికి చెప్పండి.",
+    "review": "reviewed",
+    "enHash": "400b0567"
+  },
+  "orders.delivery.accepted": {
+    "message": "{shop} మీ ఆర్డర్ అంగీకరించింది, {time} లోపు పంపుతుంది.",
+    "review": "reviewed",
+    "enHash": "f1b3c175"
+  },
+  "orders.delivery.acceptedNoTime": {
+    "message": "{shop} మీ ఆర్డర్ అంగీకరించింది, త్వరలో పంపుతుంది.",
+    "review": "reviewed",
+    "enHash": "b8f95b32"
+  },
+  "orders.delivery.onTheWay": {
+    "message": "{shop} నుండి మీ ఆర్డర్ దారిలో ఉంది.",
+    "review": "reviewed",
+    "enHash": "5c7cbe84"
+  },
+  "orders.delivery.to": {
+    "message": "{label} కు డెలివరీ: {address}",
+    "review": "reviewed",
+    "enHash": "f4a4eb85"
   }
 }

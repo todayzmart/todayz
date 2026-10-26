@@ -508,5 +508,50 @@
     "message": "ಮುಚ್ಚಿ",
     "review": "reviewed",
     "enHash": "bbfa773e"
+  },
+  "orders.callShop": {
+    "message": "ಅಂಗಡಿಗೆ ಕರೆ ಮಾಡಿ",
+    "review": "reviewed",
+    "enHash": "b605f7d5"
+  },
+  "orders.step.out_for_delivery": {
+    "message": "ದಾರಿಯಲ್ಲಿದೆ",
+    "review": "reviewed",
+    "enHash": "7884d39a"
+  },
+  "orders.step.delivered": {
+    "message": "ತಲುಪಿಸಲಾಗಿದೆ",
+    "review": "reviewed",
+    "enHash": "eea956cd"
+  },
+  "orders.code.deliveryLabel": {
+    "message": "ಡೆಲಿವರಿ ಕೋಡ್",
+    "review": "reviewed",
+    "enHash": "ff5c3ad0"
+  },
+  "orders.code.riderNote": {
+    "message": "ಆರ್ಡರ್ ಬಂದಾಗ ಈ ಕೋಡ್ ಅನ್ನು ಡೆಲಿವರಿ ಮಾಡುವವರಿಗೆ ಹೇಳಿ.",
+    "review": "reviewed",
+    "enHash": "400b0567"
+  },
+  "orders.delivery.accepted": {
+    "message": "{shop} ನಿಮ್ಮ ಆರ್ಡರ್ ಒಪ್ಪಿಕೊಂಡಿದೆ ಮತ್ತು {time} ಒಳಗೆ ಕಳುಹಿಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "f1b3c175"
+  },
+  "orders.delivery.acceptedNoTime": {
+    "message": "{shop} ನಿಮ್ಮ ಆರ್ಡರ್ ಒಪ್ಪಿಕೊಂಡಿದೆ ಮತ್ತು ಶೀಘ್ರದಲ್ಲೇ ಕಳುಹಿಸುತ್ತದೆ.",
+    "review": "reviewed",
+    "enHash": "b8f95b32"
+  },
+  "orders.delivery.onTheWay": {
+    "message": "{shop} ನಿಂದ ನಿಮ್ಮ ಆರ್ಡರ್ ದಾರಿಯಲ್ಲಿದೆ.",
+    "review": "reviewed",
+    "enHash": "5c7cbe84"
+  },
+  "orders.delivery.to": {
+    "message": "{label} ಗೆ ಡೆಲಿವರಿ: {address}",
+    "review": "reviewed",
+    "enHash": "f4a4eb85"
   }
 }

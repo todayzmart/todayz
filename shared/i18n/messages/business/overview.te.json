@@ -520,17 +520,17 @@
     "enHash": "88eca95d"
   },
   "overview.insights.stock_check_due.sentence": {
-    "message": "<strong>{count, plural, other {#}} ఐటమ్‌లు {unit, select, days {{span, plural, other {#}} రోజులుగా} other {{span, plural, other {#}} గంటలుగా}} నిర్ధారించలేదు</strong>. కస్టమర్‌లకు అవి “స్టాక్ ఇటీవల నిర్ధారించలేదు” అని కనిపిస్తాయి.",
+    "message": "<strong>{count, plural, other {#}} ఐటమ్‌లు {unit, select, days {{span, plural, other {#}} రోజులుగా} other {{span, plural, other {#}} గంటలుగా}} నిర్ధారించలేదు</strong>. కస్టమర్లకు అవి “స్టాక్ ఇటీవల నిర్ధారించలేదు” అని కనిపిస్తాయి.",
     "review": "reviewed",
     "enHash": "b9322572"
   },
   "overview.insights.regulars_slipping.label": {
-    "message": "రెగ్యులర్ కస్టమర్‌లు దూరమవుతున్నారు",
+    "message": "రెగ్యులర్ కస్టమర్లు దూరమవుతున్నారు",
     "review": "reviewed",
     "enHash": "55ae88e6"
   },
   "overview.insights.regulars_slipping.sentence": {
-    "message": "<strong>{count, plural, other {#}} రెగ్యులర్ కస్టమర్‌లు</strong> {unit, select, weeks {{span, plural, other {#}} వారాలుగా} other {{span, plural, other {#}} రోజులుగా}} కొనలేదు.",
+    "message": "<strong>{count, plural, other {#}} రెగ్యులర్ కస్టమర్లు</strong> {unit, select, weeks {{span, plural, other {#}} వారాలుగా} other {{span, plural, other {#}} రోజులుగా}} కొనలేదు.",
     "review": "reviewed",
     "enHash": "2302efd8"
   },
@@ -585,7 +585,7 @@
     "enHash": "82d76c10"
   },
   "overview.insights.action.see_customers": {
-    "message": "కస్టమర్‌లను చూడండి",
+    "message": "కస్టమర్లను చూడండి",
     "review": "reviewed",
     "enHash": "393ef412"
   },
@@ -615,7 +615,7 @@
     "enHash": "9c2386e6"
   },
   "overview.setup.next.products": {
-    "message": "కస్టమర్‌లు కనుగొనేలా మీ ప్రోడక్ట్‌లు జోడించండి.",
+    "message": "కస్టమర్లు కనుగొనేలా మీ ప్రోడక్ట్‌లు జోడించండి.",
     "review": "reviewed",
     "enHash": "b7a72097"
   },
@@ -680,12 +680,12 @@
     "enHash": "12cfd9dc"
   },
   "overview.gate.cashier": {
-    "message": "ఈ స్క్రీన్ యజమానులు, మేనేజర్‌ల కోసం. మీ ఆర్డర్‌లు, కౌంటర్ ఇక్కడ ఉన్నాయి.",
+    "message": "ఈ స్క్రీన్ యజమానులు, మేనేజర్‌ల కోసం. మీ ఆర్డర్లు, కౌంటర్ ఇక్కడ ఉన్నాయి.",
     "review": "reviewed",
     "enHash": "be4f2c6b"
   },
   "overview.gate.orders": {
-    "message": "ఆర్డర్‌లు",
+    "message": "ఆర్డర్లు",
     "review": "reviewed",
     "enHash": "cded0933"
   }

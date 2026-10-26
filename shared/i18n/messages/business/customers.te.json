@@ -1,6 +1,6 @@
 {
   "customers.title": {
-    "message": "కస్టమర్‌లు",
+    "message": "కస్టమర్లు",
     "review": "reviewed",
     "enHash": "035eae60"
   },
@@ -50,7 +50,7 @@
     "enHash": "0e85749a"
   },
   "customers.error": {
-    "message": "కస్టమర్‌లు లోడ్ కాలేదు",
+    "message": "కస్టమర్లు లోడ్ కాలేదు",
     "review": "reviewed",
     "enHash": "fefeb39f"
   },
@@ -60,27 +60,27 @@
     "enHash": "dfe60ca9"
   },
   "customers.notEnough.title": {
-    "message": "ఇంకా తగినంత లింక్ చేసిన కస్టమర్‌లు లేరు",
+    "message": "ఇంకా తగినంత లింక్ చేసిన కస్టమర్లు లేరు",
     "review": "reviewed",
     "enHash": "bdd0f6d3"
   },
   "customers.notEnough.body": {
-    "message": "దీన్ని చూడడానికి కౌంటర్‌లో కస్టమర్‌లను లింక్ చేయండి",
+    "message": "దీన్ని చూడడానికి కౌంటర్‌లో కస్టమర్లను లింక్ చేయండి",
     "review": "reviewed",
     "enHash": "5d5ad767"
   },
   "customers.about.window": {
-    "message": "గత {days} రోజుల్లో {total, plural, other {#}} కస్టమర్‌లు ఇక్కడ కొన్నారు",
+    "message": "గత {days} రోజుల్లో {total, plural, other {#}} కస్టమర్లు ఇక్కడ కొన్నారు",
     "review": "reviewed",
     "enHash": "8c69f589"
   },
   "customers.about.slipping": {
-    "message": "{total, plural, other {#}} రెగ్యులర్ కస్టమర్‌లు {days} రోజులుగా కొనలేదు",
+    "message": "{total, plural, other {#}} రెగ్యులర్ కస్టమర్లు {days} రోజులుగా కొనలేదు",
     "review": "reviewed",
     "enHash": "d1425e51"
   },
   "customers.empty": {
-    "message": "ఈ వ్యవధిలో కస్టమర్‌లు లేరు",
+    "message": "ఈ వ్యవధిలో కస్టమర్లు లేరు",
     "review": "reviewed",
     "enHash": "adf13418"
   },

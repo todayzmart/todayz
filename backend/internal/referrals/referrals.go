@@ -117,6 +117,10 @@ type Deps struct {
 	// transaction; nil leaves the posting to the sweep (router tests, a
 	// process without a queue).
 	Jobs platformjobs.Enqueuer
+	// SelfLike runs risk's referral.self_like on a referral before its reward
+	// posts (D-237). jobs.ReferralsService always sets it; nil (router
+	// tests) leaves the check to risk_scan.
+	SelfLike SelfLikeCheck
 	// PublicURL is the API's public base URL (the share links).
 	PublicURL string
 	// CustomerApp and BusinessApp are the apps' origins (the redirects).
@@ -134,6 +138,7 @@ type Service struct {
 	ledger      Ledger
 	notices     notice.Sender
 	jobs        platformjobs.Enqueuer
+	selfLike    SelfLikeCheck
 	publicURL   string
 	customerApp string
 	businessApp string
@@ -151,7 +156,7 @@ func New(d Deps) (*Service, error) {
 		return nil, errors.New("referrals: a ledger is required")
 	}
 	s := &Service{
-		db: d.DB, clock: d.Clock, settings: d.Settings, hasher: d.Hasher, ledger: d.Ledger, notices: d.Notices, jobs: d.Jobs,
+		db: d.DB, clock: d.Clock, settings: d.Settings, hasher: d.Hasher, ledger: d.Ledger, notices: d.Notices, jobs: d.Jobs, selfLike: d.SelfLike,
 		publicURL:   strings.TrimRight(d.PublicURL, "/"),
 		customerApp: strings.TrimRight(d.CustomerApp, "/"),
 		businessApp: strings.TrimRight(d.BusinessApp, "/"),

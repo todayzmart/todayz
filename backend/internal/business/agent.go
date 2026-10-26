@@ -188,6 +188,12 @@ func RegisterField(r chi.Router, f *Field, az authz.Authorizer) {
 
 var errFieldUnavailable = errors.New("business: field routes are not configured")
 
+// errUploadExpired is a field photo confirmed past its confirm_by: the sweep
+// rejects it and deletes its object, so the agent adds it again.
+func errUploadExpired() error {
+	return problem.New(genproblems.InvalidTransition, "the upload URL has expired; add the photo again")
+}
+
 // fieldCall is the caller of a field route and the engine's decision.
 type fieldCall struct {
 	p   authn.Principal
@@ -903,7 +909,7 @@ func (f *Field) confirmPhoto(ctx context.Context, bidStr, docStr string) (adminf
 	}
 	now := f.s.clock.Now()
 	if doc.ConfirmBy != nil && now.After(*doc.ConfirmBy) {
-		return adminfieldapi.FieldDocument{}, problem.New(genproblems.InvalidTransition, "the upload URL has expired; add the photo again")
+		return adminfieldapi.FieldDocument{}, errUploadExpired()
 	}
 	// Outside the transaction: no row lock is held over the bucket call.
 	obj, err := f.s.presign.head(ctx, doc.ObjectKey, now)
@@ -926,6 +932,11 @@ func (f *Field) confirmPhoto(ctx context.Context, bidStr, docStr string) (adminf
 			return nil
 		}
 		doc, err = f.s.q(ctx).MarkDocumentUploaded(ctx, businessdb.MarkDocumentUploadedParams{Now: f.s.clock.Now(), ID: cur.ID})
+		if db.IsNoRows(err) {
+			// Past confirm_by since the first read: the sweep may already
+			// have deleted the object.
+			return errUploadExpired()
+		}
 		if err != nil {
 			return fmt.Errorf("business: confirm field photo: %w", err)
 		}

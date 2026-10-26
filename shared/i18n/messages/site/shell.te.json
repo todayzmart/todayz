@@ -1,0 +1,52 @@
+{
+  "site.title": {
+    "message": "TodayZ: దగ్గరలో అన్నీ, ఈ రోజే",
+    "review": "reviewed",
+    "enHash": "e514d77d"
+  },
+  "site.description": {
+    "message": "మీకు దగ్గరలోని దుకాణాల్లో ఏం స్టాక్‌లో ఉందో చూడండి, బుక్ చేయండి, పికప్ లేదా డెలివరీలో తీసుకోండి.",
+    "review": "reviewed",
+    "enHash": "7e3e5251"
+  },
+  "site.skipToContent": {
+    "message": "నేరుగా ప్రధాన భాగానికి వెళ్లండి",
+    "review": "reviewed",
+    "enHash": "0a4470d6"
+  },
+  "site.logoAlt": {
+    "message": "TodayZ",
+    "review": "reviewed",
+    "enHash": "34b58f9d"
+  },
+  "site.hero.title": {
+    "message": "దగ్గరలో అన్నీ, ఈ రోజే.",
+    "review": "reviewed",
+    "enHash": "1aaf493f"
+  },
+  "site.hero.sub": {
+    "message": "స్థానిక దుకాణాలు తమ స్టాక్‌ను ఆన్‌లైన్‌లో పెడతాయి. మీ దగ్గర ఏం స్టాక్‌లో ఉందో చూసి, బుక్ చేసి, పికప్ లేదా డెలివరీలో తీసుకోండి.",
+    "review": "reviewed",
+    "enHash": "ecee0988"
+  },
+  "site.soon.tag": {
+    "message": "త్వరలో రాబోతోంది",
+    "review": "reviewed",
+    "enHash": "e4115be2"
+  },
+  "site.soon.title": {
+    "message": "మేము ప్రారంభానికి సిద్ధమవుతున్నాం",
+    "review": "reviewed",
+    "enHash": "6c48ef38"
+  },
+  "site.soon.body": {
+    "message": "TodayZ ను నిర్మిస్తున్నప్పుడు ఈ సైట్ తాత్కాలిక పేజీ. దుకాణ యజమానులు త్వరలో ఇక్కడ సైన్ అప్ చేయగలరు.",
+    "review": "reviewed",
+    "enHash": "dc1f1b4f"
+  },
+  "site.footer": {
+    "message": "© {year} TodayZ",
+    "review": "reviewed",
+    "enHash": "04b1a988"
+  }
+}

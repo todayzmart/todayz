@@ -33,12 +33,19 @@ type supportBucket struct {
 	srv     *httptest.Server
 	mu      sync.Mutex
 	objects map[string][2]string // path → content type, size
+	onHead  func(path string)    // runs (unlocked) before a HEAD is answered
 }
 
 func newSupportBucket(t *testing.T) *supportBucket {
 	t.Helper()
 	b := &supportBucket{objects: map[string][2]string{}}
 	b.srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		b.mu.Lock()
+		hook := b.onHead
+		b.mu.Unlock()
+		if hook != nil && r.Method == http.MethodHead {
+			hook(r.URL.Path)
+		}
 		b.mu.Lock()
 		defer b.mu.Unlock()
 		o, ok := b.objects[r.URL.Path]

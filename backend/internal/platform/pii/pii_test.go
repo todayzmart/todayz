@@ -110,3 +110,15 @@ func TestPhones(t *testing.T) {
 	require.False(t, IsReservedTestPhone("+919876543210"))
 	require.False(t, IsReservedTestPhone("+9190000000"))
 }
+
+func TestContainsPhone(t *testing.T) {
+	for _, s := range []string{
+		"9876543210", "call +91 98765 43210", "ph 098765-43210", "0091 98765 43210", "98765.43210",
+		"९८७६५४३२१०", "９８７６５४३२१०", "call 98765 ४३२१०",
+	} {
+		require.True(t, ContainsPhone(s), s)
+	}
+	for _, s := range []string{"", "order TZ-48213", "pincode 560011", "on 2026-10-24", "5 no-shows in 30 days", "1234567890"} {
+		require.False(t, ContainsPhone(s), s)
+	}
+}
