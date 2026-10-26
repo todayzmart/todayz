@@ -76,3 +76,9 @@ SC-AI-56…65 are in 08-testing (Admin AI row).
 - Conservative defaults taken: every line starts as Skip, so a confirm with nothing chosen applies nothing; the triage summary takes no edit; the slot comments are unchanged.
 - The production `build` of the admin app needs a real `VITE_TURNSTILE_SITE_KEY` (pre-existing, noted in the W3-15 report); `build:e2e`, which `make check` uses, is green.
 - hi, kn, te and ta copy are machine drafts awaiting review.
+
+## Branch
+
+- `aae618bb` backend, `c0cf3d68` console, tests, copy, plan and this report, `2b29bec0` merge of `main` at `403b64d6` (clean, no conflicts).
+- After the merge: Go tests with `-race` on the shared test Postgres for `internal/ai/{catalogue,triage,riskexplain,assist}` (with the evals), `internal/admin`, `internal/support`, `internal/identity` (changed on `main`) and `cmd/todayz`: all ok. Admin typecheck, lint, CSS lint, 285 unit tests, `build:e2e`, size 171.85 kB, Playwright 50 passed; i18n 198 passed.
+- Not pushed.
