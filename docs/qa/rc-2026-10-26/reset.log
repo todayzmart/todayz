@@ -1,0 +1,13 @@
+==> reset: reset-db
+ Container todayz-postgres-1 Recreate 
+ Container todayz-postgres-1 Recreated 
+ Container todayz-postgres-1 Starting 
+ Container todayz-postgres-1 Started 
+ Container todayz-postgres-1 Waiting 
+ Container todayz-postgres-1 Healthy 
+stack: databases todayz and todayz_test recreated (empty; migrations and seed run next)
+==> reset: reset-backend
+/bin/bash: sqlc: command not found
+make[2]: *** [gen-backend] Error 127
+make reset: step reset-backend failed (exit 2)
+make[1]: *** [reset] Error 2
