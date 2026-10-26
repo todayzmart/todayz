@@ -3,6 +3,7 @@ import { createUpdateController } from '@todayz/auth';
 import { asMessages } from '@todayz/i18n';
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { createMemoryHistory, createRootRoute, createRouter, RouterProvider } from '@tanstack/react-router';
+import { StrictMode } from 'react';
 import { IntlProvider } from 'react-intl';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { UpdateContext } from '../app/update-context';
@@ -66,6 +67,8 @@ interface Options {
   role?: PosStoreRef['role'];
   online?: boolean;
   narrow?: boolean;
+  /** Render under StrictMode, which runs every effect twice as the dev build does. */
+  strict?: boolean;
 }
 
 async function mount(opts: Options = {}) {
@@ -94,7 +97,8 @@ async function mount(opts: Options = {}) {
   );
   // The add-product sheet links to Stock, so the counter needs a router around it.
   const router = createRouter({ routeTree: createRootRoute({ component: () => tree }), history: createMemoryHistory({ initialEntries: ['/'] }) });
-  const view = render(<RouterProvider router={router} />);
+  const app = <RouterProvider router={router} />;
+  const view = render(opts.strict ? <StrictMode>{app}</StrictMode> : app);
   await screen.findByRole('button', { name: /Rice 1 kg/ });
   return { server, storage, user, view };
 }
@@ -386,6 +390,31 @@ describe('B-05 counter', () => {
     await user.click(tile(/Sugar 1 kg/));
     expect(await screen.findByText('Customer link removed')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Link customer' })).toBeEnabled();
+  });
+
+  it('makes the bill QR on the first try when the effect runs twice', async () => {
+    const { user, server } = await mount({ strict: true });
+    // As the server does: the same Idempotency-Key while its request is in flight is a 409.
+    const inFlight = new Set<string>();
+    let calls = 0;
+    server.api.createBillClaim = (_draft, key) => {
+      calls++;
+      if (inFlight.has(key)) return Promise.reject(new Error('409 conflict'));
+      inFlight.add(key);
+      return new Promise((resolve) =>
+        setTimeout(() => {
+          inFlight.delete(key);
+          resolve({ claimId: 'claim-1', token: 'EXAMPLE_token', expiresAt: '2026-10-24T10:02:00.000Z', serverNow: SERVER_NOW });
+        }, 20),
+      );
+    };
+    await user.click(tile(/Rice 1 kg/));
+    await user.click(screen.getByRole('button', { name: 'Link customer' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Link a customer' });
+    await user.click(within(dialog).getByRole('button', { name: /Customer scans a QR/ }));
+    expect(await within(dialog).findByRole('img', { name: /QR/ })).toBeInTheDocument();
+    expect(within(dialog).queryByText("Couldn't make the QR.")).toBeNull();
+    expect(calls).toBe(1);
   });
 
   it('on a phone the bill sits behind a bar and a sheet', async () => {

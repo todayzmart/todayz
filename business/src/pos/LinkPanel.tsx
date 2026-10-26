@@ -125,17 +125,22 @@ function BillQr({
   };
   // Device clock minus server clock when the claim was made, so the countdown follows the server's expiry.
   const skewRef = useRef(0);
-  // One Idempotency-Key (a ULID, 04 §1.6) per bill, amount and "Try again", so a repeated request
-  // replays the same claim.
-  const keys = useRef(new Map<string, string>());
+  // One request per bill, amount and "Try again", under one Idempotency-Key (a ULID, 04 §1.6). The
+  // effect re-running (StrictMode, a remount) waits on the same request instead of sending the key
+  // again while it is in flight, which the server answers 409.
+  const claims = useRef(new Map<string, Promise<BillClaim>>());
 
   useEffect(() => {
     let cancelled = false;
     const sig = `${saleClientId}-${amountPaise}-${round}`;
-    const key = keys.current.get(sig) ?? newUlid();
-    keys.current.set(sig, key);
-    api
-      .createBillClaim({ saleClientId, amountPaise }, key)
+    let pending = claims.current.get(sig);
+    if (!pending) {
+      pending = api.createBillClaim({ saleClientId, amountPaise }, newUlid());
+      claims.current.set(sig, pending);
+      // A failed request is not kept, so the next run asks again.
+      pending.catch(() => claims.current.delete(sig));
+    }
+    pending
       .then((c) => {
         if (cancelled) return;
         skewRef.current = now() - Date.parse(c.serverNow);
