@@ -291,6 +291,14 @@
     "defaultMessage": "Name",
     "description": "Label of the name field"
   },
+  "account.name.edit": {
+    "defaultMessage": "Edit name",
+    "description": "Account: pencil button next to the name; opens the name field"
+  },
+  "account.name.cancel": {
+    "defaultMessage": "Cancel",
+    "description": "Account: closes the name field without saving"
+  },
   "account.name.save": {
     "defaultMessage": "Save",
     "description": "Saves the name"
@@ -307,10 +315,6 @@
     "defaultMessage": "We couldn't save that. Try again.",
     "description": "Saving the name failed"
   },
-  "account.phone": {
-    "defaultMessage": "Mobile number",
-    "description": "Row label for the signed-in number (masked)"
-  },
   "account.language": {
     "defaultMessage": "Language",
     "description": "Row label for the language"
@@ -318,10 +322,6 @@
   "account.location": {
     "defaultMessage": "Location",
     "description": "Row label for the saved location"
-  },
-  "account.change": {
-    "defaultMessage": "Change",
-    "description": "Link to change the language or location"
   },
   "account.signOut": {
     "defaultMessage": "Sign out",

@@ -1439,6 +1439,55 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
 - **Not changed.** Only an admin-accepted storefront photo is ever public; shop interior photos (`shop_photo`), KYC documents and pending uploads stay private. A store shows its photo up to 5 minutes after the acceptance.
 - Tests: `internal/business` `TestPublishStorePhotosDB`, `shared/ui` StoreCard, customer `home.test.tsx` and `store.test.tsx`.
 
+**D-247 · The site's cream-and-navy look is tried as a standalone page first (founder, 26 Oct: "i want to test first … site / cream / navy / bag logo / keep all the things mentioned").**
+- **What.** A local-only trial of the founder's landing page (`design/trials/site-home/index.html`), rebuilt on our fonts (Anek, Figtree), tokens and Lucide icons. It keeps every section and its copy, and uses:
+  - a cream page background with the dot grid (D-101);
+  - navy blocks for the top bar, radar, savings calculator, store owners panel and footer;
+  - our bag logo with the `TodayZ` wordmark, not the "T" monogram.
+- **Scope.** Site only, and only as a trial. Tokens, `shared/ui`, the four apps and the live Astro site are unchanged, and no visual baselines move.
+- **Trial-only colours.** Cream `#faf9f5` / `#f3f0e9`, navy `#0b101d`, and mint and category colours used only on navy. They are CSS variables in the trial page. Text and buttons on cream stay on our brand green, because the source page's emerald fails contrast on cream.
+- **If the founder keeps it.** The colours become tokens in `design/source/tokens.json`, the page is ported into `site/` with message keys, and the copy conflicts listed in the trial README are settled first.
+
+**D-248 · A bright, Zomato/Swiggy-style look is tried on the customer app home and the site (founder, 26 Oct: "white theme but exellent color combinations, styles, css, ui/ux etc / can we do like that"; answers: both surfaces, free stock photos, light grey background).**
+- **What.** Two local-only trial pages:
+  - `design/trials/app-home/index.html` is the customer home at phone width;
+  - `design/trials/site-home-bright/index.html` is the D-247 site page re-skinned, with the same content.
+- **The look.**
+  - A light grey page (`#f4f5f7`) with white cards and soft shadows.
+  - Brand green is the one loud colour; colour comes from photos and from full-strength promo or section blocks (green, plum, blue).
+  - Anek headings at weight 800, letter-spaced centred section labels between hairlines, and round category photos.
+  - Big photo shop cards with the cashback on the photo, a product rail with `ADD`, a sticky search with a mic, filter chips, a floating cart bar and the five-tab bottom bar.
+- **What is not copied.** Their logos, illustrations, exact colours or layouts. Text stays on our green, because their orange and red fail contrast for small text.
+- **Photos.** These are Openverse CC BY 2.0 photos in `design/trials/photos/`, credited in `CREDITS.md`, for the trials only.
+- **Scope.** Trials only. Tokens, `shared/ui`, the apps and the live site are unchanged, and no visual baselines move. If the founder keeps the look, the trial-only values become tokens first, and the screens follow.
+
+**D-249 · The bright look moves from the trial into the customer app as a skin (founder, 26 Oct, on the live `/account`: "too bad"; "i see every page in customer side"; answer: "Fix the source").**
+- **What.** The customer shell root sets `data-skin="bright"`. The skin lives in `design/source/components/bundle.css` and changes the default look for that app only:
+  - a light grey `page` (#F4F5F7) behind white cards, with `shadow-card` in place of the hairline border;
+  - the primary button is `brand` green instead of `inverse`, and selected chips are `brand-soft`;
+  - plain links are `brand` at weight 600, so no browser blue or purple, and `dd` has no indent;
+  - the active bottom-nav tab is `brand`, with a 3px bar on top;
+  - page titles are Anek 800 at 26px.
+- **New tokens.** `page` and `shadow-card`. Only `ink` and `ink-2` text sits directly on `page`; `ink-3` would fall to 4.3:1.
+- **New components.**
+  - `tz-list`: a settings list of rows, each with a tinted round icon, a label, a value and a chevron.
+  - `tz-label-rule`: a letter-spaced label between hairlines that fade out.
+- **Unchanged.** Business, admin and the design cards keep the white page, the borders and the `inverse` primary. The README's colour rules carry a "Bright skin" section for the exceptions.
+- **First screen.** Account is restyled:
+  - a profile card with a letter avatar;
+  - Language, Location, Baskets and Help as `tz-list` rows;
+  - Saved addresses;
+  - a white Sign out button.
+
+  The unused keys `account.phone` and `account.change` are removed.
+- **Next.** The other customer screens follow one at a time. Screenshots come from `customer/e2e/bright.shots.spec.ts`.
+- **Baselines.** The customer visual baselines in `e2e/visual/` will differ. They are refreshed only after the founder's yes.
+
+**D-250 · Baskets takes the last bottom-nav tab, and the name on Account is edited behind a pencil (founder, 26 Oct, on the live `/account`: "keep baskets in last tab, as on click on home screen profile icon and remove save button (instead keep edit icon and then this current UI)").**
+- **Nav.** The tabs are Home, Search, Orders, Wallet, Baskets. Account opens from the avatar in the Home header, so the Baskets row on Account goes.
+- **Name.** Account shows the name and phone with a pencil ("Edit name"). The pencil opens the name field with Cancel and Save. A saved name closes the field and shows "Saved". A 412 keeps the field open with the reloaded name and the conflict message.
+- **Profile photo.** Asked for in the same message; built in its own session.
+
 **D-252 · Products get photos: a shop's photo, an admin upload, or a stock photo from the Open Food/Beauty/Products Facts databases, each approved by an admin (lead brief, 26 Oct).**
 - **Why.** Every product showed only its initials. Shops can photograph what they add, and many packaged goods already have free photos under CC BY-SA in the Open Food Facts family of databases. Scraping retailers is not allowed.
 - **One table.** Migration `49601` adds `product_images` (source `retailer | admin | off | obf | opf`, status `uploading | pending | approved | rejected | replaced`) and `products.image_id` / `products.image_key`. A draft lives in the private bucket and no customer sees it. Approval copies it into the public images bucket and makes it the product's image; the image it replaces becomes `replaced`.

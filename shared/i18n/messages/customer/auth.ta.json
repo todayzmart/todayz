@@ -384,11 +384,6 @@
     "review": "reviewed",
     "enHash": "b1ecaf57"
   },
-  "account.phone": {
-    "message": "மொபைல் எண்",
-    "review": "reviewed",
-    "enHash": "8e5c12de"
-  },
   "account.language": {
     "message": "மொழி",
     "review": "reviewed",
@@ -399,14 +394,19 @@
     "review": "reviewed",
     "enHash": "d219c681"
   },
-  "account.change": {
-    "message": "மாற்று",
-    "review": "reviewed",
-    "enHash": "64fbd995"
-  },
   "account.signOut": {
     "message": "சைன் அவுட்",
     "review": "reviewed",
     "enHash": "dc1649a1"
+  },
+  "account.name.edit": {
+    "message": "பெயரைத் திருத்து",
+    "review": "machine",
+    "enHash": "d3aafd85"
+  },
+  "account.name.cancel": {
+    "message": "ரத்துசெய்",
+    "review": "machine",
+    "enHash": "77dfd213"
   }
 }

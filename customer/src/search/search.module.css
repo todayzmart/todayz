@@ -1,22 +1,22 @@
-/* C-05 Search. Tokens only. */
+/* C-05 Search (D-249 bright): a white sticky search band, one row of filter chips, and one white card
+   per shop with its items in a swipe row. Tokens only. */
 
 .page {
   padding-bottom: calc(var(--space-12) + var(--space-6));
 }
 
 .head {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-4);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  padding: var(--space-3) var(--space-4);
   padding-inline: max(var(--space-4), calc((100% - var(--column)) / 2 + var(--space-4)));
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
 }
 
-.title {
-  margin: 0;
-  font: var(--type-display);
-  letter-spacing: var(--type-display-tracking);
-  color: var(--ink);
+.head :global(.tz-ui-search-trailing) {
+  border-left: 1px solid var(--line);
 }
 
 .body {
@@ -34,35 +34,41 @@
   color: var(--ink-2);
 }
 
-.sectionTitle {
-  margin: 0;
-  font: var(--type-headline);
-  letter-spacing: var(--type-headline-tracking);
-  color: var(--ink);
-}
-
 .recentHead {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  margin-bottom: var(--space-2);
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
 }
 
+.recentHead > h2 {
+  flex: 1;
+}
+
+/* Recent searches and suggestions: one white card of rows. */
 .suggestions {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 var(--space-3);
   display: flex;
   flex-direction: column;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.suggestions > li + li {
+  border-top: 1px solid var(--line);
 }
 
 .suggestion {
   width: 100%;
   min-height: var(--tap-min);
-  padding: var(--space-2) var(--space-1);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
   border: 0;
-  border-bottom: 1px solid var(--line);
   background: transparent;
   color: var(--ink);
   font: var(--type-body);
@@ -70,16 +76,58 @@
   cursor: pointer;
 }
 
-.filters {
+.suggestion > :global(svg) {
+  flex: none;
+  color: var(--ink-2);
+}
+
+.suggestionText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.suggestion:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.cats {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
 
+/* Radius, sort and the filters in one row that scrolls sideways. */
+.filterRow {
+  display: flex;
+  gap: var(--space-2);
+  margin-inline: calc(-1 * var(--space-4));
+  padding: 2px var(--space-4) var(--space-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filterRow > * {
+  flex: none;
+}
+
 .summary {
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--brand-soft);
   font: var(--type-label);
-  color: var(--ink-2);
+  color: var(--brand-strong);
+}
+
+.summary > :global(svg) {
+  flex: none;
 }
 
 .groups {
@@ -88,19 +136,43 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
 }
 
+/* One white card per shop: the shop row on top (its own card look switched off), then its items. */
 .group {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  padding: var(--space-1) 0 var(--space-3);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.group > :global(.tz-scard) {
+  box-shadow: none;
+  background: none;
 }
 
 .items {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
   gap: var(--space-3);
+  padding: 0 var(--space-3) var(--space-1);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+
+.items > * {
+  flex: none;
+  width: 156px;
+  scroll-snap-align: start;
+}
+
+.group .items :global(.tz-pcard) {
+  border-color: var(--line);
+  box-shadow: none;
 }
 
 /* C-23 voice search: listening, the cap, a failure (W3-12). */

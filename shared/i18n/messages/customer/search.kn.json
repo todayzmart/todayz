@@ -243,5 +243,10 @@
     "message": "ಸೇರಿಸಿದ ಫಿಲ್ಟರ್‌ಗಳು",
     "review": "reviewed",
     "enHash": "8111377d"
+  },
+  "search.categories.title": {
+    "message": "ವರ್ಗದ ಪ್ರಕಾರ ಖರೀದಿಸಿ",
+    "review": "machine",
+    "enHash": "09ac8bca"
   }
 }

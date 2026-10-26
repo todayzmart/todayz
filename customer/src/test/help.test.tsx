@@ -166,6 +166,6 @@ describe('C-19 help', () => {
       returning: true,
       handlers: [signedIn, on('GET', '/v1/me', () => json(200, { id: USER, phoneMasked: '+91 ••••• •0021', name: 'Asha', preferredLang: 'en' }, { etag: '"1"' }))],
     });
-    expect(await screen.findByRole('link', { name: 'Get help or see your tickets' })).toHaveAttribute('href', '/help');
+    expect(await screen.findByRole('link', { name: /Get help or see your tickets/ })).toHaveAttribute('href', '/help');
   });
 });

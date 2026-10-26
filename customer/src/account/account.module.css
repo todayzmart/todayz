@@ -1,0 +1,40 @@
+/* Account: the profile header (bright skin, D-249). Values come from tokens only. */
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--t-bg);
+  color: var(--t-ink);
+  font: 800 22px/1 var(--font-display);
+}
+
+.whoText {
+  flex: 1;
+  min-width: 0;
+}
+
+.edit {
+  margin-top: var(--space-4);
+}
+
+.editActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.saved {
+  margin: var(--space-3) 0 0;
+  font: var(--type-body-sm);
+  color: var(--brand-strong);
+}

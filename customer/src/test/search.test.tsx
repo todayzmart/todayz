@@ -78,7 +78,7 @@ describe('C-05 Search', () => {
     });
     renderDiscover('/search?q=atta', routes(stale));
     atBengaluru();
-    fireEvent.click(await screen.findByRole('button', { name: '20 km' }));
+    fireEvent.change(await screen.findByRole('combobox', { name: 'Search radius' }), { target: { value: '20' } });
     await waitFor(() => expect(screen.queryByRole('button', { name: /Search within/ })).not.toBeInTheDocument());
     expect(await screen.findByText('None of the shops has confirmed yet.')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Search within/ })).not.toBeInTheDocument();

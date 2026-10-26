@@ -248,5 +248,160 @@
     "message": "విభాగం తెరవండి",
     "review": "reviewed",
     "enHash": "d189c7fd"
+  },
+  "home.wallet.label": {
+    "message": "వాలెట్, {count, plural, one {# క్రెడిట్} other {# క్రెడిట్‌లు}}",
+    "review": "machine",
+    "enHash": "d1c7ec10"
+  },
+  "home.account.label": {
+    "message": "ఖాతా",
+    "review": "machine",
+    "enHash": "85dfa32c"
+  },
+  "home.filters.label": {
+    "message": "షాపులను ఫిల్టర్ చేయండి",
+    "review": "machine",
+    "enHash": "2a5b401c"
+  },
+  "home.radius.within": {
+    "message": "{km} km లోపల",
+    "review": "machine",
+    "enHash": "e7ce5cbc"
+  },
+  "home.filter.openNow": {
+    "message": "ఇప్పుడు తెరిచి ఉన్నవి",
+    "review": "machine",
+    "enHash": "d7a05e65"
+  },
+  "home.filter.pickup": {
+    "message": "పికప్",
+    "review": "machine",
+    "enHash": "a51122c1"
+  },
+  "home.filter.delivery": {
+    "message": "డెలివరీ",
+    "review": "machine",
+    "enHash": "9631af52"
+  },
+  "home.filter.offers": {
+    "message": "ఆఫర్లు",
+    "review": "machine",
+    "enHash": "43c94306"
+  },
+  "home.filters.clear": {
+    "message": "ఫిల్టర్లు తీసివేయండి",
+    "review": "machine",
+    "enHash": "41222671"
+  },
+  "home.empty.filtered.title": {
+    "message": "ఈ ఫిల్టర్లకు సరిపడే షాపు లేదు",
+    "review": "machine",
+    "enHash": "423f30a9"
+  },
+  "home.empty.filtered.body": {
+    "message": "తక్కువ ఫిల్టర్లు ఎంచుకోండి లేదా ఇంకా దూరం వరకు వెతకండి.",
+    "review": "machine",
+    "enHash": "d7669f3a"
+  },
+  "home.offers.title": {
+    "message": "మీ దగ్గరి ఆఫర్లు",
+    "review": "machine",
+    "enHash": "13f6c37f"
+  },
+  "home.offers.viewShop": {
+    "message": "షాపు చూడండి",
+    "review": "machine",
+    "enHash": "c55061ee"
+  },
+  "home.offers.how.eyebrow": {
+    "message": "TodayZ ఎలా పని చేస్తుంది",
+    "review": "machine",
+    "enHash": "eab4e74e"
+  },
+  "home.offers.how.title": {
+    "message": "బుక్ చేయండి. నడిచి వెళ్లి తెచ్చుకోండి.",
+    "review": "machine",
+    "enHash": "4242d4c6"
+  },
+  "home.offers.how.sub": {
+    "message": "దగ్గరి షాపుల షెల్ఫ్‌లో ఉన్నవాటిని బుక్ చేసి, ఈరోజే పికప్ చేయండి.",
+    "review": "machine",
+    "enHash": "ae797517"
+  },
+  "home.offers.how.cta": {
+    "message": "దగ్గరలో వెతకండి",
+    "review": "machine",
+    "enHash": "ad3bae31"
+  },
+  "home.offers.credits.eyebrow": {
+    "message": "క్యాష్ బ్యాక్",
+    "review": "machine",
+    "enHash": "90685d65"
+  },
+  "home.offers.credits.title": {
+    "message": "కొంటూనే క్రెడిట్‌లు పొందండి",
+    "review": "machine",
+    "enHash": "5d61d4dd"
+  },
+  "home.offers.credits.sub": {
+    "message": "క్యాష్ బ్యాక్ ఉన్న షాపులు క్రెడిట్‌లుగా తిరిగి ఇస్తాయి. ప్రతి క్రెడిట్ తర్వాతి ఆర్డర్‌పై ₹1 తగ్గింపు.",
+    "review": "machine",
+    "enHash": "087fcf9b"
+  },
+  "home.offers.credits.cta": {
+    "message": "వాలెట్ తెరవండి",
+    "review": "machine",
+    "enHash": "57fba6b3"
+  },
+  "home.offers.baskets.eyebrow": {
+    "message": "బాస్కెట్‌లు",
+    "review": "machine",
+    "enHash": "d368818f"
+  },
+  "home.offers.baskets.cta": {
+    "message": "బాస్కెట్‌లు తెరవండి",
+    "review": "machine",
+    "enHash": "f22b5481"
+  },
+  "home.categories.title": {
+    "message": "మీరు ఏం వెతుకుతున్నారు?",
+    "review": "machine",
+    "enHash": "ffca59bc"
+  },
+  "home.card.cashback": {
+    "message": "{pct}% క్యాష్ బ్యాక్",
+    "review": "machine",
+    "enHash": "73d039a2"
+  },
+  "home.card.asCredits": {
+    "message": "క్రెడిట్‌లుగా",
+    "review": "machine",
+    "enHash": "0414ab76"
+  },
+  "home.card.rating": {
+    "message": "5కి {rating} రేటింగ్, {count, plural, one {# రేటింగ్} other {# రేటింగ్‌లు}}",
+    "review": "machine",
+    "enHash": "df99ab0c"
+  },
+  "home.card.footer.cashback": {
+    "message": "ప్రతి ఆర్డర్‌పై {pct}% క్రెడిట్‌లుగా తిరిగి",
+    "review": "machine",
+    "enHash": "f1fad6f5"
+  },
+  "home.card.footer.none": {
+    "message": "ఈ షాపులో క్యాష్ బ్యాక్ లేదు",
+    "review": "machine",
+    "enHash": "45bf03b9"
+  },
+  "home.place.current": {
+    "message": "మీ లొకేషన్:",
+    "review": "machine",
+    "enHash": "9cf8c08f"
+  },
+  "home.place.change": {
+    "message": "లొకేషన్ మార్చండి",
+    "review": "machine",
+    "enHash": "04410a88"
   }
 }

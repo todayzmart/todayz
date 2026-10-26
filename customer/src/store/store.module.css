@@ -1,46 +1,188 @@
-/* C-07 Shop page, shared bits for the cart bar and item grids. Tokens only. */
+/* C-07 Shop page (D-249 bright): a photo cover, a white card over it, a sticky search band with
+   category chips, and the item grid. Tokens only. */
 
 .page {
   padding-bottom: calc(var(--space-12) + var(--space-6));
 }
 
 .head {
+  max-width: var(--column);
+  margin: 0 auto;
+}
+
+.cover {
+  height: 184px;
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+.cover > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card {
+  position: relative;
+  margin: calc(-1 * var(--space-12)) var(--space-4) 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-4) var(--space-4) var(--space-5);
-  padding-inline: max(var(--space-4), calc((100% - var(--column)) / 2 + var(--space-4)));
+  padding: var(--space-4) var(--space-4) 0;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+/* Without a cashback strip the card still ends with padding. */
+.card > :last-child:not(.offer) {
+  margin-bottom: var(--space-4);
 }
 
 .titleRow {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-3);
+}
+
+.titleText {
+  flex: 1;
+  min-width: 0;
 }
 
 .name {
   margin: 0;
-  font: var(--type-display);
+  font: var(--type-title);
   letter-spacing: var(--type-display-tracking);
   color: var(--ink);
   overflow-wrap: anywhere;
 }
 
-.rating {
+.meta {
+  margin-top: 2px;
+}
+
+.meta > span {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
 }
 
-.note {
+.meta :global(svg) {
+  width: 14px;
+  height: 14px;
+  color: var(--ink-3);
+}
+
+.rate {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 2px;
+  padding: 2px 7px;
+  border-radius: var(--radius-xs);
+  background: var(--brand);
+  color: var(--on-brand);
+  font: var(--type-label);
+}
+
+.rate :global(svg) {
+  width: 12px;
+  height: 12px;
+  fill: currentcolor;
+}
+
+.facts {
+  list-style: none;
   margin: 0;
+  padding: var(--space-3) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border-top: 1px solid var(--line);
   font: var(--type-body-sm);
+  color: var(--ink-2);
+}
+
+.facts > li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.facts :global(svg) {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--ink-3);
+}
+
+.open {
+  font-weight: 700;
+  color: var(--brand-strong);
+}
+
+.closed {
+  font-weight: 700;
+  color: var(--danger);
+}
+
+.note {
   color: var(--ink-2);
 }
 
 .actions {
   display: flex;
   gap: var(--space-2);
+}
+
+/* The cashback strip closes the card, like Home's shop cards. */
+.offer {
+  margin: 0 calc(-1 * var(--space-4));
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 10px var(--space-4);
+  border-top: 1px dashed var(--line-control);
+  background: var(--info-soft);
+  font: var(--type-label);
+  color: var(--info);
+}
+
+.offer > :global(svg) {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+
+/* In-shop search and category chips stay on top while the items scroll. */
+.band {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  margin-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  padding-inline: max(var(--space-4), calc((100% - var(--column)) / 2 + var(--space-4)));
+  background: var(--surface);
+  border-block: 1px solid var(--line);
+}
+
+.band :global(.tz-chips) {
+  flex-wrap: nowrap;
+  margin-inline: calc(-1 * var(--space-4));
+  padding-inline: var(--space-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.band :global(.tz-chip) {
+  flex: none;
 }
 
 .body {
@@ -56,7 +198,6 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-3);
-  margin-block: var(--space-3);
 }
 
 /* Above the bottom nav, inside the content column. */

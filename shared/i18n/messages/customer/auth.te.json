@@ -384,11 +384,6 @@
     "review": "reviewed",
     "enHash": "b1ecaf57"
   },
-  "account.phone": {
-    "message": "మొబైల్ నంబర్",
-    "review": "reviewed",
-    "enHash": "8e5c12de"
-  },
   "account.language": {
     "message": "భాష",
     "review": "reviewed",
@@ -399,14 +394,19 @@
     "review": "reviewed",
     "enHash": "d219c681"
   },
-  "account.change": {
-    "message": "మార్చండి",
-    "review": "reviewed",
-    "enHash": "64fbd995"
-  },
   "account.signOut": {
     "message": "సైన్ అవుట్",
     "review": "reviewed",
     "enHash": "dc1649a1"
+  },
+  "account.name.edit": {
+    "message": "పేరు మార్చండి",
+    "review": "machine",
+    "enHash": "d3aafd85"
+  },
+  "account.name.cancel": {
+    "message": "రద్దు చేయండి",
+    "review": "machine",
+    "enHash": "77dfd213"
   }
 }

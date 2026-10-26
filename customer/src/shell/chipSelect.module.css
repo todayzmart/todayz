@@ -1,0 +1,40 @@
+/* ChipSelect: a tz-chip wrapping a native select. Tokens only. */
+.chip {
+  position: relative;
+  padding: 0;
+}
+
+.chip select {
+  height: 100%;
+  padding: 0 calc(var(--space-3) + 18px) 0 var(--space-3);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  appearance: none;
+  cursor: pointer;
+}
+
+.chip[data-icon] select {
+  padding-left: calc(var(--space-3) + 22px);
+}
+
+.chip > :global(svg) {
+  position: absolute;
+  right: var(--space-2);
+  pointer-events: none;
+}
+
+.chip > :global(svg:first-of-type):not(:last-of-type) {
+  right: auto;
+  left: var(--space-3);
+}
+
+.chip:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.chip select:focus-visible {
+  outline: none;
+}

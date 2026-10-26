@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>TodayZ site trial · cream and navy</title>
+<!-- Trial of the founder's landing page (D-247) in our own fonts and tokens. Needs `make gen` (or
+     `pnpm --filter @todayz/tokens gen`) so shared/tokens/generated exists. Not part of any build. -->
+<link rel="stylesheet" href="../../../shared/tokens/generated/fonts.css">
+<link rel="stylesheet" href="../../../shared/tokens/generated/tokens.css">
+<style>
+/* Trial-only values (D-247). If the founder keeps the look, these become tokens in design/source. */
+:root{
+  --cream:#faf9f5;--cream-2:#f3f0e9;--navy:#0b101d;
+  --navy-line:rgba(255,255,255,.14);--navy-panel:rgba(255,255,255,.08);--on-navy-2:rgba(255,255,255,.7);
+  --navy-accent:#6ee7b7;--navy-green:#34d399;--navy-pink:#f472b6;--navy-blue:#60a5fa;--amber:#d97706;
+  --hair:color-mix(in srgb,var(--ink) 10%,transparent);
+  --dot:color-mix(in srgb,var(--ink) 10%,transparent);
+  --lift:0 1px 2px rgba(13,17,23,.04),0 22px 44px -24px rgba(13,17,23,.28);
+  --r-card:24px;--r-block:36px;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:96px}
+body{margin:0;background:var(--cream) radial-gradient(var(--dot) 1px,transparent 1px) 0 0/22px 22px;color:var(--ink);font:400 16px/1.55 var(--font-sans);-webkit-font-smoothing:antialiased;overflow-x:clip}
+svg{display:block}a{color:inherit}button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:8px}
+.navy :focus-visible,footer :focus-visible{outline-color:var(--navy-accent)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ic{display:inline-grid;place-items:center;flex-shrink:0}
+.ic svg{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.w{max-width:1180px;margin:0 auto;padding:0 24px}
+@media(max-width:480px){.w{padding:0 16px}}
+.disp{font-family:var(--font-display);font-weight:600;letter-spacing:-.02em}
+.acc{color:var(--brand)}
+.eyebrow{font:600 12px/1.4 var(--font-sans);letter-spacing:.14em;text-transform:uppercase;color:var(--brand);margin:0 0 14px}
+h1,h2,h3,h4{margin:0}
+h2{font:600 clamp(34px,5vw,58px)/1.05 var(--font-display);letter-spacing:-.02em;margin:0 0 16px}
+.sub{color:var(--ink-2);font-size:18px;max-width:640px;margin:0}
+.head{margin-bottom:48px}.head.c{text-align:center}.head.c .sub{margin:0 auto}
+section{padding:96px 0;position:relative}
+@media(max-width:640px){section{padding:64px 0}}
+.band{background:color-mix(in srgb,var(--cream-2) 60%,transparent);border-block:1px solid var(--hair)}
+
+/* top bar */
+.bar{background:var(--navy);color:var(--on-inverse);font-size:13px;padding:8px 0}
+.bar .w{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.live{display:inline-flex;align-items:center;gap:8px;padding:3px 11px;border-radius:99px;background:rgba(52,211,153,.16);border:1px solid rgba(52,211,153,.4);color:var(--navy-accent);font-weight:600}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--navy-green);display:inline-block;animation:pl 2.2s 4}
+@keyframes pl{50%{opacity:.35;transform:scale(1.3)}}
+.bar a{color:var(--on-inverse);text-underline-offset:3px;display:inline-flex;align-items:center;min-height:24px}
+.bar .ic{color:var(--navy-accent);vertical-align:-3px;margin-right:4px;display:inline-grid}
+@media(max-width:760px){.bar .hide{display:none}}
+
+/* header */
+header.nav{position:sticky;top:0;z-index:80;background:color-mix(in srgb,var(--cream) 86%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--hair)}
+.nav .w{display:flex;align-items:center;gap:16px;height:76px}
+.logo{display:flex;align-items:center;gap:11px;flex-shrink:0;text-decoration:none}
+.logo .mark{width:44px;height:44px;border-radius:12px;background:var(--surface);border:1px solid var(--hair);display:grid;place-items:center;overflow:hidden}
+.logo .mark img{width:36px;height:36px;display:block}
+.logo b{display:block;font:700 22px/1 var(--font-display);letter-spacing:-.02em}.logo b span{color:var(--brand-mark)}
+.logo small{font:700 11px/1 var(--font-sans);letter-spacing:.16em;color:var(--brand);display:block;margin-top:4px}
+.ns{flex:1;min-width:0;max-width:520px;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--hair);border-radius:99px;min-height:44px;padding:0 8px 0 16px;cursor:text;color:var(--ink-2);font-size:14px;text-align:left}
+.ns:hover{border-color:var(--brand)}.ns .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ns kbd{font:700 11px var(--font-sans);background:var(--cream-2);border-radius:6px;padding:3px 7px;color:var(--ink)}
+.nr{margin-left:auto;display:flex;gap:10px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:99px;background:var(--cream-2);border:1px solid var(--hair);font:600 13px var(--font-sans);color:var(--ink);cursor:pointer}
+.pill.g{background:var(--brand-soft);color:var(--brand-strong);border-color:color-mix(in srgb,var(--brand) 30%,transparent);cursor:default}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:99px;min-height:44px;padding:0 22px;font:700 14px var(--font-sans);background:var(--ink);color:var(--on-inverse);cursor:pointer;text-decoration:none;transition:background .18s,transform .18s}
+.btn:hover{background:var(--brand);transform:translateY(-1px)}
+.btn.light{background:var(--surface);color:var(--ink)}.btn.light:hover{background:var(--navy-accent);color:var(--ink)}
+@media(max-width:1120px){.pill.g{display:none}}
+@media(max-width:900px){.ns,.nr .btn{display:none}}
+@media(max-width:560px){#loc .lt{display:none}.logo small{display:none}}
+
+/* hero */
+.hero{padding:84px 0 70px;text-align:center;overflow:hidden}
+.hero::before{content:"";position:absolute;left:50%;top:-80px;width:1100px;height:700px;transform:translateX(-50%);background:radial-gradient(closest-side,color-mix(in srgb,var(--brand-mark) 16%,transparent),transparent);pointer-events:none}
+.hero .w{position:relative}
+.badge{display:inline-flex;align-items:center;gap:9px;padding:7px 16px;border-radius:99px;background:var(--brand-soft);border:1px solid color-mix(in srgb,var(--brand) 30%,transparent);color:var(--brand-strong);font:700 12px var(--font-sans);letter-spacing:.12em;text-transform:uppercase}
+.badge .dot{background:var(--brand-mark)}
+h1{font:600 clamp(48px,9vw,112px)/1.02 var(--font-display);letter-spacing:-.03em;margin:26px auto 22px;max-width:1000px}
+.lead{font-size:19px;color:var(--ink-2);max-width:610px;margin:0 auto}
+.trig{margin:36px auto 0;width:100%;max-width:680px;background:var(--surface);border:1px solid var(--hair);border-radius:99px;padding:8px;display:flex;align-items:center;gap:14px;box-shadow:var(--lift);cursor:pointer;text-align:left;transition:border-color .2s,transform .2s}
+.trig:hover{border-color:var(--brand);transform:translateY(-2px)}
+.trig .i{width:44px;height:44px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;flex-shrink:0}
+.trig .t{flex:1;color:var(--ink-2);font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trig .go{background:var(--ink);color:var(--on-inverse);padding:13px 24px;border-radius:99px;font:700 14px var(--font-sans);white-space:nowrap}
+@media(max-width:560px){.trig .go{display:none}}
+.hstats{display:flex;justify-content:center;margin:56px auto 0;max-width:820px;border:1px solid var(--hair);border-radius:22px;background:color-mix(in srgb,var(--surface) 80%,transparent);backdrop-filter:blur(8px);overflow:hidden}
+.hstats div{flex:1;padding:22px 12px;border-right:1px solid var(--hair)}.hstats div:last-child{border:0}
+.hstats b{display:block;font:600 44px/1.05 var(--font-display);letter-spacing:-.02em}.hstats span{display:block;font-size:13px;color:var(--ink-2);margin-top:4px}
+@media(max-width:600px){.hstats b{font-size:30px}.hstats span{font-size:12px;line-height:1.35}.hstats div{padding:16px 8px}}
+
+/* marquee */
+.mq{padding:44px 0;background:color-mix(in srgb,var(--cream-2) 70%,transparent);border-block:1px solid var(--hair);overflow:hidden;position:relative}
+.mq h2{text-align:center;margin:0 0 22px;padding:0 68px;font:600 16px var(--font-sans);letter-spacing:0}
+.mqp{position:absolute;right:16px;top:32px;width:44px;height:44px;border-radius:50%;border:1px solid var(--hair);background:var(--surface);display:grid;place-items:center;cursor:pointer}
+.mt{display:flex;gap:12px;width:max-content;animation:mqa 48s linear infinite;margin-bottom:12px}.mt.r{animation-direction:reverse;animation-duration:56s}
+.mq.paused .mt{animation-play-state:paused}
+@keyframes mqa{to{transform:translateX(-50%)}}
+.mt button{white-space:nowrap;background:var(--surface);border:1px solid var(--hair);border-radius:99px;min-height:44px;padding:0 18px;font:500 14px var(--font-sans);cursor:pointer;display:flex;gap:9px;align-items:center}
+.mt button:hover{border-color:var(--brand);background:var(--brand-soft)}.mt i{width:8px;height:8px;border-radius:50%}
+
+/* problem */
+.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}@media(max-width:860px){.pg{grid-template-columns:1fr}}
+.pc{background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-card);padding:34px;transition:transform .3s,box-shadow .3s,border-color .3s}
+.pc:hover{transform:translateY(-6px);box-shadow:var(--lift);border-color:var(--brand)}
+.pc .n{font:600 72px/1 var(--font-display);color:var(--brand)}.pc h3{margin:14px 0 8px;font:700 21px/1.25 var(--font-sans)}.pc p{margin:0;color:var(--ink-2);font-size:15px}
+.way{margin-top:18px;background:var(--brand-strong);color:var(--on-brand);border-radius:var(--r-card);padding:30px 34px;display:flex;gap:24px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.way .eyebrow{color:var(--navy-accent);margin-bottom:6px}.way p{font:600 30px/1.15 var(--font-display);letter-spacing:-.01em;margin:0}
+
+/* journey */
+.dg{background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-block);padding:34px 20px 26px;box-shadow:var(--lift);overflow:hidden}
+.dgs{overflow-x:auto}.dg svg.map{width:100%;height:auto;min-width:640px}
+.dgc{display:flex;justify-content:flex-end;margin:6px 0 0}
+.ghost{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:99px;border:1px solid var(--hair);background:var(--surface);font:600 13px var(--font-sans);cursor:pointer}
+.hud{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}.hud div{background:var(--cream-2);border:1px solid var(--hair);border-radius:18px;padding:14px 16px}
+.hud b{display:block;font:600 34px/1.05 var(--font-display)}.hud span{font-size:12px;letter-spacing:.06em;color:var(--ink-2);text-transform:uppercase}
+@media(max-width:640px){.hud{grid-template-columns:1fr 1fr}}
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:26px;padding-top:26px;border-top:1px dashed var(--line-control)}@media(max-width:760px){.pipe{grid-template-columns:1fr 1fr}}
+.pipe b{display:block;font:700 12px var(--font-sans);letter-spacing:.12em;color:var(--brand);margin-bottom:5px}.pipe span{font-size:14px;color:var(--ink-2)}
+.note{font-size:12px;color:var(--ink-2);margin:16px 0 0;text-align:center}
+
+/* errands (the section the source file left unstyled) */
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}@media(max-width:940px){.ig{grid-template-columns:1fr;gap:36px}}
+.bn{display:flex;gap:16px;margin-top:22px}.bn .bi{flex:0 0 48px;height:48px;border-radius:14px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center}
+.bn b{display:block;font-size:17px}.bn span{font-size:15px;color:var(--ink-2)}
+.dc{background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-block);padding:28px;box-shadow:var(--lift)}
+.dc .t{display:flex;justify-content:space-between;align-items:baseline;gap:12px}.dc .t b{font:600 22px var(--font-display)}.dc .t span{white-space:nowrap;font-size:12px;color:var(--ink-2);background:var(--cream-2);border-radius:99px;padding:3px 10px}
+.rings{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin:14px 0 6px}
+.rings .st{display:grid;gap:10px;font-size:14px}.rings .st b{font-size:20px}.rings .st span{color:var(--ink-2)}
+.rr{stroke-dashoffset:var(--c);transition:stroke-dashoffset 1.8s cubic-bezier(.2,.8,.2,1) .3s}.in .rr{stroke-dashoffset:var(--o)}
+.wb{display:flex;gap:8px;height:124px;align-items:flex-end;margin:14px 0 10px}
+.wb div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;height:100%;text-align:center}
+.wb i{display:block;border-radius:9px;background:var(--cream-2);border:1px solid var(--hair)}.wb i.on{background:var(--brand-mark);border-color:var(--brand-mark)}
+.wb small{font-size:11px;color:var(--ink-2)}
+.alr{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--hair)}
+.alr .ai{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex-shrink:0}
+.alr b{display:block;font-size:15px}.alr small{display:block;color:var(--ink-2);font-size:13px}
+
+/* radar */
+.rg{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center}@media(max-width:940px){.rg{grid-template-columns:1fr}}
+.radar{background:var(--navy);border-radius:var(--r-block);padding:20px;box-shadow:var(--lift)}.radar svg{width:100%;height:auto;max-width:620px;margin:0 auto}
+@media(max-width:640px){.radar{padding:8px}#rd text{font-size:20px}#nodes text{font-size:24px}}
+.sweep{transform-origin:300px 300px;animation:sw 6s linear 3}@keyframes sw{to{transform:rotate(360deg)}}
+.nd{cursor:pointer;outline:none}.nd:focus-visible .ring{stroke:var(--navy-accent);stroke-width:3}
+.nd circle.o{animation:nd 2.6s ease-out 3;transform-box:fill-box;transform-origin:center}@keyframes nd{from{opacity:.6;transform:scale(1)}to{opacity:0;transform:scale(2.4)}}
+.ins{background:var(--surface);border:1px solid var(--hair);border-radius:28px;padding:30px;box-shadow:var(--lift)}
+.cat{display:inline-block;font:700 11px var(--font-sans);letter-spacing:.12em;padding:4px 11px;border-radius:99px;background:var(--brand-soft);color:var(--brand-strong)}
+.ins h3{font:600 34px/1.1 var(--font-display);margin:14px 0 6px}.ins p{color:var(--ink-2);margin:0 0 20px;font-size:15px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px}.kv div{background:var(--cream-2);border-radius:14px;padding:13px}.kv b{display:block;font-size:19px}.kv span{font-size:12px;color:var(--ink-2)}
+.leg{display:flex;gap:16px;flex-wrap:wrap;margin-top:18px;font-size:13px;color:var(--ink-2)}.leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+
+/* shelf */
+.fh{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:30px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}.tabs button{border:1px solid var(--hair);background:var(--surface);min-height:44px;padding:0 18px;border-radius:99px;font:600 14px var(--font-sans);cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--ink);color:var(--on-inverse);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}@media(max-width:1020px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.grid{grid-template-columns:1fr}}
+.sc{background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-card);padding:18px;display:flex;flex-direction:column;gap:7px;transition:transform .25s,box-shadow .25s,border-color .25s}.sc:hover{transform:translateY(-5px);box-shadow:var(--lift);border-color:var(--brand)}
+.th{height:104px;border-radius:16px;display:grid;place-items:center;position:relative}
+.th em{position:absolute;left:10px;top:10px;font:700 11px var(--font-sans);letter-spacing:.08em;background:var(--surface);color:var(--ink);padding:3px 9px;border-radius:99px;font-style:normal}
+.sc small{color:var(--ink-2);font-size:13px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}.sc h3{font:700 16px/1.3 var(--font-sans)}
+.av{height:6px;background:var(--cream-2);border-radius:9px;overflow:hidden}.av i{display:block;height:100%;background:var(--brand-mark);border-radius:9px}.av i.low{background:var(--amber)}
+.sc .f{display:flex;justify-content:space-between;align-items:center;margin-top:6px}.sc .f b{font-size:19px}
+.sc .f button{border:1px solid var(--line-control);background:transparent;border-radius:99px;min-height:44px;padding:0 18px;font:700 13px var(--font-sans);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.sc .f button:hover,.sc .f button[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.age{color:var(--brand);font-weight:700}.age.low{color:var(--warning)}
+
+/* navy blocks */
+.navy{background:var(--navy);color:var(--on-inverse);border-radius:44px;padding:56px;display:grid;grid-template-columns:1.1fr .9fr;gap:46px;align-items:center;position:relative;overflow:hidden}
+.navy::before{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(closest-side,rgba(52,211,153,.22),transparent);pointer-events:none}
+.navy>*{position:relative}
+@media(max-width:860px){.navy{grid-template-columns:1fr;padding:34px 22px;border-radius:32px}}
+.navy .eyebrow{color:var(--navy-accent)}.navy h3{font:600 clamp(32px,4.4vw,50px)/1.08 var(--font-display);letter-spacing:-.02em;margin:0 0 12px}.navy h3 .acc{color:var(--navy-accent)}
+.navy p{color:var(--on-navy-2);margin:0 0 28px;max-width:470px}
+.navy label{display:flex;justify-content:space-between;font:700 12px var(--font-sans);letter-spacing:.08em;margin-bottom:10px;color:var(--on-navy-2);text-transform:uppercase}.navy label b{color:var(--navy-accent);font-size:15px;letter-spacing:0}
+input[type=range]{width:100%;height:44px;accent-color:var(--navy-green);margin:0 0 14px}
+.res{background:var(--surface);color:var(--ink);border-radius:30px;padding:34px;text-align:center}
+.res small{font:700 11px var(--font-sans);letter-spacing:.14em;color:var(--ink-2)}.res .tot{display:block;font:600 64px/1.1 var(--font-display);color:var(--brand);margin:6px 0 10px}
+.res .rw2{display:flex;justify-content:space-between;padding:11px 0;border-top:1px solid var(--line);font-size:14px;color:var(--ink-2);text-align:left}.res .rw2 b{font-weight:700;color:var(--ink)}
+.res .btn{width:100%;margin-top:20px}
+.panel{background:var(--navy-panel);border:1px solid var(--navy-line);border-radius:18px;padding:16px 18px}.panel span{display:block;color:var(--on-navy-2);font-size:14px}
+
+/* footer */
+footer{background:var(--navy);color:var(--on-navy-2);padding:70px 0 30px;font-size:14px}
+.fg{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:34px;margin-bottom:44px}@media(max-width:760px){.fg{grid-template-columns:1fr 1fr}.fg>div:first-child{grid-column:1/-1}}
+footer h2{color:var(--on-inverse);margin:0 0 10px;font:700 14px var(--font-sans);letter-spacing:0}footer ul{list-style:none;padding:0;margin:0}
+footer li a{display:inline-flex;align-items:center;min-height:36px;text-decoration:none}footer a:hover{color:var(--navy-accent)}
+footer .logo b{color:var(--on-inverse)}footer .logo .mark{border-color:transparent}
+.fb{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid var(--navy-line);padding-top:22px;font-size:13px}
+
+/* dialogs */
+dialog{border:1px solid var(--hair);border-radius:28px;padding:0;width:calc(100% - 32px);max-width:640px;margin:8vh auto auto;background:var(--surface);color:var(--ink);box-shadow:0 40px 90px -20px rgba(0,0,0,.6)}
+dialog::backdrop{background:rgba(5,8,6,.6);backdrop-filter:blur(8px)}
+.mh{display:flex;align-items:center;gap:12px;padding:14px 16px 14px 22px;border-bottom:1px solid var(--hair)}
+.mh input{flex:1;border:0;background:transparent;font:500 16px var(--font-sans);color:var(--ink);min-height:44px}.mh input:focus-visible{outline:0}
+.mh:focus-within{box-shadow:inset 0 -2px 0 var(--focus)}
+.x{border:0;background:var(--cream-2);width:44px;height:44px;border-radius:50%;cursor:pointer;display:grid;place-items:center;margin-left:auto}
+.mr{max-height:56vh;overflow-y:auto;padding:10px}.ri{display:flex;align-items:center;gap:14px;padding:12px;border-radius:16px}.ri:hover{background:var(--cream-2)}
+.ri .e{width:46px;height:46px;border-radius:13px;display:grid;place-items:center}.ri b{display:block;font-size:15px}.ri small{color:var(--ink-2);font-size:13px}.ri .p{margin-left:auto;text-align:right;font-weight:800}
+.mp{padding:28px}.mp h2{font:600 32px/1.1 var(--font-display);margin:0 0 8px}.mp p{color:var(--ink-2);margin:0 0 20px;font-size:15px}
+.mp label{display:block;font:600 14px var(--font-sans);margin:0 0 6px}
+.mp input,.mp select{width:100%;border:1px solid var(--line-control);background:var(--surface);color:var(--ink);border-radius:14px;min-height:48px;padding:0 16px;font:500 15px var(--font-sans);margin-bottom:14px}
+.mp input:focus-visible,.mp select:focus-visible{outline:3px solid var(--focus);outline-offset:1px;border-color:var(--focus)}
+.mp .btn{width:100%;min-height:52px}
+.lo{display:block;width:100%;text-align:left;border:1px solid var(--line-control);background:var(--surface);min-height:52px;padding:0 16px;border-radius:14px;margin-bottom:8px;font:600 15px var(--font-sans);cursor:pointer}.lo:hover{border-color:var(--brand)}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}.rv.in{opacity:1;transform:none}
+.no-js .rv{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.rr{stroke-dashoffset:var(--o)}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="vh" href="#main">Skip to content</a>
+<aside class="bar" aria-label="Announcement"><div class="w">
+  <span class="live"><i class="dot" aria-hidden="true"></i>Hyperlocal physical network · onboarding stores now</span>
+  <span><span class="ic" data-i="Footprints" data-s="15"></span><b>Walk-in reward:</b> up to 2% cashback, and every step counted</span>
+  <span class="hide"><a href="#owners" data-open="rm">List store</a> &nbsp;•&nbsp; <a href="#journey">See the journey</a></span>
+</div></aside>
+
+<header class="nav"><div class="w">
+  <a href="#main" class="logo" aria-label="TodayZ home"><span class="mark"><img src="../../source/assets/Logos/todayz-bag-mark.png" alt="" width="36" height="36"></span><span><b>Today<span>Z</span></b><small>PHYSICAL SEARCH ENGINE</small></span></a>
+  <button class="ns" type="button" data-open="sm"><span class="ic" data-i="Search" data-s="16"></span><span class="t">Search live shelf stock — “Dolo 650”, “USB-C cable”, “Amul Taaza”…</span><kbd>⌘K</kbd></button>
+  <div class="nr">
+    <button class="pill" id="loc" type="button" data-open="lm" aria-label="Change area"><span class="ic" data-i="MapPin" data-s="16"></span><b class="lt" id="locT">Indiranagar, Bengaluru</b><span class="ic" data-i="ChevronDown" data-s="14"></span></button>
+    <div class="pill g"><span class="ic" data-i="Coins" data-s="16"></span><b>₹284</b> · <span class="ic" data-i="Footprints" data-s="16"></span>6,420 steps</div>
+    <button class="btn" type="button" data-open="rm">List store inventory</button>
+  </div>
+</div></header>
+
+<main id="main">
+<section class="hero"><div class="w">
+  <span class="badge"><i class="dot" aria-hidden="true"></i>Your neighbourhood, in stock</span>
+  <h1>Making the physical world <span class="acc">searchable.</span></h1>
+  <p class="lead">Find it nearby, reserve it in a tap, and walk over to collect it. No delivery or handling fees, no days of waiting. Just a short walk that earns cashback and counts your steps.</p>
+  <button class="trig" type="button" data-open="sm"><span class="i"><span class="ic" data-i="Search" data-s="20"></span></span><span class="t">Search “AirPods Max”, “Cold-pressed juice”, “Dolo 650”…</span><span class="go">Search local stock</span></button>
+  <div class="hstats">
+    <div><b>₹0</b><span>Delivery &amp; handling fees</span></div>
+    <div><b>2%</b><span>Up to, cashback on every walk-in</span></div>
+    <div><b>1 tap</b><span>From search to reserved</span></div>
+  </div>
+</div></section>
+
+<div class="mq" id="mq"><h2>What people are searching for, right now</h2>
+  <button class="mqp" type="button" id="mqp" aria-pressed="false" aria-label="Pause the moving list"><span class="ic" data-i="Pause" data-s="18"></span></button>
+  <div id="m1"></div><div id="m2"></div></div>
+
+<section><div class="w">
+  <div class="head c rv"><p class="eyebrow">The problem</p><h2>Every way of buying <span class="acc">costs you something.</span></h2><p class="sub">Time, patience or money. Today you pay at least one of the three, and often all of them.</p></div>
+  <div class="pg">
+    <div class="pc rv"><div class="n">01</div><h3>Roam, then give up</h3><p>You walk from shop to shop, asking and waiting, and still head home empty-handed.</p></div>
+    <div class="pc rv"><div class="n">02</div><h3>Order online, wait days</h3><p>It’s on a screen in seconds and at your door in days, for something a shop down the road already had.</p></div>
+    <div class="pc rv"><div class="n">03</div><h3>Quick commerce, pay the fees</h3><p>Fast, but delivery, handling and small-basket charges quietly add up on every single order.</p></div>
+  </div>
+  <div class="way rv"><div><p class="eyebrow">The TodayZ way</p><p>Search once. Reserve. Walk over. Pay shelf price.</p></div><a href="#journey" class="btn light">See how it feels <span class="ic" data-i="ArrowRight" data-s="16"></span></a></div>
+</div></section>
+
+<section id="journey" class="band"><div class="w">
+  <div class="head c rv"><p class="eyebrow">The journey</p><h2>Search once. <span class="acc">Walk there.</span> Keep the difference.</h2><p class="sub">Find it, reserve it, and collect it from a store down the road. Watch what one short walk adds up to.</p></div>
+  <div class="dg rv" id="dg"><div class="dgs" tabindex="0" role="region" aria-label="Walking route map, scrolls sideways on small screens"><svg class="map" viewBox="0 0 1040 400" role="img" aria-label="A walking route from you to Sharma General Store, 600 m away">
+    <g fill="var(--cream-2)" stroke="var(--hair)"><rect x="40" y="40" width="200" height="120" rx="18"/><rect x="270" y="40" width="250" height="150" rx="18"/><rect x="560" y="30" width="170" height="130" rx="18"/><rect x="40" y="190" width="260" height="90" rx="18"/><rect x="330" y="290" width="220" height="90" rx="18"/><rect x="600" y="300" width="180" height="80" rx="18"/><rect x="780" y="200" width="220" height="80" rx="18"/><rect x="800" y="30" width="200" height="110" rx="18" opacity=".6"/></g>
+    <path id="jp" d="M90 340 C200 340 230 245 340 245 S520 315 640 255 S820 130 930 100" fill="none" stroke="var(--ink-2)" stroke-opacity=".5" stroke-width="5" stroke-dasharray="2 12" stroke-linecap="round"/>
+    <path id="jg" fill="none" stroke="var(--brand-mark)" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="90" cy="340" r="14" fill="var(--surface)" stroke="var(--brand-mark)" stroke-width="3"/><text x="90" y="376" text-anchor="middle" font-family="Figtree" font-size="12" font-weight="700" letter-spacing="1.5" fill="var(--ink-2)">YOU</text>
+    <circle cx="930" cy="100" r="22" fill="var(--amber)" opacity=".22"/><circle cx="930" cy="100" r="12" fill="var(--amber)"/>
+    <rect x="690" y="130" width="250" height="58" rx="16" fill="var(--surface)" stroke="var(--hair)"/><text x="710" y="154" font-family="Figtree" font-size="14" font-weight="700" fill="var(--ink)">Sharma General Store</text><text x="710" y="174" font-family="Figtree" font-size="12" font-weight="600" fill="var(--brand)">✓ Reserved · 600 m · 8 min walk</text>
+    <circle id="jh" r="22" fill="var(--brand-mark)" opacity=".2" cx="90" cy="340"/><circle id="jw" r="9" fill="var(--amber)" stroke="var(--surface)" stroke-width="3" cx="90" cy="340"/>
+  </svg></div>
+  <div class="dgc"><button class="ghost" type="button" id="jr"><span class="ic" data-i="RotateCcw" data-s="16"></span>Play the walk again</button></div>
+  <div class="hud" aria-live="off"><div><b id="c1">0</b><span>Steps walked</span></div><div><b id="c2">0</b><span>Calories burnt</span></div><div><b id="c3">₹0</b><span>Fees saved</span></div><div><b id="c4">₹0</b><span>Cashback earned</span></div></div>
+  <div class="pipe"><div><b>01 · SEARCH</b><span>Type what you need. See every nearby store that has it.</span></div><div><b>02 · RESERVE</b><span>Hold it at the shelf price in a single tap.</span></div><div><b>03 · WALK</b><span>Follow the route. Steps and calories count as you go.</span></div><div><b>04 · COLLECT</b><span>Pay in store, earn cashback, keep the fees.</span></div></div>
+  <p class="note">Illustrative example. Fees, steps and calories are estimates and vary by person and store.</p></div>
+</div></section>
+
+<section><div class="w"><div class="ig">
+  <div>
+    <p class="eyebrow rv">Errands, reimagined</p>
+    <h2 class="rv">The best shop is the one <span class="acc">you walk to.</span></h2>
+    <p class="sub rv">Every reservation turns an errand into a short, rewarding walk. Your steps, calories and cashback add up quietly, and you see more of the neighbourhood you live in.</p>
+    <div class="bn rv"><span class="bi"><span class="ic" data-i="Footprints" data-s="22"></span></span><div><b>A step counter, built in</b><span>Steps and calories for every trip to a store, with no extra app to open.</span></div></div>
+    <div class="bn rv"><span class="bi"><span class="ic" data-i="Coins" data-s="22"></span></span><div><b>Cashback on every walk-in</b><span>Up to 2% back when you collect and pay at the store.</span></div></div>
+    <div class="bn rv"><span class="bi"><span class="ic" data-i="Leaf" data-s="22"></span></span><div><b>No fees, less packaging</b><span>No delivery or handling charges, and no rider on the road for a packet of biscuits.</span></div></div>
+  </div>
+  <div class="dc rv" id="act">
+    <div class="t"><b>Your week on foot</b><span>Sample activity</span></div>
+    <div class="rings">
+      <svg viewBox="0 0 180 180" width="170" height="170" role="img" aria-label="Activity rings: 6,420 steps today"><g fill="none" stroke-width="13" stroke-linecap="round" transform="rotate(-90 90 90)">
+        <circle cx="90" cy="90" r="76" stroke="var(--cream-2)"/><circle class="rr" cx="90" cy="90" r="76" stroke="var(--brand-mark)" stroke-dasharray="477" style="--c:477;--o:95"/>
+        <circle cx="90" cy="90" r="58" stroke="var(--cream-2)"/><circle class="rr" cx="90" cy="90" r="58" stroke="var(--amber)" stroke-dasharray="364" style="--c:364;--o:138"/>
+        <circle cx="90" cy="90" r="40" stroke="var(--cream-2)"/><circle class="rr" cx="90" cy="90" r="40" stroke="var(--info)" stroke-dasharray="251" style="--c:251;--o:138"/></g>
+        <g aria-hidden="true"><text x="90" y="92" text-anchor="middle" font-family="Anek Latin" font-weight="600" font-size="21" fill="var(--ink)">6,420</text><text x="90" y="106" text-anchor="middle" font-family="Figtree" font-size="8" font-weight="600" letter-spacing=".6" fill="var(--ink-2)">STEPS</text></g></svg>
+      <div class="st"><div><b>6,420</b> <span>steps</span></div><div><b style="color:var(--tint-amber-ink)">214</b> <span>kcal burnt</span></div><div><b style="color:var(--info)">4.9</b> <span>km walked</span></div></div>
+    </div>
+    <div class="wb" id="wb" role="img" aria-label="Steps this week, highest on Saturday"></div>
+    <div class="alr"><span class="ai" style="background:var(--brand-soft);color:var(--brand-strong)"><span class="ic" data-i="IndianRupee" data-s="20"></span></span><div><b>₹1,240 saved in fees this month</b><small>Delivery and handling you didn’t pay</small></div></div>
+    <div class="alr"><span class="ai" style="background:var(--tint-amber);color:var(--tint-amber-ink)"><span class="ic" data-i="Coins" data-s="20"></span></span><div><b>₹284 cashback earned</b><small>From 11 store pickups</small></div></div>
+  </div>
+</div></div></section>
+
+<section class="band"><div class="w">
+  <div class="head rv"><p class="eyebrow">Physical orbit</p><h2>Explore the <span class="acc">1.5 km</span> around you</h2><p class="sub">Every node is a live shelf. Hover or tap a store to see what it holds, and how far the walk is.</p></div>
+  <div class="rg">
+    <div class="radar rv"><svg viewBox="0 0 600 600" id="rd" role="group" aria-label="Stores within 1.5 km">
+      <defs><radialGradient id="sg" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(300 300) scale(290)"><stop offset="0" stop-color="#34d399" stop-opacity=".45"/><stop offset="1" stop-color="#34d399" stop-opacity="0"/></radialGradient></defs>
+      <g fill="none" stroke="rgba(255,255,255,.16)"><circle cx="300" cy="300" r="95"/><circle cx="300" cy="300" r="190"/><circle cx="300" cy="300" r="285"/><path d="M300 15V585M15 300H585" stroke-dasharray="3 6"/></g>
+      <g font-family="Figtree" font-size="11" fill="rgba(255,255,255,.6)" letter-spacing="1"><text x="294" y="198" text-anchor="end">500 M</text><text x="294" y="103" text-anchor="end">1 KM</text><text x="294" y="28" text-anchor="end">1.5 KM</text></g>
+      <path class="sweep" d="M300 300 L300 15 A285 285 0 0 1 501 99 Z" fill="url(#sg)"/>
+      <g id="nodes"></g>
+      <circle cx="300" cy="300" r="26" fill="#fff"/><circle cx="300" cy="300" r="9" fill="var(--brand-mark)"/><text x="300" y="347" text-anchor="middle" font-family="Figtree" font-size="12" font-weight="700" fill="#fff" letter-spacing="1.5">YOU</text>
+    </svg></div>
+    <div class="ins rv" id="ins" aria-live="polite"></div>
+  </div>
+</div></section>
+
+<section id="shelf"><div class="w">
+  <div class="fh rv"><div><p class="eyebrow">Shelf inspector</p><h2 style="margin:0">Available nearby, <span class="acc">right now.</span></h2></div><div class="tabs" id="tabs" role="group" aria-label="Category"></div></div>
+  <div class="grid" id="pg"></div>
+</div></section>
+
+<section style="padding-top:20px"><div class="w">
+  <div class="head c rv"><p class="eyebrow">Your savings</p><h2>See what one <span class="acc">walk</span> is worth</h2><p class="sub">Move a few of your monthly orders from delivery to the shop down the road.</p></div>
+  <div class="navy rv">
+  <div>
+    <label for="o1"><span>Orders a month</span><b id="ol">8</b></label><input type="range" id="o1" min="2" max="30" value="8">
+    <label for="f1"><span>Fees you usually pay per order</span><b id="fl">₹35</b></label><input type="range" id="f1" min="10" max="80" step="5" value="35">
+    <label for="k1"><span>Round-trip walk to the store</span><b id="kl">1.0 km</b></label><input type="range" id="k1" min="0.4" max="3" step="0.1" value="1">
+  </div>
+  <div class="res"><small>YOU KEEP EVERY YEAR</small><b class="tot" id="tb" aria-live="polite">₹0</b>
+    <div class="rw2"><span>Fees avoided</span><b id="r1"></b></div><div class="rw2"><span>Cashback earned</span><b id="r2"></b></div><div class="rw2"><span>Steps walked</span><b id="r3"></b></div><div class="rw2"><span>Calories burnt</span><b id="r4"></b></div>
+    <button class="btn" type="button" data-open="um">Get early access</button></div>
+  </div>
+  <p class="note">Illustrative. Assumes a ₹380 average basket, 2% cashback, about 1,300 steps and 45 kcal per km. Cashback rates and fees vary.</p>
+</div></section>
+
+<section id="owners" style="padding:20px 0 96px"><div class="w"><div class="navy rv">
+  <div><p class="eyebrow">For store owners</p><h3>Your shelf has <span class="acc">what they’re looking for.</span></h3><p>Be found by shoppers nearby, earn ₹30 for every customer you bring onto TodayZ, and know what to restock before you run out.</p><button class="btn light" type="button" data-open="rm">List your store</button></div>
+  <div style="display:grid;gap:12px">
+    <div class="panel"><b>Be found nearby</b><span>Shoppers see your stock the moment they search.</span></div>
+    <div class="panel"><b>₹30 per customer</b><span>Earned when someone you refer places a first order.</span></div>
+    <div class="panel"><b>Sell more, waste less</b><span>Clear daily guidance on what to restock and discount.</span></div>
+  </div>
+</div></div></section>
+</main>
+
+<footer><div class="w">
+  <div class="fg">
+    <div><a href="#main" class="logo" aria-label="TodayZ home"><span class="mark"><img src="../../source/assets/Logos/todayz-bag-mark.png" alt="" width="36" height="36"></span><span><b>Today<span>Z</span></b></span></a><p style="max-width:310px;margin-top:16px">Search, reserve and walk to what’s already on your neighbourhood shelves. Making the physical world searchable.</p></div>
+    <div><h2>Search sectors</h2><ul><li><a href="#shelf">Electronics</a></li><li><a href="#shelf">Groceries</a></li><li><a href="#shelf">Pharmacy</a></li></ul></div>
+    <div><h2>For merchants</h2><ul><li><a href="#owners" data-open="rm">List shelf inventory</a></li><li><a href="#owners" data-open="rm">Earn ₹30 per customer</a></li><li><a href="#owners">Store insights</a></li></ul></div>
+    <div><h2>Trust</h2><ul><li><a href="#main">Verified stock promise</a></li><li><a href="#main">Rewards policy</a></li><li><a href="#main">Privacy &amp; security</a></li></ul></div>
+  </div>
+  <div class="fb"><span>© 2026 TodayZ. All rights reserved.</span><span>todayz.in</span></div>
+</div></footer>
+
+<dialog id="sm" aria-label="Search local stock"><div class="mh"><span class="ic" data-i="Search" data-s="20"></span><input id="sq" type="search" placeholder="Search products, brands, medicines…" aria-label="Search products"><button class="x" type="button" data-close aria-label="Close"><span class="ic" data-i="X" data-s="18"></span></button></div><div class="mr" id="sres" aria-live="polite"></div></dialog>
+<dialog id="rm" aria-labelledby="rmh"><div class="mh"><button class="x" type="button" data-close aria-label="Close"><span class="ic" data-i="X" data-s="18"></span></button></div>
+  <form class="mp" id="rf"><h2 id="rmh">Put your shelf on the map.</h2><p>Tell us about your store. We’ll set up your shelf with you, and show you how to earn ₹30 for every customer you bring online.</p>
+    <label for="rs1">Store name</label><input id="rs1" autocomplete="organization" required>
+    <label for="rs2">Mobile number</label><input id="rs2" type="tel" inputmode="numeric" autocomplete="tel" required>
+    <label for="rs3">How do you track stock today?</label><select id="rs3"><option>Billing software</option><option>Spreadsheet</option><option>Paper register</option></select>
+    <button class="btn" type="submit">Request onboarding</button></form>
+  <div class="mp" id="rok" hidden><h2 tabindex="-1">You’re on the list.</h2><p>Our team will call you shortly to set up your store and explain the ₹30 referral programme.</p></div></dialog>
+<dialog id="lm" aria-labelledby="lmh"><div class="mh"><b id="lmh" style="flex:1">Choose your area</b><button class="x" type="button" data-close aria-label="Close"><span class="ic" data-i="X" data-s="18"></span></button></div><div class="mp" id="ll"></div></dialog>
+<dialog id="um" aria-labelledby="umh"><div class="mh"><button class="x" type="button" data-close aria-label="Close"><span class="ic" data-i="X" data-s="18"></span></button></div>
+  <form class="mp" id="uf"><h2 id="umh">Be first on your street.</h2><p>Leave your number and we’ll message you the day TodayZ opens near you.</p><label for="up">Mobile number</label><input id="up" type="tel" inputmode="numeric" autocomplete="tel" required><button class="btn" type="submit">Notify me</button></form>
+  <div class="mp" id="uok" hidden><h2 tabindex="-1">You’re in.</h2><p>We’ll message you as soon as stores near you go live.</p></div></dialog>
+
+<script>
+const $=id=>document.getElementById(id);
+const ICONS={"Search":"<path d=\"m21 21-4.34-4.34\"/><circle cx=\"11\" cy=\"11\" r=\"8\"/>","MapPin":"<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/>","ChevronDown":"<path d=\"m6 9 6 6 6-6\"/>","X":"<path d=\"M18 6 6 18\"/><path d=\"m6 6 12 12\"/>","Footprints":"<path d=\"M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z\"/><path d=\"M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z\"/><path d=\"M16 17h4\"/><path d=\"M4 13h4\"/>","Coins":"<path d=\"M13.744 17.736a6 6 0 1 1-7.48-7.48\"/><path d=\"M15 6h1v4\"/><path d=\"m6.134 14.768.866-.5 2 3.464\"/><circle cx=\"16\" cy=\"8\" r=\"6\"/>","Leaf":"<path d=\"M11 20a10 10 0 0010-10 25.9 25.9 0 00-1.04-7.281 1 1 0 00-1.755-.325C15.833 5.5 13 5.5 9.8 6.1A7 7 0 0011 20\"/><path d=\"M2 21a5 5 0 012.911-4.544C7.613 15.212 8.351 15.24 11 13\"/>","Check":"<path d=\"M20 6 9 17l-5-5\"/>","Pill":"<path d=\"m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z\"/><path d=\"m8.5 8.5 7 7\"/>","Milk":"<path d=\"M8 2h8\"/><path d=\"M9 2v2.789a4 4 0 0 1-.672 2.219l-.656.984A4 4 0 0 0 7 10.212V20a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-9.789a4 4 0 0 0-.672-2.219l-.656-.984A4 4 0 0 1 15 4.788V2\"/><path d=\"M7 15a6.472 6.472 0 0 1 5 0 6.47 6.47 0 0 0 5 0\"/>","Candy":"<path d=\"M10 7v10.9\"/><path d=\"M14 6.1V17\"/><path d=\"M16 7V3a1 1 0 0 1 1.707-.707 2.5 2.5 0 0 0 2.152.717 1 1 0 0 1 1.131 1.131 2.5 2.5 0 0 0 .717 2.152A1 1 0 0 1 21 8h-4\"/><path d=\"M16.536 7.465a5 5 0 0 0-7.072 0l-2 2a5 5 0 0 0 0 7.07 5 5 0 0 0 7.072 0l2-2a5 5 0 0 0 0-7.07\"/><path d=\"M8 17v4a1 1 0 0 1-1.707.707 2.5 2.5 0 0 0-2.152-.717 1 1 0 0 1-1.131-1.131 2.5 2.5 0 0 0-.717-2.152A1 1 0 0 1 3 16h4\"/>","Cable":"<path d=\"M17 19a1 1 0 0 1-1-1v-2a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a1 1 0 0 1-1 1z\"/><path d=\"M17 21v-2\"/><path d=\"M19 14V6.5a1 1 0 0 0-7 0v11a1 1 0 0 1-7 0V10\"/><path d=\"M21 21v-2\"/><path d=\"M3 5V3\"/><path d=\"M4 10a2 2 0 0 1-2-2V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2a2 2 0 0 1-2 2z\"/><path d=\"M7 5V3\"/>","Croissant":"<path d=\"M10.2 18H4.774a1.5 1.5 0 0 1-1.352-.97 11 11 0 0 1 .132-6.487\"/><path d=\"M18 10.2V4.774a1.5 1.5 0 0 0-.97-1.352 11 11 0 0 0-6.486.132\"/><path d=\"M18 5a4 3 0 0 1 4 3 2 2 0 0 1-2 2 10 10 0 0 0-5.139 1.42\"/><path d=\"M5 18a3 4 0 0 0 3 4 2 2 0 0 0 2-2 10 10 0 0 1 1.42-5.14\"/><path d=\"M8.709 2.554a10 10 0 0 0-6.155 6.155 1.5 1.5 0 0 0 .676 1.626l9.807 5.42a2 2 0 0 0 2.718-2.718l-5.42-9.807a1.5 1.5 0 0 0-1.626-.676\"/>","Headphones":"<path d=\"M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3\"/>","Droplets":"<path d=\"M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z\"/><path d=\"M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97\"/>","Soup":"<path d=\"M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z\"/><path d=\"M7 21h10\"/><path d=\"M19.5 12 22 6\"/><path d=\"M16.25 3c.27.1.8.53.75 1.36-.06.83-.93 1.2-1 2.02-.05.78.34 1.24.73 1.62\"/><path d=\"M11.25 3c.27.1.8.53.74 1.36-.05.83-.93 1.2-.98 2.02-.06.78.33 1.24.72 1.62\"/><path d=\"M6.25 3c.27.1.8.53.75 1.36-.06.83-.93 1.2-1 2.02-.05.78.34 1.24.74 1.62\"/>","Store":"<path d=\"M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5\"/><path d=\"M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244\"/><path d=\"M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05\"/>","ArrowRight":"<path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/>","IndianRupee":"<path d=\"M6 3h12\"/><path d=\"M6 8h12\"/><path d=\"m6 13 8.5 8\"/><path d=\"M6 13h3\"/><path d=\"M9 13c6.667 0 6.667-10 0-10\"/>","Pause":"<rect x=\"14\" y=\"3\" width=\"5\" height=\"18\" rx=\"1\"/><rect x=\"5\" y=\"3\" width=\"5\" height=\"18\" rx=\"1\"/>","Play":"<path d=\"M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z\"/>","RotateCcw":"<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"/><path d=\"M3 3v5h5\"/>","Route":"<circle cx=\"6\" cy=\"19\" r=\"3\"/><path d=\"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15\"/><circle cx=\"18\" cy=\"5\" r=\"3\"/>","Hourglass":"<path d=\"M5 22h14\"/><path d=\"M5 2h14\"/><path d=\"M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22\"/><path d=\"M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2\"/>","ShoppingBag":"<path d=\"M16 10a4 4 0 0 1-8 0\"/><path d=\"M3.103 6.034h17.794\"/><path d=\"M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z\"/>","Truck":"<path d=\"M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2\"/><path d=\"M15 18H9\"/><path d=\"M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14\"/><circle cx=\"17\" cy=\"18\" r=\"2\"/><circle cx=\"7\" cy=\"18\" r=\"2\"/>","PersonStanding":"<circle cx=\"12\" cy=\"5\" r=\"1\"/><path d=\"m9 20 3-6 3 6\"/><path d=\"m6 8 6 2 6-2\"/><path d=\"M12 10v4\"/>","Flame":"<path d=\"M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4\"/>"};
+const svg=(n,z=18)=>`<svg width="${z}" height="${z}" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`;
+const paint=root=>root.querySelectorAll('[data-i]').forEach(e=>{e.innerHTML=svg(e.dataset.i,+e.dataset.s||18);e.removeAttribute('data-i')});
+paint(document);
+/* dialogs: native <dialog> keeps focus inside and closes on Escape */
+const open=id=>{const d=$(id);if(!d.open)d.showModal();if(id==='sm'){$('sq').focus();sr($('sq').value)}};
+document.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(o){e.preventDefault();open(o.dataset.open)}const c=e.target.closest('[data-close]');if(c)c.closest('dialog').close()});
+document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d)d.close()}));
+addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();open('sm')}});
+/* data */
+const T={Groceries:['var(--tint-green)','var(--tint-green-ink)'],Pharmacy:['var(--tint-rose)','var(--tint-rose-ink)'],Electronics:['var(--tint-sky)','var(--tint-sky-ink)']};
+const P=[
+{i:'Milk',n:'Amul Taaza Milk 1L',c:'Groceries',s:'Sharma General Store',d:300,p:66,a:'In stock',v:98,bg:'sky'},
+{i:'Candy',n:'Cadbury Dairy Milk 50g',c:'Groceries',s:'Green Kirana Market',d:420,p:40,a:'In stock',v:96,bg:'rose'},
+{i:'Pill',n:'Dolo 650 · 15 tablets',c:'Pharmacy',s:'Apollo Care Pharmacy',d:380,p:32,a:'Only 3 left',v:34,bg:'green'},
+{i:'Cable',n:'USB-C Fast Charge Cable',c:'Electronics',s:'Vijay Electronics',d:300,p:349,a:'In stock',v:88,bg:'lilac'},
+{i:'Croissant',n:'Britannia Brown Bread',c:'Groceries',s:'Sharma General Store',d:300,p:45,a:'In stock',v:92,bg:'amber'},
+{i:'Headphones',n:'boAt Wired Earphones',c:'Electronics',s:'Vijay Electronics',d:300,p:499,a:'In stock',v:81,bg:'sky'},
+{i:'Droplets',n:'Himalaya Face Wash 100ml',c:'Pharmacy',s:'Aura Apothecary',d:760,p:145,a:'In stock',v:90,bg:'green'},
+{i:'Soup',n:'Maggi Masala 4-pack',c:'Groceries',s:'Green Kirana Market',d:420,p:56,a:'In stock',v:94,bg:'peach'}];
+const fm=d=>d<1000?d+' m':(d/1000).toFixed(1)+' km',wk=d=>Math.round(d/.76).toLocaleString('en-IN');
+/* marquee */
+const Q=[['HVAC repair quotes nearby','sky'],['Bulk office supplies pricing','amber'],['Noise-cancelling headphones under ₹3,000','sky'],['Birthday party cake, same day','rose'],['Wholesale coffee beans 5 kg','green'],['Standing desk converter','amber'],['Dolo 650 near me','green'],['Phone screen guard 6.7″','lilac']];
+const mr=(a,id,cl,hide)=>{const h=a.map(x=>`<button type="button" data-q="${x[0].split(' ')[0]}"${hide?' tabindex="-1" aria-hidden="true"':''}><i style="background:var(--tint-${x[1]}-ink)"></i>${x[0]}</button>`).join('');return h};
+$('m1').innerHTML=`<div class="mt">${mr(Q)}${mr(Q,0,0,1)}</div>`;$('m2').innerHTML=`<div class="mt r">${mr([...Q].reverse())}${mr([...Q].reverse(),0,0,1)}</div>`;
+$('mq').addEventListener('click',e=>{const b=e.target.closest('[data-q]');if(b){open('sm');$('sq').value=b.dataset.q;sr(b.dataset.q)}});
+$('mqp').onclick=()=>{const p=$('mq').classList.toggle('paused');$('mqp').setAttribute('aria-pressed',p);$('mqp').setAttribute('aria-label',p?'Play the moving list':'Pause the moving list');$('mqp').innerHTML=svg(p?'Play':'Pause',18)};
+/* journey: plays when it scrolls into view, then stops; "Play the walk again" replays it */
+const RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const jp=$('jp'),jg=$('jg'),jw=$('jw'),jh=$('jh'),JL=jp.getTotalLength();jg.setAttribute('d',jp.getAttribute('d'));jg.style.strokeDasharray=JL;
+const jset=p=>{const q=jp.getPointAtLength(p*JL);[jw,jh].forEach(e=>{e.setAttribute('cx',q.x);e.setAttribute('cy',q.y)});jg.style.strokeDashoffset=JL*(1-p);$('c1').textContent=Math.round(p*790).toLocaleString('en-IN');$('c2').textContent=Math.round(p*27);$('c3').textContent='₹'+Math.round(p*40);$('c4').textContent=p>=1?'₹7.60':'₹0'};
+let raf=0;const jplay=()=>{cancelAnimationFrame(raf);if(RM){jset(1);return}let t0;const f=ts=>{t0??=ts;const p=Math.min(1,(ts-t0)/8000);jset(p);if(p<1)raf=requestAnimationFrame(f)};raf=requestAnimationFrame(f)};
+jset(RM?1:0);$('jr').onclick=jplay;
+/* activity */
+const WK=[5200,7400,6100,8800,6900,9400,6420];$('wb').innerHTML=WK.map((v,i)=>`<div><i class="${i===6?'on':''}" style="height:${Math.round(v/9500*92)}px"></i><small>${'MTWTFSS'[i]}</small></div>`).join('');
+/* radar */
+const CC={Groceries:'var(--navy-green)',Pharmacy:'var(--navy-pink)',Electronics:'var(--navy-blue)'};
+const R=[[P[0],-40],[P[1],25],[P[2],110],[P[3],200],[P[6],160],[P[5],-100],[P[4],-150],[P[7],70]];
+const rad=d=>Math.min(278,40+d/1500*238);
+$('nodes').innerHTML=R.map(([p,ang],i)=>{const r=rad(p.d+i*40),a=ang*Math.PI/180,x=300+r*Math.sin(a),y=300-r*Math.cos(a);return `<g class="nd" data-n="${i}" tabindex="0" role="button" aria-label="${p.s}, ${fm(p.d+i*40)} away"><circle class="o" cx="${x}" cy="${y}" r="10" fill="${CC[p.c]}"/><circle cx="${x}" cy="${y}" r="30" fill="transparent"/><circle class="ring" cx="${x}" cy="${y}" r="10" fill="${CC[p.c]}" stroke="#0b101d" stroke-width="3"/><text x="${x}" y="${y-18}" text-anchor="middle" font-family="Figtree" font-size="12" font-weight="600" fill="#fff">${p.s.split(' ')[0]}</text></g>`}).join('');
+const insp=i=>{const p=R[i][0],d=p.d+i*40;$('ins').innerHTML=`<span class="cat">${p.c.toUpperCase()}</span><h3>${p.s}</h3><p>${fm(d)} away · a ${Math.ceil(d/80)}-minute walk · live shelf</p><div class="kv"><div><b>₹${p.p}</b><span>${p.n}</span></div><div><b>${p.v}%</b><span>Availability now</span></div><div><b>${wk(d)}</b><span>Steps, one way</span></div><div><b>${Math.max(1,Math.round(d/1000*45))} kcal</b><span>Burnt on the way</span></div></div><div class="leg"><span><i style="background:var(--tint-green-ink)"></i>Groceries</span><span><i style="background:var(--tint-rose-ink)"></i>Pharmacy</span><span><i style="background:var(--tint-sky-ink)"></i>Electronics</span></div>`};
+document.querySelectorAll('.nd').forEach(n=>{n.onmouseenter=n.onclick=()=>insp(+n.dataset.n);n.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();insp(+n.dataset.n)}}});insp(0);
+/* shelf */
+let cat='All';const cats=['All','Groceries','Pharmacy','Electronics'];
+const tb=()=>{$('tabs').innerHTML=cats.map(c=>`<button type="button" aria-pressed="${c===cat}" data-c="${c}">${c}</button>`).join('')};
+const gr=()=>{$('pg').innerHTML=P.filter(x=>cat==='All'||x.c===cat).map(x=>`<div class="sc"><div class="th" style="background:var(--tint-${x.bg});color:var(--tint-${x.bg}-ink)"><em>${x.c.toUpperCase()}</em>${svg(x.i,40)}</div><small>${svg('MapPin',14)} ${x.s}</small><h3>${x.n}</h3><div class="av" role="img" aria-label="${x.v}% available"><i class="${x.v<50?'low':''}" style="width:${x.v}%"></i></div><small><span class="age ${x.v<50?'low':''}">${x.v}% available</span> · ${svg('Footprints',14)} ${wk(x.d)} steps · ${Math.ceil(x.d/80)} min</small><div class="f"><b>₹${x.p}</b><button type="button" aria-pressed="false" aria-label="Reserve ${x.n}">Reserve</button></div></div>`).join('')};
+$('tabs').onclick=e=>{const b=e.target.closest('[data-c]');if(b){cat=b.dataset.c;tb();gr();$('tabs').querySelector(`[data-c="${cat}"]`).focus()}};
+$('pg').onclick=e=>{const b=e.target.closest('.f button');if(b&&b.getAttribute('aria-pressed')==='false'){b.setAttribute('aria-pressed','true');b.innerHTML=svg('Check',14)+'Reserved'}};tb();gr();
+/* search */
+function sr(v){v=v.trim().toLowerCase();const r=P.filter(x=>!v||(x.n+x.c+x.s).toLowerCase().includes(v));$('sres').innerHTML=r.length?r.map(x=>`<div class="ri"><div class="e" style="background:var(--tint-${x.bg});color:var(--tint-${x.bg}-ink)">${svg(x.i,24)}</div><div><b>${x.n}</b><small>${x.s} · ${fm(x.d)} · <span class="age">${x.a}</span></small></div><div class="p">₹${x.p}</div></div>`).join(''):`<p style="padding:34px;text-align:center;color:var(--ink-2);margin:0">No store within 1.5 km lists “${v.replace(/[<>&"]/g,'')}” yet. Retailers can be the first.</p>`}
+$('sq').addEventListener('input',e=>sr(e.target.value));
+/* location, forms, calculator */
+const LOC=['Indiranagar, Bengaluru','Bandra West, Mumbai','Connaught Place, Delhi','Banjara Hills, Hyderabad'];
+$('ll').innerHTML=LOC.map(l=>`<button class="lo" type="button" data-l="${l}">${l}</button>`).join('');
+$('ll').onclick=e=>{const b=e.target.closest('[data-l]');if(b){$('locT').textContent=b.dataset.l;$('lm').close()}};
+const done=(f,ok)=>{$(f).onsubmit=e=>{e.preventDefault();$(f).hidden=true;$(ok).hidden=false;$(ok).querySelector('h2').focus()}};done('rf','rok');done('uf','uok');
+const o1=$('o1'),f1=$('f1'),k1=$('k1'),N=n=>Math.round(n).toLocaleString('en-IN');
+const cl=()=>{const o=+o1.value,f=+f1.value,k=+k1.value,fe=o*12*f,cb=o*12*380*.02;$('ol').textContent=o;$('fl').textContent='₹'+f;$('kl').textContent=k.toFixed(1)+' km';o1.setAttribute('aria-valuetext',o+' orders');f1.setAttribute('aria-valuetext','₹'+f);k1.setAttribute('aria-valuetext',k.toFixed(1)+' km');$('tb').textContent='₹'+N(fe+cb);$('r1').textContent='₹'+N(fe);$('r2').textContent='₹'+N(cb);$('r3').textContent=N(o*12*k*1300);$('r4').textContent=N(o*12*k*45)+' kcal'};
+[o1,f1,k1].forEach(e=>e.oninput=cl);cl();
+/* reveal on scroll; the journey starts the first time it is seen */
+const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');if(x.target.id==='dg')jplay();io.unobserve(x.target)}}),{threshold:.15});
+document.querySelectorAll('.rv').forEach(e=>io.observe(e));
+</script>
+</body>
+</html>

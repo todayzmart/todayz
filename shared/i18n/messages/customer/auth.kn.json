@@ -384,11 +384,6 @@
     "review": "reviewed",
     "enHash": "b1ecaf57"
   },
-  "account.phone": {
-    "message": "ಮೊಬೈಲ್ ನಂಬರ್",
-    "review": "reviewed",
-    "enHash": "8e5c12de"
-  },
   "account.language": {
     "message": "ಭಾಷೆ",
     "review": "reviewed",
@@ -399,14 +394,19 @@
     "review": "reviewed",
     "enHash": "d219c681"
   },
-  "account.change": {
-    "message": "ಬದಲಿಸಿ",
-    "review": "reviewed",
-    "enHash": "64fbd995"
-  },
   "account.signOut": {
     "message": "ಸೈನ್ ಔಟ್",
     "review": "reviewed",
     "enHash": "dc1649a1"
+  },
+  "account.name.edit": {
+    "message": "ಹೆಸರು ಬದಲಿಸಿ",
+    "review": "machine",
+    "enHash": "d3aafd85"
+  },
+  "account.name.cancel": {
+    "message": "ರದ್ದುಮಾಡಿ",
+    "review": "machine",
+    "enHash": "77dfd213"
   }
 }

@@ -2,7 +2,9 @@
 
 .app {
   min-height: 100dvh;
-  background: var(--bg);
+
+  /* Bright skin (D-249): grey page, white cards. */
+  background: var(--page);
   color: var(--ink);
 }
 
@@ -47,8 +49,7 @@
   }
 }
 
-/* Active tab: ink label and icon with a 2px stroke, from bundle.css (.tz-bnav a[aria-current]).
-   Brand is only for the active sidebar icon. */
+/* Active tab: brand label and a brand bar on top, from the bright skin in bundle.css. */
 
 .hero {
   display: flex;

@@ -243,5 +243,10 @@
     "message": "சேர்த்த வடிகட்டிகள்",
     "review": "reviewed",
     "enHash": "8111377d"
+  },
+  "search.categories.title": {
+    "message": "வகை வாரியாக வாங்குங்கள்",
+    "review": "machine",
+    "enHash": "09ac8bca"
   }
 }

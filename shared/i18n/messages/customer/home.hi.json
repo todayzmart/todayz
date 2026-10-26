@@ -248,5 +248,160 @@
     "message": "कैटेगरी खोलें",
     "review": "reviewed",
     "enHash": "d189c7fd"
+  },
+  "home.wallet.label": {
+    "message": "वॉलेट, {count, plural, one {# क्रेडिट} other {# क्रेडिट}}",
+    "review": "machine",
+    "enHash": "d1c7ec10"
+  },
+  "home.account.label": {
+    "message": "अकाउंट",
+    "review": "machine",
+    "enHash": "85dfa32c"
+  },
+  "home.filters.label": {
+    "message": "दुकानें फ़िल्टर करें",
+    "review": "machine",
+    "enHash": "2a5b401c"
+  },
+  "home.radius.within": {
+    "message": "{km} km के अंदर",
+    "review": "machine",
+    "enHash": "e7ce5cbc"
+  },
+  "home.filter.openNow": {
+    "message": "अभी खुली",
+    "review": "machine",
+    "enHash": "d7a05e65"
+  },
+  "home.filter.pickup": {
+    "message": "पिकअप",
+    "review": "machine",
+    "enHash": "a51122c1"
+  },
+  "home.filter.delivery": {
+    "message": "डिलीवरी",
+    "review": "machine",
+    "enHash": "9631af52"
+  },
+  "home.filter.offers": {
+    "message": "ऑफ़र",
+    "review": "machine",
+    "enHash": "43c94306"
+  },
+  "home.filters.clear": {
+    "message": "फ़िल्टर हटाएँ",
+    "review": "machine",
+    "enHash": "41222671"
+  },
+  "home.empty.filtered.title": {
+    "message": "इन फ़िल्टर से कोई दुकान नहीं मिली",
+    "review": "machine",
+    "enHash": "423f30a9"
+  },
+  "home.empty.filtered.body": {
+    "message": "कम फ़िल्टर चुनें या ज़्यादा दूरी तक खोजें।",
+    "review": "machine",
+    "enHash": "d7669f3a"
+  },
+  "home.offers.title": {
+    "message": "आपके पास के ऑफ़र",
+    "review": "machine",
+    "enHash": "13f6c37f"
+  },
+  "home.offers.viewShop": {
+    "message": "दुकान देखें",
+    "review": "machine",
+    "enHash": "c55061ee"
+  },
+  "home.offers.how.eyebrow": {
+    "message": "TodayZ कैसे काम करता है",
+    "review": "machine",
+    "enHash": "eab4e74e"
+  },
+  "home.offers.how.title": {
+    "message": "बुक करें। चलकर ले आएँ।",
+    "review": "machine",
+    "enHash": "4242d4c6"
+  },
+  "home.offers.how.sub": {
+    "message": "पास की दुकानों की शेल्फ़ पर जो है, उसे बुक करें और आज ही ले जाएँ।",
+    "review": "machine",
+    "enHash": "ae797517"
+  },
+  "home.offers.how.cta": {
+    "message": "पास में खोजें",
+    "review": "machine",
+    "enHash": "ad3bae31"
+  },
+  "home.offers.credits.eyebrow": {
+    "message": "कैशबैक",
+    "review": "machine",
+    "enHash": "90685d65"
+  },
+  "home.offers.credits.title": {
+    "message": "खरीदारी पर क्रेडिट कमाएँ",
+    "review": "machine",
+    "enHash": "5d61d4dd"
+  },
+  "home.offers.credits.sub": {
+    "message": "कैशबैक वाली दुकानें क्रेडिट लौटाती हैं। हर क्रेडिट अगले ऑर्डर पर ₹1 की छूट है।",
+    "review": "machine",
+    "enHash": "087fcf9b"
+  },
+  "home.offers.credits.cta": {
+    "message": "वॉलेट खोलें",
+    "review": "machine",
+    "enHash": "57fba6b3"
+  },
+  "home.offers.baskets.eyebrow": {
+    "message": "बास्केट",
+    "review": "machine",
+    "enHash": "d368818f"
+  },
+  "home.offers.baskets.cta": {
+    "message": "बास्केट खोलें",
+    "review": "machine",
+    "enHash": "f22b5481"
+  },
+  "home.categories.title": {
+    "message": "आप क्या ढूँढ रहे हैं?",
+    "review": "machine",
+    "enHash": "ffca59bc"
+  },
+  "home.card.cashback": {
+    "message": "{pct}% कैशबैक",
+    "review": "machine",
+    "enHash": "73d039a2"
+  },
+  "home.card.asCredits": {
+    "message": "क्रेडिट के रूप में",
+    "review": "machine",
+    "enHash": "0414ab76"
+  },
+  "home.card.rating": {
+    "message": "5 में से {rating} रेटिंग, {count, plural, one {# रेटिंग} other {# रेटिंग}}",
+    "review": "machine",
+    "enHash": "df99ab0c"
+  },
+  "home.card.footer.cashback": {
+    "message": "हर ऑर्डर पर {pct}% क्रेडिट वापस",
+    "review": "machine",
+    "enHash": "f1fad6f5"
+  },
+  "home.card.footer.none": {
+    "message": "इस दुकान पर कैशबैक नहीं है",
+    "review": "machine",
+    "enHash": "45bf03b9"
+  },
+  "home.place.current": {
+    "message": "आपकी लोकेशन:",
+    "review": "machine",
+    "enHash": "9cf8c08f"
+  },
+  "home.place.change": {
+    "message": "लोकेशन बदलें",
+    "review": "machine",
+    "enHash": "04410a88"
   }
 }

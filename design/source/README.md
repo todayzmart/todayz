@@ -38,6 +38,29 @@ White first, black and grey for structure, a pale mint and soft pastels for warm
 - **Light only.** TodayZ ships one theme: white. There is no dark mode at launch; every app stays light whatever the phone or computer is set to.
 - **Focus** is a 2px solid `focus` ring offset 2px, on every interactive element.
 
+### Bright skin (customer app, D-249)
+
+The customer app sets `data-skin="bright"` on its root, and the skin in `components/bundle.css` changes these rules for that app only. Business, admin and the design cards keep the rules above.
+
+- **The page is light grey `page` (#F4F5F7).** Cards stay white and lift off it with `shadow-card` instead of a `line` border. Only `ink` and `ink-2` text sits directly on the grey; `ink-3` would fall to 4.3:1.
+- **Primary buttons are `brand` green, not `inverse`.** Brand stays the one loud colour; secondary buttons stay white and outlined.
+- **Selected chips** are `brand-soft` with a `brand` border and `brand-strong` text.
+- **Plain links** (an `a` with no class) are `brand` at weight 600.
+- **The active tab** is `brand`, with a 3px brand bar on top.
+- **The soft danger button** is white and outlined, with `danger` text.
+- **Page titles** are Anek 800 at 26px.
+- **Settings lists** (`tz-list`, `tz-list-row`, `tz-list-icon`, `tz-list-text`) are a white card of rows. Each row has a round tinted icon (`data-tint`), a label with its value, and a chevron when it opens something.
+- **Section labels** (`tz-label-rule`) are letter-spaced capitals centred between hairlines that fade out.
+- **Search** is 48px tall with a 12px corner, a soft shadow and a `brand` search icon.
+- **Category tiles** are 64px circles with a white ring and a soft shadow.
+- **Offer tags** (cashback) are `info` text on `info-soft`.
+- **Home's shop cards** use the feature layout (`StoreCard layout="feature"`, `tz-scard-feature`): the shop's photo across the top, then the name in Anek 800. Without a photo, the initials sit on a shorter band in the category tint. Search and the map sheet keep the row layout.
+- **Feature card overlays:** an open or closed tag on the photo (`photoTag`), the cashback in white over the `scrim-photo` gradient (`highlight`), a green rating badge (`rating`) and a dashed footer that says what the shop gives back (`footer`).
+- **Home's header** shows the locality (from the reverse lookup) with the area line under it, a `brand-soft` credits pill and a round `tint-sky` avatar. The search bar sticks under it.
+- **Home's offers row** is a swipe row of photo banners with dots. The "how it works" card is `brand`; shop offers and the credits and baskets cards cycle `promo-plum`, `promo-blue` and `promo-rose`, with white text and a white pill button in the banner's colour. The photo fades in from the left with a mask.
+- **Home's categories** are a 3-column grid of round photos (`CategoryRow layout="grid"`, `imageUrl`).
+- **Stock photos** for categories and the static banners are CC0, bundled as small WebP files in `customer/src/home/photos/` (sources in `SOURCES.md`). A shop's own photo or banner image always wins over a stock photo.
+
 ## Typography
 
 - **Anek** (`display` family) for headlines and codes. It has Latin, Devanagari, Kannada, Telugu and Tamil cuts drawn as one family, so a Kannada heading feels as designed as an English one. Styles: `display-xl`, `display`, `headline`, `otp`.

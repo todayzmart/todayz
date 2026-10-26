@@ -12,6 +12,11 @@ function routes(stores = [card(), card({ storeId: STORE_B_ID, storeSlug: SHOP_B,
     '/v1/discover/summary': () => SUMMARY,
     '/v1/discover/categories': () => CATEGORIES,
     '/v1/discover/stores': () => pageOf(stores),
+    '/v1/discover/offers': () => ({
+      items: [
+        { kind: 'offer', storeId: STORE_B_ID, storeSlug: SHOP_B, storeName: 'Annapurna Kirana', locality: 'Indiranagar', tint: 'green', distanceM: 1200, offer: { title: '10% off on dals' }, banner: null },
+      ],
+    }),
   };
 }
 
@@ -27,11 +32,11 @@ describe('C-03 Home', () => {
     expect(await screen.findByText('Sri Lakshmi Stores')).toBeInTheDocument();
     expect(screen.getByText('14')).toBeInTheDocument();
     expect(screen.getByText('9')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '2 km' })).toHaveAttribute('aria-pressed', 'true');
+    expect((screen.getByRole('combobox', { name: 'Search radius' }) as HTMLSelectElement).value).toBe('2');
     const list = calls.find((c) => c.path === '/v1/discover/stores');
     expect(list?.query.get('radius')).toBe('2000');
     // The in-store-only shop says so and is not marked open.
-    expect(screen.getByText('Annapurna Kirana')).toBeInTheDocument();
+    expect(screen.getByText('Annapurna Kirana', { selector: '.tz-scard-name' })).toBeInTheDocument();
     expect(screen.getByText('In-store only')).toBeInTheDocument();
   });
 
@@ -48,9 +53,20 @@ describe('C-03 Home', () => {
     const { calls } = renderDiscover('/', routes());
     atBengaluru();
     await screen.findByText('Sri Lakshmi Stores');
-    fireEvent.click(screen.getByRole('button', { name: '5 km' }));
+    fireEvent.change(screen.getByRole('combobox', { name: 'Search radius' }), { target: { value: '5' } });
     await waitFor(() => expect(calls.some((c) => c.path === '/v1/discover/stores' && c.query.get('radius') === '5000')).toBe(true));
-    expect(screen.getByRole('button', { name: '5 km' })).toHaveAttribute('aria-pressed', 'true');
+    expect((screen.getByRole('combobox', { name: 'Search radius' }) as HTMLSelectElement).value).toBe('5');
+  });
+
+  it('a filter chip asks for open shops only, and the offers row shows a shop\'s offer', async () => {
+    const { calls } = renderDiscover('/', routes());
+    atBengaluru();
+    await screen.findByText('Sri Lakshmi Stores');
+    expect(await screen.findByText('10% off on dals')).toBeInTheDocument();
+    const chip = screen.getByRole('button', { name: /Open now/ });
+    fireEvent.click(chip);
+    await waitFor(() => expect(calls.some((c) => c.path === '/v1/discover/stores' && c.query.get('openNow') === 'true')).toBe(true));
+    expect(chip).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('says so when no shop is in the area, and offers a wider radius', async () => {

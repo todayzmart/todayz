@@ -78,5 +78,10 @@
     "message": "ಹೋಮ್‌ಗೆ ಹೋಗಿ",
     "review": "reviewed",
     "enHash": "f36ae945"
+  },
+  "shell.nav.baskets": {
+    "message": "ಬಾಸ್ಕೆಟ್‌ಗಳು",
+    "review": "machine",
+    "enHash": "d368818f"
   }
 }

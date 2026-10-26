@@ -70,7 +70,7 @@ body { margin: 0; font-family: var(--font-sans); font-size: 14px; line-height: 2
 .tz-add { height: var(--control-sm); padding: 0 var(--space-4); border-radius: var(--radius-pill); border: 1px solid var(--line-control); background: var(--surface); color: var(--ink); box-shadow: var(--shadow-xs); font: 600 13px/18px var(--font-sans); cursor: pointer; }
 
 /* Product card */
-.tz-thumb { aspect-ratio: 1; max-width: 100%; border-radius: var(--radius-md); background: var(--media); display: grid; place-items: center; color: var(--ink-2); font: 600 22px/1 var(--font-display); }
+.tz-thumb { position: relative; overflow: hidden; aspect-ratio: 1; max-width: 100%; border-radius: var(--radius-md); background: var(--media); display: grid; place-items: center; color: var(--ink-2); font: 600 22px/1 var(--font-display); }
 .tz-pcard { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-2) var(--space-2) var(--space-3); border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line); min-width: 0; }
 .tz-pcard-name { font: 400 14px/20px var(--font-sans); color: var(--ink); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 40px; }
 .tz-pcard-unit { font: 400 13px/18px var(--font-sans); color: var(--ink-2); }
@@ -385,3 +385,82 @@ body { margin: 0; font-family: var(--font-sans); font-size: 14px; line-height: 2
 .tz-tag { white-space: nowrap; flex: none; }
 .tz-insights-2col { display: grid; grid-template-columns: 1fr 1fr; }
 @media (max-width: 720px) { .tz-insights-2col { grid-template-columns: 1fr; } }
+
+/* Settings list: a card of rows, each an icon, a label with its value, and a chevron when it opens something (bright skin, D-249) */
+.tz-list { display: flex; flex-direction: column; margin: 0; padding: 0 var(--space-4); list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+.tz-list-row { display: grid; grid-template-columns: 36px 1fr auto; gap: var(--space-3); align-items: center; min-height: 60px; padding: var(--space-3) 0; border-top: 1px solid var(--line); color: var(--ink); text-decoration: none; }
+.tz-list > :first-child, .tz-list > li:first-child > .tz-list-row { border-top: 0; }
+.tz-list > li + li > .tz-list-row { border-top: 1px solid var(--line); }
+.tz-list-icon { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--t-bg, var(--surface-sunken)); color: var(--t-ink, var(--ink-2)); }
+.tz-list-icon .tz-ico { width: 18px; height: 18px; }
+.tz-list-text { display: flex; flex-direction: column; min-width: 0; }
+.tz-list-text b { font: 600 15px/20px var(--font-sans); color: var(--ink); }
+.tz-list-text small { font: 400 13px/18px var(--font-sans); color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tz-list-row > .tz-ico:last-child { color: var(--ink-3); }
+.tz-list.tz-list-row:hover { background: var(--surface-subtle); }
+.tz-list a.tz-list-row:hover { background: var(--surface-subtle); margin: 0 calc(-1 * var(--space-4)); padding-inline: var(--space-4); }
+/* Section label: letter-spaced, centred between hairlines that fade out */
+.tz-label-rule { display: flex; align-items: center; gap: var(--space-3); margin: 0; font: 700 12px/16px var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+.tz-label-rule::before, .tz-label-rule::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--line-control)); }
+.tz-label-rule::after { background: linear-gradient(270deg, transparent, var(--line-control)); }
+
+/* Bright skin (D-249): the customer app sets data-skin="bright" on its root. A light grey page, white cards lifted by a soft shadow instead of a border, brand green as the one loud colour, Anek 800 titles. Business and admin keep the default look. */
+[data-skin="bright"] { background: var(--page); }
+[data-skin="bright"] :is(.tz-card, .tz-scard, .tz-pcard, .tz-ocard, .tz-map-card, .tz-list) { border-color: transparent; box-shadow: var(--shadow-card); }
+[data-skin="bright"] .tz-page-title { font: 800 26px/30px var(--font-display); letter-spacing: -0.01em; }
+[data-skin="bright"] .tz-card-title { font: 700 16px/22px var(--font-sans); }
+[data-skin="bright"] .tz-btn { font-weight: 600; text-decoration: none; }
+[data-skin="bright"] .tz-btn-primary { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+[data-skin="bright"] .tz-btn-primary:hover { background: var(--brand-strong); border-color: var(--brand-strong); }
+[data-skin="bright"] .tz-btn-soft-danger { background: var(--surface); border-color: var(--line-control); box-shadow: var(--shadow-xs); }
+[data-skin="bright"] .tz-btn-soft-danger:hover { background: var(--danger-soft); }
+[data-skin="bright"] .tz-chip { border-color: var(--line); font-weight: 600; box-shadow: var(--shadow-xs); }
+[data-skin="bright"] .tz-chip[aria-pressed="true"] { background: var(--brand-soft); border-color: var(--brand); color: var(--brand-strong); }
+[data-skin="bright"] :where(a:not([class])) { color: var(--brand); font-weight: 600; text-underline-offset: 2px; }
+[data-skin="bright"] :where(dd) { margin: 0; }
+[data-skin="bright"] .tz-bnav a { position: relative; color: var(--ink-2); font-weight: 600; }
+[data-skin="bright"] .tz-bnav a[aria-current="page"] { color: var(--brand); }
+[data-skin="bright"] .tz-bnav a[aria-current="page"]::before { content: ""; position: absolute; top: 0; left: 50%; width: 28px; height: 3px; margin-left: -14px; border-radius: 0 0 3px 3px; background: var(--brand); }
+[data-skin="bright"] .tz-search { min-height: 48px; border-radius: var(--radius-lg); border-color: var(--line); box-shadow: var(--shadow-card); color: var(--brand); }
+[data-skin="bright"] .tz-search input { font-weight: 500; }
+[data-skin="bright"] .tz-cats { padding: 2px 2px var(--space-2); gap: var(--space-2); }
+[data-skin="bright"] .tz-cat { width: 76px; font-weight: 600; color: var(--ink-2); }
+[data-skin="bright"] .tz-cat i { width: 64px; height: 64px; border-radius: 50%; border: 3px solid var(--surface); box-shadow: var(--shadow-card); }
+[data-skin="bright"] .tz-tag-offer { border-color: transparent; background: var(--info-soft); color: var(--info); font-weight: 600; }
+
+/* Feature shop card: the shop's photo across the top, then the name, meta and tags (customer Home, D-249). Without a photo, the initials sit on the category tint. */
+.tz-scard-feature { display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 0; overflow: hidden; border-radius: var(--radius-xl); }
+.tz-scard-photo { order: -1; position: relative; height: 168px; display: grid; place-items: center; background: var(--t-bg, var(--surface-sunken)); color: var(--t-ink, var(--ink-2)); font: 800 40px/1 var(--font-display); }
+.tz-scard-photo:not(:has(img)) { height: 112px; }
+.tz-scard-photo img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
+/* On the photo: the open or closed tag top left, and a highlight (cashback) at the foot over a dark scrim. */
+.tz-scard-ptag { position: absolute; left: var(--space-3); top: var(--space-3); z-index: 1; display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: var(--radius-xs); background: var(--surface); color: var(--ink); font: 700 12px/16px var(--font-sans); }
+.tz-scard-ptag[data-kind="open"]::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--brand); }
+.tz-scard-ptag[data-kind="plain"] { background: var(--inverse); color: var(--on-inverse); }
+.tz-scard-photo:has(.tz-scard-hl)::after { content: ""; position: absolute; inset: auto 0 0; height: 70%; background: linear-gradient(0deg, var(--scrim-photo), transparent); }
+.tz-scard-hl { position: absolute; left: var(--space-3); bottom: var(--space-3); z-index: 1; display: flex; flex-direction: column; gap: 3px; color: var(--on-inverse); text-align: left; }
+.tz-scard-hl b { font: 800 21px/1 var(--font-display); letter-spacing: -0.01em; }
+.tz-scard-hl span { font: 700 11px/14px var(--font-sans); letter-spacing: .12em; text-transform: uppercase; }
+.tz-scard-body { min-width: 0; padding: var(--space-3) var(--space-4) var(--space-4); }
+.tz-scard-body:has(+ .tz-scard-photo + .tz-scard-foot) { padding-bottom: var(--space-3); }
+.tz-scard-feature .tz-scard-name { font: 800 18px/24px var(--font-display); letter-spacing: -0.01em; }
+.tz-scard-r1 { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-2); }
+.tz-scard-rate { flex: none; display: inline-flex; align-items: center; gap: 3px; margin-top: 2px; padding: 2px 7px; border-radius: var(--radius-xs); background: var(--brand); color: var(--on-brand); font: 800 13px/18px var(--font-sans); }
+.tz-scard-rate .tz-ico { width: 12px; height: 12px; fill: currentColor; }
+.tz-scard-feature .tz-meta { margin-top: 2px; }
+.tz-scard-feature .tz-meta > span { display: inline-flex; align-items: center; gap: 4px; }
+.tz-scard-feature .tz-meta .tz-ico { width: 14px; height: 14px; color: var(--ink-3); }
+.tz-scard-foot { display: flex; align-items: center; gap: var(--space-2); padding: 10px var(--space-4); border-top: 1px dashed var(--line-control); font: 600 13px/18px var(--font-sans); color: var(--info); }
+.tz-scard-foot[data-kind="plain"] { color: var(--ink-2); }
+.tz-scard-foot .tz-ico { width: 18px; height: 18px; flex: none; }
+
+/* Category grid with photos (customer Home, D-249): round photos in a grid instead of a scrolling row. A tile without a photo keeps its tinted icon. */
+.tz-cats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4) var(--space-2); overflow: visible; }
+.tz-cats-grid .tz-cat { width: auto; }
+.tz-cats-grid .tz-cat i { width: 80px; height: 80px; border-radius: 50%; }
+.tz-cat i img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.tz-cat i:has(img) { overflow: hidden; background: var(--surface); }
+[data-skin="bright"] .tz-cats-grid .tz-cat { font: 600 13px/17px var(--font-sans); }
+.tz-cat:hover i { transform: translateY(-2px); }
+.tz-cat i { transition: transform 150ms cubic-bezier(0.2, 0, 0, 1); }
+@media (prefers-reduced-motion: reduce) { .tz-cat i { transition: none; } .tz-cat:hover i { transform: none; } }
