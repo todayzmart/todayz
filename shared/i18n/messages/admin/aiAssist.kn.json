@@ -1,322 +1,322 @@
 {
   "aiAssist.badge": {
     "message": "AI ಡ್ರಾಫ್ಟ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7f61d5cd"
   },
   "aiAssist.working": {
     "message": "ಡ್ರಾಫ್ಟ್ ಆಗುತ್ತಿದೆ. ಕೆಲವು ಸೆಕೆಂಡುಗಳು ಬೇಕು.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "997405ca"
   },
   "aiAssist.failed": {
     "message": "ಸಹಾಯಕ ಇದನ್ನು ಡ್ರಾಫ್ಟ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಕೈಯಿಂದ ಮುಂದುವರಿಸಿ ಅಥವಾ ಮತ್ತೆ ಕೇಳಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c11d37ed"
   },
   "aiAssist.check": {
     "message": "ಪ್ರತಿ ಸಾಲನ್ನು ಪರಿಶೀಲಿಸಿ, ನಂತರ ಬಳಸಿ, ಬದಲಿಸಿ ಅಥವಾ ಬಿಡಿ. ನೀವು ದೃಢೀಕರಿಸುವವರೆಗೆ ಏನೂ ಬದಲಾಗುವುದಿಲ್ಲ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7a6e64d3"
   },
   "aiAssist.partly": {
     "message": "ಕೆಲವು ಸಾಲುಗಳು ಅನ್ವಯವಾದವು. ನೀವು ಅನ್ವಯಿಸಲಾಗದವು ಇಲ್ಲೇ ಇವೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6e21eeaa"
   },
   "aiAssist.applied": {
     "message": "ಆಯಿತು. ನೀವು ಆರಿಸಿದ್ದು ಅನ್ವಯವಾಗಿ ಆಡಿಟ್ ಲಾಗ್‌ನಲ್ಲಿ ದಾಖಲಾಗಿದೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b34c7f38"
   },
   "aiAssist.discarded": {
     "message": "ಬಿಡಲಾಗಿದೆ. ಏನೂ ಬದಲಾಗಿಲ್ಲ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "38d561e4"
   },
   "aiAssist.again": {
     "message": "ಮತ್ತೆ ಕೇಳಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3f094ed6"
   },
   "aiAssist.choice.label": {
     "message": "“{line}” ಅನ್ನು ಏನು ಮಾಡಬೇಕು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "296cc524"
   },
   "aiAssist.choice.use": {
     "message": "ಬಳಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1d4d43cc"
   },
   "aiAssist.choice.edit": {
     "message": "ಬದಲಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5301648d"
   },
   "aiAssist.choice.skip": {
     "message": "ಬಿಡಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3da47453"
   },
   "aiAssist.notPermitted": {
     "message": "ನಿಮ್ಮ ಪಾತ್ರ ಈ ಸಾಲನ್ನು ಅನ್ವಯಿಸಲಾಗದು. ಸಾಧ್ಯವಿರುವವರನ್ನು ಕೇಳಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3b31adea"
   },
   "aiAssist.lineInvalid": {
     "message": "ಈ ಸಾಲನ್ನು ಪರಿಶೀಲಿಸಿ: ಒಂದು ಮೌಲ್ಯ ಇಲ್ಲ ಅಥವಾ ಅನುಮತಿಯಿಲ್ಲ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "718ab9d1"
   },
   "aiAssist.nothing": {
     "message": "ಈ ಡ್ರಾಫ್ಟ್‌ನಲ್ಲಿ ನಿರ್ಧರಿಸಲು ಏನೂ ಉಳಿದಿಲ್ಲ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0abf9aee"
   },
   "aiAssist.confirm": {
     "message": "ಆಯ್ಕೆಗಳನ್ನು ದೃಢೀಕರಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7ea1e5fa"
   },
   "aiAssist.optional": {
     "message": "ಐಚ್ಛಿಕ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0c6c4102"
   },
   "aiAssist.none": {
     "message": "ಯಾವುದೂ ಇಲ್ಲ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6eef6648"
   },
   "aiAssist.toast.done": {
     "message": "ಆಯ್ಕೆಗಳನ್ನು ಉಳಿಸಲಾಗಿದೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6080b585"
   },
   "aiAssist.error.cap": {
     "message": "AI ಸಹಾಯ ನಾಳೆಯವರೆಗೆ ನಿಂತಿದೆ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6ab931ad"
   },
   "aiAssist.error.off": {
     "message": "ಸಹಾಯಕ ಈಗ ಇಲ್ಲಿ ಲಭ್ಯವಿಲ್ಲ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fca9b961"
   },
   "aiAssist.error.moved": {
     "message": "ಡ್ರಾಫ್ಟ್ ನಂತರ ಇದು ಬದಲಾಗಿದೆ. ರಿಲೋಡ್ ಮಾಡಿ ಮತ್ತೆ ಕೇಳಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a0b03efc"
   },
   "aiAssist.error.invalid": {
     "message": "ಆರಿಸಿದ ಸಾಲುಗಳನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9670e68b"
   },
   "aiAssist.error.forbidden": {
     "message": "ನಿಮ್ಮ ಪಾತ್ರ ಈ ಸಹಾಯಕವನ್ನು ಬಳಸಲಾಗದು.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4d4cdc64"
   },
   "aiAssist.error.network": {
     "message": "TodayZ ತಲುಪಲಾಗಲಿಲ್ಲ. ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "293ea9aa"
   },
   "aiAssist.error.generic": {
     "message": "ಏನೋ ತಪ್ಪಾಯಿತು. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4244e822"
   },
   "aiAssist.catalogue.title": {
     "message": "AI ಸ್ವಚ್ಛತೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "859805b7"
   },
   "aiAssist.catalogue.intro": {
     "message": "ಈ ಉತ್ಪನ್ನದ ಸ್ವಚ್ಛ ಫೀಲ್ಡ್‌ಗಳು, ಸಂಭಾವ್ಯ ನಕಲು ಮತ್ತು ವರ್ಗದ ಇಲ್ಲದ ಹೆಸರುಗಳನ್ನು ಡ್ರಾಫ್ಟ್ ಮಾಡಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f48628bb"
   },
   "aiAssist.catalogue.start": {
     "message": "ಸ್ವಚ್ಛತೆ ಡ್ರಾಫ್ಟ್ ಮಾಡಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9727fb69"
   },
   "aiAssist.catalogue.normalise": {
     "message": "ಸ್ವಚ್ಛ ಫೀಲ್ಡ್‌ಗಳು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e2ee0a90"
   },
   "aiAssist.catalogue.useFields": {
     "message": "ಈ ಫೀಲ್ಡ್‌ಗಳನ್ನು ಬಳಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ccbc4718"
   },
   "aiAssist.catalogue.name": {
     "message": "ಹೆಸರು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "709a2322"
   },
   "aiAssist.catalogue.variant": {
     "message": "ವೇರಿಯಂಟ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cc91b1ea"
   },
   "aiAssist.catalogue.brand": {
     "message": "ಬ್ರ್ಯಾಂಡ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "62b4aa57"
   },
   "aiAssist.catalogue.pack": {
     "message": "ಪ್ಯಾಕ್ ಗಾತ್ರ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "87dd2c97"
   },
   "aiAssist.catalogue.unit": {
     "message": "ಘಟಕ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f6b935ab"
   },
   "aiAssist.catalogue.category": {
     "message": "ವರ್ಗ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a3c686e7"
   },
   "aiAssist.catalogue.duplicate": {
     "message": "ಸಂಭಾವ್ಯ ನಕಲು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fafd5515"
   },
   "aiAssist.catalogue.useMerge": {
     "message": "ಇದರಲ್ಲಿ ವಿಲೀನಗೊಳಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4e163fe5"
   },
   "aiAssist.catalogue.into": {
     "message": "ಇದರಲ್ಲಿ ವಿಲೀನಗೊಳಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ce9aabe5"
   },
   "aiAssist.catalogue.mergeInto": {
     "message": "{name} ನಂತೆಯೇ ({similarity} ಹೆಸರು ಹೊಂದಾಣಿಕೆ)",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "387f4b9b"
   },
   "aiAssist.catalogue.names": {
     "message": "ವರ್ಗದ ಹೆಸರುಗಳು",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "68def64d"
   },
   "aiAssist.catalogue.useNames": {
     "message": "ಈ ಹೆಸರುಗಳನ್ನು ಬಳಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0e12b4e9"
   },
   "aiAssist.catalogue.mergeOrEdit": {
     "message": "ವಿಲೀನ ಅಥವಾ ಸ್ವಚ್ಛತೆ, ಎರಡೂ ಅಲ್ಲ: ಎರಡರಲ್ಲಿ ಒಂದು ಸಾಲನ್ನು ಬಿಡಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5ecfb3f7"
   },
   "aiAssist.triage.title": {
     "message": "AI ಟ್ರಯಾಜ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c43e4907"
   },
   "aiAssist.triage.intro": {
     "message": "ವರ್ಗ, ಆದ್ಯತೆ ಮತ್ತು ಆರ್ಡರ್ ಊಹೆ, ಉದ್ದದ ಥ್ರೆಡ್‌ನ ಸಾರಾಂಶ ಮತ್ತು ಉತ್ತರವನ್ನು ಡ್ರಾಫ್ಟ್ ಮಾಡಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4af54d0e"
   },
   "aiAssist.triage.start": {
     "message": "ಟ್ರಯಾಜ್ ಡ್ರಾಫ್ಟ್ ಮಾಡಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d2028e85"
   },
   "aiAssist.triage.classify": {
     "message": "ವರ್ಗ ಮತ್ತು ಆದ್ಯತೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "710f5853"
   },
   "aiAssist.triage.useClassify": {
     "message": "ಇವನ್ನು ಹೊಂದಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c1791b81"
   },
   "aiAssist.triage.category": {
     "message": "ವರ್ಗ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a3c686e7"
   },
   "aiAssist.triage.priority": {
     "message": "ಆದ್ಯತೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "886cbff9"
   },
   "aiAssist.triage.order": {
     "message": "ಆರ್ಡರ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1d75774c"
   },
   "aiAssist.triage.summary": {
     "message": "ಥ್ರೆಡ್ ಸಾರಾಂಶ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6582f21a"
   },
   "aiAssist.triage.useSummary": {
     "message": "ಉಪಯುಕ್ತ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "45e36dd9"
   },
   "aiAssist.triage.reply": {
     "message": "ಉತ್ತರದ ಡ್ರಾಫ್ಟ್",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3baa690f"
   },
   "aiAssist.triage.useReply": {
     "message": "ಈ ಉತ್ತರ ಕಳುಹಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a3fb6190"
   },
   "aiAssist.triage.replyLabel": {
     "message": "ತೆರೆದವರಿಗೆ ಉತ್ತರ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fe53ec96"
   },
   "aiAssist.risk.title": {
     "message": "AI ವಿವರಣೆ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c7c60332"
   },
   "aiAssist.risk.intro": {
     "message": "ಈ ನಿಯಮ ಎಣಿಸಿದ್ದರ ಸಣ್ಣ ಸಾರಾಂಶವನ್ನು ಫ್ಲ್ಯಾಗ್‌ನ ಸ್ವಂತ ಸಂಖ್ಯೆಗಳಿಂದ ಮಾತ್ರ ಡ್ರಾಫ್ಟ್ ಮಾಡಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4ed37e2c"
   },
   "aiAssist.risk.start": {
     "message": "ಈ ಫ್ಲ್ಯಾಗ್ ವಿವರಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f0572de9"
   },
   "aiAssist.risk.summary": {
     "message": "ಸಾರಾಂಶ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "12b71c3e"
   },
   "aiAssist.risk.useSummary": {
     "message": "ಆಡಿಟ್ ಲಾಗ್‌ಗೆ ಸೇರಿಸಿ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "00437a79"
   },
   "aiAssist.risk.editHelp": {
     "message": "ಸಾಕ್ಷ್ಯದಲ್ಲಿ ಕಾಣುವ ಸಂಖ್ಯೆಗಳನ್ನು ಮಾತ್ರ ಬಳಸಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "30e28df3"
   },
   "aiAssist.risk.ungrounded": {
     "message": "ಈ ಸಾರಾಂಶದ ಒಂದು ಸಂಖ್ಯೆ ಸಾಕ್ಷ್ಯದಲ್ಲಿ ಇಲ್ಲ. ಫ್ಲ್ಯಾಗ್‌ನ ಸ್ವಂತ ಸಂಖ್ಯೆಗಳನ್ನು ಮಾತ್ರ ಬಳಸಿ.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a33af9a4"
   }
 }

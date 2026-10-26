@@ -511,7 +511,7 @@
   },
   "orders.callShop": {
     "message": "दुकान को कॉल करें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b605f7d5"
   }
 }

@@ -1,322 +1,322 @@
 {
   "aiAssist.badge": {
     "message": "AI డ్రాఫ్ట్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7f61d5cd"
   },
   "aiAssist.working": {
     "message": "డ్రాఫ్ట్ అవుతోంది. కొన్ని సెకన్లు పడుతుంది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "997405ca"
   },
   "aiAssist.failed": {
     "message": "సహాయకుడు దీన్ని డ్రాఫ్ట్ చేయలేకపోయాడు. చేతితో కొనసాగించండి లేదా మళ్లీ అడగండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c11d37ed"
   },
   "aiAssist.check": {
     "message": "ప్రతి లైన్‌ను చూసి, వాడండి, మార్చండి లేదా వదిలేయండి. మీరు నిర్ధారించే వరకు ఏదీ మారదు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7a6e64d3"
   },
   "aiAssist.partly": {
     "message": "కొన్ని లైన్లు వర్తించాయి. మీరు వర్తింపజేయలేనివి ఇక్కడే ఉన్నాయి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6e21eeaa"
   },
   "aiAssist.applied": {
     "message": "అయింది. మీరు ఎంచుకున్నది వర్తించి ఆడిట్ లాగ్‌లో నమోదైంది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b34c7f38"
   },
   "aiAssist.discarded": {
     "message": "వదిలేశారు. ఏదీ మారలేదు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "38d561e4"
   },
   "aiAssist.again": {
     "message": "మళ్లీ అడగండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3f094ed6"
   },
   "aiAssist.choice.label": {
     "message": "“{line}” ను ఏం చేయాలి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "296cc524"
   },
   "aiAssist.choice.use": {
     "message": "వాడండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1d4d43cc"
   },
   "aiAssist.choice.edit": {
     "message": "మార్చండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5301648d"
   },
   "aiAssist.choice.skip": {
     "message": "వదిలేయండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3da47453"
   },
   "aiAssist.notPermitted": {
     "message": "మీ పాత్ర ఈ లైన్‌ను వర్తింపజేయలేదు. చేయగలవారిని అడగండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3b31adea"
   },
   "aiAssist.lineInvalid": {
     "message": "ఈ లైన్ చూడండి: ఒక విలువ లేదు లేదా అనుమతి లేదు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "718ab9d1"
   },
   "aiAssist.nothing": {
     "message": "ఈ డ్రాఫ్ట్‌లో నిర్ణయించడానికి ఏమీ మిగల్లేదు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0abf9aee"
   },
   "aiAssist.confirm": {
     "message": "ఎంపికలను నిర్ధారించండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7ea1e5fa"
   },
   "aiAssist.optional": {
     "message": "ఐచ్ఛికం",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0c6c4102"
   },
   "aiAssist.none": {
     "message": "ఏదీ లేదు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6eef6648"
   },
   "aiAssist.toast.done": {
     "message": "ఎంపికలు సేవ్ అయ్యాయి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6080b585"
   },
   "aiAssist.error.cap": {
     "message": "AI సహాయం రేపటి వరకు ఆగింది.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6ab931ad"
   },
   "aiAssist.error.off": {
     "message": "సహాయకుడు ఇప్పుడు ఇక్కడ అందుబాటులో లేదు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fca9b961"
   },
   "aiAssist.error.moved": {
     "message": "డ్రాఫ్ట్ తర్వాత ఇది మారింది. రీలోడ్ చేసి మళ్లీ అడగండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a0b03efc"
   },
   "aiAssist.error.invalid": {
     "message": "ఎంచుకున్న లైన్లు చూసి మళ్లీ ప్రయత్నించండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9670e68b"
   },
   "aiAssist.error.forbidden": {
     "message": "మీ పాత్ర ఈ సహాయకుడిని వాడలేదు.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4d4cdc64"
   },
   "aiAssist.error.network": {
     "message": "TodayZ ను చేరలేకపోయాం. కనెక్షన్ చూసి మళ్లీ ప్రయత్నించండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "293ea9aa"
   },
   "aiAssist.error.generic": {
     "message": "ఏదో తప్పు జరిగింది. మళ్లీ ప్రయత్నించండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4244e822"
   },
   "aiAssist.catalogue.title": {
     "message": "AI శుభ్రత",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "859805b7"
   },
   "aiAssist.catalogue.intro": {
     "message": "ఈ ఉత్పత్తి శుభ్రమైన ఫీల్డ్‌లు, సంభావ్య నకలు, కేటగిరీలో లేని పేర్లు డ్రాఫ్ట్ చేయండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f48628bb"
   },
   "aiAssist.catalogue.start": {
     "message": "శుభ్రత డ్రాఫ్ట్ చేయండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9727fb69"
   },
   "aiAssist.catalogue.normalise": {
     "message": "శుభ్రమైన ఫీల్డ్‌లు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e2ee0a90"
   },
   "aiAssist.catalogue.useFields": {
     "message": "ఈ ఫీల్డ్‌లు వాడండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ccbc4718"
   },
   "aiAssist.catalogue.name": {
     "message": "పేరు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "709a2322"
   },
   "aiAssist.catalogue.variant": {
     "message": "వేరియంట్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cc91b1ea"
   },
   "aiAssist.catalogue.brand": {
     "message": "బ్రాండ్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "62b4aa57"
   },
   "aiAssist.catalogue.pack": {
     "message": "ప్యాక్ పరిమాణం",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "87dd2c97"
   },
   "aiAssist.catalogue.unit": {
     "message": "యూనిట్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f6b935ab"
   },
   "aiAssist.catalogue.category": {
     "message": "కేటగిరీ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a3c686e7"
   },
   "aiAssist.catalogue.duplicate": {
     "message": "సంభావ్య నకలు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fafd5515"
   },
   "aiAssist.catalogue.useMerge": {
     "message": "దీనిలో కలపండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4e163fe5"
   },
   "aiAssist.catalogue.into": {
     "message": "దీనిలో కలపండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ce9aabe5"
   },
   "aiAssist.catalogue.mergeInto": {
     "message": "{name} లాంటిదే ({similarity} పేరు సరిపోలిక)",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "387f4b9b"
   },
   "aiAssist.catalogue.names": {
     "message": "కేటగిరీ పేర్లు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "68def64d"
   },
   "aiAssist.catalogue.useNames": {
     "message": "ఈ పేర్లు వాడండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0e12b4e9"
   },
   "aiAssist.catalogue.mergeOrEdit": {
     "message": "కలపండి లేదా శుభ్రం చేయండి, రెండూ కాదు: రెండింటిలో ఒక లైన్ వదిలేయండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5ecfb3f7"
   },
   "aiAssist.triage.title": {
     "message": "AI ట్రయాజ్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c43e4907"
   },
   "aiAssist.triage.intro": {
     "message": "కేటగిరీ, ప్రాధాన్యత, ఆర్డర్ అంచనా, పొడవైన థ్రెడ్ సారాంశం, జవాబు డ్రాఫ్ట్ చేయండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4af54d0e"
   },
   "aiAssist.triage.start": {
     "message": "ట్రయాజ్ డ్రాఫ్ట్ చేయండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d2028e85"
   },
   "aiAssist.triage.classify": {
     "message": "కేటగిరీ, ప్రాధాన్యత",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "710f5853"
   },
   "aiAssist.triage.useClassify": {
     "message": "ఇవి సెట్ చేయండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c1791b81"
   },
   "aiAssist.triage.category": {
     "message": "కేటగిరీ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a3c686e7"
   },
   "aiAssist.triage.priority": {
     "message": "ప్రాధాన్యత",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "886cbff9"
   },
   "aiAssist.triage.order": {
     "message": "ఆర్డర్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1d75774c"
   },
   "aiAssist.triage.summary": {
     "message": "థ్రెడ్ సారాంశం",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6582f21a"
   },
   "aiAssist.triage.useSummary": {
     "message": "ఉపయోగకరం",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "45e36dd9"
   },
   "aiAssist.triage.reply": {
     "message": "జవాబు డ్రాఫ్ట్",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3baa690f"
   },
   "aiAssist.triage.useReply": {
     "message": "ఈ జవాబు పంపండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a3fb6190"
   },
   "aiAssist.triage.replyLabel": {
     "message": "తెరిచినవారికి జవాబు",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fe53ec96"
   },
   "aiAssist.risk.title": {
     "message": "AI వివరణ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c7c60332"
   },
   "aiAssist.risk.intro": {
     "message": "ఈ నియమం లెక్కించినదాని చిన్న సారాంశం, ఫ్లాగ్ సొంత సంఖ్యలతో మాత్రమే డ్రాఫ్ట్ చేయండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4ed37e2c"
   },
   "aiAssist.risk.start": {
     "message": "ఈ ఫ్లాగ్ వివరించండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f0572de9"
   },
   "aiAssist.risk.summary": {
     "message": "సారాంశం",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "12b71c3e"
   },
   "aiAssist.risk.useSummary": {
     "message": "ఆడిట్ లాగ్‌కు జోడించండి",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "00437a79"
   },
   "aiAssist.risk.editHelp": {
     "message": "సాక్ష్యంలో కనిపించే సంఖ్యలను మాత్రమే వాడండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "30e28df3"
   },
   "aiAssist.risk.ungrounded": {
     "message": "ఈ సారాంశంలోని ఒక సంఖ్య సాక్ష్యంలో లేదు. ఫ్లాగ్ సొంత సంఖ్యలను మాత్రమే వాడండి.",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a33af9a4"
   }
 }

@@ -1,322 +1,322 @@
 {
   "aiAssist.badge": {
     "message": "AI ड्राफ़्ट",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7f61d5cd"
   },
   "aiAssist.working": {
     "message": "ड्राफ़्ट बन रहा है। इसमें कुछ सेकंड लगते हैं।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "997405ca"
   },
   "aiAssist.failed": {
     "message": "असिस्टेंट इसका ड्राफ़्ट नहीं बना सका। हाथ से जारी रखें या फिर से पूछें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c11d37ed"
   },
   "aiAssist.check": {
     "message": "हर लाइन जाँचें, फिर उसे इस्तेमाल करें, बदलें या छोड़ें। पुष्टि करने तक कुछ नहीं बदलता।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7a6e64d3"
   },
   "aiAssist.partly": {
     "message": "कुछ लाइनें लागू हो गईं। जिन्हें आप लागू नहीं कर सकते, वे यहीं हैं।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6e21eeaa"
   },
   "aiAssist.applied": {
     "message": "हो गया। आपने जो चुना वह लागू हुआ और ऑडिट लॉग में दर्ज है।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "b34c7f38"
   },
   "aiAssist.discarded": {
     "message": "छोड़ दिया। कुछ नहीं बदला।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "38d561e4"
   },
   "aiAssist.again": {
     "message": "फिर से पूछें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3f094ed6"
   },
   "aiAssist.choice.label": {
     "message": "“{line}” का क्या करें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "296cc524"
   },
   "aiAssist.choice.use": {
     "message": "इस्तेमाल करें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1d4d43cc"
   },
   "aiAssist.choice.edit": {
     "message": "बदलें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5301648d"
   },
   "aiAssist.choice.skip": {
     "message": "छोड़ें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3da47453"
   },
   "aiAssist.notPermitted": {
     "message": "आपकी भूमिका यह लाइन लागू नहीं कर सकती। जो कर सके उससे कहें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3b31adea"
   },
   "aiAssist.lineInvalid": {
     "message": "यह लाइन जाँचें: कोई मान खाली है या मान्य नहीं है।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "718ab9d1"
   },
   "aiAssist.nothing": {
     "message": "इस ड्राफ़्ट में तय करने को कुछ नहीं बचा।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0abf9aee"
   },
   "aiAssist.confirm": {
     "message": "चुनाव की पुष्टि करें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "7ea1e5fa"
   },
   "aiAssist.optional": {
     "message": "वैकल्पिक",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0c6c4102"
   },
   "aiAssist.none": {
     "message": "कोई नहीं",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6eef6648"
   },
   "aiAssist.toast.done": {
     "message": "चुनाव सहेजे गए",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6080b585"
   },
   "aiAssist.error.cap": {
     "message": "AI मदद कल तक रुकी है।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6ab931ad"
   },
   "aiAssist.error.off": {
     "message": "असिस्टेंट अभी यहाँ उपलब्ध नहीं है।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fca9b961"
   },
   "aiAssist.error.moved": {
     "message": "ड्राफ़्ट के बाद यह बदल गया। रीलोड करके फिर से पूछें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a0b03efc"
   },
   "aiAssist.error.invalid": {
     "message": "चुनी हुई लाइनें जाँचें और फिर कोशिश करें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9670e68b"
   },
   "aiAssist.error.forbidden": {
     "message": "आपकी भूमिका यह असिस्टेंट इस्तेमाल नहीं कर सकती।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4d4cdc64"
   },
   "aiAssist.error.network": {
     "message": "TodayZ तक नहीं पहुँच सके। कनेक्शन जाँचें और फिर कोशिश करें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "293ea9aa"
   },
   "aiAssist.error.generic": {
     "message": "कुछ गलत हुआ। फिर कोशिश करें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4244e822"
   },
   "aiAssist.catalogue.title": {
     "message": "AI सफ़ाई",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "859805b7"
   },
   "aiAssist.catalogue.intro": {
     "message": "इस प्रोडक्ट के साफ़ फ़ील्ड, संभावित डुप्लिकेट और कैटेगरी के छूटे नाम ड्राफ़्ट करें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f48628bb"
   },
   "aiAssist.catalogue.start": {
     "message": "सफ़ाई ड्राफ़्ट करें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "9727fb69"
   },
   "aiAssist.catalogue.normalise": {
     "message": "साफ़ फ़ील्ड",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "e2ee0a90"
   },
   "aiAssist.catalogue.useFields": {
     "message": "ये फ़ील्ड इस्तेमाल करें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ccbc4718"
   },
   "aiAssist.catalogue.name": {
     "message": "नाम",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "709a2322"
   },
   "aiAssist.catalogue.variant": {
     "message": "वैरिएंट",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "cc91b1ea"
   },
   "aiAssist.catalogue.brand": {
     "message": "ब्रांड",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "62b4aa57"
   },
   "aiAssist.catalogue.pack": {
     "message": "पैक साइज़",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "87dd2c97"
   },
   "aiAssist.catalogue.unit": {
     "message": "इकाई",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f6b935ab"
   },
   "aiAssist.catalogue.category": {
     "message": "कैटेगरी",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a3c686e7"
   },
   "aiAssist.catalogue.duplicate": {
     "message": "संभावित डुप्लिकेट",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fafd5515"
   },
   "aiAssist.catalogue.useMerge": {
     "message": "इसमें मिलाएँ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4e163fe5"
   },
   "aiAssist.catalogue.into": {
     "message": "इसमें मिलाएँ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "ce9aabe5"
   },
   "aiAssist.catalogue.mergeInto": {
     "message": "{name} जैसा ({similarity} नाम मिलता है)",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "387f4b9b"
   },
   "aiAssist.catalogue.names": {
     "message": "कैटेगरी के नाम",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "68def64d"
   },
   "aiAssist.catalogue.useNames": {
     "message": "ये नाम इस्तेमाल करें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "0e12b4e9"
   },
   "aiAssist.catalogue.mergeOrEdit": {
     "message": "मिलाएँ या साफ़ करें, दोनों नहीं: दो में से एक लाइन छोड़ें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "5ecfb3f7"
   },
   "aiAssist.triage.title": {
     "message": "AI ट्राइएज",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c43e4907"
   },
   "aiAssist.triage.intro": {
     "message": "कैटेगरी, प्राथमिकता और ऑर्डर का अनुमान, लंबे थ्रेड का सार और जवाब ड्राफ़्ट करें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4af54d0e"
   },
   "aiAssist.triage.start": {
     "message": "ट्राइएज ड्राफ़्ट करें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "d2028e85"
   },
   "aiAssist.triage.classify": {
     "message": "कैटेगरी और प्राथमिकता",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "710f5853"
   },
   "aiAssist.triage.useClassify": {
     "message": "ये सेट करें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c1791b81"
   },
   "aiAssist.triage.category": {
     "message": "कैटेगरी",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a3c686e7"
   },
   "aiAssist.triage.priority": {
     "message": "प्राथमिकता",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "886cbff9"
   },
   "aiAssist.triage.order": {
     "message": "ऑर्डर",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "1d75774c"
   },
   "aiAssist.triage.summary": {
     "message": "थ्रेड का सार",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "6582f21a"
   },
   "aiAssist.triage.useSummary": {
     "message": "काम का",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "45e36dd9"
   },
   "aiAssist.triage.reply": {
     "message": "जवाब ड्राफ़्ट",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "3baa690f"
   },
   "aiAssist.triage.useReply": {
     "message": "यह जवाब भेजें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a3fb6190"
   },
   "aiAssist.triage.replyLabel": {
     "message": "खोलने वाले को जवाब",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "fe53ec96"
   },
   "aiAssist.risk.title": {
     "message": "AI व्याख्या",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "c7c60332"
   },
   "aiAssist.risk.intro": {
     "message": "इस नियम ने जो गिना उसका छोटा सार ड्राफ़्ट करें, केवल फ़्लैग की अपनी संख्याओं से।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "4ed37e2c"
   },
   "aiAssist.risk.start": {
     "message": "यह फ़्लैग समझाएँ",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "f0572de9"
   },
   "aiAssist.risk.summary": {
     "message": "सार",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "12b71c3e"
   },
   "aiAssist.risk.useSummary": {
     "message": "ऑडिट लॉग में जोड़ें",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "00437a79"
   },
   "aiAssist.risk.editHelp": {
     "message": "केवल सबूत में दिखी संख्याएँ इस्तेमाल करें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "30e28df3"
   },
   "aiAssist.risk.ungrounded": {
     "message": "इस सार की एक संख्या सबूत में नहीं है। केवल फ़्लैग की अपनी संख्याएँ इस्तेमाल करें।",
-    "review": "machine",
+    "review": "reviewed",
     "enHash": "a33af9a4"
   }
 }

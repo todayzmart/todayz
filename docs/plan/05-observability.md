@@ -256,7 +256,7 @@ Each store sees its own: sales by hour/day, online vs POS, top items, orders fun
 
 ## 5. Alerts
 
-Routing: local → console + a local Grafana contact point (no paging). Cloud → `critical` to phone push/SMS (Grafana OnCall or simple SMS webhook) + email; `warning` to email/Slack-equivalent (WhatsApp group webhook if chosen). Every alert has a runbook in `docs/runbooks/<alert>.md` with: what it means, first 3 checks (dashboard links), likely causes, fix, who to tell.
+Routing: local → console + a local Grafana contact point (no paging). Cloud → `critical` to phone push/SMS (Grafana OnCall or simple SMS webhook) + email; `warning` to email/Slack-equivalent (WhatsApp group webhook if chosen). Every alert has a runbook in `docs/runbooks/<alert>.md` with six sections: What it means, First five minutes (dashboard links), Diagnosis, Mitigation, Escalation, Follow-up (D-236). `make check` runs `check-runbooks` (`scripts/ops/runbooks_check.py`), which fails on a missing runbook, section, dashboard or link.
 
 | Alert | Condition | Severity |
 |---|---|---|
