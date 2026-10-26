@@ -66,6 +66,8 @@ export interface CallOptions {
   ifMatch?: string;
   headers?: Record<string, string>;
   params?: Record<string, string | number | boolean>;
+  /** A multipart form (an upload): sent instead of `data`. */
+  multipart?: Record<string, string | number | boolean | { name: string; mimeType: string; buffer: Buffer }>;
 }
 
 async function reply<T>(r: APIResponse): Promise<Reply<T>> {
@@ -107,7 +109,7 @@ export class Api {
       const r = await this.who.request().fetch(`${URLS.api}${path}`, {
         method,
         headers,
-        ...(data === undefined ? {} : { data }),
+        ...(opts.multipart ? { multipart: opts.multipart } : data === undefined ? {} : { data }),
         ...(opts.params ? { params: opts.params } : {}),
       });
       return reply<T>(r);

@@ -90,6 +90,16 @@ async function latestOtp(request: APIRequestContext, national: string, since: st
   return ((await r.json()) as { otp: string }).otp;
 }
 
+/** The newest SMS code the mocks hold for a number sent since `since` (a code another flow sent, such as the field owner confirm). Never print it. */
+export async function smsCodeSince(national: string, since: string): Promise<string> {
+  const request = await newRequest();
+  try {
+    return await latestOtp(request, national, since);
+  } finally {
+    await request.dispose();
+  }
+}
+
 async function sendOtp(request: APIRequestContext, person: Person): Promise<{ requestId: string; since: string }> {
   for (let attempt = 0; ; attempt++) {
     const since = new Date(Date.now() - 1000).toISOString();
@@ -159,18 +169,26 @@ export class Principal implements Bearer {
       return this;
     }
     this.ctx = await newRequest();
+    await this.signIn();
+    return this;
+  }
+
+  /** OTP (and TOTP for an admin) on this person's own request context; keeps the session. */
+  private async signIn(): Promise<void> {
+    if (!this.ctx) throw new Error(`${this.person.key} has no request context`);
     const { requestId, since } = await sendOtp(this.ctx, this.person);
     const code = await latestOtp(this.ctx, this.person.national, since);
     const v = await this.ctx.post(`${URLS.api}/v1/auth/otp/verify`, { data: { requestId, code, app: this.person.app, deviceId: ulid() } });
     expect(v.status(), `OTP verify for ${this.person.key}`).toBe(200);
     const body = (await v.json()) as { accessToken: string; expiresAt: string; userId: string; isNewUser: boolean; nextStep?: string };
-    this.saved = { token: body.accessToken, expiresAt: Date.parse(body.expiresAt), userId: body.userId, isNewUser: body.isNewUser, cookies: [] };
+    // A sign-in again keeps the last authenticator step used: the server takes each step once.
+    const totpStep = this.saved?.totpStep;
+    this.saved = { token: body.accessToken, expiresAt: Date.parse(body.expiresAt), userId: body.userId, isNewUser: body.isNewUser, cookies: [], ...(totpStep === undefined ? {} : { totpStep }) };
     if (this.person.app === 'admin') {
       expect(body.nextStep, `${this.person.key} is an enrolled admin`).toBe('totp_verify');
       await this.totpVerify('login');
     }
     await this.persist();
-    return this;
   }
 
   /**
@@ -193,7 +211,8 @@ export class Principal implements Bearer {
     // Not in the last seconds of a step, so the code is still current when it arrives; and a step
     // after the last one used.
     for (;;) {
-      const now = Date.now();
+      // The server checks the code at its own (test clock) time.
+      const now = Date.now() + readState().clockOffsetMs;
       const left = 30_000 - (now % 30_000);
       const step = Math.floor(now / 30_000);
       if (left < 4_000 || (this.saved.totpStep !== undefined && step <= this.saved.totpStep)) {
@@ -239,6 +258,14 @@ export class Principal implements Bearer {
       // the shared jar. Wait for it and retry once, as shared/auth's session does (graceWaitMs).
       await new Promise((done) => setTimeout(done, 400));
       r = await refresh();
+    }
+    if (r.status() === 401 && !this.lent && this.person.app === 'admin') {
+      // An admin's refresh token lives 12 h (01 §2); the clock journeys move the test clock past it.
+      // Sign in again, as the admin would.
+      await this.ctx?.dispose();
+      this.ctx = await newRequest();
+      await this.signIn();
+      return;
     }
     expect(r.status(), `session refresh for ${this.person.key}`).toBe(200);
     const b = (await r.json()) as { accessToken: string; expiresAt: string };

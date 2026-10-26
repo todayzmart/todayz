@@ -346,7 +346,7 @@ func TestBrokenFixtureIsolated(t *testing.T) {
 func TestRecordingDoesNotOverrideCurated(t *testing.T) {
 	fsys := mapFS(map[string]string{
 		"llm/voice_stock/a.json": `{"match":{"contains":["chai"]},"response":{"content":[{"type":"text","text":"curated"}]}}`,
-		"llm/_recorded/voice_stock-1.json": `{"match":{"feature":"voice_stock","contains":["chai"],"tool":"record_stock_lines"},` +
+		"llm/_recorded/voice_stock-1.json": `{"match":{"feature":"voice_stock","contains":["chai"],"tool":"record_voice_stock_lines"},` +
 			`"response":{"content":[{"type":"text","text":"recorded"}]}}`,
 	})
 	for replay, want := range map[bool]string{false: "llm/voice_stock/a.json", true: "llm/_recorded/voice_stock-1.json"} {

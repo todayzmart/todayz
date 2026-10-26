@@ -248,9 +248,9 @@ header.
   ```json
   {
     "description": "why this fixture exists",
-    "match": {"contains": ["do kilo atta"], "tool": "record_stock_lines"},
+    "match": {"contains": ["do kilo atta"], "tool": "record_voice_stock_lines"},
     "response": {
-      "content": [{"type": "tool_use", "name": "record_stock_lines", "input": {"lines": []}}],
+      "content": [{"type": "tool_use", "name": "record_voice_stock_lines", "input": {"lines": []}}],
       "stop_reason": "tool_use",
       "usage": {"input_tokens": 0, "output_tokens": 0}
     }
@@ -290,7 +290,7 @@ header.
   `content_block_start`, as in the API. A thinking block starts as
   `{"type":"thinking","thinking":"","signature":""}`.
 - **Example fixtures:**
-  - `voice_stock/stock-update-hinglish.json` gives `record_stock_lines` tool_use
+  - `voice_stock/stock-update-hinglish.json` gives `record_voice_stock_lines` tool_use
     lines for the sample utterance.
   - `voice_stock/fallback.json` returns one unmatched line for anything else.
   - `coach_card/default.json` returns a short text card.

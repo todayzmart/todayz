@@ -1,4 +1,4 @@
-import { expect, request as playwrightRequest, test as base, type Browser, type BrowserContext, type Page } from '@playwright/test';
+import { expect, request as playwrightRequest, test as base, type Browser, type BrowserContext, type Locator, type Page } from '@playwright/test';
 
 import { anon, totp, ulid, type Api } from './api';
 import { principal, readState, setClockOffset, type Principal } from './principals';
@@ -288,7 +288,15 @@ export async function customerFirstRun(page: Page) {
       // storage blocked: the journey's own checks fail with the screen they see
     }
   }, JSON.stringify({ kind: 'gps', lat: QA_POINT.lat, lng: QA_POINT.lng }));
+  // A signed-in page refreshes its session on load. The journey's next goto would abort that request
+  // after the server rotated the token: the page keeps the old cookie, gets 401 inside RotationGrace
+  // and, past it, the reuse revokes the whole session family. So wait for the refresh to land.
+  const signedIn = (await page.context().cookies()).some((c) => c.name === '__Secure-tz_rt_c');
+  const refreshed = signedIn
+    ? page.waitForResponse((r) => new URL(r.url()).pathname === '/v1/auth/refresh', { timeout: 15_000 })
+    : undefined;
   await page.goto('/');
+  if (refreshed) expect((await refreshed).status(), 'the page refreshes its session').toBe(200);
 }
 
 export interface AppPage {
@@ -352,6 +360,73 @@ export async function checkoutCart(page: Page): Promise<string> {
   await expect(page.getByTestId('placed-check')).toBeVisible();
   await expect(page).toHaveURL(/\/orders\/[0-9A-Z]{26}$/);
   return new URL(page.url()).pathname.split('/').pop() ?? '';
+}
+
+/**
+ * An admin console context for `who`, signed in with the principal's own session. The sessionStorage
+ * flag is only a routing hint (the API checks the token's amr): this person passes the authenticator step.
+ */
+export async function openAdmin(browser: Browser, who: Principal): Promise<AppPage> {
+  const app = await openApp(browser, who, URLS.admin);
+  await app.context.addInitScript(() => sessionStorage.setItem('todayz.admin.2fa', String(Date.now())));
+  return app;
+}
+
+/**
+ * Waits for `done` after an action that needs a fresh authenticator code (a † admin action, D-64):
+ * if the "Confirm it is you" dialog opens, types the next unused code, then waits for `done`.
+ */
+export async function expectWithStepUp(page: Page, who: Principal, done: Locator) {
+  const step = page.getByRole('dialog', { name: 'Confirm it is you' });
+  await expect(done.or(step).first()).toBeVisible();
+  if (await step.isVisible()) {
+    await step.getByRole('group', { name: 'Authenticator code' }).locator('input').first().click();
+    await page.keyboard.type(await who.totpCode());
+  }
+  await expect(done).toBeVisible();
+}
+
+/**
+ * Runs fn with admin settings (feature flags) set to `values`, then puts the earlier values back.
+ * Needs a super admin: each change takes a fresh authenticator step-up.
+ */
+export async function withFlags<T>(admin: Principal, values: Record<string, unknown>, fn: () => Promise<T>): Promise<T> {
+  const list = await admin.api.ok<{ items: { key: string; value: unknown }[] }>('admin lists the settings', 'GET', '/v1/admin/settings');
+  const before: Record<string, unknown> = {};
+  for (const key of Object.keys(values)) {
+    const row = list.items.find((i) => i.key === key);
+    expect(row, `setting ${key} exists`).toBeTruthy();
+    before[key] = row?.value;
+  }
+  const set = async (to: Record<string, unknown>, reason: string) => {
+    for (const [key, value] of Object.entries(to)) {
+      await admin.stepUp();
+      const r = await admin.api.call('PATCH', `/v1/admin/settings/${key}`, { value, reason });
+      expect(r.status, `set ${key}: PATCH answered ${r.status} ${r.code}`).toBe(200);
+    }
+  };
+  await set(values, 'W3-14 journey');
+  try {
+    return await fn();
+  } finally {
+    await set(before, 'W3-14 journey: restore');
+  }
+}
+
+/** Polls an AI draft until it leaves `processing`; the draft must be `ready`. */
+export async function waitForDraft<T extends { status: string; failure?: unknown }>(who: Principal, path: string, timeoutMs = 40_000): Promise<T> {
+  let last: T | undefined;
+  await expect
+    .poll(
+      async () => {
+        last = await who.api.ok<T>('read the draft', 'GET', path);
+        return last.status;
+      },
+      { message: 'the draft is no longer processing', timeout: timeoutMs, intervals: [300, 500, 1_000] },
+    )
+    .not.toBe('processing');
+  expect(last?.status, `the draft is ready (failure ${JSON.stringify(last?.failure ?? null)})`).toBe('ready');
+  return last as T;
 }
 
 type People = typeof PEOPLE;

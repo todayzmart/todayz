@@ -28,11 +28,11 @@ func voiceRequest(text string) map[string]any {
 		"max_tokens": 1024,
 		"system":     []map[string]any{{"type": "text", "text": "You turn a shopkeeper's spoken update into stock lines."}},
 		"tools": []map[string]any{{
-			"name":         "record_stock_lines",
+			"name":         "record_voice_stock_lines",
 			"description":  "Record stock lines",
 			"input_schema": map[string]any{"type": "object"},
 		}},
-		"tool_choice": map[string]any{"type": "tool", "name": "record_stock_lines"},
+		"tool_choice": map[string]any{"type": "tool", "name": "record_voice_stock_lines"},
 		"metadata":    map[string]any{"user_id": "tz:voice_stock:store-0001"},
 		"messages":    []map[string]any{{"role": "user", "content": text}},
 	}
@@ -57,11 +57,11 @@ func TestAnthropicToolUseFixture(t *testing.T) {
 	}
 	block := obj(t, content[0])
 	wantKeys(t, block, "type", "id", "name", "input")
-	if block["type"] != "tool_use" || block["name"] != "record_stock_lines" || !strings.HasPrefix(block["id"].(string), "toolu_") {
+	if block["type"] != "tool_use" || block["name"] != "record_voice_stock_lines" || !strings.HasPrefix(block["id"].(string), "toolu_") {
 		t.Errorf("block = %v", block)
 	}
 	lines := obj(t, block["input"])["lines"].([]any)
-	if len(lines) != 2 || obj(t, lines[0])["unmatched_text"] != "atta" || obj(t, lines[1])["quantity"] != float64(5) {
+	if len(lines) != 2 || obj(t, lines[0])["unmatched"] != "atta" || obj(t, lines[1])["quantity"] != float64(5) {
 		t.Errorf("lines = %v", lines)
 	}
 
@@ -76,7 +76,7 @@ func TestAnthropicToolUseFixture(t *testing.T) {
 	}
 	rec := h.srv.Store().LLM.List(nil, 1)[0]
 	if rec.Feature != "voice_stock" || rec.Mode != "fixture" || rec.Status != 200 || rec.StopReason != "tool_use" ||
-		!strings.Contains(rec.Response, "record_stock_lines") || !strings.Contains(rec.Prompt, "do kilo atta") || len(rec.Tools) != 1 {
+		!strings.Contains(rec.Response, "record_voice_stock_lines") || !strings.Contains(rec.Prompt, "do kilo atta") || len(rec.Tools) != 1 {
 		t.Errorf("capture = %+v", rec)
 	}
 }
@@ -431,7 +431,7 @@ func TestMockLLMLiveRecords(t *testing.T) {
 	if err != nil || len(set.Errors) > 0 || len(all) != 1 {
 		t.Fatalf("recorded fixture does not load: %v %v (%d)", err, set.Errors, len(all))
 	}
-	if all[0].Match.Feature != "voice_stock" || all[0].Match.Tool != "record_stock_lines" || len(all[0].Match.Contains) != 1 {
+	if all[0].Match.Feature != "voice_stock" || all[0].Match.Tool != "record_voice_stock_lines" || len(all[0].Match.Contains) != 1 {
 		t.Errorf("recorded match = %+v", all[0].Match)
 	}
 	// Recordings are ignored by default ...
