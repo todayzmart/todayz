@@ -229,6 +229,7 @@ function product(over: Partial<AdminProduct> = {}): AdminProduct {
     status: 'active',
     mergedInto: null,
     storeCount: 14,
+    imageKey: null,
     createdAt: NOW,
     updatedAt: NOW,
     ...over,

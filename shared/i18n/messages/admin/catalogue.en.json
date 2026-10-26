@@ -618,5 +618,221 @@
   "catalogue.synonym.removed": {
     "defaultMessage": "Search word removed",
     "description": "Toast"
+  },
+  "catalogue.tab.images": {
+    "defaultMessage": "Images",
+    "description": "A-08 tab: product images waiting for review (D-252)"
+  },
+  "catalogue.images.table": {
+    "defaultMessage": "Images waiting for review",
+    "description": "Accessible name of the A-08 image queue table"
+  },
+  "catalogue.images.empty": {
+    "defaultMessage": "No images are waiting.",
+    "description": "A-08 image queue: nothing waiting"
+  },
+  "catalogue.images.filter.source": {
+    "defaultMessage": "Source",
+    "description": "A-08 image queue: source filter label"
+  },
+  "catalogue.images.filter.anySource": {
+    "defaultMessage": "Any source",
+    "description": "A-08 image queue: source filter, no filter"
+  },
+  "catalogue.images.source.retailer": {
+    "defaultMessage": "Shop photo",
+    "description": "Image source: a shop's own photo"
+  },
+  "catalogue.images.source.admin": {
+    "defaultMessage": "Admin upload",
+    "description": "Image source: uploaded by an admin"
+  },
+  "catalogue.images.source.off": {
+    "defaultMessage": "Open Food Facts",
+    "description": "Image source: the Open Food Facts database (proper name)"
+  },
+  "catalogue.images.source.obf": {
+    "defaultMessage": "Open Beauty Facts",
+    "description": "Image source: the Open Beauty Facts database (proper name)"
+  },
+  "catalogue.images.source.opf": {
+    "defaultMessage": "Open Products Facts",
+    "description": "Image source: the Open Products Facts database (proper name)"
+  },
+  "catalogue.images.match.barcode": {
+    "defaultMessage": "Same barcode",
+    "description": "How an imported image was matched: the same barcode"
+  },
+  "catalogue.images.match.name": {
+    "defaultMessage": "Name and brand: check closely",
+    "description": "How an imported image was matched: by name and brand, less certain"
+  },
+  "catalogue.images.col.image": {
+    "defaultMessage": "Image",
+    "description": "A-08 image queue column: the waiting image"
+  },
+  "catalogue.images.col.source": {
+    "defaultMessage": "Source",
+    "description": "A-08 image queue column and fact: where the image came from"
+  },
+  "catalogue.images.col.match": {
+    "defaultMessage": "Match",
+    "description": "A-08 image queue column and fact: how the image was matched"
+  },
+  "catalogue.images.pickAll": {
+    "defaultMessage": "Choose every image shown",
+    "description": "Checkbox: choose every image on the list for bulk approval"
+  },
+  "catalogue.images.pick": {
+    "defaultMessage": "Choose the image for {name}",
+    "description": "Checkbox: choose one image for bulk approval; {name} is the product"
+  },
+  "catalogue.images.approveChosen": {
+    "defaultMessage": "Approve chosen ({n})",
+    "description": "Button: approve the chosen images; {n} is how many"
+  },
+  "catalogue.images.bulkTitle": {
+    "defaultMessage": "Approve {n, plural, one {# image} other {# images}}?",
+    "description": "Bulk approve dialog title"
+  },
+  "catalogue.images.bulkBody": {
+    "defaultMessage": "Each image becomes its product's picture in search, on the product page and in the shops' stock lists.",
+    "description": "Bulk approve dialog body"
+  },
+  "catalogue.images.bulkDone": {
+    "defaultMessage": "{n, plural, one {# image} other {# images}} approved.",
+    "description": "Toast after a bulk approval; {n} were approved"
+  },
+  "catalogue.images.notApproved": {
+    "defaultMessage": "Not approved: {name}. {detail}",
+    "description": "A bulk-approved image that failed; {detail} is the API's reason"
+  },
+  "catalogue.pick.image": {
+    "defaultMessage": "Choose an image to compare it with the product's current one.",
+    "description": "A-08 image queue side panel before choosing a row"
+  },
+  "catalogue.pick.imageDecided": {
+    "defaultMessage": "This image is not waiting any more. Someone may have decided it already.",
+    "description": "A-08 image queue: the image in the link is not waiting any more"
+  },
+  "catalogue.images.waiting": {
+    "defaultMessage": "Waiting for review",
+    "description": "Caption under the image waiting for review"
+  },
+  "catalogue.images.current": {
+    "defaultMessage": "Current image",
+    "description": "Caption under the product's current image"
+  },
+  "catalogue.images.noCurrent": {
+    "defaultMessage": "No image yet",
+    "description": "Caption when the product has no image yet"
+  },
+  "catalogue.images.alt": {
+    "defaultMessage": "{name}, the image waiting for review",
+    "description": "Alt text of the waiting image"
+  },
+  "catalogue.images.altCurrent": {
+    "defaultMessage": "{name}, the current image",
+    "description": "Alt text of a product's current image"
+  },
+  "catalogue.images.field.product": {
+    "defaultMessage": "Product",
+    "description": "Fact label: the product the image is for"
+  },
+  "catalogue.images.field.barcode": {
+    "defaultMessage": "Barcode looked up",
+    "description": "Fact label: the barcode the importer looked up"
+  },
+  "catalogue.images.field.licence": {
+    "defaultMessage": "Licence",
+    "description": "Fact label: the image's licence"
+  },
+  "catalogue.images.field.credit": {
+    "defaultMessage": "Credit",
+    "description": "Fact label: the attribution the licence asks for"
+  },
+  "catalogue.images.field.size": {
+    "defaultMessage": "File size",
+    "description": "Fact label: the file size"
+  },
+  "catalogue.images.size": {
+    "defaultMessage": "{kb} KB",
+    "description": "A file size in kilobytes"
+  },
+  "catalogue.images.openProduct": {
+    "defaultMessage": "Open product",
+    "description": "Button: open the product on the Products tab"
+  },
+  "catalogue.images.sourcePage": {
+    "defaultMessage": "Source page",
+    "description": "Link to the product page in the open database the image came from"
+  },
+  "catalogue.images.approve": {
+    "defaultMessage": "Approve image",
+    "description": "Button: approve the image"
+  },
+  "catalogue.images.reject": {
+    "defaultMessage": "Reject image",
+    "description": "Button: reject the image"
+  },
+  "catalogue.images.approveTitle": {
+    "defaultMessage": "Approve the image for {name}?",
+    "description": "Approve image dialog title"
+  },
+  "catalogue.images.approveBody": {
+    "defaultMessage": "It replaces the product's current image for customers and shops.",
+    "description": "Approve image dialog body"
+  },
+  "catalogue.images.rejectTitle": {
+    "defaultMessage": "Reject the image for {name}?",
+    "description": "Reject image dialog title"
+  },
+  "catalogue.images.rejectBody": {
+    "defaultMessage": "The product keeps its current image. The importer will not offer this image again.",
+    "description": "Reject image dialog body for an imported image"
+  },
+  "catalogue.images.rejectBodyShop": {
+    "defaultMessage": "The shop sees your reason on its stock screen. The product keeps its current image.",
+    "description": "Reject image dialog body for a shop's photo"
+  },
+  "catalogue.images.approved": {
+    "defaultMessage": "Image approved.",
+    "description": "Toast after approving an image"
+  },
+  "catalogue.images.rejected": {
+    "defaultMessage": "Image rejected.",
+    "description": "Toast after rejecting an image"
+  },
+  "catalogue.product.noImage": {
+    "defaultMessage": "No image yet. Customers see the initials.",
+    "description": "Product card: no image yet"
+  },
+  "catalogue.product.upload": {
+    "defaultMessage": "Upload image",
+    "description": "Button: upload a product image"
+  },
+  "catalogue.product.replace": {
+    "defaultMessage": "Replace image",
+    "description": "Button: replace the product image"
+  },
+  "catalogue.product.uploadHelp": {
+    "defaultMessage": "JPEG, PNG or WebP, up to 5 MB. It goes live at once.",
+    "description": "Help under the upload button"
+  },
+  "catalogue.product.uploaded": {
+    "defaultMessage": "Image published.",
+    "description": "Toast after an admin image is published"
+  },
+  "catalogue.product.uploadFailed": {
+    "defaultMessage": "The image did not upload. Try again.",
+    "description": "The image did not reach storage"
+  },
+  "catalogue.product.badType": {
+    "defaultMessage": "Pick a JPEG, PNG or WebP image.",
+    "description": "The chosen file is not a supported image"
+  },
+  "catalogue.product.tooBig": {
+    "defaultMessage": "The image is over 5 MB. Pick a smaller one.",
+    "description": "The chosen image is over the limit"
   }
 }

@@ -2,22 +2,36 @@ import type { AdminProduct } from '@todayz/api-client/gen/model/adminProduct';
 import type { AdminProductStatus } from '@todayz/api-client/gen/model/adminProductStatus';
 import { Button, DataTable, StatusPill, Tabs, TextField, useToast, type ColumnDef } from '@todayz/ui';
 import { useNavigate } from '@tanstack/react-router';
-import { Pencil, Plus } from 'lucide-react';
-import { useMemo, useState, type FormEvent } from 'react';
+import { ImagePlus, Pencil, Plus } from 'lucide-react';
+import { useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useIntl } from 'react-intl';
 import { useWhen } from '../app/format';
 import { can, useRoles } from '../app/nav/access';
 import { useProblemText } from '../app/problems';
 import { AuditPanel } from '../audit/AuditPanel';
 import { CategoriesTab } from './CategoriesTab';
+import { imageUrl } from './image';
+import { ImagesTab } from './ImagesTab';
 import { ProductDialog, type ProductSave } from './ProductDialog';
 import { ReviewTab } from './ReviewTab';
 import { SynonymsTab } from './SynonymsTab';
 import { PRODUCT_STATUSES, productTone, useCatalogueLabels } from './labels';
 import { useCatalogueProblem } from './problem';
-import { useCategories, useCreateProduct, useProduct, useProducts, useUpdateProduct } from './queries';
+import { ProductThumb } from './ProductThumb';
+import {
+  IMAGE_MAX_BYTES,
+  IMAGE_TYPES,
+  UploadError,
+  useCategories,
+  useCreateProduct,
+  useProduct,
+  useProducts,
+  useUpdateProduct,
+  useUploadImage,
+} from './queries';
 import { MAX_Q, type CatalogueSearch, type CatalogueTab, type SubTab } from './search';
 import css from '../app/page.module.css';
+import img from './images.module.css';
 
 export type Go = (next: CatalogueSearch) => void;
 
@@ -38,6 +52,7 @@ export function CataloguePage({ search }: { search: CatalogueSearch }) {
         tabs={[
           { value: 'products', label: intl.formatMessage({ id: 'catalogue.tab.products' }) },
           { value: 'review', label: intl.formatMessage({ id: 'catalogue.tab.review' }) },
+          { value: 'images', label: intl.formatMessage({ id: 'catalogue.tab.images' }) },
           { value: 'categories', label: intl.formatMessage({ id: 'catalogue.tab.categories' }) },
           { value: 'synonyms', label: intl.formatMessage({ id: 'catalogue.tab.synonyms' }) },
         ]}
@@ -46,6 +61,7 @@ export function CataloguePage({ search }: { search: CatalogueSearch }) {
       />
       {tab === 'products' && <ProductsTab search={search} go={go} />}
       {tab === 'review' && <ReviewTab search={search} go={go} />}
+      {tab === 'images' && <ImagesTab search={search} go={go} />}
       {tab === 'categories' && <CategoriesTab search={search} go={go} />}
       {tab === 'synonyms' && <SynonymsTab search={search} go={go} />}
     </div>
@@ -87,9 +103,12 @@ function ProductsTab({ search, go }: { search: CatalogueSearch; go: Go }) {
         id: 'name',
         header: intl.formatMessage({ id: 'catalogue.col.product' }),
         cell: ({ row }) => (
-          <Button size="sm" variant="ghost" aria-pressed={row.original.id === search.open} onClick={() => go({ ...search, open: row.original.id })}>
-            {labels.name(row.original)}
-          </Button>
+          <span className={img.nameCell}>
+            <ProductThumb name={row.original.name} src={imageUrl(row.original.imageKey)} />
+            <Button size="sm" variant="ghost" aria-pressed={row.original.id === search.open} onClick={() => go({ ...search, open: row.original.id })}>
+              {labels.name(row.original)}
+            </Button>
+          </span>
         ),
       },
       { id: 'brand', header: intl.formatMessage({ id: 'catalogue.col.brand' }), accessorFn: (r) => r.brandName ?? '' },
@@ -268,6 +287,7 @@ function ProductCard({ p, now, go }: { p: AdminProduct; now: string; go: Go }) {
         <h2 id={`product-${p.id}`} className="tz-card-title">
           {labels.name(p)}
         </h2>
+        <ProductImage p={p} />
         <dl className={css.facts}>
           <dt>{intl.formatMessage({ id: 'catalogue.col.brand' })}</dt>
           <dd>{p.brandName ?? none}</dd>
@@ -339,5 +359,67 @@ function ProductCard({ p, now, go }: { p: AdminProduct; now: string; go: Go }) {
         />
       )}
     </>
+  );
+}
+
+/**
+ * The product's image and, for an admin, upload or replace it (D-252). An admin's image needs no
+ * review: confirming it publishes it at once. A merged or retired product keeps what it has.
+ */
+function ProductImage({ p }: { p: AdminProduct }) {
+  const intl = useIntl();
+  const toast = useToast();
+  const roles = useRoles();
+  const catalogueProblem = useCatalogueProblem();
+  const upload = useUploadImage(p.id);
+  const input = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const src = imageUrl(p.imageKey);
+  const may = can(roles, 'catalogueManage') && (p.status === 'active' || p.status === 'pending_review');
+
+  const chosen = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!IMAGE_TYPES.includes(file.type)) return setError(intl.formatMessage({ id: 'catalogue.product.badType' }));
+    if (file.size > IMAGE_MAX_BYTES) return setError(intl.formatMessage({ id: 'catalogue.product.tooBig' }));
+    setError(null);
+    upload.mutate(file, {
+      onSuccess: () => toast.show({ message: intl.formatMessage({ id: 'catalogue.product.uploaded' }) }),
+      onError: (err) => setError(err instanceof UploadError ? intl.formatMessage({ id: 'catalogue.product.uploadFailed' }) : catalogueProblem(err)),
+    });
+  };
+
+  return (
+    <div className={img.figure}>
+      <ProductThumb large name={p.name} src={src} {...(src ? { alt: intl.formatMessage({ id: 'catalogue.images.altCurrent' }, { name: p.name }) } : {})} />
+      {!src && <p className={css.muted}>{intl.formatMessage({ id: 'catalogue.product.noImage' })}</p>}
+      {may && (
+        <>
+          <input
+            ref={input}
+            className={img.fileInput}
+            type="file"
+            accept={IMAGE_TYPES.join(',')}
+            tabIndex={-1}
+            aria-hidden="true"
+            onChange={chosen}
+            data-testid="catalogue-image-input"
+          />
+          <div className={css.actions}>
+            <Button size="sm" variant="soft" icon={ImagePlus} loading={upload.isPending} onClick={() => input.current?.click()}>
+              {intl.formatMessage({ id: src ? 'catalogue.product.replace' : 'catalogue.product.upload' })}
+            </Button>
+          </div>
+          {error ? (
+            <p role="alert" className="tz-field-error">
+              {error}
+            </p>
+          ) : (
+            <p className={css.muted}>{intl.formatMessage({ id: 'catalogue.product.uploadHelp' })}</p>
+          )}
+        </>
+      )}
+    </div>
   );
 }

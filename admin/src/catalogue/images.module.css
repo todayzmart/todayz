@@ -1,0 +1,63 @@
+/* D-252: product images in the catalogue. */
+.thumb {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  color: var(--ink-3);
+  font: var(--type-caption);
+}
+
+.thumbLarge {
+  width: 8rem;
+  height: 8rem;
+  font: var(--type-body);
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.nameCell {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.compare {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.figure figcaption {
+  font: var(--type-caption);
+  color: var(--ink-3);
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.failed {
+  margin: 0;
+  padding-left: var(--space-4);
+}
