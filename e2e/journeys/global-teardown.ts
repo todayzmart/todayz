@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 
 import { moveClock, Shop } from '../fixtures/journey';
 import { disposeAll, principal, removeState } from '../fixtures/principals';
-import { PEOPLE, STORES } from '../fixtures/seed';
+import { OPEN_ALL_DAY } from './global-setup';
 
 // Puts the test clock back, restores the shops' seeded hours and deletes the session file.
 export default async function globalTeardown() {
@@ -13,9 +13,8 @@ export default async function globalTeardown() {
     const file = join(tmpdir(), `todayz-journeys-${process.env['TZ_JOURNEYS_RUN']}`, 'hours.json');
     if (existsSync(file)) {
       const before = JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown>;
-      const owner = await principal(PEOPLE.owner);
-      for (const store of [STORES.SL, STORES.SL2]) {
-        if (before[store.id]) await new Shop(owner, store).patchSettings({ hours: before[store.id] });
+      for (const { store, owner, businessId } of OPEN_ALL_DAY) {
+        if (before[store.id]) await new Shop(await principal(owner), store, businessId).patchSettings({ hours: before[store.id] });
       }
     }
   } finally {
