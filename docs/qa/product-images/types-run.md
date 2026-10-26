@@ -1,250 +1,255 @@
-Local stack, 26 Oct 2026, `todayz images types --limit 300` on the dev seed (5b7c9d98). 679 candidate files stored as pending in the private bucket; none picked yet. Licences: CC BY-SA 4.0 207, CC0 163, public domain 108, CC BY-SA 2.0 54, CC BY-SA 3.0 50, CC BY 4.0 41, CC BY 2.0 39, CC BY 3.0 10, CC BY-SA 2.5 6, CC BY 2.5 1.
-
 # Item-type photos
 
-Run: 0 products given their kind's approved photo; 244 kinds searched; 227 with candidates, 9 with none, 8 medicines skipped, 0 failed.
+Run: 0 products given their kind's approved photo; 679 waiting candidates dropped to search again; 251 kinds searched; 215 with candidates, 28 with none, 8 medicines skipped, 0 failed.
 
 ## Candidates (waiting for an admin to pick one in A-08)
 
-- detergent powder (household, 37 products): Detergent powder with laundry enzymes.jpg; Plastic spoon n Laundry detergent n Washing powder in white.jpg; Laundry detergent 1.jpg
-- toothpaste (personal-care, 29 products): Club toothpaste advertisement from Nakayama Taiyodo, Djawa Baroe, Vol. 1, Iss. 16 (1943-08-15), p20.jpg; Darlie Toothpaste Package.jpg; Colodent – toothpaste, Poland.jpg
-- deodorant spray (personal-care, 28 products): Spray on deodorant.jpg; Déodorant spray .jpg; A deodorant or body spray.jpg
-- mouthwash (personal-care, 28 products): Mouthwash R.O.C.S. 2023 Russia.png; Mouthwash PresiDent Antibacterial.jpg; Mouthwash PresiDent Sensitive.jpg
+- detergent powder (household, 37 products): Detergent powder with laundry enzymes.jpg; Plastic spoon n Laundry detergent n Washing powder in white.jpg
+- soft drink (beverages, 36 products): POP Soft Drink.jpg; Plastic soft drinks.jpg; HK Sunday night West Kln Promenade 維他 Vita Soft Drink Vending Machine Lemon Tea 02.JPG
+- whole wheat atta (staples, 36 products): Wheat flour Rose.jpg; Wheat flour dough.jpg; Wheat flour pakoras.jpg
+- curd (dairy-eggs, 32 products): Misti doi (sweet curd), a popular milk product in India.jpg; Soya Bean Curd with Milk (Taiwan).jpg; Curds and whey an investigative report by a housecat.jpg
+- shampoo (hair-care, 31 products): Hair shampoos, conditioners and other hair care products in liter bottles for use in hair salon.jpg; Hair wash with shampoo.jpg; Fig2.Anjus Organic hair oil and shampoo.png
+- ghee (dairy-eggs, 30 products): Mysore Pak ~ Traditional Indian sweet made from concoction of gram flour, clarified butter and powdered sugar.JPG; Cream to get clarified butter home made.Ghee.jpg; South Indian sweets or dessert called Mysore pak made from gram flour, powdered sugar and clarified butter.jpg
+- bath soap (personal-care, 29 products): Soap from Bath and Body Works.png; Lavender bath soap.jpg; Cosmic soap bubbles (God takes a bath) (612350664).jpg
+- hand wash (personal-care, 29 products): Wall-mounted manual liquid soap dispenser with chrome finish.jpg; Hand Soap Liquid.jpg; Liquid soap making.jpg
+- toothpaste (personal-care, 29 products): Whitemen Toothpaste Box (Taipei, Beitou).jpg; MC 澳門 Macau 澳門半島 Macao Peninsula 得勝馬路 2 Estrada da Vitória 皇都酒店 Royal Macau Hotel hotel 浴室 bathroom November 2024 R12S toothpaste 02.jpg
+- deodorant spray (personal-care, 28 products): Spray on deodorant.jpg; A deodorant or body spray.jpg
+- mouthwash (personal-care, 28 products): EFTA00001973 - Wooden bathroom vanity with open drawers and cabinet featuring a sink toothbrushes mouthwash and toiletries on the countertop.jpg
 - shaving cream (personal-care, 28 products): GILLETTE FOAMY SHAVING CREAM CHINA VERSION.jpg; The Art of Shaving - Lavender Shaving Cream.jpg; Shaving Cream - Gillette (51013604097).jpg
-- toothbrush soft (personal-care, 28 products): Curaprox blue smart ultra soft toothbrush, Hillegersberg, Rotterdam (2021) 05.jpg; Brushing a Baby's Mouth with a Soft Silicon Brush.jpg; A Brief Look At The History Of Toothbrushes And Toothpastes (50570386291).jpg
-- sugar (staples, 26 products): A smoky day at the Sugar Bowl--Hupa.jpg; Old Sugar factory (Cukrarna, Ljubljana).jpg; The Sugar Land Refinery in Sugar Land, TX.jpg
-- chana dal (staples, 25 products): Chana dal cropped.jpg; Chana Ko Dal.jpg; Roti with Chana Dal.jpg
-- floor cleaner (household, 25 products): Floor cleaner.jpg; Robot Floor Cleaner.png; Floor cleaner inside Sullivan Hall.jpg
-- moong dal (staples, 25 products): Moong Dal paratha.jpg; Moong Dal for stuffing in Paratha.jpg; Moong Dal Curry on a Roti.jpg
-- namkeen mixture (snacks, 25 products): Spicy and namkeen garlic mixture snack with peanuts, photographed in West Bengal, India, August 13, 2024.jpg; Street vendor selling namkeen, bhujia and mixtures at Jaisalmer.jpg; Mixture(Baramaja).jpg
-- ragi flour (staples, 25 products): Ragi millet flour.jpg; Finger Millet Field at Peddamunagalachedu Village.jpg; Food grain finger millet.jpg
+- toothbrush soft (personal-care, 28 products): Curaprox blue smart ultra soft toothbrush, Hillegersberg, Rotterdam (2021) 05.jpg
+- sugar (staples, 26 products): Granulated White Sugar with Large Crystals, Bright Side Light.jpg; Sugar crystals, granulated.jpg; Filling and sewing bags of granulated sugar, New York, from Robert N. Dennis collection of stereoscopic views.png
+- chana dal (staples, 25 products): Split Chickpeas.jpg; Chickpeas-whole-split.jpg; Kangri Dham with chana dal , maani and white rice.jpg
+- floor cleaner (household, 25 products): Robot Floor Cleaner.png; Floor cleaner.jpg; Floor cleaner inside Sullivan Hall.jpg
+- moong dal (staples, 25 products): Boiling Mung Bean - Kolkata 2011-02-17 1413.JPG; Mung Bean - Kolkata 2011-09-19 5231.JPG; Young mung bean sprouts.jpg
+- namkeen mixture (snacks, 25 products): Spicy and namkeen garlic mixture snack with peanuts, photographed in West Bengal, India, August 13, 2024.jpg
+- ragi flour (staples, 25 products): Ragi millet flour.jpg
 - sona masoori rice (staples, 25 products): Masoori Rice (5193854729).jpg
-- toor dal (staples, 25 products): Toor dal rasam.JPG; Toor dal pakodas.JPG; Toor dal tadka.JPG
-- aloo bhujia (snacks, 24 products): Dum Aloo with spicy bhujia.jpg; Shop selling Bikaneri bhujia in Jaipur.jpg; Bikaneri bhujia in West Bengal, India, photographed by Yogabrata Chakraborty, on March 11, 2023.jpg
-- banana chips (snacks, 24 products): Banana Chips in a bowl with bananas in the background.png; Banana chips.JPG; Dried banana chips.jpg
-- basmati rice (staples, 24 products): Fried rice in India, made from Basmati Rice, photographed on December 17, 2023.jpg; Perboiled Basmati rice.jpg; Basmati Jollof Rice.jpg
-- besan (staples, 24 products): Besan laddu in West Bengal, India, photographed on May 9, 2024.jpg; Besan ladoo.jpg; Besan Laddo.jpg
-- classic salted chips (snacks, 24 products): 3 Chicken Wings, PERi-Salted Chips, Corn on the Cob - Nando's.jpg; Skin on Chips, Cheese Fondue, Bacon Salt, Chives - Salt Shed 2025-09-01.jpg; Car Park for Salt and Malt Fish and Chips - geograph.org.uk - 7053297.jpg
-- dishwash gel (household, 24 products): Dish Wash Gel org.jpg; Dish Wash Gel.jpg
-- energy drink (beverages, 24 products): Energy Drink Display.jpg; BOMBA Energy Drink 'BOMBA CHERRY' 2023-08-29.jpg; Black Energy Drink, 1.jpg
-- fabric conditioner (household, 24 products): DEDRA Hypnotique aviváž.jpg; Downy Ball (3302835884).jpg; Does he need fabric softener ? (7589532672).jpg
-- garbage bags medium (household, 24 products): US Navy 071127-N-5642P-139 Local residents assist in unloading bags of fresh water from a CH-53E Sea Stallion helicopter attached to Marine Medium Helicopter Squadron (HMM) 261.jpg; US Navy 071128-N-7955L-062 Local residents wait for bags of fresh water at the back of a U.S. Marine Corps CH-53 Sea Stallion helicopter attached to Marine Medium Helicopter Squadron (HMM) 261.jpg
-- idli rava (staples, 24 products): Rava idli (south Indian dishes).jpg; Rava Idli (6005561226).jpg; Rava idli sambhar.jpg
-- instant noodles (snacks, 24 products): Spinach instant noodles and purple potato instant noodles.jpg; Chauchau (Nepali Instant Noodles Snack).jpg; Instant noodles with a drink.jpg
-- jowar flour (staples, 24 products): BhakariOnGirdle.jpg; Zunka Bhakar.jpg; Bhakari2.jpg
-- kabuli chana (staples, 24 products): Kabuli Chana.jpg; WHITE KABULI CHANA.jpg; Sa-whitegreen-chickpea.jpg
-- khakhra (snacks, 24 products): Khakhra.JPG; Butea monosperma (palash in Hindi, khakhra in Gujarati) flowering in a grassland in Muli, Surendranagar, Gujarat.jpg; Khakhra.png
-- lemon soda (beverages, 24 products): 1969 - Lemon Lime Cocktail - A-Treat Soda Bottlecap - Allentown PA.jpg; 1969 - Lemon - A-Treat Soda Bottlecap - Allentown PA.jpg; 7up lithiated lemon soda bottle cap.jpg
-- liquid detergent (household, 24 products): Liquid detergent.JPG; HK SKW 筲箕灣 Shau Kei Wan 望隆街 Mong Lung Street shop 天力藥房 Tien Lu Dispensary 勞工牌洗潔精 Labour brand liquid detergent December 2021 Px3.jpg; White Cat Dishwashing liquid on the shelf in the supermarket in Suzhou.jpg
-- maida (staples, 24 products): Regent's Canal, Maida Vale, eastern portal of Maida Vale tunnel - geograph.org.uk - 4236017.jpg; MAida.jpg; MaidaVale.jpg
-- mango drink (beverages, 24 products): Rubicon mango drink.jpg; JP 沖繩 Okinawa Kouri island Ocean Tower Blue Restaurant drink Mango Juice n red flower January 2026 N13P 03.jpg; JP 沖繩 Okinawa Kouri island Ocean Tower Blue Restaurant drink Mango Juice January 2026 N13P 01.jpg
-- masala chips (snacks, 24 products): Chips Masala, Cabbage Salad and tomato sauce.jpg; Pili Pili BBQ Chicken, Masala Chips and Ajam.jpg; Masala French Fries - Jai Ambe Smoothies and Shake, Vadodara - Gujarat - 07.jpg
-- mixed fruit juice (beverages, 24 products): Mixed fruit juice chilled.jpg; Mixed fruit juice.jpg; Passion fruit juice.jpg
-- murukku (snacks, 24 products): A Traditional Tamil Snack Murukku.jpg; Murukku variety 02.jpg; Butter murukku.jpg
+- toor dal (staples, 25 products): Split pigeon peas.jpg; Grinded pigeon peas 05.jpg; Toor dal.jpg
+- aloo bhujia (snacks, 24 products): Dum Aloo with spicy bhujia.jpg
+- banana chips (snacks, 24 products): Banana chips from Assam.jpg; Kerala banana chips Upperi varuthath.jpg; Banana chips (5484706054).jpg
+- basmati rice (staples, 24 products): Basmati Rice India, raw.jpg; 1121-Sella-Basmati-Rice.jpg; Basmati rice from India.jpg
+- besan (staples, 24 products): Sirir naru made from jaggery and gram flour IMG 20201030 123906.jpg; Gram flour AvL.jpg; 2022 A South Indian cuisine made with gram flour.jpg
+- classic salted chips (snacks, 24 products): Argentine Sweet Potato Chips with Sugar and Salt.png; Potato-chips.jpg; Home made Potato Chips.jpg
+- energy drink (beverages, 24 products): Finnish energy drink ED greenfruit 11-2022 tilted.jpg; Canadian energy drink bottle.jpg; Energy drink mix 200mg.jpg
+- garbage bags medium (household, 24 products): Kitchen renovation dust erupting from garbage bag during demolition phase.JPG; Man with garbage bag.jpg; Dead Plodia interpunctella (most likely) on a blue garbage bag (3566).jpg
+- idli rava (staples, 24 products): Puri and Semolina - Howrah 2013-10-18 3536.JPG; Semolina upma.jpg; Rava Idli with sagu chutney.jpg
+- instant noodles (snacks, 24 products): Chauchau (Nepali Instant Noodles Snack).jpg; United Airlines instant noodles snack.JPG; GD food 華豐 速食麵 instant noodle yellow January 2024 R12S 01.jpg
+- jowar flour (staples, 24 products): Mingling food (Sorghum flour).jpg; Sorghum flour.jpg; Sorghum flour used in Omalodu beverage.jpg
+- kabuli chana (staples, 24 products): Pollen grains of Chickpea.jpg; BesanHalwawithSugarGhee Chickpea Flour.jpg; Bengal gram, chickpea ( ছোলার ডাল).JPG
+- khakhra (snacks, 24 products): Khakhra.JPG; Peanut chuteny with Jain khakhra.jpg
+- lemon soda (beverages, 24 products): Monkey enjoying lemon soda 02.jpg; 7up lithiated lemon soda bottle cap.jpg; 1969 - Bitter Lemon - A-Treat Soda Bottlecap - Allentown PA.jpg
+- liquid detergent (household, 24 products): Liquid detergent.JPG
+- maida (staples, 24 products): Maida flour.jpg; Maida Gujia-Odisha.jpg
+- mango drink (beverages, 24 products): Vitamin drink (Mango & Guave smaak) Albert Heijn, Hillegersberg, Rotterdam (2022) 05.jpg; Tasting Good Mango and Guave smaak vitamin drink, Hillegersberg, Rotterdam (2022) 03.jpg; Rubicon mango drink.jpg
+- mixed fruit juice (beverages, 24 products): Fruit juices in bottles.jpg; Fruit juices 2.jpg; Titration of acidity in fruit juice - Transfer of juice in flask with pipette.jpg
+- murukku (snacks, 24 products): Thenkuzhal Murukku.jpg; Murukku(முறுக்கு).JPG; Murukku or Chakli.jpg
 - oat cookies (snacks, 24 products): Oat pulp cookies 2.jpg; Oat pulp cookies on tray.jpg; Silk Oatmeal Cookie Oat Creamer.jpg
-- packaged water (beverages, 24 products): Historic product packaging, Cotswold Motoring Museum, Bourton-on-the-Water - geograph.org.uk - 4253288.jpg; Various Packaging Waste In Water Systems.jpg; Texas National Guard 294th QM packages food, water for aerial delivery (9492426).jpg
-- urad dal (staples, 24 products): URAD DAL.jpg; Urad dal plant.jpg; Urad Dal ki Kachori.JPG
-- buttermilk (dairy-eggs, 21 products): Ithaca - Buttermilk Falls.jpg; Buttermilk Falls - Swimming pool.jpg; Ithaca - Buttermilk Falls, ca. 1905 01.jpg
-- cheese slices (dairy-eggs, 21 products): 2750Onion Cheese Omelette Sliced cheese 03.jpg; Cheese planes.jpg; White cheddar cheese sliced CNE.jpg
-- paneer (dairy-eggs, 21 products): Common chimpanzee (Pan troglodytes schweinfurthii) feeding.jpg; Marakkanam Salt Pans.JPG; Calocochlia pan 01.JPG
-- anti-dandruff shampoo (hair-care, 20 products): Anti Dandruff Soap A. M. Ostroumov.jpg; H&S Shampoo in der Ausführung Apfel.jpg; P&G HEAD & SHOULDERS AND SAFEGUARD PRODUCTS IN CHINA.jpg
-- body lotion (skin-care, 20 products): Bodyography Body Lotion.jpg; Bath & Body Works Garden Lily Lotion (6966036739).jpg; Jingle Bellini Bath and Body Works Lotion (10764814655).jpg
-- butter (dairy-eggs, 20 products): Antoine Vollon - Mound of Butter - National Gallery of Art.jpg; Multiple butter knives, a butter spreader, and a butter pick (1897).png; Butter-Tubs-Pass-1.jpg
-- conditioner (hair-care, 20 products): LG AIR CONDITIONER OUTDOOR UNIT, Panasonic AIR CONDITIONER OUTDOOR UNIT, National (Panasonic) AIR CONDITIONER OUTDOOR UNIT & DAIKIN AIR CONDITIONER OUTDOOR UNIT.jpg; DAIKIN AIR CONDITIONER OUTDOOR UNIT, Panasonic AIR CONDITIONER OUTDOOR UNIT & MITSUBISHI HEAVY INDUSTRIES AIR CONDITIONER OUTDOOR UNIT.jpg; MITSUBISHI HEAVY INDUSTRIES AIR CONDITIONER OUTDOOR UNIT, GENERAL (FUJITSU GENERAL)AIR CONDITIONER OUTDOOR UNIT & SANYO AIR CONDITIONER OUTDOOR UNIT.jpg
-- face scrub (skin-care, 20 products): Cliff Face & Scrub in Mickle Hill Quarry - geograph.org.uk - 5092181.jpg; Exfoliating face scrub.jpg; Colorado Face Scrub (12275966373).jpg
-- face wash (skin-care, 20 products): Face-lit sign for car wash.jpg; Wash Your Hands and Cover Your Face.jpg; STS-80 Cockrell washes hair and face.jpg
-- flavoured milk (dairy-eggs, 20 products): Dare Espresso flavoured milk.jpg; Milk cranberry flavoured cookies.jpg; Soy milk & Coconut flavoured fish maw soup with wild rice.jpg
-- full cream milk (dairy-eggs, 20 products): Gail Borden Eagle Brand Condensed Milk, absolute purity guaranteed, full weight, full cream. (front) - 8201071690.jpg; Gail Borden Eagle Brand Condensed Milk, absolute purity guaranteed, full weight, full cream. - DPLA - 71c301c4ea8587c131fc2241d88117f8 (page 2).jpg; Nestlé's Swiss Milk - Richest in Cream.jpg
-- hair mask (hair-care, 20 products): Mask of a woman with her hair in a small knot MET vs00.2.28.jpg; Mask of a woman with radiating waves of hair MET vs00.2.24.jpg; Mask of a woman with her hair rolled back at the forehead and temples MET vs00.2.11.jpg
-- hair oil (hair-care, 20 products): P743--Don't You Remember--Your hair received oilings.jpg; Angel hair pasta, anchovies, pesto, olive oil, black pepper - Maasachusetts.jpg; Michael-sweerts-ragazza-che-si-pettina = Michael Sweerts, Girl combing her hair (c. 1650; oil on canvas, 48.5 x 37.5 cm; Rome, Accademia Nazionale di San Luca).jpg
+- packaged water (beverages, 24 products): Aqua Blue 200ml Premium Packaged Drinking Water.jpg; Damavand Mineral Water Packaging.jpg; Chilled packaged water.jpg
+- urad dal (staples, 24 products): Black gram dal Phaseolus mungo JEG3361.jpg; Spicy Sprouted Black Gram.JPG; Black Gram Rasgulla - Howrah 2023-12-26 01765.jpg
+- buttermilk (dairy-eggs, 21 products): Buttermilk-(right)-and-Milk-(left).jpg; Neer moru spiced buttermilk.jpg; Buttermilk food truck (4299185393).jpg
+- cheese slices (dairy-eggs, 21 products): Several cheeses with a slicer, bread and milk.JPG; Food display features slices of cheese on a serving tray.jpg; Liat Portal for Foodie Disorder - Nectarine slices with blue cheese and walnuts.jpg
+- paneer (dairy-eggs, 21 products): Sweet Paneer.jpg; Paneer Biriyani.jpg
+- body lotion (skin-care, 20 products): Bodyography Body Lotion.jpg; Bath & Body Works Garden Lily Lotion (6966036739).jpg; Bath & Body Works "The Perfect Autumn" Apple lotion (7009194773).jpg
+- butter (dairy-eggs, 20 products): Bedouin women of Mesopotania churning butter by shaking milk in goatskin bags, photo from The Encyclopedia of Food by Artemas Ward.jpg; Moscow butter 2025-03 1742749546.JPG; Water buffalo butter.jpg
+- conditioner (hair-care, 20 products): Hair shampoos, conditioners and other hair care products in liter bottles for use in hair salon.jpg; Moisturiser and Hair Conditioner.jpg; Hair conditioner (51213040376).jpg
+- face scrub (skin-care, 20 products): Exfoliating face scrub.jpg; Colorado Face Scrub (12275966373).jpg; Men's Skin Care - Men's Botanics Face Scrub.jpg
+- face wash (skin-care, 20 products): Wash Your Hands and Cover Your Face.jpg; STS-80 Cockrell washes hair and face.jpg; Fit Me Face Wash review.jpg
+- flavoured milk (dairy-eggs, 20 products): Dare Espresso flavoured milk.jpg; Milk cranberry flavoured cookies.jpg
+- full cream milk (dairy-eggs, 20 products): Gail Borden Eagle Brand Condensed Milk, absolute purity guaranteed, full weight, full cream. (front) - 8201071690.jpg; RECALLED – Milk and cream (14226236028).jpg; Džiaugsmas, 4 July 2025, goat milk ice cream.jpg
+- hair mask (hair-care, 20 products): Wooden face mask with hair made of banana fibres.jpg; Hair-mask-5.jpg; African mask with straw hair (31800149417).jpg
+- hair oil (hair-care, 20 products): Hair Oil Treatment at Hair Salon.jpg; Mira hair oil.jpg; Circassian Hair Oil.jpg
 - lip balm (skin-care, 20 products): EOS lip balm 2.jpg; Lip balm with lights.jpg; Burts Bees Lip Balm.jpg
-- moisturising cream (skin-care, 20 products): Moisturizer Treatment for Eczema (14121111422).jpg; Rock- Needs Moisturizer (24618710909).jpg; White moisturizer.jpg
-- probiotic curd (dairy-eggs, 20 products): Curd rice with chatni.jpg; Lait caillé 02.jpg
-- toned milk (dairy-eggs, 20 products): Mother Dairy Double Toned Milk.PNG; The milk delivery guy (3965278591).jpg; Buckfastleigh 7612 milk train.JPG
+- toned milk (dairy-eggs, 20 products): Mother Dairy Double Toned Milk.PNG
 - aaa batteries (batteries-lighting, 18 products): Gold Peak AAA batteries.jpg; Generic Chinese VU meter (D=33mm, with AAA batteries for scale) 01.jpg; BaByliss for Men T47 - battery BYD Rechargeable AAA-92293.jpg
-- aa batteries (batteries-lighting, 18 products): IKEA LADDA rechargeable AA-batteries.jpg; AA Batteries 20211105 201531.jpg; 2500 mAh NiMH Battery - AA (11469147674).jpg
+- aa batteries (batteries-lighting, 18 products): 3x AA to D battery converter, MY DAY vintage flashlight, Sofirn SP36 flashlight.jpg; IKEA LADDA rechargeable AA-batteries.jpg; AA Batteries 20211105 201531.jpg
 - instant coffee (beverages, 18 products): From coffee bean to instant coffee 01.jpg; Instant Coffee In a Glass Jar.jpg; Instant coffee.jpg
-- leaf tea (beverages, 18 products): Tea Leaf from Munanar -1375470.jpg; Dandelion leaf tea.jpg; Dried lotus leaf tea.jpg
-- chilli powder (spices-oils, 17 products): Jambu Nerale served with chilli powder and salt 3.jpg; Citrus medica mixed with salt, sugar, green chillies and red chilli powder during winter 02.jpg; BolivianChilePowder2.JPG
-- coconut oil (spices-oils, 17 products): Coconut oil extractor and dehusking mills.jpg; JUKEG COCONUT OIL.jpg; Tempe Mendoan, Coconut Oil, and Soy Sauce.jpg
+- leaf tea (beverages, 18 products): HK SKD TKO 將軍澳 Tseung Kwan O 日出康城 Lohas Park 商場 the Lohas mall shop 陶源中菜 Sportful Garden Restaurant 茶葉 tea leaves bottles June 2021 SS2 04.jpg; Steaming tea leaves.jpg; Dried mint leaves tea.jpg
+- chilli powder (spices-oils, 17 products): Chilli powder for sale.JPG; Unriped Mango With Chilli Powder And Salt.jpg; Citrus medica mixed with salt, sugar, green chillies and red chilli powder during winter 04.jpg
+- coconut oil (spices-oils, 17 products): Coconut Oil Mills, Madras.jpg; Madras Coconut Oil Mills.jpg; Mustard in Coconut Oil.JPG
 - sunflower oil (spices-oils, 17 products): Bottle 1 liter Sunflower refined oil.jpg; Sunflower seeds -- sunflower oil.jpg; Production of sunflower oil, 2022.png
-- turmeric powder (spices-oils, 17 products): Lakadong Turmeric Powder final product.jpg; Waigaon Turmeric in powder form.jpg; Turmeric Powder.jpg
-- ball pens blue (school-supplies, 16 products): A board game die, a small ball and a pen.jpg; Blue ink pen.jpg; GelPen stub.jpg
-- biryani masala (spices-oils, 16 products): Egg Masala Biryani by Dr. Raju Kasambe DSCN7382 (6).jpg; Garam masala used for making Biryani and Hyderabadi Haleem.jpg; Biryani Rice with Goat Masala and Lamb Rogan Josh - Zam Zam (415375255).jpg
-- chicken masala (spices-oils, 16 products): Chicken masala dosa - Massachusetts.jpg; Chicken tikka masala.jpg; Chicken Tikka Masala - Mohammed - Spice Of Life.jpg
-- coriander powder (spices-oils, 16 products): Coriander Powder.jpg; Chlorofeel Spices Turmeric, Coriander and Cumin Powder Packet.jpg; Chlorofeel Spices Turmeric, Coriander and Cumin Powder.jpg
-- crayons (school-supplies, 16 products): Crayons & Drawing.jpg; Dove School Crayons 1896.jpg; Crayons box.jpg
-- garam masala (spices-oils, 16 products): Garam Masala with smiley face.png; Garam Masala 1.jpg; Garam Masala Powder by Chlorofeel Groups.jpg
-- kasuri methi (spices-oils, 16 products): Chicken Manchurian With a Kasuri Methi.jpg; Dried leaves of Fenugreek-Kasuri Methi.jpg; Washed fenugreek leaves for cooking methi-chadachadi.jpg
-- long notebook (school-supplies, 16 products): Wikimedia Bangladesh Notebook (DSC00540).jpg; Royal Society - Robert Boyle notebook 1.jpg; Amar Ekushey Article Contest 2023 Notebook (DSC00538).jpg
-- pav bhaji masala (spices-oils, 16 products): Bambayya Pav bhaji.jpg; Pav Bhaji114.jpg; MasalaBun HomeMade Mumbai.jpg
-- pepper powder (spices-oils, 16 products): Anchovies and roasted red pepper hummus, on rye crisp bread, with black pepper and curry powder - Massachusetts.jpg; Avocado toast with cheddar cheese, black pepper, and curry powder - Massachusetts.jpg; Turkey breast on toasted white bread, with melted cheddar, marinated olives, bell pepper, chili powder, black pepper, and salt - Massachusetts.jpg
+- turmeric powder (spices-oils, 17 products): Waigaon Turmeric in powder form.jpg; Lakadong Turmeric Powder final product.jpg; Kumkuma, red powder of turmeric - India.jpg
+- ball pens blue (school-supplies, 16 products): Pentel Superball BH16 France Ballpens Ballpoint pen Roll Pens Gel pens Schreibstift 01.jpg; Ballpoint pen macro.jpg; Ballpoint-pen-parts vert.jpg
+- biryani masala (spices-oils, 16 products): Garam masala used for making Biryani and Hyderabadi Haleem.jpg; Biryani Rice with Goat Masala and Lamb Rogan Josh - Zam Zam (415375255).jpg
+- chicken masala (spices-oils, 16 products): Chicken butter masala.jpg; Chicken masala spicy.jpg; Chicken Masala.jpg
+- coriander powder (spices-oils, 16 products): Coriander Powder.jpg; Chlorofeel Spices Turmeric, Coriander and Cumin Powder Packet.jpg
+- crayons (school-supplies, 16 products): Pot à crayons.jpg; Pierre noire+crayon.JPG; Crayon+craies.JPG
+- garam masala (spices-oils, 16 products): Garam Masala.JPG; Garam Masala with smiley face.png; Garam Masala Powder by Chlorofeel Groups.jpg
+- kasuri methi (spices-oils, 16 products): Dried leaves of Fenugreek-Kasuri Methi.jpg; Washed fenugreek leaves for cooking methi-chadachadi.jpg
+- long notebook (school-supplies, 16 products): Pencil on notebook.jpg; Pencil shavings on a notebook (Unsplash).jpg; A notebook.jpg
+- pepper powder (spices-oils, 16 products): Homemade Pepper powder.JPG; Turkey breast on toasted white bread, with melted cheddar, marinated olives, bell pepper, chili powder, black pepper, and salt - Massachusetts.jpg; Rice with beef, broccoli, stock, ginger powder, and black pepper - Massachusetts.jpg
 - rice bran oil (spices-oils, 16 products): Dune Aura Rice Bran oil bottle.jpg; Rice Bran Oil.jpeg; Crude Rice bran oil.jpg
-- sambar powder (spices-oils, 16 products): Sambar powder.jpg; HPIM0026 Sambar powders, Rasam powders, Harbal Agarbattis.JPG; Idly sambar vada.JPG
-- sesame oil (spices-oils, 16 products): Sesame oil label.jpg; He Jianshi - Grinding Sesame Oil.jpg; Sesame oil with matsutake mushrooms.jpg
-- baby oil (baby-care, 14 products): Oval portrait miniature of baby oil painting by Valentine Manchon Duchesne - with scale.jpg; Baby bella mushrooms, baked with cheeses, garlic, and olive oil - Massachusetts.jpg; Salad of lettuce, baby carrots, and onions, with dressing of mustard, olive oil, and vinegar - Massachusetts.jpg
-- body wash (personal-care, 14 products): Minimalist Salicylic Acid + LHA 02% Body Wash.jpg; Body Wash Aisle Shoppers Drug Mart Edmonton Early 2020.jpg; Parkwall Car Body Repairs and Hand Car Wash near Chepstow - geograph.org.uk - 5652036.jpg
-- diaper pants l (baby-care, 14 products): L&H Putting Pants on Philip 1927.jpg
-- diaper pants m (baby-care, 14 products): Remixing Floral Pants from H&M (16973987741).jpg; Pallagi (?) family finishing pants, 17 Monroe St., N.Y., 2nd floor front. None of them spoke any English. A neighbor's child said the young girl is 13 yrs. old. Photo taken at 2-45 P.M. LOC nclc.04204.jpg; Plastic pants for fitting over baby diaper.jpg
-- talcum powder (personal-care, 14 products): An Advertisement on Cuticura Talcum Powder.png; 1954 Advertisement of Cuticura Talcum Powder.png; A 1954 advertisement on Cuticura Talcum powder.jpg
-- cream biscuits (snacks, 13 products): Pran strawberry flavoured cream biscuit.jpg; Eugenia biscuit with cream, closed in a clear biocomponent resin cube, displayed in a temporary exhibition in the Mița the Cyclist House in Bucharest (02).jpg; Crawford's Biscuits - Press for Ice Cream Wafers.jpg
-- enamel paint white (paints, 13 products): Unframed sign from Superior Bathhouse; White cardboard with black enamel painted lettering; Gives 4 numbered, detailed (c1ea135f-7027-4c36-a7b5-78222ded30ed).jpg; Metal soda fountain chair; Enameled white; round seat; twisted metal wire back & legs; Paint badly chipped & stained. (3dae2601-2296-4145-9967-40dc6496fd78).jpg; Censer? with floral design in red paint on white background MET 2863.jpg
-- poha (staples, 13 products): RED POHA.jpg; AFR V3 D398 View Taken in Demsa Poha.jpg; Poha (Rice Flakes).jpg
-- wall putty (paints, 13 products): Small wall putty manufacturing machine.webp; Wall putty brick.jpg; Full auto wall putty manufacturing plant.webp
-- butter cookies (snacks, 12 products): Danish butter cookies in container with wrappers, December 2009.jpg; 2023-04-25 Danish Butter Cookie Samples.jpg; Peanut butter cookies, 2015-07-12.jpg
-- cake rusk (snacks, 12 products): قرشلة، بقسماط، Cake Rusk.jpg; Dry Cake - Ray's Confectionery, Fatorda - Goa - IMG-20200925-WA0001.jpg; AR-Bay-Biscuit.jpg
-- chyawanprash (health-wellness, 12 products): Chyawanprash Info.jpg; International Chyawanprash Day.png
-- detergent bar (household, 12 products): Savons en train de sécher par David Damour.jpg; Greenhouses gases.JPG; Energy graph.JPG
-- digestive biscuits (snacks, 12 products): McVitie's chocolate digestive biscuit.jpg; Tea and digestive biscuits - Sean macEntee 2014.jpg; Digestive biscuits.jpg
-- dust tea (beverages, 12 products): Six conjoined vases in tea-dust glaze.jpg; Dusty Kid Tea Light As Dust.jpg; Gourd-shaped Vase in Tea Dust Glaze, Xuzhou Museum.jpg
-- filter coffee (beverages, 12 products): Piccolo at filter coffee at Wood St Coffee, Walthamstow.jpg; SPM-Walküre Coffee pot with Karlsbad slit filter, 19xx.png; Drip filter coffee Before pouring water.jpg
-- glass cleaner (household, 12 products): Marianne Stokes The glass cleaner, at night.jpg; A Glass Cleaner at Olaya Towers in Riyadh, KSA.jpg; Pulex Cleano 10 glass cleaner.jpg
-- green tea bags (beverages, 12 products): Canister with bags of green tea.jpg; Packaging tea bags.jpg; English tea bags at the PLUS Veenstra, Winschoten (2019) 02.jpg
-- honey (health-wellness, 12 products): Oriental honey buzzard Mudumalai Mar21 DSC01405.jpg; Common crab spider (Xysticus cristatus) female with prey Carniolan honey bee (Apis melifera carnica).jpg; European honey bee extracts nectar.jpg
-- interior emulsion (paints, 12 products): Oil Emulsion May 26, 2013 Leonardo, NJ (52609001195).jpg; Low Library2.jpg; St Nicholas church Wrentham Suffolk (2992014050).jpg
-- iodised salt (staples, 12 products): Iodised salt.JPG; Cerebos iodised table salt.jpg; For Prevention of Goitre Always Use Iodised Salt (21880104461).jpg
-- marie biscuits (snacks, 12 products): Morinaga marie biscuit 2014.jpg; Alphonse Marie Mucha, Biscuits Lefèvre-Utile, 1896, NGA 208207.jpg; Marie biscuit chaat, kolkata, west bengal.jpg
-- masoor dal (staples, 12 products): Flickr - cyclonebill - Lamb Korma, raita, Masoor Dal, gulerødder og chapati.jpg; MASOOR DAL KEBAB.JPG; Masoor Dal (49684434892).jpg
-- popcorn (snacks, 12 products): Rootabaga Stories - His hat was popcorn, his mittens popcorn and his shoes popcorn.png; Popcorn Sutton.jpg; Popcorn Harvest (20210930-NRCS-BJOC-062).jpg
-- rajma (staples, 12 products): Rajma Dal.jpg; Rajma 02.jpg; Rajma Chawal Thali.jpg
-- salted peanuts (snacks, 12 products): Salted peanuts.jpg; Salt-water peanuts.jpg; Ground beef, roasted with spicy guacamole salsa, peanuts, salt, and black pepper - Massachusetts.jpg
-- sooji (staples, 12 products): Sooji-halwa.jpg; Sooji Burfi from North India.jpg; Sooji-kakara.jpg
-- stapler pins (office-supplies, 12 products): Stapler pins (20X).jpg; Stapler pins.jpg; STS117 John Olivas EVA3.jpg
-- toilet cleaner (household, 12 products): In Tank Toilet Cleaner Tablet Used.jpg; Toilet seat cleaner dispenser, Schiphol (2018).jpg; Roman Toilet Set Nail Cleaner (FindID 227247).jpg
-- white bread (bakery, 12 products): Jo-Jo White - 1946 Sunbeam Bread Sacramento Solons.jpg; PBJ on white bread - Massachusetts.jpg; White Cottage, Brown Bread Street - geograph.org.uk - 2192431.jpg
-- fresh cream (dairy-eggs, 11 products): Fresh ice cream - geograph.org.uk - 3148366.jpg; Ice cream and fresh bread adverts in Oldbury-on-Severn - geograph.org.uk - 6172363.jpg; IMG-20240601-WA0037 Fresh cream and fruit fancies.jpg
-- cold cream (skin-care, 10 products): Maple Cream Cold Brew - Trading Post Coffee Roasters 2026-07-16.jpg; Too cold for ice cream - geograph.org.uk - 2762472.jpg; A new cold store being built for ice cream - geograph.org.uk - 2603773.jpg
-- hair serum (hair-care, 10 products): Hair shampoos, conditioners and other hair care products in liter bottles for use in hair salon.jpg; Hair conditioner (51213040376).jpg; Shampoo y crema de enjuage sólidos.jpg
-- mozzarella cheese (dairy-eggs, 10 products): Chicken pizza with mozzarella and cheddar cheese, hot sauces, and black pepper - Massachusetts.jpg; Mozzarella Cheese Factory, Llangefni. - geograph.org.uk - 107213.jpg; Argentine Calabresa pizza with tomato and onion sauce, eggs, olives and mozzarella cheese.jpg
-- sunscreen spf (skin-care, 10 products): Daylogic Sheer Touch SPF 30 Sunscreen - Sarah Stierch.jpg; Sunbum sunscreen spf 30.jpg; LRP sunscreen bottle.jpg
-- sweet lassi (dairy-eggs, 10 products): Lassi (Sweet).JPG; Sweet lassi with roohafza.JPG; Lassi Sweet or Salted.JPG
-- apple shimla (fruits-vegetables, 9 products): Apple farming in interiors of Shimla, HP.jpg; Apple from orchards in Shimla, HP.jpg; Sunrise view of apple orchards in Cheog Village, Shimla District.jpg
-- banana robusta (fruits-vegetables, 9 products): Robusta banana.jpg; Robusta banana plantling.jpg; Cavendish Banana DS.jpg
-- beans (fruits-vegetables, 9 products): Palestinian women grinding coffee beans.jpg; Roasted coffee beans.jpg; Pinto Beans Seeds.jpg
-- copper wire (electrical, 9 products): Enamelled litz copper wire.JPG; Copper-clad-aluminum-and-copper-wire-comparison-diagram.png; Copper-clad aluminum (CCA) coiled wire.png
-- emergency torch (batteries-lighting, 9 products): Edmonton Emergency Relief Services (26301415823).jpg; Tsim Sha Tsui - 2008 Summer Olympics torch relay in Hong Kong - 2008-05-02 10h50m54s SN207104.jpg; Small torch light.jpg
-- groundnut oil (spices-oils, 9 products): GROUNDNUT OIL CAKE.jpg; Groundnut oil.jpg; Groundnut and bottles of Groundnut oil.jpg
-- led bulb (batteries-lighting, 9 products): Led light bulb - led lamp 1.png; Led light bulb.jpg; Philips LED bulb.jpg
-- led tube light (batteries-lighting, 9 products): DFC 2076 Low-angle street scene at dusk with wet pavement reflecting a thin line of blue light market stalls and hanging lanterns on the left and colorful LED tubes suspended above the road.jpg; Mycobacteria Growth Indicator Tube (MGIT) samples in ultraviolet light.jpg; Fluorescent light strip 2 tube.JPG
-- onion (fruits-vegetables, 9 products): Onion (Allium cepa)- Bacterial soft rot.jpg; Survivability Onion.png; These are onions.jpg
-- potato (fruits-vegetables, 9 products): Potato Point from Potato Beach.jpg; One potato, two potatoes... - geograph.org.uk - 567554.jpg; One thousand potato, two thousand potato, three thousand potato, four... - geograph.org.uk - 757515.jpg
-- tomato (fruits-vegetables, 9 products): Tomato je.jpg; Tomato plant 2026 G2.jpg; Tomatoes plain and sliced.jpg
+- sambar powder (spices-oils, 16 products): Sambar powder.jpg
+- sesame oil (spices-oils, 16 products): Sesamum indicum, source of sesame oil and seeds. (10539531874).jpg; ILUAMUTHU SESAME OIL.jpg; Sesame oil photo.jpg
+- baby oil (baby-care, 14 products): American Red Cross - Refugees - A tiny refugee's morning tub. A Red Cross Worker giving a refugee baby her morning bath. An oil can serves as a bath tub - NARA - 20804760.jpg; The Baby by Gustav Klimt, 1917, oil and tempera on canvas - California Palace of the Legion of Honor - San Francisco, CA - DSC02726.jpg; Baby Squid in Olive Oil and Garlic, Jan 2026.jpg
+- body wash (personal-care, 14 products): Minimalist Salicylic Acid + LHA 02% Body Wash.jpg; Body Wash Aisle Shoppers Drug Mart Edmonton Early 2020.jpg; Moscow, Yauzskie Vorota, Daihatsu Thor needs a wash and body repair, Sept 2025 03.jpg
+- diaper pants l (baby-care, 14 products): Diapers on baby - 5833.jpg; Midwife changes diaper on a baby.jpg; Flickr - Government Press Office (GPO) - A nurse in Yehud demonstrating to young immigrant mothers how to diaper their babies.jpg
+- diaper pants m (baby-care, 14 products): Diapers on baby - 5833.jpg; Midwife changes diaper on a baby.jpg; Flickr - Government Press Office (GPO) - A nurse in Yehud demonstrating to young immigrant mothers how to diaper their babies.jpg
+- talcum powder (personal-care, 14 products): Mother goose baby powder talcum advertising tin.jpg; Talcum Powder.JPEG; Mennen's Borated Talcum Toilet Powder, 1909.jpg
+- cream biscuits (snacks, 13 products): Two cream biscuits.jpg; Making Lotus Biscuit Ice Cream (167752189).jpeg; Pran strawberry flavoured cream biscuit.jpg
+- enamel paint white (paints, 13 products): Saint Catherine by Léonard II Limosin, enamel and gold paint on copper.jpg; Sharbush headgear. Rustam and dragon on twelve-pointed tile, Iran, late 12th century, stonepaste painted over glaze with enamel and gold - Freer Gallery of Art - DSC04681.jpg; Anonymous hero on twelve-pointed tile, Iran, late 12th century, stonepaste painted over glaze with enamel and gold (Freer Gallery of Art, F1911.319).jpg
+- poha (staples, 13 products): Traditional flattened rice-paper.jpg; Traditional flattened rice-hard.jpg; Flattened rice ( Poha ) making old traditional machine.jpg
+- wall putty (paints, 13 products): Wall putty brick.jpg
+- butter cookies (snacks, 12 products): HK food 黄油 Butter Cookies 丹麥牛油曲奇 Feb-2016 奶油 DSC (2).JPG; HK market food Kjeldsens Butter Cookies Jan-2016 DSC.JPG; HK food 牛油 曲奇餅 Butter Cookie Kjeldsens March 2021 SS2 03.jpg
+- cake rusk (snacks, 12 products): قرشلة، بقسماط، Cake Rusk.jpg
+- digestive biscuits (snacks, 12 products): Digestive biscuits.jpg; McVitie's chocolate digestive biscuit.jpg; Tea and digestive biscuits - Sean macEntee 2014.jpg
+- dust tea (beverages, 12 products): HK SKD TKO 將軍澳 Tseung Kwan O 日出康城 Lohas Park 商場 the Lohas mall shop 陶源中菜 Sportful Garden Restaurant 茶葉 tea leaves bottles June 2021 SS2 04.jpg; Steaming tea leaves.jpg; Dried mint leaves tea.jpg
+- filter coffee (beverages, 12 products): Piccolo at filter coffee at Wood St Coffee, Walthamstow.jpg; SPM-Walküre Coffee pot with Karlsbad slit filter, 19xx.png; Drip filter coffee after pouring water.jpg
+- glass cleaner (household, 12 products): Window washers cleaning the glass windows of the Flame Towers.jpg; Pulex Cleano 10 glass cleaner.jpg; Marianne Stokes The glass cleaner, at night.jpg
+- green tea bags (beverages, 12 products): Canister with bags of green tea.jpg
+- honey (health-wellness, 12 products): Chinese herbal honey.jpg; Chinese Materia Medica illustration, Ming; Sichuan honey Wellcome L0039305.jpg; Raw Honey For Sale (223971915).jpeg
+- interior emulsion (paints, 12 products): Enamel advert, APCOLITE plastic emulsion paint.JPG
+- iodised salt (staples, 12 products): Comparison of Table Salt with Kitchen Salt.png; Table salt.png; Toxicity of table salt III.png
+- marie biscuits (snacks, 12 products): Morinaga marie biscuit 2014.jpg; Alphonse Marie Mucha, Biscuits Lefèvre-Utile, 1896, NGA 208207.jpg; Groupe en biscuit, mariage du dauphin et de la princesse Marie-Antoinette.jpg
+- masoor dal (staples, 12 products): Split red lentils with jackfruit seed.jpg; Red lentils (1).jpg; Red lentils on pavement.jpg
+- popcorn (snacks, 12 products): LesserEvil Popcorn 2006.jpg; Popcorn Chickpeas Snack (45508604371).jpg; Popcorn 11.jpg
+- rajma (staples, 12 products): Kidney bean Fajitas.jpg; Red kidney beans 2024-11-27.jpg; Kidney beans (2).jpg
+- salted peanuts (snacks, 12 products): Ground beef, roasted with spicy guacamole salsa, peanuts, salt, and black pepper - Massachusetts.jpg; Salted peanuts.jpg; Boiled Salted Peanuts on sale in Hughenden, Queensland, Australia.jpg
+- sooji (staples, 12 products): Puri and Semolina - Howrah 2013-10-18 3536.JPG; Semolina upma.jpg; Sooji-kakara.jpg
+- stapler pins (office-supplies, 12 products): Stapler pins.jpg; Stapler pins (400X).jpg
+- toilet cleaner (household, 12 products): In Tank Toilet Cleaner Tablet Used.jpg; Roman toilet article - nail cleaner (FindID 34224).jpg; Roman Toilet Set Nail Cleaner (FindID 227247).jpg
+- white bread (bakery, 12 products): White Wheat Bread National Bakery Ooty Aug25 A7CR 07142.jpg; Freshly baked white bread (4782858788).jpg; Homemade white bread.jpg
+- fresh cream (dairy-eggs, 11 products): Thanksgiving Pumpkin Pie New Orleans 2021 - Slice of pie with fresh whipped cream.jpg; Home Made Waffle with Chocolate and Fresh Cream ( waffle receipt inherited from business owner's Grandmother.JPG; Home made Cupcakes for any occasion with delivery within 10 miles (fresh cream topping).JPG
+- cold cream (skin-care, 10 products): Maple Cream Cold Brew - Trading Post Coffee Roasters 2026-07-16.jpg; Cold brew with whipped cream.jpg; C19th printed pottery chemist's Cold Cream pot lid, Fulham Rd, London.jpg
+- mozzarella cheese (dairy-eggs, 10 products): Liat Portal for Foodie Disorder - Shakshuka with mozzarella and blue cheese.jpg; Mozzarella cheese and tomato with basil.jpg; Battered mozzarella cheese sticks (95072105).jpg
+- sunscreen spf (skin-care, 10 products): Daylogic Sheer Touch SPF 30 Sunscreen - Sarah Stierch.jpg; Sunbum sunscreen spf 30.jpg
+- sweet lassi (dairy-eggs, 10 products): Lassi Sweet or Salted.JPG; Sweet Lassi.JPG; Lassi(sweet).JPG
+- apple shimla (fruits-vegetables, 9 products): AFRICAN STAR APPLE IN MARKET.jpg; Apples and Bananas For Sale At A Local Market.jpg; Apple at Carbon Night Market, Cebu City 5.jpg
+- banana robusta (fruits-vegetables, 9 products): Robusta banana.jpg; Robusta banana plantling.jpg
+- beans (fruits-vegetables, 9 products): Carrot, green beans and other vegetables 01.jpg; Four Different Varieties of Green Beans (Phaseolus vulgaris).jpg; Picture of green bean at fruit garden market port harcourt.jpg
+- copper wire (electrical, 9 products): Overview of how copper wire looks on those two resister.jpg; Linnamäe 37 - copper wires for sinle-phase circuits.JPG; Enamelled litz copper wire.JPG
+- groundnut oil (spices-oils, 9 products): ILUAMUTHU GROUNDNUT OIL.jpg; Groundnut oil.jpg; Groundnut and bottles of Groundnut oil.jpg
+- led bulb (batteries-lighting, 9 products): Led light bulb - led lamp 2.png; LED-E27-Light-Bulb-1134.jpg; LED globo light bulb markings EU.jpg
+- led tube light (batteries-lighting, 9 products): Kinematic Charger Tube light.jpg; Two black light fluorescent tubes.jpg; Fluorescent light strip 2 tube.JPG
+- onion (fruits-vegetables, 9 products): Onion leaves at Pambeguwa perishable market 05.jpg; Spring Onions displayed at the Fruit Garden Market D-Line Port Harcourt.jpg; Bags of onions for sale at Bakin Dogo Market, Kaduna.jpg
+- potato (fruits-vegetables, 9 products): Food-healthy-vegetables-potatoes (23958160949).jpg; Sweet potatoes in Jos Market 03.jpg; Irish potatoes on wheel barrow at Bakin Dogo Market, Kaduna North.jpg
+- tomato (fruits-vegetables, 9 products): Tomatoes display in market square.jpg; Tomatoes display at market.jpg; Basket of tomatoes.jpg
 - ceiling fan regulator (electrical, 8 products): Westinghouse Ceiling fan regulator (1).jpg; KDK Ceiling fan regulator (1).jpg; Usha Ceiling fan regulator (1).jpg
-- cumin seeds (spices-oils, 8 products): Whole Cumin Seeds.jpg; Dried cumin seeds (20241008).jpg; BROWN CUMIN SEEDS.jpg
-- eraser (school-supplies, 8 products): STUDIO 2 in 1 pencil sharpener and eraser, eraser side emphasis.jpg; Mind Eraser (Overbank).JPG; Pencil with eraser and lead holder (part of a set) MET 189787.jpg
+- cumin seeds (spices-oils, 8 products): Dry-cumin-seeds.jpg; Cumin seeds(গোটা জিরা).JPG; Cumin Seeds.jpg
+- eraser (school-supplies, 8 products): Kumon-pencils-eraser.JPG; Desk-pencil-eraser-black.jpg; MITSUBISHI PENCIL UNI MATURED 9800 2B & MITSUBISHI PENCIL UNI PLASTIC ERASER(2).jpg
 - fast charger (mobile-accessories, 8 products): Fast charger, Mikulášská, Krnov.jpg; Fast charger.jpg; LG FAST CHARGER (AC ADAPTER) LP90DGC20H-WW.jpg
-- geometry box (school-supplies, 8 products): Geometry Box.jpg; MoYu accessories box 2.jpg; Box on an Inclined Plane.png
-- mcb (electrical, 8 products): Beef-wellington1a-MCB.jpg; Shish-kebab-MCB.jpg; Tri-tip-MCB.jpg
-- micro usb cable (mobile-accessories, 8 products): Blu USB 2.0 & Micro-USB cable, Hillegersberg, Rotterdam (2023) 04.jpg; Adapter cable USB Type C male to Micro USB Type B female.jpg; Huawei EC226 with USB cable (3384718751).jpg
-- modular socket (electrical, 8 products): Network socket with two RJ45 sockets (CAT6).jpg; Commercial RJ45 wall socket internals.jpg; The Powell Modular Keyboard Controller with Moog Modular - Bob Moog Foundation - 2016 NAMM Show (2016-01-23 14.36.51 by Daniel Larsen).jpg
+- geometry box (school-supplies, 8 products): Geometry Box.jpg
+- mcb (electrical, 8 products): Circuit breaker and a cut-out.jpg; Schneider Electric Double Single-Pole 15-Amp Circuit Breaker - Front and Back View.JPG; Awesome way installed circuit breakers.JPG
+- micro usb cable (mobile-accessories, 8 products): Blu USB 2.0 & Micro-USB cable, Hillegersberg, Rotterdam (2023) 01.jpg; Adapter cable USB Type C male to Micro USB Type B female.jpg; USB-C cable connected to a powerbank.jpg
 - modular switch (electrical, 8 products): DSI Modular Mac -- switch shell.jpg; DSI Modular Pro -- DIP switch legend.jpg; DSI Modular Pro -- Alps switch opened.jpg
-- mustard oil (spices-oils, 8 products): Liver, onion, and potatoes, with mustard, salt, pepper, and olive oil - Massachusetts.jpg; Ham on rye, broiled, with olive oil, black pepper, and mustard - Massachusetts.jpg; Bell peppers on mixed greens, with dressing of mustard, garlic olive oil, and vinegar - Massachusetts.jpg
-- pencils (school-supplies, 8 products): Colouring pencils.jpg; Colored pencils chevre.jpg; Colored pencils lined up on pink surface.jpg
-- phone stand (mobile-accessories, 8 products): Souvenir. The phone stand. The Obelisk to the Hero City of Leningrad.jpg; Open phone stand, Omagh - geograph.org.uk - 1452839.jpg; The phone box stands by the road in the hamlet of Dowlands - geograph.org.uk - 1701442.jpg
-- power bank (mobile-accessories, 8 products): Itel power bank Nigeria.jpg; South Humber Bank Power Station - geograph.org.uk - 2524962.jpg; STW shared power bank.jpg
-- rasam powder (spices-oils, 8 products): Rasam powder picture.JPG; Rasam Powder The Grand Sweets And Snacks.jpg; HPIM0026 Sambar powders, Rasam powders, Harbal Agarbattis.JPG
-- spike guard (electrical, 8 products): Late Medieval (c.14th Century) copper alloy knuckle guard plate with central spike. (FindID 743154).jpg; Coast Guard Lt. Catharine Lori Johann drives a spike past Chinese blockers during the U.S. women's first volleyball game at the Military World Games in Hyderabad.JPG; Mexico City - Feb. 1913- palace guard marching with spiked helmets and fixed bayonets LCCN2006685905.jpg
-- usb-c cable (mobile-accessories, 8 products): USB-C-connector-and-cable.png; USB-C cable connected to a powerbank.jpg; CAB-25579-USB-C-Extension-Cable-with-Power-Switch-Scale.jpg
-- wired earphones (mobile-accessories, 8 products): New earphone wire.jpg; Vintage Rocket Ship Germanium Crystal Radio With Ground Wire & Earphone, 4.5 Inches High, Marked Made In Japan, Circa 1960s (26373998485).jpg; J. Allister Bowman, district plant superintendent, Maritime Tel & Tel, using earphones for word from entombed men in Moose River Mine Disaster, Nova Scotia, Canada, April 1936.jpg
-- baby powder (baby-care, 7 products): Johnsons Baby Powder massage.jpg; Mother goose baby powder talcum advertising tin.jpg; Baby Powder and puff box IMG 20210811 173820.jpg
-- baby soap (baby-care, 7 products): Ivory Soap advertisement with Terry O’Malley featured as the model baby in color taking a bubble bath. Saturday Evening Post (1934).jpg; Baby-Soap-Tindi-Ringuva.jpg; Baby Lotions, Soaps, and Diaper Creams at Kroger.JPG
-- baby wipes (baby-care, 7 products): Baby wipes.jpg; Adriaen Brouwer (1605-1606-1638) (after) - The Sense of Smell, A Man Wiping a Baby's Bottom - 47374i - Wellcome Collection.jpg; Baby Wipes at Kroger.JPG
-- ball valve (plumbing, 7 products): Ball Valve - Full Bore.jpg; Caerhays, Coastal pasture with ball valved drinking trough - geograph.org.uk - 4677253.jpg; Caerhays, Coastal pasture, the ball valved drinking trough - geograph.org.uk - 4677280.jpg
-- claw hammer (tools, 7 products): Stanley graphite claw hammer.jpg; Hammered Copper Claw Ornament MET VS64 228 493.jpeg; Construction workers with claw hammers, Omagh - geograph.org.uk - 4232132.jpg
-- combination pliers (tools, 7 products): Combination pliers 2621 7 by Bahco Tools Sweden.jpg; 05-02 combination pliers big.jpg; IKEA combination pliers.jpg
-- dry iron (small-appliances, 7 products): On dry land, Iron Wharf Boatyard - geograph.org.uk - 6609836.jpg; Dry drain beside Iron Bar Drove - geograph.org.uk - 3844046.jpg; High and dry, old fishing vessel at Iron Wharf boatyard, Faversham Creek - geograph.org.uk - 3013805.jpg
-- electric kettle (small-appliances, 7 products): Electric kettle (LRM 20200521 132456-hdr).jpg; Electric kettle, Ribnitz-Damgarten (LRM 20200521 132413-hdr).jpg; Electric-kettle.jpg
-- hand blender (small-appliances, 7 products): DFC 0816 A close-up of a hand holding a plastic cup while a chocolatey smoothie is poured over ice from a blender.jpg; Blender (immersion).png; Stavmikser.jpg
+- mustard oil (spices-oils, 8 products): Mustard Oil & Seeds - Kolkata 2003-10-31 00537.JPG; Grinding Mustard Seed for oil.jpg; Machine for making mustard oil, Jaura 2.jpg
+- pencils (school-supplies, 8 products): Pen and mechanical pencil 2025.jpg; Colored pencils in holder.jpg; Dalby State School, Pencil posts, 2019.jpg
+- phone stand (mobile-accessories, 8 products): Souvenir. The phone stand. The Obelisk to the Hero City of Leningrad.jpg; A Nimitz Sailor Stands as Phone Talker During a General Quarters Drill (8841728).jpg; Not a Phone Stand.jpg
+- power bank (mobile-accessories, 8 products): USB-A and USB micro B connectors in the power bank.jpg; Charging a smartphone with a USB power bank.jpg; USB power bank.jpg
+- rasam powder (spices-oils, 8 products): Rasam powder picture.JPG; Rasam Powder The Grand Sweets And Snacks.jpg
+- spike guard (electrical, 8 products): Surge protector plug circuitry back & front.jpg; Whole House Surge Protector.jpg; Surge protector 20180112.jpg
+- usb-c cable (mobile-accessories, 8 products): USB-C cable connected to a powerbank.jpg; SAMSUNG EP-T4510 45W POWER ADAPER BLACK & USB C TO C CABLE.jpg; MagSafe and USB-C Cable Charger for iPhone.jpg
+- wired earphones (mobile-accessories, 8 products): New earphone wire.jpg; Vintage Rocket Ship Germanium Crystal Radio With Ground Wire & Earphone, 4.5 Inches High, Marked Made In Japan, Circa 1960s (26373998485).jpg
+- baby powder (baby-care, 7 products): Johnsons Baby Powder massage.jpg; Powder for baby LCCN2016872287.jpg; Baby Powder and puff box IMG 20210811 173820.jpg
+- baby soap (baby-care, 7 products): Baby-Soap-Tindi-Ringuva.jpg; Baby Lotions, Soaps, and Diaper Creams at Kroger.JPG; He won't be happy till he gets it (with profuse apologies to the Pears' Soap Baby) - L.M. Glackens. LCCN2011647182.jpg
+- baby wipes (baby-care, 7 products): Baby wipes.jpg; Comfort and Pampers Baby Wipes.JPG; Baby Wipes at Kroger.JPG
+- ball valve (plumbing, 7 products): Stainless steel homebrewing kettle ball valve tap and glass.jpg; Ball Valve - Full Bore.jpg; Ball-valve-ball-The-Alloy-Valve-Stockist.jpg
+- claw hammer (tools, 7 products): Miniature copper alloy "claw and peen" hammer (FindID 65036).jpg; Stanley graphite claw hammer.jpg; Chape and claw hammer, finds from the ruins of Kronenburg, Dossenheim.jpg
+- combination pliers (tools, 7 products): Combination pliers 2621 7 by Bahco Tools Sweden.jpg; IKEA combination pliers.jpg; 05-02 combination pliers big.jpg
+- dry iron (small-appliances, 7 products): Clothes iron from Predom Nowa Dęba.jpg; Clothes Wringer No 200 Plate 28 Pascal Iron Works (1861).jpg; Clothes iron - Mogán - Gran Canaria.jpg
+- electric kettle (small-appliances, 7 products): Zelmer Electric kettle.jpg; General electric - electric water kettle.jpg; HK SKD TKO 寶琳 Po Lam 新都城 Metro City Plaza MCP 3 III Discovery mall shop 國際家居 Japan Home Centre JHC kitchenware n electric applicants kettles January 2023 Px3.jpg
+- hand blender (small-appliances, 7 products): DFC 0816 A close-up of a hand holding a plastic cup while a chocolatey smoothie is poured over ice from a blender.jpg
 - induction cooktop (small-appliances, 7 products): Induction Cooktop Rolling Boil.jpg; Cool Top 2 induction cooktop 1972.jpg; Foil on induction cooktop.jpg
-- measuring tape (tools, 7 products): Female areola with measuring tape.jpg; Chesterman Tape Measure.jpg; Dual Scale Stanley Tape Measure Version 2022.jpg
+- measuring tape (tools, 7 products): Tape Measure 25' Klein Tools.jpg; Stanley PowerLock tape measure on tool box.jpg; Tools hang on a red wall in a workshop with wrenches and a tape measure displayed neatly in rows.jpg
 - mixer grinder (small-appliances, 7 products): Mixer-grinder-blades.jpg; A table-top mixer-grinder or mixie.jpg; Gehl 95 grinder-mixer.jpg
-- paint brush (paints, 7 products): Paint Brush MET 17.190.1967.jpg; Paint bucket and brush.jpg; Paint brush factory - geograph.org.uk - 2021393.jpg
+- paint brush (paints, 7 products): Brown brushed painted slightly worn aged seamless concrete building wall texture.jpg; President Bill Clinton paints a wall with a roller paint brush during the renovation of Cardozo High School in Washington, DC.jpg; Paint brush.JPG
 - pvc pipe (plumbing, 7 products): 1 inch PVC Valve and pipe-IMG 1061.jpg; Pvc pipe alignment in a wall.jpg; Cutting a pvc pipe.jpg
-- screwdriver set (tools, 7 products): Screwdriver set with great variety of bits and ratchet screwdriver.jpg; Precision Screwdriver Set 2.jpg; Torx screwdriver with bit set.jpg
-- a4 paper (office-supplies, 6 products): Work No. 88; A sheet of A4 paper crumbled into a ball.jpg; Bond Paper na A4 size.jpg; A4 PAPER.jpg
-- adjustable wrench (tools, 6 products): 1950s adjustable wrench by Swedish company B A Hjorth Co.jpg; Late 1900s Pilot Tools 8 inch adjustable wrench Spain.jpg; 1990s Lobtex Co Ltd Lobster 100 mm adjustable wrench size 4 made in Japan.jpg
-- allen key set (tools, 6 products): Folding Allen key set, unfolded.jpg; Folding Allen key set.jpg; Allen long arm hex key set.jpg
-- bib tap (plumbing, 6 products): Gutenberg Bible, New York Public Library, USA. Pic 01.jpg; Heiligengrabe, Kloster Stift zum Heiligengrabe, Stiftskirche -- 2017 -- 9969.jpg; Jurk van blauw-wit katoen met wit schort, witte kraag en manchetten, uniform Maasoord, objectnr 76539-1-5.JPG
-- brown bread (bakery, 6 products): Brown Bread from a Colonial Oven-Baughan (1912) - frontispiece.png; Brown Bread from a Colonial Oven-Baughan (1912) - Chapter 1 header.png; Brown Bread from a Colonial Oven-Baughan (1912) - Chapter 1 end.png
-- burger buns (bakery, 6 products): The vegan school students making burger buns.jpg; Buns, Bacon, and Bragging Rights- Raider Burger Competition Names a Winner (9332945).jpg; Burger ^ Bun and Raffaelle's - geograph.org.uk - 6640745.jpg
+- screwdriver set (tools, 7 products): Screwdriver set with great variety of bits and ratchet screwdriver.jpg; Torx screwdriver bits from set, from T8 to T45 and same with middle pin.jpg; Precision Screwdriver Set 2.jpg
+- a4 paper (office-supplies, 6 products): A4 PAPER.jpg; Bond Paper na A4 size.jpg; HK 香港仔市政大廈 Aberdeen Public Sports Centre shoes shelves May 2016 A4 paper posters.jpg
+- adjustable wrench (tools, 6 products): Late 1900s Pilot Tools 8 inch adjustable wrench Spain.jpg; Western Forge adjustable wrenches.jpg; Western Forge Craftsman adjustable wrenches.jpg
+- allen key set (tools, 6 products): Folding Allen key set.jpg; Dental key from set of blacksmith's dental instruments.jpeg; 1st choice metric hex key set.jpg
+- bib tap (plumbing, 6 products): Drinking water tap, Split, Mertojak.jpg; A defunct water tap, a remainder of old piped water system.jpg; Dysfunctional public water tap at ITI colony.jpg
+- brown bread (bakery, 6 products): Buster Brown Bread (3093674594).jpg; Baked bread brown - Credit to https homegets.com (42475190070).jpg; Buster Brown Bread (1907) (ADVERT 448).jpeg
+- burger buns (bakery, 6 products): MOS Burger's Yamazaki buns in 2013.jpg; Beet Burgers on Romaine Buns (5752193480).jpg; The vegan school students making burger buns.jpg
 - coffee chicory blend (beverages, 6 products): Cafe du Monde canned coffee chicory blend.jpg
-- compact powder (makeup, 6 products): Vintage Zell Pocket Watch Type Powder Compact (8893288034).jpg; Stratton powder compact 01.JPG; Stratton Powder compact and lipstick holder.jpg
-- eyeliner (makeup, 6 products): Lilium 'Eyeliner' 01.jpg; Hemerocallis 'Magenta Eyeliner'.jpg; Crush with eyeliner logo.png
-- file folder (office-supplies, 6 products): AQSH File Folder Cover - Balli Kombetar Bulletins 1943.png; File Folder with Documents (23909830671).jpg; File-folders.jpg
-- fruit cake (bakery, 6 products): Fruit Cake - geograph.org.uk - 5122419.jpg; Fruit Cake MET 36.3.81 EGDP016124.jpg; Company D, 1st Battalion, 28th Infantry soldier eats fruit cake at Bu Dop.jpg
-- glue stick (office-supplies, 6 products): Glue Stick.jpg; Revox B215 - IO board - added legs made of glue gun stick.jpg; FABER-CASTELL glue stick.jpg
-- hacksaw frame (tools, 6 products): Hacksaw (PSF).png; Axel blade frame.JPG
-- kajal (makeup, 6 products): Kajal Rathore.jpg; Kajal Rathore profile.jpg; Kajal Aggarwal launches her own app.jpg
-- lipstick (makeup, 6 products): Lipstick with veil (1308307).jpg; Hyman Katz, Lipstick, 1937.jpg; The Lipstick Lounge.png
+- compact powder (makeup, 6 products): Vintage Stratton Cosmetics Set, Two-Sided Mirror (L), Lipstick Holder (UR) And Powder Compact (LR) (14428277553).jpg; Vintage Zell Pocket Watch Type Powder Compact (8893288034).jpg; Stratton powder compact 02.JPG
+- eyeliner (makeup, 6 products): Tattooed Eyeliner.jpg; Two eyeliners.jpg
+- file folder (office-supplies, 6 products): File-folders.jpg; File Folder with Documents (23909830671).jpg; AQSH File Folder Cover - Balli Kombetar Bulletins 1943.png
+- fruit cake (bakery, 6 products): Fruit cake (12686703823).jpg; Fruit cakes.jpg; Dessert- coffee jelly, ginger ice cream and banana, matcha cake, mochi and fruit.jpg
+- glue stick (office-supplies, 6 products): Use glue stick to seal the torn paper towel pieces.JPG; Glue Stick.jpg; Revox B215 - IO board - added legs made of glue gun stick.jpg
+- lipstick (makeup, 6 products): Lipstick and other cosmetic equipment.jpg; Makeup-beauty-lipstick-make-up (24030573540).jpg; Lipstick, Cosmetics.jpg
 - masala chai (beverages, 6 products): Masala Chai.jpg; Veg maggi with masala chai.jpg; Mamallapuram-Masala chai-WUS-02096.jpg
-- milk rusk (bakery, 6 products): H20091105-1752--Stephanomeria cichoriacea--RPBG (31184289615).jpg; J20160602-0033—Astragalus miguelensis—RPBG (48039916288).jpg; J20170914-0027—Stephanomeria cichoriacea—RPBG (36915980200).jpg
-- multigrain bread (bakery, 6 products): Tuna with kimchi sauce on rye crisp bread and German multigrain bread - Massachusetts.jpg; Little Hosmer cheese (Jasper Hill), broiled on German multigrain bread - Massachusetts.jpg; Multigrain Bread Mumbai Delhi Pune Gujarat.jpg
-- nail polish (makeup, 6 products): Kristopher Wright with Nail Polish.jpg; Color-options-for-nail-gel-polish-gel-lac-by-diamond-nails.jpg; Nail polish impression of stomata.jpg
-- pav (bakery, 6 products): Pavo (pav).jpg; PAV-0056.png; Pav chleby.jpg
-- primer (paints, 6 products): Antoni Tolmos primer pla.png; Primer Primer Trasplante de higado (1985).jpg; 1911 Britannica - Primer.png
-- shower head (plumbing, 6 products): Silver shower head.jpg; Poppy seed head after a shower - geograph.org.uk - 1451554.jpg; Strumble Head, stormy shower passing - geograph.org.uk - 2815292.jpg
-- solvent cement (plumbing, 6 products): Titanic BMCTM.jpg; 1 (2)SHIP.jpg; Image0132SHIP.jpg
-- stapler (office-supplies, 6 products): Evo paper pro stapler open.jpg; A green stapler.jpg; Solidworks Stapler.jpg
-- sticky notes (office-supplies, 6 products): Algol and QR code in sticky notes - geograph.org.uk - 7674816.jpg; Off the wall ideas sticky notes SEI 2018 (41779807090).jpg; Stack of four sticky notes.jpg
+- multigrain bread (bakery, 6 products): Vegan Multigrain Manna Bread (4107217815).jpg; Little Hosmer cheese (Jasper Hill), broiled on German multigrain bread - Massachusetts.jpg; Multigrain Bread Mumbai Delhi Pune Gujarat.jpg
+- nail polish (makeup, 6 products): Nail polish colour palette.jpg; My Label- Aileen De Cumyow- Nail Polish Agitator.jpg; Matte nail polish.jpg
+- pav (bakery, 6 products): Pav Bread.jpg; Pav or Bread.jpg
+- primer (paints, 6 products): Brown primer paint - 1988.jpg; Mi primer dibujo en Paint.png; Lotus Elise panels primer painted.jpg
+- shower head (plumbing, 6 products): European shower tap 0512 head.JPG; Silver shower head.jpg; CG Shower head (Preview ver).jpg
+- solvent cement (plumbing, 6 products): Water Ram Repair PVC Cement.jpg
+- stapler (office-supplies, 6 products): Evo paper pro stapler.jpg; Stapler pins.jpg; Stapler pins (400X).jpg
+- sticky notes (office-supplies, 6 products): EFTA00000040 - Black filing cabinet drawer open revealing rolled white paper and a yellow sticky note labeled List with a red milk crate and FedEx box on top.jpg; Original sticky notes invention drawings Amron 1973.png; Sticky notes.jpg
 - tulsi drops (health-wellness, 6 products): Tulsi with rain drops.jpg
-- carrot (fruits-vegetables, 5 products): Carrots of many colors.jpg; Preparing and slicing carrots.jpg; Four-spotted orb weaver (Araneus quadratus) female on wild carrot (Daucus carota) seed head Uckermark.jpg
+- carrot (fruits-vegetables, 5 products): A basket Full of Carrots at Banda Market Kampala.jpg; Vegetables and Carrots.jpg; Carrot, green beans and other vegetables 01.jpg
 - coriander leaves (fruits-vegetables, 5 products): Coriander flowers and leaves.jpg; Bunches of coriander leaves.jpg; Vegetable Seller Holding Coriander Leaves on streets of Fareniya Bazar-7221.jpg
-- cucumber (fruits-vegetables, 5 products): Periclimenes imperator (Emperor shrimp) on Bohadschia argus (Sea cucumber).jpg; Cucumber Tha-Khar-Tee.jpg; Smoked salmon and dill mousse in cucumber cups.jpg
-- ginger (fruits-vegetables, 5 products): Ginger Rogers in Lady in the Dark.jpg; Ginger Prince 1948.jpg; Shari Robinson & Ginger Prince 1948.jpg
-- green chilli (fruits-vegetables, 5 products): Bhiwapur Chilli - Green Unripened.jpg; Green chilli plant in home garden.jpg; Green Chilli and New Garden, Moor Street, Chepstow - geograph.org.uk - 5684618.jpg
-- lemon (fruits-vegetables, 5 products): Lemon.jpg; Lemon - whole and split.jpg; Bloem van Anthemis lemon. 18-06-2024. (d.j.b).jpg
-- cabbage (fruits-vegetables, 4 products): Close wing position of Talbotia naganum (Moore, 1884) - Plain Cabbage WhiteANK3907.jpg; Individual cabbage in a cabbage field - geograph.org.uk - 6601083.jpg; Cabbage Farming.jpg
-- cauliflower (fruits-vegetables, 4 products): Cauliflower (PSF).jpg; Cauliflower recipe.jpg; Cauliflower Coral.jpg
-- garlic (fruits-vegetables, 4 products): Garlic bulbs and cloves.jpg; Rosy garlic Radès beach.jpg; Garlic.JPG
-- orange (fruits-vegetables, 4 products): Orange 002 2014 03 19.jpg; Ambersweet oranges.jpg; Orange juice 1 edit1.jpg
-- pomegranate (fruits-vegetables, 4 products): Pomegranate (opened).jpg; Pomegranate fruit - whole and piece with arils.jpg; Pomegranate flowers (Punica granatum), Ponte de Sor, Portugal (approx. GPS location) julesvernex2.jpg
-- spinach (fruits-vegetables, 4 products): Water Red Spinach.jpg; Ultimate Spinach 1968.jpg; Spinach Plant Nourishment Meal Fresh Healthy Bio.jpg
-- 500 g (beverages, 3 products): 500 Reward - Macon Weekly Telegraph - 1849 - John G. Ponder information reward.jpg; Champion 500 G (1).jpg; Funeral eulogy by Publius Valorius to his colleague G. Brutus, c. 500 BC.jpg
-- jaggery (staples, 2 products): Jaggery preparation0.jpg; Morrisons superstore, Barry (Geograph 3381956 by Jaggery).jpg; St Patrick's Church, Newport-Geograph-1962374-by-Jaggery.jpg
-- 2-minute noodles (snacks, 1 products): Instant noodle balls.jpg; Multi-flavor vegetable instant noodles.jpg; Instant noodles of Argentina.jpg
-- 750 ml (beverages, 1 products): Perrier - 750 ml.JPG; Mad Bull 750 ml Tequila Reposado.jpg; Hermes Airlines B737-5L9, SX-BHR, MSN 3068 (08 1998), as ML 750 Paris (CDG) - Toulouse (TLS), Flight time 1 01 (21462495073).jpg
-- antiseptic liquid (health-wellness, 1 products): Savlon Antiseptic Liquid.jpg; Skeleton of the regime - Flickr - Al Jazeera English (3).jpg; Skylab (7030266).jpg
-- bread (bakery, 1 products): Home made sour dough bread.jpg; Sweet Bread Mountain.jpg; Biodegradable Bread clip and Plastic Bread clip.png
-- eggs tray (dairy-eggs, 1 products): Trays of eggs of the chinook salmon, photo from The Encyclopedia of Food by Artemas Ward.jpg; Egg tart aluminum foil tray fragments.jpg; Tray of eggs 4.50.jpg
-- extension board (electrical, 1 products): Guildhall Extension inner courtyard, Northampton (3) Edgar Mobbs information board - geograph.org.uk - 8251976.jpg; Boarded up extension, Newbridge Inn - geograph.org.uk - 7470595.jpg; South Wales Platform Extensions information board, Rhymney - geograph.org.uk - 3845445.jpg
-- filter coffee powder (beverages, 1 products): MC Macau Yoho Treasure Island Hotel room drink product bag Coffee Tree brand Penang White Coffee Kopi Putih Instant Malaysian Coffee powder March 2026 N13P 01.jpg; Instant coffee with milk powder, 3-in-1 coffee drink, Ai Petri Plateau, Crimea.jpg; Instant coffee with milk powder, 3-in-1 coffee drink, Ai Petri, Crimea.jpg
-- foxtail millet (staples, 1 products): Japanese Foxtail millet 02.jpg; Foxtail millet.jpg; Foxtail millet (Setaria italica).jpg
-- glucose biscuits (snacks, 1 products): Nabisco glucose biscuits.jpg; Kellyville District Centre.JPG
-- gold (beverages, 1 products): Silver and gold scrap metal.jpg; Splashscreen Blender 4.2 LTS – Gold (8000×4500).png; Rosa Gold Glow 2.jpg
-- idli rice (staples, 1 products): Idli Sambar.JPG; Button idli.JPG; Idli for breakfast.jpg
+- cucumber (fruits-vegetables, 5 products): Carrots, Green Pepper and Cucumber at Barkin Dogo Market, Kaduna North 01.jpg; Fresh and big cucumber 🥒.jpg; Fresh carrots and green beans and cucumbers.jpg
+- ginger (fruits-vegetables, 5 products): Bucket of Ginger.jpg; Ginger and garbage and others.jpg; Fresh ginger on the ground on sale at the Monday Market in Kakuri, Kaduna 01.jpg
+- green chilli (fruits-vegetables, 5 products): Bhiwapur Chilli - Green Unripened.jpg; Green( chilli ).jpg; Topped focaccia (Noduja, artichokes, green chilli dressing & walnuts) - Caccia and Tails 2025-04-24.jpg
+- lemon (fruits-vegetables, 5 products): Lemon fruit at Bakin dogo market 01.jpg; Lemons Displayed For Sale At A Local Market.jpg; Lime and Lemon.jpg
+- cabbage (fruits-vegetables, 4 products): A young person Preparing Cabbage for Local Market in Nigeria.jpg; Purple cabbage with normal cabbage at Bakin Dogo Market in Kaduna.jpg; A display of a leafy cabbage at a local grocery store in Palapye,Botswana.jpg
+- cauliflower (fruits-vegetables, 4 products): Cauliflower displayed at Fruit Garden Market.jpg; Baskets of broccoli and cauliflower.jpg; Cauliflower vendor in Goa, India.jpg
+- garlic (fruits-vegetables, 4 products): Garlic-at-the-market-Rene-Cortin.jpg; Garlic vendor at the Monday Market in Kakuri, Kaduna 03.jpg; Garlic and vegetables in Kadikoy.JPG
+- orange (fruits-vegetables, 4 products): Oranges at Bakin Dogo Market, Kaduna North.jpg; Orange for sale in Banda Market.jpg; Can i get you an orange.jpg
+- pomegranate (fruits-vegetables, 4 products): Pomegranates, from Israel.jpg; Fruits of Turkey (quinces, pears, pomegranates).jpg; Dorothea Elizabeth Smith Pomegranate 1850-1853.jpg
+- spinach (fruits-vegetables, 4 products): Freshly harvested Spinach.jpg; Liat Portal for Foodie Disorder - Fresh spinach from San Francisco farmers market.jpg; Spinach Market.jpg
+- jaggery (staples, 2 products): South Indian traditional sweets called "Seedai" in tamil made from jaggery, rice flour and grated coconut.jpg; Pudde -- a local sweet (rice-based, with jaggery, wrapped in a jackfruit leaf) made in Goa.jpg; Rice with Jaggery Urundai.jpg
+- 2-minute noodles (snacks, 1 products): Chauchau (Nepali Instant Noodles Snack).jpg; United Airlines instant noodles snack.JPG; GD food 華豐 速食麵 instant noodle yellow January 2024 R12S 01.jpg
+- agarbatti pack (household, 1 products): People around nashik agarbatti seller.jpg; Agarbatti lit.jpg; Agarbatti of Kochi.jpg
+- antiseptic liquid (health-wellness, 1 products): Savlon Antiseptic Liquid.jpg
+- bread (bakery, 1 products): Local bakery bread.jpg; Purchasing bread in a Lithuanian bakery.8d19617v.jpg; Home made sour dough bread.jpg
+- eggs tray (dairy-eggs, 1 products): Trays of eggs of the chinook salmon, photo from The Encyclopedia of Food by Artemas Ward.jpg; Trays of eggs.jpg; A Tray Of Eggs.jpg
+- extension board (electrical, 1 products): Wware Relay-switched Power Strip Schematic.jpg; Blue French power strip - side.jpg; Power strip.jpg
+- filter coffee powder (beverages, 1 products): MR.VIET Arabica Ground Coffee, 250 gr.jpg; Coarsely grounded coffee beans in white bowl with intact roasted bean.png; Biodegradable Coffee Cup on the Ground.jpg
+- foxtail millet (staples, 1 products): Food grain foxtail millet.jpg; Foxtail millet kheer.jpg; Foxtail millet.jpg
+- glucose biscuits (snacks, 1 products): Nabisco glucose biscuits.jpg
+- gold (beverages, 1 products): TCPD Traffic Division ANY-9031, AGV Barley Drink and Gold Medal Taiwan Beer 20240813.jpg; Fresh Summer Fes!! Gold Division IMG 9575.jpg; Johnnie Walker Gold Label "The Centenary Blend" (Pre-2013 with 18-Year Age Statement).jpg
+- idli rice (staples, 1 products): Mv Dds Marina Arriving Chittagong Port With Parboiled Rice From India 2025-03-24 (PID-0002815).jpg; Mv BMC Pandora Carrying 15000 Metric Tons Parboiled Rice Arriving Chittagong Port 2025-01-29 (PID-0003835).jpg; How to parboil yellow basmati rice.jpg
 - insulation tape (electrical, 1 products): Insulation Tape.jpg; Electrical-Insulation-Tape 122912-480x360 (4999892165).jpg; PVC-Electrical-Insulation-Tape 308310-480x360 (4999892531).jpg
-- kodo millet (staples, 1 products): Kodo Millet.jpg; Kodo millet Idli.jpg; Kodra (kodo millet).jpg
-- led bulb (electrical, 1 products): Led light bulb - led lamp 1.png; Led light bulb.jpg; Philips LED bulb.jpg
-- mango pickle (spices-oils, 1 products): Gujarati sweet and spicy mango pickle, photo taken on January 14, 2024.jpg; Mango pickle2.jpg; Chopped Mango Pickle.jpg
-- matchbox pack of (household, 1 products): Pack basket from Pack Baskets of Maine.png; Pack elephants of battery of EIC besieging Gawilgad.jpg; Signature of George Willis Pack (1831–1906).png
-- mustard seeds (spices-oils, 1 products): Black mustard seeds (closeup).jpg; Black-mustard-seeds.jpg; Jesus and the parable of the mustard seed.jpg
-- papad (snacks, 1 products): Urad papad, microwaved.jpg; Noli papad, a popular fried snack food in Bengal, photographed on January 31, 2024.jpg; Sago Flavour Coin Papad.jpg
-- parle-g (snacks, 1 products): Parle-G Biscuit.jpg; Parle-G.jpg; Le Puits qui parle, G.32557.jpg
-- potato chips (snacks, 1 products): Sweet potato chips in Shandong, china.jpg; Potato chips - Massachusetts.jpg; Potato-Chips.jpg
-- qa pack ₹120 (household, 1 products): Manual of pack transportation (Page 120) BHL16955926.jpg; Sony Album MP 120 Video 8 3 pack (51878722261).jpg; The Figures to Longman and Luckey's complete pack of new cotillons - jeu de cartes anglais aux partitions musicales - estampe - btv1b10526326c (120 of 164).jpg
-- qa pack ₹99.99 (household, 1 products): FM-Stereo-Tuner-Pack-Maxonic-MX-99.jpg; Pack string around Lower Big Creek Lake 99-6059 (5878737248).jpg; Hundreds ‘Pack the Place’ to Cheer College of DuPage Women’s, Men’s Basketball 2017 99 (32650334932).jpg
-- rice flour (staples, 1 products): KH Postcards JF - 450 (Taffy Seller, Cassava Flour, Rice Field, and Tea Plantation).jpg; Atop Rice Flour.jpg; Assamese style steamed rice flour cake.jpg
-- rusk (bakery, 1 products): Dean Rusk, Lyndon B. Johnson and Robert McNamara in Cabinet Room meeting February 1968.jpg; WI; Rusk County Map; Town of Rusk.png; Rusk WI - 1912.jpg
-- sabudana (staples, 1 products): Puneri sabudana vada beed.jpg; Malaysia Airlines Meal - Uppama with Sabudana Khichdi (2).jpg; Sabudana Vada.jpg
-- salt (staples, 1 products): Marakkanam Salt Pans.JPG; Abandoned car in Marine Park (10852p).jpg; Piles of Salt Salar de Uyuni Bolivia Luca Galuzzi 2006 a.jpg
-- switch (electrical, 1 products): Innenleben der Nintendo Switch 20230405 HOF09139 RAW-Export.png; Nintendo Switch 2 20250605 HOF4489 RAW-Export.png; Nintendo Switch 2 in mode "handheld".png
-- tamarind (spices-oils, 1 products): Tamarind fruits (Tamarindus indica 'Si Thong').jpg; The tamarind plant.jpg; Sugar tamarind.jpg
+- kodo millet (staples, 1 products): Kodo millet khichdi.jpg; Kodo Millet.jpg; Kodra (kodo millet).jpg
+- led bulb (electrical, 1 products): LED-E27-Light-Bulb-1134-cropped.jpg; Inside of chaina led bulb (lamp)IMG 0548.JPG; G9 230V 3½W nextec LED light bulb.JPG
+- mango pickle (spices-oils, 1 products): Mouth watering home made Kanda Thalipith with butter and mango pickle.jpg; India - Sights & Culture - mango sun-drying for pickle making 2 (3975868257).jpg; Sweet pickle made out of mango, in West Bengal, India.jpg
+- matchbox pack of (household, 1 products): Holder, matchbox (AM 1991.72-4).jpg; Matchbox Label Fl Pojatzi & Comp Deutschlandsberg Zünder PERU MINISTERIO DE HACIENDA Zündholzschachteletikett.jpg; Matchbox label - Kitchen Containers - Czechoslovakia (circa 1940s) - MBP1627894159.jpg
+- mustard seeds (spices-oils, 1 products): Mustard Seeds in a plate at Reganigudem.jpg; Black-mustard-seeds.jpg; Mustard Oil & Seeds - Kolkata 2003-10-31 00537.JPG
+- papad (snacks, 1 products): Papad ... door-to-door!.JPG; Masala Papad 2.jpg; The papad.JPG
+- potato chips (snacks, 1 products): Argentine Sweet Potato Chips with Sugar and Salt.png; Potato-chips.jpg; Home made Potato Chips.jpg
+- rice flour (staples, 1 products): Rice flour.jpg; Rice Flour (Pitha Guri).jpg; Rangoli made by me using rice flour regarding Ugadi festival.jpg
+- rusk (bakery, 1 products): Rusk (Dry Biscuit,twice baked bread).jpg
+- sabudana (staples, 1 products): Pearl Tapioca Khichdi.jpg; Cooking tapioca pearls at a culinary class in Baozhong Junior High School 20130503.jpg; Tapioca pearls and cranberry seeds.jpg
+- salt (staples, 1 products): Comparison of Table Salt with Kitchen Salt.png; Table salt.png; Toxicity of table salt III.png
+- switch (electrical, 1 products): Transistor switch pcb 68a 1000.jpg; Light switch combined with Schuko sockets.JPG; Rotary switch base.jpg
+- tamarind (spices-oils, 1 products): Puliyogare Or Tamarind Rice.jpg; Samosa with tamarind chutney and tomato sauce.jpg; चिंचोके Tamarind Seeds (Tamarindus indica).jpg
 - teflon tape (plumbing, 1 products): Teflon tape used for sealing plumbing connections.jpg; Teflon tape wound around threaded pipe.jpg; Kitchen renovation new plumbing valve beneath kitchen sink with teflon tape.JPG
-- vermicelli (staples, 1 products): Longkou vermicelli (20241019).jpg; Pea vermicelli.jpg; Longkou Vermicelli 龍口粉絲 (1).jpg
-- wall plug (electrical, 1 products): Generic Chinese wall power meter for Schuko plug (2).jpg; Gaps in estate wall plugged with tree trunks - geograph.org.uk - 7581573.jpg; USB plugs in the wall of a Domino's Pizza restaurant, Winschoten (2019).jpg
-- wheat atta (staples, 1 products): Atta flour.jpg; Atta-01.jpg; Leaf-cutter ant (Atta cephalotes) Belize 4.jpg
+- vermicelli (staples, 1 products): Vegetable and Vermicelli from India.jpg; Vermicelli in Red Sauce and Mushrooms.JPG; Vermicelli Upma in North India.jpg
+- wall plug (electrical, 1 products): 22 sockets grey-painted wall Three black electric power cables plugged in, school building in Lillesand, Norway. 22 stikkontkater på gråmalt vegg med tre svarte strømkabler (2024) IMG 8882.jpg; Generic Chinese wall power meter for Schuko plug (2).jpg; Portable EV Charger Wallbox Unit with Red CEE Plug White Background EV WALL BOX EVWALLBOX.png
+- wheat atta (staples, 1 products): Wheat flour Rose.jpg; Wheat flour dough.jpg; Wheat flour pakoras.jpg
 
 ## No free-licence photo found
 
+- dishwash gel (household, 24 products): no free-licence photo found
+- fabric conditioner (household, 24 products): no free-licence photo found
+- masala chips (snacks, 24 products): no free-licence photo found
 - mosquito repellent refill (household, 24 products): no free-licence photo found
+- anti-dandruff shampoo (hair-care, 20 products): no free-licence photo found
+- moisturising cream (skin-care, 20 products): no free-licence photo found
+- probiotic curd (dairy-eggs, 20 products): no free-licence photo found
+- pav bhaji masala (spices-oils, 16 products): no free-licence photo found
 - dishwash bar (household, 13 products): no free-licence photo found
+- chyawanprash (health-wellness, 12 products): no free-licence photo found
+- detergent bar (household, 12 products): no free-licence photo found
+- hair serum (hair-care, 10 products): no free-licence photo found
+- emergency torch (batteries-lighting, 9 products): no free-licence photo found
+- modular socket (electrical, 8 products): no free-licence photo found
 - ashwagandha tablets (health-wellness, 6 products): no free-licence photo found
 - digestive churna (health-wellness, 6 products): no free-licence photo found
-- agarbatti pack (household, 1 products): no free-licence photo found
-- qa pack ₹0.50 (household, 1 products): no free-licence photo found
-- qa pack ₹100.00 (household, 1 products): no free-licence photo found
-- qa pack ₹100.01 (household, 1 products): no free-licence photo found
-- qa pack ₹487 (household, 1 products): no free-licence photo found
+- hacksaw frame (tools, 6 products): no free-licence photo found
+- kajal (makeup, 6 products): no free-licence photo found
+- milk rusk (bakery, 6 products): no free-licence photo found
+- 500 g (beverages, 3 products): only a pack size or code, not a kind of item
+- 750 ml (beverages, 1 products): only a pack size or code, not a kind of item
+- parle-g (snacks, 1 products): no free-licence photo found
+- qa pack ₹0.50 (household, 1 products): only a pack size or code, not a kind of item
+- qa pack ₹100.00 (household, 1 products): only a pack size or code, not a kind of item
+- qa pack ₹100.01 (household, 1 products): only a pack size or code, not a kind of item
+- qa pack ₹120 (household, 1 products): only a pack size or code, not a kind of item
+- qa pack ₹487 (household, 1 products): only a pack size or code, not a kind of item
+- qa pack ₹99.99 (household, 1 products): only a pack size or code, not a kind of item
 
 ## Medicines (stay on the placeholder)
 
