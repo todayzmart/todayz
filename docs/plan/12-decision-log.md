@@ -1425,3 +1425,12 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
 - **Admin app.** The Vite dev server passes the same variable to the app (`VITE_ADMIN_TOTP_OFF`; a build never gets it), and the gate then skips `/two-step`, after a reload or in a new tab too. A sign-in whose answer names no second step also goes straight in.
 - **Not changed.** Enrolment, verify, recovery and reset still work when called. Nothing is audited per sign-in about the waiver.
 - Tests: `internal/identity` `TestAdminTOTPOff`, `internal/platform/config` `TestAdminTOTPOff`, admin `auth.test.tsx` (no second step goes straight to Pulse).
+
+**D-246 · The site's cream-and-navy look is tried as a standalone page first (founder, 26 Oct: "i want to test first … site / cream / navy / bag logo / keep all the things mentioned").**
+- **What.** A local-only trial of the founder's landing page (`design/trials/site-home/index.html`), rebuilt on our fonts (Anek, Figtree), tokens and Lucide icons. It keeps every section and its copy, and uses:
+  - a cream page background with the dot grid (D-101);
+  - navy blocks for the top bar, radar, savings calculator, store owners panel and footer;
+  - our bag logo with the `TodayZ` wordmark, not the "T" monogram.
+- **Scope.** Site only, and only as a trial. Tokens, `shared/ui`, the four apps and the live Astro site are unchanged, and no visual baselines move.
+- **Trial-only colours.** Cream `#faf9f5` / `#f3f0e9`, navy `#0b101d`, and mint and category colours used only on navy. They are CSS variables in the trial page. Text and buttons on cream stay on our brand green, because the source page's emerald fails contrast on cream.
+- **If the founder keeps it.** The colours become tokens in `design/source/tokens.json`, the page is ported into `site/` with message keys, and the copy conflicts listed in the trial README are settled first.
