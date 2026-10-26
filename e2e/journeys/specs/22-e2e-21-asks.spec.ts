@@ -12,11 +12,11 @@ interface Search {
   results: { store: { storeId: string; storeSlug: string }; items: { storeItemId: string; productId: string; name: string; confirmedAt: string | null }[] }[];
 }
 interface Ask {
-  ask: { id: string; progress: { asked: number; replied: number; bestPricePaise: number | null }; yesCount: number };
+  ask: { askId: string; progress: { asked: number; replied: number; bestPricePaise: number | null }; yesCount: number };
   replies: { askReplyId: string; storeId: string; storeItemId: string | null; pricePaise: number | null; bookable: boolean; orderId: string | null }[];
 }
 interface ShopAsks {
-  items: { id: string }[];
+  asks: { askId: string }[];
 }
 interface PricedLine {
   storeItemId: string;
@@ -41,12 +41,12 @@ test('E2E-21 stale result → ask nearby → shops reply → book AP’s Yes at 
   });
 
   const askId = await test.step('the customer asks nearby shops', async () => {
-    const a = await c.api.ok<Ask['ask']>('customer asks', 'POST', '/v1/me/asks', { productId: found?.productId, quantity: 1, needBy: 'today', lat: QA_POINT.lat, lng: QA_POINT.lng });
-    return a.id;
+    const a = await c.api.ok<Ask>('customer asks', 'POST', '/v1/me/asks', { productId: found?.productId, quantity: 1, needBy: 'today', lat: QA_POINT.lat, lng: QA_POINT.lng });
+    return a.ask.askId;
   });
 
   await test.step('the ask reached the shops in the band: Annapurna, Sri Lakshmi and Sri Lakshmi 2', async () => {
-    const mine = async (shop: Shop) => (await shop.api.ok<ShopAsks>('shop lists open asks', 'GET', `${shop.base}/asks`, undefined, { params: { status: 'open' } })).items.some((i) => i.id === askId);
+    const mine = async (shop: Shop) => (await shop.api.ok<ShopAsks>('shop lists open asks', 'GET', `${shop.base}/asks`, undefined, { params: { status: 'open' } })).asks.some((a) => a.askId === askId);
     expect(await mine(sl), 'Sri Lakshmi got it').toBe(true);
     expect(await mine(sl2), 'Sri Lakshmi 2 got it').toBe(true);
     expect(await mine(ap), 'Annapurna got it').toBe(true);

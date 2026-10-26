@@ -169,18 +169,26 @@ export class Principal implements Bearer {
       return this;
     }
     this.ctx = await newRequest();
+    await this.signIn();
+    return this;
+  }
+
+  /** OTP (and TOTP for an admin) on this person's own request context; keeps the session. */
+  private async signIn(): Promise<void> {
+    if (!this.ctx) throw new Error(`${this.person.key} has no request context`);
     const { requestId, since } = await sendOtp(this.ctx, this.person);
     const code = await latestOtp(this.ctx, this.person.national, since);
     const v = await this.ctx.post(`${URLS.api}/v1/auth/otp/verify`, { data: { requestId, code, app: this.person.app, deviceId: ulid() } });
     expect(v.status(), `OTP verify for ${this.person.key}`).toBe(200);
     const body = (await v.json()) as { accessToken: string; expiresAt: string; userId: string; isNewUser: boolean; nextStep?: string };
-    this.saved = { token: body.accessToken, expiresAt: Date.parse(body.expiresAt), userId: body.userId, isNewUser: body.isNewUser, cookies: [] };
+    // A sign-in again keeps the last authenticator step used: the server takes each step once.
+    const totpStep = this.saved?.totpStep;
+    this.saved = { token: body.accessToken, expiresAt: Date.parse(body.expiresAt), userId: body.userId, isNewUser: body.isNewUser, cookies: [], ...(totpStep === undefined ? {} : { totpStep }) };
     if (this.person.app === 'admin') {
       expect(body.nextStep, `${this.person.key} is an enrolled admin`).toBe('totp_verify');
       await this.totpVerify('login');
     }
     await this.persist();
-    return this;
   }
 
   /**
@@ -249,6 +257,14 @@ export class Principal implements Bearer {
       // the shared jar. Wait for it and retry once, as shared/auth's session does (graceWaitMs).
       await new Promise((done) => setTimeout(done, 400));
       r = await refresh();
+    }
+    if (r.status() === 401 && !this.lent && this.person.app === 'admin') {
+      // An admin's refresh token lives 12 h (01 §2); the clock journeys move the test clock past it.
+      // Sign in again, as the admin would.
+      await this.ctx?.dispose();
+      this.ctx = await newRequest();
+      await this.signIn();
+      return;
     }
     expect(r.status(), `session refresh for ${this.person.key}`).toBe(200);
     const b = (await r.json()) as { accessToken: string; expiresAt: string };

@@ -1,7 +1,7 @@
 import { request as playwrightRequest } from '@playwright/test';
 
 import { anon } from '../../fixtures/api';
-import { Customer, customerFirstRun, expect, openApp, placeAndCollect, Shop, test, URLS } from '../../fixtures/journey';
+import { Customer, customerFirstRun, expect, openAdmin, openApp, placeAndCollect, Shop, test, URLS } from '../../fixtures/journey';
 import { SL_ITEMS, STORES } from '../../fixtures/seed';
 
 // E2E-10: an admin hides a review → the shop's rating changes for customers. At the W2 gate the admin
@@ -86,7 +86,7 @@ test('E2E-10 through A-12: support hides and restores a review on the Reviews sc
   const review = await asha.api.ok<{ id: string }>('customer reviews the order', 'POST', '/v1/me/reviews', { orderId: order.id, stars: 2, text: 'E2E-10 A-12 journey review' });
   await expect.poll(async () => (await rating()).count).toBe(start.count + 1);
 
-  const app = await openApp(browser, support, URLS.admin);
+  const app = await openAdmin(browser, support);
   const { page } = app;
   try {
     await test.step('A-12 lists the review of the shop; support opens it', async () => {

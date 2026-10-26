@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { Customer, expect, Shop, test, waitForDraft, withFlags } from '../../fixtures/journey';
-import { QA_POINT, seedItemId, STORES } from '../../fixtures/seed';
+import { seedItemId, STORES } from '../../fixtures/seed';
 
 // E2E-11 (AI-R1, D-65): the owner speaks a stock update (mock speech and model) → a draft of lines →
 // edits the line that named no item to a stale item → confirms → the stock changes and the shop's
@@ -15,7 +15,7 @@ interface Draft {
   lines: { lineId: string; kind: string; storeItemId: string | null; matched: boolean; disabled: string | null }[];
 }
 interface Items {
-  items: { id: string; confirmedAt: string | null }[];
+  items: { storeItemId: string; confirmedAt: string | null }[];
 }
 
 const STALE = seedItemId(STORES.SL2, 12);
@@ -26,11 +26,12 @@ test('E2E-11 voice update: draft → edit → confirm → stock changes → cust
   const customer = new Customer(await who('asha'));
   const sl2 = new Shop(owner, STORES.SL2);
   const itemsPath = `/v1/discover/stores/${STORES.SL2.slug}/items`;
-  const params = { lat: QA_POINT.lat, lng: QA_POINT.lng };
+  // The whole catalogue in one page (Sri Lakshmi 2 lists 22 items).
+  const params = { limit: 50 };
 
   await test.step('the customer sees the item as not confirmed recently', async () => {
     const list = await customer.api.ok<Items>('customer reads the shop items', 'GET', itemsPath, undefined, { params });
-    const row = list.items.find((i) => i.id === STALE);
+    const row = list.items.find((i) => i.storeItemId === STALE);
     expect(row, 'the stale seed item is listed').toBeTruthy();
     expect(row?.confirmedAt, 'stock is stale').toBeNull();
   });
@@ -71,7 +72,7 @@ test('E2E-11 voice update: draft → edit → confirm → stock changes → cust
       .poll(
         async () => {
           const list = await customer.api.ok<Items>('customer reads the shop items', 'GET', itemsPath, undefined, { params });
-          return list.items.find((i) => i.id === STALE)?.confirmedAt ?? null;
+          return list.items.find((i) => i.storeItemId === STALE)?.confirmedAt ?? null;
         },
         { message: 'confirmedAt is set', timeout: 20_000 },
       )

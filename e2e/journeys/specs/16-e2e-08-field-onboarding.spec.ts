@@ -50,7 +50,8 @@ test('E2E-08 field agent onboards a shop → owner confirms → admin verifies �
       pincode: '560038',
       location: { lat: QA_POINT.lat + 0.0004, lng: QA_POINT.lng + 0.0004 },
       phone: '+919000000049',
-      hours: ALL_DAY,
+      // Weekly hours only: holidays are the owner's to add later (FieldStoreHours).
+      hours: { weekly: ALL_DAY.weekly },
     });
     return s.id;
   });
