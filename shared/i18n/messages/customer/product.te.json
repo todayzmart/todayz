@@ -108,5 +108,10 @@
     "message": "దుకాణానికి వెళ్లండి",
     "review": "reviewed",
     "enHash": "349df3f4"
+  },
+  "product.photoCredit": {
+    "message": "ఫోటో: {author}, {licence}",
+    "review": "reviewed",
+    "enHash": "8e875b52"
   }
 }

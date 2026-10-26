@@ -108,5 +108,10 @@
     "message": "கடைக்குச் செல்",
     "review": "reviewed",
     "enHash": "349df3f4"
+  },
+  "product.photoCredit": {
+    "message": "புகைப்படம்: {author}, {licence}",
+    "review": "reviewed",
+    "enHash": "8e875b52"
   }
 }

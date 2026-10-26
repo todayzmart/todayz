@@ -108,5 +108,10 @@
     "message": "ಅಂಗಡಿಗೆ ಹೋಗಿ",
     "review": "reviewed",
     "enHash": "349df3f4"
+  },
+  "product.photoCredit": {
+    "message": "ಫೋಟೋ: {author}, {licence}",
+    "review": "reviewed",
+    "enHash": "8e875b52"
   }
 }

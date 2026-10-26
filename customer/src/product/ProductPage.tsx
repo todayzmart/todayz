@@ -118,6 +118,26 @@ export function ProductPage({ slug, itemId }: { slug: string; itemId: string }) 
       <div className={styles.media} aria-hidden="true">
         {imageUrl(item.imageKey) ? <img className={styles.mediaImg} src={imageUrl(item.imageKey)} alt="" decoding="async" /> : initials(item.name)}
       </div>
+      {imageUrl(item.imageKey) && item.imageCredit && (
+        // An open-database photo is CC BY-SA: name the authors, link the source and the licence (D-252).
+        <p className={styles.credit}>
+          {intl.formatMessage(
+            { id: 'product.photoCredit' },
+            {
+              author: (
+                <a href={item.imageCredit.sourceUrl} target="_blank" rel="noopener noreferrer">
+                  {item.imageCredit.author}
+                </a>
+              ),
+              licence: (
+                <a href={item.imageCredit.licenceUrl} target="_blank" rel="noopener noreferrer license">
+                  {item.imageCredit.licence}
+                </a>
+              ),
+            },
+          )}
+        </p>
+      )}
 
       <div className={styles.titleBlock}>
         <h1 className={styles.name}>{item.name}</h1>

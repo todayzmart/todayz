@@ -108,5 +108,10 @@
     "message": "दुकान पर जाएँ",
     "review": "reviewed",
     "enHash": "349df3f4"
+  },
+  "product.photoCredit": {
+    "message": "फ़ोटो: {author}, {licence}",
+    "review": "reviewed",
+    "enHash": "8e875b52"
   }
 }

@@ -86,5 +86,9 @@
   "product.gone.action": {
     "defaultMessage": "Go to the shop",
     "description": "Action of the product-gone state"
+  },
+  "product.photoCredit": {
+    "defaultMessage": "Photo: {author}, {licence}",
+    "description": "Credit under a product photo from an open database; author and licence are links"
   }
 }

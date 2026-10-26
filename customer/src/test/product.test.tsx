@@ -50,6 +50,31 @@ describe('C-08 Product detail', () => {
     expect(screen.getByText('₹250')).toBeInTheDocument();
   });
 
+  it('credits an open-database photo with its authors, source and licence; a shop photo has no credit line (D-252)', async () => {
+    const credit = {
+      author: 'Open Food Facts contributors',
+      licence: 'CC BY-SA 3.0',
+      licenceUrl: 'https://creativecommons.org/licenses/by-sa/3.0/',
+      sourceUrl: 'https://world.openfoodfacts.org/product/8901262010016',
+    };
+    const { container, unmount } = renderDiscover(`/s/${SHOP_A}/i/${ID}`, {
+      ...routes(),
+      [`/v1/discover/stores/${SHOP_A}/items`]: () => pageOf([item({ imageKey: 'products/p1/off.jpg', imageCredit: credit })]),
+    });
+    await screen.findByRole('heading', { level: 1, name: 'Aashirvaad Atta' });
+    expect(container.querySelector('img')?.getAttribute('src')).toMatch(/\/products\/p1\/off\.jpg$/);
+    expect(screen.getByRole('link', { name: 'Open Food Facts contributors' })).toHaveAttribute('href', credit.sourceUrl);
+    expect(screen.getByRole('link', { name: 'CC BY-SA 3.0' })).toHaveAttribute('href', credit.licenceUrl);
+    unmount();
+
+    renderDiscover(`/s/${SHOP_A}/i/${ID}`, {
+      ...routes(),
+      [`/v1/discover/stores/${SHOP_A}/items`]: () => pageOf([item({ imageKey: 'products/p1/shop.jpg', imageCredit: null })]),
+    });
+    await screen.findByRole('heading', { level: 1, name: 'Aashirvaad Atta' });
+    expect(screen.queryByText(/^Photo:/)).not.toBeInTheDocument();
+  });
+
   it('says so when the item is not listed', async () => {
     renderDiscover(`/s/${SHOP_A}/i/${ID}`, {
       [`/v1/discover/stores/${SHOP_A}`]: () => page(),
