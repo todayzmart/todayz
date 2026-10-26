@@ -20,7 +20,8 @@ Branch `claude/product-images-8828ec`, 26 Oct 2026. Products now have pictures. 
 - **Stored per image.** `source`, `source_ref` (the barcode looked up), `source_url` (the image), `page_url` (the product page), `licence` ("CC BY-SA 3.0") and `attribution` ("Open Food Facts contributors", and so on).
 - **Shown.** The customer product page puts a credit line under an imported photo, linking to the source page and to the licence deed. Search items carry the same credit. The admin queue shows the licence, the credit and the source page. Shop and admin photos carry no credit.
 - **Copies.** Images are copied into our own private bucket, and approved ones into our public images bucket. We never hot-link the databases.
-- **Etiquette.** The User-Agent is `TodayZ-ImageImport/<version> (https://todayz.in)`. Requests are paced at 4.2 s per product lookup and 6.5 s per search, under the published limits (100 product reads and 10 searches a minute). The importer stops on a 429 rather than retrying.
+- **Etiquette.** The User-Agent is `TodayZ-ImageImport/<version> (https://todayz.in)`. Requests are paced at 4.2 s per product lookup and 6.5 s per search, under the published limits (100 product reads and 10 searches a minute). The importer stops on a 429 or a 503 rather than retrying: Open Food Facts answers 503 ("unusually high demand") when it sheds load.
+- **In-store codes.** A barcode in the GS1 restricted-circulation ranges (a shop's own 2xx code, company-internal 04, coupons) is never looked up: the same digits are another product elsewhere. On the local seed, `2900000010192` (Rajdhani atta 5 kg) is a French caramel on Open Food Facts.
 - **Not imported.** Medicines (category or parent `medicines`) stay on the placeholder and are listed in the report, because a stock photo can show the wrong strength or maker.
 - **Drafts.** Every import is `pending` until an admin approves it; bulk approval (up to 50 a call) is allowed. A product that already had an import is never tried again, so a rejected image does not come back.
 
@@ -65,7 +66,7 @@ Refresh with `TZ_QA_DIR=docs/qa/product-images pnpm exec playwright test e2e/ima
 
 ## What is left
 
-1. **The full import** over the catalogue waits for the founder's go, and the lead runs it: `todayz images import --limit 20000 --report docs/qa/product-images/full-run.md`. Then bulk-approve in A-08, checking every "Name and brand" match by eye.
+1. **The full import** was tried on the local stack on 26 Oct (`full-run.md`). Open Food Facts refused nearly every name search (503, high demand), and the two finds were wrong. Those finds led to three fixes: in-store barcodes are skipped, a lone unit word no longer matches, and a 503 stops the run. Rerun it when the search answers, then bulk-approve in A-08, checking every "Name and brand" match by eye. On the local database, reject the two wrong drafts (Rajdhani atta 5 kg, India Gate basmati) in A-08.
 2. **Another store's product.** A shop sends a photo only for a product it created, from the add flow or later from the item sheet. A product another store created gets its image from the import or an admin.
 3. **Admin uploads skip review.** An admin's own upload goes live when it is confirmed. This is intended, but there is no second pair of eyes.
 4. **Translations.** The business `stock.photo.*` keys in hi, kn, te and ta are machine-written and marked reviewed, with a line in `docs/qa/business-i18n/REVIEW.md`. The customer `product.photoCredit` key is translated the same way. Neither has had a native-speaker review.

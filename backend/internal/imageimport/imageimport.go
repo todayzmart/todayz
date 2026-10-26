@@ -43,7 +43,8 @@ const maxImageBytes = 5 << 20
 // pageSize is how many candidates one query reads.
 const pageSize = 100
 
-// ErrRateLimited stops a run when a database answers 429.
+// ErrRateLimited stops a run when a database answers 429, or 503, which is
+// how Open Food Facts sheds load ("unusually high demand").
 var ErrRateLimited = errors.New("imageimport: rate limited, run again later")
 
 // Store keeps the copied image in the private bucket (*storage.Client).
@@ -398,7 +399,7 @@ func (im *Importer) get(ctx context.Context, u, accept string) (*http.Response, 
 }
 
 func statusErr(res *http.Response) error {
-	if res.StatusCode == http.StatusTooManyRequests {
+	if res.StatusCode == http.StatusTooManyRequests || res.StatusCode == http.StatusServiceUnavailable {
 		return ErrRateLimited
 	}
 	return fmt.Errorf("imageimport: %s answered %s", res.Request.URL.Host, res.Status)

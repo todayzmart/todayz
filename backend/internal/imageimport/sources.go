@@ -46,7 +46,10 @@ func primary(category, parent string) string {
 	return "off"
 }
 
-// barcode reports whether s looks like an EAN/UPC (8 to 14 digits).
+// barcode reports whether s looks like an EAN/UPC (8 to 14 digits) that
+// names the same product everywhere. A shop's own in-store code (GS1
+// restricted circulation) is not looked up: the same digits are another
+// product in another shop or country.
 func barcode(s string) bool {
 	if len(s) < 8 || len(s) > 14 { //settings:ok EAN-8 to EAN-14 lengths
 		return false
@@ -56,7 +59,24 @@ func barcode(s string) bool {
 			return false
 		}
 	}
-	return true
+	return !restricted(s)
+}
+
+// restricted reports a GS1 restricted-circulation code: EAN-8 starting 0 or
+// 2; GTIN-13 (UPC-A padded) starting 02, 04, 2, 980-984 or 99.
+func restricted(s string) bool {
+	if len(s) == 8 { //settings:ok EAN-8 length
+		return s[0] == '0' || s[0] == '2'
+	}
+	g := strings.TrimLeft(s, "0")
+	g = strings.Repeat("0", max(0, 13-len(g))) + g //settings:ok GTIN-13 length
+	switch {
+	case g[0] == '2', strings.HasPrefix(g, "02"), strings.HasPrefix(g, "04"), strings.HasPrefix(g, "99"):
+		return true
+	case strings.HasPrefix(g, "98") && g[2] >= '0' && g[2] <= '4':
+		return true
+	}
+	return false
 }
 
 // tokens are the lower-case words of s, without pack sizes and filler.
@@ -76,18 +96,18 @@ func tokens(s string) []string {
 
 var filler = map[string]bool{"and": true, "the": true, "of": true, "with": true, "pack": true, "new": true}
 
-// unitWord is a pack size such as 500g, 1l, 200ml or a bare number.
+// unitWord is a pack size such as 500g, 1l, 200ml, a bare number, or the
+// unit of "1 kg" standing on its own.
 func unitWord(w string) bool {
 	i := 0
 	for i < len(w) && w[i] >= '0' && w[i] <= '9' {
 		i++
 	}
-	if i == 0 {
-		return false
-	}
 	switch w[i:] {
-	case "", "g", "gm", "gms", "kg", "ml", "l", "ltr", "pc", "pcs", "x":
+	case "g", "gm", "gms", "kg", "ml", "l", "ltr", "pc", "pcs", "x":
 		return true
+	case "":
+		return i > 0
 	}
 	return false
 }

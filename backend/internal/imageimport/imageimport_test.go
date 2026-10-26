@@ -45,7 +45,7 @@ type fakeFacts struct {
 	dbs     map[string]*httptest.Server
 	agents  map[string]bool
 	calls   []string
-	tooMany bool
+	tooMany int // the status a throttled database answers, 0 when it is not
 }
 
 var slugRe = regexp.MustCompile(`[^a-z0-9]+`)
@@ -62,8 +62,8 @@ func newFakeFacts(t *testing.T) *fakeFacts {
 		code := s.Code
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			f.record(r, code)
-			if f.tooMany {
-				w.WriteHeader(http.StatusTooManyRequests)
+			if f.tooMany != 0 {
+				w.WriteHeader(f.tooMany)
 				return
 			}
 			var file string
@@ -289,14 +289,19 @@ func TestImportDryRunAndLimit(t *testing.T) {
 }
 
 func TestImportStopsWhenRateLimited(t *testing.T) {
-	w := newWorld(t)
-	w.product("Amul Butter", "Amul", catDairy, "8901262010016")
-	w.product("Amul Cheese", "Amul", catDairy, "8901262010023")
-	w.facts.tooMany = true
-	rep, err := w.importer(w.facts.options(10)).Run(context.Background())
-	require.ErrorIs(t, err, ErrRateLimited)
-	require.Equal(t, 1, rep.Tried)
-	require.Len(t, w.facts.calls, 1, "no call after a 429")
+	// Open Food Facts sheds load with a 503 page ("unusually high demand"), so it stops a run like a 429.
+	for _, status := range []int{http.StatusTooManyRequests, http.StatusServiceUnavailable} {
+		t.Run(http.StatusText(status), func(t *testing.T) {
+			w := newWorld(t)
+			w.product("Amul Butter", "Amul", catDairy, "8901262010016")
+			w.product("Amul Cheese", "Amul", catDairy, "8901262010023")
+			w.facts.tooMany = status
+			rep, err := w.importer(w.facts.options(10)).Run(context.Background())
+			require.ErrorIs(t, err, ErrRateLimited)
+			require.Equal(t, 1, rep.Tried)
+			require.Len(t, w.facts.calls, 1, "no call after the first refusal")
+		})
+	}
 }
 
 func TestNewRefuses(t *testing.T) {
@@ -324,6 +329,14 @@ func TestMatching(t *testing.T) {
 	require.True(t, barcode("12345678"))
 	require.False(t, barcode("1234567"))
 	require.False(t, barcode("89012620100AB"))
+	require.False(t, barcode("2900000010192"), "a shop's in-store code is another product elsewhere")
+	require.False(t, barcode("212345678901"), "UPC-A random weight")
+	require.False(t, barcode("0412345678903"), "company internal")
+	require.False(t, barcode("9812345678901"), "coupon")
+	require.False(t, barcode("21234567"), "EAN-8 in-store")
+	require.True(t, barcode("0690225106542"))
+	require.True(t, barcode("012345678905"), "UPC-A")
+	require.True(t, barcode("9780140449136"), "a book")
 
 	require.Equal(t, []string{"amul", "butter"}, tokens("Amul Butter 500g (Pack of 2)"))
 	require.True(t, nameMatch("Parle-G Gold Biscuits 1kg", "Parle", "Parle-G Gold Biscuits", "Parle"))
@@ -331,4 +344,6 @@ func TestMatching(t *testing.T) {
 	require.False(t, nameMatch("Boost Health Drink 500g", "Boost", "Boost Energy Bar", "Boost"))
 	require.False(t, nameMatch("Amul", "Amul", "Amul Butter", "Amul"), "nothing beyond the brand to match")
 	require.False(t, nameMatch("Butter", "", "Butter", "Amul"), "no brand")
+	require.Equal(t, []string{"india", "gate", "basmati", "rice"}, tokens("India Gate Basmati rice 1 kg"))
+	require.False(t, nameMatch("India Gate Basmati rice 1 kg", "India Gate", "Brown Rice India gate 1 kg", "India Gate"), "a unit is not a matching word")
 }
