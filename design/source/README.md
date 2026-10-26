@@ -55,6 +55,11 @@ The customer app sets `data-skin="bright"` on its root, and the skin in `compone
 - **Category tiles** are 64px circles with a white ring and a soft shadow.
 - **Offer tags** (cashback) are `info` text on `info-soft`.
 - **Home's shop cards** use the feature layout (`StoreCard layout="feature"`, `tz-scard-feature`): the shop's photo across the top, then the name in Anek 800. Without a photo, the initials sit on a shorter band in the category tint. Search and the map sheet keep the row layout.
+- **Feature card overlays:** an open or closed tag on the photo (`photoTag`), the cashback in white over the `scrim-photo` gradient (`highlight`), a green rating badge (`rating`) and a dashed footer that says what the shop gives back (`footer`).
+- **Home's header** shows the locality (from the reverse lookup) with the area line under it, a `brand-soft` credits pill and a round `tint-sky` avatar. The search bar sticks under it.
+- **Home's offers row** is a swipe row of photo banners with dots. The "how it works" card is `brand`; shop offers and the credits and baskets cards cycle `promo-plum`, `promo-blue` and `promo-rose`, with white text and a white pill button in the banner's colour. The photo fades in from the left with a mask.
+- **Home's categories** are a 3-column grid of round photos (`CategoryRow layout="grid"`, `imageUrl`).
+- **Stock photos** for categories and the static banners are CC0, bundled as small WebP files in `customer/src/home/photos/` (sources in `SOURCES.md`). A shop's own photo or banner image always wins over a stock photo.
 
 ## Typography
 

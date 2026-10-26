@@ -1,20 +1,25 @@
-// C-03 Home: where you are, what is around you (counts from the discover summary), the radius, categories
-// and the shops near you. The full-screen map (C-04) and banners (W2-07) are later.
+// C-03 Home (D-249): where you are, the wallet, search with the mic, filters, offers near you, the
+// categories with photos, the counts, the map and the shops near you as photo cards.
 import { listCategories } from '@todayz/api-client/gen/catalogue/catalogue';
 import { getDiscoverSummary, listDiscoverStores } from '@todayz/api-client/gen/discover/discover';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
-import { CategoryRow, EmptyState, RadiusChips, SearchField, Skeleton, StoreCard, Button } from '@todayz/ui';
-import { ChevronRight, MapPin, ShoppingBasket, Store as StoreIcon } from 'lucide-react';
+import { Button, CategoryRow, Chip, EmptyState, SearchField, Skeleton, StoreCard } from '@todayz/ui';
+import { BadgePercent, Bike, ChevronDown, Clock, MapPin, ShoppingBag, Store as StoreIcon } from 'lucide-react';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { usePlace } from '../app/place';
 import { LimitBanner } from '../orders/LimitBanner';
+import { VoiceSearchSlot } from '../search/slots';
 import { Icon } from '../shell/Icon';
 import { CartBarLink } from '../store/CartBarLink';
+import { useVoiceOutcome } from '../voice-search/session';
 import { categoryIcon } from './categories';
 import { useCoords, type Coords } from './coords';
-import { asTint, radiusM, storeHref, useStoreCardProps } from './present';
+import { useFeatureCardProps } from './feature';
+import { Header } from './Header';
+import { Offers } from './Offers';
+import { categoryPhoto } from './photos';
+import { asTint, radiusM, storeHref } from './present';
 import { RouterLink } from './RouterLink';
 import { RADIUS_OPTIONS_KM, setRadiusKm, useRadiusKm } from './radius';
 import styles from './home.module.css';
@@ -39,35 +44,14 @@ function useNearView<T extends Element>(): [React.RefObject<T | null>, boolean] 
 export function Home({ category }: { category?: string | undefined }) {
   const intl = useIntl();
   const router = useRouter();
-  const place = usePlace();
   const coords = useCoords();
   const [q, setQ] = useState('');
-
-  const where =
-    place?.kind === 'pin'
-      ? intl.formatMessage({ id: 'location.current' }, { place: place.pin })
-      : place?.kind === 'gps'
-        ? intl.formatMessage({ id: 'location.current' }, { place: intl.formatMessage({ id: 'location.gps.label' }).toLowerCase() })
-        : intl.formatMessage({ id: 'location.set' });
+  const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
+  const voice = useVoiceOutcome();
 
   return (
     <>
-      <header className={styles.hero}>
-        <div className={styles.brandRow}>
-          <span className="tz-side-brand">
-            <img className={styles.mark} src="/icons/mark-96.png" alt="" width={28} height={28} />
-            <span>
-              Today<b>Z</b>
-            </span>
-          </span>
-          <Link to="/location" className={`tz-btn tz-btn-soft tz-btn-sm ${styles.placeChip}`} title={where}>
-            <Icon icon={MapPin} />
-            <span className={styles.placeText}>{where}</span>
-          </Link>
-        </div>
-        <h1 className={styles.heroTitle}>{intl.formatMessage({ id: 'shell.hero.title' })}</h1>
-        <p className={styles.heroSub}>{intl.formatMessage({ id: 'shell.hero.sub' })}</p>
-      </header>
+      <Header coords={coords} />
       {/* Sticky under the header, as the big delivery apps do: search stays one tap away while the list scrolls. */}
       <div className={styles.searchBar}>
         <form
@@ -75,7 +59,12 @@ export function Home({ category }: { category?: string | undefined }) {
           onSubmit={(e) => {
             e.preventDefault();
             const text = q.trim();
-            router.history.push(text ? `/search?q=${encodeURIComponent(text)}` : '/search');
+            const source = text ? voice.searched(text) : undefined;
+            const params = new URLSearchParams();
+            if (text) params.set('q', text);
+            if (source) params.set('source', source);
+            const query = params.toString();
+            router.history.push(query ? `/search?${query}` : '/search');
           }}
         >
           <SearchField
@@ -84,21 +73,25 @@ export function Home({ category }: { category?: string | undefined }) {
             value={q}
             onChange={setQ}
             enterKeyHint="search"
+            trailing={
+              <VoiceSearchSlot
+                onNotice={setVoiceNotice}
+                onTranscript={(heard) => {
+                  voice.heard(heard);
+                  setQ(heard.transcript);
+                }}
+              />
+            }
           />
+          {voiceNotice && (
+            <p className={styles.voiceNotice} role="status">
+              {voiceNotice}
+            </p>
+          )}
         </form>
       </div>
       <div className={styles.body}>
         <LimitBanner />
-        <Link to="/baskets" className={`tz-list tz-list-row ${styles.basketEntry}`}>
-          <span className="tz-list-icon" data-tint="peach">
-            <Icon icon={ShoppingBasket} />
-          </span>
-          <span className="tz-list-text">
-            <b>{intl.formatMessage({ id: 'basket.entry' })}</b>
-            <small>{intl.formatMessage({ id: 'basket.entry.body' })}</small>
-          </span>
-          <Icon icon={ChevronRight} />
-        </Link>
         {coords.status === 'none' && (
           <EmptyState
             icon={MapPin}
@@ -127,12 +120,21 @@ export function Home({ category }: { category?: string | undefined }) {
   );
 }
 
+type Filter = 'openNow' | 'pickup' | 'delivery' | 'hasOffer';
+const FILTERS: readonly { key: Filter; label: string; icon: typeof Clock }[] = [
+  { key: 'openNow', label: 'home.filter.openNow', icon: Clock },
+  { key: 'pickup', label: 'home.filter.pickup', icon: ShoppingBag },
+  { key: 'delivery', label: 'home.filter.delivery', icon: Bike },
+  { key: 'hasOffer', label: 'home.filter.offers', icon: BadgePercent },
+];
+
 function Nearby({ coords, category }: { coords: Coords; category: string | undefined }) {
   const intl = useIntl();
   const router = useRouter();
   const [mapRef, mapNear] = useNearView<HTMLDivElement>();
   const km = useRadiusKm();
-  const cardProps = useStoreCardProps();
+  const cardProps = useFeatureCardProps();
+  const [filters, setFilters] = useState<ReadonlySet<Filter>>(new Set());
   const { lat, lng } = coords;
 
   const summary = useQuery({
@@ -145,7 +147,7 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
     queryFn: () => listCategories(),
   });
   const stores = useInfiniteQuery({
-    queryKey: ['discover', 'stores', lat, lng, km, category ?? null],
+    queryKey: ['discover', 'stores', lat, lng, km, category ?? null, [...filters].sort()],
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
     queryFn: ({ pageParam }: { pageParam: string | undefined }) =>
@@ -154,6 +156,7 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
         lng,
         radius: radiusM(km),
         ...(category ? { category } : {}),
+        ...Object.fromEntries([...filters].map((f) => [f, true])),
         limit: 20,
         ...(pageParam ? { cursor: pageParam } : {}),
       }),
@@ -169,41 +172,54 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
 
   return (
     <>
-      <dl className={styles.stats} aria-busy={summary.isPending}>
-        <div className={styles.stat}>
-          <dt className={styles.statLabel}>{intl.formatMessage({ id: 'home.stats.shops' })}</dt>
-          <dd className={styles.statValue}>{summary.data ? num(summary.data.storesNearby) : <Skeleton width="2ch" />}</dd>
-        </div>
-        <div className={styles.stat}>
-          <dt className={styles.statLabel}>{intl.formatMessage({ id: 'home.stats.open' })}</dt>
-          <dd className={styles.statValue}>{summary.data ? num(summary.data.openNow) : <Skeleton width="2ch" />}</dd>
-        </div>
-        <div className={styles.stat}>
-          <dt className={styles.statLabel}>{intl.formatMessage({ id: 'home.stats.products' })}</dt>
-          <dd className={styles.statValue}>{summary.data ? num(summary.data.productsInRadius) : <Skeleton width="3ch" />}</dd>
-        </div>
-      </dl>
+      <div className={styles.filters} role="group" aria-label={intl.formatMessage({ id: 'home.filters.label' })}>
+        <label className={`tz-chip ${styles.radius}`}>
+          <span className="tz-ui-sr-only">{intl.formatMessage({ id: 'home.radius.label' })}</span>
+          <select value={km} onChange={(e) => setRadiusKm(Number(e.target.value))}>
+            {RADIUS_OPTIONS_KM.map((k) => (
+              <option key={k} value={k}>
+                {intl.formatMessage({ id: 'home.radius.within' }, { km: String(k) })}
+              </option>
+            ))}
+          </select>
+          <Icon icon={ChevronDown} />
+        </label>
+        {FILTERS.map((f) => (
+          <Chip
+            key={f.key}
+            icon={f.icon}
+            pressed={filters.has(f.key)}
+            onPressedChange={(on) =>
+              setFilters((prev) => {
+                const next = new Set(prev);
+                if (on) next.add(f.key);
+                else next.delete(f.key);
+                return next;
+              })
+            }
+          >
+            {intl.formatMessage({ id: f.label })}
+          </Chip>
+        ))}
+      </div>
 
-      <RadiusChips
-        label={intl.formatMessage({ id: 'home.radius.label' })}
-        options={RADIUS_OPTIONS_KM.map((k) => ({ km: k, label: intl.formatMessage({ id: 'home.radius.km' }, { km: String(k) }) }))}
-        value={km}
-        onChange={setRadiusKm}
-      />
+      <Offers coords={coords} km={km} />
 
       {categories.data && categories.data.items.length > 0 && (
         <section className={styles.section} aria-labelledby="home-cats">
           <h2 id="home-cats" className="tz-label-rule">
-            {intl.formatMessage({ id: 'home.categories.label' })}
+            {intl.formatMessage({ id: 'home.categories.title' })}
           </h2>
           <CategoryRow
             label={intl.formatMessage({ id: 'home.categories.label' })}
+            layout="grid"
             LinkComponent={RouterLink}
             categories={categories.data.items.map((c) => ({
               key: c.slug,
               label: c.name,
               icon: categoryIcon(c.icon),
               tint: asTint(c.tint) ?? 'green',
+              imageUrl: categoryPhoto(c.slug),
               href: category === c.slug ? '/' : `/?category=${encodeURIComponent(c.slug)}`,
             }))}
           />
@@ -222,6 +238,21 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
           )}
         </section>
       )}
+
+      <dl className={styles.stats} aria-busy={summary.isPending}>
+        <div className={styles.stat}>
+          <dt className={styles.statLabel}>{intl.formatMessage({ id: 'home.stats.shops' })}</dt>
+          <dd className={styles.statValue}>{summary.data ? num(summary.data.storesNearby) : <Skeleton width="2ch" />}</dd>
+        </div>
+        <div className={styles.stat}>
+          <dt className={styles.statLabel}>{intl.formatMessage({ id: 'home.stats.open' })}</dt>
+          <dd className={styles.statValue}>{summary.data ? num(summary.data.openNow) : <Skeleton width="2ch" />}</dd>
+        </div>
+        <div className={styles.stat}>
+          <dt className={styles.statLabel}>{intl.formatMessage({ id: 'home.stats.products' })}</dt>
+          <dd className={styles.statValue}>{summary.data ? num(summary.data.productsInRadius) : <Skeleton width="3ch" />}</dd>
+        </div>
+      </dl>
 
       <section className={styles.section} aria-label={intl.formatMessage({ id: 'home.map.label' })}>
         <div ref={mapRef}>
@@ -250,13 +281,12 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
         <div aria-busy={stores.isPending} className={styles.list}>
           {stores.isPending && (
             <>
-              <Skeleton shape="block" height="76px" />
-              <Skeleton shape="block" height="76px" />
-              <Skeleton shape="block" height="76px" />
+              <Skeleton shape="block" height="240px" />
+              <Skeleton shape="block" height="240px" />
             </>
           )}
           {items.map((s) => (
-            <StoreCard key={s.storeSlug} layout="feature" {...cardProps(s)} />
+            <StoreCard key={s.storeSlug} {...cardProps(s)} />
           ))}
         </div>
         {stores.isError && (
@@ -265,7 +295,15 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
             action={<Button onClick={() => void stores.refetch()}>{intl.formatMessage({ id: 'home.retry' })}</Button>}
           />
         )}
-        {stores.isSuccess && items.length === 0 && (
+        {stores.isSuccess && items.length === 0 && filters.size > 0 && (
+          <EmptyState
+            icon={StoreIcon}
+            title={intl.formatMessage({ id: 'home.empty.filtered.title' })}
+            description={intl.formatMessage({ id: 'home.empty.filtered.body' })}
+            action={<Button onClick={() => setFilters(new Set())}>{intl.formatMessage({ id: 'home.filters.clear' })}</Button>}
+          />
+        )}
+        {stores.isSuccess && items.length === 0 && filters.size === 0 && (
           <EmptyState
             icon={StoreIcon}
             title={intl.formatMessage({ id: 'home.empty.title' })}

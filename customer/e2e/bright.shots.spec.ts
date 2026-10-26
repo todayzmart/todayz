@@ -71,6 +71,20 @@ const DISCOVER: Record<string, unknown> = {
     ],
     nextCursor: null,
   },
+  '/v1/discover/places/reverse': { name: 'Indiranagar', label: 'Indiranagar, Bengaluru 560038', pincode: '560038', city: 'Bengaluru' },
+  '/v1/discover/offers': {
+    items: [
+      {
+        kind: 'banner', storeId: '01KE0S1W6W8ZV7T1C3A6MSSRI-', storeSlug: 'sri-lakshmi-stores', storeName: 'Sri Lakshmi Provision Stores',
+        locality: 'Indiranagar', tint: 'green', distanceM: 450, offer: null,
+        banner: { headline: 'Fresh fruit, 10% off till 8 pm', imageKey: 'cat-fruit.jpg', template: null },
+      },
+      {
+        kind: 'offer', storeId: '01KE0S1W6W8ZV7T1C3A6MSAPOL', storeSlug: 'apollo-pharmacy', storeName: 'Jeevan Medicals',
+        locality: 'HAL 2nd Stage', tint: 'rose', distanceM: 800, offer: { title: 'Flat ₹50 off on ₹499' }, banner: null,
+      },
+    ],
+  },
 };
 
 /** With TZ_AXE (a path to axe.min.js), the screen must have no WCAG 2.2 AA violations. */
@@ -102,6 +116,7 @@ async function signedIn(page: Page) {
       return ok(route, { accessToken: 'tok', tokenType: 'Bearer', expiresAt: new Date(Date.now() + 15 * 60_000).toISOString(), userId: USER });
     if (p === '/v1/me') return ok(route, { id: USER, phoneMasked: '+91 ••••• •0021', name: 'Asha', preferredLang: 'en' }, { etag: '"1"' });
     if (p === '/v1/me/addresses') return ok(route, { addresses });
+    if (p === '/v1/me/wallet') return ok(route, { availableCredits: 240 });
     if (p in DISCOVER) return ok(route, DISCOVER[p]);
     if (p === '/v1/me/stream') return route.fulfill({ status: 200, contentType: 'text/event-stream', headers: cors(route), body: '' });
     return route.fulfill({ status: 404, headers: cors(route), body: '' });
@@ -127,7 +142,8 @@ test('home', async ({ page }) => {
   await page.setViewportSize(PHONE);
   await signedIn(page);
   await page.goto('/');
-  await page.getByText('Annapurna Kirana').waitFor();
+  await page.locator('.tz-scard-name', { hasText: 'Annapurna Kirana' }).waitFor();
+  await page.getByText('Fresh fruit, 10% off till 8 pm').waitFor();
   await page.evaluate(() => document.fonts.ready);
   await page.waitForFunction(() => [...document.images].every((i) => i.complete));
   await axe(page);

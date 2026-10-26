@@ -56,7 +56,31 @@ describe('StoreCard', () => {
     expect(container.querySelector('.tz-scard-photo img')).toHaveAttribute('src', 'https://img.example/stores/s/1.jpg');
     expect(container.querySelector('.tz-ui-chevron')).toBeNull();
     fireEvent.error(container.querySelector('img') as HTMLImageElement);
-    expect(screen.getByText('SS')).toHaveClass('tz-scard-photo');
-    expect(screen.getByText('SS')).toHaveAttribute('data-tint', 'green');
+    expect(screen.getByText('SS')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByText('SS').parentElement).toHaveClass('tz-scard-photo');
+    expect(screen.getByText('SS').parentElement).toHaveAttribute('data-tint', 'green');
+  });
+
+  it('feature layout carries the photo tag, the highlight, the rating and the footer, name first', () => {
+    const { container } = render(
+      <StoreCard
+        layout="feature"
+        name="Sai Store"
+        initials="SS"
+        meta={['0.1 km']}
+        href="/s/sai"
+        photoTag={{ label: 'Open now', kind: 'open' }}
+        highlight={{ title: '5% cashback', sub: 'as credits' }}
+        rating={{ value: '4.6', label: 'Rated 4.6 of 5' }}
+        footer={{ label: '5% back as credits on every order', kind: 'offer' }}
+      />,
+    );
+    const link = screen.getByRole('link');
+    expect(link.textContent?.indexOf('Sai Store')).toBe(0);
+    expect(screen.getByText('Open now')).toHaveAttribute('data-kind', 'open');
+    expect(container.querySelector('.tz-scard-hl')).toHaveTextContent('5% cashbackas credits');
+    expect(screen.getByText('Rated 4.6 of 5')).toHaveClass('tz-ui-sr-only');
+    expect(screen.getByText('4.6')).toHaveAttribute('aria-hidden', 'true');
+    expect(container.querySelector('.tz-scard-foot')).toHaveAttribute('data-kind', 'offer');
   });
 });

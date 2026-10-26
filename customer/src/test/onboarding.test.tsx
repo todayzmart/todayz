@@ -30,7 +30,7 @@ describe('C-02 location', () => {
     renderAt('/location');
     fireEvent.change(await screen.findByLabelText('PIN code'), { target: { value: '560001' } });
     fireEvent.click(screen.getByRole('button', { name: 'Use this PIN code' }));
-    expect(await screen.findByRole('link', { name: /Shopping near 560001/ })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: /Your location: 560001/ })).toBeInTheDocument();
   });
 
   it('refuses a PIN code that is not 6 digits', async () => {
