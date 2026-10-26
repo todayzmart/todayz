@@ -660,6 +660,7 @@ Every numeric key has a min and a max (the Rule column, or after the default). A
 | `site_marquee_window_days` | days | 7 | §11.3: search window for the site strip. Min 1, max 30. |
 | `site_marquee_max_items` | count | 20 | §11.3: products proposed per city. Min 5, max 50. |
 | `refine_ai_min_words` | count | 4 | §11.1: words a query with no chip needs before search sets `refineHint` and the app may call search assist (AI-C2). Min 2, max 20. |
+| `substitute_pack_tolerance_pct` | count | 25 | §11.1, [11-ai-features.md](11-ai-features.md) AI-C3 (D-235): how far a same-shop substitute's pack may be from the out-of-stock item's, in percent either way, in base units. Min 5, max 100. |
 | `share_card_create_per_hour` | count | 30 | §11.1: share cards one IP or anonymous device can create per hour (`429`); re-creating an existing card does not count. Min 5, max 300. |
 
 **Baskets** (§11.4, D-110)

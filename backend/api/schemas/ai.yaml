@@ -415,7 +415,7 @@ BannerCopyConfirmResult:
       oneOf:
         - {$ref: ./ai.yaml#/BannerCopyValue}
         - {type: "null"}
-# W3-12 consumer AI (AI-C1, C2, C5; D-101, D-110, D-233).
+# W3-12 consumer AI (AI-C1, C2, C5; D-101, D-110, D-231).
 AiCustomerFeatures:
   type: object
   additionalProperties: false

@@ -294,7 +294,7 @@ LIMIT @lim;
 SELECT id, name FROM products WHERE id = ANY(@ids::uuid[]);
 
 ------------------------------------------------------------------------------
--- Substitutes (W3-12, AI-C3 rule-based, D-233)
+-- Substitutes (W3-12, AI-C3 rule-based, D-235)
 ------------------------------------------------------------------------------
 
 -- name: SubstituteSource :one

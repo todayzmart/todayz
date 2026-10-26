@@ -5,7 +5,7 @@
 # example per success response and the default problem response.
 #
 # W1-06. Coordinates come in as query parameters and are never stored or
-# logged. The refine-chip parser is W3-12's (D-101, D-233). Not built yet: clusters by zoom (the app clusters the pins), and
+# logged. The refine-chip parser is W3-12's (D-101, D-231). Not built yet: clusters by zoom (the app clusters the pins), and
 # the standee scan on the shop page (`?s=`, W2-10).
 /v1/discover/places/search:
   get:
@@ -370,9 +370,9 @@
     tags:
     - discover
     summary: Alternatives to a shop's item
-    description: 'AI-C3 substitutes, rule-based (11 §AI-C3, D-233; no model, no flag): what to buy
+    description: 'AI-C3 substitutes, rule-based (11 §AI-C3, D-235; no model, no flag): what to buy
       instead of `itemId` when it is out of stock. `sameShop`: in-stock items of this shop in the same
-      category, of a pack size within 25% of it in the same kind of unit, same brand first, then the
+      category, of a pack size within `substitute_pack_tolerance_pct` (default 25%) of it in the same kind of unit, same brand first, then the
       closest pack, then price. `nearby`: the same master product in stock at other live shops of
       verified businesses inside the radius, nearest first. A store that is not live, or an item it
       does not list, is 404 `not_found`. Read-only and not logged as a search.'

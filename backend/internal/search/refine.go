@@ -27,7 +27,7 @@ type ChipReader interface {
 // req.Q as the words that were not chips. A chip whose filter the request already sets
 // explicitly is not applied and not shown. Reading never fails a search: on an error the
 // query is searched as typed. hint is refineHint: parsing was on, no chip was read and the
-// query has at least refine_ai_min_words words (the conservative half of 01 §11.1, D-233).
+// query has at least refine_ai_min_words words (the conservative half of 01 §11.1, D-231).
 func (s *Service) refine(ctx context.Context, req *searchReq) (chips []discoverapi.DiscoverChip, hint bool, err error) {
 	chips = []discoverapi.DiscoverChip{}
 	if !req.Parse {

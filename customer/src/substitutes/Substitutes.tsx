@@ -1,4 +1,4 @@
-// AI-C3 substitutes (W3-12, D-233): on an out-of-stock item in C-07, C-08 and C-09, "See similar items"
+// AI-C3 substitutes (W3-12, D-235): on an out-of-stock item in C-07, C-08 and C-09, "See similar items"
 // opens a sheet with similar in-stock items of the same shop and the same product at shops nearby. The
 // list is rule-based (no model); nothing changes in the cart until the customer opens an item and adds it.
 import { listDiscoverSubstitutes } from '@todayz/api-client/gen/discover/discover';

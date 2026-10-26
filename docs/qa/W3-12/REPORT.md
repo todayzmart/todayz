@@ -13,7 +13,8 @@ Every AI answer is a draft the customer confirms. Nothing joins a basket, a cart
 
 - **Branch:** `claude/agitated-goodall-8937ce` on base `5beb1ed6`. Current `main` is merged in (see the end). Not pushed.
 - **Local only:** testcontainers or the shared test Postgres, the recorded model and speech replies, and Playwright against a faked API. Nothing called a model, a speech provider or a cloud account.
-- **Decision:** D-233 (number may move at merge; see Questions).
+- **Decisions:** D-231 (the features call, refine chips in search, voice search) and D-235 (rule-based substitutes and `substitute_pack_tolerance_pct`), numbers given by the lead.
+- **Migration:** `31201_w3-12_substitutes.sql` adds `substitute_pack_tolerance_pct` (count, default 25, min 5, max 100; 01 §17, admin group "asks" beside `refine_ai_min_words`). The min and max are my choice.
 - **Rules:** 11 §AI-C1, C2, C3, C5; 01 §11, §11.1, §17.
 - **Scenarios:** SC-AI-41…55.
 - **Tests named in the brief:** ASK-16, ASK-26, ASK-27, BSK-15.
@@ -33,7 +34,7 @@ Every AI answer is a draft the customer confirms. Nothing joins a basket, a cart
 | `POST /v1/me/ai/voice-search` | Voice search: multipart audio and an optional language |
 | `POST /v1/me/ai/search-assist` | Search assist |
 
-`backend/api/paths/discover.yaml` adds `GET /v1/discover/stores/{slug}/substitutes?itemId&lat&lng&radius` (public, like the rest of discover). It returns `DiscoverSubstitutes {sameShop ≤ 4, nearby ≤ 3, serverNow}`.
+`backend/api/paths/discover.yaml` adds `GET /v1/discover/stores/{slug}/substitutes?itemId&lat&lng&radius` (public, like the rest of discover). It returns `DiscoverSubstitutes {sameShop ≤ 3, nearby ≤ 3, serverNow}`, at most 6 rows.
 
 ### Backend
 
@@ -71,11 +72,12 @@ Every AI answer is a draft the customer confirms. Nothing joins a basket, a cart
 
 **`internal/search`**
 
-- `refine.go`: search reads the chips from `q` unless `parse=false`, and answers them with the remaining words.
+- **Picked up W1-06's TODO(lead)** (the lead's answer of 26 Oct; W1-06 is closed): `refine.go` makes search read the chips from `q` unless `parse=false`, and answers them with the remaining words. The change to `search_run.go` is the `Parse` field only.
+- The parser itself is `internal/ai/querynorm/chips.go` (deterministic; en, hi, kn, te, ta and their digits), not `internal/search/chips.go` as the answer named. Voice search and search assist use the same parser, and domain packages do not import each other's internals, so search reads it through the `search.ChipReader` interface that `cmd/todayz` wires. `refine_ai_min_words` is read through `settings.Cache`.
 - `refineHint` is true when parsing was on, no chip was read and the query has at least `refine_ai_min_words` words. This is the parser half of 01 §11.1; see Questions.
-- `substitutes.go` holds the AI-C3 rules (D-233). There is no model and no flag.
-  - **Same shop:** in-stock items of other products in the item's category, with a pack within ±25% in base units (g, ml, pc, pack). Same brand first, then nearest pack, then price. At most 4.
-  - **Nearby:** the same product in stock at other shops in the radius, nearest first, one item (the cheapest) per shop. At most 3.
+- `substitutes.go` holds the AI-C3 rules (D-235). There is no model and no flag.
+  - **Same shop:** in-stock items of other products in the item's category, with a pack within `substitute_pack_tolerance_pct` (default 25%) either way, in base units (g, ml, pc, pack). Same brand first, then nearest pack, then price. At most 3.
+  - **Nearby:** the same product in stock at other live shops of verified businesses inside the search radius (the contract's `radius`, default 2 km, as in search), nearest first, one item (the cheapest) per shop. At most 3.
   - Not logged.
 - New queries are in `db/queries/search/search.sql`.
 
@@ -142,9 +144,10 @@ All Go tests ran with `-p 2` against the shared test Postgres.
 | `TestAIConsumerSearchAssistFailuresLeaveSearchAlone` | ASK-27: a timeout, a provider error or invalid output is 204 |
 | `TestAIConsumerSearchReadsRefineChips` | Search answers chips and `refineHint` |
 | `TestAIConsumerFlags` | Each feature off is the common 404, and `/v1/me/ai/features` agrees |
-| `querynorm` `TestParse` | The chip parser in the five languages |
+| `querynorm` `TestParse` | The chip parser, one table per language (en, hi with Hinglish, kn, te, ta), with each script's digits |
 | `search` `TestRefineChips`, `TestRefineWithoutReader` | Search with and without the chip reader |
-| `search` `TestSubstitutes` | Pack tolerance, same brand first, out-of-stock and other-shop exclusions, nearby nearest first, limits |
+| `search` `TestSubstitutes` | Pack tolerance (25 and, changed, 5), same brand first, the 3-row cap, out-of-stock and other-shop exclusions, nearby nearest first |
+| `platform/settings` `TestSettingsMatchProductRules`, `TestKeysMatchMigration` | The new key is in 01 §17, the migration and `keys.go` |
 
 Static checks:
 
@@ -152,6 +155,7 @@ Static checks:
 - The settings lint is clean (the list limit carries `//settings:ok`).
 - golangci-lint is clean on the changed packages.
 - `make gen`, `scripts/no-egress.sh make gen check-contract` and `scripts/no-egress.sh make contract-smoke` are green.
+- Rerun on 26 Oct after the lead's answers: the Go tests for search, ai, voice, platform/settings, admin, migrate, db and cmd/todayz pass, except one run of W2-04's `TestPOSOfflineOfferMatchesEngine` (`pos_round2_http_test.go:328`, entry 4 "failed" instead of "linked"). It passes 3/3 alone; it signs TOTP codes at minute offsets, so it looks like a time-window flake, not W3-12. gosec, settingslint, golangci, check-contract, contract-smoke, the customer checks and the mocked Playwright specs (`ai`, `smoke`: 11/11) pass again.
 
 ### Recorded evals
 
@@ -206,15 +210,23 @@ All at 360 px, in this folder:
 
 ## Questions for the lead
 
-1. **D-233 number.** The brief said to ask, and that the next free number was D-231. I used D-233 because D-230 and D-232 are used on `main`, and noted that it may move at merge. Please confirm or renumber.
-2. **refineHint.** It is set only by the parser half of 01 §11.1: no chip was read in a query of at least `refine_ai_min_words` words. The other half, "the synonym table had no match", is not wired: search does not yet report whether its synonym lookup missed. Is it fine to wire that half later?
-3. **Substitutes path.** It takes the item as a query parameter (`?itemId=`) under `/stores/{slug}`, because of the ULID path-segment rule. Fine?
-4. **Substitutes numbers.** The ±25% pack tolerance and the 4 and 3 limits are constants (the contract's `maxItems`), not `platform_settings`, because 01 does not mark them configurable (`substitutes.go:22`, TODO(lead)). Should the tolerance be a setting?
-5. **Files outside my paths.** I touched these files outside W3-12's paths. Please review them at merge:
+Answered by the lead on 26 Oct and done:
+
+- **Decision numbers:** D-231 and D-235 (was D-233, which is W3-13's).
+- **Refine chips:** picked up W1-06's TODO(lead), with parser tests in one table per language (see Backend for why the parser sits in `querynorm`).
+- **Substitutes:** the placement and the query-parameter path are approved. The pack tolerance is now the `substitute_pack_tolerance_pct` setting, the rows are at most 6 (3 and 3), and the nearby half uses the search radius and only live stores of verified businesses.
+
+Still open:
+
+1. **refineHint.** It is set only by the parser half of 01 §11.1: no chip was read in a query of at least `refine_ai_min_words` words. The other half, "the synonym table had no match", is not wired: search does not yet report whether its synonym lookup missed. Is it fine to wire that half later?
+2. **Setting bounds.** `substitute_pack_tolerance_pct` min 5 and max 100 are my choice; the admin group is "asks", beside `refine_ai_min_words` in the same 01 §17 table.
+3. **Files outside my paths.** I touched these files outside W3-12's paths. Please review them at merge:
    - `customer/src/ai/` and `customer/src/voice-search/session.ts` (new folders)
    - `customer/src/main.tsx` (`setAiEventSink`)
    - `customer/src/test/render.tsx` (FormData bodies)
    - W1-06's `internal/search` (`refine.go`, `substitutes.go`, the `Parse` field in `search_run.go`), `db/queries/search/search.sql` and `api/*/discover.yaml`
+   - `platform/settings/keys.go`, `admin/settings.go` (`groupPrefixes`) and 01 §17 for the new setting
+   - W2-02's `internal/jobs/orders.go:25`: `//settings:ok` on `ordersTimerAttempts = 25`, a River attempt cap that settingslint now reads as the new setting's default
    - W3-04's `internal/voice/handlers.go` (two exported wrappers, no change in behaviour)
-6. **Translations.** The 44 keys are machine-written and marked `reviewed` under the founder's standing instruction, as for W3-08 and W3-16. The REVIEW.md row asks you to confirm.
-7. **Not mine, seen in passing.** `search_run.go:188` (W1-06's TODO(lead)): a filter naming an unknown brand or category is not logged as a zero-result search.
+4. **Translations.** The 44 keys are machine-written and marked `reviewed` under the founder's standing instruction, as for W3-08 and W3-16. The REVIEW.md row asks you to confirm.
+5. **Not mine, seen in passing.** `search_run.go:188` (W1-06's TODO(lead)): a filter naming an unknown brand or category is not logged as a zero-result search.

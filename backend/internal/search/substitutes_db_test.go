@@ -29,7 +29,7 @@ func (f *qa) idOf(sql string, args ...any) string {
 	return id
 }
 
-// AI-C3 (W3-12, D-233): rule-based substitutes for an out-of-stock item.
+// AI-C3 (W3-12, D-235): rule-based substitutes for an out-of-stock item.
 func TestSubstitutes(t *testing.T) {
 	f := newQA(t)
 	nandini := f.idOf(`SELECT id::text FROM brands WHERE slug = 'nandini'`)
@@ -53,11 +53,24 @@ func TestSubstitutes(t *testing.T) {
 		names = append(names, it.Name)
 		assert.True(t, it.InStock)
 	}
-	require.Len(t, r.SameShop, 4)
+	require.Len(t, r.SameShop, 3) // maxItems; Nandini Butter is the 4th
 	// Same brand first, then the closest pack in base units (0.1 kg is 100 g), then price.
-	assert.Equal(t, []string{"Amul Cheese", "Amul Butter", "Amul Butter", "Nandini Butter"}, names)
+	assert.Equal(t, []string{"Amul Cheese", "Amul Butter", "Amul Butter"}, names)
 	assert.InDelta(t, 90, r.SameShop[1].PackSize, 0.001)
 	assert.InDelta(t, 120, r.SameShop[2].PackSize, 0.001)
+
+	// substitute_pack_tolerance_pct at 5: only the 100 g packs are close enough.
+	f.exec(`UPDATE platform_settings SET value = '5' WHERE key = 'substitute_pack_tolerance_pct'`)
+	f.cache.Invalidate()
+	r, err = f.subs("instore", gone)
+	require.NoError(t, err)
+	names = names[:0]
+	for _, it := range r.SameShop {
+		names = append(names, it.Name)
+	}
+	assert.Equal(t, []string{"Amul Cheese", "Nandini Butter"}, names)
+	f.exec(`UPDATE platform_settings SET value = '25' WHERE key = 'substitute_pack_tolerance_pct'`)
+	f.cache.Invalidate()
 
 	// The same product in stock at other live shops of verified businesses in the radius,
 	// nearest first: "near" (300 m); hidden, unverified and out-of-stock listings never.

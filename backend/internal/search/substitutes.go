@@ -13,20 +13,16 @@ import (
 	"github.com/todayz/backend/internal/platform/db"
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
+	"github.com/todayz/backend/internal/platform/settings"
 )
 
-// AI-C3 substitutes, rule-based in v1 (11 §AI-C3, D-233): what to buy instead of an
+// AI-C3 substitutes, rule-based in v1 (11 §AI-C3, D-235): what to buy instead of an
 // out-of-stock item. No model and no flag; "AI ranking later" is 10-later.md.
 
-// Fixed numbers of the rules. 01 §17 does not list them; they are the contract's maxItems
-// and a first tolerance. TODO(lead): make substitutePackTolerance a platform setting if
-// shops ask for a different one.
+// maxSameShop and maxNearby bound the two lists to 6 rows in all (DiscoverSubstitutes
+// maxItems, D-235); the pack tolerance is substitute_pack_tolerance_pct.
 const (
-	// substitutePackTolerance is how far a same-shop alternative's pack may be from the item's
-	// (in base units), either way.
-	substitutePackTolerance = 0.25
-	// maxSameShop and maxNearby bound the two lists (DiscoverSubstitutes maxItems).
-	maxSameShop = 4
+	maxSameShop = 3
 	maxNearby   = 3
 	// substituteRows caps the rows read for the shop's alternatives.
 	substituteRows = 200 //settings:ok a per-request row bound, not a product rule
@@ -86,10 +82,15 @@ func (s *Service) Substitutes(ctx context.Context, slug string, p discoverapi.Li
 	}
 
 	if fam, ok := unitFamilies[src.Unit]; ok {
+		pct, err := s.settings.Int(ctx, settings.SubstitutePackTolerancePct)
+		if err != nil {
+			return out, internal(err)
+		}
 		base := baseSize(src.PackSize, src.Unit)
+		tol := float64(pct) / 100 //settings:ok percent to a fraction
 		rows, err := q.SubstituteShopItems(ctx, searchdb.SubstituteShopItemsParams{
 			Lng: req.Lng, Lat: req.Lat, StoreID: st.ID, CategoryID: src.CategoryID, ProductID: src.ProductID,
-			Units: fam.units, MinBase: base * (1 - substitutePackTolerance), MaxBase: base * (1 + substitutePackTolerance),
+			Units: fam.units, MinBase: base * (1 - tol), MaxBase: base * (1 + tol),
 			Lim: substituteRows,
 		})
 		if err != nil {

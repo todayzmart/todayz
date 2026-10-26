@@ -497,7 +497,7 @@
 # /v1/me/ai. Each is the common 404 while its flag is off or its provider key is missing, and
 # each call counts against the customer's daily AI cap (`ai_daily_calls_customer`). List parse
 # is a draft confirmed line by line; voice search and search assist keep nothing (no draft, no
-# audio, no transcript, no query text; 11 §1 rule 11). The features read is D-233.
+# audio, no transcript, no query text; 11 §1 rule 11). The features read is D-231.
 /v1/me/ai/features:
   get:
     operationId: getMyAiFeatures

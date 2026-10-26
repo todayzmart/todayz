@@ -170,7 +170,7 @@ func (s aiServer) GetStoreAiRetailFeatures(ctx context.Context, _ aiapi.GetStore
 	return aiapi.GetStoreAiRetailFeatures200JSONResponse(out), nil
 }
 
-// GetMyAiFeatures is which customer helpers are on (D-233) and the recording
+// GetMyAiFeatures is which customer helpers are on (D-231) and the recording
 // limits; it counts nothing against the cap.
 func (s aiServer) GetMyAiFeatures(ctx context.Context, _ aiapi.GetMyAiFeaturesRequestObject) (aiapi.GetMyAiFeaturesResponseObject, error) {
 	if _, err := querynorm.Customer(ctx); err != nil {
