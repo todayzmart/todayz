@@ -247,6 +247,7 @@ function NoPlace({ status, retry }: { status: 'none' | 'loading' | 'error'; retr
   return (
     <EmptyState
       icon={MapPin}
+      headingLevel={2}
       title={intl.formatMessage({ id: status === 'error' ? 'home.placeError.title' : 'home.noPlace.title' })}
       description={intl.formatMessage({ id: status === 'error' ? 'home.placeError.body' : 'home.noPlace.body' })}
       action={
@@ -424,6 +425,7 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
       )}
       {search.isError && (
         <EmptyState
+          headingLevel={2}
           title={intl.formatMessage({ id: 'search.error' })}
           action={<Button onClick={() => void search.refetch()}>{intl.formatMessage({ id: 'home.retry' })}</Button>}
         />
@@ -432,6 +434,7 @@ function Results({ coords, state, onChange }: { coords: Coords; state: SearchSta
         <>
           <EmptyState
             icon={SearchX}
+            headingLevel={2}
             title={intl.formatMessage({ id: 'search.zero.title' }, { query: q })}
             description={intl.formatMessage({ id: 'search.zero.body' })}
           />

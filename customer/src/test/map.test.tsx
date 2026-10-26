@@ -28,7 +28,8 @@ describe('C-03 map card', () => {
   it('draws the summary pins with their shop names and opens the full map', async () => {
     renderDiscover('/', routes());
     atBengaluru();
-    expect(await screen.findByRole('button', { name: 'Sri Lakshmi Stores, open' })).toBeInTheDocument();
+    // The map card loads lazily; under a parallel load run it took over the default 1 s.
+    expect(await screen.findByRole('button', { name: 'Sri Lakshmi Stores, open' }, { timeout: 4000 })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Annapurna Kirana, closed' })).toBeInTheDocument();
     fireEvent.click(await screen.findByRole('button', { name: 'Open full map' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'Shops near you' })).toBeInTheDocument();
