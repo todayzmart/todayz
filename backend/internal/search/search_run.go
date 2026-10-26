@@ -338,7 +338,7 @@ func (s *Service) group(ctx context.Context, rows []searchdb.SearchItemsRow, req
 				continue
 			}
 			st = &candStore{
-				ID: sid, Slug: r.StoreSlug, Name: r.StoreName, Locality: r.StoreLocality, Tint: r.CategoryTint,
+				ID: sid, Slug: r.StoreSlug, Name: r.StoreName, Locality: r.StoreLocality, Tint: r.CategoryTint, PhotoKey: r.StorePhotoKey,
 				DistanceM: r.DistanceM, Open: isOpen, Pickup: r.AcceptsPickup, Delivery: delivers,
 				FeePaise: r.DeliveryFeePaise, FreeAbove: r.DeliveryFreeAbovePaise, CashbackBP: r.CashbackBp,
 				RatingCount: r.RatingCount,
@@ -448,7 +448,7 @@ func storeResult(st *candStore, m modes, badge string, now time.Time, rs rankSet
 // storeCard is the DiscoverStoreCard of a store.
 func storeCard(st *candStore) discoverapi.DiscoverStoreCard {
 	return discoverapi.DiscoverStoreCard{
-		StoreId: st.ID.String(), StoreSlug: st.Slug, Name: st.Name, Locality: st.Locality, CategoryTint: st.Tint,
+		StoreId: st.ID.String(), StoreSlug: st.Slug, Name: st.Name, Locality: st.Locality, CategoryTint: st.Tint, PhotoKey: st.PhotoKey,
 		DistanceM: roundM(st.DistanceM), Open: st.Open, Pickup: st.Pickup, Delivery: st.Delivery,
 		Bookable: st.bookable(), Rating: st.Rating, RatingCount: int(st.RatingCount),
 		CashbackPct: cashbackPct(st.CashbackBP),

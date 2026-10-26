@@ -7,11 +7,11 @@ import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-quer
 import { Banner, Button, EmptyState, SearchField, Skeleton, Tabs } from '@todayz/ui';
 import { formatDistance } from '@todayz/i18n';
 import { MapPin, Star, Store as StoreIcon } from 'lucide-react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useIntl, type IntlShape } from 'react-intl';
 import { useCoords } from '../home/coords';
 import { useFmt, usePackLine } from '../home/format';
-import { asTint, directionsUrl, initials } from '../home/present';
+import { asTint, directionsUrl, imageUrl, initials } from '../home/present';
 import { RouterLink } from '../home/RouterLink';
 import { AskNearbySlot } from '../search/slots';
 import { Icon } from '../shell/Icon';
@@ -147,9 +147,7 @@ export function StorePage({ slug, state, onChange }: { slug: string; state: Stor
         {s ? (
           <>
             <div className={styles.titleRow}>
-              <div className="tz-avatar" data-tint={asTint(s.categoryTint)} aria-hidden="true">
-                {initials(s.name)}
-              </div>
+              <StoreAvatar name={s.name} tint={s.categoryTint} photoKey={s.photoKey} />
               <div className="tz-ui-minw0">
                 <h1 className={styles.name}>{s.name}</h1>
                 <div className="tz-meta">
@@ -225,6 +223,22 @@ export function StorePage({ slug, state, onChange }: { slug: string; state: Stor
       </div>
       {sheet}
       <CartBarLink />
+    </div>
+  );
+}
+
+/** The shop's photo once an admin has accepted one (D-246), else its initials; the initials again if it fails to load. */
+function StoreAvatar({ name, tint, photoKey }: { name: string; tint: string | null; photoKey: string | null }) {
+  const src = imageUrl(photoKey);
+  const [failed, setFailed] = useState<string | undefined>();
+  const photo = src !== undefined && src !== failed ? src : undefined;
+  return (
+    <div className={photo ? 'tz-avatar tz-ui-avatar-photo' : 'tz-avatar'} data-tint={asTint(tint)} aria-hidden="true">
+      {photo ? (
+        <img className="tz-ui-thumb-img" src={photo} alt="" decoding="async" onError={() => setFailed(photo)} />
+      ) : (
+        initials(name)
+      )}
     </div>
   );
 }

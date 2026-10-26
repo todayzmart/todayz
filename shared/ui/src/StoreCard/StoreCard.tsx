@@ -1,5 +1,5 @@
 import { ChevronRight } from 'lucide-react';
-import { type ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import { cx } from '../internal/cx';
 import { Icon } from '../internal/Icon';
 import type { LinkComponent } from '../internal/link';
@@ -17,6 +17,8 @@ export interface StoreCardProps {
   /** Two letters for the avatar, e.g. "SL". */
   initials: string;
   tint?: Tint | undefined;
+  /** The shop's photo; shown in the avatar's place, with the initials while it is missing or fails to load. */
+  imageUrl?: string | undefined;
   /** First meta line, pre-formatted: distance, area, matches ("0.6 km", "Jayanagar 4th Block"). */
   meta: readonly ReactNode[];
   tags?: readonly StoreTag[] | undefined;
@@ -26,12 +28,18 @@ export interface StoreCardProps {
 }
 
 /** Shop row for search results and the map sheet (tz-scard); the whole card is one link. */
-export function StoreCard({ name, initials, tint, meta, tags = [], href, LinkComponent, className }: StoreCardProps) {
+export function StoreCard({ name, initials, tint, imageUrl, meta, tags = [], href, LinkComponent, className }: StoreCardProps) {
   const Link = LinkComponent ?? 'a';
+  const [failed, setFailed] = useState<string | undefined>();
+  const photo = imageUrl !== undefined && imageUrl !== failed ? imageUrl : undefined;
   return (
     <Link href={href} className={cx('tz-scard', 'tz-ui-plainlink', className)}>
-      <div className="tz-avatar" data-tint={tint} aria-hidden="true">
-        {initials}
+      <div className={cx('tz-avatar', photo && 'tz-ui-avatar-photo')} data-tint={tint} aria-hidden="true">
+        {photo ? (
+          <img className="tz-ui-thumb-img" src={photo} alt="" loading="lazy" decoding="async" onError={() => setFailed(photo)} />
+        ) : (
+          initials
+        )}
       </div>
       <div className="tz-ui-minw0">
         <div className="tz-scard-name">{name}</div>

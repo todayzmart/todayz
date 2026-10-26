@@ -328,3 +328,27 @@ LEFT JOIN LATERAL (
 LEFT JOIN users u ON u.id = o.user_id
 LEFT JOIN phone_identities pi ON pi.user_id = o.user_id
 WHERE s.id = @id;
+
+-- name: StorePhotosToPublish :many
+-- Stores whose published photo is not their newest accepted storefront
+-- photo (a newer one was accepted, or the one shown was rejected later):
+-- doc_id null means the store has none left and its photo is cleared.
+SELECT s.id AS store_id, s.photo_key, s.photo_document_id, d.id AS doc_id,
+  coalesce(d.object_key, '')::text AS object_key, coalesce(d.content_type, '')::text AS content_type
+FROM stores s
+LEFT JOIN LATERAL (
+  SELECT bd.id, bd.object_key, bd.content_type FROM business_documents bd
+  WHERE bd.store_id = s.id AND bd.kind = 'storefront' AND bd.status = 'accepted'
+    AND bd.content_type LIKE 'image/%'
+  ORDER BY bd.reviewed_at DESC NULLS LAST, bd.created_at DESC, bd.id DESC
+  LIMIT 1
+) d ON true
+WHERE s.photo_document_id IS DISTINCT FROM d.id
+ORDER BY s.id
+LIMIT @lim;
+
+-- name: SetStorePhoto :execrows
+-- Publishes (or clears) the store's photo, unless another run already moved
+-- it on from what this run read.
+UPDATE stores SET photo_key = sqlc.narg(photo_key), photo_document_id = sqlc.narg(doc_id)
+WHERE id = @store_id AND photo_document_id IS NOT DISTINCT FROM sqlc.narg(prev_doc_id);

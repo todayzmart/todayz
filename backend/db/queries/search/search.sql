@@ -56,7 +56,7 @@ LIMIT 1;
 SELECT s.id, s.slug, s.name, s.locality, s.hours, s.closed_until,
   s.accepts_pickup, s.accepts_delivery, s.delivery_fee_paise, s.delivery_free_above_paise,
   s.cashback_bp, (s.rating_avg IS NOT NULL)::bool AS has_rating, COALESCE(s.rating_avg, 0)::float8 AS rating_avg,
-  s.rating_count, c.tint AS category_tint,
+  s.rating_count, c.tint AS category_tint, s.photo_key,
   ST_Y(s.location::geometry)::float8 AS lat, ST_X(s.location::geometry)::float8 AS lng,
   ST_Distance(s.location, ST_SetSRID(ST_MakePoint(@lng::float8, @lat::float8), 4326)::geography)::float8 AS distance_m
 FROM stores s
@@ -107,7 +107,7 @@ SELECT s.id, s.slug, s.name, s.locality, s.address_line1, s.address_line2, s.lan
   s.hours, s.closed_until, s.accepts_pickup, s.accepts_delivery,
   s.delivery_fee_paise, s.delivery_free_above_paise, s.delivery_min_order_paise, s.delivery_radius_m,
   s.cashback_bp, (s.rating_avg IS NOT NULL)::bool AS has_rating, COALESCE(s.rating_avg, 0)::float8 AS rating_avg,
-  s.rating_count, c.tint AS category_tint, c.slug AS category_slug,
+  s.rating_count, c.tint AS category_tint, s.photo_key, c.slug AS category_slug,
   COALESCE(NULLIF(c.names->>'en', ''), c.slug, '') AS category_name, -- '' when the business has no category (the Go code then sends null)
   ST_Y(s.location::geometry)::float8 AS lat, ST_X(s.location::geometry)::float8 AS lng,
   (sqlc.narg(lng)::float8 IS NOT NULL AND sqlc.narg(lat)::float8 IS NOT NULL)::bool AS has_distance,
@@ -158,7 +158,7 @@ SELECT si.id AS store_item_id, si.product_id, si.local_name, si.price_paise, si.
   s.hours, s.closed_until, s.accepts_pickup, s.accepts_delivery,
   s.delivery_fee_paise, s.delivery_free_above_paise, s.cashback_bp,
   (s.rating_avg IS NOT NULL)::bool AS has_rating, COALESCE(s.rating_avg, 0)::float8 AS rating_avg, s.rating_count,
-  c.tint AS category_tint,
+  c.tint AS category_tint, s.photo_key AS store_photo_key,
   (s.reliability_score IS NOT NULL)::bool AS has_reliability, COALESCE(s.reliability_score, 0)::float8 AS reliability,
   ST_Distance(s.location, ST_SetSRID(ST_MakePoint(@lng::float8, @lat::float8), 4326)::geography)::float8 AS distance_m
 FROM stores s
@@ -290,7 +290,7 @@ SELECT si.id AS store_item_id, si.product_id, si.local_name, si.price_paise, si.
   s.hours, s.closed_until, s.accepts_pickup, s.accepts_delivery,
   s.delivery_fee_paise, s.delivery_free_above_paise, s.cashback_bp,
   (s.rating_avg IS NOT NULL)::bool AS has_rating, COALESCE(s.rating_avg, 0)::float8 AS rating_avg, s.rating_count,
-  c.tint AS category_tint,
+  c.tint AS category_tint, s.photo_key AS store_photo_key,
   (s.reliability_score IS NOT NULL)::bool AS has_reliability, COALESCE(s.reliability_score, 0)::float8 AS reliability,
   ST_Distance(s.location, ST_SetSRID(ST_MakePoint(@lng::float8, @lat::float8), 4326)::geography)::float8 AS distance_m
 FROM stores s
@@ -338,7 +338,7 @@ SELECT si.id AS store_item_id, si.product_id, si.local_name, si.price_paise, si.
   s.hours, s.closed_until, s.accepts_pickup, s.accepts_delivery,
   s.delivery_fee_paise, s.delivery_free_above_paise, s.cashback_bp,
   (s.rating_avg IS NOT NULL)::bool AS has_rating, COALESCE(s.rating_avg, 0)::float8 AS rating_avg, s.rating_count,
-  c.tint AS category_tint,
+  c.tint AS category_tint, s.photo_key AS store_photo_key,
   (s.reliability_score IS NOT NULL)::bool AS has_reliability, COALESCE(s.reliability_score, 0)::float8 AS reliability,
   ST_Distance(s.location, ST_SetSRID(ST_MakePoint(@lng::float8, @lat::float8), 4326)::geography)::float8 AS distance_m
 FROM stores s

@@ -29,6 +29,15 @@ describe('C-07 Shop page', () => {
     expect(screen.getByRole('link', { name: /Get directions/ })).toBeInTheDocument();
   });
 
+  it('shows the shop\'s photo in the header when it has one (D-246)', async () => {
+    const { container } = renderDiscover(`/s/${SHOP_A}`, routes(page({ photoKey: 'stores/s1/d1.png' })));
+    atBengaluru();
+    await screen.findByRole('heading', { level: 1, name: 'Sri Lakshmi Stores' });
+    const img = container.querySelector('header .tz-avatar img');
+    expect(img?.getAttribute('src')).toMatch(/\/stores\/s1\/d1\.png$/);
+    expect(screen.queryByText('SL')).toBeNull();
+  });
+
   it('Add to cart puts the item in the one-shop cart', async () => {
     renderDiscover(`/s/${SHOP_A}`, routes());
     atBengaluru();

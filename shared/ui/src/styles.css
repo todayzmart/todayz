@@ -264,6 +264,11 @@ select.tz-input:disabled {
   border-radius: inherit;
 }
 
+/* A shop photo in the avatar's place: the picture fills it, corners clipped. */
+.tz-ui-avatar-photo {
+  overflow: hidden;
+}
+
 .tz-ui-mrp-spacer {
   text-decoration: none;
 }

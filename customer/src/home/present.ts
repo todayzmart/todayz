@@ -59,6 +59,7 @@ export function useStoreCardProps(): (s: DiscoverStoreCard) => StoreCardProps {
       name: s.name,
       initials: initials(s.name),
       tint: asTint(s.categoryTint),
+      imageUrl: imageUrl(s.photoKey),
       meta,
       tags,
       href: storeHref(s.storeSlug),

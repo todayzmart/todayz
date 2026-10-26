@@ -227,6 +227,7 @@
                 ratingCount: 128
                 cashbackPct: 2.5
                 categoryTint: green
+                photoKey: null
               nextCursor: null
               serverNow: '2026-10-24T05:30:00Z'
       default: *id001
@@ -297,6 +298,7 @@
               ratingCount: 128
               cashbackPct: 2.5
               categoryTint: green
+              photoKey: null
               categorySlug: grocery
               categoryName: Grocery
               deliveryFeePaise: 2000
@@ -417,6 +419,7 @@
                   name: Sri Lakshmi Stores
                   locality: Indiranagar
                   categoryTint: green
+                  photoKey: null
                   distanceM: 650
                   open: true
                   pickup: true

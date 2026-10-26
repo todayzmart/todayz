@@ -82,6 +82,7 @@ type candStore struct {
 	Name        string
 	Locality    *string
 	Tint        *string
+	PhotoKey    *string
 	DistanceM   float64
 	Open        bool
 	Pickup      bool

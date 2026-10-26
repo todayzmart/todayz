@@ -119,7 +119,7 @@ func (s *Service) GetStore(ctx context.Context, slug string, p discoverapi.GetDi
 		Open: s.open.OpenAt(r.Hours, r.ClosedUntil, now), Hours: hoursOut(r.Hours, now),
 		Pickup: r.AcceptsPickup, Delivery: delivers, Bookable: r.AcceptsPickup || delivers,
 		Rating: ratingPtr(r.HasRating, r.RatingAvg), RatingCount: int(r.RatingCount),
-		CashbackPct: cashbackPct(r.CashbackBp), CategoryTint: r.CategoryTint,
+		CashbackPct: cashbackPct(r.CashbackBp), CategoryTint: r.CategoryTint, PhotoKey: r.PhotoKey,
 		DeliveryFeePaise: int(r.DeliveryFeePaise), DeliveryMinOrderPaise: int(r.DeliveryMinOrderPaise),
 		DeliveryRadiusM: int(r.DeliveryRadiusM), ServerNow: now,
 	}
