@@ -363,7 +363,7 @@ func usable(f commonsFile) bool {
 		return false
 	case f.Mime != "image/jpeg" && f.Mime != "image/png" && f.Mime != "image/webp":
 		return false
-	case f.Width < minWidth, len(f.Title) > 240, len(f.PageURL) > 500, len(f.ThumbURL) > 500:
+	case f.Width < minWidth, len(f.Title) > 240, len(f.PageURL) > 500, len(f.ThumbURL) > 500: //settings:ok Commons field length caps
 		return false
 	}
 	return f.Author != "" || f.Licence == "CC0" || f.Licence == "Public domain"

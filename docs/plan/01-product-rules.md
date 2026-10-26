@@ -682,6 +682,7 @@ Every numeric key has a min and a max (the Rule column, or after the default). A
 | Key | Unit | Default | Rule |
 |---|---|---|---|
 | `customer_max_saved_addresses` | count | 20 | §5.5: saved addresses one customer can keep (`422 validation_failed` on one more). Min 1, max 50. |
+| `profile_photo_uploads_per_hour` | count | 10 | §2: profile photo uploads one customer may ask for in a rolling hour. Min 1, max 60. |
 
 **Risk** (A-13, D-225). Each raises a `risk_flags` row only; no one is blocked or suspended because of it. The one money effect is §9's payout hold: a flag on a business or one of its stores holds that business's payout while it is open or confirmed, until someone clears it.
 
@@ -706,7 +707,6 @@ Every numeric key has a min and a max (the Rule column, or after the default). A
 | `support_tickets_per_hour` | count | 5 | §13: tickets one person may open in a rolling hour. Min 1, max 60. |
 | `support_uploads_per_hour` | count | 30 | §13: attachment uploads one person may ask for in a rolling hour. Min 5, max 300. |
 | `support_upload_ttl_hours` | hours | 24 | §13: an upload no message has claimed is refused and deleted after this. Min 1, max 168. |
-| `profile_photo_uploads_per_hour` | count | 10 | §2: profile photo uploads one customer may ask for in a rolling hour. Min 1, max 60. |
 
 **Feature flags** (turn a feature off without a deploy)
 

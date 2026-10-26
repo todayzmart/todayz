@@ -58,7 +58,7 @@ var groupPrefixes = []struct {
 	{"job_", "jobs"},
 	{"ask_", "asks"}, {"site_marquee", "asks"}, {"refine_ai", "asks"}, {"substitute_", "asks"}, {"share_card", "asks"},
 	{"basket_", "baskets"},
-	{"customer_", "customers"},
+	{"customer_", "customers"}, {"profile_photo_", "customers"},
 	{"risk_", "risk"},
 	{"support_", "support"},
 	{"feature_", "features"}, {"notify_", "features"},
