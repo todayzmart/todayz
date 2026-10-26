@@ -22,7 +22,7 @@ Tags: **(a)** fix now on this branch; **(b)** needs a founder decision (the ques
 | A4 | S | `internal/search` TestSearchAtScale p95 goes just over 300 ms when 2–3 sessions run checks at once. Keep the 300 ms budget; when the machine's load per CPU is high, log the p95 and skip only the latency gate (the index checks still gate). The lead asked not to change the budget | lead notes (load flakes) | **done**: over budget with the 1-min load ≥ 1.0 per CPU skips the latency subtest with the p95 and the EXPLAINs logged; checked once with a 1 ms budget (skipped, `indexes` passed) |
 | A5 | M | OB-30: `shared/telemetry/events/asks.yaml` now exists (W3-16), so dashboard 07's "Asks panels — TODO(lead)" text panel can become the ask funnel, reply rate and time to reply | `e2e/scenarios/OB.md` OB-30 | **done**: four panels (funnel per city; reply rate, Yes share and median time per city; asks per store per day against `ask_daily_limit_store`; shares, voice and assist outcomes) from `asks`, `ask_recipients`, `orders` and `events`; `TestDashboardSQLRuns` passes. Refine chips removed have no event, so no panel |
 | A6 | M | Dashboard 11's "Statements, payouts and approvals — TODO(lead)" panel waits on tables W3-01 has since built (`statements`, `payouts`, approvals). Fill it from Postgres | `infra/grafana/dashboards/11-money-payouts.json` | **done**: four panels (statements by month and status; open payouts by hold reason with the oldest's age, and paid in range; two-person approval requests with the oldest pending's age; wallet forfeits on deletion) from `payout_statements`, `payouts`, `admin_adjustment_requests` and the ledger; `TestDashboardSQLRuns` passes |
-| A7 | M | W4-01 #6: the seed has no customer credits or payout fixtures, so E2E-09 makes its own spend first. Seed one statement with a positive closing balance so E2E-09 stands alone | W4-01 report | open, lowest priority (changes the seed every journey runs on) |
+| A7 | M | W4-01 #6: the seed has no customer credits or payout fixtures, so E2E-09 makes its own spend first. Seed one statement with a positive closing balance so E2E-09 stands alone | W4-01 report | **moved to C13**: E2E-09 already passes by making its own spend (W4-01 run 4), and a seed change is only proven by `make reset` + `make e2e`, which this session may not run |
 
 ## (b) Needs a founder decision
 
@@ -55,6 +55,7 @@ Tags: **(a)** fix now on this branch; **(b)** needs a founder decision (the ques
 | C10 | founder | W4-06 manual QA on the phones, and the TalkBack / VoiceOver pass |
 | C11 | founder | DLT ids (sign-in OTP, the field owner-confirm SMS, D-224 re-registration), SNS SMS activation, SES production access, WhatsApp number |
 | C12 | founder | `make ai-eval` with real keys before the voice flag goes on in prod; Hindi/kn/te/ta review of the notify and coach templates |
+| C13 | lead (stack) | A7: seed one Lakshmi Traders statement with a positive closing so E2E-09 needs no spend of its own; run the journeys after, since every journey shares the seed |
 
 ## Closed since the lead's notes (checked on main `876b5ed6`)
 
