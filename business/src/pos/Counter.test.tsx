@@ -353,13 +353,20 @@ describe('B-05 counter', () => {
 
   it('drops a bill QR link when the bill changes after the claim, and says so', async () => {
     const { user, server } = await mount();
-    server.api.createBillClaim = () => Promise.resolve({ claimId: 'claim-1', token: 'EXAMPLE_token', expiresAt: '2026-10-24T10:02:00.000Z', serverNow: SERVER_NOW });
+    const keys: string[] = [];
+    server.api.createBillClaim = (_draft, key) => {
+      keys.push(key);
+      return Promise.resolve({ claimId: 'claim-1', token: 'EXAMPLE_token', expiresAt: '2026-10-24T10:02:00.000Z', serverNow: SERVER_NOW });
+    };
     server.api.getBillClaim = () => Promise.resolve({ claimId: 'claim-1', status: 'claimed', expiresAt: '2026-10-24T10:02:00.000Z', claimedBy: { displayName: 'Asha' }, creditsRequested: 0, serverNow: SERVER_NOW });
     await user.click(tile(/Rice 1 kg/));
     await user.click(screen.getByRole('button', { name: 'Link customer' }));
     const dialog = await screen.findByRole('dialog', { name: 'Link a customer' });
     await user.click(within(dialog).getByRole('button', { name: /Customer scans a QR/ }));
     await waitFor(() => expect(screen.getAllByText(/Linked by bill QR/).length).toBeGreaterThan(0), { timeout: 4000 });
+    // The contract's Idempotency-Key is a ULID; anything else is a 422 before the handler.
+    expect(keys.length).toBeGreaterThan(0);
+    for (const k of keys) expect(k).toMatch(/^[0-7][0-9A-HJKMNP-TV-Z]{25}$/);
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Link a customer' })).toBeNull());
     // A second item changes the amount the QR was quoted for.
     await user.click(tile(/Sugar 1 kg/));
