@@ -100,9 +100,14 @@ test('E2E-09 month-end statement → finance marks the payout paid → the busin
   await test.step('the Credits screen in the business app shows Paid and the UTR', async () => {
     const app = await openApp(browser, owner, URLS.business);
     try {
-      await app.page.goto('/credits');
-      await expect(app.page.getByText('Paid').first()).toBeVisible();
-      await expect(app.page.getByText(utr.toUpperCase()).first()).toBeVisible();
+      const { page } = app;
+      // Credits belong to one shop: the owner picks Sri Lakshmi first, as at the counter.
+      await page.goto('/choose-shop');
+      await page.getByRole('region', { name: `Stores of ${LAKSHMI.name}` }).getByRole('button', { name: STORES.SL.name, exact: true }).click();
+      await page.goto('/credits');
+      const statement = page.getByTestId(`statement-${period}`);
+      await expect(statement.getByText('Paid', { exact: true })).toBeVisible();
+      await expect(statement.getByText(`UTR ${utr.toUpperCase()}`)).toBeVisible();
     } finally {
       await app.close();
     }
