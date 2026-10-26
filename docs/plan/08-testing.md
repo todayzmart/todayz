@@ -468,6 +468,15 @@ Device matrix for the cloud-launch pass (real devices): Redmi/Realme Android Go-
 
 Target sizing for launch: 1,000 stores, 50,000 customers, 5,000 orders/day, 50,000 POS sales/day.
 
+How the suite measures these (W4-02, `e2e/load/README.md`):
+
+- Data: `make load-data` generates the launch sizing (1,000 shops, about 211,000 stocked items, 50,000 customers, 70,000 orders over 14 days of history and 350,000 POS sales). The wave 4 run happens on one laptop, with the API capped at `GOMAXPROCS=2` and Postgres at 2 CPUs and 4 GB, so its latencies are an upper bound for a single instance.
+- `browse_peak`: "reads" are every discover read except search and suggest (summary, store list with and without a category, categories, shop page, shop items with and without a query, substitutes). "search" is `GET /v1/discover/search` and the typeahead `GET /v1/discover/suggest` together (`lat_search`). The summary also prints each endpoint on its own line, so the search endpoint alone can be judged.
+- `order_burst`: "timers late" means the gap between `accept_by` and the order's `expired` event, measured for the orders that were left unaccepted (`checks/order_burst.sql`). "Ledger reconcile clean" means the credits reconcile (03 §6) finds nothing.
+- `pos_rush`: p95 covers online sales, retries and sync batches together. A sync batch carries 20 sales, so its own time is about 20 sales' worth. "No duplicate sales" means no (store, clientId) pair holds two sales, and the run recorded no more sales than the distinct clientIds it sent (`checks/pos_rush.sql`).
+- `sse_fanout`: "memory stable" means the API's RSS at the end of the run is within 10% of its RSS once the streams are open, and no stream is lost for good.
+- `soak`: the local run is 20 minutes (`LOAD_SOAK_DURATION`); the full 2 hours is for staging (wave 5). "No connection leak" means pool and Postgres connection counts return to their idle level after the run (`sample.sh`).
+
 ## 7. Security tests
 
 - Static: gosec, govulncheck, `npm audit --production`, gitleaks (full history), Semgrep OWASP rules, Trivy on the Docker image, checkov on Terraform.

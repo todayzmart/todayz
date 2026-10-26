@@ -66,9 +66,14 @@ WHERE s.status = 'live' AND b.status = 'verified'
   AND ST_DWithin(s.location, ST_SetSRID(ST_MakePoint(@lng::float8, @lat::float8), 4326)::geography, @radius_m::float8)
   AND (sqlc.narg(category_ids)::uuid[] IS NULL
        OR b.category_id = ANY(sqlc.narg(category_ids)::uuid[])
-       OR EXISTS (SELECT 1 FROM store_items si JOIN products p ON p.id = si.product_id
+       -- W4-02: the category's product ids are one uncorrelated InitPlan, so each store
+       -- probes ux_store_items_store_product instead of joining all its items to products
+       -- (223 ms to 15 ms for a 5 km pharmacy filter on 1,000 shops). Same rows as joining
+       -- products on category_id.
+       OR EXISTS (SELECT 1 FROM store_items si
                   WHERE si.store_id = s.id AND si.is_listed AND si.on_hand - si.reserved > 0
-                    AND p.category_id = ANY(sqlc.narg(category_ids)::uuid[])))
+                    AND si.product_id = ANY(ARRAY(SELECT pc.id FROM products pc
+                                                  WHERE pc.category_id = ANY(sqlc.narg(category_ids)::uuid[])))))
 ORDER BY distance_m, s.id
 LIMIT @lim;
 
@@ -168,7 +173,11 @@ WHERE s.status = 'live' AND b.status = 'verified'
   AND p.status IN ('active', 'pending_review')
   AND (si.search @@ to_tsquery('simple', @tsq::text)
        OR si.product_id = ANY(@typo_ids::uuid[])
-       OR p.category_id = ANY(@match_category_ids::uuid[])
+       -- W4-02: the category arm as product ids (one InitPlan), so every arm of this OR is on
+       -- si and the planner can BitmapOr the GIN and product indexes per store instead of
+       -- reading every item in the radius and filtering after the products join.
+       OR si.product_id = ANY(ARRAY(SELECT pm.id FROM products pm
+                                    WHERE pm.category_id = ANY(@match_category_ids::uuid[])))
        OR si.product_id = sqlc.narg(product_id)::uuid)
   AND (sqlc.narg(product_id)::uuid IS NULL OR si.product_id = sqlc.narg(product_id)::uuid)
   AND (sqlc.narg(brand_id)::uuid IS NULL OR p.brand_id = sqlc.narg(brand_id)::uuid)
