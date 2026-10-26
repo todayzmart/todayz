@@ -1,0 +1,60 @@
+{
+  "name": "short_thread_summary_dropped",
+  "input": {
+    "number": "SUP-001211",
+    "subject": "Wrong item",
+    "opener": "customer",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "I got toned milk instead of full cream in TZ-004810."
+      }
+    ],
+    "orders": [
+      {
+        "number": "TZ-004810",
+        "status": "completed",
+        "fulfilment": "pickup",
+        "totalPaise": 6400,
+        "placedOn": "2026-10-20",
+        "linked": true,
+        "timeline": []
+      }
+    ]
+  },
+  "expect": {
+    "category": "order",
+    "order": "o1",
+    "summary": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_tt_short_thread_summary_dropped",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_short_thread_summary_dropped",
+        "name": "triage_ticket",
+        "input": {
+          "category": "order",
+          "priority": "normal",
+          "orderRef": "o1",
+          "reason": "The customer received the wrong item in order TZ-004810.",
+          "summary": "The customer got the wrong milk.",
+          "reply": "Sorry about the mix-up in TZ-004810. We have told the shop and will help you with a replacement or refund."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}

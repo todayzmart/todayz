@@ -1,0 +1,50 @@
+{
+  "name": "payout_delayed",
+  "input": {
+    "number": "SUP-001204",
+    "subject": "Payout not received",
+    "opener": "business",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "Our settlement for last week has not reached the bank account."
+      }
+    ],
+    "orders": []
+  },
+  "expect": {
+    "category": "payouts",
+    "order": "none",
+    "summary": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_tt_payout_delayed",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_payout_delayed",
+        "name": "triage_ticket",
+        "input": {
+          "category": "payouts",
+          "priority": "high",
+          "orderRef": "none",
+          "reason": "The shop says last week's settlement has not reached its bank.",
+          "summary": null,
+          "reply": "Sorry about the delay. We are checking last week's settlement with our payments team and will reply here today."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}

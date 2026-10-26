@@ -1,0 +1,50 @@
+{
+  "name": "verification_documents",
+  "input": {
+    "number": "SUP-001207",
+    "subject": "Verification pending",
+    "opener": "business",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "We uploaded our GST papers but the shop still shows verification pending."
+      }
+    ],
+    "orders": []
+  },
+  "expect": {
+    "category": "verification",
+    "order": "none",
+    "summary": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_tt_verification_documents",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_verification_documents",
+        "name": "triage_ticket",
+        "input": {
+          "category": "verification",
+          "priority": "normal",
+          "orderRef": "none",
+          "reason": "The shop is waiting for its uploaded papers to be verified.",
+          "summary": null,
+          "reply": "Thanks for uploading your papers. Our team is reviewing them and will update your verification status here."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}

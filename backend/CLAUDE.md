@@ -217,3 +217,13 @@ local and test there is no AWS adapter, so nothing calls AWS whatever `AWS_*` is
 cached 60 s per instance (failures too), database (`pg_stat_statements` top 10, DML only, guarded when
 the extension is absent) and River panels 5 s. A failing panel carries an error class; the response
 stays 200. `job_kind` and `job_run` are audit subjects for the jobs actions.
+
+W3-13 built the admin AI assistants (D-233, D-234): `internal/ai/catalogue` (AI-A1, A-08),
+`internal/ai/triage` (AI-A2, A-14) and `internal/ai/riskexplain` (AI-A3, A-13) on the shared drafts
+envelope under `/v1/admin/ai/*/drafts`, with `internal/ai/assist` for the admin caller and draft
+ownership (another admin's draft is the common 404). Each route takes its screen's own policy and is
+the common 404 while its `ai_*_enabled` flag is off. A confirmed line goes through the domain's own
+writer: `internal/admin/assist.go` (A-08 edit, merge, category names) and `internal/support/assist.go`
+(A-14 triage and reply); the risk summary is an audit entry only (`risk.flag_summary`). Catalogue lines
+need their A-08 button's permission, else `not_permitted`. Recorded evals: `catalogueeval` (SC-AI-57),
+`triageeval` (SC-AI-60), `riskeval` (SC-AI-63). Report: `docs/qa/W3-13/REPORT.md`.

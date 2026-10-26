@@ -1,0 +1,73 @@
+{
+  "name": "none_other_variant",
+  "input": {
+    "product": {
+      "name": "Maggi noodles atta",
+      "brandName": "Maggi",
+      "variant": "Atta",
+      "packSize": 70,
+      "unit": "g"
+    },
+    "category": "Snacks",
+    "candidates": [
+      {
+        "name": "Instant Noodles",
+        "brandName": "Maggi",
+        "variant": "Masala",
+        "packSize": 70,
+        "unit": "g",
+        "similarity": 0.74
+      }
+    ],
+    "categories": [
+      "Dairy",
+      "Staples",
+      "Snacks",
+      "Beverages",
+      "Personal care",
+      "Household"
+    ],
+    "namesNow": {
+      "en": "Dairy",
+      "hi": "डेयरी",
+      "kn": "ಹಾಲಿನ ಉತ್ಪನ್ನಗಳು",
+      "te": "పాల ఉత్పత్తులు",
+      "ta": "பால் பொருட்கள்"
+    }
+  },
+  "expect": {
+    "duplicate": "none",
+    "names": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_cc_none_other_variant",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_cc_none_other_variant",
+        "name": "clean_up_product",
+        "input": {
+          "name": "Instant Noodles",
+          "brandName": "Maggi",
+          "variant": "Atta",
+          "packSize": 70,
+          "unit": "g",
+          "categoryRef": "c3",
+          "duplicateRef": "none",
+          "duplicateReason": null,
+          "categoryNames": null
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 900,
+      "output_tokens": 160
+    }
+  }
+}

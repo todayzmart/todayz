@@ -1,0 +1,50 @@
+{
+  "name": "grounding_phone",
+  "input": {
+    "number": "SUP-001215",
+    "subject": "Need help",
+    "opener": "customer",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "Nobody is answering at the shop."
+      }
+    ],
+    "orders": []
+  },
+  "expect": {
+    "category": "other",
+    "order": "none",
+    "summary": false,
+    "reject": "grounding"
+  },
+  "reply": {
+    "id": "msg_tt_grounding_phone",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_grounding_phone",
+        "name": "triage_ticket",
+        "input": {
+          "category": "other",
+          "priority": "normal",
+          "orderRef": "none",
+          "reason": "The customer cannot reach the shop.",
+          "summary": null,
+          "reply": "Please call our helpline on 9876543210 for help."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}

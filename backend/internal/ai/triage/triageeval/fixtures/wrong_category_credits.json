@@ -1,0 +1,50 @@
+{
+  "name": "wrong_category_credits",
+  "input": {
+    "number": "SUP-001213",
+    "subject": "Customer credits on our bill",
+    "opener": "business",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "A customer used platform credits at our counter. Who pays us for that part?"
+      }
+    ],
+    "orders": []
+  },
+  "expect": {
+    "category": "credits",
+    "order": "none",
+    "summary": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_tt_wrong_category_credits",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_wrong_category_credits",
+        "name": "triage_ticket",
+        "input": {
+          "category": "payouts",
+          "priority": "normal",
+          "orderRef": "none",
+          "reason": "The shop asks how credits used at its counter are paid back.",
+          "summary": null,
+          "reply": "Credits a customer uses are paid back to you with your settlement. We will confirm the details here."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}

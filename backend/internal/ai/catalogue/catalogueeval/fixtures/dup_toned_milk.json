@@ -1,0 +1,81 @@
+{
+  "name": "dup_toned_milk",
+  "input": {
+    "product": {
+      "name": "Nandini toned milk",
+      "brandName": "Nandini",
+      "variant": null,
+      "packSize": 500,
+      "unit": "ml"
+    },
+    "category": "Dairy",
+    "candidates": [
+      {
+        "name": "Milk",
+        "brandName": "Nandini",
+        "variant": "Full cream",
+        "packSize": 500,
+        "unit": "ml",
+        "similarity": 0.71
+      },
+      {
+        "name": "Milk",
+        "brandName": "Nandini",
+        "variant": "Toned",
+        "packSize": 500,
+        "unit": "ml",
+        "similarity": 0.88
+      }
+    ],
+    "categories": [
+      "Dairy",
+      "Staples",
+      "Snacks",
+      "Beverages",
+      "Personal care",
+      "Household"
+    ],
+    "namesNow": {
+      "en": "Dairy",
+      "hi": "डेयरी",
+      "kn": "ಹಾಲಿನ ಉತ್ಪನ್ನಗಳು",
+      "te": "పాల ఉత్పత్తులు",
+      "ta": "பால் பொருட்கள்"
+    }
+  },
+  "expect": {
+    "duplicate": "p2",
+    "names": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_cc_dup_toned_milk",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_cc_dup_toned_milk",
+        "name": "clean_up_product",
+        "input": {
+          "name": "Milk",
+          "brandName": "Nandini",
+          "variant": "Toned",
+          "packSize": 500,
+          "unit": "ml",
+          "categoryRef": "c1",
+          "duplicateRef": "p2",
+          "duplicateReason": "The same Nandini toned milk in the same 500 ml pack.",
+          "categoryNames": null
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 900,
+      "output_tokens": 160
+    }
+  }
+}

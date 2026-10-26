@@ -1,0 +1,60 @@
+{
+  "name": "grounding_invented_refund",
+  "input": {
+    "number": "SUP-001214",
+    "subject": "Refund amount",
+    "opener": "customer",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "How much refund will I get for my cancelled order?"
+      }
+    ],
+    "orders": [
+      {
+        "number": "TZ-004611",
+        "status": "cancelled",
+        "fulfilment": "pickup",
+        "totalPaise": 25000,
+        "placedOn": "2026-10-20",
+        "linked": true,
+        "timeline": []
+      }
+    ]
+  },
+  "expect": {
+    "category": "order",
+    "order": "o1",
+    "summary": false,
+    "reject": "grounding"
+  },
+  "reply": {
+    "id": "msg_tt_grounding_invented_refund",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_grounding_invented_refund",
+        "name": "triage_ticket",
+        "input": {
+          "category": "order",
+          "priority": "normal",
+          "orderRef": "o1",
+          "reason": "The customer asks about the refund for a cancelled order.",
+          "summary": null,
+          "reply": "You will get ₹500 back for order TZ-004611 within a day."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}

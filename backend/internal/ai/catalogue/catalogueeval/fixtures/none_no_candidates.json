@@ -1,0 +1,64 @@
+{
+  "name": "none_no_candidates",
+  "input": {
+    "product": {
+      "name": "ragi flour local",
+      "brandName": null,
+      "variant": null,
+      "packSize": 1,
+      "unit": "kg"
+    },
+    "category": "Staples",
+    "candidates": [],
+    "categories": [
+      "Dairy",
+      "Staples",
+      "Snacks",
+      "Beverages",
+      "Personal care",
+      "Household"
+    ],
+    "namesNow": {
+      "en": "Dairy",
+      "hi": "डेयरी",
+      "kn": "ಹಾಲಿನ ಉತ್ಪನ್ನಗಳು",
+      "te": "పాల ఉత్పత్తులు",
+      "ta": "பால் பொருட்கள்"
+    }
+  },
+  "expect": {
+    "duplicate": "none",
+    "names": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_cc_none_no_candidates",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_cc_none_no_candidates",
+        "name": "clean_up_product",
+        "input": {
+          "name": "Ragi Flour",
+          "brandName": null,
+          "variant": null,
+          "packSize": 1,
+          "unit": "kg",
+          "categoryRef": "c2",
+          "duplicateRef": "none",
+          "duplicateReason": null,
+          "categoryNames": null
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 900,
+      "output_tokens": 160
+    }
+  }
+}

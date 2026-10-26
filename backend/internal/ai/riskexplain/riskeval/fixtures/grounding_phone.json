@@ -1,0 +1,54 @@
+{
+  "name": "grounding_phone",
+  "input": {
+    "rule": "identity.otp_failed_phone",
+    "subjectType": "phone",
+    "score": 30,
+    "status": "open",
+    "facts": [
+      {
+        "Key": "failedOtps",
+        "Value": "9"
+      },
+      {
+        "Key": "limit",
+        "Value": "5"
+      },
+      {
+        "Key": "windowHours",
+        "Value": "1"
+      }
+    ],
+    "otherFlags": {
+      "open": 0,
+      "confirmed": 0,
+      "cleared": 0
+    }
+  },
+  "expect": {
+    "text": "",
+    "reject": "grounding"
+  },
+  "reply": {
+    "id": "msg_rs_grounding_phone",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rs_grounding_phone",
+        "name": "summarise_risk_flag",
+        "input": {
+          "text": "The number 9876543210 failed 9 codes in 1 hour."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 600,
+      "output_tokens": 90
+    }
+  }
+}

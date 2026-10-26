@@ -1,0 +1,58 @@
+{
+  "name": "otp_ip_fanout",
+  "input": {
+    "rule": "identity.otp_ip_fanout",
+    "subjectType": "ip",
+    "score": 40,
+    "status": "open",
+    "facts": [
+      {
+        "Key": "phones",
+        "Value": "12"
+      },
+      {
+        "Key": "requests",
+        "Value": "30"
+      },
+      {
+        "Key": "limit",
+        "Value": "5"
+      },
+      {
+        "Key": "windowMinutes",
+        "Value": "15"
+      }
+    ],
+    "otherFlags": {
+      "open": 0,
+      "confirmed": 0,
+      "cleared": 0
+    }
+  },
+  "expect": {
+    "text": "One network address asked for sign-in codes for 12 phone numbers in 15 minutes, past the limit of 5, with 30 requests. It has no other flags.",
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_rs_otp_ip_fanout",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rs_otp_ip_fanout",
+        "name": "summarise_risk_flag",
+        "input": {
+          "text": "One network address asked for sign-in codes for 12 phone numbers in 15 minutes, past the limit of 5, with 30 requests. It has no other flags."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 600,
+      "output_tokens": 90
+    }
+  }
+}

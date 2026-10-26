@@ -1,0 +1,81 @@
+{
+  "name": "dup_tata_tea",
+  "input": {
+    "product": {
+      "name": "tata tea gold 250 g",
+      "brandName": "Tata",
+      "variant": null,
+      "packSize": 250,
+      "unit": "g"
+    },
+    "category": "Beverages",
+    "candidates": [
+      {
+        "name": "Tea",
+        "brandName": "Tata",
+        "variant": "Gold",
+        "packSize": 250,
+        "unit": "g",
+        "similarity": 0.84
+      },
+      {
+        "name": "Tea",
+        "brandName": "Tata",
+        "variant": "Premium",
+        "packSize": 250,
+        "unit": "g",
+        "similarity": 0.66
+      }
+    ],
+    "categories": [
+      "Dairy",
+      "Staples",
+      "Snacks",
+      "Beverages",
+      "Personal care",
+      "Household"
+    ],
+    "namesNow": {
+      "en": "Dairy",
+      "hi": "डेयरी",
+      "kn": "ಹಾಲಿನ ಉತ್ಪನ್ನಗಳು",
+      "te": "పాల ఉత్పత్తులు",
+      "ta": "பால் பொருட்கள்"
+    }
+  },
+  "expect": {
+    "duplicate": "p1",
+    "names": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_cc_dup_tata_tea",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_cc_dup_tata_tea",
+        "name": "clean_up_product",
+        "input": {
+          "name": "Tea",
+          "brandName": "Tata",
+          "variant": "Gold",
+          "packSize": 250,
+          "unit": "g",
+          "categoryRef": "c4",
+          "duplicateRef": "p1",
+          "duplicateReason": "Both are Tata Tea Gold in a 250 g pack.",
+          "categoryNames": null
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 900,
+      "output_tokens": 160
+    }
+  }
+}

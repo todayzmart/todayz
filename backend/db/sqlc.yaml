@@ -193,6 +193,13 @@ sql:
         package: airetaildb
         out: ../gen/sqlc/airetaildb
   - <<: *pkg
+    queries: queries/aiadmin
+    gen:
+      go:
+        <<: *go
+        package: aiadmindb
+        out: ../gen/sqlc/aiadmindb
+  - <<: *pkg
     queries: queries/coach
     gen:
       go:

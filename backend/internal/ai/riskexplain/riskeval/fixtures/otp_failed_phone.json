@@ -1,0 +1,54 @@
+{
+  "name": "otp_failed_phone",
+  "input": {
+    "rule": "identity.otp_failed_phone",
+    "subjectType": "phone",
+    "score": 30,
+    "status": "open",
+    "facts": [
+      {
+        "Key": "failedOtps",
+        "Value": "9"
+      },
+      {
+        "Key": "limit",
+        "Value": "5"
+      },
+      {
+        "Key": "windowHours",
+        "Value": "1"
+      }
+    ],
+    "otherFlags": {
+      "open": 2,
+      "confirmed": 0,
+      "cleared": 0
+    }
+  },
+  "expect": {
+    "text": "A phone number failed 9 sign-in codes within 1 hour, past the limit of 5. It has two other open flags.",
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_rs_otp_failed_phone",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rs_otp_failed_phone",
+        "name": "summarise_risk_flag",
+        "input": {
+          "text": "A phone number failed 9 sign-in codes within 1 hour, past the limit of 5. It has two other open flags."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 600,
+      "output_tokens": 90
+    }
+  }
+}
