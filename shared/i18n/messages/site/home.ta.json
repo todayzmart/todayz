@@ -993,5 +993,710 @@
     "message": "நகரும் பட்டியலை நிறுத்து",
     "review": "reviewed",
     "enHash": "8cd44034"
+  },
+  "home.lede.badge": {
+    "message": "உங்கள் ஊர், ஸ்டாக்குடன்",
+    "review": "reviewed",
+    "enHash": "5b48065b"
+  },
+  "home.lede.title": {
+    "message": "நிஜ உலகத்தை {em}",
+    "review": "reviewed",
+    "enHash": "8131f698"
+  },
+  "home.lede.title_em": {
+    "message": "தேடக்கூடியதாக்குவது.",
+    "review": "reviewed",
+    "enHash": "12976092"
+  },
+  "home.lede.body": {
+    "message": "அருகிலுள்ள கடையில் தேடுங்கள், ஆப்பில் புக் செய்யுங்கள், நடந்து சென்று எடுத்துக்கொள்ளுங்கள். பிக்அப்புக்குக் கட்டணம் இல்லை, நாள் கணக்கில் காத்திருக்க வேண்டாம், சிறிது தூரம் நடந்தால் போதும்.",
+    "review": "reviewed",
+    "enHash": "4c7e4434"
+  },
+  "home.lede.search_label": {
+    "message": "உங்கள் அருகிலுள்ள கடைகளைத் தேடுங்கள்",
+    "review": "reviewed",
+    "enHash": "e27265ba"
+  },
+  "home.lede.search_placeholder": {
+    "message": "பால், போன் சார்ஜர், பாராசிட்டமால் தேடுங்கள்…",
+    "review": "reviewed",
+    "enHash": "a54ff435"
+  },
+  "home.lede.search_go": {
+    "message": "அருகில் தேடுங்கள்",
+    "review": "reviewed",
+    "enHash": "ad3bae31"
+  },
+  "home.lede.stat.1.value": {
+    "message": "₹0",
+    "review": "reviewed",
+    "enHash": "c51874cd"
+  },
+  "home.lede.stat.1.label": {
+    "message": "பிக்அப் கட்டணம்",
+    "review": "reviewed",
+    "enHash": "cd505f16"
+  },
+  "home.lede.stat.2.value": {
+    "message": "0–20%",
+    "review": "reviewed",
+    "enHash": "b9b8fb42"
+  },
+  "home.lede.stat.2.label": {
+    "message": "கேஷ்பேக், ஒவ்வொரு கடையும் முடிவு செய்யும்",
+    "review": "reviewed",
+    "enHash": "b7f6ad15"
+  },
+  "home.lede.stat.3.value": {
+    "message": "2 km",
+    "review": "reviewed",
+    "enHash": "8067ebaa"
+  },
+  "home.lede.stat.3.label": {
+    "message": "தொடக்கத்தில் தேடல் தூரம், 20 km வரை நீட்டிக்கலாம்",
+    "review": "reviewed",
+    "enHash": "d3b1faf2"
+  },
+  "home.strip.title": {
+    "message": "இவற்றையெல்லாம் தேடலாம்",
+    "review": "reviewed",
+    "enHash": "0443693b"
+  },
+  "home.strip.pause": {
+    "message": "நகரும் பட்டியலை நிறுத்தவும்",
+    "review": "reviewed",
+    "enHash": "8cd44034"
+  },
+  "home.strip.1": {
+    "message": "பால் 1 L",
+    "review": "reviewed",
+    "enHash": "9b24bbce"
+  },
+  "home.strip.2": {
+    "message": "போன் சார்ஜர்",
+    "review": "reviewed",
+    "enHash": "3dc867cb"
+  },
+  "home.strip.3": {
+    "message": "பாராசிட்டமால் 650",
+    "review": "reviewed",
+    "enHash": "fcd766a5"
+  },
+  "home.strip.4": {
+    "message": "நோட்டுப் புத்தகங்கள்",
+    "review": "reviewed",
+    "enHash": "251ce0b0"
+  },
+  "home.strip.5": {
+    "message": "பிரவுன் பிரெட்",
+    "review": "reviewed",
+    "enHash": "b68f6446"
+  },
+  "home.strip.6": {
+    "message": "LED பல்பு",
+    "review": "reviewed",
+    "enHash": "b9cf6971"
+  },
+  "home.strip.7": {
+    "message": "ஃபேஸ் வாஷ்",
+    "review": "reviewed",
+    "enHash": "4f44dc39"
+  },
+  "home.strip.8": {
+    "message": "இயர்போன்",
+    "review": "reviewed",
+    "enHash": "efa2d377"
+  },
+  "home.strip.9": {
+    "message": "இன்ஸ்டன்ட் நூடுல்ஸ்",
+    "review": "reviewed",
+    "enHash": "9e701e5f"
+  },
+  "home.strip.10": {
+    "message": "பேட்டரிகள்",
+    "review": "reviewed",
+    "enHash": "0970f9df"
+  },
+  "home.cost.eyebrow": {
+    "message": "பிரச்சினை",
+    "review": "reviewed",
+    "enHash": "8a940000"
+  },
+  "home.cost.title": {
+    "message": "வாங்கும் ஒவ்வொரு வழியும் {em}",
+    "review": "reviewed",
+    "enHash": "5022a201"
+  },
+  "home.cost.title_em": {
+    "message": "உங்களிடம் ஏதோ ஒன்றை வாங்கிவிடுகிறது.",
+    "review": "reviewed",
+    "enHash": "2bb9b83a"
+  },
+  "home.cost.sub": {
+    "message": "நேரம், பொறுமை அல்லது பணம். இன்று இந்த மூன்றில் ஒன்றையாவது நீங்கள் கொடுக்கிறீர்கள், பல நேரம் மூன்றையும்.",
+    "review": "reviewed",
+    "enHash": "5a37b8b5"
+  },
+  "home.cost.1.title": {
+    "message": "சுற்றிவிட்டு, கடைசியில் விட்டுவிடுங்கள்",
+    "review": "reviewed",
+    "enHash": "97f4e09a"
+  },
+  "home.cost.1.body": {
+    "message": "நீங்கள் கடை கடையாகச் சென்று கேட்டுக் காத்திருக்கிறீர்கள், ஆனாலும் வெறுங்கையுடன் வீடு திரும்புகிறீர்கள்.",
+    "review": "reviewed",
+    "enHash": "b8a9828e"
+  },
+  "home.cost.2.title": {
+    "message": "ஆன்லைனில் ஆர்டர் செய்யுங்கள், நாள் கணக்கில் காத்திருங்கள்",
+    "review": "reviewed",
+    "enHash": "05596e51"
+  },
+  "home.cost.2.body": {
+    "message": "திரையில் சில நொடிகளில் தெரியும், வீட்டு வாசலுக்கு வர நாட்கள் ஆகும், அதுவும் பக்கத்துக் கடையில் ஏற்கனவே இருந்த பொருளுக்கு.",
+    "review": "reviewed",
+    "enHash": "43759e2f"
+  },
+  "home.cost.3.title": {
+    "message": "விரைவு டெலிவரி, ஆனால் கட்டணம் செலுத்துங்கள்",
+    "review": "reviewed",
+    "enHash": "5702bcb5"
+  },
+  "home.cost.3.body": {
+    "message": "வேகமாக வரும், ஆனால் டெலிவரி, ஹேண்ட்லிங், சிறிய பாஸ்கெட் கட்டணங்கள் ஒவ்வொரு ஆர்டரிலும் அமைதியாகக் கூடிக்கொண்டே போகும்.",
+    "review": "reviewed",
+    "enHash": "064c6675"
+  },
+  "home.cost.way.eyebrow": {
+    "message": "TodayZ வழி",
+    "review": "reviewed",
+    "enHash": "a7f0b759"
+  },
+  "home.cost.way.title": {
+    "message": "ஒரு முறை தேடுங்கள். புக் செய்யுங்கள். நடந்து செல்லுங்கள். கடைக்கே பணம் கொடுங்கள்.",
+    "review": "reviewed",
+    "enHash": "2e141c06"
+  },
+  "home.cost.way.cta": {
+    "message": "எப்படி இருக்கும் பாருங்கள்",
+    "review": "reviewed",
+    "enHash": "196a6a56"
+  },
+  "home.walk.eyebrow": {
+    "message": "பயணம்",
+    "review": "reviewed",
+    "enHash": "7fe9eb42"
+  },
+  "home.walk.title": {
+    "message": "ஒரு முறை தேடுங்கள். {em} பிக்அப் செய்யுங்கள்.",
+    "review": "reviewed",
+    "enHash": "c13692dc"
+  },
+  "home.walk.title_em": {
+    "message": "நடந்து செல்லுங்கள்.",
+    "review": "reviewed",
+    "enHash": "4128f8a3"
+  },
+  "home.walk.sub": {
+    "message": "தேடுங்கள், புக் செய்யுங்கள், பக்கத்துக் கடையில் எடுத்துக்கொள்ளுங்கள். ஒரு சிறிய நடை எப்படி இருக்கும் என்று பாருங்கள்.",
+    "review": "reviewed",
+    "enHash": "0a238688"
+  },
+  "home.walk.map": {
+    "message": "உங்களிடமிருந்து 600 m தொலைவிலுள்ள சர்மா ஜெனரல் ஸ்டோருக்கு நடை வழி.",
+    "review": "reviewed",
+    "enHash": "44043abc"
+  },
+  "home.walk.scroll": {
+    "message": "நடை வழி வரைபடம், சிறிய திரைகளில் பக்கவாட்டில் நகரும்",
+    "review": "reviewed",
+    "enHash": "d5ec4c27"
+  },
+  "home.walk.you": {
+    "message": "நீங்கள்",
+    "review": "reviewed",
+    "enHash": "905cb326"
+  },
+  "home.walk.tag": {
+    "message": "புக் ஆனது · 600 m · 8 நிமிட நடை",
+    "review": "reviewed",
+    "enHash": "203e6ddd"
+  },
+  "home.walk.replay": {
+    "message": "நடையை மீண்டும் ஓட்டுங்கள்",
+    "review": "reviewed",
+    "enHash": "fc90235d"
+  },
+  "home.walk.hud.1": {
+    "message": "நடந்த மீட்டர்",
+    "review": "reviewed",
+    "enHash": "e394a90c"
+  },
+  "home.walk.hud.2": {
+    "message": "நடந்த நிமிடங்கள்",
+    "review": "reviewed",
+    "enHash": "8037005b"
+  },
+  "home.walk.hud.3": {
+    "message": "பிக்அப் கட்டணம்",
+    "review": "reviewed",
+    "enHash": "d93f487e"
+  },
+  "home.walk.hud.4": {
+    "message": "ஸ்டாக் உறுதி",
+    "review": "reviewed",
+    "enHash": "06198737"
+  },
+  "home.walk.hud.4.value": {
+    "message": "12 நிமிடம் முன்",
+    "review": "reviewed",
+    "enHash": "6c786da7"
+  },
+  "home.walk.step.1.title": {
+    "message": "01 · தேடுங்கள்",
+    "review": "reviewed",
+    "enHash": "e42236a3"
+  },
+  "home.walk.step.1.body": {
+    "message": "உங்களுக்கு வேண்டியதைத் தட்டச்சு செய்யுங்கள். அது ஸ்டாக்கில் உள்ள அருகிலுள்ள கடைகளைப் பாருங்கள்.",
+    "review": "reviewed",
+    "enHash": "29f36790"
+  },
+  "home.walk.step.2.title": {
+    "message": "02 · புக் செய்யுங்கள்",
+    "review": "reviewed",
+    "enHash": "0ca4552a"
+  },
+  "home.walk.step.2.body": {
+    "message": "கடையின் விலையிலேயே புக் செய்யுங்கள், கடை அதைத் தயாராக வைக்கும்.",
+    "review": "reviewed",
+    "enHash": "329ddbbb"
+  },
+  "home.walk.step.3.title": {
+    "message": "03 · நடங்கள்",
+    "review": "reviewed",
+    "enHash": "3167c564"
+  },
+  "home.walk.step.3.body": {
+    "message": "கடை எவ்வளவு தூரம் என்பதை ஆப் காட்டும். உங்களுக்கு வசதியான நேரத்தில் நடந்து செல்லுங்கள்.",
+    "review": "reviewed",
+    "enHash": "66066c48"
+  },
+  "home.walk.step.4.title": {
+    "message": "04 · எடுத்துக்கொள்ளுங்கள்",
+    "review": "reviewed",
+    "enHash": "dc111fbf"
+  },
+  "home.walk.step.4.body": {
+    "message": "உங்கள் பிக்அப் கோடைக் காட்டுங்கள், கடைக்குப் பணம் கொடுங்கள், கடை கேஷ்பேக் தந்தால் அதைப் பெறுங்கள்.",
+    "review": "reviewed",
+    "enHash": "81d7c45d"
+  },
+  "home.walk.note": {
+    "message": "எடுத்துக்காட்டு. நடை நேரம் மணிக்கு சுமார் 5 km வேகத்தில் கணக்கிடப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "c7baab0f"
+  },
+  "home.week.eyebrow": {
+    "message": "சின்னச் சின்ன வேலைகள், புதிய விதத்தில்",
+    "review": "reviewed",
+    "enHash": "19f6df43"
+  },
+  "home.week.title": {
+    "message": "சிறந்த கடை என்பது {em}",
+    "review": "reviewed",
+    "enHash": "edbe6a99"
+  },
+  "home.week.title_em": {
+    "message": "நீங்கள் நடந்து செல்லும் கடையே.",
+    "review": "reviewed",
+    "enHash": "01a3af05"
+  },
+  "home.week.sub": {
+    "message": "ஒவ்வொரு பிக்அப்பும் ஒரு வேலையைச் சிறிய நடையாக மாற்றுகிறது. டெலிவரி கட்டணம் இல்லை, ஒரு பிஸ்கட் பாக்கெட்டுக்காகச் சாலையில் ரைடர் தேவையில்லை, நீங்கள் வாழும் பகுதியை இன்னும் நெருக்கமாகப் பார்க்கிறீர்கள்.",
+    "review": "reviewed",
+    "enHash": "32946fc6"
+  },
+  "home.week.perk.1.title": {
+    "message": "ஒவ்வொரு கடைக்கும் உள்ள தூரம்",
+    "review": "reviewed",
+    "enHash": "f89db939"
+  },
+  "home.week.perk.1.body": {
+    "message": "தேடலில் ஒவ்வொரு கடையும் எவ்வளவு தூரம் என்று தெரியும், அதனால் குறைந்த தூர நடையைத் தேர்வு செய்யலாம்.",
+    "review": "reviewed",
+    "enHash": "208d8d77"
+  },
+  "home.week.perk.2.title": {
+    "message": "கடை தரும் இடத்தில் கேஷ்பேக்",
+    "review": "reviewed",
+    "enHash": "a08e581a"
+  },
+  "home.week.perk.2.body": {
+    "message": "ஒவ்வொரு கடையும் தன் கேஷ்பேக்கைத் தானே முடிவு செய்யும், 0 முதல் 20% வரை, அது உங்களுக்குக் கிரெடிட்டாக வரும்.",
+    "review": "reviewed",
+    "enHash": "070368c8"
+  },
+  "home.week.perk.3.title": {
+    "message": "கட்டணம் இல்லை, குறைந்த பேக்கேஜிங்",
+    "review": "reviewed",
+    "enHash": "bf8271a2"
+  },
+  "home.week.perk.3.body": {
+    "message": "பிக்அப்புக்கு எதுவும் கூடுதலாகக் கொடுக்க வேண்டாம், ஒரே பொருளுக்கு டெலிவரி பையும் வேண்டாம்.",
+    "review": "reviewed",
+    "enHash": "0b09e279"
+  },
+  "home.week.card.title": {
+    "message": "ஒரு வாரப் பிக்அப்கள்",
+    "review": "reviewed",
+    "enHash": "3fcfcbbb"
+  },
+  "home.week.card.tag": {
+    "message": "எடுத்துக்காட்டு",
+    "review": "reviewed",
+    "enHash": "0f01ed56"
+  },
+  "home.week.rings": {
+    "message": "எடுத்துக்காட்டு வாரம்: 4.9 km நடை, 58 நிமிடம் நடந்தது, 6 பிக்அப்.",
+    "review": "reviewed",
+    "enHash": "d8d2e6f1"
+  },
+  "home.week.km": {
+    "message": "km நடை",
+    "review": "reviewed",
+    "enHash": "eaccc501"
+  },
+  "home.week.min": {
+    "message": "நிமிட நடை",
+    "review": "reviewed",
+    "enHash": "5c1d740b"
+  },
+  "home.week.pickups": {
+    "message": "பிக்அப்",
+    "review": "reviewed",
+    "enHash": "cf8af551"
+  },
+  "home.week.bars": {
+    "message": "எடுத்துக்காட்டு வாரத்தில் ஒவ்வொரு நாளும் நடந்த தூரம், சனிக்கிழமை அதிகம்.",
+    "review": "reviewed",
+    "enHash": "e03d16b2"
+  },
+  "home.week.days": {
+    "message": "தி செ பு வி வெ ச ஞா",
+    "review": "reviewed",
+    "enHash": "a0862b3a"
+  },
+  "home.week.row.1.title": {
+    "message": "பிக்அப் கட்டணத்தில் ₹0",
+    "review": "reviewed",
+    "enHash": "cd61f110"
+  },
+  "home.week.row.1.body": {
+    "message": "பிக்அப்புக்கு எப்போதும் கட்டணம் இல்லை",
+    "review": "reviewed",
+    "enHash": "e19693c5"
+  },
+  "home.week.row.2.title": {
+    "message": "86 கிரெடிட் கிடைத்தது",
+    "review": "reviewed",
+    "enHash": "320d9afa"
+  },
+  "home.week.row.2.body": {
+    "message": "6 பிக்அப்களின் கேஷ்பேக், 1 கிரெடிட் = ₹1",
+    "review": "reviewed",
+    "enHash": "b24af8d3"
+  },
+  "home.orbit.eyebrow": {
+    "message": "உங்கள் 2 km",
+    "review": "reviewed",
+    "enHash": "cd03ef8f"
+  },
+  "home.orbit.title": {
+    "message": "உங்களைச் சுற்றியுள்ள {em} ஐப் பாருங்கள்",
+    "review": "reviewed",
+    "enHash": "2fe44f83"
+  },
+  "home.orbit.title_em": {
+    "message": "2 km",
+    "review": "reviewed",
+    "enHash": "8067ebaa"
+  },
+  "home.orbit.sub": {
+    "message": "தேடல் 2 km க்குள் உள்ள கடைகளுடன் தொடங்கும், அதை 20 km வரை நீட்டிக்கலாம். ஒரு கடையைத் தட்டி, அங்கே என்ன இருக்கிறது, எவ்வளவு நடக்க வேண்டும் என்று பாருங்கள்.",
+    "review": "reviewed",
+    "enHash": "5a5d16cf"
+  },
+  "home.orbit.label": {
+    "message": "2 km க்குள் எடுத்துக்காட்டுக் கடைகள்",
+    "review": "reviewed",
+    "enHash": "d40f9fe7"
+  },
+  "home.orbit.you": {
+    "message": "நீங்கள்",
+    "review": "reviewed",
+    "enHash": "905cb326"
+  },
+  "home.orbit.away": {
+    "message": "{distance} தொலைவு · சுமார் {minutes} நிமிட நடை",
+    "review": "reviewed",
+    "enHash": "0c2dbb1c"
+  },
+  "home.orbit.item": {
+    "message": "எடுத்துக்காட்டுப் பொருள்",
+    "review": "reviewed",
+    "enHash": "735134c0"
+  },
+  "home.orbit.confirmed": {
+    "message": "ஸ்டாக் உறுதி",
+    "review": "reviewed",
+    "enHash": "06198737"
+  },
+  "home.orbit.confirmed_value": {
+    "message": "{minutes} நிமிடம் முன்",
+    "review": "reviewed",
+    "enHash": "61da5f60"
+  },
+  "home.orbit.walk": {
+    "message": "நடை, ஒரு வழி",
+    "review": "reviewed",
+    "enHash": "0246767d"
+  },
+  "home.orbit.walk_value": {
+    "message": "{minutes} நிமிடம்",
+    "review": "reviewed",
+    "enHash": "09a22c22"
+  },
+  "home.orbit.cashback": {
+    "message": "இந்தக் கடையின் கேஷ்பேக்",
+    "review": "reviewed",
+    "enHash": "3469fd2c"
+  },
+  "home.orbit.shop": {
+    "message": "{shop}, {distance} தொலைவு",
+    "review": "reviewed",
+    "enHash": "6992686b"
+  },
+  "home.shelf.eyebrow": {
+    "message": "ஷெல்ஃப் சோதனை",
+    "review": "reviewed",
+    "enHash": "09e8887e"
+  },
+  "home.shelf.title": {
+    "message": "அருகில் கிடைக்கும், {em}",
+    "review": "reviewed",
+    "enHash": "53b95304"
+  },
+  "home.shelf.title_em": {
+    "message": "இப்போதே.",
+    "review": "reviewed",
+    "enHash": "3254a76f"
+  },
+  "home.shelf.tabs": {
+    "message": "வகை",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "home.shelf.all": {
+    "message": "அனைத்தும்",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "home.shelf.cat.grocery": {
+    "message": "மளிகை",
+    "review": "reviewed",
+    "enHash": "9c998ada"
+  },
+  "home.shelf.cat.pharmacy": {
+    "message": "மருந்து",
+    "review": "reviewed",
+    "enHash": "2f6c536b"
+  },
+  "home.shelf.cat.electronics": {
+    "message": "எலக்ட்ரானிக்ஸ்",
+    "review": "reviewed",
+    "enHash": "89f1ebf5"
+  },
+  "home.shelf.stock": {
+    "message": "ஸ்டாக்கில் உள்ளது · {minutes} நிமிடம் முன் உறுதி செய்யப்பட்டது",
+    "review": "reviewed",
+    "enHash": "fa8811bd"
+  },
+  "home.shelf.walk": {
+    "message": "{distance} · {minutes} நிமிட நடை",
+    "review": "reviewed",
+    "enHash": "23b64712"
+  },
+  "home.shelf.find": {
+    "message": "தேடுங்கள்",
+    "review": "reviewed",
+    "enHash": "65080933"
+  },
+  "home.shelf.find_label": {
+    "message": "உங்கள் அருகில் {item} தேடுங்கள்",
+    "review": "reviewed",
+    "enHash": "38b02c29"
+  },
+  "home.save.eyebrow": {
+    "message": "உங்கள் சேமிப்பு",
+    "review": "reviewed",
+    "enHash": "09f03557"
+  },
+  "home.save.title": {
+    "message": "ஒரு {em} யின் மதிப்பு என்ன என்று பாருங்கள்",
+    "review": "reviewed",
+    "enHash": "9d38b897"
+  },
+  "home.save.title_em": {
+    "message": "நடை",
+    "review": "reviewed",
+    "enHash": "df06b147"
+  },
+  "home.save.sub": {
+    "message": "மாதத்தின் சில ஆர்டர்களை டெலிவரியிலிருந்து பக்கத்துக் கடைக்கு மாற்றுங்கள்.",
+    "review": "reviewed",
+    "enHash": "410f68bb"
+  },
+  "home.save.orders": {
+    "message": "மாதத்துக்கு ஆர்டர்கள்",
+    "review": "reviewed",
+    "enHash": "e7e0d70d"
+  },
+  "home.save.fee": {
+    "message": "டெலிவரி ஆன ஒவ்வொரு ஆர்டருக்கும் நீங்கள் செலுத்தும் கட்டணம்",
+    "review": "reviewed",
+    "enHash": "1b092045"
+  },
+  "home.save.basket": {
+    "message": "உங்கள் வழக்கமான பாஸ்கெட்",
+    "review": "reviewed",
+    "enHash": "e3640cf2"
+  },
+  "home.save.cashback": {
+    "message": "கடையின் கேஷ்பேக்",
+    "review": "reviewed",
+    "enHash": "27f9118a"
+  },
+  "home.save.walk": {
+    "message": "கடைக்குப் போய் வர நடை",
+    "review": "reviewed",
+    "enHash": "2fc9bd58"
+  },
+  "home.save.keep": {
+    "message": "ஒவ்வொரு ஆண்டும் உங்களிடம் மிஞ்சுவது",
+    "review": "reviewed",
+    "enHash": "102629ba"
+  },
+  "home.save.fees": {
+    "message": "தவிர்த்த கட்டணம்",
+    "review": "reviewed",
+    "enHash": "e948a0e4"
+  },
+  "home.save.credits": {
+    "message": "கேஷ்பேக், கிரெடிட்டில்",
+    "review": "reviewed",
+    "enHash": "51ff9a15"
+  },
+  "home.save.km": {
+    "message": "நடந்த தூரம்",
+    "review": "reviewed",
+    "enHash": "3aba6f93"
+  },
+  "home.save.hours": {
+    "message": "நடையில் செலவழித்த நேரம்",
+    "review": "reviewed",
+    "enHash": "88b31039"
+  },
+  "home.save.cta": {
+    "message": "TodayZ ஆப்பைத் திறக்கவும்",
+    "review": "reviewed",
+    "enHash": "785b7c7d"
+  },
+  "home.save.note": {
+    "message": "விளக்கத்துக்காக மட்டும். ஒவ்வொரு கடையும் தன் கேஷ்பேக்கைத் தானே முடிவு செய்யும், 0 முதல் 20% வரை, பல கடைகள் எதுவும் தருவதில்லை. நடை நேரம் மணிக்கு சுமார் 5 km வேகத்தில் கணக்கிடப்பட்டது.",
+    "review": "reviewed",
+    "enHash": "b0158fc9"
+  },
+  "home.owners.eyebrow": {
+    "message": "கடைக்காரர்களுக்கு",
+    "review": "reviewed",
+    "enHash": "fa54f1ea"
+  },
+  "home.owners.title": {
+    "message": "உங்கள் அலமாரியில் {em}",
+    "review": "reviewed",
+    "enHash": "1958bd36"
+  },
+  "home.owners.title_em": {
+    "message": "மக்கள் தேடுவதே இருக்கிறது.",
+    "review": "reviewed",
+    "enHash": "317f3f2e"
+  },
+  "home.owners.body": {
+    "message": "அருகிலுள்ளவர்களுக்கு உங்கள் கடை தெரியட்டும், TodayZ க்கு நீங்கள் அழைத்து வரும் ஒவ்வொரு வாடிக்கையாளருக்கும் 30 கிரெடிட் சம்பாதியுங்கள், தீர்ந்துபோகும் முன் எதை வாங்க வேண்டும் என்று தெரிந்துகொள்ளுங்கள்.",
+    "review": "reviewed",
+    "enHash": "bd883c32"
+  },
+  "home.owners.cta": {
+    "message": "உங்கள் கடையைச் சேர்க்கவும்",
+    "review": "reviewed",
+    "enHash": "b94ec5f9"
+  },
+  "home.owners.1.title": {
+    "message": "அருகில் தெரியுங்கள்",
+    "review": "reviewed",
+    "enHash": "f5672a1d"
+  },
+  "home.owners.1.body": {
+    "message": "தங்கள் தேடல் தூரத்துக்குள் இருப்பவர்கள் தேடும்போது உங்கள் ஸ்டாக்கைப் பார்ப்பார்கள்.",
+    "review": "reviewed",
+    "enHash": "cc6b20f6"
+  },
+  "home.owners.2.title": {
+    "message": "ஒவ்வொரு வாடிக்கையாளருக்கும் 30 கிரெடிட்",
+    "review": "reviewed",
+    "enHash": "2c192c45"
+  },
+  "home.owners.2.body": {
+    "message": "நீங்கள் அழைத்து வந்தவர் ₹100 அல்லது அதற்கு மேல் முதல் ஆர்டரை முடிக்கும்போது. 1 கிரெடிட் = ₹1, மாதந்தோறும் பணம் வழங்கப்படும்.",
+    "review": "reviewed",
+    "enHash": "a8144148"
+  },
+  "home.owners.3.title": {
+    "message": "அதிகம் விற்கவும், குறைவாக வீணாக்கவும்",
+    "review": "reviewed",
+    "enHash": "104616d1"
+  },
+  "home.owners.3.body": {
+    "message": "எதை வாங்க வேண்டும், எதற்கு ஆஃபர் வைக்க வேண்டும் என்ற தினசரி யோசனைகள்.",
+    "review": "reviewed",
+    "enHash": "d1ab7cc3"
+  },
+  "home.credits.title": {
+    "message": "புகைப்பட நன்றிகள்",
+    "review": "reviewed",
+    "enHash": "f9ce2574"
+  },
+  "home.credits.licence": {
+    "message": "புகைப்படங்கள் CC BY 2.0 உரிமத்தின் கீழ் பயன்படுத்தப்பட்டுள்ளன. தலைப்பு, எடுத்தவர், மூலம்:",
+    "review": "reviewed",
+    "enHash": "a643642b"
+  },
+  "home.save.km_value": {
+    "message": "{km} கி.மீ",
+    "review": "reviewed",
+    "enHash": "5d1ec3cd"
+  },
+  "home.save.hours_value": {
+    "message": "{hours} மணிநேரம்",
+    "review": "reviewed",
+    "enHash": "83996d17"
+  },
+  "home.lede.photo": {
+    "message": "பொருட்கள் நிறைந்த அலமாரிகளுடன் ஒரு சிறிய பொதுக் கடையின் கவுண்டரில் கடைக்காரர்.",
+    "review": "reviewed",
+    "enHash": "380ce24b"
   }
 }

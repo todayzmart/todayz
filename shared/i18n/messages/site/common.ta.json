@@ -248,5 +248,40 @@
     "message": "பாதுகாப்புச் சரிபார்ப்பு ஏற்றப்படவில்லை. பக்கத்தை மீண்டும் ஏற்றி மீண்டும் முயலவும்.",
     "review": "reviewed",
     "enHash": "15c3e9e7"
+  },
+  "bar.label": {
+    "message": "அறிவிப்பு",
+    "review": "reviewed",
+    "enHash": "cf84a98d"
+  },
+  "bar.live": {
+    "message": "இப்போது கடைகளைச் சேர்த்து வருகிறோம்",
+    "review": "reviewed",
+    "enHash": "cc641213"
+  },
+  "bar.reward": {
+    "message": "கடையில் பிக்அப் செய்யுங்கள்: கட்டணம் இல்லை, கடை தந்தால் கேஷ்பேக்",
+    "review": "reviewed",
+    "enHash": "0f32d83b"
+  },
+  "bar.list": {
+    "message": "உங்கள் கடையைச் சேர்க்கவும்",
+    "review": "reviewed",
+    "enHash": "b94ec5f9"
+  },
+  "bar.how": {
+    "message": "எப்படி வேலை செய்கிறது பாருங்கள்",
+    "review": "reviewed",
+    "enHash": "f7b38f07"
+  },
+  "brand.tagline": {
+    "message": "ஃபிசிக்கல் சர்ச் இன்ஜின்",
+    "review": "reviewed",
+    "enHash": "5c918698"
+  },
+  "nav.search": {
+    "message": "உங்கள் அருகிலுள்ள கடைகளைத் தேடுங்கள்",
+    "review": "reviewed",
+    "enHash": "e27265ba"
   }
 }

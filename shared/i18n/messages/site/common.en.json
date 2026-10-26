@@ -151,5 +151,26 @@
   "lead.err_captcha_load": {
     "defaultMessage": "The security check could not load. Reload the page and try again.",
     "description": "Shown after the generic error when the Turnstile check failed to load or errored."
+  },
+  "bar.label": {
+    "defaultMessage": "Announcement"
+  },
+  "bar.live": {
+    "defaultMessage": "Onboarding shops now"
+  },
+  "bar.reward": {
+    "defaultMessage": "Pick up in store: no fee, and cashback where the shop gives it"
+  },
+  "bar.list": {
+    "defaultMessage": "List your shop"
+  },
+  "bar.how": {
+    "defaultMessage": "See how it works"
+  },
+  "brand.tagline": {
+    "defaultMessage": "Physical search engine"
+  },
+  "nav.search": {
+    "defaultMessage": "Search shops near you"
   }
 }

@@ -1,10 +1,12 @@
 ---
 // S-04 Legal pages: numbered sections read from messages until a gap, a draft banner and the grievance block.
+import PageHead from '../components/bright/PageHead.astro';
 import Section from '../components/Section.astro';
 import Base from '../layouts/Base.astro';
 import { createT, englishMessages, type Locale, type MessageKey } from '../i18n/index.ts';
 import { company } from '../lib/company.ts';
 import type { PageDef } from '../lib/pages.ts';
+import '../styles/bright.css';
 
 interface Props {
   page: PageDef;
@@ -25,11 +27,10 @@ const grievance = name && email ? t('legal.grievance.named', { name, email }) : 
 ---
 
 <Base page={page} locale={locale}>
-  <div class="tz-hero-wash head">
-    <div class="inner">
-      <h1>{t(key(`${prefix}.title`))}</h1>
-      <p class="draft" role="note">{t('legal.draft')}</p>
-    </div>
+  <div class="bp">
+    <PageHead title={t(key(`${prefix}.title`))}>
+      <p class="b-page-note" role="note">{t('legal.draft')}</p>
+    </PageHead>
   </div>
   <Section id="terms">
     <div class="doc">
@@ -54,36 +55,6 @@ const grievance = name && email ? t('legal.grievance.named', { name, email }) : 
 </Base>
 
 <style>
-  .head {
-    padding-block: var(--space-10) var(--space-8);
-  }
-
-  .inner {
-    display: grid;
-    gap: var(--space-3);
-    max-width: 1120px;
-    margin: 0 auto;
-    padding-inline: var(--space-4);
-  }
-
-  h1 {
-    margin: 0;
-    font: var(--type-display);
-    font-weight: 800;
-    letter-spacing: var(--type-display-tracking);
-    color: var(--ink);
-  }
-
-  .draft {
-    margin: 0;
-    padding: var(--space-3);
-    max-width: 60ch;
-    border-radius: var(--radius-md);
-    background: var(--warning-soft);
-    color: var(--ink);
-    font: var(--type-body-sm);
-  }
-
   .doc {
     display: grid;
     gap: var(--space-6);

@@ -1,0 +1,102 @@
+---
+// Your 2 km: a radar of example shops around "you" (rings at 500 m, 1 km and 2 km, the default search
+// radius). Each shop has an inspector card; the first shows by default. bright.ts makes the dots
+// buttons (hover, click, Enter or Space shows that shop) and hides the other cards. Without
+// JavaScript the dots are a picture and the first card stays.
+import type { Translate } from '../../i18n/index.ts';
+import { EM, splitEm } from '../home/data.ts';
+import { SHOPS, formatDistance, walkMinutes, type Category } from './data.ts';
+
+interface Props {
+  t: Translate;
+}
+
+const { t } = Astro.props;
+const [before, after] = splitEm(t('home.orbit.title', EM));
+const C = 300;
+const R_MAX = 285;
+const scale = (m: number) => (m / 2000) * R_MAX;
+const catLabel: Record<Category, string> = {
+  grocery: t('home.shelf.cat.grocery'),
+  pharmacy: t('home.shelf.cat.pharmacy'),
+  electronics: t('home.shelf.cat.electronics'),
+};
+const nodes = SHOPS.map((s, i) => {
+  const r = scale(s.distance);
+  const a = (s.angle * Math.PI) / 180;
+  const x = Math.round(C + r * Math.sin(a));
+  const y = Math.round(C - r * Math.cos(a));
+  const distance = formatDistance(s.distance);
+  return { ...s, i, x, y, distance, minutes: walkMinutes(s.distance), short: s.name.split(' ')[0] ?? s.name, label: t('home.orbit.shop', { shop: s.name, distance }) };
+});
+const rings = [
+  { m: 500, label: '500 m' },
+  { m: 1000, label: '1 km' },
+  { m: 2000, label: '2 km' },
+];
+---
+
+<section class="b-sec b-band">
+  <div class="b-w">
+    <div class="b-head rv">
+      <p class="b-eyebrow">{t('home.orbit.eyebrow')}</p>
+      <h2>{before}<span class="b-acc">{t('home.orbit.title_em')}</span>{after}</h2>
+      <p class="b-sub">{t('home.orbit.sub')}</p>
+    </div>
+    <div class="b-orbit" data-orbit>
+      <div class="b-radar rv">
+        <svg viewBox="0 0 600 600" role="group" aria-label={t('home.orbit.label')}>
+          <defs>
+            <radialGradient id="b-sweep" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(300 300) scale(290)">
+              <stop offset="0" class="sweep-a"></stop>
+              <stop offset="1" class="sweep-b"></stop>
+            </radialGradient>
+          </defs>
+          <g class="grid">
+            {rings.map((r) => <circle cx={C} cy={C} r={scale(r.m)} />)}
+            <path d="M300 15V585M15 300H585"></path>
+          </g>
+          <g class="ring-lbl">
+            {rings.map((r) => <text x={C - 6} y={C + scale(r.m) - 6} text-anchor="end">{r.label.toUpperCase()}</text>)}
+          </g>
+          <path class="sweep" d="M300 300 L300 15 A285 285 0 0 1 501 99 Z"></path>
+          <g class="nodes">
+            {
+              nodes.map((n) => (
+                <g class="nd" data-cat={n.category} data-node={n.i} data-label={n.label}>
+                  <circle class="pulse" cx={n.x} cy={n.y} r="10" />
+                  <circle class="hit" cx={n.x} cy={n.y} r="30" />
+                  <circle class="dot" cx={n.x} cy={n.y} r="10" />
+                  <text x={n.x} y={n.y - 18} text-anchor="middle">{n.short}</text>
+                </g>
+              ))
+            }
+          </g>
+          <circle class="me-bg" cx={C} cy={C} r="26"></circle>
+          <circle class="me" cx={C} cy={C} r="9"></circle>
+          <text class="me-lbl" x={C} y="347" text-anchor="middle">{t('home.orbit.you').toUpperCase()}</text>
+        </svg>
+      </div>
+      <div class="b-ins-wrap rv" aria-live="polite">
+        {
+          nodes.map((n) => (
+            <article class="b-ins b-card" data-card={n.i} hidden={n.i !== 0}>
+              <span class="b-cat" data-cat={n.category}>{catLabel[n.category]}</span>
+              <h3>{n.name}</h3>
+              <p>{t('home.orbit.away', { distance: n.distance, minutes: n.minutes })}</p>
+              <dl class="b-kv">
+                <div><dd>₹{n.price}</dd><dt>{n.item}</dt></div>
+                <div><dd>{t('home.orbit.confirmed_value', { minutes: n.confirmed })}</dd><dt>{t('home.orbit.confirmed')}</dt></div>
+                <div><dd>{t('home.orbit.walk_value', { minutes: n.minutes })}</dd><dt>{t('home.orbit.walk')}</dt></div>
+                <div><dd>{n.cashback}%</dd><dt>{t('home.orbit.cashback')}</dt></div>
+              </dl>
+              <ul class="b-legend">
+                {(['grocery', 'pharmacy', 'electronics'] as const).map((c) => <li data-cat={c}>{catLabel[c]}</li>)}
+              </ul>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

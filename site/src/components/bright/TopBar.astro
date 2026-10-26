@@ -1,0 +1,127 @@
+---
+// Thin brand-green bar above the header on every page (D-262): onboarding pill, the pickup reward
+// and two links. Facts only from the product rules: pickup has no fee, cashback is set per shop.
+import Icon from '../Icon.astro';
+import { createT, type Locale } from '../../i18n/index.ts';
+import { pageById, pageLocales, pagePath, type PageId } from '../../lib/pages.ts';
+import { SITE_LOCALES } from '../../lib/site-locales.ts';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = createT(locale);
+
+function link(id: PageId): { href: string; hreflang: string | undefined } {
+  const target = pageById(id);
+  const inLocale = pageLocales(target, SITE_LOCALES).includes(locale);
+  return { href: pagePath(target, inLocale ? locale : 'en'), hreflang: inLocale ? undefined : 'en' };
+}
+
+const list = link('retailers');
+const how = link('how');
+---
+
+<aside class="topbar" aria-label={t('bar.label')}>
+  <div class="tb-row">
+    <span class="tb-live"><i aria-hidden="true"></i>{t('bar.live')}</span>
+    <span class="tb-reward"><Icon name="footprints" size={15} />{t('bar.reward')}</span>
+    <span class="tb-links">
+      <a href={`${list.href}#join`} hreflang={list.hreflang}>{t('bar.list')}</a>
+      <a href={how.href} hreflang={how.hreflang}>{t('bar.how')}</a>
+    </span>
+  </div>
+</aside>
+
+<style>
+  .topbar {
+    background: var(--brand-strong);
+    color: var(--on-inverse);
+    font: 500 13px/1.4 var(--font-sans);
+  }
+
+  .tb-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 14px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 6px 24px;
+  }
+
+  .tb-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 11px;
+    border: 1px solid color-mix(in srgb, var(--on-inverse) 34%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--on-inverse) 12%, transparent);
+    font-weight: 600;
+  }
+
+  .tb-live i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--brand-mark) 40%, var(--surface));
+    animation: tb-pulse 2.2s 4;
+  }
+
+  @keyframes tb-pulse {
+    50% {
+      opacity: 0.35;
+      transform: scale(1.3);
+    }
+  }
+
+  .tb-reward {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tb-links {
+    display: inline-flex;
+    gap: 16px;
+  }
+
+  .tb-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    color: var(--on-inverse);
+    text-underline-offset: 3px;
+  }
+
+  .topbar a:focus-visible {
+    outline: 2px solid var(--on-inverse);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (width <= 900px) {
+    .tb-reward {
+      display: none;
+    }
+  }
+
+  @media (width <= 520px) {
+    .tb-row {
+      padding: 6px 16px;
+    }
+
+    .tb-links a:last-child {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tb-live i {
+      animation: none;
+    }
+  }
+</style>

@@ -1,0 +1,39 @@
+---
+// For shop owners: the plum block with the referral reward (30 credits, 01-product-rules.md) and a
+// link to the lead form.
+import Icon from '../Icon.astro';
+import type { MessageKey, Translate } from '../../i18n/index.ts';
+import { EM, splitEm } from '../home/data.ts';
+
+interface Props {
+  t: Translate;
+  href: string;
+}
+
+const { t, href } = Astro.props;
+const [before, after] = splitEm(t('home.owners.title', EM));
+const panels = [1, 2, 3].map((i) => ({ title: t(`home.owners.${i}.title` as MessageKey), body: t(`home.owners.${i}.body` as MessageKey) }));
+---
+
+<section class="b-sec b-sec-tight" id="owners">
+  <div class="b-w">
+    <div class="b-block plum rv">
+      <div>
+        <p class="b-eyebrow">{t('home.owners.eyebrow')}</p>
+        <h2 class="b-block-title">{before}<span class="b-acc">{t('home.owners.title_em')}</span>{after}</h2>
+        <p class="b-block-body">{t('home.owners.body')}</p>
+        <a class="b-btn light" href={href}>{t('home.owners.cta')}<Icon name="arrow" size={16} /></a>
+      </div>
+      <ul class="b-panels">
+        {
+          panels.map((p) => (
+            <li>
+              <b>{p.title}</b>
+              <span>{p.body}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

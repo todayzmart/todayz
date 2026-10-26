@@ -1,12 +1,14 @@
 ---
-// S-02 For retailers, in any language. The landing components with the shop-facing sections only;
-// the hero carries the retailers copy, everything else reuses the home text.
+// S-02 For retailers, in any language. The bright hero with the shopkeeper photo and the owners block
+// (D-262), then the shop-facing landing sections; the hero carries the retailers copy, everything else
+// reuses the home text.
+import Hero from '../components/bright/Hero.astro';
+import Owners from '../components/bright/Owners.astro';
+import Icon from '../components/Icon.astro';
 import Bento from '../components/home/Bento.astro';
 import Cta from '../components/home/Cta.astro';
 import DemandInsights from '../components/home/DemandInsights.astro';
 import FaqSection from '../components/home/FaqSection.astro';
-import HeroScene from '../components/home/HeroScene.astro';
-import Marquee from '../components/home/Marquee.astro';
 import ShopTypes from '../components/home/ShopTypes.astro';
 import Showcase from '../components/home/Showcase.astro';
 import ThreeSteps from '../components/home/ThreeSteps.astro';
@@ -15,7 +17,10 @@ import Base from '../layouts/Base.astro';
 import { createT, type Locale, type MessageKey } from '../i18n/index.ts';
 import { faqJsonLd, softwareApplicationJsonLd } from '../lib/jsonld.ts';
 import { pageById } from '../lib/pages.ts';
+import shopkeeper from '../assets/landing/hero-shopkeeper.webp';
+import shopkeeperSmall from '../assets/landing/hero-shopkeeper-800.webp';
 import '../styles/landing.css';
+import '../styles/bright.css';
 
 interface Props {
   locale: Locale;
@@ -28,17 +33,25 @@ const faq = [1, 2, 3].map((i) => ({ q: t(`retailers.faq.${i}.q` as MessageKey), 
 ---
 
 <Base page={page} locale={locale} jsonLd={[softwareApplicationJsonLd(locale, t('retailers.meta.description')), faqJsonLd(faq)]}>
-  <div class="lp">
-    <HeroScene
-      t={t}
-      kicker={t('nav.retailers')}
+  <div class="bp">
+    <Hero
+      photo={shopkeeper}
+      small={shopkeeperSmall}
+      alt={t('retailers.hero.photo')}
+      badge={t('nav.retailers')}
       title={t('retailers.hero.title', EM)}
       titleEm={t('retailers.hero.title_em')}
       body={t('retailers.hero.body')}
-      primaryHref="#join"
-      secondaryHref="#how"
-    />
-    <Marquee t={t} />
+    >
+      <div class="b-hero-actions">
+        <a class="b-btn" href="#join">{t('nav.start')}<Icon name="arrow" size={16} /></a>
+        <a class="b-ghost" href="#how">{t('nav.how')}</a>
+      </div>
+      <p class="b-hero-note">{t('home.hero.note')}</p>
+    </Hero>
+    <Owners t={t} href="#join" />
+  </div>
+  <div class="lp">
     <Bento t={t} />
     <Showcase t={t} />
     <DemandInsights t={t} />
@@ -48,3 +61,7 @@ const faq = [1, 2, 3].map((i) => ({ q: t(`retailers.faq.${i}.q` as MessageKey), 
     <Cta t={t} locale={locale} source="retailers" />
   </div>
 </Base>
+
+<script>
+  import '../components/bright/bright.ts';
+</script>

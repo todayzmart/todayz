@@ -1,0 +1,46 @@
+---
+// The problem: three ways of buying that each cost something, then the TodayZ way.
+import Icon from '../Icon.astro';
+import type { MessageKey, Translate } from '../../i18n/index.ts';
+import { EM, splitEm } from '../home/data.ts';
+
+interface Props {
+  t: Translate;
+}
+
+const { t } = Astro.props;
+const [before, after] = splitEm(t('home.cost.title', EM));
+const cards = [1, 2, 3].map((i) => ({
+  n: `0${i}`,
+  title: t(`home.cost.${i}.title` as MessageKey),
+  body: t(`home.cost.${i}.body` as MessageKey),
+}));
+---
+
+<section class="b-sec">
+  <div class="b-w">
+    <div class="b-head c rv">
+      <p class="b-eyebrow">{t('home.cost.eyebrow')}</p>
+      <h2>{before}<span class="b-acc">{t('home.cost.title_em')}</span>{after}</h2>
+      <p class="b-sub">{t('home.cost.sub')}</p>
+    </div>
+    <ul class="b-cost">
+      {
+        cards.map((c) => (
+          <li class="b-card rv">
+            <span class="b-num" aria-hidden="true">{c.n}</span>
+            <h3>{c.title}</h3>
+            <p>{c.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="b-way rv">
+      <div>
+        <p class="b-eyebrow">{t('home.cost.way.eyebrow')}</p>
+        <p class="b-way-title">{t('home.cost.way.title')}</p>
+      </div>
+      <a class="b-btn light" href="#journey">{t('home.cost.way.cta')}<Icon name="arrow" size={16} /></a>
+    </div>
+  </div>
+</section>

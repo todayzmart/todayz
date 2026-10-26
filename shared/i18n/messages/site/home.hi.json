@@ -993,5 +993,710 @@
     "message": "चलती सूची रोकें",
     "review": "reviewed",
     "enHash": "8cd44034"
+  },
+  "home.lede.badge": {
+    "message": "आपका मोहल्ला, स्टॉक के साथ",
+    "review": "reviewed",
+    "enHash": "5b48065b"
+  },
+  "home.lede.title": {
+    "message": "असली दुनिया को {em}",
+    "review": "reviewed",
+    "enHash": "8131f698"
+  },
+  "home.lede.title_em": {
+    "message": "खोजने लायक बनाना।",
+    "review": "reviewed",
+    "enHash": "12976092"
+  },
+  "home.lede.body": {
+    "message": "पास की दुकान में ढूँढें, ऐप में बुक करें और टहलते हुए जाकर ले लें। पिकअप पर कोई फ़ीस नहीं और दिनों का इंतज़ार नहीं, बस थोड़ी सी पैदल दूरी।",
+    "review": "reviewed",
+    "enHash": "4c7e4434"
+  },
+  "home.lede.search_label": {
+    "message": "अपने पास की दुकानें खोजें",
+    "review": "reviewed",
+    "enHash": "e27265ba"
+  },
+  "home.lede.search_placeholder": {
+    "message": "दूध, फ़ोन चार्जर, पैरासिटामॉल खोजें…",
+    "review": "reviewed",
+    "enHash": "a54ff435"
+  },
+  "home.lede.search_go": {
+    "message": "पास में खोजें",
+    "review": "reviewed",
+    "enHash": "ad3bae31"
+  },
+  "home.lede.stat.1.value": {
+    "message": "₹0",
+    "review": "reviewed",
+    "enHash": "c51874cd"
+  },
+  "home.lede.stat.1.label": {
+    "message": "पिकअप की फ़ीस",
+    "review": "reviewed",
+    "enHash": "cd505f16"
+  },
+  "home.lede.stat.2.value": {
+    "message": "0–20%",
+    "review": "reviewed",
+    "enHash": "b9b8fb42"
+  },
+  "home.lede.stat.2.label": {
+    "message": "कैशबैक, हर दुकान तय करती है",
+    "review": "reviewed",
+    "enHash": "b7f6ad15"
+  },
+  "home.lede.stat.3.value": {
+    "message": "2 km",
+    "review": "reviewed",
+    "enHash": "8067ebaa"
+  },
+  "home.lede.stat.3.label": {
+    "message": "शुरू में खोज का दायरा, 20 km तक बढ़ा सकते हैं",
+    "review": "reviewed",
+    "enHash": "d3b1faf2"
+  },
+  "home.strip.title": {
+    "message": "ये सब खोज सकते हैं",
+    "review": "reviewed",
+    "enHash": "0443693b"
+  },
+  "home.strip.pause": {
+    "message": "चलती सूची रोकें",
+    "review": "reviewed",
+    "enHash": "8cd44034"
+  },
+  "home.strip.1": {
+    "message": "दूध 1 L",
+    "review": "reviewed",
+    "enHash": "9b24bbce"
+  },
+  "home.strip.2": {
+    "message": "फ़ोन चार्जर",
+    "review": "reviewed",
+    "enHash": "3dc867cb"
+  },
+  "home.strip.3": {
+    "message": "पैरासिटामॉल 650",
+    "review": "reviewed",
+    "enHash": "fcd766a5"
+  },
+  "home.strip.4": {
+    "message": "कॉपियाँ",
+    "review": "reviewed",
+    "enHash": "251ce0b0"
+  },
+  "home.strip.5": {
+    "message": "ब्राउन ब्रेड",
+    "review": "reviewed",
+    "enHash": "b68f6446"
+  },
+  "home.strip.6": {
+    "message": "LED बल्ब",
+    "review": "reviewed",
+    "enHash": "b9cf6971"
+  },
+  "home.strip.7": {
+    "message": "फ़ेस वॉश",
+    "review": "reviewed",
+    "enHash": "4f44dc39"
+  },
+  "home.strip.8": {
+    "message": "ईयरफ़ोन",
+    "review": "reviewed",
+    "enHash": "efa2d377"
+  },
+  "home.strip.9": {
+    "message": "इंस्टेंट नूडल्स",
+    "review": "reviewed",
+    "enHash": "9e701e5f"
+  },
+  "home.strip.10": {
+    "message": "बैटरी",
+    "review": "reviewed",
+    "enHash": "0970f9df"
+  },
+  "home.cost.eyebrow": {
+    "message": "समस्या",
+    "review": "reviewed",
+    "enHash": "8a940000"
+  },
+  "home.cost.title": {
+    "message": "खरीदने का हर तरीका {em}",
+    "review": "reviewed",
+    "enHash": "5022a201"
+  },
+  "home.cost.title_em": {
+    "message": "आपसे कुछ न कुछ वसूलता है।",
+    "review": "reviewed",
+    "enHash": "2bb9b83a"
+  },
+  "home.cost.sub": {
+    "message": "समय, सब्र या पैसा। आज आप इन तीनों में से कम से कम एक चुकाते हैं, और अक्सर तीनों।",
+    "review": "reviewed",
+    "enHash": "5a37b8b5"
+  },
+  "home.cost.1.title": {
+    "message": "घूमते रहो, फिर हार मान लो",
+    "review": "reviewed",
+    "enHash": "97f4e09a"
+  },
+  "home.cost.1.body": {
+    "message": "आप दुकान-दुकान पूछते और इंतज़ार करते घूमते हैं, फिर भी खाली हाथ घर लौटते हैं।",
+    "review": "reviewed",
+    "enHash": "b8a9828e"
+  },
+  "home.cost.2.title": {
+    "message": "ऑनलाइन ऑर्डर करो, दिनों इंतज़ार करो",
+    "review": "reviewed",
+    "enHash": "05596e51"
+  },
+  "home.cost.2.body": {
+    "message": "स्क्रीन पर तो सेकंडों में दिखता है, पर दरवाज़े तक दिनों में पहुँचता है, वह भी ऐसी चीज़ जो पास की दुकान में पहले से थी।",
+    "review": "reviewed",
+    "enHash": "43759e2f"
+  },
+  "home.cost.3.title": {
+    "message": "तुरंत डिलीवरी, पर फ़ीस भरो",
+    "review": "reviewed",
+    "enHash": "5702bcb5"
+  },
+  "home.cost.3.body": {
+    "message": "तेज़ है, पर डिलीवरी, हैंडलिंग और छोटे बास्केट के चार्ज हर ऑर्डर पर चुपचाप जुड़ते जाते हैं।",
+    "review": "reviewed",
+    "enHash": "064c6675"
+  },
+  "home.cost.way.eyebrow": {
+    "message": "TodayZ का तरीका",
+    "review": "reviewed",
+    "enHash": "a7f0b759"
+  },
+  "home.cost.way.title": {
+    "message": "एक बार खोजें। बुक करें। टहलते हुए जाएँ। दुकान को पैसे दें।",
+    "review": "reviewed",
+    "enHash": "2e141c06"
+  },
+  "home.cost.way.cta": {
+    "message": "देखें कैसा लगता है",
+    "review": "reviewed",
+    "enHash": "196a6a56"
+  },
+  "home.walk.eyebrow": {
+    "message": "सफ़र",
+    "review": "reviewed",
+    "enHash": "7fe9eb42"
+  },
+  "home.walk.title": {
+    "message": "एक बार खोजें। {em} पिकअप करें।",
+    "review": "reviewed",
+    "enHash": "c13692dc"
+  },
+  "home.walk.title_em": {
+    "message": "पैदल जाएँ।",
+    "review": "reviewed",
+    "enHash": "4128f8a3"
+  },
+  "home.walk.sub": {
+    "message": "ढूँढें, बुक करें और पास की दुकान से ले लें। एक छोटी सी पैदल यात्रा देखें।",
+    "review": "reviewed",
+    "enHash": "0a238688"
+  },
+  "home.walk.map": {
+    "message": "आपसे 600 m दूर शर्मा जनरल स्टोर तक पैदल रास्ते का नक्शा।",
+    "review": "reviewed",
+    "enHash": "44043abc"
+  },
+  "home.walk.scroll": {
+    "message": "पैदल रास्ते का नक्शा, छोटी स्क्रीन पर बगल में स्क्रोल होता है",
+    "review": "reviewed",
+    "enHash": "d5ec4c27"
+  },
+  "home.walk.you": {
+    "message": "आप",
+    "review": "reviewed",
+    "enHash": "905cb326"
+  },
+  "home.walk.tag": {
+    "message": "बुक हो गया · 600 m · 8 मिनट पैदल",
+    "review": "reviewed",
+    "enHash": "203e6ddd"
+  },
+  "home.walk.replay": {
+    "message": "सफ़र फिर से चलाएँ",
+    "review": "reviewed",
+    "enHash": "fc90235d"
+  },
+  "home.walk.hud.1": {
+    "message": "चले गए मीटर",
+    "review": "reviewed",
+    "enHash": "e394a90c"
+  },
+  "home.walk.hud.2": {
+    "message": "पैदल चले मिनट",
+    "review": "reviewed",
+    "enHash": "8037005b"
+  },
+  "home.walk.hud.3": {
+    "message": "पिकअप फ़ीस",
+    "review": "reviewed",
+    "enHash": "d93f487e"
+  },
+  "home.walk.hud.4": {
+    "message": "स्टॉक की पुष्टि",
+    "review": "reviewed",
+    "enHash": "06198737"
+  },
+  "home.walk.hud.4.value": {
+    "message": "12 मिनट पहले",
+    "review": "reviewed",
+    "enHash": "6c786da7"
+  },
+  "home.walk.step.1.title": {
+    "message": "01 · खोजें",
+    "review": "reviewed",
+    "enHash": "e42236a3"
+  },
+  "home.walk.step.1.body": {
+    "message": "जो चाहिए वह लिखें। पास की वे दुकानें देखें जिनके पास वह स्टॉक में है।",
+    "review": "reviewed",
+    "enHash": "29f36790"
+  },
+  "home.walk.step.2.title": {
+    "message": "02 · बुक करें",
+    "review": "reviewed",
+    "enHash": "0ca4552a"
+  },
+  "home.walk.step.2.body": {
+    "message": "दुकान के दाम पर बुक करें, और दुकान उसे तैयार रखती है।",
+    "review": "reviewed",
+    "enHash": "329ddbbb"
+  },
+  "home.walk.step.3.title": {
+    "message": "03 · चलें",
+    "review": "reviewed",
+    "enHash": "3167c564"
+  },
+  "home.walk.step.3.body": {
+    "message": "ऐप बताता है कि दुकान कितनी दूर है। जब सही लगे, चल पड़ें।",
+    "review": "reviewed",
+    "enHash": "66066c48"
+  },
+  "home.walk.step.4.title": {
+    "message": "04 · ले लें",
+    "review": "reviewed",
+    "enHash": "dc111fbf"
+  },
+  "home.walk.step.4.body": {
+    "message": "अपना पिकअप कोड दिखाएँ, दुकान को पैसे दें, और अगर दुकान कैशबैक देती है तो वह पाएँ।",
+    "review": "reviewed",
+    "enHash": "81d7c45d"
+  },
+  "home.walk.note": {
+    "message": "उदाहरण। पैदल समय लगभग 5 km प्रति घंटे की चाल से है।",
+    "review": "reviewed",
+    "enHash": "c7baab0f"
+  },
+  "home.week.eyebrow": {
+    "message": "छोटे काम, नए अंदाज़ में",
+    "review": "reviewed",
+    "enHash": "19f6df43"
+  },
+  "home.week.title": {
+    "message": "सबसे अच्छी दुकान वही है {em}",
+    "review": "reviewed",
+    "enHash": "edbe6a99"
+  },
+  "home.week.title_em": {
+    "message": "जहाँ आप पैदल जाते हैं।",
+    "review": "reviewed",
+    "enHash": "01a3af05"
+  },
+  "home.week.sub": {
+    "message": "हर पिकअप एक काम को छोटी सी सैर बना देता है। न डिलीवरी चार्ज, न बिस्कुट के एक पैकेट के लिए सड़क पर राइडर, और आप अपने मोहल्ले को और करीब से देखते हैं।",
+    "review": "reviewed",
+    "enHash": "32946fc6"
+  },
+  "home.week.perk.1.title": {
+    "message": "हर दुकान की दूरी",
+    "review": "reviewed",
+    "enHash": "f89db939"
+  },
+  "home.week.perk.1.body": {
+    "message": "खोज में दिखता है कि हर दुकान कितनी दूर है, ताकि आप सबसे पास वाली चुन सकें।",
+    "review": "reviewed",
+    "enHash": "208d8d77"
+  },
+  "home.week.perk.2.title": {
+    "message": "जहाँ दुकान दे, वहाँ कैशबैक",
+    "review": "reviewed",
+    "enHash": "a08e581a"
+  },
+  "home.week.perk.2.body": {
+    "message": "हर दुकान अपना कैशबैक खुद तय करती है, 0 से 20% तक, और वह आपको क्रेडिट में मिलता है।",
+    "review": "reviewed",
+    "enHash": "070368c8"
+  },
+  "home.week.perk.3.title": {
+    "message": "कोई फ़ीस नहीं, कम पैकेजिंग",
+    "review": "reviewed",
+    "enHash": "bf8271a2"
+  },
+  "home.week.perk.3.body": {
+    "message": "पिकअप पर कुछ अतिरिक्त नहीं देना, और एक चीज़ के लिए डिलीवरी बैग भी नहीं।",
+    "review": "reviewed",
+    "enHash": "0b09e279"
+  },
+  "home.week.card.title": {
+    "message": "पिकअप का एक हफ़्ता",
+    "review": "reviewed",
+    "enHash": "3fcfcbbb"
+  },
+  "home.week.card.tag": {
+    "message": "उदाहरण",
+    "review": "reviewed",
+    "enHash": "0f01ed56"
+  },
+  "home.week.rings": {
+    "message": "उदाहरण का हफ़्ता: 4.9 km पैदल, 58 मिनट पैदल चलना, 6 पिकअप।",
+    "review": "reviewed",
+    "enHash": "d8d2e6f1"
+  },
+  "home.week.km": {
+    "message": "km पैदल",
+    "review": "reviewed",
+    "enHash": "eaccc501"
+  },
+  "home.week.min": {
+    "message": "मिनट पैदल",
+    "review": "reviewed",
+    "enHash": "5c1d740b"
+  },
+  "home.week.pickups": {
+    "message": "पिकअप",
+    "review": "reviewed",
+    "enHash": "cf8af551"
+  },
+  "home.week.bars": {
+    "message": "उदाहरण के हफ़्ते में हर दिन पैदल चली दूरी, शनिवार को सबसे ज़्यादा।",
+    "review": "reviewed",
+    "enHash": "e03d16b2"
+  },
+  "home.week.days": {
+    "message": "सो मं बु गु शु श र",
+    "review": "reviewed",
+    "enHash": "a0862b3a"
+  },
+  "home.week.row.1.title": {
+    "message": "पिकअप फ़ीस में ₹0",
+    "review": "reviewed",
+    "enHash": "cd61f110"
+  },
+  "home.week.row.1.body": {
+    "message": "पिकअप पर कभी फ़ीस नहीं लगती",
+    "review": "reviewed",
+    "enHash": "e19693c5"
+  },
+  "home.week.row.2.title": {
+    "message": "86 क्रेडिट मिले",
+    "review": "reviewed",
+    "enHash": "320d9afa"
+  },
+  "home.week.row.2.body": {
+    "message": "6 पिकअप का कैशबैक, 1 क्रेडिट = ₹1",
+    "review": "reviewed",
+    "enHash": "b24af8d3"
+  },
+  "home.orbit.eyebrow": {
+    "message": "आपके 2 km",
+    "review": "reviewed",
+    "enHash": "cd03ef8f"
+  },
+  "home.orbit.title": {
+    "message": "अपने आसपास के {em} को देखें",
+    "review": "reviewed",
+    "enHash": "2fe44f83"
+  },
+  "home.orbit.title_em": {
+    "message": "2 km",
+    "review": "reviewed",
+    "enHash": "8067ebaa"
+  },
+  "home.orbit.sub": {
+    "message": "खोज 2 km के भीतर की दुकानों से शुरू होती है, और आप उसे 20 km तक बढ़ा सकते हैं। किसी दुकान पर टैप करें और देखें कि उसके पास क्या है और कितना चलना होगा।",
+    "review": "reviewed",
+    "enHash": "5a5d16cf"
+  },
+  "home.orbit.label": {
+    "message": "2 km के भीतर की उदाहरण दुकानें",
+    "review": "reviewed",
+    "enHash": "d40f9fe7"
+  },
+  "home.orbit.you": {
+    "message": "आप",
+    "review": "reviewed",
+    "enHash": "905cb326"
+  },
+  "home.orbit.away": {
+    "message": "{distance} दूर · लगभग {minutes} मिनट पैदल",
+    "review": "reviewed",
+    "enHash": "0c2dbb1c"
+  },
+  "home.orbit.item": {
+    "message": "उदाहरण का आइटम",
+    "review": "reviewed",
+    "enHash": "735134c0"
+  },
+  "home.orbit.confirmed": {
+    "message": "स्टॉक की पुष्टि",
+    "review": "reviewed",
+    "enHash": "06198737"
+  },
+  "home.orbit.confirmed_value": {
+    "message": "{minutes} मिनट पहले",
+    "review": "reviewed",
+    "enHash": "61da5f60"
+  },
+  "home.orbit.walk": {
+    "message": "पैदल, एक तरफ़",
+    "review": "reviewed",
+    "enHash": "0246767d"
+  },
+  "home.orbit.walk_value": {
+    "message": "{minutes} मिनट",
+    "review": "reviewed",
+    "enHash": "09a22c22"
+  },
+  "home.orbit.cashback": {
+    "message": "इस दुकान का कैशबैक",
+    "review": "reviewed",
+    "enHash": "3469fd2c"
+  },
+  "home.orbit.shop": {
+    "message": "{shop}, {distance} दूर",
+    "review": "reviewed",
+    "enHash": "6992686b"
+  },
+  "home.shelf.eyebrow": {
+    "message": "शेल्फ़ की जाँच",
+    "review": "reviewed",
+    "enHash": "09e8887e"
+  },
+  "home.shelf.title": {
+    "message": "पास में मिलता है, {em}",
+    "review": "reviewed",
+    "enHash": "53b95304"
+  },
+  "home.shelf.title_em": {
+    "message": "अभी।",
+    "review": "reviewed",
+    "enHash": "3254a76f"
+  },
+  "home.shelf.tabs": {
+    "message": "श्रेणी",
+    "review": "reviewed",
+    "enHash": "a3c686e7"
+  },
+  "home.shelf.all": {
+    "message": "सभी",
+    "review": "reviewed",
+    "enHash": "6a720856"
+  },
+  "home.shelf.cat.grocery": {
+    "message": "किराना",
+    "review": "reviewed",
+    "enHash": "9c998ada"
+  },
+  "home.shelf.cat.pharmacy": {
+    "message": "दवाइयाँ",
+    "review": "reviewed",
+    "enHash": "2f6c536b"
+  },
+  "home.shelf.cat.electronics": {
+    "message": "इलेक्ट्रॉनिक्स",
+    "review": "reviewed",
+    "enHash": "89f1ebf5"
+  },
+  "home.shelf.stock": {
+    "message": "स्टॉक में · {minutes} मिनट पहले पुष्टि हुई",
+    "review": "reviewed",
+    "enHash": "fa8811bd"
+  },
+  "home.shelf.walk": {
+    "message": "{distance} · {minutes} मिनट पैदल",
+    "review": "reviewed",
+    "enHash": "23b64712"
+  },
+  "home.shelf.find": {
+    "message": "खोजें",
+    "review": "reviewed",
+    "enHash": "65080933"
+  },
+  "home.shelf.find_label": {
+    "message": "अपने पास {item} खोजें",
+    "review": "reviewed",
+    "enHash": "38b02c29"
+  },
+  "home.save.eyebrow": {
+    "message": "आपकी बचत",
+    "review": "reviewed",
+    "enHash": "09f03557"
+  },
+  "home.save.title": {
+    "message": "देखें एक {em} की क्या कीमत है",
+    "review": "reviewed",
+    "enHash": "9d38b897"
+  },
+  "home.save.title_em": {
+    "message": "सैर",
+    "review": "reviewed",
+    "enHash": "df06b147"
+  },
+  "home.save.sub": {
+    "message": "महीने के कुछ ऑर्डर डिलीवरी से हटाकर पास की दुकान पर ले जाएँ।",
+    "review": "reviewed",
+    "enHash": "410f68bb"
+  },
+  "home.save.orders": {
+    "message": "महीने में ऑर्डर",
+    "review": "reviewed",
+    "enHash": "e7e0d70d"
+  },
+  "home.save.fee": {
+    "message": "हर डिलीवर हुए ऑर्डर पर आप जो फ़ीस देते हैं",
+    "review": "reviewed",
+    "enHash": "1b092045"
+  },
+  "home.save.basket": {
+    "message": "आपका आम बास्केट",
+    "review": "reviewed",
+    "enHash": "e3640cf2"
+  },
+  "home.save.cashback": {
+    "message": "दुकान का कैशबैक",
+    "review": "reviewed",
+    "enHash": "27f9118a"
+  },
+  "home.save.walk": {
+    "message": "दुकान तक आना-जाना पैदल",
+    "review": "reviewed",
+    "enHash": "2fc9bd58"
+  },
+  "home.save.keep": {
+    "message": "हर साल आपके पास बचता है",
+    "review": "reviewed",
+    "enHash": "102629ba"
+  },
+  "home.save.fees": {
+    "message": "बची हुई फ़ीस",
+    "review": "reviewed",
+    "enHash": "e948a0e4"
+  },
+  "home.save.credits": {
+    "message": "कैशबैक, क्रेडिट में",
+    "review": "reviewed",
+    "enHash": "51ff9a15"
+  },
+  "home.save.km": {
+    "message": "पैदल चली दूरी",
+    "review": "reviewed",
+    "enHash": "3aba6f93"
+  },
+  "home.save.hours": {
+    "message": "पैदल बिताया समय",
+    "review": "reviewed",
+    "enHash": "88b31039"
+  },
+  "home.save.cta": {
+    "message": "TodayZ ऐप खोलें",
+    "review": "reviewed",
+    "enHash": "785b7c7d"
+  },
+  "home.save.note": {
+    "message": "सिर्फ़ समझाने के लिए। हर दुकान अपना कैशबैक खुद तय करती है, 0 से 20% तक, और कई दुकानें कुछ नहीं देतीं। पैदल समय लगभग 5 km प्रति घंटे की चाल से है।",
+    "review": "reviewed",
+    "enHash": "b0158fc9"
+  },
+  "home.owners.eyebrow": {
+    "message": "दुकानदारों के लिए",
+    "review": "reviewed",
+    "enHash": "fa54f1ea"
+  },
+  "home.owners.title": {
+    "message": "आपकी अलमारी में {em}",
+    "review": "reviewed",
+    "enHash": "1958bd36"
+  },
+  "home.owners.title_em": {
+    "message": "वही है जो लोग ढूँढ रहे हैं।",
+    "review": "reviewed",
+    "enHash": "317f3f2e"
+  },
+  "home.owners.body": {
+    "message": "आसपास के लोगों को अपनी दुकान दिखाएँ, TodayZ पर लाए हर ग्राहक के लिए 30 क्रेडिट कमाएँ, और खत्म होने से पहले जानें कि क्या मँगवाना है।",
+    "review": "reviewed",
+    "enHash": "bd883c32"
+  },
+  "home.owners.cta": {
+    "message": "अपनी दुकान जोड़ें",
+    "review": "reviewed",
+    "enHash": "b94ec5f9"
+  },
+  "home.owners.1.title": {
+    "message": "आसपास दिखें",
+    "review": "reviewed",
+    "enHash": "f5672a1d"
+  },
+  "home.owners.1.body": {
+    "message": "अपने खोज के दायरे में मौजूद ग्राहक खोजते ही आपका स्टॉक देखते हैं।",
+    "review": "reviewed",
+    "enHash": "cc6b20f6"
+  },
+  "home.owners.2.title": {
+    "message": "हर ग्राहक पर 30 क्रेडिट",
+    "review": "reviewed",
+    "enHash": "2c192c45"
+  },
+  "home.owners.2.body": {
+    "message": "जब आपका बुलाया कोई व्यक्ति ₹100 या उससे ज़्यादा का पहला ऑर्डर पूरा करे। 1 क्रेडिट = ₹1, हर महीने भुगतान।",
+    "review": "reviewed",
+    "enHash": "a8144148"
+  },
+  "home.owners.3.title": {
+    "message": "ज़्यादा बेचें, कम बर्बाद करें",
+    "review": "reviewed",
+    "enHash": "104616d1"
+  },
+  "home.owners.3.body": {
+    "message": "रोज़ाना सुझाव कि क्या मँगवाना है और किस पर ऑफ़र लगाना है।",
+    "review": "reviewed",
+    "enHash": "d1ab7cc3"
+  },
+  "home.credits.title": {
+    "message": "फ़ोटो क्रेडिट",
+    "review": "reviewed",
+    "enHash": "f9ce2574"
+  },
+  "home.credits.licence": {
+    "message": "फ़ोटो CC BY 2.0 लाइसेंस के तहत इस्तेमाल हुए हैं। शीर्षक, फ़ोटोग्राफ़र और स्रोत:",
+    "review": "reviewed",
+    "enHash": "a643642b"
+  },
+  "home.save.km_value": {
+    "message": "{km} किमी",
+    "review": "reviewed",
+    "enHash": "5d1ec3cd"
+  },
+  "home.save.hours_value": {
+    "message": "{hours} घंटे",
+    "review": "reviewed",
+    "enHash": "83996d17"
+  },
+  "home.lede.photo": {
+    "message": "एक छोटी जनरल स्टोर के काउंटर पर दुकानदार, अलमारियाँ सामान से भरी हुई।",
+    "review": "reviewed",
+    "enHash": "380ce24b"
   }
 }

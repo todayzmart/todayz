@@ -369,13 +369,13 @@ test.describe('SC-SITE-03 lead form: errors are announced, and the form always r
 });
 
 test.describe('SC-SITE-06 motion can be stopped (WCAG 2.2.2)', () => {
-  test('the shop-type strip has a visible pause control that works from the keyboard', async ({ page }) => {
+  test('the search strip has a visible pause control that works from the keyboard', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/');
-    const track = page.locator('.marquee-track').first();
+    const track = page.locator('.b-strip-track').first();
     await expect(track).toHaveCSS('animation-play-state', 'running');
     const pause = page.getByRole('checkbox', { name: 'Pause the moving list' });
-    await expect(page.locator('.marquee-pause').first()).toBeVisible();
+    await expect(page.locator('.b-strip-pause').first()).toBeVisible();
     await pause.focus();
     await page.keyboard.press('Space');
     await expect(pause).toBeChecked();
@@ -394,7 +394,7 @@ test.describe('SC-SITE-06 motion can be stopped (WCAG 2.2.2)', () => {
           .filter((a) => a.effect?.getTiming().iterations === Infinity)
           .map((a) => (a.effect instanceof KeyframeEffect && a.effect.target instanceof Element ? a.effect.target.className : '?')),
       );
-      expect(endless.filter((c) => !String(c).includes('marquee-track')), path).toEqual([]);
+      expect(endless.filter((c) => !String(c).includes('b-strip-track')), path).toEqual([]);
     }
   });
 });
@@ -528,7 +528,8 @@ test.describe('SC-SITE-06 keyboard, no-JS content and restraint', () => {
     await page.goto('/');
     const mocks = page.locator('main [aria-hidden="true"]');
     expect(await mocks.count()).toBeGreaterThan(0);
-    // No mock exposes a focusable control.
-    expect(await page.locator('main [aria-hidden="true"] :is(a, button, input, select, textarea)').count()).toBe(0);
+    // No mock exposes a focusable control. The search strip's second copy keeps its links for the mouse,
+    // out of the tab order (tabindex=-1).
+    expect(await page.locator('main [aria-hidden="true"] :is(a, button, input, select, textarea):not([tabindex="-1"])').count()).toBe(0);
   });
 });

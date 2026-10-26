@@ -686,5 +686,428 @@
   "home.types.pause": {
     "defaultMessage": "Pause the moving list",
     "description": "Label of the checkbox that pauses the scrolling strip of shop types (WCAG 2.2.2)."
+  },
+  "home.lede.badge": {
+    "defaultMessage": "Your neighbourhood, in stock"
+  },
+  "home.lede.title": {
+    "defaultMessage": "Making the physical world {em}"
+  },
+  "home.lede.title_em": {
+    "defaultMessage": "searchable."
+  },
+  "home.lede.body": {
+    "defaultMessage": "Find it in a shop nearby, book it in the app, and walk over to collect it. No fee for pickup and no days of waiting, just a short walk."
+  },
+  "home.lede.search_label": {
+    "defaultMessage": "Search shops near you"
+  },
+  "home.lede.search_placeholder": {
+    "defaultMessage": "Search milk, a phone charger, paracetamol…"
+  },
+  "home.lede.search_go": {
+    "defaultMessage": "Search nearby"
+  },
+  "home.lede.stat.1.value": {
+    "defaultMessage": "₹0"
+  },
+  "home.lede.stat.1.label": {
+    "defaultMessage": "Fee for pickup"
+  },
+  "home.lede.stat.2.value": {
+    "defaultMessage": "0–20%"
+  },
+  "home.lede.stat.2.label": {
+    "defaultMessage": "Cashback, set by each shop"
+  },
+  "home.lede.stat.3.value": {
+    "defaultMessage": "2 km"
+  },
+  "home.lede.stat.3.label": {
+    "defaultMessage": "Search radius to start, up to 20 km"
+  },
+  "home.strip.title": {
+    "defaultMessage": "Things you can search for"
+  },
+  "home.strip.pause": {
+    "defaultMessage": "Pause the moving list"
+  },
+  "home.strip.1": {
+    "defaultMessage": "Milk 1 L"
+  },
+  "home.strip.2": {
+    "defaultMessage": "Phone charger"
+  },
+  "home.strip.3": {
+    "defaultMessage": "Paracetamol 650"
+  },
+  "home.strip.4": {
+    "defaultMessage": "Notebooks"
+  },
+  "home.strip.5": {
+    "defaultMessage": "Brown bread"
+  },
+  "home.strip.6": {
+    "defaultMessage": "LED bulb"
+  },
+  "home.strip.7": {
+    "defaultMessage": "Face wash"
+  },
+  "home.strip.8": {
+    "defaultMessage": "Earphones"
+  },
+  "home.strip.9": {
+    "defaultMessage": "Instant noodles"
+  },
+  "home.strip.10": {
+    "defaultMessage": "Batteries"
+  },
+  "home.cost.eyebrow": {
+    "defaultMessage": "The problem"
+  },
+  "home.cost.title": {
+    "defaultMessage": "Every way of buying {em}"
+  },
+  "home.cost.title_em": {
+    "defaultMessage": "costs you something."
+  },
+  "home.cost.sub": {
+    "defaultMessage": "Time, patience or money. Today you pay at least one of the three, and often all of them."
+  },
+  "home.cost.1.title": {
+    "defaultMessage": "Roam, then give up"
+  },
+  "home.cost.1.body": {
+    "defaultMessage": "You walk from shop to shop, asking and waiting, and still head home empty-handed."
+  },
+  "home.cost.2.title": {
+    "defaultMessage": "Order online, wait days"
+  },
+  "home.cost.2.body": {
+    "defaultMessage": "It is on a screen in seconds and at your door in days, for something a shop down the road already had."
+  },
+  "home.cost.3.title": {
+    "defaultMessage": "Quick delivery, pay the fees"
+  },
+  "home.cost.3.body": {
+    "defaultMessage": "Fast, but delivery, handling and small-basket charges quietly add up on every order."
+  },
+  "home.cost.way.eyebrow": {
+    "defaultMessage": "The TodayZ way"
+  },
+  "home.cost.way.title": {
+    "defaultMessage": "Search once. Book. Walk over. Pay the shop."
+  },
+  "home.cost.way.cta": {
+    "defaultMessage": "See how it feels"
+  },
+  "home.walk.eyebrow": {
+    "defaultMessage": "The journey"
+  },
+  "home.walk.title": {
+    "defaultMessage": "Search once. {em} Pick it up."
+  },
+  "home.walk.title_em": {
+    "defaultMessage": "Walk there."
+  },
+  "home.walk.sub": {
+    "defaultMessage": "Find it, book it, and collect it from a shop down the road. Watch one short walk play out."
+  },
+  "home.walk.map": {
+    "defaultMessage": "A walking route from you to Sharma General Store, 600 m away."
+  },
+  "home.walk.scroll": {
+    "defaultMessage": "Walking route map, scrolls sideways on small screens"
+  },
+  "home.walk.you": {
+    "defaultMessage": "You"
+  },
+  "home.walk.tag": {
+    "defaultMessage": "Booked · 600 m · 8 min walk"
+  },
+  "home.walk.replay": {
+    "defaultMessage": "Play the walk again"
+  },
+  "home.walk.hud.1": {
+    "defaultMessage": "Metres walked"
+  },
+  "home.walk.hud.2": {
+    "defaultMessage": "Minutes on foot"
+  },
+  "home.walk.hud.3": {
+    "defaultMessage": "Pickup fee"
+  },
+  "home.walk.hud.4": {
+    "defaultMessage": "Stock confirmed"
+  },
+  "home.walk.hud.4.value": {
+    "defaultMessage": "12 min ago"
+  },
+  "home.walk.step.1.title": {
+    "defaultMessage": "01 · Search"
+  },
+  "home.walk.step.1.body": {
+    "defaultMessage": "Type what you need. See the shops nearby that have it in stock."
+  },
+  "home.walk.step.2.title": {
+    "defaultMessage": "02 · Book"
+  },
+  "home.walk.step.2.body": {
+    "defaultMessage": "Book it at the shop's price, and the shop gets it ready."
+  },
+  "home.walk.step.3.title": {
+    "defaultMessage": "03 · Walk"
+  },
+  "home.walk.step.3.body": {
+    "defaultMessage": "The app shows how far the shop is. Walk over when it suits you."
+  },
+  "home.walk.step.4.title": {
+    "defaultMessage": "04 · Collect"
+  },
+  "home.walk.step.4.body": {
+    "defaultMessage": "Show your pickup code, pay the shop, and earn its cashback if it gives one."
+  },
+  "home.walk.note": {
+    "defaultMessage": "Example. Walking time assumes about 5 km an hour."
+  },
+  "home.week.eyebrow": {
+    "defaultMessage": "Errands, reimagined"
+  },
+  "home.week.title": {
+    "defaultMessage": "The best shop is the one {em}"
+  },
+  "home.week.title_em": {
+    "defaultMessage": "you walk to."
+  },
+  "home.week.sub": {
+    "defaultMessage": "Every pickup turns an errand into a short walk. No delivery charge, no rider on the road for one packet of biscuits, and you see more of the neighbourhood you live in."
+  },
+  "home.week.perk.1.title": {
+    "defaultMessage": "Distance to every shop"
+  },
+  "home.week.perk.1.body": {
+    "defaultMessage": "Search shows how far each shop is, so you can pick the short walk."
+  },
+  "home.week.perk.2.title": {
+    "defaultMessage": "Cashback where the shop gives it"
+  },
+  "home.week.perk.2.body": {
+    "defaultMessage": "Each shop sets its own cashback, from 0 to 20%, paid to you in credits."
+  },
+  "home.week.perk.3.title": {
+    "defaultMessage": "No fee, less packaging"
+  },
+  "home.week.perk.3.body": {
+    "defaultMessage": "Nothing extra to pay for pickup, and no delivery bag for a single item."
+  },
+  "home.week.card.title": {
+    "defaultMessage": "A week of pickups"
+  },
+  "home.week.card.tag": {
+    "defaultMessage": "Example"
+  },
+  "home.week.rings": {
+    "defaultMessage": "Example week: 4.9 km walked, 58 minutes on foot, 6 pickups."
+  },
+  "home.week.km": {
+    "defaultMessage": "km walked"
+  },
+  "home.week.min": {
+    "defaultMessage": "minutes on foot"
+  },
+  "home.week.pickups": {
+    "defaultMessage": "pickups"
+  },
+  "home.week.bars": {
+    "defaultMessage": "Distance walked each day of an example week, highest on Saturday."
+  },
+  "home.week.days": {
+    "defaultMessage": "M T W T F S S"
+  },
+  "home.week.row.1.title": {
+    "defaultMessage": "₹0 in pickup fees"
+  },
+  "home.week.row.1.body": {
+    "defaultMessage": "Pickup never has a fee"
+  },
+  "home.week.row.2.title": {
+    "defaultMessage": "86 credits earned"
+  },
+  "home.week.row.2.body": {
+    "defaultMessage": "Cashback from 6 pickups, 1 credit = ₹1"
+  },
+  "home.orbit.eyebrow": {
+    "defaultMessage": "Your 2 km"
+  },
+  "home.orbit.title": {
+    "defaultMessage": "Explore the {em} around you"
+  },
+  "home.orbit.title_em": {
+    "defaultMessage": "2 km"
+  },
+  "home.orbit.sub": {
+    "defaultMessage": "Search starts with the shops within 2 km, and you can widen it to 20 km. Tap a shop to see what it holds and how far the walk is."
+  },
+  "home.orbit.label": {
+    "defaultMessage": "Example shops within 2 km"
+  },
+  "home.orbit.you": {
+    "defaultMessage": "You"
+  },
+  "home.orbit.away": {
+    "defaultMessage": "{distance} away · about {minutes} min walk"
+  },
+  "home.orbit.item": {
+    "defaultMessage": "Example item"
+  },
+  "home.orbit.confirmed": {
+    "defaultMessage": "Stock confirmed"
+  },
+  "home.orbit.confirmed_value": {
+    "defaultMessage": "{minutes} min ago"
+  },
+  "home.orbit.walk": {
+    "defaultMessage": "Walk, one way"
+  },
+  "home.orbit.walk_value": {
+    "defaultMessage": "{minutes} min"
+  },
+  "home.orbit.cashback": {
+    "defaultMessage": "Cashback at this shop"
+  },
+  "home.orbit.shop": {
+    "defaultMessage": "{shop}, {distance} away"
+  },
+  "home.shelf.eyebrow": {
+    "defaultMessage": "Shelf inspector"
+  },
+  "home.shelf.title": {
+    "defaultMessage": "Available nearby, {em}"
+  },
+  "home.shelf.title_em": {
+    "defaultMessage": "right now."
+  },
+  "home.shelf.tabs": {
+    "defaultMessage": "Category"
+  },
+  "home.shelf.all": {
+    "defaultMessage": "All"
+  },
+  "home.shelf.cat.grocery": {
+    "defaultMessage": "Groceries"
+  },
+  "home.shelf.cat.pharmacy": {
+    "defaultMessage": "Pharmacy"
+  },
+  "home.shelf.cat.electronics": {
+    "defaultMessage": "Electronics"
+  },
+  "home.shelf.stock": {
+    "defaultMessage": "In stock · confirmed {minutes} min ago"
+  },
+  "home.shelf.walk": {
+    "defaultMessage": "{distance} · {minutes} min walk"
+  },
+  "home.shelf.find": {
+    "defaultMessage": "Find it"
+  },
+  "home.shelf.find_label": {
+    "defaultMessage": "Find {item} near you"
+  },
+  "home.save.eyebrow": {
+    "defaultMessage": "Your savings"
+  },
+  "home.save.title": {
+    "defaultMessage": "See what one {em} is worth"
+  },
+  "home.save.title_em": {
+    "defaultMessage": "walk"
+  },
+  "home.save.sub": {
+    "defaultMessage": "Move a few of your monthly orders from delivery to the shop down the road."
+  },
+  "home.save.orders": {
+    "defaultMessage": "Orders a month"
+  },
+  "home.save.fee": {
+    "defaultMessage": "Fees you pay per delivered order"
+  },
+  "home.save.basket": {
+    "defaultMessage": "Your usual basket"
+  },
+  "home.save.cashback": {
+    "defaultMessage": "The shop's cashback"
+  },
+  "home.save.walk": {
+    "defaultMessage": "Round-trip walk to the shop"
+  },
+  "home.save.keep": {
+    "defaultMessage": "You keep every year"
+  },
+  "home.save.fees": {
+    "defaultMessage": "Fees avoided"
+  },
+  "home.save.credits": {
+    "defaultMessage": "Cashback, in credits"
+  },
+  "home.save.km": {
+    "defaultMessage": "Distance walked"
+  },
+  "home.save.hours": {
+    "defaultMessage": "Time on foot"
+  },
+  "home.save.cta": {
+    "defaultMessage": "Open the TodayZ app"
+  },
+  "home.save.note": {
+    "defaultMessage": "Illustrative. Each shop sets its own cashback, from 0 to 20%, and many give none. Walking time assumes about 5 km an hour."
+  },
+  "home.owners.eyebrow": {
+    "defaultMessage": "For shop owners"
+  },
+  "home.owners.title": {
+    "defaultMessage": "Your shelf has {em}"
+  },
+  "home.owners.title_em": {
+    "defaultMessage": "what they are looking for."
+  },
+  "home.owners.body": {
+    "defaultMessage": "Be found by shoppers nearby, earn 30 credits for every customer you bring onto TodayZ, and know what to restock before you run out."
+  },
+  "home.owners.cta": {
+    "defaultMessage": "List your shop"
+  },
+  "home.owners.1.title": {
+    "defaultMessage": "Be found nearby"
+  },
+  "home.owners.1.body": {
+    "defaultMessage": "Shoppers within their search radius see your stock when they search."
+  },
+  "home.owners.2.title": {
+    "defaultMessage": "30 credits per customer"
+  },
+  "home.owners.2.body": {
+    "defaultMessage": "When someone you refer completes a first order of ₹100 or more. 1 credit = ₹1, paid out monthly."
+  },
+  "home.owners.3.title": {
+    "defaultMessage": "Sell more, waste less"
+  },
+  "home.owners.3.body": {
+    "defaultMessage": "Daily tips on what to restock and what to put on offer."
+  },
+  "home.credits.title": {
+    "defaultMessage": "Photo credits"
+  },
+  "home.credits.licence": {
+    "defaultMessage": "Photos used under CC BY 2.0. Title, author and source:"
+  },
+  "home.save.km_value": {
+    "defaultMessage": "{km} km"
+  },
+  "home.save.hours_value": {
+    "defaultMessage": "{hours} hours"
+  },
+  "home.lede.photo": {
+    "defaultMessage": "A shopkeeper at the counter of a small general store, its shelves full of stock."
   }
 }
