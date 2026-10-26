@@ -1,5 +1,5 @@
-import { expect, moveClock, openApp, serverNow, test, URLS } from '../../fixtures/journey';
-import { LAKSHMI } from '../../fixtures/seed';
+import { Customer, expect, moveClock, openApp, placeAndCollect, serverNow, Shop, test, URLS, waitForCredits } from '../../fixtures/journey';
+import { LAKSHMI, SL_ITEMS, STORES } from '../../fixtures/seed';
 
 // E2E-09 (D-09, A-11, B-10): month-end. The test clock moves past 00:30 IST on the 1st, the payouts.close
 // job closes last month's statements, and Lakshmi Traders has a pending payout. A finance admin marks it
@@ -24,6 +24,34 @@ test('E2E-09 month-end statement → finance marks the payout paid → the busin
   const finance = await who('finance1');
   const superAdmin = await who('superAdmin');
   const owner = await who('owner');
+
+  // A payout is made only when the month closes with credits to pay (01 §9). The seed gives nobody
+  // credits, and the shop pays its own 5% cashback, so what earlier journeys leave can close below
+  // zero. Before the month closes, a customer spends credits at SL until Lakshmi's account is above 0.
+  await test.step('Lakshmi Traders has credits to pay: a customer spends 30 credits at SL until its account is above 0', async () => {
+    const shop = new Shop(owner, STORES.SL, LAKSHMI.id);
+    const spender = new Customer(await who('walkIn'));
+    for (let i = 0; i < 5; i++) {
+      const before = (await shop.creditAccount()).balanceCredits;
+      if (before > 0) return;
+      const wallet = (await spender.wallet()).availableCredits;
+      if (wallet < 30) {
+        const accounts = await finance.api.ok<{ items: { id: string; kind: string }[] }>('finance finds the wallet', 'GET', '/v1/admin/ledger/accounts', undefined, { params: { q: spender.who.userId } });
+        const accountId = accounts.items.find((a) => a.kind === 'customer_wallet')?.id;
+        expect(accountId, 'the spender has a wallet').toBeTruthy();
+        await finance.stepUp();
+        await finance.api.ok('finance adds 100 credits', 'POST', '/v1/admin/credit-adjustments', { accountId, amountPaise: 10000, reason: 'E2E-09 gate: credits to spend' });
+        await waitForCredits(spender, wallet + 100);
+      }
+      const order = await placeAndCollect(spender, shop, [{ storeItemId: SL_ITEMS.qa100.id, quantity: 1 }], 30);
+      expect(order.creditsUsed).toBe(30);
+      // The capture adds 30 and the cashback takes its share back; both post in the worker.
+      await expect
+        .poll(async () => (await shop.creditAccount()).balanceCredits, { message: 'the spend and the cashback are posted', timeout: 30_000 })
+        .toBe(before + 30 - order.cashbackCredits);
+    }
+    expect((await shop.creditAccount()).balanceCredits, 'Lakshmi has credits to pay').toBeGreaterThan(0);
+  });
 
   const period = await test.step('the clock moves just past the 1st, 01:00 IST: last month closes', async () => {
     const ist = new Date((await serverNow()) + IST_MS);
