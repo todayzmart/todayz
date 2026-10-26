@@ -36,6 +36,7 @@ blob-report/
 e2e/load/out/
 e2e/security/out/
 e2e/contract/out/
+e2e/a11y/out/
 .schemathesis/
 .hypothesis/
 __pycache__/

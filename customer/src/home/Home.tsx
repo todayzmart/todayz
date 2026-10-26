@@ -6,7 +6,7 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import { CategoryRow, EmptyState, RadiusChips, SearchField, Skeleton, StoreCard, Button } from '@todayz/ui';
 import { MapPin, ShoppingBasket, Store as StoreIcon } from 'lucide-react';
-import { lazy, Suspense, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { usePlace } from '../app/place';
 import { LimitBanner } from '../orders/LimitBanner';
@@ -21,6 +21,20 @@ import styles from './home.module.css';
 
 // MapLibre stays out of the first load: the card is its own chunk.
 const StoreMapCard = lazy(() => import('./StoreMapCard'));
+
+/** True once the element is within 300 px of the viewport (always true where IntersectionObserver is missing): the map's JS and WebGL setup wait until then (W4-04, mobile TBT). */
+function useNearView<T extends Element>(): [React.RefObject<T | null>, boolean] {
+  const ref = useRef<T | null>(null);
+  const [near, setNear] = useState(typeof IntersectionObserver === 'undefined');
+  useEffect(() => {
+    const el = ref.current;
+    if (near || !el) return undefined;
+    const io = new IntersectionObserver((entries) => entries.some((e) => e.isIntersecting) && setNear(true), { rootMargin: '300px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [near]);
+  return [ref, near];
+}
 
 export function Home({ category }: { category?: string | undefined }) {
   const intl = useIntl();
@@ -46,9 +60,9 @@ export function Home({ category }: { category?: string | undefined }) {
               Today<b>Z</b>
             </span>
           </span>
-          <Link to="/location" className="tz-btn tz-btn-soft tz-btn-sm">
+          <Link to="/location" className={`tz-btn tz-btn-soft tz-btn-sm ${styles.placeChip}`} title={where}>
             <Icon icon={MapPin} />
-            {where}
+            <span className={styles.placeText}>{where}</span>
           </Link>
         </div>
         <h1 className={styles.heroTitle}>{intl.formatMessage({ id: 'shell.hero.title' })}</h1>
@@ -110,6 +124,7 @@ export function Home({ category }: { category?: string | undefined }) {
 function Nearby({ coords, category }: { coords: Coords; category: string | undefined }) {
   const intl = useIntl();
   const router = useRouter();
+  const [mapRef, mapNear] = useNearView<HTMLDivElement>();
   const km = useRadiusKm();
   const cardProps = useStoreCardProps();
   const { lat, lng } = coords;
@@ -200,17 +215,23 @@ function Nearby({ coords, category }: { coords: Coords; category: string | undef
       )}
 
       <section className={styles.section} aria-label={intl.formatMessage({ id: 'home.map.label' })}>
-        <Suspense fallback={<Skeleton shape="block" height="220px" />}>
-          <StoreMapCard
-            coords={coords}
-            km={km}
-            summary={summary.data}
-            names={names}
-            interactive={false}
-            onExpand={() => router.history.push('/map')}
-            onSelectShop={(slug) => router.history.push(storeHref(slug))}
-          />
-        </Suspense>
+        <div ref={mapRef}>
+          {mapNear ? (
+            <Suspense fallback={<Skeleton shape="block" height="220px" />}>
+              <StoreMapCard
+                coords={coords}
+                km={km}
+                summary={summary.data}
+                names={names}
+                interactive={false}
+                onExpand={() => router.history.push('/map')}
+                onSelectShop={(slug) => router.history.push(storeHref(slug))}
+              />
+            </Suspense>
+          ) : (
+            <Skeleton shape="block" height="220px" />
+          )}
+        </div>
       </section>
 
       <section className={styles.section} aria-labelledby="home-shops">

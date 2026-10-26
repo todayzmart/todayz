@@ -1,0 +1,16 @@
+{
+  "name": "@todayz/e2e-a11y",
+  "private": true,
+  "description": "axe on every route at three viewports, and the visual baselines (e2e/visual), against make dev (W4-04). See e2e/CLAUDE.md.",
+  "type": "module",
+  "scripts": {
+    "a11y": "playwright test -c playwright.config.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.64.0",
+    "@types/node": "26.6.4",
+    "typescript": "6.0.3"
+  }
+}

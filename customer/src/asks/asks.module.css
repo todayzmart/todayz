@@ -11,6 +11,12 @@
 
 .cta {
   align-self: flex-start;
+
+  /* The label wraps on a 360 px phone in longer scripts (Tamil) instead of running past the edge. */
+  max-width: 100%;
+  white-space: normal;
+  padding-block: var(--space-1);
+  text-align: center;
 }
 
 .back {

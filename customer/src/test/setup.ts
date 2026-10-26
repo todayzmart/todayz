@@ -21,6 +21,28 @@ for (const name of ['localStorage', 'sessionStorage'] as const) {
   Object.defineProperty(globalThis, name, { value: memoryStorage(), configurable: true, writable: true });
 }
 
+// The Home map waits until its card is near the viewport (IntersectionObserver); tests have no layout, so
+// every observed element counts as visible straight away.
+class VisibleObserver implements IntersectionObserver {
+  readonly root = null;
+  readonly rootMargin = '';
+  readonly scrollMargin = '';
+  readonly thresholds: readonly number[] = [];
+  private readonly cb: IntersectionObserverCallback;
+  constructor(cb: IntersectionObserverCallback) {
+    this.cb = cb;
+  }
+  observe(target: Element): void {
+    this.cb([{ isIntersecting: true, target } as IntersectionObserverEntry], this);
+  }
+  unobserve(): void {}
+  disconnect(): void {}
+  takeRecords(): IntersectionObserverEntry[] {
+    return [];
+  }
+}
+Object.defineProperty(globalThis, 'IntersectionObserver', { value: VisibleObserver, configurable: true, writable: true });
+
 afterEach(() => {
   cleanup();
   localStorage.clear();

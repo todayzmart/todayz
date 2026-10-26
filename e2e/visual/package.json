@@ -1,0 +1,15 @@
+{
+  "name": "@todayz/e2e-visual",
+  "private": true,
+  "description": "Visual baselines of the key screens of the four apps in en and en-XA against make dev (W4-04). See e2e/CLAUDE.md.",
+  "type": "module",
+  "scripts": {
+    "visual": "playwright test -c playwright.config.ts",
+    "typecheck": "tsc --noEmit -p ../a11y/tsconfig.json"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "@types/node": "26.6.4",
+    "typescript": "6.0.3"
+  }
+}

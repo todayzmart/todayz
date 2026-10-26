@@ -187,6 +187,7 @@
   letter-spacing: -0.03em;
   color: var(--ink);
   text-wrap: balance;
+  overflow-wrap: break-word;
 }
 
 .lp h1 em,
@@ -568,6 +569,7 @@
   width: 286px;
   padding: 14px;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
 }
 
@@ -586,6 +588,8 @@
 .lp .oc-head b {
   font: 600 14px/18px var(--font-sans);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .lp .oc-head div span {
@@ -2706,7 +2710,7 @@
 
 @media (width <= 1100px) {
   .lp .hero-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     min-height: 0;
     gap: 40px;
   }
