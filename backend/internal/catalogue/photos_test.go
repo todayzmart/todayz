@@ -124,9 +124,14 @@ func TestProductPhotoFlow(t *testing.T) {
 func TestProductPhotoRefusals(t *testing.T) {
 	w := newPhotoWorld(t)
 
-	// Only the store that created the product adds its photo.
+	// A product in review takes a photo only from the store that created it.
 	_, err := w.create(w.other, []byte("x"))
 	require.Equal(t, genproblems.NotFound, problemCode(t, err))
+	// Once it is on the master list, any store may send one (D-253).
+	w.exec(`UPDATE products SET status = 'active' WHERE id = $1`, ids.UUID(w.product))
+	_, err = w.create(w.other, []byte("x"))
+	require.NoError(t, err)
+	w.exec(`UPDATE products SET status = 'pending_review' WHERE id = $1`, ids.UUID(w.product))
 
 	// Size and type limits.
 	_, err = w.svc.createPhoto(w.ctx, w.biz.String(), w.store.String(), w.product.String(),

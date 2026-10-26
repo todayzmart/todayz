@@ -15,6 +15,7 @@ import { ImagesTab } from './ImagesTab';
 import { ProductDialog, type ProductSave } from './ProductDialog';
 import { ReviewTab } from './ReviewTab';
 import { SynonymsTab } from './SynonymsTab';
+import { TypePhotosTab } from './TypePhotosTab';
 import { PRODUCT_STATUSES, productTone, useCatalogueLabels } from './labels';
 import { useCatalogueProblem } from './problem';
 import { ProductThumb } from './ProductThumb';
@@ -53,6 +54,7 @@ export function CataloguePage({ search }: { search: CatalogueSearch }) {
           { value: 'products', label: intl.formatMessage({ id: 'catalogue.tab.products' }) },
           { value: 'review', label: intl.formatMessage({ id: 'catalogue.tab.review' }) },
           { value: 'images', label: intl.formatMessage({ id: 'catalogue.tab.images' }) },
+          { value: 'types', label: intl.formatMessage({ id: 'catalogue.tab.types' }) },
           { value: 'categories', label: intl.formatMessage({ id: 'catalogue.tab.categories' }) },
           { value: 'synonyms', label: intl.formatMessage({ id: 'catalogue.tab.synonyms' }) },
         ]}
@@ -62,6 +64,7 @@ export function CataloguePage({ search }: { search: CatalogueSearch }) {
       {tab === 'products' && <ProductsTab search={search} go={go} />}
       {tab === 'review' && <ReviewTab search={search} go={go} />}
       {tab === 'images' && <ImagesTab search={search} go={go} />}
+      {tab === 'types' && <TypePhotosTab search={search} go={go} />}
       {tab === 'categories' && <CategoriesTab search={search} go={go} />}
       {tab === 'synonyms' && <SynonymsTab search={search} go={go} />}
     </div>

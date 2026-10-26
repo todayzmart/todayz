@@ -21,7 +21,7 @@ function initials(name: string): string {
  * The product's picture (D-252): the approved image, else the store's own photo while it waits
  * for review, else the initials. A turned-down photo is not shown.
  */
-export function Thumb({ item, large = false }: { item: Pick<StoreItem, 'name' | 'imageKey' | 'photo'>; large?: boolean }) {
+export function Thumb({ item, large = false }: { item: Pick<StoreItem, 'name' | 'imageKey'> & Partial<Pick<StoreItem, 'photo'>>; large?: boolean }) {
   const src = imageUrl(item.imageKey) ?? (item.photo?.status === 'pending' ? item.photo.previewUrl : undefined);
   return (
     <span className={large ? `${styles.thumb} ${styles.thumbLarge}` : styles.thumb} aria-hidden="true">

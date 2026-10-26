@@ -681,3 +681,100 @@ WHERE id = @id;
 -- name: InsertAdminProductImage :exec
 INSERT INTO product_images (id, product_id, source, status, object_key, content_type, size_bytes, uploaded_by, created_at, updated_at)
 VALUES (@id, @product_id, 'admin', 'uploading', @object_key, @content_type, @size_bytes, @uploaded_by, @now, @now);
+
+------------------------------------------------------------------------------
+-- Item-type photos (D-253)
+------------------------------------------------------------------------------
+
+-- name: ListTypeKinds :many
+-- Kinds of item with a photo of this status (pending: candidates to review;
+-- approved: the kind has its photo), by name then category (keyset).
+SELECT k.category_id, k.type_key, (c.names ->> 'en')::text AS category_name,
+  (SELECT count(*) FROM products p LEFT JOIN brands b ON b.id = p.brand_id
+    WHERE p.category_id = k.category_id AND p.status IN ('active', 'pending_review')
+      AND item_type_key(p.name, b.name) = k.type_key)::int AS product_count,
+  (SELECT count(*) FROM product_images pi JOIN type_photos t ON t.id = pi.type_photo_id
+    WHERE t.category_id = k.category_id AND t.type_key = k.type_key AND pi.status = 'approved')::int AS showing,
+  coalesce((SELECT array_agg(s.name) FROM (
+    SELECT p.name FROM products p LEFT JOIN brands b ON b.id = p.brand_id
+    WHERE p.category_id = k.category_id AND p.status IN ('active', 'pending_review')
+      AND item_type_key(p.name, b.name) = k.type_key
+    ORDER BY p.name LIMIT 3) s), '{}')::text[] AS samples
+FROM (SELECT DISTINCT tp.category_id, tp.type_key FROM type_photos tp WHERE tp.status = @status) k
+JOIN categories c ON c.id = k.category_id
+WHERE sqlc.narg(after_key)::text IS NULL
+   OR (k.type_key, k.category_id) > (sqlc.narg(after_key)::text, sqlc.narg(after_category)::uuid)
+ORDER BY k.type_key, k.category_id
+LIMIT @lim;
+
+-- name: ListKindTypePhotos :many
+-- A kind's approved photo, then its candidates, best match first.
+SELECT id, category_id, type_key, status, rank, object_key, content_type, size_bytes, public_key,
+  source_ref, source_url, page_url, licence, attribution, reject_reason, decided_at, created_at
+FROM type_photos
+WHERE category_id = @category_id AND type_key = @type_key AND status IN ('pending', 'approved')
+ORDER BY status = 'approved' DESC, rank, id;
+
+-- name: GetTypePhoto :one
+SELECT id, category_id, type_key, status, rank, object_key, content_type, size_bytes, public_key,
+  source_ref, source_url, page_url, licence, attribution, reject_reason, decided_at, created_at
+FROM type_photos WHERE id = @id;
+
+-- name: LockTypePhoto :one
+SELECT id, category_id, type_key, status, object_key, content_type, public_key
+FROM type_photos WHERE id = @id FOR UPDATE;
+
+-- name: TypeKindHasApproved :one
+SELECT EXISTS (SELECT 1 FROM type_photos
+  WHERE category_id = @category_id AND type_key = @type_key AND status = 'approved')::bool;
+
+-- name: ApproveTypePhoto :exec
+UPDATE type_photos SET status = 'approved', public_key = @public_key, decided_by = @by,
+  decided_at = @now::timestamptz, reject_reason = NULL, updated_at = @now
+WHERE id = @id;
+
+-- name: RejectTypePhoto :exec
+UPDATE type_photos SET status = 'rejected', public_key = NULL, reject_reason = @reason, decided_by = @by,
+  decided_at = @now::timestamptz, updated_at = @now
+WHERE id = @id;
+
+-- name: RejectOtherTypePhotos :execrows
+-- The kind's other candidates once one is picked.
+UPDATE type_photos SET status = 'rejected', reject_reason = @reason, decided_by = @by,
+  decided_at = @now::timestamptz, updated_at = @now
+WHERE category_id = @category_id AND type_key = @type_key AND status = 'pending' AND id <> @id;
+
+-- name: TypeKindProducts :many
+-- Products of a kind that may take its photo: in the catalogue, no image of
+-- their own, and never shown this photo before (one an admin took down from
+-- a product stays down). Locked, in id order.
+SELECT p.id FROM products p LEFT JOIN brands b ON b.id = p.brand_id
+WHERE p.category_id = @category_id AND item_type_key(p.name, b.name) = @type_key::text
+  AND p.status IN ('active', 'pending_review') AND p.image_id IS NULL
+  AND NOT EXISTS (SELECT 1 FROM product_images x WHERE x.product_id = p.id AND x.type_photo_id = @type_photo_id)
+ORDER BY p.id
+FOR UPDATE OF p;
+
+-- name: InsertTypeImages :exec
+-- One approved `type` image per product, sharing the kind's public copy.
+INSERT INTO product_images (id, product_id, source, status, object_key, content_type, size_bytes, public_key,
+  source_url, page_url, licence, attribution, type_photo_id, decided_by, decided_at, created_at, updated_at)
+SELECT u.id, u.product_id, 'type', 'approved', t.object_key, t.content_type, t.size_bytes, t.public_key,
+  t.source_url, t.page_url, t.licence, t.attribution, t.id, sqlc.narg(by)::uuid, @now::timestamptz, @now::timestamptz, @now::timestamptz
+FROM (SELECT unnest(@ids::uuid[]) AS id, unnest(@product_ids::uuid[]) AS product_id) u
+JOIN type_photos t ON t.id = @type_photo_id AND t.status = 'approved';
+
+-- name: SetTypeProductImages :exec
+UPDATE products p SET image_id = u.id, image_key = @image_key::text, updated_at = @now::timestamptz, version = version + 1
+FROM (SELECT unnest(@ids::uuid[]) AS id, unnest(@product_ids::uuid[]) AS product_id) u
+WHERE p.id = u.product_id;
+
+-- name: TakeDownTypeImages :execrows
+-- Every product showing a kind's photo goes back to the placeholder.
+WITH down AS (
+  UPDATE product_images SET status = 'rejected', public_key = NULL, reject_reason = @reason, decided_by = @by,
+    decided_at = @now::timestamptz, updated_at = @now::timestamptz
+  WHERE type_photo_id = @type_photo_id AND status = 'approved'
+  RETURNING id, product_id)
+UPDATE products p SET image_id = NULL, image_key = NULL, updated_at = @now::timestamptz, version = version + 1
+FROM down WHERE p.id = down.product_id AND p.image_id = down.id;

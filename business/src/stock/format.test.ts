@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { effectiveMrp, itemTitle, parseQuantity, parseRupees, rupeesText, stockLevel } from './format';
+import { effectiveMrp, itemTitle, parseQuantity, parseRupees, rupeesText, stockLevel, withBrand } from './format';
 
 describe('parseQuantity', () => {
   it('accepts whole numbers from 0 to 1,000,000', () => {
@@ -24,6 +24,16 @@ describe('parseRupees', () => {
   });
   it('round-trips through rupeesText', () => {
     for (const p of [5800, 5850, 5805, 99]) expect(parseRupees(rupeesText(p))).toBe(p);
+  });
+});
+
+describe('withBrand', () => {
+  it('leads with the brand unless the name already does', () => {
+    expect(withBrand('Sugar 1 kg', 'Daawat')).toBe('Daawat Sugar 1 kg');
+    expect(withBrand('Daawat Sugar 1 kg', 'Daawat')).toBe('Daawat Sugar 1 kg');
+    expect(withBrand('daawat sugar', 'Daawat')).toBe('daawat sugar');
+    expect(withBrand('Daawatwala Sugar', 'Daawat')).toBe('Daawat Daawatwala Sugar');
+    expect(withBrand('Toor dal', null)).toBe('Toor dal');
   });
 });
 

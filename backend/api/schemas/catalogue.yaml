@@ -82,6 +82,9 @@ ProductMatch:
     inStore:
       type: boolean
       description: The store in the query already lists this product.
+    imageKey:
+      type: [string, "null"]
+      description: The product's approved image on the image host (D-252, D-253); null shows the placeholder.
 ProductCreate:
   type: object
   additionalProperties: false
@@ -214,8 +217,8 @@ StoreItem:
     canAddPhoto:
       type: boolean
       description: >-
-        This store created the product and it is not merged or retired, so it may send a photo
-        (`createProductPhoto`, manager and above).
+        The store may send a photo of this product (`createProductPhoto`, manager and above): any
+        product on the master list, or one still in review that this store created (D-253).
     createdAt: {$ref: ./common.yaml#/Timestamp}
     updatedAt: {$ref: ./common.yaml#/Timestamp}
 StoreItemList:

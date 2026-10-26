@@ -311,7 +311,10 @@ func (s *Service) rejectImage(ctx context.Context, actor, id ids.ID, body api.Ad
 						return nil, nil, err
 					}
 				}
-				takenDown = img.PublicKey
+				if img.Source != "type" {
+					// A kind's photo (D-253) is one file shared by many products.
+					takenDown = img.PublicKey
+				}
 			default:
 				return nil, nil, invalidTransition("only a waiting or approved image can be rejected")
 			}
