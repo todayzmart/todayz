@@ -114,7 +114,8 @@ type Providers struct {
 	SMSDLTEntityID   string // SMS_DLT_ENTITY_ID: IN_ENTITY_ID on every send
 	SMSOTPTemplateID string // SMS_OTP_TEMPLATE_ID: IN_TEMPLATE_ID of the OTP text
 	// SMSNoticeTemplateIDs maps a notify catalogue template name (for
-	// example tz_order_unseen_hi) to its DLT template id
+	// example tz_order_unseen_hi), or tz_owner_code for the field owner code
+	// (identity), to its DLT template id
 	// (SMS_NOTICE_TEMPLATE_IDS="name=id,name=id").
 	SMSNoticeTemplateIDs map[string]string
 	WhatsAppProvider     string

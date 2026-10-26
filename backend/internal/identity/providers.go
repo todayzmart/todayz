@@ -44,18 +44,32 @@ const turnstileTestSecret = "1x0000000000000000000000000000000AA"
 // registration.
 const otpText = "%s is your TodayZ login code. Do not share it with anyone."
 
+// ownerCodeTemplate names the field owner code's DLT template in
+// SMS_NOTICE_TEMPLATE_IDS, and ownerCodeText is its registered text (part C1
+// of the founder steps). Until that id is set, the owner code goes out with
+// the sign-in template (OwnerCodeSender).
+const (
+	ownerCodeTemplate = "tz_owner_code"
+	ownerCodeText     = "%s is your TodayZ code to confirm your shop with our field agent. Share it only with that agent."
+)
+
 // awsOTP sends OTPs through AWS End User Messaging SMS (awssms, D-212) with
 // the OTP's DLT template (SMS_OTP_TEMPLATE_ID). The phone and the code travel
 // only in the signed JSON body.
 type awsOTP struct {
 	client   *awssms.Client
 	template string
+	text     string // the template's text with one %s for the code; otpText when empty
 }
 
 func (a *awsOTP) SendOTP(ctx context.Context, e164, code string) error {
+	text := a.text
+	if text == "" {
+		text = otpText
+	}
 	_, err := a.client.Send(ctx, awssms.Message{
 		To:         e164,
-		Body:       fmt.Sprintf(otpText, code),
+		Body:       fmt.Sprintf(text, code),
 		TemplateID: a.template,
 		TTL:        OTPTTL, // an OTP delivered after it expires is useless
 	})

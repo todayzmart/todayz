@@ -49,7 +49,7 @@ async function answerRefresh(page: Page, signedIn: boolean) {
 
 /**
  * Signed in, the shell asks for the staff's businesses, the live orders and (for the owner) today's
- * overview, Demand insights (W3-03) and coach cards (W3-11). One shop with no orders; any other call is a 404 problem. Registered before the refresh route, which wins for its path.
+ * overview, Demand insights (W3-03), coach cards (W3-11) and the Asks tab (W3-16). One shop with no orders; any other call is a 404 problem. Registered before the refresh route, which wins for its path.
  */
 async function answerApi(page: Page) {
   await page.route('**/v1/**', (route) => {
@@ -75,6 +75,7 @@ async function answerApi(page: Page) {
     if (path.endsWith('/overview')) return json(200, overview({ range: new URL(req.url()).searchParams.get('range') ?? 'today', newOrders: [] }));
     if (path.endsWith('/insights')) return json(200, { items: INSIGHTS, nextCursor: null, period: PERIOD, serverNow: SERVER_NOW });
     if (path.endsWith('/coach/cards')) return json(200, { items: [], nextCursor: null, serverNow: SERVER_NOW });
+    if (path.endsWith('/asks')) return json(200, { asks: [], openCount: 0, nextCursor: null, serverNow: SERVER_NOW });
     if (path.endsWith('/stream')) {
       return route.fulfill({ status: 200, contentType: 'text/event-stream', headers, body: 'retry: 600000\nevent: ready\ndata: {}\n\n' });
     }
