@@ -283,7 +283,7 @@ func alertFixtures(f fixture) map[string]func(e *env, tx pgx.Tx) {
 				VALUES (gen_random_uuid(), 'order', gen_random_uuid(), 'return_unconfirmed', $1::timestamptz - interval '5 minutes', $1)`, alertNow)
 		},
 		// Two small pending requests by one admin to two customers: each is under the
-		// per-customer line, together they pass the day's line (D-246 B9).
+		// per-customer line, together they pass the day's line (D-251 B9).
 		"tz-risk-admin-adjust-day": func(e *env, tx pgx.Tx) {
 			e.txExec(tx, `INSERT INTO admin_adjustment_requests (id, customer_id, amount, reason, requested_by, requested_at)
 				SELECT gen_random_uuid(), c, 3000, 'goodwill', $2, $1::timestamptz - interval '1 hour'

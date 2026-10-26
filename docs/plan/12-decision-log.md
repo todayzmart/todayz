@@ -1433,7 +1433,7 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
 - **Note for the founder.** Under the Legal Metrology (Packaged Commodities) Rules, selling a pre-packaged item above its printed MRP is an offence. The app now allows it; the shop is responsible.
 - Tests: `cmd/todayz` catalogue (create above MRP) and voice (set price above MRP), `internal/asks` `TestReplyPriceRule`, shelf scan refusals, business `stock.test.tsx`.
 
-**D-246 · The go-live questions B1–B10, decided (founder, 26 Oct: "take the best decisions").**
+**D-251 · The go-live questions B1–B10, decided (founder, 26 Oct: "take the best decisions").**
 The questions are in `docs/qa/go-live-gaps/LIST.md`. The founder delegated them; each answer below is the reading that is safest for launch and cheapest to change later.
 - **B1 · The customer home map loads on a tap.** MapLibre's JS and WebGL setup kept the phone home at 74 in Lighthouse (target 90), even after it waited for the card to scroll near (W4-04). The home card now shows the shop counts ("Map: 12 shops within 2 km, 5 open now") and "Tap to see the map"; the map loads on the tap and stays shown for the rest of the visit. `/map` is unchanged. Re-measure in the lead's Lighthouse run (C9).
 - **B2 · No change to the speed targets.** 08 §6 already counts "search" as the search and suggest calls together (285 ms, a pass); the search call alone (590 ms on the laptop) is watched on the prod dashboards rather than gated. The POS batch of 20 sales is about 34 ms a sale, and `pos_rush`'s write p95 < 400 ms is per request, so it passes.

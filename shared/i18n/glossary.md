@@ -16,14 +16,14 @@ The product terms as they appear in `messages/**` (hi, kn, te, ta), checked on 2
 | credits | क्रेडिट | ಕ್ರೆಡಿಟ್ | క్రెడిట్ (plural క్రెడిట్‌లు) | கிரெடிட் |
 | pickup | पिकअप | ಪಿಕಪ್ | పికప్ | பிக்அப் |
 | delivery | डिलीवरी | ಡೆಲಿವರಿ | డెలివరీ | டெலிவரி |
-| order code, pickup code | कोड | ಕೋಡ್ | కోడ్ | கோடு (D-246) |
+| order code, pickup code | कोड | ಕೋಡ್ | కోడ్ | கோடு (D-251) |
 | standee | स्टैंडी | ಸ್ಟ್ಯಾಂಡಿ | స్టాండీ | ஸ்டாண்டி |
 | stock | स्टॉक | ಸ್ಟಾಕ್ | స్టాక్ | ஸ்டாக் |
 | offer | ऑफ़र | ಆಫರ್ | ఆఫర్ (plural ఆఫర్లు) | ஆஃபர் |
 | POS, counter | काउंटर | ಕೌಂಟರ್ | కౌంటర్ | கவுண்டர் |
 | bill | बिल | ಬಿಲ್ | బిల్లు | பில் |
 | wallet | वॉलेट | ವಾಲೆಟ್ | వాలెట్ | வாலெட் |
-| payout | पेआउट | ಪೇಔಟ್ | పేఅవుట్ | பேஅவுட் (D-246) |
+| payout | पेआउट | ಪೇಔಟ್ | పేఅవుట్ | பேஅவுட் (D-251) |
 | ask (noun) | माँगें | ಕೇಳಿಕೆ | అభ్యర్థనలు | கோரிக்கைகள் |
 | ask (verb) | पूछें, कहें | ಕೇಳಿ | అడగండి | கேளுங்கள் |
 | coach | कोच | ಕೋಚ್ | కోచ్ | கோச் |
@@ -37,9 +37,9 @@ The product terms as they appear in `messages/**` (hi, kn, te, ta), checked on 2
 | campaign | कैंपेन | ಅಭಿಯಾನ | క్యాంపెయిన్ | பிரச்சாரம் |
 | address | पता | ವಿಳಾಸ | చిరునామా | முகவரி |
 | account | खाता | ಖಾತೆ | ఖాతా | கணக்கு |
-| refund | रिफ़ंड | ರಿಫಂಡ್ (D-246) | రీఫండ్ | ரீஃபண்ட் (D-246) |
+| refund | रिफ़ंड | ರಿಫಂಡ್ (D-251) | రీఫండ్ | ரீஃபண்ட் (D-251) |
 | voice | आवाज़, बोलकर | ಧ್ವನಿ, ಮಾತಿನ | వాయిస్ | குரல் |
-| cancel | कैंसल (D-246) | ಕ್ಯಾನ್ಸಲ್ (D-246) | క్యాన్సిల్ (D-246) | ரத்து |
+| cancel | कैंसल (D-251) | ಕ್ಯಾನ್ಸಲ್ (D-251) | క్యాన్సిల్ (D-251) | ரத்து |
 
 Telugu plurals: after a consonant ending in a virama the suffix takes a ZWNJ (U+200C) in క్రెడిట్‌లు (majority form); ఆర్డర్లు, కస్టమర్లు and ఆఫర్లు take none (majority form).
 
@@ -59,7 +59,7 @@ Fixed on 26 Oct (the majority form was clear):
 
 The per-message list is in `docs/qa/W4-05/REPORT.md`.
 
-Decided by the founder's delegation on 26 Oct (D-246 B6), by rule 1 where it applies. The messages follow these terms since 26 Oct (go-live A8). Not changed on purpose: "Discard" and "Undo" keep रद्द / ರದ್ದು / రద్దు, because they are not "cancel"; the hi plan-pricing page keeps कीमत (the price of TodayZ, not an item's); and "ask" as a verb and "demand" keep माँग. The native-speaker review (C12) should read the changed messages in context:
+Decided by the founder's delegation on 26 Oct (D-251 B6), by rule 1 where it applies. The messages follow these terms since 26 Oct (go-live A8). Not changed on purpose: "Discard" and "Undo" keep रद्द / ರದ್ದು / రద్దు, because they are not "cancel"; the hi plan-pricing page keeps कीमत (the price of TodayZ, not an item's); and "ask" as a verb and "demand" keep माँग. The native-speaker review (C12) should read the changed messages in context:
 
 | English | Hindi | Kannada | Telugu | Tamil |
 |---|---|---|---|---|

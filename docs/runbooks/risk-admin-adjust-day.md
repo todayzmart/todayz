@@ -1,6 +1,6 @@
 # Admin adjustments in a day
 
-Alert `tz-risk-admin-adjust-day` in `infra/grafana/alerts/risk.yaml` (D-246 B9). Severity: **ops (risk queue)**.
+Alert `tz-risk-admin-adjust-day` in `infra/grafana/alerts/risk.yaml` (D-251 B9). Severity: **ops (risk queue)**.
 
 ## What it means
 

@@ -23,7 +23,7 @@ import styles from './home.module.css';
 const StoreMapCard = lazy(() => import('./StoreMapCard'));
 
 // MapLibre's JS and WebGL setup cost the phone home its Lighthouse score even when they waited for the
-// card to scroll near (W4-04): the card is a plain summary until a tap (D-246 B1). Once shown, it stays
+// card to scroll near (W4-04): the card is a plain summary until a tap (D-251 B1). Once shown, it stays
 // shown for the rest of the visit.
 let mapShown = false;
 

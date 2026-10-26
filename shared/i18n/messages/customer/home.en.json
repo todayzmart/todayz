@@ -117,7 +117,7 @@
   },
   "home.map.show": {
     "defaultMessage": "Tap to see the map",
-    "description": "Button on the Home map card that loads the map; until a tap the card shows only the shop counts (D-246 B1)"
+    "description": "Button on the Home map card that loads the map; until a tap the card shows only the shop counts (D-251 B1)"
   },
   "home.map.pinOpen": {
     "defaultMessage": "{name}, open",

@@ -25,7 +25,7 @@ function routes(over: Record<string, () => unknown> = {}) {
 }
 
 /**
- * MapLibre waits for a tap on the Home card (D-246 B1), and stays shown for the rest of the visit, so an
+ * MapLibre waits for a tap on the Home card (D-251 B1), and stays shown for the rest of the visit, so an
  * earlier test in this file may have shown it already. The lazy chunk took over the default 1 s under a
  * parallel load run.
  */

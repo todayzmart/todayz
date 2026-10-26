@@ -136,7 +136,7 @@
   gap: var(--space-1);
 }
 
-/* The Home map before a tap (D-246 B1): a summary card, no MapLibre. */
+/* The Home map before a tap (D-251 B1): a summary card, no MapLibre. */
 .mapEntry {
   display: flex;
   align-items: center;

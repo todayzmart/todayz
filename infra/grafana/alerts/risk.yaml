@@ -7,7 +7,7 @@
 #   Unconfirmed returns  a return_unconfirmed risk flag was raised (a delivery-failed return auto-
 #                        confirmed after 72 h, D-69). ops info
 #   Admin adjust day     one admin's wallet adjustments in the IST day, across all customers, passed
-#                        admin_adjust_daily_total_alert_above_paise (D-246 B9). ops warning
+#                        admin_adjust_daily_total_alert_above_paise (D-251 B9). ops warning
 #
 # The first two read the flags their WPs raise and the third reads the setting itself, so each
 # threshold lives in one place (platform_settings).
@@ -93,7 +93,7 @@ groups:
           __dashboardUid__: todayz-08
         isPaused: false
 
-      # One admin's wallet adjustments today (IST), across all customers (D-246 B9), counted as the
+      # One admin's wallet adjustments today (IST), across all customers (D-251 B9), counted as the
       # two-person rule counts them per customer (D-237): posted at-once adjustments plus that
       # admin's pending and approved requests. The value is paise.
       - uid: tz-risk-admin-adjust-day
