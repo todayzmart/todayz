@@ -158,7 +158,7 @@ StoreItem:
     confirmed more than `stock_stale_after_hours` ago (or never).
   required: [id, storeId, productId, name, productName, localName, brand, variant, packSize, unit,
     categoryId, barcodes, pricePaise, mrpPaise, productMrpPaise, onHand, reserved, available,
-    lowStockAt, lowStock, isListed, stockUpdatedAt, stale, createdAt, updatedAt]
+    lowStockAt, lowStock, isListed, stockUpdatedAt, stale, imageKey, photo, createdAt, updatedAt]
   properties:
     id: {$ref: ./common.yaml#/Ulid}
     storeId: {$ref: ./common.yaml#/Ulid}
@@ -203,6 +203,14 @@ StoreItem:
       type: [string, "null"]
       format: date-time
     stale: {type: boolean}
+    imageKey:
+      type: [string, "null"]
+      description: The product's approved image on the image host (D-252); null shows the placeholder.
+    photo:
+      description: The store's own photo while it waits for review or was turned down; null otherwise.
+      oneOf:
+        - $ref: '#/StoreItemPhoto'
+        - type: "null"
     createdAt: {$ref: ./common.yaml#/Timestamp}
     updatedAt: {$ref: ./common.yaml#/Timestamp}
 StoreItemList:
@@ -420,3 +428,74 @@ StockBatchUpdate:
       type: [string, "null"]
       format: date
       maxLength: 10
+ProductPhotoContentType:
+  type: string
+  enum: [image/jpeg, image/png, image/webp]
+ProductPhotoCreate:
+  type: object
+  additionalProperties: false
+  required: [contentType, sizeBytes]
+  properties:
+    contentType: {$ref: '#/ProductPhotoContentType'}
+    sizeBytes:
+      type: integer
+      format: int64
+      minimum: 1
+      maximum: 5242880
+      description: The file's exact size in bytes (at most 5 MB; the app resizes first). The upload URL signs it.
+ProductPhoto:
+  type: object
+  description: >-
+    A shop's photo of a product it created (D-252). `pending` waits for admin review and customers do
+    not see it; `approved` is the product's image; `rejected` was turned down.
+  required: [id, productId, status, contentType, previewUrl, rejectReason, createdAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    productId: {$ref: ./common.yaml#/Ulid}
+    status:
+      type: string
+      enum: [uploading, pending, approved, rejected, replaced]
+    contentType: {$ref: '#/ProductPhotoContentType'}
+    previewUrl:
+      type: [string, "null"]
+      description: A signed link to the stored photo, valid for 15 minutes; null while uploading.
+    rejectReason: {type: [string, "null"]}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+ProductPhotoUploadHeaders:
+  type: object
+  required: [Content-Type, Content-Length]
+  properties:
+    Content-Type: {$ref: '#/ProductPhotoContentType'}
+    Content-Length:
+      type: string
+      pattern: ^[1-9][0-9]*$
+ProductPhotoUploadTarget:
+  type: object
+  description: A presigned PUT into the private bucket. Send the file with exactly these headers before `expiresAt`.
+  required: [url, method, headers, expiresAt]
+  properties:
+    url: {type: string}
+    method:
+      type: string
+      enum: [PUT]
+    headers: {$ref: '#/ProductPhotoUploadHeaders'}
+    expiresAt: {$ref: ./common.yaml#/Timestamp}
+ProductPhotoUpload:
+  type: object
+  required: [photo, upload]
+  properties:
+    photo: {$ref: '#/ProductPhoto'}
+    upload: {$ref: '#/ProductPhotoUploadTarget'}
+StoreItemPhoto:
+  type: object
+  description: The store's own photo of the product while it is not the product's image (waiting or turned down).
+  required: [id, status, previewUrl, rejectReason]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    status:
+      type: string
+      enum: [pending, rejected]
+    previewUrl:
+      type: string
+      description: A signed link to the stored photo, valid for 15 minutes.
+    rejectReason: {type: [string, "null"]}

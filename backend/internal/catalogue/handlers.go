@@ -25,6 +25,8 @@ var ops = map[string]string{
 	"ListCategories":      authz.Public,
 	"SearchProducts":      policy.ItemView,
 	"CreateProduct":       policy.ProductCreate,
+	"CreateProductPhoto":  policy.ProductCreate,
+	"ConfirmProductPhoto": policy.ProductCreate,
 	"ListStoreItems":      policy.ItemView,
 	"GetStoreItem":        policy.ItemView,
 	"GetStoreItemHistory": policy.ItemView,
@@ -174,4 +176,20 @@ func (h handlers) UpdateStockBatch(ctx context.Context, req catalogueapi.UpdateS
 		return nil, asProblem(err)
 	}
 	return catalogueapi.UpdateStockBatch200JSONResponse{Body: b, Headers: catalogueapi.UpdateStockBatch200ResponseHeaders{ETag: ptr(etag(v))}}, nil
+}
+
+func (h handlers) CreateProductPhoto(ctx context.Context, req catalogueapi.CreateProductPhotoRequestObject) (catalogueapi.CreateProductPhotoResponseObject, error) {
+	up, err := h.s.createPhoto(ctx, req.Bid, req.Sid, req.ProductId, req.Body)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return catalogueapi.CreateProductPhoto201JSONResponse(up), nil
+}
+
+func (h handlers) ConfirmProductPhoto(ctx context.Context, req catalogueapi.ConfirmProductPhotoRequestObject) (catalogueapi.ConfirmProductPhotoResponseObject, error) {
+	ph, err := h.s.confirmPhoto(ctx, req.Bid, req.Sid, req.ProductId, req.PhotoId)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return catalogueapi.ConfirmProductPhoto200JSONResponse(ph), nil
 }

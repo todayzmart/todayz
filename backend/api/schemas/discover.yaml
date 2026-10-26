@@ -188,6 +188,28 @@ DiscoverSearchItem:
     imageKey:
       type: [string, "null"]
       description: The product image's object key on the image host, when there is one.
+    imageCredit:
+      description: >-
+        Who made the image and under which licence, when its licence asks for credit (a stock photo from
+        Open Food Facts and its sister projects, CC BY-SA; D-252). Show it with the image on the product
+        page. Absent or null for the shop's own photo.
+      oneOf:
+        - $ref: "#/DiscoverImageCredit"
+        - type: "null"
+DiscoverImageCredit:
+  type: object
+  required: [author, licence, licenceUrl, sourceUrl]
+  properties:
+    author:
+      type: string
+      description: For example "Open Food Facts contributors".
+    licence:
+      type: string
+      description: For example "CC BY-SA 3.0".
+    licenceUrl: {type: string}
+    sourceUrl:
+      type: string
+      description: The source's page for the product.
 DiscoverBadge:
   type: string
   enum: [lowest_price, closest]

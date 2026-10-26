@@ -30,6 +30,7 @@ import (
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/notice"
 	"github.com/todayz/backend/internal/platform/pii"
+	"github.com/todayz/backend/internal/platform/storage"
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
@@ -78,6 +79,9 @@ type Deps struct {
 	// Notices writes A-16's test send to the caller's own inbox. Without it
 	// a test send answers 503.
 	Notices notice.Sender
+	// Storage holds product images (D-252); without its images bucket the
+	// image approve and upload routes answer 503.
+	Storage *storage.Client
 }
 
 // PhoneAccounts finds or makes the account of an E.164 phone in the caller's
@@ -120,6 +124,7 @@ type Service struct {
 	notifyTemplates func() []NotifyTemplate
 	integrations    []Integration
 	notices         notice.Sender
+	storage         *storage.Client
 }
 
 // New builds the service.
@@ -128,7 +133,7 @@ func New(d Deps) (*Service, error) {
 		return nil, errors.New("admin: a clock is required")
 	}
 	return &Service{db: d.DB, clock: d.Clock, audit: d.Audit, az: d.Authz, seal: d.Seal, hash: d.Hash, strikes: d.Strikes, providers: d.Providers, hours: d.Hours, banners: d.Banners, accounts: d.Accounts,
-		notifyTemplates: d.NotifyTemplates, integrations: d.Integrations, notices: d.Notices}, nil
+		notifyTemplates: d.NotifyTemplates, integrations: d.Integrations, notices: d.Notices, storage: d.Storage}, nil
 }
 
 func (s *Service) ready(ctx context.Context) error {

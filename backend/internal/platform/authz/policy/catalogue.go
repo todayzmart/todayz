@@ -26,7 +26,7 @@ func init() {
 		{Name: StockCount, Kind: authz.KindBusiness, Grants: all, Doc: "movement count_correction"},
 		{Name: StockRestock, Kind: authz.KindBusiness, Grants: ownerManager, Doc: "movements restock, supplier_bill"},
 		{Name: StockDamage, Kind: authz.KindBusiness, Grants: ownerManager, Doc: "movements damage, expired (D-06)"},
-		{Name: ProductCreate, Kind: authz.KindBusiness, Grants: ownerManager, Doc: "POST {B}/products (a missing product, pending review, D-37)"},
+		{Name: ProductCreate, Kind: authz.KindBusiness, Grants: ownerManager, Doc: "POST {B}/products (a missing product, pending review, D-37); POST {B}/stores/{sid}/products/{productId}/photos and .../{photoId}/confirm (its photo, reviewed by an admin, D-252)"},
 		{Name: BatchesManage, Kind: authz.KindBusiness, Grants: ownerManager, Doc: "GET {S}/batches, PATCH {S}/batches/{batchId} (cost and expiry, D-99)"},
 	}})
 }

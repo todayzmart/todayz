@@ -45,6 +45,7 @@ import (
 	"github.com/todayz/backend/internal/platform/httpx/problem"
 	"github.com/todayz/backend/internal/platform/ids"
 	"github.com/todayz/backend/internal/platform/settings"
+	"github.com/todayz/backend/internal/platform/storage"
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
@@ -58,6 +59,8 @@ type Deps struct {
 	Settings *settings.Cache
 	// Authz runs the second check of a movement kind or a price change.
 	Authz authz.Authorizer
+	// Storage holds product photos (D-252); without it the photo routes are 503.
+	Storage *storage.Client
 }
 
 // Service implements the catalogue routes.
@@ -69,6 +72,7 @@ type Service struct {
 	audit    *audit.Writer
 	writer   *Writer
 	ids      *ids.Generator
+	storage  *storage.Client
 }
 
 var errUnavailable = errors.New("catalogue: not configured")
@@ -78,7 +82,7 @@ func New(d Deps) (*Service, error) {
 	if d.Clock == nil {
 		return nil, errors.New("catalogue: a clock is required")
 	}
-	s := &Service{db: d.DB, clock: d.Clock, settings: d.Settings, az: d.Authz, writer: NewWriter(d.Clock), ids: ids.NewGenerator()}
+	s := &Service{db: d.DB, clock: d.Clock, settings: d.Settings, az: d.Authz, writer: NewWriter(d.Clock), ids: ids.NewGenerator(), storage: d.Storage}
 	if d.DB != nil {
 		var ipKey []byte
 		if d.Config != nil && d.Config.Keys.PIIHashKey.IsSet() {

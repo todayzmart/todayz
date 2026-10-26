@@ -88,9 +88,9 @@ func init() {
 		{Name: AdminLeadView, Kind: authz.KindAdmin, Grants: leads, Doc: "GET /v1/admin/leads (Leads tab on A-03)"},
 		{Name: AdminLeadManage, Kind: authz.KindAdmin, Grants: leads, Doc: "POST /v1/admin/leads/{leadId}/status: audited"},
 
-		{Name: AdminCatalogueView, Kind: authz.KindAdmin, Grants: catalogue, Doc: "GET /v1/admin/products, .../{productId}, /v1/admin/pending-products, /v1/admin/categories, /v1/admin/synonyms (A-08)"},
-		{Name: AdminCatalogueReview, Kind: authz.KindAdmin, Grants: catalogue, Doc: "POST /v1/admin/pending-products/{pendingId}/approve, /merge, /reject: audited"},
-		{Name: AdminCatalogueManage, Kind: authz.KindAdmin, Grants: admins, Doc: "POST/PATCH /v1/admin/products, POST/PATCH /v1/admin/categories, POST/DELETE /v1/admin/synonyms (A-08): audited"},
+		{Name: AdminCatalogueView, Kind: authz.KindAdmin, Grants: catalogue, Doc: "GET /v1/admin/products, .../{productId}, /v1/admin/pending-products, /v1/admin/categories, /v1/admin/synonyms, /v1/admin/product-images (A-08)"},
+		{Name: AdminCatalogueReview, Kind: authz.KindAdmin, Grants: catalogue, Doc: "POST /v1/admin/pending-products/{pendingId}/approve, /merge, /reject; POST /v1/admin/product-image-approvals, /v1/admin/product-images/{imageId}/approve, /reject (D-252): audited"},
+		{Name: AdminCatalogueManage, Kind: authz.KindAdmin, Grants: admins, Doc: "POST/PATCH /v1/admin/products, POST/PATCH /v1/admin/categories, POST/DELETE /v1/admin/synonyms, POST /v1/admin/products/{productId}/images and .../{imageId}/confirm (A-08, D-252): audited"},
 
 		{Name: AdminBannerModerate, Kind: authz.KindAdmin, Grants: support, Doc: "GET /v1/admin/banners, POST .../approve, .../takedown (A-20): audited"},
 

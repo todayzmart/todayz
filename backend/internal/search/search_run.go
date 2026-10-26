@@ -369,6 +369,7 @@ func (s *Service) group(ctx context.Context, rows []searchdb.SearchItemsRow, req
 			ID: iid, ProductID: pid, Name: name, Variant: r.Variant, Brand: r.BrandName,
 			PackSize: r.PackSize, Unit: r.Unit, Price: r.PricePaise, Mrp: r.MrpPaise, Available: r.Available,
 			StockUpdatedAt: r.StockUpdatedAt, ImageKey: r.ImageKey, Offer: offer,
+			Credit:   imageCredit(r.ImageSource, r.ImageLicence, r.ImageAttribution, r.ImagePageUrl),
 			Text:     textScore(core, r, exact[r.ProductID.Bytes]),
 			Category: !r.Fts && !named[r.ProductID.Bytes],
 		})
@@ -461,7 +462,7 @@ func searchItem(it candItem, now time.Time, staleAfter time.Duration) discoverap
 	out := discoverapi.DiscoverSearchItem{
 		StoreItemId: it.ID.String(), ProductId: it.ProductID.String(), Name: it.Name,
 		Variant: it.Variant, Brand: it.Brand, PackSize: it.PackSize, Unit: discoverapi.DiscoverUnit(it.Unit),
-		PricePaise: int(it.Price), HasOffer: it.Offer, InStock: true, ImageKey: it.ImageKey,
+		PricePaise: int(it.Price), HasOffer: it.Offer, InStock: true, ImageKey: it.ImageKey, ImageCredit: it.Credit,
 		ConfirmedAt: confirmedAt(it.StockUpdatedAt, now, staleAfter),
 	}
 	if it.Mrp != nil {

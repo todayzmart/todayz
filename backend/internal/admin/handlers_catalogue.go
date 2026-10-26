@@ -29,6 +29,12 @@ var CatalogueOps = map[string]string{
 	"ListAdminSynonyms":          policy.AdminCatalogueView,
 	"CreateAdminSynonym":         policy.AdminCatalogueManage,
 	"DeleteAdminSynonym":         policy.AdminCatalogueManage,
+	"ListAdminProductImages":     policy.AdminCatalogueView,
+	"ApproveAdminProductImage":   policy.AdminCatalogueReview,
+	"ApproveAdminProductImages":  policy.AdminCatalogueReview,
+	"RejectAdminProductImage":    policy.AdminCatalogueReview,
+	"CreateAdminProductImage":    policy.AdminCatalogueManage,
+	"ConfirmAdminProductImage":   policy.AdminCatalogueManage,
 }
 
 // maxBody is the request body limit (the platform's 1 MB).
@@ -245,4 +251,85 @@ func (h catalogueHandlers) DeleteAdminSynonym(ctx context.Context, req catalogue
 		return nil, asProblem(err)
 	}
 	return catalogueapi.DeleteAdminSynonym204Response{}, nil
+}
+
+// ListAdminProductImages implements GET /v1/admin/product-images.
+func (h catalogueHandlers) ListAdminProductImages(ctx context.Context, req catalogueapi.ListAdminProductImagesRequestObject) (catalogueapi.ListAdminProductImagesResponseObject, error) {
+	out, err := h.s.listImages(ctx, req.Params)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return catalogueapi.ListAdminProductImages200JSONResponse(out), nil
+}
+
+// ApproveAdminProductImage implements POST /v1/admin/product-images/{imageId}/approve.
+func (h catalogueHandlers) ApproveAdminProductImage(ctx context.Context, req catalogueapi.ApproveAdminProductImageRequestObject) (catalogueapi.ApproveAdminProductImageResponseObject, error) {
+	actor, id, err := adminCall(ctx, req.ImageId, req.Body != nil)
+	if err != nil {
+		return nil, err
+	}
+	out, err := h.s.approveImageBody(ctx, actor, id, *req.Body)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return catalogueapi.ApproveAdminProductImage200JSONResponse(out), nil
+}
+
+// ApproveAdminProductImages implements POST /v1/admin/product-image-approvals.
+func (h catalogueHandlers) ApproveAdminProductImages(ctx context.Context, req catalogueapi.ApproveAdminProductImagesRequestObject) (catalogueapi.ApproveAdminProductImagesResponseObject, error) {
+	p, err := principal(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if req.Body == nil {
+		return nil, fieldErr("body", "required")
+	}
+	out, err := h.s.approveImages(ctx, p.UserID, *req.Body)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return catalogueapi.ApproveAdminProductImages200JSONResponse(out), nil
+}
+
+// RejectAdminProductImage implements POST /v1/admin/product-images/{imageId}/reject.
+func (h catalogueHandlers) RejectAdminProductImage(ctx context.Context, req catalogueapi.RejectAdminProductImageRequestObject) (catalogueapi.RejectAdminProductImageResponseObject, error) {
+	actor, id, err := adminCall(ctx, req.ImageId, req.Body != nil)
+	if err != nil {
+		return nil, err
+	}
+	out, err := h.s.rejectImage(ctx, actor, id, *req.Body)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return catalogueapi.RejectAdminProductImage200JSONResponse(out), nil
+}
+
+// CreateAdminProductImage implements POST /v1/admin/products/{productId}/images.
+func (h catalogueHandlers) CreateAdminProductImage(ctx context.Context, req catalogueapi.CreateAdminProductImageRequestObject) (catalogueapi.CreateAdminProductImageResponseObject, error) {
+	actor, id, err := adminCall(ctx, req.ProductId, req.Body != nil)
+	if err != nil {
+		return nil, err
+	}
+	out, err := h.s.createImage(ctx, actor, id, *req.Body)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return catalogueapi.CreateAdminProductImage201JSONResponse(out), nil
+}
+
+// ConfirmAdminProductImage implements POST /v1/admin/product-images/{imageId}/confirm.
+func (h catalogueHandlers) ConfirmAdminProductImage(ctx context.Context, req catalogueapi.ConfirmAdminProductImageRequestObject) (catalogueapi.ConfirmAdminProductImageResponseObject, error) {
+	actor, id, err := adminCall(ctx, req.ImageId, true)
+	if err != nil {
+		return nil, err
+	}
+	var body catalogueapi.AdminProductImageApprove
+	if req.Body != nil {
+		body = *req.Body
+	}
+	out, err := h.s.confirmImage(ctx, actor, id, body)
+	if err != nil {
+		return nil, asProblem(err)
+	}
+	return catalogueapi.ConfirmAdminProductImage200JSONResponse(out), nil
 }

@@ -223,6 +223,8 @@
                   isListed: true
                   stockUpdatedAt: "2026-10-23T05:00:00Z"
                   stale: false
+                  imageKey: null
+                  photo: null
                   createdAt: "2026-10-01T05:00:00Z"
                   updatedAt: "2026-10-23T05:00:00Z"
               nextCursor: null
@@ -285,6 +287,8 @@
               isListed: true
               stockUpdatedAt: "2026-10-23T05:00:00Z"
               stale: false
+              imageKey: null
+              photo: null
               createdAt: "2026-10-23T05:00:00Z"
               updatedAt: "2026-10-23T05:00:00Z"
       default:
@@ -345,6 +349,8 @@
               isListed: true
               stockUpdatedAt: "2026-10-19T17:00:00Z"
               stale: true
+              imageKey: null
+              photo: null
               createdAt: "2026-10-01T05:00:00Z"
               updatedAt: "2026-10-19T17:00:00Z"
       default:
@@ -403,6 +409,8 @@
               isListed: true
               stockUpdatedAt: "2026-10-23T05:00:00Z"
               stale: false
+              imageKey: null
+              photo: null
               createdAt: "2026-10-01T05:00:00Z"
               updatedAt: "2026-10-23T05:10:00Z"
       default:
@@ -492,6 +500,8 @@
                 isListed: true
                 stockUpdatedAt: "2026-10-23T05:00:00Z"
                 stale: false
+                imageKey: null
+                photo: null
                 createdAt: "2026-10-01T05:00:00Z"
                 updatedAt: "2026-10-23T05:00:00Z"
               movements:
@@ -679,5 +689,108 @@
               mrpPaise: 2800
               updatedAt: "2026-10-23T05:00:00Z"
               etag: '"v2"'
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/products/{productId}/photos:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: productId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: createProductPhoto
+    tags: [catalogue]
+    summary: Start the upload of a photo of a product this store created
+    description: >-
+      Manager and above (`product.create`, D-252). Only the store that created the product
+      (`createProduct`) may add its photo, while the product is not merged or retired (else
+      `404 not_found` / `409 invalid_transition`). Returns a presigned PUT into the private bucket, valid
+      for 15 minutes; confirm it with `.../photos/{photoId}/confirm`. The photo then waits for admin
+      review and customers see it only once approved. Storage not configured is `503`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/catalogue.yaml#/ProductPhotoCreate
+          example:
+            contentType: image/jpeg
+            sizeBytes: 81234
+    responses:
+      "201":
+        description: The photo and the upload to make
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/catalogue.yaml#/ProductPhotoUpload
+            example:
+              photo: &photo
+                id: 01JB0SPH1A2B3C4D5E6F7G8H9J
+                productId: 01JB0S9P1R2D3C4T5M6A7S8T9S
+                status: uploading
+                contentType: image/jpeg
+                previewUrl: null
+                rejectReason: null
+                createdAt: "2026-10-26T09:00:00Z"
+              upload:
+                url: https://s3.todayz.localhost/todayz-private/product-images/01JB0S9P1R2D3C4T5M6A7S8T9S/01JB0SPH1A2B3C4D5E6F7G8H9J.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256
+                method: PUT
+                headers: {Content-Type: image/jpeg, Content-Length: "81234"}
+                expiresAt: "2026-10-26T09:15:00Z"
+      default:
+        $ref: ../common/responses.yaml#/Problem
+/v1/biz/businesses/{bid}/stores/{sid}/products/{productId}/photos/{photoId}/confirm:
+  parameters:
+    - name: bid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: sid
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: productId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+    - name: photoId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: confirmProductPhoto
+    tags: [catalogue]
+    summary: Confirm an uploaded product photo; it goes to admin review
+    description: >-
+      The file must be in storage with the declared type and size (else `422` on `upload`). The photo
+      becomes `pending` (admin review, D-252). Confirming a confirmed photo again answers it unchanged.
+    x-idempotency: none
+    responses:
+      "200":
+        description: The photo, waiting for review
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/catalogue.yaml#/ProductPhoto
+            example:
+              <<: *photo
+              status: pending
+              previewUrl: https://s3.todayz.localhost/todayz-private/product-images/01JB0S9P1R2D3C4T5M6A7S8T9S/01JB0SPH1A2B3C4D5E6F7G8H9J.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256
       default:
         $ref: ../common/responses.yaml#/Problem

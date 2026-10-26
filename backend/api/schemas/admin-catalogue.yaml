@@ -12,7 +12,7 @@ AdminProductUnit:
 AdminProduct:
   type: object
   additionalProperties: false
-  required: [id, name, brandName, categoryId, categoryName, variant, packSize, unit, mrpPaise, barcodes, status, mergedInto, storeCount, createdAt, updatedAt]
+  required: [id, name, brandName, categoryId, categoryName, variant, packSize, unit, mrpPaise, barcodes, status, mergedInto, storeCount, imageKey, createdAt, updatedAt]
   properties:
     id: {$ref: ./common.yaml#/Ulid}
     name: {type: string, maxLength: 120}
@@ -46,6 +46,10 @@ AdminProduct:
       type: integer
       description: Stores that list the product.
       minimum: 0
+    imageKey:
+      type: [string, 'null']
+      description: The product's approved image on the image host (D-252); null shows the placeholder.
+      maxLength: 300
     createdAt: {$ref: ./common.yaml#/Timestamp}
     updatedAt: {$ref: ./common.yaml#/Timestamp}
 AdminProductList:
@@ -286,3 +290,177 @@ AdminSynonymCreate:
     synonym: {type: string, minLength: 1, maxLength: 80}
     lang: {$ref: '#/AdminSynonymLang'}
     productId: {$ref: ./common.yaml#/Ulid}
+AdminProductImageStatus:
+  type: string
+  description: >-
+    `uploading` until the upload is confirmed; `pending` waits for review and no customer sees it;
+    `approved` is the product's image; `rejected` was turned down or taken down; `replaced` was the
+    product's image before a newer one (D-252).
+  enum: [uploading, pending, approved, rejected, replaced]
+AdminProductImageSource:
+  type: string
+  description: "`retailer` a shop's photo, `admin` an admin upload, `off`/`obf`/`opf` Open Food/Beauty/Products Facts."
+  enum: [retailer, admin, off, obf, opf]
+AdminProductImageContentType:
+  type: string
+  enum: [image/jpeg, image/png, image/webp]
+AdminProductImage:
+  type: object
+  additionalProperties: false
+  required: [id, productId, productName, brandName, categoryName, productStatus, productImageKey, source, status,
+    contentType, sizeBytes, previewUrl, imageKey, sourceRef, sourceUrl, pageUrl, licence, attribution, match,
+    storeId, storeName, rejectReason, decidedAt, createdAt]
+  properties:
+    id: {$ref: ./common.yaml#/Ulid}
+    productId: {$ref: ./common.yaml#/Ulid}
+    productName: {type: string, maxLength: 120}
+    brandName:
+      type: [string, 'null']
+      maxLength: 120
+    categoryName: {type: string, maxLength: 120}
+    productStatus: {$ref: '#/AdminProductStatus'}
+    productImageKey:
+      type: [string, 'null']
+      description: The product's current image on the image host, to compare with this one.
+      maxLength: 300
+    source: {$ref: '#/AdminProductImageSource'}
+    status: {$ref: '#/AdminProductImageStatus'}
+    contentType: {$ref: '#/AdminProductImageContentType'}
+    sizeBytes:
+      type: [integer, 'null']
+      minimum: 1
+    previewUrl:
+      type: [string, 'null']
+      description: A signed link to the stored file, valid for 15 minutes; null while uploading.
+    imageKey:
+      type: [string, 'null']
+      description: The copy on the image host once approved.
+      maxLength: 300
+    sourceRef:
+      type: [string, 'null']
+      description: The barcode the importer looked up.
+      maxLength: 64
+    sourceUrl:
+      type: [string, 'null']
+      description: Where an imported image was downloaded from.
+      maxLength: 500
+    pageUrl:
+      type: [string, 'null']
+      description: The source's page for the product (the attribution link).
+      maxLength: 500
+    licence:
+      type: [string, 'null']
+      maxLength: 40
+    attribution:
+      type: [string, 'null']
+      maxLength: 200
+    match:
+      type: [string, 'null']
+      description: "`barcode` (the same barcode) or `name` (found by name and brand: check it closely)."
+      maxLength: 16
+    storeId:
+      oneOf:
+        - {$ref: ./common.yaml#/Ulid}
+        - {type: 'null'}
+    storeName:
+      type: [string, 'null']
+      maxLength: 80
+    rejectReason:
+      type: [string, 'null']
+      maxLength: 500
+    decidedAt:
+      type: [string, 'null']
+      format: date-time
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+AdminProductImageList:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor, serverNow]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/AdminProductImage'}
+    nextCursor: {$ref: ./common.yaml#/NextCursor}
+    serverNow: {$ref: ./common.yaml#/ServerNow}
+AdminProductImageApprove:
+  type: object
+  additionalProperties: false
+  properties:
+    reason: {type: string, minLength: 1, maxLength: 500}
+AdminProductImageReject:
+  type: object
+  additionalProperties: false
+  required: [reason]
+  properties:
+    reason: {type: string, minLength: 1, maxLength: 500}
+AdminProductImageBulkApprove:
+  type: object
+  additionalProperties: false
+  required: [imageIds]
+  properties:
+    imageIds:
+      type: array
+      minItems: 1
+      maxItems: 50
+      uniqueItems: true
+      items: {$ref: ./common.yaml#/Ulid}
+    reason: {type: string, minLength: 1, maxLength: 500}
+AdminProductImageBulkFailure:
+  type: object
+  additionalProperties: false
+  required: [imageId, code, detail]
+  properties:
+    imageId: {$ref: ./common.yaml#/Ulid}
+    code: {type: string, maxLength: 64}
+    detail: {type: string, maxLength: 500}
+AdminProductImageBulkResult:
+  type: object
+  additionalProperties: false
+  required: [approved, failed]
+  properties:
+    approved:
+      type: array
+      items: {$ref: '#/AdminProductImage'}
+    failed:
+      type: array
+      items: {$ref: '#/AdminProductImageBulkFailure'}
+AdminProductImageCreate:
+  type: object
+  additionalProperties: false
+  required: [contentType, sizeBytes]
+  properties:
+    contentType: {$ref: '#/AdminProductImageContentType'}
+    sizeBytes:
+      type: integer
+      format: int64
+      minimum: 1
+      maximum: 5242880
+      description: The file's exact size in bytes (at most 5 MB). The upload URL signs it.
+AdminProductImageUploadHeaders:
+  type: object
+  additionalProperties: false
+  required: [Content-Type, Content-Length]
+  properties:
+    Content-Type: {$ref: '#/AdminProductImageContentType'}
+    Content-Length:
+      type: string
+      pattern: ^[1-9][0-9]*$
+AdminProductImageUploadTarget:
+  type: object
+  additionalProperties: false
+  description: A presigned PUT into the private bucket. Send the file with exactly these headers before `expiresAt`.
+  required: [url, method, headers, expiresAt]
+  properties:
+    url: {type: string}
+    method:
+      type: string
+      enum: [PUT]
+    headers: {$ref: '#/AdminProductImageUploadHeaders'}
+    expiresAt: {$ref: ./common.yaml#/Timestamp}
+AdminProductImageUpload:
+  type: object
+  additionalProperties: false
+  required: [image, upload]
+  properties:
+    image: {$ref: '#/AdminProductImage'}
+    upload: {$ref: '#/AdminProductImageUploadTarget'}

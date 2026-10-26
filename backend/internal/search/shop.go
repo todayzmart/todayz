@@ -217,7 +217,7 @@ func (s *Service) ListStoreItems(ctx context.Context, slug string, p discoverapi
 		it := searchItem(candItem{
 			ID: iid, ProductID: pid, Name: name, Variant: r.Variant, Brand: r.BrandName, PackSize: r.PackSize,
 			Unit: r.Unit, Price: r.PricePaise, Mrp: r.MrpPaise, StockUpdatedAt: r.StockUpdatedAt,
-			ImageKey: r.ImageKey, Offer: offers[iid],
+			ImageKey: r.ImageKey, Offer: offers[iid], Credit: imageCredit(r.ImageSource, r.ImageLicence, r.ImageAttribution, r.ImagePageUrl),
 		}, now, stale)
 		it.InStock = r.InStock
 		out.Items = append(out.Items, it)

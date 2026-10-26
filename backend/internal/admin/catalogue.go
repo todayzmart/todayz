@@ -43,7 +43,7 @@ func productOut(r admindb.ListProductsRow) api.AdminProduct {
 		CategoryName: r.CategoryName, Variant: r.Variant, PackSize: r.PackSize, Unit: api.AdminProductUnit(r.Unit),
 		MrpPaise: r.MrpPaise, Barcodes: nonNil(r.Barcodes), Status: api.AdminProductStatus(r.Status),
 		MergedInto: optID(r.MergedInto), StoreCount: int(r.StoreCount),
-		CreatedAt: r.CreatedAt.UTC(), UpdatedAt: r.UpdatedAt.UTC(),
+		CreatedAt: r.CreatedAt.UTC(), UpdatedAt: r.UpdatedAt.UTC(), ImageKey: r.ImageKey,
 	}
 }
 
@@ -361,6 +361,7 @@ func (s *Service) listPending(ctx context.Context, limit *int, cursor *string) (
 				ID: r.ID, Name: r.Name, BrandName: r.BrandName, CategoryID: r.CategoryID, CategoryName: r.CategoryName,
 				Variant: r.Variant, PackSize: r.PackSize, Unit: r.Unit, MrpPaise: r.MrpPaise, Barcodes: r.Barcodes,
 				Status: r.Status, MergedInto: r.MergedInto, StoreCount: r.StoreCount, CreatedAt: r.CreatedAt, UpdatedAt: r.UpdatedAt,
+				ImageKey: r.ImageKey,
 			}),
 			CreatedByStoreId: optID(r.CreatedByStoreID), CreatedByStoreName: r.CreatedByStoreName,
 			Suggestions: []api.AdminDuplicateSuggestion{},
@@ -428,6 +429,13 @@ func (s *Service) decidePending(ctx context.Context, actor, id ids.ID, to, actio
 				return nil, nil, err
 			}
 			after := map[string]any{"status": to}
+			if to == prodRetired {
+				n, err := s.closeImages(ctx, q, actor, cur.ID, "the product was rejected")
+				if err != nil {
+					return nil, nil, err
+				}
+				after["imagesRejected"] = n
+			}
 			if reason != nil {
 				after["reason"] = *reason
 			}
@@ -491,7 +499,11 @@ func (s *Service) mergePending(ctx context.Context, actor, id ids.ID, body api.A
 			}); err != nil {
 				return nil, nil, err
 			}
-			after := map[string]any{"status": prodMerged, "mergedInto": into.String(), "synonymsMoved": moved}
+			closed, err := s.closeImages(ctx, q, actor, cur.ID, "the product was merged into another")
+			if err != nil {
+				return nil, nil, err
+			}
+			after := map[string]any{"status": prodMerged, "mergedInto": into.String(), "synonymsMoved": moved, "imagesRejected": closed}
 			if reason != nil {
 				after["reason"] = *reason
 			}

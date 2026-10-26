@@ -18,10 +18,12 @@ import (
 	"github.com/todayz/backend/internal/platform/authz"
 	"github.com/todayz/backend/internal/platform/awssms"
 	"github.com/todayz/backend/internal/platform/config"
+	"github.com/todayz/backend/internal/platform/httpx"
 	platformjobs "github.com/todayz/backend/internal/platform/jobs"
 	"github.com/todayz/backend/internal/platform/jobs/adminapi"
 	"github.com/todayz/backend/internal/platform/notice"
 	"github.com/todayz/backend/internal/platform/pii"
+	"github.com/todayz/backend/internal/platform/storage"
 )
 
 // mountAdmin mounts the admin domain's routes. Only the work package that builds
@@ -88,6 +90,7 @@ func mountAdminConsole(r chi.Router, d *deps) {
 			{Name: "GEOCODER_API_KEY", Set: pr.GeocoderAPIKey.IsSet()},
 		}
 		ad.Integrations = notifyIntegrations(d.Config)
+		ad.Storage = storage.New(d.Config.Storage, httpx.NewOutboundClient(httpx.OutboundOptions{NoEgress: d.Config.NoEgress}))
 	}
 	ad.NotifyTemplates = func() []admin.NotifyTemplate { return notifyTemplates(d.Config) }
 	if d.DB != nil {

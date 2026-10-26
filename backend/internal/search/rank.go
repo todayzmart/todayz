@@ -5,6 +5,7 @@ import (
 	"sort"
 	"time"
 
+	discoverapi "github.com/todayz/backend/gen/api/discover"
 	"github.com/todayz/backend/internal/platform/ids"
 )
 
@@ -60,8 +61,9 @@ type candItem struct {
 	Available      int32 // on hand less reserved (basket coverage)
 	StockUpdatedAt *time.Time
 	ImageKey       *string
-	Text           float64 // text match, 0–1
-	Category       bool    // matched only because the query names its category
+	Credit         *discoverapi.DiscoverImageCredit // the image's licence credit, when it needs one
+	Text           float64                          // text match, 0–1
+	Category       bool                             // matched only because the query names its category
 	Offer          bool
 }
 

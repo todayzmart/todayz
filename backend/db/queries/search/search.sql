@@ -124,10 +124,12 @@ WHERE s.slug = @slug AND s.status = 'live' AND b.status = 'verified' AND s.locat
 SELECT si.id AS store_item_id, si.product_id, si.local_name, si.price_paise, si.mrp_paise,
   (si.on_hand - si.reserved > 0)::bool AS in_stock, si.stock_updated_at,
   p.name AS product_name, p.variant, p.pack_size::float8 AS pack_size, p.unit, p.image_key,
+  pim.source AS image_source, pim.licence AS image_licence, pim.attribution AS image_attribution, pim.page_url AS image_page_url,
   br.name AS brand_name
 FROM store_items si
 JOIN products p ON p.id = si.product_id
 LEFT JOIN brands br ON br.id = p.brand_id
+LEFT JOIN product_images pim ON pim.id = p.image_id
 WHERE si.store_id = @store_id AND si.is_listed
   AND p.status IN ('active', 'pending_review')
   AND (sqlc.narg(tsq)::text IS NULL OR si.search @@ to_tsquery('simple', sqlc.narg(tsq)::text))
@@ -151,6 +153,7 @@ LIMIT @lim OFFSET @off;
 SELECT si.id AS store_item_id, si.product_id, si.local_name, si.price_paise, si.mrp_paise,
   (si.on_hand - si.reserved)::int AS available, si.stock_updated_at,
   p.name AS product_name, p.variant, p.pack_size::float8 AS pack_size, p.unit, p.image_key,
+  pim.source AS image_source, pim.licence AS image_licence, pim.attribution AS image_attribution, pim.page_url AS image_page_url,
   p.category_id, p.brand_id, br.name AS brand_name,
   (si.search @@ to_tsquery('simple', @tsq::text))::bool AS fts,
   GREATEST(similarity(p.name, @q::text), similarity(COALESCE(si.local_name, ''), @q::text))::float8 AS sim,
@@ -166,6 +169,7 @@ JOIN businesses b ON b.id = s.business_id
 JOIN store_items si ON si.store_id = s.id
 JOIN products p ON p.id = si.product_id
 LEFT JOIN brands br ON br.id = p.brand_id
+LEFT JOIN product_images pim ON pim.id = p.image_id
 LEFT JOIN categories c ON c.id = b.category_id
 WHERE s.status = 'live' AND b.status = 'verified'
   AND ST_DWithin(s.location, ST_SetSRID(ST_MakePoint(@lng::float8, @lat::float8), 4326)::geography, @radius_m::float8)
@@ -283,6 +287,7 @@ ON CONFLICT (id, occurred_at) DO NOTHING;
 SELECT si.id AS store_item_id, si.product_id, si.local_name, si.price_paise, si.mrp_paise,
   (si.on_hand - si.reserved)::int AS available, si.stock_updated_at,
   p.name AS product_name, p.variant, p.pack_size::float8 AS pack_size, p.unit, p.image_key,
+  pim.source AS image_source, pim.licence AS image_licence, pim.attribution AS image_attribution, pim.page_url AS image_page_url,
   p.category_id, p.brand_id, br.name AS brand_name,
   true AS fts,
   1::float8 AS sim,
@@ -298,6 +303,7 @@ JOIN businesses b ON b.id = s.business_id
 JOIN store_items si ON si.store_id = s.id
 JOIN products p ON p.id = si.product_id
 LEFT JOIN brands br ON br.id = p.brand_id
+LEFT JOIN product_images pim ON pim.id = p.image_id
 LEFT JOIN categories c ON c.id = b.category_id
 WHERE s.status = 'live' AND b.status = 'verified'
   AND ST_DWithin(s.location, ST_SetSRID(ST_MakePoint(@lng::float8, @lat::float8), 4326)::geography, @radius_m::float8)
@@ -331,6 +337,7 @@ WHERE si.id = @store_item_id AND si.store_id = @store_id AND si.is_listed
 SELECT si.id AS store_item_id, si.product_id, si.local_name, si.price_paise, si.mrp_paise,
   (si.on_hand - si.reserved)::int AS available, si.stock_updated_at,
   p.name AS product_name, p.variant, p.pack_size::float8 AS pack_size, p.unit, p.image_key,
+  pim.source AS image_source, pim.licence AS image_licence, pim.attribution AS image_attribution, pim.page_url AS image_page_url,
   p.category_id, p.brand_id, br.name AS brand_name,
   true AS fts,
   1::float8 AS sim,
@@ -346,6 +353,7 @@ JOIN businesses b ON b.id = s.business_id
 JOIN store_items si ON si.store_id = s.id
 JOIN products p ON p.id = si.product_id
 LEFT JOIN brands br ON br.id = p.brand_id
+LEFT JOIN product_images pim ON pim.id = p.image_id
 LEFT JOIN categories c ON c.id = b.category_id
 WHERE s.id = @store_id AND s.status = 'live' AND b.status = 'verified'
   AND si.is_listed AND si.on_hand - si.reserved > 0

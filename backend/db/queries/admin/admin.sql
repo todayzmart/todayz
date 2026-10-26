@@ -310,7 +310,7 @@ RETURNING id, name, phone_enc, shop_name, city, source, status, status_changed_a
 -- variant and brand; barcode is an exact match.
 SELECT p.id, p.name, b.name AS brand_name, p.category_id, (c.names ->> 'en')::text AS category_name,
   p.variant, p.pack_size::float8 AS pack_size, p.unit, p.mrp_paise, p.barcodes, p.status, p.merged_into,
-  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at
+  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at, p.image_key
 FROM products p JOIN categories c ON c.id = p.category_id LEFT JOIN brands b ON b.id = p.brand_id
 WHERE (sqlc.narg(status)::text IS NULL OR p.status = sqlc.narg(status)::text)
   AND (sqlc.narg(category_id)::uuid IS NULL OR p.category_id = sqlc.narg(category_id)::uuid)
@@ -327,7 +327,7 @@ LIMIT @lim;
 -- name: GetProduct :one
 SELECT p.id, p.name, b.name AS brand_name, p.category_id, (c.names ->> 'en')::text AS category_name,
   p.variant, p.pack_size::float8 AS pack_size, p.unit, p.mrp_paise, p.barcodes, p.status, p.merged_into,
-  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at
+  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at, p.image_key
 FROM products p JOIN categories c ON c.id = p.category_id LEFT JOIN brands b ON b.id = p.brand_id
 WHERE p.id = @id;
 
@@ -374,7 +374,7 @@ WHERE p.id = @product_id AND si.product_id = p.id;
 -- The review queue, oldest first (keyset after_at/after_id).
 SELECT p.id, p.name, b.name AS brand_name, p.category_id, (c.names ->> 'en')::text AS category_name,
   p.variant, p.pack_size::float8 AS pack_size, p.unit, p.mrp_paise, p.barcodes, p.status, p.merged_into,
-  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at,
+  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at, p.image_key,
   p.created_by_store_id, s.name AS created_by_store_name
 FROM products p JOIN categories c ON c.id = p.category_id LEFT JOIN brands b ON b.id = p.brand_id
 LEFT JOIN stores s ON s.id = p.created_by_store_id
@@ -388,7 +388,7 @@ LIMIT @lim;
 -- Active products whose names look like name (pg_trgm), closest first.
 SELECT p.id, p.name, b.name AS brand_name, p.category_id, (c.names ->> 'en')::text AS category_name,
   p.variant, p.pack_size::float8 AS pack_size, p.unit, p.mrp_paise, p.barcodes, p.status, p.merged_into,
-  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at,
+  (SELECT count(*) FROM store_items si WHERE si.product_id = p.id)::int AS store_count, p.created_at, p.updated_at, p.image_key,
   similarity(p.name, @name::text)::float8 AS similarity
 FROM products p JOIN categories c ON c.id = p.category_id LEFT JOIN brands b ON b.id = p.brand_id
 WHERE p.status = 'active' AND p.id <> @id AND p.name % @name::text
@@ -453,6 +453,12 @@ WHERE ps.id = @id;
 
 -- name: ProductStatus :one
 SELECT status FROM products WHERE id = @id;
+
+-- name: RejectOpenProductImages :execrows
+-- A product leaving review (rejected or merged) turns down its photos that
+-- are still uploading or waiting (D-252).
+UPDATE product_images SET status = 'rejected', reject_reason = @reason, decided_by = @by, decided_at = @now::timestamptz, updated_at = @now
+WHERE product_id = @product_id AND status IN ('uploading','pending');
 
 -- name: InsertSynonym :exec
 INSERT INTO product_synonyms (id, term, synonym, lang, product_id, created_at)
@@ -605,3 +611,73 @@ FROM notification_deliveries
 WHERE channel = @channel AND status = 'failed'
 ORDER BY updated_at DESC
 LIMIT 1;
+
+------------------------------------------------------------------------------
+-- product images (D-252): retailer photos, admin uploads, imported stock images
+------------------------------------------------------------------------------
+
+-- name: ListProductImages :many
+-- The image queue for one status, oldest first (keyset after_at/after_id).
+SELECT pi.id, pi.product_id, p.name AS product_name, b.name AS brand_name,
+  (c.names ->> 'en')::text AS category_name, p.status AS product_status, p.image_key AS product_image_key,
+  pi.source, pi.status, pi.object_key, pi.content_type, pi.size_bytes, pi.public_key, pi.source_ref,
+  pi.source_url, pi.page_url, pi.licence, pi.attribution, pi.match, pi.store_id, st.name AS store_name,
+  pi.reject_reason, pi.decided_at, pi.created_at
+FROM product_images pi
+JOIN products p ON p.id = pi.product_id
+JOIN categories c ON c.id = p.category_id
+LEFT JOIN brands b ON b.id = p.brand_id
+LEFT JOIN stores st ON st.id = pi.store_id
+WHERE pi.status = @status
+  AND (sqlc.narg(source)::text IS NULL OR pi.source = sqlc.narg(source)::text)
+  AND (sqlc.narg(product_id)::uuid IS NULL OR pi.product_id = sqlc.narg(product_id)::uuid)
+  AND (sqlc.narg(after_at)::timestamptz IS NULL
+       OR (pi.created_at, pi.id) > (sqlc.narg(after_at)::timestamptz, sqlc.narg(after_id)::uuid))
+ORDER BY pi.created_at, pi.id
+LIMIT @lim;
+
+-- name: GetProductImage :one
+SELECT pi.id, pi.product_id, p.name AS product_name, b.name AS brand_name,
+  (c.names ->> 'en')::text AS category_name, p.status AS product_status, p.image_key AS product_image_key,
+  pi.source, pi.status, pi.object_key, pi.content_type, pi.size_bytes, pi.public_key, pi.source_ref,
+  pi.source_url, pi.page_url, pi.licence, pi.attribution, pi.match, pi.store_id, st.name AS store_name,
+  pi.reject_reason, pi.decided_at, pi.created_at
+FROM product_images pi
+JOIN products p ON p.id = pi.product_id
+JOIN categories c ON c.id = p.category_id
+LEFT JOIN brands b ON b.id = p.brand_id
+LEFT JOIN stores st ON st.id = pi.store_id
+WHERE pi.id = @id;
+
+-- name: LockProductImage :one
+SELECT id, product_id, source, status, object_key, content_type, size_bytes, public_key
+FROM product_images WHERE id = @id FOR UPDATE;
+
+-- name: LockProductForImage :one
+-- The product row is locked before its images, so two approvals of one
+-- product's images queue up behind each other.
+SELECT id, status, image_id, image_key FROM products WHERE id = @id FOR UPDATE;
+
+-- name: ReplaceApprovedImage :exec
+UPDATE product_images SET status = 'replaced', updated_at = @now
+WHERE product_id = @product_id AND status = 'approved';
+
+-- name: ApproveProductImage :exec
+UPDATE product_images SET status = 'approved', public_key = @public_key, size_bytes = coalesce(sqlc.narg(size_bytes), size_bytes),
+  decided_by = @by, decided_at = @now::timestamptz, reject_reason = NULL, updated_at = @now
+WHERE id = @id;
+
+-- name: RejectProductImage :exec
+-- Turns down a waiting image, or takes down the approved one (its public copy
+-- is removed by the caller).
+UPDATE product_images SET status = 'rejected', public_key = NULL, reject_reason = @reason,
+  decided_by = @by, decided_at = @now::timestamptz, updated_at = @now
+WHERE id = @id;
+
+-- name: SetProductImage :exec
+UPDATE products SET image_id = sqlc.narg(image_id), image_key = sqlc.narg(image_key), updated_at = @now::timestamptz, version = version + 1
+WHERE id = @id;
+
+-- name: InsertAdminProductImage :exec
+INSERT INTO product_images (id, product_id, source, status, object_key, content_type, size_bytes, uploaded_by, created_at, updated_at)
+VALUES (@id, @product_id, 'admin', 'uploading', @object_key, @content_type, @size_bytes, @uploaded_by, @now, @now);

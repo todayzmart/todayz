@@ -79,10 +79,18 @@ SELECT si.id, si.store_id, si.product_id, si.local_name, si.price_paise, si.mrp_
   si.on_hand, si.reserved, si.low_stock_at, si.is_listed, si.stock_updated_at,
   si.created_at, si.updated_at, si.version,
   p.name AS product_name, p.variant, p.pack_size::float8 AS pack_size, p.unit, p.image_key,
-  p.barcodes, p.category_id, p.brand_id, b.name AS brand_name, p.mrp_paise AS product_mrp_paise
+  p.barcodes, p.category_id, p.brand_id, b.name AS brand_name, p.mrp_paise AS product_mrp_paise,
+  ph.id AS photo_id, coalesce(ph.status, '')::text AS photo_status, coalesce(ph.object_key, '')::text AS photo_key, ph.reject_reason AS photo_reject_reason
 FROM store_items si
 JOIN products p ON p.id = si.product_id
 LEFT JOIN brands b ON b.id = p.brand_id
+-- The store's newest photo of the product that is not (yet) its image (D-252).
+LEFT JOIN LATERAL (
+  SELECT pi.id, pi.status, pi.object_key, pi.reject_reason FROM product_images pi
+  WHERE pi.product_id = p.id AND pi.store_id = si.store_id AND pi.source = 'retailer'
+    AND pi.status IN ('pending','rejected','approved','replaced')
+  ORDER BY pi.created_at DESC, pi.id DESC LIMIT 1
+) ph ON true
 WHERE si.id = @id AND si.store_id = @store_id;
 
 -- name: LookupStoreItem :one
@@ -112,10 +120,18 @@ SELECT si.id, si.store_id, si.product_id, si.local_name, si.price_paise, si.mrp_
   si.on_hand, si.reserved, si.low_stock_at, si.is_listed, si.stock_updated_at,
   si.created_at, si.updated_at, si.version,
   p.name AS product_name, p.variant, p.pack_size::float8 AS pack_size, p.unit, p.image_key,
-  p.barcodes, p.category_id, p.brand_id, b.name AS brand_name, p.mrp_paise AS product_mrp_paise
+  p.barcodes, p.category_id, p.brand_id, b.name AS brand_name, p.mrp_paise AS product_mrp_paise,
+  ph.id AS photo_id, coalesce(ph.status, '')::text AS photo_status, coalesce(ph.object_key, '')::text AS photo_key, ph.reject_reason AS photo_reject_reason
 FROM store_items si
 JOIN products p ON p.id = si.product_id
 LEFT JOIN brands b ON b.id = p.brand_id
+-- The store's newest photo of the product that is not (yet) its image (D-252).
+LEFT JOIN LATERAL (
+  SELECT pi.id, pi.status, pi.object_key, pi.reject_reason FROM product_images pi
+  WHERE pi.product_id = p.id AND pi.store_id = si.store_id AND pi.source = 'retailer'
+    AND pi.status IN ('pending','rejected','approved','replaced')
+  ORDER BY pi.created_at DESC, pi.id DESC LIMIT 1
+) ph ON true
 WHERE si.store_id = @store_id
   AND (sqlc.narg(pattern)::text IS NULL
        OR p.name ILIKE sqlc.narg(pattern)::text
@@ -341,3 +357,29 @@ GROUP BY si.id, si.store_id, si.on_hand
 HAVING sum(b.quantity) > GREATEST(si.on_hand, 0)
 ORDER BY si.id
 LIMIT @lim;
+
+------------------------------------------------------------------------------
+-- Product photos (D-252)
+------------------------------------------------------------------------------
+
+-- name: GetProductForPhoto :one
+SELECT id, status, created_by_store_id FROM products WHERE id = @id;
+
+-- name: InsertProductPhoto :one
+INSERT INTO product_images (id, product_id, source, status, object_key, content_type, size_bytes,
+  store_id, uploaded_by, created_at, updated_at)
+VALUES (@id, @product_id, 'retailer', 'uploading', @object_key, @content_type, @size_bytes,
+  @store_id, @uploaded_by, @now, @now)
+RETURNING id, product_id, status, object_key, content_type, size_bytes, reject_reason, created_at;
+
+-- name: LockProductPhoto :one
+-- A store's photo of one product, locked for the confirm.
+SELECT id, product_id, status, object_key, content_type, size_bytes, reject_reason, created_at
+FROM product_images
+WHERE id = @id AND product_id = @product_id AND store_id = @store_id AND source = 'retailer'
+FOR UPDATE;
+
+-- name: MarkProductPhotoPending :one
+UPDATE product_images SET status = 'pending', size_bytes = @size_bytes, updated_at = @now
+WHERE id = @id AND status = 'uploading'
+RETURNING id, product_id, status, object_key, content_type, size_bytes, reject_reason, created_at;

@@ -48,6 +48,7 @@
                   status: active
                   mergedInto: null
                   storeCount: 14
+                  imageKey: products/01JB0SPR1A2B3C4D5E6F7G8H9J/01JB0SMG1A2B3C4D5E6F7G8H9J.jpg
                   createdAt: "2026-10-01T09:00:00Z"
                   updatedAt: "2026-10-20T09:00:00Z"
               nextCursor: null
@@ -162,6 +163,7 @@
                     status: pending_review
                     mergedInto: null
                     storeCount: 0
+                    imageKey: null
                     createdAt: "2026-10-24T09:00:00Z"
                     updatedAt: "2026-10-24T09:00:00Z"
                   createdByStoreId: 01JB0SST1A2B3C4D5E6F7G8H9J
@@ -413,4 +415,242 @@
     responses:
       "204":
         description: Removed
+      default: *problem
+/v1/admin/product-images:
+  get:
+    operationId: listAdminProductImages
+    tags: [admin-catalogue]
+    summary: Product images to review (D-252), oldest first
+    description: >-
+      A shop's photo of a product it created and the stock photos the importer found wait here as
+      `pending`; no customer sees them until approved. `status` defaults to `pending`; `source` narrows
+      to one source. `previewUrl` is a signed link to the draft, valid for 15 minutes.
+    parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: ../schemas/admin-catalogue.yaml#/AdminProductImageStatus
+      - name: source
+        in: query
+        schema:
+          $ref: ../schemas/admin-catalogue.yaml#/AdminProductImageSource
+      - name: productId
+        in: query
+        schema:
+          $ref: ../schemas/common.yaml#/Ulid
+      - $ref: ../common/parameters.yaml#/Limit
+      - $ref: ../common/parameters.yaml#/Cursor
+    responses:
+      "200":
+        description: Images
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminProductImageList
+            example:
+              items:
+                - &image
+                  id: 01JB0SMG1A2B3C4D5E6F7G8H9J
+                  productId: 01JB0SPR1A2B3C4D5E6F7G8H9J
+                  productName: Toor Dal
+                  brandName: Tata Sampann
+                  categoryName: Staples
+                  productStatus: active
+                  productImageKey: null
+                  source: off
+                  status: pending
+                  contentType: image/jpeg
+                  sizeBytes: 48211
+                  previewUrl: https://s3.todayz.localhost/todayz-private/product-images/01JB0SPR1A2B3C4D5E6F7G8H9J/01JB0SMG1A2B3C4D5E6F7G8H9J.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256
+                  imageKey: null
+                  sourceRef: "8901725181234"
+                  sourceUrl: https://images.openfoodfacts.org/images/products/890/172/518/1234/front_en.3.400.jpg
+                  pageUrl: https://world.openfoodfacts.org/product/8901725181234
+                  licence: CC BY-SA 3.0
+                  attribution: Open Food Facts contributors
+                  match: barcode
+                  storeId: null
+                  storeName: null
+                  rejectReason: null
+                  decidedAt: null
+                  createdAt: "2026-10-26T09:00:00Z"
+              nextCursor: null
+              serverNow: "2026-10-26T11:00:00Z"
+      default: *problem
+/v1/admin/product-image-approvals:
+  post:
+    operationId: approveAdminProductImages
+    tags: [admin-catalogue]
+    summary: Approve up to 50 pending images at once (audited)
+    description: >-
+      Each image is approved as `POST .../{imageId}/approve` would; one that cannot be (not pending, its
+      product gone, storage failed) is listed in `failed` with its problem code and the rest go on.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-catalogue.yaml#/AdminProductImageBulkApprove
+          example:
+            imageIds: [01JB0SMG1A2B3C4D5E6F7G8H9J]
+    responses:
+      "200":
+        description: What was approved and what was not
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminProductImageBulkResult
+            example:
+              approved:
+                - <<: *image
+                  status: approved
+                  imageKey: products/01JB0SPR1A2B3C4D5E6F7G8H9J/01JB0SMG1A2B3C4D5E6F7G8H9J.jpg
+              failed: []
+      default: *problem
+/v1/admin/product-images/{imageId}/approve:
+  parameters: &imageParam
+    - name: imageId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: approveAdminProductImage
+    tags: [admin-catalogue]
+    summary: Approve a pending image (audited)
+    description: >-
+      Copies the draft into the public images bucket and makes it the product's image; the image it
+      replaces becomes `replaced`. Only a `pending` image may be approved, else `409 invalid_transition`;
+      a merged or retired product's image is `409 invalid_transition` too. Storage not configured is `503`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-catalogue.yaml#/AdminProductImageApprove
+          example: {}
+    responses:
+      "200":
+        description: The image after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminProductImage
+            example:
+              <<: *image
+              status: approved
+              imageKey: products/01JB0SPR1A2B3C4D5E6F7G8H9J/01JB0SMG1A2B3C4D5E6F7G8H9J.jpg
+      default: *problem
+/v1/admin/product-images/{imageId}/reject:
+  parameters: *imageParam
+  post:
+    operationId: rejectAdminProductImage
+    tags: [admin-catalogue]
+    summary: Reject a pending image, or take down the product's approved one (audited)
+    description: >-
+      A `pending` image becomes `rejected`. The product's `approved` image becomes `rejected` too and the
+      product shows the placeholder again. Any other status is `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-catalogue.yaml#/AdminProductImageReject
+          example:
+            reason: Not this pack size
+    responses:
+      "200":
+        description: The image after the change
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminProductImage
+            example:
+              <<: *image
+              status: rejected
+              rejectReason: Not this pack size
+      default: *problem
+/v1/admin/products/{productId}/images:
+  parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  post:
+    operationId: createAdminProductImage
+    tags: [admin-catalogue]
+    summary: Start an admin upload of a product's image
+    description: >-
+      Returns a presigned PUT into the private bucket, valid for 15 minutes; confirm it with
+      `POST /v1/admin/product-images/{imageId}/confirm`, which publishes it at once. A merged or retired
+      product is `409 invalid_transition`. Storage not configured is `503`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-catalogue.yaml#/AdminProductImageCreate
+          example:
+            contentType: image/jpeg
+            sizeBytes: 48211
+    responses:
+      "201":
+        description: The upload to make
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminProductImageUpload
+            example:
+              image:
+                <<: *image
+                source: admin
+                status: uploading
+                previewUrl: null
+                sourceRef: null
+                sourceUrl: null
+                pageUrl: null
+                licence: null
+                attribution: null
+                match: null
+              upload:
+                url: https://s3.todayz.localhost/todayz-private/product-images/01JB0SPR1A2B3C4D5E6F7G8H9J/01JB0SMG1A2B3C4D5E6F7G8H9J.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256
+                method: PUT
+                headers: {Content-Type: image/jpeg, Content-Length: "48211"}
+                expiresAt: "2026-10-26T11:15:00Z"
+      default: *problem
+/v1/admin/product-images/{imageId}/confirm:
+  parameters: *imageParam
+  post:
+    operationId: confirmAdminProductImage
+    tags: [admin-catalogue]
+    summary: Publish an admin upload as the product's image (audited)
+    description: >-
+      The file must be in storage with the declared type and size (else `422` on `upload`). The image is
+      approved at once and replaces the product's image. Only an `uploading` admin image may be confirmed,
+      else `409 invalid_transition`.
+    x-idempotency: none
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/admin-catalogue.yaml#/AdminProductImageApprove
+          example: {}
+    responses:
+      "200":
+        description: The image, approved
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/admin-catalogue.yaml#/AdminProductImage
+            example:
+              <<: *image
+              source: admin
+              status: approved
+              imageKey: products/01JB0SPR1A2B3C4D5E6F7G8H9J/01JB0SMG1A2B3C4D5E6F7G8H9J.jpg
       default: *problem
