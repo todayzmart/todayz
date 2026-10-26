@@ -70,7 +70,7 @@ type Deps struct {
 	// Settings is platform_settings (the saved-address cap, D-222); nil in
 	// route-only tests, where saving an address answers 503.
 	Settings *settings.Cache
-	// Storage holds profile photos (D-253); nil answers 503 on the photo
+	// Storage holds profile photos (D-259); nil answers 503 on the photo
 	// routes.
 	Storage *storage.Client
 	// SMS and Human override the providers built from Config (tests).

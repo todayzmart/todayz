@@ -176,11 +176,11 @@ const (
 	// Added by field agents (seeded by 30602_w3-06_field_limits.sql)
 	FieldOwnerCodesPerAgentHour Key = "field_owner_codes_per_agent_hour" // count, default 10
 
-	// Added by the customer profile photo (D-253; seeded by 49901_w4-99_profile_photo.sql)
+	// Added by the customer profile photo (D-259; seeded by 49901_w4-99_profile_photo.sql)
 	ProfilePhotoUploadsPerHour Key = "profile_photo_uploads_per_hour" // count, default 10
 )
 
-// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101, D-110, D-131, D-218, D-222, D-225, D-226, D-232, D-253).
+// AllKeys lists every key: the W0-03 keys in 01 §17 order, then keys added later (D-91–D-95, D-99, D-101, D-110, D-131, D-218, D-222, D-225, D-226, D-232, D-259).
 var AllKeys = []Key{
 	OrderAcceptTimeoutMin,
 	PickupHoldMin,

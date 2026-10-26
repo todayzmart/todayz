@@ -29,7 +29,7 @@ type Me struct {
 	// Customer: customer app only; nil when the profile is missing.
 	Customer *CustomerProfile
 	// PhotoURL: customer app only, a presigned GET of the profile photo
-	// (D-253); nil without one.
+	// (D-259); nil without one.
 	PhotoURL *string
 }
 

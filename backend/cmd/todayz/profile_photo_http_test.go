@@ -21,7 +21,7 @@ import (
 	"github.com/todayz/backend/internal/platform/testclock"
 )
 
-// The profile photo through the router (D-253): register, PUT, confirm,
+// The profile photo through the router (D-259): register, PUT, confirm,
 // remove. Customer app only (a business token is 403), another customer's
 // upload is 404, the upload URL is no-store, and photoUrl reaches only the
 // customer app's /v1/me. Bodies are checked against the contract.

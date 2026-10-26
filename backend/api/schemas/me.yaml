@@ -38,7 +38,7 @@ Me:
         type: string
     photoUrl:
       description: >-
-        Customer app only (D-253): a signed link to the profile photo, valid for 15 minutes; null
+        Customer app only (D-259): a signed link to the profile photo, valid for 15 minutes; null
         without one. Read it again with GET /v1/me rather than storing it.
       type:
         - string

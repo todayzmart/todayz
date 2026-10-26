@@ -2,7 +2,7 @@ import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { json, problem, renderAt, type Call, type Handler } from './render';
 
-// C-18 profile photo (D-253): register, PUT straight to storage, confirm; remove; the Home avatar.
+// C-18 profile photo (D-259): register, PUT straight to storage, confirm; remove; the Home avatar.
 
 const TOKEN = 'tok-photo';
 const PHOTO = 'https://s3.test/todayz-private/profile/u/1.jpg?X-Amz-Signature=abc';

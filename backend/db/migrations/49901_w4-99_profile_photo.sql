@@ -1,4 +1,4 @@
--- The customer's profile photo (D-253, founder 26 Oct: it shows at once, with no admin review, and
+-- The customer's profile photo (D-259, founder 26 Oct: it shows at once, with no admin review, and
 -- only the customer sees it). The app registers an upload and PUTs the file into the private
 -- bucket; the confirm step reads it back, re-encodes it (dropping EXIF and every other piece of
 -- metadata) to profile-photos/<userId>/<uploadId>.jpg and points users.photo_key at that copy.
@@ -30,7 +30,7 @@ CREATE TABLE user_photo_uploads (
 );
 CREATE INDEX ix_user_photo_uploads_user_created ON user_photo_uploads (user_id, created_at DESC);
 
--- 01 §17 (D-253). TestSettingsMatchProductRules reads this insert (D-95).
+-- 01 §17 (D-259). TestSettingsMatchProductRules reads this insert (D-95).
 INSERT INTO platform_settings (key, value, unit, min, max, description) VALUES
   ('profile_photo_uploads_per_hour', '10', 'count', 1, 60, 'Account. 01 §2: profile photo uploads one customer may ask for in a rolling hour');
 

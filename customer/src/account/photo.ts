@@ -1,4 +1,4 @@
-// C-18 profile photo (D-253): the upload and remove calls and their state; the pieces that show it
+// C-18 profile photo (D-259): the upload and remove calls and their state; the pieces that show it
 // are in ProfilePhoto.tsx.
 import { ApiError } from '@todayz/api-client';
 import { confirmMyPhotoUpload, createMyPhotoUpload, deleteMyPhoto, type getMe } from '@todayz/api-client/gen/me/me';

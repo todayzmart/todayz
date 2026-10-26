@@ -17,7 +17,7 @@ import (
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
-// Profile photo (D-253, 01 §2). The customer registers an upload and PUTs the
+// Profile photo (D-259, 01 §2). The customer registers an upload and PUTs the
 // file straight into the private bucket; confirming it re-encodes it on the
 // server (imageclean: EXIF and every other byte that is not a pixel is
 // dropped) and stores the result as the photo. Only the customer sees it, on

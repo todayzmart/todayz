@@ -13,7 +13,7 @@ const (
 	// Saved addresses (W2-15): the customer's own only; another user's is 404.
 	MeAddressesView   = "me.addresses.view"
 	MeAddressesManage = "me.addresses.manage"
-	// Profile photo (D-253): the customer's own, seen only by them.
+	// Profile photo (D-259): the customer's own, seen only by them.
 	MePhotoManage = "me.photo.manage"
 )
 

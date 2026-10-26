@@ -1,4 +1,4 @@
-// C-18 profile photo (D-253): the avatar shows the photo, else the initial; the camera badge picks a
+// C-18 profile photo (D-259): the avatar shows the photo, else the initial; the camera badge picks a
 // new one (JPEG, PNG or WebP, at most 5 MB after the in-browser shrink) and "Remove photo" takes it
 // away. The server re-encodes it without metadata and shows it only to its owner.
 import { Button } from '@todayz/ui';

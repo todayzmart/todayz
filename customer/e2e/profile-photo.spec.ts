@@ -2,10 +2,10 @@ import { guardPage, shot, type PageGuard } from '@todayz/config/playwright';
 import { expect, test, type Page, type Route } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
-// C-18 profile photo (D-253) at 360 px on the e2e build with a faked API (no stack): the initial,
+// C-18 profile photo (D-259) at 360 px on the e2e build with a faked API (no stack): the initial,
 // adding a photo (register, PUT to storage with only Content-Type, confirm), the photo on Account
 // and in the Home header, a refused file, and removing it.
-// `TZ_QA_DIR=docs/qa/D-253 pnpm exec playwright test profile-photo.spec.ts` refreshes the committed shots.
+// `TZ_QA_DIR=docs/qa/D-259 pnpm exec playwright test profile-photo.spec.ts` refreshes the committed shots.
 
 const PHONE = { width: 360, height: 780 } as const;
 const USER = '01J9ZAAAAAAAAAAAAAAAAAAAAA';
@@ -89,7 +89,7 @@ test.afterEach(() => {
   expect(guard.errors.filter((e) => !e.includes('status of 404')), 'console and page errors').toEqual([]);
 });
 
-test('360: add, show and remove a profile photo (C-18, D-253)', async ({ page }) => {
+test('360: add, show and remove a profile photo (C-18, D-259)', async ({ page }) => {
   const api = await fakeApi(page);
   await page.goto('/account');
   const card = page.getByRole('region', { name: 'Asha' });

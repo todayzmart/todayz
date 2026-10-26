@@ -276,7 +276,7 @@ WHERE user_id = @user_id;
 DELETE FROM addresses WHERE user_id = @user_id;
 
 ------------------------------------------------------------------------------
--- Profile photo (D-253)
+-- Profile photo (D-259)
 ------------------------------------------------------------------------------
 
 -- name: CountRecentPhotoUploads :one

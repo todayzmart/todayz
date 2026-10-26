@@ -1,10 +1,10 @@
-# D-253 Profile photo: QA report
+# D-259 Profile photo: QA report
 
 A signed-in customer can add, change and remove a profile photo. It shows on Account (C-18) and in the Home header avatar (C-03), right away and only to them.
 
 - Branch: `claude/angry-bose-8759f6`. Not pushed; the lead merges.
 - Everything ran locally: the shared test Postgres, `storagetest.Fake` for the bucket, and Playwright against a faked API. Nothing touched a cloud account, and the running local stack was left alone.
-- Decision: D-253 in `docs/plan/12-decision-log.md`. Rules: 01 §2 (Profile photo) and §17 (`profile_photo_uploads_per_hour`). Screens: 06 C-03 and C-18.
+- Decision: D-259 in `docs/plan/12-decision-log.md`. Rules: 01 §2 (Profile photo) and §17 (`profile_photo_uploads_per_hour`). Screens: 06 C-03 and C-18.
 
 ## Founder answers
 
@@ -100,7 +100,7 @@ The unit tests cover:
 
 ## Risks and follow-ups
 
-- **Number collisions.** Migration `49901` and decision D-253 were the next free ones on this branch. If another branch takes either before this merges, renumber at merge.
+- **Number collisions.** Migration `49901` and decision D-259 were the next free ones on this branch. If another branch takes either before this merges, renumber at merge.
 - **Re-signed links.** `photoUrl` changes on every `/v1/me` read, so the browser downloads the photo again after each reload (about 30–60 KB). A stable cache key, such as a CDN path signed per user, can come later if it matters.
 - **Orphans.** A raw upload never confirmed stays in the bucket until account deletion. A bucket lifecycle rule on `profile/*.upload` (for example, delete after 1 day) would clean these up. It belongs in `infra/` and is the lead's call.
 - **Translations.** The Hindi, Kannada, Tamil and Telugu strings are machine drafts; they ship only after review.

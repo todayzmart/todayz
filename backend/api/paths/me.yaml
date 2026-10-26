@@ -121,7 +121,7 @@
     tags: [me]
     summary: Get an upload URL for a profile photo
     description: >-
-      Customer app only (D-253). Records the upload and returns a presigned PUT into the private
+      Customer app only (D-259). Records the upload and returns a presigned PUT into the private
       bucket, valid for 15 minutes. The URL signs the Content-Type and the size, so the PUT sends
       exactly the returned headers. JPEG, PNG or WebP, at most 5 MB. At most
       `profile_photo_uploads_per_hour` uploads per person in a rolling hour (`429 rate_limited`).
@@ -173,7 +173,7 @@
     tags: [me]
     summary: Use an uploaded file as my profile photo
     description: >-
-      Customer app only (D-253). The object must exist with the declared size and be a JPEG,
+      Customer app only (D-259). The object must exist with the declared size and be a JPEG,
       PNG or WebP of that type (`422 validation_failed` on `upload` otherwise). The server
       re-encodes it as a JPEG of at most 512 px a side, so EXIF (with any location) and other
       metadata never reach storage, and replaces the previous photo. Only the customer sees it.
@@ -208,7 +208,7 @@
     operationId: deleteMyPhoto
     tags: [me]
     summary: Remove my profile photo
-    description: Customer app only (D-253). The photo is deleted from storage; without one this changes nothing.
+    description: Customer app only (D-259). The photo is deleted from storage; without one this changes nothing.
     x-idempotency: none
     responses:
       "200":
