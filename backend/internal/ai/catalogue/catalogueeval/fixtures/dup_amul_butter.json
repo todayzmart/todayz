@@ -1,0 +1,81 @@
+{
+  "name": "dup_amul_butter",
+  "input": {
+    "product": {
+      "name": "amul buter 100g",
+      "brandName": null,
+      "variant": null,
+      "packSize": 100,
+      "unit": "g"
+    },
+    "category": "Dairy",
+    "candidates": [
+      {
+        "name": "Butter",
+        "brandName": "Amul",
+        "variant": null,
+        "packSize": 100,
+        "unit": "g",
+        "similarity": 0.82
+      },
+      {
+        "name": "Butter",
+        "brandName": "Amul",
+        "variant": null,
+        "packSize": 500,
+        "unit": "g",
+        "similarity": 0.61
+      }
+    ],
+    "categories": [
+      "Dairy",
+      "Staples",
+      "Snacks",
+      "Beverages",
+      "Personal care",
+      "Household"
+    ],
+    "namesNow": {
+      "en": "Dairy",
+      "hi": "डेयरी",
+      "kn": "ಹಾಲಿನ ಉತ್ಪನ್ನಗಳು",
+      "te": "పాల ఉత్పత్తులు",
+      "ta": "பால் பொருட்கள்"
+    }
+  },
+  "expect": {
+    "duplicate": "p1",
+    "names": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_cc_dup_amul_butter",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_cc_dup_amul_butter",
+        "name": "clean_up_product",
+        "input": {
+          "name": "Butter",
+          "brandName": "Amul",
+          "variant": null,
+          "packSize": 100,
+          "unit": "g",
+          "categoryRef": "c1",
+          "duplicateRef": "p1",
+          "duplicateReason": "Same brand, same kind and the same pack and unit.",
+          "categoryNames": null
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 900,
+      "output_tokens": 160
+    }
+  }
+}

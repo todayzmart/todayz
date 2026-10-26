@@ -1,4 +1,5 @@
 import type { RiskFlag } from '@todayz/api-client/gen/model/riskFlag';
+import { RiskAssist } from '../ai-assist/risk/RiskAssist';
 
 /**
  * Where the risk explanation (AI-A3, D-82) sits in the A-13 flag detail. W3-13 renders
@@ -7,5 +8,9 @@ import type { RiskFlag } from '@todayz/api-client/gen/model/riskFlag';
  * draft: the reviewer still clears or confirms with the buttons above.
  */
 export function AssistSlot({ flag }: { flag: RiskFlag }) {
-  return <div data-slot="risk-assist" data-flag={flag.id} />;
+  return (
+    <div data-slot="risk-assist" data-flag={flag.id}>
+      <RiskAssist key={flag.id} flag={flag} />
+    </div>
+  );
 }

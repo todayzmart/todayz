@@ -19,7 +19,13 @@ A failed attempt is retried with backoff until `MaxAttempts`; then the run is **
 nothing retries it on its own. For a `timer` kind this means an order, booking or hold is not
 being moved on time. For a `money` kind, a ledger, payout or reconciliation step is not done.
 
-## First three checks
+## First five minutes
+
+1. A-21 Jobs: open the kind, then the latest failed run. Read the error.
+2. Is it one kind or many? Many failing at once usually means the database or a deploy.
+3. If a deploy started it, roll back ([Release checklist → Rollback](../ops/release-checklist.md#rollback)). Never run, pause or retry a `timer` kind by hand.
+
+## Diagnosis
 
 1. **A-21 Jobs** (https://admin.todayz.localhost/jobs): find the kind (badge *Failing*). Open
    the latest run. It shows the error (at most 2 KB, scrubbed), the attempt, the summary counts
@@ -35,7 +41,7 @@ being moved on time. For a `money` kind, a ledger, payout or reconciliation step
    - All kinds failing together points at the database, the worker or a deploy.
    - One kind failing points at that kind's code or data.
 
-## Likely causes
+### Likely causes
 
 - **A dependency is down or slow.** Database (pool exhausted, lock wait), the mocks or provider
   (SMS, WhatsApp, push, payments): the error names the call, and egress shows refused hosts.
@@ -47,7 +53,7 @@ being moved on time. For a `money` kind, a ledger, payout or reconciliation step
   become `Batched` and `Yield` between batches.
 - **A paused dependency kind**, or a setting changed in `platform_settings` (A-20 audit log).
 
-## Fix
+## Mitigation
 
 - Fix the cause first (dependency, data or code).
 - **Scheduled kind, not `timer`:** on A-21, **Retry** the failed or discarded run that still
@@ -78,7 +84,9 @@ The alert clears when:
 - **Scheduled kind:** one of the next three finished runs succeeds.
 - **Event kind:** the 15-minute failure ratio drops to 20 % or below.
 
-## Who to tell
+## Escalation
+
+**Level:** `timer` and `money` kinds: SEV1 if orders or money are stuck for many people, else SEV2. Other kinds: SEV3 ([Severity levels](../ops/severity.md)).
 
 - **The kind's owner** (the work package on A-21, for example W2-02 for order timers). They own
   the fix.
@@ -86,3 +94,9 @@ The alert clears when:
   - Money: the finance admin, before any manual correction.
   - Timers: the support admin, if customers or shops saw late or wrong order states.
 - After a discarded money run is retried, note it in the incident log with the run ids.
+
+## Follow-up
+
+- A test that reproduces the error.
+- If runs were discarded, check what they left undone and who fixes it (the kind's runbook).
+- SEV1 or SEV2: finish the [incident note](../ops/incident-template.md) and its review within two working days.

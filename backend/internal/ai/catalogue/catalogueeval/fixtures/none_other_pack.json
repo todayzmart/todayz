@@ -1,0 +1,73 @@
+{
+  "name": "none_other_pack",
+  "input": {
+    "product": {
+      "name": "Surf excel easy wash",
+      "brandName": "Surf Excel",
+      "variant": "Easy Wash",
+      "packSize": 1,
+      "unit": "kg"
+    },
+    "category": "Household",
+    "candidates": [
+      {
+        "name": "Detergent Powder",
+        "brandName": "Surf Excel",
+        "variant": "Easy Wash",
+        "packSize": 500,
+        "unit": "g",
+        "similarity": 0.8
+      }
+    ],
+    "categories": [
+      "Dairy",
+      "Staples",
+      "Snacks",
+      "Beverages",
+      "Personal care",
+      "Household"
+    ],
+    "namesNow": {
+      "en": "Dairy",
+      "hi": "डेयरी",
+      "kn": "ಹಾಲಿನ ಉತ್ಪನ್ನಗಳು",
+      "te": "పాల ఉత్పత్తులు",
+      "ta": "பால் பொருட்கள்"
+    }
+  },
+  "expect": {
+    "duplicate": "none",
+    "names": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_cc_none_other_pack",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_cc_none_other_pack",
+        "name": "clean_up_product",
+        "input": {
+          "name": "Detergent Powder",
+          "brandName": "Surf Excel",
+          "variant": "Easy Wash",
+          "packSize": 1,
+          "unit": "kg",
+          "categoryRef": "c6",
+          "duplicateRef": "none",
+          "duplicateReason": null,
+          "categoryNames": null
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 900,
+      "output_tokens": 160
+    }
+  }
+}

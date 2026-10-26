@@ -1,0 +1,58 @@
+{
+  "name": "schema_empty",
+  "input": {
+    "rule": "identity.otp_ip_fanout",
+    "subjectType": "ip",
+    "score": 40,
+    "status": "open",
+    "facts": [
+      {
+        "Key": "phones",
+        "Value": "12"
+      },
+      {
+        "Key": "requests",
+        "Value": "30"
+      },
+      {
+        "Key": "limit",
+        "Value": "5"
+      },
+      {
+        "Key": "windowMinutes",
+        "Value": "15"
+      }
+    ],
+    "otherFlags": {
+      "open": 0,
+      "confirmed": 0,
+      "cleared": 0
+    }
+  },
+  "expect": {
+    "text": "",
+    "reject": "schema"
+  },
+  "reply": {
+    "id": "msg_rs_schema_empty",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rs_schema_empty",
+        "name": "summarise_risk_flag",
+        "input": {
+          "text": "   "
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 600,
+      "output_tokens": 90
+    }
+  }
+}

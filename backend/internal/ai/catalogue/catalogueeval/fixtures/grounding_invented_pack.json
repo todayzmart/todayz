@@ -1,0 +1,73 @@
+{
+  "name": "grounding_invented_pack",
+  "input": {
+    "product": {
+      "name": "Bru instant coffee",
+      "brandName": "Bru",
+      "variant": null,
+      "packSize": 50,
+      "unit": "g"
+    },
+    "category": "Beverages",
+    "candidates": [
+      {
+        "name": "Instant Coffee",
+        "brandName": "Bru",
+        "variant": null,
+        "packSize": 100,
+        "unit": "g",
+        "similarity": 0.7
+      }
+    ],
+    "categories": [
+      "Dairy",
+      "Staples",
+      "Snacks",
+      "Beverages",
+      "Personal care",
+      "Household"
+    ],
+    "namesNow": {
+      "en": "Dairy",
+      "hi": "डेयरी",
+      "kn": "ಹಾಲಿನ ಉತ್ಪನ್ನಗಳು",
+      "te": "పాల ఉత్పత్తులు",
+      "ta": "பால் பொருட்கள்"
+    }
+  },
+  "expect": {
+    "duplicate": "none",
+    "names": false,
+    "reject": "grounding"
+  },
+  "reply": {
+    "id": "msg_cc_grounding_invented_pack",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_cc_grounding_invented_pack",
+        "name": "clean_up_product",
+        "input": {
+          "name": "Instant Coffee",
+          "brandName": "Bru",
+          "variant": null,
+          "packSize": 200,
+          "unit": "g",
+          "categoryRef": "c4",
+          "duplicateRef": "none",
+          "duplicateReason": null,
+          "categoryNames": null
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 900,
+      "output_tokens": 160
+    }
+  }
+}

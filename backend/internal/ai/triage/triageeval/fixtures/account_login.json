@@ -1,0 +1,50 @@
+{
+  "name": "account_login",
+  "input": {
+    "number": "SUP-001206",
+    "subject": "Cannot log in",
+    "opener": "customer",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "The OTP never arrives when I try to sign in."
+      }
+    ],
+    "orders": []
+  },
+  "expect": {
+    "category": "account",
+    "order": "none",
+    "summary": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_tt_account_login",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_account_login",
+        "name": "triage_ticket",
+        "input": {
+          "category": "account",
+          "priority": "high",
+          "orderRef": "none",
+          "reason": "The customer cannot sign in because the code does not arrive.",
+          "summary": null,
+          "reply": "Sorry for the trouble. Please check that your number is right and try again in a few minutes; we are looking into the message delivery."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}

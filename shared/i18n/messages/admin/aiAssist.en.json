@@ -1,0 +1,258 @@
+{
+  "aiAssist.badge": {
+    "defaultMessage": "AI draft",
+    "description": "Pill on every admin AI card: what it shows is a draft"
+  },
+  "aiAssist.working": {
+    "defaultMessage": "Drafting. This takes a few seconds.",
+    "description": "While the model writes the draft"
+  },
+  "aiAssist.failed": {
+    "defaultMessage": "The assistant could not draft this. Carry on by hand or ask again.",
+    "description": "The draft failed (model error or a number it could not back up)"
+  },
+  "aiAssist.check": {
+    "defaultMessage": "Check each line, then use, edit or skip it. Nothing changes until you confirm.",
+    "description": "Above the drafted lines"
+  },
+  "aiAssist.partly": {
+    "defaultMessage": "Some lines were applied. The ones you may not apply are still here.",
+    "description": "After a confirm that left refused lines open"
+  },
+  "aiAssist.applied": {
+    "defaultMessage": "Done. What you chose was applied and recorded in the audit log.",
+    "description": "After the draft was confirmed"
+  },
+  "aiAssist.discarded": {
+    "defaultMessage": "Skipped. Nothing was changed.",
+    "description": "After every line was skipped"
+  },
+  "aiAssist.again": {
+    "defaultMessage": "Ask again",
+    "description": "Button: start a new draft"
+  },
+  "aiAssist.choice.label": {
+    "defaultMessage": "What to do with “{line}”",
+    "description": "Accessible name of a line's use / edit / skip switch; line is the line's heading"
+  },
+  "aiAssist.choice.use": {
+    "defaultMessage": "Use",
+    "description": "Option: use the drafted line as it is"
+  },
+  "aiAssist.choice.edit": {
+    "defaultMessage": "Edit",
+    "description": "Option: edit the drafted line before using it"
+  },
+  "aiAssist.choice.skip": {
+    "defaultMessage": "Skip",
+    "description": "Option: do not use this line"
+  },
+  "aiAssist.notPermitted": {
+    "defaultMessage": "Your role cannot apply this line. Ask someone who can.",
+    "description": "A line the signed-in admin's role may not apply"
+  },
+  "aiAssist.lineInvalid": {
+    "defaultMessage": "Check this line: a value is missing or not allowed.",
+    "description": "A line the confirm refused, or an edit that is empty or too long"
+  },
+  "aiAssist.nothing": {
+    "defaultMessage": "Nothing left to decide in this draft.",
+    "description": "Every line of the draft is settled"
+  },
+  "aiAssist.confirm": {
+    "defaultMessage": "Confirm choices",
+    "description": "Button: send the use / edit / skip choices"
+  },
+  "aiAssist.optional": {
+    "defaultMessage": "Optional",
+    "description": "Help under an optional field"
+  },
+  "aiAssist.none": {
+    "defaultMessage": "None",
+    "description": "An empty value"
+  },
+  "aiAssist.toast.done": {
+    "defaultMessage": "Choices saved",
+    "description": "Toast after a confirm"
+  },
+  "aiAssist.error.cap": {
+    "defaultMessage": "AI help is paused until tomorrow.",
+    "description": "429 ai_daily_cap_reached: the platform's daily AI limit"
+  },
+  "aiAssist.error.off": {
+    "defaultMessage": "The assistant is not available here right now.",
+    "description": "404: the feature is off or the draft is gone"
+  },
+  "aiAssist.error.moved": {
+    "defaultMessage": "This item changed since the draft. Reload and ask again.",
+    "description": "409: the product left the queue or the ticket moved on"
+  },
+  "aiAssist.error.invalid": {
+    "defaultMessage": "Check the lines you chose and try again.",
+    "description": "422 without a line reason"
+  },
+  "aiAssist.error.forbidden": {
+    "defaultMessage": "Your role cannot use this assistant.",
+    "description": "403"
+  },
+  "aiAssist.error.network": {
+    "defaultMessage": "Could not reach TodayZ. Check the connection and try again.",
+    "description": "No answer from the API"
+  },
+  "aiAssist.error.generic": {
+    "defaultMessage": "Something went wrong. Try again.",
+    "description": "Any other failure"
+  },
+  "aiAssist.catalogue.title": {
+    "defaultMessage": "AI clean-up",
+    "description": "A-08 assistant card heading"
+  },
+  "aiAssist.catalogue.intro": {
+    "defaultMessage": "Draft clean fields, a likely duplicate and missing category names for this product.",
+    "description": "A-08 assistant: before it is asked"
+  },
+  "aiAssist.catalogue.start": {
+    "defaultMessage": "Draft a clean-up",
+    "description": "A-08 assistant: start button"
+  },
+  "aiAssist.catalogue.normalise": {
+    "defaultMessage": "Clean fields",
+    "description": "Line heading: the product's normalised fields"
+  },
+  "aiAssist.catalogue.useFields": {
+    "defaultMessage": "Use these fields",
+    "description": "Option: apply the normalised fields to the pending product"
+  },
+  "aiAssist.catalogue.name": {
+    "defaultMessage": "Name",
+    "description": "Field: product name"
+  },
+  "aiAssist.catalogue.variant": {
+    "defaultMessage": "Variant",
+    "description": "Field: product variant"
+  },
+  "aiAssist.catalogue.brand": {
+    "defaultMessage": "Brand",
+    "description": "Field: brand (read only)"
+  },
+  "aiAssist.catalogue.pack": {
+    "defaultMessage": "Pack size",
+    "description": "Field: pack size"
+  },
+  "aiAssist.catalogue.unit": {
+    "defaultMessage": "Unit",
+    "description": "Field: pack unit"
+  },
+  "aiAssist.catalogue.category": {
+    "defaultMessage": "Category",
+    "description": "Field: category"
+  },
+  "aiAssist.catalogue.duplicate": {
+    "defaultMessage": "Likely duplicate",
+    "description": "Line heading: the active product this one duplicates"
+  },
+  "aiAssist.catalogue.useMerge": {
+    "defaultMessage": "Merge into it",
+    "description": "Option: merge the pending product into the drafted one"
+  },
+  "aiAssist.catalogue.into": {
+    "defaultMessage": "Merge into",
+    "description": "Field: the active product to merge into"
+  },
+  "aiAssist.catalogue.mergeInto": {
+    "defaultMessage": "Same as {name} ({similarity} name match)",
+    "description": "The drafted duplicate; similarity is a percentage"
+  },
+  "aiAssist.catalogue.names": {
+    "defaultMessage": "Category names",
+    "description": "Line heading: the category's names in five languages"
+  },
+  "aiAssist.catalogue.useNames": {
+    "defaultMessage": "Use these names",
+    "description": "Option: save the drafted category names"
+  },
+  "aiAssist.catalogue.mergeOrEdit": {
+    "defaultMessage": "Merge or clean up, not both: skip one of the two lines.",
+    "description": "Both the clean fields and the merge are chosen"
+  },
+  "aiAssist.triage.title": {
+    "defaultMessage": "AI triage",
+    "description": "A-14 assistant card heading"
+  },
+  "aiAssist.triage.intro": {
+    "defaultMessage": "Draft a category, priority and order guess, a summary of a long thread, and a reply.",
+    "description": "A-14 assistant: before it is asked"
+  },
+  "aiAssist.triage.start": {
+    "defaultMessage": "Draft triage",
+    "description": "A-14 assistant: start button"
+  },
+  "aiAssist.triage.classify": {
+    "defaultMessage": "Category and priority",
+    "description": "Line heading: drafted category, priority and order"
+  },
+  "aiAssist.triage.useClassify": {
+    "defaultMessage": "Set these",
+    "description": "Option: set the ticket's category and priority"
+  },
+  "aiAssist.triage.category": {
+    "defaultMessage": "Category",
+    "description": "Field: ticket category"
+  },
+  "aiAssist.triage.priority": {
+    "defaultMessage": "Priority",
+    "description": "Field: ticket priority"
+  },
+  "aiAssist.triage.order": {
+    "defaultMessage": "Order",
+    "description": "Field: the order the ticket is about"
+  },
+  "aiAssist.triage.summary": {
+    "defaultMessage": "Thread summary",
+    "description": "Line heading: summary of a long thread, for the agent only"
+  },
+  "aiAssist.triage.useSummary": {
+    "defaultMessage": "Helpful",
+    "description": "Option: mark the summary as used"
+  },
+  "aiAssist.triage.reply": {
+    "defaultMessage": "Reply draft",
+    "description": "Line heading: drafted reply to the opener"
+  },
+  "aiAssist.triage.useReply": {
+    "defaultMessage": "Send this reply",
+    "description": "Option: send the drafted reply to the opener"
+  },
+  "aiAssist.triage.replyLabel": {
+    "defaultMessage": "Reply to the opener",
+    "description": "Field: the edited reply"
+  },
+  "aiAssist.risk.title": {
+    "defaultMessage": "AI explanation",
+    "description": "A-13 assistant card heading"
+  },
+  "aiAssist.risk.intro": {
+    "defaultMessage": "Draft a short summary of what this rule counted, using only the flag's own numbers.",
+    "description": "A-13 assistant: before it is asked"
+  },
+  "aiAssist.risk.start": {
+    "defaultMessage": "Explain this flag",
+    "description": "A-13 assistant: start button"
+  },
+  "aiAssist.risk.summary": {
+    "defaultMessage": "Summary",
+    "description": "Line heading and field: the drafted summary"
+  },
+  "aiAssist.risk.useSummary": {
+    "defaultMessage": "Add to audit log",
+    "description": "Option: record the summary on the flag's audit trail"
+  },
+  "aiAssist.risk.editHelp": {
+    "defaultMessage": "Use only numbers shown in the evidence.",
+    "description": "Help under the edited summary"
+  },
+  "aiAssist.risk.ungrounded": {
+    "defaultMessage": "A number in this summary is not in the evidence. Use only the flag's own numbers.",
+    "description": "422 ungrounded: an edited summary added a number"
+  }
+}

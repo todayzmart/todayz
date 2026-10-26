@@ -493,6 +493,338 @@
                 - {lineId: l3, outcome: discarded}
               copy: {headline: ಹಾಲು ಮತ್ತು ಬೆಣ್ಣೆ ಮೇಲೆ 10% ರಿಯಾಯಿತಿ, subline: ಈ ವಾರ ಮಾತ್ರ, tint: green, storeItemId: 01JB0SA1T2E3M4S5H6D7X8Y9Z1}
       default: *problem
+# W3-13 (admin AI, AI-A1, A2, A3): each feature has its three draft endpoints under
+# `/v1/admin/ai/<feature>`. Only the admin who created a draft reads and confirms it (another
+# admin's draft is the common 404). A route takes the same check as the screen it helps (A-08
+# catalogue review, A-14 tickets, A-13 risk). The confirm applies only what the admin sent,
+# through the same writer as the screen's own buttons, re-checked as if typed by hand (11 §1
+# rule 1). A feature is the common 404 while its flag is off or the model key is missing.
+/v1/admin/ai/catalogue-cleanup/drafts:
+  post:
+    operationId: createCatalogueCleanupDraft
+    tags: [ai]
+    summary: Suggest a clean-up for a pending product (AI-A1)
+    description: >-
+      Catalogue reviewers and admins (A-08). `{pendingId}` of a product waiting in the review queue.
+      Answers 202; in the background the model suggests normalised fields, the duplicate to merge it
+      into (only from the queue's own look-alike candidates) and the category's names in the five
+      languages. One call against the platform's daily AI cap (`429 ai_daily_cap_reached`).
+    x-idempotency: required
+    x-problems: [ai_daily_cap_reached]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/ai.yaml#/CatalogueCleanupDraftRequest
+          example: {pendingId: 01JB3C0A1T2A3M4P5G6V7E8P9D}
+    responses:
+      "202":
+        description: Accepted for processing
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiDraftCreated
+            example: {draftId: 01JB3C1D2R3A4F5T6C7A8T9A0A, status: processing}
+      default: *problem
+/v1/admin/ai/catalogue-cleanup/drafts/{draftId}:
+  parameters: &adminDraft
+    - name: draftId
+      in: path
+      required: true
+      schema:
+        $ref: ../schemas/common.yaml#/Ulid
+  get:
+    operationId: getCatalogueCleanupDraft
+    tags: [ai]
+    summary: A catalogue clean-up draft
+    description: >-
+      The admin who created it. Up to three lines: `normalise` (the fields to set), `duplicate` (the
+      product to merge into, with a reason) and `categoryNames` (the five names); each is null when
+      the model had nothing to add. `canApply` is false for a line the caller may not confirm
+      (changing fields and category names is for admins; a catalogue reviewer may merge).
+    responses:
+      "200":
+        description: The draft
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/CatalogueCleanupDraft
+            example:
+              draftId: 01JB3C1D2R3A4F5T6C7A8T9A0A
+              feature: catalogue_cleanup
+              status: ready
+              promptVersion: catalogue_cleanup/prompt@1
+              createdAt: "2026-10-26T05:30:00Z"
+              pendingId: 01JB3C0A1T2A3M4P5G6V7E8P9D
+              normalise:
+                lineId: l1
+                name: Amul Taaza Toned Milk
+                brandName: Amul
+                variant: Toned
+                packSize: 500
+                unit: ml
+                categoryId: 01JB0CAT1D2A3K4R5Y6M7N8P9K
+                categoryName: Dairy
+                canApply: true
+              duplicate:
+                lineId: l2
+                productId: 01JB0PR0D1V2C3T4A5M6W7X8T9
+                productName: Amul Taaza Toned Milk 500 ml
+                similarity: 0.82
+                reason: Same brand, variant and pack size; only the spelling differs.
+                canApply: true
+              categoryNames: null
+              outcomes: []
+              failure: null
+      default: *problem
+/v1/admin/ai/catalogue-cleanup/drafts/{draftId}/confirm:
+  parameters: *adminDraft
+  post:
+    operationId: confirmCatalogueCleanupDraft
+    tags: [ai]
+    summary: Apply the accepted clean-up
+    description: >-
+      The admin who created it. `accepted` or `edited` applies a line exactly as A-08's own buttons
+      would: `normalise` edits the pending product, `duplicate` merges it into the product,
+      `categoryNames` renames the category, each audited. Sending both `normalise` and `duplicate`
+      as accepted or edited is `422` (merge or edit, not both). A line the caller may not apply is
+      `not_permitted` and the draft stays open. `discarded` changes nothing. Idempotent.
+    x-idempotency: required
+    x-money: true
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/ai.yaml#/CatalogueCleanupConfirmRequest
+          example:
+            lines:
+              - {lineId: l1, outcome: discarded}
+              - {lineId: l2, outcome: accepted}
+    responses:
+      "200":
+        description: The outcome
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiConfirmResult
+            example:
+              draftId: 01JB3C1D2R3A4F5T6C7A8T9A0A
+              status: confirmed
+              lines:
+                - {lineId: l1, outcome: discarded}
+                - {lineId: l2, outcome: accepted}
+      default: *problem
+/v1/admin/ai/ticket-triage/drafts:
+  post:
+    operationId: createTicketTriageDraft
+    tags: [ai]
+    summary: Suggest a triage and a reply for a ticket (AI-A2)
+    description: >-
+      Support and admins (A-14). `{ticketId}` of a ticket that is not closed. Answers 202; in the
+      background the model suggests a category, a priority and the order the ticket is about, a
+      summary of a long thread and a reply from the order's timeline. The model sees the thread
+      scrubbed of phones, codes and addresses, never internal notes or names. One call against the
+      platform's daily AI cap (`429 ai_daily_cap_reached`).
+    x-idempotency: required
+    x-problems: [ai_daily_cap_reached]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/ai.yaml#/TicketTriageDraftRequest
+          example: {ticketId: 01JB3T1C2K3E4T5S6V7P8P9Q0R}
+    responses:
+      "202":
+        description: Accepted for processing
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiDraftCreated
+            example: {draftId: 01JB3T2R3J4A5G6E7D8R9A0F1T, status: processing}
+      default: *problem
+/v1/admin/ai/ticket-triage/drafts/{draftId}:
+  parameters: *adminDraft
+  get:
+    operationId: getTicketTriageDraft
+    tags: [ai]
+    summary: A ticket triage draft
+    description: >-
+      The admin who created it. Up to three lines: `classify` (category, priority, linked order),
+      `summary` (only for a thread of several messages) and `reply` (a draft for the agent to edit);
+      each is null when there is nothing to suggest.
+    responses:
+      "200":
+        description: The draft
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/TicketTriageDraft
+            example:
+              draftId: 01JB3T2R3J4A5G6E7D8R9A0F1T
+              feature: ticket_triage
+              status: ready
+              promptVersion: ticket_triage/prompt@1
+              createdAt: "2026-10-26T05:30:00Z"
+              ticketId: 01JB3T1C2K3E4T5S6V7P8P9Q0R
+              classify:
+                lineId: l1
+                category: order
+                priority: high
+                orderId: 01JB0RD1E2R3S4A5M6P7N8E9X0
+                orderNumber: TZ-104233
+                reason: The customer says order TZ-104233 was collected but not received.
+              summary: null
+              reply:
+                lineId: l3
+                text: Sorry about this. Order TZ-104233 shows as collected at 6:10 pm; we are checking with the shop and will update you.
+              outcomes: []
+              failure: null
+      default: *problem
+/v1/admin/ai/ticket-triage/drafts/{draftId}/confirm:
+  parameters: *adminDraft
+  post:
+    operationId: confirmTicketTriageDraft
+    tags: [ai]
+    summary: Apply the accepted triage and send the reply
+    description: >-
+      The admin who created it. `classify` accepted or edited sets the ticket's category, priority
+      (the SLA moves as for A-14's own priority change) and linked order (only an order of the
+      ticket's opener), audited. `reply` accepted or edited sends the reply exactly as the agent's
+      own reply. `summary` changes nothing; its outcome is kept as feedback. `discarded` changes
+      nothing. A closed ticket is `409 invalid_transition`. Idempotent.
+    x-idempotency: required
+    x-money: true
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/ai.yaml#/TicketTriageConfirmRequest
+          example:
+            lines:
+              - lineId: l1
+                outcome: edited
+                value: {category: order, priority: urgent, orderId: 01JB0RD1E2R3S4A5M6P7N8E9X0}
+              - lineId: l3
+                outcome: edited
+                value: {text: Sorry about this. We are checking with the shop and will update you today.}
+    responses:
+      "200":
+        description: The outcome
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiConfirmResult
+            example:
+              draftId: 01JB3T2R3J4A5G6E7D8R9A0F1T
+              status: confirmed
+              lines:
+                - {lineId: l1, outcome: edited}
+                - {lineId: l3, outcome: edited}
+      default: *problem
+/v1/admin/ai/risk-summary/drafts:
+  post:
+    operationId: createRiskSummaryDraft
+    tags: [ai]
+    summary: Explain a risk flag's evidence (AI-A3)
+    description: >-
+      Support and admins (A-13). `{flagId}` of a risk flag. Answers 202; in the background the model
+      writes a short summary of what the rule counted. Every number in it must be one of the flag's
+      own (its facts, score and history counts), or the draft fails as `grounding` (D-230). One call
+      against the platform's daily AI cap (`429 ai_daily_cap_reached`).
+    x-idempotency: required
+    x-problems: [ai_daily_cap_reached]
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/ai.yaml#/RiskSummaryDraftRequest
+          example: {flagId: 01JB3R1F2M3A4G5R6J7S8K9A0B}
+    responses:
+      "202":
+        description: Accepted for processing
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiDraftCreated
+            example: {draftId: 01JB3R2S3V4M5M6A7R8Y9D0R1F, status: processing}
+      default: *problem
+/v1/admin/ai/risk-summary/drafts/{draftId}:
+  parameters: *adminDraft
+  get:
+    operationId: getRiskSummaryDraft
+    tags: [ai]
+    summary: A risk summary draft
+    description: The admin who created it. One line, the summary.
+    responses:
+      "200":
+        description: The draft
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/RiskSummaryDraft
+            example:
+              draftId: 01JB3R2S3V4M5M6A7R8Y9D0R1F
+              feature: risk_summary
+              status: ready
+              promptVersion: risk_summary/prompt@1
+              createdAt: "2026-10-26T05:30:00Z"
+              flagId: 01JB3R1F2M3A4G5R6J7S8K9A0B
+              lines:
+                - {lineId: l1, text: The store had 6 pickup-code lockouts against a limit of 3 in a day. Its score is 70 and it has 2 earlier flags.}
+              outcomes: []
+              failure: null
+      default: *problem
+/v1/admin/ai/risk-summary/drafts/{draftId}/confirm:
+  parameters: *adminDraft
+  post:
+    operationId: confirmRiskSummaryDraft
+    tags: [ai]
+    summary: Attach the summary to the flag
+    description: >-
+      The admin who created it. `accepted` or `edited` attaches the summary to the flag in the audit
+      log (`risk.flag_summary`); an edited one may hold only the flag's own numbers. It does not
+      clear, confirm or change the flag. `discarded` attaches nothing. Idempotent.
+    x-idempotency: required
+    x-money: true
+    parameters:
+      - $ref: ../common/parameters.yaml#/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/ai.yaml#/RiskSummaryConfirmRequest
+          example:
+            lines:
+              - {lineId: l1, outcome: accepted}
+    responses:
+      "200":
+        description: The outcome
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/ai.yaml#/AiConfirmResult
+            example:
+              draftId: 01JB3R2S3V4M5M6A7R8Y9D0R1F
+              status: confirmed
+              lines:
+                - {lineId: l1, outcome: accepted}
+      default: *problem
 # W3-12 (consumer AI, AI-C1, C2, C5; D-101, D-110): the signed-in customer's own helpers under
 # /v1/me/ai. Each is the common 404 while its flag is off or its provider key is missing, and
 # each call counts against the customer's daily AI cap (`ai_daily_calls_customer`). List parse

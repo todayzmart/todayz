@@ -1,0 +1,60 @@
+{
+  "name": "hindi_order_query",
+  "input": {
+    "number": "SUP-001212",
+    "subject": "ऑर्डर कहाँ है",
+    "opener": "customer",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "मेरा ऑर्डर TZ-004902 अभी तक तैयार नहीं हुआ।"
+      }
+    ],
+    "orders": [
+      {
+        "number": "TZ-004902",
+        "status": "accepted",
+        "fulfilment": "pickup",
+        "totalPaise": 15000,
+        "placedOn": "2026-10-20",
+        "linked": true,
+        "timeline": []
+      }
+    ]
+  },
+  "expect": {
+    "category": "order",
+    "order": "o1",
+    "summary": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_tt_hindi_order_query",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_hindi_order_query",
+        "name": "triage_ticket",
+        "input": {
+          "category": "order",
+          "priority": "normal",
+          "orderRef": "o1",
+          "reason": "The customer asks why order TZ-004902 is not ready yet.",
+          "summary": null,
+          "reply": "देरी के लिए माफ़ी। हमने दुकान से ऑर्डर TZ-004902 जल्दी तैयार करने को कहा है।"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}

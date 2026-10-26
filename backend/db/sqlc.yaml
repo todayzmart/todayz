@@ -200,6 +200,13 @@ sql:
         package: aiconsumerdb
         out: ../gen/sqlc/aiconsumerdb
   - <<: *pkg
+    queries: queries/aiadmin
+    gen:
+      go:
+        <<: *go
+        package: aiadmindb
+        out: ../gen/sqlc/aiadmindb
+  - <<: *pkg
     queries: queries/coach
     gen:
       go:

@@ -420,7 +420,7 @@ resource "aws_autoscaling_policy" "worker_in" {
 
 resource "aws_cloudwatch_metric_alarm" "worker_queue_age_high" {
   alarm_name          = "${local.name}-worker-oldest-job-age-high"
-  alarm_description   = "Oldest available River job older than ${var.worker_scale_out_age_seconds}s for 3 minutes: scale the worker out."
+  alarm_description   = "Oldest available River job older than ${var.worker_scale_out_age_seconds}s for 3 minutes: scale the worker out. Runbook: docs/runbooks/job-queue-backlog.md."
   namespace           = "TodayZ/Worker"
   metric_name         = var.worker_oldest_job_age_metric_name
   statistic           = "Maximum"

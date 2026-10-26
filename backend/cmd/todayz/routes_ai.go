@@ -15,6 +15,7 @@ import (
 	genproblems "github.com/todayz/backend/gen/problems"
 	"github.com/todayz/backend/internal/ai/bannercopy"
 	"github.com/todayz/backend/internal/ai/billscan"
+	aicatalogue "github.com/todayz/backend/internal/ai/catalogue"
 	"github.com/todayz/backend/internal/ai/client"
 	"github.com/todayz/backend/internal/ai/drafts"
 	"github.com/todayz/backend/internal/ai/guard"
@@ -22,7 +23,9 @@ import (
 	"github.com/todayz/backend/internal/ai/querynorm"
 	"github.com/todayz/backend/internal/ai/replydraft"
 	"github.com/todayz/backend/internal/ai/retail"
+	"github.com/todayz/backend/internal/ai/riskexplain"
 	"github.com/todayz/backend/internal/ai/shelfscan"
+	"github.com/todayz/backend/internal/ai/triage"
 	"github.com/todayz/backend/internal/ai/voicesearch"
 	"github.com/todayz/backend/internal/catalogue"
 	"github.com/todayz/backend/internal/platform/authz"
@@ -123,6 +126,7 @@ func mountAI(r chi.Router, d *deps) {
 		list:     listparse.Handlers{S: list},
 		assist:   querynorm.Handlers{S: assist},
 		speech:   voicesearch.Handlers{S: speech},
+		admin:    newAIAdmin(d, kit, llm),
 		guard:    kit.Guard,
 	}, mws...)
 }
@@ -130,7 +134,10 @@ func mountAI(r chi.Router, d *deps) {
 // aiRetailOps is every ai operation's route check.
 func aiRetailOps() map[string]string {
 	ops := map[string]string{"GetStoreAiRetailFeatures": policy.InsightsView, "GetMyAiFeatures": policy.MeAiUse}
-	for _, m := range []map[string]string{billscan.Ops, shelfscan.Ops, replydraft.Ops, bannercopy.Ops, listparse.Ops, querynorm.Ops, voicesearch.Ops} {
+	for _, m := range []map[string]string{
+		billscan.Ops, shelfscan.Ops, replydraft.Ops, bannercopy.Ops, listparse.Ops, querynorm.Ops, voicesearch.Ops,
+		aicatalogue.Ops, triage.Ops, riskexplain.Ops,
+	} {
 		maps.Copy(ops, m)
 	}
 	return ops
@@ -146,6 +153,7 @@ type aiServer struct {
 	list   listparse.Handlers
 	assist querynorm.Handlers
 	speech voicesearch.Handlers
+	admin  aiAdmin // W3-13: the admin assistants (ai_admin.go)
 	guard  *guard.Guard
 }
 

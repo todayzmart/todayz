@@ -218,4 +218,14 @@ cached 60 s per instance (failures too), database (`pg_stat_statements` top 10, 
 the extension is absent) and River panels 5 s. A failing panel carries an error class; the response
 stays 200. `job_kind` and `job_run` are audit subjects for the jobs actions.
 
+W3-13 built the admin AI assistants (D-233, D-234): `internal/ai/catalogue` (AI-A1, A-08),
+`internal/ai/triage` (AI-A2, A-14) and `internal/ai/riskexplain` (AI-A3, A-13) on the shared drafts
+envelope under `/v1/admin/ai/*/drafts`, with `internal/ai/assist` for the admin caller and draft
+ownership (another admin's draft is the common 404). Each route takes its screen's own policy and is
+the common 404 while its `ai_*_enabled` flag is off. A confirmed line goes through the domain's own
+writer: `internal/admin/assist.go` (A-08 edit, merge, category names) and `internal/support/assist.go`
+(A-14 triage and reply); the risk summary is an audit entry only (`risk.flag_summary`). Catalogue lines
+need their A-08 button's permission, else `not_permitted`. Recorded evals: `catalogueeval` (SC-AI-57),
+`triageeval` (SC-AI-60), `riskeval` (SC-AI-63). Report: `docs/qa/W3-13/REPORT.md`.
+
 W3-12 built consumer AI (D-231, D-235): `internal/ai/listparse` (AI-C1 drafts on `/v1/me/ai/list-parse/drafts*`; confirm answers lines and writes nothing, BSK-15), `internal/ai/querynorm` (the deterministic refine-chip parser `chips.go` that search reads through `search.ChipReader`, and AI-C2 search assist on `POST /v1/me/ai/search-assist`: 3 s, 204 on any failure, stores nothing), `internal/ai/voicesearch` (AI-C5 on `POST /v1/me/ai/voice-search`: W3-04's `voice.ReadRecording`, keeps no audio or words, one call per use against `ai_daily_calls_customer`) and `GET /v1/me/ai/features` (`me.ai.use`). Search reads chips unless `parse=false` and sets `refineHint` (`internal/search/refine.go`). AI-C3 substitutes are rule-based in `internal/search/substitutes.go` (`GET /v1/discover/stores/{slug}/substitutes`, no model, not logged). Recorded evals: `listparseeval` (200), `querynormeval` (100), `voicesearcheval` (100), run in `make check`.

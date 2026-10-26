@@ -1,0 +1,73 @@
+{
+  "name": "dup_parle_g",
+  "input": {
+    "product": {
+      "name": "Parle G biscuit",
+      "brandName": "Parle",
+      "variant": null,
+      "packSize": 1,
+      "unit": "pack"
+    },
+    "category": "Snacks",
+    "candidates": [
+      {
+        "name": "Parle-G Biscuits",
+        "brandName": "Parle",
+        "variant": null,
+        "packSize": 1,
+        "unit": "pack",
+        "similarity": 0.86
+      }
+    ],
+    "categories": [
+      "Dairy",
+      "Staples",
+      "Snacks",
+      "Beverages",
+      "Personal care",
+      "Household"
+    ],
+    "namesNow": {
+      "en": "Dairy",
+      "hi": "डेयरी",
+      "kn": "ಹಾಲಿನ ಉತ್ಪನ್ನಗಳು",
+      "te": "పాల ఉత్పత్తులు",
+      "ta": "பால் பொருட்கள்"
+    }
+  },
+  "expect": {
+    "duplicate": "p1",
+    "names": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_cc_dup_parle_g",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_cc_dup_parle_g",
+        "name": "clean_up_product",
+        "input": {
+          "name": "Parle-G Biscuits",
+          "brandName": "Parle",
+          "variant": null,
+          "packSize": 1,
+          "unit": "pack",
+          "categoryRef": "c3",
+          "duplicateRef": "p1",
+          "duplicateReason": "Same brand, same kind and the same pack and unit.",
+          "categoryNames": null
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 900,
+      "output_tokens": 160
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "name": "app_crash",
+  "input": {
+    "number": "SUP-001208",
+    "subject": "POS closes by itself",
+    "opener": "business",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "The counter screen closes every time we add a discount."
+      }
+    ],
+    "orders": []
+  },
+  "expect": {
+    "category": "app",
+    "order": "none",
+    "summary": false,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_tt_app_crash",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_app_crash",
+        "name": "triage_ticket",
+        "input": {
+          "category": "app",
+          "priority": "high",
+          "orderRef": "none",
+          "reason": "The business app closes when the shop adds a discount at the counter.",
+          "summary": null,
+          "reply": "Sorry about that. Could you tell us which phone you use? We have passed this to our app team."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}

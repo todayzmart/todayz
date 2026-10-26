@@ -1,0 +1,95 @@
+{
+  "name": "delivery_late_long_thread",
+  "input": {
+    "number": "SUP-001210",
+    "subject": "Delivery very late",
+    "opener": "customer",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "My delivery for TZ-004700 is late."
+      },
+      {
+        "from": "support",
+        "text": "Sorry, we are checking with the shop."
+      },
+      {
+        "from": "opener",
+        "text": "It has been two hours now."
+      },
+      {
+        "from": "support",
+        "text": "The shop says the rider has left."
+      },
+      {
+        "from": "opener",
+        "text": "Still nothing. Please cancel it."
+      }
+    ],
+    "orders": [
+      {
+        "number": "TZ-004700",
+        "status": "out_for_delivery",
+        "fulfilment": "delivery",
+        "totalPaise": 48000,
+        "placedOn": "2026-10-20",
+        "linked": true,
+        "timeline": [
+          {
+            "from": null,
+            "to": "placed",
+            "by": "customer",
+            "at": "2026-10-22 12:00"
+          },
+          {
+            "from": "placed",
+            "to": "accepted",
+            "by": "business",
+            "at": "2026-10-22 12:04"
+          },
+          {
+            "from": "ready",
+            "to": "out_for_delivery",
+            "by": "business",
+            "at": "2026-10-22 13:10"
+          }
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "category": "order",
+    "order": "o1",
+    "summary": true,
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_tt_delivery_late_long_thread",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_delivery_late_long_thread",
+        "name": "triage_ticket",
+        "input": {
+          "category": "order",
+          "priority": "urgent",
+          "orderRef": "o1",
+          "reason": "Order TZ-004700 is out for delivery and the customer now asks to cancel.",
+          "summary": "The customer's delivery for TZ-004700 is late. Support checked with the shop, which said the rider had left. The customer still has nothing and asks to cancel.",
+          "reply": "Sorry, this has taken far too long. We are calling the shop about TZ-004700 now and will cancel it if the rider cannot reach you soon."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}

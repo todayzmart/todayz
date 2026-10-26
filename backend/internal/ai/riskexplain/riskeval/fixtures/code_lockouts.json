@@ -1,0 +1,54 @@
+{
+  "name": "code_lockouts",
+  "input": {
+    "rule": "orders.code_lockouts",
+    "subjectType": "store",
+    "score": 60,
+    "status": "open",
+    "facts": [
+      {
+        "Key": "lockouts",
+        "Value": "7"
+      },
+      {
+        "Key": "limit",
+        "Value": "3"
+      },
+      {
+        "Key": "day",
+        "Value": "2026-10-20"
+      }
+    ],
+    "otherFlags": {
+      "open": 0,
+      "confirmed": 0,
+      "cleared": 0
+    }
+  },
+  "expect": {
+    "text": "The store had 7 order code lockouts on 2026-10-20, past the limit of 3. It has no other flags.",
+    "reject": ""
+  },
+  "reply": {
+    "id": "msg_rs_code_lockouts",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_rs_code_lockouts",
+        "name": "summarise_risk_flag",
+        "input": {
+          "text": "The store had 7 order code lockouts on 2026-10-20, past the limit of 3. It has no other flags."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 600,
+      "output_tokens": 90
+    }
+  }
+}

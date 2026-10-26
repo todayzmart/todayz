@@ -1,0 +1,60 @@
+{
+  "name": "schema_unknown_order",
+  "input": {
+    "number": "SUP-001216",
+    "subject": "Missing item",
+    "opener": "customer",
+    "category": "other",
+    "priority": "normal",
+    "replies": [
+      {
+        "from": "opener",
+        "text": "One packet was missing from my order."
+      }
+    ],
+    "orders": [
+      {
+        "number": "TZ-004650",
+        "status": "completed",
+        "fulfilment": "pickup",
+        "totalPaise": 9000,
+        "placedOn": "2026-10-20",
+        "linked": false,
+        "timeline": []
+      }
+    ]
+  },
+  "expect": {
+    "category": "order",
+    "order": "o3",
+    "summary": false,
+    "reject": "schema"
+  },
+  "reply": {
+    "id": "msg_tt_schema_unknown_order",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-haiku-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_tt_schema_unknown_order",
+        "name": "triage_ticket",
+        "input": {
+          "category": "order",
+          "priority": "normal",
+          "orderRef": "o3",
+          "reason": "An item was missing from an order.",
+          "summary": null,
+          "reply": "Sorry about the missing packet. We are checking with the shop."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 260
+    }
+  }
+}

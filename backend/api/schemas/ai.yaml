@@ -415,6 +415,289 @@ BannerCopyConfirmResult:
       oneOf:
         - {$ref: ./ai.yaml#/BannerCopyValue}
         - {type: "null"}
+# W3-13 admin AI (AI-A1, A2, A3). A draft read carries draftId, feature, status, promptVersion,
+# createdAt, the subject's id, its lines (each null when the model had nothing for it), the
+# recorded outcomes and the failure code. `canApply` is false for a line the caller may not confirm.
+AdminAiUnit:
+  type: string
+  description: A product's unit (the catalogue's AdminProductUnit).
+  enum: [g, kg, ml, l, pc, pack]
+CatalogueCleanupDraftRequest:
+  type: object
+  additionalProperties: false
+  required: [pendingId]
+  properties:
+    pendingId: {$ref: ./common.yaml#/Ulid}
+CatalogueCleanupNormalise:
+  type: object
+  additionalProperties: false
+  description: >-
+    The pending product's fields, normalised. The pack size is the product's own or one written in its
+    name; `brandName` is shown for information only (the catalogue has no brand field to set).
+  required: [lineId, name, brandName, variant, packSize, unit, categoryId, categoryName, canApply]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    name: {type: string, minLength: 1, maxLength: 120}
+    brandName:
+      type: [string, "null"]
+      maxLength: 120
+    variant:
+      type: [string, "null"]
+      maxLength: 80
+    packSize: {type: number, format: double, exclusiveMinimum: 0}
+    unit: {$ref: ./ai.yaml#/AdminAiUnit}
+    categoryId: {$ref: ./common.yaml#/Ulid}
+    categoryName: {type: string, maxLength: 120}
+    canApply: {type: boolean}
+CatalogueCleanupDuplicate:
+  type: object
+  additionalProperties: false
+  description: The active product to merge the pending one into, one of the queue's look-alike candidates.
+  required: [lineId, productId, productName, similarity, reason, canApply]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    productId: {$ref: ./common.yaml#/Ulid}
+    productName: {type: string, maxLength: 200}
+    similarity:
+      type: number
+      format: double
+      description: Trigram similarity of the names, 0 to 1.
+      minimum: 0
+      maximum: 1
+    reason: {type: string, minLength: 1, maxLength: 300}
+    canApply: {type: boolean}
+AdminAiCategoryNames:
+  type: object
+  additionalProperties: false
+  description: A category's name in each of the five languages, each in its own script.
+  required: [en, hi, kn, te, ta]
+  properties:
+    en: {type: string, minLength: 1, maxLength: 60}
+    hi: {type: string, minLength: 1, maxLength: 60}
+    kn: {type: string, minLength: 1, maxLength: 60}
+    te: {type: string, minLength: 1, maxLength: 60}
+    ta: {type: string, minLength: 1, maxLength: 60}
+CatalogueCleanupCategoryNames:
+  type: object
+  additionalProperties: false
+  description: Names for the product's category; suggested only when the category lacks a language.
+  required: [lineId, categoryId, names, canApply]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    categoryId: {$ref: ./common.yaml#/Ulid}
+    names: {$ref: ./ai.yaml#/AdminAiCategoryNames}
+    canApply: {type: boolean}
+CatalogueCleanupDraft:
+  type: object
+  additionalProperties: false
+  required: [draftId, feature, status, promptVersion, createdAt, pendingId, normalise, duplicate, categoryNames,
+    outcomes, failure]
+  properties:
+    draftId: {$ref: ./common.yaml#/Ulid}
+    feature: {type: string, enum: [catalogue_cleanup]}
+    status: {$ref: ./ai.yaml#/AiDraftStatus}
+    promptVersion: {type: string, maxLength: 80}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    pendingId: {$ref: ./common.yaml#/Ulid}
+    normalise:
+      oneOf:
+        - {$ref: ./ai.yaml#/CatalogueCleanupNormalise}
+        - {type: "null"}
+    duplicate:
+      oneOf:
+        - {$ref: ./ai.yaml#/CatalogueCleanupDuplicate}
+        - {type: "null"}
+    categoryNames:
+      oneOf:
+        - {$ref: ./ai.yaml#/CatalogueCleanupCategoryNames}
+        - {type: "null"}
+    outcomes: {$ref: ./ai.yaml#/AiOutcomes}
+    failure: {$ref: ./ai.yaml#/AiDraftFailure}
+CatalogueCleanupLineValue:
+  type: object
+  additionalProperties: false
+  description: >-
+    An edited line: for `normalise` the fields to set (name, variant, packSize, unit, categoryId; at least
+    one), for `duplicate` the productId (one of the draft's candidates), for `categoryNames` the names.
+  properties:
+    name: {type: string, minLength: 1, maxLength: 120}
+    variant:
+      type: [string, "null"]
+      minLength: 1
+      maxLength: 80
+    packSize: {type: number, format: double, exclusiveMinimum: 0, maximum: 1000000}
+    unit: {$ref: ./ai.yaml#/AdminAiUnit}
+    categoryId: {$ref: ./common.yaml#/Ulid}
+    productId: {$ref: ./common.yaml#/Ulid}
+    names: {$ref: ./ai.yaml#/AdminAiCategoryNames}
+CatalogueCleanupDecision:
+  type: object
+  additionalProperties: false
+  required: [lineId, outcome]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    outcome: {$ref: ./ai.yaml#/AiConfirmOutcome}
+    value: {$ref: ./ai.yaml#/CatalogueCleanupLineValue}
+CatalogueCleanupConfirmRequest:
+  type: object
+  additionalProperties: false
+  required: [lines]
+  properties:
+    lines:
+      type: array
+      minItems: 1
+      maxItems: 3
+      items: {$ref: ./ai.yaml#/CatalogueCleanupDecision}
+TicketTriageDraftRequest:
+  type: object
+  additionalProperties: false
+  required: [ticketId]
+  properties:
+    ticketId: {$ref: ./common.yaml#/Ulid}
+AdminAiTicketCategory:
+  type: string
+  description: A ticket's category (A-14's TicketCategory).
+  enum: [order, credits, payouts, catalogue, account, verification, app, other]
+AdminAiTicketPriority:
+  type: string
+  enum: [normal, high, urgent]
+TicketTriageClassify:
+  type: object
+  additionalProperties: false
+  description: >-
+    The suggested category, priority and linked order. `orderId` is the ticket's own order or one of
+    its opener's recent orders, else null.
+  required: [lineId, category, priority, orderId, orderNumber, reason]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    category: {$ref: ./ai.yaml#/AdminAiTicketCategory}
+    priority: {$ref: ./ai.yaml#/AdminAiTicketPriority}
+    orderId:
+      oneOf:
+        - {$ref: ./common.yaml#/Ulid}
+        - {type: "null"}
+    orderNumber:
+      type: [string, "null"]
+      maxLength: 20
+    reason: {type: string, minLength: 1, maxLength: 300}
+TicketTriageText:
+  type: object
+  additionalProperties: false
+  required: [lineId, text]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    text: {type: string, minLength: 1, maxLength: 1000}
+TicketTriageDraft:
+  type: object
+  additionalProperties: false
+  required: [draftId, feature, status, promptVersion, createdAt, ticketId, classify, summary, reply, outcomes, failure]
+  properties:
+    draftId: {$ref: ./common.yaml#/Ulid}
+    feature: {type: string, enum: [ticket_triage]}
+    status: {$ref: ./ai.yaml#/AiDraftStatus}
+    promptVersion: {type: string, maxLength: 80}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    ticketId: {$ref: ./common.yaml#/Ulid}
+    classify:
+      oneOf:
+        - {$ref: ./ai.yaml#/TicketTriageClassify}
+        - {type: "null"}
+    summary:
+      oneOf:
+        - {$ref: ./ai.yaml#/TicketTriageText}
+        - {type: "null"}
+    reply:
+      oneOf:
+        - {$ref: ./ai.yaml#/TicketTriageText}
+        - {type: "null"}
+    outcomes: {$ref: ./ai.yaml#/AiOutcomes}
+    failure: {$ref: ./ai.yaml#/AiDraftFailure}
+TicketTriageLineValue:
+  type: object
+  additionalProperties: false
+  description: >-
+    An edited line: for `classify` the category, priority and orderId (null unlinks nothing; it leaves
+    the order as it is), for `reply` the text. `summary` takes no value.
+  properties:
+    category: {$ref: ./ai.yaml#/AdminAiTicketCategory}
+    priority: {$ref: ./ai.yaml#/AdminAiTicketPriority}
+    orderId:
+      oneOf:
+        - {$ref: ./common.yaml#/Ulid}
+        - {type: "null"}
+    text: {type: string, minLength: 1, maxLength: 4000}
+TicketTriageDecision:
+  type: object
+  additionalProperties: false
+  required: [lineId, outcome]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    outcome: {$ref: ./ai.yaml#/AiConfirmOutcome}
+    value: {$ref: ./ai.yaml#/TicketTriageLineValue}
+TicketTriageConfirmRequest:
+  type: object
+  additionalProperties: false
+  required: [lines]
+  properties:
+    lines:
+      type: array
+      minItems: 1
+      maxItems: 3
+      items: {$ref: ./ai.yaml#/TicketTriageDecision}
+RiskSummaryDraftRequest:
+  type: object
+  additionalProperties: false
+  required: [flagId]
+  properties:
+    flagId: {$ref: ./common.yaml#/Ulid}
+RiskSummaryLine:
+  type: object
+  additionalProperties: false
+  required: [lineId, text]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    text: {type: string, minLength: 1, maxLength: 600}
+RiskSummaryDraft:
+  type: object
+  additionalProperties: false
+  required: [draftId, feature, status, promptVersion, createdAt, flagId, lines, outcomes, failure]
+  properties:
+    draftId: {$ref: ./common.yaml#/Ulid}
+    feature: {type: string, enum: [risk_summary]}
+    status: {$ref: ./ai.yaml#/AiDraftStatus}
+    promptVersion: {type: string, maxLength: 80}
+    createdAt: {$ref: ./common.yaml#/Timestamp}
+    flagId: {$ref: ./common.yaml#/Ulid}
+    lines:
+      type: array
+      maxItems: 1
+      items: {$ref: ./ai.yaml#/RiskSummaryLine}
+    outcomes: {$ref: ./ai.yaml#/AiOutcomes}
+    failure: {$ref: ./ai.yaml#/AiDraftFailure}
+RiskSummaryLineValue:
+  type: object
+  additionalProperties: false
+  required: [text]
+  properties:
+    text: {type: string, minLength: 1, maxLength: 600}
+RiskSummaryDecision:
+  type: object
+  additionalProperties: false
+  required: [lineId, outcome]
+  properties:
+    lineId: {$ref: ./ai.yaml#/AiDraftLineId}
+    outcome: {$ref: ./ai.yaml#/AiConfirmOutcome}
+    value: {$ref: ./ai.yaml#/RiskSummaryLineValue}
+RiskSummaryConfirmRequest:
+  type: object
+  additionalProperties: false
+  required: [lines]
+  properties:
+    lines:
+      type: array
+      minItems: 1
+      maxItems: 1
+      items: {$ref: ./ai.yaml#/RiskSummaryDecision}
 # W3-12 consumer AI (AI-C1, C2, C5; D-101, D-110, D-231).
 AiCustomerFeatures:
   type: object
