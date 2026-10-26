@@ -9,15 +9,20 @@ import { useIntl } from 'react-intl';
 import type { CurrentStore } from '../orders/store';
 import { useIdempotentAction } from './action';
 import { createProduct, type CreatedProduct } from './api';
-import { itemTitle, parseQuantity, parseRupees } from './format';
+import { itemTitle, parseQuantity, parseRupees, withBrand } from './format';
 import { PhotoError, shrinkPhoto, uploadProductPhoto } from './photo';
 import { addItem, useCategories, useProductSearch } from './queries';
 import { Icon } from '../shell/Icon';
 import { StockError } from './StockError';
+import { Thumb } from './Thumb';
 import styles from './stock.module.css';
 
 /** What the price step needs of a product, whether it came from the master list or was just created. */
-type Chosen = Pick<ProductMatch, 'id' | 'name' | 'variant' | 'packSize' | 'unit' | 'mrpPaise'>;
+type Chosen = Pick<ProductMatch, 'id' | 'name' | 'variant' | 'packSize' | 'unit' | 'mrpPaise'> & {
+  imageKey?: string | null | undefined;
+  /** Picked from the master list: the price step offers a photo (D-253). A new product took its photo already. */
+  listed?: boolean;
+};
 
 export interface AddItemProps {
   store: CurrentStore;
@@ -63,7 +68,7 @@ export function AddItem({ store, initialQuery = '', hadProductId = false, onClos
               onChange={setQ}
               clearLabel={intl.formatMessage({ id: 'stock.search.clear' })}
             />
-            <Matches query={matches} enabled={q.trim().length >= 2 || barcode !== undefined} onPick={setChosen} />
+            <Matches query={matches} enabled={q.trim().length >= 2 || barcode !== undefined} onPick={(p) => setChosen({ ...p, name: withBrand(p.name, p.brand), listed: true })} />
             <div className={styles.actions}>
               <Button onClick={() => setCreating(true)}>{intl.formatMessage({ id: 'stock.add.create' })}</Button>
             </div>
@@ -84,8 +89,9 @@ function Matches({ query, enabled, onPick }: { query: ReturnType<typeof useProdu
     <ul className={styles.matches} aria-label={intl.formatMessage({ id: 'stock.add.results' })}>
       {query.data.items.map((p) => (
         <li key={p.id} className={styles.match}>
+          <Thumb item={{ name: withBrand(p.name, p.brand), imageKey: p.imageKey ?? null }} />
           <span className={styles.cell}>
-            <span className={styles.name}>{itemTitle({ name: p.brand ? `${p.brand} ${p.name}` : p.name, variant: p.variant, packSize: p.packSize, unit: p.unit })}</span>
+            <span className={styles.name}>{itemTitle({ name: withBrand(p.name, p.brand), variant: p.variant, packSize: p.packSize, unit: p.unit })}</span>
             {p.mrpPaise !== null && <span className={styles.sub}>{intl.formatMessage({ id: 'stock.item.mrp' })} {formatMoney(p.mrpPaise, 'product')}</span>}
           </span>
           {p.inStore ? (
@@ -110,6 +116,8 @@ function PriceStep({ store, product, onBack, onDone }: { store: CurrentStore; pr
   const [opening, setOpening] = useState('');
   const [expiresOn, setExpiresOn] = useState('');
   const [invalid, setInvalid] = useState<{ price?: string; opening?: string }>({});
+  const photo = usePhoto();
+  const [uploading, setUploading] = useState(false);
   const title = itemTitle(product);
 
   const submit = async (e: FormEvent) => {
@@ -127,15 +135,29 @@ function PriceStep({ store, product, onBack, onDone }: { store: CurrentStore; pr
       ...(stock > 0 ? { openingStock: stock, ...(expiresOn ? { expiresOn } : {}) } : {}),
     };
     const out = await action.run(JSON.stringify(body), (key) => addItem(qc, store, body, key));
-    if (out) {
-      toast.show({ message: intl.formatMessage({ id: 'stock.toast.added' }, { item: title }) });
-      onDone();
+    if (!out) return;
+    toast.show({ message: intl.formatMessage({ id: 'stock.toast.added' }, { item: title }) });
+    if (photo.blob) {
+      // The item is listed either way; a photo that does not upload only costs the picture.
+      setUploading(true);
+      try {
+        await uploadProductPhoto(store, product.id, photo.blob);
+        toast.show({ message: intl.formatMessage({ id: 'stock.photo.sent' }) });
+      } catch {
+        toast.show({ message: intl.formatMessage({ id: 'stock.photo.failed' }) });
+      } finally {
+        setUploading(false);
+      }
     }
+    onDone();
   };
 
   return (
     <form className={styles.form} onSubmit={(e) => void submit(e)} noValidate aria-label={intl.formatMessage({ id: 'stock.add.priceTitle' })}>
-      <h3 className={styles.formTitle}>{title}</h3>
+      <div className={styles.photoField}>
+        {product.listed && <Thumb item={{ name: product.name, imageKey: product.imageKey ?? null }} large />}
+        <h3 className={styles.formTitle}>{title}</h3>
+      </div>
       <TextField
         label={intl.formatMessage({ id: 'stock.form.price' })}
         help={product.mrpPaise !== null ? intl.formatMessage({ id: 'stock.form.priceMrp' }, { mrp: formatMoney(product.mrpPaise, 'product') }) : undefined}
@@ -154,10 +176,11 @@ function PriceStep({ store, product, onBack, onDone }: { store: CurrentStore; pr
         onChange={(e) => setOpening(e.target.value)}
       />
       <TextField label={intl.formatMessage({ id: 'stock.form.expiry' })} type="date" value={expiresOn} onChange={(e) => setExpiresOn(e.target.value)} />
+      {product.listed && <PhotoPicker photo={photo} />}
       <StockError error={action.error} />
       <div className={styles.formActions}>
         <Button onClick={onBack}>{intl.formatMessage({ id: 'stock.form.back' })}</Button>
-        <Button type="submit" variant="primary" loading={action.pending}>
+        <Button type="submit" variant="primary" loading={action.pending || uploading}>
           {intl.formatMessage({ id: 'stock.add.save' })}
         </Button>
       </div>
@@ -291,7 +314,7 @@ function NewProductForm({
 
 type Photo = ReturnType<typeof usePhoto>;
 
-/** The optional photo of a new product (D-252): shrunk on the device as soon as it is picked. */
+/** The optional photo of a product (D-252, D-253): shrunk on the device as soon as it is picked. */
 function usePhoto() {
   const [blob, setBlob] = useState<Blob | null>(null);
   const [preview, setPreview] = useState<string | null>(null);

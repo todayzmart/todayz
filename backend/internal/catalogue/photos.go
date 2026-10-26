@@ -17,7 +17,7 @@ import (
 	"github.com/todayz/backend/internal/platform/telemetry"
 )
 
-// A shop's photo of a product it created (D-252). The app resizes the photo,
+// A shop's photo of a product (D-252; any master-list product since D-253). The app resizes the photo,
 // asks for a presigned PUT into the private bucket, uploads it and confirms;
 // the photo then waits in the admin image queue (internal/admin) and only an
 // approval copies it to the public images bucket and makes it the product's
@@ -89,9 +89,9 @@ func (s *Service) createPhoto(ctx context.Context, bid, sid, productID string, b
 	if err != nil {
 		return catalogueapi.ProductPhotoUpload{}, fmt.Errorf("catalogue: photo product: %w", err)
 	}
-	// Only the store that created the product adds its photo; to anyone else
-	// the product is not theirs to change.
-	if creator, _ := ids.FromUUID(prod.CreatedByStoreID); !prod.CreatedByStoreID.Valid || creator != sc.StoreID {
+	// Any store may send a photo of a product on the master list (D-253); a
+	// product still in review is seen only by the store that created it.
+	if creator, _ := ids.FromUUID(prod.CreatedByStoreID); prod.Status == "pending_review" && (!prod.CreatedByStoreID.Valid || creator != sc.StoreID) {
 		return catalogueapi.ProductPhotoUpload{}, problem.New(genproblems.NotFound, "")
 	}
 	if prod.Status == "merged" || prod.Status == "retired" {

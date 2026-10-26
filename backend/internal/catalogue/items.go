@@ -160,7 +160,7 @@ func (s *Service) searchProducts(ctx context.Context, bid string, p catalogueapi
 		out.Items = append(out.Items, catalogueapi.ProductMatch{
 			Id: ulidOf(r.ID), Name: r.Name, Brand: r.BrandName, Variant: r.Variant, PackSize: float32(r.PackSize),
 			Unit: catalogueapi.Unit(r.Unit), MrpPaise: intp(r.MrpPaise), CategoryId: ulidOf(r.CategoryID),
-			Barcodes: nonNil(r.Barcodes), InStore: r.InStore,
+			Barcodes: nonNil(r.Barcodes), InStore: r.InStore, ImageKey: r.ImageKey,
 		})
 	}
 	return out, nil

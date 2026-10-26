@@ -158,6 +158,47 @@ describe('B-07 product photo (D-252)', () => {
     expect(storage).not.toHaveBeenCalled();
   });
 
+  it('a master-list product shows its picture once branded, and takes a photo after it is added (D-253)', async () => {
+    let photoPost: Call | undefined;
+    let added = false;
+    const match = { id: 'p7', name: 'Daawat Sugar 1 kg', brand: 'Daawat', variant: null, packSize: 1, unit: 'kg', mrpPaise: 5000, categoryId: 'c1', barcodes: [], inStore: false, imageKey: 'types/t1.jpg' };
+    renderAt('/stock', {
+      messages,
+      handlers: [
+        shops,
+        (c) => (c.method === 'GET' && c.path === '/v1/biz/businesses/b1/products/search' ? json(200, { items: [match], nextCursor: null }) : undefined),
+        (c) => {
+          if (c.method !== 'POST' || c.path !== `${BASE}/items`) return undefined;
+          added = true;
+          return json(201, item('i7', 'Daawat Sugar 1 kg', { productId: 'p7' }));
+        },
+        (c) => {
+          if (c.method !== 'POST' || c.path !== `${BASE}/products/p7/photos`) return undefined;
+          photoPost = c;
+          return json(201, { ...upload, photo: { ...upload.photo, productId: 'p7' } });
+        },
+        (c) => (c.method === 'POST' && c.path === `${BASE}/products/p7/photos/ph1/confirm` ? json(200, { ...upload.photo, productId: 'p7', status: 'pending' }) : undefined),
+        ...reads([]),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: 'Add item' }));
+    const dialog = await screen.findByRole('dialog');
+    fireEvent.change(within(dialog).getByRole('searchbox'), { target: { value: 'sugar' } });
+    const row = (await within(dialog).findByText('Daawat Sugar 1 kg')).closest('li') as HTMLElement;
+    expect(row.querySelector('img')?.getAttribute('src')).toBe('https://img.todayz.localhost/types/t1.jpg');
+    fireEvent.click(within(row).getByRole('button', { name: 'Add' }));
+
+    fireEvent.change(await within(dialog).findByLabelText('Selling price'), { target: { value: '48' } });
+    fireEvent.change(within(dialog).getByLabelText('Take or choose a photo'), {
+      target: { files: [new File([new Uint8Array([1, 2, 3, 4])], 'sugar.png', { type: 'image/png' })] },
+    });
+    await within(dialog).findByRole('button', { name: 'Remove photo' });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Add to my shop' }));
+    await waitFor(() => expect(added).toBe(true));
+    await waitFor(() => expect(photoPost?.body).toEqual({ contentType: 'image/png', sizeBytes: 4 }));
+    expect(await screen.findByText('Photo sent. TodayZ will check it.')).toBeInTheDocument();
+  });
+
   it('the list shows the approved image, the store photo waiting for review, or the initials; the sheet says why a photo was turned down', async () => {
     const { container } = renderAt('/stock', {
       messages,

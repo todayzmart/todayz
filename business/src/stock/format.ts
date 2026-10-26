@@ -20,6 +20,15 @@ export function itemTitle(i: Named): string {
   return [i.name, i.variant, named ? null : pack].filter(Boolean).join(' · ');
 }
 
+/** The product name led by its brand, unless the name already starts with it ("Daawat Sugar", not "Daawat Daawat Sugar"). */
+export function withBrand(name: string, brand: string | null | undefined): string {
+  const b = brand?.trim();
+  if (!b) return name;
+  const n = name.trim().toLowerCase();
+  const lead = b.toLowerCase();
+  return n === lead || n.startsWith(`${lead} `) ? name : `${b} ${name}`;
+}
+
 /** Out when nothing is available to sell, low at or below the shop's threshold, else in stock. */
 export function stockLevel(i: Pick<StoreItem, 'available' | 'lowStock'>): StockLevel {
   if (i.available <= 0) return 'out';

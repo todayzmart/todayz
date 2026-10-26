@@ -82,7 +82,7 @@ SELECT si.id, si.store_id, si.product_id, si.local_name, si.price_paise, si.mrp_
   p.barcodes, p.category_id, p.brand_id, b.name AS brand_name, p.mrp_paise AS product_mrp_paise,
   ph.id AS photo_id, coalesce(ph.status, '')::text AS photo_status, coalesce(ph.object_key, '')::text AS photo_key, ph.reject_reason AS photo_reject_reason,
   -- The store created the product and it is still live, so it may send a photo (D-252).
-  (p.created_by_store_id IS NOT DISTINCT FROM si.store_id AND p.status NOT IN ('merged','retired'))::bool AS can_add_photo
+  (p.status = 'active' OR (p.status = 'pending_review' AND p.created_by_store_id IS NOT DISTINCT FROM si.store_id))::bool AS can_add_photo
 FROM store_items si
 JOIN products p ON p.id = si.product_id
 LEFT JOIN brands b ON b.id = p.brand_id
@@ -125,7 +125,7 @@ SELECT si.id, si.store_id, si.product_id, si.local_name, si.price_paise, si.mrp_
   p.barcodes, p.category_id, p.brand_id, b.name AS brand_name, p.mrp_paise AS product_mrp_paise,
   ph.id AS photo_id, coalesce(ph.status, '')::text AS photo_status, coalesce(ph.object_key, '')::text AS photo_key, ph.reject_reason AS photo_reject_reason,
   -- The store created the product and it is still live, so it may send a photo (D-252).
-  (p.created_by_store_id IS NOT DISTINCT FROM si.store_id AND p.status NOT IN ('merged','retired'))::bool AS can_add_photo
+  (p.status = 'active' OR (p.status = 'pending_review' AND p.created_by_store_id IS NOT DISTINCT FROM si.store_id))::bool AS can_add_photo
 FROM store_items si
 JOIN products p ON p.id = si.product_id
 LEFT JOIN brands b ON b.id = p.brand_id
