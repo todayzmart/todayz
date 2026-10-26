@@ -245,17 +245,17 @@
     "enHash": "ceafde86"
   },
   "help.signedOut.body": {
-    "message": "உங்கள் டிக்கெட்கள் உங்கள் கணக்கில் வைக்கப்படும், எனவே டிக்கெட் திறக்க அல்லது பதில்களைப் பார்க்க உள்நுழையுங்கள்.",
+    "message": "உங்கள் டிக்கெட்கள் உங்கள் கணக்கில் வைக்கப்படும், எனவே டிக்கெட் திறக்க அல்லது பதில்களைப் பார்க்க சைன் இன் செய்யுங்கள்.",
     "review": "reviewed",
     "enHash": "8f10756a"
   },
   "help.signedOut.cta": {
-    "message": "உள்நுழை",
+    "message": "சைன் இன்",
     "review": "reviewed",
     "enHash": "ada2e9e9"
   },
   "help.signedOut.title": {
-    "message": "உதவிக்கு உள்நுழையுங்கள்",
+    "message": "உதவிக்கு சைன் இன் செய்யுங்கள்",
     "review": "reviewed",
     "enHash": "e9c9d810"
   },

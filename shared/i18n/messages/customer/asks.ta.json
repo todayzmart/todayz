@@ -95,7 +95,7 @@
     "enHash": "9bc2575c"
   },
   "asks.sheet.signIn": {
-    "message": "அனுப்ப உள்நுழையவும்",
+    "message": "அனுப்ப சைன் இன் செய்யவும்",
     "review": "reviewed",
     "enHash": "b9cb22a0"
   },
@@ -200,7 +200,7 @@
     "enHash": "8f4f8da5"
   },
   "asks.signedOut.title": {
-    "message": "உங்கள் கோரிக்கைகளைப் பார்க்க உள்நுழையவும்",
+    "message": "உங்கள் கோரிக்கைகளைப் பார்க்க சைன் இன் செய்யவும்",
     "review": "reviewed",
     "enHash": "ab68f44d"
   },
@@ -210,7 +210,7 @@
     "enHash": "7aa8a7a4"
   },
   "asks.signedOut.cta": {
-    "message": "உள்நுழை",
+    "message": "சைன் இன்",
     "review": "reviewed",
     "enHash": "ada2e9e9"
   },

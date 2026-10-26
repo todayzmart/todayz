@@ -95,7 +95,7 @@
     "enHash": "43b1e64b"
   },
   "footer.refunds": {
-    "message": "பணத்திருப்பம் மற்றும் கிரெடிட்",
+    "message": "ரீஃபண்ட் மற்றும் கிரெடிட்",
     "review": "reviewed",
     "enHash": "1f2dac46"
   },
@@ -190,7 +190,7 @@
     "enHash": "90e40d50"
   },
   "nav.login": {
-    "message": "உள்நுழை",
+    "message": "லாக் இன்",
     "review": "reviewed",
     "enHash": "f7c400ed"
   },

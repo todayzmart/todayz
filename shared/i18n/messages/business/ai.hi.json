@@ -140,7 +140,7 @@
     "enHash": "b394c9ca"
   },
   "ai.err.price": {
-    "message": "रुपये में कीमत डालें",
+    "message": "रुपये में दाम डालें",
     "review": "reviewed",
     "enHash": "c223f02c"
   },
@@ -210,7 +210,7 @@
     "enHash": "44f6af69"
   },
   "ai.bill.cost": {
-    "message": "ख़रीद कीमत",
+    "message": "ख़रीद का दाम",
     "review": "reviewed",
     "enHash": "b0e0a2d5"
   },
@@ -245,7 +245,7 @@
     "enHash": "7499282c"
   },
   "ai.shelf.desc": {
-    "message": "शेल्फ़ की फ़ोटो लें। हम कैटलॉग में प्रोडक्ट ढूंढते हैं; आप चुनें कि क्या और किस कीमत पर बेचना है।",
+    "message": "शेल्फ़ की फ़ोटो लें। हम कैटलॉग में प्रोडक्ट ढूंढते हैं; आप चुनें कि क्या और किस दाम पर बेचना है।",
     "review": "reviewed",
     "enHash": "66d96c07"
   },
@@ -285,7 +285,7 @@
     "enHash": "6762efb2"
   },
   "ai.shelf.price": {
-    "message": "आपकी कीमत",
+    "message": "आपका दाम",
     "review": "reviewed",
     "enHash": "16a067af"
   },

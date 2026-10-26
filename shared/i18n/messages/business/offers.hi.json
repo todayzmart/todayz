@@ -115,7 +115,7 @@
     "enHash": "bbfa773e"
   },
   "offers.cancel": {
-    "message": "रद्द करें",
+    "message": "कैंसल करें",
     "review": "reviewed",
     "enHash": "77dfd213"
   },
@@ -415,7 +415,7 @@
     "enHash": "54353916"
   },
   "offers.value.flatHelp": {
-    "message": "हर यूनिट पर घटती है, इसलिए क़ीमत से कम होनी चाहिए।",
+    "message": "हर यूनिट पर घटती है, इसलिए दाम से कम होनी चाहिए।",
     "review": "reviewed",
     "enHash": "978487d2"
   },
@@ -520,7 +520,7 @@
     "enHash": "2b198b3b"
   },
   "offers.err.flatTooHigh": {
-    "message": "रकम आइटम की क़ीमत से कम होनी चाहिए।",
+    "message": "रकम आइटम के दाम से कम होनी चाहिए।",
     "review": "reviewed",
     "enHash": "ddda7614"
   },
@@ -605,7 +605,7 @@
     "enHash": "5b885ef8"
   },
   "offers.preview.waiting": {
-    "message": "ऑफ़र भरें, फिर उसके साथ एक सैंपल कार्ट की क़ीमत दिखेगी।",
+    "message": "ऑफ़र भरें, फिर उसके साथ एक सैंपल कार्ट का दाम दिखेगा।",
     "review": "reviewed",
     "enHash": "d28ce48f"
   },

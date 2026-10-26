@@ -59,7 +59,7 @@ Fixed on 26 Oct (the majority form was clear):
 
 The per-message list is in `docs/qa/W4-05/REPORT.md`.
 
-Decided by the founder's delegation on 26 Oct (D-246 B6), by rule 1 where it applies. The existing messages are not changed yet (LIST.md A8); change them with the native-speaker review:
+Decided by the founder's delegation on 26 Oct (D-246 B6), by rule 1 where it applies. The messages follow these terms since 26 Oct (go-live A8). Not changed on purpose: "Discard" and "Undo" keep रद्द / ರದ್ದು / రద్దు, because they are not "cancel"; the hi plan-pricing page keeps कीमत (the price of TodayZ, not an item's); and "ask" as a verb and "demand" keep माँग. The native-speaker review (C12) should read the changed messages in context:
 
 | English | Hindi | Kannada | Telugu | Tamil |
 |---|---|---|---|---|

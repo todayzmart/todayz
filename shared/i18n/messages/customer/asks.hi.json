@@ -100,17 +100,17 @@
     "enHash": "b9cb22a0"
   },
   "asks.error.limit": {
-    "message": "आप एक दिन में {n} माँगें भेज सकते हैं। कल फिर कोशिश करें।",
+    "message": "आप एक दिन में {n} बार पूछताछ भेज सकते हैं। कल फिर कोशिश करें।",
     "review": "reviewed",
     "enHash": "ec90d6cb"
   },
   "asks.error.limitPlain": {
-    "message": "आपने आज की माँगें भेज दी हैं। कल फिर कोशिश करें।",
+    "message": "आपने आज की सारी पूछताछ भेज दी है। कल फिर कोशिश करें।",
     "review": "reviewed",
     "enHash": "0e263750"
   },
   "asks.error.open": {
-    "message": "इसके लिए आपकी एक माँग पहले से खुली है।",
+    "message": "इसके लिए आपकी एक पूछताछ पहले से खुली है।",
     "review": "reviewed",
     "enHash": "b3de419a"
   },
@@ -120,12 +120,12 @@
     "enHash": "620c9c35"
   },
   "asks.error.noShops": {
-    "message": "अभी पास की कोई दुकान माँग नहीं ले सकती।",
+    "message": "अभी पास की कोई दुकान पूछताछ नहीं ले सकती।",
     "review": "reviewed",
     "enHash": "a6c08e1c"
   },
   "asks.error.storeUnavailable": {
-    "message": "यह दुकान अभी माँगें नहीं ले रही है।",
+    "message": "यह दुकान अभी पूछताछ नहीं ले रही है।",
     "review": "reviewed",
     "enHash": "02e91de0"
   },
@@ -135,27 +135,27 @@
     "enHash": "ea124d37"
   },
   "asks.error.failed": {
-    "message": "हम आपकी माँग नहीं भेज सके। फिर से कोशिश करें।",
+    "message": "हम आपकी पूछताछ नहीं भेज सके। फिर से कोशिश करें।",
     "review": "reviewed",
     "enHash": "a99b37d4"
   },
   "asks.ordersLink": {
-    "message": "आपकी माँगें",
+    "message": "आपकी पूछताछ",
     "review": "reviewed",
     "enHash": "77bf3817"
   },
   "asks.title": {
-    "message": "आपकी माँगें",
+    "message": "आपकी पूछताछ",
     "review": "reviewed",
     "enHash": "77bf3817"
   },
   "asks.back": {
-    "message": "आपकी माँगें",
+    "message": "आपकी पूछताछ",
     "review": "reviewed",
     "enHash": "77bf3817"
   },
   "asks.loading": {
-    "message": "आपकी माँगें लोड हो रही हैं",
+    "message": "आपकी पूछताछ लोड हो रही है",
     "review": "reviewed",
     "enHash": "9d8c3fab"
   },
@@ -165,22 +165,22 @@
     "enHash": "042c862e"
   },
   "asks.gone": {
-    "message": "हमें यह माँग नहीं मिली",
+    "message": "हमें यह पूछताछ नहीं मिली",
     "review": "reviewed",
     "enHash": "f4d97a99"
   },
   "asks.error.load": {
-    "message": "हम आपकी माँगें लोड नहीं कर सके",
+    "message": "हम आपकी पूछताछ लोड नहीं कर सके",
     "review": "reviewed",
     "enHash": "b1c92572"
   },
   "asks.error.close": {
-    "message": "हम माँग बंद नहीं कर सके। फिर से कोशिश करें।",
+    "message": "हम पूछताछ बंद नहीं कर सके। फिर से कोशिश करें।",
     "review": "reviewed",
     "enHash": "07d1cd69"
   },
   "asks.empty.title": {
-    "message": "अभी कोई माँग नहीं",
+    "message": "अभी कोई पूछताछ नहीं",
     "review": "reviewed",
     "enHash": "f9782d98"
   },
@@ -200,12 +200,12 @@
     "enHash": "8f4f8da5"
   },
   "asks.signedOut.title": {
-    "message": "अपनी माँगें देखने के लिए साइन इन करें",
+    "message": "अपनी पूछताछ देखने के लिए साइन इन करें",
     "review": "reviewed",
     "enHash": "ab68f44d"
   },
   "asks.signedOut.body": {
-    "message": "आपकी माँगें और दुकानों के जवाब आपके अकाउंट में रहते हैं।",
+    "message": "आपकी पूछताछ और दुकानों के जवाब आपके अकाउंट में रहते हैं।",
     "review": "reviewed",
     "enHash": "7aa8a7a4"
   },
@@ -260,7 +260,7 @@
     "enHash": "269931fa"
   },
   "asks.close": {
-    "message": "माँग बंद करें",
+    "message": "पूछताछ बंद करें",
     "review": "reviewed",
     "enHash": "2385e8a9"
   },
