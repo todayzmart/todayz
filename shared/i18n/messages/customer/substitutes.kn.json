@@ -1,0 +1,47 @@
+{
+  "substitutes.open": {
+    "message": "ಇದೇ ತರಹದ ವಸ್ತುಗಳನ್ನು ನೋಡಿ",
+    "review": "reviewed",
+    "enHash": "0fb1f77d"
+  },
+  "substitutes.title": {
+    "message": "{name} ಬದಲಿಗೆ",
+    "review": "reviewed",
+    "enHash": "b873aba1"
+  },
+  "substitutes.description": {
+    "message": "ಈಗ ಸ್ಟಾಕ್‌ನಲ್ಲಿದೆ. ಕಾರ್ಟ್‌ಗೆ ಸೇರಿಸಲು ಒಂದನ್ನು ತೆರೆಯಿರಿ.",
+    "review": "reviewed",
+    "enHash": "306d85b7"
+  },
+  "substitutes.sameShop": {
+    "message": "ಇದೇ ಅಂಗಡಿಯಲ್ಲಿ",
+    "review": "reviewed",
+    "enHash": "0f94e4c5"
+  },
+  "substitutes.nearby": {
+    "message": "ಇತರ ಅಂಗಡಿಗಳಲ್ಲಿ ಇದೇ ವಸ್ತು",
+    "review": "reviewed",
+    "enHash": "54b5bcb2"
+  },
+  "substitutes.none": {
+    "message": "ಹತ್ತಿರದಲ್ಲಿ ಇದೇ ತರಹದ್ದು ಸ್ಟಾಕ್‌ನಲ್ಲಿ ಇಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "fb970cd7"
+  },
+  "substitutes.error": {
+    "message": "ಇದೇ ತರಹದ ವಸ್ತುಗಳು ಲೋಡ್ ಆಗಲಿಲ್ಲ.",
+    "review": "reviewed",
+    "enHash": "6c4c70bc"
+  },
+  "substitutes.retry": {
+    "message": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "substitutes.close": {
+    "message": "ಮುಚ್ಚಿ",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  }
+}

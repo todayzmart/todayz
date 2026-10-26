@@ -1,0 +1,47 @@
+{
+  "substitutes.open": {
+    "message": "ఇలాంటి వస్తువులు చూడండి",
+    "review": "reviewed",
+    "enHash": "0fb1f77d"
+  },
+  "substitutes.title": {
+    "message": "{name} బదులు",
+    "review": "reviewed",
+    "enHash": "b873aba1"
+  },
+  "substitutes.description": {
+    "message": "ఇప్పుడు స్టాక్‌లో ఉంది. కార్ట్‌కు జోడించడానికి ఒకదాన్ని తెరవండి.",
+    "review": "reviewed",
+    "enHash": "306d85b7"
+  },
+  "substitutes.sameShop": {
+    "message": "ఇదే దుకాణంలో",
+    "review": "reviewed",
+    "enHash": "0f94e4c5"
+  },
+  "substitutes.nearby": {
+    "message": "ఇతర దుకాణాల్లో ఇదే వస్తువు",
+    "review": "reviewed",
+    "enHash": "54b5bcb2"
+  },
+  "substitutes.none": {
+    "message": "దగ్గరలో ఇలాంటిది ఏదీ స్టాక్‌లో లేదు.",
+    "review": "reviewed",
+    "enHash": "fb970cd7"
+  },
+  "substitutes.error": {
+    "message": "ఇలాంటి వస్తువులు లోడ్ కాలేదు.",
+    "review": "reviewed",
+    "enHash": "6c4c70bc"
+  },
+  "substitutes.retry": {
+    "message": "మళ్ళీ ప్రయత్నించండి",
+    "review": "reviewed",
+    "enHash": "042c862e"
+  },
+  "substitutes.close": {
+    "message": "మూసివేయండి",
+    "review": "reviewed",
+    "enHash": "bbfa773e"
+  }
+}

@@ -4,7 +4,8 @@ import { expect, test, type Page, type Route } from '@playwright/test';
 // W3-12 consumer AI at 360 px on the e2e build with a faked API (no stack, no model): C-23 voice
 // search (the transcript fills the box and never searches; the search then says source=voice; the
 // cap disables the mic), C-05 search assist chips that apply only when tapped, and C-22 list parse
-// (draft lines reviewed one by one; only the kept lines join the basket). The microphone is a
+// (draft lines reviewed one by one; only the kept lines join the basket), and AI-C3 substitutes on an
+// out-of-stock item (rule-based, no model; nothing joins the cart from the sheet). The microphone is a
 // synthetic tone recorded by the browser's own MediaRecorder.
 // `TZ_QA_DIR=docs/qa/W3-12 pnpm exec playwright test ai.spec.ts` refreshes the committed shots.
 
@@ -55,6 +56,44 @@ const searchResult = (q: string, refineHint: boolean) => ({
   nextCursor: null,
   serverNow: NOW,
 });
+
+const SUB_ITEM = '01KE0S1W6W8ZV7T1C3A6ITEM02';
+const OUT_ITEM = { ...item, inStock: false, qtyAvailable: 0 };
+const storePage = {
+  ...store,
+  addressLine1: null,
+  addressLine2: null,
+  landmark: null,
+  city: 'Bengaluru',
+  pincode: '560038',
+  lat: 12.97,
+  lng: 77.64,
+  closedUntil: null,
+  hours: { weekly: Object.fromEntries(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((d) => [d, [{ open: '09:00', close: '21:00' }]])), holidays: [] },
+  categoryTint: 'green',
+  categorySlug: 'grocery',
+  categoryName: 'Grocery',
+  deliveryFeePaise: 2000,
+  deliveryFreeAbovePaise: null,
+  deliveryMinOrderPaise: 0,
+  deliveryRadiusM: 3000,
+  serverNow: NOW,
+};
+const substitutes = {
+  sameShop: [
+    { ...item, storeItemId: SUB_ITEM, productId: '01KE0S1W6W8ZV7T1C3A6PROD02', name: 'Pillsbury Chakki Atta', pricePaise: 23500, mrpPaise: 25000 },
+    { ...item, storeItemId: '01KE0S1W6W8ZV7T1C3A6ITEM03', productId: '01KE0S1W6W8ZV7T1C3A6PROD03', name: 'Fortune Chakki Fresh Atta', pricePaise: 22500, mrpPaise: 24000 },
+  ],
+  nearby: [
+    {
+      store: { ...store, storeId: '01KE0S1W6W8ZV7T1C3A6MS0002', storeSlug: 'annapurna-kirana', name: 'Annapurna Kirana', distanceM: 1200 },
+      items: [{ ...item, storeItemId: '01KE0S1W6W8ZV7T1C3A6ITEM09', pricePaise: 24500 }],
+      badge: null,
+      deliveryFeePaise: null,
+    },
+  ],
+  serverNow: NOW,
+};
 
 const draftLines = [
   { lineId: 'l1', text: 'atta 1 kg', quantity: 1 },
@@ -143,6 +182,10 @@ async function fakeApi(page: Page, answers: Answers = {}): Promise<Seen[]> {
       return send(200, searchResult(q, q.includes('under')));
     }
     if (p === '/v1/discover/search/suggest') return send(200, { items: [] });
+    if (p === `/v1/discover/stores/${store.storeSlug}`) return send(200, storePage);
+    if (p === `/v1/discover/stores/${store.storeSlug}/items`)
+      return send(200, { items: [OUT_ITEM, substitutes.sameShop[0]], nextCursor: null, serverNow: NOW });
+    if (p === `/v1/discover/stores/${store.storeSlug}/substitutes`) return send(200, substitutes);
     if (p === '/v1/discover/categories') return send(200, { items: [] });
     if (p === `/v1/me/baskets/${BASKET_ID}`)
       return send(200, { basketId: BASKET_ID, name: 'Weekly', lines: [], lastSplit: null, updatedAt: NOW, version: 1 });
@@ -293,4 +336,36 @@ test('360: C-22 a pasted list becomes draft lines; only the kept ones join the b
     ],
   });
   await shot(page, 'customer-c22-list-added-360.png', { fullPage: true });
+});
+
+test('360: AI-C3 an out-of-stock item offers similar items; a row opens that item, the cart is untouched', async ({ page }) => {
+  const seen = await fakeApi(page);
+  await page.goto(`/s/${store.storeSlug}/i/${item.storeItemId}`);
+  await expect(page.getByRole('heading', { level: 1, name: 'Aashirvaad Atta' })).toBeVisible();
+  const open = page.getByRole('button', { name: 'See similar items' });
+  await expect(open).toBeVisible();
+  expect(seen.some((s) => s.path.endsWith('/substitutes'))).toBe(false);
+  await shot(page, 'customer-c08-substitutes-button-360.png');
+
+  await open.click();
+  const sheet = page.getByRole('dialog', { name: 'Instead of Aashirvaad Atta' });
+  await expect(sheet.getByText('Pillsbury Chakki Atta')).toBeVisible();
+  await expect(sheet.getByText('Annapurna Kirana')).toBeVisible();
+  const call = seen.find((s) => s.path.endsWith('/substitutes'));
+  expect(call?.query.get('itemId')).toBe(item.storeItemId);
+  expect(call?.query.get('lat')).toBe('12.97');
+  await shot(page, 'customer-c08-substitutes-sheet-360.png');
+
+  await sheet.getByRole('link', { name: /Pillsbury Chakki Atta/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Pillsbury Chakki Atta' })).toBeVisible();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  expect(seen.some((s) => s.path === '/v1/me/checkout/quote')).toBe(false);
+});
+
+test('360: AI-C3 the shop page shows the button under the out-of-stock card only', async ({ page }) => {
+  await fakeApi(page);
+  await page.goto(`/s/${store.storeSlug}`);
+  await expect(page.getByText('Pillsbury Chakki Atta')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'See similar items' })).toHaveCount(1);
+  await shot(page, 'customer-c07-substitutes-360.png');
 });

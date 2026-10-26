@@ -15,6 +15,7 @@ import { DeliveryProblemBanner, FulfilmentSwitch } from './Delivery';
 import { deliveryProblemOf } from './deliveryRules';
 import { useFulfilment } from './fulfilment';
 import { addressLine } from '../address/line';
+import { Substitutes } from '../substitutes/Substitutes';
 import styles from './tx.module.css';
 
 /** Problem codes the quote can answer with that the cart explains in words. */
@@ -65,6 +66,7 @@ export function CartPage() {
   }
 
   const byId = new Map<string, QuoteLine>((quote.data?.lines ?? []).map((l) => [l.storeItemId, l]));
+  const shopSlug = cart.store.slug;
   const blocked = (quote.data && !quote.data.orderable) === true;
   const localTotal = cart.lines.reduce((sum, l) => sum + l.pricePaise * l.qty, 0);
   const total = quote.data ? quote.data.totalPaise : localTotal;
@@ -99,7 +101,7 @@ export function CartPage() {
         )}
         <ul className={styles.list}>
           {cart.lines.map((l) => (
-            <CartRow key={l.storeItemId} line={l} quoted={byId.get(l.storeItemId)} />
+            <CartRow key={l.storeItemId} shopSlug={shopSlug} line={l} quoted={byId.get(l.storeItemId)} />
           ))}
         </ul>
       </section>
@@ -182,7 +184,7 @@ export function CartPage() {
   );
 }
 
-function CartRow({ line, quoted }: { line: CartLine; quoted: QuoteLine | undefined }) {
+function CartRow({ shopSlug, line, quoted }: { shopSlug: string; line: CartLine; quoted: QuoteLine | undefined }) {
   const intl = useIntl();
   const price = quoted?.unitPricePaise ?? line.pricePaise;
   const mrp = quoted?.mrpPaise ?? line.mrpPaise;
@@ -204,6 +206,7 @@ function CartRow({ line, quoted }: { line: CartLine; quoted: QuoteLine | undefin
           )}
         </p>
         {out && <p className={styles.flag}>{intl.formatMessage({ id: 'cart.line.out' })}</p>}
+        {out && <Substitutes shopSlug={shopSlug} storeItemId={line.storeItemId} name={line.productName} />}
         {short && quoted && (
           <p className={styles.flag}>{intl.formatMessage({ id: 'cart.line.short' }, { count: quoted.availableQuantity })}</p>
         )}

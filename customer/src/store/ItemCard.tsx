@@ -1,6 +1,6 @@
 // One item of a shop as it appears on the shop page, in search results and on "other shops": price, MRP,
 // stock with its proof, and Add to cart. An in-store-only shop (not bookable) shows directions instead of Add.
-// "Add to basket" sits under the card either way (C-22).
+// "Add to basket" sits under the card either way (C-22); an out-of-stock item also offers similar ones (AI-C3).
 import type { DiscoverSearchItem } from '@todayz/api-client/gen/model/discoverSearchItem';
 import { MapPin, Store as StoreIcon } from 'lucide-react';
 import { ProductCard, StockTag } from '@todayz/ui';
@@ -10,6 +10,7 @@ import basketStyles from '../basket/basket.module.css';
 import { offPercent, useFmt, usePackLine, useStockProps } from '../home/format';
 import { imageUrl, initials } from '../home/present';
 import { RouterLink } from '../home/RouterLink';
+import { Substitutes } from '../substitutes/Substitutes';
 import { Icon } from '../shell/Icon';
 import { itemHref, useStepperLabels } from './itemUi';
 
@@ -36,7 +37,12 @@ export function ItemCard({ shopSlug, item, serverNow, bookable, qty, onChange, d
   const href = itemHref(shopSlug, item.storeItemId);
   const img = imageUrl(item.imageKey);
 
-  const toBasket = <AddToBasket productId={item.productId} name={item.name} detail={packLine(item)} compact />;
+  const toBasket = (
+    <>
+      {!item.inStock && <Substitutes shopSlug={shopSlug} storeItemId={item.storeItemId} name={item.name} />}
+      <AddToBasket productId={item.productId} name={item.name} detail={packLine(item)} compact />
+    </>
+  );
 
   if (!bookable) {
     return (

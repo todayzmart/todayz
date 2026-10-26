@@ -1,0 +1,38 @@
+{
+  "substitutes.open": {
+    "defaultMessage": "See similar items",
+    "description": "Button on an out-of-stock item (shop page, product page, cart line): opens the substitutes sheet"
+  },
+  "substitutes.title": {
+    "defaultMessage": "Instead of {name}",
+    "description": "Substitutes sheet title; {name} is the out-of-stock product's name"
+  },
+  "substitutes.description": {
+    "defaultMessage": "In stock now. Open one to add it to your cart.",
+    "description": "Substitutes sheet: nothing is added until the customer opens an item and adds it"
+  },
+  "substitutes.sameShop": {
+    "defaultMessage": "In this shop",
+    "description": "Substitutes sheet heading: similar items at the same shop"
+  },
+  "substitutes.nearby": {
+    "defaultMessage": "Same item at other shops",
+    "description": "Substitutes sheet heading: the same product at shops nearby, each row is a shop name and distance"
+  },
+  "substitutes.none": {
+    "defaultMessage": "Nothing similar is in stock nearby.",
+    "description": "Substitutes sheet when there is no similar item and no other shop has it"
+  },
+  "substitutes.error": {
+    "defaultMessage": "Similar items could not load.",
+    "description": "Substitutes sheet when the request failed"
+  },
+  "substitutes.retry": {
+    "defaultMessage": "Try again",
+    "description": "Substitutes sheet: retry loading"
+  },
+  "substitutes.close": {
+    "defaultMessage": "Close",
+    "description": "Close the substitutes sheet"
+  }
+}
