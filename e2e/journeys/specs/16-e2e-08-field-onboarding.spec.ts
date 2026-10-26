@@ -20,7 +20,6 @@ interface Search {
 test('E2E-08 field agent onboards a shop → owner confirms → admin verifies → live in search → first order', async ({ who }) => {
   const agent = await who('fieldAgent');
   const admin = await who('superAdmin');
-  const owner = await who('newOwner');
   const customer = new Customer(await who('walkIn'));
   const ownerPhone = '9000000048';
   const tag = `${Date.now()}`.slice(-6);
@@ -82,6 +81,15 @@ test('E2E-08 field agent onboards a shop → owner confirms → admin verifies �
       }, { message: 'the mock SMS holds the owner code', timeout: 20_000 })
       .toBe(6);
     await agent.api.ok('owner gives the code to the agent', 'POST', `/v1/admin/field/businesses/${bid}/owner-confirm/verify`, { code });
+  });
+
+  // The owner signs in only after the confirm: a sign-in code to the number inside the resend gap
+  // would make the agent's owner-confirm send 429 (01 §2 counts codes per number).
+  const owner = await who('newOwner');
+  await test.step('the owner sends the new store for review', async () => {
+    // Only an owner or manager moves a store from draft to pending_review (submitStore); a field
+    // agent has no submit.
+    await owner.api.ok('owner submits the store', 'POST', `/v1/biz/businesses/${bid}/stores/${sid}/submit`, {});
   });
 
   await test.step('an admin verifies the business; the store goes live', async () => {

@@ -5,13 +5,15 @@
     "content": [
       {
         "type": "tool_use",
-        "name": "record_stock_lines",
+        "id": "toolu_mock_voice_fallback",
+        "name": "record_voice_stock_lines",
         "input": {
           "lines": [
-            {"action": "sale", "unmatched_text": "item not recognised", "quantity": 1, "unit": "piece", "price": null}
+            {"kind": "sale", "item": null, "unmatched": "item not recognised", "heard": "item not recognised", "quantity": 1, "price_rupees": null, "confidence": 0.5}
           ]
         }
       }
-    ]
+    ],
+    "stop_reason": "tool_use"
   }
 }

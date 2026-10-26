@@ -1,21 +1,23 @@
 {
-  "description": "The sample Hinglish utterance in fixtures/stt. store_item_id values are placeholders: W3-04 swaps in seeded ids or matches on unmatched_text.",
+  "description": "The sample Hinglish utterance in fixtures/stt, answered with backend/internal/voice's record_voice_stock_lines tool. Both lines are unmatched (candidate refs depend on the shop's list), so the draft asks the person to pick each item.",
   "match": {
     "contains": ["do kilo atta"],
-    "tool": "record_stock_lines"
+    "tool": "record_voice_stock_lines"
   },
   "response": {
     "content": [
       {
         "type": "tool_use",
-        "name": "record_stock_lines",
+        "id": "toolu_mock_voice_hinglish",
+        "name": "record_voice_stock_lines",
         "input": {
           "lines": [
-            {"action": "sale", "unmatched_text": "atta", "quantity": 2, "unit": "kg", "price": null},
-            {"action": "sale", "store_item_id": "00000000-0000-4000-8000-0000000000a1", "quantity": 5, "unit": "pack", "price": null}
+            {"kind": "sale", "item": null, "unmatched": "atta", "heard": "do kilo atta", "quantity": 2, "price_rupees": null, "confidence": 0.6},
+            {"kind": "sale", "item": null, "unmatched": "Amul doodh", "heard": "paanch Amul doodh bik gaye", "quantity": 5, "price_rupees": null, "confidence": 0.6}
           ]
         }
       }
-    ]
+    ],
+    "stop_reason": "tool_use"
   }
 }

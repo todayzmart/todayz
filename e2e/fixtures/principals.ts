@@ -211,7 +211,8 @@ export class Principal implements Bearer {
     // Not in the last seconds of a step, so the code is still current when it arrives; and a step
     // after the last one used.
     for (;;) {
-      const now = Date.now();
+      // The server checks the code at its own (test clock) time.
+      const now = Date.now() + readState().clockOffsetMs;
       const left = 30_000 - (now % 30_000);
       const step = Math.floor(now / 30_000);
       if (left < 4_000 || (this.saved.totpStep !== undefined && step <= this.saved.totpStep)) {
