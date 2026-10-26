@@ -1398,3 +1398,9 @@ Once the runner had disk (D-214's `free-disk.sh`), ci, security and e2e each fai
 - Now, in the same transaction as the business submit, every draft store of the business with no gaps (`storeGaps`, the same test the owner's submit uses) goes to `pending_review`, and each writes a `store.submit` audit row as the agent. A store with a gap stays draft. `submitReady` already refuses the confirm unless at least one store is complete, so the business never reaches review with no store to review.
 - No new endpoint, setting or migration. The owner's own submit is unchanged for stores added later.
 - Tests: `cmd/todayz` field onboarding HTTP test (store `pending_review` and the audit row after verify); E2E-08 reads the store's status after the confirm instead of submitting it. 01 §14 says so.
+
+**D-242 · The generic rate limits are confirmed as backstops (lead, 26 Oct; W4-03 F4).**
+- The numbers in `ratelimit.DefaultRules` stand, per client IP and per API instance: auth 60 a minute, me and public 600, biz and admin 1200. They stop a runaway client or script, never a person. A busy counter at 1 sale every 2 s uses about 30 biz calls a minute.
+- They are in code, not `platform_settings`. They are not a product rule, and a bad value in a settings row must not be able to lock everyone out.
+- They are per instance and in memory, so N instances allow N times the rate. That is accepted. Abuse limits that must hold globally are the Postgres-backed OTP caps (01 §2), and in W5 Cloudflare rate-limiting rules sit in front of `api.todayz.in`.
+- The limiter stays off locally and in tests (contract fuzzing and the journeys would trip it). `internal/platform/ratelimit` tests cover it.

@@ -28,8 +28,8 @@ const (
 )
 
 // DefaultRules are deliberately high: they stop a runaway client or script,
-// never a person. TODO(lead): the plan gives no numbers for the generic
-// limits (02 §2.3); confirm or replace these before Wave 5.
+// never a person (D-242). Per client IP and per instance; global abuse limits
+// are the OTP caps in Postgres and, in W5, Cloudflare rules.
 var DefaultRules = map[string]Rule{
 	GroupAuth:   {PerMinute: 60, Burst: 60},
 	GroupMe:     {PerMinute: 600, Burst: 300},

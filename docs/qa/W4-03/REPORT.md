@@ -18,7 +18,7 @@ No critical findings. One high, a build-time-only dependency that is already acc
 | F1 | medium | No CSP on the customer, business and admin Pages apps. The API, the site and the share Function have one. Output encoding is in place, so this is defence in depth | scripts/deploy/pages.sh | **report-only shipped** by the lead (26 Oct): the policy below, plus `blob:` workers for MapLibre, `font-src` and `object-src 'none'`. Enforce it once prod shows no violations |
 | F2 | medium | `Permissions-Policy: microphone=()` on all Pages apps blocked getUserMedia audio, which broke customer voice search (C-23) and business voice in prod | scripts/deploy/pages.sh:39 | **fixed** by the lead: `microphone=(self)` |
 | F3 | medium (known) | The referral D-13 same-device rule trusts the deviceId the client sends at OTP verify, so a fresh id gets `pending`. Bounded by: one OTP-verified phone per account, OTP caps of 5 per phone and 20 per IP each hour, one claim per account, and no reward before a qualifying purchase | backend/internal/referrals/claim.go:118-135 | open, referrals owner. Proposal: a server-issued signed device id bound to the refresh family, plus a risk flag on claims per referrer per IP per 24 h. TestAbuseReferralFarmingHTTP pins `pending`; flip it when fixed |
-| F4 | low | The generic rate limiter is in-memory per instance, off locally and in tests, and its numbers are TODO(lead) | backend/cmd/todayz/security.go:62-69, backend/internal/platform/ratelimit/ratelimit.go:30-33 | open, lead |
+| F4 | low | The generic rate limiter is in-memory per instance, off locally and in tests, and its numbers are TODO(lead) | backend/cmd/todayz/security.go:62-69, backend/internal/platform/ratelimit/ratelimit.go:30-33 | **closed** by D-242: the numbers are confirmed as backstops, and per-instance limiting is accepted |
 | F5 | low (W5) | clientip trusts CF-Connecting-IP from any peer when deployed | backend/internal/platform/httpx/mw/clientip.go:16-42 | open, W5. Restrict the ALB security group to Cloudflare ranges, or use authenticated origin pulls |
 | F6 | low | POS offline `sold_at` has no bounds, so a sale can be back-dated into a closed day | backend/internal/pos/sync.go:408 | open, POS owner. Refuse or flag values older than changesKept or later than now plus skew |
 | F7 | low | The referral device check skips a session with no device row (TODO(lead)) | backend/internal/referrals/claim.go:125-126 | open, referrals owner |
@@ -106,7 +106,7 @@ The deeper scans of business, admin and the site were not run, for time. Their b
 ## Remaining
 
 1. ZAP: a full scan of business, admin and the site, and an API active scan on a bigger machine or in CI.
-2. Lead: F1 (CSP, report-only first), F4, F8 (product), D1 after 29 Oct.
+2. Lead: enforce the F1 CSP after prod shows no violations; F8 (product); D1 after 29 Oct.
 3. Referrals owner: F3, F7. POS owner: F6.
 4. W5: F5, TLS config, RDS TLS, subdomain takeover.
 5. Not verified here: AI cost quotas.
