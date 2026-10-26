@@ -80,13 +80,14 @@ test('E2E-09 month-end statement → finance marks the payout paid → the busin
   const utr = `W314${Date.now()}`.slice(0, 16);
   await test.step('finance marks it paid with the UTR (step-up)', async () => {
     await finance.stepUp();
-    const paid = await finance.api.ok<{ status: string; utr: string }>('finance marks the payout paid', 'POST', `/v1/admin/payouts/${payout.id}/mark-paid`, {
+    // mark-paid answers with the payout detail (AdminPayoutDetail: { payout, lines, causes, … }).
+    const { payout: paid } = await finance.api.ok<{ payout: { status: string; utr: string | null } }>('finance marks the payout paid', 'POST', `/v1/admin/payouts/${payout.id}/mark-paid`, {
       utr,
       amountPaise: payout.amountPaise,
       reason: 'W3-14 gate: paid by UPI',
     });
     expect(paid.status).toBe('paid');
-    expect(paid.utr.toUpperCase()).toBe(utr.toUpperCase());
+    expect(paid.utr?.toUpperCase()).toBe(utr.toUpperCase());
   });
 
   await test.step('the business statements read Paid with the UTR', async () => {
